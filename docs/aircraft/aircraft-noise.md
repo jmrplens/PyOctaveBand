@@ -61,7 +61,7 @@ integrates $\mathrm{PNLT}$ over the **10 dB-down** window (the records nearest
 to $\mathrm{PNLTM} - 10$ on each side) and normalises to 10 s:
 
 $$
-\mathrm{EPNL} = 10\log_{10}\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
+\mathrm{EPNL} = 10\log_{10}\!\Big(\sum_{k=k_\mathrm{F}}^{k_\mathrm{L}} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
 - 10\log_{10} T_0, \qquad T_0 = 10\ \mathrm{s},
 $$
 
@@ -186,7 +186,7 @@ needs the one-third-octave-band attenuation over the path. The pure-tone
 coefficient is the ISO 9613-1 one (identical, per ARP 5534 §3.1) already
 provided by `air_attenuation`; `sae_band_attenuation` adds the **SAE Method**
 (ARP 5534 §3.2.2), a regression that maps the pure-tone mid-band path-length
-attenuation $\delta_t = \alpha\,s$ to the band attenuation $\delta_B$ and stays
+attenuation $\delta_\mathrm{t} = \alpha\,s$ to the band attenuation $\delta_\mathrm{B}$ and stays
 consistent with the ISO/ANSI Exact Method well beyond the 50 dB limit of the
 older Approximate Method.
 
@@ -233,7 +233,7 @@ att.plot()                    # band vs pure-tone mid-band (needs matplotlib)
 ```
 
 `sae_band_attenuation` returns an `AircraftBandAttenuation` with `band_attenuation`
-($\delta_B$), `midband_attenuation` ($\delta_t = \alpha\,s$) and the pure-tone
+($\delta_\mathrm{B}$), `midband_attenuation` ($\delta_\mathrm{t} = \alpha\,s$) and the pure-tone
 `coefficient` ($\alpha$, dB/m). The SAE Method is valid roughly 6–32 °C and 20–95 % RH (the 14 CFR
 Part 36 test window), over path lengths to 7620 m, and is reciprocal
 (source↔receiver).

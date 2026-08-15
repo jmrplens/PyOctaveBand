@@ -530,7 +530,7 @@ refinement).
 
 That bound is a *phase* speed error. A pulse travels at the **group** speed,
 and differentiating the same dispersion relation gives
-$v_g/c = \cos\theta/\sqrt{1 - S^2\sin^2\theta}$ with $\theta = k\Delta x/2$,
+$v_\mathrm{g}/c = \cos\theta/\sqrt{1 - S^2\sin^2\theta}$ with $\theta = k\Delta x/2$,
 i.e. $1 - (1 - S^2)(k\,\Delta x)^2/8$ — the same law with 8 in place of 24,
 so a wavepacket arrives three times later than the phase rule suggests: 4.1 %
 at ten cells per wavelength, not 1.4 %. Being a speed error, it is paid per

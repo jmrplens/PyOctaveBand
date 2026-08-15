@@ -13,7 +13,7 @@ room, with the Sabine absorption area and the speed of sound ``c`` in m/s
 
 .. math::
 
-   L_p(\text{ST}) = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}}
+   L_p(\text{ST}) = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 L_{pi}}
    \right] \tag{Eq. 16}
 
    A = \frac{55.26}{c} \, \frac{V}{T_{60}}
@@ -32,9 +32,9 @@ clause 4 (23.0 C, 101.325 kPa, 50 %), per clause 9.1.4:
 
 .. math::
 
-   C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}
+   C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 5 \log_{10}\frac{273.15 + \theta}{314}
 
-   C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296}
+   C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 15 \log_{10}\frac{273.15 + \theta}{296}
 
 The **comparison method** replaces the absorption-area terms by a reference
 sound source (RSS) of known sound power ``LW(RSS)`` measured at the same
@@ -185,7 +185,7 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
 
     A non-finite or :math:`\le -273` degC temperature makes
     :math:`\sqrt{273 + \theta}` complex/zero, and a non-finite or non-positive
-    static pressure makes :math:`\log_{10}(p_s/p_{s0})` undefined; both are rejected
+    static pressure makes :math:`\log_{10}(p_\mathrm{s}/p_{\mathrm{s}0})` undefined; both are rejected
     with a clean ``ValueError``."""
     if not np.isfinite(temperature) or temperature <= -273.0:
         raise ValueError(

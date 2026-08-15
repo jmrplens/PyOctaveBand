@@ -302,7 +302,7 @@ up to 12 kHz.
 Two practical notes from the paper are built in: the recording mean is
 subtracted by default (`remove_dc=True`; a DC offset otherwise leaks a
 scaled inverse filter into the impulse response), and the non-integer part
-of each arrival $L\ln(n) f_s$ is removed in the frequency domain, so the
+of each arrival $L\ln(n) f_\mathrm{s}$ is removed in the frequency domain, so the
 harmonic phases carry no residual sub-sample skew.
 
 ## 3. Analysing classical exponential-sweep (ESS) recordings (`method="farina"`)
@@ -373,7 +373,7 @@ govern **both** methods.
   (`ir_length`, default the largest power of two that fits, capped at 8192
   samples) must not exceed it. Lengthen the sweep or lower `n_harmonics` for a
   reverberant system whose tail needs a longer window.
-- **The Nyquist ceiling.** Keep $N f_2$ below $f_s/2$: distortion products above
+- **The Nyquist ceiling.** Keep $N f_2$ below $f_\mathrm{s}/2$: distortion products above
   it fold back in any real recording and are then counted at the wrong
   frequency.
 - **The amplitude reference.** The analysis is referenced to the excitation

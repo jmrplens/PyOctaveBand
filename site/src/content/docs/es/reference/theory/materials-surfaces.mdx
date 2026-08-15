@@ -109,7 +109,7 @@ dispersión y bajo en coeficiente de difusión normalizado, porque redirigir no 
 repartir (Cox & D'Antonio 3.ª ed., §5.1 y Fig. 5.2). También difieren las
 condiciones de medida: la Parte 1 es un método de cámara reverberante a
 incidencia aleatoria, restringido a muestras poco profundas y que absorban poco
-($\alpha_s \le 0{,}50$, apartado 6.3.4), y la Parte 2 un método de campo libre
+($\alpha_\mathrm{s} \le 0{,}50$, apartado 6.3.4), y la Parte 2 un método de campo libre
 sin ninguna de las dos restricciones, así que una superficie puede tener
 legítimamente publicado solo uno de los dos coeficientes.
 
@@ -128,14 +128,14 @@ otra dispersa; el coeficiente de dispersión $s$ es la fracción de energía no
 especular. ISO 17497-1:2004+A1:2014 lo mide en una cámara reverberante con la
 muestra sobre una mesa giratoria: cuatro tiempos de reverberación, con la
 mesa parada y girando, cada uno sin y con la muestra (Tabla 2), dan la
-absorción a incidencia aleatoria $\alpha_s$ (apartado 8.1.1, Fórmula 1) y la
-absorción *especular* $\alpha_{spec}$ (apartado 8.1.2, Fórmula 4). La
+absorción a incidencia aleatoria $\alpha_\mathrm{s}$ (apartado 8.1.1, Fórmula 1) y la
+absorción *especular* $\alpha_\mathrm{spec}$ (apartado 8.1.2, Fórmula 4). La
 rotación decorrelaciona las reflexiones dispersas entre decaimientos, de modo
 que se promedian y se registran como «absorción» extra, y el coeficiente de
 dispersión se sigue (apartado 8.1.3, Fórmula 5):
 
 $$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s},
+s = \frac{\alpha_\mathrm{spec} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}},
 $$
 
 siendo cada $\alpha$ una diferencia de Sabine entre dos condiciones,
@@ -217,11 +217,11 @@ $$
 
 1 para una respuesta perfectamente uniforme y tendiendo a 0 para un único
 lóbulo especular; la Fórmula 6 es la forma ponderada por área con
-$N_i = A_i / A_{min}$ a partir de los factores de ángulo sólido de la
+$N_i = A_i / A_\mathrm{min}$ a partir de los factores de ángulo sólido de la
 Fórmula 8 ($A_i = (4\pi/\Delta\phi) \sin^2(\Delta\theta/4)$ en el cénit).
 Normalizar frente a un reflector plano de referencia del mismo tamaño elimina
 la difracción de borde (apartado 8.2, Fórmula 7):
-$d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. El valor a
+$d_{\theta,\mathrm{n}} = (d_\theta - d_{\theta,\mathrm{r}})/(1 - d_{\theta,\mathrm{r}})$. El valor a
 incidencia aleatoria promedia sobre las posiciones de fuente: en una medida de
 contorno bidimensional las fuentes preferentes se sitúan a 0°, ±30° y ±60° de
 la normal de referencia (apartado 6.2.2) y se promedian con pesos 1:3:3:3:3,
@@ -245,7 +245,7 @@ Valores de referencia: el arco de 37 receptores predicho
 por el modelo para el QRD $N = 7$ publicado de seis periodos (Cox & D'Antonio
 3.ª ed., Apéndice B; Hargreaves et al. 2000, Tabla I) a 1000 Hz da
 $d_\theta = 0{,}1099$, su referencia plana $0{,}0049$ y
-$d_{\theta,n} = 0{,}1055$; las predicciones del modelo promediadas por banda
+$d_{\theta,\mathrm{n}} = 0{,}1055$; las predicciones del modelo promediadas por banda
 coinciden con la difusión normalizada BEM publicada del Apéndice B en las
 bandas de 200-400 Hz dentro de 0,01 (anclaje de baja frecuencia: la
 desviación absoluta media en banda ancha 100-5000 Hz ronda 0,09); factor de
@@ -265,11 +265,11 @@ un flanco de subida abrupto, una meseta obligatoria de 5 ms y un flanco de
 bajada Blackman-Harris), y
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_r(f)}{H_i(f)} \right|^2,
-\qquad K_r = \frac{d_s - d_m}{d_s + d_m} = \frac{2}{3}
+\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
+\qquad K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
 $$
 
-para la geometría obligatoria $d_s = 1{,}25$ m, $d_m = 0{,}25$ m
+para la geometría obligatoria $d_\mathrm{s} = 1{,}25$ m, $d_\mathrm{m} = 0{,}25$ m
 (apartado 4.2, Anexo C); $K_r$ es el cociente de expansión esférica entre el
 camino directo y el de la imagen. Referenciar la medición del pavimento a otra
 sobre una superficie muy reflectante cancela toda la cadena electroacústica
@@ -288,8 +288,8 @@ de la boca del tubo. Remite las matemáticas al método de función de
 transferencia de
 ISO 10534-2 de más abajo (sus apartados 4/5.7/6.6); la implementación
 reutiliza ese módulo, añadiendo la geometría y los límites de validez de la
-Parte 2 ($f_u = 0{,}58\ c_0/d$; cotas de separación de micrófonos
-$0{,}45\ c_0/f_{max}$ y $0{,}05\ c_0/f_{min}$, apartado 5.4) y la corrección
+Parte 2 ($f_\mathrm{u} = 0{,}58\ c_0/d$; cotas de separación de micrófonos
+$0{,}45\ c_0/f_\mathrm{max}$ y $0{,}05\ c_0/f_{min}$, apartado 5.4) y la corrección
 sustractiva del Anexo A por pérdidas internas del sistema.
 
 Consulta la [guía de absorción in situ de
@@ -300,22 +300,22 @@ pavimentos](/phonometry/es/materials/surfaces/road-absorption/) para su uso.
 ### Absorción acústica ponderada (ISO 11654)
 
 ISO 11654:1997 condensa una curva de absorción en tercios de octava de ISO 354
-en un solo número. El coeficiente práctico $\alpha_p$ promedia los tres
+en un solo número. El coeficiente práctico $\alpha_\mathrm{p}$ promedia los tres
 tercios de cada octava de 250 Hz a 4 kHz y redondea a pasos de 0,05
 (apartado 4.1). La curva de referencia (0,80, 1,00, 1,00, 1,00, 0,90 en
 250–4000 Hz) se desplaza después hacia abajo en pasos de 0,05 hasta que la
 suma de desviaciones desfavorables, contadas solo donde la medición queda
-*por debajo* de la curva desplazada, es $\le 0{,}10$; $\alpha_w$ es la curva
+*por debajo* de la curva desplazada, es $\le 0{,}10$; $\alpha_\mathrm{w}$ es la curva
 desplazada a 500 Hz (apartado 4.2). Un indicador de forma señala el exceso de
 absorción $\ge 0{,}25$ sobre la curva desplazada: L a 250 Hz, M a
 500/1000 Hz, H a 2000/4000 Hz (apartado 4.3), y el Anexo B informativo asigna
-$\alpha_w$ a las clases de absorción A–E. Como toda magnitud es múltiplo de
+$\alpha_\mathrm{w}$ a las clases de absorción A–E. Como toda magnitud es múltiplo de
 0,05, la implementación hace toda la aritmética de la malla en veinteavos
 enteros, dejando la búsqueda del desplazamiento y las fronteras de clase
 exactas y a salvo del punto flotante. Los dos ejemplos resueltos del Anexo A
-se reproducen: $\alpha_p = (0{,}35, 0{,}70, 0{,}65, 0{,}60, 0{,}55)$ →
-$\alpha_w = 0{,}60$, clase C; y subir 500 Hz a 1,00 mantiene
-$\alpha_w = 0{,}60$ pero añade el indicador, «0,60(M)».
+se reproducen: $\alpha_\mathrm{p} = (0{,}35, 0{,}70, 0{,}65, 0{,}60, 0{,}55)$ →
+$\alpha_\mathrm{w} = 0{,}60$, clase C; y subir 500 Hz a 1,00 mantiene
+$\alpha_\mathrm{w} = 0{,}60$ pero añade el indicador, «0,60(M)».
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_es.svg" alt="Valoración ponderada de absorción acústica de ISO 11654: el espectro de absorción práctica trazado frente a la curva de referencia desplazada de 250 Hz a 4000 Hz, con la desviación desfavorable a 250 Hz sombreada y el coeficiente ponderado alpha_w leído a 500 Hz" width="80%" />
 
@@ -330,7 +330,7 @@ de un absorbente poroso: las regresiones de Delany-Bazley y de Miki predicen la
 impedancia y el número de onda complejos de un material a partir de $\sigma$ a
 solas, y el modelo de Johnson-Champoux-Allard la toma como el primero de sus
 cinco parámetros. Lo que gobierna la absorción, en cambio, es la resistencia de
-la **capa entera**, $R_s = \sigma d$, frente a la impedancia característica del
+la **capa entera**, $R_\mathrm{s} = \sigma d$, frente a la impedancia característica del
 aire: una capa con fondo rígido funciona mejor con
 $\rho_0 c_0 \lesssim \sigma d \lesssim 4 \rho_0 c_0$, así que una manta de
 50 mm quiere entre unos 8 y 33 kPa·s/m², que es donde se agrupan los
@@ -347,7 +347,7 @@ dibuja la ventana y da los rangos por material.
 
 ISO 9053-1:2018 (método estático) hace pasar un flujo
 estacionario por la muestra y ajusta $\Delta p = a\,u + b\,u^2$ por el origen
-(apartado 7.5); como $R_s = \Delta p / u = a + b\,u$, el coeficiente lineal es
+(apartado 7.5); como $R_\mathrm{s} = \Delta p / u = a + b\,u$, el coeficiente lineal es
 la resistencia específica a velocidad nula, informada a la velocidad de
 referencia $u = 0{,}5$ mm/s.
 
@@ -365,7 +365,7 @@ caudalímetro por un pistón a ~2 Hz y un micrófono en una cavidad cerrada
 (apartado 8.7, Fórmula 2):
 
 $$
-R = \kappa'\ \frac{p_s}{2 \pi f V}\ \frac{h_t}{h_s}\ 10^{(L_{ps} - L_{pt})/20}
+R = \kappa'\ \frac{p_\mathrm{s}}{2 \pi f V}\ \frac{h_\mathrm{t}}{h_\mathrm{s}}\ 10^{(L_{ps} - L_{p\mathrm{t}})/20}
 $$
 
 Solo entra una *diferencia* de niveles, así que el equipo de medición sonora
@@ -395,11 +395,11 @@ plenamente observable. ISO 10534-2:1998 (método de función de transferencia; l
 numeración de apartados y de ecuaciones que se cita aquí es la de esa edición, e
 ISO 10534-2:2023 la renumera)
 compara la función de transferencia medida entre dos micrófonos $H_{12}$ con
-las analíticas incidente y reflejada $H_I = e^{-j k_0 s}$,
-$H_R = e^{+j k_0 s}$ (Anexo D) para dar (apartado 7, Ec. 17):
+las analíticas incidente y reflejada $H_\mathrm{I} = e^{-j k_0 s}$,
+$H_\mathrm{R} = e^{+j k_0 s}$ (Anexo D) para dar (apartado 7, Ec. 17):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\ e^{2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\ e^{2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1 + r}{1 - r},
 $$
 
@@ -412,7 +412,7 @@ el desajuste de amplitud y, mucho peor, el de fase de los dos canales
 exige una de dos correcciones antes de evaluar nada de lo anterior: intercambiar
 los dos micrófonos en cada medida de probeta y combinar las dos funciones de
 transferencia (7.5.1, Ec. 8), o medir una sola vez un factor de calibración
-$H_c$ como la media geométrica del par intercambiado sobre una probeta
+$H_\mathrm{c}$ como la media geométrica del par intercambiado sobre una probeta
 absorbente y dividir por él cada medida posterior (7.5.2, Ecs. 10 y 13), que es
 la vía que implementan `mic_calibration_factor` y `apply_mic_calibration`.
 Importa más de lo que parece: el método infiere un factor de reflexión complejo

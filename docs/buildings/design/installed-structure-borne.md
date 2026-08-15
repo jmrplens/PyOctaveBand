@@ -6,17 +6,17 @@
 by building service equipment (pumps, fans, lifts, water installations) that
 injects **structure-borne sound** into the building. It closes the
 structural-vibroacoustics chain: the source is described by its characteristic
-structure-borne sound power level $L_{Ws,c}$, derived from the EN 15657
+structure-borne sound power level $L_{W\mathrm{s,c}}$, derived from the EN 15657
 reception-plate measurement through the Formula (15)/(17) conversion and a
 mobility correction (**not** the raw plate-injected level;
 see [EN 15657](structure-borne-power.md)); the source and receiver point
 mobilities set how much power is actually coupled into the structure, and the
 building transmission carries it to the receiving room. The Annex I mobility
 correction `installed_power_from_reception_plate` refers the characteristic
-reception-plate level $L_{Ws,n}$ to the actual receiver,
-$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+reception-plate level $L_{W\mathrm{s,n}}$ to the actual receiver,
+$L_{W\mathrm{s,inst}} = L_{W\mathrm{s,n}} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
 with $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
-with the source mobility instead it yields $L_{Ws,c}$ (Annex I.3, Table I.8).
+with the source mobility instead it yields $L_{W\mathrm{s,c}}$ (Annex I.3, Table I.8).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne.svg" alt="The EN 12354-5 cascade per octave band: the characteristic structure-borne power level, the installed power level after subtracting the coupling term, the per-path normalised sound pressure levels, and their energetic total" width="82%"></picture>
 
@@ -52,30 +52,30 @@ plt.show()
 ## 1. Coupling and installed power
 
 Only part of the characteristic power is injected into the supporting element;
-the loss is the **coupling term** $D_C$, positive whenever the two mobilities
-are well mismatched, set for a point excitation by the source mobility $Y_s$
+the loss is the **coupling term** $D_\mathrm{C}$, positive whenever the two mobilities
+are well mismatched, set for a point excitation by the source mobility $Y_\mathrm{s}$
 and the receiver mobility $Y_i$ (Formula 19b):
 
 $$
-D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
+D_{\mathrm{C},i} = 10\log_{10}\frac{|Y_\mathrm{s} + Y_i|^2}{|Y_\mathrm{s}|\,\mathrm{Re}\{Y_i\}},
 $$
 
-which reduces to $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
-mobility, Formula 19c) and to $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
+which reduces to $10\log_{10}(|Y_\mathrm{s}|/\mathrm{Re}\{Y_i\})$ for a **force source** (high source
+mobility, Formula 19c) and to $-10\log_{10}(|Y_\mathrm{s}|\,\mathrm{Re}\{Z_i\})$ for a **velocity source**
 (low source mobility, Formula 19d); an elastic support adds its transfer
 mobility $Y_k$ inside the modulus (Formula 19e). The **installed** power level is
-then (Formula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+then (Formula 18b) $L_{W\mathrm{s,inst}} = L_{W\mathrm{s,c}} - D_\mathrm{C}$.
 
-The physics behind $D_C$ is the classical power input of a point-excited
+The physics behind $D_\mathrm{C}$ is the classical power input of a point-excited
 plate: only the real part of the receiver's driving-point mobility absorbs
-power, and the mismatch between $Y_s$ and $Y_i$ decides how much of the
+power, and the mismatch between $Y_\mathrm{s}$ and $Y_i$ decides how much of the
 source's capability ever enters the structure (Hopkins 2007, Section 2.8).
 The mobilities themselves come from the
 [mechanical-mobility chain](../../vibration/structural/mechanical-mobility.md): measured per ISO 7626,
 or from the infinite-plate closed forms of
 [panel theory](panel-sound-insulation.md) when no measurement exists. A pump
 on a concrete slab is the textbook force source: its casing mobility is
-orders of magnitude above the slab's, so $D_C$ collapses to Formula 19c and
+orders of magnitude above the slab's, so $D_\mathrm{C}$ collapses to Formula 19c and
 the injected power no longer depends on the receiver at all.
 
 ```python
@@ -90,9 +90,9 @@ print(round(float(building.installed_structure_borne_power_level(82.0, dc)), 1))
 Nothing measures the source mobility of a boiler, so clause D.1.3 builds it out
 of the machine's own parts and Table D.1 gives the six closed forms it uses.
 `typical_element_mobility` is that table: the rows are `"mass"`
-$[2\pi f M]^{-1}$, `"bar_end"` $[\rho c_L S]^{-1}$, `"beam"`
-$[7{,}6\,\rho t w\sqrt{c_L t f}]^{-1}$, `"plate"` $[2{,}3\,c_L\rho t^2]^{-1}$,
-`"pipe"` $[63\,\rho t r\sqrt{c_L r f}]^{-1}$ and `"mass_spring"`
+$[2\pi f M]^{-1}$, `"bar_end"` $[\rho c_\mathrm{L} S]^{-1}$, `"beam"`
+$[7{,}6\,\rho t w\sqrt{c_\mathrm{L} t f}]^{-1}$, `"plate"` $[2{,}3\,c_\mathrm{L}\rho t^2]^{-1}$,
+`"pipe"` $[63\,\rho t r\sqrt{c_\mathrm{L} r f}]^{-1}$ and `"mass_spring"`
 $\left[\left(\frac{2\pi f\eta}{s(1+\eta^2)}\right)^2 + \left(\frac{2\pi f}{s(1+\eta^2)} - \frac{1}{2\pi f M}\right)^2\right]^{1/2}$,
 each in m/N.s. `TABLE_D1_QUANTITIES` is the table's "describing quantities"
 column, and only those may be passed; the four rows whose expression contains
@@ -122,21 +122,21 @@ its own adjustment term and flanking index:
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_installed_paths.svg" alt="EN 12354-5 installation paths: a pump on resilient mounts injects structure-borne power into the floor slab, the excited floor radiates into the receiving room below, a second path travels along the slab into the flanking wall, and the prediction cascade runs from the characteristic power to the normalised sound pressure level" width="92%"></picture>
 
 Each transmission path $i \to j$ gives a normalised sound pressure level from the
-installed power, the structure-to-airborne adjustment term $D_{sa}$, the flanking
+installed power, the structure-to-airborne adjustment term $D_\mathrm{sa}$, the flanking
 sound reduction index $R_{ij,\mathrm{ref}}$ (EN 12354-1) and the element area
 (Formula 18a):
 
 $$
-L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
+L_{\mathrm{n,s},ij} = L_{W\mathrm{s,inst},i} - D_{\mathrm{sa},i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
 with $S_0 = A_0 = 10\ \text{m}^2$, and the paths combine energetically (Formula 17).
 
-$D_{sa}$ is normally **negative** — the standard's own Annex I columns run from
+$D_\mathrm{sa}$ is normally **negative** — the standard's own Annex I columns run from
 about $-14$ dB at 63 Hz to $-45$ dB at 2 kHz — and Formula (18a) subtracts it,
 so a negative value *raises* the predicted level. Annex F.2 gives the working
-form $D_{sa,i} = 10\log_{10}(400 f_{c,i}\sigma_i / m_i f^2)$, which is
+form $D_{\mathrm{sa},i} = 10\log_{10}(400 f_{\mathrm{c},i}\sigma_i / m_i f^2)$, which is
 `structure_to_airborne_adjustment`; passing a positive number in its place
 leaves the prediction 20 to 40 dB low with no error raised.
 
@@ -179,7 +179,7 @@ machine, in octave bands from 31,5 Hz to 4 kHz: 139, 142, 145, 148, 151, 154,
 `tapping_machine_force_level_estimate` the closed form printed beside the table
 (valid only up to about 1000 Hz, and the only route to one-third-octave values),
 and `tapping_machine_characteristic_power_level` /
-`tapping_machine_coupling_term` turn them into the $L_{Ws,c}$ and $D_C$ of
+`tapping_machine_coupling_term` turn them into the $L_{W\mathrm{s,c}}$ and $D_\mathrm{C}$ of
 Formulae (D.9a) and (D.9b). The table's levels are re $10^{-6}$ N despite the
 "re 1 pN" its caption prints; see [the errata register](../../ERRATA.md).
 
@@ -202,18 +202,18 @@ one-page PDF fiche, clearly labelled a prediction and not a measurement: a
 prediction-basis line naming EN 12354-5:2009, an optional metadata header
 (client, source equipment, receiving room, instrumentation, climate, date), a
 per-band table (nominal octave/one-third-octave frequency, the installed
-structure-borne power level $L_{Ws,\mathrm{inst}}$, each transmission path's
+structure-borne power level $L_{W\mathrm{s,inst}}$, each transmission path's
 normalised SPL
-$L_{n,s,ij}$ and the combined total $L_{n,s}$), the per-path and total
-$L_{n,s}(f)$
-spectra, and a boxed band-summed total $L_{n,s}$ (dB) with the installed power
+$L_{\mathrm{n,s},ij}$ and the combined total $L_\mathrm{n,s}$), the per-path and total
+$L_\mathrm{n,s}(f)$
+spectra, and a boxed band-summed total $L_\mathrm{n,s}$ (dB) with the installed power
 total and the path count.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the source
 equipment), `test_room` (the receiving room), `instrumentation` and the footer
 identity `laboratory`, `operator`, `report_id` and `notes`. Supplying
 `requirement` adds a PASS/FAIL verdict against a declared upper limit on the
-overall $L_{n,s}$ (lower is better). `verbose=True` adds one column per
+overall $L_\mathrm{n,s}$ (lower is better). `verbose=True` adds one column per
 transmission path (up to five); otherwise only the installed power and the
 combined total are shown. `language="es"` renders the Spanish fiche. The basis
 strip states Formulae 18a/17 and the prediction disclaimer. Rendering needs the
@@ -259,10 +259,10 @@ room.*
 ## See also
 
 - [Structure-borne sound power of equipment (EN 15657)](structure-borne-power.md):
-  the reception-plate characterisation that supplies $L_{Ws,c}$ and the source
+  the reception-plate characterisation that supplies $L_{W\mathrm{s,c}}$ and the source
   mobility this prediction consumes.
 - [Mechanical mobility and the FRF family (ISO 7626-1)](../../vibration/structural/mechanical-mobility.md):
-  the measured $Y_s$ and $Y_i$ behind the coupling term.
+  the measured $Y_\mathrm{s}$ and $Y_i$ behind the coupling term.
 - [Bending-wave transmission at plate junctions](../../vibration/structural/junction-transmission.md):
   the junction physics that carries the installed power to the flanking
   radiators.

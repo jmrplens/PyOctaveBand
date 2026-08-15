@@ -184,7 +184,7 @@ enventanado es la misma que la de
 El **pistón circular rígido en pantalla infinita** es el radiador canónico tras
 un cono de altavoz, el extremo abierto de un conducto y la eficiencia de
 radiación de cualquier superficie vibrante finita (Beranek y Mellow §4.19,
-§13.7). Su impedancia mecánica de radiación es $Z_r = \rho c S\,(R_1 + jX_1)$ con
+§13.7). Su impedancia mecánica de radiación es $Z_\mathrm{r} = \rho c S\,(R_1 + jX_1)$ con
 $S = \pi a^2$ y las funciones adimensionales de resistencia y reactancia
 (Ecs. (13.117), (13.118))
 
@@ -195,7 +195,7 @@ $$
 
 donde $J_1$ es la función de Bessel y $H_1$ la de Struve de orden uno. A baja
 frecuencia $R_1 \to (ka)^2/2$ y la reactancia es de tipo másico con la **masa de
-radiación** $M_r = 8\rho a^3/3$ (Ec. (4.151)); a alta frecuencia $R_1 \to 1$,
+radiación** $M_\mathrm{r} = 8\rho a^3/3$ (Ec. (4.151)); a alta frecuencia $R_1 \to 1$,
 $X_1 \to 0$ y el pistón radia como en un tubo infinito. El campo lejano sigue la
 directividad $D(\theta) = 2 J_1(ka\sin\theta)/(ka\sin\theta)$, cuyo primer nulo
 está en $ka\sin\theta = 3{,}8317$.
@@ -598,7 +598,7 @@ variante de respuesta en frecuencia a intervalos de 15°.
 El **índice de directividad** que imprime la ficha tiene dos vías admisibles
 (23.3.2). O bien se mide el nivel en el eje a 1 m en campo libre y el nivel del
 mismo altavoz en una cámara reverberante, y se corrige:
-$D_i = L_{ax} - L_p + 10\lg(T/T_0) - 10\lg(V/V_0) + 25$ dB, con $T_0 = 1$ s y
+$D_\mathrm{i} = L_\mathrm{ax} - L_p + 10\lg(T/T_0) - 10\lg(V/V_0) + 25$ dB, con $T_0 = 1$ s y
 $V_0 = 1\ \mathrm{m^3}$; o bien se integran sobre la esfera las presiones al
 cuadrado de estas curvas polares. `LoudspeakerDirectivity` acepta o un `index_db`
 ya calculado, o los datos polares que necesita la segunda vía.
@@ -652,24 +652,24 @@ ecs. (18.13) a (18.24)) escribe ese lazo con dos ganancias en decibelios. La
 hablante,
 
 $$
-Z_S = L_{H\text{-}L} - L_{T\text{-}M},
+Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}},
 $$
 
 el nivel que el altavoz produce en un oyente medio menos el que el hablante
-produce en el micrófono; $Z_S = -6$ dB, típico de un auditorio o una iglesia,
+produce en el micrófono; $Z_\mathrm{S} = -6$ dB, típico de un auditorio o una iglesia,
 significa un nivel de conversación cómodo al doble de la distancia
 hablante-micrófono. La **ganancia del lazo de realimentación** es la parte de
 la salida que vuelve,
 
 $$
-G_S = L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta),
+G_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{M}} - L_{\mathrm{H}\text{-}\mathrm{L}} + D_\mathrm{M}(\theta),
 $$
 
-con $D_M(\theta)$ el índice de directividad del micrófono hacia el altavoz
+con $D_\mathrm{M}(\theta)$ el índice de directividad del micrófono hacia el altavoz
 *respecto al* hablante: cero para un micrófono omnidireccional, unos $-2$ a
 $-3$ dB para un cardioide apuntado al hablante. Al sumar la serie infinita de
 idas y vueltas, el sistema oscila cuando la ganancia del lazo alcanza la
-unidad, es decir $Z_S + G_S = 0$ (ec. (18.16)).
+unidad, es decir $Z_\mathrm{S} + G_\mathrm{S} = 0$ (ec. (18.16)).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_es.svg" alt="Esquema del lazo de realimentación de un sistema de refuerzo sonoro: el hablante a 0,3 metros del micrófono, el altavoz colgado a 4 metros del micrófono y a 12 metros del oyente medio, con el camino de la señal en trazo continuo y el de realimentación discontinuo" width="85%" />
 
@@ -683,10 +683,10 @@ Un sistema utilizable necesita margen por debajo de ese umbral. Long adopta
 fase con una reflexión en una superficie dura y los 4 dB restantes son
 seguridad. Con varios micrófonos abiertos a la vez las señales devueltas se
 suman en la mesa, lo que recoge la corrección por **número de micrófonos
-abiertos** $\Delta L_\text{nom} = 10\log_{10} N_m$ (ec. (18.23)). El criterio queda
+abiertos** $\Delta L_\text{nom} = 10\log_{10} N_\mathrm{m}$ (ec. (18.23)). El criterio queda
 
 $$
-Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10.
+Z_\mathrm{S} + L_{\mathrm{H}\text{-}\mathrm{M}} + \Delta L_\text{nom} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 10.
 $$
 
 ```python
@@ -724,7 +724,7 @@ copias es todo el argumento.
 />
 
 *Tres ejecuciones del mismo auditorio, todas salidas de `feedback_stability`
-con $L_{H\text{-}M} = 76$ dB y $L_{H\text{-}L} = 80$ dB. Las ganancias de lazo
+con $L_{\mathrm{H}\text{-}\mathrm{M}} = 76$ dB y $L_{\mathrm{H}\text{-}\mathrm{L}} = 80$ dB. Las ganancias de lazo
 son $-10{,}0$, $-3{,}98$ y $+0{,}02$ dB, así que cada vuelta multiplica a la
 anterior por 0,316, 0,632 y 1,002; las dos primeras sumas convergen a
 $1/(1-g)$ y la tercera no converge en absoluto. Por eso la ganancia antes de
@@ -763,21 +763,21 @@ plt.show()
 El criterio consume tres niveles y un índice de directividad, y los cuatro son
 mediciones, no suposiciones. Tómalos en este orden.
 
-1. **Ajusta el sistema una vez y no lo toques.** $L_{H\text{-}M}$ y
-   $L_{H\text{-}L}$ son un *par* leído con un mismo ajuste de ganancia sin
+1. **Ajusta el sistema una vez y no lo toques.** $L_{\mathrm{H}\text{-}\mathrm{M}}$ y
+   $L_{\mathrm{H}\text{-}\mathrm{L}}$ son un *par* leído con un mismo ajuste de ganancia sin
    mover, así que solo importa su diferencia y basta con una lectura relativa,
    pero el ajuste no puede cambiar entre una y otra.
 2. **Excita con ruido rosa** y lee el nivel en la posición del micrófono con el
    micrófono físicamente en su sitio y su orientación de trabajo: su presencia y
-   hacia dónde apunta forman parte del lazo. Eso es $L_{H\text{-}M}$. Acercar o
+   hacia dónde apunta forman parte del lazo. Eso es $L_{\mathrm{H}\text{-}\mathrm{M}}$. Acercar o
    alejar la cápsula 0,3 m del altavoz lo cambia en varios decibelios, y es el
    arreglo más barato que hay cuando el criterio no se cumple.
-3. **Lee $L_{H\text{-}L}$** con el mismo ajuste, promediado sobre tres a cinco
+3. **Lee $L_{\mathrm{H}\text{-}\mathrm{L}}$** con el mismo ajuste, promediado sobre tres a cinco
    butacas representativas.
-4. **Mide $L_{T\text{-}M}$** con un hablante o una boca artificial a la
+4. **Mide $L_{\mathrm{T}\text{-}\mathrm{M}}$** con un hablante o una boca artificial a la
    distancia de hablante de diseño; eso fija
-   $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$.
-5. **Lee $D_M(\theta)$** en los propios datos polares del micrófono, en la
+   $Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}$.
+5. **Lee $D_\mathrm{M}(\theta)$** en los propios datos polares del micrófono, en la
    dirección en que queda el altavoz *respecto al* hablante — véase la
    [familia de patrones](/phonometry/es/devices/electroacoustics/microphones/#patron-direccional)
    —, en vez de suponerlo. Vale cero para una cápsula omnidireccional apunte a
@@ -790,17 +790,17 @@ del conjunto sala más sistema que los 10 dB existen para cubrir, y el ring-out
 es lo que confirma sobre el terreno la aritmética de arriba.
 
 Esos dos casos particulares son los del propio Long (ecs. (18.21) y (18.22)):
-con $Z_S = -6$ dB el criterio se reduce a
-$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, de modo que un micrófono
+con $Z_\mathrm{S} = -6$ dB el criterio se reduce a
+$L_{\mathrm{H}\text{-}\mathrm{M}} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 4$, de modo que un micrófono
 omnidireccional debe ver el altavoz 4 dB por debajo del nivel medio en el
 público, mientras que un cardioide puede dejarlo subir hasta 2 dB por debajo.
 
 :::caution
 **Un desliz de signo en la ecuación impresa.** Long imprime la ec. (18.24) con
-$+D_M(\theta)$ en el segundo miembro donde las ecs. (18.20) a (18.22) exigen
-$-D_M(\theta)$, lo que convertiría la ventaja de un micrófono direccional en una
+$+D_\mathrm{M}(\theta)$ en el segundo miembro donde las ecs. (18.20) a (18.22) exigen
+$-D_\mathrm{M}(\theta)$, lo que convertiría la ventaja de un micrófono direccional en una
 penalización. `feedback_stability` implementa el signo de la ec. (18.20), de
-modo que con $N_m = 1$ reproduce exactamente los casos particulares del propio
+modo que con $N_\mathrm{m} = 1$ reproduce exactamente los casos particulares del propio
 Long. El defecto queda recogido en el
 [registro de erratas](/phonometry/es/reference/errata/).
 :::
@@ -809,11 +809,11 @@ Long. El defecto queda recogido en el
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finito | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; unos -6 dB en un auditorio |
-| `level_loudspeaker_at_microphone` | float | dB | finito | $L_{H\text{-}M}$ |
-| `level_loudspeaker_at_listener` | float | dB | finito | $L_{H\text{-}L}$ |
-| `microphone_directivity` | float | dB | por defecto 0 | $D_M(\theta)$, 0 omni, unos -2 cardioide |
-| `open_microphones` | int | — | ≥ 1, por defecto 1 | $N_m$ |
+| `open_loop_gain` | float | dB | finito | $Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}$; unos -6 dB en un auditorio |
+| `level_loudspeaker_at_microphone` | float | dB | finito | $L_{\mathrm{H}\text{-}\mathrm{M}}$ |
+| `level_loudspeaker_at_listener` | float | dB | finito | $L_{\mathrm{H}\text{-}\mathrm{L}}$ |
+| `microphone_directivity` | float | dB | por defecto 0 | $D_\mathrm{M}(\theta)$, 0 omni, unos -2 cardioide |
+| `open_microphones` | int | — | ≥ 1, por defecto 1 | $N_\mathrm{m}$ |
 | `stability_margin` | float | dB | ≥ 0, por defecto 10 | Margen de Long para sistema ecualizado |
 
 Devuelve un `FeedbackStabilityResult` (`open_loop_gain`,

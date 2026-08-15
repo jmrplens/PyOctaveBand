@@ -27,10 +27,10 @@ Procedures* (4th ed., 2010):
   :math:`n \hat{G}_{xx}/\chi^2_{n;\alpha/2} \le G_{xx} \le
   n \hat{G}_{xx}/\chi^2_{n;1-\alpha/2}` (Eq. 8.163);
 * the **first-order resolution-bias error**:
-  :math:`b[\hat{G}_{xx}] \approx (B_e^2/24) \, G''_{xx}`
+  :math:`b[\hat{G}_{xx}] \approx (B_\mathrm{e}^2/24) \, G''_{xx}`
   (Eq. 8.139), which for a resonance peak of half-power bandwidth
-  :math:`B_r`
-  becomes :math:`\varepsilon_b \approx -(B_e/B_r)^2/3` (Eq. 8.141) -
+  :math:`B_\mathrm{r}`
+  becomes :math:`\varepsilon_\mathrm{b} \approx -(B_\mathrm{e}/B_\mathrm{r})^2/3` (Eq. 8.141) -
   exposed here as
   :func:`resolution_bias_error`;
 * the **coherent output spectrum**
@@ -245,9 +245,9 @@ def _segment_statistics(
       this reduces to :math:`n_d = k` exactly.
     * ``resolution_bandwidth`` - the effective noise bandwidth of the
       tapered segment,
-      :math:`B_e = f_s \sum w^2 / \left( \sum w \right)^2`, the
+      :math:`B_\mathrm{e} = f_\mathrm{s} \sum w^2 / \left( \sum w \right)^2`, the
       tapered-window analog
-      of Bendat & Piersol's :math:`B_e \approx 1/T` (Eq. 8.160).
+      of Bendat & Piersol's :math:`B_\mathrm{e} \approx 1/T` (Eq. 8.160).
     """
     from scipy import signal as sp_signal
 
@@ -370,7 +370,7 @@ class SpectralDensityResult:
     :ivar degrees_of_freedom: Chi-square degrees of freedom
         :math:`n = 2 n_d` of
         the interior bins (Eq. 8.162; :math:`n_d` at DC/Nyquist).
-    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e` of
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_\mathrm{e}` of
         the tapered segment, in Hz (drives the bias error of Eq. 8.139).
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
@@ -435,7 +435,7 @@ def power_spectral_density(
         the B&P Section 11.5.2 recommendation for side-lobe suppression).
     :param nperseg: Welch segment length; ``None`` picks a length giving a
         bin spacing of at most 4 Hz (the resolution bandwidth
-        :math:`B_e` further
+        :math:`B_\mathrm{e}` further
         depends on the taper; see :attr:`SpectralDensityResult.resolution_bandwidth`).
     :param overlap: Segment overlap fraction in [0, 1) (default 0.5, which
         with a Hann taper retrieves most of the stability lost to tapering,
@@ -481,18 +481,18 @@ def resolution_bias_error(
 ) -> float:
     r"""First-order resolution-bias error at a resonance peak (Eq. 8.141).
 
-    :math:`\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -(B_e/B_r)^2/3` for
+    :math:`\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -(B_\mathrm{e}/B_\mathrm{r})^2/3` for
     a resonance of half-power bandwidth
-    :math:`B_r` analysed with resolution bandwidth :math:`B_e`: peaks are
+    :math:`B_\mathrm{r}` analysed with resolution bandwidth :math:`B_\mathrm{e}`: peaks are
     underestimated (and valleys overestimated) by frequency smoothing, in
     the direction of reduced dynamic range (B&P Section 8.5.1). The
-    approximation assumes :math:`B_e < B_r`.
+    approximation assumes :math:`B_\mathrm{e} < B_\mathrm{r}`.
 
     :param resolution_bandwidth: Analysis resolution bandwidth
-        :math:`B_e`, Hz
+        :math:`B_\mathrm{e}`, Hz
         (:attr:`SpectralDensityResult.resolution_bandwidth`).
     :param half_power_bandwidth: Half-power (-3 dB) bandwidth
-        :math:`B_r` of the
+        :math:`B_\mathrm{r}` of the
         spectral peak, in Hz.
     :return: Normalized bias error (dimensionless, negative at a peak).
     :raises ValueError: If either bandwidth is not positive.
@@ -531,7 +531,7 @@ class CrossSpectralDensityResult:
     :ivar n_segments: Raw number of segments averaged.
     :ivar n_averages: Effective number of independent averages
         :math:`n_d`.
-    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e`, in
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_\mathrm{e}`, in
         Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
@@ -688,7 +688,7 @@ class CoherentOutputSpectrumResult:
     :ivar n_segments: Raw number of segments averaged.
     :ivar n_averages: Effective number of independent averages
         :math:`n_d`.
-    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e`, in
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_\mathrm{e}`, in
         Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.

@@ -8,7 +8,7 @@ Sabine-form absorption coefficients: the random-incidence absorption
 coefficient ``alpha_s`` (Clause 8.1.1, Eq. (1)) and the specular absorption
 coefficient ``alpha_spec`` (Clause 8.1.2, Eq. (4)). Their ratio yields the
 scattering coefficient
-:math:`s = (\alpha_{\mathrm{spec}} - \alpha_s) / (1 - \alpha_s)`
+:math:`s = (\alpha_{\mathrm{spec}} - \alpha_\mathrm{s}) / (1 - \alpha_\mathrm{s})`
 (Clause 8.1.3, Eq. (5)). The turntable base plate is qualified through its
 own scattering coefficient (Clause 8.1.4, Eq. (6)) against the Table 1
 limits (Clause 6.2). Air properties come from the speed-of-sound and
@@ -233,7 +233,7 @@ def random_incidence_absorption(
 
     .. math::
 
-       \alpha_s = 55.3 \, \frac{V}{S}
+       \alpha_\mathrm{s} = 55.3 \, \frac{V}{S}
        \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right)
        - \frac{4 V}{S} (m_2 - m_1)
 
@@ -303,8 +303,8 @@ def scattering_coefficient(
 
     .. math::
 
-       s = 1 - \frac{1 - \alpha_{\text{spec}}}{1 - \alpha_s}
-         = \frac{\alpha_{\text{spec}} - \alpha_s}{1 - \alpha_s}
+       s = 1 - \frac{1 - \alpha_{\text{spec}}}{1 - \alpha_\mathrm{s}}
+         = \frac{\alpha_{\text{spec}} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}}
 
     Following the presentation rule of Clause 8.3, negative results are
     truncated to 0 while values greater than 1 (which can occur through edge
@@ -646,10 +646,10 @@ def scattering_coefficient_uncertainty(
     .. math::
 
        u_s = \left\lvert
-       \frac{\alpha_{\mathrm{spec}} - 1}{1 - \alpha_s} \right\rvert
+       \frac{\alpha_{\mathrm{spec}} - 1}{1 - \alpha_\mathrm{s}} \right\rvert
        \sqrt{\left( \frac{u_{\alpha_{\mathrm{spec}}}}
        {\alpha_{\mathrm{spec}} - 1} \right)^{2}
-       + \left( \frac{u_{\alpha_s}}{1 - \alpha_s} \right)^{2}}
+       + \left( \frac{u_{\alpha_\mathrm{s}}}{1 - \alpha_\mathrm{s}} \right)^{2}}
 
     with the expanded uncertainty :math:`U = 2 u_s` (95 % confidence).
 

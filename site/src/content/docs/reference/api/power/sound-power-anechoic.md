@@ -26,7 +26,7 @@ K_{1i} = -10 \log_{10}\!\left( 1 - 10^{-0.1 \Delta L_{pi}} \right) \tag{Eq. 11}
 $$
 
 $$
-\overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right] \tag{Eq. 12}
+\overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right] \tag{Eq. 12}
 $$
 
 $$
@@ -39,7 +39,7 @@ of a hemi-anechoic room (Eq. 15), and each tabulated position carries an equal
 share of it; unequal partial areas $S_i$ are averaged by Eq. 13 instead.
 The A-weighted total is combined with the ISO 3744 Annex E band corrections
 (Annex C, Eq. C.1) and the expanded uncertainty
-$U = k\sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$ (Eq. 24/25) takes its
+$U = k\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$ (Eq. 24/25) takes its
 reproducibility standard deviation from Table 3 (anechoic) or Table 2
 (hemi-anechoic).
 
@@ -59,24 +59,24 @@ meteorological_corrections(
 
 Meteorological corrections C1, C2, C3 (ISO 3745:2012 Eq. 14 block).
 
-Using the measured static pressure $p_s$ (kPa) and air temperature
+Using the measured static pressure $p_\mathrm{s}$ (kPa) and air temperature
 $\theta$ (deg C) form:
 
 $$
-C_1 = -10 \log_{10}\frac{p_s}{p_{s,0}} + 5 \log_{10}\frac{273 + \theta}{\theta_0}, \qquad \theta_0 = 314~\text{K}
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 5 \log_{10}\frac{273 + \theta}{\theta_0}, \qquad \theta_0 = 314~\text{K}
 $$
 
 $$
-C_2 = -10 \log_{10}\frac{p_s}{p_{s,0}} + 15 \log_{10}\frac{273 + \theta}{\theta_1}, \qquad \theta_1 = 296~\text{K}
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s},0}} + 15 \log_{10}\frac{273 + \theta}{\theta_1}, \qquad \theta_1 = 296~\text{K}
 $$
 
 $$
 C_3 = A_0 \left( 1.0053 - 0.0012\,A_0 \right)^{1.6}, \qquad A_0 = \alpha(f)\,r
 $$
 
-$p_{s,0} = 101.325$ kPa. This is the $p_s$/$\theta$
+$p_{\mathrm{s},0} = 101.325$ kPa. This is the $p_\mathrm{s}$/$\theta$
 form of C1 (not the characteristic-impedance form), chosen because it
-needs only the measured $p_s$ and $\theta$ and is consistent
+needs only the measured $p_\mathrm{s}$ and $\theta$ and is consistent
 with C2. At the reference conditions (23 deg C, 101.325 kPa)
 $C_2 = 0$ exactly while $C_1 = 5 \log_{10}(296/314) = -0.128$ dB.
 C3 requires the atmospheric attenuation coefficient $\alpha(f)$
@@ -184,11 +184,11 @@ precision_uncertainty(
 ) -> float | np.ndarray
 ```
 
-Expanded uncertainty $U = k \sigma_{tot}$ (ISO 3745:2012).
+Expanded uncertainty $U = k \sigma_\mathrm{tot}$ (ISO 3745:2012).
 
 ISO 3745:2012 Eq. 24/25:
-$\sigma_{tot} = \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$ and
-$U = k \sigma_{tot}$, with $k = 2$ (95 %, two-sided) or
+$\sigma_\mathrm{tot} = \sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$ and
+$U = k \sigma_\mathrm{tot}$, with $k = 2$ (95 %, two-sided) or
 $k = 1.6$ (95 %, one-sided, when comparing to a limit).
 
 **Parameters**
@@ -239,7 +239,7 @@ $DI_i = L_{pi} - \overline{L_p}$
 per position and band (Eq. 21); `non_uniformity_index` the
 per-band `VIr` sample standard deviation about the arithmetic mean
 (Eq. 22). `uncertainty` is the A-weighted expanded uncertainty
-$U = k\sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$
+$U = k\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$
 (Eq. 24/25) and `uncertainty_bands` the
 per-band value (`NaN` without `frequencies`).
 `sound_power_level_a` is the A-weighted total `LWA` (Eq. C.1).
@@ -333,7 +333,7 @@ when `areas` are given) and combined with the surface area and the
 meteorological corrections:
 
 $$
-L_W = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right] + 10 \log_{10}\frac{S}{S_0} + C_1 + C_2 + C_3
+L_W = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 (L'_{pi} - K_{1i})} \right] + 10 \log_{10}\frac{S}{S_0} + C_1 + C_2 + C_3
 $$
 
 $S = 4\pi r^2$ for a `'sphere'` (anechoic, Eq. 14) or

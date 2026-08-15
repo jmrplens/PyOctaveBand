@@ -31,7 +31,7 @@ and a **side branch** of acoustic impedance ``Z_b`` is the shunt element
 
    \begin{bmatrix}
    1 & 0 \\
-   1 / Z_b & 1
+   1 / Z_\mathrm{b} & 1
    \end{bmatrix}.
 
 **Transmission loss** from the compound matrix ``T`` (Munjal, *Acoustics of
@@ -62,13 +62,13 @@ attenuation of inserting the silencer in place of a direct connection,
 .. math::
 
    \mathrm{IL} = 20 \log_{10}
-   \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}}
-   {Z_s + Z_r} \right\rvert,
+   \left\lvert \frac{T_{11} Z_\mathrm{r} + T_{12} + Z_\mathrm{s} Z_\mathrm{r} T_{21} + Z_\mathrm{s} T_{22}}
+   {Z_\mathrm{s} + Z_\mathrm{r}} \right\rvert,
 
 which is ``0`` when the silencer reduces to a through connection
 (:math:`T = I`)
 and, for equal inlet/outlet areas, equals the transmission loss for the
-anechoic reference :math:`Z_s = Z_r = \rho c / S` (with unequal areas the
+anechoic reference :math:`Z_\mathrm{s} = Z_\mathrm{r} = \rho c / S` (with unequal areas the
 direct
 connection contains the same area jump, so its mismatch loss cancels from
 the insertion loss but not from the transmission loss).
@@ -310,8 +310,8 @@ def insertion_loss(
     .. math::
 
        \mathrm{IL} = 20 \log_{10}
-       \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}}
-       {Z_s + Z_r} \right\rvert.
+       \left\lvert \frac{T_{11} Z_\mathrm{r} + T_{12} + Z_\mathrm{s} Z_\mathrm{r} T_{21} + Z_\mathrm{s} T_{22}}
+       {Z_\mathrm{s} + Z_\mathrm{r}} \right\rvert.
 
     :param transfer_matrix: A ``(n_freq, 2, 2)`` compound matrix.
     :param source_impedance: Source internal acoustic impedance ``Z_s``,
@@ -349,11 +349,11 @@ def helmholtz_impedance(
 ) -> _Complex:
     r"""Acoustic impedance of a Helmholtz side branch (Bies Eq. (8.152)).
 
-    :math:`Z = R + j(\rho \omega l_e / S_{\mathrm{neck}} -
+    :math:`Z = R + j(\rho \omega l_\mathrm{e} / S_{\mathrm{neck}} -
     \rho c^2 / (\omega V))` with acoustic
-    mass :math:`\rho l_e / S_{\mathrm{neck}}` and compliance
+    mass :math:`\rho l_\mathrm{e} / S_{\mathrm{neck}}` and compliance
     :math:`V / (\rho c^2)`; the resonance
-    :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}`
+    :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_\mathrm{e} V)}`
     (Bies Eq. (8.46)) is where the
     reactance vanishes, leaving :math:`Z = R`: a lossless branch
     (``resistance = 0``) shorts the duct there, and a resistive one presents
@@ -390,8 +390,8 @@ def quarter_wave_impedance(
 ) -> _Complex:
     r"""Acoustic impedance of a closed quarter-wave side branch (Bies Eq. (8.146)).
 
-    :math:`Z = -j (\rho c / S) \cot(k l_e)`; the reactance vanishes at
-    :math:`l_e = \lambda / 4` (:math:`f = c / 4 l_e`), where the closed tube
+    :math:`Z = -j (\rho c / S) \cot(k l_\mathrm{e})`; the reactance vanishes at
+    :math:`l_\mathrm{e} = \lambda / 4` (:math:`f = c / 4 l_\mathrm{e}`), where the closed tube
     presents a
     pressure node and shorts the duct.
 
@@ -680,7 +680,7 @@ def helmholtz_resonator(
     :param source_impedance: Optional source impedance ``Z_s``, Pa s/m3.
     :param radiation_impedance: Optional radiation impedance ``Z_r``, Pa s/m3.
     :return: A :class:`ReactiveSilencerResult`; ``resonances`` holds
-        :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}`.
+        :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_\mathrm{e} V)}`.
     """
     f = _frequencies(frequencies)
     c = require_positive(speed_of_sound, "speed_of_sound")
@@ -728,7 +728,7 @@ def quarter_wave_resonator(
     :param source_impedance: Optional source impedance ``Z_s``, Pa s/m3.
     :param radiation_impedance: Optional radiation impedance ``Z_r``, Pa s/m3.
     :return: A :class:`ReactiveSilencerResult`; ``resonances`` holds the odd
-        multiples of :math:`f = c / (4 l_e)` within the frequency range.
+        multiples of :math:`f = c / (4 l_\mathrm{e})` within the frequency range.
     """
     f = _frequencies(frequencies)
     c = require_positive(speed_of_sound, "speed_of_sound")

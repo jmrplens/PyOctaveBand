@@ -62,18 +62,18 @@ comparison but does
 not print this figure). Thus the habit of taking a power-of-two number of
 averages is not, in general, optimal.
 
-**Non-integer samples per period.** When :math:`f_s T` is not an integer
+**Non-integer samples per period.** When :math:`f_\mathrm{s} T` is not an integer
 the period boundaries fall between samples. Each block is then aligned to
 a common integer grid by the band-limited fractional delay of
 :func:`phonometry.signals.test_signals.fractional_delay` before averaging, so
 the periodic waveform is recovered within the interpolation error of that
-band-limited shift. An integer :math:`f_s T` needs no interpolation and
+band-limited shift. An integer :math:`f_\mathrm{s} T` needs no interpolation and
 the waveform is recovered to machine precision. The averaged samples stay
-on the :math:`1/f_s` sampling grid throughout: output sample ``m`` is the
-average of the input at the times :math:`n T + m/f_s`, so the returned
-time axis is :math:`m/f_s` and the
-:math:`M = \operatorname{round}(f_s T)` samples cover one period exactly
-when :math:`f_s T` is an integer and to within half a sample otherwise.
+on the :math:`1/f_\mathrm{s}` sampling grid throughout: output sample ``m`` is the
+average of the input at the times :math:`n T + m/f_\mathrm{s}`, so the returned
+time axis is :math:`m/f_\mathrm{s}` and the
+:math:`M = \operatorname{round}(f_\mathrm{s} T)` samples cover one period exactly
+when :math:`f_\mathrm{s} T` is an integer and to within half a sample otherwise.
 No resampling onto an ``M``-point angular grid is performed.
 """
 
@@ -157,9 +157,9 @@ class SynchronousAverageResult:
     :ivar period_waveform: The averaged periodic waveform, one period of
         :attr:`samples_per_period` samples.
     :ivar times: Time axis of :attr:`period_waveform`, in seconds: the
-        sampling grid :math:`m/f_s`, :math:`m = 0 \ldots M-1` (the
-        averaged samples stay on the :math:`1/f_s` grid; see the module
-        note). The axis spans one period exactly when :math:`f_s T` is an
+        sampling grid :math:`m/f_\mathrm{s}`, :math:`m = 0 \ldots M-1` (the
+        averaged samples stay on the :math:`1/f_\mathrm{s}` grid; see the module
+        note). The axis spans one period exactly when :math:`f_\mathrm{s} T` is an
         integer, and to within half a sample otherwise.
     :ivar residual: Input minus the periodic reconstruction, over the
         analysed span (``n_averages * samples_per_period`` samples, aligned
@@ -171,7 +171,7 @@ class SynchronousAverageResult:
     :ivar period: Repetition period ``T``, in seconds.
     :ivar fs: Sample rate, in Hz.
     :ivar interpolated: Whether band-limited fractional-delay alignment was
-        applied (``True`` when :math:`f_s T` is not an integer).
+        applied (``True`` when :math:`f_\mathrm{s} T` is not an integer).
     :ivar noise_reduction_db: Power reduction of asynchronous noise,
         :math:`10 \log_{10} N` dB (amplitude SNR gain :math:`\sqrt{N}`).
     :ivar residual_rms: Root-mean-square of :attr:`residual`.

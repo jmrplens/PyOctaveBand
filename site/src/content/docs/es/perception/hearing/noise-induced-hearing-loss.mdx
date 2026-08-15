@@ -59,12 +59,12 @@ cuadrado del exceso del nivel de exposición sobre un umbral de corte $L_0$
 dependiente de la frecuencia (ISO 1999, apartado 6.3.1, Fórmula 2, Tabla 1):
 
 $$
-N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_\mathrm{EX,8h} - L_0)^2,
 $$
 
 con $t$ la exposición en años y $t_0 = 1$ año; por debajo de $L_0$ el efecto es
 nulo. Un **fractil** poblacional se obtiene de dos semi-gaussianas cuyas
-dispersiones $d_u$ (peor que la mediana) y $d_l$ (mejor) se dan en las Fórmulas
+dispersiones $d_\mathrm{u}$ (peor que la mediana) y $d_\mathrm{l}$ (mejor) se dan en las Fórmulas
 6/7 y la Tabla 3: $N_Q = N_{50} + z\,d$ con $z$ el cuantil normal estándar,
 recortado a cero (apartado 6.3.2).
 
@@ -96,7 +96,7 @@ $L_0 = 89$ dB, a 90 dB) el ruido no produce desplazamiento permanente. Para
 duraciones menores de 10 años la mediana se extrapola del valor a 10 años
 (Fórmula 3); puede pedirse un subconjunto de frecuencias con `frequencies=`.
 
-**Qué tiene que ser $L_{EX,8h}$.** El primer argumento es el nivel de exposición
+**Qué tiene que ser $L_\mathrm{EX,8h}$.** El primer argumento es el nivel de exposición
 al ruido ponderado A normalizado a una jornada nominal de ocho horas, en la
 práctica el resultado de un
 [estudio según ISO 9612](/phonometry/es/perception/hearing/occupational-exposure/)
@@ -185,7 +185,7 @@ La muesca de 3 kHz a 4 kHz, con recuperación parcial a 6 kHz, es la firma del
 daño por ruido y la razón de que la vigilancia audiométrica ensaye esas
 frecuencias. Sale del modelo en lugar de imponérsele: el nivel de corte $L_0$
 y los coeficientes $u$, $v$ de la Tabla 1 son mínimos donde el oído es más
-vulnerable, de modo que el mismo $L_{EX,8h}$ compra mucho más desplazamiento a
+vulnerable, de modo que el mismo $L_\mathrm{EX,8h}$ compra mucho más desplazamiento a
 4 kHz que a 500 Hz.
 
 ### Dónde vale el modelo
@@ -229,12 +229,12 @@ de metadatos opcional (empresa, trabajador(es)/grupo, lugar de trabajo y fecha
 de la evaluación), una tabla con el NIPTS mediano $N_{50}$ y el del fractil
 pedido en las seis frecuencias audiométricas junto al gráfico del espectro con
 su banda de fractiles, el desplazamiento promediado en el conjunto de
-2/3/4 kHz enmarcado con las condiciones de exposición ($L_{EX,8h}$, la
+2/3/4 kHz enmarcado con las condiciones de exposición ($L_\mathrm{EX,8h}$, la
 duración en años y el porcentaje poblacional $Q$), y las notas que mantienen
 honesta la ficha: los valores son una predicción estadística para la población
 expuesta, no el audiograma de nadie, y la ISO 1999 deja al usuario la elección
 de las frecuencias de discapacidad. `verbose=True` añade las columnas de
-dispersión $d_u$/$d_l$; un `requirement` en los metadatos se interpreta como el
+dispersión $d_\mathrm{u}$/$d_\mathrm{l}$; un `requirement` en los metadatos se interpreta como el
 NIPTS representativo máximo admisible y añade una fila CUMPLE/NO CUMPLE (un
 desplazamiento menor cumple). El renderizado necesita reportlab y matplotlib
 (`pip install "phonometry[report,plot]"`); solo se admite
@@ -464,7 +464,7 @@ predicción y el mismo encabezado de metadatos que la ficha de NIPTS, pero con
 una tabla que lleva la componente de edad $H$, la de ruido $N$ y la combinada
 $H'$ en cada frecuencia audiométrica, junto al gráfico de las tres curvas, con
 el umbral promediado en el conjunto de 2/3/4 kHz enmarcado y las condiciones
-del oyente y de la exposición (edad y sexo, $L_{EX,8h}$ durante los años de
+del oyente y de la exposición (edad y sexo, $L_\mathrm{EX,8h}$ durante los años de
 exposición y el porcentaje poblacional $Q$). Sus notas añaden la que importa
 aquí: la componente de edad es la base de datos A evaluada a partir de
 ISO 7029:2017, cuyos valores difieren de la selección ilustrativa de la Tabla
@@ -526,7 +526,7 @@ aquí no se aplica ninguna, así que hay que aportarla y comprobarla uno mismo.
 ## Véase también
 
 - [Exposición laboral al ruido](/phonometry/es/perception/hearing/occupational-exposure/): el
-  estudio según ISO 9612 que produce el $L_{EX,8h}$ que consume este modelo, y
+  estudio según ISO 9612 que produce el $L_\mathrm{EX,8h}$ que consume este modelo, y
   la incertidumbre que lo acompaña.
 - [Umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/): la componente
   de edad $H$ de ISO 7029 a la que este modelo suma la componente de ruido, y el

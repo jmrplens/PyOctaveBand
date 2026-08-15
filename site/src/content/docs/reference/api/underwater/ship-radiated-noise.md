@@ -16,9 +16,9 @@ source below the sea surface:
   dB re 1 µPa·m (ISO 17208-1), the level of the product of the far-field RMS
   pressure and the source distance.
 * [`monopole_source_level`](/phonometry/reference/api/underwater/ship-radiated-noise/#monopole_source_level) -- converts `LRN` to the source level
-  $L_s = L_{\mathrm{RN}} + \Delta L$ with the Lloyd's-mirror surface
+  $L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L$ with the Lloyd's-mirror surface
   correction $\Delta L$ of ISO 17208-2 Formula 3, for a nominal source
-  depth $d_s = 0.7 D$ (Formula 1).
+  depth $d_\mathrm{s} = 0.7 D$ (Formula 1).
 
 Supporting helpers give the ISO 17208-1 three-hydrophone measurement depths
 ([`hydrophone_depths`](/phonometry/reference/api/underwater/ship-radiated-noise/#hydrophone_depths)) and the ISO 17208-2 tabulated source-level
@@ -74,14 +74,14 @@ monopole_source_level(
 Equivalent monopole source level from radiated noise level
 (ISO 17208-2).
 
-$L_s = L_{\mathrm{RN}} + \Delta L$ with the surface correction
+$L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L$ with the surface correction
 
 $$
 \Delta L = -10 \log_{10} \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4} \tag{Formula 3}
 $$
 
-where $u = k d_s$, $k = 2 \pi f/c$ and the nominal source
-depth is $d_s = 0.7 D$ (Formula 1).
+where $u = k d_\mathrm{s}$, $k = 2 \pi f/c$ and the nominal source
+depth is $d_\mathrm{s} = 0.7 D$ (Formula 1).
 
 **Parameters**
 
@@ -149,8 +149,8 @@ Equivalent monopole source level of a ship (ISO 17208-2).
 | `frequencies` | Frequencies, in Hz. |
 | `radiated_noise_level` | Input RNL per frequency, in dB re 1 µPa·m. |
 | `surface_correction` | Lloyd's-mirror correction $\Delta L$ per frequency, dB. |
-| `source_level` | Equivalent monopole source level $L_s = L_{\mathrm{RN}} + \Delta L$, in dB re 1 µPa·m. |
-| `source_depth` | Nominal source depth $d_s = 0.7 D$, in m. |
+| `source_level` | Equivalent monopole source level $L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L$, in dB re 1 µPa·m. |
+| `source_depth` | Nominal source depth $d_\mathrm{s} = 0.7 D$, in m. |
 | `sound_speed` | Speed of sound used, in m/s. |
 
 ### ShipSourceLevelResult.plot()

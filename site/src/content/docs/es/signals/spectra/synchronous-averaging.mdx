@@ -297,7 +297,7 @@ síncrono y ningún número de promedios lo va a eliminar.
   enseñar.
 - **La frecuencia de muestreo sale del contenido que quieres conservar.** Un
   piñón de 37 dientes a 1800 r/min engrana a $37 \times 30 = 1110$ Hz, así que
-  conservar cinco armónicos de engrane pide $f_s \ge 2{,}56 \times 5550 =
+  conservar cinco armónicos de engrane pide $f_\mathrm{s} \ge 2{,}56 \times 5550 =
   14{,}2$ kHz: 16 kHz en la práctica, 25,6 kHz en un analizador que lo ofrezca.
 - **Longitud de registro de $N+1$ revoluciones**, con $N$ elegido por la regla de
   los órdenes interferentes del §3 y no por costumbre.
@@ -310,9 +310,9 @@ síncrono y ningún número de promedios lo va a eliminar.
 
 ## 4. Muestras por periodo no enteras
 
-Cuando $f_s T$ es entero, las fronteras de periodo caen sobre muestras, los
+Cuando $f_\mathrm{s} T$ es entero, las fronteras de periodo caen sobre muestras, los
 bloques se trocean directamente y una señal periódica sin ruido se recupera
-con precisión de máquina (`interpolated` es `False`). Cuando $f_s T$ no es
+con precisión de máquina (`interpolated` es `False`). Cuando $f_\mathrm{s} T$ no es
 entero las fronteras caen entre muestras; cada bloque se alinea entonces a una
 malla entera común mediante el retardo fraccionario de banda limitada de
 [`fractional_delay`](/phonometry/es/signals/spectra/test-signals/), y la forma de onda
@@ -390,7 +390,7 @@ como `noise_reduction_db` y `amplitude_snr_gain`, y la elección de $N$ que
 sitúa un nodo del peine sobre un orden interferente, siguiendo el propio
 ejemplo del artículo con el orden 32,05. `time_synchronous_average` también
 implementa la alineación de banda limitada por retardo fraccionario usada
-cuando $f_s T$ no es entero.
+cuando $f_\mathrm{s} T$ no es entero.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">

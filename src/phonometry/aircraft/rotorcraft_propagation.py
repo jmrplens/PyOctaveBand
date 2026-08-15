@@ -5,7 +5,7 @@ Rotorcraft propagation, ground effect and screening (ECAC Doc 32 / NORAH2).
 Between the noise hemisphere that describes a helicopter and the receiver on the
 ground lies the path, and the path knows nothing about rotorcraft. The ECAC
 Doc 32 propagation chain
-:math:`\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g` adds spherical
+:math:`\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}` adds spherical
 spreading, atmospheric absorption and the ground effect of a point source over
 an impedance plane; the NORAH2 guidance extends that last term to real terrain,
 where a fitted mean ground plane replaces the flat ground and a blocked line of
@@ -17,9 +17,9 @@ This module provides the propagation primitives of the method (clean-room, from
 the NORAH2 guidance SC01.D1.5d, the basis of ECAC Doc 32):
 
 * :func:`spherical_spreading_adjustment` --
-  :math:`\Delta L_s = -20 \cdot \log_{10}(r/60)` (Eq. 24).
+  :math:`\Delta L_\mathrm{s} = -20 \cdot \log_{10}(r/60)` (Eq. 24).
 * :func:`atmospheric_adjustment` --
-  :math:`\Delta L_a = -\alpha(f) \cdot (r - 60)` with the ISO 9613-1
+  :math:`\Delta L_\mathrm{a} = -\alpha(f) \cdot (r - 60)` with the ISO 9613-1
   pure-tone coefficient (Eq. 26/27), reusing
   :func:`~phonometry.environment.propagation.air_absorption.air_attenuation`.
 * :func:`ground_effect_adjustment` -- ``ΔLg`` for a point source over an impedance
@@ -97,7 +97,7 @@ def spherical_spreading_adjustment(
 
     The hemisphere levels are defined at the reference distance ``rh`` (60 m in
     the standard database), so at slant distance ``r`` the geometric spreading
-    adjustment is :math:`\Delta L_s = -20 \cdot \log_{10}(r/r_h)`.
+    adjustment is :math:`\Delta L_\mathrm{s} = -20 \cdot \log_{10}(r/r_\mathrm{h})`.
 
     :param distance: Slant distance ``r`` from the rotorcraft to the observer, in
         metres (``> 0``).
@@ -124,8 +124,8 @@ def atmospheric_adjustment(
     r"""Atmospheric-absorption adjustment ``ΔLa`` of the hemisphere level (Eq. 26/27).
 
     The hemisphere already includes absorption out to the reference distance
-    ``rh``, so only the excess path :math:`r - r_h` is corrected:
-    :math:`\Delta L_a = -\alpha(f) \cdot (r - r_h)` with the ISO 9613-1
+    ``rh``, so only the excess path :math:`r - r_\mathrm{h}` is corrected:
+    :math:`\Delta L_\mathrm{a} = -\alpha(f) \cdot (r - r_\mathrm{h})` with the ISO 9613-1
     pure-tone coefficient ``α``
     evaluated at the exact band centre (Eq. 26/27, ICAO reference atmosphere by
     default). This matches the guidance Eq. 27 to 0.02 dB/km and the NORAH2
@@ -136,7 +136,7 @@ def atmospheric_adjustment(
 
     .. note::
         The printed guidance Eq. 27 pairs the coefficient ``6.6928e-6`` with
-        :math:`f_{r,O} = 630.7` Hz, which evaluates to nonsense (14.3 dB/km
+        :math:`f_\mathrm{r,O} = 630.7` Hz, which evaluates to nonsense (14.3 dB/km
         at 500 Hz against Table 4's 3.1). The physically correct pairing
         (``6.6928e-6``
         with the oxygen relaxation frequency, ``1.3415e-6`` with 630.7 Hz)
@@ -161,7 +161,7 @@ def atmospheric_adjustment(
         (default 60). Pass :attr:`RotorcraftHemisphere.distance` when the data
         uses a non-standard polar distance.
     :return: The adjustment ``ΔLa`` per band, in dB (added to the level,
-        :math:`\le 0` for :math:`r \ge r_h`).
+        :math:`\le 0` for :math:`r \ge r_\mathrm{h}`).
     :raises ValueError: If a distance is not strictly positive.
     """
     f = require_positive_array(frequencies, "frequencies")
@@ -221,7 +221,7 @@ def ground_effect_adjustment(
     A point source over a locally-reacting impedance ground produces interference
     between the direct and reflected rays. With the spherical reflection
     coefficient ``Q`` (Chien-Soroka) and the Delany-Bazley impedance,
-    :math:`\Delta L_g = 10 \cdot \log_{10}\{1 + (r_1/r_2)^2 \lvert Q \rvert^2
+    :math:`\Delta L_\mathrm{g} = 10 \cdot \log_{10}\{1 + (r_1/r_2)^2 \lvert Q \rvert^2
     + 2 (r_1/r_2) \lvert Q \rvert \cdot I\}` (Eq. 29), where ``I``
     (Eq. 30) is the in-band interference factor.
 
@@ -461,7 +461,7 @@ def diffraction_attenuation(
 ) -> NDArray[np.float64]:
     r"""Pure diffraction attenuation ``ΔLd`` per band (guidance Eq. 42-44).
 
-    :math:`\Delta L_d = 10 \cdot C_h \cdot \log_{10}(3 + (40/\lambda)
+    :math:`\Delta L_\mathrm{d} = 10 \cdot C_h \cdot \log_{10}(3 + (40/\lambda)
     \cdot C'' \cdot \delta)` where the argument is at least 1
     (below it the attenuation is 0),
     :math:`C_h = \min(f_m \cdot h_0/250, 1)` (Eq. 43) and
@@ -523,7 +523,7 @@ class TerrainScreeningResult:
         in dB, added to the received level in the Doc 32 Eq. 23 chain (it
         replaces the flat-ground ``ΔLg``): the mean-ground-plane ground
         effect when the line of sight is clear,
-        :math:`-(\Delta L_d + \Delta L_g)` of Eq. 45
+        :math:`-(\Delta L_\mathrm{d} + \Delta L_\mathrm{g})` of Eq. 45
         when terrain blocks it.
     :ivar screened: Whether terrain blocks the line of sight (any profile
         point strictly above it).

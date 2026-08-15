@@ -285,14 +285,14 @@ each with its own per-order definition:
 - **Modulation distortion** (14.12.7): a large low tone $f_\text{low}$ and a
   small high tone $f_\text{high}$ (preferably 4:1). The per-order values are
   *arithmetic* sums of the sideband amplitudes relative to the $f_\text{high}$
-  output: $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
-  $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
+  output: $d_{\mathrm{m},2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
+  $d_{\mathrm{m},3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
   combined-RMS `smpte` value that SMPTE-type analyzers report (not an IEC
   quantity).
 - **Difference-frequency distortion** (14.12.8): two equal high tones
   $f_1 < f_2$, referenced to $U_{2,\text{ref}} = 2U_{2,f_2}$ (the sum of both
-  tone amplitudes): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
-  $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
+  tone amplitudes): $d_{\mathrm{d},2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
+  $d_{\mathrm{d},3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
 - **Total difference-frequency distortion** (14.12.10): a specific two-tone
   test ($f_1 = 2f_0$, $f_2 = 3f_0 - \delta$; the standard tones 8 kHz and
   11.95 kHz are the defaults) where only the two in-band products at
@@ -445,7 +445,7 @@ IEC 60268-3:2013, *Sound system equipment – Part 3: Amplifiers*
 (clauses 14.12.2–14.12.11): total harmonic distortion
 $\mathrm{THD}_F$/$\mathrm{THD}_R$ (the
 14.12.3.2 formula defines the R form), nth-order harmonic distortion $d_n$, the
-per-order modulation ($d_{m,n}$) and difference-frequency ($d_{d,n}$)
+per-order modulation ($d_{\mathrm{m},n}$) and difference-frequency ($d_{\mathrm{d},n}$)
 intermodulation, total difference-frequency distortion, dynamic intermodulation
 (DIM) and the ITU-R BS.468-4 / IEC 60268-1 weighted THD. AES17-2015,
 *Measurement of digital audio equipment* (clauses 5.2.5, 5.2.8 and 6.3.1): the
@@ -527,7 +527,7 @@ reference-value pitfall, is covered in
 The rigid circular **piston in an infinite baffle** is the canonical radiator
 behind a loudspeaker cone, the open end of a duct and the radiation efficiency
 of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanical
-radiation impedance is $Z_r = \rho c S\,(R_1 + jX_1)$ with $S = \pi a^2$ and the
+radiation impedance is $Z_\mathrm{r} = \rho c S\,(R_1 + jX_1)$ with $S = \pi a^2$ and the
 dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
 
 $$
@@ -537,7 +537,7 @@ $$
 
 with $J_1$ the Bessel function and $H_1$ the Struve function of order one. At
 low frequency $R_1 \to (ka)^2/2$ and the reactance is mass-like with the
-radiation mass $M_r = 8\rho a^3/3$ (Eq. (4.151)); at high frequency
+radiation mass $M_\mathrm{r} = 8\rho a^3/3$ (Eq. (4.151)); at high frequency
 $R_1 \to 1$, $X_1 \to 0$ and the piston radiates as into an infinite tube. The
 far field follows the directivity
 $D(\theta) = 2 J_1(ka\sin\theta)/(ka\sin\theta)$, whose first null is at
@@ -842,21 +842,21 @@ Equations (18.13) to (18.24)) writes that loop with two decibel gains:
 
 $$
 \begin{aligned}
-Z_S &= L_{H\text{-}L} - L_{T\text{-}M}
+Z_\mathrm{S} &= L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}
   && \text{(Eq. (18.17))  open-loop system gain} \\
-G_S &= L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
+G_\mathrm{S} &= L_{\mathrm{H}\text{-}\mathrm{M}} - L_{\mathrm{H}\text{-}\mathrm{L}} + D_\mathrm{M}(\theta)
   && \text{(Eq. (18.18))  feedback-loop gain}
 \end{aligned}
 $$
 
-$Z_S$ is the level the loudspeaker produces at an average listener minus the
-level the talker produces at the microphone; $Z_S = -6$ dB, typical of an
+$Z_\mathrm{S}$ is the level the loudspeaker produces at an average listener minus the
+level the talker produces at the microphone; $Z_\mathrm{S} = -6$ dB, typical of an
 auditorium or a church, means a comfortable conversational level at twice the
-talker-to-microphone distance. $D_M(\theta)$ is the directivity index of the
+talker-to-microphone distance. $D_\mathrm{M}(\theta)$ is the directivity index of the
 microphone toward the loudspeaker *relative to* the talker: zero for an
 omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
 talker. Summing the infinite series of round trips, the system oscillates when
-the loop gain reaches unity, that is $Z_S + G_S = 0$ (Equation (18.16)).
+the loop gain reaches unity, that is $Z_\mathrm{S} + G_\mathrm{S} = 0$ (Equation (18.16)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
 
@@ -870,11 +870,11 @@ equalised system (other authors quote 12 dB unequalised and 6 dB carefully
 equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
 off a hard surface, and the remaining 4 dB is safety. With several microphones
 open at once the returned signals add at the mixer, which the
-number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_m$
+number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_\mathrm{m}$
 accounts for (Equation (18.23)). The criterion is then
 
 $$
-Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10.
+Z_\mathrm{S} + L_{\mathrm{H}\text{-}\mathrm{M}} + \Delta L_\text{nom} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 10.
 $$
 
 ```python
@@ -896,8 +896,8 @@ res.plot()      # the gain structure against the oscillation and margin lines
 ```
 
 Those two special cases are Long's own (Equations (18.21) and (18.22)): with
-$Z_S = -6$ dB the criterion collapses to
-$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, so an omnidirectional
+$Z_\mathrm{S} = -6$ dB the criterion collapses to
+$L_{\mathrm{H}\text{-}\mathrm{M}} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 4$, so an omnidirectional
 microphone must see the loudspeaker 4 dB below the average level in the
 audience, while a cardioid may let it rise to 2 dB below.
 
@@ -905,18 +905,18 @@ audience, while a cardioid may let it rise to 2 dB below.
 > `+ D_M(theta)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that $N_m = 1$ reproduces Long's own special cases exactly. The defect is
+> so that $N_\mathrm{m} = 1$ reproduces Long's own special cases exactly. The defect is
 > recorded in the [errata registry](https://jmrplens.github.io/phonometry/reference/errata/).
 
 ### `feedback_stability()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finite | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; about −6 dB in an auditorium |
-| `level_loudspeaker_at_microphone` | float | dB | finite | $L_{H\text{-}M}$ |
-| `level_loudspeaker_at_listener` | float | dB | finite | $L_{H\text{-}L}$ |
-| `microphone_directivity` | float | dB | default 0 | $D_M(\theta)$, 0 omni, about −2 cardioid |
-| `open_microphones` | int | — | ≥ 1, default 1 | $N_m$ |
+| `open_loop_gain` | float | dB | finite | $Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}$; about −6 dB in an auditorium |
+| `level_loudspeaker_at_microphone` | float | dB | finite | $L_{\mathrm{H}\text{-}\mathrm{M}}$ |
+| `level_loudspeaker_at_listener` | float | dB | finite | $L_{\mathrm{H}\text{-}\mathrm{L}}$ |
+| `microphone_directivity` | float | dB | default 0 | $D_\mathrm{M}(\theta)$, 0 omni, about −2 cardioid |
+| `open_microphones` | int | — | ≥ 1, default 1 | $N_\mathrm{m}$ |
 | `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
 
 Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,
@@ -1049,7 +1049,7 @@ capsule diverge there.
 A microphone's electronics and the air load on its diaphragm set a noise
 floor, expressed as the **equivalent noise level**: the sound pressure
 level whose output would equal the weighted inherent-noise voltage,
-$L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
+$L_\mathrm{N} = 20\log_{10}\bigl((U_\mathrm{N}/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
 with two weightings,
 and the numbers are far apart on paper. The **A-weighted** figure (RMS
 detector) is the one most datasheets quote, e.g. 14 dB(A) for a good studio
@@ -1089,7 +1089,7 @@ standard's own definitions rather than merely repeated:
   symmetric pattern; the ideal cardioid returns $10\log_{10} 3 = 4.8$ dB.
 - **Equivalent noise level** (17.2). The weighted inherent-noise voltage over
   the rated sensitivity as a sound pressure level,
-  $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, with the
+  $L_\mathrm{N} = 20\log_{10}\bigl((U_\mathrm{N}/M)/20\,\mu\text{Pa}\bigr)$, with the
   signal-to-noise ratio re 1 Pa
   (94 dB SPL) derived from it. The overload sound pressure level (15.2) is
   read from a distortion-against-level curve at the stated THD limit.
@@ -1469,7 +1469,7 @@ up to 12 kHz.
 Two practical notes from the paper are built in: the recording mean is
 subtracted by default (`remove_dc=True`; a DC offset otherwise leaks a
 scaled inverse filter into the impulse response), and the non-integer part
-of each arrival $L\ln(n) f_s$ is removed in the frequency domain, so the
+of each arrival $L\ln(n) f_\mathrm{s}$ is removed in the frequency domain, so the
 harmonic phases carry no residual sub-sample skew.
 
 ## 3. Analysing classical ESS recordings (`method="farina"`)

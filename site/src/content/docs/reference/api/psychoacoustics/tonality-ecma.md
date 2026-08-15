@@ -18,7 +18,7 @@ signal; this module adds
 
 * the tonality output stages (Clause 6.2.8-6.2.11): the overall-SNR gate
   `q(l)` (Formulae 49-50), the time-dependent specific tonality
-  $T'(l, z) = c_T q(l) N'_{tonal}(l, z)$ (Formula 51), the average
+  $T'(l, z) = c_T q(l) N'_\mathrm{tonal}(l, z)$ (Formula 51), the average
   specific tonality `T'(z)` and its frequency `f_ton,z(z)` (Formulae
   53-55), the time-dependent tonality `T(l)` with its frequency
   `f_ton(l)` (Formulae 61-62) and the representative single value `T`

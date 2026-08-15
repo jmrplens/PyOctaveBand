@@ -81,7 +81,7 @@ verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 processing as A/C — but stateful mode cannot carry the internal oversampling
 across blocks, so if you stream G-weighting at a sample rate below 48 kHz,
 verify the response before trusting the level. Levels measured with the G
-curve are reported as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over
+curve are reported as $L_{p\mathrm{G}}$ (or $L_\mathrm{Geq}$ for the equivalent level over
 time).
 
 ## 2. Historical and special-purpose curves: B, D and AU
@@ -152,7 +152,7 @@ perceived-noise-level (PNL) rating, so a plain sound level meter could
 estimate aircraft noise: the +11.5 dB hump around 3.15 kHz is where jet
 turbomachinery whine annoys most (it is deliberately *not* an equal-loudness
 feature). NASA's aircraft-noise handbook gives the classic rule of thumb
-$L_{PN} \approx L_D + 7\ \text{dB}$. IEC 537 was withdrawn and current
+$L_\mathrm{PN} \approx L_\mathrm{D} + 7\ \text{dB}$. IEC 537 was withdrawn and current
 certification practice reports EPNL from one-third-octave analysis or plain
 A-weighted levels, so `D` is provided for historical data and comparisons.
 With the standard unavailable, the implementation uses the widely published
@@ -208,7 +208,7 @@ print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB"
 Ultrasound only reaches a digital filter when the sample rate captures it,
 so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
 reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as $L_{AU}$. The
+steep U roll-off accurate. Levels are reported as $L_\mathrm{AU}$. The
 implementation follows the Table 2 pole locations exactly (they reproduce
 every Table 1 nominal value within 0.05 dB) and is verified in CI against
 the Table 1 tolerances up to 40 kHz.
@@ -234,7 +234,7 @@ conformance report instead).
 
 ### Which weighting should I use for infrasound below 20 Hz?
 
-Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. It has 0 dB gain at 10 Hz, rises at 12 dB/octave from 1 Hz to 20 Hz and falls off at 24 dB/octave outside that band. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{p\mathrm{G}}$ (or $L_\mathrm{Geq}$ for the equivalent level over time).
 
 ## See also
 

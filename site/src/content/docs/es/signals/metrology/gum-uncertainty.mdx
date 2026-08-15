@@ -58,7 +58,7 @@ las entradas $u_i(y) = |c_i|\,u(x_i)$ ponderadas por los coeficientes de
 sensibilidad $c_i = \partial f / \partial x_i$:
 
 $$
-u_c^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i).
+u_\mathrm{c}^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i).
 $$
 
 `combine_uncertainty` evalúa las sensibilidades por diferencias centradas, de
@@ -162,7 +162,7 @@ micrófono*, no por el instrumento.
 
 La cuadratura vuelve esa lección cuantitativa y algo brutal. Eliminar por
 completo el término de calibración (un calibrador perfecto, sin deriva) mueve
-$u_c$ de 0,407 a 0,390 dB, una ganancia de 0,017 dB a cambio de un esfuerzo
+$u_\mathrm{c}$ de 0,407 a 0,390 dB, una ganancia de 0,017 dB a cambio de un esfuerzo
 imposible. Reducir a la mitad el término de posición, que significa cuatro veces
 más posiciones, lo lleva a 0,272 dB. Los balances se mejoran por arriba del
 diagrama de barras y nunca por abajo, y el diagrama de barras está para decirte
@@ -186,23 +186,23 @@ calibrado por separado.
 
 ### Factor de cobertura y grados de libertad efectivos
 
-La **incertidumbre expandida** $U = k\,u_c$ escala la incertidumbre combinada
+La **incertidumbre expandida** $U = k\,u_\mathrm{c}$ escala la incertidumbre combinada
 por un factor de cobertura $k = t_p(\nu_\text{ef})$ de la distribución $t$ con
 los **grados de libertad efectivos** dados por la fórmula de Welch–Satterthwaite
 (Anexo G.4). Aquí la única entrada de Tipo A (9 grados de libertad) hace bajar
 $\nu_\text{ef}$ hasta 16,5, de modo que $k = 2{,}11$ en lugar del 1,96 de gran
 muestra. Esta cadena reproduce de principio a fin los ejemplos resueltos de la
-propia GUM: el balance del bloque patrón del anexo H.1 ($u_c = 31{,}7$ nm,
+propia GUM: el balance del bloque patrón del anexo H.1 ($u_\mathrm{c} = 31{,}7$ nm,
 $U_{99} = 92$ nm frente a los 32/93 impresos) y la medida correlacionada de
-resistencia del anexo H.2 ($u_c(R) = 0{,}071\ \Omega$,
-$u_c(X) = 0{,}295\ \Omega$, $u_c(Z) = 0{,}236\ \Omega$ de la Tabla H.3).
+resistencia del anexo H.2 ($u_\mathrm{c}(R) = 0{,}071\ \Omega$,
+$u_\mathrm{c}(X) = 0{,}295\ \Omega$, $u_\mathrm{c}(Z) = 0{,}236\ \Omega$ de la Tabla H.3).
 
 `expanded(0.95)` implementa la regla de la propia GUM: un intervalo bilateral con
 $k$ tomado de la distribución $t$ en $\nu_\text{ef}$. Las normas de acústica
 suelen fijar $k$ por convenio en su lugar: $k = 2$ para una declaración bilateral
 al 95 % cuando los grados de libertad son grandes, y $k = 1{,}65$ para la
 declaración **unilateral** al 95 % que se usa cuando un nivel se compara con un
-límite y solo importa el rebasamiento. La misma $u_c = 0{,}407$ dB da entonces
+límite y solo importa el rebasamiento. La misma $u_\mathrm{c} = 0{,}407$ dB da entonces
 tres incertidumbres expandidas distintas:
 
 | Convenio | $k$ | $U$ |
@@ -224,14 +224,14 @@ cuadratura. La correlación es el error silencioso clásico de un balance: dos
 correcciones trazables al *mismo* calibrador, o dos canales que comparten un
 instrumento, no se promedian como lo harían términos independientes, y
 combinarlas en cuadratura como si no estuvieran correlacionadas suele subestimar
-$u_c$. Con sensibilidades de signo opuesto el sesgo apunta al revés, y una
+$u_\mathrm{c}$. Con sensibilidades de signo opuesto el sesgo apunta al revés, y una
 pareja totalmente correlacionada puede cancelarse por completo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/uncertainty_correlation_es.svg" alt="Izquierda: la incertidumbre típica combinada de dos términos de 0,3 dB frente a su coeficiente de correlación, subiendo desde cero en menos uno, pasando por el valor en cuadratura 0,424 en cero, hasta 0,600 en más uno para sensibilidades del mismo signo, y la curva reflejada para signos opuestos. Derecha: el mismo balance como dos barras, 0,424 dB suponiendo independencia frente a 0,600 dB con trazabilidad al mismo calibrador, anotado como un 41 por ciento subestimado" width="92%" />
 
 *Dos términos de 0,3 dB cada uno, combinados con `combine_uncertainty` y una
 matriz de correlación. Tratar como independiente una pareja totalmente
-correlacionada subestima $u_c$ en un 41 % (0,424 dB en lugar de 0,600 dB), y el
+correlacionada subestima $u_\mathrm{c}$ en un 41 % (0,424 dB en lugar de 0,600 dB), y el
 error crece con el número de términos que comparten fuente. Leyendo la misma
 curva al revés: una pareja con $\rho = -1$ y sensibilidades del mismo signo se
 cancela hasta cero, que es lo que compra una medida diferencial hecha con un solo
@@ -302,9 +302,9 @@ print([round(x, 2) for x in mc.interval]) # [73.2, 74.8]
 ```
 
 Para este modelo casi lineal la incertidumbre típica de Monte Carlo reproduce el
-$u_c$ de la GUM con tres cifras y el intervalo al 95 % coincide con $Y \pm U$.
+$u_\mathrm{c}$ de la GUM con tres cifras y el intervalo al 95 % coincide con $Y \pm U$.
 Ambos métodos se validan frente a los ejemplos resueltos de las propias Guías: el
-modelo aditivo de cuatro entradas unidad da $u_c = 2{,}0$ (Suplemento 1,
+modelo aditivo de cuatro entradas unidad da $u_\mathrm{c} = 2{,}0$ (Suplemento 1,
 apartado 9.2), y cuatro entradas rectangulares dan un intervalo de Monte Carlo de
 $[-3{,}88,\, 3{,}88]$ (Suplemento 1, apartado 9.2.3).
 
@@ -317,7 +317,7 @@ el modelo es fuertemente no lineal en el rango de las incertidumbres de
 entrada (conversiones energía-nivel con entradas anchas, productos y
 cocientes con incertidumbres relativas grandes), cuando una sola entrada no
 gaussiana domina el balance (un término rectangular grande hace la salida
-casi rectangular, y un intervalo gaussiano $\pm\,2u_c$ la sobrecubre), o
+casi rectangular, y un intervalo gaussiano $\pm\,2u_\mathrm{c}$ la sobrecubre), o
 cuando la salida queda cerca de un límite físico (un coeficiente de absorción
 cerca de 0 o 1, una corrección de nivel que no puede cruzar el cero), donde
 el intervalo de cobertura verdadero es asimétrico y ninguna afirmación
@@ -351,9 +351,9 @@ Carlo.*
 
 *A la izquierda está adónde se va el dinero: las diez posiciones se llevan por sí
 solas el 73,9 % de la varianza, el instrumento el 18,1 % y el calibrador el
-8,0 %, así que $u_c$ = 0,407 dB es una afirmación sobre el diseño de la medición
+8,0 %, así que $u_\mathrm{c}$ = 0,407 dB es una afirmación sobre el diseño de la medición
 y no sobre el sonómetro. Reducir a la mitad el término del instrumento movería
-$u_c$ 0,02 dB; tres posiciones más lo mueven diez veces eso. A la derecha está el
+$u_\mathrm{c}$ 0,02 dB; tres posiciones más lo mueven diez veces eso. A la derecha está el
 mismo balance remuestreado un millón de veces: la incertidumbre típica de Monte
 Carlo es de 0,4073 dB frente a los 0,4072 dB de la GUM, y su intervalo al 95 %,
 $[73{,}20,\ 74{,}80]$, coincide con $Y \pm U$ = 74,00 ± 0,86 dB con

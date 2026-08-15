@@ -73,29 +73,29 @@ This page collects the theory behind outdoor and environmental noise: the whole-
 
 ## Environmental descriptors (ISO 1996-1)
 
-The **day-evening-night level** $L_{den}$ (ISO 1996-1:2016, 3.6.4) is an energy average over the 24 h day with penalty weightings of **+5 dB for the evening** and **+10 dB for the night**:
+The **day-evening-night level** $L_\mathrm{den}$ (ISO 1996-1:2016, 3.6.4) is an energy average over the 24 h day with penalty weightings of **+5 dB for the evening** and **+10 dB for the night**:
 
 $$
-L_{den} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_d\ 10^{0.1 L_{day}} + t_e\ 10^{0.1 (L_{evening} + 5)} + t_n\ 10^{0.1 (L_{night} + 10)} \right]\right\rbrace
+L_\mathrm{den} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_\mathrm{d}\ 10^{0.1 L_\mathrm{day}} + t_\mathrm{e}\ 10^{0.1 (L_\mathrm{evening} + 5)} + t_\mathrm{n}\ 10^{0.1 (L_\mathrm{night} + 10)} \right]\right\rbrace
 $$
 
-with default period durations $(t_d, t_e, t_n) = (12, 4, 8)$ h; countries may define the periods differently (3.6.4 Note 1). The **day-night level** $L_{dn}$ (3.6.5) drops the evening period:
+with default period durations $(t_\mathrm{d}, t_\mathrm{e}, t_\mathrm{n}) = (12, 4, 8)$ h; countries may define the periods differently (3.6.4 Note 1). The **day-night level** $L_\mathrm{dn}$ (3.6.5) drops the evening period:
 
 $$
-L_{dn} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_d\ 10^{0.1 L_{day}} + t_n\ 10^{0.1 (L_{night} + 10)} \right]\right\rbrace, \qquad (t_d, t_n) = (15, 9)\ \text{h}
+L_\mathrm{dn} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_\mathrm{d}\ 10^{0.1 L_\mathrm{day}} + t_\mathrm{n}\ 10^{0.1 (L_\mathrm{night} + 10)} \right]\right\rbrace, \qquad (t_\mathrm{d}, t_\mathrm{n}) = (15, 9)\ \text{h}
 $$
 
 Both are special cases of the **composite whole-day rating level** (6.5, generalizing Formulae 5–6), where each period $i$ contributes its rating level $L_i$ plus an adjustment $K_i$, weighted by its share of the day:
 
 $$
-L_R = 10 \log_{10}\left[ \sum_i \frac{h_i}{24}\ 10^{0.1 (L_i + K_i)} \right], \qquad \sum_i h_i = 24\ \text{h}
+L_\mathrm{R} = 10 \log_{10}\left[ \sum_i \frac{h_i}{24}\ 10^{0.1 (L_i + K_i)} \right], \qquad \sum_i h_i = 24\ \text{h}
 $$
 
 The adjustments $K_i$ cover time-of-day penalties (ISO 1996-1 Table A.1: evening 5 dB, night 10 dB) as well as source-character adjustments (e.g. tonal penalties), which the ECMA-418-1 TNR/PR assessments can justify objectively.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%"></picture>
 
-*A 24-hour $L_{Aeq}$ profile split into day, evening and night, the +5/+10 dB penalties and the resulting $L_{den}$.*
+*A 24-hour $L_\mathrm{Aeq}$ profile split into day, evening and night, the +5/+10 dB penalties and the resulting $L_\mathrm{den}$.*
 
 See the [Environmental levels guide](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/) for usage.
 
@@ -110,16 +110,16 @@ $$
 designed to peak around 15 for very sudden, loud impulses. The adjustment to the measurement-period level takes the governing (highest-$P$) impulse (clause 8, Formula 2):
 
 $$
-K_I = 1.8\ (P - 5)\ \text{dB} \quad (P > 5;\ \text{else } K_I = 0),
+K_\mathrm{I} = 1.8\ (P - 5)\ \text{dB} \quad (P > 5;\ \text{else } K_\mathrm{I} = 0),
 $$
 
 and the whole-day rating level combines the adjusted periods energetically (clause 8, Note 1):
 
 $$
-L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
 $$
 
-$K_I$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_I(P{=}10) = 9.0$ dB are reproduced exactly.
+$K_\mathrm{I}$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_\mathrm{I}(P{=}10) = 9.0$ dB are reproduced exactly.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impulsive_sound_onsets.svg" alt="A-weighted Fast level history of three hammer strikes over a 55 dB(A) background across six seconds: each strike rises from about 52 dB to 89 dB, the detected onset start and end points are marked with the least-squares onset line, the governing level difference of 36.8 dB is annotated, and the title reports a prominence of 11.34 with an adjustment of 11.42 dB, category highly impulsive" width="90%"></picture>
 
@@ -144,13 +144,13 @@ frequency. ISO 9613-1:1993, Eq. (5) gives the pure-tone attenuation coefficient
 $\alpha$ in decibels per metre:
 
 $$
-\alpha = 8.686\ f^2 \Big[ 1.84\times10^{-11} \big(p_a/p_r\big)^{-1} \big(T/T_0\big)^{1/2}
-       + \big(T/T_0\big)^{-5/2} \big( 0.01275\ \tfrac{e^{-2239.1/T}}{f_{rO} + f^2/f_{rO}}
-       + 0.1068\ \tfrac{e^{-3352.0/T}}{f_{rN} + f^2/f_{rN}} \big) \Big],
+\alpha = 8.686\ f^2 \Big[ 1.84\times10^{-11} \big(p_\mathrm{a}/p_\mathrm{r}\big)^{-1} \big(T/T_0\big)^{1/2}
+       + \big(T/T_0\big)^{-5/2} \big( 0.01275\ \tfrac{e^{-2239.1/T}}{f_\mathrm{rO} + f^2/f_\mathrm{rO}}
+       + 0.1068\ \tfrac{e^{-3352.0/T}}{f_\mathrm{rN} + f^2/f_\mathrm{rN}} \big) \Big],
 $$
 
-with the oxygen and nitrogen relaxation frequencies $f_{rO}$, $f_{rN}$ of
-Eq. (3)/(4), the reference conditions $T_0 = 293.15$ K, $p_r = 101.325$ kPa
+with the oxygen and nitrogen relaxation frequencies $f_\mathrm{rO}$, $f_\mathrm{rN}$ of
+Eq. (3)/(4), the reference conditions $T_0 = 293.15$ K, $p_\mathrm{r} = 101.325$ kPa
 (Clause 4.2) and the molar water-vapour concentration $h$ from the relative
 humidity (Annex B). At low frequency $\alpha \propto f^2$; near each relaxation
 frequency the corresponding term peaks and rolls off, which is why $\alpha$ rises
@@ -158,7 +158,7 @@ by two decades from 50 Hz to 10 kHz and why raising the humidity sweeps a peak
 across the band. The library reproduces Table 1 to under 0.4 % (the standard's
 own printed precision), well inside its stated $\pm 10$ %; passing
 `exact_midband=True` snaps each frequency onto the exact midbands
-$f_m = 1000 \cdot 10^{k/10}$ (Note 5) used to compute that table. The same
+$f_\mathrm{m} = 1000 \cdot 10^{k/10}$ (Note 5) used to compute that table. The same
 $\alpha$ is the only route to the ISO 354 power attenuation coefficient
 $m = \alpha/(10 \log_{10} e)$, exposed as `air_attenuation_m`.
 
@@ -181,56 +181,56 @@ less: 0 °C at 70 % and 20 °C at 50 % differ by 0.02 dB/km at 1 kHz.*
 
 ISO 9613-2:1996 predicts the octave-band level at a receiver **downwind** of a
 point source (or the equivalent moderate temperature inversion) as
-$L_{fT}(DW) = L_W + D_c - A$ (Eq. (3)), where $D_c$ is the directivity correction
+$L_{fT}(DW) = L_W + D_\mathrm{c} - A$ (Eq. (3)), where $D_\mathrm{c}$ is the directivity correction
 and $A$ is the octave-band attenuation, a sum of independent physical mechanisms
 (Eq. (4)):
 
 $$
-A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc}.
+A = A_\mathrm{div} + A_\mathrm{atm} + A_\mathrm{gr} + A_\mathrm{bar} + A_\mathrm{misc}.
 $$
 
 The library implements the four general terms of Clause 7; the informative
-$A_{misc}$ (foliage, industrial sites, housing) and reflections are left to the
+$A_\mathrm{misc}$ (foliage, industrial sites, housing) and reflections are left to the
 caller. **Geometrical divergence** is spherical spreading from a point source,
-$A_{div} = 20 \log_{10}(d/d_0) + 11$ dB with $d_0 = 1$ m (Eq. (7)): exactly
+$A_\mathrm{div} = 20 \log_{10}(d/d_0) + 11$ dB with $d_0 = 1$ m (Eq. (7)): exactly
 51 dB at 100 m, +6 dB per distance doubling. **Atmospheric absorption** is
-$A_{atm} = \alpha\ d$ (Eq. (8)) with $\alpha$ the ISO 9613-1 coefficient above.
-**Ground effect** $A_{gr} = A_s + A_r + A_m$ (Eq. (9)) sums a source, receiver and
+$A_\mathrm{atm} = \alpha\ d$ (Eq. (8)) with $\alpha$ the ISO 9613-1 coefficient above.
+**Ground effect** $A_\mathrm{gr} = A_\mathrm{s} + A_\mathrm{r} + A_\mathrm{m}$ (Eq. (9)) sums a source, receiver and
 middle region, each evaluated from the Table 3 functions $a'/b'/c'/d'$ and its
-ground factor $G$ (0 hard, 1 porous); a negative $A_{gr}$ denotes a net gain from
+ground factor $G$ (0 hard, 1 porous); a negative $A_\mathrm{gr}$ denotes a net gain from
 the ground reflection. An alternative A-weighted-only form
-$A_{gr} = 4.8 - (2 h_m/d)[17 + 300/d] \ge 0$ (Eq. (10)) is offered for porous
+$A_\mathrm{gr} = 4.8 - (2 h_\mathrm{m}/d)[17 + 300/d] \ge 0$ (Eq. (10)) is offered for porous
 ground when only the A-weighted level matters, paired with the solid-angle index
 $D_\Omega$ (Eq. (11)). **Screening** by a barrier is the diffraction insertion
 loss
 
 $$
-D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big] \quad\text{dB},
+D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_\mathrm{met} \big] \quad\text{dB},
 $$
 
 (Eq. (14)) with $C_2 = 20$ (or 40 when ground reflections are handled by image
 sources), $C_3 = 1$ for a single edge or Eq. (15) for a double edge, the
-path-length difference $z = d_{ss} + d_{sr} - d$ (Eq. (16)/(17)), wavelength
-$\lambda = 340/f$ and the meteorological factor $K_{met}$ (Eq. (18)); $D_z$ is
+path-length difference $z = d_\mathrm{ss} + d_\mathrm{sr} - d$ (Eq. (16)/(17)), wavelength
+$\lambda = 340/f$ and the meteorological factor $K_\mathrm{met}$ (Eq. (18)); $D_z$ is
 capped at 20 dB (single) or 25 dB (double). For a top-edge barrier the ground
 effect of the screened path is folded into the screening term,
-$A_{bar} = D_z - A_{gr} \ge 0$ (Eq. (12), Note 13); for a lateral (vertical-edge)
-barrier $A_{bar} = D_z$ and the ground term is kept (Eq. (13)). The long-term
-average level subtracts the meteorological correction $C_{met}$ (Eq. (6),
+$A_\mathrm{bar} = D_z - A_\mathrm{gr} \ge 0$ (Eq. (12), Note 13); for a lateral (vertical-edge)
+barrier $A_\mathrm{bar} = D_z$ and the ground term is kept (Eq. (13)). The long-term
+average level subtracts the meteorological correction $C_\mathrm{met}$ (Eq. (6),
 (21)/(22)). The method's stated accuracy is $\pm 1$ to $\pm 3$ dB for broadband
 noise up to 1000 m (Table 5).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown.svg" alt="ISO 9613-2 per-octave-band attenuation breakdown as a stacked bar of Adiv, Aatm, Agr and Abar with the total A overlaid, for a 200 m path over porous ground with a 4 m barrier" width="80%"></picture>
 
 *The four terms at their true relative sizes, band by band, for a 200 m path
-over porous ground with a 4 m barrier. $A_{div}$ is 57 dB in every band because
-it is pure geometry. $A_{atm}$ is nothing at 63 Hz and 18.7 dB at 8 kHz, so it
-is the term that decides how far high frequencies travel and no other. $A_{gr}$
+over porous ground with a 4 m barrier. $A_\mathrm{div}$ is 57 dB in every band because
+it is pure geometry. $A_\mathrm{atm}$ is nothing at 63 Hz and 18.7 dB at 8 kHz, so it
+is the term that decides how far high frequencies travel and no other. $A_\mathrm{gr}$
 is where the low bands live and is **negative** at 63 Hz (−4.6 dB: the ground
-reflection adds energy rather than removing it). $A_{bar}$ is at its 20 dB cap
+reflection adds energy rather than removing it). $A_\mathrm{bar}$ is at its 20 dB cap
 from 2 kHz up but falls to zero at 250 Hz, because the top-edge form subtracts
-the ground effect the screened path gives away, $A_{bar} = D_z - A_{gr} \geq 0$,
-and 250 Hz is exactly where $A_{gr}$ peaks. Which term is worth refining
+the ground effect the screened path gives away, $A_\mathrm{bar} = D_z - A_\mathrm{gr} \geq 0$,
+and 250 Hz is exactly where $A_\mathrm{gr}$ peaks. Which term is worth refining
 depends entirely on the band and the geometry.*
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%"></picture>
@@ -238,11 +238,11 @@ depends entirely on the band and the geometry.*
 ### Occupational noise exposure and uncertainty (ISO 9612)
 
 ISO 9612:2009 is the engineering method (accuracy grade 2) for a worker's daily
-noise exposure level $L_{EX,8h}$, normalised to a nominal 8 h day. Three
+noise exposure level $L_\mathrm{EX,8h}$, normalised to a nominal 8 h day. Three
 **measurement strategies** trade effort for representativeness. The *task-based*
 method (Clause 9) splits the day into tasks, energy-averages $I \ge 3$ samples
 per task (Eq. 7) and sums the task contributions
-$L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0)$ energetically (Eq. 9/10).
+$L_{\mathrm{EX,8h},m} = L_{p,\mathrm{A,eq}T,m} + 10 \log_{10}(T_m/T_0)$ energetically (Eq. 9/10).
 The *job-based* method (Clause 10) energy-averages $N \ge 5$ random samples over a
 homogeneous exposure group (Eq. 11) and normalises the effective-day duration
 (Eq. 12); the *full-day* method (Clause 11) does the same arithmetic on whole-day
@@ -253,7 +253,7 @@ measurements (Eq. 13).
 The **Annex C** uncertainty budget is normative. The combined standard
 uncertainty is $u^2 = \sum c_i^2 u_i^2$ (C.1) and the expanded uncertainty is
 $U = k\ u$ with $k = 1.65$ for a **one-sided** 95 % interval (Clause 14), so the
-reported upper limit is $L_{EX,8h} + U$. The task and job methods differ in an
+reported upper limit is $L_\mathrm{EX,8h} + U$. The task and job methods differ in an
 instructive way: the task noise-sampling uncertainty $u_{1a}$ divides the summed
 squared deviations by $I(I-1)$ (the standard error of the mean, Eq. C.6)
 whereas the job/full-day sampling uncertainty $u_1$ is the plain sample standard
@@ -263,9 +263,9 @@ sensitivity coefficients $c_{1a}$ (Eq. C.4) and $c_{1b}$ (Eq. C.5) and an option
 task-duration uncertainty $u_{1b}$ (Eq. C.7); the job/full-day budget (Eq. C.9)
 reads $c_1 u_1$ from Table C.4 as a function of $(N, u_1)$ and adds the instrument
 uncertainty $u_2$ (Table C.5) and microphone-position uncertainty $u_3 = 1.0$ dB
-in quadrature. Peak levels $L_{p,Cpeak}$ are reported without an uncertainty:
+in quadrature. Peak levels $L_{p,\mathrm{Cpeak}}$ are reported without an uncertainty:
 Annex C provides no method for them (Table C.5, Note 1). The three worked
-examples of Annexes D (task, $L_{EX,8h} = 84.3$ dB, $U = 2.7$ dB), E (job,
+examples of Annexes D (task, $L_\mathrm{EX,8h} = 84.3$ dB, $U = 2.7$ dB), E (job,
 $88.1$ dB, $3.8$ dB) and F (full-day, $90.1$ dB, $3.4$ dB) are reproduced to
 the standard's printed precision: every intermediate of Annex E is digit-exact,
 and its final level differs only by the standard's own pre-rounding of the
@@ -274,7 +274,7 @@ effective-day level (see the [Occupational Noise Exposure guide](https://jmrplen
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty.svg" alt="ISO 9612 Annex D task-based exposure: the three task LEX,8h contributions as bars, the energy-summed daily LEX,8h line and the one-sided 95 % upper limit LEX,8h + U band above it" width="80%"></picture>
 
 *What the budget buys: the Annex D worked day, its three task contributions, the
-energy-summed $L_{EX,8h}$ and the band up to $L_{EX,8h} + U$ that the one-sided
+energy-summed $L_\mathrm{EX,8h}$ and the band up to $L_\mathrm{EX,8h} + U$ that the one-sided
 95 % interval adds on top. The reported result is the pair, not the line — and
 with $U = 2.7$ dB the upper limit sits 2.7 dB above the number, which is enough
 to cross an action value on its own.*
@@ -309,7 +309,7 @@ geometry: a hemisphere $S = 2 \pi r^2$ over one reflecting plane (halved and
 quartered for two and three planes), a one-plane box $S = 4(ab + bc + ca)$ with
 $a = 0.5\ l_1 + d$, $b = 0.5\ l_2 + d$, $c = l_3 + d$. ISO 3746 (survey) shares
 the maths with looser criteria. The expanded uncertainty is
-$U = 2 \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$.
+$U = 2 \sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$.
 
 ### Precision grade in anechoic rooms (ISO 3745)
 
@@ -323,18 +323,18 @@ microphone position *before* the energy average (Eq. 11); no correction is
 needed above a 15 dB margin, and below 10 dB (250 Hz – 5 kHz) or 6 dB (edge
 bands) the correction is clamped and the result flagged as an upper bound
 (clause 9.4.2). The meteorological terms are
-$C_1 = -10 \log_{10}(p_s/p_{s0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ and
-$C_2 = -10 \log_{10}(p_s/p_{s0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ with
+$C_1 = -10 \log_{10}(p_\mathrm{s}/p_{\mathrm{s}0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ and
+$C_2 = -10 \log_{10}(p_\mathrm{s}/p_{\mathrm{s}0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ with
 $\theta_0 = 314$ K, $\theta_1 = 296$ K: at the 23 °C / 101.325 kPa reference
 $C_2 = 0$ exactly and $C_1 = -0.128$ dB; and
 $C_3 = A_0 (1.0053 - 0.0012 A_0)^{1.6}$ with $A_0 = a(f)\ r$ restores the
 ISO 9613-1 air absorption over the measurement radius. The Annex D/E
 microphone arrays are built in as digit-exact coordinate tables (40 equal-area
 positions; the mirror set 21–40 is added when the band-SPL spread exceeds
-$N_M/2$, clause 9.3.2), and the same positions yield the directivity index
+$N_\mathrm{M}/2$, clause 9.3.2), and the same positions yield the directivity index
 $DI_i = L_{pi} - \bar{L}_p$ (Eq. 21). The clause 10.5 uncertainty example,
 $U = 2\sqrt{0.5^2 + 2.0^2} = 4.12$ dB, is reproduced, along with the Table 2/3
-per-band $\sigma_{R0}$ values.
+per-band $\sigma_{\mathrm{R}0}$ values.
 
 ### Reverberation room (ISO 3741)
 
@@ -356,7 +356,7 @@ characterised.
 
 Sound intensity is the net energy flux $\vec{I} = \overline{p\ \vec{u}}$, so by
 the divergence theorem the power through a closed surface is
-$P = \sum_i \langle I_{n,i} \rangle\ S_i$. A steady source *outside* the surface
+$P = \sum_i \langle I_{\mathrm{n},i} \rangle\ S_i$. A steady source *outside* the surface
 contributes zero net flux (its energy enters and leaves), which is why
 intensity rejects stationary background noise, but it can still drive a band's
 $P$ negative, in which case that band is not determinable. Two normative field
@@ -365,8 +365,8 @@ $F_{pI} = [L_p] - L_W + 10 \log_{10}(S/S_0)$ (reactivity) and the
 negative-partial-power indicator
 $F_{+/-} = 10 \log_{10}(\sum_i \lvert P_i \rvert / \lvert \sum_i P_i \rvert)$
 (recirculation), together with the probe's dynamic capability
-$L_d = \delta_{pI0} - K$ ($K = 10$ dB grade 2, 7 dB grade 3), which must exceed
-$F_{pI}$. A band earns the engineering grade when $L_d > F_{pI}$, $F_{+/-} \le 3$ dB
+$L_\mathrm{d} = \delta_{pI0} - K$ ($K = 10$ dB grade 2, 7 dB grade 3), which must exceed
+$F_{pI}$. A band earns the engineering grade when $L_\mathrm{d} > F_{pI}$, $F_{+/-} \le 3$ dB
 and the two repeated sweeps agree within the Table 2 limit.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_intensity_scan.svg" alt="ISO 9614-3 precision sound intensity scanning: a source enclosed by a measurement surface divided into segments, a two-microphone intensity probe scanned along a serpentine path over each segment, and the sound power formed by summing the normal intensity times segment area, subject to the field-indicator acceptance criteria" width="92%"></picture>
@@ -384,17 +384,17 @@ positions the surface needs.*
 ### Precision intensity scanning (ISO 9614-3)
 
 ISO 9614-3:2002 upgrades the scanning method to precision grade with a tighter
-indicator machinery. The partial powers $P_i = I_{n,i} S_i$ (Eq. 5) sum as
+indicator machinery. The partial powers $P_i = I_{\mathrm{n},i} S_i$ (Eq. 5) sum as
 before, but validity now rests on the signed and unsigned pressure-intensity
-indicators $F_{pIn} = \bar{L}_p - L_{In}$ (Eqs. B.3/B.6, the F2/F3 of
-ISO 9614-1) and the normalized intensity non-uniformity $F_S$ (Eq. B.8),
+indicators $F_{pIn} = \bar{L}_p - L_{I\mathrm{n}}$ (Eqs. B.3/B.6, the F2/F3 of
+ISO 9614-1) and the normalized intensity non-uniformity $F_\mathrm{S}$ (Eq. B.8),
 through five acceptance criteria (Annex C): scan repeatability
-$|L_{In}(1) - L_{In}(2)| \le s/2$ (C.1), dynamic capability
-$L_d = \delta_{pI0} - K \ge F_{pIn}(\text{signed})$ with the precision
+$|L_{I\mathrm{n}}(1) - L_{I\mathrm{n}}(2)| \le s/2$ (C.1), dynamic capability
+$L_\mathrm{d} = \delta_{pI0} - K \ge F_{pIn}(\text{signed})$ with the precision
 bias-error factor $K = 10$ dB (C.2),
 $F_{pIn}(\text{signed}) - F_{pIn}(\text{unsigned}) \le 3$ dB (C.3),
-$F_S \le 2$ (C.4) and the scan-density convergence
-$0.83 \le F_S(1)/F_S(2) \le 1.2$ (C.5). Eq. 10 normalizes the result to the
+$F_\mathrm{S} \le 2$ (C.4) and the scan-density convergence
+$0.83 \le F_\mathrm{S}(1)/F_\mathrm{S}(2) \le 1.2$ (C.5). Eq. 10 normalizes the result to the
 reference meteorological conditions,
 $L_{W0} = L_W - 15 \log_{10}[(B/101325) \cdot 296.15/(273.15 + \theta)]$. Bands whose
 net power is negative are not determinable (clause 9.2) and are flagged. A
@@ -506,14 +506,14 @@ part; the scattering coefficient $s$ is the non-specular energy fraction.
 ISO 17497-1:2004+A1:2014 measures it in a reverberation room with the test
 sample on a turntable: four reverberation times, stationary and rotating,
 each without and with the sample (Table 2), give the random-incidence
-absorption $\alpha_s$ (clause 8.1.1, Formula 1) and the *specular* absorption
-$\alpha_{spec}$ (clause 8.1.2, Formula 4). Rotation decorrelates the scattered
+absorption $\alpha_\mathrm{s}$ (clause 8.1.1, Formula 1) and the *specular* absorption
+$\alpha_\mathrm{spec}$ (clause 8.1.2, Formula 4). Rotation decorrelates the scattered
 reflections between decays, so they average out and register as extra
 "absorption", and the scattering coefficient follows (clause 8.1.3,
 Formula 5):
 
 $$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s},
+s = \frac{\alpha_\mathrm{spec} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}},
 $$
 
 each $\alpha$ being a two-condition Sabine difference
@@ -547,16 +547,16 @@ d_\theta = \frac{\left( \sum_i p_i \right)^2 - \sum_i p_i^2}{(n - 1) \sum_i p_i^
 $$
 
 1 for a perfectly uniform response and tending to 0 for a single specular
-lobe; Formula 6 is the area-weighted form with $N_i = A_i / A_{min}$ from the
+lobe; Formula 6 is the area-weighted form with $N_i = A_i / A_\mathrm{min}$ from the
 Formula 8 solid-angle factors ($A_i = (4\pi/\Delta\phi) \sin^2(\Delta\theta/4)$
 at the zenith). Normalizing against a flat reference reflector of the same
 size removes edge diffraction (clause 8.2, Formula 7):
-$d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. The
+$d_{\theta,\mathrm{n}} = (d_\theta - d_{\theta,\mathrm{r}})/(1 - d_{\theta,\mathrm{r}})$. The
 random-incidence value averages the source angles with weights 1:3:3:3:3 for
 0°, ±30°, ±60° (clause 8.4). Anchors: the model-predicted 37-receiver arc of
 the published six-period $N = 7$ QRD (Cox & D'Antonio 3rd ed., Appendix B;
 Hargreaves et al. 2000, Table I) at 1000 Hz gives $d_\theta = 0.1099$, its
-flat reference $0.0049$ and $d_{\theta,n} = 0.1055$; the band-averaged model
+flat reference $0.0049$ and $d_{\theta,\mathrm{n}} = 0.1055$; the band-averaged model
 predictions match the published Appendix B BEM normalised diffusion in the
 200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
 mean absolute deviation is about 0.09); zenith area factor 1.5710.
@@ -584,11 +584,11 @@ leading edge, a mandated 5 ms flat top and a Blackman-Harris trailing edge),
 and
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_r(f)}{H_i(f)} \right|^2,
-\qquad K_r = \frac{d_s - d_m}{d_s + d_m} = \frac{2}{3}
+\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
+\qquad K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
 $$
 
-for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m (clause 4.2,
+for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m (clause 4.2,
 Annex C); $K_r$ is the spherical-spreading ratio between the direct and the
 image path. Ratioing the road measurement against one on a highly reflective
 reference surface cancels the entire electro-acoustic chain along with $K_r$
@@ -598,8 +598,8 @@ radius ≈ 1.34 m for the standard geometry) and the valid range is
 250–1600 Hz) instead couples a small impedance tube to the surface and defers
 the mathematics to the ISO 10534-2 transfer-function method below (its
 clauses 4/5.7/6.6); the implementation reuses that module, adding the Part 2
-geometry and validity limits ($f_u = 0.58\ c_0/d$; microphone spacing bounds
-$0.45\ c_0/f_{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
+geometry and validity limits ($f_\mathrm{u} = 0.58\ c_0/d$; microphone spacing bounds
+$0.45\ c_0/f_\mathrm{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
@@ -611,20 +611,20 @@ See the [In-situ Road-Surface Absorption guide](https://jmrplens.github.io/phono
 ### Weighted sound absorption (ISO 11654)
 
 ISO 11654:1997 condenses an ISO 354 third-octave absorption curve into a
-single number. The practical coefficient $\alpha_p$ averages the three thirds
+single number. The practical coefficient $\alpha_\mathrm{p}$ averages the three thirds
 of each octave 250 Hz – 4 kHz and rounds to steps of 0.05 (clause 4.1). The
 reference curve (0.80, 1.00, 1.00, 1.00, 0.90 at 250–4000 Hz) is then shifted
 downward in 0.05 steps until the sum of unfavourable deviations, counted only
 where the measurement falls *below* the shifted curve, is $\le 0.10$;
-$\alpha_w$ is the shifted curve at 500 Hz (clause 4.2). A shape indicator
+$\alpha_\mathrm{w}$ is the shifted curve at 500 Hz (clause 4.2). A shape indicator
 flags excess absorption $\ge 0.25$ above the shifted curve: L at 250 Hz, M at
 500/1000 Hz, H at 2000/4000 Hz (clause 4.3), and the informative Annex B maps
-$\alpha_w$ to the absorption classes A–E. Because every quantity is a multiple
+$\alpha_\mathrm{w}$ to the absorption classes A–E. Because every quantity is a multiple
 of 0.05, the implementation does the whole grid arithmetic in integer
 twentieths, making the shift search and class boundaries exact and
 float-safe. The two Annex A worked examples are reproduced:
-$\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
-raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
+$\alpha_\mathrm{p} = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_\mathrm{w} = 0.60$, class C; and
+raising 500 Hz to 1.00 keeps $\alpha_\mathrm{w} = 0.60$ but adds the indicator, "0.60(M)".
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
 
@@ -637,7 +637,7 @@ See the [Sound Absorption Measurement and Rating guide](https://jmrplens.github.
 Airflow resistivity $\sigma = R\,A/d$ is the key transport parameter of a
 porous absorber. ISO 9053-1:2018 (static method) drives a steady flow through
 the specimen and fits $\Delta p = a\,u + b\,u^2$ through the origin
-(clause 7.5); since $R_s = \Delta p / u = a + b\,u$, the linear coefficient is
+(clause 7.5); since $R_\mathrm{s} = \Delta p / u = a + b\,u$, the linear coefficient is
 the zero-velocity specific resistance, reported at the reference velocity
 $u = 0.5$ mm/s. ISO 9053-2:2020 (alternating method) replaces the flowmeter
 with a ~2 Hz piston and a microphone in a closed cavity (clause 8.7,
@@ -652,7 +652,7 @@ at the 0.5 mm/s reference velocity, which is why the reference velocity has to
 be stated with any resistivity that is quoted.*
 
 $$
-R = \kappa'\ \frac{p_s}{2 \pi f V}\ \frac{h_t}{h_s}\ 10^{(L_{ps} - L_{pt})/20}
+R = \kappa'\ \frac{p_\mathrm{s}}{2 \pi f V}\ \frac{h_\mathrm{t}}{h_\mathrm{s}}\ 10^{(L_{ps} - L_{p\mathrm{t}})/20}
 $$
 
 Only a level *difference* enters, so the sound-level device needs no
@@ -674,11 +674,11 @@ $f > c_0/(20 s)$; clauses 4.2–4.5) carries only plane waves, so the surface
 reflection factor of a sample is fully observable. ISO 10534-2
 (transfer-function method) compares the measured two-microphone transfer
 function $H_{12}$ with the analytic incident and reflected ones
-$H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$ (Annex D) to give (clause 7,
+$H_\mathrm{I} = e^{-j k_0 s}$, $H_\mathrm{R} = e^{+j k_0 s}$ (Annex D) to give (clause 7,
 Eq. 17):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\ e^{2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\ e^{2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1 + r}{1 - r},
 $$
 
@@ -822,24 +822,24 @@ See the [Loudness guide](https://jmrplens.github.io/phonometry/perception/psycho
 Both methods operate on a Hann-windowed, RMS-averaged power spectrum (clauses 11.1 / 12.1) and use the clause 10 critical-band model. The critical bandwidth centred on a tone at $f$ is (Formula 2):
 
 $$
-\Delta f_c = 25.0 + 75.0 \left(1.0 + 1.4 \left(\tfrac{f}{1000}\right)^2\right)^{0.69} \ \text{Hz}
+\Delta f_\mathrm{c} = 25.0 + 75.0 \left(1.0 + 1.4 \left(\tfrac{f}{1000}\right)^2\right)^{0.69} \ \text{Hz}
 $$
 
-Band edges are placed **arithmetically** for $f \le 500$ Hz (Formulae 4–5): $f_{1,2} = f \mp \Delta f_c / 2$, and **geometrically** above (Formulae 7–8): $f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_c$.
+Band edges are placed **arithmetically** for $f \le 500$ Hz (Formulae 4–5): $f_{1,2} = f \mp \Delta f_\mathrm{c} / 2$, and **geometrically** above (Formulae 7–8): $f_1 = -\Delta f_\mathrm{c}/2 + \sqrt{\Delta f_\mathrm{c}^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_\mathrm{c}$.
 
-**TNR** (clause 11). The tone band spans the spectral minima on both sides of the peak within 15 % of $\Delta f_c$ (clause 11.2). The tone power subtracts the straight line connecting the band-edge bins (Formula 9): over $N$ tone-band bins, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. The masking-noise power is the remaining critical-band power rescaled to the full critical bandwidth (Formula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_c / \Delta f_{\text{band}}$, and $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Formula 11). The prominence criterion (Formulae 12–13) is
+**TNR** (clause 11). The tone band spans the spectral minima on both sides of the peak within 15 % of $\Delta f_\mathrm{c}$ (clause 11.2). The tone power subtracts the straight line connecting the band-edge bins (Formula 9): over $N$ tone-band bins, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. The masking-noise power is the remaining critical-band power rescaled to the full critical bandwidth (Formula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_\mathrm{c} / \Delta f_{\text{band}}$, and $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Formula 11). The prominence criterion (Formulae 12–13) is
 
 $$
-\mathrm{TNR}_{\text{crit}} = \begin{cases} 8.0 + 8.33 \log_{10}(1000/f_t) \ \text{dB} & f_t < 1\ \text{kHz} \\ 8.0 \ \text{dB} & f_t \ge 1\ \text{kHz} \end{cases}
+\mathrm{TNR}_{\text{crit}} = \begin{cases} 8.0 + 8.33 \log_{10}(1000/f_\mathrm{t}) \ \text{dB} & f_\mathrm{t} < 1\ \text{kHz} \\ 8.0 \ \text{dB} & f_\mathrm{t} \ge 1\ \text{kHz} \end{cases}
 $$
 
-**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_t \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_t \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_t)$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
+**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_\mathrm{t} \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_\mathrm{t} \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_\mathrm{t})$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
 
 *The TNR criterion drawn rather than evaluated, over the 89.1 Hz – 11.2 kHz
 range of interest, with one assessed tone on it. Because the criterion is
-$8.0 + 8.33\log_{10}(1000/f_t)$ below 1 kHz and flat above, the same
+$8.0 + 8.33\log_{10}(1000/f_\mathrm{t})$ below 1 kHz and flat above, the same
 tone-to-noise ratio is judged against a different threshold at every frequency:
 the example tone clears its 13.0 dB threshold at 250 Hz by 2.1 dB, while a
 10 dB tone would be prominent anywhere above 1 kHz and not prominent here.*
@@ -850,7 +850,7 @@ See the [Prominent Discrete Tones guide](https://jmrplens.github.io/phonometry/p
 
 The ear analyzes sound in **critical bands**: frequency regions within which energy is summed before loudness is formed. The **Bark scale** maps frequency to critical-band rate $z$, 0 to 24 Bark, and ISO 532-1:2017 samples the specific loudness $N'(z)$ at 0.1-Bark steps (240 values). The implementation is a clean-room port of the standard's normative reference program (Annex A.4) and proceeds in stages:
 
-1. **One-third-octave levels**: 28 bands, 25 Hz to 12.5 kHz (the Annex A filterbank at 48 kHz, Tables A.1/A.2). For time-varying sounds the squared band outputs are smoothed by three cascaded low-passes with $\tau = 2/(3 f_c)$ ($f_c$ capped at 1 kHz) and sampled every 2 ms.
+1. **One-third-octave levels**: 28 bands, 25 Hz to 12.5 kHz (the Annex A filterbank at 48 kHz, Tables A.1/A.2). For time-varying sounds the squared band outputs are smoothed by three cascaded low-passes with $\tau = 2/(3 f_\mathrm{c})$ ($f_\mathrm{c}$ capped at 1 kHz) and sampled every 2 ms.
 2. **Low-frequency grouping**: the 11 bands up to 250 Hz receive the equal-loudness corrections of Table A.3 and are summed into the first three critical bands (25–80, 100–160, 200–250 Hz).
 3. **a0 transmission**: the outer/middle-ear transfer correction of Table A.4 (plus the diffuse-field difference of Table A.5 when `field='diffuse'`) yields the critical-band levels $L_E$.
 4. **Core loudness**: each of the 20 critical bands is transformed with the threshold-in-quiet levels $L_{TQ}$ of Table A.6 (after the bandwidth adaptation DCB of Table A.7):
@@ -889,7 +889,7 @@ ISO 532-1 is one of three loudness models; two newer families refine the auditor
 
 ### Moore-Glasberg loudness (ISO 532-2:2017, ISO 532-3:2023)
 
-Instead of Zwicker's fixed critical bands, the Moore-Glasberg model forms a continuous **excitation pattern** on the ERB-number ("Cam") scale using level-dependent **rounded-exponential (roex)** auditory filters. As a function of the normalized frequency deviation $g = |f - f_c| / f_c$ from a filter centred at $f_c$, the filter weighting is
+Instead of Zwicker's fixed critical bands, the Moore-Glasberg model forms a continuous **excitation pattern** on the ERB-number ("Cam") scale using level-dependent **rounded-exponential (roex)** auditory filters. As a function of the normalized frequency deviation $g = |f - f_\mathrm{c}| / f_\mathrm{c}$ from a filter centred at $f_\mathrm{c}$, the filter weighting is
 
 $$
 W(g) = (1 + p\ g)\ e^{-p\ g}
@@ -998,10 +998,10 @@ $$
 Steady background noise multiplies each band's $m$ by the intensity ratio (the noise term):
 
 $$
-m'_k = m_k \cdot \frac{I_k}{I_k + I_{n,k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
+m'_k = m_k \cdot \frac{I_k}{I_k + I_{\mathrm{n},k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
 $$
 
-and when absolute band levels are known the full correction $m'_k = m_k I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})$ adds the auditory masking intensity $I_{am,k}$ (from the next lower octave band, Table A.2) and the absolute reception threshold $I_{rt,k}$ (Table A.3). Each corrected $m$ maps to an **effective SNR**, clipped to the ±15 dB range where intelligibility actually varies, then to a transmission index (A.5.4/A.5.5):
+and when absolute band levels are known the full correction $m'_k = m_k I_k / (I_k + I_{\mathrm{am},k} + I_{\mathrm{rt},k} + I_{\mathrm{n},k})$ adds the auditory masking intensity $I_{\mathrm{am},k}$ (from the next lower octave band, Table A.2) and the absolute reception threshold $I_{\mathrm{rt},k}$ (Table A.3). Each corrected $m$ maps to an **effective SNR**, clipped to the ±15 dB range where intelligibility actually varies, then to a transmission index (A.5.4/A.5.5):
 
 $$
 \mathrm{SNR}_{\mathrm{eff}} = 10 \log_{10} \frac{m}{1 - m}\ \text{dB}, \qquad \mathrm{TI} = \frac{\mathrm{SNR}_{\mathrm{eff}} + 15}{30}
@@ -1074,10 +1074,10 @@ See the [Speech Intelligibility guide](https://jmrplens.github.io/phonometry/per
 ISO 389-7:2005 Table 1 fixes the reference threshold of hearing of otologically normal young adults: the free-field and diffuse-field SPL corresponding to 0 dB HL at the 11 audiometric frequencies 125 Hz – 8 kHz (22.1 dB at 125 Hz for both fields, 2.4/0.8 dB free/diffuse at 1 kHz, diverging at high frequency to 12.6 vs 6.8 dB at 8 kHz). ISO 7029:2017 describes how that threshold shifts statistically with age: the median deviation from age 18 is (clause 4.2, Table 1)
 
 $$
-\Delta H_{md} = a\ (Y - 18)^b \ \text{dB},
+\Delta H_\mathrm{md} = a\ (Y - 18)^b \ \text{dB},
 $$
 
-and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, using the upper spread $s_u$ for $z \ge 0$ (worse than median) and the lower spread $s_l$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
+and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_\mathrm{md} + z(Q)\ s$, using the upper spread $s_\mathrm{u}$ for $z \ge 0$ (worse than median) and the lower spread $s_\mathrm{l}$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold.svg" alt="Two panels. Left: the ISO 7029 median hearing-threshold deviation for men at ages 20, 40, 60 and 80 on an inverted audiogram axis, with the 10 to 90 percent fractile band around the 70-year curve; the loss deepens toward high frequencies and with age. Right: the ISO 389-7 free-field and diffuse-field reference threshold, coinciding below 1 kHz and diverging above, dipping to a minimum near 3 to 4 kHz" width="96%"></picture>
 
@@ -1090,10 +1090,10 @@ See the [Hearing Threshold guide](https://jmrplens.github.io/phonometry/percepti
 ISO 1999:2013 predicts the permanent threshold shift a noise-exposed population accrues. The median noise-induced shift (NIPTS) for 10–40 years of exposure is (clause 6.3.1, Formula 2, Table 1):
 
 $$
-N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{yr},
+N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_\mathrm{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{yr},
 $$
 
-quadratic in the excess over the frequency-dependent onset level $L_0$ (75 dB at 4 kHz, the most sensitive band, up to 93 dB at 500 Hz) and zero below it; under 10 years it scales as $\log_{10}(t+1)/\log_{10} 11$ (Formula 3). Fractiles add the spread, $N_Q = N_{50} + z\ d_{u,l}$ with $d = (X + Y \log_{10} t)(L_{EX,8h} - L_0)^2$ (clause 6.3.2, Formulae 4–7, Tables 2/3), clamped at zero. The library's `fractile` counts the fraction of the population with the *smaller* shift, so `fractile=0.9` is the most-susceptible decile (reliable range 0.05–0.95); ISO 1999's own $Q$ runs the other way, counting the percentage with worse hearing, so the same decile is $Q = 10\ \%$ there and in the Annex D column headings. The hearing threshold level associated with age and noise (HTLAN) combines NIPTS with the ISO 7029 age component at the same fractile through the compressed sum (clause 6.1, Formula 1):
+quadratic in the excess over the frequency-dependent onset level $L_0$ (75 dB at 4 kHz, the most sensitive band, up to 93 dB at 500 Hz) and zero below it; under 10 years it scales as $\log_{10}(t+1)/\log_{10} 11$ (Formula 3). Fractiles add the spread, $N_Q = N_{50} + z\ d_{u,l}$ with $d = (X + Y \log_{10} t)(L_\mathrm{EX,8h} - L_0)^2$ (clause 6.3.2, Formulae 4–7, Tables 2/3), clamped at zero. The library's `fractile` counts the fraction of the population with the *smaller* shift, so `fractile=0.9` is the most-susceptible decile (reliable range 0.05–0.95); ISO 1999's own $Q$ runs the other way, counting the percentage with worse hearing, so the same decile is $Q = 10\ \%$ there and in the Annex D column headings. The hearing threshold level associated with age and noise (HTLAN) combines NIPTS with the ISO 7029 age component at the same fractile through the compressed sum (clause 6.1, Formula 1):
 
 $$
 H' = H + N - \frac{H\ N}{120}.
@@ -1221,13 +1221,13 @@ Reverberation time is a least-squares fit $L = a + b t$ over a window, extrapola
 
 ### Clarity, definition and centre time (ISO 3382-1, Annex A)
 
-Splitting the energy at an early/late boundary $t_e$ gives the early-to-late index and the definition ratio:
+Splitting the energy at an early/late boundary $t_\mathrm{e}$ gives the early-to-late index and the definition ratio:
 
 $$
-C_{te} = 10 \log_{10} \frac{\int_0^{t_e} p^2\ dt}{\int_{t_e}^{\infty} p^2\ dt}\ \text{dB}, \qquad D_{50} = \frac{\int_0^{0.05} p^2\ dt}{\int_0^{\infty} p^2\ dt}, \qquad C_{50} = 10 \log_{10} \frac{D_{50}}{1 - D_{50}},
+C_{te} = 10 \log_{10} \frac{\int_0^{t_\mathrm{e}} p^2\ dt}{\int_{t_e}^{\infty} p^2\ dt}\ \text{dB}, \qquad D_{50} = \frac{\int_0^{0.05} p^2\ dt}{\int_0^{\infty} p^2\ dt}, \qquad C_{50} = 10 \log_{10} \frac{D_{50}}{1 - D_{50}},
 $$
 
-with $t_e = 50$ ms (C50, speech) or 80 ms (C80, music), and the **centre time** $T_s = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. For a pure exponential decay these have closed forms $C_{te} = 10 \log_{10}(e^{a t_e} - 1)$ and $T_s = 1/a$; at $T = 1$ s ($a = 13.8155$) they evaluate to C80 = 3.05 dB, C50 = −0.02 dB, D50 = 0.499 and Ts = 72.4 ms, the values the implementation reproduces. Table A.1 JNDs (EDT 5 %, C80 1 dB, D50 0.05, Ts 10 ms) bound how finely each is worth reporting.
+with $t_\mathrm{e} = 50$ ms (C50, speech) or 80 ms (C80, music), and the **centre time** $T_\mathrm{s} = \int_0^{\infty} t\ p^2\ dt / \int_0^{\infty} p^2\ dt$. For a pure exponential decay these have closed forms $C_{te} = 10 \log_{10}(e^{a t_\mathrm{e}} - 1)$ and $T_\mathrm{s} = 1/a$; at $T = 1$ s ($a = 13.8155$) they evaluate to C80 = 3.05 dB, C50 = −0.02 dB, D50 = 0.499 and Ts = 72.4 ms, the values the implementation reproduces. Table A.1 JNDs (EDT 5 %, C80 1 dB, D50 0.05, Ts 10 ms) bound how finely each is worth reporting.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/room_parameters_bands.svg" alt="ISO 3382 per-band parameters of a synthetic room impulse response: grouped EDT, T20 and T30 bars per octave band falling from about 1.4 s at 125 Hz to 0.7 s at 4 kHz, over a second panel where C50 and C80 rise with frequency" width="92%"></picture>
 
@@ -1243,7 +1243,7 @@ more of it the room has already removed.*
 The spatial decay rate of A-weighted speech is the ordinary least-squares slope of $L_{p,A,S}$ against $\log_{10}(r/r_0)$ ($r_0 = 1$ m) over the 2–16 m positions, rescaled to a per-doubling figure, and the nominal level is read off the same line at 4 m:
 
 $$
-L = a + b\ \log_{10}(r/r_0), \qquad D_{2,S} = -\log_{10}(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \log_{10}(4/r_0).
+L = a + b\ \log_{10}(r/r_0), \qquad D_{2,\mathrm{S}} = -\log_{10}(2)\ b, \qquad L_{p,A,S,4\text{m}} = a + b\ \log_{10}(4/r_0).
 $$
 
 The distraction distance rD and privacy distance rP are the distances where a **linear** (not logarithmic) regression of STI against distance crosses 0.50 and 0.20; a non-negative fitted slope (STI not falling with distance) makes them undefined, realising the standard's "can prove impossible to determine" note.
@@ -1252,7 +1252,7 @@ The distraction distance rD and privacy distance rP are the distances where a **
 
 *Two regressions on two different axes, which is what makes this clause hard to
 hold in the head. The level line is fitted against $\log_{10}(r/r_0)$ and read
-twice — as the slope $D_{2,S}$ per doubling, and at $r = 4$ m for
+twice — as the slope $D_{2,\mathrm{S}}$ per doubling, and at $r = 4$ m for
 $L_{p,A,S,4\text{m}}$. The STI line is fitted against $r$ itself, **linearly**,
 and read where it crosses 0.50 and 0.20 for the distraction and privacy
 distances. If that second fit comes out flat or rising, the two distances do
@@ -1280,13 +1280,13 @@ $$
 L_p = L_W + 10 \log_{10}\!\left( \frac{Q}{4\pi r^2} + \frac{4}{R} \right) \left[ + 10 \log_{10}\frac{\rho c}{400} \right] \quad \text{(Bies Eq. 6.43)},
 $$
 
-the optional last term (about $+0.14$ dB at 20 °C) correcting a characteristic impedance away from 400 Pa·s/m. The **critical distance** $r_c = \sqrt{Q R / 16\pi}$ is where the two fields cross; Kuttruff's reverberation distance (Eq. 5.44, $r_c = \sqrt{A/16\pi}$ for $Q=1$) uses the Sabine area $A = S\bar\alpha$ instead of $R = A/(1-\bar\alpha)$, the two coinciding for small $\bar\alpha$. The **Schroeder frequency** $f_s = 2000\sqrt{T/V}$ (Kuttruff Eq. 3.44) roughly marks the modal-to-diffuse transition, a heuristic crossover rather than a sharp cutoff: well below it discrete room modes dominate and these diffuse-field relations grow unreliable, well above it the modes overlap and the relations hold. Borderline rooms still warrant a band-by-band check. See the [Image sources and steady-state field guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/).
+the optional last term (about $+0.14$ dB at 20 °C) correcting a characteristic impedance away from 400 Pa·s/m. The **critical distance** $r_\mathrm{c} = \sqrt{Q R / 16\pi}$ is where the two fields cross; Kuttruff's reverberation distance (Eq. 5.44, $r_\mathrm{c} = \sqrt{A/16\pi}$ for $Q=1$) uses the Sabine area $A = S\bar\alpha$ instead of $R = A/(1-\bar\alpha)$, the two coinciding for small $\bar\alpha$. The **Schroeder frequency** $f_\mathrm{s} = 2000\sqrt{T/V}$ (Kuttruff Eq. 3.44) roughly marks the modal-to-diffuse transition, a heuristic crossover rather than a sharp cutoff: well below it discrete room modes dominate and these diffuse-field relations grow unreliable, well above it the modes overlap and the relations hold. Borderline rooms still warrant a band-by-band check. See the [Image sources and steady-state field guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/).
 
 ### Field insulation and weighted rating (ISO 16283-1, ISO 717-1)
 
-Per one-third-octave band the level difference $D = L_1 - L_2$ (energy-averaged over microphone positions, $L = 10 \log_{10}[(1/n) \sum_i 10^{L_i/10}]$) is normalised two ways: the standardized level difference $D_{nT} = D + 10 \log_{10}(T/T_0)$ with $T_0 = 0.5$ s (so $D_{nT} = D$ when $T = T_0$), and the apparent sound reduction index $R' = D + 10 \log_{10}(S/A)$ with the Sabine absorption area $A = 0.16\ V / T$, hence $R' = D + 10 \log_{10}[S T / (0.16\ V)]$.
+Per one-third-octave band the level difference $D = L_1 - L_2$ (energy-averaged over microphone positions, $L = 10 \log_{10}[(1/n) \sum_i 10^{L_i/10}]$) is normalised two ways: the standardized level difference $D_\mathrm{nT} = D + 10 \log_{10}(T/T_0)$ with $T_0 = 0.5$ s (so $D_\mathrm{nT} = D$ when $T = T_0$), and the apparent sound reduction index $R' = D + 10 \log_{10}(S/A)$ with the Sabine absorption area $A = 0.16\ V / T$, hence $R' = D + 10 \log_{10}[S T / (0.16\ V)]$.
 
-The single-number rating (ISO 717-1, Clause 4.4) shifts the Table 3 **reference curve** in 1 dB steps toward the measured curve until the sum of *unfavourable* deviations $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ is maximal but $\le$ 32.0 dB (16 thirds) or 10.0 dB (5 octaves); the rating $R_w$ is the shifted reference at 500 Hz. The **spectrum adaptation terms** are $C = X_{A1} - X_w$ and $C_{tr} = X_{A2} - X_w$ with $X_{Aj} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (Table 4 spectra No. 1 pink noise, No. 2 urban traffic), each rounded to an integer. The ISO 717-1 Annex C worked example ($R_w = 30$, $C = -2$, $C_{tr} = -3$, unfavourable sum 31.8 dB) is reproduced exactly.
+The single-number rating (ISO 717-1, Clause 4.4) shifts the Table 3 **reference curve** in 1 dB steps toward the measured curve until the sum of *unfavourable* deviations $\sum_i \max(0, \text{ref}_i + k - \text{meas}_i)$ is maximal but $\le$ 32.0 dB (16 thirds) or 10.0 dB (5 octaves); the rating $R_\mathrm{w}$ is the shifted reference at 500 Hz. The **spectrum adaptation terms** are $C = X_{\mathrm{A}1} - X_\mathrm{w}$ and $C_\mathrm{tr} = X_{\mathrm{A}2} - X_\mathrm{w}$ with $X_{\mathrm{A}j} = -10 \log_{10} \sum_i 10^{(L_{ij} - X_i)/10}$ (Table 4 spectra No. 1 pink noise, No. 2 urban traffic), each rounded to an integer. The ISO 717-1 Annex C worked example ($R_\mathrm{w} = 30$, $C = -2$, $C_\mathrm{tr} = -3$, unfavourable sum 31.8 dB) is reproduced exactly.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/insulation_rating.svg" alt="Measured one-third-octave sound reduction index with the shifted ISO 717-1 reference curve and the resulting weighted rating at 500 Hz" width="80%"></picture>
 
@@ -1297,17 +1297,17 @@ The single-number rating (ISO 717-1, Clause 4.4) shifts the Table 3 **reference 
 Impact insulation swaps the airborne source for a standardized **tapping
 machine** and rates the receiving-room level, so the sign conventions flip. The
 standardized and normalized impact levels are $L'_{nT} = L_i - 10 \log_{10}(T/T_0)$
-(the reverberation term is *subtracted*, opposite to $D_{nT}$) and
+(the reverberation term is *subtracted*, opposite to $D_\mathrm{nT}$) and
 $L'_n = L_i + 10 \log_{10}(A/A_0)$ with $A_0 = 10$ m² and $A = 0.16\ V/T$. The
 ISO 717-2 rating shifts the Table 3 reference curve until $\sum_i \max(0, \text{meas}_i - (\text{ref}_i + k))$
 is maximal but $\le$ 32.0 dB (16 thirds) or 10.0 dB (5 octaves); the
 *unfavourable* deviation now counts where the **measurement exceeds** the
 reference (impact noise is worse when louder), the mirror image of ISO 717-1.
 The rating is the shifted reference at 500 Hz, reduced by a further 5 dB for
-octave bands, and the adaptation term is $C_I = L_{n,\text{sum}} - 15 - L_{n,w}$
-with the energetic sum $L_{n,\text{sum}} = 10 \log_{10} \sum_i 10^{L_i/10}$ over
+octave bands, and the adaptation term is $C_\mathrm{I} = L_\mathrm{n,sum} - 15 - L_\mathrm{n,w}$
+with the energetic sum $L_\mathrm{n,sum} = 10 \log_{10} \sum_i 10^{L_i/10}$ over
 100–2500 Hz (thirds) or 125–2000 Hz (octaves). The ISO 717-2 Annex C examples
-are reproduced exactly (thirds $L_{n,w} = 79$, $C_I = -11$; octaves $54$, $0$),
+are reproduced exactly (thirds $L_\mathrm{n,w} = 79$, $C_\mathrm{I} = -11$; octaves $54$, $0$),
 via the same monotone shift search as ISO 717-1 run on the negated curves.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating.svg" alt="Measured one-third-octave normalized impact sound pressure level with the shifted ISO 717-2 reference curve and the resulting weighted rating read at 500 Hz" width="80%"></picture>
@@ -1324,11 +1324,11 @@ Sound absorption (ISO 354) measures the equivalent absorption area from
 Sabine's relation applied to a reverberation room empty and with the specimen:
 $A = 55.3\ V/(c\ T) - 4 V m$ (the $4 V m$ term is the air absorption, $m$ the
 power attenuation coefficient in 1/m), so the specimen area is
-$A_T = A_2 - A_1$ and its coefficient $\alpha_s = A_T/S$. With the speed of
+$A_\mathrm{T} = A_2 - A_1$ and its coefficient $\alpha_\mathrm{s} = A_\mathrm{T}/S$. With the speed of
 sound from Eq. (6), $c = 331 + 0.6\ t$ (°C), and $m$ converted from an
 ISO 9613-1 attenuation coefficient by $m = \alpha / (10 \log_{10} e)$. Because
 diffraction and edge scattering intercept more than the flat sample area,
-$\alpha_s$ is left unclamped and may exceed 1.0 (Clause 3.7 NOTE 2).
+$\alpha_\mathrm{s}$ is left unclamped and may exceed 1.0 (Clause 3.7 NOTE 2).
 
 ### Laboratory vs field normalization (ISO 10140, ISO 16283)
 
@@ -1340,15 +1340,15 @@ reduction index $R = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 10140-2) versus the
 apparent field index $R' = L_1 - L_2 + 10 \log_{10}(S/A)$ (ISO 16283-1), the
 same closed form evaluated with the facility's known $A$ or the room's measured
 $A = 0.16\ V/T$. The impact pair is the normalized laboratory level
-$L_n = L_i + 10 \log_{10}(A/A_0)$ (ISO 10140-3) versus the field $L'_n$
+$L_\mathrm{n} = L_i + 10 \log_{10}(A/A_0)$ (ISO 10140-3) versus the field $L'_n$
 (ISO 16283-2), both referenced to $A_0 = 10$ m². Before either is formed the
 receiving-room level is corrected for background noise by the energy
-subtraction $L = 10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ for a 6–15 dB
+subtraction $L = 10 \log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$ for a 6–15 dB
 signal-to-background margin, capped at a fixed $1.3$ dB (the limit of
 measurement) at or below 6 dB and omitted at or above 15 dB (ISO 10140-4,
 Clause 4.3), the laboratory analogue of the 6/10 dB rule of ISO 16283-1. The
 façade extension (ISO 16283-3) replaces the source-room level by the level 2 m
-in front of the façade, $D_{2m} = L_{1,2m} - L_2$, and adds a fixed
+in front of the façade, $D_{2\mathrm{m}} = L_{1,2\mathrm{m}} - L_2$, and adds a fixed
 angle-of-incidence correction to the element sound reduction index, $-1.5$ dB
 for the 45° loudspeaker method ($R'_{45°}$) and $-3$ dB for the all-angle
 road-traffic method ($R'_{tr,s}$); all three carry the ISO 717-1 airborne
@@ -1369,28 +1369,28 @@ Formula 26):
 side and lower case the receiving side, so $Dd$ goes straight through the
 separating element, $Ff$ runs along a flanking element on both sides of the
 junction, and $Df$ and $Fd$ cross from one to the other. The junction they cross
-is where $K_{ij}$ and the coupling length $\ell_f$ live in the formula below,
-and the separating element is where $S_s$ is measured. Each junction contributes
+is where $K_{ij}$ and the coupling length $\ell_\mathrm{f}$ live in the formula below,
+and the separating element is where $S_\mathrm{s}$ is measured. Each junction contributes
 three flanking terms, so a room with four flanking elements sums thirteen paths.*
 
 $$
-R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
-       + \sum 10^{-R_{Ff,w}/10} + \sum 10^{-R_{Df,w}/10}
-       + \sum 10^{-R_{Fd,w}/10} \Big].
+R'_w = -10 \log_{10}\Big[ 10^{-R_\mathrm{Dd,w}/10}
+       + \sum 10^{-R_\mathrm{Ff,w}/10} + \sum 10^{-R_\mathrm{Df,w}/10}
+       + \sum 10^{-R_\mathrm{Fd,w}/10} \Big].
 $$
 
-The direct path is $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Formula 27), the
+The direct path is $R_\mathrm{Dd,w} = R_\mathrm{s,w} + \Delta R_\mathrm{Dd,w}$ (Formula 27), the
 separating-element laboratory index plus any lining improvement. Each flanking
 path (Formula 28a) is
 
 $$
-R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-         + 10 \log_{10}\frac{S_s}{l_0\ l_f},
+R_{ij,\mathrm{w}} = \frac{R_{i,\mathrm{w}} + R_{j,\mathrm{w}}}{2} + \Delta R_{ij,\mathrm{w}} + K_{ij}
+         + 10 \log_{10}\frac{S_\mathrm{s}}{l_0\ l_\mathrm{f}},
 $$
 
-with $R_{i,w}$, $R_{j,w}$ the laboratory indices of the two elements meeting at
-the junction ($i$ source side, $j$ receiving side), $\Delta R_{ij,w}$ the
-combined lining improvement, $S_s$ the separating-element area, $l_f$ the
+with $R_{i,\mathrm{w}}$, $R_{j,\mathrm{w}}$ the laboratory indices of the two elements meeting at
+the junction ($i$ source side, $j$ receiving side), $\Delta R_{ij,\mathrm{w}}$ the
+combined lining improvement, $S_\mathrm{s}$ the separating-element area, $l_\mathrm{f}$ the
 junction coupling length and $l_0 = 1$ m the reference coupling length. $K_{ij}$
 is the junction **vibration reduction index** (Annex E), an empirical function of
 the mass ratio $M = \log_{10}(m'_{\perp,i}/m'_i)$: for a rigid cross-junction
@@ -1398,9 +1398,9 @@ $K_{13} = 8.7 + 17.1 M + 5.7 M^2$ (through) and $K_{12} = 8.7 + 5.7 M^2$
 (corner), read at 500 Hz, and floored at $K_{ij,\min} = 10 \log_{10}[l_f\ l_0
 (1/S_i + 1/S_j)]$ (Formula 29). Two linings combine as $\max(a,b) + \min(a,b)/2$
 (Formulas 30/31). The impact counterpart (EN 12354-2, Formula 21) is the direct
-subtraction $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, with the bare-floor
-equivalent level $L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Annex B), the
-covering improvement $\Delta L_w$ (ISO 717-2) and the flanking correction $K$
+subtraction $L'_{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K$, with the bare-floor
+equivalent level $L_\mathrm{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Annex B), the
+covering improvement $\Delta L_\mathrm{w}$ (ISO 717-2) and the flanking correction $K$
 from Table 1. The EN 12354-1 Annex H.3 ($R'_w = 52$ dB) and EN 12354-2 Annex E.3
 ($L'_{n,w} = 45$ dB) worked examples are reproduced exactly; the simplified
 model is stated to have about a 2 dB standard deviation (Clause 5).
@@ -1412,15 +1412,15 @@ parts (the normative Clause 4 model). The total (Formula 1) sums the surfaces,
 the objects and the air:
 
 $$
-A = \sum_i \alpha_{s,i}\ S_i + \sum_j A_{obj,j} + \sum_k \alpha_{s,k}\ S_k + A_{air},
-\qquad A_{air} = 4\ m\ V\ (1 - \psi),
+A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{obj,j} + \sum_k \alpha_{s,k}\ S_k + A_\mathrm{air},
+\qquad A_\mathrm{air} = 4\ m\ V\ (1 - \psi),
 $$
 
 with $m$ the power attenuation coefficient of air (Formula 2; Table 1
 tabulates it for six temperature/humidity climates over the octave bands
-125 Hz – 8 kHz), $\psi = \sum V_{obj} / V$ the volume fraction occupied by
+125 Hz – 8 kHz), $\psi = \sum V_\mathrm{obj} / V$ the volume fraction occupied by
 objects (Formula 3), and a hard irregular object approximated by
-$A_{obj} = V_{obj}^{2/3}$ (Formula 4). The reverberation time follows from
+$A_\mathrm{obj} = V_\mathrm{obj}^{2/3}$ (Formula 4). The reverberation time follows from
 Sabine applied to the free volume (clause 4.4, Formula 5):
 
 $$
@@ -1451,11 +1451,11 @@ ISO 12999-1 supplies the uncertainty of the quantities above from
 inter-laboratory (ISO 5725) reproducibility and repeatability rather than a
 GUM functional model. Three **measurement situations** fix the standard
 uncertainty $u$: situation **A** (laboratory characterisation) uses the
-reproducibility standard deviation $\sigma_R$; situation **B** (same location,
-different teams) the in-situ $\sigma_{situ}$; situation **C** (same location,
-operator and equipment, repeated) the repeatability $\sigma_r$. The per-band and
-single-number values are tabulated for airborne $R$/$R'$/$D_n$/$D_{nT}$
-(Tables 2/3), impact $L_n$/$L'_n$ (Table 4 bands, situations B/C only; Table 5
+reproducibility standard deviation $\sigma_\mathrm{R}$; situation **B** (same location,
+different teams) the in-situ $\sigma_\mathrm{situ}$; situation **C** (same location,
+operator and equipment, repeated) the repeatability $\sigma_\mathrm{r}$. The per-band and
+single-number values are tabulated for airborne $R$/$R'$/$D_\mathrm{n}$/$D_\mathrm{nT}$
+(Tables 2/3), impact $L_\mathrm{n}$/$L'_n$ (Table 4 bands, situations B/C only; Table 5
 ratings adding a situation-A estimate) and the
 covering reduction $\Delta L$ (Tables 6/7, situation A only). The expanded
 uncertainty is $U = k\ u$ (Formula 2) with the coverage factor $k$ of Table 8
@@ -1463,7 +1463,7 @@ uncertainty is $U = k\ u$ (Formula 2) with the coverage factor $k$ of Table 8
 enforced). A two-sided interval $Y = y \pm U$ reports a value (Formula 3); a
 one-sided factor declares conformity, $y - U > $ requirement for a lower limit
 (Formula 5) or $y + U <$ requirement for an upper limit (Formula 4).
-Uncorrelated components combine in quadrature $u_c = \sqrt{\sum u_i^2}$
+Uncorrelated components combine in quadrature $u_\mathrm{c} = \sqrt{\sum u_i^2}$
 (Formula C.2), $m$ independent measurements reduce $u$ to $u/\sqrt{m}$
 (Formula A.7), and the uncorrelated single-number uncertainty is the
 energy-weighted quadrature sum of the band uncertainties (Formula B.2).
@@ -1478,20 +1478,20 @@ of a panel can also be **predicted** from its physical properties. A limp panel
 follows the mass law $TL_0 = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2]$ (Bies Eq. 7.40),
 which rises 6 dB per octave and 6 dB per doubling of the surface mass $m''$; the
 field-incidence value subtracts 5.5 dB (one-third octave). Stiffness adds a
-**coincidence dip** at $f_c = (c_0^2/2\pi)\sqrt{m''/B'}$ (Eq. 7.3), where the free
+**coincidence dip** at $f_\mathrm{c} = (c_0^2/2\pi)\sqrt{m''/B'}$ (Eq. 7.3), where the free
 bending wavelength matches the acoustic trace wavelength. Sharp's method holds
-the mass law to $f_c/2$, drops linearly in $\log f$ to the dip
-$TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$ and rises again above $f_c$ with the loss
+the mass law to $f_\mathrm{c}/2$, drops linearly in $\log f$ to the dip
+$TL = 20\log_{10}(f_\mathrm{c} m'') + 10\log_{10}\eta - 44$ and rises again above $f_\mathrm{c}$ with the loss
 factor $\eta$ (Eq. 7.44). A **double wall** is a mass-spring-mass system with the
 cavity as the spring: below $f_0 = 60\sqrt{(m_1+m_2)/(m_1 m_2 d)}$ (Eq. 7.62) it
 follows the mass law of the combined mass, and above it the two leaves' mass laws
 add plus the cavity term $20\log_{10}(2kd)$, saturating at +6 dB beyond
-$f_l = c_0/(2\pi d)$ (Eq. 7.64); a porous fill lowers $f_0$. Small air paths cap
+$f_\mathrm{l} = c_0/(2\pi d)$ (Eq. 7.64); a porous fill lowers $f_0$. Small air paths cap
 any construction: the transmission coefficient of a straight slit (Gomperts,
 Hopkins Eq. 4.99, with resonances at $d + 2e = z\lambda/2$) or a circular hole
 (Wilson & Soroka, Eq. 4.102) combines with the wall in the area-weighted energy
 sum $R = -10\log_{10}[(1/\sum S_n)\sum S_n 10^{-R_n/10}]$ (Eq. 4.92), so a bare opening
-of relative area $S_a/S$ limits the composite to $10\log_{10}(S/S_a)$. The resonant
+of relative area $S_\mathrm{a}/S$ limits the composite to $10\log_{10}(S/S_\mathrm{a})$. The resonant
 transmission path and the double-wall radiation draw on the plate radiation
 efficiency and point mobilities of the
 [vibration theory](https://jmrplens.github.io/phonometry/reference/theory/vibration/). The prediction is clean-room from Bies,
@@ -1500,12 +1500,12 @@ Hansen & Howard (2017), Hopkins (2007) and Cremer, Heckl & Petersson (2005).
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/panel_insulation_concept.svg" alt="Four panels: the single-panel mass law with its coincidence dip, the double wall with the mass-spring-mass resonance and cavity gain, the plate radiation efficiency rising to unity above the critical frequency, and a composite wall whose 1 % open slit caps R at the open-area limit" width="92%"></picture>
 
 *The four behaviours of the paragraph above, one per panel. Top left, the mass
-law rising 6 dB per octave with Sharp's coincidence dip cut into it at $f_c$.
+law rising 6 dB per octave with Sharp's coincidence dip cut into it at $f_\mathrm{c}$.
 Top right, the double wall: no better than the combined mass below $f_0$, then
 the cavity term climbing until it saturates. Bottom left, the radiation
 efficiency that decides how much of the plate's vibration becomes sound. Bottom
 right, the ceiling a leak imposes: a 1 % open area holds the composite at
-$10\log_{10}(S/S_a) = 20$ dB however good the wall is, which is the panel worth
+$10\log_{10}(S/S_\mathrm{a}) = 20$ dB however good the wall is, which is the panel worth
 showing a client.*
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aperture_slit_geometry.svg" alt="To-scale cross-section of a 2 mm slit through a 100 mm wall: the hatched wall drawn in section with the narrow horizontal air gap at mid-height, an incident-sound arrow pointing at the gap from the left, the 100 mm wall depth and 2 mm slit width dimensioned, and circular transmitted wavefronts sketched spreading from the slit exit on the right" width="80%"></picture>
@@ -1637,7 +1637,7 @@ This page collects the theory behind the measurement chain itself: the standardi
 
 ## Octave Band Frequencies (ANSI S1.11 / IEC 61260)
 
-The mid-band frequencies ($f_m$) and edges ($f_1$, $f_2$) use a base-10 ratio:
+The mid-band frequencies ($f_\mathrm{m}$) and edges ($f_1$, $f_2$) use a base-10 ratio:
 
 $$
 G = 10^{0.3}
@@ -1646,7 +1646,7 @@ $$
 **Mid-band:**
 
 $$
-f_m = 1000 \cdot G^{x/b}
+f_\mathrm{m} = 1000 \cdot G^{x/b}
 $$
 
 (for odd $b$)
@@ -1654,7 +1654,7 @@ $$
 **Band edges:**
 
 $$
-f_1 = f_m \cdot G^{-1/(2b)}, \quad f_2 = f_m \cdot G^{1/(2b)}
+f_1 = f_\mathrm{m} \cdot G^{-1/(2b)}, \quad f_2 = f_\mathrm{m} \cdot G^{1/(2b)}
 $$
 
 ## Frequency Resolution vs FFT Bin Spacing
@@ -1734,7 +1734,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a six-tone signal with the raw PSD in the background" width="80%"></picture>
 
 *The two objects on one axis, for a six-tone signal at 20, 100, 500, 2000,
-4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_s$ = 48 kHz,
+4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_\mathrm{s}$ = 48 kHz,
 `nperseg = 8192`, so a fixed 5.86 Hz bin everywhere); the markers are the
 standardized third-octave levels of the same signal. The bin width never
 changes and the band width does: 4.60 Hz at the 20 Hz band, narrower than one
@@ -1761,13 +1761,13 @@ The library implements standard classical filter prototypes:
 **1. Butterworth:** Maximally flat passband.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_\mathrm{c})^{2n}}}
 $$
 
 **2. Chebyshev I:** Equiripple in passband, steeper roll-off.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_\mathrm{c})}}
 $$
 
 **3. Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
@@ -1779,7 +1779,7 @@ $$
 **4. Elliptic:** Equiripple in both, maximum selectivity.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_\mathrm{c}, L)}}
 $$
 
 **5. Bessel:** Maximally flat group delay (linear phase).
@@ -1829,7 +1829,7 @@ critical strategies:
 2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
    band's upper edge by a factor of 1.25, the signal is automatically
    downsampled (decimated) by
-   $M = \lfloor (f_s/2) / (1.25\,f_\text{upper}) \rfloor$ before filtering,
+   $M = \lfloor (f_\mathrm{s}/2) / (1.25\,f_\text{upper}) \rfloor$ before filtering,
    which is most bands rather than only the low ones (29 of the 33
    one-third-octave bands at 48 kHz). This keeps the digital pole locations far
    from the unit circle boundary, preventing oscillation and noise. The band
@@ -1842,11 +1842,11 @@ critical strategies:
 The A-weighting transfer function:
 
 $$
-R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}
+R_\mathrm{A}(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}
 $$
 
 $$
-A(f) = 20 \log_{10}(R_A(f)) + 2.00
+A(f) = 20 \log_{10}(R_\mathrm{A}(f)) + 2.00
 $$
 
 The digital filter is obtained from the analog poles/zeros via the bilinear
@@ -1867,7 +1867,7 @@ y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]
 $$
 
 $$
-\alpha = 1 - e^{-1 / (f_s \cdot \tau)}
+\alpha = 1 - e^{-1 / (f_\mathrm{s} \cdot \tau)}
 $$
 
 Where $\tau$ is the time constant (e.g., 125 ms for Fast).
@@ -1905,22 +1905,22 @@ Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
 through the infrasound decade below it, and the two 24 dB/octave roll-offs
 that fence the curve off below 1 Hz and above 20 Hz.*
 
-Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
+Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
 See the [Special Weightings guide](https://jmrplens.github.io/phonometry/signals/levels/special-weightings/) for usage.
 
 ## Event and dose metrics
 
-**Sound exposure level** (SEL; $L_{AE}$ with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
+**Sound exposure level** (SEL; $L_{\mathrm{A}E}$ with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
 
 $$
-\mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
+\mathrm{SEL} = L_{\mathrm{eq},T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="A vehicle pass-by level history with its Leq over the whole event and the equal-energy one-second SEL block" width="80%"></picture>
 
 *What the formula does to an event: the pass-by is replaced by a one-second
-block of the same total energy, which is why SEL exceeds the event's $L_{eq}$
+block of the same total energy, which is why SEL exceeds the event's $L_\mathrm{eq}$
 whenever the event lasts longer than a second, and why two events of the same
 SEL are interchangeable in a dose even when one is loud and short and the
 other quiet and long.*
@@ -1928,18 +1928,18 @@ other quiet and long.*
 **Sound exposure** $E$ (IEC 61252, 3.1) is the time integral of the squared A-weighted sound pressure, expressed in pascal-squared hours:
 
 $$
-E = \int_0^T p_A^2(t)\ dt = \overline{p_A^2} \cdot T \quad [\text{Pa}^2\text{h}]
+E = \int_0^T p_\mathrm{A}^2(t)\ dt = \overline{p_\mathrm{A}^2} \cdot T \quad [\text{Pa}^2\text{h}]
 $$
 
 When the recording is a representative sample of a longer shift, $E$ scales the measured mean square by the actual exposure duration. The **normalized 8 h level** (IEC 61252, 3.3) converts exposure to the steady level that carries the same energy over a nominal working day:
 
 $$
-L_{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
+L_\mathrm{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
 $$
 
-It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 1999 (IEC 61252, 3.3 NOTES 5–6). The anchor of IEC 61252 (3.3 NOTE 4): an exposure of **3.2 Pa²h corresponds to $L_{EX,8h}$ of exactly 90 dB**.
+It is identical to $L_\mathrm{EP,d}$ of Directive 86/188/EEC and $L_\mathrm{EX,8h}$ of ISO 1999 (IEC 61252, 3.3 NOTES 5–6). The anchor of IEC 61252 (3.3 NOTE 4): an exposure of **3.2 Pa²h corresponds to $L_\mathrm{EX,8h}$ of exactly 90 dB**.
 
-**$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
+**$L_\mathrm{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_\mathrm{Cpeak} = 20\log_{10}(\max|p_\mathrm{C}(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
 See the [Levels guide](https://jmrplens.github.io/phonometry/signals/levels/levels/) for usage and the [Calibration guide](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) for absolute-scale setup.
 
@@ -1973,7 +1973,7 @@ IEC 61043 clause 7.3 specifies the probe intensity response with exactly this ar
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="A two-microphone p-p sound intensity probe: two pressure microphones separated by a spacer, from which the pressure gradient and hence the normal intensity are estimated" width="88%"></picture>
 
-The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
+The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_\mathrm{d} = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
 
 See the [Sound Intensity guide](https://jmrplens.github.io/phonometry/devices/emission/intensity/) for usage.
 
@@ -1990,7 +1990,7 @@ model $y = f(x_1, \ldots, x_N)$, the law of propagation of uncertainty
 coefficients:
 
 $$
-u_c^2(y) = \sum_{i=1}^{N} \left( \frac{\partial f}{\partial x_i} \right)^2 u^2(x_i),
+u_\mathrm{c}^2(y) = \sum_{i=1}^{N} \left( \frac{\partial f}{\partial x_i} \right)^2 u^2(x_i),
 $$
 
 generalized to $(c \odot u)^{\top} r\ (c \odot u)$ for correlated inputs. The
@@ -1998,12 +1998,12 @@ sensitivities are obtained by central differences on the user's model callable
 (step scaled to $10^{-3}$ of each input uncertainty), so no hand-derived
 partials are needed. Type B inputs enter through the clause 4.3 half-width
 rules: rectangular $a/\sqrt{3}$ (4.3.7), triangular $a/\sqrt{6}$ (4.3.9),
-U-shaped $a/\sqrt{2}$. The expanded uncertainty $U = k\,u_c$ takes $k$ from
+U-shaped $a/\sqrt{2}$. The expanded uncertainty $U = k\,u_\mathrm{c}$ takes $k$ from
 the t-distribution at the Welch–Satterthwaite effective degrees of freedom
 (Annex G.4):
 
 $$
-\nu_{\mathrm{eff}} = \frac{u_c^4}{\sum_i u_i^4 / \nu_i}.
+\nu_{\mathrm{eff}} = \frac{u_\mathrm{c}^4}{\sum_i u_i^4 / \nu_i}.
 $$
 
 **Supplement 1** (ISO/IEC Guide 98-3-1:2008) propagates the full distributions
@@ -2011,7 +2011,7 @@ instead: $10^6$ Monte Carlo draws (clause 6.4) through the same model give
 $u(y)$ and the probabilistically symmetric coverage interval from the
 $\frac{1}{2}(1 \mp p)$ fractiles (clause 7.7): the route when the model is
 non-linear or the output visibly non-Gaussian. The Guides' own examples are
-reproduced: the four-term additive model gives $u_c = 2.0$ and the Monte Carlo
+reproduced: the four-term additive model gives $u_\mathrm{c} = 2.0$ and the Monte Carlo
 95 % interval $\pm 3.88$ of Supplement 1 clause 9.2/Table 3 (four rectangular
 inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives
@@ -2103,7 +2103,7 @@ This page collects the theory behind human vibration: the ISO 8041-1 frequency w
 Human response to vibration depends on frequency, axis and body part, so
 acceleration is filtered by the frequency weightings of ISO 8041-1:2017 before
 any metric. Each weighting is the analog cascade
-$H(s) = H_h(s) H_l(s) H_t(s) H_s(s)$ (Formula 5): two-pole Butterworth
+$H(s) = H_\mathrm{h}(s) H_\mathrm{l}(s) H_\mathrm{t}(s) H_\mathrm{s}(s)$ (Formula 5): two-pole Butterworth
 band-limiting high-pass and low-pass stages (Formulae 1/2), an
 acceleration–velocity transition (Formula 3, carrying the only non-unity gain,
 $K = 1.024$ for Wb) and an upward step (Formula 4), with the Table 3 corner
@@ -2128,13 +2128,13 @@ different bands drawn above the curves.*
 
 The weighted metrics follow ISO 2631-1:1997: running rms with linear or
 exponential integration (Eqs. 2/3), **MTVV** as its maximum (Eq. 4), the
-fourth-power **VDV** $= (\int a_w^4\, dt)^{1/4}$ in m/s^1.75 (Eq. 5), the crest
+fourth-power **VDV** $= (\int a_\mathrm{w}^4\, dt)^{1/4}$ in m/s^1.75 (Eq. 5), the crest
 factor with the basic method deemed adequate up to 9 (clause 6.2), and the
-vibration total value $a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}$ (Eq. 10). Hand-arm
-exposure follows ISO 5349-1:2001: $a_{hv}$ (Eq. 1, all $k = 1$), daily
-exposure $A(8) = a_{hv} \sqrt{T/T_0}$ with $T_0 = 8$ h (Eq. 2), partial
+vibration total value $a_\mathrm{v} = \sqrt{\sum_j k_j^2 a_{\mathrm{w}j}^2}$ (Eq. 10). Hand-arm
+exposure follows ISO 5349-1:2001: $a_\mathrm{hv}$ (Eq. 1, all $k = 1$), daily
+exposure $A(8) = a_\mathrm{hv} \sqrt{T/T_0}$ with $T_0 = 8$ h (Eq. 2), partial
 exposures combined in quadrature (ISO 5349-2:2001, Eqs. 1–3), and the Annex C
-vascular-risk model $D_y = 31.8\ A(8)^{-1.06}$ for the years to 10 %
+vascular-risk model $D_\mathrm{y} = 31.8\ A(8)^{-1.06}$ for the years to 10 %
 white-finger prevalence. The Directive 2002/44/EC action and limit values are
 built in: hand-arm $A(8)$ 2.5/5.0 m/s², whole-body $A(8)$ 0.5/1.15 m/s² or
 VDV 9.1/21.0 m/s^1.75 (Article 3). The ISO 5349-2 worked examples are
@@ -2157,18 +2157,18 @@ sixth-power (Palmgren-Miner) dose (clause 5.3, Formulae 3/4):
 
 $$
 D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{zd} = D_z\ (t_d / t_m)^{1/6}.
+D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
-Annex C converts the daily dose to a compressive stress $S_d = m_z D_{zd}$
+Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$
 ($m_z = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
-the age-declining ultimate strength $S_u = 6.75 - S_{age}(b + i)$ and forms
+the age-declining ultimate strength $S_\mathrm{u} = 6.75 - S_\mathrm{age}(b + i)$ and forms
 the cumulative stress variable $R$ (Formulae C.3/C.4), mapped to an injury
 probability by the Table C.1 Weibull law $\Pi = 1 - e^{-(R/\alpha)^\beta}$.
 The spinal filter is evaluated analytically in the frequency domain and
 validated against the Annex D 256 Hz digital-filter tabulation within the
 clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
-over 20 years) is reproduced: $D_{zd} = 55.97$ m/s², $R = 1.22$,
+over 20 years) is reproduced: $D_{z\mathrm{d}} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 
@@ -2176,7 +2176,7 @@ separate software) is out of scope.
 
 *The two objects of the model. Left, the clause 5.2 seat-to-spine
 transmissibility: unity at DC, peaking at $|H| \approx 1.54$ near 5 Hz and
-rolling off above it, which is why $W_k$ had to be replaced for shocks. Right,
+rolling off above it, which is why $W_\mathrm{k}$ had to be replaced for shocks. Right,
 the Table C.1 Weibull law $\Pi(R)$ with the Annex C worked example marked at
 $R = 1.22$, $\Pi = 0.37$ — the risk rises steeply over a narrow band of $R$, so
 a dose that doubles does not double the probability.*
@@ -2193,13 +2193,13 @@ structure absorbs. For infinite structures these are closed forms (Cremer
 Table 5.1): an infinite thin plate is a pure resistance $Z = 8\sqrt{B'\,m''}$
 (real, frequency independent, with $B'$ the bending stiffness per unit width and
 $m''$ the mass per unit area), an infinite beam has
-$Y = (1-\mathrm{j})/(4 m' c_B)$ (a 45-degree phase, falling as $\omega^{-1/2}$
-through the bending wave speed $c_B$), and a longitudinal rod has
-$Z = \rho c_L S$. These supply the receiver mobility EN 12354-5 needs when no
+$Y = (1-\mathrm{j})/(4 m' c_\mathrm{B})$ (a 45-degree phase, falling as $\omega^{-1/2}$
+through the bending wave speed $c_\mathrm{B}$), and a longitudinal rod has
+$Z = \rho c_\mathrm{L} S$. These supply the receiver mobility EN 12354-5 needs when no
 measurement exists, and are the theoretical companions of the measured ISO 7626
 mobilities. How efficiently a bending plate then radiates the airborne power is
 its **radiation efficiency** $\sigma$: below the critical frequency it radiates
-weakly (edge and corner modes), and above it $\sigma \to (1 - f_c/f)^{-1/2} \to 1$
+weakly (edge and corner modes), and above it $\sigma \to (1 - f_\mathrm{c}/f)^{-1/2} \to 1$
 (Leppington/Maidanik, Hopkins Eqs 2.227-2.230). Because $\sigma$ is exactly the
 radiation factor $\varepsilon$ of ISO 7849, predicting it closes the sound-power-
 from-vibration chain without a power measurement, and it drives the resonant

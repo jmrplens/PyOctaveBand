@@ -581,7 +581,7 @@ it; the list grows as guides gain their References sections.
   absorbers for use in buildings — Rating of sound absorption*
   (ISO 11654:1997).
   [iso.org catalogue](https://www.iso.org/standard/19583.html).
-  The weighted sound-absorption rating $\alpha_w$, its shape indicators and
+  The weighted sound-absorption rating $\alpha_\mathrm{w}$, its shape indicators and
   the absorption class.
   Cited by
   [Sound Absorption Measurement and Rating](../materials/absorbers/absorption-measurement.md).

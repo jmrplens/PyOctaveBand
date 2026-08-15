@@ -16,7 +16,7 @@ interface), the angle of incidence from the normal is
    {\rho_2 c_2 \sin\varphi + \rho_1 c_1 \cos\theta_2}
 
 * :func:`critical_angle` -- the critical grazing angle
-  :math:`\varphi_c = \arccos(c_1/c_2)` (only when ``c2 > c1``); below it the
+  :math:`\varphi_\mathrm{c} = \arccos(c_1/c_2)` (only when ``c2 > c1``); below it the
   wave is totally reflected (:math:`\lvert R \rvert = 1`).
 * :func:`reflection_coefficient` -- the complex ``R`` per grazing angle.
 * :func:`seabed_reflection` -- the complex ``R``, its magnitude ``|R|`` and the
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 
 
 def critical_angle(c1: float, c2: float) -> float:
-    r"""Critical grazing angle :math:`\varphi_c = \arccos(c_1/c_2)`, in
+    r"""Critical grazing angle :math:`\varphi_\mathrm{c} = \arccos(c_1/c_2)`, in
     degrees.
 
     Defined only when the sediment is faster than the water (``c2 > c1``); at and

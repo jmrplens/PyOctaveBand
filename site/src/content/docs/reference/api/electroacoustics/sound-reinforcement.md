@@ -12,27 +12,27 @@ but it also feeds the microphone that drives it. Long (*Architectural
 Acoustics* 2nd ed., Chapter 18, Equations (18.13) to (18.24)) writes the loop
 in terms of two decibel gains,
 
-* the **open-loop system gain** $Z_S$ (Equation (18.17)), the level
+* the **open-loop system gain** $Z_\mathrm{S}$ (Equation (18.17)), the level
   the loudspeaker produces at an average listener minus the level the
   talker produces at the microphone,
 
   $$
-  Z_S = L_{H\text{-}L} - L_{T\text{-}M}
+  Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}
   $$
 
-  so $Z_S = -6$ dB (a typical auditorium or church) means the
+  so $Z_\mathrm{S} = -6$ dB (a typical auditorium or church) means the
   amplified sound at the listener sits 6 dB below what the talker delivers
   to the microphone, i.e. a comfortable conversational level at twice the
   talker-to-microphone distance;
 
-* the **feedback-loop gain** $G_S$ (Equation (18.18)), the part of
+* the **feedback-loop gain** $G_\mathrm{S}$ (Equation (18.18)), the part of
   that output that returns to the microphone,
 
   $$
-  G_S = L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
+  G_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{M}} - L_{\mathrm{H}\text{-}\mathrm{L}} + D_\mathrm{M}(\theta)
   $$
 
-  with $D_M(\theta)$ the directivity index of the microphone toward
+  with $D_\mathrm{M}(\theta)$ the directivity index of the microphone toward
   the loudspeaker *relative to* the talker (zero for an omnidirectional
   microphone, about -2 to -3 dB for a cardioid pointed at the talker).
 
@@ -40,7 +40,7 @@ Summing the infinite series of round trips (Equation (18.14)) makes the system
 oscillate when the loop gain reaches unity, that is (Equation (18.16))
 
 $$
-Z_S + G_S = 0
+Z_\mathrm{S} + G_\mathrm{S} = 0
 $$
 
 Long takes a **feedback stability margin** of 10 dB for an equalised system
@@ -49,24 +49,24 @@ it covers a tone that adds in phase with a reflection from a hard surface, the
 remaining 4 dB is safety. With several microphones open at once the returned
 signals add at the mixer, which is accounted for by the *number of open
 microphones* correction (Equation (18.23))
-$\Delta L_\text{nom} = 10 \log_{10} N_m$. The stability criterion is
+$\Delta L_\text{nom} = 10 \log_{10} N_\mathrm{m}$. The stability criterion is
 then Equation (18.24),
 
 $$
-Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10
+Z_\mathrm{S} + L_{\mathrm{H}\text{-}\mathrm{M}} + \Delta L_\text{nom} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 10
 $$
 
 :::note
-Long prints Equation (18.24) with $+ D_M(\theta)$ on the
+Long prints Equation (18.24) with $+ D_\mathrm{M}(\theta)$ on the
 right-hand side, which contradicts Equations (18.20) to (18.22) it
 generalises (and would flip the benefit of a directional microphone
 into a penalty; see `docs/ERRATA.md`). This module implements the
-sign of Equation (18.20), so that $N_m = 1$ reproduces Long's
-own special cases: with $Z_S = -6$ dB the criterion collapses to
-$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$
+sign of Equation (18.20), so that $N_\mathrm{m} = 1$ reproduces Long's
+own special cases: with $Z_\mathrm{S} = -6$ dB the criterion collapses to
+$L_{\mathrm{H}\text{-}\mathrm{M}} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 4$
 (Equation (18.21)), which for an omnidirectional microphone puts the
 loudspeaker level at the microphone 4 dB below the average level in
-the audience, and for a cardioid ($D_M = -2$ dB) 2 dB below it
+the audience, and for a cardioid ($D_\mathrm{M} = -2$ dB) 2 dB below it
 (Equation (18.22)).
 :::
 
@@ -112,19 +112,19 @@ feedback_loop_gain(
 ) -> float
 ```
 
-Feedback-loop gain $G_S$ (Long Equation (18.18)).
+Feedback-loop gain $G_\mathrm{S}$ (Long Equation (18.18)).
 
-$G_S = L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)$.
+$G_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{M}} - L_{\mathrm{H}\text{-}\mathrm{L}} + D_\mathrm{M}(\theta)$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `level_loudspeaker_at_microphone` | Direct-field level $L_{H\text{-}M}$ the loudspeaker produces at the microphone, dB. |
-| `level_loudspeaker_at_listener` | Direct-field level $L_{H\text{-}L}$ the loudspeaker produces at an average listener, dB. |
-| `microphone_directivity` | Directivity index $D_M(\theta)$ of the microphone toward the loudspeaker relative to the talker, dB (0 for an omnidirectional microphone, about [`CARDIOID_RELATIVE_DIRECTIVITY`](/phonometry/reference/api/electroacoustics/sound-reinforcement/#cardioid_relative_directivity) for a cardioid). |
+| `level_loudspeaker_at_microphone` | Direct-field level $L_{\mathrm{H}\text{-}\mathrm{M}}$ the loudspeaker produces at the microphone, dB. |
+| `level_loudspeaker_at_listener` | Direct-field level $L_{\mathrm{H}\text{-}\mathrm{L}}$ the loudspeaker produces at an average listener, dB. |
+| `microphone_directivity` | Directivity index $D_\mathrm{M}(\theta)$ of the microphone toward the loudspeaker relative to the talker, dB (0 for an omnidirectional microphone, about [`CARDIOID_RELATIVE_DIRECTIVITY`](/phonometry/reference/api/electroacoustics/sound-reinforcement/#cardioid_relative_directivity) for a cardioid). |
 
-**Returns:** The feedback-loop gain $G_S$, dB.
+**Returns:** The feedback-loop gain $G_\mathrm{S}$, dB.
 
 ## feedback_stability
 
@@ -143,7 +143,7 @@ feedback_stability(
 Stability of a reinforcement loop (Long Equations (18.16) to
 (18.24)).
 
-The loop gain $Z_S + G_S + \Delta L_\text{nom}$ is compared
+The loop gain $Z_\mathrm{S} + G_\mathrm{S} + \Delta L_\text{nom}$ is compared
 with the oscillation threshold of Equation (18.16) reduced by the
 stability margin, that is Equation (18.24) written with the sign of
 Equation (18.20) (see the module docstring).
@@ -152,11 +152,11 @@ Equation (18.20) (see the module docstring).
 
 | Name | Description |
 | :--- | :--- |
-| `open_loop_gain` | Open-loop system gain $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$, dB; about -6 dB for a typical auditorium or church. |
-| `level_loudspeaker_at_microphone` | Direct-field level $L_{H\text{-}M}$ produced by the loudspeaker system at the microphone, dB. |
-| `level_loudspeaker_at_listener` | Direct-field level $L_{H\text{-}L}$ produced by the loudspeaker system at an average listener, dB. |
-| `microphone_directivity` | Directivity index $D_M(\theta)$ of the microphone toward the loudspeaker relative to the talker, dB. |
-| `open_microphones` | Number $N_m$ of microphones open at once. |
+| `open_loop_gain` | Open-loop system gain $Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}$, dB; about -6 dB for a typical auditorium or church. |
+| `level_loudspeaker_at_microphone` | Direct-field level $L_{\mathrm{H}\text{-}\mathrm{M}}$ produced by the loudspeaker system at the microphone, dB. |
+| `level_loudspeaker_at_listener` | Direct-field level $L_{\mathrm{H}\text{-}\mathrm{L}}$ produced by the loudspeaker system at an average listener, dB. |
+| `microphone_directivity` | Directivity index $D_\mathrm{M}(\theta)$ of the microphone toward the loudspeaker relative to the talker, dB. |
+| `open_microphones` | Number $N_\mathrm{m}$ of microphones open at once. |
 | `stability_margin` | Required margin below oscillation, dB (default [`DEFAULT_STABILITY_MARGIN`](/phonometry/reference/api/electroacoustics/sound-reinforcement/#default_stability_margin), Long's equalised-system value). |
 
 **Returns:** A [`FeedbackStabilityResult`](/phonometry/reference/api/electroacoustics/sound-reinforcement/#feedbackstabilityresult).
@@ -188,20 +188,20 @@ Gain structure and stability verdict of a reinforcement loop.
 
 | Name | Description |
 | :--- | :--- |
-| `open_loop_gain` | Open-loop system gain $Z_S$, dB (Equation (18.17)). |
-| `feedback_loop_gain` | Feedback-loop gain $G_S$, dB (Equation (18.18)). |
+| `open_loop_gain` | Open-loop system gain $Z_\mathrm{S}$, dB (Equation (18.17)). |
+| `feedback_loop_gain` | Feedback-loop gain $G_\mathrm{S}$, dB (Equation (18.18)). |
 | `nom_correction` | Number-of-open-microphones correction $\Delta L_\text{nom}$, dB (Equation (18.23)). |
-| `loop_gain` | Total loop gain $Z_S + G_S + \Delta L_\text{nom}$, dB. The system oscillates at 0 dB (Equation (18.16)). |
+| `loop_gain` | Total loop gain $Z_\mathrm{S} + G_\mathrm{S} + \Delta L_\text{nom}$, dB. The system oscillates at 0 dB (Equation (18.16)). |
 | `stability_margin` | Required margin below oscillation, dB. |
 | `margin` | Margin actually available, `-loop_gain`, dB. |
 | `headroom` | Gain that may still be added before the required margin is used up, `-stability_margin - loop_gain`, dB; negative when the criterion of Equation (18.24) is already violated. |
 | `is_stable` | Whether the criterion of Equation (18.24) holds. |
-| `maximum_open_loop_gain` | Largest $Z_S$ the loop tolerates, dB. |
-| `maximum_level_at_microphone` | Largest $L_{H\text{-}M}$ the loop tolerates, dB, for the given $Z_S$ (Equations (18.20) to (18.22)). |
-| `level_loudspeaker_at_microphone` | Input $L_{H\text{-}M}$, dB. |
-| `level_loudspeaker_at_listener` | Input $L_{H\text{-}L}$, dB. |
-| `microphone_directivity` | Input $D_M(\theta)$, dB. |
-| `open_microphones` | Input $N_m$. |
+| `maximum_open_loop_gain` | Largest $Z_\mathrm{S}$ the loop tolerates, dB. |
+| `maximum_level_at_microphone` | Largest $L_{\mathrm{H}\text{-}\mathrm{M}}$ the loop tolerates, dB, for the given $Z_\mathrm{S}$ (Equations (18.20) to (18.22)). |
+| `level_loudspeaker_at_microphone` | Input $L_{\mathrm{H}\text{-}\mathrm{M}}$, dB. |
+| `level_loudspeaker_at_listener` | Input $L_{\mathrm{H}\text{-}\mathrm{L}}$, dB. |
+| `microphone_directivity` | Input $D_\mathrm{M}(\theta)$, dB. |
+| `open_microphones` | Input $N_\mathrm{m}$. |
 
 ### FeedbackStabilityResult.plot()
 
@@ -217,7 +217,7 @@ FeedbackStabilityResult.plot(
 Plot the gain structure against the oscillation and margin
 lines.
 
-Bars for $Z_S$, $G_S$ and $\Delta L_\text{nom}$
+Bars for $Z_\mathrm{S}$, $G_\mathrm{S}$ and $\Delta L_\text{nom}$
 accumulate into the total loop gain, with the 0 dB oscillation
 threshold of Equation (18.16) and the required stability margin
 marked. Requires matplotlib (`pip install phonometry[plot]`).
@@ -230,7 +230,7 @@ open_microphone_correction(open_microphones: int) -> float
 
 Number-of-open-microphones correction (Long Equation (18.23)).
 
-$\Delta L_\text{nom} = 10 \log_{10} N_m$: doubling the number
+$\Delta L_\text{nom} = 10 \log_{10} N_\mathrm{m}$: doubling the number
 of simultaneously open microphones costs about 3 dB of gain before
 feedback.
 
@@ -238,7 +238,7 @@ feedback.
 
 | Name | Description |
 | :--- | :--- |
-| `open_microphones` | Number $N_m$ of microphones open at once (>= 1). |
+| `open_microphones` | Number $N_\mathrm{m}$ of microphones open at once (>= 1). |
 
 **Returns:** The correction $\Delta L_\text{nom}$, dB.
 

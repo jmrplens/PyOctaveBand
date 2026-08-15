@@ -436,10 +436,10 @@ detector (the roll-off of a fourth-order Butterworth applied forward and
 backward; the rejection is finite, and the zero-phase pass leaves small
 transients at the record edges).
 
-For an AM tone $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ with $f_m$
+For an AM tone $A_0 (1 + m \cos(2\pi f_\mathrm{m} t)) \cos(2\pi f_\mathrm{c} t)$ with $f_\mathrm{m}$
 on an analysis bin the closed forms are:
 
-| `kind` | mean level | line at $f_m$ | line at $2f_m$ |
+| `kind` | mean level | line at $f_\mathrm{m}$ | line at $2f_m$ |
 |---|---|---|---|
 | `'magnitude'` | $A_0$ | $A_0 m$ | - |
 | `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
@@ -461,7 +461,7 @@ res.plot()
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_spectrum.svg" alt="Envelope spectrum of an amplitude-modulated one kilohertz tone in noise against frequency up to one hundred hertz: a single sharp line at the twenty-five hertz modulation frequency reaching exactly the dotted reference at amplitude zero point four, with a flat noise floor elsewhere" width="82%" loading="eager" />
 
 *The line is not proportional to the modulation, it **is** the modulation: with
-$f_m$ on an analysis bin the magnitude detector reads 0.3996 against the closed
+$f_\mathrm{m}$ on an analysis bin the magnitude detector reads 0.3996 against the closed
 form $A_0 m = 0.4$, and `mean_level` reads 1.001 against $A_0 = 1$. That is the
 point of the scaling by the taper's coherent gain — the ordinate is a modulation
 depth, not an arbitrary level. Around it the floor sits near 5×10⁻⁴, so the
@@ -514,7 +514,7 @@ broad hump the defect impacts excite — a structural resonance of the housing,
 typically somewhere between 1 and 20 kHz for rolling-element bearings. Put the
 band around that hump. Make it several times wider than the highest repetition
 rate you need to see (three to five times the highest defect frequency, so its
-harmonics survive the detector), and choose $f_s$ at least 2.56 times the top of
+harmonics survive the detector), and choose $f_\mathrm{s}$ at least 2.56 times the top of
 the band. Where two candidate humps exist, take the one whose envelope spectrum
 gives the higher line-to-floor ratio: the band is a signal-to-noise choice, not
 a physical constant. A band too wide readmits the strong low-frequency

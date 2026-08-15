@@ -13,7 +13,7 @@ by :math:`e^{-j k x}` (so a passive medium has
   :math:`[[\cos(k_x d), jZ_x\sin(k_x d)], [j\sin(k_x d)/Z_x, \cos(k_x d)]]`
   with the in-depth wavenumber
   :math:`k_x = \sqrt{k^2 - k_0^2 \sin^2 \theta}` from Snell's law and
-  :math:`Z_x = Z_c k / k_x` (Cox & D'Antonio Eqs. (2.29)-(2.32); Bies
+  :math:`Z_x = Z_\mathrm{c} k / k_x` (Cox & D'Antonio Eqs. (2.29)-(2.32); Bies
   Eq. (D.83); equivalent to the layer-recursion of Bies Eq. (D.95) and
   Mechel Sect. D.4). Thin resonant sheets (perforated plate, microperforated
   plate, limp membrane) enter as series transfer impedances
@@ -207,7 +207,7 @@ class LayeredAbsorberResult:
     r"""Oblique-incidence prediction of a layered absorber.
 
     All arrays share the shape of ``frequency``. ``surface_impedance`` is the
-    specific impedance :math:`Z_s = p / u_n` at the front face (may be
+    specific impedance :math:`Z_\mathrm{s} = p / u_n` at the front face (may be
     ``inf`` for a lossless-sheet stack over a rigid wall), ``reflection``
     the complex plane-wave reflection factor :math:`R(\theta)`,
     ``absorption`` the coefficient
@@ -334,7 +334,7 @@ def _fluid_layer_terms(
 
     :math:`k_x = \sqrt{k^2 - k_0^2 \sin^2 \theta}` (Snell's law, Cox &
     D'Antonio 3e Eq. (2.30)) and the in-depth wave impedance
-    :math:`Z_x = z_c k / k_x`; the layer chain matrix (Eq. (2.29)) is built
+    :math:`Z_x = z_\mathrm{c} k / k_x`; the layer chain matrix (Eq. (2.29)) is built
     from ``cos``/``sin`` of :math:`k_x d` with these two terms.
     """
     kx = np.sqrt(k * k - k0_sin2)
@@ -673,7 +673,7 @@ def layered_absorber(
     (``termination="rigid"``), by radiation into free air behind
     (``termination="free"``, :math:`Z_L = \rho c / \cos(\theta)`) or by an
     arbitrary complex impedance. The reflection factor is
-    :math:`R = (Z_s \cos(\theta) - \rho c) / (Z_s \cos(\theta) + \rho c)`
+    :math:`R = (Z_\mathrm{s} \cos(\theta) - \rho c) / (Z_\mathrm{s} \cos(\theta) + \rho c)`
     and :math:`\alpha = 1 - \lvert R \rvert^2` (Mechel 2e Sect. D.3
     Eq. (2)).
 
@@ -852,7 +852,7 @@ def statistical_absorption(
     Sect. D.5).
 
     :param normalized_impedance: Normalised surface impedance
-        :math:`z = Z_s / (\rho c)` (complex scalar or array), with
+        :math:`z = Z_\mathrm{s} / (\rho c)` (complex scalar or array), with
         :math:`\operatorname{Re}(z) > 0`.
     :param angle_limit: Upper integration angle ``theta_lim``, in radians
         (0 < theta_lim <= pi/2; default pi/2).

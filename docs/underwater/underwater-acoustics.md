@@ -47,11 +47,11 @@ level** and then by an **equivalent monopole source level**:
 $$
 L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{r_0}
 \ \ \mathrm{dB\ re\ 1\ \mu Pa\!\cdot\! m}, \qquad
-L_s = L_{\mathrm{RN}} + \Delta L,
+L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L,
 $$
 
 where the Lloyd's-mirror surface correction (ISO 17208-2 Formula 3) for a
-nominal source depth $d_s = 0.7\,D$ ($D$ = mean draught) and $u = k\,d_s$,
+nominal source depth $d_\mathrm{s} = 0.7\,D$ ($D$ = mean draught) and $u = k\,d_\mathrm{s}$,
 $k = 2\pi f/c$, is
 
 $$
@@ -100,7 +100,7 @@ past a vertical string of three hydrophones at a closest point of approach of
 100 m or one ship length, whichever is greater, in water at least 150 m or
 1.5 ship lengths deep so the bottom stays out of the picture (Clauses 5.2,
 5.4). Only the **data window** of ±30° about the CPA is scored: the averaging
-runs while the ship crosses a window of length $2\,d_{CPA}\tan 30°$ (about
+runs while the ship crosses a window of length $2\,d_\mathrm{CPA}\tan 30°$ (about
 1.15 CPA distances), centred on the beam aspect the radiated noise level is
 defined for (Clause 3, Figure 3). Four runs are required, two per side; each
 run's three hydrophone levels are power-averaged (Formula 8), the runs are
@@ -123,7 +123,7 @@ and the data window in plan.
 ## 3. Pile-driving sound (ISO 18406)
 
 Percussive pile driving radiates one impulsive pulse per hammer strike. Each
-strike has a **single-strike sound exposure level** $\mathrm{SEL}_{ss}$; over a driving
+strike has a **single-strike sound exposure level** $\mathrm{SEL_{ss}}$; over a driving
 sequence the exposures add to a **cumulative sound exposure level**:
 
 $$

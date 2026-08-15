@@ -45,12 +45,12 @@ characteristic impedance `rho c` differing from the reference 400 Pa s/m; it
 is about `+0.14 dB` at 20 degC and is omitted by default (Bies notes the
 `~0.1 dB` it contributes).
 
-**Critical distance** $r_c = \sqrt{Q R / (16 \pi)}$ is where the direct
+**Critical distance** $r_\mathrm{c} = \sqrt{Q R / (16 \pi)}$ is where the direct
 and reverberant terms are equal (setting
 $Q / (4 \pi r^2) = 4 / R$ in Equation
 (6.43)); closer than `rc` the direct field dominates, farther the reverberant
 field does. Kuttruff's reverberation distance (Equation (5.44),
-$r_c = \sqrt{A / (16 \pi)}$ for $Q = 1$) uses the Sabine
+$r_\mathrm{c} = \sqrt{A / (16 \pi)}$ for $Q = 1$) uses the Sabine
 absorption area $A = S \bar{\alpha}$ in place of the room constant
 $R = A / (1 - \bar{\alpha})$;
 the two coincide for a small `alpha_bar` and differ by the factor
@@ -70,7 +70,7 @@ between the first two whenever the source is closer to the boundary than a
 wavelength. `source_model` selects which of the three
 [`SOURCE_POWER_MODELS`](/phonometry/reference/api/rooms/steady-field/#source_power_models) is applied.
 
-**Schroeder frequency** $f_s = 2000 \sqrt{T / V}$ (Kuttruff Equation
+**Schroeder frequency** $f_\mathrm{s} = 2000 \sqrt{T / V}$ (Kuttruff Equation
 (3.44),
 `V` in cubic metres, `T` in seconds) marks the boundary between the
 modal low-frequency regime -- where discrete room modes rule and the diffuse
@@ -90,7 +90,7 @@ critical_distance(
 ```
 
 Critical (reverberation) distance
-$r_c = \sqrt{Q R / (16 \pi)}$.
+$r_\mathrm{c} = \sqrt{Q R / (16 \pi)}$.
 
 The distance at which the direct and reverberant fields of
 [`steady_state_spl`](/phonometry/reference/api/rooms/steady-field/#steady_state_spl) are equal (Bies Equation (6.43) crossover;
@@ -137,7 +137,7 @@ schroeder_frequency(
 ) -> np.ndarray | float
 ```
 
-Schroeder frequency $f_s = 2000 \sqrt{T / V}$
+Schroeder frequency $f_\mathrm{s} = 2000 \sqrt{T / V}$
 (Kuttruff Equation (3.44)).
 
 The frequency above which room modes overlap (on average three

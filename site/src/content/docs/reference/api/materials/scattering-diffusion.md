@@ -366,11 +366,11 @@ normalized_diffusion_coefficient(
 
 Normalised directional diffusion coefficient (ISO 17497-2, Formula (7)).
 
-$d_{\theta,n} = (d_\theta - d_{\theta,r}) / (1 - d_{\theta,r})$,
+$d_{\theta,\mathrm{n}} = (d_\theta - d_{\theta,\mathrm{r}}) / (1 - d_{\theta,\mathrm{r}})$,
 removing the
 finite-panel diffusion of the reference flat surface `d_theta_r` (same
 projected footprint as the test surface). It maps
-$d_\theta = d_{\theta,r}$
+$d_\theta = d_{\theta,\mathrm{r}}$
 to 0 and $d_\theta = 1$ to 1.
 
 **Parameters**

@@ -11,13 +11,13 @@ ISO 9614-3:2002 (precision, grade 1).
 
 A probe is swept continuously over each segment of a hypothetical surface that
 encloses the source, reporting the time-averaged signed normal intensity
-$\langle I_{n,i} \rangle$ and mean-square pressure per segment. The
+$\langle I_{\mathrm{n},i} \rangle$ and mean-square pressure per segment. The
 sound power follows from the partial powers
-$P_i = \langle I_{n,i} \rangle S_i$ summed over the `N` segments
+$P_i = \langle I_{\mathrm{n},i} \rangle S_i$ summed over the `N` segments
 (clause 9, equations (5), (6), (12), (13)):
 
 $$
-P_i = \langle I_{n,i} \rangle \, S_i \tag{Eq. 12}
+P_i = \langle I_{\mathrm{n},i} \rangle \, S_i \tag{Eq. 12}
 $$
 
 $$
@@ -53,7 +53,7 @@ $$
 indicator (equivalent to ISO 9614-1 `F3-F2`, Note 15). Because Part 2 weights
 by segment area `Si` while [`phonometry.field_indicators`](/phonometry/reference/api/power/intensity/#field_indicators) (ISO 9614-1)
 assumes equal-area positions, the indicators are computed directly here; only
-the dynamic-capability index $L_d = \delta_{pI0} - K$ is shared with
+the dynamic-capability index $L_\mathrm{d} = \delta_{pI0} - K$ is shared with
 [`phonometry.dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index).
 
 Qualification criteria per band (Annex B), where `K` is 10 (engineering) or
@@ -61,7 +61,7 @@ Qualification criteria per band (Annex B), where `K` is 10 (engineering) or
 grade 3, and the per-segment repeatability limit `s` comes from Table 2:
 
 $$
-\text{criterion 1:} \quad L_d > F_{pI}, \qquad L_d = \delta_{pI0} - K
+\text{criterion 1:} \quad L_\mathrm{d} > F_{pI}, \qquad L_\mathrm{d} = \delta_{pI0} - K
 $$
 
 $$
@@ -119,23 +119,23 @@ $$
 $$
 
 $$
-L_{|I_n|} = 10 \log_{10}\!\left[ \frac{1}{N} \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
+L_{|I_\mathrm{n}|} = 10 \log_{10}\!\left[ \frac{1}{N} \sum_j \frac{|I_{\mathrm{n}j}|}{I_0} \right] \tag{Eq. B.5}
 $$
 
 $$
-L_{I_n} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N} \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
+L_{I_\mathrm{n}} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N} \sum_j I_{\mathrm{n}j} \right| \right] \tag{Eq. B.7}
 $$
 
 $$
-F_{pI_n}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_n|} \tag{Eq. B.3}
+F_{pI_\mathrm{n}}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_\mathrm{n}|} \tag{Eq. B.3}
 $$
 
 $$
-F_{pI_n}^{\mathrm{signed}} = \overline{L_p} - L_{I_n} \tag{Eq. B.6}
+F_{pI_\mathrm{n}}^{\mathrm{signed}} = \overline{L_p} - L_{I_\mathrm{n}} \tag{Eq. B.6}
 $$
 
 $$
-F_S = \frac{1}{\overline{I_n}} \sqrt{ \frac{1}{N-1} \sum_j \left( I_{nj} - \overline{I_n} \right)^2 } \tag{Eq. B.8}
+F_\mathrm{S} = \frac{1}{\overline{I_\mathrm{n}}} \sqrt{ \frac{1}{N-1} \sum_j \left( I_{\mathrm{n}j} - \overline{I_\mathrm{n}} \right)^2 } \tag{Eq. B.8}
 $$
 
 With `time_window_intensity` (an `(M, NB)` array of window-averaged
@@ -177,7 +177,7 @@ Evaluate the five ISO 9614-3:2002 Annex C acceptance criteria per band.
 | `indicators` | The [`PrecisionFieldIndicators`](/phonometry/reference/api/power/sound-power-intensity/#precisionfieldindicators) (gives criteria 3 and 4 directly). |
 | `scan_intensity_level_1` | `LIn(1)` per band (dB), first scan. |
 | `scan_intensity_level_2` | `LIn(2)` per band (dB), second scan; with the first scan and `s` this gives criterion 1 ($\lvert \Delta L \rvert \le s/2$). |
-| `pressure_residual_index` | `delta_pI0` (dB), scalar or per band; with $K = 10$ gives `Ld` for criterion 2 ($L_d \ge F_{pI_n}^{\mathrm{signed}}$). |
+| `pressure_residual_index` | `delta_pI0` (dB), scalar or per band; with $K = 10$ gives `Ld` for criterion 2 ($L_\mathrm{d} \ge F_{pI_\mathrm{n}}^{\mathrm{signed}}$). |
 | `field_nonuniformity_1` | `FS(1)` per band (initial scan density). |
 | `field_nonuniformity_2` | `FS(2)` per band (doubled density); with `FS(1)` gives criterion 5. |
 | `frequencies` | `(NB,)` nominal mid-band frequencies (Hz), selecting the criterion-1 limit `s` from Table 1. |
@@ -202,18 +202,18 @@ ISO 9614-3:2002 Annex C acceptance criteria (per band, pass/fail).
 
 Each attribute is a boolean array (True = satisfied) or `None` when its
 inputs are absent. `criterion_1` scan repeatability
-$\lvert L_{I_n}(1) - L_{I_n}(2) \rvert \le s/2$ (Eq. C.1);
+$\lvert L_{I_\mathrm{n}}(1) - L_{I_\mathrm{n}}(2) \rvert \le s/2$ (Eq. C.1);
 `criterion_2` dynamic-capability
-adequacy $L_d \ge F_{pI_n}^{\mathrm{signed}}$ (Eq. C.2);
+adequacy $L_\mathrm{d} \ge F_{pI_\mathrm{n}}^{\mathrm{signed}}$ (Eq. C.2);
 `criterion_3`
-$F_{pI_n}^{\mathrm{signed}} - F_{pI_n}^{\mathrm{unsigned}} \le 3$ dB
+$F_{pI_\mathrm{n}}^{\mathrm{signed}} - F_{pI_\mathrm{n}}^{\mathrm{unsigned}} \le 3$ dB
 (Eq. C.3); `criterion_4`
-$F_S \le 2$ (Eq. C.4); `criterion_5` scan-density convergence
-$0.83 \le F_S(1)/F_S(2) \le 1.2$ (Eq. C.5). `qualified` is the
+$F_\mathrm{S} \le 2$ (Eq. C.4); `criterion_5` scan-density convergence
+$0.83 \le F_\mathrm{S}(1)/F_\mathrm{S}(2) \le 1.2$ (Eq. C.5). `qualified` is the
 conjunction of criteria 1-3 with the field non-uniformity accepted
 through criterion 4
 or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
-is qualified as a final result even if $F_S(2) \ge 2$); `None`
+is qualified as a final result even if $F_\mathrm{S}(2) \ge 2$); `None`
 unless both criterion 1 and criterion 2 are evaluable.
 
 ## PrecisionFieldIndicators
@@ -234,7 +234,7 @@ ISO 9614-3:2002 Annex B field indicators (per band).
 the unsigned pressure-intensity indicator (= F2, Eq. B.3, using the mean
 magnitude of the segment intensities) and `f_pi_signed` the signed one
 (= F3, Eq. B.6, using the algebraic mean); by construction
-$F_{pI_n}^{\mathrm{signed}} \ge F_{pI_n}^{\mathrm{unsigned}}$.
+$F_{pI_\mathrm{n}}^{\mathrm{signed}} \ge F_{pI_\mathrm{n}}^{\mathrm{unsigned}}$.
 `fs` is the field-non-uniformity indicator (= F4, Eq. B.8).
 
 ## PrecisionIntensityResult
@@ -254,7 +254,7 @@ PrecisionIntensityResult(
 
 Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
 
-`partial_power` is the signed $P_i = I_{n,i} S_i$ per partial
+`partial_power` is the signed $P_i = I_{\mathrm{n},i} S_i$ per partial
 surface and band (Eq. 5); `sound_power` the signed band total
 $P = \sum P_i$ (Eq. 8) and `sound_power_level` its level
 $L_W = 10 \log_{10}(P/P_0)$ (Eq. 9), `NaN`
@@ -372,9 +372,9 @@ Sound power level by sound-intensity scanning (ISO 9614-2:1996).
 
 `normal_intensity` is an `(N_seg, N_bands)` array (or `(N_seg,)` for a
 single band) of the signed, segment-averaged normal sound intensity
-$\langle I_{n,i} \rangle$ (W/m^2), and `areas` the `(N_seg,)`
+$\langle I_{\mathrm{n},i} \rangle$ (W/m^2), and `areas` the `(N_seg,)`
 segment areas `Si` (m^2). The partial powers
-$P_i = \langle I_{n,i} \rangle S_i$ are summed to the band sound
+$P_i = \langle I_{\mathrm{n},i} \rangle S_i$ are summed to the band sound
 power `P` and level $L_W = 10 \log_{10}(P/P_0)$ (equations (12), (6),
 (13)). Bands with $P < 0$ are flagged (`negative_band`) and
 reported as `NaN` (clause 9.2).
@@ -424,10 +424,10 @@ sound_power_intensity_precision(
 Sound power by intensity scanning, precision (ISO 9614-3:2002).
 
 `partial_intensity` is an `(N, NB)` array (or `(N,)` for a single
-band) of the signed normal intensity $I_{ni}$ on each of the `N`
+band) of the signed normal intensity $I_{\mathrm{n}i}$ on each of the `N`
 partial surfaces (already the two-scan result), and `areas` the `(N,)`
 partial surface areas $S_i$. The partial powers
-$P_i = I_{ni} S_i$ (Eq. 5) are summed to $P$ (Eq. 8) and
+$P_i = I_{\mathrm{n}i} S_i$ (Eq. 5) are summed to $P$ (Eq. 8) and
 $L_W = 10 \log_{10}(P/P_0)$ (Eq. 9); a band with net $P \le 0$ is
 flagged (`not_applicable_band`, clause 9.2) and reported as `NaN`.
 $L_{W0}$ normalizes to reference meteorology:
@@ -472,7 +472,7 @@ SoundPowerIntensityResult(
 
 Result of an ISO 9614-2:1996 sound-power-by-scanning determination.
 
-`partial_power` is the signed $P_i = \langle I_{n,i} \rangle S_i$
+`partial_power` is the signed $P_i = \langle I_{\mathrm{n},i} \rangle S_i$
 per segment and band (Eq. 12); `partial_power_level` the magnitude level
 $10 \log_{10}(|P_i|/P_0)$ (Eq. 8), with the sign carried by
 `partial_power`. `sound_power` is the signed band total

@@ -268,7 +268,7 @@ borde de banda.
 
 `fractional_delay` desplaza un registro cualquier número de muestras,
 incluidas fracciones de muestra, multiplicando el espectro por la rampa de
-fase $e^{-j 2\pi f D/f_s}$: cada componente se retrasa exactamente `D` muestras.
+fase $e^{-j 2\pi f D/f_\mathrm{s}}$: cada componente se retrasa exactamente `D` muestras.
 Dos convenciones de frontera cubren los dos casos de uso:
 
 - `mode="linear"` (por defecto) rellena el registro con ceros más allá del
@@ -281,7 +281,7 @@ Dos convenciones de frontera cubren los dos casos de uso:
   vuelta. Para registros periódicos es exacto: un tono centrado en un bin
   de la DFT retrasado `D` muestras es igual al tono retrasado
   analíticamente con precisión de máquina, y su fase cambia exactamente
-  $-2\pi f D/f_s$ radianes.
+  $-2\pi f D/f_\mathrm{s}$ radianes.
 
 ```python
 import numpy as np
@@ -348,7 +348,7 @@ afirmaciones de exactitud son formas cerradas, no normativas.
 
 - [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): la balística de detector que ejercitan las ráfagas tonales (IEC 61672-1, Tabla 4).
 - [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/): el trabajo de alineación construido sobre el núcleo de retardo fraccionario.
-- [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de periodos con el mismo desplazamiento de banda limitada cuando $f_s T$ no es entero.
+- [Promediado síncrono](/phonometry/es/signals/spectra/synchronous-averaging/): alineación de periodos con el mismo desplazamiento de banda limitada cuando $f_\mathrm{s} T$ no es entero.
 - [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/): la verificación del ruido de colores y las métricas de ventanas.
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): las excitaciones de MLS y barrido exponencial del retrato de familia, tal como las usa ISO 18233.
 - [Medición de sistemas](/phonometry/es/signals/spectra/system-measurement/): la pareja de Golay y el barrido conformado, los otros dos miembros de la familia.

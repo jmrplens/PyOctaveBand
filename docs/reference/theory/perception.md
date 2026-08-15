@@ -37,24 +37,24 @@ See the [Loudness guide](../../perception/psychoacoustics/loudness.md) for usage
 Both methods operate on a Hann-windowed, RMS-averaged power spectrum (clauses 11.1 / 12.1) and use the clause 10 critical-band model. The critical bandwidth centred on a tone at $f$ is (Formula 2):
 
 $$
-\Delta f_c = 25.0 + 75.0 \left(1.0 + 1.4 \left(\tfrac{f}{1000}\right)^2\right)^{0.69} \ \text{Hz}
+\Delta f_\mathrm{c} = 25.0 + 75.0 \left(1.0 + 1.4 \left(\tfrac{f}{1000}\right)^2\right)^{0.69} \ \text{Hz}
 $$
 
-Band edges are placed **arithmetically** for $f \le 500$ Hz (Formulae 4–5): $f_{1,2} = f \mp \Delta f_c / 2$, and **geometrically** above (Formulae 7–8): $f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_c$.
+Band edges are placed **arithmetically** for $f \le 500$ Hz (Formulae 4–5): $f_{1,2} = f \mp \Delta f_\mathrm{c} / 2$, and **geometrically** above (Formulae 7–8): $f_1 = -\Delta f_\mathrm{c}/2 + \sqrt{\Delta f_\mathrm{c}^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_\mathrm{c}$.
 
-**TNR** (clause 11). The tone band spans the spectral minima on both sides of the peak within 15 % of $\Delta f_c$ (clause 11.2). The tone power subtracts the straight line connecting the band-edge bins (Formula 9): over $N$ tone-band bins, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. The masking-noise power is the remaining critical-band power rescaled to the full critical bandwidth (Formula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_c / \Delta f_{\text{band}}$, and $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Formula 11). The prominence criterion (Formulae 12–13) is
+**TNR** (clause 11). The tone band spans the spectral minima on both sides of the peak within 15 % of $\Delta f_\mathrm{c}$ (clause 11.2). The tone power subtracts the straight line connecting the band-edge bins (Formula 9): over $N$ tone-band bins, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. The masking-noise power is the remaining critical-band power rescaled to the full critical bandwidth (Formula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_\mathrm{c} / \Delta f_{\text{band}}$, and $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Formula 11). The prominence criterion (Formulae 12–13) is
 
 $$
-\mathrm{TNR}_{\text{crit}} = \begin{cases} 8.0 + 8.33 \log_{10}(1000/f_t) \ \text{dB} & f_t < 1\ \text{kHz} \\ 8.0 \ \text{dB} & f_t \ge 1\ \text{kHz} \end{cases}
+\mathrm{TNR}_{\text{crit}} = \begin{cases} 8.0 + 8.33 \log_{10}(1000/f_\mathrm{t}) \ \text{dB} & f_\mathrm{t} < 1\ \text{kHz} \\ 8.0 \ \text{dB} & f_\mathrm{t} \ge 1\ \text{kHz} \end{cases}
 $$
 
-**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_t \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_t \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_t)$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
+**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_\mathrm{t} \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_\mathrm{t} \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_\mathrm{t})$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
 
 *The TNR criterion drawn rather than evaluated, over the 89.1 Hz – 11.2 kHz
 range of interest, with one assessed tone on it. Because the criterion is
-$8.0 + 8.33\log_{10}(1000/f_t)$ below 1 kHz and flat above, the same
+$8.0 + 8.33\log_{10}(1000/f_\mathrm{t})$ below 1 kHz and flat above, the same
 tone-to-noise ratio is judged against a different threshold at every frequency:
 the example tone clears its 13.0 dB threshold at 250 Hz by 2.1 dB, while a
 10 dB tone would be prominent anywhere above 1 kHz and not prominent here.*
@@ -65,7 +65,7 @@ See the [Prominent Discrete Tones guide](../../perception/psychoacoustics/tone-p
 
 The ear analyzes sound in **critical bands**: frequency regions within which energy is summed before loudness is formed. The **Bark scale** maps frequency to critical-band rate $z$, 0 to 24 Bark, and ISO 532-1:2017 samples the specific loudness $N'(z)$ at 0.1-Bark steps (240 values). The implementation is a clean-room port of the standard's normative reference program (Annex A.4) and proceeds in stages:
 
-1. **One-third-octave levels**: 28 bands, 25 Hz to 12.5 kHz (the Annex A filterbank at 48 kHz, Tables A.1/A.2). For time-varying sounds the squared band outputs are smoothed by three cascaded low-passes with $\tau = 2/(3 f_c)$ ($f_c$ capped at 1 kHz) and sampled every 2 ms.
+1. **One-third-octave levels**: 28 bands, 25 Hz to 12.5 kHz (the Annex A filterbank at 48 kHz, Tables A.1/A.2). For time-varying sounds the squared band outputs are smoothed by three cascaded low-passes with $\tau = 2/(3 f_\mathrm{c})$ ($f_\mathrm{c}$ capped at 1 kHz) and sampled every 2 ms.
 2. **Low-frequency grouping**: the 11 bands up to 250 Hz receive the equal-loudness corrections of Table A.3 and are summed into the first three critical bands (25–80, 100–160, 200–250 Hz).
 3. **a0 transmission**: the outer/middle-ear transfer correction of Table A.4 (plus the diffuse-field difference of Table A.5 when `field='diffuse'`) yields the critical-band levels $L_E$.
 4. **Core loudness**: each of the 20 critical bands is transformed with the threshold-in-quiet levels $L_{TQ}$ of Table A.6 (after the bandwidth adaptation DCB of Table A.7):
@@ -104,7 +104,7 @@ ISO 532-1 is one of three loudness models; two newer families refine the auditor
 
 ### Moore-Glasberg loudness (ISO 532-2:2017, ISO 532-3:2023)
 
-Instead of Zwicker's fixed critical bands, the Moore-Glasberg model forms a continuous **excitation pattern** on the ERB-number ("Cam") scale using level-dependent **rounded-exponential (roex)** auditory filters. As a function of the normalized frequency deviation $g = |f - f_c| / f_c$ from a filter centred at $f_c$, the filter weighting is
+Instead of Zwicker's fixed critical bands, the Moore-Glasberg model forms a continuous **excitation pattern** on the ERB-number ("Cam") scale using level-dependent **rounded-exponential (roex)** auditory filters. As a function of the normalized frequency deviation $g = |f - f_\mathrm{c}| / f_\mathrm{c}$ from a filter centred at $f_\mathrm{c}$, the filter weighting is
 
 $$
 W(g) = (1 + p\ g)\ e^{-p\ g}
@@ -213,10 +213,10 @@ $$
 Steady background noise multiplies each band's $m$ by the intensity ratio (the noise term):
 
 $$
-m'_k = m_k \cdot \frac{I_k}{I_k + I_{n,k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
+m'_k = m_k \cdot \frac{I_k}{I_k + I_{\mathrm{n},k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
 $$
 
-and when absolute band levels are known the full correction $m'_k = m_k I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})$ adds the auditory masking intensity $I_{am,k}$ (from the next lower octave band, Table A.2) and the absolute reception threshold $I_{rt,k}$ (Table A.3). Each corrected $m$ maps to an **effective SNR**, clipped to the ±15 dB range where intelligibility actually varies, then to a transmission index (A.5.4/A.5.5):
+and when absolute band levels are known the full correction $m'_k = m_k I_k / (I_k + I_{\mathrm{am},k} + I_{\mathrm{rt},k} + I_{\mathrm{n},k})$ adds the auditory masking intensity $I_{\mathrm{am},k}$ (from the next lower octave band, Table A.2) and the absolute reception threshold $I_{\mathrm{rt},k}$ (Table A.3). Each corrected $m$ maps to an **effective SNR**, clipped to the ±15 dB range where intelligibility actually varies, then to a transmission index (A.5.4/A.5.5):
 
 $$
 \mathrm{SNR}_{\mathrm{eff}} = 10 \log_{10} \frac{m}{1 - m}\ \text{dB}, \qquad \mathrm{TI} = \frac{\mathrm{SNR}_{\mathrm{eff}} + 15}{30}
@@ -289,10 +289,10 @@ See the [Speech Intelligibility guide](../../perception/speech/speech-intelligib
 ISO 389-7:2005 Table 1 fixes the reference threshold of hearing of otologically normal young adults: the free-field and diffuse-field SPL corresponding to 0 dB HL at the 11 audiometric frequencies 125 Hz – 8 kHz (22.1 dB at 125 Hz for both fields, 2.4/0.8 dB free/diffuse at 1 kHz, diverging at high frequency to 12.6 vs 6.8 dB at 8 kHz). ISO 7029:2017 describes how that threshold shifts statistically with age: the median deviation from age 18 is (clause 4.2, Table 1)
 
 $$
-\Delta H_{md} = a\ (Y - 18)^b \ \text{dB},
+\Delta H_\mathrm{md} = a\ (Y - 18)^b \ \text{dB},
 $$
 
-and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, using the upper spread $s_u$ for $z \ge 0$ (worse than median) and the lower spread $s_l$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
+and any fractile follows a two-sided Gaussian model (clause 4.4), $\Delta H_Q = \Delta H_\mathrm{md} + z(Q)\ s$, using the upper spread $s_\mathrm{u}$ for $z \ge 0$ (worse than median) and the lower spread $s_\mathrm{l}$ otherwise, each a degree-5 polynomial in $Y - 18$ per sex and frequency (clause 4.3, Tables 2–5). At age 18 every deviation is zero by construction. The formulae are established to 80 years at and below 2 kHz and to 70 years above; beyond that the evaluation is an extrapolation. Anchors: at 60 years the medians evaluate to 7.85 dB (male, 1 kHz), 20.21 dB (male, 4 kHz) and 15.32 dB (female, 4 kHz), matching the Table 1 formula to $10^{-3}$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hearing_threshold.svg" alt="Two panels. Left: the ISO 7029 median hearing-threshold deviation for men at ages 20, 40, 60 and 80 on an inverted audiogram axis, with the 10 to 90 percent fractile band around the 70-year curve; the loss deepens toward high frequencies and with age. Right: the ISO 389-7 free-field and diffuse-field reference threshold, coinciding below 1 kHz and diverging above, dipping to a minimum near 3 to 4 kHz" width="96%"></picture>
 
@@ -305,10 +305,10 @@ See the [Hearing Threshold guide](../../perception/hearing/hearing-threshold.md)
 ISO 1999:2013 predicts the permanent threshold shift a noise-exposed population accrues. The median noise-induced shift (NIPTS) for 10–40 years of exposure is (clause 6.3.1, Formula 2, Table 1):
 
 $$
-N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{yr},
+N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_\mathrm{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{yr},
 $$
 
-quadratic in the excess over the frequency-dependent onset level $L_0$ (75 dB at 4 kHz, the most sensitive band, up to 93 dB at 500 Hz) and zero below it; under 10 years it scales as $\log_{10}(t+1)/\log_{10} 11$ (Formula 3). Fractiles add the spread, $N_Q = N_{50} + z\ d_{u,l}$ with $d = (X + Y \log_{10} t)(L_{EX,8h} - L_0)^2$ (clause 6.3.2, Formulae 4–7, Tables 2/3), clamped at zero. The library's `fractile` counts the fraction of the population with the *smaller* shift, so `fractile=0.9` is the most-susceptible decile (reliable range 0.05–0.95); ISO 1999's own $Q$ runs the other way, counting the percentage with worse hearing, so the same decile is $Q = 10\ \%$ there and in the Annex D column headings. The hearing threshold level associated with age and noise (HTLAN) combines NIPTS with the ISO 7029 age component at the same fractile through the compressed sum (clause 6.1, Formula 1):
+quadratic in the excess over the frequency-dependent onset level $L_0$ (75 dB at 4 kHz, the most sensitive band, up to 93 dB at 500 Hz) and zero below it; under 10 years it scales as $\log_{10}(t+1)/\log_{10} 11$ (Formula 3). Fractiles add the spread, $N_Q = N_{50} + z\ d_{u,l}$ with $d = (X + Y \log_{10} t)(L_\mathrm{EX,8h} - L_0)^2$ (clause 6.3.2, Formulae 4–7, Tables 2/3), clamped at zero. The library's `fractile` counts the fraction of the population with the *smaller* shift, so `fractile=0.9` is the most-susceptible decile (reliable range 0.05–0.95); ISO 1999's own $Q$ runs the other way, counting the percentage with worse hearing, so the same decile is $Q = 10\ \%$ there and in the Annex D column headings. The hearing threshold level associated with age and noise (HTLAN) combines NIPTS with the ISO 7029 age component at the same fractile through the compressed sum (clause 6.1, Formula 1):
 
 $$
 H' = H + N - \frac{H\ N}{120}.

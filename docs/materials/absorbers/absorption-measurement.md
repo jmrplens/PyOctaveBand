@@ -9,8 +9,8 @@ public-tender requirement, and is rarely questioned again. This guide covers
 that number's whole laboratory life. The **measurement** is ISO 354: a sample
 of 10 m² to 12 m² on the floor of a reverberation room, two decay times, and
 Sabine's formula run backwards to get the random-incidence coefficient
-$\alpha_s$ per one-third-octave band. The **rating** is ISO 11654: the spectrum
-collapsed into the weighted coefficient $\alpha_w$ with its letter class A to
+$\alpha_\mathrm{s}$ per one-third-octave band. The **rating** is ISO 11654: the spectrum
+collapsed into the weighted coefficient $\alpha_\mathrm{w}$ with its letter class A to
 E, the single number absorber datasheets quote. And because a coefficient
 without an uncertainty is only half a result, ISO 12999-2 supplies the
 **measurement uncertainty** of both. The normal-incidence counterpart measured
@@ -26,15 +26,15 @@ specimen area $S$, and returns a frozen `SoundAbsorptionMeasurement`. The
 equivalent sound absorption areas follow from Sabine's equation (ISO 354:2003
 Eq. (5)/(7)), $A = 55.3\,V/(c\,T) - 4\,V\,m$, with the speed of sound from
 Eq. (6), $c = 331 + 0.6\,t$; the sound absorption coefficient is
-$\alpha_s = (A_2 - A_1)/S$ (Eq. (8)/(9)). The coefficient may exceed 1.0 from
+$\alpha_\mathrm{s} = (A_2 - A_1)/S$ (Eq. (8)/(9)). The coefficient may exceed 1.0 from
 edge and diffraction effects (Clause 3.7 NOTE 2) and is never clamped. Air
 attenuation enters only through the per-band coefficient $m$ (default 0, the
 zero-attenuation reference); pass `attenuation_from_alpha` of an ISO 9613-1
 value when it is needed.
 
-ISO 354 is a characterisation: it produces the $\alpha_s$ spectrum, not a
-single-number rating. The weighted coefficient $\alpha_w$ is an ISO 11654
-quantity; feed the measured $\alpha_s$ to `weighted_absorption_from_third_octave`
+ISO 354 is a characterisation: it produces the $\alpha_\mathrm{s}$ spectrum, not a
+single-number rating. The weighted coefficient $\alpha_\mathrm{w}$ is an ISO 11654
+quantity; feed the measured $\alpha_\mathrm{s}$ to `weighted_absorption_from_third_octave`
 in section 3 to obtain it.
 
 ```python
@@ -58,7 +58,7 @@ m.plot()              # alpha_s versus one-third-octave frequency
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement.svg" alt="ISO 354 reverberation-room sound absorption: the alpha_s spectrum of a porous absorber sample over the one-third-octave bands from 100 Hz to 5000 Hz, rising from near zero at low frequency to a broad maximum around 0.69 near 1600 Hz and easing off above" width="80%"></picture>
 
 *The Sabine inversion of the two decay times: the porous sample barely
-changes the long low-frequency decays ($\alpha_s \to 0$), bites hardest where
+changes the long low-frequency decays ($\alpha_\mathrm{s} \to 0$), bites hardest where
 its thickness approaches a quarter wavelength, and eases off at high
 frequency, a typical thin-porous-absorber signature (Cox & D'Antonio 3e,
 Ch. 5).*
@@ -102,8 +102,8 @@ plt.show()
 
 `SoundAbsorptionMeasurement.report(path)` renders a one-page PDF fiche laid out
 like an accredited reverberation-room absorption test report (ISO 354:2003): a
-standard-basis line, a metadata header block, the one-third-octave $\alpha_s$
-table beside the $\alpha_s$ curve (the result's own `.plot()`), a boxed
+standard-basis line, a metadata header block, the one-third-octave $\alpha_\mathrm{s}$
+table beside the $\alpha_\mathrm{s}$ curve (the result's own `.plot()`), a boxed
 characterisation headline and a footer with the fixed disclaimer. ISO 354 has
 no pass/fail verdict and no single-number rating, so the fiche carries neither.
 Setting `verbose=True` adds the reverberation times $T_1$/$T_2$ and the
@@ -145,7 +145,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 354 absorption example report: metadata header with sample area S, room volume V and speed of sound c, the one-third-octave alpha_s table grouped by octave beside the alpha_s curve, and the boxed characterisation headline over the tested one-third-octave range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso354_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso354_absorption_example.pdf)
 
-*Reverberation-room absorption fiche (`SoundAbsorptionMeasurement.report`), the $\alpha_s$ spectrum.*
+*Reverberation-room absorption fiche (`SoundAbsorptionMeasurement.report`), the $\alpha_\mathrm{s}$ spectrum.*
 
 
 ## 2. Absorption areas from room decay times
@@ -160,14 +160,14 @@ coefficient:
 
 $$
 A = \frac{55.3\ V}{c\ T} - 4 V m, \qquad
-\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0.6\ t ,
+\alpha_\mathrm{s} = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0.6\ t ,
 $$
 
 with $c$ from the room air temperature $t$ in °C (valid 15–30 °C) and $m$ the
 power attenuation coefficient of air (default 0; convert an ISO 9613-1
 $\alpha$ in dB/m with `attenuation_from_alpha`). Because edge and diffraction
 effects can scatter more energy than the sample's flat area intercepts,
-$\alpha_s$ may exceed 1.0 and is never clamped (ISO 354 Clause 3.7).
+$\alpha_\mathrm{s}$ may exceed 1.0 and is never clamped (ISO 354 Clause 3.7).
 
 ```python
 import numpy as np
@@ -198,7 +198,7 @@ to a straight portion of it. That is the operation behind $T_1$, and again
 behind $T_2$ — the clip shows a *single* room, not the pair, so it answers
 "where does one $T$ come from" and not "what does subtracting two of them
 cost". The second question is the one that governs this measurement, and
-section 4 puts a number on it: because $\alpha_s$ is a difference of two
+section 4 puts a number on it: because $\alpha_\mathrm{s}$ is a difference of two
 reciprocal decay times, its uncertainty is worst exactly where the two decays
 are most alike, at the low-frequency end.
 
@@ -226,13 +226,13 @@ here checks any of it.
 | `m` (`m1`, `m2`) | float or 1D array | 1/m | ≥ 0, default `0` | Air power attenuation coefficient |
 
 `absorption_area()` returns the equivalent absorption area $A$ (m²) with the
-shape of `t60`; `absorption_coefficient()` returns $\alpha_s$;
+shape of `t60`; `absorption_coefficient()` returns $\alpha_\mathrm{s}$;
 `attenuation_from_alpha(alpha)` converts an ISO 9613-1 $\alpha$ (dB/m) to $m$.
 
 
 ## 3. Weighted rating and absorption class (ISO 11654)
 
-The measurement of section 1 delivers the $\alpha_s$ spectrum in
+The measurement of section 1 delivers the $\alpha_\mathrm{s}$ spectrum in
 one-third-octave bands. ISO 11654:1997 turns that spectrum into a
 single-number rating comparable across products.
 
@@ -242,7 +242,7 @@ single-number rating comparable across products.
 first grouped into octave bands, each the arithmetic mean of its three thirds:
 
 $$
-\alpha_{p,i} = \tfrac{1}{3}\big(\alpha_{i1} + \alpha_{i2} + \alpha_{i3}\big),
+\alpha_{\mathrm{p},i} = \tfrac{1}{3}\big(\alpha_{i1} + \alpha_{i2} + \alpha_{i3}\big),
 $$
 
 evaluated to the second decimal and then rounded in steps of $0.05$ (the
@@ -252,25 +252,25 @@ $1.00$ are set to $1.00$. The five rating bands are 250, 500, 1000, 2000 and
 
 **Weighted absorption (Clause 4.2).** A fixed reference curve
 $\{250{:}\,0.80,\ 500{:}\,1.00,\ 1000{:}\,1.00,\ 2000{:}\,1.00,\ 4000{:}\,0.90\}$
-is shifted downwards, towards the measured $\alpha_p$, in steps of $0.05$ until
+is shifted downwards, towards the measured $\alpha_\mathrm{p}$, in steps of $0.05$ until
 the sum of the **unfavourable** deviations (taken only where the measurement
 lies below the shifted curve, with magnitude $(\text{curve} - \text{measured})$)
-is no more than $0.10$. The weighted coefficient $\alpha_w$ is the shifted-curve
+is no more than $0.10$. The weighted coefficient $\alpha_\mathrm{w}$ is the shifted-curve
 value read at 500 Hz.
 
 **Shape indicators (Clause 4.3).** When a practical coefficient exceeds the
 shifted curve by $0.25$ or more, a shape indicator is appended: `L` at 250 Hz,
 `M` at 500 or 1000 Hz, `H` at 2000 or 4000 Hz (e.g. `0.60(M)`).
 
-**Absorption class (Table B.1).** Finally $\alpha_w$ maps to a class: A
+**Absorption class (Table B.1).** Finally $\alpha_\mathrm{w}$ maps to a class: A
 (0.90–1.00), B (0.80–0.85), C (0.60–0.75), D (0.30–0.55), E (0.15–0.25), or "not
-classified" (0.00–0.10). Because $\alpha_w$ is always a multiple of $0.05$ these
+classified" (0.00–0.10). Because $\alpha_\mathrm{w}$ is always a multiple of $0.05$ these
 ranges partition the grid exactly.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
 
 *The Annex A.2 worked example: the reference curve is shifted down by 0.40 until
-the unfavourable deviations sum to 0.05 ($\le 0.10$), giving $\alpha_w = 0.60$;
+the unfavourable deviations sum to 0.05 ($\le 0.10$), giving $\alpha_\mathrm{w} = 0.60$;
 the 500 Hz peak overshoots the shifted curve by $\ge 0.25$, adding the `M`
 indicator, so the rating is $0.60(\text{M})$, class C.*
 
@@ -306,13 +306,13 @@ result.plot()   # the figure above: practical curve vs shifted reference
 print(materials.absorption_class(0.85))       # B
 ```
 
-`weighted_absorption` accepts the five octave-band $\alpha_p$ values (as a
+`weighted_absorption` accepts the five octave-band $\alpha_\mathrm{p}$ values (as a
 sequence or a `{frequency: value}` mapping); pass the fifteen one-third-octave
-$\alpha_s$ values to `practical_absorption_coefficient` first if you are starting
-from raw ISO 354 data. To keep the one-third-octave $\alpha_s$ on the result (so
+$\alpha_\mathrm{s}$ values to `practical_absorption_coefficient` first if you are starting
+from raw ISO 354 data. To keep the one-third-octave $\alpha_\mathrm{s}$ on the result (so
 the fiche can print the full table every accredited ISO 354 certificate carries),
 rate it in one step with `weighted_absorption_from_third_octave(alpha_s)`, which
-forms $\alpha_p$, rates it and retains the input $\alpha_s$ and its band centres
+forms $\alpha_\mathrm{p}$, rates it and retains the input $\alpha_\mathrm{s}$ and its band centres
 (`third_octave_alpha_s`, `third_octave_bands`). The result carries the shifted
 reference curve and the per-band deviations, and its `.plot()` renders the figure
 above.
@@ -333,18 +333,18 @@ print(result.third_octave_alpha_s)  # the input alpha_s, retained for the fiche
 `AbsorptionRatingResult.report(path)` renders a one-page PDF fiche laid out like
 an accredited absorption test report (an ISO 354 reverberation-room measurement
 rated per ISO 11654): a standard-basis line, an optional metadata header block,
-the octave-band $\alpha_p$ table beside the practical-versus-shifted-reference
-plot (the result's own `.plot()`), the boxed $\alpha_w$ single number with its
+the octave-band $\alpha_\mathrm{p}$ table beside the practical-versus-shifted-reference
+plot (the result's own `.plot()`), the boxed $\alpha_\mathrm{w}$ single number with its
 absorption class and applied shift, an optional verdict row and a footer with
 the fixed disclaimer. When the rating was built with
 `weighted_absorption_from_third_octave`, the left table becomes the full ISO 354
-one-third-octave $\alpha_s$ table with the octave $\alpha_p$ on the matching
+one-third-octave $\alpha_\mathrm{s}$ table with the octave $\alpha_\mathrm{p}$ on the matching
 rows, exactly as accredited certificates print it. It uses the same
 `ReportMetadata` container (documented
 under [Insulation ratings](../../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata))
 and rendering engine as the ISO 717 insulation fiche; passing
 `metadata=None` produces a lightweight prediction fiche, and a supplied
-`requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
+`requirement` is read as the minimum $\alpha_\mathrm{w}$ for the PASS/FAIL verdict.
 Setting `verbose=True` swaps the two-column table for the ISO 11654 evaluation
 columns (practical coefficient, shifted reference, unfavourable deviation).
 Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
@@ -379,7 +379,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 11654 absorption example report: metadata header, the full one-third-octave alpha_s table with the octave alpha_p on the matching rows beside the practical-versus-shifted-reference plot, boxed alpha_w = 0.60 (M) with absorption class C and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso11654_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso11654_absorption_example.pdf)
 
-*Weighted absorption fiche (`AbsorptionRatingResult.report`), $\alpha_w$ with its class.*
+*Weighted absorption fiche (`AbsorptionRatingResult.report`), $\alpha_\mathrm{w}$ with its class.*
 
 
 ## Tube or reverberation room?
@@ -392,17 +392,17 @@ do not match, sometimes not even closely.
 The [tube](impedance-tube.md) measures a **normal-incidence** coefficient: one
 plane wave, one angle, a specimen a few centimetres across, and a complex
 reflection factor that keeps magnitude and phase. ISO 354 measures the **random-incidence**
-coefficient $\alpha_s$: a diffuse field striking a sample of 10 m² to 12 m²
+coefficient $\alpha_\mathrm{s}$: a diffuse field striking a sample of 10 m² to 12 m²
 from every direction at once, recovered from the change in the room's decay
 time through Sabine's formula, an energy average with no phase left in it.
 Because the diffuse field finds more ways into an absorber than the single
 normal-incidence wave (oblique waves travel a longer path inside the layer),
-$\alpha_s$ usually comes out higher. For a locally reacting surface the two
+$\alpha_\mathrm{s}$ usually comes out higher. For a locally reacting surface the two
 are linked by Paris' angular average, which defines the statistical
 absorption coefficient
 
 $$
-\alpha_{st} = \int_0^{\pi/2} \alpha(\theta)\,\sin 2\theta\,\mathrm{d}\theta,
+\alpha_\mathrm{st} = \int_0^{\pi/2} \alpha(\theta)\,\sin 2\theta\,\mathrm{d}\theta,
 $$
 
 an integral that weights the oblique angles most heavily; evaluating it
@@ -411,10 +411,10 @@ angle-dependent $\alpha(\theta)$ from the measured surface impedance, not just
 the normal-incidence coefficient itself.
 
 **Why ISO 354 values exceed 1.** A ratio of absorbed to incident energy cannot
-exceed one, yet reverberation-room reports of $\alpha_s = 1.05$ to $1.20$ for
+exceed one, yet reverberation-room reports of $\alpha_\mathrm{s} = 1.05$ to $1.20$ for
 thick porous absorbers are routine and correct by the method. Sabine's formula
 converts the decay-time change into an equivalent absorption area $A$, and
-$\alpha_s = A/S$ divides by the *geometric* sample area $S$. Diffraction at
+$\alpha_\mathrm{s} = A/S$ divides by the *geometric* sample area $S$. Diffraction at
 the sample edges lets the specimen drain energy from a sound field wider than
 its footprint (the edge effect), so the equivalent area can exceed the
 geometric one. Such values are not errors, but they are not portable either:
@@ -434,7 +434,7 @@ as supplied.
 **Which to use.** They answer different questions. The reverberation-room
 value is the one that feeds diffuse-field prediction: Sabine reverberation
 estimates, the equivalent absorption areas of
-[EN 12354-6](../../buildings/rooms/enclosed-space-absorption.md) and the $\alpha_w$ rating and
+[EN 12354-6](../../buildings/rooms/enclosed-space-absorption.md) and the $\alpha_\mathrm{w}$ rating and
 class, all of which expect random incidence over a mounted, finite sample
 (ISO 354's Annex B mounting types exist because the mounting is part of the
 result). The tube value is the laboratory and development tool: it needs only
@@ -443,7 +443,7 @@ surface impedance pins down the parameters of porous-material models in the
 Allard and Atalla tradition, with the
 [airflow resistivity](airflow-resistance.md) as the first input; the fitted model then predicts the layer at any angle, thickness
 or backing. What the tube number is *not* is a drop-in substitute for
-$\alpha_s$: feeding normal-incidence coefficients into a Sabine or EN 12354-6
+$\alpha_\mathrm{s}$: feeding normal-incidence coefficients into a Sabine or EN 12354-6
 budget systematically underpredicts the installed absorption.
 
 
@@ -457,20 +457,20 @@ companion of the sound-insulation uncertainty of ISO 12999-1
 ([Field Insulation Measurement (ISO 16283)](../../buildings/insulation/insulation-field.md)).
 
 **One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
-reproducibility standard deviation is $\sigma_R = m\,\alpha_s + n$ (Formula (1)),
-and for the equivalent absorption area $\sigma_R = m\,A_T + n\,S$ with
+reproducibility standard deviation is $\sigma_\mathrm{R} = m\,\alpha_\mathrm{s} + n$ (Formula (1)),
+and for the equivalent absorption area $\sigma_\mathrm{R} = m\,A_\mathrm{T} + n\,S$ with
 $S = 10\ \text{m}^2$ (Formula (2)), where $m$ and $n$ are the frequency-dependent
 constants of Table 1 (63–5000 Hz). The repeatability value is
-$\sigma_r = 0.6\,\sigma_R$ (Formula (3)).
+$\sigma_\mathrm{r} = 0.6\,\sigma_\mathrm{R}$ (Formula (3)).
 
 **Practical coefficient (Clause 6).** For the ISO 11654 practical coefficient
-$\sigma_R = m\,\alpha_p + n$ in octave bands with the constants of Table 2
-(250–4000 Hz); again $\sigma_r = 0.6\,\sigma_R$.
+$\sigma_\mathrm{R} = m\,\alpha_\mathrm{p} + n$ in octave bands with the constants of Table 2
+(250–4000 Hz); again $\sigma_\mathrm{r} = 0.6\,\sigma_\mathrm{R}$.
 
-**Single numbers (Clause 7).** The weighted coefficient $\alpha_w$ has a constant
-standard uncertainty ($\sigma_R = 0.035$, $\sigma_r = 0.020$); the EN 1793-1
+**Single numbers (Clause 7).** The weighted coefficient $\alpha_\mathrm{w}$ has a constant
+standard uncertainty ($\sigma_\mathrm{R} = 0.035$, $\sigma_\mathrm{r} = 0.020$); the EN 1793-1
 single-number rating $DL_{\alpha,\text{NRD}}$ scales with the value
-($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$). That uncertainty
+($\sigma_\mathrm{R} = 0.10\,DL_\alpha$, $\sigma_\mathrm{r} = 0.02\,DL_\alpha$). That uncertainty
 formula is all this page takes from EN 1793-1: the standard's own in-situ
 measurement method for road-traffic noise-reducing devices is not implemented.
 
@@ -518,7 +518,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
 
 - [Impedance Tube](impedance-tube.md): the normal-incidence absorption,
   surface impedance and transmission loss of small samples (ISO 10534-1/-2,
-  ASTM E2611), and why its coefficient differs from $\alpha_s$.
+  ASTM E2611), and why its coefficient differs from $\alpha_\mathrm{s}$.
 - [Airflow Resistance](airflow-resistance.md): the ISO 9053-1/-2 flow
   resistivity that anchors the porous-material models behind most absorbers.
 - [Porous and Multilayer Absorbers](porous-absorbers.md): predicting the
@@ -526,7 +526,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
 - [Room Acoustics](../../buildings/rooms/room-acoustics.md): the ISO 3382 decay measurements that
   supply the reverberation times $T_1$ and $T_2$.
 - [Reverberation-time prediction](../../buildings/rooms/reverberation-prediction.md): the Sabine,
-  Eyring and Millington-Sette estimators that consume $\alpha_s$.
+  Eyring and Millington-Sette estimators that consume $\alpha_\mathrm{s}$.
 - [Equivalent absorption area of furnished rooms](../../buildings/rooms/enclosed-space-absorption.md):
   the EN 12354-6 absorption budget these coefficients feed.
 - [Field Insulation Measurement (ISO 16283)](../../buildings/insulation/insulation-field.md): the

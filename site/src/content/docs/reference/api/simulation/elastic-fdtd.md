@@ -20,7 +20,7 @@ finite-difference method", *Geophysics* 51(4), 889-901 (1986):
   centres of the acoustic solver ([`FDTD2D`](/phonometry/reference/api/simulation/fdtd/#fdtd2d))
   and the velocities live on the cell faces;
 * the Courant stability condition
-  $c_P \Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2} < 1$
+  $c_\mathrm{P} \Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2} < 1$
   (Eqs. 6-7), which depends only on the P-wave speed, and the numerical
   dispersion relations of Eqs. 13-14 with the 10-cells-per-wavelength rule;
 * liquids as the `c_s = 0` limit: shear-free cells propagate the acoustic
@@ -49,11 +49,11 @@ random numbers and single-threaded numpy execution, so identical inputs give
 bit-identical outputs on the same platform.
 
 Validated against analytic oracles: P- and S-wave times of flight
-$c_P = \sqrt{(\lambda + 2\mu) / \rho}$ and
-$c_S = \sqrt{\mu / \rho}$, the
+$c_\mathrm{P} = \sqrt{(\lambda + 2\mu) / \rho}$ and
+$c_\mathrm{S} = \sqrt{\mu / \rho}$, the
 Rayleigh-wave speed from the exact characteristic equation (Cremer, Heckl &
 Petersson 2005, Eq. 3.149), the Kirchhoff thin-plate flexural dispersion
-$c_B = (B'/m'')^{1/4} \sqrt{\omega}$ in its $\lambda_B \gg h$
+$c_\mathrm{B} = (B'/m'')^{1/4} \sqrt{\omega}$ in its $\lambda_\mathrm{B} \gg h$
 domain
 (Eqs. 3.83-3.89), the normal-incidence fluid-solid reflection coefficient
 $(Z_2 - Z_1)/(Z_2 + Z_1)$, the normal-incidence mass law of a thin
@@ -65,7 +65,7 @@ Layered Media I* (Springer 1990), Eqs. 4.2.22-4.2.26 (with the shear-wave
 mode conversion active), to the Scholte interface-wave speed from the exact
 characteristic equation of Eq. 4.4.20 (see [`scholte_speed`](/phonometry/reference/api/simulation/elastic-fdtd/#scholte_speed)), and to
 the exact three-media transmission of an immersed plate (B&G Eqs. 2.4.10,
-2.4.14) including its first thickness resonance $f_1 = c_P / (2 h)$
+2.4.14) including its first thickness resonance $f_1 = c_\mathrm{P} / (2 h)$
 (Eq. 2.4.19), following the fluid-solid finite-difference benchmark of
 van Vossen, Robertsson & Chapman, *Geophysics* 67(2), 618-624 (2002).
 
@@ -113,7 +113,7 @@ each time step and, optionally, full-field snapshots.
 The grid covers `(nx * dx, ny * dx)` metres; a cell index `(ix, iy)`
 maps to the physical cell centre `((ix + 0.5) * dx, (iy + 0.5) * dx)`.
 Resolve at least 10 cells per shortest wavelength
-($\Delta x \le c_{s,\min} / (10 f)$ with `c_s_min` the smallest
+($\Delta x \le c_{\mathrm{s},\min} / (10 f)$ with `c_s_min` the smallest
 non-zero
 `c_s` over the solid cells, since the S wave is always the shortest;
 a wholly fluid map falls back to the acoustic rule on the smallest
@@ -135,7 +135,7 @@ $1/\sqrt{r}$ amplitude spreading.
 | `sources` | One or more of [`ExplosionSource`](/phonometry/reference/api/simulation/elastic-fdtd/#explosionsource) or [`ForceSource`](/phonometry/reference/api/simulation/elastic-fdtd/#forcesource). |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array. |
 | `shape` | Grid shape `(ny, nx)`, required when `c_p` is scalar. |
-| `cfl` | Courant number in `(0, 1)` (Virieux Eqs. 6-7); the time step is $\Delta t = C_N\, \Delta x / (c_{p,\max} \sqrt{2})$. Default 0.6. |
+| `cfl` | Courant number in `(0, 1)` (Virieux Eqs. 6-7); the time step is $\Delta t = C_\mathrm{N}\, \Delta x / (c_{\mathrm{p},\max} \sqrt{2})$. Default 0.6. |
 | `recording` | What the run records ([`ElasticRecording`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticrecording)): the probe cells and their fields, and the snapshot cadence and field. `None` records nothing but the time axis. |
 | `boundaries` | How the domain edges are terminated ([`ElasticBoundaries`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticboundaries)); `None` is rigid on all four sides. |
 | `obstacle_mask` | Boolean map, shape `(ny, nx)`, of rigid cells (rasterised interior geometry). |
@@ -205,7 +205,8 @@ as zero on the edge, is a shear-free rigid wall; `free_sides` turns
 selected sides into traction-free surfaces via stress imaging and sponge
 layers into absorbing ones. Material maps are given as the measurable
 wave speeds and converted internally to the Lame parameters
-$\mu = \rho c_s^2$ and $\lambda = \rho (c_p^2 - 2 c_s^2)$;
+$\mu = \rho c_\mathrm{s}^2$ and
+$\lambda = \rho (c_\mathrm{p}^2 - 2 c_\mathrm{s}^2)$;
 density is
 arithmetically averaged onto the faces and `mu` harmonically averaged
 onto the corners (zero whenever any neighbour is a fluid), the Moczo
@@ -217,10 +218,10 @@ interfaces converge to the physical traction continuity.
 | Name | Description |
 | :--- | :--- |
 | `c_p` | P-wave speed map [m/s], shape `(ny, nx)`. A scalar with an explicit `shape` is also accepted. |
-| `c_s` | S-wave speed map [m/s]; scalar or `(ny, nx)` array. `c_s = 0` marks a fluid cell (the acoustic limit); every cell must satisfy $c_p^2 \ge 2 c_s^2$ (non-negative `lambda`). |
+| `c_s` | S-wave speed map [m/s]; scalar or `(ny, nx)` array. `c_s = 0` marks a fluid cell (the acoustic limit); every cell must satisfy $c_\mathrm{p}^2 \ge 2 c_\mathrm{s}^2$ (non-negative `lambda`). |
 | `dx` | Grid spacing [m] (square cells). |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array. |
-| `cfl` | Courant number $C_N = c_{p,\max}\, \Delta t \sqrt{2} / \Delta x$; the scheme is stable for $C_N < 1$ (Virieux Eqs. 6-7, a bound on `c_P` alone, independent of `c_S` and of the Poisson ratio) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
+| `cfl` | Courant number $C_\mathrm{N} = c_{\mathrm{p},\max}\, \Delta t \sqrt{2} / \Delta x$; the scheme is stable for $C_\mathrm{N} < 1$ (Virieux Eqs. 6-7, a bound on `c_P` alone, independent of `c_S` and of the Poisson ratio) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
 | `sponge_width` | Thickness of the absorbing layer in cells (0 = no absorbing sides). |
 | `sponge_sides` | Which sides absorb: a single side name or an iterable drawn from `{"left", "right", "top", "bottom"}` (default: all four when `sponge_width > 0`). |
 | `sponge_reflection` | Target round-trip amplitude reflection of the sponge layer; sets the peak absorption rate. |
@@ -548,14 +549,14 @@ Material(c_p: float, c_s: float, rho: float)
 An isotropic elastic medium as measurable wave speeds and density.
 
 The three numbers the solver's material maps are built from: the
-compressional speed $c_p = \sqrt{(\lambda + 2\mu) / \rho}$, the
-shear
-speed $c_s = \sqrt{\mu / \rho}$ and the density `rho`.
+compressional speed $c_\mathrm{p} = \sqrt{(\lambda + 2\mu) / \rho}$,
+the shear
+speed $c_\mathrm{s} = \sqrt{\mu / \rho}$ and the density `rho`.
 `c_s = 0`
 marks a fluid (the acoustic `mu = 0` limit of the elastic scheme,
 Virieux 1986), so the same dataclass names both fluids and solids.
-Every material must satisfy $c_p^2 \ge 2 c_s^2$ (non-negative
-first
+Every material must satisfy $c_\mathrm{p}^2 \ge 2 c_\mathrm{s}^2$
+(non-negative first
 Lame parameter), the constructor bound of [`ElasticFDTD2D`](/phonometry/reference/api/simulation/elastic-fdtd/#elasticfdtd2d).
 
 The module constants [`AIR`](/phonometry/reference/api/simulation/elastic-fdtd/#air), [`WATER`](/phonometry/reference/api/simulation/elastic-fdtd/#water), [`STEEL`](/phonometry/reference/api/simulation/elastic-fdtd/#steel),
@@ -596,8 +597,8 @@ Sections 4.5.2 and 8.5.4). Its speed `v` lies below both the fluid
 sound speed and the solid shear speed, and solves the exact
 characteristic equation of Brekhovskikh & Godin, *Acoustics of Layered
 Media I* (1990), Eq. 4.4.20, written in the notation of Eq. 4.4.18
-($q = c_S^2/c_P^2$, $r = c_S^2/c^2$,
-$s = v^2/c_S^2$,
+($q = c_\mathrm{S}^2/c_\mathrm{P}^2$, $r = c_\mathrm{S}^2/c^2$,
+$s = v^2/c_\mathrm{S}^2$,
 $m = \rho_{\mathrm{solid}}/\rho_{\mathrm{fluid}}$):
 
 $$
@@ -609,7 +610,7 @@ limit of the left side is the Rayleigh equation. For stiff beds the
 root hugs the fluid speed (water over steel: 1479.6 m/s, 0.027 % below
 `c`) while for soft sediments it drops well below it, which is why
 measured seabed interface waves probe the sediment shear speed
-($v \approx 0.85 c_S$ rule, Jensen et al. Section 5.10.5).
+($v \approx 0.85 c_\mathrm{S}$ rule, Jensen et al. Section 5.10.5).
 
 **Parameters**
 

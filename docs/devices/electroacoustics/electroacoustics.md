@@ -174,14 +174,14 @@ each with its own per-order definition:
 - **Modulation distortion** (14.12.7): a large low tone $f_\text{low}$ and a
   small high tone $f_\text{high}$ (preferably 4:1). The per-order values are
   *arithmetic* sums of the sideband amplitudes relative to the $f_\text{high}$
-  output: $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
-  $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
+  output: $d_{\mathrm{m},2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
+  $d_{\mathrm{m},3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
   combined-RMS `smpte` value that SMPTE-type analyzers report (not an IEC
   quantity).
 - **Difference-frequency distortion** (14.12.8): two equal high tones
   $f_1 < f_2$, referenced to $U_{2,\text{ref}} = 2U_{2,f_2}$ (the sum of both
-  tone amplitudes): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
-  $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
+  tone amplitudes): $d_{\mathrm{d},2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
+  $d_{\mathrm{d},3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
 - **Total difference-frequency distortion** (14.12.10): a specific two-tone
   test ($f_1 = 2f_0$, $f_2 = 3f_0 - \delta$; the standard tones 8 kHz and
   11.95 kHz are the defaults) where only the two in-band products at
@@ -334,7 +334,7 @@ IEC 60268-3:2013, *Sound system equipment – Part 3: Amplifiers*
 (clauses 14.12.2–14.12.11): total harmonic distortion
 $\mathrm{THD}_F$/$\mathrm{THD}_R$ (the
 14.12.3.2 formula defines the R form), nth-order harmonic distortion $d_n$, the
-per-order modulation ($d_{m,n}$) and difference-frequency ($d_{d,n}$)
+per-order modulation ($d_{\mathrm{m},n}$) and difference-frequency ($d_{\mathrm{d},n}$)
 intermodulation, total difference-frequency distortion, dynamic intermodulation
 (DIM) and the ITU-R BS.468-4 / IEC 60268-1 weighted THD. AES17-2015,
 *Measurement of digital audio equipment* (clauses 5.2.5, 5.2.8 and 6.3.1): the

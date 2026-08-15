@@ -127,7 +127,7 @@ res.plot()   # the same PA / wS / wFR view, now from the four derived sensations
 **Fluctuation strength** $F$ (vacil) quantifies the perception of *slow*
 loudness fluctuation. Like roughness it is a band-pass sensation of the
 modulation frequency, but it peaks about an order of magnitude lower, at
-$f_{mod} \approx 4\ \text{Hz}$ rather than the ~70 Hz roughness peak. By
+$f_\mathrm{mod} \approx 4\ \text{Hz}$ rather than the ~70 Hz roughness peak. By
 definition, a 1 kHz tone at 60 dB,
 100 % amplitude-modulated at 4 Hz, produces 1 vacil. This page covers the
 Fastl & Zwicker models; the normative Sottek-model fluctuation strength of
@@ -177,15 +177,15 @@ plt.show()
 
 For sinusoidally amplitude-modulated broadband noise, Fastl & Zwicker give a
 closed form (Eq. 10.2) in modulation factor $m$, level $L$ and modulation
-frequency $f_{mod}$:
+frequency $f_\mathrm{mod}$:
 
 $$
 F = \frac{5.8\,(1.25\,m - 0.25)\,[0.05\,(L/\mathrm{dB}) - 1]}
-{(f_{mod}/5\,\mathrm{Hz})^2 + (4\,\mathrm{Hz}/f_{mod}) + 1.5}\ \ \mathrm{vacil}.
+{(f_\mathrm{mod}/5\,\mathrm{Hz})^2 + (4\,\mathrm{Hz}/f_\mathrm{mod}) + 1.5}\ \ \mathrm{vacil}.
 $$
 
 The denominator is the 4 Hz band-pass: it bottoms out near
-$f_{mod} \approx 3.7\ \text{Hz}$ and
+$f_\mathrm{mod} \approx 3.7\ \text{Hz}$ and
 rises on either side. The result is clamped at 0 (the sensation vanishes below
 ~20 dB or $m < 0.2$). This exact form is the value to quote for AM broadband
 noise.
@@ -258,7 +258,7 @@ accumulates more of it than the single closed form allows.
 > 1 kHz / 60 dB / $m = 1$ / 4 Hz AM tone reads 1.00 vacil by construction, and
 > cross-checked against the Osses 2016 Table 1 literature values and the open
 > SQAT reference (used only as a numeric oracle). Over the 70 dB AM-tone sweep
-> $f_{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ it gives
+> $f_\mathrm{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ it gives
 > `[0.40, 0.79, 1.09, 1.05, 0.17, 0.09]` vacil against the literature
 > `[0.39, 0.84, 1.25, 1.30, 0.36, 0.06]`
 > (Pearson $r = 0.98$, correct 4 Hz peak, within ~2.1×). FM-tone accuracy is

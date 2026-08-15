@@ -55,11 +55,11 @@ realised here as the sum of both measured tone amplitudes, identical
 for the standard equal-amplitude tones -- and
 
 $$
-d_{d,2} = a_{f_2-f_1} / (a_{f_1} + a_{f_2})
+d_{\mathrm{d},2} = a_{f_2-f_1} / (a_{f_1} + a_{f_2})
 $$
 
 $$
-d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2}) / (a_{f_1} + a_{f_2})
+d_{\mathrm{d},3} = (a_{2f_2-f_1} + a_{2f_1-f_2}) / (a_{f_1} + a_{f_2})
 $$
 
 with the third order an *arithmetic* sum of the two products. Products
@@ -148,14 +148,14 @@ g)-h) the per-order values use the *arithmetic* sum of the two
 sideband amplitudes, referenced to the output voltage at `f2`:
 
 $$
-d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1}) / a_{f_2}
+d_{\mathrm{m},2} = (a_{f_2+f_1} + a_{f_2-f_1}) / a_{f_2}
 $$
 
 $$
-d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1}) / a_{f_2}
+d_{\mathrm{m},3} = (a_{f_2+2f_1} + a_{f_2-2f_1}) / a_{f_2}
 $$
 
-(The alternative presentation $d'_{m,n} = 5 d_{m,n}$ references
+(The alternative presentation $d'_{\mathrm{m},n} = 5 d_{\mathrm{m},n}$ references
 the 4:1 reference output voltage
 $U_{2,\mathrm{ref}} = 5 U_{2,f_2}$ instead.) The combined
 root-sum-square that SMPTE-type analyzers report is returned alongside
@@ -200,8 +200,8 @@ Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
 
 | Name | Description |
 | :--- | :--- |
-| `d2` | Second-order modulation distortion $d_{m,2}$ (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at $f_2 \pm f_1$ relative to the output amplitude at `f2`. |
-| `d3` | Third-order modulation distortion $d_{m,3}$ (14.12.7.2 h): the arithmetic sum of the sidebands at $f_2 \pm 2 f_1$ relative to the output amplitude at `f2`. |
+| `d2` | Second-order modulation distortion $d_{\mathrm{m},2}$ (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at $f_2 \pm f_1$ relative to the output amplitude at `f2`. |
+| `d3` | Third-order modulation distortion $d_{\mathrm{m},3}$ (14.12.7.2 h): the arithmetic sum of the sidebands at $f_2 \pm 2 f_1$ relative to the output amplitude at `f2`. |
 | `smpte` | Combined-RMS convention of SMPTE-type analyzers (not an IEC 60268-3 quantity): $\sqrt{\sum a_s^2} / a_{f_2}$ over all four sidebands. |
 | `f_low` | Low modulating tone `f1`, in Hz. |
 | `f_high` | High carrier tone `f2`, in Hz. |

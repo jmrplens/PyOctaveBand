@@ -187,7 +187,7 @@ perfectamente plausible.
 micrófono a ±0,2 mm o mejor, y las de traslación a ±0,5 mm (apartado 4.5); la
 posición del plano de referencia respecto al micrófono 1 declarada a ±0,5 mm
 (apartado 7.1); y el diámetro del micrófono por debajo del 20 % de la
-separación, y pequeño frente a $c_0/f_u$, para que la cápsula promedie un trozo
+separación, y pequeño frente a $c_0/f_\mathrm{u}$, para que la cápsula promedie un trozo
 despreciable de la onda (apartado 4.4). El plano de referencia, $x = 0$, es
 normalmente la superficie de la probeta, pero una probeta perfilada o
 estructurada lateralmente tiene su plano de referencia situado a cierta
@@ -390,11 +390,11 @@ factor de reflexión en la cara de la muestra, la absorción y la impedancia
 superficial normalizada (ecs. (17)–(19)):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
 $$
 
-con $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, la separación de micrófonos $s$
+con $H_\mathrm{I} = e^{-j k_0 s}$, $H_\mathrm{R} = e^{+j k_0 s}$, la separación de micrófonos $s$
 (otra vez el sentido que la letra tiene en la parte 2) y $x_1$ la distancia del
 plano de referencia al micrófono más lejano.
 
@@ -475,12 +475,12 @@ Los dos procedimientos permitidos usan la misma medición, hecha dos veces:
 2. **Intercambiar físicamente los dos cartuchos de micrófono**, de modo que A
    ocupe la posición exacta que ocupaba B y viceversa, *sin* mover los cables
    del preamplificador ni del analizador. Medir $H_{12}^{II}$.
-3. Formar $H_c = \sqrt{H_{12}^{I}/H_{12}^{II}}$ (Ec. (10)) y dividir por él la
+3. Formar $H_\mathrm{c} = \sqrt{H_{12}^{I}/H_{12}^{II}}$ (Ec. (10)) y dividir por él la
    función de transferencia de trabajo.
 
 La diferencia entre los dos procedimientos es solo con qué frecuencia se hace el
 paso 2. El apartado 7.5.1 repite el intercambio para *cada* probeta, lo que
-conviene con pocas muestras; el apartado 7.5.2 determina $H_c$ una vez contra
+conviene con pocas muestras; el apartado 7.5.2 determina $H_\mathrm{c}$ una vez contra
 una probeta de calibración y lo conserva para toda la serie, lo que conviene en
 una tirada de producción, tras lo cual los micrófonos deben quedarse donde
 están. La técnica de un solo micrófono del Anexo B no necesita corrección
@@ -633,8 +633,8 @@ $z = Z/\rho c_0$) junto a la curva de $\alpha(f)$ (el propio `.plot()` del
 resultado, en un eje de frecuencia logarítmico continuo), un titular de
 caracterización en caja y un pie con el descargo fijo. La ISO 10534-2 es una
 caracterización, así que la ficha no incluye veredicto de cumplimiento ni número
-único; el coeficiente a incidencia normal no es comparable con el $\alpha_s$ /
-$\alpha_w$ a incidencia aleatoria de la ISO 354 / ISO 11654. Con `verbose=True`
+único; el coeficiente a incidencia normal no es comparable con el $\alpha_\mathrm{s}$ /
+$\alpha_\mathrm{w}$ a incidencia aleatoria de la ISO 354 / ISO 11654. Con `verbose=True`
 se añade la columna del módulo del factor de reflexión $|r|$.
 
 Usa el mismo contenedor `ReportMetadata` y el mismo motor que las demás fichas.
@@ -833,7 +833,7 @@ deja pasar la capa exenta (la pérdida de transmisión, Ec. (26)) y cuánto
 absorbe la misma capa con respaldo rígido (Ec. (28)).*
 
 **Un TL de tubo no es un índice de reducción sonora.** La ficha de la sección 3
-avisa de que el $\alpha$ a incidencia normal no es el $\alpha_s$ a incidencia
+avisa de que el $\alpha$ a incidencia normal no es el $\alpha_\mathrm{s}$ a incidencia
 aleatoria; el mismo aviso vale del lado de la transmisión, y ahí se pasa por
 alto más a menudo. Lo que mide el tubo es la pérdida por transmisión de una
 probeta de unos pocos centímetros, para una onda plana a un ángulo, con los
@@ -1023,7 +1023,7 @@ calentamiento del apartado 5 se enuncian para el operador, y nada de la
 biblioteca comprueba que se haya cumplido ninguno de ellos.
 `tube_attenuation_constant` implementa solo la estimación de la Ec. (A.18),
 que la propia norma llama límite inferior; la determinación medida de las Ecs.
-(A.13)/(A.14) con el tubo vacío no está implementada. El $\alpha_s$ de
+(A.13)/(A.14) con el tubo vacío no está implementada. El $\alpha_\mathrm{s}$ de
 incidencia aleatoria de la cámara reverberante es otra magnitud con su propia
 guía: [Medida y clasificación de la absorción
 sonora](/phonometry/es/materials/absorbers/absorption-measurement/).

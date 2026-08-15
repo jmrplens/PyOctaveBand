@@ -123,7 +123,7 @@ DEFAULT_CHANNEL_WEIGHTS: dict[int, tuple[float, ...]] = {
 def _analog_from_biquad(coeffs: tuple[float, float, float], rate: float) -> np.ndarray:
     """Map a digital biquad polynomial to its bilinear analog prototype.
 
-    Substituting :math:`z^{-1} = (K - s)/(K + s)` with :math:`K = 2 f_s`
+    Substituting :math:`z^{-1} = (K - s)/(K + s)` with :math:`K = 2 f_\\mathrm{s}`
     (the inverse of the bilinear transform) into
     :math:`c_0 + c_1 z^{-1} + c_2 z^{-2}` gives the analog quadratic
     :math:`(c_0 - c_1 + c_2)\\,s^2 + 2K(c_0 - c_2)\\,s + K^2(c_0 + c_1 + c_2)`.

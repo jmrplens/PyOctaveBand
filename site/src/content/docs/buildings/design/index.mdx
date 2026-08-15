@@ -9,7 +9,7 @@ import ScopeClaim from '../../../../components/ScopeClaim.astro';
 The pages of the [Sound insulation](/phonometry/buildings/insulation/)
 section answer the question *what does this building achieve?* The pages here
 answer the one that comes first: *what will it achieve, and what should I
-build?* Both halves speak the same language of $R$, $L_n$ and their weighted
+build?* Both halves speak the same language of $R$, $L_\mathrm{n}$ and their weighted
 single numbers, but a prediction is assembled from element data instead of
 measured in a finished room, so its inputs, its assumptions and its error bars
 are its own subject.
@@ -30,7 +30,7 @@ every path is formed per band, and the result shows which path dominates each
 band rather than only whether the room passes.
 
 **Which of the two do you run?** Run the simplified model when what you have is
-catalogue weighted ratings — $R_w$, $\Delta L_w$, a mass per unit area — and the
+catalogue weighted ratings — $R_\mathrm{w}$, $\Delta L_\mathrm{w}$, a mass per unit area — and the
 question is whether the partition meets a limit. Run the detailed one when you
 have per-band element and junction spectra, or the material properties the
 standard can calculate them from, and the question is *which path to fix in
@@ -52,7 +52,7 @@ expresses in one number.
 Two pages here carry the floor half of any design, one measuring and one
 predicting.
 [Floor-Covering Impact Improvement (ISO 16251-1)](/phonometry/buildings/design/impact-improvement/)
-gives the weighted improvement $\Delta L_w$ of a covering that exists, on a
+gives the weighted improvement $\Delta L_\mathrm{w}$ of a covering that exists, on a
 small heavyweight mock-up, and that is the term EN 12354-2 subtracts from the
 bare-floor level.
 [Predicting Resilient-Layer Performance](/phonometry/buildings/design/resilient-layers/)
@@ -101,12 +101,12 @@ to vary the uncertain inputs and read the spread in the answer, which
 ISO 12354-1:2017 Annex K systematises into an uncertainty on the result.
 
 Every prediction here starts from measured data that came from somewhere else,
-and the design report has to say where. The element $R$ and $L_n$ come from
+and the design report has to say where. The element $R$ and $L_\mathrm{n}$ come from
 ISO 10140-2 and -3, together with the laboratory structural reverberation time
 printed in the same report, because the in-situ conversion needs it. The
 junction indices $K_{ij}$ come from an ISO 10848 measurement or from the
 EN 12354-1 Annex E catalogue of junction types. The floor-covering improvement
-$\Delta L_w$ comes from ISO 16251-1 or from a full-size ISO 10140-3 test. The
+$\Delta L_\mathrm{w}$ comes from ISO 16251-1 or from a full-size ISO 10140-3 test. The
 resilient layer's $s'$ comes from EN 29052-1. And for service equipment, the
 characteristic structure-borne power comes from the EN 15657 reception plate.
 Two of the pages in this section are themselves such measurements, feeding the

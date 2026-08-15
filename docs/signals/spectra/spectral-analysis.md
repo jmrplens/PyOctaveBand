@@ -40,7 +40,7 @@ Averaging $n_d$ independent segments gives the estimate $2 n_d$ chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
 $$
-\varepsilon_r[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,\alpha/2}} \le G_{xx} \le
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_d .
 $$
@@ -65,14 +65,14 @@ res.plot()                                        # PSD in dB with the CI band
 ```
 
 The **resolution bias** is the other half of the error budget: a finite
-analysis bandwidth $B_e$ (reported as `resolution_bandwidth`, the effective
+analysis bandwidth $B_\mathrm{e}$ (reported as `resolution_bandwidth`, the effective
 noise bandwidth of the taper) smooths sharp spectral features, always in the
 direction of reduced dynamic range (Eq. 8.139). For a resonance peak of
-half-power bandwidth $B_r$, the first-order normalized bias is the closed form
+half-power bandwidth $B_\mathrm{r}$, the first-order normalized bias is the closed form
 of Eq. 8.141, exposed as `resolution_bias_error`:
 
 $$
-\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -\frac{1}{3}\left(\frac{B_e}{B_r}\right)^2 .
+\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -\frac{1}{3}\left(\frac{B_\mathrm{e}}{B_\mathrm{r}}\right)^2 .
 $$
 
 ```python
@@ -81,7 +81,7 @@ from phonometry import resolution_bias_error
 eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # Br = 25 Hz peak
 ```
 
-Narrow $B_e$ (long segments) suppresses the bias but leaves fewer averages and
+Narrow $B_\mathrm{e}$ (long segments) suppresses the bias but leaves fewer averages and
 a larger random error; the two requirements on segment length pull in
 opposite directions, which is exactly the trade-off the reported numbers make
 visible.
@@ -133,7 +133,7 @@ the magnitude and phase (Eqs. 9.33 and 9.52, with the measured coherence in
 place of the unknown true value, as the book recommends for measured data):
 
 $$
-\varepsilon_r[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
 \mathrm{s.d.}[\hat{\theta}_{xy}] =
 \frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_d}} .
 $$
@@ -141,7 +141,7 @@ $$
 Both shrink as the coherence approaches one: a strongly coherent pair needs
 far fewer averages for the same confidence. The phase is unwrapped, so its
 slope against frequency is the group delay
-$\tau_g = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
+$\tau_\mathrm{g} = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
 delay path the phase is linear and that slope reads the propagation delay
 directly.
 
@@ -221,9 +221,9 @@ output estimate (Eq. 9.73), plus the first-order propagation of the coherence
 error through the SNR:
 
 $$
-\varepsilon_r[\hat{G}_{vv}] =
+\varepsilon_\mathrm{r}[\hat{G}_{vv}] =
 \frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
-\varepsilon_r[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
+\varepsilon_\mathrm{r}[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
 $$
 
 For additive uncorrelated output noise of known level the coherence has the
@@ -424,7 +424,7 @@ Because the tapers are orthogonal the eigenspectra are nearly uncorrelated,
 so the average carries about $2K$ chi-square degrees of freedom from a
 single record - the same statistical machinery as the Welch result (random
 error, chi-square confidence interval), without segmenting. The
-half-bandwidth $W = NW\,f_s/N$ is set through the duration x half-bandwidth
+half-bandwidth $W = NW\,f_\mathrm{s}/N$ is set through the duration x half-bandwidth
 product $NW$ (default 4). $2W$ is the resolution of the estimate (reported
 as `resolution_bandwidth`), and only the tapers below the Shannon number
 $2NW$ keep their spectral-window energy inside the design band - their

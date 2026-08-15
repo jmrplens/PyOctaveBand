@@ -40,7 +40,7 @@ superficie $m$ y área $S$ conocidas, cuyo factor de pérdida estructural $\eta$
 se conoce, y se mide la velocidad vibratoria media espacial de la placa. La
 Fórmula (14) da la potencia *inyectada en esa placa concreta*; las magnitudes
 de fuente independientes de la placa (la fuerza bloqueada equivalente,
-Fórmula 15; el nivel de potencia característico de placa receptora $L_{Wsn}$,
+Fórmula 15; el nivel de potencia característico de placa receptora $L_{W\mathrm{sn}}$,
 Fórmula 17; y la velocidad libre y movilidad equivalentes de la fuente,
 Fórmulas 18/19) se derivan de ella y son lo que consume la predicción de
 equipos instalados de EN 12354-5.
@@ -50,7 +50,7 @@ equipos instalados de EN 12354-5.
 *Una fuente, dos placas conformes, dos respuestas separadas 12,0 dB en todas las
 bandas (67,5 dB frente a 79,5 dB sumados en bandas). La placa ligera vibra
 35,1 dB más fuerte, pero también disipa a través de un $\eta m S$ unas 204 veces
-menor, y $L_{Ws}$ es la potencia que absorbe **esa placa**, no una propiedad de
+menor, y $L_{W\mathrm{s}}$ es la potencia que absorbe **esa placa**, no una propiedad de
 la máquina. Leída por su cuenta, ninguna de las dos curvas describe la fuente;
 la sección 4 es la que convierte cualquiera de ellas en las magnitudes
 independientes de la placa que consume EN 12354-5.*
@@ -116,7 +116,7 @@ $P = \omega\,\eta\,(m S)\,\langle v^2 \rangle$, de modo que
 el nivel de potencia inyectada en bandas de tercio de octava es (Fórmula 14)
 
 $$
-L_{Ws} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
+L_{W\mathrm{s}} = 10\log_{10}\!\left(\frac{2\pi f\,\eta\,m\,S}{f_0\,m_0\,S_0}\right)
          + L_v - 60 \;\;[\mathrm{dB\ re\ 1\ pW}],
 $$
 
@@ -129,12 +129,12 @@ la velocidad de referencia de EN 15657 $v_0 = 10^{-9}\ \text{m/s}$ y
 $P_0 = 1\ \text{pW}$. La
 velocidad de la placa es la media energética espacial sobre las $N$ posiciones
 (Fórmula 12) y el factor de pérdida procede del tiempo de reverberación
-estructural $T_s$ (Fórmula 13, idéntica al factor de pérdida total de
+estructural $T_\mathrm{s}$ (Fórmula 13, idéntica al factor de pérdida total de
 ISO 10848):
 
 $$
 L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
-\eta = \frac{2{,}2}{f\,T_s}.
+\eta = \frac{2{,}2}{f\,T_\mathrm{s}}.
 $$
 
 ```python
@@ -169,13 +169,13 @@ largo-ancho próxima a $\sqrt{2}$ y un factor de pérdidas de al menos 0,08 en l
 bandas bajas (de 50 Hz a 100 Hz). Su dimensión mínima debe ser al menos la mayor
 separación entre contactos del equipo. Cada uno de esos números se gana su
 sitio: la placa de hormigón de 10 cm es la misma placa cuya movilidad
-característica $Y_{R,\infty,\text{baja}} = 5\times10^{-6}$ m/(N·s) ancla la
+característica $Y_{\mathrm{R},\infty,\mathrm{baja}} = 5\times10^{-6}$ m/(N·s) ancla la
 Fórmula (17), así que una placa más delgada o más ligera rompería la conversión;
 la proporción $\sqrt{2}$ reparte los modos de manera que ninguna banda quede
 dominada por una pareja degenerada; el mínimo del factor de pérdidas mantiene la
 placa reverberante pero bien amortiguada, que es lo que hace que se sostengan
-$\eta = 2{,}2/(fT_s)$ y el balance de potencia en régimen estacionario — con
-$T_s = 0{,}25$ s la placa da $\eta = 0{,}176$ a 50 Hz y 0,088 a 100 Hz, justo
+$\eta = 2{,}2/(fT_\mathrm{s})$ y el balance de potencia en régimen estacionario — con
+$T_\mathrm{s} = 0{,}25$ s la placa da $\eta = 0{,}176$ a 50 Hz y 0,088 a 100 Hz, justo
 dentro del requisito —; y la dimensión mínima evita que una fuente con varios
 contactos puentee los bordes de la placa. Un banco puede llevar hasta **tres**
 placas de baja movilidad mutuamente aisladas para que una fuente que toca varios
@@ -252,13 +252,13 @@ Una placa apoyada en el suelo de un laboratorio recoge el tráfico y la maquinar
 mucho antes que un micrófono, y la corrección es lo único que hay entre eso y un
 espectro de fuente que en realidad es el del edificio.
 
-**El factor de pérdidas.** $T_s$ es una caída estructural medida sobre la propia
-placa, que alimenta $\eta = 2{,}2/(f\,T_s)$. La Fórmula (14) es lineal en
-$10\lg\eta$, así que un error en $T_s$ mueve $L_{Ws}$ decibelio a decibelio: es
+**El factor de pérdidas.** $T_\mathrm{s}$ es una caída estructural medida sobre la propia
+placa, que alimenta $\eta = 2{,}2/(f\,T_\mathrm{s})$. La Fórmula (14) es lineal en
+$10\lg\eta$, así que un error en $T_\mathrm{s}$ mueve $L_{W\mathrm{s}}$ decibelio a decibelio: es
 el dato más sensible de la página. La regla de carga sigue a la placa: en la
 placa de **baja movilidad** no debería haber diferencia apreciable entre medir
-$T_s$ y las movilidades puntuales con el equipo montado o sin él; la placa de
-**alta movilidad** se carga dinámicamente con el equipo, así que tanto $T_s$ como
+$T_\mathrm{s}$ y las movilidades puntuales con el equipo montado o sin él; la placa de
+**alta movilidad** se carga dinámicamente con el equipo, así que tanto $T_\mathrm{s}$ como
 las movilidades puntuales **se deben** medir con la fuente colocada.
 
 **Movilidades.** Las movilidades puntuales de la placa se miden en los puntos de
@@ -290,7 +290,7 @@ requisitos de arriba. El propio sonido aéreo de la fuente puede mover la placa 
 que es por lo que la placa de alta movilidad está perforada en torno al 50 %. Un
 factor de pérdidas medido sobre la placa desnuda se puede arrastrar al
 caso de alta movilidad, donde la norma exige que la fuente esté colocada, y el
-error se va directo a $L_{Ws}$. Y una máquina que no ha alcanzado el régimen
+error se va directo a $L_{W\mathrm{s}}$. Y una máquina que no ha alcanzado el régimen
 estacionario, o que se mide promediando un ciclo sin decirlo, produce un número
 que ningún otro laboratorio puede reproducir.
 
@@ -324,7 +324,7 @@ placa, y solo la sustitución mide sorteándolo.
 
 ## 4. De la potencia de placa a las magnitudes de fuente (Fórmulas 15–19)
 
-La $L_{Ws}$ inyectada en la placa **no** es un descriptor de la fuente: la misma
+La $L_{W\mathrm{s}}$ inyectada en la placa **no** es un descriptor de la fuente: la misma
 fuente inyecta una potencia distinta en un receptor distinto. La EN 15657
 deriva las magnitudes independientes de la placa: el **nivel de fuerza
 bloqueada equivalente** (Fórmula 15, re $F_0 = 10^{-6}\ \text{N}$, no la
@@ -334,26 +334,26 @@ de ISO 16283-2, a 120 dB de distancia) desde la
 placa de baja movilidad,
 
 $$
-L_{Fb,eq} = L_{Ws,\mathrm{baja}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{baja,eq}}\}}{Y_0},
+L_{F\mathrm{b,eq}} = L_{W\mathrm{s,baja}} - 10\log_{10}\frac{\mathrm{Re}\{Y_\mathrm{R,baja,eq}\}}{Y_0},
 $$
 
 el **nivel de potencia característico de placa receptora** que consume
 EN 12354-5 (Fórmula 17), referido a la placa normalizada de hormigón de 10 cm
 de movilidad característica
-$Y_{R,\infty,\text{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$ (apartado 7.2.4),
+$Y_{\mathrm{R},\infty,\mathrm{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$ (apartado 7.2.4),
 
 $$
-L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{baja}}}{Y_0},
+L_{W\mathrm{sn}} = L_{F\mathrm{b,eq}} + 10\log_{10}\frac{Y_{\mathrm{R},\infty,\mathrm{baja}}}{Y_0},
 $$
 
 y, desde la placa de alta movilidad, el **nivel de velocidad libre
 equivalente** (Fórmula 18, re $10^{-9}\ \text{m/s}$) y la **movilidad de la
 fuente**
-$|Y_{S,\text{eq}}|$ (Fórmula 19). La corrección de movilidad del Anexo I de EN 12354-5
+$|Y_\mathrm{S,eq}|$ (Fórmula 19). La corrección de movilidad del Anexo I de EN 12354-5
 (`installed_power_from_reception_plate`, véase el
 [ruido estructural
 instalado](/phonometry/es/buildings/design/installed-structure-borne/))
-refiere después $L_{Wsn}$ al elemento receptor real.
+refiere después $L_{W\mathrm{sn}}$ al elemento receptor real.
 
 ```python
 from phonometry import building
@@ -381,22 +381,22 @@ print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| en 
 Lee la cadena en orden. La cisterna inyecta 61,7 dB en la placa de medida;
 quitar la movilidad de esa placa deja una fuerza bloqueada equivalente, y
 volver a expresar esa misma fuerza sobre la placa normalizada de hormigón de
-10 cm, de $Y_{R,\infty,\text{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$, da
-$L_{Wsn} = 61,4$ dB, el número que un fabricante puede declarar. Referir esa
+10 cm, de $Y_{\mathrm{R},\infty,\mathrm{baja}} = 5\times10^{-6}\ \text{m/(N·s)}$, da
+$L_{W\mathrm{sn}} = 61,4$ dB, el número que un fabricante puede declarar. Referir esa
 misma fuerza a la pared receptora real ($Y = 24,1\times10^{-6}$) suma
 $10\log_{10}(24,1/5,0) = 6,8$ dB y da 68,2 dB. Ese paso es toda la lección del
 apartado: un receptor ligero y de movilidad alta acepta más potencia de la misma
-fuente, así que un $L_{Wsn}$ declarado compara máquinas y nunca es la potencia
+fuente, así que un $L_{W\mathrm{sn}}$ declarado compara máquinas y nunca es la potencia
 que verá un edificio concreto.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/structure_borne_conversion_es.svg" alt="Cuatro curvas en bandas de octava para la misma cisterna: el nivel medido sobre la placa de ensayo, el nivel característico de placa receptora sobre la placa normalizada de hormigón de 10 cm, el nivel instalado sobre la pared receptora y el nivel de potencia característico obtenido con la movilidad de la fuente, con aspas que muestran que restar el término de acoplamiento al último devuelve el tercero" width="88%" />
 
 *La misma fuente, cuatro niveles distintos, y solo uno de ellos describe la
 máquina. Léelos hacia arriba desde la curva gris: lo que midió la placa de
-ensayo, después el $L_{Wsn}$ declarado sobre la placa normalizada de 10 cm, y
+ensayo, después el $L_{W\mathrm{sn}}$ declarado sobre la placa normalizada de 10 cm, y
 después las dos ramas de la corrección del Anexo I — los 68,2 dB de la pared
 receptora y los 84,4 dB independientes de la placa. Las aspas son
-$L_{Ws,c} - D_C$, y caen sobre la curva instalada, que es la aritmética que
+$L_{W\mathrm{s,c}} - D_\mathrm{C}$, y caen sobre la curva instalada, que es la aritmética que
 comparten las dos páginas. El escalón de 6,8 dB en todas las bandas es
 $10\lg(24,1/5,0)$: no ha cambiado nada de la cisterna, solo aquello a lo que
 estaba atornillada.*
@@ -433,12 +433,12 @@ plt.show()
 :::caution
 **De la misma corrección salen dos magnitudes; no las confundas.**
 Con la movilidad del *receptor* da el nivel de potencia instalada
-$L_{Ws,\mathrm{inst}} = 68,2$ dB. Con la movilidad de la *fuente* da el nivel de
-potencia característico independiente de la placa $L_{Ws,c} = 84,4$ dB, y eso es
+$L_{W\mathrm{s,inst}} = 68,2$ dB. Con la movilidad de la *fuente* da el nivel de
+potencia característico independiente de la placa $L_{W\mathrm{s,c}} = 84,4$ dB, y eso es
 lo que [EN 12354-5](/phonometry/es/buildings/design/installed-structure-borne/)
-toma como entrada, del que resta el término de acoplamiento $D_C = 16,2$ dB para
+toma como entrada, del que resta el término de acoplamiento $D_\mathrm{C} = 16,2$ dB para
 volver a los mismos 68,2 dB. Alimenta EN 12354-5 con los 84,4, nunca con los
-68,2: arrastrar 68,2 como nivel de potencia característico resta $D_C$ una
+68,2: arrastrar 68,2 como nivel de potencia característico resta $D_\mathrm{C}$ una
 segunda vez y cae 16 dB por debajo, sin que se levante ningún error.
 :::
 
@@ -459,8 +459,8 @@ EN 15657:2018 (Fórmula 14), una cabecera de metadatos opcional (cliente, equipo
 fuente, entorno de ensayo, instrumentación, clima, fecha), una tabla por bandas
 (frecuencia nominal de octava/tercio de octava, el nivel de velocidad medio
 espacial de la placa $L_v$ y el nivel de potencia acústica estructural inyectado
-$L_{Ws}$), el espectro $L_{Ws}(f)$ con un eje de bandas nominal, y el total
-sumado en bandas $L_{Ws}$ (dB re 1 pW) recuadrado, con la masa por unidad de
+$L_{W\mathrm{s}}$), el espectro $L_{W\mathrm{s}}(f)$ con un eje de bandas nominal, y el total
+sumado en bandas $L_{W\mathrm{s}}$ (dB re 1 pW) recuadrado, con la masa por unidad de
 superficie de la placa $m$ y el área $S$.
 
 Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
@@ -470,7 +470,7 @@ aquí son el **equipo fuente** (`specimen`), el **entorno de ensayo**
 (`test_date`) y la identidad del pie (`laboratory`, `operator`, `report_id`,
 `notes`); la masa y el área de la placa provienen del propio resultado. Aportar
 `requirement` añade un veredicto CUMPLE/NO CUMPLE frente a un límite superior declarado
-sobre el total $L_{Ws}$ (una emisión de potencia es una magnitud donde menos es
+sobre el total $L_{W\mathrm{s}}$ (una emisión de potencia es una magnitud donde menos es
 mejor, así que la fuente cumple en el límite o por debajo). `verbose=True` añade
 la columna del factor de pérdidas de la placa $\eta$ a la tabla.
 `language="es"` genera la ficha en español con comas decimales. La franja de

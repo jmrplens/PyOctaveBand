@@ -371,7 +371,7 @@ def epnl_from_pnlt(
 
     .. math::
 
-       \mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_F..k_L}
+       \mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_\mathrm{F}..k_\mathrm{L}}
        10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right)
        - 10 \cdot \log_{10}(T_0)
 

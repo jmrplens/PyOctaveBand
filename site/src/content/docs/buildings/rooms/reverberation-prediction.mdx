@@ -184,7 +184,7 @@ choice of model.
 finished surfaces, and give every material its own row: a wall carrying a window
 and a door becomes three rows whose areas sum to the wall. EN 12354-6 Annex E
 case 3 does exactly this, splitting a 10.90 m² long wall into 9.81 m² lined at
-$\alpha_s$ = 0.85 plus 1.09 m² bare at 0.04. Do not average a lining into its
+$\alpha_\mathrm{s}$ = 0.85 plus 1.09 m² bare at 0.04. Do not average a lining into its
 wall by hand; the formulae already do the area weighting, and Millington-Sette
 does it non-linearly, so pre-averaging changes the answer.
 
@@ -195,7 +195,7 @@ Mounting depth and edge condition change them substantially, so a coefficient
 quoted for a product bonded direct to the substrate does not describe the same
 product on a 200 mm plenum. ISO 354 delivers one-third-octave data and an
 octave-band run takes the arithmetic mean of the three thirds. A datasheet's
-single-number rating — $\alpha_w$, NRC, SAA — is *not* a substitute for the
+single-number rating — $\alpha_\mathrm{w}$, NRC, SAA — is *not* a substitute for the
 per-band table (see the
 [EN 12354-6 guide](/phonometry/buildings/rooms/enclosed-space-absorption/#3-where-the-input-data-comes-from),
 which states the prohibition normatively). Audience and seating are rated per
@@ -318,7 +318,7 @@ model, evaluated at the room's own temperature and humidity.
 
 Every statistical model also assumes a **diffuse field**, and low
 frequencies break that assumption first: below the **Schroeder frequency**
-$f_s \approx 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s — 141 Hz for a 200 m³
+$f_\mathrm{s} \approx 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s — 141 Hz for a 200 m³
 classroom with $T$ = 1 s) the room responds as a set of discrete modes, not as
 a reverberant mixture. `room.schroeder_frequency(T, V)` computes it, and
 [the modes of a rectangular room](/phonometry/buildings/rooms/room-image-sources/#3-modes-of-a-rectangular-room)
@@ -722,7 +722,7 @@ prediction.
 ## See also
 
 - [Sound Absorption Measurement and Rating](/phonometry/materials/absorbers/absorption-measurement/):
-  the ISO 354 measurement every $\alpha_s$ on this page comes from, its mounting
+  the ISO 354 measurement every $\alpha_\mathrm{s}$ on this page comes from, its mounting
   dependence, and the ISO 11654 rating that must *not* be substituted for the
   per-band table (§0).
 - [Room acoustic parameters (ISO 3382-1/2)](/phonometry/buildings/rooms/room-acoustics/#how-much-decay-range-the-noise-floor-allows):

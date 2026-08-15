@@ -194,11 +194,11 @@ point alone. `fan_sound_power` implements the ASHRAE scaling law printed as
 Long Eq. 13.1,
 
 $$
-L_W = K_F + 10\log_{10}\frac{Q_F}{Q_\text{REF}}
-    + 10\log_{10}\frac{P_F}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
+L_W = K_\mathrm{F} + 10\log_{10}\frac{Q_\mathrm{F}}{Q_\text{REF}}
+    + 10\log_{10}\frac{P_\mathrm{F}}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
 $$
 
-with the spectral constant $K_F$ of Table 13.5 (one row per fan type), the
+with the spectral constant $K_\mathrm{F}$ of Table 13.5 (one row per fan type), the
 off-peak efficiency correction $C_\text{EFF}$ of Table 13.6 and the blade
 frequency increment $C_\text{BFI}$ of Table 13.7 dropped into the single
 octave band that contains the blade passing frequency. In SI the references
@@ -414,11 +414,11 @@ power is normally manufacturer data measured to ASHRAE Standard 70, and
 that is what a real sheet uses. When there is none to hand,
 `diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
 an overall level
-$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31.3$ from the
-face area, the approach velocity $U_G = Q/S_G$ and the normalised
+$L_W = 10\log_{10} S_\mathrm{G} + 30\log_{10}\xi + 60\log_{10} U_\mathrm{G} - 31.3$ from the
+face area, the approach velocity $U_\mathrm{G} = Q/S_\mathrm{G}$ and the normalised
 pressure-drop coefficient $\xi$, spread over the octaves by the shape
 function $C_D = -11.82 - 0.15 A - 1.13 A^2$ ($-5.82$ for a round device)
-about the peak band $f_P = 48.8\,U_G$.
+about the peak band $f_\mathrm{P} = 48.8\,U_\mathrm{G}$.
 
 ```python
 from phonometry import diffuser_sound_power
@@ -677,7 +677,7 @@ a plane-wave prediction quietly stops being right.
 Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
 (2nd ed.), section 7.3: circular ducts by Eq. 7.6 with the
 $\pi\alpha_{pq}$ eigenvalues of Table 7.1 that solve
-$J'_p(\kappa_{pq} a_i) = 0$, rectangular ducts by Eq. 7.10, and the
+$J'_p(\kappa_{pq} a_\mathrm{i}) = 0$, rectangular ducts by Eq. 7.10, and the
 mean-flow correction of Eqs. 7.8 and 7.9, in which a uniform axial flow of
 Mach number $M$ lowers every cut-on frequency by $\sqrt{1 - M^2}$ and
 moves the cut-on itself from $k_x = 0$ to
@@ -935,12 +935,12 @@ taking logarithms gives Equation (4.101),
 
 $$
 \text{NR} = \text{TL}
-- 10\log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+- 10\log_{10}\!\left[\frac{S_\mathrm{w}}{S_2 \alpha_2 + \tau S_\mathrm{w}}\right],
 $$
 
 with $\text{NR} = L_{p1} - L_{p2}$ the noise reduction between the two
 reverberant fields, $\text{TL} = 10\log_{10}(1/\tau)$ the transmission loss of the
-partition (the quantity UNE calls the sound reduction index $R$), $S_w$ the
+partition (the quantity UNE calls the sound reduction index $R$), $S_\mathrm{w}$ the
 area of the partition and $S_2 \alpha_2$ the equivalent absorption area of
 the receiving room.
 
@@ -948,10 +948,10 @@ Read the logarithm and the whole page follows. A **large partition into a
 hard room** delivers *less* than its transmission loss: a lot of area
 radiating into a room with nothing to soak it up. A **small partition into
 a well-absorbing room** delivers *more*. The two rooms and the wall are not
-separable, which is why quoting a wall's $R_w$ and stopping is not an
+separable, which is why quoting a wall's $R_\mathrm{w}$ and stopping is not an
 answer.
 
-The $\tau S_w$ term is the power the partition itself passes back into the
+The $\tau S_\mathrm{w}$ term is the power the partition itself passes back into the
 source room. At any realistic transmission loss it is worth a few
 hundredths of a decibel, so it is off by default and
 `include_partition_transmission=True` switches it on.
@@ -1167,12 +1167,12 @@ derives the enclosure equation from the same power balance as §4.9 and gets
 Equation (4.115),
 
 $$
-\text{IL} = \text{TL} - 10\log_{10}(S_E / R_i),
+\text{IL} = \text{TL} - 10\log_{10}(S_\mathrm{E} / R_\mathrm{i}),
 $$
 
-with $S_E$ the external radiating area and $R_i$ the room constant of the
+with $S_\mathrm{E}$ the external radiating area and $R_\mathrm{i}$ the room constant of the
 enclosure interior, machine surface included. Solved for the panels,
-$\text{TL} = \text{IL} + 10\log_{10}(S_E / R_i)$, which is
+$\text{TL} = \text{IL} + 10\log_{10}(S_\mathrm{E} / R_\mathrm{i})$, which is
 `enclosure_required_transmission_loss`.
 
 ```python
@@ -1312,7 +1312,7 @@ to a surface than roughly half a wavelength.
   and [Flanking transmission](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/):
   the EN 12354 models for the flanking paths this page only debits.
 - [Field sound insulation](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/):
-  how the same room pair is measured, and the $D_{nT}$ and $R'$ a test report
+  how the same room pair is measured, and the $D_\mathrm{nT}$ and $R'$ a test report
   hands back.
 - [Room-noise criteria](https://jmrplens.github.io/phonometry/buildings/rooms/room-noise/): the NC and
   RC Mark II families the verdict is written in.
@@ -1385,8 +1385,8 @@ j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
 \qquad k = \omega/c,
 $$
 
-and a side branch of acoustic impedance $Z_b$ is the shunt
-$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$
+and a side branch of acoustic impedance $Z_\mathrm{b}$ is the shunt
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_\mathrm{b} & 1 \end{smallmatrix}\right]$
 (Eq. (8.144)). The **transmission loss** follows from the compound matrix $T$
 with the port impedances $Z_1 = \rho c/S_\text{in}$ and
 $Z_n = \rho c/S_\text{out}$ (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
@@ -1402,12 +1402,12 @@ which for equal inlet/outlet areas reduces to (Bies Eq. (8.148))
 
 $$
 \mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
-+ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
-\qquad Z_c = \frac{\rho c}{S},
++ \tfrac{T_{12}}{Z_\mathrm{c}} + Z_\mathrm{c}\,T_{21} + T_{22}\right|\right),
+\qquad Z_\mathrm{c} = \frac{\rho c}{S},
 $$
 
-and the **insertion loss** for a source impedance $Z_s$ and a radiation
-impedance $Z_r$ is the extra attenuation over a direct (zero-length)
+and the **insertion loss** for a source impedance $Z_\mathrm{s}$ and a radiation
+impedance $Z_\mathrm{r}$ is the extra attenuation over a direct (zero-length)
 connection, so a through connection gives $\mathrm{IL} = 0$.
 
 ### Expansion chamber
@@ -1486,8 +1486,8 @@ inlet, the 6.5 dB peak of the four-pole curve above.
 
 A **Helmholtz resonator** (`helmholtz_resonator`) and a closed **quarter-wave
 tube** (`quarter_wave_resonator`) each short the duct at their tuning
-frequency, $f_0 = \tfrac{c}{2\pi}\sqrt{S_\text{neck}/(l_e V)}$
-(Bies Eq. (8.46)) and $f = c/4l_e$ (Eq. (8.44)), giving a sharp
+frequency, $f_0 = \tfrac{c}{2\pi}\sqrt{S_\text{neck}/(l_\mathrm{e} V)}$
+(Bies Eq. (8.46)) and $f = c/4l_\mathrm{e}$ (Eq. (8.44)), giving a sharp
 transmission-loss spike there. An
 **extended-tube chamber** (`extended_tube_chamber`) buries quarter-wave side
 branches in an expansion chamber to fill its troughs; with zero extensions it
@@ -1580,7 +1580,7 @@ neck only 2 cm long.
 
 *The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
 drawn as its equal-volume cube, and the tuning moves as
-$\sqrt{S_n/(l_e V)}$, so small errors in these dimensions shift the spike off
+$\sqrt{S_\mathrm{n}/(l_\mathrm{e} V)}$, so small errors in these dimensions shift the spike off
 its target.*
 
 <details>
@@ -1609,7 +1609,7 @@ same duct.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%"></picture>
 
 *A quarter-wave stub is just a closed tube of the right length: 0.3 m of
-pipe puts the spike at $c/4l_e \approx 285\ \text{Hz}$, and the 20 cm² branch
+pipe puts the spike at $c/4l_\mathrm{e} \approx 285\ \text{Hz}$, and the 20 cm² branch
 area only sets how strongly the stub loads the duct.*
 
 <details>
@@ -1963,7 +1963,7 @@ angle off the inlet axis.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%"></picture>
 
 *Only $r$ and its angle off the inlet axis fix the drawn box; $S_\text{out}$
-and $S_w$ enter Wells' method as bare areas, so any plenum sharing these four
+and $S_\mathrm{w}$ enter Wells' method as bare areas, so any plenum sharing these four
 numbers has the same predicted attenuation.*
 
 <details>
@@ -2034,11 +2034,11 @@ $R$, minus a penalty $C$ for the reverberant build-up inside the small, hard
 cavity (Bies Eqs. (7.103), (7.111)):
 
 $$
-\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_E}{R_i}\right),
+\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_\mathrm{E}}{R_\mathrm{i}}\right),
 $$
 
-with the external area $S_E$ and the interior room constant
-$R_i = S_i \alpha_i/(1-\alpha_i)$ (the same `room_constant` as the
+with the external area $S_\mathrm{E}$ and the interior room constant
+$R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i}/(1-\alpha_\mathrm{i})$ (the same `room_constant` as the
 steady-state room field). A hard interior wastes much of the panel $R$; lining
 it drives $C$ toward its floor $10\log_{10}0.3 = -5.2$ dB.
 
@@ -2104,9 +2104,9 @@ the interior `room_constant` and `.plot()`.
 **What the enclosure actually delivers.** An enclosure is a composite, so the
 elements combine on an energy basis before $\mathrm{IL} = R - C$ is applied, and
 the result is set by the worst of them. A bare opening of relative area
-$S_a/S_E$ caps the composite at $10\log_{10}(S_E/S_a)$ whatever the panels are:
+$S_\mathrm{a}/S_\mathrm{E}$ caps the composite at $10\log_{10}(S_\mathrm{E}/S_\mathrm{a})$ whatever the panels are:
 one per cent of open area caps it at 20 dB. For the sheet-steel case below
-(mean panel $R$ = 32.3 dB, $S_E$ = 24 m²), a 1.28 m² door at $R$ = 15 dB takes
+(mean panel $R$ = 32.3 dB, $S_\mathrm{E}$ = 24 m²), a 1.28 m² door at $R$ = 15 dB takes
 the mean insertion loss from 28.9 dB to 21.4 dB, and adding a 0.24 m² gap at the
 door foot takes it to 15.1 dB. `composite_transmission_loss(areas,
 reduction_indices)` builds that composite and `enclosure_insertion_loss` takes

@@ -55,9 +55,9 @@ to a heavy basic wall of about 350 kg/m²:
 
 * `system="mineral_wool"` (Formula D.3), an exterior thermal system on
   mineral wool with 40 % glued area and no anchors:
-  $\Delta R_w = -36 \log_{10}(f_o) + 82.5$,
-  $\Delta R_A = -42 \log_{10}(f_o) + 92.0$,
-  $\Delta R_{A,tr} = -39 \log_{10}(f_o) + 87.7$, each floored at −4 dB.
+  $\Delta R_\mathrm{w} = -36 \log_{10}(f_o) + 82.5$,
+  $\Delta R_\mathrm{A} = -42 \log_{10}(f_o) + 92.0$,
+  $\Delta R_\mathrm{A,tr} = -39 \log_{10}(f_o) + 87.7$, each floored at −4 dB.
 * `system="foam"` (Formula D.4), the same on PS, EPS or EEPS foams:
   $-33 \log_{10}(f_o) + 76.0$, $-33 \log_{10}(f_o) + 74.0$,
   $-36 \log_{10}(f_o) + 77.0$, floored at −3 dB.
@@ -66,7 +66,7 @@ to a heavy basic wall of about 350 kg/m²:
   $-24 \log_{10}(f_o) + 54$, floored at −4 dB.
 
 `anchors=True` applies Formula (D.5) for 4 to 10 anchors or battens per
-m² ($0.66 \Delta R_{w,ref} - 1.2$ and its two companions), and
+m² ($0.66 \Delta R_\mathrm{w,ref} - 1.2$ and its two companions), and
 `glued_area` applies Formula (D.6),
 $\Delta R - 0.05\,\%S_o + 2.0$, for a glued area other than the
 40 % reference. Both corrections are applied after the floor of the
@@ -114,7 +114,7 @@ still depends on the basic element it sits on, so ISO 12354-1:2017
 Formula (D.8) shifts the laboratory rating by $a X$ with
 
 $a = 1.35 \log_{10}(f_o) - 3.5$, capped at 0, and
-$X = R_{w,situ} - 53$, clamped to `[−10, +7]`.
+$X = R_\mathrm{w,situ} - 53$, clamped to `[−10, +7]`.
 
 The same formula applies to `ΔRw`, `ΔRA` and `ΔRA,tr`.
 
@@ -242,12 +242,12 @@ Weighted improvement `ΔRw` of an interior lining (Table D.1).
 ISO 12354-1:2017 Table D.1 reads `ΔRw` off the lining's resonance
 frequency, rounded to the centre of the one-third-octave band in which it
 falls. Below 200 Hz the improvement also depends on the bare element:
-$\Delta R_w = 74.4 - 20 \log_{10}(f_o) - R_w/2$, never below 0 dB
+$\Delta R_\mathrm{w} = 74.4 - 20 \log_{10}(f_o) - R_\mathrm{w}/2$, never below 0 dB
 (NOTE 1). At and above 200 Hz the lining *degrades* the insulation, by
 1 dB at 200 Hz down to 10 dB from 630 Hz to 1 600 Hz, recovering to 5 dB
 from 1 600 Hz to 5 000 Hz.
 
-Table D.1 is stated for basic elements with $20 \le R_w \le 60$ dB.
+Table D.1 is stated for basic elements with $20 \le R_\mathrm{w} \le 60$ dB.
 Its last two rows both cover 1 600 Hz with different values; this function
 takes the more conservative −10 dB there (see `docs/ERRATA.md`).
 

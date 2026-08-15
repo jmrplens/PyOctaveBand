@@ -34,21 +34,21 @@ Because it uses the direction average,
 **Equivalent absorption length (Part 1, Formula (12)).**
 
 $$
-a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0} \sqrt{\frac{f_{\mathrm{ref}}}{f}}
+a_j = \frac{2.2\,\pi^2\,S_j}{T_{\mathrm{s},j}\,c_0} \sqrt{\frac{f_{\mathrm{ref}}}{f}}
 $$
 
 with the structural
 reverberation time `Ts,j`, the element area `Sj`, the speed of sound in air
 `c0` and the reference frequency $f_{\mathrm{ref}} = 1000$ Hz. The
 related total loss
-factor is $\eta = 2.2 / (f \, T_s)$ (Clause 7.3.1).
+factor is $\eta = 2.2 / (f \, T_\mathrm{s})$ (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-$D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ (Formula (4)); with a tapping
+$D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ (Formula (4)); with a tapping
 machine on the
 source-room floor the normalized flanking impact level is
-$L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ (Formula (5)), both with the reference
+$L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)$ (Formula (5)), both with the reference
 absorption
 area $A_0 = 10$ m². Their single-number ratings `Dn,f,w (C; Ctr)` and
 `Ln,f,w (CI)` follow ISO 717-1/-2 through the verified
@@ -127,7 +127,7 @@ critical_frequency(
 
 Thin-plate critical frequency `fc` (Part 1, Formula (20)).
 
-$f_c = c_0^2 / (1.8 \, c_L \, h)$ for a homogeneous isotropic
+$f_\mathrm{c} = c_0^2 / (1.8 \, c_\mathrm{L} \, h)$ for a homogeneous isotropic
 element. The
 constant 1.8 already carries the $2\pi/\sqrt{12}$ factor of the
 thin-plate
@@ -137,12 +137,12 @@ mutually consistent this equals [`phonometry.coincidence_frequency`](/phonometry
 
 :::note
 The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
-`π` in the denominator ($1.8 \, c_L \, h \, \pi$), which
+`π` in the denominator ($1.8 \, c_\mathrm{L} \, h \, \pi$), which
 would misplace
 `fc` by a factor π; the π-free form implemented here is the one
 ISO 10848-1:2017 restores in its Formula (5), ISO 12354-1:2017
 prints in its symbol definitions
-($f_c = c_0^2/(1.8 \, c_L t)$) and
+($f_\mathrm{c} = c_0^2/(1.8 \, c_\mathrm{L} t)$) and
 Hopkins Eq. 2.201 derives. See `docs/ERRATA.md`.
 :::
 
@@ -208,7 +208,7 @@ equivalent_absorption_length(
 Equivalent absorption length `aj` (Formula (12)).
 
 $$
-a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0} \sqrt{\frac{f_{\mathrm{ref}}}{f}}
+a_j = \frac{2.2\,\pi^2\,S_j}{T_{\mathrm{s},j}\,c_0} \sqrt{\frac{f_{\mathrm{ref}}}{f}}
 $$
 
 with $f_{\mathrm{ref}} = 1000$ Hz.
@@ -245,7 +245,7 @@ Normalized flanking impact level `Ln,f` (Formula (5)).
 
 | Name | Description |
 | :--- | :--- |
-| `l_n_f` | $L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ per band, in dB. |
+| `l_n_f` | $L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)$ per band, in dB. |
 | `rating` | Single-number `Ln,f,w` with `CI` (ISO 717-2), or `None` when the band count is neither 16 nor 5. |
 
 ### FlankingImpactLevelResult.plot()
@@ -319,7 +319,7 @@ Normalized flanking level difference `Dn,f` (airborne, Formula (4)).
 
 | Name | Description |
 | :--- | :--- |
-| `d_n_f` | $D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ per band, in dB. |
+| `d_n_f` | $D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ per band, in dB. |
 | `rating` | Single-number `Dn,f,w` with `C`/`Ctr` (ISO 717-1), or `None` when the band count is neither 16 nor 5. |
 
 ### FlankingLevelDifferenceResult.plot()
@@ -389,7 +389,7 @@ modal_density(
 ) -> float
 ```
 
-Modal density $n = \pi \cdot S \cdot f_c / c_0^2$ (Part 4, (5)).
+Modal density $n = \pi \cdot S \cdot f_\mathrm{c} / c_0^2$ (Part 4, (5)).
 
 **Parameters**
 
@@ -419,7 +419,7 @@ modal_overlap_factor(
 ) -> np.ndarray
 ```
 
-Modal overlap factor $M = 2.2 \cdot n / T_s$ (Part 4, F. (6)).
+Modal overlap factor $M = 2.2 \cdot n / T_\mathrm{s}$ (Part 4, F. (6)).
 
 With the modal density `n` from [`modal_density`](/phonometry/reference/api/building/flanking-transmission/#modal_density). Part 4 prefers
 $M \ge 1$ at 250 Hz and above, and requires bands with
@@ -460,7 +460,7 @@ normalized_flanking_impact_level(
 
 Normalized flanking impact level `Ln,f` (Formula (5)).
 
-$L_{n,f} = L_2 + 10 \log_{10}(A/A_0)$ with the reference absorption
+$L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)$ with the reference absorption
 area $A_0 = 10$ m², from the receiving-room impact level with the
 tapping machine on the source-room floor.
 
@@ -496,7 +496,7 @@ normalized_flanking_level_difference(
 
 Normalized flanking level difference `Dn,f` (airborne, Formula (4)).
 
-$D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ with the reference absorption
+$D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ with the reference absorption
 area $A_0 = 10$ m².
 
 **Parameters**
@@ -532,7 +532,7 @@ strong_coupling_satisfied(
 Strong-coupling applicability check (Part 1, Formula (15)).
 
 `Kij` is relevant only where
-$\overline{D}_{v,ij} \ge 3 - 10 \log_{10}\frac{m_i f_{cj}}{m_j f_{ci}}$.
+$\overline{D}_{v,ij} \ge 3 - 10 \log_{10}\frac{m_i f_{\mathrm{c}j}}{m_j f_{\mathrm{c}i}}$.
 
 **Parameters**
 
@@ -561,7 +561,7 @@ total_loss_factor(
 ) -> np.ndarray
 ```
 
-Total loss factor $\eta = 2.2 / (f \, T_s)$ (Clause 7.3.1).
+Total loss factor $\eta = 2.2 / (f \, T_\mathrm{s})$ (Clause 7.3.1).
 
 **Parameters**
 
@@ -676,7 +676,7 @@ Indirect `Kij` from the normalized flanking level difference.
 ISO 10848-1:2006, Clause 4.3.1 Note 2 (unnumbered):
 
 $$
-K_{ij} = D_{n,f} - \frac{R_i + R_j}{2} - 10 \log_{10}\frac{\sqrt{a_i a_j}}{l_{ij}} + 10 \log_{10}\frac{\sqrt{S_i S_j}}{A_0}
+K_{ij} = D_\mathrm{n,f} - \frac{R_i + R_j}{2} - 10 \log_{10}\frac{\sqrt{a_i a_j}}{l_{ij}} + 10 \log_{10}\frac{\sqrt{S_i S_j}}{A_0}
 $$
 
 The standard warns this holds only for resonant-only transmission; measured

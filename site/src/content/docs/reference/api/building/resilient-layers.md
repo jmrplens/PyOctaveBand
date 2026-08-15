@@ -21,11 +21,11 @@ The chain is one story told in three steps.
 hammer from 40 mm, ten impacts per second, so the impact velocity is
 $v_o = \sqrt{2 g h} = 0.886$ m/s (Eq. 3.85) and, for a short impact, the
 peak force per Fourier line is $|F_n| = 2 m v_o/T_i$ (Eq. 3.90), giving
-the band mean-square force $F_{rms}^{2} = 3.9 B$ (Eq. 3.92). Real floors
+the band mean-square force $F_\mathrm{rms}^{2} = 3.9 B$ (Eq. 3.92). Real floors
 are not that simple: the hammer, the contact stiffness `K` it deforms and the
 floor's driving-point impedance `Zdp` form a mass-spring-dashpot (Fig. 3.28)
 whose force pulse ([`force_pulse`](/phonometry/reference/api/building/resilient-layers/#force_pulse), Eqs. 3.95/3.96) is **over-critical**
-when $K m \ge 4 Z_{dp}^{2}$ (a single positive pulse, no rebound) and
+when $K m \ge 4 Z_\mathrm{dp}^{2}$ (a single positive pulse, no rebound) and
 **under-critical** otherwise (a rebound; only the first positive lobe is
 transformed). Its spectrum ([`tapping_force_spectrum`](/phonometry/reference/api/building/resilient-layers/#tapping_force_spectrum)) is flat up to the
 cut-off `fco` (Eqs. 3.101/3.102) and falls above it, and it asymptotes at low
@@ -49,7 +49,7 @@ improvement follows one of three laws
 Cremer, $\Delta L = 40 \log_{10}(f/f_o)$ (Eq. 4.119, Vigran Eq. 8.40), the
 empirical $\Delta L = 30 \log_{10}(f/f_o)$ that EN 12354-2 adopted for
 sand-cement screeds (Formula C.1, Eq. 4.124), and the same 40 lg law with the
-hammer-impedance term $10 \log_{10}[1 + (f/f_{limit})^{2}]$ that a lightweight
+hammer-impedance term $10 \log_{10}[1 + (f/f_\mathrm{limit})^{2}]$ that a lightweight
 walking surface needs (Eq. 4.123, Vigran Eq. 8.48). A floating floor on
 discrete mounts instead of a continuous layer is a two-subsystem SEA problem
 ([`resilient_mount_improvement`](/phonometry/reference/api/building/resilient-layers/#resilient_mount_improvement), Vér's model as Hopkins Eq. 4.118 and
@@ -84,7 +84,7 @@ combined_dynamic_stiffness(layers: ArrayLike) -> float
 
 Total dynamic stiffness of stacked resilient layers (Formula C.6).
 
-$s'_{tot} = (\sum 1/s'_i)^{-1}$, springs in series (Hopkins
+$s'_\mathrm{tot} = (\sum 1/s'_i)^{-1}$, springs in series (Hopkins
 Eq. 4.121 states the same rule). ISO 12354-2:2017 warns that it holds only
 if every layer covers the whole floor without cuts for pipes or electrical
 devices.
@@ -178,7 +178,7 @@ spectrum is averaged into bands.
 
 `two_line` is Hopkins's design estimate: $\Delta L \approx 0$
 below the covering's cut-off and a straight 12 dB/octave above it, that
-is $40 \log_{10}(f/f_{co})$.
+is $40 \log_{10}(f/f_\mathrm{co})$.
 Real coverings behave as non-linear springs under the tapping machine's
 high force and show two or three slopes between 5 and 22 dB/octave, so the
 model identifies the general features rather than replacing a measurement.
@@ -269,15 +269,15 @@ One floating floor on top of another over a heavyweight base is a
 mass-spring-mass-spring system with
 
 $$
-f_{msms} = \frac{1}{2^{3/2} \pi} \sqrt{X \pm \sqrt{X^{2} - \frac{4 s_1 s_2}{\rho_{s1} \rho_{s2}}}}, \qquad X = \frac{s_1}{\rho_{s1}} + \frac{s_2}{\rho_{s1}} + \frac{s_2}{\rho_{s2}}
+f_\mathrm{msms} = \frac{1}{2^{3/2} \pi} \sqrt{X \pm \sqrt{X^{2} - \frac{4 s_1 s_2}{\rho_{\mathrm{s}1} \rho_{\mathrm{s}2}}}}, \qquad X = \frac{s_1}{\rho_{\mathrm{s}1}} + \frac{s_2}{\rho_{\mathrm{s}1}} + \frac{s_2}{\rho_{\mathrm{s}2}}
 $$
 
 subscript 1 being the lower floating floor (on the resilient layer that
 rests on the base) and 2 the upper one. The double floor avoids the single
 floor's dip at `fms`, but the steep rise in `ΔL` only starts above the
 higher of the two resonances. For two identical floors the roots are
-$f_{ms} \sqrt{(3 \pm \sqrt{5})/2}$, that is $0.618 f_{ms}$
-and $1.618 f_{ms}$.
+$f_\mathrm{ms} \sqrt{(3 \pm \sqrt{5})/2}$, that is $0.618 f_\mathrm{ms}$
+and $1.618 f_\mathrm{ms}$.
 
 **Parameters**
 
@@ -329,7 +329,7 @@ and all give $\Delta L = 0$ at and below it (in the band containing
   loss factor and act as finite plates with a reverberant bending field,
   for which the 40 lg law overestimates `ΔL`.
 * `"cremer_hammer"`:
-  $\Delta L = 40 \log_{10}(f/f_o) + 10 \log_{10}[1 + (f/f_{limit})^{2}]$, the
+  $\Delta L = 40 \log_{10}(f/f_o) + 10 \log_{10}[1 + (f/f_\mathrm{limit})^{2}]$, the
   40 lg law with the reduction in power input above the limiting frequency
   of the hammer's own impedance (Hopkins Eq. 4.123, Vigran Eq. 8.48). A
   lightweight walking surface such as chipboard needs it, and tends to
@@ -456,7 +456,7 @@ Force pulse `F1(t)` of a single hammer impact (Eqs. 3.95/3.96).
 Lindblad's solution of the mass-spring-dashpot of Hopkins Fig. 3.28, the
 hammer mass `m` on the contact stiffness `K` in series with the floor's
 driving-point impedance `Zdp`. For an **over-critical** oscillation
-($K m \ge 4 Z_{dp}^{2}$) the pulse decays to zero without changing
+($K m \ge 4 Z_\mathrm{dp}^{2}$) the pulse decays to zero without changing
 sign (Eq. 3.95); for an **under-critical** one it is a decaying sinusoid
 (Eq. 3.96) whose first positive lobe is the impact proper. Hopkins's rule
 is stated in terms of the sign of the force rather than of any mechanism:
@@ -528,15 +528,15 @@ $v_o = 0.886$ m/s.
 hammer_limiting_frequency(impedance: float, *, mass: float = 0.5) -> float
 ```
 
-Limiting frequency $f_{limit} = Z_{dp}/(2 \pi m)$ (Hopkins
+Limiting frequency $f_\mathrm{limit} = Z_\mathrm{dp}/(2 \pi m)$ (Hopkins
 Eq. 3.106).
 
 The frequency at which the floor's driving-point impedance equals the
-magnitude of the hammer's own mass impedance $|Z_h| = \omega m$;
+magnitude of the hammer's own mass impedance $|Z_\mathrm{h}| = \omega m$;
 above it the hammer mass, not the floor, limits the injected power, and
 the power input stops rising at 3 dB per doubling of frequency. Vigran's
 Eq. (8.48) writes the same frequency as
-$f_z = 4 \sqrt{m_1 B_1}/(\pi m_h)$.
+$f_z = 4 \sqrt{m_1 B_1}/(\pi m_\mathrm{h})$.
 
 **Parameters**
 
@@ -610,14 +610,14 @@ per unit area of stiffness `k` each, with all transmission through the
 mounts and none through the cavity. Hopkins Eq. (4.118) writes it as
 
 $$
-\Delta L \approx 10 \log_{10}\!\left( \frac{2.3 \rho_{s1}^{2} c_{L1} h_1 \eta_1 S_1 \omega^{3}}{N k^{2}} \right)
+\Delta L \approx 10 \log_{10}\!\left( \frac{2.3 \rho_{\mathrm{s}1}^{2} c_{\mathrm{L}1} h_1 \eta_1 S_1 \omega^{3}}{N k^{2}} \right)
 $$
 
 where `k` is the dynamic stiffness of each mount, `N` the **number** of
 mounts and `S1` the area of the walking surface. Since
-$2.3 \rho_{s1}^{2} c_{L1} h_1 = Z_{dp1} \rho_{s1}$ for
-$Z_{dp1} = 2.3 \rho c_L h^{2}$ (Eq. 2.190), the same expression
-reads $10 \log_{10}(Z_{dp1} \rho_{s1} \eta_1 \omega^{3}/(N/S_1 \cdot k^{2}))$, which is the form evaluated here: this function takes the mount
+$2.3 \rho_{\mathrm{s}1}^{2} c_{\mathrm{L}1} h_1 = Z_{\mathrm{dp}1} \rho_{\mathrm{s}1}$ for
+$Z_{\mathrm{dp}1} = 2.3 \rho c_\mathrm{L} h^{2}$ (Eq. 2.190), the same expression
+reads $10 \log_{10}(Z_{\mathrm{dp}1} \rho_{\mathrm{s}1} \eta_1 \omega^{3}/(N/S_1 \cdot k^{2}))$, which is the form evaluated here: this function takes the mount
 **density** `N/S1`, not the count.
 
 Vigran's Eq. (8.45) is a sum of three terms, $Z_1/Z_2$,
@@ -667,11 +667,11 @@ short_pulse_mean_square_force(
 ```
 
 Band mean-square force of a short impact
-$F_{rms}^{2} = 3.9 B$ (Eq. 3.92).
+$F_\mathrm{rms}^{2} = 3.9 B$ (Eq. 3.92).
 
 The limiting case in which the impact is short enough that the hammer's
 momentum alone sets the force: combining $|F_n| = 2 m v_o/T_i$
-(Eq. 3.90) with $F_{rms}^{2} = |F_n|^{2} B/(2 f_i)$ (Eq. 3.91)
+(Eq. 3.90) with $F_\mathrm{rms}^{2} = |F_n|^{2} B/(2 f_i)$ (Eq. 3.91)
 gives 3.925 B, printed as 3.9 B. Hopkins finds it adequate for bare
 concrete slabs of at least 100 mm.
 
@@ -705,11 +705,11 @@ Cut-off frequency `fco` of the force spectrum (Eqs. 3.101/3.102).
 
 Above `fco` the tapping machine's force spectrum is no longer flat and
 the force falls away. For an under-critical oscillation
-($K m < 4 Z_{dp}^{2}$, the case of a concrete slab with or without
+($K m < 4 Z_\mathrm{dp}^{2}$, the case of a concrete slab with or without
 a soft covering) it is the undamped mass-spring value
-$f_{co} = \sqrt{K/m}/(2 \pi)$ (Eq. 3.102); for an over-critical one
+$f_\mathrm{co} = \sqrt{K/m}/(2 \pi)$ (Eq. 3.102); for an over-critical one
 (a lightweight walking surface) it is the lower root
-$[K/(2 Z_{dp}) - \sqrt{(K/(2 Z_{dp}))^{2} - K/m}]/(2 \pi)$
+$[K/(2 Z_\mathrm{dp}) - \sqrt{(K/(2 Z_\mathrm{dp}))^{2} - K/m}]/(2 \pi)$
 (Eq. 3.101).
 
 **Parameters**
@@ -755,13 +755,13 @@ Force spectrum of the ISO tapping machine on a floor (Hopkins 3.6.3.1).
 
 The Fourier transform of the single-impact force pulse
 ([`force_pulse`](/phonometry/reference/api/building/resilient-layers/#force_pulse)), scaled by the impact repetition rate. Writing
-$a = K/(2 Z_{dp})$ and $\omega_o^{2} = K/m$, the transform of
+$a = K/(2 Z_\mathrm{dp})$ and $\omega_o^{2} = K/m$, the transform of
 Eqs. (3.95)/(3.96) is the same rational function in both critical cases,
 $\hat{F}(\omega) = v_o K/(\omega_o^{2} - \omega^{2} + 2 i a \omega)$,
 multiplied for the under-critical case by
 $1 + e^{-a \pi/\beta} e^{-i \omega \pi/\beta}$ because only the
 first positive lobe (of duration $\pi/\beta$) is transformed. That
-truncation is what produces the deep troughs at $n f_{co}$,
+truncation is what produces the deep troughs at $n f_\mathrm{co}$,
 $n = 3, 5, 7$ that Hopkins notes below Fig. 4.64; they vanish once
 the covering's internal damping is included and the spectrum is averaged
 into bands.
@@ -843,10 +843,10 @@ Force spectrum of the ISO tapping machine on one walking surface.
 | `frequencies` | Band centre frequencies `f`, in Hz. |
 | `peak_force` | Magnitude of the Fourier force component `\|Fn\|`, in N (Hopkins Fig. 3.32). |
 | `mean_square_force` | Band mean-square force `F²rms`, in N² (Eq. 3.91). |
-| `power_input` | Power injected into the floor $W_{in} = F_{rms}^{2}/Z_{dp}$, in W (Eq. 3.103). |
+| `power_input` | Power injected into the floor $W_\mathrm{in} = F_\mathrm{rms}^{2}/Z_\mathrm{dp}$, in W (Eq. 3.103). |
 | `cut_off_frequency` | Cut-off frequency `fco`, in Hz (Eqs. 3.101/3.102). |
 | `limiting_frequency` | Limiting frequency `flimit`, in Hz (Eq. 3.106). |
-| `over_critical` | `True` when $K m \ge 4 Z_{dp}^{2}$, i.e. the hammer does not rebound. |
+| `over_critical` | `True` when $K m \ge 4 Z_\mathrm{dp}^{2}$, i.e. the hammer does not rebound. |
 | `contact_stiffness` | Contact stiffness `K` used, in N/m. |
 | `impedance` | Driving-point impedance `Zdp` used, in N.s/m. |
 | `lower_limit` | Low-frequency asymptote $\lvert F_n \rvert_{\text{lower}} = m v_o/T_i$, in N (Eq. 3.99). |
@@ -873,7 +873,7 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 *property*
 
-Power input level $10 \log_{10}(W_{in}/1~\text{pW})$, in dB
+Power input level $10 \log_{10}(W_\mathrm{in}/1~\text{pW})$, in dB
 (Hopkins Fig. 3.33).
 
 ## weighted_floating_floor_improvement
@@ -896,9 +896,9 @@ stiffness. ISO 12354-2:2017 gives it as the two nomograms of Figures C.1
 and C.2 and prints the fits:
 
 * `floor="screed"` (sand-cement or calcium-sulfate screeds, Formula C.4):
-  $\Delta L_w = 13 \log_{10}(m') - 14.2 \log_{10}(s') + 20.8$;
+  $\Delta L_\mathrm{w} = 13 \log_{10}(m') - 14.2 \log_{10}(s') + 20.8$;
 * `floor="asphalt"` (asphalt or dry floating floors, Formula C.5):
-  $\Delta L_w = (-0.21 m' - 5.45) \log_{10}(s') + 0.46 m' + 23.8$.
+  $\Delta L_\mathrm{w} = (-0.21 m' - 5.45) \log_{10}(s') + 0.46 m' + 23.8$.
 
 **Parameters**
 

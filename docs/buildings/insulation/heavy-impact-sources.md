@@ -30,18 +30,18 @@ level** it delivers into a rigid floor (ISO 16283-2:2020 Formula (A.1) =
 JIS A 1418-2:2019 Formula (1)):
 
 $$
-L_{FE} = 10\log_{10}\!\left[\frac{1}{T_\text{ref}}
+L_{F\mathrm{E}} = 10\log_{10}\!\left[\frac{1}{T_\mathrm{ref}}
 \int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
 $$
 
-with $F_0 = 1$ N, $T_\text{ref} = 1$ s and $t_2 - t_1$ the duration of the
+with $F_0 = 1$ N, $T_\mathrm{ref} = 1$ s and $t_2 - t_1$ the duration of the
 impact. Both characteristics require a **single-peak** waveform of
 $20 \pm 2$ ms (JIS A 1418-2:2019 A.2 b)). The octave-band values are printed
 identically in ISO 16283-2:2020 Table A.1, ISO 10140-5:2010 Table F.1 and
 JIS A 1418-2:2019 Table A.2 for the ball; the bang machine appears only in
 JIS A 1418-2:2019 Table A.1.
 
-| Octave (Hz) | Rubber ball $L_{FE}$ (dB re 1 N) | Bang machine $L_{FE}$ (dB re 1 N) |
+| Octave (Hz) | Rubber ball $L_{F\mathrm{E}}$ (dB re 1 N) | Bang machine $L_{F\mathrm{E}}$ (dB re 1 N) |
 |---|---|---|
 | 31.5 | 39.0 ± 1.0 | 47.0 ± 1.0 |
 | 63 | 31.0 ± 1.5 | 40.0 ± 1.5 |
@@ -121,7 +121,7 @@ to saturate. ISO 16283-2:2020 (definition 3.16, Formulae (4), (5) and (6))
 therefore uses
 
 $$
-L'_{i,F\max,V,T} = L_{i,F\max} + 10\log_{10}\frac{V}{V_0}
+L'_{\mathrm{i,Fmax},V,T} = L_\mathrm{i,Fmax} + 10\log_{10}\frac{V}{V_0}
 - 10\log_{10}\frac{g(C)}{g(C_0)},\qquad
 C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
 $$
@@ -164,7 +164,7 @@ ISO 717-2:2020 Annex D is normative and does not use a reference curve at all.
 The rating is an energy sum of A-weighted band levels (Formula (D.1)):
 
 $$
-X_{iA,F\max} = 10\log_{10}\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
+X_\mathrm{iA,Fmax} = 10\log_{10}\!\left(\sum_j 10^{(X_{\mathrm{i,Fmax},j} + A_j)/10}\right),
 $$
 
 over the one-third-octave bands 50 Hz to 630 Hz **or** the octave bands 63 Hz
@@ -172,8 +172,8 @@ to 500 Hz, with the Table D.3 corrections $A_j$, rounded half-up to an integer.
 A one-third-octave measurement is rated in one-third octaves; the standard
 warns explicitly against summing thirds into octaves first, because the two
 routes do not give the same answer. The same formula rates all four quantities
-of Tables D.1 and D.2: $L_{iA,F\max}$, $L_{iA,F\max,V,T}$, $L'_{iA,F\max}$ and
-$L'_{iA,F\max,V,T}$.
+of Tables D.1 and D.2: $L_\mathrm{iA,Fmax}$, $L_{\mathrm{iA,Fmax},V,T}$, $L'_\mathrm{iA,Fmax}$ and
+$L'_{\mathrm{iA,Fmax},V,T}$.
 
 The worked example of Table D.4 is reproduced exactly, including the
 deliberately unrounded intermediate the standard prints:
@@ -220,7 +220,7 @@ that takes a floor construction to a heavy-impact level; Hopkins states
 plainly that the complexity of the input force and the use of a
 time-weighted maximum leave no simple counterpart to the tapping-machine
 prediction. No accredited worked example exists anywhere that carries a real
-floor from measured $L_{i,F\max}$ through to $L'_{iA,F\max,V,T}$, so the
+floor from measured $L_\mathrm{i,Fmax}$ through to $L'_{\mathrm{iA,Fmax},V,T}$, so the
 standardization chain is anchored on its own $T = T_0$ identity and on a
 published 25-band reproduction of Formula (4).
 

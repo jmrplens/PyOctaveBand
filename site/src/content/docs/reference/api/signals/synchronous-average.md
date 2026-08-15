@@ -65,18 +65,18 @@ comparison but does
 not print this figure). Thus the habit of taking a power-of-two number of
 averages is not, in general, optimal.
 
-**Non-integer samples per period.** When $f_s T$ is not an integer
+**Non-integer samples per period.** When $f_\mathrm{s} T$ is not an integer
 the period boundaries fall between samples. Each block is then aligned to
 a common integer grid by the band-limited fractional delay of
 [`phonometry.signals.test_signals.fractional_delay`](/phonometry/reference/api/signals/test-signals/#fractional_delay) before averaging, so
 the periodic waveform is recovered within the interpolation error of that
-band-limited shift. An integer $f_s T$ needs no interpolation and
+band-limited shift. An integer $f_\mathrm{s} T$ needs no interpolation and
 the waveform is recovered to machine precision. The averaged samples stay
-on the $1/f_s$ sampling grid throughout: output sample `m` is the
-average of the input at the times $n T + m/f_s$, so the returned
-time axis is $m/f_s$ and the
-$M = \operatorname{round}(f_s T)$ samples cover one period exactly
-when $f_s T$ is an integer and to within half a sample otherwise.
+on the $1/f_\mathrm{s}$ sampling grid throughout: output sample `m` is the
+average of the input at the times $n T + m/f_\mathrm{s}$, so the returned
+time axis is $m/f_\mathrm{s}$ and the
+$M = \operatorname{round}(f_\mathrm{s} T)$ samples cover one period exactly
+when $f_\mathrm{s} T$ is an integer and to within half a sample otherwise.
 No resampling onto an `M`-point angular grid is performed.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -141,13 +141,13 @@ Time synchronous average of a periodic waveform in noise.
 | Name | Description |
 | :--- | :--- |
 | `period_waveform` | The averaged periodic waveform, one period of `samples_per_period` samples. |
-| `times` | Time axis of `period_waveform`, in seconds: the sampling grid $m/f_s$, $m = 0 \ldots M-1$ (the averaged samples stay on the $1/f_s$ grid; see the module note). The axis spans one period exactly when $f_s T$ is an integer, and to within half a sample otherwise. |
+| `times` | Time axis of `period_waveform`, in seconds: the sampling grid $m/f_\mathrm{s}$, $m = 0 \ldots M-1$ (the averaged samples stay on the $1/f_\mathrm{s}$ grid; see the module note). The axis spans one period exactly when $f_\mathrm{s} T$ is an integer, and to within half a sample otherwise. |
 | `residual` | Input minus the periodic reconstruction, over the analysed span (`n_averages * samples_per_period` samples, aligned to the integer period grid): what is left after the synchronous component is removed. |
 | `n_averages` | Number of periods averaged, `N`. |
 | `samples_per_period` | Integer samples per period `M` after any alignment. |
 | `period` | Repetition period `T`, in seconds. |
 | `fs` | Sample rate, in Hz. |
-| `interpolated` | Whether band-limited fractional-delay alignment was applied (`True` when $f_s T$ is not an integer). |
+| `interpolated` | Whether band-limited fractional-delay alignment was applied (`True` when $f_\mathrm{s} T$ is not an integer). |
 | `noise_reduction_db` | Power reduction of asynchronous noise, $10 \log_{10} N$ dB (amplitude SNR gain $\sqrt{N}$). |
 | `residual_rms` | Root-mean-square of `residual`. |
 | `comb_frequencies` | Frequency axis of the comb-filter response, in Hz (from DC over a whole number of harmonics of `1/T`). |

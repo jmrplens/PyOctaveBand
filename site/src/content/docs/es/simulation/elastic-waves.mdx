@@ -86,9 +86,9 @@ no puede representar.
 ## 1. El esquema velocidad-esfuerzo P-SV
 
 Un sólido transporta más de una onda. Junto a la **onda P** de compresión
-a $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ se propaga una **onda S** de
-cizalla a $c_S = \sqrt{\mu/\rho}$, y toda superficie libre de tracción
-guía una **onda de Rayleigh** justo por debajo de $c_S$.
+a $c_\mathrm{P} = \sqrt{(\lambda + 2\mu)/\rho}$ se propaga una **onda S** de
+cizalla a $c_\mathrm{S} = \sqrt{\mu/\rho}$, y toda superficie libre de tracción
+guía una **onda de Rayleigh** justo por debajo de $c_\mathrm{S}$.
 `elastic_fdtd_simulation` integra el sistema velocidad-esfuerzo 2D en
 deformación plana de Virieux (1986, Ec. 2),
 
@@ -117,7 +117,7 @@ en un `ElasticBoundaries` (los lados y el grosor de la esponja).
 
 Dos números gobiernan cada ejecución, y leen extremos opuestos de los mapas
 de material. **Estabilidad**: el paso temporal sigue a la onda *más rápida*
-del dominio, $c_P^{\max}$, exactamente igual que en el esquema acústico
+del dominio, $c_\mathrm{P}^{\max}$, exactamente igual que en el esquema acústico
 (Virieux, Ecs. 6-7). **Resolución**: el tamaño de celda sigue a la *más
 lenta*, $\Delta x \le c_\text{min}/(10 f)$, donde $c_\text{min}$ es la
 velocidad de cizalla no nula más lenta de entre las celdas sólidas, o una
@@ -199,7 +199,7 @@ error de una fila desplaza todas las llegadas en $\Delta x / c$ y cuesta una
 ejecución entera. No hay contrapartida elástica de `FDTD2D.plot_geometry`,
 así que esta comprobación corre por cuenta del lector. Merece la pena
 conocer de antemano un fallo más: toda celda debe cumplir
-$c_P^2 \ge 2 c_S^2$, cosa que el constructor impone, y ese rechazo es lo
+$c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2$, cosa que el constructor impone, y ese rechazo es lo
 primero que hay que mirar cuando un mapa de sedimento o de material
 compuesto no se deja construir.
 
@@ -231,11 +231,11 @@ cizalla por encima es su imagen antisimétrica. Esa única condición de
 contorno es la que hace a las superficies portadoras de ondas: golpea
 verticalmente la superficie libre de un bloque de aluminio (el problema de
 Lamb) y, además de los frentes de cuerpo P y S, una **onda de Rayleigh**
-rueda por la superficie a $c_R \approx 0{,}93\,c_S$, la raíz de la ecuación
+rueda por la superficie a $c_\mathrm{R} \approx 0{,}93\,c_\mathrm{S}$, la raíz de la ecuación
 característica exacta de Rayleigh (Cremer, Heckl y Petersson, Ec. 3.149).
 Los tests fijan la velocidad de Rayleigh medida a esa raíz dentro del 2 %
 y la onda de flexión de una tira delgada libre-libre a la dispersión de
-placa de Kirchhoff $c_B \propto \sqrt{\omega}$ en su dominio de placa
+placa de Kirchhoff $c_\mathrm{B} \propto \sqrt{\omega}$ en su dominio de placa
 delgada. Las superficies libres siguen la regla de muestreo de Rayleigh:
 reserva 15-20 celdas por longitud de onda ahí, pues la superficie de
 imagen de segundo orden es la parte más dispersiva del esquema.
@@ -243,8 +243,8 @@ imagen de segundo orden es la parte más dispersiva del esquema.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves_es.webp" alt="Instantánea de la velocidad de partícula vertical en un bloque de aluminio de 0,6 por 0,3 metros unas centésimas de milisegundo después de un golpe vertical sobre su superficie libre superior: el frente P de compresión es el arco exterior, el frente S de cizalla el arco interior a aproximadamente la mitad de su radio, y los lóbulos más intensos se pegan a la superficie justo detrás del frente S, etiquetados como la onda de Rayleigh; arcos punteados marcan los radios exactos de P y S" width="96%" loading="eager" />
 
 *Una instantánea, tres velocidades: el frente P ha recorrido el doble de
-distancia que el frente S (arcos punteados en los radios exactos $c_P t$ y
-$c_S t$), y el movimiento más intenso viaja a lo largo de la superficie
+distancia que el frente S (arcos punteados en los radios exactos $c_\mathrm{P} t$ y
+$c_\mathrm{S} t$), y el movimiento más intenso viaja a lo largo de la superficie
 libre como la onda de Rayleigh, un pelo más lenta que S.*
 
 **La esponja es la herramienta equivocada allí donde vive la física de esta
@@ -296,7 +296,7 @@ plt.show()
 La instantánea se detiene a 73 µs porque unos lados rígidos y una ejecución
 corta eran la manera más barata de conseguir un fotograma limpio, y un
 fotograma basta para las dos velocidades de cuerpo: los arcos punteados están
-dibujados en los radios exactos $c_P t$ y $c_S t$, así que son una medición y
+dibujados en los radios exactos $c_\mathrm{P} t$ y $c_\mathrm{S} t$, así que son una medición y
 no una etiqueta. Lo que un solo fotograma no puede zanjar es la **tercera**
 onda. Para ella no se dibuja nada analítico, su velocidad se separa un 7 % de
 la del frente de cizalla, y su propiedad definitoria, que se queda en la
@@ -325,7 +325,7 @@ del encuadre y siguen su camino; los lóbulos de superficie no van a ninguna
 parte salvo a lo largo de la superficie, a su propia velocidad más lenta, y
 siguen ahí cuando las ondas de cuerpo ya se han marchado. El recuadro traza dos
 sondas de superficie separadas 0,15 m, y el retardo entre sus picos es la
-medición: el $c_R$ simulado frente a 2921 m/s, la raíz de la ecuación
+medición: el $c_\mathrm{R}$ simulado frente a 2921 m/s, la raíz de la ecuación
 característica exacta de Rayleigh citada arriba, que los tests fijan dentro
 del 2 %.
 
@@ -375,7 +375,7 @@ velocidad de cizalla y la densidad), y una velocidad de cizalla nula marca
 un fluido. Se distribuyen cinco constantes, y de ellas sale cualquier otro
 número de esta página:
 
-| Constante | $c_P$ [m/s] | $c_S$ [m/s] | $\rho$ [kg/m³] |
+| Constante | $c_\mathrm{P}$ [m/s] | $c_\mathrm{S}$ [m/s] | $\rho$ [kg/m³] |
 |---|---|---|---|
 | `AIR` | 343 | 0 | 1,2 |
 | `WATER` | 1480 | 0 | 1000 |
@@ -387,7 +387,7 @@ Son cifras redondas nominales, para documentación y validación, no datos
 certificados, así que una probeta real hay que introducirla a mano: por eso
 la sección 1 escribe los 6320 / 3130 / 2700 del bloque de aluminio en vez de
 importar `ALUMINIUM`. El constructor impone una sola cota,
-$c_P^2 \ge 2\,c_S^2$, que es la afirmación de que el primer parámetro de
+$c_\mathrm{P}^2 \ge 2\,c_\mathrm{S}^2$, que es la afirmación de que el primer parámetro de
 Lamé no es negativo o, equivalentemente, de que el coeficiente de Poisson no
 es negativo. Un trío rechazado suele significar una velocidad de cizalla
 introducida demasiado alta, o una velocidad de compresión medida sobre una
@@ -464,7 +464,7 @@ Fuera de la incidencia normal el sólido deja de ser un líquido. El sonido
 incidente se refracta en **dos** ondas transmitidas, P y SV (**conversión
 de modo**), y la refracción obedece la ley de Snell por separado para cada
 una de ellas, así que cada una tiene su propio ángulo crítico:
-$\arcsin(c_1/c_{P2})$ para la onda de compresión y $\arcsin(c_1/c_{S2})$
+$\arcsin(c_1/c_{\mathrm{P}2})$ para la onda de compresión y $\arcsin(c_1/c_{\mathrm{S}2})$
 para la de cizalla. Ambos salen solo de las velocidades de onda (la densidad
 entra únicamente en las amplitudes), así que son dos líneas de aritmética
 sobre las constantes de material de la sección 4.
@@ -487,13 +487,13 @@ el contacto sobre la malla escalonada.
 
 Esos dos ángulos parten el rango en cuatro regímenes. La columna titulada
 *fluido equivalente* es esa misma interfase modelada como un fondo sin
-cizalla del mismo $c_P$ y $\rho$, el modelo que lleva el módulo submarino, y
+cizalla del mismo $c_\mathrm{P}$ y $\rho$, el modelo que lleva el módulo submarino, y
 la diferencia entre las dos columnas es toda la razón de ser de este
 esquema.
 
 | Incidencia | Ondas transmitidas | \|V\| elástico | \|V\| fluido equivalente | Qué significa |
 |---|---|---|---|---|
-| 0° | solo P | 0,938 | 0,938 | no se excita cizalla, así que el acero es exactamente un líquido de su $\rho$ y su $c_P$ |
+| 0° | solo P | 0,938 | 0,938 | no se excita cizalla, así que el acero es exactamente un líquido de su $\rho$ y su $c_\mathrm{P}$ |
 | de 0° a 14,5° | P y SV | 0,938, que baja a 0,937 en 9° y luego sube hasta el ángulo crítico | 0,938, que sube hasta 1 | la cizalla ya se lleva su parte de la potencia transmitida, y el modelo fluido ya devuelve de más |
 | de 14,5° a 27,5° | solo SV, P evanescente | baja hasta 0,905 en 16,4°; 0,918 en 20° | 1 (reflexión total) | el modelo fluido sobrestima la energía devuelta en toda la fuga por cizalla |
 | más allá de 27,5° | ninguna se propaga | 1, con una fase | 1, con una fase *distinta* | reflexión total en ambos casos; la diferencia de fase es aquello a lo que se engancha una onda de Scholte |
@@ -673,7 +673,7 @@ elástica en agua es exactamente la capa fluida de tres medios de B&G §2.4:
 su transmisión sigue la forma cerrada de la Ec. 2.4.14, que se reduce a la
 conocida ley de masas para placas delgadas y bajas frecuencias y predice
 **transmisión total** en las resonancias de espesor de media onda
-$f_n = n c_P / (2 h)$ (Ec. 2.4.19). Para una placa de acero de 10 mm esa
+$f_n = n c_\mathrm{P} / (2 h)$ (Ec. 2.4.19). Para una placa de acero de 10 mm esa
 primera resonancia cae en 295 kHz, y una sola ejecución FDTD de banda ancha
 reproduce toda la curva: 5,8 dB a 10 kHz (donde
 `mass_law_transmission_loss` con agua como fluido ambiente coincide con la
@@ -705,7 +705,7 @@ ecos durante todo el registro, así que no necesita puerta alguna. Después,
 $\mathrm{TL}(f) = 20\log_{10}|I(f)/T(f)|$ a partir de los dos espectros de
 magnitud. Dos comprobaciones que el lector puede hacer sobre su propia
 placa: el valor a 10 kHz frente a `mass_law_transmission_loss` con agua como
-fluido ambiente, y el mínimo frente a $f_n = n\,c_P/(2h)$. Esa misma lógica
+fluido ambiente, y el mínimo frente a $f_n = n\,c_\mathrm{P}/(2h)$. Esa misma lógica
 de ventana temporal es la que aplica una medición in situ de ISO 13472-1 con
 una ventana de Adrienne, así que el truco se traslada tal cual a un banco
 real.
@@ -721,17 +721,17 @@ media onda es el principio en que se basan la medida ultrasónica de
 espesores y la elección de las capas de acoplamiento de los transductores, y
 por eso la validación lleva la placa a propósito hasta los centenares de
 kilohercios. La frecuencia donde se encuentran los dos regímenes es una
-divisoria válida para cualquier placa: $c_P/(2h)$, que vale 295 kHz para
+divisoria válida para cualquier placa: $c_\mathrm{P}/(2h)$, que vale 295 kHz para
 10 mm de acero y 59 kHz para 50 mm del mismo.
 
 A incidencia oblicua la física de la placa se enriquece, y el clip de abajo es
 este mismo esquema excitando la misma placa de acero de 10 mm, ahora tendida en
 aire, con una onda plana sostenida que llega a 45°. Los dos paneles se
-diferencian en **un solo número**: la frecuencia de excitación, $f_c/2 = 603$ Hz
-a la izquierda y $2 f_c = 2413$ Hz a la derecha, a un lado y otro de la
+diferencian en **un solo número**: la frecuencia de excitación, $f_\mathrm{c}/2 = 603$ Hz
+a la izquierda y $2 f_\mathrm{c} = 2413$ Hz a la derecha, a un lado y otro de la
 frecuencia de coincidencia de 1206 Hz que la biblioteca calcula con los mismos
 $m''$ y $B'$ usados más arriba. Todo lo demás (la placa, el ángulo, la malla y
-la escala de color) se mantiene fijo. Por debajo de $f_c$ la placa refleja casi
+la escala de color) se mantiene fijo. Por debajo de $f_\mathrm{c}$ la placa refleja casi
 todo y el nivel transmitido cae sobre la ley de masas oblicua; por encima, la
 longitud de onda de traza acústica coincide con la longitud de onda de flexión
 libre, la placa rerradia un haz a 45° que crece a lo largo del tramo iluminado y

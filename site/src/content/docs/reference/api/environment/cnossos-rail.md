@@ -16,10 +16,10 @@ one of the two heights and contributes a directional sound power per metre of
 line
 
 $$
-L'_{W,eq,line,i}(\psi,\phi) = L_{W,0,dir,i}(\psi,\phi) + 10 \log_{10}\left( \frac{Q}{1000 v} \right) \tag{2.3.2}
+L'_{W,\mathrm{eq,line},i}(\psi,\phi) = L_{W,0,\mathrm{dir},i}(\psi,\phi) + 10 \log_{10}\left( \frac{Q}{1000 v} \right) \tag{2.3.2}
 $$
 
-for a running train, or $+\, 10 \log_{10}(T_{idle} / (T_{ref} L))$ (2.3.4)
+for a running train, or $+\, 10 \log_{10}(T_\mathrm{idle} / (T_\mathrm{ref} L))$ (2.3.4)
 for an idling
 one. This module implements the whole of 2.3 together with the coefficient
 database of Appendix G, in the twenty-four 1/3-octave bands from 50 Hz to
@@ -289,7 +289,7 @@ impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]
 
 Impact roughness `L_R,IMPACT,i` of (2.3.12), in dB.
 
-$L_{R,IMPACT,i} = L_{R,\text{IMPACT-SINGLE},i} + 10 \log_{10}(n_l/0.01)$, so at the
+$L_{\mathrm{R,IMPACT},i} = L_{\mathrm{R,IMPACT-SINGLE},i} + 10 \log_{10}(n_l/0.01)$, so at the
 tabulated density of one joint per 100 m the table is returned verbatim.
 
 **Parameters**
@@ -592,7 +592,7 @@ rolling_sound_power(
 
 One rolling-noise component of (2.3.8) to (2.3.10), in dB.
 
-$L_{W,0,i} = L_{R,TOT,i} + L_{H,i} + 10 \log_{10}(N_a)$: the same
+$L_{W,0,i} = L_{\mathrm{R,TOT},i} + L_{H,i} + 10 \log_{10}(N_\mathrm{a})$: the same
 addition serves the
 track, the wheel and the freight superstructure, each with its own transfer
 function. All three sit at source A.
@@ -725,7 +725,7 @@ Superstructure transfer `L_H,VEH,SUP,i` of Table G-3c, in dB per axle.
 
 Only one superstructure is tabulated, the "EU standard" of vehicle type
 `a` (freight), and it is 0.0 dB in every band, so (2.3.10) reduces to
-$L_{R,TOT,i} + 10 \log_{10}(N_a)$. The contribution is considered
+$L_{\mathrm{R,TOT},i} + 10 \log_{10}(N_\mathrm{a})$. The contribution is considered
 for freight wagons only.
 
 **Returns:** The 24 1/3-octave values, all zero.
@@ -742,7 +742,7 @@ total_effective_roughness(
 
 Total effective roughness `L_R,TOT,i` of (2.3.7), in dB.
 
-$L_{R,TOT,i} = 10 \log_{10}(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}) + A_{3,i}$. All
+$L_{\mathrm{R,TOT},i} = 10 \log_{10}(10^{L_{\mathrm{r,TR},i}/10} + 10^{L_{\mathrm{r,VEH},i}/10}) + A_{3,i}$. All
 three spectra must already be on the frequency grid, that is resampled with
 [`roughness_to_frequency`](/phonometry/reference/api/environment/cnossos-rail/#roughness_to_frequency) at the speed of interest.
 
@@ -876,7 +876,7 @@ Traction sound power per vehicle of Table G-5, in dB.
 
 Because the Directive models only constant speed and idling and takes the
 source strength at maximum load,
-$L_{W,0,const,i} = L_{W,0,idling,i}$, so this
+$L_{W,0,\mathrm{const},i} = L_{W,0,\mathrm{idling},i}$, so this
 one table serves both running conditions.
 
 **Parameters**

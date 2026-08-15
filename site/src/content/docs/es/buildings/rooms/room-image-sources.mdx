@@ -485,7 +485,7 @@ $$
 
 con el factor de directividad de la fuente $Q$ (1 omnidireccional, 2 sobre un
 suelo duro, 4 en una arista, 8 en una esquina). Los dos términos se cruzan en la
-**distancia crítica** $r_c = \sqrt{Q R / 16\pi}$: más cerca que $r_c$ domina el
+**distancia crítica** $r_\mathrm{c} = \sqrt{Q R / 16\pi}$: más cerca que $r_\mathrm{c}$ domina el
 campo directo y duplicar la distancia baja el nivel 6 dB; más lejos manda el
 campo reverberante y alejarse apenas ayuda.
 
@@ -502,7 +502,7 @@ $A = S\bar\alpha$, y la diferencia se desvanece cuando $\bar\alpha \to 0$, que e
 la razón de que el módulo prefiera $R$ y de que el $A/16\pi$ de Kuttruff coincida
 con él en una sala viva.
 
-Dónde se monta una fuente no es un detalle, porque $Q$ mueve $r_c$ como
+Dónde se monta una fuente no es un detalle, porque $Q$ mueve $r_\mathrm{c}$ como
 $\sqrt{Q}$: la misma máquina tiene una distancia crítica de 1,11 m sobre un
 soporte y de 3,14 m en la esquina del mismo taller. La lámina de abajo fija los
 cuatro valores a montajes reales.
@@ -532,12 +532,12 @@ Para una sala que merece dibujarse — un taller de 12 × 8 × 4 m, $S$ = 352 m�
 $\bar\alpha$ = 0,15, así que $R$ = 62 m² —, `SteadyFieldResult.plot()` dibuja los
 niveles directo, reverberante y total frente a la distancia con la distancia
 crítica marcada: la curva total sigue el campo directo $1/r^2$ cerca de la fuente
-y se aplana en la meseta reverberante más allá de $r_c$ = 1,11 m.
+y se aplana en la meseta reverberante más allá de $r_\mathrm{c}$ = 1,11 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_es.svg" alt="Campo estacionario de sala de una fuente de 90 dB en un taller con constante de sala de 62 metros cuadrados: el nivel de presión acústica total sigue el campo directo de 6 dB por duplicación cerca de la fuente, cruza la meseta reverberante constante en la distancia crítica de 1,11 m y se aplana sobre ella más allá" width="80%" />
 
 *Una fuente de 90 dB re 1 pW en un taller de 12 x 8 x 4 m con absorción
-media de 0,15: dentro de $r_c = 1{,}11$ m alejarse baja el nivel 6 dB por
+media de 0,15: dentro de $r_\mathrm{c} = 1{,}11$ m alejarse baja el nivel 6 dB por
 duplicación; más allá manda la meseta reverberante y solo la absorción, no
 la distancia, baja el nivel (Bies 5.ª ed., §6.4).*
 
@@ -577,13 +577,13 @@ plt.show()
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_directivity_es.svg" alt="Panel izquierdo, el nivel estacionario total frente a la distancia en un taller de 12 por 8 por 4 metros para factores de directividad de fuente de 1, 2, 4 y 8: las cuatro curvas comparten una misma meseta reverberante lejos de la fuente y se separan cerca de ella, con la distancia crítica marcada desplazándose de 1,11 a 3,14 metros como la raíz cuadrada de Q. Panel derecho, la misma sala con Q fijo en 2 y la absorción media escalonada en 0,05, 0,15 y 0,35: la meseta baja con la absorción mientras que la asíntota de campo directo cerca de la fuente no se mueve" width="92%" />
 
 *Izquierda: $Q$ mueve el cruce, no la meseta. Duplicar $Q$ sube el campo directo
-3 dB y empuja $r_c$ hacia fuera un factor $\sqrt{2}$, pero el nivel reverberante
+3 dB y empuja $r_\mathrm{c}$ hacia fuera un factor $\sqrt{2}$, pero el nivel reverberante
 lejos de la fuente es idéntico en las cuatro curvas, porque $Q$ nunca entra en el
 término $4/R$. Derecha: la absorción hace lo contrario. Escalonar $\bar\alpha$ de
 0,05 a 0,35 lleva la constante de sala de 18,5 m² a 189,5 m² y la meseta de
 83,3 dB a 73,2 dB — 10,1 dB, exactamente $10\lg(R_2/R_1)$ — mientras que la
 asíntota de campo cercano no se mueve. Ese es el contenido preciso de «más allá de
-$r_c$ solo la absorción, y no la distancia, baja el nivel», y son siete veces más
+$r_\mathrm{c}$ solo la absorción, y no la distancia, baja el nivel», y son siete veces más
 absorción para 10 dB.*
 
 <details>
@@ -665,17 +665,17 @@ previsto, así que este modelo sobrestima el nivel lejos de la fuente, subestima
 beneficio de la distancia, y el cruce se lee mejor como una referencia de orden de
 magnitud que como una frontera.
 
-La distancia de reverberación de Kuttruff ($r_c = \sqrt{A/16\pi}$ para $Q = 1$)
+La distancia de reverberación de Kuttruff ($r_\mathrm{c} = \sqrt{A/16\pi}$ para $Q = 1$)
 usa el área de absorción de Sabine $A = S\bar\alpha$ en lugar de la constante de
 sala $R = A/(1-\bar\alpha)$; ambas coinciden para $\bar\alpha$ pequeño, y este
-módulo usa $R$ de modo que $r_c$ es exactamente el cruce de su propio
+módulo usa $R$ de modo que $r_\mathrm{c}$ es exactamente el cruce de su propio
 `steady_state_spl`. Pasa `characteristic_impedance=rho_c` para añadir el término
 $10\log_{10}(\rho c / 400)$ de Bies (unos +0,14 dB a 20 °C).
 
 **Dónde se difumina la estadística.** La **frecuencia de Schroeder**
-$f_s = 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s) marca aproximadamente la transición
+$f_\mathrm{s} = 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s) marca aproximadamente la transición
 modal-a-difuso, un cruce heurístico y no un corte abrupto: bastante por debajo
-dominan los modos discretos y los supuestos difusos de $R$ y $r_c$ pierden
+dominan los modos discretos y los supuestos difusos de $R$ y $r_\mathrm{c}$ pierden
 fiabilidad, bastante por encima los modos se solapan y esta imagen estadística
 se cumple. En salas límite conviene comprobar banda a banda.
 
@@ -687,12 +687,12 @@ se deriva en el §3, que crece con el cuadrado de la frecuencia, así que el
 solapamiento se vuelve inevitable por encima de cierta frecuencia. Pide
 aproximadamente tres modos dentro de una anchura de banda — impón
 $3 \approx (2,2/T)\,(4\pi V f^2/c_0^3)$ — y despejar $f$ da
-$f_s \approx 2000\sqrt{T/V}$ con $c_0 \approx 343$ m/s. De ahí salen tres cosas.
+$f_\mathrm{s} \approx 2000\sqrt{T/V}$ con $c_0 \approx 343$ m/s. De ahí salen tres cosas.
 La constante codifica una *elección* de cuánto solapamiento cuenta como difuso,
 así que los autores más estrictos citan 4000 para la misma física. Una sala grande
 alcanza la transición a una frecuencia más baja simplemente porque tiene más modos
 a cualquier frecuencia. Y la transición es suave, así que una banda que quede a
-caballo de $f_s$ debe comprobarse posición a posición en lugar de darse por buena.
+caballo de $f_\mathrm{s}$ debe comprobarse posición a posición en lugar de darse por buena.
 La figura de la escalera de modos del §3 muestra el cruce directamente: su
 densidad modal supera un modo por hercio justo alrededor de la frecuencia de
 Schroeder marcada.

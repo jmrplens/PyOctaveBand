@@ -114,14 +114,14 @@ Rolling noise is the wheel and the rail exciting each other through the
 roughness of the two running surfaces. The method separates the cause from the
 radiation:
 
-- **cause**: the rail roughness $L_{r,TR}$ (Table G-1b, selected by digit 2 of
-  the track descriptor) and the wheel roughness $L_{r,VEH}$ (Table G-1a,
+- **cause**: the rail roughness $L_\mathrm{r,TR}$ (Table G-1b, selected by digit 2 of
+  the track descriptor) and the wheel roughness $L_\mathrm{r,VEH}$ (Table G-1a,
   selected by the brake type, digit 3 of the vehicle descriptor), energy-summed
   and then filtered by the **contact filter** $A_3$ (Table G-2), which accounts
   for the finite size of the contact patch:
 
 $$
-L_{R,\mathrm{TOT},i} = 10\,\log_{10}\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
+L_{\mathrm{R,TOT},i} = 10\,\log_{10}\!\left(10^{L_{\mathrm{r,TR},i}/10} + 10^{L_{\mathrm{r,VEH},i}/10}\right) + A_{3,i};
 $$
 
 - **radiation**: three speed-independent transfer functions turn that roughness
@@ -131,7 +131,7 @@ $$
   (Table G-3c, which is 0,0 dB in every band):
 
 $$
-L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\log_{10} N_a,
+L_{W,0,\mathrm{TR},i} = L_{\mathrm{R,TOT},i} + L_{H,\mathrm{TR},i} + 10\,\log_{10} N_\mathrm{a},
 $$
 
 and the same addition for the wheel and the superstructure. The three
@@ -226,7 +226,7 @@ applied (2.3.11). Table G-4 is given for one joint per 100 m, and any other
 density scales it (2.3.12):
 
 $$
-L_{R,\mathrm{IMPACT},i} = L_{R,\mathrm{IMPACT-SINGLE},i}
+L_{\mathrm{R,IMPACT},i} = L_{\mathrm{R,IMPACT-SINGLE},i}
   + 10\,\log_{10}\!\left(\frac{n_l}{0{,}01}\right).
 $$
 
@@ -301,7 +301,7 @@ for $\psi \le 0$:
 $$
 \Delta L_{W,\mathrm{dir,ver},i} = \frac{40}{3}
   \left[\tfrac{2}{3}\sin 2\psi - \sin\psi\right]
-  \log_{10}\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
+  \log_{10}\!\left(\frac{f_{\mathrm{c},i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
 $$
 
 and zero elsewhere. The two editions disagree over the whole lower half space,
@@ -335,8 +335,8 @@ rolling-noise component but with the bridge transfer function of Table G-7
 (2.3.18):
 
 $$
-L_{W,0,\mathrm{bridge},i} = L_{R,\mathrm{TOT},i} + L_{H,\mathrm{bridge},i}
-  + 10\,\log_{10} N_a.
+L_{W,0,\mathrm{bridge},i} = L_{\mathrm{R,TOT},i} + L_{H,\mathrm{bridge},i}
+  + 10\,\log_{10} N_\mathrm{a}.
 $$
 
 The rolling noise of the vehicle on the bridge is still computed normally, with
@@ -437,7 +437,7 @@ such as depots, stations and loudspeakers, are treated by the industrial method.
 - [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the
   ISO 9613-2 chain that carries a source power to a receiver.
 - [Environmental noise levels](../assessment/environmental-levels.md): the
-  $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
+  $L_\mathrm{den}$ and $L_\mathrm{night}$ indicators the resulting maps are drawn for.
 
 ## References
 

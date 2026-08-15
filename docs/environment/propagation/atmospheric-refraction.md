@@ -16,7 +16,7 @@ Renterghem, *Predicting Outdoor Sound* 2e (2021, Ch. 11).
 
 Whether refraction matters is mostly a question of range. A representative
 surface-layer gradient of ±0.1 s⁻¹ curves rays with a radius
-$R_c = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
+$R_\mathrm{c} = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
 sensibly straight and the homogeneous models above are accurate. Beyond a few
 hundred metres the geometry takes over: downwind, or under a nocturnal
 temperature inversion, the downward-curved rays close over the ground and hold
@@ -26,7 +26,7 @@ same wind profile opens an acoustic shadow into which the level collapses by
 familiar upwind/downwind asymmetry of any steady outdoor source: the same
 machine at the same distance, tens of decibels apart depending on which side
 you stand. It is also why ISO 9613-2 fixes its "favourable" downwind
-atmosphere by decree, and what its scalar $C_{met}$ compresses; the models on
+atmosphere by decree, and what its scalar $C_\mathrm{met}$ compresses; the models on
 this page compute the physics that decides both.
 
 The sketch below puts both sides in one scene: one source, a receiver 350 m
@@ -187,25 +187,25 @@ For a **linear** profile every ray is an exact **circular arc**. Its radius of
 curvature is (Salomons Sec. 4.4; Attenborough Ch. 11):
 
 $$
-R_c = \frac{1}{|g|\,\xi}, \qquad \xi = \frac{\cos\theta_0}{c(\text{launch})},
+R_\mathrm{c} = \frac{1}{|g|\,\xi}, \qquad \xi = \frac{\cos\theta_0}{c(\text{launch})},
 \qquad\Rightarrow\qquad
-R_c = \frac{c_0}{|g|\cos\theta_0},
+R_\mathrm{c} = \frac{c_0}{|g|\cos\theta_0},
 $$
 
 exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
-downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
+downward refraction turns at the height $R_\mathrm{c}(1 - \cos\theta_0)$. For an
 **upward-refracting**
 linear profile the ground-grazing ray bounds a region beyond which no direct or
 once-reflected ray arrives, at the closed-form **shadow-zone distance**
 (`shadow_zone_distance`):
 
 $$
-x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
-\qquad R_c = \frac{c_0}{|g|}.
+x_\text{shadow} = \sqrt{2 R_\mathrm{c}}\left(\sqrt{h_\mathrm{s}} + \sqrt{h_\mathrm{r}}\right),
+\qquad R_\mathrm{c} = \frac{c_0}{|g|}.
 $$
 
 These closed forms are the exact oracle for the ray tracer: a circle fit of a
-traced ray recovers $R_c$ to machine precision.
+traced ray recovers $R_\mathrm{c}$ to machine precision.
 
 ## 3. Parabolic equation (Green's Function PE)
 
@@ -323,7 +323,7 @@ The models are anchored by independent oracles:
   over a rigid ground.
 - **Exact ray geometry.** For a linear profile the traced ray is a circular arc
   whose fitted radius matches the closed-form `ray_curvature_radius` to machine
-  precision, and the turning height matches $R_c(1 - \cos\theta_0)$.
+  precision, and the turning height matches $R_\mathrm{c}(1 - \cos\theta_0)$.
 - **Reciprocity.** Swapping the source and receiver heights leaves the PE level.
 - **Shadow zone.** Over an upward-refracting profile the PE level collapses far
   inside the closed-form shadow distance.

@@ -24,15 +24,15 @@ absorption. Their difference is the speech-to-noise ratio (Equation (17.52)):
 
 .. math::
 
-   L_{SN} = 10 \log_{10}\!\left[ \frac{Q}{4 \pi r^2} \right]
+   L_\mathrm{SN} = 10 \log_{10}\!\left[ \frac{Q}{4 \pi r^2} \right]
    + 10 \log_{10}\!\left[ \frac{A_{\text{tab}}}{4} \right]
 
 which is independent of the talker's power and of the number of talkers: adding
 a table adds both a talker and its share of absorption. What decides whether a
 restaurant works is therefore the *absorption per table*, not its total
-absorption. Requiring :math:`L_{SN} > -6` dB for adequate cross-table
+absorption. Requiring :math:`L_\mathrm{SN} > -6` dB for adequate cross-table
 communication
-at a separation ``rs``, and :math:`L_{SN} < -9` dB for privacy between tables
+at a separation ``rs``, and :math:`L_\mathrm{SN} < -9` dB for privacy between tables
 a distance ``rt`` apart, turns into a pair of design bounds
 (Equations (17.53) and (17.54)):
 
@@ -174,7 +174,7 @@ def speech_to_noise_ratio(
 ) -> np.ndarray | float:
     r"""Speech-to-noise ratio across a table (Long Equation (17.52)).
 
-    :math:`L_{SN} = 10 \log_{10}[Q / (4 \pi r^2)]
+    :math:`L_\mathrm{SN} = 10 \log_{10}[Q / (4 \pi r^2)]
     + 10 \log_{10}[A_{\text{tab}} / 4]`, the difference
     between Equations (17.50) and (17.51). Neither the talker's power nor the
     number of talkers appears: a busier room brings its own absorption with it.
@@ -203,8 +203,8 @@ def absorption_per_table(
 ) -> np.ndarray | float:
     r"""Absorption per table giving a chosen ``L_SN`` (inverse of (17.52)).
 
-    :math:`A_{\text{tab}} = 16 \pi r^2\, 10^{L_{SN}/10} / Q`. With
-    :math:`L_{SN} = -6` dB this is
+    :math:`A_{\text{tab}} = 16 \pi r^2\, 10^{L_\mathrm{SN}/10} / Q`. With
+    :math:`L_\mathrm{SN} = -6` dB this is
     Long's communication bound (Equation (17.53)), with ``-9 dB`` his privacy
     bound (Equation (17.54)).
 

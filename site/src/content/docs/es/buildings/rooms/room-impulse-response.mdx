@@ -229,10 +229,10 @@ sensibilidad a los cambios del entorno, y un único barrido largo no.
 6.2.2.2 es normativo al respecto (ec. (10)): el periodo de repetición **no debe
 ser más corto que $T$**, de modo que caigan al menos dos líneas espectrales dentro
 del ancho de banda de cualquier modo de la sala. Como el periodo de una secuencia
-de orden $N$ es $(2^N-1)/f_s$, eso fija el orden:
+de orden $N$ es $(2^N-1)/f_\mathrm{s}$, eso fija el orden:
 
 $$
-N \geq \frac{\lg\!\left(T f_s + 1\right)}{\lg 2} .
+N \geq \frac{\lg\!\left(T f_\mathrm{s} + 1\right)}{\lg 2} .
 $$
 
 A 48 kHz, el orden 16 da 1,37 s y el orden 18 da 5,46 s, y una sala con
@@ -444,7 +444,7 @@ un filtro lineal fijo cambia la forma de la parte temprana pero no la pendiente
 del decaimiento de la banda, que es la razón de que los tiempos de reverberación
 sean transferibles entre sistemas de medición. Para los parámetros de energía no
 lo es: la caída de la fuente en baja frecuencia y su directividad en alta
-redistribuyen la energía temprana y desplazan C50, C80 y $T_s$, así que esos **no**
+redistribuyen la energía temprana y desplazan C50, C80 y $T_\mathrm{s}$, así que esos **no**
 son transferibles. De ahí se siguen dos consecuencias. Declara la fuente empleada
 siempre que indiques claridad o tiempo central; y elimina la respuesta en campo
 libre de la cadena antes de auralizar la respuesta o de compararla entre sistemas.
@@ -585,7 +585,7 @@ Cuatro errores de colocación sesgan la propia media:
 - **Demasiado cerca de la fuente.** Dentro del campo directo el EDT se
   desploma y el C80 se satura hacia arriba haga lo que haga la sala. La
   ISO 3382-2 mantiene por ello cada micrófono al menos a
-  $d_{min} = 2\sqrt{V/(c\,\hat T)}$ de la fuente, con $\hat T$ una
+  $d_\mathrm{min} = 2\sqrt{V/(c\,\hat T)}$ de la fuente, con $\hat T$ una
   estimación del tiempo de reverberación esperado (2,0 m para la sala de
   10 × 6 × 3,5 m de los dibujos de arriba, V = 210 m³, con 0,6 s esperados).
 - **La lotería de baja frecuencia.** Por debajo de la frecuencia de
@@ -601,7 +601,7 @@ resultado:
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/source_distance_bias_es.svg" alt="Dos paneles apilados que comparten un eje de distancia fuente-receptor de 0,6 a 7 metros, en la misma sala de 10 por 6 por 3,5 metros de los dibujos de configuración. Arriba, el T30 medio de 500 a 1000 Hz se mantiene entre 0,54 y 0,66 segundos a lo largo de todo el barrido mientras el EDT sube de 0,18 a unos 0,45 segundos; abajo, la claridad C80 baja de 17,5 a unos 10,5 decibelios. La región interior a d_min = 2,0 metros aparece sombreada como excluida y la distancia crítica de 1,5 metros está marcada con una línea de puntos" width="90%" />
 
 *EDT, T30 y C80 de la sala de arriba frente a la distancia a la fuente, a partir
-de respuestas al impulso sintéticas. Dentro de $d_{min}$, el EDT es corto por un
+de respuestas al impulso sintéticas. Dentro de $d_\mathrm{min}$, el EDT es corto por un
 factor de aproximadamente 2,5 y el C80 sale 7 dB alto — muchas veces la diferencia
 apenas perceptible del 5 % relativo y de 1 dB de la Tabla A.1 de la ISO 3382-1 —
 mientras que el T30 fluctúa 0,12 s a lo largo de todo el barrido sin tendencia en

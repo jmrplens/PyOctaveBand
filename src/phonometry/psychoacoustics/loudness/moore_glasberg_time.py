@@ -420,8 +420,8 @@ def _specific_loudness(excitation: np.ndarray) -> np.ndarray:
 
     Applies the compressive transformation of Formulae (7)-(9) with the
     ISO 532-3 constants (:math:`C = 0.063`, Tables 2-4,
-    :math:`E_{THRQ}/E_0 = 2.307` for
-    fc >= 500 Hz): the near-threshold Formula (8) below :math:`E_{THRQ}/E_0`
+    :math:`E_\mathrm{THRQ}/E_0 = 2.307` for
+    fc >= 500 Hz): the near-threshold Formula (8) below :math:`E_\mathrm{THRQ}/E_0`
     and the high-level Formula (9) above :math:`E/E_0 = 10^{10}`.
     """
     n_spec = np.zeros(_FC_GRID.size, dtype=np.float64)

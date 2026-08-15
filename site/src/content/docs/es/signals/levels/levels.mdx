@@ -42,9 +42,9 @@ Una medición de ruido rara vez termina en una forma de onda: termina en un
 puñado de números únicos que se pueden contrastar con un límite, un
 reglamento o un informe. Esta página es esa cadena de reducción, calculada
 directamente sobre la señal calibrada en pascales y no sobre lecturas de un
-sonómetro: el nivel continuo equivalente $L_{eq}$/$L_{Aeq}$, los niveles
-percentiles $L_N$, las medidas de sucesos y de pico ($L_{AE}$/SEL,
-$L_{Cpeak}$) y la dosis de ruido de IEC 61252. Trabajar desde la señal
+sonómetro: el nivel continuo equivalente $L_\mathrm{eq}$/$L_\mathrm{Aeq}$, los niveles
+percentiles $L_N$, las medidas de sucesos y de pico ($L_{\mathrm{A}E}$/SEL,
+$L_\mathrm{Cpeak}$) y la dosis de ruido de IEC 61252. Trabajar desde la señal
 significa aplicar cada definición (una integral, un percentil, una suma de
 energías) de forma exacta, sin aproximaciones de detector ni de pantalla
 por medio.
@@ -53,29 +53,29 @@ Qué descriptor encaja con qué pregunta sigue las familias de magnitudes de
 ISO 1996-1 (BS 7445-1 es la guía de práctica de medición sobre esa misma
 elección, y Bies, Hansen y Howard 2017, §2.5 las repasa en paralelo):
 
-- **Exposición acumulada en un intervalo**: $L_{eq}$/$L_{Aeq}$, la media
+- **Exposición acumulada en un intervalo**: $L_\mathrm{eq}$/$L_\mathrm{Aeq}$, la media
   energética. Responde a «cuánto sonido llegó en total», sin importar cómo
   se repartió en el tiempo.
 - **Cómo se distribuyó el nivel fluctuante**: los percentiles $L_N$:
   $L_{90}$ como nivel de fondo, $L_{10}$ como indicador de intrusión de
-  tráfico, $L_{50}$ como mediana. Dos señales con el mismo $L_{Aeq}$ pueden
+  tráfico, $L_{50}$ como mediana. Dos señales con el mismo $L_\mathrm{Aeq}$ pueden
   tener dispersiones $L_{10} - L_{90}$ muy distintas.
 - **El instante más ruidoso del intervalo**: el nivel máximo con ponderación
-  temporal $L_{AFmax}$ o $L_{ASmax}$, que nombra su propia balística porque las
+  temporal $L_\mathrm{AFmax}$ o $L_\mathrm{ASmax}$, que nombra su propia balística porque las
   dos difieren sobre un mismo evento.
 - **Sucesos aislados de duraciones distintas, comparados con justicia**:
   SEL, toda la energía del suceso normalizada a un segundo.
-- **Cribado de riesgo auditivo**: $L_{Cpeak}$ y las medidas de dosis, que
+- **Cribado de riesgo auditivo**: $L_\mathrm{Cpeak}$ y las medidas de dosis, que
   alimentan el flujo laboral de
   [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/).
-- **Molestia comunitaria a largo plazo**: $L_{den}$/$L_{dn}$ y los niveles
+- **Molestia comunitaria a largo plazo**: $L_\mathrm{den}$/$L_\mathrm{dn}$ y los niveles
   de evaluación de ISO 1996-1, que penalizan la energía de tarde y noche
   antes de promediar el día: el asunto de
   [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
 
 Conviene mantener nítidas dos fronteras con las páginas hermanas. Las
 métricas integradas de esta página evitan deliberadamente el detector
-exponencial: $L_{eq}$ y SEL no tienen constante de tiempo, y las balísticas
+exponencial: $L_\mathrm{eq}$ y SEL no tienen constante de tiempo, y las balísticas
 Fast/Slow solo entran por los niveles percentiles, definidos sobre la traza
 de nivel con ponderación temporal (ver
 [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/)). Y todo lo
@@ -89,10 +89,10 @@ El nivel continuo equivalente integra la presión al cuadrado durante el tiempo
 de medición:
 
 $$
-L_{eq} = 10\log_{10}\left(\frac{1}{T}\int_0^T \frac{p^2(t)}{p_0^2}\ dt\right) \text{ dB}, \qquad p_0 = 20\ \mu\text{Pa}
+L_\mathrm{eq} = 10\log_{10}\left(\frac{1}{T}\int_0^T \frac{p^2(t)}{p_0^2}\ dt\right) \text{ dB}, \qquad p_0 = 20\ \mu\text{Pa}
 $$
 
-y $L_{Aeq}$ es la misma integral tras ponderar A la señal. $L_N$ es el nivel
+y $L_\mathrm{Aeq}$ es la misma integral tras ponderar A la señal. $L_N$ es el nivel
 superado el $N\ \%$ del tiempo: el percentil $(100-N)$ de la distribución del
 nivel con ponderación temporal.
 
@@ -118,8 +118,8 @@ análisis digital a fondo de escala (la calibración no se aplica en modo dBFS).
 
 ¿Por qué la media *energética* y no la media aritmética de los valores en dB?
 Porque las dosis sonoras se suman como energía: dos periodos a 60 dB y 80 dB no
-promedian 70 dB; la mitad a 80 dB domina y $L_{eq} = 77$ dB. Promediar
-decibelios directamente subestima cualquier ruido fluctuante. $L_{eq}$ es el
+promedian 70 dB; la mitad a 80 dB domina y $L_\mathrm{eq} = 77$ dB. Promediar
+decibelios directamente subestima cualquier ruido fluctuante. $L_\mathrm{eq}$ es el
 nivel del sonido *estacionario* que transporta la misma energía que el real,
 fluctuante, y por eso las normativas se redactan en términos de él.
 
@@ -267,12 +267,12 @@ que las normativas siempre indican la ponderación temporal.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/level_distribution_es.svg" alt="Panel izquierdo: dos historiales de nivel Fast a lo largo de sesenta segundos que comparten una misma línea de LAeq en 61 dB, un ruido estacionario de tipo tráfico que oscila entre 55 y 66 dB y un fondo plano de 53 dB interrumpido por tres eventos breves de 78 dB. Panel derecho: sus curvas de excedencia, nivel frente a porcentaje del tiempo superado, con L10, L50 y L90 marcados en cada una. La curva del ruido estacionario cae suavemente de 66 a 55 dB en todo el rango, mientras que la de los eventos se mantiene plana en 53 dB a partir de un 6 % y solo sube con fuerza en sus primeros puntos porcentuales, y las dos anotaciones indican L10 menos L90 de 8,0 dB frente a 0,5 dB, y LAeq menos L50 de 1,7 dB frente a 7,6 dB" width="88%" />
 
-*El mismo $L_{Aeq}$, dos ruidos opuestos. El estacionario tiene la dispersión
-percentil ancha y un $L_{eq}$ que queda justo por encima de su mediana; el que
+*El mismo $L_\mathrm{Aeq}$, dos ruidos opuestos. El estacionario tiene la dispersión
+percentil ancha y un $L_\mathrm{eq}$ que queda justo por encima de su mediana; el que
 sostienen tres eventos breves casi no tiene dispersión percentil — los eventos
 ocupan el 4 % del registro, así que ningún percentil por debajo de $L_{10}$
-puede verlos — y tiene un $L_{eq}$ 7,6 dB por encima de la mediana. Los
-percentiles leen la forma de la distribución; el $L_{eq}$ lee solo su energía.*
+puede verlos — y tiene un $L_\mathrm{eq}$ 7,6 dB por encima de la mediana. Los
+percentiles leen la forma de la distribución; el $L_\mathrm{eq}$ lee solo su energía.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -312,30 +312,30 @@ plt.show()
 
 </details>
 
-$L_{eq}$ y la familia $L_N$ responden preguntas distintas sobre el mismo
-historial de niveles. $L_{eq}$ es una media energética, así que los momentos más
-ruidosos la dominan: un solo segundo a 100 dB eleva el $L_{eq}$ de una hora
+$L_\mathrm{eq}$ y la familia $L_N$ responden preguntas distintas sobre el mismo
+historial de niveles. $L_\mathrm{eq}$ es una media energética, así que los momentos más
+ruidosos la dominan: un solo segundo a 100 dB eleva el $L_\mathrm{eq}$ de una hora
 por lo demás estable a 60 dB hasta unos 66 dB, mientras que $L_{90}$,
 $L_{50}$ e incluso $L_{10}$ apenas se mueven (un evento de un segundo ocupa
 mucho menos del 10 % de la hora). Los percentiles son estadísticos de rango,
 robustos frente a eventos raros por construcción. En la práctica:
 
-- **$L_{eq}$ (y $L_{Aeq}$)** es la métrica de dosis: las normativas, la
+- **$L_\mathrm{eq}$ (y $L_\mathrm{Aeq}$)** es la métrica de dosis: las normativas, la
   exposición y los modelos de molestia se escriben con ella precisamente
   *porque* se niega a ignorar los eventos ruidosos raros.
 - **$L_{90}$** estima el nivel residual (de fondo) bajo una fuente
   intermitente, que es como lo usa el Anexo I de ISO 1996-2.
 - **$L_{10}$** sigue los picos de los eventos; la separación
   $L_{10} - L_{90}$ es un indicador rápido de intermitencia.
-- **$L_{eq} - L_{50}$** mide lo «picudo» que es el historial: en ruido
+- **$L_\mathrm{eq} - L_{50}$** mide lo «picudo» que es el historial: en ruido
   estacionario casi coinciden, y cuanto más fluctúa el nivel más sube
-  $L_{eq}$ por encima de la mediana (para una distribución gaussiana de
+  $L_\mathrm{eq}$ por encima de la mediana (para una distribución gaussiana de
   niveles con desviación típica $\sigma$ dB,
-  $L_{eq} \approx L_{50} + 0{,}115\,\sigma^2$).
+  $L_\mathrm{eq} \approx L_{50} + 0{,}115\,\sigma^2$).
 
 Una precaución: los percentiles no se combinan. Dos horas con $L_{90}$
 conocidos no dan el $L_{90}$ de las dos horas con ninguna fórmula;
-recalcúlalo sobre la envolvente conjunta. Los valores de $L_{eq}$, en cambio,
+recalcúlalo sobre la envolvente conjunta. Los valores de $L_\mathrm{eq}$, en cambio,
 se combinan exactamente promediando energías ponderadas por el tiempo, que es
 lo que hace el `composite_rating_level` de
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
@@ -353,7 +353,7 @@ lo que hace el `composite_rating_level` de
 
 ## Nivel máximo con ponderación temporal (LAFmax, LASmax)
 
-Junto al $L_{eq}$, la mayoría de los informes de ruido llevan el mayor nivel que
+Junto al $L_\mathrm{eq}$, la mayoría de los informes de ruido llevan el mayor nivel que
 alcanzó la aguja del sonómetro: el **nivel máximo con ponderación temporal**, el
 mayor valor que alcanza el nivel ponderado en frecuencia y en tiempo dentro del
 intervalo declarado (IEC 61672-1:2013, 3.7; el apartado 5.1.14 exige una función
@@ -374,7 +374,7 @@ Las dos ponderaciones forman parte del nombre, y por buenas razones: aquí los
 mismos eventos leen 1,9 dB más bajo en Slow, y una ráfaga de 100 ms lee unos
 7,6 dB más bajo en Slow que en Fast (la aritmética es la ley de la ráfaga tonal
 de [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/)).
-Informa $L_{AFmax}$ o $L_{ASmax}$, nunca un «Lmax» a secas.
+Informa $L_\mathrm{AFmax}$ o $L_\mathrm{ASmax}$, nunca un «Lmax» a secas.
 
 Un máximo es un extremo sin rango, así que lo decide una única muestra de la
 envolvente y la balística, no el grueso del registro. Sobre esta señal cae a una
@@ -387,11 +387,11 @@ guarde la traza con una resolución más gruesa que $\tau/2$ aproximadamente
 (60 ms en Fast, 500 ms en Slow) recorta justo el máximo que se desplegó para
 capturar.
 
-No lo confundas con el $L_{Cpeak}$ de más abajo. El pico es la mayor presión
-instantánea, sin promediado ninguno; el $L_{AFmax}$ es el mayor valor cuadrático
+No lo confundas con el $L_\mathrm{Cpeak}$ de más abajo. El pico es la mayor presión
+instantánea, sin promediado ninguno; el $L_\mathrm{AFmax}$ es el mayor valor cuadrático
 medio de 125 ms. En fuentes impulsivas el pico queda de 10 a 20 dB por encima
 del nivel máximo con ponderación temporal, y por eso los criterios de riesgo
-auditivo están escritos sobre el pico y nunca sobre el $L_{AFmax}$.
+auditivo están escritos sobre el pico y nunca sobre el $L_\mathrm{AFmax}$.
 
 ## Métricas de pico, evento y laborales
 
@@ -428,16 +428,16 @@ print(f"jornada: E {E:.2f} Pa2h | LEX,8h {lex:.1f} dB")
 ```
 
 Los tres papeles son deliberadamente señales distintas. El evento de 4 s tiene
-un $L_{AE}$ 6,0 dB por encima de su propio $L_{Aeq}$, porque
+un $L_{\mathrm{A}E}$ 6,0 dB por encima de su propio $L_\mathrm{Aeq}$, porque
 $10\log_{10}4 = 6{,}0$. La muestra de jornada se *extrapola*, no se repite:
 `duration_hours=8` dice que esos 10 s representan las ocho horas enteras, así
-que el $L_{EX,8h}$ vuelve igual al $L_{Aeq}$ de la muestra y solo la exposición
+que el $L_\mathrm{EX,8h}$ vuelve igual al $L_\mathrm{Aeq}$ de la muestra y solo la exposición
 $E$ lleva la duración: 8 h a 85 dB(A) son
 $8 \times (0{,}3557\ \text{Pa})^2 = 1{,}01\ \text{Pa}^2\text{h}$.
 
 `lc_peak` está verificado contra las respuestas de referencia de ciclo
 único/semiciclo de la Tabla 5 de IEC 61672-1:2013, `sel` contra la columna
-$L_{AE}$ de la Tabla 4, y las funciones de dosis contra las anclas de IEC 61252
+$L_{\mathrm{A}E}$ de la Tabla 4, y las funciones de dosis contra las anclas de IEC 61252
 (3,2 Pa²h ↔ exactamente 90 dB). `lc_peak` sobremuestrea de forma polifásica la
 señal ponderada C por `oversample` (por defecto `8`) antes de tomar el máximo,
 recuperando el verdadero pico inter-muestra: un máximo en rejilla subestima los
@@ -481,12 +481,12 @@ plt.show()
 
 </details>
 
-Más allá de la aritmética hay dos cosas que deciden si un $L_{Cpeak}$ significa
+Más allá de la aritmética hay dos cosas que deciden si un $L_\mathrm{Cpeak}$ significa
 algo. **Qué significa el número.** En el marco laboral europeo (Directiva
 2003/10/CE, artículo 3, el esquema frente al que evalúa la
 [guía de exposición laboral](/phonometry/es/perception/hearing/occupational-exposure/))
 los valores de acción de pico son 135 y 137 dB(C), con un valor límite de
-exposición de 140 dB(C), junto a los valores de $L_{EX,8h}$ de 80, 85 y 87 dB.
+exposición de 140 dB(C), junto a los valores de $L_\mathrm{EX,8h}$ de 80, 85 y 87 dB.
 Una lectura de pico en los 120 y pico no llama la atención en la industria,
 mientras que una lectura por encima de 135 dB(C) es un hallazgo por sí misma
 diga lo que diga la dosis diaria. La ponderación es C y no A porque el pico es
@@ -510,12 +510,12 @@ esto da por hechos están explicados paso a paso en
 ### SEL: comparar eventos de distinta duración
 
 Un paso de tren de 4 s y otro de 30 s no pueden compararse solo por su
-$L_{Aeq}$: el evento más largo entrega más energía al mismo nivel. El **nivel
+$L_\mathrm{Aeq}$: el evento más largo entrega más energía al mismo nivel. El **nivel
 de exposición sonora** comprime la energía del evento *completo* en
 exactamente un segundo:
 
 $$
-L_E = L_{eq,T} + 10\log_{10}\frac{T}{T_0}, \qquad T_0 = 1\ \text{s}
+L_E = L_{\mathrm{eq},T} + 10\log_{10}\frac{T}{T_0}, \qquad T_0 = 1\ \text{s}
 $$
 
 de modo que los eventos de cualquier duración resultan directamente
@@ -563,7 +563,7 @@ plt.show()
 El SEL es una integral, así que la respuesta depende por completo de dónde
 empieza y dónde acaba la integración: toda muestra que le pases a `sel` cuenta
 como energía del evento, fondo incluido. Un registro rellenado con fondo infla
-el resultado en $10\log_{10}(1 + E_b/E_e)$: 0,4 dB cuando el fondo lleva una
+el resultado en $10\log_{10}(1 + E_\mathrm{b}/E_\mathrm{e})$: 0,4 dB cuando el fondo lleva una
 décima parte de la energía del evento y 1,8 dB cuando lleva la mitad, las dos
 mayores que la repetibilidad que pide la mayoría de los procedimientos de paso.
 La convención que hace comparables dos pasos es la ventana entre los dos
@@ -598,7 +598,7 @@ corregir y como cota superior, porque un evento a menos de 3 dB sobre el fondo
 no es un evento medido. El estimador habitual del residual es el $L_{90}$ del
 mismo registro, y por eso el apartado de percentiles de más arriba va antes.
 
-Una última conexión con la figura: el SEL y el $L_{eq}$ que imprime su pie se
+Una última conexión con la figura: el SEL y el $L_\mathrm{eq}$ que imprime su pie se
 diferencian exactamente en $10\log_{10}T$, así que son una sola medida expresada
 dos veces, no dos medidas.
 
@@ -610,20 +610,20 @@ integral temporal de la presión ponderada A al cuadrado) y el **nivel
 normalizado a 8 h** equivalente:
 
 $$
-E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}],\ t\ \text{en horas}
+E = \int_0^T p_\mathrm{A}^2(t)\ dt \quad [\text{Pa}^2\text{h}],\ t\ \text{en horas}
 \qquad
-L_{EX,8h} = 10\log_{10}\frac{E}{T_0\,p_0^2}, \quad T_0 = 8\ \text{h}
+L_\mathrm{EX,8h} = 10\log_{10}\frac{E}{T_0\,p_0^2}, \quad T_0 = 8\ \text{h}
 $$
 
 La anotación de unidades solo se sostiene si $t$ está en horas: integrando en
 segundos salen Pa²s, que es la misma exposición expresada 3600 veces mayor, y
-35,6 dB de error si luego se mete en la fórmula de $L_{EX,8h}$. En la práctica
+35,6 dB de error si luego se mete en la fórmula de $L_\mathrm{EX,8h}$. En la práctica
 se integra en segundos y se divide entre 3600, que es lo que hace
 `sound_exposure` internamente (media cuadrática × duración en horas).
 
 El ancla que conviene memorizar: **3,2 Pa²h ⇔ exactamente 90 dB durante 8 h**
 (la batería de CI lo verifica). Sale directamente de la fórmula: 90 dB son
-$p_{A,\mathrm{rms}} = 20\,\mu\mathrm{Pa} \times 10^{4{,}5} = 0{,}6325$ Pa, y
+$p_\mathrm{A,rms} = 20\,\mu\mathrm{Pa} \times 10^{4{,}5} = 0{,}6325$ Pa, y
 $8\ \text{h} \times (0{,}6325\ \text{Pa})^2 = 3{,}2\ \text{Pa}^2\text{h}$. La
 mitad de dosis son −3 dB; el doble de duración al mismo nivel son +3 dB.
 
@@ -680,10 +680,10 @@ plt.show()
 
 | Función | Parámetros clave | Devuelve | Ancla normativa |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` referencia el *pico* a fondo de escala (`1.0`), no el RMS | $L_{Cpeak}$ [dB] | IEC 61672-1 §5.13, ráfagas tonales de la Tabla 5 |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` da el $L_{AE}$ | SEL [dB] | IEC 61672-1 Tabla 4 (columna $L_{AE}$) |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` referencia el *pico* a fondo de escala (`1.0`), no el RMS | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, ráfagas tonales de la Tabla 5 |
+| `sel(x, fs, weighting=None, ...)` | `weighting='A'` da el $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Tabla 4 (columna $L_{\mathrm{A}E}$) |
 | `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` trata `x` como muestra de ese periodo | $E$ [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
+| `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
 
 `lex_8h` valora *una* grabación; componer una jornada laboral completa a
 partir de muestras por tarea o por función, con el balance de incertidumbre
@@ -693,7 +693,7 @@ normativo de la ISO 9612, continúa en
 Convertir estos niveles en los indicadores regulatorios día-tarde-noche y
 declararlos con garantías es
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): los
-descriptores $L_{den}$ y $L_{dn}$, los niveles de evaluación compuestos de
+descriptores $L_\mathrm{den}$ y $L_\mathrm{dn}$, los niveles de evaluación compuestos de
 ISO 1996-1
 con sus ajustes por carácter, y la cadena de determinación de ISO 1996-2 con
 el ajuste tonal, la corrección de ruido residual y el balance de
@@ -774,7 +774,7 @@ plt.show()
 En un espectrograma de fracción de octava, la resolución temporal en baja
 frecuencia la fija el *filtro de banda*, no `window_time`. Una banda de ancho
 $B$ necesita unas pocas veces $1/B$ para asentarse, y en tercios de octava
-$B = 0{,}231\,f_m$, así que el valor por defecto de 0,125 s es el correcto a
+$B = 0{,}231\,f_\mathrm{m}$, así que el valor por defecto de 0,125 s es el correcto a
 1 kHz y es silenciosamente erróneo en la parte baja de ese mismo banco: todas
 las tramas de la banda más grave del banco `fraction=3` por defecto informan del
 transitorio del filtro, no del nivel de banda. Elige `window_time` a partir de
@@ -813,7 +813,7 @@ prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/), y
 las
 líneas isofónicas de ISO 226 viven con las métricas de percepción en
 [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/). Que un único
-$L_{eq}$ sea un
+$L_\mathrm{eq}$ sea un
 resumen justo de una medición es, de entrada, una cuestión de
 estacionariedad: los tests de
 [cualificación de datos](/phonometry/es/signals/metrology/data-qualification/) la
@@ -826,14 +826,14 @@ responden objetivamente a partir de medias cuadráticas por segmento.
 La balística de envolvente Fast/Slow/Impulse de la IEC 61672-1:2013 que hay
 tras los niveles percentiles, el pico ponderado C del apartado 5.13
 (`lc_peak`, verificado frente a la Tabla 5) y el nivel de exposición sonora
-(`sel`, verificado frente a la columna $L_{AE}$ de la Tabla 4); la exposición
+(`sel`, verificado frente a la columna $L_{\mathrm{A}E}$ de la Tabla 4); la exposición
 sonora y el LEX,8h de la IEC 61252:1993 (`sound_exposure`, `lex_8h`); y el
 espectrograma en bandas de fracción de octava de
 `OctaveFilterBank.spectrogram`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
-Los indicadores de jornada completa de la ISO 1996-1 ($L_{den}$, $L_{dn}$,
+Los indicadores de jornada completa de la ISO 1996-1 ($L_\mathrm{den}$, $L_\mathrm{dn}$,
 niveles de evaluación) y los procedimientos de determinación de la ISO 1996-2
 se han trasladado a [Niveles
 ambientales](/phonometry/es/environment/assessment/environmental-levels/). La
@@ -844,23 +844,23 @@ edición implementada (1993), no las de la más reciente.
 
 ## Véase también
 
-- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/): los indicadores $L_{den}$/$L_{dn}$, los niveles de evaluación y la cadena de determinación de ISO 1996-2 construidos sobre los niveles de esta página.
+- [Niveles ambientales (ISO 1996-1/-2)](/phonometry/es/environment/assessment/environmental-levels/): los indicadores $L_\mathrm{den}$/$L_\mathrm{dn}$, los niveles de evaluación y la cadena de determinación de ISO 1996-2 construidos sobre los niveles de esta página.
 - [Ponderación temporal](/phonometry/es/signals/levels/time-weighting/): el detector Fast/Slow/Impulse sobre el que se definen los niveles percentiles.
 - [Calibración](/phonometry/es/signals/metrology/calibration/): el factor de sensibilidad que convierte unidades digitales en los pascales que todo nivel de esta página supone.
 - [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): las estrategias de medición en el puesto de trabajo que alimentan las medidas de dosis.
 - [Multicanal y rendimiento](/phonometry/es/signals/filters/multichannel/): niveles por canal y cómo combinarlos energéticamente.
 - Referencia de la API: [`signals.levels`](/phonometry/es/reference/api/signals/levels/).
-- Teoría: [Métricas de evento y de dosis](/phonometry/es/reference/theory/signal-analysis/#métricas-de-evento-y-de-dosis): las definiciones energéticas detrás de $L_{eq}$, el SEL y las magnitudes de exposición, y cómo se relacionan con ellas los niveles percentiles.
+- Teoría: [Métricas de evento y de dosis](/phonometry/es/reference/theory/signal-analysis/#métricas-de-evento-y-de-dosis): las definiciones energéticas detrás de $L_\mathrm{eq}$, el SEL y las magnitudes de exposición, y cómo se relacionan con ellas los niveles percentiles.
 
 ## Respuestas rápidas
 
 ### ¿Cuál es la diferencia entre Leq y SEL?
 
-$L_{eq}$ es el nivel continuo equivalente: la media energética de la presión
+$L_\mathrm{eq}$ es el nivel continuo equivalente: la media energética de la presión
 al cuadrado durante el tiempo de medición $T$, referida a
-$p_0 = 20\ \mu\text{Pa}$. El SEL, el nivel de exposición sonora ($L_{AE}$ si
+$p_0 = 20\ \mu\text{Pa}$. El SEL, el nivel de exposición sonora ($L_{\mathrm{A}E}$ si
 está ponderado A), comprime la energía del evento completo en exactamente un
-segundo: $L_E = L_{eq,T} + 10\log_{10}(T/T_0)$ con $T_0 = 1\ \text{s}$, de
+segundo: $L_E = L_{\mathrm{eq},T} + 10\log_{10}(T/T_0)$ con $T_0 = 1\ \text{s}$, de
 modo que los eventos de cualquier duración resultan directamente comparables
 y $N$ eventos idénticos se suman como $+10\log_{10}N$.
 
@@ -868,7 +868,7 @@ y $N$ eventos idénticos se suman como $+10\log_{10}N$.
 
 Según IEC 61252:1993, la exposición sonora $E$ es la integral temporal de la
 presión ponderada A al cuadrado, expresada en pascales al cuadrado por hora,
-y $L_{EX,8h}$ (equivalente a $L_{EP,d}$) es el nivel correspondiente
+y $L_\mathrm{EX,8h}$ (equivalente a $L_\mathrm{EP,d}$) es el nivel correspondiente
 normalizado a 8 h. El ancla que conviene memorizar: 3,2 Pa²h corresponde a
 exactamente 90 dB durante 8 h. La mitad de dosis son -3 dB, y el doble de
 duración al mismo nivel son +3 dB.

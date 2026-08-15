@@ -12,7 +12,7 @@ incoherent **source line** of point sources 0.05 m above the pavement. Each
 vehicle category `m` radiates a directional sound power per metre of line
 
 $$
-L'_{W,eq,line,i,m} = L_{W,i,m} + 10 \log_{10}\left( \frac{Q_m}{1000 v_m} \right) \tag{2.2.1}
+L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10 \log_{10}\left( \frac{Q_m}{1000 v_m} \right) \tag{2.2.1}
 $$
 
 built from a **rolling** term (2.2.4) and a **propulsion** term (2.2.11), each
@@ -79,7 +79,7 @@ line_source_segment_power(
 
 Sound power of the point source representing a segment of source line.
 
-$L_{W,segment,i} = L'_{W,eq,line,i} + 10 \log_{10}(dL)$. This is
+$L_{W,\mathrm{segment},i} = L'_{W,\mathrm{eq,line},i} + 10 \log_{10}(dL)$. This is
 arithmetic, not a
 normative rule: section 2.5.3 of Annex II states that how a line source is
 split into equivalent point sources "is outside the scope of the current
@@ -129,7 +129,7 @@ road_propulsion_noise(
 
 Propulsion-noise sound power `L_WP,i,m` of one vehicle (2.2.11)/(2.2.12).
 
-$L_{WP,i,m} = A_{P,i,m} + B_{P,i,m} (v_m - v_{ref})/v_{ref} + dL_{WP,i,m}$ with
+$L_{W\mathrm{P},i,m} = A_{\mathrm{P},i,m} + B_{\mathrm{P},i,m} (v_m - v_\mathrm{ref})/v_\mathrm{ref} + dL_{W\mathrm{P},i,m}$ with
 `dL_WP` collecting the road surface (2.2.20), the road gradient
 (2.2.13)-(2.2.16) and the junction (2.2.18). Unlike rolling noise, the
 surface term is $\min\{\alpha_{i,m}; 0\}$: an absorbing surface
@@ -191,7 +191,7 @@ road_rolling_noise(
 
 Rolling-noise sound power `L_WR,i,m` of one vehicle (2.2.4)/(2.2.5).
 
-$L_{WR,i,m} = A_{R,i,m} + B_{R,i,m} \log_{10}(v_m/v_{ref}) + dL_{WR,i,m}$ with the
+$L_{W\mathrm{R},i,m} = A_{\mathrm{R},i,m} + B_{\mathrm{R},i,m} \log_{10}(v_m/v_\mathrm{ref}) + dL_{W\mathrm{R},i,m}$ with the
 correction term `dL_WR` collecting the road surface (2.2.19), the studded
 tyres (2.2.8), the junction (2.2.17) and the air temperature (2.2.10).
 Categories 4a and 4b have no rolling noise: their Table F-1 rows are zero,
@@ -246,7 +246,7 @@ road_source_power(
 Directional sound power per metre of a road source line (2.2.1).
 
 Evaluates
-$L'_{W,eq,line,i,m} = L_{W,i,m} + 10 \log_{10}(Q_m/(1000 v_m))$ for every
+$L'_{W,\mathrm{eq,line},i,m} = L_{W,i,m} + 10 \log_{10}(Q_m/(1000 v_m))$ for every
 category of the traffic mix and sums the categories energetically. The
 flow term uses the true average speed even where the sound power itself is
 frozen at 20 km/h (2.2.1).

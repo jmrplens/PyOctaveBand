@@ -24,16 +24,16 @@ wall, by an array of Helmholtz resonators on a lattice step $a$. The slit
 chain is evaluated with the transfer-matrix method,
 
 $$
-T = M_{\Delta l}\,\prod_m \left(M_s\,M_{HR}^{(m)}\,M_s\right),
+T = M_{\Delta l}\,\prod_m \left(M_\mathrm{s}\,M_\mathrm{HR}^{(m)}\,M_\mathrm{s}\right),
 $$
 
-half-lattice slit steps $M_s$ around each resonator, the resonators as shunt
-point scatterers $[[1,0],[1/Z_{HR},1]]$, and a slit-radiation end correction
+half-lattice slit steps $M_\mathrm{s}$ around each resonator, the resonators as shunt
+point scatterers $[[1,0],[1/Z_\mathrm{HR},1]]$, and a slit-radiation end correction
 $M_{\Delta l}$, with visco-thermal effective parameters in the slit and in the
 square necks and cavities (Stinson 1991). Below the resonance of the loading
 resonators the shunt compliance adds to the compliance of the slit itself, and
 the effective phase velocity of the slit mode collapses: the retrieved
-effective wavenumber $k_{eff}$ of the chain corresponds to a phase speed of a
+effective wavenumber $k_\mathrm{eff}$ of the chain corresponds to a phase speed of a
 few tens of metres per second. The slit therefore reaches its
 quarter-wavelength condition, and any intermediate reflection phase, at a
 fraction of the depth an air-filled well would need.

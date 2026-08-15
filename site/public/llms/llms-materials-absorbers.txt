@@ -100,8 +100,8 @@ public-tender requirement, and is rarely questioned again. This guide covers
 that number's whole laboratory life. The **measurement** is ISO 354: a sample
 of 10 m² to 12 m² on the floor of a reverberation room, two decay times, and
 Sabine's formula run backwards to get the random-incidence coefficient
-$\alpha_s$ per one-third-octave band. The **rating** is ISO 11654: the spectrum
-collapsed into the weighted coefficient $\alpha_w$ with its letter class A to
+$\alpha_\mathrm{s}$ per one-third-octave band. The **rating** is ISO 11654: the spectrum
+collapsed into the weighted coefficient $\alpha_\mathrm{w}$ with its letter class A to
 E, the single number absorber datasheets quote. And because a coefficient
 without an uncertainty is only half a result, ISO 12999-2 supplies the
 **measurement uncertainty** of both. The normal-incidence counterpart measured
@@ -117,15 +117,15 @@ specimen area $S$, and returns a frozen `SoundAbsorptionMeasurement`. The
 equivalent sound absorption areas follow from Sabine's equation (ISO 354:2003
 Eq. (5)/(7)), $A = 55.3\,V/(c\,T) - 4\,V\,m$, with the speed of sound from
 Eq. (6), $c = 331 + 0.6\,t$; the sound absorption coefficient is
-$\alpha_s = (A_2 - A_1)/S$ (Eq. (8)/(9)). The coefficient may exceed 1.0 from
+$\alpha_\mathrm{s} = (A_2 - A_1)/S$ (Eq. (8)/(9)). The coefficient may exceed 1.0 from
 edge and diffraction effects (Clause 3.7 NOTE 2) and is never clamped. Air
 attenuation enters only through the per-band coefficient $m$ (default 0, the
 zero-attenuation reference); pass `attenuation_from_alpha` of an ISO 9613-1
 value when it is needed.
 
-ISO 354 is a characterisation: it produces the $\alpha_s$ spectrum, not a
-single-number rating. The weighted coefficient $\alpha_w$ is an ISO 11654
-quantity; feed the measured $\alpha_s$ to `weighted_absorption_from_third_octave`
+ISO 354 is a characterisation: it produces the $\alpha_\mathrm{s}$ spectrum, not a
+single-number rating. The weighted coefficient $\alpha_\mathrm{w}$ is an ISO 11654
+quantity; feed the measured $\alpha_\mathrm{s}$ to `weighted_absorption_from_third_octave`
 in section 3 to obtain it.
 
 ```python
@@ -149,7 +149,7 @@ m.plot()              # alpha_s versus one-third-octave frequency
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_absorption_measurement.svg" alt="ISO 354 reverberation-room sound absorption: the alpha_s spectrum of a porous absorber sample over the one-third-octave bands from 100 Hz to 5000 Hz, rising from near zero at low frequency to a broad maximum around 0.69 near 1600 Hz and easing off above" width="80%"></picture>
 
 *The Sabine inversion of the two decay times: the porous sample barely
-changes the long low-frequency decays ($\alpha_s \to 0$), bites hardest where
+changes the long low-frequency decays ($\alpha_\mathrm{s} \to 0$), bites hardest where
 its thickness approaches a quarter wavelength, and eases off at high
 frequency, a typical thin-porous-absorber signature (Cox & D'Antonio 3e,
 Ch. 5).*
@@ -193,8 +193,8 @@ plt.show()
 
 `SoundAbsorptionMeasurement.report(path)` renders a one-page PDF fiche laid out
 like an accredited reverberation-room absorption test report (ISO 354:2003): a
-standard-basis line, a metadata header block, the one-third-octave $\alpha_s$
-table beside the $\alpha_s$ curve (the result's own `.plot()`), a boxed
+standard-basis line, a metadata header block, the one-third-octave $\alpha_\mathrm{s}$
+table beside the $\alpha_\mathrm{s}$ curve (the result's own `.plot()`), a boxed
 characterisation headline and a footer with the fixed disclaimer. ISO 354 has
 no pass/fail verdict and no single-number rating, so the fiche carries neither.
 Setting `verbose=True` adds the reverberation times $T_1$/$T_2$ and the
@@ -236,7 +236,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 354 absorption example report: metadata header with sample area S, room volume V and speed of sound c, the one-third-octave alpha_s table grouped by octave beside the alpha_s curve, and the boxed characterisation headline over the tested one-third-octave range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso354_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso354_absorption_example.pdf)
 
-*Reverberation-room absorption fiche (`SoundAbsorptionMeasurement.report`), the $\alpha_s$ spectrum.*
+*Reverberation-room absorption fiche (`SoundAbsorptionMeasurement.report`), the $\alpha_\mathrm{s}$ spectrum.*
 
 
 ## 2. Absorption areas from room decay times
@@ -251,14 +251,14 @@ coefficient:
 
 $$
 A = \frac{55.3\ V}{c\ T} - 4 V m, \qquad
-\alpha_s = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0.6\ t ,
+\alpha_\mathrm{s} = \frac{A_2 - A_1}{S}, \qquad c = 331 + 0.6\ t ,
 $$
 
 with $c$ from the room air temperature $t$ in °C (valid 15–30 °C) and $m$ the
 power attenuation coefficient of air (default 0; convert an ISO 9613-1
 $\alpha$ in dB/m with `attenuation_from_alpha`). Because edge and diffraction
 effects can scatter more energy than the sample's flat area intercepts,
-$\alpha_s$ may exceed 1.0 and is never clamped (ISO 354 Clause 3.7).
+$\alpha_\mathrm{s}$ may exceed 1.0 and is never clamped (ISO 354 Clause 3.7).
 
 ```python
 import numpy as np
@@ -289,7 +289,7 @@ to a straight portion of it. That is the operation behind $T_1$, and again
 behind $T_2$ — the clip shows a *single* room, not the pair, so it answers
 "where does one $T$ come from" and not "what does subtracting two of them
 cost". The second question is the one that governs this measurement, and
-section 4 puts a number on it: because $\alpha_s$ is a difference of two
+section 4 puts a number on it: because $\alpha_\mathrm{s}$ is a difference of two
 reciprocal decay times, its uncertainty is worst exactly where the two decays
 are most alike, at the low-frequency end.
 
@@ -317,13 +317,13 @@ here checks any of it.
 | `m` (`m1`, `m2`) | float or 1D array | 1/m | ≥ 0, default `0` | Air power attenuation coefficient |
 
 `absorption_area()` returns the equivalent absorption area $A$ (m²) with the
-shape of `t60`; `absorption_coefficient()` returns $\alpha_s$;
+shape of `t60`; `absorption_coefficient()` returns $\alpha_\mathrm{s}$;
 `attenuation_from_alpha(alpha)` converts an ISO 9613-1 $\alpha$ (dB/m) to $m$.
 
 
 ## 3. Weighted rating and absorption class (ISO 11654)
 
-The measurement of section 1 delivers the $\alpha_s$ spectrum in
+The measurement of section 1 delivers the $\alpha_\mathrm{s}$ spectrum in
 one-third-octave bands. ISO 11654:1997 turns that spectrum into a
 single-number rating comparable across products.
 
@@ -333,7 +333,7 @@ single-number rating comparable across products.
 first grouped into octave bands, each the arithmetic mean of its three thirds:
 
 $$
-\alpha_{p,i} = \tfrac{1}{3}\big(\alpha_{i1} + \alpha_{i2} + \alpha_{i3}\big),
+\alpha_{\mathrm{p},i} = \tfrac{1}{3}\big(\alpha_{i1} + \alpha_{i2} + \alpha_{i3}\big),
 $$
 
 evaluated to the second decimal and then rounded in steps of $0.05$ (the
@@ -343,25 +343,25 @@ $1.00$ are set to $1.00$. The five rating bands are 250, 500, 1000, 2000 and
 
 **Weighted absorption (Clause 4.2).** A fixed reference curve
 $\{250{:}\,0.80,\ 500{:}\,1.00,\ 1000{:}\,1.00,\ 2000{:}\,1.00,\ 4000{:}\,0.90\}$
-is shifted downwards, towards the measured $\alpha_p$, in steps of $0.05$ until
+is shifted downwards, towards the measured $\alpha_\mathrm{p}$, in steps of $0.05$ until
 the sum of the **unfavourable** deviations (taken only where the measurement
 lies below the shifted curve, with magnitude $(\text{curve} - \text{measured})$)
-is no more than $0.10$. The weighted coefficient $\alpha_w$ is the shifted-curve
+is no more than $0.10$. The weighted coefficient $\alpha_\mathrm{w}$ is the shifted-curve
 value read at 500 Hz.
 
 **Shape indicators (Clause 4.3).** When a practical coefficient exceeds the
 shifted curve by $0.25$ or more, a shape indicator is appended: `L` at 250 Hz,
 `M` at 500 or 1000 Hz, `H` at 2000 or 4000 Hz (e.g. `0.60(M)`).
 
-**Absorption class (Table B.1).** Finally $\alpha_w$ maps to a class: A
+**Absorption class (Table B.1).** Finally $\alpha_\mathrm{w}$ maps to a class: A
 (0.90–1.00), B (0.80–0.85), C (0.60–0.75), D (0.30–0.55), E (0.15–0.25), or "not
-classified" (0.00–0.10). Because $\alpha_w$ is always a multiple of $0.05$ these
+classified" (0.00–0.10). Because $\alpha_\mathrm{w}$ is always a multiple of $0.05$ these
 ranges partition the grid exactly.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
 
 *The Annex A.2 worked example: the reference curve is shifted down by 0.40 until
-the unfavourable deviations sum to 0.05 ($\le 0.10$), giving $\alpha_w = 0.60$;
+the unfavourable deviations sum to 0.05 ($\le 0.10$), giving $\alpha_\mathrm{w} = 0.60$;
 the 500 Hz peak overshoots the shifted curve by $\ge 0.25$, adding the `M`
 indicator, so the rating is $0.60(\text{M})$, class C.*
 
@@ -397,13 +397,13 @@ result.plot()   # the figure above: practical curve vs shifted reference
 print(materials.absorption_class(0.85))       # B
 ```
 
-`weighted_absorption` accepts the five octave-band $\alpha_p$ values (as a
+`weighted_absorption` accepts the five octave-band $\alpha_\mathrm{p}$ values (as a
 sequence or a `{frequency: value}` mapping); pass the fifteen one-third-octave
-$\alpha_s$ values to `practical_absorption_coefficient` first if you are starting
-from raw ISO 354 data. To keep the one-third-octave $\alpha_s$ on the result (so
+$\alpha_\mathrm{s}$ values to `practical_absorption_coefficient` first if you are starting
+from raw ISO 354 data. To keep the one-third-octave $\alpha_\mathrm{s}$ on the result (so
 the fiche can print the full table every accredited ISO 354 certificate carries),
 rate it in one step with `weighted_absorption_from_third_octave(alpha_s)`, which
-forms $\alpha_p$, rates it and retains the input $\alpha_s$ and its band centres
+forms $\alpha_\mathrm{p}$, rates it and retains the input $\alpha_\mathrm{s}$ and its band centres
 (`third_octave_alpha_s`, `third_octave_bands`). The result carries the shifted
 reference curve and the per-band deviations, and its `.plot()` renders the figure
 above.
@@ -424,18 +424,18 @@ print(result.third_octave_alpha_s)  # the input alpha_s, retained for the fiche
 `AbsorptionRatingResult.report(path)` renders a one-page PDF fiche laid out like
 an accredited absorption test report (an ISO 354 reverberation-room measurement
 rated per ISO 11654): a standard-basis line, an optional metadata header block,
-the octave-band $\alpha_p$ table beside the practical-versus-shifted-reference
-plot (the result's own `.plot()`), the boxed $\alpha_w$ single number with its
+the octave-band $\alpha_\mathrm{p}$ table beside the practical-versus-shifted-reference
+plot (the result's own `.plot()`), the boxed $\alpha_\mathrm{w}$ single number with its
 absorption class and applied shift, an optional verdict row and a footer with
 the fixed disclaimer. When the rating was built with
 `weighted_absorption_from_third_octave`, the left table becomes the full ISO 354
-one-third-octave $\alpha_s$ table with the octave $\alpha_p$ on the matching
+one-third-octave $\alpha_\mathrm{s}$ table with the octave $\alpha_\mathrm{p}$ on the matching
 rows, exactly as accredited certificates print it. It uses the same
 `ReportMetadata` container (documented
 under [Insulation ratings](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata))
 and rendering engine as the ISO 717 insulation fiche; passing
 `metadata=None` produces a lightweight prediction fiche, and a supplied
-`requirement` is read as the minimum $\alpha_w$ for the PASS/FAIL verdict.
+`requirement` is read as the minimum $\alpha_\mathrm{w}$ for the PASS/FAIL verdict.
 Setting `verbose=True` swaps the two-column table for the ISO 11654 evaluation
 columns (practical coefficient, shifted reference, unfavourable deviation).
 Rendering needs reportlab and, for the figure the fiche embeds, matplotlib (`pip
@@ -470,7 +470,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 11654 absorption example report: metadata header, the full one-third-octave alpha_s table with the octave alpha_p on the matching rows beside the practical-versus-shifted-reference plot, boxed alpha_w = 0.60 (M) with absorption class C and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso11654_absorption_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso11654_absorption_example.pdf)
 
-*Weighted absorption fiche (`AbsorptionRatingResult.report`), $\alpha_w$ with its class.*
+*Weighted absorption fiche (`AbsorptionRatingResult.report`), $\alpha_\mathrm{w}$ with its class.*
 
 
 ## Tube or reverberation room?
@@ -483,17 +483,17 @@ do not match, sometimes not even closely.
 The [tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/) measures a **normal-incidence** coefficient: one
 plane wave, one angle, a specimen a few centimetres across, and a complex
 reflection factor that keeps magnitude and phase. ISO 354 measures the **random-incidence**
-coefficient $\alpha_s$: a diffuse field striking a sample of 10 m² to 12 m²
+coefficient $\alpha_\mathrm{s}$: a diffuse field striking a sample of 10 m² to 12 m²
 from every direction at once, recovered from the change in the room's decay
 time through Sabine's formula, an energy average with no phase left in it.
 Because the diffuse field finds more ways into an absorber than the single
 normal-incidence wave (oblique waves travel a longer path inside the layer),
-$\alpha_s$ usually comes out higher. For a locally reacting surface the two
+$\alpha_\mathrm{s}$ usually comes out higher. For a locally reacting surface the two
 are linked by Paris' angular average, which defines the statistical
 absorption coefficient
 
 $$
-\alpha_{st} = \int_0^{\pi/2} \alpha(\theta)\,\sin 2\theta\,\mathrm{d}\theta,
+\alpha_\mathrm{st} = \int_0^{\pi/2} \alpha(\theta)\,\sin 2\theta\,\mathrm{d}\theta,
 $$
 
 an integral that weights the oblique angles most heavily; evaluating it
@@ -502,10 +502,10 @@ angle-dependent $\alpha(\theta)$ from the measured surface impedance, not just
 the normal-incidence coefficient itself.
 
 **Why ISO 354 values exceed 1.** A ratio of absorbed to incident energy cannot
-exceed one, yet reverberation-room reports of $\alpha_s = 1.05$ to $1.20$ for
+exceed one, yet reverberation-room reports of $\alpha_\mathrm{s} = 1.05$ to $1.20$ for
 thick porous absorbers are routine and correct by the method. Sabine's formula
 converts the decay-time change into an equivalent absorption area $A$, and
-$\alpha_s = A/S$ divides by the *geometric* sample area $S$. Diffraction at
+$\alpha_\mathrm{s} = A/S$ divides by the *geometric* sample area $S$. Diffraction at
 the sample edges lets the specimen drain energy from a sound field wider than
 its footprint (the edge effect), so the equivalent area can exceed the
 geometric one. Such values are not errors, but they are not portable either:
@@ -525,7 +525,7 @@ as supplied.
 **Which to use.** They answer different questions. The reverberation-room
 value is the one that feeds diffuse-field prediction: Sabine reverberation
 estimates, the equivalent absorption areas of
-[EN 12354-6](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/) and the $\alpha_w$ rating and
+[EN 12354-6](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/) and the $\alpha_\mathrm{w}$ rating and
 class, all of which expect random incidence over a mounted, finite sample
 (ISO 354's Annex B mounting types exist because the mounting is part of the
 result). The tube value is the laboratory and development tool: it needs only
@@ -534,7 +534,7 @@ surface impedance pins down the parameters of porous-material models in the
 Allard and Atalla tradition, with the
 [airflow resistivity](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/) as the first input; the fitted model then predicts the layer at any angle, thickness
 or backing. What the tube number is *not* is a drop-in substitute for
-$\alpha_s$: feeding normal-incidence coefficients into a Sabine or EN 12354-6
+$\alpha_\mathrm{s}$: feeding normal-incidence coefficients into a Sabine or EN 12354-6
 budget systematically underpredicts the installed absorption.
 
 
@@ -548,20 +548,20 @@ companion of the sound-insulation uncertainty of ISO 12999-1
 ([Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/)).
 
 **One-third-octave bands (Clause 5).** For the sound-absorption coefficient the
-reproducibility standard deviation is $\sigma_R = m\,\alpha_s + n$ (Formula (1)),
-and for the equivalent absorption area $\sigma_R = m\,A_T + n\,S$ with
+reproducibility standard deviation is $\sigma_\mathrm{R} = m\,\alpha_\mathrm{s} + n$ (Formula (1)),
+and for the equivalent absorption area $\sigma_\mathrm{R} = m\,A_\mathrm{T} + n\,S$ with
 $S = 10\ \text{m}^2$ (Formula (2)), where $m$ and $n$ are the frequency-dependent
 constants of Table 1 (63–5000 Hz). The repeatability value is
-$\sigma_r = 0.6\,\sigma_R$ (Formula (3)).
+$\sigma_\mathrm{r} = 0.6\,\sigma_\mathrm{R}$ (Formula (3)).
 
 **Practical coefficient (Clause 6).** For the ISO 11654 practical coefficient
-$\sigma_R = m\,\alpha_p + n$ in octave bands with the constants of Table 2
-(250–4000 Hz); again $\sigma_r = 0.6\,\sigma_R$.
+$\sigma_\mathrm{R} = m\,\alpha_\mathrm{p} + n$ in octave bands with the constants of Table 2
+(250–4000 Hz); again $\sigma_\mathrm{r} = 0.6\,\sigma_\mathrm{R}$.
 
-**Single numbers (Clause 7).** The weighted coefficient $\alpha_w$ has a constant
-standard uncertainty ($\sigma_R = 0.035$, $\sigma_r = 0.020$); the EN 1793-1
+**Single numbers (Clause 7).** The weighted coefficient $\alpha_\mathrm{w}$ has a constant
+standard uncertainty ($\sigma_\mathrm{R} = 0.035$, $\sigma_\mathrm{r} = 0.020$); the EN 1793-1
 single-number rating $DL_{\alpha,\text{NRD}}$ scales with the value
-($\sigma_R = 0.10\,DL_\alpha$, $\sigma_r = 0.02\,DL_\alpha$). That uncertainty
+($\sigma_\mathrm{R} = 0.10\,DL_\alpha$, $\sigma_\mathrm{r} = 0.02\,DL_\alpha$). That uncertainty
 formula is all this page takes from EN 1793-1: the standard's own in-situ
 measurement method for road-traffic noise-reducing devices is not implemented.
 
@@ -609,7 +609,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
 
 - [Impedance Tube](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/): the normal-incidence absorption,
   surface impedance and transmission loss of small samples (ISO 10534-1/-2,
-  ASTM E2611), and why its coefficient differs from $\alpha_s$.
+  ASTM E2611), and why its coefficient differs from $\alpha_\mathrm{s}$.
 - [Airflow Resistance](https://jmrplens.github.io/phonometry/materials/absorbers/airflow-resistance/): the ISO 9053-1/-2 flow
   resistivity that anchors the porous-material models behind most absorbers.
 - [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/): predicting the
@@ -617,7 +617,7 @@ print(float(materials.single_number_rating_uncertainty(8.1).reported_expanded_un
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the ISO 3382 decay measurements that
   supply the reverberation times $T_1$ and $T_2$.
 - [Reverberation-time prediction](https://jmrplens.github.io/phonometry/buildings/rooms/reverberation-prediction/): the Sabine,
-  Eyring and Millington-Sette estimators that consume $\alpha_s$.
+  Eyring and Millington-Sette estimators that consume $\alpha_\mathrm{s}$.
 - [Equivalent absorption area of furnished rooms](https://jmrplens.github.io/phonometry/buildings/rooms/enclosed-space-absorption/):
   the EN 12354-6 absorption budget these coefficients feed.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
@@ -688,14 +688,14 @@ or slowly-oscillating flow. Both parts share the same three quantities and units
 
 $$
 R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
-R_s = R\,A\ \left[\text{Pa·s/m}\right], \qquad
-\sigma = \frac{R_s}{d}\ \left[\text{Pa·s/m}^2\right],
+R_\mathrm{s} = R\,A\ \left[\text{Pa·s/m}\right], \qquad
+\sigma = \frac{R_\mathrm{s}}{d}\ \left[\text{Pa·s/m}^2\right],
 $$
 
 with $\Delta p$ the pressure difference across the specimen, $q_v$ the volumetric
 flow, $A$ the cross-section and $d$ the thickness. Note the specific airflow
-resistance $R_s$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
-is $R_s$ per metre of thickness.
+resistance $R_\mathrm{s}$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
+is $R_\mathrm{s}$ per metre of thickness.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance.svg" alt="Airflow resistance measurement rigs: the ISO 9053-1 static method with a specimen in a holder, a steady laminar flow q_v and a differential manometer reading the pressure drop; and the ISO 9053-2 alternating method with an oscillating piston driving a cavity terminated by the specimen or an airtight plug, and a microphone reading the cavity level" width="92%"></picture>
 
@@ -704,9 +704,9 @@ is $R_s$ per metre of thickness.
 In the static method (ISO 9053-1:2018) a steady laminar flow is stepped up and the
 pressure difference plotted against the linear velocity $u = q_v/A$. A regression
 of at least second order **constrained through the origin**, $\Delta p = a\,u +
-b\,u^2$, is fitted, and $\Delta p$ and $R_s$ are read at the reference velocity
+b\,u^2$, is fitted, and $\Delta p$ and $R_\mathrm{s}$ are read at the reference velocity
 $u = 0.5\ \text{mm/s}$ (Clause 7.5); the highest velocity must not exceed
-15 mm/s. Because $R_s = \Delta p/u = a + b\,u$, the linear term $a$ is the
+15 mm/s. Because $R_\mathrm{s} = \Delta p/u = a + b\,u$, the linear term $a$ is the
 zero-velocity specific airflow resistance.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance.svg" alt="ISO 9053-1 static-method airflow resistance: the measured pressure drop against linear airflow velocity, fitted with a through-origin quadratic, with the specific airflow resistance evaluated at the 0.5 mm/s reference velocity" width="80%"></picture>
@@ -765,10 +765,10 @@ r.plot()   # the figure above: the fitted dp(u) with the evaluation point
 accredited airflow-resistance test report (ISO 9053-1:2018, static method): a
 standard-basis line, an optional metadata header block, a two-panel body with a
 metrics table (the evaluation velocity, the fitted pressure difference, the
-airflow resistance $R$, the specific airflow resistance $R_s$, the airflow
+airflow resistance $R$, the specific airflow resistance $R_\mathrm{s}$, the airflow
 resistivity $\sigma$ when a thickness is available, and the through-origin fit
 coefficients $a$ and $b$) beside the fitted $\Delta p(u)$ curve (the result's
-own `.plot()`), the boxed specific airflow resistance $R_s$ with $R$ and
+own `.plot()`), the boxed specific airflow resistance $R_\mathrm{s}$ with $R$ and
 $\sigma$ alongside, and a footer with the fixed disclaimer. ISO 9053-1 is a
 material characterisation, so the fiche carries no pass/fail verdict.
 
@@ -804,7 +804,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 9053-1 static airflow-resistance example report: metadata header with the specimen thickness, the metrics table with the evaluation velocity, the fitted pressure difference, the airflow resistance R, the specific airflow resistance R_s, the airflow resistivity sigma and the through-origin fit coefficients beside the fitted pressure-drop curve, and the boxed specific airflow resistance R_s with R and sigma alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9053_airflow_resistance_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9053_airflow_resistance_example.pdf)
 
-*Static airflow-resistance fiche (`StaticAirflowResult.report`), $R_s$, $R$ and $\sigma$ at 0.5 mm/s.*
+*Static airflow-resistance fiche (`StaticAirflowResult.report`), $R_\mathrm{s}$, $R$ and $\sigma$ at 0.5 mm/s.*
 
 
 ## 3. Alternating method (ISO 9053-2)
@@ -815,8 +815,8 @@ airtight plug; the resistance follows from the sound-pressure-level difference
 between the two terminations (Formula (2)):
 
 $$
-R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
-    10^{(L_{p,s} - L_{p,t})/20},
+R = \frac{\kappa'\,P_\mathrm{S}}{2\pi f\,V}\cdot\frac{h_\mathrm{t}}{h_\mathrm{s}}\cdot
+    10^{(L_{p,\mathrm{s}} - L_{p,\mathrm{t}})/20},
 $$
 
 where $\kappa'$ is the **effective** ratio of specific heats. Heat conduction
@@ -878,7 +878,7 @@ front face before the pores can absorb it. Between the two lies the classic
 design window for the total flow resistance of a layer of thickness $d$,
 
 $$
-\rho_0 c_0 \;\lesssim\; R_s = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
+\rho_0 c_0 \;\lesssim\; R_\mathrm{s} = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
 $$
 
 that is, a specific flow resistance of one to four times the characteristic
@@ -1181,11 +1181,11 @@ complex transfer function $H_{12}$; from it the reflection factor at the sample
 face, the absorption and the normalised surface impedance follow (Eqs. (17)–(19)):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
 $$
 
-with $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, microphone spacing $s$ and $x_1$
+with $H_\mathrm{I} = e^{-j k_0 s}$, $H_\mathrm{R} = e^{+j k_0 s}$, microphone spacing $s$ and $x_1$
 the distance from the sample to the farther microphone.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube.gif" alt="Animation: incident and reflected waves sum into a standing wave inside the impedance tube; a rigid termination gives deep envelope nodes, a porous sample gives shallow ones, sampled by the two wall microphones" width="640" height="360" loading="lazy"></picture>
@@ -1277,7 +1277,7 @@ result's own `.plot()`, on a continuous logarithmic frequency axis), a boxed
 characterisation headline and a footer with the fixed disclaimer. ISO 10534-2 is
 a characterisation, so the fiche carries no pass/fail verdict and no
 single-number rating; the normal-incidence coefficient is not comparable to the
-random-incidence $\alpha_s$/$\alpha_w$ of ISO 354 / ISO 11654. Setting
+random-incidence $\alpha_\mathrm{s}$/$\alpha_\mathrm{w}$ of ISO 354 / ISO 11654. Setting
 `verbose=True` inserts the reflection-factor magnitude $|r|$ column.
 
 It uses the same `ReportMetadata` container and rendering engine as the other
@@ -1617,7 +1617,7 @@ own guide, [Metamaterial Absorbers](https://jmrplens.github.io/phonometry/materi
 ## 1. Equivalent-fluid models of a porous material
 
 A rigid-frame porous material behaves like an *equivalent fluid* with a
-complex characteristic impedance $Z_c$ and wavenumber $k$ (time convention
+complex characteristic impedance $Z_\mathrm{c}$ and wavenumber $k$ (time convention
 $e^{+j\omega t}$, so a passive medium has $\mathrm{Im}(k) < 0$).
 
 **Delany–Bazley** (Mechel 2e Sect. G.11; Bies 5e Appendix D, Table D.1;
@@ -1625,7 +1625,7 @@ Hopkins Eqs. 1.171–1.174) is the one-parameter power law in the absorber
 variable $X = \rho_0 f / \sigma$:
 
 $$
-\frac{Z_c}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
+\frac{Z_\mathrm{c}}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
 \frac{k}{k_0} = 1 + C_5 X^{-C_6} - j\,C_7 X^{-C_8},
 $$
 
@@ -1647,9 +1647,9 @@ evaluated broadband.
 model (Cox & D'Antonio 3e Eqs. 6.19–6.25): flow resistivity $\sigma$,
 porosity $\phi$, tortuosity $\alpha_\infty$ and the viscous/thermal
 characteristic lengths $\Lambda$, $\Lambda'$ give the effective density and
-bulk modulus with the exact limits $j\omega\rho_e \to \sigma$ at DC,
-$\rho_e \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ at high
-frequency, and the isothermal-to-adiabatic transition in $K_e$.
+bulk modulus with the exact limits $j\omega\rho_\mathrm{e} \to \sigma$ at DC,
+$\rho_\mathrm{e} \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ at high
+frequency, and the isothermal-to-adiabatic transition in $K_\mathrm{e}$.
 
 ```python
 import numpy as np
@@ -1675,7 +1675,7 @@ db.plot()   # normalised Zc and k components vs frequency
 3e, Figs. 6.19–6.20): at low frequency the viscous forces dominate and the
 material looks stiff and lossy (all four components large); as frequency
 rises the components fall towards the free-air limits
-$Z_c \to \rho_0 c_0$ and $k \to k_0$, so a thin layer only works where its
+$Z_\mathrm{c} \to \rho_0 c_0$ and $k \to k_0$, so a thin layer only works where its
 thickness is a fair fraction of the wavelength inside the material.*
 
 <details>
@@ -1709,7 +1709,7 @@ plt.show()
 The three models agree closely over the Delany–Bazley fit range (Cox &
 D'Antonio Figs. 6.19–6.21 make the same comparison); JCA extends the
 prediction physically outside it. A `PorousMediumResult` built from measured
-data (for example the $Z_c$, $k$ recovered by the
+data (for example the $Z_\mathrm{c}$, $k$ recovered by the
 [ASTM E2611 transfer-matrix reduction](https://jmrplens.github.io/phonometry/materials/absorbers/impedance-tube/)) plugs into the layer
 solver exactly like a modelled one.
 
@@ -1719,11 +1719,11 @@ Every model above assumes the frame stands still. That is only true above the
 **decoupling frequency** of Zwikker and Kosten,
 
 $$
-F_d = \frac{\sigma\,\phi^2}{2\pi\rho_1},
+F_\mathrm{d} = \frac{\sigma\,\phi^2}{2\pi\rho_1},
 $$
 
 with $\rho_1$ the bulk density of the frame (the density of the sample as
-weighed, not of the material the fibres are made of). Below $F_d$ the
+weighed, not of the material the fibres are made of). Below $F_\mathrm{d}$ the
 visco-inertial coupling is strong enough for the wave in the pores to drag the
 frame along, and a light frame (aeronautic-grade fibreglass, felts, thin
 screens) has real inertia to contribute. Neglecting the *stiffness* of the
@@ -1733,13 +1733,13 @@ density (Allard & Atalla 2e Eqs. 11.53-11.55, after Panneton 2007):
 
 $$
 \tilde\rho_{\text{limp}} =
-\frac{\rho_t\,\tilde\rho_{\text{eq}} - \rho_0^2}
-     {\rho_t + \tilde\rho_{\text{eq}} - 2\rho_0},
-\qquad \rho_t = \rho_1 + \phi\rho_0,
+\frac{\rho_\mathrm{t}\,\tilde\rho_{\text{eq}} - \rho_0^2}
+     {\rho_\mathrm{t} + \tilde\rho_{\text{eq}} - 2\rho_0},
+\qquad \rho_\mathrm{t} = \rho_1 + \phi\rho_0,
 $$
 
 where $\tilde\rho_{\text{eq}}$ is the rigid-frame effective density of any of
-the three models above and $\rho_t$ is the apparent total density of the
+the three models above and $\rho_\mathrm{t}$ is the apparent total density of the
 material. What anchors the correction is the printed equation itself,
 transcribed term by term against the page; the book tabulates no computed limp
 density anywhere. Two limits it states in prose are exact as well and are
@@ -1750,7 +1750,7 @@ The limits are:
 - **heavy frame**: as $\rho_1$ grows the correction vanishes and the
   rigid-frame result comes back;
 - **low frequency**: the rigid-frame density diverges as $\sigma/(j\omega)$,
-  while the limp one converges on the finite, real $\rho_t$. A rigid frame
+  while the limp one converges on the finite, real $\rho_\mathrm{t}$. A rigid frame
   forbids rigid-body motion of the sample; a limp one allows it, which is why
   the limp model is the right one for an unconstrained specimen in an
   impedance tube.
@@ -1764,7 +1764,7 @@ straight into a `PorousLayer` in the stack.
 Table 11.2, the input set behind their Fig. 11.2). Above the decoupling
 frequency the two predictions are indistinguishable, which is the plot's own
 check on the correction; below it the rigid-frame effective density runs away
-and the limp one settles on $\rho_t/\rho_0 = 25.9$.*
+and the limp one settles on $\rho_\mathrm{t}/\rho_0 = 25.9$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1806,10 +1806,10 @@ plt.show()
 </details>
 
 The correction is only worth applying where the frame really is limp. Beranek
-(1947) asked for $|K_c/K_f| < 0.05$ between the bulk modulus of the frame in
+(1947) asked for $|K_c/K_\mathrm{f}| < 0.05$ between the bulk modulus of the frame in
 vacuum and that of the fluid in the pores; the frame-structural-interaction
 study of Doutres et al. (2007) relaxed that to $0.2$, which for air
-($K_f \approx P_0 = 101.3$ kPa) is the rule of thumb that the frame must be
+($K_\mathrm{f} \approx P_0 = 101.3$ kPa) is the rule of thumb that the frame must be
 softer than about 20 kPa. `limp_frame_applicable` applies either threshold.
 Neither accounts for mounting: a thin light foam decoupled from a vibrating
 structure by an air gap behaves limply well above the limit, and a material
@@ -1867,15 +1867,15 @@ $$
 $$
 
 and for the usual case of a frame whose solid grains are much stiffer than the
-frame they build ($K_s \to \infty$, true of glass, rock and polymer frames) the
+frame they build ($K_\mathrm{s} \to \infty$, true of glass, rock and polymer frames) the
 three elastic coefficients follow from the shear modulus $N$, the Poisson
-coefficient $\nu$ and the bulk modulus $K_f$ of the fluid in the pores
+coefficient $\nu$ and the bulk modulus $K_\mathrm{f}$ of the fluid in the pores
 (Eqs. 6.26-6.29):
 
 $$
-R = \phi K_f, \qquad Q = (1-\phi)K_f, \qquad
-P = \tfrac{4}{3}N + K_b + \frac{(1-\phi)^2}{\phi}K_f, \qquad
-K_b = \frac{2N(1+\nu)}{3(1-2\nu)}.
+R = \phi K_\mathrm{f}, \qquad Q = (1-\phi)K_\mathrm{f}, \qquad
+P = \tfrac{4}{3}N + K_\mathrm{b} + \frac{(1-\phi)^2}{\phi}K_\mathrm{f}, \qquad
+K_\mathrm{b} = \frac{2N(1+\nu)}{3(1-2\nu)}.
 $$
 
 With the modified densities $\tilde\rho_{11}$, $\tilde\rho_{12}$,
@@ -1897,7 +1897,7 @@ wall holds its frame still at the wall and free at the front face, so the
 frame-borne wave resonates a quarter wavelength inside the layer, at
 
 $$
-f_r = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
+f_\mathrm{r} = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
 K_c = \frac{2(1-\nu)N}{1-2\nu}
 $$
 
@@ -2002,7 +2002,7 @@ foams), when the material is bonded to a plate that shakes it directly, or when
 a measured impedance shows a feature no equivalent fluid can explain. A light,
 soft blanket in free air is better served by `limp_frame`.
 
-**Honest note on validation.** There is no published table of $Z_s(f)$ or
+**Honest note on validation.** There is no published table of $Z_\mathrm{s}(f)$ or
 $\alpha(f)$ for a fully specified Biot layer, here or anywhere else checked, so
 this model cannot be pinned digit by digit the way the standards-based modules
 are. What it is anchored on instead, in decreasing strength: the **rigid-frame
@@ -2023,7 +2023,7 @@ value while its modulus, 0.939, is 14.5 % away. That is recorded in
 [Errata](https://jmrplens.github.io/phonometry/reference/errata/), along with the parameter sweep that
 fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
 thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
-$\mathrm{Im}(Z_s)$ peak rule. Everything else, including the whole
+$\mathrm{Im}(Z_\mathrm{s})$ peak rule. Everything else, including the whole
 oblique-incidence behaviour beyond its rigid-frame limit, rests on closed forms
 and on structural identities, not on published digits.
 
@@ -2043,12 +2043,12 @@ j \sin(k_x d)/Z_x & \cos(k_x d)
 $$
 
 with the in-depth wavenumber $k_x = \sqrt{k^2 - k_0^2 \sin^2\theta}$ from
-Snell's law and $Z_x = Z_c k / k_x$. Thin resonant sheets enter as series
+Snell's law and $Z_x = Z_\mathrm{c} k / k_x$. Thin resonant sheets enter as series
 impedances $[[1, z], [0, 1]]$. Closing the chain with a rigid wall (or free
 air, or any impedance) gives the surface impedance, the reflection factor
 $R(\theta)$ and $\alpha(\theta) = 1 - |R|^2$. A single hard-backed porous
 layer reduces to the textbook closed form
-$Z_s = -j Z_c \cot(k d)$ (Mechel Sect. D.3, Eq. 1).
+$Z_\mathrm{s} = -j Z_\mathrm{c} \cot(k d)$ (Mechel Sect. D.3, Eq. 1).
 
 Before the matrices, the physical picture: a hard-backed porous layer is an
 equivalent fluid wrapped in five measurable numbers. The 50 mm layer below,
@@ -2259,7 +2259,7 @@ Maa's oblique closed form (Eq. 23) exactly. The random-incidence coefficient
 is the Paris integral (Mechel Sect. D.5, Eq. 9)
 
 $$
-\alpha_{dif} = \frac{2}{\sin^2\theta_{lim}} \int_0^{\theta_{lim}}
+\alpha_\mathrm{dif} = \frac{2}{\sin^2\theta_\mathrm{lim}} \int_0^{\theta_\mathrm{lim}}
 \alpha(\theta)\,\cos\theta\,\sin\theta\,\mathrm{d}\theta,
 $$
 
@@ -2290,7 +2290,7 @@ print(round(float(materials.statistical_absorption(1.567 + 0j)), 3))  # 0.951
 
 *Why the reverberation room reads higher than the tube: the Paris integral
 weights the oblique angles, whose waves travel a longer path inside the
-layer, so $\alpha_{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
+layer, so $\alpha_\mathrm{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
 where the layer is thin against the wavelength. This is the model-side
 counterpart of the tube-versus-reverberation-room discussion of
 [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/).*
@@ -2346,7 +2346,7 @@ $\alpha_\infty = 1$ it tracks Delany–Bazley over the fit range.
 
 **Rigid or limp frame.** Every equivalent-fluid model above assumes a
 motionless frame, which only holds above the decoupling frequency
-$F_d = \sigma\phi^2/2\pi\rho_1$. Below it a light frame moves with the pore
+$F_\mathrm{d} = \sigma\phi^2/2\pi\rho_1$. Below it a light frame moves with the pore
 fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
 Use it for felts, screens and light fibreglass, for anything measured
 unconstrained in an impedance tube, and wherever the frame in vacuum is softer
@@ -2361,8 +2361,8 @@ local reaction, a good approximation for high flow resistivity, partitioned
 cavities or thin resonant facings; for thick, light porous layers integrate
 the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
 Either way the prediction is for a laterally infinite sample: the finite-size
-edge effect that lets a measured ISO 354 $\alpha_s$ exceed the predicted
-$\alpha_{dif}$, and even exceed 1.0, is not modelled here.
+edge effect that lets a measured ISO 354 $\alpha_\mathrm{s}$ exceed the predicted
+$\alpha_\mathrm{dif}$, and even exceed 1.0, is not modelled here.
 
 **Where the numbers were checked.** The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to
@@ -2540,7 +2540,7 @@ losses of the sub-millimetre slit and the resonator necks make *perfect*
 absorption possible: when the intrinsic loss balances the leakage, the
 reflection zero lands on the real-frequency axis and $\alpha = 1$ (critical
 coupling). The panel transfer matrix is the chain
-$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$; the rigidly-backed
+$T = M_{\Delta l}\,\prod_n (M_\mathrm{s}\,M_\mathrm{HR}^{(n)}\,M_\mathrm{s})$; the rigidly-backed
 reflection factor is
 $R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
 $Z_0 = \rho_0 c_0 / S_0$. The slit uses the narrow-channel visco-thermal

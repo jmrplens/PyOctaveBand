@@ -91,7 +91,7 @@ reducción acústica $R$ de las normas europeas y la pérdida por transmisión $
 de la bibliografía norteamericana que sigue esta página son la *misma magnitud*,
 $TL \equiv R = -10\lg\tau$; la página conserva el símbolo de cada fuente para que
 sus fórmulas se puedan contrastar con el texto impreso, y por eso los resultados
-exponen `transmission_loss` y lo valoran como $R_w$. Del mismo modo, aquí se
+exponen `transmission_loss` y lo valoran como $R_\mathrm{w}$. Del mismo modo, aquí se
 escribe la masa por unidad de superficie $m''$, que es la notación de Bies y de
 Hopkins para el $m'$ que usan las guías de ISO 12354; $m$ a secas está reservado
 en el resto del sitio para el coeficiente de atenuación de potencia del aire de
@@ -179,22 +179,22 @@ Un panel real también es rígido, así que en la **frecuencia de coincidencia
 (crítica)** (Bies Ec. 7.3)
 
 $$
-f_c = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B'}}
-    = \frac{0{,}55\, c_0^2}{c_L\, h},
+f_\mathrm{c} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B'}}
+    = \frac{0{,}55\, c_0^2}{c_\mathrm{L}\, h},
 $$
 
 la longitud de onda de flexión libre iguala la longitud de onda de traza del
 sonido incidente y el panel se vuelve transparente: la **caída del aislamiento en la coincidencia**.
-El método de Sharp mantiene la ley de masas de campo hasta $f_c/2$, cae con una
-recta en $\log f$ y desde $f_c$ sigue (Ec. 7.44)
-$TL = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2] + 10\log_{10}(2\eta f/\pi f_c)$ con el factor
+El método de Sharp mantiene la ley de masas de campo hasta $f_\mathrm{c}/2$, cae con una
+recta en $\log f$ y desde $f_\mathrm{c}$ sigue (Ec. 7.44)
+$TL = 10\log_{10}[1 + (\pi f m''/\rho_0 c_0)^2] + 10\log_{10}(2\eta f/\pi f_\mathrm{c})$ con el factor
 de pérdidas $\eta$. El valle se sitúa en el punto B de la carta de diseño de
-Bies, $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$.
+Bies, $TL = 20\log_{10}(f_\mathrm{c} m'') + 10\log_{10}\eta - 44$.
 
 Toda la sección en un esquema: un campo difuso excita una hoja simple y el
 $R(f)$ predicho sube con la ley de masas hasta la coincidencia. Una
-placa de yeso laminado de 12,5 mm sitúa $f_c$ cerca de 2,6 kHz y puntúa
-$R_w = 27$ dB.
+placa de yeso laminado de 12,5 mm sitúa $f_\mathrm{c}$ cerca de 2,6 kHz y puntúa
+$R_\mathrm{w} = 27$ dB.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation_es.svg" alt="Sección de un ensayo de aislamiento: un panel de yeso laminado de 12,5 mm montado entre muros de relleno pesados, flechas verdes de incidencia difusa que llegan con varios ángulos desde el recinto emisor, flechas azules más finas transmitidas hacia el recinto receptor, una onda de flexión dibujada a lo largo de la placa y un recuadro con el índice de reducción acústica predicho subiendo 6 dB por octava hasta la coincidencia en fc = 2,6 kHz, con la masa de 8,8 kg por metro cuadrado y la valoración Rw = 27 dB anotadas" width="92%" />
 
@@ -229,25 +229,25 @@ elemento *tal como está montado*, no el factor de pérdidas interno del materia
 En un elemento montado, el total es el interno más el de radiación más las
 pérdidas en los bordes, y para un elemento pesado en un hueco de ensayo domina
 el término de bordes: el anexo C de ISO 12354-1 da
-$\eta_\text{tot,lab} \approx \eta_\text{int} + m'/(485\sqrt{f}) \approx 0{,}01 +
+$\eta_\mathrm{tot,lab} \approx \eta_\mathrm{int} + m'/(485\sqrt{f}) \approx 0{,}01 +
 m'/(485\sqrt{f})$ para elementos por debajo de 800 kg/m², al alcance sin salir
 de la biblioteca como `laboratory_total_loss_factor`. Para este vidrio de
 15 kg/m² esa estimación vale 0,011 a 500 Hz, apenas por encima del valor
 interno; para un forjado de hormigón de 484 kg/m² vale 0,055, cinco veces la
 cifra del material. La vía medida es el tiempo de reverberación estructural y
-$\eta = 2{,}2/(fT_s)$, la misma magnitud que miden las guías de
+$\eta = 2{,}2/(fT_\mathrm{s})$, la misma magnitud que miden las guías de
 [ISO 10848](/phonometry/es/buildings/insulation/flanking-lab/) y de
 [EN 15657](/phonometry/es/buildings/design/structure-borne-power/).
 Conviene saber qué hay en juego: la profundidad del valle lleva $10\lg\eta$, así
 que un factor de tres en $\eta$ mueve la región de coincidencia 4,8 dB y no
-cambia nada por debajo de $f_c/2$.
+cambia nada por debajo de $f_\mathrm{c}/2$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_es.svg" alt="Índice de reducción acústica previsto de un vidrio flotado de 6 mm por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con la caída del aislamiento en la coincidencia, hacia 2100 Hz, marcada, las desviaciones desfavorables sombreadas y el índice Rw anotado" width="80%" />
 
 *El espectro de Sharp previsto se evalúa exactamente como una medición: la
-caída del aislamiento en $f_c \approx 2{,}1$ kHz concentra la mayor parte
+caída del aislamiento en $f_\mathrm{c} \approx 2{,}1$ kHz concentra la mayor parte
 de las desviaciones desfavorables, y la referencia desplazada leída a
-500 Hz da el $R_w = 32$ dB de catálogo del vidrio de 6 mm.*
+500 Hz da el $R_\mathrm{w} = 32$ dB de catálogo del vidrio de 6 mm.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -410,16 +410,16 @@ La chapa grecada y la nervada no son isótropas. Son muy rígidas *en el sentido
 de las grecas y casi tan flexibles como una chapa plana *en el transversal*, de
 modo que en lugar de una frecuencia de coincidencia tienen todo un **rango de
 coincidencia** delimitado por las dos rigideces principales a flexión (Vigran
-ec. 6.107, la $f_c = (c_0^2/2\pi)\sqrt{m''/B}$ isótropa evaluada dos veces):
+ec. 6.107, la $f_\mathrm{c} = (c_0^2/2\pi)\sqrt{m''/B}$ isótropa evaluada dos veces):
 
 $$
-f_{c1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
-f_{c2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
+f_{\mathrm{c}1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
+f_{\mathrm{c}2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
 $$
 
 La dirección más rígida fija la frecuencia de coincidencia *más baja*, y ahí
-está la trampa: grecar una chapa para ganar resistencia arrastra $f_{c1}$ hacia
-abajo, a menudo hasta unos pocos cientos de hercios, mientras $f_{c2}$ se sube
+está la trampa: grecar una chapa para ganar resistencia arrastra $f_{\mathrm{c}1}$ hacia
+abajo, a menudo hasta unos pocos cientos de hercios, mientras $f_{\mathrm{c}2}$ se sube
 a 15 kHz o 30 kHz. En todo ese tramo domina la transmisión resonante y $R$ se
 aplana muy por debajo de la ley de masas de una placa plana de la misma masa.
 
@@ -428,14 +428,14 @@ La impedancia de onda de flexión depende ahora del azimut $\vartheta$ además d
 es la ec. 7.30 de Bies):
 
 $$
-Z_w = \mathrm{j}\omega m''\left[1 -
-\left(\frac{f}{f_{c1}}\cos^2\vartheta + \frac{f}{f_{c2}}\sin^2\vartheta\right)^2
+Z_\mathrm{w} = \mathrm{j}\omega m''\left[1 -
+\left(\frac{f}{f_{\mathrm{c}1}}\cos^2\vartheta + \frac{f}{f_{\mathrm{c}2}}\sin^2\vartheta\right)^2
 (1 + \mathrm{j}\eta)\sin^4\varphi\right],
 $$
 
-y el promedio en campo difuso de $\tau = |1 + Z_w\cos\varphi/2\rho_0c_0|^{-2}$
+y el promedio en campo difuso de $\tau = |1 + Z_\mathrm{w}\cos\varphi/2\rho_0c_0|^{-2}$
 pasa a ser una integral doble (Vigran ec. 6.111 = Bies ec. 7.38). Con
-$f_{c1} = f_{c2}$ se recupera exactamente la impedancia isótropa de Cremer.
+$f_{\mathrm{c}1} = f_{\mathrm{c}2}$ se recupera exactamente la impedancia isótropa de Cremer.
 
 `orthotropic_transmission_loss` ofrece las dos vías publicadas:
 
@@ -448,18 +448,18 @@ $f_{c1} = f_{c2}$ se recupera exactamente la impedancia isótropa de Cremer.
   $\sin^2\varphi = 0{,}96$ de Vigran).
 - `method="heckl"` es la aproximación en forma cerrada de Heckl para
   $\eta = 0$, el gráfico de diseño de la fig. 7.9(b) de Bies: ley de masas de
-  incidencia de campo por debajo de $f_{c1}/2$, luego
+  incidencia de campo por debajo de $f_{\mathrm{c}1}/2$, luego
 
   $$
-  \tau_F \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{c1}}{f^2}
-  \left[\ln\frac{4f}{f_{c1}}\right]^2 \quad (f_{c1} \le f < f_{c2}/2),
+  \tau_\mathrm{F} \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{\mathrm{c}1}}{f^2}
+  \left[\ln\frac{4f}{f_{\mathrm{c}1}}\right]^2 \quad (f_{\mathrm{c}1} \le f < f_{\mathrm{c}2}/2),
   \qquad
-  \tau_F \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{c1}f_{c2}}}{f^2}
-  \quad (f > 2f_{c2}),
+  \tau_\mathrm{F} \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{\mathrm{c}1}f_{\mathrm{c}2}}}{f^2}
+  \quad (f > 2f_{\mathrm{c}2}),
   $$
 
   con rectas en $\log_{10} f$ que salvan los dos huecos. No necesita factor de
-  pérdidas ni cálculo numérico, pero exige $f_{c2} > 4f_{c1}$ para que sus
+  pérdidas ni cálculo numérico, pero exige $f_{\mathrm{c}2} > 4f_{\mathrm{c}1}$ para que sus
   cuatro puntos de construcción queden ordenados.
 
 Para la greca sinusoidal habitual las rigideces equivalentes vienen de
@@ -515,11 +515,11 @@ grecada es lo que demuestra que el factor de masa pertenece ahí: con los
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_es.svg" alt="Pérdida por transmisión en decibelios frente a bandas de tercio de octava de 100 hercios a 16 kilohercios para una chapa de acero de 1 mm, plana y grecada. Ambas curvas suben juntas a 6 decibelios por octava desde unos 11 decibelios a 100 hercios hasta 28 decibelios a 800 hercios. Por encima de 1 kilohercio la chapa plana sigue subiendo hasta un máximo cercano a 45 decibelios a 6,3 kilohercios antes de su propia caída por coincidencia, mientras la chapa grecada se desploma a 22 decibelios a 1,6 kilohercios dentro de una banda sombreada que va de 1165 hercios a 13,1 kilohercios y luego recupera lentamente, quedando unos 13 decibelios por debajo de la plana a 2,5 kilohercios. Una línea discontinua muestra la aproximación en forma cerrada de Heckl siguiendo el mismo desplome de forma más suave" width="88%" loading="lazy" />
 
 *El intercambio que hace el grecado, sobre la propia geometría de Vigran. Por
-debajo de $f_{c1}$ los dos paneles quedan a unos 2 dB uno del otro (el grecado
+debajo de $f_{\mathrm{c}1}$ los dos paneles quedan a unos 2 dB uno del otro (el grecado
 algo por encima: es un 9 % más pesado, y la integral en campo difuso usa un
 ángulo límite de 78 grados en lugar de la corrección de banda de 5,5 dB de
 Sharp). A lo largo del rango de coincidencia la chapa grecada cede hasta 13 dB,
-y $R_w$ baja de 28 dB a 25 dB, con un panel más rígido y apenas más pesado.*
+y $R_\mathrm{w}$ baja de 28 dB a 25 dB, con un panel más rígido y apenas más pesado.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -579,7 +579,7 @@ plt.show()
 
 Merece la pena repetir dos advertencias que Bies añade a la rama de Heckl,
 porque ningún modelo suave predice ninguna de las dos. Por debajo de unos
-$0{,}7f_{c1}$ la estimación infravalora $R$ en paneles pequeños, y el error
+$0{,}7f_{\mathrm{c}1}$ la estimación infravalora $R$ en paneles pequeños, y el error
 crece a medida que el panel se reduce; y las chapas grecadas reales casi siempre
 muestran un valle de hasta 5 dB en algún punto entre 2 kHz y 4 kHz, que los
 cálculos por elementos finitos atribuyeron a resonancias de los tramos de panel
@@ -598,7 +598,7 @@ $$
 
 el conjunto se mueve como uno y sigue la ley de masas de la masa *combinada*;
 por encima, las dos leyes de masas se suman, reforzadas por la cámara, hasta la
-frecuencia límite $f_l = c_0/(2\pi d)$ donde el refuerzo satura en 6 dB
+frecuencia límite $f_\mathrm{l} = c_0/(2\pi d)$ donde el refuerzo satura en 6 dB
 (Ec. 7.64). Un relleno poroso (cualquier
 [`PorousMediumResult`](/phonometry/es/materials/absorbers/porous-absorbers/)) ablanda la
 cámara y baja $f_0$.
@@ -681,11 +681,11 @@ $X$, medida sobre dos cubos de hormigón de 100 mm nominalmente idénticos
 $Nk/S$ a la rigidez del aire de la cámara:
 
 $$
-f_\text{msm} = \frac{1}{2\pi}
-\sqrt{\frac{s_a + Nk/S}{\rho_{s1}\rho_{s2}/(\rho_{s1}+\rho_{s2})}}.
+f_\mathrm{msm} = \frac{1}{2\pi}
+\sqrt{\frac{s_\mathrm{a} + Nk/S}{\rho_{\mathrm{s}1}\rho_{\mathrm{s}2}/(\rho_{\mathrm{s}1}+\rho_{\mathrm{s}2})}}.
 $$
 
-Por debajo de $f_\text{msm}$ las dos hojas actúan como una sola placa de masa
+Por debajo de $f_\mathrm{msm}$ las dos hojas actúan como una sola placa de masa
 combinada, así que las llaves rígidas son doblemente malas: suben la resonancia
 hasta el rango de valoración y puentean la cámara. `WALL_TIE_STIFFNESS`
 contiene la Tabla A4 de Hopkins, cuyas filas de 50 mm proceden de Hopkins,
@@ -724,19 +724,19 @@ dw = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075,
 transmite potencia estructural entre las hojas. Con las movilidades en el punto
 de excitación $Y_i$, $Y_j$ de las dos hojas (placas delgadas infinitas,
 $Y = 1/(8\sqrt{B'm''})$, Ec. 2.190) y la movilidad del conector de un muelle
-lineal $Y_c = \mathrm{i}\omega/k$ (Ec. 4.88), $N$ uniones idénticas y no
+lineal $Y_\mathrm{c} = \mathrm{i}\omega/k$ (Ec. 4.88), $N$ uniones idénticas y no
 correlacionadas dan el factor de pérdidas por acoplamiento (Ec. 4.87)
 
 $$
 \eta_{ij} = \frac{N}{\omega m_i}
-\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_c|^2}.
+\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_\mathrm{c}|^2}.
 $$
 
-El área de la placa se cancela ($N/m_i = n/\rho_{s1}$ con $n$ llaves por m²),
+El área de la placa se cancela ($N/m_i = n/\rho_{\mathrm{s}1}$ con $n$ llaves por m²),
 así que solo entra la densidad de llaves. Una unión rígida (un tornillo, un
 clavo, un perno o una llave tan rígida que nunca cede) es el límite
-$Y_c = 0$, donde $\eta_{ij}$ cae como $1/f$. Una llave elástica añade dos
-potencias más en cuanto $|Y_c| = \omega/k$ supera a las movilidades de las
+$Y_\mathrm{c} = 0$, donde $\eta_{ij}$ cae como $1/f$. Una llave elástica añade dos
+potencias más en cuanto $|Y_\mathrm{c}| = \omega/k$ supera a las movilidades de las
 placas: $\eta_{ij}$ cae entonces como $1/f^3$ y la *razón* frente al techo
 rígido como $1/f^2$. Es exactamente por lo que una llave de mariposa de
 1,7 MN/m y una de torsión vertical de 94 MN/m se comportan de forma tan
@@ -780,8 +780,8 @@ $$
 R = -10\log_{10}\!\left( \frac{1}{\sum_n S_n} \sum_n S_n\, 10^{-R_n/10} \right),
 $$
 
-de modo que una abertura desnuda de área relativa $S_a/S$ limita la composición
-a $10\log_{10}(S/S_a)$: una abertura del 1 % nunca puede superar los 20 dB, sea cual
+de modo que una abertura desnuda de área relativa $S_\mathrm{a}/S$ limita la composición
+a $10\log_{10}(S/S_\mathrm{a})$: una abertura del 1 % nunca puede superar los 20 dB, sea cual
 sea la pared.
 
 ```python
@@ -861,27 +861,27 @@ que $\sigma = 1$ significa «tan eficiente como un pistón» — y, como muestra
 números de abajo, cerca de la coincidencia una placa puede superarlo.
 
 Hay tres regímenes, no dos (Leppington/Maidanik, Hopkins Ec. 2.227-2.230). **Muy
-por debajo de $f_c$** la longitud de onda de flexión es más corta que la
+por debajo de $f_\mathrm{c}$** la longitud de onda de flexión es más corta que la
 acústica, las semiondas contiguas se cancelan mutuamente el caudal volumétrico y
 solo radian las franjas sin cancelar de los bordes y las esquinas. Por eso el
 cálculo necesita las dos dimensiones de la placa y su condición de borde: un
 borde empotrado radia más que uno simplemente apoyado, y una placa con bafles
 perpendiculares a sus bordes más que una enrasada en un bafle infinito — los
-argumentos `boundary` y `baffle` eligen entre ellos. **Alrededor de $f_c$** la
+argumentos `boundary` y `baffle` eligen entre ellos. **Alrededor de $f_\mathrm{c}$** la
 longitud de onda de traza de la onda de flexión coincide con la acústica, la
-forma de Leppington $(1 - f_c/f)^{-1/2}$ diverge y queda limitada por la
+forma de Leppington $(1 - f_\mathrm{c}/f)^{-1/2}$ diverge y queda limitada por la
 expresión en coincidencia; el panel de abajo alcanza un máximo de
-$\sigma = 2,6$ en la banda de 2 kHz. **Solo muy por encima de $f_c$** se asienta
+$\sigma = 2,6$ en la banda de 2 kHz. **Solo muy por encima de $f_\mathrm{c}$** se asienta
 $\sigma$ hacia 1: un tercio de octava pasada la coincidencia este panel sigue en
 1,74.
 
 $$
-\sigma = \frac{1}{\sqrt{1 - f_c/f}} \quad (f > f_c), \qquad
-\sigma \to 1 \quad (f \gg f_c) .
+\sigma = \frac{1}{\sqrt{1 - f_\mathrm{c}/f}} \quad (f > f_\mathrm{c}), \qquad
+\sigma \to 1 \quad (f \gg f_\mathrm{c}) .
 $$
 
 Merece la pena llevarse dos consecuencias. Una placa *pequeña* es, por debajo de
-$f_c$, mejor radiador relativo que una grande del mismo material, porque la
+$f_\mathrm{c}$, mejor radiador relativo que una grande del mismo material, porque la
 franja de borde que radia es una fracción mayor de ella: el panel de
 1,5 × 1,25 m de abajo da $\sigma = 0,011$ a 100 Hz, y un panel de 0,5 × 0,4 m
 del mismo vidrio, 0,034. Y la caída de $R$ en la coincidencia y el pico de
@@ -891,12 +891,12 @@ EN 12354 y como el factor de radiación que mide ISO 7849.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/radiation_efficiency_panels_es.svg" alt="Izquierda: eficiencia de radiación frente a la frecuencia para un vidrio de 1,5 por 1,25 metros y otro de 0,5 por 0,4 metros del mismo vidrio, los dos con la frecuencia crítica y la línea de la unidad marcadas, que muestra que el vidrio pequeño radia tres veces mejor por debajo de la coincidencia. Derecha: la placa simplemente apoyada y con bafle que supone el modelo, dibujada a escala" width="92%" />
 
-*Tres regímenes en un mismo eje. Por debajo de $f_c$ los dos vidrios se
+*Tres regímenes en un mismo eje. Por debajo de $f_\mathrm{c}$ los dos vidrios se
 diferencian en un factor de tres en $\sigma$ aunque son el mismo vidrio — el más
 pequeño radia relativamente mejor, porque su franja de borde sin cancelar es una
 fracción mayor de él. En la coincidencia los dos superan la unidad: el vidrio de
 1,5 × 1,25 m llega a 2,61 en la banda de 2 kHz, que es la que contiene
-$f_c$ = 2107 Hz. Por encima, $\sigma$ vuelve hacia 1 solo despacio: todavía 1,74
+$f_\mathrm{c}$ = 2107 Hz. Por encima, $\sigma$ vuelve hacia 1 solo despacio: todavía 1,74
 un tercio de octava pasada la coincidencia y 1,32 a 5 kHz. El panel de la derecha
 es la geometría que supone el modelo y la razón de que necesite dos dimensiones y
 una condición de borde.*
@@ -949,7 +949,7 @@ puntual $Y$ (la inversa de la impedancia) fija cuánta energía absorbe una
 estructura. Para estructuras infinitas son formas cerradas: una placa delgada
 infinita es una resistencia pura $Z = 8\sqrt{B'\,m''}$ (real, independiente de
 la frecuencia), mientras que una viga infinita tiene
-$Y = (1-\mathrm{j})/(4 m' c_B)$ (45 grados, decayendo como $\omega^{-1/2}$).
+$Y = (1-\mathrm{j})/(4 m' c_\mathrm{B})$ (45 grados, decayendo como $\omega^{-1/2}$).
 Aportan la movilidad de receptor que EN 12354-5 necesita cuando no hay medida.
 `infinite_plate_point_mobility` e `infinite_beam_point_mobility` devuelven esas
 mismas magnitudes empaquetadas como un `MobilityResult` de ISO 7626, así que se
@@ -972,7 +972,7 @@ print(round(float(w) * 1e3, 3), "mW")                 # W = |F|^2 / (16 sqrt(B' 
 | Parámetro | Tipo | Unidades | Rango / defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `mass_per_area` | float | kg/m² | > 0 | Densidad superficial $m''$ |
-| `critical_frequency` / `bending_stiffness` | float | Hz / N·m | dar uno | Coincidencia $f_c$, o $B'$ para calcularla |
+| `critical_frequency` / `bending_stiffness` | float | Hz / N·m | dar uno | Coincidencia $f_\mathrm{c}$, o $B'$ para calcularla |
 | `loss_factor` | float | — | > 0; defecto `0.01` en hoja simple, `0.1` en doble hoja | Factor de pérdidas total $\eta$ |
 | `band` | str | — | `'third'` (−5,5 dB) / `'octave'` (−4,0 dB) | Ancho de la corrección de campo |
 | `mass1` / `mass2` | float | kg/m² | > 0 | Densidades superficiales de las hojas |
@@ -1041,7 +1041,7 @@ modelo de rendija de Gomperts solo es válido para una rendija estrecha,
 $w < 0{,}3\lambda$, así que una abertura ancha queda fuera de él; y solo está
 implementado el «método n.º 1» de Leppington para la eficiencia de radiación,
 no sus otras formulaciones publicadas. Los modelos ortótropos son modelos de
-panel infinito en las mismas condiciones: por debajo de unos $0{,}7f_{c1}$ la
+panel infinito en las mismas condiciones: por debajo de unos $0{,}7f_{\mathrm{c}1}$ la
 rama de Heckl infravalora $R$ en paneles pequeños, y el valle entre 2 kHz y 4
 kHz que muestra la chapa grecada real proviene de resonancias de los tramos de
 panel entre nervios, que ninguna de las dos vías predice. Solo la greca
@@ -1061,7 +1061,7 @@ sala-placa-cámara-placa-sala.
 ## Véase también
 
 - [Predicción del aislamiento (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
-  ensambla el $R$ de elemento predicho o medido en el $R'_w$ in situ.
+  ensambla el $R$ de elemento predicho o medido en el $R'_\mathrm{w}$ in situ.
 - [Potencia acústica a partir de la vibración (ISO 7849)](/phonometry/es/devices/emission/vibration-sound-power/):
   consume la eficiencia de radiación predicha como su factor de radiación.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):

@@ -53,7 +53,7 @@ Two sibling pages complete the chain. The detector output is the level
 track that the percentile levels $L_N$ of
 [Integrated and Statistical Levels](/phonometry/signals/levels/levels/) are
 defined on, while the integrated
-metrics ($L_{eq}$, SEL) bypass the detector entirely; and the full
+metrics ($L_\mathrm{eq}$, SEL) bypass the detector entirely; and the full
 IEC 61672-1 instrument chain that wraps this detector (weighting, ranges,
 periodic tests) is the subject of
 [Build a sound level meter](/phonometry/signals/sound-level-meter/).
@@ -150,7 +150,7 @@ decay, switching per sample on the sign of the change:
 
 $$
 y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
-\alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1.5)} & \text{otherwise}\end{cases}
+\alpha = \begin{cases}1 - e^{-1/(f_\mathrm{s} \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_\mathrm{s} \cdot 1.5)} & \text{otherwise}\end{cases}
 $$
 
 A time constant and a decay rate are the same statement. An exponentially
@@ -164,14 +164,14 @@ operator was meant to be able to read off a moving needle.
 The asymmetry has a consequence worth stating: unlike F and S, Impulse is not a
 filter. Its coefficient depends on the signal, so an I-weighted level is not
 additive — the I-weighted level of two sources running together cannot be
-derived from the two measured separately, while their $L_{eq}$ values can.
+derived from the two measured separately, while their $L_\mathrm{eq}$ values can.
 
 ### Choosing F, S or I
 
 - **Fast** is the default of nearly every modern method: percentile levels,
   impulsive-event detection, community noise, the general "level vs time"
   plot. Its 125 ms constant is of the same order as the ear's own loudness
-  integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
+  integration time, so an $L_\mathrm{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
   the price of missing short events (a 100 ms burst peaks 7.6 dB lower
@@ -185,12 +185,12 @@ derived from the two measured separately, while their $L_{eq}$ values can.
   IEC 61672-1, whose first edition (2002) explains why: I-weighted levels
   are not suitable for rating impulsive sounds. Modern *international*
   practice rates impulsiveness with
-  $L_{Aeq}$ plus an adjustment (ISO 1996-1 Table A.1, or the onset analysis
+  $L_\mathrm{Aeq}$ plus an adjustment (ISO 1996-1 Table A.1, or the onset analysis
   of [Impulsive-sound prominence](/phonometry/environment/assessment/impulsive-sound/)) and assesses
-  hearing-damage risk with $L_{Cpeak}$, never with I-weighted levels. Some
+  hearing-damage risk with $L_\mathrm{Cpeak}$, never with I-weighted levels. Some
   national rules still require the I weighting explicitly: the Spanish
-  RD 1367/2007 grades its impulsive correction $K_i$ on
-  $L_{AIeq} - L_{Aeq}$ (see
+  RD 1367/2007 grades its impulsive correction $K_\mathrm{i}$ on
+  $L_\mathrm{AIeq} - L_\mathrm{Aeq}$ (see
   [Spanish Noise Regulation](/phonometry/environment/assessment/spanish-noise-regulation/)),
   which is why `mode='impulse'` is a first-class option here and not a
   compatibility shim.
@@ -201,7 +201,7 @@ derived from the two measured separately, while their $L_{eq}$ values can.
 lasts. The measured curves land on the Table 4 reference points, so the whole
 table is one line of algebra. The gap between two curves at a given duration is
 the reason a maximum level has to name its time weighting; and the absolute
-loss is why very short impulses are rated with $L_{Cpeak}$ instead — even
+loss is why very short impulses are rated with $L_\mathrm{Cpeak}$ instead — even
 Impulse, the ballistics designed for impacts, is 18 dB low on a 1 ms burst.*
 
 <details>
@@ -254,10 +254,10 @@ the level functions, which do it for you.
 
 Those reference values are not a lookup table with no formula behind it.
 IEC 61672-1 gives them in Note 1 to Table 4 as Equation (7), the exact response
-of the section 1 detector to an isolated 4 kHz toneburst of duration $T_b$:
+of the section 1 detector to an isolated 4 kHz toneburst of duration $T_\mathrm{b}$:
 
 $$
-\Delta_{\mathrm{ref}} = 10\log_{10}\left(1 - e^{-T_b/\tau}\right)\ \text{dB}
+\Delta_{\mathrm{ref}} = 10\log_{10}\left(1 - e^{-T_\mathrm{b}/\tau}\right)\ \text{dB}
 $$
 
 Read it out loud and the whole table follows. On Fast ($\tau = 125$ ms) a
@@ -267,9 +267,9 @@ and $-10.21$ dB on Slow, and that 7.6 dB is the number quoted in the
 [choosing guidance](#choosing-f-s-or-i) above. The physics is one sentence: a
 detector with memory $\tau$ cannot reach its steady value on an event shorter
 than $\tau$, so **every meter under-reads every short event**, by an amount
-that depends only on $T_b/\tau$. That is why a maximum level is meaningless
+that depends only on $T_\mathrm{b}/\tau$. That is why a maximum level is meaningless
 without its ballistics, and why impulses short compared with 125 ms are rated
-with $L_{Cpeak}$ instead.
+with $L_\mathrm{Cpeak}$ instead.
 
 The Fast envelope's response to 4 kHz tonebursts lands exactly on the
 standard's reference values: the example below verifies the three Table 4 rows
@@ -400,7 +400,7 @@ The `impulse` mode uses an asymmetric kernel that is JIT-compiled when
 Without numba a pure-Python fallback produces identical results, just slower.
 
 See [Integrated and Statistical Levels](/phonometry/signals/levels/levels/) for
-$L_{eq}$/$L_N$ metrics built on these envelopes, and
+$L_\mathrm{eq}$/$L_N$ metrics built on these envelopes, and
 [Why phonometry](/phonometry/start/why-phonometry/) for the IEC
 61672-1 tone-burst verification.
 
@@ -422,7 +422,7 @@ IEC 61672-1's wider instrument chain (frequency weighting, level ranges,
 periodic tests) is not on this page; it is the subject of [Build a sound level
 meter](/phonometry/signals/sound-level-meter/). ANSI S1.4-1983 is cited only
 for the historical origin of the F and S constants, not implemented as its own
-instrument specification. Modern impulsiveness rating ($L_{Aeq}$ plus an
+instrument specification. Modern impulsiveness rating ($L_\mathrm{Aeq}$ plus an
 adjustment, or onset analysis) is on the [Impulsive-sound
 prominence](/phonometry/environment/assessment/impulsive-sound/) page, not
 built on the Impulse weighting here.
@@ -436,7 +436,7 @@ built on the Impulse weighting here.
 - [Frequency Weighting](/phonometry/signals/levels/weighting/): the A/C/Z filters applied before the detector.
 - [Block Processing](/phonometry/signals/filters/block-processing/): streaming the detector over frames without state discontinuities.
 - [Impulsive-sound prominence](/phonometry/environment/assessment/impulsive-sound/): the onset-based rating of impulses that the international standards moved to.
-- [Spanish Noise Regulation](/phonometry/environment/assessment/spanish-noise-regulation/): a rating in force that still requires the I weighting, through the $L_{AIeq} - L_{Aeq}$ impulsive correction $K_i$.
+- [Spanish Noise Regulation](/phonometry/environment/assessment/spanish-noise-regulation/): a rating in force that still requires the I weighting, through the $L_\mathrm{AIeq} - L_\mathrm{Aeq}$ impulsive correction $K_\mathrm{i}$.
 - [Calibration and dBFS](/phonometry/signals/metrology/calibration/): the IEC 61672-3 periodic tests, in which these ballistics are spot-checked against the class limits on a real instrument.
 - API reference: [`filters.weighting`](/phonometry/reference/api/filters/weighting/).
 - Theory: [Time Integration](/phonometry/reference/theory/signal-analysis/#time-integration): the first-order equation the exponential detectors solve, and what integrating it over a fixed block instead would change.

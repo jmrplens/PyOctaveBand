@@ -6,14 +6,14 @@ ISO 9614-3:2002 (precision, grade 1).
 
 A probe is swept continuously over each segment of a hypothetical surface that
 encloses the source, reporting the time-averaged signed normal intensity
-:math:`\langle I_{n,i} \rangle` and mean-square pressure per segment. The
+:math:`\langle I_{\mathrm{n},i} \rangle` and mean-square pressure per segment. The
 sound power follows from the partial powers
-:math:`P_i = \langle I_{n,i} \rangle S_i` summed over the ``N`` segments
+:math:`P_i = \langle I_{\mathrm{n},i} \rangle S_i` summed over the ``N`` segments
 (clause 9, equations (5), (6), (12), (13)):
 
 .. math::
 
-   P_i = \langle I_{n,i} \rangle \, S_i \tag{Eq. 12}
+   P_i = \langle I_{\mathrm{n},i} \rangle \, S_i \tag{Eq. 12}
 
    P = \sum_i P_i \tag{Eq. 6}
 
@@ -41,7 +41,7 @@ normative):
 indicator (equivalent to ISO 9614-1 ``F3-F2``, Note 15). Because Part 2 weights
 by segment area ``Si`` while :func:`phonometry.field_indicators` (ISO 9614-1)
 assumes equal-area positions, the indicators are computed directly here; only
-the dynamic-capability index :math:`L_d = \delta_{pI0} - K` is shared with
+the dynamic-capability index :math:`L_\mathrm{d} = \delta_{pI0} - K` is shared with
 :func:`phonometry.dynamic_capability_index`.
 
 Qualification criteria per band (Annex B), where ``K`` is 10 (engineering) or
@@ -50,7 +50,7 @@ grade 3, and the per-segment repeatability limit ``s`` comes from Table 2:
 
 .. math::
 
-   \text{criterion 1:} \quad L_d > F_{pI}, \qquad L_d = \delta_{pI0} - K
+   \text{criterion 1:} \quad L_\mathrm{d} > F_{pI}, \qquad L_\mathrm{d} = \delta_{pI0} - K
 
    \text{criterion 2:} \quad F_{+/-} \le 3~\text{dB}
 
@@ -154,7 +154,7 @@ def _table2_s(nominal: int, band_type: BandType) -> float:
 class SoundPowerIntensityResult:
     r"""Result of an ISO 9614-2:1996 sound-power-by-scanning determination.
 
-    ``partial_power`` is the signed :math:`P_i = \langle I_{n,i} \rangle S_i`
+    ``partial_power`` is the signed :math:`P_i = \langle I_{\mathrm{n},i} \rangle S_i`
     per segment and band (Eq. 12); ``partial_power_level`` the magnitude level
     :math:`10 \log_{10}(|P_i|/P_0)` (Eq. 8), with the sign carried by
     ``partial_power``. ``sound_power`` is the signed band total
@@ -344,9 +344,9 @@ def sound_power_intensity(
 
     ``normal_intensity`` is an ``(N_seg, N_bands)`` array (or ``(N_seg,)`` for a
     single band) of the signed, segment-averaged normal sound intensity
-    :math:`\langle I_{n,i} \rangle` (W/m^2), and ``areas`` the ``(N_seg,)``
+    :math:`\langle I_{\mathrm{n},i} \rangle` (W/m^2), and ``areas`` the ``(N_seg,)``
     segment areas ``Si`` (m^2). The partial powers
-    :math:`P_i = \langle I_{n,i} \rangle S_i` are summed to the band sound
+    :math:`P_i = \langle I_{\mathrm{n},i} \rangle S_i` are summed to the band sound
     power ``P`` and level :math:`L_W = 10 \log_{10}(P/P_0)` (equations (12), (6),
     (13)). Bands with :math:`P < 0` are flagged (``negative_band``) and
     reported as ``NaN`` (clause 9.2).
@@ -574,7 +574,7 @@ def _a_weighting_omission(
     Clause 10.6 b requires the contribution of the bands in which criteria 1
     and/or 2 are not satisfied to be omitted from an A-weighted sound power
     level determination (unless negligible per 4.3), and the omission to be
-    stated. Criterion 1 (:math:`L_d > F_{pI}`, B.1.1) needs the surface
+    stated. Criterion 1 (:math:`L_\mathrm{d} > F_{pI}`, B.1.1) needs the surface
     pressure-intensity indicator and the dynamic capability index; without them
     the screening cannot be evaluated and ``None`` is returned. Criterion 2
     (:math:`F_{+/-} \le 3` dB, B.1.2) binds engineering-grade determinations
@@ -654,7 +654,7 @@ class PrecisionFieldIndicators:
     the unsigned pressure-intensity indicator (= F2, Eq. B.3, using the mean
     magnitude of the segment intensities) and ``f_pi_signed`` the signed one
     (= F3, Eq. B.6, using the algebraic mean); by construction
-    :math:`F_{pI_n}^{\mathrm{signed}} \ge F_{pI_n}^{\mathrm{unsigned}}`.
+    :math:`F_{pI_\mathrm{n}}^{\mathrm{signed}} \ge F_{pI_\mathrm{n}}^{\mathrm{unsigned}}`.
     ``fs`` is the field-non-uniformity indicator (= F4, Eq. B.8)."""
 
     ft: np.ndarray | None
@@ -669,18 +669,18 @@ class PrecisionCriteria:
 
     Each attribute is a boolean array (True = satisfied) or ``None`` when its
     inputs are absent. ``criterion_1`` scan repeatability
-    :math:`\lvert L_{I_n}(1) - L_{I_n}(2) \rvert \le s/2` (Eq. C.1);
+    :math:`\lvert L_{I_\mathrm{n}}(1) - L_{I_\mathrm{n}}(2) \rvert \le s/2` (Eq. C.1);
     ``criterion_2`` dynamic-capability
-    adequacy :math:`L_d \ge F_{pI_n}^{\mathrm{signed}}` (Eq. C.2);
+    adequacy :math:`L_\mathrm{d} \ge F_{pI_\mathrm{n}}^{\mathrm{signed}}` (Eq. C.2);
     ``criterion_3``
-    :math:`F_{pI_n}^{\mathrm{signed}} - F_{pI_n}^{\mathrm{unsigned}} \le 3` dB
+    :math:`F_{pI_\mathrm{n}}^{\mathrm{signed}} - F_{pI_\mathrm{n}}^{\mathrm{unsigned}} \le 3` dB
     (Eq. C.3); ``criterion_4``
-    :math:`F_S \le 2` (Eq. C.4); ``criterion_5`` scan-density convergence
-    :math:`0.83 \le F_S(1)/F_S(2) \le 1.2` (Eq. C.5). ``qualified`` is the
+    :math:`F_\mathrm{S} \le 2` (Eq. C.4); ``criterion_5`` scan-density convergence
+    :math:`0.83 \le F_\mathrm{S}(1)/F_\mathrm{S}(2) \le 1.2` (Eq. C.5). ``qualified`` is the
     conjunction of criteria 1-3 with the field non-uniformity accepted
     through criterion 4
     or, where evaluated, criterion 5 (C.1.6.2: a band satisfying criterion 5
-    is qualified as a final result even if :math:`F_S(2) \ge 2`); ``None``
+    is qualified as a final result even if :math:`F_\mathrm{S}(2) \ge 2`); ``None``
     unless both criterion 1 and criterion 2 are evaluable."""
 
     criterion_1: np.ndarray | None
@@ -749,7 +749,7 @@ def _check_report_bands(
 class PrecisionIntensityResult:
     r"""Result of an ISO 9614-3:2002 sound-power-by-scanning determination.
 
-    ``partial_power`` is the signed :math:`P_i = I_{n,i} S_i` per partial
+    ``partial_power`` is the signed :math:`P_i = I_{\mathrm{n},i} S_i` per partial
     surface and band (Eq. 5); ``sound_power`` the signed band total
     :math:`P = \sum P_i` (Eq. 8) and ``sound_power_level`` its level
     :math:`L_W = 10 \log_{10}(P/P_0)` (Eq. 9), ``NaN``
@@ -893,19 +893,19 @@ def precision_field_indicators(
        \overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N}
        \sum_j 10^{0.1 L_{pj}} \right] \tag{Eq. B.4}
 
-       L_{|I_n|} = 10 \log_{10}\!\left[ \frac{1}{N}
-       \sum_j \frac{|I_{nj}|}{I_0} \right] \tag{Eq. B.5}
+       L_{|I_\mathrm{n}|} = 10 \log_{10}\!\left[ \frac{1}{N}
+       \sum_j \frac{|I_{\mathrm{n}j}|}{I_0} \right] \tag{Eq. B.5}
 
-       L_{I_n} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N}
-       \sum_j I_{nj} \right| \right] \tag{Eq. B.7}
+       L_{I_\mathrm{n}} = 10 \log_{10}\!\left[ \frac{1}{I_0} \left| \frac{1}{N}
+       \sum_j I_{\mathrm{n}j} \right| \right] \tag{Eq. B.7}
 
-       F_{pI_n}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_n|}
+       F_{pI_\mathrm{n}}^{\mathrm{unsigned}} = \overline{L_p} - L_{|I_\mathrm{n}|}
        \tag{Eq. B.3}
 
-       F_{pI_n}^{\mathrm{signed}} = \overline{L_p} - L_{I_n} \tag{Eq. B.6}
+       F_{pI_\mathrm{n}}^{\mathrm{signed}} = \overline{L_p} - L_{I_\mathrm{n}} \tag{Eq. B.6}
 
-       F_S = \frac{1}{\overline{I_n}} \sqrt{ \frac{1}{N-1}
-       \sum_j \left( I_{nj} - \overline{I_n} \right)^2 } \tag{Eq. B.8}
+       F_\mathrm{S} = \frac{1}{\overline{I_\mathrm{n}}} \sqrt{ \frac{1}{N-1}
+       \sum_j \left( I_{\mathrm{n}j} - \overline{I_\mathrm{n}} \right)^2 } \tag{Eq. B.8}
 
     With ``time_window_intensity`` (an ``(M, NB)`` array of window-averaged
     intensities) the temporal-variability indicator ``FT`` (Eq. B.1) is also
@@ -1002,7 +1002,7 @@ def precision_qualification(
         (:math:`\lvert \Delta L \rvert \le s/2`).
     :param pressure_residual_index: ``delta_pI0`` (dB), scalar or per band; with
         :math:`K = 10` gives ``Ld`` for criterion 2
-        (:math:`L_d \ge F_{pI_n}^{\mathrm{signed}}`).
+        (:math:`L_\mathrm{d} \ge F_{pI_\mathrm{n}}^{\mathrm{signed}}`).
     :param field_nonuniformity_1: ``FS(1)`` per band (initial scan density).
     :param field_nonuniformity_2: ``FS(2)`` per band (doubled density); with
         ``FS(1)`` gives criterion 5.
@@ -1110,10 +1110,10 @@ def sound_power_intensity_precision(
     r"""Sound power by intensity scanning, precision (ISO 9614-3:2002).
 
     ``partial_intensity`` is an ``(N, NB)`` array (or ``(N,)`` for a single
-    band) of the signed normal intensity :math:`I_{ni}` on each of the ``N``
+    band) of the signed normal intensity :math:`I_{\mathrm{n}i}` on each of the ``N``
     partial surfaces (already the two-scan result), and ``areas`` the ``(N,)``
     partial surface areas :math:`S_i`. The partial powers
-    :math:`P_i = I_{ni} S_i` (Eq. 5) are summed to :math:`P` (Eq. 8) and
+    :math:`P_i = I_{\mathrm{n}i} S_i` (Eq. 5) are summed to :math:`P` (Eq. 8) and
     :math:`L_W = 10 \log_{10}(P/P_0)` (Eq. 9); a band with net :math:`P \le 0` is
     flagged (``not_applicable_band``, clause 9.2) and reported as ``NaN``.
     :math:`L_{W0}` normalizes to reference meteorology:

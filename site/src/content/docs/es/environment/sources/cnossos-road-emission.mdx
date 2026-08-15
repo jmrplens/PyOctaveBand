@@ -94,7 +94,7 @@ su vez la suma energética de un término de **rodadura** y otro de **propulsió
 rodadura alguna y se quedan solo con la propulsión (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{W\mathrm{R},i,m}/10} + 10^{L_{W\mathrm{P},i,m}/10}\right).
 $$
 
 La Tabla [2.2.a] define cinco categorías de vehículo: **1** vehículos ligeros,
@@ -172,10 +172,10 @@ mapa queda desviado varios decibelios. De aquí se lee cada uno.
 
 | Argumento | Qué significa | De dónde se lee | La trampa |
 | :--- | :--- | :--- | :--- |
-| `RoadTraffic.flow_rate` ($Q_m$) | Vehículos de la categoría $m$ por hora | Promedio anual por hora, por periodo temporal (día / tarde / noche), por clase de vehículo y **por línea fuente**, a partir de aforos o de un modelo de tráfico (2.2.1) | Un aforo de hora punta. $Q$ es un promedio anual del periodo, que es lo que convierte el resultado en un ingrediente del $L_{den}$ |
+| `RoadTraffic.flow_rate` ($Q_m$) | Vehículos de la categoría $m$ por hora | Promedio anual por hora, por periodo temporal (día / tarde / noche), por clase de vehículo y **por línea fuente**, a partir de aforos o de un modelo de tráfico (2.2.1) | Un aforo de hora punta. $Q$ es un promedio anual del periodo, que es lo que convierte el resultado en un ingrediente del $L_\mathrm{den}$ |
 | `RoadTraffic.speed` ($v_m$) | Velocidad representativa de la categoría $m$ | En la mayoría de los casos, la **menor** entre el máximo legal del tramo de vía y el máximo legal de la categoría de vehículo; donde no haya datos de medida locales, el máximo legal de la categoría (2.2.1) | Suponer que hace falta una media medida. No hace falta: el valor por defecto de la norma *es* el límite legal, y los vehículos pesados suelen tener uno más bajo que el del tramo |
 | `temperature` ($\tau$) | Temperatura del aire | La temperatura del aire **promedio anual** del periodo, a partir de datos meteorológicos de largo plazo (2.2.10) | El valor del día de la campaña. Con $K_1 = 0{,}08$ dB/°C, una media anual de 12 °C frente a una tarde de 20 °C son 0,6 dB en el término de rodadura de los ligeros |
-| `RoadTraffic.studded_fraction`, `studded_months` ($Q_{\mathrm{stud,ratio}}$, $T_s$) | Cuota de flota y temporada | La proporción media de vehículos ligeros por hora con neumáticos con clavos **durante** los meses en que los llevan, y el número de esos meses; el propio método forma $p_s = Q_{\mathrm{stud,ratio}}\,T_s/12$ (2.2.7) | Pasar la cuota promediada al año, que aplica $T_s/12$ dos veces |
+| `RoadTraffic.studded_fraction`, `studded_months` ($Q_{\mathrm{stud,ratio}}$, $T_\mathrm{s}$) | Cuota de flota y temporada | La proporción media de vehículos ligeros por hora con neumáticos con clavos **durante** los meses en que los llevan, y el número de esos meses; el propio método forma $p_\mathrm{s} = Q_{\mathrm{stud,ratio}}\,T_\mathrm{s}/12$ (2.2.7) | Pasar la cuota promediada al año, que aplica $T_\mathrm{s}/12$ dos veces |
 | `junction_distance` ($x$) | Distancia al cruce | Medida a lo largo de la vía desde la fuente puntual hasta la **intersección más próxima de esta línea fuente con otra línea fuente** (2.2.5) | Medir hasta la línea de detención o hasta el bordillo. Es el cruce de líneas, y solo afectan los últimos 100 m |
 | `junction_type` ($k$) | 1 cruce con semáforo, 2 glorieta | La regulación del cruce, no su forma | Un cruce con prioridad no es ninguno de los dos: la corrección está definida para semáforos y glorietas |
 | `gradient` ($s$) | Pendiente longitudinal con signo, % | El modelo del terreno a lo largo de la línea fuente, saturando en ±12 % | Aplicar un solo signo a un flujo bidireccional. La norma exige partir el flujo por la mitad y corregir una mitad en subida y la otra en bajada |
@@ -185,7 +185,7 @@ mapa queda desviado varios decibelios. De aquí se lee cada uno.
 Dos consecuencias que conviene enunciar sin rodeos. La primera, que la
 temperatura tiene que pertenecer al *mismo* periodo que $Q$ y $v$: un flujo de
 noche emparejado con una media anual de temperatura y una velocidad de noche es
-lo que convierte la potencia de línea resultante en un ingrediente del $L_{den}$
+lo que convierte la potencia de línea resultante en un ingrediente del $L_\mathrm{den}$
 y no en una instantánea de una tarde. La segunda, que la línea fuente es un
 objeto de modelado y no una marca vial: moverla del centro del carril al bordillo
 cambia todas las distancias de propagación aguas abajo.
@@ -197,8 +197,8 @@ la velocidad a partir de la velocidad de referencia
 $v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
-             + \Delta L_{WR,i,m},
+L_{W\mathrm{R},i,m} = A_{\mathrm{R},i,m} + B_{\mathrm{R},i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+             + \Delta L_{W\mathrm{R},i,m},
 $$
 
 donde la corrección reúne cuatro efectos independientes (2.2.5): el pavimento,
@@ -215,22 +215,22 @@ Los **neumáticos con clavos** (2.2.6 a 2.2.9) solo se aplican a la categoría 1
 El exceso por neumático $D_{\mathrm{stud},i}(v)$ se satura por debajo de
 50 km/h y por encima de 90 km/h, y la corrección de parque lo pondera por la
 fracción del año en que los clavos están en circulación,
-$p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
+$p_\mathrm{s} = Q_{\mathrm{stud,ratio}} \cdot T_\mathrm{s}/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_\mathrm{s}) + p_\mathrm{s}\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
 Los **cruces** (2.2.17, 2.2.18) suman el mismo decaimiento lineal a los dos
-términos: $\Delta L_{WR,\mathrm{acc}} = C_{R,m,k}\cdot\max(1 - |x|/100,\ 0)$ para
+términos: $\Delta L_{W\mathrm{R,acc}} = C_{\mathrm{R},m,k}\cdot\max(1 - |x|/100,\ 0)$ para
 el ruido de rodadura y
-$\Delta L_{WP,\mathrm{acc}} = C_{P,m,k}\cdot\max(1 - |x|/100,\ 0)$ para el de
+$\Delta L_{W\mathrm{P,acc}} = C_{\mathrm{P},m,k}\cdot\max(1 - |x|/100,\ 0)$ para el de
 propulsión, con $x$ la distancia en metros de la fuente puntual a la intersección
 más próxima de su línea fuente con otra línea fuente, y $k$ el tipo de cruce: 1
 para un cruce regulado por semáforo y 2 para una glorieta. Los dos se atribuyen
-por igual a todas las bandas de octava. Los coeficientes de rodadura $C_R$ son
+por igual a todas las bandas de octava. Los coeficientes de rodadura $C_\mathrm{R}$ son
 *negativos* (el tráfico junto a un cruce va más despacio) y los de propulsión
-$C_P$ positivos (va acelerando), y la norma declara explícitamente que los dos
+$C_\mathrm{P}$ positivos (va acelerando), y la norma declara explícitamente que los dos
 son nulos a partir de $|x| \ge 100$ m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_road_corrections_es.svg" alt="Tres paneles que dan el cambio ponderado A de la potencia de línea fuente que produce cada corrección de la sección 3, todos calculados sobre un flujo de 1000 vehículos por hora. Izquierda: la temperatura del aire barrida de menos 10 a más 40 grados Celsius, una recta que vale unos 2,1 dB a menos 10 para los vehículos ligeros y unos 0,5 dB para los pesados, cruzando el cero en la referencia de 20 grados. Centro: la corrección por neumáticos con clavos frente a la velocidad para dos cuotas de flota, plana por debajo de 50 km/h, con máximo cerca de 50 km/h y plana otra vez por encima de 90 km/h. Derecha: la corrección por cruce frente a la distancia al cruce de 0 a 120 m, negativa tanto para un cruce con semáforo como para una glorieta, más profunda para la glorieta en el propio cruce, e idénticamente nula a partir de 100 m" width="92%" />
@@ -299,8 +299,8 @@ y admisión. Es **lineal** con la velocidad, no logarítmico, porque a baja
 velocidad el motor trabaja más por unidad de distancia recorrida:
 
 $$
-L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
-             + \Delta L_{WP,i,m}.
+L_{W\mathrm{P},i,m} = A_{\mathrm{P},i,m} + B_{\mathrm{P},i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
+             + \Delta L_{W\mathrm{P},i,m}.
 $$
 
 Dónde se cruzan las dos leyes de velocidad es lo que da a la fuente viaria su
@@ -432,9 +432,9 @@ velocidad en que la fila se declara válida. El
 pavimento entra de forma distinta en cada término:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{W\mathrm{R,road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
-\Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
+\Delta L_{W\mathrm{P,road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
 
 Un pavimento absorbente reduce el ruido de propulsión; uno ruidoso no lo
@@ -496,7 +496,7 @@ representativo, seca, sin neumáticos con clavos, a 20 °C y en llano. Exactamen
 en esas condiciones toda corrección del 2.2 se anula de forma idéntica, así que
 a la velocidad de referencia $v_m = v_\mathrm{ref} = 70\ \text{km/h}$, donde
 también se anulan los dos términos de velocidad, las potencias acústicas
-**son** los coeficientes $A_{R,i,m}$ y $A_{P,i,m}$ de la Tabla F-1.
+**son** los coeficientes $A_{\mathrm{R},i,m}$ y $A_{\mathrm{P},i,m}$ de la Tabla F-1.
 
 ## 6. Entregar la fuente a un modelo de propagación
 
@@ -641,5 +641,5 @@ fuentes puntuales lo declara fuera de alcance el propio método.
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
   la cadena ISO 9613-2 que lleva una potencia de fuente hasta un receptor.
 - [Niveles de ruido ambiental](/phonometry/es/environment/assessment/environmental-levels/): los
-  indicadores $L_{den}$ y $L_{night}$ para los que se trazan los mapas
+  indicadores $L_\mathrm{den}$ y $L_\mathrm{night}$ para los que se trazan los mapas
   resultantes.

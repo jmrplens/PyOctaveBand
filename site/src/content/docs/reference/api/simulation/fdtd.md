@@ -15,8 +15,8 @@ formulation of Attenborough & Van Renterghem, *Predicting Outdoor Sound*
 * the governing first-order system in `p` and `v` (Eqs. 4.3-4.4);
 * the staggered-in-place, staggered-in-time discretisation (Eqs. 4.11-4.12),
   with pressure at cell centres and velocity components on cell faces;
-* the Courant stability condition $C_N \le 1$ with
-  $C_N = c\,\Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2}$
+* the Courant stability condition $C_\mathrm{N} \le 1$ with
+  $C_\mathrm{N} = c\,\Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2}$
   (Eqs. 4.13-4.14);
 * rigid boundaries as zero normal face velocity (Eq. 4.32) and the
   frequency-independent real-impedance boundary update (Eqs. 4.33-4.35);
@@ -189,7 +189,7 @@ sides into absorbing or locally reacting boundaries. Sources are soft
 | `c` | Sound-speed map [m/s], shape `(ny, nx)`. A scalar with an explicit `shape` is also accepted. |
 | `dx` | Grid spacing [m] (square cells). |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array (default 1.2). |
-| `cfl` | Courant number $C_N = c_{\max}\, \Delta t \sqrt{2} / \Delta x$ (Eq. 4.13); the explicit scheme is stable for $C_N \le 1$ (Eq. 4.14) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
+| `cfl` | Courant number $C_\mathrm{N} = c_{\max}\, \Delta t \sqrt{2} / \Delta x$ (Eq. 4.13); the explicit scheme is stable for $C_\mathrm{N} \le 1$ (Eq. 4.14) and values in `(0, 1)` are accepted. The default 0.6 keeps a wide stability margin with moderate numerical dispersion. |
 | `sponge_width` | Thickness of the absorbing layer in cells (0 = no absorbing sides). |
 | `sponge_sides` | Which sides absorb: a single side name or an iterable drawn from `{"left", "right", "top", "bottom"}` (default: all four when `sponge_width > 0`). `left`/`right` are the low/high column edges and `top`/`bottom` the low/high row edges (the default `imshow` origin). |
 | `sponge_reflection` | Target round-trip amplitude reflection of the sponge layer; sets the peak absorption rate. |
@@ -430,7 +430,7 @@ spreading rather than the 3D spherical $1/r$.
 | `sources` | One or more of [`GaussianPulse`](/phonometry/reference/api/simulation/fdtd/#gaussianpulse), [`CWSource`](/phonometry/reference/api/simulation/fdtd/#cwsource) or [`SignalSource`](/phonometry/reference/api/simulation/fdtd/#signalsource). |
 | `shape` | Grid shape `(ny, nx)`, required when `c` is a scalar. |
 | `rho` | Density map [kg/m3]; scalar or `(ny, nx)` array. |
-| `cfl` | Courant number in `(0, 1)` (Eqs. 4.13-4.14); the time step is $\Delta t = C_N\, \Delta x / (c_{\max} \sqrt{2})$. Default 0.6. |
+| `cfl` | Courant number in `(0, 1)` (Eqs. 4.13-4.14); the time step is $\Delta t = C_\mathrm{N}\, \Delta x / (c_{\max} \sqrt{2})$. Default 0.6. |
 | `probes` | Pressure-probe cells as `(ix, iy)` index pairs. |
 | `boundaries` | `"rigid"` (default), `"absorbing"`, or a mapping from side name (`left`/`right`/`top`/`bottom`) to `"rigid"`, `"absorbing"`, or a real specific impedance [Pa s/m] (scalar or per-edge-cell 1D array, Eqs. 4.33-4.35). |
 | `absorbing_layer_cells` | Sponge-layer thickness for absorbing sides, in cells. |

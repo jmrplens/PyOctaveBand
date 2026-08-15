@@ -157,11 +157,11 @@ partir del punto de funcionamiento. `fan_sound_power` implementa la ley de
 escalado de ASHRAE tal como la imprime Long en la Ec. 13.1,
 
 $$
-L_W = K_F + 10\log_{10}\frac{Q_F}{Q_\text{REF}}
-    + 10\log_{10}\frac{P_F}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
+L_W = K_\mathrm{F} + 10\log_{10}\frac{Q_\mathrm{F}}{Q_\text{REF}}
+    + 10\log_{10}\frac{P_\mathrm{F}}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
 $$
 
-con la constante espectral $K_F$ de la Tabla 13.5 (una fila por tipo de
+con la constante espectral $K_\mathrm{F}$ de la Tabla 13.5 (una fila por tipo de
 ventilador), la corrección $C_\text{EFF}$ por trabajar fuera del rendimiento
 máximo de la Tabla 13.6 y el incremento $C_\text{BFI}$ por frecuencia de paso
 de álabes de la Tabla 13.7, aplicado a la única banda de octava que contiene
@@ -519,18 +519,18 @@ potencia acústica suele venir de datos de fabricante medidos según ASHRAE
 Standard 70, que es lo que usa una hoja real. Cuando no se dispone de ellos,
 `diffuser_sound_power` es la estimación de Reynolds tal como la dan las
 Ecs. 13.27 a 13.33 de Long: un nivel global
-$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31{,}3$ a partir
-del área de la cara $S_G$, la velocidad de aproximación $U_G = Q/S_G$ y el
+$L_W = 10\log_{10} S_\mathrm{G} + 30\log_{10}\xi + 60\log_{10} U_\mathrm{G} - 31{,}3$ a partir
+del área de la cara $S_\mathrm{G}$, la velocidad de aproximación $U_\mathrm{G} = Q/S_\mathrm{G}$ y el
 coeficiente normalizado de pérdida de carga
-$\xi = 334{,}9\,\Delta p/(\rho_0 U_G^2)$ de la Ec. 13.28. Long escribe las
-cuatro en unidades anglosajonas ($S_G$ en ft², $U_G$ en ft/s, $\Delta p$ en
+$\xi = 334{,}9\,\Delta p/(\rho_0 U_\mathrm{G}^2)$ de la Ec. 13.28. Long escribe las
+cuatro en unidades anglosajonas ($S_\mathrm{G}$ en ft², $U_\mathrm{G}$ en ft/s, $\Delta p$ en
 pulgadas de columna de agua); `diffuser_sound_power` acepta y devuelve SI y
 convierte internamente, que es la razón de que aquí las constantes se citen
 sobre las unidades de Long. El espectro sale como
 $L_{W,\text{oct}} = L_W + C_D$ con la función de forma
 $C_D = -11{,}82 - 0{,}15 A - 1{,}13 A^2$ para un equipo rectangular
 ($-5{,}82$ si es circular), donde $A$ es la distancia en octavas a la banda
-de pico $f_P = 48{,}8\,U_G$ (Ec. 13.32, $U_G$ en **ft/s**), contada sobre la
+de pico $f_\mathrm{P} = 48{,}8\,U_\mathrm{G}$ (Ec. 13.32, $U_\mathrm{G}$ en **ft/s**), contada sobre la
 numeración de bandas de Long con la banda 0 en 32 Hz.
 
 ```python
@@ -586,7 +586,7 @@ velocidad en el paso de aire coloca cuatro curvas paralelas separadas 16,6 dB
 por cada duplicación, en todas las bandas a la vez, que es la razón de que un
 silenciador dimensionado por pérdida de carga y no por velocidad frontal acabe
 siendo el elemento más ruidoso del trazado. La banda de pico del difusor se
-mueve además de su nivel — $f_P = 48{,}8\,U_G$ en unidades de Long —, así que
+mueve además de su nivel — $f_\mathrm{P} = 48{,}8\,U_\mathrm{G}$ en unidades de Long —, así que
 una boca de salida más rápida no es simplemente más ruidosa: mueve su ruido a
 las bandas que una curva de criterio juzga con más dureza. El cruce que importa
 en una hoja real es aquel en el que una de estas curvas se encuentra con el
@@ -977,7 +977,7 @@ avisar.
 Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
 (2.ª ed.), sección 7.3: conductos circulares por la Ec. 7.6 con los
 autovalores $\pi\alpha_{pq}$ de la Tabla 7.1 que resuelven
-$J'_p(\kappa_{pq} a_i) = 0$, conductos rectangulares por la Ec. 7.10,
+$J'_p(\kappa_{pq} a_\mathrm{i}) = 0$, conductos rectangulares por la Ec. 7.10,
 
 $$
 (f_\text{co})_{pq} = \frac{c}{2}\sqrt{(p/a)^2 + (q/b)^2}\,\sqrt{1 - M^2},

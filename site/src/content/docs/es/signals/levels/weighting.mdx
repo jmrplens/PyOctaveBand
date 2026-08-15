@@ -147,7 +147,7 @@ que corrió la misma suerte) sigue disponible para datos históricos; véase
 ### Cuándo importa C − A
 
 Como A descarta los graves y C los conserva, la diferencia
-$L_{Ceq} - L_{Aeq}$ es un indicador de un solo número del contenido en
+$L_\mathrm{Ceq} - L_\mathrm{Aeq}$ es un indicador de un solo número del contenido en
 baja frecuencia:
 
 - **Por debajo de unos 10 dB**: espectro de banda ancha ordinario; el nivel
@@ -269,7 +269,7 @@ print(f"LAeq de la misma señal                     "
 ```
 
 La vía de la **tabla** es a la que te ves obligado cuando los datos llegan ya
-como niveles de banda: sumar el $A(f_m)$ tabulado a cada nivel de banda. Es una
+como niveles de banda: sumar el $A(f_\mathrm{m})$ tabulado a cada nivel de banda. Es una
 aproximación, porque A sube con mucha pendiente en las bandas graves, así que su
 media ponderada por energía *dentro* de una banda no es su valor en la
 frecuencia central. Medido frente a la vía exacta sobre ese mismo ruido rosa:
@@ -318,7 +318,7 @@ for recording in batch:
 ## 5. Precisión en alta frecuencia (`high_accuracy`)
 
 Un diseño con transformación bilineal simple comprime la respuesta cerca de
-Nyquist: a $f_s = 48$ kHz el error de la curva A a 12,5 kHz alcanza −2,7 dB,
+Nyquist: a $f_\mathrm{s} = 48$ kHz el error de la curva A a 12,5 kHz alcanza −2,7 dB,
 fuera
 de la tolerancia **clase 1** de IEC 61672-1 (+2,0/−2,5 dB).
 
@@ -326,7 +326,7 @@ Por defecto (`high_accuracy=True`), phonometry diseña y ejecuta el filtro de
 ponderación a una frecuencia interna sobremuestreada (hasta 8×, alcanzando
 ≥ 144 kHz a frecuencias de audio habituales; una entrada de 96 kHz funciona
 a ×2) y diezma de vuelta, manteniendo la respuesta dentro de las tolerancias
-de clase 1 hasta 16 kHz (error ≈ −0,5 dB a 12,5 kHz para $f_s = 48$ kHz).
+de clase 1 hasta 16 kHz (error ≈ −0,5 dB a 12,5 kHz para $f_\mathrm{s} = 48$ kHz).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_es.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño sobremuestreado, con error" width="80%" />
 
@@ -536,13 +536,13 @@ especiales](/phonometry/es/signals/levels/special-weightings/).
 Llama a `filters.weighting_filter(recording, fs, curve='A')` sobre una señal
 calibrada. Devuelve la señal temporal ponderada A, filtrada con el diseño de
 polos y ceros de IEC 61672-1:2013 dentro de las tolerancias de clase 1, así que
-`signals.leq()` sobre la salida es el $L_{Aeq}$. La misma función aplica las
+`signals.leq()` sobre la salida es el $L_\mathrm{Aeq}$. La misma función aplica las
 ponderaciones C, Z, B, D, AU y la G de infrasonido mediante `curve`.
 
 ### ¿Cuándo debo usar la ponderación C en lugar de la ponderación A?
 
-Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_{Ceq} - L_{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A valora el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
+Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y usa la diferencia $L_\mathrm{Ceq} - L_\mathrm{Aeq}$ como indicador del contenido en baja frecuencia: por debajo de unos 10 dB el nivel ponderado A valora el espectro con justicia, mientras que en torno a 15 a 20 dB o más la energía se concentra en las bajas frecuencias y el nivel ponderado A subestima el problema. El método HML de ISO 4869-2 se apoya exactamente en esta diferencia C menos A para la selección de protectores auditivos.
 
 ### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
 
-No con un diseño bilineal simple: a $f_s = 48$ kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.
+No con un diseño bilineal simple: a $f_\mathrm{s} = 48$ kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.

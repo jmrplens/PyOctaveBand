@@ -28,10 +28,10 @@ Procedures* (4th ed., 2010):
   (Eq. 8.162), giving the interval
   $n \hat{G}_{xx}/\chi^2_{n;\alpha/2} \le G_{xx} \le n \hat{G}_{xx}/\chi^2_{n;1-\alpha/2}$ (Eq. 8.163);
 * the **first-order resolution-bias error**:
-  $b[\hat{G}_{xx}] \approx (B_e^2/24) \, G''_{xx}$
+  $b[\hat{G}_{xx}] \approx (B_\mathrm{e}^2/24) \, G''_{xx}$
   (Eq. 8.139), which for a resonance peak of half-power bandwidth
-  $B_r$
-  becomes $\varepsilon_b \approx -(B_e/B_r)^2/3$ (Eq. 8.141) -
+  $B_\mathrm{r}$
+  becomes $\varepsilon_\mathrm{b} \approx -(B_\mathrm{e}/B_\mathrm{r})^2/3$ (Eq. 8.141) -
   exposed here as
   [`resolution_bias_error`](/phonometry/reference/api/signals/spectra/#resolution_bias_error);
 * the **coherent output spectrum**
@@ -164,7 +164,7 @@ $G_{yy} = G_{vv} + G_{nn}$
 | `coherence_bias` | First-order bias of the coherence estimate, $b[\hat{\gamma}^2] \approx (1 - \gamma^2)^2 / n_d$ (Eq. 9.75). |
 | `n_segments` | Raw number of segments averaged. |
 | `n_averages` | Effective number of independent averages $n_d$. |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$, in Hz. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |
@@ -273,7 +273,7 @@ estimate, as Bendat & Piersol recommend for measured data (Section 9.2).
 | `phase_std` | Standard deviation of the phase estimate, in radians, $\mathrm{s.d.} = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})$ (Eq. 9.52). |
 | `n_segments` | Raw number of segments averaged. |
 | `n_averages` | Effective number of independent averages $n_d$. |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$, in Hz. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |
@@ -379,7 +379,7 @@ resolution-bias error at a resonance peak see
 | `x` | Signal, 1-D. |
 | `fs` | Sample rate, in Hz. |
 | `window` | Segment taper (any scipy window name; default Hann, the B&P Section 11.5.2 recommendation for side-lobe suppression). |
-| `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_e$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
+| `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_\mathrm{e}$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5, which with a Hann taper retrieves most of the stability lost to tapering, B&P Section 11.5.2.2). |
 | `scaling` | `'density'` (units²/Hz) or `'spectrum'` (units² per segment bandwidth). |
 | `confidence` | Confidence level for the chi-square interval. |
@@ -403,19 +403,19 @@ resolution_bias_error(
 
 First-order resolution-bias error at a resonance peak (Eq. 8.141).
 
-$\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -(B_e/B_r)^2/3$ for
+$\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -(B_\mathrm{e}/B_\mathrm{r})^2/3$ for
 a resonance of half-power bandwidth
-$B_r$ analysed with resolution bandwidth $B_e$: peaks are
+$B_\mathrm{r}$ analysed with resolution bandwidth $B_\mathrm{e}$: peaks are
 underestimated (and valleys overestimated) by frequency smoothing, in
 the direction of reduced dynamic range (B&P Section 8.5.1). The
-approximation assumes $B_e < B_r$.
+approximation assumes $B_\mathrm{e} < B_\mathrm{r}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `resolution_bandwidth` | Analysis resolution bandwidth $B_e$, Hz ([`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
-| `half_power_bandwidth` | Half-power (-3 dB) bandwidth $B_r$ of the spectral peak, in Hz. |
+| `resolution_bandwidth` | Analysis resolution bandwidth $B_\mathrm{e}$, Hz ([`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
+| `half_power_bandwidth` | Half-power (-3 dB) bandwidth $B_\mathrm{r}$ of the spectral peak, in Hz. |
 
 **Returns:** Normalized bias error (dimensionless, negative at a peak).
 
@@ -461,7 +461,7 @@ Welch autospectral density with its statistical error (B&P Ch. 8).
 | `n_segments` | Raw number of (possibly overlapped) segments averaged. |
 | `n_averages` | Effective number of independent averages $n_d$ (equals `n_segments` without overlap; smaller with overlap). |
 | `degrees_of_freedom` | Chi-square degrees of freedom $n = 2 n_d$ of the interior bins (Eq. 8.162; $n_d$ at DC/Nyquist). |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$ of the tapered segment, in Hz (drives the bias error of Eq. 8.139). |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$ of the tapered segment, in Hz (drives the bias error of Eq. 8.139). |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |

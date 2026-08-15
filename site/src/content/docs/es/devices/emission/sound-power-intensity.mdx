@@ -132,7 +132,7 @@ iguales, así que los indicadores de campo de allí y los criterios de
 cualificación de aquí son los mismos dos números con las notaciones de dos
 normas.
 
-La **capacidad dinámica** de la sonda $L_d = \delta_{pI0} - K$ (índice de
+La **capacidad dinámica** de la sonda $L_\mathrm{d} = \delta_{pI0} - K$ (índice de
 intensidad residual de presión menos el factor de sesgo $K$, 10 dB para el
 grado 2 y 7 dB para el grado 3) debe superar $F_{pI}$ (criterio 1);
 $F_{+/-} \le 3\ \text{dB}$ es el criterio 2 (obligatorio para el grado 2); y
@@ -162,7 +162,7 @@ superficie alejándola del campo próximo, apantallar o retirar la fuente extra�
 montar un **espaciador mayor** para subir $\delta_{pI0}$ (véase
 [Elegir la sonda](/phonometry/es/devices/emission/intensity/#elegir-la-sonda)),
 y solo después plantearse mejor equipo. Rebajar la pretensión de grado de
-ingeniería a inspección da por sí sola 3 dB de $L_d$, porque $K$ pasa de 10 dB a
+ingeniería a inspección da por sí sola 3 dB de $L_\mathrm{d}$, porque $K$ pasa de 10 dB a
 7 dB — a costa del grado.
 
 ```python
@@ -267,7 +267,7 @@ una banda fuera, por razones distintas:
   `a_weighting_omitted_bands` registra exactamente cuáles.
 
 El apartado 10.6 b) hace además que declarar esa omisión forme parte de la
-determinación: un $L_{WA}$ informado sin decir qué bandas se descartaron no es
+determinación: un $L_{W\mathrm{A}}$ informado sin decir qué bandas se descartaron no es
 conforme. La consecuencia va en un solo sentido — el total es una
 **subestimación**, y quien lee puede acotarlo sumando las bandas omitidas a su
 nivel calculado y devolviéndolas. Ojo también al modo de fallo del propio
@@ -333,8 +333,8 @@ informe de los criterios por separado en lugar de con un único booleano.
 | `areas` | array 1D | m² | > 0, `(N_seg,)` | Áreas de los segmentos $S_i$ |
 | `normal_intensity_2` | array 2D | W/m² | misma forma | Segundo barrido → criterio 3 y promediado |
 | `pressure_levels` | array 2D | dB | misma forma | SPL por segmento $L_{pi}$ → $F_{pI}$ |
-| `pressure_residual_index` | float o array 1D | dB | — | $\delta_{pI0}$ → $L_d$ / criterio 1 |
-| `frequencies` | array 1D | Hz | octava 63 Hz-4 kHz, tercio 50 Hz-6,3 kHz | $L_{WA}$ y límites de la Tabla 2; fuera de ese rango la Tabla 2 no tiene $s$ y la llamada lanza un error |
+| `pressure_residual_index` | float o array 1D | dB | — | $\delta_{pI0}$ → $L_\mathrm{d}$ / criterio 1 |
+| `frequencies` | array 1D | Hz | octava 63 Hz-4 kHz, tercio 50 Hz-6,3 kHz | $L_{W\mathrm{A}}$ y límites de la Tabla 2; fuera de ese rango la Tabla 2 no tiene $s$ y la llamada lanza un error |
 | `band_type` | str | — | `'third'` (por defecto) / `'octave'` | Consulta de la Tabla 2 |
 | `grade` | str | — | `'engineering'` (por defecto) / `'survey'` | Selecciona $K$ |
 | `repeatability_limit` | float o array 1D | dB | por defecto Tabla 2 (inspección: los 4 dB ponderados A reutilizados por banda) | Sobrescribe $s$ del criterio 3 |
@@ -344,9 +344,9 @@ por segmento y banda, `sound_power`/`sound_power_level` (total de banda, `NaN`
 donde `negative_band`), `negative_band` (las bandas no determinables),
 `surface_pressure_intensity_index` ($F_{pI}$),
 `negative_partial_power_index` ($F_{+/-}$), `repeatability`,
-`dynamic_capability_index` ($L_d$), `achieved_grade`,
+`dynamic_capability_index` ($L_\mathrm{d}$), `achieved_grade`,
 `a_weighting_omitted_bands` (las bandas que el apartado 10.6 b) dejó fuera de
-$L_{WA}$), `surface_area`, `sound_power_level_a` y `grade`.
+$L_{W\mathrm{A}}$), `surface_area`, `sound_power_level_a` y `grade`.
 
 `partial_power_level` es el campo que paga todo el método. Una determinación por
 presión devuelve un número por banda; un barrido de intensidad devuelve uno por
@@ -415,8 +415,8 @@ incertidumbre explícito.
 $P_i = I_{n,i}\,S_i$; el total $P = \sum_i P_i$ da
 $L_W = 10\log_{10}(P/P_0)$, $P_0 = 1\ \text{pW}$. Una banda cuya potencia neta no
 es positiva ($P \le 0$) se marca no aplicable en lugar de
-registrarse. Los indicadores de campo (variabilidad temporal $F_T$, los
-indicadores presión-intensidad con y sin signo, y la no uniformidad $F_S$)
+registrarse. Los indicadores de campo (variabilidad temporal $F_\mathrm{T}$, los
+indicadores presión-intensidad con y sin signo, y la no uniformidad $F_\mathrm{S}$)
 gobiernan los cinco criterios de aceptación.
 
 ```python
@@ -518,7 +518,7 @@ cálculo con los criterios quitados.
 
 `precision_field_indicators` calcula los indicadores del Anexo B a partir de los
 mismos arrays por segmento — los indicadores presión-intensidad con y sin signo
-$F_{pI_n}$, la no uniformidad del campo $F_S$ y la variabilidad temporal $F_T$
+$F_{pI_n}$, la no uniformidad del campo $F_\mathrm{S}$ y la variabilidad temporal $F_\mathrm{T}$
 cuando se aporta una intensidad por ventana temporal. `precision_qualification`
 evalúa después los cinco criterios del Anexo C por banda:
 
@@ -527,14 +527,14 @@ evalúa después los cinco criterios del Anexo C por banda:
    (Ec. C.1) — la mitad de la tolerancia que admite la ISO 9614-2, que es casi
    todo lo que cuesta la «precisión»;
 2. **suficiencia de la capacidad dinámica**,
-   $L_d \ge F_{pI_n}^{\text{con signo}}$ con $L_d = \delta_{pI0} - K$ y
+   $L_\mathrm{d} \ge F_{pI_n}^{\text{con signo}}$ con $L_\mathrm{d} = \delta_{pI0} - K$ y
    $K = 10$ dB (Ec. C.2);
 3. $F_{pI_n}^{\text{con signo}} - F_{pI_n}^{\text{sin signo}} \le 3$ dB
    (Ec. C.3), la contrapartida de precisión del límite de $F_{+/-}$ de la
    ISO 9614-2;
-4. **no uniformidad del campo**, $F_S \le 2$ (Ec. C.4);
+4. **no uniformidad del campo**, $F_\mathrm{S} \le 2$ (Ec. C.4);
 5. **convergencia con la densidad de barrido**,
-   $0{,}83 \le F_S(1)/F_S(2) \le 1{,}2$ entre la densidad inicial y una doblada
+   $0{,}83 \le F_\mathrm{S}(1)/F_\mathrm{S}(2) \le 1{,}2$ entre la densidad inicial y una doblada
    (Ec. C.5).
 
 La conjunción es `qualified`, y lleva un matiz que conviene conocer antes de
@@ -565,7 +565,7 @@ print(crit.qualified.tolist())     # [False, True, True, True, False]
 ```
 
 Aquí fallan dos bandas, y fallan por la razón que dicen los números: a 250 Hz y a
-4 kHz el indicador con signo (12,2 dB y 9,2 dB) supera la $L_d = 5$ dB de la
+4 kHz el indicador con signo (12,2 dB y 9,2 dB) supera la $L_\mathrm{d} = 5$ dB de la
 sonda, así que el instrumento no puede resolver el flujo neto frente a su propio
 índice residual. Eso es el criterio 2, y la respuesta es una sonda mejor, un
 espaciador mayor o una superficie alejada del campo próximo reactivo, no un
@@ -580,7 +580,7 @@ compartiendo el diseño y el contenedor `ReportMetadata` de la
 [ficha de los métodos de presión](/phonometry/es/devices/emission/sound-power-pressure/#3-el-informe-de-medición-report).
 La línea de base normativa nombra la ISO 9614-2:1996 y el grado de
 medición, la tabla por bandas lista el nivel de potencia acústica de banda
-$L_W$ derivado de la intensidad, y el recuadro del $L_{WA}$ recoge el $L_W$
+$L_W$ derivado de la intensidad, y el recuadro del $L_{W\mathrm{A}}$ recoge el $L_W$
 total, la superficie de medición $S$ y el grado de determinación (el resultado
 por intensidad no tiene incertidumbre expandida $U$). `verbose=True` añade los
 indicadores de campo $F_{pI}$ (superficial de presión-intensidad) y $F_{+/-}$
@@ -643,7 +643,7 @@ determinación, porque el apartado 4.3 lo exige cuando ese rango es más estrech
 que de 50 Hz a 6,3 kHz. Un conjunto de tercios de octava se imprime en dos
 grupos de columnas contiguos, como una hoja acreditada encaja tantas bandas en
 una página. `verbose=True` tabula por banda los cuatro indicadores del Anexo B
-$F_T$, $F_{p|I_n|}$, $F_{pI_n}$ y $F_S$, la tabulación que pide el punto f) 1)
+$F_\mathrm{T}$, $F_{p|I_n|}$, $F_{pI_n}$ y $F_\mathrm{S}$, la tabulación que pide el punto f) 1)
 del capítulo 10, sobre la superficie de medición tal como los define el Anexo B,
 y la celda de cualificación que deciden los criterios.
 
@@ -651,15 +651,15 @@ Si le pasas una cualificación del Anexo C, la hoja hace lo que el apartado
 10 f) 2) declara obligatorio: las bandas cuyos criterios del Anexo C no se
 cumplen quedan fuera de la determinación ponderada A y se nombran en la hoja,
 junto a las bandas a las que el método no es aplicable en absoluto (apartado
-9.2). Por eso el $L_{WA}$ del recuadro puede diferir de
+9.2). Por eso el $L_{W\mathrm{A}}$ del recuadro puede diferir de
 `result.sound_power_level_a`, que se calcula antes de evaluar ningún criterio y
 por tanto suma todas las bandas aplicables. A su lado el recuadro indica el
-$L_{WA0}$ normalizado, porque el punto f) 2) del capítulo 10 declara la magnitud
+$L_{W\mathrm{A}0}$ normalizado, porque el punto f) 2) del capítulo 10 declara la magnitud
 normalizada mientras que el número principal es el nivel frente al que se
 escribe un límite declarado. Sin `criteria`, la ficha recuadra el
 valor del propio resultado e indica que no se aportó cualificación.
 `residual_index` pone en la hoja el índice presión-intensidad residual de la
-sonda (apartado 10 d) 5)) con la capacidad dinámica $L_d$ que se deduce de él;
+sonda (apartado 10 d) 5)) con la capacidad dinámica $L_\mathrm{d}$ que se deduce de él;
 los elementos del apartado 10 que son descripción libre y no números, la
 geometría y la velocidad del barrido, el tiempo de barrido y las comprobaciones
 con la sonda invertida, van en el campo `notes` de los metadatos.
@@ -735,7 +735,7 @@ criterio 2 y nombrada como omitida.
 La determinación por barrido de ISO 9614-2 (`sound_power_intensity`): las
 potencias parciales, los indicadores de campo $F_{pI}$ (presión-intensidad
 superficial) y $F_{+/-}$ (potencia parcial negativa), la capacidad dinámica
-$L_d$, el criterio de repetibilidad, el grado alcanzado por banda y el marcado
+$L_\mathrm{d}$, el criterio de repetibilidad, el grado alcanzado por banda y el marcado
 de no aplicable del apartado 9.2 para bandas con flujo neto entrante, con el
 cribado del apartado 10.6 b) del total ponderado A
 (`a_weighting_omitted_bands`). La determinación de precisión de ISO 9614-3

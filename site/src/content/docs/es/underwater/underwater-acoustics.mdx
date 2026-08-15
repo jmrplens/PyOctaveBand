@@ -109,11 +109,11 @@ equivalente:
 $$
 L_{\mathrm{RN}} = 20\log_{10}\frac{p_{\mathrm{rms}}}{p_0} + 20\log_{10}\frac{r}{r_0}
 \ \ \mathrm{dB\ re\ 1\ \mu Pa\!\cdot\! m}, \qquad
-L_s = L_{\mathrm{RN}} + \Delta L,
+L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L,
 $$
 
 donde la corrección de superficie de espejo de Lloyd (ISO 17208-2 Fórmula 3) para
-una profundidad de fuente nominal $d_s = 0{,}7\,D$ ($D$ = calado medio) y $u = k\,d_s$,
+una profundidad de fuente nominal $d_\mathrm{s} = 0{,}7\,D$ ($D$ = calado medio) y $u = k\,d_\mathrm{s}$,
 $k = 2\pi f/c$, es
 
 $$
@@ -123,7 +123,7 @@ $$
 La corrección existe por la superficie del mar. Para un receptor
 situado debajo, la superficie es un espejo de presión nula, así que el buque
 radia como una fuente más una imagen en oposición de fase a una distancia
-$2 d_s$ por encima de ella: el dipolo del anexo A de la ISO 17208-2. Cuando el
+$2 d_\mathrm{s}$ por encima de ella: el dipolo del anexo A de la ISO 17208-2. Cuando el
 par queda somero en términos de longitud de onda, ambos casi se cancelan, y el
 campo medido debajo subestima lo que tendría que valer un monopolo equivalente;
 cuando queda profundo en términos de longitud de onda, ambos se descorrelacionan
@@ -141,7 +141,7 @@ $-10\log_{10}(2) = -3{,}01$ dB cuando $u \to \infty$, donde fuente e imagen se
 suman de forma incoherente.
 
 La propia profundidad de fuente nominal es una convención, no una fuente
-localizada: la Fórmula (1) de la ISO 17208-2 fija $d_s = 0{,}7\,D$ sobre la
+localizada: la Fórmula (1) de la ISO 17208-2 fija $d_\mathrm{s} = 0{,}7\,D$ sobre la
 media de los calados de proa y de popa, y su propia nota 4 califica la elección
 de «algo arbitraria», un compromiso. El nivel de fuente declarado es por tanto
 un valor *monopolar equivalente de través* que no significa nada por sí solo:
@@ -151,7 +151,7 @@ velocidad del sonido empleada y la fórmula de conversión aplicada.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ship_source_level_es.svg" alt="Nivel de ruido radiado y nivel de fuente monopolar equivalente de un buque en función de la frecuencia, con la corrección de superficie de espejo de Lloyd en un eje gemelo que muestra su divergencia a baja frecuencia y su aproximación a −3 dB a alta frecuencia" width="82%" loading="eager" />
 
 *La separación entre las dos curvas es la corrección de superficie, y cambia de
-signo. Para este calado de 6 m ($d_s$ = 4,2 m) suma 9,08 dB en 20 Hz, cruza el
+signo. Para este calado de 6 m ($d_\mathrm{s}$ = 4,2 m) suma 9,08 dB en 20 Hz, cruza el
 cero cerca de 59 Hz, se pasa hasta −4,07 dB en 160 Hz y solo entonces se asienta
 en los $-10\log_{10}(2) = -3{,}01$ dB de un par fuente e imagen incoherente, que
 alcanza hacia 4 kHz. Todo lo que queda a la izquierda del cruce es la inversión
@@ -210,11 +210,11 @@ incertidumbre expandida tabulada (5 dB ≤100 Hz, 3 dB 125 Hz–16 kHz,
 Esas cifras tabuladas son la incertidumbre del *nivel de ruido radiado*, y son
 valores representativos más que un balance de incertidumbre de tu campaña. El
 apartado 5 de la ISO 17208-2 añade dos términos más al *nivel de fuente*. La
-velocidad del sonido entra solo a través de $k d_s$, así que hasta un error del
+velocidad del sonido entra solo a través de $k d_\mathrm{s}$, así que hasta un error del
 10 % en ella cuesta menos de un decibelio. La corrección ajustada se aparta de
 la expresión completa del espejo de Lloyd en menos de 2 dB en casi todas las
 bandas de decidécada, con una excepción: unos 4 dB en la banda donde
-$k d_s \approx 13$, que para la profundidad de fuente de 4,2 m del ejemplo
+$k d_\mathrm{s} \approx 13$, que para la profundidad de fuente de 4,2 m del ejemplo
 anterior son 739 Hz, y conviene calcularla para tu propio calado antes de
 declarar nada. El tercer término, hasta qué punto es adecuado describir un
 radiador direccional con varios mecanismos como un único monopolo, la norma
@@ -231,7 +231,7 @@ máxima aproximación de 100 m o una eslora, lo que sea mayor, en aguas de al
 menos 150 m o 1,5 esloras de profundidad para que el fondo quede fuera de la
 escena (apartados 5.2, 5.4). Solo puntúa la **ventana de datos** de ±30°
 alrededor del CPA: el promediado corre mientras el buque cruza una ventana de
-longitud $2\,d_{CPA}\tan 30°$ (aproximadamente 1,15 distancias de CPA),
+longitud $2\,d_\mathrm{CPA}\tan 30°$ (aproximadamente 1,15 distancias de CPA),
 centrada en el aspecto de través para el que se define el nivel de ruido
 radiado (apartado 3, figura 3). Se exigen cuatro pasadas, dos por cada costado
 del buque; los
@@ -279,7 +279,7 @@ y la ventana de datos en planta.
 ## 3. Sonido del hincado de pilotes (ISO 18406)
 
 El hincado de pilotes por percusión radia un pulso impulsivo por cada golpe de
-martillo. Cada golpe tiene un **nivel de exposición sonora por golpe** $\mathrm{SEL}_{ss}$;
+martillo. Cada golpe tiene un **nivel de exposición sonora por golpe** $\mathrm{SEL_{ss}}$;
 a lo largo de una secuencia de hincado las exposiciones se suman en un **nivel de
 exposición sonora acumulado**:
 

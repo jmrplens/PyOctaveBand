@@ -233,7 +233,7 @@ Averaging $n_d$ independent segments gives the estimate $2 n_d$ chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
 $$
-\varepsilon_r[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,\alpha/2}} \le G_{xx} \le
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_d .
 $$
@@ -258,14 +258,14 @@ res.plot()                                        # PSD in dB with the CI band
 ```
 
 The **resolution bias** is the other half of the error budget: a finite
-analysis bandwidth $B_e$ (reported as `resolution_bandwidth`, the effective
+analysis bandwidth $B_\mathrm{e}$ (reported as `resolution_bandwidth`, the effective
 noise bandwidth of the taper) smooths sharp spectral features, always in the
 direction of reduced dynamic range (Eq. 8.139). For a resonance peak of
-half-power bandwidth $B_r$, the first-order normalized bias is the closed form
+half-power bandwidth $B_\mathrm{r}$, the first-order normalized bias is the closed form
 of Eq. 8.141, exposed as `resolution_bias_error`:
 
 $$
-\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -\frac{1}{3}\left(\frac{B_e}{B_r}\right)^2 .
+\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -\frac{1}{3}\left(\frac{B_\mathrm{e}}{B_\mathrm{r}}\right)^2 .
 $$
 
 ```python
@@ -274,7 +274,7 @@ from phonometry import resolution_bias_error
 eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # Br = 25 Hz peak
 ```
 
-Narrow $B_e$ (long segments) suppresses the bias but leaves fewer averages and
+Narrow $B_\mathrm{e}$ (long segments) suppresses the bias but leaves fewer averages and
 a larger random error; the two requirements on segment length pull in
 opposite directions, which is exactly the trade-off the reported numbers make
 visible.
@@ -326,7 +326,7 @@ the magnitude and phase (Eqs. 9.33 and 9.52, with the measured coherence in
 place of the unknown true value, as the book recommends for measured data):
 
 $$
-\varepsilon_r[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
 \mathrm{s.d.}[\hat{\theta}_{xy}] =
 \frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_d}} .
 $$
@@ -334,7 +334,7 @@ $$
 Both shrink as the coherence approaches one: a strongly coherent pair needs
 far fewer averages for the same confidence. The phase is unwrapped, so its
 slope against frequency is the group delay
-$\tau_g = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
+$\tau_\mathrm{g} = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
 delay path the phase is linear and that slope reads the propagation delay
 directly.
 
@@ -414,9 +414,9 @@ output estimate (Eq. 9.73), plus the first-order propagation of the coherence
 error through the SNR:
 
 $$
-\varepsilon_r[\hat{G}_{vv}] =
+\varepsilon_\mathrm{r}[\hat{G}_{vv}] =
 \frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
-\varepsilon_r[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
+\varepsilon_\mathrm{r}[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
 $$
 
 For additive uncorrelated output noise of known level the coherence has the
@@ -617,7 +617,7 @@ Because the tapers are orthogonal the eigenspectra are nearly uncorrelated,
 so the average carries about $2K$ chi-square degrees of freedom from a
 single record - the same statistical machinery as the Welch result (random
 error, chi-square confidence interval), without segmenting. The
-half-bandwidth $W = NW\,f_s/N$ is set through the duration x half-bandwidth
+half-bandwidth $W = NW\,f_\mathrm{s}/N$ is set through the duration x half-bandwidth
 product $NW$ (default 4). $2W$ is the resolution of the estimate (reported
 as `resolution_bandwidth`), and only the tapers below the Shannon number
 $2NW$ keep their spectral-window energy inside the design band - their
@@ -1060,8 +1060,8 @@ print(res.resolution_bandwidth)    # Be of the tapered segment, in Hz
 res.plot()                         # dB image over the time-frequency plane
 ```
 
-The segment length is the whole design decision: $T_B = \text{nperseg}/f_s$
-of time resolution against $B_e \approx 1/T_B$ of frequency resolution, a
+The segment length is the whole design decision: $T_B = \text{nperseg}/f_\mathrm{s}$
+of time resolution against $B_\mathrm{e} \approx 1/T_B$ of frequency resolution, a
 product of one
 (Section 12.6.4.2). Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
@@ -1151,7 +1151,7 @@ res.plot()                               # power spectrum in dB over the band
 One distinction matters and the result states it: the **grid** can be made
 arbitrarily fine (`n_points`), but the **resolution** - the ability to
 separate two tones - is set by the record length and taper, reported as
-`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T$
+`resolution_bandwidth` ($B_\mathrm{e} = f_\mathrm{s} \sum w^2/(\sum w)^2$, i.e. $1/T$
 untapered, $1.5/T$ for Hann). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
 
@@ -1579,10 +1579,10 @@ detector (the roll-off of a fourth-order Butterworth applied forward and
 backward; the rejection is finite, and the zero-phase pass leaves small
 transients at the record edges).
 
-For an AM tone $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ with $f_m$
+For an AM tone $A_0 (1 + m \cos(2\pi f_\mathrm{m} t)) \cos(2\pi f_\mathrm{c} t)$ with $f_\mathrm{m}$
 on an analysis bin the closed forms are:
 
-| `kind` | mean level | line at $f_m$ | line at $2f_m$ |
+| `kind` | mean level | line at $f_\mathrm{m}$ | line at $2f_m$ |
 |---|---|---|---|
 | `'magnitude'` | $A_0$ | $A_0 m$ | - |
 | `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
@@ -1919,9 +1919,9 @@ $N$.
 
 ## 4. Non-integer samples per period
 
-When $f_s T$ is an integer, the period boundaries fall on samples, the blocks
+When $f_\mathrm{s} T$ is an integer, the period boundaries fall on samples, the blocks
 are sliced directly, and a noiseless periodic signal is recovered to machine
-precision (`interpolated` is `False`). When $f_s T$ is not an integer the
+precision (`interpolated` is `False`). When $f_\mathrm{s} T$ is not an integer the
 boundaries fall between samples; each block is then aligned to a common
 integer grid by the band-limited fractional delay of
 [`fractional_delay`](https://jmrplens.github.io/phonometry/signals/spectra/test-signals/), and the waveform is recovered within
@@ -1977,7 +1977,7 @@ average (Eq. 8, magnitude Eq. 9) in `comb_filter_response`, the square-root
 noise-reduction law reported as `noise_reduction_db` and `amplitude_snr_gain`,
 and the choice of $N$ that places a comb node on an interfering order,
 following the paper's own 32.05-order example. `time_synchronous_average` also
-implements the band-limited fractional-delay alignment used when $f_s T$ is not
+implements the band-limited fractional-delay alignment used when $f_\mathrm{s} T$ is not
 an integer.
 
 **Not covered.** Synchronous averaging needs a period it is given. Finding that
@@ -2197,7 +2197,7 @@ The correlation-peak methods refine the sample peak by three-point parabolic
 interpolation, optionally after **band-limited local upsampling**
 (`upsample=16` resamples a window around the peak sixteenfold before the
 parabola). Sub-sample accuracy presumes the peak is oversampled, i.e. the
-signals are band-limited below Nyquist; on a $0.4\,f_s$ band-limited pair the
+signals are band-limited below Nyquist; on a $0.4\,f_\mathrm{s}$ band-limited pair the
 tests pin the achievable error at ≲0.1 sample for the parabola alone and
 ≲2e-3 samples with `upsample=16`. For GCC the delay must fit within half a
 Welch segment; raise `nperseg` for longer delays.
@@ -2620,7 +2620,7 @@ documented counterpart for preparing records outside those chains.
 
 `fractional_delay` shifts a record by any number of samples, including
 sub-sample amounts, by multiplying the spectrum with the phase ramp
-$e^{-j 2\pi f D/f_s}$: every component is delayed by exactly `D` samples. Two
+$e^{-j 2\pi f D/f_\mathrm{s}}$: every component is delayed by exactly `D` samples. Two
 boundary conventions cover the two use cases:
 
 - `mode="linear"` (default) zero-pads the record past the shift, so samples
@@ -2631,7 +2631,7 @@ boundary conventions cover the two use cases:
 - `mode="circular"` applies the ramp over the record itself and wraps. For
   periodic records it is exact: a tone centered on a DFT bin delayed by
   `D` samples equals the analytically delayed tone to machine precision,
-  and its phase changes by exactly $-2\pi f D/f_s$ radians.
+  and its phase changes by exactly $-2\pi f D/f_\mathrm{s}$ radians.
 
 ```python
 import numpy as np
@@ -2687,7 +2687,7 @@ not normative.
 - [Correlation and delay](https://jmrplens.github.io/phonometry/signals/spectra/correlation-delay/): the alignment work built
   on the fractional-delay kernel.
 - [Synchronous averaging](https://jmrplens.github.io/phonometry/signals/spectra/synchronous-averaging/): period alignment with
-  the same band-limited shift when $f_s T$ is not an integer.
+  the same band-limited shift when $f_\mathrm{s} T$ is not an integer.
 - [Spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/): the colored-noise verification
   and the window metrics.
 
@@ -2846,8 +2846,8 @@ synthesis (Secs. 4.2-4.3) uses the second lever: define the target magnitude
 $|H(f)|$, make the group delay grow in proportion to the target's power,
 
 $$
-\tau_G(f) = \tau_G(f - df) + C\,|H(f)|^2,\qquad
-C = \frac{\tau_G(f_{end}) - \tau_G(f_{start})}{\sum |H(f)|^2},
+\tau_\mathrm{G}(f) = \tau_\mathrm{G}(f - df) + C\,|H(f)|^2,\qquad
+C = \frac{\tau_\mathrm{G}(f_\mathrm{end}) - \tau_\mathrm{G}(f_\mathrm{start})}{\sum |H(f)|^2},
 $$
 
 (Eqs. (11)-(12)), integrate the group delay into a phase, and inverse-FFT.
@@ -2957,11 +2957,11 @@ amplifier. Mueller & Massarani confine the inversion with a band-pass
 frequency-dependent Tikhonov regularization,
 
 $$
-H_{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
+H_\mathrm{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
 $$
 
 with $\varepsilon(f)$ small inside the band to be equalized and large outside.
-In-band the equalized magnitude $|H \cdot H_{inv}|$ deviates from unity by
+In-band the equalized magnitude $|H \cdot H_\mathrm{inv}|$ deviates from unity by
 exactly $\varepsilon/(|H|^2 + \varepsilon)$ - a closed form the conformance
 suite checks bin by bin - and out-of-band the filter gain can never exceed
 $1/(2\sqrt{\varepsilon})$, the analytic maximum of $x/(x^2 + \varepsilon)$. A

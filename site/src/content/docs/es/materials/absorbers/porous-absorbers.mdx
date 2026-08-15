@@ -121,7 +121,7 @@ perfecta en el acoplamiento crítico, tienen su propia guía,
 ## 1. Modelos de fluido equivalente de un material poroso
 
 Un material poroso de esqueleto rígido se comporta como un *fluido
-equivalente* con una impedancia característica compleja $Z_c$ y un número de
+equivalente* con una impedancia característica compleja $Z_\mathrm{c}$ y un número de
 onda $k$ (convención temporal $e^{+j\omega t}$, de modo que un medio pasivo
 tiene $\mathrm{Im}(k) < 0$).
 
@@ -130,7 +130,7 @@ Hopkins ecs. 1.171–1.174) es la ley de potencias de un parámetro en la
 variable del absorbente $X = \rho_0 f / \sigma$:
 
 $$
-\frac{Z_c}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
+\frac{Z_\mathrm{c}}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
 \frac{k}{k_0} = 1 + C_5 X^{-C_6} - j\,C_7 X^{-C_8},
 $$
 
@@ -159,9 +159,9 @@ parámetros (Cox & D'Antonio 3e ecs. 6.19–6.25): la resistividad al flujo
 $\sigma$, la porosidad $\phi$, la tortuosidad $\alpha_\infty$ y las
 longitudes características viscosa/térmica $\Lambda$, $\Lambda'$ dan la
 densidad efectiva y el módulo de compresibilidad con los límites exactos
-$j\omega\rho_e \to \sigma$ en continua,
-$\rho_e \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ a alta
-frecuencia, y la transición isoterma-adiabática en $K_e$.
+$j\omega\rho_\mathrm{e} \to \sigma$ en continua,
+$\rho_\mathrm{e} \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ a alta
+frecuencia, y la transición isoterma-adiabática en $K_\mathrm{e}$.
 
 ```python
 import numpy as np
@@ -187,7 +187,7 @@ db.plot()   # componentes normalizadas de Zc y k frente a la frecuencia
 3.ª ed., figs. 6.19–6.20): a baja frecuencia dominan las fuerzas viscosas y
 el material se ve rígido y con pérdidas (las cuatro componentes grandes); al
 subir la frecuencia las componentes caen hacia los límites de aire libre
-$Z_c \to \rho_0 c_0$ y $k \to k_0$, de modo que una capa delgada solo
+$Z_\mathrm{c} \to \rho_0 c_0$ y $k \to k_0$, de modo que una capa delgada solo
 trabaja donde su espesor es una fracción apreciable de la longitud de onda
 dentro del material.*
 
@@ -222,7 +222,7 @@ plt.show()
 Los tres modelos coinciden estrechamente dentro del rango de ajuste de
 Delany–Bazley (Cox & D'Antonio, figs. 6.19–6.21, hacen la misma
 comparación); JCA extiende la predicción con base física fuera de él. Un
-`PorousMediumResult` construido con datos medidos (por ejemplo los $Z_c$,
+`PorousMediumResult` construido con datos medidos (por ejemplo los $Z_\mathrm{c}$,
 $k$ recuperados por la
 [reducción de matriz de transferencia ASTM E2611](/phonometry/es/materials/absorbers/impedance-tube/))
 se conecta al modelo de capas exactamente igual que uno modelado.
@@ -351,12 +351,12 @@ Todos los modelos anteriores suponen que el esqueleto no se mueve. Eso solo es
 cierto por encima de la **frecuencia de desacoplo** de Zwikker y Kosten,
 
 $$
-F_d = \frac{\sigma\,\phi^2}{2\pi\rho_1},
+F_\mathrm{d} = \frac{\sigma\,\phi^2}{2\pi\rho_1},
 $$
 
 con $\rho_1$ la densidad aparente del esqueleto (la densidad de la muestra tal
 como se pesa, no la del material del que están hechas las fibras). Por debajo
-de $F_d$ el acoplamiento visco-inercial es lo bastante fuerte para que la onda
+de $F_\mathrm{d}$ el acoplamiento visco-inercial es lo bastante fuerte para que la onda
 en los poros arrastre al esqueleto, y un esqueleto ligero (fibra de vidrio de
 grado aeronáutico, fieltros, velos finos) aporta una inercia nada
 despreciable. Despreciar la *rigidez* del esqueleto pero no su *masa* en la
@@ -366,13 +366,13 @@ Atalla 2e, ecs. 11.53-11.55, según Panneton 2007):
 
 $$
 \tilde\rho_{\text{limp}} =
-\frac{\rho_t\,\tilde\rho_{\text{eq}} - \rho_0^2}
-     {\rho_t + \tilde\rho_{\text{eq}} - 2\rho_0},
-\qquad \rho_t = \rho_1 + \phi\rho_0,
+\frac{\rho_\mathrm{t}\,\tilde\rho_{\text{eq}} - \rho_0^2}
+     {\rho_\mathrm{t} + \tilde\rho_{\text{eq}} - 2\rho_0},
+\qquad \rho_\mathrm{t} = \rho_1 + \phi\rho_0,
 $$
 
 donde $\tilde\rho_{\text{eq}}$ es la densidad efectiva de esqueleto rígido de
-cualquiera de los tres modelos anteriores y $\rho_t$ es la densidad total
+cualquiera de los tres modelos anteriores y $\rho_\mathrm{t}$ es la densidad total
 aparente del material. En qué se ancla esa forma, y con qué debilidad, lo
 expone la nota de validación del final de este apartado. Tiene dos límites que
 merece la pena conocer como física:
@@ -381,7 +381,7 @@ merece la pena conocer como física:
   recupera el resultado de esqueleto rígido;
 - **baja frecuencia**: la densidad de esqueleto rígido diverge como
   $\sigma/(j\omega)$, mientras que la flexible converge al valor finito y real
-  $\rho_t$. Un esqueleto rígido prohíbe el movimiento de cuerpo rígido de la
+  $\rho_\mathrm{t}$. Un esqueleto rígido prohíbe el movimiento de cuerpo rígido de la
   muestra; uno flexible lo permite, y por eso el modelo flexible es el
   adecuado para una probeta sin sujeción dentro de un tubo de impedancia.
 
@@ -395,7 +395,7 @@ tabla 11.2, el juego de datos de entrada de su fig. 11.2). Por encima de la
 frecuencia de desacoplo las dos predicciones son indistinguibles, que es la
 comprobación que el propio gráfico hace de la corrección; por debajo, la
 densidad efectiva de esqueleto rígido se dispara y la flexible se asienta en
-$\rho_t/\rho_0 = 25,9$.*
+$\rho_\mathrm{t}/\rho_0 = 25,9$.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -437,10 +437,10 @@ plt.show()
 </details>
 
 La corrección solo merece la pena donde el esqueleto es realmente flexible.
-Beranek (1947) exigía $|K_c/K_f| < 0,05$ entre el módulo de compresibilidad del
+Beranek (1947) exigía $|K_c/K_\mathrm{f}| < 0,05$ entre el módulo de compresibilidad del
 esqueleto en vacío y el del fluido de los poros; el estudio de interacción
 esqueleto-estructura de Doutres et al. (2007) lo relajó a $0,2$, que para el
-aire ($K_f \approx P_0 = 101,3$ kPa) es la regla práctica de que el esqueleto
+aire ($K_\mathrm{f} \approx P_0 = 101,3$ kPa) es la regla práctica de que el esqueleto
 ha de ser más blando que unos 20 kPa. `limp_frame_applicable` aplica cualquiera
 de los dos umbrales. Ninguno tiene en cuenta el montaje: una espuma fina y
 ligera desacoplada de una estructura vibrante por una cámara de aire se
@@ -502,15 +502,15 @@ $$
 $$
 
 y para el caso habitual de un armazón cuyos granos sólidos son mucho más rígidos
-que el armazón que forman ($K_s \to \infty$, cierto en esqueletos de vidrio,
+que el armazón que forman ($K_\mathrm{s} \to \infty$, cierto en esqueletos de vidrio,
 roca y polímero) los tres coeficientes elásticos salen del módulo de cizalla $N$, el
-coeficiente de Poisson $\nu$ y el módulo de compresibilidad $K_f$ del fluido de
+coeficiente de Poisson $\nu$ y el módulo de compresibilidad $K_\mathrm{f}$ del fluido de
 los poros (ecs. 6.26-6.29):
 
 $$
-R = \phi K_f, \qquad Q = (1-\phi)K_f, \qquad
-P = \tfrac{4}{3}N + K_b + \frac{(1-\phi)^2}{\phi}K_f, \qquad
-K_b = \frac{2N(1+\nu)}{3(1-2\nu)}.
+R = \phi K_\mathrm{f}, \qquad Q = (1-\phi)K_\mathrm{f}, \qquad
+P = \tfrac{4}{3}N + K_\mathrm{b} + \frac{(1-\phi)^2}{\phi}K_\mathrm{f}, \qquad
+K_\mathrm{b} = \frac{2N(1+\nu)}{3(1-2\nu)}.
 $$
 
 Con las densidades modificadas $\tilde\rho_{11}$, $\tilde\rho_{12}$,
@@ -567,7 +567,7 @@ frontal, de modo que la onda del esqueleto resuena a un cuarto de longitud de
 onda dentro de la capa, en
 
 $$
-f_r = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
+f_\mathrm{r} = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
 K_c = \frac{2(1-\nu)N}{1-2\nu}
 $$
 
@@ -677,7 +677,7 @@ fluido equivalente explica. Para una manta ligera y blanda al aire, `limp_frame`
 es mejor opción.
 
 **Nota honesta sobre la validación.** No existe ninguna tabla publicada de
-$Z_s(f)$ ni de $\alpha(f)$ para una capa de Biot completamente especificada, ni
+$Z_\mathrm{s}(f)$ ni de $\alpha(f)$ para una capa de Biot completamente especificada, ni
 aquí ni en ninguna otra fuente comprobada, así que este modelo no se puede
 anclar dígito a dígito como sí se hace con los módulos basados en normas. Lo que
 lo ancla, en orden decreciente de fuerza: el **límite de esqueleto rígido**, en
@@ -699,7 +699,7 @@ impreso mientras su módulo, 0,939, se aparta un 14,5 %. Queda registrado en
 [Erratas](/phonometry/es/reference/errata/), junto con el barrido de parámetros
 que no logra acercar $|\mu_b|$ a 0,82. El pico de impedancia de la muestra más
 delgada del libro está impreso como 860 Hz y sale en 863,5 Hz con la regla del
-máximo de $\mathrm{Im}(Z_s)$. Todo lo demás, incluido el comportamiento en
+máximo de $\mathrm{Im}(Z_\mathrm{s})$. Todo lo demás, incluido el comportamiento en
 incidencia oblicua más allá de su límite de esqueleto rígido, descansa en formas
 cerradas y en identidades estructurales, no en dígitos publicados.
 
@@ -720,12 +720,12 @@ $$
 
 con el número de onda en profundidad
 $k_x = \sqrt{k^2 - k_0^2 \sin^2\theta}$ por la ley de Snell y
-$Z_x = Z_c k / k_x$. Las láminas resonantes delgadas entran como impedancias
+$Z_x = Z_\mathrm{c} k / k_x$. Las láminas resonantes delgadas entran como impedancias
 en serie $[[1, z], [0, 1]]$. Cerrar la cadena con una pared rígida (o aire
 libre, o cualquier impedancia) da la impedancia de superficie, el factor de
 reflexión $R(\theta)$ y $\alpha(\theta) = 1 - |R|^2$. Una única capa porosa
 sobre pared rígida se reduce a la forma cerrada de libro
-$Z_s = -j Z_c \cot(k d)$ (Mechel secc. D.3, ec. 1).
+$Z_\mathrm{s} = -j Z_\mathrm{c} \cot(k d)$ (Mechel secc. D.3, ec. 1).
 
 Detrás de las matrices hay una sola imagen física: una capa porosa con respaldo
 rígido es un fluido equivalente resumido en cinco números medibles. La capa de 50 mm
@@ -1117,7 +1117,7 @@ oblicua de Maa (ec. 23). El coeficiente de incidencia aleatoria es la
 integral de Paris (Mechel secc. D.5, ec. 9)
 
 $$
-\alpha_{dif} = \frac{2}{\sin^2\theta_{lim}} \int_0^{\theta_{lim}}
+\alpha_\mathrm{dif} = \frac{2}{\sin^2\theta_\mathrm{lim}} \int_0^{\theta_\mathrm{lim}}
 \alpha(\theta)\,\cos\theta\,\sin\theta\,\mathrm{d}\theta,
 $$
 
@@ -1133,7 +1133,7 @@ truncar tiende a quedar por debajo de los valores medidos. Lo que hace la
 práctica se sigue de ahí: truncar en torno a 78° cuando la intención es
 compararse con una medición en cámara reverberante, y mantener 90° cuando la
 intención es el coeficiente teórico de incidencia aleatoria de una superficie
-infinita. Un $\alpha_{dif}$ truncado es una magnitud de ingeniería ajustada y
+infinita. Un $\alpha_\mathrm{dif}$ truncado es una magnitud de ingeniería ajustada y
 no una magnitud física, así que el límite debe citarse junto al número: el
 fragmento de abajo imprime el tamaño de la decisión. Para una
 superficie de *reacción local* con impedancia normalizada conocida la
@@ -1166,7 +1166,7 @@ print(np.round(truncated.absorption - diffuse.absorption, 3))
 
 *Por qué la cámara reverberante lee más alto que el tubo: la integral de
 Paris pondera los ángulos oblicuos, cuyas ondas recorren un camino más largo
-dentro de la capa, así que $\alpha_{dif}$ supera al $\alpha(0°)$ de
+dentro de la capa, así que $\alpha_\mathrm{dif}$ supera al $\alpha(0°)$ de
 incidencia normal justo donde la capa es delgada frente a la longitud de
 onda. Es la contraparte de modelo de la discusión tubo frente a cámara
 reverberante de
@@ -1194,23 +1194,23 @@ plt.show()
 
 </details>
 
-**No compares esto con el $\alpha_s$ de una hoja de características.** La integral de
+**No compares esto con el $\alpha_\mathrm{s}$ de una hoja de características.** La integral de
 Paris se evalúa sobre una capa *infinita y lateralmente uniforme*. Una medición
 ISO 354 se hace sobre una probeta montada de 10 a 12 m² cuyos bordes difractan
-energía hacia dentro, que es la razón de que el $\alpha_s$ medido supere 1 de
+energía hacia dentro, que es la razón de que el $\alpha_\mathrm{s}$ medido supere 1 de
 forma rutinaria y de que el mismo producto salga distinto en dos salas. Espera
-que el valor medido corra por encima del $\alpha_{dif}$ predicho en torno a 0,1
+que el valor medido corra por encima del $\alpha_\mathrm{dif}$ predicho en torno a 0,1
 a 0,2 en las bandas medias, y más cuanto menor sea la probeta y mayor su
 relación perímetro-superficie. El corolario para el ajuste de modelos es la
 mitad importante: ajusta los parámetros del material contra una medida de tubo,
 o contra la predicción difusa de un modelo en el que confíes, y nunca contra el
-$\alpha_s$ de una hoja de características, porque el excedente de tamaño finito se
+$\alpha_\mathrm{s}$ de una hoja de características, porque el excedente de tamaño finito se
 absorbería dentro de una resistividad al flujo equivocada y se propagaría
 después a todas las construcciones que predigas con ella. Para lo que la
 predicción *sí* sirve es para comparar construcciones, para dimensionar un
 tratamiento antes de que exista y para alimentar un cálculo de sala que espera
 entrada de incidencia aleatoria; una especificación escrita contra un
-$\alpha_s$ medido sigue teniendo que cerrarse con una medida.
+$\alpha_\mathrm{s}$ medido sigue teniendo que cerrarse con una medida.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/oblique_absorption_es.svg" alt="Panel izquierdo: coeficiente de absorción frente al ángulo de incidencia de 0 a 90 grados para una capa porosa de 50 mm con respaldo rígido a 250, 500, 1000 y 2000 hercios, cada curva continua de reacción volumétrica acompañada por una discontinua de reacción local, con el truncamiento de 78 grados marcado. Panel derecho: el coeficiente de campo difuso integrado frente al coeficiente estadístico de reacción local a lo largo de la frecuencia, con el techo de 0,951 de la forma cerrada dibujado como línea punteada" width="88%" />
 
@@ -1270,7 +1270,7 @@ $\alpha_\infty = 1$ sigue a Delany–Bazley dentro del rango de ajuste.
 
 **Esqueleto rígido o flexible.** Todos los modelos de fluido equivalente
 anteriores suponen un esqueleto inmóvil, lo que solo se cumple por encima de la
-frecuencia de desacoplo $F_d = \sigma\phi^2/2\pi\rho_1$. Por debajo, un
+frecuencia de desacoplo $F_\mathrm{d} = \sigma\phi^2/2\pi\rho_1$. Por debajo, un
 esqueleto ligero se mueve con el fluido de los poros, y `limp_frame` añade su
 inercia (Allard & Atalla, ecs. 11.53-11.55). Úsalo con fieltros, velos y fibra
 de vidrio ligera, con cualquier material medido sin sujeción en un tubo de
@@ -1330,8 +1330,8 @@ entradas, y la sección 1.1 dice de dónde salen sin implementar ninguno de esos
 métodos de caracterización (solo se muestra el ajuste inverso contra una
 impedancia medida, y eso es `scipy.optimize`, no esta biblioteca). Las reglas
 de construcción del final de la sección 3 son práctica de ingeniería sin norma
-detrás, y la diferencia de tamaño finito entre un $\alpha_{dif}$ predicho y un
-$\alpha_s$ medido se enuncia pero no se modela: nada de aquí reproduce el
+detrás, y la diferencia de tamaño finito entre un $\alpha_\mathrm{dif}$ predicho y un
+$\alpha_\mathrm{s}$ medido se enuncia pero no se modela: nada de aquí reproduce el
 efecto de borde. El libro de Cox y D'Antonio trata tanto difusores como
 absorbentes, pero esta guía solo implementa la mitad de absorbentes. La
 predicción del difusor de rejilla de fase de Schroeder vive en un módulo

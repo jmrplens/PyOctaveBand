@@ -11,12 +11,12 @@ residual-noise correction, and the measurement-uncertainty budget.
 energy-summed tone level ``Lpt`` (Formula (C.1)) and the masking-noise level
 ``Lpn`` in the critical band around the tone, the tonal audibility above the
 masking threshold is
-:math:`\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]` dB
+:math:`\Delta L_\mathrm{ta} = L_{p\mathrm{t}} - L_{p\mathrm{n}} + 2 + \log_{10}[1 + (f_\mathrm{c}/502)^{2.5}]` dB
 (Formula (C.3)), and the
-tonal adjustment is the piecewise function :math:`K_t = 0` for
-:math:`\Delta L_{ta} < 4`,
-:math:`K_t = \Delta L_{ta} - 4` for :math:`4 \le \Delta L_{ta} \le 10` and
-:math:`K_t = 6` for :math:`\Delta L_{ta} > 10`
+tonal adjustment is the piecewise function :math:`K_\mathrm{t} = 0` for
+:math:`\Delta L_\mathrm{ta} < 4`,
+:math:`K_\mathrm{t} = \Delta L_\mathrm{ta} - 4` for :math:`4 \le \Delta L_\mathrm{ta} \le 10` and
+:math:`K_\mathrm{t} = 6` for :math:`\Delta L_\mathrm{ta} > 10`
 (Formulae (C.4)–(C.6)). The critical bandwidth is 100 Hz for centre
 frequencies up to 500 Hz and 20 % of the centre frequency above (Table C.1).
 :func:`assess_tonal_audibility` returns both in a plottable result. (The 2017
@@ -32,7 +32,7 @@ neighbours by 15 dB (25–125 Hz), 8 dB (160–400 Hz) or 5 dB (500–10 000 Hz)
 audibility ``ΔL`` to ``Kt`` (0–6 dB).
 
 **Residual-noise correction (Clause 10.4).**
-:math:`L = 10 \log_{10}(10^{L'/10} - 10^{L_{res}/10})` (Formula (16)); with a
+:math:`L = 10 \log_{10}(10^{L'/10} - 10^{L_\mathrm{res}/10})` (Formula (16)); with a
 residual
 within 3 dB of the measured level no correction is allowed; the
 *uncorrected* measured level ``L'`` is then the reportable value, as an upper
@@ -128,7 +128,7 @@ def tonal_audibility(
 ) -> float:
     r"""Tonal audibility above the masking threshold (Formula (C.3)).
 
-    :math:`\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]`
+    :math:`\Delta L_\mathrm{ta} = L_{p\mathrm{t}} - L_{p\mathrm{n}} + 2 + \log_{10}[1 + (f_\mathrm{c}/502)^{2.5}]`
     dB.
 
     :param tone_level: Energy-summed tone level ``Lpt`` in the critical band,
@@ -152,10 +152,10 @@ def tonal_audibility(
 def tonal_adjustment(audibility: float) -> float:
     r"""Tonal adjustment ``Kt`` from the audibility (Formulae (C.4)–(C.6)).
 
-    :math:`K_t = 0` for :math:`\Delta L_{ta} < 4`,
-    :math:`K_t = \Delta L_{ta} - 4` for :math:`4 \le \Delta L_{ta} \le 10`
+    :math:`K_\mathrm{t} = 0` for :math:`\Delta L_\mathrm{ta} < 4`,
+    :math:`K_\mathrm{t} = \Delta L_\mathrm{ta} - 4` for :math:`4 \le \Delta L_\mathrm{ta} \le 10`
     and
-    :math:`K_t = 6` for :math:`\Delta L_{ta} > 10`. ``Kt`` is not restricted
+    :math:`K_\mathrm{t} = 6` for :math:`\Delta L_\mathrm{ta} > 10`. ``Kt`` is not restricted
     to integers.
 
     :param audibility: Tonal audibility ``ΔLta``, in dB.
@@ -337,7 +337,7 @@ def residual_sound_correction(
 ) -> ResidualCorrectionResult:
     r"""Correct a measured level for residual sound (Formula (16)).
 
-    :math:`L = 10 \log_{10}(10^{L'/10} - 10^{L_{res}/10})`. When the residual is
+    :math:`L = 10 \log_{10}(10^{L'/10} - 10^{L_\mathrm{res}/10})`. When the residual is
     within 3 dB
     of the measured level, §10.4 allows **no** correction: the *uncorrected*
     measured level ``L'`` is the reportable value, as an upper bound of the
@@ -385,9 +385,9 @@ def gaussian_residual_level(
 ) -> float:
     r"""Estimate the residual equivalent level from percentiles (Annex I).
 
-    :math:`L_{eq} = L_{50} + 0.115 \cdot ((L_{50} - L_{90})/1.28)^2`
+    :math:`L_\mathrm{eq} = L_{50} + 0.115 \cdot ((L_{50} - L_{90})/1.28)^2`
     (Formula (I.1)) or, with ``L95``,
-    :math:`L_{eq} = L_{50} + 0.115 \cdot ((L_{50} - L_{95})/1.65)^2`
+    :math:`L_\mathrm{eq} = L_{50} + 0.115 \cdot ((L_{50} - L_{95})/1.65)^2`
     (Formula (I.2)). Supply exactly
     one of ``l90`` / ``l95``.
 
@@ -495,10 +495,10 @@ def residual_correction_uncertainty(
 ) -> float:
     r"""Uncertainty of the residual-corrected level (Formulae (F.7)–(F.9)).
 
-    With :math:`m = 10^{-0.1(L' - L_{res})}`, the sensitivity coefficients
+    With :math:`m = 10^{-0.1(L' - L_\mathrm{res})}`, the sensitivity coefficients
     are
-    :math:`c_{L'} = 1/(1 - m)` and :math:`c_{res} = -m/(1 - m)`, and
-    :math:`u_L = \sqrt{c_{L'}^2 \cdot u_{L'}^2 + c_{res}^2 \cdot u_{res}^2}`.
+    :math:`c_{L'} = 1/(1 - m)` and :math:`c_\mathrm{res} = -m/(1 - m)`, and
+    :math:`u_L = \sqrt{c_{L'}^2 \cdot u_{L'}^2 + c_\mathrm{res}^2 \cdot u_\mathrm{res}^2}`.
 
     :param measured_level: Measured level ``L'``, in dB.
     :param residual_level: Residual level ``Lres``, in dB.

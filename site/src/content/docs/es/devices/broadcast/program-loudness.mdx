@@ -78,7 +78,7 @@ es la suma ponderada por canal de las potencias cuadráticas medias $z_i$
 (Fórmula 2):
 
 $$
-L_K = -0{,}691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
+L_\mathrm{K} = -0{,}691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
 $$
 
 donde la constante cancela la ganancia de la ponderación K a 997 Hz y $G_i$
@@ -156,7 +156,7 @@ del paso alto RLB:
 paso alto RLB elimina la energía por debajo de 100 Hz que el oído no integra en
 la sonoridad, y el realce de cabeza esférica de +4 dB por encima de unos 2 kHz
 hace las veces de la ganancia por difracción de una cabeza en un campo sonoro.
-La constante de −0,691 de $L_K$ es lo que hace que las dos juntas marquen
+La constante de −0,691 de $L_\mathrm{K}$ es lo que hace que las dos juntas marquen
 exactamente −3,01 LKFS con una sinusoide de 997 Hz a plena escala.*
 
 <details>
@@ -176,7 +176,7 @@ Ese es todo el modelo: dos biquads y una media cuadrática. Conviene decir con
 claridad qué no puede hacer una medida así, porque la pregunta con la que llega
 el lector suele ser «¿es esta *la* sonoridad?». La cadena es lineal e
 independiente del nivel por construcción — duplicar la ganancia de un programa
-suma exactamente 6 dB a $L_K$, que es justo lo que convierte la normalización en
+suma exactamente 6 dB a $L_\mathrm{K}$, que es justo lo que convierte la normalización en
 una sola multiplicación, y justo lo que un oído real no hace. No hay
 enmascaramiento, ni suma por bandas críticas, ni curvas isofónicas, ni suma
 binaural en ninguna parte. Así que BS.1770 ordena con fiabilidad material
@@ -454,10 +454,10 @@ demasiado pocas ventanas de 3 s.
 
 Los picos por muestra engañan: el máximo verdadero de la forma de onda
 reconstruida cae en general *entre* muestras, y un medidor de pico por
-muestra infravalora 3 dB un tono a $f_s/4$ con la fase desafortunada. El peor
+muestra infravalora 3 dB un tono a $f_\mathrm{s}/4$ con la fase desafortunada. El peor
 caso está acotado por $20\log_{10}\cos(\pi f_{\mathrm{norm}}/n)$, donde $n$ es
-la razón de sobremuestreo y $f_{\mathrm{norm}} = f/f_s$ es la frecuencia del tono
-normalizada a la de muestreo — que es exactamente por lo que $f_s/4$ es el peor
+la razón de sobremuestreo y $f_{\mathrm{norm}} = f/f_\mathrm{s}$ es la frecuencia del tono
+normalizada a la de muestreo — que es exactamente por lo que $f_\mathrm{s}/4$ es el peor
 caso, ya que $f_{\mathrm{norm}} = 1/4$ maximiza la cota en la banda de audio.
 Por eso el Anexo 2 de BS.1770-5 mide el **pico
 verdadero** sobre la señal sobremuestreada hasta al menos 192 kHz (4× a
@@ -482,7 +482,7 @@ cumplir los medidores en modo EBU).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/true_peak_intersample_es.svg" alt="Dos paneles. A la izquierda, doce muestras del tono de 12 kHz a plena escala con un desfase de un cuarto de ciclo: cada punto de muestra se sitúa en 0,707 de la escala completa sobre la línea discontinua de pico muestral en menos 3,01 dBFS, mientras que la reconstrucción de banda limitada trazada a través de ellos toca más y menos uno, y la rejilla sobremuestreada 4 veces se marca en la parte inferior. A la derecha, la infravaloración de peor caso 20 log cos de pi f_norm entre n frente a la frecuencia normalizada para razones de sobremuestreo de 1, 2, 4 y 8, con el mínimo de 4 que pide BS.1770 marcado en f_norm igual a un cuarto, donde quedan menos 0,17 decibelios" width="92%" />
 
-*Izquierda: el mecanismo. Muestrear un tono a $f_s/4$ a plena escala con la fase
+*Izquierda: el mecanismo. Muestrear un tono a $f_\mathrm{s}/4$ a plena escala con la fase
 equivocada deja **todas** las muestras en $1/\sqrt{2}$, así que un medidor de
 pico por muestra marca −3,01 dBFS mientras que la forma de onda que de verdad
 saldrá de un convertidor alcanza la escala completa. Derecha: la cota, frente a
@@ -777,7 +777,7 @@ binaural quedan fuera por construcción; eso vive en [Sonoridad (ISO
   por la magnitud percibida que los LUFS con puertas de esta página
   deliberadamente no responden.
 - [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/):
-  $L_{eq}$, $L_{Ceq}$ y la misma maquinaria de pico sobremuestreado que sostiene
+  $L_\mathrm{eq}$, $L_\mathrm{Ceq}$ y la misma maquinaria de pico sobremuestreado que sostiene
   `lc_peak`.
 - [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/): A, C y Z
   frente a la ponderación K de esta página.

@@ -13,14 +13,14 @@ part; the scattering coefficient $s$ is the non-specular energy fraction.
 ISO 17497-1:2004+A1:2014 measures it in a reverberation room with the test
 sample on a turntable: four reverberation times, stationary and rotating,
 each without and with the sample (Table 2), give the random-incidence
-absorption $\alpha_s$ (clause 8.1.1, Formula 1) and the *specular* absorption
-$\alpha_{spec}$ (clause 8.1.2, Formula 4). Rotation decorrelates the scattered
+absorption $\alpha_\mathrm{s}$ (clause 8.1.1, Formula 1) and the *specular* absorption
+$\alpha_\mathrm{spec}$ (clause 8.1.2, Formula 4). Rotation decorrelates the scattered
 reflections between decays, so they average out and register as extra
 "absorption", and the scattering coefficient follows (clause 8.1.3,
 Formula 5):
 
 $$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s},
+s = \frac{\alpha_\mathrm{spec} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}},
 $$
 
 each $\alpha$ being a two-condition Sabine difference
@@ -54,16 +54,16 @@ d_\theta = \frac{\left( \sum_i p_i \right)^2 - \sum_i p_i^2}{(n - 1) \sum_i p_i^
 $$
 
 1 for a perfectly uniform response and tending to 0 for a single specular
-lobe; Formula 6 is the area-weighted form with $N_i = A_i / A_{min}$ from the
+lobe; Formula 6 is the area-weighted form with $N_i = A_i / A_\mathrm{min}$ from the
 Formula 8 solid-angle factors ($A_i = (4\pi/\Delta\phi) \sin^2(\Delta\theta/4)$
 at the zenith). Normalizing against a flat reference reflector of the same
 size removes edge diffraction (clause 8.2, Formula 7):
-$d_{\theta,n} = (d_\theta - d_{\theta,r})/(1 - d_{\theta,r})$. The
+$d_{\theta,\mathrm{n}} = (d_\theta - d_{\theta,\mathrm{r}})/(1 - d_{\theta,\mathrm{r}})$. The
 random-incidence value averages the source angles with weights 1:3:3:3:3 for
 0°, ±30°, ±60° (clause 8.4). Anchors: the model-predicted 37-receiver arc of
 the published six-period $N = 7$ QRD (Cox & D'Antonio 3rd ed., Appendix B;
 Hargreaves et al. 2000, Table I) at 1000 Hz gives $d_\theta = 0.1099$, its
-flat reference $0.0049$ and $d_{\theta,n} = 0.1055$; the band-averaged model
+flat reference $0.0049$ and $d_{\theta,\mathrm{n}} = 0.1055$; the band-averaged model
 predictions match the published Appendix B BEM normalised diffusion in the
 200-400 Hz bands within 0.01 (a low-band anchor: the broadband 100-5000 Hz
 mean absolute deviation is about 0.09); zenith area factor 1.5710.
@@ -91,11 +91,11 @@ leading edge, a mandated 5 ms flat top and a Blackman-Harris trailing edge),
 and
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_r(f)}{H_i(f)} \right|^2,
-\qquad K_r = \frac{d_s - d_m}{d_s + d_m} = \frac{2}{3}
+\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
+\qquad K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
 $$
 
-for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m (clause 4.2,
+for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m (clause 4.2,
 Annex C); $K_r$ is the spherical-spreading ratio between the direct and the
 image path. Ratioing the road measurement against one on a highly reflective
 reference surface cancels the entire electro-acoustic chain along with $K_r$
@@ -105,8 +105,8 @@ radius ≈ 1.34 m for the standard geometry) and the valid range is
 250–1600 Hz) instead couples a small impedance tube to the surface and defers
 the mathematics to the ISO 10534-2 transfer-function method below (its
 clauses 4/5.7/6.6); the implementation reuses that module, adding the Part 2
-geometry and validity limits ($f_u = 0.58\ c_0/d$; microphone spacing bounds
-$0.45\ c_0/f_{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
+geometry and validity limits ($f_\mathrm{u} = 0.58\ c_0/d$; microphone spacing bounds
+$0.45\ c_0/f_\mathrm{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>
@@ -118,20 +118,20 @@ See the [In-situ Road-Surface Absorption guide](../../materials/surfaces/road-ab
 ### Weighted sound absorption (ISO 11654)
 
 ISO 11654:1997 condenses an ISO 354 third-octave absorption curve into a
-single number. The practical coefficient $\alpha_p$ averages the three thirds
+single number. The practical coefficient $\alpha_\mathrm{p}$ averages the three thirds
 of each octave 250 Hz – 4 kHz and rounds to steps of 0.05 (clause 4.1). The
 reference curve (0.80, 1.00, 1.00, 1.00, 0.90 at 250–4000 Hz) is then shifted
 downward in 0.05 steps until the sum of unfavourable deviations, counted only
 where the measurement falls *below* the shifted curve, is $\le 0.10$;
-$\alpha_w$ is the shifted curve at 500 Hz (clause 4.2). A shape indicator
+$\alpha_\mathrm{w}$ is the shifted curve at 500 Hz (clause 4.2). A shape indicator
 flags excess absorption $\ge 0.25$ above the shifted curve: L at 250 Hz, M at
 500/1000 Hz, H at 2000/4000 Hz (clause 4.3), and the informative Annex B maps
-$\alpha_w$ to the absorption classes A–E. Because every quantity is a multiple
+$\alpha_\mathrm{w}$ to the absorption classes A–E. Because every quantity is a multiple
 of 0.05, the implementation does the whole grid arithmetic in integer
 twentieths, making the shift search and class boundaries exact and
 float-safe. The two Annex A worked examples are reproduced:
-$\alpha_p = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_w = 0.60$, class C; and
-raising 500 Hz to 1.00 keeps $\alpha_w = 0.60$ but adds the indicator, "0.60(M)".
+$\alpha_\mathrm{p} = (0.35, 0.70, 0.65, 0.60, 0.55)$ → $\alpha_\mathrm{w} = 0.60$, class C; and
+raising 500 Hz to 1.00 keeps $\alpha_\mathrm{w} = 0.60$ but adds the indicator, "0.60(M)".
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/absorption_rating.svg" alt="ISO 11654 weighted sound absorption rating: the practical absorption spectrum plotted against the shifted reference curve over 250 Hz to 4000 Hz, with the unfavourable deviation at 250 Hz shaded and the weighted coefficient alpha_w read at 500 Hz" width="80%"></picture>
 
@@ -144,7 +144,7 @@ See the [Sound Absorption Measurement and Rating guide](../../materials/absorber
 Airflow resistivity $\sigma = R\,A/d$ is the key transport parameter of a
 porous absorber. ISO 9053-1:2018 (static method) drives a steady flow through
 the specimen and fits $\Delta p = a\,u + b\,u^2$ through the origin
-(clause 7.5); since $R_s = \Delta p / u = a + b\,u$, the linear coefficient is
+(clause 7.5); since $R_\mathrm{s} = \Delta p / u = a + b\,u$, the linear coefficient is
 the zero-velocity specific resistance, reported at the reference velocity
 $u = 0.5$ mm/s. ISO 9053-2:2020 (alternating method) replaces the flowmeter
 with a ~2 Hz piston and a microphone in a closed cavity (clause 8.7,
@@ -159,7 +159,7 @@ at the 0.5 mm/s reference velocity, which is why the reference velocity has to
 be stated with any resistivity that is quoted.*
 
 $$
-R = \kappa'\ \frac{p_s}{2 \pi f V}\ \frac{h_t}{h_s}\ 10^{(L_{ps} - L_{pt})/20}
+R = \kappa'\ \frac{p_\mathrm{s}}{2 \pi f V}\ \frac{h_\mathrm{t}}{h_\mathrm{s}}\ 10^{(L_{ps} - L_{p\mathrm{t}})/20}
 $$
 
 Only a level *difference* enters, so the sound-level device needs no
@@ -181,11 +181,11 @@ $f > c_0/(20 s)$; clauses 4.2–4.5) carries only plane waves, so the surface
 reflection factor of a sample is fully observable. ISO 10534-2
 (transfer-function method) compares the measured two-microphone transfer
 function $H_{12}$ with the analytic incident and reflected ones
-$H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$ (Annex D) to give (clause 7,
+$H_\mathrm{I} = e^{-j k_0 s}$, $H_\mathrm{R} = e^{+j k_0 s}$ (Annex D) to give (clause 7,
 Eq. 17):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\ e^{2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\ e^{2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1 + r}{1 - r},
 $$
 

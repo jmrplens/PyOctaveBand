@@ -164,7 +164,7 @@ Three constraints decide whether the mounting is acceptable:
 
 ### What the magnitude is an average of (ISO 5349-2, 5.4 and 6.1.11)
 
-Every $a_{hv}$ fed to the exposure calculation below is an average, and the
+Every $a_\mathrm{hv}$ fed to the exposure calculation below is an average, and the
 averaging rule is normative: magnitudes are averaged over periods of normal use
 of the tool or of contact with the workpiece, using **linear** averaging over one
 or more complete operations or work cycles (6.1.11). Exponential averaging is
@@ -234,7 +234,7 @@ at $s = j\,2\pi f$ (ISO 8041-1 Formulae (1)–(5)): a second-order Butterworth
 transition** carrying the overall gain $K$, and an **upward step**:
 
 $$
-H(s) = H_h(s)\,H_l(s)\,H_t(s)\,H_s(s).
+H(s) = H_\mathrm{h}(s)\,H_\mathrm{l}(s)\,H_\mathrm{t}(s)\,H_\mathrm{s}(s).
 $$
 
 A single Table 3 parameter set $(f_1, Q_1, f_2, Q_2, f_3, f_4, Q_4, f_5, Q_5,
@@ -366,10 +366,10 @@ plt.show()
 
 The basic evaluation is the **weighted r.m.s. acceleration**. From a
 one-third-octave spectrum it is (ISO 2631-1 Eq. (9); the identical construction
-gives the hand-arm $a_{hw}$ of ISO 5349-1 Eq. (A.1)):
+gives the hand-arm $a_\mathrm{hw}$ of ISO 5349-1 Eq. (A.1)):
 
 $$
-a_w = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
+a_\mathrm{w} = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
 $$
 
 with $W_i$ the weighting factor at band centre $i$ and $a_i$ the measured band
@@ -403,7 +403,7 @@ result.plot()   # unweighted vs weighted bands, as in the figure below (needs ma
 ```
 
 Those band labels are the nominal ones, for legibility. Passing the true centres
-$10^{n/10}$ Hz (1, 1.259, 1.585, ... 79.433) instead moves $a_w$ from 1.0260 to
+$10^{n/10}$ Hz (1, 1.259, 1.585, ... 79.433) instead moves $a_\mathrm{w}$ from 1.0260 to
 1.0267 m/s², so the caution above is about comparing a *single* $W_i$ against a
 printed table, not about a broadband r.m.s., where the two agree to three
 figures.
@@ -411,7 +411,7 @@ figures.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration.svg" alt="A measured vehicle-seat acceleration spectrum (grey) and its Wk-weighted contribution (blue) over the one-third octaves from 1 to 80 Hz: the weighting attenuates the low and high bands but leaves the 4 to 8 Hz range nearly unchanged, giving a weighted r.m.s. a_w of about 1.03 m/s^2" width="90%" />
 
 *The weighting leaves the 4–8 Hz bands almost untouched and throws away
-everything above 20 Hz, so $a_w$ = 1.026 m/s² is set by three bands out of
+everything above 20 Hz, so $a_\mathrm{w}$ = 1.026 m/s² is set by three bands out of
 nineteen. A vehicle seat is judged on the part of its spectrum it was least
 able to isolate.*
 
@@ -453,11 +453,11 @@ plt.show()
 
 When the r.m.s. value understates an intermittent or shock-laden exposure,
 ISO 2631-1 adds dose measures computed on the weighted time signal: the
-**running r.m.s.** $a_w(t_0)$ (Eqs. (2)/(3)) and its maximum, the **maximum
+**running r.m.s.** $a_\mathrm{w}(t_0)$ (Eqs. (2)/(3)) and its maximum, the **maximum
 transient vibration value** `MTVV` (Eq. (4), the maximum of the running r.m.s.
 with a 1 s integration time); the fourth-power **vibration dose value**
-$\text{VDV} = \left(\int a_w^4\,dt\right)^{1/4}$ (Eq. (5)); the **motion
-sickness dose value** $\text{MSDV} = \left(\int a_w^2\,dt\right)^{1/2}$
+$\text{VDV} = \left(\int a_\mathrm{w}^4\,dt\right)^{1/4}$ (Eq. (5)); the **motion
+sickness dose value** $\text{MSDV} = \left(\int a_\mathrm{w}^2\,dt\right)^{1/2}$
 (Annex D, on the `Wf`-weighted vertical axis, not `Wk`); and the **crest
 factor** (peak / r.m.s.), whose value above 9 signals that the basic method is
 inadequate.
@@ -472,12 +472,12 @@ criteria that actually decide are two ratios, and either one exceeded means the
 additional method matters for the judgement:
 
 $$
-\frac{\text{MTVV}}{a_w} = 1{,}5, \qquad
-\frac{\text{VDV}}{a_w\,T^{1/4}} = 1{,}75 .
+\frac{\text{MTVV}}{a_\mathrm{w}} = 1{,}5, \qquad
+\frac{\text{VDV}}{a_\mathrm{w}\,T^{1/4}} = 1{,}75 .
 $$
 
-$\text{MTVV}/a_w$ asks whether any single second of the record is much worse
-than the record as a whole; $\text{VDV}/(a_w T^{1/4})$ asks whether the fourth
+$\text{MTVV}/a_\mathrm{w}$ asks whether any single second of the record is much worse
+than the record as a whole; $\text{VDV}/(a_\mathrm{w} T^{1/4})$ asks whether the fourth
 power finds peaks that the second power averaged away. Whichever is used,
 clause 6.1 requires **both** the basic value and the additional value to be
 reported, and clause 5.6 adds the measurement period of the crest factor.
@@ -575,12 +575,12 @@ MSDV is the only measure on this page that converts directly into an expected
 number of people. It is computed on the **`Wf`**-weighted z-axis acceleration
 over the whole period during which motion could occur (Annex D, method (a)); for
 a continuous motion of roughly constant magnitude it may instead be estimated
-from a short-period r.m.s. as $\text{MSDV}_z = a_w T_0^{1/2}$ (method (b)), whose
+from a short-period r.m.s. as $\text{MSDV}_z = a_\mathrm{w} T_0^{1/2}$ (method (b)), whose
 measurement period should not normally be less than **240 s**. The reading is
 that the percentage of people who may vomit is approximately
 $K_m\,\text{MSDV}_z$, with $K_m = 1/3$ for a mixed population of unadapted male
 and female adults, over exposures from about 20 min to about 6 h and prevalences
-up to about 70 %; the estimate can be exceeded when $a_w$ is above 0.5 m/s².
+up to about 70 %; the estimate can be exceeded when $a_\mathrm{w}$ is above 0.5 m/s².
 Females are more prone than males, and prevalence declines with age.
 
 ```python
@@ -609,7 +609,7 @@ r.m.s. accelerations with the posture multiplying factors $k_j$ (ISO 2631-1
 Eq. (10); for hand-arm, ISO 5349-1 Eq. (1) with every $k = 1$):
 
 $$
-a_v = \sqrt{\sum_j k_j^2\,a_{wj}^2}.
+a_\mathrm{v} = \sqrt{\sum_j k_j^2\,a_{\mathrm{w}j}^2}.
 $$
 
 ```python
@@ -629,10 +629,10 @@ inside which caution is indicated and above which risks are likely; Directive
 2002/44/EC turns that guidance into the enforceable $A(8)$ action and limit
 values used below. The *comfort* assessment of clause 8 instead combines all
 axes (and, where relevant, backrest, feet and rotation) into the vibration
-total value $a_v$ with its own $k$ set and reads it on the Annex C scale for
+total value $a_\mathrm{v}$ with its own $k$ set and reads it on the Annex C scale for
 public transport.
 
-| Overall vibration total value $a_v$ | Likely reaction |
+| Overall vibration total value $a_\mathrm{v}$ | Likely reaction |
 | :--- | :--- |
 | less than 0.315 m/s² | not uncomfortable |
 | 0.315 m/s² to 0.63 m/s² | a little uncomfortable |
@@ -681,9 +681,9 @@ several operations combine through their partial exposures
 $A_i(8) = a_i\,\sqrt{T_i/T_0}$ as $A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1
 Eqs. (2)/(3); ISO 5349-2 Eqs. (1)–(3)). Directive 2002/44/EC fixes which
 magnitude $a$ each kind is based on (Annex, points 1): for hand-arm vibration
-the vector total $a_{hv}$ (Part A), but for whole-body vibration the *highest*
-frequency-weighted axis value $\max(1.4\,a_{wx},\,1.4\,a_{wy},\,a_{wz})$
-(Part B), not the vector total $a_v$ above. `wbv_exposure_basis` returns that
+the vector total $a_\mathrm{hv}$ (Part A), but for whole-body vibration the *highest*
+frequency-weighted axis value $\max(1.4\,a_{\mathrm{w}x},\,1.4\,a_{\mathrm{w}y},\,a_{\mathrm{w}z})$
+(Part B), not the vector total $a_\mathrm{v}$ above. `wbv_exposure_basis` returns that
 dominant-axis value:
 
 ```python
@@ -722,7 +722,7 @@ result.plot()   # partial exposures and A(8) against the EAV/ELV, as in the figu
 
 *The shortest task is not the smallest contributor. Felling runs for one hour
 against two for the brush-saw, and still lands within 8 % of it, because
-$A_i(8)$ goes as $\sqrt{T_i}$ while it goes as $a_{hv}$ directly: halving the
+$A_i(8)$ goes as $\sqrt{T_i}$ while it goes as $a_\mathrm{hv}$ directly: halving the
 time costs 29 %, raising the magnitude from 4.6 to 6.0 m/s² buys 30 %.*
 
 <details>
@@ -795,8 +795,8 @@ print(f"{result.a8:.2g}")     # 3.6  m/s^2, the reportable value
 ## 4. Exposure–response guidance
 
 For hand-transmitted vibration, ISO 5349-1 Annex C relates the daily exposure to
-the group-mean lifetime $D_y$ (in years) that produces vibration-white-finger in
-10 % of an exposed group, $D_y = 31.8\,A(8)^{-1.06}$ (Eq. (C.1)):
+the group-mean lifetime $D_\mathrm{y}$ (in years) that produces vibration-white-finger in
+10 % of an exposed group, $D_\mathrm{y} = 31.8\,A(8)^{-1.06}$ (Eq. (C.1)):
 
 ```python
 from phonometry import vibration
@@ -848,7 +848,7 @@ ISO 2631-1 Eq. (B.3) energy-equivalent magnitude across periods of different
 magnitude and duration,
 
 $$
-a_{w,e} = \sqrt{\frac{\sum_i a_{wi}^2\,T_i}{\sum_i T_i}},
+a_\mathrm{w,e} = \sqrt{\frac{\sum_i a_{\mathrm{w}i}^2\,T_i}{\sum_i T_i}},
 $$
 
 which answers a different question from $A(8)$ on the same inputs: it is a
@@ -874,8 +874,8 @@ Guides): the standard-basis line naming the applied ISO method (ISO 5349-1/-2
 for hand-transmitted vibration, ISO 2631-1 for whole-body vibration) and the
 directive it is assessed against, a header grid (company, operator/worker,
 workplace, instrumentation and calibration), the per-operation exposure analysis
-(each operation's vibration magnitude, the hand-arm vector total $a_{hv}$ or
-the whole-body Directive Part B dominant-axis value $a_{w,max}$, its daily
+(each operation's vibration magnitude, the hand-arm vector total $a_\mathrm{hv}$ or
+the whole-body Directive Part B dominant-axis value $a_\mathrm{w,max}$, its daily
 exposure time $T_i$ and the partial exposure $A_i(8)$, closed by the daily
 total and the combined $A(8)$) with the contribution chart, and the boxed
 $A(8)$ with its exposure zone.
@@ -947,7 +947,7 @@ ISO 8041-1:2017 as far as it defines the frequency weightings: the Table 3
 cascade of analog stages (Formulae (1)-(5)) that `frequency_weighting` and
 `apply_weighting` realise for all nine weightings, reproducing the Annex B
 design-goal tables. ISO 2631-1:1997 for whole-body vibration, covering the
-weighted r.m.s. $a_w$ and vibration total value $a_v$
+weighted r.m.s. $a_\mathrm{w}$ and vibration total value $a_\mathrm{v}$
 (`weighted_acceleration`, `vibration_total_value`), the MTVV, VDV, MSDV and
 crest-factor dose measures, the clause 6.3.3 comparison ratios, the Annex C
 comfort scale and the Annex D motion-sickness reading (`running_rms`,

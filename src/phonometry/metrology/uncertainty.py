@@ -11,7 +11,7 @@ Uncertainty in Measurement*:
   from the input standard uncertainties and sensitivity coefficients, with
   optional input correlations, the effective degrees of freedom
   (Welch-Satterthwaite, Annex G.4) and the expanded uncertainty
-  :math:`U = k u_c` with a coverage factor from the t-distribution
+  :math:`U = k u_\mathrm{c}` with a coverage factor from the t-distribution
   (clause 6);
 * the **Monte Carlo method** (ISO/IEC Guide 98-3-1:2008, Supplement 1) - the
   numerical propagation of the input probability density functions, giving the
@@ -117,11 +117,11 @@ class UncertaintyResult:
 
     :ivar value: The output estimate :math:`y = f(x_1, \ldots, x_N)`.
     :ivar combined_uncertainty: Combined standard uncertainty
-        :math:`u_c(y)`.
+        :math:`u_\mathrm{c}(y)`.
     :ivar sensitivities: Sensitivity coefficients
         :math:`c_i = \partial f/\partial x_i`.
     :ivar contributions: Per-input contributions
-        :math:`\lvert c_i \rvert u(x_i)` to :math:`u_c(y)`.
+        :math:`\lvert c_i \rvert u(x_i)` to :math:`u_\mathrm{c}(y)`.
     :ivar effective_dof: Welch-Satterthwaite effective degrees of freedom
         (Annex G.4, defined for independent inputs). For a correlated budget
         with finite input dof it is ``NaN`` (undefined: the GUM has no
@@ -141,7 +141,7 @@ class UncertaintyResult:
     def expanded(
         self, coverage: float = 0.95, *, coverage_factor_override: float | None = None
     ) -> tuple[float, float]:
-        r"""Coverage factor ``k`` and expanded uncertainty :math:`U = k u_c`.
+        r"""Coverage factor ``k`` and expanded uncertainty :math:`U = k u_\mathrm{c}`.
 
         :param coverage: Coverage probability in (0, 1); ``0.95`` by default.
         :param coverage_factor_override: Explicit ``k``. Required for a
@@ -348,7 +348,7 @@ def combine_uncertainty(
         fallback -- Welch-Satterthwaite holds for independent inputs only)
         and an :class:`UncertaintyWarning` is issued when finite input dof
         would otherwise have been propagated.
-    :return: An :class:`UncertaintyResult` with :math:`u_c(y)`, the
+    :return: An :class:`UncertaintyResult` with :math:`u_\mathrm{c}(y)`, the
         sensitivity
         coefficients, the contributions and the effective degrees of freedom.
     :raises ValueError: for no inputs or a malformed correlation matrix.

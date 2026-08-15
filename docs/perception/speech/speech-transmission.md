@@ -202,7 +202,7 @@ Each route has failure modes the standard is explicit about:
 - **Level-dependent effects.** The STI is not level-invariant: auditory
   masking and the reception threshold act on the *absolute* band levels at the
   listener. Play the test signal at the system's operating level (the
-  standard's Annex J practice sets it 3 dB above the $L_{Aeq}$ of continuous
+  standard's Annex J practice sets it 3 dB above the $L_\mathrm{Aeq}$ of continuous
   speech at the position) and pass `level=` and `ambient=` so the analysis
   includes them; an impulse response measured loud and rescaled afterwards
   misses these effects entirely.

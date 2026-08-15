@@ -16,7 +16,7 @@ coefficients it contains:
 
 .. math::
 
-   \alpha_{p,i} = \frac{\alpha_{i1} + \alpha_{i2} + \alpha_{i3}}{3}
+   \alpha_{\mathrm{p},i} = \frac{\alpha_{i1} + \alpha_{i2} + \alpha_{i3}}{3}
 
 The mean is evaluated to the second decimal and then rounded in steps of
 0.05 (the NOTE of Clause 4.1 gives :math:`0.92 \to 0.90`); rounded means
@@ -194,7 +194,7 @@ class AbsorptionRatingResult:
     :ivar absorption_class: Sound absorption class ``A``-``E`` or
         ``"Not classified"`` from Table B.1 (Annex B).
     :ivar shift: Downward shift applied to the reference curve, in
-        absorption units (Clause 4.2); :math:`\alpha_w = 1.00 - \text{shift}`.
+        absorption units (Clause 4.2); :math:`\alpha_\mathrm{w} = 1.00 - \text{shift}`.
     :ivar unfavourable_sum: Sum of the unfavourable deviations at the final
         shift (Clause 4.2); at most 0.10.
     :ivar band_centers: Octave rating-band centre frequencies, in Hz

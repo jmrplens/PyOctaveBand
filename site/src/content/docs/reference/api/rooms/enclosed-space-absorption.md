@@ -16,7 +16,7 @@ equivalent absorption areas of objects and object arrays and the air
 absorption:
 
 $$
-A = \sum_i \alpha_{s,i} S_i + \sum_j A_{\text{obj},j} + \sum_k \alpha_{s,k} S_k + A_{\text{air}} \tag{Formula 1}
+A = \sum_i \alpha_{\mathrm{s},i} S_i + \sum_j A_{\text{obj},j} + \sum_k \alpha_{\mathrm{s},k} S_k + A_{\text{air}} \tag{Formula 1}
 $$
 
 with the air term $A_{\text{air}} = 4 m V (1 - \psi)$ (Formula 2),

@@ -16,15 +16,15 @@ opposite ends of the absorption scale and are **not** interchangeable:
 
      \alpha(f) = 1 - Q_W(f)
      = 1 - \frac{1}{K_r^{2}}
-     \left\lvert \frac{H_r(f)}{H_i(f)} \right\rvert^{2}
+     \left\lvert \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right\rvert^{2}
 
   with ``Hi``/``Hr`` the incident/reflected transfer functions and ``Kr`` the
-  geometrical-spreading factor :math:`K_r = (d_s - d_m) / (d_s + d_m)` for the
-  mandatory geometry :math:`d_s = 1.25` m (source-to-plane) and
-  :math:`d_m = 0.25` m (mic-to-plane), giving :math:`K_r = 2/3` (Clause 4.2 /
+  geometrical-spreading factor :math:`K_r = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})` for the
+  mandatory geometry :math:`d_\mathrm{s} = 1.25` m (source-to-plane) and
+  :math:`d_\mathrm{m} = 0.25` m (mic-to-plane), giving :math:`K_r = 2/3` (Clause 4.2 /
   Annex C). The complex pressure reflection factor
-  :math:`Q_p = (1/K_r)(H_r/H_i)\, e^{+j 2 \pi f \Delta\tau}` with
-  :math:`\Delta\tau = 2 d_m / c` (Annex C) is available for theory comparison.
+  :math:`Q_p = (1/K_r)(H_\mathrm{r}/H_\mathrm{i})\, e^{+j 2 \pi f \Delta\tau}` with
+  :math:`\Delta\tau = 2 d_\mathrm{m} / c` (Annex C) is available for theory comparison.
   A highly reflective reference surface removes the electro-acoustic chain
   error and the geometry factor by a ratio (Annex B), and non-normal incidence
   uses :math:`K_{r,\theta}` (Annex F).
@@ -160,18 +160,18 @@ def geometric_spreading_factor(
 ) -> float:
     r"""Geometrical-spreading factor ``Kr`` (ISO 13472-1:2002, Clause 4.1).
 
-    :math:`K_r = (d_s - d_m) / (d_s + d_m)`. It corrects the reflected path
+    :math:`K_r = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})`. It corrects the reflected path
     for the extra spherical spreading over the image-source distance
-    :math:`d_s + d_m` relative to the direct distance :math:`d_s - d_m`
-    (Annex C). The mandatory geometry :math:`d_s = 1.25` m,
-    :math:`d_m = 0.25` m gives :math:`K_r = 2/3` (Clause 4.2).
+    :math:`d_\mathrm{s} + d_\mathrm{m}` relative to the direct distance :math:`d_\mathrm{s} - d_\mathrm{m}`
+    (Annex C). The mandatory geometry :math:`d_\mathrm{s} = 1.25` m,
+    :math:`d_\mathrm{m} = 0.25` m gives :math:`K_r = 2/3` (Clause 4.2).
 
     :param source_height: Source-to-reference-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-reference-plane distance ``dm``, in metres.
     :return: Geometrical-spreading factor ``Kr`` (dimensionless,
         :math:`0 < K_r < 1`).
     :raises ValueError: If ``ds`` or ``dm`` is not positive or
-        :math:`d_s \le d_m`.
+        :math:`d_\mathrm{s} \le d_\mathrm{m}`.
     """
     _check_geometry(source_height, mic_height)
     return float((source_height - mic_height) / (source_height + mic_height))
@@ -205,7 +205,7 @@ def reflected_path_delay(
 ) -> float:
     r"""Reflected-path arrival delay ``dtau`` (ISO 13472-1:2002, Annex C).
 
-    :math:`\Delta\tau = 2 d_m / c` is the time difference between the direct
+    :math:`\Delta\tau = 2 d_\mathrm{m} / c` is the time difference between the direct
     and the surface-reflected impulses for the normal-incidence geometry; it
     is the delay undone by the phase-restoration term of
     :func:`insitu_reflection_factor`.
@@ -364,7 +364,7 @@ def insitu_reflection_factor(
 ) -> Complex:
     r"""Complex pressure reflection factor ``r(f)`` (ISO 13472-1, Clause 4.1).
 
-    :math:`r(f) = (1 / K_r) H_r(f) / H_i(f)` from the windowed reflected and
+    :math:`r(f) = (1 / K_r) H_\mathrm{r}(f) / H_\mathrm{i}(f)` from the windowed reflected and
     incident
     impulse responses, with ``Hr``/``Hi`` their real FFTs and ``Kr`` the
     geometrical-spreading factor (or ``Kr,theta`` when ``incidence_angle`` is
@@ -372,7 +372,7 @@ def insitu_reflection_factor(
     reflected-path time offset is undone by
     :math:`\exp(+j 2 \pi f \, \text{delay})`, yielding
     the complex ``Qp`` of the Clause 4.1 NOTE (with ``delay`` set to
-    :math:`\Delta\tau = 2 d_m / c`,
+    :math:`\Delta\tau = 2 d_\mathrm{m} / c`,
     Annex C; the frequency-dependent form of Annex G).
 
     :param incident_ir: Windowed incident (direct-path) impulse response
@@ -436,7 +436,7 @@ def power_reflection_coefficient(
     r"""Sound-power reflection factor ``QW(f)`` (ISO 13472-1, 4.1 / Annex C).
 
     The **direct energy route**
-    :math:`Q_W(f) = (1 / K_r^2) \lvert H_r(f) / H_i(f) \rvert^2`
+    :math:`Q_W(f) = (1 / K_r^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2`
     (``Kr,theta`` for oblique incidence). It equals
     :math:`\lvert r \rvert^2` from
     :func:`insitu_reflection_factor` but is formed from magnitudes only, so it is
@@ -470,7 +470,7 @@ def insitu_absorption_coefficient(
     r"""Normal-incidence absorption coefficient ``alpha(f)`` (ISO 13472-1, 4.1).
 
     :math:`\alpha(f) = 1 - Q_W(f)
-    = 1 - (1 / K_r^2) \lvert H_r(f) / H_i(f) \rvert^2` (the direct
+    = 1 - (1 / K_r^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2` (the direct
     energy route via :func:`power_reflection_coefficient`; for oblique incidence
     ``Kr`` is replaced by ``Kr,theta``, Annex F). Non-specularly reflected energy
     is treated as absorbed, so ``alpha`` may be slightly overestimated
@@ -546,7 +546,7 @@ def one_third_octave_absorption(
     Both parts require a **linear average** of the narrow-band absorption over
     each one-third-octave band (ISO 13472-1 Clause 4.1; ISO 13472-2 Clause 6.6),
     keeping negative narrow-band values during the averaging. The band edges are
-    the IEC base-two limits :math:`f_c \cdot 2^{\pm 1/6}`. Negative one-third-octave
+    the IEC base-two limits :math:`f_\mathrm{c} \cdot 2^{\pm 1/6}`. Negative one-third-octave
     results are set to zero when ``clip_negative`` is true (ISO 13472-2
     Clause 6.6 step 5); Part 1 does not mandate clipping, so pass
     ``clip_negative=False`` to reproduce its raw output.
@@ -713,12 +713,12 @@ def max_sampled_area_radius(
 
     .. math::
 
-       r = \frac{1}{d_s + d_m + c T_w}
-       \sqrt{(d_s + d_m + c T_w/2)(d_s + c T_w/2)
-       (2 d_m + c T_w)(c T_w)}
+       r = \frac{1}{d_\mathrm{s} + d_\mathrm{m} + c T_\mathrm{w}}
+       \sqrt{(d_\mathrm{s} + d_\mathrm{m} + c T_\mathrm{w}/2)(d_\mathrm{s} + c T_\mathrm{w}/2)
+       (2 d_\mathrm{m} + c T_\mathrm{w})(c T_\mathrm{w})}
 
     with ``Tw`` the width of the temporal window isolating the reflected wave.
-    The Annex A worked example (:math:`d_s = 1.25`, :math:`d_m = 0.25`,
+    The Annex A worked example (:math:`d_\mathrm{s} = 1.25`, :math:`d_\mathrm{m} = 0.25`,
     :math:`c = 340` m/s, and the 5 ms flat window) gives
     :math:`r \approx 1.34` m.
 
@@ -752,7 +752,7 @@ def msa_major_axis(
     r"""Major axis of the oblique sampled-area ellipsoid (ISO 13472-1,
     Annex F).
 
-    :math:`a = c\,T_w + \sqrt{(d_s + d_m)^2 + d_p^2}` for the ellipsoid of
+    :math:`a = c\,T_\mathrm{w} + \sqrt{(d_\mathrm{s} + d_\mathrm{m})^2 + d_\mathrm{p}^2}` for the ellipsoid of
     revolution with the source and microphone at its foci; ``dp`` is the
     source-to-microphone distance projected on the reference plane.
 
@@ -788,9 +788,9 @@ def spot_tube_upper_frequency(
 ) -> float:
     r"""Upper usable frequency of the spot tube (ISO 13472-2:2010, 5.4.1).
 
-    :math:`f_u = 0.58 c_0 / d` (circular tube), the highest frequency at which
+    :math:`f_\mathrm{u} = 0.58 c_0 / d` (circular tube), the highest frequency at which
     only plane waves propagate. A 100 mm tube at :math:`c_0 = 340` m/s gives
-    :math:`f_u \approx 1972` Hz, comfortably above the 1800 Hz narrow-band
+    :math:`f_\mathrm{u} \approx 1972` Hz, comfortably above the 1800 Hz narrow-band
     top.
 
     :param diameter: Tube diameter ``d``, in metres.

@@ -12,8 +12,8 @@ replaces the DFT-based envelope analysis with High-resolution Spectral
 Analysis (HSA):
 
 * fluctuation-strength zero-padding (Clause 5.1.2.2) and segmentation
-  (Clause 5.1.5.2) with the fixed block/hop :math:`s_b = 65536` /
-  :math:`s_h = 16384`
+  (Clause 5.1.5.2) with the fixed block/hop :math:`s_\mathrm{b} = 65536` /
+  :math:`s_\mathrm{h} = 16384`
   (Clause 9.1.1);
 * the Hilbert envelope of each critical-band block and a factor-32
   downsampling to 1500 Hz (Clause 9.1.2, Formula 119);
@@ -58,14 +58,14 @@ pinned by the calibration signal; the confirmed defects are recorded in
 ``docs/ERRATA.md``):
 
 * Formula (127) prints the phase factor
-  :math:`\exp(-j 2\pi f_n (\tilde{s}_b - n_{ze} + n_{zb} - 1))`; the DFT of
+  :math:`\exp(-j 2\pi f_n (\tilde{s}_\mathrm{b} - n_\mathrm{ze} + n_\mathrm{zb} - 1))`; the DFT of
   the rectangular analysis window requires :math:`\pi`
   in place of :math:`2\pi` (with :math:`2\pi` the HSA cannot reproduce the
   very
   spectra it fits, breaking the exact-recovery property claimed for it).
 * Formula (144) subtracts 1 from the three-bin centroid before scaling by
   ``delta_f``; with the 0-based bin convention stated below Formula (122)
-  (bin k maps to :math:`k \tilde{r}_s / \tilde{s}_b`) that offset shifts
+  (bin k maps to :math:`k \tilde{r}_\mathrm{s} / \tilde{s}_\mathrm{b}`) that offset shifts
   every modulation
   rate one bin low, so the centroid is used without the offset.
 * Clause 9.1.7 states the Newton constants (differential step 1e-5, damped

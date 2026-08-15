@@ -49,7 +49,7 @@ powered two-wheelers of category 4, which have no rolling noise at all and take
 the propulsion term alone (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{W\mathrm{R},i,m}/10} + 10^{L_{W\mathrm{P},i,m}/10}\right).
 $$
 
 Table [2.2.a] fixes five modelled categories: **1** light motor vehicles, **2**
@@ -94,8 +94,8 @@ Rolling noise is tyre-road noise. It grows logarithmically with speed from the
 reference speed $v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
-             + \Delta L_{WR,i,m},
+L_{W\mathrm{R},i,m} = A_{\mathrm{R},i,m} + B_{\mathrm{R},i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+             + \Delta L_{W\mathrm{R},i,m},
 $$
 
 where the correction collects four independent effects (2.2.5): the road
@@ -110,17 +110,17 @@ harder and the road louder, so the correction is *positive* below 20 °C.
 **Studded tyres** (2.2.6 to 2.2.9) apply to category 1 only. The per-tyre excess
 $D_{\mathrm{stud},i}(v)$ saturates below 50 km/h and above 90 km/h, and the
 fleet-level correction weights it by the share of the year that studded tyres
-are on the road, $p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
+are on the road, $p_\mathrm{s} = Q_{\mathrm{stud,ratio}} \cdot T_\mathrm{s}/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_\mathrm{s}) + p_\mathrm{s}\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
-**Junctions** (2.2.17) add $C_{R,m,k} \cdot \max(1 - |x|/100,\ 0)$, with $x$
+**Junctions** (2.2.17) add $C_{\mathrm{R},m,k} \cdot \max(1 - |x|/100,\ 0)$, with $x$
 the distance in metres to the nearest junction and $k$ the junction type: 1 for
 a crossing with traffic lights, 2 for a roundabout. The rolling coefficients
-$C_R$ are *negative* (traffic near a junction is slower), the propulsion
-coefficients $C_P$ positive (it is accelerating). Both vanish from 100 m out.
+$C_\mathrm{R}$ are *negative* (traffic near a junction is slower), the propulsion
+coefficients $C_\mathrm{P}$ positive (it is accelerating). Both vanish from 100 m out.
 
 ## 4. Propulsion noise (2.2.11 to 2.2.16)
 
@@ -129,8 +129,8 @@ is **linear** in speed, not logarithmic, because at low speed the engine is
 working hardest relative to the distance covered:
 
 $$
-L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
-             + \Delta L_{WP,i,m}.
+L_{W\mathrm{P},i,m} = A_{\mathrm{P},i,m} + B_{\mathrm{P},i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
+             + \Delta L_{W\mathrm{P},i,m}.
 $$
 
 Where the two speed laws cross is what makes the road source behave the way
@@ -197,9 +197,9 @@ valid. The surface enters the two terms
 differently:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{W\mathrm{R,road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
-\Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
+\Delta L_{W\mathrm{P,road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
 
 An absorbing surface reduces propulsion noise; a noisy one does not increase it.
@@ -222,8 +222,8 @@ and seven years old, in representative maintenance condition, dry, with no
 studded tyres, at 20 °C, on the flat. Under exactly those conditions every
 correction in 2.2 vanishes identically, so at the reference speed
 $v_m = v_\mathrm{ref} = 70\ \text{km/h}$, where the two speed terms vanish as
-well, the sound powers **are** the Table F-1 coefficients $A_{R,i,m}$ and
-$A_{P,i,m}$.
+well, the sound powers **are** the Table F-1 coefficients $A_{\mathrm{R},i,m}$ and
+$A_{\mathrm{P},i,m}$.
 
 ## 6. Handing the source to a propagation model
 
@@ -322,8 +322,8 @@ split into point sources is declared out of scope by the method itself.
 
 - [Outdoor Sound Propagation](../propagation/outdoor-propagation.md): the ISO 9613-2 chain that
   carries a source power to a receiver.
-- [Environmental noise levels](../assessment/environmental-levels.md): the $L_{den}$ and
-  $L_{night}$ indicators the resulting maps are drawn for.
+- [Environmental noise levels](../assessment/environmental-levels.md): the $L_\mathrm{den}$ and
+  $L_\mathrm{night}$ indicators the resulting maps are drawn for.
 
 ## References
 

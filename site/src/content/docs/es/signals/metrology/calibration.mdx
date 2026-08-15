@@ -614,7 +614,7 @@ legítimamente se pueden sacar de una grabación sin calibrar, y aquí vive casi
 todo `signals/spectra`.
 
 **Dependientes del marco** (verosímiles, equivocadas y silenciosas sin
-calibración): el $L_{Aeq}$ frente a un límite, el SEL, la dosis y la exposición al
+calibración): el $L_\mathrm{Aeq}$ frente a un límite, el SEL, la dosis y la exposición al
 ruido, los niveles percentiles $L_N$, toda magnitud psicoacústica anclada a
 20 µPa (la sonoridad en sonios, la agudeza, la cadena de ECMA-418-2), los
 criterios de pico de la normativa de conservación de la audición, y todos los
@@ -639,11 +639,11 @@ Los niveles se pueden leer de dos maneras, y las dos se usan en los analizadores
 comerciales:
 
 - **RMS (`mode='rms'`)** integra energía sobre la trama, que es sobre lo que
-  está definido todo nivel normalizado ($L_{eq}$, $L_{Aeq}$, $L_N$).
+  está definido todo nivel normalizado ($L_\mathrm{eq}$, $L_\mathrm{Aeq}$, $L_N$).
 - **Pico (`mode='peak'`)** retiene el mayor valor instantáneo de la trama, que es
   contra lo que se comprueban los criterios de impacto y de límite de pico como
-  $L_{Cpeak}$. Ojo: el pico de banda que se devuelve aquí está limitado en banda
-  y sin ponderar, así que no es en sí mismo $L_{Cpeak}$.
+  $L_\mathrm{Cpeak}$. Ojo: el pico de banda que se devuelve aquí está limitado en banda
+  y sin ponderar, así que no es en sí mismo $L_\mathrm{Cpeak}$.
 
 ```python
 import numpy as np

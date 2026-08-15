@@ -14,12 +14,12 @@ Two standardised measurement methods share the same three quantities and units
   $\Delta p$ the air pressure difference across the specimen (Pa) and
   `q_v` the volumetric airflow rate through it (m3/s)
   (ISO 9053-1:2018, 3.1).
-- **Specific airflow resistance** $R_s = R\,A$ in **Pa\*s/m** (not
+- **Specific airflow resistance** $R_\mathrm{s} = R\,A$ in **Pa\*s/m** (not
   Pa\*s/m2), with `A` the cross-sectional area of the specimen perpendicular
   to the flow (m2) (ISO 9053-1:2018, 3.2). Equivalently
-  $R_s = \Delta p / u$ with `u` the linear airflow velocity, since
+  $R_\mathrm{s} = \Delta p / u$ with `u` the linear airflow velocity, since
   $u = q_v / A$.
-- **Airflow resistivity** $\sigma = R_s / d$ in Pa\*s/m2, with `d` the
+- **Airflow resistivity** $\sigma = R_\mathrm{s} / d$ in Pa\*s/m2, with `d` the
   specimen thickness in the flow direction (m), for homogeneous materials
   (ISO 9053-1:2018, 3.3). Equivalently $\sigma = R\,A / d$.
 
@@ -34,7 +34,7 @@ plotted against `u` and fitted with a regression of at least second order
 constrained through the origin, $\Delta p = a u + b u^2$;
 $\Delta p$ and `R_s` are then evaluated at
 $u = 0.5\times 10^{-3}$ m/s (clause 7.5). Because
-$R_s = \Delta p / u = a + b u$, the linear coefficient `a` is the
+$R_\mathrm{s} = \Delta p / u = a + b u$, the linear coefficient `a` is the
 zero-velocity specific airflow resistance.
 
 **Alternating (AC) method, ISO 9053-2:2020.** A sinusoidally moving piston
@@ -44,7 +44,7 @@ termination. The airflow resistance follows from the sound-pressure-level
 difference between the two terminations (ISO 9053-2:2020, Formula (2), 8.7):
 
 $$
-R = \frac{\kappa' P_S}{2\pi f V} \, \frac{h_t}{h_s} \, 10^{(L_{ps} - L_{pt})/20}
+R = \frac{\kappa' P_\mathrm{S}}{2\pi f V} \, \frac{h_\mathrm{t}}{h_\mathrm{s}} \, 10^{(L_{p\mathrm{s}} - L_{p\mathrm{t}})/20}
 $$
 
 with `kappa'` the effective ratio of specific heats for air (Annex A),
@@ -54,7 +54,7 @@ piston stroke amplitudes with the airtight termination / specimen cell, and
 `L_ps`/`L_pt` the cavity sound pressure levels with the specimen /
 airtight termination (dB). Only the level *difference* enters, so the sound level
 device needs no absolute calibration (clause 8.7). The RMS piston volume flow is
-$q_v = 2\pi f h A_P$ (ISO 9053-2:2020, 6.2), with `h` the stroke
+$q_v = 2\pi f h A_\mathrm{P}$ (ISO 9053-2:2020, 6.2), with `h` the stroke
 amplitude and `A_P` the piston cross-sectional area.
 
 The **effective** ratio of specific heats `kappa'` accounts for heat conduction
@@ -89,7 +89,7 @@ specimen (Pa) and `volume_flow_rate` is the volumetric airflow rate
 airflow_resistivity(specific_resistance: float, thickness: float) -> float
 ```
 
-Airflow resistivity $\sigma = R_s / d$ (ISO 9053-1:2018, 3.3).
+Airflow resistivity $\sigma = R_\mathrm{s} / d$ (ISO 9053-1:2018, 3.3).
 
 `specific_resistance` is `R_s` (Pa\*s/m) and `thickness` is `d` (m),
 the specimen thickness in the flow direction. Returns `sigma` in Pa\*s/m2.
@@ -120,7 +120,7 @@ Alternating-method airflow resistance (ISO 9053-2:2020, Formula (2), 8.7).
 Implements:
 
 $$
-R = \frac{\kappa' P_S}{2\pi f V} \, \frac{h_t}{h_s} \, 10^{(L_{ps} - L_{pt})/20}
+R = \frac{\kappa' P_\mathrm{S}}{2\pi f V} \, \frac{h_\mathrm{t}}{h_\mathrm{s}} \, 10^{(L_{p\mathrm{s}} - L_{p\mathrm{t}})/20}
 $$
 
 `level_specimen` (`L_ps`) and `level_termination` (`L_pt`) are the
@@ -201,7 +201,7 @@ piston_volume_flow_rate(
 ) -> float
 ```
 
-RMS piston volume flow $q_v = 2\pi f h A_P$ (ISO 9053-2, 6.2).
+RMS piston volume flow $q_v = 2\pi f h A_\mathrm{P}$ (ISO 9053-2, 6.2).
 
 `frequency` is the piston frequency `f` (Hz), `stroke_amplitude` the
 stroke amplitude `h` (m) and `piston_area` the piston cross-section
@@ -224,9 +224,9 @@ Specific airflow resistance `R_s` in Pa\*s/m (ISO 9053-1:2018, 3.2).
 Two equivalent routes are accepted; supply exactly one:
 
 - `resistance` (`R`, Pa\*s/m3) and `area` (`A`, m2):
-  $R_s = R\,A$.
+  $R_\mathrm{s} = R\,A$.
 - `pressure_drop` ($\Delta p$, Pa) and `velocity` (`u`, m/s):
-  $R_s = \Delta p / u$ (from $R_s = R\,A$ with
+  $R_\mathrm{s} = \Delta p / u$ (from $R_\mathrm{s} = R\,A$ with
   $u = q_v / A$).
 
 The unit is pascal second per metre (Pa\*s/m), not Pa\*s/m2.
@@ -257,7 +257,7 @@ of at least two measurement steps; `area` is the cross-section `A` (m2)
 and `thickness` the specimen thickness `d` (m, optional, enabling
 `sigma`).
 
-Because $R_s = \Delta p / u = a + b u$, the returned
+Because $R_\mathrm{s} = \Delta p / u = a + b u$, the returned
 `linear_coefficient` `a` is the zero-velocity specific airflow
 resistance. A velocity above the clause 7.5 upper limit (15 mm/s) raises
 [`AirflowResistanceWarning`](/phonometry/reference/api/materials/airflow-resistance/#airflowresistancewarning).

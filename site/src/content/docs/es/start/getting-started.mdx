@@ -307,8 +307,8 @@ casi 3 dB, prácticamente todos del tono de 100 Hz, al que la curva atenúa unos
 19 dB. `signals.laeq(recording, fs, calibration_factor=cal)` es la forma de una
 línea de las dos anteriores y aplica la ponderación internamente, así que no
 apliques nunca la ponderación A a la señal antes de pasarla a una función de
-nivel: eso la pondera dos veces. Las envolventes Fast y Slow, $L_{AE}$,
-$L_{Cpeak}$ y los niveles percentiles son llamadas de la misma clase: [Ponderación
+nivel: eso la pondera dos veces. Las envolventes Fast y Slow, $L_{\mathrm{A}E}$,
+$L_\mathrm{Cpeak}$ y los niveles percentiles son llamadas de la misma clase: [Ponderación
 temporal](/phonometry/es/signals/levels/time-weighting/) y [Niveles integrados y
 estadísticos](/phonometry/es/signals/levels/levels/) las tienen, y [Construye un
 sonómetro](/phonometry/es/signals/sound-level-meter/) recorre la cadena entera,
@@ -330,7 +330,7 @@ hacen deciden lo que valen los niveles:
   del nivel, así que una muestra procesada ya no se puede convertir en un nivel
   de presión acústica. Una recortada tampoco.
 - **Graba a 48 kHz o más.** A 44,1 kHz se descartan las bandas por encima de
-  $f_s/2$: el banco devuelve 32 bandas que terminan en 15 848,9 Hz en lugar de
+  $f_\mathrm{s}/2$: el banco devuelve 32 bandas que terminan en 15 848,9 Hz en lugar de
   las 33 que terminan en 19 952,6 Hz de arriba, y lo avisa con un
   `PhonometryWarning`.
 - **Repite la comprobación del calibrador al final.** La diferencia entre antes
@@ -405,7 +405,7 @@ cicla o una sala por la que alguien pasa vuelven como un promedio energético qu
 nadie había pedido. Si el nivel se mueve durante el registro, trocea la señal y
 llama al banco por trozos, o toma la vía normalizada y usa la balística
 exponencial Fast/Slow que muestra un sonómetro; `mode="peak"` da el pico de
-banda en lugar del promedio, y un pico de banda no es el $L_{Cpeak}$. Hay un
+banda en lugar del promedio, y un pico de banda no es el $L_\mathrm{Cpeak}$. Hay un
 suelo por el otro lado: un filtro de banda necesita varios ciclos de su propia
 frecuencia central para establecerse, así que un registro de un segundo dice muy
 poco sobre las bandas de 12,5 o 16 Hz por muchos dígitos que devuelva.
@@ -421,7 +421,7 @@ resultado expone una figura `.plot(language="en"|"es")` de una línea y, cuando
 una norma define un formato de informe, un método `.report()` que genera la
 ficha PDF normativa.
 
-- [Construir un sonómetro](/phonometry/es/signals/sound-level-meter/): la misma cadena de principio a fin, del tono de calibrador a $L_{AF}(t)$, $L_{Aeq}$, $L_{AE}$, $L_{Cpeak}$, los niveles percentiles y la comprobación de clase de cada etapa
+- [Construir un sonómetro](/phonometry/es/signals/sound-level-meter/): la misma cadena de principio a fin, del tono de calibrador a $L_\mathrm{AF}(t)$, $L_\mathrm{Aeq}$, $L_{\mathrm{A}E}$, $L_\mathrm{Cpeak}$, los niveles percentiles y la comprobación de clase de cada etapa
 - [Todas las guías](/phonometry/es/start/guides/): el mapa, todas las guías agrupadas por tema con una línea sobre cada una
 - [Glosario](/phonometry/es/reference/glossary/): un símbolo, su unidad, el apartado que lo define y la guía que lo calcula
 - [Galería de arquitecturas de filtro](/phonometry/es/signals/filters/filter-gallery/): elige una arquitectura e inspecciona sus respuestas

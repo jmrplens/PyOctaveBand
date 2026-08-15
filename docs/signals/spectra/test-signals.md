@@ -179,7 +179,7 @@ documented counterpart for preparing records outside those chains.
 
 `fractional_delay` shifts a record by any number of samples, including
 sub-sample amounts, by multiplying the spectrum with the phase ramp
-$e^{-j 2\pi f D/f_s}$: every component is delayed by exactly `D` samples. Two
+$e^{-j 2\pi f D/f_\mathrm{s}}$: every component is delayed by exactly `D` samples. Two
 boundary conventions cover the two use cases:
 
 - `mode="linear"` (default) zero-pads the record past the shift, so samples
@@ -190,7 +190,7 @@ boundary conventions cover the two use cases:
 - `mode="circular"` applies the ramp over the record itself and wraps. For
   periodic records it is exact: a tone centered on a DFT bin delayed by
   `D` samples equals the analytically delayed tone to machine precision,
-  and its phase changes by exactly $-2\pi f D/f_s$ radians.
+  and its phase changes by exactly $-2\pi f D/f_\mathrm{s}$ radians.
 
 ```python
 import numpy as np
@@ -246,7 +246,7 @@ not normative.
 - [Correlation and delay](correlation-delay.md): the alignment work built
   on the fractional-delay kernel.
 - [Synchronous averaging](synchronous-averaging.md): period alignment with
-  the same band-limited shift when $f_s T$ is not an integer.
+  the same band-limited shift when $f_\mathrm{s} T$ is not an integer.
 - [Spectral analysis](spectral-analysis.md): the colored-noise verification
   and the window metrics.
 

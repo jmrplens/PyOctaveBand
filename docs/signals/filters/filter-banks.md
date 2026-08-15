@@ -16,8 +16,8 @@ $G = 10^{3/10} \approx 1.99526$ (so "one octave" is *not* exactly 2). For
 band fraction $1/b$, the mid frequencies and band edges follow (5.2-5.5):
 
 $$
-f_m = 1000 \cdot G^{x/b} \quad (b\ \text{odd}), \qquad
-f_1 = f_m G^{-1/2b}, \quad f_2 = f_m G^{+1/2b}
+f_\mathrm{m} = 1000 \cdot G^{x/b} \quad (b\ \text{odd}), \qquad
+f_1 = f_\mathrm{m} G^{-1/2b}, \quad f_2 = f_\mathrm{m} G^{+1/2b}
 $$
 
 so every 1/3-octave band spans $G^{1/3} \approx 1.2589 \approx 10^{1/10}$:
@@ -43,18 +43,18 @@ A digital band-pass filter is a constellation of poles and zeros in the
 z-plane: zeros at or near DC and Nyquist pin the response down far from the
 band (to the stopband floor, for equiripple designs), and the poles cluster
 just inside the unit circle at the angles
-$\omega = 2\pi f / f_s$ the passband spans. Two intuitions follow. First,
+$\omega = 2\pi f / f_\mathrm{s}$ the passband spans. Two intuitions follow. First,
 selectivity is proximity: the closer the poles sit to the unit circle, the
 sharper the band and the longer the filter rings (the group-delay peaks of
 section 4 are that ringing, measured). Second, stability is a margin, not a
 property of the architecture: an IIR filter is stable only while every pole
 stays strictly inside the unit circle, and a narrow band at a high sample
-rate pushes the poles outward (pole radius $\approx 1 - \pi B / f_s$ for
+rate pushes the poles outward (pole radius $\approx 1 - \pi B / f_\mathrm{s}$ for
 bandwidth $B$) and squeezes them together, until double-precision
 coefficients can no longer represent their positions accurately.
 Second-order sections (SOS) defuse half of the problem: each pole pair keeps
 its own coefficients, so rounding errors stay local instead of compounding
-through one high-order polynomial. The other half, the tiny $B / f_s$ ratio
+through one high-order polynomial. The other half, the tiny $B / f_\mathrm{s}$ ratio
 itself, is what decimation fixes.
 
 ### Multirate decimation
@@ -78,7 +78,7 @@ filter can remove it.
 The bank protects its own decimation stages, but it can only analyze what the
 capture chain delivered:
 
-- **Fold-down at the ADC.** Energy above $f_s/2$ that reaches the converter
+- **Fold-down at the ADC.** Energy above $f_\mathrm{s}/2$ that reaches the converter
   without an analog anti-alias filter folds into the analysis range and is
   indistinguishable from real in-band sound. Sound cards filter this
   internally; custom instrumentation chains may not.
@@ -86,7 +86,7 @@ capture chain delivered:
   low-quality resampler leaves images that bias the highest bands. Use a
   polyphase resampler (`scipy.signal.resample_poly`) or, simpler, analyze at
   the native rate: every phonometry function takes `fs` directly.
-- **Bands near Nyquist.** A band whose upper edge approaches $f_s/2$ cannot
+- **Bands near Nyquist.** A band whose upper edge approaches $f_\mathrm{s}/2$ cannot
   realize its design response: the bilinear transform compresses the
   frequency axis there (the same effect the weighting filters counter with
   `high_accuracy`). Keep the top band edge comfortably below Nyquist or raise
@@ -96,7 +96,7 @@ capture chain delivered:
 
 A band level is not read off a signal, it is *estimated* from it, and the
 narrower the band the longer that takes. The bandwidth of a $1/b$-octave band
-is $B = f_m\,(G^{1/2b} - G^{-1/2b})$ — $0.231\,f_m$ for one-third octaves —
+is $B = f_\mathrm{m}\,(G^{1/2b} - G^{-1/2b})$ — $0.231\,f_\mathrm{m}$ for one-third octaves —
 and two consequences follow. The filter has to **settle**: a band rings for a
 few times $1/B$, so that much of the front of the record is transient rather
 than level (about a second in the 12.5 Hz band, twelve milliseconds at 1 kHz).
@@ -146,7 +146,7 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 band over the whole record, which is what every standard means by "band level".
 `'peak'` reports $20\log_{10}$ of the largest absolute sample inside the band:
 an instantaneous, band-limited, unweighted peak — not the C-weighted
-$L_{C\text{peak}}$ of the [Levels](../levels/levels.md) guide — and on
+$L_\mathrm{Cpeak}$ of the [Levels](../levels/levels.md) guide — and on
 impulsive signals it is dominated by the filter's own ringing. There is no
 `'sum'` mode: a total across bands is an energy sum the caller performs,
 `10*np.log10(np.sum(10**(spl/10)))`, never an arithmetic mean of decibels.
@@ -302,7 +302,7 @@ plt.show()
 
 ### Group delay, quantified
 
-The group delay $\tau_g(\omega) = -\frac{d\phi(\omega)}{d\omega}$ of the
+The group delay $\tau_\mathrm{g}(\omega) = -\frac{d\phi(\omega)}{d\omega}$ of the
 1 kHz octave band shows the trade-off directly: Bessel stays nearly flat across
 the passband (transient shapes survive), while Chebyshev I and Elliptic pay for
 their steep roll-off with strong delay peaks at the band edges.
@@ -405,8 +405,8 @@ plt.show()
 
 IEC 61260-1:2014 (clauses 5.2-5.5) builds every band from the base-10
 octave ratio $G = 10^{3/10} \approx 1.99526$, so one octave is not exactly
-2. Mid frequencies follow $f_m = 1000 \cdot G^{x/b}$ (for odd $b$) and the
-edges are $f_1 = f_m G^{-1/2b}$ and $f_2 = f_m G^{+1/2b}$; every
+2. Mid frequencies follow $f_\mathrm{m} = 1000 \cdot G^{x/b}$ (for odd $b$) and the
+edges are $f_1 = f_\mathrm{m} G^{-1/2b}$ and $f_2 = f_\mathrm{m} G^{+1/2b}$; every
 one-third-octave band spans $G^{1/3} \approx 1.2589$, ten bands per decade.
 
 ## See also

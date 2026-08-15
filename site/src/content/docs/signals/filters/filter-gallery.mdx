@@ -115,7 +115,7 @@ plt.show()
 directions, and the class column of the table below says which of the five you
 may actually use for a standards-compliant band measurement.*
 
-| Architecture | Ripple across the band centre | At $2f_m$ | At $4f_m$ | Group delay at $f_m$ | IEC 61260-1 class (order 6, 48 kHz) |
+| Architecture | Ripple across the band centre | At $2f_\mathrm{m}$ | At $4f_\mathrm{m}$ | Group delay at $f_\mathrm{m}$ | IEC 61260-1 class (order 6, 48 kHz) |
 | :--- | ---: | ---: | ---: | ---: | :---: |
 | `butter` | 0.00 dB | −39.6 dB | −88.2 dB | 1.74 ms | **1** |
 | `cheby1` | 0.10 dB | −50.2 dB | −101.6 dB | 1.97 ms | none |
@@ -415,14 +415,14 @@ not in power.
 Which recombination is flat depends on the parity of `order/2`, and the naive
 sum is wrong for half the even orders:
 
-| `order` | `order/2` | Branch phase difference at $f_c$ | Flat recombination |
+| `order` | `order/2` | Branch phase difference at $f_\mathrm{c}$ | Flat recombination |
 | :---: | :---: | :---: | :--- |
 | 2 | 1 (odd) | 180° | `low - high` |
 | 4 | 2 (even) | 0° | `low + high` |
 | 6 | 3 (odd) | 180° | `low - high` |
 | 8 | 4 (even) | 0° | `low + high` |
 
-At orders 2 and 6 the branches are in antiphase at $f_c$ and `low + high`
+At orders 2 and 6 the branches are in antiphase at $f_\mathrm{c}$ and `low + high`
 collapses into a deep notch there instead of summing flat. Even in the flat
 cases the sum is **all-pass**, not phase-free: its magnitude is flat to better
 than 0.001 dB from 20 Hz to 20 kHz while its phase turns a full 360° through the

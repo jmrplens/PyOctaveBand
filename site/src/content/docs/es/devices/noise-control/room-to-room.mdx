@@ -78,7 +78,7 @@ logaritmos se llega a la Ecuación (4.101),
 
 $$
 \text{NR} = \text{TL}
-- 10\log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+- 10\log_{10}\!\left[\frac{S_\mathrm{w}}{S_2 \alpha_2 + \tau S_\mathrm{w}}\right],
 $$
 
 con $\text{NR} = L_{p1} - L_{p2}$ la reducción de ruido entre los dos campos
@@ -86,20 +86,20 @@ reverberantes, $\text{TL} = 10\log_{10}(1/\tau)$ la **pérdida por transmisión*
 de la partición — el nombre que Norton y Karczub, y la literatura
 norteamericana, dan a la magnitud que mide ISO 10140-2 y que ISO 717-1 valora
 como **índice de reducción acústica** $R$; son el mismo número, y su índice
-global es el $R_w$ que se usa más abajo, de modo que el $R$ y el $R_w$ de un
+global es el $R_\mathrm{w}$ que se usa más abajo, de modo que el $R$ y el $R_\mathrm{w}$ de un
 informe de ensayo de laboratorio entran directamente en esta ecuación (véase
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/))
-—, $S_w$ el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
+—, $S_\mathrm{w}$ el área de la partición y $S_2 \alpha_2$ el área de absorción sonora
 equivalente del recinto receptor.
 
 Leyendo el logaritmo se entiende toda la página. Una **partición grande hacia
 un recinto duro** entrega *menos* que su pérdida por transmisión: mucha
 superficie radiando hacia un recinto sin nada que lo absorba. Una **partición
 pequeña hacia un recinto bien absorbente** entrega *más*. Los dos recintos y
-el muro no son separables, y por eso citar el $R_w$ de un muro y detenerse
+el muro no son separables, y por eso citar el $R_\mathrm{w}$ de un muro y detenerse
 ahí no es una respuesta.
 
-El término $\tau S_w$ es la potencia que la propia partición devuelve al
+El término $\tau S_\mathrm{w}$ es la potencia que la propia partición devuelve al
 recinto emisor. Con cualquier pérdida por transmisión realista vale unas
 centésimas de decibelio, así que está desactivado por omisión y
 `include_partition_transmission=True` lo activa.
@@ -110,15 +110,15 @@ La $\text{NR}$ de esta ecuación es la **diferencia de niveles** $D$ en bruto qu
 devuelve una medición en campo de los dos recintos. Las normas de medición no
 informan $D$ en bruto, y por la razón que este apartado acaba de explicar: $D$
 depende del recinto receptor. La normalizan, o bien a un tiempo de
-reverberación de referencia, $D_{nT} = D + 10\log_{10}(T/T_0)$ con
+reverberación de referencia, $D_\mathrm{nT} = D + 10\log_{10}(T/T_0)$ con
 $T_0 = 0{,}5$ s — la magnitud en la que está escrita la mayoría de la
 reglamentación residencial —, o bien a un área de absorción de referencia de
-10 m², $D_n = D - 10\log_{10}(A/10)$. La magnitud propia del muro es $R$, y su
+10 m², $D_\mathrm{n} = D - 10\log_{10}(A/10)$. La magnitud propia del muro es $R$, y su
 versión en campo, $R' = D + 10\log_{10}(S/A)$, incluye los flancos y por eso
 queda siempre por debajo del $R$ de laboratorio que supone este cálculo.
 
 La consecuencia merece decirse sin rodeos: una $\text{NR}$ calculada y un
-$D_{nT,w}$ certificado del mismo muro son números distintos por construcción, y
+$D_\mathrm{nT,w}$ certificado del mismo muro son números distintos por construcción, y
 compararlos sin renormalizar es la forma más habitual de concluir que el modelo
 está mal cuando no lo está. El tiempo de reverberación del recinto receptor hay
 que medirlo en la misma sesión, porque es lo que lleva la normalización.
@@ -184,7 +184,7 @@ que el muro nunca toca.
 
 *Resta a la reducción de ruido que entrega cada muro su propia pérdida por
 transmisión y las tres particiones se derrumban sobre una única curva, porque la
-diferencia, $-10\log_{10}[S_w/(S_2\alpha_2)]$, no contiene ninguna propiedad del
+diferencia, $-10\log_{10}[S_\mathrm{w}/(S_2\alpha_2)]$, no contiene ninguna propiedad del
 muro. Es el panel inferior: la separación cambia de signo justo donde el área de
 absorción del recinto receptor cruza los 24 m² de la partición. Ordenar tres
 muros es seguro; citar los decibelios que «da» uno de ellos, no.*
@@ -400,12 +400,12 @@ diferencia. Norton deduce la ecuación del cerramiento del mismo balance de
 potencia del apartado 4.9 y obtiene la Ecuación (4.115),
 
 $$
-\text{IL} = \text{TL} - 10\log_{10}(S_E / R_i),
+\text{IL} = \text{TL} - 10\log_{10}(S_\mathrm{E} / R_\mathrm{i}),
 $$
 
-con $S_E$ el área radiante exterior y $R_i$ la constante de recinto del
+con $S_\mathrm{E}$ el área radiante exterior y $R_\mathrm{i}$ la constante de recinto del
 interior del cerramiento, superficie de la máquina incluida. Resuelta para
-los paneles, $\text{TL} = \text{IL} + 10\log_{10}(S_E / R_i)$, que es
+los paneles, $\text{TL} = \text{IL} + 10\log_{10}(S_\mathrm{E} / R_\mathrm{i})$, que es
 `enclosure_required_transmission_loss`.
 
 ```python
@@ -636,7 +636,7 @@ superficie que media longitud de onda.
   los modelos de la EN 12354 para las trayectorias por flancos que esta página
   se limita a cargar en cuenta.
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
-  cómo se mide ese mismo par de recintos, y el $D_{nT}$ y el $R'$ que devuelve
+  cómo se mide ese mismo par de recintos, y el $D_\mathrm{nT}$ y el $R'$ que devuelve
   un informe de ensayo.
 - [Criterios de ruido en recintos](/phonometry/es/buildings/rooms/room-noise/): las
   familias NC y RC Mark II en las que se escribe el veredicto.

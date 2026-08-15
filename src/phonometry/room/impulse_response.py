@@ -209,7 +209,7 @@ def sweep_signal(
     :param f1: Start frequency in Hz (at or below the lowest band edge to be
         measured, ISO 18233 B.3.1). Must be > 0.
     :param f2: Stop frequency in Hz (at or above the highest band edge). Must
-        satisfy :math:`f_1 < f_2 \le f_s/2`.
+        satisfy :math:`f_1 < f_2 \le f_\mathrm{s}/2`.
     :param seconds: Sweep duration in seconds. Any duration may be used; a
         longer sweep raises the effective signal-to-noise ratio (B.2, B.6).
     :param amplitude: Peak amplitude of the sweep. Default 1.0.
@@ -878,9 +878,9 @@ def shaped_sweep_signal(
 
     .. math::
 
-       \tau_G(f) = \tau_G(f - df) + C\, |H(f)|^2
+       \tau_\mathrm{G}(f) = \tau_\mathrm{G}(f - df) + C\, |H(f)|^2
 
-       C = \frac{\tau_G(f_{\text{end}}) - \tau_G(f_{\text{start}})}
+       C = \frac{\tau_\mathrm{G}(f_{\text{end}}) - \tau_\mathrm{G}(f_{\text{start}})}
        {\sum |H|^2}
 
     so the sweep dwells on each frequency for a time proportional to the
@@ -902,9 +902,9 @@ def shaped_sweep_signal(
     :param f1: Start frequency of the sweep band in Hz. Must be > 0. The
         magnitude rolls off over 1/6 octave *below* ``f1`` (clipped at the
         first FFT bin), so the full target level holds across ``[f1, f2]``.
-    :param f2: Stop frequency in Hz. Must satisfy :math:`f_1 < f_2 \le f_s/2`;
+    :param f2: Stop frequency in Hz. Must satisfy :math:`f_1 < f_2 \le f_\mathrm{s}/2`;
         keep some margin below Nyquist so the upper roll-off has room.
-    :param seconds: Sweep duration :math:`\tau_G(f_2) - \tau_G(f_1)` in
+    :param seconds: Sweep duration :math:`\tau_\mathrm{G}(f_2) - \tau_\mathrm{G}(f_1)` in
         seconds.
         The returned signal is slightly longer (lead-in plus tail margin,
         see ``start_delay``).

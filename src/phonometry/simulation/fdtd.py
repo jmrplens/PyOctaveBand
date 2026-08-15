@@ -10,8 +10,8 @@ formulation of Attenborough & Van Renterghem, *Predicting Outdoor Sound*
 * the governing first-order system in ``p`` and ``v`` (Eqs. 4.3-4.4);
 * the staggered-in-place, staggered-in-time discretisation (Eqs. 4.11-4.12),
   with pressure at cell centres and velocity components on cell faces;
-* the Courant stability condition :math:`C_N \le 1` with
-  :math:`C_N = c\,\Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2}`
+* the Courant stability condition :math:`C_\mathrm{N} \le 1` with
+  :math:`C_\mathrm{N} = c\,\Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2}`
   (Eqs. 4.13-4.14);
 * rigid boundaries as zero normal face velocity (Eq. 4.32) and the
   frequency-independent real-impedance boundary update (Eqs. 4.33-4.35);
@@ -649,8 +649,8 @@ class FDTD2D:
     :param rho: Density map [kg/m3]; scalar or ``(ny, nx)`` array
         (default 1.2).
     :param cfl: Courant number
-        :math:`C_N = c_{\max}\, \Delta t \sqrt{2} / \Delta x` (Eq. 4.13);
-        the explicit scheme is stable for :math:`C_N \le 1` (Eq. 4.14) and
+        :math:`C_\mathrm{N} = c_{\max}\, \Delta t \sqrt{2} / \Delta x` (Eq. 4.13);
+        the explicit scheme is stable for :math:`C_\mathrm{N} \le 1` (Eq. 4.14) and
         values
         in ``(0, 1)`` are accepted. The default 0.6 keeps a wide stability
         margin with moderate numerical dispersion.
@@ -1275,7 +1275,7 @@ def fdtd_simulation(
     :param shape: Grid shape ``(ny, nx)``, required when ``c`` is a scalar.
     :param rho: Density map [kg/m3]; scalar or ``(ny, nx)`` array.
     :param cfl: Courant number in ``(0, 1)`` (Eqs. 4.13-4.14); the time step
-        is :math:`\Delta t = C_N\, \Delta x / (c_{\max} \sqrt{2})`.
+        is :math:`\Delta t = C_\mathrm{N}\, \Delta x / (c_{\max} \sqrt{2})`.
         Default 0.6.
     :param probes: Pressure-probe cells as ``(ix, iy)`` index pairs.
     :param boundaries: ``"rigid"`` (default), ``"absorbing"``, or a mapping

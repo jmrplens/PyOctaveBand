@@ -70,8 +70,8 @@ j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
 \qquad k = \omega/c,
 $$
 
-and a side branch of impedance $Z_b$ is the shunt
-$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$. The
+and a side branch of impedance $Z_\mathrm{b}$ is the shunt
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_\mathrm{b} & 1 \end{smallmatrix}\right]$. The
 **transmission loss** follows from the compound matrix $T$ with the port
 impedances $Z_1 = \rho c/S_\text{in}$ and $Z_n = \rho c/S_\text{out}$
 (Munjal Eq. (3.27); Bies Eq. (8.141) prints the `T11`/`T22` impedance
@@ -87,12 +87,12 @@ which for equal inlet/outlet areas $S$ reduces to (Bies Eq. (8.148))
 
 $$
 \mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
-+ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
-\qquad Z_c = \frac{\rho c}{S},
++ \tfrac{T_{12}}{Z_\mathrm{c}} + Z_\mathrm{c}\,T_{21} + T_{22}\right|\right),
+\qquad Z_\mathrm{c} = \frac{\rho c}{S},
 $$
 
-and the **insertion loss** for a source impedance $Z_s$ and radiation impedance
-$Z_r$ is the extra attenuation over a direct connection.
+and the **insertion loss** for a source impedance $Z_\mathrm{s}$ and radiation impedance
+$Z_\mathrm{r}$ is the extra attenuation over a direct connection.
 
 ### Expansion chamber
 
@@ -220,7 +220,7 @@ above that approximates a constant-volume-velocity machine such as a
 reciprocating engine and one far below it a constant-pressure source. The
 termination is not a free choice at all — for a duct discharging into a room it
 is the radiation impedance of the open end,
-$Z_r = (\rho c/S)(R_1 + jX_1)$, whose normalised $R_1$ and $X_1$ the
+$Z_\mathrm{r} = (\rho c/S)(R_1 + jX_1)$, whose normalised $R_1$ and $X_1$ the
 [radiating piston](/phonometry/devices/electroacoustics/loudspeakers/#2-radiating-piston-radiation-impedance-and-directivity)
 of the electroacoustics domain returns as `radiating_piston(...).resistance` and
 `.reactance` (its `radiation_resistance` and `radiation_reactance` are the
@@ -303,15 +303,15 @@ inlet, the 6.5 dB peak of the four-pole curve above.
 
 ### Side-branch and extended-tube resonators
 
-A **Helmholtz resonator** (neck area $S_n$, effective length $l_e$, cavity
-volume $V$) and a closed **quarter-wave tube** (length $l_e$) each short the
+A **Helmholtz resonator** (neck area $S_\mathrm{n}$, effective length $l_\mathrm{e}$, cavity
+volume $V$) and a closed **quarter-wave tube** (length $l_\mathrm{e}$) each short the
 duct at their tuning frequency, giving a sharp transmission-loss spike there:
-$f_0 = \tfrac{c}{2\pi}\sqrt{S_n/(l_e V)}$ (Bies Eq. (8.46)) and $f = c/4l_e$
+$f_0 = \tfrac{c}{2\pi}\sqrt{S_\mathrm{n}/(l_\mathrm{e} V)}$ (Bies Eq. (8.46)) and $f = c/4l_\mathrm{e}$
 (Eq. (8.44)). An **extended-tube chamber** buries quarter-wave side branches in
 an expansion chamber to fill the plain chamber's troughs.
 
 Both lengths are **effective** lengths, and both functions take them that way
-(`neck_length` and `length` are documented as $l_e$, end corrections included).
+(`neck_length` and `length` are documented as $l_\mathrm{e}$, end corrections included).
 The air in a neck does not stop moving at the mouth: it drags a slug of air
 along on each side, so the mass that resonates against the cavity belongs to a
 tube longer than the one that was drilled. Add about $0.85a$ per flanged end
@@ -520,7 +520,7 @@ neck only 2 cm long.
 
 *The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
 drawn as its equal-volume cube, and the tuning moves as
-$\sqrt{S_n/(l_e V)}$, so small errors in these dimensions shift the spike off
+$\sqrt{S_\mathrm{n}/(l_\mathrm{e} V)}$, so small errors in these dimensions shift the spike off
 its target.*
 
 <details>
@@ -549,14 +549,14 @@ same duct.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%" />
 
 *A quarter-wave stub is just a closed tube of the right length: 0.3 m of
-pipe puts the spike at $c/4l_e \approx 285\ \text{Hz}$, and the 20 cm² branch
+pipe puts the spike at $c/4l_\mathrm{e} \approx 285\ \text{Hz}$, and the 20 cm² branch
 area only sets how strongly the stub loads the duct.*
 
 :::caution
 **Tune at the working temperature.**
 Every frequency on this page is a wavelength condition, so all of them scale
 directly with the speed of sound **in the working gas**: $kL = \pi/2$ for the
-chamber, $c/4l_e$ for the stub, and the $c$ in front of the Helmholtz square
+chamber, $c/4l_\mathrm{e}$ for the stub, and the $c$ in front of the Helmholtz square
 root. For air, $c(T) = 343\sqrt{T/293}$ with $T$ in kelvin, so an exhaust at
 500 °C (773 K) runs at about 557 m/s, a factor 1.62, and the 0.3 m stub cut for
 285.8 Hz on cold-air values sings at 464 Hz once the pipe is hot. Pass the
@@ -856,7 +856,7 @@ reflecting surface is more than twice as far away as the microphone.
 The procedure is then two series with nothing else changed. $L_{pI}$ is
 determined with the test object installed, $L_{pII}$ with the substitution duct
 in its place, at identical points or paths and with an unchanged source
-spectrum, and the insertion loss is $D_i = L_{pII} - L_{pI}$ third octave by
+spectrum, and the insertion loss is $D_\mathrm{i} = L_{pII} - L_{pI}$ third octave by
 third octave (6.2.1). In a test duct the spatial average takes **at least three
 equally spaced positions** on a line inclined to the duct axis at about half its
 length, spanning at least a quarter wavelength of the lowest band, going to five

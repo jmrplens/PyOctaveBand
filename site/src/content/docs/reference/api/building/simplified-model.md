@@ -28,14 +28,14 @@ energetic sum of the direct path `Dd` and, for every flanking element, the
 three flanking paths `Ff`, `Df` and `Fd`:
 
 $$
-R'_w = -10 \log_{10}\!\left[ 10^{-R_{Dd,w}/10} + \sum 10^{-R_{Ff,w}/10} + \sum 10^{-R_{Df,w}/10} + \sum 10^{-R_{Fd,w}/10} \right]
+R'_\mathrm{w} = -10 \log_{10}\!\left[ 10^{-R_\mathrm{Dd,w}/10} + \sum 10^{-R_\mathrm{Ff,w}/10} + \sum 10^{-R_\mathrm{Df,w}/10} + \sum 10^{-R_\mathrm{Fd,w}/10} \right]
 $$
 
-with the direct path $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Formula 27)
+with the direct path $R_\mathrm{Dd,w} = R_\mathrm{s,w} + \Delta R_\mathrm{Dd,w}$ (Formula 27)
 and each flanking path (Formula 28a)
 
 $$
-R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij} + 10 \log_{10}\frac{S_s}{l_0 l_f}
+R_{ij,\mathrm{w}} = \frac{R_{i,\mathrm{w}} + R_{j,\mathrm{w}}}{2} + \Delta R_{ij,\mathrm{w}} + K_{ij} + 10 \log_{10}\frac{S_\mathrm{s}}{l_0 l_\mathrm{f}}
 $$
 
 where $l_0 = 1$ m is the reference coupling length.
@@ -49,7 +49,7 @@ ratio $M = \log_{10}(m'_{\perp,i} / m'_i)$. A minimum value `Kij,min`
 follows from the Kij,min relation of Clause 4.4.2 (printed as Eq. (23)
 in the BS EN 12354-1:2000 edition).
 
-**Impact, Formula (21).** $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ with
+**Impact, Formula (21).** $L'_\mathrm{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K$ with
 the bare-floor equivalent level `Ln,w,eq` (Annex B
 $164 - 35 \log_{10}(m'/m'_0)$), the covering improvement `ΔLw` (ISO 717-2)
 and the flanking correction `K` from Table 1.
@@ -190,7 +190,7 @@ equivalent_impact_level(mass_per_area: float) -> float
 
 Bare-floor equivalent weighted impact level `Ln,w,eq` (Part 2, Annex B).
 
-$L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ with $m'_0 = 1$ kg/m²,
+$L_\mathrm{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ with $m'_0 = 1$ kg/m²,
 the closed form
 used in the Annex E worked example for a homogeneous concrete floor. The
 Annex B relation is stated for homogeneous floors of 100 kg/m² to
@@ -240,10 +240,10 @@ contributes across its junction with the separating element.
 
 **Kij,min (Clause 4.4.2).** When `flanking_area` is given, the mandatory
 floor $K_{ij} \ge K_{ij,\mathrm{min}}$ is applied automatically per
-path: `KFf` is clamped to $10 \log_{10}[l_f l_0 (2/S_F)]$ (both
+path: `KFf` is clamped to $10 \log_{10}[l_\mathrm{f} l_0 (2/S_\mathrm{F})]$ (both
 junction elements are
 the flanking element) and `KFd`/`KDf` to
-$10 \log_{10}[l_f l_0 (1/S_F + 1/S_s)]$ (flanking and separating
+$10 \log_{10}[l_\mathrm{f} l_0 (1/S_\mathrm{F} + 1/S_\mathrm{s})]$ (flanking and separating
 element), via
 [`junction_min_vibration_reduction`](/phonometry/reference/api/building/simplified-model/#junction_min_vibration_reduction). Without `flanking_area` the
 per-path floors cannot be formed from the available geometry, so the raw
@@ -266,7 +266,7 @@ stay within Clause 4.4.2.
 | `delta_r_ff` | Combined lining improvement for the Ff path, in dB. |
 | `delta_r_fd` | Combined lining improvement for the Fd path, in dB. |
 | `delta_r_df` | Combined lining improvement for the Df path, in dB. |
-| `flanking_area` | Flanking-element area $S_F = S_f$, in m². Enables the automatic `Kij,min` clamp (Clause 4.4.2); `None` skips it. |
+| `flanking_area` | Flanking-element area $S_\mathrm{F} = S_\mathrm{f}$, in m². Enables the automatic `Kij,min` clamp (Clause 4.4.2); `None` skips it. |
 
 **Returns:** The `(Ff, Df, Fd)` [`FlankingPath`](/phonometry/reference/api/building/simplified-model/#flankingpath) triple.
 
@@ -296,11 +296,11 @@ flanking_path(
 Build one flanking path `Rij,w` (EN 12354-1 Formula 28a).
 
 $$
-R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij} + 10 \log_{10}\frac{S_s}{l_0 l_f}
+R_{ij,\mathrm{w}} = \frac{R_{i,\mathrm{w}} + R_{j,\mathrm{w}}}{2} + \Delta R_{ij,\mathrm{w}} + K_{ij} + 10 \log_{10}\frac{S_\mathrm{s}}{l_0 l_\mathrm{f}}
 $$
 
-with `r_source` and `r_receive` as $R_{i,w}$ / $R_{j,w}$,
-`delta_r` as $\Delta R_{ij,w}$ and `k_ij` as $K_{ij}$.
+with `r_source` and `r_receive` as $R_{i,\mathrm{w}}$ / $R_{j,\mathrm{w}}$,
+`delta_r` as $\Delta R_{ij,\mathrm{w}}$ and `k_ij` as $K_{ij}$.
 The two element indices depend on the path: for `Ff` both are the flanking
 element (`RF,w`, `Rf,w`); for `Fd` they are the flanking (source) and
 separating (receive) elements; for `Df` the separating (source) and
@@ -491,7 +491,7 @@ Minimum vibration reduction index `Kij,min` (EN 12354-1 Clause 4.4.2).
 
 Printed as Formula (29) in the EN 12354-1:2000 edition.
 
-$K_{ij,\mathrm{min}} = 10 \log_{10}[l_f \, l_0 \, (1/S_i + 1/S_j)]$ with
+$K_{ij,\mathrm{min}} = 10 \log_{10}[l_\mathrm{f} \, l_0 \, (1/S_i + 1/S_j)]$ with
 the reference coupling
 length $l_0 = 1$ m. When the tabulated `Kij` is below this value,
 the minimum is used (Clause 4.4.2).
@@ -630,11 +630,11 @@ predicted_airborne_insulation(
 Predict the apparent airborne insulation `R'w` (EN 12354-1 Formula 26).
 
 Energetically combines the direct path
-$R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Formula 27, from
+$R_\mathrm{Dd,w} = R_\mathrm{s,w} + \Delta R_\mathrm{Dd,w}$ (Formula 27, from
 `r_direct` and `delta_r_direct`) with the supplied flanking paths:
 
 $$
-R'_w = -10 \log_{10}\!\left[ 10^{-R_{Dd,w}/10} + \sum 10^{-R_{ij,w}/10} \right]
+R'_\mathrm{w} = -10 \log_{10}\!\left[ 10^{-R_\mathrm{Dd,w}/10} + \sum 10^{-R_{ij,\mathrm{w}}/10} \right]
 $$
 
 With no flanking paths the result equals the direct path `RDd,w`; each
@@ -670,7 +670,7 @@ predicted_impact_insulation(
 
 Predict the apparent impact insulation `L'n,w` (EN 12354-2 Formula 21).
 
-$L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$. The bare-floor equivalent
+$L'_\mathrm{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K$. The bare-floor equivalent
 level may come from
 [`equivalent_impact_level`](/phonometry/reference/api/building/simplified-model/#equivalent_impact_level) and the flanking correction from
 [`impact_flanking_correction`](/phonometry/reference/api/building/simplified-model/#impact_flanking_correction).
@@ -700,7 +700,7 @@ standardized_impact_level(l_prime_n_w: float, volume: float) -> float
 Standardized apparent impact level `L'nT,w` (EN 12354-2 Formula 3).
 
 $$
-L'_{nT,w} = L'_{n,w} - 10 \log_{10}\frac{0.16\,V}{A_0 T_0} = L'_{n,w} - 10 \log_{10}(0.032\,V)
+L'_\mathrm{nT,w} = L'_\mathrm{n,w} - 10 \log_{10}\frac{0.16\,V}{A_0 T_0} = L'_\mathrm{n,w} - 10 \log_{10}(0.032\,V)
 $$
 
 with $A_0 = 10$ m² and $T_0 = 0.5$ s, the exact Formula (3)
@@ -736,15 +736,15 @@ standardized_level_difference(
 Standardized level difference `DnT,w` from `R'w` (EN 12354-1 Formula 5b).
 
 $$
-D_{nT} = R' + 10 \log_{10}\frac{0.16\,V}{T_0 S_s} = R' + 10 \log_{10}\frac{0.32\,V}{S_s}
+D_\mathrm{nT} = R' + 10 \log_{10}\frac{0.16\,V}{T_0 S_\mathrm{s}} = R' + 10 \log_{10}\frac{0.32\,V}{S_\mathrm{s}}
 $$
 
 with $T_0 = 0.5$ s, the exact Formula (5b) form, applied to the
 weighted single numbers of the simplified model (Clause 4.4). The Annex
-H.3 worked example rounds the factor to $10 \log_{10}(V/(3 S_s))$
+H.3 worked example rounds the factor to $10 \log_{10}(V/(3 S_\mathrm{s}))$
 ($1/0.32 = 3.125 \approx 3$), printing $52.2 + 1.6 = 53.8$ dB
 where the exact form gives 53.6 dB;
-both round to the same $D_{nT,w} = 54$ dB.
+both round to the same $D_\mathrm{nT,w} = 54$ dB.
 
 **Parameters**
 

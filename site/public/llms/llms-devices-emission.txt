@@ -129,12 +129,12 @@ declaration a datasheet prints.
 ## Choosing a method
 
 All deliver the same quantity, a per-band $L_W$ and an A-weighted total
-$L_{WA}$, but under different environments, accuracy grades and practical
+$L_{W\mathrm{A}}$, but under different environments, accuracy grades and practical
 constraints.
 
 | Method | Standard | Measured quantity | Environment | Accuracy grade | Use when |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{R0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
+| Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{\mathrm{R}0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
 | Reverberation room | **ISO 3741** | Sound pressure in the diffuse field | Qualified hard-walled reverberation room | Grade 1 (precision) | Highest accuracy for steady, broadband sources in a lab |
 | Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
 | Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
@@ -219,21 +219,21 @@ order; the first match names the standard.
 
 ### What the accuracy grades mean
 
-The grade is a claim about **reproducibility**: $\sigma_{R0}$ is the standard
+The grade is a claim about **reproducibility**: $\sigma_{\mathrm{R}0}$ is the standard
 deviation you would see if different laboratories measured the same source,
 each following the standard correctly. Typical A-weighted values are
-$\sigma_{R0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
 ISO 9614-2) and 3 dB or more for grade 3 (larger still when $K_2$ is
 large or the spectrum is tonal). Per-band values are larger at the
 spectrum edges. The `uncertainty` field of the pressure-method results
 (enveloping surface and anechoic) is the expanded uncertainty
 $U = 2\sigma_\text{tot}$ (95 % coverage), where
-$\sigma_\text{tot} = \sqrt{\sigma_{R0}^2 + \sigma_\text{omc}^2}$ also folds
+$\sigma_\text{tot} = \sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\text{omc}^2}$ also folds
 in the operating/mounting instability
 $\sigma_\text{omc}$ that you estimate and pass in; the grade only bounds the method's
 share of the budget.
 
-In practice: a grade-2 $L_{WA}$ of 92.4 dB carries $U \approx 3\ \text{dB}$, so two grade-2
+In practice: a grade-2 $L_{W\mathrm{A}}$ of 92.4 dB carries $U \approx 3\ \text{dB}$, so two grade-2
 results 2 dB apart are statistically indistinguishable, and checking that
 same source against a 93 dB limit is a coin flip. Choose the grade from the
 decision the number has to support, not from the facility that happens to
@@ -245,19 +245,19 @@ A measured sound power level is not yet a *declaration*. ISO 4871:1996 is the
 standard for the noise-emission declaration a manufacturer prints in technical
 documents: which quantities are stated, in which form, and how a declared value
 is verified. The preferred quantity is the A-weighted sound power level
-$L_{WA}$, optionally accompanied by the A-weighted emission sound pressure level
-$L_{pA}$ at a work station.
+$L_{W\mathrm{A}}$, optionally accompanied by the A-weighted emission sound pressure level
+$L_{p\mathrm{A}}$ at a work station.
 
 A declaration takes one of two alternative forms (clause 4):
 
-- the **dual-number** form (clause 3.16): the measured value $L_{WA}$ and its
-  uncertainty $K_{WA}$ stated together but separately; and
+- the **dual-number** form (clause 3.16): the measured value $L_{W\mathrm{A}}$ and its
+  uncertainty $K_{W\mathrm{A}}$ stated together but separately; and
 - the **single-number** form (clause 3.15): the derived declared value
-  $L_{WAd} = L_{WA} + K_{WA}$, an upper limit that repeated measurements are unlikely
+  $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$, an upper limit that repeated measurements are unlikely
   to exceed at the stated confidence level.
 
-$K_{WA}$ combines the measurement (reproducibility) and, for a batch, the
-production spread; for a single machine $K = 1.645\,\sigma_R$ (Annex A.2.2). A
+$K_{W\mathrm{A}}$ combines the measurement (reproducibility) and, for a batch, the
+production spread; for a single machine $K = 1.645\,\sigma_\mathrm{R}$ (Annex A.2.2). A
 `NoiseEmissionDeclaration` holds one or more per-operating-mode declarations
 and renders the ISO 4871 fiche through `.report()`. The quickest route is to
 `declare()` straight from a measured sound power:
@@ -285,8 +285,8 @@ declaration.report(
 ```
 
 Or build the declaration directly, reproducing the ISO 4871 Annex B example
-(two operating modes, $L_{WA} = 88$ and 95 dB with $K_{WA} = 2$ dB, giving
-declared $L_{WAd} = 90$ and 97 dB):
+(two operating modes, $L_{W\mathrm{A}} = 88$ and 95 dB with $K_{W\mathrm{A}} = 2$ dB, giving
+declared $L_{W\mathrm{Ad}} = 90$ and 97 dB):
 
 ```python
 mode1 = ph.OperatingModeDeclaration(
@@ -311,7 +311,7 @@ repository. Click the preview to open the PDF:
 [![ISO 4871 noise emission declaration example report: a header with the machine identification and operating conditions, the declared dual-number table across two operating-mode columns listing the measured A-weighted sound power level L_WA, its uncertainty K_WA, the emission sound pressure level L_pA and the derived declared value L_WAd = L_WA + K_WA (90 and 97 dB), the noise-test-code and basic-standards footnote, and a clause 6.2 verification table where mode 1 passes and mode 2 fails](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso4871_declaration_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso4871_declaration_example.pdf)
 
 *Noise emission declaration fiche (`NoiseEmissionDeclaration.report`), the
-ISO 4871 Annex B dual-number table with the declared $L_{WAd} = L_{WA} + K_{WA}$ and
+ISO 4871 Annex B dual-number table with the declared $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and
 the clause 6.2 verification verdict.*
 
 
@@ -330,7 +330,7 @@ the clause 6.2 verification verdict.*
   scanning methods.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
   absorption area that feed the room corrections.
-- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-intensity/).
 
@@ -347,11 +347,11 @@ ISO 9614-3 all determine it.
 
 ### What do the accuracy grades in sound power measurement mean?
 
-The grade is a claim about reproducibility: $\sigma_{R0}$ is the standard deviation
+The grade is a claim about reproducibility: $\sigma_{\mathrm{R}0}$ is the standard deviation
 you would see if different laboratories measured the same source, each
 following the standard correctly. Typical A-weighted values are
-$\sigma_{R0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
-ISO 9614-2) and 3 dB or more for grade 3. A grade-2 $L_{WA}$ carries
+$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+ISO 9614-2) and 3 dB or more for grade 3. A grade-2 $L_{W\mathrm{A}}$ carries
 $U \approx 3\ \text{dB}$, so two grade-2 results 2 dB apart are statistically
 indistinguishable.
 
@@ -383,7 +383,7 @@ then decide the grade actually achieved.
   equipment* (ISO 4871:1996).
   [iso.org catalogue](https://www.iso.org/standard/10868.html).
   The declaration section: the dual/single-number forms,
-  $L_{WAd} = L_{WA} + K_{WA}$ (clause 3.15) and the clause 6.2 verification.
+  $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ (clause 3.15) and the clause 6.2 verification.
 
 ## Standards
 
@@ -392,7 +392,7 @@ sources — Guidelines for the use of basic standards*: the Table 3 / Annex D
 selection guidance condensed into the decision path of this page.
 ISO 4871:1996, *Acoustics — Declaration and verification of noise emission
 values of machinery and equipment*: the dual-number and single-number
-declaration forms, the declared value $L_{WAd} = L_{WA} + K_{WA}$ and the
+declaration forms, the declared value $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ and the
 clause 6.2 verification. The basic determination standards (ISO 3744/3746,
 ISO 3741, ISO 3745, ISO 9614-2/-3) are covered in their method guides.
 
@@ -401,11 +401,11 @@ all — ISO 3743-1, ISO 3743-2 and ISO 3747 — and neither is the sound *energy
 level $L_J$ of a single event. ISO 9614-1's own discrete-point power summation
 is absent as well; only its field indicators exist, in
 [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/). The emission sound pressure level
-$L_{pA}$ that stands beside $L_{WA}$ in a declaration is consumed here, never
+$L_{p\mathrm{A}}$ that stands beside $L_{W\mathrm{A}}$ in a declaration is consumed here, never
 determined: ISO 11201, ISO 11202 and ISO 11204 are outside the library. Of
 ISO 4871, only the clause 6.2 single-machine verification is evaluated; the
 batch criteria of clause 6.3 are not, and the batch statistics beyond the
-single-machine $K = 1{,}645\,\sigma_R$ case of Annex A.2.2 are stated rather
+single-machine $K = 1{,}645\,\sigma_\mathrm{R}$ case of Annex A.2.2 are stated rather
 than derived.
 
 ---
@@ -441,7 +441,7 @@ them, and the sound power follows because a diffuse-enough surface captures
 all the radiated energy:
 
 $$
-\bar{L}_p = 10\log_{10}\left( \frac{1}{N_M} \sum_i 10^{L_{pi}/10} \right), \qquad
+\bar{L}_p = 10\log_{10}\left( \frac{1}{N_\mathrm{M}} \sum_i 10^{L_{pi}/10} \right), \qquad
 L_W = \bar{L}_p - K_1 - K_2 + 10\log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
 $$
 
@@ -506,7 +506,7 @@ res.plot()   # sound power level bars per band, LWA in the title (needs matplotl
 *One bar per band: the energy-averaged surface pressure minus the background
 ($K_1$) and environmental ($K_2$) corrections plus the surface term
 $10\log_{10}(S/S_0)$ gives $L_W(f)$, and the A-weighted energy sum across bands
-gives the single-number $L_{WA}$ in the title.*
+gives the single-number $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -550,7 +550,7 @@ plt.show()
 
 </details>
 
-The A-weighted total $L_{WA}$ is combined from the band powers with the
+The A-weighted total $L_{W\mathrm{A}}$ is combined from the band powers with the
 ISO 3744
 Annex E A-weighting corrections, so it needs `frequencies`. Passing a
 `RoomEnvironment` as `room` (`reverberation_time` + `volume`, or
@@ -605,7 +605,7 @@ these habits:
 | `distance` | float | m | > 0 (box) | Measurement distance $d$ |
 | `reflecting_planes` | int | — | `1` / `2` / `3`, default `1` | Halves/quarters the hemisphere area |
 | `background_levels` | 2D array or spectrum | dB | `(NM, NB)`, or `(NB,)` / `(1, NB)` | Enables $K_1$; a single spectrum broadcasts to every position |
-| `frequencies` | 1D array | Hz | nominal band centres | Enables $L_{WA}$ (Annex E) |
+| `frequencies` | 1D array | Hz | nominal band centres | Enables $L_{W\mathrm{A}}$ (Annex E) |
 | `room` | `RoomEnvironment` or None | — | default `None` (free field) | The room data behind $K_2$; its fields are the three routes to $A$ below |
 | `room.absorption_area` | float or 1D array | m² | > 0 | $A$ for $K_2$ (direct); per-band array → per-band $K_2$ |
 | `room.reverberation_time`, `room.volume` | float/array, float | s, m³ | > 0 | $A = 0.16\,V/T$ for $K_2$; per-band $T$ → per-band $K_2$ |
@@ -618,7 +618,7 @@ Returns a `SoundPowerResult`: `sound_power_level` (per-band $L_W$),
 `background_correction`/`environmental_correction` ($K_1$/$K_2$),
 `directivity_index` (apparent $DI_i^*$ per microphone position **and** frequency
 band, shape `(NM, NB)`; ISO 3744 clause 8.6), `surface_area`,
-`sound_power_level_a` ($L_{WA}$), `uncertainty` (expanded, 95 %) and `grade`.
+`sound_power_level_a` ($L_{W\mathrm{A}}$), `uncertainty` (expanded, 95 %) and `grade`.
 `measurement_positions('hemisphere', radius=…, reflecting_planes=…, tones=…,
 grade=…)` returns the normative `(N, 3)` microphone coordinates (Table B.1 for
 tonal sources, B.2 for broadband). Those coordinates plot directly with
@@ -743,7 +743,7 @@ result.plot()   # LW spectrum, LWA in the title (needs matplotlib)
 
 *One bar per band: the surface-averaged pressure plus the area, background and
 meteorological corrections give $L_W(f)$, and the A-weighted energy sum across
-bands gives the single-number $L_{WA}$ in the title.*
+bands gives the single-number $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -796,7 +796,7 @@ line naming the applied method and accuracy grade, an optional metadata header
 per-band table (nominal octave/one-third-octave frequency, the surface
 sound-pressure level $L_p$ and the band sound-power level $L_W$), the
 sound-power spectrum $L_W(f)$ with a nominal band axis, and a boxed A-weighted
-sound power level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the expanded
+sound power level $L_{W\mathrm{A}}$ (dB re 1 pW) with the total $L_W$, the expanded
 uncertainty $U$ and the measurement surface area $S$ alongside.
 
 The metadata is supplied through a `ReportMetadata`, whose applicable fields
@@ -853,7 +853,7 @@ repository. Click the preview to open the PDF:
 
 *Sound power determination fiche (`SoundPowerResult.report`), an ISO 3744
 engineering-grade hemisphere measurement with the $K_1$/$K_2$ corrections and
-the boxed $L_{WA}$.*
+the boxed $L_{W\mathrm{A}}$.*
 
 The precision result writes the same sheet from the ISO 3745 side, with the
 meteorological corrections on its basis strip in place of the $K_1$/$K_2$ pair.
@@ -886,7 +886,7 @@ the reproducibility one.*
 
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured $L_{WA}$ feeds.
+  declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power in the Reverberation Room (ISO 3741)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-reverberation/):
   the precision-grade diffuse-field alternative when the source can travel
   to a qualified room.
@@ -895,7 +895,7 @@ the reproducibility one.*
   cannot subtract.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the reverberation time and equivalent
   absorption area that feed $K_2$.
-- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the $K_1$/$K_2$ and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power/).
@@ -994,8 +994,8 @@ interior microphones miss. $C_1$ (reference-quantity) and $C_2$
 conditions of 23 °C and 101.325 kPa,
 
 $$
-C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
-C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
 $$
 
 with the speed of sound $c = 20.05\sqrt{273 + \theta}$. The
@@ -1053,7 +1053,7 @@ rev.plot()   # reverberation-room LW spectrum, LWA in the title (needs matplotli
 
 *The mean room level carried through the absorption-area, Waterhouse and
 meteorological terms of Eq. 20 gives the one-third-octave $L_W(f)$, and the
-A-weighted energy sum across the 21 bands gives the $L_{WA}$ in the title.*
+A-weighted energy sum across the 21 bands gives the $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1115,7 +1115,7 @@ either, so an impulsive or single-event source falls outside this guide.
 | `t60` | float or 1D array | s | > 0 | Room reverberation time (scalar broadcasts) |
 | `volume` | float | m³ | > 0 | Room volume $V$ |
 | `surface_area` | float | m² | > 0 | Total room surface $S$ (Waterhouse, $A/S$) |
-| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{WA}$ |
+| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{W\mathrm{A}}$ |
 | `background_levels` | 1D or 2D array | dB | matches `levels` | $K_{1i}$ per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
 | `temperature` | float | °C | default `23.0` | Sets $c$, $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | default `101.325` | Sets $C_1$, $C_2$ |
@@ -1153,10 +1153,10 @@ names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
 method was used, the direct method using the room equivalent absorption area
 (Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
 per-band table lists the mean room sound-pressure level $L_p$ and the band
-sound-power level $L_W$, and the boxed $L_{WA}$ carries the total $L_W$ and the
+sound-power level $L_W$, and the boxed $L_{W\mathrm{A}}$ carries the total $L_W$ and the
 determination method (the reverberation result has no expanded uncertainty $U$).
 `verbose=True` adds the background correction $K_1$ and, for the direct method,
-the equivalent absorption area $A$ and the Waterhouse boundary correction $C_w$;
+the equivalent absorption area $A$ and the Waterhouse boundary correction $C_\mathrm{w}$;
 the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
 meteorological corrections $C_1$/$C_2$ and the speed of sound, and cites the
 Annex F A-weighting.
@@ -1205,21 +1205,21 @@ repository. Click the preview to open the PDF:
 
 *Reverberation-room sound power fiche (`ReverberationSoundPowerResult.report`),
 an ISO 3741 precision-grade direct-method determination with the Waterhouse and
-$C_1$/$C_2$ corrections and the boxed $L_{WA}$.*
+$C_1$/$C_2$ corrections and the boxed $L_{W\mathrm{A}}$.*
 
 
 ## See also
 
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured $L_{WA}$ feeds.
+  declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/):
   the in-situ enveloping surface and the precision anechoic array.
 - [Sound Power by Intensity Scanning (ISO 9614)](https://jmrplens.github.io/phonometry/devices/emission/sound-power-intensity/):
   the routes that tolerate steady background noise.
 - [Room Acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): measuring the reverberation time
   $T_{60}$ that sets the Sabine absorption area.
-- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
 - [Theory](https://jmrplens.github.io/phonometry/reference/theory/environment-transport/): the Waterhouse and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/).
@@ -1305,7 +1305,7 @@ F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
 F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} .
 $$
 
-The probe's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual
+The probe's **dynamic capability** $L_\mathrm{d} = \delta_{pI0} - K$ (pressure-residual
 intensity index minus the bias factor $K$, 10 dB for grade 2 and 7 dB for
 grade 3) must exceed $F_{pI}$ (criterion 1); $F_{+/-} \le 3\ \text{dB}$ is
 criterion 2 (mandatory for grade 2); and the two repeated sweeps must agree
@@ -1407,8 +1407,8 @@ frequency-dependent bias handled in the [intensity guide](https://jmrplens.githu
 | `areas` | 1D array | m² | > 0, `(N_seg,)` | Segment areas $S_i$ |
 | `normal_intensity_2` | 2D array | W/m² | same shape | Second sweep → criterion 3 and averaging |
 | `pressure_levels` | 2D array | dB | same shape | Segment SPL $L_{pi}$ → $F_{pI}$ |
-| `pressure_residual_index` | float or 1D array | dB | — | $\delta_{pI0}$ → $L_d$ / criterion 1 |
-| `frequencies` | 1D array | Hz | nominal centres | $L_{WA}$ and Table 2 limits |
+| `pressure_residual_index` | float or 1D array | dB | — | $\delta_{pI0}$ → $L_\mathrm{d}$ / criterion 1 |
+| `frequencies` | 1D array | Hz | nominal centres | $L_{W\mathrm{A}}$ and Table 2 limits |
 | `band_type` | str | — | `'third'` (default) / `'octave'` | Table 2 lookup |
 | `grade` | str | — | `'engineering'` (default) / `'survey'` | Selects $K$ |
 | `repeatability_limit` | float or 1D array | dB | default Table 2 | Override criterion-3 $s$ |
@@ -1417,7 +1417,7 @@ Returns a `SoundPowerIntensityResult`: `partial_power`/`partial_power_level`
 per segment and band, `sound_power`/`sound_power_level` (band total, `NaN`
 where `negative_band`), `surface_pressure_intensity_index` ($F_{pI}$),
 `negative_partial_power_index` ($F_{+/-}$), `repeatability`,
-`dynamic_capability_index` ($L_d$), `achieved_grade`, `surface_area`,
+`dynamic_capability_index` ($L_\mathrm{d}$), `achieved_grade`, `surface_area`,
 `sound_power_level_a` and `grade`.
 
 ## 2. Precision intensity scanning (ISO 9614-3)
@@ -1432,8 +1432,8 @@ scan, tighter field-indicator criteria and an explicit uncertainty budget.
 $P_i = I_{n,i}\,S_i$; the total $P = \sum_i P_i$ gives
 $L_W = 10\log_{10}(P/P_0)$, $P_0 = 1\ \text{pW}$. A band whose net intensity is
 negative (more power flowing in than out) is flagged not-applicable rather than
-logged. The field indicators (temporal variability $F_T$, the signed and
-unsigned pressure–intensity indicators, and the non-uniformity $F_S$) drive the
+logged. The field indicators (temporal variability $F_\mathrm{T}$, the signed and
+unsigned pressure–intensity indicators, and the non-uniformity $F_\mathrm{S}$) drive the
 five acceptance criteria.
 
 ```python
@@ -1534,7 +1534,7 @@ its own `.report()`, sharing the layout and the `ReportMetadata` container of
 the [pressure-method fiche](https://jmrplens.github.io/phonometry/devices/emission/sound-power-pressure/#3-the-measurement-report-report).
 The standard-basis line
 names ISO 9614-2:1996 and the measurement grade, the per-band table lists the
-intensity-derived band sound-power level $L_W$, and the boxed $L_{WA}$ carries
+intensity-derived band sound-power level $L_W$, and the boxed $L_{W\mathrm{A}}$ carries
 the total $L_W$, the measurement surface $S$ and the determination grade
 (the intensity result has no expanded uncertainty $U$). `verbose=True` adds the
 field indicators $F_{pI}$ (surface pressure-intensity) and $F_{+/-}$
@@ -1580,7 +1580,7 @@ repository. Click the preview to open the PDF:
 
 *Sound power by intensity fiche (`SoundPowerIntensityResult.report`), an
 ISO 9614-2 engineering-grade scan with the field indicators and the boxed
-$L_{WA}$.*
+$L_{W\mathrm{A}}$.*
 
 ### The precision sheet (ISO 9614-3)
 
@@ -1593,7 +1593,7 @@ band; the caption names the frequency range the determination covers, because
 clause 4.3 asks for it whenever that range is narrower than 50 Hz to 6.3 kHz.
 A one-third-octave set is printed in two column groups side by side, the way
 an accredited sheet fits that many bands on a page. `verbose=True` tabulates
-the four Annex B indicators $F_T$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_S$ per band,
+the four Annex B indicators $F_\mathrm{T}$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_\mathrm{S}$ per band,
 the tabulation clause 10 f) 1) asks for, over the measurement surface as
 Annex B defines them, and the qualification cell the criteria decide.
 
@@ -1601,15 +1601,15 @@ Hand it an Annex C qualification and the sheet does what clause 10 f) 2)
 makes mandatory: the bands whose criteria are not satisfied are dropped from
 the A-weighted determination and named on the sheet, next to the bands the
 method is not applicable to at all (clause 9.2). That is why the boxed
-$L_{WA}$ can differ from `result.sound_power_level_a`, which is computed
+$L_{W\mathrm{A}}$ can differ from `result.sound_power_level_a`, which is computed
 before any criterion is evaluated and therefore sums every applicable band.
-Beside it the box states the normalized $L_{WA0}$, since clause 10 f) 2)
+Beside it the box states the normalized $L_{W\mathrm{A}0}$, since clause 10 f) 2)
 reports the normalized quantity while the headline number is the level a
 declared limit is written against.
 Without `criteria` the fiche boxes the result's own value and says that no
 qualification was supplied. `residual_index` puts the probe's
 pressure-residual intensity index on the sheet (clause 10 d) 5)) with the
-dynamic capability $L_d$ it yields; the clause 10 items that are free
+dynamic capability $L_\mathrm{d}$ it yields; the clause 10 items that are free
 description rather than numbers, the scan geometry and speed, the scanning
 time and the probe-reversal checks, go in the metadata `notes`.
 
@@ -1678,7 +1678,7 @@ normalized levels, the per-band uncertainty and the Annex C omission stated.*
 
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured $L_{WA}$ feeds.
+  declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Intensity (p-p)](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe, its
   finite-difference bias and the ISO 9614-1 field indicators behind the
   scanning methods.
@@ -1736,22 +1736,22 @@ without an
 acoustic measurement. The radiated power is (ISO/TS 7849-1, Formula 6)
 
 $$
-P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
+P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
 $$
 
-with $Z_c$ the characteristic impedance of air, $\langle v^2 \rangle$ the
+with $Z_\mathrm{c}$ the characteristic impedance of air, $\langle v^2 \rangle$ the
 mean-square vibratory velocity over the radiating area $S$. Expressed in levels
 (velocity level re $v_0 = 5\times10^{-8}\ \text{m/s}$), the A-weighted sound
 power level is (Formula 12 / 15)
 
 $$
 L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
-      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
+      + 10\log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}},
 $$
 
 where $S_0 = 1\ \text{m}^2$, the normalized impedance
-$Z_{c,n} = 411\ \text{N·s/m}^3$ and the reference
-$Z_{c,0} = 400\ \text{N·s/m}^3$ give the fixed
+$Z_\mathrm{c,n} = 411\ \text{N·s/m}^3$ and the reference
+$Z_{\mathrm{c},0} = 400\ \text{N·s/m}^3$ give the fixed
 $10\log_{10}(411/400) = 0.118\ \text{dB}$
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
@@ -1828,7 +1828,7 @@ The two parts differ only in the radiation factor. **Part 1 (survey)** assumes
 $\varepsilon = 1$ and yields the *upper limit* $L_{W,\max}$, needing only the
 velocity level and the area. **Part 2 (engineering)** applies a frequency-band
 radiation factor $\varepsilon_j$ determined (per ISO 9614) as
-$\varepsilon_j = P_j/(Z_{c,n}\,\langle v_j^2 \rangle\,S)$.
+$\varepsilon_j = P_j/(Z_\mathrm{c,n}\,\langle v_j^2 \rangle\,S)$.
 
 ```python
 import numpy as np
@@ -1921,8 +1921,8 @@ the air on top of it, which no spectrum can draw. The clip below drives a
 10 mm steel plate in air along its whole length — a force on the plate, not a
 wave arriving at it, and over the whole plate rather than a patch, because a
 patch radiates from the patch and below coincidence that would be the only
-thing in the air — and runs the same scene twice, at $f_c/2$ and at
-$2f_c$, with nothing differing between the panels but the drive frequency.
+thing in the air — and runs the same scene twice, at $f_\mathrm{c}/2$ and at
+$2f_\mathrm{c}$, with nothing differing between the panels but the drive frequency.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency.gif" alt="Animation: a bending wave running along a steel plate in air, with alternating pressure lobes that cling to the plate and fade out within centimetres in the lower-frequency panel, and a plane beam departing at forty-five degrees in the higher-frequency panel" width="640" height="360" loading="lazy"></picture>
 
@@ -1935,12 +1935,12 @@ dies within a fraction of a wavelength: the pressure at the surface is of the
 same order as in the other panel, but a quarter-cycle out of step with the
 velocity, so it carries no power away — which is what $\varepsilon \ll 1$
 *means*. Above coincidence the bending wave outruns sound, the trace match is
-satisfied, and a plane beam leaves at $\arcsin(c_0/c_B) = 45°$. Each panel
+satisfied, and a plane beam leaves at $\arcsin(c_0/c_\mathrm{B}) = 45°$. Each panel
 is annotated with the closed forms its regime obeys, from the plate's own
-constants: below coincidence $\lambda_B = 0.40$ m is shorter than the 0.57 m of
-sound in air, so $\sin\theta = \lambda/\lambda_B$ has no solution and the skin
-that stands in its place decays over $1/\sqrt{k_B^2 - k_0^2} = 0.091$ m; above
-it $\lambda_B = 0.20$ m is longer than the 0.14 m in air and the trace match
+constants: below coincidence $\lambda_\mathrm{B} = 0.40$ m is shorter than the 0.57 m of
+sound in air, so $\sin\theta = \lambda/\lambda_\mathrm{B}$ has no solution and the skin
+that stands in its place decays over $1/\sqrt{k_\mathrm{B}^2 - k_0^2} = 0.091$ m; above
+it $\lambda_\mathrm{B} = 0.20$ m is longer than the 0.14 m in air and the trace match
 sends a beam out at 45°. Nothing is measured off the scene: the ends of the
 plate reflect the bending wave partially, so the air carries a leftward beam on
 top of the rightward one and any reading is the difference of the two. Two cautions: the scene is an effectively infinite plate, so
@@ -1969,7 +1969,7 @@ machine/source, test environment, instrumentation, climate, date), a per-band
 table (nominal octave/one-third-octave frequency, the surface vibratory
 velocity level $L_v$ and the band sound-power level $L_W$), the sound-power
 spectrum $L_W(f)$ with a nominal band axis, and a boxed A-weighted sound power
-level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the radiating area $S$ and the
+level $L_{W\mathrm{A}}$ (dB re 1 pW) with the total $L_W$, the radiating area $S$ and the
 applied method alongside.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the
@@ -2063,7 +2063,7 @@ ISO/TS 7849-1:2009 (*survey method using a fixed radiation
 factor*) and ISO/TS 7849-2:2009 (*engineering method including determination of
 the adequate radiation factor*), *Acoustics — Determination of airborne sound
 power levels emitted by machinery using vibration measurement*: the radiated
-power $P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$ (Formula 6), the
+power $P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \varepsilon$ (Formula 6), the
 velocity level and its calibration
 (Formulae 3, 8), the mean over the surface (Formulae 10/11), the extraneous
 correction (Table 2), the radiation factor (Formula 4/8) and the sound power
@@ -2298,7 +2298,7 @@ fi.plot(dynamic_capability=ld)   # F2/F3 per band vs Ld, F4 on a twin axis (need
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators.svg" alt="ISO 9614-1 field indicators of a ten-position scan over six octave bands: F2 and F3 climb towards low frequency as the field turns reactive, crossing the dashed dynamic-capability line Ld at 125 Hz where F3 also rises above F2, with the field non-uniformity F4 drawn as bars on a twin axis" width="88%"></picture>
 
 *$F_2$ climbs towards low frequency as the field turns reactive, and at 125 Hz
-it crosses the instrument's dynamic capability $L_d = \delta_{pI0} - K$: that
+it crosses the instrument's dynamic capability $L_\mathrm{d} = \delta_{pI0} - K$: that
 band fails criterion 1, and no averaging will fix it — it calls for a larger
 spacer, a different surface or a quieter room. $F_3$ rising above $F_2$ in the
 same band reveals inward-flowing (negative) partial intensity, and the $F_4$
@@ -2379,7 +2379,7 @@ $$
 
 A 10 dB margin keeps the bias within about 0.5 dB and a 7 dB margin within
 about 1 dB; these are precisely the bias factors $K$ of ISO 9614, and the
-**dynamic capability** $L_d = \delta_{pI0} - K$ is the largest field index the
+**dynamic capability** $L_\mathrm{d} = \delta_{pI0} - K$ is the largest field index the
 instrument can afford at a given grade. Read it as a budget: every decibel
 the field's $\delta_{pI}$ rises spends a decibel of margin, and when
 $\delta_{pI}$ reaches $\delta_{pI0}$ the reading is pure phase error, of
@@ -2524,7 +2524,7 @@ reverberant rooms where the diffuse field raises pressure without
 transporting energy outward. This is why ISO 9614-1 keeps the measurement
 surface on average more than 0.5 m away from the source, and why, when a
 scan fails the dynamic-capability criterion, moving the surface outward or
-adding absorption to the room usually lowers $F_2$ below $L_d$ more cheaply
+adding absorption to the room usually lowers $F_2$ below $L_\mathrm{d}$ more cheaply
 than better hardware.
 
 ### Choosing the spacer

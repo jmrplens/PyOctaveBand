@@ -13,7 +13,7 @@ current guidance (NMFS 2018 Equation 1, Southall et al. 2019 Equation 2):
 with ``f`` in kilohertz. ``C`` is fixed by putting the peak of ``W`` at 0 dB,
 so the companion **exposure function**
 :math:`E(f) = K - 10 \log_{10}(\dots) = K + C - W(f)`
-has its minimum at the weighted threshold :math:`T_w = K + C`. Only the
+has its minimum at the weighted threshold :math:`T_\mathrm{w} = K + C`. Only the
 parameter table changes between guidance versions, so the version is explicit
 in the API and is carried on every result object:
 
@@ -42,7 +42,7 @@ a number of events and reports the exceedance of each applicable criterion.
 Implemented clean-room from the three documents; validated against the worked
 example of NMFS (2018) Appendix D (:math:`W(1~\text{kHz})` for the five
 groups), against ``C`` recomputed as the peak of ``W`` for all three
-parameter sets, and against the published :math:`T_w = K + C` and
+parameter sets, and against the published :math:`T_\mathrm{w} = K + C` and
 injury = TTS + 20 dB identities.
 
 .. note::
@@ -355,7 +355,7 @@ class AuditoryWeightingResult:
     :ivar parameters: The :class:`WeightingParameters` used.
     :ivar guidance: The guidance version.
     :ivar group: Hearing-group code.
-    :ivar weighted_tts_onset: :math:`T_w = K + C`, the minimum of the
+    :ivar weighted_tts_onset: :math:`T_\mathrm{w} = K + C`, the minimum of the
         exposure function, in dB.
     """
 

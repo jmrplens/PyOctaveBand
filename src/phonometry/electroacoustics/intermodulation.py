@@ -82,10 +82,10 @@ def _imd_component(
 class ModulationDistortionResult:
     r"""Modulation (intermodulation) distortion (IEC 60268-3 14.12.7).
 
-    :ivar d2: Second-order modulation distortion :math:`d_{m,2}`
+    :ivar d2: Second-order modulation distortion :math:`d_{\mathrm{m},2}`
         (14.12.7.2 g): the *arithmetic* sum of the sideband amplitudes at
         :math:`f_2 \pm f_1` relative to the output amplitude at ``f2``.
-    :ivar d3: Third-order modulation distortion :math:`d_{m,3}`
+    :ivar d3: Third-order modulation distortion :math:`d_{\mathrm{m},3}`
         (14.12.7.2 h): the arithmetic sum of the sidebands at
         :math:`f_2 \pm 2 f_1` relative to the output amplitude at ``f2``.
     :ivar smpte: Combined-RMS convention of SMPTE-type analyzers (not an
@@ -157,11 +157,11 @@ def modulation_distortion(
 
     .. math::
 
-       d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1}) / a_{f_2}
+       d_{\mathrm{m},2} = (a_{f_2+f_1} + a_{f_2-f_1}) / a_{f_2}
 
-       d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1}) / a_{f_2}
+       d_{\mathrm{m},3} = (a_{f_2+2f_1} + a_{f_2-2f_1}) / a_{f_2}
 
-    (The alternative presentation :math:`d'_{m,n} = 5 d_{m,n}` references
+    (The alternative presentation :math:`d'_{\mathrm{m},n} = 5 d_{\mathrm{m},n}` references
     the 4:1 reference output voltage
     :math:`U_{2,\mathrm{ref}} = 5 U_{2,f_2}` instead.) The combined
     root-sum-square that SMPTE-type analyzers report is returned alongside
@@ -236,9 +236,9 @@ def difference_frequency_distortion(
 
     .. math::
 
-       d_{d,2} = a_{f_2-f_1} / (a_{f_1} + a_{f_2})
+       d_{\mathrm{d},2} = a_{f_2-f_1} / (a_{f_1} + a_{f_2})
 
-       d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2}) / (a_{f_1} + a_{f_2})
+       d_{\mathrm{d},3} = (a_{2f_2-f_1} + a_{2f_1-f_2}) / (a_{f_1} + a_{f_2})
 
     with the third order an *arithmetic* sum of the two products. Products
     that fall outside (0, Nyquist) or that cannot be separated from a primary

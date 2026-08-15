@@ -20,7 +20,7 @@ The *task-based* strategy (Clause 9) splits the nominal day into tasks, takes
 $I \ge 3$ samples per task, and energy-sums the task contributions
 
 $$
-L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
+L_{\mathrm{EX,8h},m} = L_{p,\mathrm{A,eq}T,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
 $$
 
 so a loud but short task contributes little. The *job-based* (Clause 10) and
@@ -114,7 +114,7 @@ plt.show()
 
 Two subtleties are worth spelling out. First, the coverage factor is
 $k = 1.65$ for a **one-sided** 95 % interval (Clause 14), because a hygienist
-cares only about the *upper* bound: `res.upper_limit` = $L_{EX,8h} + U$ is the
+cares only about the *upper* bound: `res.upper_limit` = $L_\mathrm{EX,8h} + U$ is the
 value 95 % of measurements fall below, the number compared against an action
 limit. Second, the task and job methods weight the *same* spread of samples
 differently. The task sampling uncertainty $u_{1a}$ (Eq. C.6) divides the summed
@@ -123,7 +123,7 @@ factor $\sqrt{I}$), whereas the job/full-day sampling uncertainty $u_1$ (Eq. C.1
 is the plain sample standard deviation with denominator $N-1$, whose contribution
 $c_1 u_1$ is then read from **Table C.4** as a function of $(N, u_1)$. The same
 raw scatter therefore inflates the job estimate more, which is the standard's
-built-in penalty for coarser, fewer samples. (The printed job $L_{EX,8h}$ is
+built-in penalty for coarser, fewer samples. (The printed job $L_\mathrm{EX,8h}$ is
 $88.2$ dB where Annex E reports $88.1$: the standard rounds the effective-day
 level to $88.4$ before the duration normalisation; the library keeps it
 unrounded.)
@@ -142,14 +142,14 @@ budget is set by its largest term, so tightening the instrument grade buys
 little once sampling scatter is large; the productive
 move is *more samples* (the standard error falls as $1/\sqrt{I}$ or $1/\sqrt{N}$),
 which is exactly what the Clause 9.3 / 10.4 advisories nudge you toward.
-Because peak $L_{p,Cpeak}$ carries no Annex C sampling model (Table C.5,
+Because peak $L_{p,\mathrm{Cpeak}}$ carries no Annex C sampling model (Table C.5,
 Note 1), it is reported without an uncertainty, not with a zero one.
 
 When a task's samples span **3 dB or more** (Clause 9.3), or the job contribution
 $c_1 u_1$ exceeds 3.5 dB (Clause 10.4), or too few workers are covered
 (Table 1 cumulative-duration), the result sets `sampling_advisory=True` and, with
 `warn=True`, emits an `OccupationalExposureWarning` recommending more measurements. Peak
-levels $L_{p,Cpeak}$ are reported **without** an uncertainty: Annex C gives no
+levels $L_{p,\mathrm{Cpeak}}$ are reported **without** an uncertainty: Annex C gives no
 method for them (Table C.5, Note 1), so peak-uncertainty is out of scope. The
 three Annex D/E/F worked examples above are reproduced to the standard's printed
 precision (Annex E's final rounding is disclosed above), and the theory is
@@ -160,8 +160,8 @@ derived on the [Theory](../../reference/theory/environment-transport.md) page.
 | Parameter | Applies to | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `tasks` | task | list of `Task` | — | $\ge 1$ | Each `Task` has `samples`, `duration_hours`, optional `duration_range`/`duration_samples`, `label`, `instrument` |
-| `samples` | job / full-day | sequence | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ advised) | Random $L_{p,A,eqT}$ samples |
-| `effective_duration_hours` | job / full-day | float | h | $> 0$ | Effective working-day duration $T_e$ |
+| `samples` | job / full-day | sequence | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ advised) | Random $L_{p,\mathrm{A,eq}T}$ samples |
+| `effective_duration_hours` | job / full-day | float | h | $> 0$ | Effective working-day duration $T_\mathrm{e}$ |
 | `instrument` | all | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (default) | Selects $u_2$ (Table C.5) |
 | `u3` | all | float | dB | default `1.0` | Microphone-position uncertainty (Clause C.6) |
 | `include_duration_uncertainty` | task | bool | — | default `True` | `False` omits the $(c_{1b}u_{1b})^2$ term (Annex D case a) |
@@ -169,9 +169,9 @@ derived on the [Theory](../../reference/theory/environment-transport.md) page.
 | `warn` | all | bool | — | default `True` | Emit `OccupationalExposureWarning` for the sampling advisories |
 
 All three return an `ExposureResult` with `lex_8h`, `combined_standard_uncertainty`
-$u$, `expanded_uncertainty` $U = 1.65\ u$, `upper_limit` = $L_{EX,8h} + U$,
+$u$, `expanded_uncertainty` $U = 1.65\ u$, `upper_limit` = $L_\mathrm{EX,8h} + U$,
 `sampling_advisory`, and (task-based) the per-task `tasks` breakdown; the
-result's `.plot()` draws the per-task contribution bars with the $L_{EX,8h}$
+result's `.plot()` draws the per-task contribution bars with the $L_\mathrm{EX,8h}$
 and upper-limit lines (task-based results only, since the other strategies
 carry no per-task breakdown).
 
@@ -187,13 +187,13 @@ the applied strategy, a header grid (company via `client`, worker(s)/job via
 and `calibration` free-text fields of `ReportMetadata`), the work analysis
 (the per-task table with the contribution chart for a task-based result, or
 the sampling summary with the Formula C.9 budget for job-based/full-day), the
-boxed $L_{EX,8h}$ with $U$, $k = 1.65$ and the one-sided 95 % upper limit, an
+boxed $L_\mathrm{EX,8h}$ with $U$, $k = 1.65$ and the one-sided 95 % upper limit, an
 assessment table against the exposure action values (80/85 dB(A)) and the
 exposure limit value (87 dB(A)) of Directive 2003/10/EC with a PASS/FAIL
 verdict against the limit value, and a footer identity block. A printed note
 records that the limit value applies to the effective exposure with the worn
 hearing protectors' attenuation taken into account, which the measured
-$L_{EX,8h}$ does not include. `verbose=True` adds the per-task Annex C
+$L_\mathrm{EX,8h}$ does not include. `verbose=True` adds the per-task Annex C
 uncertainty columns ($u_{1a}$, $u_{1b}$, $u_2$); `language="es"` renders the
 Spanish fiche (nivel de exposición diario equivalente, comma decimals).
 Rendering needs the optional `phonometry[report]` extra (reportlab), plus
@@ -227,7 +227,7 @@ Annex D task-based day with the Directive 2003/10/EC assessment.*
 ## See also
 
 - [Levels](../../signals/levels/levels.md): the `lex_8h` / `sound_exposure` dose primitives
-  (IEC 61252) and the $L_{Cpeak}$ these strategies report alongside.
+  (IEC 61252) and the $L_\mathrm{Cpeak}$ these strategies report alongside.
 - [Measurement uncertainty](../../signals/metrology/gum-uncertainty.md): the GUM machinery behind
   combined and expanded uncertainties.
 - [Theory](../../reference/theory/environment-transport.md): the derivation of the strategy formulas and the
@@ -248,7 +248,7 @@ Annex D task-based day with the Directive 2003/10/EC assessment.*
   European Union.
   [eur-lex.europa.eu](https://eur-lex.europa.eu/eli/dir/2003/10/oj/eng).
   The EU exposure action values (80/85 dB) and limit value (87 dB) that the
-  $L_{EX,8h}$ and its upper limit are assessed against.
+  $L_\mathrm{EX,8h}$ and its upper limit are assessed against.
 - National Institute for Occupational Safety and Health. (1998). *Criteria for
   a recommended standard: Occupational noise exposure — Revised criteria 1998*
   (DHHS/NIOSH Publication No. 98-126).
@@ -271,9 +271,9 @@ and F.
 Clauses 12.3 and 12.4 are procedures, not calculations: they stay with the
 surveyor, and Table B.1 is reproduced as guidance with the caller choosing the
 strategy — nothing here applies it. Hearing-protector attenuation (the
-**ISO 4869** series) is not applied, so the $L_{EX,8h}$ computed here, and the
+**ISO 4869** series) is not applied, so the $L_\mathrm{EX,8h}$ computed here, and the
 limit-value comparison the fiche prints on it, is the **unprotected** exposure
 — which is also what the **ISO 1999** hearing-loss model expects. Annex C
-offers no uncertainty model for $L_{p,Cpeak}$ (Table C.5, Note 1), which is why
+offers no uncertainty model for $L_{p,\mathrm{Cpeak}}$ (Table C.5, Note 1), which is why
 the peak is reported without one rather than with a zero one.
 

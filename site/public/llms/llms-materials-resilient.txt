@@ -130,13 +130,13 @@ in the laboratory arrangement, measured resonant frequency (Formula 3) are
 
 $$
 f_0 = \frac{1}{2\pi}\sqrt{\frac{s'}{m'}}, \qquad
-f_r = \frac{1}{2\pi}\sqrt{\frac{s'_t}{m'_t}},
+f_\mathrm{r} = \frac{1}{2\pi}\sqrt{\frac{s'_\mathrm{t}}{m'_\mathrm{t}}},
 $$
 
 so the **apparent** dynamic stiffness follows from the resonance (Formula 4):
 
 $$
-s'_t = 4\pi^2\,m'_t\,f_r^2 .
+s'_\mathrm{t} = 4\pi^2\,m'_\mathrm{t}\,f_\mathrm{r}^2 .
 $$
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="EN 29052-1 resonance rig in three panels: the three excitation arrangements of Figures 1 to 3, one on a rigid foundation with the load plate driven and measured, two on an isolated baseplate of at least 100 kg where both plates are measured and the exciter drives either the load plate or the baseplate; below, the specimen and load requirements with the plaster bed, the steel load plate and the petroleum-jelly fillet, and the mass-spring model whose response peak gives the resonant frequency" width="92%"></picture>
@@ -146,12 +146,12 @@ load plate whose total mass per unit area, plate plus added load, is
 200 kg/m² (8 kg on the 0.04 m² specimen). That load reproduces the static
 preload of a typical floating floor, about 2 kPa. A vertical exciter drives
 the plate, an accelerometer picks up its response, and the fundamental
-vertical resonance $f_r$ of the plate-on-specimen system is read from the
-response peak; Formula 4 turns it into $s'_t$. That extraction is the
-laboratory's: the Clause 7 procedures for reading $f_r$ from the raw
+vertical resonance $f_\mathrm{r}$ of the plate-on-specimen system is read from the
+response peak; Formula 4 turns it into $s'_\mathrm{t}$. That extraction is the
+laboratory's: the Clause 7 procedures for reading $f_\mathrm{r}$ from the raw
 excitation-response signal — sinusoidal, white-noise or pulse excitation,
 with the extrapolation to zero force amplitude — are not implemented, and
-`apparent_dynamic_stiffness` expects the already-extrapolated $f_r$.
+`apparent_dynamic_stiffness` expects the already-extrapolated $f_\mathrm{r}$.
 
 ```python
 from phonometry import materials
@@ -193,9 +193,9 @@ plt.show()
 
 For an air-permeable material the enclosed pore air adds a parallel stiffness
 from its isothermal compression (Formula 7):
-$s'_a = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
+$s'_\mathrm{a} = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
 loaded thickness and $\varepsilon$ the porosity. The standard's worked NOTE
-($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_a = 111/d$ MN/m³ for
+($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_\mathrm{a} = 111/d$ MN/m³ for
 $d$ in millimetres:
 
 ```python
@@ -206,10 +206,10 @@ print(round(materials.enclosed_gas_stiffness(thickness=0.020, porosity=0.9) / 1e
 ```
 
 The dynamic stiffness of the *installed* material is then set by the lateral
-airflow resistivity $r$ (clause 8.2): $s' = s'_t$ for
-$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ for
+airflow resistivity $r$ (clause 8.2): $s' = s'_\mathrm{t}$ for
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_\mathrm{t} + s'_\mathrm{a}$ for
 $10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, and for
-$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_t$
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_\mathrm{t}$
 when the gas term is negligible. `floating_floor_resonance`
 chains the whole determination:
 
@@ -233,12 +233,12 @@ its `.plot()` draws the $f_0(s')$ design curve.
 
 **Test-report fiche.** `DynamicStiffnessResult.report(path)` renders a one-page
 accredited dynamic-stiffness test report (EN 29052-1:1992 = ISO 9052-1:1989): a
-metadata header (specimen, the total mass per unit area $m'_t$, the loaded
+metadata header (specimen, the total mass per unit area $m'_\mathrm{t}$, the loaded
 thickness $d$ in metres shown in mm, test facility, climate), a metrics table (the resonant frequency
-$f_r$, the apparent stiffness $s'_t$ of Formula 4, the enclosed-gas term $s'_a$
+$f_\mathrm{r}$, the apparent stiffness $s'_\mathrm{t}$ of Formula 4, the enclosed-gas term $s'_\mathrm{a}$
 when it applies, the installed $s'$ of clause 8.2 and the natural frequency
 $f_0$ of Formula 2) beside the $f_0(s')$ design curve, and a boxed apparent
-dynamic stiffness $s'_t$ (no pass/fail). Clause 9 rounds every stiffness to the
+dynamic stiffness $s'_\mathrm{t}$ (no pass/fail). Clause 9 rounds every stiffness to the
 nearest MN/m³; `language="es"` renders the Spanish fiche. The fiche always
 embeds the $f_0(s')$ design curve, so it needs both the report and plot extras
 (`pip install "phonometry[report,plot]"`). Clause 6's specimen selection — at
@@ -271,7 +271,7 @@ res.report(
 The evaluation treats the rig as a single-degree-of-freedom system: the load
 plate moves as a rigid piston on a massless spring. That holds while the
 specimen is light against the plate and its first internal resonance sits
-well above $f_r$; a heavy or very thick layer starts to act as a distributed
+well above $f_\mathrm{r}$; a heavy or very thick layer starts to act as a distributed
 system and the simple Formula 4 reading degrades. Three practical pitfalls
 follow from the preload:
 
@@ -288,9 +288,9 @@ follow from the preload:
 * **Respect the contact.** The standard seats the load plate on a thin
   bonding layer (a plaster paste) so the full specimen area carries the
   load. A dry, uneven contact concentrates the force, stiffens the response
-  locally and biases $f_r$ upward.
+  locally and biases $f_\mathrm{r}$ upward.
 
-The natural frequency that matters in the end is not the rig's $f_r$ but the
+The natural frequency that matters in the end is not the rig's $f_\mathrm{r}$ but the
 installed floor's $f_0$ from Formula 2: the floating floor only improves
 insulation well above $f_0$, which is why a low $s'$ (a soft layer under a
 heavy slab) is the design goal.
@@ -330,7 +330,7 @@ EN 29052-1:1992 (= ISO 9052-1:1989), *Acoustics — Determination
 of dynamic stiffness — Part 1: Materials used under floating floors in
 dwellings*: the dynamic stiffness per unit area (Formula 1), the resonance
 relations (Formulae 2-4), the enclosed-gas term (Formula 7, clause 8.2 NOTE
-$s'_a = 111/d$ MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
+$s'_\mathrm{a} = 111/d$ MN/m³) and the airflow-resistivity regimes (clause 8.2, Formulae
 5-6). Conformance is anchored on the standard's own numeric NOTE plus
 hand-computed closed-form values of the resonance relations.
 

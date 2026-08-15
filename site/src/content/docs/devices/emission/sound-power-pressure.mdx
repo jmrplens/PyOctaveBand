@@ -63,7 +63,7 @@ them, and the sound power follows because a diffuse-enough surface captures
 all the radiated energy:
 
 $$
-\overline{L'_p} = 10\log_{10}\left( \frac{1}{N_M} \sum_i 10^{L'_{pi}/10} \right), \qquad
+\overline{L'_p} = 10\log_{10}\left( \frac{1}{N_\mathrm{M}} \sum_i 10^{L'_{pi}/10} \right), \qquad
 L_W = \overline{L'_p} - K_1 - K_2 + 10\log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
 $$
 
@@ -216,7 +216,7 @@ res.plot()   # sound power level bars per band, LWA in the title (needs matplotl
 *One bar per band: the energy-averaged surface pressure minus the background
 ($K_1$) and environmental ($K_2$) corrections plus the surface term
 $10\log_{10}(S/S_0)$ gives $L_W(f)$, and the A-weighted energy sum across bands
-gives the single-number $L_{WA}$ in the title.*
+gives the single-number $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -260,7 +260,7 @@ plt.show()
 
 </details>
 
-The A-weighted total $L_{WA}$ is combined from the band powers with the
+The A-weighted total $L_{W\mathrm{A}}$ is combined from the band powers with the
 ISO 3744 Annex E A-weighting corrections, so it needs `frequencies`. Passing
 a `RoomEnvironment` as `room` (`reverberation_time` + `volume`, or
 `absorption_area`, or `mean_absorption_coefficient` + `room_surface`) enables
@@ -365,7 +365,7 @@ winter needs the Annex G correction applied by hand.
 | `distance` | float | m | > 0 (box) | Measurement distance $d$ |
 | `reflecting_planes` | int | — | `1` / `2` / `3`, default `1` | Halves/quarters the hemisphere area |
 | `background_levels` | 2D array or spectrum | dB | `(NM, NB)`, or `(NB,)` / `(1, NB)` | Enables $K_1$; a single spectrum broadcasts to every position |
-| `frequencies` | 1D array | Hz | nominal band centres | Enables $L_{WA}$ (Annex E) |
+| `frequencies` | 1D array | Hz | nominal band centres | Enables $L_{W\mathrm{A}}$ (Annex E) |
 | `room` | `RoomEnvironment` or None | — | default `None` (free field) | The room data behind $K_2$; its fields are the three routes to $A$ below |
 | `room.absorption_area` | float or 1D array | m² | > 0 | $A$ for $K_2$ (direct); per-band array → per-band $K_2$ |
 | `room.reverberation_time`, `room.volume` | float/array, float | s, m³ | > 0 | $A = 0.16\,V/T$ for $K_2$; per-band $T$ → per-band $K_2$ |
@@ -378,7 +378,7 @@ Returns a `SoundPowerResult`: `sound_power_level` (per-band $L_W$),
 `background_correction`/`environmental_correction` ($K_1$/$K_2$),
 `directivity_index` (apparent $DI_i^*$ per microphone position **and** frequency
 band, shape `(NM, NB)`; ISO 3744 clause 8.4), `surface_area`,
-`sound_power_level_a` ($L_{WA}$), `uncertainty` (expanded, 95 %) and `grade`.
+`sound_power_level_a` ($L_{W\mathrm{A}}$), `uncertainty` (expanded, 95 %) and `grade`.
 `measurement_positions('hemisphere', radius=…, reflecting_planes=…, tones=…,
 grade=…)` returns the normative `(N, 3)` microphone coordinates (Table B.1 for
 tonal sources, B.2 for broadband). Those coordinates plot directly with
@@ -504,7 +504,7 @@ unprimed, unlike section 1's — is the surface average of the levels **after**
 each one has been background-corrected on its own,
 
 $$
-\overline{L_p} = 10\log_{10}\left[\frac{1}{N_M} \sum_i
+\overline{L_p} = 10\log_{10}\left[\frac{1}{N_\mathrm{M}} \sum_i
 10^{0.1\left(L'_{pi} - K_{1i}\right)}\right]
 $$
 
@@ -631,13 +631,13 @@ the grade-2 one of section 1 — the cost of the grade is mostly time.
 | `surface` | str | — | `'sphere'` / `'hemisphere'` | Anechoic or hemi-anechoic room |
 | `radius` | float | m | > 0 | Measurement radius $r$; bounded by $2 d_0$, $\lambda/4$ and the 1 m floor above |
 | `background_levels` | 2D array or spectrum | dB | matches `levels_positions` | Enables the per-position $K_{1i}$ of Eq. 11 |
-| `frequencies` | 1D array | Hz | one per band | Enables $L_{WA}$ and the per-band $C_3$ |
+| `frequencies` | 1D array | Hz | one per band | Enables $L_{W\mathrm{A}}$ and the per-band $C_3$ |
 | `areas` | 1D array | m² | one per position | Unequal segment areas, for a localized investigation (clause 9.4.3.2); equal areas assumed when omitted |
 | `temperature` | float | °C | default `23.0` | Sets $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | default `101.325` | Sets $C_1$, $C_2$ |
 | `air_absorption_coefficient` | float or 1D array | dB/m | default `None` | The $C_3$ air-absorption term; supplied, not computed |
 | `sigma_omc` | float | dB | default `0.0` | Operating and mounting standard deviation, clause 10.5 |
-| `coverage_factor` | float | — | default `2.0` | $k$ in $U = k\sqrt{\sigma_{R0}^2 + \sigma_\text{omc}^2}$ |
+| `coverage_factor` | float | — | default `2.0` | $k$ in $U = k\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\text{omc}^2}$ |
 
 The last two are the whole uncertainty story, and the default hides it: left
 alone, `sigma_omc = 0` claims a perfectly repeatable installation and the fiche
@@ -676,7 +676,7 @@ result.plot()   # LW spectrum, LWA in the title (needs matplotlib)
 
 *One bar per band: the surface-averaged pressure plus the area, background and
 meteorological corrections give $L_W(f)$, and the A-weighted energy sum across
-bands gives the single-number $L_{WA}$ in the title.*
+bands gives the single-number $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -729,7 +729,7 @@ line naming the applied method and accuracy grade, an optional metadata header
 per-band table (nominal octave/one-third-octave frequency, the surface
 sound-pressure level $L_p$ and the band sound-power level $L_W$), the
 sound-power spectrum $L_W(f)$ with a nominal band axis, and a boxed A-weighted
-sound power level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the expanded
+sound power level $L_{W\mathrm{A}}$ (dB re 1 pW) with the total $L_W$, the expanded
 uncertainty $U$ and the measurement surface area $S$ alongside.
 
 The metadata is supplied through a `ReportMetadata`, whose applicable fields
@@ -862,7 +862,7 @@ Power](/phonometry/devices/emission/sound-power/).
 - [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the reverberation
   time and equivalent absorption area that feed $K_2$.
 - [Levels](/phonometry/signals/levels/levels/): energy averaging and the A-weighting
-  behind $L_{WA}$.
+  behind $L_{W\mathrm{A}}$.
 - [Theory](/phonometry/reference/theory/environment-transport/): the $K_1$/$K_2$
   and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](/phonometry/reference/api/power/sound-power/).

@@ -127,7 +127,7 @@ verified in CI against every Table 2 nominal response value (0.25 Hz to 315 Hz).
 processing as A/C — but stateful mode runs the plain design at the input rate,
 so if you stream G-weighting at a low sample rate, verify the response before
 trusting the level. Levels measured with the G curve are reported as
-$L_{pG}$ (or $L_{Geq}$ for the equivalent level over time).
+$L_{p\mathrm{G}}$ (or $L_\mathrm{Geq}$ for the equivalent level over time).
 
 ### Reading an LpG: the scale is not the dB(A) scale
 
@@ -141,12 +141,12 @@ levels below about 90 dB are not normally significant for human perception.
 
 Two consequences follow. First, the useful range spans some 30 dB, not the
 100 dB a reader is used to in dB(A), so **a few decibels matter far more here**
-— an $L_{pG}$ of 85 dB and one of 105 dB are not "similar", they are inaudible
+— an $L_{p\mathrm{G}}$ of 85 dB and one of 105 dB are not "similar", they are inaudible
 and very loud. Second, because the growth of sensation with level is much more
 rapid than in the audible range while the threshold itself varies between
 individuals, a level near 100 dB(G) can be imperceptible to one person and
 clearly perceived by another, which is why infrasound complaints are
-investigated case by case. Compare an $L_{pG}$ against these perception
+investigated case by case. Compare an $L_{p\mathrm{G}}$ against these perception
 anchors, never against an A-weighted limit, and never combine the two into one
 number.
 
@@ -165,7 +165,7 @@ no practical limit on the microphone's dimensions, because directional effects
 are negligible at infrasonic wavelengths.
 
 Two actions follow. **Document the chain's own low-frequency corner** and
-report $L_{pG}$ only down to where the chain is flat; a level quoted to 0.25 Hz
+report $L_{p\mathrm{G}}$ only down to where the chain is flat; a level quoted to 0.25 Hz
 from a chain that is 12 dB down at 0.5 Hz is not a measurement. **Choose an
 averaging time long enough for the value to be representative**: Annex A.5
 gives an integration time or time constant of 10 s as the usual choice, 1 s
@@ -184,7 +184,7 @@ and its insertion loss documented and corrected.
 
 What has to be recorded for the result to be reportable is short: the chain's
 own low-frequency corner, the board and the screens with their corrections, the
-averaging time and window shape, and the $L_{pG}$ with the analysis bandwidth
+averaging time and window shape, and the $L_{p\mathrm{G}}$ with the analysis bandwidth
 it was computed over.
 
 ## 2. Historical and special-purpose curves: B, D and AU
@@ -256,7 +256,7 @@ perceived-noise-level (PNL) rating, so a plain sound level meter could
 estimate aircraft noise: the +11.5 dB hump around 3.15 kHz is where jet
 turbomachinery whine annoys most (it is deliberately *not* an equal-loudness
 feature). NASA's aircraft-noise handbook gives the classic rule of thumb
-$L_{PN} \approx L_D + 7\ \text{dB}$. IEC 537 was withdrawn and current
+$L_\mathrm{PN} \approx L_\mathrm{D} + 7\ \text{dB}$. IEC 537 was withdrawn and current
 certification practice reports EPNL from one-third-octave analysis or plain
 A-weighted levels, so `D` is provided for historical data and comparisons.
 With the standard unavailable, the implementation uses the widely published
@@ -312,7 +312,7 @@ print(f"LA = {la:.1f} dB   LAU = {lau:.1f} dB   audible alone = {la_ref:.1f} dB"
 Ultrasound only reaches a digital filter when the sample rate captures it,
 so measure at 96 kHz or more (at 48 kHz there is nothing above 24 kHz to
 reject); the AU design internally oversamples toward 288 kHz to keep the
-steep U roll-off accurate. Levels are reported as $L_{AU}$. The
+steep U roll-off accurate. Levels are reported as $L_\mathrm{AU}$. The
 implementation follows the Table 2 pole locations exactly (they reproduce
 every Table 1 nominal value within 0.05 dB) and is verified in CI against
 the Table 1 tolerances up to 40 kHz.
@@ -332,7 +332,7 @@ filter, would decide the reading. Check the converter too — an interface that
 runs at 96 kHz but anti-alias filters at 20 kHz measures nothing to reject. And
 because the near field of a cleaner or a welder changes by several decibels
 over a few centimetres, take the reading at the operator's head position and
-record it. Report $L_{AU}$ together with the unweighted level of the ultrasonic
+record it. Report $L_\mathrm{AU}$ together with the unweighted level of the ultrasonic
 component and the capsule type: separating those two is the entire point of the
 AU weighting.
 
@@ -391,4 +391,4 @@ levels instead of D).
 
 ### Which weighting should I use for infrasound below 20 Hz?
 
-Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. Normalized to 0 dB at 10 Hz, it rises at 12 dB/octave between about 1 Hz and 20 Hz, falls at 24 dB/octave above 20 Hz and rolls off again at 24 dB/octave below about 1 Hz. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{pG}$ (or $L_{Geq}$ for the equivalent level over time). Read the result against the ISO 7196 perception anchors, never against an A-weighted limit: about 100 dB(G) is the normal threshold, below about 90 dB(G) infrasound is not normally significant, and a very loud infrasound is about 120 dB(G).
+Use the G frequency weighting of ISO 7196:1995, which rates infrasound the way A-weighting rates audible noise. Normalized to 0 dB at 10 Hz, it rises at 12 dB/octave between about 1 Hz and 20 Hz, falls at 24 dB/octave above 20 Hz and rolls off again at 24 dB/octave below about 1 Hz. Apply it to sources such as wind turbines, HVAC and blasting, and report levels as $L_{p\mathrm{G}}$ (or $L_\mathrm{Geq}$ for the equivalent level over time). Read the result against the ISO 7196 perception anchors, never against an A-weighted limit: about 100 dB(G) is the normal threshold, below about 90 dB(G) infrasound is not normally significant, and a very loud infrasound is about 120 dB(G).

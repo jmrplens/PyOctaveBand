@@ -31,18 +31,18 @@ octave) or $4.0$ dB (octave). The mass law rises **6 dB per octave and 6 dB per
 doubling of mass**. At the **coincidence (critical) frequency** (Bies Eq. 7.3)
 
 $$
-f_c = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B'}} = \frac{0.55\, c_0^2}{c_L\, h},
+f_\mathrm{c} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B'}} = \frac{0.55\, c_0^2}{c_\mathrm{L}\, h},
 $$
 
 the free bending wavelength matches the trace wavelength and the panel goes
 transparent: the **coincidence dip**. Sharp's method holds the field-incidence
-mass law up to $f_c/2$, drops through a straight line in $\log f$, and from $f_c$
+mass law up to $f_\mathrm{c}/2$, drops through a straight line in $\log f$, and from $f_\mathrm{c}$
 upward follows Eq. 7.44 with the loss factor $\eta$; the dip sits at Bies
-design-chart point B, $TL = 20\log_{10}(f_c m'') + 10\log_{10}\eta - 44$.
+design-chart point B, $TL = 20\log_{10}(f_\mathrm{c} m'') + 10\log_{10}\eta - 44$.
 
 The whole section in one sketch: a diffuse field drives a single leaf, and the
 predicted $R(f)$ climbs with the mass law until the coincidence dip. A 12.5 mm
-plasterboard leaf puts $f_c$ near 2.6 kHz and rates $R_w = 27$ dB.
+plasterboard leaf puts $f_\mathrm{c}$ near 2.6 kHz and rates $R_\mathrm{w} = 27$ dB.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_panel_insulation.svg" alt="Section of a sound insulation test: a 12.5 mm plasterboard panel mounted between heavy filler walls, green arrows of diffuse incidence arriving at several angles from the source room, thinner blue transmitted arrows leaving into the receiving room, a bending wave drawn along the leaf, and an inset of the predicted sound reduction index rising 6 dB per octave to a coincidence dip at fc = 2.6 kHz, with the leaf's mass of 8.8 kg per square metre and the Rw = 27 dB rating annotated" width="92%"></picture>
 
@@ -74,9 +74,9 @@ The predicted spectrum plugs straight into the ISO 717-1 rating through
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/single_panel_rating.svg" alt="Predicted sound reduction index of a 6 mm float glass pane per one-third-octave band against the shifted ISO 717-1 reference curve, with the coincidence dip at about 2100 Hz marked, the unfavourable deviations shaded and the Rw rating annotated" width="80%"></picture>
 
 *The predicted Sharp spectrum rated exactly like a measurement: the
-coincidence dip at $f_c \approx 2.1$ kHz collects most of the unfavourable
+coincidence dip at $f_\mathrm{c} \approx 2.1$ kHz collects most of the unfavourable
 deviations, and the shifted reference read at 500 Hz gives the catalogue
-$R_w = 32$ dB of 6 mm glass.*
+$R_\mathrm{w} = 32$ dB of 6 mm glass.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -126,10 +126,10 @@ The clip below watches coincidence happen in a 2D
 [elastic FDTD field](../../simulation/elastic-waves.md): a 10 mm
 steel plate immersed in air, driven by a sustained plane wave at 45 degrees,
 with both frequencies picked from the library's `coincidence_frequency`. At
-$f_c/2 = 603$ Hz the measured transmission lands on the oblique mass law; at
-$2f_c = 2413$ Hz the 45-degree trace equals $\lambda_B$ exactly and the
+$f_\mathrm{c}/2 = 603$ Hz the measured transmission lands on the oblique mass law; at
+$2f_\mathrm{c} = 2413$ Hz the 45-degree trace equals $\lambda_\mathrm{B}$ exactly and the
 trace-matched plate re-radiates a 45-degree beam that grows along the plate,
-pinning the transmitted level at the $f_c/2$ figure even though the mass law
+pinning the transmitted level at the $f_\mathrm{c}/2$ figure even though the mass law
 demands 12 dB
 more blocking at four times the frequency. The air drives the heavy steel so
 weakly that the resonant bending wave needs tens of metres of illuminated
@@ -224,8 +224,8 @@ print(res.transmission_loss.round(1))
 
 The physical model has its own Norton-flavoured variant for the region above
 coincidence: `coincidence_model="cremer"` replaces Sharp's Eq. 7.44 with
-Cremer's empirical $TL = TL_0 + 10\log_{10}(f/f_c - 1) + 10\log_{10}\eta - 2\ \text{dB}$
-(Norton Eq. 3.110), and runs the mass law right up to $f_c$ with no interpolated
+Cremer's empirical $TL = TL_0 + 10\log_{10}(f/f_\mathrm{c} - 1) + 10\log_{10}\eta - 2\ \text{dB}$
+(Norton Eq. 3.110), and runs the mass law right up to $f_\mathrm{c}$ with no interpolated
 bridge. Both rise at about 10 dB per octave far above coincidence; they differ
 in how they leave the dip.
 
@@ -235,16 +235,16 @@ Ribbed and corrugated cladding is not isotropic. It is very stiff *along* the
 corrugations and almost as limp as a flat sheet *across* them, so instead of one
 coincidence frequency it has a whole **coincidence range** bounded by the two
 principal bending stiffnesses (Vigran Eq. 6.107, the isotropic
-$f_c = (c_0^2/2\pi)\sqrt{m''/B}$ evaluated twice):
+$f_\mathrm{c} = (c_0^2/2\pi)\sqrt{m''/B}$ evaluated twice):
 
 $$
-f_{c1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
-f_{c2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
+f_{\mathrm{c}1} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_1}}, \qquad
+f_{\mathrm{c}2} = \frac{c_0^2}{2\pi}\sqrt{\frac{m''}{B_2}}, \qquad B_1 > B_2 .
 $$
 
 The stiffest direction sets the *lowest* coincidence frequency, which is the
-sting in the tail: corrugating a sheet to gain strength drags $f_{c1}$ down,
-often to a few hundred hertz, while $f_{c2}$ runs up to 15 kHz or 30 kHz. Over
+sting in the tail: corrugating a sheet to gain strength drags $f_{\mathrm{c}1}$ down,
+often to a few hundred hertz, while $f_{\mathrm{c}2}$ runs up to 15 kHz or 30 kHz. Over
 that whole span the resonant transmission dominates and $R$ flattens far below
 the mass law of a flat plate of the same mass.
 
@@ -253,14 +253,14 @@ incidence angle $\varphi$ (Heckl 1960; Hansen 1993; Vigran Eq. 6.108, which is
 Bies Eq. 7.30):
 
 $$
-Z_w = \mathrm{j}\omega m''\left[1 -
-\left(\frac{f}{f_{c1}}\cos^2\vartheta + \frac{f}{f_{c2}}\sin^2\vartheta\right)^2
+Z_\mathrm{w} = \mathrm{j}\omega m''\left[1 -
+\left(\frac{f}{f_{\mathrm{c}1}}\cos^2\vartheta + \frac{f}{f_{\mathrm{c}2}}\sin^2\vartheta\right)^2
 (1 + \mathrm{j}\eta)\sin^4\varphi\right],
 $$
 
-and the diffuse-field average of $\tau = |1 + Z_w\cos\varphi/2\rho_0c_0|^{-2}$
+and the diffuse-field average of $\tau = |1 + Z_\mathrm{w}\cos\varphi/2\rho_0c_0|^{-2}$
 becomes a double integral (Vigran Eq. 6.111 = Bies Eq. 7.38). Setting
-$f_{c1} = f_{c2}$ recovers Cremer's isotropic impedance exactly.
+$f_{\mathrm{c}1} = f_{\mathrm{c}2}$ recovers Cremer's isotropic impedance exactly.
 
 `orthotropic_transmission_loss` offers both published routes:
 
@@ -272,19 +272,19 @@ $f_{c1} = f_{c2}$ recovers Cremer's isotropic impedance exactly.
   `limiting_angle` (78 degrees by default, Sharp's value, which is Vigran's
   $\sin^2\varphi = 0.96$).
 - `method="heckl"` is Heckl's closed-form approximation for $\eta = 0$, the
-  design chart of Bies Fig. 7.9(b): field-incidence mass law below $f_{c1}/2$,
+  design chart of Bies Fig. 7.9(b): field-incidence mass law below $f_{\mathrm{c}1}/2$,
   then
 
   $$
-  \tau_F \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{c1}}{f^2}
-  \left[\ln\frac{4f}{f_{c1}}\right]^2 \quad (f_{c1} \le f < f_{c2}/2),
+  \tau_\mathrm{F} \approx \frac{\rho_0c_0}{2\pi^2 m''}\,\frac{f_{\mathrm{c}1}}{f^2}
+  \left[\ln\frac{4f}{f_{\mathrm{c}1}}\right]^2 \quad (f_{\mathrm{c}1} \le f < f_{\mathrm{c}2}/2),
   \qquad
-  \tau_F \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{c1}f_{c2}}}{f^2}
-  \quad (f > 2f_{c2}),
+  \tau_\mathrm{F} \approx \frac{\rho_0c_0}{2m''}\,\frac{\sqrt{f_{\mathrm{c}1}f_{\mathrm{c}2}}}{f^2}
+  \quad (f > 2f_{\mathrm{c}2}),
   $$
 
   with straight lines in $\log_{10} f$ across the two gaps. It needs no loss
-  factor and no numerical work, but it requires $f_{c2} > 4f_{c1}$ for its four
+  factor and no numerical work, but it requires $f_{\mathrm{c}2} > 4f_{\mathrm{c}1}$ for its four
   construction points to stay in order.
 
 For the common "wavy" corrugation the equivalent stiffnesses come from
@@ -338,11 +338,11 @@ return 26.7 Hz and 106.7 Hz.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/orthotropic_transmission_loss.svg" alt="Transmission loss in decibels against one-third-octave bands from 100 hertz to 16 kilohertz for a 1 mm steel sheet, flat and corrugated. Both curves rise together at 6 decibels per octave from about 11 decibels at 100 hertz to 28 decibels at 800 hertz. Above 1 kilohertz the flat sheet keeps climbing to a peak near 45 decibels at 6.3 kilohertz before its own coincidence dip, while the corrugated sheet collapses to 22 decibels at 1.6 kilohertz inside a shaded band running from 1165 hertz to 13.1 kilohertz and then recovers slowly, staying about 13 decibels below the flat sheet at 2.5 kilohertz. A dashed line shows Heckl's closed-form approximation tracking the same collapse more smoothly" width="88%"></picture>
 
-*The trade corrugating makes, on Vigran's own geometry. Below $f_{c1}$ the two
+*The trade corrugating makes, on Vigran's own geometry. Below $f_{\mathrm{c}1}$ the two
 panels are within about 2 dB of each other (the corrugated one slightly higher:
 it is 9 % heavier, and the diffuse-field integral uses a 78 degree limiting
 angle rather than Sharp's 5.5 dB band correction). Across the coincidence range
-the corrugated sheet gives away up to 13 dB, and $R_w$ falls from 28 dB to
+the corrugated sheet gives away up to 13 dB, and $R_\mathrm{w}$ falls from 28 dB to
 25 dB, for a panel that is stiffer and barely heavier.*
 
 <details>
@@ -401,7 +401,7 @@ plt.show()
 </details>
 
 Two caveats Bies attaches to the Heckl branch are worth repeating, because no
-smooth model predicts either. Below about $0.7f_{c1}$ the estimate
+smooth model predicts either. Below about $0.7f_{\mathrm{c}1}$ the estimate
 underestimates $R$ on small panels, the error growing as the panel shrinks; and
 real corrugated panels almost always show a dip of up to 5 dB somewhere between
 2 kHz and 4 kHz, which finite-element work traced to resonances of the panel
@@ -418,7 +418,7 @@ f_0 = \frac{1}{2\pi}\sqrt{\frac{s''\,(m_1 + m_2)}{m_1\, m_2}}
 $$
 
 the pair follows the mass law of the *combined* mass; above it the two mass laws
-add, boosted by the cavity, until $f_l = c_0/(2\pi d)$ where the boost saturates
+add, boosted by the cavity, until $f_\mathrm{l} = c_0/(2\pi d)$ where the boost saturates
 at 6 dB (Eq. 7.64). A porous fill lowers $f_0$.
 
 ```python
@@ -493,11 +493,11 @@ measured on two nominally identical 100 mm concrete cubes
 $Nk/S$ to the cavity air stiffness:
 
 $$
-f_\text{msm} = \frac{1}{2\pi}
-\sqrt{\frac{s_a + Nk/S}{\rho_{s1}\rho_{s2}/(\rho_{s1}+\rho_{s2})}}.
+f_\mathrm{msm} = \frac{1}{2\pi}
+\sqrt{\frac{s_\mathrm{a} + Nk/S}{\rho_{\mathrm{s}1}\rho_{\mathrm{s}2}/(\rho_{\mathrm{s}1}+\rho_{\mathrm{s}2})}}.
 $$
 
-Below $f_\text{msm}$ the two leaves act as one plate of the combined mass, so
+Below $f_\mathrm{msm}$ the two leaves act as one plate of the combined mass, so
 stiff ties are doubly bad: they raise the resonance into the rating range and
 bridge the cavity. `WALL_TIE_STIFFNESS` carries Hopkins' Table A4, whose 50 mm
 rows come from Hopkins, Wilson & Craik (1999) and whose 100 mm row from
@@ -536,18 +536,18 @@ dw = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075,
 transmits structure-borne power between the leaves. With the driving-point
 mobilities $Y_i$, $Y_j$ of the two leaves (infinite thin plates,
 $Y = 1/(8\sqrt{B'm''})$, Eq. 2.190) and the connector mobility of a linear
-spring $Y_c = \mathrm{i}\omega/k$ (Eq. 4.88), $N$ identical uncorrelated
+spring $Y_\mathrm{c} = \mathrm{i}\omega/k$ (Eq. 4.88), $N$ identical uncorrelated
 connections give the coupling loss factor (Eq. 4.87)
 
 $$
 \eta_{ij} = \frac{N}{\omega m_i}
-\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_c|^2}.
+\frac{\mathrm{Re}\{Y_j\}}{|Y_i + Y_j + Y_\mathrm{c}|^2}.
 $$
 
-The plate area cancels ($N/m_i = n/\rho_{s1}$ with $n$ ties per m²), so only
+The plate area cancels ($N/m_i = n/\rho_{\mathrm{s}1}$ with $n$ ties per m²), so only
 the tie density enters. A rigid connection (a screw, a nail, a bolt, or a tie
-stiff enough never to yield) is the limit $Y_c = 0$; a resilient tie rolls the
-coupling off two powers faster once $|Y_c| = \omega/k$ overtakes the plate
+stiff enough never to yield) is the limit $Y_\mathrm{c} = 0$; a resilient tie rolls the
+coupling off two powers faster once $|Y_\mathrm{c}| = \omega/k$ overtakes the plate
 mobilities: $\eta_{ij}$ then falls as $1/f^3$ against the rigid ceiling's
 $1/f$, so the *ratio* between them goes as $1/f^2$. That is exactly why a
 butterfly tie at 1.7 MN/m and a vertical-twist tie at 94 MN/m behave so
@@ -590,7 +590,7 @@ $$
 R = -10\log_{10}\!\left( \frac{1}{\sum_n S_n} \sum_n S_n\, 10^{-R_n/10} \right),
 $$
 
-so a bare opening of relative area $S_a/S$ caps the composite at $10\log_{10}(S/S_a)$:
+so a bare opening of relative area $S_\mathrm{a}/S$ caps the composite at $10\log_{10}(S/S_\mathrm{a})$:
 a 1 % opening can never do better than 20 dB, whatever the wall.
 
 ```python
@@ -659,7 +659,7 @@ is its **radiation efficiency** $\sigma$, the radiation factor $\varepsilon$
 that [Sound Power from Surface Vibration](../../devices/emission/vibration-sound-power.md) (ISO 7849)
 otherwise takes as a measured input. Below the critical frequency the plate
 radiates weakly; above it $\sigma \to 1$ (Leppington/Maidanik, Eqs 2.227-2.230):
-$\sigma = (1 - f_c/f)^{-1/2}$ for $f > f_c$.
+$\sigma = (1 - f_\mathrm{c}/f)^{-1/2}$ for $f > f_\mathrm{c}$.
 
 ```python
 from phonometry import radiation_efficiency, sound_power_from_vibration
@@ -682,7 +682,7 @@ The vibrational power a point force injects is $W = \tfrac12 |F|^2\,\mathrm{Re}\
 (Cremer Eq. 5.23), so the driving-point **mobility** $Y$ (the reciprocal of the
 impedance) sets how much energy a structure absorbs. An infinite thin plate is a
 pure resistance $Z = 8\sqrt{B'\,m''}$ (real, frequency independent); an infinite
-beam has $Y = (1-\mathrm{j})/(4 m' c_B)$ (45 degrees, falling as
+beam has $Y = (1-\mathrm{j})/(4 m' c_\mathrm{B})$ (45 degrees, falling as
 $\omega^{-1/2}$). They supply the receiver mobility EN 12354-5 needs when no
 measurement exists.
 
@@ -752,7 +752,7 @@ range:
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `mass_per_area` | float | kg/m² | > 0 | Surface density $m''$ |
-| `critical_frequency` / `bending_stiffness` | float | Hz / N·m | give one | Coincidence $f_c$, or $B'$ to compute it |
+| `critical_frequency` / `bending_stiffness` | float | Hz / N·m | give one | Coincidence $f_\mathrm{c}$, or $B'$ to compute it |
 | `loss_factor` | float | — | > 0; default `0.01` single panel, `0.1` double wall | Total loss factor $\eta$ |
 | `band` | str | — | `'third'` (−5.5 dB) / `'octave'` (−4.0 dB) | Field-incidence correction width |
 | `mass1` / `mass2` | float | kg/m² | > 0 | Double-wall leaf surface densities |
@@ -809,7 +809,7 @@ with a linear-spring connector (Eqs 4.87, 4.88).
 numerical bounds are stated in [Function parameters](#function-parameters)
 above: Sharp below $1.5\times$ the first panel resonance, Gomperts above
 $w = 0.3\lambda$, and Leppington's other formulations. The orthotropic models
-are infinite-panel models: below about $0.7 f_{c1}$ Heckl's branch
+are infinite-panel models: below about $0.7 f_{\mathrm{c}1}$ Heckl's branch
 underestimates $R$ on small panels, and the 2 kHz to 4 kHz dip real corrugated
 cladding shows comes from resonances of the sections between the ribs, which
 neither route predicts. Only the sinusoidal corrugation has equivalent
@@ -854,7 +854,7 @@ need the whole room-plate-cavity-plate-room chain.
 ## See also
 
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): assembles
-  predicted or measured element $R$ into the in-situ $R'_w$.
+  predicted or measured element $R$ into the in-situ $R'_\mathrm{w}$.
 - [Sound Power from Surface Vibration (ISO 7849)](../../devices/emission/vibration-sound-power.md):
   consumes the predicted radiation efficiency as its radiation factor.
 - [Mechanical mobility and the FRF family (ISO 7626-1)](../../vibration/structural/mechanical-mobility.md):

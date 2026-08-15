@@ -151,7 +151,7 @@ class CorrelationResult:
     :ivar kind: ``'autocorrelation'`` or ``'cross-correlation'``.
     :ivar fs: Sample rate, in Hz.
     :ivar n_samples: Record length ``N``, in samples.
-    :ivar duration: Record length :math:`T = N/f_s`, in seconds.
+    :ivar duration: Record length :math:`T = N/f_\mathrm{s}`, in seconds.
     """
 
     lags: NDArray[np.float64]
@@ -833,7 +833,7 @@ def impulse_response_delay(
 
     Sub-sample accuracy presumes the IR is band-limited below Nyquist;
     the synthetic fractional-delay tests pin the achievable accuracy
-    (about 1e-3 samples for a :math:`0.4 f_s` band-limited pulse at the
+    (about 1e-3 samples for a :math:`0.4 f_\mathrm{s}` band-limited pulse at the
     default ``upsample=8``).
 
     :param ir: Impulse response, 1-D.

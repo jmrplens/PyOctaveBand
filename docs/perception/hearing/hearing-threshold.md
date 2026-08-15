@@ -18,15 +18,15 @@ For a person older than 18, the **median** hearing threshold deviation from the
 value at age 18 grows as a power law of age (ISO 7029 clause 4.2, Table 1):
 
 $$
-\Delta H_{md} = a\,(Y - 18)^{b},
+\Delta H_\mathrm{md} = a\,(Y - 18)^{b},
 $$
 
 with coefficients $a$, $b$ per frequency and sex. The spread around the median
-is modelled by two half-Gaussians whose standard deviations $s_u$ (worse than
-the median) and $s_l$ (better) are fifth-degree polynomials in $(Y - 18)$
+is modelled by two half-Gaussians whose standard deviations $s_\mathrm{u}$ (worse than
+the median) and $s_\mathrm{l}$ (better) are fifth-degree polynomials in $(Y - 18)$
 (clause 4.3, Tables 2–5). Any **population fractile** $Q$ follows from the
-standard-normal quantile $z(Q)$ (clause 4.4): $\Delta H_Q = \Delta H_{md} +
-z(Q)\,s$, using $s_u$ when $z \ge 0$ and $s_l$ otherwise.
+standard-normal quantile $z(Q)$ (clause 4.4): $\Delta H_Q = \Delta H_\mathrm{md} +
+z(Q)\,s$, using $s_\mathrm{u}$ when $z \ge 0$ and $s_\mathrm{l}$ otherwise.
 
 ```python
 from phonometry import hearing
@@ -63,7 +63,7 @@ prediction for a person: `fractile=0.9` returns the threshold that 90 % of
 otologically normal people of that age and sex are *better* than (only the
 worst-hearing tenth exceeds it), and `fractile=0.5` the median: half above,
 half below. The spread is deliberately asymmetric (two half-Gaussians,
-$s_u > s_l$): ageing drags a minority far down while the better-hearing half
+$s_\mathrm{u} > s_\mathrm{l}$): ageing drags a minority far down while the better-hearing half
 stays bunched near the median, so the far percentiles on the bad side move
 much faster with age than the good side ever improves. An individual
 audiogram can sit anywhere in that fan; the model tells you how *surprising*

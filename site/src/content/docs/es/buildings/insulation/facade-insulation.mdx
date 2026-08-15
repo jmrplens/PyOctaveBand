@@ -54,7 +54,7 @@ EN 12354-3 predice esa misma diferencia de niveles estandarizada a partir de
 los índices de reducción acústica del muro, del acristalamiento y de la
 entrada de aire antes de instalar ninguno de ellos, y la EN 12354-4 le da la
 vuelta al cerramiento para radiar al exterior una fuente interior. Una sección
-final pone lado a lado la $D_{2m,nT}$ medida y la prevista y muestra qué las
+final pone lado a lado la $D_{2\mathrm{m,nT}}$ medida y la prevista y muestra qué las
 separa y qué no. Las curvas de referencia tras cada número único están en
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/);
 los cerramientos interiores del mismo edificio, en
@@ -89,24 +89,24 @@ eligen por criterios distintos, que expone
 [Elegir y realizar el método](#elegir-y-realizar-el-metodo).
 Las magnitudes se siguen de la elección:
 ISO 16283-3 referencia el nivel del recinto receptor $L_2$ al nivel **2 m frente
-a la fachada** $L_{1,2m}$, dando la diferencia de niveles $D_{2m}$ y, exactamente
+a la fachada** $L_{1,2\mathrm{m}}$, dando la diferencia de niveles $D_{2\mathrm{m}}$ y, exactamente
 como en el caso a ruido aéreo, sus formas estandarizada y normalizada:
 
 $$
-D_{2m} = L_{1,2m} - L_2, \quad
-D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}, \quad
-D_{2m,n} = D_{2m} - 10 \log_{10}\frac{A}{A_0},
+D_{2\mathrm{m}} = L_{1,2\mathrm{m}} - L_2, \quad
+D_{2\mathrm{m,nT}} = D_{2\mathrm{m}} + 10 \log_{10}\frac{T}{T_0}, \quad
+D_{2\mathrm{m,n}} = D_{2\mathrm{m}} - 10 \log_{10}\frac{A}{A_0},
 $$
 
 con $T_0 = 0{,}5$ s, $A_0 = 10$ m² y $A = 0{,}16\ V/T$ (viviendas). Cuando el
-micrófono se sitúa **sobre el elemento de ensayo** (nivel superficial $L_{1,s}$),
+micrófono se sitúa **sobre el elemento de ensayo** (nivel superficial $L_{1,\mathrm{s}}$),
 el método del *elemento* también da un índice de reducción acústica aparente, que
 lleva una corrección fija por ángulo de incidencia: $-1{,}5$ dB para el método del
 altavoz a 45° y $-3$ dB para el método de tráfico rodado con todos los ángulos:
 
 $$
-R'_{45°} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 1{,}5, \qquad
-R'_{tr,s} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 3.
+R'_{45°} = L_{1,\mathrm{s}} - L_2 + 10 \log_{10}\frac{S}{A} - 1{,}5, \qquad
+R'_\mathrm{tr,s} = L_{1,\mathrm{s}} - L_2 + 10 \log_{10}\frac{S}{A} - 3.
 $$
 
 La magnitud de fachada es a ruido aéreo, así que su índice de un solo número usa
@@ -121,11 +121,11 @@ llega el sonido. ISO 16283-3 declara la hipótesis que hay detrás de cada una e
 sus propias definiciones: los $-1{,}5$ dB de $R'_{45°}$ «se basan en la
 hipótesis de que el sonido incide desde un solo ángulo, 45°, y de que el campo
 sonoro del recinto receptor se aproxima a un campo difuso» (3.12, Nota 3),
-mientras que los $-3$ dB de $R'_{tr,s}$ suponen que el sonido llega «desde
+mientras que los $-3$ dB de $R'_\mathrm{tr,s}$ suponen que el sonido llega «desde
 todos los ángulos» (3.13, Nota 2). Así que el 1,5 dB entre los dos métodos es
 una afirmación sobre la *fuente*, no sobre la pared, y es la razón por la que
-un resultado de altavoz se etiqueta $D_{ls,2m,nT}$ y uno de tráfico
-$D_{tr,2m,nT}$ en lugar de llamarse los dos igual.
+un resultado de altavoz se etiqueta $D_{\mathrm{ls},2\mathrm{m,nT}}$ y uno de tráfico
+$D_{\mathrm{tr},2\mathrm{m,nT}}$ en lugar de llamarse los dos igual.
 
 Los 2 m del método global son un compromiso del mismo tipo. Más cerca, el
 micrófono lee una presión dominada por la propia reflexión de la fachada y por
@@ -136,9 +136,9 @@ estable en casi todo el rango, y lo bastante cerca para seguir dentro del campo
 de la fachada; pero la norma es franca sobre el precio, y anota en el
 apartado 9.6.1 que «se producirán errores sistemáticos a bajas frecuencias
 debido a efectos de interferencia». La consecuencia práctica es la que hay que
-llevarse: el nivel de referencia de un $D_{2m,nT}$ se mide delante de una
+llevarse: el nivel de referencia de un $D_{2\mathrm{m,nT}}$ se mide delante de una
 superficie reflectante y es por tanto más alto que el campo libre que la misma
-fuente produciría con el edificio quitado, así que un $D_{2m,nT}$ y un $D_{nT}$
+fuente produciría con el edificio quitado, así que un $D_{2\mathrm{m,nT}}$ y un $D_\mathrm{nT}$
 interior no son la misma clase de número aunque tengan el mismo tamaño.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_facade_setup_es.svg" alt="Sección por una fachada de vivienda: un altavoz sobre el terreno con la línea de incidencia de 45 grados más menos 5 grados hasta el centro de un elemento de ensayo de 11,5 metros cuadrados, la distancia oblicua r acotada en 5 m para el método del elemento y 7 m para el método global y la perpendicular D debajo, un micrófono sujeto enrasado sobre el elemento de ensayo con sus tolerancias de 10 mm en paralelo y 3 mm en normal, y el micrófono global a 2,0 más menos 0,2 m del plano de la fachada a 1,5 m sobre el suelo del recinto receptor" width="92%" loading="eager" />
@@ -149,11 +149,11 @@ interior no son la misma clase de número aunque tengan el mismo tamaño.
 
 **Global o de elemento.** Responden a preguntas distintas, y la Tabla 1 de
 ISO 16283-3 dice cuál se prefiere para cada una. Los métodos **globales** dan
-$D_{2m,nT}$ (o $D_{2m,n}$) y «cuantifican el aislamiento a ruido aéreo de una
+$D_{2\mathrm{m,nT}}$ (o $D_{2\mathrm{m,n}}$) y «cuantifican el aislamiento a ruido aéreo de una
 fachada completa o de un edificio completo en una situación especificada»; ese
 resultado «no puede compararse con un índice de reducción acústica obtenido en
 laboratorio», porque es una propiedad del edificio tal como está construido.
-Los métodos de **elemento** dan $R'_{45°}$ o $R'_{tr,s}$ y son la vía cuando lo
+Los métodos de **elemento** dan $R'_{45°}$ o $R'_\mathrm{tr,s}$ y son la vía cuando lo
 que se busca es caracterizar un componente o compararlo con datos de
 laboratorio. El método 1, elemento con altavoz, es la manera *preferente* de
 estimar el índice aparente de un elemento; el método 6, global con tráfico
@@ -172,7 +172,7 @@ de ±60° del ángulo de visión desde la fachada, con desviaciones de hasta ±1
 y el ángulo de elevación desde el punto de máxima proximidad debe quedar por
 debajo de ±40° (apartado 10.3.2). La norma declara además sin rodeos el techo
 del método de elemento con tráfico: el ruido de fondo suele limitarlo a
-elementos o fachadas con $R'_w < 40$ dB (NOTA del apartado 10.1).
+elementos o fachadas con $R'_\mathrm{w} < 40$ dB (NOTA del apartado 10.1).
 
 **Dónde va el altavoz (apartados 9.3 y 9.4).** Ángulo de incidencia de
 45° ± 5°, preferiblemente sobre el terreno o tan alto sobre él como permita la
@@ -242,10 +242,10 @@ fac.plot()   # D2m,nT por banda con D2m, D2m,n y R' superpuestos (requiere matpl
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_es.svg" alt="Aislamiento de fachada in situ de una vivienda con el método del altavoz a 45 grados: la D2m,nT estandarizada, la D2m bruta, la D2m,n normalizada y el índice de reducción aparente R'45 por banda de tercio de octava, con el índice Dls,2m,nT,w anotado" width="80%" />
 
-*Las cuatro magnitudes de fachada de una misma medición: la $D_{2m}$ bruta,
+*Las cuatro magnitudes de fachada de una misma medición: la $D_{2\mathrm{m}}$ bruta,
 sus formas estandarizada y normalizada, y la $R'_{45°}$ de elemento con la
 corrección por ángulo de incidencia de −1,5 dB. El recuadro recoge el valor
-único $D_{ls,2m,nT,w}$ obtenido al pasar $D_{2m,nT}$ al motor de ISO 717-1.*
+único $D_{\mathrm{ls},2\mathrm{m,nT,w}}$ obtenido al pasar $D_{2\mathrm{m,nT}}$ al motor de ISO 717-1.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -299,12 +299,12 @@ se supone que los niveles por banda ya están corregidos por ruido de fondo.
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada $L_{1,2m}$ |
+| `l1_2m` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel 2 m frente a la fachada $L_{1,2\mathrm{m}}$ |
 | `l2` | array 1D o 2D | dB | mismo número de bandas | Niveles del recinto receptor |
 | `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
 | `area` | float, opcional | m² | > 0, con `surface_level`, `volume` | Superficie del elemento de ensayo $S$ (habilita $R'$) |
-| `volume` | float, opcional | m³ | > 0 | Recinto receptor $V$ (habilita $D_{2m,n}$; requerido para $R'$) |
-| `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial $L_{1,s}$ sobre el elemento (habilita $R'$) |
+| `volume` | float, opcional | m³ | > 0 | Recinto receptor $V$ (habilita $D_{2\mathrm{m,n}}$; requerido para $R'$) |
+| `surface_level` | array 1D/2D, opcional | dB | mismo número de bandas | Nivel superficial $L_{1,\mathrm{s}}$ sobre el elemento (habilita $R'$) |
 | `method` | str | — | `'loudspeaker'` (−1,5 dB) / `'road_traffic'` (−3 dB) | Corrección por ángulo de incidencia de $R'$ |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia $T_0$ |
 | `frequencies` | array 1D, opcional | Hz | — | Centros de banda que lleva el resultado para representar |
@@ -318,7 +318,7 @@ fachada de 16 bandas a `weighted_rating` para su número único de ISO 717-1.
 `FacadeInsulationResult.report(path)` escribe el informe de ensayo de fachada en
 campo ISO 16283-3 de una página: la línea de base normativa, una cabecera de
 metadatos opcional, la tabla en tercios de octava junto a la curva medida frente
-a la referencia desplazada, el índice de campo $D_{2m,nT,w}\ (C;\ C_{tr})$ en
+a la referencia desplazada, el índice de campo $D_{2\mathrm{m,nT,w}}\ (C;\ C_\mathrm{tr})$ en
 su recuadro, la declaración de método de ingeniería, un veredicto opcional
 (una diferencia de
 niveles cumple si iguala o supera el requisito) y un pie. `quantity="d_2m_nt"`
@@ -345,25 +345,25 @@ Las partes 3 y 4 predicen los dos sentidos a través del cerramiento del edifici
 ambos a partir de la misma suma energética de los **factores de transmisión** de
 los elementos $\tau = 10^{-R/10}$, ponderados por área según $S_i/S$ (un elemento
 pequeño o un paso de aire entra a través de su diferencia de nivel normalizada del
-elemento $D_{n,e}$ con el área de referencia $A_0 = 10\ \text{m}^2$):
+elemento $D_\mathrm{n,e}$ con el área de referencia $A_0 = 10\ \text{m}^2$):
 
 $$
 R' = -10 \log_{10}\!\Big( \sum_i \tfrac{S_i}{S}\,10^{-R_i/10}
-                          + \sum_k \tfrac{A_0}{S}\,10^{-D_{n,e,k}/10} \Big).
+                          + \sum_k \tfrac{A_0}{S}\,10^{-D_{\mathrm{n,e},k}/10} \Big).
 $$
 
 **Parte 3: exterior → interior.** A partir de $R'$ (Fórmula 10) se derivan los
-índices referidos a altavoz y a tráfico $R_{45} = R'+1$ y $R_{tr,s} = R'$, y la
+índices referidos a altavoz y a tráfico $R_{45} = R'+1$ y $R_\mathrm{tr,s} = R'$, y la
 salida principal, la diferencia de nivel estandarizada a 2 m (Fórmula 13)
 
 $$
-D_{2m,nT} = R' + \Delta L_{fs} + 10 \log_{10}\frac{V}{6\,T_0\,S}, \qquad T_0 = 0{,}5\ \text{s},
+D_{2\mathrm{m,nT}} = R' + \Delta L_\mathrm{fs} + 10 \log_{10}\frac{V}{6\,T_0\,S}, \qquad T_0 = 0{,}5\ \text{s},
 $$
 
-con el término de forma de la fachada $\Delta L_{fs}$ (Anexo C; 0 dB para una
+con el término de forma de la fachada $\Delta L_\mathrm{fs}$ (Anexo C; 0 dB para una
 fachada plana reflectante; `facade_shape_level_difference` lo consulta en la
 tabla de la Figura C.2 para galerías, balcones y terrazas, interpolando sobre
-la absorción del intradós $\alpha_w$). Los índices de un solo número reutilizan
+la absorción del intradós $\alpha_\mathrm{w}$). Los índices de un solo número reutilizan
 EN ISO 717-1 (`weighted_rating`).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction_es.svg" alt="Índices de reducción acústica parciales por elemento y la reducción aparente de la fachada R' y la diferencia de nivel estandarizada D2m,nT resultantes para el ejemplo resuelto del Anexo F de EN 12354-3, con la entrada de aire limitando las bandas bajas" width="80%" />
@@ -471,9 +471,9 @@ La predicción de fachada también escribe un informe de **predicción** de una
 página mediante un método `report(path)`, con la misma maquetación que las
 fichas de predicción a ruido aéreo y de impactos. `FacadePredictionResult.report()`
 representa la tabla de elementos de la fachada (el índice parcial ponderado
-$R_{p,w}$ de cada elemento) junto a la gráfica por elemento / $R'$ /
-$D_{2m,nT}$, el número único previsto $D_{2m,nT,w}$ en un recuadro (con
-$R'_{tr,s,w}$ y $C_{tr}$), la
+$R_\mathrm{p,w}$ de cada elemento) junto a la gráfica por elemento / $R'$ /
+$D_{2\mathrm{m,nT}}$, el número único previsto $D_{2\mathrm{m,nT,w}}$ en un recuadro (con
+$R'_\mathrm{tr,s,w}$ y $C_\mathrm{tr}$), la
 declaración de predicción y, cuando se aporta un `requirement`, un veredicto
 CUMPLE/NO CUMPLE (la diferencia de niveles cumple si es igual o mayor). `verbose=True`
 añade la fracción de energía sonora transmitida por cada elemento, que señala el
@@ -486,7 +486,7 @@ volumen del recinto receptor `receiving_volume`, la situación exterior/de tráf
 en `test_room`, además de los campos de identidad del calculista / laboratorio
 (`client`, `manufacturer`, `measurement_standard`, `laboratory`, `operator`,
 `report_id`, `test_date`), un resumen libre de la forma de la fachada y del
-modelo en `notes` y el objetivo $D_{2m,nT,w}$ en `requirement`. Los metadatos,
+modelo en `notes` y el objetivo $D_{2\mathrm{m,nT,w}}$ en `requirement`. Los metadatos,
 `language="es"` y el extra `phonometry[report]` se comportan como en las fichas
 de medición.
 
@@ -518,12 +518,12 @@ fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
 ## Sonido interior radiado al exterior (EN 12354-4)
 
 **Parte 4: interior → exterior.** El nivel de potencia acústica radiada por un
-segmento (Fórmula 2) es $L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)$ con
-$S_0 = 1$ m² y el término de difusividad del campo interior $C_d$ (Anexo B;
+segmento (Fórmula 2) es $L_W = L_{p,\mathrm{in}} + C_\mathrm{d} - R' + 10 \log_{10}(S/S_0)$ con
+$S_0 = 1$ m² y el término de difusividad del campo interior $C_\mathrm{d}$ (Anexo B;
 −6 dB difuso ideal, −5 dB industrial medio). Los huecos son elementos cuya «R»
 es la pérdida por inserción del silenciador (un hueco desnudo es 0 dB). El nivel
-exterior se obtiene de la atenuación simplificada $A_{tot}$ del Anexo E de un lado
-radiante finito, $L_p = L_W - A_{tot}$.
+exterior se obtiene de la atenuación simplificada $A_\mathrm{tot}$ del Anexo E de un lado
+radiante finito, $L_p = L_W - A_\mathrm{tot}$.
 
 ```python
 from phonometry import building
@@ -557,7 +557,7 @@ seg.plot()   # LW radiada por octava con la línea de LWA ponderada A (requiere 
 *El segmento del lado 1 del Anexo G: el muro domina la superficie pero la
 $R$ más débil de la puerta gobierna la potencia radiada, así que el espectro
 de octavas se mantiene plano donde el muro solo caería. La línea discontinua
-es el valor único ponderado A $L_{WA}$ formado a partir de las octavas.*
+es el valor único ponderado A $L_{W\mathrm{A}}$ formado a partir de las octavas.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -609,14 +609,14 @@ plt.show()
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `FacadeElement.area` | float | m² | > 0 para `r` / `insertion_loss` | Área del elemento $S_i$ (se ignora para `dn_e`) |
-| `FacadeElement.r` / `dn_e` / `insertion_loss` | float o secuencia | dB | dar exactamente uno | Elemento de área $R_i$ / elemento pequeño $D_{n,e}$ / pérdida por inserción del hueco |
+| `FacadeElement.r` / `dn_e` / `insertion_loss` | float o secuencia | dB | dar exactamente uno | Elemento de área $R_i$ / elemento pequeño $D_\mathrm{n,e}$ / pérdida por inserción del hueco |
 | `facade_sound_reduction(area)` | float | m² | > 0 | Área total de la fachada $S$ |
 | `facade_sound_reduction(volume)` | float | m³ | > 0 | Volumen del recinto receptor $V$ (Fórmula 13) |
-| `facade_sound_reduction(delta_l_fs)` | float | dB | por defecto `0` | Término de forma de la fachada $\Delta L_{fs}$ (Anexo C; consúltalo con `facade_shape_level_difference`) |
-| `radiated_sound_power(lp_in)` | float o secuencia | dB | — | Nivel interior $L_{p,in}$ por banda |
-| `radiated_sound_power(c_d)` | float | dB | por defecto `-6` | Término de difusividad $C_d$ (Anexo B) |
+| `facade_sound_reduction(delta_l_fs)` | float | dB | por defecto `0` | Término de forma de la fachada $\Delta L_\mathrm{fs}$ (Anexo C; consúltalo con `facade_shape_level_difference`) |
+| `radiated_sound_power(lp_in)` | float o secuencia | dB | — | Nivel interior $L_{p,\mathrm{in}}$ por banda |
+| `radiated_sound_power(c_d)` | float | dB | por defecto `-6` | Término de difusividad $C_\mathrm{d}$ (Anexo B) |
 | `radiated_sound_power(r_prime_cap)` | float | dB | por defecto `None` (sin tope) | Tope de campo opcional sobre $R'$, nota al pie del ejemplo del Anexo G (usa 40 dB), no parte de la Fórmula (2)/(3) |
-| `radiated_sound_power(octave_bands)` | sec. de int | Hz | por defecto `None` | Centros de octava que casan con las bandas; habilita el $L_{WA}$ ponderado A |
+| `radiated_sound_power(octave_bands)` | sec. de int | Hz | por defecto `None` | Centros de octava que casan con las bandas; habilita el $L_{W\mathrm{A}}$ ponderado A |
 | `facade_sound_reduction(frequencies)` | secuencia | Hz | por defecto `None`; longitud = nº de bandas | Centros de banda que se conservan en el resultado para las gráficas |
 | `facade_sound_reduction(bands)` | str o `None` | — | `'octave'` / `'third-octave'` / `None` | En qué conjunto de bandas están los datos; `None` lo infiere del número, como en la [página de índices](/phonometry/es/buildings/insulation/insulation-ratings/) |
 | `outdoor_attenuation(width, height, distance)` | float | m | > 0 | Lado radiante finito y distancia de recepción (Anexo E) |
@@ -635,11 +635,11 @@ construido. Merece la pena compararlas porque acaban en la misma magnitud, la
 diferencia de niveles estandarizada a 2 m, y porque el término geométrico que
 lleva la predicción de un índice a una diferencia de niveles es la propia
 normalización de la medición escrita de otra manera. Se parte de la
-definición medida, se sustituye $D_{2m}$ por el índice aparente que implica y
+definición medida, se sustituye $D_{2\mathrm{m}}$ por el índice aparente que implica y
 se introduce el área de absorción de Sabine $A = 0{,}16\ V/T$:
 
 $$
-D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}
+D_{2\mathrm{m,nT}} = D_{2\mathrm{m}} + 10 \log_{10}\frac{T}{T_0}
           = R' + 10 \log_{10}\frac{A}{S} + 10 \log_{10}\frac{T}{T_0}
           = R' + 10 \log_{10}\frac{0{,}16\ V}{S\ T_0}.
 $$
@@ -687,7 +687,7 @@ print(building.weighted_rating(meas.d_2m_nt).rating, fac.d_2m_nt_w)   # 33 33
 ```
 
 Las dos curvas van paralelas hasta el segundo decimal y ambas se valoran en
-$D_{2m,nT,w} = 33$ dB. Todo lo que separa una predicción real de una medición
+$D_{2\mathrm{m,nT,w}} = 33$ dB. Todo lo que separa una predicción real de una medición
 real está, por tanto, en los datos de entrada y no en las fórmulas:
 
 * **Los índices de los elementos.** La predicción consume valores de $R$ de
@@ -695,15 +695,15 @@ real está, por tanto, en los datos de entrada y no en las fórmulas:
   como lo monta el laboratorio. La fachada construida añade sus sellados
   perimetrales, su cajón de persiana, la junta entre marco y mocheta y lo que
   la obra haya hecho con ellos.
-* **El término de forma.** $\Delta L_{fs}$ vale 0 dB solo para una fachada
+* **El término de forma.** $\Delta L_\mathrm{fs}$ vale 0 dB solo para una fachada
   plana y reflectante. Un balcón, una galería o una terraza cambian el campo
   en la posición de 2 m, y la medición se lleva ese cambio tal cual mientras
   que la predicción tiene que buscarlo en el Anexo C.
 * **La fuente.** La ISO 16283-3 etiqueta el resultado con altavoz como
-  $D_{ls,2m,nT}$ precisamente porque un altavoz a 45° no es tráfico rodado; su
+  $D_{\mathrm{ls},2\mathrm{m,nT}}$ precisamente porque un altavoz a 45° no es tráfico rodado; su
   índice de elemento lleva una corrección de ángulo de −1,5 dB donde el método
   de tráfico para todos los ángulos lleva −3 dB. La EN 12354-3 predice
-  directamente el $R_{tr,s} = R'$ referido al tráfico y ofrece
+  directamente el $R_\mathrm{tr,s} = R'$ referido al tráfico y ofrece
   $R_{45} = R' + 1$ para la comparación con altavoz.
 * **El recinto receptor.** La predicción supone el volumen de proyecto y un
   campo receptor difuso. La medición toma el recinto amueblado, y la hipótesis de
@@ -724,12 +724,12 @@ entrada de aire, no el muro.
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-La ISO 16283-3:2016 (las magnitudes de fachada en campo $D_{2m}$, $D_{2m,nT}$,
-$D_{2m,n}$, $R'_{45°}$ y $R'_{tr,s}$ de los métodos de elemento con altavoz y
+La ISO 16283-3:2016 (las magnitudes de fachada en campo $D_{2\mathrm{m}}$, $D_{2\mathrm{m,nT}}$,
+$D_{2\mathrm{m,n}}$, $R'_{45°}$ y $R'_\mathrm{tr,s}$ de los métodos de elemento con altavoz y
 con tráfico rodado, con el promediado de posiciones del apartado 9.5.1 y el
 informe de ensayo del apartado 14) mediante `building.facade_insulation`; la
 EN 12354-3:2000 (la suma de factores de transmisión de la Fórmula 10, los
-índices $R_{45}$ y $R_{tr,s}$, la $D_{2m,nT}$ de la Fórmula 13 y el término de
+índices $R_{45}$ y $R_\mathrm{tr,s}$, la $D_{2\mathrm{m,nT}}$ de la Fórmula 13 y el término de
 forma de fachada del Anexo C) mediante `building.facade_sound_reduction` y
 `building.facade_shape_level_difference`; y la EN 12354-4:2000 (la potencia
 acústica radiada de la Fórmula 2 con el término de difusividad del Anexo B y
@@ -770,8 +770,8 @@ no las filas impresas.
   los modelos de flancos aéreos y de impacto de EN 12354-1/2, que comparten la
   suma de factores de transmisión usada aquí.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
-  el motor de curva de referencia tras los números únicos $D_{2m,nT,w}$,
-  $R'_{45,w}$ y $R'_{tr,s,w}$.
+  el motor de curva de referencia tras los números únicos $D_{2\mathrm{m,nT,w}}$,
+  $R'_{45,w}$ y $R'_\mathrm{tr,s,w}$.
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/):
   la magnitud de fachada en bandas de octava del método rápido de control.
 - [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/):

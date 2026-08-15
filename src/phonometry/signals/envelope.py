@@ -40,9 +40,9 @@ correlating (Figure 13.11), because the spectral content of the envelope
 - not of the signal - is where amplitude modulations show as discrete
 lines. The optional ``band`` argument reproduces the figure's band-pass
 front end (the classical bearing-envelope chain: isolate the resonance
-band, then envelope it). An AM tone with modulation frequency :math:`f_m`
+band, then envelope it). An AM tone with modulation frequency :math:`f_\mathrm{m}`
 (on an analysis bin) and depth ``m`` puts a line of closed-form
-amplitude at exactly :math:`f_m`, the anchor the tests pin; off-bin
+amplitude at exactly :math:`f_\mathrm{m}`, the anchor the tests pin; off-bin
 modulation lines read low by the taper's scalloping loss.
 """
 
@@ -325,13 +325,13 @@ def envelope_spectrum(
     single-record amplitude spectrum.
 
     Closed forms for an AM tone
-    :math:`A_0 (1 + m \cos(2 \pi f_m t)) \cos(2 \pi f_c t)`
-    with :math:`0 \le m < 1` and :math:`f_m` on an analysis bin:
+    :math:`A_0 (1 + m \cos(2 \pi f_\mathrm{m} t)) \cos(2 \pi f_\mathrm{c} t)`
+    with :math:`0 \le m < 1` and :math:`f_\mathrm{m}` on an analysis bin:
 
     * ``kind="magnitude"``: a line of amplitude :math:`A_0 m` at
-      :math:`f_m`; mean level :math:`A_0`.
-    * ``kind="squared"``: lines :math:`2 A_0^2 m` at :math:`f_m` and
-      :math:`A_0^2 m^2 / 2` at :math:`2 f_m`; mean level
+      :math:`f_\mathrm{m}`; mean level :math:`A_0`.
+    * ``kind="squared"``: lines :math:`2 A_0^2 m` at :math:`f_\mathrm{m}` and
+      :math:`A_0^2 m^2 / 2` at :math:`2 f_\mathrm{m}`; mean level
       :math:`A_0^2 (1 + m^2/2)`.
 
     Amplitude modulation of rotating machinery (bearing and gear defect
@@ -354,7 +354,7 @@ def envelope_spectrum(
         (default ``True``, the Figure 13.11 DC remover); the mean is
         reported either way.
     :param band: Optional ``(low, high)`` band-pass edges, in Hz
-        (:math:`0 < \text{low} < \text{high} < f_s/2`), applied to the
+        (:math:`0 < \text{low} < \text{high} < f_\mathrm{s}/2`), applied to the
         record before
         envelope detection as a zero-phase 4th-order Butterworth
         (:func:`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude

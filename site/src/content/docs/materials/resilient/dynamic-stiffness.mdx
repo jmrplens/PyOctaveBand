@@ -75,13 +75,13 @@ laboratory arrangement, measured resonant frequency (Formula 3) are
 
 $$
 f_0 = \frac{1}{2\pi}\sqrt{\frac{s'}{m'}}, \qquad
-f_r = \frac{1}{2\pi}\sqrt{\frac{s'_t}{m'_t}},
+f_\mathrm{r} = \frac{1}{2\pi}\sqrt{\frac{s'_\mathrm{t}}{m'_\mathrm{t}}},
 $$
 
 so the **apparent** dynamic stiffness follows from the resonance (Formula 4):
 
 $$
-s'_t = 4\pi^2\,m'_t\,f_r^2 .
+s'_\mathrm{t} = 4\pi^2\,m'_\mathrm{t}\,f_\mathrm{r}^2 .
 $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig.svg" alt="EN 29052-1 resonance rig in three panels: the three excitation arrangements of Figures 1 to 3, one on a rigid foundation with the load plate driven and measured, two on an isolated baseplate of at least 100 kg where both plates are measured and the exciter drives either the load plate or the baseplate; below, the specimen and load requirements with the plaster bed, the steel load plate and the petroleum-jelly fillet, and the mass-spring model whose response peak gives the resonant frequency" width="92%" />
@@ -92,12 +92,12 @@ the 0.04 m² specimen). That load reproduces the static preload of a typical
 floating floor, about 2 kPa, and it is why the standard's scope stops at
 loadings below 0.4 kPa and above 4 kPa. A vertical exciter drives the system,
 an accelerometer picks up its response, and the fundamental vertical resonance
-$f_r$ of the plate-on-specimen system is read from the response peak;
-Formula 4 turns it into $s'_t$.
+$f_\mathrm{r}$ of the plate-on-specimen system is read from the response peak;
+Formula 4 turns it into $s'_\mathrm{t}$.
 
-### 1.1 Getting $f_r$
+### 1.1 Getting $f_\mathrm{r}$
 
-The library takes $f_r$ as an input, and Clause 7 is how a laboratory produces
+The library takes $f_\mathrm{r}$ as an input, and Clause 7 is how a laboratory produces
 one. Three excitation signals are offered and declared **equivalent**:
 sinusoidal, white noise and pulse. Sinusoidal is the reference method in case
 of dispute; white-noise and pulse excitation are analysed as a frequency
@@ -109,7 +109,7 @@ are measured. Whichever is used, the arrangement must permit vertical motion
 only, without rotational components, and it is reported with the result.
 
 The sinusoidal procedure is a sweep at **constant excitation force**. The catch
-is that $f_r$ often depends on that force, because a resilient layer is
+is that $f_\mathrm{r}$ often depends on that force, because a resilient layer is
 non-linear: drive it harder and it softens, and the peak walks down in
 frequency. So the standard does not ask for a resonance, it asks for the
 resonance the material would have at vanishing amplitude:
@@ -119,8 +119,8 @@ resonance the material would have at vanishing amplitude:
    expected stiffness selects: $0.2\ \text{N} \le F \le 0.8\ \text{N}$ for
    $s' > 50$ MN/m³, and $0.1\ \text{N} \le F \le 0.4\ \text{N}$ for
    $s' \le 50$ MN/m³.
-3. Extrapolate the $(F, f_r)$ points linearly to zero force. **That
-   intercept** is the $f_r$ the library expects.
+3. Extrapolate the $(F, f_\mathrm{r})$ points linearly to zero force. **That
+   intercept** is the $f_\mathrm{r}$ the library expects.
 
 ```python
 import numpy as np
@@ -145,7 +145,7 @@ high the vertical vibration maximum is not pronounced, and the standard's
 answer is to stop looking at the magnitude: locate the resonance from the
 **phase shift** between the excitation and the vibration signal instead. That
 phase is not a fallback reading of the same thing — it is a sharper one, and
-watching a sweep run through $f_r$ shows why.
+watching a sweep run through $f_\mathrm{r}$ shows why.
 
 <Video
   name="anim_dynamic_stiffness_sweep"
@@ -156,14 +156,14 @@ watching a sweep run through $f_r$ shows why.
 />
 
 The magnitude peak is broad — it is what the loss factor makes of it — while
-the phase runs through $-90°$ steeply and crosses it at $f_r$ whatever the
+the phase runs through $-90°$ steeply and crosses it at $f_\mathrm{r}$ whatever the
 damping. That is the whole reason the standard offers the phase reading for
 damped materials, and it is worth having on any rig, because a peak that is
 2 Hz wide is a peak that can be read 2 Hz wrong.
 
 ### 1.2 Preparing the specimen and the rig
 
-The measured $f_r$ is decided by the bedding and by the rig tolerances at
+The measured $f_\mathrm{r}$ is decided by the bedding and by the rig tolerances at
 least as much as by the material, and both are normative.
 
 - **Specimens.** At least three, each 200 mm × 200 mm (Clause 6). Their
@@ -172,7 +172,7 @@ least as much as by the material, and both are normative.
   0.02 mm thick, apply a thin paste of plaster of Paris and water at least
   5 mm deep so that any unevenness is covered, and bed the load plate onto it
   **before the plaster sets**. A dry or partial contact carries the load on
-  part of the specimen area, stiffens the reading and biases $f_r$ upward.
+  part of the specimen area, stiffens the reading and biases $f_\mathrm{r}$ upward.
 - **Closed-cell materials.** Seal the joint between the specimen and the base
   around the perimeter with a fillet of petroleum jelly. An unsealed perimeter
   changes what the enclosed gas of section 2 can do.
@@ -224,9 +224,9 @@ plt.show()
 
 For an air-permeable material the enclosed pore air adds a parallel stiffness
 from its isothermal compression (Formula 7):
-$s'_a = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
+$s'_\mathrm{a} = p_0/(d\,\varepsilon)$, with $p_0$ the atmospheric pressure, $d$ the
 loaded thickness and $\varepsilon$ the porosity. The standard's worked NOTE
-($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_a = 111/d$ MN/m³ for
+($p_0 = 0.1\ \text{MPa}$, $\varepsilon = 0.9$) is $s'_\mathrm{a} = 111/d$ MN/m³ for
 $d$ in millimetres:
 
 ```python
@@ -243,8 +243,8 @@ material, is the spring.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_gas_stiffness.svg" alt="Log-log plot of dynamic stiffness per unit area against loaded thickness from 5 to 60 millimetres: the frame stiffness is a horizontal line at 4.94 meganewtons per cubic metre, the enclosed-gas term falls as 111 over the thickness and crosses it near 22 millimetres, and their sum is the installed stiffness, with the worked determination marked at 20 millimetres and a right-hand axis giving the natural frequency of a 120 kilogram per square metre screed" width="88%" />
 
 *The inversion that decides whether a thin layer can ever be soft. The frame
-stiffness $s'_t$ is a property of the material and does not care how thick the
-layer is; the enclosed-gas term $s'_a = p_0/(d\varepsilon)$ does, and it grows
+stiffness $s'_\mathrm{t}$ is a property of the material and does not care how thick the
+layer is; the enclosed-gas term $s'_\mathrm{a} = p_0/(d\varepsilon)$ does, and it grows
 without limit as the layer thins. Below the crossing near 22 mm the air in the
 pores is the stiffer of the two springs, so a 10 mm permeable layer cannot be
 soft however soft its frame is: 11 MN/m³ of gas alone puts $f_0$ back above
@@ -277,10 +277,10 @@ plt.show()
 </details>
 
 The dynamic stiffness of the *installed* material is then set by the lateral
-airflow resistivity $r$ (clause 8.2): $s' = s'_t$ for
-$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ for
+airflow resistivity $r$ (clause 8.2): $s' = s'_\mathrm{t}$ for
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_\mathrm{t} + s'_\mathrm{a}$ for
 $10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, and for
-$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_t$
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ the method only resolves $s' = s'_\mathrm{t}$
 when the gas term is negligible.
 
 **Why lateral resistivity decides anything.** Under the load plate the layer is
@@ -289,17 +289,17 @@ of the layer, or it can be compressed in place with the frame. It is a spring
 in parallel with the frame only in the second case, and the lateral airflow
 resistivity is exactly what decides which happens. That maps onto the three
 branches. At **high** $r$ the air is trapped both in the 200 mm specimen and
-under a full floor, so the $s'_t$ the rig measured already contains it and
+under a full floor, so the $s'_\mathrm{t}$ the rig measured already contains it and
 nothing is added. At **intermediate** $r$ it escapes from the small specimen
-but not from a floor several metres across, so the standard computes $s'_a$
+but not from a floor several metres across, so the standard computes $s'_\mathrm{a}$
 and adds it back. At **low** $r$ it escapes from both: there is no gas spring
 to add, but the method can no longer separate the two contributions either.
-In that third case report $s' = s'_t$ with the reservation, and state the
-estimated error of disregarding $s'_a$ — the standard asks for exactly that.
+In that third case report $s' = s'_\mathrm{t}$ with the reservation, and state the
+estimated error of disregarding $s'_\mathrm{a}$ — the standard asks for exactly that.
 Note also where $r$ comes from: it is the same viscous property ISO 9053
 measures, but along the layer rather than through it, and here it is an input
 rather than something the method determines. Take the porosity $\varepsilon$
-for $s'_a$ as the standard's 0.9 unless it has been measured.
+for $s'_\mathrm{a}$ as the standard's 0.9 unless it has been measured.
 
 **Mind the prefix.** $r$ is the quantity ISO 9053 calls $\sigma$ and reports in
 Pa·s/m², while EN 29052-1 writes it $r$ and thresholds it in **kPa·s/m²**. The
@@ -338,13 +338,13 @@ its `.plot()` draws the $f_0(s')$ design curve.
 
 `DynamicStiffnessResult.report(path)` renders a one-page accredited
 dynamic-stiffness test report (EN 29052-1:1992 = ISO 9052-1:1989): a metadata
-header (specimen, the total mass per unit area $m'_t$ used during the test, the
+header (specimen, the total mass per unit area $m'_\mathrm{t}$ used during the test, the
 loaded thickness $d$ (in metres, shown in mm), test facility, climate), a compact metrics table (the
-resonant frequency $f_r$, the apparent stiffness $s'_t$ of Formula 4, the
-enclosed-gas term $s'_a$ when it applies, the installed $s'$ of clause 8.2 and
+resonant frequency $f_\mathrm{r}$, the apparent stiffness $s'_\mathrm{t}$ of Formula 4, the
+enclosed-gas term $s'_\mathrm{a}$ when it applies, the installed $s'$ of clause 8.2 and
 the natural frequency $f_0$ of Formula 2) beside the $f_0(s')$ design curve, and
-a boxed apparent dynamic stiffness $s'_t$ with the installed $s'$ and the
-resonance $f_r$ alongside. Clause 9 rounds every stiffness to the nearest
+a boxed apparent dynamic stiffness $s'_\mathrm{t}$ with the installed $s'$ and the
+resonance $f_\mathrm{r}$ alongside. Clause 9 rounds every stiffness to the nearest
 MN/m³. It is a characterisation, so there is no pass/fail verdict;
 `language="es"` renders the Spanish fiche. The fiche always embeds the
 $f_0(s')$ design curve, so it needs both the report and plot extras
@@ -381,7 +381,7 @@ res.report(
 The evaluation treats the rig as a single-degree-of-freedom system: the load
 plate moves as a rigid piston on a massless spring. That holds while the
 specimen is light against the plate and its first internal resonance sits
-well above $f_r$; a heavy or very thick layer starts to act as a distributed
+well above $f_\mathrm{r}$; a heavy or very thick layer starts to act as a distributed
 system and the simple Formula 4 reading degrades. Three practical pitfalls
 follow from the preload:
 
@@ -398,11 +398,11 @@ follow from the preload:
 * **Respect the contact.** The standard seats the load plate on a thin
   bonding layer (a plaster paste) so the full specimen area carries the
   load. A dry, uneven contact concentrates the force, stiffens the response
-  locally and biases $f_r$ upward.
+  locally and biases $f_\mathrm{r}$ upward.
 
 ### 3.1 Reading $s'$, and what it buys
 
-The natural frequency that matters in the end is not the rig's $f_r$ but the
+The natural frequency that matters in the end is not the rig's $f_\mathrm{r}$ but the
 installed floor's $f_0$ from Formula 2. Two questions follow, and the page
 owes both an answer.
 
@@ -478,9 +478,9 @@ the enclosed-gas term of Formula 7 (`enclosed_gas_stiffness`), and the clause
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="Not covered">
-Clause 7's measurement procedure, extracting the resonant frequency $f_r$ from
+Clause 7's measurement procedure, extracting the resonant frequency $f_\mathrm{r}$ from
 the raw excitation-response signal by sinusoidal, white-noise or pulse
-methods, is not implemented: pass an already-extrapolated $f_r$, obtained as
+methods, is not implemented: pass an already-extrapolated $f_\mathrm{r}$, obtained as
 section 1.1 describes (the extrapolation itself is a straight-line fit, which
 section 1.1 shows). The lateral airflow resistivity $r$ of clause 8.2 is
 likewise taken as an input rather than measured; ISO 9053's static and

@@ -131,7 +131,7 @@ Filter banks, weighting, levels, spectra, calibration and uncertainty. This is
 the chain that turns a digital signal into a standards-compliant number, and
 every other area consumes it: a loudness model needs calibrated band levels, a
 room parameter needs a filtered impulse response, an environmental rating is an
-adjusted $L_{eq}$. Implements IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196,
+adjusted $L_\mathrm{eq}$. Implements IEC 61260-1, ANSI S1.11, IEC 61672-1, ISO 7196,
 IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
 
 - [Build a sound level meter](/phonometry/signals/sound-level-meter/):
@@ -166,16 +166,16 @@ IEC 61252, ISO 1996-1, IEC 60942 and the GUM.
   for audible sound in the presence of ultrasound.
 - [Time Weighting](/phonometry/signals/levels/time-weighting/): the Fast, Slow and
   Impulse exponential ballistics of IEC 61672-1.
-- [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): $L_{eq}$ and
-  $L_{Aeq}$, the percentile levels $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$ and
+- [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): $L_\mathrm{eq}$ and
+  $L_\mathrm{Aeq}$, the percentile levels $L_{10}$/$L_{50}$/$L_{90}$, $L_\mathrm{Cpeak}$ and
   SEL, and the noise dose.
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/assessment/environmental-levels/):
-  $L_{den}$, $L_{dn}$ and the composite rating levels, the tonal adjustment, the
+  $L_\mathrm{den}$, $L_\mathrm{dn}$ and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget. It lives under
   Environment and transport, and is repeated here because it is the level
   definitions above aggregated over a day.
 - [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/):
-  the corrected level $L_{Keq}$ with its $K_t$, $K_f$ and $K_i$ corrections, the
+  the corrected level $L_\mathrm{Keq}$ with its $K_\mathrm{t}$, $K_\mathrm{f}$ and $K_\mathrm{i}$ corrections, the
   evaluation periods and noise phases, the limit tables and the Article 25
   compliance check. It lives under Environment and transport too.
 
@@ -279,7 +279,7 @@ ISO 9612.
   the permanent threshold shift as a function of level, duration and frequency,
   combined with the age component.
 - [Occupational Noise Exposure (ISO 9612)](/phonometry/perception/hearing/occupational-exposure/):
-  the task-based, job-based and full-day strategies for $L_{EX,8h}$, with the
+  the task-based, job-based and full-day strategies for $L_\mathrm{EX,8h}$, with the
   uncertainty budget and the upper limit.
 
 ## [Rooms and buildings](/phonometry/buildings/)
@@ -297,7 +297,7 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
   the ISO 18233 deterministic acquisition, exponential sweeps with their
   deconvolution, and MLS.
 - [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): the room parameters
-  EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ and $T_s$ derived from
+  EDT, $T_{20}$, $T_{30}$, $C_{50}$, $C_{80}$, $D_{50}$ and $T_\mathrm{s}$ derived from
   that impulse response.
 - [Open-Plan Office Acoustics (ISO 3382-3)](/phonometry/buildings/rooms/open-plan-acoustics/):
   the spatial decay rate of speech and the distraction and privacy distances
@@ -336,13 +336,13 @@ ISO 12999-1, ISO 10052, ANSI/ASA S12.2 and ASTM E413/E1414.
   specifies them, the laboratory check they have to pass, and the single number
   of ISO 717-2 Annex D.
 - [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/):
-  the airborne and impact reference-curve engines with $C$, $C_{tr}$ and $C_I$,
+  the airborne and impact reference-curve engines with $C$, $C_\mathrm{tr}$ and $C_\mathrm{I}$,
   the enlarged-range terms and the ISO 717 fiche.
 - [Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/): the
   building envelope measured per ISO 16283-3, predicted per EN 12354-3 and
   radiating outwards per EN 12354-4.
 - [Spanish Building Code (CTE DB-HR)](/phonometry/buildings/insulation/spanish-building-code/):
-  the DB-HR global indices $R_A$, $R_{A,tr}$, $D_{nT,A}$ and $D_{2m,nT,Atr}$,
+  the DB-HR global indices $R_\mathrm{A}$, $R_\mathrm{A,tr}$, $D_\mathrm{nT,A}$ and $D_{2\mathrm{m,nT,Atr}}$,
   the clause 2 requirement tables and the window-size correction.
 
 **[Insulation design](/phonometry/buildings/design/)**
@@ -523,14 +523,14 @@ regulatory mapping.
 
 - [Impulsive-sound prominence (NT ACOU 112)](/phonometry/environment/assessment/impulsive-sound/):
   the predicted prominence of each impulse from its onset rate and level
-  difference, and the adjustment added to $L_{Aeq}$.
+  difference, and the adjustment added to $L_\mathrm{Aeq}$.
 
 - [Environmental Levels (ISO 1996-1/-2)](/phonometry/environment/assessment/environmental-levels/):
-  $L_{den}$, $L_{dn}$ and the composite rating levels, the tonal adjustment, the
+  $L_\mathrm{den}$, $L_\mathrm{dn}$ and the composite rating levels, the tonal adjustment, the
   residual-noise correction and the uncertainty budget. Also listed under
   Signal analysis, beside the level definitions it builds on.
 - [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/):
-  the corrected level $L_{Keq}$ with its $K_t$, $K_f$ and $K_i$ corrections, the
+  the corrected level $L_\mathrm{Keq}$ with its $K_\mathrm{t}$, $K_\mathrm{f}$ and $K_\mathrm{i}$ corrections, the
   evaluation periods and noise phases, the limit tables and the Article 25
   compliance check. Also listed under Signal analysis, for the same reason.
 

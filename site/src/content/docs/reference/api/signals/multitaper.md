@@ -92,7 +92,7 @@ the resolution bandwidth $2W$).
 | :--- | :--- |
 | `x` | Signal, 1-D (used whole; no segmentation). |
 | `fs` | Sample rate, in Hz. |
-| `time_half_bandwidth` | Duration x half-bandwidth product `NW` (dimensionless; default 4, P&W's worked choice). The design half-bandwidth is $W = NW f_s / N$ Hz; larger `NW` admits more tapers (lower variance) at the cost of resolution $2W$. |
+| `time_half_bandwidth` | Duration x half-bandwidth product `NW` (dimensionless; default 4, P&W's worked choice). The design half-bandwidth is $W = NW f_\mathrm{s} / N$ Hz; larger `NW` admits more tapers (lower variance) at the cost of resolution $2W$. |
 | `n_tapers` | Number of tapers `K`; `None` picks $2 NW - 1$ (all tapers with near-unity concentration, P&W Section 7.1). At most the Shannon number $2 NW$. |
 | `adaptive` | Use Thomson's adaptive weights (default) or the eigenvalue-weighted average. |
 | `scaling` | `'density'` (units²/Hz) or `'spectrum'` (units², sinusoid-peak reading). |
@@ -155,7 +155,7 @@ costs degrees of freedom there (P&W Eq. 370b).
 | `eigenvalues` | Concentration ratios $\lambda_k(N, W)$ of the tapers - the fraction of each taper's spectral-window energy inside the design band $[-W, W]$ (P&W Section 7.1; near unity for $k < 2NW$). |
 | `time_half_bandwidth` | The duration x half-bandwidth product `NW` (dimensionless; $W = NW/(N \Delta t)$). |
 | `n_tapers` | Number of tapers `K` averaged. |
-| `resolution_bandwidth` | The resolution bandwidth $2W$ of the estimator, in Hz - the multitaper analog of the Welch $B_e$ (P&W call $2W$ *the* natural resolution measure of the method). |
+| `resolution_bandwidth` | The resolution bandwidth $2W$ of the estimator, in Hz - the multitaper analog of the Welch $B_\mathrm{e}$ (P&W call $2W$ *the* natural resolution measure of the method). |
 | `adaptive` | Whether Thomson's adaptive weights were used. |
 | `scaling` | `'density'` or `'spectrum'`. |
 

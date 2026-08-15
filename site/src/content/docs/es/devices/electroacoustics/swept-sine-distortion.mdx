@@ -311,7 +311,7 @@ hasta 12 kHz.
 Dos notas prácticas del artículo vienen incorporadas: la media de la
 grabación se resta por defecto (`remove_dc=True`; de lo contrario, un offset de
 continua cuela en la respuesta al impulso una copia escalada del filtro
-inverso), y la parte no entera de cada llegada $L\ln(n) f_s$ se elimina en
+inverso), y la parte no entera de cada llegada $L\ln(n) f_\mathrm{s}$ se elimina en
 el dominio de la frecuencia, de modo que las fases armónicas no arrastran
 sesgo sub-muestra residual.
 
@@ -383,7 +383,7 @@ reglas de abajo rigen para **los dos** métodos.
   (`ir_length`, por defecto la mayor potencia de dos que cabe, con tope en 8192
   muestras) no debe excederlo. Alarga el barrido o baja `n_harmonics` en un
   sistema reverberante cuya cola necesite una ventana más larga.
-- **El techo de Nyquist.** Mantén $N f_2$ por debajo de $f_s/2$: los productos
+- **El techo de Nyquist.** Mantén $N f_2$ por debajo de $f_\mathrm{s}/2$: los productos
   de distorsión por encima se pliegan en cualquier grabación real y quedan
   contados entonces en la frecuencia equivocada.
 - **La referencia de amplitud.** El análisis queda referido a la `amplitude` de

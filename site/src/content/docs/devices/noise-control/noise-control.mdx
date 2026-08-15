@@ -215,13 +215,13 @@ angle off the inlet axis.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%" />
 
 *Only $r$ and its angle off the inlet axis fix the drawn box; $S_\text{out}$
-and $S_w$ enter Wells' method as bare areas, so any plenum sharing these four
+and $S_\mathrm{w}$ enter Wells' method as bare areas, so any plenum sharing these four
 numbers has the same predicted attenuation.*
 
 The formula is a sum of two terms inside one logarithm, a direct term
-$\cos\theta/\pi r^2$ and a reverberant term $(1-\alpha)/S_w\alpha$, and which
+$\cos\theta/\pi r^2$ and a reverberant term $(1-\alpha)/S_\mathrm{w}\alpha$, and which
 of them dominates decides which design move is worth making. For the plenum
-drawn above ($r = 1.2$ m, $S_w = 6$ m², $\alpha = 0.2$) the two are 0.221 and
+drawn above ($r = 1.2$ m, $S_\mathrm{w} = 6$ m², $\alpha = 0.2$) the two are 0.221 and
 0.667, so the reverberant term rules: doubling the line of sight to 2.4 m buys
 0.9 dB and swinging the outlet a full radian off the inlet axis buys 0.6 dB,
 while raising the lining absorption from 0.2 to 0.6 buys 4.2 dB. Line it first.
@@ -273,7 +273,7 @@ An `HvacSpectrumResult` also files itself: `.report()` renders a one-page
 duct-noise fiche with the per-band table beside the spectrum, the boxed
 single-number result — the A-weighted sound power level when the spectrum is
 regenerated noise, the mean attenuation when it is a loss — and, when a
-`requirement` is declared, the verdict against it: a maximum $L_{WA}$ in the
+`requirement` is declared, the verdict against it: a maximum $L_{W\mathrm{A}}$ in the
 first case, a minimum mean attenuation in the second.
 
 ```python
@@ -320,11 +320,11 @@ $R$, minus a penalty $C$ for the reverberant build-up inside the small, hard
 cavity (Bies Eqs. (7.103), (7.111)):
 
 $$
-\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_E}{R_i}\right),
+\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_\mathrm{E}}{R_\mathrm{i}}\right),
 $$
 
-with the external area $S_E$ and the interior **room constant**
-$R_i = S_i \alpha_i/(1-\alpha_i)$ (the same
+with the external area $S_\mathrm{E}$ and the interior **room constant**
+$R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i}/(1-\alpha_\mathrm{i})$ (the same
 [`room_constant`](/phonometry/buildings/rooms/room-image-sources/) as the steady-state
 room field).
 
@@ -336,18 +336,18 @@ rating a datasheet quotes. The $0.3$ is the empirical floor Bies keeps for the
 direct and near field, which no amount of lining removes, so $C$ can never fall
 below $10\log_{10}0.3 = -5.2$ dB however well the interior is treated.
 
-That turns into a design rule. $C$ changes sign at $R_i = S_E/0.7$: an interior
+That turns into a design rule. $C$ changes sign at $R_\mathrm{i} = S_\mathrm{E}/0.7$: an interior
 room constant of about one and a half times the external area is break-even,
 below it the enclosure delivers less than its panels and above it slightly more.
-The figure's case ($S_E = 6$ m², $S_i = 5$ m², $\alpha_i = 0.3$) gives
-$R_i = 2.14$ m² and $C = +4.9$ dB, well on the losing side, which is where an
+The figure's case ($S_\mathrm{E} = 6$ m², $S_\mathrm{i} = 5$ m², $\alpha_\mathrm{i} = 0.3$) gives
+$R_\mathrm{i} = 2.14$ m² and $C = +4.9$ dB, well on the losing side, which is where an
 unlined or lightly lined box always sits; break-even here would need
-$\alpha_i = 0.63$. Because $R_i$ rises steeply as $\alpha_i$ approaches one, the
-step from $\alpha_i = 0.3$ to $0.7$ is a factor of five in $R_i$ and
+$\alpha_\mathrm{i} = 0.63$. Because $R_\mathrm{i}$ rises steeply as $\alpha_\mathrm{i}$ approaches one, the
+step from $\alpha_\mathrm{i} = 0.3$ to $0.7$ is a factor of five in $R_\mathrm{i}$ and
 $+4.9 \to -0.9$ dB in $C$ — **5.8 dB of insertion loss for the price of the
 lining**. Note that `model="norton"` drops the $0.3$ and therefore has no floor,
 so the two models agree while the interior is hard and diverge once it is well
-lined (2.0 dB apart at $\alpha_i = 0.7$ for this box).
+lined (2.0 dB apart at $\alpha_\mathrm{i} = 0.7$ for this box).
 
 **The panel transmission loss $R$ is supplied by you** as a per-band array
 (measured, or predicted by a panel model), or as a callable of frequency. This
@@ -457,7 +457,7 @@ worst of them rather than by the panels. Two facts follow. A door of 1.28 m²
 at $R = 15$ dB in the 24 m² shell above pulls the mean composite $R$ from
 32.3 dB down to 24.7 dB and the mean insertion loss from 28.9 to 21.4 dB. And a
 **bare opening**
-of relative area $S_a/S_E$ caps the composite at $10\log_{10}(S_E/S_a)$ no
+of relative area $S_\mathrm{a}/S_\mathrm{E}$ caps the composite at $10\log_{10}(S_\mathrm{E}/S_\mathrm{a})$ no
 matter what the panels are: one per cent of open area caps it at 20 dB, ten per
 cent at 10 dB. Add a 0.24 m² gap at the door foot — one per cent of this shell,
 the width of a badly hung door — and the fiche's 28.9 dB becomes 15.1 dB.

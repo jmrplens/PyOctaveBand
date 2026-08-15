@@ -595,7 +595,7 @@ def _excitation_pattern(freqs: np.ndarray, levels_cochlea: np.ndarray) -> np.nda
 
     Each filter is a level-dependent rounded-exponential (roex) filter
     (Formulae 2-5): the upper skirt slope
-    :math:`p_u = 4 f_c / \mathrm{ERB}_n` is level
+    :math:`p_\mathrm{u} = 4 f_\mathrm{c} / \mathrm{ERB}_n` is level
     independent while the lower skirt slope ``p_l`` decreases (broadens) with
     the source level X_j of the component it filters, giving the
     level-dependent upward spread of excitation.

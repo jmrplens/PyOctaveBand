@@ -34,7 +34,7 @@ semiplano izquierdo ($s = -1/\tau$).
 | Salida | Envolvente continua con ponderación temporal (un valor por muestra) | Salida escalonada (un valor cada $\tau$ segundos) |
 | Unidades de entrada | Presión acústica en bruto (Pa); se eleva al cuadrado internamente | Se espera la magnitud energética (Pa²) como entrada |
 | Filtro | Promediado exponencial estable (polo en $s=-1/\tau$) | Diseño teóricamente inestable (polo en el semiplano derecho) estabilizado reiniciando el estado cada $\tau$ segundos |
-| Comportamiento | Verdadera ponderación temporal IEC | Más cercano a un integrador por bloques ($L_{eq,\tau}$) |
+| Comportamiento | Verdadera ponderación temporal IEC | Más cercano a un integrador por bloques ($L_{\mathrm{eq},\tau}$) |
 
 Un polo en el eje real negativo corresponde a una respuesta al impulso
 exponencial decreciente ($h(t) \propto e^{-t/\tau}$), exactamente lo que
@@ -44,16 +44,16 @@ por bloques lo oculta, pero cambia la naturaleza de la medición.
 
 De esa ecuación salen además los valores de referencia del apartado siguiente, y
 vale la pena deducirlos una vez en lugar de dar por buena la Tabla 4. Intégrala
-partiendo del reposo sobre una ráfaga de duración $T_b$ y la envolvente alcanza
-$(1-e^{-T_b/\tau})$ del valor estacionario que acabaría produciendo ese mismo
+partiendo del reposo sobre una ráfaga de duración $T_\mathrm{b}$ y la envolvente alcanza
+$(1-e^{-T_\mathrm{b}/\tau})$ del valor estacionario que acabaría produciendo ese mismo
 tono, así que el nivel máximo con ponderación temporal respecto del régimen
 estacionario es
 
 $$
-\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_b/\tau}\right)
+\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_\mathrm{b}/\tau}\right)
 $$
 
-que es la Ecuación (7) de IEC 61672-1:2013. Con $\tau_F = 0,125$ s da
+que es la Ecuación (7) de IEC 61672-1:2013. Con $\tau_\mathrm{F} = 0,125$ s da
 −0,98 dB a 200 ms, −4,82 dB a 50 ms, −11,14 dB a 10 ms y −20,99 dB a
 1 ms: la columna «Objetivo IEC» entera de la Tabla 4, con el redondeo de la
 propia norma. La CI exige la identidad en todas las filas de Fast y Slow
@@ -61,9 +61,9 @@ propia norma. La CI exige la identidad en todas las filas de Fast y Slow
 modo que la transcripción de la tabla está comprobada y no dada por buena.
 
 La consecuencia sostiene el resto de esta página. Como la respuesta es una
-función suave de $T_b/\tau$, un detector que resuelva de verdad la ecuación
+función suave de $T_\mathrm{b}/\tau$, un detector que resuelva de verdad la ecuación
 sigue la columna entera de una vez; un detector que promedia sobre bloques fijos
-de 125 ms no contiene ningún $T_b$, y solo puede acertar allí donde la ráfaga
+de 125 ms no contiene ningún $T_\mathrm{b}$, y solo puede acertar allí donde la ráfaga
 llene un bloque por casualidad.
 
 ## Verificación frente a IEC 61672-1 (ráfagas tonales)
@@ -77,18 +77,18 @@ al nivel de régimen estacionario.
 La Tabla 4 fija la excitación pero no el montaje, así que aquí va el montaje. Se
 genera una sinusoide de 4 kHz a 48 kHz durante 3 s. La **referencia** es el nivel
 Fast estacionario de esa sinusoide continua, promediado sobre su último medio
-segundo: una vez asentado el integrador, este es el $L_A$ en la notación de la
+segundo: una vez asentado el integrador, este es el $L_\mathrm{A}$ en la notación de la
 norma. Después se recorta de *esa misma* sinusoide la ráfaga de la duración
 indicada, de modo que su fase y su amplitud son idénticas a las del tono de
 referencia, y se rodea de ceros. La **respuesta** es el máximo de la envolvente
 Fast de esa ráfaga, expresado respecto de la referencia:
-$10\log_{10}(\max \text{env} / \text{ref})$, que es el $L_{AFmax} - L_A$ de la
+$10\log_{10}(\max \text{env} / \text{ref})$, que es el $L_\mathrm{AFmax} - L_\mathrm{A}$ de la
 norma. Fíjate en qué verifica y qué no: la IEC 61672-1 enuncia estos límites
 para el dispositivo de entrada eléctrica sobre un rango definido de niveles
 estacionarios y sin indicación de sobrecarga (apartados 5.9.5-5.9.6), así que
 los números de abajo verifican la *balística*, no un instrumento completo. Los
 mismos valores de referencia están transcritos en
-`tests/filters/test_iec_compliance.py` para F y S y para la columna $L_{AE}$.
+`tests/filters/test_iec_compliance.py` para F y S y para la columna $L_{\mathrm{A}E}$.
 
 **Resultados de phonometry (ponderación Fast):**
 
@@ -153,7 +153,7 @@ estacionario, 1,0 dB por encima del objetivo.
   description="Una ráfaga tonal de 4 kHz se desliza a través de la frontera entre dos bloques de integración de 125 ms. La envolvente exponencial Fast alcanza el mismo máximo en todas las alineaciones porque la duración de la ráfaga entra en su ecuación diferencial, mientras que la escalera del Leq por bloques sube y baja según dónde vaya cayendo la ráfaga, y el panel de lectura frente a alineación va construyendo las dos trazas sobre el corredor de clase 1 sombreado. El segundo acto lo repite con una ráfaga de 200 ms, donde el corredor tiene la mitad de anchura."
 />
 
-*La traza exponencial es plana porque $10\lg(1-e^{-T_b/\tau})$ contiene $T_b$
+*La traza exponencial es plana porque $10\lg(1-e^{-T_\mathrm{b}/\tau})$ contiene $T_\mathrm{b}$
 y nada del reloj; la traza por bloques es un retrato de la alineación y de
 nada más. Las dos lecturas se calculan aquí con
 `time_weighting(x, fs, mode="fast")` y con `leq` sobre segmentos consecutivos
@@ -165,7 +165,7 @@ procedimiento de arriba.*
 - Si necesitas **envolventes Fast/Slow/Impulse conformes con la norma**
   (comportamiento de sonómetro, un nivel por muestra), usa
   [`time_weighting`](/phonometry/es/signals/levels/time-weighting/) de phonometry.
-- Si necesitas un **$L_{eq}$ promediado por bloques para cada intervalo**, esa
+- Si necesitas un **$L_\mathrm{eq}$ promediado por bloques para cada intervalo**, esa
   es una métrica distinta e igualmente válida; puedes calcularla con
   [`leq`](/phonometry/es/signals/levels/levels/) sobre segmentos consecutivos.
 - Ambos enfoques son útiles; simplemente responden a preguntas distintas. La
@@ -197,7 +197,7 @@ metrología:
 | Norma | Qué se verifica | Archivo de test |
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Tabla 3 | Ponderación A/C/Z en las 34 frecuencias nominales, límites de clase 1, a 48 y 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas tonales (de 1 s a 1 ms) y la columna $L_{AE}$ para `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Tabla 4 | Respuestas F/S a ráfagas tonales (de 1 s a 1 ms) y la columna $L_{\mathrm{A}E}$ para `sel()` | `tests/filters/test_iec_compliance.py` |
 | IEC 61672-1:2013 Tabla 5 | Respuestas de pico de un ciclo/medio ciclo de `lc_peak()`, límites de clase 1 | `tests/signals/test_levels.py` |
 | IEC 61260-1:2014 Tabla 1 | Límites de aceptación de clase 1/2 del banco de filtros mediante `verify_filter_class()` | `tests/filters/test_compliance.py` |
 | ISO 7196:1995 Tabla 2 | Ponderación G (infrasonidos) en todos los valores nominales de respuesta, 0,25–315 Hz | `tests/filters/test_g_weighting.py` |

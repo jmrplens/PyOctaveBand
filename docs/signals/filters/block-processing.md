@@ -152,7 +152,7 @@ value the functional API hands back as `initial_state` (see
   the outputs no longer concatenate into the continuous result. This is why
   `detrend` must be `False` in stateful mode.
 - **Not every metric streams.** Energy metrics accumulate cleanly (a
-  running $L_{eq}$ is a running energy sum), but rank statistics do not: the
+  running $L_\mathrm{eq}$ is a running energy sum), but rank statistics do not: the
   $L_{90}$ of a recording is not any combination of per-block $L_{90}$
   values. Stream the *envelope* and compute percentiles once, on the pooled
   result.

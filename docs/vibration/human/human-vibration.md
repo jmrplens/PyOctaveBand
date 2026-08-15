@@ -29,7 +29,7 @@ at $s = j\,2\pi f$ (ISO 8041-1 Formulae (1)–(5)): a second-order Butterworth
 transition** carrying the overall gain $K$, and an **upward step**:
 
 $$
-H(s) = H_h(s)\,H_l(s)\,H_t(s)\,H_s(s).
+H(s) = H_\mathrm{h}(s)\,H_\mathrm{l}(s)\,H_\mathrm{t}(s)\,H_\mathrm{s}(s).
 $$
 
 A single Table 3 parameter set $(f_1, Q_1, f_2, Q_2, f_3, f_4, Q_4, f_5, Q_5,
@@ -117,10 +117,10 @@ three hand axes with every $k = 1$ (ISO 5349-1).
 
 The basic evaluation is the **weighted r.m.s. acceleration**. From a
 one-third-octave spectrum it is (ISO 2631-1 Eq. (9); the identical construction
-gives the hand-arm $a_{hw}$ of ISO 5349-1 Eq. (A.1)):
+gives the hand-arm $a_\mathrm{hw}$ of ISO 5349-1 Eq. (A.1)):
 
 $$
-a_w = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
+a_\mathrm{w} = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
 $$
 
 with $W_i$ the weighting factor at band centre $i$ and $a_i$ the measured band
@@ -188,8 +188,8 @@ When the r.m.s. value understates an intermittent or shock-laden exposure,
 ISO 2631-1 adds dose measures computed on the weighted time signal: the
 **running r.m.s.** and its maximum, the **maximum transient vibration value**
 `MTVV` (Eq. (4), a 1 s running r.m.s.); the fourth-power **vibration dose
-value** $\text{VDV} = \left(\int a_w^4\,dt\right)^{1/4}$ (Eq. (5)); the **motion
-sickness dose value** $\text{MSDV} = \left(\int a_w^2\,dt\right)^{1/2}$; and the
+value** $\text{VDV} = \left(\int a_\mathrm{w}^4\,dt\right)^{1/4}$ (Eq. (5)); the **motion
+sickness dose value** $\text{MSDV} = \left(\int a_\mathrm{w}^2\,dt\right)^{1/2}$; and the
 **crest factor** (peak / r.m.s.), whose value above 9 signals that the basic
 method is inadequate.
 
@@ -213,7 +213,7 @@ r.m.s. accelerations with the posture multiplying factors $k_j$ (ISO 2631-1
 Eq. (10); for hand-arm, ISO 5349-1 Eq. (1) with every $k = 1$):
 
 $$
-a_v = \sqrt{\sum_j k_j^2\,a_{wj}^2}.
+a_\mathrm{v} = \sqrt{\sum_j k_j^2\,a_{\mathrm{w}j}^2}.
 $$
 
 ```python
@@ -233,7 +233,7 @@ inside which caution is indicated and above which risks are likely; Directive
 2002/44/EC turns that guidance into the enforceable $A(8)$ action and limit
 values used below. The *comfort* assessment of clause 8 instead combines all
 axes (and, where relevant, backrest, feet and rotation) into the vibration
-total value $a_v$ with its own $k$ set and reads it on the Annex C scale for
+total value $a_\mathrm{v}$ with its own $k$ set and reads it on the Annex C scale for
 public transport, whose deliberately overlapping bands run from "not
 uncomfortable" below 0.315 m/s² to "extremely uncomfortable" above 2 m/s²; the
 standard defines no comfort limit, since acceptable magnitudes depend on trip
@@ -247,9 +247,9 @@ several operations combine through their partial exposures
 $A_i(8) = a_i\,\sqrt{T_i/T_0}$ as $A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1
 Eqs. (2)/(3); ISO 5349-2 Eqs. (1)–(3)). Directive 2002/44/EC fixes which
 magnitude $a$ each kind is based on (Annex, points 1): for hand-arm vibration
-the vector total $a_{hv}$ (Part A), but for whole-body vibration the *highest*
-frequency-weighted axis value $\max(1.4\,a_{wx},\,1.4\,a_{wy},\,a_{wz})$
-(Part B), not the vector total $a_v$ above. `wbv_exposure_basis` returns that
+the vector total $a_\mathrm{hv}$ (Part A), but for whole-body vibration the *highest*
+frequency-weighted axis value $\max(1.4\,a_{\mathrm{w}x},\,1.4\,a_{\mathrm{w}y},\,a_{\mathrm{w}z})$
+(Part B), not the vector total $a_\mathrm{v}$ above. `wbv_exposure_basis` returns that
 dominant-axis value:
 
 ```python
@@ -322,8 +322,8 @@ plt.show()
 ## 4. Exposure–response guidance
 
 For hand-transmitted vibration, ISO 5349-1 Annex C relates the daily exposure to
-the group-mean lifetime $D_y$ (in years) that produces vibration-white-finger in
-10 % of an exposed group, $D_y = 31.8\,A(8)^{-1.06}$ (Eq. (C.1)):
+the group-mean lifetime $D_\mathrm{y}$ (in years) that produces vibration-white-finger in
+10 % of an exposed group, $D_\mathrm{y} = 31.8\,A(8)^{-1.06}$ (Eq. (C.1)):
 
 ```python
 from phonometry import vibration
@@ -348,8 +348,8 @@ directive it is assessed against, a header grid (company via `client`,
 operator/worker via `specimen`, workplace via `test_room`, and the
 `instrumentation` and `calibration` free-text fields of `ReportMetadata`), the
 per-operation exposure analysis (each operation's vibration magnitude, the
-hand-arm vector total $a_{hv}$ or the whole-body Directive Part B dominant-axis
-value $a_{w,max}$, its daily exposure time $T_i$ and the partial exposure
+hand-arm vector total $a_\mathrm{hv}$ or the whole-body Directive Part B dominant-axis
+value $a_\mathrm{w,max}$, its daily exposure time $T_i$ and the partial exposure
 $A_i(8)$, closed by the daily total and the combined $A(8)$) with the
 contribution chart, and the boxed $A(8)$ with its exposure zone. The fiche then
 assesses $A(8)$ against Directive 2002/44/EC (Article 3): the exposure action

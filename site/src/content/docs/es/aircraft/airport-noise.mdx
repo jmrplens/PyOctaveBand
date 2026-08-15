@@ -53,7 +53,7 @@ en [Propagación exterior](/phonometry/es/environment/propagation/outdoor-propag
 
 El método de ruido de aeropuerto de ECAC Doc 29 describe la aeronave con tablas
 **nivel-potencia-distancia (NPD)**. `npd_level` lee el nivel de evento
-($L_{Amax}$/`SEL`) para una potencia y distancia arbitrarias, interpolando
+($L_\mathrm{Amax}$/`SEL`) para una potencia y distancia arbitrarias, interpolando
 linealmente en potencia (Ec. 4-3) y log-linealmente en distancia oblicua
 (Ec. 4-4).
 
@@ -178,7 +178,7 @@ la distancia de ese segmento, y se corrige término a término:
 |---|---|---|---|
 | `impedance_adjustment` | $\Delta_{\text{imp}}$ | §4.2.1 | el aire del aeródromo frente a la impedancia de referencia de 409,81 N·s/m³ de las tablas |
 | `duration_correction` | $\Delta_V$ | §4.5.1 | la velocidad del segmento frente a la velocidad de referencia NPD (solo niveles de exposición) |
-| `engine_installation_correction` | $\Delta_I(\varphi)$ | §4.5.3 | dónde van montados los motores, a través del ángulo de depresión |
+| `engine_installation_correction` | $\Delta_\mathrm{I}(\varphi)$ | §4.5.3 | dónde van montados los motores, a través del ángulo de depresión |
 | `lateral_attenuation` | $\Lambda(\beta, \ell)$ | §4.5.4 | el efecto suelo y la refracción para un receptor apartado a un lado |
 | `noise_fraction` | $\Delta_F$ | §4.5.6 | la parte de la energía de la trayectoria infinita que aporta un segmento finito (solo niveles de exposición) |
 | `start_of_roll_directivity` | $\Delta_{\text{SOR}}(\psi)$ | §4.5.7 | el lóbulo trasero de chorro detrás de un segmento del recorrido de despegue |
@@ -190,8 +190,8 @@ de estribor arriba, y $\varphi = \beta \pm \varepsilon$ el ángulo de depresión
 en los ejes de la aeronave, con signo más para observadores a estribor y menos
 para los de babor (§4.5.2). A lo largo de la traza, $\lambda$ es la longitud del
 segmento, $q$ la distancia del inicio del segmento al pie de la perpendicular
-(negativa por detrás del segmento), $d_p$ la distancia perpendicular al segmento
-prolongado y $d_s$ la distancia más corta al segmento en sí (§4.4.1). $\psi$ es
+(negativa por detrás del segmento), $d_\mathrm{p}$ la distancia perpendicular al segmento
+prolongado y $d_\mathrm{s}$ la distancia más corta al segmento en sí (§4.4.1). $\psi$ es
 el acimut desde el morro del que depende el lóbulo de inicio del recorrido.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_doc29_segment_es.svg" alt="Cuatro paneles de la geometría de segmentos de trayectoria de ECAC Doc 29 dibujados a escala. Panel a, observador al costado de un segmento en ascenso de 464 m: la trayectoria de vuelo infinita a trazos con el segmento finito en trazo grueso entre S1 y S2, el pie de la perpendicular Sp, q = 214 m desde S1, la distancia oblicua mínima dp = 526 m hasta el observador O y las distancias d1 = 568 m y d2 = 582 m a los extremos del segmento; una nota dice que con q entre 0 y la longitud del segmento la consulta NPD para un nivel de exposición usa dp. Panel b, observador detrás del segmento con q = -300 m: el pie de la perpendicular cae en la prolongación por delante del observador, dp = 520 m va a trazos y la distancia más corta ds coincide con d1 = 600 m, con una nota de que la consulta usa ds detrás de un recorrido de despegue y dp en los demás casos. Panel c, el plano normal a la trayectoria de vuelo: la aeronave con el plano de las alas alabeado 15 grados, la trayectoria de propagación bajando hasta un receptor a 1,2 m sobre la línea del suelo, el ángulo de elevación beta de 18 grados en el receptor y el ángulo de depresión phi igual a beta más epsilon, 33 grados, en la aeronave. Panel d, vista en planta detrás del recorrido de despegue: la pista con un reactor en el inicio del recorrido, arcos traseros a trazos, el acimut psi de 120 grados medido desde el morro y el observador a la distancia dSOR. El pie indica que phi es beta más epsilon a estribor y beta menos epsilon a babor, que psi va de 90 grados al través a 180 grados por la popa con el lóbulo de chorro máximo cerca de 120 grados, y que la consulta NPD usa dp para niveles de exposición y ds para niveles máximos, con una cota inferior de 30 m, y que el término de inicio del recorrido se escala por 762 m entre dSOR más allá de 762 m" width="92%" />
@@ -200,7 +200,7 @@ Se ensamblan en un nivel de exposición de segmento como
 
 $$
 L_{E,\text{seg}} = \bigl[L_{E\infty}(P, d) + \Delta_{\text{imp}}\bigr]
- + \Delta_V + \Delta_I(\varphi) - \Lambda(\beta, \ell)
+ + \Delta_V + \Delta_\mathrm{I}(\varphi) - \Lambda(\beta, \ell)
  + \Delta_F + \Delta_{\text{SOR}}
 $$
 
@@ -375,7 +375,7 @@ Los
 contornos más exteriores son los menos fiables: los fijan los segmentos a mayor
 distancia oblicua, donde la tabla NPD se está extrapolando. Esto es un
 movimiento, no un estudio: un contorno de planeamiento acumula muchos eventos
-así en un índice tipo $L_{den}$, que es el «No cubierto» de esta página.*
+así en un índice tipo $L_\mathrm{den}$, que es el «No cubierto» de esta página.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -500,7 +500,7 @@ segmento** es su
 $\varphi = \beta \pm \varepsilon$ según de qué lado de la traza esté el
 receptor (§4.5.2). **Detrás de un recorrido de despegue**, la geometría lateral
 al extremo más cercano del §4.5.5 sustituye a la de la trayectoria de nivel
-equivalente, que es el mismo cambio que hace que la consulta NPD use allí $d_s$.
+equivalente, que es el mismo cambio que hace que la consulta NPD use allí $d_\mathrm{s}$.
 Y un **segmento de pista** toma la media Ec. 4-13b de las velocidades de sus
 extremos en lugar de la interpolación cuadrática que usa un segmento en el aire,
 mientras que toda consulta NPD lleva una cota inferior en los 30 m recomendados.
@@ -516,7 +516,7 @@ interpolación NPD de `npd_level`/`npd_curve` (Ecs. 4-3, 4-4), las correcciones
 por segmento `impedance_adjustment`, `lateral_attenuation` (suelo blando de
 SAE AIR 5662), `engine_installation_correction`, `duration_correction`,
 `noise_fraction` y `start_of_roll_directivity`, su ensamblado en
-`SEL`/$L_{Amax}$ por `event_level` y el contorno en malla de tierra
+`SEL`/$L_\mathrm{Amax}$ por `event_level` y el contorno en malla de tierra
 `noise_contour`, incluidos el recorrido de aterrizaje, el ángulo de alabeo por
 segmento y la geometría lateral de extremo más próximo. Validada por debajo de
 0,01 dB contra el workbook de referencia de la Parte 1 del Vol. 3 de la Doc 29
@@ -525,7 +525,7 @@ segmento y la geometría lateral de extremo más próximo. Validada por debajo d
 
 <ScopeClaim status="not-covered" label="No cubierto">
 La cadena construye solo contornos de evento único: no ensambla los índices
-acumulados multievento (una suma tipo $L_{den}$ sobre un programa de vuelos
+acumulados multievento (una suma tipo $L_\mathrm{den}$ sobre un programa de vuelos
 completo) que un estudio de contornos Doc 29 completo necesita por encima de
 estos niveles de evento único. Las propias tablas NPD son un dato de entrada,
 no una predicción: la biblioteca interpola las tablas que se le aportan para
@@ -559,7 +559,7 @@ blando con hierba.
   términos de atenuación de ISO 9613-2 y el efecto suelo que la atenuación
   lateral condensa en una sola curva.
 - [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): los
-  índices de largo plazo tipo $L_{den}$ que un estudio de aeropuerto completo
+  índices de largo plazo tipo $L_\mathrm{den}$ que un estudio de aeropuerto completo
   acumula a partir de eventos únicos.
 - Referencia de la API:
   [`aircraft.airport_noise`](/phonometry/es/reference/api/aeroacoustics/airport-noise/).

@@ -126,26 +126,26 @@ reutilizan entre ellas. Hay que leerlas por sección:
 | $A$ | Atenuación por banda de octava, en dB (ISO 9613-2) | Área de absorción equivalente de la sala, en m² |
 | $A_0$ | — | Área de absorción de referencia, 1 m²; salvo en el término de aire de ISO 3745, donde $A_0 = a(f)\,r$ es un producto de absorción adimensional |
 | $C_1$, $C_2$ | Constantes de pantalla en $D_z$ (ISO 9613-2) | Correcciones meteorológicas (ISO 3745, ISO 3741) |
-| $K$ | — | $K_1$ de fondo, $K_2$ de campo reverberante, $K_I$ de ajuste por impulsos, y la $K$ a secas el factor de error de sesgo de los métodos de intensidad; $K_{met}$ es el factor meteorológico de pantalla de ISO 9613-2 |
+| $K$ | — | $K_1$ de fondo, $K_2$ de campo reverberante, $K_\mathrm{I}$ de ajuste por impulsos, y la $K$ a secas el factor de error de sesgo de los métodos de intensidad; $K_\mathrm{met}$ es el factor meteorológico de pantalla de ISO 9613-2 |
 
 ## Descriptores ambientales (ISO 1996-1)
 
-El **nivel día-tarde-noche** $L_{den}$ (ISO 1996-1:2016, 3.6.4) es un promedio energético sobre las 24 h del día con penalizaciones de **+5 dB para la tarde** y **+10 dB para la noche**:
+El **nivel día-tarde-noche** $L_\mathrm{den}$ (ISO 1996-1:2016, 3.6.4) es un promedio energético sobre las 24 h del día con penalizaciones de **+5 dB para la tarde** y **+10 dB para la noche**:
 
 $$
-L_{den} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_d\ 10^{0{,}1 L_{day}} + t_e\ 10^{0{,}1 (L_{evening} + 5)} + t_n\ 10^{0{,}1 (L_{night} + 10)} \right]\right\rbrace
+L_\mathrm{den} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_\mathrm{d}\ 10^{0{,}1 L_\mathrm{day}} + t_\mathrm{e}\ 10^{0{,}1 (L_\mathrm{evening} + 5)} + t_\mathrm{n}\ 10^{0{,}1 (L_\mathrm{night} + 10)} \right]\right\rbrace
 $$
 
-con duraciones de periodo por defecto $(t_d, t_e, t_n) = (12, 4, 8)$ h; cada país puede definir los periodos de forma distinta (3.6.4 Nota 1). El **nivel día-noche** $L_{dn}$ (3.6.5) prescinde del periodo de tarde:
+con duraciones de periodo por defecto $(t_\mathrm{d}, t_\mathrm{e}, t_\mathrm{n}) = (12, 4, 8)$ h; cada país puede definir los periodos de forma distinta (3.6.4 Nota 1). El **nivel día-noche** $L_\mathrm{dn}$ (3.6.5) prescinde del periodo de tarde:
 
 $$
-L_{dn} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_d\ 10^{0{,}1 L_{day}} + t_n\ 10^{0{,}1 (L_{night} + 10)} \right]\right\rbrace, \qquad (t_d, t_n) = (15, 9)\ \text{h}
+L_\mathrm{dn} = 10 \log_{10}\left\lbrace\frac{1}{24}\left[ t_\mathrm{d}\ 10^{0{,}1 L_\mathrm{day}} + t_\mathrm{n}\ 10^{0{,}1 (L_\mathrm{night} + 10)} \right]\right\rbrace, \qquad (t_\mathrm{d}, t_\mathrm{n}) = (15, 9)\ \text{h}
 $$
 
 Ambos son casos particulares del **nivel de evaluación compuesto de día completo** (6.5, que generaliza las Fórmulas 5–6), donde cada periodo $i$ aporta su nivel de evaluación $L_i$ más un ajuste $K_i$, ponderado por su fracción del día:
 
 $$
-L_R = 10 \log_{10}\left[ \sum_i \frac{h_i}{24}\ 10^{0{,}1 (L_i + K_i)} \right], \qquad \sum_i h_i = 24\ \text{h}
+L_\mathrm{R} = 10 \log_{10}\left[ \sum_i \frac{h_i}{24}\ 10^{0{,}1 (L_i + K_i)} \right], \qquad \sum_i h_i = 24\ \text{h}
 $$
 
 Los ajustes $K_i$ cubren las penalizaciones horarias (ISO 1996-1 Tabla A.1: tarde 5 dB, noche 10 dB) así como los ajustes por carácter de la fuente (p. ej. penalizaciones tonales), que las evaluaciones TNR/PR de ECMA-418-1 permiten justificar objetivamente.
@@ -153,20 +153,20 @@ Los ajustes $K_i$ cubren las penalizaciones horarias (ISO 1996-1 Tabla A.1: tard
 **Qué son las penalizaciones, y qué significa el número.** Los +5 y +10 dB no son
 física: nada del sonido cambia a las 19:00. Codifican un hallazgo de
 dosis-respuesta, que la misma energía acústica se declara más molesta cuando
-interrumpe una tarde en casa o el sueño de una noche, así que $L_{den}$ es un
+interrumpe una tarde en casa o el sueño de una noche, así que $L_\mathrm{den}$ es un
 indicador de *molestia* construido con niveles acústicos y nunca debe leerse
 como si fuera uno de ellos. En la escala en la que vive, una noche rural anda
 por los 40 y pico, una calle residencial tranquila por la mitad de los 50 y una
 fachada de una arteria urbana concurrida por la parte alta de los 60, y la
 Directiva de ruido ambiental publica los mapas estratégicos en bandas de 5 dB
-de $L_{den}$ desde 55 dB hacia arriba. La ponderación decide además dónde merece la pena aplicar una medida
+de $L_\mathrm{den}$ desde 55 dB hacia arriba. La ponderación decide además dónde merece la pena aplicar una medida
 correctora: una hora de noche entra con $10 \times 8/24$ frente a los $12/24$
 del día, así que un decibelio ganado de noche vale unas 6,7 veces un decibelio
 ganado de día, pero solo cuando la noche ya es lo bastante ruidosa como para
 importar, y el punto de cruce es aritmético. El término de noche supera al de día
 cuando el nivel nocturno se pone a menos de unos 8 dB del diurno; en el perfil de
 abajo la noche está 14,4 dB por debajo del día, así que aporta solo el 12,5 % del
-total frente al 51,3 % del día, y quitar 3 dB al día mueve el $L_{den}$ 1,3 dB
+total frente al 51,3 % del día, y quitar 3 dB al día mueve el $L_\mathrm{den}$ 1,3 dB
 mientras que quitarle 3 dB a la noche lo mueve 0,3 dB. Conviene mirar el reparto
 antes de decidir dónde gastar.
 
@@ -174,12 +174,12 @@ Consulta la [guía de niveles ambientales](/phonometry/es/environment/assessment
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" width="80%" />
 
-*Un perfil $L_{Aeq}$ de 24 horas dividido en día, tarde y noche, las
-penalizaciones de +5/+10 dB y el $L_{den}$ resultante de 64,3 dB: una fachada de
+*Un perfil $L_\mathrm{Aeq}$ de 24 horas dividido en día, tarde y noche, las
+penalizaciones de +5/+10 dB y el $L_\mathrm{den}$ resultante de 64,3 dB: una fachada de
 arteria urbana, de lleno dentro del rango que cartografía la Directiva. El día
 promedia 64,4 dB, la tarde 62,6 dB y la noche 50,0 dB; las penalizaciones suben
 las líneas de tarde y de noche por encima de sus propios niveles, y aun así el
-$L_{den}$ cae a menos de 0,1 dB del día, porque una noche así de tranquila no
+$L_\mathrm{den}$ cae a menos de 0,1 dB del día, porque una noche así de tranquila no
 puede moverlo.*
 
 ## Prominencia de sonidos impulsivos (NT ACOU 112)
@@ -212,21 +212,21 @@ ajuste al nivel del periodo de medición toma el impulso determinante (el de
 mayor $P$) (apartado 8, Fórmula 2):
 
 $$
-K_I = 1{,}8\ (P - 5)\ \text{dB} \quad (P > 5;\ \text{si no, } K_I = 0),
+K_\mathrm{I} = 1{,}8\ (P - 5)\ \text{dB} \quad (P > 5;\ \text{si no, } K_\mathrm{I} = 0),
 $$
 
 y el nivel de evaluación de la jornada completa combina energéticamente los
 periodos ajustados (apartado 8, Nota 1):
 
 $$
-L_{Ar,T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
 $$
 
-$K_I$ es exactamente el tipo de ajuste por carácter de la fuente que entra en el nivel de evaluación compuesto de ISO 1996-1 anterior. Los anclajes $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11{,}95$ y $K_I(P{=}10) = 9{,}0$ dB se reproducen exactamente.
+$K_\mathrm{I}$ es exactamente el tipo de ajuste por carácter de la fuente que entra en el nivel de evaluación compuesto de ISO 1996-1 anterior. Los anclajes $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11{,}95$ y $K_\mathrm{I}(P{=}10) = 9{,}0$ dB se reproducen exactamente.
 
 **Qué documento citar.** ISO ha publicado desde entonces la misma construcción
 como ISO/PAS 1996-3:2022, así que un informe de campaña puede citar cualquiera de
-las dos; la prominencia $P$ y el ajuste $K_I$ implementados aquí siguen la
+las dos; la prominencia $P$ y el ajuste $K_\mathrm{I}$ implementados aquí siguen la
 formulación de NT ACOU 112 que la PAS reproduce. Lo que exige un ajuste de
 entrada es ISO 1996-2:2017, la parte de medición: el procedimiento objetivo solo
 decide de cuánto es el ajuste, y es ISO 1996-1 la que después combina los
@@ -247,14 +247,14 @@ temperatura. La ISO 9613-1:1993, Ec. (5) da el coeficiente de atenuación de ton
 puro $\alpha$ en decibelios por metro:
 
 $$
-\alpha = 8{,}686\ f^2 \Big[ 1{,}84\times10^{-11} \big(p_a/p_r\big)^{-1} \big(T/T_0\big)^{1/2}
-       + \big(T/T_0\big)^{-5/2} \big( 0{,}01275\ \tfrac{e^{-2239{,}1/T}}{f_{rO} + f^2/f_{rO}}
-       + 0{,}1068\ \tfrac{e^{-3352{,}0/T}}{f_{rN} + f^2/f_{rN}} \big) \Big],
+\alpha = 8{,}686\ f^2 \Big[ 1{,}84\times10^{-11} \big(p_\mathrm{a}/p_\mathrm{r}\big)^{-1} \big(T/T_0\big)^{1/2}
+       + \big(T/T_0\big)^{-5/2} \big( 0{,}01275\ \tfrac{e^{-2239{,}1/T}}{f_\mathrm{rO} + f^2/f_\mathrm{rO}}
+       + 0{,}1068\ \tfrac{e^{-3352{,}0/T}}{f_\mathrm{rN} + f^2/f_\mathrm{rN}} \big) \Big],
 $$
 
-con las frecuencias de relajación del oxígeno y el nitrógeno $f_{rO}$, $f_{rN}$
+con las frecuencias de relajación del oxígeno y el nitrógeno $f_\mathrm{rO}$, $f_\mathrm{rN}$
 de la Ec. (3)/(4), las condiciones de referencia $T_0 = 293{,}15$ K,
-$p_r = 101{,}325$ kPa (apartado 4.2) y la concentración molar de vapor de agua $h$
+$p_\mathrm{r} = 101{,}325$ kPa (apartado 4.2) y la concentración molar de vapor de agua $h$
 a partir de la humedad relativa (anexo B). A baja frecuencia
 $\alpha \propto f^2$; cerca de cada frecuencia de relajación el término
 correspondiente alcanza un máximo y decae, razón por la que $\alpha$ sube dos
@@ -262,7 +262,7 @@ décadas de 50 Hz a 10 kHz y por la que subir la humedad barre un pico por la
 banda. La biblioteca reproduce la Tabla 1 con menos del 0,4 % (la propia
 precisión impresa de la norma), muy dentro de su $\pm 10$ % declarado; pasar
 `exact_midband=True` ajusta cada frecuencia a los centros exactos
-$f_m = 1000 \cdot 10^{k/10}$ (Nota 5) empleados para calcular esa tabla. El mismo
+$f_\mathrm{m} = 1000 \cdot 10^{k/10}$ (Nota 5) empleados para calcular esa tabla. El mismo
 $\alpha$ es la única vía hacia el coeficiente de atenuación de potencia de la
 ISO 354 $m = \alpha/(10 \log_{10} e)$, expuesto como `air_attenuation_m`.
 
@@ -305,62 +305,62 @@ La ISO 9613-2:1996 predice el nivel por banda de octava en un receptor bajo
 **propagación a favor del viento**, es decir, con un viento flojo soplando de la
 fuente al receptor, o con la inversión térmica moderada junto al suelo que curva
 los rayos del mismo modo (apartado 5), como
-$L_{fT}(DW) = L_W + D_c - A$ (Ec. (3)), donde $D_c$ es la
+$L_{fT}(DW) = L_W + D_\mathrm{c} - A$ (Ec. (3)), donde $D_\mathrm{c}$ es la
 corrección de directividad y $A$ la atenuación por bandas de octava, suma de
 mecanismos físicos independientes (Ec. (4)):
 
 $$
-A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc}.
+A = A_\mathrm{div} + A_\mathrm{atm} + A_\mathrm{gr} + A_\mathrm{bar} + A_\mathrm{misc}.
 $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/outdoor_attenuation_breakdown_es.svg" alt="Desglose por bandas de octava de la atenuación de ISO 9613-2 en barras apiladas de Adiv, Aatm, Agr y Abar con la atenuación total A superpuesta, para un recorrido de 200 m sobre suelo poroso con una barrera de 4 m" width="80%" />
 
 *Los cuatro términos a su tamaño relativo real, banda a banda, para un recorrido
-de 200 m sobre suelo poroso con una barrera de 4 m. $A_{div}$ vale 57 dB en
-todas las bandas porque es geometría pura. $A_{atm}$ es nulo a 63 Hz y vale
+de 200 m sobre suelo poroso con una barrera de 4 m. $A_\mathrm{div}$ vale 57 dB en
+todas las bandas porque es geometría pura. $A_\mathrm{atm}$ es nulo a 63 Hz y vale
 18,7 dB a 8 kHz, así que es el término que decide hasta dónde llegan las
-frecuencias altas y ningún otro. $A_{gr}$ es donde viven las bandas bajas y es
+frecuencias altas y ningún otro. $A_\mathrm{gr}$ es donde viven las bandas bajas y es
 **negativo** a 63 Hz (−4,6 dB: la reflexión en el suelo añade energía en vez de
-quitarla). $A_{bar}$ está en su tope de 20 dB de 2 kHz hacia arriba, pero cae a
+quitarla). $A_\mathrm{bar}$ está en su tope de 20 dB de 2 kHz hacia arriba, pero cae a
 cero a 250 Hz, porque la forma de borde superior resta el efecto del suelo al
-que renuncia el recorrido apantallado, $A_{bar} = D_z - A_{gr} \geq 0$, y
-250 Hz es justo donde $A_{gr}$ alcanza su máximo. Qué término merece la pena
+que renuncia el recorrido apantallado, $A_\mathrm{bar} = D_z - A_\mathrm{gr} \geq 0$, y
+250 Hz es justo donde $A_\mathrm{gr}$ alcanza su máximo. Qué término merece la pena
 afinar depende por completo de la banda y de la geometría.*
 
 La biblioteca implementa los cuatro términos generales del apartado 7; el
-$A_{misc}$ informativo (vegetación, zonas industriales, edificación) y las
+$A_\mathrm{misc}$ informativo (vegetación, zonas industriales, edificación) y las
 reflexiones se dejan a criterio del usuario. La **divergencia geométrica** es la
 expansión esférica desde una fuente puntual,
-$A_{div} = 20 \log_{10}(d/d_0) + 11$ dB con $d_0 = 1$ m (Ec. (7)): exactamente
+$A_\mathrm{div} = 20 \log_{10}(d/d_0) + 11$ dB con $d_0 = 1$ m (Ec. (7)): exactamente
 51 dB a 100 m, +6 dB por cada duplicación de la distancia. La **absorción
-atmosférica** es $A_{atm} = \alpha\ d$ (Ec. (8)) con $\alpha$ el coeficiente de
-la ISO 9613-1 anterior. El **efecto del suelo** $A_{gr} = A_s + A_r + A_m$
+atmosférica** es $A_\mathrm{atm} = \alpha\ d$ (Ec. (8)) con $\alpha$ el coeficiente de
+la ISO 9613-1 anterior. El **efecto del suelo** $A_\mathrm{gr} = A_\mathrm{s} + A_\mathrm{r} + A_\mathrm{m}$
 (Ec. (9)) suma una región fuente, receptor y media, cada una a partir de las
 funciones $a'/b'/c'/d'$ de la Tabla 3 y su factor de suelo $G$ (0 duro,
-1 poroso); un $A_{gr}$ negativo es una ganancia neta por la reflexión en el
+1 poroso); un $A_\mathrm{gr}$ negativo es una ganancia neta por la reflexión en el
 suelo. Una forma alternativa, solo ponderada A,
-$A_{gr} = 4{,}8 - (2 h_m/d)[17 + 300/d] \ge 0$ (Ec. (10)) se ofrece para suelo
+$A_\mathrm{gr} = 4{,}8 - (2 h_\mathrm{m}/d)[17 + 300/d] \ge 0$ (Ec. (10)) se ofrece para suelo
 poroso cuando solo importa el nivel ponderado A, acompañada del índice de ángulo
 sólido $D_\Omega$ (Ec. (11)). El **apantallamiento** por una barrera es la
 pérdida por inserción debida a la difracción
 
 $$
-D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big] \quad\text{dB},
+D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_\mathrm{met} \big] \quad\text{dB},
 $$
 
 (Ec. (14)) con $C_2 = 20$ (o 40 cuando las reflexiones en el suelo se tratan por
 fuentes imagen), $C_3 = 1$ para un borde o la Ec. (15) para un borde doble, la
-diferencia de recorrido $z = d_{ss} + d_{sr} - d$ (Ec. (16)/(17)), longitud de
-onda $\lambda = 340/f$ y el factor meteorológico $K_{met}$ (Ec. (18)); $D_z$ se
+diferencia de recorrido $z = d_\mathrm{ss} + d_\mathrm{sr} - d$ (Ec. (16)/(17)), longitud de
+onda $\lambda = 340/f$ y el factor meteorológico $K_\mathrm{met}$ (Ec. (18)); $D_z$ se
 limita a 20 dB (un borde) o 25 dB (doble). Para una barrera de borde superior, el
 efecto del suelo del recorrido apantallado se integra en el término de
-apantallamiento, $A_{bar} = D_z - A_{gr} \ge 0$ (Ec. (12), Nota 13); para una
-barrera lateral $A_{bar} = D_z$ y se conserva el término del suelo (Ec. (13)).
+apantallamiento, $A_\mathrm{bar} = D_z - A_\mathrm{gr} \ge 0$ (Ec. (12), Nota 13); para una
+barrera lateral $A_\mathrm{bar} = D_z$ y se conserva el término del suelo (Ec. (13)).
 (La norma fija $\lambda = 340/f$ dentro del término de apantallamiento en lugar
 de deducir $c$ de la temperatura, así que la atenuación por barrera es
 independiente de la temperatura por construcción; el término de absorción
 atmosférica de más arriba no lo es.) El
-nivel medio a largo plazo resta la corrección meteorológica $C_{met}$ (Ec. (6),
+nivel medio a largo plazo resta la corrección meteorológica $C_\mathrm{met}$ (Ec. (6),
 (21)/(22)).
 
 **Dónde se aplica el método, y qué cuenta como barrera.** Está definido para las
@@ -368,7 +368,7 @@ ocho bandas de octava nominales de 63 Hz a 8 kHz y para fuentes puntuales,
 descomponiendo una fuente extensa en subfuentes puntuales (apartados 4–5), así
 que una cadena en tercios de octava o una banda de 31,5 Hz quedan fuera. Predice
 el nivel *a favor del viento*; a una situación en contra del viento o con viento
-cruzado solo se llega a través de la corrección a largo plazo $C_{met}$, nunca
+cruzado solo se llega a través de la corrección a largo plazo $C_\mathrm{met}$, nunca
 evaluando directamente la Ec. (3). La forma de suelo solo ponderada A de la
 Ec. (10) arrastra dos condiciones propias más: suelo poroso o mayoritariamente
 poroso, y un sonido que no sea un tono puro. Y un objeto se gana un $D_z$ solo si
@@ -387,18 +387,18 @@ exactitud declarada más allá de 1000 m, donde el método es una extrapolación
 
 ## Exposición al ruido en el trabajo (ISO 9612)
 
-La magnitud en sí, $L_{EX,8h}$, se define a partir de la exposición sonora en
+La magnitud en sí, $L_\mathrm{EX,8h}$, se define a partir de la exposición sonora en
 [Análisis de señal](/phonometry/es/reference/theory/signal-analysis/#métricas-de-evento-y-de-dosis);
 esta sección trata de medirla en un puesto de trabajo y de acotar su
 incertidumbre.
 
 La ISO 9612:2009 es el método de ingeniería (clase de exactitud 2) para el nivel
-diario de exposición al ruido de un trabajador $L_{EX,8h}$, normalizado a una
+diario de exposición al ruido de un trabajador $L_\mathrm{EX,8h}$, normalizado a una
 jornada nominal de 8 h. Tres **estrategias de medición** cambian esfuerzo por
 representatividad. El método *basado en tareas* (apartado 9) divide la jornada en
 tareas, promedia en energía $I \ge 3$ muestras por tarea (Ec. 7) y suma en
 energía las contribuciones de cada tarea
-$L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0)$ (Ec. 9/10). El método
+$L_{\mathrm{EX,8h},m} = L_{p,\mathrm{A,eq}T,m} + 10 \log_{10}(T_m/T_0)$ (Ec. 9/10). El método
 *basado en la función* (apartado 10) promedia en energía $N \ge 5$ muestras
 aleatorias sobre un grupo de exposición homogéneo (Ec. 11) y normaliza la
 duración efectiva de la jornada (Ec. 12); el método *de jornada completa*
@@ -427,7 +427,7 @@ silencio la declaración de clase 2.
 El balance de incertidumbre del **anexo C** es normativo. La incertidumbre
 típica combinada es $u^2 = \sum c_i^2 u_i^2$ (C.1) y la incertidumbre expandida es
 $U = k\ u$ con $k = 1{,}65$ para un intervalo **unilateral** al 95 %
-(apartado 14), de modo que el límite superior declarado es $L_{EX,8h} + U$. Los
+(apartado 14), de modo que el límite superior declarado es $L_\mathrm{EX,8h} + U$. Los
 métodos por tareas y por función difieren de forma instructiva: la incertidumbre
 de muestreo del ruido de la tarea $u_{1a}$ divide la suma de desviaciones al
 cuadrado entre $I(I-1)$ (el error típico de la media, Ec. C.6), mientras que la
@@ -440,9 +440,9 @@ duración de la tarea $u_{1b}$ (Ec. C.7); el balance por función/jornada
 completa (Ec. C.9) lee $c_1 u_1$ de la Tabla C.4 en función de $(N, u_1)$ y suma
 en cuadratura la incertidumbre del instrumento $u_2$ (Tabla C.5) y la
 incertidumbre de posición del micrófono $u_3 = 1{,}0$ dB. Los niveles de pico
-$L_{p,Cpeak}$ se declaran sin incertidumbre: el anexo C no da método para ellos
+$L_{p,\mathrm{Cpeak}}$ se declaran sin incertidumbre: el anexo C no da método para ellos
 (Tabla C.5, Nota 1). Los tres ejemplos resueltos de los anexos D (tarea,
-$L_{EX,8h} = 84{,}3$ dB, $U = 2{,}7$ dB), E (función, $88{,}1$ dB, $3{,}8$ dB) y F
+$L_\mathrm{EX,8h} = 84{,}3$ dB, $U = 2{,}7$ dB), E (función, $88{,}1$ dB, $3{,}8$ dB) y F
 (jornada completa, $90{,}1$ dB, $3{,}4$ dB) se reproducen con la precisión impresa
 de la norma: todos los intermedios del anexo E son exactos dígito a dígito, y su
 nivel final difiere solo por el redondeo previo que la propia norma aplica al
@@ -452,8 +452,8 @@ trabajo](/phonometry/es/perception/hearing/occupational-exposure/)).
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/exposure_uncertainty_es.svg" alt="Exposición basada en tareas del anexo D de ISO 9612: las tres contribuciones de tarea al LEX,8h como barras, la línea del LEX,8h diario sumado en energía y la banda del límite superior unilateral al 95 por ciento LEX,8h + U por encima de ella" width="80%" />
 
 *Lo que compra el balance: la jornada resuelta del anexo D, sus tres
-contribuciones de tarea, el $L_{EX,8h}$ sumado en energía y la banda hasta
-$L_{EX,8h} + U$ que el intervalo unilateral al 95 % añade encima. El resultado
+contribuciones de tarea, el $L_\mathrm{EX,8h}$ sumado en energía y la banda hasta
+$L_\mathrm{EX,8h} + U$ que el intervalo unilateral al 95 % añade encima. El resultado
 que se declara es la pareja, no la línea, y con $U = 2{,}7$ dB el límite superior
 queda 2,7 dB por encima del número, que basta por sí solo para cruzar un valor de
 acción.*
@@ -504,7 +504,7 @@ determinación. (ISO 3746 usa la misma forma con umbrales ponderados A más
 gruesos: 10 dB, 3 dB y un tope de 3 dB.) La respuesta honrada a un margen de 2 dB
 es una hora del día más tranquila o una superficie de medición más cerca de la
 fuente, no una corrección mayor. En cuanto a $K_2$, puede despreciarse por debajo
-de 0,5 dB, y el método de ingeniería solo es válido mientras $K_{2A} \le 4$ dB
+de 0,5 dB, y el método de ingeniería solo es válido mientras $K_{2\mathrm{A}} \le 4$ dB
 (7 dB para el método de inspección de ISO 3746, apartado 4.3), así que una sala
 que devuelve 6 dB no es una corrección que aplicar sino una sala que rechazar. Y
 conviene leer con cuidado el sentido de $K_2$: crece con $4S/A$, así que agrandar
@@ -530,7 +530,7 @@ que el grado de ingeniería usa 10 posiciones clave sobre un plano reflectante
 reducido. `measurement_positions()` las devuelve escaladas al radio elegido, y
 `plot_microphone_positions()` dibuja el conjunto antes de medir nada.
 ISO 3746 (inspección) comparte las matemáticas con criterios más
-laxos. La incertidumbre expandida es $U = 2 \sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$.
+laxos. La incertidumbre expandida es $U = 2 \sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$.
 
 ### Grado de precisión en cámaras anecoicas (ISO 3745)
 
@@ -545,8 +545,8 @@ no hace falta corrección por encima de un margen de 15 dB, y por debajo de
 10 dB (250 Hz – 5 kHz) o 6 dB (bandas extremas) la corrección se satura y el
 resultado se marca como cota superior (apartado 9.4.2). Los términos
 meteorológicos son
-$C_1 = -10 \log_{10}(p_s/p_{s0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ y
-$C_2 = -10 \log_{10}(p_s/p_{s0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ con
+$C_1 = -10 \log_{10}(p_\mathrm{s}/p_{\mathrm{s}0}) + 5 \log_{10}[(273 + \theta)/\theta_0]$ y
+$C_2 = -10 \log_{10}(p_\mathrm{s}/p_{\mathrm{s}0}) + 15 \log_{10}[(273 + \theta)/\theta_1]$ con
 $\theta_0 = 314$ K, $\theta_1 = 296$ K: en la referencia de 23 °C /
 101,325 kPa, $C_2 = 0$ exactamente y $C_1 = -0{,}128$ dB; y
 $C_3 = A_0 (1{,}0053 - 0{,}0012 A_0)^{1{,}6}$ con $A_0 = a(f)\ r$ restituye la
@@ -554,11 +554,11 @@ absorción del aire de ISO 9613-1 sobre el radio de medición. Las
 disposiciones de micrófonos de los Anexos D/E están incorporadas como tablas
 de coordenadas
 exactas dígito a dígito (40 posiciones de igual área; el juego espejo 21–40 se
-añade cuando la dispersión del SPL por banda supera $N_M/2$, apartado 9.3.2),
+añade cuando la dispersión del SPL por banda supera $N_\mathrm{M}/2$, apartado 9.3.2),
 y las mismas posiciones dan el índice de directividad
 $DI_i = L_{pi} - \bar{L}_p$ (Ec. 21). El ejemplo de incertidumbre del
 apartado 10.5, $U = 2\sqrt{0{,}5^2 + 2{,}0^2} = 4{,}12$ dB, se reproduce, junto
-con los valores de $\sigma_{R0}$ por banda de las Tablas 2/3.
+con los valores de $\sigma_{\mathrm{R}0}$ por banda de las Tablas 2/3.
 
 ### Cámara reverberante (ISO 3741)
 
@@ -581,7 +581,7 @@ no necesita caracterizarse.
 
 La intensidad acústica es el flujo neto de energía $\vec{I} = \overline{p\ \vec{u}}$,
 así que por el teorema de la divergencia la potencia que atraviesa una
-superficie cerrada es $P = \sum_i \langle I_{n,i} \rangle\ S_i$. Una fuente
+superficie cerrada es $P = \sum_i \langle I_{\mathrm{n},i} \rangle\ S_i$. Una fuente
 estacionaria *fuera* de la superficie aporta flujo neto nulo (su energía entra y
 sale), y por eso la intensidad rechaza el ruido de fondo estacionario, pero aún
 puede llevar el $P$ de una banda a negativo, en cuyo caso esa banda es no
@@ -610,15 +610,15 @@ indicador superficial presión-intensidad $F_{pI} = \bar{L}_p - L_W + 10 \log_{1
 (reactividad) y el indicador de potencia parcial negativa
 $F_{+/-} = 10 \log_{10}(\sum_i \lvert P_i \rvert / \lvert \sum_i P_i \rvert)$
 (recirculación), junto con la capacidad dinámica de la sonda
-$L_d = \delta_{pI0} - K$ ($K = 10$ dB grado 2, 7 dB grado 3), que debe superar
-$F_{pI}$. Una banda obtiene el grado de ingeniería cuando $L_d > F_{pI}$,
+$L_\mathrm{d} = \delta_{pI0} - K$ ($K = 10$ dB grado 2, 7 dB grado 3), que debe superar
+$F_{pI}$. Una banda obtiene el grado de ingeniería cuando $L_\mathrm{d} > F_{pI}$,
 $F_{+/-} \le 3$ dB y los dos barridos repetidos coinciden dentro del límite de
 la Tabla 2.
 
 Esos mismos dos indicadores llevan tres juegos de nombres a lo largo de la
 familia ISO 9614: la ISO 9614-1 los llama $F_2$ (presión-intensidad), $F_3$
 (potencia parcial negativa) y $F_4$ (no uniformidad del campo); la Parte 2
-escribe $F_{pI}$ y $F_{+/-}$; la Parte 3 escribe $F_{pIn}$ y $F_S$. Cada
+escribe $F_{pI}$ y $F_{+/-}$; la Parte 3 escribe $F_{pIn}$ y $F_\mathrm{S}$. Cada
 subsección de aquí usa los símbolos de su propia parte. La nomenclatura de $F_2$
 a $F_4$ es la que se emplea en [Intensidad
 acústica](/phonometry/es/reference/theory/signal-analysis/#intensidad-acústica-iec-61043).
@@ -639,17 +639,17 @@ las barras de $F_4$ fijan cuántas posiciones necesita la superficie.*
 
 ISO 9614-3:2002 eleva el método de barrido al grado de precisión con una
 maquinaria de indicadores más estricta. Las potencias parciales
-$P_i = I_{n,i} S_i$ (Ec. 5) se suman como antes, pero la validez descansa
+$P_i = I_{\mathrm{n},i} S_i$ (Ec. 5) se suman como antes, pero la validez descansa
 ahora en los indicadores presión-intensidad con y sin signo
-$F_{pIn} = \bar{L}_p - L_{In}$ (Ecs. B.3/B.6, los F2/F3 de ISO 9614-1) y en
-la no uniformidad normalizada de la intensidad $F_S$ (Ec. B.8), a través de
+$F_{pIn} = \bar{L}_p - L_{I\mathrm{n}}$ (Ecs. B.3/B.6, los F2/F3 de ISO 9614-1) y en
+la no uniformidad normalizada de la intensidad $F_\mathrm{S}$ (Ec. B.8), a través de
 cinco criterios de aceptación (Anexo C): repetibilidad del barrido
-$|L_{In}(1) - L_{In}(2)| \le s/2$ (C.1), capacidad dinámica
-$L_d = \delta_{pI0} - K \ge F_{pIn}(\text{con signo})$ con el factor de error
+$|L_{I\mathrm{n}}(1) - L_{I\mathrm{n}}(2)| \le s/2$ (C.1), capacidad dinámica
+$L_\mathrm{d} = \delta_{pI0} - K \ge F_{pIn}(\text{con signo})$ con el factor de error
 de sesgo de precisión $K = 10$ dB (C.2),
 $F_{pIn}(\text{con signo}) - F_{pIn}(\text{sin signo}) \le 3$ dB (C.3),
-$F_S \le 2$ (C.4) y la convergencia de densidad de barrido
-$0{,}83 \le F_S(1)/F_S(2) \le 1{,}2$ (C.5). La Ec. 10 normaliza el resultado a
+$F_\mathrm{S} \le 2$ (C.4) y la convergencia de densidad de barrido
+$0{,}83 \le F_\mathrm{S}(1)/F_\mathrm{S}(2) \le 1{,}2$ (C.5). La Ec. 10 normaliza el resultado a
 las condiciones meteorológicas de referencia,
 $L_{W0} = L_W - 15 \log_{10}[(B/101325) \cdot 296{,}15/(273{,}15 + \theta)]$. Las
 bandas con potencia neta negativa son no determinables (apartado 9.2) y se

@@ -132,7 +132,7 @@ Two traps come with the method. A rippled but tone-free spectrum can produce a
 correction, which the standard itself allows you to reject after a narrow-band
 re-analysis (§4.3.1 Step 10). And a tone falling between two bands splits its
 excess, so the raw correction comes out too small; the **bandsharing
-adjustment** $\Delta_B$ — the shortfall of $C$ at the $\mathrm{PNLTM}$ record
+adjustment** $\Delta_\mathrm{B}$ — the shortfall of $C$ at the $\mathrm{PNLTM}$ record
 against the mean of the records within one second of it — adds it back before
 the 10 dB-down window is located.
 
@@ -349,10 +349,10 @@ In the simplified method (§8.3) each band of the $\mathrm{PNLTM}$ spectrum is
 moved to the reference day by
 
 $$
-\mathrm{SPL}_R(i) = \mathrm{SPL}(i)
- + 0.01\,[\alpha(i) - \alpha_R(i)]\,QK
- + 0.01\,\alpha_R(i)\,(QK - Q_rK_r)
- + 20\lg\frac{QK}{Q_rK_r},
+\mathrm{SPL}_\mathrm{R}(i) = \mathrm{SPL}(i)
+ + 0.01\,[\alpha(i) - \alpha_\mathrm{R}(i)]\,QK
+ + 0.01\,\alpha_\mathrm{R}(i)\,(QK - Q_\mathrm{r}K_\mathrm{r})
+ + 20\lg\frac{QK}{Q_\mathrm{r}K_\mathrm{r}},
 $$
 
 which swaps the test-day absorption coefficient for the reference one over the
@@ -360,17 +360,17 @@ measured path, re-absorbs over the corrected path length, and applies an
 inverse-square term for the change in path length (§8.3.2.1). The adjusted
 spectrum is re-run through the noy law and the tone correction, the bandsharing
 adjustment of the test day is added back, and the difference
-$\Delta_1 = \mathrm{PNLTM}_R - \mathrm{PNLTM}$ is one of four terms added to the
+$\Delta_1 = \mathrm{PNLTM}_\mathrm{R} - \mathrm{PNLTM}$ is one of four terms added to the
 measured EPNL:
 
 $$
-\mathrm{EPNL}_R = \mathrm{EPNL} + \Delta_1 + \Delta_{\text{peak}}
+\mathrm{EPNL}_\mathrm{R} = \mathrm{EPNL} + \Delta_1 + \Delta_{\text{peak}}
  + \Delta_2 + \Delta_3
 $$
 
 (§8.3.6). $\Delta_{\text{peak}}$ handles a secondary peak within 2 dB of
 $\mathrm{PNLTM}$ that overtakes the adjusted maximum (§8.3.3);
-$\Delta_2 = -7.5\lg(QK/Q_rK_r) + 10\lg(V_G/V_{GR})$ is the change in duration
+$\Delta_2 = -7.5\lg(QK/Q_\mathrm{r}K_\mathrm{r}) + 10\lg(V_\mathrm{G}/V_\mathrm{GR})$ is the change in duration
 from the path length and the ground speed (§8.3.4); and $\Delta_3$ corrects for
 the difference between the propulsion operating parameters flown and those
 specified for the reference condition, from manufacturer sensitivity curves
@@ -380,9 +380,9 @@ approach disagreement above 4 EPNdB, or a result within 1 EPNdB of the Chapter 3
 limit.
 
 The library supplies the ingredients and not the bookkeeping. `air_attenuation`
-and `sae_band_attenuation` below are exactly the $\alpha(i)$ and $\alpha_R(i)$
+and `sae_band_attenuation` below are exactly the $\alpha(i)$ and $\alpha_\mathrm{R}(i)$
 of the first two terms, and the EPNL machinery re-runs an adjusted spectrum as
-readily as a measured one; the flight-path geometry $QK/Q_rK_r$ and the four
+readily as a measured one; the flight-path geometry $QK/Q_\mathrm{r}K_\mathrm{r}$ and the four
 $\Delta$ terms themselves are not implemented. Adjust first, then report: the
 EPNL this page returns is a test-day value, and a `requirement` verdict is only
 a certification verdict once §8 has been applied.
@@ -435,8 +435,8 @@ Correcting a measured flyover to reference atmospheric conditions needs the
 one-third-octave-band attenuation over the path. The pure-tone coefficient is
 the ISO 9613-1 one (identical, per ARP 5534 §3.1) provided by `air_attenuation`;
 `sae_band_attenuation` adds the **SAE Method** (ARP 5534 §3.2.2) mapping the
-pure-tone mid-band path attenuation $\delta_t = \alpha\,s$ to the band
-attenuation $\delta_B$, consistent with the Exact Method well beyond the 50 dB
+pure-tone mid-band path attenuation $\delta_\mathrm{t} = \alpha\,s$ to the band
+attenuation $\delta_\mathrm{B}$, consistent with the Exact Method well beyond the 50 dB
 Approximate-Method limit.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption.svg" alt="Aircraft atmospheric absorption versus frequency for two path lengths; the SAE-Method band attenuation stays below the pure-tone mid-band value at high absorption" width="82%" />

@@ -45,9 +45,9 @@ correlating (Figure 13.11), because the spectral content of the envelope
 - not of the signal - is where amplitude modulations show as discrete
 lines. The optional `band` argument reproduces the figure's band-pass
 front end (the classical bearing-envelope chain: isolate the resonance
-band, then envelope it). An AM tone with modulation frequency $f_m$
+band, then envelope it). An AM tone with modulation frequency $f_\mathrm{m}$
 (on an analysis bin) and depth `m` puts a line of closed-form
-amplitude at exactly $f_m$, the anchor the tests pin; off-bin
+amplitude at exactly $f_\mathrm{m}$, the anchor the tests pin; off-bin
 modulation lines read low by the taper's scalloping loss.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -136,13 +136,13 @@ frequency reads low by the taper's scalloping loss -- up to about
 single-record amplitude spectrum.
 
 Closed forms for an AM tone
-$A_0 (1 + m \cos(2 \pi f_m t)) \cos(2 \pi f_c t)$
-with $0 \le m < 1$ and $f_m$ on an analysis bin:
+$A_0 (1 + m \cos(2 \pi f_\mathrm{m} t)) \cos(2 \pi f_\mathrm{c} t)$
+with $0 \le m < 1$ and $f_\mathrm{m}$ on an analysis bin:
 
 * `kind="magnitude"`: a line of amplitude $A_0 m$ at
-  $f_m$; mean level $A_0$.
-* `kind="squared"`: lines $2 A_0^2 m$ at $f_m$ and
-  $A_0^2 m^2 / 2$ at $2 f_m$; mean level
+  $f_\mathrm{m}$; mean level $A_0$.
+* `kind="squared"`: lines $2 A_0^2 m$ at $f_\mathrm{m}$ and
+  $A_0^2 m^2 / 2$ at $2 f_\mathrm{m}$; mean level
   $A_0^2 (1 + m^2/2)$.
 
 Amplitude modulation of rotating machinery (bearing and gear defect
@@ -164,7 +164,7 @@ untouched) before the detector, the Figure 13.11 front end.
 | `window` | Taper (any scipy window name; default Hann). The amplitude is corrected for the taper's coherent gain. |
 | `nfft` | FFT length, at least `x.size` (default: the record length). |
 | `remove_dc` | Remove the envelope mean before the transform (default `True`, the Figure 13.11 DC remover); the mean is reported either way. |
-| `band` | Optional `(low, high)` band-pass edges, in Hz ($0 < \text{low} < \text{high} < f_s/2$), applied to the record before envelope detection as a zero-phase 4th-order Butterworth (`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude roll-off). Default `None`: detect on the record as given. |
+| `band` | Optional `(low, high)` band-pass edges, in Hz ($0 < \text{low} < \text{high} < f_\mathrm{s}/2$), applied to the record before envelope detection as a zero-phase 4th-order Butterworth (`scipy.signal.sosfiltfilt`, giving an 8th-order magnitude roll-off). Default `None`: detect on the record as given. |
 
 **Returns:** An [`EnvelopeSpectrumResult`](/phonometry/reference/api/signals/envelope/#envelopespectrumresult).
 

@@ -334,10 +334,10 @@ def _sti_from_mtf(
 
     Noise handling: ``snr`` alone multiplies ``m`` by
     :math:`1/(1 + 10^{-SNR/10})`,
-    which is exactly the :math:`I_k/(I_k + I_{n,k})` factor of the standard.
+    which is exactly the :math:`I_k/(I_k + I_{\mathrm{n},k})` factor of the standard.
     When ``level`` is provided the full intensity-domain correction
-    :math:`m' = m \cdot I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})` is used
-    instead, with ``ambient`` (or ``level - snr``) defining :math:`I_{n,k}`,
+    :math:`m' = m \cdot I_k / (I_k + I_{\mathrm{am},k} + I_{\mathrm{rt},k} + I_{\mathrm{n},k})` is used
+    instead, with ``ambient`` (or ``level - snr``) defining :math:`I_{\mathrm{n},k}`,
     so the noise degradation is never applied twice.
     """
     m = _truncated_mtf(mtf)

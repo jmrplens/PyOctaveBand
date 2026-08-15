@@ -174,13 +174,13 @@ $k_{rm}$ real, el resto son evanescentes y se extinguen al cabo de unas
 pocas profundidades de agua. El campo es la suma modal (Ec. 5.14),
 
 $$
-p(r, z) \simeq \frac{i\,e^{-i\pi/4}}{\rho(z_s)\sqrt{8\pi r}}
-  \sum_m \Psi_m(z_s)\,\Psi_m(z)\,
+p(r, z) \simeq \frac{i\,e^{-i\pi/4}}{\rho(z_\mathrm{s})\sqrt{8\pi r}}
+  \sum_m \Psi_m(z_\mathrm{s})\,\Psi_m(z)\,
   \frac{e^{\,i k_{rm} r}}{\sqrt{k_{rm}}},
 $$
 
 cada modo ponderado por su excitación en la profundidad de la fuente
-$\Psi_m(z_s)$ y su amplitud en la del receptor $\Psi_m(z)$, y la pérdida
+$\Psi_m(z_\mathrm{s})$ y su amplitud en la del receptor $\Psi_m(z)$, y la pérdida
 de propagación coherente sale como $PL = -20 \log_{10}\,\lvert
 p(r,z)/p_0(1\,\mathrm{m})\rvert$ (Ec. 5.15). `normal_modes` discretiza la
 ecuación en profundidad por diferencias finitas (un problema de autovalores
@@ -287,7 +287,7 @@ perfil independiente de la distancia la lentitud horizontal se conserva a
 lo largo de cada rayo, que es la **ley de Snell** en forma continua,
 $\cos\theta(z)/c(z) = \cos\theta_0/c(z_0)$: un rayo se curva hacia la
 velocidad del sonido más baja, se aplana según crece $c$ y gira donde
-$c(z_t) = c(z_s)/\cos\theta_0$. En un gradiente lineal $c(z) = c_0 + gz$
+$c(z_\mathrm{t}) = c(z_\mathrm{s})/\cos\theta_0$. En un gradiente lineal $c(z) = c_0 + gz$
 los arcos son exactamente circulares con radio
 $R = c_0/(g \cos\theta_0)$, la forma cerrada contra la que se valida el
 trazado de rayos; en un perfil de aguas profundas la familia de rayos se reenfoca
@@ -296,7 +296,7 @@ sección 1. `ray_trace` integra todos los ángulos de lanzamiento a la vez
 con un esquema Runge-Kutta de cuarto orden y paso fijo, reflejando en la
 superficie y en el fondo, y arrastra con ellos el tiempo de propagación como
 un tercer estado del mismo paso ($dt/dr = 1/(\xi c^2)$, con
-$\xi = \cos\theta_0/c(z_s)$ el invariante de Snell):
+$\xi = \cos\theta_0/c(z_\mathrm{s})$ el invariante de Snell):
 
 ```python
 import numpy as np

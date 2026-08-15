@@ -21,10 +21,10 @@ of two forms selected by the relevant noise test code (clause 4):
   unlikely to exceed at the stated confidence level.
 
 ``K`` combines the measurement uncertainty (reproducibility) and, for a batch,
-the production spread (clauses 3.20 to 3.24; :math:`K = 1.645 \sigma_R` for a
+the production spread (clauses 3.20 to 3.24; :math:`K = 1.645 \sigma_\mathrm{R}` for a
 single machine, Annex A.2.2). Verification (clause 6) compares a verification
 measurement ``L_1`` against the declared form: for a single machine the
-combined form is verified when :math:`L_1 \le L_d` and the dual-number form
+combined form is verified when :math:`L_1 \le L_\mathrm{d}` and the dual-number form
 when :math:`L_1 \le (L + K)`, the sum of the separately rounded declared
 values (clause 6.2).
 
@@ -67,13 +67,13 @@ class OperatingModeDeclaration:
     ``K_WA`` (ISO 4871 clause 3.16), and optionally the A-weighted emission sound
     pressure level ``L_pA`` at a work station with its uncertainty ``K_pA``
     (clause 3.11). The derived declared single-number values follow from
-    :math:`L_d = L + K` (clause 3.15), the sum rounded to the nearest decibel.
+    :math:`L_\mathrm{d} = L + K` (clause 3.15), the sum rounded to the nearest decibel.
     When a verification measurement ``L_1`` (an A-weighted sound power level
     determined for verification, clause 6) is supplied, :attr:`verified`
     applies the single-machine criterion of clause 6.2 for the combined form
-    (verified when :math:`L_1 \le L_{WAd}`) and :attr:`verified_dual` the
+    (verified when :math:`L_1 \le L_{W\mathrm{Ad}}`) and :attr:`verified_dual` the
     dual-number one (verified when
-    :math:`L_1 \le \mathrm{round}(L_{WA}) + \mathrm{round}(K_{WA})`).
+    :math:`L_1 \le \mathrm{round}(L_{W\mathrm{A}}) + \mathrm{round}(K_{W\mathrm{A}})`).
 
     :ivar mode: Operating-mode label printed as the table column header (e.g.
         ``"Operating mode 1"``); it identifies the operating mode of clause 5 c.
@@ -148,7 +148,7 @@ class OperatingModeDeclaration:
         r"""Declared single-number sound power level (ISO 4871 clause 3.15).
 
         Clause 3.15 defines the declared value
-        :math:`L_{WAd} = L_{WA} + K_{WA}` as the *sum* of the measured
+        :math:`L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}` as the *sum* of the measured
         value and its uncertainty, rounded to the nearest decibel: the sum is
         formed from the unrounded quantities (clause 3.12) and rounded once,
         not assembled from the separately rounded dual-number values (3.16).
@@ -159,7 +159,7 @@ class OperatingModeDeclaration:
     def declared_emission_pressure_level(self) -> int | None:
         r"""Declared single-number emission pressure level (clause 3.15).
 
-        The sum :math:`L_{pAd} = L_{pA} + K_{pA}` rounded once to the nearest
+        The sum :math:`L_{p\mathrm{Ad}} = L_{p\mathrm{A}} + K_{p\mathrm{A}}` rounded once to the nearest
         decibel (clause 3.15); ``None`` when no emission sound pressure level
         is declared for the mode.
         """
@@ -189,7 +189,7 @@ class OperatingModeDeclaration:
 
         ``True`` when the verification measurement ``L_1`` does not exceed the
         combined (single-number) declared value ``L_WAd``
-        (:math:`L_1 \le L_{WAd}`),
+        (:math:`L_1 \le L_{W\mathrm{Ad}}`),
         ``False`` otherwise, and ``None`` when no verification measurement is
         supplied. For a dual-number declaration use :attr:`verified_dual`,
         which compares against the separately rounded ``L + K``.
@@ -204,7 +204,7 @@ class OperatingModeDeclaration:
 
         ``True`` when the verification measurement ``L_1`` does not exceed the
         sum of the separately rounded declared values
-        (:math:`L_1 \le \mathrm{round}(L_{WA}) + \mathrm{round}(K_{WA})`,
+        (:math:`L_1 \le \mathrm{round}(L_{W\mathrm{A}}) + \mathrm{round}(K_{W\mathrm{A}})`,
         clauses 3.16 and 6.2),
         ``False`` otherwise, and ``None`` when no verification measurement is
         supplied.
@@ -239,7 +239,7 @@ class NoiseEmissionDeclaration:
         accepted and wrapped in a one-tuple.
     :ivar form: Which declaration form the fiche presents, ``"dual-number"``
         (default, clause 3.16: ``L`` and ``K`` separately) or
-        ``"single-number"`` (clause 3.15: the derived :math:`L_d = L + K`).
+        ``"single-number"`` (clause 3.15: the derived :math:`L_\mathrm{d} = L + K`).
     :raises ValueError: If no operating mode is given or ``form`` is unknown.
     """
 
@@ -286,7 +286,7 @@ class NoiseEmissionDeclaration:
         identification and operating conditions, the declared dual- or
         single-number table across the operating-mode columns following the
         ISO 4871 Annex B layouts (``L_WA`` and ``K_WA`` for the dual-number
-        form, the derived :math:`L_{WAd} = L_{WA} + K_{WA}` for the
+        form, the derived :math:`L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}` for the
         single-number form,
         plus the emission sound pressure level when declared), the
         noise-test-code and basic-standards footnote, a verification verdict

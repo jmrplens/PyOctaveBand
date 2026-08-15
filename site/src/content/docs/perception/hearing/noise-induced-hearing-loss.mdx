@@ -58,12 +58,12 @@ of the excess of the noise exposure level over a frequency-dependent cut-off
 $L_0$ (ISO 1999 clause 6.3.1, Formula 2, Table 1):
 
 $$
-N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+N_{50} = \left[u + v\,\log_{10}\frac{t}{t_0}\right](L_\mathrm{EX,8h} - L_0)^2,
 $$
 
 with $t$ the exposure in years and $t_0 = 1$ year; below $L_0$ the effect is
 zero. A population **fractile** follows from two half-Gaussians whose spreads
-$d_u$ (worse than the median) and $d_l$ (better) are given by Formulae 6/7 and
+$d_\mathrm{u}$ (worse than the median) and $d_\mathrm{l}$ (better) are given by Formulae 6/7 and
 Table 3: $N_{50} + z\,d$ with $z$ the standard-normal quantile, clamped at
 zero (clause 6.3.2).
 
@@ -94,7 +94,7 @@ the noise causes no permanent shift. For durations under 10 years the median is
 extrapolated from the 10-year value (Formula 3); a subset of the frequencies
 can be requested with `frequencies=`.
 
-**What $L_{EX,8h}$ must be.** The first argument is the A-weighted noise
+**What $L_\mathrm{EX,8h}$ must be.** The first argument is the A-weighted noise
 exposure level normalised to a nominal eight-hour day — in practice the result
 of an
 [ISO 9612 survey](/phonometry/perception/hearing/occupational-exposure/) of the
@@ -181,7 +181,7 @@ The notch at 3 kHz to 4 kHz, with partial recovery at 6 kHz, is the signature
 of noise damage and the reason audiometric surveillance tests those
 frequencies. It comes out of the model rather than being imposed on it: the
 cut-off level $L_0$ and the coefficients $u$, $v$ of Table 1 are lowest where
-the ear is most vulnerable, so the same $L_{EX,8h}$ buys far more shift at
+the ear is most vulnerable, so the same $L_\mathrm{EX,8h}$ buys far more shift at
 4 kHz than at 500 Hz.
 
 ### Where the model applies
@@ -222,11 +222,11 @@ worker(s)/group, workplace and date of assessment), a table of the median
 $N_{50}$ and the fractile NIPTS at the six audiometric frequencies beside the
 result's own spectrum plot with its fractile band, the boxed shift averaged
 over the 2/3/4 kHz hearing-handicap set together with the exposure conditions
-($L_{EX,8h}$, the duration in years and the population percentage $Q$), and the
+($L_\mathrm{EX,8h}$, the duration in years and the population percentage $Q$), and the
 notes that keep the fiche honest: the values are a statistical prediction for
 the exposed population rather than anyone's audiogram, and ISO 1999 leaves the
 choice of handicap frequencies to the user. `verbose=True` adds the spread
-columns $d_u$/$d_l$; a `requirement` in the metadata is read as the maximum
+columns $d_\mathrm{u}$/$d_\mathrm{l}$; a `requirement` in the metadata is read as the maximum
 acceptable representative NIPTS and adds a PASS/FAIL row (a smaller shift
 passes). Rendering needs reportlab and matplotlib
 (`pip install "phonometry[report,plot]"`); only `engine="reportlab"` is
@@ -447,7 +447,7 @@ line and metadata header as the NIPTS fiche, but a table that carries the age
 component $H$, the noise component $N$ and the combined $H'$ at each
 audiometric frequency, beside the three-curve plot, with the boxed threshold
 averaged over the 2/3/4 kHz hearing-handicap set and the listener and exposure
-conditions (age and sex, $L_{EX,8h}$ over the exposure years, and the
+conditions (age and sex, $L_\mathrm{EX,8h}$ over the exposure years, and the
 population percentage $Q$). Its notes add the one that matters here: the age
 component is database A evaluated from ISO 7029:2017, whose values differ from
 the illustrative Table A.3 selection of ISO 1999, which derives from an earlier
@@ -508,7 +508,7 @@ supply and check it yourself.
 ## See also
 
 - [Occupational noise exposure](/phonometry/perception/hearing/occupational-exposure/): the
-  ISO 9612 survey that produces the $L_{EX,8h}$ this model consumes, and the
+  ISO 9612 survey that produces the $L_\mathrm{EX,8h}$ this model consumes, and the
   uncertainty that comes with it.
 - [Hearing threshold](/phonometry/perception/hearing/hearing-threshold/): the ISO 7029 age
   component $H$ this model adds the noise component to, and the ISO 389-7 zero

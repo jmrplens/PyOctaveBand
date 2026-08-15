@@ -19,7 +19,7 @@ calcula.
 
 | El trabajo | Dónde se responde |
 |---|---|
-| Tengo una grabación WAV y necesito niveles ponderados A, $L_{Aeq}$ y los niveles percentiles | [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/) — IEC 61672-1 e IEC 61260-1, la cadena entera en una página ejecutable, del tono de calibrador a la comprobación de clase de cada etapa |
+| Tengo una grabación WAV y necesito niveles ponderados A, $L_\mathrm{Aeq}$ y los niveles percentiles | [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/) — IEC 61672-1 e IEC 61260-1, la cadena entera en una página ejecutable, del tono de calibrador a la comprobación de clase de cada etapa |
 | Mis números no están en pascales y no sé qué son | [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) — el tono de calibrador, la sensibilidad en pascales por unidad digital, la regla de deriva antes/después y la alternativa digital en dBFS |
 | Necesito un espectro en lugar de un nivel | [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) para niveles de banda (IEC 61260-1), [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/) para una estimación de densidad |
 
@@ -30,7 +30,7 @@ calcula.
 | El tiempo de reverberación de una sala en la que puedo entrar | [Medición de la respuesta al impulso](/phonometry/es/buildings/rooms/room-impulse-response/) para la adquisición (barridos de ISO 18233 y la alternativa del ruido interrumpido), y después [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/) para $T_{20}$, $T_{30}$, EDT, $C_{50}$, $C_{80}$ y el resto de ISO 3382-1 |
 | El tiempo de reverberación de una sala que todavía no existe | [Predicción del tiempo de reverberación](/phonometry/es/buildings/rooms/reverberation-prediction/) — la familia de Sabine, con el apartado que dice qué modelo usar y cuándo fallan todos; [Absorción acústica en recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/) cuando un informe de diseño tiene que citar EN 12354-6 |
 | Si una sala está bastante silenciosa para lo que ocurre dentro | [Criterios de ruido de salas](/phonometry/es/buildings/rooms/room-noise/) — NC, RC Mark II y NR, y el apartado sobre cómo elegir entre ellos |
-| El $R'_w$ o el $D_{nT,w}$ de un elemento separador que he medido en obra | [Medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) (ISO 16283-1/-2) para la medición, y después [Índices globales de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/) (ISO 717-1/-2) para el número único y los términos de adaptación |
+| El $R'_w$ o el $D_\mathrm{nT,w}$ de un elemento separador que he medido en obra | [Medición del aislamiento en campo](/phonometry/es/buildings/insulation/insulation-field/) (ISO 16283-1/-2) para la medición, y después [Índices globales de aislamiento](/phonometry/es/buildings/insulation/insulation-ratings/) (ISO 717-1/-2) para el número único y los términos de adaptación |
 | La prueba de que un muro cumple el CTE DB-HR | [Código Técnico de la Edificación](/phonometry/es/buildings/insulation/spanish-building-code/) — las magnitudes exigidas, contra cuál está escrita cada exigencia y la comprobación de cumplimiento |
 | El aislamiento de un edificio que todavía estoy diseñando | [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/), y [Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/) cuando hay que desglosar las trayectorias por flancos |
 
@@ -48,7 +48,7 @@ calcula.
 
 | El trabajo | Dónde se responde |
 |---|---|
-| El $L_{den}$, el $L_{night}$ o un nivel de evaluación de un estudio ambiental | [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/) — ISO 1996-1/-2, los indicadores y los ajustes que se les suman |
+| El $L_\mathrm{den}$, el $L_\mathrm{night}$ o un nivel de evaluación de un estudio ambiental | [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/) — ISO 1996-1/-2, los indicadores y los ajustes que se les suman |
 | La potencia de la fuente para un mapa de ruido viario o ferroviario | [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/) y [emisión de la fuente ferroviaria](/phonometry/es/environment/sources/cnossos-rail-emission/) — el anexo II de la 2002/49/CE, su lado de la fuente |
 | Cuánto quitan la distancia, una barrera o la meteorología | [Propagación en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/) (ISO 9613-2), [Efecto suelo y barreras](/phonometry/es/environment/propagation/ground-barriers/), [Refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/) |
 | Si un parque eólico cumple | [Ruido de aerogeneradores](/phonometry/es/environment/sources/wind-turbine-noise/) — IEC 61400-11 y la evaluación de audibilidad tonal |
@@ -58,7 +58,7 @@ calcula.
 
 | El trabajo | Dónde se responde |
 |---|---|
-| Si un trabajador supera el límite diario de exposición | [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/) — ISO 9612, el $L_{EX,8h}$ y su incertidumbre |
+| Si un trabajador supera el límite diario de exposición | [Exposición al ruido en el trabajo](/phonometry/es/perception/hearing/occupational-exposure/) — ISO 9612, el $L_\mathrm{EX,8h}$ y su incertidumbre |
 | La sonoridad en sonios, o la agudeza, la aspereza y la intensidad de fluctuación | [Sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) (ISO 532-1/-2/-3), y después [Métricas de calidad sonora](/phonometry/es/perception/psychoacoustics/sound-quality/) |
 | Si un tono dentro de un ruido es audible, y en qué medida | [Audibilidad de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/) (ISO/PAS 20065, DIN 45681) y [Tonos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/), cuyo apartado sobre qué métrica usar cubre las dos |
 | El STI de un sistema de megafonía | [Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/) — IEC 60268-16, directo e indirecto (STIPA) |

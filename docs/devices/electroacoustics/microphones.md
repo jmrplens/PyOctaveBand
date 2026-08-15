@@ -67,7 +67,7 @@ capsule diverge there.
 A microphone's electronics and the air load on its diaphragm set a noise
 floor, expressed as the **equivalent noise level**: the sound pressure
 level whose output would equal the weighted inherent-noise voltage,
-$L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
+$L_\mathrm{N} = 20\log_{10}\bigl((U_\mathrm{N}/M)/20\,\mu\text{Pa}\bigr)$. The standard states it
 with two weightings,
 and the numbers are far apart on paper. The **A-weighted** figure (RMS
 detector) is the one most datasheets quote, e.g. 14 dB(A) for a good studio
@@ -107,7 +107,7 @@ standard's own definitions rather than merely repeated:
   symmetric pattern; the ideal cardioid returns $10\log_{10} 3 = 4.8$ dB.
 - **Equivalent noise level** (17.2). The weighted inherent-noise voltage over
   the rated sensitivity as a sound pressure level,
-  $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, with the
+  $L_\mathrm{N} = 20\log_{10}\bigl((U_\mathrm{N}/M)/20\,\mu\text{Pa}\bigr)$, with the
   signal-to-noise ratio re 1 Pa
   (94 dB SPL) derived from it. The overload sound pressure level (15.2) is
   read from a distortion-against-level curve at the stated THD limit.

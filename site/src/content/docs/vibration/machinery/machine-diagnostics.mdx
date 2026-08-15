@@ -83,18 +83,18 @@ sections 2 and 4.
 | Symbol | Meaning | Unit | Section |
 |---|---|---|---|
 | $N$ | shaft speed (the API's first positional argument) | r/min | 1 |
-| $f_s$ | shaft rotational frequency, $f_s = N/60$ | Hz | all |
+| $f_\mathrm{s}$ | shaft rotational frequency, $f_\mathrm{s} = N/60$ | Hz | all |
 | $Z$ | number of rolling elements in the bearing | — | 1 |
 | $d$, $D$ | rolling-element diameter, pitch diameter | same unit for both | 1 |
 | $\phi$ | contact angle, from the radial plane | degrees | 1 |
 | $g$ | the shared factor $g = (d/D)\cos\phi$ | — | 1 |
 | $N$ | number of gear teeth on the wheel (Norton's Eq. 8.3) | — | 2 |
 | $R$, $p$ | rotor bars, magnetic poles (not pole pairs) | — | 3 |
-| $s$, $f_e$ | slip (a fraction, not a percentage), supply frequency | —, Hz | 3 |
+| $s$, $f_\mathrm{e}$ | slip (a fraction, not a percentage), supply frequency | —, Hz | 3 |
 | $N$, $V$ | number of rotor blades, number of stator vanes | — | 4 |
 | $N$ | number of pumping events per revolution | — | 4 |
 | $n$ | harmonic index (rotor-slot in section 3, blade in section 4) | — | 3, 4 |
-| $m_L$ | number of lobes of a rotating interaction pattern | — | 4 |
+| $m_\mathrm{L}$ | number of lobes of a rotating interaction pattern | — | 4 |
 
 Nothing in the library reuses the name: `bearing_fault_frequencies`,
 `gear_mesh_frequencies` and `blade_pass_frequencies` all take the shaft speed
@@ -110,17 +110,17 @@ four of the eleven are the rotating-inner-race counterparts of rows already in
 the table — either pairwise identical to them or reached through the
 `rotating_race` argument. With the shaft speed $N$ in r/min, $Z$ rolling
 elements of diameter $d$ on a pitch diameter $D$, a contact angle $\phi$,
-and writing $g = (d/D)\cos\phi$ and $f_s = N/60$:
+and writing $g = (d/D)\cos\phi$ and $f_\mathrm{s} = N/60$:
 
 | Name | Meaning | Expression | Norton eq. |
 |---|---|---|---|
-| `shaft` | shaft rotational frequency | $f_s = N/60$ | (8.4) |
-| `FTF` | cage (fundamental train) frequency | $(f_s/2)(1 - g)$ | (8.5) |
-| `FTF_rel` | cage relative to the rotating race | $f_s - \text{FTF}$ | (8.11) |
-| `BSF` | rolling-element rotational frequency | $(f_s/2)(D/d)(1 - g^2)$ | (8.7) |
+| `shaft` | shaft rotational frequency | $f_\mathrm{s} = N/60$ | (8.4) |
+| `FTF` | cage (fundamental train) frequency | $(f_\mathrm{s}/2)(1 - g)$ | (8.5) |
+| `FTF_rel` | cage relative to the rotating race | $f_\mathrm{s} - \text{FTF}$ | (8.11) |
+| `BSF` | rolling-element rotational frequency | $(f_\mathrm{s}/2)(D/d)(1 - g^2)$ | (8.7) |
 | `BDF` | rolling-element spin frequency | $2\,\text{BSF}$ | (8.10) |
-| `BPFO` | element pass frequency, outer race | $Z(f_s/2)(1 - g)$ | (8.8) |
-| `BPFI` | element pass frequency, inner race | $Z(f_s/2)(1 + g)$ | (8.9) |
+| `BPFO` | element pass frequency, outer race | $Z(f_\mathrm{s}/2)(1 - g)$ | (8.8) |
+| `BPFI` | element pass frequency, inner race | $Z(f_\mathrm{s}/2)(1 + g)$ | (8.9) |
 
 Those three geometric quantities carry the whole family, and two of them are
 routinely mistaken. The **pitch** diameter is measured between the rolling-element
@@ -134,7 +134,7 @@ $g = (d/D)\cos\phi$ has a cosine in it.
 
 The two exact identities the section leans on are geometric statements this
 picture makes obvious: every element passes either the outer-race defect or the
-inner-race one, so $\text{BPFO} + \text{BPFI} = Z f_s$; and with a stationary
+inner-race one, so $\text{BPFO} + \text{BPFI} = Z f_\mathrm{s}$; and with a stationary
 outer race the cage carries all $Z$ elements past the defect once per cage
 revolution, so $\text{BPFO} = Z \times \text{FTF}$.
 
@@ -147,7 +147,7 @@ damaged roller is therefore expected at `BDF` (183.3 Hz for the bearing above),
 usually modulated at the cage rate `FTF`, while the line the figure draws at
 91.7 Hz is the roller's rotational rate `BSF`. Two
 identities are worth remembering because they are exact and catch data-entry
-errors instantly: $\text{BPFO} + \text{BPFI} = Z f_s$ always, and
+errors instantly: $\text{BPFO} + \text{BPFI} = Z f_\mathrm{s}$ always, and
 $\text{BPFO} = Z \times \text{FTF}$ whenever the outer race is stationary.
 
 Presence and absence is the weak form of the diagnosis, and it works here only
@@ -161,7 +161,7 @@ same geometry:
   sideband structure;
 - an **inner-race** defect turns with the shaft, so it passes in and out of the
   load zone once per revolution. The impact train is amplitude-modulated at the
-  shaft rate, and BPFI carries $\pm f_s$ sidebands around the line and around
+  shaft rate, and BPFI carries $\pm f_\mathrm{s}$ sidebands around the line and around
   every harmonic — often more visible than the carrier itself;
 - a **rolling-element** defect strikes the two races alternately while
   travelling round with the cage, so it is modulated at the cage rate: BDF
@@ -171,7 +171,7 @@ same geometry:
 The sideband *spacing* is therefore the tie-breaker whenever two predicted
 families fall close together, and it is the same argument the gear-sideband
 paragraph of section 2 makes for a different component. Resolving a
-$\pm f_s$ sideband costs record length, which is why the acquisition of section
+$\pm f_\mathrm{s}$ sideband costs record length, which is why the acquisition of section
 5 matters here and not only in principle.
 
 ```python
@@ -195,7 +195,7 @@ on the line", not "the peak is at the line".
 
 ### The speed is the whole prediction
 
-Every frequency on this page is strictly proportional to $f_s = N/60$: the
+Every frequency on this page is strictly proportional to $f_\mathrm{s} = N/60$: the
 seven bearing lines, the gear mesh and its sidebands, the motor's `1x`, `2x`
 and rotor-slot family, the blade-passing lines. A speed error therefore
 propagates one-for-one into every predicted line, and the shaft speed is the
@@ -228,7 +228,7 @@ averaging when gear evidence does not.
 ## 2. Gears
 
 The gear-meshing (tooth-passing) frequency of a wheel with $N$ teeth is
-$\text{GMF} = N f_s$ (Eq. 8.3), with integer harmonics. What distinguishes the fault
+$\text{GMF} = N f_\mathrm{s}$ (Eq. 8.3), with integer harmonics. What distinguishes the fault
 types is the **sideband** family around each harmonic: a single chipped tooth
 or an eccentric wheel modulates the mesh once per revolution and produces low,
 flat sidebands spaced by the shaft rate, while distributed wear raises tall
@@ -260,7 +260,7 @@ the bearing. Rotor defects that produce static or dynamic air-gap eccentricity
 are read on the **rotor-slot harmonics** of Eq. (8.20),
 
 $$
-f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
+f_\mathrm{sh} = f_\mathrm{e} \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
 $$
 
 for $R$ rotor bars, $p$ magnetic poles (not pole pairs), slip $s$ (a
@@ -285,13 +285,13 @@ setting: the 360 Hz above is twice 180 Hz, and a six-pole machine on a 50 Hz
 mains would run near 1000 r/min with `2fe` at 100 Hz instead. The printed
 `fsh` = 3600 Hz is the check the paragraph below is arguing for — at zero slip
 Eq. (8.20) must reduce to the physical rotor-bar passing rate
-$R f_s = 60 \times 60$ Hz.
+$R f_\mathrm{s} = 60 \times 60$ Hz.
 
 Give the slip directly, or give the mains `supply_frequency` and let the slip
 follow from it and the measured shaft speed. The supply frequency is taken as
-$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes $f_e = f_s\,p/2$,
+$f_\mathrm{e} = f_\mathrm{s}\,p / (2(1 - s))$; Norton's Eq. (8.19) writes $f_\mathrm{e} = f_\mathrm{s}\,p/2$,
 which is the same expression at zero slip but does not reduce Eq. (8.20) to
-the physical rotor-bar passing rate $R f_s$ when the machine is loaded.
+the physical rotor-bar passing rate $R f_\mathrm{s}$ when the machine is loaded.
 Under load the result also carries the slip frequency and the pole-pass
 line $\text{FP} = p \times f_\text{slip}$, the
 sideband spacing that a broken rotor bar puts around `1x`. The third panel of
@@ -301,7 +301,7 @@ picture: they are three decades apart.
 
 ## 4. Fans, blowers and pumps
 
-The blade-passing frequency of an impeller with $N$ blades is $f_b = n N f_s$
+The blade-passing frequency of an impeller with $N$ blades is $f_\mathrm{b} = n N f_\mathrm{s}$
 (Eq. 8.15). A pump's hydraulic pulsations follow the same form, with the blade
 count replaced by the number of pumping events per revolution (Eq. 8.18). And a
 rotary positive-displacement blower repeats four times per revolution, which is
@@ -317,15 +317,15 @@ print(round(res["BPF"], 1))        # 80.0 Hz, the pulsation rate
 print(round(res.shaft_rate, 1))    # 80.0 Hz - NOT the shaft rate, which is 20
 ```
 
-The trick costs the shaft line: `shaft_rate` comes back at $4 f_s$, so read the
+The trick costs the shaft line: `shaft_rate` comes back at $4 f_\mathrm{s}$, so read the
 shaft rate from a separate call at the true speed (or from
 `bearing_fault_frequencies`) before combining families with
 `combine_fault_lines`, or a 4th shaft harmonic will be plotted as if it were
 bearing evidence.
 
 In a **ducted axial fan** the blades also interact with the stator vanes and set
-up rotating pressure patterns with $m_L = nN \pm kV$ lobes for $V$ vanes
-(Eq. 8.16), turning at $n N f_s / m_L$ (Eq. 8.17). A pattern that spins faster
+up rotating pressure patterns with $m_\mathrm{L} = nN \pm kV$ lobes for $V$ vanes
+(Eq. 8.16), turning at $n N f_\mathrm{s} / m_\mathrm{L}$ (Eq. 8.17). A pattern that spins faster
 than the blades themselves radiates far more strongly, which is why the choice
 of $N$ and $V$ matters, and why those speeds are the ones to check against the
 duct cut-on frequencies. Each line is named `lobe n=<n> m=<mL>`: the blade
@@ -343,10 +343,10 @@ print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35
 
 Those two numbers are the principle, worked. Both patterns come from the *same*
 blade harmonic on the *same* fan; the only difference is the sign of $k$ in
-$m_L = nN \pm kV$, which is why the lobe count has to be part of the line's
-name. The $m_L = 2$ pattern turns at $nNf_s/m_L = 6 \times 58.3/2 = 175$ Hz,
+$m_\mathrm{L} = nN \pm kV$, which is why the lobe count has to be part of the line's
+name. The $m_\mathrm{L} = 2$ pattern turns at $nNf_\mathrm{s}/m_\mathrm{L} = 6 \times 58.3/2 = 175$ Hz,
 three times the shaft speed, so it is the strong radiator and the line to check
-against the duct cut-on frequency. The $m_L = 10$ pattern turns at 35 Hz, below
+against the duct cut-on frequency. The $m_\mathrm{L} = 10$ pattern turns at 35 Hz, below
 the shaft speed, so it radiates weakly. Six blades against four vanes is a
 design decision, and this is what it decides.
 
@@ -354,10 +354,10 @@ design decision, and this is what it decides.
 
 *A fault family is recognised by its pattern, not by a single number. The two
 gear panels are the same 28-tooth pinion at 1500 r/min with two different
-faults: a chipped tooth gives low, flat sidebands at $\pm f_s$ and harmonics
+faults: a chipped tooth gives low, flat sidebands at $\pm f_\mathrm{s}$ and harmonics
 that fall away; distributed wear gives tall sideband groups and lifts the
 higher harmonics. The motor panel spans three decades of amplitude, which is
-why the rotor-slot harmonic and its $\pm f_s$ sidebands need a logarithmic
+why the rotor-slot harmonic and its $\pm f_\mathrm{s}$ sidebands need a logarithmic
 axis to be visible at all beside `1x`. The fan panel puts the two lobe
 patterns beside the blade rate they come from.*
 
@@ -418,9 +418,9 @@ nothing on a bearing that is in fact spalled.
 margin: 20 kHz for a 3 kHz housing resonance leaves the band-pass and the
 detector room to work. The record must contain enough revolutions for the
 envelope spectrum to resolve the shaft rate, because the resolution the reader
-gets is $1/T$ and the sideband spacing to be resolved is $f_s$ itself. Two
+gets is $1/T$ and the sideband spacing to be resolved is $f_\mathrm{s}$ itself. Two
 seconds at 2000 r/min is 67 revolutions and 0.5 Hz of resolution against a
-33 Hz shaft rate, which is why the shaft line and the $\pm f_s$ sidebands of
+33 Hz shaft rate, which is why the shaft line and the $\pm f_\mathrm{s}$ sidebands of
 section 1 are separable at all. Record longer if the speed is low or the
 sidebands are the diagnosis; record shorter only if the speed will not hold
 still (see *The speed is the whole prediction* above).

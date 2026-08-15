@@ -12,7 +12,7 @@ EN 12354-3 predicts the same standardized level difference from the sound
 reduction indices of the wall, the glazing and the air inlet before any of them
 is installed, and EN 12354-4 turns the envelope round to radiate an indoor
 source outwards. A closing section puts the measured and the predicted
-$D_{2m,nT}$ side by side and shows what does, and does not, separate them. The
+$D_{2\mathrm{m,nT}}$ side by side and shows what does, and does not, separate them. The
 reference curves behind every single number live in
 [Insulation Ratings (ISO 717)](insulation-ratings.md); the internal partitions
 of the same building in
@@ -25,24 +25,24 @@ The same source/receiver logic reaches the building **façade**, but now the
 source is *outdoors*: a loudspeaker at 45° or the road traffic itself. Rather
 than a level difference across an internal partition, ISO 16283-3 references the
 receiving-room level $L_2$ to the level **2 m in front of the façade**
-$L_{1,2m}$, giving the level difference $D_{2m}$ and, exactly as in the airborne
+$L_{1,2\mathrm{m}}$, giving the level difference $D_{2\mathrm{m}}$ and, exactly as in the airborne
 case, its standardized and normalized forms:
 
 $$
-D_{2m} = L_{1,2m} - L_2, \quad
-D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}, \quad
-D_{2m,n} = D_{2m} - 10 \log_{10}\frac{A}{A_0},
+D_{2\mathrm{m}} = L_{1,2\mathrm{m}} - L_2, \quad
+D_{2\mathrm{m,nT}} = D_{2\mathrm{m}} + 10 \log_{10}\frac{T}{T_0}, \quad
+D_{2\mathrm{m,n}} = D_{2\mathrm{m}} - 10 \log_{10}\frac{A}{A_0},
 $$
 
 with $T_0 = 0.5$ s, $A_0 = 10$ m² and $A = 0.16\ V/T$ (dwellings). When the
-microphone sits **on the test element** (surface level $L_{1,s}$) the *element*
+microphone sits **on the test element** (surface level $L_{1,\mathrm{s}}$) the *element*
 method also yields an apparent sound reduction index, carrying a fixed
 angle-of-incidence correction: $-1.5$ dB for the 45° loudspeaker method,
 $-3$ dB for the all-angle road-traffic method:
 
 $$
-R'_{45°} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 1.5, \qquad
-R'_{tr,s} = L_{1,s} - L_2 + 10 \log_{10}\frac{S}{A} - 3.
+R'_{45°} = L_{1,\mathrm{s}} - L_2 + 10 \log_{10}\frac{S}{A} - 1.5, \qquad
+R'_\mathrm{tr,s} = L_{1,\mathrm{s}} - L_2 + 10 \log_{10}\frac{S}{A} - 3.
 $$
 
 The façade quantity is airborne, so its single-number rating uses the
@@ -78,10 +78,10 @@ fac.plot()   # per-band D2m,nT with D2m, D2m,n and R' overlaid (needs matplotlib
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_field_insulation.svg" alt="Field facade insulation of a dwelling under the 45-degree loudspeaker method: the standardized D2m,nT, the raw D2m, the normalized D2m,n and the apparent reduction index R'45 per one-third-octave band, with the Dls,2m,nT,w rating annotated" width="80%"></picture>
 
-*The four façade quantities of one measurement: the raw $D_{2m}$, its
+*The four façade quantities of one measurement: the raw $D_{2\mathrm{m}}$, its
 standardized and normalized forms, and the element $R'_{45°}$ carrying the
 −1.5 dB angle-of-incidence correction. The rating box reads the single
-number $D_{ls,2m,nT,w}$ obtained by feeding $D_{2m,nT}$ to the ISO 717-1
+number $D_{\mathrm{ls},2\mathrm{m,nT,w}}$ obtained by feeding $D_{2\mathrm{m,nT}}$ to the ISO 717-1
 engine.*
 
 <details>
@@ -136,12 +136,12 @@ assumed already corrected for background noise.
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `l1_2m` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Level 2 m in front of the façade $L_{1,2m}$ |
+| `l1_2m` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Level 2 m in front of the façade $L_{1,2\mathrm{m}}$ |
 | `l2` | 1D or 2D array | dB | same band count | Receiving-room levels |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
 | `area` | float, optional | m² | > 0, with `surface_level`, `volume` | Test-element area $S$ (enables $R'$) |
-| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $D_{2m,n}$; required for $R'$) |
-| `surface_level` | 1D/2D array, optional | dB | same band count | Surface level $L_{1,s}$ on the element (enables $R'$) |
+| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $D_{2\mathrm{m,n}}$; required for $R'$) |
+| `surface_level` | 1D/2D array, optional | dB | same band count | Surface level $L_{1,\mathrm{s}}$ on the element (enables $R'$) |
 | `method` | str | — | `'loudspeaker'` (−1.5 dB) / `'road_traffic'` (−3 dB) | Angle-of-incidence correction of $R'$ |
 | `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 | `frequencies` | 1D array, optional | Hz | — | Band centres carried on the result for plotting |
@@ -155,7 +155,7 @@ quantity to `weighted_rating` for its ISO 717-1 single number.
 `FacadeInsulationResult.report(path)` writes the one-page ISO 16283-3 field
 façade test report: the standard-basis line, an optional metadata header, the
 one-third-octave table beside the measured-versus-shifted-reference curve, the
-boxed field rating $D_{2m,nT,w}\ (C;\ C_{tr})$, the engineering-method
+boxed field rating $D_{2\mathrm{m,nT,w}}\ (C;\ C_\mathrm{tr})$, the engineering-method
 statement, an optional requirement verdict (a level difference passes at or above it) and a
 footer. `quantity="d_2m_nt"` (default) reports the standardized level
 difference; `"d_2m_n"` the normalized one; `"r_prime"` the apparent sound
@@ -169,33 +169,33 @@ fac.report("Rp45_facade.pdf", quantity="r_prime")      # R'45,w (C; Ctr)
 
 [![Field facade ISO 16283-3 example report: metadata header, one-third-octave D2m,nT table beside the measured-versus-shifted-reference curve, boxed D2m,nT,w (C; Ctr), the engineering-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16283_facade_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso16283_facade_example.pdf)
 
-*Field façade fiche (`FacadeInsulationResult.report`), $D_{2m,nT,w}\ (C;\ C_{tr})$.*
+*Field façade fiche (`FacadeInsulationResult.report`), $D_{2\mathrm{m,nT,w}}\ (C;\ C_\mathrm{tr})$.*
 
 ## Prediction from the elements (EN 12354-3)
 
 Parts 3 and 4 predict the two directions across the building envelope, both from
 the same energy summation of the element **transmission factors**
 $\tau = 10^{-R/10}$, area-weighted by $S_i/S$ (a small element or air path enters
-through its element-normalized level difference $D_{n,e}$ with the reference area
+through its element-normalized level difference $D_\mathrm{n,e}$ with the reference area
 $A_0 = 10\ \text{m}^2$):
 
 $$
 R' = -10 \log_{10}\!\Big( \sum_i \tfrac{S_i}{S}\,10^{-R_i/10}
-                          + \sum_k \tfrac{A_0}{S}\,10^{-D_{n,e,k}/10} \Big).
+                          + \sum_k \tfrac{A_0}{S}\,10^{-D_{\mathrm{n,e},k}/10} \Big).
 $$
 
 **Part 3: outdoor → indoor.** From $R'$ (Formula 10) follow the loudspeaker- and
-traffic-referenced indices $R_{45} = R'+1$ and $R_{tr,s} = R'$, and the primary
+traffic-referenced indices $R_{45} = R'+1$ and $R_\mathrm{tr,s} = R'$, and the primary
 output, the standardized level difference at 2 m (Formula 13)
 
 $$
-D_{2m,nT} = R' + \Delta L_{fs} + 10 \log_{10}\frac{V}{6\,T_0\,S}, \qquad T_0 = 0.5\ \text{s},
+D_{2\mathrm{m,nT}} = R' + \Delta L_\mathrm{fs} + 10 \log_{10}\frac{V}{6\,T_0\,S}, \qquad T_0 = 0.5\ \text{s},
 $$
 
-with the façade-shape term $\Delta L_{fs}$ (Annex C; 0 dB for a flat reflecting
+with the façade-shape term $\Delta L_\mathrm{fs}$ (Annex C; 0 dB for a flat reflecting
 façade; `facade_shape_level_difference` looks it up from the Figure C.2 table
 for galleries, balconies and terraces, interpolating over the underside
-absorption $\alpha_w$). Single-number ratings reuse EN ISO 717-1
+absorption $\alpha_\mathrm{w}$). Single-number ratings reuse EN ISO 717-1
 (`weighted_rating`).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/facade_prediction.svg" alt="Per-element partial sound reduction indices and the resulting façade apparent reduction R' and standardized level difference D2m,nT for the EN 12354-3 Annex F worked example, the air inlet limiting the low bands" width="80%"></picture>
@@ -293,9 +293,9 @@ plt.show()
 The façade prediction also writes a one-page **prediction** report through a
 `report(path)` method, the same layout as the airborne and impact prediction
 fiches. `FacadePredictionResult.report()` renders the façade-element table (each
-element's weighted partial index $R_{p,w}$) beside the per-element / $R'$ /
-$D_{2m,nT}$ plot, the boxed predicted $D_{2m,nT,w}$ (with $R'_{tr,s,w}$ and
-$C_{tr}$), the prediction statement and, when a `requirement` is supplied, a
+element's weighted partial index $R_\mathrm{p,w}$) beside the per-element / $R'$ /
+$D_{2\mathrm{m,nT}}$ plot, the boxed predicted $D_{2\mathrm{m,nT,w}}$ (with $R'_\mathrm{tr,s,w}$ and
+$C_\mathrm{tr}$), the prediction statement and, when a `requirement` is supplied, a
 PASS/FAIL verdict
 (the level difference passes at or above it). `verbose=True` annexes each
 element's share of the transmitted sound energy, which singles out the limiting
@@ -307,7 +307,7 @@ receiving-room `receiving_volume`, the outdoor/traffic situation in `test_room`,
 plus the calculator / laboratory identity fields (`client`, `manufacturer`,
 `measurement_standard`, `laboratory`, `operator`, `report_id`, `test_date`), a
 free-text façade-shape and model summary in `notes` and the target
-$D_{2m,nT,w}$ in `requirement`. Metadata, `language="es"` and the `phonometry[report]` extra
+$D_{2\mathrm{m,nT,w}}$ in `requirement`. Metadata, `language="es"` and the `phonometry[report]` extra
 behave as in the measurement fiches.
 
 ```python
@@ -333,11 +333,11 @@ fac.report("D2mnT_prediction.pdf", metadata=ReportMetadata(
 ## Indoor sound radiated outdoors (EN 12354-4)
 
 **Part 4: indoor → outdoor.** The sound power level radiated by a segment
-(Formula 2) is $L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)$ with $S_0 = 1$ m²
-and the inside-field diffusivity term $C_d$ (Annex B; −6 dB ideal diffuse, −5 dB
+(Formula 2) is $L_W = L_{p,\mathrm{in}} + C_\mathrm{d} - R' + 10 \log_{10}(S/S_0)$ with $S_0 = 1$ m²
+and the inside-field diffusivity term $C_\mathrm{d}$ (Annex B; −6 dB ideal diffuse, −5 dB
 average industrial). Openings are elements whose "R" is the silencer insertion
 loss (a bare opening is 0 dB). The exterior level follows from the simplified
-Annex E attenuation $A_{tot}$ of a finite radiating side, $L_p = L_W - A_{tot}$.
+Annex E attenuation $A_\mathrm{tot}$ of a finite radiating side, $L_p = L_W - A_\mathrm{tot}$.
 
 ```python
 from phonometry import building
@@ -366,7 +366,7 @@ seg.plot()   # radiated LW per octave with the A-weighted LWA line (needs matplo
 *The Annex G side-1 segment: the wall dominates the area but the door's
 weaker $R$ carries the radiated power, so the octave spectrum stays flat
 where the wall alone would fall. The dashed line is the A-weighted single
-number $L_{WA}$ formed from the octave bands.*
+number $L_{W\mathrm{A}}$ formed from the octave bands.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -417,14 +417,14 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `FacadeElement.area` | float | m² | > 0 for `r` / `insertion_loss` | Element area $S_i$ (ignored for `dn_e`) |
-| `FacadeElement.r` / `dn_e` / `insertion_loss` | float or seq | dB | give exactly one | Area element $R_i$ / small-element $D_{n,e}$ / opening insertion loss |
+| `FacadeElement.r` / `dn_e` / `insertion_loss` | float or seq | dB | give exactly one | Area element $R_i$ / small-element $D_\mathrm{n,e}$ / opening insertion loss |
 | `facade_sound_reduction(area)` | float | m² | > 0 | Total façade area $S$ |
 | `facade_sound_reduction(volume)` | float | m³ | > 0 | Receiving-room volume $V$ (Formula 13) |
-| `facade_sound_reduction(delta_l_fs)` | float | dB | default `0` | Façade-shape term $\Delta L_{fs}$ (Annex C; look it up with `facade_shape_level_difference`) |
-| `radiated_sound_power(lp_in)` | float or seq | dB | — | Inside level $L_{p,in}$ per band |
-| `radiated_sound_power(c_d)` | float | dB | default `-6` | Diffusivity term $C_d$ (Annex B) |
+| `facade_sound_reduction(delta_l_fs)` | float | dB | default `0` | Façade-shape term $\Delta L_\mathrm{fs}$ (Annex C; look it up with `facade_shape_level_difference`) |
+| `radiated_sound_power(lp_in)` | float or seq | dB | — | Inside level $L_{p,\mathrm{in}}$ per band |
+| `radiated_sound_power(c_d)` | float | dB | default `-6` | Diffusivity term $C_\mathrm{d}$ (Annex B) |
 | `radiated_sound_power(r_prime_cap)` | float | dB | default `None` (off) | Optional field cap on $R'$, an Annex G example footnote (it uses 40 dB), not part of Formula (2)/(3) |
-| `radiated_sound_power(octave_bands)` | seq of int | Hz | default `None` | Octave centres matching the bands; enables the A-weighted $L_{WA}$ |
+| `radiated_sound_power(octave_bands)` | seq of int | Hz | default `None` | Octave centres matching the bands; enables the A-weighted $L_{W\mathrm{A}}$ |
 | `facade_sound_reduction(frequencies)` | seq | Hz | default `None`; length = band count | Band centres carried on the result for plotting |
 | `outdoor_attenuation(width, height, distance)` | float | m | > 0 | Finite radiating side and reception distance (Annex E) |
 | `outdoor_level(l_w, attenuation)` | float or seq | dB | broadcast-compatible | Exterior $L_p$ from one or more sides (Formula E.1) |
@@ -441,12 +441,12 @@ life: EN 12354-3 before it exists, ISO 16283-3 once it does. They are worth
 comparing because they end on the same quantity, the standardized level
 difference at 2 m, and because the geometry term that carries the prediction
 from an index to a level difference is the measurement's own normalisation
-written another way. Start from the measured definition, replace $D_{2m}$ by
+written another way. Start from the measured definition, replace $D_{2\mathrm{m}}$ by
 the apparent index it implies and substitute the Sabine absorption area
 $A = 0.16\ V/T$:
 
 $$
-D_{2m,nT} = D_{2m} + 10 \log_{10}\frac{T}{T_0}
+D_{2\mathrm{m,nT}} = D_{2\mathrm{m}} + 10 \log_{10}\frac{T}{T_0}
           = R' + 10 \log_{10}\frac{A}{S} + 10 \log_{10}\frac{T}{T_0}
           = R' + 10 \log_{10}\frac{0.16\ V}{S\ T_0}.
 $$
@@ -492,7 +492,7 @@ print(building.weighted_rating(meas.d_2m_nt).rating, fac.d_2m_nt_w)   # 33 33
 ```
 
 The two curves run parallel to the second decimal and both rate at
-$D_{2m,nT,w} = 33$ dB. Everything that separates a real prediction from a real
+$D_{2\mathrm{m,nT,w}} = 33$ dB. Everything that separates a real prediction from a real
 measurement therefore sits in the inputs, not in the formulas:
 
 * **The element indices.** The prediction consumes laboratory $R$ values
@@ -500,14 +500,14 @@ measurement therefore sits in the inputs, not in the formulas:
   laboratory mounts it. The built façade adds its perimeter seals, its
   roller-shutter box, the joint between frame and reveal and whatever the site
   did to them.
-* **The shape term.** $\Delta L_{fs}$ is 0 dB only for a flat reflecting
+* **The shape term.** $\Delta L_\mathrm{fs}$ is 0 dB only for a flat reflecting
   façade. A balcony, a gallery or a terrace changes the field at the 2 m
   position, and a measurement takes that change as it is while a prediction
   has to look it up in Annex C.
-* **The source.** ISO 16283-3 labels the loudspeaker result $D_{ls,2m,nT}$
+* **The source.** ISO 16283-3 labels the loudspeaker result $D_{\mathrm{ls},2\mathrm{m,nT}}$
   precisely because a loudspeaker at 45° is not road traffic; its element
   index carries a −1.5 dB angle correction where the all-angle traffic method
-  carries −3 dB. EN 12354-3 predicts the traffic-referenced $R_{tr,s} = R'$
+  carries −3 dB. EN 12354-3 predicts the traffic-referenced $R_\mathrm{tr,s} = R'$
   directly and offers $R_{45} = R' + 1$ for the loudspeaker comparison.
 * **The receiving room.** The prediction assumes the design volume and a
   diffuse receiving field. The measurement takes the room furnished, and the
@@ -552,10 +552,10 @@ decides the result.
 
 ## Standards
 
-ISO 16283-3:2016, which defines the field façade quantities $D_{2m}$,
-$D_{2m,nT}$, $D_{2m,n}$, $R'_{45°}$ and $R'_{tr,s}$ of the loudspeaker and
+ISO 16283-3:2016, which defines the field façade quantities $D_{2\mathrm{m}}$,
+$D_{2\mathrm{m,nT}}$, $D_{2\mathrm{m,n}}$, $R'_{45°}$ and $R'_\mathrm{tr,s}$ of the loudspeaker and
 road-traffic methods and their test report; EN 12354-3:2000, which predicts
-the same $D_{2m,nT}$ from the element indices with the Annex C façade-shape
+the same $D_{2\mathrm{m,nT}}$ from the element indices with the Annex C façade-shape
 term (Annex F worked example); and EN 12354-4:2000, which predicts the sound
 power radiated outwards by a building side and its exterior level (Annex G
 worked example). The single-number ratings come from ISO 717-1 (Annex F of
@@ -583,7 +583,7 @@ implementation follows the formulae rather than the printed rows.
   airborne and impact flanking models of EN 12354-1/2 that share the
   transmission-factor summation used here.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  engine behind the $D_{2m,nT,w}$, $R'_{45,w}$ and $R'_{tr,s,w}$ single
+  engine behind the $D_{2\mathrm{m,nT,w}}$, $R'_{45,w}$ and $R'_\mathrm{tr,s,w}$ single
   numbers.
 - [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md): the
   octave-band façade quantity of the quick survey method.

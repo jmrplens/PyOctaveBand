@@ -154,11 +154,11 @@ point alone. `fan_sound_power` implements the ASHRAE scaling law printed as
 Long Eq. 13.1,
 
 $$
-L_W = K_F + 10\log_{10}\frac{Q_F}{Q_\text{REF}}
-    + 10\log_{10}\frac{P_F}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
+L_W = K_\mathrm{F} + 10\log_{10}\frac{Q_\mathrm{F}}{Q_\text{REF}}
+    + 10\log_{10}\frac{P_\mathrm{F}}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
 $$
 
-with the spectral constant $K_F$ of Table 13.5 (one row per fan type), the
+with the spectral constant $K_\mathrm{F}$ of Table 13.5 (one row per fan type), the
 off-peak efficiency correction $C_\text{EFF}$ of Table 13.6 and the blade
 frequency increment $C_\text{BFI}$ of Table 13.7 dropped into the single
 octave band that contains the blade passing frequency. In SI the references
@@ -499,16 +499,16 @@ power is normally manufacturer data measured to ASHRAE Standard 70, and
 that is what a real sheet uses. When there is none to hand,
 `diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
 an overall level
-$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31.3$ from the
-face area $S_G$, the approach velocity $U_G = Q/S_G$ and the normalised
-pressure-drop coefficient $\xi = 334.9\,\Delta p/(\rho_0 U_G^2)$ of Eq. 13.28.
-Long writes all four in foot-pound units ($S_G$ in ft², $U_G$ in ft/s,
+$L_W = 10\log_{10} S_\mathrm{G} + 30\log_{10}\xi + 60\log_{10} U_\mathrm{G} - 31.3$ from the
+face area $S_\mathrm{G}$, the approach velocity $U_\mathrm{G} = Q/S_\mathrm{G}$ and the normalised
+pressure-drop coefficient $\xi = 334.9\,\Delta p/(\rho_0 U_\mathrm{G}^2)$ of Eq. 13.28.
+Long writes all four in foot-pound units ($S_\mathrm{G}$ in ft², $U_\mathrm{G}$ in ft/s,
 $\Delta p$ in inches of water gauge); `diffuser_sound_power` takes and returns
 SI and converts internally, which is why the constants here are quoted on
 Long's units. The spectrum follows as $L_{W,\text{oct}} = L_W + C_D$ with the
 shape function $C_D = -11.82 - 0.15 A - 1.13 A^2$ for a rectangular device
 ($-5.82$ for a round one), where $A$ is the distance in octaves from the peak
-band $f_P = 48.8\,U_G$ (Eq. 13.32, $U_G$ in **ft/s**), counted on Long's band
+band $f_\mathrm{P} = 48.8\,U_\mathrm{G}$ (Eq. 13.32, $U_\mathrm{G}$ in **ft/s**), counted on Long's band
 numbering with band 0 at 32 Hz.
 
 ```python
@@ -561,7 +561,7 @@ figures are for.
 velocity puts four parallel curves 16.6 dB apart for every doubling, in every
 band at once, which is why a silencer sized for pressure drop rather than for
 face velocity becomes the loudest element in the run. The diffuser's peak band
-moves as well as its level — $f_P = 48.8\,U_G$ in Long's units — so a faster
+moves as well as its level — $f_\mathrm{P} = 48.8\,U_\mathrm{G}$ in Long's units — so a faster
 outlet is not simply louder, it moves its noise into the bands a criterion curve
 judges most harshly. The crossing that matters on a real sheet is where one of
 these curves meets the attenuated fan level: past it, the element bought to
@@ -931,7 +931,7 @@ wavenumber, and a plane-wave prediction quietly stops being right.
 Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
 (2nd ed.), section 7.3: circular ducts by Eq. 7.6 with the
 $\pi\alpha_{pq}$ eigenvalues of Table 7.1 that solve
-$J'_p(\kappa_{pq} a_i) = 0$, rectangular ducts by Eq. 7.10,
+$J'_p(\kappa_{pq} a_\mathrm{i}) = 0$, rectangular ducts by Eq. 7.10,
 
 $$
 (f_\text{co})_{pq} = \frac{c}{2}\sqrt{(p/a)^2 + (q/b)^2}\,\sqrt{1 - M^2},

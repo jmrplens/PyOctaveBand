@@ -31,8 +31,8 @@ import ThemeImage from '../../../../components/ThemeImage.astro';
 
 The *Documento Básico HR* "Protección frente al ruido" of the Spanish building
 code states its requirements in A-weighted global quantities that are close
-relatives of, but not identical to, the ISO 717-1 weighted ratings: $R_A$,
-$R_{A,tr}$, $D_{nT,A}$ and $D_{2m,nT,Atr}$. This page implements the direct
+relatives of, but not identical to, the ISO 717-1 weighted ratings: $R_\mathrm{A}$,
+$R_\mathrm{A,tr}$, $D_\mathrm{nT,A}$ and $D_{2\mathrm{m,nT,Atr}}$. This page implements the direct
 Annex A route, which is the normative one for DB-HR, the requirement tables of
 clause 2, and the two design calculations most often used with them: the
 window-size correction and the insulation of a composite façade.
@@ -52,7 +52,7 @@ I_x = -10 \log_{10} \sum_i 10^{(L_{x,i} - X_i)/10} \quad \text{[dBA]}
 $$
 
 where $X_i$ is the band insulation (the sound reduction index $R$ or $R'$, the
-standardized level difference $D_{nT}$, $D_{2m,nT}$ and so on) and $L_{x,i}$
+standardized level difference $D_\mathrm{nT}$, $D_{2\mathrm{m,nT}}$ and so on) and $L_{x,i}$
 the normalised source spectrum. The sum runs over **eighteen** one-third-octave
 bands, 100 Hz to 5 kHz, two more than the sixteen of ISO 717-1 (100 Hz to
 3150 Hz): the 4 kHz and 5 kHz bands, which are the first reason the two routes
@@ -60,15 +60,15 @@ do not always agree. The band centres are in `DB_HR_FREQUENCIES`.
 
 | Normalised spectrum | Annex A table | Quantity it defines | Formula |
 | :--- | :--- | :--- | :--- |
-| A-weighted pink noise, $L_{Ar,i}$ | Table A.5 | $R_A$, $D_{nT,A}$, $D_{2m,nT,A}$ | (A.5), (A.7) |
-| Road traffic, $L_{Atr,i}$ | Table A.3 | $R_{A,tr}$, $D_{2m,nT,Atr}$ | (A.6) |
-| Railway noise, $L_{Aef,i}$ | Table A.4 (numerically identical to A.3) | $D_{2m,nT,A}$ | (A.5) |
-| Aircraft noise, $L_{Aav,i}$ | Table A.2 | $D_{2m,nT,Atr}$ | (A.6) |
+| A-weighted pink noise, $L_{\mathrm{Ar},i}$ | Table A.5 | $R_\mathrm{A}$, $D_\mathrm{nT,A}$, $D_{2\mathrm{m,nT,A}}$ | (A.5), (A.7) |
+| Road traffic, $L_{\mathrm{Atr},i}$ | Table A.3 | $R_\mathrm{A,tr}$, $D_{2\mathrm{m,nT,Atr}}$ | (A.6) |
+| Railway noise, $L_{\mathrm{Aef},i}$ | Table A.4 (numerically identical to A.3) | $D_{2\mathrm{m,nT,A}}$ | (A.5) |
+| Aircraft noise, $L_{\mathrm{Aav},i}$ | Table A.2 | $D_{2\mathrm{m,nT,Atr}}$ | (A.6) |
 
 The railway row is the one worth reading twice. Clause 3.1.3.4 point 1 says
 that where railway noise dominates the façade is assessed in
-$D_{2m,nT,A}$ through formula (A.5), and only road traffic and aircraft give
-$D_{2m,nT,Atr}$ through (A.6); Table H.1 prints the same split. Because
+$D_{2\mathrm{m,nT,A}}$ through formula (A.5), and only road traffic and aircraft give
+$D_{2\mathrm{m,nT,Atr}}$ through (A.6); Table H.1 prints the same split. Because
 Table A.4 is digit for digit Table A.3, a rail-dominant façade comes out at
 the same *number* as a road one, but the quantity the requirement and the
 report are stated in is not the same. That is why `d2m_nt_a()` and
@@ -135,9 +135,9 @@ the document itself accepts three approximations as long as the two routes
 differ by less than 1 dB:
 
 $$
-D_{nT,A} \approx D_{nT,w} + C \quad (H.1), \qquad
-D_{2m,nT,A} \approx D_{2m,nT,w} + C \quad (H.2), \qquad
-D_{2m,nT,Atr} \approx D_{2m,nT,w} + C_{tr} \quad (H.3)
+D_\mathrm{nT,A} \approx D_\mathrm{nT,w} + C \quad (H.1), \qquad
+D_{2\mathrm{m,nT,A}} \approx D_{2\mathrm{m,nT,w}} + C \quad (H.2), \qquad
+D_{2\mathrm{m,nT,Atr}} \approx D_{2\mathrm{m,nT,w}} + C_\mathrm{tr} \quad (H.3)
 $$
 
 with (H.2) covering the rail-dominant case of the previous section. On the two
@@ -145,8 +145,8 @@ published spectra this page reproduces, the agreement is exact to the integer:
 
 | Case | Direct route (Annex A) | ISO 717-1 route | Published? |
 | :--- | :--- | :--- | :--- |
-| Separating wall of Ejemplo 7.2 | $R'_A = 51.4$ dBA, rounded to 51 | $R'_w = 52$ with $C_{100-5000} = -1$, i.e. 51 | yes, Ejemplo 7.1 prints $R'_w = 52$, $C = -1$ and the 51 dBA |
-| Façade of Ejercicio 7.1 | $D_{2m,nT,Atr} = 32.8$ dBA, rounded to 33 | $D_{2m,nT,w} = 38$ with $C_{tr,100-5000} = -5$, i.e. 33 | no, the book prints neither 38 nor $-5$ |
+| Separating wall of Ejemplo 7.2 | $R'_\mathrm{A} = 51.4$ dBA, rounded to 51 | $R'_\mathrm{w} = 52$ with $C_{100-5000} = -1$, i.e. 51 | yes, Ejemplo 7.1 prints $R'_\mathrm{w} = 52$, $C = -1$ and the 51 dBA |
+| Façade of Ejercicio 7.1 | $D_{2\mathrm{m,nT,Atr}} = 32.8$ dBA, rounded to 33 | $D_{2\mathrm{m,nT,w}} = 38$ with $C_{\mathrm{tr},100-5000} = -5$, i.e. 33 | no, the book prints neither 38 nor $-5$ |
 
 The two rows are not equally strong evidence. The wall row is a genuine
 external check, because the *Manual* prints the ISO 717-1 numbers as well as
@@ -155,16 +155,16 @@ and the $-5$ come from this library's own ISO 717-1 engine, so that row shows
 the two routes agreeing with each other rather than agreeing with a source.
 
 The real trap is the name of the spectrum adaptation terms. Annex H writes
-them as plain $C$ and $C_{tr}$ and refers their definition to
+them as plain $C$ and $C_\mathrm{tr}$ and refers their definition to
 UNE-EN ISO 717-1 without narrowing the frequency range. Since the DB-HR
 indices run to 5 kHz while the ISO 717-1 core range stops at 3150 Hz, the
 terms that make (H.1) to (H.3) come out right are the **enlarged-range**
-$C_{100-5000}$ and $C_{tr,100-5000}$; that reading is not in Annex H itself
+$C_{100-5000}$ and $C_{\mathrm{tr},100-5000}$; that reading is not in Annex H itself
 but in the *Manual*, in the note to expressions [7.15] and [7.16]. It matters:
 on the façade of Ejercicio 7.1 the core-range $C$ is $-2$ while $C_{100-5000}$
 is $-1$, so taking the wrong one gives 36 dBA instead of 37 for the
-$D_{2m,nT,A}$ of that façade. On the same specimen $C_{tr}$ and
-$C_{tr,100-5000}$ are both $-5$, so the $D_{2m,nT,Atr}$ that DB-HR actually
+$D_{2\mathrm{m,nT,A}}$ of that façade. On the same specimen $C_\mathrm{tr}$ and
+$C_{\mathrm{tr},100-5000}$ are both $-5$, so the $D_{2\mathrm{m,nT,Atr}}$ that DB-HR actually
 requires happens not to discriminate between the two readings at all.
 
 ```python
@@ -188,9 +188,9 @@ DB-HR states its requirements on two kinds of room: the **protected room**
 bedrooms, living areas, classrooms, operating theatres, professional offices)
 and the **habitable room** (*recinto habitable*) in general.
 
-**Façades (Table 2.1).** The requirement on $D_{2m,nT,Atr}$ is read by bands of
-the site's day noise index $L_d$ ($L_d \le 60$, $60 < L_d \le 65$,
-$65 < L_d \le 70$, $70 < L_d \le 75$ and $L_d > 75$ dBA):
+**Façades (Table 2.1).** The requirement on $D_{2\mathrm{m,nT,Atr}}$ is read by bands of
+the site's day noise index $L_\mathrm{d}$ ($L_\mathrm{d} \le 60$, $60 < L_\mathrm{d} \le 65$,
+$65 < L_\mathrm{d} \le 70$, $70 < L_\mathrm{d} \le 75$ and $L_\mathrm{d} > 75$ dBA):
 
 | Use | Room | `db_hr_facade_requirement(ld, use, room)` | $\le 60$ | 60-65 | 65-70 | 70-75 | $> 75$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
@@ -205,14 +205,14 @@ carry the stricter row under a cultural or educational use and the more lenient
 one under a residential use.
 
 Three rules modify the reading: a façade not directly exposed to the dominant
-noise (an enclosed courtyard, a quiet surrounding) is assessed with $L_d$
+noise (an enclosed courtyard, a quiet surrounding) is assessed with $L_\mathrm{d}$
 reduced by 10 dBA, where aircraft noise dominates the table value is increased
-by 4 dBA, and where no official $L_d$ exists for the site, 60 dBA is assumed
+by 4 dBA, and where no official $L_\mathrm{d}$ exists for the site, 60 dBA is assumed
 for residential acoustic areas.
 
 **Airborne insulation between rooms (clause 2.1.1).** Partition walls
-(*tabiquería*) within one use unit must have $R_A \ge 33$ dBA. Against a room
-of another use unit, a protected room requires $D_{nT,A} \ge 50$ dBA and a
+(*tabiquería*) within one use unit must have $R_\mathrm{A} \ge 33$ dBA. Against a room
+of another use unit, a protected room requires $D_\mathrm{nT,A} \ge 50$ dBA and a
 habitable room $\ge 45$ dBA; against a services or activity room, a protected
 room requires $\ge 55$ dBA and a habitable room $\ge 45$ dBA. When the two
 rooms share a door or a window, the requirement moves to the opening (sound
@@ -221,12 +221,12 @@ one) and to the enclosure around it (50 dBA).
 
 **Party walls (clause 2.1.1 c).** Against a *medianería* DB-HR offers two
 **alternative** routes, not cumulative ones: either each of the two leaves
-reaches $D_{2m,nT,Atr} \ge 40$ dBA, or the two leaves taken together reach
-$D_{nT,A} \ge 50$ dBA. `db_hr_party_wall_requirement()` returns whichever route
+reaches $D_{2\mathrm{m,nT,Atr}} \ge 40$ dBA, or the two leaves taken together reach
+$D_\mathrm{nT,A} \ge 50$ dBA. `db_hr_party_wall_requirement()` returns whichever route
 is asked for.
 
 **Impact sound (clause 2.1.2).** The standardized impact sound pressure level
-$L'_{nT,w}$ must not exceed 65 dB in a protected room against a room of another
+$L'_\mathrm{nT,w}$ must not exceed 65 dB in a protected room against a room of another
 use unit, nor 60 dB against a services or activity room; that same 60 dB limit
 applies to the habitable room.
 
@@ -263,14 +263,14 @@ check.complies                                      # True
 ```
 
 The quantity has to match the requirement. DB-HR states the between-rooms limit
-in $D_{nT,A}$, and $R'$ and $D_{nT}$ normalise the same level difference by
+in $D_\mathrm{nT,A}$, and $R'$ and $D_\mathrm{nT}$ normalise the same level difference by
 different things — $R' = D + 10\log_{10}(S/A)$ by the partition area and the
-receiving-room absorption, $D_{nT} = D + 10\log_{10}(T/T_0)$ by the
-reverberation time — so an $R'_A$ from a field report has to be converted
+receiving-room absorption, $D_\mathrm{nT} = D + 10\log_{10}(T/T_0)$ by the
+reverberation time — so an $R'_\mathrm{A}$ from a field report has to be converted
 through the room's $T$ and the partition area before it means anything against
-the 50 dBA. Only the *tabiquería* requirement ($R_A \ge 33$ dBA) is stated in
-the $R_A$ family. Earlier revisions of this page checked the party wall's
-$R'_A = 51.4$ dBA straight against the $D_{nT,A}$ requirement: the verdict
+the 50 dBA. Only the *tabiquería* requirement ($R_\mathrm{A} \ge 33$ dBA) is stated in
+the $R_\mathrm{A}$ family. Earlier revisions of this page checked the party wall's
+$R'_\mathrm{A} = 51.4$ dBA straight against the $D_\mathrm{nT,A}$ requirement: the verdict
 happened to come out the same here, but the comparison was between two
 different quantities and nothing guarantees the agreement in general.
 
@@ -284,9 +284,9 @@ a list of value-requirement pairs.
 The tests that determine the sound reduction index of a window are run on
 specimens of about 1.8 m², and a larger window insulates less. The *Catálogo de
 Elementos Constructivos* of the building code corrects the catalogue value of
-$R_A$ and $R_{A,tr}$ by total window area: 0 dB up to 2.7 m², $-1$ dB between
+$R_\mathrm{A}$ and $R_\mathrm{A,tr}$ by total window area: 0 dB up to 2.7 m², $-1$ dB between
 2.7 and 3.6 m², $-2$ dB between 3.6 and 4.6 m² and $-3$ dB above 4.6 m². A 4 m²
-sliding window with 4-6-4 glazing, catalogued at $R_A = 26$ dBA, ends up at
+sliding window with 4-6-4 glazing, catalogued at $R_\mathrm{A} = 26$ dBA, ends up at
 24 dBA (Ejemplo 7.4).
 
 A real façade is not a homogeneous element: it has a blind part and one or more
@@ -373,11 +373,11 @@ scope as well.
 
 ## See also
 
-- [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/): the reference-curve route with $R_w$, $C$, $C_{tr}$ and the enlarged-range terms that DB-HR calls simply $C$ and $C_{tr}$.
-- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/): where the site's day noise index $L_d$ that Table 2.1 is entered with comes from.
-- [Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/): the ISO 16283-3 measurement of $D_{2m,nT}$ and its EN 12354-3 prediction, which feed the $D_{2m,nT,Atr}$ index of this page.
+- [Insulation Ratings (ISO 717)](/phonometry/buildings/insulation/insulation-ratings/): the reference-curve route with $R_\mathrm{w}$, $C$, $C_\mathrm{tr}$ and the enlarged-range terms that DB-HR calls simply $C$ and $C_\mathrm{tr}$.
+- [Spanish Noise Regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/): where the site's day noise index $L_\mathrm{d}$ that Table 2.1 is entered with comes from.
+- [Façade Sound Insulation](/phonometry/buildings/insulation/facade-insulation/): the ISO 16283-3 measurement of $D_{2\mathrm{m,nT}}$ and its EN 12354-3 prediction, which feed the $D_{2\mathrm{m,nT,Atr}}$ index of this page.
 - [Predicting Panel Sound Insulation](/phonometry/buildings/design/panel-sound-insulation/): the composite-façade calculation and transmission through openings and slits.
-- [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/): the band spectra of $R'$, $D_{nT}$ and $L'_{nT}$ that these global quantities summarise.
+- [Field Insulation Measurement (ISO 16283)](/phonometry/buildings/insulation/insulation-field/): the band spectra of $R'$, $D_\mathrm{nT}$ and $L'_\mathrm{nT}$ that these global quantities summarise.
 - API reference: [`building.regulation.spain`](/phonometry/reference/api/building/spain/).
 - Theory: [Sound insulation and absorption, measured](/phonometry/reference/theory/rooms-buildings/#sound-insulation-and-absorption-measured-iso-16283-iso-10140-iso-717-iso-354): the quantities the code requires, derived from ISO 12354 and ISO 717 rather than from the code.
 
@@ -385,9 +385,9 @@ scope as well.
 
 ### How does the DB-HR index RA differ from the Rw of ISO 717-1?
 
-The $R_w$ of ISO 717-1 comes from shifting a reference curve over sixteen
-one-third-octave bands (100 Hz to 3150 Hz). The $R_A$ of DB-HR comes from
+The $R_\mathrm{w}$ of ISO 717-1 comes from shifting a reference curve over sixteen
+one-third-octave bands (100 Hz to 3150 Hz). The $R_\mathrm{A}$ of DB-HR comes from
 weighting the band sound reduction index with a normalised pink-noise spectrum
 and summing energetically over **eighteen** bands (100 Hz to 5 kHz). DB-HR
-accepts the equivalence $R_A \approx R_w + C$, but that $C$ is the
+accepts the equivalence $R_\mathrm{A} \approx R_\mathrm{w} + C$, but that $C$ is the
 enlarged-range term $C_{100-5000}$, not the core-range one.

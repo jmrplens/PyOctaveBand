@@ -142,7 +142,7 @@ up to 12 kHz.
 Two practical notes from the paper are built in: the recording mean is
 subtracted by default (`remove_dc=True`; a DC offset otherwise leaks a
 scaled inverse filter into the impulse response), and the non-integer part
-of each arrival $L\ln(n) f_s$ is removed in the frequency domain, so the
+of each arrival $L\ln(n) f_\mathrm{s}$ is removed in the frequency domain, so the
 harmonic phases carry no residual sub-sample skew.
 
 ## 3. Analysing classical ESS recordings (`method="farina"`)

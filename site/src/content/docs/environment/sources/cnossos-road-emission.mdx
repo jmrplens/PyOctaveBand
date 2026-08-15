@@ -92,7 +92,7 @@ powered two-wheelers of category 4, which have no rolling noise at all and take
 the propulsion term alone (2.2.3):
 
 $$
-L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{WR,i,m}/10} + 10^{L_{WP,i,m}/10}\right).
+L_{W,i,m} = 10\,\log_{10}\!\left(10^{L_{W\mathrm{R},i,m}/10} + 10^{L_{W\mathrm{P},i,m}/10}\right).
 $$
 
 Table [2.2.a] defines five vehicle categories: **1** light motor vehicles, **2**
@@ -168,10 +168,10 @@ decibels. This is where each of them is read from.
 
 | Argument | What it means | Where it is read from | The trap |
 | :--- | :--- | :--- | :--- |
-| `RoadTraffic.flow_rate` ($Q_m$) | Vehicles of category $m$ per hour | Yearly average per hour, per time period (day / evening / night), per vehicle class and **per source line**, from traffic counting or a traffic model (2.2.1) | A peak-hour count. $Q$ is an annual average for the period, which is what makes the result an $L_{den}$ ingredient |
+| `RoadTraffic.flow_rate` ($Q_m$) | Vehicles of category $m$ per hour | Yearly average per hour, per time period (day / evening / night), per vehicle class and **per source line**, from traffic counting or a traffic model (2.2.1) | A peak-hour count. $Q$ is an annual average for the period, which is what makes the result an $L_\mathrm{den}$ ingredient |
 | `RoadTraffic.speed` ($v_m$) | Representative speed of category $m$ | In most cases the **lower** of the legal maximum for the road section and the legal maximum for the vehicle category; where local measurement data is unavailable, the legal maximum for the category (2.2.1) | Assuming a measured average is required. It is not — the standard's default *is* the legal limit, and heavy vehicles usually take a lower one than the section |
 | `temperature` ($\tau$) | Air temperature | The **yearly average** air temperature of the period, from long-term meteorological data (2.2.10) | The survey-day value. At $K_1 = 0{,}08$ dB/°C, a 12 °C annual mean against a 20 °C afternoon is 0,6 dB on the light-vehicle rolling term |
-| `RoadTraffic.studded_fraction`, `studded_months` ($Q_{\mathrm{stud,ratio}}$, $T_s$) | Fleet share and season | The average ratio of light vehicles per hour fitted with studded tyres **during** the months they are fitted, and the number of those months; the method forms $p_s = Q_{\mathrm{stud,ratio}}\,T_s/12$ itself (2.2.7) | Passing the year-averaged share, which applies $T_s/12$ twice |
+| `RoadTraffic.studded_fraction`, `studded_months` ($Q_{\mathrm{stud,ratio}}$, $T_\mathrm{s}$) | Fleet share and season | The average ratio of light vehicles per hour fitted with studded tyres **during** the months they are fitted, and the number of those months; the method forms $p_\mathrm{s} = Q_{\mathrm{stud,ratio}}\,T_\mathrm{s}/12$ itself (2.2.7) | Passing the year-averaged share, which applies $T_\mathrm{s}/12$ twice |
 | `junction_distance` ($x$) | Distance to the junction | Measured along the road from the point source to the nearest **intersection of this source line with another source line** (2.2.5) | Measuring to the stop line or the kerb. It is the line crossing, and only the last 100 m is affected |
 | `junction_type` ($k$) | 1 crossing with lights, 2 roundabout | The junction control, not its shape | A priority junction is neither: the correction is defined for signals and roundabouts |
 | `gradient` ($s$) | Signed longitudinal slope, % | The terrain model along the source line, saturating at ±12 % | Applying one sign to a two-way flow. The standard requires splitting the flow in half and correcting one half uphill and the other downhill |
@@ -180,7 +180,7 @@ decibels. This is where each of them is read from.
 
 Two consequences worth stating outright. First, the temperature has to belong to
 the *same* period as $Q$ and $v$: a night flow paired with an annual mean
-temperature and a night speed is what makes the resulting line power an $L_{den}$
+temperature and a night speed is what makes the resulting line power an $L_\mathrm{den}$
 ingredient rather than a snapshot of one evening. Second, the source line is a
 modelling object, not a lane marking — moving it from the lane centre to the
 kerb changes every propagation distance downstream of it.
@@ -191,8 +191,8 @@ Rolling noise is tyre-road noise. It grows logarithmically with speed from the
 reference speed $v_\mathrm{ref} = 70\ \text{km/h}$:
 
 $$
-L_{WR,i,m} = A_{R,i,m} + B_{R,i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
-             + \Delta L_{WR,i,m},
+L_{W\mathrm{R},i,m} = A_{\mathrm{R},i,m} + B_{\mathrm{R},i,m}\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right)
+             + \Delta L_{W\mathrm{R},i,m},
 $$
 
 where the correction collects four independent effects (2.2.5): the road
@@ -207,20 +207,20 @@ harder and the road louder, so the correction is *positive* below 20 °C.
 **Studded tyres** (2.2.6 to 2.2.9) apply to category 1 only. The per-tyre excess
 $D_{\mathrm{stud},i}(v)$ saturates below 50 km/h and above 90 km/h, and the
 fleet-level correction weights it by the share of the year that studded tyres
-are on the road, $p_s = Q_{\mathrm{stud,ratio}} \cdot T_s/12$:
+are on the road, $p_\mathrm{s} = Q_{\mathrm{stud,ratio}} \cdot T_\mathrm{s}/12$:
 
 $$
-\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_s) + p_s\,10^{D_{\mathrm{stud},i}/10}\right].
+\Delta L_{\mathrm{studded},i} = 10\,\log_{10}\!\left[(1 - p_\mathrm{s}) + p_\mathrm{s}\,10^{D_{\mathrm{stud},i}/10}\right].
 $$
 
 **Junctions** (2.2.17, 2.2.18) add the same linear taper to both terms:
-$\Delta L_{WR,\mathrm{acc}} = C_{R,m,k}\cdot\max(1 - |x|/100,\ 0)$ for rolling
-noise and $\Delta L_{WP,\mathrm{acc}} = C_{P,m,k}\cdot\max(1 - |x|/100,\ 0)$ for
+$\Delta L_{W\mathrm{R,acc}} = C_{\mathrm{R},m,k}\cdot\max(1 - |x|/100,\ 0)$ for rolling
+noise and $\Delta L_{W\mathrm{P,acc}} = C_{\mathrm{P},m,k}\cdot\max(1 - |x|/100,\ 0)$ for
 propulsion noise, with $x$ the distance in metres from the point source to the
 nearest intersection of its source line with another source line, and $k$ the
 junction type: 1 for a crossing with traffic lights, 2 for a roundabout. Both are
-attributed equally to all octave bands. The rolling coefficients $C_R$ are
-*negative* (traffic near a junction is slower), the propulsion coefficients $C_P$
+attributed equally to all octave bands. The rolling coefficients $C_\mathrm{R}$ are
+*negative* (traffic near a junction is slower), the propulsion coefficients $C_\mathrm{P}$
 positive (it is accelerating), and the standard states explicitly that both are
 zero from $|x| \ge 100$ m.
 
@@ -288,8 +288,8 @@ is **linear** in speed, not logarithmic, because at low speed the engine is
 working hardest relative to the distance covered:
 
 $$
-L_{WP,i,m} = A_{P,i,m} + B_{P,i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
-             + \Delta L_{WP,i,m}.
+L_{W\mathrm{P},i,m} = A_{\mathrm{P},i,m} + B_{\mathrm{P},i,m}\,\frac{v_m - v_\mathrm{ref}}{v_\mathrm{ref}}
+             + \Delta L_{W\mathrm{P},i,m}.
 $$
 
 Where the two speed laws cross is what makes the road source behave the way
@@ -416,9 +416,9 @@ valid. The surface enters the two terms
 differently:
 
 $$
-\Delta L_{WR,\mathrm{road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
+\Delta L_{W\mathrm{R,road},i,m} = \alpha_{i,m} + \beta_m\,\log_{10}\!\left(\frac{v_m}{v_\mathrm{ref}}\right),
 \qquad
-\Delta L_{WP,\mathrm{road},i,m} = \min\{\alpha_{i,m};\,0\}.
+\Delta L_{W\mathrm{P,road},i,m} = \min\{\alpha_{i,m};\,0\}.
 $$
 
 An absorbing surface reduces propulsion noise; a noisy one does not increase it.
@@ -478,8 +478,8 @@ and seven years old, in representative maintenance condition, dry, with no
 studded tyres, at 20 °C, on the flat. Under exactly those conditions every
 correction in 2.2 vanishes identically, so at the reference speed
 $v_m = v_\mathrm{ref} = 70\ \text{km/h}$, where the two speed terms vanish as
-well, the sound powers **are** the Table F-1 coefficients $A_{R,i,m}$ and
-$A_{P,i,m}$.
+well, the sound powers **are** the Table F-1 coefficients $A_{\mathrm{R},i,m}$ and
+$A_{\mathrm{P},i,m}$.
 
 ## 6. Handing the source to a propagation model
 
@@ -619,4 +619,4 @@ point sources is declared out of scope by the method itself.
 - [Outdoor Sound Propagation](/phonometry/environment/propagation/outdoor-propagation/): the
   ISO 9613-2 chain that carries a source power to a receiver.
 - [Environmental noise levels](/phonometry/environment/assessment/environmental-levels/): the
-  $L_{den}$ and $L_{night}$ indicators the resulting maps are drawn for.
+  $L_\mathrm{den}$ and $L_\mathrm{night}$ indicators the resulting maps are drawn for.

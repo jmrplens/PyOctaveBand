@@ -89,8 +89,8 @@ los micrófonos del interior no captan. $C_1$ (cantidad de referencia) y $C_2$
 de referencia de 23 °C y 101,325 kPa,
 
 $$
-C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273{,}15 + \theta}{314}, \qquad
-C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273{,}15 + \theta}{296},
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 5 \log_{10}\frac{273{,}15 + \theta}{314}, \qquad
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 15 \log_{10}\frac{273{,}15 + \theta}{296},
 $$
 
 con la velocidad del sonido $c = 20{,}05\sqrt{273 + \theta}$.
@@ -174,12 +174,12 @@ y un espectro medido otro día no lo es.
 
 El `SoundPowerWarning` con una dispersión entre posiciones de 1,5 dB es la
 entrada a la ampliación, no un defecto en sí mismo. El apartado 8.4.2.2 calcula
-la desviación típica $s_M$ de los seis niveles iniciales banda a banda (Ec. 10);
+la desviación típica $s_\mathrm{M}$ de los seis niveles iniciales banda a banda (Ec. 10);
 por encima de 1,5 dB en alguna banda la fuente está radiando componentes
 discretas significativas para esa cámara, y la respuesta es *muestrear más*, no
 otra fórmula: o se cualifica la cámara según el Anexo D, o se lee el número de
 posiciones necesario en la Tabla 4 — seis siguen siendo seis hasta 160 Hz, pero
-de 400 Hz a 630 Hz pasan a 12 posiciones para $1{,}5 < s_M \le 3$ dB y a 24 por
+de 400 Hz a 630 Hz pasan a 12 posiciones para $1{,}5 < s_\mathrm{M} \le 3$ dB y a 24 por
 encima de 3 dB, y de 800 Hz hacia arriba a 15 y 30 — y se añaden posiciones de
 fuente según la Ec. 12 y la Tabla 5. Promediar más tiempo en seis posiciones no
 compra nada aquí, porque la dispersión es espacial. El número de posiciones, la
@@ -220,7 +220,7 @@ rev.plot()   # espectro LW de la cámara reverberante; LWA en el título (requie
 
 *El nivel medio de la cámara llevado a través de los términos de área de
 absorción, de Waterhouse y meteorológicos de la Ec. 20 da el $L_W(f)$ por tercio
-de octava, y la suma energética ponderada A entre las 21 bandas da el $L_{WA}$ del
+de octava, y la suma energética ponderada A entre las 21 bandas da el $L_{W\mathrm{A}}$ del
 título.*
 
 <details>
@@ -323,7 +323,7 @@ plt.show()
 | `t60` | float o array 1D | s | > 0 | Tiempo de reverberación de la cámara (el escalar se difunde) |
 | `volume` | float | m³ | > 0 | Volumen de la cámara $V$ |
 | `surface_area` | float | m² | > 0 | Superficie total de la cámara $S$ (Waterhouse, $A/S$) |
-| `frequencies` | array 1D | Hz | uno por banda | Obligatorio (Waterhouse necesita $f$); habilita $L_{WA}$ |
+| `frequencies` | array 1D | Hz | uno por banda | Obligatorio (Waterhouse necesita $f$); habilita $L_{W\mathrm{A}}$ |
 | `background_levels` | array 1D o 2D | dB | coincide con `levels` | $K_1$ por banda (criterio dependiente de la frecuencia) |
 | `temperature` | float | °C | por defecto `23.0` | Fija $c$, $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | por defecto `101.325` | Fija $C_1$, $C_2$ |
@@ -366,9 +366,9 @@ presión y humedad (apartado 8.6.2).
 
 Como la RSS aporta la constante de la sala, la distancia mínima entre fuente y
 micrófono puede tomarse también de la propia lectura de la RSS (apartado 8.3,
-Ec. 9), $d_{\min} = D_2 \cdot 10^{0{,}05 (L_{Wr} - L_{pr})}$ con $D_2 = 0{,}4$ y
+Ec. 9), $d_{\min} = D_2 \cdot 10^{0{,}05 (L_{W\mathrm{r}} - L_{p\mathrm{r}})}$ con $D_2 = 0{,}4$ y
 0,8 recomendado por debajo de 5 kHz. En el ejemplo de abajo,
-$L_{Wr} - L_{pr} = 7$ dB en la banda de 100 Hz, así que
+$L_{W\mathrm{r}} - L_{p\mathrm{r}} = 7$ dB en la banda de 100 Hz, así que
 $d_{\min} = 0{,}90$ m, o 1,8 m con el $D_2$ recomendado — lo bastante cerca de
 los 0,8/1,6 m de la Ec. 8 como para servir de contraste útil.
 
@@ -415,11 +415,11 @@ indica qué método se empleó, el método directo usando el área de absorción
 equivalente de la cámara (Ec. 20) o el método de comparación usando una fuente
 sonora de referencia (Ec. 21). La tabla por bandas lista el nivel de presión
 acústica medio en la cámara $L_p$ y el nivel de potencia acústica de banda $L_W$,
-y el recuadro del $L_{WA}$ recoge el $L_W$ total y el método de determinación
+y el recuadro del $L_{W\mathrm{A}}$ recoge el $L_W$ total y el método de determinación
 (el resultado en cámara reverberante no tiene incertidumbre expandida $U$).
 `verbose=True` añade la corrección por ruido de fondo $K_1$ y, para el método
 directo, el área de absorción equivalente $A$ y la corrección de contorno de
-Waterhouse $C_w$; la franja de base indica el modelo de corrección (Ec. 20 o
+Waterhouse $C_\mathrm{w}$; la franja de base indica el modelo de corrección (Ec. 20 o
 Ec. 21), las correcciones meteorológicas aplicadas $C_1$/$C_2$ y la velocidad
 del sonido, y cita la ponderación A del Anexo F.
 
@@ -514,7 +514,7 @@ viven en [Potencia acústica](/phonometry/es/devices/emission/sound-power/).
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): la medición del
   tiempo de reverberación $T_{60}$ que fija el área de absorción de Sabine.
 - [Niveles](/phonometry/es/signals/levels/levels/): el promediado en energía y la
-  ponderación A que sustentan $L_{WA}$.
+  ponderación A que sustentan $L_{W\mathrm{A}}$.
 - [Teoría](/phonometry/es/reference/theory/environment-transport/): las
   derivaciones de Waterhouse y $C_1$/$C_2$.
 - Referencia de la API: [`emission.sound_power_reverberation`](/phonometry/es/reference/api/power/sound-power-reverberation/).

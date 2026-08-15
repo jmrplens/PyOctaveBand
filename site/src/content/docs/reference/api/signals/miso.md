@@ -164,7 +164,7 @@ conditioning that produced the partial coherences is recorded in
 | `coherent_output_random_error` | Normalized random error of each $G_{v_i}$ (Eq. 9.100), shape `(q, F)`, using $n_d - (i-1)$ effective averages for the `i`-th ordered input. |
 | `n_segments` | Raw number of (possibly overlapped) segments averaged. |
 | `n_averages` | Effective number of independent averages $n_d$. |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$, in Hz. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |

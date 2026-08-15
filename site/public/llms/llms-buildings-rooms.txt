@@ -379,7 +379,7 @@ mistakes bias the mean itself:
   sit on symmetry lines.
 - **Too close to the source.** Inside the direct field EDT collapses and
   C80 saturates upward no matter what the room does. ISO 3382-2 therefore
-  keeps every microphone at least $d_{min} = 2\sqrt{V/(c\,\hat T)}$ from
+  keeps every microphone at least $d_\mathrm{min} = 2\sqrt{V/(c\,\hat T)}$ from
   the source, with $\hat T$ an estimate of the expected reverberation time
   (about 2.2 m for a 200 m³ classroom with an expected 0.5 s).
 - **Low-frequency luck.** Below the Schroeder frequency (see the
@@ -516,7 +516,7 @@ D_{50} = \frac{\int_0^{0.05} p^2\ dt}{\int_0^{\infty} p^2\ dt},
 $$
 
 with $te = 50$ ms → C50 (speech) and $te = 80$ ms → C80 (music), plus the
-**centre time** $T_s = \int t\ p^2\ dt / \int p^2\ dt$. Each parameter has a
+**centre time** $T_\mathrm{s} = \int t\ p^2\ dt / \int p^2\ dt$. Each parameter has a
 **just-noticeable difference** (ISO 3382-1 Table A.1: EDT 5 %, C80 1 dB,
 D50 0.05, Ts 10 ms) that sets how precisely it is worth reporting.
 
@@ -686,7 +686,7 @@ INR at acquisition, since doubling the sweep length or
 the number of synchronous averages buys 3 dB each time; and only then fall
 back to EDT, never to a fit stretched into the noise.
 
-Below the **Schroeder frequency** $f_s \approx 2000\sqrt{T/V}$ these
+Below the **Schroeder frequency** $f_\mathrm{s} \approx 2000\sqrt{T/V}$ these
 decay statistics stop telling the whole story: the field is ruled by
 discrete **room modes**. The simulation below drives the same rigid
 5 m by 3.5 m room at its (2,1) mode and then between two modes; on
@@ -731,7 +731,7 @@ room-acoustics measurement report (a performance space per ISO 3382-1:2009 or
 an ordinary room per ISO 3382-2:2008, both evaluated by the integrated
 impulse-response method): a standard-basis line, an optional metadata header
 block, the full-width per-band parameter table ($T_{20}$, $T_{30}$, EDT,
-$C_{50}$, $C_{80}$, $D_{50}$, $T_s$) above the result's own per-band decay-time
+$C_{50}$, $C_{80}$, $D_{50}$, $T_\mathrm{s}$) above the result's own per-band decay-time
 plot (`.plot()`), the boxed mid-frequency reverberation time $T_\text{mid}$
 (the mean of the 500 Hz and 1000 Hz octave $T_{30}$) with the mid-frequency EDT
 alongside, and a footer with the fixed disclaimer. ISO 3382-1/-2 are
@@ -895,12 +895,12 @@ $\log_{10}(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
 positions,
 
 $$
-D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
+D_\mathrm{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-with **$L_{p,A,S,4m}$** read off the same line at 4 m. The **distraction
-distance** $r_D$ (STI = 0.50) and **privacy distance** $r_P$ (STI = 0.20) come
-from a linear regression of STI against distance. Good offices push $r_D$
+with **$L_{p,\mathrm{A,S},4\,\mathrm{m}}$** read off the same line at 4 m. The **distraction
+distance** $r_\mathrm{D}$ (STI = 0.50) and **privacy distance** $r_\mathrm{P}$ (STI = 0.20) come
+from a linear regression of STI against distance. Good offices push $r_\mathrm{D}$
 below ~5 m; poor ones leave speech distracting past 10 m.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan.svg" alt="ISO 3382-3 open-plan measurement line from the source at 1 m along positions from 2 m to 16 m, feeding the four single-number quantities D2,S, Lp,A,S,4m, rD and rP" width="86%"></picture>
@@ -991,7 +991,7 @@ the axis, and a result that retained its positions redraws its own line with
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry.svg" alt="To-scale plan of the open-plan measurement line: the red source star at the origin, six blue microphone dots from 2 m to 16 m on a dotted line through the grey workstation blocks, the dashed distraction distance rD = 6.5 m and privacy distance rP = 13 m marked across the line and the 16 m span dimensioned" width="86%"></picture>
 
 *Every ISO 3382-3 quantity comes off this one line: six microphones from 2 m
-to 16 m through the workstations, with $r_D$ and $r_P$ landing between them.*
+to 16 m through the workstations, with $r_\mathrm{D}$ and $r_\mathrm{P}$ landing between them.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1017,7 +1017,7 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | 1D array | m | ≥ 4 positions, all > 0 | Source-to-receiver distances |
-| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,A,S,n}$ per position |
+| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,\mathrm{A,S},n}$ per position |
 | `sti_values` | 1D array | — | same length | STI per position (full IEC 60268-16 method) |
 
 Returns an `OpenPlanResult` with `d2s`, `lp_as_4m`, `rd` and `rp`; its
@@ -1029,7 +1029,7 @@ STI can itself be measured with the STIPA tools in the
 [Speech Transmission Index guide](https://jmrplens.github.io/phonometry/perception/speech/speech-transmission/).
 
 Two things stay outside the function. The fourth required single number, the
-average A-weighted background noise $L_{p,A,B}$, is not computed here — it is
+average A-weighted background noise $L_{p,\mathrm{A,B}}$, is not computed here — it is
 the energetic A-weighted average of the per-position octave-band background
 levels, and it belongs in the report alongside the quantities this page
 produces. And nothing checks the measurement conditions of clauses 5.1 and
@@ -1042,15 +1042,15 @@ the background capture are the operator's responsibility, not the library's.
 `OpenPlanResult.report(path)` renders a one-page PDF fiche laid out like an
 open-plan-office speech-privacy measurement report: a standard-basis line, an
 optional metadata header block, a compact metrics table of the four
-single-number quantities of Clause 4 ($D_{2,S}$, $L_{p,A,S,4m}$, the
-distraction distance $r_D$ and the privacy distance $r_P$) stacked above the
+single-number quantities of Clause 4 ($D_\mathrm{2,S}$, $L_{p,\mathrm{A,S},4\,\mathrm{m}}$, the
+distraction distance $r_\mathrm{D}$ and the privacy distance $r_\mathrm{P}$) stacked above the
 full-width spatial-decay plot (`.plot()`, the Clause 6.2 regression on the
-logarithmic distance axis with the 4 m read-off and the $r_D$ / $r_P$ crossings
-marked), the boxed $D_{2,S}$ with the other quantities alongside, and a footer with the
+logarithmic distance axis with the 4 m read-off and the $r_\mathrm{D}$ / $r_\mathrm{P}$ crossings
+marked), the boxed $D_\mathrm{2,S}$ with the other quantities alongside, and a footer with the
 fixed disclaimer. ISO 3382-3 **characterises** a space rather than defining an
 intrinsic pass/fail, so a verdict row appears only when a target spatial decay
 rate is supplied through the metadata's `requirement` field
-(`ReportMetadata(requirement=...)`, read as the minimum acceptable $D_{2,S}$ in
+(`ReportMetadata(requirement=...)`, read as the minimum acceptable $D_\mathrm{2,S}$ in
 dB, reflecting the informative quality ranges of Annex A where a larger spatial
 decay is better; the room passes at or above it). It uses the same
 `ReportMetadata` container as the [ISO 3382-1/-2 room-acoustics fiche](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/#iso-3382-report-report);
@@ -1093,7 +1093,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 3382-3 open-plan office acoustics example report: metadata header, the metrics table of the four single-number quantities (D2,S = 7.0 dB per doubling, Lp,A,S,4m = 48.0 dB, rD = 5.0 m, rP = 15.0 m) above the spatial-decay plot on a logarithmic distance axis with the D2,S regression, the 4 m read-off and the rD and rP crossings, boxed D2,S and a PASS verdict against a 7.0 dB target](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3382_3_open_plan_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3382_3_open_plan_example.pdf)
 
-*Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
+*Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_\mathrm{2,S}$, $L_{p,\mathrm{A,S},4\,\mathrm{m}}$, $r_\mathrm{D}$, $r_\mathrm{P}$ and the spatial-decay curve.*
 
 ## Crowd self-noise in an occupied room
 
@@ -1135,7 +1135,7 @@ Subtracting the two gives the **speech-to-noise ratio**, and this is the result
 worth remembering:
 
 $$
-L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
+L_\mathrm{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
 + 10\log_{10}\!\left[\frac{A_\text{tab}}{4}\right]
 \quad \text{(Eq. (17.52))}
 $$
@@ -1143,8 +1143,8 @@ $$
 Neither $L_W$ nor $N$ survives. A busier room is not intrinsically worse,
 because each new table brings both a talker and its own share of absorption.
 What decides whether a restaurant works is the absorption **per table**, not
-the absorption of the room. Requiring $L_{SN} > -6$ dB for adequate
-cross-table communication at a separation $r_s$, and $L_{SN} < -9$ dB so a
+the absorption of the room. Requiring $L_\mathrm{SN} > -6$ dB for adequate
+cross-table communication at a separation $r_s$, and $L_\mathrm{SN} < -9$ dB so a
 neighbouring table $r_t$ away is not overheard, turns into a pair of design
 bounds:
 
@@ -1216,12 +1216,12 @@ absorption or where in the room a given table sits.
 ## Standards
 
 ISO 3382-3:2012 (open-plan office speech metrics: the spatial decay rate
-$D_{2,S}$, the A-weighted speech level at 4 m, and the distraction and
+$D_\mathrm{2,S}$, the A-weighted speech level at 4 m, and the distraction and
 privacy distances from STI). Validated against the standard's own quantity
 definitions in the [conformance report](https://jmrplens.github.io/phonometry/reference/conformance/). The
 implemented edition is frozen at ISO 3382-3:2012; the superseding
-ISO 3382-3:2022 revision removes the privacy distance $r_P$, adds the
-comfort distance $r_C$ and moves the per-position STI to the indirect
+ISO 3382-3:2022 revision removes the privacy distance $r_\mathrm{P}$, adds the
+comfort distance $r_\mathrm{C}$ and moves the per-position STI to the indirect
 IEC 60268-16 method, and is not the one checked here.
 
 ## See also
@@ -1485,15 +1485,15 @@ with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
 from 400 Pa·s/m and is omitted by default. The **critical distance**
 
 $$
-r_c = \sqrt{Q R / (16 \pi)}
+r_\mathrm{c} = \sqrt{Q R / (16 \pi)}
 $$
 
 is where the two fields are equal (the crossover of Equation (6.43)); closer
-than $r_c$ the direct field dominates, farther the reverberant field does.
-Kuttruff's reverberation distance (Equation (5.44), $r_c = \sqrt{A / 16 \pi}$
+than $r_\mathrm{c}$ the direct field dominates, farther the reverberant field does.
+Kuttruff's reverberation distance (Equation (5.44), $r_\mathrm{c} = \sqrt{A / 16 \pi}$
 for $Q = 1$) uses the Sabine absorption area $A = S \bar\alpha$ instead of the
 room constant $R = A / (1 - \bar\alpha)$; the two coincide for a small
-$\bar\alpha$ and this module uses $R$, so $r_c$ is exactly the crossover of its
+$\bar\alpha$ and this module uses $R$, so $r_\mathrm{c}$ is exactly the crossover of its
 own `steady_state_spl`.
 
 ```python
@@ -1518,7 +1518,7 @@ print(round(float(room.steady_state_spl(90.0, 5.0, 25.0)), 2))    # far-field le
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%"></picture>
 
 *A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
-0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
+0.15: within $r_\mathrm{c} = 1.11$ m moving away drops the level 6 dB per doubling;
 beyond it the reverberant plateau takes over and only absorption, not
 distance, lowers the level (Bies 5e, §6.4).*
 
@@ -1578,12 +1578,12 @@ that raises `Q` also raises the radiated power is a modelling choice worth up to
 The **Schroeder frequency**
 
 $$
-f_s = 2000 \sqrt{T / V} \quad \text{(Kuttruff Equation (3.44))}
+f_\mathrm{s} = 2000 \sqrt{T / V} \quad \text{(Kuttruff Equation (3.44))}
 $$
 
 ($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse transition, a
 heuristic crossover rather than a sharp cutoff: well below it discrete room
-modes dominate and the diffuse assumptions of $R$ and $r_c$ grow unreliable,
+modes dominate and the diffuse assumptions of $R$ and $r_\mathrm{c}$ grow unreliable,
 well above it the modes overlap and the statistical field of this section
 holds. In borderline rooms it is worth checking band by band.
 
@@ -2456,7 +2456,7 @@ repository. Click the preview to open the PDF:
 ## See also
 
 - [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/):
-  the ISO 354 measurement every $\alpha_s$ on this page comes from, its mounting
+  the ISO 354 measurement every $\alpha_\mathrm{s}$ on this page comes from, its mounting
   dependence, and the ISO 11654 rating that must *not* be substituted for the
   per-band table (§0).
 - [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/#how-much-decay-range-do-i-need-for-a-valid-t20-or-t30):
@@ -2551,8 +2551,8 @@ coefficient, the equivalent absorption areas of the objects, the object arrays
 and the air absorption (Formula 1):
 
 $$
-A = \sum_i \alpha_{s,i}\,S_i + \sum_j A_{\mathrm{obj},j}
-    + \sum_k \alpha_{s,k}\,S_k + A_{\mathrm{air}}.
+A = \sum_i \alpha_{\mathrm{s},i}\,S_i + \sum_j A_{\mathrm{obj},j}
+    + \sum_k \alpha_{\mathrm{s},k}\,S_k + A_{\mathrm{air}}.
 $$
 
 For hard, irregular objects whose absorption is not measured, an empirical
@@ -2651,7 +2651,7 @@ reverberation time in [Room Acoustics](https://jmrplens.github.io/phonometry/bui
 
 ## 3. Where the input data comes from
 
-**Surface coefficients.** The standard expects the $\alpha_{s,i}$ to come
+**Surface coefficients.** The standard expects the $\alpha_{\mathrm{s},i}$ to come
 from laboratory measurements to EN ISO 354, the reverberation-room method of
 [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/);
 theoretical, empirical or field
@@ -2664,16 +2664,16 @@ because the same diffuse-field convention that produced it is the one the
 model assumes.
 
 **Furniture and occupants.** Objects contribute through three routes:
-a measured equivalent absorption area $A_{obj}$ when one exists (persons
+a measured equivalent absorption area $A_\mathrm{obj}$ when one exists (persons
 and seating have tabulated values in the informative Annex C), the
-Formula 4 estimate $V_{obj}^{2/3}$ for hard, irregular, unmeasured objects
+Formula 4 estimate $V_\mathrm{obj}^{2/3}$ for hard, irregular, unmeasured objects
 (furniture, machinery), and object *arrays* rated as an absorbing surface
-$\alpha_s S_k$ when many similar objects cover a zone (an audience, a
+$\alpha_\mathrm{s} S_k$ when many similar objects cover a zone (an audience, a
 storage rack). Objects also displace air: their summed volume enters the
 object fraction $\psi$ that shortens $T$ in Formula 5 beyond what their
 absorption alone would.
 
-**Air.** The air term $A_{air} = 4mV(1-\psi)$ uses the power attenuation
+**Air.** The air term $A_\mathrm{air} = 4mV(1-\psi)$ uses the power attenuation
 coefficient $m$ from the standard's Table 1, resolved by the
 `air_condition` strings (temperature and relative-humidity class, derived
 from ISO 9613-1); it only matters above 1 kHz and grows with the volume.
@@ -2764,11 +2764,11 @@ repository. Click the preview to open the PDF:
 - [Room acoustic parameters (ISO 3382-1/2)](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/):
   the measured counterpart of the reverberation time predicted here.
 - [Sound Absorption Measurement and Rating](https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/):
-  where the $\alpha_s$ come from (ISO 354) and where $\alpha_w$ is defined
+  where the $\alpha_\mathrm{s}$ come from (ISO 354) and where $\alpha_\mathrm{w}$ is defined
   (ISO 11654) — the rating §3 forbids as an input.
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
   the family member that consumes the $A$ computed here, through
-  $D_{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
+  $D_\mathrm{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
 - [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   the three Annex E cases these implementations are checked against.
 - [Outdoor Sound Propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the full ISO 9613-1

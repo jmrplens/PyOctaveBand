@@ -13,10 +13,10 @@ and a **radiation factor** `epsilon` (the radiation efficiency). The radiated
 power, in watts, is (ISO/TS 7849-1, Equation 6):
 
 $$
-P = Z_c \, \langle v^2 \rangle \, S \, \epsilon
+P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \epsilon
 $$
 
-with $Z_c$ the characteristic impedance of air and
+with $Z_\mathrm{c}$ the characteristic impedance of air and
 $\langle v^2 \rangle$ the mean-square vibratory velocity averaged over
 the radiating area $S$. The vibratory velocity is reported as a
 **level**, in decibels, re $v_0 = 5 \times 10^{-8}$ m/s (Equation 3):
@@ -29,12 +29,12 @@ so the A-weighted sound power level follows in logarithmic form, in decibels
 (ISO/TS 7849-1, Equation 12; ISO/TS 7849-2, Equation 15):
 
 $$
-L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
+L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}}
 $$
 
 where $S_0 = 1~\text{m}^2$, the normalized characteristic impedance
-$Z_{c,n} = 411~\text{N s/m}^3$ (at 23 degC, 101.3 kPa) and the
-reference acoustic impedance $Z_{c,0} = 400~\text{N s/m}^3$ give the
+$Z_\mathrm{c,n} = 411~\text{N s/m}^3$ (at 23 degC, 101.3 kPa) and the
+reference acoustic impedance $Z_{\mathrm{c},0} = 400~\text{N s/m}^3$ give the
 fixed $10 \log_{10}(411/400) = 0.118$ dB term.
 
 The two parts differ only in `epsilon`:
@@ -44,7 +44,7 @@ The two parts differ only in `epsilon`:
   $\langle v^2 \rangle$ and `S`.
 * **Part 2 (engineering)** applies a frequency-band radiation factor
   `epsilon_j` determined (per ISO 9614) as
-  $\epsilon_j = P_j / (Z_{c,n} \langle v_j^2 \rangle S)$ (Equation 8).
+  $\epsilon_j = P_j / (Z_\mathrm{c,n} \langle v_j^2 \rangle S)$ (Equation 8).
 
 This module feeds the structure-borne source characterisation standards
 (ISO 9611, EN 15657, EN 12354-5).
@@ -123,7 +123,7 @@ radiated_sound_power_level(
 Radiated sound power level (ISO/TS 7849-1 Eq. 12, -2 Eq. 15).
 
 $$
-L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
+L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon + 10 \log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}}
 $$
 
 With the default `radiation_factor = 1` this is the Part 1 *upper limit*
@@ -162,7 +162,7 @@ radiation_factor(
 
 A-weighted radiation factor `epsilon` (ISO/TS 7849-1 Eq. 4, -2 Eq. 8).
 
-$\epsilon = P / (Z_c \langle v^2 \rangle S)$, the sound-radiation
+$\epsilon = P / (Z_\mathrm{c} \langle v^2 \rangle S)$, the sound-radiation
 efficiency, from an independently measured radiated power (ISO 9614), the
 surface area and the mean-square vibratory velocity.
 
@@ -344,7 +344,7 @@ spectrum `LW(f)` with a nominal band axis, the boxed A-weighted sound
 power level `LWA` (dB re 1 pW) with the total `LW`, the radiating
 area `S` and the applied method, an optional verdict row against a
 declared limit, and a measurement-basis strip stating the sound-power
-relation $L_W = L_v + 10 \log_{10}(S/S_0) + 10 \log_{10} \epsilon + 10 \log_{10}(Z_{c,n}/Z_{c,0})$.
+relation $L_W = L_v + 10 \log_{10}(S/S_0) + 10 \log_{10} \epsilon + 10 \log_{10}(Z_\mathrm{c,n}/Z_{\mathrm{c},0})$.
 
 **Parameters**
 

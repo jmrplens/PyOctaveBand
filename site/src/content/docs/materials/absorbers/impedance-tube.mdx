@@ -178,7 +178,7 @@ still return a perfectly plausible-looking spectrum.
 ±0.2 mm or better and traversing ones to ±0.5 mm (Clause 4.5); the reference
 plane's position relative to microphone 1 reported to ±0.5 mm (Clause 7.1);
 and the microphone diameter under 20 % of the spacing, and small against
-$c_0/f_u$, so the capsule averages a negligible piece of the wave
+$c_0/f_\mathrm{u}$, so the capsule averages a negligible piece of the wave
 (Clause 4.4). The reference plane, $x = 0$, is normally the specimen surface,
 but a profiled or laterally structured specimen has its reference plane placed
 some distance *in front* of it — and $x_1$ is measured to that plane, not to
@@ -374,11 +374,11 @@ complex transfer function $H_{12}$; from it the reflection factor at the sample
 face, the absorption and the normalised surface impedance follow (Eqs. (17)–(19)):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
 $$
 
-with $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, microphone spacing $s$ (the
+with $H_\mathrm{I} = e^{-j k_0 s}$, $H_\mathrm{R} = e^{+j k_0 s}$, microphone spacing $s$ (the
 Part 2 meaning of the letter again) and $x_1$ the distance from the reference
 plane to the farther microphone.
 
@@ -458,12 +458,12 @@ Both permitted procedures use the same measurement, made twice:
 2. **Physically interchange the two microphone cartridges**, so that A takes
    the exact position B occupied and vice versa, *without* moving the cables
    on the preamplifier or the analyser. Measure $H_{12}^{II}$.
-3. Form $H_c = \sqrt{H_{12}^{I}/H_{12}^{II}}$ (Eq. (10)) and divide the working
+3. Form $H_\mathrm{c} = \sqrt{H_{12}^{I}/H_{12}^{II}}$ (Eq. (10)) and divide the working
    transfer function by it.
 
 The difference between the two procedures is only how often step 2 is done.
 Clause 7.5.1 repeats the swap for *every* specimen, which suits a small number
-of samples; Clause 7.5.2 determines $H_c$ once against a calibration specimen
+of samples; Clause 7.5.2 determines $H_\mathrm{c}$ once against a calibration specimen
 and keeps it for the whole series, which suits a production run — after which
 the microphones must stay where they are. The one-microphone technique of
 Annex B needs no correction at all, because there is only one channel: it buys
@@ -610,7 +610,7 @@ result's own `.plot()`, on a continuous logarithmic frequency axis), a boxed
 characterisation headline and a footer with the fixed disclaimer. ISO 10534-2 is
 a characterisation, so the fiche carries no pass/fail verdict and no
 single-number rating; the normal-incidence coefficient is not comparable to the
-random-incidence $\alpha_s$/$\alpha_w$ of ISO 354 / ISO 11654. Setting
+random-incidence $\alpha_\mathrm{s}$/$\alpha_\mathrm{w}$ of ISO 354 / ISO 11654. Setting
 `verbose=True` inserts the reflection-factor magnitude $|r|$ column.
 
 It uses the same `ReportMetadata` container and rendering engine as the other
@@ -803,7 +803,7 @@ the free-standing layer lets through (the transmission loss, Eq. (26)) and
 how much the rigidly-backed layer absorbs (Eq. (28)).*
 
 **A tube TL is not a sound reduction index.** The fiche of section 3 warns
-that the normal-incidence $\alpha$ is not the random-incidence $\alpha_s$; the
+that the normal-incidence $\alpha$ is not the random-incidence $\alpha_\mathrm{s}$; the
 same warning applies on the transmission side and is missed more often. What
 the tube measures is the transmission loss of a specimen a few centimetres
 across, for one plane wave at one angle, with the specimen edges clamped by
@@ -987,7 +987,7 @@ stated for the operator, and nothing in the library checks that any of them
 was met. `tube_attenuation_constant` implements only the Eq. (A.18) estimate,
 which the standard itself calls a lower limit; the measured determination of
 Eqs. (A.13)/(A.14) from the empty tube is not implemented. The
-random-incidence $\alpha_s$ of the reverberation room is a different quantity
+random-incidence $\alpha_\mathrm{s}$ of the reverberation room is a different quantity
 with its own guide: [Sound Absorption Measurement and
 Rating](/phonometry/materials/absorbers/absorption-measurement/).
 </ScopeClaim>

@@ -60,7 +60,7 @@ dice a quien revisa si el veredicto sobrevive a la incertidumbre de medida.
 interesante.)
 
 Los métodos se apoyan en la **banda crítica**, el ancho de banda de análisis
-del oído, $\Delta f_c = 25 + 75\ [1 + 1{,}4(f/1000)^2]^{0{,}69}$ Hz (162 Hz a
+del oído, $\Delta f_\mathrm{c} = 25 + 75\ [1 + 1{,}4(f/1000)^2]^{0{,}69}$ Hz (162 Hz a
 1 kHz): a un tono solo lo enmascara el ruido que hay *dentro* de su banda
 crítica, así que ambos métodos se centran en esa banda y no en todo el
 espectro, pero la usan de forma distinta. La relación tono-ruido trabaja
@@ -70,16 +70,16 @@ en cambio, compara la banda *completa* centrada en el tono con la media de sus
 dos bandas críticas contiguas (apartado 12, Fórmula 23):
 
 $$
-\mathrm{TNR} = L_t - L_n, \qquad
-\mathrm{PR} = 10\,\log_{10}\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
+\mathrm{TNR} = L_\mathrm{t} - L_\mathrm{n}, \qquad
+\mathrm{PR} = 10\,\log_{10}\!\frac{W_\mathrm{M}}{\tfrac{1}{2}(W_\mathrm{L} + W_\mathrm{U})}\ \text{dB},
 $$
 
-donde $L_t$ es el nivel del tono (la suma en energía de las líneas tonales por
-encima de la línea de base entre los bordes de la banda, Fórmula 9), $L_n$ el
+donde $L_\mathrm{t}$ es el nivel del tono (la suma en energía de las líneas tonales por
+encima de la línea de base entre los bordes de la banda, Fórmula 9), $L_\mathrm{n}$ el
 nivel del ruido enmascarante que queda en la banda crítica, reescalado al ancho
-de banda crítico completo (Fórmulas 10–11), y $W_M$, $W_L$, $W_U$ las potencias
+de banda crítico completo (Fórmulas 10–11), y $W_\mathrm{M}$, $W_\mathrm{L}$, $W_\mathrm{U}$ las potencias
 de las bandas críticas central, inferior y superior (por debajo de
-$f_t = 171{,}4$ Hz la banda inferior truncada se reescala a un ancho de banda
+$f_\mathrm{t} = 171{,}4$ Hz la banda inferior truncada se reescala a un ancho de banda
 de 100 Hz, Fórmula 24).
 
 <ThemeImage
@@ -119,9 +119,9 @@ plt.show()
 
 </details>
 
-Un TNR igual o superior a $8 + 8{,}33\log_{10}(1000/f_t)$ dB por debajo de
-1 kHz (8 dB constantes para $f_t \ge 1$ kHz) clasifica el tono como
-*prominente*; el criterio del PR es $9 + 10\log_{10}(1000/f_t)$ dB por debajo
+Un TNR igual o superior a $8 + 8{,}33\log_{10}(1000/f_\mathrm{t})$ dB por debajo de
+1 kHz (8 dB constantes para $f_\mathrm{t} \ge 1$ kHz) clasifica el tono como
+*prominente*; el criterio del PR es $9 + 10\log_{10}(1000/f_\mathrm{t})$ dB por debajo
 de 1 kHz y 9 dB a partir de ahí, aplicado igualmente con $\ge$. Las
 frecuencias bajas reciben umbrales más altos porque unas bandas relativamente
 más anchas enmascaran más.
@@ -181,7 +181,7 @@ ruido, así que se degrada cuando esa separación es ambigua: un tono montado
 sobre una pendiente abrupta de ruido, o componentes muy juntos cuyas faldas se
 solapan. El PR no necesita separación alguna, lo que lo convierte en la opción
 robusta y automatizable cuando **varios tonos comparten la banda crítica**
-(todos caen en $W_M$); a cambio se queda corto cuando una banda *vecina* también
+(todos caen en $W_\mathrm{M}$); a cambio se queda corto cuando una banda *vecina* también
 lleva un tono (las bandas laterales dejan de ser ruido) y se sesga en espectros
 de pendiente pronunciada, donde las dos bandas laterales ya no estiman el
 enmascaramiento en el tono. En la práctica: prefiere el TNR para un tono limpio

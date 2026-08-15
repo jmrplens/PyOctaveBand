@@ -18,7 +18,7 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density), so a
   signal in pascals reads directly in Pa²/Hz or Pa² and averaging the
   columns reproduces the Welch estimate bin by bin). Each cell trades the
-  time resolution $T_B = \text{nperseg}/f_s$ against the frequency
+  time resolution $T_B = \text{nperseg}/f_\mathrm{s}$ against the frequency
   resolution
   $1/T_B$ at a resolution-bandwidth-time product of one, so a single
   cell of random data is an unaveraged estimate: the power carries a
@@ -43,7 +43,7 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   precision against the demodulate-decimate-DFT chain. The bin spacing
   can be made arbitrarily fine, but the true resolution stays set by the
   record length and taper (the reported effective noise bandwidth
-  $B_e = f_s \sum w^2 / \left( \sum w \right)^2$): zooming refines
+  $B_\mathrm{e} = f_\mathrm{s} \sum w^2 / \left( \sum w \right)^2$): zooming refines
   the grid, only a longer record
   refines the resolution (Eq. 11.127).
 
@@ -83,12 +83,12 @@ frequency reads $A^2/2$ - its mean square - in every
 `'spectrum'` column it spans.
 
 The display trades time against frequency resolution through the
-segment length: $T_B = \text{nperseg}/f_s$ of time resolution
+segment length: $T_B = \text{nperseg}/f_\mathrm{s}$ of time resolution
 against
-$B_e \approx 1/T_B$ of frequency resolution
+$B_\mathrm{e} \approx 1/T_B$ of frequency resolution
 (Section 12.6.4.2). Because
 each cell is a single unaveraged estimate
-($B_e T_B \approx 1$), random
+($B_\mathrm{e} T_B \approx 1$), random
 data carries a per-cell normalized random error of 1 (Eq. 8.158 with
 $n_d = 1$): the spectrogram is a tool for deterministic
 structure -
@@ -140,9 +140,9 @@ Calibrated STFT power spectrogram (B&P Section 12.6.4.2).
 | :--- | :--- |
 | `times` | Segment-centre times, in seconds (one per column). |
 | `frequencies` | One-sided frequency axis, in Hz (one per row). |
-| `power` | Power spectrogram, shape `(frequencies, times)` (units²/Hz for `'density'` scaling, units² for `'spectrum'`). Each column is the tapered periodogram of one segment, with the exact calibration of [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density): the column mean over time reproduces the Welch spectrum bin by bin. Integrating a `'density'` column over frequency gives that segment's taper-weighted mean square $\sum (x w)^2 / \sum w^2$; summing those over time *and multiplying by the hop duration* `hop/fs` recovers the record energy $\sum x^2 / f_s$ when the squared taper overlap-adds to a constant (e.g. Hann at 75 % overlap), up to the taper roll-off at the record edges (the first and last segments are under-weighted: about 1-2 % low for typical records). |
-| `time_resolution` | Segment duration $T_B = \text{nperseg}/f_s$, in seconds - the time resolution of the display. |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$ of the tapered segment, in Hz - the frequency resolution ($\approx 1/T_B$ for a light taper; the $B_e T_B$ product per cell is close to 1). |
+| `power` | Power spectrogram, shape `(frequencies, times)` (units²/Hz for `'density'` scaling, units² for `'spectrum'`). Each column is the tapered periodogram of one segment, with the exact calibration of [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density): the column mean over time reproduces the Welch spectrum bin by bin. Integrating a `'density'` column over frequency gives that segment's taper-weighted mean square $\sum (x w)^2 / \sum w^2$; summing those over time *and multiplying by the hop duration* `hop/fs` recovers the record energy $\sum x^2 / f_\mathrm{s}$ when the squared taper overlap-adds to a constant (e.g. Hann at 75 % overlap), up to the taper roll-off at the record edges (the first and last segments are under-weighted: about 1-2 % low for typical records). |
+| `time_resolution` | Segment duration $T_B = \text{nperseg}/f_\mathrm{s}$, in seconds - the time resolution of the display. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$ of the tapered segment, in Hz - the frequency resolution ($\approx 1/T_B$ for a light taper; the $B_\mathrm{e} T_B$ product per cell is close to 1). |
 | `random_error` | Normalized random error of each (unaveraged) power cell for random data, $1/\sqrt{n_d} = 1$ with $n_d = 1$ (Eq. 8.158); Bendat & Piersol quote $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display (Section 12.6.4.2). Deterministic components are unaffected. |
 | `n_segments` | Number of segments (columns). |
 | `hop` | Hop between segment starts, in samples. |
@@ -204,7 +204,7 @@ exactly. The grid can be made
 arbitrarily fine, but the true resolution remains the reported
 effective noise bandwidth of the tapered record ($1/T$ for no
 taper): the zoom refines the *grid*; only a longer record separates
-tones closer than $B_e$ (Eq. 11.127).
+tones closer than $B_\mathrm{e}$ (Eq. 11.127).
 
 **Parameters**
 
@@ -213,8 +213,8 @@ tones closer than $B_e$ (Eq. 11.127).
 | `x` | Signal, 1-D. |
 | `fs` | Sample rate, in Hz. |
 | `f_min` | Lower edge of the zoom band, in Hz ($\ge 0$). |
-| `f_max` | Upper edge of the zoom band, in Hz ($\le f_s/2$). |
-| `n_points` | Grid points across `[f_min, f_max]` (endpoints included); `None` places one point per record-length resolution $f_s/N$. |
+| `f_max` | Upper edge of the zoom band, in Hz ($\le f_\mathrm{s}/2$). |
+| `n_points` | Grid points across `[f_min, f_max]` (endpoints included); `None` places one point per record-length resolution $f_\mathrm{s}/N$. |
 | `window` | Record taper (any scipy window name; default Hann; `'boxcar'` for none). |
 
 **Returns:** A [`ZoomFFTResult`](/phonometry/reference/api/signals/time-frequency/#zoomfftresult).
@@ -250,8 +250,8 @@ Narrow-band zoom spectrum on a fine frequency grid (B&P 11.5.4).
 | `spectrum` | Complex amplitude-calibrated coefficients: a sine of peak amplitude `A` on an analysis frequency reads $\lvert \text{spectrum} \rvert = A$ (calibration $2 X(f) / \sum w$; no one-sided doubling at exactly 0 Hz or the Nyquist frequency). |
 | `amplitude` | $\lvert \text{spectrum} \rvert$ - peak-amplitude spectrum. |
 | `power` | Mean-square spectrum $\text{amplitude}^2/2$ ($\text{amplitude}^2$ at DC/Nyquist), consistent with the `'spectrum'` scaling of the Welch module: a tone reads its mean square $A^2/2$. |
-| `bin_spacing` | Grid spacing, in Hz - freely chosen, finer than $f_s/N$ if requested (the zoom gain of Eq. 11.127). |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e = f_s \sum w^2 / \left( \sum w \right)^2$ of the tapered record, in Hz - the true resolution, set by the record length and taper, that no grid refinement improves. |
+| `bin_spacing` | Grid spacing, in Hz - freely chosen, finer than $f_\mathrm{s}/N$ if requested (the zoom gain of Eq. 11.127). |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e} = f_\mathrm{s} \sum w^2 / \left( \sum w \right)^2$ of the tapered record, in Hz - the true resolution, set by the record length and taper, that no grid refinement improves. |
 | `window` | Taper name. |
 | `n_points` | Number of grid points. |
 

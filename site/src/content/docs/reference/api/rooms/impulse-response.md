@@ -411,11 +411,11 @@ set to the band-limited target, and the group delay grows in proportion
 to the target's spectral power (Eqs. (11)-(12)):
 
 $$
-\tau_G(f) = \tau_G(f - df) + C\, |H(f)|^2
+\tau_\mathrm{G}(f) = \tau_\mathrm{G}(f - df) + C\, |H(f)|^2
 $$
 
 $$
-C = \frac{\tau_G(f_{\text{end}}) - \tau_G(f_{\text{start}})} {\sum |H|^2}
+C = \frac{\tau_\mathrm{G}(f_{\text{end}}) - \tau_\mathrm{G}(f_{\text{start}})} {\sum |H|^2}
 $$
 
 so the sweep dwells on each frequency for a time proportional to the
@@ -439,8 +439,8 @@ measurement's noise floor (that is its purpose: SNR shaping).
 | :--- | :--- |
 | `fs` | Sampling frequency in Hz. |
 | `f1` | Start frequency of the sweep band in Hz. Must be > 0. The magnitude rolls off over 1/6 octave *below* `f1` (clipped at the first FFT bin), so the full target level holds across `[f1, f2]`. |
-| `f2` | Stop frequency in Hz. Must satisfy $f_1 < f_2 \le f_s/2$; keep some margin below Nyquist so the upper roll-off has room. |
-| `seconds` | Sweep duration $\tau_G(f_2) - \tau_G(f_1)$ in seconds. The returned signal is slightly longer (lead-in plus tail margin, see `start_delay`). |
+| `f2` | Stop frequency in Hz. Must satisfy $f_1 < f_2 \le f_\mathrm{s}/2$; keep some margin below Nyquist so the upper roll-off has room. |
+| `seconds` | Sweep duration $\tau_\mathrm{G}(f_2) - \tau_\mathrm{G}(f_1)$ in seconds. The returned signal is slightly longer (lead-in plus tail margin, see `start_delay`). |
 | `target` | The magnitude shape: `"pink"` (default; 3 dB per octave falling, the classical room-measurement emphasis), `"white"` (flat), or a `(frequencies_hz, magnitude_db)` pair of arrays interpolated in dB over log-frequency (only the shape matters; any overall offset is normalised away). |
 | `amplitude` | Peak amplitude of the returned sweep. Default 1.0. |
 | `start_delay` | Group delay assigned to `f1`, in seconds; the same margin is left after `tau_G(f2)`, so the signal lasts `seconds + 2*start_delay`. The sweep spreads slightly beyond its nominal start (Sec. 4.2: the group delay of the lowest bin "should not be set to zero"), so the default `0.05*seconds` gives the first half-wave room to evolve. |
@@ -545,7 +545,7 @@ $2 \pi f(t)$ (Farina, AES 108th Conv., 2000; ISO 18233 Bibliography
 | :--- | :--- |
 | `fs` | Sampling frequency in Hz. |
 | `f1` | Start frequency in Hz (at or below the lowest band edge to be measured, ISO 18233 B.3.1). Must be > 0. |
-| `f2` | Stop frequency in Hz (at or above the highest band edge). Must satisfy $f_1 < f_2 \le f_s/2$. |
+| `f2` | Stop frequency in Hz (at or above the highest band edge). Must satisfy $f_1 < f_2 \le f_\mathrm{s}/2$. |
 | `seconds` | Sweep duration in seconds. Any duration may be used; a longer sweep raises the effective signal-to-noise ratio (B.2, B.6). |
 | `amplitude` | Peak amplitude of the sweep. Default 1.0. |
 | `fade` | Half-Hann fade-in/out length as a fraction of the sweep duration, applied to suppress start/stop transients (B.3.3). Default 0.01. Set to 0.0 to disable. Because the sweep frequency is logarithmic in time, the fades consume roughly `fade*log2(f2/f1)` octaves at each band edge (the fade-out lands on the highest frequencies): with the default 0.01 the top ~29 dB of the highest band is unusable, so choose `f1`/`f2` with margin beyond the analysis range (ISO 18233 B.3.1) rather than relying on a smaller fade. |

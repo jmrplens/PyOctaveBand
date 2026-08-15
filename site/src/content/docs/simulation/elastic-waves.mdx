@@ -82,9 +82,9 @@ cannot represent.
 ## 1. The P-SV velocity-stress scheme
 
 A solid carries more than one wave. Alongside the compressional **P wave**
-at $c_P = \sqrt{(\lambda + 2\mu)/\rho}$ a shear **S wave** propagates at
-$c_S = \sqrt{\mu/\rho}$, and every traction-free surface guides a
-**Rayleigh wave** just below $c_S$. `elastic_fdtd_simulation` integrates
+at $c_\mathrm{P} = \sqrt{(\lambda + 2\mu)/\rho}$ a shear **S wave** propagates at
+$c_\mathrm{S} = \sqrt{\mu/\rho}$, and every traction-free surface guides a
+**Rayleigh wave** just below $c_\mathrm{S}$. `elastic_fdtd_simulation` integrates
 the 2D plane-strain velocity-stress system of Virieux (1986, Eq. 2),
 
 $$
@@ -111,7 +111,7 @@ as one `ElasticBoundaries` (the sides and the sponge thickness).
 
 Two numbers govern every run, and they read opposite ends of the material
 maps. **Stability**: the time step follows the *fastest* wave in the domain,
-$c_P^{\max}$, exactly as in the acoustic solver (Virieux Eqs. 6-7).
+$c_\mathrm{P}^{\max}$, exactly as in the acoustic solver (Virieux Eqs. 6-7).
 **Resolution**: the cell size follows the *slowest*,
 $\Delta x \le c_\text{min}/(10 f)$, where $c_\text{min}$ is the slowest
 non-zero shear speed among the solid cells — or a fluid $P$ speed, if some
@@ -185,7 +185,7 @@ on, or simply asserting the row index of the first solid row — because a
 one-row error moves every arrival by $\Delta x / c$ and costs a whole run.
 There is no elastic counterpart of `FDTD2D.plot_geometry`, so this check is
 the reader's own. One more failure is worth knowing in advance: every cell
-must satisfy $c_P^2 \ge 2 c_S^2$, which the constructor enforces, and that
+must satisfy $c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2$, which the constructor enforces, and that
 rejection is the first thing to look at when a sediment or composite map
 will not build.
 
@@ -213,18 +213,18 @@ zero on the surface plane and the shear stress above it is its
 antisymmetric image. That single boundary condition is what makes surfaces
 wave-bearing: strike the free surface of an aluminium block vertically
 (Lamb's problem) and, besides the P and S body fronts, a **Rayleigh wave**
-rolls along the surface at $c_R \approx 0.93\,c_S$, the root of the exact
+rolls along the surface at $c_\mathrm{R} \approx 0.93\,c_\mathrm{S}$, the root of the exact
 Rayleigh characteristic equation (Cremer, Heckl & Petersson Eq. 3.149).
 The tests pin the measured Rayleigh speed to that root within 2 % and the
 flexural wave of a thin free-free strip to the Kirchhoff plate dispersion
-$c_B \propto \sqrt{\omega}$ in its thin-plate domain. Free surfaces ride
+$c_\mathrm{B} \propto \sqrt{\omega}$ in its thin-plate domain. Free surfaces ride
 the Rayleigh sampling rule: allow 15-20 cells per wavelength there, the
 second-order imaging surface being the most dispersive part of the scheme.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/elastic_halfspace_waves.webp" alt="Snapshot of the vertical particle velocity in a 0.6 by 0.3 metre aluminium block a few hundredths of a millisecond after a vertical hit on its free upper surface: the compressional P front is the outer arc, the shear S front the inner arc at about half its radius, and the strongest lobes hug the surface just behind the S front, labelled as the Rayleigh wave; dotted arcs mark the exact P and S radii" width="96%" loading="eager" />
 
 *One snapshot, three speeds: the P front has covered twice the distance of
-the S front (dotted arcs at the exact $c_P t$ and $c_S t$ radii), and the
+the S front (dotted arcs at the exact $c_\mathrm{P} t$ and $c_\mathrm{S} t$ radii), and the
 strongest motion travels along the free surface as the Rayleigh wave, a
 whisker slower than S.*
 
@@ -273,7 +273,7 @@ plt.show()
 
 The snapshot stops at 73 µs because rigid sides and a short run were the
 cheapest way to get one clean frame, and one frame is enough for the two body
-speeds: the dotted arcs are drawn at the exact $c_P t$ and $c_S t$ radii, so
+speeds: the dotted arcs are drawn at the exact $c_\mathrm{P} t$ and $c_\mathrm{S} t$ radii, so
 they are a measurement and not a label. What one frame cannot settle is the
 **third** wave. Nothing analytic is drawn for it, its speed differs from the
 shear front's by 7 %, and its defining property — it stays on the surface
@@ -299,7 +299,7 @@ Watch what the fronts do at the end. Both body arcs run out of the frame and
 keep going; the surface lobes do not go anywhere but along the surface, at
 their own slower speed, and they are still there when the body waves have
 left. The inset traces two surface probes 0.15 m apart, and the delay between
-their peaks is the measurement: the simulated $c_R$ against 2921 m/s, the root
+their peaks is the measurement: the simulated $c_\mathrm{R}$ against 2921 m/s, the root
 of the exact Rayleigh characteristic equation quoted above, which the tests
 pin to within 2 %.
 
@@ -345,7 +345,7 @@ A `Material` is three measurable numbers — the compressional speed, the
 shear speed and the density — and a zero shear speed marks a fluid. Five
 constants ship, and every number elsewhere on this page comes out of them:
 
-| Constant | $c_P$ [m/s] | $c_S$ [m/s] | $\rho$ [kg/m³] |
+| Constant | $c_\mathrm{P}$ [m/s] | $c_\mathrm{S}$ [m/s] | $\rho$ [kg/m³] |
 |---|---|---|---|
 | `AIR` | 343 | 0 | 1.2 |
 | `WATER` | 1480 | 0 | 1000 |
@@ -357,7 +357,7 @@ They are nominal round figures for documentation and validation, not
 certified data, so a real specimen should be entered by hand — which is why
 section 1 writes the aluminium block's 6320 / 3130 / 2700 out rather than
 importing `ALUMINIUM`. The constructor enforces one bound,
-$c_P^2 \ge 2\,c_S^2$: that is the statement that the first Lamé parameter is
+$c_\mathrm{P}^2 \ge 2\,c_\mathrm{S}^2$: that is the statement that the first Lamé parameter is
 non-negative, equivalently that Poisson's ratio is not negative. A rejected
 triple usually means a shear speed entered too high, or a compressional
 speed measured on a thin bar rather than in bulk — the thin-bar speed is the
@@ -430,8 +430,8 @@ plt.show()
 Away from normal incidence the solid stops being a liquid. The incident
 sound refracts into **two** transmitted waves, P and SV (**mode
 conversion**), and refraction obeys Snell's law separately for each of them,
-so each has its own critical angle: $\arcsin(c_1/c_{P2})$ for the
-compressional wave and $\arcsin(c_1/c_{S2})$ for the shear wave. Both follow
+so each has its own critical angle: $\arcsin(c_1/c_{\mathrm{P}2})$ for the
+compressional wave and $\arcsin(c_1/c_{\mathrm{S}2})$ for the shear wave. Both follow
 from the wave speeds alone — density enters only the amplitudes — so they
 are two lines of arithmetic on the material constants of section 4.
 
@@ -453,13 +453,13 @@ physically sits on the staggered grid.
 
 Those two angles cut the range into four regimes. The column headed
 *equivalent fluid* is the same interface modelled as a shear-free bottom of
-the same $c_P$ and $\rho$ — the model the underwater module carries — and
+the same $c_\mathrm{P}$ and $\rho$ — the model the underwater module carries — and
 the difference between the two columns is the whole reason this solver
 exists.
 
 | Incidence | Transmitted waves | \|V\| elastic | \|V\| equivalent fluid | What it means |
 |---|---|---|---|---|
-| 0° | P only | 0.938 | 0.938 | no shear is excited, so the steel is exactly a liquid of its $\rho$ and $c_P$ |
+| 0° | P only | 0.938 | 0.938 | no shear is excited, so the steel is exactly a liquid of its $\rho$ and $c_\mathrm{P}$ |
 | 0° to 14.5° | P and SV | 0.938 falling to 0.937 at 9°, then rising to the critical angle | 0.938 rising to 1 | shear already takes a share of the transmitted power, and the fluid model already returns more |
 | 14.5° to 27.5° | SV only, P evanescent | dips to 0.905 at 16.4°, 0.918 at 20° | 1 (total reflection) | the fluid model over-predicts the returned energy by the whole shear leak |
 | beyond 27.5° | none propagating | 1, with a phase | 1, with a *different* phase | total reflection either way; the phase difference is what a Scholte wave locks onto |
@@ -629,7 +629,7 @@ At normal incidence no shear is excited, so an elastic plate in water is
 exactly the three-media fluid layer of B&G §2.4: its transmission follows
 the closed form of Eq. 2.4.14, which reduces to the familiar mass law for
 thin plates and low frequencies and predicts **total transmission** at the
-half-wave thickness resonances $f_n = n c_P / (2 h)$ (Eq. 2.4.19). For a
+half-wave thickness resonances $f_n = n c_\mathrm{P} / (2 h)$ (Eq. 2.4.19). For a
 10 mm steel plate that first resonance sits at 295 kHz, and one broadband
 FDTD run reproduces the whole curve: 5.8 dB at 10 kHz (where
 `mass_law_transmission_loss` with water as the ambient fluid agrees with
@@ -658,7 +658,7 @@ whole record, so it needs no gate at all. Then
 $\mathrm{TL}(f) = 20\log_{10}|I(f)/T(f)|$ from the two magnitude spectra.
 Two checks a reader can run on their own plate: the 10 kHz value against
 `mass_law_transmission_loss` with water as the ambient fluid, and the dip
-against $f_n = n\,c_P/(2h)$. The same time-gating logic is what an in-situ
+against $f_n = n\,c_\mathrm{P}/(2h)$. The same time-gating logic is what an in-situ
 ISO 13472-1 measurement does with an Adrienne window, so the trick transfers
 straight to a real bench.
 
@@ -671,17 +671,17 @@ resonance earns its keep in its own band: total transmission at half-wave
 thickness is the principle behind ultrasonic thickness gauging and behind
 the choice of transducer coupling layers, which is why the validation
 deliberately drives the plate to hundreds of kilohertz. The frequency where
-the two regimes meet is one division for any plate: $c_P/(2h)$, which is
+the two regimes meet is one division for any plate: $c_\mathrm{P}/(2h)$, which is
 295 kHz for 10 mm of steel and 59 kHz for 50 mm of it.
 
 At oblique incidence the plate physics gets richer, and the clip below is
 this solver driving the same 10 mm steel plate, now lying in air, with a
 sustained 45° plane wave arriving on it. The two panels differ in **one
-number only** — the drive frequency, $f_c/2 = 603$ Hz on the left and
-$2 f_c = 2413$ Hz on the right, either side of the 1206 Hz coincidence
+number only** — the drive frequency, $f_\mathrm{c}/2 = 603$ Hz on the left and
+$2 f_\mathrm{c} = 2413$ Hz on the right, either side of the 1206 Hz coincidence
 frequency the library computes from the same $m''$ and $B'$ used above.
 Everything else, the plate, the angle, the mesh and the colour scale, is
-held fixed. Below $f_c$ the plate reflects almost everything and the
+held fixed. Below $f_\mathrm{c}$ the plate reflects almost everything and the
 transmitted level lands on the oblique mass law; above it the acoustic
 trace wavelength matches the free bending wavelength, the plate re-radiates
 a 45° beam that grows along the lit span, and the transmitted level holds at

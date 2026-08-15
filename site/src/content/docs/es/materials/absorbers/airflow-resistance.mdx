@@ -53,19 +53,19 @@ mismas tres magnitudes y unidades (ISO 9053-1:2018, apartado 3):
 
 $$
 R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
-R_s = R\,A\ \left[\text{Pa·s/m}\right], \qquad
-\sigma = \frac{R_s}{d}\ \left[\text{Pa·s/m}^2\right],
+R_\mathrm{s} = R\,A\ \left[\text{Pa·s/m}\right], \qquad
+\sigma = \frac{R_\mathrm{s}}{d}\ \left[\text{Pa·s/m}^2\right],
 $$
 
 con $\Delta p$ la diferencia de presión a través de la probeta, $q_v$ el flujo
 volumétrico, $A$ la sección transversal y $d$ el espesor. Nótese que la
-resistencia específica al flujo de aire $R_s$ está en **Pa·s/m** (no Pa·s/m²); la
-resistividad al flujo de aire $\sigma$ es $R_s$ por metro de espesor. Dos
+resistencia específica al flujo de aire $R_\mathrm{s}$ está en **Pa·s/m** (no Pa·s/m²); la
+resistividad al flujo de aire $\sigma$ es $R_\mathrm{s}$ por metro de espesor. Dos
 funciones auxiliares recorren esa cadena desde lo que muestra realmente un
 instrumento: `linear_airflow_velocity(q_v, area)` es la definición
 $u = q_v/A$ del apartado 3.4 (un banco lee un flujo volumétrico en un
 rotámetro, nunca una velocidad), y `specific_airflow_resistance(resistance,
-area)` es el $R_s = R\,A$ del apartado 3.2, que además admite la otra vía,
+area)` es el $R_\mathrm{s} = R\,A$ del apartado 3.2, que además admite la otra vía,
 `specific_airflow_resistance(pressure_drop=…, velocity=…)`, para un banco que
 registra $\Delta p$ y $u$ y nunca llega a formar $R$.
 
@@ -93,9 +93,9 @@ catálogo.
 En el método estático (ISO 9053-1:2018) un flujo laminar estacionario se aumenta
 por escalones y la diferencia de presión se traza frente a la velocidad lineal
 $u = q_v/A$. Se ajusta una regresión de al menos segundo orden **forzada a pasar
-por el origen**, $\Delta p = a\,u + b\,u^2$, y $\Delta p$ y $R_s$ se leen a la
+por el origen**, $\Delta p = a\,u + b\,u^2$, y $\Delta p$ y $R_\mathrm{s}$ se leen a la
 velocidad de referencia $u = 0{,}5\ \text{mm/s}$ (apartado 7.5); la velocidad más
-alta no debe superar los 15 mm/s. Como $R_s = \Delta p/u = a + b\,u$, el término
+alta no debe superar los 15 mm/s. Como $R_\mathrm{s} = \Delta p/u = a + b\,u$, el término
 lineal $a$ es la resistencia específica al flujo de aire a velocidad nula.
 
 Ninguna de las dos velocidades es arbitraria, y el apartado 7.5 dice por qué.
@@ -200,7 +200,7 @@ probetas delgadas y de baja porosidad. La probeta descansa sobre un soporte
 perforado o una rejilla de hilo fino con al menos un 50 % de superficie abierta
 repartida uniformemente, agujeros no menores de 3 mm y una resistencia al flujo
 de aire inferior al 1 % de la de la probeta; el apartado 5.2 llega a dar la
-forma cerrada $R_s = 8\eta h/(\phi r^2)$ de una placa perforada, de modo que el
+forma cerrada $R_\mathrm{s} = 8\eta h/(\phi r^2)$ de una placa perforada, de modo que el
 soporte se pueda comprobar en vez de suponer.
 
 **Las dos formas de equivocarse, y su signo.** Los dos mecanismos de error
@@ -260,10 +260,10 @@ formato de un informe de ensayo de resistencia al flujo de aire acreditado
 cabecera de metadatos opcional, un cuerpo de dos paneles con una tabla de
 resultados (la velocidad de evaluación, la diferencia de presión ajustada, la
 resistencia al flujo de aire $R$, la resistencia específica al flujo de aire
-$R_s$, la resistividad al flujo de aire $\sigma$ cuando hay espesor disponible,
+$R_\mathrm{s}$, la resistividad al flujo de aire $\sigma$ cuando hay espesor disponible,
 y los coeficientes del ajuste por el origen $a$ y $b$) junto a la curva ajustada
 $\Delta p(u)$ (el propio `.plot()` del resultado), la resistencia específica al
-flujo de aire $R_s$ en un recuadro con $R$ y $\sigma$ al lado, y un pie con el
+flujo de aire $R_\mathrm{s}$ en un recuadro con $R$ y $\sigma$ al lado, y un pie con el
 descargo de responsabilidad fijo. La ISO 9053-1 es una caracterización del
 material, por lo que la ficha no lleva veredicto de conformidad.
 
@@ -311,23 +311,23 @@ hermético; la resistencia se obtiene de la diferencia de nivel de presión acú
 entre las dos terminaciones (Fórmula (2)):
 
 $$
-R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
-    10^{(L_{p,s} - L_{p,t})/20},
+R = \frac{\kappa'\,P_\mathrm{S}}{2\pi f\,V}\cdot\frac{h_\mathrm{t}}{h_\mathrm{s}}\cdot
+    10^{(L_{p,\mathrm{s}} - L_{p,\mathrm{t}})/20},
 $$
 
-con $P_S$ la presión estática (atmosférica), $f$ la frecuencia del pistón, $V$
+con $P_\mathrm{S}$ la presión estática (atmosférica), $f$ la frecuencia del pistón, $V$
 el volumen de la cavidad de aire (incluida toda tubería de conexión, con el
-pistón a media carrera), $L_{p,s}$ y $L_{p,t}$ los niveles de presión acústica
+pistón a media carrera), $L_{p,\mathrm{s}}$ y $L_{p,\mathrm{t}}$ los niveles de presión acústica
 de la cavidad medidos con la celda de medición que lleva la probeta y con la
-terminación hermética, $h_s$ y $h_t$ las amplitudes de carrera del pistón
+terminación hermética, $h_\mathrm{s}$ y $h_\mathrm{t}$ las amplitudes de carrera del pistón
 correspondientes, y $\kappa'$ la relación **efectiva** de calores específicos.
 
 **Qué está diciendo la fórmula.** La terminación hermética es la referencia: con
 ella la cavidad es una compliancia sellada, todo el volumen que barre el pistón
 se emplea en comprimir el aire y el nivel es alto. Pon la probeta en su lugar y
 la mayor parte de ese flujo se escapa en cambio por los poros, de modo que el
-nivel de la cavidad cae, y esa caída $L_{p,t} - L_{p,s}$ *es* la medida. La
-relación de carreras $h_t/h_s$ solo normaliza las dos tandas a la misma
+nivel de la cavidad cae, y esa caída $L_{p,\mathrm{t}} - L_{p,\mathrm{s}}$ *es* la medida. La
+relación de carreras $h_\mathrm{t}/h_\mathrm{s}$ solo normaliza las dos tandas a la misma
 velocidad de volumen, que es la razón de que las dos carreras sean
 deliberadamente desiguales: la NOTA 1 del apartado 6.2 de ISO 9053-2 da 1,4 mm
 con la terminación hermética frente a 14 mm con la probeta para un pistón de
@@ -337,11 +337,11 @@ analizador. Merece la pena quedarse con dos consecuencias. Solo entra una
 *diferencia* de nivel a una frecuencia, así que el dispositivo de medida
 acústica no necesita calibración absoluta y su respuesta en frecuencia no es
 crítica; lo que importa es la linealidad de nivel (apartado 8.7). Y el orden de
-las tandas lo fija el apartado 8.5/8.6: medir $P_S$, fijar la carrera a $h_s$,
-leer la frecuencia del pistón, el nivel de fondo $L_{p,b}$ (con la fuente en
-marcha y sin celda ni terminación montadas) y después $L_{p,s}$; solo entonces
-cambiar a la terminación hermética, fijar $h_t$, confirmar que la frecuencia no
-se ha movido y leer $L_{p,t}$.
+las tandas lo fija el apartado 8.5/8.6: medir $P_\mathrm{S}$, fijar la carrera a $h_\mathrm{s}$,
+leer la frecuencia del pistón, el nivel de fondo $L_{p,\mathrm{b}}$ (con la fuente en
+marcha y sin celda ni terminación montadas) y después $L_{p,\mathrm{s}}$; solo entonces
+cambiar a la terminación hermética, fijar $h_\mathrm{t}$, confirmar que la frecuencia no
+se ha movido y leer $L_{p,\mathrm{t}}$.
 
 La conducción de
 calor entre el aire oscilante y las paredes de la cavidad hace que la compresión
@@ -429,9 +429,9 @@ plt.show()
 
 **Criterios de aceptación (apartado 8.7).** La Fórmula (2) solo es válida cuando
 se cumplen dos condiciones. La Fórmula (3),
-$(h_t/h_s)\,10^{(L_{p,s}-L_{p,t})/20} < 0{,}3$, mantiene la Fórmula (2)
+$(h_\mathrm{t}/h_\mathrm{s})\,10^{(L_{p,\mathrm{s}}-L_{p,\mathrm{t}})/20} < 0{,}3$, mantiene la Fórmula (2)
 linealizada lo bastante cerca de la relación exacta del Anexo B; la Fórmula (4),
-$L_{p,s} - L_{p,b} > 10$ dB, mantiene la influencia del fondo sobre $L_{p,s}$
+$L_{p,\mathrm{s}} - L_{p,\mathrm{b}} > 10$ dB, mantiene la influencia del fondo sobre $L_{p,\mathrm{s}}$
 por debajo de 0,4 dB para ruido no correlacionado (un fondo correlacionado
 necesita más). `alternating_airflow_resistance` admite `background_level`
 precisamente para poder comprobar la segunda, y avisa mediante
@@ -440,8 +440,8 @@ frecuencia del pistón sale de 1–4 Hz. Cuando una falla, la norma ofrece cuatr
 mandos: cambiar la longitud de la probeta, el diámetro de la probeta, el volumen
 de la cavidad, la frecuencia del pistón o la carrera del pistón. También
 conviene comprobar que el flujo que el pistón impulsa a través de la probeta cae
-en la ventana recomendada: el apartado 6.2 da $q_v = 2\pi f h A_P$ y la
-Fórmula (1) $v_s = q_v/A$, y recomienda velocidades eficaces entre 0,5 mm/s y
+en la ventana recomendada: el apartado 6.2 da $q_v = 2\pi f h A_\mathrm{P}$ y la
+Fórmula (1) $v_\mathrm{s} = q_v/A$, y recomienda velocidades eficaces entre 0,5 mm/s y
 4 mm/s, el mismo régimen físico que la velocidad de referencia del método
 estático.
 
@@ -470,7 +470,7 @@ print(round(r_s, 1), round(r_s / 0.05))    # 1751.1 Pa*s/m, 35022 Pa*s/m^2
 **Qué devuelve la parte 2, y qué no.** A diferencia del método estático,
 `alternating_airflow_resistance` devuelve una resistencia a secas en Pa·s/m³, no
 un objeto de resultado: no hay equivalente de `StaticAirflowResult`, así que no
-hay `.plot()` ni ficha de ISO 9053-2, y los dos pasos hasta $R_s$ y $\sigma$ son
+hay `.plot()` ni ficha de ISO 9053-2, y los dos pasos hasta $R_\mathrm{s}$ y $\sigma$ son
 cosa de quien llama, que es lo que hacen las dos últimas líneas de arriba. Lo
 que compra la parte 2 a cambio son las probetas que la parte 1 no puede
 sostener: materiales muy abiertos o muy delgados cuya caída de presión estática
@@ -511,7 +511,7 @@ Entre ambos extremos queda la ventana de diseño clásica para la resistencia
 al flujo total de una capa de espesor $d$,
 
 $$
-\rho_0 c_0 \;\lesssim\; R_s = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
+\rho_0 c_0 \;\lesssim\; R_\mathrm{s} = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
 $$
 
 es decir, una resistencia específica al flujo de una a cuatro veces la

@@ -62,7 +62,7 @@ separation.
 The measured `delta_pI0` this module classifies is a property of the whole
 probe-spacer-analyser chain and must be determined with the spacer that will be
 fitted in the field; the library does not measure it. Once classified, the
-ISO 9614 dynamic capability $L_d = \delta_{pI0} - K$ follows from
+ISO 9614 dynamic capability $L_\mathrm{d} = \delta_{pI0} - K$ follows from
 [`phonometry.emission.intensity.dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.

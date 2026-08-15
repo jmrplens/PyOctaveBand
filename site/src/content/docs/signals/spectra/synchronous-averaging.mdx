@@ -290,7 +290,7 @@ number of averages will remove it.
   and hides the mesh harmonics the average exists to show.
 - **Sample rate from the content you want to keep.** A 37-tooth pinion at
   1800 r/min meshes at $37 \times 30 = 1110$ Hz, so keeping five mesh harmonics
-  needs $f_s \ge 2.56 \times 5550 = 14.2$ kHz — 16 kHz in practice, 25.6 kHz on
+  needs $f_\mathrm{s} \ge 2.56 \times 5550 = 14.2$ kHz — 16 kHz in practice, 25.6 kHz on
   an analyser that offers it.
 - **Record length of $N+1$ revolutions**, with $N$ chosen by the
   interfering-order rule of section 3 rather than by habit.
@@ -302,9 +302,9 @@ number of averages will remove it.
 
 ## 4. Non-integer samples per period
 
-When $f_s T$ is an integer, the period boundaries fall on samples, the blocks
+When $f_\mathrm{s} T$ is an integer, the period boundaries fall on samples, the blocks
 are sliced directly, and a noiseless periodic signal is recovered to machine
-precision (`interpolated` is `False`). When $f_s T$ is not an integer the
+precision (`interpolated` is `False`). When $f_\mathrm{s} T$ is not an integer the
 boundaries fall between samples; each block is then aligned to a common
 integer grid by the band-limited fractional delay of
 [`fractional_delay`](/phonometry/signals/spectra/test-signals/), and the waveform is
@@ -374,7 +374,7 @@ magnitude Eq. 9) implemented by `comb_filter_response`, the square-root
 noise-reduction law reported as `noise_reduction_db` and `amplitude_snr_gain`,
 and the choice of $N$ that places a comb node on an interfering order,
 following the paper's own 32.05-order example. `time_synchronous_average` also
-implements the band-limited fractional-delay alignment used when $f_s T$ is
+implements the band-limited fractional-delay alignment used when $f_\mathrm{s} T$ is
 not an integer.
 </ScopeClaim>
 

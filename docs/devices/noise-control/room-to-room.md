@@ -34,12 +34,12 @@ taking logarithms gives Equation (4.101),
 
 $$
 \text{NR} = \text{TL}
-- 10\log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+- 10\log_{10}\!\left[\frac{S_\mathrm{w}}{S_2 \alpha_2 + \tau S_\mathrm{w}}\right],
 $$
 
 with $\text{NR} = L_{p1} - L_{p2}$ the noise reduction between the two
 reverberant fields, $\text{TL} = 10\log_{10}(1/\tau)$ the transmission loss of the
-partition (the quantity UNE calls the sound reduction index $R$), $S_w$ the
+partition (the quantity UNE calls the sound reduction index $R$), $S_\mathrm{w}$ the
 area of the partition and $S_2 \alpha_2$ the equivalent absorption area of
 the receiving room.
 
@@ -47,10 +47,10 @@ Read the logarithm and the whole page follows. A **large partition into a
 hard room** delivers *less* than its transmission loss: a lot of area
 radiating into a room with nothing to soak it up. A **small partition into
 a well-absorbing room** delivers *more*. The two rooms and the wall are not
-separable, which is why quoting a wall's $R_w$ and stopping is not an
+separable, which is why quoting a wall's $R_\mathrm{w}$ and stopping is not an
 answer.
 
-The $\tau S_w$ term is the power the partition itself passes back into the
+The $\tau S_\mathrm{w}$ term is the power the partition itself passes back into the
 source room. At any realistic transmission loss it is worth a few
 hundredths of a decibel, so it is off by default and
 `include_partition_transmission=True` switches it on.
@@ -266,12 +266,12 @@ derives the enclosure equation from the same power balance as §4.9 and gets
 Equation (4.115),
 
 $$
-\text{IL} = \text{TL} - 10\log_{10}(S_E / R_i),
+\text{IL} = \text{TL} - 10\log_{10}(S_\mathrm{E} / R_\mathrm{i}),
 $$
 
-with $S_E$ the external radiating area and $R_i$ the room constant of the
+with $S_\mathrm{E}$ the external radiating area and $R_\mathrm{i}$ the room constant of the
 enclosure interior, machine surface included. Solved for the panels,
-$\text{TL} = \text{IL} + 10\log_{10}(S_E / R_i)$, which is
+$\text{TL} = \text{IL} + 10\log_{10}(S_\mathrm{E} / R_\mathrm{i})$, which is
 `enclosure_required_transmission_loss`.
 
 ```python
@@ -411,7 +411,7 @@ to a surface than roughly half a wavelength.
   and [Flanking transmission](../../buildings/insulation/flanking-lab.md):
   the EN 12354 models for the flanking paths this page only debits.
 - [Field sound insulation](../../buildings/insulation/insulation-field.md):
-  how the same room pair is measured, and the $D_{nT}$ and $R'$ a test report
+  how the same room pair is measured, and the $D_\mathrm{nT}$ and $R'$ a test report
   hands back.
 - [Room-noise criteria](../../buildings/rooms/room-noise.md): the NC and
   RC Mark II families the verdict is written in.

@@ -21,7 +21,7 @@ of a measured response,
 whose all-pass **excess phase** collects pure latency and any genuine
 non-minimum-phase behaviour (reflections, non-invertible zeros): the part
 of the phase no stable causal equalizer can remove. The **group delay**
-:math:`\tau_g = -(1/2\pi) \, d\phi/df` is estimated from the unwrapped
+:math:`\tau_\mathrm{g} = -(1/2\pi) \, d\phi/df` is estimated from the unwrapped
 phase.
 
 Sampling precautions (documented, and the reason for the ``oversample``
@@ -179,7 +179,7 @@ def group_delay(
     fs: float,
 ) -> NDArray[np.float64]:
     r"""
-    Group delay :math:`\tau_g(f) = -(1/2\pi) \, d\phi/df` of a response.
+    Group delay :math:`\tau_\mathrm{g}(f) = -(1/2\pi) \, d\phi/df` of a response.
 
     The phase is unwrapped and differentiated with second-order central
     differences (one-sided at the grid ends). The estimate is exact for a

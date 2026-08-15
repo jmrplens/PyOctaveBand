@@ -24,7 +24,7 @@ follows (clause 7). From the impulse with the highest prominence over a
 30-minute period, a graduated adjustment follows (clause 8):
 
 $$
-K_I = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5, \text{ else } 0 \tag{Formula 2}
+K_\mathrm{I} = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5, \text{ else } 0 \tag{Formula 2}
 $$
 
 and the rating level over a reference time interval combines the adjusted
@@ -43,15 +43,15 @@ adjustment it earns (typically 0.0 dB to 9.0 dB):
   gradient exceeds 10 dB/s; its **starting** and **end** points are found from
   procedures a) to d) of Clause 4, merging events separated by less than 50 ms
   (Clause 3.3, Figure 2);
-* for each onset the **level difference** $\mathrm{LD} = L_e - L_s$
+* for each onset the **level difference** $\mathrm{LD} = L_\mathrm{e} - L_\mathrm{s}$
   and the **onset rate** `OR` (the least-squares slope over the onset) are
   measured (Clauses 3.4, 3.5, Figures 1 and 2);
 * the prominence (Clause 5, Formula 2) and the adjustment
-  $K_I = 1.8 \cdot (P - 5)$ dB for $P > 5$ (Clause 6, Formula 3)
+  $K_\mathrm{I} = 1.8 \cdot (P - 5)$ dB for $P > 5$ (Clause 6, Formula 3)
   are the NT ACOU 112 formulae above;
-* the source is categorised (Clause 7) as *not impulsive* ($K_I = 0$),
-  *regular impulsive* ($0 < K_I \le 5$) or *highly impulsive*
-  ($K_I > 5$).
+* the source is categorised (Clause 7) as *not impulsive* ($K_\mathrm{I} = 0$),
+  *regular impulsive* ($0 < K_\mathrm{I} \le 5$) or *highly impulsive*
+  ($K_\mathrm{I} > 5$).
 
 The ISO/PAS method for determining `KI` is not sensitive to the absolute
 calibration of the equipment (Clause 8): onset rate and level difference are
@@ -77,7 +77,7 @@ Applies procedures a) to d) of the standard: the starting point is the
 first sample where the gradient exceeds 10 dB/s, the end point the first
 later sample where it drops below 10 dB/s, and onsets separated by less
 than 50 ms are merged. Each onset carries its level difference
-$\mathrm{LD} = L_e - L_s$ (3.4), its onset rate (3.5) and its
+$\mathrm{LD} = L_\mathrm{e} - L_\mathrm{s}$ (3.4), its onset rate (3.5) and its
 prominence `P`.
 
 **Parameters**
@@ -104,7 +104,7 @@ impulse_adjustment(prominence: ArrayLike) -> np.ndarray
 
 Adjustment `KI` to `LAeq` from the prominence (clause 8, Formula 2).
 
-$K_I = 1.8 \, (P - 5)$ dB for $P > 5$, else 0 dB. The
+$K_\mathrm{I} = 1.8 \, (P - 5)$ dB for $P > 5$, else 0 dB. The
 adjustment is made
 to `LAeq,30min` on the basis of the single impulse with the highest `P`.
 This helper applies the bare Formula 2; the clause 8 onset-rate
@@ -186,7 +186,7 @@ A single detected onset of `LpAF` (ISO/PAS 1996-3, Clause 3).
 | `time_end` | Time of the end point, in seconds. |
 | `level_start` | Level `Ls` at the starting point, in dB. |
 | `level_end` | Level `Le` at the end point, in dB. |
-| `level_difference` | Level difference $\mathrm{LD} = L_e - L_s$, in dB (3.4). |
+| `level_difference` | Level difference $\mathrm{LD} = L_\mathrm{e} - L_\mathrm{s}$, in dB (3.4). |
 | `onset_rate` | Onset rate `OR`, in dB/s, the least-squares slope over the onset (3.5). |
 | `prominence` | Predicted prominence `P` of this onset (Formula 2). |
 | `qualifies` | Whether the onset rate exceeds 10 dB/s, so the onset can contribute an adjustment (Clause 6). |
@@ -439,7 +439,7 @@ Combines the impulse-adjusted equivalent levels of the measurement
 sub-intervals into a single rating level:
 
 $$
-L_{Ar,T} = 10 \log_{10}\!\left[ \frac{1}{T} \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
+L_{\mathrm{Ar},T} = 10 \log_{10}\!\left[ \frac{1}{T} \sum_N \Delta t_N \, 10^{(L_{\mathrm{Aeq},N} + K_{\mathrm{I},N})/10} \right]
 $$
 
 **Parameters**

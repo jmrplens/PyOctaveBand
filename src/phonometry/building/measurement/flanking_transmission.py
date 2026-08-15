@@ -30,21 +30,21 @@ Because it uses the direction average,
 
 .. math::
 
-   a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0}
+   a_j = \frac{2.2\,\pi^2\,S_j}{T_{\mathrm{s},j}\,c_0}
    \sqrt{\frac{f_{\mathrm{ref}}}{f}}
 
 with the structural
 reverberation time ``Ts,j``, the element area ``Sj``, the speed of sound in air
 ``c0`` and the reference frequency :math:`f_{\mathrm{ref}} = 1000` Hz. The
 related total loss
-factor is :math:`\eta = 2.2 / (f \, T_s)` (Clause 7.3.1).
+factor is :math:`\eta = 2.2 / (f \, T_\mathrm{s})` (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-:math:`D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` (Formula (4)); with a tapping
+:math:`D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` (Formula (4)); with a tapping
 machine on the
 source-room floor the normalized flanking impact level is
-:math:`L_{n,f} = L_2 + 10 \log_{10}(A/A_0)` (Formula (5)), both with the reference
+:math:`L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)` (Formula (5)), both with the reference
 absorption
 area :math:`A_0 = 10` m². Their single-number ratings ``Dn,f,w (C; Ctr)`` and
 ``Ln,f,w (CI)`` follow ISO 717-1/-2 through the verified
@@ -234,7 +234,7 @@ def total_loss_factor(
     frequency: Sequence[float] | np.ndarray,
     structural_reverberation_time: float | Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    r"""Total loss factor :math:`\eta = 2.2 / (f \, T_s)` (Clause 7.3.1).
+    r"""Total loss factor :math:`\eta = 2.2 / (f \, T_\mathrm{s})` (Clause 7.3.1).
 
     :param frequency: Band centre frequency ``f``, in Hz, per band.
     :param structural_reverberation_time: Structural reverberation time
@@ -260,7 +260,7 @@ def equivalent_absorption_length(
 
     .. math::
 
-       a_j = \frac{2.2\,\pi^2\,S_j}{T_{s,j}\,c_0}
+       a_j = \frac{2.2\,\pi^2\,S_j}{T_{\mathrm{s},j}\,c_0}
        \sqrt{\frac{f_{\mathrm{ref}}}{f}}
 
     with :math:`f_{\mathrm{ref}} = 1000` Hz.
@@ -591,7 +591,7 @@ def vibration_reduction_index_from_flanking(
 
     .. math::
 
-       K_{ij} = D_{n,f} - \frac{R_i + R_j}{2}
+       K_{ij} = D_\mathrm{n,f} - \frac{R_i + R_j}{2}
        - 10 \log_{10}\frac{\sqrt{a_i a_j}}{l_{ij}}
        + 10 \log_{10}\frac{\sqrt{S_i S_j}}{A_0}
 
@@ -639,7 +639,7 @@ def vibration_reduction_index_from_flanking(
 class FlankingLevelDifferenceResult:
     r"""Normalized flanking level difference ``Dn,f`` (airborne, Formula (4)).
 
-    :ivar d_n_f: :math:`D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` per band, in dB.
+    :ivar d_n_f: :math:`D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` per band, in dB.
     :ivar rating: Single-number ``Dn,f,w`` with ``C``/``Ctr`` (ISO 717-1), or
         ``None`` when the band count is neither 16 nor 5.
     """
@@ -715,7 +715,7 @@ class FlankingLevelDifferenceResult:
 class FlankingImpactLevelResult:
     r"""Normalized flanking impact level ``Ln,f`` (Formula (5)).
 
-    :ivar l_n_f: :math:`L_{n,f} = L_2 + 10 \log_{10}(A/A_0)` per band, in dB.
+    :ivar l_n_f: :math:`L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)` per band, in dB.
     :ivar rating: Single-number ``Ln,f,w`` with ``CI`` (ISO 717-2), or ``None``
         when the band count is neither 16 nor 5.
     """
@@ -797,7 +797,7 @@ def normalized_flanking_level_difference(
 ) -> FlankingLevelDifferenceResult:
     r"""Normalized flanking level difference ``Dn,f`` (airborne, Formula (4)).
 
-    :math:`D_{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` with the reference absorption
+    :math:`D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` with the reference absorption
     area :math:`A_0 = 10` m².
 
     :param source_level: Source-room average SPL ``L1`` per band, in dB.
@@ -831,7 +831,7 @@ def normalized_flanking_impact_level(
 ) -> FlankingImpactLevelResult:
     r"""Normalized flanking impact level ``Ln,f`` (Formula (5)).
 
-    :math:`L_{n,f} = L_2 + 10 \log_{10}(A/A_0)` with the reference absorption
+    :math:`L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)` with the reference absorption
     area :math:`A_0 = 10` m², from the receiving-room impact level with the
     tapping machine on the source-room floor.
 
@@ -878,7 +878,7 @@ def critical_frequency(
 ) -> float:
     r"""Thin-plate critical frequency ``fc`` (Part 1, Formula (20)).
 
-    :math:`f_c = c_0^2 / (1.8 \, c_L \, h)` for a homogeneous isotropic
+    :math:`f_\mathrm{c} = c_0^2 / (1.8 \, c_\mathrm{L} \, h)` for a homogeneous isotropic
     element. The
     constant 1.8 already carries the :math:`2\pi/\sqrt{12}` factor of the
     thin-plate
@@ -888,12 +888,12 @@ def critical_frequency(
 
     .. note::
         The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
-        ``π`` in the denominator (:math:`1.8 \, c_L \, h \, \pi`), which
+        ``π`` in the denominator (:math:`1.8 \, c_\mathrm{L} \, h \, \pi`), which
         would misplace
         ``fc`` by a factor π; the π-free form implemented here is the one
         ISO 10848-1:2017 restores in its Formula (5), ISO 12354-1:2017
         prints in its symbol definitions
-        (:math:`f_c = c_0^2/(1.8 \, c_L t)`) and
+        (:math:`f_\mathrm{c} = c_0^2/(1.8 \, c_\mathrm{L} t)`) and
         Hopkins Eq. 2.201 derives. See ``docs/ERRATA.md``.
 
     :param longitudinal_wave_speed: Longitudinal wave speed ``cL``, in m/s.
@@ -918,7 +918,7 @@ def strong_coupling_satisfied(
     r"""Strong-coupling applicability check (Part 1, Formula (15)).
 
     ``Kij`` is relevant only where
-    :math:`\overline{D}_{v,ij} \ge 3 - 10 \log_{10}\frac{m_i f_{cj}}{m_j f_{ci}}`.
+    :math:`\overline{D}_{v,ij} \ge 3 - 10 \log_{10}\frac{m_i f_{\mathrm{c}j}}{m_j f_{\mathrm{c}i}}`.
 
     :param velocity_level_difference: Direction-averaged ``D̄v,ij`` per band,
         in dB.
@@ -946,7 +946,7 @@ def modal_density(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> float:
-    r"""Modal density :math:`n = \pi \cdot S \cdot f_c / c_0^2` (Part 4, (5)).
+    r"""Modal density :math:`n = \pi \cdot S \cdot f_\mathrm{c} / c_0^2` (Part 4, (5)).
 
     :param area: Element area ``S``, in m².
     :param critical_frequency: Critical frequency ``fc``, in Hz.
@@ -967,7 +967,7 @@ def modal_overlap_factor(
     *,
     speed_of_sound: float = _DEFAULT_SPEED_OF_SOUND,
 ) -> np.ndarray:
-    r"""Modal overlap factor :math:`M = 2.2 \cdot n / T_s` (Part 4, F. (6)).
+    r"""Modal overlap factor :math:`M = 2.2 \cdot n / T_\mathrm{s}` (Part 4, F. (6)).
 
     With the modal density ``n`` from :func:`modal_density`. Part 4 prefers
     :math:`M \ge 1` at 250 Hz and above, and requires bands with

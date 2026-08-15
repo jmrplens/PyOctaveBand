@@ -100,7 +100,7 @@ D_{50} = \frac{\int_0^{0{,}05} p^2\ dt}{\int_0^{\infty} p^2\ dt},
 $$
 
 con $te = 50$ ms → C50 (habla) y $te = 80$ ms → C80 (música), más el
-**tiempo central** $T_s = \int t\ p^2\ dt / \int p^2\ dt$. Cada parámetro
+**tiempo central** $T_\mathrm{s} = \int t\ p^2\ dt / \int p^2\ dt$. Cada parámetro
 tiene una **diferencia apenas perceptible** (ISO 3382-1 Tabla A.1: EDT 5 %,
 C80 1 dB, D50 0,05, Ts 10 ms) que fija con qué precisión merece la pena
 informarlo.
@@ -113,9 +113,9 @@ aplica ese disparo banda a banda antes de integrar, de modo que cualquier retard
 de propagación y de sistema que arrastre la grabación se elimina automáticamente:
 una RI medida no necesita recorte manual. Importa de forma asimétrica. Los tiempos
 de reverberación usan solo la *pendiente* del decaimiento y les da igual dónde
-empiece, pero C50, C80 y $T_s$ integran *desde* $t = 0$, así que un origen situado
+empiece, pero C50, C80 y $T_\mathrm{s}$ integran *desde* $t = 0$, así que un origen situado
 un milisegundo tarde deja fuera parte del sonido directo y puede mover C50 y C80
-varios decibelios y $T_s$ decenas de milisegundos, dejando T20 y T30 casi
+varios decibelios y $T_\mathrm{s}$ decenas de milisegundos, dejando T20 y T30 casi
 intactos: el error es invisible en el número que todo el mundo comprueba. El
 detector yerra deliberadamente por el lado temprano, que es la dirección
 inofensiva. De ahí salen dos reglas de trabajo: no recortes nunca una RI a mano
@@ -212,7 +212,7 @@ independientes. Para música, el C80 de salas de conciertos y polivalentes
 desocupadas de hasta 25 000 m³ suele ir entre −5 dB y +5 dB (la columna de
 «intervalo típico» de la Tabla A.1 de la ISO 3382-1), donde los valores negativos
 se leen como sala mezclada o reverberante y los superiores a unos +3 dB como seca;
-el $T_s$ de esas mismas salas va entre 60 ms y 260 ms y se mueve en sentido
+el $T_\mathrm{s}$ de esas mismas salas va entre 60 ms y 260 ms y se mueve en sentido
 inverso a la claridad, y el $D_{50}$ entre 0,3 y 0,7. Con esos intervalos van dos
 cautelas. Son valores de una sola posición en salas *desocupadas*, y el público
 acorta el decaimiento y sube la claridad, así que una sala ocupada no queda
@@ -460,7 +460,7 @@ plt.show()
 ### Por debajo de la frecuencia de Schroeder: modos, no decaimiento
 
 Por debajo de la **frecuencia de Schroeder**
-$f_s \approx 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s)
+$f_\mathrm{s} \approx 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s)
 estas estadísticas de caída dejan de contar toda la historia: el campo lo
 gobiernan **modos propios** discretos. La constante no es una constante física.
 Cada modo amortiguado hasta un tiempo de reverberación $T$ tiene una anchura de
@@ -468,7 +468,7 @@ banda a media potencia de unos $2{,}2/T$ hercios, la densidad modal crece como
 $4\pi Vf^2/c_0^3$, y exigir aproximadamente tres modos dentro de una anchura de
 banda da $2000\sqrt{T/V}$: una *elección* de cuánto solapamiento cuenta como
 difuso, que es la razón de que los textos más estrictos citen 4000 para la misma
-física. La transición es suave, así que una banda que quede a caballo de $f_s$
+física. La transición es suave, así que una banda que quede a caballo de $f_\mathrm{s}$
 debe comprobarse posición a posición en lugar de darse por buena, y la
 [escalera de modos](/phonometry/es/buildings/rooms/room-image-sources/#3-modos-de-una-sala-rectangular)
 de la guía de fuentes imagen enumera lo que hay ahí abajo de verdad. La
@@ -571,7 +571,7 @@ espectáculos según la ISO 3382-1:2009 o una sala ordinaria según la
 ISO 3382-2:2008, ambos evaluados por el método de la respuesta al impulso
 integrada): una línea de base normativa, un bloque opcional de metadatos de
 cabecera, la tabla de parámetros por bandas a ancho completo ($T_{20}$,
-$T_{30}$, EDT, $C_{50}$, $C_{80}$, $D_{50}$, $T_s$) sobre la gráfica de tiempos
+$T_{30}$, EDT, $C_{50}$, $C_{80}$, $D_{50}$, $T_\mathrm{s}$) sobre la gráfica de tiempos
 de caída por banda del propio resultado (`.plot()`), el resultado enmarcado del
 tiempo de reverberación de frecuencias medias $T_\text{mid}$ (la media de los
 $T_{30}$ de las octavas de 500 Hz y 1000 Hz, el descriptor habitual de la sala)

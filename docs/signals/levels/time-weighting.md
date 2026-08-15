@@ -22,7 +22,7 @@ instrument practice).
 
 Two sibling pages complete the chain. The detector output is the level
 track that the percentile levels $L_N$ of [Levels](levels.md) are defined
-on, while the integrated metrics ($L_{eq}$, SEL) bypass the detector
+on, while the integrated metrics ($L_\mathrm{eq}$, SEL) bypass the detector
 entirely; and the full IEC 61672-1 instrument chain that wraps this
 detector (weighting, ranges, periodic tests) is the subject of
 [Build a sound level meter](../sound-level-meter.md).
@@ -109,20 +109,20 @@ decay, switching per sample on the sign of the change:
 
 $$
 y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
-\alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1.5)} & \text{otherwise}\end{cases}
+\alpha = \begin{cases}1 - e^{-1/(f_\mathrm{s} \cdot 0.035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_\mathrm{s} \cdot 1.5)} & \text{otherwise}\end{cases}
 $$
 
 The asymmetry has a consequence worth stating: unlike F and S, Impulse is not a
 filter. Its coefficient depends on the signal, so an I-weighted level is not
 additive — the I-weighted level of two sources running together cannot be
-derived from the two measured separately, while their $L_{eq}$ values can.
+derived from the two measured separately, while their $L_\mathrm{eq}$ values can.
 
 ### Choosing F, S or I
 
 - **Fast** is the default of nearly every modern method: percentile levels,
   impulsive-event detection, community noise, the general "level vs time"
   plot. Its 125 ms constant is of the same order as the ear's own loudness
-  integration time, so an $L_{AF}$ trace roughly tracks what a listener notices.
+  integration time, so an $L_\mathrm{AF}$ trace roughly tracks what a listener notices.
 - **Slow** suits quasi-stationary sources and any procedure that needs a
   steady readout: it averages away the flicker of a fluctuating source at
   the price of missing short events (a 100 ms burst peaks 7.6 dB lower
@@ -137,9 +137,9 @@ derived from the two measured separately, while their $L_{eq}$ values can.
   are not suitable for rating impulsive sounds. It survives in meters only
   for continuity with older national requirements. Modern practice rates
   impulsiveness with
-  $L_{Aeq}$ plus an adjustment (ISO 1996-1 Table A.1, or the onset analysis
+  $L_\mathrm{Aeq}$ plus an adjustment (ISO 1996-1 Table A.1, or the onset analysis
   of [Impulsive-sound prominence](../../environment/assessment/impulsive-sound.md)) and assesses
-  hearing-damage risk with $L_{Cpeak}$, never with I-weighted levels.
+  hearing-damage risk with $L_\mathrm{Cpeak}$, never with I-weighted levels.
 
 ## 3. `time_weighting()` / `TimeWeighting` parameters
 
@@ -271,7 +271,7 @@ The `impulse` mode uses an asymmetric kernel that is JIT-compiled when
 [numba](https://numba.pydata.org/) is installed (`pip install phonometry[perf]`).
 Without numba a pure-Python fallback produces identical results, just slower.
 
-See [Integrated & Statistical Levels](levels.md) for $L_{eq}$/$L_N$ metrics
+See [Integrated & Statistical Levels](levels.md) for $L_\mathrm{eq}$/$L_N$ metrics
 built on these envelopes, and [Why phonometry](../../start/why-phonometry.md) for the IEC
 61672-1 tone-burst verification.
 
@@ -282,7 +282,7 @@ built on these envelopes, and [Why phonometry](../../start/why-phonometry.md) fo
 - [Frequency Weighting](weighting.md): the A/C/Z filters applied before the detector.
 - [Block Processing](../filters/block-processing.md): streaming the detector over frames without state discontinuities.
 - [Impulsive-sound prominence](../../environment/assessment/impulsive-sound.md): the onset-based rating of impulses that the international standards moved to.
-- [Spanish Noise Regulation](../../environment/assessment/spanish-noise-regulation.md): a rating in force that still requires the I weighting, through the $L_{AIeq} - L_{Aeq}$ impulsive correction $K_i$.
+- [Spanish Noise Regulation](../../environment/assessment/spanish-noise-regulation.md): a rating in force that still requires the I weighting, through the $L_\mathrm{AIeq} - L_\mathrm{Aeq}$ impulsive correction $K_\mathrm{i}$.
 - [Calibration and dBFS](../metrology/calibration.md): the IEC 61672-3 periodic tests, in which these ballistics are spot-checked against the class limits on a real instrument.
 - API reference: [`filters.weighting`](https://jmrplens.github.io/phonometry/reference/api/filters/weighting/).
 - Theory: [Time Integration](../../reference/theory/signal-analysis.md#time-integration): the first-order equation the exponential detectors solve, and what integrating it over a fixed block instead would change.

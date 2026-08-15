@@ -13,7 +13,7 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   :func:`~phonometry.signals.spectra.power_spectral_density`, so a
   signal in pascals reads directly in Pa²/Hz or Pa² and averaging the
   columns reproduces the Welch estimate bin by bin). Each cell trades the
-  time resolution :math:`T_B = \text{nperseg}/f_s` against the frequency
+  time resolution :math:`T_B = \text{nperseg}/f_\mathrm{s}` against the frequency
   resolution
   :math:`1/T_B` at a resolution-bandwidth-time product of one, so a single
   cell of random data is an unaveraged estimate: the power carries a
@@ -38,7 +38,7 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   precision against the demodulate-decimate-DFT chain. The bin spacing
   can be made arbitrarily fine, but the true resolution stays set by the
   record length and taper (the reported effective noise bandwidth
-  :math:`B_e = f_s \sum w^2 / \left( \sum w \right)^2`): zooming refines
+  :math:`B_\mathrm{e} = f_\mathrm{s} \sum w^2 / \left( \sum w \right)^2`): zooming refines
   the grid, only a longer record
   refines the resolution (Eq. 11.127).
 
@@ -104,18 +104,18 @@ class SpectrogramResult:
         segment's taper-weighted mean square
         :math:`\sum (x w)^2 / \sum w^2`; summing
         those over time *and multiplying by the hop duration* ``hop/fs``
-        recovers the record energy :math:`\sum x^2 / f_s` when the
+        recovers the record energy :math:`\sum x^2 / f_\mathrm{s}` when the
         squared taper
         overlap-adds to a constant (e.g. Hann at 75 % overlap), up to the
         taper roll-off at the record edges (the first and last segments
         are under-weighted: about 1-2 % low for typical records).
     :ivar time_resolution: Segment duration
-        :math:`T_B = \text{nperseg}/f_s`, in
+        :math:`T_B = \text{nperseg}/f_\mathrm{s}`, in
         seconds - the time resolution of the display.
-    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e` of
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_\mathrm{e}` of
         the tapered segment, in Hz - the frequency resolution
         (:math:`\approx 1/T_B`
-        for a light taper; the :math:`B_e T_B` product per cell is close
+        for a light taper; the :math:`B_\mathrm{e} T_B` product per cell is close
         to 1).
     :ivar random_error: Normalized random error of each (unaveraged)
         power cell for random data, :math:`1/\sqrt{n_d} = 1` with
@@ -183,12 +183,12 @@ def spectrogram(
     ``'spectrum'`` column it spans.
 
     The display trades time against frequency resolution through the
-    segment length: :math:`T_B = \text{nperseg}/f_s` of time resolution
+    segment length: :math:`T_B = \text{nperseg}/f_\mathrm{s}` of time resolution
     against
-    :math:`B_e \approx 1/T_B` of frequency resolution
+    :math:`B_\mathrm{e} \approx 1/T_B` of frequency resolution
     (Section 12.6.4.2). Because
     each cell is a single unaveraged estimate
-    (:math:`B_e T_B \approx 1`), random
+    (:math:`B_\mathrm{e} T_B \approx 1`), random
     data carries a per-cell normalized random error of 1 (Eq. 8.158 with
     :math:`n_d = 1`): the spectrogram is a tool for deterministic
     structure -
@@ -267,9 +267,9 @@ class ZoomFFTResult:
         at DC/Nyquist), consistent with the ``'spectrum'`` scaling of
         the Welch module: a tone reads its mean square :math:`A^2/2`.
     :ivar bin_spacing: Grid spacing, in Hz - freely chosen, finer than
-        :math:`f_s/N` if requested (the zoom gain of Eq. 11.127).
+        :math:`f_\mathrm{s}/N` if requested (the zoom gain of Eq. 11.127).
     :ivar resolution_bandwidth: Effective noise bandwidth
-        :math:`B_e = f_s \sum w^2 / \left( \sum w \right)^2` of the
+        :math:`B_\mathrm{e} = f_\mathrm{s} \sum w^2 / \left( \sum w \right)^2` of the
         tapered record, in Hz - the true
         resolution, set by the record length and taper, that no grid
         refinement improves.
@@ -329,15 +329,15 @@ def zoom_fft(
     arbitrarily fine, but the true resolution remains the reported
     effective noise bandwidth of the tapered record (:math:`1/T` for no
     taper): the zoom refines the *grid*; only a longer record separates
-    tones closer than :math:`B_e` (Eq. 11.127).
+    tones closer than :math:`B_\mathrm{e}` (Eq. 11.127).
 
     :param x: Signal, 1-D.
     :param fs: Sample rate, in Hz.
     :param f_min: Lower edge of the zoom band, in Hz (:math:`\ge 0`).
-    :param f_max: Upper edge of the zoom band, in Hz (:math:`\le f_s/2`).
+    :param f_max: Upper edge of the zoom band, in Hz (:math:`\le f_\mathrm{s}/2`).
     :param n_points: Grid points across ``[f_min, f_max]`` (endpoints
         included); ``None`` places one point per record-length resolution
-        :math:`f_s/N`.
+        :math:`f_\mathrm{s}/N`.
     :param window: Record taper (any scipy window name; default Hann;
         ``'boxcar'`` for none).
     :return: A :class:`ZoomFFTResult`.

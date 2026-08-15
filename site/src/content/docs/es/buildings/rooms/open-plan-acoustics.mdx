@@ -27,8 +27,8 @@ import ThemeImage from '../../../../../components/ThemeImage.astro';
 Una oficina diáfana no es un problema de reverberación; es un problema de
 privacidad, y una sala que queda bien en los parámetros de sala cerrada puede
 suspenderlo igualmente. ISO 3382-3 caracteriza por ello la oficina con
-cuatro números únicos — $r_D$, $D_{2,S}$, $L_{p,A,S,4m}$ y el ruido de fondo
-medio $L_{p,A,B}$ — medidos a lo largo de una línea de puestos de trabajo,
+cuatro números únicos — $r_\mathrm{D}$, $D_\mathrm{2,S}$, $L_{p,\mathrm{A,S},4\,\mathrm{m}}$ y el ruido de fondo
+medio $L_{p,\mathrm{A,B}}$ — medidos a lo largo de una línea de puestos de trabajo,
 alejándose de un hablante. Esta guía cubre esa cadena de medición — las
 magnitudes, la línea de medición a escala y la ficha acreditada — y después le
 da la vuelta a la pregunta: en fase de proyecto, antes de que exista ninguna
@@ -51,59 +51,59 @@ qué rapidez el habla de un hablante se desvanece hasta la ininteligibilidad a
 medida que uno se aleja. Los niveles y el STI se miden a lo largo de una fila
 de puestos de trabajo (al menos 4 posiciones, preferiblemente 6–10), y cuatro
 magnitudes de un solo número resumen la sala: la distancia de distracción
-$r_D$, la tasa de decaimiento espacial $D_{2,S}$, el nivel de habla a 4 m
-$L_{p,A,S,4m}$ y el ruido de fondo medio ponderado A $L_{p,A,B}$
-(apartado 6.4). La distancia de privacidad $r_P$ y el STI en el puesto más
-cercano son añadidos opcionales; `open_plan_metrics` devuelve $D_{2,S}$,
-$L_{p,A,S,4m}$, $r_D$ y $r_P$. La **tasa de decaimiento
+$r_\mathrm{D}$, la tasa de decaimiento espacial $D_\mathrm{2,S}$, el nivel de habla a 4 m
+$L_{p,\mathrm{A,S},4\,\mathrm{m}}$ y el ruido de fondo medio ponderado A $L_{p,\mathrm{A,B}}$
+(apartado 6.4). La distancia de privacidad $r_\mathrm{P}$ y el STI en el puesto más
+cercano son añadidos opcionales; `open_plan_metrics` devuelve $D_\mathrm{2,S}$,
+$L_{p,\mathrm{A,S},4\,\mathrm{m}}$, $r_\mathrm{D}$ y $r_\mathrm{P}$. La **tasa de decaimiento
 espacial** del habla ponderada A es la pendiente del nivel frente a
 $\log_{10}(r/r_0)$, escalada a una cifra por duplicación usando solo las posiciones
 de 2–16 m,
 
 $$
-D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
+D_\mathrm{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-con **$L_{p,A,S,4m}$** leído en la misma recta a 4 m. La **distancia de
-distracción** $r_D$ (STI = 0,50) y la **distancia de privacidad** $r_P$
+con **$L_{p,\mathrm{A,S},4\,\mathrm{m}}$** leído en la misma recta a 4 m. La **distancia de
+distracción** $r_\mathrm{D}$ (STI = 0,50) y la **distancia de privacidad** $r_\mathrm{P}$
 (STI = 0,20) provienen de una regresión lineal del STI frente a la distancia.
 
 Las dos distancias se leen **sobre la recta ajustada**, y el apartado 6.3
 permite que la lectura caiga fuera del tramo medido: la Figura 3 b) dibuja la
-recta prolongada hasta el cruce. Así que un $r_D$ que cae dentro de la línea es
-una medición, mientras que un $r_P$ bastante más allá de la última posición es
+recta prolongada hasta el cruce. Así que un $r_\mathrm{D}$ que cae dentro de la línea es
+una medición, mientras que un $r_\mathrm{P}$ bastante más allá de la última posición es
 una extrapolación cuya confianza decae con la distancia: decláralo con el tramo
-medido al lado («$r_P$ = 17 m, extrapolado desde posiciones hasta 16 m»). La
+medido al lado («$r_\mathrm{P}$ = 17 m, extrapolado desde posiciones hasta 16 m»). La
 norma también prevé oficinas en las que el STI nunca baja a 0,20 — «puede
 resultar imposible determinar la distancia de privacidad si el STI > 0,20 en
 todas las posiciones» — y eso es lo que significa aquí un `nan`, no un fallo. Un
 STI *no decreciente* a lo largo de la línea suele indicar que la última posición
 quedó cerca de una superficie reflectante, donde suben tanto el nivel como el
 STI; el apartado 6.2 dice que se descarte esa posición de los ajustes de
-$D_{2,S}$ y $r_D$ en lugar de darle vueltas.
+$D_\mathrm{2,S}$ y $r_\mathrm{D}$ en lugar de darle vueltas.
 
 El Anexo A de la ISO 3382-3 es informativo, pero fija los dos extremos de la
 escala:
 
 | Magnitud | Oficina mala típica | Objetivo bueno |
 | :--- | :---: | :---: |
-| $D_{2,S}$ | < 5 dB | ≥ 7 dB |
-| $L_{p,A,S,4m}$ | > 50 dB | ≤ 48 dB |
-| $r_D$ | > 10 m | ≤ 5 m |
+| $D_\mathrm{2,S}$ | < 5 dB | ≥ 7 dB |
+| $L_{p,\mathrm{A,S},4\,\mathrm{m}}$ | > 50 dB | ≤ 48 dB |
+| $r_\mathrm{D}$ | > 10 m | ≤ 5 m |
 
 Esos intervalos son informativos, y las guías nacionales o el pliego del cliente
-prevalecen sobre ellos. Lee $D_{2,S}$ y $L_{p,A,S,4m}$ **como una pareja**: la
+prevalecen sobre ellos. Lee $D_\mathrm{2,S}$ y $L_{p,\mathrm{A,S},4\,\mathrm{m}}$ **como una pareja**: la
 tasa de decaimiento es una pendiente y el nivel a 4 m es su ordenada, así que
 citar cualquiera de los dos por separado favorece o condena la sala.
 
-$L_{p,A,B}$ es la cuarta magnitud exigida y no es un adorno: el ruido de fondo
+$L_{p,\mathrm{A,B}}$ es la cuarta magnitud exigida y no es un adorno: el ruido de fondo
 se mide en bandas de octava en todas las posiciones con la misma integración de
 $\ge 10$ s, se pondera A y se promedia sobre la línea, y esa media es el
 enmascarador frente al que se calcula el STI de cada posición. Promediarlo
-espacialmente es lo que deja $r_D$ y $r_P$ sin ambigüedad. Es también la razón
+espacialmente es lo que deja $r_\mathrm{D}$ y $r_\mathrm{P}$ sin ambigüedad. Es también la razón
 de que el diseño de una oficina diáfana tenga dos palancas y no una
-— **atenuación** (mamparas, techo absorbente, distribución: suben $D_{2,S}$ y
-bajan $L_{p,A,S,4m}$) y **enmascaramiento** (subir el fondo para que el habla
+— **atenuación** (mamparas, techo absorbente, distribución: suben $D_\mathrm{2,S}$ y
+bajan $L_{p,\mathrm{A,S},4\,\mathrm{m}}$) y **enmascaramiento** (subir el fondo para que el habla
 pierda antes la inteligibilidad) — y de que la oficina se mida amueblada,
 desocupada y con las instalaciones en marcha. Una oficina medida con la
 ventilación o el sistema de enmascaramiento bajados devuelve un STI mayor en
@@ -129,16 +129,16 @@ print(round(m.rd, 1), round(m.rp, 1))                # 6.7 m, 16.7 m
 m.plot()   # la regresión de decaimiento espacial de la figura de abajo
 ```
 
-**Leer esta oficina.** $D_{2,S}$ = 7,0 dB es exactamente el umbral de oficina
-buena del Anexo A, pero $L_{p,A,S,4m}$ = 51,0 dB queda por encima de la línea de
-50 dB de oficina *mala*, y $r_D$ se queda aun así en 6,7 m. Es una buena tasa de
+**Leer esta oficina.** $D_\mathrm{2,S}$ = 7,0 dB es exactamente el umbral de oficina
+buena del Anexo A, pero $L_{p,\mathrm{A,S},4\,\mathrm{m}}$ = 51,0 dB queda por encima de la línea de
+50 dB de oficina *mala*, y $r_\mathrm{D}$ se queda aun así en 6,7 m. Es una buena tasa de
 decaimiento gastada desde un nivel de partida demasiado alto, así que la
 corrección es atenuar **cerca del hablante** — una mampara, una isla acústica
 sobre el puesto — y no ganar más decaimiento más lejos. Y una línea medida no se
 parece a esta: las posiciones se dispersan en torno a la recta ajustada,
 típicamente uno o dos decibelios, con las cercanas tiradas hacia arriba por el
 campo directo y las lejanas aplanadas por el suelo de ruido de fondo. Lo que se
-declara es la **regresión**, no ninguna posición suelta: $L_{p,A,S,4m}$ se lee
+declara es la **regresión**, no ninguna posición suelta: $L_{p,\mathrm{A,S},4\,\mathrm{m}}$ se lee
 sobre la recta aunque no hubiera ningún micrófono a 4 m, que es también la razón
 de que se prefieran seis posiciones — cuatro apenas sujetan una pendiente en
 cuanto hay que descartar una de ellas.
@@ -248,7 +248,7 @@ propia línea con `m.plot_geometry()`.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_es.svg" alt="Planta a escala de la línea de medida en oficina diáfana: la estrella roja de la fuente en el origen, seis micrófonos azules de 2 m a 16 m sobre una línea punteada entre los bloques grises de los puestos de trabajo, la distancia de distracción rD = 6,5 m y la de privacidad rP = 13 m marcadas a trazos sobre la línea y los 16 m de recorrido acotados" width="86%" />
 
 *Todas las magnitudes de ISO 3382-3 salen de esta única línea: seis
-micrófonos de 2 m a 16 m entre los puestos de trabajo, con $r_D$ y $r_P$
+micrófonos de 2 m a 16 m entre los puestos de trabajo, con $r_\mathrm{D}$ y $r_\mathrm{P}$
 cayendo entre ellos.*
 
 <details>
@@ -294,7 +294,7 @@ procesarla después, toda la cadena tiene que cumplir.
 los operadores, y con la climatización y cualquier **sistema de enmascaramiento
 funcionando a la potencia de un día de trabajo normal**. La norma enuncia el
 fallo directamente: si las fuentes funcionan a potencia reducida, los valores de
-STI salen demasiado altos, lo que sobrestima tanto $r_D$ como $r_P$. Y como no
+STI salen demasiado altos, lo que sobrestima tanto $r_\mathrm{D}$ como $r_\mathrm{P}$. Y como no
 hay personas, el enmascaramiento que aporta la conversación real tampoco está en
 la medición, así que las distancias reales en uso son *más cortas* que las
 medidas.
@@ -317,7 +317,7 @@ distancia a la fuente — de **125 Hz a 8 kHz**, con un tiempo de integración d
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_setup_es.svg" alt="Dos paneles. El panel a es una planta de una oficina diáfana de 30 por 12 metros dividida en una zona con islas absorbentes y otra de yeso a secas, con una franja de exclusión de 2,0 metros a lo largo de todas las paredes, grupos de mesas con mamparas de 1,2 metros, la fuente S1 en la posición de cabeza de un puesto y la fuente S2 en el extremo opuesto emitiendo de vuelta, ocho posiciones de medición sobre un recorrido no recto con P1 en el puesto más cercano, una acotación de holgura de 0,5 metros junto a una mesa y la ventana de regresión de 2 a 16 metros acotada. El panel b es una sección que fija el centro acústico del altavoz y el micrófono a 1,2 metros junto a un ocupante sentado, con la lista de apartados de la fuente, la cadena de recepción, el estado de la sala y la línea" width="94%" />
 
 **Por qué la ventana se detiene en 2 m y en 16 m.** El apartado 6.2 solo admite
-en la regresión de $D_{2,S}$ las posiciones entre 2 m y 16 m, y los dos extremos
+en la regresión de $D_\mathrm{2,S}$ las posiciones entre 2 m y 16 m, y los dos extremos
 tienen su razón. Más cerca de 2 m el receptor está en el campo directo del
 hablante, cuyos 6 dB por duplicación son una propiedad del campo libre y no de la
 oficina; más allá de 16 m el nivel de habla ha alcanzado normalmente el fondo, de
@@ -325,7 +325,7 @@ modo que la regresión estaría ajustando ruido. Una línea de seis posiciones d
 2 m a 16 m mantiene así al menos cuatro puntos dentro del ajuste aunque haya que
 descartar el último por estar cerca de una pared.
 
-### Del ruido rosa medido a $L_{p,A,S,n}$
+### Del ruido rosa medido a $L_{p,\mathrm{A,S},n}$
 
 Un altavoz no es un hablante, así que ISO 3382-3 no usa nunca su nivel
 directamente. El apartado 6.2 mide la *sala* con ruido rosa y después vuelve a
@@ -335,9 +335,9 @@ a 1 m (Ec. 1-2), de modo que el nivel de salida del altavoz se cancela y solo
 tiene que quedar lo bastante por encima del fondo:
 
 $$
-L_{p,Ls,1m,i} \approx L_{W,Ls,i} - 11\ \text{dB},
+L_{p,\mathrm{Ls,1m},i} \approx L_{W,\mathrm{Ls},i} - 11\ \text{dB},
 \qquad
-D_{n,i} = L_{p,Ls,1m,i} - L_{p,Ls,n,i} .
+D_{n,i} = L_{p,\mathrm{Ls,1m},i} - L_{p,\mathrm{Ls},n,i} .
 $$
 
 Esa atenuación se aplica después al espectro de habla de esfuerzo normal
@@ -345,15 +345,15 @@ Esa atenuación se aplica después al espectro de habla de esfuerzo normal
 (Ec. 4):
 
 $$
-L_{p,S,n,i} = L_{p,S,1m,i} - D_{n,i},
+L_{p,\mathrm{S},n,i} = L_{p,\mathrm{S,1m},i} - D_{n,i},
 \qquad
-L_{p,A,S,n} = 10\log_{10}\sum_i 10^{(L_{p,S,n,i} + A_i)/10} .
+L_{p,\mathrm{A,S},n} = 10\log_{10}\sum_i 10^{(L_{p,\mathrm{S},n,i} + A_i)/10} .
 $$
 
 La Tabla 1 aporta el espectro omnidireccional de esfuerzo normal y las
 ponderaciones A:
 
-| Banda $i$ | $f$ [Hz] | $L_{p,S,1m,i}$ [dB] | $A_i$ [dB] |
+| Banda $i$ | $f$ [Hz] | $L_{p,\mathrm{S,1m},i}$ [dB] | $A_i$ [dB] |
 | ---: | ---: | ---: | ---: |
 | 1 | 125 | 49,9 | −16,1 |
 | 2 | 250 | 54,3 | −8,6 |
@@ -367,8 +367,8 @@ cuyo total ponderado A es 57,4 dB: una voz que habla con normalidad a 1 m.
 
 **La lectura ponderada A del ruido rosa en el sonómetro no es la entrada que
 espera `open_plan_metrics`.** Meterla da un nivel absoluto que es el del
-altavoz, no el de un hablante, así que $L_{p,A,S,4m}$ sale directamente mal y
-$D_{2,S}$ queda sesgada por la diferencia espectral entre el ruido rosa y el
+altavoz, no el de un hablante, así que $L_{p,\mathrm{A,S},4\,\mathrm{m}}$ sale directamente mal y
+$D_\mathrm{2,S}$ queda sesgada por la diferencia espectral entre el ruido rosa y el
 habla. Ejecuta antes la cadena de cuatro pasos:
 
 ```python
@@ -407,7 +407,7 @@ que en [Niveles](/phonometry/es/signals/levels/levels/).
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | array 1D | m | ≥ 4 posiciones, todas > 0 | Distancias fuente-receptor |
-| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A $L_{p,A,S,n}$ por posición, procedente de la cadena de las Ec. (1)-(4) del apartado 6.2 — **no** los dB(A) de ruido rosa medidos |
+| `spl_a_speech` | array 1D | dB | misma longitud | Nivel de habla ponderado A $L_{p,\mathrm{A,S},n}$ por posición, procedente de la cadena de las Ec. (1)-(4) del apartado 6.2 — **no** los dB(A) de ruido rosa medidos |
 | `sti_values` | array 1D | — | misma longitud | STI por posición (método completo de IEC 60268-16) |
 
 Devuelve un `OpenPlanResult` con `d2s`, `lp_as_4m`, `rd` y `rp`; su
@@ -423,18 +423,18 @@ posición puede medirse a su vez con las herramientas STIPA de la
 `OpenPlanResult.report(path)` renderiza una ficha PDF de una página con el
 formato de un informe de medición de privacidad acústica en oficinas diáfanas:
 la línea de base normativa, un bloque de cabecera de metadatos opcional, una tabla
-compacta de las cuatro magnitudes que devuelve `open_plan_metrics` ($D_{2,S}$,
-$L_{p,A,S,4m}$, la distancia de distracción $r_D$ y la distancia de privacidad
-$r_P$) apilada sobre la gráfica de decaimiento espacial a todo el ancho del
+compacta de las cuatro magnitudes que devuelve `open_plan_metrics` ($D_\mathrm{2,S}$,
+$L_{p,\mathrm{A,S},4\,\mathrm{m}}$, la distancia de distracción $r_\mathrm{D}$ y la distancia de privacidad
+$r_\mathrm{P}$) apilada sobre la gráfica de decaimiento espacial a todo el ancho del
 resultado (`.plot()`, la regresión del apartado 6.2 en el eje logarítmico de
-distancia con la lectura a 4 m y los cruces $r_D$ / $r_P$ marcados, la curva al
-estilo de la Figura 3), el $D_{2,S}$ enmarcado con las demás magnitudes al lado,
+distancia con la lectura a 4 m y los cruces $r_\mathrm{D}$ / $r_\mathrm{P}$ marcados, la curva al
+estilo de la Figura 3), el $D_\mathrm{2,S}$ enmarcado con las demás magnitudes al lado,
 y un pie
 con el descargo fijo. La ISO 3382-3 **caracteriza** un espacio en lugar de
 definir un cumple/no cumple intrínseco, por lo que la fila de veredicto aparece solo
 cuando se suministra una tasa de decaimiento espacial objetivo a través del
 campo `requirement` de los metadatos (`ReportMetadata(requirement=...)`,
-interpretada como el $D_{2,S}$ mínimo aceptable en dB, según los intervalos de
+interpretada como el $D_\mathrm{2,S}$ mínimo aceptable en dB, según los intervalos de
 calidad informativos del Anexo A donde un mayor decaimiento espacial es mejor;
 la sala cumple igualando o superando el objetivo). Usa el mismo contenedor
 `ReportMetadata` y el mismo motor de renderizado que la
@@ -532,15 +532,15 @@ Restar ambos da la **relación habla-ruido**, y este es el resultado que merece
 la pena recordar:
 
 $$
-L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right] + 10\log_{10}\!\left[\frac{A_\text{mesa}}{4}\right].
+L_\mathrm{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right] + 10\log_{10}\!\left[\frac{A_\text{mesa}}{4}\right].
 $$
 
 No sobrevive ni $L_W$ ni $N$. Una sala más llena no es intrínsecamente peor,
 porque cada mesa nueva aporta a la vez un hablante y su propia cuota de
 absorción. Lo que decide si un restaurante funciona es la absorción **por
-mesa**, no la absorción de la sala. Exigir $L_{SN} > -6$ dB para una
+mesa**, no la absorción de la sala. Exigir $L_\mathrm{SN} > -6$ dB para una
 comunicación adecuada a una separación $r_s$ a través de la mesa, y
-$L_{SN} < -9$ dB para que no se escuche a una mesa vecina situada a $r_t$, se
+$L_\mathrm{SN} < -9$ dB para que no se escuche a una mesa vecina situada a $r_t$, se
 traduce en un par de cotas de diseño (ecs. (17.53) y (17.54)):
 
 $$
@@ -680,7 +680,7 @@ y `absorption_per_table` son invocables directamente.
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
 Las magnitudes de oficina diáfana del apartado 4 y los apartados 6.2/6.3 de la
-ISO 3382-3:2012 ($D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$) de
+ISO 3382-3:2012 ($D_\mathrm{2,S}$, $L_{p,\mathrm{A,S},4\,\mathrm{m}}$, $r_\mathrm{D}$, $r_\mathrm{P}$) de
 `room.open_plan_metrics`, con el dibujo a escala de la línea de medición
 (`room.plot_open_plan_geometry` y `.plot_geometry()`) y la ficha ISO 3382-3 de
 una página con `.report()`. Las condiciones de medición de los apartados 5.1 y
@@ -697,7 +697,7 @@ El STI por posición de la ISO 3382-3 se toma como entrada de
 las herramientas STIPA de la [guía del Índice de transmisión del
 habla](/phonometry/es/perception/speech/speech-transmission/). La cuarta
 magnitud de número único exigida, el ruido de fondo medio ponderado A
-$L_{p,A,B}$, tampoco se calcula aquí: es la media energética ponderada A de
+$L_{p,\mathrm{A,B}}$, tampoco se calcula aquí: es la media energética ponderada A de
 los niveles de fondo por banda de octava de cada posición, y le corresponde ir
 en el informe junto a las tres que sí produce esta página. Tampoco **se
 comprueba** ninguna de las condiciones de medición de los apartados 5.1 y 5.2:
@@ -705,11 +705,11 @@ la función consume distancias, niveles y valores de STI vengan de donde
 vengan, así que la directividad de la fuente, el estado amueblado y desocupado
 y la captura del ruido de fondo son responsabilidad del operador y no de la
 biblioteca. La edición implementada está fijada en la ISO 3382-3:2012; la
-revisión sucesora ISO 3382-3:2022 retira la distancia de privacidad $r_P$,
-añade la distancia de confort $r_C$ y traslada el STI por posición al método
+revisión sucesora ISO 3382-3:2022 retira la distancia de privacidad $r_\mathrm{P}$,
+añade la distancia de confort $r_\mathrm{C}$ y traslada el STI por posición al método
 indirecto de la IEC 60268-16, y no es la comprobada aquí. El modelo de ruido
 autogenerado es un cálculo de *diseño* y deliberadamente no modela el reflejo
-de Lombard: se cancela en $L_{SN}$ mientras todo el mundo alce la voz por
+de Lombard: se cancela en $L_\mathrm{SN}$ mientras todo el mundo alce la voz por
 igual, de modo que el modelo explica por qué el nivel se dispara en una sala
 dura, no dónde se detiene. Supone además un campo reverberante difuso y una
 única cifra de absorción por mesa, así que no dice nada de las mamparas, la

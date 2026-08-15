@@ -80,7 +80,7 @@ que la unión ensayada es la única trayectoria entre ellos; excitadores y máqu
 impactos accionan uno de los elementos, y las diferencias
 de nivel de velocidad a través de la unión se condensan en el **índice de
 reducción vibratoria** $K_{ij}$, junto con los descriptores globales de
-flanco $D_{n,f}$ (aéreo) y $L_{n,f}$ (impacto). Esta guía cubre esa cadena
+flanco $D_\mathrm{n,f}$ (aéreo) y $L_\mathrm{n,f}$ (impacto). Esta guía cubre esa cadena
 de medición: la diferencia de niveles de velocidad promediada direccionalmente,
 las longitudes de absorción equivalentes, las comprobaciones de validez SEA
 de la parte 4 y las tres fichas con formato de informe acreditado. Los valores
@@ -96,8 +96,8 @@ placas](/phonometry/es/vibration/structural/junction-transmission/).
 ISO 10848:2006/2010 es el método de laboratorio que **mide** el **índice de
 reducción vibratoria** de unión $K_{ij}$ que la [predicción EN
 12354](/phonometry/es/buildings/design/insulation-prediction/)
-toma como entrada, junto con los descriptores globales de flanco $D_{n,f}$
-(aéreo) y $L_{n,f}$ (impacto). Es la contraparte de medición de la función
+toma como entrada, junto con los descriptores globales de flanco $D_\mathrm{n,f}$
+(aéreo) y $L_\mathrm{n,f}$ (impacto). Es la contraparte de medición de la función
 empírica `junction_vibration_reduction()` de esa predicción.
 
 **Índice de reducción vibratoria (Fórmula (13)).**
@@ -106,10 +106,10 @@ partir de la diferencia de nivel de velocidad promediada direccionalmente
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Fórmula (11), que hace
 $K_{ij}$ simétrico), la longitud de unión de arista común $l_{ij}$ y las
 **longitudes de absorción equivalentes**
-$a_j = 2{,}2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$ (Fórmula (12),
-$f_\text{ref} = 1000$ Hz). Para elementos ligeros y bien amortiguados
+$a_j = 2{,}2\pi^2 S_j /(T_{\mathrm{s},j} c_0)\sqrt{f_\mathrm{ref}/f}$ (Fórmula (12),
+$f_\mathrm{ref} = 1000$ Hz). Para elementos ligeros y bien amortiguados
 $a_j = S_j / l_0$ ($l_0 = 1$ m) y la Fórmula (13) se reduce a la Fórmula (14)
-simplificada, que no necesita ningún $T_s$.
+simplificada, que no necesita ningún $T_\mathrm{s}$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_junction_rig_es.svg" alt="Bancos de medición de unión ISO 10848 para una unión en L y una unión en T de placas de hormigón de 140 a 200 mm: un excitador o un martillo excita el elemento i, los acelerómetros sobre los elementos i y j leen la diferencia de nivel de velocidad Dv,ij, y la longitud de unión de al menos 2,3 m recorre la línea de esquina resaltada" width="92%" loading="eager" />
 
@@ -125,15 +125,15 @@ banco, que es toda la razón por la que EN 12354 puede consumirlo.
 
 ### El tiempo de reverberación estructural, y de dónde sale
 
-$T_{s,j}$ es la segunda entrada más influyente de esta página y la que más a
+$T_{\mathrm{s},j}$ es la segunda entrada más influyente de esta página y la que más a
 menudo se da por supuesta. **No** es el tiempo de reverberación del recinto: es
 la caída de la energía de *ondas de flexión* sobre el propio elemento, medida
 con acelerómetros, y es lo que lleva el factor de pérdidas total del elemento a
-la longitud de absorción, $\eta_\text{total} = 2{,}2/(f T_s)$
-(ISO 10848-1:2017, Fórmula (19)). Como $a_j \propto 1/T_{s,j}$ y $K_{ij}$ lleva
-$-10\log_{10}\sqrt{a_i a_j}$, un $T_s$ equivocado en un factor de dos desplaza
+la longitud de absorción, $\eta_\text{total} = 2{,}2/(f T_\mathrm{s})$
+(ISO 10848-1:2017, Fórmula (19)). Como $a_j \propto 1/T_{\mathrm{s},j}$ y $K_{ij}$ lleva
+$-10\log_{10}\sqrt{a_i a_j}$, un $T_\mathrm{s}$ equivocado en un factor de dos desplaza
 $K_{ij}$ 1,5 dB por cada elemento, y lo desplaza en la dirección que hace
-parecer la unión mejor de lo que es cuando $T_s$ se sobrestima.
+parecer la unión mejor de lo que es cuando $T_\mathrm{s}$ se sobrestima.
 
 Mídelo como prescribe el apartado 7.3 de ISO 10848-1:2017: excitación puntual
 con un excitador electrodinámico y una señal MLS o de barrido sinusoidal (el
@@ -149,22 +149,22 @@ elementos pesados acoplados a otros elementos pesados dan una caída recta corta
 seguida de una curva a medida que vuelve energía del resto de la estructura,
 así que el intervalo de evaluación corto no es una comodidad sino una exigencia
 de la física. El apartado 7.3.5 fija el suelo por debajo del cual un análisis
-directo deja de ser fiable: $T_s > 70/f$ y $T_s > 2T_\text{det}$, con
+directo deja de ser fiable: $T_\mathrm{s} > 70/f$ y $T_\mathrm{s} > 2T_\text{det}$, con
 $T_\text{det}$ el tiempo de reverberación del detector promediador.
 
 Espera unas décimas de segundo en una placa pesada de hormigón montada en un
 edificio, decreciendo con la frecuencia, y bastante menos en un elemento ligero
 bien amortiguado, que es la razón por la que la vía ligera de la Fórmula (14)
-prescinde por completo de $T_s$. La identidad del factor de pérdidas es la
-comprobación de sensatez de un valor medido: a 500 Hz un $T_s$ de 0,35 s da
+prescinde por completo de $T_\mathrm{s}$. La identidad del factor de pérdidas es la
+comprobación de sensatez de un valor medido: a 500 Hz un $T_\mathrm{s}$ de 0,35 s da
 $\eta = 2{,}2/(500 \times 0{,}35) = 0{,}013$, un factor de pérdidas total
 verosímil para una placa pesada in situ, mientras que un $\eta$ que salga por
 encima de 0,1 o por debajo de 0,005 dice que la caída se leyó mal, no que la
 placa sea rara.
 
-**Descriptores globales.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Fórmula (4),
-aéreo) y $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Fórmula (5), máquina de impactos),
-$A_0 = 10\ \text{m}^2$; sus números únicos $D_{n,f,w}$ / $L_{n,f,w}$ reutilizan
+**Descriptores globales.** $D_\mathrm{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Fórmula (4),
+aéreo) y $L_\mathrm{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Fórmula (5), máquina de impactos),
+$A_0 = 10\ \text{m}^2$; sus números únicos $D_\mathrm{n,f,w}$ / $L_\mathrm{n,f,w}$ reutilizan
 los motores de ISO 717. El número único $\overline{K}_{ij}$ es la media
 aritmética entre 200 y 1250 Hz en tercios de octava, o entre 125 y 1000 Hz en
 bandas de octava (Anexo A).
@@ -212,7 +212,7 @@ marcan en `result.bracketed` y quedan excluidas del número único
 $\overline{K}_{ij}$, como exige el apartado 9 de la parte 4.
 Como ISO 10848 no contiene ningún ejemplo numérico resuelto, la conformidad se
 ancla en identidades de forma cerrada ($K_{ij}$ simplificado, $a_j$ a
-$f_\text{ref}$, $\eta$).
+$f_\mathrm{ref}$, $\eta$).
 
 ```python
 import numpy as np
@@ -248,10 +248,10 @@ res_m.bracketed    # marcas por banda; las bandas acotadas salen del número ún
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference_es.svg" alt="Diferencia de niveles normalizada de flancos Dn,f por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con las desviaciones desfavorables sombreadas y el índice Dn,f,w anotado" width="80%" />
 
-*El descriptor global de flancos $D_{n,f}$ es una magnitud aérea, así que su
-número único $D_{n,f,w}$ sale del motor de ISO 717-1 sin cambios; entra
+*El descriptor global de flancos $D_\mathrm{n,f}$ es una magnitud aérea, así que su
+número único $D_\mathrm{n,f,w}$ sale del motor de ISO 717-1 sin cambios; entra
 directamente en el modelo EN 12354-1 como dato de la trayectoria por flancos de la
-unión ensayada (el homólogo de impactos $L_{n,f}$ se evalúa igual según
+unión ensayada (el homólogo de impactos $L_\mathrm{n,f}$ se evalúa igual según
 ISO 717-2).*
 
 <details>
@@ -305,9 +305,9 @@ siquiera.
 elementos tiene dos elementos que dan a cada recinto, y un nivel en el recinto
 receptor alimentado por *todos* ellos no es atribuible a ninguna trayectoria en
 concreto. Por eso los elementos que no se ensayan se apantallan, uno tras otro,
-y la regla cambia según la magnitud: al medir $D_{n,f}$ para la transmisión a
+y la regla cambia según la magnitud: al medir $D_\mathrm{n,f}$ para la transmisión a
 través de $i$ y $j$, apantalla el otro elemento **en los dos recintos**; al
-medir $L_{n,f}$, apantalla el otro elemento **en el recinto receptor**; al medir
+medir $L_\mathrm{n,f}$, apantalla el otro elemento **en el recinto receptor**; al medir
 $K_{ij}$ con excitación estructural **no hace falta apantallar nada**, porque la
 excitación se aplica a un elemento y no a un campo sonoro. El sonido radiado
 medido por intensidad según ISO 15186-1 tampoco necesita apantallamiento en el
@@ -322,7 +322,7 @@ $\Delta R_\text{min} = 10 - L_{v,1j} + L_{v,2j}$ cuando
 $L_{v,1j} - L_{v,2j} \le 10$ dB, y nada en absoluto cuando la diferencia ya
 supera los 10 dB (Fórmulas (23) y (24)). Un apantallamiento pesado sobre un
 elemento ligero puede cambiar la mismísima transmisión que se está midiendo, y
-hay que evitarlo. **Un $K_{ij}$ o un $D_{n,f}$ declarado sin decir cómo se
+hay que evitarlo. **Un $K_{ij}$ o un $D_\mathrm{n,f}$ declarado sin decir cómo se
 apantallaron los demás elementos, y cómo se verificó ese apantallamiento, es un
 número de pareja de recintos con una etiqueta de trayectoria pegada encima**, y
 entra directo en una predicción EN 12354, donde el error no está acotado en
@@ -335,9 +335,9 @@ frecuencia; donde la textura de la superficie derrote a la cera, pega con
 cemento una arandela metálica pequeña y encera o atornilla sobre ella
 (ISO 5348). La masa del acelerómetro debe ser lo bastante pequeña para no
 cargar la placa, que es lo que hace explícito la Fórmula (16):
-$m_\text{acc} < 1/(2\pi f Y_\text{dp})$, con la movilidad puntual de una placa
+$m_\text{acc} < 1/(2\pi f Y_\mathrm{dp})$, con la movilidad puntual de una placa
 delgada isótropa estimada por la Fórmula (17) como
-$Y_\text{dp} = 1/(8\sqrt{B\rho_s}) = 1/(2{,}3\,\rho_s c_L h)$. La desigualdad
+$Y_\mathrm{dp} = 1/(8\sqrt{B\rho_\mathrm{s}}) = 1/(2{,}3\,\rho_\mathrm{s} c_\mathrm{L} h)$. La desigualdad
 aprieta en el extremo **superior** del intervalo de bandas, así que
 compruébala en la banda más alta, no en la más baja.
 
@@ -382,7 +382,7 @@ comparten un único plenum continuo por encima. El sonido sale del recinto
 emisor a través de las placas del techo, viaja lateralmente por encima del
 tabique y vuelve a bajar a través de las placas del recinto receptor. Ese
 trayecto suele ser el eslabón más débil de una distribución de oficinas, y no
-es lo que describe el $R_w$ de un tabique.
+es lo que describe el $R_\mathrm{w}$ de un tabique.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_es.svg" alt="Dos paneles: el índice de reducción del trayecto techo-plenum Rcl por bandas de octava para dos profundidades de plenum frente a la suma de los índices de los dos techos, y la diferencia de niveles normalizada del techo de un informe de ensayo acreditado ASTM E1414 con la curva ASTM E413 ajustada y sus deficiencias sombreadas dando CAC 34" width="92%" />
 
@@ -390,7 +390,7 @@ es lo que describe el $R_w$ de un tabique.
 techos, unos 10 dB en esta geometría, y duplicar su profundidad solo devuelve
 3 dB de ella, que es la razón por la que la placa es la palanca y el hueco no.
 Derecha: la misma magnitud tal como la mide un laboratorio acreditado, con la
-curva ASTM E413 ajustada al $D_{n,c}$ medido y sus deficiencias sombreadas; la
+curva ASTM E413 ajustada al $D_\mathrm{n,c}$ medido y sus deficiencias sombreadas; la
 clase se lee sobre la curva desplazada a 500 Hz.*
 
 <details>
@@ -445,31 +445,31 @@ plt.show()
 La variante unidimensional de Mechel, tal como la
 presenta Vigran en la Sección 9.2.3, trata el plenum como un conducto revestido
 por un lado. El techo de cada lado tiene un factor de transmisión
-$\tau_S = \tau_{S,pl}\tau_{S,a}$ (las placas por el eventual absorbente del
-plenum, Ec. (9.14)); la potencia inyectada se reparte, con una fracción $s_S$
+$\tau_\mathrm{S} = \tau_\mathrm{S,pl}\tau_\mathrm{S,a}$ (las placas por el eventual absorbente del
+plenum, Ec. (9.14)); la potencia inyectada se reparte, con una fracción $s_\mathrm{S}$
 dirigida hacia el tabique, y decae como $\exp(-mx)$ con el coeficiente de
 atenuación de potencia
 $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$ (Ecs. (9.15) y (9.16)).
 Integrando sobre la longitud del techo a ambos lados se obtiene la Ec. (9.18),
 cuyo lado receptor incorpora la fuga de vuelta al recinto,
-$m'_R = m_R + s_R\tau_R/h$ (Ec. (9.17)). Vigran imprime el $m_R$ *sin prima* en
+$m'_\mathrm{R} = m_\mathrm{R} + s_\mathrm{R}\tau_\mathrm{R}/h$ (Ec. (9.17)). Vigran imprime el $m_\mathrm{R}$ *sin prima* en
 el denominador de esa expresión; es una errata, registrada en
 [el registro de erratas](/phonometry/es/reference/errata/), y aquí se usa el
-$m'_R$ derivado. Leída al pie de la letra, la forma impresa no es monótona con
+$m'_\mathrm{R}$ derivado. Leída al pie de la letra, la forma impresa no es monótona con
 el amortiguamiento del plenum (añadir absorbente predeciría un trayecto peor
-que no poner nada) y no está acotada cuando $m_R \to 0$. Para un plenum con poca atenuación y
-$s_S = s_R = 0{,}5$ eso se reduce a la forma compacta que hace visible la
+que no poner nada) y no está acotada cuando $m_\mathrm{R} \to 0$. Para un plenum con poca atenuación y
+$s_\mathrm{S} = s_\mathrm{R} = 0{,}5$ eso se reduce a la forma compacta que hace visible la
 geometría (Ecs. (9.19) y (9.20)):
 
 $$
-R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+R_\mathrm{cl} = R_\mathrm{S} + R_\mathrm{R} - 10\log_{10}\!\left[\frac{\varepsilon^2 L_\mathrm{R}}{4h}\right],
 $$
 
 con $\varepsilon = 1$ para paredes laterales del plenum totalmente absorbentes
 y $\varepsilon = 2$ para totalmente reflectantes. Un plenum profundo ayuda, un
 recinto largo perjudica, y duplicar el aislamiento de las placas ayuda el doble
-porque $R_S$ y $R_R$ aparecen los dos. Referido al área del tabique en lugar de
-a la del techo, $R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Ec. (9.13)), que es lo
+porque $R_\mathrm{S}$ y $R_\mathrm{R}$ aparecen los dos. Referido al área del tabique en lugar de
+a la del techo, $R_\mathrm{cl,p} = R_\mathrm{cl} + 10\log_{10}(H_\mathrm{S}/L_\mathrm{S})$ (Ec. (9.13)), que es lo
 que permite sumar el trayecto por el techo al trayecto directo como factores de
 transmisión.
 
@@ -500,21 +500,21 @@ print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 
 ### La magnitud medida: la atenuación normalizada del techo
 
-Un techo no se valora por $R_{cl}$ sino por la
-**diferencia de niveles normalizada del techo suspendido** $D_{n,c} = D - 10\log_{10}(A/A_0)$
+Un techo no se valora por $R_\mathrm{cl}$ sino por la
+**diferencia de niveles normalizada del techo suspendido** $D_\mathrm{n,c} = D - 10\log_{10}(A/A_0)$
 (ISO 140-9:1985, apartado 3.3), con $A$ el área de absorción acústica
 equivalente del recinto receptor y la referencia $A_0 = 10\ \text{m}^2$. La
 instalación tiene dos recintos de al menos 50 m³ cuyos volúmenes difieren en al
 menos un 10 %, un tabique divisorio adelgazado a 100 mm como máximo en su parte
 superior y un plenum de 650 mm a 760 mm de profundidad con una pared lateral y
 las dos testeras revestidas; la norma imprime la absorción exigida al
-revestimiento, $\alpha_s \ge 0{,}65$ a 125 Hz y $\ge 0{,}80$ de 250 Hz a
+revestimiento, $\alpha_\mathrm{s} \ge 0{,}65$ a 125 Hz y $\ge 0{,}80$ de 250 Hz a
 4000 Hz, y exige $\alpha < 0{,}10$ en la otra pared lateral y en el techo del
 plenum. Su equivalente norteamericana, ASTM E1414, usa
 $A_0 = 12\ \text{m}^2$, de modo que un valor ASTM queda unos
 $10\log_{10}(12/10) = 0{,}79$ dB por encima para los mismos recintos.
 
-ISO valora $D_{n,c}$ con la curva de ISO 717-1, dando $D_{n,c,w}$; ASTM E1414
+ISO valora $D_\mathrm{n,c}$ con la curva de ISO 717-1, dando $D_\mathrm{n,c,w}$; ASTM E1414
 lo valora a través de ASTM E413 como **clase de atenuación de techo**. E413
 redondea los datos al entero más próximo (apartado 5.2), eleva su curva de
 referencia en pasos de 1 dB mientras la suma de las deficiencias no supere
@@ -561,15 +561,15 @@ entre corchetes y se excluyen de la media; `verbose=True` añade una columna que
 indica si cada banda entra en la media.
 
 `FlankingLevelDifferenceResult.report()` y `FlankingImpactLevelResult.report()`
-escriben informes de **medición** de los descriptores globales $D_{n,f}$
-(aéreo) y $L_{n,f}$ (impactos, máquina de impactos), reutilizando la misma
+escriben informes de **medición** de los descriptores globales $D_\mathrm{n,f}$
+(aéreo) y $L_\mathrm{n,f}$ (impactos, máquina de impactos), reutilizando la misma
 disposición de dos paneles del aislamiento: la magnitud por banda junto a la
 curva medida frente a la referencia ISO 717 desplazada y el número único
-$D_{n,f,w}$ (C; Ctr) (ISO 717-1) o $L_{n,f,w}$ (CI) (ISO 717-2).
+$D_\mathrm{n,f,w}$ (C; Ctr) (ISO 717-1) o $L_\mathrm{n,f,w}$ (CI) (ISO 717-2).
 `verbose=True` anexa
 la evaluación ISO 717 por banda (el valor, la referencia desplazada y la
 desviación desfavorable). Un `requirement` indicado en `ReportMetadata` añade un
-veredicto ($D_{n,f,w}$ cumple igualando o superándolo, $L_{n,f,w}$ igualándolo o
+veredicto ($D_\mathrm{n,f,w}$ cumple igualando o superándolo, $L_\mathrm{n,f,w}$ igualándolo o
 por debajo), y `language="es"` genera cada ficha en español. Se necesita
 reportlab y, para la figura que incrusta la ficha, matplotlib
 (`pip install "phonometry[report,plot]"`).
@@ -639,8 +639,8 @@ desde la diferencia de niveles de velocidad promediada direccionalmente
 la forma simplificada para elementos ligeros (Fórmula (14)), el factor de
 pérdidas total y la media de número único del Anexo A, mediante
 `building.direction_averaged_level_difference` y
-`building.vibration_reduction_index`; los descriptores globales $D_{n,f}$
-(Fórmula (4)) y $L_{n,f}$ (Fórmula (5)) con sus números únicos de ISO 717,
+`building.vibration_reduction_index`; los descriptores globales $D_\mathrm{n,f}$
+(Fórmula (4)) y $L_\mathrm{n,f}$ (Fórmula (5)) con sus números únicos de ISO 717,
 mediante `building.normalized_flanking_level_difference` y
 `building.normalized_flanking_impact_level`; la comprobación de acoplamiento
 fuerte (Fórmula (15)) y las comprobaciones de validez de ISO 10848-4:2010 por
@@ -654,22 +654,22 @@ corchetes las bandas poco fiables (`building.strong_coupling_satisfied`,
 <ScopeClaim status="not-covered" label="No cubierto">
 Las partes 2, 3 y 4 de ISO 10848 difieren en los tipos de unión y de elemento
 de ensayo a los que se aplican; phonometry implementa solo las fórmulas
-genéricas de $K_{ij}$/$D_{n,f}$/$L_{n,f}$ de la parte 1, más la comprobación
+genéricas de $K_{ij}$/$D_\mathrm{n,f}$/$L_\mathrm{n,f}$ de la parte 1, más la comprobación
 de solape modal de la parte 4, no los montajes de ensayo específicos de
 instalación que describen las otras partes. La adquisición de [La
 medición](#la-medicion-iso-10848-1-2017) está documentada aquí y no se
 comprueba en ninguna parte: nada verifica que los demás elementos se
 apantallaran, que el apantallamiento alcanzara $\Delta R_\text{min}$, que se
 respetaran los recuentos y las separaciones de posiciones, que el acelerómetro
-cumpliera la desigualdad de carga másica, ni que $T_s$ se midiera sobre los
+cumpliera la desigualdad de carga másica, ni que $T_\mathrm{s}$ se midiera sobre los
 elementos ya montados en lugar de suponerse. Como ISO 10848 no contiene
 ejemplo numérico resuelto, la conformidad se ancla en identidades de forma
-cerrada ($K_{ij}$ simplificado, $a_j$ en $f_\text{ref}$, $\eta$).
+cerrada ($K_{ij}$ simplificado, $a_j$ en $f_\mathrm{ref}$, $\eta$).
 </ScopeClaim>
 
 <ScopeClaim status="covered" label="Cubierto">
 La rama de techos suspendidos cubre la atenuación normalizada del techo
-$D_{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de atenuación de techo
+$D_\mathrm{n,c}$ del apartado 3.3 de ISO 140-9:1985, la clase de atenuación de techo
 de ASTM E413-22 que invoca ASTM E1414 y el modelo unidimensional de plenum de
 la Sección 9.2.3 de Vigran, con `building.normalized_ceiling_attenuation`,
 `building.ceiling_attenuation_class`,
@@ -677,7 +677,7 @@ la Sección 9.2.3 de Vigran, con `building.normalized_ceiling_attenuation`,
 `building.partition_referenced_reduction_index`. El modelo de plenum no tiene
 salida numérica publicada propia, así que se ancla en sus formas cerradas y en
 las propiedades estructurales que una lectura errónea rompe: la monotonía con
-el amortiguamiento del plenum, la cota $\tau_{cl} \le 1$ y la convergencia de
+el amortiguamiento del plenum, la cota $\tau_\mathrm{cl} \le 1$ y la convergencia de
 la Ec. (9.18) a la Ec. (9.20); la cadena de medición y la clase se anclan en
 informes de laboratorio acreditados ASTM E1414. La constante de propagación
 $k'$ de un conducto revestido es aquí un dato de entrada, no una predicción.
@@ -695,7 +695,7 @@ $k'$ de un conducto revestido es aquí un dato de entrada, no una predicción.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
   la instalación de ISO 10140 cuya transmisión directa esquivan estas trayectorias por flancos.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
-  los motores de curva de referencia tras $D_{n,f,w}$ y $L_{n,f,w}$.
+  los motores de curva de referencia tras $D_\mathrm{n,f,w}$ y $L_\mathrm{n,f,w}$.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): las fórmulas
   de flancos en la derivación de EN 12354.
 - [Acústica de oficinas diáfanas (ISO 3382-3)](/phonometry/es/buildings/rooms/open-plan-acoustics/): el contexto de oficina

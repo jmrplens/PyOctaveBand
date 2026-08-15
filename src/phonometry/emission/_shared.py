@@ -13,7 +13,7 @@ A-weighted total with the band corrections :math:`C_k` tabulated in ISO
 
 .. math::
 
-   L_{WA} = 10 \log_{10}\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right]
+   L_{W\mathrm{A}} = 10 \log_{10}\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right]
    \tag{Eq. E.1}
 
 and the other standards adopt that same table by reference for their own

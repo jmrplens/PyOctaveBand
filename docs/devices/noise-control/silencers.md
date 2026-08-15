@@ -32,8 +32,8 @@ j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
 \qquad k = \omega/c,
 $$
 
-and a side branch of acoustic impedance $Z_b$ is the shunt
-$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$
+and a side branch of acoustic impedance $Z_\mathrm{b}$ is the shunt
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_\mathrm{b} & 1 \end{smallmatrix}\right]$
 (Eq. (8.144)). The **transmission loss** follows from the compound matrix $T$
 with the port impedances $Z_1 = \rho c/S_\text{in}$ and
 $Z_n = \rho c/S_\text{out}$ (Munjal Eq. (3.27); Bies Eq. (8.141) prints the
@@ -49,12 +49,12 @@ which for equal inlet/outlet areas reduces to (Bies Eq. (8.148))
 
 $$
 \mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
-+ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
-\qquad Z_c = \frac{\rho c}{S},
++ \tfrac{T_{12}}{Z_\mathrm{c}} + Z_\mathrm{c}\,T_{21} + T_{22}\right|\right),
+\qquad Z_\mathrm{c} = \frac{\rho c}{S},
 $$
 
-and the **insertion loss** for a source impedance $Z_s$ and a radiation
-impedance $Z_r$ is the extra attenuation over a direct (zero-length)
+and the **insertion loss** for a source impedance $Z_\mathrm{s}$ and a radiation
+impedance $Z_\mathrm{r}$ is the extra attenuation over a direct (zero-length)
 connection, so a through connection gives $\mathrm{IL} = 0$.
 
 ### Expansion chamber
@@ -133,8 +133,8 @@ inlet, the 6.5 dB peak of the four-pole curve above.
 
 A **Helmholtz resonator** (`helmholtz_resonator`) and a closed **quarter-wave
 tube** (`quarter_wave_resonator`) each short the duct at their tuning
-frequency, $f_0 = \tfrac{c}{2\pi}\sqrt{S_\text{neck}/(l_e V)}$
-(Bies Eq. (8.46)) and $f = c/4l_e$ (Eq. (8.44)), giving a sharp
+frequency, $f_0 = \tfrac{c}{2\pi}\sqrt{S_\text{neck}/(l_\mathrm{e} V)}$
+(Bies Eq. (8.46)) and $f = c/4l_\mathrm{e}$ (Eq. (8.44)), giving a sharp
 transmission-loss spike there. An
 **extended-tube chamber** (`extended_tube_chamber`) buries quarter-wave side
 branches in an expansion chamber to fill its troughs; with zero extensions it
@@ -227,7 +227,7 @@ neck only 2 cm long.
 
 *The whole 120 Hz notch hangs on a 1 L box and a 2 cm neck: the cavity is
 drawn as its equal-volume cube, and the tuning moves as
-$\sqrt{S_n/(l_e V)}$, so small errors in these dimensions shift the spike off
+$\sqrt{S_\mathrm{n}/(l_\mathrm{e} V)}$, so small errors in these dimensions shift the spike off
 its target.*
 
 <details>
@@ -256,7 +256,7 @@ same duct.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry.svg" alt="To-scale cross-section of the quarter-wave side branch: a closed tube 300 mm long and 50.5 mm in equivalent diameter standing on a duct of 112.8 mm equivalent diameter, with the tube length, tube diameter and duct diameter dimensioned" width="88%"></picture>
 
 *A quarter-wave stub is just a closed tube of the right length: 0.3 m of
-pipe puts the spike at $c/4l_e \approx 285\ \text{Hz}$, and the 20 cm² branch
+pipe puts the spike at $c/4l_\mathrm{e} \approx 285\ \text{Hz}$, and the 20 cm² branch
 area only sets how strongly the stub loads the duct.*
 
 <details>

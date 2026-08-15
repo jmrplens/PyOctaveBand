@@ -151,8 +151,8 @@ for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 ## Accumulating a level across blocks
 
 The commonest streaming task is the one the pitfalls above say is easy: the
-$L_{eq}$, or the band spectrum, of a recording that does not fit in memory.
-It *is* easy, and it is exact rather than approximate, because $L_{eq}$ has no
+$L_\mathrm{eq}$, or the band spectrum, of a recording that does not fit in memory.
+It *is* easy, and it is exact rather than approximate, because $L_\mathrm{eq}$ has no
 time constant and no detector — only a sum of squares and a sample count:
 
 ```python
@@ -239,14 +239,14 @@ value the functional API hands back as `initial_state` (see
   the outputs no longer concatenate into the continuous result. This is why
   `detrend` must be `False` in stateful mode.
 - **Not every metric streams.** Energy metrics accumulate cleanly (a
-  running $L_{eq}$ is a running energy sum), but rank statistics do not: the
+  running $L_\mathrm{eq}$ is a running energy sum), but rank statistics do not: the
   $L_{90}$ of a recording is not any combination of per-block $L_{90}$
   values. Stream the *envelope* and compute percentiles once, on the pooled
   result.
 - **The first block still carries the onset transient.** State starts at
   rest, so the filter settles during the first instants exactly as in a
   single pass. How long that is follows from the bandwidth: a band settles in
-  a few times $1/B$, and with $B = 0.231\,f_m$ for one-third octaves that is
+  a few times $1/B$, and with $B = 0.231\,f_\mathrm{m}$ for one-third octaves that is
   about a second at 12.5 Hz, a tenth of a second at 125 Hz and thirteen
   milliseconds at 1 kHz (the record-length rule of
   [Filter Banks](/phonometry/signals/filters/filter-banks/#how-long-must-the-record-be)).
@@ -350,7 +350,7 @@ observed. With a 125 ms Fast constant a block of 20 to 100 ms tracks the
 envelope faithfully; blocks much longer than $\tau$ turn the display into a
 sparse sample of it. The running maximum above exists for the same reason: a
 peak that occurs mid-block never appears in the displayed samples, so
-$L_{AFmax}$ has to be accumulated as the maximum *inside* each block. And the
+$L_\mathrm{AFmax}$ has to be accumulated as the maximum *inside* each block. And the
 first blocks contain the detector's own attack ramp ($5\tau$: 0.6 s Fast, 5 s
 Slow), which must be excluded from any maximum or percentile.
 

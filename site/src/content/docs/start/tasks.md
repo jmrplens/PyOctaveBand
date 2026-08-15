@@ -18,7 +18,7 @@ it.
 
 | The job | Where it is answered |
 |---|---|
-| I have a WAV recording and I need A-weighted levels, $L_{Aeq}$ and the percentile levels | [Build a sound level meter](/phonometry/signals/sound-level-meter/) — IEC 61672-1 and IEC 61260-1, the whole chain on one runnable page, from the calibrator tone to the class check of every stage |
+| I have a WAV recording and I need A-weighted levels, $L_\mathrm{Aeq}$ and the percentile levels | [Build a sound level meter](/phonometry/signals/sound-level-meter/) — IEC 61672-1 and IEC 61260-1, the whole chain on one runnable page, from the calibrator tone to the class check of every stage |
 | My numbers are not in pascals and I do not know what they are | [Calibration and dBFS](/phonometry/signals/metrology/calibration/) — the calibrator tone, the sensitivity in pascals per digital unit, the pre/post drift rule and the digital dBFS alternative |
 | I need a spectrum rather than a level | [Filter Banks](/phonometry/signals/filters/filter-banks/) for band levels (IEC 61260-1), [Spectral analysis](/phonometry/signals/spectra/spectral-analysis/) for a density estimate |
 
@@ -29,7 +29,7 @@ it.
 | The reverberation time of a room I can get into | [Measuring the Room Impulse Response](/phonometry/buildings/rooms/room-impulse-response/) for the acquisition (ISO 18233 sweeps and the interrupted-noise alternative), then [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/) for $T_{20}$, $T_{30}$, EDT, $C_{50}$, $C_{80}$ and the rest of ISO 3382-1 |
 | The reverberation time of a room that does not exist yet | [Reverberation-time prediction](/phonometry/buildings/rooms/reverberation-prediction/) — the Sabine family, with the section that says which model to use and when every model fails; [Sound absorption in enclosed spaces](/phonometry/buildings/rooms/enclosed-space-absorption/) when a design report has to cite EN 12354-6 |
 | Whether a room is quiet enough for what happens in it | [Room-noise criteria](/phonometry/buildings/rooms/room-noise/) — NC, RC Mark II and NR, and the section on choosing between them |
-| $R'_w$ or $D_{nT,w}$ of a partition I measured on site | [Field Insulation Measurement](/phonometry/buildings/insulation/insulation-field/) (ISO 16283-1/-2) for the measurement, then [Insulation Ratings](/phonometry/buildings/insulation/insulation-ratings/) (ISO 717-1/-2) for the single number and the adaptation terms |
+| $R'_w$ or $D_\mathrm{nT,w}$ of a partition I measured on site | [Field Insulation Measurement](/phonometry/buildings/insulation/insulation-field/) (ISO 16283-1/-2) for the measurement, then [Insulation Ratings](/phonometry/buildings/insulation/insulation-ratings/) (ISO 717-1/-2) for the single number and the adaptation terms |
 | Proof that a wall meets the Spanish CTE DB-HR | [Spanish Building Code](/phonometry/buildings/insulation/spanish-building-code/) — the required quantities, which one each requirement is written against, and the compliance check |
 | The insulation of a building I am still designing | [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/), and [Detailed prediction](/phonometry/buildings/design/detailed-prediction/) when the flanking paths have to be itemised |
 
@@ -47,7 +47,7 @@ it.
 
 | The job | Where it is answered |
 |---|---|
-| $L_{den}$, $L_{night}$ or a rating level from an environmental survey | [Environmental noise levels](/phonometry/environment/assessment/environmental-levels/) — ISO 1996-1/-2, the indicators and the adjustments that go on top of them |
+| $L_\mathrm{den}$, $L_\mathrm{night}$ or a rating level from an environmental survey | [Environmental noise levels](/phonometry/environment/assessment/environmental-levels/) — ISO 1996-1/-2, the indicators and the adjustments that go on top of them |
 | Source power for a road or railway noise map | [CNOSSOS-EU road traffic source emission](/phonometry/environment/sources/cnossos-road-emission/) and [railway source emission](/phonometry/environment/sources/cnossos-rail-emission/) — Annex II of 2002/49/EC, the source side of it |
 | How much a distance, a barrier or the weather takes off | [Outdoor propagation](/phonometry/environment/propagation/outdoor-propagation/) (ISO 9613-2), [Ground effect and barriers](/phonometry/environment/propagation/ground-barriers/), [Atmospheric refraction](/phonometry/environment/propagation/atmospheric-refraction/) |
 | Whether a wind farm is compliant | [Wind turbine noise](/phonometry/environment/sources/wind-turbine-noise/) — IEC 61400-11 and the tonal audibility assessment |
@@ -57,7 +57,7 @@ it.
 
 | The job | Where it is answered |
 |---|---|
-| Whether a worker is over the daily exposure limit | [Occupational Noise Exposure](/phonometry/perception/hearing/occupational-exposure/) — ISO 9612, the $L_{EX,8h}$ and its uncertainty |
+| Whether a worker is over the daily exposure limit | [Occupational Noise Exposure](/phonometry/perception/hearing/occupational-exposure/) — ISO 9612, the $L_\mathrm{EX,8h}$ and its uncertainty |
 | Loudness in sones, or sharpness, roughness and fluctuation strength | [Loudness](/phonometry/perception/psychoacoustics/loudness/) (ISO 532-1/-2/-3), then [Sound quality metrics](/phonometry/perception/psychoacoustics/sound-quality/) |
 | Whether a tone in a noise is audible, and by how much | [Tone audibility](/phonometry/perception/psychoacoustics/tone-audibility/) (ISO/PAS 20065, DIN 45681) and [Tone prominence](/phonometry/perception/psychoacoustics/tone-prominence/), whose section on which metric to use covers both |
 | The STI of a public-address system | [Speech Transmission Index](/phonometry/perception/speech/speech-transmission/) — IEC 60268-16, direct and indirect (STIPA) |

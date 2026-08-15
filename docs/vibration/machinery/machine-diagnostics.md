@@ -63,22 +63,22 @@ plt.show()
 Norton reproduces the eleven discrete frequencies collected by Shahan and
 Kamperman (Eqs. 8.4 to 8.14). With the shaft speed $N$ in r/min, $Z$ rolling
 elements of diameter $d$ on a pitch diameter $D$, a contact angle $\phi$,
-and writing $g = (d/D)\cos\phi$ and $f_s = N/60$:
+and writing $g = (d/D)\cos\phi$ and $f_\mathrm{s} = N/60$:
 
 | Name | Meaning | Expression | Norton eq. |
 |---|---|---|---|
-| `shaft` | shaft rotational frequency | $f_s = N/60$ | (8.4) |
-| `FTF` | cage (fundamental train) frequency | $(f_s/2)(1 - g)$ | (8.5) |
-| `FTF_rel` | cage relative to the rotating race | $f_s - \text{FTF}$ | (8.11) |
-| `BSF` | rolling-element rotational frequency | $(f_s/2)(D/d)(1 - g^2)$ | (8.7) |
+| `shaft` | shaft rotational frequency | $f_\mathrm{s} = N/60$ | (8.4) |
+| `FTF` | cage (fundamental train) frequency | $(f_\mathrm{s}/2)(1 - g)$ | (8.5) |
+| `FTF_rel` | cage relative to the rotating race | $f_\mathrm{s} - \text{FTF}$ | (8.11) |
+| `BSF` | rolling-element rotational frequency | $(f_\mathrm{s}/2)(D/d)(1 - g^2)$ | (8.7) |
 | `BDF` | rolling-element spin frequency | $2\,\text{BSF}$ | (8.10) |
-| `BPFO` | element pass frequency, outer race | $Z(f_s/2)(1 - g)$ | (8.8) |
-| `BPFI` | element pass frequency, inner race | $Z(f_s/2)(1 + g)$ | (8.9) |
+| `BPFO` | element pass frequency, outer race | $Z(f_\mathrm{s}/2)(1 - g)$ | (8.8) |
+| `BPFI` | element pass frequency, inner race | $Z(f_\mathrm{s}/2)(1 + g)$ | (8.9) |
 
 Three of them carry the diagnosis: `BPFO` for an outer-race defect, `BPFI` for
 an inner-race defect, and `BDF` for a damaged rolling element or cage. Two
 identities are worth remembering because they are exact and catch data-entry
-errors instantly: $\text{BPFO} + \text{BPFI} = Z f_s$ always, and
+errors instantly: $\text{BPFO} + \text{BPFI} = Z f_\mathrm{s}$ always, and
 $\text{BPFO} = Z \times \text{FTF}$ whenever the outer race is stationary.
 
 ```python
@@ -103,7 +103,7 @@ on the line", not "the peak is at the line".
 ## 2. Gears
 
 The gear-meshing (tooth-passing) frequency of a wheel with $N$ teeth is
-$\text{GMF} = N f_s$ (Eq. 8.3), with integer harmonics. What distinguishes the fault
+$\text{GMF} = N f_\mathrm{s}$ (Eq. 8.3), with integer harmonics. What distinguishes the fault
 types is the **sideband** family around each harmonic: a single chipped tooth
 or an eccentric wheel modulates the mesh once per revolution and produces low,
 flat sidebands spaced by the shaft rate, while distributed wear raises tall
@@ -131,7 +131,7 @@ defects that produce static or dynamic air-gap eccentricity are read on the
 **rotor-slot harmonics** of Eq. (8.20),
 
 $$
-f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
+f_\mathrm{sh} = f_\mathrm{e} \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
 $$
 
 for $R$ rotor bars, $p$ magnetic poles (not pole pairs), unit slip $s$ and
@@ -149,24 +149,24 @@ print(round(res["1x"]), round(res["2x"]),
 
 Give the slip directly, or give the mains `supply_frequency` and let the slip
 follow from it and the measured shaft speed. The supply frequency is taken as
-$f_e = f_s\,p / (2(1 - s))$; Norton's Eq. (8.19) writes `fe = fs p / 2`,
+$f_\mathrm{e} = f_\mathrm{s}\,p / (2(1 - s))$; Norton's Eq. (8.19) writes `fe = fs p / 2`,
 which is the same expression at zero slip but does not reduce Eq. (8.20) to
-the physical rotor-bar passing rate $R f_s$ when the machine is loaded.
+the physical rotor-bar passing rate $R f_\mathrm{s}$ when the machine is loaded.
 Under load the result also carries the slip frequency and the pole-pass
 line $\text{FP} = p \times f_\text{slip}$, the
 sideband spacing that a broken rotor bar puts around `1x`.
 
 ## 4. Fans, blowers and pumps
 
-The blade-passing frequency of an impeller with $N$ blades is $f_b = n N f_s$
+The blade-passing frequency of an impeller with $N$ blades is $f_\mathrm{b} = n N f_\mathrm{s}$
 (Eq. 8.15); a pump's hydraulic pulsations follow the same form with $N$
 pumping events per revolution (Eq. 8.18), and a rotary
 positive-displacement blower repeats four times per revolution, so it is
 handled by passing $4 \times \text{r/min}$.
 
 In a **ducted axial fan** the blades also interact with the stator vanes and set
-up rotating pressure patterns with $m_L = nN \pm kV$ lobes for $V$ vanes
-(Eq. 8.16), turning at $n N f_s / m_L$ (Eq. 8.17). A pattern that spins faster
+up rotating pressure patterns with $m_\mathrm{L} = nN \pm kV$ lobes for $V$ vanes
+(Eq. 8.16), turning at $n N f_\mathrm{s} / m_\mathrm{L}$ (Eq. 8.17). A pattern that spins faster
 than the blades themselves radiates far more strongly, which is why the choice
 of $N$ and $V$ matters, and why those speeds are the ones to check against the
 duct cut-on frequencies. Each line is named `lobe n=<n> m=<mL>`: the blade

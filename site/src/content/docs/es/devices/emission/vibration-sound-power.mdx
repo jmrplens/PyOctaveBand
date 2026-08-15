@@ -40,20 +40,20 @@ radiación), sin una medición acústica. La potencia radiada es (ISO/TS 7849-1,
 Fórmula 6)
 
 $$
-P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
+P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
 $$
 
-con $Z_c$ la impedancia característica del aire y $\langle v^2 \rangle$ la
+con $Z_\mathrm{c}$ la impedancia característica del aire y $\langle v^2 \rangle$ la
 velocidad vibratoria cuadrática media sobre el área radiante $S$. Expresada en
 niveles (nivel de velocidad re $v_0 = 5\times10^{-8}\ \text{m/s}$), cada parte
 escribe esa relación con sus propias magnitudes. La **Parte 1** va ponderada
 en A de principio a fin: un solo nivel de velocidad superficial ponderado A
-$L_{vA}$, el valor fijo $\varepsilon_A = 1$ y un único número ponderado A, el
+$L_{v\mathrm{A}}$, el valor fijo $\varepsilon_\mathrm{A} = 1$ y un único número ponderado A, el
 *límite superior* del nivel de potencia acústica aérea (Fórmula 12)
 
 $$
-L_{WA,\max} = L_{vA} + 10\log_{10}\frac{S}{S_0}
-      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}}.
+L_{W\mathrm{A},\max} = L_{v\mathrm{A}} + 10\log_{10}\frac{S}{S_0}
+      + 10\log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}}.
 $$
 
 La **Parte 2** es la contrapartida por bandas, con el factor de radiación
@@ -61,12 +61,12 @@ $\varepsilon_j$ determinado en cada banda (Fórmula 15)
 
 $$
 L_{W,j} = L_{v,j} + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon_j
-      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
+      + 10\log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}},
 $$
 
 donde $S_0 = 1\ \text{m}^2$, la impedancia normalizada
-$Z_{c,n} = 411\ \text{N·s/m}^3$ y la de referencia
-$Z_{c,0} = 400\ \text{N·s/m}^3$ dan el término fijo
+$Z_\mathrm{c,n} = 411\ \text{N·s/m}^3$ y la de referencia
+$Z_{\mathrm{c},0} = 400\ \text{N·s/m}^3$ dan el término fijo
 $10\log_{10}(411/400) = 0{,}118\ \text{dB}$.
 Esta guía ejecuta la forma por bandas para las dos partes, de modo que el
 límite superior de la Parte 1 y el valor de ingeniería de la Parte 2 puedan
@@ -111,7 +111,7 @@ de control)**
 supone $\varepsilon = 1$ y da el *límite superior* $L_{W,\max}$, necesitando
 solo el nivel de velocidad y el área. La **Parte 2 (ingeniería)** aplica un
 factor de radiación por banda $\varepsilon_j$ determinado (según ISO 9614) como
-$\varepsilon_j = P_j/(Z_{c,n}\,\langle v_j^2 \rangle\,S)$.
+$\varepsilon_j = P_j/(Z_\mathrm{c,n}\,\langle v_j^2 \rangle\,S)$.
 
 ```python
 import numpy as np
@@ -310,7 +310,7 @@ su longitud**, con una fuerza sobre la placa y no con una onda que llega a
 ella, porque ese es el caso de emisión del que trata este método — y porque una
 placa excitada solo en un parche radia desde el parche, que por debajo de la
 coincidencia sería lo único que habría en el aire y enseñaría lo contrario de
-la verdad. Después ejecuta la misma escena dos veces, a $f_c/2$ y a $2f_c$, sin
+la verdad. Después ejecuta la misma escena dos veces, a $f_\mathrm{c}/2$ y a $2f_\mathrm{c}$, sin
 más diferencia entre los paneles que la frecuencia de excitación.
 
 <Video
@@ -330,15 +330,15 @@ de ciclo desfasada respecto de la velocidad, así que no se lleva potencia
 alguna — que es lo que $\varepsilon \ll 1$ *significa*. Por encima de la
 coincidencia la onda de flexión adelanta al sonido, la traza acústica iguala la
 longitud de onda de flexión y un haz plano se marcha a
-$\arcsin(c_0/c_B) = 45°$.
+$\arcsin(c_0/c_\mathrm{B}) = 45°$.
 
 Cada panel lleva anotadas las formas cerradas que obedece su régimen, sacadas
 de las propias constantes de la placa: por debajo de la coincidencia, que
-$\lambda_B = 0{,}40$ m es *más corta* que los 0,57 m del sonido en aire, así que
-$\sin\theta = \lambda/\lambda_B$ no tiene solución — no hay ángulo por el que el
+$\lambda_\mathrm{B} = 0{,}40$ m es *más corta* que los 0,57 m del sonido en aire, así que
+$\sin\theta = \lambda/\lambda_\mathrm{B}$ no tiene solución — no hay ángulo por el que el
 sonido pueda salir — y la piel que ocupa su lugar decae con una altura de
-$1/\sqrt{k_B^2 - k_0^2} = 0{,}091$ m; por encima de la coincidencia, que
-$\lambda_B = 0{,}20$ m es *más larga* que los 0,14 m en aire, así que la traza
+$1/\sqrt{k_\mathrm{B}^2 - k_0^2} = 0{,}091$ m; por encima de la coincidencia, que
+$\lambda_\mathrm{B} = 0{,}20$ m es *más larga* que los 0,14 m en aire, así que la traza
 acústica iguala la longitud de onda de flexión y lanza un haz a 45°. No
 se mide nada sobre la escena misma. Se probaron dos magnitudes y las dos las
 estropearon los extremos de la placa — una capa amortiguadora refleja
@@ -452,7 +452,7 @@ opcional (cliente, máquina/fuente, entorno de ensayo, instrumentación, clima,
 fecha), una tabla por bandas (frecuencia nominal de octava/tercio de octava, el
 nivel de velocidad vibratoria superficial $L_v$ y el nivel de potencia acústica
 de banda $L_W$), el espectro de potencia acústica $L_W(f)$ con eje de banda
-nominal, y un nivel de potencia acústica ponderado A $L_{WA}$ (dB re 1 pW)
+nominal, y un nivel de potencia acústica ponderado A $L_{W\mathrm{A}}$ (dB re 1 pW)
 recuadrado con el total $L_W$, el área radiante $S$ y el método aplicado al
 lado. Esos dos salen del `sound_power_level_a` del resultado (el total
 ponderado A declarable) y de su `total_level` (la suma en bandas sin
@@ -466,7 +466,7 @@ ensayo** (`test_room`), el **cliente**, la **instrumentación**, la
 de ensayo** (`test_date`) y la identidad del pie (`laboratory`, `operator`,
 `report_id`, `notes`); el área radiante $S$ procede del propio resultado y se
 imprime en el recuadro, junto con la relación de potencia acústica
-$L_W = L_v + 10\log_{10}(S/S_0) + 10\log_{10}\varepsilon + 10\log_{10}(Z_{c,n}/Z_{c,0})$ en la
+$L_W = L_v + 10\log_{10}(S/S_0) + 10\log_{10}\varepsilon + 10\log_{10}(Z_\mathrm{c,n}/Z_{\mathrm{c},0})$ en la
 franja de base. Aportar `requirement` añade un veredicto CUMPLE/NO CUMPLE frente a un
 límite de potencia acústica ponderado A declarado (una emisión de potencia
 acústica es una magnitud en la que menos es mejor, así que la fuente cumple en
@@ -516,7 +516,7 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 <ScopeClaim status="covered" label="Cubierto">
 La ISO/TS 7849-1:2009 y la ISO/TS 7849-2:2009 en lo que definen el cálculo de
 la potencia acústica a partir de la vibración: la potencia radiada
-$P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$ (Fórmula 6), el nivel de
+$P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \varepsilon$ (Fórmula 6), el nivel de
 velocidad y su conversión de calibración (Fórmulas 3, 8) que ejecutan
 `velocity_level` y `velocity_level_from_acceleration`, la media sobre la
 superficie (Fórmulas 10/11) que ejecuta `mean_velocity_level`, la corrección

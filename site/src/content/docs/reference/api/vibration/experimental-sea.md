@@ -74,8 +74,8 @@ Modal densities for the usual subsystems are provided as well
 ([`flat_plate_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#flat_plate_modal_density), [`cylindrical_shell_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#cylindrical_shell_modal_density),
 [`bar_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#bar_modal_density), [`beam_modal_density`](/phonometry/reference/api/vibration/experimental-sea/#beam_modal_density)), following Norton
 Eqs. 6.23-6.29. The flat-plate expression
-$n(f) = S \sqrt{12} / (2 c_L t)$ is the same quantity as EN 12354-4's
-$n = \pi S f_c / c_0^2$
+$n(f) = S \sqrt{12} / (2 c_\mathrm{L} t)$ is the same quantity as EN 12354-4's
+$n = \pi S f_\mathrm{c} / c_0^2$
 ([`modal_density`](/phonometry/reference/api/building/flanking-transmission/#modal_density)), only
 parametrised by the plate itself rather than by its critical frequency; the
 two agree identically and a regression test pins that.
@@ -90,14 +90,14 @@ bar_modal_density(length: float, longitudinal_wave_speed: float) -> float
 
 Modal density of a uniform bar in longitudinal vibration (Eq. 6.23).
 
-$n(f) = 2 L / c_L$, independent of frequency.
+$n(f) = 2 L / c_\mathrm{L}$, independent of frequency.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `length` | Bar length `L`, in m (> 0). |
-| `longitudinal_wave_speed` | Bar wave speed $c_L = \sqrt{E/\rho}$, in m/s (> 0). |
+| `longitudinal_wave_speed` | Bar wave speed $c_\mathrm{L} = \sqrt{E/\rho}$, in m/s (> 0). |
 
 **Returns:** The modal density `n(f)`, in modes per hertz.
 
@@ -157,19 +157,19 @@ cylindrical_shell_modal_density(
 Average modal density of a thin-walled cylinder (Norton 6.27-6.29).
 
 The semi-empirical approximations of Szechenyi, as collected by Clarkson &
-Pope, in three regimes of $x = f / f_r$ around the ring frequency
+Pope, in three regimes of $x = f / f_\mathrm{r}$ around the ring frequency
 [`ring_frequency`](/phonometry/reference/api/vibration/experimental-sea/#ring_frequency):
 
 $$
-n = \frac{5 S}{\pi c_L t} \sqrt{x}, \qquad x \le 0.48 \tag{6.27}
+n = \frac{5 S}{\pi c_\mathrm{L} t} \sqrt{x}, \qquad x \le 0.48 \tag{6.27}
 $$
 
 $$
-n = \frac{7.2 S}{\pi c_L t}\, x, \qquad 0.48 < x \le 0.83 \tag{6.28}
+n = \frac{7.2 S}{\pi c_\mathrm{L} t}\, x, \qquad 0.48 < x \le 0.83 \tag{6.28}
 $$
 
 $$
-n = \frac{2 S}{\pi c_L t} \left[ 2 + \frac{0.596}{F - 1/F} \left( F \arccos\frac{1.745}{F^2 x^2} - \frac{1}{F} \arccos\frac{1.745 F^2}{x^2} \right) \right], \qquad x > 0.83 \tag{6.29}
+n = \frac{2 S}{\pi c_\mathrm{L} t} \left[ 2 + \frac{0.596}{F - 1/F} \left( F \arccos\frac{1.745}{F^2 x^2} - \frac{1}{F} \arccos\frac{1.745 F^2}{x^2} \right) \right], \qquad x > 0.83 \tag{6.29}
 $$
 
 with the bandwidth factor
@@ -209,9 +209,9 @@ flat_plate_modal_density(
 
 Modal density of a flat plate in flexure (Norton Eq. 6.25).
 
-$n(f) = S \sqrt{12} / (2 c_L t)$, independent of frequency, with
+$n(f) = S \sqrt{12} / (2 c_\mathrm{L} t)$, independent of frequency, with
 the plate (quasi-longitudinal) wave speed
-$c_L = \sqrt{E / (\rho (1 - \nu^2))}$.
+$c_\mathrm{L} = \sqrt{E / (\rho (1 - \nu^2))}$.
 
 **Parameters**
 
@@ -444,7 +444,7 @@ ring_frequency(mean_radius: float, longitudinal_wave_speed: float) -> float
 
 Ring frequency of a cylindrical shell (Norton Eq. 6.26).
 
-$f_r = c_L / (2\pi a_m)$: the frequency at which the shell vibrates
+$f_\mathrm{r} = c_\mathrm{L} / (2\pi a_\mathrm{m})$: the frequency at which the shell vibrates
 uniformly in the breathing mode. Above it a cylinder behaves like a flat
 plate; below it the modes group by circumferential order and the modal
 density is no longer a simple function of frequency.

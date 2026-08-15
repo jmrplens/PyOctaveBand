@@ -26,7 +26,7 @@ concatenation is the **K-weighting**. The loudness over an interval is the
 channel-weighted sum of the mean-square powers $z_i$ (Formula 2):
 
 $$
-L_K = -0.691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
+L_\mathrm{K} = -0.691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
 $$
 
 where the constant cancels the K-weighting gain at 997 Hz and $G_i$ weighs
@@ -290,7 +290,7 @@ programmes shorter than a minute: too few 3 s windows.
 
 Digital sample peaks lie: the true maximum of the reconstructed waveform
 generally falls *between* samples, and a sample-peak meter under-reads a
-badly phased tone at $f_s/4$ by 3 dB (worst case
+badly phased tone at $f_\mathrm{s}/4$ by 3 dB (worst case
 $20\log_{10}\cos(\pi f_{\mathrm{norm}}/n)$ for oversampling ratio $n$).
 BS.1770-5 Annex 2 therefore meters the **true peak** on a signal oversampled
 to at least 192 kHz (4× at 48 kHz), in **dBTP** (dB relative to 100 % full
@@ -419,7 +419,7 @@ this implementation.
   psychoacoustic models, in sones and specific loudness, that answer the
   perceived-magnitude question this page's gated LUFS deliberately does not.
 - [Integrated & Statistical Levels](../../signals/levels/levels.md):
-  $L_{eq}$, $L_{Ceq}$ and the same oversampled-peak machinery behind `lc_peak`.
+  $L_\mathrm{eq}$, $L_\mathrm{Ceq}$ and the same oversampled-peak machinery behind `lc_peak`.
 - [Frequency weightings](../../signals/levels/weighting.md): A, C and Z
   against the K-weighting of this page.
 - [Electroacoustics (IEC 60268-3)](../electroacoustics/electroacoustics.md):

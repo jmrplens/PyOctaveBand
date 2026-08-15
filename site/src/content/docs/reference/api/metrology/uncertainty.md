@@ -16,7 +16,7 @@ Uncertainty in Measurement*:
   from the input standard uncertainties and sensitivity coefficients, with
   optional input correlations, the effective degrees of freedom
   (Welch-Satterthwaite, Annex G.4) and the expanded uncertainty
-  $U = k u_c$ with a coverage factor from the t-distribution
+  $U = k u_\mathrm{c}$ with a coverage factor from the t-distribution
   (clause 6);
 * the **Monte Carlo method** (ISO/IEC Guide 98-3-1:2008, Supplement 1) - the
   numerical propagation of the input probability density functions, giving the
@@ -56,7 +56,7 @@ Combined standard uncertainty by the GUM law of propagation (clause 5).
 | `quantities` | The input [`Quantity`](/phonometry/reference/api/metrology/uncertainty/#quantity) objects, in the order the model takes its arguments. |
 | `correlation` | Optional `N x N` correlation matrix $r_{ij}$ between the inputs; `None` treats them as uncorrelated. With a non-identity matrix and finite input dof the effective degrees of freedom are `NaN` (undefined; the GUM defines no correlated fallback -- Welch-Satterthwaite holds for independent inputs only) and an [`UncertaintyWarning`](/phonometry/reference/api/metrology/uncertainty/#uncertaintywarning) is issued when finite input dof would otherwise have been propagated. |
 
-**Returns:** An [`UncertaintyResult`](/phonometry/reference/api/metrology/uncertainty/#uncertaintyresult) with $u_c(y)$, the sensitivity coefficients, the contributions and the effective degrees of freedom.
+**Returns:** An [`UncertaintyResult`](/phonometry/reference/api/metrology/uncertainty/#uncertaintyresult) with $u_\mathrm{c}(y)$, the sensitivity coefficients, the contributions and the effective degrees of freedom.
 
 **Raises**
 
@@ -232,9 +232,9 @@ Result of the GUM law of propagation of uncertainty (Guide 98-3).
 | Name | Description |
 | :--- | :--- |
 | `value` | The output estimate $y = f(x_1, \ldots, x_N)$. |
-| `combined_uncertainty` | Combined standard uncertainty $u_c(y)$. |
+| `combined_uncertainty` | Combined standard uncertainty $u_\mathrm{c}(y)$. |
 | `sensitivities` | Sensitivity coefficients $c_i = \partial f/\partial x_i$. |
-| `contributions` | Per-input contributions $\lvert c_i \rvert u(x_i)$ to $u_c(y)$. |
+| `contributions` | Per-input contributions $\lvert c_i \rvert u(x_i)$ to $u_\mathrm{c}(y)$. |
 | `effective_dof` | Welch-Satterthwaite effective degrees of freedom (Annex G.4, defined for independent inputs). For a correlated budget with finite input dof it is `NaN` (undefined: the GUM has no correlated form and `expanded()` then needs an explicit factor); with all-infinite input dof it is `inf` (normal-distribution coverage factor), since the GUM defines no correlated Welch-Satterthwaite form. |
 | `names` | Input labels aligned with the arrays above. |
 
@@ -248,7 +248,7 @@ UncertaintyResult.expanded(
 ) -> tuple[float, float]
 ```
 
-Coverage factor `k` and expanded uncertainty $U = k u_c$.
+Coverage factor `k` and expanded uncertainty $U = k u_\mathrm{c}$.
 
 **Parameters**
 

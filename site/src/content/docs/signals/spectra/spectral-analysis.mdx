@@ -102,7 +102,7 @@ Averaging $n_d$ independent segments gives the estimate $2 n_d$ chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
 $$
-\varepsilon_r[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,\alpha/2}} \le G_{xx} \le
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_d .
 $$
@@ -130,14 +130,14 @@ res.plot()                                        # PSD in dB with the CI band
 ```
 
 The **resolution bias** is the other half of the error budget: a finite
-analysis bandwidth $B_e$ (reported as `resolution_bandwidth`, the effective
+analysis bandwidth $B_\mathrm{e}$ (reported as `resolution_bandwidth`, the effective
 noise bandwidth of the taper) smooths sharp spectral features, always in the
 direction of reduced dynamic range (Eq. 8.139). For a resonance peak of
-half-power bandwidth $B_r$, the first-order normalized bias is the closed form
+half-power bandwidth $B_\mathrm{r}$, the first-order normalized bias is the closed form
 of Eq. 8.141, exposed as `resolution_bias_error`:
 
 $$
-\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -\frac{1}{3}\left(\frac{B_e}{B_r}\right)^2 .
+\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -\frac{1}{3}\left(\frac{B_\mathrm{e}}{B_\mathrm{r}}\right)^2 .
 $$
 
 ```python
@@ -146,7 +146,7 @@ from phonometry import resolution_bias_error
 eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # Br = 25 Hz peak
 ```
 
-Narrow $B_e$ (long segments) suppresses the bias but leaves fewer averages and
+Narrow $B_\mathrm{e}$ (long segments) suppresses the bias but leaves fewer averages and
 a larger random error; the two requirements on segment length pull in
 opposite directions, which is exactly the trade-off the reported numbers make
 visible.
@@ -154,16 +154,16 @@ visible.
 ### Choosing the segment length, and then the record length
 
 The bias formula is more useful read backwards. Keeping a resonance peak's bias
-under 1 dB means $\varepsilon_b \ge -0.2$, hence $B_e \le 0.775\,B_r$; keeping
-it under a tenth of a decibel means $B_e \le 0.263\,B_r$. The familiar rule of
+under 1 dB means $\varepsilon_\mathrm{b} \ge -0.2$, hence $B_\mathrm{e} \le 0.775\,B_\mathrm{r}$; keeping
+it under a tenth of a decibel means $B_\mathrm{e} \le 0.263\,B_\mathrm{r}$. The familiar rule of
 thumb — three or four analysis bandwidths across the half-power width of the
 narrowest feature that matters — is exactly this formula, and now it has a
 number attached to it.
 
 Work forward from the measurement rather than from a habitual `nperseg`. A mode
-at 100 Hz with $Q = 50$ has $B_r = f/Q = 2$ Hz. Holding its bias under 2 %
-(0.09 dB) needs $B_e \le B_r\sqrt{3 \times 0.02} = 0.49$ Hz, and for the Hann
-taper $B_e = 1.5\,f_s/\texttt{nperseg}$, so at 48 kHz that is
+at 100 Hz with $Q = 50$ has $B_\mathrm{r} = f/Q = 2$ Hz. Holding its bias under 2 %
+(0.09 dB) needs $B_\mathrm{e} \le B_\mathrm{r}\sqrt{3 \times 0.02} = 0.49$ Hz, and for the Hann
+taper $B_\mathrm{e} = 1.5\,f_\mathrm{s}/\texttt{nperseg}$, so at 48 kHz that is
 `nperseg` $\ge 147\,000$, i.e. segments of at least **3.1 s**. Asking for a 10 %
 random error then needs $n_d = 100$ effective averages, which at 50 % overlap
 means a record of about **150 s**:
@@ -183,7 +183,7 @@ print(round(b_e, 2), int(nperseg), round(record_s))     # 0.49 146969 153
 `nperseg = 512` the analysis bandwidth is 140.6 Hz, five times the resonance
 width, and the peak reads about 8 dB low and far too broad; by 4096 the
 bandwidth is 17.6 Hz and the peak is essentially resolved. The right panel puts
-the two errors on one axis: the bias falls as $B_e^2$ and the random error rises
+the two errors on one axis: the bias falls as $B_\mathrm{e}^2$ and the random error rises
 as $n_d^{-1/2}$, and they are equal near `nperseg = 7400` for this resonance —
 which is the segment length to choose if there is no reason to favour one error
 over the other.*
@@ -272,7 +272,7 @@ the magnitude and phase (Eqs. 9.33 and 9.52, with the measured coherence in
 place of the unknown true value, as the book recommends for measured data):
 
 $$
-\varepsilon_r[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
 \mathrm{s.d.}[\hat{\theta}_{xy}] =
 \frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_d}} .
 $$
@@ -280,7 +280,7 @@ $$
 Both shrink as the coherence approaches one: a strongly coherent pair needs
 far fewer averages for the same confidence. The phase is unwrapped, so its
 slope against frequency is the group delay
-$\tau_g = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
+$\tau_\mathrm{g} = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; for a pure
 delay path the phase is linear and that slope reads the propagation delay
 directly.
 
@@ -360,9 +360,9 @@ output estimate (Eq. 9.73), plus the first-order propagation of the coherence
 error through the SNR:
 
 $$
-\varepsilon_r[\hat{G}_{vv}] =
+\varepsilon_\mathrm{r}[\hat{G}_{vv}] =
 \frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
-\varepsilon_r[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
+\varepsilon_\mathrm{r}[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
 $$
 
 For additive uncorrelated output noise of known level the coherence has the
@@ -461,7 +461,7 @@ Bendat & Piersol name five causes with different fixes:
 | :--- | :--- | :--- |
 | Coherence flat across the band, consistent with $\gamma^2 = \mathrm{SNR}/(1+\mathrm{SNR})$ | uncorrelated noise at either sensor — the modelled case of section 3 | average more, raise the level, get closer |
 | Coherence falling progressively with frequency, worse as the record is segmented shorter | a bulk propagation delay comparable with the segment length | align the records first, or raise `nperseg` well above the delay — see [Correlation and delay](/phonometry/signals/spectra/correlation-delay/) |
-| Sharp dips exactly at the resonances | resolution bias: the analysis bandwidth smears the peak differently in the two channels | lengthen the segment; the $\varepsilon_b$ formula of section 1 says by how much |
+| Sharp dips exactly at the resonances | resolution bias: the analysis bandwidth smears the peak differently in the two channels | lengthen the segment; the $\varepsilon_\mathrm{b}$ formula of section 1 says by how much |
 | Low at the harmonics of a strong tone while broadband coherence stays high | non-linearity, a rattle or a clipped channel | fix the path, or work below the level at which it appears |
 | Low over a band with no obvious structure | a second, uncorrelated source is also driving the output | the [MISO page](/phonometry/signals/spectra/miso-coherence/): one input cannot explain two sources |
 
@@ -515,12 +515,12 @@ one-third-octave **band levels** of that same white noise rise 3 dB per band.
 Overlay a smoothed PSD on a filter-bank spectrum without converting and the two
 disagree by 20 to 30 dB, and neither is wrong.
 
-The conversion is one term. A fractional-octave band of centre frequency $f_c$
-has bandwidth $B_n = f_c\,(2^{1/2n} - 2^{-1/2n})$, that is $0.2316\,f_c$ in one
-third of an octave and $0.7071\,f_c$ in a full octave, so
+The conversion is one term. A fractional-octave band of centre frequency $f_\mathrm{c}$
+has bandwidth $B_n = f_\mathrm{c}\,(2^{1/2n} - 2^{-1/2n})$, that is $0.2316\,f_\mathrm{c}$ in one
+third of an octave and $0.7071\,f_\mathrm{c}$ in a full octave, so
 
 $$
-L_\text{band} = 10\log_{10}\!\left(\frac{G(f_c)\,B_n}{p_0^2}\right),
+L_\text{band} = 10\log_{10}\!\left(\frac{G(f_\mathrm{c})\,B_n}{p_0^2}\right),
 $$
 
 which at 1 kHz in one-third octave adds $10\log_{10}(0.2316 \times 1000) =
@@ -569,7 +569,7 @@ dB/octave of the exact value; the conformance suite pins the pink slope at
 Those slopes are density slopes, and they are not what a fractional-octave
 display of the same signal shows. A band's width grows in proportion to its
 centre frequency, so a band level is the density plus $10\log_{10} B_n$ with
-$B_n \propto f_c$: **every colour reads 3 dB per octave higher in a band display
+$B_n \propto f_\mathrm{c}$: **every colour reads 3 dB per octave higher in a band display
 than its density slope suggests.** White noise, whose density is flat, therefore
 rises 3 dB per octave through an octave-band filter bank, and pink noise, at
 −3 dB/octave, comes out flat — which is why pink is the reference stimulus for
@@ -696,8 +696,8 @@ so the average carries about $2K$ chi-square degrees of freedom from a
 single record - the same statistical machinery as the Welch result (random
 error, chi-square confidence interval), without segmenting. The
 design parameter is the dimensionless duration-times-half-bandwidth product
-$p = NW$ (default 4), and for a record of $N_r$ samples at $f_s$ it fixes the
-half-bandwidth $W = p\,f_s/N_r$ in hertz. $2W$ is the resolution of the estimate
+$p = NW$ (default 4), and for a record of $N_\mathrm{r}$ samples at $f_\mathrm{s}$ it fixes the
+half-bandwidth $W = p\,f_\mathrm{s}/N_\mathrm{r}$ in hertz. $2W$ is the resolution of the estimate
 (reported as `resolution_bandwidth`), and only the tapers below the Shannon
 number $2p$ keep their spectral-window energy inside the design band - their
 concentrations $\lambda_k$ are reported as `eigenvalues`, and the default

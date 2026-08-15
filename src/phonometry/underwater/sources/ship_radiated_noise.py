@@ -11,9 +11,9 @@ source below the sea surface:
   dB re 1 µPa·m (ISO 17208-1), the level of the product of the far-field RMS
   pressure and the source distance.
 * :func:`monopole_source_level` -- converts ``LRN`` to the source level
-  :math:`L_s = L_{\mathrm{RN}} + \Delta L` with the Lloyd's-mirror surface
+  :math:`L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L` with the Lloyd's-mirror surface
   correction :math:`\Delta L` of ISO 17208-2 Formula 3, for a nominal source
-  depth :math:`d_s = 0.7 D` (Formula 1).
+  depth :math:`d_\mathrm{s} = 0.7 D` (Formula 1).
 
 Supporting helpers give the ISO 17208-1 three-hydrophone measurement depths
 (:func:`hydrophone_depths`) and the ISO 17208-2 tabulated source-level
@@ -142,8 +142,8 @@ class ShipSourceLevelResult:
     :ivar surface_correction: Lloyd's-mirror correction :math:`\Delta L` per
         frequency, dB.
     :ivar source_level: Equivalent monopole source level
-        :math:`L_s = L_{\mathrm{RN}} + \Delta L`, in dB re 1 µPa·m.
-    :ivar source_depth: Nominal source depth :math:`d_s = 0.7 D`, in m.
+        :math:`L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L`, in dB re 1 µPa·m.
+    :ivar source_depth: Nominal source depth :math:`d_\mathrm{s} = 0.7 D`, in m.
     :ivar sound_speed: Speed of sound used, in m/s.
     """
 
@@ -172,15 +172,15 @@ def monopole_source_level(
     r"""Equivalent monopole source level from radiated noise level
     (ISO 17208-2).
 
-    :math:`L_s = L_{\mathrm{RN}} + \Delta L` with the surface correction
+    :math:`L_\mathrm{s} = L_{\mathrm{RN}} + \Delta L` with the surface correction
 
     .. math::
 
        \Delta L = -10 \log_{10} \frac{2 u^4 + 14 u^2}{14 + 2 u^2 + u^4}
        \tag{Formula 3}
 
-    where :math:`u = k d_s`, :math:`k = 2 \pi f/c` and the nominal source
-    depth is :math:`d_s = 0.7 D` (Formula 1).
+    where :math:`u = k d_\mathrm{s}`, :math:`k = 2 \pi f/c` and the nominal source
+    depth is :math:`d_\mathrm{s} = 0.7 D` (Formula 1).
 
     :param rnl: Radiated noise level per frequency, in dB re 1 µPa·m (scalar or
         array; array length must match ``frequency``).

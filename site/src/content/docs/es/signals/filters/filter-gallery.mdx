@@ -116,7 +116,7 @@ plt.show()
 sentidos contrarios, y la columna de clase de la tabla de abajo dice cuáles de
 las cinco puedes usar de verdad para una medida de banda conforme a norma.*
 
-| Arquitectura | Rizado en el centro de banda | En $2f_m$ | En $4f_m$ | Retardo de grupo en $f_m$ | Clase IEC 61260-1 (orden 6, 48 kHz) |
+| Arquitectura | Rizado en el centro de banda | En $2f_\mathrm{m}$ | En $4f_\mathrm{m}$ | Retardo de grupo en $f_\mathrm{m}$ | Clase IEC 61260-1 (orden 6, 48 kHz) |
 | :--- | ---: | ---: | ---: | ---: | :---: |
 | `butter` | 0,00 dB | −39,6 dB | −88,2 dB | 1,74 ms | **1** |
 | `cheby1` | 0,10 dB | −50,2 dB | −101,6 dB | 1,97 ms | ninguna |
@@ -421,14 +421,14 @@ la unidad en *amplitud*, no en potencia.
 Qué recombinación es plana depende de la paridad de `order/2`, y la suma ingenua
 es incorrecta para la mitad de los órdenes pares:
 
-| `order` | `order/2` | Diferencia de fase entre ramas en $f_c$ | Recombinación plana |
+| `order` | `order/2` | Diferencia de fase entre ramas en $f_\mathrm{c}$ | Recombinación plana |
 | :---: | :---: | :---: | :--- |
 | 2 | 1 (impar) | 180° | `low - high` |
 | 4 | 2 (par) | 0° | `low + high` |
 | 6 | 3 (impar) | 180° | `low - high` |
 | 8 | 4 (par) | 0° | `low + high` |
 
-Con los órdenes 2 y 6 las ramas quedan en antifase en $f_c$ y `low + high` se
+Con los órdenes 2 y 6 las ramas quedan en antifase en $f_\mathrm{c}$ y `low + high` se
 hunde ahí en una muesca profunda en vez de sumar plano. Incluso en los casos
 planos la suma es **paso todo**, no libre de fase: su magnitud es plana dentro
 de 0,001 dB de 20 Hz a 20 kHz mientras su fase gira 360° completos a

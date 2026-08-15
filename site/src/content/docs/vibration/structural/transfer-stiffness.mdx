@@ -45,7 +45,7 @@ $k_{2,1}$, the frequency-dependent ratio of the *blocking force* on the output
 (ISO 10846-1, 3.7):
 
 $$
-k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
+k_{2,1} = \frac{F_{2,\mathrm{b}}}{u_1} \quad [\mathrm{N/m}].
 $$
 
 Because a vibration isolator is only effective between structures of large
@@ -138,21 +138,21 @@ Those conditions belong on the fiche of section 6 with the result:
 ### Three methods, not two
 
 The **direct method** (ISO 10846-2) measures the blocked output force and the
-input displacement, $k_{2,1} = F_{2,b}/u_1$. The **indirect method**
+input displacement, $k_{2,1} = F_{2,\mathrm{b}}/u_1$. The **indirect method**
 (ISO 10846-3) loads the output with a compact blocking mass $m_2$ and measures
 the vibration transmissibility $T = u_2/u_1$; the blocking force is then the
 inertia force of the mass (ISO 10846-3, Eq. 1):
 
 $$
-k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
+k_{2,1} = -(2\pi f)^2\,(m_2 + m_\mathrm{f})\,T \qquad (T \ll 1),
 $$
 
-with $m_f$ the mass of the output flange, which the `flange_mass=` keyword
+with $m_\mathrm{f}$ the mass of the output flange, which the `flange_mass=` keyword
 carries (it defaults to zero). It is not a refinement: ISO 10846-3 measures the
 vibration of the mass centre of the *compact body* formed by the blocking mass
-together with the output flange of the test element, so $m_f$ is whatever is
+together with the output flange of the test element, so $m_\mathrm{f}$ is whatever is
 weighed with it — the flange and any auxiliary fixture that moves as part of the
-test element. Left at zero it reports a stiffness low by $m_2/(m_2 + m_f)$. The
+test element. Left at zero it reports a stiffness low by $m_2/(m_2 + m_\mathrm{f})$. The
 approximation is valid well above the mass/spring resonance, where $T$ is
 small.
 
@@ -361,8 +361,8 @@ range where inertial forces inside the element are negligible.*
 
 The blocking-force idealisation itself is quantified by ISO 10846-1, Eq. (6):
 for an isolator of output driving-point stiffness $k_{2,2}$ on a termination of
-stiffness $k_t$, the delivered force is $F_2/F_{2,b} = 1/(1 + k_{2,2}/k_t)$,
-within 10 % of the blocking force for $|k_{2,2}| < 0.1\,|k_t|$ (Eq. 7):
+stiffness $k_\mathrm{t}$, the delivered force is $F_2/F_{2,\mathrm{b}} = 1/(1 + k_{2,2}/k_\mathrm{t})$,
+within 10 % of the blocking force for $|k_{2,2}| < 0.1\,|k_\mathrm{t}|$ (Eq. 7):
 
 ```python
 import warnings
@@ -408,7 +408,7 @@ for k_t in (3e9, 2e6, 5e5):
     print(f"{k_t:.0e}", round(ratio, 3))     # 1.0 / 0.667 / 0.333
 ```
 
-On the concrete floor ($k_t = 3$ GN/m) the delivered force *is* the blocked
+On the concrete floor ($k_\mathrm{t} = 3$ GN/m) the delivered force *is* the blocked
 force, Equation (7) is satisfied by three orders of magnitude, and the
 datasheet number is directly usable. On a lightweight floor of 2 MN/m it is
 not: only two thirds of the blocked force arrives (−3.5 dB), Equation (7) fails,
@@ -487,7 +487,7 @@ res.report(
 
 <Scope>
 <ScopeClaim status="covered" label="Covered">
-ISO 10846-1:2008's $k_{2,1} = F_{2,b}/u_1$ definition, the level (ISO 10846-2
+ISO 10846-1:2008's $k_{2,1} = F_{2,\mathrm{b}}/u_1$ definition, the level (ISO 10846-2
 and -3, 3.17) and loss factor (ISO 10846-1, 3.8) (`transfer_stiffness_level`,
 `loss_factor`), the ISO 10846-2:2008 direct method
 (`transfer_stiffness_direct`), and the ISO 10846-3:2002 indirect method of

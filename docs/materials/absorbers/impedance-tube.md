@@ -228,11 +228,11 @@ complex transfer function $H_{12}$; from it the reflection factor at the sample
 face, the absorption and the normalised surface impedance follow (Eqs. (17)–(19)):
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}}\,e^{\,2 j k_0 x_1}, \qquad
 \alpha = 1 - |r|^2, \qquad \frac{Z}{\rho c_0} = \frac{1+r}{1-r},
 $$
 
-with $H_I = e^{-j k_0 s}$, $H_R = e^{+j k_0 s}$, microphone spacing $s$ and $x_1$
+with $H_\mathrm{I} = e^{-j k_0 s}$, $H_\mathrm{R} = e^{+j k_0 s}$, microphone spacing $s$ and $x_1$
 the distance from the sample to the farther microphone.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_standing_wave_tube.gif" alt="Animation: incident and reflected waves sum into a standing wave inside the impedance tube; a rigid termination gives deep envelope nodes, a porous sample gives shallow ones, sampled by the two wall microphones" width="640" height="360" loading="lazy"></picture>
@@ -324,7 +324,7 @@ result's own `.plot()`, on a continuous logarithmic frequency axis), a boxed
 characterisation headline and a footer with the fixed disclaimer. ISO 10534-2 is
 a characterisation, so the fiche carries no pass/fail verdict and no
 single-number rating; the normal-incidence coefficient is not comparable to the
-random-incidence $\alpha_s$/$\alpha_w$ of ISO 354 / ISO 11654. Setting
+random-incidence $\alpha_\mathrm{s}$/$\alpha_\mathrm{w}$ of ISO 354 / ISO 11654. Setting
 `verbose=True` inserts the reflection-factor magnitude $|r|$ column.
 
 It uses the same `ReportMetadata` container and rendering engine as the other

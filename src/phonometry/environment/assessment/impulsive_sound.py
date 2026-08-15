@@ -21,7 +21,7 @@ follows (clause 7). From the impulse with the highest prominence over a
 
 .. math::
 
-   K_I = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5,
+   K_\mathrm{I} = 1.8 \, (P - 5)~\text{dB} \quad \text{for } P > 5,
    \text{ else } 0 \tag{Formula 2}
 
 and the rating level over a reference time interval combines the adjusted
@@ -40,15 +40,15 @@ adjustment it earns (typically 0.0 dB to 9.0 dB):
   gradient exceeds 10 dB/s; its **starting** and **end** points are found from
   procedures a) to d) of Clause 4, merging events separated by less than 50 ms
   (Clause 3.3, Figure 2);
-* for each onset the **level difference** :math:`\mathrm{LD} = L_e - L_s`
+* for each onset the **level difference** :math:`\mathrm{LD} = L_\mathrm{e} - L_\mathrm{s}`
   and the **onset rate** ``OR`` (the least-squares slope over the onset) are
   measured (Clauses 3.4, 3.5, Figures 1 and 2);
 * the prominence (Clause 5, Formula 2) and the adjustment
-  :math:`K_I = 1.8 \cdot (P - 5)` dB for :math:`P > 5` (Clause 6, Formula 3)
+  :math:`K_\mathrm{I} = 1.8 \cdot (P - 5)` dB for :math:`P > 5` (Clause 6, Formula 3)
   are the NT ACOU 112 formulae above;
-* the source is categorised (Clause 7) as *not impulsive* (:math:`K_I = 0`),
-  *regular impulsive* (:math:`0 < K_I \le 5`) or *highly impulsive*
-  (:math:`K_I > 5`).
+* the source is categorised (Clause 7) as *not impulsive* (:math:`K_\mathrm{I} = 0`),
+  *regular impulsive* (:math:`0 < K_\mathrm{I} \le 5`) or *highly impulsive*
+  (:math:`K_\mathrm{I} > 5`).
 
 The ISO/PAS method for determining ``KI`` is not sensitive to the absolute
 calibration of the equipment (Clause 8): onset rate and level difference are
@@ -227,7 +227,7 @@ def predicted_prominence(
 def impulse_adjustment(prominence: ArrayLike) -> np.ndarray:
     r"""Adjustment ``KI`` to ``LAeq`` from the prominence (clause 8, Formula 2).
 
-    :math:`K_I = 1.8 \, (P - 5)` dB for :math:`P > 5`, else 0 dB. The
+    :math:`K_\mathrm{I} = 1.8 \, (P - 5)` dB for :math:`P > 5`, else 0 dB. The
     adjustment is made
     to ``LAeq,30min`` on the basis of the single impulse with the highest ``P``.
     This helper applies the bare Formula 2; the clause 8 onset-rate
@@ -323,8 +323,8 @@ def rating_level(
 
     .. math::
 
-       L_{Ar,T} = 10 \log_{10}\!\left[ \frac{1}{T}
-       \sum_N \Delta t_N \, 10^{(L_{Aeq,N} + K_{I,N})/10} \right]
+       L_{\mathrm{Ar},T} = 10 \log_{10}\!\left[ \frac{1}{T}
+       \sum_N \Delta t_N \, 10^{(L_{\mathrm{Aeq},N} + K_{\mathrm{I},N})/10} \right]
 
     :param laeq: Equivalent level ``LAeq,N`` of each sub-interval, in dB.
     :param adjustment: Adjustment ``KI,N`` of each sub-interval, in dB.
@@ -401,7 +401,7 @@ class ImpulseOnset:
     :ivar time_end: Time of the end point, in seconds.
     :ivar level_start: Level ``Ls`` at the starting point, in dB.
     :ivar level_end: Level ``Le`` at the end point, in dB.
-    :ivar level_difference: Level difference :math:`\mathrm{LD} = L_e - L_s`,
+    :ivar level_difference: Level difference :math:`\mathrm{LD} = L_\mathrm{e} - L_\mathrm{s}`,
         in dB (3.4).
     :ivar onset_rate: Onset rate ``OR``, in dB/s, the least-squares slope over
         the onset (3.5).
@@ -634,7 +634,7 @@ def detect_onsets(
     first sample where the gradient exceeds 10 dB/s, the end point the first
     later sample where it drops below 10 dB/s, and onsets separated by less
     than 50 ms are merged. Each onset carries its level difference
-    :math:`\mathrm{LD} = L_e - L_s` (3.4), its onset rate (3.5) and its
+    :math:`\mathrm{LD} = L_\mathrm{e} - L_\mathrm{s}` (3.4), its onset rate (3.5) and its
     prominence ``P``.
 
     :param levels: A-weighted, F time-weighted level history ``LpAF``, in dB,

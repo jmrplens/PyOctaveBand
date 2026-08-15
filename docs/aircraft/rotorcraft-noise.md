@@ -7,7 +7,7 @@ source with a **noise hemisphere**: one-third-octave-band sound pressure levels
 on a spherical grid of azimuth $\varphi$ and polar angle $\theta$, measured at
 a fixed **60 m** reference distance under ICAO reference atmospheric
 conditions. Placing that source at a receiver adds the propagation adjustment
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$ ($+\ \Delta L_\mathrm{d}$).
 
 This page covers the source and propagation primitives, the flight-condition
 interpolation across a hemisphere database, the hover/idle source derivation
@@ -52,9 +52,9 @@ lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-bel
 The hemisphere level at 60 m is carried to the receiver by three adjustments
 (Doc 32 §A.4):
 
-- **`spherical_spreading_adjustment(r)`**: $\Delta L_s = -20\log_{10}(r/60)$
+- **`spherical_spreading_adjustment(r)`**: $\Delta L_\mathrm{s} = -20\log_{10}(r/60)$
   (Eq. 24).
-- **`atmospheric_adjustment(freqs, r)`**: $\Delta L_a = -\alpha(f)\,(r - 60)$
+- **`atmospheric_adjustment(freqs, r)`**: $\Delta L_\mathrm{a} = -\alpha(f)\,(r - 60)$
   with the
   ISO 9613-1 pure-tone coefficient at the exact band centre (Eq. 26/27), reusing
   the library's `air_attenuation`; this is what the NORAH2 reference
@@ -292,9 +292,9 @@ hemispheres) does not model.
 
 `flight_path_kinematics` derives, from a time-stamped track by central finite
 differences, everything the event needs (Eq. 16-21 / Doc 32 Eq. 8-10): ground
-speed $V_g$, airspeed $V_A$ (zero wind), heading
+speed $V_\mathrm{g}$, airspeed $V_\mathrm{A}$ (zero wind), heading
 $\Theta = \operatorname{atan2}(\Delta X, \Delta Y)$, curvature
-$K = \Delta\Theta/\Delta S$, bank angle $\Phi = \arctan(K V_g^2 / g)$ and
+$K = \Delta\Theta/\Delta S$, bank angle $\Phi = \arctan(K V_\mathrm{g}^2 / g)$ and
 path angle $\gamma = \arctan(\Delta Z / \Delta S)$.
 The guidance recommends smoothing radar tracks (e.g. spline resampling to a
 0.5 s cadence) before differentiating.
@@ -313,7 +313,7 @@ Per track point, the flight condition selects (or blends) the hemispheres and
 the emission angles address the source level; the hemisphere frame is oriented
 by the heading and tilted by the bank angle in turns (pitch attitude is
 implicit in the hemispheres). The received one-third-octave history is
-expressed at recorded time $t_r = t_e + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$)
+expressed at recorded time $t_\mathrm{r} = t_\mathrm{e} + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$)
 and integrated: `LASmax`, `SEL` over the full history and over the certification
 10 dB-down window (Doc 32 Eq. 27), and `EPNL` per ICAO Annex 16 (Doc 32
 Eq. 28), reusing the library's `epnl_from_pnlt`.
@@ -532,7 +532,7 @@ Validated against the NORAH2 guidance Table 4 (all 31 bands, 10 Hz-10 kHz), the
 closed-form inverse-square spreading, the analytic rigid-ground +6 dB and
 grazing limits of the ground effect, off-node bilinear lookups on the reference
 hemispheres of all eleven rotorcraft types, hand-checked interpolation
-simplices, closed-form kinematics and the Lorentzian $\mathrm{SEL} - L_{ASmax}$ flyover
+simplices, closed-form kinematics and the Lorentzian $\mathrm{SEL} - L_\mathrm{ASmax}$ flyover
 integral, and end to end against the NORAH2 prototype's ARP verification cases:
 emission angles reproduce to 0.01°, retarded times to 0.02 s, every step level
 of the hard-ground events to 0.08 dB(A) out to 18 km, `LASmax` to 0.03 dB and

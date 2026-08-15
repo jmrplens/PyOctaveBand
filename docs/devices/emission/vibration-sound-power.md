@@ -9,22 +9,22 @@ without an
 acoustic measurement. The radiated power is (ISO/TS 7849-1, Formula 6)
 
 $$
-P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
+P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \varepsilon \quad [\mathrm{W}],
 $$
 
-with $Z_c$ the characteristic impedance of air, $\langle v^2 \rangle$ the
+with $Z_\mathrm{c}$ the characteristic impedance of air, $\langle v^2 \rangle$ the
 mean-square vibratory velocity over the radiating area $S$. Expressed in levels
 (velocity level re $v_0 = 5\times10^{-8}\ \text{m/s}$), the A-weighted sound
 power level is (Formula 12 / 15)
 
 $$
 L_W = L_v + 10\log_{10}\frac{S}{S_0} + 10\log_{10}\varepsilon
-      + 10\log_{10}\frac{Z_{c,n}}{Z_{c,0}},
+      + 10\log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}},
 $$
 
 where $S_0 = 1\ \text{m}^2$, the normalized impedance
-$Z_{c,n} = 411\ \text{N·s/m}^3$ and the reference
-$Z_{c,0} = 400\ \text{N·s/m}^3$ give the fixed
+$Z_\mathrm{c,n} = 411\ \text{N·s/m}^3$ and the reference
+$Z_{\mathrm{c},0} = 400\ \text{N·s/m}^3$ give the fixed
 $10\log_{10}(411/400) = 0.118\ \text{dB}$
 term. This module feeds the structure-borne source and building prediction
 standards (ISO 9611, EN 15657, EN 12354-5).
@@ -101,7 +101,7 @@ The two parts differ only in the radiation factor. **Part 1 (survey)** assumes
 $\varepsilon = 1$ and yields the *upper limit* $L_{W,\max}$, needing only the
 velocity level and the area. **Part 2 (engineering)** applies a frequency-band
 radiation factor $\varepsilon_j$ determined (per ISO 9614) as
-$\varepsilon_j = P_j/(Z_{c,n}\,\langle v_j^2 \rangle\,S)$.
+$\varepsilon_j = P_j/(Z_\mathrm{c,n}\,\langle v_j^2 \rangle\,S)$.
 
 ```python
 import numpy as np
@@ -194,8 +194,8 @@ the air on top of it, which no spectrum can draw. The clip below drives a
 10 mm steel plate in air along its whole length — a force on the plate, not a
 wave arriving at it, and over the whole plate rather than a patch, because a
 patch radiates from the patch and below coincidence that would be the only
-thing in the air — and runs the same scene twice, at $f_c/2$ and at
-$2f_c$, with nothing differing between the panels but the drive frequency.
+thing in the air — and runs the same scene twice, at $f_\mathrm{c}/2$ and at
+$2f_\mathrm{c}$, with nothing differing between the panels but the drive frequency.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_elastic_radiation_efficiency.gif" alt="Animation: a bending wave running along a steel plate in air, with alternating pressure lobes that cling to the plate and fade out within centimetres in the lower-frequency panel, and a plane beam departing at forty-five degrees in the higher-frequency panel" width="640" height="360" loading="lazy"></picture>
 
@@ -208,12 +208,12 @@ dies within a fraction of a wavelength: the pressure at the surface is of the
 same order as in the other panel, but a quarter-cycle out of step with the
 velocity, so it carries no power away — which is what $\varepsilon \ll 1$
 *means*. Above coincidence the bending wave outruns sound, the trace match is
-satisfied, and a plane beam leaves at $\arcsin(c_0/c_B) = 45°$. Each panel
+satisfied, and a plane beam leaves at $\arcsin(c_0/c_\mathrm{B}) = 45°$. Each panel
 is annotated with the closed forms its regime obeys, from the plate's own
-constants: below coincidence $\lambda_B = 0.40$ m is shorter than the 0.57 m of
-sound in air, so $\sin\theta = \lambda/\lambda_B$ has no solution and the skin
-that stands in its place decays over $1/\sqrt{k_B^2 - k_0^2} = 0.091$ m; above
-it $\lambda_B = 0.20$ m is longer than the 0.14 m in air and the trace match
+constants: below coincidence $\lambda_\mathrm{B} = 0.40$ m is shorter than the 0.57 m of
+sound in air, so $\sin\theta = \lambda/\lambda_\mathrm{B}$ has no solution and the skin
+that stands in its place decays over $1/\sqrt{k_\mathrm{B}^2 - k_0^2} = 0.091$ m; above
+it $\lambda_\mathrm{B} = 0.20$ m is longer than the 0.14 m in air and the trace match
 sends a beam out at 45°. Nothing is measured off the scene: the ends of the
 plate reflect the bending wave partially, so the air carries a leftward beam on
 top of the rightward one and any reading is the difference of the two. Two cautions: the scene is an effectively infinite plate, so
@@ -242,7 +242,7 @@ machine/source, test environment, instrumentation, climate, date), a per-band
 table (nominal octave/one-third-octave frequency, the surface vibratory
 velocity level $L_v$ and the band sound-power level $L_W$), the sound-power
 spectrum $L_W(f)$ with a nominal band axis, and a boxed A-weighted sound power
-level $L_{WA}$ (dB re 1 pW) with the total $L_W$, the radiating area $S$ and the
+level $L_{W\mathrm{A}}$ (dB re 1 pW) with the total $L_W$, the radiating area $S$ and the
 applied method alongside.
 
 The relevant `ReportMetadata` fields are `client`, `specimen` (the
@@ -336,7 +336,7 @@ ISO/TS 7849-1:2009 (*survey method using a fixed radiation
 factor*) and ISO/TS 7849-2:2009 (*engineering method including determination of
 the adequate radiation factor*), *Acoustics — Determination of airborne sound
 power levels emitted by machinery using vibration measurement*: the radiated
-power $P = Z_c \, \langle v^2 \rangle \, S \, \varepsilon$ (Formula 6), the
+power $P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \varepsilon$ (Formula 6), the
 velocity level and its calibration
 (Formulae 3, 8), the mean over the surface (Formulae 10/11), the extraneous
 correction (Table 2), the radiation factor (Formula 4/8) and the sound power

@@ -10,7 +10,7 @@ Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007).
 Real Decreto 1367/2007 develops Ley 37/2003 del Ruido on acoustic zoning,
 quality objectives and emitter limit values. Its assessment chain is built on
 one index the ISO 1996 family does not define: the **corrected equivalent
-continuous level** $L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i$
+continuous level** $L_{\mathrm{Keq},T} = L_{\mathrm{Aeq},T} + K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}$
 (Annex I A.2 c), where the
 three corrections penalise emergent tonal components, low-frequency components
 and impulsive character. Each is 0, 3 or 6 dB and their sum is capped at 9 dB
@@ -19,15 +19,15 @@ and impulsive character. Each is 0, 3 or 6 dB and their sum is capped at 9 dB
 **Corrections (Annex IV A.3.3).** The reference procedures are:
 
 * `Kt`: unweighted one-third-octave analysis; for the band `f` holding the
-  tone, $L_t = L_f - L_s$ with `Ls` the *arithmetic* mean of the two
+  tone, $L_\mathrm{t} = L_f - L_s$ with `Ls` the *arithmetic* mean of the two
   adjacent
   band levels. `Kt` is 0/3/6 dB by the thresholds 8/12 dB (20 to 125 Hz),
   5/8 dB (160 to 400 Hz) and 3/5 dB (500 Hz to 10 kHz); with several emergent
   tones the largest applies.
-* `Kf`: $L_f = L_{Ceq,Ti} - L_{Aeq,Ti}$ (background-corrected),
+* `Kf`: $L_f = L_{\mathrm{Ceq},Ti} - L_{\mathrm{Aeq},Ti}$ (background-corrected),
   giving 0 dB for
   $L_f \le 10$, 3 dB for $10 < L_f \le 15$ and 6 dB above.
-* `Ki`: $L_i = L_{AIeq,Ti} - L_{Aeq,Ti}$ (background-corrected),
+* `Ki`: $L_\mathrm{i} = L_{\mathrm{AIeq},Ti} - L_{\mathrm{Aeq},Ti}$ (background-corrected),
   with the same
   0/3/6 dB thresholds as `Kf`.
 
@@ -47,10 +47,10 @@ variants rather than delegating:
   *mean* of the neighbours with 8/5/3 dB thresholds and grades the result.
 * [`impulsive_sound_adjustment`](/phonometry/reference/api/environment/impulsive-sound/#impulsive_sound_adjustment)
   is the ISO/PAS 1996-3 onset-rate method on a calibrated time signal. The
-  RD's `Ki` is the classic $L_{AIeq} - L_{Aeq}$ impulse-vs-fast
+  RD's `Ki` is the classic $L_\mathrm{AIeq} - L_\mathrm{Aeq}$ impulse-vs-fast
   difference read
   off a sound level meter.
-* No ISO 1996 counterpart exists for `Kf`: the $L_{Ceq} - L_{Aeq}$
+* No ISO 1996 counterpart exists for `Kf`: the $L_\mathrm{Ceq} - L_\mathrm{Aeq}$
   difference is
   specific to the RD.
 
@@ -61,7 +61,7 @@ period level is the energy mean weighted by phase duration (Annex IV
 A.3.4.2 b):
 
 $$
-L_{Keq,T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{Keq,Ti}/10} \right]
+L_{\mathrm{Keq},T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{\mathrm{Keq},Ti}/10} \right]
 $$
 
 The result is
@@ -290,7 +290,7 @@ corrected_level(
 
 Corrected equivalent continuous level `LKeq,T` (Annex I A.2 c).
 
-$L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i$ with the sum of the
+$L_{\mathrm{Keq},T} = L_{\mathrm{Aeq},T} + K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}$ with the sum of the
 corrections capped
 at 9 dB. Although it is derived from an A-weighted level, the index is
 expressed in dB by definition.
@@ -324,7 +324,7 @@ evaluation_period_level(
 
 Evaluation-period level `LKeq,T` from its noise phases.
 
-$L_{Keq,T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{Keq,Ti}/10} \right]$ (Annex IV
+$L_{\mathrm{Keq},T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{\mathrm{Keq},Ti}/10} \right]$ (Annex IV
 A.3.4.2 b): the duration-weighted energy mean of the phase levels. The
 returned value is **not** rounded; apply [`round_reported_level`](/phonometry/reference/api/environment/spain/#round_reported_level) for the value
 the regulation asks to report.
@@ -354,9 +354,9 @@ Impulsive correction `Ki` (Annex IV A.3.3).
 
 From the impulse- and fast-time-weighted equivalent levels of the same
 noise phase, both already corrected for background noise,
-$L_i = L_{AIeq,Ti} - L_{Aeq,Ti}$ gives $K_i = 0$ for
-$L_i \le 10$ dB,
-$K_i = 3$ for $10 < L_i \le 15$ dB and $K_i = 6$ above.
+$L_\mathrm{i} = L_{\mathrm{AIeq},Ti} - L_{\mathrm{Aeq},Ti}$ gives $K_\mathrm{i} = 0$ for
+$L_\mathrm{i} \le 10$ dB,
+$K_\mathrm{i} = 3$ for $10 < L_\mathrm{i} \le 15$ dB and $K_\mathrm{i} = 6$ above.
 
 :::note
 This is the classic sound-level-meter route. The onset-rate method of
@@ -450,7 +450,7 @@ long_term_corrected_level(
 
 Long-term index `LK,x` from the daily period levels (Annex I A.2 d).
 
-$L_{K,x} = 10 \log_{10}\left[ (1/n) \sum_i 10^{L_{Keq,x,i}/10} \right]$:
+$L_{\mathrm{K},x} = 10 \log_{10}\left[ (1/n) \sum_i 10^{L_{\mathrm{Keq},x,i}/10} \right]$:
 the energy mean of the
 daily corrected levels of the same evaluation period over a year. With
 `weights` the mean is weighted, which lets a whole block of identical
@@ -482,10 +482,10 @@ Low-frequency correction `Kf` (Annex IV A.3.3).
 
 From the C- and A-weighted equivalent levels of the same noise phase, both
 already corrected for background noise,
-$L_f = L_{Ceq,Ti} - L_{Aeq,Ti}$ gives
-$K_f = 0$ for $L_f \le 10$ dB, $K_f = 3$ for
+$L_f = L_{\mathrm{Ceq},Ti} - L_{\mathrm{Aeq},Ti}$ gives
+$K_\mathrm{f} = 0$ for $L_f \le 10$ dB, $K_\mathrm{f} = 3$ for
 $10 < L_f \le 15$ dB and
-$K_f = 6$ above.
+$K_\mathrm{f} = 6$ above.
 
 :::note
 The printed table reads "Si 10 >Lf \<=15" for the 3 dB row, a misprint
@@ -577,7 +577,7 @@ character.
 
 *property*
 
-Summed correction $K = K_t + K_f + K_i$, capped at 9 dB.
+Summed correction $K = K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}$, capped at 9 dB.
 
 ### NoisePhase.lkeq
 
@@ -790,12 +790,12 @@ Tonal correction `Kt` from a one-third-octave spectrum (Annex IV A.3.3).
 
 The spectrum must be **unweighted** (no frequency weighting applied, as
 required by step a). For every interior band `f` the procedure forms
-$L_t = L_f - L_s$ with `Ls` the arithmetic mean of the levels of
+$L_\mathrm{t} = L_f - L_s$ with `Ls` the arithmetic mean of the levels of
 the bands
 immediately above and below (step b), and reads `Kt` off the table of
-step c: with 20 Hz to 125 Hz bands $L_t < 8$ gives 0 dB,
-$8 \le L_t \le 12$
-gives 3 dB and $L_t > 12$ gives 6 dB; the thresholds are 5/8 dB over
+step c: with 20 Hz to 125 Hz bands $L_\mathrm{t} < 8$ gives 0 dB,
+$8 \le L_\mathrm{t} \le 12$
+gives 3 dB and $L_\mathrm{t} > 12$ gives 6 dB; the thresholds are 5/8 dB over
 160 Hz to 400 Hz and 3/5 dB over 500 Hz to 10 kHz. With more than one
 emergent tone the largest `Kt` governs (step d).
 
@@ -844,7 +844,7 @@ Tonal correction `Kt` of RD 1367/2007 (Annex IV A.3.3).
 | :--- | :--- |
 | `frequencies` | One-third-octave band centre frequencies, in Hz. |
 | `levels` | Unweighted band sound pressure levels, in dB. |
-| `differences` | $L_t = L_f - L_s$ per band, in dB, where `Ls` is the arithmetic mean of the two adjacent band levels. `NaN` for bands that cannot be evaluated (the two end bands, and bands outside the 20 Hz to 10 kHz range of the table). |
+| `differences` | $L_\mathrm{t} = L_f - L_s$ per band, in dB, where `Ls` is the arithmetic mean of the two adjacent band levels. `NaN` for bands that cannot be evaluated (the two end bands, and bands outside the 20 Hz to 10 kHz range of the table). |
 | `band_corrections` | The `Kt` each band would contribute, in dB (0, 3 or 6); `NaN` where `differences` is `NaN`. |
 | `correction` | The governing `Kt`, in dB: the largest band contribution (Annex IV A.3.3 d), or 0 dB if no band qualifies. |
 | `governing_frequency` | Centre frequency of the governing band, in Hz, or `None` when `correction` is 0 dB. |
@@ -868,7 +868,7 @@ Plot the band spectrum with the emergent-tone differences `Lt`.
 total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float
 ```
 
-Summed correction $K = K_t + K_f + K_i$, capped at 9 dB
+Summed correction $K = K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}$, capped at 9 dB
 (Annex IV A.3.3).
 
 Each of the three tables of Annex IV A.3.3 grades its parameter 0, 3 or

@@ -5,7 +5,7 @@
 Noise with prominent impulses (hammering, riveting, pile driving) is more
 annoying than a steady sound of the same equivalent level. **NT ACOU 112:2002**
 (a Nordtest method) quantifies how *prominent* an impulse is and turns it into a
-graduated adjustment $K_I$ added to the measured $L_{Aeq}$. The prominence is read
+graduated adjustment $K_\mathrm{I}$ added to the measured $L_\mathrm{Aeq}$. The prominence is read
 from two properties of each impulse's onset in the A-weighted, time-weighting-F
 level history: how fast it rises (the **onset rate**) and how far it rises (the
 **level difference**).
@@ -29,7 +29,7 @@ when its onset rate exceeds 10 dB/s (clause 4.5; clause 8 applies the
 adjustment "for sounds with onset rates larger than 10 dB/s" only):
 `impulse_prominence` marks non-qualifying events in its `qualifies` mask,
 warns about them, and never lets them set the governing prominence or a
-$K_I$ (the adjustment is 0 dB when no event qualifies).
+$K_\mathrm{I}$ (the adjustment is 0 dB when no event qualifies).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_onset_detection_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_onset_detection.gif" alt="Animation: a magnifier scans the A-weighted level history, highlights the onset stretch steeper than 10 dB per second, and the onset rate, level difference, prominence and adjustment KI boxes light up in turn" width="640" height="360" loading="lazy"></picture>
 
@@ -62,7 +62,7 @@ Below a prominence of 5 the impulse is not audible enough to matter; above it
 the adjustment grows linearly (Formula 2):
 
 $$
-K_I = 1.8\,(P - 5)\ \text{dB} \quad (P > 5), \qquad K_I = 0 \quad (P \le 5).
+K_\mathrm{I} = 1.8\,(P - 5)\ \text{dB} \quad (P > 5), \qquad K_\mathrm{I} = 0 \quad (P \le 5).
 $$
 
 ```python
@@ -72,13 +72,13 @@ print(float(environment.impulse_adjustment(10.0)))  # 9.0 dB
 print(float(environment.impulse_adjustment(5.0)))   # 0.0 dB (at the threshold)
 ```
 
-The adjustment is applied to $L_{Aeq,30\text{min}}$ from the single event with the
+The adjustment is applied to $L_{\mathrm{Aeq},30\text{min}}$ from the single event with the
 highest prominence. The **rating level** over a longer reference time combines
 the impulse-adjusted equivalent levels of the sub-intervals (clause 8, Note 1):
 
 $$
-L_{Ar,T} = 10\,\log_{10}\!\left(\frac{1}{T}\sum_N \Delta t_N\,
-10^{(L_{Aeq,N} + K_{I,N})/10}\right).
+L_{\mathrm{Ar},T} = 10\,\log_{10}\!\left(\frac{1}{T}\sum_N \Delta t_N\,
+10^{(L_{\mathrm{Aeq},N} + K_{\mathrm{I},N})/10}\right).
 $$
 
 ```python
@@ -90,7 +90,7 @@ print(round(environment.rating_level([72.0, 66.0], [7.6, 0.0], [30.0, 30.0], 60.
 ```
 
 The `ImpulseProminenceResult` carries the `per_impulse` prominences, the governing
-`prominence` and its `adjustment`, and its `.plot()` draws the $K_I(P)$ curve
+`prominence` and its `adjustment`, and its `.plot()` draws the $K_\mathrm{I}(P)$ curve
 with the impulses marked. The method is a supplement to the environmental-noise
 measurement of ISO 1996-2.
 
@@ -125,17 +125,17 @@ NT ACOU 112 takes the onset rate and level difference as inputs. **ISO/PAS
 *objective measurement chain* that reads those quantities straight from a
 calibrated recording. `impulsive_sound_adjustment` A-weights the signal,
 applies time weighting F ($\tau = 125\ \text{ms}$), samples the level history
-$L_{pAF}$
+$L_{p\mathrm{AF}}$
 every 10-25 ms, detects each onset (the contiguous stretch whose gradient
 exceeds 10 dB/s, merging events less than 50 ms apart), measures its level
-difference $L_D = L_e - L_s$ and its least-squares onset rate $\mathrm{OR}$,
+difference $L_\mathrm{D} = L_\mathrm{e} - L_\mathrm{s}$ and its least-squares onset rate $\mathrm{OR}$,
 and returns
-the governing adjustment $K_I$ with the source category of clause 7:
-*not impulsive* ($K_I = 0$), *regular impulsive* ($0 < K_I \le 5$) or
-*highly impulsive* ($K_I > 5$).
+the governing adjustment $K_\mathrm{I}$ with the source category of clause 7:
+*not impulsive* ($K_\mathrm{I} = 0$), *regular impulsive* ($0 < K_\mathrm{I} \le 5$) or
+*highly impulsive* ($K_\mathrm{I} > 5$).
 
 The onset detection can be exercised on a level history directly with
-`detect_onsets`, which is convenient for meters that already log $L_{pAF}$:
+`detect_onsets`, which is convenient for meters that already log $L_{p\mathrm{AF}}$:
 
 ```python
 import numpy as np
@@ -205,14 +205,14 @@ least-squares fits over the detected rise, so a shallow fit on a visibly steep
 edge means the level history was logged too coarsely to resolve it. And the
 level difference is measured from the level *just before* the onset, not from
 the long-term background, which is why a second strike arriving on the decay
-tail of the first one scores a smaller $L_D$ than it appears to deserve.
+tail of the first one scores a smaller $L_\mathrm{D}$ than it appears to deserve.
 
 Because the onset rate and level difference are level *differences*, the
 adjustment is insensitive to the absolute calibration of the meter (clause 8);
-only the reported $L_{Aeq}$ and the adjusted $L_{Aeq}$ depend on it. The scope of the
+only the reported $L_\mathrm{Aeq}$ and the adjusted $L_\mathrm{Aeq}$ depend on it. The scope of the
 document states that the adjustment typically falls between 0,0 dB and 9,0 dB;
 the formula itself is not capped, so a very sudden, loud impulse can exceed
-that range. `ImpulsiveSoundResult.plot()` draws the $L_{pAF}$ history with the
+that range. `ImpulsiveSoundResult.plot()` draws the $L_{p\mathrm{AF}}$ history with the
 detected onsets, the least-squares onset lines and the governing level
 difference marked.
 
@@ -223,7 +223,7 @@ measurement. ISO 1996-1:2016 (Table A.1) adds a fixed 5 dB when the source is
 *regular impulsive* and 12 dB when it is *highly impulsive*, and leaves the
 choice of category to the assessor's judgement. NT ACOU 112 replaces that
 judgement with a measurement: the onset rate and level difference of the
-actual impulses produce a graduated $K_I$ that runs from 0 dB for barely
+actual impulses produce a graduated $K_\mathrm{I}$ that runs from 0 dB for barely
 perceptible onsets to about 18 dB for the most sudden, loud ones, crossing
 the two conventional figures on the way. The approach proved durable: the
 same onset-based prominence was later carried into ISO/PAS 1996-3:2022, which
@@ -236,7 +236,7 @@ weighting F itself limits how fast a recorded level can rise: very short
 impulses arrive already smoothed, so the level history must be logged at the
 meter's full output rate (not in coarse intervals); otherwise the onset rate,
 and with it $P$, is underestimated. And the method rates the *prominence* of the
-impulses, not their energy: $K_I$ rides on top of the measured $L_{Aeq}$ in the
+impulses, not their energy: $K_\mathrm{I}$ rides on top of the measured $L_\mathrm{Aeq}$ in the
 rating level, it never replaces it.
 
 ## 5. Assessment report (`.report()`)
@@ -248,8 +248,8 @@ line, an optional metadata header block (source/situation, client, measurement
 position, instrumentation and date, with the 30-minute assessment period always
 shown), a full-width per-impulse table (onset rate, level difference, predicted
 prominence $P$ and whether the onset qualifies as an impulse) above the
-adjustment-curve plot $K_I(P)$ with the candidate impulses marked, the boxed
-governing prominence $P$ together with the derived $L_{Aeq}$ adjustment $K_I$
+adjustment-curve plot $K_\mathrm{I}(P)$ with the candidate impulses marked, the boxed
+governing prominence $P$ together with the derived $L_\mathrm{Aeq}$ adjustment $K_\mathrm{I}$
 (Formula 2), an optional PASS/FAIL verdict row and a prominence-category note,
 and a footer with the fixed disclaimer.
 
@@ -285,7 +285,7 @@ repository; click the preview to open the PDF.
 [![NT ACOU 112 impulsive-sound prominence example report: metadata header, a per-impulse table of the onset rate, level difference and predicted prominence P, the KI(P) adjustment-curve plot with the candidate impulses marked, the boxed governing prominence P = 12.25 with the LAeq adjustment KI = 13.0 dB (NT ACOU 112:2002 Formula 2) and a FAIL verdict against a maximum governing prominence of 10](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/ntacou112_impulse_prominence_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/ntacou112_impulse_prominence_example.pdf)
 
 *Impulsive-sound prominence fiche (`ImpulseProminenceResult.report`), governing
-prominence $P$ with the $L_{Aeq}$ adjustment $K_I$.*
+prominence $P$ with the $L_\mathrm{Aeq}$ adjustment $K_\mathrm{I}$.*
 
 ## See also
 
@@ -315,12 +315,12 @@ prominence $P$ with the $L_{Aeq}$ adjustment $K_I$.*
 
 NT ACOU 112:2002 (Nordtest), *Prominence of impulsive sounds and
 for adjustment of LAeq*: the predicted prominence (clause 7, Formula 1), the
-adjustment to $L_{Aeq}$ (clause 8, Formula 2) and the rating level (clause 8,
+adjustment to $L_\mathrm{Aeq}$ (clause 8, Formula 2) and the rating level (clause 8,
 Note 1), with the onset defined in clauses 4.5-4.7.
 
-**Not covered.** Only the graduated $K_I$ of Formula 2 is implemented. NT ACOU
+**Not covered.** Only the graduated $K_\mathrm{I}$ of Formula 2 is implemented. NT ACOU
 112's Note 4 to clause 7 records an older Nordic guideline — a flat 5 dB
-adjustment from subjective judgement, recommended when $K_I > 3$ for noise
+adjustment from subjective judgement, recommended when $K_\mathrm{I} > 3$ for noise
 characteristic of working operations and offered where the graduated method
 cannot be applied — and that fallback is not implemented. **ISO 1996-1**
 Table A.1's category adjustments (5 dB regular, 12 dB highly impulsive) appear

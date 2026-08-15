@@ -23,7 +23,7 @@ $u_i(y) = |c_i|\,u(x_i)$ weighted by the sensitivity coefficients
 $c_i = \partial f / \partial x_i$:
 
 $$
-u_c^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i).
+u_\mathrm{c}^2(y) = \sum_{i=1}^{N} \left(\frac{\partial f}{\partial x_i}\right)^2 u^2(x_i).
 $$
 
 `combine_uncertainty` evaluates the sensitivities by central differences, so any
@@ -55,7 +55,7 @@ k, U = result.expanded(0.95)
 print(round(k, 2), round(U, 2))               # 2.11 0.86  ->  Y = 74.0 ± 0.9 dB
 ```
 
-The **expanded uncertainty** $U = k\,u_c$ scales the combined uncertainty by a
+The **expanded uncertainty** $U = k\,u_\mathrm{c}$ scales the combined uncertainty by a
 coverage factor $k = t_p(\nu_\text{eff})$ from the $t$-distribution at the
 **effective degrees of freedom** given by the Welch–Satterthwaite formula
 (Annex G.4). Here the single Type A input (9 degrees of freedom) pulls
@@ -65,7 +65,7 @@ correlated sum then adds linearly instead of in quadrature. Correlation is the
 classic silent error in a budget: two corrections traceable to the *same*
 calibrator, or two channels sharing one instrument, do not average away the
 way independent terms would, and combining them in quadrature as if they were
-uncorrelated typically understates $u_c$ (with sensitivities of opposite sign
+uncorrelated typically understates $u_\mathrm{c}$ (with sensitivities of opposite sign
 the bias can point the other way). Because the GUM defines Welch–Satterthwaite
 for *independent* inputs only, a correlated budget with finite input degrees
 of freedom carries no effective degrees of freedom at all: `effective_dof` is
@@ -75,9 +75,9 @@ every input is Type B with infinite degrees of freedom does a correlated
 budget keep $\nu_\text{eff} = \infty$ and use the normal-distribution coverage
 factor. This chain reproduces the GUM's
 own worked examples end to end: the Annex H.1 end-gauge budget
-($u_c = 31.7$ nm, $U_{99} = 92$ nm against the printed 32/93) and the Annex
-H.2 correlated resistance measurement ($u_c(R) = 0.071\ \Omega$,
-$u_c(X) = 0.295\ \Omega$, $u_c(Z) = 0.236\ \Omega$ from Table H.3).
+($u_\mathrm{c} = 31.7$ nm, $U_{99} = 92$ nm against the printed 32/93) and the Annex
+H.2 correlated resistance measurement ($u_\mathrm{c}(R) = 0.071\ \Omega$,
+$u_\mathrm{c}(X) = 0.295\ \Omega$, $u_\mathrm{c}(Z) = 0.236\ \Omega$ from Table H.3).
 
 ## 2. The Monte Carlo method (Supplement 1)
 
@@ -111,9 +111,9 @@ print([round(x, 2) for x in mc.interval]) # [73.2, 74.8]
 ```
 
 For this near-linear model the Monte Carlo standard uncertainty reproduces the
-GUM $u_c$ to three digits and the 95 % interval matches $Y \pm U$. The two
+GUM $u_\mathrm{c}$ to three digits and the 95 % interval matches $Y \pm U$. The two
 methods are validated against the Guides' own worked examples: the additive
-model of four unit inputs gives $u_c = 2.0$ (Supplement 1 clause 9.2), and four
+model of four unit inputs gives $u_\mathrm{c} = 2.0$ (Supplement 1 clause 9.2), and four
 rectangular inputs give a Monte Carlo interval of $[-3.88,\, 3.88]$
 (Supplement 1 clause 9.2.3).
 
@@ -125,7 +125,7 @@ to three digits. They stop holding when the model is strongly non-linear over
 the span of the input uncertainties (energy-to-level conversions with wide
 inputs, products and quotients with large relative uncertainties), when a
 single non-Gaussian input dominates the budget (one large rectangular term
-makes the output nearly rectangular, and a Gaussian $\pm\,2u_c$ interval
+makes the output nearly rectangular, and a Gaussian $\pm\,2u_\mathrm{c}$ interval
 overcovers it), or when the output sits near a physical bound (an absorption
 coefficient near 0 or 1, a level correction that cannot cross zero), where
 the true coverage interval is asymmetric and no $Y \pm U$ statement can

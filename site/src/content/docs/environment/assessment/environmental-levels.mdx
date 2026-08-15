@@ -35,20 +35,20 @@ import Scope from '../../../../components/Scope.astro';
 import ScopeClaim from '../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../components/ThemeImage.astro';
 
-A community does not hear a single $L_{Aeq}$: it hears a day whose evenings and
+A community does not hear a single $L_\mathrm{Aeq}$: it hears a day whose evenings and
 nights matter more, a source whose tones or impulses annoy beyond their
 energy, and a measurement taken over a residual background with a finite
 confidence. The tonal half of that sentence is this page; the impulsive half
 belongs to
 [Impulsive sound prominence](/phonometry/environment/assessment/impulsive-sound/),
 which measures the adjustment ISO 1996-1 Table A.1 only tabulates. This page is the regulatory assessment chain built on top of
-the measured period levels: the whole-day descriptors $L_{den}$/$L_{dn}$
+the measured period levels: the whole-day descriptors $L_\mathrm{den}$/$L_\mathrm{dn}$
 and the composite rating levels of ISO 1996-1, and the ISO 1996-2
 determination procedures that make the reported number defensible: the
 tonal adjustment, the residual-noise correction and the measurement
 uncertainty budget.
 
-The level computation itself, the $L_{eq}$/$L_{Aeq}$ integrals,
+The level computation itself, the $L_\mathrm{eq}$/$L_\mathrm{Aeq}$ integrals,
 the percentile levels $L_N$, SEL and the noise dose that produce the period
 levels this page consumes, is
 [Integrated and Statistical Levels](/phonometry/signals/levels/levels/); everything
@@ -84,22 +84,22 @@ time-of-day adjustments filled in.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile.svg" alt="Synthetic 24-hour urban LAeq profile with day, evening and night bands, the +5 and +10 dB weighted period levels and the resulting Lden" width="80%" />
 
 *The same day weighted three ways: the evening band is lifted 5 dB and the night
-band 10 dB before the 12/4/8 h energy average, which is why an $L_{den}$ of
+band 10 dB before the 12/4/8 h energy average, which is why an $L_\mathrm{den}$ of
 64.3 dB sits above every hourly level of the night.*
 
 **What 64.3 dB means.** The scale is worth carrying: a rural night sits in the
 40s, a quiet residential street in the mid-50s, a façade on a busy urban arterial
 in the high 60s, and the Environmental Noise Directive reports strategic maps in
-5 dB $L_{den}$ bands from 55 dB upward. The +5 and +10 dB weights are the price
+5 dB $L_\mathrm{den}$ bands from 55 dB upward. The +5 and +10 dB weights are the price
 of exposure at the hours when people are at home and asleep, so an evening or a
-night source moves $L_{den}$ far more than its energy share suggests — in the
+night source moves $L_\mathrm{den}$ far more than its energy share suggests — in the
 profile above, the evening is 1.8 dB *quieter* than the day and lasts a third as
 long, yet the +5 dB weight gives it 36 % of the energy that makes up the 64.3 dB
 against the day's 51 %. Two limits on reading it. The reported indicator is a **long-term**
 average: ISO 1996-1 defines its periods over a long-term time interval, normally
-a year, so the worked day here is one sample of an $L_{den}$ and not an
-$L_{den}$. And the number is an exposure, not a response; ISO 1996-1 carries
-annexes that map an adjusted $L_{den}$ or $L_{dn}$ onto an estimated percentage
+a year, so the worked day here is one sample of an $L_\mathrm{den}$ and not an
+$L_\mathrm{den}$. And the number is an exposure, not a response; ISO 1996-1 carries
+annexes that map an adjusted $L_\mathrm{den}$ or $L_\mathrm{dn}$ onto an estimated percentage
 of a population highly annoyed, which is informative and is not implemented here.
 
 <details>
@@ -144,7 +144,7 @@ plt.show()
 
 | Function | Key parameters | Notes |
 | :--- | :--- | :--- |
-| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period $L_{Aeq}$ values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | period $L_\mathrm{Aeq}$ values [dB]; `hours` must sum to 24 | +5 dB evening, +10 dB night (3.6.4) |
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB night (3.6.5) |
 | `composite_rating_level(periods)` | iterable of `(level_db, hours, adjustment_db)`; hours positive, finite and summing to 24 | General Formulae (5)-(6); adjustments per Table A.1 |
 
@@ -183,13 +183,13 @@ made — a rule the standard states in the same clause, and the reason an END
 façade indicator, which is *defined* to include the reflection, must not be
 corrected at all.
 
-Combine with `laeq()` per time period to go from recordings to $L_{den}$. The
+Combine with `laeq()` per time period to go from recordings to $L_\mathrm{den}$. The
 tonal adjustment itself is justified by the tonal audibility route of the next
 section (fed, for the ISO/PAS 20065 method, by
 [Objective audibility of tones in noise](/phonometry/perception/psychoacoustics/tone-audibility/));
 the `tone_to_noise_ratio()` / `prominence_ratio()` verdicts of
 [Prominent Discrete Tones](/phonometry/perception/psychoacoustics/tone-prominence/) are
-complementary emission screening, not the $K_t$ basis.
+complementary emission screening, not the $K_\mathrm{t}$ basis.
 
 ## Determining levels: tonal adjustment, residual noise and uncertainty (ISO 1996-2)
 
@@ -250,19 +250,19 @@ instead ([Objective audibility of tones in noise](/phonometry/perception/psychoa
 what it keeps is the Annex J table that converts a *mean* audibility into an
 integer adjustment. The 2007 algorithm is the one implemented here, because it
 runs on a single spectrum. From the energy-summed tone
-level $L_{pt}$ and the masking-noise level $L_{pn}$ in the critical band around a
+level $L_{p\mathrm{t}}$ and the masking-noise level $L_{p\mathrm{n}}$ in the critical band around a
 tone, the audibility above the masking threshold is
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2.5}]$ dB (Formula (C.3)),
-and the adjustment is $K_t = 0$ for $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$
-for $4 \le \Delta L_{ta} \le 10$ and $K_t = 6$ above (Formulae (C.4)–(C.6)). The
-critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_c$ above (Table C.1).
+$\Delta L_\mathrm{ta} = L_{p\mathrm{t}} - L_{p\mathrm{n}} + 2 + \log_{10}[1 + (f_\mathrm{c}/502)^{2.5}]$ dB (Formula (C.3)),
+and the adjustment is $K_\mathrm{t} = 0$ for $\Delta L_\mathrm{ta} < 4$, $K_\mathrm{t} = \Delta L_\mathrm{ta} - 4$
+for $4 \le \Delta L_\mathrm{ta} \le 10$ and $K_\mathrm{t} = 6$ above (Formulae (C.4)–(C.6)). The
+critical bandwidth is 100 Hz up to 500 Hz and 20 % of $f_\mathrm{c}$ above (Table C.1).
 The one-third-octave **survey method** (`tonal_seeking_survey`) flags a band
 exceeding both neighbours by 15/8/5 dB (low/mid/high), and
 `tonal_adjustment_from_mean_audibility` maps the ISO/PAS 20065 mean audibility to
-$K_t$ (Table J.1).
+$K_\mathrm{t}$ (Table J.1).
 
 The chain is three functions, not one: `tonal_audibility(Lpt, Lpn, fc)` returns
-$\Delta L_{ta}$ from Formula (C.3), `tonal_adjustment(dLta)` maps it to $K_t$
+$\Delta L_\mathrm{ta}$ from Formula (C.3), `tonal_adjustment(dLta)` maps it to $K_\mathrm{t}$
 through Formulae (C.4)-(C.6), and `assess_tonal_audibility(...)` combines both
 with `critical_bandwidth` into the plottable result the snippets below use.
 The two lower-level functions are the ones the
@@ -275,7 +275,7 @@ wanted.
 
 *The adjustment saturates at both ends: below 4 dB of audibility a tone costs
 nothing and above 10 dB it costs no more than 6 dB, so the whole decision lives
-in a 6 dB window of $\Delta L_{ta}$. All four Annex C.5 examples land in or above
+in a 6 dB window of $\Delta L_\mathrm{ta}$. All four Annex C.5 examples land in or above
 that window.*
 
 <details>
@@ -341,11 +341,11 @@ ISO 1996-2:2017 and every entry has a name, a source and a size:
 
 | Contribution | Where it comes from | $c_j u_j$ |
 | :--- | :--- | :--- |
-| Measured level $L_{eq,1h}$ | $u = 0{,}5$ dB — which already absorbs the class 1 sound level meter's own 0,5 dB default — multiplied by the residual-correction sensitivity $c_{L'}$ of Formula (F.7) | 0,59 dB |
+| Measured level $L_\mathrm{eq,1h}$ | $u = 0{,}5$ dB — which already absorbs the class 1 sound level meter's own 0,5 dB default — multiplied by the residual-correction sensitivity $c_{L'}$ of Formula (F.7) | 0,59 dB |
 | Source operating conditions | 1 000 vehicles counted, $10/\sqrt{1000}$ (Formula (8)) | 0,30 dB |
 | **Meteorology** | favourable conditions, Formula (12) | **2,00 dB** |
 | Microphone location | the +5,7 dB flush-mounted correction of Annex B | 0,40 dB |
-| Residual sound | $L_{res} = 50$ dB with $u = 2$ dB, through the sensitivity $c_{res}$ of Formula (F.8) | 0,38 dB |
+| Residual sound | $L_\mathrm{res} = 50$ dB with $u = 2$ dB, through the sensitivity $c_\mathrm{res}$ of Formula (F.8) | 0,38 dB |
 
 `combined_standard_uncertainty` also accepts $(u_j, c_j)$ **pairs**, so the
 sensitivity coefficients need not be pre-multiplied by hand, and
@@ -366,7 +366,7 @@ the cheapest way to shrink $u$ is therefore to measure more often, which is what
 
 <Scope>
 <ScopeClaim status="covered" label="Covered">
-ISO 1996-1:2016's $L_{den}$, $L_{dn}$ and composite rating level (clause 6.5,
+ISO 1996-1:2016's $L_\mathrm{den}$, $L_\mathrm{dn}$ and composite rating level (clause 6.5,
 `environment.lden`/`ldn`/`composite_rating_level`); and ISO 1996-2:2007's
 Annex C tonal adjustment together with ISO 1996-2:2017's residual-noise
 correction (Clause 10.4), measurement uncertainty budget (Clause 4, Annex F),
@@ -383,10 +383,10 @@ follows once you have applied them.
 
 ## See also
 
-- [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): the $L_{eq}$/$L_{Aeq}$, percentile and event levels the indicators of this page are assembled from.
-- [Impulsive sound prominence (NT ACOU 112)](/phonometry/environment/assessment/impulsive-sound/): the measured impulsive adjustment $K_I$, and `rating_level`, which combines impulse-adjusted sub-intervals over a reference time — the sub-daily counterpart of `composite_rating_level` here, which combines whole periods with their time-of-day and character adjustments (ISO 1996-1 clause 6.5).
+- [Integrated and Statistical Levels](/phonometry/signals/levels/levels/): the $L_\mathrm{eq}$/$L_\mathrm{Aeq}$, percentile and event levels the indicators of this page are assembled from.
+- [Impulsive sound prominence (NT ACOU 112)](/phonometry/environment/assessment/impulsive-sound/): the measured impulsive adjustment $K_\mathrm{I}$, and `rating_level`, which combines impulse-adjusted sub-intervals over a reference time — the sub-daily counterpart of `composite_rating_level` here, which combines whole periods with their time-of-day and character adjustments (ISO 1996-1 clause 6.5).
 - [Spanish noise regulation (RD 1367/2007)](/phonometry/environment/assessment/spanish-noise-regulation/): one national application of exactly this chain, with its own tonal, low-frequency and impulsive corrections.
-- [Objective audibility of tones in noise (ISO/PAS 20065)](/phonometry/perception/psychoacoustics/tone-audibility/): the tonal audibility whose mean value maps to the $K_t$ adjustment (Table J.1).
+- [Objective audibility of tones in noise (ISO/PAS 20065)](/phonometry/perception/psychoacoustics/tone-audibility/): the tonal audibility whose mean value maps to the $K_\mathrm{t}$ adjustment (Table J.1).
 - [Prominent Discrete Tones](/phonometry/perception/psychoacoustics/tone-prominence/): the ECMA-418-1 tone-to-noise and prominence-ratio verdicts, complementary emission screening for the tonal question.
 - [Occupational exposure (ISO 9612)](/phonometry/perception/hearing/occupational-exposure/): the workplace counterpart, from task samples to the daily exposure level with its uncertainty budget.
 - API reference: [`environment.assessment.measurement`](/phonometry/reference/api/environment/measurement/) and [`environment.assessment.rating`](/phonometry/reference/api/environment/rating/).
@@ -396,8 +396,8 @@ follows once you have applied them.
 
 ### What penalties does Lden apply to evening and night noise?
 
-$L_{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
+$L_\mathrm{den}$, the day-evening-night level of ISO 1996-1:2016 (3.6.4), adds
 +5 dB to the evening level and +10 dB to the night level before
 energy-averaging the whole day, with default periods of 12, 4 and 8 hours,
 adjustable because countries define them differently. The day-night variant
-$L_{dn}$ (3.6.5) keeps only the +10 dB night penalty.
+$L_\mathrm{dn}$ (3.6.5) keeps only the +10 dB night penalty.

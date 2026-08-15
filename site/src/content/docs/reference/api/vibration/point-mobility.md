@@ -34,15 +34,15 @@ a beam (N.m^2) and `B'` the bending stiffness of a plate *per unit width*
 (N.m), the impedance `Z` and mobility `Y` for a point force are:
 
 $$
-\text{Longitudinal rod:} \quad Z = \rho c_L S, \qquad Y = \frac{1}{\rho c_L S}
+\text{Longitudinal rod:} \quad Z = \rho c_\mathrm{L} S, \qquad Y = \frac{1}{\rho c_\mathrm{L} S}
 $$
 
 $$
-\text{Slender beam, bending, centre:} \quad Z = 2 m' c_B (1 + j), \qquad Y = \frac{1 - j}{4 m' c_B}
+\text{Slender beam, bending, centre:} \quad Z = 2 m' c_\mathrm{B} (1 + j), \qquad Y = \frac{1 - j}{4 m' c_\mathrm{B}}
 $$
 
 $$
-\text{Slender beam, bending, end:} \quad Z = \frac{m' c_B}{2} (1 + j), \qquad Y = \frac{1 - j}{m' c_B}
+\text{Slender beam, bending, end:} \quad Z = \frac{m' c_\mathrm{B}}{2} (1 + j), \qquad Y = \frac{1 - j}{m' c_\mathrm{B}}
 $$
 
 $$
@@ -56,11 +56,11 @@ $$
 The thin-plate driving-point impedance $Z = 8 \sqrt{B' m''}$ is real
 and frequency independent (the plate behaves as a pure resistance to a point
 force), so a plate absorbs power like a matched resistance. The beam
-impedance grows as $c_B = (B \omega^2 / m')^{1/4}$ (the bending wave
+impedance grows as $c_\mathrm{B} = (B \omega^2 / m')^{1/4}$ (the bending wave
 speed), so its mobility falls as $\omega^{-1/2}$; the
 $(1 - j)$ factor means half the input goes into a reactive near field.
 A moment excitation of the beam has the mobility (Cremer Eq. 5.75)
-$Y_M = \omega (1 + j) / (4 B k_B)$ with $k_B = \omega / c_B$ the
+$Y_\mathrm{M} = \omega (1 + j) / (4 B k_\mathrm{B})$ with $k_\mathrm{B} = \omega / c_\mathrm{B}$ the
 bending wavenumber.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
@@ -76,7 +76,7 @@ beam_bending_wave_speed(
 ```
 
 Free bending wave speed of a beam
-$c_B = (B \omega^2 / m')^{1/4}$.
+$c_\mathrm{B} = (B \omega^2 / m')^{1/4}$.
 
 **Parameters**
 
@@ -108,9 +108,9 @@ infinite_beam_impedance(
 
 Point impedance of an infinite beam in bending (Cremer Table 5.1).
 
-$Z = 2 m' c_B (1 + j)$ for a force at the centre of the beam and
-$Z = (m' c_B / 2)(1 + j)$ for a force at a free end, with the
-bending wave speed $c_B = (B \omega^2 / m')^{1/4}$
+$Z = 2 m' c_\mathrm{B} (1 + j)$ for a force at the centre of the beam and
+$Z = (m' c_\mathrm{B} / 2)(1 + j)$ for a force at a free end, with the
+bending wave speed $c_\mathrm{B} = (B \omega^2 / m')^{1/4}$
 ([`beam_bending_wave_speed`](/phonometry/reference/api/vibration/point-mobility/#beam_bending_wave_speed)).
 
 **Parameters**
@@ -144,8 +144,8 @@ infinite_beam_mobility(
 
 Point mobility of an infinite beam in bending (Cremer Table 5.1).
 
-$Y = (1 - j) / (4 m' c_B)$ for a force at the centre and
-$Y = (1 - j) / (m' c_B)$ for a force at a free end, the reciprocal
+$Y = (1 - j) / (4 m' c_\mathrm{B})$ for a force at the centre and
+$Y = (1 - j) / (m' c_\mathrm{B})$ for a force at a free end, the reciprocal
 of [`infinite_beam_impedance`](/phonometry/reference/api/vibration/point-mobility/#infinite_beam_impedance). The mobility falls as
 $\omega^{-1/2}$.
 
@@ -178,8 +178,8 @@ infinite_beam_moment_mobility(
 
 Moment (rotational) mobility of an infinite beam (Cremer Eq. 5.75).
 
-$Y_M = \omega (1 + j) / (4 B k_B)$ with the bending wavenumber
-$k_B = \omega / c_B$, the angular velocity per unit applied moment
+$Y_\mathrm{M} = \omega (1 + j) / (4 B k_\mathrm{B})$ with the bending wavenumber
+$k_\mathrm{B} = \omega / c_\mathrm{B}$, the angular velocity per unit applied moment
 at the driving point.
 
 **Parameters**
@@ -353,7 +353,7 @@ longitudinal_rod_impedance(
 
 Point impedance of an infinite rod in longitudinal motion (Table 5.1).
 
-$Z = \rho c_L S$, real and frequency independent.
+$Z = \rho c_\mathrm{L} S$, real and frequency independent.
 
 **Parameters**
 
@@ -381,7 +381,7 @@ longitudinal_rod_mobility(
 ) -> float
 ```
 
-Point mobility of an infinite rod $Y = 1 / (\rho c_L S)$
+Point mobility of an infinite rod $Y = 1 / (\rho c_\mathrm{L} S)$
 (Table 5.1).
 
 **Parameters**
@@ -443,7 +443,7 @@ plate_bending_wave_speed(
 ```
 
 Free bending wave speed of a plate
-$c_B = (B' \omega^2 / m'')^{1/4}$.
+$c_\mathrm{B} = (B' \omega^2 / m'')^{1/4}$.
 
 **Parameters**
 

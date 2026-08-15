@@ -34,7 +34,7 @@ Table 8 (a minimum of :math:`k = 1` is enforced). Declaring conformity with a
 requirement uses the **one-sided** factor (Formulae 4/5); reporting a two-sided
 interval :math:`Y = y \pm U` (Formula 3) uses the two-sided factor.
 
-**Combination.** Uncorrelated quadrature :math:`u_c = \sqrt{\sum u_i^2}`
+**Combination.** Uncorrelated quadrature :math:`u_\mathrm{c} = \sqrt{\sum u_i^2}`
 (Formula C.2);
 prediction input uncertainty (Formula A.1); model/reality combination (Formula A.2);
 reduction by ``m`` independent measurements :math:`u/\sqrt{m}` (Formula A.7);
@@ -461,7 +461,7 @@ def uncertain_value(
 def combine_uncertainties(*components: float) -> float:
     r"""Combine independent standard uncertainties in quadrature (Formula C.2).
 
-    :math:`u_c = \sqrt{\sum u_i^2}` for uncorrelated contributions with unit
+    :math:`u_\mathrm{c} = \sqrt{\sum u_i^2}` for uncorrelated contributions with unit
     sensitivity
     coefficients, also the model/reality combination of Formula (A.2).
 
@@ -485,7 +485,7 @@ def prediction_input_uncertainty(
     .. math::
 
        u_{\mathrm{input}} =
-       \sqrt{\frac{\sigma_R^2 + \sigma_{\mathrm{product}}^2}{n}
+       \sqrt{\frac{\sigma_\mathrm{R}^2 + \sigma_{\mathrm{product}}^2}{n}
        + \sigma_{\mathrm{product}}^2}
 
     combines the
@@ -530,7 +530,7 @@ def single_number_uncertainty_uncorrelated(
 
     .. math::
 
-       u(R_w{+}C) = \sqrt{\sum_i (w_i \, u_i)^2}
+       u(R_\mathrm{w}{+}C) = \sqrt{\sum_i (w_i \, u_i)^2}
 
     with energy weights
 

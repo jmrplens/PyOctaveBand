@@ -18,7 +18,7 @@ runs a first one-third-octave analysis on a synthetic signal, then anchors that
 analysis to a calibrator tone so the levels are decibels re 20 µPa rather than
 decibels re nothing, reduces them to one A-weighted level, and states what a
 recording must satisfy for any of it to hold. It stops one stage short of a
-meter: the Fast and Slow ballistics, $L_{AE}$, $L_{Cpeak}$ and the percentile
+meter: the Fast and Slow ballistics, $L_{\mathrm{A}E}$, $L_\mathrm{Cpeak}$ and the percentile
 levels are in [Build a sound level
 meter](/phonometry/signals/sound-level-meter/), which runs the whole chain end
 to end on one page, and [Calibration and

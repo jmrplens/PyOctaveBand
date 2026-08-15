@@ -86,11 +86,11 @@ point alone. `fan_sound_power` implements the ASHRAE scaling law printed as
 Long Eq. 13.1,
 
 $$
-L_W = K_F + 10\log_{10}\frac{Q_F}{Q_\text{REF}}
-    + 10\log_{10}\frac{P_F}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
+L_W = K_\mathrm{F} + 10\log_{10}\frac{Q_\mathrm{F}}{Q_\text{REF}}
+    + 10\log_{10}\frac{P_\mathrm{F}}{P_\text{REF}} + C_\text{EFF} + C_\text{BFI},
 $$
 
-with the spectral constant $K_F$ of Table 13.5 (one row per fan type), the
+with the spectral constant $K_\mathrm{F}$ of Table 13.5 (one row per fan type), the
 off-peak efficiency correction $C_\text{EFF}$ of Table 13.6 and the blade
 frequency increment $C_\text{BFI}$ of Table 13.7 dropped into the single
 octave band that contains the blade passing frequency. In SI the references
@@ -306,11 +306,11 @@ power is normally manufacturer data measured to ASHRAE Standard 70, and
 that is what a real sheet uses. When there is none to hand,
 `diffuser_sound_power` is Reynolds's estimate as Long Eqs. 13.27 to 13.33:
 an overall level
-$L_W = 10\log_{10} S_G + 30\log_{10}\xi + 60\log_{10} U_G - 31.3$ from the
-face area, the approach velocity $U_G = Q/S_G$ and the normalised
+$L_W = 10\log_{10} S_\mathrm{G} + 30\log_{10}\xi + 60\log_{10} U_\mathrm{G} - 31.3$ from the
+face area, the approach velocity $U_\mathrm{G} = Q/S_\mathrm{G}$ and the normalised
 pressure-drop coefficient $\xi$, spread over the octaves by the shape
 function $C_D = -11.82 - 0.15 A - 1.13 A^2$ ($-5.82$ for a round device)
-about the peak band $f_P = 48.8\,U_G$.
+about the peak band $f_\mathrm{P} = 48.8\,U_\mathrm{G}$.
 
 ```python
 from phonometry import diffuser_sound_power
@@ -569,7 +569,7 @@ a plane-wave prediction quietly stops being right.
 Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
 (2nd ed.), section 7.3: circular ducts by Eq. 7.6 with the
 $\pi\alpha_{pq}$ eigenvalues of Table 7.1 that solve
-$J'_p(\kappa_{pq} a_i) = 0$, rectangular ducts by Eq. 7.10, and the
+$J'_p(\kappa_{pq} a_\mathrm{i}) = 0$, rectangular ducts by Eq. 7.10, and the
 mean-flow correction of Eqs. 7.8 and 7.9, in which a uniform axial flow of
 Mach number $M$ lowers every cut-on frequency by $\sqrt{1 - M^2}$ and
 moves the cut-on itself from $k_x = 0$ to

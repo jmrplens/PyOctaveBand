@@ -371,7 +371,7 @@ class MISOCoherenceResult:
         input.
     :ivar n_segments: Raw number of (possibly overlapped) segments averaged.
     :ivar n_averages: Effective number of independent averages :math:`n_d`.
-    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_e`, in Hz.
+    :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_\mathrm{e}`, in Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.
     :ivar overlap: Segment overlap fraction.

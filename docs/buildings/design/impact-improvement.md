@@ -9,7 +9,7 @@ to a square metre of carpet. ISO 16251-1 therefore shrinks the laboratory to
 a small heavyweight mock-up: a softly supported concrete plate, a standard
 tapping machine and an accelerometer underneath. This guide covers the
 mock-up measurement of the improvement $\Delta L$ and its weighted
-$\Delta L_w$ against the ISO 717-2 reference floor, the accredited fiche,
+$\Delta L_\mathrm{w}$ against the ISO 717-2 reference floor, the accredited fiche,
 and the ISO 12354-2 engineering estimate that predicts a floating floor's
 improvement from the dynamic stiffness of its resilient layer. The
 full-size laboratory chain lives in
@@ -33,17 +33,17 @@ follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
 for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
 The improvement is the position-averaged difference
 $\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+$\Delta L_\mathrm{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
 
-**Weighted improvement.** $\Delta L_w$ is the ISO 717-2 weighted reduction: the
-improvement is applied to the heavyweight **reference floor** $L_{n,r,0}$
-(ISO 717-2 Table 4), $L_{n,r} = L_{n,r,0} - \Delta L$, and
-$\Delta L_w = 78 - L_{n,r,w}$, computed by `weighted_impact_improvement()`, which
+**Weighted improvement.** $\Delta L_\mathrm{w}$ is the ISO 717-2 weighted reduction: the
+improvement is applied to the heavyweight **reference floor** $L_\mathrm{n,r,0}$
+(ISO 717-2 Table 4), $L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$, and
+$\Delta L_\mathrm{w} = 78 - L_\mathrm{n,r,w}$, computed by `weighted_impact_improvement()`, which
 reuses the verified ISO 717-2 rating engine. A clause 6.3 measurement spans 18
 bands (100–5000 Hz, optionally extended to 50 Hz); the rating is formed on the
 100–3150 Hz sub-range of whatever spectrum contains it. The statement of
 results (clause 8 e)) also carries the spectrum adaptation term
-$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020 Formula (A.4)), exposed as
+$C_{\mathrm{I},\Delta} = C_\mathrm{I,r,0} - C_\mathrm{I,r}$ (ISO 717-2:2020 Formula (A.4)), exposed as
 `ci_delta` on the result and standalone as
 `impact_improvement_adaptation_term()`.
 
@@ -52,7 +52,7 @@ carpet on the CSTB heavyweight mock-up, digitized from Figure 4 of Foret,
 Chéné and Guigou-Carter, "A comparison of the reduction of transmitted impact
 noise by floor coverings measured using ISO 140-8 and ISO/CD 16251-1" (Forum
 Acusticum 2011, Aalborg). Its published ISO 16251-1 weighted improvement is
-$\Delta L_w = 29$ dB, reproduced exactly by the rating engine.
+$\Delta L_\mathrm{w} = 29$ dB, reproduced exactly by the rating engine.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement.svg" alt="ISO 16251-1 floor-covering impact sound improvement: the improvement delta-L of a real textile carpet rising with frequency across one-third-octave bands from 100 Hz to 3150 Hz, with the shaded improvement area and the weighted single-number delta-Lw annotated" width="80%"></picture>
 
@@ -106,7 +106,7 @@ res.plot()            # the delta-L(f) improvement spectrum above (needs matplot
 impact-improvement fiche: the ISO 16251-1 basis line, a metadata header, the
 per-band table (frequency and $\Delta L$, bands at the 1.3 dB limit prefixed
 `>`) beside the $\Delta L(f)$ improvement curve, the boxed single-number
-$\Delta L_w\ (C_{I,\Delta})$ (the ISO 16251-1 Clause 8 e) statement of
+$\Delta L_\mathrm{w}\ (C_{\mathrm{I},\Delta})$ (the ISO 16251-1 Clause 8 e) statement of
 results, rated
 per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
 `specimen` (the floor covering under test), `client`, `manufacturer`,
@@ -116,7 +116,7 @@ per ISO 717-2) and a footer. The applicable `ReportMetadata` fields are
 verdict passes at or above it). The bare reference floor is the standardised
 heavyweight floor of ISO 717-2:2020 Table 4, fixed by the standard.
 `verbose=True` adds the reference-floor-with-covering column
-$L_{n,r} = L_{n,r,0} - \Delta L$, the derivation basis of $\Delta L_w$.
+$L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$, the derivation basis of $\Delta L_\mathrm{w}$.
 
 ```python
 from phonometry import building, ReportMetadata
@@ -187,13 +187,13 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 ```
 
 The closed-form weighted estimate of Formula (C.4),
-$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
+$\Delta L_\mathrm{w} = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condenses the same
 physics into one line: heavier slabs and softer layers rate better. Both
 estimates are design aids kept deliberately on the safe side (the 30 lg
 slope undercuts the 40 lg infinite-plate theory where experimental data say
 real screeds fall short); once a specimen exists, the measured mock-up of
 this page, or the full ISO 10140-3 floor, is the reference, and the
-[EN 12354-2 prediction](insulation-prediction.md) consumes whichever $\Delta L_w$ you have.
+[EN 12354-2 prediction](insulation-prediction.md) consumes whichever $\Delta L_\mathrm{w}$ you have.
 
 ## References
 
@@ -206,7 +206,7 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
   reduction of transmitted impact noise by floor coverings measured using
   ISO 140-8 and ISO/CD 16251-1. *Forum Acusticum 2011, Aalborg* (CSTB).
   The measured textile-carpet improvement spectrum used as the worked
-  example on this page ($\Delta L_w = 29$ dB); the per-band $\Delta L$ was
+  example on this page ($\Delta L_\mathrm{w} = 29$ dB); the per-band $\Delta L$ was
   digitized from its
   Figure 4.
 - International Organization for Standardization. (2014). *Acoustics —
@@ -219,8 +219,8 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
   Rating of sound insulation in buildings and of building elements — Part 2:
   Impact sound insulation* (ISO 717-2:2020).
   [iso.org catalogue](https://www.iso.org/standard/69867.html).
-  The reference floor $L_{n,r,0}$ (Table 4) and the rating engine behind
-  $\Delta L_w$, with the Formula (A.4) adaptation term $C_{I,\Delta}$.
+  The reference floor $L_\mathrm{n,r,0}$ (Table 4) and the rating engine behind
+  $\Delta L_\mathrm{w}$, with the Formula (A.4) adaptation term $C_{\mathrm{I},\Delta}$.
 
 - International Organization for Standardization. (2017). *Building acoustics
   — Estimation of acoustic performance of buildings from the performance of
@@ -234,8 +234,8 @@ this page, or the full ISO 10140-3 floor, is the reference, and the
 
 ISO 16251-1:2014, which specifies the small-mock-up laboratory method for
 the impact-sound improvement $\Delta L$ of floor coverings; ISO 717-2:2020,
-which supplies the reference floor, the $\Delta L_w$ rating and the
-$C_{I,\Delta}$ adaptation term; and ISO 12354-2:2017 Annex C (informative),
+which supplies the reference floor, the $\Delta L_\mathrm{w}$ rating and the
+$C_{\mathrm{I},\Delta}$ adaptation term; and ISO 12354-2:2017 Annex C (informative),
 whose floating-floor estimate this page reproduces from the EN 29052-1
 dynamic stiffness, with the worked floor of its Annex G (context for design,
 not a measurement).
@@ -262,7 +262,7 @@ Foret et al. (2011) worked example.
   prediction counterpart of this page, from the tapping-machine force model
   to floating floors and wall linings.
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md): the
-  impact model whose Formula (21) consumes $\Delta L_w$.
+  impact model whose Formula (21) consumes $\Delta L_\mathrm{w}$.
 - [Insulation Ratings (ISO 717)](../insulation/insulation-ratings.md): the reference-curve
   engine behind the weighted improvement.
 - API reference: [`building.measurement.floor_covering_improvement`](https://jmrplens.github.io/phonometry/reference/api/building/floor-covering-improvement/).

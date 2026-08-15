@@ -4,7 +4,7 @@ Underwater sound propagation: propagation loss (closed-form).
 
 Propagation loss ``PL``, :math:`N_\mathrm{PL}` (dB) is the difference between
 the source level in a given direction and the mean-square sound pressure level
-at the receiver, :math:`N_\mathrm{PL}(x) = L_S - L_p(x)` (ISO 18405:2017,
+at the receiver, :math:`N_\mathrm{PL}(x) = L_\mathrm{S} - L_p(x)` (ISO 18405:2017,
 3.4.1.4). Here it is the sum of geometrical spreading and volume absorption:
 
 * :func:`spreading_loss` -- geometrical spreading, :math:`20 \log_{10} R`

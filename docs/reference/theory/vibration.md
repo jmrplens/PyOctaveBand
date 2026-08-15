@@ -9,7 +9,7 @@ This page collects the theory behind human vibration: the ISO 8041-1 frequency w
 Human response to vibration depends on frequency, axis and body part, so
 acceleration is filtered by the frequency weightings of ISO 8041-1:2017 before
 any metric. Each weighting is the analog cascade
-$H(s) = H_h(s) H_l(s) H_t(s) H_s(s)$ (Formula 5): two-pole Butterworth
+$H(s) = H_\mathrm{h}(s) H_\mathrm{l}(s) H_\mathrm{t}(s) H_\mathrm{s}(s)$ (Formula 5): two-pole Butterworth
 band-limiting high-pass and low-pass stages (Formulae 1/2), an
 acceleration–velocity transition (Formula 3, carrying the only non-unity gain,
 $K = 1.024$ for Wb) and an upward step (Formula 4), with the Table 3 corner
@@ -34,13 +34,13 @@ different bands drawn above the curves.*
 
 The weighted metrics follow ISO 2631-1:1997: running rms with linear or
 exponential integration (Eqs. 2/3), **MTVV** as its maximum (Eq. 4), the
-fourth-power **VDV** $= (\int a_w^4\, dt)^{1/4}$ in m/s^1.75 (Eq. 5), the crest
+fourth-power **VDV** $= (\int a_\mathrm{w}^4\, dt)^{1/4}$ in m/s^1.75 (Eq. 5), the crest
 factor with the basic method deemed adequate up to 9 (clause 6.2), and the
-vibration total value $a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}$ (Eq. 10). Hand-arm
-exposure follows ISO 5349-1:2001: $a_{hv}$ (Eq. 1, all $k = 1$), daily
-exposure $A(8) = a_{hv} \sqrt{T/T_0}$ with $T_0 = 8$ h (Eq. 2), partial
+vibration total value $a_\mathrm{v} = \sqrt{\sum_j k_j^2 a_{\mathrm{w}j}^2}$ (Eq. 10). Hand-arm
+exposure follows ISO 5349-1:2001: $a_\mathrm{hv}$ (Eq. 1, all $k = 1$), daily
+exposure $A(8) = a_\mathrm{hv} \sqrt{T/T_0}$ with $T_0 = 8$ h (Eq. 2), partial
 exposures combined in quadrature (ISO 5349-2:2001, Eqs. 1–3), and the Annex C
-vascular-risk model $D_y = 31.8\ A(8)^{-1.06}$ for the years to 10 %
+vascular-risk model $D_\mathrm{y} = 31.8\ A(8)^{-1.06}$ for the years to 10 %
 white-finger prevalence. The Directive 2002/44/EC action and limit values are
 built in: hand-arm $A(8)$ 2.5/5.0 m/s², whole-body $A(8)$ 0.5/1.15 m/s² or
 VDV 9.1/21.0 m/s^1.75 (Article 3). The ISO 5349-2 worked examples are
@@ -63,18 +63,18 @@ sixth-power (Palmgren-Miner) dose (clause 5.3, Formulae 3/4):
 
 $$
 D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{zd} = D_z\ (t_d / t_m)^{1/6}.
+D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
-Annex C converts the daily dose to a compressive stress $S_d = m_z D_{zd}$
+Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$
 ($m_z = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
-the age-declining ultimate strength $S_u = 6.75 - S_{age}(b + i)$ and forms
+the age-declining ultimate strength $S_\mathrm{u} = 6.75 - S_\mathrm{age}(b + i)$ and forms
 the cumulative stress variable $R$ (Formulae C.3/C.4), mapped to an injury
 probability by the Table C.1 Weibull law $\Pi = 1 - e^{-(R/\alpha)^\beta}$.
 The spinal filter is evaluated analytically in the frequency domain and
 validated against the Annex D 256 Hz digital-filter tabulation within the
 clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
-over 20 years) is reproduced: $D_{zd} = 55.97$ m/s², $R = 1.22$,
+over 20 years) is reproduced: $D_{z\mathrm{d}} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 
@@ -82,7 +82,7 @@ separate software) is out of scope.
 
 *The two objects of the model. Left, the clause 5.2 seat-to-spine
 transmissibility: unity at DC, peaking at $|H| \approx 1.54$ near 5 Hz and
-rolling off above it, which is why $W_k$ had to be replaced for shocks. Right,
+rolling off above it, which is why $W_\mathrm{k}$ had to be replaced for shocks. Right,
 the Table C.1 Weibull law $\Pi(R)$ with the Annex C worked example marked at
 $R = 1.22$, $\Pi = 0.37$ — the risk rises steeply over a narrow band of $R$, so
 a dose that doubles does not double the probability.*
@@ -99,13 +99,13 @@ structure absorbs. For infinite structures these are closed forms (Cremer
 Table 5.1): an infinite thin plate is a pure resistance $Z = 8\sqrt{B'\,m''}$
 (real, frequency independent, with $B'$ the bending stiffness per unit width and
 $m''$ the mass per unit area), an infinite beam has
-$Y = (1-\mathrm{j})/(4 m' c_B)$ (a 45-degree phase, falling as $\omega^{-1/2}$
-through the bending wave speed $c_B$), and a longitudinal rod has
-$Z = \rho c_L S$. These supply the receiver mobility EN 12354-5 needs when no
+$Y = (1-\mathrm{j})/(4 m' c_\mathrm{B})$ (a 45-degree phase, falling as $\omega^{-1/2}$
+through the bending wave speed $c_\mathrm{B}$), and a longitudinal rod has
+$Z = \rho c_\mathrm{L} S$. These supply the receiver mobility EN 12354-5 needs when no
 measurement exists, and are the theoretical companions of the measured ISO 7626
 mobilities. How efficiently a bending plate then radiates the airborne power is
 its **radiation efficiency** $\sigma$: below the critical frequency it radiates
-weakly (edge and corner modes), and above it $\sigma \to (1 - f_c/f)^{-1/2} \to 1$
+weakly (edge and corner modes), and above it $\sigma \to (1 - f_\mathrm{c}/f)^{-1/2} \to 1$
 (Leppington/Maidanik, Hopkins Eqs 2.227-2.230). Because $\sigma$ is exactly the
 radiation factor $\varepsilon$ of ISO 7849, predicting it closes the sound-power-
 from-vibration chain without a power measurement, and it drives the resonant

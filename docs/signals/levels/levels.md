@@ -6,8 +6,8 @@ A noise measurement rarely ends with a waveform: it ends with a handful of
 single numbers that a limit, a regulation or a report can be checked
 against. This page is that reduction chain, computed directly from the
 calibrated signal in pascals rather than from meter readouts: the
-equivalent continuous level $L_{eq}$/$L_{Aeq}$, the percentile levels
-$L_N$, the event and peak measures ($L_{AE}$/SEL, $L_{Cpeak}$) and the
+equivalent continuous level $L_\mathrm{eq}$/$L_\mathrm{Aeq}$, the percentile levels
+$L_N$, the event and peak measures ($L_{\mathrm{A}E}$/SEL, $L_\mathrm{Cpeak}$) and the
 noise dose of IEC 61252. Working from the signal means each
 definition (an integral, a percentile, an energy sum) is applied exactly,
 with no detector or display approximation in between.
@@ -16,26 +16,26 @@ Which descriptor fits which question follows the ISO 1996-1 quantity
 families (BS 7445-1 is the survey-practice guide to the same choice, and
 Bies, Hansen & Howard 2017, §2.5 surveys them side by side):
 
-- **Accumulated exposure over an interval**: $L_{eq}$/$L_{Aeq}$, the
+- **Accumulated exposure over an interval**: $L_\mathrm{eq}$/$L_\mathrm{Aeq}$, the
   energy mean. It answers "how much sound arrived in total", regardless of
   how it was distributed in time.
 - **How the fluctuating level was distributed**: the percentiles $L_N$:
   $L_{90}$ as the background level, $L_{10}$ as the intrusive traffic
-  indicator, $L_{50}$ as the median. Two signals with the same $L_{Aeq}$
+  indicator, $L_{50}$ as the median. Two signals with the same $L_\mathrm{Aeq}$
   can have very different $L_{10} - L_{90}$ spreads.
 - **Single events of different durations, compared fairly**: SEL, the
   event's whole energy normalized to one second.
-- **Hearing-risk screening**: $L_{Cpeak}$ and the dose measures, which
+- **Hearing-risk screening**: $L_\mathrm{Cpeak}$ and the dose measures, which
   feed the occupational workflow of
   [Occupational Noise Exposure](../../perception/hearing/occupational-exposure.md).
-- **Long-term community annoyance**: $L_{den}$/$L_{dn}$ and the ISO
+- **Long-term community annoyance**: $L_\mathrm{den}$/$L_\mathrm{dn}$ and the ISO
   1996-1 rating levels, which weight evening and night energy before
   averaging the day: the subject of
   [Environmental levels](../../environment/assessment/environmental-levels.md).
 
 Two boundaries with the sibling pages are worth keeping sharp. The
 integrated metrics here deliberately bypass the exponential detector:
-$L_{eq}$ and SEL have no time constant, and Fast/Slow ballistics enter
+$L_\mathrm{eq}$ and SEL have no time constant, and Fast/Slow ballistics enter
 only through the percentile levels, which are defined on the time-weighted
 level track (see [Time Weighting](time-weighting.md)). And everything on
 this page assumes the signal is already in pascals: the sensitivity factor
@@ -47,10 +47,10 @@ The equivalent continuous level integrates the squared pressure over the
 measurement time:
 
 $$
-L_{eq} = 10\log_{10}\left(\frac{1}{T}\int_0^T \frac{p^2(t)}{p_0^2}\ dt\right) \text{ dB}, \qquad p_0 = 20\ \mu\text{Pa}
+L_\mathrm{eq} = 10\log_{10}\left(\frac{1}{T}\int_0^T \frac{p^2(t)}{p_0^2}\ dt\right) \text{ dB}, \qquad p_0 = 20\ \mu\text{Pa}
 $$
 
-and $L_{Aeq}$ is the same integral after A-weighting the signal. $L_N$ is the
+and $L_\mathrm{Aeq}$ is the same integral after A-weighting the signal. $L_N$ is the
 level exceeded $N\ \%$ of the time: the $(100-N)$-th percentile of the
 time-weighted level distribution.
 
@@ -76,8 +76,8 @@ full-scale analysis (calibration does not apply in dBFS mode).
 
 Why the *energy* mean and not the arithmetic mean of dB values? Because sound
 doses add as energy: two periods at 60 dB and 80 dB do not average to 70 dB;
-the 80 dB half dominates and $L_{eq} = 77$ dB. Averaging decibels directly
-underestimates every fluctuating noise. $L_{eq}$ is the level of the *steady*
+the 80 dB half dominates and $L_\mathrm{eq} = 77$ dB. Averaging decibels directly
+underestimates every fluctuating noise. $L_\mathrm{eq}$ is the level of the *steady*
 sound carrying the same energy as the real, fluctuating one, which is why
 regulations are written in terms of it.
 
@@ -183,30 +183,30 @@ impulsive noise, so regulations always name the time weighting.
 
 ### Reading Leq against the percentiles
 
-$L_{eq}$ and the $L_N$ family answer different questions about the same
-level history. $L_{eq}$ is an energy mean, so the loudest moments dominate
-it: a single second at 100 dB lifts the $L_{eq}$ of an otherwise steady
+$L_\mathrm{eq}$ and the $L_N$ family answer different questions about the same
+level history. $L_\mathrm{eq}$ is an energy mean, so the loudest moments dominate
+it: a single second at 100 dB lifts the $L_\mathrm{eq}$ of an otherwise steady
 60 dB hour to about 66 dB, while $L_{90}$, $L_{50}$ and even $L_{10}$ barely
 move (a one-second event occupies far less than 10 % of the hour).
 Percentiles are rank statistics, robust against rare events by construction.
 In practice:
 
-- **$L_{eq}$ (and $L_{Aeq}$)** is the dose metric: regulations, exposure
+- **$L_\mathrm{eq}$ (and $L_\mathrm{Aeq}$)** is the dose metric: regulations, exposure
   and annoyance models are written in it precisely *because* it refuses to
   ignore rare loud events.
 - **$L_{90}$** estimates the residual (background) level under an
   intermittent source, which is how ISO 1996-2 Annex I uses it.
 - **$L_{10}$** tracks event peaks; the spread $L_{10} - L_{90}$ is a quick
   intermittency indicator.
-- **$L_{eq} - L_{50}$** measures how "peaky" the history is: for steady
+- **$L_\mathrm{eq} - L_{50}$** measures how "peaky" the history is: for steady
   noise the two nearly coincide, and the more the level fluctuates the
-  further $L_{eq}$ climbs above the median (for a Gaussian level
+  further $L_\mathrm{eq}$ climbs above the median (for a Gaussian level
   distribution with standard deviation $\sigma$ dB,
-  $L_{eq} \approx L_{50} + 0.115\,\sigma^2$).
+  $L_\mathrm{eq} \approx L_{50} + 0.115\,\sigma^2$).
 
 One caution: percentiles do not combine. Two hours with known $L_{90}$
 values do not yield the two-hour $L_{90}$ by any formula; recompute it from
-the pooled envelope. $L_{eq}$ values, by contrast, combine exactly by
+the pooled envelope. $L_\mathrm{eq}$ values, by contrast, combine exactly by
 time-weighted energy averaging, which is what the `composite_rating_level`
 of [Environmental levels](../../environment/assessment/environmental-levels.md) does.
 
@@ -248,7 +248,7 @@ lex = signals.lex_8h(shift_sample, fs, duration_hours=8, calibration_factor=sens
 ```
 
 `lc_peak` is verified against the one-cycle/half-cycle reference responses of
-IEC 61672-1:2013 Table 5, `sel` against the Table 4 $L_{AE}$ toneburst
+IEC 61672-1:2013 Table 5, `sel` against the Table 4 $L_{\mathrm{A}E}$ toneburst
 column, and
 the dose functions against the IEC 61252 anchors (3.2 Pa²h ↔ exactly 90 dB).
 `lc_peak` polyphase-oversamples the C-weighted signal by `oversample` (default
@@ -261,12 +261,12 @@ whole event.
 
 ### SEL: comparing events of different duration
 
-A 4 s train pass-by and a 30 s one cannot be compared by their $L_{Aeq}$
+A 4 s train pass-by and a 30 s one cannot be compared by their $L_\mathrm{Aeq}$
 alone: the longer event delivers more energy at the same level. The **sound
 exposure level** compresses the *whole* event energy into exactly one second:
 
 $$
-L_E = L_{eq,T} + 10\log_{10}\frac{T}{T_0}, \qquad T_0 = 1\ \text{s}
+L_E = L_{\mathrm{eq},T} + 10\log_{10}\frac{T}{T_0}, \qquad T_0 = 1\ \text{s}
 $$
 
 so events of any duration become directly comparable, and $N$ identical
@@ -317,8 +317,8 @@ integral of the squared A-weighted pressure) and the equivalent
 **normalized 8 h level**:
 
 $$
-E = \int_0^T p_A^2(t)\ dt \quad [\text{Pa}^2\text{h}], \qquad
-L_{EX,8h} = 10\log_{10}\frac{E}{8\ \text{h} \cdot p_0^2}
+E = \int_0^T p_\mathrm{A}^2(t)\ dt \quad [\text{Pa}^2\text{h}], \qquad
+L_\mathrm{EX,8h} = 10\log_{10}\frac{E}{8\ \text{h} \cdot p_0^2}
 $$
 
 The anchor worth memorizing: **3.2 Pa²h ⇔ exactly 90 dB over 8 h** (the CI
@@ -329,10 +329,10 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | $L_{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{AE}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{AE}$ column) |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
 | `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_{EX,8h}$ [dB] | IEC 61252 ($\equiv L_{EP,d}$) |
+| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in
@@ -340,7 +340,7 @@ job samples, with the normative ISO 9612 uncertainty budget, continues in
 
 Turning these levels into the regulatory day-evening-night indicators and
 reporting them defensibly is
-[Environmental levels](../../environment/assessment/environmental-levels.md): the $L_{den}$ and $L_{dn}$
+[Environmental levels](../../environment/assessment/environmental-levels.md): the $L_\mathrm{den}$ and $L_\mathrm{dn}$
 descriptors, the composite rating levels of ISO 1996-1 with their character
 adjustments, and the ISO 1996-2 determination chain of tonal adjustment,
 residual-noise correction and the measurement uncertainty budget.
@@ -428,11 +428,11 @@ and the ISO 226 equal-loudness contours live with the perception metrics in
 
 ### What is the difference between Leq and SEL?
 
-$L_{eq}$ is the equivalent continuous level: the energy mean of the squared
+$L_\mathrm{eq}$ is the equivalent continuous level: the energy mean of the squared
 pressure over the measurement time $T$, referenced to
-$p_0 = 20\ \mu\text{Pa}$. SEL, the sound exposure level ($L_{AE}$ when
+$p_0 = 20\ \mu\text{Pa}$. SEL, the sound exposure level ($L_{\mathrm{A}E}$ when
 A-weighted), compresses the whole event energy into exactly one second:
-$L_E = L_{eq,T} + 10\log_{10}(T/T_0)$ with $T_0 = 1\ \text{s}$, so events of
+$L_E = L_{\mathrm{eq},T} + 10\log_{10}(T/T_0)$ with $T_0 = 1\ \text{s}$, so events of
 any duration become directly comparable and $N$ identical events sum as
 $+10\log_{10}N$.
 
@@ -440,14 +440,14 @@ $+10\log_{10}N$.
 
 Per IEC 61252:1993, the sound exposure $E$ is the time integral of the
 squared A-weighted pressure, expressed in pascal-squared-hours, and
-$L_{EX,8h}$ (equivalent to $L_{EP,d}$) is the corresponding level normalized
+$L_\mathrm{EX,8h}$ (equivalent to $L_\mathrm{EP,d}$) is the corresponding level normalized
 to 8 h. The anchor worth memorizing: 3.2 Pa²h corresponds to exactly 90 dB
 over 8 h. Half the dose is -3 dB, and double duration at the same level is
 +3 dB.
 
 ## See also
 
-- [Environmental Levels (ISO 1996-1/-2)](../../environment/assessment/environmental-levels.md): the $L_{den}$/$L_{dn}$ indicators, rating levels and the ISO 1996-2 determination chain built on the levels of this page.
+- [Environmental Levels (ISO 1996-1/-2)](../../environment/assessment/environmental-levels.md): the $L_\mathrm{den}$/$L_\mathrm{dn}$ indicators, rating levels and the ISO 1996-2 determination chain built on the levels of this page.
 - [Time Weighting](time-weighting.md): the Fast/Slow/Impulse detector the percentile levels are defined on.
 - [Calibration](../metrology/calibration.md): the sensitivity factor that turns digital units into the pascals every level here assumes.
 - [Occupational exposure (ISO 9612)](../../perception/hearing/occupational-exposure.md): the workplace measurement strategies the dose measures feed.
@@ -488,7 +488,7 @@ environmental indicators and determination procedures are covered in
 
 **Not covered.** **IEC 61252 was revised in 2025; only the formulae of the
 implemented first edition (1993) are here**, not the newer one. The ISO 1996-1
-whole-day indicators ($L_{den}$, $L_{dn}$, the rating levels) and the
+whole-day indicators ($L_\mathrm{den}$, $L_\mathrm{dn}$, the rating levels) and the
 ISO 1996-2 determination procedures are not on this page either — they are in
 [Environmental levels](../../environment/assessment/environmental-levels.md).
 

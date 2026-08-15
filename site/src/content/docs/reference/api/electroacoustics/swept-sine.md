@@ -235,9 +235,9 @@ $\ln(f_2/f_1)/2$ periods of `f1`).
 | :--- | :--- |
 | `fs` | Sampling frequency in Hz. |
 | `f1` | Start frequency in Hz. Must be > 0. |
-| `f2` | Stop frequency in Hz. Must satisfy $f_1 < f_2 \le f_s/2$. When $f_2/f_1$ is an integer the sweep also *ends* with zero phase (Novak et al. 2015, Sec. 2.5). |
+| `f2` | Stop frequency in Hz. Must satisfy $f_1 < f_2 \le f_\mathrm{s}/2$. When $f_2/f_1$ is an integer the sweep also *ends* with zero phase (Novak et al. 2015, Sec. 2.5). |
 | `seconds` | Approximate sweep duration in seconds; the exact duration is quantized by the synchronization rounding. |
 | `amplitude` | Peak amplitude of the sweep. Default 1.0. |
 | `fade` | Optional half-Hann fade-in/out as a fraction of the sweep duration (default 0.0: the analytic deconvolution assumes the unfaded sweep, and fades only reshape the band edges). Keep it small if the playback chain needs one, and pass the same value to [`swept_sine_distortion`](/phonometry/reference/api/electroacoustics/swept-sine/#swept_sine_distortion). |
 
-**Returns:** The sweep samples, length $\lceil T f_s \rceil$.
+**Returns:** The sweep samples, length $\lceil T f_\mathrm{s} \rceil$.

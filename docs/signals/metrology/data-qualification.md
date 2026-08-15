@@ -252,8 +252,8 @@ $$
 where $N_a$ is the crossing rate of level $a$ (Eq. (5.196)). $N_0/2$ is the
 record's **apparent frequency**: a 60 Hz sine crosses zero 120 times per
 second, low-pass noise of bandwidth $B$ gives $N_0 = 2B/\sqrt{3}$ (an
-apparent frequency of $0.58B$, Example 5.12) and a band centred on $f_c$
-gives $N_0 = 2\sqrt{f_c^2 + B^2/12}$ (Example 5.13).
+apparent frequency of $0.58B$, Example 5.12) and a band centred on $f_\mathrm{c}$
+gives $N_0 = 2\sqrt{f_\mathrm{c}^2 + B^2/12}$ (Example 5.13).
 `level_crossing_rate` counts the actual crossings of each level and puts
 the Rice curve next to them, taking the moments from the record's own
 [Welch autospectrum](../spectra/spectral-analysis.md):
@@ -400,7 +400,7 @@ Qualification comes *before* the statistics this section's other pages
 compute: the chi-square confidence interval of a
 [Welch PSD](../spectra/spectral-analysis.md) and the random-error
 formulas of the [correlation estimators](../spectra/correlation-delay.md)
-all assume the record is stationary, as does the very idea of *the* $L_{eq}$ of
+all assume the record is stationary, as does the very idea of *the* $L_\mathrm{eq}$ of
 a measurement in [Levels](../levels/levels.md). When a record fails
 the test, split it at the change (the `segment_values` sequence shows
 where), analyse the pieces, or move to the short-time views - the
@@ -432,7 +432,7 @@ out glitches stay manual steps, the way the book describes them.
 - [Spectral analysis](../spectra/spectral-analysis.md): the chi-square confidence interval that assumes the stationarity this page tests.
 - [Time-frequency analysis](../spectra/time-frequency.md): the short-time view for records that fail the test, and for the glides its mean square cannot see.
 - [GUM uncertainty](gum-uncertainty.md): propagating the remaining random error of a qualified average.
-- [Levels](../levels/levels.md): the $L_{eq}$ whose definition assumes one stationary measurement.
+- [Levels](../levels/levels.md): the $L_\mathrm{eq}$ whose definition assumes one stationary measurement.
 - API reference: [`metrology.data_qualification`](https://jmrplens.github.io/phonometry/reference/api/metrology/data-qualification/).
 - Theory: [Measurement uncertainty (GUM)](../../reference/theory/signal-analysis.md#measurement-uncertainty-isoiec-guide-98-3-gum-and-supplement-1): the uncertainty framework the qualification criteria of this page feed.
 

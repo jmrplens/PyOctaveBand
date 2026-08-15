@@ -39,7 +39,7 @@ Table 8 (a minimum of $k = 1$ is enforced). Declaring conformity with a
 requirement uses the **one-sided** factor (Formulae 4/5); reporting a two-sided
 interval $Y = y \pm U$ (Formula 3) uses the two-sided factor.
 
-**Combination.** Uncorrelated quadrature $u_c = \sqrt{\sum u_i^2}$
+**Combination.** Uncorrelated quadrature $u_\mathrm{c} = \sqrt{\sum u_i^2}$
 (Formula C.2);
 prediction input uncertainty (Formula A.1); model/reality combination (Formula A.2);
 reduction by `m` independent measurements $u/\sqrt{m}$ (Formula A.7);
@@ -137,7 +137,7 @@ combine_uncertainties(*components: float) -> float
 
 Combine independent standard uncertainties in quadrature (Formula C.2).
 
-$u_c = \sqrt{\sum u_i^2}$ for uncorrelated contributions with unit
+$u_\mathrm{c} = \sqrt{\sum u_i^2}$ for uncorrelated contributions with unit
 sensitivity
 coefficients, also the model/reality combination of Formula (A.2).
 
@@ -238,7 +238,7 @@ prediction_input_uncertainty(
 Return the prediction input uncertainty `u_input` (Formula A.1).
 
 $$
-u_{\mathrm{input}} = \sqrt{\frac{\sigma_R^2 + \sigma_{\mathrm{product}}^2}{n} + \sigma_{\mathrm{product}}^2}
+u_{\mathrm{input}} = \sqrt{\frac{\sigma_\mathrm{R}^2 + \sigma_{\mathrm{product}}^2}{n} + \sigma_{\mathrm{product}}^2}
 $$
 
 combines the
@@ -369,7 +369,7 @@ single_number_uncertainty_uncorrelated(
 Uncorrelated single-number uncertainty from band uncertainties (Formula B.2).
 
 $$
-u(R_w{+}C) = \sqrt{\sum_i (w_i \, u_i)^2}
+u(R_\mathrm{w}{+}C) = \sqrt{\sum_i (w_i \, u_i)^2}
 $$
 
 with energy weights

@@ -13,11 +13,11 @@ Mellow, *Acoustics: Sound Fields, Transducers and Vibration* 2nd ed., §4.4;
 Bies, Hansen & Howard, *Engineering Noise Control* 5th ed.).
 
 **Radiation impedance.** The reaction force of the air on the piston is
-:math:`F = Z_r u` with the mechanical radiation impedance
+:math:`F = Z_\mathrm{r} u` with the mechanical radiation impedance
 
 .. math::
 
-   Z_r = \rho c S \left( R_1(2ka) + j X_1(2ka) \right),
+   Z_\mathrm{r} = \rho c S \left( R_1(2ka) + j X_1(2ka) \right),
    \qquad S = \pi a^2
 
 where :math:`k = \omega / c` is the wavenumber, :math:`\rho c` the
@@ -37,14 +37,14 @@ function, both of order one, evaluated at :math:`x = 2ka`.
   radiated power
   rises as :math:`f^2`, and :math:`X_1 \to (8 / 3\pi) ka`. The reactance is
   mass-like,
-  :math:`X_r = \rho c S X_1 = \omega M_r` with the **radiation (accreted)
-  mass** :math:`M_r = 8 \rho a^3 / 3`
+  :math:`X_\mathrm{r} = \rho c S X_1 = \omega M_\mathrm{r}` with the **radiation (accreted)
+  mass** :math:`M_\mathrm{r} = 8 \rho a^3 / 3`
   (Beranek & Mellow Eq. (4.32)): the piston drags an extra
   :math:`8 \rho a^3 / 3` of
   air, equivalent to a layer :math:`8a / 3\pi` thick over its face.
 * **High frequency** (:math:`ka \gg 1`): :math:`R_1 \to 1` and
   :math:`X_1 \to 0`, so
-  :math:`Z_r \to \rho c S` -- the piston radiates as if into an infinite tube
+  :math:`Z_\mathrm{r} \to \rho c S` -- the piston radiates as if into an infinite tube
   and the
   air loads it purely resistively.
 
@@ -304,15 +304,15 @@ class RadiatingPistonResult:
     :ivar frequencies: Frequencies ``f``, Hz.
     :ivar ka: Wavenumber-radius product ``ka`` at each frequency.
     :ivar resistance: Normalized piston resistance :math:`R_1(2ka)` (real
-        part of :math:`Z_r / (\rho c S)`).
+        part of :math:`Z_\mathrm{r} / (\rho c S)`).
     :ivar reactance: Normalized piston reactance :math:`X_1(2ka)`
-        (imaginary part of :math:`Z_r / (\rho c S)`).
+        (imaginary part of :math:`Z_\mathrm{r} / (\rho c S)`).
     :ivar radiation_resistance: Mechanical radiation resistance
         :math:`\rho c S R_1`, N s/m.
     :ivar radiation_reactance: Mechanical radiation reactance
         :math:`\rho c S X_1`, N s/m.
     :ivar radiation_mass: Low-frequency accreted air mass
-        :math:`M_r = 8 \rho a^3/3`, kg (a single value; the mass limit of
+        :math:`M_\mathrm{r} = 8 \rho a^3/3`, kg (a single value; the mass limit of
         ``radiation_reactance / omega``).
     :ivar directivity_index: Directivity index
         :math:`DI = 10 \log_{10} Q`, dB.

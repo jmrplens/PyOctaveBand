@@ -73,7 +73,7 @@ tareas, toma $I \ge 3$ muestras por tarea y suma en energía las contribuciones 
 cada tarea
 
 $$
-L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
+L_{\mathrm{EX,8h},m} = L_{p,\mathrm{A,eq}T,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
 $$
 
 de modo que una tarea ruidosa pero corta contribuye poco. Las estrategias
@@ -81,8 +81,8 @@ de modo que una tarea ruidosa pero corta contribuye poco. Las estrategias
 en cambio muestras aleatorias sobre un grupo de exposición homogéneo — $N \ge 5$
 muestras para la estrategia basada en la función, al menos tres turnos completos
 para la de jornada completa —, las promedian en energía y normalizan ese promedio
-a la jornada nominal de ocho horas con la duración efectiva de la jornada $T_e$
-en el mismo término $10\log_{10}(T_e/T_0)$. El nivel
+a la jornada nominal de ocho horas con la duración efectiva de la jornada $T_\mathrm{e}$
+en el mismo término $10\log_{10}(T_\mathrm{e}/T_0)$. El nivel
 diario es el mismo en ambos casos; las estrategias difieren en cómo se construye
 la **incertidumbre**.
 
@@ -172,7 +172,7 @@ serie deben descartarse (apartado 12.2). Eso es lo que afirman las
 antes de dar la jornada por buena, se compara el registro de nivel frente al
 tiempo con las notas de observación: un dosímetro registra un golpe o un roce en
 el micrófono como un suceso genuino de nivel alto (apartado 13.2), y un solo
-artefacto de esos puede mover el $L_{EX,8h}$ de la jornada; todo pico
+artefacto de esos puede mover el $L_\mathrm{EX,8h}$ de la jornada; todo pico
 inexplicado debe investigarse y la medición repetirse si el resultado queda
 afectado de forma significativa, y con un instrumento sin registro, repetirse
 sin más.
@@ -227,18 +227,18 @@ res.plot()   # la figura de abajo: contribuciones por tarea con LEX,8h y LEX,8h 
 
 **Cómo leer los números por función y de jornada completa.** El caso por tareas
 tiene su desglose por tarea; los otros dos merecen el mismo repaso, porque en
-ambos la respuesta la mueve un término que no es un nivel medido. $T_e$ es la
+ambos la respuesta la mueve un término que no es un nivel medido. $T_\mathrm{e}$ es la
 **duración efectiva de la jornada laboral** que establece el análisis del
 trabajo: el tiempo que el trabajador está realmente expuesto, con las pausas
 fuera del ruido excluidas y las que transcurren dentro de él incluidas. Las seis
-muestras por función promedian en energía 88,4 dB, y con $T_e = 7{,}5$ h la
-normalización $10\log_{10}(7{,}5/8)$ resta 0,3 dB, así que $L_{EX,8h}$ = 88,2 dB,
+muestras por función promedian en energía 88,4 dB, y con $T_\mathrm{e} = 7{,}5$ h la
+normalización $10\log_{10}(7{,}5/8)$ resta 0,3 dB, así que $L_\mathrm{EX,8h}$ = 88,2 dB,
 *por debajo* del promedio muestreado. Las seis muestras de jornada completa
 promedian en energía 89,5 dB, pero ese turno dura 9,25 h, así que el mismo
-término suma $10\log_{10}(9{,}25/8)$ = 0,6 dB y $L_{EX,8h}$ = 90,1 dB, que es más
+término suma $10\log_{10}(9{,}25/8)$ = 0,6 dB y $L_\mathrm{EX,8h}$ = 90,1 dB, que es más
 alto que cuatro de las seis muestras individuales. Eso no es un error:
 normalizar un turno largo a una jornada nominal de ocho horas *debe*
-penalizarlo. Equivócate en $T_e$ por un factor y todo el resultado se mueve en
+penalizarlo. Equivócate en $T_\mathrm{e}$ por un factor y todo el resultado se mueve en
 su $10\log_{10}$, y por eso la estrategia por tareas lleva un término aparte de
 incertidumbre de duración $u_{1b}$ para exactamente esa magnitud.
 
@@ -321,7 +321,7 @@ $N = 4$ de la Tabla C.4 se aplican solo a mediciones de jornada completa
 
 Conviene detallar dos sutilezas. Primero, el factor de cobertura es $k = 1{,}65$
 para un intervalo **unilateral** al 95 % (apartado 14), porque al higienista solo
-le importa la cota *superior*: `res.upper_limit` = $L_{EX,8h} + U$ es el valor por
+le importa la cota *superior*: `res.upper_limit` = $L_\mathrm{EX,8h} + U$ es el valor por
 debajo del cual queda el 95 % de las mediciones, el número que se compara con un
 valor de acción. Segundo, los métodos por tareas y por función ponderan de forma
 distinta la *misma* dispersión de muestras. La incertidumbre de muestreo de la
@@ -332,7 +332,7 @@ la desviación típica muestral simple con denominador $N-1$, cuya contribución
 $c_1 u_1$ se lee luego de la **Tabla C.4** en función de $(N, u_1)$. La misma
 dispersión bruta infla, por tanto, más la estimación por función, que es la
 penalización que la norma impone a un muestreo más grueso y con menos
-muestras. (El $L_{EX,8h}$ por función impreso es $88{,}2$ dB donde el anexo E
+muestras. (El $L_\mathrm{EX,8h}$ por función impreso es $88{,}2$ dB donde el anexo E
 declara $88{,}1$: la norma redondea el nivel de jornada efectiva a $88{,}4$ antes
 de la normalización de la duración; la biblioteca lo mantiene sin redondear.)
 
@@ -413,7 +413,7 @@ función paga una penalización mucho más dura por una $N$ pequeña (19,2 dB co
 tres, 6,2 dB con cinco, 3,9 dB con diez), porque la Tabla C.4 no divide sin más
 entre $\sqrt{N}$. Esa diferencia es la penalización que la norma lleva
 incorporada para un muestreo más grueso y con menos muestras, y es contra lo que
-empujan los avisos de los apartados 9.3 / 10.4. Como el pico $L_{p,Cpeak}$ no
+empujan los avisos de los apartados 9.3 / 10.4. Como el pico $L_{p,\mathrm{Cpeak}}$ no
 tiene modelo de muestreo en el anexo C (Tabla C.5, Nota 1), se declara sin
 incertidumbre, no con una incertidumbre nula.
 
@@ -432,8 +432,8 @@ en la página de [Teoría](/phonometry/es/reference/theory/environment-transport
 | Parámetro | Se aplica a | Tipo | Unidades | Rango / def. | Notas |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `tasks` | tarea | lista de `Task` | — | $\ge 1$ | Cada `Task` tiene `samples`, `duration_hours`, `duration_range`/`duration_samples` opcionales, `label`, `instrument` |
-| `samples` | función / jornada | secuencia | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ recomendado) | Muestras aleatorias $L_{p,A,eqT}$ |
-| `effective_duration_hours` | función / jornada | float | h | $> 0$ | Duración efectiva de la jornada $T_e$ |
+| `samples` | función / jornada | secuencia | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ recomendado) | Muestras aleatorias $L_{p,\mathrm{A,eq}T}$ |
+| `effective_duration_hours` | función / jornada | float | h | $> 0$ | Duración efectiva de la jornada $T_\mathrm{e}$ |
 | `instrument` | todas | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (def.) | Selecciona $u_2$ (Tabla C.5) |
 | `u3` | todas | float | dB | def. `1.0` | Incertidumbre de posición del micrófono (apartado C.6) |
 | `include_duration_uncertainty` | tarea | bool | — | def. `True` | `False` omite el término $(c_{1b}u_{1b})^2$ (anexo D caso a) |
@@ -441,10 +441,10 @@ en la página de [Teoría](/phonometry/es/reference/theory/environment-transport
 | `warn` | todas | bool | — | def. `True` | Emitir `OccupationalExposureWarning` para los avisos de muestreo |
 
 Las tres devuelven un `ExposureResult` con `lex_8h`, `combined_standard_uncertainty`
-$u$, `expanded_uncertainty` $U = 1{,}65\ u$, `upper_limit` = $L_{EX,8h} + U$,
+$u$, `expanded_uncertainty` $U = 1{,}65\ u$, `upper_limit` = $L_\mathrm{EX,8h} + U$,
 `sampling_advisory` y (basada en tareas) el desglose por tarea en `tasks`; el
 `.plot()` del resultado dibuja las barras de contribución por tarea con las
-líneas de $L_{EX,8h}$ y del límite superior (solo resultados por tareas: las
+líneas de $L_\mathrm{EX,8h}$ y del límite superior (solo resultados por tareas: las
 otras estrategias no llevan desglose por tarea).
 
 ## 3. El informe de medición (apartado 15)
@@ -459,10 +459,10 @@ con el formato de un servicio de prevención: la línea de base normativa con la
 estrategia aplicada, una cabecera (empresa, trabajador(es)/puesto, lugar de
 trabajo, y la instrumentación y la trazabilidad de calibración del
 apartado 15 c), el análisis del trabajo (la tabla por tareas con duraciones,
-niveles $L_{p,A,eqT,m}$ y contribuciones $L_{EX,8h,m}$ para un resultado por
+niveles $L_{p,\mathrm{A,eq}T,m}$ y contribuciones $L_{\mathrm{EX,8h},m}$ para un resultado por
 tareas (con su gráfica de contribuciones), o el resumen del muestreo con el
 balance de la fórmula C.9 para los resultados por función o de jornada
-completa) y el $L_{EX,8h}$ en caja con $U$, $k$ y el límite superior
+completa) y el $L_\mathrm{EX,8h}$ en caja con $U$, $k$ y el límite superior
 unilateral al 95 %.
 
 Como el número existe para compararse con la ley, la ficha evalúa después el
@@ -472,7 +472,7 @@ una acción (80 y 85 dB(A)) y el valor límite de exposición (87 dB(A)), cada
 uno marcado superado / no superado sobre el valor tal como se muestra, con un
 veredicto CUMPLE/NO CUMPLE frente al valor límite. Una nota impresa recuerda
 que el valor límite se aplica a la exposición *efectiva*, teniendo en cuenta
-la atenuación de los protectores auditivos utilizados, que el $L_{EX,8h}$
+la atenuación de los protectores auditivos utilizados, que el $L_\mathrm{EX,8h}$
 medido no incluye. `verbose=True` añade las columnas de incertidumbre por
 tarea del anexo C ($u_{1a}$, $u_{1b}$, $u_2$), y `language="es"` produce la
 ficha en español (*nivel de exposición diario equivalente*, *valor límite de
@@ -536,10 +536,10 @@ quien mide, y esta guía los documenta para que los números que se le dan a una
 `Task` signifiquen algo. La Tabla B.1 se reproduce como orientación y es quien
 llama el que elige la estrategia; aquí no se aplica ninguna. La atenuación de
 los protectores auditivos (la serie ISO 4869) no se aplica, así que el
-$L_{EX,8h}$ que se calcula aquí, y la comparación con el valor límite que la
+$L_\mathrm{EX,8h}$ que se calcula aquí, y la comparación con el valor límite que la
 ficha imprime sobre él, son la exposición **sin protección**, que es además la
 que quiere el modelo de pérdida auditiva de la ISO 1999. Y el anexo C no
-ofrece modelo de incertidumbre para $L_{p,Cpeak}$ (Tabla C.5, Nota 1), y por
+ofrece modelo de incertidumbre para $L_{p,\mathrm{Cpeak}}$ (Tabla C.5, Nota 1), y por
 eso el pico se declara sin ella en lugar de con una incertidumbre nula.
 </ScopeClaim>
 </Scope>
@@ -547,7 +547,7 @@ eso el pico se declara sin ella en lugar de con una incertidumbre nula.
 ## Véase también
 
 - [Niveles](/phonometry/es/signals/levels/levels/): las primitivas de dosis `lex_8h` /
-  `sound_exposure` (IEC 61252) y el $L_{p,Cpeak}$ que estas estrategias declaran al
+  `sound_exposure` (IEC 61252) y el $L_{p,\mathrm{Cpeak}}$ que estas estrategias declaran al
   lado.
 - [Incertidumbre de medición](/phonometry/es/signals/metrology/gum-uncertainty/): la
   maquinaria GUM que sustenta las incertidumbres combinadas y expandidas.
