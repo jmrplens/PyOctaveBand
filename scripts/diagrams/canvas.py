@@ -396,6 +396,19 @@ class SVG:
         self.add(f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" '
                  f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"{d}/>')
 
+    def text_width(self, s: str, size: float, *, bold: bool = False,
+                   mono: bool = False, italic: bool = False) -> float:
+        """Pen advance the label ``s`` will occupy, in the sheet's language.
+
+        The same translate-compose-measure the emission runs, stopping one
+        step short of drawing, so a caller that has to fit a label into a
+        box decides on what the reader will actually see rather than on the
+        length of the English string. A label that composes to nothing
+        occupies nothing.
+        """
+        runs = _label_runs(self.tr(s), mono=mono, bold=bold, italic=italic)
+        return measure(runs, size) if runs else 0.0
+
     def text(self, x: float, y: float, s: str, size: int = 20,
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:

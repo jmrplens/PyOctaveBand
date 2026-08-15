@@ -13,6 +13,12 @@ from __future__ import annotations
 from .canvas import SVG, Theme
 from .parts import _accel, _accel_wall, _rot_arrow, _spring_v
 
+#: Width, in px, a stage-box title has to leave inside the box at the larger
+#: size to keep it. It is the threshold the size decision is taken on, not a
+#: promise: a title wider than the box even at the smaller size is a
+#: composition to rewrite, and the fit gate is what catches one.
+_BOX_PAD = 24.0
+
 # ---------------------------------------------------------------------------
 # d8 - Airborne sound insulation setup (ISO 16283-1)
 # ---------------------------------------------------------------------------
@@ -81,7 +87,13 @@ def _d_ir_measurement(s: SVG, th: Theme) -> None:
     def box(x: float, y: float, title: str, subs: list[str],
             color: str) -> None:
         s.rect(x, y, bw, bh, th.panel, color, rx=12, sw=2)
-        t_size = 20 if len(title) > 11 else 22
+        # Drop a step when the title will not clear the box at the larger
+        # size. Counting characters decided this on the English string and
+        # on the assumption that every glyph is as wide as every other, so a
+        # Spanish twin that is longer on the page but not in characters kept
+        # a size it overflows at; the pen advance is what the box has to
+        # hold.
+        t_size = 22 if s.text_width(title, 22, bold=True) <= bw - _BOX_PAD else 20
         if subs:
             s.text(x + bw / 2, y + 38, title, t_size, th.fg, bold=True)
             if len(subs) == 1:
