@@ -10,6 +10,12 @@
 # absorbed by that script's numeric tolerance, so the stack does not have to
 # byte-match the runner hardware.
 #
+# The matplotlib/FreeType pin is also load-bearing for the diagram *plates*:
+# their labels are baked to glyph outlines through matplotlib's FT2Font and
+# libraqm shaping (scripts/diagrams/outline.py), partly from the DejaVu faces
+# shipped inside the matplotlib wheel. A wheel bump rewrites every glyph in
+# all 592 committed plate files and is reviewed as its own regeneration.
+#
 # Bump these together with a fresh `make graphs` regeneration (generate the
 # figures with exactly this stack, then commit both). Generated from the
 # maintainer's venv that produced the committed figures.

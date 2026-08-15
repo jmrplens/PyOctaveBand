@@ -15,11 +15,19 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass
 
 from .i18n import lookup, visit
-from .outline import _COMBINING, Run, assert_capabilities
+from .outline import (
+    _COMBINING,
+    GlyphStore,
+    Run,
+    assert_capabilities,
+    emit_runs,
+    measure,
+)
 
 
 @dataclass(frozen=True)
@@ -42,9 +50,6 @@ DARK = Theme(
     suffix="_dark", bg="#0d1117", fg="#e6e6e6", muted="#9a9a9a", panel="#1c2128",
     primary="#4da3d8", secondary="#e46a6a", accent="#5abf5a",
 )
-
-_FONT = "Segoe UI, Helvetica, Arial, sans-serif"
-_MONO = "Consolas, Menlo, monospace"
 
 #: The letter runs a sub/superscript sets upright: the descriptive
 #: subscripts of the corpus, printed in roman by the standards that define
@@ -79,8 +84,24 @@ _TITLE_SIZE = 26
 
 
 def _esc(s: str) -> str:
-    """Escape XML metacharacters so labels may contain <, > and & literally."""
+    """Escape XML metacharacters so labels may contain <, > and & literally.
+
+    Serves the root ``<title>`` and the source-string comments beside each
+    outlined label; the librsvg space-collapse workaround it once covered
+    is now handled by the explicit collapse in :func:`_label_runs`.
+    """
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _comment(s: str) -> str:
+    """An XML comment carrying a label's source string.
+
+    Keeps the outlined artwork greppable and keeps every label in the
+    structural half of ``check_figures``, so a changed word still fails
+    with a readable diff. ``--`` is illegal inside a comment and is
+    sanitised to a U+2010 pair; no label contains one today.
+    """
+    return f"<!-- {_esc(s).replace('--', '‐‐')} -->"
 
 
 def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]]:
@@ -263,36 +284,10 @@ def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
     return chunks
 
 
-def _math_spans(s: str, size: int) -> str:
-    """Serialise the runs of :func:`_math_runs` into ``<tspan>`` markup.
-
-    Baseline shifts become cumulative rounded ``dy`` steps, script runs
-    carry their reduced ``font-size`` and italic runs their
-    ``font-style``. No tspan carries an ``x`` of its own, so the whole
-    string remains one text chunk and ``text-anchor`` keeps working. The
-    caller must put ``xml:space="preserve"`` on the wrapping ``<text>``:
-    without it librsvg collapses every space at a tspan boundary, even
-    NBSP.
-    """
-    parts: list[str] = []
-    baseline = 0.0
-    for text, italic, shift, scale in _math_runs(s):
-        attrs: list[str] = []
-        dy = (shift - baseline) * size
-        baseline = shift
-        if abs(dy) > 1e-9:
-            attrs.append(f' dy="{dy:.1f}"')
-        if scale != 1.0:
-            attrs.append(f' font-size="{size * scale:.1f}"')
-        if italic:
-            attrs.append(' font-style="italic"')
-        parts.append(f'<tspan{"".join(attrs)}>{_esc(text)}</tspan>')
-    return "".join(parts)
-
-
-#: The XML whitespace collapse a viewer applies to non-preserve text,
-#: reproduced explicitly. ASCII only, never ``str.split()``, which would
-#: also eat the NBSPs the labels use to keep quantities on their units.
+#: The XML whitespace collapse the viewers applied to the live-text
+#: plates, reproduced explicitly now that the glyphs are baked. ASCII
+#: only, never ``str.split()``, which would also eat the NBSPs the
+#: labels use to keep quantities on their units.
 _WS_RUN = re.compile(r"[ \t\r\n]+")
 
 
@@ -338,6 +333,7 @@ class SVG:
         self.w, self.h, self.th = width, height, th
         self.lang = lang
         self.parts: list[str] = []
+        self._glyphs = GlyphStore()
 
     def tr(self, s: str) -> str:
         """Translate a user-visible string for the current language."""
@@ -376,36 +372,39 @@ class SVG:
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:
         s = self.tr(s)
-        self.add(self._emit_text(x, y, s, size, fill or self.th.fg, anchor,
-                                 bold=bold, mono=mono, italic=italic))
+        fragment = self._emit_text(x, y, s, size, fill or self.th.fg, anchor,
+                                   bold=bold, mono=mono, italic=italic)
+        if fragment:
+            self.add(fragment)
 
     def _emit_text(self, x: float, y: float, s: str, size: int, fill: str,
                    anchor: str, *, bold: bool = False, mono: bool = False,
                    italic: bool = False) -> str:
         """The emission core of :meth:`text`: one already-translated label.
 
-        The caller translates; this composes and serialises. Keeping the
-        two apart is what lets the title of :meth:`render` share the exact
-        same emission as every body label.
+        The caller translates; this composes, measures and outlines. The
+        pipeline is strictly tr -> compose -> measure -> outline, and the
+        split is what lets the title of :meth:`render` share the exact
+        same emission as every body label. The label is anchored at draw
+        time from its measured width, checked against the sheet (the fit
+        gate; ``PHONO_DIAGRAM_FIT=report`` downgrades the error to a
+        stderr record so one run collects the full worklist), and written
+        as ``<use>`` groups behind an XML comment carrying the source
+        string. A label that composes to nothing emits nothing.
         """
-        w = ' font-weight="600"' if bold else ""
-        if "$" in s:
-            if mono:
-                raise ValueError(
-                    f"mono cannot carry composed mathematics: {s!r} would "
-                    "drop its $...$ styling; write the label without mono "
-                    "or without markup"
-                )
-            # Composed mathematics: ``italic`` does not apply, the markup
-            # styles every glyph run itself (see _math_runs).
-            return (f'<text x="{x}" y="{y}" font-family="{_FONT}" '
-                    f'font-size="{size}" fill="{fill}" '
-                    f'text-anchor="{anchor}"{w} xml:space="preserve">'
-                    f'{_math_spans(s, size)}</text>')
-        i = ' font-style="italic"' if italic else ""
-        fam = _MONO if mono else _FONT
-        return (f'<text x="{x}" y="{y}" font-family="{fam}" font-size="{size}" '
-                f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{_esc(s)}</text>')
+        runs = _label_runs(s, mono=mono, bold=bold, italic=italic)
+        if not runs:
+            return ""
+        width = measure(runs, size)
+        x0 = x - {"start": 0.0, "middle": width / 2, "end": width}[anchor]
+        if x0 < -0.5 or x0 + width > self.w + 0.5:
+            message = (f"label {s!r} spans {x0:.0f}..{x0 + width:.0f} "
+                       f"on a {self.w} px sheet")
+            if os.environ.get("PHONO_DIAGRAM_FIT") == "report":
+                print(f"fit: {message}", file=sys.stderr)
+            else:
+                raise ValueError(message)
+        return _comment(s) + emit_runs(self._glyphs, runs, x0, y, size, fill)
 
     def path(self, d: str, fill: str = "none", stroke: str = "none",
              sw: float = 1.5, dash: str = "") -> None:
@@ -500,17 +499,26 @@ class SVG:
             x += hatch
 
     def render(self, title: str) -> str:
+        """Assemble the document: canvas, accessible title, atlas, artwork.
+
+        The visible title routes through :meth:`_emit_text`, so the
+        loudest string on every plate takes the same translation-once,
+        measurement, fit gate, comment and outlining as every body label;
+        the root ``<title>`` keeps a direct open accessible while the MDX
+        alt text stays the site's accessible name. The ``<defs>`` atlas
+        is assembled after the artwork, but its ids are content-derived,
+        so document order stays deterministic either way.
+        """
         th = self.th
         t = self.tr(title)
-        body = (f' xml:space="preserve">{_math_spans(t, _TITLE_SIZE)}'
-                if "$" in t else f'>{_esc(t)}')
-        head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
+        title_fragment = self._emit_text(self.w / 2, 30, t, _TITLE_SIZE,
+                                         th.fg, "middle", bold=True)
+        return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
                 f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'
                 f'<rect width="{self.w}" height="{self.h}" fill="{th.bg}"/>'
-                f'<text x="{self.w / 2}" y="30" font-family="{_FONT}" '
-                f'font-size="{_TITLE_SIZE}" font-weight="600" fill="{th.fg}" '
-                f'text-anchor="middle"{body}</text>')
-        return head + "".join(self.parts) + "</svg>"
+                f'<title>{_esc(t)}</title>'
+                f'<defs>{self._glyphs.defs()}</defs>'
+                + title_fragment + "".join(self.parts) + "</svg>")
 
 
 def _write(output_dir: str, name: str, build: Callable[[SVG, Theme], None], title: str,
