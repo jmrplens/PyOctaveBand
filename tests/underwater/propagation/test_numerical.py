@@ -3,8 +3,9 @@
 
 Oracles are analytic and independent of the implementation: the ideal
 (pressure-release) waveguide's exact normal modes, the circular-arc ray paths of
-a linear sound-speed gradient, and free-field spherical spreading for the
-parabolic equation.
+a linear sound-speed gradient and the published closed form for the travel time
+along them (Medwin & Clay 1998, Eq. (3.3.20)), and free-field spherical
+spreading for the parabolic equation.
 """
 
 from __future__ import annotations
@@ -111,6 +112,120 @@ def test_ray_trace_constant_speed_is_straight() -> None:
                     max_range=1000.0, n_steps=2000)
     # A horizontal ray in isovelocity water stays at the source depth.
     assert np.allclose(res.depths[0], 50.0, atol=1e-6)
+
+
+# --- Ray travel times -------------------------------------------------------
+#
+# Oracle: the closed-form travel time through a layer of constant sound-speed
+# gradient, Medwin & Clay, *Fundamentals of Acoustical Oceanography* (Academic
+# Press, 1998), Sec. 3.3.4, Eq. (3.3.20) printed on p. 88,
+#
+#     t(n+1) - t(n) = |1/b| ln{ w(n+1)[1 + (1 - a^2 b^2 w(n)^2)^(1/2)]
+#                             / ( w(n) [1 + (1 - a^2 b^2 w(n+1)^2)^(1/2)] ) },
+#
+# in which b = dc/dz is the gradient, w = c/b (their Eqs. (3.3.16)-(3.3.17)) and
+# a = sin(theta_v)/c is the Snell invariant with theta_v measured from the
+# vertical. Since a*b*w = a*c = sin(theta_v) = cos(theta), with theta the angle
+# from the HORIZONTAL that this library launches its rays at, the printed
+# equation reads, in the library's own variables,
+#
+#     t = (1/g) ln[ (c2/c1) (1 + sin theta_1) / (1 + sin theta_2) ],
+#
+# and the companion Eq. (3.3.21) gives the range as
+# r = (sin theta_1 - sin theta_2)/(a g), i.e. sin theta_2 = sin theta_1 - xi g r
+# with xi = cos(theta_1)/c1. The numbers below were evaluated from those two
+# printed equations at 40 decimal digits (mpmath) and rounded to 1e-11 s; no
+# part of them comes from running the solver.
+_MEDWIN_C0, _MEDWIN_G = 1500.0, 0.05  # c(z) = 1500 + 0.05 z, launch 10 deg down
+#: (range in m, travel time in s) for a 10 deg ray launched at the surface.
+_MEDWIN_TRAVEL_TIME = [
+    (2_000.0, 1.34017403528),   # still descending
+    (5_000.0, 3.31823980910),   # just short of the 5289.8 m turning range
+    (8_000.0, 5.29257808047),   # climbing again, past the turn
+    (10_000.0, 6.62594192637),  # back up at 96.4 m depth
+]
+
+
+def test_ray_travel_time_matches_iso_gradient_closed_form() -> None:
+    """Travel time against Medwin & Clay (1998) Eq. (3.3.20), p. 88.
+
+    The closed form for a layer of constant gradient, evaluated independently of
+    this library (see the derivation above the table), pinned at four ranges
+    that straddle the ray's turning point.
+    """
+    prof = (np.array([0.0, 2000.0]),
+            np.array([_MEDWIN_C0, _MEDWIN_C0 + _MEDWIN_G * 2000.0]))
+    res = ray_trace(*prof, source_depth=0.0, launch_angles_deg=[10.0],
+                    max_range=10_000.0, n_steps=20_001)
+    assert res.travel_times.shape == res.depths.shape
+    assert res.travel_times[0, 0] == 0.0
+    for rng, t_ref in _MEDWIN_TRAVEL_TIME:
+        i = int(np.argmin(np.abs(res.ranges[0] - rng)))
+        assert res.ranges[0, i] == pytest.approx(rng)
+        assert res.travel_times[0, i] == pytest.approx(t_ref, abs=1e-9), rng
+
+
+def test_ray_travel_time_deeper_turning_ray_takes_longer() -> None:
+    """A ray that turns deeper spends longer getting to its turning point.
+
+    Steeper launch means a deeper turn (Snell: c(z_t) = c(z_s)/cos theta_0), and
+    Medwin & Clay Eq. (3.3.20) taken from the source to that turn collapses to
+    t_turn = (1/g) ln[(1 + sin theta_0)/cos theta_0], which is strictly
+    increasing in theta_0 and, notably, free of the sound speed itself.
+    """
+    g = _MEDWIN_G
+    prof = (np.array([0.0, 2000.0]),
+            np.array([_MEDWIN_C0, _MEDWIN_C0 + g * 2000.0]))
+    angles = [4.0, 8.0, 12.0, 16.0]
+    res = ray_trace(*prof, source_depth=0.0, launch_angles_deg=angles,
+                    max_range=12_000.0, n_steps=24_001)
+    turn_times, turn_depths = [], []
+    for k, angle in enumerate(angles):
+        th = np.radians(angle)
+        xi = np.cos(th) / _MEDWIN_C0
+        r_turn = np.sin(th) / (xi * g)  # Eq. (3.3.21) with sin theta_2 = 0
+        t_turn = np.log((1.0 + np.sin(th)) / np.cos(th)) / g
+        got = float(np.interp(r_turn, res.ranges[k], res.travel_times[k]))
+        assert got == pytest.approx(t_turn, abs=1e-6), angle
+        turn_times.append(got)
+        turn_depths.append((1.0 / xi - _MEDWIN_C0) / g)
+    assert np.all(np.diff(turn_depths) > 0.0)  # steeper turns deeper
+    assert np.all(np.diff(turn_times) > 0.0)   # and takes longer to get there
+
+
+def test_ray_travel_time_constant_profile_is_range_over_speed() -> None:
+    # With no gradient the ray is straight, its arc is range/cos(theta0) long and
+    # it is covered at c, so t = r/(c cos theta0); horizontally, exactly r/c.
+    res = ray_trace(*_ISO, source_depth=50.0, launch_angles_deg=[0.0, 20.0],
+                    max_range=1500.0, n_steps=2000)
+    r, c = res.ranges[0], 1500.0
+    assert np.allclose(res.travel_times[0], r / c, rtol=0.0, atol=1e-12)
+    assert np.allclose(res.travel_times[1], r / (c * np.cos(np.radians(20.0))),
+                       rtol=0.0, atol=1e-12)
+
+
+def test_ray_travel_time_survives_reflections() -> None:
+    # Reflections cost no time and do not change the speed, so a ray bouncing
+    # between surface and bottom in isovelocity water still covers r/(c cos th0);
+    # this is the folding path, which a post-hoc integral over the drawn (folded)
+    # geometry would get wrong.
+    res = ray_trace(*_ISO, source_depth=100.0, launch_angles_deg=[60.0],
+                    max_range=5000.0, n_steps=3000)
+    assert res.travel_times[0, -1] == pytest.approx(
+        5000.0 / (1500.0 * np.cos(np.radians(60.0))), rel=1e-9)
+
+
+def test_ray_travel_time_increases_monotonically_along_every_ray() -> None:
+    # Time only ever runs forward, whichever way the ray is going: a Munk-like
+    # profile with rays that turn, reflect and cross each other.
+    z = np.linspace(0.0, 5000.0, 60)
+    eta = 2.0 * (z - 1300.0) / 1300.0
+    c = 1500.0 * (1.0 + 0.00737 * (eta - 1.0 + np.exp(-eta)))
+    res = ray_trace(z, c, source_depth=1000.0,
+                    launch_angles_deg=np.linspace(-14.0, 14.0, 15),
+                    max_range=60_000.0, n_steps=4000)
+    assert np.all(res.travel_times[:, 0] == 0.0)
+    assert np.all(np.diff(res.travel_times, axis=1) > 0.0)
 
 
 # --- Parabolic equation -----------------------------------------------------
