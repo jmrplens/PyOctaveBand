@@ -7,25 +7,28 @@ sidebar:
 
 The sonar equation (passive and active), in decibels.
 
-Combines the sonar performance terms -- source level `SL`, transmission loss
-`TL`, noise level `NL`, directivity index `DI`, detection threshold `DT`,
+Combines the sonar performance terms -- source level `SL`, propagation loss
+`PL`, noise level `NL`, directivity index `DI`, detection threshold `DT`,
 target strength `TS` and reverberation level `RL` -- into the signal excess
 `SE`, the signal-to-noise ratio and the figure of merit (the maximum allowable
-transmission loss at the detection limit $\mathrm{SE} = 0$):
+propagation loss at the detection limit $\mathrm{SE} = 0$):
 
 * [`passive_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#passive_sonar_equation) --
-  $\mathrm{SE} = \mathrm{SL} - \mathrm{TL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$.
+  $\mathrm{SE} = \mathrm{SL} - \mathrm{PL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$.
 * [`active_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#active_sonar_equation) -- monostatic, noise-limited
-  $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$ or, when a reverberation level
+  $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$ or, when a reverberation level
   is given, reverberation-limited
-  $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$.
+  $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$.
 
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
-Underwater Sound*, via Etter (2003), Table 10.2.
+Underwater Sound*, via Etter (2003), Table 10.2. The loss term is the
+propagation loss $N_\mathrm{PL} = L_S - L_p(x)$ of ISO 18405:2017,
+3.4.1.4, which is also the term its own passive and active sonar equations
+(3.6.2.7 and 3.6.2.11) are written with.
 
-The figure of merit is the *maximum allowable transmission loss*, so inverting
-a transmission-loss law at $\mathrm{TL} = \mathrm{FOM}$ gives the
+The figure of merit is the *maximum allowable propagation loss*, so inverting
+a propagation-loss law at $\mathrm{PL} = \mathrm{FOM}$ gives the
 **detection range**, the
 range at which the detection probability is 50 %:
 
@@ -45,7 +48,7 @@ range at which the detection probability is 50 %:
 ```python
 active_sonar_equation(
     source_level: float,
-    transmission_loss: NDArray[np.float64] | list[float] | float,
+    propagation_loss: NDArray[np.float64] | list[float] | float,
     target_strength: float,
     noise_level: float,
     *,
@@ -55,18 +58,18 @@ active_sonar_equation(
 ) -> SonarEquationResult
 ```
 
-Monostatic active sonar equation with a two-way transmission loss.
+Monostatic active sonar equation with a two-way propagation loss.
 
-Noise-limited: $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$. When
+Noise-limited: $\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$. When
 `reverberation_level` is given, reverberation-limited:
-$\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{TL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$ (`DI` does not apply to reverberation).
+$\mathrm{SE} = \mathrm{SL} - 2\,\mathrm{PL} + \mathrm{TS} - \mathrm{RL} - \mathrm{DT}$ (`DI` does not apply to reverberation).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `source_level` | Source level `SL`, in dB. |
-| `transmission_loss` | One-way transmission loss `TL`, in dB (scalar or array); the equation applies $2\,\mathrm{TL}$. |
+| `propagation_loss` | One-way propagation loss `PL`, in dB (scalar or array); the equation applies $2\,\mathrm{PL}$. |
 | `target_strength` | Target strength `TS`, in dB. |
 | `noise_level` | Background noise level `NL`, in dB. |
 | `directivity_index` | Receiver directivity index `DI`, in dB. |
@@ -100,11 +103,11 @@ detection_range(
 ) -> DetectionRangeResult
 ```
 
-Range at which the closed-form transmission loss equals the figure of
+Range at which the closed-form propagation loss equals the figure of
 merit.
 
-Solves $\mathrm{TL}(r) = \mathrm{FOM}$ for the loss of
-[`transmission_loss`](/phonometry/reference/api/underwater/closed-form/#transmission_loss), which is
+Solves $\mathrm{PL}(r) = \mathrm{FOM}$ for the loss of
+[`propagation_loss`](/phonometry/reference/api/underwater/closed-form/#propagation_loss), which is
 strictly increasing in range, so the root is unique. A **one-way** figure of
 merit works for both sonar modes: the active figure of merit returned by
 [`active_sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/#active_sonar_equation) is already the maximum allowable one-way loss.
@@ -113,7 +116,7 @@ merit works for both sonar modes: the active figure of merit returned by
 
 | Name | Description |
 | :--- | :--- |
-| `figure_of_merit` | Maximum allowable one-way transmission loss, in dB. |
+| `figure_of_merit` | Maximum allowable one-way propagation loss, in dB. |
 | `frequency_hz` | Acoustic frequency, in Hz. |
 | `law` | Spreading law (see [`spreading_loss`](/phonometry/reference/api/underwater/closed-form/#spreading_loss)). |
 | `transition_range` | Transition range for the `"practical"` law, in m. |
@@ -139,15 +142,15 @@ merit works for both sonar modes: the active figure of merit returned by
 detection_range_from_curve(
     figure_of_merit: float,
     range_m: NDArray[np.float64] | list[float],
-    transmission_loss: NDArray[np.float64] | list[float],
+    propagation_loss: NDArray[np.float64] | list[float],
     *,
     crossing: str = 'first',
 ) -> float
 ```
 
-Detection range read off a computed transmission-loss curve.
+Detection range read off a computed propagation-loss curve.
 
-Finds where `TL(r)` crosses the figure of merit from below, interpolating
+Finds where `PL(r)` crosses the figure of merit from below, interpolating
 linearly between the two bracketing samples. Real waveguides oscillate, so
 `crossing` selects which crossing to report.
 
@@ -155,9 +158,9 @@ linearly between the two bracketing samples. Real waveguides oscillate, so
 
 | Name | Description |
 | :--- | :--- |
-| `figure_of_merit` | Maximum allowable transmission loss, in dB. |
+| `figure_of_merit` | Maximum allowable propagation loss, in dB. |
 | `range_m` | Ranges, in metres (1-D, strictly increasing). |
-| `transmission_loss` | Loss at each range, in dB (same length). |
+| `propagation_loss` | Loss at each range, in dB (same length). |
 | `crossing` | `"first"` (default) or `"last"` upward crossing. |
 
 **Returns:** The detection range, in metres. Two limiting cases carry no crossing and are distinguished by the loss at the **last** sample: `inf` when the loss is still below the figure of merit there (the target stays detectable past the end of the grid) and `0.0` when the loss exceeds it there, which without an upward crossing means it exceeded it at every sample and the target is detectable nowhere. [`detection_range`](/phonometry/reference/api/underwater/sonar-equation/#detection_range) returns the same two values for the same two situations.
@@ -176,24 +179,24 @@ DetectionRangeResult(
     figure_of_merit: float,
     frequency: float,
     range_m: NDArray[np.float64],
-    transmission_loss: NDArray[np.float64],
+    propagation_loss: NDArray[np.float64],
     absorption_coefficient: float,
     law: str,
     model: str,
 )
 ```
 
-Detection range obtained by inverting a transmission-loss law.
+Detection range obtained by inverting a propagation-loss law.
 
 **Attributes**
 
 | Name | Description |
 | :--- | :--- |
-| `detection_range` | Range at which `TL` equals the figure of merit, in metres. `inf` when the loss never reaches it inside `max_range` (detectable throughout) and `0.0` when it already exceeds it at the search floor (detectable nowhere). |
+| `detection_range` | Range at which `PL` equals the figure of merit, in metres. `inf` when the loss never reaches it inside `max_range` (detectable throughout) and `0.0` when it already exceeds it at the search floor (detectable nowhere). |
 | `figure_of_merit` | The figure of merit inverted, in dB. |
 | `frequency` | Acoustic frequency, in Hz. |
 | `range_m` | Range grid over which the loss was evaluated, in metres. |
-| `transmission_loss` | Transmission loss at each range, in dB. |
+| `propagation_loss` | Propagation loss at each range, in dB. |
 | `absorption_coefficient` | Absorption coefficient $\alpha$, in dB/km. |
 | `law` | The spreading law used. |
 | `model` | The absorption model used. |
@@ -209,14 +212,14 @@ DetectionRangeResult.plot(
 ) -> Axes
 ```
 
-Plot the transmission loss against the figure of merit.
+Plot the propagation loss against the figure of merit.
 
 ## passive_sonar_equation
 
 ```python
 passive_sonar_equation(
     source_level: float,
-    transmission_loss: NDArray[np.float64] | list[float] | float,
+    propagation_loss: NDArray[np.float64] | list[float] | float,
     noise_level: float,
     *,
     directivity_index: float = 0.0,
@@ -224,14 +227,14 @@ passive_sonar_equation(
 ) -> SonarEquationResult
 ```
 
-Passive sonar equation $\mathrm{SE} = \mathrm{SL} - \mathrm{TL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$.
+Passive sonar equation $\mathrm{SE} = \mathrm{SL} - \mathrm{PL} - (\mathrm{NL} - \mathrm{DI}) - \mathrm{DT}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `source_level` | Source level `SL` (of the target), in dB. |
-| `transmission_loss` | One-way transmission loss `TL`, in dB (scalar or array). |
+| `propagation_loss` | One-way propagation loss `PL`, in dB (scalar or array). |
 | `noise_level` | Background noise level `NL`, in dB. |
 | `directivity_index` | Receiver directivity index `DI`, in dB. |
 | `detection_threshold` | Detection threshold `DT`, in dB. |
@@ -252,7 +255,7 @@ SonarEquationResult(
     signal_excess: NDArray[np.float64],
     snr: NDArray[np.float64],
     figure_of_merit: float,
-    transmission_loss: NDArray[np.float64],
+    propagation_loss: NDArray[np.float64],
     source_level: float,
     noise_level: float,
     directivity_index: float,
@@ -269,10 +272,10 @@ Sonar-equation solution.
 | Name | Description |
 | :--- | :--- |
 | `mode` | `"passive"` or `"active"`. |
-| `signal_excess` | Signal excess `SE` per transmission loss, in dB (detection when `SE >= 0`). |
+| `signal_excess` | Signal excess `SE` per propagation loss, in dB (detection when `SE >= 0`). |
 | `snr` | Signal-to-noise (or signal-to-reverberation) ratio, in dB ($\mathrm{SE} + \mathrm{DT}$). |
-| `figure_of_merit` | Maximum allowable (one-way) transmission loss at the detection limit $\mathrm{SE} = 0$, in dB. |
-| `transmission_loss` | The transmission-loss values, in dB. |
+| `figure_of_merit` | Maximum allowable (one-way) propagation loss at the detection limit $\mathrm{SE} = 0$, in dB. |
+| `propagation_loss` | The propagation-loss values, in dB. |
 | `source_level` | Source level `SL`, in dB. |
 | `noise_level` | Background noise level `NL` input, in dB. The masking term is $\mathrm{NL} - \mathrm{DI}$, except when `reverberation_limited` is true, where the reverberation level `RL` masks instead. |
 | `directivity_index` | Receiver directivity index `DI`, in dB. |
@@ -291,4 +294,4 @@ SonarEquationResult.plot(
 ) -> Axes
 ```
 
-Plot signal excess versus transmission loss with the detection limit.
+Plot signal excess versus propagation loss with the detection limit.

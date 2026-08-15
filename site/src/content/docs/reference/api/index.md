@@ -205,7 +205,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | Module | Summary |
 | :--- | :--- |
 | [`underwater.acoustics`](/phonometry/reference/api/underwater/acoustics/) | Underwater-acoustics reference levels (ISO 18405:2017). |
-| [`underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/) | Underwater sound propagation: transmission loss (closed-form). |
+| [`underwater.propagation.closed_form`](/phonometry/reference/api/underwater/closed-form/) | Underwater sound propagation: propagation loss (closed-form). |
 | [`underwater.propagation.weston_regimes`](/phonometry/reference/api/underwater/weston-regimes/) | Weston's shallow-water propagation regimes (flux theory). |
 | [`underwater.propagation.sound_speed`](/phonometry/reference/api/underwater/sound-speed/) | Speed of sound in sea water (empirical equations). |
 | [`underwater.sonar_equation`](/phonometry/reference/api/underwater/sonar-equation/) | The sonar equation (passive and active), in decibels. |

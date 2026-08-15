@@ -142,6 +142,14 @@ Expanded uncertainty $U = k \cdot u$ (Clause 4).
 
 Coverage factor $k = 2$ for 95 % or $k = 1.3$ for 80 %.
 
+:::note
+Three domains define an expanded uncertainty over their own coverage
+factors, so the package top level qualifies each of them: this one is
+`phonometry.environmental_expanded_uncertainty`, the building one is
+[`insulation_expanded_uncertainty`](/phonometry/reference/api/building/uncertainty/#insulation_expanded_uncertainty). Inside
+`phonometry.environment` the plain name is unambiguous and stays.
+:::
+
 **Parameters**
 
 | Name | Description |
@@ -156,6 +164,10 @@ Coverage factor $k = 2$ for 95 % or $k = 1.3$ for 80 %.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `u` is negative/non-finite or `confidence` is not one of the tabulated values. |
+
+## EnvironmentalMeasurementWarning
+
+Warning for unreliable environmental-noise determinations.
 
 ## gaussian_residual_level
 
@@ -266,7 +278,7 @@ of the measured level, §10.4 allows **no** correction: the *uncorrected*
 measured level `L'` is the reportable value, as an upper bound of the
 specific sound (the corrected value would understate reliability, being
 the lower-side estimate). The result is then flagged `reliable = False`
-and an `EnvironmentalMeasurementWarning` is issued; report
+and an [`EnvironmentalMeasurementWarning`](/phonometry/reference/api/environment/measurement/#environmentalmeasurementwarning) is issued; report
 `reportable_upper_bound` (= `L'`), not `corrected_level`.
 
 **Parameters**
@@ -495,7 +507,7 @@ $\sqrt{\sum (L_i - L_k)^2/(N - 1)}$ (Formula (20)) is also
 reported as
 `approximate_uncertainty`; it is valid only "if the difference between
 different Li is small", so a spread above 3 dB triggers an
-`EnvironmentalMeasurementWarning` (e.g. [50, 60, 70] dB gives
+[`EnvironmentalMeasurementWarning`](/phonometry/reference/api/environment/measurement/#environmentalmeasurementwarning) (e.g. [50, 60, 70] dB gives
 3.94 dB by Formulae (17)+(19) but 12.18 dB by Formula (20)).
 
 **Parameters**

@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Figures for the underwater guides: transmission loss, sources and criteria.
+"""Figures for the underwater guides: propagation loss, sources and criteria.
 
 The ocean channel and what is heard in it: sound-speed profiles, the Weston
 propagation regimes and the sonar equation, seabed reflection, ambient and
@@ -124,26 +124,26 @@ def generate_pile_driving(output_dir: str) -> None:
     plt.close()
 
 
-def generate_underwater_transmission_loss(output_dir: str) -> None:
-    """Underwater TL vs range: geometrical spreading + volume absorption."""
-    print("Generating underwater_transmission_loss...")
-    from phonometry import transmission_loss
+def generate_underwater_propagation_loss(output_dir: str) -> None:
+    """Underwater PL vs range: geometrical spreading + volume absorption."""
+    print("Generating underwater_propagation_loss...")
+    from phonometry import propagation_loss
 
     ranges = np.linspace(10.0, 20_000.0, 400)
-    res = transmission_loss(
+    res = propagation_loss(
         ranges, 10_000.0, law="practical", transition_range=1000.0,
         temperature=10.0, salinity=35.0, depth=100.0, model="francois-garrison",
     )
     _fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(res.range_m, res.tl, color=COLOR_PRIMARY, linewidth=2.0,
-            label="Total transmission loss")
+    ax.plot(res.range_m, res.pl, color=COLOR_PRIMARY, linewidth=2.0,
+            label="Total propagation loss")
     ax.plot(res.range_m, res.spreading, color="#8c8c8c", linestyle="--", linewidth=1.4,
             label="Geometrical spreading")
     ax.plot(res.range_m, res.absorption, color=COLOR_SECONDARY, linestyle=":", linewidth=1.6,
             label="Volume absorption")
     ax.set_xlabel("Range [m]")
-    ax.set_ylabel("Transmission loss [dB]")
-    ax.set_title("Underwater Transmission Loss (Francois–Garrison)",
+    ax.set_ylabel("Propagation loss [dB]")
+    ax.set_title("Underwater Propagation Loss (Francois–Garrison)",
                  pad=12)
     ax.invert_yaxis()
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -155,7 +155,7 @@ def generate_underwater_transmission_loss(output_dir: str) -> None:
             transform=ax.transAxes, va="bottom", fontsize=10,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
-    save_figure(output_dir, "underwater_transmission_loss.svg")
+    save_figure(output_dir, "underwater_propagation_loss.svg")
     plt.close()
 
 
@@ -286,21 +286,21 @@ def generate_underwater_sound_speed(output_dir: str) -> None:
 
 
 def generate_sonar_equation(output_dir: str) -> None:
-    """Passive sonar equation: signal excess vs transmission loss."""
+    """Passive sonar equation: signal excess vs propagation loss."""
     print("Generating sonar_equation...")
     from phonometry import passive_sonar_equation
 
-    tl = np.linspace(40.0, 120.0, 400)
-    res = passive_sonar_equation(140.0, tl, 60.0, directivity_index=15.0,
+    pl = np.linspace(40.0, 120.0, 400)
+    res = passive_sonar_equation(140.0, pl, 60.0, directivity_index=15.0,
                                  detection_threshold=8.0)
     _fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(res.transmission_loss, res.signal_excess, color=COLOR_PRIMARY, linewidth=2.0,
+    ax.plot(res.propagation_loss, res.signal_excess, color=COLOR_PRIMARY, linewidth=2.0,
             label="Signal excess")
     ax.axhline(0.0, color=COLOR_SECONDARY, linestyle="--", linewidth=1.4,
                label="Detection limit (SE = 0)")
     ax.axvline(res.figure_of_merit, color="#8c8c8c", linestyle=":", linewidth=1.6,
                label="Figure of merit")
-    ax.set_xlabel("Transmission loss [dB]")
+    ax.set_xlabel("Propagation loss [dB]")
     ax.set_ylabel("Signal excess [dB]")
     ax.set_title("Passive Sonar Equation", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -467,36 +467,36 @@ def generate_numerical_propagation(output_dir: str) -> None:
     axes[0].grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     axes[0].legend(loc="upper right", fontsize=9)
 
-    # (b) Parabolic-equation transmission-loss field for the same environment;
+    # (b) Parabolic-equation propagation-loss field for the same environment;
     # imshow renders a single raster image (the figure is a raster WebP).
     pe_field = parabolic_equation(50.0, zprof, cprof, source_depth=1000.0,
                                   max_range=100_000.0, range_step=25.0,
                                   n_depth_points=1024)
-    tl = pe_field.transmission_loss
-    vmax = float(np.percentile(tl[np.isfinite(tl)], 95))
-    tl = np.where(np.isfinite(tl), tl, vmax)  # clip the infinite zero-range column
-    img = axes[1].imshow(tl, cmap="viridis_r", vmin=vmax - 50.0, vmax=vmax,
+    pl = pe_field.propagation_loss
+    vmax = float(np.percentile(pl[np.isfinite(pl)], 95))
+    pl = np.where(np.isfinite(pl), pl, vmax)  # clip the infinite zero-range column
+    img = axes[1].imshow(pl, cmap="viridis_r", vmin=vmax - 50.0, vmax=vmax,
                          aspect="auto", origin="upper", interpolation="bilinear",
                          extent=(0.0, 100.0, float(zprof[-1]), 0.0))
-    fig.colorbar(img, ax=axes[1], label="Transmission loss [dB]")
+    fig.colorbar(img, ax=axes[1], label="Propagation loss [dB]")
     axes[1].set_xlabel("Range [km]")
     axes[1].set_ylabel("Depth [m]")
     axes[1].set_title("Parabolic equation (50 Hz)")
 
-    # (c) Transmission loss vs range: modes and PE agree for a shallow gradient.
+    # (c) Propagation loss vs range: modes and PE agree for a shallow gradient.
     r = np.linspace(100.0, 20_000.0, 400)
     nm = normal_modes(50.0, [0.0, 200.0], [1500.0, 1530.0], source_depth=30.0,
                       receiver_depth=120.0, ranges_m=r, n_depth_points=800)
     pe = parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1530.0], source_depth=30.0,
                             max_range=20_000.0, range_step=20.0, n_depth_points=512)
     zi = int(np.argmin(np.abs(pe.depths - 120.0)))
-    axes[2].plot(nm.ranges / 1000.0, nm.transmission_loss, color=COLOR_PRIMARY,
+    axes[2].plot(nm.ranges / 1000.0, nm.propagation_loss, color=COLOR_PRIMARY,
                  linewidth=1.0, label="Normal modes")
-    axes[2].plot(pe.ranges / 1000.0, pe.transmission_loss[zi], color=COLOR_SECONDARY,
+    axes[2].plot(pe.ranges / 1000.0, pe.propagation_loss[zi], color=COLOR_SECONDARY,
                  linewidth=0.8, alpha=0.7, label="Parabolic equation")
     axes[2].invert_yaxis()
     axes[2].set_xlabel("Range [km]")
-    axes[2].set_ylabel("Transmission loss [dB]")
+    axes[2].set_ylabel("Propagation loss [dB]")
     axes[2].set_title("Modes vs PE (50 Hz, $z$ = 120 m)")
     axes[2].grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     axes[2].legend(loc="upper right", fontsize=9)
@@ -648,18 +648,18 @@ def generate_detection_range(output_dir: str) -> None:
     modes = normal_modes(30.0, [0.0, 100.0], [1500.0, 1500.0],
                          source_depth=25.0, receiver_depth=60.0,
                          ranges_m=ranges, n_depth_points=800)
-    tl = np.asarray(modes.transmission_loss, dtype=float)
+    pl = np.asarray(modes.propagation_loss, dtype=float)
     fom = 60.0
-    ax_m.plot(ranges / 1000.0, tl, color=COLOR_PRIMARY, linewidth=1.2,
-              label="Normal-mode TL (30 Hz, 100 m waveguide, 3 modes)")
+    ax_m.plot(ranges / 1000.0, pl, color=COLOR_PRIMARY, linewidth=1.2,
+              label="Normal-mode PL (30 Hz, 100 m waveguide, 3 modes)")
     ax_m.axhline(fom, color=COLOR_SECONDARY, linewidth=1.8, linestyle="--",
                  label=f"Figure of merit = {fom:.0f} dB")
-    crossings = np.where(np.diff(np.sign(tl - fom)) != 0)[0]
+    crossings = np.where(np.diff(np.sign(pl - fom)) != 0)[0]
     for i, idx in enumerate(crossings):
-        ax_m.plot([ranges[idx] / 1000.0], [tl[idx]], "o", color=COLOR_TERTIARY,
+        ax_m.plot([ranges[idx] / 1000.0], [pl[idx]], "o", color=COLOR_TERTIARY,
                   markersize=6, zorder=5,
                   label="Crossings" if i == 0 else None)
-    first = detection_range_from_curve(fom, ranges, tl, crossing="first")
+    first = detection_range_from_curve(fom, ranges, pl, crossing="first")
     last = float(ranges[crossings[-1]])
     ax_m.annotate(f"first crossing: {first / 1000.0:.2f} km\n"
                   "(what detection_range_from_curve returns)",
@@ -674,7 +674,7 @@ def generate_detection_range(output_dir: str) -> None:
                               "linewidth": 1.0})
     ax_m.invert_yaxis()
     ax_m.set_xlabel("Range [km]")
-    ax_m.set_ylabel("Transmission loss [dB]")
+    ax_m.set_ylabel("Propagation loss [dB]")
     ax_m.set_title(f"Real Waveguide: {len(crossings)} Crossings",
                    pad=12)
     ax_m.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -742,7 +742,7 @@ def generate_normal_modes(output_dir: str) -> None:
 
     ax = axes[2]
     res.plot(ax=ax)
-    ax.set_title("Modal Transmission Loss ($z$ = 100 m)",
+    ax.set_title("Modal Propagation Loss ($z$ = 100 m)",
                  pad=12)
     plt.tight_layout()
     save_figure(output_dir, "normal_modes.svg")
@@ -752,7 +752,7 @@ def generate_normal_modes(output_dir: str) -> None:
 def generate_sonar_budget(output_dir: str) -> None:
     """The worked budget as a picture: every term moves the crossing."""
     print("Generating sonar_budget...")
-    from phonometry import detection_range, passive_sonar_equation, transmission_loss
+    from phonometry import detection_range, passive_sonar_equation, propagation_loss
 
     ranges = np.linspace(50.0, 30_000.0, 800)
     cases = (
@@ -763,19 +763,19 @@ def generate_sonar_budget(output_dir: str) -> None:
          COLOR_SECONDARY, "--"),
     )
     fom_full = float(passive_sonar_equation(
-        source_level=140.0, transmission_loss=np.array([50.0]),
+        source_level=140.0, propagation_loss=np.array([50.0]),
         noise_level=60.0, directivity_index=15.0,
         detection_threshold=8.0).figure_of_merit)
     fom_trim = float(passive_sonar_equation(
-        source_level=140.0, transmission_loss=np.array([50.0]),
+        source_level=140.0, propagation_loss=np.array([50.0]),
         noise_level=60.0, directivity_index=7.5,
         detection_threshold=8.0).figure_of_merit)
 
     _fig, ax = plt.subplots(figsize=(11.0, 6.4))
     for label, freq, law, r0, color, ls in cases:
-        tl = transmission_loss(ranges, freq, law=law, transition_range=r0,
-                               temperature=10.0, salinity=35.0, depth=100.0)
-        ax.plot(ranges / 1000.0, tl.tl, ls, color=color, linewidth=1.9,
+        loss = propagation_loss(ranges, freq, law=law, transition_range=r0,
+                                temperature=10.0, salinity=35.0, depth=100.0)
+        ax.plot(ranges / 1000.0, loss.pl, ls, color=color, linewidth=1.9,
                 label=label)
     for fom, style, lab, dy in (
             (fom_full, "-", f"FOM = {fom_full:.1f} dB (DI 15)", -15),
@@ -798,7 +798,7 @@ def generate_sonar_budget(output_dir: str) -> None:
     ax.set_ylim(40.0, 126.0)
     ax.invert_yaxis()
     ax.set_xlabel("Range [km]")
-    ax.set_ylabel("Transmission loss [dB]")
+    ax.set_ylabel("Propagation loss [dB]")
     ax.set_title("A Passive Sonar Budget, End to End", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -904,48 +904,48 @@ def generate_pe_paraxial_error(output_dir: str) -> None:
                                source_depth=30.0, max_range=6000.0,
                                range_step=5.0, n_depth_points=1024)
     iz = int(np.argmin(np.abs(field.depths - z_rx)))
-    nm = np.asarray(modes.transmission_loss, dtype=float)
-    pe = np.interp(ranges, field.ranges, field.transmission_loss[iz])
+    nm = np.asarray(modes.propagation_loss, dtype=float)
+    pe = np.interp(ranges, field.ranges, field.propagation_loss[iz])
 
-    def _range_average(tl: "np.ndarray", width: int = 61) -> "np.ndarray":
+    def _range_average(pl: "np.ndarray", width: int = 61) -> "np.ndarray":
         """Incoherent (energy-domain) running mean over range."""
         kernel = np.ones(width) / width
-        return -10.0 * np.log10(np.convolve(10.0 ** (-tl / 10.0), kernel,
+        return -10.0 * np.log10(np.convolve(10.0 ** (-pl / 10.0), kernel,
                                             mode="same"))
 
     sm_nm, sm_pe = _range_average(nm), _range_average(pe)
     inner = (ranges > 300.0) & (ranges < 5700.0)
     bias = float(np.mean(sm_pe[inner] - sm_nm[inner]))
 
-    fig, (ax_tl, ax_ang) = plt.subplots(
+    fig, (ax_pl, ax_ang) = plt.subplots(
         1, 2, figsize=(13.5, 5.6), gridspec_kw={"width_ratios": [2.0, 1.0]})
 
     # The unsmoothed traces are the interference pattern the range average is
     # taken over: they belong behind their own smoothed curve, which is a
     # matter of shade and width, not of opacity. At a third of the opacity
     # both of these landed within half a level of the dark page.
-    ax_tl.plot(ranges / 1000.0, nm,
-               color=theme_line(COLOR_PRIMARY, ax_tl, quiet=0.35), linewidth=0.7)
-    ax_tl.plot(ranges / 1000.0, pe,
-               color=theme_line(COLOR_SECONDARY, ax_tl, quiet=0.35), linewidth=0.7)
-    ax_tl.plot(ranges[inner] / 1000.0, sm_nm[inner], color=COLOR_PRIMARY,
+    ax_pl.plot(ranges / 1000.0, nm,
+               color=theme_line(COLOR_PRIMARY, ax_pl, quiet=0.35), linewidth=0.7)
+    ax_pl.plot(ranges / 1000.0, pe,
+               color=theme_line(COLOR_SECONDARY, ax_pl, quiet=0.35), linewidth=0.7)
+    ax_pl.plot(ranges[inner] / 1000.0, sm_nm[inner], color=COLOR_PRIMARY,
                linewidth=2.2, label="Normal modes, range-averaged (reference)")
-    ax_tl.plot(ranges[inner] / 1000.0, sm_pe[inner], color=COLOR_SECONDARY,
+    ax_pl.plot(ranges[inner] / 1000.0, sm_pe[inner], color=COLOR_SECONDARY,
                linewidth=2.2, label="Parabolic equation, range-averaged")
-    ax_tl.set_ylim(30.0, 92.0)
-    ax_tl.invert_yaxis()
-    ax_tl.set_xlabel("Range [km]")
-    ax_tl.set_ylabel("Transmission loss [dB]")
-    ax_tl.set_title("50 Hz in 100 m of Water, Receiver at 60 m",
+    ax_pl.set_ylim(30.0, 92.0)
+    ax_pl.invert_yaxis()
+    ax_pl.set_xlabel("Range [km]")
+    ax_pl.set_ylabel("Propagation loss [dB]")
+    ax_pl.set_title("50 Hz in 100 m of Water, Receiver at 60 m",
                     pad=12)
-    ax_tl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
-    ax_tl.set_axisbelow(True)
-    ax_tl.legend(loc="lower right", fontsize=9)
-    ax_tl.text(0.03, 0.06,
+    ax_pl.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax_pl.set_axisbelow(True)
+    ax_pl.legend(loc="lower right", fontsize=9)
+    ax_pl.text(0.03, 0.06,
                f"the PE loses {bias:.1f} dB of level at every range,\n"
                "and the offset does not shrink: an ideal\n"
                "waveguide strips nothing away",
-               transform=ax_tl.transAxes, fontsize=9, color=COLOR_FG,
+               transform=ax_pl.transAxes, fontsize=9, color=COLOR_FG,
                bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
                      "edgecolor": COLOR_GRID})
 

@@ -11,7 +11,7 @@ references:
     issue: 3
     pages: "896-907"
     doi: "10.1121/1.388170"
-    note: "The pure-water and magnesium-sulfate halves of the default absorption model of the transmission-loss section."
+    note: "The pure-water and magnesium-sulfate halves of the default absorption model of the propagation-loss section."
   - type: article
     authors: ["Francois, R. E.", "Garrison, G. R."]
     year: 1982
@@ -165,7 +165,7 @@ import ThemeImage from '../../../components/ThemeImage.astro';
 import Video from '../../../components/Video.astro';
 
 This page computes what the sea does to a sound level in closed form, without
-simulating a field. By the end you can put a number on the transmission loss of
+simulating a field. By the end you can put a number on the propagation loss of
 a path, choose the absorption and sound-speed models that suit your water,
 follow Weston's four shallow-water regimes as the sea floor takes over from
 geometry, balance a passive or active sonar equation and invert it for a
@@ -176,25 +176,25 @@ The reference levels every result is expressed in are on the
 refraction and boundaries decide the answer, the
 [solvers](/phonometry/underwater/underwater-solvers/) take over.
 
-## Transmission loss
+## Propagation loss
 
-**Two quantities, and ISO 18405 keeps them apart.** *Transmission loss* is the
-reduction in a specified level between two specified points; *propagation loss*
-is the difference between the source level and the mean-square sound pressure
-level at a position, referred to 1 m². The sonar equation needs the
-source-referred quantity, so what this page actually computes is a propagation
-loss — and the standard deprecates using either name as a synonym for the
-other, even though the literature and the function name `transmission_loss`
-follow the older usage. Either quantity has to be quoted with the averaging time
-and the frequency range it applies to. On the geometries of this page the two
-are numerically interchangeable, because the reference range is 1 m in both, and
-that is why the Weston propagation loss below is plotted on the same axis as the
-transmission loss here.
+**Two quantities, and ISO 18405 keeps them apart.** *Propagation loss* $N_{PL}$
+is the difference between the source level in a specified direction and the
+mean-square sound pressure level at a specified position, $N_{PL}(x) = L_S -
+L_p(x)$, referred to 1 m² (clause 3.4.1.4). *Transmission loss* $\Delta L_{TL}$
+is the reduction in a specified level between two specified points (clause
+3.4.1.3). The sonar equation needs the source-referred quantity, so what this
+page computes is a propagation loss, and that is what the function is called.
+The standard deprecates each name as a synonym of the other, in both
+directions, which is why so much of the literature calls this quantity a
+transmission loss and why this library stopped. Either quantity has to be
+quoted with the averaging time and the frequency range it applies to. Weston's
+regimes below are the same quantity on the same axis.
 
-The transmission loss is
+The propagation loss is
 
 $$
-TL = \text{spreading} + \alpha R .
+PL = \text{spreading} + \alpha R .
 $$
 
 Geometrical spreading is $20 \log_{10} R$ (spherical), $10 \log_{10} R$ (cylindrical) or
@@ -205,7 +205,7 @@ the reference), **Ainslie-McColm** (`"ainslie-mccolm"`, 1998) or **Thorp**
 (`"thorp"`, 1967, frequency-only); the first two agree to within ~10 % across
 100 Hz-1 MHz.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_transmission_loss.svg" alt="Underwater transmission loss versus range at 10 kHz with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%" loading="eager" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/underwater_propagation_loss.svg" alt="Underwater propagation loss versus range at 10 kHz with the geometrical-spreading and volume-absorption contributions drawn separately, loss increasing downward" width="82%" loading="eager" />
 
 *The two terms trade places with range, which is why they are drawn apart. Out
 to the 1 km transition the loss is spreading and almost nothing else: 61.0 dB
@@ -225,11 +225,11 @@ from phonometry import underwater
 
 # 10 kHz at 10 °C, 35 ppt, 100 m depth; practical spreading with R0 = 1000 m.
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical",
+pl = underwater.propagation_loss(ranges, 10e3, law="practical",
                                   transition_range=1000.0, temperature=10.0,
                                   salinity=35.0, depth=100.0)
-print(f"alpha = {tl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
-tl.plot()   # total TL with the spreading and absorption contributions
+print(f"alpha = {pl.absorption_coefficient:.2f} dB/km")   # alpha = 0.95 dB/km
+pl.plot()   # total PL with the spreading and absorption contributions
 plt.show()
 ```
 
@@ -240,20 +240,20 @@ import numpy as np
 from phonometry import underwater
 
 ranges = np.linspace(10.0, 20_000.0, 400)
-tl = underwater.transmission_loss(ranges, 10e3, law="practical", transition_range=1000.0,
+pl = underwater.propagation_loss(ranges, 10e3, law="practical", transition_range=1000.0,
                           temperature=10.0, salinity=35.0, depth=100.0)
-print(round(tl.absorption_coefficient, 3), round(float(tl.tl[-1]), 1))
+print(round(pl.absorption_coefficient, 3), round(float(pl.pl[-1]), 1))
 # 0.95 dB/km, 92.0 dB at 20 km
 
 # The same case on the other two absorption models, so the agreement claim
 # above is checkable rather than asserted:
 for model in ("ainslie-mccolm", "thorp"):
-    other = underwater.transmission_loss(ranges, 10e3, law="practical",
+    other = underwater.propagation_loss(ranges, 10e3, law="practical",
                               transition_range=1000.0, temperature=10.0,
                               salinity=35.0, depth=100.0, model=model)
     print(model, round(other.absorption_coefficient, 3))   # 0.973 / 1.15
 
-tl.plot()   # TL vs range with the spreading/absorption split (needs matplotlib)
+pl.plot()   # PL vs range with the spreading/absorption split (needs matplotlib)
 ```
 
 Two arguments in that call decide more than they look. `depth` is only the depth
@@ -336,7 +336,7 @@ plus the waveguide cut-off frequency and the number of cut-on modes. What it
 returns is a **propagation loss** $PL = -10\log_{10} F$: the incoherent,
 range-averaged ratio of the received to the source mean-square pressure, with
 the absorption term added separately. For the geometries of this page it is
-directly comparable with the transmission loss above and with the depth-averaged
+directly comparable with the propagation loss above and with the depth-averaged
 modal result — the difference between the two ISO 18405 quantities is the
 reference-range convention, not the physics — which is why the two are plotted
 on the same axis.
@@ -540,15 +540,15 @@ kilometres.
 ## Sonar equation
 
 The sonar equation gives the **signal excess** $SE$ (detection when
-$SE \ge 0$) and the **figure of merit** (the maximum allowable transmission
+$SE \ge 0$) and the **figure of merit** (the maximum allowable propagation
 loss at $SE = 0$):
 
 $$
-SE = SL - TL - (NL - DI) - DT \ \ \text{(passive)},
+SE = SL - PL - (NL - DI) - DT \ \ \text{(passive)},
 $$
 
 $$
-SE = SL - 2\,TL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
+SE = SL - 2\,PL + TS - (NL - DI) - DT \ \ \text{(active, monostatic)},
 $$
 
 or reverberation-limited with $RL$ in place of $NL - DI$.
@@ -556,17 +556,17 @@ or reverberation-limited with $RL$ in place of $NL - DI$.
 Those two forms are two geometries. In the passive case the target radiates and
 the sound travels one way; in the active case the sonar radiates, the target
 scatters a fraction of what reaches it back, and the loss is paid twice — which
-is why $TL$ appears doubled and $TS$ appears at all. Reverberation is not
+is why $PL$ appears doubled and $TS$ appears at all. Reverberation is not
 ambient noise: it is the sonar's own transmission scattered back by the surface,
 the volume and the seabed, so it scales with the transmitted level and replaces
 $NL - DI$ rather than adding to it.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation.svg" alt="The two sonar geometries: passive, with a radiating target, a one-way transmission loss, an isotropic ambient noise field, a receiving array with its directivity index and a detector with its detection threshold; and active monostatic, with the transmitter and receiver at one point, outbound and return transmission losses, a target strength drawn as a backscattered lobe, and surface, volume and bottom scattering feeding a reverberation level that replaces the noise term" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_sonar_equation.svg" alt="The two sonar geometries: passive, with a radiating target, a one-way propagation loss, an isotropic ambient noise field, a receiving array with its directivity index and a detector with its detection threshold; and active monostatic, with the transmitter and receiver at one point, outbound and return propagation losses, a target strength drawn as a backscattered lobe, and surface, volume and bottom scattering feeding a reverberation level that replaces the noise term" width="92%" />
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with transmission loss and crossing zero, the detection limit, at the figure of merit" width="82%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sonar_equation.svg" alt="The passive sonar equation: signal excess falling with propagation loss and crossing zero, the detection limit, at the figure of merit" width="82%" />
 
 *A straight line of slope −1, and its intercept is the whole design. Signal
-excess falls decibel for decibel with transmission loss and crosses zero at
+excess falls decibel for decibel with propagation loss and crosses zero at
 $FOM = SL - (NL - DI) - DT$ = 140 − (60 − 15) − 8 = 87.0 dB, so the sonar
 detects wherever the channel loses less than 87 dB and nowhere else. Every term
 moves the line vertically and none of them changes its slope: 6 dB more array
@@ -581,12 +581,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                        noise_level=60.0, directivity_index=15.0,
                                        detection_threshold=8.0)
 print(f"figure of merit = {se.figure_of_merit:.1f} dB")  # figure of merit = 87.0 dB
-se.plot()   # signal excess vs transmission loss, zero crossing at the FOM
+se.plot()   # signal excess vs propagation loss, zero crossing at the FOM
 plt.show()
 ```
 
@@ -596,16 +596,16 @@ plt.show()
 import numpy as np
 from phonometry import underwater
 
-tl = np.linspace(40.0, 120.0, 400)
-se = underwater.passive_sonar_equation(source_level=140.0, transmission_loss=tl,
+pl = np.linspace(40.0, 120.0, 400)
+se = underwater.passive_sonar_equation(source_level=140.0, propagation_loss=pl,
                                noise_level=60.0, directivity_index=15.0,
                                detection_threshold=8.0)
 print(se.figure_of_merit)
-se.plot()   # signal excess vs transmission loss (needs matplotlib)
+se.plot()   # signal excess vs propagation loss (needs matplotlib)
 ```
 
-The terms, once: $SL$ the source level of the target, $TL$ the one-way
-transmission loss, $NL$ the noise level at the receiver, $DI$ the directivity
+The terms, once: $SL$ the source level of the target, $PL$ the one-way
+propagation loss, $NL$ the noise level at the receiver, $DI$ the directivity
 index (array gain), $DT$ the detection threshold and, for the active form, $TS$
 the target strength.
 
@@ -630,12 +630,12 @@ conversion.
 The figure of merit is quoted below as "dB re m²": Ainslie writes it as a
 maximum *propagation factor* rather than as a loss, and the propagation factor
 has units of m², so the same number that reads as a maximum allowable
-transmission loss in decibels reads as a figure of merit re 1 m².
+propagation loss in decibels reads as a figure of merit re 1 m².
 
 ### Detection range
 
-Since the figure of merit *is* the maximum allowable transmission loss,
-inverting a loss law at $TL = FOM$ gives the **detection range**, the range at
+Since the figure of merit *is* the maximum allowable propagation loss,
+inverting a loss law at $PL = FOM$ gives the **detection range**, the range at
 which the detection probability is 50 %. `detection_range` inverts the
 closed-form loss above, which grows monotonically with range and therefore has
 a single crossing; `detection_range_from_curve` reads the crossing off any
@@ -648,7 +648,7 @@ from phonometry import underwater
 # Ainslie's active CW example: FOM = 82.7 dB re m2 at 50 kHz -> r50 ~ 1.3 km.
 res = underwater.detection_range(82.7, 50e3)
 print(res.detection_range)          # metres
-res.plot()                          # TL vs FOM with the crossing marked
+res.plot()                          # PL vs FOM with the crossing marked
 ```
 
 That call carries four silent defaults: `law="spherical"`, 10 °C, 35 ppt and
@@ -659,7 +659,7 @@ dominates, the temperature and depth passed to it are not decorative either.
 Reach for `detection_range_from_curve` whenever the loss came from a solver
 instead of a law.
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detection_range.svg" alt="Left, the closed-form transmission loss for Ainslie's 50 kilohertz active example crossing a figure of merit of 82.7 decibels once, at 1319 metres; right, a 30 hertz normal-mode transmission loss in a 100 metre waveguide crossing a figure of merit of 60 decibels eight times between 1 and 6 kilometres, with the first crossing and the last one marked" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/detection_range.svg" alt="Left, the closed-form propagation loss for Ainslie's 50 kilohertz active example crossing a figure of merit of 82.7 decibels once, at 1319 metres; right, a 30 hertz normal-mode propagation loss in a 100 metre waveguide crossing a figure of merit of 60 decibels eight times between 1 and 6 kilometres, with the first crossing and the last one marked" width="92%" />
 
 *The closed-form loss grows monotonically, so the crossing is unique and
 `detection_range` can return it. A real waveguide's loss oscillates: here the
@@ -683,12 +683,12 @@ ranges = np.linspace(200.0, 6000.0, 1200)
 modes = underwater.normal_modes(30.0, [0.0, 100.0], [1500.0, 1500.0],
                                 source_depth=25.0, receiver_depth=60.0,
                                 ranges_m=ranges, n_depth_points=800)
-tl = np.asarray(modes.transmission_loss)
-ax_m.plot(ranges / 1000.0, tl, label="Normal-mode TL (30 Hz, 100 m)")
+pl = np.asarray(modes.propagation_loss)
+ax_m.plot(ranges / 1000.0, pl, label="Normal-mode PL (30 Hz, 100 m)")
 ax_m.axhline(60.0, linestyle="--", label="Figure of merit = 60 dB")
-print(underwater.detection_range_from_curve(60.0, ranges, tl))   # first crossing
+print(underwater.detection_range_from_curve(60.0, ranges, pl))   # first crossing
 ax_m.invert_yaxis()
-ax_m.set(xlabel="Range [km]", ylabel="Transmission loss [dB]")
+ax_m.set(xlabel="Range [km]", ylabel="Propagation loss [dB]")
 ax_m.legend()
 plt.show()
 ```
@@ -959,16 +959,16 @@ print(underwater.VESSEL_CLASSES)        # the 13 JOMOPANS-ECHO vessel classes
 # `source_psd` is a SOURCE level at 1 m; the `shipping` term of the ambient sum
 # is a RECEIVED spectrum level at the listening position. Propagation is the
 # step between them - here that one ship, 2 km away.
-tl = np.array([float(underwater.transmission_loss(
-    2000.0, float(f), law="practical", transition_range=1000.0).tl[0])
+pl = np.array([float(underwater.propagation_loss(
+    2000.0, float(f), law="practical", transition_range=1000.0).pl[0])
     for f in ship.frequency])
-received = ship.source_psd - tl
+received = ship.source_psd - pl
 noise = underwater.ocean_ambient_noise(ship.frequency, wind_speed_knots=10.0,
                                shipping=received)
 print(round(float(np.interp(100.0, ship.frequency, noise.spectrum_level)), 1))
 # 97.6 dB re 1 uPa^2/Hz at 100 Hz, against 72.7 for the wind alone. Passing
 # ship.source_psd straight in would print 160.6: a source level is not a
-# received one, and the error is the whole transmission loss.
+# received one, and the error is the whole propagation loss.
 ```
 
 Even that is a single-ship estimate. Measured shipping noise at a site is the
@@ -992,7 +992,7 @@ closed forms, have their own guide:
 <Scope>
 <ScopeClaim status="covered" label="Covered">
 ISO 18405:2017 terminology (propagation loss, source level, levels re 1 µPa)
-underlies every quantity on this page. `transmission_loss` and
+underlies every quantity on this page. `propagation_loss` and
 `seawater_absorption` implement geometrical spreading plus the
 Francois-Garrison (1982, default), Ainslie-McColm (1998) or Thorp (1967)
 absorption models. `sea_water_sound_speed` and `sound_speed_profile` implement
@@ -1004,7 +1004,7 @@ Weston energy-flux regimes and their transition ranges (Ainslie section
 9.1.1.2, Table 9.1). `passive_sonar_equation` and `active_sonar_equation`
 implement the passive and monostatic active sonar equations (Urick, via Etter
 2003), and `detection_range` / `detection_range_from_curve` invert a
-transmission loss at the figure of merit. `seabed_reflection` and
+propagation loss at the figure of merit. `seabed_reflection` and
 `bottom_reflection_loss` implement the fluid-fluid Rayleigh reflection
 coefficient and critical angle (Medwin & Clay). `ocean_ambient_noise` sums the
 Wenz wind "rule of fives" and Mellen thermal-noise components.

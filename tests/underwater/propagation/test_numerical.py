@@ -46,7 +46,7 @@ def test_normal_modes_ideal_waveguide_wavenumbers() -> None:
     assert np.allclose(res.wavenumbers[:m_max], kr_exact, atol=1e-4)
 
 
-def test_normal_modes_tl_matches_analytic_modal_sum() -> None:
+def test_normal_modes_pl_matches_analytic_modal_sum() -> None:
     D, c, f, rho = 100.0, 1500.0, 20.0, 1000.0
     zs, zr = 36.0, 46.0
     r = np.linspace(100.0, 10_000.0, 200)
@@ -60,8 +60,8 @@ def test_normal_modes_tl_matches_analytic_modal_sum() -> None:
     psir = np.sqrt(2 * rho / D) * np.sin(kzm * zr)
     modal = (psis * psir / np.sqrt(kr))[:, None] * np.exp(1j * kr[:, None] * r[None, :])
     field = (1j / (rho * np.sqrt(8 * np.pi * r))) * np.exp(-1j * np.pi / 4) * modal.sum(0)
-    tl_exact = -20 * np.log10(np.abs(field) / (1 / (4 * np.pi)))
-    assert np.max(np.abs(res.transmission_loss - tl_exact)) < 0.05
+    pl_exact = -20 * np.log10(np.abs(field) / (1 / (4 * np.pi)))
+    assert np.max(np.abs(res.propagation_loss - pl_exact)) < 0.05
 
 
 def test_normal_modes_rigid_bottom_wavenumbers() -> None:
@@ -328,7 +328,7 @@ def test_ray_travel_time_increases_monotonically_along_every_ray() -> None:
 
 
 def test_parabolic_equation_free_field_spherical_spreading() -> None:
-    # In a deep homogeneous medium the PE reproduces TL = 20 log10(r) at the
+    # In a deep homogeneous medium the PE reproduces PL = 20 log10(r) at the
     # source depth (spherical spreading) before any boundary interaction.
     D, zs = 20_000.0, 10_000.0
     res = parabolic_equation(50.0, np.array([0.0, D]), np.array([1500.0, 1500.0]),
@@ -338,12 +338,12 @@ def test_parabolic_equation_free_field_spherical_spreading() -> None:
     zi = int(np.argmin(np.abs(res.depths - zs)))
     r = res.ranges
     mask = (r > 500.0) & (r < 3000.0)
-    d = res.transmission_loss[zi][mask] - 20 * np.log10(r[mask])
+    d = res.propagation_loss[zi][mask] - 20 * np.log10(r[mask])
     assert np.max(np.abs(d)) < 0.05
 
 
 def test_parabolic_equation_tracks_normal_modes_trend() -> None:
-    # Smoothed (incoherent) PE and normal-mode TL agree in trend within a few dB
+    # Smoothed (incoherent) PE and normal-mode PL agree in trend within a few dB
     # for a range-independent, depth-VARYING waveguide (exercises the PE's
     # refraction term n²≠1, not just free propagation).
     D, f = 200.0, 50.0
@@ -355,13 +355,13 @@ def test_parabolic_equation_tracks_normal_modes_trend() -> None:
     pe = parabolic_equation(f, *prof, source_depth=zs, max_range=9500.0,
                             range_step=5.0, n_depth_points=1024)
     zi = int(np.argmin(np.abs(pe.depths - zr)))
-    pe_tl = np.interp(r, pe.ranges, pe.transmission_loss[zi])
+    pe_pl = np.interp(r, pe.ranges, pe.propagation_loss[zi])
 
-    def smooth(tl: np.ndarray) -> np.ndarray:
+    def smooth(pl: np.ndarray) -> np.ndarray:
         w = np.ones(21) / 21
-        return -10 * np.log10(np.convolve(10 ** (-tl / 10), w, mode="same"))
+        return -10 * np.log10(np.convolve(10 ** (-pl / 10), w, mode="same"))
 
-    diff = smooth(pe_tl) - smooth(nm.transmission_loss)
+    diff = smooth(pe_pl) - smooth(nm.propagation_loss)
     core = diff[20:-20]
     # constant offset from the Gaussian starter's angular spectrum; low scatter.
     assert core.std() < 2.0
@@ -414,24 +414,24 @@ def test_plots_smoke() -> None:
     assert pe.plot() is not None
 
 
-# Independent absolute TL anchors: converged image-source sum (|m| <= 4000)
+# Independent absolute PL anchors: converged image-source sum (|m| <= 4000)
 # for the ideal pressure-release waveguide D = 100 m, c = 1500 m/s, f = 20 Hz,
-# zs = 36 m, zr = 46 m, rho = 1000 kg/m3, TL = -20*lg(4*pi*|p|). Unlike the
+# zs = 36 m, zr = 46 m, rho = 1000 kg/m3, PL = -20*lg(4*pi*|p|). Unlike the
 # analytic modal-sum test, this oracle does not share the Eq. 5.14 prefactor
 # with the implementation, so it pins the absolute calibration.
-_IMAGE_SOURCE_TL = [
+_IMAGE_SOURCE_PL = [
     (200.0, 39.145), (500.0, 42.297), (1000.0, 48.238),
     (3000.0, 52.137), (5000.0, 53.165),
 ]
 
 
 def test_normal_modes_match_image_source_oracle() -> None:
-    ranges = [r for r, _ in _IMAGE_SOURCE_TL]
+    ranges = [r for r, _ in _IMAGE_SOURCE_PL]
     res = normal_modes(20.0, [0.0, 100.0], [1500.0, 1500.0],
                        source_depth=36.0, receiver_depth=46.0,
                        ranges_m=ranges, n_depth_points=3000)
-    for (rng, tl_ref), tl_mod in zip(_IMAGE_SOURCE_TL, res.transmission_loss):
-        assert tl_mod == pytest.approx(tl_ref, abs=0.02), rng
+    for (rng, pl_ref), pl_mod in zip(_IMAGE_SOURCE_PL, res.propagation_loss):
+        assert pl_mod == pytest.approx(pl_ref, abs=0.02), rng
 
 
 def test_parabolic_equation_long_range_absolute_anchor() -> None:
@@ -441,5 +441,5 @@ def test_parabolic_equation_long_range_absolute_anchor() -> None:
                              source_depth=36.0, max_range=5000.0,
                              range_step=5.0, n_depth_points=1024)
     iz = int(np.argmin(np.abs(res.depths - 46.0)))
-    tl = float(res.transmission_loss[iz, -1])
-    assert tl == pytest.approx(53.165, abs=0.05)
+    pl = float(res.propagation_loss[iz, -1])
+    assert pl == pytest.approx(53.165, abs=0.05)

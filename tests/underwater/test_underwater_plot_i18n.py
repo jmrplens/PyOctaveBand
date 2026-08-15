@@ -22,7 +22,7 @@ def _result() -> object:
 def test_plot_default_is_english() -> None:
     ax = _result().plot()
     assert ax.get_title() == "Sonar equation"
-    assert ax.get_xlabel() == "Transmission loss [dB]"
+    assert ax.get_xlabel() == "Propagation loss [dB]"
     assert ax.get_ylabel() == "Signal excess [dB]"
     plt.close("all")
 
@@ -120,10 +120,10 @@ def test_detection_range_plot_labels() -> None:
 
     res = detection_range(78.0, 300.0)
     ax = res.plot()
-    assert ax.get_title() == "Transmission loss vs figure of merit"
+    assert ax.get_title() == "Propagation loss vs figure of merit"
     ax_es = res.plot(language="es")
     labels = [t.get_text() for t in ax_es.get_legend().get_texts()]
-    assert ax_es.get_title() == "Pérdida por transmisión frente a cifra de mérito"
+    assert ax_es.get_title() == "Pérdida de propagación frente a cifra de mérito"
     assert any(text.startswith("Alcance de detección") for text in labels)
     plt.close("all")
 

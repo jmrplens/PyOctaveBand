@@ -733,6 +733,12 @@ def _type_name(obj: object) -> str:
         return cls.__qualname__
     if cls.__module__ == "types" and cls.__qualname__ == "MappingProxyType":
         return "mapping"
+    # A typing alias is its own documentation: `Literal["a", "b"]` says what
+    # the name accepts, where the class behind it is a private implementation
+    # detail (`typing._LiteralGenericAlias`) that tells a reader nothing and
+    # names something they must not import.
+    if cls.__module__ == "typing":
+        return str(obj).replace("typing.", "")
     return f"{cls.__module__}.{cls.__qualname__}"
 
 

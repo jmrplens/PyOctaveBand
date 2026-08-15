@@ -530,8 +530,8 @@ from .underwater import (
     generate_sonar_budget,
     generate_sonar_equation,
     generate_sound_speed_models,
+    generate_underwater_propagation_loss,
     generate_underwater_sound_speed,
-    generate_underwater_transmission_loss,
     generate_weston_regimes,
 )
 from .vibration import (
@@ -930,9 +930,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_epnl,
     # Wind-turbine noise: IEC 61400-11 tonal audibility.
     generate_wind_turbine_tonality,
-    # Underwater propagation: transmission loss, sound-speed profile and the
+    # Underwater propagation: propagation loss, sound-speed profile and the
     # sonar equation.
-    generate_underwater_transmission_loss,
+    generate_underwater_propagation_loss,
     generate_weston_regimes,
     generate_underwater_sound_speed,
     generate_sonar_equation,

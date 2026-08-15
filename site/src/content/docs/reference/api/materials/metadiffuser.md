@@ -238,3 +238,39 @@ $a = L / M$ for a panel of depth `L` and `M` resonators. All
 lengths are in metres. A `None` entry in a well sequence stands for a
 flat rigid strip of the panel face ($R = 1$), the `+1` state of
 ternary-sequence designs.
+
+## plot_metadiffuser_panel_geometry
+
+```python
+plot_metadiffuser_panel_geometry(
+    wells: Sequence[Any],
+    ax: Axes | None = None,
+    *,
+    depth: float,
+    period: float,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Draw one period of a metadiffuser panel, to scale.
+
+Side cut of the slotted panel (Sci. Rep. 7:5389 Fig. 1(b)): the face
+runs along the top with the sound arriving from above, the wells
+repeat horizontally at the pitch `d`, and each well is a slit of
+height `h_n` descending the panel depth, loaded by its resonators
+at the lattice step `a = L / M` shelved sideways into the septum;
+`None` wells are flat rigid strips; rigid back wall underneath.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `wells` | The well sequence of [`metadiffuser_reflection`](/phonometry/reference/api/materials/metadiffuser/#metadiffuser_reflection) ([`MetadiffuserWell`](/phonometry/reference/api/materials/metadiffuser/#metadiffuserwell) or `None` per well). |
+| `ax` | Existing axes, or `None` to create a figure. |
+| `depth` | Panel depth `L`, in metres. |
+| `period` | Well pitch `d`, in metres. |
+| `language` | Label language, `"en"` (default) or `"es"`. |
+| `kwargs` | Forwarded to the slit rectangles. |
+
+**Returns:** The axes.
