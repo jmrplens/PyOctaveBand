@@ -1010,7 +1010,7 @@ def _d_soundfield_audiometry(s: SVG, th: Theme) -> None:
 
     # ---------------- C - the earphone condition, for contrast ------------
     xc = px0[2]
-    room(xc, "C · Earphone — not this standard",
+    room(xc, "C · Earphone: not this standard",
          "supra-aural or insert · monaural", th.secondary)
     s.ground(gy, xc, xc + pw)
     sx = xc + 74.0
