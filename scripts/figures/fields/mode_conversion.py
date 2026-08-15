@@ -280,7 +280,7 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
     # fig.text does not claim space from the constrained layout on its own.
     fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
     fig.suptitle(T("Mode conversion: water on steel, three incidences "
-                   "(elastic 2D FDTD)"), fontweight="bold")
+                   "(elastic 2D FDTD)"))
     axes = fig.subplots(1, 3, sharey=True)
     ims: list[Any] = []
     v_txts: list[Any] = []
@@ -292,7 +292,7 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
                        aspect="equal", interpolation="bilinear")
         ax.axhline(0.0, color=FIELD_INK, lw=1.0, zorder=4)
         ax.set_title(T(f"$\\theta$ = {theta:.0f}°"), fontsize=10,
-                     fontweight="bold")
+                     )
         ax.tick_params(labelsize=7)
         ax.set_xlabel("x [mm]", fontsize=8)
         # Incident beam arrow, drawn from the top of the frame down onto

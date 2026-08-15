@@ -43,7 +43,7 @@ def generate_tone_burst_train(output_dir: str) -> None:
     axes[0].plot(t_ms, -single.envelope, color=COLOR_SECONDARY, linewidth=1.6,
                  linestyle="--")
     axes[0].set_title("Single 5 ms burst of 5 kHz tone (25 full periods)",
-                      fontweight="bold")
+                      )
     axes[0].set_xlabel("Time [ms]")
     axes[0].legend(loc="upper right", fontsize=9)
 
@@ -54,7 +54,7 @@ def generate_tone_burst_train(output_dir: str) -> None:
     axes[1].plot(t_s, -train.envelope, color=COLOR_SECONDARY, linewidth=1.6,
                  linestyle="--")
     axes[1].set_title("Repetitive train: 10 bursts per second (duty cycle 5 %)",
-                      fontweight="bold")
+                      )
     axes[1].set_xlabel("Time [s]")
     axes[1].legend(loc="upper right", fontsize=9)
 
@@ -62,7 +62,7 @@ def generate_tone_burst_train(output_dir: str) -> None:
         ax.set_ylabel("Amplitude")
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
         ax.set_axisbelow(True)
-    fig.suptitle("Tone-Burst Test Signal (IEC 60268-1)", fontweight="bold")
+    fig.suptitle("Tone-Burst Test Signal (IEC 60268-1)")
     plt.tight_layout()
     save_figure(output_dir, "tone_burst_train.svg")
     plt.close()
@@ -112,7 +112,7 @@ def generate_regularized_inversion(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Magnitude [dB]")
     ax.set_title("Regularized Spectral Inversion (Kirkeby Frequency-"
-                 "Dependent Regularization)", fontweight="bold", pad=12)
+                 "Dependent Regularization)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.legend(loc="lower center", fontsize=9)
@@ -156,7 +156,7 @@ def generate_shaped_sweep(output_dir: str) -> None:
     axes[0].set_ylabel("Amplitude")
     axes[0].set_xlim(0.0, float(t[-1]))
     axes[0].set_title("Shaped Sweep with an Arbitrary Target Spectrum "
-                      "(Group-Delay Synthesis)", fontweight="bold", pad=12)
+                      "(Group-Delay Synthesis)", pad=12)
     axes[0].grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     axes[0].set_axisbelow(True)
     axes[0].text(0.985, 0.95,
@@ -220,7 +220,7 @@ def generate_resampling_antialias(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Magnitude [dB]")
     ax.set_title("Polyphase Resampling 44.1 kHz → 48 kHz: "
-                 "the Delivered Anti-Alias Filter", fontweight="bold", pad=12)
+                 "the Delivered Anti-Alias Filter", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
@@ -266,7 +266,7 @@ def generate_golay_ir(output_dir: str) -> None:
     ax.set_xlabel("Time [ms]")
     ax.set_ylabel("Amplitude")
     ax.set_title("Golay-Pair Impulse Response: Exact Complementary Recovery",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)

@@ -131,7 +131,7 @@ _STRINGS: dict[str, str] = {
     "highpass": "paso alto",
     "Liftering at {q} ms ({mode})": "Liftering a {q} ms ({mode})",
     "Searched band": "Banda de búsqueda",
-    "Echo: {delay} ms, a = {a}": "Eco: {delay} ms, a = {a}",
+    "Echo: {delay} ms, $a$ = {a}": "Eco: {delay} ms, $a$ = {a}",
     "Echo detection on the power cepstrum":
         "Detección de ecos en el cepstro de potencia",
     "Envelope ({kind})": "Envolvente ({kind})",
@@ -142,7 +142,7 @@ _STRINGS: dict[str, str] = {
     "Envelope spectrum (Bendat & Piersol 13.3)":
         "Espectro de la envolvente (Bendat y Piersol 13.3)",
     "Measured phase": "Fase medida",
-    "Minimum phase (from |H|)": "Fase mínima (de |H|)",
+    "Minimum phase (from $|H|$)": "Fase mínima (de $|H|$)",
     "Excess phase (all-pass)": "Fase de exceso (pasa-todo)",
     "Phase decomposition": "Descomposición de fase",
     "Minimum-phase / all-pass decomposition":
@@ -157,7 +157,7 @@ _STRINGS: dict[str, str] = {
         "Salva de tono (IEC 60268-1): {f} Hz, {cycles} ciclos",
     "Tone burst (IEC 60268-1): {f} Hz, {cycles} cycles, {rate}/s":
         "Salva de tono (IEC 60268-1): {f} Hz, {cycles} ciclos, {rate}/s",
-    "Window w[m]": "Ventana w[m]",
+    "Window $w[m]$": "Ventana $w[m]$",
     "Sample": "Muestra",
     "Frequency offset [DFT bins]":
         "Desplazamiento en frecuencia [bins de la DFT]",
@@ -181,8 +181,8 @@ _STRINGS: dict[str, str] = {
         "Inversión regularizada (Kirkeby) — planitud {flat} dB",
     "Time synchronous average (McFadden 1987)":
         "Promediado síncrono en el tiempo (McFadden 1987)",
-    "Averaged periodic waveform (N = {n})":
-        "Forma de onda periódica promediada (N = {n})",
+    "Averaged periodic waveform ($N$ = {n})":
+        "Forma de onda periódica promediada ($N$ = {n})",
     "Time [ms]": "Tiempo [ms]",
     "Frequency [orders]": "Frecuencia [órdenes]",
     "Comb filter $|C(f)|$ (Eq. 8)": "Filtro peine $|C(f)|$ (Ec. 8)",
@@ -194,8 +194,8 @@ _STRINGS: dict[str, str] = {
     "Design attenuation −{a} dB": "Atenuación de diseño −{a} dB",
     "Rejected band (would fold back as aliases)":
         "Banda rechazada (se plegaría como alias)",
-    "Polyphase resampling {fs0} Hz → {fs1} Hz (L/M = {up}/{down}, {taps} taps)":
-        "Remuestreo polifásico {fs0} Hz → {fs1} Hz (L/M = {up}/{down}, {taps} coeficientes)",
+    "Polyphase resampling {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, {taps} taps)":
+        "Remuestreo polifásico {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, {taps} coeficientes)",
 }
 
 
@@ -736,7 +736,7 @@ def plot_time_delay(
     :param kwargs: Forwarded to the correlation ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import decimal_comma, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     label = {
@@ -756,7 +756,7 @@ def plot_time_delay(
             lw=0.0,
             label=_t("95 % interval (Eq. 8.130)", language),
         )
-    tau = decimal_comma(f"{1e3 * result.delay:.4g}", language)
+    tau = decimal_comma(fmt_minus(1e3 * result.delay, ".4g"), language)
     ax.axvline(
         result.delay,
         color=_C_REFERENCE,
@@ -792,14 +792,14 @@ def plot_aligned_impulse_response(
     :param kwargs: Forwarded to the aligned-IR ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import decimal_comma, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     t = np.arange(result.reference.size) / result.fs
     ax.plot(t, result.reference, color=_C_MUTED, lw=1.0,
             label=_t("Reference IR", language))
     kwargs.setdefault("color", _C_PRIMARY)
-    n = decimal_comma(f"{result.delay_samples:+.3f}", language)
+    n = decimal_comma(fmt_minus(result.delay_samples, "+.3f"), language)
     kwargs.setdefault("label", _t("Aligned IR (delay {n} samples)", language, n=n))
     ax.plot(t, result.aligned, lw=1.2, **kwargs)
     ax.set_xlabel(_t(_TIME_LABEL, language))
@@ -893,7 +893,7 @@ def plot_phase_decomposition(
         axp.semilogx(freqs[pos], result.phase[pos], **kwargs)
         axp.semilogx(
             freqs[pos], result.minimum_phase[pos], color=_C_SECONDARY,
-            ls="--", label=_t("Minimum phase (from |H|)", language),
+            ls="--", label=_t("Minimum phase (from $|H|$)", language),
         )
         axp.semilogx(
             freqs[pos], result.excess_phase[pos], color=_C_MUTED,
@@ -1046,7 +1046,7 @@ def plot_resampled_signal(
     fs0 = format_number(result.original_fs, language, decimals=0)
     fs1 = format_number(result.fs, language, decimals=0)
     ax.set_title(_t(
-        "Polyphase resampling {fs0} Hz → {fs1} Hz (L/M = {up}/{down}, "
+        "Polyphase resampling {fs0} Hz → {fs1} Hz ($L/M$ = {up}/{down}, "
         "{taps} taps)",
         language, fs0=fs0, fs1=fs1, up=result.up, down=result.down,
         taps=result.n_taps,
@@ -1111,7 +1111,7 @@ def plot_window_metrics(
     :param kwargs: Forwarded to the spectrum ``plot`` call.
     :return: The spectrum axes (``ax`` given) or the array of two axes.
     """
-    from .._i18n import decimal_comma, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
     from ..signals.windows import _WINDOW_OVERSAMPLE, _window_spectrum_db
 
     max_bins = 24.0
@@ -1124,7 +1124,7 @@ def plot_window_metrics(
         enbw = decimal_comma(f"{result.enbw_bins:.3f}", language)
         kwargs.setdefault("label", _t(_ENBW_LABEL, language, enbw=enbw))
         axs.plot(bins[shown], level[shown], **kwargs)
-        sll = decimal_comma(f"{result.highest_sidelobe_db:.1f}", language)
+        sll = decimal_comma(fmt_minus(result.highest_sidelobe_db, ".1f"), language)
         axs.axhline(
             result.highest_sidelobe_db, color=_C_REFERENCE, lw=1.0,
             linestyle="--",
@@ -1153,7 +1153,7 @@ def plot_window_metrics(
     axes = _new_axes_column(2, figsize=(8.0, 6.5))
     axes[0].plot(np.arange(result.n), result.taps, color=_C_PRIMARY, lw=1.2)
     axes[0].set_xlabel(_t("Sample", language))
-    axes[0].set_ylabel(_t("Window w[m]", language))
+    axes[0].set_ylabel(_t("Window $w[m]$", language))
     axes[0].set_title(title)
     axes[0].grid(True, alpha=0.3)
     _spectrum_panel(axes[1])
@@ -1260,7 +1260,7 @@ def plot_echo_detection(
         [1e3 * result.delay], [result.reflection_coefficient], "v",
         color=_C_SECONDARY, markersize=9,
         label=_t(
-            "Echo: {delay} ms, a = {a}", language,
+            "Echo: {delay} ms, $a$ = {a}", language,
             delay=format_number(1e3 * result.delay, language, decimals=2,
                                 trim=True),
             a=format_number(result.reflection_coefficient, language,
@@ -1410,7 +1410,7 @@ def plot_synchronous_average(
         kwargs.setdefault("lw", 1.6)
         axw.plot(
             1e3 * result.times, result.period_waveform,
-            label=_t("Averaged periodic waveform (N = {n})", language,
+            label=_t("Averaged periodic waveform ($N$ = {n})", language,
                      n=result.n_averages),
             **kwargs,
         )

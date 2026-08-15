@@ -49,24 +49,25 @@ _LABEL_RESIDUAL_INDEX = r"$\delta_{pI0}$ [dB]"
 #: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
     "Band": "Banda",
-    "Sound power level LW [dB]": "Nivel de potencia acústica LW [dB]",
+    "Sound power level $L_W$ [dB]": "Nivel de potencia acústica $L_W$ [dB]",
     "sound power spectrum": "espectro de potencia acústica",
     "Non-positive band": "Banda no positiva",
-    "Pressure level Lp": "Nivel de presión Lp",
-    "Intensity level LI": "Nivel de intensidad LI",
+    "Pressure level $L_p$": "Nivel de presión $L_p$",
+    "Intensity level $L_I$": "Nivel de intensidad $L_I$",
     "Level [dB]": "Nivel [dB]",
-    "Pressure-intensity index δpI [dB]": "Índice presión-intensidad δpI [dB]",
+    r"Pressure-intensity index $\delta_{pI}$ [dB]":
+        r"Índice presión-intensidad $\delta_{pI}$ [dB]",
     "Sound power level $L_W$ [dB re 1 pW]": "Nivel de potencia acústica $L_W$ [dB re 1 pW]",
     "ISO/TS 7849 sound power from surface vibration": "Potencia acústica por vibración superficial ISO/TS 7849",
-    "F2 (surface pressure-intensity)": "F2 (presión-intensidad superficial)",
-    "F3 (negative partial power)": "F3 (potencia parcial negativa)",
-    "Dynamic capability Ld": "Capacidad dinámica Ld",
-    "F4 (non-uniformity)": "F4 (no uniformidad)",
-    "F1 (temporal variability)": "F1 (variabilidad temporal)",
-    "F1 limit (Table B.3)": "Límite de F1 (tabla B.3)",
+    "$F_2$ (surface pressure-intensity)": "$F_2$ (presión-intensidad superficial)",
+    "$F_3$ (negative partial power)": "$F_3$ (potencia parcial negativa)",
+    r"Dynamic capability $L_\mathrm{d}$": r"Capacidad dinámica $L_\mathrm{d}$",
+    "$F_4$ (non-uniformity)": "$F_4$ (no uniformidad)",
+    "$F_1$ (temporal variability)": "$F_1$ (variabilidad temporal)",
+    "$F_1$ limit (Table B.3)": "Límite de $F_1$ (tabla B.3)",
     "Indicator [dB]": "Indicador [dB]",
-    "Field non-uniformity F4": "No uniformidad del campo F4",
-    "Dimensionless indicators F1, F4": "Indicadores adimensionales F1, F4",
+    "Field non-uniformity $F_4$": "No uniformidad del campo $F_4$",
+    "Dimensionless indicators $F_1$, $F_4$": "Indicadores adimensionales $F_1$, $F_4$",
     "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
     "Class {cls} pass region": "Región de aceptación clase {cls}",
     "Class 1 minimum": "Mínimo clase 1",
@@ -149,13 +150,14 @@ def plot_sound_power(
     bars = ax.bar(positions, np.nan_to_num(lw), **kwargs)
     _hatch_invalid(bars, neg)
 
-    ax.set_ylabel(_t("Sound power level LW [dB]", language))
+    ax.set_ylabel(_t("Sound power level $L_W$ [dB]", language))
     designation = _sound_power_designation(result)
     lwa = float(result.sound_power_level_a)
     if np.isfinite(lwa):
         ax.set_title(
             f"{designation} {_t('sound power spectrum', language)}  "
-            f"(LWA = {format_number(lwa, language, decimals=1)} dB(A))"
+            "($L_{WA}$ = "
+            f"{format_number(lwa, language, decimals=1)} dB(A))"
         )
     else:
         ax.set_title(f"{designation} {_t('sound power spectrum', language)}")
@@ -201,9 +203,10 @@ def plot_intensity(
     index = np.asarray(result.pressure_intensity_index, dtype=np.float64)
 
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Pressure level Lp", language))
+    kwargs.setdefault("label", _t("Pressure level $L_p$", language))
     ax.plot(freqs, lp, "o-", **kwargs)
-    ax.plot(freqs, li, "s--", color=_C_REFERENCE, label=_t("Intensity level LI", language))
+    ax.plot(freqs, li, "s--", color=_C_REFERENCE,
+            label=_t("Intensity level $L_I$", language))
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t("Level [dB]", language))
     ax.grid(True, which="both", alpha=0.3)
@@ -215,16 +218,18 @@ def plot_intensity(
         width=_bar_width(freqs),
         color=_C_TERTIARY,
         alpha=0.25,
-        label="δpI = Lp - LI",
+        label=r"$\delta_{pI} = L_p - L_I$",
     )
-    twin.set_ylabel(_t("Pressure-intensity index δpI [dB]", language))
+    twin.set_ylabel(_t(r"Pressure-intensity index $\delta_{pI}$ [dB]", language))
 
     lines, labels = ax.get_legend_handles_labels()
     tlines, tlabels = twin.get_legend_handles_labels()
     ax.legend(lines + tlines, labels + tlabels, loc="best", fontsize="small")
     ax.set_title(
-        "ISO 9614 Lp vs LI  "
-        f"(total δpI = {format_number(result.total_pressure_intensity_index, language, decimals=1)} dB)"
+        "ISO 9614 $L_p$ vs $L_I$  "
+        r"(total $\delta_{pI}$ = "
+        f"{format_number(result.total_pressure_intensity_index, language, decimals=1)}"
+        " dB)"
     )
     localize_axes(ax, language)
     return ax
@@ -273,16 +278,17 @@ def plot_field_indicators(
     f4 = np.atleast_1d(np.asarray(result.f4, dtype=np.float64))
 
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("F2 (surface pressure-intensity)", language))
+    kwargs.setdefault("label", _t("$F_2$ (surface pressure-intensity)", language))
     ax.plot(freqs, f2, "o-", **kwargs)
     ax.plot(freqs, f3, "s--", color=_C_REFERENCE,
-            label=_t("F3 (negative partial power)", language))
+            label=_t("$F_3$ (negative partial power)", language))
     if dynamic_capability is not None:
         ld = np.broadcast_to(
             np.asarray(dynamic_capability, dtype=np.float64), freqs.shape
         )
         ax.plot(freqs, ld, ls=":", lw=1.8, color=_C_MUTED,
-                drawstyle="steps-mid", label=_t("Dynamic capability Ld", language))
+                drawstyle="steps-mid",
+                label=_t(r"Dynamic capability $L_\mathrm{d}$", language))
     _freq_axis(ax, freqs, language=language)
     ax.set_ylabel(_t("Indicator [dB]", language))
     ax.grid(True, which="both", alpha=0.3)
@@ -294,9 +300,9 @@ def plot_field_indicators(
         width=_bar_width(freqs),
         color=_C_TERTIARY,
         alpha=0.25,
-        label=_t("F4 (non-uniformity)", language),
+        label=_t("$F_4$ (non-uniformity)", language),
     )
-    twin.set_ylabel(_t("Field non-uniformity F4", language))
+    twin.set_ylabel(_t("Field non-uniformity $F_4$", language))
     if result.f1 is not None:
         # F1 is dimensionless like F4, so it shares the twin axis; the
         # Table B.3 threshold above which the field is not stationary enough
@@ -307,11 +313,11 @@ def plot_field_indicators(
             np.asarray(result.f1, dtype=np.float64), freqs.shape
         )
         twin.plot(freqs, f1, "^-", color=_C_SECONDARY, lw=1.4,
-                  label=_t("F1 (temporal variability)", language))
+                  label=_t("$F_1$ (temporal variability)", language))
         twin.axhline(TEMPORAL_VARIABILITY_LIMIT, ls="-.", lw=1.0,
                      color=_C_SECONDARY,
-                     label=_t("F1 limit (Table B.3)", language))
-        twin.set_ylabel(_t("Dimensionless indicators F1, F4", language))
+                     label=_t("$F_1$ limit (Table B.3)", language))
+        twin.set_ylabel(_t("Dimensionless indicators $F_1$, $F_4$", language))
 
     lines, labels = ax.get_legend_handles_labels()
     tlines, tlabels = twin.get_legend_handles_labels()
@@ -378,7 +384,7 @@ def plot_intensity_class(
     :param kwargs: Forwarded to the measured-curve ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import localize_axes
+    from .._i18n import decimal_comma, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequency, dtype=np.float64)
@@ -439,7 +445,12 @@ def plot_intensity_class(
     ax.set_title(
         _t("IEC 61043 Table 2 — {device}, {spacing} mm separation", language,
            device=_t(_DEVICE_LABELS[result.device], language),
-           spacing=f"{result.spacing * 1000.0:g}")
+           # ``:g`` prints the separation exactly as the chain was verified
+           # with (a 6.35 mm quarter-inch spacer stays 6.35, which a fixed
+           # one-decimal format would round away); only its decimal separator
+           # needs localising, and ``spacing`` is validated positive, so the
+           # sign never enters.
+           spacing=decimal_comma(f"{result.spacing * 1000.0:g}", language))
     )
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, which="both", alpha=0.3)

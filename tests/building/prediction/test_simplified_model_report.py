@@ -29,6 +29,7 @@ from phonometry import (
     predicted_airborne_insulation,
     predicted_impact_insulation,
 )
+from phonometry._i18n import fmt_minus
 from phonometry.building.prediction.facade import (
     FacadePredictionResult,
 )
@@ -255,7 +256,9 @@ def test_facade_prediction_rating_pinned_to_annex_f(tmp_path) -> None:
     assert "Formula 13" in text
     # The apparent-index values are stated, not just their labels (Annex F).
     assert f"{ref.EN12354_3_ANNEX_F_RTRS_W} dB" in text  # R'tr,s,w = 31 dB
-    assert f"{ref.EN12354_3_ANNEX_F_CTR} dB" in text  # Ctr = -3 dB
+    # Signed through the same helper the fiche prints with, so the expectation
+    # cannot drift from the sign the document carries.
+    assert f"{fmt_minus(ref.EN12354_3_ANNEX_F_CTR)} dB" in text  # Ctr = −3 dB
     # A couple of the per-element weighted partial indices Rp,w from the table.
     assert "wall" in text
     assert "59" in text  # wall Rp,w

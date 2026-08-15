@@ -82,7 +82,7 @@ def test_trend_test_es_and_bad_language() -> None:
     plt.close("all")
     runs = ph.trend_test(RNG.standard_normal(40), method="runs")
     ax = runs.plot(language="es")
-    assert "Rachas r =" in _labels(ax)
+    assert "Rachas $r$ =" in _labels(ax)
     assert "Mediana de la secuencia" in _labels(ax)
     plt.close("all")
     with pytest.raises(ValueError):
@@ -100,7 +100,7 @@ def test_stationarity_test_es_and_bad_language() -> None:
     plt.close("all")
     runs = ph.stationarity_test(x, FS, method="runs")
     ax = runs.plot(language="es")
-    assert "Rachas r =" in _labels(ax)
+    assert "Rachas $r$ =" in _labels(ax)
     assert "Mediana de la secuencia" in _labels(ax)
     plt.close("all")
     with pytest.raises(ValueError):

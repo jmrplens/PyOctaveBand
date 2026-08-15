@@ -195,7 +195,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # Short on purpose: the Spanish of a longer title overran the canvas at
     # both ends. What the boundary has to do with it is in the panel titles.
     fig.suptitle(T("Lamb's problem: P, S and the surface wave "
-                   "(elastic 2D FDTD)"), fontweight="bold")
+                   "(elastic 2D FDTD)"))
     # The field panels are 2:1 and, in a two-row canvas, height-limited: a
     # wider cell than their natural width only pads them with white. The
     # probe traces are time series and use every pixel of width they get,
@@ -219,7 +219,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
                        extent=(-half, half, half, 0.0), cmap=CMAP_FIELD,
                        vmin=-vmaxes[row], vmax=vmaxes[row], aspect="equal",
                        interpolation="bilinear")
-        ax.set_title(title, fontsize=9.5, fontweight="bold")
+        ax.set_title(title, fontsize=9.5)
         ax.plot([0.0], [0.0], marker="v", ms=6, color=COLOR_SECONDARY,
                 markeredgecolor=FIELD_STROKE, markeredgewidth=0.6,
                 clip_on=False, zorder=6)
@@ -280,6 +280,13 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
         T(f"surface train: {c_meas:.0f} m/s measured, {c_r:.0f} m/s exact"),
         T("only P and S: a clamped wall carries no surface wave"),
     ]
+    # The Spanish of the rigid-run verdict is wider than the
+    # height-limited field panel (it ran ~150 px past the right spine),
+    # and a pill wider than its panel cannot be slid inside it. Both
+    # pills break onto two lines at their one ": " instead -- after the
+    # translation, so the i18n keys stay the one-line strings -- and in
+    # every language, so the four variants keep one composition.
+    verdicts = [v.replace(": ", ":\n", 1) for v in verdicts]
     # The symbols are mathtext, which is the house convention and also the
     # fix for a real defect: `_translate_str` rewrites decimal points as
     # commas for Spanish unless the string carries maths, and it had been

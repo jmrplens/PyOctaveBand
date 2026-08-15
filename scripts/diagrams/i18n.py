@@ -74,7 +74,7 @@ _ES: dict[str, str] = {
     "CNOSSOS-EU railway source lines and directivity angles":
         "Líneas fuente ferroviarias y directividad CNOSSOS-EU",
     "datum: the plane tangent to the two rail heads":
-        "referencia: el plano tangente a las dos cabezas de carril",
+        "referencia: plano tangente a las dos cabezas de carril",
     "A — rolling, impact, squeal,": "A — rodadura, impacto, chirrido,",
     "bridge, low traction": "puente, tracción baja",
     "B — exhausts, roof apparatus,": "B — escapes, equipos de techo,",
@@ -87,7 +87,7 @@ _ES: dict[str, str] = {
     "0 dB broadside": "0 dB en perpendicular",
     "−20 dB along the track": "−20 dB en el eje de la vía",
     "receiver bearing": "dirección al receptor",
-    "Impact noise applies from 50 m": "El ruido de impacto se aplica desde 50 m",
+    "Impact noise applies from 50 m": "Ruido de impacto aplicado desde 50 m",
     "before a joint to 50 m after it": "antes de una junta hasta 50 m después",
     "Curve squeal needs ≥ 50 m": "El chirrido en curva exige ≥ 50 m",
     "of continuous curve": "de curva continua",
@@ -152,7 +152,7 @@ _ES: dict[str, str] = {
     "activity already in operation": "actividad ya en funcionamiento",
     # Facade sound insulation setup (buildings/insulation/facade-insulation).
     "Facade sound insulation setup (ISO 16283-3)":
-        "Montaje de aislamiento acustico de fachada (ISO 16283-3)",
+        "Montaje de aislamiento acústico de fachada (ISO 16283-3)",
     "Receiving room": "Recinto receptor",
     "$S$ = 11.5 m²": "$S$ = 11,5 m²",
     "Loudspeaker": "Altavoz",
@@ -165,7 +165,7 @@ _ES: dict[str, str] = {
     "≤ 10 mm parallel / ≤ 3 mm normal": "≤ 10 mm paralelo / ≤ 3 mm normal",
     "3 to 10 positions, never gridded":
         "de 3 a 10 posiciones, nunca en rejilla",
-    "L₁,2m  global method": "L₁,2m  metodo global",
+    "L₁,2m  global method": "L₁,2m  método global",
     "(2.0 ± 0.2) m": "(2,0 ± 0,2) m",
     "1.5 m": "1,5 m",
     "above the": "por encima del",
@@ -176,12 +176,12 @@ _ES: dict[str, str] = {
         "comparable con una $R$ de laboratorio.",
     "Global method → D2m,nT: the whole facade as built, "
     "not comparable with a laboratory R.":
-        "Metodo global → D2m,nT: la fachada tal como esta construida; "
+        "Método global → D2m,nT: la fachada tal como está construida; "
         "no comparable con laboratorio.",
     "Road traffic replaces the loudspeaker at all angles: "
     "simultaneous inside and outside, ≥ 50 pass-bys.":
-        "El trafico rodado incide desde todos los angulos: medicion "
-        "simultanea dentro y fuera, ≥ 50 pasos.",
+        "El tráfico rodado incide desde todos los ángulos: medición "
+        "simultánea dentro y fuera, ≥ 50 pasos.",
     "Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "
     "by the functions.":
         "Apartados 9.4, 9.5.1, 9.6.1 y 10.2. Nada de esto lo comprueban "
@@ -190,7 +190,7 @@ _ES: dict[str, str] = {
     "Standard heavy and soft impact sources (ISO 16283-2, JIS A 1418-2)":
         "Fuentes de impacto normalizadas (ISO 16283-2, JIS A 1418-2)",
     "Floor under test (source room)": "Forjado ensayado (recinto emisor)",
-    "(a) tapping machine": "(a) maquina de impactos",
+    "(a) tapping machine": "(a) máquina de impactos",
     "ISO 10140-5 Annex E": "ISO 10140-5 Anexo E",
     "5 hammers, 500 g each": "5 martillos de 500 g cada uno",
     "(100 ± 20) ms apart": "separados (100 ± 20) ms",
@@ -204,29 +204,29 @@ _ES: dict[str, str] = {
     "$e$ = 0.8 ± 0.1": "$e$ = 0,8 ± 0,1",
     "(100 ± 1) cm": "(100 ± 1) cm",
     "from the ball's BOTTOM": "desde la BASE de la pelota",
-    "(c) bang machine": "(c) maquina de golpes",
+    "(c) bang machine": "(c) máquina de golpes",
     "JIS A 1418-2 only": "solo en JIS A 1418-2",
     "(2.4 ± 0.2)·10⁵ Pa": "(2,4 ± 0,2)·10⁵ Pa",
     "$m_{eff}$ = (7.3 ± 0.2) kg": "$m_{ef}$ = (7,3 ± 0,2) kg",
     "85 cm": "85 cm",
     "source": "fuente",
-    "rigid floor +": "suelo rigido +",
+    "rigid floor +": "suelo rígido +",
     "force plate": "plataforma de fuerza",
     "octave filter": "filtro de octava",
     "analyser → $L_{FE}$": "analizador → $L_{FE}$",
     "JIS A 1418-2 Annex C: the filter goes BEFORE the analyser,":
         "JIS A 1418-2 Anexo C: el filtro va ANTES del analizador,",
     "so $L_{FE}$ is evaluated once per band":
-        "de modo que $L_{FE}$ se evalua una vez por banda",
+        "de modo que $L_{FE}$ se evalúa una vez por banda",
     "The dimensions above are the standards' informative construction "
     "examples;":
         "Las dimensiones anteriores son ejemplos constructivos informativos "
         "de las normas;",
     "the specification is the force spectrum, not the shape.":
-        "la especificacion es el espectro de fuerza, no la forma.",
+        "la especificación es el espectro de fuerza, no la forma.",
     # ISO 10052 survey sweep (buildings/insulation/insulation-survey).
     "The ISO 10052 survey sweep (Clauses 6.2 and 6.3)":
-        "El barrido del metodo de control ISO 10052 (apartados 6.2 y 6.3)",
+        "El barrido del método de control ISO 10052 (apartados 6.2 y 6.3)",
     "Plan of the room": "Planta del recinto",
     "separating element": "elemento separador",
     "≥ 0.5 m": "≥ 0,5 m",
@@ -241,16 +241,16 @@ _ES: dict[str, str] = {
     "during each traverse": "durante cada barrido",
     "Alternative (Clause 6.3.1): a rotating microphone on a stand, ≥ 10° to "
     "the horizontal, sweep radius ≥ 1 m.":
-        "Alternativa (apartado 6.3.1): microfono giratorio sobre soporte, "
-        "≥ 10° respecto a la horizontal, radio de barrido ≥ 1 m.",
+        "Alternativa (apartado 6.3.1): micrófono giratorio, ≥ 10° sobre la "
+        "horizontal, radio de barrido ≥ 1 m.",
     "Without a real-time octave analyser, repeat the whole sweep once per "
     "band and read each 30 s $L_{eq}$.":
-        "Sin analizador de octavas en tiempo real, repetir todo el barrido "
-        "una vez por banda y leer cada $L_{eq}$ de 30 s.",
+        "Sin analizador de octavas en tiempo real, repetir el barrido una "
+        "vez por banda y leer cada $L_{eq}$ de 30 s.",
     "Tapping machine (6.2.3): centre of the floor, on the diagonal; "
     "three positions at 45° to the ribs.":
-        "Maquina de impactos (6.2.3): centro del forjado, en la diagonal; "
-        "tres posiciones a 45° respecto a las viguetas.",
+        "Máquina de impactos (6.2.3): centro del forjado, en la diagonal; "
+        "tres posiciones a 45° con las viguetas.",
     # Rooms / prediction: the EN 12354-6 take-off plate and the directivity
     # plate (buildings/rooms/enclosed-space-absorption, room-image-sources).
     "Room take-off: one room, three input lists (EN 12354-6)":
@@ -348,7 +348,7 @@ _ES: dict[str, str] = {
         "N  neutro: dentro de ambas tolerancias",
     # Measuring the rated spectrum (ANSI/ASA S12.2-2019, clause 5.2.5)
     "Measuring the rated spectrum (ANSI/ASA S12.2-2019, clause 5.2.5)":
-        "Medida del espectro que se califica (ANSI/ASA S12.2-2019, cláusula 5.2.5)",
+        "Medir el espectro que se califica (ANSI/ASA S12.2-2019, cláusula 5.2.5)",
     "ceiling plenum": "plénum del falso techo",
     "supply duct": "conducto de impulsión",
     "diffuser": "difusor",
@@ -665,7 +665,7 @@ _ES: dict[str, str] = {
         "importancia de banda $I_i$ (Tabla 3)  ·  índice en [0, 1]  (cláusula 6)",
     # Human vibration (ISO 2631-1 / ISO 8041-1 / 2002-44-EC)
     "Whole-body vibration measurement chain (ISO 2631-1 / ISO 8041-1)":
-        "Cadena de medición de vibración de cuerpo entero (ISO 2631-1 / ISO 8041-1)",
+        "Medición de vibración de cuerpo entero (ISO 2631-1 / ISO 8041-1)",
     "vibration input": "entrada de vibración",
     "Seat/body interface": "Interfaz asiento/cuerpo",
     "Triaxial accelerometer": "Acelerómetro triaxial",
@@ -1479,7 +1479,7 @@ _ES: dict[str, str] = {
     "Reflecting plane (hemi-anechoic)": "Plano reflectante (semianecoica)",
     "Anechoic wedges": "Cuñas anecoicas",
     "Source (DUT)": "Fuente (DUT)",
-    "20 / 40 mic positions": "20 / 40 posiciones de micrófono",
+    "20 / 40 mic positions": "20 / 40 puntos de micrófono",
     "radius $r$": "radio $r$",
     "$S = 2πr^2$ (hemi-anechoic) · $4πr^2$ (anechoic)":
         "$S = 2πr^2$ (semianecoica) · $4πr^2$ (anecoica)",
@@ -1504,7 +1504,7 @@ _ES: dict[str, str] = {
         "Cinco criterios de aceptación (Anexo C); banda no válida si $P < 0$",
     # d_room - ISO 3382-1/-2 room-acoustics measurement setup
     "Room-acoustics measurement setup (ISO 3382-1 / ISO 3382-2)":
-        "Configuración de medición de acústica de salas (ISO 3382-1 / ISO 3382-2)",
+        "Montaje de medición de acústica de salas (ISO 3382-1 / ISO 3382-2)",
     "Room plan (top view)": "Planta de la sala (vista superior)",
     "Microphone position": "Posición de micrófono",
     "Loudspeaker source": "Fuente (altavoz)",
@@ -1524,8 +1524,7 @@ _ES: dict[str, str] = {
     "Precision": "Precisión",
     # --- Tanda 11: new diagrams -------------------------------------------
     "Exponential-detector chain of the time weightings (IEC 61672-1)":
-        "Cadena del detector exponencial de las ponderaciones temporales "
-        "(IEC 61672-1)",
+        "El detector exponencial de las ponderaciones temporales (IEC 61672-1)",
     "Block processing: carrying the filter state versus resetting it":
         "Procesado por bloques: conservar el estado del filtro frente a "
         "reiniciarlo",
@@ -2036,8 +2035,7 @@ _ES: dict[str, str] = {
         "cada punto de sujeción (5.3)",
     # Power injection (Norton & Karczub 6.6.4)
     "Power injection: coupling loss factors from measured energies":
-        "Inyección de potencia: factores de pérdida por acoplo a partir de "
-        "energías medidas",
+        "Inyección de potencia: de energías medidas a factores de pérdida",
     "Run 1: drive subsystem 1": "Ensayo 1: se excita el subsistema 1",
     "Run 2: drive subsystem 2": "Ensayo 2: se excita el subsistema 2",
     "subsystem 1": "subsistema 1",
@@ -2059,8 +2057,8 @@ _ES: dict[str, str] = {
         "subsistema, lejos de los bordes y del punto de excitación",
     "one run inverts to $η_{12}$ only if $η_1$ and $η_2$ are known from a "
     "decay measurement; two runs solve all four":
-        "un ensayo despeja $η_{12}$ solo si $η_1$ y $η_2$ se conocen por "
-        "medición de decaimiento; dos ensayos resuelven los cuatro",
+        "un ensayo despeja $η_{12}$ solo si $η_1$ y $η_2$ se miden por "
+        "decaimiento; dos ensayos resuelven los cuatro",
     "bands wide enough to hold several modes of each subsystem: the modal "
     "densities decide how wide":
         "bandas anchas para contener varios modos de cada subsistema: las "
@@ -3331,7 +3329,7 @@ _ES: dict[str, str] = {
     "≥ 2 machine positions, skew to the edges,":
         "≥ 2 posiciones de la máquina, oblicuas a los bordes,",
     "no hammer within 100 mm of an edge, all feet on the specimen":
-        "ningún martillo a menos de 100 mm de un borde, todas las patas sobre la probeta",
+        "ningún martillo a menos de 100 mm del borde, las patas sobre la probeta",
     "≥ 4 accelerometer positions, uniform but random,":
         "≥ 4 posiciones de acelerómetro, uniformes pero aleatorias,",
     "off the symmetry lines and ≥ 100 mm from every edge":
@@ -3343,7 +3341,7 @@ _ES: dict[str, str] = {
     "$L_a = 10 lg(⟨a^2⟩/a_0^2)$,  $a_0$ = 10⁻⁶ m/s²   (Formula 1)":
         "$L_a = 10 lg(⟨a^2⟩/a_0^2)$,  $a_0$ = 10⁻⁶ m/s²   (fórmula 1)",
     "EN 12354-1 Annex E junction types, path branches and the mass ratio":
-        "Tipos de unión del anexo E de la EN 12354-1, ramas de vía y cociente de masas",
+        "Uniones del anexo E (EN 12354-1), ramas de vía y cociente de masas",
     "rigid cross": "cruz rígida",
     "rigid T": "T rígida",
     "T with a flexible interlayer": "T con capa elástica intermedia",
@@ -3360,11 +3358,11 @@ _ES: dict[str, str] = {
     "$M = lg(m′_{perp,i} / m′_i)$: $m′_i$ is the element carrying the path, so the ratio is per path, not per junction.":
         "$M = lg(m′_{perp,i} / m′_i)$: $m′_i$ es el elemento que lleva la vía, así que el cociente es por vía, no por unión.",
     "The functions take the RATIO, not $M$. Annex H.3 floor, ratio 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB":
-        "Las funciones toman el COCIENTE, no $M$. Forjado del anexo H.3, cociente 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB",
+        "Las funciones toman el COCIENTE, no $M$. Forjado H.3, cociente 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB",
     "$ℓ_f$ is the coupling length along the junction line, measured surface to surface. Annex E values are read at 500 Hz, ± 3 dB.":
-        "$ℓ_f$ es la longitud de acoplamiento a lo largo de la unión, medida de superficie a superficie. Los valores del anexo E se leen a 500 Hz, ± 3 dB.",
+        "$ℓ_f$ es la longitud de acoplamiento en la unión, medida entre superficies. El anexo E se lee a 500 Hz, ± 3 dB.",
     "ISO 12354-1 Annex L worked building: elements, junctions, paths":
-        "Edificio resuelto del anexo L de la ISO 12354-1: elementos, uniones y vías",
+        "Edificio resuelto del anexo L (ISO 12354-1): elementos, uniones y vías",
     "Section: two stacked dwellings": "Sección: dos viviendas superpuestas",
     "source dwelling": "vivienda emisora",
     "receiving dwelling": "vivienda receptora",
@@ -3466,9 +3464,9 @@ _ES: dict[str, str] = {
     "comparison method: the same six positions, and no $A$, no $V$, no $S$, no Waterhouse and no $C_1$ in Eq. 21":
         "método de comparación: las mismas seis posiciones, y sin $A$, sin $V$, sin $S$, sin Waterhouse y sin $C_1$ en la Ec. 21",
     "averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · background at the same positions, just before or after":
-        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · ruido de fondo en las mismas posiciones, justo antes o después",
+        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · ruido de fondo en las mismas posiciones, antes o después",
     "hard walls, $α < 0,06$ within one wavelength of the source · $T_{60}$ per ISO 3382-2 from the first 10 dB or 15 dB only":
-        "paredes duras, $α < 0,06$ a menos de una longitud de onda de la fuente · $T_{60}$ según ISO 3382-2, solo los primeros 10 dB o 15 dB",
+        "paredes duras, $α < 0,06$ a menos de una longitud de onda de la fuente · $T_{60}$ según ISO 3382-2, solo los primeros 10 o 15 dB",
     # --- ISO 3744 parallelepiped measurement surface ---
     "ISO 3744 parallelepiped measurement surface":
         "Superficie de medición paralelepipédica ISO 3744",
@@ -3598,7 +3596,7 @@ _ES: dict[str, str] = {
         "y la pérdida por inserción límite de la instalación, por flancos en las paredes del conducto, acota lo que puede declarar",
     # Room-to-room chain in section (devices/noise-control/room-to-room).
     "Plant room to operator room: every symbol of the balance, in section":
-        "De sala de máquinas a sala de control: cada símbolo del balance, en sección",
+        "De la sala de máquinas a la de control: el balance en sección",
     "Plant room 8 × 10 × 3 m": "Sala de máquinas 8 × 10 × 3 m",
     "bare floor, absorbent ceiling": "suelo desnudo, techo absorbente",
     "Operator room 5 × 5 × 3 m": "Sala de control 5 × 5 × 3 m",
@@ -3799,7 +3797,7 @@ _ES: dict[str, str] = {
     "B · Diffuse field": "B · Campo difuso",
     "third-octave noise band · binaural":
         "banda de ruido de tercio de octava · biaural",
-    "C · Earphone — not this standard": "C · Auricular: no es esta norma",
+    "C · Earphone: not this standard": "C · Auricular: no es esta norma",
     "supra-aural or insert · monaural": "supraaural o de inserción · monoaural",
     "level measured here,": "el nivel se mide aquí,",
     "subject and chair absent": "sin el sujeto ni la silla",
@@ -4057,7 +4055,7 @@ _ES: dict[str, str] = {
     # Capturing a microphone array (signals/filters/multichannel).
     "Capturing an array: one clock, locked gains, a written row map":
         "Capturar un array: un reloj, ganancias fijas, mapa de filas escrito",
-    "Four positions, four sensitivities": "Cuatro posiciones, cuatro sensibilidades",
+    "Four positions, four sensitivities": "Cada posición, su sensibilidad",
     "mV/Pa, one per capsule": "mV/Pa, una por cápsula",
     "one capsule at a time,": "una cápsula cada vez,",
     "gains locked throughout": "con las ganancias fijas",

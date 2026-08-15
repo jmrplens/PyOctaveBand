@@ -154,7 +154,6 @@ def plot_image_source_geometry(
     ax.set_ylabel(_t(_AXIS_Y, language))
     ax.set_title(
         _t("Image-source room plan (z of the source plane)", language),
-        fontweight="bold",
     )
     ax.legend(loc=_LEGEND_LOC, fontsize=8)
     localize_axes(ax, language)

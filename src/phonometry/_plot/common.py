@@ -563,20 +563,31 @@ def _freq_axis(ax: Axes, freqs: np.ndarray, *, language: str = "en") -> None:
 
     ax.set_xscale("log")
     ax.set_xticks(list(freqs))
-    ax.set_xticklabels([_format_freq(f) for f in freqs], rotation=45, ha="right")
+    ax.set_xticklabels(
+        [_format_freq(f, language) for f in freqs], rotation=45, ha="right"
+    )
     # Suppress the log-scale minor-tick labels (2x10^2, 3x10^2, ...) that would
     # otherwise collide with off-decade band centres such as 750 or 1500 Hz.
     ax.xaxis.set_minor_formatter(mticker.NullFormatter())
     ax.set_xlabel(_t(_LABEL_FREQUENCY_HZ, language))
 
 
-def _format_freq(f: float) -> str:
-    """Short human label for a band centre frequency."""
+def _format_freq(f: float, language: str = "en") -> str:
+    """Short human label for a band centre frequency.
+
+    The label is localised here rather than by :func:`~phonometry._i18n.localize_axes`:
+    the band centres are installed with ``set_xticklabels``, which replaces the
+    numeric formatter that pass reformats, so a Spanish figure would otherwise
+    draw ``31.5`` and ``1.25k`` with an English decimal point.  English is a
+    no-op, so the English figures stay byte-identical.
+    """
+    from .._i18n import decimal_comma
+
     if f >= 1000.0:
         text = f"{f / 1000.0:g}k"
     else:
         text = f"{f:g}"
-    return text
+    return decimal_comma(text, language)
 
 
 #: Nominal octave-band centres (IEC 61672 / ISO 266) spanning the acoustic
@@ -603,6 +614,7 @@ def format_frequency_axis(
     fmax: float | None = None,
     *,
     minor: str | None = "thirds",
+    language: str = "en",
 ) -> None:
     """Label a *continuous* logarithmic frequency x-axis with band centres.
 
@@ -611,7 +623,10 @@ def format_frequency_axis(
     :func:`_format_freq` form (``1k``, ``2k``, ...) and replaces the default
     power-of-ten log formatter (``10^2``, ``10^3``) that reads poorly in
     acoustics.  ``minor="thirds"`` adds unlabelled one-third-octave minor
-    ticks; ``minor=None`` clears the minor ticks.
+    ticks; ``minor=None`` clears the minor ticks.  ``language="es"`` draws the
+    off-decade centres with the Spanish decimal comma (``31,5``, ``1,25k``),
+    which the tick-label pass of :func:`~phonometry._i18n.localize_axes` cannot
+    reach once the labels are fixed strings.
 
     The x-axis is switched to a log scale when it is not already one.  The
     tick set is clipped to the data range: pass ``fmin`` / ``fmax`` to fix it
@@ -630,9 +645,21 @@ def format_frequency_axis(
         hi = fmax
     lo, hi = min(lo, hi), max(lo, hi)
     majors = [f for f in _OCTAVE_NOMINAL if lo <= f <= hi]
+    # An octave label every octave is right for the audio band, and too many
+    # for an axis that spans the ultrasonic: ten to a million is seventeen
+    # labels on one panel, and at the high end -- where "31.5k" and "125k" are
+    # the widest strings on the axis -- they run together into "16k31.5k63k".
+    # Past four decades, label every third octave instead and let the rest
+    # stand as unlabelled ticks; three octaves is close enough to a decade that
+    # the axis still reads as one.
+    stride = 3 if hi > lo * 10 ** 4 else 1
+    labelled = majors[::stride]
     ax.xaxis.set_major_locator(mticker.FixedLocator(majors))
     ax.xaxis.set_major_formatter(
-        mticker.FixedFormatter([_format_freq(f) for f in majors])
+        mticker.FixedFormatter([
+            _format_freq(f, language) if f in labelled else ""
+            for f in majors
+        ])
     )
     if minor == "thirds":
         minors = [
@@ -660,7 +687,7 @@ def _band_axis(
     (e.g. a shared-x upper panel).
     """
     labels = [
-        item if isinstance(item, str) else _format_freq(float(item))
+        item if isinstance(item, str) else _format_freq(float(item), language)
         for item in labels_or_freqs
     ]
     positions = np.arange(len(labels), dtype=np.float64)
@@ -882,13 +909,13 @@ def _annotate_impact_500(
     octave-band -5 dB reduction applies (ISO 717-2 Clause 4.3.2), annotate
     the rating as ``read - 5 dB`` so the figure stays normatively truthful.
     """
-    from .._i18n import decimal_comma
+    from .._i18n import format_number
 
     if band_centers.size == 0:
         return
     idx = int(np.argmin(np.abs(band_centers - 500.0)))
     read_value = float(reference[idx])
-    read_str = decimal_comma(f"{read_value:.0f}", language)
+    read_str = format_number(read_value, language, decimals=0)
     read_label = (
         f"lectura 500 Hz = {read_str} dB" if language == "es"
         else f"500 Hz read = {read_str} dB"
@@ -907,11 +934,13 @@ def _annotate_impact_500(
     )
     offset = rating - read_value
     if abs(offset) >= 0.5:  # octave-band -5 dB rule (Clause 4.3.2)
-        rating_str = decimal_comma(str(rating), language)
+        rating_str = format_number(rating, language, decimals=0)
+        # The sign between the read value and "5 dB" is a subtraction operator,
+        # so it is set with the typographic minus, not the ASCII hyphen.
         annotation = (
-            f"índice = {rating_str} dB = {read_str} - 5 dB (regla de octava)"
+            f"índice = {rating_str} dB = {read_str} − 5 dB (regla de octava)"
             if language == "es"
-            else f"rating = {rating_str} dB = {read_str} - 5 dB (octave rule)"
+            else f"rating = {rating_str} dB = {read_str} − 5 dB (octave rule)"
         )
         ax.annotate(
             annotation,
@@ -1160,7 +1189,7 @@ def _plot_band_level_bars(
     **kwargs: Any,
 ) -> Axes:
     """Per-band level bar chart with a band-summed total line (shared helper)."""
-    from .._i18n import decimal_comma
+    from .._i18n import decimal_comma, format_number
 
     ax = ax if ax is not None else _new_axes()
     lw = np.asarray(levels, dtype=np.float64)
@@ -1178,7 +1207,7 @@ def _plot_band_level_bars(
     ax.set_xticklabels(labels)
     ax.axhline(
         total_level, color=_C_REFERENCE, ls="--", lw=1.2,
-        label=f"total {decimal_comma(f'{total_level:.1f}', language)} dB",
+        label=f"total {format_number(total_level, language, decimals=1)} dB",
     )
     ax.set_ylabel(ylabel)
     ax.set_title(title)
@@ -1263,21 +1292,25 @@ def _plot_insulation_bands(
     ylabel: str,
     title: str,
     ax: Axes | None,
+    language: str = "en",
     **kwargs: Any,
 ) -> Axes:
     """Shared per-band insulation renderer (measurement bands are index-only).
 
     The ISO 16283 results do not carry their band centres, so the curves are
     drawn over band indices; user kwargs style the first (primary) curve
-    only, mirroring :func:`plot_facade_insulation`.
+    only, mirroring :func:`plot_facade_insulation`.  The band word is drawn
+    here, so it goes through this module's own :func:`_t`, the way
+    :func:`_facade_x_axis` localises the same axis.
     """
     ax = ax if ax is not None else _new_axes()
     n = curves[0][1].size
     x = np.arange(n, dtype=np.float64)
+    band_word = _t("Band", language)
     ax.set_xticks(x)
-    ax.set_xticklabels([f"Band {i + 1}" for i in range(n)],
+    ax.set_xticklabels([f"{band_word} {i + 1}" for i in range(n)],
                        rotation=45, ha="right")
-    ax.set_xlabel("Band")
+    ax.set_xlabel(band_word)
     for index, (label, y) in enumerate(curves):
         opts: dict[str, Any] = {"label": label}
         if index == 0:
@@ -1297,10 +1330,14 @@ def _plot_insulation_bands(
 
 
 
+#: Y-axis label of each ISO 12999-2 absorption-uncertainty quantity, drawn by
+#: ``_plot/materials.py``.  The subscripts of ``alpha_s`` (ISO 354), ``A_T``
+#: (ISO 354) and ``alpha_p`` (ISO 11654) name what the quantity is *of*, so
+#: they are descriptive and set upright; the unit stays outside the maths.
 _ABSORPTION_QUANTITY_LABELS: Final = {
-    "absorption_coefficient": "Sound absorption coefficient alpha_s",
-    "equivalent_area": "Equivalent absorption area A_T [m2]",
-    "practical_coefficient": "Practical absorption coefficient alpha_p",
+    "absorption_coefficient": r"Sound absorption coefficient $\alpha_\mathrm{s}$",
+    "equivalent_area": r"Equivalent absorption area $A_\mathrm{T}$ [m²]",
+    "practical_coefficient": r"Practical absorption coefficient $\alpha_\mathrm{p}$",
 }
 
 

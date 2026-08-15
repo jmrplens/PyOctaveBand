@@ -291,7 +291,7 @@ def test_resample_plot_filter_and_edges() -> None:
     assert -res.stopband_attenuation_db in ys
     assert "Polyphase resampling" in ax.get_title()
     assert "160/240" not in ax.get_title()  # reduced ratio, not the raw rates
-    assert f"L/M = {res.up}/{res.down}" in ax.get_title()
+    assert f"$L/M$ = {res.up}/{res.down}" in ax.get_title()
     plt.close("all")
 
 

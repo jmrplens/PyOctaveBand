@@ -176,7 +176,7 @@ def test_plot_draws_both_ladders_and_shades_the_plane_wave_band() -> None:
     assert isinstance(ax, Axes)
     lines = {str(line.get_label()): line for line in ax.get_lines()}
     assert np.allclose(lines["No flow"].get_ydata(), res.cut_on_no_flow)
-    assert np.allclose(lines[f"M = {res.mach:.3f}"].get_ydata(), res.cut_on)
+    assert np.allclose(lines[f"$M$ = {res.mach:.3f}"].get_ydata(), res.cut_on)
     assert [t.get_text() for t in ax.get_xticklabels()] == [
         f"({p}, {q})" for p, q in res.modes
     ]

@@ -30,7 +30,7 @@ from .common import (
 #: Legend label of the Rice peak-height curve, parameterised by the
 #: irregularity factor ``r`` (Bendat & Piersol 5.5.4); the same in both
 #: languages.
-_RICE_CURVE_LABEL = "Rice (r = {r})"
+_RICE_CURVE_LABEL = "Rice ($r$ = {r})"
 
 #: Spanish translations of the fixed strings rendered by the metrology
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
@@ -40,13 +40,13 @@ _RICE_CURVE_LABEL = "Rice (r = {r})"
 _STRINGS: dict[str, str] = {
     r"Contribution to combined uncertainty $|c_i|\,u(x_i)$":
         r"Contribución a la incertidumbre combinada $|c_i|\,u(x_i)$",
-    "GUM uncertainty budget — y = {value}":
-        "Presupuesto de incertidumbre (GUM) — y = {value}",
+    "GUM uncertainty budget — $y$ = {value}":
+        "Presupuesto de incertidumbre (GUM) — $y$ = {value}",
     "{pct} % coverage interval": "Intervalo de cobertura {pct} %",
-    "Output quantity y": "Magnitud de salida y",
+    "Output quantity $y$": "Magnitud de salida $y$",
     "Probability density": "Densidad de probabilidad",
-    "Monte Carlo distribution (GUM Supplement 1) — u(y) = {uy}":
-        "Distribución de Monte Carlo (GUM Suplemento 1) — u(y) = {uy}",
+    "Monte Carlo distribution (GUM Supplement 1) — $u(y)$ = {uy}":
+        "Distribución de Monte Carlo (GUM Suplemento 1) — $u(y)$ = {uy}",
     "Sample": "Muestra",
     "Segment mean square": "Media cuadrática por segmento",
     "Segment RMS": "RMS por segmento",
@@ -64,23 +64,23 @@ _STRINGS: dict[str, str] = {
         "Test de estacionariedad (Bendat y Piersol 10.3.1.1)",
     "stationary": "estacionario",
     "nonstationary": "no estacionario",
-    "Reverse arrangements A = {a}, accept ({lo}, {hi}]: {verdict}":
-        "Inversiones de orden A = {a}, aceptación ({lo}, {hi}]: {verdict}",
-    "Runs r = {r}, accept ({lo}, {hi}]: {verdict}":
-        "Rachas r = {r}, aceptación ({lo}, {hi}]: {verdict}",
+    "Reverse arrangements $A$ = {a}, accept ({lo}, {hi}]: {verdict}":
+        "Inversiones de orden $A$ = {a}, aceptación ({lo}, {hi}]: {verdict}",
+    "Runs $r$ = {r}, accept ({lo}, {hi}]: {verdict}":
+        "Rachas $r$ = {r}, aceptación ({lo}, {hi}]: {verdict}",
     "Measured rate": "Tasa medida",
     "Rice expectation (Eq. 5.196)": "Expectativa de Rice (Ec. 5.196)",
-    "Level a [signal units]": "Nivel a [unidades de la señal]",
+    "Level $a$ [signal units]": "Nivel $a$ [unidades de la señal]",
     "Crossings per second [1/s]": "Cruces por segundo [1/s]",
     "Level-crossing rate (Bendat & Piersol 5.5.1)":
         "Tasa de cruces por nivel (Bendat y Piersol 5.5.1)",
     "Empirical peak exceedance": "Excedencia empírica de picos",
     _RICE_CURVE_LABEL: _RICE_CURVE_LABEL,
-    "Rayleigh limit (r = 1)": "Límite de Rayleigh (r = 1)",
-    "Gaussian limit (r = 0)": "Límite gaussiano (r = 0)",
+    "Rayleigh limit ($r$ = 1)": "Límite de Rayleigh ($r$ = 1)",
+    "Gaussian limit ($r$ = 0)": "Límite gaussiano ($r$ = 0)",
     r"Standardized peak height $z = a/\sigma_x$":
         r"Altura de pico estandarizada $z = a/\sigma_x$",
-    "Prob[peak > z]": "Prob[pico > z]",
+    "Prob[peak > $z$]": "Prob[pico > $z$]",
     "Peak-height distribution (Bendat & Piersol 5.5.4)":
         "Distribución de alturas de pico (Bendat y Piersol 5.5.4)",
 }
@@ -107,10 +107,13 @@ def plot_uncertainty_budget(
     # The y-axis carries categorical input names (a FixedFormatter), so
     # localize_axes is intentionally not applied here: it would overwrite
     # those labels with comma-formatted tick numbers.
-    from .._i18n import decimal_comma
+    from .._i18n import decimal_comma, fmt_minus
 
     ax = ax if ax is not None else _new_axes()
     contributions = np.asarray(result.contributions, dtype=np.float64)
+    # The fallback must read exactly like the names combine_uncertainty
+    # fills in (``x1``, ``x2``, ...), so a hand-built result and a library
+    # one label the same bars the same way.
     names = list(result.names) or [f"x{i + 1}" for i in range(contributions.size)]
     positions = np.arange(contributions.size)
     kwargs.setdefault("color", _C_PRIMARY)
@@ -122,8 +125,8 @@ def plot_uncertainty_budget(
     ax.set_yticklabels(names)
     ax.invert_yaxis()
     ax.set_xlabel(_t(r"Contribution to combined uncertainty $|c_i|\,u(x_i)$", language))
-    value = decimal_comma(f"{result.value:.4g}", language)
-    ax.set_title(_t("GUM uncertainty budget — y = {value}", language, value=value))
+    value = decimal_comma(fmt_minus(result.value, ".4g"), language)
+    ax.set_title(_t("GUM uncertainty budget — $y$ = {value}", language, value=value))
     ax.legend(loc="lower right", fontsize="small")
     ax.grid(True, axis="x", alpha=0.3)
     return ax
@@ -143,7 +146,7 @@ def plot_monte_carlo(
     :return: The axes.
     :raises ValueError: If the result carries no output samples.
     """
-    from .._i18n import decimal_comma, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     if result.samples is None:
         raise ValueError(
@@ -160,13 +163,16 @@ def plot_monte_carlo(
     pct = decimal_comma(f"{100.0 * result.coverage:g}", language)
     ax.axvspan(low, high, color=_C_PRIMARY, alpha=0.12,
                label=_t("{pct} % coverage interval", language, pct=pct))
-    value = decimal_comma(f"{result.value:.4g}", language)
+    value = decimal_comma(fmt_minus(result.value, ".4g"), language)
     ax.axvline(result.value, color=_C_REFERENCE, ls="--",
-               label=f"y = {value}")
-    ax.set_xlabel(_t("Output quantity y", language))
+               label=f"$y$ = {value}")
+    ax.set_xlabel(_t("Output quantity $y$", language))
     ax.set_ylabel(_t("Probability density", language))
     uy = decimal_comma(f"{result.standard_uncertainty:.3g}", language)
-    ax.set_title(_t("Monte Carlo distribution (GUM Supplement 1) — u(y) = {uy}", language, uy=uy))
+    ax.set_title(
+        _t("Monte Carlo distribution (GUM Supplement 1) — $u(y)$ = {uy}",
+           language, uy=uy)
+    )
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
@@ -190,9 +196,9 @@ def _trend_verdict_label(
     own acceptance region.
     """
     template = (
-        "Reverse arrangements A = {a}, accept ({lo}, {hi}]: {verdict}"
+        "Reverse arrangements $A$ = {a}, accept ({lo}, {hi}]: {verdict}"
         if method == "reverse_arrangements"
-        else "Runs r = {r}, accept ({lo}, {hi}]: {verdict}"
+        else "Runs $r$ = {r}, accept ({lo}, {hi}]: {verdict}"
     )
     return _t(
         template, language, a=count, r=count,
@@ -335,7 +341,7 @@ def plot_level_crossing_rate(
         label=_t("Measured rate", language), **kwargs,
     )
     ax.set_yscale("log")
-    ax.set_xlabel(_t("Level a [signal units]", language))
+    ax.set_xlabel(_t("Level $a$ [signal units]", language))
     ax.set_ylabel(_t("Crossings per second [1/s]", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -371,11 +377,11 @@ def plot_peak_statistics(
     z = np.linspace(float(peaks[0]), float(peaks[-1]), 400)
     ax.plot(
         z, _rice_peak_exceedance(z, 1.0), color=_C_MUTED, lw=1.0,
-        linestyle="--", label=_t("Rayleigh limit (r = 1)", language),
+        linestyle="--", label=_t("Rayleigh limit ($r$ = 1)", language),
     )
     ax.plot(
         z, _rice_peak_exceedance(z, 0.0), color=_C_MUTED, lw=1.0,
-        linestyle=":", label=_t("Gaussian limit (r = 0)", language),
+        linestyle=":", label=_t("Gaussian limit ($r$ = 0)", language),
     )
     ax.plot(
         z, result.peak_exceedance(z), color=_C_REFERENCE, lw=1.5,
@@ -395,7 +401,7 @@ def plot_peak_statistics(
     ax.set_yscale("log")
     ax.set_ylim(bottom=floor)
     ax.set_xlabel(_t(r"Standardized peak height $z = a/\sigma_x$", language))
-    ax.set_ylabel(_t("Prob[peak > z]", language))
+    ax.set_ylabel(_t("Prob[peak > $z$]", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)

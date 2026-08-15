@@ -43,7 +43,7 @@ def test_fdtd_probes_es_and_bad_language() -> None:
 def test_fdtd_snapshot_es() -> None:
     res = _result()
     ax = res.plot(kind="snapshot", frame=-1, language="es")
-    assert ax.get_title().startswith("Campo de presión FDTD en t =")
+    assert ax.get_title().startswith("Campo de presión FDTD en $t$ =")
     plt.close("all")
     with pytest.raises(ValueError):
         res.plot(kind="snapshot", language="xx")

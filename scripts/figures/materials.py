@@ -43,8 +43,8 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     s_mn = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     # Two typical floating-floor masses per unit area (light vs heavy screed).
-    for m, color, label in ((40.0, COLOR_SECONDARY, "$m′$ = 40 kg/m²"),
-                             (120.0, COLOR_PRIMARY, "$m′$ = 120 kg/m²")):
+    for m, color, label in ((40.0, COLOR_SECONDARY, r"$m^{\prime}$ = 40 kg/m²"),
+                             (120.0, COLOR_PRIMARY, r"$m^{\prime}$ = 120 kg/m²")):
         f0 = np.asarray(natural_frequency(s_mn * 1e6, m), dtype=float)
         ax.plot(s_mn, f0, color=color, linewidth=2.2, label=label)
 
@@ -57,19 +57,19 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     ax.plot([s_mn[0], s0], [f00, f00], color=COLOR_GRID, ls=":", lw=1.0, zorder=1)
 
     ax.set_xscale("log")
-    ax.set_xlabel("Dynamic stiffness per unit area $s′$ [MN/m³]")
+    ax.set_xlabel(r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]")
     ax.set_ylabel(r"Natural frequency $f_0$ [Hz]")
-    ax.set_title("EN 29052-1 Floating-Floor Resonance", fontweight="bold", pad=12)
+    ax.set_title("EN 29052-1 Floating-Floor Resonance", pad=12)
     ax.set_ylim(bottom=0.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=10)
 
     info = [
-        r"$f_0 = (1/2\pi)\sqrt{s′/m′}$  (Formula 2)",
-        r"$s′ = s′_t + s′_a$  (clause 8.2)",
-        r"$s′_t = 4\pi^2 m′_t f_r^2$  (Formula 4)",
-        r"$s′_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
+        r"$f_0 = (1/2\pi)\sqrt{s^{\prime}/m^{\prime}}$  (Formula 2)",
+        r"$s^{\prime} = s^{\prime}_t + s^{\prime}_a$  (clause 8.2)",
+        r"$s^{\prime}_t = 4\pi^2 m^{\prime}_t f_r^2$  (Formula 4)",
+        r"$s^{\prime}_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -111,7 +111,7 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
     ax_l.set_xlim(rig[0], rig[-1])
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel("Load-plate response [dB re static]")
-    ax_l.set_title("On the rig: reading $f_r$", fontweight="bold", pad=12)
+    ax_l.set_title("On the rig: reading $f_r$", pad=12)
     ax_l.legend(loc="upper right", fontsize=9)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
@@ -130,9 +130,9 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
                   label="ideal mass-spring isolation")
     for f0, color, marker, label in (
         (f0_hard, COLOR_PRIMARY, "o",
-         f"$s′$ = 10.5 MN/m³, $f_0$ = {f0_hard:.0f} Hz"),
+         rf"$s^{{\prime}}$ = 10.5 MN/m³, $f_0$ = {f0_hard:.0f} Hz"),
         (f0_soft, COLOR_TERTIARY, "s",
-         f"$s′$ = 5.0 MN/m³, $f_0$ = {f0_soft:.0f} Hz"),
+         rf"$s^{{\prime}}$ = 5.0 MN/m³, $f_0$ = {f0_soft:.0f} Hz"),
     ):
         law = floating_floor_improvement_spectrum(bands, resonance_frequency=f0)
         ax_r.semilogx(bands, np.asarray(law.improvement), color=color,
@@ -149,7 +149,7 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
     ax_r.set_ylim(-22.0, 60.0)
     ax_r.set_xlabel(LABEL_FREQ_HZ)
     ax_r.set_ylabel("Improvement of impact insulation [dB]")
-    ax_r.set_title("Installed: only well above $f_0$", fontweight="bold", pad=12)
+    ax_r.set_title("Installed: only well above $f_0$", pad=12)
     format_frequency_axis(ax_r, 30.0, 3150.0)
     ax_r.legend(loc="upper left", fontsize=9)
     ax_r.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -177,12 +177,12 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     ax.loglog(d_mm, s_frame, color=COLOR_PRIMARY, linewidth=1.9,
-              linestyle="--", zorder=3, label="$s′_t$, frame (Formula 4)")
+              linestyle="--", zorder=3, label=r"$s^{\prime}_t$, frame (Formula 4)")
     ax.loglog(d_mm, s_gas, color=COLOR_TERTIARY, linewidth=1.9,
               linestyle="-.", zorder=3,
-              label=r"$s′_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
+              label=r"$s^{\prime}_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
     ax.loglog(d_mm, s_total, color=COLOR_SECONDARY, linewidth=2.4, zorder=4,
-              label="installed $s′ = s′_t + s′_a$ (clause 8.2)")
+              label=r"installed $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ (clause 8.2)")
     ax.scatter([20.0], [10.49], color=COLOR_FG, s=70, zorder=6)
     ax.annotate("the worked determination:\n$d$ = 20 mm, 4.94 + 5.56 = 10.49",
                 (21.0, 10.49), fontsize=9, color=COLOR_FG, ha="left",
@@ -190,7 +190,7 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
     ax.set_xlabel("Loaded thickness $d$ [mm]")
     ax.set_ylabel("Dynamic stiffness per unit area [MN/m³]")
     ax.set_title("The gas spring takes over as the layer gets thinner",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlim(d_mm[0], d_mm[-1])
     ax.set_ylim(1.0, 40.0)
     from matplotlib.ticker import NullFormatter, ScalarFormatter
@@ -215,9 +215,9 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
     ax_f.set_yticks([15, 20, 30, 40, 60, 90])
 
     ax.text(0.015, 0.05,
-            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s′ = s′_t$" "\n"
-            r"$10 \leq r < 100$  →  $s′ = s′_t + s′_a$" "\n"
-            r"$r < 10$  →  $s′ = s′_t$ only if $s′_a$ is negligible",
+            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_t$" "\n"
+            r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_t + s^{\prime}_a$" "\n"
+            r"$r < 10$  →  $s^{\prime} = s^{\prime}_t$ only if $s^{\prime}_a$ is negligible",
             transform=ax.transAxes, va="bottom", ha="left", fontsize=9,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -257,7 +257,7 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
     ax.set_ylabel("Sound absorption coefficient")
     ax.set_ylim(0.0, 1.15)
     ax.set_title("ISO 12999-2 Sound Absorption Coefficient Uncertainty",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -317,7 +317,7 @@ def generate_absorption_rating(output_dir: str) -> None:
                 fontsize=9.5, color=COLOR_FG)
 
     ax.set_title("ISO 11654 Weighted Sound Absorption Coefficient (Annex A.2 example)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound absorption coefficient")
     ax.set_xscale("log")
@@ -375,7 +375,7 @@ def generate_airflow_resistance(output_dir: str) -> None:
         ax.text(0.03, dy, text, transform=ax.transAxes, va="top", ha="left",
                 fontsize=9.5, color=COLOR_FG)
 
-    ax.set_title("ISO 9053-1 Static-Method Airflow Resistance", fontweight="bold",
+    ax.set_title("ISO 9053-1 Static-Method Airflow Resistance",
                  pad=12)
     ax.set_xlabel("Linear airflow velocity $u$ [mm/s]")
     ax.set_ylabel(r"Pressure drop $\Delta p$ [Pa]")
@@ -425,7 +425,7 @@ def generate_impedance_tube(output_dir: str) -> None:
                 xy=(dl_anchor, 0.75), xytext=(15.0, 0.44),
                 fontsize=10, arrowprops={"arrowstyle": "->", "lw": 1.0})
 
-    ax.set_title("ISO 10534-1 Standing-Wave-Ratio Method", fontweight="bold", pad=12)
+    ax.set_title("ISO 10534-1 Standing-Wave-Ratio Method", pad=12)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     lines1, labels1 = ax.get_legend_handles_labels()
     lines2, labels2 = ax_r.get_legend_handles_labels()
@@ -492,12 +492,24 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
         open_area=0.05,
     )
     f_mem = membrane_resonance_frequency(surface_density=2.0, cavity_depth=0.048)
-    for f0, color, label in (
-        (f_helm, COLOR_TERTIARY, "Helmholtz closed form"),
-        (f_mem, "#9467bd", "Membrane closed form"),
+    # Each guide label hangs from its own ceiling instead of standing on a
+    # common floor: the Spanish label is a third longer than the English one,
+    # so a shared baseline pushes the longer one up into whatever crosses its
+    # dotted line. The ceiling and the offset from the line are the free
+    # stretch each label has -- the Helmholtz one stops under the crossing of
+    # the porous and perforated curves, the membrane one stands clear of the
+    # steep flank of its own resonance and under the legend.
+    for f0, color, label, offset, top in (
+        (f_helm, COLOR_TERTIARY, "Helmholtz closed form", 1.04, 0.65),
+        (f_mem, "#9467bd", "Membrane closed form", 1.09, 0.82),
     ):
-        ax.axvline(f0, color=color, linestyle=":", linewidth=1.1, alpha=0.8)
-        ax.text(f0 * 1.04, 0.44, label, rotation=90, va="bottom",
+        # The guides stop above the note row: the only stretch of the bottom
+        # margin wide enough for the note is the one the Helmholtz guide ran
+        # through. Above that row each guide still crosses every curve it is
+        # there to mark.
+        ax.axvline(f0, ymin=0.085, color=color, linestyle=":", linewidth=1.1,
+                   alpha=0.8)
+        ax.text(f0 * offset, top, label, rotation=90, va="top",
                 ha="left", fontsize=8.5, color=color)
 
     ax.set_xlabel("Frequency [Hz]")
@@ -505,13 +517,17 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
     ax.set_ylim(0.0, 1.08)
     ax.set_xlim(50.0, 5000.0)
     ax.set_title("Multilayer Absorber Prediction (Transfer-Matrix Method)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.set_xticks([63, 125, 250, 500, 1000, 2000, 4000])
     ax.set_xticklabels(["63", "125", "250", "500", "1k", "2k", "4k"])
     ax.legend(loc="upper left", fontsize=9)
-    ax.text(0.985, 0.03, "Normal incidence, rigid backing, 50 mm total depth",
+    # The note stops short of the right frame: further right the bottom margin
+    # belongs to the microperforated dip and its spike, and to the tail of the
+    # perforated curve. Anchored here it clears the perforated tail above and
+    # the membrane tail below at both label lengths.
+    ax.text(0.865, 0.036, "Normal incidence, rigid backing, 50 mm total depth",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
@@ -579,7 +595,7 @@ def generate_limp_frame_effective_density(output_dir: str) -> None:
     ax.set_ylim(-30.0, 30.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Normalised effective density $\rho_e/\rho_0$")
-    ax.set_title("A Limp Frame Carries Its Own Inertia", fontweight="bold",
+    ax.set_title("A Limp Frame Carries Its Own Inertia",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -662,15 +678,18 @@ def generate_biot_frame_resonance(output_dir: str) -> None:
     ax.set_ylim(-3.0, 3.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Normalised surface impedance $Z_s/\rho_0 c_0$")
-    ax.set_title("Only an Elastic Frame Resonates", fontweight="bold", pad=12)
+    ax.set_title("Only an Elastic Frame Resonates", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower right", fontsize=9)
-    ax.text(0.015, 0.03,
+    # The empty band between the real and imaginary parts, to the right of the
+    # resonance marker: the bottom-left corner is crossed by both imaginary
+    # curves and by the marker itself, in either language.
+    ax.text(0.30, 0.57,
             "Glass wool, 100 mm glued to a rigid wall: porosity 0.94,\n"
             "flow resistivity 40 kPa s/m², frame density 130 kg/m³,\n"
             "shear modulus 2.2 MPa",
-            transform=ax.transAxes, va="bottom", ha="left", fontsize=8.5,
+            transform=ax.transAxes, va="center", ha="left", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()
     save_figure(output_dir, "biot_frame_resonance.svg")
@@ -728,7 +747,7 @@ def generate_slow_sound_absorber(output_dir: str) -> None:
     ax.set_ylim(0.0, 1.08)
     ax.set_xlim(150.0, 500.0)
     ax.set_title("Perfect Absorption by Critical Coupling (Slow-Sound Panel)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -893,7 +912,7 @@ def generate_metadiffuser_polar(output_dir: str) -> None:
                          [f"{_fmt_minus(a, '.0f')}°" for a in range(-90, 91, 30)])
     ax.set_title(
         "The 2 cm metadiffuser scatters like the 27 cm QRD (2 kHz)",
-        pad=18, fontweight="bold",
+        pad=18,
     )
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.02), fontsize=9)
     plt.tight_layout()
@@ -956,7 +975,7 @@ def generate_metadiffuser_absorption(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Absorption coefficient")
     ax.set_title("The absorption a metadiffuser pays for its phases",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.legend(loc="upper left", fontsize=9, ncol=2)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -1006,9 +1025,15 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
     ax_l.set_xticks(index)
     ax_l.set_xlabel("Slit index $n$")
     ax_l.set_ylabel("Reflection phase [deg]")
+    # Wider than the data so the |R| annotations centred on the first and the
+    # last slit, which are about 0.31 of a slit wide either side of the marker,
+    # stay inside the spines rather than being cut by them.
+    ax_l.set_xlim(0.55, 5.45)
     ax_l.set_ylim(-115.0, 115.0)
-    ax_l.set_title("At the 2 kHz design frequency", fontweight="bold", pad=12)
-    ax_l.legend(loc="lower right", fontsize=9)
+    ax_l.set_title("At the 2 kHz design frequency", pad=12)
+    # Above the phases rather than under them: at the lower right the box met
+    # the |R| annotation of slit 3, whose comma in Spanish reached its border.
+    ax_l.legend(loc="upper right", fontsize=9)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
 
@@ -1024,15 +1049,24 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
                   linewidth=1.5, zorder=3, label=f"slit {slit + 1}")
     ax_r.axvline(2000.0, color=COLOR_FG, linestyle=":", linewidth=1.3,
                  zorder=1)
-    ax_r.annotate("within 10 deg of the target", (1615.0, 12.0), fontsize=8.5,
-                  color=COLOR_FG, ha="left", va="bottom")
+    # Set on two lines inside the band it names: the only stretch of the panel
+    # no curve reaches is the left end of the band itself, before the three
+    # slits that converge on zero drop into it around 1900 Hz. One line was
+    # 330 Hz wide in English and 400 Hz in Spanish, wider than any clear
+    # corridor here, so it was crossed by the curves and by the 2 kHz guide.
+    ax_r.annotate("within 10 deg\nof the target", (1665.0, -1.25), fontsize=8.0,
+                  color=COLOR_FG, ha="left", va="center")
     ax_r.set_xlim(freqs[0], freqs[-1])
     ax_r.set_ylim(-100.0, 100.0)
     ax_r.set_xlabel(LABEL_FREQ_HZ)
     ax_r.set_ylabel("Phase error against the QRD target [deg]")
     ax_r.set_title("Across the band: exact only where it was tuned",
-                   fontweight="bold", pad=12)
-    ax_r.legend(loc="lower left", fontsize=9, ncol=3)
+                   pad=12)
+    # Below the axes rather than in them: five curves with poles in the band
+    # leave no clear rectangle inside, and at the lower left the box sat on
+    # the slit-3 curve, which crossed its own sample in the key.
+    ax_r.legend(loc="upper center", bbox_to_anchor=(0.5, -0.11), fontsize=9,
+                ncol=5, columnspacing=1.4, handlelength=1.6)
     ax_r.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
     fig.align_ylabels((ax_l, ax_r))
@@ -1085,7 +1119,7 @@ def generate_metadiffuser_spectrum(output_dir: str) -> None:
     ax.set_ylim(0.0, 0.45)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Normalised diffusion coefficient")
-    ax.set_title("The honest bandwidth of the trick", fontweight="bold",
+    ax.set_title("The honest bandwidth of the trick",
                  pad=12)
     format_frequency_axis(ax, freqs[0], freqs[-1])
     ax.legend(loc="upper right", fontsize=9)
@@ -1247,7 +1281,7 @@ def generate_scattering_coefficient(output_dir: str) -> None:
     ax_a.set_ylabel("Absorption coefficient")
     ax_a.set_ylim(0.0, 1.0)
     ax_a.set_title("Random-incidence scattering coefficient (ISO 17497-1)",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_a.legend(loc="upper left", fontsize=9)
     ax_a.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_a.set_axisbelow(True)
@@ -1410,7 +1444,7 @@ def generate_diffusion_measurement_chain(output_dir: str) -> None:
     win.set_xlim(20.0, (t_room + t_h3 + 4.0e-3) * 1e3)
     axes[0].set_title(
         "From three impulse responses to one level (ISO 17497-2, Clause 7.4)",
-        fontweight="bold", pad=12,
+        pad=12,
     )
     axes[1].text(
         0.30, 0.10,
@@ -1479,7 +1513,7 @@ def generate_qrd_working_band(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Predicted diffusion coefficient $d$")
     ax.set_title("The working band of a Schroeder design",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.legend(loc="upper right", fontsize=9)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -1534,7 +1568,7 @@ def generate_diffuser_modulation(output_dir: str) -> None:
     # hyphen; restate the same grid with the typographic minus.
     polar.set_thetagrids(np.arange(-90, 91, 30),
                          [f"{_fmt_minus(a, '.0f')}°" for a in range(-90, 91, 30)])
-    polar.set_title("Reflected polar response at 1 kHz", fontweight="bold",
+    polar.set_title("Reflected polar response at 1 kHz",
                     pad=18)
     polar.legend(loc="lower center", bbox_to_anchor=(0.5, -0.17), fontsize=9)
 
@@ -1556,7 +1590,7 @@ def generate_diffuser_modulation(output_dir: str) -> None:
     ax.set_ylim(0.0, 0.45)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Normalised diffusion coefficient")
-    ax.set_title("Band by band, same 4.2 m panel", fontweight="bold", pad=12)
+    ax.set_title("Band by band, same 4.2 m panel", pad=12)
     format_frequency_axis(ax, freqs[0], freqs[-1])
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -1611,7 +1645,7 @@ def generate_diffusion_polar(output_dir: str) -> None:
                          [f"{_fmt_minus(a, '.0f')}°" for a in range(-90, 91, 30)])
     polar.set_title(
         f"Directional diffusion  $d$ = {result.coefficient:.2f}  (ISO 17497-2)",
-        fontweight="bold", pad=20,
+        pad=20,
     )
     plt.tight_layout()
     save_figure(output_dir, "diffusion_polar.png")
@@ -1649,7 +1683,6 @@ def generate_diffuser_prediction(output_dir: str) -> None:
     format_frequency_axis(ax, 250.0, 5000.0)
     ax.set_title(
         "Predicted diffusion from design (Cox & D'Antonio Fraunhofer model)",
-        fontweight="bold",
     )
     ax.legend(loc="best")
     plt.tight_layout()
@@ -1688,7 +1721,7 @@ def generate_insitu_absorption(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title("In-situ road-surface absorption (ISO 13472-1)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Absorption coefficient $\alpha$")
     ax.set_ylim(0.0, 1.0)
@@ -1829,7 +1862,7 @@ def generate_adrienne_window(output_dir: str) -> None:
     bot.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     bot.set_axisbelow(True)
 
-    top.set_title("The one free parameter of ISO 13472-1", fontweight="bold",
+    top.set_title("The one free parameter of ISO 13472-1",
                   pad=12)
     fig.align_ylabels(axes)
     plt.tight_layout()
@@ -1869,7 +1902,7 @@ def generate_insitu_method_windows(output_dir: str) -> None:
     ax_b.set_ylim(-0.6, 1.8)
     ax_b.set_yticks([])
     ax_b.set_title("Two in-situ methods, two reported bands",
-                   fontweight="bold", pad=12)
+                   pad=12)
     format_frequency_axis(ax_b, 200.0, 5000.0)
     ax_b.grid(axis="x", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_b.set_axisbelow(True)
@@ -1903,7 +1936,7 @@ def generate_insitu_method_windows(output_dir: str) -> None:
     ax_d.set_xlabel("Tube diameter $d$ [mm]")
     ax_d.set_ylabel("Plane-wave ceiling [Hz]")
     ax_d.set_title("The bore that seals is the bore that caps the band",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_d.legend(loc="upper right", fontsize=9)
     ax_d.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_d.set_axisbelow(True)
@@ -2078,7 +2111,7 @@ def generate_sound_absorption_inversion(output_dir: str) -> None:
                       color=theme_fill(COLOR_SECONDARY, ax_t), zorder=0)
     ax_t.set_ylabel("Reverberation time [s]")
     ax_t.set_title("ISO 354: What the Sabine Inversion Consumes",
-                   fontweight="bold", pad=12)
+                   pad=12)
     ax_t.set_ylim(bottom=0.0)
     ax_t.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_t.set_axisbelow(True)
@@ -2162,9 +2195,9 @@ def generate_effective_kappa(output_dir: str) -> None:
                label=f"Annex A.3 example (2 Hz, {kappa_a3:.3f})")
 
     ax.set_xlabel("Piston frequency $f$ [Hz]  (ISO 9053-2 Clause 6.2: 1 Hz to 4 Hz)")
-    ax.set_ylabel(r"Effective ratio of specific heats $\kappa′$")
+    ax.set_ylabel(r"Effective ratio of specific heats $\kappa^{\prime}$")
     ax.set_title("ISO 9053-2 Annex A Heat-Conduction Correction",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlim(1.0, 4.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -2210,7 +2243,7 @@ def generate_flow_resistivity_window(output_dir: str) -> None:
     format_frequency_axis(ax_f, 100.0, 5000.0)
     ax_f.set_xlabel(LABEL_FREQ_HZ)
     ax_f.set_ylabel(r"Normal-incidence absorption $\alpha$")
-    ax_f.set_title("50 mm hard-backed layer", fontweight="bold", pad=10)
+    ax_f.set_title("50 mm hard-backed layer", pad=10)
     ax_f.set_ylim(0.0, 1.0)
     ax_f.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_f.set_axisbelow(True)
@@ -2244,7 +2277,7 @@ def generate_flow_resistivity_window(output_dir: str) -> None:
               fontsize=10, ha="center", color=COLOR_FG)
     ax_w.set_xlabel(r"$\sigma\,d\,/\,(\rho_0 c_0)$")
     ax_w.set_ylabel(r"Absorption coefficient")
-    ax_w.set_title("The design window", fontweight="bold", pad=10)
+    ax_w.set_title("The design window", pad=10)
     ax_w.set_ylim(0.0, 1.0)
     ax_w.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_w.set_axisbelow(True)
@@ -2302,7 +2335,7 @@ def generate_tube_working_ranges(output_dir: str) -> None:
     format_frequency_axis(ax, 25.0, 11000.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_title("Plane-Wave Working Range of an Impedance Tube",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", axis="x", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     plt.tight_layout()
@@ -2342,7 +2375,7 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
         1.0 + r_eff**2 + 2.0 * r_eff * np.cos(2 * k * x + np.radians(54.1))
     )
     ax.plot(x, lossy, color=COLOR_SECONDARY, linewidth=1.8, linestyle=":",
-            label=f"the same, with tube loss ($k_0\u2032\u2032$ = {atten:.3f} Np/m)")
+            label=rf"the same, with tube loss ($k_0^{{\prime\prime}}$ = {atten:.3f} Np/m)")
 
     # How far the far minima have filled in, in decibels.
     minima = [float(lossy[np.argmin(np.abs(x - xm))])
@@ -2371,7 +2404,7 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
     ax.set_xlabel("Distance from the specimen face $x$ [m]  (towards the source)")
     ax.set_ylabel(r"Envelope level $20\log_{10}(|p(x)|/A)$ [dB]")
     ax.set_title("What the Probe Carriage Traverses (500 Hz, 100 mm tube)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlim(0.0, 1.0)
     ax.set_ylim(-20.0, 15.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -2418,7 +2451,7 @@ def generate_porous_model_comparison(output_dir: str) -> None:
     ax_z.set_xlabel(LABEL_FREQ_HZ)
     ax_z.set_ylabel(r"$Z_c/(\rho_0 c_0)$")
     ax_z.set_title(r"Characteristic impedance, $\sigma$ = 20 kPa·s/m²",
-                   fontweight="bold", pad=10)
+                   pad=10)
     ax_z.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_z.set_axisbelow(True)
     ax_z.legend(loc="upper right", fontsize=8.5, ncol=2)
@@ -2440,7 +2473,7 @@ def generate_porous_model_comparison(output_dir: str) -> None:
     format_frequency_axis(ax_s, 20.0, 20000.0)
     ax_s.set_xlabel(LABEL_FREQ_HZ)
     ax_s.set_ylabel(r"$\mathrm{Re}(Z_s)/(\rho_0 c_0)$,  50 mm hard-backed layer")
-    ax_s.set_title("Where the extrapolation fails", fontweight="bold", pad=10)
+    ax_s.set_title("Where the extrapolation fails", pad=10)
     ax_s.set_ylim(-8.0, 8.0)
     ax_s.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_s.set_axisbelow(True)
@@ -2537,7 +2570,7 @@ def generate_oblique_absorption(output_dir: str) -> None:
     ax_t.set_xlabel(r"Incidence angle $\theta$ [°]")
     ax_t.set_ylabel(r"$\alpha(\theta)$")
     ax_t.set_title("The integrand: solid bulk-reacting, dashed locally reacting",
-                   fontweight="bold", pad=10)
+                   pad=10)
     ax_t.set_xlim(0.0, 90.0)
     ax_t.set_ylim(0.0, 1.0)
     ax_t.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -2562,7 +2595,7 @@ def generate_oblique_absorption(output_dir: str) -> None:
     format_frequency_axis(ax_f, 125.0, 4000.0)
     ax_f.set_xlabel(LABEL_FREQ_HZ)
     ax_f.set_ylabel("Absorption coefficient")
-    ax_f.set_title("The two averages, and the tube", fontweight="bold", pad=10)
+    ax_f.set_title("The two averages, and the tube", pad=10)
     ax_f.set_ylim(0.0, 1.05)
     ax_f.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_f.set_axisbelow(True)
@@ -2622,7 +2655,7 @@ def generate_sheet_transfer_impedance(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Normalised transfer impedance $z/\rho_0 c_0$")
     ax.set_title("Where a Resonant Sheet Resonates, and How Well It Absorbs",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_ylim(-2.0, 5.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -2676,7 +2709,7 @@ def generate_critical_coupling_impedance(output_dir: str) -> None:
                   arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG})
     ax_h.set_xlabel("Slit height $h$ [mm]")
     ax_h.set_ylabel(r"Normalised surface impedance $z$ at 300 Hz")
-    ax_h.set_title("What the design solver solves", fontweight="bold", pad=10)
+    ax_h.set_title("What the design solver solves", pad=10)
     ax_h.set_ylim(-4.0, 6.0)
     ax_h.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_h.set_axisbelow(True)
@@ -2711,7 +2744,7 @@ def generate_critical_coupling_impedance(output_dir: str) -> None:
     ax_l.axvline(1.0, color=COLOR_GRID, linewidth=1.0)
     ax_l.set_xlabel(r"Re$(z)$")
     ax_l.set_ylabel(r"Im$(z)$")
-    ax_l.set_title("The locus over 150-500 Hz", fontweight="bold", pad=10)
+    ax_l.set_title("The locus over 150-500 Hz", pad=10)
     ax_l.set_xlim(0.0, 4.0)
     ax_l.set_ylim(-3.0, 3.0)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -2772,7 +2805,7 @@ def generate_slow_sound_dispersion(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(r"Phase speed in the slit  $c_\mathrm{eff}/c_0$")
     ax.set_title("Slow Sound: the Phase Speed Inside a Loaded Slit",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_ylim(0.0, 1.25)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -2822,7 +2855,7 @@ def generate_graded_slit_absorber(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Absorption coefficient")
     ax.set_title("What a Chain of Resonators Buys, and What It Costs",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlim(120.0, 700.0)
     ax.set_ylim(0.0, 1.05)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)

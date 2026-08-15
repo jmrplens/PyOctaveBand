@@ -60,7 +60,7 @@ def generate_gcc_phat_delay(output_dir: str) -> None:
     ax.set_xlabel("Lag [ms]")
     ax.set_ylabel("Normalized correlation")
     ax.set_title("Time-Delay Estimation: GCC-PHAT vs Direct Correlation "
-                 "(Knapp & Carter)", fontweight="bold", pad=12)
+                 "(Knapp & Carter)", pad=12)
     ax.set_xlim(-10.0, 10.0)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -114,7 +114,7 @@ def generate_cepstrum_echo(output_dir: str) -> None:
     ax.set_xlabel("Quefrency [ms]")
     ax.set_ylabel("Cepstrum")
     ax.set_title("Echo Detection on the Power Cepstrum (Quefrency Analysis)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -156,7 +156,7 @@ def generate_envelope_spectrum(output_dir: str) -> None:
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Modulation amplitude")
     ax.set_title("Envelope Spectrum of an AM Tone (Bendat & Piersol 13.3)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -207,7 +207,7 @@ def generate_synchronous_average(output_dir: str) -> None:
     ax0.set_xlabel("Time [ms]")
     ax0.set_ylabel("Amplitude")
     ax0.set_title("Periodic Waveform Extracted from Noise",
-                  fontweight="bold", pad=10)
+                  pad=10)
     ax0.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax0.set_axisbelow(True)
     ax0.legend(loc="upper right", fontsize=8)
@@ -233,7 +233,7 @@ def generate_synchronous_average(output_dir: str) -> None:
     ax1.set_xlabel("Frequency [orders]")
     ax1.set_ylabel("Comb filter magnitude")
     ax1.set_title("Rejecting a Tone by Choosing $N$ (McFadden 1987)",
-                  fontweight="bold", pad=10)
+                  pad=10)
     ax1.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax1.set_axisbelow(True)
     ax1.legend(loc="upper right", fontsize=8)
@@ -298,7 +298,7 @@ def generate_cepstrum_variants(output_dir: str) -> None:
     ax.set_xlim(0.5, 20.0)
     ax.set_ylim(-0.3, 0.6)
     ax.set_title("The Three Cepstrum Variants of One Echo-Carrying Record",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -354,7 +354,7 @@ def generate_lifter_split(output_dir: str) -> None:
         ax.set_axisbelow(True)
         format_frequency_axis(ax, 500.0, 2000.0)
     axes[0].set_title("Liftering at 4 ms: Envelope Versus Echo Ripple",
-                      fontweight="bold", pad=12)
+                      pad=12)
     plt.tight_layout()
     save_figure(output_dir, "lifter_split.svg")
     plt.close()
@@ -400,7 +400,7 @@ def generate_correlation_normalizations(output_dir: str) -> None:
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
         ax.set_axisbelow(True)
     ax_c.set_title("Correlation Normalizations of a Two-Sensor Delay Model",
-                   fontweight="bold", pad=12)
+                   pad=12)
     plt.tight_layout()
     save_figure(output_dir, "correlation_normalizations.svg")
     plt.close()
@@ -437,7 +437,7 @@ def generate_ir_alignment(output_dir: str) -> None:
     ax.set_xlabel("Time [ms]")
     ax.set_ylabel("Amplitude")
     ax.set_title("Sub-Sample Impulse-Response Alignment",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -485,7 +485,7 @@ def generate_hilbert_envelope(output_dir: str) -> None:
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
         ax.set_axisbelow(True)
     ax_e.set_title("Hilbert Envelope and Instantaneous Frequency",
-                   fontweight="bold", pad=12)
+                   pad=12)
     plt.tight_layout()
     save_figure(output_dir, "hilbert_envelope.svg")
     plt.close()
@@ -526,7 +526,7 @@ def generate_tsa_noise_reduction(output_dir: str) -> None:
     ax.set_xlabel("Number of averages $N$")
     ax.set_ylabel("RMS error of the averaged waveform")
     ax.set_title(r"TSA Noise Reduction: the $\sqrt{N}$ Law (McFadden 1987)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)

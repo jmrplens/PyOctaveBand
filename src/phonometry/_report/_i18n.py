@@ -1066,6 +1066,14 @@ def format_number(
     (the package-architecture rule keeps the render leaves free of module-level
     parent imports), reach it through a sibling module instead. The import is
     lazy for the same reason.
+
+    The typographic minus comes with it. A fiche and the figure printed inside
+    it are one document, and a reading signed with an ASCII hyphen in the table
+    while the plot above it carries U+2212 puts two lengths of minus on one
+    page. Transcription was the argument for keeping the hyphen here, and it is
+    a real cost -- U+2212 is not what every numeric field or search box accepts
+    -- but it is a cost the reader pays once, against a mark that is wrong on
+    every printing.
     """
     from .._i18n import format_number as _format_number
 

@@ -169,7 +169,7 @@ def plot_fdtd_domain(
     ax.set_aspect("equal")
     ax.set_xlabel(_t(_AXIS_X, language))
     ax.set_ylabel(_t(_AXIS_Y, language))
-    ax.set_title(_t("FDTD domain", language), fontweight="bold")
+    ax.set_title(_t("FDTD domain", language))
     label_keys = {
         "sponge": "Sponge layer", "impedance": "Impedance edge",
         "rigid": "Rigid edge", "source": "Source", "probe": "Probe",

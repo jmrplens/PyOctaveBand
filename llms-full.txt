@@ -17870,9 +17870,9 @@ plt.show()
 
 # By hand, from the per-band fields the result carries:
 fig, ax = plt.subplots()
-ax.plot(bands, enc.panel_transmission_loss, "s--", label="Panel R")
-ax.plot(bands, enc.correction, "^:", label="Interior correction C")
-ax.plot(bands, enc.insertion_loss, "o-", label="Insertion loss (R - C)")
+ax.plot(bands, enc.panel_transmission_loss, "s--", label="Panel $R$")
+ax.plot(bands, enc.correction, "^:", label="Interior correction $C$")
+ax.plot(bands, enc.insertion_loss, "o-", label="Insertion loss ($R - C$)")
 ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Level [dB]")
 ax.set_xscale("log")
 ax.legend()
@@ -31344,7 +31344,7 @@ weighted = result.band_audibility * result.band_importance
 fig, ax = plt.subplots()
 ax.bar(pos, result.band_audibility, color="#c6dbef", label=r"Band audibility $A_i$")
 ax.bar(pos, weighted / weighted.max(), width=0.5, color="#1f77b4",
-       label=r"Importance-weighted $I_i A_i$ (scaled)")
+       label=r"Importance-weighted $I_i\,A_i$ (scaled)")
 ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in result.frequencies], rotation=45, ha="right")
 ax.set_xlabel("One-third-octave band [Hz]")
@@ -49532,7 +49532,7 @@ ax.bar(pos + 0.2, result.weighted, 0.4, color="#1f77b4",
 ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel(r"r.m.s. acceleration [m/s$^2$]")
+ax.set_ylabel("r.m.s. acceleration [m/s²]")
 ax.set_title(f"Weighted acceleration ($a_w$ = {result.overall:.3f} m/s²)")
 ax.legend()
 plt.show()
@@ -49658,7 +49658,7 @@ result.plot()
 plt.show()
 
 # By hand, mirroring what DailyVibrationExposure.plot() draws:
-labels = [*result.labels, "A(8)"]
+labels = [*result.labels, "$A(8)$"]
 values = [*result.partials.tolist(), result.a8]
 a = result.assessment
 fig, ax = plt.subplots()
@@ -49668,7 +49668,7 @@ ax.axhline(a.action_value, color="#2ca02c", ls="--", label=f"EAV = {a.action_val
 ax.axhline(a.limit_value, color="#d62728", ls="--", label=f"ELV = {a.limit_value:g}")
 ax.set_xticks(range(len(values)))
 ax.set_xticklabels(labels, rotation=30, ha="right")
-ax.set_ylabel(r"Daily exposure A(8) [m/s$^2$]")
+ax.set_ylabel("Daily exposure $A(8)$ [m/s²]")
 ax.legend()
 plt.show()
 ```

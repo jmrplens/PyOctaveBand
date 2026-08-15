@@ -83,6 +83,27 @@ graphs:
 figure-contrast:
 	$(PYTHON) scripts/check_figure_contrast.py
 
+# A label mathtext cannot parse does not degrade into a worse label: generation
+# raises and the figure is never written, which `check_figures` then reports as
+# staleness -- sending the reader after a data change rather than a typo. This
+# parses every `$...$` in the sources instead, in seconds, and covers labels no
+# example exercises. It earns its place on a combination rather than a typo:
+# `^{\prime}` is a good prime and `^{\prime}^{\prime}` is a double superscript
+# matplotlib refuses, which is what a mechanical prime substitution makes of a
+# double prime, and did make of three labels here.
+mathtext:
+	$(PYTHON) scripts/check_mathtext.py
+
+# The blind spot of the Spanish pass, and the reason it needs a check of its
+# own. That pass ends with the decimal comma, guarded by `"$" not in s` because
+# a bare comma inside `$...$` sets with maths spacing -- but the guard tests the
+# WHOLE string, so a label carrying mathematics anywhere keeps an English point
+# everywhere. No other gate can see it: the language gate compares untranslated
+# WORDS, and a number is not a word. This reads the translation tables and fails
+# on a Spanish value that still has a point the pass will never reach.
+decimal-comma:
+	$(PYTHON) scripts/check_decimal_comma.py
+
 # The Spanish variant of a figure is the English one with its strings looked
 # up in a table at save time, so a string nobody added to the table ships in
 # English inside `X_es.svg` and every other gate stays green: the page is
@@ -99,6 +120,11 @@ figure-language:
 # concurrently under `make -j`, which would let the contrast checker parse the
 # SVGs while the generators are still deleting and rewriting them.
 figures:
+	# First, because it reads the sources and costs seconds: a label that
+	# cannot parse aborts the generation below, and finding that out from the
+	# traceback of a four-hundred-figure run is the slow way round.
+	$(MAKE) mathtext
+	$(MAKE) decimal-comma
 	$(MAKE) graphs
 	$(MAKE) figure-contrast
 	$(MAKE) figure-language

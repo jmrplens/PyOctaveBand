@@ -189,7 +189,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Atmospheric refraction: downwind duct, upwind shadow "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[0.20, 1.0])
     titles = [T("Downwind: sound speed grows with height"),
               T("Upwind: sound speed falls with height")]
@@ -224,7 +224,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
                            cmap="magma", vmin=-30.0, vmax=0.0,
                            aspect="auto", interpolation="bilinear",
                            alpha=0.0, zorder=2.5)
-        ax_f.set_title(titles[row], fontsize=10, fontweight="bold")
+        ax_f.set_title(titles[row], fontsize=10)
         ax_f.set_xlim(14.0, 430.0)
         ax_f.set_ylim(-7.0, 105.0)
         ax_f.fill_between([14.0, 430.0], -7.0, 0.0, facecolor=COLOR_GRID,

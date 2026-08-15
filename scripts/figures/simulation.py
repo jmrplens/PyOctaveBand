@@ -71,7 +71,7 @@ def generate_metadiffuser_ntff_polar(output_dir: str) -> None:
                          [f"{_fmt_minus(a, '.0f')}°" for a in range(-90, 91, 30)])
     ax.set_title(
         "Far field of the meshed metadiffuser vs the model (2 kHz)",
-        pad=18, fontweight="bold",
+        pad=18,
     )
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.02), fontsize=9)
     plt.tight_layout()
@@ -130,8 +130,8 @@ def generate_fdtd_simulation(output_dir: str) -> None:
         1, 2, figsize=(12.5, 5.0), gridspec_kw={"width_ratios": [1.25, 1.0]})
     res.plot(kind="snapshot", frame=7, ax=ax_f)
     res.plot(ax=ax_p)
-    ax_p.set_title("FDTD probe pressure", fontweight="bold", pad=10)
-    ax_f.set_title(ax_f.get_title(), fontweight="bold", pad=10)
+    ax_p.set_title("FDTD probe pressure", pad=10)
+    ax_f.set_title(ax_f.get_title(), pad=10)
 
     plt.tight_layout()
     save_figure(output_dir, "fdtd_simulation.png")
@@ -194,7 +194,7 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
     ax.annotate("Rayleigh wave",
                 xy=(x0 - 0.92 * r_s, 0.004), xytext=(0.045, 0.06), **ann)
     ax.set_title("Rayleigh wave along a free aluminium surface "
-                 "(elastic FDTD)", fontweight="bold", pad=10)
+                 "(elastic FDTD)", pad=10)
 
     plt.tight_layout()
     save_figure(output_dir, "elastic_halfspace_waves.png")
@@ -266,7 +266,7 @@ def generate_scholte_interface_wave(output_dir: str) -> None:
     ax.text(12.0, 32.0, "water 1500 m/s", **txt)
     ax.text(12.0, 192.0, "seabed 3500 / 2000 m/s", **txt)
     ax.set_title("Scholte wave along a water-sediment interface "
-                 "(elastic FDTD)", fontweight="bold", pad=10)
+                 "(elastic FDTD)", pad=10)
 
     plt.tight_layout()
     save_figure(output_dir, "scholte_interface_wave.png")
@@ -306,7 +306,7 @@ def generate_fdtd_room_modes(output_dir: str) -> None:
         ax.annotate(f"({mx},{my})", xy=(f_mode, 1.5), ha="center", fontsize=9,
                     color=COLOR_FG)
     ax.set_title("Rigid-box FDTD probe spectrum vs analytic modes",
-                 fontweight="bold", pad=14)
+                 pad=14)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Probe spectrum [dB re max]")
     ax.set_xlim(100.0, 450.0)
@@ -373,7 +373,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
     ax_f.text(0.04, (ny - 0.5 * sponge) * dx, "sponge", fontsize=9,
               color=FIELD_INK)
     ax_f.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
-    ax_f.set_title("Settled field, 1 kHz CW", fontweight="bold", pad=10)
+    ax_f.set_title("Settled field, 1 kHz CW", pad=10)
 
     # (b) the transverse cut: flat to the last bit of a float64
     ax_t.plot(np.arange(nx) * dx, envelope[80, :], color=COLOR_PRIMARY,
@@ -384,7 +384,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
              ylim=(-1.45 * amp, 1.75 * amp))
     ax_t.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax_t.legend(loc="lower center", fontsize=9)
-    ax_t.set_title("Cut across the front (row 80)", fontweight="bold", pad=10)
+    ax_t.set_title("Cut across the front (row 80)", pad=10)
     ax_t.annotate("largest difference between neighbouring columns:\n"
                   f"{spread:.1e} Pa — the row is bit-identical",
                   xy=(0.03, 0.88), xycoords="axes fraction", fontsize=9,
@@ -401,7 +401,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
     ax_l.set(xlabel="Row envelope [dB re the forward field]", ylabel="$y$ [m]",
              xlim=(-72.0, 8.0))
     ax_l.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
-    ax_l.set_title("What is left behind the line", fontweight="bold", pad=10)
+    ax_l.set_title("What is left behind the line", pad=10)
     ax_l.annotate(f"{_fmt_minus(10 * np.log10(behind), '.1f')} dB of the "
                   "field energy sits\n"
                   "in the 20 sponge rows behind the line",
@@ -413,7 +413,7 @@ def generate_fdtd_plane_wave_launch(output_dir: str) -> None:
                   fontsize=9, color=COLOR_FG)
 
     fig.suptitle("One-way plane-wave launch: flat front, absorbed back side",
-                 fontweight="bold")
+                 )
     plt.tight_layout()
     save_figure(output_dir, "fdtd_plane_wave_launch.webp")
     plt.close()
@@ -491,7 +491,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
                                      period=period, language=_LANG)
     ax_m.set_title("What the transfer matrix homogenises: five slit "
                    "resonators, each one reflection coefficient",
-                   fontweight="bold", pad=32)
+                   pad=32)
 
     extent = (c0 * dx, c1 * dx, r1 * dx, r0 * dx)
     ax_g.imshow(crop, cmap="Greys", vmin=0.0, vmax=1.6, extent=extent,
@@ -499,7 +499,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
     ax_g.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_g.set_title("What the solver steps on: the same panel as a boolean "
                    "obstacle mask at dx = 0.5 mm",
-                   fontweight="bold", pad=10)
+                   pad=10)
     z0 = ix["lat"] + round(4 * period / dx)
     z1 = z0 + round(period / dx)
     ax_g.add_patch(Rectangle(
@@ -515,7 +515,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
         spine.set_linewidth(1.8)
     ax_z.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_z.set_title("The fifth cell magnified: the 3.2 mm neck is six cells "
-                   "wide, and it is what sets dx", fontweight="bold", pad=10)
+                   "wide, and it is what sets dx", pad=10)
     neck_y = (ix["r_face"] + round(0.005 / dx)) * dx
     neck_x = (ix["lat"] + round((4.12 * period + 20.3e-3) / dx)) * dx
     ax_z.annotate("3.2 mm neck = 6 cells", xy=(neck_x, neck_y),
@@ -610,7 +610,7 @@ def generate_elastic_probe_traces(output_dir: str) -> None:
                 bbox={"facecolor": COLOR_PANEL, "edgecolor": COLOR_GRID,
                       "boxstyle": "round,pad=0.4"})
     ax.set_title("Water over steel at normal incidence: the probe history "
-                 "res.plot() draws", fontweight="bold", pad=12)
+                 "res.plot() draws", pad=12)
     ax.set(xlabel="Time [ms]", ylabel="Pressure [Pa]",
            xlim=(0.0, float(t_ms[-1])), ylim=(-1.15, 1.35))
     ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)

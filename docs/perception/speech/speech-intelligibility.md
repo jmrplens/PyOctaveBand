@@ -136,7 +136,7 @@ weighted = result.band_audibility * result.band_importance
 fig, ax = plt.subplots()
 ax.bar(pos, result.band_audibility, color="#c6dbef", label=r"Band audibility $A_i$")
 ax.bar(pos, weighted / weighted.max(), width=0.5, color="#1f77b4",
-       label=r"Importance-weighted $I_i A_i$ (scaled)")
+       label=r"Importance-weighted $I_i\,A_i$ (scaled)")
 ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in result.frequencies], rotation=45, ha="right")
 ax.set_xlabel("One-third-octave band [Hz]")

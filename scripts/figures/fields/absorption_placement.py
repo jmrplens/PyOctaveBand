@@ -239,7 +239,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Where the absorption sits: same total, two decays "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     gs = fig.add_gridspec(3, 2, height_ratios=(1.0, 1.0, 1.15), hspace=0.12)
     titles = [T("Absorption spread over all four edges"),
               T("The same total, floor and ceiling only")]
@@ -289,7 +289,7 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
             ax.set_ylim(-strip - 0.06, _AP_LY + strip + 0.06)
             ax.set_xticks([])
             ax.set_yticks([])
-        ax_p.set_title(title, fontsize=9.5, fontweight="bold")
+        ax_p.set_title(title, fontsize=9.5)
         if col == 0:
             ax_p.set_ylabel(T("$p(x, y)$"), fontsize=8.5)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=8.5)
@@ -336,7 +336,13 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
                        label=T("all four edges"), zorder=5)[0]
     line_b = ax_d.plot([], [], color=COLOR_SECONDARY, lw=1.8,
                        label=T("floor + ceiling"), zorder=4)[0]
-    ax_d.legend(fontsize=7.2, loc="upper right", framealpha=0.85)
+    # One row, hugging the top-right: the two-row box used to reach down to
+    # ~-20 dB, where the concentrated room's verdict pill (whose Spanish
+    # text runs wider) slid underneath it and covered the second entry's
+    # swatch. A single row bottoms out near -11 dB, clear of the pill's top
+    # (~-16 dB) in both languages, and the curves stay below -30 dB in the
+    # strip it occupies.
+    ax_d.legend(fontsize=7.2, loc="upper right", framealpha=0.85, ncols=2)
     pill_a = ax_d.text(0.055 * t_end, _AP_FLOOR + 4.0, "",
                        ha="left", va="bottom", fontsize=8.5,
                        color="white", zorder=6,

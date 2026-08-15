@@ -230,7 +230,7 @@ def _polyline_point(pts: Any, frac: float) -> tuple[float, float]:
 
 def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
                 color: str, lo: str = "", hi: str = "",
-                end_dy: float = -0.12) -> dict[str, Any]:
+                end_dy: float = -0.12, end_dx: float = 1.12) -> dict[str, Any]:
     """A semicircular meter dial; move the needle with :func:`_set_gauge`.
 
     ``lo``/``hi`` are optional scale-endpoint labels (left and right end of
@@ -240,7 +240,12 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
     which is what a label wide for its dial needs; a dial whose endpoint
     labels are two or three characters wide is better served by a shallower
     drop, close enough under the arc ends to read as belonging to that arc
-    rather than floating in the gap to the next dial.
+    rather than floating in the gap to the next dial. ``end_dx`` is the
+    horizontal hang, in radii from the dial centre: the default puts the
+    labels just outside the arc ends, and a dial in a row packed so tight
+    that an outside label would fall into the gap to its neighbour tucks
+    them inside the arc instead (``end_dx`` < 1, with a drop deep enough
+    to clear the needle lying flat along the baseline).
     """
     from matplotlib.patches import Arc
 
@@ -256,10 +261,10 @@ def _make_gauge(ax: Any, cx: float, cy: float, r: float, label: str,
     # Spanish "20 sonios" against the English "20 sone") otherwise reaches
     # back under the needle tip with a couple of pixels to spare.
     if lo:
-        ax.text(cx - 1.12 * r, cy + end_dy * r, lo, ha="center", va="top",
+        ax.text(cx - end_dx * r, cy + end_dy * r, lo, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     if hi:
-        ax.text(cx + 1.12 * r, cy + end_dy * r, hi, ha="center", va="top",
+        ax.text(cx + end_dx * r, cy + end_dy * r, hi, ha="center", va="top",
                 color=COLOR_FG, fontsize=7)
     (needle,) = ax.plot([cx, cx - 0.78 * r], [cy, cy], color=color, lw=2.4,
                         solid_capstyle="round")
@@ -380,7 +385,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Time-weighting ballistics (IEC 61672-1)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.0, 1.15])
     ax_s = fig.add_subplot(gs[:, 0])
@@ -456,17 +461,18 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
               va="center", color=COLOR_FG, fontsize=8.5, alpha=0.85)
 
     # --- meter gauges + response traces -----------------------------------
-    # One shared 0..1.2 scale, spelled out on the first dial only (the
-    # endpoint labels of adjacent dials would otherwise collide). "0" and
-    # "1.2" are two or three characters wide and never reach back under the
-    # needle, so they hang just clear of the arc ends instead of at the
-    # shared default, which drops them into the gap between F and S where
-    # they read as labelling neither. Not flush against the ends either: at
-    # this radius the arc's own end tick is horizontal, and a label whose
-    # top edge meets it is drawn with a line through its digits.
+    # One shared 0..1.2 scale, spelled out on the F and S dials. The dials
+    # sit so close that a label hung outside an arc end lands in the gap to
+    # the neighbouring dial (that is where the lone "1.2" of the
+    # first-dial-only design sat, nearer the S arc than the F one, reading
+    # as labelling neither), so the endpoint labels tuck inside each
+    # labelled arc instead, under the horizontal end ticks; the drop is
+    # deep enough that the needle lying flat along the baseline at zero
+    # clears the digits under its tip.
     gauges = [_make_gauge(ax_g, 0.6, 0.0, 0.5, "F", COLOR_PRIMARY,
-                          lo="0", hi="1.2", end_dy=-0.04),
-              _make_gauge(ax_g, 1.7, 0.0, 0.5, "S", COLOR_SECONDARY),
+                          lo="0", hi="1.2", end_dx=0.80, end_dy=-0.14),
+              _make_gauge(ax_g, 1.7, 0.0, 0.5, "S", COLOR_SECONDARY,
+                          lo="0", hi="1.2", end_dx=0.80, end_dy=-0.14),
               _make_gauge(ax_g, 2.8, 0.0, 0.5, "I", col_imp)]
     ax_t.set_xlim(0.5, 4.0)
     ax_t.set_ylim(0, 1.25)
@@ -575,7 +581,7 @@ def animate_onset_detection(output_dir: str) -> None:
     ax.text(0.02, 0.05, T("detector: onset when $dL/dt > 10$ dB/s"),
             transform=ax.transAxes, ha="left", va="bottom", color=COLOR_FG,
             fontsize=9, zorder=8, path_effects=_halo(3.0))
-    ax.set_title(T("Impulse onset detection (NT ACOU 112)"), fontweight="bold")
+    ax.set_title(T("Impulse onset detection (NT ACOU 112)"))
     ax.set_xlabel(T("Time [s]"))
     ax.set_ylabel(T("A-weighted level $L_{AF}$ [dB]"), fontsize=9)
     ax.legend(loc="upper right", fontsize=8)
@@ -673,7 +679,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
     ]
     fig = _anim_figure()
     fig.suptitle(T(r"Two-microphone p-p probe: instantaneous intensity $p\cdot u$"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, height_ratios=[1.15, 1.0])
     dial_c, dial_r = (1.55, 3.05), 1.25
     i_axis_y, i_scale = 1.05, 2.35
@@ -681,7 +687,7 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
     for col, (title, phi, caption) in enumerate(cases):
         ax_s = fig.add_subplot(gs[0, col])
         _schematic_axes(ax_s, (0.0, 10.0), (0.0, 4.9), equal=True)
-        ax_s.set_title(title, fontsize=10.5, fontweight="bold")
+        ax_s.set_title(title, fontsize=10.5)
         ax_s.add_patch(Circle(dial_c, dial_r, facecolor="none",
                               edgecolor=COLOR_GRID, lw=1.2))
         p_ph = _make_arrow(ax_s, COLOR_PRIMARY, scale=11.0)
@@ -713,7 +719,11 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
                   color=COLOR_FG, fontsize=10, alpha=0.8)
         ax_s.text(8.85, i_axis_y, "+", ha="left", va="center",
                   color=COLOR_FG, fontsize=10, alpha=0.8)
-        ax_s.text(3.4, 1.55, T(r"$I(t) = p\cdot u$"), ha="left", va="bottom",
+        # Anchored 0.4 to the right of the number-line's left end: the
+        # Spanish phase caption under the dial is wider than the English
+        # one and its right edge otherwise runs to within a few pixels of
+        # this label (they share a vertical band).
+        ax_s.text(3.8, 1.55, T(r"$I(t) = p\cdot u$"), ha="left", va="bottom",
                   color=COLOR_SECONDARY, fontsize=9)
         i_arrow = _make_arrow(ax_s, COLOR_SECONDARY, scale=16.0)
         (mean_marker,) = ax_s.plot([], [], marker="^", ms=7, color=COLOR_FG)
@@ -859,7 +869,7 @@ def animate_schroeder(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Schroeder backward integration (ISO 3382)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 1, height_ratios=[1.0, 1.3])
     ax_e = fig.add_subplot(gs[0])
     _grid_axes(ax_e)
@@ -958,7 +968,7 @@ def animate_flanking_paths(output_dir: str) -> None:
     T = _translate_str
     fig = _anim_figure()
     fig.suptitle(T("Flanking transmission paths (EN 12354-1)"),
-                 fontweight="bold")
+                 )
     ax = fig.add_subplot()
     _schematic_axes(ax, (0.0, 14.2), (0.0, 7.6), equal=True)
 
@@ -1108,7 +1118,7 @@ def animate_intensity_scan_power(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Intensity scanning over a box surface (ISO 9614-2)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(1, 2, width_ratios=[1.75, 1.0])
     ax = fig.add_subplot(gs[0])
     _schematic_axes(ax, (0.0, 9.4), (0.0, 6.4), equal=True)
@@ -1331,7 +1341,7 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Sweep measurement and deconvolution (ISO 18233)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, height_ratios=[0.85, 1.15])
     ax_r = fig.add_subplot(gs[0, :])
     # The band below zero is the caption's: at the drawn scale an 8 pt line is
@@ -1479,8 +1489,8 @@ def animate_specific_loudness(output_dir: str) -> None:
     z = np.arange(1, 241) * 0.1
 
     fig = _anim_figure()
-    fig.suptitle(T("Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)"),
-                 fontweight="bold")
+    fig.suptitle(T(r"Specific loudness $N^{\prime}(z)$ and its integral (ISO 532-1)"),
+                 )
     gs = fig.add_gridspec(1, 2, width_ratios=[2.1, 1.0])
     ax = fig.add_subplot(gs[0])
     _grid_axes(ax)
@@ -1488,7 +1498,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     # headroom above the 85 dB pattern (max N' ~ 5.4 sone/Bark)
     ax.set_ylim(0.0, 6.0)
     ax.set_xlabel(T("Critical-band rate $z$ [Bark]"))
-    ax.set_ylabel(T("Specific loudness $N\u2032$ [sone/Bark]"), fontsize=9)
+    ax.set_ylabel(T(r"Specific loudness $N^{\prime}$ [sone/Bark]"), fontsize=9)
     (line,) = ax.plot([], [], color=COLOR_PRIMARY, lw=2.2)
     fill = {"art": None}
     ax.axvline(8.5, color=COLOR_FG, lw=0.9, ls=":", alpha=0.6)
@@ -1579,7 +1589,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("One source, two rooms, one sound power"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, height_ratios=[2.35, 1.0])
     ax_a = fig.add_subplot(gs[0, 0])
     _schematic_axes(ax_a, (0.0, 8.0), (0.0, 6.6), equal=True)
@@ -1590,7 +1600,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     # --- anechoic room: wedges on every wall, mic ring, free field -------
     ax_a.set_title(T("Anechoic room (ISO 3745)"), fontsize=10,
-                   fontweight="bold")
+                   )
     ax_a.add_patch(Rectangle((0.6, 0.4), 6.8, 5.6, facecolor="none",
                              edgecolor=COLOR_FG, lw=1.4))
     wedge = 0.42
@@ -1631,7 +1641,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
 
     # --- reverberation room: bare walls, diffuse build-up, one mic path --
     ax_r.set_title(T("Reverberation room (ISO 3741)"), fontsize=10,
-                   fontweight="bold")
+                   )
     # animated fill (the diffuse level building up) + a fixed outline
     room = Rectangle((0.6, 0.4), 6.8, 5.6, facecolor=COLOR_PRIMARY,
                      edgecolor="none", alpha=0.0)
@@ -1764,7 +1774,7 @@ def animate_comb_filtering(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Comb filtering from a single reflection"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.25, 1.0])
     ax = fig.add_subplot(gs[:, 0])
     _schematic_axes(ax, (0.0, 5.6), (-2.3, 2.6), equal=True)
@@ -1919,7 +1929,7 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     phase = np.degrees(np.angle(response(freqs)))
 
     fig = _anim_figure()
-    fig.suptitle(T(r"Reading $f_r$ on the EN 29052-1 rig"), fontweight="bold")
+    fig.suptitle(T(r"Reading $f_r$ on the EN 29052-1 rig"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.0, 1.0])
 
@@ -2161,7 +2171,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The modulation transfer function on the envelope "
-                   "(IEC 60268-16)"), fontweight="bold")
+                   "(IEC 60268-16)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.55, 1.0],
                           height_ratios=[1.0, 1.0])
 
@@ -2225,7 +2235,7 @@ def animate_modulation_transfer(output_dir: str) -> None:
                     alpha=0.85)
     ax_b.set_xticks(xs)
     ax_b.set_xticklabels(list(_MTF_BAND_LABELS))
-    sti_txt = ax_b.set_title("", fontsize=10.5, fontweight="bold",
+    sti_txt = ax_b.set_title("", fontsize=10.5,
                              family="monospace", color=COLOR_FG)
 
     # Act timing over the 10 s sweep (the last 2 s of the clip are the hold).
@@ -2378,7 +2388,7 @@ def animate_loudness_gating(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The two passes of the EBU R 128 gate (BS.1770-5)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[3.05, 1.0],
                           height_ratios=[2.5, 1.0])
 
@@ -2637,7 +2647,7 @@ def animate_epnl_flyover(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("EPNL, record by record (ICAO Annex 16 Appendix 2)"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.0, 1.35],
                           height_ratios=[1.45, 1.0])
 
@@ -2897,7 +2907,7 @@ def animate_image_source_buildup(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("The reflectogram is a lattice being swept "
-                   "(image-source method)"), fontweight="bold")
+                   "(image-source method)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.12, 1.0],
                           height_ratios=[1.5, 1.0])
 
@@ -3090,7 +3100,7 @@ def animate_iso717_shift(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Fitting the ISO 717 reference curve, one step at a time"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.45, 1.0],
                           height_ratios=[1.0, 1.0])
 
@@ -3369,7 +3379,7 @@ def animate_block_vs_exponential(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("One burst, two detectors, and the block grid underneath"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.28, 1.0],
                           height_ratios=[1.0, 1.15])
 
@@ -3575,7 +3585,7 @@ def animate_feedback_howl(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Gain before feedback is a convergence condition"),
-                 fontweight="bold")
+                 )
     gs = fig.add_gridspec(2, 2, width_ratios=[1.1, 1.0],
                           height_ratios=[1.0, 1.0])
 

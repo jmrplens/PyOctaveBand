@@ -634,7 +634,11 @@ def _d_dosimeter(s: SVG, th: Theme) -> None:
 
     def strip(y: float, title: str, caption: str) -> None:
         s.text(x0, y - 10, title, 19, th.fg, "start", bold=True)
-        s.text(x0, y + 68, caption, 16, th.muted, "start", italic=True)
+        # The italic caption voice applies to prose; a caption carrying
+        # $...$ mathematics composes its own italics run by run (whole-string
+        # italic plus markup is refused by the canvas).
+        s.text(x0, y + 68, caption, 16, th.muted, "start",
+               italic="$" not in caption)
 
     # Strategy 1: task-based; the day split into tasks, >= 3 samples each.
     y1 = 190.0
@@ -1006,7 +1010,7 @@ def _d_soundfield_audiometry(s: SVG, th: Theme) -> None:
 
     # ---------------- C - the earphone condition, for contrast ------------
     xc = px0[2]
-    room(xc, "C · Earphone — not this standard",
+    room(xc, "C · Earphone: not this standard",
          "supra-aural or insert · monaural", th.secondary)
     s.ground(gy, xc, xc + pw)
     sx = xc + 74.0

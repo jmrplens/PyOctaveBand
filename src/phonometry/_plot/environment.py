@@ -75,17 +75,21 @@ _STRINGS: dict[str, str] = {
     "Governing": "Determinante",
     "Predicted prominence $P$": "Prominencia prevista $P$",
     "Adjustment $K_I$ [dB]": "Ajuste $K_I$ [dB]",
+    # The decimal lives inside the mathematics, out of reach of the automatic
+    # comma pass, so the Spanish value carries it already converted; the braces
+    # keep mathtext from spacing the comma as the punctuation mark it is.
+    r"$K_I = 1.8\,(P-5)$": r"$K_I = 1{,}8\,(P-5)$",
     "NT ACOU 112 — impulse adjustment to $L_{Aeq}$": "NT ACOU 112 — ajuste por impulsos a $L_{Aeq}$",
     "knees $\\Delta L_{ta}=4,\\,10$ dB": "codos $\\Delta L_{ta}=4,\\,10$ dB",
     "Tonal audibility $\\Delta L_{ta}$ [dB]": "Audibilidad tonal $\\Delta L_{ta}$ [dB]",
     "Tonal adjustment $K_t$ [dB]": "Ajuste tonal $K_t$ [dB]",
     "ISO 1996-2 tonal adjustment": "Ajuste tonal ISO 1996-2",
-    "$A_{div}$ — divergence": "$A_{div}$ — divergencia",
-    "$A_{atm}$ — atmospheric": "$A_{atm}$ — atmosférica",
-    "$A_{gr}$ — ground": "$A_{gr}$ — suelo",
-    "$A_{bar}$ — barrier": "$A_{bar}$ — barrera",
+    r"$A_{\mathrm{div}}$ — divergence": r"$A_{\mathrm{div}}$ — divergencia",
+    r"$A_{\mathrm{atm}}$ — atmospheric": r"$A_{\mathrm{atm}}$ — atmosférica",
+    r"$A_{\mathrm{gr}}$ — ground": r"$A_{\mathrm{gr}}$ — suelo",
+    r"$A_{\mathrm{bar}}$ — barrier": r"$A_{\mathrm{bar}}$ — barrera",
     _TOTAL_A_LABEL: _TOTAL_A_LABEL,
-    "Attenuation A [dB]": "Atenuación A [dB]",
+    "Attenuation $A$ [dB]": "Atenuación $A$ [dB]",
     "ISO 9613-2 attenuation breakdown": "Desglose de atenuación ISO 9613-2",
     "CNOSSOS-EU railway source line power": (
         "Potencia de la línea fuente ferroviaria CNOSSOS-EU"
@@ -99,6 +103,7 @@ _STRINGS: dict[str, str] = {
     _FREE_FIELD_LABEL: "Nivel re campo libre [dB]",
     "Spherical-wave ground effect (Weyl-Van der Pol)": "Efecto de suelo de onda esférica (Weyl-Van der Pol)",
     "Insertion loss": "Pérdida por inserción",
+    "exact": "exacto",
     "ground": "suelo",
     "Grazing limit (5 dB)": "Límite rasante (5 dB)",
     "Insertion loss [dB]": "Pérdida por inserción [dB]",
@@ -164,12 +169,15 @@ def plot_atmospheric_attenuation(
     :param kwargs: Forwarded to the ``alpha`` curve ``plot`` call.
     :return: The axes.
     """
-    from .._i18n import decimal_comma, localize_axes
+    from .._i18n import decimal_comma, fmt_minus, localize_axes
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     alpha_km = np.asarray(result.attenuation_coefficient, dtype=np.float64) * 1000.0
-    t_str = decimal_comma(f"{result.temperature:g}", language)
+    # ISO 9613-1 is tabulated down to -20 degC, so the reading really can be
+    # negative: fmt_minus signs it typographically without touching the hyphen
+    # of an exponent that ":g" may emit.
+    t_str = decimal_comma(fmt_minus(result.temperature, "g"), language)
     rh_str = decimal_comma(f"{result.relative_humidity:g}", language)
     rh_unit = "% HR" if language == "es" else "% RH"
     label = f"{t_str} °C, {rh_str} {rh_unit}"
@@ -217,7 +225,7 @@ def plot_wind_turbine_tonality(
             label=f"{_t('Tone', language)} ({format_number(result.tone_level, language)} dB)")
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Level [dB]", language))
-    ax.set_title(f"{_t('IEC 61400-11 tonal audibility', language)} ΔLₐ = {format_number(result.tonal_audibility, language)} dB")
+    ax.set_title(f"{_t('IEC 61400-11 tonal audibility', language)} $\\Delta L_a$ = {format_number(result.tonal_audibility, language)} dB")
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
@@ -247,7 +255,7 @@ def plot_impulse_prominence(
     p_max = max(per_max, result.prominence, 15.0) + 1.0
     grid = np.linspace(0.0, p_max, 200)
     ax.plot(grid, impulse_adjustment(grid), color=_C_PRIMARY,
-            label=r"$K_I = 1.8\,(P-5)$")
+            label=_t(r"$K_I = 1.8\,(P-5)$", language))
     ax.axvline(ADJUSTMENT_THRESHOLD, color=_C_MUTED, ls=":",
                label=f"{_t('threshold', language)} $P = {decimal_comma(f'{ADJUSTMENT_THRESHOLD:g}', language)}$")
 
@@ -256,7 +264,7 @@ def plot_impulse_prominence(
     ax.scatter(per, impulse_adjustment(per), label=_t("Impulses", language), **kwargs)
     ax.scatter([result.prominence], [result.adjustment], color=_C_REFERENCE,
                zorder=4, s=90, marker="*",
-               label=f"{_t('Governing', language)}  P = {format_number(result.prominence, language, decimals=2)},  "
+               label=f"{_t('Governing', language)}  $P$ = {format_number(result.prominence, language, decimals=2)},  "
                      f"$K_I$ = {format_number(result.adjustment, language)} dB")
     ax.set_xlabel(_t("Predicted prominence $P$", language))
     ax.set_ylabel(_t("Adjustment $K_I$ [dB]", language))
@@ -338,10 +346,10 @@ def plot_outdoor_attenuation(
     pos_bottom = np.zeros(n)
     neg_bottom = np.zeros(n)
     terms = (
-        (result.a_div, _C_PRIMARY, _t("$A_{div}$ — divergence", language)),
-        (result.a_atm, _C_TERTIARY, _t("$A_{atm}$ — atmospheric", language)),
-        (result.a_gr, _C_QUATERNARY, _t("$A_{gr}$ — ground", language)),
-        (result.a_bar, _C_SECONDARY, _t("$A_{bar}$ — barrier", language)),
+        (result.a_div, _C_PRIMARY, _t(r"$A_{\mathrm{div}}$ — divergence", language)),
+        (result.a_atm, _C_TERTIARY, _t(r"$A_{\mathrm{atm}}$ — atmospheric", language)),
+        (result.a_gr, _C_QUATERNARY, _t(r"$A_{\mathrm{gr}}$ — ground", language)),
+        (result.a_bar, _C_SECONDARY, _t(r"$A_{\mathrm{bar}}$ — barrier", language)),
     )
     for values, color, label in terms:
         term = np.asarray(values, dtype=np.float64)
@@ -356,7 +364,7 @@ def plot_outdoor_attenuation(
     ax.plot(positions, np.asarray(result.a_total, dtype=np.float64),
             zorder=4, **kwargs)
     ax.axhline(0.0, color=_C_MUTED, lw=0.8)
-    ax.set_ylabel(_t("Attenuation A [dB]", language))
+    ax.set_ylabel(_t("Attenuation $A$ [dB]", language))
     ax.set_title(_t("ISO 9613-2 attenuation breakdown", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
@@ -408,7 +416,7 @@ def plot_cnossos_rail_emission(
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
-    ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU railway source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)
@@ -453,6 +461,16 @@ def plot_spherical_ground(
     return ax
 
 
+#: Drawn name of each barrier model, keyed by the API token: the token itself
+#: is snake_case, and an underscore outside mathematics is drawn as a literal
+#: low line.  "Kurze-Anderson" is a compound of two surnames and is deliberately
+#: absent from the translation table, so ``_t`` returns it unchanged.
+_BARRIER_METHOD_LABELS: dict[str, str] = {
+    "kurze_anderson": "Kurze-Anderson",
+    "exact": "exact",
+}
+
+
 def plot_barrier_insertion_loss(
     result: BarrierInsertionLoss, ax: Axes | None = None, *, language: str = "en",
     **kwargs: Any
@@ -472,7 +490,10 @@ def plot_barrier_insertion_loss(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     il = np.asarray(result.insertion_loss, dtype=np.float64)
     ground_frag = f", {_t('ground', language)}" if result.ground else ""
-    label = f"{_t('Insertion loss', language)} ({result.method}{ground_frag})"
+    method_label = _t(
+        _BARRIER_METHOD_LABELS.get(result.method, result.method), language
+    )
+    label = f"{_t('Insertion loss', language)} ({method_label}{ground_frag})"
     ax.plot(freqs, il, **{"color": _C_SECONDARY, "lw": 1.4, "marker": "s",
                           "ms": 3.0, "label": label, **kwargs})
     ax.axhline(0.0, color=_C_MUTED, lw=0.8)
@@ -505,7 +526,7 @@ def plot_sound_speed_profile(
     ax = ax if ax is not None else _new_axes()
     z = np.asarray(profile.heights, dtype=np.float64)
     c = np.asarray(profile.sound_speeds, dtype=np.float64)
-    label = profile.description or "c_eff(z)"
+    label = profile.description or r"$c_\mathrm{eff}(z)$"
     ax.plot(c, z, **{"color": _C_PRIMARY, "lw": 1.4, "label": label, **kwargs})
     ax.set_xlabel(_t("Effective sound speed [m/s]", language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
@@ -829,7 +850,7 @@ def plot_cnossos_road_emission(
         )
     # Pure symbol notation, identical in every language, so it is set directly
     # rather than routed through the translation table.
-    ax.set_ylabel("$L'_{W,eq,line}$ [dB re 1 pW/m]")
+    ax.set_ylabel(r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]")
     ax.set_title(_t("CNOSSOS-EU road source line power", language))
     ax.legend(loc="best", fontsize="small")
     ax.grid(True, axis="y", alpha=0.3)

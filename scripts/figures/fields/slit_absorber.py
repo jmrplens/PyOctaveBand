@@ -236,7 +236,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Slow-sound slit absorber at critical coupling "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.55, 0.52])
     titles = [T("Critically coupled slit: the wave dies inside"),
               T("Wide slit (detuned): the reflection returns")]
@@ -296,7 +296,7 @@ def animate_fdtd_slit_absorber(output_dir: str) -> None:
         # of the curve in both rows.
         ax.set_ylim(-0.033, env_base + env_h + 0.026)
         ax.set_yticks([])
-        ax.set_title(title, fontsize=10, fontweight="bold")
+        ax.set_title(title, fontsize=10)
         ax.tick_params(labelsize=7)
         if row == 0:
             ax.tick_params(labelbottom=False)

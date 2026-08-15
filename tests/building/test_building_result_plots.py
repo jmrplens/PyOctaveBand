@@ -120,8 +120,11 @@ def test_extended_rating_plot_full_range_and_terms_in_title() -> None:
     # Title carries the core rating and the covered Annex B terms.
     title = ax.get_title()
     assert str(res.rating) in title
-    assert "C50-5000" in title
-    assert "Ctr,50-5000" in title
+    # The terms are set as mathematics, and their range is joined by U+2010:
+    # an ASCII hyphen inside $...$ is the binary minus, which mathtext would
+    # space out as a subtraction.
+    assert "$C_{50‐5000}$" in title
+    assert "$C_{\\mathrm{tr},50‐5000}$" in title
     plt.close("all")
 
 
@@ -131,7 +134,7 @@ def test_extended_impact_rating_plot_title_carries_ci_50_2500() -> None:
     ax = res.plot()
     title = ax.get_title()
     assert str(res.rating) in title
-    assert "CI,50-2500" in title
+    assert "$C_{\\mathrm{I},50‐2500}$" in title  # U+2010, not a minus
     # Impact shading uses the opposite sign: measurement above reference.
     assert len(ax.collections) >= 1
     plt.close("all")
@@ -256,7 +259,7 @@ def test_impact_insulation_plot_curves_and_label_kwarg() -> None:
     labels = [str(ln.get_label()) for ln in ax.lines]
     # user label styles only the primary curve; companions keep theirs.
     assert "my measurement" in labels
-    assert any("L'_n" in lbl for lbl in labels)
+    assert any(r"L^{\prime}_\mathrm{n}" in lbl for lbl in labels)
     plt.close("all")
 
 

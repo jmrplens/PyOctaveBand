@@ -68,8 +68,8 @@ _STRINGS: dict[str, str] = {
     _FREQ_LABEL: "Frecuencia [Hz]",
     "Weighting factor [dB]": "Factor de ponderación [dB]",
     "Unweighted $a_i$": "Sin ponderar $a_i$",
-    "r.m.s. acceleration [m/s$^2$]": "Aceleración eficaz [m/s$^2$]",
-    "Vibration exposure A(8) [m/s$^2$]": "Exposición a vibración A(8) [m/s$^2$]",
+    "r.m.s. acceleration [m/s²]": "Aceleración eficaz [m/s²]",
+    "Vibration exposure $A(8)$ [m/s²]": "Exposición a vibración $A(8)$ [m/s²]",
     "driving-point mobility": "movilidad en punto de excitación",
     "transfer mobility": "movilidad de transferencia",
     _MOBILITY_LABEL: "Movilidad $|Y|$ [m/(N·s)]",
@@ -90,8 +90,8 @@ _STRINGS: dict[str, str] = {
     "Plate radiation efficiency (Leppington / Maidanik)": "Eficiencia de radiación de placa (Leppington / Maidanik)",
     "Frequency weighting {name} (ISO 8041-1)": "Ponderación en frecuencia {name} (ISO 8041-1)",
     "Weighted $W_i a_i$ ({name})": "Ponderada $W_i a_i$ ({name})",
-    "{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s$^2$)": "{designation} espectro de aceleración ponderada  ($a_w$ = {aw} m/s$^2$)",
-    "Directive 2002/44/EC daily {kind} exposure  (A(8) = {a8} m/s$^2$, {zone})": "Directiva 2002/44/CE exposición diaria {kind}  (A(8) = {a8} m/s$^2$, {zone})",
+    "{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s²)": "{designation} espectro de aceleración ponderada  ($a_w$ = {aw} m/s²)",
+    "Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})": "Directiva 2002/44/CE exposición diaria {kind}  ($A(8)$ = {a8} m/s², {zone})",
     "below action": "por debajo de la acción",
     "action": "acción",
     "limit": "límite",
@@ -209,11 +209,11 @@ def plot_weighted_spectrum(
         label=_t("Weighted $W_i a_i$ ({name})", language).format(name=result.weighting_name),
         **kwargs,
     )
-    ax.set_ylabel(_t("r.m.s. acceleration [m/s$^2$]", language))
+    ax.set_ylabel(_t("r.m.s. acceleration [m/s²]", language))
     # Wh is the hand-arm weighting of ISO 5349-1; the others (Wk, Wd, Wm...)
     # are the whole-body weightings of ISO 2631.
     designation = "ISO 5349-1" if str(result.weighting_name) == "Wh" else "ISO 2631"
-    ax.set_title(_t("{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s$^2$)", language).format(
+    ax.set_title(_t("{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s²)", language).format(
         designation=designation,
         aw=format_number(float(result.overall), language, decimals=3),
     ))
@@ -266,11 +266,11 @@ def plot_daily_exposure(
         )
     ax.bar(
         positions[-1], values[-1], width=width, color=_A8_COLOR,
-        edgecolor=edgecolor, linewidth=0.6, zorder=3, label="A(8)", **kwargs,
+        edgecolor=edgecolor, linewidth=0.6, zorder=3, label="$A(8)$", **kwargs,
     )
     # The legend carries the bar identity, so the crowded category ticks go.
     ax.set_xticks([])
-    ax.set_ylabel(_t("Vibration exposure A(8) [m/s$^2$]", language))
+    ax.set_ylabel(_t("Vibration exposure $A(8)$ [m/s²]", language))
 
     assessment = result.assessment
     eav = float(assessment.action_value)
@@ -283,7 +283,7 @@ def plot_daily_exposure(
     ax.set_ylim(0.0, top)
     kind = str(assessment.kind).upper()
     zone = _t(str(assessment.zone), language)
-    ax.set_title(_t("Directive 2002/44/EC daily {kind} exposure  (A(8) = {a8} m/s$^2$, {zone})", language).format(
+    ax.set_title(_t("Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})", language).format(
         kind=kind, a8=format_number(float(result.a8), language, decimals=2),
         zone=zone,
     ))
@@ -590,35 +590,86 @@ def _draw_measured_spectrum(
 _LABEL_PAD_PT = 2.0
 #: Horizontal room one rotated ``x-small`` label needs, in points. The name is
 #: turned through 90 degrees, so what it occupies across the axis is its text
-#: height, not its length.
+#: height, not its length. Used when the names cannot be measured on the
+#: figure's own renderer.
 _LABEL_WIDTH_PT = 8.5
 #: Fallback axis width, in points, when the axes geometry is not available.
 _LABEL_FALLBACK_WIDTH_PT = 400.0
+#: Fallback axis height, in points, when the axes geometry is not available.
+_LABEL_FALLBACK_HEIGHT_PT = 260.0
+#: Gap kept above the names, between them and the top of the axes, in points.
+#: Wide enough to absorb the shrinking a later ``tight_layout`` does to the
+#: axes: the strip is cut before the caller composes the figure, so a name
+#: measured against a taller panel still has room in the one that is drawn.
+_LABEL_TOP_PAD_PT = 8.0
+#: Lowest the name strip is allowed to start, as a fraction of the axes: a name
+#: long enough to want more than this is given the strip it fits in, rather than
+#: the one it asks for, so the spectrum is never squeezed out of its own panel.
+_LABEL_BAND_FLOOR = 0.62
+#: White space kept between one name and the next, in points, on top of the
+#: measured width of a name: two of them are only told apart by the gap.
+_LABEL_GAP_PT = 1.0
+
+
+def _axis_extent_points(ax: Axes) -> tuple[float, float]:
+    """Width and height of the axes box in points, for laying names out in it."""
+    try:
+        box = ax.get_window_extent()
+        dpi = float(ax.get_figure().dpi)  # type: ignore[union-attr]
+        width_pt, height_pt = box.width * 72.0 / dpi, box.height * 72.0 / dpi
+    except (AttributeError, ValueError):  # pragma: no cover - defensive
+        return _LABEL_FALLBACK_WIDTH_PT, _LABEL_FALLBACK_HEIGHT_PT
+    return (width_pt if width_pt > 0.0 else _LABEL_FALLBACK_WIDTH_PT,
+            height_pt if height_pt > 0.0 else _LABEL_FALLBACK_HEIGHT_PT)
 
 
 def _axis_width_points(ax: Axes) -> float:
     """Width of the axes box in points, for laying labels out across it."""
+    return _axis_extent_points(ax)[0]
+
+
+def _label_strip(ax: Axes, names: list[str]) -> tuple[float, float]:
+    """Where the names go: strip start as an axes fraction, and their thickness.
+
+    The names are set turned through 90 degrees, so the room they need above
+    the lines is the length of the longest of them and the room they take
+    across the axis is the height of one line of text. Both are measured on
+    the figure's own renderer, so the strip is cut to the width the reader will
+    actually see rather than to an assumed one.
+    """
+    _, height_pt = _axis_extent_points(ax)
+    probe = ax.text(0.0, 0.0, "", rotation=90, fontsize="x-small", alpha=0.0)
+    length_pt, thickness_pt = 0.0, 0.0
     try:
-        width_px = float(ax.get_window_extent().width)
         dpi = float(ax.get_figure().dpi)  # type: ignore[union-attr]
-    except (AttributeError, ValueError):  # pragma: no cover - defensive
-        return _LABEL_FALLBACK_WIDTH_PT
-    width_pt = width_px * 72.0 / dpi
-    return width_pt if width_pt > 0.0 else _LABEL_FALLBACK_WIDTH_PT
+        for name in names:
+            probe.set_text(name)
+            box = probe.get_window_extent()
+            length_pt = max(length_pt, box.height * 72.0 / dpi)
+            thickness_pt = max(thickness_pt, box.width * 72.0 / dpi)
+    except (AttributeError, RuntimeError, ValueError):  # pragma: no cover
+        length_pt, thickness_pt = 0.0, 0.0
+    finally:
+        probe.remove()
+    if thickness_pt <= 0.0:  # pragma: no cover - defensive
+        return 1.0, _LABEL_WIDTH_PT
+    band = 1.0 - (length_pt + _LABEL_TOP_PAD_PT) / height_pt
+    return max(band, _LABEL_BAND_FLOOR), thickness_pt + _LABEL_GAP_PT
 
 
 def _label_offsets(
-    frequencies: list[float], f_max: float, width_pt: float
+    frequencies: list[float], f_max: float, width_pt: float,
+    label_pt: float = _LABEL_WIDTH_PT,
 ) -> dict[int, float]:
     """Horizontal label offsets in points, keyed by index into *frequencies*.
 
     The names are drawn rotated, so each occupies a narrow vertical strip and
-    two of them collide when their lines sit less than :data:`_LABEL_WIDTH_PT`
-    apart across the axis. Walking the lines in frequency order and pushing
-    each label just far enough right to clear the previous one separates a
-    crowded group with the least displacement that fits: an isolated line keeps
-    its label exactly where it was, and a run of evenly spaced sidebands drifts
-    by the difference between the label width and the spacing, no more.
+    two of them collide when their lines sit less than *label_pt* apart across
+    the axis. Walking the lines in frequency order and pushing each label just
+    far enough right to clear the previous one separates a crowded group with
+    the least displacement that fits: an isolated line keeps its label exactly
+    where it was, and a run of evenly spaced sidebands drifts by the difference
+    between the label width and the spacing, no more.
     """
     scale = width_pt / f_max if f_max > 0.0 else 0.0
     offsets: dict[int, float] = {}
@@ -627,7 +678,7 @@ def _label_offsets(
         anchor = frequencies[i] * scale + _LABEL_PAD_PT
         placed = max(anchor, cursor)
         offsets[i] = placed - frequencies[i] * scale
-        cursor = placed + _LABEL_WIDTH_PT
+        cursor = placed + label_pt
     return offsets
 
 
@@ -635,34 +686,44 @@ def _draw_fault_lines(
     ax: Axes,
     result: FaultFrequencyResult,
     f_max: float,
-    top: float,
     language: str,
     *,
     annotate: bool,
-) -> None:
+) -> float:
     """Draw one dashed line per predicted fault frequency, coloured by family.
 
     Each family contributes a single legend entry, so shaft harmonics never
-    read as bearing evidence.
+    read as bearing evidence. The lines stop where their names begin, so a
+    crowded group -- gear sidebands sit a shaft rate apart, a few points on a
+    kilohertz axis -- reads as a strip of names above a strip of lines instead
+    of names struck through by their neighbours' lines. The strip start is
+    returned as an axes fraction, for the caller to keep the spectrum and its
+    legend below it.
     """
     visible = [line for line in result.lines if line.frequency <= f_max]
+    band, label_pt = 1.0, _LABEL_WIDTH_PT
+    if annotate:
+        band, label_pt = _label_strip(ax, [line.name for line in visible])
     offsets = _label_offsets(
-        [line.frequency for line in visible], f_max, _axis_width_points(ax)
+        [line.frequency for line in visible], f_max, _axis_width_points(ax),
+        label_pt,
     )
     labelled: set[str] = set()
     for i, line in enumerate(visible):
         colour = _FAMILY_COLORS.get(line.family, _C_EDGE)
         label = None if line.family in labelled else _t(line.family, language)
         labelled.add(line.family)
-        ax.axvline(line.frequency, color=colour, ls="--", lw=1.0, alpha=0.85,
-                   label=label, zorder=2)
+        ax.axvline(line.frequency, ymax=band, color=colour, ls="--", lw=1.0,
+                   alpha=0.85, label=label, zorder=2)
         if annotate:
             ax.annotate(
-                line.name, xy=(line.frequency, 1.02 * top),
-                xytext=(offsets[i], 0), textcoords="offset points",
+                line.name, xy=(line.frequency, band),
+                xycoords=("data", "axes fraction"),
+                xytext=(offsets[i], _LABEL_PAD_PT), textcoords="offset points",
                 rotation=90, fontsize="x-small", color=colour,
                 ha="left", va="bottom",
             )
+    return band
 
 
 def plot_fault_frequencies(
@@ -713,8 +774,8 @@ def plot_fault_frequencies(
     top = _draw_measured_spectrum(
         ax, spectrum_f, spectrum_a, f_max, language, kwargs
     )
-    ax.set_ylim(0.0, 1.24 * top)
-    _draw_fault_lines(ax, result, f_max, top, language, annotate=annotate)
+    band = _draw_fault_lines(ax, result, f_max, language, annotate=annotate)
+    ax.set_ylim(0.0, 1.03 * top / band)
     ax.set_xlim(0.0, f_max)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_title(
@@ -723,7 +784,10 @@ def plot_fault_frequencies(
             fs=format_number(result.shaft_rate, language, decimals=2, trim=True),
         )
     )
-    ax.legend(loc="upper right", fontsize="small")
+    # The legend belongs to the spectrum, so it is anchored to the part of the
+    # axes the spectrum has: above the strip start there are only line names.
+    ax.legend(loc="upper right", fontsize="small",
+              bbox_to_anchor=(0.0, 0.0, 1.0, band))
     ax.grid(True, axis="y", alpha=0.3)
     localize_axes(ax, language)
     return ax

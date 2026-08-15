@@ -148,7 +148,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("Ground effect: direct + reflected interference "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[1.5, 1.0])
     ax_p = fig.add_subplot(gs[0, 0])
     ax_r = fig.add_subplot(gs[1, 0])
@@ -204,7 +204,7 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     # Level vs elevation angle, converging to the image-source model.
     _grid_axes(ax_l)
     ax_l.set_title(T("Level on the 8 m arc"), fontsize=10,
-                   fontweight="bold")
+                   )
     ax_l.set_xlabel(T(r"elevation angle $\theta$ [°]"), fontsize=8)
     ax_l.set_ylabel(T("level [dB re max]"), fontsize=8)
     ax_l.set_xlim(0.0, 63.0)

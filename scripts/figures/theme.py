@@ -13,7 +13,6 @@ measurement the weighting figures are drawn from and the tests guard.
 """
 
 import os
-import pathlib
 from collections.abc import Sequence
 from typing import Any
 
@@ -196,10 +195,10 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
     """Translate, theme-suffix and save the current figure.
 
     Vector figures are written as SVG made byte-reproducible with a fixed
-    ``svg.hashsalt`` (deterministic element ids), ``svg.fonttype = "none"``
-    (text kept as ``<text>`` rather than freetype glyph outlines, so the
-    output does not depend on the font build) and no date metadata -- so
-    ``make graphs`` is stable and CI can diff it. The figures in
+    ``svg.hashsalt`` (deterministic element ids), ``svg.fonttype = "path"``
+    (text drawn as glyph outlines, for the reason spelled out below) and no
+    date metadata -- so ``make graphs`` is stable and CI can diff it. The
+    figures in
     :data:`_RASTER_FIGURES` stay raster (SVG would be heavier), written as
     lossless WebP: matplotlib renders the canvas to an in-memory PNG with the
     version-stamped ``Software`` chunk (and any date) stripped, and Pillow
@@ -215,33 +214,52 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
     path = os.path.join(output_dir, f"{stem}{_LANG_SUFFIX}{_FILENAME_SUFFIX}.{ext}")
     if ext == "svg":
         plt.rcParams["svg.hashsalt"] = "phonometry"
-        plt.rcParams["svg.fonttype"] = "none"
+        # Text is drawn as outlines, not as <text>. Keeping it as text made a
+        # figure's typography depend on the machine reading it, and for half
+        # the corpus that dependency was visible:
+        #
+        # A label with any mathtext in it is not laid out by the viewer. The
+        # whole string goes through matplotlib's mathtext, which emits one
+        # <tspan> per glyph carrying its own absolute ``x`` -- and those
+        # positions are computed from DejaVu Sans metrics. The file, meanwhile,
+        # asked for a *generic* family, so the viewer set those glyphs in its
+        # own sans (Helvetica on iOS/macOS, Roboto on Android, Arial/Segoe on
+        # Windows, whatever fontconfig picks on Linux) at DejaVu's advances.
+        # Narrower glyphs on wider advances read as letter-spaced prose: the
+        # title of ln_levels_example shipped as "S t a t i s t i c a l". A
+        # label with no mathtext escaped it, being written as one <text> the
+        # viewer is free to shape -- so the defect landed on exactly the
+        # figures carrying mathematics, and grew with every one added.
+        #
+        # The generic family was itself the fix for the previous round of this:
+        # matplotlib writes mathtext with a bare "DejaVu Sans" and no generic
+        # fallback, so a viewer without that font fell back to a *serif*. Both
+        # failures are the same failure -- the drawn result depending on the
+        # reader's font stack -- and outlines end the dependency rather than
+        # trading one symptom for the next. It also drops the STIX exception
+        # that fix needed (radicals and extensible delimiters are drawn from a
+        # dedicated font at a size matched to the glyph beside them, which
+        # rewriting the family silently broke).
+        #
+        # Reproducibility, which is why 'none' was chosen originally, is not
+        # lost: the outlines come from the DejaVu build that matplotlib itself
+        # ships, so they are pinned by the pinned matplotlib, and
+        # check_figures.py compares structure plus numbers within a tolerance
+        # rather than bytes. The report fiches have drawn their plot text as
+        # paths all along (see phonometry._report._layout), so this is the two
+        # halves of the project agreeing rather than a new departure.
+        #
+        # What it costs: the text of a committed .svg is no longer text, so it
+        # cannot be selected in an editor or found with Ctrl-F. Nothing
+        # downstream wanted it. Every figure is embedded as <img>, where the
+        # internal DOM is not exposed to assistive technology (the alt text
+        # is, and ThemeImage.astro refuses to render without one), and in a
+        # figure with mathematics that text layer was already unreadable --
+        # thirty positioned tspans with the glyphs in layout order, as
+        # check_figure_language.py had to work around.
+        plt.rcParams["svg.fonttype"] = "path"
         kwargs.setdefault("metadata", {"Date": None})
         plt.savefig(path, **kwargs)
-        # svg.fonttype='none' keeps text selectable, but matplotlib writes
-        # mathtext runs ('$...$') with a bare font-family ('DejaVu Sans', no
-        # generic), so viewers lacking that font fall back to a serif while
-        # plain <text> (full chain ending in sans-serif) stays sans. Normalise
-        # every declaration to the generic 'sans-serif' so all text renders in
-        # the viewer's native sans font, consistently and viewer-independently.
-        # Exception: mathtext draws radicals and extensible delimiters with a
-        # dedicated 'STIXSizeOneSym' run sized to match the glyph next to it
-        # (e.g. the bar over \sqrt{...}); rewriting that run to sans-serif
-        # swaps in the reader's sans glyph at the wrong size, so the radical
-        # bar no longer lines up with the symbol it covers. Leave any
-        # declaration whose family starts with 'STIX' untouched. The
-        # lookahead sits before the optional whitespace (not inside
-        # ``\s*``): matplotlib emits a space after the colon, and a
-        # trailing ``\s*(?!'STIX)`` would backtrack to zero width and test
-        # the lookahead against that leading space instead of the quote,
-        # matching (and clobbering) the STIX declaration it was meant to
-        # protect.
-        import re as _re
-        svg_text = pathlib.Path(path).read_text(encoding="utf-8")
-        svg_text = _re.sub(
-            r"font-family:(?!\s*'STIX)\s*[^;\"]+", "font-family: sans-serif", svg_text
-        )
-        pathlib.Path(path).write_text(svg_text, encoding="utf-8")
         return
     import io
 
@@ -271,7 +289,7 @@ def save_figure(output_dir: str, filename: str, **kwargs: Any) -> None:
 
 def apply_axis_styling(ax: Any, title: str, xlim: tuple[float, float] | None = None, ylim: tuple[float, float] | None = None) -> None:
     """Apply consistent styling to plots."""
-    ax.set_title(title, fontweight="bold", pad=12)
+    ax.set_title(title, pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel(LABEL_LEVEL_DB)
     ax.grid(which="major", color=COLOR_GRID, linestyle="-")

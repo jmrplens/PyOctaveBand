@@ -183,7 +183,7 @@ def _showfilter(
     ax.axhline(-3, color=theme_line("#d62728", ax, quiet=0.5), linestyle="--",
                linewidth=1, label="-3 dB")
 
-    ax.set_title("Filter Bank Frequency Response", fontweight="bold", pad=15)
+    ax.set_title("Filter Bank Frequency Response", pad=15)
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("Amplitude [dB]")
     ax.grid(which="major", color="#e0e0e0", linestyle="-")

@@ -219,10 +219,11 @@ def test_fiche_pins_displayed_numbers(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     # Independent expectation: the trimmed Case 1 steps land at -23.0 LUFS
-    # (the -20/-30 dBFS analytic pair shifted by -0.4 dB).
-    assert "-23.0 LUFS ±0.2 LU" in text
+    # (the -20/-30 dBFS analytic pair shifted by -0.4 dB). The printed sign is
+    # the typographic minus every fiche reading carries.
+    assert "−23.0 LUFS ±0.2 LU" in text
     assert "(EBU R 128 item i)" in text
-    assert "I = -23.0 LUFS" in text
+    assert "I = −23.0 LUFS" in text
     assert "Quality Control (EBU R 128 item i)." in text
 
 

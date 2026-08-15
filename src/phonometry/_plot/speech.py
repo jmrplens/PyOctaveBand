@@ -49,8 +49,8 @@ _STRINGS: dict[str, str] = {
     "Analysis segment": "Segmento de análisis",
     "Band audibility": "Audibilidad de banda",
     "Band audibility $A_i$": "Audibilidad de banda $A_i$",
-    "Importance-weighted $I_i A_i$ (scaled)":
-        "$I_i A_i$ ponderada por importancia (escalada)",
+    r"Importance-weighted $I_i\,A_i$ (scaled)":
+        r"Ponderada por importancia $I_i\,A_i$ (escalada)",
     "IEC 60268-16 STI = {sti}  (rating {rating})":
         "IEC 60268-16 STI = {sti}  (calificación {rating})",
     _NAME_VALUE_LABEL: _NAME_VALUE_LABEL,
@@ -198,7 +198,7 @@ def plot_sii(
     peak = float(contribution.max()) if contribution.size else 0.0
     scaled = contribution / peak if peak > 0.0 else contribution
     ax.bar(positions, scaled, width=0.5,
-           label=_t("Importance-weighted $I_i A_i$ (scaled)", language), **kwargs)
+           label=_t(r"Importance-weighted $I_i\,A_i$ (scaled)", language), **kwargs)
     ax.set_ylabel(_t("Band audibility", language))
     ax.set_ylim(0.0, 1.0)
     ax.set_title(_t(_SII_TITLE, language).format(

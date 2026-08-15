@@ -138,7 +138,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
 
     fig = _anim_figure()
     fig.suptitle(T("SOFAR channel: sound trapped by the $c(z)$ minimum "
-                   "(2D FDTD)"), fontweight="bold")
+                   "(2D FDTD)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[0.22, 1.0])
     titles = [T("Source on the channel axis (depth 400 m)"),
               T("Source near the surface (depth 150 m)")]
@@ -177,7 +177,7 @@ def animate_fdtd_ducting(output_dir: str) -> None:
                            cmap="magma", vmin=-20.0, vmax=0.0,
                            aspect="auto", interpolation="bilinear",
                            alpha=0.0, zorder=2.5)
-        ax_f.set_title(titles[row], fontsize=10, fontweight="bold")
+        ax_f.set_title(titles[row], fontsize=10)
         ax_f.axhline(_DUCT_AXIS, color="#888888", ls="--", lw=0.9,
                      alpha=0.8, zorder=3)
         ax_f.plot([200.0], [depth], marker="o", ms=5, color=COLOR_TERTIARY,

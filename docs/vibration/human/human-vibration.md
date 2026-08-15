@@ -176,7 +176,7 @@ ax.bar(pos + 0.2, result.weighted, 0.4, color="#1f77b4",
 ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax.set_xlabel("Frequency [Hz]")
-ax.set_ylabel(r"r.m.s. acceleration [m/s$^2$]")
+ax.set_ylabel("r.m.s. acceleration [m/s²]")
 ax.set_title(f"Weighted acceleration ($a_w$ = {result.overall:.3f} m/s²)")
 ax.legend()
 plt.show()
@@ -302,7 +302,7 @@ result.plot()
 plt.show()
 
 # By hand, mirroring what DailyVibrationExposure.plot() draws:
-labels = [*result.labels, "A(8)"]
+labels = [*result.labels, "$A(8)$"]
 values = [*result.partials.tolist(), result.a8]
 a = result.assessment
 fig, ax = plt.subplots()
@@ -312,7 +312,7 @@ ax.axhline(a.action_value, color="#2ca02c", ls="--", label=f"EAV = {a.action_val
 ax.axhline(a.limit_value, color="#d62728", ls="--", label=f"ELV = {a.limit_value:g}")
 ax.set_xticks(range(len(values)))
 ax.set_xticklabels(labels, rotation=30, ha="right")
-ax.set_ylabel(r"Daily exposure A(8) [m/s$^2$]")
+ax.set_ylabel("Daily exposure $A(8)$ [m/s²]")
 ax.legend()
 plt.show()
 ```

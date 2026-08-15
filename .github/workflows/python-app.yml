@@ -245,11 +245,15 @@ jobs:
   # `make graphs` run. The rendering + compute stack is pinned in
   # requirements-figures.txt so SVG *structure* (elements, text, colours) and
   # WebP dimensions/encoding are stable -- matplotlib/fonttools/pillow fix the
-  # layout, numpy/scipy fix the computed data. The comparison itself
-  # (scripts/check_figures.py) is tolerance-aware rather than a byte diff:
-  # GitHub's heterogeneous runner CPUs shift a few path coordinates ~1 ULP,
-  # which is visually irrelevant but breaks a byte compare. Bump the pinned
-  # stack together with a fresh `make graphs` regeneration.
+  # layout, numpy/scipy fix the computed data. The pin is also load-bearing
+  # for the diagram plates' baked glyph outlines (scripts/diagrams/outline.py
+  # shapes them through the wheel's FT2Font/libraqm and DejaVu faces): a wheel
+  # bump rewrites every glyph in all 592 plate files and is reviewed as its
+  # own regeneration. The comparison itself (scripts/check_figures.py) is
+  # tolerance-aware rather than a byte diff: GitHub's heterogeneous runner
+  # CPUs shift a few path coordinates ~1 ULP, which is visually irrelevant but
+  # breaks a byte compare. Bump the pinned stack together with a fresh
+  # `make graphs` regeneration.
   figures:
     name: Documentation figures up to date
     runs-on: ubuntu-latest
@@ -268,8 +272,32 @@ jobs:
         pip install -e .
         # Pin the render+compute stack last so it wins over looser deps.
         pip install -r requirements-figures.txt
+    - name: Fail if any label's mathematics does not parse
+      # Before the regeneration, not after: an unparseable label aborts the
+      # generation, and this names the file and line instead of leaving a
+      # traceback in the middle of a four-hundred-figure run. Reads the
+      # sources, so it costs seconds and covers labels no figure exercises.
+      run: python scripts/check_mathtext.py
+    - name: Fail if a Spanish label would keep an English decimal point
+      # The one defect the language gate structurally cannot see: it compares
+      # untranslated WORDS, and a number is not a word. Static, so it needs no
+      # generation run.
+      run: python scripts/check_decimal_comma.py
     - name: Regenerate figures and diagrams
       run: make graphs
+    - name: Regenerate the plates again and demand identical bytes
+      # The diagram plates bake their labels to glyph outlines and must be
+      # bit-deterministic: two runs in the same job have to agree byte for
+      # byte, which is stronger than the tolerance gate below and catches an
+      # accidentally unordered collection in the glyph store the moment it
+      # appears.
+      run: |
+        mkdir /tmp/plates-first-run
+        cp .github/images/diagram_*.svg .github/images/sound_power_methods*.svg /tmp/plates-first-run/
+        python scripts/generate_diagrams.py
+        for f in /tmp/plates-first-run/*.svg; do
+          cmp "$f" ".github/images/$(basename "$f")"
+        done
     - name: Fail if any committed figure is stale
       # Tolerance-aware compare instead of a byte diff: GitHub's runner fleet is
       # hardware-heterogeneous, so the pinned stack computes a few path

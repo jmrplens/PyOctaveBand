@@ -43,9 +43,9 @@ if TYPE_CHECKING:
     from ..psychoacoustics.quality.tone_audibility import ToneAudibilityResult
 
 #: Critical-band rate axis label of the Zwicker/DIN 45631 family (Bark scale).
-_AXIS_BARK = "Critical-band rate z [Bark]"
+_AXIS_BARK = "Critical-band rate $z$ [Bark]"
 #: Critical-band rate axis label of the ECMA-418-2 (Sottek Hearing Model) family.
-_AXIS_BARK_HMS = "Critical-band rate z [Bark_HMS]"
+_AXIS_BARK_HMS = r"Critical-band rate $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]"
 #: Time axis label shared by every time-varying psychoacoustic renderer.
 _AXIS_TIME = "Time [s]"
 #: Frequency axis label shared by the spectral psychoacoustic renderers.
@@ -57,37 +57,52 @@ _AXIS_FREQUENCY = "Frequency [Hz]"
 #: than ``"es"``, so the English output is byte-for-byte identical to the
 #: pre-i18n renderers.
 _STRINGS: dict[str, str] = {
-    _AXIS_BARK: "Razón de banda crítica z [Bark]",
-    _AXIS_BARK_HMS: "Razón de banda crítica z [Bark_HMS]",
-    "Specific loudness N' [sone/Bark]": "Sonoridad específica N' [sonios/Bark]",
-    "Specific loudness N' [sone_HMS/Bark_HMS]": "Sonoridad específica N' [sonios_HMS/Bark_HMS]",
-    "Specific loudness N' [sone/Cam]": "Sonoridad específica N' [sonios/Cam]",
+    # Every prime below is composed as ``^{\prime}``, never typed as U+2032:
+    # the character is an ordinary glyph of the maths run, so its ink stops at
+    # cap height and the overhang of an italic "f" runs into it; ``^{\prime}``
+    # is raised as a superscript, above the ascender, and clears it.
+    _AXIS_BARK: "Razón de banda crítica $z$ [Bark]",
+    _AXIS_BARK_HMS: r"Razón de banda crítica $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]",
+    r"Specific loudness $N^{\prime}$ [sone/Bark]":
+        r"Sonoridad específica $N^{\prime}$ [sonios/Bark]",
+    r"Specific loudness $N^{\prime}$ [$\mathrm{sone}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]":
+        r"Sonoridad específica $N^{\prime}$ [$\mathrm{sonios}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]",
+    r"Specific loudness $N^{\prime}$ [sone/Cam]":
+        r"Sonoridad específica $N^{\prime}$ [sonios/Cam]",
     "ERB number [Cam]": "Número ERB [Cam]",
     _AXIS_TIME: "Tiempo [s]",
-    "Loudness N [sone]": "Sonoridad N [sonios]",
-    "Loudness N [sone_HMS]": "Sonoridad N [sonios_HMS]",
+    "Loudness $N$ [sone]": "Sonoridad $N$ [sonios]",
+    r"Loudness $N$ [$\mathrm{sone}_{\mathrm{HMS}}$]":
+        r"Sonoridad $N$ [$\mathrm{sonios}_{\mathrm{HMS}}$]",
     "Loudness [sone]": "Sonoridad [sonios]",
     "Short-term loudness": "Sonoridad a corto plazo",
     "Long-term loudness": "Sonoridad a largo plazo",
-    "Specific tonality T' [tu_HMS]": "Tonalidad específica T' [tu_HMS]",
-    "Tonality T [tu_HMS]": "Tonalidad T [tu_HMS]",
-    "Roughness R [asper]": "Aspereza R [asper]",
-    "Fluctuation strength F [vacil_HMS]": "Intensidad de fluctuación F [vacil_HMS]",
-    "Specific fluctuation strength $f'(z)$ [vacil/Bark]": "Intensidad de fluctuación específica $f'(z)$ [vacil/Bark]",
+    r"Specific tonality $T^{\prime}$ [$\mathrm{tu}_{\mathrm{HMS}}$]":
+        r"Tonalidad específica $T^{\prime}$ [$\mathrm{tu}_{\mathrm{HMS}}$]",
+    r"Tonality $T$ [$\mathrm{tu}_{\mathrm{HMS}}$]":
+        r"Tonalidad $T$ [$\mathrm{tu}_{\mathrm{HMS}}$]",
+    "Roughness $R$ [asper]": "Aspereza $R$ [asper]",
+    r"Fluctuation strength $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]":
+        r"Intensidad de fluctuación $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]",
+    r"Specific fluctuation strength $f^{\prime}(z)$ [vacil/Bark]":
+        r"Intensidad de fluctuación específica $f^{\prime}(z)$ [vacil/Bark]",
     "Value": "Valor",
     "Tone frequency [Hz]": "Frecuencia del tono [Hz]",
     r"Audibility $\Delta L$ [dB]": r"Audibilidad $\Delta L$ [dB]",
     r"threshold $\Delta L=0$ dB": r"umbral $\Delta L=0$ dB",
     "ISO/PAS 20065 tonal audibility": "Audibilidad tonal ISO/PAS 20065",
-    "ISO 532-1 loudness N = {n} sone ({ln} phon)": "ISO 532-1 sonoridad N = {n} sonios ({ln} fonios)",
-    "ECMA-418-2 loudness N = {n} sone_HMS": "ECMA-418-2 sonoridad N = {n} sonios_HMS",
-    "ISO 532-2 loudness N = {n} sone ({ln} phon)": "ISO 532-2 sonoridad N = {n} sonios ({ln} fonios)",
-    "ISO 532-3 peak long-term loudness N = {n} sone ({ln} phon)": "ISO 532-3 sonoridad a largo plazo máxima N = {n} sonios ({ln} fonios)",
-    "ECMA-418-2 tonality T = {t} tu_HMS": "ECMA-418-2 tonalidad T = {t} tu_HMS",
-    "ECMA-418-2 roughness R = {r} asper": "ECMA-418-2 aspereza R = {r} asper",
-    "ECMA-418-2 fluctuation strength F = {f} vacil_HMS": "ECMA-418-2 intensidad de fluctuación F = {f} vacil_HMS",
-    "Fluctuation strength F = {f} vacil": "Intensidad de fluctuación F = {f} vacil",
-    "Psychoacoustic annoyance PA = {pa} (N5 = {n5} sone)": "Molestia psicoacústica PA = {pa} (N5 = {n5} sonios)",
+    "ISO 532-1 loudness $N$ = {n} sone ({ln} phon)": "ISO 532-1 sonoridad $N$ = {n} sonios ({ln} fonios)",
+    r"ECMA-418-2 loudness $N$ = {n} $\mathrm{{sone}}_{{\mathrm{{HMS}}}}$":
+        r"ECMA-418-2 sonoridad $N$ = {n} $\mathrm{{sonios}}_{{\mathrm{{HMS}}}}$",
+    "ISO 532-2 loudness $N$ = {n} sone ({ln} phon)": "ISO 532-2 sonoridad $N$ = {n} sonios ({ln} fonios)",
+    "ISO 532-3 peak long-term loudness $N$ = {n} sone ({ln} phon)": "ISO 532-3 sonoridad a largo plazo máxima $N$ = {n} sonios ({ln} fonios)",
+    r"ECMA-418-2 tonality $T$ = {t} $\mathrm{{tu}}_{{\mathrm{{HMS}}}}$":
+        r"ECMA-418-2 tonalidad $T$ = {t} $\mathrm{{tu}}_{{\mathrm{{HMS}}}}$",
+    "ECMA-418-2 roughness $R$ = {r} asper": "ECMA-418-2 aspereza $R$ = {r} asper",
+    r"ECMA-418-2 fluctuation strength $F$ = {f} $\mathrm{{vacil}}_{{\mathrm{{HMS}}}}$":
+        r"ECMA-418-2 intensidad de fluctuación $F$ = {f} $\mathrm{{vacil}}_{{\mathrm{{HMS}}}}$",
+    "Fluctuation strength $F$ = {f} vacil": "Intensidad de fluctuación $F$ = {f} vacil",
+    "Psychoacoustic annoyance PA = {pa} ($N_5$ = {n5} sone)": "Molestia psicoacústica PA = {pa} ($N_5$ = {n5} sonios)",
     r"decisive $\Delta L$ = {da} dB @ {df} Hz": r"decisiva $\Delta L$ = {da} dB @ {df} Hz",
     r"tone level $L_\mathrm{pt}$": r"nivel del tono $L_\mathrm{pt}$",
     r"masking noise $L_\mathrm{pn}$ (critical band)": r"ruido enmascarante $L_\mathrm{pn}$ (banda crítica)",
@@ -154,10 +169,10 @@ def plot_zwicker_loudness(
     ax_specific.plot(bark, specific, **kwargs)
     ax_specific.fill_between(bark, specific, color=kwargs["color"], alpha=0.25)
     ax_specific.set_xlabel(_t(_AXIS_BARK, language))
-    ax_specific.set_ylabel(_t("Specific loudness N' [sone/Bark]", language))
+    ax_specific.set_ylabel(_t(r"Specific loudness $N^{\prime}$ [sone/Bark]", language))
     ax_specific.set_xlim(0.0, bark[-1])
     ax_specific.set_ylim(bottom=0.0)
-    ax_specific.set_title(_t("ISO 532-1 loudness N = {n} sone ({ln} phon)", language).format(
+    ax_specific.set_title(_t("ISO 532-1 loudness $N$ = {n} sone ({ln} phon)", language).format(
         n=format_number(result.loudness, language, decimals=2),
         ln=format_number(result.loudness_level, language, decimals=1),
     ))
@@ -204,19 +219,19 @@ def plot_zwicker_loudness_time(
     time = np.asarray(result.time, dtype=np.float64)
     lvt = np.asarray(result.loudness_vs_time, dtype=np.float64)
     kwargs.setdefault("color", _C_TERTIARY)
-    ax_time.plot(time, lvt, label="N(t)", **kwargs)
+    ax_time.plot(time, lvt, label="$N(t)$", **kwargs)
     if result.n5 is not None:
         ax_time.axhline(
             result.n5, color=_C_REFERENCE, ls="--", lw=1,
-            label="N5=" + format_number(result.n5, language, decimals=2),
+            label="$N_5$=" + format_number(result.n5, language, decimals=2),
         )
     if result.n10 is not None:
         ax_time.axhline(
             result.n10, color=_C_SECONDARY, ls=":", lw=1,
-            label="N10=" + format_number(result.n10, language, decimals=2),
+            label="$N_{10}$=" + format_number(result.n10, language, decimals=2),
         )
     ax_time.set_xlabel(_t(_AXIS_TIME, language))
-    ax_time.set_ylabel(_t("Loudness N [sone]", language))
+    ax_time.set_ylabel(_t("Loudness $N$ [sone]", language))
     ax_time.set_ylim(bottom=0.0)
     ax_time.grid(True, alpha=0.3)
     ax_time.legend(loc="best", fontsize="small")
@@ -257,10 +272,15 @@ def plot_ecma_loudness(
     ax_specific.plot(bark, specific, **kwargs)
     ax_specific.fill_between(bark, specific, color=kwargs["color"], alpha=0.25)
     ax_specific.set_xlabel(_t(_AXIS_BARK_HMS, language))
-    ax_specific.set_ylabel(_t("Specific loudness N' [sone_HMS/Bark_HMS]", language))
+    ax_specific.set_ylabel(_t(
+        r"Specific loudness $N^{\prime}$ [$\mathrm{sone}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]",
+        language,
+    ))
     ax_specific.set_xlim(0.0, bark[-1])
     ax_specific.set_ylim(bottom=0.0)
-    ax_specific.set_title(_t("ECMA-418-2 loudness N = {n} sone_HMS", language).format(
+    ax_specific.set_title(_t(
+        r"ECMA-418-2 loudness $N$ = {n} $\mathrm{{sone}}_{{\mathrm{{HMS}}}}$", language,
+    ).format(
         n=format_number(result.loudness, language, decimals=2),
     ))
     ax_specific.grid(True, alpha=0.3)
@@ -272,9 +292,9 @@ def plot_ecma_loudness(
     ax_time = cast("Axes", axes[1])
     time = np.asarray(result.time, dtype=np.float64)
     lvt = np.asarray(result.loudness_vs_time, dtype=np.float64)
-    ax_time.plot(time, lvt, color=_C_TERTIARY, label="N(l)")
+    ax_time.plot(time, lvt, color=_C_TERTIARY, label="$N(l)$")
     ax_time.set_xlabel(_t(_AXIS_TIME, language))
-    ax_time.set_ylabel(_t("Loudness N [sone_HMS]", language))
+    ax_time.set_ylabel(_t(r"Loudness $N$ [$\mathrm{sone}_{\mathrm{HMS}}$]", language))
     ax_time.set_ylim(bottom=0.0)
     ax_time.grid(True, alpha=0.3)
     ax_time.legend(loc="best", fontsize="small")
@@ -306,10 +326,10 @@ def plot_moore_glasberg_loudness(
     ax.plot(erb_number, specific, **kwargs)
     ax.fill_between(erb_number, specific, color=kwargs["color"], alpha=0.25)
     ax.set_xlabel(_t("ERB number [Cam]", language))
-    ax.set_ylabel(_t("Specific loudness N' [sone/Cam]", language))
+    ax.set_ylabel(_t(r"Specific loudness $N^{\prime}$ [sone/Cam]", language))
     ax.set_xlim(erb_number[0], erb_number[-1])
     ax.set_ylim(bottom=0.0)
-    ax.set_title(_t("ISO 532-2 loudness N = {n} sone ({ln} phon)", language).format(
+    ax.set_title(_t("ISO 532-2 loudness $N$ = {n} sone ({ln} phon)", language).format(
         n=format_number(result.loudness, language, decimals=2),
         ln=format_number(result.loudness_level, language, decimals=1),
     ))
@@ -349,7 +369,7 @@ def plot_moore_glasberg_time_loudness(
     if time.size:
         ax.set_xlim(time[0], time[-1])
     ax.set_ylim(bottom=0.0)
-    ax.set_title(_t("ISO 532-3 peak long-term loudness N = {n} sone ({ln} phon)", language).format(
+    ax.set_title(_t("ISO 532-3 peak long-term loudness $N$ = {n} sone ({ln} phon)", language).format(
         n=format_number(result.n_max, language, decimals=2),
         ln=format_number(result.loudness_level_max, language, decimals=1),
     ))
@@ -395,10 +415,14 @@ def plot_ecma_tonality(
     ax_specific.plot(bark, specific, **kwargs)
     ax_specific.fill_between(bark, specific, color=kwargs["color"], alpha=0.25)
     ax_specific.set_xlabel(_t(_AXIS_BARK_HMS, language))
-    ax_specific.set_ylabel(_t("Specific tonality T' [tu_HMS]", language))
+    ax_specific.set_ylabel(
+        _t(r"Specific tonality $T^{\prime}$ [$\mathrm{tu}_{\mathrm{HMS}}$]", language)
+    )
     ax_specific.set_xlim(0.0, bark[-1])
     ax_specific.set_ylim(bottom=0.0)
-    ax_specific.set_title(_t("ECMA-418-2 tonality T = {t} tu_HMS", language).format(
+    ax_specific.set_title(_t(
+        r"ECMA-418-2 tonality $T$ = {t} $\mathrm{{tu}}_{{\mathrm{{HMS}}}}$", language,
+    ).format(
         t=format_number(result.tonality, language, decimals=2),
     ))
     ax_specific.grid(True, alpha=0.3)
@@ -410,9 +434,9 @@ def plot_ecma_tonality(
     ax_time = cast("Axes", axes[1])
     time = np.asarray(result.time, dtype=np.float64)
     tvt = np.asarray(result.tonality_vs_time, dtype=np.float64)
-    ax_time.plot(time, tvt, color=_C_QUATERNARY, label="T(l)")
+    ax_time.plot(time, tvt, color=_C_QUATERNARY, label="$T(l)$")
     ax_time.set_xlabel(_t(_AXIS_TIME, language))
-    ax_time.set_ylabel(_t("Tonality T [tu_HMS]", language))
+    ax_time.set_ylabel(_t(r"Tonality $T$ [$\mathrm{tu}_{\mathrm{HMS}}$]", language))
     ax_time.set_ylim(bottom=0.0)
     ax_time.grid(True, alpha=0.3)
     ax_time.legend(loc="best", fontsize="small")
@@ -506,11 +530,11 @@ def plot_ecma_roughness(
         np.asarray(result.bark, dtype=np.float64),
         ax,
         "#8c564b",
-        _t("Roughness R [asper]", language),
-        _t("ECMA-418-2 roughness R = {r} asper", language).format(
+        _t("Roughness $R$ [asper]", language),
+        _t("ECMA-418-2 roughness $R$ = {r} asper", language).format(
             r=format_number(result.roughness, language, decimals=2),
         ),
-        "R' [asper/Bark_HMS]",
+        r"$R^{\prime}$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]",
         kwargs,
         language,
     )
@@ -549,11 +573,15 @@ def plot_ecma_fluctuation_strength(
         np.asarray(result.bark, dtype=np.float64),
         ax,
         "#17becf",
-        _t("Fluctuation strength F [vacil_HMS]", language),
-        _t("ECMA-418-2 fluctuation strength F = {f} vacil_HMS", language).format(
+        _t(r"Fluctuation strength $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]", language),
+        _t(
+            r"ECMA-418-2 fluctuation strength $F$ = {f} "
+            r"$\mathrm{{vacil}}_{{\mathrm{{HMS}}}}$",
+            language,
+        ).format(
             f=format_number(result.fluctuation_strength, language, decimals=2),
         ),
-        "F' [vacil_HMS/Bark_HMS]",
+        r"$F^{\prime}$ [$\mathrm{vacil}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]",
         kwargs,
         language,
     )
@@ -584,8 +612,10 @@ def plot_fluctuation_strength(
     ax.plot(z, spec, **kwargs)
     ax.fill_between(z, spec, color=kwargs["color"], alpha=0.25)
     ax.set_xlabel(_t(_AXIS_BARK, language))
-    ax.set_ylabel(_t("Specific fluctuation strength $f'(z)$ [vacil/Bark]", language))
-    ax.set_title(_t("Fluctuation strength F = {f} vacil", language).format(
+    ax.set_ylabel(
+        _t(r"Specific fluctuation strength $f^{\prime}(z)$ [vacil/Bark]", language)
+    )
+    ax.set_title(_t("Fluctuation strength $F$ = {f} vacil", language).format(
         f=format_number(result.fluctuation_strength, language, decimals=2),
     ))
     ax.set_ylim(bottom=0.0)
@@ -625,7 +655,7 @@ def plot_psychoacoustic_annoyance(
     ax.set_xticks(positions)
     ax.set_xticklabels(labels)
     ax.set_ylabel(_t("Value", language))
-    ax.set_title(_t("Psychoacoustic annoyance PA = {pa} (N5 = {n5} sone)", language).format(
+    ax.set_title(_t("Psychoacoustic annoyance PA = {pa} ($N_5$ = {n5} sone)", language).format(
         pa=format_number(result.annoyance, language, decimals=1),
         n5=format_number(result.n5, language, decimals=1),
     ))

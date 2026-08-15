@@ -24,10 +24,12 @@ def test_spanish_labels_and_comma_decimals() -> None:
     res = _result()
 
     ax_en = res.plot(language="en")
-    assert ax_en.get_xlabel() == "Critical-band rate z [Bark]"
+    assert ax_en.get_xlabel() == "Critical-band rate $z$ [Bark]"
 
     ax_es = res.plot(language="es")
-    assert ax_es.get_xlabel() == "Razón de banda crítica z [Bark]"
+    # The symbol is drawn as mathematics and is the same symbol in both
+    # languages; only the prose around it is translated.
+    assert ax_es.get_xlabel() == "Razón de banda crítica $z$ [Bark]"
     assert "sonios" in ax_es.get_title()
     # Spanish uses a comma decimal separator in the annotated numbers.
     assert "," in ax_es.get_title()

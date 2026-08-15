@@ -412,9 +412,10 @@ plt.show()
 
 # A mano, con los campos por banda que lleva el resultado:
 fig, ax = plt.subplots()
-ax.plot(bands, enc.panel_transmission_loss, "s--", label="R del panel")
-ax.plot(bands, enc.correction, "^:", label="Corrección interior C")
-ax.plot(bands, enc.insertion_loss, "o-", label="Pérdida por inserción (R - C)")
+ax.plot(bands, enc.panel_transmission_loss, "s--", label="$R$ del panel")
+ax.plot(bands, enc.correction, "^:", label="Corrección interior $C$")
+ax.plot(bands, enc.insertion_loss, "o-",
+        label="Pérdida por inserción ($R - C$)")
 ax.set_xlabel("Frecuencia [Hz]"); ax.set_ylabel("Nivel [dB]")
 ax.set_xscale("log")
 ax.legend()

@@ -71,7 +71,7 @@ def generate_psd_confidence_smoothing(output_dir: str) -> None:
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("PSD [dB re 1/Hz]")
     ax.set_title("Calibrated Spectral Density of Pink Noise (Bendat & Piersol)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.set_xlim(20.0, 20000.0)
     format_frequency_axis(ax, 20.0, 20000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -139,7 +139,7 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
     ax.set_ylabel("PSD [dB re 1/Hz]")
     ax.set_title(
         "Thomson Multitaper Density of a Short Record (Percival & Walden)",
-        fontweight="bold", pad=12)
+        pad=12)
     ax.set_xlim(20.0, 20000.0)
     format_frequency_axis(ax, 20.0, 20000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -172,7 +172,7 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
     ax_hd.set_xlabel("Frequency [Hz]")
     ax_hd.set_ylabel("PSD [dB re 1/Hz]")
     ax_hd.set_title("A 60 dB tone over a pink floor, and what it costs",
-                    fontweight="bold", pad=12)
+                    pad=12)
     ax_hd.set_xlim(200.0, 5000.0)
     format_frequency_axis(ax_hd, 200.0, 5000.0)
     ax_hd.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -230,7 +230,7 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel("PSD [dB re 1/Hz]")
     ax_l.set_title(f"A {b_r:.0f} Hz-wide resonance at {f_r:.0f} Hz",
-                   fontweight="bold", pad=10)
+                   pad=10)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
     ax_l.legend(loc="upper right", fontsize=8.5)
@@ -263,7 +263,7 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
     ax_r.set_ylim(0.0, 8.0)
     ax_r.set_xlabel("Segment length [samples]")
     ax_r.set_ylabel("Error [dB]")
-    ax_r.set_title("Bias falls, variance rises", fontweight="bold", pad=10)
+    ax_r.set_title("Bias falls, variance rises", pad=10)
     ax_r.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
     ax_r.legend(loc="upper center", fontsize=8.5)
@@ -315,7 +315,7 @@ def generate_noise_colors(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("PSD re its own 1 kHz level [dB]")
     ax.set_title("The five colours of noise_signal, over three decades",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=8.5)
@@ -367,7 +367,7 @@ def generate_calibrated_spectrogram(output_dir: str) -> None:
     ax.set_xlabel("Time [s]")
     ax.set_ylabel(LABEL_FREQ_HZ)
     ax.set_title("Calibrated Spectrogram in dB SPL (Bendat & Piersol)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.text(0.02, 0.965,
             "a siren, an impact and a pink-noise floor:\n"
             "every cell reads an absolute level",
@@ -416,7 +416,7 @@ def generate_zoom_fft_resolution(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Amplitude [dB]")
     ax.set_title("Zoom FFT Resolves Tones One Coarse Bin Apart "
-                 "(Bendat & Piersol)", fontweight="bold", pad=12)
+                 "(Bendat & Piersol)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -458,7 +458,7 @@ def generate_window_functions_tradeoff(output_dir: str) -> None:
     ax.set_xlabel("Frequency offset [DFT bins]")
     ax.set_ylabel("Level re main lobe [dB]")
     ax.set_title("Window Functions: The Spectral Trade-off (Harris 1978)",
-                 fontweight="bold", pad=12)
+                 pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -515,7 +515,7 @@ def generate_miso_coherence(output_dir: str) -> None:
     ax_top.set_ylabel("Coherent output [dB re 1/Hz]")
     ax_top.set_title(
         "Multiple-Input Coherence: Which Source Dominates Each Band "
-        "(Bendat & Piersol Ch. 7)", fontweight="bold", pad=12)
+        "(Bendat & Piersol Ch. 7)", pad=12)
     ax_top.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_top.set_axisbelow(True)
     ax_top.legend(loc="lower center", fontsize=8.5, ncol=2)
@@ -590,7 +590,7 @@ def generate_cross_spectral_density_delay(output_dir: str) -> None:
         ax.set_axisbelow(True)
         format_frequency_axis(ax, 20.0, 3500.0)
     ax_m.set_title("Cross-Spectral Density of a 2 ms Delay Path",
-                   fontweight="bold", pad=12)
+                   pad=12)
     plt.tight_layout()
     save_figure(output_dir, "cross_spectral_density.svg")
     plt.close()
@@ -648,7 +648,7 @@ def generate_coherent_output_snr(output_dir: str) -> None:
         format_frequency_axis(ax, 20.0, 20000.0)
     ax_g.set_title(
         "Coherent Output Spectrum and Spectral SNR (Bendat & Piersol 9.2.2)",
-        fontweight="bold", pad=12)
+        pad=12)
     plt.tight_layout()
     save_figure(output_dir, "coherent_output_snr.svg")
     plt.close()

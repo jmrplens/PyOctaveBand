@@ -38,17 +38,17 @@ _LANG_SUFFIX = ""
 
 _ES_EXACT = {
     # Materials: diffusers, resilient layers and in-situ surfaces (B11b)
-    "$s′_t$, frame (Formula 4)": "$s′_t$, esqueleto (Fórmula 4)",
-    r"$s′_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)":
-        r"$s′_a$, aire encerrado (Fórmula 7, $\varepsilon = 0{,}9$)",
-    "installed $s′ = s′_t + s′_a$ (clause 8.2)":
-        "instalada $s′ = s′_t + s′_a$ (apartado 8.2)",
-    r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s′ = s′_t$" "\n"
-    r"$10 \leq r < 100$  →  $s′ = s′_t + s′_a$" "\n"
-    r"$r < 10$  →  $s′ = s′_t$ only if $s′_a$ is negligible":
-        r"apartado 8.2:  $r \geq 100$ kPa·s/m²  →  $s′ = s′_t$" "\n"
-        r"$10 \leq r < 100$  →  $s′ = s′_t + s′_a$" "\n"
-        r"$r < 10$  →  $s′ = s′_t$ solo si $s′_a$ es despreciable",
+    r"$s^{\prime}_t$, frame (Formula 4)": r"$s^{\prime}_t$, esqueleto (Fórmula 4)",
+    r"$s^{\prime}_a$, enclosed gas (Formula 7, $\varepsilon = 0.9$)":
+        r"$s^{\prime}_a$, aire encerrado (Fórmula 7, $\varepsilon = 0{,}9$)",
+    r"installed $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ (clause 8.2)":
+        r"instalada $s^{\prime} = s^{\prime}_t + s^{\prime}_a$ (apartado 8.2)",
+    r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_t$" "\n"
+    r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_t + s^{\prime}_a$" "\n"
+    r"$r < 10$  →  $s^{\prime} = s^{\prime}_t$ only if $s^{\prime}_a$ is negligible":
+        r"apartado 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_t$" "\n"
+        r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_t + s^{\prime}_a$" "\n"
+        r"$r < 10$  →  $s^{\prime} = s^{\prime}_t$ solo si $s^{\prime}_a$ es despreciable",
     "the worked determination:\n$d$ = 20 mm, 4.94 + 5.56 = 10.49":
         "la determinación del ejemplo:\n$d$ = 20 mm, 4,94 + 5,56 = 10,49",
     r"$f_u = 0.58\,c_0/d$ (Clause 5.4)":
@@ -98,8 +98,8 @@ _ES_EXACT = {
         "excitación pequeña: $f_r$ = 25,0 Hz",
     # The $ delimiters take these legends out of the automatic decimal-comma
     # pass, so the comma is baked here (values fixed by the worked example).
-    "$s′$ = 10.5 MN/m³, $f_0$ = 47 Hz": "$s′$ = 10,5 MN/m³, $f_0$ = 47 Hz",
-    "$s′$ = 5.0 MN/m³, $f_0$ = 32 Hz": "$s′$ = 5,0 MN/m³, $f_0$ = 32 Hz",
+    r"$s^{\prime}$ = 10.5 MN/m³, $f_0$ = 47 Hz": r"$s^{\prime}$ = 10,5 MN/m³, $f_0$ = 47 Hz",
+    r"$s^{\prime}$ = 5.0 MN/m³, $f_0$ = 32 Hz": r"$s^{\prime}$ = 5,0 MN/m³, $f_0$ = 32 Hz",
     "over-driven: peak lower and at 22 Hz":
         "sobreexcitado: pico más bajo y en 22 Hz",
     "this peak is the whole measurement\n"
@@ -166,7 +166,7 @@ _ES_EXACT = {
     "Phase error against the QRD target [deg]":
         "Error de fase frente al objetivo QRD [grados]",
     "Slit index $n$": "Índice de ranura $n$",
-    "within 10 deg of the target": "dentro de 10 grados del objetivo",
+    "within 10 deg\nof the target": "dentro de 10 grados\ndel objetivo",
     "slit 1": "ranura 1",
     "slit 2": "ranura 2",
     "slit 3": "ranura 3",
@@ -290,10 +290,10 @@ _ES_EXACT = {
         "La misma pared, en laboratorio y en dos edificios\n"
         "(transmision por flancos EN 12354-1 sobre doce caminos)",
     "laboratory $R$ ($R_w$ = 49 dB)": "$R$ de laboratorio ($R_w$ = 49 dB)",
-    "field $R′$, good junctions ($R′_w$ = 47 dB)":
-        "$R′$ in situ, uniones buenas ($R′_w$ = 47 dB)",
-    "field $R′$, flanking dominant ($R′_w$ = 42 dB)":
-        "$R′$ in situ, flancos dominantes ($R′_w$ = 42 dB)",
+    r"field $R^{\prime}$, good junctions ($R^{\prime}_w$ = 47 dB)":
+        r"$R^{\prime}$ in situ, uniones buenas ($R^{\prime}_w$ = 47 dB)",
+    r"field $R^{\prime}$, flanking dominant ($R^{\prime}_w$ = 42 dB)":
+        r"$R^{\prime}$ in situ, flancos dominantes ($R^{\prime}_w$ = 42 dB)",
     "2 dB: normal": "2 dB: normal",
     "7 dB: find the path": "7 dB: busque el camino",
     "The weak element sets the composite\n"
@@ -373,12 +373,15 @@ _ES_EXACT = {
     "gear": "engranaje",
     "motor": "motor",
     "blade": "álabe",
-    "sidebands at $\\pm f_s$ = 25 Hz:\nlow and flat":
-        "bandas laterales a $\\pm f_s$ = 25 Hz:\nbajas y planas",
-    "sidebands at $\\pm f_s$ = 25 Hz:\ntall groups, and the\n"
+    # Both sideband blocks are set narrow, one clause per line: they stand in
+    # the stretch of axis below the first mesh cluster, and the Spanish
+    # reading is the wider of the two, so it sets the line breaks.
+    "sidebands at\n$\\pm f_s$ = 25 Hz:\nlow and flat":
+        "bandas laterales\na $\\pm f_s$ = 25 Hz:\nbajas y planas",
+    "sidebands at\n$\\pm f_s$ = 25 Hz:\ntall groups, and the\n"
     "higher harmonics lift":
-        "bandas laterales a $\\pm f_s$ = 25 Hz:\ngrupos altos, y los "
-        "armónicos\nsuperiores se levantan",
+        "bandas laterales\na $\\pm f_s$ = 25 Hz:\ngrupos altos, y los\n"
+        "armónicos superiores\nse levantan",
     "rotor-slot harmonic\nwith $\\pm f_s$ sidebands:\n"
     "the spacing is the diagnosis":
         "armónico de ranura de rotor\ncon bandas laterales a $\\pm f_s$:\n"
@@ -620,15 +623,15 @@ _ES_EXACT = {
         r"4,8 dB donde $C_h$ = 1, 3,0 dB en 63 Hz",
     "A-weighted sound pressure level [dB(A)]":
         "Nivel de presión acústica ponderado A [dB(A)]",
-    "Received level $L_A(t)$": "Nivel recibido $L_A(t)$",
+    r"Received level $L_\mathrm{A}(t)$": r"Nivel recibido $L_\mathrm{A}(t)$",
     "One-third-octave-band centre frequency [Hz]":
         "Frecuencia central de banda de 1/3 de octava [Hz]",
     r"Ground-effect adjustment $\Delta L_g$ [dB]":
         r"Ajuste por efecto de suelo $\Delta L_g$ [dB]",
     "Hard (asphalt/concrete, class G)": "Duro (asfalto/hormigón, clase G)",
     "Soft (grass/pasture, class D)": "Blando (hierba/pasto, clase D)",
-    "x [km]": "x [km]",
-    "y [km]": "y [km]",
+    "$x$ [km]": "$x$ [km]",
+    "$y$ [km]": "$y$ [km]",
     "Slant distance [m]": "Distancia oblicua [m]",
     "Event level [dB]": "Nivel de evento [dB]",
     "markers: tabulated NPD nodes\nlines: log-linear interpolation":
@@ -886,9 +889,9 @@ _ES_EXACT = {
         r"$40\,\log_{10}(f/f_0)$ + término del martillo (tablero de partículas)",
     "ISO 12354-2 Annex G bands": "Bandas del Anexo G de ISO 12354-2",
     "$f_0$ = 52.8 Hz": "$f_0$ = 52,8 Hz",
-    "35 mm screed $m′$ = 73.5 kg/m² on $s′$ = 8 MN/m³\n"
+    "35 mm screed $m^{\\prime}$ = 73.5 kg/m² on $s^{\\prime}$ = 8 MN/m³\n"
     "$\\Delta L_w$ = 32.2 dB  (ISO 12354-2 Formula C.4)":
-        "solera de 35 mm $m′$ = 73,5 kg/m² sobre $s′$ = 8 MN/m³\n"
+        "solera de 35 mm $m^{\\prime}$ = 73,5 kg/m² sobre $s^{\\prime}$ = 8 MN/m³\n"
         "$\\Delta L_w$ = 32,2 dB  (fórmula C.4 de ISO 12354-2)",
     "Soft Floor Covering Improvement From the Hammer Contact Stiffness":
         "Mejora del revestimiento de suelo blando a partir de la rigidez de contacto del martillo",
@@ -943,19 +946,19 @@ _ES_EXACT = {
     # dynamic_stiffness figure (EN 29052-1)
     "EN 29052-1 Floating-Floor Resonance":
         "Resonancia de suelo flotante EN 29052-1",
-    "Dynamic stiffness per unit area $s′$ [MN/m³]":
-        "Rigidez dinámica por unidad de área $s′$ [MN/m³]",
+    r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]":
+        r"Rigidez dinámica por unidad de área $s^{\prime}$ [MN/m³]",
     r"Natural frequency $f_0$ [Hz]": r"Frecuencia natural $f_0$ [Hz]",
     "design point": "punto de diseño",
     "design point (10 MN/m³, 46 Hz)": "punto de diseño (10 MN/m³, 46 Hz)",
-    r"$f_0 = (1/2\pi)\sqrt{s′/m′}$  (Formula 2)" "\n"
-    r"$s′ = s′_t + s′_a$  (clause 8.2)" "\n"
-    r"$s′_t = 4\pi^2 m′_t f_r^2$  (Formula 4)" "\n"
-    r"$s′_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)":
-        r"$f_0 = (1/2\pi)\sqrt{s′/m′}$  (Fórmula 2)" "\n"
-        r"$s′ = s′_t + s′_a$  (apartado 8.2)" "\n"
-        r"$s′_t = 4\pi^2 m′_t f_r^2$  (Fórmula 4)" "\n"
-        r"$s′_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTA)",
+    r"$f_0 = (1/2\pi)\sqrt{s^{\prime}/m^{\prime}}$  (Formula 2)" "\n"
+    r"$s^{\prime} = s^{\prime}_t + s^{\prime}_a$  (clause 8.2)" "\n"
+    r"$s^{\prime}_t = 4\pi^2 m^{\prime}_t f_r^2$  (Formula 4)" "\n"
+    r"$s^{\prime}_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)":
+        r"$f_0 = (1/2\pi)\sqrt{s^{\prime}/m^{\prime}}$  (Fórmula 2)" "\n"
+        r"$s^{\prime} = s^{\prime}_t + s^{\prime}_a$  (apartado 8.2)" "\n"
+        r"$s^{\prime}_t = 4\pi^2 m^{\prime}_t f_r^2$  (Fórmula 4)" "\n"
+        r"$s^{\prime}_a = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTA)",
     # junction_transmission figure (Hopkins 5.2.1.3, Cremer/Craik)
     "Bending-wave transmission at a rigid X-junction (Hopkins 5.2.1.3)":
         "Transmisión de onda de flexión en una unión X rígida (Hopkins 5.2.1.3)",
@@ -1013,12 +1016,12 @@ _ES_EXACT = {
     "infinite beam, 100 × 200 mm steel":
         "viga infinita, acero de 100 × 200 mm",
     "steel strut, longitudinal": "puntal de acero, longitudinal",
-    "plate:  $Y = 1/(8\\sqrt{B′ m′′})$, real and flat\n"
-    "beam:   $Y = (1-\\mathrm{j})/(4 m′ c_B)$, $\\propto f^{-1/2}$\n"
+    "plate:  $Y = 1/(8\\sqrt{B^{\\prime} m^{\\prime\\prime}})$, real and flat\n"
+    "beam:   $Y = (1-\\mathrm{j})/(4 m^{\\prime} c_B)$, $\\propto f^{-1/2}$\n"
     "rod:    $Y = 1/(\\rho c_L S)$, real and flat\n"
     "plate $|Y|$ = $2.55\\times10^{-6}$ m/(N·s)":
-        "placa: $Y = 1/(8\\sqrt{B′ m′′})$, real y plana\n"
-        "viga:  $Y = (1-\\mathrm{j})/(4 m′ c_B)$, $\\propto f^{-1/2}$\n"
+        "placa: $Y = 1/(8\\sqrt{B^{\\prime} m^{\\prime\\prime}})$, real y plana\n"
+        "viga:  $Y = (1-\\mathrm{j})/(4 m^{\\prime} c_B)$, $\\propto f^{-1/2}$\n"
         "barra: $Y = 1/(\\rho c_L S)$, real y plana\n"
         "placa $|Y|$ = $2{,}55\\times10^{-6}$ m/(N·s)",
     # mobility_random_error figure (ISO 7626-2 Annex A)
@@ -1146,11 +1149,11 @@ _ES_EXACT = {
     "$R_p$ — window": "$R_p$ — ventana",
     "$R_p$ — skylight": "$R_p$ — claraboya",
     "$R_p$ — air inlet": "$R_p$ — entrada de aire",
-    "$R′$ (façade)": "$R′$ (fachada)",
+    r"$R^{\prime}$ (façade)": r"$R^{\prime}$ (fachada)",
     "air inlet limits the low bands": "la entrada de aire limita las bandas bajas",
-    "$R′_{tr,s,w}$ = 31 dB   ($C_{tr}$ = −3)\n$D_{2m,nT,w}$ = 33 dB\n"
+    "$R^{\\prime}_{tr,s,w}$ = 31 dB   ($C_{tr}$ = −3)\n$D_{2m,nT,w}$ = 33 dB\n"
     "air inlet limits the low bands":
-        "$R′_{tr,s,w}$ = 31 dB   ($C_{tr}$ = −3)\n$D_{2m,nT,w}$ = 33 dB\n"
+        "$R^{\\prime}_{tr,s,w}$ = 31 dB   ($C_{tr}$ = −3)\n$D_{2m,nT,w}$ = 33 dB\n"
         "la entrada de aire limita las bandas bajas",
     # facade_elevation_geometry element names, drawn by plot_facade_elements;
     # worded as the facade-insulation page's own alt text.
@@ -1391,8 +1394,14 @@ _ES_EXACT = {
     "Critical-band rate $z$ [Bark]": "Raz\u00f3n de banda cr\u00edtica $z$ [Bark]",
     "Specific loudness N' [sone/Bark]":
         "Sonoridad espec\u00edfica N' [sonios/Bark]",
-    "Specific loudness $N\u2032$ [sone/Bark]":
-        "Sonoridad espec\u00edfica $N\u2032$ [sonios/Bark]",
+    # The library renderer composes the prime now, so the key follows the
+    # drawn text; loudness_pattern and sharpness_pair_and_targets reach this
+    # entry through a `res.plot(ax=...)` with no language.
+    # Raw string with the accent typed as a character: raw because `\prime`
+    # must stay a backslash, and a raw string cannot spell the accent as a
+    # `\u`-escape -- it would ship the seven characters literally.
+    r"Specific loudness $N^{\prime}$ [sone/Bark]":
+        "Sonoridad espec\u00edfica $N^{\\prime}$ [sonios/Bark]",
     "Shaded area = total loudness $N$":
         "\u00c1rea sombreada = sonoridad total $N$",
     "STI vs Reverberation Time (IEC 60268-16)":
@@ -1558,8 +1567,8 @@ _ES_EXACT = {
     "dropout": "corte",
     "the 30 dB window: $D_i - 15$ to $D_i + 15$":
         "la ventana de 30 dB: de $D_i - 15$ a $D_i + 15$",
-    "speech $E_i′$": "voz $E_i′$",
-    "external noise $N_i′$": "ruido externo $N_i′$",
+    r"speech $E_i^{\prime}$": r"voz $E_i^{\prime}$",
+    r"external noise $N_i^{\prime}$": r"ruido externo $N_i^{\prime}$",
     "equivalent masking $Z_i$": "enmascaramiento equivalente $Z_i$",
     "equivalent disturbance $D_i$": "perturbación equivalente $D_i$",
     # "Band audibility $A_i$" already pairs above for the SII bars figure.
@@ -1692,9 +1701,9 @@ _ES_EXACT = {
     "EDT slope": "Pendiente EDT",
     "ISO 717-1 Weighted Sound Reduction Index (Annex C example)":
         "\u00cdndice ponderado de reducci\u00f3n ac\u00fastica (ISO 717-1, ejemplo del Anexo C)",
-    "Apparent sound reduction index $R′$ [dB]":
-        "Índice de reducción acústica aparente $R′$ [dB]",
-    "Measured $R′$ (third octave)": "$R′$ medido (tercios de octava)",
+    r"Apparent sound reduction index $R^{\prime}$ [dB]":
+        r"Índice de reducción acústica aparente $R^{\prime}$ [dB]",
+    r"Measured $R^{\prime}$ (third octave)": r"$R^{\prime}$ medido (tercios de octava)",
     "Shifted reference curve (ISO 717-1)":
         "Curva de referencia desplazada (ISO 717-1)",
     "Unfavourable deviations": "Desviaciones desfavorables",
@@ -1812,8 +1821,8 @@ _ES_EXACT = {
         "Los modelos divergen a niveles altos",
     "Sottek Specific Loudness (ECMA-418-2)":
         "Sonoridad específica de Sottek (ECMA-418-2)",
-    r"Specific loudness $N′$ [$\mathrm{sone}_{\mathrm{HMS}}$/Bark]":
-        r"Sonoridad específica $N′$ [$\mathrm{sonios}_{\mathrm{HMS}}$/Bark]",
+    r"Specific loudness $N^{\prime}$ [$\mathrm{sone}_{\mathrm{HMS}}$/Bark]":
+        r"Sonoridad específica $N^{\prime}$ [$\mathrm{sonios}_{\mathrm{HMS}}$/Bark]",
     "Peak specific loudness": "Sonoridad específica máxima",
     "ECMA-418-2 Tonality $T(t)$": "Tonalidad $T(t)$ (ECMA-418-2)",
     r"Tonality $T$ [$\mathrm{tu}_{\mathrm{HMS}}$]":
@@ -1897,11 +1906,11 @@ _ES_EXACT = {
         "Intensidad de fluctuación específica media",
     r"Critical-band rate $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]":
         r"Razón de banda crítica $z$ [$\mathrm{Bark}_{\mathrm{HMS}}$]",
-    r"Specific roughness $R′(z)$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]":
-        r"Aspereza específica $R′(z)$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]",
-    r"Specific fluctuation strength $F′(z)$ "
+    r"Specific roughness $R^{\prime}(z)$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]":
+        r"Aspereza específica $R^{\prime}(z)$ [asper/$\mathrm{Bark}_{\mathrm{HMS}}$]",
+    r"Specific fluctuation strength $F^{\prime}(z)$ "
     r"[$\mathrm{vacil}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]":
-        r"Intensidad de fluctuación específica $F′(z)$ "
+        r"Intensidad de fluctuación específica $F^{\prime}(z)$ "
         r"[$\mathrm{vacil}_{\mathrm{HMS}}$/$\mathrm{Bark}_{\mathrm{HMS}}$]",
     r"Fluctuation strength $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]":
         r"Intensidad de fluctuación $F$ [$\mathrm{vacil}_{\mathrm{HMS}}$]",
@@ -2735,7 +2744,7 @@ _ES_EXACT = {
     "ISO 12354-1 Detailed Model: Dominant Path per Band (Annex L)":
         "Modelo detallado ISO 12354-1: camino dominante por banda (Anexo L)",
     "other paths": "otros caminos",
-    "$R′$ (apparent)": "$R′$ (aparente)",
+    r"$R^{\prime}$ (apparent)": r"$R^{\prime}$ (aparente)",
     "Transmission path": "Camino de transmisión",
     "Dd — direct": "Dd — directo",
     "Ff — flanking–flanking": "Ff — flanco–flanco",
@@ -2744,21 +2753,24 @@ _ES_EXACT = {
     "dominant path": "camino dominante",
     # prediction_flanking_demo / detailed_prediction_paths info boxes:
     # ratings and formulae, symbols only (decimal commas aside).
-    "$R_w$ (Dd) = 57.0 dB\n$R′_w$ = 52.2 dB\n$R′_w - R_w$ = −4.8 dB\n"
+    "$R_w$ (Dd) = 57.0 dB\n$R^{\\prime}_w$ = 52.2 dB\n$R^{\\prime}_w - R_w$ = −4.8 dB\n"
     "Dd 32.9 %   ΣFf,Fd,Df 67.1 %":
-        "$R_w$ (Dd) = 57,0 dB\n$R′_w$ = 52,2 dB\n$R′_w - R_w$ = −4,8 dB\n"
+        "$R_w$ (Dd) = 57,0 dB\n$R^{\\prime}_w$ = 52,2 dB\n$R^{\\prime}_w - R_w$ = −4,8 dB\n"
         "Dd 32,9 %   ΣFf,Fd,Df 67,1 %",
-    "$R′ = -10\\,\\log_{10}(\\Sigma\\,10^{-R_{ij}/10})$\n"
-    "$R′_w$ ($C$; $C_{tr}$) = 57 (−1; −7) dB":
-        "$R′ = -10\\,\\log_{10}(\\Sigma\\,10^{-R_{ij}/10})$\n"
-        "$R′_w$ ($C$; $C_{tr}$) = 57 (−1; −7) dB",
+    "$R^{\\prime} = -10\\,\\log_{10}(\\Sigma\\,10^{-R_{ij}/10})$\n"
+    "$R^{\\prime}_w$ ($C$; $C_{tr}$) = 57 (−1; −7) dB":
+        "$R^{\\prime} = -10\\,\\log_{10}(\\Sigma\\,10^{-R_{ij}/10})$\n"
+        "$R^{\\prime}_w$ ($C$; $C_{tr}$) = 57 (−1; −7) dB",
     "ISO 12999-1 Measurement Uncertainty (situation B, airborne)":
         "Incertidumbre de medición ISO 12999-1 (situación B, aéreo)",
-    "Measured $R′$": "$R′$ medido",
+    r"Measured $R^{\prime}$": r"$R^{\prime}$ medido",
     "Standard uncertainty $\\pm u$": "Incertidumbre típica $\\pm u$",
     "Expanded uncertainty $\\pm U$ (95 %)":
         "Incertidumbre expandida $\\pm U$ (95 %)",
-    "$R′_w \\pm U$ (single number)": "$R′_w \\pm U$ (valor único)",
+    # One backslash, not two: the key must equal the DRAWN text, and the
+    # renderer draws `\pm`, so a raw `\\pm` here is a different string and the
+    # lookup misses (which is exactly how the language gate caught this line).
+    r"$R^{\prime}_w \pm U$ (single number)": r"$R^{\prime}_w \pm U$ (valor único)",
     # Outdoor propagation & occupational exposure (PR-C).
     r"ISO 9613-1 Atmospheric Absorption $\alpha(f)$":
         r"Absorción atmosférica $\alpha(f)$ (ISO 9613-1)",
@@ -2775,8 +2787,8 @@ _ES_EXACT = {
     "CNOSSOS-EU Railway Source Line Power (96 coaches/h at 160 km/h)":
         "Potencia de la línea fuente ferroviaria CNOSSOS-EU "
         "(96 coches/h a 160 km/h)",
-    r"Line power $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]":
-        r"Potencia de la línea $L′_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]",
+    r"Line power $L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]":
+        r"Potencia de la línea $L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]",
     "Both source heights": "Ambas alturas de fuente",
     "Source A, 0,5 m (rolling, impact, traction)":
         "Fuente A, 0,5 m (rodadura, impacto, tracción)",
@@ -3074,8 +3086,8 @@ _ES_EXACT = {
         r"la muestra resuelta  $|r| = 0{,}5$  ($\Delta L$ = 9,54 dB)",
     r"near-anechoic  $|r| = 0.1$  ($\Delta L$ = 1.74 dB)":
         r"casi anecoica  $|r| = 0{,}1$  ($\Delta L$ = 1,74 dB)",
-    "the same, with tube loss ($k_0′′$ = 0.013 Np/m)":
-        "la misma, con la atenuación del tubo ($k_0′′$ = 0,013 Np/m)",
+    r"the same, with tube loss ($k_0^{\prime\prime}$ = 0.013 Np/m)":
+        r"la misma, con la atenuación del tubo ($k_0^{\prime\prime}$ = 0,013 Np/m)",
     "minima at 12, 46 and 81 cm: −5.99, −5.92, −5.85 dB\n"
     "(read the nearest one, and extrapolate to x = 0)":
         "mínimos en 12, 46 y 81 cm: −5,99, −5,92, −5,85 dB\n"
@@ -3102,8 +3114,8 @@ _ES_EXACT = {
     "Piston frequency $f$ [Hz]  (ISO 9053-2 Clause 6.2: 1 Hz to 4 Hz)":
         "Frecuencia del pistón $f$ [Hz]  "
         "(ISO 9053-2, apartado 6.2: de 1 a 4 Hz)",
-    r"Effective ratio of specific heats $\kappa′$":
-        r"Relación efectiva de calores específicos $\kappa′$",
+    r"Effective ratio of specific heats $\kappa^{\prime}$":
+        r"Relación efectiva de calores específicos $\kappa^{\prime}$",
     "Bias in $R$ if the adiabatic value is used [%]":
         "Error en $R$ si se usa el valor adiabático [%]",
     r"adiabatic $\kappa$ = 1.4008": r"$\kappa$ adiabática = 1,4008",
@@ -3344,8 +3356,8 @@ _ES_EXACT = {
     " response":
         "la misma información en otro dominio: barrido ⊛ filtro inverso ="
         " respuesta al impulso",
-    "Specific loudness $N\u2032(z)$ and its integral (ISO 532-1)":
-        "Sonoridad específica $N\u2032(z)$ y su integral (ISO 532-1)",
+    r"Specific loudness $N^{\prime}(z)$ and its integral (ISO 532-1)":
+        "Sonoridad específica $N^{\\prime}(z)$ y su integral (ISO 532-1)",
     "1 kHz ≈ 8.5 Bark": "1 kHz ≈ 8,5 Bark",
     "upward spread of masking":
         "extensión del enmascaramiento hacia agudos",
@@ -3482,13 +3494,13 @@ _ES_EXACT = {
         "Aislamiento de fachada in situ ISO 16283-3",
     "$D_{2m,nT}$ (standardized)": "$D_{2m,nT}$ (estandarizada)",
     "$D_{2m,n}$ (normalized)": "$D_{2m,n}$ (normalizada)",
-    "$R′_{45°}$ (element)": "$R′_{45°}$ (elemento)",
+    r"$R^{\prime}_{45°}$ (element)": r"$R^{\prime}_{45°}$ (elemento)",
     "Level difference / reduction index [dB]":
         "Diferencia de nivel / índice de reducción [dB]",
     "ISO 10052 Survey Method: Impact Sound":
         "Método de control ISO 10052: ruido de impactos",
     "$L_i$ (impact level)": "$L_i$ (nivel de impactos)",
-    "$L′_{nT}$ (standardized)": "$L′_{nT}$ (estandarizado)",
+    r"$L^{\prime}_{nT}$ (standardized)": r"$L^{\prime}_{nT}$ (estandarizado)",
     "Impact sound pressure level [dB]":
         "Nivel de presión acústica de impactos [dB]",
     "ISO 10140 Laboratory Insulation (flanking suppressed)":
@@ -3510,29 +3522,34 @@ _ES_EXACT = {
         "Predicción de ruido de impactos EN 12354-2 (Anexo E.3)",
     "Level / correction [dB]": "Nivel / corrección [dB]",
     # impact_prediction_terms info box: formulae, symbols only.
-    "$L′_{n,w} = L_{n,w,eq} - \\Delta L_w + K$\n"
-    "$L_{n,w,eq} = 164 - 35\\,\\log_{10}(m′/m′_0)$ = 76.2 dB\n"
-    "$L′_{n,w}$ = 45.2 dB → 45 dB":
-        "$L′_{n,w} = L_{n,w,eq} - \\Delta L_w + K$\n"
-        "$L_{n,w,eq} = 164 - 35\\,\\log_{10}(m′/m′_0)$ = 76,2 dB\n"
-        "$L′_{n,w}$ = 45,2 dB → 45 dB",
+    "$L^{\\prime}_{n,w} = L_{n,w,eq} - \\Delta L_w + K$\n"
+    "$L_{n,w,eq} = 164 - 35\\,\\log_{10}(m^{\\prime}/m^{\\prime}_0)$ = 76.2 dB\n"
+    "$L^{\\prime}_{n,w}$ = 45.2 dB → 45 dB":
+        "$L^{\\prime}_{n,w} = L_{n,w,eq} - \\Delta L_w + K$\n"
+        "$L_{n,w,eq} = 164 - 35\\,\\log_{10}(m^{\\prime}/m^{\\prime}_0)$ = 76,2 dB\n"
+        "$L^{\\prime}_{n,w}$ = 45,2 dB → 45 dB",
     "EN 12354-4 Radiated Sound Power (Annex G)":
         "Potencia acústica radiada EN 12354-4 (Anexo G)",
     "radiated $L_W$ per octave": "$L_W$ radiada por octava",
-    "$L_W = L_{p,\\mathrm{in}} + C_d - R′ + 10\\,\\log_{10}(S/S_0)$\n"
+    "$L_W = L_{p,\\mathrm{in}} + C_d - R^{\\prime} + 10\\,\\log_{10}(S/S_0)$\n"
     "wall 176 m² + industrial door 24 m², $C_d$ = −5 dB":
-        "$L_W = L_{p,\\mathrm{in}} + C_d - R′ + 10\\,\\log_{10}(S/S_0)$\n"
+        "$L_W = L_{p,\\mathrm{in}} + C_d - R^{\\prime} + 10\\,\\log_{10}(S/S_0)$\n"
         "muro de 176 m² + puerta industrial de 24 m², $C_d$ = −5 dB",
     "Radiated sound power level [dB re 1 pW]":
         "Nivel de potencia acústica radiada [dB re 1 pW]",
     "Predicted Single-Panel Insulation Rated per ISO 717-1":
         "Aislamiento previsto de panel simple evaluado según ISO 717-1",
     "predicted $R$ (Sharp)": "$R$ previsto (Sharp)",
-    # Shared ylabel of single_panel_rating, plateau_transmission_loss,
-    # orthotropic_transmission_loss and panel_insulation_concept; "pérdida
-    # por transmisión" as the panel-sound-insulation page words it.
+    # Shared ylabel of single_panel_rating, plateau_transmission_loss and
+    # orthotropic_transmission_loss; "pérdida por transmisión" as the
+    # panel-sound-insulation page words it.
     r"Sound reduction index $R$ (transmission loss $TL$) [dB]":
         r"Índice de reducción acústica $R$ (pérdida por transmisión $TL$) [dB]",
+    # The same label over two lines, as the four-panel grid of
+    # panel_insulation_concept sets it: one line is taller than its panels.
+    "Sound reduction index $R$\n(transmission loss $TL$) [dB]":
+        "Índice de reducción acústica $R$\n"
+        "(pérdida por transmisión $TL$) [dB]",
     "Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)":
         "$K_{ij}$ de unión por el enfoque ondulatorio (Hopkins Ec. 5.116)",
     "X corner": "X esquina",
@@ -3583,8 +3600,8 @@ _ES_EXACT = {
         "Límite rasante de Kurze-Anderson (5 dB)",
     "Insertion loss [dB]": "Pérdida por inserción [dB]",
     # --- WP emission & electroacoustics figures (result .plot() labels) ---
-    "Carrier f₂": "Portadora f₂",
-    "Sidebands f₂ ± n·f₁": "Bandas laterales f₂ ± n·f₁",
+    "Carrier $f_2$": "Portadora $f_2$",
+    r"Sidebands $f_2 \pm n \cdot f_1$": r"Bandas laterales $f_2 \pm n \cdot f_1$",
     "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
     "$R_1$ (resistance)": "$R_1$ (resistencia)",
     "$X_1$ (reactance)": "$X_1$ (reactancia)",
@@ -3592,12 +3609,12 @@ _ES_EXACT = {
         r"Impedancia de radiación normalizada $Z_r / \rho c S$",
     "Baffled circular piston radiation impedance":
         "Impedancia de radiación de un pistón circular con pantalla",
-    "F2 (surface pressure-intensity)": "F2 (presión-intensidad superficial)",
-    "F3 (negative partial power)": "F3 (potencia parcial negativa)",
-    "Dynamic capability Ld": "Capacidad dinámica Ld",
-    "F4 (non-uniformity)": "F4 (no uniformidad)",
+    "$F_2$ (surface pressure-intensity)": "$F_2$ (presión-intensidad superficial)",
+    "$F_3$ (negative partial power)": "$F_3$ (potencia parcial negativa)",
+    r"Dynamic capability $L_\mathrm{d}$": r"Capacidad dinámica $L_\mathrm{d}$",
+    "$F_4$ (non-uniformity)": "$F_4$ (no uniformidad)",
     "Indicator [dB]": "Indicador [dB]",
-    "Field non-uniformity F4": "No uniformidad del campo F4",
+    "Field non-uniformity $F_4$": "No uniformidad del campo $F_4$",
     "ISO 9614-1 field indicators": "Indicadores de campo ISO 9614-1",
     "Helmholtz resonator": "Resonador de Helmholtz",
     "Quarter-wave tube": "Tubo de cuarto de onda",
@@ -3615,9 +3632,9 @@ _ES_EXACT = {
         "Sala de máquinas a sala de control: lo que aporta el muro, y NC 45",
     "Duct higher-order-mode cut-on: 254 mm steam line at 200 m/s":
         "Corte de modos superiores del conducto: línea de vapor de 254 mm a 200 m/s",
-    "Panel R": "R del panel",
-    "Interior correction C": "Corrección interior C",
-    "Insertion loss (R - C)": "Pérdida por inserción (R - C)",
+    "Panel $R$": "$R$ del panel",
+    "Interior correction $C$": "Corrección interior $C$",
+    "Insertion loss ($R - C$)": "Pérdida por inserción ($R - C$)",
     "Machine enclosure insertion loss":
         "Pérdida por inserción de encapsulado de máquina",
     # silencer_insertion_loss: one TL, as many ILs as installations
@@ -3765,7 +3782,7 @@ _ES_EXACT = {
         "Absorción del recinto receptor $S_2\\alpha_2$",
     "Area [m²]": "Área [m²]",
     "Measured phase": "Fase medida",
-    "Minimum phase (from |H|)": "Fase mínima (de |H|)",
+    "Minimum phase (from $|H|$)": "Fase mínima (de $|H|$)",
     "Excess phase (all-pass)": "Fase de exceso (pasa-todo)",
     "Phase [rad]": "Fase [rad]",
     "Minimum-phase / all-pass decomposition":
@@ -4065,9 +4082,9 @@ _ES_EXACT = {
         "martillo de 0,5 kg desde 40 mm, 10 impactos por segundo\n"
         "rango de acústica de la edificación sombreado",
     # detailed_impact_paths (buildings/design/detailed-prediction)
-    "Apparent normalized impact level $L′_n$ [dB]":
-        "Nivel de impactos normalizado aparente $L′_n$ [dB]",
-    "$L′_n$ (apparent)": "$L′_n$ (aparente)",
+    r"Apparent normalized impact level $L^{\prime}_n$ [dB]":
+        r"Nivel de impactos normalizado aparente $L^{\prime}_n$ [dB]",
+    r"$L^{\prime}_n$ (apparent)": r"$L^{\prime}_n$ (aparente)",
     "ISO 12354-2 Detailed Model: the Direct Path Governs (Annex G)":
         "Modelo detallado de la ISO 12354-2: manda la vía directa (anexo G)",
     # radiation_efficiency_panels (buildings/design/panel-sound-insulation)
@@ -4586,9 +4603,9 @@ _ES_PATTERNS = [
     (r"^floating floor \$f_0\$ = (\d+)\.(\d+) Hz$",
      r"suelo flotante $f_0$ = \1,\2 Hz"),
     ((r"^five paths, not thirteen: only the floor is excited\n"
-      r"\$L′_\{n,w\}\$ \(\$C_I\$\) = (.+) \((.+)\) dB$"),
+      r"\$L\^\{\\prime\}_\{n,w\}\$ \(\$C_I\$\) = (.+) \((.+)\) dB$"),
      ("cinco vías, no trece: solo se excita el forjado\n"
-      r"$L′_{n,w}$ ($C_I$) = \1 (\2) dB")),
+      r"$L^{\\prime}_{n,w}$ ($C_I$) = \1 (\2) dB")),
     # structure_borne_conversion annotation (baked-in computed values; the
     # mathtext blocks the decimal-comma pass, so the commas are written here).
     ((r"^\+(\d+)\.(\d+) dB = \$10\\,\\mathrm\{lg\}\(24\.1/5\.0\)\$:\n"
@@ -4649,13 +4666,13 @@ _ES_PATTERNS = [
       "el acoplamiento queda muy por debajo del amortiguamiento: SEA válido")),
     # plateau_transmission_loss info box (baked-in panel and plateau values;
     # the mathtext blocks the decimal-comma pass, so the commas are here).
-    ((r"^6 mm float glass, \$m′′\$ = (\d+)\.(\d+) kg/m², "
+    ((r"^6 mm float glass, \$m\^\{\\prime\\prime\}\$ = (\d+)\.(\d+) kg/m², "
       r"\$\\eta\$ = (\d+)\.(\d+)\n"
       r"plateau height 27 dB, \$B/A = 10\$ → \$A\$ = (\d+) Hz, "
       r"\$B\$ = (\d+) Hz\n"
       r"identical below \$A\$; the plateau replaces the whole coincidence "
       r"region$"),
-     (r"vidrio float de 6 mm, $m′′$ = \1,\2 kg/m², $\\eta$ = \3,\4"
+     (r"vidrio float de 6 mm, $m^{\\prime\\prime}$ = \1,\2 kg/m², $\\eta$ = \3,\4"
       "\naltura de meseta 27 dB, $B/A = 10$ → $A$ = \\5 Hz, $B$ = \\6 Hz\n"
       "idénticas por debajo de $A$; la meseta sustituye toda la región de "
       "coincidencia")),
@@ -4753,12 +4770,20 @@ _ES_PATTERNS = [
      r"level flyover, 60 kt, 150 m, 120 m sideline, grass$"),
      ("SEL \\1,\\2 dB(A)  ·  EPNL \\3,\\4 EPNdB\n"
      "sobrevuelo nivelado, 60 kt, 150 m, 120 m lateral, hierba")),
-    (r"^\$L_\{ASmax\}\$ = (\d+)\.(\d+) dB\(A\)$",
-     r"$L_{ASmax}$ = \1,\2 dB(A)"),
-    (r"^Diffracted path \(δ = (\d+)\.(\d+) m\)$",
-     r"Camino difractado (δ = \1,\2 m)"),
-    (r"^Diffracted path \(δ = (\d+),(\d+) m\)$",
-     r"Camino difractado (δ = \1,\2 m)"),
+    # The subscript is upright now, so the pattern matches the drawn form:
+    # ``\mathrm`` is a literal backslash in the string, hence ``\\mathrm`` in
+    # this raw regex, and its braces are literal too. The replacement still
+    # spells the comma itself -- the string carries a dollar, so the save-time
+    # decimal pass skips it whole.
+    (r"^\$L_\\mathrm\{ASmax\}\$ = (\d+)\.(\d+) dB\(A\)$",
+     r"$L_\\mathrm{ASmax}$ = \1,\2 dB(A)"),
+    # rotorcraft_terrain_screening: the library legend sets its path difference
+    # as mathematics, so ``_translate_figure`` skips its decimal-comma pass over
+    # the whole string and the comma has to be spelt in the replacement.
+    (r"^Diffracted path \(\$\\delta\$ = (\d+)\.(\d+) m\)$",
+     r"Camino difractado ($\\delta$ = \1,\2 m)"),
+    (r"^Diffracted path \(\$\\delta\$ = (\d+),(\d+) m\)$",
+     r"Camino difractado ($\\delta$ = \1,\2 m)"),
     (r"^(\d+) yr$", r"\1 años"),
     # anim_elastic_coincidence titles and verdicts (library values baked in).
     (r"^\$f = f_c/2\$ = (\d+) Hz, 45° incidence$",
@@ -5011,11 +5036,18 @@ _ES_PATTERNS = [
     (r"^Figure-of-eight \(\$b\$ = (\d+)\.(\d+)\): DI = (\d+)\.(\d+) dB$",
      r"Figura en ocho ($b$ = \1,\2): DI = \3,\4 dB"),
     (r"^network alone: (.+) dB$", r"la red sola: \1 dB"),
-    # modulation_distortion: the library title reads the same in Spanish;
-    # only the decimal comma differs, and the save-time pass applies it.
-    ((r"^IEC 60268-3 d₂ = (.+)%, d₃ = (.+)%; SMPTE = (.+)% "
-      r"\(f₁ = (.+)Hz, f₂ = (.+)Hz\)$"),
-     r"IEC 60268-3 d₂ = \1%, d₃ = \2%; SMPTE = \3% (f₁ = \4Hz, f₂ = \5Hz)"),
+    # modulation_distortion: the library title reads the same in Spanish, and
+    # only the decimal comma differs -- but the title carries its symbols as
+    # mathtext, so ``_translate_figure`` skips its decimal-comma pass over the
+    # whole string (a bare comma inside $...$ sets wrong). The commas are spelt
+    # here instead, which is why each reading is captured as two digit groups:
+    # a value that arrived without a decimal point would not match, and the
+    # audit would say so, rather than the figure quietly shipping an English
+    # point. The frequencies are ``60`` and ``7k`` for the same reason.
+    ((r"^IEC 60268-3 \$d_2\$ = (\d+)\.(\d+)%, \$d_3\$ = (\d+)\.(\d+)%; "
+      r"SMPTE = (\d+)\.(\d+)% \(\$f_1\$ = (\d+k?)Hz, \$f_2\$ = (\d+k?)Hz\)$"),
+     (r"IEC 60268-3 $d_2$ = \1,\2%, $d_3$ = \3,\4%; SMPTE = \5,\6% "
+      r"($f_1$ = \7Hz, $f_2$ = \8Hz)")),
     # Broadcast figures: the metered readouts (program_loudness box,
     # true_peak_intersample annotations). Alignment of the monospace box is
     # preserved by the captures.
@@ -5195,9 +5227,11 @@ _ES_PATTERNS = [
     (r"^diffusion coefficient \$d\$ = (\d+)\.(\d+)$",
      r"coeficiente de difusión $d$ = \1,\2"),
     (r"^design frequency (.+) Hz$", r"frecuencia de diseño \1 Hz"),
-    # 2D FDTD wave simulation (public API concept figure)
-    (r"^FDTD pressure field at t = (.+) ms$",
-     r"Campo de presión FDTD en t = \1 ms"),
+    # 2D FDTD wave simulation (public API concept figure). The title carries
+    # mathtext, so the save-time decimal-comma pass skips the whole string and
+    # the comma has to be baked into the replacement here.
+    (r"^FDTD pressure field at \$t\$ = (\d+)\.(\d+) ms$",
+     r"Campo de presión FDTD en $t$ = \1,\2 ms"),
     (r"^probe \((.+)\) m$", r"sonda (\1) m"),
     # Building & structure-borne result figures (dynamic values baked in).
     (r"^Airborne: \$R_w\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB$",
@@ -5213,28 +5247,28 @@ _ES_PATTERNS = [
      ("$R_w$($C$;$C_{tr}$) = \\1\n$C_{50-5000}$ = \\2\n"
       "índice en las bandas básicas, términos en el rango completo")),
     ((r"^\$D_\{ls,2m,nT,w\}\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB\n"
-      r"45° loudspeaker method \(−1\.5 dB on \$R′\$\)$"),
+      r"45° loudspeaker method \(−1\.5 dB on \$R\^\{\\prime\}\$\)$"),
      ("$D_{ls,2m,nT,w}$($C$;$C_{tr}$) = \\1 dB\n"
-      "método del altavoz a 45° (−1,5 dB en $R′$)")),
-    ((r"^\$L′_\{nT,w\}\$\(\$C_I\$\) = (.+) dB\n"
-      r"note the minus sign: a live room lowers \$L′_\{nT\}\$$"),
-     ("$L′_{nT,w}$($C_I$) = \\1 dB\n"
-      "atención al signo menos: un recinto vivo reduce $L′_{nT}$")),
+      "método del altavoz a 45° (−1,5 dB en $R^{\\\\prime}$)")),
+    ((r"^\$L\^\{\\prime\}_\{nT,w\}\$\(\$C_I\$\) = (.+) dB\n"
+      r"note the minus sign: a live room lowers \$L\^\{\\prime\}_\{nT\}\$$"),
+     ("$L^{\\\\prime}_{nT,w}$($C_I$) = \\1 dB\n"
+      "atención al signo menos: un recinto vivo reduce $L^{\\\\prime}_{nT}$")),
     ((r"^\$D_\{nT,w\}\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB\n"
-      r"\$R′_w\$ = (\d+) dB   \(\$S\$ = 12\.5 m², \$V\$ = 30\.4 m³\)$"),
+      r"\$R\^\{\\prime\}_w\$ = (\d+) dB   \(\$S\$ = 12\.5 m², \$V\$ = 30\.4 m³\)$"),
      ("$D_{nT,w}$($C$;$C_{tr}$) = \\1 dB\n"
-      "$R′_w$ = \\2 dB   ($S$ = 12,5 m², $V$ = 30,4 m³)")),
-    ((r"^\$R′_w\$ = (\d+) ± (\d+)\.(\d+) dB\n"
+      "$R^{\\\\prime}_w$ = \\2 dB   ($S$ = 12,5 m², $V$ = 30,4 m³)")),
+    ((r"^\$R\^\{\\prime\}_w\$ = (\d+) ± (\d+)\.(\d+) dB\n"
       r"\$U = k\\,u\$ ,  \$k\$ = (\d+)\.(\d+) \(95 %\)$"),
-     ("$R′_w$ = \\1 ± \\2,\\3 dB\n"
+     ("$R^{\\\\prime}_w$ = \\1 ± \\2,\\3 dB\n"
       "$U = k\\,u$ ,  $k$ = \\4,\\5 (95 %)")),
     ((r"^\$6 - 10\\,\\mathrm\{lg\}\(10\^\{0\{,\}6\} - 1\)\$"
       r" = (\d+)\.(\d+) dB$"),
      r"$6 - 10\\,\\mathrm{lg}(10^{0{,}6} - 1)$ = \1,\2 dB"),
     ((r"^\$R_w\$\(\$C\$;\$C_\{tr\}\$\) = (.+) dB\n"
-      r"6 mm float glass, \$m′′\$ = 15 kg/m², \$\\eta\$ = 0\.024$"),
+      r"6 mm float glass, \$m\^\{\\prime\\prime\}\$ = 15 kg/m², \$\\eta\$ = 0\.024$"),
      ("$R_w$($C$;$C_{tr}$) = \\1 dB\n"
-      r"vidrio flotado de 6 mm, $m′′$ = 15 kg/m², $\\eta$ = 0,024")),
+      r"vidrio flotado de 6 mm, $m^{\\prime\\prime}$ = 15 kg/m², $\\eta$ = 0,024")),
     ((r"^below \$f_0\$: stiffness-controlled, \$\|Y\| \\sim \\omega/k\$\n"
       r"above \$f_0\$: mass-controlled, \$\|Y\| \\sim 1/\(\\omega m\)\$\n"
       r"\$f_0\$ = (\d+)\.(\d+) Hz,  \$1/c\$ = (\d+)\.(\d+) m/\(N·s\)$"),
@@ -5322,16 +5356,16 @@ _ES_PATTERNS = [
       "$L_t$ en 250 Hz = \\3,\\4 dB")),
     # orthotropic_transmission_loss info box (library values baked in; the
     # mathtext blocks the decimal-comma pass, so the commas are here).
-    ((r"^1 mm steel sheet, \$m′′\$ = (\d+)\.(\d+) kg/m², flat "
+    ((r"^1 mm steel sheet, \$m\^\{\\prime\\prime\}\$ = (\d+)\.(\d+) kg/m², flat "
       r"\$f_c\$ = (\d+)\.(\d+) kHz\n"
       r"corrugated \$H\$ = (\d+) mm, \$L\$ = (\d+) mm, "
-      r"\$m′′\$ = (\d+)\.(\d+) kg/m², "
+      r"\$m\^\{\\prime\\prime\}\$ = (\d+)\.(\d+) kg/m², "
       r"\$f_\{c1\}\$ = (\d+) Hz, \$f_\{c2\}\$ = (\d+)\.(\d+) kHz\n"
       r"worst penalty (\d+) dB at (\d+) Hz, for a stiffer and only 9 % "
       r"heavier panel$"),
-     (r"chapa de acero de 1 mm, $m′′$ = \1,\2 kg/m², "
+     (r"chapa de acero de 1 mm, $m^{\\prime\\prime}$ = \1,\2 kg/m², "
       r"$f_c$ plana = \3,\4 kHz"
-      "\ngrecada $H$ = \\5 mm, $L$ = \\6 mm, $m′′$ = \\7,\\8 kg/m², "
+      "\ngrecada $H$ = \\5 mm, $L$ = \\6 mm, $m^{\\\\prime\\\\prime}$ = \\7,\\8 kg/m², "
       "$f_{c1}$ = \\g<9> Hz, $f_{c2}$ = \\g<10>,\\g<11> kHz\n"
       "penalización máxima \\g<12> dB a \\g<13> Hz, con un panel más rígido "
       "y solo un 9 % más pesado")),
@@ -5756,15 +5790,23 @@ def _translate_figure(fig: Any) -> None:
                 wrapped._phonometry_comma = True  # type: ignore[attr-defined]
                 axis.set_major_formatter(wrapped)
             elif type(fmt) is _SF and axis.get_scale() == "linear":
-                # ``f"{v:g}"`` writes an ASCII hyphen, while the formatter it
-                # replaces runs every label through ``fix_minus`` and ships the
-                # typographic U+2212 the English figure shows. Keep that pass,
-                # or the same axis is drawn with a different minus sign in each
-                # language.
-                wrapped = _FF(
-                    lambda v, pos, _f=fmt: _f.fix_minus(_comma(f"{v:g}"))
-                )
-                axis.set_major_formatter(wrapped)
+                # Reformat THROUGH a ScalarFormatter, never with a bare
+                # ``f"{v:g}"``. The formatter chooses one decimal precision for
+                # the whole axis from the tick spacing, so English draws
+                # ``0.0 0.2 ... 1.0``; ``%g`` decides per value and drew the
+                # Spanish twin as ``0  0,2 ... 1``, dropping exactly the
+                # decimals that keep a tick column aligned (and its ASCII
+                # hyphen needed a fix_minus of its own). A subclass INSTALLED
+                # on the axis -- matplotlib then keeps its tick locations in
+                # sync, exactly as ``phonometry._i18n.localize_axes`` does; a
+                # formatter wrapped detached renders blank labels -- formats
+                # with the English precision, swaps the comma, and inherits
+                # the typographic U+2212 from the base class.
+                class _CommaSF(_SF):
+                    def __call__(self, x: float, pos: int | None = None) -> str:
+                        return super().__call__(x, pos).replace(".", ",")
+
+                axis.set_major_formatter(_CommaSF())
     for artist in fig.findobj(_mtext.Text):
         s = artist.get_text()
         if not s:

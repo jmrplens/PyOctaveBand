@@ -68,12 +68,12 @@ _LEGEND_LOWER_RIGHT: Final = "lower right"
 #: so the English output is byte-for-byte identical to the pre-i18n
 #: renderers.
 _STRINGS: dict[str, str] = {
-    "Source level Ls": "Nivel de fuente Ls",
+    r"Source level $L_\mathrm{s}$": r"Nivel de fuente $L_\mathrm{s}$",
     "Radiated noise level": "Nivel de ruido radiado",
     "Frequency [Hz]": "Frecuencia [Hz]",
     "Level [dB re 1 µPa·m]": "Nivel [dB re 1 µPa·m]",
-    "Surface correction ΔL": "Corrección de superficie ΔL",
-    "Surface correction ΔL [dB]": "Corrección de superficie ΔL [dB]",
+    r"Surface correction $\Delta L$": r"Corrección de superficie $\Delta L$",
+    r"Surface correction $\Delta L$ [dB]": r"Corrección de superficie $\Delta L$ [dB]",
     "ISO 17208-2 equivalent monopole source level": "Nivel de fuente monopolar equivalente ISO 17208-2",
     "Peak": "Pico",
     "Pressure [Pa]": "Presión [Pa]",
@@ -92,7 +92,7 @@ _STRINGS: dict[str, str] = {
     "Transmission loss [dB]": "Pérdida por transmisión [dB]",
     "Underwater transmission loss": "Pérdida por transmisión submarina",
     "Signal excess": "Exceso de señal",
-    "Detection limit (SE = 0)": "Límite de detección (SE = 0)",
+    r"Detection limit ($\mathrm{SE}$ = 0)": r"Límite de detección ($\mathrm{SE}$ = 0)",
     "Figure of merit": "Cifra de mérito",
     "Signal excess [dB]": "Exceso de señal [dB]",
     "Sonar equation": "Ecuación del sonar",
@@ -119,16 +119,16 @@ _STRINGS: dict[str, str] = {
     "Parabolic-equation transmission loss": "Pérdida por transmisión por ecuación parabólica",
     "Weston regimes": "Regímenes de Weston",
     "Composite": "Compuesto",
-    "Spherical (20 log10 r)": "Esférica (20 log10 r)",
-    "Cylindrical (10 log10 r)": "Cilíndrica (10 log10 r)",
-    "Mode stripping (15 log10 r)": "Descamado de modos (15 log10 r)",
+    r"Spherical ($20\,\log_{10} r$)": r"Esférica ($20\,\log_{10} r$)",
+    r"Cylindrical ($10\,\log_{10} r$)": r"Cilíndrica ($10\,\log_{10} r$)",
+    r"Mode stripping ($15\,\log_{10} r$)": r"Descamado de modos ($15\,\log_{10} r$)",
     "Single mode": "Modo único",
     "Propagation loss [dB re 1 m²]": "Pérdida de propagación [dB re 1 m²]",
     "Hearing threshold [dB]": "Umbral de audición [dB]",
     "Group audiogram": "Audiograma de grupo",
     "Orca audiogram": "Audiograma de orca",
     "Best sensitivity": "Mejor sensibilidad",
-    "Weighting W(f) [dB]": "Ponderación W(f) [dB]",
+    "Weighting $W(f)$ [dB]": "Ponderación $W(f)$ [dB]",
     "Auditory weighting function": "Función de ponderación auditiva",
     "Unweighted": "Sin ponderar",
     "Weighted": "Ponderada",
@@ -170,7 +170,7 @@ def plot_ship_source_level(
     dl = np.asarray(result.surface_correction, dtype=np.float64)
 
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault("label", _t("Source level Ls", language))
+    kwargs.setdefault("label", _t(r"Source level $L_\mathrm{s}$", language))
     ax.semilogx(freqs, ls, "o-", **kwargs)
     ax.semilogx(freqs, rnl, "s--", color=_C_REFERENCE, label=_t("Radiated noise level", language))
     ax.set_xlabel(_t(_FREQUENCY_LABEL, language))
@@ -179,8 +179,9 @@ def plot_ship_source_level(
     ax.set_axisbelow(True)
 
     twin = ax.twinx()
-    twin.semilogx(freqs, dl, ":", color=_C_TERTIARY, label=_t("Surface correction ΔL", language))
-    twin.set_ylabel(_t("Surface correction ΔL [dB]", language))
+    twin.semilogx(freqs, dl, ":", color=_C_TERTIARY,
+                  label=_t(r"Surface correction $\Delta L$", language))
+    twin.set_ylabel(_t(r"Surface correction $\Delta L$ [dB]", language))
     # After twinx() (it re-initialises the shared x-axis with the default log
     # locator) so the octave-band labelling is not reset back to 10^n ticks.
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -190,8 +191,8 @@ def plot_ship_source_level(
     ax.legend(lines + tlines, labels + tlabels, loc="best", fontsize="small")
     ax.set_title(
         f"{_t('ISO 17208-2 equivalent monopole source level', language)} "
-        f"(d_s = {format_number(result.source_depth, language)} m, "
-        f"c = {format_number(result.sound_speed, language, decimals=0)} m/s)"
+        rf"($d_\mathrm{{s}}$ = {format_number(result.source_depth, language)} m, "
+        rf"$c$ = {format_number(result.sound_speed, language, decimals=0)} m/s)"
     )
     localize_axes(ax, language)
     return ax
@@ -235,14 +236,20 @@ def plot_pile_strike(
     if ax is not None:
         _waveform(ax)
         ax.set_xlabel(_t(_TIME_LABEL, language))
-        ax.set_title(f"{_t('ISO 18406 pile strike', language)} (SEL_ss = {format_number(result.single_strike_sel, language, decimals=0)} dB)")
+        ax.set_title(
+            f"{_t('ISO 18406 pile strike', language)} "
+            rf"($\mathrm{{SEL}}_{{\mathrm{{ss}}}}$ = "
+            f"{format_number(result.single_strike_sel, language, decimals=0)} dB)"
+        )
         localize_axes(ax, language)
         return ax
 
     axes = _new_axes_column(2, sharex=True, figsize=(8.0, 6.0))
     _waveform(axes[0])
     axes[0].set_title(
-        f"{_t('ISO 18406 pile strike', language)} (SEL_ss = {format_number(result.single_strike_sel, language, decimals=0)} dB re 1 µPa²·s)"
+        f"{_t('ISO 18406 pile strike', language)} "
+        rf"($\mathrm{{SEL}}_{{\mathrm{{ss}}}}$ = "
+        f"{format_number(result.single_strike_sel, language, decimals=0)} dB re 1 µPa²·s)"
     )
     axes[1].plot(t, cum, color=_C_TERTIARY, label=_t("Cumulative energy", language))
     for frac in (0.05, 0.95):
@@ -272,7 +279,7 @@ def plot_sound_speed_profile(
     ax = ax if ax is not None else _new_axes()
     depth = np.asarray(result.depth, dtype=np.float64)
     speed = np.asarray(result.sound_speed, dtype=np.float64)
-    label = f"{result.model} c(z)"
+    label = f"{result.model} $c(z)$"
     ax.plot(speed, depth, **{"color": _C_PRIMARY, "lw": 1.4, "label": label, **kwargs})
     if not ax.yaxis_inverted():
         ax.invert_yaxis()
@@ -338,7 +345,8 @@ def plot_sonar_equation(
     order = np.argsort(tl)
     label = f"{_t('Signal excess', language)} ({result.mode})"
     ax.plot(tl[order], se[order], **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
-    ax.axhline(0.0, color=_C_REFERENCE, ls="--", lw=1.0, label=_t("Detection limit (SE = 0)", language))
+    ax.axhline(0.0, color=_C_REFERENCE, ls="--", lw=1.0,
+               label=_t(r"Detection limit ($\mathrm{SE}$ = 0)", language))
     ax.axvline(result.figure_of_merit, color=_C_MUTED, ls=":", lw=1.0,
                label=f"{_t('Figure of merit', language)} = {format_number(result.figure_of_merit, language)} dB")
     ax.set_xlabel(_t(_TRANSMISSION_LOSS_LABEL, language))
@@ -625,9 +633,9 @@ def plot_weston_regimes(
     r = np.asarray(result.range_m, dtype=np.float64)
     ax.set_xscale("log")
     for label, curve, color, style in (
-        ("Spherical (20 log10 r)", result.spherical, _C_MUTED, ":"),
-        ("Cylindrical (10 log10 r)", result.cylindrical, _C_SECONDARY, "--"),
-        ("Mode stripping (15 log10 r)", result.mode_stripping, _C_TERTIARY, "-."),
+        (r"Spherical ($20\,\log_{10} r$)", result.spherical, _C_MUTED, ":"),
+        (r"Cylindrical ($10\,\log_{10} r$)", result.cylindrical, _C_SECONDARY, "--"),
+        (r"Mode stripping ($15\,\log_{10} r$)", result.mode_stripping, _C_TERTIARY, "-."),
         ("Single mode", result.single_mode, _C_QUATERNARY, (0, (3, 1, 1, 1))),
     ):
         ax.plot(r, np.asarray(curve, dtype=np.float64), ls=style, lw=1.0, color=color,
@@ -649,7 +657,7 @@ def plot_weston_regimes(
     ax.set_title(
         f"{_t('Weston regimes', language)} "
         f"({format_number(result.frequency, language, decimals=0)} Hz, "
-        f"H = {format_number(result.water_depth, language, decimals=0)} m, {result.seabed})"
+        f"$H$ = {format_number(result.water_depth, language, decimals=0)} m, {result.seabed})"
     )
     ax.grid(True, which="both", alpha=0.3)
     ax.set_axisbelow(True)
@@ -703,7 +711,7 @@ def plot_auditory_weighting(
     from .._i18n import localize_axes
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    ax = _spectrum_axes(ax, freqs, ylabel="Weighting W(f) [dB]",
+    ax = _spectrum_axes(ax, freqs, ylabel="Weighting $W(f)$ [dB]",
                         title="Auditory weighting function", language=language)
     label = f"{result.group} ({result.guidance})"
     ax.plot(freqs, np.asarray(result.weighting, dtype=np.float64),
@@ -746,8 +754,9 @@ def plot_weighted_exposure(
             ax.axhline(level, color=color, ls="--", lw=1.2,
                        label=f"{name} {format_number(level, language, decimals=0)} dB")
     ax.axhline(result.cumulative_sel, color=_C_TERTIARY, ls="-.", lw=1.2,
-               label=(f"SEL_cum {format_number(result.cumulative_sel, language)} dB "
-                      f"(N = {result.n_events})"))
+               label=(rf"$\mathrm{{SEL}}_{{\mathrm{{cum}}}}$ "
+                      rf"{format_number(result.cumulative_sel, language)} dB "
+                      rf"($N$ = {result.n_events})"))
     ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
@@ -775,7 +784,8 @@ def plot_strike_sel_spectrum(
             **{"color": _C_PRIMARY, "lw": 1.4, "marker": "o", "ms": 3,
                "label": f"1/{result.fraction}", **kwargs})
     ax.axhline(result.total_sel, color=_C_REFERENCE, ls="--", lw=1.2,
-               label=f"SEL_ss {format_number(result.total_sel, language)} dB")
+               label=(rf"$\mathrm{{SEL}}_{{\mathrm{{ss}}}}$ "
+                      rf"{format_number(result.total_sel, language)} dB"))
     ax.legend(loc="best", fontsize="small")
     localize_axes(ax, language)
     return ax
