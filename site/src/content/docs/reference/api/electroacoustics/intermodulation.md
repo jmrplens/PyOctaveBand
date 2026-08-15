@@ -227,7 +227,7 @@ Draws the output amplitude at `f2` (the 0 dB reference) and the
 four intermodulation sidebands at $f_2 \pm f_1$ and
 $f_2 \pm 2f_1$ as a stem-style spectrum in dB relative to
 the carrier, the modulation counterpart of
-[`plot`](/phonometry/reference/api/electroacoustics/distortion/).
+[`plot`](/phonometry/reference/api/electroacoustics/distortion/#harmonicdistortionresultplot).
 
 **Parameters**
 

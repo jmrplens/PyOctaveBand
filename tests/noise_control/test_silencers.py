@@ -16,6 +16,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from phonometry.noise_control import duct_modes as dm
 from phonometry.noise_control import silencers as sl
 
 
@@ -286,6 +287,95 @@ def test_validation() -> None:
         sl.expansion_chamber([100.0], 0.3, -0.04, 0.01)
     with pytest.raises(ValueError, match="must exceed"):
         sl.extended_tube_chamber([100.0], 0.3, 0.01, 0.02)
+
+
+def test_chain_matches_the_hand_built_cascade() -> None:
+    # The chain is the same three calls a hand-built layout makes, so its
+    # compound matrix must equal the cascade of the bare matrices exactly.
+    f = np.linspace(20.0, 400.0, 200)
+    zb = sl.quarter_wave_impedance(f, 0.686, 7.85e-3)
+    chain = (
+        sl.SilencerChain(f).duct(0.15, 0.0314).shunt(zb).duct(0.60, 0.1257)
+    )
+    expected = sl.cascade(
+        sl.duct_matrix(f, 0.15, 0.0314),
+        sl.shunt_matrix(zb),
+        sl.duct_matrix(f, 0.60, 0.1257),
+    )
+    assert np.array_equal(chain.transfer_matrix, expected)
+    res = chain.result(inlet_area=0.0314, outlet_area=0.0314)
+    assert np.array_equal(
+        res.transmission_loss,
+        sl.transmission_loss(
+            expected, inlet_area=0.0314, outlet_area=0.0314
+        ),
+    )
+    # The widest section of the chain sets the plane-wave ceiling, exactly as
+    # the widest declared area of a named device does.
+    assert res.plane_wave_limit == pytest.approx(
+        dm.plane_wave_limit(area=0.1257, speed_of_sound=343.0)
+    )
+    assert res.kind == "element chain"
+    assert res.chain is not None
+
+
+def test_chain_of_one_duct_is_the_expansion_chamber() -> None:
+    # A chamber is one duct element between two pipes: the chain reproduces
+    # the named constructor to the last bit.
+    f = np.linspace(20.0, 800.0, 400)
+    chain = sl.SilencerChain(f).duct(0.3, 0.04)
+    res = chain.result(inlet_area=0.01, outlet_area=0.01)
+    named = sl.expansion_chamber(f, 0.3, 0.04, 0.01)
+    assert np.array_equal(res.transmission_loss, named.transmission_loss)
+
+
+def test_chain_records_only_what_it_was_given() -> None:
+    # The asymmetry the drawing rests on: a duct call carries a length and an
+    # area, a shunt call carries neither.
+    f = np.linspace(20.0, 400.0, 381)
+    chain = (
+        sl.SilencerChain(f)
+        .duct(0.25, 0.0314)
+        .shunt(sl.quarter_wave_impedance(f, 0.686, 7.85e-3), label="stub")
+    )
+    duct, shunt = chain.elements
+    assert duct.is_duct
+    assert (duct.length, duct.area) == (0.25, 0.0314)
+    assert duct.label is None
+    assert duct.shorting_frequency is None
+    assert not shunt.is_duct
+    assert shunt.length is None
+    assert shunt.area is None
+    assert shunt.label == "stub"
+    # The one thing an impedance says about itself: where it is least, which
+    # for a lossless quarter-wave tube is its tuning c/(4 l_e) = 125 Hz.
+    assert shunt.shorting_frequency == pytest.approx(125.0, abs=1.0)
+
+
+def test_chain_shunt_accepts_a_constant_and_rejects_a_mismatch() -> None:
+    f = np.linspace(20.0, 400.0, 100)
+    chain = sl.SilencerChain(f).duct(0.2, 0.01).shunt(1.0e4)
+    assert chain.transfer_matrix.shape == (100, 2, 2)
+    # A constant impedance has no least value inside the grid.
+    assert chain.elements[1].shorting_frequency is None
+    empty = sl.SilencerChain(f)
+    with pytest.raises(ValueError, match="one value per analysis frequency"):
+        empty.shunt(np.ones(7, dtype=np.complex128))
+
+
+def test_chain_result_is_immune_to_later_additions() -> None:
+    f = np.linspace(20.0, 400.0, 50)
+    chain = sl.SilencerChain(f).duct(0.2, 0.01)
+    res = chain.result(inlet_area=0.01, outlet_area=0.01)
+    chain.duct(0.4, 0.02)
+    assert res.chain is not None
+    assert len(res.chain.elements) == 1
+    assert len(chain.elements) == 2
+
+
+def test_empty_chain_has_no_matrix() -> None:
+    with pytest.raises(ValueError, match="at least one matrix"):
+        _ = sl.SilencerChain([100.0, 200.0]).transfer_matrix
 
 
 def test_plot_language_spanish_and_validation() -> None:
