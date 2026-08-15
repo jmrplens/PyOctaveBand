@@ -267,7 +267,7 @@ cuyo ángulo crítico y gradiente de pérdida por reflexión codifican exactamen
 lo que estas condiciones de contorno omiten, y lee la respuesta modal como una
 cota superior del nivel recibido.
 
-## 3. Trazado de rayos: tiempos de propagación y zonas de convergencia
+## 3. Trazado de rayos: puntos de giro y zonas de convergencia
 
 En el límite de alta frecuencia la ecuación de Helmholtz colapsa en la
 ecuación eikonal, y sus características son los **rayos**: trayectorias
@@ -352,9 +352,8 @@ plt.show()
 
 </details>
 
-Los rayos compran geometría: caminos de eigenrayos, tiempos de propagación
-y distancias de las zonas de convergencia a un coste independiente de la
-frecuencia. Lo que aquí no llevan es una amplitud completa: la intensidad
+Los rayos compran geometría: caminos, profundidades de giro y distancias de
+las zonas de convergencia a un coste independiente de la frecuencia. Lo que aquí no llevan es una amplitud completa: la intensidad
 geométrica del tubo de rayos diverge en las cáusticas, así que el objeto de
 resultado devuelve los caminos y deja el nivel al campo modal o de la PE.
 
@@ -573,12 +572,12 @@ cap. 1):
 
 | Método | Régimen natural | Qué aporta |
 |---|---|---|
-| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de eigenrayos, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
+| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, zonas de convergencia; coste independiente de la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($M \approx kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
 | `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | TL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
-frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
+frecuencias sorprendentemente bajas para trabajo de geometría de caminos, y
 la PE sigue siendo el caballo de batalla bastante por encima de su régimen
 formal de ángulos pequeños. Cuando dos de los tres coinciden en un caso, como
 hacen los modos y la PE en la figura de la sección 1, esa coincidencia es la
@@ -695,7 +694,7 @@ Los tres métodos suponen una columna de agua independiente de la distancia con
 un contorno de presión nula (o, para los modos, opcionalmente rígido): no hay
 fondo absorbente ni elástico, ni atenuación del sedimento, ni batimetría real,
 así que los problemas dependientes de la distancia quedan fuera de alcance. El
-trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes: la
+trazado de rayos devuelve caminos, no tiempos de propagación ni amplitudes: la
 intensidad de tubo de rayos con correcciones de cáusticas no se calcula. La PE
 es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
 angular de Padé. Para la física del lecho elástico que estos métodos fluidos
@@ -727,8 +726,8 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 ### ¿Qué método de propagación submarina debo usar?
 
 Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
-alta frecuencia y océano profundo (geometría de eigenrayos y tiempos de
-propagación a un coste independiente de la frecuencia), modos normales para
+alta frecuencia y océano profundo (geometría de los caminos de rayos y zonas
+de convergencia a un coste independiente de la frecuencia), modos normales para
 baja frecuencia en aguas someras (pocos modos propagantes, $M \approx kD/\pi$,
 la solución de referencia en su régimen) y la ecuación parabólica para caminos
 largos de un solo sentido a baja frecuencia (el campo completo TL($z$,$r$)

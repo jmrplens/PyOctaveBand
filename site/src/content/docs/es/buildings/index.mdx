@@ -125,12 +125,15 @@ datos de elemento y a partir de la física del propio elemento.
 <Scope>
 <ScopeClaim status="not-covered">
 **La biblioteca empieza después del micrófono y se detiene antes de la
-geometría.** Del lado de la medición, cada función toma niveles de banda ya
-promediados sobre las posiciones y ya corregidos por el ruido de fondo: el
-número de posiciones, los procedimientos de baja frecuencia, los mínimos de
-señal frente al ruido de fondo y las cualificaciones de la instalación de
-ensayo de ISO 16283, ISO 10140 e ISO 3382 son cosa del operador, y aquí nada
-comprueba que se hayan cumplido. Del lado de la predicción, los índices
+geometría.** Del lado de la medición, el promediado entre posiciones ocurre
+en cuanto aportas las posiciones — las funciones de aislamiento promedian en
+energía los espectros por posición por ti —, pero nada verifica cómo se hizo
+la medición: el número y la colocación de las posiciones, los procedimientos
+de baja frecuencia y las cualificaciones de la instalación de ensayo de
+ISO 16283, ISO 10140 e ISO 3382 son cosa del operador. También lo es medir el
+ruido de fondo: solo está implementada la corrección de laboratorio de
+ISO 10140-4, que avisa cuando se incumple su mínimo de 6 dB, y los niveles de
+campo han de llegar ya corregidos. Del lado de la predicción, los índices
 globales de los elementos, los índices de unión y las mejoras de los
 revestimientos son entradas que aportas tú desde una medición o desde el
 propio anexo de una norma; ninguna se deriva de un plano.

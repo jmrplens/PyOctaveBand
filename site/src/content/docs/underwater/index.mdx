@@ -97,8 +97,8 @@ pile-driving noise has no closed form here or anywhere in the library.
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
 all three solvers assume a **range-independent** water column with no
 absorbing or elastic bottom and no real bathymetry — which rules out
-range-dependent problems entirely. The ray solver returns paths and travel
-times but not amplitudes (no ray-tube intensity, no caustic correction), and
+range-dependent problems entirely. The ray solver returns paths but not
+travel times or amplitudes (no ray-tube intensity, no caustic correction), and
 the parabolic equation is the standard small-angle Tappert form rather than a
 wide-angle Padé variant. For the elastic seabed physics these fluid solvers
 leave out, the [elastic wave solver](/phonometry/simulation/elastic-waves/) is

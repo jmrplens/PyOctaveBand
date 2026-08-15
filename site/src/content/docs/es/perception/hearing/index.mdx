@@ -78,10 +78,14 @@ En el orden en que discurre la cadena.
 **Nada de lo que hay aquí es un veredicto sobre una persona.** ISO 1999 no
 define un hándicap auditivo ni un umbral indemnizable: esa línea la fija la
 regulación nacional, y la biblioteca no aplica ninguna, así que el criterio lo
-aportas y lo compruebas tú. Lo mismo vale para los valores de acción de la
-exposición: el LEX,8h y su límite superior unilateral al 95 % salen de ISO
-9612, y las cifras con las que se comparan están en la directiva de tu
-jurisdicción, no aquí.
+aportas y lo compruebas tú. El lado de la exposición se detiene un paso más
+tarde: el LEX,8h y su límite superior unilateral al 95 % salen de ISO 9612, y
+la ficha que escribe `ExposureResult.report()` sí compara el LEX,8h con los
+valores de acción y el valor límite de la Directiva 2003/10/CE (80, 85 y
+87 dB(A)) y emite el veredicto CUMPLE/NO CUMPLE frente al valor límite; pero
+ese veredicto juzga una exposición sin protección, no a una persona: la
+exposición efectiva tras los protectores auditivos y cualquier transposición
+nacional más estricta siguen corriendo de tu cuenta.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">

@@ -66,7 +66,9 @@ for less severe seated exposures is distributed separately by ISO and is not
 implemented, which is what makes the 1 g delineation above a routing decision
 rather than a preference.
 
-And no exposure verdict is issued. The action and limit values of Directive
-2002/44/EC are stated so that an A(8) can be read against them, but the
-library applies no national implementation of the directive, and a
-risk-assessment conclusion is not a number this section produces.
+And the verdict stops at the directive itself. An A(8) is assessed against
+the action and limit values of Directive 2002/44/EC — each marked exceeded or
+not, the exposure zone named, and a PASS/FAIL verdict issued against the
+limit value — but the library applies no national transposition of the
+directive, and the conclusion of a workplace risk assessment is not a number
+this section produces.

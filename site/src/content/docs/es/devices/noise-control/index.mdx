@@ -97,10 +97,12 @@ como origen de las cifras de un proveedor, no se implementan. Dentro de las
 predicciones, tres límites son estructurales. **Solo se calculan los elementos
 de silenciador reactivos**: los silenciadores disipativos de conducto
 revestido se comentan para la selección, pero no se modelan a partir de las
-propiedades del revestimiento en ningún punto de la biblioteca, y las cifras
-de codo revestido y de plenum de la página de HVAC son tablas de instalación
-interpoladas y no un modelo de revestimiento. **El flujo medio queda fuera de
-las matrices de elemento**: no aparecen la convección, los gradientes de
+propiedades del revestimiento en ningún punto de la biblioteca, y en la página
+de HVAC la cifra de codo revestido es una lectura de tabla (la Tabla 8.11 de
+Bies) y el plenum es la forma cerrada de Wells gobernada por una absorción
+media declarada — ninguno de los dos es un modelo de revestimiento. **El flujo
+medio queda fuera de las matrices de elemento**: no aparecen la convección,
+los gradientes de
 temperatura ni la impedancia dependiente del flujo de los perforados, así que
 un silenciador que transporta un flujo apreciable se predice como si no lo
 hiciera. Y `enclosure_insertion_loss` **nunca predice la pérdida por

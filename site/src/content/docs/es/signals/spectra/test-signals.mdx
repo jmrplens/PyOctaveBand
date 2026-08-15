@@ -329,12 +329,18 @@ banda atenuada y la anchura de transición de `resample_signal`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
-La IEC 60268-1:1985 es una norma general para equipos de sistemas de sonido.
-Aquí solo se implementan los apartados de ráfagas tonales del anexo A; el
-resto de sus partes (amplificadores, altavoces, conectores, etc.) quedan sin
-tocar. `fractional_delay` y los generadores de ruido de colores de
-`noise_signal` son herramientas de DSP de propósito general sin norma que las
-gobierne; sus afirmaciones de exactitud son formas cerradas, no normativas.
+La IEC 60268-1:1985 es una norma general para equipos de sistemas de sonido;
+en esta página solo se implementan los apartados de ráfagas tonales del
+anexo A. Las partes de dispositivos no se cubren aquí, pero tampoco quedan
+sin tocar: los amplificadores (IEC 60268-3), los micrófonos (IEC 60268-4) y
+los altavoces (IEC 60268-5) tienen sus propias guías en
+[Electroacústica](/phonometry/es/devices/electroacoustics/), y el índice de
+transmisión del habla de la IEC 60268-16 tiene la guía del
+[Índice de transmisión del habla](/phonometry/es/perception/speech/speech-transmission/);
+solo las partes de conectores están ausentes de la biblioteca por completo.
+`fractional_delay` y los generadores de ruido de colores de `noise_signal`
+son herramientas de DSP de propósito general sin norma que las gobierne; sus
+afirmaciones de exactitud son formas cerradas, no normativas.
 </ScopeClaim>
 </Scope>
 

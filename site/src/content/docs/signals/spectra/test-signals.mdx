@@ -310,12 +310,18 @@ transition width.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="Not covered">
-IEC 60268-1:1985 is a general standard for sound system equipment. Only the
-Annex A tone-burst clauses are implemented here; its other parts (amplifiers,
-loudspeakers, connectors, and so on) are untouched. `fractional_delay` and the
-colored-noise generators of `noise_signal` are general-purpose DSP tools with
-no governing standard of their own; their accuracy claims are closed-form, not
-normative.
+IEC 60268-1:1985 is a general standard for sound system equipment; only the
+Annex A tone-burst clauses are implemented on this page. The device parts are
+not covered here, but they are not untouched either: amplifiers
+(IEC 60268-3), microphones (IEC 60268-4) and loudspeakers (IEC 60268-5) have
+their own guides under
+[Electroacoustics](/phonometry/devices/electroacoustics/), and the speech
+transmission index of IEC 60268-16 has the
+[Speech Transmission Index](/phonometry/perception/speech/speech-transmission/)
+guide; only the connector parts are absent from the library altogether.
+`fractional_delay` and the colored-noise generators of `noise_signal` are
+general-purpose DSP tools with no governing standard of their own; their
+accuracy claims are closed-form, not normative.
 </ScopeClaim>
 </Scope>
 
