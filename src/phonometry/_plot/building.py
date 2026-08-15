@@ -97,6 +97,11 @@ _MAX_IMPACT_LABEL = "Maximum impact sound pressure level [dB]"
 #: its symbol (the panel and aperture transmission predictions).
 _R_INDEX_LABEL = "Sound reduction index $R$ [dB]"
 
+#: The apparent sound reduction index's symbol, as every curve label writes it:
+#: composed prime (never the U+2032 character, which sits at x-height and takes
+#: a following subscript with it).
+_R_PRIME = r"$R^{\prime}$"
+
 #: Shared y-axis label of the sound-insulation figures that spell the quantity
 #: out instead (the airborne measurement and prediction curves).
 _REDUCTION_INDEX_LABEL = "Sound reduction index [dB]"
@@ -633,7 +638,7 @@ def plot_facade_insulation(
     if result.d_2m_n is not None:
         curves.append(("$D_{2m,n}$", np.asarray(result.d_2m_n, dtype=np.float64)))
     if result.r_prime is not None:
-        curves.append((r"$R^{\prime}$", np.asarray(result.r_prime, dtype=np.float64)))
+        curves.append((_R_PRIME, np.asarray(result.r_prime, dtype=np.float64)))
     # Forward user kwargs to the primary D2m,nT curve only, so styling kwargs
     # (label=, color=) neither collide with the per-curve labels nor make the
     # companion curves indistinguishable.
@@ -679,7 +684,7 @@ def plot_facade_prediction(
     for name, rp in result.element_r.items():
         ax.plot(x, np.asarray(rp, dtype=np.float64), "--", lw=0.9, alpha=0.6, label=name)
 
-    opts: dict[str, Any] = {"label": r"$R^{\prime}$", "color": "black", "lw": 2.0}
+    opts: dict[str, Any] = {"label": _R_PRIME, "color": "black", "lw": 2.0}
     opts.update(kwargs)
     ax.plot(x, r_prime, "o-", **opts)
     ax.plot(
@@ -1037,7 +1042,7 @@ def plot_detailed_airborne_prediction(
             rf"{format_number(result.rating.rating, language, decimals=0)} dB"
         )
     return _plot_path_shares(
-        result, result.r_prime, total_label=r"$R^{\prime}$",
+        result, result.r_prime, total_label=_R_PRIME,
         ylabel=_REDUCTION_INDEX_LABEL, title=title, ax=ax,
         language=language, **kwargs,
     )
@@ -1131,7 +1136,7 @@ def plot_airborne_insulation(
         ("$D$", np.asarray(result.d, dtype=np.float64)),
     ]
     if result.r_prime is not None:
-        curves.append((r"$R^{\prime}$", np.asarray(result.r_prime, dtype=np.float64)))
+        curves.append((_R_PRIME, np.asarray(result.r_prime, dtype=np.float64)))
     ax = _plot_insulation_bands(
         curves,
         ylabel=_t(_LEVEL_DIFFERENCE_LABEL, language),

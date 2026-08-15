@@ -58,7 +58,8 @@ def test_plain_string_bakes_to_one_commented_group() -> None:
     # One <use> per inked glyph; the three spaces advance the pen only.
     assert element.count("<use ") == len("probe A, 30 mm above".replace(" ", ""))
     assert element.count(_REG) == element.count("<use ")
-    assert "<text" not in element and "tspan" not in element
+    assert "<text" not in element
+    assert "tspan" not in element
 
 
 def test_comment_escapes_metacharacters() -> None:
@@ -373,7 +374,8 @@ def test_render_routes_the_title_through_the_same_emission() -> None:
     # 0.7 of the title size.
     assert "35.72) scale(0.182 -0.182)" in composed
     assert _BOLDITAL in composed
-    assert "<text" not in composed and "xml:space" not in composed
+    assert "<text" not in composed
+    assert "xml:space" not in composed
 
 
 def test_emission_carries_no_style_attribute_and_no_checker_ids() -> None:

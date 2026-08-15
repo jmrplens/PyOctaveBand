@@ -1663,11 +1663,13 @@ C 699.257218 223.50441 699.434828 222.611505 699.434828 221.709832
 " clip-path="url(#p13cdd663f2)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #555555; stroke-opacity: 0.6; stroke-width: 0.8"/>
      </g>
      <g id="text_28">
-      <!-- −20 -->
+      <!-- −20,0 -->
       <g style="fill: #ffffff" transform="translate(698.912163 216.679874) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-c9c"/>
        <use xlink:href="#DejaVuSans-15" transform="translate(83.796875 0)"/>
        <use xlink:href="#DejaVuSans-13" transform="translate(147.421875 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(211.046875 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(242.828125 0)"/>
       </g>
      </g>
     </g>
@@ -1725,11 +1727,13 @@ C 732.700611 232.4773 733.76627 227.119869 733.76627 221.709832
 " clip-path="url(#p13cdd663f2)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #555555; stroke-opacity: 0.6; stroke-width: 0.8"/>
      </g>
      <g id="text_30">
-      <!-- −15 -->
+      <!-- −15,0 -->
       <g style="fill: #ffffff" transform="translate(730.63028 203.5418) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-c9c"/>
        <use xlink:href="#DejaVuSans-14" transform="translate(83.796875 0)"/>
        <use xlink:href="#DejaVuSans-18" transform="translate(147.421875 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(211.046875 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(242.828125 0)"/>
       </g>
      </g>
     </g>
@@ -1787,11 +1791,13 @@ C 766.144004 241.450189 768.097713 231.628233 768.097713 221.709832
 " clip-path="url(#p13cdd663f2)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #555555; stroke-opacity: 0.6; stroke-width: 0.8"/>
      </g>
      <g id="text_32">
-      <!-- −10 -->
+      <!-- −10,0 -->
       <g style="fill: #ffffff" transform="translate(762.348397 190.403725) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-c9c"/>
        <use xlink:href="#DejaVuSans-14" transform="translate(83.796875 0)"/>
        <use xlink:href="#DejaVuSans-13" transform="translate(147.421875 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(211.046875 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(242.828125 0)"/>
       </g>
      </g>
     </g>
@@ -1848,10 +1854,12 @@ C 799.587397 250.423078 802.429155 236.136596 802.429155 221.709832
 " clip-path="url(#p13cdd663f2)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #555555; stroke-opacity: 0.6; stroke-width: 0.8"/>
      </g>
      <g id="text_34">
-      <!-- −5 -->
+      <!-- −5,0 -->
       <g style="fill: #ffffff" transform="translate(794.066514 177.265651) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-c9c"/>
        <use xlink:href="#DejaVuSans-18" transform="translate(83.796875 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(147.421875 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(179.203125 0)"/>
       </g>
      </g>
     </g>
@@ -1908,9 +1916,11 @@ C 833.03079 259.395967 836.760598 240.64496 836.760598 221.709832
 " clip-path="url(#p13cdd663f2)" style="fill: none; stroke-dasharray: 2.96,1.28; stroke-dashoffset: 0; stroke: #555555; stroke-opacity: 0.6; stroke-width: 0.8"/>
      </g>
      <g id="text_36">
-      <!-- 0 -->
+      <!-- 0,0 -->
       <g style="fill: #ffffff" transform="translate(825.784631 164.127577) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-13"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(95.40625 0)"/>
       </g>
      </g>
     </g>

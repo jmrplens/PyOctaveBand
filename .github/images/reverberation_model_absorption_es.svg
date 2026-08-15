@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="708.282812pt" height="526.398125pt" viewBox="0 0 708.282812 526.398125" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="713.053125pt" height="526.398125pt" viewBox="0 0 713.053125 526.398125" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -21,8 +21,8 @@
  <g id="figure_1">
   <g id="patch_1">
    <path d="M -0 526.398125 
-L 708.282812 526.398125 
-L 708.282812 0 
+L 713.053125 526.398125 
+L 713.053125 0 
 L -0 0 
 z
 " style="fill: #ffffff"/>
@@ -1527,9 +1527,11 @@ L 63.710156 339.563229
       </g>
      </g>
      <g id="text_10">
-      <!-- 0 -->
-      <g transform="translate(60.528906 502.393438) scale(0.1 -0.1)">
+      <!-- 0,0 -->
+      <g transform="translate(55.758594 502.393438) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-13"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(95.40625 0)"/>
       </g>
      </g>
     </g>
@@ -1719,9 +1721,11 @@ L 697.901563 339.563229
       </g>
      </g>
      <g id="text_15">
-      <!-- 1 -->
-      <g transform="translate(694.720313 502.393438) scale(0.1 -0.1)">
+      <!-- 1,0 -->
+      <g transform="translate(689.95 502.393438) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-14"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(95.40625 0)"/>
       </g>
      </g>
     </g>

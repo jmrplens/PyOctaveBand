@@ -86,7 +86,8 @@ def test_combining_marks_shape_in_all_four_sans_faces() -> None:
 
 def test_six_face_matrix_measures_and_shapes() -> None:
     for face_key, chain in _FACES.items():
-        assert chain[0].is_file() and chain[1].is_file()
+        assert chain[0].is_file()
+        assert chain[1].is_file()
         runs = segment("Level 3", face_key)
         assert runs == [FaceRun("Level 3", chain[0])]
         assert advance("Level 3", chain[0], 20) > 0.0

@@ -127,11 +127,7 @@ def _dim(
     ao = a + normal * offset
     bo = b + normal * offset
     if abs(offset) > 1e-12:
-        for point, moved in ((a, ao), (b, bo)):
-            ax.plot(
-                [point[0], moved[0]], [point[1], moved[1]],
-                linestyle=":", linewidth=0.7, color=_C_EDGE, zorder=4,
-            )
+        _dim_extension_lines(ax, ((a, ao), (b, bo)))
     style = "|-|, widthA=0.4, widthB=0.4" if tight else "<->"
     ax.annotate(
         "", xy=tuple(bo), xytext=tuple(ao),
@@ -143,18 +139,41 @@ def _dim(
     if angle > 90.0 or angle <= -90.0:
         angle += 180.0
     shift = normal * (9.0 * label_side)
-    ha, va, rotation = "center", "center", angle
-    if label_upright:
-        rotation = 0.0
-        if abs(shift[0]) > 1e-12:
-            ha = "left" if shift[0] > 0.0 else "right"
-        if abs(shift[1]) > 1e-12:
-            va = "bottom" if shift[1] > 0.0 else "top"
+    ha, va, rotation = _dim_label_anchor(shift, angle, label_upright)
     ax.annotate(
         label, xy=(mid[0], mid[1]), xytext=tuple(shift),
         textcoords="offset points", fontsize=fontsize, ha=ha,
         va=va, rotation=rotation, rotation_mode="anchor", zorder=6,
     )
+
+
+def _dim_extension_lines(
+    ax: Axes, spans: tuple[tuple[np.ndarray, np.ndarray], ...]
+) -> None:
+    """The dashed witness lines from each measured point to its offset twin."""
+    for point, moved in spans:
+        ax.plot(
+            [point[0], moved[0]], [point[1], moved[1]],
+            linestyle=":", linewidth=0.7, color=_C_EDGE, zorder=4,
+        )
+
+
+def _dim_label_anchor(
+    shift: np.ndarray, angle: float, upright: bool
+) -> tuple[str, str, float]:
+    """Alignment and rotation of a dimension label.
+
+    Along the dimension by default; an upright label instead anchors by the
+    edge nearest the line, on whichever sides the offset actually moves it.
+    """
+    if not upright:
+        return "center", "center", angle
+    ha, va = "center", "center"
+    if abs(shift[0]) > 1e-12:
+        ha = "left" if shift[0] > 0.0 else "right"
+    if abs(shift[1]) > 1e-12:
+        va = "bottom" if shift[1] > 0.0 else "top"
+    return ha, va, 0.0
 
 
 #: Fill styles per material kind: (facecolor, hatch, alpha).

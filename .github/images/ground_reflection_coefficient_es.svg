@@ -1116,9 +1116,11 @@ L 438.741562 134.710713
       </g>
      </g>
      <g id="text_9">
-      <!-- 1 -->
-      <g transform="translate(31.141406 138.509541) scale(0.1 -0.1)">
+      <!-- 1,0 -->
+      <g transform="translate(21.600781 138.509541) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-14"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(95.40625 0)"/>
       </g>
      </g>
     </g>

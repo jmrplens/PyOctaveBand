@@ -835,9 +835,11 @@ L 666.740781 70.688782
       </g>
      </g>
      <g id="text_12">
-      <!-- 1 -->
-      <g transform="translate(30.742969 74.48761) scale(0.1 -0.1)">
+      <!-- 1,0 -->
+      <g transform="translate(21.202344 74.48761) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-14"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(95.40625 0)"/>
       </g>
      </g>
     </g>

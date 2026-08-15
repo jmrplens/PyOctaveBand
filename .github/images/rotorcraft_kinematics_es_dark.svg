@@ -2047,10 +2047,12 @@ L 807.561094 274.138231
       </g>
      </g>
      <g id="text_31">
-      <!-- 30 -->
-      <g style="fill: #ffffff" transform="translate(452.600781 277.937059) scale(0.1 -0.1)">
+      <!-- 30,0 -->
+      <g style="fill: #ffffff" transform="translate(443.060156 277.937059) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-16"/>
        <use xlink:href="#DejaVuSans-13" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(127.25 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(159.03125 0)"/>
       </g>
      </g>
     </g>
@@ -2087,10 +2089,12 @@ L 807.561094 185.383502
       </g>
      </g>
      <g id="text_33">
-      <!-- 31 -->
-      <g style="fill: #ffffff" transform="translate(452.600781 189.18233) scale(0.1 -0.1)">
+      <!-- 31,0 -->
+      <g style="fill: #ffffff" transform="translate(443.060156 189.18233) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-16"/>
        <use xlink:href="#DejaVuSans-14" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(127.25 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(159.03125 0)"/>
       </g>
      </g>
     </g>
@@ -2127,10 +2131,12 @@ L 807.561094 96.628773
       </g>
      </g>
      <g id="text_35">
-      <!-- 32 -->
-      <g style="fill: #ffffff" transform="translate(452.600781 100.427601) scale(0.1 -0.1)">
+      <!-- 32,0 -->
+      <g style="fill: #ffffff" transform="translate(443.060156 100.427601) scale(0.1 -0.1)">
        <use xlink:href="#DejaVuSans-16"/>
        <use xlink:href="#DejaVuSans-15" transform="translate(63.625 0)"/>
+       <use xlink:href="#DejaVuSans-f" transform="translate(127.25 0)"/>
+       <use xlink:href="#DejaVuSans-13" transform="translate(159.03125 0)"/>
       </g>
      </g>
     </g>
