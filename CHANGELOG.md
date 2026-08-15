@@ -1018,6 +1018,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   font: the type is converted from the committed font file at generation time,
   so nothing is fetched and nothing reflows once the page has painted.
 
+### Fixed
+
+- The coverage claims tell the truth again, all 582 of them audited claim by
+  claim against the code. The errors ran almost entirely in one direction: the
+  documentation undersold the library. Five claims denied functionality that
+  ships and is tested (the Directive 2003/10/EC exposure verdict of the ISO
+  9612 fiche, the Directive 2002/44/EC assessment with its PASS/FAIL banner,
+  the IEC 60268 device parts implemented since electroacoustics landed,
+  binaural summation, internal position averaging); a cluster of section
+  indexes compressed their children's carefully drawn boundaries into false
+  generalizations the child pages state correctly; three pages called Wells'
+  closed-form plenum an interpolated table; and two Spanish twins had drifted
+  from their English originals. The one flattering error, the ray solver's
+  travel times that it does not compute, is corrected the other way. Thirty-one
+  corrections over 17 English and 19 Spanish pages; no claim changed status,
+  only its text became true.
+
 ### Changed
 
 - Every entry of `docs/ERRATA.md` was checked again against the page it
