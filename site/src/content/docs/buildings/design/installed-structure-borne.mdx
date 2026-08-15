@@ -203,6 +203,58 @@ plt.show()
 
 </details>
 
+### Table D.1: $Y_s$ from the machine's own parts
+
+Nothing measures the source mobility of a boiler. Clause D.1.3 builds it
+instead out of the parts that carry the vibration to the feet, and Table D.1
+gives the six closed forms it uses. `typical_element_mobility` is that table:
+
+| Row | Describing quantities | $\lvert Y\rvert$ in m/N.s |
+| --- | --- | --- |
+| `"mass"` | $M$ [kg] | $[2\pi f M]^{-1}$ |
+| `"bar_end"` | $\rho$ [kg/m3], $c_L$ [m/s], $S$ [m²] | $[\rho c_L S]^{-1}$ |
+| `"beam"` | $\rho$, $c_L$, $t$ [m], $w$ [m] | $[7{,}6\,\rho t w\sqrt{c_L t f}]^{-1}$ |
+| `"plate"` | $\rho$, $c_L$, $t$ [m] | $[2{,}3\,c_L\rho t^2]^{-1}$ |
+| `"pipe"` | $\rho$, $c_L$, $t$ [m], $r$ [m] | $[63\,\rho t r\sqrt{c_L r f}]^{-1}$ |
+| `"mass_spring"` | $M$ [kg], $s$ [N/m], $\eta$ [-] | $\left[\left(\frac{2\pi f\eta}{s(1+\eta^2)}\right)^2 + \left(\frac{2\pi f}{s(1+\eta^2)} - \frac{1}{2\pi f M}\right)^2\right]^{1/2}$ |
+
+Frequency is not in the "describing quantities" column, because it is the band
+frequency of the prediction rather than a property of the element — but it is
+in four of the six expressions, so those four rows take `frequency` and the
+other two refuse it. Pick the row by what actually carries the vibration: a
+small compact machine is its total mass, a machine on non-rigid feet is the
+mass-spring row, and the pipework leaving a pump is the pipe row. Note that
+`"plate"` is Formula (F.4) again, written in $\rho$, $c_L$ and $t$ instead of
+mass and bending stiffness — the same number as `vibration.infinite_plate_mobility`.
+
+```python
+from phonometry import building
+
+# A 120 kg pump on four rubber mounts, 1,0e6 N/m each, loss factor 0,1.
+y_feet = building.typical_element_mobility(
+    "mass_spring", frequency=125.0, mass=120.0, stiffness=4.0e6, loss_factor=0.1
+)
+print(f"{float(y_feet):.3g}")                       # 0.000185 m/(N.s)
+
+# Well above the 29 Hz mount resonance the feet dominate: the casing on its
+# own is an order of magnitude stiffer, so the mounts are what sets Y_s.
+y_casing = building.typical_element_mobility("mass", frequency=125.0, mass=120.0)
+print(f"{float(y_casing):.3g}")                     # 1.06e-05 m/(N.s)
+
+dc = building.coupling_term(y_feet, 3e-5 + 1e-5j)   # onto a concrete floor
+print(round(float(dc), 1))                          # 9.2 dB
+```
+
+The mass-spring row is the only one with a turning point. It is the series sum
+of a spring mobility and a mass mobility, so its second bracket holds the two
+reactances and they cancel at $f_0 = (2\pi)^{-1}\sqrt{s(1+\eta^2)/M}$, leaving
+$\lvert Y_s\rvert$ at its damping-limited *minimum* — which is the frequency
+at which the mount injects the **most** power, because a small source mobility
+is a small $D_C$. That is the mounting resonance, and $\eta$ is the only thing
+setting how bad it gets. A row called with a quantity it does not
+describe, or with a `frequency` its expression does not contain, raises rather
+than quietly using a default.
+
 ### Where the machine is fixed is part of $Y_i$
 
 The receiver mobility is not a material constant of the element; it is a
@@ -263,6 +315,51 @@ is the dynamic transfer stiffness of the mount, measured on the
 [ISO 10846 rig](/phonometry/vibration/structural/transfer-stiffness/). The fixing
 position and the mount's data sheet both belong in the report's `notes`, because
 they are the two things that make a repeat prediction reproducible.
+
+### Table F.1: the tapping machine as a substitution source
+
+When the equipment itself cannot be characterised, clause D.1.2.3 lets you
+measure the building's transmission with a source whose force level is known
+and substitute the equipment into it afterwards (Formula D.6). The ISO tapping
+machine is the practical choice on low-mobility receiving structures, and
+Table F.1 is its octave-band force level:
+
+| Octave band [Hz] | 31,5 | 63 | 125 | 250 | 500 | 1000 | 2000 | 4000 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| $L_F$ [dB] | 139 | 142 | 145 | 148 | 151 | 154 | 156 | 156 |
+
+Two conditions travel with the table. The closed form the standard prints
+beside it, $L_F = 10\log_{10}(2{,}5f/10^{-12})$ in octave bands and
+$10\log_{10}(0{,}8f/10^{-12})$ in one-third-octave bands, holds only "up till
+about 1000 Hz": it gives 157 dB and 160 dB at 2 kHz and 4 kHz where the table
+flattens at 156 dB, so read the table where the table exists and the closed
+form only for the one-third-octave bands it does not tabulate. And the levels
+are re $10^{-6}$ N despite the "re 1 pN" the caption prints; see the
+[errata registry](/phonometry/reference/errata/).
+
+Clause D.1.3 then treats the machine as a force source with the mass-like
+mobility of its 0,5 kg hammers, which turns the table into the two inputs this
+page takes: $L_{Ws,c} = L_F - 5 - 10\log_{10}f$ (Formula D.9a) and
+$D_{C,i} = -10\log_{10}(\omega M Y_i) + 10\log_{10}[1 + (\omega M Y_i)^2]$
+(Formula D.9b, which is Formula 19b with $Y_s = 1/\mathrm{j}\omega M$).
+
+```python
+import numpy as np
+from phonometry import building
+
+bands = np.array(building.TABLE_F1_OCTAVE_BANDS)
+lf = building.tapping_machine_force_level()            # Table F.1
+lw_c = building.tapping_machine_characteristic_power_level(bands, lf)
+print(np.round(lw_c, 1))   # [119. 119. 119. 119. 119. 119. 118. 115.]
+
+# Onto the 220 mm concrete floor of the previous section (Y_i = 1,07e-6).
+dc = building.tapping_machine_coupling_term(bands, 1.07e-6)
+print(np.round(lw_c - dc, 1))   # [79.3 82.3 85.3 88.3 91.3 94.3 96.3 96.3]
+```
+
+In one-third-octave bands the characteristic power comes out flat at 114 dB
+re 1 pW, which is Formula (D.9a)'s own "$\approx 115$ dB" and the flat thick
+curve of the standard's Figure D.3.
 
 ## 2. Transmission to the receiving room
 
@@ -376,9 +473,10 @@ raised.
 :::
 
 Every input of Formula (F.3) is already available:
-[`in_situ_element`](/phonometry/buildings/design/detailed-prediction/) returns
-the in-situ structural reverberation time, the radiation factor and $R$ for the
-element.
+[`in_situ_element`](/phonometry/buildings/design/detailed-prediction/#in_situ_element-parameters)
+returns the in-situ structural reverberation time, the radiation factor and $R$
+for the element, and `structure_to_airborne_adjustment` is Formula (F.3)
+itself.
 
 ```python
 import numpy as np
@@ -387,7 +485,9 @@ from phonometry import building
 # Formula (F.3) for the 92 kg/m2 wall of the Annex I worked building.
 f = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
 sigma = np.minimum(1.0, np.sqrt(f / 200.0))        # radiation factor, fc = 200 Hz
-dsa_f3 = 10 * np.log10(400.0 * 200.0 * sigma / (92.0 * f**2))
+dsa_f3 = building.structure_to_airborne_adjustment(
+    f, critical_frequency=200.0, mass_per_area=92.0, radiation_factor=sigma
+)
 print(np.round(dsa_f3, 1))    # [-9.1 -13.6 -18.6 -24.6 -30.6 -36.6]  all negative
 
 bands = np.array([250.0, 500.0, 1000.0])
@@ -523,15 +623,23 @@ via `installed_structure_borne_power_level`, and the per-path normalised sound
 pressure level and its energetic total (Formulae 18a, 17) via
 `installed_source_prediction`. Validated against the standard's own Annex I
 worked examples, the whirlpool bath (I.2) and the flushing cistern (I.3),
-within the ±0.15 dB rounding of the printed intermediates.
+within the ±0.15 dB rounding of the printed intermediates. The informative
+tables of the annexes are here too: Table D.1 (mobility of typical
+construction elements) via `typical_element_mobility`, Table F.1 (force level
+of the ISO tapping machine) via `tapping_machine_force_level` with Formulae
+(D.9a) and (D.9b), the adjustment term of Formula (F.3) via
+`structure_to_airborne_adjustment`, and the multi-junction $\Delta K$ of
+clause F.1 via `multi_junction_adjustment`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="Not covered">
-The Annex D and F default-value tables for the structure- to-airborne
-adjustment term $D_{sa}$ and the flanking reduction index
-$R_{ij,\mathrm{ref}}$ are not implemented; both are inputs you supply from
-measurement, EN 12354-1 or the standard's own annexes. Only the 2009 edition
-is implemented, not the 2023 revision.
+The flanking reduction index $R_{ij,\mathrm{ref}}$ is an input you supply from
+measurement or from EN 12354-1; Annex F.1 gives only the multi-junction
+correction to it, not the index itself. Formula (F.1) for the equivalent
+$K_{ij}$ over several junctions, the SEA route of Formula (F.2) and the
+mobility corrections for excitation near a border or corner (Formulae F.6a and
+F.6b) are not implemented. Only the 2009 edition is implemented, not the 2023
+revision.
 </ScopeClaim>
 </Scope>
 

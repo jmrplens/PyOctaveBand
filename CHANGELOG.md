@@ -30,6 +30,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   that promised paths and travel times, and had been corrected the other way
   when the coverage audit found nothing computing them, is true as first
   written.
+- Both ray solvers reflect at a boundary instead of folding it. A crossing used
+  to be handled by taking a whole Runge-Kutta step and folding whatever came out
+  of the medium back into it, which integrates the step through water or ground
+  that is not there and applies a mid-step reflection at the step's end: a
+  first-order error at every bounce inside a fourth-order integration, carried
+  by the geometry and not only by the timing, and invisible to the tests because
+  the only reflection they exercised was in isovelocity water where there is
+  nothing to get wrong. Each crossing now ends a sub-step exactly on the
+  boundary, located by the step's own cubic Hermite and polished against real
+  steps, so a reflected ray keeps the order the rest of the path is integrated
+  with. Two rays that must be identical, launched up and down from the same
+  point on a boundary, went from 3.6 m apart to 1e-12 m in the ocean and to
+  exactly equal in the atmosphere, and a path working both the surface and the
+  bottom now reproduces the exact circular arc of a constant gradient to 7e-15 s
+  over four bounces. The solver guide was printing 583.7 m for a turning depth
+  whose analytic value it printed as 583.3 m and offering the gap as its own
+  validation; the gap was this defect, and the two figures that draw rays
+  against a boundary move with the fix.
+- The informative tables of EN 12354-5:2009 are in the library instead of in
+  the reader's notebook. `typical_element_mobility` is Table D.1, the six
+  closed forms clause D.1.3 builds a source mobility out of (mass, bar end,
+  beam, plate, pipe, mass-spring), with `TABLE_D1_QUANTITIES` carrying the
+  table's own "describing quantities" column: a row rejects a quantity that
+  does not describe it, and the four rows whose expression contains the
+  frequency demand it while the other two refuse it.
+  `tapping_machine_force_level` is Table F.1, the octave-band force level of
+  the ISO tapping machine used as the substitution source of clause D.1.2.3,
+  with `tapping_machine_force_level_estimate` for the closed form printed
+  beside it (which the standard itself limits to about 1000 Hz, and which is
+  the only route to the one-third-octave values it does not tabulate) and
+  `tapping_machine_characteristic_power_level` /
+  `tapping_machine_coupling_term` for Formulae (D.9a) and (D.9b). Annex F
+  supplies the two terms Formula (18a) takes and they are here too:
+  `structure_to_airborne_adjustment` is Formula (F.3) for the adjustment term
+  `D_sa`, which the documentation previously spelled out as a raw expression
+  for the reader to copy, and `multi_junction_adjustment` is the 4 dB and 6 dB
+  of clause F.1 with the −5 dB floor on the resulting `Kij`.
+- Two defects registered in the errata registry, both from EN 12354-5:2009.
+  Table F.1 and clause F.4.2 print the force level "re 1 pN"; the reference is
+  10⁻⁶ N, which is what Formulae (D.5a), (D.9a) and (F.10) balance at, what the
+  tapping machine's own hammers produce, and what EN 15657:2018 Formula (15)
+  and ISO 1683 use. And the Key of Figure D.3 labels all three curves
+  `L_Ws,c,A` where its own caption names one characteristic power and two
+  installed ones.
 - Every piece of vector artwork draws its own text. The figures' SVGs used to
   ship live text positioned glyph by glyph from DejaVu metrics while asking the
   viewer for a generic sans, so any label carrying mathematics arrived
