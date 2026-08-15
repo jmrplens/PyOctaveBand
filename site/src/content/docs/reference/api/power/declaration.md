@@ -44,7 +44,7 @@ declaration is most often built from a measured sound power via
 
 ## DeclarationForm
 
-*Constant* (`typing._LiteralGenericAlias`).
+*Constant* (`Literal['dual-number', 'single-number']`).
 
 ## NoiseEmissionDeclaration
 

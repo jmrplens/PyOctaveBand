@@ -3226,8 +3226,8 @@ export const glossary = [
         },
         guide: "underwater/underwater-propagation",
         definition: {
-          en: "Figure of merit: the propagation loss at which the probability of detection falls to 50 %, that is, the loss a passive system can afford before the signal excess reaches zero. Inverting any loss law at $TL = \\mathrm{FOM}$ gives the detection range directly, which is why it is quoted instead of the whole curve.",
-          es: "Figura de mérito: las pérdidas por propagación a las que la probabilidad de detección baja al 50 %, es decir, las pérdidas que un sistema pasivo puede permitirse antes de que el exceso de señal llegue a cero. Invertir cualquier ley de pérdidas en $TL = \\mathrm{FOM}$ da directamente el alcance de detección, y por eso se cita en lugar de toda la curva.",
+          en: "Figure of merit: the propagation loss a passive system can afford before the signal excess reaches zero, that is, the loss at which SE = 0. It is read as the loss at which the probability of detection falls to 50 % only under the usual convention that the detection threshold is itself referred to that probability; SE = 0 fixes no probability on its own. Inverting any loss law at $PL = \\mathrm{FOM}$ gives the detection range directly, which is why it is quoted instead of the whole curve.",
+          es: "Figura de mérito: las pérdidas de propagación que un sistema pasivo puede permitirse antes de que el exceso de señal llegue a cero, es decir, aquellas para las que SE = 0. Solo se leen como las pérdidas a las que la probabilidad de detección baja al 50 % bajo el convenio habitual de referir a esa probabilidad el propio umbral de detección; SE = 0 no fija por sí solo ninguna probabilidad. Invertir cualquier ley de pérdidas en $PL = \\mathrm{FOM}$ da directamente el alcance de detección, y por eso se cita en lugar de toda la curva.",
         },
       },
       {

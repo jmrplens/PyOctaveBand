@@ -355,7 +355,9 @@ def helmholtz_impedance(
     :math:`V / (\rho c^2)`; the resonance
     :math:`f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}`
     (Bies Eq. (8.46)) is where the
-    reactance vanishes and the branch shorts the duct.
+    reactance vanishes, leaving :math:`Z = R`: a lossless branch
+    (``resistance = 0``) shorts the duct there, and a resistive one presents
+    its resistance instead, which is what bounds the peak attenuation.
 
     :param frequencies: Frequencies ``f``, Hz (1-D array).
     :param neck_area: Neck cross-sectional area ``S_neck``, m2.

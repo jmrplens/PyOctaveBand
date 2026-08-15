@@ -359,8 +359,8 @@ compute the field.
   forms these solvers replace when refraction and boundaries matter, and
   the sound-speed profiles they consume.
 - [Underwater acoustics: radiated noise and pile driving](underwater-acoustics.md):
-  the ISO 18405 reference levels every propagation loss here is expressed
-  in.
+  the ISO 18405 reference levels in which every propagation loss here is
+  expressed.
 - [Atmospheric refraction: rays and the GFPE](../environment/propagation/atmospheric-refraction.md):
   the airborne siblings of these solvers, with the same ray bending and a
   Green's-function PE marched over ground impedance instead of a seabed.

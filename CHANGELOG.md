@@ -1236,8 +1236,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   none of them had a page. Thirteen are now exported at the top level and
   documented: the six four-pole primitives the silencer guide teaches by name
   (`insertion_loss`, `cascade`, `duct_matrix`, `shunt_matrix`,
-  `helmholtz_impedance`, `quarter_wave_impedance`, alongside the
-  `transmission_loss` the previous entry rebound), the bending-wave speeds,
+  `helmholtz_impedance`, `quarter_wave_impedance`), which join the
+  `transmission_loss` the previous entry rebound and was already exported, the
+  bending-wave speeds,
   beam impedance and rod mobility of `vibration.structural.point_mobility`
   (`beam_bending_wave_speed`, `plate_bending_wave_speed`,
   `infinite_beam_impedance`, `longitudinal_rod_mobility`),

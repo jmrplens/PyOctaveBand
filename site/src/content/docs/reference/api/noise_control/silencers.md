@@ -259,7 +259,9 @@ mass $\rho l_e / S_{\mathrm{neck}}$ and compliance
 $V / (\rho c^2)$; the resonance
 $f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}$
 (Bies Eq. (8.46)) is where the
-reactance vanishes and the branch shorts the duct.
+reactance vanishes, leaving $Z = R$: a lossless branch
+(`resistance = 0`) shorts the duct there, and a resistive one presents
+its resistance instead, which is what bounds the peak attenuation.
 
 **Parameters**
 
