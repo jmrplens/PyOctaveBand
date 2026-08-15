@@ -14,10 +14,12 @@ each light and dark.
 from __future__ import annotations
 
 import os
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 
 from .i18n import lookup, visit
+from .outline import _COMBINING, Run, assert_capabilities
 
 
 @dataclass(frozen=True)
@@ -43,11 +45,6 @@ DARK = Theme(
 
 _FONT = "Segoe UI, Helvetica, Arial, sans-serif"
 _MONO = "Consolas, Menlo, monospace"
-
-#: Combining diacritics a symbol may carry (T̂, L̄, x̃); each travels with
-#: the base letter it modifies, so the pair styles as one glyph. Circumflex,
-#: macron, overline, dot above, tilde, acute, grave, breve and dot below.
-_COMBINING = "\u0302\u0304\u0305\u0307\u0303\u0301\u0300\u0306\u0323"
 
 #: The letter runs a sub/superscript sets upright: the descriptive
 #: subscripts of the corpus, printed in roman by the standards that define
@@ -293,6 +290,47 @@ def _math_spans(s: str, size: int) -> str:
     return "".join(parts)
 
 
+#: The XML whitespace collapse a viewer applies to non-preserve text,
+#: reproduced explicitly. ASCII only, never ``str.split()``, which would
+#: also eat the NBSPs the labels use to keep quantities on their units.
+_WS_RUN = re.compile(r"[ \t\r\n]+")
+
+
+def _label_runs(s: str, *, mono: bool = False, bold: bool = False,
+                italic: bool = False) -> list[Run]:
+    """Compose a translated label into the styled runs the engine sets.
+
+    A ``$...$`` label takes the composer's runs, with the call's ``bold``
+    styling the italic variable runs into BoldItalic; ``mono`` and
+    whole-string ``italic`` cannot coexist with markup and are refused
+    (silently dropping either published a mis-set label). A plain label
+    is one run of the requested face, after the ASCII whitespace collapse
+    the viewer applied to the live-text plates; a label that collapses to
+    nothing composes to no runs at all.
+    """
+    if "$" in s:
+        if mono:
+            raise ValueError(
+                f"mono cannot carry composed mathematics: {s!r} would "
+                "drop its $...$ styling; write the label without mono "
+                "or without markup"
+            )
+        if italic:
+            raise ValueError(
+                f"whole-string italic cannot carry composed mathematics: "
+                f"{s!r} styles its own italics run by run; drop the italic "
+                "or the markup"
+            )
+        return [
+            Run(text, (False, bold, run_italic), shift, scale)
+            for text, run_italic, shift, scale in _math_runs(s)
+        ]
+    s = _WS_RUN.sub(" ", s).strip(" ")
+    if not s:
+        return []
+    return [Run(s, (mono, bold, italic), 0.0, 1.0)]
+
+
 class SVG:
     """Tiny element accumulator with technical-drawing helpers."""
 
@@ -477,6 +515,7 @@ class SVG:
 
 def _write(output_dir: str, name: str, build: Callable[[SVG, Theme], None], title: str,
            height: int = 560) -> None:
+    assert_capabilities()
     for lang, lang_suffix in (("en", ""), ("es", "_es")):
         for th in (LIGHT, DARK):
             visit(name, lang)
