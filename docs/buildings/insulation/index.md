@@ -95,18 +95,25 @@ related EN 12354-5, lives in
 
 ## What this section does not cover
 
-**The library starts after the microphone.** Every function here takes band
-levels that were already energy-averaged over positions and already corrected
-for background noise, and nothing verifies how the measurement was made: not
-the number and placement of source and microphone positions, not the
-low-frequency procedures of ISO 16283-1/-2, not the 6 dB signal-to-background
-floor, and not the test-facility and mounting requirements of ISO 10140-1.
-Those are the operator's responsibility and the report's, and they are what
-makes the numbers here mean something. Two consequences worth naming: the
-field and laboratory background corrections are *different* rules, so a
-laboratory helper must not be applied to field data; and the intensity route
-takes both the pressure and the intensity level as inputs, with the scanning
-probe and its phase-mismatch calibration outside the library.
+**The library starts after the microphone.** The field, laboratory, survey and
+intensity routines that form an insulation index accept per-position spectra
+and energy-average them for you; the heavy-impact standardization, the
+flanking indices, the ISO 717 ratings and the background-noise helpers take
+their per-band input already formed. Either way, nothing verifies how the
+measurement was made: not the number and placement of the source and
+microphone positions behind those spectra, not the low-frequency procedures
+of ISO 16283-1/-2, and not the test-facility and mounting requirements of
+ISO 10140-1. Those are the operator's responsibility and the report's, and
+they are what makes the numbers here mean something. Background noise is the
+one correction genuinely left to the caller: field levels must arrive already
+corrected, their 6 dB signal-to-background floor checked by the operator,
+while the ISO 10140-4 laboratory helper applies its rule itself, warning when
+its own floor is broken and capping the correction. Two consequences worth
+naming: the field and laboratory background corrections are *different*
+rules, so that laboratory helper must not be applied to field data; and the
+intensity route takes both the pressure and the intensity level as inputs,
+with the scanning probe and its phase-mismatch calibration outside the
+library.
 
 **Coverage inside the standards is partial in two places.** Of ISO 10848 only
 the Part 1 formulae are implemented generically, plus the Part 4 modal-overlap

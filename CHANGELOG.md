@@ -9,6 +9,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Every piece of vector artwork draws its own text. The figures' SVGs used to
+  ship live text positioned glyph by glyph from DejaVu metrics while asking the
+  viewer for a generic sans, so any label carrying mathematics arrived
+  letter-spaced on every machine without DejaVu, which is all of them; the
+  plates asked for Segoe UI first, a face neither the maintainer's machine nor
+  CI has ever had. Both now bake outlines: the figures from the DejaVu that
+  matplotlib ships, the plates from a vendored Liberation Sans whose metrics
+  are the ones the hand-tuned compositions were adjusted against (measured:
+  width ratio 1.000 over all 6,550 drawn strings, against 1.14 for DejaVu,
+  which would have broken ninety-five plates), with a deterministic per-glyph
+  fallback and a hard error for a character no face covers. Three plates
+  rendered under an emptied fontconfig are pixel-identical to the normal
+  render, which is the property the whole change exists for.
+- The corpus typography is finished end to end: figure titles at text weight
+  (the ISO 80000 justification for mixed weights dissolved on reading the
+  standard, which regulates slope and never weight), the prime composed as a
+  superscript everywhere mathtext draws (typed U+2032 sits at x-height,
+  collides with ascenders and takes the following subscript with it), range
+  hyphens restored inside mathematics where an ASCII hyphen sets as a spaced
+  binary minus, negative readings signed with U+2212 through the shared
+  helpers in figures, plots and fiches alike, and the library renderers'
+  symbols moved into mathematics with descriptive subscripts upright, their
+  Spanish keys moving in lockstep in both translation tables.
+- Fifty-five layout collisions repaired across nineteen figures, each found by
+  opening all 427 figures in both languages, confirmed at pixel level, fixed,
+  and looked at again; two systemic causes fixed at the root (the frequency
+  axis labels every third octave past four decades, the seawater relaxation
+  labels hold inside the axis). All forty-two clips re-rendered with the
+  wave's typography and the visual audit's parked recompositions, every WebM
+  variant probed as AV1.
+- Two new gates guard what no existing gate could see: every `$...$` in the
+  sources must parse (an unparseable label aborts generation and used to be
+  reported as staleness), and no Spanish translation value may keep a decimal
+  point that the save-time comma pass cannot reach past a dollar sign. Both
+  wired into `make figures` and CI ahead of the regeneration, both proven red
+  against the real defect before being trusted.
 - The scope sections of every guide are set apart from the prose and made
   auditable. Each "what this covers" and "what this does not cover" section now
   renders as a specification panel: one claim per row, a screen-printed legend
@@ -1017,6 +1053,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   index while the artwork is hidden from the accessibility tree. Still no web
   font: the type is converted from the committed font file at generation time,
   so nothing is fetched and nothing reflows once the page has painted.
+
+### Fixed
+
+- The coverage claims tell the truth again, all 582 of them audited claim by
+  claim against the code. The errors ran almost entirely in one direction: the
+  documentation undersold the library. Five claims denied functionality that
+  ships and is tested (the Directive 2003/10/EC exposure verdict of the ISO
+  9612 fiche, the Directive 2002/44/EC assessment with its PASS/FAIL banner,
+  the IEC 60268 device parts implemented since electroacoustics landed,
+  binaural summation, internal position averaging); a cluster of section
+  indexes compressed their children's carefully drawn boundaries into false
+  generalizations the child pages state correctly; three pages called Wells'
+  closed-form plenum an interpolated table; and two Spanish twins had drifted
+  from their English originals. The one flattering error, the ray solver's
+  travel times that it does not compute, is corrected the other way. Thirty-one
+  corrections over 17 English and 19 Spanish pages; no claim changed status,
+  only its text became true.
 
 ### Changed
 

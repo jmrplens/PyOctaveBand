@@ -615,8 +615,9 @@ screening of the A-weighted total (`a_weighting_omitted_bands`). The ISO
 9614-3 precision determination (`sound_power_intensity_precision`) with its
 own not-applicable flagging, its Annex B field indicators
 (`precision_field_indicators`) and the five Annex C acceptance criteria
-(`precision_qualification`). Both results render the accredited-style
-sound-power fiche through `.report()`.
+(`precision_qualification`). The scanning result renders the accredited-style
+sound-power fiche through `.report()`; the precision result draws its spectrum
+with `.plot()` but writes no fiche.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="Not covered">

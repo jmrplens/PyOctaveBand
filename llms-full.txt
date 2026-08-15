@@ -3039,12 +3039,16 @@ Pages elsewhere on the site that this section leans on:
 ## What this section does not cover
 
 **A prediction is only as good as the element data you feed it, and the
-library takes that data as given.** The element ratings, the junction indices,
-the covering improvement and the structure-to-airborne adjustment terms of EN
-12354-5 Annexes D and F are inputs you supply from measurement or from the
-standards' own annexes; none of them is derived here. The simplified
-prediction page stops at the weighted single numbers by design, and the
-detailed page is where the per-band models live.
+library takes that data as given.** The element ratings, the junction indices
+and the covering improvements are parameters the entry points consume,
+supplied from measurement or computed with this section's own estimators —
+the Annex E junction catalogue, the floating-floor and lining improvement
+laws, the Annex B homogeneous-element chain and the panel-physics models —
+and nothing checks the numbers you pass. Only the structure-to-airborne
+adjustment terms of EN 12354-5 Annexes D and F have no estimator here at all
+and must come from the standard's own tables. The simplified prediction page
+stops at the weighted single numbers by design, and the detailed page is
+where the per-band models live.
 
 Every panel model carries a validity range it does not extend past, and the
 guides flag each: Sharp's single-panel method is not valid below about 1.5
@@ -5395,14 +5399,16 @@ and from the physics of the element itself.
 ## What this section does not cover
 
 **The library starts after the microphone and stops before the geometry.** On
-the measurement side, every function takes band levels already averaged over
-positions and already corrected for background noise: the position counts, the
-low-frequency procedures, the signal-to-background floors and the
-test-facility qualifications of ISO 16283, ISO 10140 and ISO 3382 are the
-operator's job, and nothing here checks that they were done. On the prediction
-side, the element ratings, the junction indices and the covering improvements
-are inputs you supply from measurement or from a standard's own annex; none is
-derived from a drawing.
+the measurement side, position averaging happens once positions are supplied
+— the insulation functions energy-average per-position spectra for you — but
+nothing verifies how the measurement was made: the position counts and
+placements, the low-frequency procedures and the test-facility qualifications
+of ISO 16283, ISO 10140 and ISO 3382 are the operator's job. So is measuring
+the background noise: only the ISO 10140-4 laboratory correction is
+implemented, warning when its 6 dB floor is broken, and field levels must
+arrive already corrected. On the prediction side, the element ratings, the
+junction indices and the covering improvements are inputs you supply from
+measurement or from a standard's own annex; none is derived from a drawing.
 
 **Nothing here is a wave solver or a room model.** There is no geometry
 importer, no material database, no ray tracer and no auralisation: the room
@@ -6841,18 +6847,25 @@ related EN 12354-5, lives in
 
 ## What this section does not cover
 
-**The library starts after the microphone.** Every function here takes band
-levels that were already energy-averaged over positions and already corrected
-for background noise, and nothing verifies how the measurement was made: not
-the number and placement of source and microphone positions, not the
-low-frequency procedures of ISO 16283-1/-2, not the 6 dB signal-to-background
-floor, and not the test-facility and mounting requirements of ISO 10140-1.
-Those are the operator's responsibility and the report's, and they are what
-makes the numbers here mean something. Two consequences worth naming: the
-field and laboratory background corrections are *different* rules, so a
-laboratory helper must not be applied to field data; and the intensity route
-takes both the pressure and the intensity level as inputs, with the scanning
-probe and its phase-mismatch calibration outside the library.
+**The library starts after the microphone.** The field, laboratory, survey and
+intensity routines that form an insulation index accept per-position spectra
+and energy-average them for you; the heavy-impact standardization, the
+flanking indices, the ISO 717 ratings and the background-noise helpers take
+their per-band input already formed. Either way, nothing verifies how the
+measurement was made: not the number and placement of the source and
+microphone positions behind those spectra, not the low-frequency procedures
+of ISO 16283-1/-2, and not the test-facility and mounting requirements of
+ISO 10140-1. Those are the operator's responsibility and the report's, and
+they are what makes the numbers here mean something. Background noise is the
+one correction genuinely left to the caller: field levels must arrive already
+corrected, their 6 dB signal-to-background floor checked by the operator,
+while the ISO 10140-4 laboratory helper applies its rule itself, warning when
+its own floor is broken and capping the correction. Two consequences worth
+naming: the field and laboratory background corrections are *different*
+rules, so that laboratory helper must not be applied to field data; and the
+intensity route takes both the pressure and the intensity level as inputs,
+with the scanning probe and its phase-mismatch calibration outside the
+library.
 
 **Coverage inside the standards is partial in two places.** Of ISO 10848 only
 the Part 1 formulae are implemented generically, plus the Part 4 modal-overlap
@@ -12861,9 +12874,9 @@ produced them. Two implemented editions are pinned rather than current: the
 distortion metrics follow AES17-2015 and not the 2020 revision, and the
 microphone report follows IEC 60268-4:2014 and not the 2018 one. Thiele-Small
 parameter extraction from an impedance curve is not implemented, and the
-electrical and mechanical power-handling ratings of IEC 60268-5 clause 17 are
-stated by the manufacturer rather than computed. The feedback criterion is
-level bookkeeping, not an acoustic model: it consumes two direct-field levels
+electrical and mechanical power-handling ratings of IEC 60268-5 clauses 17 and
+18 are stated by the manufacturer rather than computed. The feedback criterion
+is level bookkeeping, not an acoustic model: it consumes two direct-field levels
 you supply, does not compute them from a coverage pattern, and predicts
 neither the ring frequency nor the effect of an equaliser or frequency
 shifter. And IEC 60268-16, the speech transmission index, is not part of this
@@ -16720,10 +16733,12 @@ Three specific absences are worth knowing before you plan a job. ISO 9614-1's
 discrete fixed-point power summation is **not implemented at all** — only its
 field indicators are, reused by the scanning routes. Dissipative duct-lining
 silencers are **not modelled from liner properties** anywhere: the reactive
-elements are computed exactly, and the lined-elbow and plenum figures are
-interpolated installation tables. And no page here predicts a panel's
-transmission loss: `enclosure_insertion_loss` combines a value you supply with
-the interior correction, and the prediction itself is [Insulation
+elements are computed exactly within the no-flow plane-wave model, and the
+lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
+attenuation Wells' closed form driven by a declared mean absorption — neither is a liner model.
+And no page here predicts a panel's transmission loss:
+`enclosure_insertion_loss` combines a value you supply with the interior
+correction, and the prediction itself is [Insulation
 design](https://jmrplens.github.io/phonometry/buildings/design/).
 
 Editions are pinned rather than current in two places: the distortion metrics
@@ -17630,9 +17645,10 @@ declared data, and the measurement standards named above are cited as the
 source of a supplier's figures, not implemented. Within the predictions, three
 limits are structural. **Only reactive silencer elements are computed** —
 dissipative duct-lining silencers are discussed for selection but are not
-modelled from liner properties anywhere in the library, and the lined-elbow
-and plenum figures on the HVAC page are interpolated installation tables
-rather than a liner model. **Mean flow is outside the element matrices**:
+modelled from liner properties anywhere in the library, and on the HVAC page
+the lined-elbow figure is a table lookup (Bies Table 8.11) and the plenum
+attenuation is Wells' closed form driven by a declared mean absorption — neither is a liner
+model. **Mean flow is outside the element matrices**:
 convection, temperature gradients and the flow-dependent impedance of
 perforates do not appear, so a silencer carrying significant flow is predicted
 as though it were not. And `enclosure_insertion_loss` **never predicts the
@@ -17941,8 +17957,9 @@ over interior volume) — the two numbers a prediction never captures.
 ## What this guide covers
 
 **Covered.** The Bies §8.11-8.17 / ASHRAE HVAC methods —
-`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
-tables), `hvac.plenum_attenuation` (Wells' closed form) and
+`hvac.end_reflection_loss` (interpolated table) and
+`hvac.elbow_insertion_loss` (Table 8.11 lookup),
+`hvac.plenum_attenuation` (Wells' closed form) and
 `hvac.flow_noise_straight_duct` / `flow_noise_bend` (VDI 2081) — and the
 machine-enclosure insertion loss of Bies §7.4, Eqs. (7.103) and (7.111),
 through `enclosure_insertion_loss`, which combines a supplied panel
@@ -17951,9 +17968,11 @@ transmission loss with the interior room-constant correction, together with the
 
 **Not covered.** The reactive elements — expansion chambers, side branches,
 extended tubes — live in [Silencers](https://jmrplens.github.io/phonometry/devices/noise-control/silencers/). Dissipative duct-lining
-silencers are modelled from liner properties nowhere in the library; the lined
-elbow and the plenum here are interpolated installation tables. Nothing on this
-page is a measurement: the ISO 11546 procedure of section 2 is described so a
+silencers are modelled from liner properties nowhere in the library: the
+lined-elbow figure here is a table lookup (Bies Table 8.11) and the plenum is
+Wells' closed form driven by a declared mean absorption — neither is a liner
+model. Nothing on this page is a measurement: the ISO 11546 procedure of
+section 2 is described so a
 declared figure can be read, not implemented. Structure-borne transmission from
 a machine into its enclosure or its slab is outside every model here.
 
@@ -18815,10 +18834,10 @@ matters for selection:
   pressure drop the silencer becomes the noise source.
 
 phonometry models the reactive family in closed form on this page. The
-dissipative side enters through the installation data of the
-[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the lined-elbow insertion loss and the
-lined plenum attenuation of Wells' method, both from interpolated ASHRAE
-data rather than a liner model. The porous physics that a first-principles
+dissipative side enters at installation level, through the
+[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/): the lined-elbow insertion loss read from
+tabulated ASHRAE data and the lined plenum attenuation from Wells' closed
+form, neither of them a liner model. The porous physics that a first-principles
 liner calculation needs, the equivalent-fluid models fed by the airflow
 resistivity, is the same material theory as
 [Porous and Multilayer Absorbers](https://jmrplens.github.io/phonometry/materials/absorbers/porous-absorbers/).
@@ -18856,9 +18875,10 @@ the insertion loss a supplier publishes.
 
 **Not covered.** Reactive elements only. Dissipative (absorptive, duct-lining)
 silencers are discussed for selection but never modelled from liner properties,
-and the lined-elbow and plenum data of the
-[HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) are interpolated installation tables, not a
-liner model. Mean-flow effects — convection, temperature gradients, the
+and in the [HVAC methods](https://jmrplens.github.io/phonometry/devices/noise-control/noise-control/) the lined-elbow figure is a table
+lookup (Bies Table 8.11) and the plenum is Wells' closed form driven by a
+declared mean absorption — neither is a liner model.
+Mean-flow effects — convection, temperature gradients, the
 flow-dependent impedance of perforates — are outside the no-flow element
 matrices used here. Nothing on this page is a measurement: no part of ISO 7235
 is implemented, shell breakout and the end corrections at the area jumps are
@@ -27846,9 +27866,13 @@ In the order the chain runs.
 **Nothing here is a verdict about a person.** ISO 1999 does not define a
 hearing handicap or a compensable fence — that line is set by national
 regulation, and the library applies none of it, so you supply and check the
-criterion yourself. The same is true of the exposure action values: the LEX,8h
-and its one-sided 95 % upper limit come out of ISO 9612, and the numbers they
-are compared against are in your jurisdiction's directive, not here.
+criterion yourself. The exposure side stops one step later: the LEX,8h and its
+one-sided 95 % upper limit come out of ISO 9612, and the fiche written by
+`ExposureResult.report()` does compare the LEX,8h against the Directive
+2003/10/EC action and limit values (80, 85 and 87 dB(A)) and issues the
+PASS/FAIL verdict against the limit value — but that is a verdict on an
+unprotected exposure, not on a person: the effective exposure behind hearing
+protectors, and any stricter national transposition, are still yours to check.
 
 Two implementation boundaries follow the standards. Only **database A** is
 implemented for ISO 1999: `htlan` always draws its age component from ISO
@@ -47696,8 +47720,8 @@ pile-driving noise has no closed form here or anywhere in the library.
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
 all three solvers assume a **range-independent** water column with no
 absorbing or elastic bottom and no real bathymetry — which rules out
-range-dependent problems entirely. The ray solver returns paths and travel
-times but not amplitudes (no ray-tube intensity, no caustic correction), and
+range-dependent problems entirely. The ray solver returns paths but not
+travel times or amplitudes (no ray-tube intensity, no caustic correction), and
 the parabolic equation is the standard small-angle Tappert form rather than a
 wide-angle Padé variant. For the elastic seabed physics these fluid solvers
 leave out, the [elastic wave solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/) is
@@ -49110,7 +49134,7 @@ print(round(float(modes.wavenumbers[0]), 5))    # 0.20885  computed kr1
 print(round(np.sqrt(k**2 - (np.pi / 200.0) ** 2), 5))   # 0.20885  exact
 ```
 
-## 3. Ray tracing: travel times and convergence zones
+## 3. Ray tracing: turning points and convergence zones
 
 In the high-frequency limit the Helmholtz equation collapses to the eikonal
 equation, and its characteristics are **rays**: trajectories integrated from
@@ -49151,7 +49175,7 @@ print(round(z_turn, 1))                     # 583.3  analytic turning depth
 print(round(float(rays.depths.max()), 1))   # 583.7  traced
 ```
 
-Rays buy geometry: eigenray paths, travel times and convergence-zone ranges
+Rays buy geometry: paths, turning depths and convergence-zone ranges
 at a cost independent of frequency. What they do not carry here is a full
 amplitude: the geometric ray-tube intensity diverges at caustics, so the
 result object returns the paths and leaves the level to the modal or PE
@@ -49257,12 +49281,12 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 
 | Solver | Natural regime | What it buys you |
 |---|---|---|
-| `ray_trace` | High frequency (water depth ≫ λ), deep water | Eigenray geometry, travel times, convergence zones; cost independent of frequency |
+| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, convergence zones; cost independent of frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
 | `parabolic_equation` | Low frequency, long one-way paths | Full-field TL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
-frequencies for travel-time work, and the PE remains the workhorse well above
+frequencies for path-geometry work, and the PE remains the workhorse well above
 its formal small-angle regime. When two of the three agree on a case, as the
 modes and the PE do in the section 1 figure, that agreement is the practical
 convergence test.
@@ -49287,7 +49311,7 @@ equation is why they all live in one module.
 ### Which underwater propagation solver should I use?
 
 Pick by frequency and geometry (Jensen et al. 2011, Ch. 1): rays for high
-frequency and deep water (eigenray geometry and travel times at a cost
+frequency and deep water (ray-path geometry and convergence zones at a cost
 independent of frequency), normal modes for low frequency in shallow water
 (few propagating modes, $m < kD/\pi$, the reference solution for its
 regime) and the parabolic equation for low-frequency, long one-way paths
@@ -49854,10 +49878,12 @@ for less severe seated exposures is distributed separately by ISO and is not
 implemented, which is what makes the 1 g delineation above a routing decision
 rather than a preference.
 
-And no exposure verdict is issued. The action and limit values of Directive
-2002/44/EC are stated so that an A(8) can be read against them, but the
-library applies no national implementation of the directive, and a
-risk-assessment conclusion is not a number this section produces.
+And the verdict stops at the directive itself. An A(8) is assessed against
+the action and limit values of Directive 2002/44/EC — each marked exceeded or
+not, the exposure zone named, and a PASS/FAIL verdict issued against the
+limit value — but the library applies no national transposition of the
+directive, and the conclusion of a workplace risk assessment is not a number
+this section produces.
 
 ---
 

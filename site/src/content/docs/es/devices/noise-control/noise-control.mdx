@@ -265,8 +265,9 @@ plt.show()
 
 </details>
 
-Los métodos de reflexión de extremo y de codos interpolan las tablas ASHRAE
-(pasan exactamente por los nodos tabulados); los métodos de plenum (Wells) y de
+El método de reflexión de extremo interpola su tabla ASHRAE (pasa exactamente
+por los nodos tabulados) y el de codos lee la Tabla 8.11 según la banda en la
+que cae su $W/\lambda$; los métodos de plenum (Wells) y de
 ruido de flujo (VDI 2081) son formas cerradas. `end_reflection_loss`,
 `elbow_insertion_loss`, `flow_noise_straight_duct` y `flow_noise_bend` devuelven
 un `HvacSpectrumResult` (atenuación o nivel de potencia acústica regenerada) con
@@ -578,10 +579,10 @@ comparar dos cosas distintas.
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-Los métodos HVAC de Bies §8.11-8.17 / ASHRAE: `hvac.end_reflection_loss` y
-`hvac.elbow_insertion_loss` (tablas interpoladas), `hvac.plenum_attenuation`
-(forma cerrada de Wells) y `hvac.flow_noise_straight_duct`/`flow_noise_bend`
-(VDI 2081). La pérdida por inserción de cerramientos de máquina de Bies §7.4
+Los métodos HVAC de Bies §8.11-8.17 / ASHRAE: `hvac.end_reflection_loss`
+(tabla interpolada) y `hvac.elbow_insertion_loss` (lectura de la Tabla 8.11),
+`hvac.plenum_attenuation` (forma cerrada de Wells) y
+`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). La pérdida por inserción de cerramientos de máquina de Bies §7.4
 (Ecs. (7.103), (7.111)), `enclosure_insertion_loss`, que combina una pérdida
 de transmisión de panel aportada con la corrección por la constante de sala
 interior, y el compuesto de paneles, puertas y aberturas que la alimenta
@@ -593,8 +594,10 @@ Los elementos de silenciador reactivo (cámaras de expansión, ramas laterales,
 tubos extendidos) se han trasladado a
 [Silenciadores](/phonometry/es/devices/noise-control/silencers/), y los
 silenciadores disipativos con revestimiento interior no se modelan a partir de
-las propiedades del revestimiento en ninguna parte: los valores de codo
-revestido y de plenum de esta página son tablas de instalación interpoladas.
+las propiedades del revestimiento en ninguna parte: la cifra de codo revestido
+de esta página es una lectura de tabla (la Tabla 8.11 de Bies) y el plenum es
+la forma cerrada de Wells gobernada por una absorción media declarada —
+ninguno de los dos es un modelo de revestimiento.
 `enclosure_insertion_loss` nunca predice la pérdida de transmisión de panel
 $R$; se aporta medida o de otro modelo, y el módulo solo la combina con la
 corrección interior. Nada de lo que hay aquí es una medición: el procedimiento

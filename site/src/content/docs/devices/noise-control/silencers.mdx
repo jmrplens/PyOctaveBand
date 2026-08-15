@@ -731,10 +731,11 @@ include_unlined=True)` for the two linings, and
 for the splitter unit.
 
 phonometry models the reactive family in closed form on this page. The
-dissipative side enters through the installation data of the
+dissipative side enters at installation level, through the
 [HVAC methods](/phonometry/devices/noise-control/noise-control/): the lined-elbow
-insertion loss and the lined plenum attenuation of Wells' method, both from
-interpolated ASHRAE data rather than a liner model. The porous physics that
+insertion loss read from tabulated ASHRAE data and the lined plenum
+attenuation from Wells' closed form, neither of them a liner model. The
+porous physics that
 a first-principles liner calculation needs, the equivalent-fluid models fed
 by the airflow resistivity, is the same material theory as
 [Porous and Multilayer Absorbers](/phonometry/materials/absorbers/porous-absorbers/).
@@ -830,8 +831,9 @@ Munjal Eq. (3.27)): the closed-form `expansion_chamber` (Eq. (8.111)),
 `helmholtz_resonator` and `quarter_wave_resonator` (Eqs. (8.46), (8.44)),
 `extended_tube_chamber`, and the `duct_matrix`/
 `shunt_matrix`/`cascade`/`transmission_loss`/`insertion_loss` building blocks
-for arbitrary element chains, each with its to-scale `.plot_geometry()`
-drawing, cross-checked against the independent FDTD solver; the
+for arbitrary element chains; the to-scale `.plot_geometry()` drawing on each
+of the four constructors' results, and the expansion chamber cross-checked
+against the independent FDTD solver; the
 `plane_wave_limit` that bounds all of them; and, as prose rather than as code,
 the ISO 7235 substitution measurement that produces the insertion loss a
 supplier publishes.
@@ -840,9 +842,11 @@ supplier publishes.
 <ScopeClaim status="not-covered" label="Not covered">
 Only reactive elements are computed: dissipative (absorptive, duct-lining)
 silencers are discussed for selection but not modelled from the liner
-properties, and the lined-elbow and plenum data of the [HVAC
-methods](/phonometry/devices/noise-control/noise-control/) are interpolated
-installation tables, not a liner model. Mean-flow effects (convection,
+properties, and in the [HVAC
+methods](/phonometry/devices/noise-control/noise-control/) the lined-elbow
+figure is a table lookup (Bies Table 8.11) and the plenum attenuation is
+Wells' closed form driven by a declared mean absorption — neither is a liner model.
+Mean-flow effects (convection,
 temperature gradients, flow-dependent impedance of perforates) are outside the
 no-flow element matrices used here. Nothing on this page is a measurement: no
 part of ISO 7235 is implemented, the shell breakout and the end corrections at

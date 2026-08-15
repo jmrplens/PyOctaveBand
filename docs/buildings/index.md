@@ -108,14 +108,16 @@ and from the physics of the element itself.
 ## What this section does not cover
 
 **The library starts after the microphone and stops before the geometry.** On
-the measurement side, every function takes band levels already averaged over
-positions and already corrected for background noise: the position counts, the
-low-frequency procedures, the signal-to-background floors and the
-test-facility qualifications of ISO 16283, ISO 10140 and ISO 3382 are the
-operator's job, and nothing here checks that they were done. On the prediction
-side, the element ratings, the junction indices and the covering improvements
-are inputs you supply from measurement or from a standard's own annex; none is
-derived from a drawing.
+the measurement side, position averaging happens once positions are supplied
+— the insulation functions energy-average per-position spectra for you — but
+nothing verifies how the measurement was made: the position counts and
+placements, the low-frequency procedures and the test-facility qualifications
+of ISO 16283, ISO 10140 and ISO 3382 are the operator's job. So is measuring
+the background noise: only the ISO 10140-4 laboratory correction is
+implemented, warning when its 6 dB floor is broken, and field levels must
+arrive already corrected. On the prediction side, the element ratings, the
+junction indices and the covering improvements are inputs you supply from
+measurement or from a standard's own annex; none is derived from a drawing.
 
 **Nothing here is a wave solver or a room model.** There is no geometry
 importer, no material database, no ray tracer and no auralisation: the room

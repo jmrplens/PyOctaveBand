@@ -106,19 +106,27 @@ emparentada EN 12354-5, vive en
 
 <Scope>
 <ScopeClaim status="not-covered">
-**La biblioteca empieza después del micrófono.** Cada función de aquí toma
-niveles de banda que ya se han promediado en energía sobre las posiciones y ya
-se han corregido por ruido de fondo, y nada verifica cómo se hizo la medición:
-ni el número y la colocación de las posiciones de fuente y de micrófono, ni
-los procedimientos de baja frecuencia de ISO 16283-1/-2, ni el mínimo de 6 dB
-de señal frente al ruido de fondo, ni los requisitos de instalación de ensayo
-y de montaje de ISO 10140-1. Eso es cosa del operador y del informe, y es lo
-que hace que los números de aquí signifiquen algo. Dos consecuencias que
+**La biblioteca empieza después del micrófono.** Las funciones de campo, de
+laboratorio, de control y de intensidad que forman un índice de aislamiento
+aceptan espectros por posición y los promedian en energía por ti; la
+estandarización de impacto pesado, los índices de flanco, los índices
+globales de ISO 717 y las funciones auxiliares de ruido de fondo toman su
+entrada por banda ya formada. En cualquiera de los dos casos, nada verifica
+cómo se hizo la medición: ni el número y la colocación de las posiciones de
+fuente y de micrófono detrás de esos espectros, ni los procedimientos de baja
+frecuencia de ISO 16283-1/-2, ni los requisitos de instalación de ensayo y de
+montaje de ISO 10140-1. Eso es cosa del operador y del informe, y es lo que
+hace que los números de aquí signifiquen algo. El ruido de fondo es la única
+corrección que de verdad queda en manos de quien llama: los niveles de campo
+han de llegar ya corregidos, con su mínimo de 6 dB de señal frente al ruido
+de fondo comprobado por el operador, mientras que la función auxiliar de
+laboratorio de ISO 10140-4 aplica su regla por sí misma, avisando cuando se
+incumple su propio mínimo y acotando la corrección. Dos consecuencias que
 conviene nombrar: las correcciones por ruido de fondo de campo y de
-laboratorio son reglas *distintas*, así que una función auxiliar de
+laboratorio son reglas *distintas*, así que esa función auxiliar de
 laboratorio no debe aplicarse a datos de campo; y la vía de intensidad toma
-como entradas tanto el nivel de presión como el de intensidad, con la sonda de
-barrido y su calibración del desajuste de fase fuera de la biblioteca.
+como entradas tanto el nivel de presión como el de intensidad, con la sonda
+de barrido y su calibración del desajuste de fase fuera de la biblioteca.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">

@@ -292,8 +292,9 @@ over interior volume) — the two numbers a prediction never captures.
 ## What this guide covers
 
 **Covered.** The Bies §8.11-8.17 / ASHRAE HVAC methods —
-`hvac.end_reflection_loss` and `hvac.elbow_insertion_loss` (interpolated
-tables), `hvac.plenum_attenuation` (Wells' closed form) and
+`hvac.end_reflection_loss` (interpolated table) and
+`hvac.elbow_insertion_loss` (Table 8.11 lookup),
+`hvac.plenum_attenuation` (Wells' closed form) and
 `hvac.flow_noise_straight_duct` / `flow_noise_bend` (VDI 2081) — and the
 machine-enclosure insertion loss of Bies §7.4, Eqs. (7.103) and (7.111),
 through `enclosure_insertion_loss`, which combines a supplied panel
@@ -302,9 +303,11 @@ transmission loss with the interior room-constant correction, together with the
 
 **Not covered.** The reactive elements — expansion chambers, side branches,
 extended tubes — live in [Silencers](silencers.md). Dissipative duct-lining
-silencers are modelled from liner properties nowhere in the library; the lined
-elbow and the plenum here are interpolated installation tables. Nothing on this
-page is a measurement: the ISO 11546 procedure of section 2 is described so a
+silencers are modelled from liner properties nowhere in the library: the
+lined-elbow figure here is a table lookup (Bies Table 8.11) and the plenum is
+Wells' closed form driven by a declared mean absorption — neither is a liner
+model. Nothing on this page is a measurement: the ISO 11546 procedure of
+section 2 is described so a
 declared figure can be read, not implemented. Structure-borne transmission from
 a machine into its enclosure or its slab is outside every model here.
 

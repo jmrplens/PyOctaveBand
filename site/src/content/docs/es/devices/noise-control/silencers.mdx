@@ -767,12 +767,12 @@ include_unlined=True)` para los dos revestimientos, y
 para la unidad de bafles.
 
 phonometry modela la familia reactiva en forma cerrada en esta página. El
-lado disipativo entra por los datos de instalación de los
+lado disipativo entra a nivel de instalación, por los
 [métodos HVAC](/phonometry/es/devices/noise-control/noise-control/): la pérdida por inserción
-del codo revestido y la atenuación del plenum revestido del método de Wells,
-ambas a partir de datos ASHRAE interpolados y no de un modelo de
-revestimiento. La física porosa que necesitaría un cálculo de revestimiento
-desde primeros principios, los modelos de fluido equivalente alimentados por
+del codo revestido, leída de datos ASHRAE tabulados, y la atenuación del
+plenum revestido según la forma cerrada de Wells; ninguna de las dos es un
+modelo de revestimiento. La física porosa que necesitaría un cálculo de
+revestimiento desde primeros principios, los modelos de fluido equivalente alimentados por
 la resistividad al flujo de aire, es la misma teoría de materiales que
 [Absorbentes porosos y multicapa](/phonometry/es/materials/absorbers/porous-absorbers/).
 
@@ -877,8 +877,9 @@ polos (Bies §8.8-8.9, Munjal Ec. (3.27)): la forma cerrada `expansion_chamber`
 (Ec. (8.111)), `helmholtz_resonator` y `quarter_wave_resonator` (Ecs. (8.46),
 (8.44)), `extended_tube_chamber`, y los bloques
 `duct_matrix`/`shunt_matrix`/`cascade`/`transmission_loss`/ `insertion_loss`
-para encadenar elementos arbitrarios, cada uno con su dibujo a escala
-`.plot_geometry()`, contrastados con la simulación FDTD independiente; el
+para encadenar elementos arbitrarios; el dibujo a escala `.plot_geometry()`
+del resultado de cada uno de los cuatro constructores, y la cámara de
+expansión contrastada con la simulación FDTD independiente; el
 `plane_wave_limit` que acota a todos ellos; y, como prosa y no como código, la
 medición por sustitución de ISO 7235 que produce la pérdida por inserción que
 publica un suministrador.
@@ -887,10 +888,11 @@ publica un suministrador.
 <ScopeClaim status="not-covered" label="No cubierto">
 Solo se calculan elementos reactivos: los silenciadores disipativos
 (absorbentes, con revestimiento interior) se discuten para la selección pero
-no se modelan a partir de las propiedades del revestimiento, y los datos de
-codo revestido y plenum de los [métodos
-HVAC](/phonometry/es/devices/noise-control/noise-control/) son tablas de
-instalación interpoladas, no un modelo de revestimiento. Los efectos del flujo
+no se modelan a partir de las propiedades del revestimiento, y en los [métodos
+HVAC](/phonometry/es/devices/noise-control/noise-control/) la cifra de codo
+revestido es una lectura de tabla (la Tabla 8.11 de Bies) y el plenum es la
+forma cerrada de Wells gobernada por una absorción media declarada — ninguno
+de los dos es un modelo de revestimiento. Los efectos del flujo
 medio (convección, gradientes de temperatura, impedancia de los perforados
 dependiente del flujo) quedan fuera de las matrices de elemento sin flujo que
 se usan aquí. Nada de lo que hay en esta página es una medición: no se

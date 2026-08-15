@@ -254,8 +254,9 @@ plt.show()
 
 </details>
 
-The end-reflection and elbow methods interpolate the ASHRAE tables (they pass
-exactly through the tabulated nodes); the plenum (Wells) and flow-noise (VDI
+The end-reflection method interpolates its ASHRAE table (it passes exactly
+through the tabulated nodes) and the elbow method reads Table 8.11 by the band
+its $W/\lambda$ falls in; the plenum (Wells) and flow-noise (VDI
 2081) methods are closed forms. `end_reflection_loss`, `elbow_insertion_loss`,
 `flow_noise_straight_duct` and `flow_noise_bend` return an `HvacSpectrumResult`
 (attenuation or regenerated sound power level) with `.plot()`; `plenum_attenuation`
@@ -557,10 +558,11 @@ with a value computed here compares two different things.
 
 <Scope>
 <ScopeClaim status="covered" label="Covered">
-The Bies §8.11-8.17 / ASHRAE HVAC methods: `hvac.end_reflection_loss` and
-`hvac.elbow_insertion_loss` (interpolated tables), `hvac.plenum_attenuation`
-(Wells closed form) and `hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI
-2081). The machine- enclosure insertion loss of Bies §7.4 (Eqs. (7.103),
+The Bies §8.11-8.17 / ASHRAE HVAC methods: `hvac.end_reflection_loss`
+(interpolated table) and `hvac.elbow_insertion_loss` (Table 8.11 lookup),
+`hvac.plenum_attenuation` (Wells closed form) and
+`hvac.flow_noise_straight_duct`/`flow_noise_bend` (VDI 2081). The machine-
+enclosure insertion loss of Bies §7.4 (Eqs. (7.103),
 (7.111)), `enclosure_insertion_loss`, combining a supplied panel transmission
 loss with the interior room-constant correction, and the composite of panels,
 doors and openings that feeds it (`composite_transmission_loss`).
@@ -571,7 +573,9 @@ The reactive silencer elements (expansion chambers, side branches, extended
 tubes) have moved to
 [Silencers](/phonometry/devices/noise-control/silencers/), and dissipative
 duct-lining silencers are not modelled from liner properties anywhere: the
-lined-elbow and plenum values here are interpolated installation tables.
+lined-elbow figure here is a table lookup (Bies Table 8.11) and the plenum is
+Wells' closed form driven by a declared mean absorption — neither is a liner
+model.
 `enclosure_insertion_loss` never predicts the panel transmission loss $R$
 itself; you supply it measured or from another model, and the module only
 combines it with the interior correction. Nothing here is a measurement: the

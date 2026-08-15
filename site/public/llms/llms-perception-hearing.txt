@@ -76,9 +76,13 @@ In the order the chain runs.
 **Nothing here is a verdict about a person.** ISO 1999 does not define a
 hearing handicap or a compensable fence — that line is set by national
 regulation, and the library applies none of it, so you supply and check the
-criterion yourself. The same is true of the exposure action values: the LEX,8h
-and its one-sided 95 % upper limit come out of ISO 9612, and the numbers they
-are compared against are in your jurisdiction's directive, not here.
+criterion yourself. The exposure side stops one step later: the LEX,8h and its
+one-sided 95 % upper limit come out of ISO 9612, and the fiche written by
+`ExposureResult.report()` does compare the LEX,8h against the Directive
+2003/10/EC action and limit values (80, 85 and 87 dB(A)) and issues the
+PASS/FAIL verdict against the limit value — but that is a verdict on an
+unprotected exposure, not on a person: the effective exposure behind hearing
+protectors, and any stricter national transposition, are still yours to check.
 
 Two implementation boundaries follow the standards. Only **database A** is
 implemented for ISO 1999: `htlan` always draws its age component from ISO

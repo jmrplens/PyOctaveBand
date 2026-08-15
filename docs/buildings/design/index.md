@@ -149,12 +149,16 @@ Pages elsewhere on the site that this section leans on:
 ## What this section does not cover
 
 **A prediction is only as good as the element data you feed it, and the
-library takes that data as given.** The element ratings, the junction indices,
-the covering improvement and the structure-to-airborne adjustment terms of EN
-12354-5 Annexes D and F are inputs you supply from measurement or from the
-standards' own annexes; none of them is derived here. The simplified
-prediction page stops at the weighted single numbers by design, and the
-detailed page is where the per-band models live.
+library takes that data as given.** The element ratings, the junction indices
+and the covering improvements are parameters the entry points consume,
+supplied from measurement or computed with this section's own estimators —
+the Annex E junction catalogue, the floating-floor and lining improvement
+laws, the Annex B homogeneous-element chain and the panel-physics models —
+and nothing checks the numbers you pass. Only the structure-to-airborne
+adjustment terms of EN 12354-5 Annexes D and F have no estimator here at all
+and must come from the standard's own tables. The simplified prediction page
+stops at the weighted single numbers by design, and the detailed page is
+where the per-band models live.
 
 Every panel model carries a validity range it does not extend past, and the
 guides flag each: Sharp's single-panel method is not valid below about 1.5
