@@ -117,12 +117,16 @@ def test_anchor_and_bold_carry_over() -> None:
     assert 'font-weight="600"' in element
 
 
-def test_mono_and_italic_ignored_for_math() -> None:
-    element = _element("$L_p$", mono=True, italic=True)
+def test_italic_ignored_and_mono_refused_for_math() -> None:
+    element = _element("$L_p$", italic=True)
     assert f'font-family="{_FONT}"' in element
     assert "Consolas" not in element
     # The only italics are the composed variables, not the whole string.
     assert 'text-anchor="middle" xml:space=' in element
+    # Mono cannot carry the $...$ styling: silently dropping it published
+    # a mis-set label, so the combination is refused outright.
+    with pytest.raises(ValueError, match="mono"):
+        _element("$L_p$", mono=True)
 
 
 def test_math_and_prose_escape_metacharacters() -> None:

@@ -188,7 +188,10 @@ def _d_signal_chain(s: SVG, th: Theme) -> None:
     for i, (title, sub, color) in enumerate(stages):
         s.rect(x, y, bw, bh, th.panel, color, rx=12, sw=2)
         s.text(x + bw / 2, y + 40, title, 22, th.fg, bold=True)
-        s.text(x + bw / 2, y + 68, sub, 19, color, mono=True)
+        # Mono is the code voice: it styles the literal stage tags, while a
+        # sub carrying $...$ mathematics composes in the text face (mono
+        # plus markup is refused by the canvas).
+        s.text(x + bw / 2, y + 68, sub, 19, color, mono="$" not in sub)
         if i < len(stages) - 1:
             s.arrow(x + bw + 1, y + bh / 2, x + bw + gap - 2, y + bh / 2, th.fg, 2)
         x += bw + gap
@@ -1809,7 +1812,10 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
     for title, detail, color in stages:
         s.rect(bx, y, bw, bh, th.panel, color, rx=12, sw=2)
         s.text(bx + bw / 2, y + 38, title, 20, th.fg, bold=True)
-        s.text(bx + bw / 2, y + 66, detail, 18, th.muted, mono=True)
+        # Mono is the code voice of the literal switch settings; the
+        # averaging-time detail carries $...$ mathematics and composes in
+        # the text face (mono plus markup is refused by the canvas).
+        s.text(bx + bw / 2, y + 66, detail, 18, th.muted, mono="$" not in detail)
         if y > 140:
             s.arrow(bx + bw / 2, y - 34, bx + bw / 2, y - 6, th.fg, 2)
         y += bh + 34

@@ -199,19 +199,21 @@ def _math_tokens(run: str, s: str, script: bool = False) -> list[tuple[str, str]
     return out
 
 
-def _math_spans(s: str, size: int) -> str:
-    """Compose a translated ``$...$`` string into styled ``<tspan>`` runs.
+def _math_runs(s: str) -> list[tuple[str, bool, float, float]]:
+    """Chunk a translated ``$...$`` string into styled runs.
 
-    Prose outside the ``$...$`` spans stays upright at the baseline; inside
-    them variables are italicised and ``_``/``^`` scripts are dropped or
-    raised via ``dy`` at reduced size, with the offset restored on the next
-    run. No tspan carries an ``x`` of its own, so the whole string remains
-    one text chunk and ``text-anchor`` keeps working. The caller must put
-    ``xml:space="preserve"`` on the wrapping ``<text>``: without it librsvg
-    collapses every space at a tspan boundary, even NBSP. Radicals keep the
-    house spelling ``√(...)``; there are no commands, every glyph is
-    literal, and a backslash in a math run is an error -- the LaTeX
-    commands of the matplotlib figures do not exist here.
+    Each run is ``(text, italic, shift, scale)``: the glyphs, whether they
+    are italicised, how far the baseline drops (positive) or rises
+    (negative) as a fraction of the font size, and the glyph scale
+    (:data:`_SCRIPT_SCALE` inside a script). Adjacent chunks of identical
+    style merge into one run -- that merge is a shaping-boundary decision,
+    not an optimisation: ``CN = `` kerns and shapes as a single run only
+    if it stays whole. Prose outside the ``$...$`` spans stays upright at
+    the baseline; inside them variables are italicised and ``_``/``^``
+    scripts are dropped or raised at reduced size. Radicals keep the house
+    spelling ``√(...)``; there are no commands, every glyph is literal,
+    and a backslash in a math run is an error -- the LaTeX commands of
+    the matplotlib figures do not exist here.
 
     Script policy: inside a ``_``/``^`` script, letters are indices and are
     set in italic (``$K_{ij}$``, ``$η_{ij}$``), except the descriptive
@@ -261,10 +263,23 @@ def _math_spans(s: str, size: int) -> str:
                 for kind2, payload2 in _math_tokens(payload, s, script=True):
                     add(payload2, italic=kind2 == "var", shift=shift,
                         scale=_SCRIPT_SCALE)
+    return chunks
 
+
+def _math_spans(s: str, size: int) -> str:
+    """Serialise the runs of :func:`_math_runs` into ``<tspan>`` markup.
+
+    Baseline shifts become cumulative rounded ``dy`` steps, script runs
+    carry their reduced ``font-size`` and italic runs their
+    ``font-style``. No tspan carries an ``x`` of its own, so the whole
+    string remains one text chunk and ``text-anchor`` keeps working. The
+    caller must put ``xml:space="preserve"`` on the wrapping ``<text>``:
+    without it librsvg collapses every space at a tspan boundary, even
+    NBSP.
+    """
     parts: list[str] = []
     baseline = 0.0
-    for text, italic, shift, scale in chunks:
+    for text, italic, shift, scale in _math_runs(s):
         attrs: list[str] = []
         dy = (shift - baseline) * size
         baseline = shift
@@ -323,20 +338,36 @@ class SVG:
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:
         s = self.tr(s)
-        fill = fill or self.th.fg
+        self.add(self._emit_text(x, y, s, size, fill or self.th.fg, anchor,
+                                 bold=bold, mono=mono, italic=italic))
+
+    def _emit_text(self, x: float, y: float, s: str, size: int, fill: str,
+                   anchor: str, *, bold: bool = False, mono: bool = False,
+                   italic: bool = False) -> str:
+        """The emission core of :meth:`text`: one already-translated label.
+
+        The caller translates; this composes and serialises. Keeping the
+        two apart is what lets the title of :meth:`render` share the exact
+        same emission as every body label.
+        """
         w = ' font-weight="600"' if bold else ""
         if "$" in s:
-            # Composed mathematics: ``mono`` and ``italic`` do not apply,
-            # the markup styles every glyph run itself (see _math_spans).
-            self.add(f'<text x="{x}" y="{y}" font-family="{_FONT}" '
-                     f'font-size="{size}" fill="{fill}" '
-                     f'text-anchor="{anchor}"{w} xml:space="preserve">'
-                     f'{_math_spans(s, size)}</text>')
-            return
+            if mono:
+                raise ValueError(
+                    f"mono cannot carry composed mathematics: {s!r} would "
+                    "drop its $...$ styling; write the label without mono "
+                    "or without markup"
+                )
+            # Composed mathematics: ``italic`` does not apply, the markup
+            # styles every glyph run itself (see _math_runs).
+            return (f'<text x="{x}" y="{y}" font-family="{_FONT}" '
+                    f'font-size="{size}" fill="{fill}" '
+                    f'text-anchor="{anchor}"{w} xml:space="preserve">'
+                    f'{_math_spans(s, size)}</text>')
         i = ' font-style="italic"' if italic else ""
         fam = _MONO if mono else _FONT
-        self.add(f'<text x="{x}" y="{y}" font-family="{fam}" font-size="{size}" '
-                 f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{_esc(s)}</text>')
+        return (f'<text x="{x}" y="{y}" font-family="{fam}" font-size="{size}" '
+                f'fill="{fill}" text-anchor="{anchor}"{w}{i}>{_esc(s)}</text>')
 
     def path(self, d: str, fill: str = "none", stroke: str = "none",
              sw: float = 1.5, dash: str = "") -> None:
