@@ -316,6 +316,33 @@ def test_without_criteria_the_fiche_says_so(tmp_path) -> None:
     assert f"{_oracle_lwa():.1f}" in text
 
 
+def test_clause_9_2_band_is_named_without_any_qualification(tmp_path) -> None:
+    """A not-applicable band is named even when no Annex C data was supplied.
+
+    The omission statement is the standard's, not the qualification's: a band
+    with non-positive net power leaves the A-weighted determination whether or
+    not the criteria were ever evaluated, so it is named either way.
+    """
+    pytest.importorskip("reportlab")
+    pytest.importorskip("svglib")
+    pytest.importorskip("matplotlib")
+    scan = np.tile(_INTENSITY, (_N_SEG, 1)).copy()
+    scan[:, 1] = -_INTENSITY[1]
+    with pytest.warns(SoundPowerWarning, match="non-positive in one or more bands"):
+        res = sound_power_intensity_precision(
+            scan,
+            np.full(_N_SEG, _SEG_AREA),
+            frequencies=_FREQS,
+            temperature=_TEMPERATURE,
+            barometric_pressure=_PRESSURE_PA,
+        )
+    out = tmp_path / "unqualified_negative.pdf"
+    res.report(str(out))
+    text = _extract_text(str(out))
+    assert "The Annex C qualification was not supplied" in text
+    assert "Bands omitted from LWA: 250 Hz (clause 9.2)" in text
+
+
 def test_qualified_set_states_that_nothing_is_omitted(tmp_path) -> None:
     """Every band qualifying is stated too, not left to silence."""
     pytest.importorskip("reportlab")

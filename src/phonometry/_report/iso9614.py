@@ -705,21 +705,34 @@ def _precision_criteria_strip(
         "referenced to the reference sound power 1 pW.",
         language,
     )
-    if criteria is None or criteria.qualified is None:
-        return text + " " + t(
-            "The Annex C qualification was not supplied with this "
-            "determination, so no band is omitted on its criteria.",
-            language,
+    parts = [text]
+    qualified = None if criteria is None else criteria.qualified
+    if qualified is None:
+        parts.append(
+            t(
+                "The Annex C qualification was not supplied with this "
+                "determination, so no band is omitted on its criteria.",
+                language,
+            )
         )
-    if not bool(np.any(omitted)):
-        return text + " " + t(
-            "Every band satisfies the Annex C criteria; none is omitted from "
-            "L<sub>WA</sub>.",
-            language,
+    # The list of omitted bands is the mandatory statement itself, and a band
+    # can be omitted under clause 9.2 with no qualification in sight, so it is
+    # printed whenever there is one to print.
+    if bool(np.any(omitted)):
+        parts.append(
+            t("Bands omitted from L<sub>WA</sub>: {bands}.", language).format(
+                bands=_omitted_band_list(result, criteria, omitted, language)
+            )
         )
-    return text + " " + t(
-        "Bands omitted from L<sub>WA</sub>: {bands}.", language
-    ).format(bands=_omitted_band_list(result, criteria, omitted, language))
+    elif qualified is not None:
+        parts.append(
+            t(
+                "Every band satisfies the Annex C criteria; none is omitted "
+                "from L<sub>WA</sub>.",
+                language,
+            )
+        )
+    return " ".join(parts)
 
 
 def render_precision_intensity_report(
