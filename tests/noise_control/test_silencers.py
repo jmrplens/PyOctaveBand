@@ -252,10 +252,13 @@ def test_chain_records_only_what_it_was_given() -> None:
         .shunt(sl.quarter_wave_impedance(f, 0.686, 7.85e-3), label="stub")
     )
     duct, shunt = chain.elements
-    assert duct.is_duct and (duct.length, duct.area) == (0.25, 0.0314)
-    assert duct.label is None and duct.shorting_frequency is None
+    assert duct.is_duct
+    assert (duct.length, duct.area) == (0.25, 0.0314)
+    assert duct.label is None
+    assert duct.shorting_frequency is None
     assert not shunt.is_duct
-    assert shunt.length is None and shunt.area is None
+    assert shunt.length is None
+    assert shunt.area is None
     assert shunt.label == "stub"
     # The one thing an impedance says about itself: where it is least, which
     # for a lossless quarter-wave tube is its tuning c/(4 l_e) = 125 Hz.
@@ -268,8 +271,9 @@ def test_chain_shunt_accepts_a_constant_and_rejects_a_mismatch() -> None:
     assert chain.transfer_matrix.shape == (100, 2, 2)
     # A constant impedance has no least value inside the grid.
     assert chain.elements[1].shorting_frequency is None
+    empty = sl.SilencerChain(f)
     with pytest.raises(ValueError, match="one value per analysis frequency"):
-        sl.SilencerChain(f).shunt(np.ones(7, dtype=np.complex128))
+        empty.shunt(np.ones(7, dtype=np.complex128))
 
 
 def test_chain_result_is_immune_to_later_additions() -> None:

@@ -68,11 +68,14 @@ _CHAIN_NOTE = (
 )
 
 
+#: Title every reactive-silencer drawing carries, whichever renderer draws it.
+_CROSS_SECTION = "Reactive silencer cross-section"
+
 #: Spanish translations of the fixed strings rendered here, keyed by their
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
 _STRINGS: dict[str, str] = {
-    "Reactive silencer cross-section": "Sección del silenciador reactivo",
+    _CROSS_SECTION: "Sección del silenciador reactivo",
     _KIND_EXPANSION: "cámara de expansión",
     _KIND_HELMHOLTZ: "resonador de Helmholtz",
     _KIND_QUARTER: "resonador de cuarto de onda",
@@ -453,7 +456,7 @@ def plot_silencer_geometry(
         )
     _finish_geometry_axes(
         ax,
-        _t("Reactive silencer cross-section", language)
+        _t(_CROSS_SECTION, language)
         + f" ({_t(kind, language)})",
     )
     return ax
@@ -647,12 +650,12 @@ def _dimension_chain(
             ax, (x0, y_wall), (x1, y_wall), _mm(x1 - x0, language),
             offset=y_lengths - y_wall, tight=(x1 - x0) < 0.25 * total,
         )
-    y_total = y_lengths
+    # A single segment is its own overall run, so the second line would repeat
+    # the first; the overall run is dimensioned only when there is more than one.
     if len(segments) > 1:
-        y_total = y_lengths - 1.6 * off
         _dim(
             ax, (0.0, y_lengths), (total, y_lengths),
-            "L = " + _mm(total, language), offset=y_total - y_lengths,
+            "L = " + _mm(total, language), offset=-1.6 * off,
         )
     drawn: set[float] = set()
     for x0, x1, area in _equal_area_runs(segments):
@@ -734,7 +737,7 @@ def plot_silencer_chain_geometry(
         _note_under(ax, total, _t(_CHAIN_NOTE, language))
     _finish_geometry_axes(
         ax,
-        _t("Reactive silencer cross-section", language)
+        _t(_CROSS_SECTION, language)
         + f" ({_t(_KIND_CHAIN, language)})",
     )
     return ax

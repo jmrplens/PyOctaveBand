@@ -1045,7 +1045,8 @@ class SilencerChain:
             radiation_impedance=radiation_impedance,
             kind=_KIND_CHAIN, areas=areas,
         )
-        return replace(computed, chain=self._snapshot())
+        attached: ReactiveSilencerResult = replace(computed, chain=self._snapshot())
+        return attached
 
     def plot_geometry(
         self, ax: Axes | None = None, *, language: str = "en"

@@ -151,8 +151,9 @@ def test_silencer_chain_without_a_duct_refuses_to_draw() -> None:
         chain.plot_geometry()
     # A zero-length duct is the identity matrix: nothing acoustically, and
     # nothing to draw either.
+    flat = pm.SilencerChain(FREQ).duct(0.0, 0.02)
     with pytest.raises(ValueError, match="no duct of positive length"):
-        pm.SilencerChain(FREQ).duct(0.0, 0.02).plot_geometry()
+        flat.plot_geometry()
 
 
 def test_silencer_free_function_validation() -> None:
