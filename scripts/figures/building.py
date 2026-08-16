@@ -278,8 +278,8 @@ def generate_intensity_insulation(output_dir: str) -> None:
     # Data-only info box (language-neutral); the Kc lift is explained by the
     # shaded "Kc adaptation" legend entry, which the ES translator handles.
     info = [
-        rf"$R_{{I,\mathrm{{w}}}}$ = {result.rating.rating} dB",
-        rf"$R_{{I,\mathrm{{M,w}}}}$ = {result.rating_modified.rating} dB",
+        rf"$R_\mathrm{{I,w}}$ = {result.rating.rating} dB",
+        rf"$R_\mathrm{{I,M,w}}$ = {result.rating_modified.rating} dB",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
