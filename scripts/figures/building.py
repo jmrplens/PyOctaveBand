@@ -919,7 +919,7 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (rf"$D_{{I,\mathrm{{n,e,w}}}}$($C$;$C_\mathrm{{tr}}$) = {res.rating.rating}"
+        (rf"$D_\mathrm{{I,n,e,w}}$($C$;$C_\mathrm{{tr}}$) = {res.rating.rating}"
          f"({_fmt_minus(res.rating.c)};{_fmt_minus(res.rating.ctr)}) dB"),
         (r"$D_{I,\mathrm{n,e}} = L_{p1} - 6 - [L_{I\mathrm{n}} + "
          r"10\,\log_{10}(S_\mathrm{m}/A_0)] + 10\,\log_{10} N$"),
