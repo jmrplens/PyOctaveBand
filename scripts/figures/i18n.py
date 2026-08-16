@@ -5673,9 +5673,9 @@ _ES_PATTERNS = [
     # Lamb's problem clip: the measured Rayleigh speed and the material line.
     (r"^surface train: (.+) m/s measured, (.+) m/s exact$",
      r"tren de superficie: \1 m/s medido, \2 m/s exacto"),
-    ((r"^aluminium: \$c_\\mathrm\{P\}\$ = (.+), \$c_\\mathrm\{S\}\$ = (.+), \$c_R\$ = (.+) m/s "
+    ((r"^aluminium: \$c_\\mathrm\{P\}\$ = (.+), \$c_\\mathrm\{S\}\$ = (.+), \$c_\\mathrm\{R\}\$ = (.+) m/s "
       r"\(C&H Eq\. 3\.149\)$"),
-     r"aluminio: $c_\\mathrm{P}$ = \1, $c_\\mathrm{S}$ = \2, $c_R$ = \3 m/s (C&H ec. 3.149)"),
+     r"aluminio: $c_\\mathrm{P}$ = \1, $c_\\mathrm{S}$ = \2, $c_\\mathrm{R}$ = \3 m/s (C&H ec. 3.149)"),
     # Mode-conversion clip: the display gain and the measured reflection.
     (r"^steel drawn ×(\d+) \(\+(\d+) dB\)$",
      r"acero dibujado ×\1 (+\2 dB)"),
