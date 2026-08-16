@@ -1386,7 +1386,7 @@ z
     </g>
    </g>
    <g id="text_27">
-    <!-- ISO 15186-1 Intensity Sound Reduction Index ($R_I$ and $R_{I,\mathrm{M}}$) -->
+    <!-- ISO 15186-1 Intensity Sound Reduction Index ($R_\mathrm{I}$ and $R_{I,\mathrm{M}}$) -->
     <g style="fill: #ffffff" transform="translate(203.005234 16.32) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-2c" d="M 628 4666 
@@ -1589,7 +1589,7 @@ z
      <use xlink:href="#DejaVuSans-3" transform="translate(2274.029297 0.015625)"/>
      <use xlink:href="#DejaVuSans-b" transform="translate(2305.816406 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(2344.830078 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-2c" transform="translate(2414.3125 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-2c" transform="translate(2414.3125 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(2437.691406 0.015625)"/>
      <use xlink:href="#DejaVuSans-44" transform="translate(2469.478516 0.015625)"/>
      <use xlink:href="#DejaVuSans-51" transform="translate(2530.757812 0.015625)"/>
@@ -1789,10 +1789,10 @@ L 76.566406 53.612109
      </g>
     </g>
     <g id="text_29">
-     <!-- $R_I$ (intensity) -->
+     <!-- $R_\mathrm{I}$ (intensity) -->
      <g style="fill: #ffffff" transform="translate(83.766406 56.762109) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(0 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-2c" transform="translate(69.482422 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-2c" transform="translate(69.482422 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(92.861328 0.015625)"/>
       <use xlink:href="#DejaVuSans-b" transform="translate(124.648438 0.015625)"/>
       <use xlink:href="#DejaVuSans-4c" transform="translate(163.662109 0.015625)"/>
@@ -1817,7 +1817,7 @@ L 76.566406 67.112812
      </g>
     </g>
     <g id="text_30">
-     <!-- $R_{I,\mathrm{M}} = R_I + K_\mathrm{c}$ -->
+     <!-- $R_{I,\mathrm{M}} = R_\mathrm{I} + K_\mathrm{c}$ -->
      <g style="fill: #ffffff" transform="translate(83.766406 70.262812) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-e" d="M 2944 4013 
@@ -1842,7 +1842,7 @@ z
       <use xlink:href="#DejaVuSans-30" transform="translate(126.015625 -14.906201) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(208.62793 0.09375)"/>
       <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(311.899414 0.09375)"/>
-      <use xlink:href="#DejaVuSans-Oblique-2c" transform="translate(381.381836 -14.906201) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-2c" transform="translate(381.381836 -14.906201) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-e" transform="translate(424.243164 0.09375)"/>
       <use xlink:href="#DejaVuSans-Oblique-2e" transform="translate(527.514648 0.09375)"/>
       <use xlink:href="#DejaVuSans-46" transform="translate(593.09082 -14.906201) scale(0.7)"/>
