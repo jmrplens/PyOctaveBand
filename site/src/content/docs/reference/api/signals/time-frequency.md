@@ -22,8 +22,8 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   resolution
   $1/T_B$ at a resolution-bandwidth-time product of one, so a single
   cell of random data is an unaveraged estimate: the power carries a
-  normalized random error of $1/\sqrt{n_d} = 1$ with
-  $n_d = 1$ (Eq. 8.158),
+  normalized random error of $1/\sqrt{n_\mathrm{d}} = 1$ with
+  $n_\mathrm{d} = 1$ (Eq. 8.158),
   and the magnitude display an error of
   $\sqrt{2}/1.25 \approx 1.13$ - the
   Rayleigh-ratio result Bendat & Piersol quote in Section 12.6.4.2.
@@ -90,7 +90,7 @@ $B_\mathrm{e} \approx 1/T_B$ of frequency resolution
 each cell is a single unaveraged estimate
 ($B_\mathrm{e} T_B \approx 1$), random
 data carries a per-cell normalized random error of 1 (Eq. 8.158 with
-$n_d = 1$): the spectrogram is a tool for deterministic
+$n_\mathrm{d} = 1$): the spectrogram is a tool for deterministic
 structure -
 tones, sweeps, transients - not a low-variance spectral estimator.
 
@@ -143,7 +143,7 @@ Calibrated STFT power spectrogram (B&P Section 12.6.4.2).
 | `power` | Power spectrogram, shape `(frequencies, times)` (units²/Hz for `'density'` scaling, units² for `'spectrum'`). Each column is the tapered periodogram of one segment, with the exact calibration of [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density): the column mean over time reproduces the Welch spectrum bin by bin. Integrating a `'density'` column over frequency gives that segment's taper-weighted mean square $\sum (x w)^2 / \sum w^2$; summing those over time *and multiplying by the hop duration* `hop/fs` recovers the record energy $\sum x^2 / f_\mathrm{s}$ when the squared taper overlap-adds to a constant (e.g. Hann at 75 % overlap), up to the taper roll-off at the record edges (the first and last segments are under-weighted: about 1-2 % low for typical records). |
 | `time_resolution` | Segment duration $T_B = \text{nperseg}/f_\mathrm{s}$, in seconds - the time resolution of the display. |
 | `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$ of the tapered segment, in Hz - the frequency resolution ($\approx 1/T_B$ for a light taper; the $B_\mathrm{e} T_B$ product per cell is close to 1). |
-| `random_error` | Normalized random error of each (unaveraged) power cell for random data, $1/\sqrt{n_d} = 1$ with $n_d = 1$ (Eq. 8.158); Bendat & Piersol quote $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display (Section 12.6.4.2). Deterministic components are unaffected. |
+| `random_error` | Normalized random error of each (unaveraged) power cell for random data, $1/\sqrt{n_\mathrm{d}} = 1$ with $n_\mathrm{d} = 1$ (Eq. 8.158); Bendat & Piersol quote $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display (Section 12.6.4.2). Deterministic components are unaffected. |
 | `n_segments` | Number of segments (columns). |
 | `hop` | Hop between segment starts, in samples. |
 | `window` | Taper name. |

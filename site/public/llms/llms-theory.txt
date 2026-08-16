@@ -599,7 +599,7 @@ radius ≈ 1.34 m for the standard geometry) and the valid range is
 the mathematics to the ISO 10534-2 transfer-function method below (its
 clauses 4/5.7/6.6); the implementation reuses that module, adding the Part 2
 geometry and validity limits ($f_\mathrm{u} = 0.58\ c_0/d$; microphone spacing bounds
-$0.45\ c_0/f_\mathrm{max}$ and $0.05\ c_0/f_{min}$, clause 5.4) and the Annex A
+$0.45\ c_0/f_\mathrm{max}$ and $0.05\ c_0/f_\mathrm{min}$, clause 5.4) and the Annex A
 subtractive correction for internal system losses.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insitu_subtraction.svg" alt="ISO 13472-1 in-situ road absorption by the subtraction technique: a loudspeaker at 1.25 m and a microphone at 0.25 m above the road surface, with the direct and road-reflected ray paths and a free-field reference measurement, the reflected component isolated by an Adrienne time window" width="92%"></picture>

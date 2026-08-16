@@ -48,9 +48,9 @@ machinery of [`phonometry.signals.spectra`](/phonometry/reference/api/signals/sp
 
 The random errors follow Bendat & Piersol Section 9.3: conditioning on the
 $i-1$ preceding inputs costs $i-1$ degrees of freedom, so the
-`i`-th ordered input carries $n_d - (i-1)$ effective averages
+`i`-th ordered input carries $n_\mathrm{d} - (i-1)$ effective averages
 (Eqs. 9.100/9.101) and the `q`-input multiple coherence carries
-$n_d - (q-1)$ (Eqs. 9.98/9.99).
+$n_\mathrm{d} - (q-1)$ (Eqs. 9.98/9.99).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -160,10 +160,10 @@ conditioning that produced the partial coherences is recorded in
 | `coherent_output_spectra` | Partial coherent output spectrum $G_{v_i}$ per input (Eq. 7.86), shape `(q, F)`: the output power the input contributes, with `sum(coherent_output_spectra) + noise_psd = output_psd`. |
 | `output_psd` | Measured output autospectrum $\hat{G}_{yy}(f)$. |
 | `noise_psd` | Residual (uncorrelated) output spectrum $\hat{G}_{nn} = \hat{G}_{yy \cdot q!}$ after removing every input (Eq. 7.121). |
-| `multiple_coherence_random_error` | Normalized random error of $\gamma^2_{y:x}$ (Eq. 9.98), using $n_d - (q-1)$ effective averages. |
-| `coherent_output_random_error` | Normalized random error of each $G_{v_i}$ (Eq. 9.100), shape `(q, F)`, using $n_d - (i-1)$ effective averages for the `i`-th ordered input. |
+| `multiple_coherence_random_error` | Normalized random error of $\gamma^2_{y:x}$ (Eq. 9.98), using $n_\mathrm{d} - (q-1)$ effective averages. |
+| `coherent_output_random_error` | Normalized random error of each $G_{v_i}$ (Eq. 9.100), shape `(q, F)`, using $n_\mathrm{d} - (i-1)$ effective averages for the `i`-th ordered input. |
 | `n_segments` | Raw number of (possibly overlapped) segments averaged. |
-| `n_averages` | Effective number of independent averages $n_d$. |
+| `n_averages` | Effective number of independent averages $n_\mathrm{d}$. |
 | `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |

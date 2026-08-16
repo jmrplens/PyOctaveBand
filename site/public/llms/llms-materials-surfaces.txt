@@ -315,7 +315,7 @@ f_\mathrm{u} = 0.58\,\frac{c_0}{d},
 $$
 
 with $d$ the tube diameter, and the microphone spacing $s$ must sit between
-$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_\mathrm{max}$. The reported range is the
+$0.05\,c_0/f_\mathrm{min}$ and $0.45\,c_0/f_\mathrm{max}$. The reported range is the
 one-third-octave bands 250–1600 Hz.
 
 ```python
