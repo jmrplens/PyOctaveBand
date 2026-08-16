@@ -93,7 +93,7 @@ which is the check that enforces the rule; see
   717-2:2013.
 - **Library behaviour:** implements A.2.1 as written and pins $C_I = -11$ with
   the 2013 print as the oracle
-  ([`tests/reference_data.py`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data.py), conformance check
+  ([`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data), conformance check
   "ISO 717-2 Annex C, Table C.1").
 - **Status:** unreported.
 
@@ -1119,7 +1119,7 @@ which is the check that enforces the rule; see
 - **Library behaviour:** `combined_tone_level` follows Anmerkung 2 (shared
   lines counted once), which reproduces the printed "2 FG" oracle; for the "6
   FG" row only the $\Delta L$ chain is pinned, with the contradiction recorded
-  in `tests/reference_data.py`.
+  in `tests/reference_data/`.
 - **Status:** unreported.
 
 ## DIN 45681:2005-03, Anhang I, Tabellen I.2 and I.10 (wrong spectrum index in a column header)
@@ -1308,7 +1308,7 @@ which is the check that enforces the rule; see
   entry carries the notice above.
 - **Library behaviour:** unaffected; the library computes the corrected values
   from the normative clauses and always did. Its Annex C.2 anchors
-  ([`tests/reference_data.py`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data.py),
+  ([`tests/reference_data/`](https://github.com/jmrplens/phonometry/blob/main/tests/reference_data),
   `ANSIS3_5_ANNEX_C1*` and `ANSIS3_5_ANNEX_C2*`) pin the errata-consistent
   chain of both examples, cross-checked to double precision against the
   working group's own reference implementation `SII.C` and its published
@@ -1742,7 +1742,7 @@ which is the check that enforces the rule; see
   Predicting Outdoor Sound 2e:2021, and on PDF page 4 (printed p. 22) of Miki,
   J. Acoust. Soc. Jpn (E) 11(1):1990.
 - **Library behaviour:** implements Miki's original 0.109; the digitization
-  point $f/\sigma = 0.1$ is pinned in ``tests/reference_data.py`` and in the
+  point $f/\sigma = 0.1$ is pinned in ``tests/reference_data/`` and in the
   conformance check "Miki 1990 Eqs. (30)-(34)".
 - **Status:** unreported (textbook rather than a standard).
 
