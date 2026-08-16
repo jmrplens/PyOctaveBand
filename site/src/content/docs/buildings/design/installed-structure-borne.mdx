@@ -196,7 +196,8 @@ for yk in (1e-4, 1e-3):               # elastic support, Formula 19e
     ax.semilogx(ratio, [float(building.coupling_term(a, yi, transfer_mobility=yk))
                         for a in ys], label=f"with $Y_k$ = {yk:g} m/(N·s)")
 ax.plot(7.07, 9.86, "o")              # the pump of the snippet
-ax.set(xlabel="Mobility ratio $|Y_s| / |Y_i|$", ylabel="Coupling term $D_C$ [dB]")
+ax.set(xlabel=r"Mobility ratio $|Y_\mathrm{s}| / |Y_i|$",
+       ylabel=r"Coupling term $D_\mathrm{C}$ [dB]")
 ax.legend()
 plt.show()
 ```

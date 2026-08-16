@@ -264,7 +264,7 @@ L 0 -2
       </g>
      </g>
      <g id="text_3">
-      <!-- Radio de curvatura $R_\mathrm{c} = c_0/|g|$ [m] -->
+      <!-- Radio de curvatura $R_{\mathrm{c}} = c_0/|g|$ [m] -->
       <g style="fill: #ffffff" transform="translate(335.321172 36.5) scale(0.1 -0.1)">
        <defs>
         <path id="DejaVuSans-35" d="M 2841 2188 
@@ -2079,7 +2079,7 @@ L 667.84 72.402344
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <!-- $h_\mathrm{s}/h_\mathrm{r}$ = 0,5 / 1,5 m -->
+     <!-- $h_{\mathrm{s}}/h_{\mathrm{r}}$ = 0,5 / 1,5 m -->
      <g style="fill: #ffffff" transform="translate(675.84 75.902344) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-Oblique-4b" d="M 3566 2113 
@@ -2159,7 +2159,7 @@ L 667.84 87.404688
 " style="fill: none; stroke: #2ca02c; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_23">
-     <!-- $h_\mathrm{s}/h_\mathrm{r}$ = 2 / 2 m -->
+     <!-- $h_{\mathrm{s}}/h_{\mathrm{r}}$ = 2 / 2 m -->
      <g style="fill: #ffffff" transform="translate(675.84 90.904688) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-Oblique-4b" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-56" transform="translate(63.378906 -14.984326) scale(0.7)"/>
@@ -2185,7 +2185,7 @@ L 667.84 102.407031
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_24">
-     <!-- $h_\mathrm{s}/h_\mathrm{r}$ = 2 / 10 m -->
+     <!-- $h_{\mathrm{s}}/h_{\mathrm{r}}$ = 2 / 10 m -->
      <g style="fill: #ffffff" transform="translate(675.84 105.907031) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-Oblique-4b" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-56" transform="translate(63.378906 -14.984326) scale(0.7)"/>

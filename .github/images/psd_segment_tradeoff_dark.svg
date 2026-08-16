@@ -2475,7 +2475,7 @@ L 619.389922 51.735117
      </g>
     </g>
     <g id="text_43">
-     <!-- random error, $10\lg(1+1/\sqrt{n_d})$ [dB] -->
+     <!-- random error, $10\lg(1+1/\sqrt{n_\mathrm{d}})$ [dB] -->
      <g style="fill: #ffffff" transform="translate(626.189922 54.710117) scale(0.085 -0.085)">
       <defs>
        <path id="STIXSizeOneSym-Regular-26" d="M 6970 9933 
@@ -2517,38 +2517,6 @@ Q 3622 2519 3608 2391
 Q 3594 2263 3566 2113 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-47" d="M 2675 525 
-Q 2444 222 2128 65 
-Q 1813 -91 1428 -91 
-Q 903 -91 598 267 
-Q 294 625 294 1247 
-Q 294 1766 478 2236 
-Q 663 2706 1013 3078 
-Q 1244 3325 1534 3454 
-Q 1825 3584 2144 3584 
-Q 2481 3584 2739 3421 
-Q 2997 3259 3138 2956 
-L 3513 4863 
-L 4091 4863 
-L 3144 0 
-L 2566 0 
-L 2675 525 
-z
-M 891 1350 
-Q 891 897 1095 644 
-Q 1300 391 1663 391 
-Q 1931 391 2161 520 
-Q 2391 650 2566 903 
-Q 2750 1166 2856 1509 
-Q 2963 1853 2963 2188 
-Q 2963 2622 2758 2865 
-Q 2553 3109 2194 3109 
-Q 1922 3109 1687 2981 
-Q 1453 2853 1288 2613 
-Q 1106 2353 998 2009 
-Q 891 1666 891 1350 
-z
-" transform="scale(0.015625)"/>
       </defs>
       <use xlink:href="#DejaVuSans-55" transform="translate(0 0.776514)"/>
       <use xlink:href="#DejaVuSans-44" transform="translate(41.113281 0.776514)"/>
@@ -2575,7 +2543,7 @@ z
       <use xlink:href="#DejaVuSans-12" transform="translate(1232.767578 0.776514)"/>
       <use xlink:href="#STIXSizeOneSym-Regular-26" transform="translate(1266.458984 1.265625) scale(0.55898)"/>
       <use xlink:href="#DejaVuSans-Oblique-51" transform="translate(1338.035309 0.75)"/>
-      <use xlink:href="#DejaVuSans-Oblique-47" transform="translate(1401.414215 -14.249951) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-47" transform="translate(1401.414215 -14.249951) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-c" transform="translate(1461.082184 0.776514)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1500.095856 0.776514)"/>
       <use xlink:href="#DejaVuSans-3e" transform="translate(1531.882965 0.776514)"/>

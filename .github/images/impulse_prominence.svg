@@ -1946,7 +1946,7 @@ L 885.765 38.289519
      </g>
     </g>
     <g id="text_36">
-     <!-- Adjustment $K_\mathrm{I}$ [dB] -->
+     <!-- Adjustment $K_{\mathrm{I}}$ [dB] -->
      <g transform="translate(454.659375 230.667656) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-24" d="M 2188 4044 
@@ -2103,7 +2103,7 @@ z
     </g>
    </g>
    <g id="text_37">
-    <!-- Adjustment to $L_\mathrm{Aeq}$ -->
+    <!-- Adjustment to $L_{\mathrm{Aeq}}$ -->
     <g transform="translate(632.186172 16.32) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -2202,7 +2202,7 @@ L 519.327344 39.42
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     </g>
     <g id="text_38">
-     <!-- $K_\mathrm{I} = 1.8\,(P-5)$ -->
+     <!-- $K_{\mathrm{I}} = 1.8\,(P-5)$ -->
      <g transform="translate(527.327344 42.92) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-c9c" d="M 678 2272 
@@ -2295,7 +2295,7 @@ z
      </g>
     </g>
     <g id="text_41">
-     <!-- Governing  $K_\mathrm{I}$ = 13.0 dB -->
+     <!-- Governing  $K_{\mathrm{I}}$ = 13.0 dB -->
      <g transform="translate(527.327344 87.925469) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-2a" d="M 3809 666 

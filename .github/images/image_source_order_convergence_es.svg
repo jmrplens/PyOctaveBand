@@ -1306,7 +1306,7 @@ z
      <use xlink:href="#DejaVuSans-14" transform="translate(1378.076172 0.015625)"/>
      <use xlink:href="#DejaVuSans-15" transform="translate(1441.699219 0.015625)"/>
     </g>
-    <!-- $V$ = 105 m³, $S$ = 142 m², $f_\mathrm{s}$ = 48 kHz -->
+    <!-- $V$ = 105 m³, $S$ = 142 m², $f_{\mathrm{s}}$ = 48 kHz -->
     <g transform="translate(491.711252 372.626426) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-Oblique-39" d="M 1319 0 

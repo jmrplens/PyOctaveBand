@@ -1249,7 +1249,7 @@ L 441.163437 26.5225
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_17">
-    <!-- ISO 1999 — NIPTS a $L_\mathrm{EX,8h}$ = 95 dB -->
+    <!-- ISO 1999 — NIPTS a $L_{\mathrm{EX,8h}}$ = 95 dB -->
     <g transform="translate(136.044609 16.5225) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-32" d="M 2522 4238 

@@ -265,8 +265,8 @@ def generate_tone_audibility_uncertainty(output_dir: str) -> None:
     edges = [-2.0, 0.0, 2.0, 4.0, 6.0, 9.0, 12.0, 14.0]
     for step, (low, high) in enumerate(itertools.pairwise(edges)):
         ax.axhline(high, color=COLOR_GRID, linewidth=1.0, linestyle=":")
-        ax.text(0.46, (low + high) / 2, f"$K_\\mathrm{{t}}$ = {step}", fontsize=9,
-                color=COLOR_FG, va="center", ha="left")
+        ax.text(0.46, (low + high) / 2, rf"$K_\mathrm{{t}}$ = {step}",
+                fontsize=9, color=COLOR_FG, va="center", ha="left")
     ax.axhline(0.0, color=COLOR_FG, linewidth=1.2)
 
     ax.fill_between([0.4, 5.8], mean - mean_u, mean + mean_u,
@@ -282,7 +282,8 @@ def generate_tone_audibility_uncertainty(output_dir: str) -> None:
                     fontsize=9, color=COLOR_FG)
 
     ax.annotate(
-        f"$K_\\mathrm{{t}}$ = {k_t} dB, but the interval reaches into $K_\\mathrm{{t}}$ = {k_low} dB",
+        rf"$K_\mathrm{{t}}$ = {k_t} dB, but the interval reaches into "
+        rf"$K_\mathrm{{t}}$ = {k_low} dB",
         xy=(3.0, mean - mean_u), xytext=(1.55, 1.1), fontsize=10,
         color=COLOR_SECONDARY,
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_SECONDARY})
@@ -624,7 +625,7 @@ def generate_two_tone_separation(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.semilogx(freqs, f_d, color=COLOR_PRIMARY, linewidth=2.2,
-                label="Threshold $f_\\mathrm{D}$ (Formula 19)")
+                label=r"Threshold $f_\mathrm{D}$ (Formula 19)")
     ax.fill_between(freqs, f_d, 100.0,
                     color=theme_fill(COLOR_PRIMARY, ax), zorder=0)
     ax.plot([212.0], [21.0], "o", color=COLOR_SECONDARY, markersize=9,
@@ -639,7 +640,7 @@ def generate_two_tone_separation(output_dir: str) -> None:
     ax.plot([137.3], [18.9], "s", color=COLOR_TERTIARY, markersize=9,
             zorder=5)
     ax.annotate("Annex E pair: 118.4 and 137.3 Hz,\n"
-                "18.9 Hz apart — below $f_\\mathrm{D}$, so combined",
+                r"18.9 Hz apart — below $f_\mathrm{D}$, so combined",
                 xy=(137.3, 18.9), xytext=(95.0, 44.0), fontsize=10,
                 color=COLOR_TERTIARY,
                 arrowprops={"arrowstyle": "->", "lw": 1.0,
@@ -649,8 +650,8 @@ def generate_two_tone_separation(output_dir: str) -> None:
     ax.text(600.0, 12.0, "energy-summed into one FG entry", fontsize=11,
             color=COLOR_FG, ha="center")
 
-    ax.set_xlabel("Frequency of the more audible tone $f_\\mathrm{T}$ [Hz]")
-    ax.set_ylabel(r"Frequency separation $|f_{T1} - f_{T2}|$ [Hz]")
+    ax.set_xlabel(r"Frequency of the more audible tone $f_\mathrm{T}$ [Hz]")
+    ax.set_ylabel(r"Frequency separation $|f_{\mathrm{T}1} - f_{\mathrm{T}2}|$ [Hz]")
     ax.set_xlim(88.0, 1000.0)
     ax.set_ylim(0.0, 100.0)
     ax.set_title("Two Tones in One Critical Band: Separate or Combined "
@@ -804,13 +805,14 @@ def generate_erb_bandwidth(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.loglog(f, erb, color=COLOR_PRIMARY, linewidth=2.2,
-              label=r"$\mathrm{ERB}_N$ (Glasberg & Moore, 1990)")
+              label=r"$\mathrm{ERB}_\mathrm{N}$ (Glasberg & Moore, 1990)")
     ax.loglog(f, third_octave, color=COLOR_SECONDARY, linewidth=1.6,
               linestyle="--", label="One-third octave (23 % of $f$)")
     ax.set_title("Auditory-Filter Bandwidth and the Cam Scale "
                  "(Glasberg & Moore, 1990)", pad=12)
     ax.set_xlabel("Centre frequency [Hz]")
-    ax.set_ylabel(r"Equivalent rectangular bandwidth $\mathrm{ERB}_N$ [Hz]")
+    ax.set_ylabel(
+        r"Equivalent rectangular bandwidth $\mathrm{ERB}_\mathrm{N}$ [Hz]")
     ax.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
     format_frequency_axis(ax, 50.0, 16000.0)
     from matplotlib.ticker import FixedFormatter, FixedLocator
@@ -840,7 +842,8 @@ def generate_erb_bandwidth(output_dir: str) -> None:
     ax2.set_xticklabels([f"{c:.0f}" for c in cam_ticks])
     ax2.xaxis.set_minor_locator(NullLocator())
     ax2.xaxis.set_minor_formatter(NullFormatter())
-    ax2.set_xlabel(r"$\mathrm{ERB}_N$ number [Cam]", color=COLOR_TERTIARY)
+    ax2.set_xlabel(r"$\mathrm{ERB}_\mathrm{N}$ number [Cam]",
+                   color=COLOR_TERTIARY)
     save_figure(output_dir, "erb_bandwidth.svg")
     plt.close()
 
@@ -1275,6 +1278,8 @@ def generate_annoyance_weightings(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0,
                             "color": COLOR_SECONDARY})
     ax.set_xlabel("Sharpness $S$ [acum]")
+    # S is the sharpness quantity symbol (the x label draws it as $S$), so the
+    # subscript of w stays italic: Fastl & Zwicker (16.3) prints it that way.
     ax.set_ylabel("Sharpness weighting $w_S$")
     ax.set_xlim(1.0, 5.0)
     ax.set_ylim(0.0, None)
@@ -1369,7 +1374,10 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        r"$\mathrm{{PA}} = N_5(1 + \sqrt{w_S^2 + w_{FR}^2})$",
+        # S, F and R are the sharpness, fluctuation-strength and roughness
+        # quantity symbols, drawn italic in the same box, so the subscripts
+        # they form stay italic too (Fastl & Zwicker, Eqs 16.2 to 16.4).
+        r"$\mathrm{PA} = N_5(1 + \sqrt{w_S^2 + w_{FR}^2})$",
         r"$w_S = (S - 1.75)\,0.25\,\log_{10}(N_5 + 10)$",
         r"$w_{FR} = (2.18/N_5^{0.4})(0.4\,F + 0.6\,R)$",
     ]
@@ -1538,10 +1546,12 @@ def generate_tone_audibility(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        r"$d\!f_\mathrm{c} = 25 + 75\,(1 + 1.4\,(f_\mathrm{T}/1000)^2)^{0.69}$",
-        (r"$L_\mathrm{G} = L_\mathrm{S} + 10\,\log_{10}(d\!f_\mathrm{c}/d\!f)$,"
+        r"$\Delta f_\mathrm{c} = 25 + 75\,(1 + 1.4\,(f_\mathrm{T}/1000)^2)^{0.69}$",
+        (r"$L_\mathrm{G} = L_\mathrm{S} + 10\,\log_{10}(\Delta f_\mathrm{c}"
+         r"/\Delta f)$,"
          r"  $a_\mathrm{v} = -2 - \log_{10}(1 + (f/502)^{2.5})$"),
-        r"$\Delta L = L_\mathrm{T} - L_\mathrm{G} - a_\mathrm{v}$  (combustion engine, Annex E)",
+        (r"$\Delta L = L_\mathrm{T} - L_\mathrm{G} - a_\mathrm{v}$"
+         r"  (combustion engine, Annex E)"),
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="left", fontsize=8.5, color=COLOR_FG,
@@ -1581,16 +1591,16 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
 
     # Daily energy-summed level and its one-sided 95 % upper limit LEX,8h + U.
     ax.axhspan(lex, upper, color=COLOR_SECONDARY, alpha=0.14, zorder=0,
-               label="$L_\\mathrm{EX,8h} + U$ (one-sided 95 %)")
+               label=r"$L_{\mathrm{EX,8h}} + U$ (one-sided 95 %)")
     ax.axhline(lex, color=COLOR_SECONDARY, linewidth=2.0, zorder=4,
-               label="Daily $L_\\mathrm{EX,8h}$")
+               label=r"Daily $L_{\mathrm{EX,8h}}$")
     ax.axhline(upper, color=COLOR_SECONDARY, linewidth=1.2, linestyle="--",
                zorder=4)
 
     box = [
-        f"$L_\\mathrm{{EX,8h}}$ = {lex:.1f} dB",
+        rf"$L_{{\mathrm{{EX,8h}}}}$ = {lex:.1f} dB",
         f"$U$ = {result.expanded_uncertainty:.1f} dB ($k$ = 1.65)",
-        f"$L_\\mathrm{{EX,8h}} + U$ = {upper:.1f} dB",
+        rf"$L_{{\mathrm{{EX,8h}}}} + U$ = {upper:.1f} dB",
     ]
     ax.text(0.03, 0.78, "\n".join(box), transform=ax.transAxes, va="top",
             ha="left", fontsize=10, color=COLOR_FG,
@@ -1600,7 +1610,7 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
     ax.set_title("ISO 9612 Task-Based Exposure (Annex D)",
                  pad=12)
     ax.set_xlabel("Measurement task")
-    ax.set_ylabel("$L_\\mathrm{EX,8h}$ contribution [dB]")
+    ax.set_ylabel(r"$L_{\mathrm{EX,8h}}$ contribution [dB]")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=15, ha="right")
     ax.set_ylim(0.0, upper + 10.0)
@@ -1840,12 +1850,13 @@ def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
 
     # --- Right: the two half-Gaussian spreads at the same frequency --------
     ax_spread.plot(ages, s_u, "-", color=COLOR_PRIMARY, linewidth=2.0,
-                   label="$s_\\mathrm{u}$ (worse than the median)")
+                   label=r"$s_\mathrm{u}$ (worse than the median)")
     ax_spread.plot(ages, s_l, "--", color=COLOR_TERTIARY, linewidth=2.0,
-                   label="$s_\\mathrm{l}$ (better than the median)")
+                   label=r"$s_\mathrm{l}$ (better than the median)")
     ax_spread.fill_between(ages, s_l, s_u, where=s_u >= s_l,
                            color=theme_fill(COLOR_PRIMARY, ax_spread),
-                           zorder=0, label="$s_\\mathrm{u} - s_\\mathrm{l}$: the asymmetry")
+                           zorder=0,
+                           label=r"$s_\mathrm{u} - s_\mathrm{l}$: the asymmetry")
     # The three-line clause note is far wider than the ten-year band it
     # describes, so the top of the panel keeps a clear strip for it: the note
     # is anchored to the right edge in axes coordinates (Spanish grows to the
@@ -1856,7 +1867,7 @@ def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
     ax_spread.set_ylim(-1.5, max(s_u.max(), s_l.max()) + 10.0)
     peak = int(np.argmax(s_u))
     ax_spread.annotate(
-        f"$s_\\mathrm{{u}}$ peaks at {ages[peak]:.0f} yr ({s_u[peak]:.1f} dB)",
+        rf"$s_\mathrm{{u}}$ peaks at {ages[peak]:.0f} yr ({s_u[peak]:.1f} dB)",
         xy=(ages[peak], s_u[peak]), xytext=(24.0, s_u[peak] + 4.0),
         fontsize=11, arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
@@ -1914,7 +1925,7 @@ def generate_nipts_level_growth(output_dir: str) -> None:
         xy=(76.5, 1.0), xytext=(76.0, 22.0), fontsize=11,
         arrowprops={"arrowstyle": "->", "lw": 1.0},
     )
-    ax_f.set_xlabel(r"$L_\mathrm{EX,8h}$ [dB(A)]")
+    ax_f.set_xlabel(r"$L_{\mathrm{EX,8h}}$ [dB(A)]")
     ax_f.set_ylabel("Median NIPTS $N_{50}$ [dB]")
     ax_f.set_title("ISO 1999 median NIPTS against level (40 years)",
                    pad=10)
@@ -1940,7 +1951,7 @@ def generate_nipts_level_growth(output_dir: str) -> None:
         )
         ax_t.text(lo - 0.6, 0.5 * (a + b), f"+{b - a:.1f} dB", fontsize=11,
                   ha="right", va="center", color=COLOR_FG)
-    ax_t.set_xlabel(r"$L_\mathrm{EX,8h}$ [dB(A)]")
+    ax_t.set_xlabel(r"$L_{\mathrm{EX,8h}}$ [dB(A)]")
     ax_t.set_ylabel("Median NIPTS at 4 kHz [dB]")
     ax_t.set_title("The same 3 dB is worth more the louder the job",
                    pad=10)
@@ -2016,13 +2027,13 @@ def generate_exposure_budget(output_dir: str) -> None:
 
     # --- Left: the Annex D variance budget, term by term ------------------
     parts = [
-        ("sampling  $(c_{1a}u_{1a})^2$", COLOR_PRIMARY,
+        (r"sampling  $(c_{1\mathrm{a}}u_{1\mathrm{a}})^2$", COLOR_PRIMARY,
          [(t.c1a * t.u1a) ** 2 for t in res.tasks]),
-        ("duration  $(c_{1b}u_{1b})^2$", COLOR_SECONDARY,
+        (r"duration  $(c_{1\mathrm{b}}u_{1\mathrm{b}})^2$", COLOR_SECONDARY,
          [(t.c1b * t.u1b) ** 2 for t in res.tasks]),
-        ("instrument  $(c_{1a}u_2)^2$", COLOR_TERTIARY,
+        (r"instrument  $(c_{1\mathrm{a}}u_2)^2$", COLOR_TERTIARY,
          [(t.c1a * t.u2) ** 2 for t in res.tasks]),
-        ("position  $(c_{1a}u_3)^2$", "#ff7f0e",
+        (r"position  $(c_{1\mathrm{a}}u_3)^2$", "#ff7f0e",
          [(t.c1a * t.u3) ** 2 for t in res.tasks]),
     ]
     labels = [t.label for t in res.tasks] + ["whole day"]
@@ -2062,7 +2073,7 @@ def generate_exposure_budget(output_dir: str) -> None:
 
     ax_n.plot(counts, expanded(scatter / np.sqrt(counts)), "-",
               color=COLOR_PRIMARY, linewidth=2.0,
-              label="task-based, $u_{1a}$ (Eq. C.6)")
+              label=r"task-based, $u_{1\mathrm{a}}$ (Eq. C.6)")
     ax_n.plot(counts,
               expanded(np.asarray([hearing.table_c4_contribution(int(n), scatter)
                                    for n in counts])),
@@ -2439,7 +2450,7 @@ def generate_noise_induced_hearing_loss(output_dir: str) -> None:
     ax_n.invert_yaxis()
     ax_n.set_xlabel("Audiometric frequency [Hz]")
     ax_n.set_ylabel("Median NIPTS [dB]")
-    ax_n.set_title(r"ISO 1999 — NIPTS at $L_\mathrm{EX,8h}$ = 95 dB",
+    ax_n.set_title(r"ISO 1999 — NIPTS at $L_{\mathrm{EX,8h}}$ = 95 dB",
                    pad=10)
     ax_n.grid(which="both", color=COLOR_GRID, linestyle="-", alpha=0.4)
     ax_n.set_axisbelow(True)

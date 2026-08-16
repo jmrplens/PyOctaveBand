@@ -610,15 +610,15 @@ def generate_open_plan_quality(output_dir: str) -> None:
     # Annex A: the two ends of the informative scale, shaded on each axis.
     ax_l.axhspan(50.0, 62.0, color=theme_fill(COLOR_SECONDARY, ax_l), zorder=0)
     ax_l.axhspan(30.0, 48.0, color=theme_fill(COLOR_PRIMARY, ax_l), zorder=0)
-    ax_l.annotate(r"$L_{p,\mathrm{A,S},4\,\mathrm{m}} > 50$ dB: poor", xy=(2.1, 59.0),
-                  fontsize=9, color=COLOR_FG)
+    ax_l.annotate(r"$L_{p,\mathrm{A,S},4\,\mathrm{m}} > 50$ dB: poor",
+                  xy=(2.1, 59.0), fontsize=9, color=COLOR_FG)
     ax_l.annotate(r"$L_{p,\mathrm{A,S},4\,\mathrm{m}} \leq 48$ dB: good target",
                   xy=(2.1, 32.0), fontsize=9, color=COLOR_FG)
     ax_s.axvspan(1.8, 5.0, color=theme_fill(COLOR_PRIMARY, ax_s), zorder=0)
     ax_s.axvspan(10.0, 20.0, color=theme_fill(COLOR_SECONDARY, ax_s), zorder=0)
-    ax_s.annotate(r"$r_\mathrm{D} \leq 5$ m: good", xy=(2.1, 0.10), fontsize=9,
-                  color=COLOR_FG)
-    ax_s.annotate(r"$r_\mathrm{D} > 10$ m: poor", xy=(10.4, 0.10), fontsize=9,
+    ax_s.annotate(r"$r_{\mathrm{D}} \leq 5$ m: good", xy=(2.1, 0.10),
+                  fontsize=9, color=COLOR_FG)
+    ax_s.annotate(r"$r_{\mathrm{D}} > 10$ m: poor", xy=(10.4, 0.10), fontsize=9,
                   color=COLOR_FG)
 
     for label, d2s, lp_4m, sti_0, sti_slope, color in cases:
@@ -632,14 +632,15 @@ def generate_open_plan_quality(output_dir: str) -> None:
         ax_l.plot(positions, levels, "o", color=color, markersize=7,
                   markerfacecolor="white", markeredgewidth=1.6,
                   label=rf"{label}: $D_{{2,\mathrm{{S}}}}$ = {res.d2s:.0f} dB, "
-                        rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = {res.lp_as_4m:.0f} dB")
+                        rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = "
+                        rf"{res.lp_as_4m:.0f} dB")
         ax_l.plot(4.0, res.lp_as_4m, "D", color=color, markersize=9, zorder=6)
         ax_s.plot(span, sti_0 - sti_slope * span, "--", color=color,
                   linewidth=1.6)
         ax_s.plot(positions, sti, "o", color=color, markersize=7,
                   markerfacecolor="white", markeredgewidth=1.6,
-                  label=f"{label}: $r_\\mathrm{{D}}$ = {res.rd:.1f} m, "
-                        f"$r_\\mathrm{{P}}$ = {res.rp:.0f} m")
+                  label=rf"{label}: $r_{{\mathrm{{D}}}}$ = {res.rd:.1f} m, "
+                        rf"$r_{{\mathrm{{P}}}}$ = {res.rp:.0f} m")
         ax_s.plot(res.rd, 0.50, "D", color=color, markersize=9, zorder=6)
 
     ax_l.axvline(4.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
@@ -689,10 +690,10 @@ def generate_absorption_per_table(output_dir: str) -> None:
     _fig, (ax_a, ax_w) = plt.subplots(1, 2, figsize=(12.5, 5.8))
 
     ax_a.plot(span, communication, color=COLOR_PRIMARY, linewidth=2.0,
-              label=r"Communication: $A_{\mathrm{tab}} > 6.31\,r_s^2$  "
-                    r"($L_{\mathrm{SN}} > -6$ dB)")
+              label=r"Communication: $A_{\mathrm{tab}} > 6.31\,r_{\mathrm{s}}^2$"
+                    r"  ($L_{\mathrm{SN}} > -6$ dB)")
     ax_a.plot(span, privacy, color=COLOR_SECONDARY, linewidth=2.0,
-              label=r"Privacy: $A_{\mathrm{tab}} < 3.16\,r_t^2$  "
+              label=r"Privacy: $A_{\mathrm{tab}} < 3.16\,r_{\mathrm{t}}^2$  "
                     r"($L_{\mathrm{SN}} < -9$ dB)")
     ax_a.axhspan(lower, upper, color=theme_fill(COLOR_TERTIARY, ax_a), zorder=0)
     ax_a.annotate(rf"feasible $A_{{\mathrm{{tab}}}}$: {lower:.1f} to "
@@ -701,11 +702,13 @@ def generate_absorption_per_table(output_dir: str) -> None:
                   color=COLOR_FG, ha="center")
     ax_a.plot([r_s], [lower], "o", color=COLOR_PRIMARY, markersize=9)
     ax_a.plot([r_t], [upper], "o", color=COLOR_SECONDARY, markersize=9)
-    ax_a.annotate(rf"$r_s$ = {r_s:g} m → $A_{{\mathrm{{tab}}}}$ > {lower:.1f} m²",
+    ax_a.annotate(rf"$r_{{\mathrm{{s}}}}$ = {r_s:g} m → "
+                  rf"$A_{{\mathrm{{tab}}}}$ > {lower:.1f} m²",
                   xy=(r_s, lower), xytext=(0.66, 22.0), fontsize=9,
                   color=COLOR_PRIMARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_PRIMARY})
-    ax_a.annotate(rf"$r_t$ = {r_t:g} m → $A_{{\mathrm{{tab}}}}$ < {upper:.1f} m²",
+    ax_a.annotate(rf"$r_{{\mathrm{{t}}}}$ = {r_t:g} m → "
+                  rf"$A_{{\mathrm{{tab}}}}$ < {upper:.1f} m²",
                   xy=(r_t, upper), xytext=(2.05, 6.0), fontsize=9,
                   color=COLOR_SECONDARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_SECONDARY})
@@ -732,7 +735,8 @@ def generate_absorption_per_table(output_dir: str) -> None:
     ax_w.fill_between(ratios, 0.0, width, where=width > 0.0, zorder=0,
                       color=theme_fill(COLOR_TERTIARY, ax_w))
     ax_w.axvline(closure, color=COLOR_SECONDARY, linestyle="--", linewidth=1.6)
-    ax_w.annotate(f"window closes at $r_t/r_s$ = {closure:.2f}",
+    ax_w.annotate(rf"window closes at $r_{{\mathrm{{t}}}}/r_{{\mathrm{{s}}}}$ = "
+                  rf"{closure:.2f}",
                   xy=(closure, -4.0), xytext=(closure + 0.05, -4.0),
                   fontsize=10, color=COLOR_SECONDARY)
     ax_w.plot([r_t / r_s], [upper - lower], "o", color=COLOR_TERTIARY,
@@ -741,10 +745,11 @@ def generate_absorption_per_table(output_dir: str) -> None:
                   xy=(r_t / r_s, upper - lower), xytext=(1.02, 9.6),
                   fontsize=9, color=COLOR_TERTIARY,
                   arrowprops={"arrowstyle": "->", "color": COLOR_TERTIARY})
-    ax_w.set_xlabel("Table spacing over cross-table separation, $r_t/r_s$")
+    ax_w.set_xlabel(r"Table spacing over cross-table separation, "
+                    r"$r_{\mathrm{t}}/r_{\mathrm{s}}$")
     ax_w.set_ylabel(r"Width of the feasible $A_{\mathrm{tab}}$ window [m²]")
     ax_w.set_xlim(1.0, 2.2)
-    ax_w.set_title(f"Packed tables close it ($r_s$ = {r_s:g} m)",
+    ax_w.set_title(rf"Packed tables close it ($r_{{\mathrm{{s}}}}$ = {r_s:g} m)",
                    pad=10)
     ax_w.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_w.set_axisbelow(True)
@@ -775,15 +780,18 @@ def generate_open_plan_decay(output_dir: str) -> None:
     rr = np.logspace(np.log10(2.0), np.log10(16.0), 100)
     line_spl, = ax.plot(rr, a_lp + b_log * np.log10(rr), color=COLOR_PRIMARY,
                         linestyle="--", linewidth=1.8,
-                        label=f"Spatial decay $D_{{2,\\mathrm{{S}}}}$ = {m.d2s:.1f} dB")
+                        label=rf"Spatial decay $D_{{2,\mathrm{{S}}}}$ = "
+                              rf"{m.d2s:.1f} dB")
     pts_spl, = ax.plot(r, lp, "o", color=COLOR_PRIMARY, markersize=7,
                        markerfacecolor="white", markeredgewidth=1.6,
-                       label=r"Measured $L_{p,A,S}$")
+                       label=r"Measured $L_{p,\mathrm{A,S}}$")
     ax.axvline(4.0, color=COLOR_FG, linestyle=":", alpha=0.35, linewidth=1)
     mark_4m, = ax.plot(4.0, m.lp_as_4m, "D", color=COLOR_SECONDARY, markersize=9,
                        zorder=6,
-                       label=rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB")
-    ax.annotate(rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = {m.lp_as_4m:.0f} dB",
+                       label=rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = "
+                             rf"{m.lp_as_4m:.0f} dB")
+    ax.annotate(rf"$L_{{p,\mathrm{{A,S}},4\,\mathrm{{m}}}}$ = "
+                rf"{m.lp_as_4m:.0f} dB",
                 xy=(4.0, m.lp_as_4m),
                 xytext=(4.7, m.lp_as_4m + 4.5), fontsize=10,
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
@@ -811,8 +819,9 @@ def generate_open_plan_decay(output_dir: str) -> None:
     # r_D is called out to the right of its marker: the space to its left holds
     # the 4 m diamond and the leader of the L_p,A,S,4m callout. r_P sits near the
     # right frame, so its own callout goes to the left.
-    for dist, level, name, xfac, yoff in [(m.rd, 0.50, "$r_\\mathrm{D}$", 1.18, 0.07),
-                                          (m.rp, 0.20, "$r_\\mathrm{P}$", 0.62, 0.03)]:
+    for dist, level, name, xfac, yoff in [
+            (m.rd, 0.50, r"$r_{\mathrm{D}}$", 1.18, 0.07),
+            (m.rp, 0.20, r"$r_{\mathrm{P}}$", 0.62, 0.03)]:
         ax2.axhline(level, color=COLOR_FG, linestyle=":", alpha=0.25, linewidth=1)
         ax2.plot(dist, level, "v", color=COLOR_SECONDARY, markersize=9, zorder=6)
         ax2.annotate(f"{name} = {dist:.1f} m", xy=(dist, level),
@@ -1587,7 +1596,7 @@ def generate_image_source_order_convergence(output_dir: str) -> None:
 
     info = [
         r"room 7 × 5 × 3 m, $\alpha$ = 0.12",
-        "$V$ = 105 m³, $S$ = 142 m², $f_\\mathrm{s}$ = 48 kHz",
+        r"$V$ = 105 m³, $S$ = 142 m², $f_{\mathrm{s}}$ = 48 kHz",
         "shaded: ±10 % around Eyring",
     ]
     ax.text(0.985, 0.04, "\n".join(info), transform=ax.transAxes,
@@ -1807,11 +1816,12 @@ def generate_steady_state_directivity(output_dir: str) -> None:
                                    mean_absorption=0.15, distances=grid,
                                    directivity=q)
         left.semilogx(field.distances, field.total, color=colour, linewidth=2.0,
-                      label=f"$Q$ = {q:g}  ($r_\\mathrm{{c}}$ = {field.critical_distance:.2f} m)",
+                      label=rf"$Q$ = {q:g}  ($r_{{\mathrm{{c}}}}$ = "
+                            rf"{field.critical_distance:.2f} m)",
                       zorder=5)
         left.axvline(field.critical_distance, color=colour, linestyle=":",
                      linewidth=1.2, zorder=3)
-    left.set_title(r"$Q$ moves $r_\mathrm{c}$, not the plateau",
+    left.set_title(r"$Q$ moves $r_{\mathrm{c}}$, not the plateau",
                    pad=10)
     left.legend(loc="upper right", fontsize=9)
 
@@ -1964,7 +1974,7 @@ def generate_decay_range_bias(output_dir: str) -> None:
 
     info = [
         "synthetic single-slope decay, $T$ = 1.0 s",
-        "white noise floor swept, $f_\\mathrm{s}$ = 48 kHz",
+        r"white noise floor swept, $f_{\mathrm{s}}$ = 48 kHz",
         "green band: the 5 % JND",
         "red band: flagged invalid for T20",
         "below ~34 dB the fit returns NaN",

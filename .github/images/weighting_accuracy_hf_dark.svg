@@ -694,7 +694,7 @@ L 705.503125 28.32
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_8">
-    <!-- A-Weighting High-Frequency Accuracy @ $f_\mathrm{s}$ = 48 kHz -->
+    <!-- A-Weighting High-Frequency Accuracy @ $f_{\mathrm{s}}$ = 48 kHz -->
     <g style="fill: #ffffff" transform="translate(219.304297 16.32) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-24" d="M 2188 4044 

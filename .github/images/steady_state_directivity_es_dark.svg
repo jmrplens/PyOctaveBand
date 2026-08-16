@@ -1485,7 +1485,7 @@ z
     </g>
    </g>
    <g id="text_14">
-    <!-- $Q$ mueve $r_\mathrm{c}$, no la meseta -->
+    <!-- $Q$ mueve $r_{\mathrm{c}}$, no la meseta -->
     <g style="fill: #ffffff" transform="translate(178.642695 16.798125) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-Oblique-34" d="M 2309 -84 
@@ -1763,7 +1763,7 @@ L 356.967109 38.588125
 " style="fill: none; stroke: #32648e; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_15">
-     <!-- $Q$ = 1  ($r_\mathrm{c}$ = 1,11 m) -->
+     <!-- $Q$ = 1  ($r_{\mathrm{c}}$ = 1,11 m) -->
      <g style="fill: #ffffff" transform="translate(364.167109 41.738125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-b" d="M 1984 4856 
@@ -1822,7 +1822,7 @@ L 356.967109 52.090234
 " style="fill: none; stroke: #1e9b8a; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_16">
-     <!-- $Q$ = 2  ($r_\mathrm{c}$ = 1,57 m) -->
+     <!-- $Q$ = 2  ($r_{\mathrm{c}}$ = 1,57 m) -->
      <g style="fill: #ffffff" transform="translate(364.167109 55.240234) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(78.710938 0.125)"/>
@@ -1853,7 +1853,7 @@ L 356.967109 65.592344
 " style="fill: none; stroke: #69cd5b; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_17">
-     <!-- $Q$ = 4  ($r_\mathrm{c}$ = 2,22 m) -->
+     <!-- $Q$ = 4  ($r_{\mathrm{c}}$ = 2,22 m) -->
      <g style="fill: #ffffff" transform="translate(364.167109 68.742344) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(78.710938 0.125)"/>
@@ -1884,7 +1884,7 @@ L 356.967109 79.094453
 " style="fill: none; stroke: #fde725; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <!-- $Q$ = 8  ($r_\mathrm{c}$ = 3,14 m) -->
+     <!-- $Q$ = 8  ($r_{\mathrm{c}}$ = 3,14 m) -->
      <g style="fill: #ffffff" transform="translate(364.167109 82.244453) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(78.710938 0.125)"/>

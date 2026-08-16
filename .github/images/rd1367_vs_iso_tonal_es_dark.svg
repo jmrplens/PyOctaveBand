@@ -1380,7 +1380,7 @@ Q 51.323846 75.743644 54.323846 75.743644
 z
 " style="fill: #1c2128; opacity: 0.9; stroke: #ffffff; stroke-linejoin: miter"/>
     </g>
-    <!-- RD 1367 tonal_correction: $K_\mathrm{t}$ = 6 dB -->
+    <!-- RD 1367 tonal_correction: $K_{\mathrm{t}}$ = 6 dB -->
     <g style="fill: #ffffff" transform="translate(54.323846 45.333293) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-35" d="M 2841 2188 
@@ -1673,7 +1673,7 @@ z
      <use xlink:href="#DejaVuSans-58" transform="translate(2309.3125 0)"/>
      <use xlink:href="#DejaVuSans-48" transform="translate(2372.6875 0)"/>
     </g>
-    <!-- $L_\mathrm{t}$ en 250 Hz = 10,5 dB -->
+    <!-- $L_{\mathrm{t}}$ en 250 Hz = 10,5 dB -->
     <g style="fill: #ffffff" transform="translate(54.323846 69.340324) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -1720,7 +1720,7 @@ z
     </g>
    </g>
    <g id="text_24">
-    <!-- $L_\mathrm{t}$ = 10,5 dB: los dos métodos coinciden -->
+    <!-- $L_{\mathrm{t}}$ = 10,5 dB: los dos métodos coinciden -->
     <g style="fill: #ffffff" transform="translate(137.180195 16.8) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-50" d="M 3328 2828 
@@ -2444,7 +2444,7 @@ Q 498.892674 75.743644 501.892674 75.743644
 z
 " style="fill: #1c2128; opacity: 0.9; stroke: #ffffff; stroke-linejoin: miter"/>
     </g>
-    <!-- RD 1367 tonal_correction: $K_\mathrm{t}$ = 3 dB -->
+    <!-- RD 1367 tonal_correction: $K_{\mathrm{t}}$ = 3 dB -->
     <g style="fill: #ffffff" transform="translate(501.892674 45.333293) scale(0.1 -0.1)">
      <use xlink:href="#DejaVuSans-35" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-27" transform="translate(69.482422 0.015625)"/>
@@ -2533,7 +2533,7 @@ z
      <use xlink:href="#DejaVuSans-56" transform="translate(2359.234375 0)"/>
      <use xlink:href="#DejaVuSans-48" transform="translate(2411.328125 0)"/>
     </g>
-    <!-- $L_\mathrm{t}$ en 250 Hz = 7,5 dB -->
+    <!-- $L_{\mathrm{t}}$ en 250 Hz = 7,5 dB -->
     <g style="fill: #ffffff" transform="translate(501.892674 69.340324) scale(0.1 -0.1)">
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-57" transform="translate(55.712891 -14.984326) scale(0.7)"/>
@@ -2559,7 +2559,7 @@ z
     </g>
    </g>
    <g id="text_39">
-    <!-- $L_\mathrm{t}$ = 7,5 dB: los veredictos se separan -->
+    <!-- $L_{\mathrm{t}}$ = 7,5 dB: los veredictos se separan -->
     <g style="fill: #ffffff" transform="translate(591.769023 16.8) scale(0.12 -0.12)">
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-57" transform="translate(55.712891 -14.984326) scale(0.7)"/>

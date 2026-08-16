@@ -889,7 +889,7 @@ L 777.503125 28.8
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_12">
-    <!-- El límite homogéneo: 500 Hz, suelo rígido, $h_\mathrm{s} = h_\mathrm{r}$ = 2 m -->
+    <!-- El límite homogéneo: 500 Hz, suelo rígido, $h_{\mathrm{s}} = h_{\mathrm{r}}$ = 2 m -->
     <g style="fill: #ffffff" transform="translate(244.384297 16.8) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-28" d="M 628 4666 

@@ -2362,7 +2362,7 @@ export const glossary = [
       },
       {
         id: "l-ws",
-        symbol: "$L_{Ws}$",
+        symbol: "$L_{W\mathrm{s}}$",
         unit: "dB re 1 pW",
         standard: "EN 15657:2018",
         clause: {

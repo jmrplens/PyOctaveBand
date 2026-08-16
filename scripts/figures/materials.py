@@ -68,8 +68,10 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
     info = [
         r"$f_0 = (1/2\pi)\sqrt{s^{\prime}/m^{\prime}}$  (Formula 2)",
         r"$s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$  (clause 8.2)",
-        r"$s^{\prime}_\mathrm{t} = 4\pi^2 m^{\prime}_\mathrm{t} f_\mathrm{r}^2$  (Formula 4)",
-        r"$s^{\prime}_\mathrm{a} = p_0/(d\,\varepsilon) \approx 111/d$ MN/m³  (NOTE)",
+        (r"$s^{\prime}_\mathrm{t} = 4\pi^2 m^{\prime}_\mathrm{t} f_\mathrm{r}^2$"
+         r"  (Formula 4)"),
+        (r"$s^{\prime}_\mathrm{a} = p_0/(d\,\varepsilon) \approx 111/d$"
+         r" MN/m³  (NOTE)"),
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=10, color=COLOR_FG,
@@ -98,7 +100,7 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
     rig = np.linspace(8.0, 70.0, 600)
     ax_l.plot(rig, 20.0 * np.log10(sdof(rig, 25.0, 0.14)),
               color=COLOR_PRIMARY, linewidth=2.0, zorder=3,
-              label="small excitation: $f_\\mathrm{r}$ = 25.0 Hz")
+              label=r"small excitation: $f_\mathrm{r}$ = 25.0 Hz")
     ax_l.plot(rig, 20.0 * np.log10(sdof(rig, 22.0, 0.22)),
               color=COLOR_SECONDARY, linewidth=1.8, linestyle="--", zorder=3,
               label="over-driven: peak lower and at 22 Hz")
@@ -111,7 +113,7 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
     ax_l.set_xlim(rig[0], rig[-1])
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel("Load-plate response [dB re static]")
-    ax_l.set_title("On the rig: reading $f_\\mathrm{r}$", pad=12)
+    ax_l.set_title(r"On the rig: reading $f_\mathrm{r}$", pad=12)
     ax_l.legend(loc="upper right", fontsize=9)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
@@ -177,12 +179,15 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     ax.loglog(d_mm, s_frame, color=COLOR_PRIMARY, linewidth=1.9,
-              linestyle="--", zorder=3, label=r"$s^{\prime}_\mathrm{t}$, frame (Formula 4)")
+              linestyle="--", zorder=3,
+              label=r"$s^{\prime}_\mathrm{t}$, frame (Formula 4)")
     ax.loglog(d_mm, s_gas, color=COLOR_TERTIARY, linewidth=1.9,
               linestyle="-.", zorder=3,
-              label=r"$s^{\prime}_\mathrm{a}$, enclosed gas (Formula 7, $\varepsilon = 0.9$)")
+              label=r"$s^{\prime}_\mathrm{a}$, enclosed gas"
+                    r" (Formula 7, $\varepsilon = 0.9$)")
     ax.loglog(d_mm, s_total, color=COLOR_SECONDARY, linewidth=2.4, zorder=4,
-              label=r"installed $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$ (clause 8.2)")
+              label=r"installed $s^{\prime} = s^{\prime}_\mathrm{t}"
+                    r" + s^{\prime}_\mathrm{a}$ (clause 8.2)")
     ax.scatter([20.0], [10.49], color=COLOR_FG, s=70, zorder=6)
     ax.annotate("the worked determination:\n$d$ = 20 mm, 4.94 + 5.56 = 10.49",
                 (21.0, 10.49), fontsize=9, color=COLOR_FG, ha="left",
@@ -215,9 +220,12 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
     ax_f.set_yticks([15, 20, 30, 40, 60, 90])
 
     ax.text(0.015, 0.05,
-            r"clause 8.2:  $r \geq 100$ kPa·s/m²  →  $s^{\prime} = s^{\prime}_\mathrm{t}$" "\n"
-            r"$10 \leq r < 100$  →  $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$" "\n"
-            r"$r < 10$  →  $s^{\prime} = s^{\prime}_\mathrm{t}$ only if $s^{\prime}_\mathrm{a}$ is negligible",
+            r"clause 8.2:  $r \geq 100$ kPa·s/m²"
+            r"  →  $s^{\prime} = s^{\prime}_\mathrm{t}$" "\n"
+            r"$10 \leq r < 100$"
+            r"  →  $s^{\prime} = s^{\prime}_\mathrm{t} + s^{\prime}_\mathrm{a}$" "\n"
+            r"$r < 10$  →  $s^{\prime} = s^{\prime}_\mathrm{t}$ only if"
+            r" $s^{\prime}_\mathrm{a}$ is negligible",
             transform=ax.transAxes, va="bottom", ha="left", fontsize=9,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -301,7 +309,8 @@ def generate_absorption_rating(output_dir: str) -> None:
     # alpha_w is the shifted reference read at 500 Hz.
     ax.axvline(500, color=COLOR_FG, linestyle=":", alpha=0.4)
     ax.plot(500, result.alpha_w, "D", color=COLOR_SECONDARY, markersize=9, zorder=6)
-    ax.annotate(f"$\\alpha_\\mathrm{{w}}$ = {result.rating_label}", xy=(500, result.alpha_w),
+    ax.annotate(f"$\\alpha_\\mathrm{{w}}$ = {result.rating_label}",
+                xy=(500, result.alpha_w),
                 xytext=(600, result.alpha_w - 0.16), fontsize=12, fontweight="bold",
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
@@ -1271,7 +1280,8 @@ def generate_scattering_coefficient(output_dir: str) -> None:
     )
     ax_a.fill_between(freqs, alpha_s, alpha_spec, color=COLOR_TERTIARY,
                       alpha=theme_fill_alpha(COLOR_TERTIARY, ax_a), zorder=1,
-                      label=r"$\alpha_{\mathrm{spec}} - \alpha_\mathrm{s}$  (numerator of Eq. (5))")
+                      label=r"$\alpha_{\mathrm{spec}} - \alpha_\mathrm{s}$"
+                            r"  (numerator of Eq. (5))")
     ax_a.semilogx(freqs, alpha_spec, color=COLOR_SECONDARY, linewidth=1.9,
                   marker="s", markersize=5, zorder=3,
                   label=r"$\alpha_{\mathrm{spec}}$, rotating turntable (T3, T4)")
@@ -1300,7 +1310,8 @@ def generate_scattering_coefficient(output_dir: str) -> None:
     ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax.set_axisbelow(True)
     ax.text(0.985, 0.06,
-            r"$s = (\alpha_{\mathrm{spec}} - \alpha_\mathrm{s})/(1 - \alpha_\mathrm{s})$   Eq. (5)",
+            r"$s = (\alpha_{\mathrm{spec}} - \alpha_\mathrm{s})"
+            r"/(1 - \alpha_\mathrm{s})$   Eq. (5)",
             transform=ax.transAxes, va="bottom", ha="right", fontsize=11,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -1726,7 +1737,9 @@ def generate_insitu_absorption(output_dir: str) -> None:
     ax.set_ylabel(r"Absorption coefficient $\alpha$")
     ax.set_ylim(0.0, 1.0)
     ax.text(0.04, 0.94,
-            r"$K_r = 2/3$" "\n" r"$\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$",
+            r"$K_\mathrm{r} = 2/3$" "\n"
+            r"$\alpha = 1 - (1/K_\mathrm{r}^2)\,"
+            r"|H_\mathrm{r}/H_\mathrm{i}|^2$",
             transform=ax.transAxes, va="top", ha="left", fontsize=10,
             color=COLOR_FG,
             bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
@@ -1799,7 +1812,7 @@ def generate_adrienne_window(output_dir: str) -> None:
     top, mid, bot = axes
 
     top.plot(ms, h_free, color=COLOR_PRIMARY, linewidth=1.3, zorder=3,
-             label="$h_i$: free field, the rig clear of every surface")
+             label=r"$h_\mathrm{i}$: free field, the rig clear of every surface")
     top.plot(ms, gate_incident, color=COLOR_TERTIARY, linewidth=1.5,
              linestyle="--", zorder=2,
              label="the same window, on the direct sound")
@@ -1809,7 +1822,7 @@ def generate_adrienne_window(output_dir: str) -> None:
     mid.plot(ms, h_road, color=COLOR_MUTED, linewidth=1.2, zorder=2,
              label="measured over the road: the two arrivals overlap")
     mid.plot(ms, h_reflected, color=COLOR_SECONDARY, linewidth=1.5, zorder=4,
-             label="$h_\\mathrm{r}$ = road - free field, the surface alone")
+             label=r"$h_\mathrm{r}$ = road - free field, the surface alone")
     mid.plot(ms, gate, color=COLOR_TERTIARY, linewidth=1.6, zorder=3,
              label=f"Adrienne window: 0.5 + 5 + 5 ms = {duration * 1e3:.1f} ms")
     mid.annotate("", xy=(t_direct * 1e3, -0.60),
@@ -1842,9 +1855,11 @@ def generate_adrienne_window(output_dir: str) -> None:
     mag_i, mag_r = mag_i - peak, mag_r - peak
     keep = (f_i >= 100.0) & (f_i <= 5000.0)
     bot.semilogx(f_i[keep], mag_i[keep], color=COLOR_PRIMARY, linewidth=1.6,
-                 zorder=3, label="$|H_\\mathrm{i}|$, the windowed free-field reference")
+                 zorder=3,
+                 label=r"$|H_\mathrm{i}|$, the windowed free-field reference")
     bot.semilogx(f_i[keep], mag_r[keep], color=COLOR_SECONDARY, linewidth=1.6,
-                 zorder=3, label="$|H_\\mathrm{r}|$, the windowed surface reflection")
+                 zorder=3,
+                 label=r"$|H_\mathrm{r}|$, the windowed surface reflection")
     bot.axvspan(100.0, 250.0, color=theme_fill(COLOR_MUTED, bot), zorder=0)
     bot.axvline(1.0 / duration, color=COLOR_FG, linestyle=":", linewidth=1.3,
                 zorder=2)
@@ -2383,7 +2398,7 @@ def generate_standing_wave_envelope(output_dir: str) -> None:
     ax.annotate(
         f"minima at 12, 46 and 81 cm: {_fmt_minus(minima[0], '.2f')}, "
         f"{_fmt_minus(minima[1], '.2f')}, {_fmt_minus(minima[2], '.2f')} dB\n"
-        "(read the nearest one, and extrapolate to x = 0)",
+        "(read the nearest one, and extrapolate to $x$ = 0)",
         xy=(0.806, minima[2]), xytext=(0.27, -14.6), fontsize=9.5, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG})
 
@@ -2472,7 +2487,8 @@ def generate_porous_model_comparison(output_dir: str) -> None:
                   arrowprops={"arrowstyle": "->", "lw": 1.0, "color": COLOR_FG})
     format_frequency_axis(ax_s, 20.0, 20000.0)
     ax_s.set_xlabel(LABEL_FREQ_HZ)
-    ax_s.set_ylabel(r"$\mathrm{Re}(Z_\mathrm{s})/(\rho_0 c_0)$,  50 mm hard-backed layer")
+    ax_s.set_ylabel(r"$\mathrm{Re}(Z_\mathrm{s})/(\rho_0 c_0)$,"
+                    r"  50 mm hard-backed layer")
     ax_s.set_title("Where the extrapolation fails", pad=10)
     ax_s.set_ylim(-8.0, 8.0)
     ax_s.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -2517,13 +2533,14 @@ def generate_biot_waves(output_dir: str) -> None:
     mu_a = np.abs(waves.airborne_velocity_ratio)
     mu_b = np.abs(waves.frame_borne_velocity_ratio)
     ax_mu.semilogy(freq, mu_a, color=COLOR_PRIMARY, linewidth=2.0,
-                   label=r"airborne  $|\mu_a|$")
+                   label=r"airborne  $|\mu_\mathrm{a}|$")
     ax_mu.semilogy(freq, mu_b, color=COLOR_SECONDARY, linewidth=2.0,
-                   label=r"frame-borne  $|\mu_b|$")
+                   label=r"frame-borne  $|\mu_\mathrm{b}|$")
     ax_mu.axhline(1.0, color=COLOR_FG, linestyle="--", linewidth=1.0)
     ax_mu.text(1460.0, 1.12, "fluid and frame move together", fontsize=9,
                color=COLOR_FG, ha="right")
-    ax_mu.annotate(f"$|\\mu_a| \\geq$ {mu_a.min():.0f} everywhere: the fluid moves "
+    ax_mu.annotate(f"$|\\mu_\\mathrm{{a}}| \\geq$ {mu_a.min():.0f} everywhere: "
+                   "the fluid moves "
                    "and the frame barely does",
                    xy=(700.0, float(np.interp(700.0, freq, mu_a))),
                    xytext=(300.0, 6.0), fontsize=9.5, color=COLOR_FG,
@@ -2586,7 +2603,8 @@ def generate_oblique_absorption(output_dir: str) -> None:
     ax_f.semilogx(freq, diffuse, color=COLOR_PRIMARY, linewidth=2.2,
                   label=r"$\alpha_\mathrm{dif}$  bulk (Paris integral)")
     ax_f.semilogx(freq, statistical, color=COLOR_SECONDARY, linewidth=2.0,
-                  linestyle="--", label=r"$\alpha_\mathrm{st}$  locally reacting (closed form)")
+                  linestyle="--",
+                  label=r"$\alpha_\mathrm{st}$  locally reacting (closed form)")
     ax_f.semilogx(freq, normal.absorption, color=COLOR_MUTED, linewidth=1.6,
                   linestyle=":", label=r"$\alpha(0°)$  what the tube reads")
     ax_f.axhline(0.951, color=COLOR_FG, linestyle=":", linewidth=1.2)

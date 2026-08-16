@@ -923,7 +923,7 @@ L 707.465 59.561541
      </g>
     </g>
     <g id="text_23">
-     <!-- Índice de reducción acústica $R$ (pérdida por transmisión $TL$) [dB] -->
+     <!-- Índice de reducción acústica $R$ (pérdida por transmisión $\mathrm{TL}$) [dB] -->
      <g style="fill: #ffffff" transform="translate(16.5 371.001478) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-8f" d="M 628 4666 
@@ -1221,24 +1221,24 @@ Q 2666 3584 2933 3390
 Q 3200 3197 3328 2828 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-37" d="M 378 4666 
-L 4325 4666 
-L 4225 4134 
-L 2559 4134 
-L 1759 0 
-L 1125 0 
-L 1925 4134 
-L 275 4134 
-L 378 4666 
+       <path id="DejaVuSans-37" d="M -19 4666 
+L 3928 4666 
+L 3928 4134 
+L 2272 4134 
+L 2272 0 
+L 1638 0 
+L 1638 4134 
+L -19 4134 
+L -19 4666 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
-L 1709 4666 
-L 909 525 
-L 3181 525 
-L 3078 0 
-L 172 0 
-L 1075 4666 
+       <path id="DejaVuSans-2f" d="M 628 4666 
+L 1259 4666 
+L 1259 531 
+L 3531 531 
+L 3531 0 
+L 628 0 
+L 628 4666 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-c" d="M 513 4856 
@@ -1343,8 +1343,8 @@ z
       <use xlink:href="#DejaVuSans-b5" transform="translate(2669.486328 0.265625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(2730.667969 0.265625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(2794.046875 0.265625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-37" transform="translate(2825.833984 0.265625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(2886.917969 0.265625)"/>
+      <use xlink:href="#DejaVuSans-37" transform="translate(2825.833984 0.265625)"/>
+      <use xlink:href="#DejaVuSans-2f" transform="translate(2886.917969 0.265625)"/>
       <use xlink:href="#DejaVuSans-c" transform="translate(2942.630859 0.265625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(2981.644531 0.265625)"/>
       <use xlink:href="#DejaVuSans-3e" transform="translate(3013.431641 0.265625)"/>

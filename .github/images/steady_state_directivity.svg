@@ -1511,7 +1511,7 @@ z
     </g>
    </g>
    <g id="text_14">
-    <!-- $Q$ moves $r_\mathrm{c}$, not the plateau -->
+    <!-- $Q$ moves $r_{\mathrm{c}}$, not the plateau -->
     <g transform="translate(171.822695 16.32) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-Oblique-34" d="M 2309 -84 
@@ -1771,7 +1771,7 @@ L 356.567109 38.11
 " style="fill: none; stroke: #471365; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_15">
-     <!-- $Q$ = 1  ($r_\mathrm{c}$ = 1.11 m) -->
+     <!-- $Q$ = 1  ($r_{\mathrm{c}}$ = 1.11 m) -->
      <g transform="translate(363.767109 41.26) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-b" d="M 1984 4856 
@@ -1837,7 +1837,7 @@ L 356.567109 51.612109
 " style="fill: none; stroke: #32648e; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_16">
-     <!-- $Q$ = 2  ($r_\mathrm{c}$ = 1.57 m) -->
+     <!-- $Q$ = 2  ($r_{\mathrm{c}}$ = 1.57 m) -->
      <g transform="translate(363.767109 54.762109) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(78.710938 0.125)"/>
@@ -1868,7 +1868,7 @@ L 356.567109 65.114219
 " style="fill: none; stroke: #20a486; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_17">
-     <!-- $Q$ = 4  ($r_\mathrm{c}$ = 2.22 m) -->
+     <!-- $Q$ = 4  ($r_{\mathrm{c}}$ = 2.22 m) -->
      <g transform="translate(363.767109 68.264219) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(78.710938 0.125)"/>
@@ -1899,7 +1899,7 @@ L 356.567109 78.616328
 " style="fill: none; stroke: #9bd93c; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_18">
-     <!-- $Q$ = 8  ($r_\mathrm{c}$ = 3.14 m) -->
+     <!-- $Q$ = 8  ($r_{\mathrm{c}}$ = 3.14 m) -->
      <g transform="translate(363.767109 81.766328) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.125)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(78.710938 0.125)"/>

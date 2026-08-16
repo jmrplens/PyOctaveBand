@@ -265,7 +265,8 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.98, 0.05,
-            f"$h_\\mathrm{{s}}$ = {hs:.0f} m, $h_\\mathrm{{r}}$ = {hr:.1f} m, $d_\\mathrm{{p}}$ = {dp:.0f} m",
+            rf"$h_\mathrm{{s}}$ = {hs:.0f} m, $h_\mathrm{{r}}$ = {hr:.1f} m, "
+            rf"$d_\mathrm{{p}}$ = {dp:.0f} m",
             transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
     plt.tight_layout()
@@ -413,8 +414,8 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
     # figure now plots, higher up (where it used to sit) the 250 Hz curve
     # cuts straight through the text.
     ax.annotate(
-        r"$10\,C_h\,\mathrm{lg}\,3$ at grazing incidence ($\delta = 0$):" "\n"
-        f"{grazing:.1f} dB where $C_h$ = 1, {grazing_63:.1f} dB at 63 Hz",
+        r"$10\,C_\mathrm{h}\,\mathrm{lg}\,3$ at grazing incidence ($\delta = 0$):" "\n"
+        rf"{grazing:.1f} dB where $C_\mathrm{{h}}$ = 1, {grazing_63:.1f} dB at 63 Hz",
         xy=(0.0, grazing), xytext=(0.45, 1.6),
         fontsize=9, color=COLOR_FG,
         arrowprops={"arrowstyle": "->", "color": COLOR_FG, "lw": 1.0})
@@ -943,9 +944,9 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
     ax.plot([rcv[0]], [rcv[1]], "o", color=COLOR_PRIMARY, ms=7, label="receiver")
     m, c = float(plane.slope), float(plane.intercept)
     for (px, py), color, label in ((src, COLOR_SECONDARY,
-                                    f"$h_\\mathrm{{s}}$ = {hs_eq:.0f} m"),
+                                    rf"$h_\mathrm{{s}}$ = {hs_eq:.0f} m"),
                                    (rcv, COLOR_PRIMARY,
-                                    f"$h_\\mathrm{{r}}$ = {hr_eq:.1f} m")):
+                                    rf"$h_\mathrm{{r}}$ = {hr_eq:.1f} m")):
         # Foot of the perpendicular onto the fitted plane.
         fx = (px + m * (py - c)) / (1.0 + m**2)
         ax.plot([px, fx], [py, m * fx + c], color=color, lw=1.6, ls="-")

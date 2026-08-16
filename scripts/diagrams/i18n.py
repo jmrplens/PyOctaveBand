@@ -175,9 +175,9 @@ _ES: dict[str, str] = {
         "Método de elemento → $R′_{45°}$ o $R′_{tr,s}$: un componente, "
         "comparable con una $R$ de laboratorio.",
     "Global method → D2m,nT: the whole facade as built, "
-    "not comparable with a laboratory R.":
+    "not comparable with a laboratory $R$.":
         "Método global → D2m,nT: la fachada tal como está construida; "
-        "no comparable con laboratorio.",
+        "no comparable con una $R$ de laboratorio.",
     "Road traffic replaces the loudspeaker at all angles: "
     "simultaneous inside and outside, ≥ 50 pass-bys.":
         "El tráfico rodado incide desde todos los ángulos: medición "
@@ -200,14 +200,14 @@ _ES: dict[str, str] = {
         "ISO 16283-2 Anexo A / ISO 10140-5 Anexo F",
     "180 mm": "180 mm",
     "30 mm wall": "pared de 30 mm",
-    "$m_{eff}$ = (2.5 ± 0.1) kg": "$m_{ef}$ = (2,5 ± 0,1) kg",
+    "$m_{eff}$ = (2.5 ± 0.1) kg": "$m_{eff}$ = (2,5 ± 0,1) kg",
     "$e$ = 0.8 ± 0.1": "$e$ = 0,8 ± 0,1",
     "(100 ± 1) cm": "(100 ± 1) cm",
     "from the ball's BOTTOM": "desde la BASE de la pelota",
     "(c) bang machine": "(c) máquina de golpes",
     "JIS A 1418-2 only": "solo en JIS A 1418-2",
     "(2.4 ± 0.2)·10⁵ Pa": "(2,4 ± 0,2)·10⁵ Pa",
-    "$m_{eff}$ = (7.3 ± 0.2) kg": "$m_{ef}$ = (7,3 ± 0,2) kg",
+    "$m_{eff}$ = (7.3 ± 0.2) kg": "$m_{eff}$ = (7,3 ± 0,2) kg",
     "85 cm": "85 cm",
     "source": "fuente",
     "rigid floor +": "suelo rígido +",
@@ -282,10 +282,11 @@ _ES: dict[str, str] = {
     "    (10.90, 0.04),   # long wall": "    (10.90, 0.04),   # pared larga",
     "    (10.90, 0.04),   # facade": "    (10.90, 0.04),   # fachada",
     "    (6.55, 0.04),    # short wall": "    (6.55, 0.04),    # pared corta",
-    # The one-wall-two-rows inset: mnemonic subscripts follow the block's
-    # "pared"/"ventana" wording (vent = ventana, not ventilación).
-    "($S_{wall} − S_{win}$, $α_{wall}$)": "($S_{pared} − S_{vent}$, $α_{pared}$)",
-    "($S_{win}$, $α_{win}$)": "($S_{vent}$, $α_{vent}$)",
+    # The one-wall-two-rows inset: the prose around it is translated, the
+    # identifiers of the symbols are not (a subscript is part of the name
+    # of the quantity, and "wall"/"win" name the same two areas in both).
+    "($S_{wall} − S_{win}$, $α_{wall}$)": "($S_{wall} − S_{win}$, $α_{wall}$)",
+    "($S_{win}$, $α_{win}$)": "($S_{win}$, $α_{win}$)",
     "One wall, two rows": "Una pared, dos filas",
     "window": "ventana",
     "one wall on the drawing": "una pared en el plano",
@@ -466,7 +467,8 @@ _ES: dict[str, str] = {
         "Hz / dB, medido a ≥ 1,5 m — en la práctica un dodecaedro, no un monitor",
     "Level (4.2.1):": "Nivel (4.2.1):",
     "≥ 45 dB over the background": "≥ 45 dB sobre el ruido de fondo",
-    "per band for T30, ≥ 35 dB for T20": "por banda para T30; 35 dB para T20",
+    "per band for $T_{30}$, ≥ 35 dB for $T_{20}$":
+        "por banda para $T_{30}$; 35 dB para $T_{20}$",
     "Receiving chain (4.2.2.2):": "Cadena de recepción (4.2.2.2):",
     "class 1 to IEC 61672-1,": "clase 1 según IEC 61672-1,",
     "IEC 61260 filters, omnidirectional": "filtros IEC 61260, micrófono",
@@ -1649,6 +1651,10 @@ _ES: dict[str, str] = {
         "(apartado 4.1)",
     "mean of the three one-third octaves, rounded to 0.05":
         "media de los tres tercios de octava, redondeado a 0,05",
+    "read off the shifted curve, always a multiple of 0.05":
+        "leído sobre la curva desplazada, siempre múltiplo de 0,05",
+    "appended to $α_w$ in parentheses, e.g. 0.60(M)":
+        "añadido a $α_w$ entre paréntesis, p. ej. 0,60(M)",
     "Shift the reference curve in 0.05 steps to best fit  (Clause 4.2)":
         "Desplazar la curva de referencia en pasos de 0,05 hasta el mejor "
         "ajuste  (apartado 4.2)",
@@ -2581,6 +2587,7 @@ _ES: dict[str, str] = {
         "Medición de FRF a dos canales: el estimador H1 y la coherencia",
     "Signal generator": "Generador de señal",
     "broadband noise or a sweep": "ruido de banda ancha o barrido",
+    "its gain is in H1": "su ganancia va en H1",
     "Power amplifier": "Amplificador",
     "Loudspeaker under test": "Altavoz en ensayo",
     "measurement microphone": "micrófono de medición",
@@ -3435,12 +3442,12 @@ _ES: dict[str, str] = {
     "an exponential decay (C)": "una caída exponencial (C)",
     "INR = 55 dB": "INR = 55 dB",
     "Evaluation windows": "Ventanas de evaluación",
-    "hatched: the 15 dB margin ISO 3382-1 asks for beyond each window — EDT needs 25 dB, T20 35 dB, T30 45 dB":
-        "rayado: el margen de 15 dB que exige la ISO 3382-1 más allá de cada ventana — EDT necesita 25 dB, T20 35 dB y T30 45 dB",
+    "hatched: the 15 dB margin ISO 3382-1 asks for beyond each window — EDT needs 25 dB, $T_{20}$ 35 dB, $T_{30}$ 45 dB":
+        "rayado: el margen de 15 dB que exige la ISO 3382-1 más allá de cada ventana — EDT necesita 25 dB, $T_{20}$ 35 dB y $T_{30}$ 45 dB",
     "the library flags at 46 dB and 54 dB instead, where the fit's positive bias crosses 5 %":
         "la biblioteca avisa en 46 dB y 54 dB, donde el sesgo positivo del ajuste cruza el 5 %",
-    "short of range? T20 instead of T30 -> a longer sweep or more averages -> EDT; never a fit into the noise":
-        "¿falta rango? T20 en vez de T30 -> un barrido más largo o más promedios -> EDT; nunca un ajuste metido en el ruido",
+    "short of range? $T_{20}$ instead of $T_{30}$ -> a longer sweep or more averages -> EDT; never a fit into the noise":
+        "¿falta rango? $T_{20}$ en vez de $T_{30}$ -> un barrido más largo o más promedios -> EDT; nunca un ajuste metido en el ruido",
     # --- ISO 3741 reverberation test room (devices/emission) ---
     "ISO 3741 reverberation test room": "Sala reverberante de ensayo ISO 3741",
     "Direct method (Eq. 20)": "Método directo (Ec. 20)",

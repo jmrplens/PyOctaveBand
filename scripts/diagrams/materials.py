@@ -519,8 +519,10 @@ def _d_iso11654(s: SVG, th: Theme) -> None:
           "mean of the three one-third octaves, rounded to 0.05", th.primary)
     _step(206, "Shift the reference curve in 0.05 steps to best fit  (Clause 4.2)",
           "sum of unfavourable deviations kept ≤ 0.10", th.fg)
-    _step(284, "Weighted coefficient  $α_w$ = shifted reference at 500 Hz", "", th.fg)
-    _step(362, "Shape indicators (L, M, H) where  $α_p$ − reference ≥ 0.25", "", th.secondary)
+    _step(284, "Weighted coefficient  $α_w$ = shifted reference at 500 Hz",
+          "read off the shifted curve, always a multiple of 0.05", th.fg)
+    _step(362, "Shape indicators (L, M, H) where  $α_p$ − reference ≥ 0.25",
+          "appended to $α_w$ in parentheses, e.g. 0.60(M)", th.secondary)
     for y0, y1 in ((100, 128), (182, 206), (260, 284), (338, 362)):
         s.arrow(cx, y0, cx, y1, th.fg, 1.8)
     s.arrow(cx, 416, cx, 444, th.fg, 1.8)

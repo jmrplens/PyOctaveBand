@@ -498,7 +498,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
                 aspect="equal", interpolation="nearest")
     ax_g.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_g.set_title("What the solver steps on: the same panel as a boolean "
-                   "obstacle mask at dx = 0.5 mm",
+                   r"obstacle mask at $\Delta x$ = 0.5 mm",
                    pad=10)
     z0 = ix["lat"] + round(4 * period / dx)
     z1 = z0 + round(period / dx)
@@ -515,7 +515,7 @@ def generate_metadiffuser_meshed_panel(output_dir: str) -> None:
         spine.set_linewidth(1.8)
     ax_z.set(xlabel="$x$ [m]", ylabel="$y$ [m]")
     ax_z.set_title("The fifth cell magnified: the 3.2 mm neck is six cells "
-                   "wide, and it is what sets dx", pad=10)
+                   r"wide, and it is what sets $\Delta x$", pad=10)
     neck_y = (ix["r_face"] + round(0.005 / dx)) * dx
     neck_x = (ix["lat"] + round((4.12 * period + 20.3e-3) / dx)) * dx
     ax_z.annotate("3.2 mm neck = 6 cells", xy=(neck_x, neck_y),

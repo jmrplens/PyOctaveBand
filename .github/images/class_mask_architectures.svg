@@ -46536,7 +46536,7 @@ L 199.199668 48.402813
      </g>
     </g>
     <g id="text_4">
-     <!-- Normalised frequency $f\,/\,f_\mathrm{m}$ -->
+     <!-- Normalised frequency $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(165.044609 287.199063) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-31" d="M 628 4666 
@@ -94146,7 +94146,7 @@ L 625.799668 48.402813
      </g>
     </g>
     <g id="text_19">
-     <!-- Normalised frequency $f\,/\,f_\mathrm{m}$ -->
+     <!-- Normalised frequency $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(591.644609 287.199063) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-31" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-52" transform="translate(74.804688 0.015625)"/>
@@ -141780,7 +141780,7 @@ L 199.199668 319.601406
      </g>
     </g>
     <g id="text_35">
-     <!-- Normalised frequency $f\,/\,f_\mathrm{m}$ -->
+     <!-- Normalised frequency $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(165.044609 558.397656) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-31" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-52" transform="translate(74.804688 0.015625)"/>
@@ -189266,7 +189266,7 @@ L 625.799668 319.601406
      </g>
     </g>
     <g id="text_51">
-     <!-- Normalised frequency $f\,/\,f_\mathrm{m}$ -->
+     <!-- Normalised frequency $f\,/\,f_{\mathrm{m}}$ -->
      <g transform="translate(591.644609 558.397656) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-31" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-52" transform="translate(74.804688 0.015625)"/>

@@ -913,7 +913,7 @@ Q 51.222534 73.235039 54.222534 73.235039
 z
 " style="fill: #e0e0e0; opacity: 0.6; stroke: #000000; stroke-linejoin: miter"/>
     </g>
-    <!-- Tonal audibility $\Delta L_\mathrm{a}$ = 8.6 dB -->
+    <!-- Tonal audibility $\Delta L_{\mathrm{a}}$ = 8.6 dB -->
     <g transform="translate(54.222534 54.828984) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-37" d="M -19 4666 

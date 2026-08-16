@@ -702,7 +702,7 @@ L 777.503125 28.32
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_12">
-    <!-- The Homogeneous Limit: 500 Hz, Rigid Ground, $h_\mathrm{s} = h_\mathrm{r}$ = 2 m -->
+    <!-- The Homogeneous Limit: 500 Hz, Rigid Ground, $h_{\mathrm{s}} = h_{\mathrm{r}}$ = 2 m -->
     <g style="fill: #ffffff" transform="translate(228.904297 16.32) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-37" d="M -19 4666 

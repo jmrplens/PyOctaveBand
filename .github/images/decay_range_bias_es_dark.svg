@@ -1548,7 +1548,7 @@ z
      <use xlink:href="#DejaVuSans-3" transform="translate(2505.957031 0.015625)"/>
      <use xlink:href="#DejaVuSans-56" transform="translate(2537.744141 0.015625)"/>
     </g>
-    <!-- suelo de ruido blanco barrido, $f_\mathrm{s}$ = 48 kHz -->
+    <!-- suelo de ruido blanco barrido, $f_{\mathrm{s}}$ = 48 kHz -->
     <g style="fill: #ffffff" transform="translate(304.364844 62.126777) scale(0.09 -0.09)">
      <defs>
       <path id="DejaVuSans-45" d="M 3116 1747 

@@ -1340,7 +1340,7 @@ z
      <use xlink:href="#DejaVuSans-c" transform="translate(1600.342119 0.746875)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(1639.355791 0.746875)"/>
     </g>
-    <!-- $L_{n,s,ij} = L_{W\mathrm{s,inst}} - D_\mathrm{sa} - R_{ij} - 10\,\log_{10}(S_i/S_0) - 10\,\log_{10}(A_0/4)$ -->
+    <!-- $L_{\mathrm{n,s},ij} = L_{W\mathrm{s,inst}} - D_\mathrm{sa} - R_{ij} - 10\,\log_{10}(S_i/S_0) - 10\,\log_{10}(A_0/4)$ -->
     <g transform="translate(50.898346 378.329346) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -1352,29 +1352,6 @@ L 172 0
 L 1075 4666 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-51" d="M 3566 2113 
-L 3156 0 
-L 2578 0 
-L 2988 2091 
-Q 3016 2238 3031 2350 
-Q 3047 2463 3047 2528 
-Q 3047 2791 2881 2937 
-Q 2716 3084 2419 3084 
-Q 1956 3084 1622 2776 
-Q 1288 2469 1184 1941 
-L 800 0 
-L 225 0 
-L 903 3500 
-L 1478 3500 
-L 1363 2950 
-Q 1603 3253 1940 3418 
-Q 2278 3584 2650 3584 
-Q 3113 3584 3367 3334 
-Q 3622 3084 3622 2631 
-Q 3622 2519 3608 2391 
-Q 3594 2263 3566 2113 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-f" d="M 750 794 
 L 1409 794 
 L 1409 256 
@@ -1382,37 +1359,6 @@ L 897 -744
 L 494 -744 
 L 750 256 
 L 750 794 
-z
-" transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-Oblique-4d" d="M 928 3500 
@@ -1603,9 +1549,9 @@ z
 " transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-51" transform="translate(55.712891 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-51" transform="translate(55.712891 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(100.078125 -14.984326) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(135.966797 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-56" transform="translate(135.966797 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(172.436523 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(208.325195 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-Oblique-4d" transform="translate(227.773438 -14.984326) scale(0.7)"/>
@@ -1656,7 +1602,7 @@ z
      <use xlink:href="#DejaVuSans-17" transform="translate(2768.043291 0.015625)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(2831.666338 0.015625)"/>
     </g>
-    <!-- $L_\mathrm{n,s} = 10\,\log_{10}(\Sigma\,10^{L_{n,s,ij}/10})$,  $S_0 = A_0$ = 10 m² -->
+    <!-- $L_\mathrm{n,s} = 10\,\log_{10}(\Sigma\,10^{L_{\mathrm{n,s},ij}/10})$,  $S_0 = A_0$ = 10 m² -->
     <g transform="translate(50.898346 390.571006) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-337" d="M 1353 531 
@@ -1742,9 +1688,9 @@ z
      <use xlink:href="#DejaVuSans-14" transform="translate(821.280271 0.746875)"/>
      <use xlink:href="#DejaVuSans-13" transform="translate(884.903318 0.746875)"/>
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(949.483396 42.046875) scale(0.7)"/>
-     <use xlink:href="#DejaVuSans-Oblique-51" transform="translate(988.482419 31.546909) scale(0.49)"/>
+     <use xlink:href="#DejaVuSans-51" transform="translate(988.482419 31.546909) scale(0.49)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(1019.538083 31.546909) scale(0.49)"/>
-     <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(1044.660154 31.546909) scale(0.49)"/>
+     <use xlink:href="#DejaVuSans-56" transform="translate(1044.660154 31.546909) scale(0.49)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(1070.188962 31.546909) scale(0.49)"/>
      <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(1095.311033 31.546909) scale(0.49)"/>
      <use xlink:href="#DejaVuSans-Oblique-4d" transform="translate(1108.924802 31.546909) scale(0.49)"/>
@@ -2023,7 +1969,7 @@ L 551.053438 67.112344
      </g>
     </g>
     <g id="text_21">
-     <!-- paths $L_{n,s,ij}$ -->
+     <!-- paths $L_{\mathrm{n,s},ij}$ -->
      <g transform="translate(558.253438 70.262344) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-53" d="M 1159 525 
@@ -2060,9 +2006,9 @@ z
       <use xlink:href="#DejaVuSans-56" transform="translate(227.34375 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(279.443359 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(311.230469 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-51" transform="translate(366.943359 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-51" transform="translate(366.943359 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(411.308594 -14.984326) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(447.197266 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-56" transform="translate(447.197266 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(483.666992 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-Oblique-4c" transform="translate(519.555664 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-Oblique-4d" transform="translate(539.003906 -14.984326) scale(0.7)"/>

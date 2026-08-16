@@ -1256,7 +1256,7 @@ z
 " style="fill: #1f77b4"/>
     </g>
     <g id="text_24">
-     <!-- en $2 f_\mathrm{m}$ -->
+     <!-- en $2 f_{\mathrm{m}}$ -->
      <g transform="translate(391.655625 308.353437) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-49" d="M 3059 4863 
@@ -1328,7 +1328,7 @@ z
 " style="fill: #2ca02c"/>
     </g>
     <g id="text_25">
-     <!-- en $4 f_\mathrm{m}$ -->
+     <!-- en $4 f_{\mathrm{m}}$ -->
      <g transform="translate(391.655625 321.855547) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-48" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(61.523438 0.015625)"/>

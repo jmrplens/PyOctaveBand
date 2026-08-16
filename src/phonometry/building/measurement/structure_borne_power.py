@@ -16,7 +16,7 @@ The power a resonant plate dissipates equals
 
 .. math::
 
-   L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60
+   L_{W\mathrm{s}} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v - 60
    \qquad \text{dB re 1 pW}
 
 with the references :math:`f_0 = 1` Hz, :math:`m_0 = 1` kg (printed as 1 kg;
@@ -149,7 +149,7 @@ def structure_borne_power_level(
 
     .. math::
 
-       L_{Ws} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v
+       L_{W\mathrm{s}} = 10 \log_{10}\frac{2 \pi f \eta\, m S}{f_0 m_0 S_0} + L_v
        + 10 \log_{10}\frac{v_0^2}{P_0}
 
     With the EN 15657 reference :math:`v_0 = 10^{-9}` m/s the last term is
@@ -221,7 +221,7 @@ class StructureBornePowerResult:
 
     @property
     def total_level(self) -> float:
-        r"""Band-summed power level :math:`10 \log_{10}(\sum 10^{0.1 L_{Ws}})`,
+        r"""Band-summed power level :math:`10 \log_{10}(\sum 10^{0.1 L_{W\mathrm{s}}})`,
         in dB."""
         lw = np.asarray(self.power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))

@@ -41,7 +41,7 @@ def generate_ship_source_level(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(10, 6.0))
     ax.semilogx(freqs, res.source_level, "o-", color=COLOR_PRIMARY, linewidth=2.0,
-                markersize=4, label="Source level $L_\\mathrm{s}$")
+                markersize=4, label=r"Source level $L_\mathrm{s}$")
     ax.semilogx(freqs, res.radiated_noise_level, "s--", color=COLOR_SECONDARY,
                 linewidth=1.6, markersize=3, alpha=0.8, label="Radiated noise level")
     ax.set_xlabel("Frequency [Hz]")
@@ -880,8 +880,9 @@ def generate_ray_turning_point(output_dir: str) -> None:
     ax_r.set_ylim(1760.0, -70.0)
     ax_r.set_xlabel("Range [km]")
     ax_r.set_ylabel("Depth [m]")
-    ax_r.set_title(r"Every Ray Turns Where $c(z_\mathrm{t}) = c(z_\mathrm{s})/\cos\theta_0$",
-                   pad=12)
+    ax_r.set_title(
+        r"Every Ray Turns Where $c(z_\mathrm{t}) = c(z_\mathrm{s})/\cos\theta_0$",
+        pad=12)
     ax_r.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_r.set_axisbelow(True)
     ax_r.legend(loc="lower center", fontsize=8.5, ncols=3)

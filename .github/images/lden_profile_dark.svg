@@ -1361,7 +1361,7 @@ L 67.025781 40.11
 " style="fill: none; stroke: #ffffff; stroke-width: 1.6; stroke-linecap: square"/>
     </g>
     <g id="text_19">
-     <!-- Hourly $L_\mathrm{Aeq}$ -->
+     <!-- Hourly $L_{\mathrm{Aeq}}$ -->
      <g style="fill: #ffffff" transform="translate(74.225781 43.26) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-24" d="M 2188 4044 

@@ -693,7 +693,7 @@ L 442.598438 26.798125
      </g>
     </g>
     <g id="text_10">
-     <!-- Frecuencia del tono $f_\mathrm{c}$ [Hz] -->
+     <!-- Frecuencia del tono $f_{\mathrm{c}}$ [Hz] -->
      <g style="fill: #ffffff" transform="translate(178.099609 357.914219) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-29" d="M 628 4666 
@@ -2620,7 +2620,7 @@ L 885.758437 51.485642
      </g>
     </g>
     <g id="text_35">
-     <!-- Tonalidad exigida $\Delta L_\mathrm{tn}$ [dB] -->
+     <!-- Tonalidad exigida $\Delta L_{\mathrm{tn}}$ [dB] -->
      <g style="fill: #ffffff" transform="translate(461.21625 245.105781) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-5b" d="M 3513 3500 
@@ -2895,7 +2895,7 @@ L 514.010781 37.933125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_37">
-     <!-- Tonalidad necesaria para ser audible ($\Delta L_\mathrm{a} &gt; 0$) -->
+     <!-- Tonalidad necesaria para ser audible ($\Delta L_{\mathrm{a}} &gt; 0$) -->
      <g style="fill: #ffffff" transform="translate(520.810781 40.908125) scale(0.085 -0.085)">
       <defs>
        <path id="DejaVuSans-21" d="M 678 3150 
@@ -2962,7 +2962,7 @@ L 514.010781 50.685117
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_38">
-     <!-- Tonalidad necesaria para ser declarable ($\Delta L_\mathrm{a} \geq -3$ dB) -->
+     <!-- Tonalidad necesaria para ser declarable ($\Delta L_{\mathrm{a}} \geq -3$ dB) -->
      <g style="fill: #ffffff" transform="translate(520.810781 53.660117) scale(0.085 -0.085)">
       <defs>
        <path id="DejaVuSans-cef" d="M 678 3175 

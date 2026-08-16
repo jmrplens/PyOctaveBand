@@ -343,7 +343,8 @@ def plot_flight_path_kinematics(
     ax.plot(t, result.airspeed, **{"color": _C_PRIMARY, "lw": 1.8,
             "label": _t("Airspeed $V_\\mathrm{A}$", language), **kwargs})
     ax.plot(t, result.ground_speed, **{"color": _C_SECONDARY, "lw": 1.4,
-            "ls": "--", "label": _t("Ground speed $V_\\mathrm{g}$", language), **kwargs})
+            "ls": "--", "label": _t("Ground speed $V_\\mathrm{g}$", language),
+            **kwargs})
     ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Speed [m/s]", language))
     ax2 = ax.twinx()

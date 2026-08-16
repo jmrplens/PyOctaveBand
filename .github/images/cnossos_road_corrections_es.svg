@@ -2190,7 +2190,7 @@ L 567.88125 37.276875
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_35">
-     <!-- $Q_{\mathrm{stud}}$ = 0,2, $T_\mathrm{s}$ = 4 meses -->
+     <!-- $Q_{\mathrm{stud}}$ = 0,2, $T_{\mathrm{s}}$ = 4 meses -->
      <g transform="translate(574.28125 40.076875) scale(0.08 -0.08)">
       <defs>
        <path id="DejaVuSans-Oblique-34" d="M 2309 -84 
@@ -2284,7 +2284,7 @@ L 567.88125 49.2775
 " style="fill: none; stroke: #2ca02c; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_36">
-     <!-- $Q_{\mathrm{stud}}$ = 0,5, $T_\mathrm{s}$ = 4 meses -->
+     <!-- $Q_{\mathrm{stud}}$ = 0,5, $T_{\mathrm{s}}$ = 4 meses -->
      <g transform="translate(574.28125 52.0775) scale(0.08 -0.08)">
       <use xlink:href="#DejaVuSans-Oblique-34" transform="translate(0 0.78125)"/>
       <use xlink:href="#DejaVuSans-56" transform="translate(78.710938 -14.218701) scale(0.7)"/>

@@ -1933,7 +1933,7 @@ L 448.328281 40.588125
 " style="fill: none; stroke-dasharray: 1.9,3.135; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.9"/>
     </g>
     <g id="text_21">
-     <!-- $L_\mathrm{EX,8h}$ = 80 dB  ($E$ = 0,32 Pa²·h) -->
+     <!-- $L_{\mathrm{EX,8h}}$ = 80 dB  ($E$ = 0,32 Pa²·h) -->
      <g transform="translate(455.528281 43.738125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -2032,7 +2032,7 @@ L 448.328281 54.090234
 " style="fill: none; stroke: #1f77b4; stroke-width: 1.9; stroke-linecap: square"/>
     </g>
     <g id="text_22">
-     <!-- $L_\mathrm{EX,8h}$ = 85 dB  ($E$ = 1,01 Pa²·h) -->
+     <!-- $L_{\mathrm{EX,8h}}$ = 85 dB  ($E$ = 1,01 Pa²·h) -->
      <g transform="translate(455.528281 57.240234) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-28" transform="translate(55.712891 -14.984326) scale(0.7)"/>
@@ -2075,7 +2075,7 @@ L 448.328281 67.592344
 " style="fill: none; stroke-dasharray: 7.03,3.04; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.9"/>
     </g>
     <g id="text_23">
-     <!-- $L_\mathrm{EX,8h}$ = 87 dB  ($E$ = 1,60 Pa²·h) -->
+     <!-- $L_{\mathrm{EX,8h}}$ = 87 dB  ($E$ = 1,60 Pa²·h) -->
      <g transform="translate(455.528281 70.742344) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-1a" d="M 525 4666 

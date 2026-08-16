@@ -106,9 +106,10 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
     rw_dd = result.r_direct_w
     rpw = result.r_prime_w
     lines = [
-        f"$R_\\mathrm{{w}}$ (Dd) = {rw_dd:.1f} dB",
+        rf"$R_\mathrm{{w}}$ (Dd) = {rw_dd:.1f} dB",
         rf"$R^{{\prime}}_\mathrm{{w}}$ = {rpw:.1f} dB",
-        rf"$R^{{\prime}}_\mathrm{{w}} - R_\mathrm{{w}}$ = {_fmt_minus(rpw - rw_dd, '.1f')} dB",
+        (rf"$R^{{\prime}}_\mathrm{{w}} - R_\mathrm{{w}}$"
+         rf" = {_fmt_minus(rpw - rw_dd, '.1f')} dB"),
         f"Dd {direct_share:.1f} %   ΣFf,Fd,Df {flank_share:.1f} %",
     ]
     ax.text(0.985, 0.62, "\n".join(lines), transform=ax.transAxes,
@@ -200,7 +201,8 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
         freq, 150.0, 170.0, stiffness1, stiffness2, ties_per_area=2.5
     )
     ax_clf.loglog(freq, rigid.rigid_coupling_loss_factor, "--", color=COLOR_MUTED,
-                  linewidth=2.0, zorder=3, label="rigid connection ($Y_\\mathrm{c} = 0$)")
+                  linewidth=2.0, zorder=3,
+                  label=r"rigid connection ($Y_\mathrm{c} = 0$)")
     ax_clf.set_xticks([50, 125, 250, 500, 1000, 2000, 4000])
     ax_clf.set_xticklabels(["50", "125", "250", "500", "1k", "2k", "4k"])
     ax_clf.set_xlim(50.0, 5000.0)
@@ -486,10 +488,11 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.plot(x, lws_c, color=COLOR_SECONDARY, marker="o", lw=2.0,
             label=r"characteristic $L_{W\mathrm{s,c}}$ (EN 15657)")
     ax.plot(x, lws_inst, color=COLOR_TERTIARY, marker="s", lw=2.0,
-            label=r"installed $L_{W\mathrm{s,inst}} = L_{W\mathrm{s,c}} - D_\mathrm{C}$")
+            label=r"installed $L_{W\mathrm{s,inst}} = L_{W\mathrm{s,c}}"
+                  r" - D_\mathrm{C}$")
     for k, p in enumerate(res.path_levels):
         ax.plot(x, p, color=COLOR_GRID, lw=1.0, ls=":", marker=".",
-                label="paths $L_{n,s,ij}$" if k == 0 else None)
+                label=r"paths $L_{\mathrm{n,s},ij}$" if k == 0 else None)
     ax.plot(x, res.total_level, color=COLOR_PRIMARY, marker="D", lw=2.4,
             label=r"total $L_\mathrm{n,s}$")
 
@@ -503,10 +506,12 @@ def generate_installed_structure_borne(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
 
     info = [
-        r"$D_\mathrm{C} = 10\,\log_{10}(|Y_\mathrm{s}+Y_i|^2 / (|Y_\mathrm{s}|\,\mathrm{Re}\,Y_i))$",
-        (r"$L_{n,s,ij} = L_{W\mathrm{s,inst}} - D_\mathrm{sa} - R_{ij}"
+        (r"$D_\mathrm{C} = 10\,\log_{10}(|Y_\mathrm{s}+Y_i|^2"
+         r" / (|Y_\mathrm{s}|\,\mathrm{Re}\,Y_i))$"),
+        (r"$L_{\mathrm{n,s},ij} = L_{W\mathrm{s,inst}} - D_\mathrm{sa} - R_{ij}"
          r" - 10\,\log_{10}(S_i/S_0) - 10\,\log_{10}(A_0/4)$"),
-        (r"$L_\mathrm{n,s} = 10\,\log_{10}(\Sigma\,10^{L_{n,s,ij}/10})$,  "
+        (r"$L_\mathrm{n,s} = 10\,\log_{10}"
+         r"(\Sigma\,10^{L_{\mathrm{n,s},ij}/10})$,  "
          "$S_0 = A_0$ = 10 m²"),
     ]
     ax.text(0.015, 0.02, "\n".join(info), transform=ax.transAxes,
@@ -580,7 +585,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     # ran into the title and its tail into the label of the panel below. Set
     # over two lines it clears both, in either language.
     r_label = ("Sound reduction index $R$\n"
-               "(transmission loss $TL$) [dB]")
+               "(transmission loss $\\mathrm{TL}$) [dB]")
 
     # (a) Single panel: field-incidence mass law and the coincidence dip.
     bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
@@ -594,7 +599,8 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
                 label="field-incidence mass law")
     ax.semilogx(bands, sharp.transmission_loss, color=COLOR_PRIMARY, lw=2.0,
                 marker="o", markersize=3, label="single panel $R$ (Sharp)")
-    ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_\\mathrm{c}$")
+    ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2,
+               label=r"$f_\mathrm{c}$")
     ax.set_title("Single panel: mass law and coincidence",
                  pad=10)
     ax.set_ylabel(r_label)
@@ -627,7 +633,8 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     ax.loglog(bands, sigma.radiation_efficiency, color=COLOR_PRIMARY, lw=2.0,
               marker="o", markersize=3, label=r"$\sigma(f)$")
     ax.axhline(1.0, color=COLOR_FG, ls=":", lw=0.9, alpha=0.5, label="$\\sigma = 1$")
-    ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2, label="$f_\\mathrm{c}$")
+    ax.axvline(fc, color=COLOR_SECONDARY, ls=":", lw=1.2,
+               label=r"$f_\mathrm{c}$")
     ax.set_title("Radiation efficiency of a bending plate",
                  pad=10)
     ax.set_ylabel(r"Radiation efficiency $\sigma$")
@@ -685,7 +692,8 @@ def generate_impact_prediction_terms(output_dir: str) -> None:
     imp = predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
                                       k_correction=k)
 
-    labels = ["$L_\\mathrm{n,w,eq}$", r"$-\Delta L_\mathrm{w}$", "$+K$", r"$L^{\prime}_\mathrm{n,w}$"]
+    labels = [r"$L_\mathrm{n,w,eq}$", r"$-\Delta L_\mathrm{w}$", "$+K$",
+              r"$L^{\prime}_\mathrm{n,w}$"]
     values = [imp.ln_w_eq, -imp.delta_l_w, imp.k_correction, imp.l_prime_n_w]
     # COLOR_MUTED rather than the gridline grey for the starting term: a bar
     # is a read value, so it has to hold up against the page on both themes.
@@ -801,7 +809,8 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
 
     info = [
         r"$R^{\prime} = -10\,\log_{10}(\Sigma\,10^{-R_{ij}/10})$",
-        (rf"$R^{{\prime}}_\mathrm{{w}}$ ($C$; $C_\mathrm{{tr}}$) = {res.rating.rating} "
+        (rf"$R^{{\prime}}_\mathrm{{w}}$ ($C$; $C_\mathrm{{tr}}$)"
+         rf" = {res.rating.rating} "
          f"({_fmt_minus(res.rating.c)}; {_fmt_minus(res.rating.ctr)}) dB"),
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -844,9 +853,10 @@ def generate_single_panel_rating(output_dir: str) -> None:
                     zorder=1, label="unfavourable deviations")
     idx_fc = float(np.interp(np.log10(fc), np.log10(bands), x))
     ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
-               zorder=4, label=f"coincidence $f_\\mathrm{{c}}$ = {fc:.0f} Hz")
+               zorder=4, label=rf"coincidence $f_\mathrm{{c}}$ = {fc:.0f} Hz")
 
-    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+    ax.set_ylabel("Sound reduction index $R$ "
+                  "(transmission loss $\\mathrm{TL}$) [dB]")
     ax.set_title("Predicted Single-Panel Insulation Rated per ISO 717-1",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -854,7 +864,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (f"$R_\\mathrm{{w}}$($C$;$C_\\mathrm{{tr}}$) = {w.rating}"
+        (rf"$R_\mathrm{{w}}$($C$;$C_\mathrm{{tr}}$) = {w.rating}"
          f"({_fmt_minus(w.c)};{_fmt_minus(w.ctr)}) dB"),
         r"6 mm float glass, $m^{\prime\prime}$ = 15 kg/m², $\eta$ = 0.024",
     ]
@@ -903,9 +913,10 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
             label="plateau estimate (Norton Table 3.1)")
     idx_fc = float(np.interp(np.log10(f_c), np.log10(bands), x))
     ax.axvline(idx_fc, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
-               zorder=4, label="critical frequency $f_\\mathrm{c}$")
+               zorder=4, label=r"critical frequency $f_\mathrm{c}$")
 
-    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+    ax.set_ylabel("Sound reduction index $R$ "
+                  "(transmission loss $\\mathrm{TL}$) [dB]")
     ax.set_title("Plateau Estimate Against the Physical Panel Model",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -981,7 +992,7 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
     idx_1 = float(np.interp(np.log10(fc1), np.log10(bands), x))
     idx_2 = float(np.interp(np.log10(fc2), np.log10(bands), x))
     ax.axvspan(idx_1, idx_2, color=theme_fill(COLOR_TERTIARY, ax), lw=0, zorder=0,
-               label=r"coincidence range $f_{c1}$ to $f_{c2}$")
+               label=r"coincidence range $f_{\mathrm{c}1}$ to $f_{\mathrm{c}2}$")
     ax.plot(x, flat.transmission_loss, "-o", color=COLOR_PRIMARY,
             linewidth=2.2, markersize=5, zorder=5,
             label=r"flat 1 mm sheet (isotropic, single $f_\mathrm{c}$)")
@@ -991,7 +1002,8 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
     ax.plot(x, heckl.transmission_loss, "--", color=COLOR_TERTIARY,
             linewidth=1.8, zorder=4, label="Heckl's approximation")
 
-    ax.set_ylabel("Sound reduction index $R$ (transmission loss $TL$) [dB]")
+    ax.set_ylabel("Sound reduction index $R$ "
+                  "(transmission loss $\\mathrm{TL}$) [dB]")
     ax.set_title("Corrugating a Sheet Flattens Its Sound Reduction Index",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1005,10 +1017,11 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
     )
     info = [
         (rf"1 mm steel sheet, $m^{{\prime\prime}}$ = {mass_flat:.1f} kg/m², flat "
-         f"$f_\\mathrm{{c}}$ = {flat_fc / 1000.0:.1f} kHz"),
+         rf"$f_\mathrm{{c}}$ = {flat_fc / 1000.0:.1f} kHz"),
         (f"corrugated $H$ = 10 mm, $L$ = 100 mm, "
          rf"$m^{{\prime\prime}}$ = {mass_corr:.1f} kg/m², "
-         f"$f_{{c1}}$ = {fc1:.0f} Hz, $f_{{c2}}$ = {fc2 / 1000.0:.1f} kHz"),
+         rf"$f_{{\mathrm{{c}}1}}$ = {fc1:.0f} Hz, "
+         rf"$f_{{\mathrm{{c}}2}}$ = {fc2 / 1000.0:.1f} kHz"),
         (f"worst penalty {penalty:.0f} dB at {nominal[worst]:g} Hz, "
          "for a stiffer and only 9 % heavier panel"),
     ]
@@ -1075,7 +1088,7 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     ax.set_xlabel(r"Mobility ratio $|Y_\mathrm{s}|/|Y_i|$")
-    ax.set_ylabel("Coupling term $D_\\mathrm{C}$ [dB]")
+    ax.set_ylabel(r"Coupling term $D_\mathrm{C}$ [dB]")
     ax.set_title("EN 12354-5 Coupling Term and Its Two Limits",
                  pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
@@ -1083,7 +1096,8 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        r"$D_\mathrm{C} = 10\,\log_{10}(|Y_\mathrm{s} + Y_i + Y_k|^2 / (|Y_\mathrm{s}|\,\mathrm{Re}\{Y_i\}))$",
+        (r"$D_\mathrm{C} = 10\,\log_{10}(|Y_\mathrm{s} + Y_i + Y_k|^2"
+         r" / (|Y_\mathrm{s}|\,\mathrm{Re}\{Y_i\}))$"),
         "left: velocity source (stiff receiver takes more)",
         "right: force source (stiff receiver takes less)",
     ]
@@ -1143,9 +1157,13 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
                                     "color": colour})
 
     ax.axhline(upper, color=COLOR_MUTED, linestyle="--", linewidth=1.6,
-               zorder=4, label=r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_\text{h}/T_i$  (rebound)")
+               zorder=4,
+               label=r"$|F_n|_{\mathrm{upper}} = 2\,m\,v_\mathrm{h}/T_\mathrm{i}$"
+                     r"  (rebound)")
     ax.axhline(lower, color=COLOR_MUTED, linestyle="-.", linewidth=1.6,
-               zorder=4, label=r"$|F_n|_{\mathrm{lower}} = m\,v_\text{h}/T_i$  (no rebound)")
+               zorder=4,
+               label=r"$|F_n|_{\mathrm{lower}} = m\,v_\mathrm{h}/T_\mathrm{i}$"
+                     r"  (no rebound)")
     ax.annotate("", xy=(90.0, upper), xytext=(90.0, lower),
                 arrowprops={"arrowstyle": "<->", "lw": 1.4})
     ax.text(97.0, (upper * lower) ** 0.5,
@@ -1225,7 +1243,8 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
     twin = ax.twinx()
     twin.plot(x, res.l_prime_n, "-o", color=COLOR_FG, linewidth=2.0,
               markersize=4, zorder=5, label=r"$L^{\prime}_\mathrm{n}$ (apparent)")
-    twin.set_ylabel(r"Apparent normalized impact level $L^{\prime}_\mathrm{n}$ [dB]")
+    twin.set_ylabel(
+        r"Apparent normalized impact level $L^{\prime}_\mathrm{n}$ [dB]")
     idx_f0 = float(np.interp(np.log10(f_0), np.log10(bands), x))
     twin.axvline(idx_f0, color=COLOR_MUTED, linestyle=":", linewidth=1.6,
                  zorder=4, label=f"floating floor $f_0$ = {f_0:.1f} Hz")
@@ -1236,7 +1255,8 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
 
     info = [
         "five paths, not thirteen: only the floor is excited",
-        (rf"$L^{{\prime}}_\mathrm{{n,w}}$ ($C_\mathrm{{I}}$) = {res.rating.rating} "
+        (rf"$L^{{\prime}}_\mathrm{{n,w}}$ ($C_\mathrm{{I}}$)"
+         rf" = {res.rating.rating} "
          f"({_fmt_minus(res.rating.ci)}) dB"),
     ]
     ax.text(0.015, 0.03, "\n".join(info), transform=ax.transAxes,
@@ -1277,7 +1297,8 @@ def generate_radiation_efficiency_panels(output_dir: str) -> None:
     ax_l.axhline(1.0, color=COLOR_MUTED, linestyle="--", linewidth=1.4,
                  zorder=3, label=r"$\sigma = 1$ (as efficient as a piston)")
     ax_l.axvline(f_c, color=COLOR_TERTIARY, linestyle=":", linewidth=1.6,
-                 zorder=3, label=f"critical frequency $f_\\mathrm{{c}}$ = {f_c:.0f} Hz")
+                 zorder=3,
+                 label=rf"critical frequency $f_\mathrm{{c}}$ = {f_c:.0f} Hz")
     peak = float(big.radiation_efficiency.max())
     # The label goes in the open wedge under the legend and left of the rise,
     # with the leader carrying the eye to the peak: anywhere along the top the
@@ -1336,10 +1357,12 @@ def generate_structure_borne_conversion(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.plot(x, l_ws, "-o", color=COLOR_MUTED, linewidth=2.0, markersize=5,
             zorder=4,
-            label=r"$L_{W\mathrm{s}}$ measured on the test plate ($Y = 5.34\times10^{-6}$)")
+            label=(r"$L_{W\mathrm{s}}$ measured on the test plate"
+                   r" ($Y = 5.34\times10^{-6}$)"))
     ax.plot(x, l_wsn, "-s", color=COLOR_PRIMARY, linewidth=2.4, markersize=6,
             zorder=5,
-            label=(r"$L_{Wsn}$ on the standard plate ($Y = 5\times10^{-6}$): "
+            label=(r"$L_{W\mathrm{sn}}$ on the standard plate "
+                   r"($Y = 5\times10^{-6}$): "
                    "what is declared"))
     ax.plot(x, installed, "-^", color=COLOR_TERTIARY, linewidth=2.4,
             markersize=6, zorder=5,
@@ -1347,12 +1370,14 @@ def generate_structure_borne_conversion(output_dir: str) -> None:
                    r"($Y = 24.1\times10^{-6}$)"))
     ax.plot(x, characteristic, "-D", color=COLOR_SECONDARY, linewidth=2.4,
             markersize=6, zorder=5,
-            label=(r"$L_{W\mathrm{s,c}}$ with the source mobility ($Y = 10^{-3}$): "
+            label=(r"$L_{W\mathrm{s,c}}$ with the source mobility "
+                   r"($Y = 10^{-3}$): "
                    "the input to EN 12354-5"))
     ax.plot(x, characteristic - d_c, "x", color=COLOR_FG, markersize=9,
             markeredgewidth=2.0, zorder=6,
-            label=(f"$L_{{W\\mathrm{{s,c}}}} - D_\\mathrm{{C}}$, $D_\\mathrm{{C}}$ = {d_c:g} dB: "
-                   f"back to $L_{{W\\mathrm{{s,inst}}}}$"))
+            label=(rf"$L_{{W\mathrm{{s,c}}}} - D_\mathrm{{C}}$, "
+                   rf"$D_\mathrm{{C}}$ = {d_c:g} dB: "
+                   rf"back to $L_{{W\mathrm{{s,inst}}}}$"))
 
     # The step the section exists to teach, marked in the lowest band.
     ax.annotate("", xy=(0, installed[0]), xytext=(0, l_wsn[0]),

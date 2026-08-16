@@ -1475,7 +1475,7 @@ Q 49.843846 306.530992 52.843846 306.530992
 z
 " style="fill: #f0f2f5; stroke: #9e9e9e; stroke-linejoin: miter"/>
     </g>
-    <!-- $L_\mathrm{Aeq}$ 52,4 dB -->
+    <!-- $L_{\mathrm{Aeq}}$ 52,4 dB -->
     <g transform="translate(52.843846 274.925328) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -1543,7 +1543,7 @@ z
      <use xlink:href="#DejaVuSans-47" transform="translate(478.663477 0.015625)"/>
      <use xlink:href="#DejaVuSans-25" transform="translate(542.140039 0.015625)"/>
     </g>
-    <!-- $L_\mathrm{Ceq}$ 75,7 dB -->
+    <!-- $L_{\mathrm{Ceq}}$ 75,7 dB -->
     <g transform="translate(52.843846 287.527281) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-26" d="M 4122 4306 
@@ -2751,7 +2751,7 @@ Q 461.412674 306.530992 464.412674 306.530992
 z
 " style="fill: #f0f2f5; stroke: #9e9e9e; stroke-linejoin: miter"/>
     </g>
-    <!-- $L_\mathrm{Aeq}$ 54,6 dB -->
+    <!-- $L_{\mathrm{Aeq}}$ 54,6 dB -->
     <g transform="translate(464.412674 274.925328) scale(0.1 -0.1)">
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-24" transform="translate(55.712891 -14.984326) scale(0.7)"/>
@@ -2766,7 +2766,7 @@ z
      <use xlink:href="#DejaVuSans-47" transform="translate(478.663477 0.015625)"/>
      <use xlink:href="#DejaVuSans-25" transform="translate(542.140039 0.015625)"/>
     </g>
-    <!-- $L_\mathrm{Ceq}$ 56,4 dB -->
+    <!-- $L_{\mathrm{Ceq}}$ 56,4 dB -->
     <g transform="translate(464.412674 287.527281) scale(0.1 -0.1)">
      <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-26" transform="translate(55.712891 -14.984326) scale(0.7)"/>

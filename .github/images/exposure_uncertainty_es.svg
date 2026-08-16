@@ -804,7 +804,7 @@ z
      </g>
     </g>
     <g id="text_10">
-     <!-- Contribución a $L_\mathrm{EX,8h}$ [dB] -->
+     <!-- Contribución a $L_{\mathrm{EX,8h}}$ [dB] -->
      <g transform="translate(15.2 272.370118) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-26" d="M 4122 4306 
@@ -1204,7 +1204,7 @@ Q 56.272473 148.844692 61.272473 148.844692
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <!-- $L_\mathrm{EX,8h}$ = 84,3 dB -->
+    <!-- $L_{\mathrm{EX,8h}}$ = 84,3 dB -->
     <g transform="translate(61.272473 116.432778) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-20" d="M 678 2906 
@@ -1406,7 +1406,7 @@ z
      <use xlink:href="#DejaVuSans-18" transform="translate(978.564453 0.015625)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(1042.1875 0.015625)"/>
     </g>
-    <!-- $L_\mathrm{EX,8h} + U$ = 87,0 dB -->
+    <!-- $L_{\mathrm{EX,8h}} + U$ = 87,0 dB -->
     <g transform="translate(61.272473 140.441372) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-e" d="M 2944 4013 
@@ -1665,7 +1665,7 @@ z
 " style="fill: #d62728; opacity: 0.14; stroke: #d62728; stroke-linejoin: miter"/>
     </g>
     <g id="text_16">
-     <!-- $L_\mathrm{EX,8h} + U$ (unilateral 95 %) -->
+     <!-- $L_{\mathrm{EX,8h}} + U$ (unilateral 95 %) -->
      <g transform="translate(577.285 43.738125) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-8" d="M 4653 2053 
@@ -1751,7 +1751,7 @@ L 570.085 54.090234
 " style="fill: none; stroke: #d62728; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_17">
-     <!-- $L_\mathrm{EX,8h}$ diario -->
+     <!-- $L_{\mathrm{EX,8h}}$ diario -->
      <g transform="translate(577.285 57.240234) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-28" transform="translate(55.712891 -14.984326) scale(0.7)"/>

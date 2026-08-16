@@ -349,7 +349,7 @@ L 634.467597 28.318125
      </g>
     </g>
     <g id="text_9">
-     <!-- Audibilidad tonal $\Delta L_\mathrm{ta}$ [dB] -->
+     <!-- Audibilidad tonal $\Delta L_{\mathrm{ta}}$ [dB] -->
      <g style="fill: #ffffff" transform="translate(304.403672 429.515781) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-24" d="M 2188 4044 
@@ -857,7 +857,7 @@ L 705.6425 60.717921
      </g>
     </g>
     <g id="text_17">
-     <!-- Ajuste tonal $K_\mathrm{t}$ [dB] -->
+     <!-- Ajuste tonal $K_{\mathrm{t}}$ [dB] -->
      <g style="fill: #ffffff" transform="translate(14.8 262.966953) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-4d" d="M 603 3500 
@@ -1017,7 +1017,7 @@ Q 39.631009 80.508945 44.631009 80.508945
 z
 " style="fill: #1c2128; stroke: #555555; stroke-linejoin: miter"/>
     </g>
-    <!-- $K_\mathrm{t} = 0$  ($\Delta L_\mathrm{ta} &lt; 4$) -->
+    <!-- $K_{\mathrm{t}} = 0$  ($\Delta L_{\mathrm{ta}} &lt; 4$) -->
     <g style="fill: #ffffff" transform="translate(44.631009 48.097031) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-20" d="M 678 2906 
@@ -1085,7 +1085,7 @@ z
      <use xlink:href="#DejaVuSans-17" transform="translate(704.672852 0.125)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(768.295898 0.125)"/>
     </g>
-    <!-- $K_\mathrm{t} = \Delta L_\mathrm{ta} - 4$  ($4 \leq \Delta L_\mathrm{ta} \leq 10$) -->
+    <!-- $K_{\mathrm{t}} = \Delta L_{\mathrm{ta}} - 4$  ($4 \leq \Delta L_{\mathrm{ta}} \leq 10$) -->
     <g style="fill: #ffffff" transform="translate(44.631009 60.101328) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-c9c" d="M 678 2272 
@@ -1135,7 +1135,7 @@ z
      <use xlink:href="#DejaVuSans-13" transform="translate(1274.624023 0.125)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(1338.24707 0.125)"/>
     </g>
-    <!-- $K_\mathrm{t} = 6$  ($\Delta L_\mathrm{ta} &gt; 10$) -->
+    <!-- $K_{\mathrm{t}} = 6$  ($\Delta L_{\mathrm{ta}} &gt; 10$) -->
     <g style="fill: #ffffff" transform="translate(44.631009 72.105625) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-21" d="M 678 3150 
@@ -1323,7 +1323,7 @@ L 570.1925 360.502266
 " style="fill: none; stroke: #1f77b4; stroke-width: 2.4; stroke-linecap: square"/>
     </g>
     <g id="text_20">
-     <!-- $K_\mathrm{t}(\Delta L_\mathrm{ta})$ (Fórmulas C.4-C.6) -->
+     <!-- $K_{\mathrm{t}}(\Delta L_{\mathrm{ta}})$ (Fórmulas C.4-C.6) -->
      <g style="fill: #ffffff" transform="translate(577.3925 363.652266) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-29" d="M 628 4666 

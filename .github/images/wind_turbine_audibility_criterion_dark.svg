@@ -691,7 +691,7 @@ L 442.198438 26.318125
      </g>
     </g>
     <g id="text_10">
-     <!-- Tone frequency $f_\mathrm{c}$ [Hz] -->
+     <!-- Tone frequency $f_{\mathrm{c}}$ [Hz] -->
      <g style="fill: #ffffff" transform="translate(188.499609 357.434219) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-37" d="M -19 4666 
@@ -2509,7 +2509,7 @@ L 885.358437 51.005642
      </g>
     </g>
     <g id="text_35">
-     <!-- Required tonality $\Delta L_\mathrm{tn}$ [dB] -->
+     <!-- Required tonality $\Delta L_{\mathrm{tn}}$ [dB] -->
      <g style="fill: #ffffff" transform="translate(460.81625 244.025781) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-35" d="M 2841 2188 
@@ -2803,7 +2803,7 @@ L 513.610781 37.453125
 " style="fill: none; stroke: #1f77b4; stroke-width: 2; stroke-linecap: square"/>
     </g>
     <g id="text_37">
-     <!-- Tonality needed to be audible ($\Delta L_\mathrm{a} &gt; 0$) -->
+     <!-- Tonality needed to be audible ($\Delta L_{\mathrm{a}} &gt; 0$) -->
      <g style="fill: #ffffff" transform="translate(520.410781 40.428125) scale(0.085 -0.085)">
       <defs>
        <path id="DejaVuSans-21" d="M 678 3150 
@@ -2863,7 +2863,7 @@ L 513.610781 50.205117
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_38">
-     <!-- Tonality needed to be reportable ($\Delta L_\mathrm{a} \geq -3$ dB) -->
+     <!-- Tonality needed to be reportable ($\Delta L_{\mathrm{a}} \geq -3$ dB) -->
      <g style="fill: #ffffff" transform="translate(520.410781 53.180117) scale(0.085 -0.085)">
       <defs>
        <path id="DejaVuSans-cef" d="M 678 3175 

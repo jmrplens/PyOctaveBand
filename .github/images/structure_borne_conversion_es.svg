@@ -1950,63 +1950,9 @@ L 65.575781 336.821863
      </g>
     </g>
     <g id="text_19">
-     <!-- $L_{Wsn}$ sobre la placa normalizada ($Y = 5\times10^{-6}$): lo que se declara -->
+     <!-- $L_{W\mathrm{sn}}$ sobre la placa normalizada ($Y = 5\times10^{-6}$): lo que se declara -->
      <g transform="translate(72.375781 339.796863) scale(0.085 -0.085)">
       <defs>
-       <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
-z
-" transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-51" d="M 3566 2113 
-L 3156 0 
-L 2578 0 
-L 2988 2091 
-Q 3016 2238 3031 2350 
-Q 3047 2463 3047 2528 
-Q 3047 2791 2881 2937 
-Q 2716 3084 2419 3084 
-Q 1956 3084 1622 2776 
-Q 1288 2469 1184 1941 
-L 800 0 
-L 225 0 
-L 903 3500 
-L 1478 3500 
-L 1363 2950 
-Q 1603 3253 1940 3418 
-Q 2278 3584 2650 3584 
-Q 3113 3584 3367 3334 
-Q 3622 3084 3622 2631 
-Q 3622 2519 3608 2391 
-Q 3594 2263 3566 2113 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSans-54" d="M 947 1747 
 Q 947 1113 1208 752 
 Q 1469 391 1925 391 
@@ -2036,8 +1982,8 @@ z
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.746875)"/>
       <use xlink:href="#DejaVuSans-Oblique-3a" transform="translate(55.712891 -14.253076) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(124.926758 -14.253076) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-51" transform="translate(161.396484 -14.253076) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-56" transform="translate(124.926758 -14.253076) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-51" transform="translate(161.396484 -14.253076) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(208.496094 0.746875)"/>
       <use xlink:href="#DejaVuSans-56" transform="translate(240.283203 0.746875)"/>
       <use xlink:href="#DejaVuSans-52" transform="translate(292.382812 0.746875)"/>

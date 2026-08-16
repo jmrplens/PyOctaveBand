@@ -1291,6 +1291,8 @@ def _d_stoi_bench(s: SVG, th: Theme) -> None:
     s.arrow(332, ly, 356, ly, th.secondary, 2.2)
     s.rect(356, ly - 74, 172, 148, "none", th.muted, rx=8, sw=1.6, dash="6,5")
     s.text(442, ly - 84, "test box", 14, th.muted)
+    # No second line inside the box on purpose: what the device may be
+    # takes two lines and is lettered under it, below.
     box(370, ly - 52, 144, 46, "device under test", "", th.secondary)
     s.text(442, ly + 20, "hearing aid on an artificial ear,", 13, th.muted)
     s.text(442, ly + 40, "or a headset on a torso simulator", 13, th.muted)

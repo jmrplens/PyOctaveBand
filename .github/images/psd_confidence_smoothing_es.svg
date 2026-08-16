@@ -6213,7 +6213,7 @@ L 705.503125 28.318125
 " style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_20">
-    <!-- $n_d$ = 442 promedios, $\varepsilon_\mathrm{r}$ = 4,8 % -->
+    <!-- $n_\mathrm{d}$ = 442 promedios, $\varepsilon_\mathrm{r}$ = 4,8 % -->
     <g transform="translate(560.42516 47.816161) scale(0.085 -0.085)">
      <defs>
       <path id="DejaVuSans-Oblique-51" d="M 3566 2113 
@@ -6237,38 +6237,6 @@ Q 3113 3584 3367 3334
 Q 3622 3084 3622 2631 
 Q 3622 2519 3608 2391 
 Q 3594 2263 3566 2113 
-z
-" transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-47" d="M 2675 525 
-Q 2444 222 2128 65 
-Q 1813 -91 1428 -91 
-Q 903 -91 598 267 
-Q 294 625 294 1247 
-Q 294 1766 478 2236 
-Q 663 2706 1013 3078 
-Q 1244 3325 1534 3454 
-Q 1825 3584 2144 3584 
-Q 2481 3584 2739 3421 
-Q 2997 3259 3138 2956 
-L 3513 4863 
-L 4091 4863 
-L 3144 0 
-L 2566 0 
-L 2675 525 
-z
-M 891 1350 
-Q 891 897 1095 644 
-Q 1300 391 1663 391 
-Q 1931 391 2161 520 
-Q 2391 650 2566 903 
-Q 2750 1166 2856 1509 
-Q 2963 1853 2963 2188 
-Q 2963 2622 2758 2865 
-Q 2553 3109 2194 3109 
-Q 1922 3109 1687 2981 
-Q 1453 2853 1288 2613 
-Q 1106 2353 998 2009 
-Q 891 1666 891 1350 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-20" d="M 678 2906 
@@ -6473,7 +6441,7 @@ z
 " transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-Oblique-51" transform="translate(0 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-47" transform="translate(63.378906 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-47" transform="translate(63.378906 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(110.546875 0.015625)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(142.333984 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(226.123047 0.015625)"/>

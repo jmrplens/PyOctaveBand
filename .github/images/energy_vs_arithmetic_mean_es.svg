@@ -1118,7 +1118,7 @@ L 67.025781 286.165781
 " style="fill: none; stroke-dasharray: 6.66,2.88; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.8"/>
     </g>
     <g id="text_15">
-     <!-- $L_\mathrm{eq}$ (media energética) = 77 dB -->
+     <!-- $L_{\mathrm{eq}}$ (media energética) = 77 dB -->
      <g transform="translate(74.225781 289.315781) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -1693,7 +1693,7 @@ L 843.523438 28.318125
      </g>
     </g>
     <g id="text_34">
-     <!-- $L_\mathrm{eq}$ menos la media aritmética en dB [dB] -->
+     <!-- $L_{\mathrm{eq}}$ menos la media aritmética en dB [dB] -->
      <g transform="translate(438.159609 268.416953) rotate(-90) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-48" transform="translate(55.712891 -14.984326) scale(0.7)"/>

@@ -803,7 +803,7 @@ L 778.2875 71.345126
      </g>
     </g>
     <g id="text_15">
-     <!-- Potencia acústica ponderada A $L_{W\!,A}$ [dB(A) re 1 pW] -->
+     <!-- Potencia acústica ponderada A $L_{W\!,\mathrm{A}}$ [dB(A) re 1 pW] -->
      <g transform="translate(15.2 351.646953) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-33" d="M 1259 4147 
@@ -1019,22 +1019,6 @@ L 750 256
 L 750 794 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-24" d="M 2356 4666 
-L 3072 4666 
-L 3938 0 
-L 3278 0 
-L 3084 1197 
-L 984 1197 
-L 325 0 
-L -341 0 
-L 2356 4666 
-z
-M 2584 4044 
-L 1275 1722 
-L 2988 1722 
-L 2584 4044 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSans-25" d="M 1259 2228 
 L 1259 519 
 L 2272 519 
@@ -1143,7 +1127,7 @@ z
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(1576.371094 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-3a" transform="translate(1632.083984 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(1689.932878 -14.984326) scale(0.7)"/>
-      <use xlink:href="#DejaVuSans-Oblique-24" transform="translate(1725.82155 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-24" transform="translate(1725.82155 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1776.441667 0.015625)"/>
       <use xlink:href="#DejaVuSans-3e" transform="translate(1808.228777 0.015625)"/>
       <use xlink:href="#DejaVuSans-47" transform="translate(1847.242448 0.015625)"/>

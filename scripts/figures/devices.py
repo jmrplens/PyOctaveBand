@@ -865,7 +865,7 @@ def generate_sound_power_pressure_result(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title("Enveloping-surface sound power (ISO 3744)  "
-                 f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
+                 f"$L_{{W\\!\\mathrm{{A}}}}$ = {lwa:.1f} dB(A)",
                  pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound power level $L_W$ [dB]")
@@ -907,7 +907,7 @@ def generate_sound_power_reverberation_result(output_dir: str) -> None:
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
         "Reverberation-room sound power (ISO 3741)  "
-        f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
+        f"$L_{{W\\!\\mathrm{{A}}}}$ = {lwa:.1f} dB(A)",
         pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound power level $L_W$ [dB]")
@@ -955,7 +955,7 @@ def generate_sound_power_intensity_result(output_dir: str) -> None:
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
         "Intensity-scanning sound power (ISO 9614-2)  "
-        f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
+        f"$L_{{W\\!\\mathrm{{A}}}}$ = {lwa:.1f} dB(A)",
         pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound power level $L_W$ [dB]")
@@ -994,7 +994,7 @@ def generate_precision_anechoic_power(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title("Precision sound power (ISO 3745)  "
-                 f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
+                 f"$L_{{W\\!\\mathrm{{A}}}}$ = {lwa:.1f} dB(A)",
                  pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound power level $L_W$ [dB]")
@@ -1048,7 +1048,7 @@ def generate_intensity_scan_power(output_dir: str) -> None:
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title("Precision intensity scanning (ISO 9614-3)  "
-                 f"$L_{{W\\!A}}$ = {lwa:.1f} dB(A)",
+                 f"$L_{{W\\!\\mathrm{{A}}}}$ = {lwa:.1f} dB(A)",
                  pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound power level $L_W$ [dB]")
@@ -1129,7 +1129,8 @@ def generate_silencer_insertion_loss(output_dir: str) -> None:
             lw=1.7, ls="--",
             label="Insertion loss, stiff source ($Z_\\mathrm{s} = 20\\,\\rho c/S$)")
     ax.plot(freqs, np.asarray(matched.insertion_loss), color=COLOR_PRIMARY,
-            lw=1.7, label="Insertion loss, matched source ($Z_\\mathrm{s} = \\rho c/S$)")
+            lw=1.7,
+            label="Insertion loss, matched source ($Z_\\mathrm{s} = \\rho c/S$)")
     ax.set_xlim(20.0, 880.0)
     ax.set_ylim(-30.0, 24.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
@@ -1898,7 +1899,7 @@ def generate_sound_power_grades_declaration(output_dir: str) -> None:
                 label="declared limit 93 dB(A)")
     axl.set_xticks(range(len(grades)))
     axl.set_xticklabels([name for name, _ in grades], fontsize=9)
-    axl.set_ylabel("$L_{W\\!A}$ [dB re 1 pW]")
+    axl.set_ylabel("$L_{W\\!\\mathrm{A}}$ [dB re 1 pW]")
     axl.set_ylim(84.0, 101.0)
     axl.set_title("One measurement, three grades: 92.4 dB(A) against a 93 dB "
                   "limit", pad=12)
@@ -1909,21 +1910,22 @@ def generate_sound_power_grades_declaration(output_dir: str) -> None:
              ("Operating mode 2", 95.0, 2.0, 98.0))
     for k, (name, level, k_wa, l1) in enumerate(modes):
         axr.bar([k], [level], width=0.5, color=COLOR_PRIMARY,
-                label="$L_{W\\!A}$" if k == 0 else None)
+                label="$L_{W\\!\\mathrm{A}}$" if k == 0 else None)
         axr.bar([k], [k_wa], width=0.5, bottom=level, color=COLOR_MUTED,
-                label="$K_{W\\!A}$" if k == 0 else None)
+                label="$K_{W\\!\\mathrm{A}}$" if k == 0 else None)
         axr.plot([k], [l1], "D", color=COLOR_SECONDARY, markersize=10,
                  label="verification level $L_1$" if k == 0 else None)
         verdict = "verified" if l1 <= level + k_wa else "not verified"
-        axr.annotate(f"$L_{{W\\!Ad}}$ = {level + k_wa:.0f} dB\n"
+        axr.annotate(f"$L_{{W\\!\\mathrm{{Ad}}}}$ = {level + k_wa:.0f} dB\n"
                      f"$L_1$ = {l1:.0f} dB\n{verdict}",
                      (k, max(l1, level + k_wa) + 1.4), ha="center", fontsize=9)
     axr.set_xticks(range(len(modes)))
     axr.set_xticklabels([name for name, *_ in modes], fontsize=9)
     axr.set_ylabel("A-weighted sound power level [dB]")
     axr.set_ylim(80.0, 106.0)
-    axr.set_title("ISO 4871 Annex B: $L_{W\\!Ad} = L_{W\\!A} + K_{W\\!A}$, "
-                  "verified when $L_1 \\leq L_{W\\!Ad}$",
+    axr.set_title("ISO 4871 Annex B: $L_{W\\!\\mathrm{Ad}} = "
+                  "L_{W\\!\\mathrm{A}} + K_{W\\!\\mathrm{A}}$, "
+                  "verified when $L_1 \\leq L_{W\\!\\mathrm{Ad}}$",
                   pad=12)
     axr.grid(axis="y", color=COLOR_GRID, linestyle="-")
     axr.legend(loc="upper left", fontsize=9)
@@ -2250,7 +2252,8 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
                     ms=4, label=f"{flow:.0f} cfm ({velocity:.1f} m/s)")
         ax.axvline(peak, color=color, lw=1.0, ls=":")
     limit = air_terminal_velocity_limit(30, opening="supply")
-    ax.annotate(f"peak band $f_\\mathrm{{P}} = 48.8\\,U_\\mathrm{{G}}$ moves up one octave per\n"
+    ax.annotate(f"peak band $f_\\mathrm{{P}} = 48.8\\,U_\\mathrm{{G}}$ moves "
+                f"up one octave per\n"
                 f"doubling of the face velocity; ASHRAE Table 9 caps\nthe "
                 f"neck of an RC 30 supply outlet at {limit:.1f} m/s",
                 xy=(250.0, 33.0), xytext=(340.0, 12.0), fontsize="small",
@@ -2510,7 +2513,7 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(np.arange(bands.size) - 0.16, lp1 - nc45, width=0.32,
            color=theme_fill(COLOR_TERTIARY, ax), edgecolor=COLOR_TERTIARY,
-           label="Target $\\mathrm{{IL}}$ = $L_{p1}$ − NC 45")
+           label="Target $\\mathrm{IL}$ = $L_{p1}$ − NC 45")
     ax.bar(np.arange(bands.size) + 0.16,
            np.asarray(norton.correction, dtype=float), width=0.32,
            color=theme_fill(COLOR_SECONDARY, ax), edgecolor=COLOR_SECONDARY,

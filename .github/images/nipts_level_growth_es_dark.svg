@@ -305,7 +305,7 @@ z
      </g>
     </g>
     <g id="text_7">
-     <!-- $L_\mathrm{EX,8h}$ [dB(A)] -->
+     <!-- $L_{\mathrm{EX,8h}}$ [dB(A)] -->
      <g style="fill: #ffffff" transform="translate(207.846172 372.395781) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
@@ -2222,7 +2222,7 @@ L 867.572379 26.798125
      </g>
     </g>
     <g id="text_32">
-     <!-- $L_\mathrm{EX,8h}$ [dB(A)] -->
+     <!-- $L_{\mathrm{EX,8h}}$ [dB(A)] -->
      <g style="fill: #ffffff" transform="translate(652.446172 372.395781) scale(0.1 -0.1)">
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-28" transform="translate(55.712891 -14.984326) scale(0.7)"/>

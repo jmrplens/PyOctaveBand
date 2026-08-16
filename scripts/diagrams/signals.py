@@ -730,7 +730,8 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
 
     box(60, 250, 68, 72.0, "Signal generator", "broadband noise or a sweep",
         th.fg)
-    box(310, 460, 68, 72.0, "Power amplifier", "", th.fg)
+    box(310, 460, 68, 72.0, "Power amplifier",
+        "its gain is in H1", th.fg)
     s.arrow(250.0, 104.0, 306.0, 104.0, th.fg, 2.0)
     s.arrow(460.0, 104.0, 496.0, 104.0, th.fg, 2.0)
 

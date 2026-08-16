@@ -13,6 +13,12 @@ from __future__ import annotations
 from .canvas import SVG, Theme
 from .parts import _accel, _accel_wall, _rot_arrow, _spring_v
 
+#: Width, in px, a stage-box title has to leave inside the box at the larger
+#: size to keep it. It is the threshold the size decision is taken on, not a
+#: promise: a title wider than the box even at the smaller size is a
+#: composition to rewrite, and the fit gate is what catches one.
+_BOX_PAD = 24.0
+
 # ---------------------------------------------------------------------------
 # d8 - Airborne sound insulation setup (ISO 16283-1)
 # ---------------------------------------------------------------------------
@@ -81,7 +87,13 @@ def _d_ir_measurement(s: SVG, th: Theme) -> None:
     def box(x: float, y: float, title: str, subs: list[str],
             color: str) -> None:
         s.rect(x, y, bw, bh, th.panel, color, rx=12, sw=2)
-        t_size = 20 if len(title) > 11 else 22
+        # Drop a step when the title will not clear the box at the larger
+        # size. Counting characters decided this on the English string and
+        # on the assumption that every glyph is as wide as every other, so a
+        # Spanish twin that is longer on the page but not in characters kept
+        # a size it overflows at; the pen advance is what the box has to
+        # hold.
+        t_size = 22 if s.text_width(title, 22, bold=True) <= bw - _BOX_PAD else 20
         if subs:
             s.text(x + bw / 2, y + 38, title, t_size, th.fg, bold=True)
             if len(subs) == 1:
@@ -725,7 +737,7 @@ def _d_room_measurement_section(s: SVG, th: Theme) -> None:
     for i, line in enumerate((
         "Level (4.2.1):",
         "≥ 45 dB over the background",
-        "per band for T30, ≥ 35 dB for T20",
+        "per band for $T_{30}$, ≥ 35 dB for $T_{20}$",
         "Receiving chain (4.2.2.2):",
         "class 1 to IEC 61672-1,",
         "IEC 61260 filters, omnidirectional",
@@ -1972,7 +1984,8 @@ def _d_decay_range(s: SVG, th: Theme) -> None:
         s.line(wx, fy, wx + 196, fy, th.accent, 1.8, dash="7,4")
         s.text(wx + 202, fy + 5, f"{-flag:.0f} dB", 14, th.accent,
                anchor="start")
-    windows = (("EDT", 0.0, -10.0), ("T20", -5.0, -25.0), ("T30", -5.0, -35.0))
+    windows = (("EDT", 0.0, -10.0), ("$T_{20}$", -5.0, -25.0),
+               ("$T_{30}$", -5.0, -35.0))
     for i, (name, hi, lo) in enumerate(windows):
         bx = wx + 16 + 64 * i
         s.rect(bx, y_of(hi), 38, (hi - lo) * per_db, th.panel, th.primary,
@@ -1989,13 +2002,14 @@ def _d_decay_range(s: SVG, th: Theme) -> None:
     s.rect(48, 416, 804, 88, "none", th.muted, rx=10, dash="6,5")
     s.text(450, 442,
            "hatched: the 15 dB margin ISO 3382-1 asks for beyond each window "
-           "— EDT needs 25 dB, T20 35 dB, T30 45 dB", 14, th.fg)
+           "— EDT needs 25 dB, $T_{20}$ 35 dB, $T_{30}$ 45 dB", 14, th.fg)
     s.text(450, 466,
            "the library flags at 46 dB and 54 dB instead, where the fit's "
            "positive bias crosses 5 %", 14, th.accent)
     s.text(450, 490,
-           "short of range? T20 instead of T30 -> a longer sweep or more "
-           "averages -> EDT; never a fit into the noise", 14, th.secondary)
+           "short of range? $T_{20}$ instead of $T_{30}$ -> a longer sweep "
+           "or more averages -> EDT; never a fit into the noise", 14,
+           th.secondary)
 
 
 # ---------------------------------------------------------------------------
@@ -2201,10 +2215,11 @@ def _d_facade_setup(s: SVG, th: Theme) -> None:
         (600, ("Element method → $R′_{45°}$ (loudspeaker) or $R′_{tr,s}$ "
               "(traffic): one component, comparable with a laboratory $R$.")),
         # The 2 m of the quantity's subscript is a value with its unit,
-        # which the composer has no roman run for yet; the line stays plain
-        # until that case is adjudicated (as does the L1,2m label above).
+        # which the composer has no roman run for yet; that one symbol
+        # stays plain until the case is adjudicated (as does the L1,2m
+        # label above), while the R beside it is set like its twin.
         (626, ("Global method → D2m,nT: the whole facade as built, "
-              "not comparable with a laboratory R.")),
+              "not comparable with a laboratory $R$.")),
         (652, ("Road traffic replaces the loudspeaker at all angles: "
               "simultaneous inside and outside, ≥ 50 pass-bys.")),
         (678, ("Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "

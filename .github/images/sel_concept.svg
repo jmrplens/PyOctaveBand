@@ -8206,7 +8206,7 @@ L 75.405469 333.507422
 " style="fill: none; stroke-dasharray: 5.92,2.56; stroke-dashoffset: 0; stroke: #2ca02c; stroke-width: 1.6"/>
     </g>
     <g id="text_20">
-     <!-- $L_\mathrm{eq}$ over the whole event -->
+     <!-- $L_{\mathrm{eq}}$ over the whole event -->
      <g transform="translate(82.605469 336.657422) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 

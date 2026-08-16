@@ -78,7 +78,7 @@ def generate_psd_confidence_smoothing(output_dir: str) -> None:
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     ax.text(0.985, 0.965,
-            f"$n_d$ = {res.n_averages:.0f} averages, "
+            f"$n_\\mathrm{{d}}$ = {res.n_averages:.0f} averages, "
             f"$\\varepsilon_\\mathrm{{r}}$ = {100.0 * res.random_error:.1f} %",
             transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
             color=COLOR_FG)
@@ -115,7 +115,7 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
         10.0 * np.log10(welch.ci_lower[wband]),
         10.0 * np.log10(welch.ci_upper[wband]),
         color=COLOR_SECONDARY, alpha=0.20, lw=0.0,
-        label=f"Welch 95 % interval ($n_d$ = {welch.n_averages:.1f})")
+        label=f"Welch 95 % interval ($n_\\mathrm{{d}}$ = {welch.n_averages:.1f})")
     ax.semilogx(welch.frequencies[wband],
                 10.0 * np.log10(welch.psd[wband]), color=COLOR_SECONDARY,
                 linewidth=0.9, alpha=0.9, label="Welch, nperseg = 2048")
@@ -247,9 +247,11 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
         measured.append(float(np.max(10.0 * np.log10(res.psd[band]))))
     measured_db = np.asarray(measured)
     ax_r.semilogx(grid, bias_db, "o-", color=COLOR_SECONDARY, base=2,
-                  label="resolution bias, $-10\\lg(1+\\varepsilon_\\mathrm{b})$ [dB]")
+                  label="resolution bias, "
+                        "$-10\\lg(1+\\varepsilon_\\mathrm{b})$ [dB]")
     ax_r.semilogx(grid, random_db, "s-", color=COLOR_PRIMARY, base=2,
-                  label="random error, $10\\lg(1+1/\\sqrt{n_d})$ [dB]")
+                  label="random error, "
+                        "$10\\lg(1+1/\\sqrt{n_\\mathrm{d}})$ [dB]")
     ax_r.semilogx(grid, measured_db.max() - measured_db, "^--", color=COLOR_TERTIARY,
                   base=2, label="measured peak deficit [dB]")
     # bias - random falls monotonically with nperseg, so interpolate on the

@@ -2261,7 +2261,7 @@ L 702.160442 272.517539
 " style="fill: none; stroke: #ffffff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_32">
-    <!-- $r_\mathrm{D} \leq 5$ m: good -->
+    <!-- $r_{\mathrm{D}} \leq 5$ m: good -->
     <g style="fill: #ffffff" transform="translate(86.231046 474.751282) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSans-Oblique-55" transform="translate(0 0.015625)"/>
      <use xlink:href="#DejaVuSans-27" transform="translate(41.113281 -14.984326) scale(0.7)"/>
@@ -2278,7 +2278,7 @@ L 702.160442 272.517539
     </g>
    </g>
    <g id="text_33">
-    <!-- $r_\mathrm{D} &gt; 10$ m: poor -->
+    <!-- $r_{\mathrm{D}} &gt; 10$ m: poor -->
     <g style="fill: #ffffff" transform="translate(523.451843 474.751282) scale(0.09 -0.09)">
      <use xlink:href="#DejaVuSans-Oblique-55" transform="translate(0 0.78125)"/>
      <use xlink:href="#DejaVuSans-27" transform="translate(41.113281 -14.218701) scale(0.7)"/>
@@ -2354,7 +2354,7 @@ z
      </g>
     </g>
     <g id="text_36">
-     <!-- Treated: $r_\mathrm{D}$ = 4.5 m, $r_\mathrm{P}$ = 16 m -->
+     <!-- Treated: $r_{\mathrm{D}}$ = 4.5 m, $r_{\mathrm{P}}$ = 16 m -->
      <g style="fill: #ffffff" transform="translate(539.440442 287.457539) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-33" d="M 1259 4147 
@@ -2417,7 +2417,7 @@ z
      </g>
     </g>
     <g id="text_37">
-     <!-- Untreated: $r_\mathrm{D}$ = 11.0 m, $r_\mathrm{P}$ = 24 m -->
+     <!-- Untreated: $r_{\mathrm{D}}$ = 11.0 m, $r_{\mathrm{P}}$ = 24 m -->
      <g style="fill: #ffffff" transform="translate(539.440442 300.959648) scale(0.09 -0.09)">
       <use xlink:href="#DejaVuSans-38" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(73.193359 0.015625)"/>
