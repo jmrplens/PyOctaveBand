@@ -1386,7 +1386,7 @@ z
     </g>
    </g>
    <g id="text_27">
-    <!-- ISO 15186-1 Intensity Sound Reduction Index ($R_\mathrm{I}$ and $R_{I,\mathrm{M}}$) -->
+    <!-- ISO 15186-1 Intensity Sound Reduction Index ($R_\mathrm{I}$ and $R_\mathrm{I,M}$) -->
     <g style="fill: #ffffff" transform="translate(203.005234 16.32) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-2c" d="M 628 4666 
@@ -1596,7 +1596,7 @@ z
      <use xlink:href="#DejaVuSans-47" transform="translate(2594.136719 0.015625)"/>
      <use xlink:href="#DejaVuSans-3" transform="translate(2657.613281 0.015625)"/>
      <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(2689.400391 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-2c" transform="translate(2758.882812 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-2c" transform="translate(2758.882812 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(2779.527344 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-30" transform="translate(2815.416016 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-c" transform="translate(2878.545898 0.015625)"/>
@@ -1817,7 +1817,7 @@ L 76.566406 67.112812
      </g>
     </g>
     <g id="text_30">
-     <!-- $R_{I,\mathrm{M}} = R_\mathrm{I} + K_\mathrm{c}$ -->
+     <!-- $R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ -->
      <g style="fill: #ffffff" transform="translate(83.766406 70.262812) scale(0.09 -0.09)">
       <defs>
        <path id="DejaVuSans-e" d="M 2944 4013 
@@ -1837,7 +1837,7 @@ z
 " transform="scale(0.015625)"/>
       </defs>
       <use xlink:href="#DejaVuSans-Oblique-35" transform="translate(0 0.09375)"/>
-      <use xlink:href="#DejaVuSans-Oblique-2c" transform="translate(69.482422 -14.906201) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-2c" transform="translate(69.482422 -14.906201) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-f" transform="translate(90.126953 -14.906201) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-30" transform="translate(126.015625 -14.906201) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(208.62793 0.09375)"/>

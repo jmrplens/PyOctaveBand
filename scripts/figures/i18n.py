@@ -805,9 +805,9 @@ _ES_EXACT = {
     "Class 2 corridor": "Corredor de clase 2",
     # intensity_insulation figure (ISO 15186-1)
     r"ISO 15186-1 Intensity Sound Reduction Index "
-    r"($R_\mathrm{I}$ and $R_{I,\mathrm{M}}$)":
+    r"($R_\mathrm{I}$ and $R_\mathrm{I,M}$)":
         "Índice de reducción acústica por intensidad ISO 15186-1 "
-        r"($R_\mathrm{I}$ y $R_{I,\mathrm{M}}$)",
+        r"($R_\mathrm{I}$ y $R_\mathrm{I,M}$)",
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
     r"$K_\mathrm{c}$ adaptation": r"Adaptación $K_\mathrm{c}$",
     r"$R_\mathrm{I}$ (intensity)": r"$R_\mathrm{I}$ (intensidad)",

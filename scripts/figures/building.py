@@ -261,7 +261,7 @@ def generate_intensity_insulation(output_dir: str) -> None:
             markersize=6, zorder=5, label=r"$R_\mathrm{I}$ (intensity)")
     ax.plot(x, result.r_i_modified, "--", color=COLOR_TERTIARY, linewidth=2.2,
             marker="s", markersize=6, zorder=5,
-            label=r"$R_{I,\mathrm{M}} = R_\mathrm{I} + K_\mathrm{c}$")
+            label=r"$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(f)}" for f in freqs], rotation=45, ha="right",
@@ -269,7 +269,7 @@ def generate_intensity_insulation(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound reduction index [dB]")
     ax.set_title(r"ISO 15186-1 Intensity Sound Reduction Index "
-                 r"($R_\mathrm{I}$ and $R_{I,\mathrm{M}}$)",
+                 r"($R_\mathrm{I}$ and $R_\mathrm{I,M}$)",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
