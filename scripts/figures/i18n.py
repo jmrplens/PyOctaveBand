@@ -805,12 +805,12 @@ _ES_EXACT = {
     "Class 2 corridor": "Corredor de clase 2",
     # intensity_insulation figure (ISO 15186-1)
     r"ISO 15186-1 Intensity Sound Reduction Index "
-    r"($R_I$ and $R_{I,\mathrm{M}}$)":
+    r"($R_\mathrm{I}$ and $R_{I,\mathrm{M}}$)":
         "Índice de reducción acústica por intensidad ISO 15186-1 "
-        r"($R_I$ y $R_{I,\mathrm{M}}$)",
+        r"($R_\mathrm{I}$ y $R_{I,\mathrm{M}}$)",
     "Sound reduction index [dB]": "Índice de reducción acústica [dB]",
     r"$K_\mathrm{c}$ adaptation": r"Adaptación $K_\mathrm{c}$",
-    r"$R_I$ (intensity)": r"$R_I$ (intensidad)",
+    r"$R_\mathrm{I}$ (intensity)": r"$R_\mathrm{I}$ (intensidad)",
     # intensity_element_insulation info box: rating and formula, symbols only.
     "$D_{I,\\mathrm{n,e,w}}$($C$;$C_\\mathrm{tr}$) = 29(−1;−2) dB\n"
     "$D_{I,\\mathrm{n,e}} = L_{p1} - 6 - [L_{I\\mathrm{n}}"
@@ -879,13 +879,13 @@ _ES_EXACT = {
         "$L_\\mathrm{R}$ = 4,75 m, paredes laterales reflectantes)",
     # As above: the italic pair is the library renderer's, the upright
     # pair this figure's.
-    "$R_S + R_R$ (two ceilings)": "$R_S + R_R$ (dos techos)",
+    "$R_\\mathrm{S} + R_\\mathrm{R}$ (two ceilings)": "$R_\\mathrm{S} + R_\\mathrm{R}$ (dos techos)",
     r"$R_\mathrm{S} + R_\mathrm{R}$ (two ceilings)":
         r"$R_\mathrm{S} + R_\mathrm{R}$ (dos techos)",
     "Ceiling attenuation class\n(ASTM E1414/E413, CAC = 34 dB)":
         "Clase de atenuación de techo\n(ASTM E1414/E413, CAC = 34 dB)",
-    "Normalized ceiling attenuation $D_{n,c}$ [dB]":
-        "Diferencia de niveles normalizada del techo $D_{n,c}$ [dB]",
+    "Normalized ceiling attenuation $D_\\mathrm{n,c}$ [dB]":
+        "Diferencia de niveles normalizada del techo $D_\\mathrm{n,c}$ [dB]",
     r"Normalized ceiling attenuation $D_\mathrm{n,c}$ [dB]":
         r"Diferencia de niveles normalizada del techo $D_\mathrm{n,c}$ [dB]",
     r"$D_\mathrm{n,c}$ (measured)": r"$D_\mathrm{n,c}$ (medido)",
@@ -1832,7 +1832,7 @@ _ES_EXACT = {
     # Symbols only: reads the same in Spanish. Both spellings are listed
     # because the corpus still draws each -- the upright w is what ISO 717-1
     # prints, the italic one survives where a plate has not been reset yet.
-    "$R_w$": "$R_w$",
+    "$R_\\mathrm{w}$": "$R_\\mathrm{w}$",
     r"$R_\mathrm{w}$": r"$R_\mathrm{w}$",
     "$L\u2032_{\\mathrm{n}T,\\mathrm{w}}$": "$L\u2032_{\\mathrm{n}T,\\mathrm{w}}$",
     # --- anim_block_vs_exponential: the alignment the block detector needs ---
@@ -2257,9 +2257,9 @@ _ES_EXACT = {
         r"Amplitud exacta de la línea $A_0 m$ = 0,4",
     "Modulation amplitude": "Amplitud de modulación",
     "the carrier is at 1 kHz; its amplitude modulation\n"
-    "appears as one line at exactly $f_m$":
+    "appears as one line at exactly $f_\\mathrm{m}$":
         "la portadora está en 1 kHz; su modulación de amplitud\n"
-        "aparece como una línea exactamente en $f_m$",
+        "aparece como una línea exactamente en $f_\\mathrm{m}$",
     # Time synchronous averaging (McFadden 1987)
     "Periodic Waveform Extracted from Noise":
         "Forma de onda periódica extraída del ruido",
@@ -3089,9 +3089,9 @@ _ES_EXACT = {
     # RD 1367/2007 assessment figures (FL3); the .plot() labels mirror the
     # library's own translations in src/phonometry/_plot/environment.py.
     "Band level": "Nivel de banda",
-    "$L_t$ vs neighbour mean": "$L_t$ frente a la media de contiguas",
-    "RD 1367/2007 tonal correction $K_t$ = 6 dB":
-        "Corrección tonal $K_t$ = 6 dB (RD 1367/2007)",
+    "$L_\\mathrm{t}$ vs neighbour mean": "$L_\\mathrm{t}$ frente a la media de contiguas",
+    "RD 1367/2007 tonal correction $K_\\mathrm{t}$ = 6 dB":
+        "Corrección tonal $K_\\mathrm{t}$ = 6 dB (RD 1367/2007)",
     "RD 1367/2007: the Low-Frequency and Impulsive Corrections":
         "RD 1367/2007: las correcciones de baja frecuencia e impulsiva",
     r"$K_{\mathrm{f}}$, from $L_{\mathrm{Ceq},Ti} - L_{\mathrm{Aeq},Ti}$":
@@ -3714,8 +3714,8 @@ _ES_EXACT = {
     "Level re carrier [dB]": "Nivel respecto a la portadora [dB]",
     "$R_1$ (resistance)": "$R_1$ (resistencia)",
     "$X_1$ (reactance)": "$X_1$ (reactancia)",
-    r"Normalized radiation impedance $Z_r / \rho c S$":
-        r"Impedancia de radiación normalizada $Z_r / \rho c S$",
+    r"Normalized radiation impedance $Z_\mathrm{r} / \rho c S$":
+        r"Impedancia de radiación normalizada $Z_\mathrm{r} / \rho c S$",
     "Baffled circular piston radiation impedance":
         "Impedancia de radiación de un pistón circular con pantalla",
     "$F_2$ (surface pressure-intensity)": "$F_2$ (presión-intensidad superficial)",
@@ -4171,9 +4171,9 @@ _ES_EXACT = {
     "free end": "extremo libre",
     "4 kHz tone burst at ▼": "salva de tono de 4 kHz en ▼",
     # anim_elastic_coincidence
-    "Coincidence: the same steel plate, below and above $f_c$ "
+    "Coincidence: the same steel plate, below and above $f_\\mathrm{c}$ "
     "(elastic 2D FDTD)":
-        "Coincidencia: la misma placa de acero, bajo y sobre $f_c$ "
+        "Coincidencia: la misma placa de acero, bajo y sobre $f_\\mathrm{c}$ "
         "(FDTD elástico 2D)",
     "10 mm steel plate": "placa de acero de 10 mm",
     # coupling_term_regimes (EN 12354-5, buildings/design)
@@ -4587,8 +4587,8 @@ _ES_EXACT = {
     "14 dB at 2 kHz, gone only above coincidence":
         "lo que la Parte 1 paga: 25 dB en 63 Hz,\n"
         "14 dB en 2 kHz; solo desaparece sobre la coincidencia",
-    "Radiation efficiency: a driven plate below and above $f_c$":
-        "Eficiencia de radiación: una placa excitada bajo y sobre $f_c$",
+    "Radiation efficiency: a driven plate below and above $f_\\mathrm{c}$":
+        "Eficiencia de radiación: una placa excitada bajo y sobre $f_\\mathrm{c}$",
     "colour: air pressure / the pressure a piston of the same surface "
     "velocity would make":
         "color: presión del aire / la que haría un pistón con la misma "
@@ -4927,17 +4927,17 @@ _ES_PATTERNS = [
      r"Camino difractado ($\\delta$ = \1,\2 m)"),
     (r"^(\d+) yr$", r"\1 años"),
     # anim_elastic_coincidence titles and verdicts (library values baked in).
-    (r"^\$f = f_c/2\$ = (\d+) Hz, 45° incidence$",
-     r"$f = f_c/2$ = \1 Hz, incidencia a 45°"),
-    (r"^\$f = 2f_c\$ = (\d+) Hz, 45° incidence$",
-     r"$f = 2f_c$ = \1 Hz, incidencia a 45°"),
-    (r"^below \$f_c\$: the mass law holds: (.+) dB \(it predicts (.+)\)$",
-     r"bajo $f_c$: manda la ley de masas: \1 dB (predice \2)"),
-    ((r"^above \$f_c\$: trace matches \$\\lambda_B\$: (.+) dB, "
+    (r"^\$f = f_\\mathrm\{c\}/2\$ = (\d+) Hz, 45° incidence$",
+     r"$f = f_\\mathrm{c}/2$ = \1 Hz, incidencia a 45°"),
+    (r"^\$f = 2f_\\mathrm\{c\}\$ = (\d+) Hz, 45° incidence$",
+     r"$f = 2f_\\mathrm{c}$ = \1 Hz, incidencia a 45°"),
+    (r"^below \$f_\\mathrm\{c\}\$: the mass law holds: (.+) dB \(it predicts (.+)\)$",
+     r"bajo $f_\\mathrm{c}$: manda la ley de masas: \1 dB (predice \2)"),
+    ((r"^above \$f_\\mathrm\{c\}\$: trace matches \$\\lambda_B\$: (.+) dB, "
       r"the mass law said (.+)$"),
-     r"sobre $f_c$: la traza iguala $\\lambda_B$: \1 dB, la ley de masas decía \2"),
-    (r"^coincidence_frequency: \$f_c\$ = (\d+) Hz \(10 mm steel\)$",
-     r"coincidence_frequency: $f_c$ = \1 Hz (acero de 10 mm)"),
+     r"sobre $f_\\mathrm{c}$: la traza iguala $\\lambda_B$: \1 dB, la ley de masas decía \2"),
+    (r"^coincidence_frequency: \$f_\\mathrm\{c\}\$ = (\d+) Hz \(10 mm steel\)$",
+     r"coincidence_frequency: $f_\\mathrm{c}$ = \1 Hz (acero de 10 mm)"),
     # anim_elastic_plate_junction: the junction readout. Its own entry
     # because the mathtext symbols take it out of the decimal-comma pass.
     ((r"^junction_transmission\('L'\): \$\\tau\(0°\)\$ = (\d+)\.(\d+), "
@@ -5681,9 +5681,9 @@ _ES_PATTERNS = [
     # Lamb's problem clip: the measured Rayleigh speed and the material line.
     (r"^surface train: (.+) m/s measured, (.+) m/s exact$",
      r"tren de superficie: \1 m/s medido, \2 m/s exacto"),
-    ((r"^aluminium: \$c_P\$ = (.+), \$c_S\$ = (.+), \$c_R\$ = (.+) m/s "
+    ((r"^aluminium: \$c_\\mathrm\{P\}\$ = (.+), \$c_\\mathrm\{S\}\$ = (.+), \$c_R\$ = (.+) m/s "
       r"\(C&H Eq\. 3\.149\)$"),
-     r"aluminio: $c_P$ = \1, $c_S$ = \2, $c_R$ = \3 m/s (C&H ec. 3.149)"),
+     r"aluminio: $c_\\mathrm{P}$ = \1, $c_\\mathrm{S}$ = \2, $c_R$ = \3 m/s (C&H ec. 3.149)"),
     # Mode-conversion clip: the display gain and the measured reflection.
     (r"^steel drawn ×(\d+) \(\+(\d+) dB\)$",
      r"acero dibujado ×\1 (+\2 dB)"),
@@ -5694,13 +5694,13 @@ _ES_PATTERNS = [
     (r"^both evanescent\n\$\|V\|\$ = (\d+)\.(\d+), with a phase$",
      "las dos evanescentes\n$|V|$ = \\1,\\2, con una fase"),
     # Radiation-efficiency clip: panel titles, verdicts and footer.
-    ((r"^\$f = f_c/2\$ = (.+) Hz, below coincidence: the plate wave is "
+    ((r"^\$f = f_\\mathrm\{c\}/2\$ = (.+) Hz, below coincidence: the plate wave is "
       r"slower than sound$"),
-     ("$f = f_c/2$ = \\1 Hz, bajo coincidencia: la onda de la placa es más "
+     ("$f = f_\\\\mathrm{c}/2$ = \\1 Hz, bajo coincidencia: la onda de la placa es más "
       "lenta que el sonido")),
-    ((r"^\$f = 2f_c\$ = (.+) Hz, above coincidence: the plate wave is "
+    ((r"^\$f = 2f_\\mathrm\{c\}\$ = (.+) Hz, above coincidence: the plate wave is "
       r"faster than sound$"),
-     ("$f = 2f_c$ = \\1 Hz, sobre coincidencia: la onda de la placa es más "
+     ("$f = 2f_\\\\mathrm{c}$ = \\1 Hz, sobre coincidencia: la onda de la placa es más "
       "rápida que el sonido")),
     ((r"^\$\\lambda_B\$ = (\d+)\.(\d+) m is shorter than \$\\lambda\$ = "
       r"(\d+)\.(\d+) m in air\n"
@@ -5716,9 +5716,9 @@ _ES_PATTERNS = [
      ("$\\\\lambda_B$ = \\1,\\2 m es mayor que $\\\\lambda$ = \\3,\\4 m "
       "en el aire\n"
       "la coincidencia de traza lanza un haz a \\5°")),
-    ((r"^elastic 2D FDTD, 10 mm steel plate, \$f_c\$ = (.+) Hz · overlaid "
+    ((r"^elastic 2D FDTD, 10 mm steel plate, \$f_\\mathrm\{c\}\$ = (.+) Hz · overlaid "
       r"line: its deflection, exaggerated$"),
-     ("FDTD elástico 2D, placa de acero de 10 mm, $f_c$ = \\1 Hz · línea "
+     ("FDTD elástico 2D, placa de acero de 10 mm, $f_\\\\mathrm{c}$ = \\1 Hz · línea "
       "superpuesta: su deformación, exagerada")),
     # Underwater figures: readouts carrying computed values (the detection
     # ranges, the modal wavenumbers, the orca branches, the exposure
