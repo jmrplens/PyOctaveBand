@@ -56,7 +56,7 @@ product of one
 (Section 12.6.4.2). Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
 *unaveraged* estimate, random data carries a per-cell normalized random
-error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
+error of 1 (Eq. 8.158 with $n_\mathrm{d} = 1$; Bendat & Piersol quote
 $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display) - the spectrogram is a tool for
 deterministic structure (tones, sweeps, transients), while the averaged
 [Welch estimate](spectral-analysis.md) is the low-variance

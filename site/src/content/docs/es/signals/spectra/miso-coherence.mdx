@@ -234,7 +234,7 @@ son la medición.
 - **Ganancias fijas durante toda la tirada**, y todas las fuentes funcionando a
   la vez en el punto de operación que se está diagnosticando.
 - **Promedios de sobra.** Cada paso de condicionamiento gasta uno, así que la
-  última entrada del orden lleva $n_d - (q-1)$; apunta a unos cuantos cientos de
+  última entrada del orden lleva $n_\mathrm{d} - (q-1)$; apunta a unos cuantos cientos de
   promedios efectivos antes de leer una coherencia parcial pequeña como un cero
   físico.
 - **Anota junto al resultado:** modelo, posición y sensibilidad del sensor de
@@ -246,8 +246,8 @@ son la medición.
 
 Los errores aleatorios siguen la sección 9.3. Condicionar a las $i-1$ entradas
 previas cuesta $i-1$ grados de libertad, de modo que la $i$-ésima entrada
-ordenada lleva $n_d-(i-1)$ promedios efectivos (Ecs. 9.100/9.101) y la
-coherencia múltiple de $q$ entradas lleva $n_d-(q-1)$ (Ec. 9.98). El resultado
+ordenada lleva $n_\mathrm{d}-(i-1)$ promedios efectivos (Ecs. 9.100/9.101) y la
+coherencia múltiple de $q$ entradas lleva $n_\mathrm{d}-(q-1)$ (Ec. 9.98). El resultado
 expone `multiple_coherence_random_error` y `coherent_output_random_error`
 junto al número de promedios efectivos `n_averages`.
 

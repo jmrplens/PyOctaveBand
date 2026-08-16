@@ -877,15 +877,10 @@ _ES_EXACT = {
     "$L_\\mathrm{R}$ = 4.75 m, reflecting sidewalls)":
         "Trayecto por plenum de techo suspendido\n(modelo unidimensional, "
         "$L_\\mathrm{R}$ = 4,75 m, paredes laterales reflectantes)",
-    # As above: the italic pair is the library renderer's, the upright
-    # pair this figure's.
-    "$R_\\mathrm{S} + R_\\mathrm{R}$ (two ceilings)": "$R_\\mathrm{S} + R_\\mathrm{R}$ (dos techos)",
     r"$R_\mathrm{S} + R_\mathrm{R}$ (two ceilings)":
         r"$R_\mathrm{S} + R_\mathrm{R}$ (dos techos)",
     "Ceiling attenuation class\n(ASTM E1414/E413, CAC = 34 dB)":
         "Clase de atenuación de techo\n(ASTM E1414/E413, CAC = 34 dB)",
-    "Normalized ceiling attenuation $D_\\mathrm{n,c}$ [dB]":
-        "Diferencia de niveles normalizada del techo $D_\\mathrm{n,c}$ [dB]",
     r"Normalized ceiling attenuation $D_\mathrm{n,c}$ [dB]":
         r"Diferencia de niveles normalizada del techo $D_\mathrm{n,c}$ [dB]",
     r"$D_\mathrm{n,c}$ (measured)": r"$D_\mathrm{n,c}$ (medido)",
@@ -1829,10 +1824,7 @@ _ES_EXACT = {
     "largest sum still under the cap": "la mayor suma bajo el límite",
     "legal, but the sum is smaller:": "válido, pero la suma es menor:",
     "this is one step too far": "esto es un paso de más",
-    # Symbols only: reads the same in Spanish. Both spellings are listed
-    # because the corpus still draws each -- the upright w is what ISO 717-1
-    # prints, the italic one survives where a plate has not been reset yet.
-    "$R_\\mathrm{w}$": "$R_\\mathrm{w}$",
+    # Symbols only: reads the same in Spanish.
     r"$R_\mathrm{w}$": r"$R_\mathrm{w}$",
     "$L\u2032_{\\mathrm{n}T,\\mathrm{w}}$": "$L\u2032_{\\mathrm{n}T,\\mathrm{w}}$",
     # --- anim_block_vs_exponential: the alignment the block detector needs ---

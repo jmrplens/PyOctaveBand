@@ -17,8 +17,8 @@ Fine-band time-frequency views of a record, following Bendat & Piersol,
   resolution
   :math:`1/T_B` at a resolution-bandwidth-time product of one, so a single
   cell of random data is an unaveraged estimate: the power carries a
-  normalized random error of :math:`1/\sqrt{n_d} = 1` with
-  :math:`n_d = 1` (Eq. 8.158),
+  normalized random error of :math:`1/\sqrt{n_\mathrm{d}} = 1` with
+  :math:`n_\mathrm{d} = 1` (Eq. 8.158),
   and the magnitude display an error of
   :math:`\sqrt{2}/1.25 \approx 1.13` - the
   Rayleigh-ratio result Bendat & Piersol quote in Section 12.6.4.2.
@@ -118,8 +118,8 @@ class SpectrogramResult:
         for a light taper; the :math:`B_\mathrm{e} T_B` product per cell is close
         to 1).
     :ivar random_error: Normalized random error of each (unaveraged)
-        power cell for random data, :math:`1/\sqrt{n_d} = 1` with
-        :math:`n_d = 1`
+        power cell for random data, :math:`1/\sqrt{n_\mathrm{d}} = 1` with
+        :math:`n_\mathrm{d} = 1`
         (Eq. 8.158); Bendat & Piersol quote
         :math:`\sqrt{2}/1.25 \approx 1.13` for the
         magnitude display (Section 12.6.4.2). Deterministic components
@@ -190,7 +190,7 @@ def spectrogram(
     each cell is a single unaveraged estimate
     (:math:`B_\mathrm{e} T_B \approx 1`), random
     data carries a per-cell normalized random error of 1 (Eq. 8.158 with
-    :math:`n_d = 1`): the spectrogram is a tool for deterministic
+    :math:`n_\mathrm{d} = 1`): the spectrogram is a tool for deterministic
     structure -
     tones, sweeps, transients - not a low-variance spectral estimator.
 

@@ -64,11 +64,11 @@ assembly reproduces the chapter 6 closed form Eq. (6.107) to machine precision.
 The book does print four *output* numbers for the fully specified glass wool of
 Table 6.1, and all four are reproduced: the airborne branch changes from
 :math:`(\delta_1, \mu_1)` to :math:`(\delta_2, \mu_2)` at 495 Hz,
-:math:`\lvert \mu_a \rvert > 40` above 50 Hz, and ``mu_b`` runs from 1.0 at
+:math:`\lvert \mu_\mathrm{a} \rvert > 40` above 50 Hz, and ``mu_b`` runs from 1.0 at
 50 Hz to 0.82 at 1500 Hz (all printed pp. 124-125), while the impedance peak
 of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
-reproduced by :math:`\operatorname{Re}(\mu_b)`: the printed sentence calls it
-a modulus, but :math:`\lvert \mu_b \rvert` is 0.939 at 1500 Hz against the
+reproduced by :math:`\operatorname{Re}(\mu_\mathrm{b})`: the printed sentence calls it
+a modulus, but :math:`\lvert \mu_\mathrm{b} \rvert` is 0.939 at 1500 Hz against the
 printed 0.82, and ``docs/ERRATA.md`` records why. See
 ``tests/materials/absorbers/test_biot.py``.
 """

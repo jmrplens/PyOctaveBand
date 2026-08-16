@@ -36,13 +36,13 @@ diagram traces it with the numbers of this page's example.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis.svg" alt="Block diagram of the Welch PSD pipeline: a 20 second pink noise record at 48 kilohertz is split into 50 percent overlapped segments of 4096 samples giving 467 segments and an 11.7 hertz bin spacing, each segment is Hann tapered for a resolution bandwidth of 17.6 hertz, the one-sided squared FFT periodograms are averaged into 442 effective averages, and the result is Gxx of f with a chi-square confidence interval, a random error of 1 over the square root of n d equal to 4.8 percent and about 885 degrees of freedom; a final note states the trade-off that longer segments buy resolution but spend averages" width="92%"></picture>
 
-Averaging $n_d$ independent segments gives the estimate $2 n_d$ chi-square
+Averaging $n_\mathrm{d}$ independent segments gives the estimate $2 n_\mathrm{d}$ chi-square
 degrees of freedom (Eq. 8.162), from which everything else follows:
 
 $$
-\varepsilon_\mathrm{r}[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[\hat{G}_{xx}] = \frac{1}{\sqrt{n_\mathrm{d}}}, \qquad
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,\alpha/2}} \le G_{xx} \le
-\frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_d .
+\frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_\mathrm{d} .
 $$
 
 With overlapped, tapered segments the averages are correlated, so the result
@@ -133,9 +133,9 @@ the magnitude and phase (Eqs. 9.33 and 9.52, with the measured coherence in
 place of the unknown true value, as the book recommends for measured data):
 
 $$
-\varepsilon_\mathrm{r}[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_\mathrm{d}}}, \qquad
 \mathrm{s.d.}[\hat{\theta}_{xy}] =
-\frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_d}} .
+\frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_\mathrm{d}}} .
 $$
 
 Both shrink as the coherence approaches one: a strongly coherent pair needs
@@ -222,8 +222,8 @@ error through the SNR:
 
 $$
 \varepsilon_\mathrm{r}[\hat{G}_{vv}] =
-\frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
-\varepsilon_\mathrm{r}[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
+\frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_\mathrm{d}}}, \qquad
+\varepsilon_\mathrm{r}[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_\mathrm{d}}} .
 $$
 
 For additive uncorrelated output noise of known level the coherence has the
@@ -293,8 +293,8 @@ plt.show()
 </details>
 
 The `coherence_bias` field reports the small positive bias of the coherence
-estimate, $b[\hat{\gamma}^2] \approx (1-\gamma^2)^2/n_d$ (Eq. 9.75),
-negligible once $n_d$ reaches a
+estimate, $b[\hat{\gamma}^2] \approx (1-\gamma^2)^2/n_\mathrm{d}$ (Eq. 9.75),
+negligible once $n_\mathrm{d}$ reaches a
 few hundred, and another reason to average generously before trusting a low
 coherence.
 

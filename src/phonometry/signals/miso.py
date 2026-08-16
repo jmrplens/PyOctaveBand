@@ -46,9 +46,9 @@ machinery of :mod:`phonometry.signals.spectra`:
 
 The random errors follow Bendat & Piersol Section 9.3: conditioning on the
 :math:`i-1` preceding inputs costs :math:`i-1` degrees of freedom, so the
-``i``-th ordered input carries :math:`n_d - (i-1)` effective averages
+``i``-th ordered input carries :math:`n_\mathrm{d} - (i-1)` effective averages
 (Eqs. 9.100/9.101) and the ``q``-input multiple coherence carries
-:math:`n_d - (q-1)` (Eqs. 9.98/9.99).
+:math:`n_\mathrm{d} - (q-1)` (Eqs. 9.98/9.99).
 """
 
 from __future__ import annotations
@@ -282,10 +282,10 @@ def _coherent_output_errors(
     r"""Random error of each partial coherent output spectrum (Eq. 9.100).
 
     :math:`\varepsilon = (2-\gamma^2)^{1/2} /
-    (\lvert \gamma \rvert \sqrt{n_d - (i-1)})` for the ``i``-th ordered
+    (\lvert \gamma \rvert \sqrt{n_\mathrm{d} - (i-1)})` for the ``i``-th ordered
     input, with :math:`\gamma^2 = \gamma^2_{iy \cdot (i-1)!}` its partial
     coherence. Bins with zero partial coherence, or an effective average
-    count :math:`n_d - (i-1) \le 0`, report ``inf`` (no usable estimate).
+    count :math:`n_\mathrm{d} - (i-1) \le 0`, report ``inf`` (no usable estimate).
     """
     err = np.full_like(partial, np.inf)
     for pos, orig in enumerate(order):
@@ -308,7 +308,7 @@ def _multiple_coherence_error(
     r"""Random error of the multiple coherence estimate (Eq. 9.98).
 
     :math:`\varepsilon = \sqrt{2}\,(1-\gamma^2_{y:x}) /
-    (\lvert \gamma_{y:x} \rvert \sqrt{n_d - (q-1)})`.
+    (\lvert \gamma_{y:x} \rvert \sqrt{n_\mathrm{d} - (q-1)})`.
     """
     eff = nd - (q - 1)
     gamma = np.sqrt(multiple)
@@ -363,14 +363,14 @@ class MISOCoherenceResult:
         :math:`\hat{G}_{nn} = \hat{G}_{yy \cdot q!}` after removing every
         input (Eq. 7.121).
     :ivar multiple_coherence_random_error: Normalized random error of
-        :math:`\gamma^2_{y:x}` (Eq. 9.98), using :math:`n_d - (q-1)`
+        :math:`\gamma^2_{y:x}` (Eq. 9.98), using :math:`n_\mathrm{d} - (q-1)`
         effective averages.
     :ivar coherent_output_random_error: Normalized random error of each
         :math:`G_{v_i}` (Eq. 9.100), shape ``(q, F)``, using
-        :math:`n_d - (i-1)` effective averages for the ``i``-th ordered
+        :math:`n_\mathrm{d} - (i-1)` effective averages for the ``i``-th ordered
         input.
     :ivar n_segments: Raw number of (possibly overlapped) segments averaged.
-    :ivar n_averages: Effective number of independent averages :math:`n_d`.
+    :ivar n_averages: Effective number of independent averages :math:`n_\mathrm{d}`.
     :ivar resolution_bandwidth: Effective noise bandwidth :math:`B_\mathrm{e}`, in Hz.
     :ivar window: Taper name.
     :ivar nperseg: Segment length, in samples.

@@ -420,13 +420,13 @@ the agreement to machine precision between the **two independent derivations**
 the book gives, the ch. 6 closed form Eq. 6.107 and the ch. 11 global-matrix
 assembly; and the three computed numbers the book does print in prose for the
 Table 6.1 glass wool, all reproduced: the airborne wave changes root at 495 Hz,
-$|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
-1500 Hz. That last one is matched by $\mathrm{Re}(\mu_b)$, not by $|\mu_b|$,
+$|\mu_\mathrm{a}| > 40$ above 50 Hz, and $\mu_\mathrm{b}$ falls from 1.0 at 50 Hz to 0.82 at
+1500 Hz. That last one is matched by $\mathrm{Re}(\mu_\mathrm{b})$, not by $|\mu_\mathrm{b}|$,
 even though the printed sentence says "the ratio modulus": the model gives
-$\mu_b(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
+$\mu_\mathrm{b}(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
 value while its modulus, 0.939, is 14.5 % away. That is recorded in
 [Errata](../../ERRATA.md), along with the parameter sweep that
-fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
+fails to bring $|\mu_\mathrm{b}|$ anywhere near 0.82. The impedance peak of the book's
 thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
 $\mathrm{Im}(Z_\mathrm{s})$ peak rule. Everything else, including the whole
 oblique-incidence behaviour beyond its rigid-frame limit, rests on closed forms
