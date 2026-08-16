@@ -52,18 +52,18 @@ or slowly-oscillating flow. Both parts share the same three quantities and units
 
 $$
 R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
-R_s = R\,A\ \left[\text{Pa·s/m}\right], \qquad
-\sigma = \frac{R_s}{d}\ \left[\text{Pa·s/m}^2\right],
+R_\mathrm{s} = R\,A\ \left[\text{Pa·s/m}\right], \qquad
+\sigma = \frac{R_\mathrm{s}}{d}\ \left[\text{Pa·s/m}^2\right],
 $$
 
 with $\Delta p$ the pressure difference across the specimen, $q_v$ the volumetric
 flow, $A$ the cross-section and $d$ the thickness. Note the specific airflow
-resistance $R_s$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
-is $R_s$ per metre of thickness. Two helpers walk that chain from what an
+resistance $R_\mathrm{s}$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
+is $R_\mathrm{s}$ per metre of thickness. Two helpers walk that chain from what an
 instrument actually shows: `linear_airflow_velocity(q_v, area)` is the
 Clause 3.4 definition $u = q_v/A$ (a rig reads a volumetric flow off a
 rotameter, never a velocity), and
-`specific_airflow_resistance(resistance, area)` is Clause 3.2's $R_s = R\,A$ —
+`specific_airflow_resistance(resistance, area)` is Clause 3.2's $R_\mathrm{s} = R\,A$ —
 which also accepts the other route, `specific_airflow_resistance(pressure_drop=…,
 velocity=…)`, for a bench that logs $\Delta p$ and $u$ and never forms $R$ at
 all.
@@ -90,9 +90,9 @@ model fitted from a catalogue value.
 In the static method (ISO 9053-1:2018) a steady laminar flow is stepped up and the
 pressure difference plotted against the linear velocity $u = q_v/A$. A regression
 of at least second order **constrained through the origin**, $\Delta p = a\,u +
-b\,u^2$, is fitted, and $\Delta p$ and $R_s$ are read at the reference velocity
+b\,u^2$, is fitted, and $\Delta p$ and $R_\mathrm{s}$ are read at the reference velocity
 $u = 0.5\ \text{mm/s}$ (Clause 7.5); the highest velocity must not exceed
-15 mm/s. Because $R_s = \Delta p/u = a + b\,u$, the linear term $a$ is the
+15 mm/s. Because $R_\mathrm{s} = \Delta p/u = a + b\,u$, the linear term $a$ is the
 zero-velocity specific airflow resistance.
 
 Neither velocity is arbitrary, and Clause 7.5 says why. A plane wave of
@@ -193,7 +193,7 @@ unidirectional, with more than a diameter behind it recommended for thin,
 low-porosity specimens. The specimen rests on a perforated support or a
 thin-wire grid with at least 50 % open area evenly distributed, holes no
 smaller than 3 mm, and an airflow resistance under 1 % of the specimen's;
-Clause 5.2 even gives the closed form $R_s = 8\eta h/(\phi r^2)$ for a
+Clause 5.2 even gives the closed form $R_\mathrm{s} = 8\eta h/(\phi r^2)$ for a
 perforated plate so the support can be checked rather than assumed.
 
 **The two ways to get it wrong, and their signs.** Both dominant error
@@ -250,10 +250,10 @@ faulty instrument; a 20 % disagreement between your own three specimens is.
 accredited airflow-resistance test report (ISO 9053-1:2018, static method): a
 standard-basis line, an optional metadata header block, a two-panel body with a
 metrics table (the evaluation velocity, the fitted pressure difference, the
-airflow resistance $R$, the specific airflow resistance $R_s$, the airflow
+airflow resistance $R$, the specific airflow resistance $R_\mathrm{s}$, the airflow
 resistivity $\sigma$ when a thickness is available, and the through-origin fit
 coefficients $a$ and $b$) beside the fitted $\Delta p(u)$ curve (the result's
-own `.plot()`), the boxed specific airflow resistance $R_s$ with $R$ and
+own `.plot()`), the boxed specific airflow resistance $R_\mathrm{s}$ with $R$ and
 $\sigma$ alongside, and a footer with the fixed disclaimer. ISO 9053-1 is a
 material characterisation, so the fiche carries no pass/fail verdict.
 
@@ -300,23 +300,23 @@ airtight plug; the resistance follows from the sound-pressure-level difference
 between the two terminations (Formula (2)):
 
 $$
-R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
-    10^{(L_{p,s} - L_{p,t})/20},
+R = \frac{\kappa'\,P_\mathrm{S}}{2\pi f\,V}\cdot\frac{h_\mathrm{t}}{h_\mathrm{s}}\cdot
+    10^{(L_{p,\mathrm{s}} - L_{p,\mathrm{t}})/20},
 $$
 
-with $P_S$ the static (atmospheric) pressure, $f$ the piston frequency, $V$ the
+with $P_\mathrm{S}$ the static (atmospheric) pressure, $f$ the piston frequency, $V$ the
 volume of the air cavity (including every connecting pipe, with the piston at
-mid-stroke), $L_{p,s}$ and $L_{p,t}$ the cavity sound pressure levels measured
+mid-stroke), $L_{p,\mathrm{s}}$ and $L_{p,\mathrm{t}}$ the cavity sound pressure levels measured
 with the measurement cell carrying the specimen and with the airtight
-termination, $h_s$ and $h_t$ the corresponding piston stroke amplitudes, and
+termination, $h_\mathrm{s}$ and $h_\mathrm{t}$ the corresponding piston stroke amplitudes, and
 $\kappa'$ the **effective** ratio of specific heats.
 
 **What the formula is saying.** The airtight termination is the reference: with
 it the cavity is a sealed compliance, the piston's whole swept volume goes into
 compressing the air, and the level is high. Put the specimen in its place and
 most of that flow bleeds through the pores instead, so the cavity level falls —
-and the drop $L_{p,t} - L_{p,s}$ *is* the measurement. The stroke ratio
-$h_t/h_s$ only normalises the two runs to the same volume velocity, which is
+and the drop $L_{p,\mathrm{t}} - L_{p,\mathrm{s}}$ *is* the measurement. The stroke ratio
+$h_\mathrm{t}/h_\mathrm{s}$ only normalises the two runs to the same volume velocity, which is
 why the two strokes are deliberately unequal: ISO 9053-2 Clause 6.2 NOTE 1
 gives 1.4 mm with the airtight termination against 14 mm with the specimen for
 a 10 mm piston, a 100 mm cell and a cavity near $10^{-3}$ m³ — exactly the
@@ -324,11 +324,11 @@ example below — so that both levels land inside the analyser's useful range.
 Two consequences are worth having. Only a level *difference* at one frequency
 enters, so the sound measuring device needs no absolute calibration and its
 frequency response is not critical; what matters is level linearity
-(Clause 8.7). And the run order is fixed by Clause 8.5/8.6: measure $P_S$, set
-the stroke to $h_s$, read the piston frequency, the background level $L_{p,b}$
-(source running, neither cell nor termination fitted) and then $L_{p,s}$; only
-then swap in the airtight termination, set $h_t$, confirm the frequency has not
-moved, and read $L_{p,t}$.
+(Clause 8.7). And the run order is fixed by Clause 8.5/8.6: measure $P_\mathrm{S}$, set
+the stroke to $h_\mathrm{s}$, read the piston frequency, the background level $L_{p,\mathrm{b}}$
+(source running, neither cell nor termination fitted) and then $L_{p,\mathrm{s}}$; only
+then swap in the airtight termination, set $h_\mathrm{t}$, confirm the frequency has not
+moved, and read $L_{p,\mathrm{t}}$.
 
 Heat conduction
 between the oscillating air and the cavity walls makes the compression not fully
@@ -413,9 +413,9 @@ plt.show()
 
 **Acceptance criteria (Clause 8.7).** Formula (2) is only valid when two
 conditions hold. Formula (3),
-$(h_t/h_s)\,10^{(L_{p,s}-L_{p,t})/20} < 0.3$, keeps the linearised Formula (2)
+$(h_\mathrm{t}/h_\mathrm{s})\,10^{(L_{p,\mathrm{s}}-L_{p,\mathrm{t}})/20} < 0.3$, keeps the linearised Formula (2)
 close enough to the exact relation of Annex B; Formula (4),
-$L_{p,s} - L_{p,b} > 10$ dB, keeps the background's influence on $L_{p,s}$
+$L_{p,\mathrm{s}} - L_{p,\mathrm{b}} > 10$ dB, keeps the background's influence on $L_{p,\mathrm{s}}$
 below 0.4 dB for uncorrelated noise (a correlated background needs more).
 `alternating_airflow_resistance` accepts `background_level` precisely so it can
 check the second, and warns through `AirflowResistanceWarning` when either
@@ -423,8 +423,8 @@ fails or when the piston frequency leaves 1–4 Hz. When one does fail, the
 standard offers four knobs: change the specimen length, the specimen diameter,
 the cavity volume, the piston frequency or the piston stroke. It is also worth
 checking that the flow the piston drives through the specimen lands in the
-recommended window: Clause 6.2 gives $q_v = 2\pi f h A_P$ and Formula (1)
-$v_s = q_v/A$, and recommends rms velocities between 0.5 mm/s and 4 mm/s —
+recommended window: Clause 6.2 gives $q_v = 2\pi f h A_\mathrm{P}$ and Formula (1)
+$v_\mathrm{s} = q_v/A$, and recommends rms velocities between 0.5 mm/s and 4 mm/s —
 the same physical regime as the static method's reference velocity.
 
 ```python
@@ -451,7 +451,7 @@ print(round(r_s, 1), round(r_s / 0.05))    # 1751.1 Pa*s/m, 35022 Pa*s/m^2
 **What Part 2 returns, and what it does not.** Unlike the static method,
 `alternating_airflow_resistance` returns a bare resistance in Pa·s/m³, not a
 result object: there is no `StaticAirflowResult` equivalent, so no `.plot()`
-and no ISO 9053-2 fiche, and the two steps to $R_s$ and $\sigma$ are the
+and no ISO 9053-2 fiche, and the two steps to $R_\mathrm{s}$ and $\sigma$ are the
 caller's — which is what the last two lines above do. What Part 2 buys instead
 is the specimens Part 1 cannot hold: very open or very thin materials whose
 static pressure drop is too small to read against the rig's own leakage, and
@@ -488,7 +488,7 @@ front face before the pores can absorb it. Between the two lies the classic
 design window for the total flow resistance of a layer of thickness $d$,
 
 $$
-\rho_0 c_0 \;\lesssim\; R_s = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
+\rho_0 c_0 \;\lesssim\; R_\mathrm{s} = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
 $$
 
 that is, a specific flow resistance of one to four times the characteristic

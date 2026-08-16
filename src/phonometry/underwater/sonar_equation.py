@@ -21,7 +21,7 @@ propagation loss at the detection limit :math:`\mathrm{SE} = 0`):
 All quantities are in dB (levels re a plane wave of 1 µPa rms; the terms are
 spectrum levels, i.e. referred to a 1 Hz band). Source: Urick, *Principles of
 Underwater Sound*, via Etter (2003), Table 10.2. The loss term is the
-propagation loss :math:`N_\mathrm{PL} = L_S - L_p(x)` of ISO 18405:2017,
+propagation loss :math:`N_\mathrm{PL} = L_\mathrm{S} - L_p(x)` of ISO 18405:2017,
 3.4.1.4, which is also the term its own passive and active sonar equations
 (3.6.2.7 and 3.6.2.11) are written with.
 

@@ -24,7 +24,7 @@ so the report never merely repeats a manufacturer number:
 
   .. math::
 
-     L_M = 20 \log_{10}(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
+     L_M = 20 \log_{10}(M / M_\mathrm{r}), \qquad M_\mathrm{r} = 1\ \mathrm{V/Pa}
 
   the rated sensitivity referring to the standard reference frequency of
   1 000 Hz (11.3). This is the first clean-room oracle: 12.5 mV/Pa returns
@@ -54,8 +54,8 @@ so the report never merely repeats a manufacturer number:
 * **Equivalent sound pressure level due to inherent noise** (17.2 d/e). The
   equivalent sound pressure is the ratio of the weighted inherent-noise
   output voltage to the rated free-field sensitivity,
-  :math:`p_N = U_N / M`, and its level is
-  :math:`L_N = 20 \log_{10}(p_N / p_0)` with :math:`p_0 = 20` uPa, the fourth
+  :math:`p_\mathrm{N} = U_\mathrm{N} / M`, and its level is
+  :math:`L_\mathrm{N} = 20 \log_{10}(p_\mathrm{N} / p_0)` with :math:`p_0 = 20` uPa, the fourth
   oracle. The overload sound pressure level (15.2.2) is read from a measured
   distortion-against-level curve as the interpolated sound pressure level
   where the distortion reaches the specified limit.

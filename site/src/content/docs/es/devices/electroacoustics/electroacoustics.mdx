@@ -132,7 +132,7 @@ entero de periodos) o una ventana de baja fuga para leer las amplitudes sin
 fuga espectral.
 
 Solo se suman los armónicos que caen **por debajo de Nyquist** — la
-implementación detiene la suma en el primer orden que alcanza $f_s/2$ —, así que
+implementación detiene la suma en el primer orden que alcanza $f_\mathrm{s}/2$ —, así que
 el recuento efectivo de órdenes se encoge a medida que sube la frecuencia de
 ensayo: a 48 kHz un ensayo de 1 kHz suma diez órdenes y uno de 7 kHz suma dos, y
 un barrido de THD con `n_harmonics` fijo no mide la misma magnitud en los dos
@@ -402,14 +402,14 @@ segundo con los tonos fijados, y los puntos van en orden de apartado:
   y para que $f_2 - 2f_1$ quede por encima del armónico significativo más alto
   de $f_1$. Los valores por orden son sumas *aritméticas* de las amplitudes de
   las bandas laterales respecto a la salida en $f_2$:
-  $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ y
-  $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. El resultado también lleva el
+  $d_{\mathrm{m},2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ y
+  $d_{\mathrm{m},3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. El resultado también lleva el
   valor `smpte` de RMS combinado que dan los analizadores tipo SMPTE (no
   es una magnitud IEC).
 - **Distorsión por diferencia de frecuencias** (14.12.8): dos tonos agudos
   iguales $f_1 < f_2$, referida a $U_{2,\text{ref}} = 2U_{2,f_2}$ (la suma de las
-  amplitudes de ambos tonos): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ y la
-  suma aritmética $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
+  amplitudes de ambos tonos): $d_{\mathrm{d},2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ y la
+  suma aritmética $d_{\mathrm{d},3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
 - **Intermodulación dinámica** (DIM, 14.12.9): una sinusoide de 15 kHz más una onda
   cuadrada de 3,15 kHz filtrada en paso bajo (1:4 pico a pico). La DIM es el
   RMS de los productos de intermodulación
@@ -436,9 +436,9 @@ modulado térmicamente, un woofer que desplaza por efecto Doppler la salida de u
 tweeter — puede dar una THD baja y una distorsión de modulación mala.
 
 Una advertencia sobre la referencia. La IEC 60268-3 admite dos presentaciones de
-las mismas bandas laterales: contra la salida en $f_2$, que es la $d_m$ que
+las mismas bandas laterales: contra la salida en $f_2$, que es la $d_\mathrm{m}$ que
 devuelve esta función, y contra la tensión de referencia combinada 4:1
-$U_{2,\text{ref}} = 5\,U_{2,f_2}$, que da $d'_m = 5\,d_m$. Una cifra sacada de
+$U_{2,\text{ref}} = 5\,U_{2,f_2}$, que da $d'_\mathrm{m} = 5\,d_\mathrm{m}$. Una cifra sacada de
 una hoja de características puede ser, por tanto, cinco veces (14 dB) la
 calculada aquí, así que la referencia se tiene que citar junto al número.
 
@@ -581,7 +581,7 @@ la resolución es demasiado gruesa cerca de una resonancia aguda y, sobre todo,
 un retardo más largo que el segmento. El promediado es lo que convierte la
 coherencia en una barra de error: el error aleatorio normalizado de la
 estimación de $|H_1|$ es
-$\varepsilon = \sqrt{1-\gamma^2}\,/\,(|\gamma|\sqrt{2 n_d})$ para $n_d$
+$\varepsilon = \sqrt{1-\gamma^2}\,/\,(|\gamma|\sqrt{2 n_\mathrm{d}})$ para $n_\mathrm{d}$
 promedios, así que $\gamma^2 = 0{,}9$ necesita unos 22 promedios para un error
 de magnitud del 5 %. Como regla de trabajo, una banda cuya coherencia se queda
 por debajo de 0,9 aproximadamente está **sin medir**, más que mal medida, y su

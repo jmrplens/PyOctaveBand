@@ -45,7 +45,7 @@ _STRINGS: dict[str, str] = {
         "Índice de transferencia de modulación MTI",
     _THIRD_OCTAVE_LABEL: "Banda de tercio de octava [Hz]",
     "Mean intermediate correlation": "Correlación intermedia media",
-    "Spectral correlation $d_m$": "Correlación espectral $d_m$",
+    "Spectral correlation $d_\\mathrm{m}$": "Correlación espectral $d_\\mathrm{m}$",
     "Analysis segment": "Segmento de análisis",
     "Band audibility": "Audibilidad de banda",
     "Band audibility $A_i$": "Audibilidad de banda $A_i$",
@@ -155,7 +155,7 @@ def plot_stoi(
         kwargs.setdefault("color", _C_PRIMARY)
         ax.plot(np.arange(scores.size), scores, **kwargs)
         ax.set_xlabel(_t("Analysis segment", language))
-        ax.set_ylabel(_t("Spectral correlation $d_m$", language))
+        ax.set_ylabel(_t("Spectral correlation $d_\\mathrm{m}$", language))
     # The intermediate correlations are cosine-similarity quantities in
     # [-1, 1] (unlike the [0, 1] ratios of plot_sti/plot_sii), so keep room
     # for anti-correlated bands rather than clipping them at zero.

@@ -1291,7 +1291,7 @@ Q 437.490873 384.464631 442.490873 384.464631
 z
 " style="fill: #f0f2f5; stroke: #e0e0e0; stroke-linejoin: miter"/>
     </g>
-    <!-- $D_{I,\mathrm{n,e,w}}$($C$;$C_\mathrm{tr}$) = 29(−1;−2) dB -->
+    <!-- $D_\mathrm{I,n,e,w}$($C$;$C_\mathrm{tr}$) = 29(−1;−2) dB -->
     <g transform="translate(544.890873 363.459357) scale(0.1 -0.1)">
      <defs>
       <path id="DejaVuSans-Oblique-27" d="M 1081 4666 
@@ -1315,11 +1315,11 @@ Q 3206 4147 2406 4147
 L 1613 4147 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-Oblique-2c" d="M 1081 4666 
-L 1716 4666 
-L 806 0 
-L 172 0 
-L 1081 4666 
+      <path id="DejaVuSans-2c" d="M 628 4666 
+L 1259 4666 
+L 1259 0 
+L 628 0 
+L 628 4666 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-f" d="M 750 794 
@@ -1465,7 +1465,7 @@ z
 " transform="scale(0.015625)"/>
      </defs>
      <use xlink:href="#DejaVuSans-Oblique-27" transform="translate(0 0.015625)"/>
-     <use xlink:href="#DejaVuSans-Oblique-2c" transform="translate(77.001953 -14.984326) scale(0.7)"/>
+     <use xlink:href="#DejaVuSans-2c" transform="translate(77.001953 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(97.646484 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-51" transform="translate(133.535156 -14.984326) scale(0.7)"/>
      <use xlink:href="#DejaVuSans-f" transform="translate(177.900391 -14.984326) scale(0.7)"/>
@@ -1498,6 +1498,13 @@ z
     <!-- $D_{I,\mathrm{n,e}} = L_{p1} - 6 - [L_{I\mathrm{n}} + 10\,\log_{10}(S_\mathrm{m}/A_0)] + 10\,\log_{10} N$ -->
     <g transform="translate(442.490873 375.463654) scale(0.1 -0.1)">
      <defs>
+      <path id="DejaVuSans-Oblique-2c" d="M 1081 4666 
+L 1716 4666 
+L 806 0 
+L 172 0 
+L 1081 4666 
+z
+" transform="scale(0.015625)"/>
       <path id="DejaVuSans-Oblique-2f" d="M 1075 4666 
 L 1709 4666 
 L 909 525 
@@ -1704,13 +1711,6 @@ z
     <!-- ISO 15186-1 Small-Element Insulation by Intensity -->
     <g transform="translate(221.956172 16.318125) scale(0.12 -0.12)">
      <defs>
-      <path id="DejaVuSans-2c" d="M 628 4666 
-L 1259 4666 
-L 1259 0 
-L 628 0 
-L 628 4666 
-z
-" transform="scale(0.015625)"/>
       <path id="DejaVuSans-36" d="M 3425 4513 
 L 3425 3897 
 Q 3066 4069 2747 4153 

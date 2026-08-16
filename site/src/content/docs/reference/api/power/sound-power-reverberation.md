@@ -17,7 +17,7 @@ room, with the Sabine absorption area and the speed of sound `c` in m/s
 (ISO 3741:2010 clause 9.1.4, Eq. 20):
 
 $$
-L_p(\text{ST}) = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 16}
+L_p(\text{ST}) = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 16}
 $$
 
 $$
@@ -39,11 +39,11 @@ correction) carry the result to the reference meteorological conditions of
 clause 4 (23.0 C, 101.325 kPa, 50 %), per clause 9.1.4:
 
 $$
-C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 5 \log_{10}\frac{273.15 + \theta}{314}
 $$
 
 $$
-C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296}
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 15 \log_{10}\frac{273.15 + \theta}{296}
 $$
 
 The **comparison method** replaces the absorption-area terms by a reference

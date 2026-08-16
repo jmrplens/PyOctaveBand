@@ -296,7 +296,7 @@ The unweighted level of the same second is 93.98 dB: A weighting takes almost
 by about 19 dB. `signals.laeq(recording, fs, calibration_factor=cal)` is the
 one-line form of the two lines above and applies the weighting internally, so
 never A-weight the signal first and then pass it to a level function — that
-weights it twice. The Fast and Slow envelopes, $L_{AE}$, $L_{Cpeak}$ and the
+weights it twice. The Fast and Slow envelopes, $L_{\mathrm{A}E}$, $L_\mathrm{Cpeak}$ and the
 percentile levels are the same kind of call: [Time
 Weighting](/phonometry/signals/levels/time-weighting/) and [Integrated and
 Statistical Levels](/phonometry/signals/levels/levels/) have them, and [Build a
@@ -317,7 +317,7 @@ which they are made decide what the levels are worth:
   Automatic gain control, noise suppression, limiting and interface EQ all
   change the level as a function of the level, so a processed sample can no
   longer be turned into a sound pressure level. A clipped one cannot either.
-- **Record at 48 kHz or more.** At 44.1 kHz the bands above $f_s/2$ are dropped:
+- **Record at 48 kHz or more.** At 44.1 kHz the bands above $f_\mathrm{s}/2$ are dropped:
   the bank returns 32 bands ending at 15848.9 Hz instead of the 33 ending at
   19952.6 Hz shown above, and says so with a `PhonometryWarning`.
 - **Repeat the calibrator check at the end.** The pre/post difference is the
@@ -389,7 +389,7 @@ someone walks through comes back as an energy average nobody asked for. If the
 level moves during the record, slice the signal and call the bank per slice, or
 take the standard route and use the exponential Fast/Slow ballistics that a
 sound level meter shows; `mode="peak"` gives the band peak instead of the
-average, and a band peak is not $L_{Cpeak}$. There is a floor on the other side
+average, and a band peak is not $L_\mathrm{Cpeak}$. There is a floor on the other side
 too: a band filter needs several cycles of its own centre frequency to settle,
 so a one-second record says very little about the 12.5 or 16 Hz bands however
 many digits come back.
@@ -404,7 +404,7 @@ simulation. Every result object exposes a one-line
 `.plot(language="en"|"es")` figure and, where a standard defines a reporting
 format, a `.report()` method that renders the normative PDF fiche.
 
-- [Build a sound level meter](/phonometry/signals/sound-level-meter/): the same chain run end to end, from the calibrator tone to $L_{AF}(t)$, $L_{Aeq}$, $L_{AE}$, $L_{Cpeak}$, the percentile levels and the class check of every stage
+- [Build a sound level meter](/phonometry/signals/sound-level-meter/): the same chain run end to end, from the calibrator tone to $L_\mathrm{AF}(t)$, $L_\mathrm{Aeq}$, $L_{\mathrm{A}E}$, $L_\mathrm{Cpeak}$, the percentile levels and the class check of every stage
 - [All guides](/phonometry/start/guides/): the map, every guide grouped by topic with a line on each
 - [Glossary](/phonometry/reference/glossary/): a symbol, its unit, its defining clause and the guide that computes it
 - [Filter Architecture Gallery](/phonometry/signals/filters/filter-gallery/): choose an architecture and inspect responses

@@ -72,7 +72,7 @@ Band-limited delay via a frequency-domain phase ramp
 $e^{-j 2 \pi k \cdot \text{delay} / N}$: every spectral
 component is delayed by exactly
 `delay` samples, i.e. its phase changes by
-$-2 \pi f \cdot \text{delay} / f_s$
+$-2 \pi f \cdot \text{delay} / f_\mathrm{s}$
 radians. Two boundary conventions:
 
 * `'linear'` (default): the record is zero-padded past the shift
@@ -297,7 +297,7 @@ the "integral number of full periods" is sample-exact only when
 an integer). Otherwise the gate closes up to half a sample away from
 the tone's final zero crossing and the gated waveform carries a
 residual step of up to
-$\text{amplitude} \cdot \sin(\pi \cdot \text{frequency}/f_s)$
+$\text{amplitude} \cdot \sin(\pi \cdot \text{frequency}/f_\mathrm{s})$
 there
 (e.g. 10 cycles of 997 Hz at 48 kHz span 481.44 samples, gated at
 481); a [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) quantifies the

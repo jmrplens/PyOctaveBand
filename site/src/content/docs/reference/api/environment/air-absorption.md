@@ -16,32 +16,32 @@ oxygen and nitrogen molecules plus classical and rotational losses
 The attenuation coefficient, in decibels per metre (ISO 9613-1:1993):
 
 $$
-\alpha = 8.686 f^2 \left\{ 1.84 \times 10^{-11} \left( \frac{p_a}{p_r} \right)^{-1} \left( \frac{T}{T_0} \right)^{1/2} + \left( \frac{T}{T_0} \right)^{-5/2} \left[ 0.01275 \, e^{-2239.1/T} \left( f_{rO} + \frac{f^2}{f_{rO}} \right)^{-1} + 0.1068 \, e^{-3352.0/T} \left( f_{rN} + \frac{f^2}{f_{rN}} \right)^{-1} \right] \right\} \tag{Eq. 5}
+\alpha = 8.686 f^2 \left\{ 1.84 \times 10^{-11} \left( \frac{p_\mathrm{a}}{p_\mathrm{r}} \right)^{-1} \left( \frac{T}{T_0} \right)^{1/2} + \left( \frac{T}{T_0} \right)^{-5/2} \left[ 0.01275 \, e^{-2239.1/T} \left( f_\mathrm{rO} + \frac{f^2}{f_\mathrm{rO}} \right)^{-1} + 0.1068 \, e^{-3352.0/T} \left( f_\mathrm{rN} + \frac{f^2}{f_\mathrm{rN}} \right)^{-1} \right] \right\} \tag{Eq. 5}
 $$
 
 with the oxygen and nitrogen relaxation frequencies (ISO 9613-1:1993):
 
 $$
-f_{rO} = \frac{p_a}{p_r} \left[ 24 + 4.04 \times 10^{4} \, h \, \frac{0.02 + h}{0.391 + h} \right] \tag{Eq. 3}
+f_\mathrm{rO} = \frac{p_\mathrm{a}}{p_\mathrm{r}} \left[ 24 + 4.04 \times 10^{4} \, h \, \frac{0.02 + h}{0.391 + h} \right] \tag{Eq. 3}
 $$
 
 $$
-f_{rN} = \frac{p_a}{p_r} \left( \frac{T}{T_0} \right)^{-1/2} \left\{ 9 + 280 \, h \exp\!\left[ -4.170 \left( \left( \frac{T}{T_0} \right)^{-1/3} - 1 \right) \right] \right\} \tag{Eq. 4}
+f_\mathrm{rN} = \frac{p_\mathrm{a}}{p_\mathrm{r}} \left( \frac{T}{T_0} \right)^{-1/2} \left\{ 9 + 280 \, h \exp\!\left[ -4.170 \left( \left( \frac{T}{T_0} \right)^{-1/3} - 1 \right) \right] \right\} \tag{Eq. 4}
 $$
 
 Here `T` is the ambient temperature (K), $T_0 = 293.15$ K and
-$p_r = 101.325$ kPa are the reference conditions (ISO 9613-1:1993,
+$p_\mathrm{r} = 101.325$ kPa are the reference conditions (ISO 9613-1:1993,
 clause 4.2), `pa` is the ambient pressure (kPa) and `h` is the molar
 concentration of water vapour as a percentage, obtained from the relative
 humidity by the psychrometric conversion (ISO 9613-1:1993, clause 6.4 /
 Annex B):
 
 $$
-h = h_r \, \frac{p_{sat}/p_r}{p_a/p_r}
+h = h_\mathrm{r} \, \frac{p_\mathrm{sat}/p_\mathrm{r}}{p_\mathrm{a}/p_\mathrm{r}}
 $$
 
 $$
-\frac{p_{sat}}{p_r} = 10^{-6.8346 \, (T_{01}/T)^{1.261} + 4.6151}, \qquad T_{01} = 273.16~\text{K}
+\frac{p_\mathrm{sat}}{p_\mathrm{r}} = 10^{-6.8346 \, (T_{01}/T)^{1.261} + 4.6151}, \qquad T_{01} = 273.16~\text{K}
 $$
 
 with `hr` the relative humidity (%) and `T01` the triple-point temperature of
@@ -51,7 +51,7 @@ Table 1 of ISO 9613-1:1993 tabulates `alpha` (in dB/km) at the reference
 pressure for a grid of temperature, relative humidity and one-third-octave
 frequency; its rows are labelled with the ISO 266 preferred frequencies but
 the coefficients are computed at the exact midband frequencies (Note 5)
-$f_m = 1000 \cdot 10^{k/10}$, `k` integer. Pass
+$f_\mathrm{m} = 1000 \cdot 10^{k/10}$, `k` integer. Pass
 `exact_midband=True` to snap the requested frequencies onto that grid and
 reproduce Table 1 exactly.
 
@@ -91,7 +91,7 @@ scalars.
 | `temperature` | Ambient air temperature, in degrees Celsius (default 20 degC, i.e. the reference `T0`). A value outside the -20..+50 degC tabulated range emits an [`AtmosphericAbsorptionWarning`](/phonometry/reference/api/environment/air-absorption/#atmosphericabsorptionwarning); a value at or below absolute zero raises `ValueError`. |
 | `relative_humidity` | Relative humidity, in percent, with respect to saturation over liquid water (default 50 %). Outside 10..100 % emits an [`AtmosphericAbsorptionWarning`](/phonometry/reference/api/environment/air-absorption/#atmosphericabsorptionwarning); outside [0, 100] % raises `ValueError`. |
 | `pressure` | Ambient atmospheric pressure `pa`, in kilopascals (default 101.325 kPa = one standard atmosphere = `pr`). Above 200 kPa emits an [`AtmosphericAbsorptionWarning`](/phonometry/reference/api/environment/air-absorption/#atmosphericabsorptionwarning); non-positive raises `ValueError`. |
-| `exact_midband` | When `True`, each requested frequency is snapped to the nearest exact one-third-octave midband $f_m = 1000 \cdot 10^{k/10}$ (Eq. (6)) before evaluation, reproducing the frequencies used for Table 1 (Note 5). Default `False` (use `frequencies` verbatim). |
+| `exact_midband` | When `True`, each requested frequency is snapped to the nearest exact one-third-octave midband $f_\mathrm{m} = 1000 \cdot 10^{k/10}$ (Eq. (6)) before evaluation, reproducing the frequencies used for Table 1 (Note 5). Default `False` (use `frequencies` verbatim). |
 
 **Returns:** Attenuation coefficient `alpha`, in dB/m, with the shape of `frequencies`.
 
@@ -169,7 +169,7 @@ unchanged; this is a thin, plottable wrapper around the existing function
 | `temperature` | Ambient air temperature, in degrees Celsius (default 20). |
 | `relative_humidity` | Relative humidity, in percent (default 50). |
 | `pressure` | Ambient atmospheric pressure, in kilopascals (default 101.325 kPa, one standard atmosphere). |
-| `exact_midband` | Snap the frequencies to the exact one-third-octave midbands $f_m = 1000 \cdot 10^{k/10}$ (Eq. (6)) before evaluation; see [`air_attenuation`](/phonometry/reference/api/environment/air-absorption/#air_attenuation). When `True` the stored `frequencies` are the snapped midbands the coefficient was computed at. |
+| `exact_midband` | Snap the frequencies to the exact one-third-octave midbands $f_\mathrm{m} = 1000 \cdot 10^{k/10}$ (Eq. (6)) before evaluation; see [`air_attenuation`](/phonometry/reference/api/environment/air-absorption/#air_attenuation). When `True` the stored `frequencies` are the snapped midbands the coefficient was computed at. |
 | `distance` | Optional propagation distance `d`, in metres. When given, the result's [`total_attenuation`](/phonometry/reference/api/environment/air-absorption/#atmosphericattenuationtotal_attenuation) returns the total attenuation $A = \alpha d$ over that distance (ISO 9613-2 Eq. (8)). Must be finite and non-negative. |
 
 **Returns:** A frozen [`AtmosphericAttenuation`](/phonometry/reference/api/environment/air-absorption/#atmosphericattenuation).

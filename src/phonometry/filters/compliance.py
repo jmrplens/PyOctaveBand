@@ -140,7 +140,7 @@ def _map_breakpoint(exponent: float, fraction: float) -> float:
     .. math::
 
        1 + \frac{G^{1/(2b)} - 1}{G^{1/2} - 1}
-       \left( \Omega_h(1/1) - 1 \right)
+       \left( \Omega_\mathrm{h}(1/1) - 1 \right)
     """
     omega_octave = _G ** exponent
     scale = (_G ** (1 / (2 * fraction)) - 1) / (_G ** 0.5 - 1)
@@ -157,7 +157,7 @@ def class_limits(
         3 for one-third octave, ...).
     :param filter_class: Performance class: 1 or 2 for ``edition="2014"``;
         0, 1 or 2 for ``edition="1995"``.
-    :param omega: Normalized frequencies :math:`f/f_m` (> 0).
+    :param omega: Normalized frequencies :math:`f/f_\mathrm{m}` (> 0).
     :param edition: ``"2014"`` (IEC 61260-1:2014, classes 1/2) or ``"1995"``
         (IEC 61260:1995 / ANSI S1.11-2004, classes 0/1/2).
     :return: Tuple (minimum, maximum) relative attenuation in dB per point;

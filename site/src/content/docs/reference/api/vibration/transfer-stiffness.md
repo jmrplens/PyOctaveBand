@@ -14,7 +14,7 @@ frequency-dependent ratio of the *blocking force* phasor `F2,b` on the output
 with the output blocked (ISO 10846-1, 3.7), in N/m:
 
 $$
-k_{2,1} = \frac{F_{2,b}}{u_1}
+k_{2,1} = \frac{F_{2,\mathrm{b}}}{u_1}
 $$
 
 For an isolator between two structures of large driving-point stiffness, the
@@ -36,12 +36,12 @@ Two laboratory methods determine $k_{2,1}$:
 
 * **Direct method** (ISO 10846-2): measure the blocked output force `F2,b`
   and the input displacement `u1` directly:
-  $k_{2,1} = F_{2,b} / u_1$.
+  $k_{2,1} = F_{2,\mathrm{b}} / u_1$.
 * **Indirect method** (ISO 10846-3): load the output with a compact blocking
   mass `m2` and measure the vibration transmissibility
   $T = u_2/u_1$; the blocking force is the mass's inertia force
   (ISO 10846-3, Equation 1):
-  $k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$ for $T \ll 1$,
+  $k_{2,1} = -(2\pi f)^2 (m_2 + m_\mathrm{f}) T$ for $T \ll 1$,
   where `mf` is the mass of the output flange of the test element. The
   approximation is valid only where $|T| \le 0.1$ (Inequality (2):
   $\Delta L_{1,2} \ge 20$ dB) and while the blocking mass still
@@ -109,18 +109,18 @@ Ratio of the delivered force to the blocking force (ISO 10846-1, Eq. 6).
 
 For an isolator driving a receiving structure, the output force for a
 given source displacement `u1` is
-$F_2 = k_{2,1} u_1 / (1 + k_{2,2}/k_t)$
+$F_2 = k_{2,1} u_1 / (1 + k_{2,2}/k_\mathrm{t})$
 (Equation (6)), where `k2,2` is the isolator's output driving-point
 stiffness (output blocked at the input) and `kt` the dynamic
 driving-point stiffness of the termination. This function returns
 
 $$
-\frac{F_2}{F_{2,b}} = \frac{1}{1 + k_{2,2}/k_t}
+\frac{F_2}{F_{2,\mathrm{b}}} = \frac{1}{1 + k_{2,2}/k_\mathrm{t}}
 $$
 
 the factor by which the delivered force deviates from the blocking force
-$F_{2,b} = k_{2,1} u_1$ of Equation (7). For
-$|k_{2,2}| < 0.1 |k_t|$ the ratio is within 10 % of unity
+$F_{2,\mathrm{b}} = k_{2,1} u_1$ of Equation (7). For
+$|k_{2,2}| < 0.1 |k_\mathrm{t}|$ the ratio is within 10 % of unity
 ($1/1.1 = 0.909$ at the limit), which is the
 stiffness mismatch that justifies characterising an isolator by its
 blocked transfer stiffness alone.
@@ -221,7 +221,7 @@ transfer_stiffness_direct(
 
 Dynamic transfer stiffness by the direct method (ISO 10846-2).
 
-$k_{2,1} = F_{2,b} / u_1$, the blocked output force phasor over
+$k_{2,1} = F_{2,\mathrm{b}} / u_1$, the blocked output force phasor over
 the input displacement phasor.
 
 **Parameters**
@@ -253,7 +253,7 @@ transfer_stiffness_indirect(
 
 Dynamic transfer stiffness by the indirect method (ISO 10846-3, Eq. 1).
 
-$k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$: the blocking force is the
+$k_{2,1} = -(2\pi f)^2 (m_2 + m_\mathrm{f}) T$: the blocking force is the
 inertia force of a compact blocking mass `m2` (plus the output flange
 mass `mf`), derived from the measured vibration transmissibility
 $T = u_2/u_1$. Valid for $T \ll 1$ (i.e. well above the

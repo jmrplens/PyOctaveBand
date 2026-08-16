@@ -33,7 +33,7 @@ left half-plane ($s = -1/\tau$).
 | Output | Continuous time-weighted envelope (one value per sample) | Stepped output (one value every $\tau$ seconds) |
 | Input units | Raw sound pressure (Pa); squared internally | Energetic quantity (Pa²) expected as input |
 | Filter | Stable exponential averaging (pole at $s=-1/\tau$) | Theoretically unstable design (pole in the right half-plane) stabilized by resetting the filter state every $\tau$ seconds |
-| Behavior | True IEC time weighting | Closer to a block integrator ($L_{eq,\tau}$) |
+| Behavior | True IEC time weighting | Closer to a block integrator ($L_{\mathrm{eq},\tau}$) |
 
 A pole on the negative real axis corresponds to a decaying exponential impulse
 response ($h(t) \propto e^{-t/\tau}$), exactly what "exponential time
@@ -43,15 +43,15 @@ the measurement's nature.
 
 That equation is also where the reference numbers of the next section come
 from, which is worth doing once rather than taking Table 4 on faith. Integrate
-it from rest over a burst of duration $T_b$ and the envelope reaches
-$(1-e^{-T_b/\tau})$ of the steady value the same tone would eventually produce,
+it from rest over a burst of duration $T_\mathrm{b}$ and the envelope reaches
+$(1-e^{-T_\mathrm{b}/\tau})$ of the steady value the same tone would eventually produce,
 so the maximum time-weighted level relative to steady state is
 
 $$
-\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_b/\tau}\right)
+\delta_{\text{ref}} = 10\lg\!\left(1 - e^{-T_\mathrm{b}/\tau}\right)
 $$
 
-which is IEC 61672-1:2013 Equation (7). With $\tau_F = 0.125$ s that gives
+which is IEC 61672-1:2013 Equation (7). With $\tau_\mathrm{F} = 0.125$ s that gives
 −0.98 dB at 200 ms, −4.82 dB at 50 ms, −11.14 dB at 10 ms and −20.99 dB at
 1 ms: the whole "IEC target" column of Table 4, to the standard's own rounding.
 CI asserts the identity for every Fast and Slow row
@@ -59,9 +59,9 @@ CI asserts the identity for every Fast and Slow row
 transcription of the table is itself checked rather than trusted.
 
 The consequence carries the rest of this page. Because the response is a smooth
-function of $T_b/\tau$, a detector that really solves the equation tracks the
+function of $T_\mathrm{b}/\tau$, a detector that really solves the equation tracks the
 whole column at once; a detector that averages over fixed 125 ms blocks has no
-$T_b$ in it at all, and can only be right where the burst happens to fill a
+$T_\mathrm{b}$ in it at all, and can only be right where the burst happens to fill a
 block.
 
 ## Verification against IEC 61672-1 (tone bursts)
@@ -75,17 +75,17 @@ level.
 Table 4 fixes the excitation but not the plumbing, so here is the plumbing. A
 4 kHz sine is generated at 48 kHz for 3 s. The **reference** is the steady Fast
 level of that continuous sine, averaged over its last half second — once the
-integrator has settled, this is $L_A$ in the standard's notation. The burst of
+integrator has settled, this is $L_\mathrm{A}$ in the standard's notation. The burst of
 the stated duration is then cut out of *the same* sine, so its phase and
 amplitude are identical to the reference tone's, and zeros surround it. The
 **response** is the maximum of the Fast envelope of that burst, expressed
 relative to the reference: $10\log_{10}(\max \text{env} / \text{ref})$, which is
-the standard's $L_{AFmax} - L_A$. Note what this does and does not verify:
+the standard's $L_\mathrm{AFmax} - L_\mathrm{A}$. Note what this does and does not verify:
 IEC 61672-1 states these limits for the electrical input facility over a defined
 range of steady levels with no overload indicated (clauses 5.9.5-5.9.6), so the
 numbers below verify the *ballistics*, not a complete instrument. The same
 reference values are transcribed in `tests/filters/test_iec_compliance.py` for F
-and S and for the $L_{AE}$ column.
+and S and for the $L_{\mathrm{A}E}$ column.
 
 **phonometry results (Fast weighting):**
 
@@ -147,8 +147,8 @@ level, 1.0 dB above the target.
   description="A 4 kHz tone burst slides across the boundary between two 125 ms integration blocks. The exponential Fast envelope peaks at the same level at every alignment because the burst duration enters its differential equation, while the block Leq staircase rises and falls with where the burst happens to land, and the reading-against-alignment panel builds up both traces against the shaded class 1 corridor. The second act repeats it for a 200 ms burst, where the corridor is half as wide."
 />
 
-*The exponential trace is flat because $10\lg(1-e^{-T_b/\tau})$ contains
-$T_b$ and nothing about the clock; the block trace is a picture of the
+*The exponential trace is flat because $10\lg(1-e^{-T_\mathrm{b}/\tau})$ contains
+$T_\mathrm{b}$ and nothing about the clock; the block trace is a picture of the
 alignment and nothing else. Both readings are computed here with
 `time_weighting(x, fs, mode="fast")` and with `leq` over consecutive 125 ms
 slices, against the same steady-tone reference the procedure above defines.*
@@ -158,7 +158,7 @@ slices, against the same steady-tone reference the procedure above defines.*
 - If you need **standard-compliant Fast/Slow/Impulse envelopes** (sound level
   meter behavior, one level per sample), use phonometry's
   [`time_weighting`](/phonometry/signals/levels/time-weighting/).
-- If you need **block-averaged $L_{eq}$ per interval**, that is a different, equally
+- If you need **block-averaged $L_\mathrm{eq}$ per interval**, that is a different, equally
   valid metric; you can compute it with [`leq`](/phonometry/signals/levels/levels/) over consecutive
   slices.
 - Both approaches are useful; they just answer different questions. The
@@ -186,7 +186,7 @@ sample from the metrology core:
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{\mathrm{A}E}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
 | IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signals/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/filters/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |

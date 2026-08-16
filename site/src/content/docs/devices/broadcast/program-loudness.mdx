@@ -76,7 +76,7 @@ concatenation is the **K-weighting**. The loudness over an interval is the
 channel-weighted sum of the mean-square powers $z_i$ (Formula 2):
 
 $$
-L_K = -0.691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
+L_\mathrm{K} = -0.691 + 10 \log_{10} \sum_i G_i\, z_i \quad \text{LKFS},
 $$
 
 where the constant cancels the K-weighting gain at 997 Hz and $G_i$ weighs
@@ -149,7 +149,7 @@ spherical-head shelf and the RLB high-pass roll-off:
 *The two stages, and the whole of the frequency dependence in BS.1770. The RLB
 high-pass removes the sub-100 Hz energy the ear does not integrate into
 loudness, and the +4 dB spherical-head shelf above about 2 kHz stands in for the
-diffraction gain of a head in a sound field. The −0.691 constant in $L_K$ is
+diffraction gain of a head in a sound field. The −0.691 constant in $L_\mathrm{K}$ is
 what makes the two of them together read exactly −3.01 LKFS on a full-scale
 997 Hz sine.*
 
@@ -170,7 +170,7 @@ That is the whole model: two biquads and a mean square. It is worth being
 explicit about what such a measure cannot do, because the question a reader
 arrives with is usually "is this *the* loudness?". The chain is linear and
 level-independent by construction — doubling a programme's gain adds exactly
-6 dB to $L_K$, which is precisely what makes normalisation a single
+6 dB to $L_\mathrm{K}$, which is precisely what makes normalisation a single
 multiplication, and precisely what a real ear does not do. There is no masking,
 no critical-band summation, no equal-loudness contour and no binaural
 summation anywhere in it. So BS.1770 ranks *similar* material reliably, which is
@@ -442,10 +442,10 @@ programmes shorter than a minute: too few 3 s windows.
 
 Digital sample peaks lie: the true maximum of the reconstructed waveform
 generally falls *between* samples, and a sample-peak meter under-reads a
-badly phased tone at $f_s/4$ by 3 dB. The worst case is bounded by
+badly phased tone at $f_\mathrm{s}/4$ by 3 dB. The worst case is bounded by
 $20\log_{10}\cos(\pi f_{\mathrm{norm}}/n)$, where $n$ is the oversampling ratio
-and $f_{\mathrm{norm}} = f/f_s$ is the tone frequency normalised to the sampling
-rate — which is exactly why $f_s/4$ is the worst case, since
+and $f_{\mathrm{norm}} = f/f_\mathrm{s}$ is the tone frequency normalised to the sampling
+rate — which is exactly why $f_\mathrm{s}/4$ is the worst case, since
 $f_{\mathrm{norm}} = 1/4$ maximises the bound over the audio band.
 BS.1770-5 Annex 2 therefore meters the **true peak** on a signal oversampled
 to at least 192 kHz (4× at 48 kHz), in **dBTP** (dB relative to 100 % full
@@ -469,7 +469,7 @@ inside the +0.2/−0.4 dB tolerance that EBU Mode meters must meet).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/true_peak_intersample.svg" alt="Two panels. Left, twelve samples of the full-scale 12 kHz tone at a quarter-cycle phase offset: every sample dot sits at 0.707 of full scale on the dashed sample-peak line at minus 3.01 dBFS, while the band-limited reconstruction drawn through them touches plus and minus one, and the 4 times oversampled grid is marked along the bottom. Right, the worst-case under-read 20 log cos of pi f_norm over n against normalised frequency for oversampling ratios of 1, 2, 4 and 8, with the BS.1770 minimum of 4 marked at f_norm equal to one quarter where minus 0.17 decibel remains" width="92%" />
 
-*Left: the mechanism. Sampling a full-scale $f_s/4$ tone at the wrong phase puts
+*Left: the mechanism. Sampling a full-scale $f_\mathrm{s}/4$ tone at the wrong phase puts
 **every** sample at $1/\sqrt{2}$, so a sample-peak meter reads −3.01 dBFS while
 the waveform that will actually leave a converter reaches full scale. Right: the
 bound, against the oversampling ratio. At the 4× BS.1770 asks for, 0.17 dB of
@@ -754,7 +754,7 @@ outside it by construction; those live in [Loudness (ISO
   psychoacoustic models, in sones and specific loudness, that answer the
   perceived-magnitude question this page's gated LUFS deliberately does not.
 - [Integrated & Statistical Levels](/phonometry/signals/levels/levels/):
-  $L_{eq}$, $L_{Ceq}$ and the same oversampled-peak machinery behind `lc_peak`.
+  $L_\mathrm{eq}$, $L_\mathrm{Ceq}$ and the same oversampled-peak machinery behind `lc_peak`.
 - [Frequency weightings](/phonometry/signals/levels/weighting/): A, C and Z
   against the K-weighting of this page.
 - [Electroacoustics (IEC 60268-3)](/phonometry/devices/electroacoustics/electroacoustics/):

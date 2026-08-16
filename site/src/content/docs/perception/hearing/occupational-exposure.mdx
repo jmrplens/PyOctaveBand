@@ -67,7 +67,7 @@ The *task-based* strategy (Clause 9) splits the nominal day into tasks, takes
 $I \ge 3$ samples per task, and energy-sums the task contributions
 
 $$
-L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
+L_{\mathrm{EX,8h},m} = L_{p,\mathrm{A,eq}T,m} + 10 \log_{10}(T_m/T_0), \qquad T_0 = 8\ \text{h},
 $$
 
 so a loud but short task contributes little. The *job-based* (Clause 10) and
@@ -75,7 +75,7 @@ so a loud but short task contributes little. The *job-based* (Clause 10) and
 exposure group — $N \ge 5$ samples for the job-based strategy, at least three
 whole shifts for the full-day one — energy-average them, and normalise that
 average to the nominal eight-hour day with the effective working-day duration
-$T_e$ in the same $10\log_{10}(T_e/T_0)$ term. The daily level is the same
+$T_\mathrm{e}$ in the same $10\log_{10}(T_\mathrm{e}/T_0)$ term. The daily level is the same
 either way; the strategies differ in how the **uncertainty** is built.
 
 **Choosing a strategy.** ISO 9612 Table B.1 picks the strategy from the *work
@@ -159,7 +159,7 @@ shall be discarded (Clause 12.2). This is what the example fiche's "field
 checks within 0.3 dB" is claiming. Then, before trusting the day, compare the
 level-versus-time log against the observation notes: a dosimeter records a
 knock or a rub on the microphone as a genuine high-level event (Clause 13.2),
-and one such artefact can move the day's $L_{EX,8h}$; any unexplained peak
+and one such artefact can move the day's $L_\mathrm{EX,8h}$; any unexplained peak
 shall be investigated and the measurement repeated if the result is
 significantly affected — and with a non-logging instrument, repeated outright.
 
@@ -209,16 +209,16 @@ res.plot()   # the figure below: task contributions with LEX,8h and LEX,8h + U
 
 **Reading the job and full-day numbers.** The task-based case gets its per-task
 breakdown; the other two deserve the same walk-through, because in both of them
-the answer is moved by a term that is not a measured level at all. $T_e$ is the
+the answer is moved by a term that is not a measured level at all. $T_\mathrm{e}$ is the
 **effective duration of the working day** established by the work analysis: the
 time the worker is actually exposed, breaks away from the noise excluded,
 breaks spent in it included. The six job samples energy-average to 88.4 dB, and
-with $T_e = 7.5$ h the normalisation $10\log_{10}(7.5/8)$ subtracts 0.3 dB, so
-$L_{EX,8h}$ = 88.2 dB — *below* the sampled average. The six full-day samples
+with $T_\mathrm{e} = 7.5$ h the normalisation $10\log_{10}(7.5/8)$ subtracts 0.3 dB, so
+$L_\mathrm{EX,8h}$ = 88.2 dB — *below* the sampled average. The six full-day samples
 energy-average to 89.5 dB, but that shift lasts 9.25 h, so the same term adds
-$10\log_{10}(9.25/8)$ = 0.6 dB and $L_{EX,8h}$ = 90.1 dB, which is higher than
+$10\log_{10}(9.25/8)$ = 0.6 dB and $L_\mathrm{EX,8h}$ = 90.1 dB, which is higher than
 four of the six individual samples. That is not an error: normalising a long
-shift to a nominal eight-hour day is *supposed* to penalise it. Get $T_e$ wrong
+shift to a nominal eight-hour day is *supposed* to penalise it. Get $T_\mathrm{e}$ wrong
 by a factor and the whole result moves by $10\log_{10}$ of it, which is why the
 task-based strategy carries a separate duration-uncertainty term $u_{1b}$ for
 exactly this quantity.
@@ -299,7 +299,7 @@ measurements only (Table C.4, NOTE 1).
 
 Two subtleties are worth spelling out. First, the coverage factor is
 $k = 1.65$ for a **one-sided** 95 % interval (Clause 14), because a hygienist
-cares only about the *upper* bound: `res.upper_limit` = $L_{EX,8h} + U$ is the
+cares only about the *upper* bound: `res.upper_limit` = $L_\mathrm{EX,8h} + U$ is the
 value 95 % of measurements fall below, the number compared against an action
 limit. Second, the task and job methods weight the *same* spread of samples
 differently. The task sampling uncertainty $u_{1a}$ (Eq. C.6) divides the summed
@@ -308,7 +308,7 @@ factor $\sqrt{I}$), whereas the job/full-day sampling uncertainty $u_1$ (Eq. C.1
 is the plain sample standard deviation with denominator $N-1$, whose contribution
 $c_1 u_1$ is then read from **Table C.4** as a function of $(N, u_1)$. The same
 raw scatter therefore inflates the job estimate more, which is the standard's
-built-in penalty for coarser, fewer samples. (The printed job $L_{EX,8h}$ is
+built-in penalty for coarser, fewer samples. (The printed job $L_\mathrm{EX,8h}$ is
 $88.2$ dB where Annex E reports $88.1$: the standard rounds the effective-day
 level to $88.4$ before the duration normalisation; the library keeps it
 unrounded.)
@@ -384,7 +384,7 @@ at thirty, while the job-based strategy pays a far steeper penalty for a small
 $N$ (19.2 dB at three, 6.2 dB at five, 3.9 dB at ten) because Table C.4 does
 not simply divide by $\sqrt{N}$. That gap is the standard's built-in penalty
 for coarser, fewer samples, and it is what the Clause 9.3 / 10.4 advisories
-push against. Because peak $L_{p,Cpeak}$ carries no Annex C sampling model
+push against. Because peak $L_{p,\mathrm{Cpeak}}$ carries no Annex C sampling model
 (Table C.5, Note 1), it is reported without an uncertainty, not with a zero one.
 
 When a task's samples span **3 dB or more** (Clause 9.3), or the job contribution
@@ -401,8 +401,8 @@ derived on the [Theory](/phonometry/reference/theory/environment-transport/) pag
 | Parameter | Applies to | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `tasks` | task | list of `Task` | — | $\ge 1$ | Each `Task` has `samples`, `duration_hours`, optional `duration_range`/`duration_samples`, `label`, `instrument` |
-| `samples` | job / full-day | sequence | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ advised) | Random $L_{p,A,eqT}$ samples |
-| `effective_duration_hours` | job / full-day | float | h | $> 0$ | Effective working-day duration $T_e$ |
+| `samples` | job / full-day | sequence | dB | $\ge 2$ ($\ge 5$ / $\ge 3$ advised) | Random $L_{p,\mathrm{A,eq}T}$ samples |
+| `effective_duration_hours` | job / full-day | float | h | $> 0$ | Effective working-day duration $T_\mathrm{e}$ |
 | `instrument` | all | str | — | `'class1'`, `'class2'`, `'personal_exposimeter'` (default) | Selects $u_2$ (Table C.5) |
 | `u3` | all | float | dB | default `1.0` | Microphone-position uncertainty (Clause C.6) |
 | `include_duration_uncertainty` | task | bool | — | default `True` | `False` omits the $(c_{1b}u_{1b})^2$ term (Annex D case a) |
@@ -410,9 +410,9 @@ derived on the [Theory](/phonometry/reference/theory/environment-transport/) pag
 | `warn` | all | bool | — | default `True` | Emit `OccupationalExposureWarning` for the sampling advisories |
 
 All three return an `ExposureResult` with `lex_8h`, `combined_standard_uncertainty`
-$u$, `expanded_uncertainty` $U = 1.65\ u$, `upper_limit` = $L_{EX,8h} + U$,
+$u$, `expanded_uncertainty` $U = 1.65\ u$, `upper_limit` = $L_\mathrm{EX,8h} + U$,
 `sampling_advisory`, and (task-based) the per-task `tasks` breakdown; the
-result's `.plot()` draws the per-task contribution bars with the $L_{EX,8h}$
+result's `.plot()` draws the per-task contribution bars with the $L_\mathrm{EX,8h}$
 and upper-limit lines (task-based results only, since the other strategies
 carry no per-task breakdown).
 
@@ -426,10 +426,10 @@ decimal place. `ExposureResult.report()` writes that report as a one-page PDF
 fiche laid out like a prevention-service measurement sheet: the standard-basis
 line naming the applied strategy, a header grid (company, worker(s)/job,
 workplace, and the Clause 15 c instrumentation and calibration traceability),
-the work analysis (the per-task table of durations, $L_{p,A,eqT,m}$ levels
-and $L_{EX,8h,m}$ contributions for a task-based result with its contribution
+the work analysis (the per-task table of durations, $L_{p,\mathrm{A,eq}T,m}$ levels
+and $L_{\mathrm{EX,8h},m}$ contributions for a task-based result with its contribution
 chart, or the sampling summary with the Formula C.9 budget for a job-based or
-full-day result) and the boxed $L_{EX,8h}$ with $U$, $k$ and the one-sided
+full-day result) and the boxed $L_\mathrm{EX,8h}$ with $U$, $k$ and the one-sided
 95 % upper limit.
 
 Because the number exists to be compared with the law, the fiche then assesses
@@ -439,7 +439,7 @@ exposure action values (80 and 85 dB(A)) and the exposure limit value
 displayed, with a PASS/FAIL verdict against the limit value. A printed note
 records that the limit value applies to the *effective* exposure, with the
 attenuation of the worn hearing protectors taken into account, which the
-measured $L_{EX,8h}$ does not include. `verbose=True` adds the per-task
+measured $L_\mathrm{EX,8h}$ does not include. `verbose=True` adds the per-task
 Annex C uncertainty columns ($u_{1a}$, $u_{1b}$, $u_2$), and `language="es"`
 renders the Spanish fiche (the vocabulary of the Spanish transposition,
 RD 286/2006: *nivel de exposición diario equivalente*, *valor límite de
@@ -499,10 +499,10 @@ The work analysis of Clause 7 and the microphone placement of Clause 12.3 /
 guide documents them so the numbers fed to a `Task` mean something. Table B.1
 is reproduced as guidance and the caller picks the strategy; nothing here
 applies it. Hearing-protector attenuation (the ISO 4869 series) is not
-applied, so the $L_{EX,8h}$ computed here — and the limit-value comparison the
+applied, so the $L_\mathrm{EX,8h}$ computed here — and the limit-value comparison the
 fiche prints on it — is the **unprotected** exposure, which is also what the
 ISO 1999 hearing-loss model wants. And Annex C offers no uncertainty model for
-$L_{p,Cpeak}$ (Table C.5, Note 1), which is why the peak is reported without
+$L_{p,\mathrm{Cpeak}}$ (Table C.5, Note 1), which is why the peak is reported without
 one rather than with a zero one.
 </ScopeClaim>
 </Scope>
@@ -510,7 +510,7 @@ one rather than with a zero one.
 ## See also
 
 - [Levels](/phonometry/signals/levels/levels/): the `lex_8h` / `sound_exposure` dose primitives
-  (IEC 61252) and the $L_{p,Cpeak}$ these strategies report alongside.
+  (IEC 61252) and the $L_{p,\mathrm{Cpeak}}$ these strategies report alongside.
 - [Measurement uncertainty](/phonometry/signals/metrology/gum-uncertainty/): the GUM machinery behind
   combined and expanded uncertainties.
 - [Theory](/phonometry/reference/theory/environment-transport/): the derivation of the strategy formulas and the

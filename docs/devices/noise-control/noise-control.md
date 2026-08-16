@@ -98,7 +98,7 @@ angle off the inlet axis.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry.svg" alt="Section of a plenum chamber: the inlet duct enters low on the left, the outlet mouth is marked on the right wall, the 1.2 m inlet-to-outlet line of sight is drawn as a dashed diagonal at 0.35 rad off the inlet axis, and the wall area of 6 square metres and outlet area of 0.09 square metres are annotated below" width="88%"></picture>
 
 *Only $r$ and its angle off the inlet axis fix the drawn box; $S_\text{out}$
-and $S_w$ enter Wells' method as bare areas, so any plenum sharing these four
+and $S_\mathrm{w}$ enter Wells' method as bare areas, so any plenum sharing these four
 numbers has the same predicted attenuation.*
 
 <details>
@@ -169,11 +169,11 @@ $R$, minus a penalty $C$ for the reverberant build-up inside the small, hard
 cavity (Bies Eqs. (7.103), (7.111)):
 
 $$
-\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_E}{R_i}\right),
+\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0.3 + \frac{S_\mathrm{E}}{R_\mathrm{i}}\right),
 $$
 
-with the external area $S_E$ and the interior room constant
-$R_i = S_i \alpha_i/(1-\alpha_i)$ (the same `room_constant` as the
+with the external area $S_\mathrm{E}$ and the interior room constant
+$R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i}/(1-\alpha_\mathrm{i})$ (the same `room_constant` as the
 steady-state room field). A hard interior wastes much of the panel $R$; lining
 it drives $C$ toward its floor $10\log_{10}0.3 = -5.2$ dB.
 
@@ -239,9 +239,9 @@ the interior `room_constant` and `.plot()`.
 **What the enclosure actually delivers.** An enclosure is a composite, so the
 elements combine on an energy basis before $\mathrm{IL} = R - C$ is applied, and
 the result is set by the worst of them. A bare opening of relative area
-$S_a/S_E$ caps the composite at $10\log_{10}(S_E/S_a)$ whatever the panels are:
+$S_\mathrm{a}/S_\mathrm{E}$ caps the composite at $10\log_{10}(S_\mathrm{E}/S_\mathrm{a})$ whatever the panels are:
 one per cent of open area caps it at 20 dB. For the sheet-steel case below
-(mean panel $R$ = 32.3 dB, $S_E$ = 24 m²), a 1.28 m² door at $R$ = 15 dB takes
+(mean panel $R$ = 32.3 dB, $S_\mathrm{E}$ = 24 m²), a 1.28 m² door at $R$ = 15 dB takes
 the mean insertion loss from 28.9 dB to 21.4 dB, and adding a 0.24 m² gap at the
 door foot takes it to 15.1 dB. `composite_transmission_loss(areas,
 reduction_indices)` builds that composite and `enclosure_insertion_loss` takes

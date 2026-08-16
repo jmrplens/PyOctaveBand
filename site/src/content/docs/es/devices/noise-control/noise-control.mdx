@@ -224,14 +224,14 @@ $r$ y su ángulo respecto al eje de entrada.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/plenum_geometry_es.svg" alt="Sección de una cámara plenum: el conducto de entrada entra abajo a la izquierda, la boca de salida está marcada en la pared derecha, la línea de visión entrada-salida de 1,2 m se dibuja como una diagonal discontinua a 0,35 rad del eje de entrada, y el área de pared de 6 metros cuadrados y el área de salida de 0,09 metros cuadrados se anotan debajo" width="88%" />
 
 *Solo $r$ y su ángulo respecto al eje de entrada fijan la caja dibujada;
-$S_\text{out}$ y $S_w$ entran en el método de Wells como áreas a secas, así que
+$S_\text{out}$ y $S_\mathrm{w}$ entran en el método de Wells como áreas a secas, así que
 cualquier plenum que comparta estos cuatro números tiene la misma atenuación
 predicha.*
 
 La fórmula es una suma de dos términos dentro de un mismo logaritmo, uno directo
-$\cos\theta/\pi r^2$ y otro reverberante $(1-\alpha)/S_w\alpha$, y cuál de los
+$\cos\theta/\pi r^2$ y otro reverberante $(1-\alpha)/S_\mathrm{w}\alpha$, y cuál de los
 dos domina decide qué movimiento de diseño merece la pena. Para el plenum
-dibujado arriba ($r = 1{,}2$ m, $S_w = 6$ m², $\alpha = 0{,}2$) valen 0,221 y 0,667,
+dibujado arriba ($r = 1{,}2$ m, $S_\mathrm{w} = 6$ m², $\alpha = 0{,}2$) valen 0,221 y 0,667,
 así que manda el término reverberante: duplicar la línea de visión hasta 2,4 m
 aporta 0,9 dB y desviar la salida un radián entero del eje de entrada aporta
 0,6 dB, mientras que subir la absorción del revestimiento de 0,2 a 0,6 aporta
@@ -285,7 +285,7 @@ ruido de conducto de una página, con la tabla por banda junto al espectro, el
 resultado de número único en su recuadro — el nivel de potencia acústica
 ponderado A cuando el espectro es ruido regenerado, la atenuación media cuando
 es una pérdida — y, cuando se declara un `requirement`, el veredicto frente a
-él: un $L_{WA}$ máximo en el primer caso, una atenuación media mínima en el
+él: un $L_{W\mathrm{A}}$ máximo en el primer caso, una atenuación media mínima en el
 segundo.
 
 ```python
@@ -333,11 +333,11 @@ panel $R$, menos una penalización $C$ por la acumulación reverberante en la
 cavidad pequeña y dura (Bies Ecs. (7.103), (7.111)):
 
 $$
-\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0{,}3 + \frac{S_E}{R_i}\right),
+\mathrm{IL} = R - C,\qquad C = 10\log_{10}\!\left(0{,}3 + \frac{S_\mathrm{E}}{R_\mathrm{i}}\right),
 $$
 
-con el área externa $S_E$ y la **constante de sala** interior
-$R_i = S_i \alpha_i/(1-\alpha_i)$ (la misma
+con el área externa $S_\mathrm{E}$ y la **constante de sala** interior
+$R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i}/(1-\alpha_\mathrm{i})$ (la misma
 [`room_constant`](/phonometry/es/buildings/rooms/room-image-sources/) del campo estacionario
 de sala).
 
@@ -351,19 +351,19 @@ directo y el campo próximo, que ningún revestimiento elimina, de modo que $C$
 nunca puede bajar de $10\log_{10}0{,}3 = -5{,}2$ dB por muy bien tratado que
 esté el interior.
 
-Eso se convierte en una regla de diseño. $C$ cambia de signo en $R_i = S_E/0{,}7$:
+Eso se convierte en una regla de diseño. $C$ cambia de signo en $R_\mathrm{i} = S_\mathrm{E}/0{,}7$:
 una constante de sala interior de alrededor de vez y media el área externa es el
 punto de equilibrio, por debajo el cerramiento entrega menos que sus paneles y
-por encima algo más. El caso de la figura ($S_E = 6$ m², $S_i = 5$ m²,
-$\alpha_i = 0{,}3$) da $R_i = 2{,}14$ m² y $C = +4{,}9$ dB, claramente en el lado
+por encima algo más. El caso de la figura ($S_\mathrm{E} = 6$ m², $S_\mathrm{i} = 5$ m²,
+$\alpha_\mathrm{i} = 0{,}3$) da $R_\mathrm{i} = 2{,}14$ m² y $C = +4{,}9$ dB, claramente en el lado
 perdedor, que es donde se sitúa siempre una caja sin revestir o poco revestida;
-el equilibrio aquí exigiría $\alpha_i = 0{,}63$. Como $R_i$ crece con fuerza
-cuando $\alpha_i$ se acerca a uno, el paso de $\alpha_i = 0{,}3$ a $0{,}7$ es un
-factor cinco en $R_i$ y lleva $C$ de $+4{,}9$ a $-0{,}9$ dB: **5,8 dB de pérdida por
+el equilibrio aquí exigiría $\alpha_\mathrm{i} = 0{,}63$. Como $R_\mathrm{i}$ crece con fuerza
+cuando $\alpha_\mathrm{i}$ se acerca a uno, el paso de $\alpha_\mathrm{i} = 0{,}3$ a $0{,}7$ es un
+factor cinco en $R_\mathrm{i}$ y lleva $C$ de $+4{,}9$ a $-0{,}9$ dB: **5,8 dB de pérdida por
 inserción al precio del revestimiento**. Conviene notar que `model="norton"`
 prescinde del $0{,}3$ y por tanto no tiene suelo, así que los dos modelos
 coinciden mientras el interior es duro y divergen en cuanto está bien revestido
-(2,0 dB de diferencia con $\alpha_i = 0{,}7$ para esta caja).
+(2,0 dB de diferencia con $\alpha_\mathrm{i} = 0{,}7$ para esta caja).
 
 **La pérdida de transmisión del panel $R$ la aportas tú** como un array por banda
 (medido, o predicho por un modelo de panel), o como una función de la frecuencia.
@@ -473,8 +473,8 @@ antes de aplicar siquiera $\mathrm{IL} = R - C$, y el resultado lo fija el peor
 de ellos, no los paneles. De ahí salen dos hechos. Una puerta de 1,28 m² con
 $R = 15$ dB en la envolvente de 24 m² de arriba baja el $R$ compuesto medio de
 32,3 dB a 24,7 dB y la pérdida por inserción media de 28,9 a 21,4 dB. Y una
-**abertura desnuda** de área relativa $S_a/S_E$ limita el compuesto a
-$10\log_{10}(S_E/S_a)$ sean cuales sean los paneles: un 1 % de área abierta la
+**abertura desnuda** de área relativa $S_\mathrm{a}/S_\mathrm{E}$ limita el compuesto a
+$10\log_{10}(S_\mathrm{E}/S_\mathrm{a})$ sean cuales sean los paneles: un 1 % de área abierta la
 limita a 20 dB, y un 10 % a 10 dB. Añade una rendija de 0,24 m² a los pies de la
 puerta — el 1 % de esta envolvente, el ancho de una puerta mal colgada — y los
 28,9 dB de la ficha se quedan en 15,1 dB.

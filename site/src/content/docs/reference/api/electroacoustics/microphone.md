@@ -28,7 +28,7 @@ so the report never merely repeats a manufacturer number:
   output voltage to the sound pressure, in volts per pascal; its level is
 
   $$
-  L_M = 20 \log_{10}(M / M_r), \qquad M_r = 1\ \mathrm{V/Pa}
+  L_M = 20 \log_{10}(M / M_\mathrm{r}), \qquad M_\mathrm{r} = 1\ \mathrm{V/Pa}
   $$
 
   the rated sensitivity referring to the standard reference frequency of
@@ -58,8 +58,8 @@ so the report never merely repeats a manufacturer number:
 * **Equivalent sound pressure level due to inherent noise** (17.2 d/e). The
   equivalent sound pressure is the ratio of the weighted inherent-noise
   output voltage to the rated free-field sensitivity,
-  $p_N = U_N / M$, and its level is
-  $L_N = 20 \log_{10}(p_N / p_0)$ with $p_0 = 20$ uPa, the fourth
+  $p_\mathrm{N} = U_\mathrm{N} / M$, and its level is
+  $L_\mathrm{N} = 20 \log_{10}(p_\mathrm{N} / p_0)$ with $p_0 = 20$ uPa, the fourth
   oracle. The overload sound pressure level (15.2.2) is read from a measured
   distortion-against-level curve as the interpolated sound pressure level
   where the distortion reaches the specified limit.

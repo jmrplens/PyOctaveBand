@@ -9,7 +9,7 @@ $k_{2,1}$, the frequency-dependent ratio of the *blocking force* on the output
 (ISO 10846-1, 3.7):
 
 $$
-k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
+k_{2,1} = \frac{F_{2,\mathrm{b}}}{u_1} \quad [\mathrm{N/m}].
 $$
 
 Because a vibration isolator is only effective between structures of large
@@ -95,16 +95,16 @@ known mass:
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_transfer_stiffness_rig.svg" alt="ISO 10846 transfer-stiffness rigs: the isolator under test between a driven excitation mass and either a blocked output with a force transducer, the direct method, or a resiliently supported blocking mass, the indirect method" width="92%"></picture>
 
 The **direct method** (ISO 10846-2) measures the blocked output force and the
-input displacement, $k_{2,1} = F_{2,b}/u_1$. The **indirect method**
+input displacement, $k_{2,1} = F_{2,\mathrm{b}}/u_1$. The **indirect method**
 (ISO 10846-3) loads the output with a compact blocking mass $m_2$ and measures
 the vibration transmissibility $T = u_2/u_1$; the blocking force is then the
 inertia force of the mass (ISO 10846-3, Eq. 1):
 
 $$
-k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
+k_{2,1} = -(2\pi f)^2\,(m_2 + m_\mathrm{f})\,T \qquad (T \ll 1),
 $$
 
-with $m_f$ the mass of the output flange. The approximation is valid well above
+with $m_\mathrm{f}$ the mass of the output flange. The approximation is valid well above
 the mass/spring resonance, where $T$ is small.
 
 ```python
@@ -180,8 +180,8 @@ left to the operator.
 
 The blocking-force idealisation itself is quantified by ISO 10846-1, Eq. (6):
 for an isolator of output driving-point stiffness $k_{2,2}$ on a termination of
-stiffness $k_t$, the delivered force is $F_2/F_{2,b} = 1/(1 + k_{2,2}/k_t)$,
-within 10 % of the blocking force for $|k_{2,2}| < 0.1\,|k_t|$ (Eq. 7):
+stiffness $k_\mathrm{t}$, the delivered force is $F_2/F_{2,\mathrm{b}} = 1/(1 + k_{2,2}/k_\mathrm{t})$,
+within 10 % of the blocking force for $|k_{2,2}| < 0.1\,|k_\mathrm{t}|$ (Eq. 7):
 
 ```python
 import warnings
@@ -289,10 +289,10 @@ characteristic points and the transfer-stiffness level spectrum.*
 
 ISO 10846 (parts 1-5), *Acoustics and vibration — Laboratory
 measurement of vibro-acoustic transfer properties of resilient elements*: the
-dynamic transfer stiffness $k_{2,1} = F_{2,b}/u_1$ and its FRF relations (Part 1,
+dynamic transfer stiffness $k_{2,1} = F_{2,\mathrm{b}}/u_1$ and its FRF relations (Part 1,
 clause 5 and Annex A / Table A.2), the level $L_k$ re 1 N/m and the loss factor
 (Parts 2 and 3, clauses 3.8/3.17), the direct method (Part 2) and the indirect
-method $k_{2,1} = -(2\pi f)^2 (m_2 + m_f) T$ (Part 3, Formula 1) with its
+method $k_{2,1} = -(2\pi f)^2 (m_2 + m_\mathrm{f}) T$ (Part 3, Formula 1) with its
 validity
 conditions (Part 3, clause 6: Inequalities 2 and 3; clause 7.6 linearity) and
 the blocking-force approximation (Part 1, Eqs. 6/7). Parts 4 and 5 extend the

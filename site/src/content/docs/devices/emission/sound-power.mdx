@@ -64,12 +64,12 @@ noise-emission declaration a datasheet prints.
 ## Choosing a method
 
 All deliver the same quantity, a per-band $L_W$ and an A-weighted total
-$L_{WA}$, but under different environments, accuracy grades and practical
+$L_{W\mathrm{A}}$, but under different environments, accuracy grades and practical
 constraints.
 
 | Method | Standard | Measured quantity | Environment | Accuracy grade | Use when |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{R0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
+| Enveloping surface | **ISO 3744** (engineering) / **ISO 3746** (survey) | Sound pressure on a hemisphere or box | Essentially free field over one or more reflecting planes | Grade 2 ($\sigma_{\mathrm{R}0} \approx 1.5\ \text{dB}$) / grade 3 ($\approx 3.0\ \text{dB}$) | In situ or a large room; no special test facility available |
 | Reverberation room | **ISO 3741** | Sound pressure in the diffuse field | Qualified hard-walled reverberation room | Grade 1 (precision) | Highest accuracy for steady, broadband sources in a lab |
 | Intensity scanning | **ISO 9614-2** | Normal sound intensity scanned over a surface | Almost any, tolerant of steady extraneous noise | Grade 2 / 3 (from per-band field indicators) | On-site with background noise, or one machine among many |
 | Anechoic room | **ISO 3745** | Sound pressure on a fixed microphone array | Qualified anechoic or hemi-anechoic room | Grade 1 (precision) | Reference-grade emission in a free-field laboratory |
@@ -218,21 +218,21 @@ order; the first match names the standard.
 
 ### What the accuracy grades mean
 
-The grade is a claim about **reproducibility**: $\sigma_{R0}$ is the standard
+The grade is a claim about **reproducibility**: $\sigma_{\mathrm{R}0}$ is the standard
 deviation you would see if different laboratories measured the same source,
 each following the standard correctly. Typical A-weighted values are
-$\sigma_{R0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
 ISO 9614-2) and 3 dB or more for grade 3 (larger still when $K_2$ is
 large or the spectrum is tonal). Per-band values are larger at the
 spectrum edges. The `uncertainty` field of the pressure-method results
 (enveloping surface and anechoic) is the expanded uncertainty
 $U = 2\sigma_\text{tot}$ (95 % coverage), where
-$\sigma_\text{tot} = \sqrt{\sigma_{R0}^2 + \sigma_\text{omc}^2}$ also folds
+$\sigma_\text{tot} = \sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\text{omc}^2}$ also folds
 in the operating/mounting instability
 $\sigma_\text{omc}$ that you estimate and pass in; the grade only bounds the method's
 share of the budget.
 
-In practice: a grade-2 $L_{WA}$ of 92.4 dB carries $U \approx 3\ \text{dB}$, so two grade-2
+In practice: a grade-2 $L_{W\mathrm{A}}$ of 92.4 dB carries $U \approx 3\ \text{dB}$, so two grade-2
 results 2 dB apart are statistically indistinguishable, and checking that
 same source against a 93 dB limit is a coin flip. Choose the grade from the
 decision the number has to support, not from the facility that happens to
@@ -257,7 +257,7 @@ the source is not steady for these methods.
 
 *What the grade buys, and what the declaration has to absorb. The left bar is
 the width the method contributes; the right panel is the same width turned into
-$K_{WA}$ and added to the measured value, which is why a wide grade produces a
+$K_{W\mathrm{A}}$ and added to the measured value, which is why a wide grade produces a
 high declared limit and a machine that is easy to declare.*
 
 <details>
@@ -293,19 +293,19 @@ A measured sound power level is not yet a *declaration*. ISO 4871:1996 is the
 standard for the noise-emission declaration a manufacturer prints in technical
 documents: which quantities are stated, in which form, and how a declared value
 is verified. The preferred quantity is the A-weighted sound power level
-$L_{WA}$, optionally accompanied by the A-weighted emission sound pressure level
-$L_{pA}$ at a work station.
+$L_{W\mathrm{A}}$, optionally accompanied by the A-weighted emission sound pressure level
+$L_{p\mathrm{A}}$ at a work station.
 
 A declaration takes one of two alternative forms (clause 4):
 
-- the **dual-number** form (clause 3.16): the measured value $L_{WA}$ and its
-  uncertainty $K_{WA}$ stated together but separately; and
+- the **dual-number** form (clause 3.16): the measured value $L_{W\mathrm{A}}$ and its
+  uncertainty $K_{W\mathrm{A}}$ stated together but separately; and
 - the **single-number** form (clause 3.15): the derived declared value
-  $L_{WAd} = L_{WA} + K_{WA}$, an upper limit that repeated measurements are unlikely
+  $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$, an upper limit that repeated measurements are unlikely
   to exceed at the stated confidence level.
 
-$K_{WA}$ combines the measurement (reproducibility) and, for a batch, the
-production spread; for a single machine $K = 1.645\,\sigma_R$ (Annex A.2.2),
+$K_{W\mathrm{A}}$ combines the measurement (reproducibility) and, for a batch, the
+production spread; for a single machine $K = 1.645\,\sigma_\mathrm{R}$ (Annex A.2.2),
 where 1.645 is the 95 % one-sided quantile of the normal distribution — the
 declared value is an upper limit, so only one tail is being covered. A
 [`NoiseEmissionDeclaration`](/phonometry/reference/api/power/sound-power/)
@@ -336,8 +336,8 @@ declaration.report(
 ```
 
 Or build the declaration directly, reproducing the ISO 4871 Annex B example
-(two operating modes, $L_{WA} = 88$ and 95 dB with $K_{WA} = 2$ dB, giving
-declared $L_{WAd} = 90$ and 97 dB):
+(two operating modes, $L_{W\mathrm{A}} = 88$ and 95 dB with $K_{W\mathrm{A}} = 2$ dB, giving
+declared $L_{W\mathrm{Ad}} = 90$ and 97 dB):
 
 ```python
 mode1 = ph.OperatingModeDeclaration(
@@ -372,9 +372,9 @@ between manufacturer and user, and the difference in accuracy accounted for.
 Without that, the comparison is measuring the procedure and not the machine.
 
 The rounding is a trap of its own. A **single-number** declaration is verified
-against $L_{WAd}$, the unrounded sum $L_{WA} + K_{WA}$ rounded once; a
+against $L_{W\mathrm{Ad}}$, the unrounded sum $L_{W\mathrm{A}} + K_{W\mathrm{A}}$ rounded once; a
 **dual-number** declaration is verified against
-$\mathrm{round}(L_{WA}) + \mathrm{round}(K_{WA})$, which can differ by a whole
+$\mathrm{round}(L_{W\mathrm{A}}) + \mathrm{round}(K_{W\mathrm{A}})$, which can differ by a whole
 decibel. The library exposes both verdicts separately — `verified` for the
 single-number rule and `verified_dual` for the dual-number one — so a
 dual-number declaration must be read from the second, not from the first.
@@ -385,7 +385,7 @@ against the very value it was built from. That always passes and is an
 illustration of the plumbing, not of a verification.
 
 The other two arguments deserve their provenance. `emission_pressure_level` is
-the A-weighted **emission sound pressure level** $L_{pA}$ at the work station,
+the A-weighted **emission sound pressure level** $L_{p\mathrm{A}}$ at the work station,
 determined by ISO 11201 (essentially free field), ISO 11202 (survey, with an
 environmental correction) or ISO 11204 (with local corrections) — none of which
 is implemented here, so it arrives as a measured value from elsewhere, taken
@@ -414,7 +414,7 @@ The ISO 3740 decision guidance condensed into the method table and the
 decision path, the operating and mounting conditions that precede it, what the
 accuracy grades claim about reproducibility, and the ISO 4871 noise-emission
 declaration (`NoiseEmissionDeclaration`, `OperatingModeDeclaration`,
-`declare()`): the dual- and single-number forms, $L_{WAd} = L_{WA} + K_{WA}$
+`declare()`): the dual- and single-number forms, $L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$
 and the clause 6.2 verification with both rounding rules (`verified`,
 `verified_dual`), rendered as the declaration fiche through `.report()`.
 </ScopeClaim>
@@ -433,12 +433,12 @@ own discrete-point power summation is not implemented at all; only its field
 indicators are, in [Sound Intensity](/phonometry/devices/emission/intensity/).
 ISO 3743-1, ISO 3743-2 and ISO 3747, the remaining members of the ISO 3740
 family, are not implemented either, and neither is the sound *energy* level
-$L_J$ for single events. The emission sound pressure level $L_{pA}$ that
-stands beside $L_{WA}$ in a declaration is consumed, not determined: ISO
+$L_J$ for single events. The emission sound pressure level $L_{p\mathrm{A}}$ that
+stands beside $L_{W\mathrm{A}}$ in a declaration is consumed, not determined: ISO
 11201, ISO 11202 and ISO 11204 are outside the library. ISO 4871's batch
 criteria of clause 6.3 are not evaluated — only the clause 6.2 single-machine
 verification — and its batch statistics beyond the single-machine
-$K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
+$K = 1.645\,\sigma_\mathrm{R}$ case (Annex A.2.2) are stated, not derived.
 </ScopeClaim>
 </Scope>
 
@@ -462,7 +462,7 @@ $K = 1.645\,\sigma_R$ case (Annex A.2.2) are stated, not derived.
 - [Predicting Sound Insulation (EN 12354)](/phonometry/buildings/design/insulation-prediction/): the
   airborne and impact insulation ratings and the EN 12354 emission predictions
   that consume a source $L_W$.
-- [Levels](/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](/phonometry/signals/levels/levels/): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
 - [Theory](/phonometry/reference/theory/environment-transport/): the Waterhouse, $K_1$/$K_2$ and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power`](/phonometry/reference/api/power/sound-power/), [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/) and [`emission.sound_power_intensity`](/phonometry/reference/api/power/sound-power-intensity/).
 - Theory: [Sound power determination](/phonometry/reference/theory/environment-transport/#sound-power-determination-iso-374437453746-iso-3741-iso-9614-23): the enveloping-surface, reverberation-room and intensity derivations behind the four routes.
@@ -480,11 +480,11 @@ ISO 9614-3 all determine it.
 
 ### What do the accuracy grades in sound power measurement mean?
 
-The grade is a claim about reproducibility: $\sigma_{R0}$ is the standard deviation
+The grade is a claim about reproducibility: $\sigma_{\mathrm{R}0}$ is the standard deviation
 you would see if different laboratories measured the same source, each
 following the standard correctly. Typical A-weighted values are
-$\sigma_{R0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
-ISO 9614-2) and 3 dB or more for grade 3. A grade-2 $L_{WA}$ carries
+$\sigma_{\mathrm{R}0} \approx 0.5\ \text{dB}$ for grade 1 (ISO 3741), 1.5 dB for grade 2 (ISO 3744,
+ISO 9614-2) and 3 dB or more for grade 3. A grade-2 $L_{W\mathrm{A}}$ carries
 $U \approx 3\ \text{dB}$, so two grade-2 results 2 dB apart are statistically
 indistinguishable.
 

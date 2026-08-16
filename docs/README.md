@@ -21,7 +21,7 @@ The chain that turns a digital signal into a standards-compliant number:
 bands, weightings, ballistics, levels, spectra, calibration and uncertainty.
 Every other section consumes it.
 
-- [Build a sound level meter](signals/sound-level-meter.md): an end-to-end walk-through that composes the core API into a working meter: calibrate against an IEC 60942 tone, apply the IEC 61672-1 frequency and time weightings, integrate into $L_{eq}$, SEL and percentile levels, split into IEC 61260-1 octave bands, and verify the class of every stage
+- [Build a sound level meter](signals/sound-level-meter.md): an end-to-end walk-through that composes the core API into a working meter: calibrate against an IEC 60942 tone, apply the IEC 61672-1 frequency and time weightings, integrate into $L_\mathrm{eq}$, SEL and percentile levels, split into IEC 61260-1 octave bands, and verify the class of every stage
 
 **[Octave filtering](signals/filters/index.md)**
 
@@ -33,7 +33,7 @@ Every other section consumes it.
 
 **[Levels and weighting](signals/levels/index.md)**
 
-- [Integrated & Statistical Levels](signals/levels/levels.md): $L_{eq}$, $L_{Aeq}$, $L_{10}$/$L_{50}$/$L_{90}$, $L_{Cpeak}$/SEL, noise dose (IEC 61252), octave spectrogram
+- [Integrated & Statistical Levels](signals/levels/levels.md): $L_\mathrm{eq}$, $L_\mathrm{Aeq}$, $L_{10}$/$L_{50}$/$L_{90}$, $L_\mathrm{Cpeak}$/SEL, noise dose (IEC 61252), octave spectrogram
 - [Frequency Weighting](signals/levels/weighting.md): A, C, Z curves
 - [Special weightings](signals/levels/special-weightings.md): the ISO 7196 G-weighting for infrasound, the historical B (ANSI S1.4-1983) and D (IEC 537) curves, and AU (IEC 61012) for audible sound in the presence of ultrasound
 - [Time Weighting](signals/levels/time-weighting.md): Fast, Slow, Impulse ballistics
@@ -81,7 +81,7 @@ noise costs a hearing threshold.
 
 - [Hearing threshold](perception/hearing/hearing-threshold.md): the age-related hearing threshold distribution (ISO 7029:2017) and the free-field/diffuse-field reference threshold of hearing (ISO 389-7:2005)
 - [Noise-induced hearing loss](perception/hearing/noise-induced-hearing-loss.md): the ISO 1999:2013 noise-induced permanent threshold shift (NIPTS) and its population distribution, and the combination with age into the hearing threshold level associated with age and noise (HTLAN)
-- [Occupational noise exposure](perception/hearing/occupational-exposure.md): the ISO 9612 task-based, job-based and full-day measurement strategies and the Annex C uncertainty budget behind every $L_{EX,8h}$ report
+- [Occupational noise exposure](perception/hearing/occupational-exposure.md): the ISO 9612 task-based, job-based and full-day measurement strategies and the Annex C uncertainty budget behind every $L_\mathrm{EX,8h}$ report
 
 ### [Rooms and buildings](buildings/index.md)
 
@@ -93,7 +93,7 @@ predicted.
 
 - [Room Acoustics](buildings/rooms/room-acoustics.md): impulse-response acquisition (ISO 18233), reverberation and room parameters (ISO 3382-1/2), open-plan speech metrics (ISO 3382-3), reverberation-room sound absorption (ISO 354)
 - [Room impulse response acquisition (ISO 18233)](buildings/rooms/room-impulse-response.md): the exponential sine sweep and its deconvolution, the MLS correlation method, and the source and microphone placement rules of a valid measurement
-- [Open-plan office acoustics (ISO 3382-3)](buildings/rooms/open-plan-acoustics.md): the spatial decay rate $D_{2,S}$ of A-weighted speech, the level at 4 m, and the distraction and privacy distances derived from STI
+- [Open-plan office acoustics (ISO 3382-3)](buildings/rooms/open-plan-acoustics.md): the spatial decay rate $D_{2,\mathrm{S}}$ of A-weighted speech, the level at 4 m, and the distraction and privacy distances derived from STI
 - [Sound absorption in enclosed spaces](buildings/rooms/enclosed-space-absorption.md): the EN 12354-6:2003 prediction of a room's total equivalent absorption area and reverberation time from its surfaces and objects (Clause 4)
 - [Reverberation-time prediction](buildings/rooms/reverberation-prediction.md): the reverberation time from a room's volume and surface absorption by five statistical models (Sabine, Eyring, Millington-Sette, Fitzroy, Arau-Puchades), with the air-absorption term
 - [Image sources and the steady-state room field](buildings/rooms/room-image-sources.md): the deterministic image-source room impulse response of a rectangular room (Kuttruff/Vorländer) and the statistical steady-state level with the room constant, critical distance and Schroeder frequency (Bies)
@@ -105,9 +105,9 @@ predicted.
 - [Laboratory Insulation Measurement](buildings/insulation/insulation-lab.md): the ISO 10140 laboratory sound reduction index and normalized impact level, measured with flanking suppressed, with the background-noise correction and the accredited test fiches
 - [Sound Insulation by Intensity (ISO 15186)](buildings/insulation/insulation-intensity.md): the ISO 15186-1/-2 sound reduction index from the intensity scanned over the radiating face, for the whole element or element by element
 - [Sound Insulation Survey Method (ISO 10052)](buildings/insulation/insulation-survey.md): the ISO 10052 octave-band control method: the reverberation index and its room-class estimate, the airborne, impact, façade and service-equipment quantities and their survey reports
-- [Laboratory Flanking Transmission (ISO 10848)](buildings/insulation/flanking-lab.md): the ISO 10848 junction vibration reduction index $K_{ij}$ and the flanking descriptors $D_{n,f}$ and $L_{n,f}$ measured on a test facility
-- [Insulation Ratings (ISO 717)](buildings/insulation/insulation-ratings.md): the ISO 717-1 airborne and ISO 717-2 impact reference-curve engines with the spectrum adaptation terms $C$, $C_{tr}$ and $C_I$, the enlarged-range and one-decimal variants, and the ISO 717 fiche
-- [Spanish Building Code (CTE DB-HR)](buildings/insulation/spanish-building-code.md): the DB-HR global indices $R_A$, $R_{A,tr}$, $D_{nT,A}$ and $D_{2m,nT,Atr}$ from the direct Annex A formula over eighteen bands, the four normalised spectra, the clause 2 requirement tables and the window-size correction
+- [Laboratory Flanking Transmission (ISO 10848)](buildings/insulation/flanking-lab.md): the ISO 10848 junction vibration reduction index $K_{ij}$ and the flanking descriptors $D_\mathrm{n,f}$ and $L_\mathrm{n,f}$ measured on a test facility
+- [Insulation Ratings (ISO 717)](buildings/insulation/insulation-ratings.md): the ISO 717-1 airborne and ISO 717-2 impact reference-curve engines with the spectrum adaptation terms $C$, $C_\mathrm{tr}$ and $C_\mathrm{I}$, the enlarged-range and one-decimal variants, and the ISO 717 fiche
+- [Spanish Building Code (CTE DB-HR)](buildings/insulation/spanish-building-code.md): the DB-HR global indices $R_\mathrm{A}$, $R_\mathrm{A,tr}$, $D_\mathrm{nT,A}$ and $D_{2\mathrm{m,nT,Atr}}$ from the direct Annex A formula over eighteen bands, the four normalised spectra, the clause 2 requirement tables and the window-size correction
 - [Façade Sound Insulation](buildings/insulation/facade-insulation.md): the building envelope measured (ISO 16283-3), predicted from its element indices (EN 12354-3) and radiating an indoor source outwards (EN 12354-4)
 - [Heavy and Soft Impact Sources (ISO 16283-2)](buildings/insulation/heavy-impact-sources.md): the rubber ball and the bang machine, their impact force exposure level and octave-band specification, the Fast-weighted standardization of the maximum impact level and the A-weighted single number of ISO 717-2 Annex D
 
@@ -129,7 +129,7 @@ summarise them, and the models that predict them.
 
 **[Absorbers](materials/absorbers/index.md)**
 
-- [Sound Absorption Measurement and Rating](materials/absorbers/absorption-measurement.md): reverberation-room absorption measurement (ISO 354), the weighted rating $\alpha_w$ with its classes (ISO 11654), and the measurement uncertainty (ISO 12999-2)
+- [Sound Absorption Measurement and Rating](materials/absorbers/absorption-measurement.md): reverberation-room absorption measurement (ISO 354), the weighted rating $\alpha_\mathrm{w}$ with its classes (ISO 11654), and the measurement uncertainty (ISO 12999-2)
 - [Airflow Resistance](materials/absorbers/airflow-resistance.md): static and alternating determination of airflow resistance, specific resistance and resistivity (ISO 9053-1/-2), and what the resistivity feeds in the porous models
 - [Impedance Tube](materials/absorbers/impedance-tube.md): normal-incidence absorption, surface impedance and transmission loss by the standing-wave-ratio, transfer-function and transfer-matrix methods (ISO 10534-1/-2, ASTM E2611), plus the virtual FDTD tube
 - [Porous and Multilayer Absorbers](materials/absorbers/porous-absorbers.md): the Delany-Bazley, Miki and Johnson-Champoux-Allard porous models, the transfer-matrix multilayer solver with perforated, microperforated (Maa) and membrane layers, and the random-incidence Paris integral
@@ -188,9 +188,9 @@ limits a noise map is drawn against.
 
 **[Assessment and regulation](environment/assessment/index.md)**
 
-- [Environmental levels](environment/assessment/environmental-levels.md): $L_{den}$, $L_{dn}$ and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget
-- [Spanish Noise Regulation (RD 1367/2007)](environment/assessment/spanish-noise-regulation.md): the corrected level $L_{Keq}$ with its tonal, low-frequency and impulsive corrections, the evaluation periods split into noise phases, the acoustic quality objective and immission limit tables, and the Article 25 compliance check of an activity
-- [Impulsive-sound prominence](environment/assessment/impulsive-sound.md): the NT ACOU 112:2002 predicted prominence of impulsive sounds (onset rate and level difference) and the graduated adjustment $K_I$ added to $L_{Aeq}$
+- [Environmental levels](environment/assessment/environmental-levels.md): $L_\mathrm{den}$, $L_\mathrm{dn}$ and the composite rating levels of ISO 1996-1, with the ISO 1996-2 tonal adjustment, residual-noise correction and measurement uncertainty budget
+- [Spanish Noise Regulation (RD 1367/2007)](environment/assessment/spanish-noise-regulation.md): the corrected level $L_\mathrm{Keq}$ with its tonal, low-frequency and impulsive corrections, the evaluation periods split into noise phases, the acoustic quality objective and immission limit tables, and the Article 25 compliance check of an activity
+- [Impulsive-sound prominence](environment/assessment/impulsive-sound.md): the NT ACOU 112:2002 predicted prominence of impulsive sounds (onset rate and level difference) and the graduated adjustment $K_\mathrm{I}$ added to $L_\mathrm{Aeq}$
 
 ### [Aircraft noise](aircraft/index.md)
 

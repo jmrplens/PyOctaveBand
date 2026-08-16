@@ -471,7 +471,7 @@ $$
 
 with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
 4 in an edge, 8 in a corner). The two terms cross at the **critical distance**
-$r_c = \sqrt{Q R / 16\pi}$: closer than $r_c$ the direct field dominates and
+$r_\mathrm{c} = \sqrt{Q R / 16\pi}$: closer than $r_\mathrm{c}$ the direct field dominates and
 doubling the distance drops the level by 6 dB; farther out the reverberant
 field takes over and moving away barely helps.
 
@@ -487,7 +487,7 @@ open window. $R$ therefore always exceeds the Sabine area $A = S\bar\alpha$, and
 the difference vanishes as $\bar\alpha \to 0$, which is why the module prefers
 $R$ and why Kuttruff's $A/16\pi$ agrees with it in a live room.
 
-Where a source is mounted is not a detail, because $Q$ moves $r_c$ as
+Where a source is mounted is not a detail, because $Q$ moves $r_\mathrm{c}$ as
 $\sqrt{Q}$: the same machine has a 1.11 m critical distance on a stand and a
 3.14 m one in the corner of the same workshop. The plate below fixes the four
 values to real mountings.
@@ -517,12 +517,12 @@ On a room worth drawing — a 12 × 8 × 4 m workshop, $S$ = 352 m²,
 $\bar\alpha$ = 0.15, so $R$ = 62 m² — `SteadyFieldResult.plot()` draws the
 direct, reverberant and total levels against distance with the critical distance
 marked: the total curve follows the $1/r^2$ direct field near the source and
-flattens onto the reverberant plateau beyond $r_c$ = 1.11 m.
+flattens onto the reverberant plateau beyond $r_\mathrm{c}$ = 1.11 m.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%" />
 
 *A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
-0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
+0.15: within $r_\mathrm{c} = 1.11$ m moving away drops the level 6 dB per doubling;
 beyond it the reverberant plateau takes over and only absorption, not
 distance, lowers the level (Bies 5e, §6.4).*
 
@@ -562,12 +562,12 @@ plt.show()
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_directivity.svg" alt="Left panel, the total steady-state level against distance in a 12 by 8 by 4 metre workshop for source directivity factors of 1, 2, 4 and 8: the four curves share one reverberant plateau far from the source and separate near it, with the marked critical distance moving outward from 1.11 to 3.14 metres as the square root of Q. Right panel, the same room at a fixed Q of 2 with the mean absorption stepped over 0.05, 0.15 and 0.35: the plateau drops with absorption while the direct-field asymptote near the source does not move" width="92%" />
 
 *Left: $Q$ moves the crossover, not the plateau. Doubling $Q$ raises the direct
-field by 3 dB and pushes $r_c$ out by $\sqrt{2}$, but the reverberant level far
+field by 3 dB and pushes $r_\mathrm{c}$ out by $\sqrt{2}$, but the reverberant level far
 from the source is identical in all four curves, because $Q$ never enters the
 $4/R$ term. Right: absorption does the opposite. Stepping $\bar\alpha$ from 0.05
 to 0.35 takes the room constant from 18.5 m² to 189.5 m² and the plateau from
 83.3 dB to 73.2 dB — 10.1 dB, exactly $10\lg(R_2/R_1)$ — while the near-field
-asymptote does not move. That is the precise content of "beyond $r_c$ only
+asymptote does not move. That is the precise content of "beyond $r_\mathrm{c}$ only
 absorption, not distance, lowers the level", and it is a seven-fold increase in
 absorption for 10 dB.*
 
@@ -650,17 +650,17 @@ model over-predicts the level far from the source, under-predicts the benefit
 of distance, and the crossover is best read as an order-of-magnitude landmark
 rather than a boundary.
 
-Kuttruff's reverberation distance ($r_c = \sqrt{A/16\pi}$ for $Q = 1$) uses the
+Kuttruff's reverberation distance ($r_\mathrm{c} = \sqrt{A/16\pi}$ for $Q = 1$) uses the
 Sabine absorption area $A = S\bar\alpha$ rather than the room constant
 $R = A/(1-\bar\alpha)$; the two coincide for a small $\bar\alpha$, and this
-module uses $R$ so that $r_c$ is exactly the crossover of its own
+module uses $R$ so that $r_\mathrm{c}$ is exactly the crossover of its own
 `steady_state_spl`. Pass `characteristic_impedance=rho_c` to add the Bies
 $10\log_{10}(\rho c / 400)$ term (about +0.14 dB at 20 °C).
 
 **Where the statistics fade.** The **Schroeder frequency**
-$f_s = 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse
+$f_\mathrm{s} = 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse
 transition, a heuristic crossover rather than a sharp cutoff: well below it
-discrete modes dominate and the diffuse assumptions of $R$ and $r_c$ grow
+discrete modes dominate and the diffuse assumptions of $R$ and $r_\mathrm{c}$ grow
 unreliable, well above it the modes overlap and this statistical picture
 holds. Borderline rooms warrant a band-by-band check.
 
@@ -671,11 +671,11 @@ the number of them per hertz is the **modal density** derived in §3, which grow
 as the square of frequency, so overlap becomes inevitable above some frequency.
 Ask for roughly three modes inside one bandwidth — set
 $3 \approx (2.2/T)\,(4\pi V f^2/c_0^3)$ — and solving for $f$ gives
-$f_s \approx 2000\sqrt{T/V}$ at $c_0 \approx 343$ m/s. Three things follow. The
+$f_\mathrm{s} \approx 2000\sqrt{T/V}$ at $c_0 \approx 343$ m/s. Three things follow. The
 constant encodes a *choice* of how much overlap counts as diffuse, so stricter
 authors quote 4000 for the same physics. A large room reaches the transition at
 a lower frequency purely because it has more modes at every frequency. And the
-transition is soft, so a band straddling $f_s$ should be checked position by
+transition is soft, so a band straddling $f_\mathrm{s}$ should be checked position by
 position rather than trusted. The mode-ladder figure of §3 shows the crossing
 directly: its modal density passes one mode per hertz right around the marked
 Schroeder frequency.

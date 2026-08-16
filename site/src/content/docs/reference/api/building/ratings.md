@@ -25,9 +25,9 @@ shifted reference) is as large as possible but not more than 32,0 dB for
 the 16 one-third-octave bands (100 Hz to 3150 Hz) or 10,0 dB for the 5
 octave bands (125 Hz to 2000 Hz). The weighted rating (`Rw`, `R'w`,
 `Dn,w`, `DnT,w` ...) is the shifted reference read at 500 Hz. The
-spectrum adaptation terms are $C = X_{A1} - X_w$ and
-$C_{tr} = X_{A2} - X_w$
-with $X_{Aj} = -10 \log_{10} \sum 10^{(L_{ij} - X_i)/10}$ rounded to an
+spectrum adaptation terms are $C = X_{\mathrm{A}1} - X_\mathrm{w}$ and
+$C_\mathrm{tr} = X_{\mathrm{A}2} - X_\mathrm{w}$
+with $X_{\mathrm{A}j} = -10 \log_{10} \sum 10^{(L_{ij} - X_i)/10}$ rounded to an
 integer, using
 the A-weighted spectra No. 1 (pink noise, `C`) and No. 2 (urban traffic,
 `Ctr`) of Table 4 (Clause 4.5, Formula (1) and (2)). Input levels are
@@ -54,7 +54,7 @@ as large as possible but not more than 32,0 dB (16 one-third-octave bands)
 or 10,0 dB (5 octave bands). The rating (`Ln,w`, `L'n,w`, `L'nT,w`)
 is the shifted reference read at 500 Hz, reduced by a further 5 dB for
 octave bands (Clause 4.3.2). The spectrum adaptation term
-$C_I = L_{n,sum} - 15 - L_{n,w}$ uses the energetic sum `Ln,sum`
+$C_\mathrm{I} = L_\mathrm{n,sum} - 15 - L_\mathrm{n,w}$ uses the energetic sum `Ln,sum`
 over
 100 Hz to 2500 Hz (one-third octave) or 125 Hz to 2000 Hz (octave),
 rounded to an integer (Clause A.2.1, Formulae (A.1) to (A.3)). The Table 3
@@ -190,13 +190,13 @@ impact_improvement_adaptation_term(
 
 Adaptation term `CI,Δ` of a floor covering (ISO 717-2:2020 A.2.2).
 
-$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (Formula (A.4)) with
-$C_{I,r,0} = -11$ dB (the
+$C_{\mathrm{I},\Delta} = C_\mathrm{I,r,0} - C_\mathrm{I,r}$ (Formula (A.4)) with
+$C_\mathrm{I,r,0} = -11$ dB (the
 bare Table 4 reference floor) and `CI,r` the ISO 717-2 spectrum
 adaptation term of the reference floor with the covering under test,
-$L_{n,r} = L_{n,r,0} - \Delta L$ (Formula (1)). Together with
+$L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$ (Formula (1)). Together with
 [`weighted_impact_improvement`](/phonometry/reference/api/building/ratings/#weighted_impact_improvement) it yields the single-number reduction
-for a flat spectrum, $\Delta L_{lin} = \Delta L_w + C_{I,\Delta}$
+for a flat spectrum, $\Delta L_\mathrm{lin} = \Delta L_\mathrm{w} + C_{\mathrm{I},\Delta}$
 (Formula (A.5)). ISO 16251-1
 Clause 8 e) requires this term in the statement of results.
 
@@ -313,9 +313,9 @@ Weighted reduction of impact level `ΔLw` (ISO 717-2:2020 §5).
 Relates a measured improvement spectrum `ΔL` to the heavyweight
 reference
 floor of Table 4: the reference level with the covering is
-$L_{n,r} = L_{n,r,0} - \Delta L$ (Formula (1)) and the weighted
+$L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$ (Formula (1)) and the weighted
 improvement is
-$\Delta L_w = L_{n,r,0,w} - L_{n,r,w} = 78 - L_{n,r,w}$
+$\Delta L_\mathrm{w} = L_\mathrm{n,r,0,w} - L_\mathrm{n,r,w} = 78 - L_\mathrm{n,r,w}$
 (Formula (2)), where `Ln,r,w` is
 the ISO 717-2 weighted rating of `Ln,r` from
 [`weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating).
@@ -396,12 +396,12 @@ Computes the weighted impact rating from the core one-third-octave bands
 100-3150 Hz (Clause 4.3) and, when the input covers 50-2500 Hz, the
 enlarged-range spectrum adaptation term `CI,50-2500` of the A.2.1 NOTE:
 the energetic sum runs over 50-2500 Hz instead of 100-2500 Hz in
-Formula (A.1), $C_I = L_{n,sum} - 15 - L_{n,w}$.
+Formula (A.1), $C_\mathrm{I} = L_\mathrm{n,sum} - 15 - L_\mathrm{n,w}$.
 
 With `one_decimal=True` the reference-curve shift runs in 0,1 dB steps
 and the sums keep one decimal place (Clauses 4.3.1/4.4; e.g. the
-reference floor yields $L_{n,r,0,w} = 77.6$ dB and
-$C_{I,r,0} = -10.3$ dB
+reference floor yields $L_\mathrm{n,r,0,w} = 77.6$ dB and
+$C_\mathrm{I,r,0} = -10.3$ dB
 as printed in A.2.2).
 
 **Parameters**
@@ -473,7 +473,7 @@ Computes the weighted rating from the core one-third-octave bands
 100-3150 Hz (Clause 4.4) and, for every enlarged frequency range covered
 by the input, the additional spectrum adaptation terms of Annex B
 (`C50-3150`, `C50-5000`, `C100-5000` and the `Ctr` counterparts)
-with the Table B.1 spectra: $C_j = X_{Aj} - X_w$ where `XAj` sums
+with the Table B.1 spectra: $C_j = X_{\mathrm{A}j} - X_\mathrm{w}$ where `XAj` sums
 over the
 bands of the enlarged range (Clause 4.5 with Annex B).
 

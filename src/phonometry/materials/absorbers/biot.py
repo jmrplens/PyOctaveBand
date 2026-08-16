@@ -17,10 +17,10 @@ of the rest of the package, exactly as printed:
 
 * **Elastic coefficients** ``P``, ``Q`` and ``R`` for the usual case of a
   frame built from a material far stiffer than the frame itself
-  (:math:`K_s \to \infty`), Eqs. (6.26)-(6.29) printed pp. 116-117:
-  :math:`R = \phi K_f`, :math:`Q = (1 - \phi) K_f`,
-  :math:`P = 4N/3 + K_b + (1 - \phi)^2 K_f / \phi` with the frame bulk
-  modulus :math:`K_b = 2N(1 + \nu)/(3(1 - 2\nu))`.
+  (:math:`K_\mathrm{s} \to \infty`), Eqs. (6.26)-(6.29) printed pp. 116-117:
+  :math:`R = \phi K_\mathrm{f}`, :math:`Q = (1 - \phi) K_\mathrm{f}`,
+  :math:`P = 4N/3 + K_\mathrm{b} + (1 - \phi)^2 K_\mathrm{f} / \phi` with the frame bulk
+  modulus :math:`K_\mathrm{b} = 2N(1 + \nu)/(3(1 - 2\nu))`.
 * **Modified densities** ``rho11``, ``rho12``, ``rho22`` (Eq. (6.56), printed
   p. 120) built from the inertial coupling
   :math:`\rho_a = \phi \rho_0 (\alpha_\infty - 1)` and the visco-inertial
@@ -64,11 +64,11 @@ assembly reproduces the chapter 6 closed form Eq. (6.107) to machine precision.
 The book does print four *output* numbers for the fully specified glass wool of
 Table 6.1, and all four are reproduced: the airborne branch changes from
 :math:`(\delta_1, \mu_1)` to :math:`(\delta_2, \mu_2)` at 495 Hz,
-:math:`\lvert \mu_a \rvert > 40` above 50 Hz, and ``mu_b`` runs from 1.0 at
+:math:`\lvert \mu_\mathrm{a} \rvert > 40` above 50 Hz, and ``mu_b`` runs from 1.0 at
 50 Hz to 0.82 at 1500 Hz (all printed pp. 124-125), while the impedance peak
 of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
-reproduced by :math:`\operatorname{Re}(\mu_b)`: the printed sentence calls it
-a modulus, but :math:`\lvert \mu_b \rvert` is 0.939 at 1500 Hz against the
+reproduced by :math:`\operatorname{Re}(\mu_\mathrm{b})`: the printed sentence calls it
+a modulus, but :math:`\lvert \mu_\mathrm{b} \rvert` is 0.939 at 1500 Hz against the
 printed 0.82, and ``docs/ERRATA.md`` records why. See
 ``tests/materials/absorbers/test_biot.py``.
 """
@@ -131,7 +131,7 @@ def _require_poisson_ratio(value: float) -> float:
 def frame_bulk_modulus(shear_modulus: complex, poisson_ratio: float) -> complex:
     r"""Bulk modulus ``Kb`` of the frame in vacuum from ``N`` and ``nu``.
 
-    :math:`K_b = 2 N (\nu + 1) / (3 (1 - 2 \nu))` (Allard & Atalla 2e,
+    :math:`K_\mathrm{b} = 2 N (\nu + 1) / (3 (1 - 2 \nu))` (Allard & Atalla 2e,
     Eq. (6.29), printed p. 116). ``Kb`` is the quantity the jacketed
     "gedanken experiment" of Eq. (6.7) measures, and the one the limp-frame
     rules of thumb of
@@ -159,7 +159,7 @@ def frame_elastic_coefficient(
 
     .. math::
 
-       K_c = \lambda + 2 \mu = K_b + 4 N / 3 = 2 (1 - \nu) N / (1 - 2 \nu)
+       K_c = \lambda + 2 \mu = K_\mathrm{b} + 4 N / 3 = 2 (1 - \nu) N / (1 - 2 \nu)
 
     (Allard & Atalla 2e, Eqs. (1.76) and (6.111), printed pp. 12 and 130).
     A compressional wave in the frame *in vacuum* travels at
@@ -194,7 +194,7 @@ def frame_quarter_wave_resonance(
 
     .. math::
 
-       f_r = \frac{1}{4 l} \sqrt{\operatorname{Re}(K_c) / \rho_1}
+       f_\mathrm{r} = \frac{1}{4 l} \sqrt{\operatorname{Re}(K_c) / \rho_1}
        \tag{Eq. 6.110}
 
     This is the frequency at which the peak that no
@@ -397,9 +397,9 @@ def biot_waves(
       :math:`\rho_{11} = \rho_1 + \rho_a - j\sigma\phi^2 G(\omega)/\omega`
       (Eq. (6.56), printed p. 120), the visco-inertial term being recovered as
       :math:`\phi \rho_0 \alpha_\infty - \rho_{22}`;
-    * :math:`K_f = \phi K_{\mathrm{eq}}`, then :math:`R = \phi K_f`,
-      :math:`Q = (1 - \phi) K_f` and
-      :math:`P = 4N/3 + K_b + (1 - \phi)^2 K_f / \phi` (Eqs. (6.26)-(6.28));
+    * :math:`K_\mathrm{f} = \phi K_{\mathrm{eq}}`, then :math:`R = \phi K_\mathrm{f}`,
+      :math:`Q = (1 - \phi) K_\mathrm{f}` and
+      :math:`P = 4N/3 + K_\mathrm{b} + (1 - \phi)^2 K_\mathrm{f} / \phi` (Eqs. (6.26)-(6.28));
     * :math:`\delta_1^2` and :math:`\delta_2^2` from Eqs. (6.67)-(6.69),
       :math:`\delta_3^2` from
       Eq. (6.83), ``mu1``, ``mu2`` from Eq. (6.71) and ``mu3`` from Eq. (6.84).
@@ -659,7 +659,7 @@ def poroelastic_transfer_matrix(
     :param waves: The :class:`BiotWavesResult` of the material.
     :param thickness: Layer thickness ``h``, in metres (> 0).
     :param transverse_wavenumber: In-plane wavenumber
-        :math:`k_t = k \sin(\theta)`,
+        :math:`k_\mathrm{t} = k \sin(\theta)`,
         in rad/m (Default: 0, normal incidence). Scalar or one value per
         frequency.
     :return: The transfer matrix with shape ``(len(frequency), 6, 6)``.
@@ -873,7 +873,7 @@ def _stack_surface_impedance(
     Assembles the linear system :math:`[D] V = 0` of Allard & Atalla
     Eqs. (11.78)
     to (11.85) and solves it with the incident pressure fixed to one
-    (Sect. 11.6.1, Eq. (11.97)), so that :math:`Z_s = 1 / V_1(1)`. Unlike the
+    (Sect. 11.6.1, Eq. (11.97)), so that :math:`Z_\mathrm{s} = 1 / V_1(1)`. Unlike the
     printed
     determinant form Eq. (11.88) this needs a single linear solve per
     frequency, and unlike the transfer-matrix form of

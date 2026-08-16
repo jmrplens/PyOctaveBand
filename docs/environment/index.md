@@ -116,7 +116,7 @@ calculations.
 
 ## Before and after these pages
 
-Every rating here is an adjusted $L_{eq}$, so the calibration, weighting and
+Every rating here is an adjusted $L_\mathrm{eq}$, so the calibration, weighting and
 time integration that produce it are in [Signal
 analysis](../signals/index.md), and [Build a sound level
 meter](../signals/sound-level-meter.md) runs that chain end to end on

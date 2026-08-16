@@ -46,8 +46,8 @@ plane-wave limits of the tube, and closes with the choice between them.
 
 Out in the field there is no reverberation room. ISO 13472-1 measures the sound
 absorption of a road surface (or any extended flat surface) *in situ* by firing
-an impulse from a loudspeaker at height $d_s$ down onto the surface and recording
-the impulse response at a microphone at height $d_m$. The **incident** and
+an impulse from a loudspeaker at height $d_\mathrm{s}$ down onto the surface and recording
+the impulse response at a microphone at height $d_\mathrm{m}$. The **incident** and
 **reflected** components are separated in time with an Adrienne window; their
 transfer function gives the reflection factor and hence the absorption.
 
@@ -57,24 +57,24 @@ transfer function gives the reflection factor and hence the absorption.
 the direct wave, so it is attenuated by the geometrical-spreading factor
 
 $$
-K_r = \frac{d_s - d_m}{d_s + d_m},
+K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
-which equals $2/3$ for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m.
+which equals $2/3$ for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m.
 Both heights are held to within 0.005 m through the averaging, and the
 acoustic centres of source and microphone lie on one line normal to the
 surface with the microphone axis parallel to it. The absorption follows from
-the windowed incident and reflected spectra $H_i$, $H_r$:
+the windowed incident and reflected spectra $H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ### 1.1 What is subtracted
 
 The microphone hears the direct wave and the road reflection in the same
 impulse response, and the mandatory geometry puts them only
-$2 d_m / c \approx 1.5$ ms apart — far too little to gate apart at the bottom
+$2 d_\mathrm{m} / c \approx 1.5$ ms apart — far too little to gate apart at the bottom
 of the reported band. ISO 13472-1 therefore requires the **subtraction
 technique** (Clause 4.2) rather than plain time windowing, and that is the
 step the two arrays this page's functions consume come out of:
@@ -87,15 +87,15 @@ step the two arrays this page's functions consume come out of:
    **at least 50** responses (Clause 4.3), which is what beats the background
    noise and the meteorological variation.
 3. Repeat the identical measurement with the rig taken away from any
-   reflecting surface. That free-field response **is** $h_i$. Correct any
+   reflecting surface. That free-field response **is** $h_\mathrm{i}$. Correct any
    residual time shift between the two takes, and make them within a short
    time of each other — the standard recommends under 10 minutes — because
    the delay is temperature dependent.
-4. Subtract: $h_r = h_\text{road} - h_i$. Everything the two takes share —
+4. Subtract: $h_\mathrm{r} = h_\text{road} - h_\mathrm{i}$. Everything the two takes share —
    the direct wave, the loudspeaker, the microphone, the whole chain —
    cancels, and what survives is the surface reflection alone.
-5. Window $h_i$ and $h_r$ with the **same** window applied at their own
-   arrival times ($T_{w,\text{direct}} = T_{w,\text{reflected}}$), transform,
+5. Window $h_\mathrm{i}$ and $h_\mathrm{r}$ with the **same** window applied at their own
+   arrival times ($T_{\mathrm{w},\text{direct}} = T_{\mathrm{w},\text{reflected}}$), transform,
    and form $\alpha$ with $K_r$.
 
 Two acceptance conditions ride on that chain. The signal-to-noise ratio must
@@ -132,7 +132,7 @@ print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
 
 ### 1.2 The reference surface (Annex B)
 
-The raw ratio $|H_r/H_i|^2/K_r^2$ assumes that the electro-acoustic chain and
+The raw ratio $|H_\mathrm{r}/H_\mathrm{i}|^2/K_r^2$ assumes that the electro-acoustic chain and
 the geometry factor cancel exactly. They do not: the loudspeaker and the
 microphone have their own responses along paths of different length, and the
 mandatory $K_r = 2/3$ is a plane-wave idealisation of a finite geometry. At
@@ -278,7 +278,7 @@ result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
 
 *The absorption rises with frequency because the surface reflects less of the
 high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
-dictates through $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
+dictates through $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -327,7 +327,7 @@ plt.show()
 **Maximum sampled area (Annex A).** The finite time window limits how much of the
 surface contributes to the reflection. The maximum sampled area is a circle whose
 radius the library computes from the geometry and window width; the Annex A worked
-example ($d_s = 1.25$ m, $d_m = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
+example ($d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
 about 1.34 m.
 
 ```python
@@ -375,7 +375,7 @@ signal processing, are what usually invalidates a roadside campaign.
 - **The maximum sampled area must be clear.** Any object other than the
   pavement — a fence, a rock, a barrier, a parked car — is a reflecting object.
   None may be inside the sampled area, and anything outside it must be farther
-  from the microphone than $d_s$, that is farther than 1.25 m. The microphone
+  from the microphone than $d_\mathrm{s}$, that is farther than 1.25 m. The microphone
   stand itself must not influence the measurement.
 - **The surface must be visually homogeneous** and free of changes in the
   material, and it must be **dry**. On a surface with a significant void
@@ -472,11 +472,11 @@ and dry.
 **Plane-wave limits (Clause 5.4).** The tube supports only plane waves below
 
 $$
-f_u = 0.58\,\frac{c_0}{d},
+f_\mathrm{u} = 0.58\,\frac{c_0}{d},
 $$
 
 with $d$ the tube diameter, and the microphone spacing $s$ must sit between
-$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_{max}$. The reported range is the
+$0.05\,c_0/f_\mathrm{min}$ and $0.45\,c_0/f_\mathrm{max}$. The reported range is the
 one-third-octave bands 250–1600 Hz, and the standard's own definition of a
 frequency range is by band *edges*: those centre frequencies mean 220 Hz to
 1800 Hz in narrow bands, which is where the two arguments below come from.
@@ -496,7 +496,7 @@ Three numbers, three different limits, and they do reconcile. The 1989 Hz is
 the plane-wave ceiling of the 100 mm bore; the reported range stops one band
 below it because a band is only usable when its *whole* width is inside the
 valid range, and the 1600 Hz band reaches 1800 Hz. The 250 Hz floor is a
-**spacing** limit, not a length limit: below $f_{min}$ the two microphones are
+**spacing** limit, not a length limit: below $f_\mathrm{min}$ the two microphones are
 closer than 5 % of a wavelength apart and there is no phase difference left to
 resolve. Tube length answers a different question — it must be long enough for
 a plane wave to form, which Clause 5.4.2 meets by putting the microphones at

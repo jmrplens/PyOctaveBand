@@ -29,11 +29,11 @@ with $R_1$ the source-receiver distance, $R_2$ the image-source
 distance and (Attenborough Eq. (2.40c) / Salomons Eq. (D.58)):
 
 $$
-Q = R_p + (1 - R_p) F(w)
+Q = R_\mathrm{p} + (1 - R_\mathrm{p}) F(w)
 $$
 
 $$
-R_p = \frac{Z \cos\theta - 1}{Z \cos\theta + 1} \tag{Salomons Eq. D.59}
+R_\mathrm{p} = \frac{Z \cos\theta - 1}{Z \cos\theta + 1} \tag{Salomons Eq. D.59}
 $$
 
 $$
@@ -46,7 +46,7 @@ $$
 
 Here `Z` is the normalized (by `rho c`) surface impedance of the ground,
 `theta` is the angle of incidence from the ground normal
-($\cos\theta = (h_s + h_r)/R_2$) and $F(w)$ is the boundary-loss
+($\cos\theta = (h_\mathrm{s} + h_\mathrm{r})/R_2$) and $F(w)$ is the boundary-loss
 factor written through the scaled complementary error function
 $\exp(-w^2) \operatorname{erfc}(-i w)$, i.e.
 the Faddeeva function `scipy.special.wofz`. The relative sound level (the
@@ -57,12 +57,12 @@ $$
 $$
 
 Limits reproduced by the implementation: an acoustically hard ground
-($|Z| \to \infty$) gives $R_p \to 1$, so
-$(1 - R_p) \to 0$ and $Q \to 1$
+($|Z| \to \infty$) gives $R_\mathrm{p} \to 1$, so
+$(1 - R_\mathrm{p}) \to 0$ and $Q \to 1$
 regardless of the boundary loss (the ground wave vanishes), and
 $\Delta L$ reaches
 `+6 dB` in phase (Salomons Sec. 3.4); at grazing incidence
-($h_s, h_r \to 0$, $\cos\theta \to 0$) $R_p \to -1$; and as
+($h_\mathrm{s}, h_\mathrm{r} \to 0$, $\cos\theta \to 0$) $R_\mathrm{p} \to -1$; and as
 the range grows ($R_2 \to \infty$) $|w| \to \infty$ and
 $F \to 0$. The ground impedance is taken in
 the $e^{-i \omega t}$ time convention of Salomons, in which a passive
@@ -476,7 +476,7 @@ spherical_reflection_coefficient(
 
 Spherical-wave reflection coefficient `Q` (Weyl-Van der Pol).
 
-Implements $Q = R_p + (1 - R_p) F(w)$ (Attenborough Eq. (2.40c);
+Implements $Q = R_\mathrm{p} + (1 - R_\mathrm{p}) F(w)$ (Attenborough Eq. (2.40c);
 Salomons Eq. (D.58)) with the plane-wave coefficient `Rp` (Eq. (D.59)),
 the boundary-loss factor
 $F(w) = 1 + i \sqrt{\pi} \, w \exp(-w^2) \operatorname{erfc}(-i w)$

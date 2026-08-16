@@ -53,7 +53,7 @@ Construye las tres trayectorias por flancos de cada unión con
 `building.flanking_element()` y combínalas con
 `building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)`.
 Para el ejemplo del anexo H.3 de EN 12354-1 que se usa abajo devuelve
-`r_prime_w` = 52,2 dB, es decir $R'_w$ = 52 dB, y nombra la trayectoria dominante.
+`r_prime_w` = 52,2 dB, es decir $R'_\mathrm{w}$ = 52 dB, y nombra la trayectoria dominante.
 El aislamiento a impactos pasa por `predicted_impact_insulation()`.
 
 ## Predicción del comportamiento (EN 12354)
@@ -84,20 +84,20 @@ El **modelo simplificado de un solo número**
 los combina energéticamente (Fórmula 26):
 
 $$
-R'_w = -10 \log_{10}\Big[ 10^{-R_{Dd,w}/10}
-      + \sum 10^{-R_{Ff,w}/10} + \sum 10^{-R_{Df,w}/10}
-      + \sum 10^{-R_{Fd,w}/10} \Big],
+R'_\mathrm{w} = -10 \log_{10}\Big[ 10^{-R_\mathrm{Dd,w}/10}
+      + \sum 10^{-R_\mathrm{Ff,w}/10} + \sum 10^{-R_\mathrm{Df,w}/10}
+      + \sum 10^{-R_\mathrm{Fd,w}/10} \Big],
 $$
 
-con la trayectoria directa $R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}$ (Fórmula 27) y cada
+con la trayectoria directa $R_\mathrm{Dd,w} = R_\mathrm{s,w} + \Delta R_\mathrm{Dd,w}$ (Fórmula 27) y cada
 trayectoria por flancos (Fórmula 28a)
 
 $$
-R_{ij,w} = \tfrac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-         + 10 \log_{10}\frac{S_s}{l_0\ l_f},
+R_{ij,\mathrm{w}} = \tfrac{R_{i,\mathrm{w}} + R_{j,\mathrm{w}}}{2} + \Delta R_{ij,\mathrm{w}} + K_{ij}
+         + 10 \log_{10}\frac{S_\mathrm{s}}{l_0\ l_\mathrm{f}},
 $$
 
-donde $l_0 = 1$ m es la longitud de acoplamiento de referencia, $l_f$ la longitud
+donde $l_0 = 1$ m es la longitud de acoplamiento de referencia, $l_\mathrm{f}$ la longitud
 de acoplamiento de la unión y $K_{ij}$ el **índice de reducción vibratoria** de
 la unión.
 
@@ -120,8 +120,8 @@ ejemplo resuelto devuelven 0,1 dB y $-4{,}8$ dB — una unión que no esconde na
 y una unión con capa elástica intermedia o de doble hoja ligera puede pasar de
 20 dB (la misma relación de masas por un `flexible_t` da 20,9 dB). Ese extremo
 superior es lo que hace casi invisible a la pared interior del ejemplo resuelto
-de más abajo: es el elemento más débil de la lista, con $R_w$ = 33 dB, y sin
-embargo los 33,5 dB tabulados para su $K_{Ff}$ sacan su trayectoria Ff de la suma
+de más abajo: es el elemento más débil de la lista, con $R_\mathrm{w}$ = 33 dB, y sin
+embargo los 33,5 dB tabulados para su $K_\mathrm{Ff}$ sacan su trayectoria Ff de la suma
 por completo. En este modelo, un elemento malo detrás de una unión buena gana a
 un elemento bueno detrás de una unión mala. Para el modelo simplificado, los
 valores del Anexo E se leen una sola vez, a 500 Hz, y hacen las veces de una
@@ -152,8 +152,8 @@ unión: sobre la misma cruz rígida del ejemplo resuelto, `path='through'` da
 *Arriba, los índices por trayectoria; abajo, la fracción de energía transmitida.
 La trayectoria directa es el mayor contribuyente individual, con el 33 %, y aun
 así dos tercios de lo que llega al recinto receptor ha rodeado la pared — que son
-los 5 dB entre $R_{s,w} = 57$ dB y $R'_w = 52$ dB. La línea discontinua es el
-$R'_w$ ensamblado, que queda necesariamente por debajo de todas las trayectorias
+los 5 dB entre $R_\mathrm{s,w} = 57$ dB y $R'_\mathrm{w} = 52$ dB. La línea discontinua es el
+$R'_\mathrm{w}$ ensamblado, que queda necesariamente por debajo de todas las trayectorias
 individuales.*
 
 ```python
@@ -231,9 +231,9 @@ plt.show()
 
 </details>
 
-Cada trayectoria por flancos añadida rebaja estrictamente $R'_w$ por debajo de
+Cada trayectoria por flancos añadida rebaja estrictamente $R'_\mathrm{w}$ por debajo de
 la directa
-$R_{Dd,w} = 57$; `res.paths` expone la fracción de energía transmitida de cada
+$R_\mathrm{Dd,w} = 57$; `res.paths` expone la fracción de energía transmitida de cada
 trayectoria, de modo que la trayectoria dominante queda visible.
 
 **Lee el reparto como un presupuesto, porque ese es el rendimiento práctico de
@@ -294,9 +294,9 @@ se suman. La Fórmula (22) de ISO 12354-1:2017 para la trayectoria directa y la
 Fórmula (23) para cada trayectoria por flancos dan las dos
 
 $$
-\Delta R_{ij,w} = \Delta R_{i,w} + \frac{\Delta R_{j,w}}{2}
+\Delta R_{ij,\mathrm{w}} = \Delta R_{i,\mathrm{w}} + \frac{\Delta R_{j,\mathrm{w}}}{2}
 \quad\text{o}\quad
-\Delta R_{j,w} + \frac{\Delta R_{i,w}}{2}\ \text{dB},
+\Delta R_{j,\mathrm{w}} + \frac{\Delta R_{i,\mathrm{w}}}{2}\ \text{dB},
 $$
 
 con la regla que decide cuál de las dos: **se toma la mitad del valor del
@@ -313,12 +313,12 @@ campo que el primero ya ha reducido, así que su magnitud global completa — me
 sobre un elemento desnudo — no está disponible por segunda vez. El apartado 4.3.3
 de ISO 12354-2 lleva la misma regla allí donde coexisten un revestimiento de
 suelo y un trasdosado del lado receptor. La trayectoria directa toma su propio
-$\Delta R_{Dd,w}$ combinado a través de `delta_r_direct`.
+$\Delta R_\mathrm{Dd,w}$ combinado a través de `delta_r_direct`.
 
 La contrapartida a impactos (EN 12354-2, Fórmula 21) es una resta directa:
-$L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$, con el nivel equivalente del suelo
-desnudo $L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Anexo B), la mejora del
-revestimiento $\Delta L_w$ (ISO 717-2) y la corrección por flancos $K$ de la
+$L'_\mathrm{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K$, con el nivel equivalente del suelo
+desnudo $L_\mathrm{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)$ (Anexo B), la mejora del
+revestimiento $\Delta L_\mathrm{w}$ (ISO 717-2) y la corrección por flancos $K$ de la
 Tabla 1.
 
 **Comprueba qué edición cita tu reglamento.** El modelo anterior es el de
@@ -326,16 +326,16 @@ EN 12354-2:2000, que condensa toda la transmisión por flancos en la única
 corrección tabulada $K$ que se lee a partir de la masa del elemento separador y
 de la masa media de los flancos. ISO 12354-2:2017 reorganizó ese mismo modelo
 simplificado en fórmulas explícitas trayectoria a trayectoria
-— $L_{n,d,w} = L_{n,eq,0,w} - \Delta L_w - \Delta L_{d,w}$ (15) para la trayectoria
+— $L_\mathrm{n,d,w} = L_\mathrm{n,eq,0,w} - \Delta L_\mathrm{w} - \Delta L_\mathrm{d,w}$ (15) para la trayectoria
 directa y, para cada trayectoria por flancos,
-$L_{n,ij,w} = L_{n,eq,0,w} - \Delta L_w + (R_{i,w} - R_{j,w})/2 - \Delta R_{j,w} -
+$L_{\mathrm{n},ij,\mathrm{w}} = L_\mathrm{n,eq,0,w} - \Delta L_\mathrm{w} + (R_{i,\mathrm{w}} - R_{j,\mathrm{w}})/2 - \Delta R_{j,\mathrm{w}} -
 K_{ij} - 10\log_{10}(S_i/l_0 l_{ij})$ (16) —, de modo que **la corrección de
 la Tabla 1 no está en el texto vigente en absoluto**, aunque la física de fondo
 y la declaración de exactitud no hayan cambiado. La edición de 2017 declara
 además un campo de aplicación que el texto de 2000 dejaba implícito
 (apartado 4.3.1): el modelo simplificado se restringe a 100 Hz–3150 Hz y, para
 construcciones ligeras, a la vía del nivel de impactos normalizado por flancos
-medido $L_{nf,ij}$ de la Fórmula (17). La vía por bandas de frecuencia de
+medido $L_{\mathrm{nf},ij}$ de la Fórmula (17). La vía por bandas de frecuencia de
 [Predicción detallada por bandas](/phonometry/es/buildings/design/detailed-prediction/)
 está anclada en las ediciones de 2017 de principio a fin.
 
@@ -351,7 +351,7 @@ que la forma cerrada no significa nada para un forjado de placa alveolar, de
 viguetas y bovedillas o de entramado de madera, tenga la masa que tenga, y es una
 extrapolación para una bóveda de 900 kg/m². La $m'$ que pide es la masa del
 **forjado estructural desnudo**, sin revestimiento y sin techo; el efecto del
-revestimiento es $\Delta L_w$ y se resta aparte.
+revestimiento es $\Delta L_\mathrm{w}$ y se resta aparte.
 
 La masa de flancos es, otra vez, una magnitud distinta: la **media aritmética
 sobre los elementos de flanco homogéneos del recinto receptor que no llevan
@@ -388,8 +388,8 @@ imp.plot()   # los términos de la Fórmula (21) como barras: Ln,w,eq - dLw + K 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_prediction_terms_es.svg" alt="La predicción de impactos del Anexo E.3 de EN 12354-2 como sus términos de la Fórmula 21: el nivel equivalente del forjado desnudo de 76,2 dB, la mejora de menos 33 dB del suelo flotante, la corrección de flancos de más 2 dB y el nivel de impactos aparente previsto resultante de 45,2 dB" width="80%" />
 
 *Todo el modelo simplificado de EN 12354-2 es una resta: el forjado masivo
-desnudo parte de $L_{n,w,eq} = 76{,}2$ dB, el suelo flotante recupera 33 dB
-y la corrección de flancos devuelve 2 dB, quedando en $L'_{n,w} = 45$ dB.*
+desnudo parte de $L_\mathrm{n,w,eq} = 76{,}2$ dB, el suelo flotante recupera 33 dB
+y la corrección de flancos devuelve 2 dB, quedando en $L'_\mathrm{n,w} = 45$ dB.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -425,14 +425,14 @@ plt.show()
 </details>
 
 La contrapartida aérea de ese cierre es la Fórmula (5b),
-$D_{nT} = R' + 10\log_{10}(0{,}32\,V/S_s)$, expuesta como
+$D_\mathrm{nT} = R' + 10\log_{10}(0{,}32\,V/S_\mathrm{s})$, expuesta como
 `standardized_level_difference`: cierra el ejemplo del Anexo H.3
 (`standardized_level_difference(52.2, 50.0, 11.5)` da 53,6 dB, la cadena
-impresa con $V/(3S)$ 53,8 dB, y ambas redondean a $D_{nT,w} = 54$ dB).
+impresa con $V/(3S)$ 53,8 dB, y ambas redondean a $D_\mathrm{nT,w} = 54$ dB).
 
 Las tres guías de aislamiento cierran un bucle: el
 [laboratorio](/phonometry/es/buildings/insulation/insulation-lab/) mide $R$ y $K_{ij}$
-elemento a elemento y unión a unión, este modelo los ensambla en un $R'_w$
+elemento a elemento y unión a unión, este modelo los ensambla en un $R'_\mathrm{w}$
 predicho, y la
 [medición en campo](/phonometry/es/buildings/insulation/insulation-field/) comprueba el
 resultado construido. Cuando el valor medido queda muy por debajo de la
@@ -450,10 +450,10 @@ ausente, una fuga alrededor del elemento separador.
 | `frequency` | float | Hz | por defecto `500` | `flexible_t` y las uniones de doble hoja E.7/E.8 dependen de la frecuencia |
 | `r_flanking` / `r_separating` | float | dB | — | Índices ponderados del elemento de flanco / separador |
 | `k_ff` / `k_fd` / `k_df` | float | dB | — | $K_{ij}$ de la unión para las tres trayectorias |
-| `separating_area` | float | m² | > 0 | Superficie del elemento separador $S_s$ |
-| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión $l_f$ |
+| `separating_area` | float | m² | > 0 | Superficie del elemento separador $S_\mathrm{s}$ |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento de la unión $l_\mathrm{f}$ |
 | `delta_r_ff` / `delta_r_fd` / `delta_r_df` | float | dB | por defecto `0` | Mejora **combinada** del trasdosado de la trayectoria entera, los dos extremos juntos (Fórmula 23) |
-| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco $S_F$; activa la saturación automática a $K_{ij,\min}$ (apartado 4.4.2 / Fórmula 29) |
+| `flanking_area` | float | m² | por defecto `None` | Área del elemento de flanco $S_\mathrm{F}$; activa la saturación automática a $K_{ij,\min}$ (apartado 4.4.2 / Fórmula 29) |
 
 ### Parámetros de `flanking_path()`
 
@@ -463,8 +463,8 @@ ausente, una fuga alrededor del elemento separador.
 | `kind` | str | — | `'Ff'` / `'Df'` / `'Fd'` | Rama de flanco de la trayectoria |
 | `r_source` / `r_receive` | float | dB | — | Índices ponderados de los elementos lado emisor / lado receptor |
 | `k_ij` | float | dB | — | Índice de reducción vibratoria de la unión para esta trayectoria |
-| `separating_area` | float | m² | > 0 | Área del elemento separador $S_s$ |
-| `coupling_length` | float | m | > 0 | Longitud de acoplamiento $l_f$ |
+| `separating_area` | float | m² | > 0 | Área del elemento separador $S_\mathrm{s}$ |
+| `coupling_length` | float | m | > 0 | Longitud de acoplamiento $l_\mathrm{f}$ |
 | `delta_r` | float | dB | def.: `0` | Mejora **combinada** del trasdosado de esta trayectoria, los dos extremos juntos (Fórmula 23) |
 | `kij_min` | float | dB | def.: `None` | Si se da, `k_ij` se acota inferiormente a este mínimo de la Fórmula (29) |
 
@@ -533,10 +533,10 @@ a partir de los datos de laboratorio de los elementos más la transmisión por
 flancos de las uniones; la hoja lo indica de forma explícita y se rotula como
 predicción, nunca como medición. `AirbornePredictionResult.report()` genera la
 ficha del índice de reducción acústica aparente previsto (la tabla de trayectorias de
-transmisión junto al gráfico de fracción de energía por trayectoria, con $R'_w$ en un
+transmisión junto al gráfico de fracción de energía por trayectoria, con $R'_\mathrm{w}$ en un
 recuadro); `ImpactPredictionResult.report()` genera la ficha del nivel de
 impactos aparente previsto (la tabla de términos de la fórmula (21) junto al
-gráfico de términos, con $L'_{n,w}$ en un recuadro). Cada una nombra la
+gráfico de términos, con $L'_\mathrm{n,w}$ en un recuadro). Cada una nombra la
 EN/ISO 12354-1/-2 y la parte de índice ISO 717 en su línea de base, imprime la
 desviación típica del modelo (~2 dB) y, cuando se da un `requirement`, añade un
 veredicto CUMPLE/NO CUMPLE (el índice aéreo cumple igualando o superándolo, y el
@@ -626,7 +626,7 @@ intermedias flexibles, fachadas ligeras y muros de doble hoja, esquinas y
 cambios de espesor) y el límite inferior $K_{ij,\min}$ del apartado 4.4.2
 mediante `building.junction_vibration_reduction` y
 `building.junction_min_vibration_reduction`. Impactos: la resta de la Fórmula
-(21) $L'_{n,w} = L_{n,w,eq} - \Delta L_w + K$ mediante
+(21) $L'_\mathrm{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K$ mediante
 `building.equivalent_impact_level`, `building.impact_flanking_correction`,
 `building.predicted_impact_insulation` y `building.standardized_impact_level`.
 Ambos resultados escriben una ficha de predicción con `.report()`.
@@ -641,8 +641,8 @@ convertidos a sus valores in situ antes de formar las trayectorias. Usa el
 modelo simplificado de aquí cuando solo conozcas las magnitudes globales
 ponderadas de los elementos y la pregunta sea si el recinto cumple; usa el
 detallado cuando existan los espectros de elemento y la pregunta sea qué
-trayectoria fija qué banda. Los propios datos de los elementos ($R_w$,
-$\Delta R_w$, $\Delta L_w$, masa por unidad de superficie) se toman como
+trayectoria fija qué banda. Los propios datos de los elementos ($R_\mathrm{w}$,
+$\Delta R_\mathrm{w}$, $\Delta L_\mathrm{w}$, masa por unidad de superficie) se toman como
 dados, de datos de laboratorio o de las estimaciones de ley de masas de
 [Predicción del aislamiento de
 paneles](/phonometry/es/buildings/design/panel-sound-insulation/). El resto de
@@ -672,7 +672,7 @@ recintos](/phonometry/es/buildings/rooms/enclosed-space-absorption/).
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   las magnitudes in situ medidas con las que se contrasta la predicción.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
-  el motor de curva de referencia tras los $R'_w$ y $L'_{n,w}$ previstos.
+  el motor de curva de referencia tras los $R'_\mathrm{w}$ y $L'_\mathrm{n,w}$ previstos.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
   los índices de ISO 10140 que consume el modelo.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):

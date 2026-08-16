@@ -10,7 +10,7 @@ Rotorcraft propagation, ground effect and screening (ECAC Doc 32 / NORAH2).
 Between the noise hemisphere that describes a helicopter and the receiver on the
 ground lies the path, and the path knows nothing about rotorcraft. The ECAC
 Doc 32 propagation chain
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ adds spherical
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$ adds spherical
 spreading, atmospheric absorption and the ground effect of a point source over
 an impedance plane; the NORAH2 guidance extends that last term to real terrain,
 where a fitted mean ground plane replaces the flat ground and a blocked line of
@@ -22,9 +22,9 @@ This module provides the propagation primitives of the method (clean-room, from
 the NORAH2 guidance SC01.D1.5d, the basis of ECAC Doc 32):
 
 * [`spherical_spreading_adjustment`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/#spherical_spreading_adjustment) --
-  $\Delta L_s = -20 \cdot \log_{10}(r/60)$ (Eq. 24).
+  $\Delta L_\mathrm{s} = -20 \cdot \log_{10}(r/60)$ (Eq. 24).
 * [`atmospheric_adjustment`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/#atmospheric_adjustment) --
-  $\Delta L_a = -\alpha(f) \cdot (r - 60)$ with the ISO 9613-1
+  $\Delta L_\mathrm{a} = -\alpha(f) \cdot (r - 60)$ with the ISO 9613-1
   pure-tone coefficient (Eq. 26/27), reusing
   [`air_attenuation`](/phonometry/reference/api/environment/air-absorption/#air_attenuation).
 * [`ground_effect_adjustment`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/#ground_effect_adjustment) -- `ΔLg` for a point source over an impedance
@@ -73,8 +73,8 @@ atmospheric_adjustment(
 Atmospheric-absorption adjustment `ΔLa` of the hemisphere level (Eq. 26/27).
 
 The hemisphere already includes absorption out to the reference distance
-`rh`, so only the excess path $r - r_h$ is corrected:
-$\Delta L_a = -\alpha(f) \cdot (r - r_h)$ with the ISO 9613-1
+`rh`, so only the excess path $r - r_\mathrm{h}$ is corrected:
+$\Delta L_\mathrm{a} = -\alpha(f) \cdot (r - r_\mathrm{h})$ with the ISO 9613-1
 pure-tone coefficient `α`
 evaluated at the exact band centre (Eq. 26/27, ICAO reference atmosphere by
 default). This matches the guidance Eq. 27 to 0.02 dB/km and the NORAH2
@@ -85,7 +85,7 @@ by up to 2.2 dB/km at 8-10 kHz; for a path-dependent band mapping use
 
 :::note
 The printed guidance Eq. 27 pairs the coefficient `6.6928e-6` with
-$f_{r,O} = 630.7$ Hz, which evaluates to nonsense (14.3 dB/km
+$f_\mathrm{r,O} = 630.7$ Hz, which evaluates to nonsense (14.3 dB/km
 at 500 Hz against Table 4's 3.1). The physically correct pairing
 (`6.6928e-6`
 with the oxygen relaxation frequency, `1.3415e-6` with 630.7 Hz)
@@ -111,7 +111,7 @@ advisory warning propagates, since `α` is large and extrapolated.
 | `pressure` | Ambient pressure, in kPa (default 101.325). |
 | `reference_distance` | Hemisphere reference distance `rh`, in metres (default 60). Pass [`RotorcraftHemisphere.distance`](/phonometry/reference/api/aeroacoustics/rotorcraft-noise/#rotorcrafthemisphere) when the data uses a non-standard polar distance. |
 
-**Returns:** The adjustment `ΔLa` per band, in dB (added to the level, $\le 0$ for $r \ge r_h$).
+**Returns:** The adjustment `ΔLa` per band, in dB (added to the level, $\le 0$ for $r \ge r_\mathrm{h}$).
 
 **Raises**
 
@@ -134,7 +134,7 @@ diffraction_attenuation(
 
 Pure diffraction attenuation `ΔLd` per band (guidance Eq. 42-44).
 
-$\Delta L_d = 10 \cdot C_h \cdot \log_{10}(3 + (40/\lambda) \cdot C'' \cdot \delta)$ where the argument is at least 1
+$\Delta L_\mathrm{d} = 10 \cdot C_h \cdot \log_{10}(3 + (40/\lambda) \cdot C'' \cdot \delta)$ where the argument is at least 1
 (below it the attenuation is 0),
 $C_h = \min(f_m \cdot h_0/250, 1)$ (Eq. 43) and
 $C''$ accounts for multiple diffraction (Eq. 44: 1 for a single
@@ -190,7 +190,7 @@ Ground-effect adjustment `ΔLg` over an impedance plane (Eq. 28-35).
 A point source over a locally-reacting impedance ground produces interference
 between the direct and reflected rays. With the spherical reflection
 coefficient `Q` (Chien-Soroka) and the Delany-Bazley impedance,
-$\Delta L_g = 10 \cdot \log_{10}\{1 + (r_1/r_2)^2 \lvert Q \rvert^2 + 2 (r_1/r_2) \lvert Q \rvert \cdot I\}$ (Eq. 29), where `I`
+$\Delta L_\mathrm{g} = 10 \cdot \log_{10}\{1 + (r_1/r_2)^2 \lvert Q \rvert^2 + 2 (r_1/r_2) \lvert Q \rvert \cdot I\}$ (Eq. 29), where `I`
 (Eq. 30) is the in-band interference factor.
 
 **Parameters**
@@ -356,7 +356,7 @@ Spherical-spreading adjustment `ΔLs` of the hemisphere level (Eq. 24).
 
 The hemisphere levels are defined at the reference distance `rh` (60 m in
 the standard database), so at slant distance `r` the geometric spreading
-adjustment is $\Delta L_s = -20 \cdot \log_{10}(r/r_h)$.
+adjustment is $\Delta L_\mathrm{s} = -20 \cdot \log_{10}(r/r_\mathrm{h})$.
 
 **Parameters**
 
@@ -459,7 +459,7 @@ Ground and screening over a terrain section (guidance §A.4.4-A.4.5).
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Band centre frequencies, in Hz, shape `(F,)`. |
-| `adjustment` | The combined ground-and-screening adjustment per band, in dB, added to the received level in the Doc 32 Eq. 23 chain (it replaces the flat-ground `ΔLg`): the mean-ground-plane ground effect when the line of sight is clear, $-(\Delta L_d + \Delta L_g)$ of Eq. 45 when terrain blocks it. |
+| `adjustment` | The combined ground-and-screening adjustment per band, in dB, added to the received level in the Doc 32 Eq. 23 chain (it replaces the flat-ground `ΔLg`): the mean-ground-plane ground effect when the line of sight is clear, $-(\Delta L_\mathrm{d} + \Delta L_\mathrm{g})$ of Eq. 45 when terrain blocks it. |
 | `screened` | Whether terrain blocks the line of sight (any profile point strictly above it). |
 | `path_difference` | The rubber-band path difference `δ`, in metres (`NaN` when unscreened). |
 | `diffraction_points` | The diffracting edges `(d, z)` on the convex propagation path, shape `(n, 2)` (empty when unscreened). |

@@ -73,7 +73,7 @@ class InverseFilterResult:
     :ivar inverse: Inverse-filter samples (time domain, length ``n_fft``).
     :ivar frequencies: Frequency grid of the design, in Hz.
     :ivar spectrum: Complex inverse spectrum on :attr:`frequencies`,
-        including the :math:`\exp(-j 2 \pi f \, \text{delay} / f_s)`
+        including the :math:`\exp(-j 2 \pi f \, \text{delay} / f_\mathrm{s})`
         modeling delay.
     :ivar response_spectrum: Complex spectrum of the measured response the
         filter was designed from, on the same grid.

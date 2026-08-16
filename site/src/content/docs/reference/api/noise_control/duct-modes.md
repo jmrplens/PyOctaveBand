@@ -19,12 +19,12 @@ This module implements the cut-on analysis of Norton & Karczub, *Fundamentals
 of Noise and Vibration Analysis for Engineers* 2nd ed., section 7.3:
 
 * circular ducts (Eq. 7.6),
-  $(f_{co})_{pq} = \pi \alpha_{pq} c / (2 \pi a_i)$, with the
+  $(f_\mathrm{co})_{pq} = \pi \alpha_{pq} c / (2 \pi a_\mathrm{i})$, with the
   $\pi \alpha_{pq}$ eigenvalues of Table 7.1 that solve
-  $J'_p(\kappa_{pq} a_i) = 0$ (the first is 1.8412, which sets the
-  plane-wave limit $k a_i < 1.8412$);
+  $J'_p(\kappa_{pq} a_\mathrm{i}) = 0$ (the first is 1.8412, which sets the
+  plane-wave limit $k a_\mathrm{i} < 1.8412$);
 * rectangular ducts (Eq. 7.10),
-  $(f_{co})_{pq} = (c / 2) \sqrt{(p / a)^2 + (q / b)^2}$;
+  $(f_\mathrm{co})_{pq} = (c / 2) \sqrt{(p / a)^2 + (q / b)^2}$;
 * the **mean-flow correction** (Eq. 7.8): a uniform axial flow of Mach number
   `M` lowers every cut-on frequency by $\sqrt{1 - M^2}$ and moves the
   cut-on from $k_x = 0$ to
@@ -61,11 +61,11 @@ Norton & Karczub Eq. 7.6 with the Table 7.1 eigenvalues, corrected for a
 uniform axial mean flow by Eqs. 7.8 and 7.9:
 
 $$
-(f_{co})_{pq} = \frac{\pi \alpha_{pq} c \sqrt{1 - M^2}}{2 \pi a_i}
+(f_\mathrm{co})_{pq} = \frac{\pi \alpha_{pq} c \sqrt{1 - M^2}}{2 \pi a_\mathrm{i}}
 $$
 
 $$
-k_x = \frac{-M \kappa_{pq}}{\sqrt{1 - M^2}}, \qquad \kappa_{pq} = \frac{\pi \alpha_{pq}}{a_i}
+k_x = \frac{-M \kappa_{pq}}{\sqrt{1 - M^2}}, \qquad \kappa_{pq} = \frac{\pi \alpha_{pq}}{a_\mathrm{i}}
 $$
 
 The flow lowers every cut-on frequency and shifts the cut-on away from
@@ -220,7 +220,7 @@ Norton & Karczub Eq. 7.10, with the same $\sqrt{1 - M^2}$
 convective factor as the circular case:
 
 $$
-(f_{co})_{pq} = \frac{c}{2} \sqrt{\left(\frac{p}{a}\right)^2 + \left(\frac{q}{b}\right)^2} \sqrt{1 - M^2}
+(f_\mathrm{co})_{pq} = \frac{c}{2} \sqrt{\left(\frac{p}{a}\right)^2 + \left(\frac{q}{b}\right)^2} \sqrt{1 - M^2}
 $$
 
 where `a` and `b` are the cross-sectional dimensions and `(p, q)`

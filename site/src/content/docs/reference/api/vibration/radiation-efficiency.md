@@ -30,32 +30,32 @@ radiates weakly; above it the bending wave is supersonic and radiates
 efficiently:
 
 $$
-f_c = \frac{c_0^2}{2\pi} \sqrt{\frac{m''}{B'}} \tag{Eq. 2.201}
+f_\mathrm{c} = \frac{c_0^2}{2\pi} \sqrt{\frac{m''}{B'}} \tag{Eq. 2.201}
 $$
 
 with `m''` the mass per unit area (kg/m^2) and `B'` the bending
 stiffness per unit width (N.m). This is the closed form
-$f_c = 0.55\,c_0^2 / (c_L h)$ in terms of the plate longitudinal wave
+$f_\mathrm{c} = 0.55\,c_0^2 / (c_\mathrm{L} h)$ in terms of the plate longitudinal wave
 speed `cL` and thickness `h`.
 
 **Frequency-averaged efficiency (Hopkins 2.9.4, "method no. 1").** With
-$\mu = \sqrt{f_c / f}$ (Eq. 2.228), the perimeter `U`, area `S`,
-the boundary constant $C_{BC}$ (1 simply supported, 2 clamped) and the
-baffle-orientation constant $C_{OB}$ (1 plate flush in an infinite
+$\mu = \sqrt{f_\mathrm{c} / f}$ (Eq. 2.228), the perimeter `U`, area `S`,
+the boundary constant $C_\mathrm{BC}$ (1 simply supported, 2 clamped) and the
+baffle-orientation constant $C_\mathrm{OB}$ (1 plate flush in an infinite
 baffle, 2 baffles perpendicular to the edges), the efficiency below `fc`
 is
 
 $$
-\sigma = \frac{U}{2\pi \mu k S \sqrt{\mu^2 - 1}} \left[ \ln\frac{\mu + 1}{\mu - 1} + \frac{2\mu}{\mu^2 - 1} \right] \left[ C_{BC} C_{OB} - \mu^{-8} \left( C_{BC} C_{OB} - 1 \right) \right] \tag{Eq. 2.227}
+\sigma = \frac{U}{2\pi \mu k S \sqrt{\mu^2 - 1}} \left[ \ln\frac{\mu + 1}{\mu - 1} + \frac{2\mu}{\mu^2 - 1} \right] \left[ C_\mathrm{BC} C_\mathrm{OB} - \mu^{-8} \left( C_\mathrm{BC} C_\mathrm{OB} - 1 \right) \right] \tag{Eq. 2.227}
 $$
 
 with $k = 2\pi f / c_0$ the acoustic wavenumber. Above `fc`,
-$\sigma = 1 / \sqrt{1 - \mu^2} = (1 - f_c/f)^{-0.5}$ (Eq. 2.229), so
+$\sigma = 1 / \sqrt{1 - \mu^2} = (1 - f_\mathrm{c}/f)^{-0.5}$ (Eq. 2.229), so
 $\sigma \to 1$ well above coincidence. In the band that contains
 `fc`,
 
 $$
-\sigma \approx \left( 0.5 - 0.15 \frac{L_1}{L_2} \right) \sqrt{k_{fc} L_1}, \qquad k_{fc} = \frac{2\pi f_c}{c_0} \tag{Eq. 2.230}
+\sigma \approx \left( 0.5 - 0.15 \frac{L_1}{L_2} \right) \sqrt{k_{fc} L_1}, \qquad k_{fc} = \frac{2\pi f_\mathrm{c}}{c_0} \tag{Eq. 2.230}
 $$
 
 with `L1` the smaller and `L2` the larger plate dimension.
@@ -75,7 +75,7 @@ coincidence_frequency(
 
 Coincidence (critical) frequency `fc` of a thin plate (Hopkins 2.201).
 
-$f_c = (c_0^2 / 2\pi) \sqrt{m'' / B'}$ (identical to Bies Eq. 7.3).
+$f_\mathrm{c} = (c_0^2 / 2\pi) \sqrt{m'' / B'}$ (identical to Bies Eq. 7.3).
 
 **Parameters**
 
@@ -155,8 +155,8 @@ expressions.
 | `length_x` | Plate dimension `Lx`, in m (> 0). |
 | `length_y` | Plate dimension `Ly`, in m (> 0). |
 | `critical_frequency` | Coincidence frequency `fc`, in hertz (> 0); see [`coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency). |
-| `boundary` | `"simply_supported"` ($C_{BC} = 1$) or `"clamped"` ($C_{BC} = 2$). |
-| `baffle` | `"infinite"` ($C_{OB} = 1$, plate flush in a rigid baffle) or `"perpendicular"` ($C_{OB} = 2$, baffles perpendicular to the edges). |
+| `boundary` | `"simply_supported"` ($C_\mathrm{BC} = 1$) or `"clamped"` ($C_\mathrm{BC} = 2$). |
+| `baffle` | `"infinite"` ($C_\mathrm{OB} = 1$, plate flush in a rigid baffle) or `"perpendicular"` ($C_\mathrm{OB} = 2$, baffles perpendicular to the edges). |
 | `speed_of_sound` | Speed of sound in air `c0` (Default: 343 m/s). |
 
 **Returns:** A [`RadiationEfficiencyResult`](/phonometry/reference/api/vibration/radiation-efficiency/#radiationefficiencyresult).

@@ -171,7 +171,7 @@ Tres restricciones deciden si el montaje es aceptable:
 
 ### De qué es promedio la magnitud (ISO 5349-2, 5.4 y 6.1.11)
 
-Todo $a_{hv}$ que alimenta el cálculo de exposición de más abajo es un promedio,
+Todo $a_\mathrm{hv}$ que alimenta el cálculo de exposición de más abajo es un promedio,
 y la regla de promediado es normativa: las magnitudes se promedian sobre
 periodos de uso normal de la herramienta o de contacto con la pieza, con
 promediado **lineal** sobre una o varias operaciones o ciclos de trabajo
@@ -245,7 +245,7 @@ aceleración–velocidad** que porta la ganancia global $K$ y un **escalón
 ascendente**:
 
 $$
-H(s) = H_h(s)\,H_l(s)\,H_t(s)\,H_s(s).
+H(s) = H_\mathrm{h}(s)\,H_\mathrm{l}(s)\,H_\mathrm{t}(s)\,H_\mathrm{s}(s).
 $$
 
 Un único conjunto de parámetros de la Tabla 3 $(f_1, Q_1, f_2, Q_2, f_3, f_4,
@@ -381,10 +381,10 @@ plt.show()
 
 La evaluación básica es la **aceleración eficaz ponderada**. A partir de un
 espectro de tercios de octava es (ISO 2631-1, ec. (9); la construcción idéntica
-da la $a_{hw}$ de mano-brazo de ISO 5349-1, ec. (A.1)):
+da la $a_\mathrm{hw}$ de mano-brazo de ISO 5349-1, ec. (A.1)):
 
 $$
-a_w = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
+a_\mathrm{w} = \sqrt{\sum_i \left(W_i\,a_i\right)^2},
 $$
 
 con $W_i$ el factor de ponderación en el centro de banda $i$ y $a_i$ la
@@ -419,14 +419,14 @@ result.plot()   # bandas sin ponderar frente a ponderadas, como en la figura de 
 
 Esas etiquetas de banda son las nominales, por legibilidad. Pasar en su lugar
 los centros verdaderos $10^{n/10}$ Hz (1; 1,259; 1,585; ...; 79,433) mueve
-$a_w$ de 1,0260 a 1,0267 m/s², así que la advertencia anterior va de comparar
+$a_\mathrm{w}$ de 1,0260 a 1,0267 m/s², así que la advertencia anterior va de comparar
 un $W_i$ *aislado* con una tabla impresa, no de un valor eficaz de banda ancha,
 donde ambos coinciden en tres cifras.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighted_acceleration_es.svg" alt="Un espectro de aceleración de asiento de vehículo medido (gris) y su contribución ponderada por Wk (azul) sobre los tercios de octava de 1 a 80 Hz: la ponderación atenúa las bandas bajas y altas pero deja el rango de 4 a 8 Hz casi inalterado, dando un valor eficaz ponderado a_w de aproximadamente 1,03 m/s^2" width="90%" />
 
 *La ponderación deja las bandas de 4 a 8 Hz casi intactas y tira todo lo que hay
-por encima de 20 Hz, así que $a_w$ = 1,026 m/s² lo fijan tres bandas de
+por encima de 20 Hz, así que $a_\mathrm{w}$ = 1,026 m/s² lo fijan tres bandas de
 diecinueve. Un asiento de vehículo se juzga por la parte del espectro que peor
 supo aislar.*
 
@@ -468,11 +468,11 @@ plt.show()
 
 Cuando el valor eficaz subestima una exposición intermitente o cargada de
 choques, ISO 2631-1 añade medidas de dosis calculadas sobre la señal temporal
-ponderada: el **valor eficaz móvil** $a_w(t_0)$ (ecs. (2)/(3)) y su máximo, el
+ponderada: el **valor eficaz móvil** $a_\mathrm{w}(t_0)$ (ecs. (2)/(3)) y su máximo, el
 **valor máximo de vibración transitoria** `MTVV` (ec. (4), el máximo del eficaz
 móvil con un tiempo de integración de 1 s); el **valor de dosis de vibración**
-de cuarta potencia $\text{VDV} = \left(\int a_w^4\,dt\right)^{1/4}$
-(ec. (5)); el **valor de dosis de mareo** $\text{MSDV} = \left(\int a_w^2\,dt
+de cuarta potencia $\text{VDV} = \left(\int a_\mathrm{w}^4\,dt\right)^{1/4}$
+(ec. (5)); el **valor de dosis de mareo** $\text{MSDV} = \left(\int a_\mathrm{w}^2\,dt
 \right)^{1/2}$ (Anexo D, sobre el eje vertical ponderado con `Wf`, no con `Wk`);
 y el **factor de cresta** (pico / eficaz), cuyo valor por encima
 de 9 indica que el método básico es inadecuado.
@@ -487,12 +487,12 @@ usarse el valor eficaz. Los criterios que de verdad deciden son dos cocientes, y
 basta con que se supere uno para que el método adicional importe en el juicio:
 
 $$
-\frac{\text{MTVV}}{a_w} = 1{,}5, \qquad
-\frac{\text{VDV}}{a_w\,T^{1/4}} = 1{,}75 .
+\frac{\text{MTVV}}{a_\mathrm{w}} = 1{,}5, \qquad
+\frac{\text{VDV}}{a_\mathrm{w}\,T^{1/4}} = 1{,}75 .
 $$
 
-$\text{MTVV}/a_w$ pregunta si algún segundo suelto del registro es mucho peor
-que el registro entero; $\text{VDV}/(a_w T^{1/4})$ pregunta si la cuarta potencia
+$\text{MTVV}/a_\mathrm{w}$ pregunta si algún segundo suelto del registro es mucho peor
+que el registro entero; $\text{VDV}/(a_\mathrm{w} T^{1/4})$ pregunta si la cuarta potencia
 encuentra picos que la segunda promedió hasta hacerlos desaparecer. Se use el que
 se use, el apartado 6.1 exige declarar **tanto** el valor básico como el valor
 adicional, y el apartado 5.6 añade el periodo de medida del factor de cresta.
@@ -594,12 +594,12 @@ número esperado de personas. Se calcula sobre la aceleración del eje z pondera
 con **`Wf`** a lo largo de todo el periodo durante el que puede haber movimiento
 (Anexo D, método (a)); para un movimiento continuo de magnitud aproximadamente
 constante puede estimarse en su lugar a partir de un eficaz de periodo corto como
-$\text{MSDV}_z = a_w T_0^{1/2}$ (método (b)), cuyo periodo de medida no debería
+$\text{MSDV}_z = a_\mathrm{w} T_0^{1/2}$ (método (b)), cuyo periodo de medida no debería
 bajar normalmente de **240 s**. La lectura es que el porcentaje de personas que
 pueden vomitar es aproximadamente $K_m\,\text{MSDV}_z$, con $K_m = 1/3$ para una
 población mixta de adultos de ambos sexos no adaptados, en exposiciones de unos
 20 min a unas 6 h y prevalencias de hasta un 70 %; la estimación puede quedarse
-corta cuando $a_w$ pasa de 0,5 m/s². Las mujeres son más propensas que los
+corta cuando $a_\mathrm{w}$ pasa de 0,5 m/s². Las mujeres son más propensas que los
 hombres, y la prevalencia baja con la edad.
 
 ```python
@@ -628,7 +628,7 @@ eficaces ponderadas por eje con los factores multiplicadores de postura $k_j$
 (ISO 2631-1, ec. (10); para mano-brazo, ISO 5349-1, ec. (1), con todo $k = 1$):
 
 $$
-a_v = \sqrt{\sum_j k_j^2\,a_{wj}^2}.
+a_\mathrm{v} = \sqrt{\sum_j k_j^2\,a_{\mathrm{w}j}^2}.
 $$
 
 ```python
@@ -649,10 +649,10 @@ se indica precaución y por encima de la cual los riesgos son probables; la
 Directiva 2002/44/CE convierte esa guía en los valores de acción y límite
 exigibles de $A(8)$ que se usan más abajo. La evaluación de *confort* del
 apartado 8 combina en cambio todos los ejes (y, cuando procede, respaldo, pies
-y rotación) en el valor total de vibración $a_v$ con su propio juego de $k$ y
+y rotación) en el valor total de vibración $a_\mathrm{v}$ con su propio juego de $k$ y
 lo lee en la escala del Anexo C para transporte público.
 
-| Valor total de vibración global $a_v$ | Reacción probable |
+| Valor total de vibración global $a_\mathrm{v}$ | Reacción probable |
 | :--- | :--- |
 | menos de 0,315 m/s² | no incómodo |
 | de 0,315 m/s² a 0,63 m/s² | algo incómodo |
@@ -702,10 +702,10 @@ exposiciones parciales $A_i(8) = a_i\,\sqrt{T_i/T_0}$ como
 $A(8) = \sqrt{\sum_i A_i(8)^2}$ (ISO 5349-1, ecs. (2)/(3); ISO 5349-2,
 ecs. (1)–(3)). La Directiva 2002/44/CE fija en qué magnitud $a$ se basa cada
 tipo (anexo, puntos 1): para la vibración mano-brazo el total vectorial
-$a_{hv}$ (parte A), pero para la vibración de cuerpo entero el valor por eje
+$a_\mathrm{hv}$ (parte A), pero para la vibración de cuerpo entero el valor por eje
 ponderado en frecuencia *más alto*
-$\max(1{,}4\,a_{wx},\,1{,}4\,a_{wy},\,a_{wz})$ (parte B), no el total
-vectorial $a_v$ de arriba. `wbv_exposure_basis` devuelve ese valor del eje
+$\max(1{,}4\,a_{\mathrm{w}x},\,1{,}4\,a_{\mathrm{w}y},\,a_{\mathrm{w}z})$ (parte B), no el total
+vectorial $a_\mathrm{v}$ de arriba. `wbv_exposure_basis` devuelve ese valor del eje
 dominante:
 
 ```python
@@ -744,7 +744,7 @@ result.plot()   # exposiciones parciales y A(8) frente a los valores EAV/ELV, co
 
 *La tarea más corta no es la que menos aporta. La tala dura una hora frente a las
 dos de la desbrozadora y aun así se queda a menos de un 8 % de ella, porque
-$A_i(8)$ va como $\sqrt{T_i}$ mientras que va con $a_{hv}$ directamente: partir
+$A_i(8)$ va como $\sqrt{T_i}$ mientras que va con $a_\mathrm{hv}$ directamente: partir
 el tiempo por la mitad cuesta un 29 %, y subir la magnitud de 4,6 a 6,0 m/s²
 compra un 30 %.*
 
@@ -820,8 +820,8 @@ print(f"{result.a8:.2g}")     # 3.6  m/s^2, el valor declarable
 ## 4. Orientación exposición–respuesta
 
 Para la vibración transmitida a la mano, el Anexo C de ISO 5349-1 relaciona la
-exposición diaria con la vida media de grupo $D_y$ (en años) que produce el dedo
-blanco por vibración en el 10 % de un grupo expuesto, $D_y = 31{,}8\,A(8)^{-1{,}06}$
+exposición diaria con la vida media de grupo $D_\mathrm{y}$ (en años) que produce el dedo
+blanco por vibración en el 10 % de un grupo expuesto, $D_\mathrm{y} = 31{,}8\,A(8)^{-1{,}06}$
 (ec. (C.1)):
 
 ```python
@@ -876,7 +876,7 @@ da la magnitud energético-equivalente de la ec. (B.3) de ISO 2631-1 entre
 periodos de distinta magnitud y duración,
 
 $$
-a_{w,e} = \sqrt{\frac{\sum_i a_{wi}^2\,T_i}{\sum_i T_i}},
+a_\mathrm{w,e} = \sqrt{\frac{\sum_i a_{\mathrm{w}i}^2\,T_i}{\sum_i T_i}},
 $$
 
 que responde a una pregunta distinta de la de $A(8)$ con los mismos datos: es un
@@ -904,8 +904,8 @@ de la UE): la línea de base normativa que nombra el método ISO aplicado (ISO
 cuerpo entero) y la directiva frente a la que se evalúa, una rejilla de
 cabecera (empresa, operador/trabajador, lugar de trabajo, instrumentación y
 calibración), el análisis de la exposición por operación (la magnitud de
-vibración de cada operación, el total vectorial mano-brazo $a_{hv}$ o el valor
-del eje dominante $a_{w,max}$ de la parte B de la Directiva para cuerpo
+vibración de cada operación, el total vectorial mano-brazo $a_\mathrm{hv}$ o el valor
+del eje dominante $a_\mathrm{w,max}$ de la parte B de la Directiva para cuerpo
 entero, su tiempo de exposición diario $T_i$ y la exposición parcial
 $A_i(8)$, cerrado por el total diario y el $A(8)$ combinado) con la gráfica de
 contribuciones, y el $A(8)$ recuadrado con su zona de exposición.
@@ -981,7 +981,7 @@ cascada de etapas analógicas de la Tabla 3 (fórmulas (1)-(5)) que
 `frequency_weighting` y `apply_weighting` realizan para las nueve
 ponderaciones, reproduciendo las tablas de objetivo de diseño del Anexo B. La
 ISO 2631-1:1997 para la vibración de cuerpo entero, que cubre el valor eficaz
-ponderado $a_w$ y el valor total de vibración $a_v$ (`weighted_acceleration`,
+ponderado $a_\mathrm{w}$ y el valor total de vibración $a_\mathrm{v}$ (`weighted_acceleration`,
 `vibration_total_value`), las medidas de dosis MTVV, VDV, MSDV y factor de
 cresta, los cocientes de comparación del apartado 6.3.3, la escala de confort
 del Anexo C y la lectura de mareo del Anexo D (`running_rms`,

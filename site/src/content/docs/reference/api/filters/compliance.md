@@ -59,7 +59,7 @@ Acceptance limits on relative attenuation at normalized frequencies.
 | :--- | :--- |
 | `fraction` | Bandwidth designator denominator b (1 for octave, 3 for one-third octave, ...). |
 | `filter_class` | Performance class: 1 or 2 for `edition="2014"`; 0, 1 or 2 for `edition="1995"`. |
-| `omega` | Normalized frequencies $f/f_m$ (> 0). |
+| `omega` | Normalized frequencies $f/f_\mathrm{m}$ (> 0). |
 | `edition` | `"2014"` (IEC 61260-1:2014, classes 1/2) or `"1995"` (IEC 61260:1995 / ANSI S1.11-2004, classes 0/1/2). |
 
 **Returns:** Tuple (minimum, maximum) relative attenuation in dB per point; the maximum is `+inf` outside the pass-band.

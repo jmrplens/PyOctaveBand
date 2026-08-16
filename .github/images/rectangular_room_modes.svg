@@ -1269,7 +1269,7 @@ L 597.464988 45.726076
 " style="fill: none; stroke-dasharray: 7.68,1.92,1.2,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_9">
-     <!-- Schroeder $f_s$ = 175 Hz -->
+     <!-- Schroeder $f_\mathrm{s}$ = 175 Hz -->
      <g transform="translate(604.128987 48.641576) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-36" d="M 3425 4513 
@@ -1381,37 +1381,6 @@ Q 1875 4863 2516 4863
 L 3059 4863 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-56" d="M 3200 3397 
-L 3091 2853 
-Q 2863 2978 2609 3040 
-Q 2356 3103 2088 3103 
-Q 1634 3103 1373 2948 
-Q 1113 2794 1113 2528 
-Q 1113 2219 1719 2053 
-Q 1766 2041 1788 2034 
-L 1972 1978 
-Q 2547 1819 2739 1644 
-Q 2931 1469 2931 1166 
-Q 2931 609 2489 259 
-Q 2047 -91 1331 -91 
-Q 1053 -91 747 -37 
-Q 441 16 72 128 
-L 184 722 
-Q 500 559 806 475 
-Q 1113 391 1394 391 
-Q 1816 391 2080 572 
-Q 2344 753 2344 1031 
-Q 2344 1331 1650 1516 
-L 1591 1531 
-L 1394 1581 
-Q 956 1697 753 1886 
-Q 550 2075 550 2369 
-Q 550 2928 970 3256 
-Q 1391 3584 2113 3584 
-Q 2397 3584 2667 3537 
-Q 2938 3491 3200 3397 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSans-20" d="M 678 2906 
 L 4684 2906 
 L 4684 2381 
@@ -1479,7 +1448,7 @@ z
       <use xlink:href="#DejaVuSans-55" transform="translate(468.654297 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(509.767578 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(541.554688 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(576.759766 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-56" transform="translate(576.759766 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(615.963867 0.015625)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(647.750977 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(731.540039 0.015625)"/>
@@ -2010,7 +1979,7 @@ L 93.021531 304.795529
 " style="fill: none; stroke-dasharray: 7.68,1.92,1.2,1.92; stroke-dashoffset: 0; stroke: #d62728; stroke-width: 1.2"/>
     </g>
     <g id="text_25">
-     <!-- Schroeder $f_s$ = 175 Hz -->
+     <!-- Schroeder $f_\mathrm{s}$ = 175 Hz -->
      <g transform="translate(99.685531 307.711029) scale(0.0833 -0.0833)">
       <use xlink:href="#DejaVuSans-36" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-46" transform="translate(63.476562 0.015625)"/>
@@ -2023,7 +1992,7 @@ L 93.021531 304.795529
       <use xlink:href="#DejaVuSans-55" transform="translate(468.654297 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(509.767578 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-49" transform="translate(541.554688 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-56" transform="translate(576.759766 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-56" transform="translate(576.759766 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(615.963867 0.015625)"/>
       <use xlink:href="#DejaVuSans-20" transform="translate(647.750977 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(731.540039 0.015625)"/>

@@ -64,7 +64,7 @@ sobre esa superficie, promédialas en energía, y la potencia acústica se obtie
 porque una superficie suficientemente difusa capta toda la energía radiada:
 
 $$
-\overline{L'_p} = 10\log_{10}\left( \frac{1}{N_M} \sum_i 10^{L'_{pi}/10} \right), \qquad
+\overline{L'_p} = 10\log_{10}\left( \frac{1}{N_\mathrm{M}} \sum_i 10^{L'_{pi}/10} \right), \qquad
 L_W = \overline{L'_p} - K_1 - K_2 + 10\log_{10}\frac{S}{S_0},\quad S_0 = 1\ \text{m}^2 .
 $$
 
@@ -221,7 +221,7 @@ res.plot()   # barras de nivel de potencia acústica por banda; LWA en el títul
 *Una barra por banda: la presión superficial promediada en energía menos las
 correcciones de fondo ($K_1$) y ambiental ($K_2$) más el término de superficie
 $10\log_{10}(S/S_0)$ dan $L_W(f)$, y la suma energética ponderada A entre bandas da
-el número único $L_{WA}$ del título.*
+el número único $L_{W\mathrm{A}}$ del título.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -265,7 +265,7 @@ plt.show()
 
 </details>
 
-El total ponderado A $L_{WA}$ se combina a partir de las potencias por banda
+El total ponderado A $L_{W\mathrm{A}}$ se combina a partir de las potencias por banda
 con
 las correcciones de ponderación A del Anexo E de ISO 3744, así que necesita
 `frequencies`. Pasar un `RoomEnvironment` como `room`
@@ -376,7 +376,7 @@ necesita aplicar a mano la corrección del Anexo G.
 | `distance` | float | m | > 0 (caja) | Distancia de medición $d$ |
 | `reflecting_planes` | int | — | `1` / `2` / `3`, por defecto `1` | Divide entre dos/cuatro el área de la semiesfera |
 | `background_levels` | array 2D o espectro | dB | `(NM, NB)`, o `(NB,)` / `(1, NB)` | Habilita $K_1$; un espectro único se difunde a todas las posiciones |
-| `frequencies` | array 1D | Hz | centros de banda nominales | Habilita $L_{WA}$ (Anexo E) |
+| `frequencies` | array 1D | Hz | centros de banda nominales | Habilita $L_{W\mathrm{A}}$ (Anexo E) |
 | `room` | `RoomEnvironment` o None | — | por defecto `None` (campo libre) | Los datos de sala tras $K_2$; sus campos son las tres vías hacia $A$ de abajo |
 | `room.absorption_area` | float o array 1D | m² | > 0 | $A$ para $K_2$ (directo); un array por banda → $K_2$ por banda |
 | `room.reverberation_time`, `room.volume` | float/array, float | s, m³ | > 0 | $A = 0{,}16\,V/T$ para $K_2$; $T$ por banda → $K_2$ por banda |
@@ -389,7 +389,7 @@ Devuelve un `SoundPowerResult`: `sound_power_level` ($L_W$ por banda),
 `background_correction`/`environmental_correction` ($K_1$/$K_2$),
 `directivity_index` (índice de directividad aparente $DI_i^*$ por posición de
 micrófono **y** banda de frecuencia, forma `(NM, NB)`; ISO 3744 apartado 8.4),
-`surface_area`, `sound_power_level_a` ($L_{WA}$), `uncertainty`
+`surface_area`, `sound_power_level_a` ($L_{W\mathrm{A}}$), `uncertainty`
 (expandida, 95 %) y `grade`. `measurement_positions('hemisphere', radius=…,
 reflecting_planes=…, tones=…, grade=…)` devuelve las coordenadas normativas
 `(N, 3)` de micrófono (Tabla B.1 para fuentes tonales, B.2 para banda ancha).
@@ -522,7 +522,7 @@ a diferencia del de la sección 1 — es la media sobre la superficie de los
 niveles **después** de corregir cada uno por su cuenta el ruido de fondo,
 
 $$
-\overline{L_p} = 10\log_{10}\left[\frac{1}{N_M} \sum_i
+\overline{L_p} = 10\log_{10}\left[\frac{1}{N_\mathrm{M}} \sum_i
 10^{0{,}1\left(L'_{pi} - K_{1i}\right)}\right]
 $$
 
@@ -655,13 +655,13 @@ de grado 2 de la sección 1: el coste del grado es sobre todo tiempo.
 | `surface` | str | — | `'sphere'` / `'hemisphere'` | Cámara anecoica o semianecoica |
 | `radius` | float | m | > 0 | Radio de medición $r$; acotado por $2 d_0$, $\lambda/4$ y el suelo de 1 m de arriba |
 | `background_levels` | array 2D o espectro | dB | coincide con `levels_positions` | Habilita el $K_{1i}$ por posición de la Ec. 11 |
-| `frequencies` | array 1D | Hz | una por banda | Habilita $L_{WA}$ y el $C_3$ por banda |
+| `frequencies` | array 1D | Hz | una por banda | Habilita $L_{W\mathrm{A}}$ y el $C_3$ por banda |
 | `areas` | array 1D | m² | una por posición | Áreas de segmento desiguales, para una investigación localizada (apartado 9.4.3.2); si se omite se suponen iguales |
 | `temperature` | float | °C | por defecto `23.0` | Fija $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | por defecto `101.325` | Fija $C_1$, $C_2$ |
 | `air_absorption_coefficient` | float o array 1D | dB/m | por defecto `None` | El término $C_3$ de absorción del aire; se aporta, no se calcula |
 | `sigma_omc` | float | dB | por defecto `0.0` | Desviación típica de funcionamiento y montaje, apartado 10.5 |
-| `coverage_factor` | float | — | por defecto `2.0` | La $k$ de $U = k\sqrt{\sigma_{R0}^2 + \sigma_\text{omc}^2}$ |
+| `coverage_factor` | float | — | por defecto `2.0` | La $k$ de $U = k\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\text{omc}^2}$ |
 
 Los dos últimos son toda la historia de la incertidumbre, y el valor por defecto
 la esconde: si se deja como está, `sigma_omc = 0` afirma que la instalación es
@@ -700,7 +700,7 @@ result.plot()   # espectro LW, LWA en el título (requiere matplotlib)
 
 *Una barra por banda: la presión promediada en la superficie más las correcciones
 de área, ruido de fondo y meteorológica dan $L_W(f)$, y la suma energética
-ponderada A entre bandas da el número único $L_{WA}$ del título.*
+ponderada A entre bandas da el número único $L_{W\mathrm{A}}$ del título.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -756,7 +756,7 @@ fuente de ruido, entorno de ensayo, instrumentación, clima, fecha), una tabla
 por bandas (frecuencia nominal de octava/tercio de octava, el nivel de presión
 acústica de superficie $L_p$ y el nivel de potencia acústica de banda $L_W$), el
 espectro de potencia acústica $L_W(f)$ con eje de bandas nominal, y un recuadro
-con el nivel de potencia acústica ponderado A $L_{WA}$ (dB re 1 pW) acompañado
+con el nivel de potencia acústica ponderado A $L_{W\mathrm{A}}$ (dB re 1 pW) acompañado
 del $L_W$ total, la incertidumbre expandida $U$ y el área de la superficie de
 medición $S$.
 
@@ -897,7 +897,7 @@ acústica](/phonometry/es/devices/emission/sound-power/).
 - [Acústica de salas](/phonometry/es/buildings/rooms/room-acoustics/): el tiempo de
   reverberación y el área de absorción equivalente que alimentan $K_2$.
 - [Niveles](/phonometry/es/signals/levels/levels/): el promediado en energía y la
-  ponderación A que sustentan $L_{WA}$.
+  ponderación A que sustentan $L_{W\mathrm{A}}$.
 - [Teoría](/phonometry/es/reference/theory/environment-transport/): las
   derivaciones de $K_1$/$K_2$ y $C_1$/$C_2$.
 - Referencia de la API: [`emission.sound_power`](/phonometry/es/reference/api/power/sound-power/).

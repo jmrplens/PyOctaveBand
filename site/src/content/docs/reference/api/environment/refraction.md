@@ -8,7 +8,7 @@ sidebar:
 Atmospheric refraction: ray tracing and the parabolic equation (PE).
 
 Sound propagation outdoors is bent by vertical gradients of the effective sound
-speed $c_{eff}(z) = c(z) + u(z)$ (the adiabatic sound speed plus the
+speed $c_\mathrm{eff}(z) = c(z) + u(z)$ (the adiabatic sound speed plus the
 component of the wind in the propagation direction, Salomons Eq. (4.4)). This
 module
 predicts that refraction with two complementary models, clean-room from
@@ -148,7 +148,7 @@ $\cos(\gamma)/c(z) = \text{const}$) with a fixed-step fourth-order
 Runge-Kutta scheme, marching in range and reflecting specularly at the
 ground ($z = 0$). The state is the height `z` and the vertical
 slowness $\zeta = \sin(\gamma)/c$; with the range-invariant
-$\xi = \cos(\gamma_0)/c(z_s)$ the equations are
+$\xi = \cos(\gamma_0)/c(z_\mathrm{s})$ the equations are
 $dz/dr = \zeta/\xi$ and
 $d\zeta/dr = -(dc/dz)/(c^3 \xi)$, the same ray core as the ocean
 [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) (with a ground
@@ -323,7 +323,7 @@ linear_sound_speed_profile(
 
 Linear effective sound-speed profile (constant vertical gradient).
 
-The profile is $c_{eff}(z) = c_0 + \text{gradient} \cdot z$. A
+The profile is $c_\mathrm{eff}(z) = c_0 + \text{gradient} \cdot z$. A
 positive `gradient` (sound speed increasing with height) refracts sound
 downward (favourable propagation); a negative gradient refracts it upward
 and creates an acoustic shadow near the ground (Salomons Sec. 4.2).
@@ -359,7 +359,7 @@ log_linear_sound_speed_profile(
 
 Logarithmic effective sound-speed profile (surface layer).
 
-The profile is $c_{eff}(z) = c_0 + b \ln(1 + z/z_0)$, the realistic
+The profile is $c_\mathrm{eff}(z) = c_0 + b \ln(1 + z/z_0)$, the realistic
 surface-layer profile of Salomons Eq. (4.5): `b` is
 the strength of the gradient (`+1 m/s` for a typical downward-refracting
 atmosphere, `-1 m/s` for an upward-refracting one) and `z0` is the
@@ -398,11 +398,11 @@ ray_curvature_radius(
 Radius of curvature of a sound ray in a linear sound-speed gradient.
 
 In a linear effective sound-speed profile a sound ray is an exact circular
-arc of radius $R_c = 1/(|\text{gradient}| \, \xi)$ with the Snell
+arc of radius $R_\mathrm{c} = 1/(|\text{gradient}| \, \xi)$ with the Snell
 invariant $\xi = \cos(\theta_0)/c$, evaluated at the launch height
 (Salomons Sec. 4.4; Attenborough Ch. 11). For a ray launched from the
 height where the speed is `ground_speed` ($c_0$),
-$R_c = c_0 / (|\text{gradient}| \cos\theta_0)$.
+$R_\mathrm{c} = c_0 / (|\text{gradient}| \cos\theta_0)$.
 
 **Parameters**
 
@@ -437,15 +437,15 @@ Distance to the acoustic shadow boundary, upward-refracting profile.
 For a linear upward-refracting profile (`gradient < 0`) the ground-level
 ray that just grazes the surface bounds a region beyond which no direct or
 once-reflected ray arrives (Salomons Sec. 4.4; Attenborough Ch. 11). With a
-ray radius $R_c = c_0/|\text{gradient}|$ the limiting horizontal
+ray radius $R_\mathrm{c} = c_0/|\text{gradient}|$ the limiting horizontal
 distance is the closed form:
 
 $$
-x_{shadow} = \sqrt{2 R_c} \left( \sqrt{h_s} + \sqrt{h_r} \right)
+x_\mathrm{shadow} = \sqrt{2 R_\mathrm{c}} \left( \sqrt{h_\mathrm{s}} + \sqrt{h_\mathrm{r}} \right)
 $$
 
-valid for source and receiver heights $h_s$, $h_r$ small
-compared with $R_c$.
+valid for source and receiver heights $h_\mathrm{s}$, $h_\mathrm{r}$ small
+compared with $R_\mathrm{c}$.
 
 **Parameters**
 

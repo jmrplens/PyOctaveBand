@@ -72,8 +72,8 @@ j\,\tfrac{S}{\rho c}\sin kL & \cos kL \end{bmatrix},
 \qquad k = \omega/c,
 $$
 
-y una rama lateral de impedancia $Z_b$ es la derivación
-$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_b & 1 \end{smallmatrix}\right]$. La
+y una rama lateral de impedancia $Z_\mathrm{b}$ es la derivación
+$\left[\begin{smallmatrix} 1 & 0 \\ 1/Z_\mathrm{b} & 1 \end{smallmatrix}\right]$. La
 **pérdida de transmisión** se obtiene de la matriz compuesta $T$ con las
 impedancias de los puertos $Z_1 = \rho c/S_\text{in}$ y $Z_n = \rho c/S_\text{out}$
 (Munjal Ec. (3.27); Bies Ec. (8.141) imprime invertidos los pesos de impedancia
@@ -90,12 +90,12 @@ que para áreas de entrada y salida iguales $S$ se reduce a (Bies Ec. (8.148))
 
 $$
 \mathrm{TL} = 20\log_{10}\!\left(\tfrac{1}{2}\left|\,T_{11}
-+ \tfrac{T_{12}}{Z_c} + Z_c\,T_{21} + T_{22}\right|\right),
-\qquad Z_c = \frac{\rho c}{S},
++ \tfrac{T_{12}}{Z_\mathrm{c}} + Z_\mathrm{c}\,T_{21} + T_{22}\right|\right),
+\qquad Z_\mathrm{c} = \frac{\rho c}{S},
 $$
 
-y la **pérdida por inserción** para una impedancia de fuente $Z_s$ y una de
-radiación $Z_r$ es la atenuación adicional frente a una conexión directa.
+y la **pérdida por inserción** para una impedancia de fuente $Z_\mathrm{s}$ y una de
+radiación $Z_\mathrm{r}$ es la atenuación adicional frente a una conexión directa.
 
 ### Cámara de expansión
 
@@ -229,7 +229,7 @@ que una fuente muy por encima de ese valor se aproxima a una máquina de
 velocidad de volumen constante, como un motor alternativo, y una muy por debajo
 a una fuente de presión constante. La terminación no es una elección libre en
 absoluto: para un conducto que descarga a una sala es la impedancia de radiación
-del extremo abierto, $Z_r = (\rho c/S)(R_1 + jX_1)$, cuyas $R_1$ y $X_1$
+del extremo abierto, $Z_\mathrm{r} = (\rho c/S)(R_1 + jX_1)$, cuyas $R_1$ y $X_1$
 normalizadas devuelve el
 [pistón radiante](/phonometry/es/devices/electroacoustics/loudspeakers/#piston-radiante)
 del dominio de electroacústica como `radiating_piston(...).resistance` y
@@ -315,15 +315,15 @@ polos de arriba.
 
 ### Resonadores laterales y de tubo extendido
 
-Un **resonador de Helmholtz** (área de cuello $S_n$, longitud efectiva $l_e$,
-volumen de cavidad $V$) y un **tubo de cuarto de onda** cerrado (longitud $l_e$)
+Un **resonador de Helmholtz** (área de cuello $S_\mathrm{n}$, longitud efectiva $l_\mathrm{e}$,
+volumen de cavidad $V$) y un **tubo de cuarto de onda** cerrado (longitud $l_\mathrm{e}$)
 cortocircuitan el conducto en su frecuencia de sintonía, dando un pico agudo de
-pérdida de transmisión: $f_0 = \tfrac{c}{2\pi}\sqrt{S_n/(l_e V)}$ (Bies Ec. (8.46))
-y $f = c/4l_e$ (Ec. (8.44)). Una **cámara de tubo extendido** aloja ramas de
+pérdida de transmisión: $f_0 = \tfrac{c}{2\pi}\sqrt{S_\mathrm{n}/(l_\mathrm{e} V)}$ (Bies Ec. (8.46))
+y $f = c/4l_\mathrm{e}$ (Ec. (8.44)). Una **cámara de tubo extendido** aloja ramas de
 cuarto de onda dentro de una cámara de expansión para rellenar sus caídas.
 
 Las dos longitudes son longitudes **efectivas**, y las dos funciones las
-toman así (`neck_length` y `length` están documentadas como $l_e$, con las
+toman así (`neck_length` y `length` están documentadas como $l_\mathrm{e}$, con las
 correcciones de extremo incluidas). El aire del cuello no deja de moverse en
 la boca: arrastra consigo una porción de aire a cada lado, así que la masa que
 resuena contra la cavidad pertenece a un tubo más largo que el que se
@@ -332,7 +332,7 @@ por extremo libre, para un cuello de radio $a$, en los dos extremos de un
 cuello de Helmholtz y solo en el extremo abierto (el del conducto) de un tubo
 de cuarto de onda. El resonador dibujado abajo es el caso de manual: su
 cuello mide 11,3 mm de diámetro ($a = 5{,}64$ mm) y 20 mm de largo, así que
-$l_e \approx 20 + 2 \times 4{,}8 = 29{,}6$ mm y la sintonía baja de los
+$l_\mathrm{e} \approx 20 + 2 \times 4{,}8 = 29{,}6$ mm y la sintonía baja de los
 122,1 Hz que devuelve la longitud taladrada a 100,3 Hz — un error del 22 % en
 una muesca que la figura de abajo enseña que solo tiene unos pocos hercios de
 ancho. Cuanto más corto y más ancho el cuello, mayor es la corrección en
@@ -541,7 +541,7 @@ de 1 cm² de solo 2 cm de longitud.
 
 *Toda la muesca de 120 Hz cuelga de una caja de 1 L y un cuello de 2 cm: la
 cavidad se dibuja como su cubo de igual volumen, y la sintonía se mueve como
-$\sqrt{S_n/(l_e V)}$, así que pequeños errores en estas dimensiones desplazan
+$\sqrt{S_\mathrm{n}/(l_\mathrm{e} V)}$, así que pequeños errores en estas dimensiones desplazan
 el pico de su objetivo.*
 
 <details>
@@ -570,14 +570,14 @@ plantado sobre el mismo conducto.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/quarter_wave_geometry_es.svg" alt="Sección a escala de la rama lateral de cuarto de onda: un tubo cerrado de 300 mm de longitud y 50,5 mm de diámetro equivalente plantado sobre un conducto de 112,8 mm de diámetro equivalente, con la longitud del tubo, el diámetro del tubo y el diámetro del conducto acotados" width="88%" />
 
 *Un tubo de cuarto de onda es solo un tubo cerrado de la longitud correcta:
-0,3 m de tubo colocan el pico en $c/4l_e \approx 285\ \text{Hz}$, y el área de
+0,3 m de tubo colocan el pico en $c/4l_\mathrm{e} \approx 285\ \text{Hz}$, y el área de
 rama de 20 cm² solo fija con cuánta fuerza carga el conducto.*
 
 :::caution
 **Sintonizar a la temperatura de trabajo.**
 Todas las frecuencias de esta página son condiciones de longitud de onda, así
 que todas escalan directamente con la velocidad del sonido **en el gas de
-trabajo**: $kL = \pi/2$ para la cámara, $c/4l_e$ para el tubo y la $c$ que va
+trabajo**: $kL = \pi/2$ para la cámara, $c/4l_\mathrm{e}$ para el tubo y la $c$ que va
 delante de la raíz cuadrada de Helmholtz. Para el aire,
 $c(T) = 343\sqrt{T/293}$ con $T$ en kelvin, así que un escape a 500 °C
 (773 K) funciona a unos 557 m/s, un factor 1,62, y el tubo de 0,3 m cortado
@@ -901,7 +901,7 @@ próxima está a más del doble de distancia que el micrófono.
 El procedimiento son luego dos series sin cambiar nada más. Se determina
 $L_{pI}$ con el objeto de ensayo instalado y $L_{pII}$ con el conducto de
 sustitución en su lugar, en puntos o recorridos idénticos y con un espectro de
-fuente inalterado, y la pérdida por inserción es $D_i = L_{pII} - L_{pI}$ tercio
+fuente inalterado, y la pérdida por inserción es $D_\mathrm{i} = L_{pII} - L_{pI}$ tercio
 de octava a tercio de octava (6.2.1). En un conducto de ensayo el promedio
 espacial toma **al menos tres posiciones equiespaciadas** sobre una recta
 inclinada respecto al eje del conducto, a la mitad de su longitud

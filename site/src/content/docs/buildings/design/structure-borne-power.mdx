@@ -39,7 +39,7 @@ plate of known mass per unit area $m$ and area $S$ whose structural loss
 factor $\eta$ is known, and the plate's spatial-average vibratory velocity is
 measured. Formula (14) gives the power *injected into that particular plate*;
 the plate-independent source quantities (the equivalent blocked force,
-Formula 15; the characteristic reception-plate power level $L_{Wsn}$,
+Formula 15; the characteristic reception-plate power level $L_{W\mathrm{sn}}$,
 Formula 17; and the equivalent free velocity and source mobility,
 Formulae 18/19) are derived from it and are what the EN 12354-5
 installed-equipment prediction consumes.
@@ -88,7 +88,7 @@ ax.bar(x - 0.2, low.power_level, width=0.4, label="low-mobility plate")
 ax.bar(x + 0.2, high.power_level, width=0.4, label="high-mobility plate")
 ax.set_xticks(x, [f"{b:g}" for b in bands])
 ax.set(xlabel="Frequency [Hz]",
-       ylabel=r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]")
+       ylabel="Structure-borne power level $L_{Ws}$ [dB re 1 pW]")
 ax.legend()
 plt.show()
 ```
@@ -124,12 +124,12 @@ $S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\log_{10}(v_0^2/P_0)$ for
 the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$ and
 $P_0 = 1\ \text{pW}$. The plate
 velocity is the energetic spatial average over the $N$ positions (Formula 12)
-and the loss factor comes from the structural reverberation time $T_s$
+and the loss factor comes from the structural reverberation time $T_\mathrm{s}$
 (Formula 13, identical to the ISO 10848 total loss factor):
 
 $$
 L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
-\eta = \frac{2.2}{f\,T_s}.
+\eta = \frac{2.2}{f\,T_\mathrm{s}}.
 $$
 
 ```python
@@ -164,12 +164,12 @@ ratio near $\sqrt{2}$, and a loss factor of at least 0,08 in the low bands
 (50 Hz to 100 Hz). Its minimum dimension shall be at least the largest contact
 spacing of the sample. Every one of those numbers earns its place: the 10 cm
 concrete plate is the same plate whose characteristic mobility
-$Y_{R,\infty,\text{low}} = 5\times10^{-6}$ m/(N·s) anchors Formula (17), so a
+$Y_{\mathrm{R},\infty,\mathrm{low}} = 5\times10^{-6}$ m/(N·s) anchors Formula (17), so a
 thinner or lighter plate would break the conversion; the $\sqrt{2}$ aspect ratio
 spreads the modes so that no band is dominated by a degenerate pair; the
 loss-factor floor keeps the plate reverberant but well damped, which is what
-makes $\eta = 2{,}2/(fT_s)$ and the steady-state power balance hold — at
-$T_s = 0{,}25$ s the plate gives $\eta = 0{,}176$ at 50 Hz and 0,088 at 100 Hz,
+makes $\eta = 2{,}2/(fT_\mathrm{s})$ and the steady-state power balance hold — at
+$T_\mathrm{s} = 0{,}25$ s the plate gives $\eta = 0{,}176$ at 50 Hz and 0,088 at 100 Hz,
 just inside the requirement; and the minimum dimension keeps a multi-contact
 source from bridging the plate's edges. A bench may carry up to **three**
 mutually isolated low-mobility plates so that a source touching several building
@@ -238,13 +238,13 @@ margin. A plate standing on a laboratory floor picks up traffic and plant
 long before a microphone does, and the correction is the only thing between that
 and a source spectrum that is really the building's.
 
-**The loss factor.** $T_s$ is a structural decay measured on the plate itself,
-feeding $\eta = 2{,}2/(f\,T_s)$. Formula (14) is linear in $10\lg\eta$, so an
-error in $T_s$ moves $L_{W\mathrm{s}}$ decibel for decibel — it is the single most
+**The loss factor.** $T_\mathrm{s}$ is a structural decay measured on the plate itself,
+feeding $\eta = 2{,}2/(f\,T_\mathrm{s})$. Formula (14) is linear in $10\lg\eta$, so an
+error in $T_\mathrm{s}$ moves $L_{W\mathrm{s}}$ decibel for decibel — it is the single most
 sensitive input on the page. The loading rule follows the plate: on the
-**low-mobility** plate there should be no significant difference whether $T_s$
+**low-mobility** plate there should be no significant difference whether $T_\mathrm{s}$
 and the point mobilities are measured with or without the equipment attached; the
-**high-mobility** plate is dynamically loaded by the equipment, so both $T_s$ and
+**high-mobility** plate is dynamically loaded by the equipment, so both $T_\mathrm{s}$ and
 the point mobilities **shall** be measured with the source fitted.
 
 **Mobilities.** The plate's point mobilities are measured at the source's contact
@@ -315,25 +315,25 @@ ISO 16283-2
 120 dB away) from the low-mobility plate,
 
 $$
-L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
+L_{F\mathrm{b,eq}} = L_{W\mathrm{s,low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_\mathrm{R,low,eq}\}}{Y_0},
 $$
 
 the **characteristic reception-plate power level** that EN 12354-5 consumes
 (Formula 17), referred to the standard 10 cm concrete plate of characteristic
-mobility $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
+mobility $Y_{\mathrm{R},\infty,\mathrm{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
 (clause 7.2.4),
 
 $$
-L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
+L_{W\mathrm{sn}} = L_{F\mathrm{b,eq}} + 10\log_{10}\frac{Y_{\mathrm{R},\infty,\mathrm{low}}}{Y_0},
 $$
 
 and, from the high-mobility plate, the **equivalent free velocity level**
 (Formula 18, re $10^{-9}\ \text{m/s}$) and the **source mobility**
-$|Y_{S,\text{eq}}|$
+$|Y_\mathrm{S,eq}|$
 (Formula 19). The EN 12354-5 Annex I mobility correction
 (`installed_power_from_reception_plate`, see
 [installed structure-borne sound](/phonometry/buildings/design/installed-structure-borne/))
-then refers $L_{Wsn}$ to the actual receiving element.
+then refers $L_{W\mathrm{sn}}$ to the actual receiving element.
 
 ```python
 from phonometry import building
@@ -360,21 +360,21 @@ print(float(building.source_mobility_from_levels(lvf, lfb)))      # |Y_S,eq| in 
 Read the chain in order. The cistern injects 61.7 dB into the measurement
 plate; stripping that plate's mobility leaves an equivalent blocked force, and
 re-expressing the same force on the standard 10 cm concrete plate of
-$Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$ gives
-$L_{Wsn} = 61.4$ dB — the number a manufacturer may declare. Referring the same
+$Y_{\mathrm{R},\infty,\mathrm{low}} = 5\times10^{-6}\ \text{m/(N·s)}$ gives
+$L_{W\mathrm{sn}} = 61.4$ dB — the number a manufacturer may declare. Referring the same
 force to the actual receiving wall ($Y = 24.1\times10^{-6}$) adds
 $10\log_{10}(24.1/5.0) = 6.8$ dB and gives 68.2 dB. That step is the section's
 whole lesson: a light, high-mobility receiver accepts more power from the same
-source, so a declared $L_{Wsn}$ compares machines and is never the power a
+source, so a declared $L_{W\mathrm{sn}}$ compares machines and is never the power a
 particular building will see.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/structure_borne_conversion.svg" alt="Four octave-band curves for the same flushing cistern: the level measured on the test plate, the characteristic reception-plate level on the standard 10 cm concrete plate, the installed level on the receiving wall and the characteristic power level obtained with the source mobility, with crosses showing that subtracting the coupling term from the last returns the third" width="88%" />
 
 *The same source, four different levels, and only one of them describes the
 machine. Read upward from the grey curve: what the test plate measured, then the
-declared $L_{Wsn}$ on the standard 10 cm plate, then the two branches of the
+declared $L_{W\mathrm{sn}}$ on the standard 10 cm plate, then the two branches of the
 Annex I correction — the receiving wall's 68.2 dB and the plate-independent
-84.4 dB. The crosses are $L_{Ws,c} - D_C$, and they land on the installed curve,
+84.4 dB. The crosses are $L_{W\mathrm{s,c}} - D_\mathrm{C}$, and they land on the installed curve,
 which is the arithmetic the two pages share. The 6.8 dB step at every band is
 $10\lg(24.1/5.0)$: nothing about the cistern changed, only what it was bolted to.*
 
@@ -395,12 +395,10 @@ characteristic = building.installed_power_from_reception_plate(l_wsn, 1.0e-3)
 
 fig, ax = plt.subplots()
 ax.semilogx(bands, l_ws, "-o", label="measured on the test plate")
-ax.semilogx(bands, l_wsn, "-s", label=r"$L_{W\mathrm{sn}}$, the declared value")
-ax.semilogx(bands, installed, "-^", label=r"$L_{W\mathrm{s,inst}}$ on the wall")
-ax.semilogx(bands, characteristic, "-D",
-            label=r"$L_{W\mathrm{s,c}}$, the EN 12354-5 input")
-ax.semilogx(bands, characteristic - 16.2, "x",
-            label=r"$L_{W\mathrm{s,c}} - D_\mathrm{C}$")
+ax.semilogx(bands, l_wsn, "-s", label="$L_{Wsn}$, the declared value")
+ax.semilogx(bands, installed, "-^", label="$L_{Ws,inst}$ on the wall")
+ax.semilogx(bands, characteristic, "-D", label="$L_{Ws,c}$, the EN 12354-5 input")
+ax.semilogx(bands, characteristic - 16.2, "x", label="$L_{Ws,c} - D_C$")
 ax.set(xlabel="Frequency [Hz]",
        ylabel="Structure-borne power level [dB re 1 pW]")
 ax.legend()
@@ -412,12 +410,12 @@ plt.show()
 :::caution
 **Two quantities come out of the same correction; do not confuse them.**
 With the *receiver* mobility it gives the installed power level
-$L_{Ws,\mathrm{inst}} = 68.2$ dB. With the *source* mobility it gives the
-plate-independent characteristic power level $L_{Ws,c} = 84.4$ dB, and that is
+$L_{W\mathrm{s,inst}} = 68.2$ dB. With the *source* mobility it gives the
+plate-independent characteristic power level $L_{W\mathrm{s,c}} = 84.4$ dB, and that is
 what [EN 12354-5](/phonometry/buildings/design/installed-structure-borne/) takes
-as its input, from which it subtracts the coupling term $D_C = 16.2$ dB to
+as its input, from which it subtracts the coupling term $D_\mathrm{C} = 16.2$ dB to
 arrive back at the same 68.2 dB. Feed EN 12354-5 the 84.4, never the 68.2:
-carrying 68.2 forward as the characteristic power level subtracts $D_C$ a
+carrying 68.2 forward as the characteristic power level subtracts $D_\mathrm{C}$ a
 second time and lands 16 dB low, with no error raised.
 :::
 

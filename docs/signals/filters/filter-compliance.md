@@ -41,7 +41,7 @@ print(result["bands"][0])
 
 The Table 1 acceptance mask itself is public too: `class_limits(fraction,
 filter_class, omega)` returns the minimum/maximum relative-attenuation
-limits at normalized frequencies $\Omega = f/f_m$, the same limits the verifier
+limits at normalized frequencies $\Omega = f/f_\mathrm{m}$, the same limits the verifier
 and the figure below use.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay.svg" alt="Butterworth band response threading between the forbidden regions of the IEC 61260-1 class 1 acceptance mask" width="80%"></picture>

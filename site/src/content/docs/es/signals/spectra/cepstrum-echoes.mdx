@@ -456,10 +456,10 @@ Butterworth de cuarto orden aplicado hacia delante y hacia atrás; el
 rechazo es finito, y el paso de fase cero deja pequeños transitorios en
 los bordes del registro).
 
-Para un tono AM $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ con $f_m$
+Para un tono AM $A_0 (1 + m \cos(2\pi f_\mathrm{m} t)) \cos(2\pi f_\mathrm{c} t)$ con $f_\mathrm{m}$
 en un bin de análisis las formas cerradas son:
 
-| `kind` | nivel medio | línea en $f_m$ | línea en $2f_m$ |
+| `kind` | nivel medio | línea en $f_\mathrm{m}$ | línea en $2f_m$ |
 |---|---|---|---|
 | `'magnitude'` | $A_0$ | $A_0 m$ | - |
 | `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
@@ -480,7 +480,7 @@ res.plot(language="es")
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/envelope_spectrum_es.svg" alt="Espectro de la envolvente de un tono de un kilohercio modulado en amplitud dentro de ruido, frente a la frecuencia hasta cien hercios: una única línea afilada en la frecuencia de modulación de veinticinco hercios que alcanza exactamente la referencia punteada de amplitud cero coma cuatro, con un suelo de ruido plano en el resto" width="82%" loading="eager" />
 
-*La línea no es proporcional a la modulación: **es** la modulación. Con $f_m$ en
+*La línea no es proporcional a la modulación: **es** la modulación. Con $f_\mathrm{m}$ en
 un bin de análisis el detector de magnitud lee 0,3996 frente a la forma cerrada
 $A_0 m = 0{,}4$, y `mean_level` lee 1,001 frente a $A_0 = 1$. Ese es el sentido
 de escalar por la ganancia coherente de la ventana: la ordenada es una
@@ -539,7 +539,7 @@ soporte, normalmente en algún punto entre 1 y 20 kHz para rodamientos de
 elementos rodantes. Coloca la banda alrededor de esa joroba. Hazla varias veces
 más ancha que la mayor tasa de repetición que necesites ver (de tres a cinco
 veces la mayor frecuencia de defecto, para que sus armónicos sobrevivan al
-detector), y elige $f_s$ al menos 2,56 veces el extremo superior de la banda.
+detector), y elige $f_\mathrm{s}$ al menos 2,56 veces el extremo superior de la banda.
 Cuando haya dos jorobas candidatas, quédate con aquella cuyo espectro de la
 envolvente dé mayor relación línea-fondo: la banda es una elección de relación señal-ruido,
 no una constante física. Una banda demasiado ancha vuelve a admitir las

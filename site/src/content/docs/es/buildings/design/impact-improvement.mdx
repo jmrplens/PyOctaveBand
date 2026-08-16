@@ -50,7 +50,7 @@ desproporcionado para un metro cuadrado de moqueta. ISO 16251-1 encoge por
 ello el laboratorio a una pequeña maqueta pesada: una placa de hormigón con
 apoyo elástico, una máquina de impactos normalizada y un acelerómetro por
 debajo. Esta guía cubre la medición en maqueta de la mejora $\Delta L$ y su
-$\Delta L_w$ ponderada frente al suelo de referencia de ISO 717-2, la ficha
+$\Delta L_\mathrm{w}$ ponderada frente al suelo de referencia de ISO 717-2, la ficha
 acreditada y la estimación de ingeniería de ISO 12354-2 que predice la mejora
 de un suelo flotante a partir de la rigidez dinámica de su capa elástica.
 La cadena de laboratorio a tamaño completo vive en
@@ -154,36 +154,36 @@ referencia $a_0 = 10^{-6}\ \text{m/s}^2$. La **corrección de ruido de fondo
 sustracción energética para 6 ≤ margen < 15 dB; el límite de 1,3 dB por debajo de
 6 dB, marcado como $> \Delta L$). La mejora es la diferencia promediada por
 posiciones $\Delta L = L_0 - L_1$ (Fórmulas (3)/(4)); las octavas siguen
-$\Delta L_\text{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Fórmula (5)).
+$\Delta L_\mathrm{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Fórmula (5)).
 
-**Mejora ponderada.** $\Delta L_w$ es la reducción ponderada de ISO 717-2: la
-mejora se aplica al **suelo de referencia** pesado $L_{n,r,0}$ (ISO 717-2 Tabla 4),
-$L_{n,r} = L_{n,r,0} - \Delta L$, y $\Delta L_w = 78 - L_{n,r,w}$, calculada por
+**Mejora ponderada.** $\Delta L_\mathrm{w}$ es la reducción ponderada de ISO 717-2: la
+mejora se aplica al **suelo de referencia** pesado $L_\mathrm{n,r,0}$ (ISO 717-2 Tabla 4),
+$L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$, y $\Delta L_\mathrm{w} = 78 - L_\mathrm{n,r,w}$, calculada por
 `weighted_impact_improvement()`, que reutiliza el motor de valoración de
 ISO 717-2. Una medición según el apartado 6.3 abarca 18 bandas (100–5000 Hz,
 opcionalmente ampliadas hasta 50 Hz); la valoración se forma sobre el subrango
 100–3150 Hz de cualquier espectro que lo contenga. La expresión de resultados
 (apartado 8 e)) incluye además el término de adaptación espectral
-$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ (ISO 717-2:2020, Fórmula (A.4)), expuesto
+$C_{\mathrm{I},\Delta} = C_\mathrm{I,r,0} - C_\mathrm{I,r}$ (ISO 717-2:2020, Fórmula (A.4)), expuesto
 como `ci_delta` en el resultado y de forma independiente como
 `impact_improvement_adaptation_term()`.
 
-**Y $C_{I,\Delta}$ es la mitad de la respuesta, así que léelo.** La valoración
+**Y $C_{\mathrm{I},\Delta}$ es la mitad de la respuesta, así que léelo.** La valoración
 ponderada desliza una curva de referencia hasta que encaja el exceso, lo que
 premia la mejora ocurra donde ocurra en el espectro; el ruido de pisadas real lo
 dominan las bandas bajas y medias, que es justo donde menos hace una capa
-elástica delgada. $C_I$ es el término de adaptación que compara la suma
+elástica delgada. $C_\mathrm{I}$ es el término de adaptación que compara la suma
 energética *sin ponderar* con la valoración ponderada, y
-$C_{I,\Delta} = C_{I,r,0} - C_{I,r}$ contrasta el suelo de referencia tal cual
-frente al suelo de referencia con el revestimiento encima, con $C_{I,r,0}$ fijado
+$C_{\mathrm{I},\Delta} = C_\mathrm{I,r,0} - C_\mathrm{I,r}$ contrasta el suelo de referencia tal cual
+frente al suelo de referencia con el revestimiento encima, con $C_\mathrm{I,r,0}$ fijado
 en $-11$ dB (A.2.2; $-10{,}3$ dB cuando se exige un decimal). La Fórmula (A.5)
 dice entonces qué significa la pareja:
-$\Delta L_\text{lin} = \Delta L_w + C_{I,\Delta}$. La moqueta de esta página se
+$\Delta L_\mathrm{lin} = \Delta L_\mathrm{w} + C_{\mathrm{I},\Delta}$. La moqueta de esta página se
 valora en 29 ($-13$) dB, así que en la escala de respuesta plana compra
-**16 dB**, no 29. Un $C_{I,\Delta}$ muy negativo es la firma de un revestimiento
+**16 dB**, no 29. Un $C_{\mathrm{I},\Delta}$ muy negativo es la firma de un revestimiento
 que solo funciona arriba — típico de las capas elásticas delgadas, y justo donde
-la máquina de impactos las favorece —; un revestimiento con $C_{I,\Delta}$ cerca
-de cero mejora todo el rango. Una ficha que solo imprime $\Delta L_w$ te ha
+la máquina de impactos las favorece —; un revestimiento con $C_{\mathrm{I},\Delta}$ cerca
+de cero mejora todo el rango. Una ficha que solo imprime $\Delta L_\mathrm{w}$ te ha
 contado la mejor mitad de la historia.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floor_covering_improvement_es.svg" alt="Mejora a impacto de revestimientos de suelo ISO 16251-1: la mejora delta-L de una moqueta textil real creciendo con la frecuencia en bandas de tercio de octava de 100 Hz a 3150 Hz, con el área de mejora sombreada y el número único ponderado delta-Lw anotado" width="80%" />
@@ -191,8 +191,8 @@ contado la mejor mitad de la historia.
 *Una moqueta textil real sobre la maqueta, y la forma es todo el argumento: 5 dB
 a 100 Hz frente a 71 dB a 3150 Hz, 66 dB de recorrido en el rango valorado. El
 revestimiento no hace casi nada contra el golpe de baja frecuencia y casi todo
-contra el chasquido de alta. $\Delta L_w$ = 29 dB solo lo registra de refilón, y
-por eso la figura se lee junto a $C_{I,\Delta} = -13$ dB y los 16 dB que ambos
+contra el chasquido de alta. $\Delta L_\mathrm{w}$ = 29 dB solo lo registra de refilón, y
+por eso la figura se lee junto a $C_{\mathrm{I},\Delta} = -13$ dB y los 16 dB que ambos
 dan en la escala de respuesta plana.*
 
 <details>
@@ -272,7 +272,7 @@ declaración de daños y el detalle del montaje no tienen campo propio y van en
 mejora a impacto de una página: la línea de base normativa, una cabecera de
 metadatos, la tabla por bandas (frecuencia y $\Delta L$, con las bandas en el
 límite de 1,3 dB precedidas por `>`) junto a la curva de mejora $\Delta L(f)$,
-el número único encuadrado $\Delta L_w\ (C_{I,\Delta})$ (la expresión de
+el número único encuadrado $\Delta L_\mathrm{w}\ (C_{\mathrm{I},\Delta})$ (la expresión de
 resultados del apartado 8 e) de ISO 16251-1) y un pie. Pasa un
 `ReportMetadata` para la cabecera; los campos aplicables son `specimen` (el
 revestimiento de suelo ensayado), `client`, `manufacturer`, `mounting`,
@@ -282,7 +282,7 @@ revestimiento de suelo ensayado), `client`, `manufacturer`, `mounting`,
 en cuanto la iguala o la supera). El suelo de referencia desnudo es el suelo
 pesado normalizado de la Tabla 4 de ISO 717-2:2020, fijado por la norma.
 `verbose=True` añade la columna del suelo de referencia con revestimiento
-$L_{n,r} = L_{n,r,0} - \Delta L$, la base de la derivación de $\Delta L_w$.
+$L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$, la base de la derivación de $\Delta L_\mathrm{w}$.
 
 ```python
 from phonometry import building, ReportMetadata
@@ -370,7 +370,7 @@ print(round(13.0 * np.log10(73.5) - 14.2 * np.log10(8.0) + 20.8, 1))   # 32.2 dB
 ```
 
 La estimación ponderada en forma cerrada de la Fórmula (C.4),
-$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condensa la misma física
+$\Delta L_\mathrm{w} = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB, condensa la misma física
 en una línea: soleras más pesadas y capas más blandas puntúan mejor. Ambas
 estimaciones son ayudas de proyecto deliberadamente del lado de la seguridad
 (la pendiente de 30 lg recorta la teoría de placa infinita de 40 lg allí
@@ -379,7 +379,7 @@ en cuanto existe un elemento de ensayo, la maqueta medida de esta página, o el 
 completo de ISO 10140-3, es la referencia, y la
 [predicción EN
 12354-2](/phonometry/es/buildings/design/insulation-prediction/) consume el
-$\Delta L_w$ que se tenga.
+$\Delta L_\mathrm{w}$ que se tenga.
 
 ## Qué cubre esta guía
 
@@ -390,9 +390,9 @@ ruido de fondo de tres ramas (Fórmula (2)), la mejora promediada por
 posiciones $\Delta L$ (Fórmulas (3)/(4)) y su síntesis en octavas (Fórmula
 (5)), mediante `building.acceleration_level`,
 `building.background_corrected_level` y `building.impact_improvement`; la
-declaración de resultados del apartado 8 e), $\Delta L_w$ frente al suelo de
+declaración de resultados del apartado 8 e), $\Delta L_\mathrm{w}$ frente al suelo de
 referencia de la Tabla 4 de ISO 717-2 con el término de adaptación
-$C_{I,\Delta}$ (Fórmula (A.4)), mediante
+$C_{\mathrm{I},\Delta}$ (Fórmula (A.4)), mediante
 `building.weighted_impact_improvement` y
 `building.impact_improvement_adaptation_term`; y la ficha acreditada de una
 página con `.report()`.
@@ -425,7 +425,7 @@ comparación del ejemplo resuelto de Foret et al. (2011).
   la contrapartida de predicción de esta página, del modelo de fuerza de la
   máquina de impactos a los suelos flotantes y los trasdosados.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
-  el modelo de impactos cuya Fórmula (21) consume $\Delta L_w$.
+  el modelo de impactos cuya Fórmula (21) consume $\Delta L_\mathrm{w}$.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
   el motor de curva de referencia tras la mejora ponderada.
 - [Teoría](/phonometry/es/reference/theory/rooms-buildings/): la derivación

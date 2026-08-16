@@ -132,7 +132,7 @@ def air_density_iso(
 ) -> Real:
     r"""Air density (ISO 10534-2:2001, Eq. (7)).
 
-    :math:`\rho = \rho_0 (p_a T_0) / (p_0 T)` with :math:`\rho_0 = 1.186`
+    :math:`\rho = \rho_0 (p_\mathrm{a} T_0) / (p_0 T)` with :math:`\rho_0 = 1.186`
     kg/m3, :math:`T_0 = 293` K and :math:`p_0 = 101.325` kPa.
 
     :param temperature: Air temperature ``T``, in **kelvin**.
@@ -169,13 +169,13 @@ def hydraulic_diameter(width: float, height: float) -> float:
 
     For a rectangular cross-section of side lengths ``w`` and ``h`` the ratio
     of four times the area to the perimeter reduces to
-    :math:`d_h = 2wh/(w + h)`; a square tube gives ``d_h`` equal to the side
+    :math:`d_\mathrm{h} = 2wh/(w + h)`; a square tube gives ``d_h`` equal to the side
     length. This is the ``d`` the Eq. (A.18) attenuation estimate expects for
     rectangular tubes (see :func:`tube_attenuation_constant`).
 
     :param width: Inner side length ``w``, in metres.
     :param height: Inner side length ``h``, in metres.
-    :return: Hydraulic diameter :math:`d_h = 4A/P`, in metres.
+    :return: Hydraulic diameter :math:`d_\mathrm{h} = 4A/P`, in metres.
     """
     if width <= 0.0 or height <= 0.0:
         raise ValueError("'width' and 'height' must be positive.")
@@ -256,10 +256,10 @@ def reflection_factor(
 
     .. math::
 
-       r = \frac{H_{12} - H_I}{H_R - H_{12}} \, e^{+2jk_0x_1}
+       r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}} \, e^{+2jk_0x_1}
 
     with the incident- and reflected-wave transfer functions
-    :math:`H_I = e^{-jk_0s}` (Eq. (D.5)) and :math:`H_R = e^{+jk_0s}`
+    :math:`H_\mathrm{I} = e^{-jk_0s}` (Eq. (D.5)) and :math:`H_\mathrm{R} = e^{+jk_0s}`
     (Eq. (D.6)), ``s`` the microphone spacing and ``x1`` the distance from
     the sample to the **farther** microphone (Clause 7.7).
 
@@ -348,7 +348,7 @@ def mic_calibration_factor(
 ) -> Complex:
     r"""Microphone-mismatch calibration factor ``Hc`` (ISO 10534-2, Eq. (10)).
 
-    :math:`H_c = \sqrt{H_{12}^{I} / H_{12}^{II}}` from a transfer function measured on an
+    :math:`H_\mathrm{c} = \sqrt{H_{12}^{I} / H_{12}^{II}}` from a transfer function measured on an
     absorptive specimen in the standard configuration (I) and with the two
     microphones physically interchanged (II) - the cabling to the analyser is
     **not** swapped (Clause 7.5.2).
@@ -367,7 +367,7 @@ def apply_mic_calibration(
 ) -> Complex:
     r"""Apply the microphone calibration factor (ISO 10534-2, Eq. (13)).
 
-    :math:`H_{12} = H_{12,\text{uncorrected}} / H_c`.
+    :math:`H_{12} = H_{12,\text{uncorrected}} / H_\mathrm{c}`.
 
     :param h12_uncorrected: Uncorrected measured transfer function.
     :param calibration_factor: Calibration factor ``Hc`` from
@@ -389,11 +389,11 @@ def plane_wave_frequency_range(
     r"""Working plane-wave frequency range ``(f_l, f_u)`` (ISO 10534-2, 4.2-4.5).
 
     The upper limit is the smaller of the microphone-spacing bound
-    :math:`f_u s < 0.45 c_0` (Eq. (4)) and, when the tube ``diameter`` is
-    given, the cut-on bound :math:`f_u d < 0.58 c_0` for a circular tube
-    (Eq. (2)) or :math:`f_u d < 0.50 c_0` for a rectangular tube (Eq. (3)).
+    :math:`f_\mathrm{u} s < 0.45 c_0` (Eq. (4)) and, when the tube ``diameter`` is
+    given, the cut-on bound :math:`f_\mathrm{u} d < 0.58 c_0` for a circular tube
+    (Eq. (2)) or :math:`f_\mathrm{u} d < 0.50 c_0` for a rectangular tube (Eq. (3)).
     The lower limit uses the Clause 4.2 guideline that the spacing exceed
-    5 % of the wavelength, i.e. :math:`f_l = c_0 / (20 s)`.
+    5 % of the wavelength, i.e. :math:`f_\mathrm{l} = c_0 / (20 s)`.
 
     :param spacing: Microphone spacing ``s``, in metres.
     :param speed_of_sound: Speed of sound ``c0``, in metres per second.

@@ -104,8 +104,8 @@ _STRINGS: dict[str, str] = {
     "Fluctuation strength $F$ = {f} vacil": "Intensidad de fluctuación $F$ = {f} vacil",
     "Psychoacoustic annoyance PA = {pa} ($N_5$ = {n5} sone)": "Molestia psicoacústica PA = {pa} ($N_5$ = {n5} sonios)",
     r"decisive $\Delta L$ = {da} dB @ {df} Hz": r"decisiva $\Delta L$ = {da} dB @ {df} Hz",
-    r"tone level $L_\mathrm{pt}$": r"nivel del tono $L_\mathrm{pt}$",
-    r"masking noise $L_\mathrm{pn}$ (critical band)": r"ruido enmascarante $L_\mathrm{pn}$ (banda crítica)",
+    r"tone level $L_{p\mathrm{t}}$": r"nivel del tono $L_{p\mathrm{t}}$",
+    r"masking noise $L_{p\mathrm{n}}$ (critical band)": r"ruido enmascarante $L_{p\mathrm{n}}$ (banda crítica)",
     r"decisive $\Delta L_{{\mathrm{{ta}}}}$ = {da} dB @ {df} Hz": r"decisiva $\Delta L_{{\mathrm{{ta}}}}$ = {da} dB @ {df} Hz",
     "Sound pressure level [dB]": "Nivel de presión acústica [dB]",
     "ISO 1996-2 tone-audibility analysis": "Análisis de audibilidad tonal ISO 1996-2",
@@ -844,7 +844,7 @@ def plot_tone_audibility_levels(
             [f1[i], f2[i]], [lg[i], lg[i]],
             color=_C_MUTED if not is_dec else _C_SECONDARY,
             lw=2.0 if is_dec else 1.2, solid_capstyle="round", zorder=2,
-            label=_t(r"masking noise $L_\mathrm{pn}$ (critical band)", language)
+            label=_t(r"masking noise $L_{p\mathrm{n}}$ (critical band)", language)
             if i == 0 else None,
         )
 
@@ -861,7 +861,7 @@ def plot_tone_audibility_levels(
     kwargs.setdefault("linestyle", "none")
     ax.plot(
         freqs, lt, color=_C_PRIMARY, markeredgecolor=_C_EDGE, zorder=4,
-        label=_t(r"tone level $L_\mathrm{pt}$", language), **kwargs,
+        label=_t(r"tone level $L_{p\mathrm{t}}$", language), **kwargs,
     )
     ax.plot(
         [freqs[decisive]], [lt[decisive]], marker="o", linestyle="none",

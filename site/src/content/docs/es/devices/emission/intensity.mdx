@@ -215,7 +215,7 @@ De aquí en adelante se repiten tres símbolos, deducidos en *El margen sobre el
 índice residual*, más abajo: $\delta_{pI0}$ es el índice presión-intensidad
 **residual**, el suelo de error de fase de la cadena sonda-espaciador-analizador;
 $K$ es el factor de sesgo que permite el grado (10 dB en ingeniería, 7 dB en
-inspección); y $L_d = \delta_{pI0} - K$ es la **capacidad dinámica**, el mayor
+inspección); y $L_\mathrm{d} = \delta_{pI0} - K$ es la **capacidad dinámica**, el mayor
 índice de campo que el instrumento puede permitirse con ese grado.
 
 Antes que nada, ISO 9614-1 plantea una pregunta sobre el *campo* y no sobre
@@ -311,7 +311,7 @@ fi.plot(dynamic_capability=ld)   # F2/F3 por banda frente a Ld, F4 en eje gemelo
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_es.svg" alt="Indicadores de campo de ISO 9614-1 de un barrido de diez posiciones sobre seis bandas de octava: F2 y F3 suben hacia baja frecuencia al volverse reactivo el campo, cruzando la línea discontinua de capacidad dinámica Ld en 125 Hz, donde F3 además sube por encima de F2, con la no uniformidad del campo F4 dibujada como barras en un eje gemelo" width="88%" />
 
 *$F_2$ sube hacia baja frecuencia al volverse reactivo el campo y en 125 Hz
-cruza la capacidad dinámica del instrumento $L_d = \delta_{pI0} - K$: esa banda
+cruza la capacidad dinámica del instrumento $L_\mathrm{d} = \delta_{pI0} - K$: esa banda
 falla el criterio 1, y ningún promediado lo arregla — pide un espaciador mayor,
 otra superficie o una sala más silenciosa. Que $F_3$ suba por encima de $F_2$
 en la misma banda revela intensidad parcial entrante (negativa), y las barras
@@ -398,7 +398,7 @@ $$
 
 Un margen de 10 dB mantiene el sesgo dentro de unos 0,5 dB y uno de 7 dB
 dentro de aproximadamente 1 dB; son precisamente los factores de sesgo $K$
-de ISO 9614, y la **capacidad dinámica** $L_d = \delta_{pI0} - K$ es el mayor
+de ISO 9614, y la **capacidad dinámica** $L_\mathrm{d} = \delta_{pI0} - K$ es el mayor
 índice de campo que el instrumento puede tolerar para un grado de precisión
 dado. Léelo como un presupuesto: cada decibelio que sube el $\delta_{pI}$ del
 campo consume un decibelio de margen, y cuando $\delta_{pI}$ alcanza
@@ -444,11 +444,11 @@ uso**.
 Es la única comprobación que no necesita banco y la que caza el error que ningún
 banco puede ver. Coloca la sonda sobre la superficie de medición, con el eje
 normal, en una posición donde la intensidad supere la media de la superficie;
-registra $I_n$ en todas las bandas. Gira la sonda **180° alrededor de un eje
+registra $I_\mathrm{n}$ en todas las bandas. Gira la sonda **180° alrededor de un eje
 normal al eje de medición**, dejando el centro acústico en el mismo sitio — lo
 que en la práctica significa montarla en un trípode en vez de sostenerla a mano
 — y mide otra vez. Para que el sistema de medición sea aceptable, en la banda de
-nivel máximo **los dos valores de $I_n$ deben tener signos opuestos y los dos
+nivel máximo **los dos valores de $I_\mathrm{n}$ deben tener signos opuestos y los dos
 niveles de intensidad deben diferir menos de 1,5 dB**. Los dos modos de fallo se
 leen como diagnóstico: signos iguales significan que los canales están cruzados
 o que uno está invertido, y una diferencia de más de 1,5 dB significa que la
@@ -616,7 +616,7 @@ eleva la presión sin transportar energía hacia fuera. Por eso ISO 9614-1
 mantiene la superficie de medición a más de 0,5 m de la fuente en promedio, y
 por eso, cuando un barrido no cumple el criterio de capacidad dinámica,
 alejar la superficie o añadir absorción a la sala suele bajar $F_2$ por
-debajo de $L_d$ con menos coste que un hardware mejor.
+debajo de $L_\mathrm{d}$ con menos coste que un hardware mejor.
 
 ### Elegir el espaciador
 

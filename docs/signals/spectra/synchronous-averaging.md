@@ -216,9 +216,9 @@ $N$.
 
 ## 4. Non-integer samples per period
 
-When $f_s T$ is an integer, the period boundaries fall on samples, the blocks
+When $f_\mathrm{s} T$ is an integer, the period boundaries fall on samples, the blocks
 are sliced directly, and a noiseless periodic signal is recovered to machine
-precision (`interpolated` is `False`). When $f_s T$ is not an integer the
+precision (`interpolated` is `False`). When $f_\mathrm{s} T$ is not an integer the
 boundaries fall between samples; each block is then aligned to a common
 integer grid by the band-limited fractional delay of
 [`fractional_delay`](test-signals.md), and the waveform is recovered within
@@ -274,7 +274,7 @@ average (Eq. 8, magnitude Eq. 9) in `comb_filter_response`, the square-root
 noise-reduction law reported as `noise_reduction_db` and `amplitude_snr_gain`,
 and the choice of $N$ that places a comb node on an interfering order,
 following the paper's own 32.05-order example. `time_synchronous_average` also
-implements the band-limited fractional-delay alignment used when $f_s T$ is not
+implements the band-limited fractional-delay alignment used when $f_\mathrm{s} T$ is not
 an integer.
 
 **Not covered.** Synchronous averaging needs a period it is given. Finding that

@@ -781,7 +781,7 @@ L 705.583125 77.260398
      </g>
     </g>
     <g id="text_11">
-     <!-- Normalized radiation impedance $Z_r / \rho c S$ -->
+     <!-- Normalized radiation impedance $Z_\mathrm{r} / \rho c S$ -->
      <g transform="translate(14.8 302.415781) rotate(-90) scale(0.1 -0.1)">
       <defs>
        <path id="DejaVuSans-31" d="M 628 4666 
@@ -1083,23 +1083,6 @@ L 738 4134
 L 838 4666 
 z
 " transform="scale(0.015625)"/>
-       <path id="DejaVuSans-Oblique-55" d="M 2853 2969 
-Q 2766 3016 2653 3041 
-Q 2541 3066 2413 3066 
-Q 1953 3066 1609 2717 
-Q 1266 2369 1153 1784 
-L 800 0 
-L 225 0 
-L 909 3500 
-L 1484 3500 
-L 1375 2956 
-Q 1603 3259 1920 3421 
-Q 2238 3584 2597 3584 
-Q 2691 3584 2781 3573 
-Q 2872 3563 2963 3538 
-L 2853 2969 
-z
-" transform="scale(0.015625)"/>
        <path id="DejaVuSans-12" d="M 1625 4666 
 L 2156 4666 
 L 531 -594 
@@ -1221,7 +1204,7 @@ z
       <use xlink:href="#DejaVuSans-48" transform="translate(1570.216797 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1631.740234 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(1663.527344 0.015625)"/>
-      <use xlink:href="#DejaVuSans-Oblique-55" transform="translate(1732.033203 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-55" transform="translate(1732.033203 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-12" transform="translate(1763.546875 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-355" transform="translate(1797.238281 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-46" transform="translate(1860.714844 0.015625)"/>

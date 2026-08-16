@@ -7,7 +7,7 @@ standards' own analog definitions, clean-room:
 
 * **ISO 8041-1:2017** - the authoritative *master* definition of every
   frequency weighting.  A single cascade
-  :math:`H(s) = H_h(s) H_l(s) H_t(s) H_s(s)`
+  :math:`H(s) = H_\mathrm{h}(s) H_\mathrm{l}(s) H_\mathrm{t}(s) H_\mathrm{s}(s)`
   (Formula (5)) of second-order band-limiting Butterworth sections
   (Formulae (1)/(2)), an acceleration-velocity transition (Formula (3)) and an
   upward step (Formula (4)) realises all nine weightings from the one Table 3
@@ -41,7 +41,7 @@ standards' own analog definitions, clean-room:
   EAV ``9.1`` / ELV ``21`` m/s^1.75).  The hand-arm ``A(8)`` is based on the
   ISO 5349-1 vector total ``a_hv`` (Annex, Part A, point 1); the whole-body
   ``A(8)`` is based on the *highest* of the frequency-weighted axis values
-  :math:`1.4 a_{wx}`, :math:`1.4 a_{wy}`, :math:`a_{wz}` (Annex, Part B,
+  :math:`1.4 a_{\mathrm{w}x}`, :math:`1.4 a_{\mathrm{w}y}`, :math:`a_{\mathrm{w}z}` (Annex, Part B,
   point 1; see :func:`wbv_exposure_basis`), not on the ISO 2631-1 Eq. (10)
   vector total.
 
@@ -405,7 +405,7 @@ def weighted_acceleration(
     r"""Weighted r.m.s. acceleration from a band spectrum (ISO 2631-1
     Eq. (9)).
 
-    :math:`a_w = \sqrt{\sum_i (W_i a_i)^2}` with the per-band weighting
+    :math:`a_\mathrm{w} = \sqrt{\sum_i (W_i a_i)^2}` with the per-band weighting
     factors :math:`W_i` of ISO 8041-1 evaluated at the band centres
     (ISO 5349-1 Eq. (A.1) is the identical construction for the hand-arm
     weighting ``Wh``).
@@ -528,7 +528,7 @@ def mtvv(signal: ArrayLike, fs: float, *, integration_time: float = 1.0) -> floa
 def vibration_dose_value(signal: ArrayLike, fs: float) -> float:
     r"""Vibration dose value ``VDV`` (ISO 2631-1 Eq. (5)).
 
-    :math:`\mathrm{VDV} = \left( \int a_w(t)^4 \, dt \right)^{1/4}`, in
+    :math:`\mathrm{VDV} = \left( \int a_\mathrm{w}(t)^4 \, dt \right)^{1/4}`, in
     m/s^1.75; more sensitive to peaks than the r.m.s. value.
 
     :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
@@ -545,7 +545,7 @@ def motion_sickness_dose_value(signal: ArrayLike, fs: float) -> float:
     r"""Motion sickness dose value ``MSDV`` (ISO 2631-1 clause 9; 8041-1
     3.1.2.5).
 
-    :math:`\mathrm{MSDV} = \left( \int a_w(t)^2 \, dt \right)^{1/2}`, in
+    :math:`\mathrm{MSDV} = \left( \int a_\mathrm{w}(t)^2 \, dt \right)^{1/2}`, in
     m/s^1.5; the ``Wf``-weighted signal is the intended input.
 
     :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
@@ -599,12 +599,12 @@ def vibration_total_value(
 ) -> float:
     r"""Vibration total value ``a_v`` / ``a_hv`` (ISO 2631-1 Eq. (10)).
 
-    :math:`a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}` over the (up to three)
+    :math:`a_\mathrm{v} = \sqrt{\sum_j k_j^2 a_{\mathrm{w}j}^2}` over the (up to three)
     axis-weighted r.m.s. accelerations.  With ``k = None`` the unweighted
     vector sum of ISO 5349-1 Eq. (1) (``a_hv``, all :math:`k = 1`) is
     returned.
 
-    :param components: Axis-weighted r.m.s. accelerations :math:`a_{wj}`,
+    :param components: Axis-weighted r.m.s. accelerations :math:`a_{\mathrm{w}j}`,
         in m/s2.
     :param k: Optional per-axis multiplying factors :math:`k_j`
         (ISO 2631-1 7.2.3); ``None`` uses unity for every axis.
@@ -626,10 +626,10 @@ def vibration_total_value(
 def wbv_exposure_basis(a_wx: float, a_wy: float, a_wz: float) -> float:
     r"""Whole-body exposure basis of Directive 2002/44/EC (Annex, Part B).
 
-    :math:`\max(1.4 a_{wx}, 1.4 a_{wy}, a_{wz})` - the Directive bases
+    :math:`\max(1.4 a_{\mathrm{w}x}, 1.4 a_{\mathrm{w}y}, a_{\mathrm{w}z})` - the Directive bases
     the whole-body daily exposure ``A(8)`` on the *highest* of the
-    frequency-weighted axis values :math:`1.4 a_{wx}`,
-    :math:`1.4 a_{wy}`, :math:`a_{wz}` for a seated or standing worker
+    frequency-weighted axis values :math:`1.4 a_{\mathrm{w}x}`,
+    :math:`1.4 a_{\mathrm{w}y}`, :math:`a_{\mathrm{w}z}` for a seated or standing worker
     (Annex, Part B, point 1, with the ISO 2631-1 clause 7.2.3
     multiplying factors), **not** on the ISO 2631-1 Eq. (10) vector total
     ``a_v``.  Feed the returned dominant-axis value to
@@ -641,7 +641,7 @@ def wbv_exposure_basis(a_wx: float, a_wy: float, a_wz: float) -> float:
     :param a_wy: ``Wd``-weighted r.m.s. acceleration on the y axis, in m/s2.
     :param a_wz: ``Wk``-weighted r.m.s. acceleration on the z axis, in m/s2.
     :return: The dominant-axis value
-        :math:`\max(1.4 a_{wx}, 1.4 a_{wy}, a_{wz})`, in m/s2.
+        :math:`\max(1.4 a_{\mathrm{w}x}, 1.4 a_{\mathrm{w}y}, a_{\mathrm{w}z})`, in m/s2.
     :raises ValueError: for a negative or non-finite axis value.
     """
     values = (float(a_wx), float(a_wy), float(a_wz))
@@ -653,7 +653,7 @@ def wbv_exposure_basis(a_wx: float, a_wy: float, a_wz: float) -> float:
 def daily_exposure(total_value: float, duration_s: float) -> float:
     r"""Daily exposure ``A(8)`` for one operation (ISO 5349-1 Eq. (2)).
 
-    :math:`A(8) = a_{hv} \sqrt{T / T_0}` with :math:`T_0 = 8` h.  The
+    :math:`A(8) = a_\mathrm{hv} \sqrt{T / T_0}` with :math:`T_0 = 8` h.  The
     identical form gives the whole-body ``A(8)`` of Directive 2002/44/EC,
     whose magnitude is the Annex Part B dominant-axis value (see
     :func:`wbv_exposure_basis`) rather than a vector total.
@@ -695,9 +695,9 @@ def hav_daily_exposure(
 ) -> float:
     r"""Daily exposure ``A(8)`` for several operations (ISO 5349-1 Eq. (3)).
 
-    :math:`A(8) = \sqrt{(1/T_0) \sum_i a_{hvi}^2 T_i}`.
+    :math:`A(8) = \sqrt{(1/T_0) \sum_i a_{\mathrm{hv}i}^2 T_i}`.
 
-    :param total_values: Vibration total value :math:`a_{hvi}` per
+    :param total_values: Vibration total value :math:`a_{\mathrm{hv}i}` per
         operation, in m/s2.
     :param durations_s: Duration :math:`T_i` per operation, in seconds.
     :return: The daily exposure ``A(8)``, in m/s2.
@@ -721,11 +721,11 @@ def energy_equivalent_acceleration(
 ) -> float:
     r"""Energy-equivalent weighted acceleration (ISO 2631-1 Eq. (B.3)).
 
-    :math:`a_{w,e} = \sqrt{\sum a_{wi}^2 T_i / \sum T_i}`.
+    :math:`a_\mathrm{w,e} = \sqrt{\sum a_{\mathrm{w}i}^2 T_i / \sum T_i}`.
 
-    :param magnitudes: Weighted r.m.s. magnitudes :math:`a_{wi}`, in m/s2.
+    :param magnitudes: Weighted r.m.s. magnitudes :math:`a_{\mathrm{w}i}`, in m/s2.
     :param durations_s: Duration :math:`T_i` per period, in seconds.
-    :return: The energy-equivalent magnitude :math:`a_{w,e}`, in m/s2.
+    :return: The energy-equivalent magnitude :math:`a_\mathrm{w,e}`, in m/s2.
     :raises ValueError: if the inputs differ in length, are empty, or the total
         duration is zero.
     """
@@ -748,12 +748,12 @@ def hav_vwf_lifetime_years(a8: float) -> float:
     r"""Years to 10 % vibration-white-finger prevalence (ISO 5349-1
     Eq. (C.1)).
 
-    :math:`D_y = 31.8 \, A(8)^{-1.06}` - the group-mean lifetime exposure
+    :math:`D_\mathrm{y} = 31.8 \, A(8)^{-1.06}` - the group-mean lifetime exposure
     that produces finger blanching in 10 % of an exposed group
     (informative Annex C).
 
     :param a8: Daily vibration exposure ``A(8)``, in m/s2 (> 0).
-    :return: The lifetime exposure duration :math:`D_y`, in years.
+    :return: The lifetime exposure duration :math:`D_\mathrm{y}`, in years.
     :raises ValueError: if ``a8`` is not positive.
     """
     a = float(a8)

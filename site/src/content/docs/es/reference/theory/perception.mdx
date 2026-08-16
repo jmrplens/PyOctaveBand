@@ -208,7 +208,7 @@ Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudn
 
 El oído analiza el sonido en **bandas críticas**: regiones de frecuencia dentro de las cuales la energía se suma antes de formarse la sonoridad. La **escala Bark** transforma la frecuencia en razón de banda crítica $z$, de 0 a 24 Bark, e ISO 532-1:2017 muestrea la sonoridad específica $N'(z)$ en pasos de 0,1 Bark (240 valores). La implementación es un port de sala limpia del programa de referencia normativo de la norma (Anexo A.4) y procede por etapas:
 
-1. **Niveles de tercio de octava**: 28 bandas, de 25 Hz a 12,5 kHz (el banco de filtros del Anexo A a 48 kHz, Tablas A.1/A.2). Para sonidos variables en el tiempo, las salidas de banda al cuadrado se suavizan con tres paso bajos en cascada con $\tau = 2/(3 f_c)$ ($f_c$ limitada a 1 kHz) y se muestrean cada 2 ms.
+1. **Niveles de tercio de octava**: 28 bandas, de 25 Hz a 12,5 kHz (el banco de filtros del Anexo A a 48 kHz, Tablas A.1/A.2). Para sonidos variables en el tiempo, las salidas de banda al cuadrado se suavizan con tres paso bajos en cascada con $\tau = 2/(3 f_\mathrm{c})$ ($f_\mathrm{c}$ limitada a 1 kHz) y se muestrean cada 2 ms.
 2. **Agrupación en baja frecuencia**: las 11 bandas hasta 250 Hz reciben las correcciones isofónicas de la Tabla A.3 y se suman en las tres primeras bandas críticas (25–80, 100–160, 200–250 Hz).
 3. **Transmisión a0**: la corrección de transferencia del oído externo/medio de la Tabla A.4 (más la diferencia de campo difuso de la Tabla A.5 con `field='diffuse'`) produce los niveles de banda crítica $L_E$.
 4. **Sonoridad núcleo**: cada una de las 20 bandas críticas se transforma con los niveles de umbral en silencio $L_{TQ}$ de la Tabla A.6 (tras la adaptación de ancho de banda DCB de la Tabla A.7):
@@ -269,7 +269,7 @@ la verdad.
 
 ### Sonoridad de Moore-Glasberg (ISO 532-2:2017, ISO 532-3:2023)
 
-En lugar de las bandas críticas fijas de Zwicker, el modelo de Moore-Glasberg forma un **patrón de excitación** continuo sobre la escala del número ERB («Cam») usando filtros auditivos **exponenciales redondeados (roex)** dependientes del nivel. En función de la desviación de frecuencia normalizada $g = |f - f_c| / f_c$ respecto a un filtro centrado en $f_c$, la ponderación del filtro es
+En lugar de las bandas críticas fijas de Zwicker, el modelo de Moore-Glasberg forma un **patrón de excitación** continuo sobre la escala del número ERB («Cam») usando filtros auditivos **exponenciales redondeados (roex)** dependientes del nivel. En función de la desviación de frecuencia normalizada $g = |f - f_\mathrm{c}| / f_\mathrm{c}$ respecto a un filtro centrado en $f_\mathrm{c}$, la ponderación del filtro es
 
 $$
 W(g) = (1 + p\ g)\ e^{-p\ g}
@@ -411,24 +411,24 @@ del apartado 10. El ancho de banda crítico centrado en un tono a $f$ es
 (Fórmula 2):
 
 $$
-\Delta f_c = 25{,}0 + 75{,}0 \left(1{,}0 + 1{,}4 \left(\tfrac{f}{1000}\right)^2\right)^{0{,}69} \ \text{Hz}
+\Delta f_\mathrm{c} = 25{,}0 + 75{,}0 \left(1{,}0 + 1{,}4 \left(\tfrac{f}{1000}\right)^2\right)^{0{,}69} \ \text{Hz}
 $$
 
-Los bordes de banda se colocan **aritméticamente** para $f \le 500$ Hz (Fórmulas 4–5): $f_{1,2} = f \mp \Delta f_c / 2$, y **geométricamente** por encima (Fórmulas 7–8): $f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_c$.
+Los bordes de banda se colocan **aritméticamente** para $f \le 500$ Hz (Fórmulas 4–5): $f_{1,2} = f \mp \Delta f_\mathrm{c} / 2$, y **geométricamente** por encima (Fórmulas 7–8): $f_1 = -\Delta f_\mathrm{c}/2 + \sqrt{\Delta f_\mathrm{c}^2 + 4 f^2}/2$, $f_2 = f_1 + \Delta f_\mathrm{c}$.
 
-**TNR** (apartado 11). La banda del tono abarca los mínimos espectrales a ambos lados del pico dentro del 15 % de $\Delta f_c$ (apartado 11.2). A la potencia del tono se le resta la recta que conecta los bins de los bordes de banda (Fórmula 9): sobre los $N$ bins de la banda del tono, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. La potencia del ruido enmascarante es la potencia restante de la banda crítica reescalada al ancho de banda crítico completo (Fórmula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_c / \Delta f_{\text{band}}$, y $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Fórmula 11). El criterio de prominencia (Fórmulas 12–13) es
+**TNR** (apartado 11). La banda del tono abarca los mínimos espectrales a ambos lados del pico dentro del 15 % de $\Delta f_\mathrm{c}$ (apartado 11.2). A la potencia del tono se le resta la recta que conecta los bins de los bordes de banda (Fórmula 9): sobre los $N$ bins de la banda del tono, $P_t = \sum_k P_k - (P_{\text{lo}} + P_{\text{hi}})\ N/2$. La potencia del ruido enmascarante es la potencia restante de la banda crítica reescalada al ancho de banda crítico completo (Fórmula 10): $P_n = (P_{\text{band}} - P_t) \cdot \Delta f_\mathrm{c} / \Delta f_{\text{band}}$, y $\mathrm{TNR} = 10\log_{10}(P_t/P_n)$ (Fórmula 11). El criterio de prominencia (Fórmulas 12–13) es
 
 $$
-\mathrm{TNR}_{\text{crit}} = \begin{cases} 8{,}0 + 8{,}33 \log_{10}(1000/f_t) \ \text{dB} & f_t < 1\ \text{kHz} \\ 8{,}0 \ \text{dB} & f_t \ge 1\ \text{kHz} \end{cases}
+\mathrm{TNR}_{\text{crit}} = \begin{cases} 8{,}0 + 8{,}33 \log_{10}(1000/f_\mathrm{t}) \ \text{dB} & f_\mathrm{t} < 1\ \text{kHz} \\ 8{,}0 \ \text{dB} & f_\mathrm{t} \ge 1\ \text{kHz} \end{cases}
 $$
 
-**PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_t \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_t \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_t)$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
+**PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_\mathrm{t} \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_\mathrm{t} \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_\mathrm{t})$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
 
 *El criterio de TNR dibujado en lugar de evaluado, sobre el rango de interés de
 89,1 Hz – 11,2 kHz, con un tono evaluado encima. Como el criterio vale
-$8{,}0 + 8{,}33\log_{10}(1000/f_t)$ por debajo de 1 kHz y es constante por
+$8{,}0 + 8{,}33\log_{10}(1000/f_\mathrm{t})$ por debajo de 1 kHz y es constante por
 encima, una misma relación tono-ruido se juzga contra un umbral distinto en
 cada frecuencia: el tono del ejemplo supera en 2,1 dB su umbral de 13,0 dB a
 250 Hz, mientras que un tono de 10 dB sería prominente en cualquier punto por
@@ -447,10 +447,10 @@ $$
 El ruido de fondo estacionario multiplica el $m$ de cada banda por la razón de intensidades (el término de ruido):
 
 $$
-m'_k = m_k \cdot \frac{I_k}{I_k + I_{n,k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
+m'_k = m_k \cdot \frac{I_k}{I_k + I_{\mathrm{n},k}} = \frac{m_k}{1 + 10^{-\mathrm{SNR}_k/10}}
 $$
 
-y cuando se conocen los niveles absolutos por banda, la corrección completa $m'_k = m_k I_k / (I_k + I_{am,k} + I_{rt,k} + I_{n,k})$ añade la intensidad de enmascaramiento auditivo $I_{am,k}$ (desde la banda de octava inmediatamente inferior, Tabla A.2) y el umbral absoluto de recepción $I_{rt,k}$ (Tabla A.3). Esos dos son términos de *nivel absoluto*, así que solo significan algo cuando la cadena está calibrada en dB SPL en la posición de escucha y la fuente se excita a un nivel de habla definido. Eso parte la medida en dos: una respuesta al impulso sin calibrar da $m$, y con un espectro de fondo medido aparte da además el término de ruido, pero los términos de enmascaramiento y de umbral de recepción se dejan fuera en lugar de adivinarlos; una medida calibrada con la fuente radiando el espectro de habla normalizado a la altura de la boca da la corrección completa. Es también la razón por la que una lectura STIPA directa de un sonómetro de mano y un STI indirecto obtenido de una respuesta al impulso de la misma sala pueden discrepar cuando nunca se fijó el nivel de la fuente. Cada $m$ corregido se transforma en una **SNR efectiva**, recortada al rango de ±15 dB donde la inteligibilidad varía realmente, y después en un índice de transmisión (A.5.4/A.5.5):
+y cuando se conocen los niveles absolutos por banda, la corrección completa $m'_k = m_k I_k / (I_k + I_{\mathrm{am},k} + I_{\mathrm{rt},k} + I_{\mathrm{n},k})$ añade la intensidad de enmascaramiento auditivo $I_{\mathrm{am},k}$ (desde la banda de octava inmediatamente inferior, Tabla A.2) y el umbral absoluto de recepción $I_{\mathrm{rt},k}$ (Tabla A.3). Esos dos son términos de *nivel absoluto*, así que solo significan algo cuando la cadena está calibrada en dB SPL en la posición de escucha y la fuente se excita a un nivel de habla definido. Eso parte la medida en dos: una respuesta al impulso sin calibrar da $m$, y con un espectro de fondo medido aparte da además el término de ruido, pero los términos de enmascaramiento y de umbral de recepción se dejan fuera en lugar de adivinarlos; una medida calibrada con la fuente radiando el espectro de habla normalizado a la altura de la boca da la corrección completa. Es también la razón por la que una lectura STIPA directa de un sonómetro de mano y un STI indirecto obtenido de una respuesta al impulso de la misma sala pueden discrepar cuando nunca se fijó el nivel de la fuente. Cada $m$ corregido se transforma en una **SNR efectiva**, recortada al rango de ±15 dB donde la inteligibilidad varía realmente, y después en un índice de transmisión (A.5.4/A.5.5):
 
 $$
 \mathrm{SNR}_{\mathrm{eff}} = 10 \log_{10} \frac{m}{1 - m}\ \text{dB}, \qquad \mathrm{TI} = \frac{\mathrm{SNR}_{\mathrm{eff}} + 15}{30}
@@ -622,10 +622,10 @@ ISO
 la desviación mediana respecto a los 18 años es (apartado 4.2, Tabla 1)
 
 $$
-\Delta H_{md} = a\ (Y - 18)^b \ \text{dB},
+\Delta H_\mathrm{md} = a\ (Y - 18)^b \ \text{dB},
 $$
 
-y cualquier fractil sigue un modelo gaussiano bilateral (apartado 4.4), $\Delta H_Q = \Delta H_{md} + z(Q)\ s$, usando la dispersión superior $s_u$ para $z \ge 0$ (peor que la mediana) y la inferior $s_l$ en caso contrario, cada una un polinomio de grado 5 en $Y - 18$ por sexo y frecuencia (apartado 4.3, Tablas 2–5). A los 18 años toda desviación es cero por construcción. Las fórmulas están establecidas hasta los 80 años a 2 kHz y por debajo, y hasta los 70 años por encima; más allá la evaluación es una extrapolación. Valores de referencia: a los 60 años las medianas evalúan a 7,85 dB (hombre, 1 kHz), 20,21 dB (hombre, 4 kHz) y 15,32 dB (mujer, 4 kHz), reproduciendo la fórmula de la Tabla 1 a $10^{-3}$.
+y cualquier fractil sigue un modelo gaussiano bilateral (apartado 4.4), $\Delta H_Q = \Delta H_\mathrm{md} + z(Q)\ s$, usando la dispersión superior $s_\mathrm{u}$ para $z \ge 0$ (peor que la mediana) y la inferior $s_\mathrm{l}$ en caso contrario, cada una un polinomio de grado 5 en $Y - 18$ por sexo y frecuencia (apartado 4.3, Tablas 2–5). A los 18 años toda desviación es cero por construcción. Las fórmulas están establecidas hasta los 80 años a 2 kHz y por debajo, y hasta los 70 años por encima; más allá la evaluación es una extrapolación. Valores de referencia: a los 60 años las medianas evalúan a 7,85 dB (hombre, 1 kHz), 20,21 dB (hombre, 4 kHz) y 15,32 dB (mujer, 4 kHz), reproduciendo la fórmula de la Tabla 1 a $10^{-3}$.
 
 Consulta la [guía de umbral de audición](/phonometry/es/perception/hearing/hearing-threshold/) para su uso.
 
@@ -640,10 +640,10 @@ población expuesta a ruido. El desplazamiento mediano inducido por ruido
 (NIPTS) para 10–40 años de exposición es (apartado 6.3.1, Fórmula 2, Tabla 1):
 
 $$
-N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{año},
+N_{50} = \big[ u + v \log_{10}(t/t_0) \big]\ (L_\mathrm{EX,8h} - L_0)^2, \qquad t_0 = 1\ \text{año},
 $$
 
-cuadrático en el exceso sobre el nivel de inicio dependiente de la frecuencia $L_0$ (75 dB a 4 kHz, la banda más sensible, hasta 93 dB a 500 Hz) y cero por debajo; para menos de 10 años escala como $\log_{10}(t+1)/\log_{10} 11$ (Fórmula 3). Los fractiles añaden la dispersión, $N_Q = N_{50} + z\ d_{u,l}$ con $d = (X + Y \log_{10} t)(L_{EX,8h} - L_0)^2$ (apartado 6.3.2, Fórmulas 4–7, Tablas 2/3), acotada en cero. El `fractile` de la biblioteca cuenta la fracción de la población con el desplazamiento *menor*, así que `fractile=0.9` es el decil más susceptible (rango fiable 0,05–0,95); la $Q$ de la propia ISO 1999 corre al revés, contando el porcentaje con peor audición, así que ese mismo decil es allí $Q = 10\ \%$, igual que en los encabezados de columna del Anexo D. El nivel de umbral de audición asociado a edad y ruido (HTLAN) combina el NIPTS con la componente de edad de ISO 7029 al mismo fractil mediante la suma comprimida (apartado 6.1, Fórmula 1):
+cuadrático en el exceso sobre el nivel de inicio dependiente de la frecuencia $L_0$ (75 dB a 4 kHz, la banda más sensible, hasta 93 dB a 500 Hz) y cero por debajo; para menos de 10 años escala como $\log_{10}(t+1)/\log_{10} 11$ (Fórmula 3). Los fractiles añaden la dispersión, $N_Q = N_{50} + z\ d_{u,l}$ con $d = (X + Y \log_{10} t)(L_\mathrm{EX,8h} - L_0)^2$ (apartado 6.3.2, Fórmulas 4–7, Tablas 2/3), acotada en cero. El `fractile` de la biblioteca cuenta la fracción de la población con el desplazamiento *menor*, así que `fractile=0.9` es el decil más susceptible (rango fiable 0,05–0,95); la $Q$ de la propia ISO 1999 corre al revés, contando el porcentaje con peor audición, así que ese mismo decil es allí $Q = 10\ \%$, igual que en los encabezados de columna del Anexo D. El nivel de umbral de audición asociado a edad y ruido (HTLAN) combina el NIPTS con la componente de edad de ISO 7029 al mismo fractil mediante la suma comprimida (apartado 6.1, Fórmula 1):
 
 $$
 H' = H + N - \frac{H\ N}{120}.

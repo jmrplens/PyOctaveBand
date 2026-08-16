@@ -41,12 +41,12 @@ characteristic impedance ``rho c`` differing from the reference 400 Pa s/m; it
 is about ``+0.14 dB`` at 20 degC and is omitted by default (Bies notes the
 ``~0.1 dB`` it contributes).
 
-**Critical distance** :math:`r_c = \sqrt{Q R / (16 \pi)}` is where the direct
+**Critical distance** :math:`r_\mathrm{c} = \sqrt{Q R / (16 \pi)}` is where the direct
 and reverberant terms are equal (setting
 :math:`Q / (4 \pi r^2) = 4 / R` in Equation
 (6.43)); closer than ``rc`` the direct field dominates, farther the reverberant
 field does. Kuttruff's reverberation distance (Equation (5.44),
-:math:`r_c = \sqrt{A / (16 \pi)}` for :math:`Q = 1`) uses the Sabine
+:math:`r_\mathrm{c} = \sqrt{A / (16 \pi)}` for :math:`Q = 1`) uses the Sabine
 absorption area :math:`A = S \bar{\alpha}` in place of the room constant
 :math:`R = A / (1 - \bar{\alpha})`;
 the two coincide for a small ``alpha_bar`` and differ by the factor
@@ -66,7 +66,7 @@ between the first two whenever the source is closer to the boundary than a
 wavelength. ``source_model`` selects which of the three
 :data:`SOURCE_POWER_MODELS` is applied.
 
-**Schroeder frequency** :math:`f_s = 2000 \sqrt{T / V}` (Kuttruff Equation
+**Schroeder frequency** :math:`f_\mathrm{s} = 2000 \sqrt{T / V}` (Kuttruff Equation
 (3.44),
 ``V`` in cubic metres, ``T`` in seconds) marks the boundary between the
 modal low-frequency regime -- where discrete room modes rule and the diffuse
@@ -125,7 +125,7 @@ def critical_distance(
     room_constant: ArrayLike, *, directivity: float = 1.0
 ) -> np.ndarray | float:
     r"""Critical (reverberation) distance
-    :math:`r_c = \sqrt{Q R / (16 \pi)}`.
+    :math:`r_\mathrm{c} = \sqrt{Q R / (16 \pi)}`.
 
     The distance at which the direct and reverberant fields of
     :func:`steady_state_spl` are equal (Bies Equation (6.43) crossover;
@@ -149,7 +149,7 @@ def critical_distance(
 def schroeder_frequency(
     reverberation_time: ArrayLike, volume: float
 ) -> np.ndarray | float:
-    r"""Schroeder frequency :math:`f_s = 2000 \sqrt{T / V}`
+    r"""Schroeder frequency :math:`f_\mathrm{s} = 2000 \sqrt{T / V}`
     (Kuttruff Equation (3.44)).
 
     The frequency above which room modes overlap (on average three

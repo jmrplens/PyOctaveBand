@@ -134,8 +134,8 @@ synthesis (Secs. 4.2-4.3) uses the second lever: define the target magnitude
 $|H(f)|$, make the group delay grow in proportion to the target's power,
 
 $$
-\tau_G(f) = \tau_G(f - df) + C\,|H(f)|^2,\qquad
-C = \frac{\tau_G(f_{end}) - \tau_G(f_{start})}{\sum |H(f)|^2},
+\tau_\mathrm{G}(f) = \tau_\mathrm{G}(f - df) + C\,|H(f)|^2,\qquad
+C = \frac{\tau_\mathrm{G}(f_\mathrm{end}) - \tau_\mathrm{G}(f_\mathrm{start})}{\sum |H(f)|^2},
 $$
 
 (Eqs. (11)-(12)), integrate the group delay into a phase, and inverse-FFT.
@@ -245,11 +245,11 @@ amplifier. Mueller & Massarani confine the inversion with a band-pass
 frequency-dependent Tikhonov regularization,
 
 $$
-H_{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
+H_\mathrm{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
 $$
 
 with $\varepsilon(f)$ small inside the band to be equalized and large outside.
-In-band the equalized magnitude $|H \cdot H_{inv}|$ deviates from unity by
+In-band the equalized magnitude $|H \cdot H_\mathrm{inv}|$ deviates from unity by
 exactly $\varepsilon/(|H|^2 + \varepsilon)$ - a closed form the conformance
 suite checks bin by bin - and out-of-band the filter gain can never exceed
 $1/(2\sqrt{\varepsilon})$, the analytic maximum of $x/(x^2 + \varepsilon)$. A

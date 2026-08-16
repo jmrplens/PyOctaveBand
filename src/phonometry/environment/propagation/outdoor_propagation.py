@@ -10,16 +10,16 @@ octave-band sound pressure level is (ISO 9613-2:1996):
 
 .. math::
 
-   L_{fT}(DW) = L_W + D_c - A \tag{Eq. 3}
+   L_{fT}(DW) = L_W + D_\mathrm{c} - A \tag{Eq. 3}
 
-with :math:`L_W` the octave-band sound power level, :math:`D_c` the
+with :math:`L_W` the octave-band sound power level, :math:`D_\mathrm{c}` the
 directivity correction
 (directivity index plus a solid-angle index ``DOmega``) and ``A`` the
 octave-band attenuation, itself a sum of physical mechanisms:
 
 .. math::
 
-   A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc} \tag{Eq. 4}
+   A = A_\mathrm{div} + A_\mathrm{atm} + A_\mathrm{gr} + A_\mathrm{bar} + A_\mathrm{misc} \tag{Eq. 4}
 
 Implemented here are the four general terms of clause 7:
 
@@ -29,7 +29,7 @@ Implemented here are the four general terms of clause 7:
 * ``Agr`` ground effect, both the general per-region method of 7.3.1 with the
   Table 3 functions ``a'/b'/c'/d'`` (Eq. (9)) and the alternative simplified
   method of 7.3.2 (Eq. (10));
-* ``Abar`` screening by a barrier, :math:`D_z - A_{gr}` with the ``Dz``
+* ``Abar`` screening by a barrier, :math:`D_z - A_\mathrm{gr}` with the ``Dz``
   diffraction
   formula of Eq. (14) including the ``C2``/``C3`` factors, the pathlength
   difference ``z`` (Eq. (16)/(17)), the meteorological factor ``Kmet``
@@ -98,13 +98,13 @@ class Barrier:
         assumed to be handled separately by image sources, so
         :math:`C_2 = 40`; otherwise :math:`C_2 = 20` (Eq. (14)).
     :param lateral: When ``True`` the diffraction is around a vertical edge
-        (Eq. (13)): :math:`A_{bar} = D_z` (the ground term is not cancelled)
-        and :math:`K_{met} = 1`. Default ``False`` selects top-edge
+        (Eq. (13)): :math:`A_\mathrm{bar} = D_z` (the ground term is not cancelled)
+        and :math:`K_\mathrm{met} = 1`. Default ``False`` selects top-edge
         diffraction (Eq. (12)).
     :param line_of_sight_clear: When ``True`` the line of sight between source
         and receiver passes *above* the top edge: ISO 9613-2:1996 (text after
         Eq. (16)) then gives the path difference ``z`` a negative sign, and
-        Eq. (14) is still evaluated (with :math:`K_{met} = 1`, Eq. (18)), so
+        Eq. (14) is still evaluated (with :math:`K_\mathrm{met} = 1`, Eq. (18)), so
         ``Dz`` falls continuously from :math:`10 \log_{10} 3 = 4.8` dB at grazing
         to 0 for deeper geometries. The edge distances stay the unsigned
         geometric lengths; only the sign convention of ``z`` changes.
@@ -147,7 +147,7 @@ class PropagationGeometry:
     :param source_height: Source height ``hs`` above ground, in metres.
     :param receiver_height: Receiver height ``hr`` above ground, in metres.
     :param projected_distance: Ground-plane projected distance ``dp``, in
-        metres; ``None`` defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
+        metres; ``None`` defaults to :math:`\sqrt{d^2 - (h_\mathrm{s} - h_\mathrm{r})^2}`.
     """
 
     distance: float
@@ -195,7 +195,7 @@ class AtmosphericConditions:
 
 @dataclass(frozen=True)
 class DirectivityCorrection:
-    r"""Directivity correction :math:`D_c = D_i + D_\Omega` (Eq. (3)).
+    r"""Directivity correction :math:`D_\mathrm{c} = D_i + D_\Omega` (Eq. (3)).
 
     The two terms the standard adds to the sound power level of a point source:
     the directivity index of the source itself and the solid-angle index of the
@@ -218,8 +218,8 @@ class SourceEmission:
     Passed to :meth:`OutdoorAttenuation.report` so the prediction fiche can box
     the A-weighted downwind level at the receiver from an octave-band
     attenuation breakdown. The level is composed as
-    :math:`L_{fT}(DW) = L_W + D_c - A`
-    with the directivity correction :math:`D_c = D_i + D_\Omega`
+    :math:`L_{fT}(DW) = L_W + D_\mathrm{c} - A`
+    with the directivity correction :math:`D_\mathrm{c} = D_i + D_\Omega`
     (ISO 9613-2:1996, Eq. (3)); an optional meteorological correction ``cmet``
     is subtracted for the long-term average level (Eq. (6)).
 
@@ -234,7 +234,7 @@ class SourceEmission:
         :func:`directivity_omega` for the alternative ground method).
     :param cmet: Optional meteorological correction ``Cmet`` (dB), obtained from
         :func:`meteorological_correction`; ``None`` reports the downwind level
-        ``LfT(DW)`` directly (:math:`C_{met} = 0`).
+        ``LfT(DW)`` directly (:math:`C_\mathrm{met} = 0`).
     """
 
     sound_power_level: ArrayLike
@@ -361,7 +361,7 @@ def geometric_divergence(distance: float) -> float:
 
     .. math::
 
-       A_{div} = 20 \log_{10}(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
+       A_\mathrm{div} = 20 \log_{10}(d/d_0) + 11~\text{dB}, \qquad d_0 = 1~\text{m}
 
     The ``+11`` (:math:`= 10 \log_{10} 4\pi`) sets the sound pressure level at the
     reference distance :math:`d_0 = 1` m from an omnidirectional point source
@@ -385,11 +385,11 @@ def atmospheric_absorption(
 ) -> NDArray[np.float64]:
     r"""Attenuation due to atmospheric absorption (ISO 9613-2:1996, Eq. (8)).
 
-    :math:`A_{atm} = \alpha d` with ``alpha`` the ISO 9613-1 atmospheric
+    :math:`A_\mathrm{atm} = \alpha d` with ``alpha`` the ISO 9613-1 atmospheric
     attenuation
     coefficient (here in dB/m, from :func:`~phonometry.environment.propagation.air_absorption.air_attenuation`)
     at each octave-band midband frequency. Eq. (8) writes ``alpha`` in dB/km
-    with :math:`A_{atm} = \alpha_{\text{dB/km}} \, d / 1000`; the two forms
+    with :math:`A_\mathrm{atm} = \alpha_{\text{dB/km}} \, d / 1000`; the two forms
     are identical.
 
     ``alpha`` is evaluated at the *exact* base-10 midband frequency behind
@@ -473,22 +473,22 @@ def ground_attenuation(
 ) -> NDArray[np.float64]:
     r"""Ground attenuation by the general per-region method (7.3.1, Eq. (9)).
 
-    :math:`A_{gr} = A_s + A_r + A_m` (source, receiver and middle regions),
+    :math:`A_\mathrm{gr} = A_\mathrm{s} + A_\mathrm{r} + A_\mathrm{m}` (source, receiver and middle regions),
     each evaluated
     with the Table 3 expressions and its ground factor ``G`` (0 = hard, 1 =
     porous, in between = porous fraction). For the source region
-    :math:`G = G_s` and :math:`h = h_s`; for the receiver region
-    :math:`G = G_r` and :math:`h = h_r` (Table 3,
+    :math:`G = G_\mathrm{s}` and :math:`h = h_\mathrm{s}`; for the receiver region
+    :math:`G = G_\mathrm{r}` and :math:`h = h_\mathrm{r}` (Table 3,
     note 1). The middle-region term uses the overlap factor ``q`` of note 2:
 
     .. math::
 
-       q = 0 \quad \text{if } d_p \le 30 (h_s + h_r)
+       q = 0 \quad \text{if } d_\mathrm{p} \le 30 (h_\mathrm{s} + h_\mathrm{r})
 
-       q = 1 - \frac{30 (h_s + h_r)}{d_p} \quad
-       \text{if } d_p > 30 (h_s + h_r)
+       q = 1 - \frac{30 (h_\mathrm{s} + h_\mathrm{r})}{d_\mathrm{p}} \quad
+       \text{if } d_\mathrm{p} > 30 (h_\mathrm{s} + h_\mathrm{r})
 
-    with :math:`A_m = -3q` at 63 Hz and :math:`A_m = -3q(1 - G_m)` above.
+    with :math:`A_\mathrm{m} = -3q` at 63 Hz and :math:`A_\mathrm{m} = -3q(1 - G_\mathrm{m})` above.
 
     :param distance: Straight-line source-to-receiver distance ``d``, in metres.
     :param source_height: Source height ``hs`` above ground, in metres.
@@ -501,7 +501,7 @@ def ground_attenuation(
     :param ground_middle: Ground factor ``Gm`` of the middle region ([0, 1]).
     :param ground_receiver: Ground factor ``Gr`` of the receiver region ([0, 1]).
     :param projected_distance: Ground-plane projected distance ``dp``, in metres;
-        defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
+        defaults to :math:`\sqrt{d^2 - (h_\mathrm{s} - h_\mathrm{r})^2}`.
     :return: ``Agr`` per band, in decibels (negative denotes a net gain).
     :raises ValueError: If a ground factor is outside ``[0, 1]``, ``distance``
         is not positive, a height is negative, or a frequency is not positive.
@@ -546,7 +546,7 @@ def ground_attenuation_alternative(
 
     .. math::
 
-       A_{gr} = 4.8 - \frac{2 h_m}{d} \left[ 17 + \frac{300}{d} \right]
+       A_\mathrm{gr} = 4.8 - \frac{2 h_\mathrm{m}}{d} \left[ 17 + \frac{300}{d} \right]
        \ge 0~\text{dB}
 
     Negative results are replaced by zero. When this method is used, add the
@@ -554,7 +554,7 @@ def ground_attenuation_alternative(
 
     :param distance: Source-to-receiver distance ``d``, in metres.
     :param mean_height: Mean height ``hm`` of the propagation path above the
-        ground (:math:`h_m = F/d`, figure 3), in metres.
+        ground (:math:`h_\mathrm{m} = F/d`, figure 3), in metres.
     :return: ``Agr``, in decibels (>= 0).
     :raises ValueError: If ``distance`` is not positive.
     """
@@ -577,7 +577,7 @@ def directivity_omega(
     .. math::
 
        D_\Omega = 10 \log_{10}\!\left\{ 1 +
-       \frac{d_p^2 + (h_s - h_r)^2}{d_p^2 + (h_s + h_r)^2} \right\}
+       \frac{d_\mathrm{p}^2 + (h_\mathrm{s} - h_\mathrm{r})^2}{d_\mathrm{p}^2 + (h_\mathrm{s} + h_\mathrm{r})^2} \right\}
        ~\text{dB}
 
     :param source_height: Source height ``hs``, in metres.
@@ -608,7 +608,7 @@ def barrier_attenuation(
 
     .. math::
 
-       D_z = 10 \log_{10}\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_{met}
+       D_z = 10 \log_{10}\!\left[ 3 + \frac{C_2}{\lambda} \, C_3 \, z \, K_\mathrm{met}
        \right] ~\text{dB}
 
     with :math:`C_2 = 20` (or 40 when ground reflections are handled by image
@@ -684,10 +684,10 @@ def meteorological_correction(
 
     .. math::
 
-       C_{met} = 0 \quad \text{if } d_p \le 10 (h_s + h_r)
+       C_\mathrm{met} = 0 \quad \text{if } d_\mathrm{p} \le 10 (h_\mathrm{s} + h_\mathrm{r})
 
-       C_{met} = C_0 \left[ 1 - \frac{10 (h_s + h_r)}{d_p} \right] \quad
-       \text{if } d_p > 10 (h_s + h_r)
+       C_\mathrm{met} = C_0 \left[ 1 - \frac{10 (h_\mathrm{s} + h_\mathrm{r})}{d_\mathrm{p}} \right] \quad
+       \text{if } d_\mathrm{p} > 10 (h_\mathrm{s} + h_\mathrm{r})
 
     ``C0`` (dB) reflects local wind and temperature-gradient statistics; practical
     values lie in 0..~5 dB (note 22). Subtract ``Cmet`` from ``LAT(DW)`` for the
@@ -730,8 +730,8 @@ def _compose_receiver_level(
 ) -> NDArray[np.float64]:
     r"""Compose the octave-band receiver level from ``Lw``, ``Dc`` and ``A``.
 
-    :math:`L_{fT} = L_W + D_c - A` (ISO 9613-2:1996, Eq. (3)) with
-    :math:`D_c = D_i + D_\Omega`; when a meteorological correction ``cmet`` is
+    :math:`L_{fT} = L_W + D_\mathrm{c} - A` (ISO 9613-2:1996, Eq. (3)) with
+    :math:`D_\mathrm{c} = D_i + D_\Omega`; when a meteorological correction ``cmet`` is
     given it is subtracted band by band to approximate the long-term average
     level (Eq. (6)). Used by :func:`predicted_receiver_level` and by the
     :class:`OutdoorAttenuation` report when a :class:`SourceEmission` is given.
@@ -759,12 +759,12 @@ def outdoor_propagation_attenuation(
     r"""Total octave-band outdoor attenuation (ISO 9613-2:1996, Eq. (4)).
 
     Assembles the four general terms of clause 7 into
-    :math:`A = A_{div} + A_{atm} + A_{gr} + A_{bar}` (the informative
+    :math:`A = A_\mathrm{div} + A_\mathrm{atm} + A_\mathrm{gr} + A_\mathrm{bar}` (the informative
     ``Amisc`` is omitted). The ground effect uses the
     general per-region method (7.3.1). With a barrier, the top-edge insertion
-    loss :math:`A_{bar} = D_z - A_{gr}` (Eq. (12)) folds the ground effect of
+    loss :math:`A_\mathrm{bar} = D_z - A_\mathrm{gr}` (Eq. (12)) folds the ground effect of
     the screened path into ``Dz`` (note 13); for a lateral (vertical-edge)
-    barrier :math:`A_{bar} = D_z`
+    barrier :math:`A_\mathrm{bar} = D_z`
     (Eq. (13)) and the ground term is retained.
 
     :param distance: Straight-line source-to-receiver distance ``d``, in metres.
@@ -783,7 +783,7 @@ def outdoor_propagation_attenuation(
     :param relative_humidity: Relative humidity, in percent (default 70).
     :param pressure: Atmospheric pressure, in kilopascals.
     :param projected_distance: Ground-plane projected distance ``dp``, in metres;
-        defaults to :math:`\sqrt{d^2 - (h_s - h_r)^2}`.
+        defaults to :math:`\sqrt{d^2 - (h_\mathrm{s} - h_\mathrm{r})^2}`.
     :return: :class:`OutdoorAttenuation` with the per-band term breakdown.
     :raises ValueError: If ``distance`` is not positive.
     """
@@ -837,7 +837,7 @@ def predicted_receiver_level(
 
     .. math::
 
-       L_{fT}(DW) = L_W + D_c - A, \qquad D_c = D_i + D_\Omega
+       L_{fT}(DW) = L_W + D_\mathrm{c} - A, \qquad D_\mathrm{c} = D_i + D_\Omega
 
     from the total attenuation :func:`outdoor_propagation_attenuation`. When ``c0``
     is given, the meteorological correction ``Cmet`` (Eq. (21)/(22)) is subtracted
@@ -859,9 +859,9 @@ def predicted_receiver_level(
         is the reference air of the tabulated coefficients.
     :param directivity: Directivity correction ``Dc = Di + DOmega``
         (:class:`DirectivityCorrection`); ``None`` is an omnidirectional source
-        in free space (:math:`D_c = 0`).
+        in free space (:math:`D_\mathrm{c} = 0`).
     :param c0: Meteorological factor ``C0``, in decibels; ``None`` returns the
-        downwind level ``LfT(DW)`` (:math:`C_{met} = 0`).
+        downwind level ``LfT(DW)`` (:math:`C_\mathrm{met} = 0`).
     :return: Predicted octave-band level per frequency, in decibels.
     """
     ground = GroundFactors() if ground is None else ground

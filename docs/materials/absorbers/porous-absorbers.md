@@ -22,7 +22,7 @@ own guide, [Metamaterial Absorbers](metamaterial-absorbers.md).
 ## 1. Equivalent-fluid models of a porous material
 
 A rigid-frame porous material behaves like an *equivalent fluid* with a
-complex characteristic impedance $Z_c$ and wavenumber $k$ (time convention
+complex characteristic impedance $Z_\mathrm{c}$ and wavenumber $k$ (time convention
 $e^{+j\omega t}$, so a passive medium has $\mathrm{Im}(k) < 0$).
 
 **Delany–Bazley** (Mechel 2e Sect. G.11; Bies 5e Appendix D, Table D.1;
@@ -30,7 +30,7 @@ Hopkins Eqs. 1.171–1.174) is the one-parameter power law in the absorber
 variable $X = \rho_0 f / \sigma$:
 
 $$
-\frac{Z_c}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
+\frac{Z_\mathrm{c}}{\rho_0 c_0} = 1 + C_1 X^{-C_2} - j\,C_3 X^{-C_4}, \qquad
 \frac{k}{k_0} = 1 + C_5 X^{-C_6} - j\,C_7 X^{-C_8},
 $$
 
@@ -52,9 +52,9 @@ evaluated broadband.
 model (Cox & D'Antonio 3e Eqs. 6.19–6.25): flow resistivity $\sigma$,
 porosity $\phi$, tortuosity $\alpha_\infty$ and the viscous/thermal
 characteristic lengths $\Lambda$, $\Lambda'$ give the effective density and
-bulk modulus with the exact limits $j\omega\rho_e \to \sigma$ at DC,
-$\rho_e \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ at high
-frequency, and the isothermal-to-adiabatic transition in $K_e$.
+bulk modulus with the exact limits $j\omega\rho_\mathrm{e} \to \sigma$ at DC,
+$\rho_\mathrm{e} \to (\alpha_\infty \rho_0/\phi)(1 + (1-j)\,\delta_v/\Lambda)$ at high
+frequency, and the isothermal-to-adiabatic transition in $K_\mathrm{e}$.
 
 ```python
 import numpy as np
@@ -80,7 +80,7 @@ db.plot()   # normalised Zc and k components vs frequency
 3e, Figs. 6.19–6.20): at low frequency the viscous forces dominate and the
 material looks stiff and lossy (all four components large); as frequency
 rises the components fall towards the free-air limits
-$Z_c \to \rho_0 c_0$ and $k \to k_0$, so a thin layer only works where its
+$Z_\mathrm{c} \to \rho_0 c_0$ and $k \to k_0$, so a thin layer only works where its
 thickness is a fair fraction of the wavelength inside the material.*
 
 <details>
@@ -114,7 +114,7 @@ plt.show()
 The three models agree closely over the Delany–Bazley fit range (Cox &
 D'Antonio Figs. 6.19–6.21 make the same comparison); JCA extends the
 prediction physically outside it. A `PorousMediumResult` built from measured
-data (for example the $Z_c$, $k$ recovered by the
+data (for example the $Z_\mathrm{c}$, $k$ recovered by the
 [ASTM E2611 transfer-matrix reduction](impedance-tube.md)) plugs into the layer
 solver exactly like a modelled one.
 
@@ -124,11 +124,11 @@ Every model above assumes the frame stands still. That is only true above the
 **decoupling frequency** of Zwikker and Kosten,
 
 $$
-F_d = \frac{\sigma\,\phi^2}{2\pi\rho_1},
+F_\mathrm{d} = \frac{\sigma\,\phi^2}{2\pi\rho_1},
 $$
 
 with $\rho_1$ the bulk density of the frame (the density of the sample as
-weighed, not of the material the fibres are made of). Below $F_d$ the
+weighed, not of the material the fibres are made of). Below $F_\mathrm{d}$ the
 visco-inertial coupling is strong enough for the wave in the pores to drag the
 frame along, and a light frame (aeronautic-grade fibreglass, felts, thin
 screens) has real inertia to contribute. Neglecting the *stiffness* of the
@@ -138,13 +138,13 @@ density (Allard & Atalla 2e Eqs. 11.53-11.55, after Panneton 2007):
 
 $$
 \tilde\rho_{\text{limp}} =
-\frac{\rho_t\,\tilde\rho_{\text{eq}} - \rho_0^2}
-     {\rho_t + \tilde\rho_{\text{eq}} - 2\rho_0},
-\qquad \rho_t = \rho_1 + \phi\rho_0,
+\frac{\rho_\mathrm{t}\,\tilde\rho_{\text{eq}} - \rho_0^2}
+     {\rho_\mathrm{t} + \tilde\rho_{\text{eq}} - 2\rho_0},
+\qquad \rho_\mathrm{t} = \rho_1 + \phi\rho_0,
 $$
 
 where $\tilde\rho_{\text{eq}}$ is the rigid-frame effective density of any of
-the three models above and $\rho_t$ is the apparent total density of the
+the three models above and $\rho_\mathrm{t}$ is the apparent total density of the
 material. What anchors the correction is the printed equation itself,
 transcribed term by term against the page; the book tabulates no computed limp
 density anywhere. Two limits it states in prose are exact as well and are
@@ -155,7 +155,7 @@ The limits are:
 - **heavy frame**: as $\rho_1$ grows the correction vanishes and the
   rigid-frame result comes back;
 - **low frequency**: the rigid-frame density diverges as $\sigma/(j\omega)$,
-  while the limp one converges on the finite, real $\rho_t$. A rigid frame
+  while the limp one converges on the finite, real $\rho_\mathrm{t}$. A rigid frame
   forbids rigid-body motion of the sample; a limp one allows it, which is why
   the limp model is the right one for an unconstrained specimen in an
   impedance tube.
@@ -169,7 +169,7 @@ straight into a `PorousLayer` in the stack.
 Table 11.2, the input set behind their Fig. 11.2). Above the decoupling
 frequency the two predictions are indistinguishable, which is the plot's own
 check on the correction; below it the rigid-frame effective density runs away
-and the limp one settles on $\rho_t/\rho_0 = 25.9$.*
+and the limp one settles on $\rho_\mathrm{t}/\rho_0 = 25.9$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -211,10 +211,10 @@ plt.show()
 </details>
 
 The correction is only worth applying where the frame really is limp. Beranek
-(1947) asked for $|K_c/K_f| < 0.05$ between the bulk modulus of the frame in
+(1947) asked for $|K_c/K_\mathrm{f}| < 0.05$ between the bulk modulus of the frame in
 vacuum and that of the fluid in the pores; the frame-structural-interaction
 study of Doutres et al. (2007) relaxed that to $0.2$, which for air
-($K_f \approx P_0 = 101.3$ kPa) is the rule of thumb that the frame must be
+($K_\mathrm{f} \approx P_0 = 101.3$ kPa) is the rule of thumb that the frame must be
 softer than about 20 kPa. `limp_frame_applicable` applies either threshold.
 Neither accounts for mounting: a thin light foam decoupled from a vibrating
 structure by an air gap behaves limply well above the limit, and a material
@@ -272,15 +272,15 @@ $$
 $$
 
 and for the usual case of a frame whose solid grains are much stiffer than the
-frame they build ($K_s \to \infty$, true of glass, rock and polymer frames) the
+frame they build ($K_\mathrm{s} \to \infty$, true of glass, rock and polymer frames) the
 three elastic coefficients follow from the shear modulus $N$, the Poisson
-coefficient $\nu$ and the bulk modulus $K_f$ of the fluid in the pores
+coefficient $\nu$ and the bulk modulus $K_\mathrm{f}$ of the fluid in the pores
 (Eqs. 6.26-6.29):
 
 $$
-R = \phi K_f, \qquad Q = (1-\phi)K_f, \qquad
-P = \tfrac{4}{3}N + K_b + \frac{(1-\phi)^2}{\phi}K_f, \qquad
-K_b = \frac{2N(1+\nu)}{3(1-2\nu)}.
+R = \phi K_\mathrm{f}, \qquad Q = (1-\phi)K_\mathrm{f}, \qquad
+P = \tfrac{4}{3}N + K_\mathrm{b} + \frac{(1-\phi)^2}{\phi}K_\mathrm{f}, \qquad
+K_\mathrm{b} = \frac{2N(1+\nu)}{3(1-2\nu)}.
 $$
 
 With the modified densities $\tilde\rho_{11}$, $\tilde\rho_{12}$,
@@ -302,7 +302,7 @@ wall holds its frame still at the wall and free at the front face, so the
 frame-borne wave resonates a quarter wavelength inside the layer, at
 
 $$
-f_r = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
+f_\mathrm{r} = \frac{1}{4l}\sqrt{\frac{\mathrm{Re}(K_c)}{\rho_1}}, \qquad
 K_c = \frac{2(1-\nu)N}{1-2\nu}
 $$
 
@@ -407,7 +407,7 @@ foams), when the material is bonded to a plate that shakes it directly, or when
 a measured impedance shows a feature no equivalent fluid can explain. A light,
 soft blanket in free air is better served by `limp_frame`.
 
-**Honest note on validation.** There is no published table of $Z_s(f)$ or
+**Honest note on validation.** There is no published table of $Z_\mathrm{s}(f)$ or
 $\alpha(f)$ for a fully specified Biot layer, here or anywhere else checked, so
 this model cannot be pinned digit by digit the way the standards-based modules
 are. What it is anchored on instead, in decreasing strength: the **rigid-frame
@@ -420,15 +420,15 @@ the agreement to machine precision between the **two independent derivations**
 the book gives, the ch. 6 closed form Eq. 6.107 and the ch. 11 global-matrix
 assembly; and the three computed numbers the book does print in prose for the
 Table 6.1 glass wool, all reproduced: the airborne wave changes root at 495 Hz,
-$|\mu_a| > 40$ above 50 Hz, and $\mu_b$ falls from 1.0 at 50 Hz to 0.82 at
-1500 Hz. That last one is matched by $\mathrm{Re}(\mu_b)$, not by $|\mu_b|$,
+$|\mu_\mathrm{a}| > 40$ above 50 Hz, and $\mu_\mathrm{b}$ falls from 1.0 at 50 Hz to 0.82 at
+1500 Hz. That last one is matched by $\mathrm{Re}(\mu_\mathrm{b})$, not by $|\mu_\mathrm{b}|$,
 even though the printed sentence says "the ratio modulus": the model gives
-$\mu_b(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
+$\mu_\mathrm{b}(1500) = 0.811 + 0.473j$, whose real part is 1.1 % from the printed
 value while its modulus, 0.939, is 14.5 % away. That is recorded in
 [Errata](../../ERRATA.md), along with the parameter sweep that
-fails to bring $|\mu_b|$ anywhere near 0.82. The impedance peak of the book's
+fails to bring $|\mu_\mathrm{b}|$ anywhere near 0.82. The impedance peak of the book's
 thinner sample is printed as 860 Hz and comes out at 863.5 Hz under the
-$\mathrm{Im}(Z_s)$ peak rule. Everything else, including the whole
+$\mathrm{Im}(Z_\mathrm{s})$ peak rule. Everything else, including the whole
 oblique-incidence behaviour beyond its rigid-frame limit, rests on closed forms
 and on structural identities, not on published digits.
 
@@ -448,12 +448,12 @@ j \sin(k_x d)/Z_x & \cos(k_x d)
 $$
 
 with the in-depth wavenumber $k_x = \sqrt{k^2 - k_0^2 \sin^2\theta}$ from
-Snell's law and $Z_x = Z_c k / k_x$. Thin resonant sheets enter as series
+Snell's law and $Z_x = Z_\mathrm{c} k / k_x$. Thin resonant sheets enter as series
 impedances $[[1, z], [0, 1]]$. Closing the chain with a rigid wall (or free
 air, or any impedance) gives the surface impedance, the reflection factor
 $R(\theta)$ and $\alpha(\theta) = 1 - |R|^2$. A single hard-backed porous
 layer reduces to the textbook closed form
-$Z_s = -j Z_c \cot(k d)$ (Mechel Sect. D.3, Eq. 1).
+$Z_\mathrm{s} = -j Z_\mathrm{c} \cot(k d)$ (Mechel Sect. D.3, Eq. 1).
 
 Before the matrices, the physical picture: a hard-backed porous layer is an
 equivalent fluid wrapped in five measurable numbers. The 50 mm layer below,
@@ -664,7 +664,7 @@ Maa's oblique closed form (Eq. 23) exactly. The random-incidence coefficient
 is the Paris integral (Mechel Sect. D.5, Eq. 9)
 
 $$
-\alpha_{dif} = \frac{2}{\sin^2\theta_{lim}} \int_0^{\theta_{lim}}
+\alpha_\mathrm{dif} = \frac{2}{\sin^2\theta_\mathrm{lim}} \int_0^{\theta_\mathrm{lim}}
 \alpha(\theta)\,\cos\theta\,\sin\theta\,\mathrm{d}\theta,
 $$
 
@@ -695,7 +695,7 @@ print(round(float(materials.statistical_absorption(1.567 + 0j)), 3))  # 0.951
 
 *Why the reverberation room reads higher than the tube: the Paris integral
 weights the oblique angles, whose waves travel a longer path inside the
-layer, so $\alpha_{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
+layer, so $\alpha_\mathrm{dif}$ exceeds the normal-incidence $\alpha(0°)$ exactly
 where the layer is thin against the wavelength. This is the model-side
 counterpart of the tube-versus-reverberation-room discussion of
 [Sound Absorption Measurement and Rating](absorption-measurement.md).*
@@ -751,7 +751,7 @@ $\alpha_\infty = 1$ it tracks Delany–Bazley over the fit range.
 
 **Rigid or limp frame.** Every equivalent-fluid model above assumes a
 motionless frame, which only holds above the decoupling frequency
-$F_d = \sigma\phi^2/2\pi\rho_1$. Below it a light frame moves with the pore
+$F_\mathrm{d} = \sigma\phi^2/2\pi\rho_1$. Below it a light frame moves with the pore
 fluid, and `limp_frame` adds its inertia (Allard & Atalla Eqs 11.53-11.55).
 Use it for felts, screens and light fibreglass, for anything measured
 unconstrained in an impedance tube, and wherever the frame in vacuum is softer
@@ -766,8 +766,8 @@ local reaction, a good approximation for high flow resistivity, partitioned
 cavities or thin resonant facings; for thick, light porous layers integrate
 the bulk model with `diffuse_field_absorption` instead (Mechel Sect. D.6).
 Either way the prediction is for a laterally infinite sample: the finite-size
-edge effect that lets a measured ISO 354 $\alpha_s$ exceed the predicted
-$\alpha_{dif}$, and even exceed 1.0, is not modelled here.
+edge effect that lets a measured ISO 354 $\alpha_\mathrm{s}$ exceed the predicted
+$\alpha_\mathrm{dif}$, and even exceed 1.0, is not modelled here.
 
 **Where the numbers were checked.** The models are pinned digit-exact to the
 printed coefficient tables (Bies Table D.1, Miki Eqs. 30–34), the solver to

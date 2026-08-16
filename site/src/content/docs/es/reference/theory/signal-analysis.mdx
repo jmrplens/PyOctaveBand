@@ -84,7 +84,7 @@ teoría](/phonometry/es/reference/theory/).
 
 ## Frecuencias de banda de octava (ANSI S1.11 / IEC 61260)
 
-Las frecuencias centrales ($f_m$) y los bordes ($f_1$, $f_2$) usan una razón en base 10:
+Las frecuencias centrales ($f_\mathrm{m}$) y los bordes ($f_1$, $f_2$) usan una razón en base 10:
 
 $$
 G = 10^{0{,}3}
@@ -100,8 +100,8 @@ la frecuencia central depende de si la fracción $b$ es impar o par:
 **Frecuencia central:**
 
 $$
-f_m = 1000 \cdot G^{(x-30)/b} \quad (b \text{ impar}), \qquad
-f_m = 1000 \cdot G^{(2x-59)/(2b)} \quad (b \text{ par})
+f_\mathrm{m} = 1000 \cdot G^{(x-30)/b} \quad (b \text{ impar}), \qquad
+f_\mathrm{m} = 1000 \cdot G^{(2x-59)/(2b)} \quad (b \text{ par})
 $$
 
 La distinción no es cosmética. Con $b$ impar la referencia cae en el *centro* de
@@ -115,10 +115,10 @@ bandas que la biblioteca devuelve con `fraction=2`, `fraction=6` o
 **Bordes de banda:**
 
 $$
-f_1 = f_m \cdot G^{-1/(2b)}, \quad f_2 = f_m \cdot G^{1/(2b)}
+f_1 = f_\mathrm{m} \cdot G^{-1/(2b)}, \quad f_2 = f_\mathrm{m} \cdot G^{1/(2b)}
 $$
 
-**Centro exacto frente a etiqueta impresa.** El $f_m$ de arriba es la frecuencia
+**Centro exacto frente a etiqueta impresa.** El $f_\mathrm{m}$ de arriba es la frecuencia
 central exacta; lo que imprime un instrumento (y lo que `nominal_frequencies`
 devuelve como cuarto elemento, o `octave_filter(..., nominal=True)`) es el
 número preferente de ISO 266 más próximo a ella. La banda de tercio de octava
@@ -205,7 +205,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_es.svg" alt="Análisis espectral en tercios de octava de una señal de seis tonos con la PSD en bruto de fondo" width="80%" />
 
 *Los dos objetos sobre un mismo eje, para una señal de seis tonos a 20, 100,
-500, 2000, 4000 y 15 000 Hz. La traza gris es una PSD de Welch ($f_s$ = 48 kHz,
+500, 2000, 4000 y 15 000 Hz. La traza gris es una PSD de Welch ($f_\mathrm{s}$ = 48 kHz,
 `nperseg = 8192`, es decir, un bin fijo de 5,86 Hz en todas partes); los
 marcadores son los niveles normalizados en tercios de octava de esa misma
 señal. El ancho de bin nunca cambia y el ancho de banda sí: 4,60 Hz en la banda
@@ -237,13 +237,13 @@ La biblioteca implementa los prototipos clásicos estándar:
 **1. Butterworth:** banda de paso máximamente plana.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_\mathrm{c})^{2n}}}
 $$
 
 **2. Chebyshev I:** rizado uniforme en la banda de paso, caída más abrupta.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_\mathrm{c})}}
 $$
 
 **3. Chebyshev II:** Chebyshev inverso, rizado uniforme en la banda atenuada,
@@ -256,7 +256,7 @@ $$
 **4. Elíptico:** rizado uniforme en ambas bandas, máxima selectividad.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_\mathrm{c}, L)}}
 $$
 
 **5. Bessel:** retardo de grupo máximamente plano (fase lineal).
@@ -344,7 +344,7 @@ las bandas del banco lejos de ese régimen:
 2. **Diezmado multitasa:** siempre que la mitad de la frecuencia de muestreo
    siga por encima de 1,25 veces el borde superior de la banda, la señal se
    diezma por
-   $M = \lfloor (f_s/2) / (1{,}25\,f_\text{sup}) \rfloor$ antes de filtrar, lo
+   $M = \lfloor (f_\mathrm{s}/2) / (1{,}25\,f_\text{sup}) \rfloor$ antes de filtrar, lo
    que se aplica a la mayoría de las bandas y no solo a las graves
    (29 de las 33 bandas de tercio de octava a 48 kHz), de modo que cada banda se
    filtra cerca de su propia frecuencia de muestreo natural y sus polos quedan
@@ -395,7 +395,7 @@ isofónicas](/phonometry/es/reference/theory/perception/#líneas-isofónicas-iso
 La función de transferencia de la ponderación A:
 
 $$
-R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20{,}6^2)\sqrt{(f^2 + 107{,}7^2)(f^2 + 737{,}9^2)}(f^2 + 12194^2)}
+R_\mathrm{A}(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20{,}6^2)\sqrt{(f^2 + 107{,}7^2)(f^2 + 737{,}9^2)}(f^2 + 12194^2)}
 $$
 
 Las cuatro frecuencias de corte son los pares de polos en 20,6 Hz y 12194 Hz,
@@ -405,7 +405,7 @@ $+2{,}00$ dB es la normalización que fuerza la respuesta a exactamente 0 dB a
 1 kHz.
 
 $$
-A(f) = 20 \log_{10}(R_A(f)) + 2{,}00
+A(f) = 20 \log_{10}(R_\mathrm{A}(f)) + 2{,}00
 $$
 
 El filtro digital se obtiene de los polos/ceros analógicos mediante la
@@ -427,15 +427,15 @@ y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]
 $$
 
 $$
-\alpha = 1 - e^{-1 / (f_s \cdot \tau)}
+\alpha = 1 - e^{-1 / (f_\mathrm{s} \cdot \tau)}
 $$
 
 Esta es la imagen digital del detector RC analógico del sonómetro clásico: la
 presión al cuadrado carga un condensador a través de una resistencia, así que el
 valor cuadrático medio que se muestra es un paso bajo de un polo sobre $p^2$ con
-constante de tiempo $\tau$, y $\alpha = 1 - e^{-1/(f_s \tau)}$ es su
-discretización invariante al impulso, exacta a cualquier $f_s$, al contrario que
-la aproximación $1/(f_s \tau)$ que suele verse. Las dos constantes normalizadas
+constante de tiempo $\tau$, y $\alpha = 1 - e^{-1/(f_\mathrm{s} \tau)}$ es su
+discretización invariante al impulso, exacta a cualquier $f_\mathrm{s}$, al contrario que
+la aproximación $1/(f_\mathrm{s} \tau)$ que suele verse. Las dos constantes normalizadas
 son $\tau = 125$ ms (**Fast**) y $\tau = 1$ s (**Slow**). Una entrada en escalón
 llega a menos de 1 dB de su valor final tras unas $1{,}6\tau$ y le faltan
 0,03 dB a $5\tau$, que es la razón por la que los niveles leídos en las primeras
@@ -490,41 +490,41 @@ encima de 20 Hz.*
 
 Los infrasonidos necesitan su propia curva porque, cerca del umbral de audición, la sonoridad percibida de los tonos de muy baja frecuencia crece con el nivel de presión acústica mucho más abruptamente que a frecuencias medias (un pequeño incremento en dB sobre el umbral produce un gran salto de sonoridad), de modo que la curva A (anclada en 1 kHz) distorsiona por completo la molestia infrasónica.
 
-Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a las frecuencias de muestreo de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_s = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
+Como G actúa sobre 0,25 Hz – 315 Hz, muy por debajo de la frecuencia de Nyquist a las frecuencias de muestreo de audio, la deformación en frecuencia de la transformación bilineal simple (aplicada sin precompensación) es despreciable en ese rango: en torno al 0,014 % a 315 Hz con $f_\mathrm{s} = 48$ kHz, menos de 0,01 dB en la respuesta. Por eso no se aplica el sobremuestreo interno usado en los diseños A/C (cuya acción se extiende hasta 16 kHz).
 
 Consulta la [guía de ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/) para su uso.
 
 ## Métricas de evento y de dosis
 
-El **nivel de exposición sonora** (SEL; $L_{AE}$ con ponderación A, IEC 61672-1:2013) normaliza la energía de un evento discreto (sobrevuelo de un avión, paso de un tren) a una duración de referencia de 1 s:
+El **nivel de exposición sonora** (SEL; $L_{\mathrm{A}E}$ con ponderación A, IEC 61672-1:2013) normaliza la energía de un evento discreto (sobrevuelo de un avión, paso de un tren) a una duración de referencia de 1 s:
 
 $$
-\mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
+\mathrm{SEL} = L_{\mathrm{eq},T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_es.svg" alt="Historial de nivel del paso de un vehículo con su Leq sobre todo el evento y el bloque SEL de un segundo de igual energía" width="80%" />
 
 *Lo que la fórmula le hace a un evento: el paso se sustituye por un bloque de un
 segundo con la misma energía total, que es la razón por la que el SEL supera al
-$L_{eq}$ del evento siempre que este dura más de un segundo, y por la que dos
+$L_\mathrm{eq}$ del evento siempre que este dura más de un segundo, y por la que dos
 eventos con el mismo SEL son intercambiables en una dosis aunque uno sea fuerte
 y corto y el otro flojo y largo.*
 
 La **exposición sonora** $E$ (IEC 61252, 3.1) es la integral temporal del cuadrado de la presión acústica ponderada A, expresada en pascales al cuadrado por hora:
 
 $$
-E = \int_0^T p_A^2(t)\ dt = \overline{p_A^2} \cdot T \quad [\text{Pa}^2\text{h}]
+E = \int_0^T p_\mathrm{A}^2(t)\ dt = \overline{p_\mathrm{A}^2} \cdot T \quad [\text{Pa}^2\text{h}]
 $$
 
 Cuando la grabación es una muestra representativa de una jornada más larga, $E$ escala el cuadrático medio medido por la duración real de la exposición. El **nivel normalizado a 8 h** (IEC 61252, 3.3) convierte la exposición en el nivel estacionario que transporta la misma energía a lo largo de una jornada laboral nominal:
 
 $$
-L_{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
+L_\mathrm{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
 $$
 
-Es idéntico al $L_{EP,d}$ de la Directiva 86/188/CEE y al $L_{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_{EX,8h}$ de exactamente 90 dB**. ISO 9612 prescribe cómo muestrear una jornada de trabajo para obtenerlo y cómo acotar el resultado; consulta [Exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#exposición-al-ruido-en-el-trabajo-iso-9612).
+Es idéntico al $L_\mathrm{EP,d}$ de la Directiva 86/188/CEE y al $L_\mathrm{EX,8h}$ de ISO 1999 (IEC 61252, 3.3 NOTAS 5–6). El ancla de IEC 61252 (3.3 NOTA 4): una exposición de **3,2 Pa²h corresponde a un $L_\mathrm{EX,8h}$ de exactamente 90 dB**. ISO 9612 prescribe cómo muestrear una jornada de trabajo para obtenerlo y cómo acotar el resultado; consulta [Exposición al ruido en el trabajo](/phonometry/es/reference/theory/environment-transport/#exposición-al-ruido-en-el-trabajo-iso-9612).
 
-**$L_{Cpeak}$** (IEC 61672-1:2013, apartado 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
+**$L_\mathrm{Cpeak}$** (IEC 61672-1:2013, apartado 5.13) es el máximo absoluto de la presión acústica ponderada C expresado en dB, $L_\mathrm{Cpeak} = 20\log_{10}(\max|p_\mathrm{C}(t)|/p_0)$, la magnitud detrás de los límites de acción laborales de 135/137/140 dB(C). La implementación se verifica contra las respuestas de referencia de un ciclo y de medio ciclo de la Tabla 5.
 
 Consulta la [guía de niveles](/phonometry/es/signals/levels/levels/) para su uso y la [guía de calibración](/phonometry/es/signals/metrology/calibration/) para configurar la escala absoluta.
 
@@ -584,7 +584,7 @@ medición.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_es.svg" alt="Una sonda p-p de intensidad acústica de dos micrófonos: dos micrófonos de presión con un separador entre ellos, a partir de los cuales se estiman el gradiente de presión y con él la intensidad normal" width="88%" />
 
-El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_d = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
+El **índice presión-intensidad** $\delta_{pI} = L_p - L_I$ mide cuán reactivo es el campo: en una onda plana progresiva libre vale $10 \log_{10}(\rho_0 c / 400) = 0{,}14$ dB, mientras que valores grandes delatan campos reactivos o ruidosos en los que domina el error de fase entre canales. El Anexo A de ISO 9614-1:1993 lo generaliza sobre una superficie de medición como el indicador F2 (con F3 para la potencia parcial negativa y F4 para la no uniformidad del campo), y la **capacidad dinámica** del instrumento $L_\mathrm{d} = \delta_{pI0} - K$ (índice presión-intensidad residual menos el factor de error de sesgo: 10 dB para los grados 1/2, 7 dB para el grado 3) debe superar F2 para que la medición sea válida (criterio 1).
 
 Consulta la [guía de intensidad acústica](/phonometry/es/devices/emission/intensity/) para su uso.
 
@@ -601,7 +601,7 @@ incertidumbre (apartado 5) combina las incertidumbres típicas de entrada a
 través de coeficientes de sensibilidad:
 
 $$
-u_c^2(y) = \sum_{i=1}^{N} \left( \frac{\partial f}{\partial x_i} \right)^2 u^2(x_i),
+u_\mathrm{c}^2(y) = \sum_{i=1}^{N} \left( \frac{\partial f}{\partial x_i} \right)^2 u^2(x_i),
 $$
 
 generalizada a $(c \odot u)^{\top} r\ (c \odot u)$ para entradas
@@ -610,11 +610,11 @@ sobre el modelo del usuario (paso escalado a $10^{-3}$ de cada incertidumbre
 de entrada), así que no hacen falta derivadas parciales a mano. Las entradas
 de Tipo B entran por las reglas de semiancho del apartado 4.3: rectangular
 $a/\sqrt{3}$ (4.3.7), triangular $a/\sqrt{6}$ (4.3.9), en U $a/\sqrt{2}$. La
-incertidumbre expandida $U = k\,u_c$ toma $k$ de la distribución t con los
+incertidumbre expandida $U = k\,u_\mathrm{c}$ toma $k$ de la distribución t con los
 grados de libertad efectivos de Welch–Satterthwaite (Anexo G.4):
 
 $$
-\nu_{\mathrm{eff}} = \frac{u_c^4}{\sum_i u_i^4 / \nu_i}.
+\nu_{\mathrm{eff}} = \frac{u_\mathrm{c}^4}{\sum_i u_i^4 / \nu_i}.
 $$
 
 El **Suplemento 1** (ISO/IEC Guide 98-3-1:2008) propaga en cambio las
@@ -623,7 +623,7 @@ través del mismo modelo dan $u(y)$ y el intervalo de cobertura
 probabilísticamente simétrico a partir de los fractiles
 $\frac{1}{2}(1 \mp p)$ (apartado 7.7): la vía cuando el modelo es no lineal o
 la salida visiblemente no gaussiana. Los ejemplos de las propias Guías se
-reproducen: el modelo aditivo de cuatro términos da $u_c = 2{,}0$ y el
+reproducen: el modelo aditivo de cuatro términos da $u_\mathrm{c} = 2{,}0$ y el
 intervalo Monte Carlo al 95 % $\pm 3{,}88$ del apartado 9.2/Tabla 3 del
 Suplemento 1 (cuatro entradas rectangulares; la salida es casi trapezoidal,
 no gaussiana, así que el intervalo es más estrecho que $\pm 1{,}96\,u$), y el

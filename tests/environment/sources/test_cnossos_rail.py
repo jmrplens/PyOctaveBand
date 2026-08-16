@@ -823,7 +823,7 @@ def test_result_plot_draws_both_heights() -> None:
         _reference_track(),
     )
     ax = result.plot()
-    assert ax.get_ylabel() == r"$L^{\prime}_{W,eq,\mathrm{line}}$ [dB re 1 pW/m]"
+    assert ax.get_ylabel() == r"$L^{\prime}_{W,\mathrm{eq,line}}$ [dB re 1 pW/m]"
     assert len(ax.get_lines()) == 2
     ax_es = result.plot(language="es")
     assert "ferroviaria" in ax_es.get_title()

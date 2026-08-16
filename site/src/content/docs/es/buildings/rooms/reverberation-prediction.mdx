@@ -186,7 +186,7 @@ así que este paso merece tanto cuidado como la elección de modelo.
 superficies acabadas, y da a cada material su propia fila: una pared con una
 ventana y una puerta pasa a ser tres filas cuyas áreas suman la pared. El caso 3
 del Anexo E de la EN 12354-6 hace exactamente esto y parte una pared larga de
-10,90 m² en 9,81 m² revestidos con $\alpha_s$ = 0,85 más 1,09 m² desnudos con
+10,90 m² en 9,81 m² revestidos con $\alpha_\mathrm{s}$ = 0,85 más 1,09 m² desnudos con
 0,04. No promedies a mano un revestimiento con su pared; las fórmulas ya hacen la
 ponderación por áreas, y Millington-Sette la hace de forma no lineal, así que
 promediar antes cambia el resultado.
@@ -199,7 +199,7 @@ así que un coeficiente declarado para un producto adherido directamente al
 soporte no describe al mismo producto sobre un plenum de 200 mm. La ISO 354
 entrega datos en tercios de octava y un cálculo en bandas de octava toma la media
 aritmética de los tres tercios. La valoración de número único de una hoja de
-características — $\alpha_w$, NRC, SAA — *no* sustituye a la tabla por bandas (ver la
+características — $\alpha_\mathrm{w}$, NRC, SAA — *no* sustituye a la tabla por bandas (ver la
 [guía de la EN 12354-6](/phonometry/es/buildings/rooms/enclosed-space-absorption/#3-de-dónde-salen-los-datos-de-entrada),
 que enuncia la prohibición de forma normativa). El público y los asientos se
 valoran por metro cuadrado de la superficie de suelo que ocupan, no por persona.
@@ -325,7 +325,7 @@ de la ISO 9613-1, evaluado a la temperatura y la humedad de la propia sala.
 
 Todos los modelos estadísticos suponen además un **campo difuso**, y las
 bajas frecuencias son las primeras en romper esa suposición: por debajo de la
-**frecuencia de Schroeder** $f_s \approx 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s
+**frecuencia de Schroeder** $f_\mathrm{s} \approx 2000\sqrt{T/V}$ ($V$ en m³, $T$ en s
 — 141 Hz para un aula de 200 m³ con $T$ = 1 s) la sala responde como un conjunto
 de modos discretos, no como una mezcla reverberante.
 `room.schroeder_frequency(T, V)` la calcula, y
@@ -755,7 +755,7 @@ predicción estadística.
 ## Véase también
 
 - [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
-  la medición ISO 354 de la que sale cada $\alpha_s$ de esta página, su
+  la medición ISO 354 de la que sale cada $\alpha_\mathrm{s}$ de esta página, su
   dependencia del montaje y la valoración ISO 11654 que *no* debe sustituir a la
   tabla por bandas (§0).
 - [Parámetros acústicos de salas (ISO 3382-1/2)](/phonometry/es/buildings/rooms/room-acoustics/#cuánto-rango-de-decaimiento-permite-el-suelo-de-ruido):

@@ -61,18 +61,39 @@ DARK = Theme(
 #: the parts of a room and of a building element the building plates name
 #: (obj and air of EN 12354-6 Formulae 2 to 4, the wall/win mnemonics of
 #: its take-off inset, perp for the ⊥ of EN 12354-1 Annex E Formula E.3),
-#: the mid-frequency average of ANSI/ASA S12.2 Annex D (MF), the force
-#: exposure level of JIS A 1418-2 Annex C (FE), and the Spanish twin the
-#: i18n table sets beside them (sup for upper). Every other letter run
-#: inside a script is an index and is set in italic ($K_{ij}$, $η_{ij}$);
-#: extend this set only for a subscript that abbreviates a word, never
-#: for letter-indices.
+#: the mid-frequency average of ANSI/ASA S12.2 Annex D (MF), and the
+#: Spanish twin the i18n table sets beside them (sup for upper).
+#:
+#: The single letters come from holding every diagram against the prose,
+#: run by run, once the prose had settled which subscripts are descriptive:
+#: the critical, sampling, resonance, lower and upper frequencies (c, s, r,
+#: l, u), the Sabine and weighted absorption and the weighted ratings (s,
+#: w), the source and receiver geometry (s, r, m, h), the impact and
+#: coupling terms (C, D, E, F, G, K, L, P, R, T), the character penalties
+#: of RD 1367/2007 (f, t), the gate and ground times (g), the situation of
+#: ISO 12999-1 (situ) and the airborne descriptors (AF, Cpeak, sa).
+#:
+#: This set is keyed on the letter run alone and knows nothing of the
+#: symbol it belongs to, so a run is upright everywhere or nowhere. Nine
+#: runs the prose sets upright somewhere are therefore deliberately absent,
+#: because the same run has to stay italic elsewhere: ``i`` and ``n``
+#: (indices in $S_i$, $L_i$, $H_n$), ``d`` ($n_d$, the disjoint averages),
+#: ``p`` ($L_p$), ``v`` ($L_v$), ``S`` ($w_S$), ``a`` ($L_{a1}$,
+#: $L_{a2}$), ``r`` ($K_r$) and ``I`` ($L_{I0}$, the residual intensity
+#: level). Romanising those would romanise a quantity symbol or an index,
+#: which is the error the whole policy exists to avoid; those labels keep
+#: the italic default. Every other letter run inside a script is an index
+#: and is set in italic ($K_{ij}$, $η_{ij}$); extend this set only for a
+#: subscript that abbreviates a word, never for letter-indices.
 _ROMAN_SCRIPTS = frozenset((
     "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
     "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "mod",
     "norm", "spec", "inst", "cal", "tab", "cum", "ss", "shadow", "co",
     "tr", "diff", "ff", "ax", "SN", "CS", "MS", "hv", "hwx", "hwy", "hwz",
     "wx", "wy", "wz", "obj", "air", "wall", "win", "perp", "MF",
+    "AF", "Cpeak", "sa", "situ",
+    "C", "D", "E", "F", "G", "K", "L", "P", "R", "T",
+    "c", "e", "f", "g", "h", "l", "m", "s", "t", "u", "w",
 ))
 
 #: Subscripts that are part quantity symbol and part word, letter by letter:

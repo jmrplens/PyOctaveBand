@@ -9,7 +9,7 @@ underlying wave acoustics in `phonometry.environment.propagation.ground_barriers
 (Weyl-Van der Pol) and the **wave-theoretic diffraction** of a screen, both in
 a homogeneous (non-refracting, non-turbulent) atmosphere. These are the physical
 core of the Nord2000 / CNOSSOS ground and barrier models, and they show the
-frequency-dependent interference structure the octave-band $A_{gr}$/$D_z$
+frequency-dependent interference structure the octave-band $A_\mathrm{gr}$/$D_z$
 terms smooth away.
 
 ## 1. Spherical-wave ground effect (Weyl-Van der Pol)
@@ -24,11 +24,11 @@ $$
 
 with $R_1$ the source-receiver distance and $R_2$ the image-source distance.
 The coefficient (Attenborough Eq. 2.40c; Salomons Eq. D.58) corrects the
-plane-wave coefficient $R_p$ for the curvature of the wavefront:
+plane-wave coefficient $R_\mathrm{p}$ for the curvature of the wavefront:
 
 $$
-Q = R_p + (1 - R_p)\,F(w), \qquad
-R_p = \frac{Z\cos\theta - 1}{Z\cos\theta + 1},
+Q = R_\mathrm{p} + (1 - R_\mathrm{p})\,F(w), \qquad
+R_\mathrm{p} = \frac{Z\cos\theta - 1}{Z\cos\theta + 1},
 $$
 
 $$
@@ -38,11 +38,11 @@ $$
 
 Here $Z$ is the ground surface impedance normalized by $\rho c$, $\theta$ is
 the angle of incidence from the ground normal
-($\cos\theta = (h_s + h_r)/R_2$), and the boundary-loss factor $F(w)$ is
+($\cos\theta = (h_\mathrm{s} + h_\mathrm{r})/R_2$), and the boundary-loss factor $F(w)$ is
 written through the scaled complementary error function
 $e^{-w^2}\operatorname{erfc}(-iw)$, i.e. the Faddeeva function
 `scipy.special.wofz`. The second term of $Q$ is the *ground wave* that keeps
-the field finite at grazing incidence, where $R_p \to -1$ and a plane-wave
+the field finite at grazing incidence, where $R_\mathrm{p} \to -1$ and a plane-wave
 model would predict silence
 (Salomons Eq. D.59, D.60, D.57).
 
@@ -113,10 +113,10 @@ plt.show()
 </details>
 
 **Limits reproduced by the implementation** (each a pinned test or conformance
-anchor): an acoustically hard ground ($|Z| \to \infty$) gives $R_p \to 1$,
+anchor): an acoustically hard ground ($|Z| \to \infty$) gives $R_\mathrm{p} \to 1$,
 $|w| \to 0$, $F \to 1$ and $Q \to 1$, so $\Delta L$ reaches +6 dB in phase;
 the effective flow resistivity $\sigma \to \infty$ tends to that hard ground;
-grazing incidence ($h_s, h_r \to 0$) gives $R_p \to -1$; and the ground
+grazing incidence ($h_\mathrm{s}, h_\mathrm{r} \to 0$) gives $R_\mathrm{p} \to -1$; and the ground
 effect is reciprocal under an exchange of source and receiver heights.
 
 ## 2. Advanced barrier diffraction
@@ -193,7 +193,7 @@ than the thin screen of the same height.
 paths are combined coherently, each ground reflection weighted by the
 spherical-wave coefficient $Q$ above (Attenborough Ch. 9; Bies Sec. 5.3.5).
 This exposes the ground-barrier interference structure that a purely energetic
-sum of $A_{gr}$ and $D_z$ cannot. As a first-order simplification a single
+sum of $A_\mathrm{gr}$ and $D_z$ cannot. As a first-order simplification a single
 $Q$ (over the
 overall source-receiver geometry) weights every bounce rather than a separate
 coefficient per image path; the model is coherent and reciprocal but not a full
@@ -276,7 +276,7 @@ plt.show()
 
 ## Relation to ISO 9613-2
 
-The tabulated $A_{gr}$ and $D_z$ of the
+The tabulated $A_\mathrm{gr}$ and $D_z$ of the
 [ISO 9613-2 method](outdoor-propagation.md)
 are octave-band, energy-based engineering fits; `ground_effect` and
 `barrier_insertion_loss` are their narrowband wave-acoustic counterparts. Over

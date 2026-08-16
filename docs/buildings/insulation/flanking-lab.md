@@ -7,7 +7,7 @@ junction gets its number. Two structurally decoupled elements meet in a
 laboratory junction rig; shakers and tapping machines drive one, and the
 velocity level differences across the junction condense into the
 **vibration reduction index** $K_{ij}$, together with the overall flanking
-descriptors $D_{n,f}$ (airborne) and $L_{n,f}$ (impact). This guide covers
+descriptors $D_\mathrm{n,f}$ (airborne) and $L_\mathrm{n,f}$ (impact). This guide covers
 that measurement chain: the direction-averaged velocity level difference,
 the equivalent absorption lengths, the SEA validity checks of Part 4 and
 the three accredited fiches. The empirical junction values a prediction
@@ -20,8 +20,8 @@ wave-theory $K_{ij}$ of ideal plate junctions is derived in
 
 ISO 10848:2006/2010 is the laboratory method that **measures** the junction
 **vibration reduction index** $K_{ij}$ that the [EN 12354 prediction](../design/insulation-prediction.md) takes
-as an input, together with the overall flanking descriptors $D_{n,f}$
-(airborne) and $L_{n,f}$ (impact). It is the measurement counterpart of the
+as an input, together with the overall flanking descriptors $D_\mathrm{n,f}$
+(airborne) and $L_\mathrm{n,f}$ (impact). It is the measurement counterpart of the
 empirical `junction_vibration_reduction()` of that prediction.
 
 **Vibration reduction index (Formula (13)).**
@@ -29,14 +29,14 @@ $K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ 
 the direction-averaged velocity level difference
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11), which
 makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
-**equivalent absorption lengths** $a_j = 2.2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$
-(Formula (12), $f_\text{ref} = 1000$ Hz). For lightweight well-damped elements
+**equivalent absorption lengths** $a_j = 2.2\pi^2 S_j /(T_{\mathrm{s},j} c_0)\sqrt{f_\mathrm{ref}/f}$
+(Formula (12), $f_\mathrm{ref} = 1000$ Hz). For lightweight well-damped elements
 $a_j = S_j / l_0$ ($l_0 = 1$ m) and Formula (13) reduces to the simplified
-Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_s)$.
+Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_\mathrm{s})$.
 
-**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
-airborne) and $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
-$A_0 = 10\ \text{m}^2$; their $D_{n,f,w}$ / $L_{n,f,w}$ single numbers reuse the
+**Overall descriptors.** $D_\mathrm{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
+airborne) and $L_\mathrm{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
+$A_0 = 10\ \text{m}^2$; their $D_\mathrm{n,f,w}$ / $L_\mathrm{n,f,w}$ single numbers reuse the
 ISO 717 rating engines. The single-number $\overline{K}_{ij}$ is the arithmetic
 mean over 200–1250 Hz for one-third-octave bands, or over 125–1000 Hz for
 octave bands (Annex A).
@@ -76,12 +76,12 @@ to `vibration_reduction_index(..., modal_overlap=M)`: bands with $M < 0.25$
 are flagged in `result.bracketed` and excluded from the single-number
 $\overline{K}_{ij}$, as Part 4 Clause 9 requires. Because ISO 10848 contains no
 worked numeric example, conformance is anchored on closed-form identities
-(simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+(simplified $K_{ij}$, $a_j$ at $f_\mathrm{ref}$, $\eta$).
 
 Those checks are the only enforcement there is. The acquisition itself —
 shielding the other elements, a shield meeting $\Delta R_\text{min}$, the
 position counts and separations, the accelerometer mass-loading inequality,
-$T_s$ measured on the elements in their installed state rather than assumed —
+$T_\mathrm{s}$ measured on the elements in their installed state rather than assumed —
 is the operator's responsibility, and nothing here checks any of it.
 
 ```python
@@ -118,10 +118,10 @@ res_m.bracketed    # per-band flags; bracketed bands leave the single number
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference.svg" alt="Normalized flanking level difference Dn,f per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the Dn,f,w rating annotated" width="80%"></picture>
 
-*The overall flanking descriptor $D_{n,f}$ is an airborne quantity, so its
-single number $D_{n,f,w}$ comes from the unchanged ISO 717-1 engine; it
+*The overall flanking descriptor $D_\mathrm{n,f}$ is an airborne quantity, so its
+single number $D_\mathrm{n,f,w}$ comes from the unchanged ISO 717-1 engine; it
 drops straight into the EN 12354-1 model as the flanking-path datum of the
-tested junction (the impact counterpart $L_{n,f}$ rates per ISO 717-2 the
+tested junction (the impact counterpart $L_\mathrm{n,f}$ rates per ISO 717-2 the
 same way).*
 
 <details>
@@ -169,7 +169,7 @@ Two offices separated by a partition that stops at the suspended ceiling share
 one continuous plenum above it. Sound leaves the source room through the
 ceiling tiles, travels sideways over the partition and comes back down through
 the tiles of the receiving room. That path is often the weakest link in an
-open-plan fit-out, and it is not what a partition's $R_w$ describes.
+open-plan fit-out, and it is not what a partition's $R_\mathrm{w}$ describes.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking.svg" alt="Two panels: the ceiling-plenum flanking reduction index Rcl per octave band for two plenum depths against the sum of the two ceiling reduction indices, and the normalized ceiling attenuation of an accredited ASTM E1414 test report with the fitted ASTM E413 contour and its shaded deficiencies giving CAC 34" width="92%"></picture>
 
@@ -179,29 +179,29 @@ rated as a ceiling attenuation class.*
 
 **The one-dimensional model.** Mechel's one-dimensional variant, as presented
 by Vigran in Section 9.2.3, treats the plenum as a duct lined on one side. The
-ceiling on each side has a transmission factor $\tau_S = \tau_{S,pl}\tau_{S,a}$
+ceiling on each side has a transmission factor $\tau_\mathrm{S} = \tau_\mathrm{S,pl}\tau_\mathrm{S,a}$
 (plates times any plenum absorber, Eq. (9.14)); the injected power splits,
-a fraction $s_S$ heading for the partition, and decays as $\exp(-mx)$ with the
+a fraction $s_\mathrm{S}$ heading for the partition, and decays as $\exp(-mx)$ with the
 power attenuation coefficient $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$
 (Eqs. (9.15) and (9.16)). Integrating over the ceiling length on both sides
 gives Eq. (9.18), whose receiving side carries the leakage back into the room,
-$m'_R = m_R + s_R\tau_R/h$ (Eq. (9.17)). Vigran prints the *unprimed* $m_R$ in
+$m'_\mathrm{R} = m_\mathrm{R} + s_\mathrm{R}\tau_\mathrm{R}/h$ (Eq. (9.17)). Vigran prints the *unprimed* $m_\mathrm{R}$ in
 that expression's denominator; that is a misprint, recorded in
-[the errata register](../../ERRATA.md), and the derived $m'_R$ is used here. Read
+[the errata register](../../ERRATA.md), and the derived $m'_\mathrm{R}$ is used here. Read
 literally, the printed form is non-monotonic in the plenum damping (adding
-absorber would predict a worse path than none) and unbounded as $m_R \to 0$. For a plenum with little
-attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
+absorber would predict a worse path than none) and unbounded as $m_\mathrm{R} \to 0$. For a plenum with little
+attenuation and $s_\mathrm{S} = s_\mathrm{R} = 0{,}5$ that collapses to the compact form that
 makes the geometry visible (Eqs. (9.19) and (9.20)):
 
 $$
-R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+R_\mathrm{cl} = R_\mathrm{S} + R_\mathrm{R} - 10\log_{10}\!\left[\frac{\varepsilon^2 L_\mathrm{R}}{4h}\right],
 $$
 
 with $\varepsilon = 1$ for totally absorbing plenum sidewalls and
 $\varepsilon = 2$ for totally reflecting ones. A deep plenum helps, a long room
-hurts, and doubling the tile insulation helps twice over because $R_S$ and
-$R_R$ both appear. Referred to the partition area instead of the ceiling,
-$R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Eq. (9.13)), which is what lets the
+hurts, and doubling the tile insulation helps twice over because $R_\mathrm{S}$ and
+$R_\mathrm{R}$ both appear. Referred to the partition area instead of the ceiling,
+$R_\mathrm{cl,p} = R_\mathrm{cl} + 10\log_{10}(H_\mathrm{S}/L_\mathrm{S})$ (Eq. (9.13)), which is what lets the
 ceiling path be added to the direct path as transmission factors.
 
 ```python
@@ -230,19 +230,19 @@ damped = plenum_flanking_reduction_index(
 print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
-**The measured quantity.** A ceiling is not rated by $R_{cl}$ but by the
-**normalized ceiling attenuation** $D_{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
+**The measured quantity.** A ceiling is not rated by $R_\mathrm{cl}$ but by the
+**normalized ceiling attenuation** $D_\mathrm{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
 clause 3.3), with $A$ the receiving-room equivalent absorption area and the
 reference $A_0 = 10\ \text{m}^2$. The facility has two rooms of at least
 50 m³ whose volumes differ by at least 10 %, a dividing wall tapered to at most
 100 mm at the top, and a plenum 650 mm to 760 mm deep with one sidewall and
 both end walls lined; the standard prints the required lining absorption
-$\alpha_s \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
+$\alpha_\mathrm{s} \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
 requires $\alpha < 0{,}10$ on the other sidewall and on the plenum ceiling.
 The North American counterpart, ASTM E1414, uses $A_0 = 12\ \text{m}^2$, so an
 ASTM value runs about $10\log_{10}(12/10) = 0{,}79$ dB higher for the same rooms.
 
-ISO rates $D_{n,c}$ with the ISO 717-1 curve, giving $D_{n,c,w}$; ASTM E1414
+ISO rates $D_\mathrm{n,c}$ with the ISO 717-1 curve, giving $D_\mathrm{n,c,w}$; ASTM E1414
 rates it through ASTM E413 as the **ceiling attenuation class**. E413 rounds the
 data to the nearest integer (clause 5.2), raises its reference contour in 1 dB
 steps while the sum of the deficiencies stays at or below 32 dB and no single
@@ -284,15 +284,15 @@ excluded from the mean; `verbose=True` adds a column stating whether each band
 enters the mean.
 
 `FlankingLevelDifferenceResult.report()` and `FlankingImpactLevelResult.report()`
-write **measurement** reports of the overall descriptors $D_{n,f}$
-(airborne) and $L_{n,f}$ (impact, tapping machine), reusing the same
+write **measurement** reports of the overall descriptors $D_\mathrm{n,f}$
+(airborne) and $L_\mathrm{n,f}$ (impact, tapping machine), reusing the same
 two-panel insulation layout: the per-band quantity beside the
 measured-versus-shifted-ISO 717-reference curve and the boxed single number
-$D_{n,f,w}$ (C; Ctr) (ISO 717-1) or $L_{n,f,w}$ (CI) (ISO 717-2).
+$D_\mathrm{n,f,w}$ (C; Ctr) (ISO 717-1) or $L_\mathrm{n,f,w}$ (CI) (ISO 717-2).
 `verbose=True`
 annexes the ISO 717 evaluation per band (the value, the shifted reference and
 the unfavourable deviation). A `requirement` supplied on the `ReportMetadata`
-adds a verdict ($D_{n,f,w}$ passes at or above it, $L_{n,f,w}$ at or below
+adds a verdict ($D_\mathrm{n,f,w}$ passes at or above it, $L_\mathrm{n,f,w}$ at or below
 it), and
 `language="es"` renders every fiche in Spanish. reportlab is required, and
 matplotlib too for the figure the fiche embeds (`pip install
@@ -337,11 +337,11 @@ repository. Click a preview to open the PDF:
 
 [![ISO 10848-2 airborne flanking report: per-band Dn,f table beside the measured-versus-shifted-reference curve, boxed Dn,f,w (C; Ctr) and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_dnf_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_dnf_example.pdf)
 
-*Flanking level difference fiche (`FlankingLevelDifferenceResult.report`), $D_{n,f,w}$ (C; Ctr).*
+*Flanking level difference fiche (`FlankingLevelDifferenceResult.report`), $D_\mathrm{n,f,w}$ (C; Ctr).*
 
 [![ISO 10848-2 impact flanking report: per-band Ln,f table beside the measured-versus-shifted-reference curve, boxed Ln,f,w (CI) and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_lnf_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_lnf_example.pdf)
 
-*Flanking impact level fiche (`FlankingImpactLevelResult.report`), $L_{n,f,w}$ (CI).*
+*Flanking impact level fiche (`FlankingImpactLevelResult.report`), $L_\mathrm{n,f,w}$ (CI).*
 
 ## References
 
@@ -371,7 +371,7 @@ repository. Click a preview to open the PDF:
   Part 9: Laboratory measurement of room-to-room airborne sound insulation of
   a suspended ceiling with a plenum above it* (ISO 140-9:1985).
   [iso.org catalogue](https://www.iso.org/standard/3944.html).
-  The normalized ceiling attenuation $D_{n,c}$ (clause 3.3) and the plenum
+  The normalized ceiling attenuation $D_\mathrm{n,c}$ (clause 3.3) and the plenum
   test facility.
 - ASTM International. (2022). *Classification for Rating Sound Insulation*
   (ASTM E413-22).
@@ -388,25 +388,25 @@ repository. Click a preview to open the PDF:
 ISO 10848-1:2006, ISO 10848-2:2006, ISO 10848-3:2006 and ISO 10848-4:2010,
 which cover the laboratory measurement of flanking transmission: the
 vibration reduction index $K_{ij}$, the equivalent absorption length, the
-normalized flanking descriptors $D_{n,f}$ / $L_{n,f}$ and the modal-overlap
+normalized flanking descriptors $D_\mathrm{n,f}$ / $L_\mathrm{n,f}$ and the modal-overlap
 validity checks that feed the EN 12354 prediction. Parts 2, 3 and 4 differ in
 which junction and specimen types they apply to; phonometry implements only
 the Part 1 formulae generically, plus the Part 4 modal-overlap validity
 check, not the facility-specific test setups the other parts describe.
 Because ISO 10848 contains no worked numeric example, conformance is
 anchored on closed-form identities (simplified $K_{ij}$, $a_j$ at
-$f_\text{ref}$, $\eta$).
+$f_\mathrm{ref}$, $\eta$).
 
 
 The suspended-ceiling branch adds ISO 140-9:1985, which defines the normalized
-ceiling attenuation $D_{n,c}$ and its laboratory, and ASTM E413-22, the rating
+ceiling attenuation $D_\mathrm{n,c}$ and its laboratory, and ASTM E413-22, the rating
 classification that ASTM E1414 invokes for the ceiling attenuation class. The
 one-dimensional plenum model itself is not standardized: it comes from Mechel
 through Vigran Section 9.2.3, and every published output of it is a figure, so
 it is anchored on its closed forms and on structural properties a wrong
 reading breaks: monotonicity in the plenum damping, the bound
-$\tau_{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
-$D_{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
+$\tau_\mathrm{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
+$D_\mathrm{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
 laboratory reports. The plenum propagation constant $k'$ of a lined duct is an
 input here, not a prediction.
 
@@ -421,7 +421,7 @@ input here, not a prediction.
 - [Laboratory Insulation Measurement](insulation-lab.md): the ISO 10140
   suite whose direct transmission these flanking paths bypass.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the
-  reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
+  reference-curve engines behind $D_\mathrm{n,f,w}$ and $L_\mathrm{n,f,w}$.
 - [Room-to-room and open-plan acoustics](../rooms/open-plan-acoustics.md): the
   open-plan context the ceiling flanking path usually appears in.
 - API reference: [`building.measurement.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)

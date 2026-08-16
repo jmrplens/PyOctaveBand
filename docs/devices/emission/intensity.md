@@ -221,7 +221,7 @@ fi.plot(dynamic_capability=ld)   # F2/F3 per band vs Ld, F4 on a twin axis (need
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_indicators.svg" alt="ISO 9614-1 field indicators of a ten-position scan over six octave bands: F2 and F3 climb towards low frequency as the field turns reactive, crossing the dashed dynamic-capability line Ld at 125 Hz where F3 also rises above F2, with the field non-uniformity F4 drawn as bars on a twin axis" width="88%"></picture>
 
 *$F_2$ climbs towards low frequency as the field turns reactive, and at 125 Hz
-it crosses the instrument's dynamic capability $L_d = \delta_{pI0} - K$: that
+it crosses the instrument's dynamic capability $L_\mathrm{d} = \delta_{pI0} - K$: that
 band fails criterion 1, and no averaging will fix it — it calls for a larger
 spacer, a different surface or a quieter room. $F_3$ rising above $F_2$ in the
 same band reveals inward-flowing (negative) partial intensity, and the $F_4$
@@ -302,7 +302,7 @@ $$
 
 A 10 dB margin keeps the bias within about 0.5 dB and a 7 dB margin within
 about 1 dB; these are precisely the bias factors $K$ of ISO 9614, and the
-**dynamic capability** $L_d = \delta_{pI0} - K$ is the largest field index the
+**dynamic capability** $L_\mathrm{d} = \delta_{pI0} - K$ is the largest field index the
 instrument can afford at a given grade. Read it as a budget: every decibel
 the field's $\delta_{pI}$ rises spends a decibel of margin, and when
 $\delta_{pI}$ reaches $\delta_{pI0}$ the reading is pure phase error, of
@@ -447,7 +447,7 @@ reverberant rooms where the diffuse field raises pressure without
 transporting energy outward. This is why ISO 9614-1 keeps the measurement
 surface on average more than 0.5 m away from the source, and why, when a
 scan fails the dynamic-capability criterion, moving the surface outward or
-adding absorption to the room usually lowers $F_2$ below $L_d$ more cheaply
+adding absorption to the room usually lowers $F_2$ below $L_\mathrm{d}$ more cheaply
 than better hardware.
 
 ### Choosing the spacer

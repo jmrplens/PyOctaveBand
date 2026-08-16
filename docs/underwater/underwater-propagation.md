@@ -79,14 +79,14 @@ ranges at which they hand over, from the seabed reflectivity alone:
 
 | Regime | Propagation factor $F$ | Loss law | Ends at |
 |---|---|---|---|
-| Spherical | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_c)$ |
-| Cylindrical | $2\psi_c/(rH)$ | $10 \log_{10} r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
-| Mode stripping | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
+| Spherical | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_\mathrm{c})$ |
+| Cylindrical | $2\psi_\mathrm{c}/(rH)$ | $10 \log_{10} r$ | $r_\mathrm{CS} = \pi H/(4\eta\psi_\mathrm{c}^2)$ |
+| Mode stripping | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_\mathrm{MS} = k^2 H_\mathrm{e}^3/(9\pi\eta)$ |
 | Single mode | Eq. (9.54), exponential | steeper than $15 \log_{10} r$ | — |
 
-$\psi_c = \arccos(c_w/c_{sed})$ is the critical grazing angle, $\eta$ the
+$\psi_\mathrm{c} = \arccos(c_\mathrm{w}/c_\mathrm{sed})$ is the critical grazing angle, $\eta$ the
 **reflection loss gradient** in nepers per radian ($|R(\theta)| \approx
-e^{-\eta\theta}$) and $H_e$ the Weston effective depth, the level a short
+e^{-\eta\theta}$) and $H_\mathrm{e}$ the Weston effective depth, the level a short
 distance below the true seabed at which a pressure-release boundary appears to
 lie. `weston_propagation_loss` assembles the composite loss
 $PL = -10 \log_{10} F$ and returns each regime's own law alongside it; the
@@ -154,9 +154,9 @@ mean = lambda pl: -10.0 * np.log10(np.mean(10.0 ** (-pl / 10.0)))
 print(mean(flux.propagation_loss), mean(modes.propagation_loss))
 ```
 
-> Ainslie's printed Equation (9.57) for $r_{MS}$ reads $k^2H_e^3/(9\eta)$. Its
+> Ainslie's printed Equation (9.57) for $r_\mathrm{MS}$ reads $k^2H_\mathrm{e}^3/(9\eta)$. Its
 > own derivation rule, equating Equations (9.47) and (9.56) exactly as printed,
-> gives $k^2H_e^2H/(9\pi\eta)$, smaller by $\pi H_e/H$. The library implements
+> gives $k^2H_\mathrm{e}^2H/(9\pi\eta)$, smaller by $\pi H_\mathrm{e}/H$. The library implements
 > the derivation-consistent form; see
 > [Errata found in published sources](../ERRATA.md).
 
@@ -321,7 +321,7 @@ the source convention, dB re 1 µPa²/Hz **at 1 m**.
 
 A plane wave striking the seabed reflects with the fluid–fluid **Rayleigh
 reflection coefficient** (Medwin & Clay). For a faster bottom ($c_2 > c_1$) there
-is a **critical grazing angle** $\varphi_c = \arccos(c_1/c_2)$, below which
+is a **critical grazing angle** $\varphi_\mathrm{c} = \arccos(c_1/c_2)$, below which
 the wave is totally reflected ($|R| = 1$, zero loss). The bottom loss is
 $BL = -20 \log_{10} |R|$.
 

@@ -183,10 +183,10 @@ refracción y los contornos deciden la respuesta, toman el relevo los
 ## Pérdida de propagación
 
 **Son dos magnitudes, y la ISO 18405 las mantiene separadas.** La *pérdida de
-propagación* $N_{PL}$ es la diferencia entre el nivel de fuente en una
+propagación* $N_\mathrm{PL}$ es la diferencia entre el nivel de fuente en una
 dirección especificada y el nivel de presión acústica cuadrático medio en una
-posición especificada, $N_{PL}(x) = L_S - L_p(x)$, referida a 1 m²
-(apartado 3.4.1.4). La *pérdida por transmisión* $\Delta L_{TL}$ es la
+posición especificada, $N_\mathrm{PL}(x) = L_\mathrm{S} - L_p(x)$, referida a 1 m²
+(apartado 3.4.1.4). La *pérdida por transmisión* $\Delta L_\mathrm{TL}$ es la
 reducción de un nivel especificado entre dos puntos especificados (apartado
 3.4.1.3). La ecuación del sonar necesita la magnitud referida a la fuente, así
 que lo que esta página calcula es una pérdida de propagación, y así se llama la
@@ -328,18 +328,18 @@ a partir de la reflectividad del fondo:
 
 | Régimen | Factor de propagación $F$ | Ley de pérdida | Termina en |
 |---|---|---|---|
-| Esférico | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_c)$ |
-| Cilíndrico | $2\psi_c/(rH)$ | $10 \log_{10} r$ | $r_{CS} = \pi H/(4\eta\psi_c^2)$ |
-| Descamado de modos | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_{MS} = k^2 H_e^3/(9\pi\eta)$ |
+| Esférico | $1/r^2$ | $20 \log_{10} r$ | $r = H/(2\psi_\mathrm{c})$ |
+| Cilíndrico | $2\psi_\mathrm{c}/(rH)$ | $10 \log_{10} r$ | $r_\mathrm{CS} = \pi H/(4\eta\psi_\mathrm{c}^2)$ |
+| Descamado de modos | $\sqrt{\pi/(\eta H)}\, r^{-3/2}$ | $15 \log_{10} r$ | $r_\mathrm{MS} = k^2 H_\mathrm{e}^3/(9\pi\eta)$ |
 | Modo único | Ec. (9.54), exponencial | más pronunciada que $15 \log_{10} r$ | — |
 
 Aquí $r$ es la distancia, $H$ la profundidad del agua, $k = 2\pi f/c_1$ el
-número de onda acústico en la columna de agua, $\psi_c = \arccos(c_1/c_2)$ el
+número de onda acústico en la columna de agua, $\psi_\mathrm{c} = \arccos(c_1/c_2)$ el
 ángulo rasante crítico que fijan las velocidades del sonido del agua y del
 sedimento, $\eta$ el **gradiente de pérdida por reflexión** en neperios por
-radián ($|R(\theta)| \approx e^{-\eta\theta}$) y $H_e$ la **profundidad efectiva
+radián ($|R(\theta)| \approx e^{-\eta\theta}$) y $H_\mathrm{e}$ la **profundidad efectiva
 de Weston**: el nivel poco *por debajo* del fondo real en el que parece situarse
-un contorno de presión nula, de modo que $H_e > H$ y las dos letras no son
+un contorno de presión nula, de modo que $H_\mathrm{e} > H$ y las dos letras no son
 intercambiables (que es todo el contenido de la nota de errata de más abajo).
 
 `weston_propagation_loss` compone la pérdida y devuelve además la ley propia de
@@ -404,9 +404,9 @@ la pérdida por modos normales promediada en profundidad y distancia cae sobre
 ella dentro de un decibelio.
 
 :::note
-La Ecuación (9.57) impresa por Ainslie para $r_{MS}$ dice $k^2H_e^3/(9\eta)$.
+La Ecuación (9.57) impresa por Ainslie para $r_\mathrm{MS}$ dice $k^2H_\mathrm{e}^3/(9\eta)$.
 Su propia regla de derivación, igualar las Ecuaciones (9.47) y (9.56) tal como
-están impresas, da $k^2H_e^2H/(9\pi\eta)$, menor en $\pi H_e/H$. La biblioteca
+están impresas, da $k^2H_\mathrm{e}^2H/(9\pi\eta)$, menor en $\pi H_\mathrm{e}/H$. La biblioteca
 implementa la forma coherente con la derivación; véase
 [Erratas encontradas en fuentes publicadas](/phonometry/es/reference/errata/).
 :::
@@ -724,11 +724,11 @@ plt.show()
 Una onda plana que incide en el fondo se refleja con el **coeficiente de
 reflexión de Rayleigh** fluido–fluido (Medwin & Clay). Para un fondo más rápido
 ($c_2 > c_1$) existe un **ángulo rasante crítico**
-$\psi_c = \arccos(c_1/c_2)$, el mismo $\psi_c$ que fija las fronteras de los
+$\psi_\mathrm{c} = \arccos(c_1/c_2)$, el mismo $\psi_\mathrm{c}$ que fija las fronteras de los
 regímenes de Weston de arriba, por debajo del cual la onda se refleja totalmente
 ($|R| = 1$, pérdida nula). La pérdida es $BL = -20 \log_{10} |R|$.
 
-La reflexión total por debajo de $\psi_c$ es una propiedad de la idealización
+La reflexión total por debajo de $\psi_\mathrm{c}$ es una propiedad de la idealización
 fluido-fluido **sin pérdidas**, no de ningún fondo marino real. Un sedimento
 real absorbe, así que $|R|$ queda un poco por debajo de la unidad a cualquier
 ángulo, y en aguas someras esa pequeña diferencia es toda la respuesta: un rayo

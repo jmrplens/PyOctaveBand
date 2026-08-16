@@ -195,7 +195,7 @@ integrates $\mathrm{PNLT}$ over the **10 dB-down** window (the records nearest
 to $\mathrm{PNLTM} - 10$ on each side) and normalises to 10 s:
 
 $$
-\mathrm{EPNL} = 10\log_{10}\!\Big(\sum_{k=k_F}^{k_L} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
+\mathrm{EPNL} = 10\log_{10}\!\Big(\sum_{k=k_\mathrm{F}}^{k_\mathrm{L}} 10^{\mathrm{PNLT}(k)/10}\,\Delta t(k)\Big)
 - 10\log_{10} T_0, \qquad T_0 = 10\ \mathrm{s},
 $$
 
@@ -320,7 +320,7 @@ needs the one-third-octave-band attenuation over the path. The pure-tone
 coefficient is the ISO 9613-1 one (identical, per ARP 5534 §3.1) already
 provided by `air_attenuation`; `sae_band_attenuation` adds the **SAE Method**
 (ARP 5534 §3.2.2), a regression that maps the pure-tone mid-band path-length
-attenuation $\delta_t = \alpha\,s$ to the band attenuation $\delta_B$ and stays
+attenuation $\delta_\mathrm{t} = \alpha\,s$ to the band attenuation $\delta_\mathrm{B}$ and stays
 consistent with the ISO/ANSI Exact Method well beyond the 50 dB limit of the
 older Approximate Method.
 
@@ -367,7 +367,7 @@ att.plot()                    # band vs pure-tone mid-band (needs matplotlib)
 ```
 
 `sae_band_attenuation` returns an `AircraftBandAttenuation` with `band_attenuation`
-($\delta_B$), `midband_attenuation` ($\delta_t = \alpha\,s$) and the pure-tone
+($\delta_\mathrm{B}$), `midband_attenuation` ($\delta_\mathrm{t} = \alpha\,s$) and the pure-tone
 `coefficient` ($\alpha$, dB/m). The SAE Method is valid roughly 6–32 °C and 20–95 % RH (the 14 CFR
 Part 36 test window), over path lengths to 7620 m, and is reciprocal
 (source↔receiver).
@@ -472,7 +472,7 @@ barriers) are [Outdoor sound propagation](https://jmrplens.github.io/phonometry/
 ## 1. The noise-power-distance engine
 
 The ECAC Doc 29 airport-noise method describes an aircraft with **noise-power-
-distance (NPD)** tables that give the event level ($L_{Amax}$ or `SEL`) of steady straight
+distance (NPD)** tables that give the event level ($L_\mathrm{Amax}$ or `SEL`) of steady straight
 flight versus engine power and slant distance. `npd_level` reads an event level
 for an arbitrary power and distance, interpolating **linearly in power**
 (Eq. 4-3) and **log-linearly in distance** (Eq. 4-4), extrapolating from the
@@ -645,7 +645,7 @@ plt.show()
 </details>
 
 `event_level` assembles these (Eq. 4-8/4-9) and sums the segments into the exposure
-level `SEL` (Eq. 4-11) or the maximum level $L_{Amax}$ (Eq. 4-10); `noise_contour`
+level `SEL` (Eq. 4-11) or the maximum level $L_\mathrm{Amax}$ (Eq. 4-10); `noise_contour`
 evaluates `event_level` over a ground grid to produce a noise contour. Mark the
 takeoff ground-roll segments with the boolean `ground_roll` mask.
 
@@ -695,7 +695,7 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 - [Outdoor sound propagation](https://jmrplens.github.io/phonometry/environment/propagation/outdoor-propagation/): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Environmental levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the $L_{den}$-style
+- [Environmental levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/): the $L_\mathrm{den}$-style
   long-term indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 
@@ -1006,7 +1006,7 @@ source with a **noise hemisphere**: one-third-octave-band sound pressure levels
 on a spherical grid of azimuth $\varphi$ and polar angle $\theta$, measured at
 a fixed **60 m** reference distance under ICAO reference atmospheric
 conditions. Placing that source at a receiver adds the propagation adjustment
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ ($+\ \Delta L_d$).
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$ ($+\ \Delta L_\mathrm{d}$).
 
 This page covers the source and propagation primitives, the flight-condition
 interpolation across a hemisphere database, the hover/idle source derivation
@@ -1051,9 +1051,9 @@ lv = aircraft.hemisphere_source_level(h, 0.0, 90.0)   # level per band abeam-bel
 The hemisphere level at 60 m is carried to the receiver by three adjustments
 (Doc 32 §A.4):
 
-- **`spherical_spreading_adjustment(r)`**: $\Delta L_s = -20\log_{10}(r/60)$
+- **`spherical_spreading_adjustment(r)`**: $\Delta L_\mathrm{s} = -20\log_{10}(r/60)$
   (Eq. 24).
-- **`atmospheric_adjustment(freqs, r)`**: $\Delta L_a = -\alpha(f)\,(r - 60)$
+- **`atmospheric_adjustment(freqs, r)`**: $\Delta L_\mathrm{a} = -\alpha(f)\,(r - 60)$
   with the
   ISO 9613-1 pure-tone coefficient at the exact band centre (Eq. 26/27), reusing
   the library's `air_attenuation`; this is what the NORAH2 reference
@@ -1291,9 +1291,9 @@ hemispheres) does not model.
 
 `flight_path_kinematics` derives, from a time-stamped track by central finite
 differences, everything the event needs (Eq. 16-21 / Doc 32 Eq. 8-10): ground
-speed $V_g$, airspeed $V_A$ (zero wind), heading
+speed $V_\mathrm{g}$, airspeed $V_\mathrm{A}$ (zero wind), heading
 $\Theta = \operatorname{atan2}(\Delta X, \Delta Y)$, curvature
-$K = \Delta\Theta/\Delta S$, bank angle $\Phi = \arctan(K V_g^2 / g)$ and
+$K = \Delta\Theta/\Delta S$, bank angle $\Phi = \arctan(K V_\mathrm{g}^2 / g)$ and
 path angle $\gamma = \arctan(\Delta Z / \Delta S)$.
 The guidance recommends smoothing radar tracks (e.g. spline resampling to a
 0.5 s cadence) before differentiating.
@@ -1312,7 +1312,7 @@ Per track point, the flight condition selects (or blends) the hemispheres and
 the emission angles address the source level; the hemisphere frame is oriented
 by the heading and tilted by the bank angle in turns (pitch attitude is
 implicit in the hemispheres). The received one-third-octave history is
-expressed at recorded time $t_r = t_e + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$)
+expressed at recorded time $t_\mathrm{r} = t_\mathrm{e} + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$)
 and integrated: `LASmax`, `SEL` over the full history and over the certification
 10 dB-down window (Doc 32 Eq. 27), and `EPNL` per ICAO Annex 16 (Doc 32
 Eq. 28), reusing the library's `epnl_from_pnlt`.
@@ -1531,7 +1531,7 @@ Validated against the NORAH2 guidance Table 4 (all 31 bands, 10 Hz-10 kHz), the
 closed-form inverse-square spreading, the analytic rigid-ground +6 dB and
 grazing limits of the ground effect, off-node bilinear lookups on the reference
 hemispheres of all eleven rotorcraft types, hand-checked interpolation
-simplices, closed-form kinematics and the Lorentzian $\mathrm{SEL} - L_{ASmax}$ flyover
+simplices, closed-form kinematics and the Lorentzian $\mathrm{SEL} - L_\mathrm{ASmax}$ flyover
 integral, and end to end against the NORAH2 prototype's ARP verification cases:
 emission angles reproduce to 0.01°, retarded times to 0.02 s, every step level
 of the hard-ground events to 0.08 dB(A) out to 18 km, `LASmax` to 0.03 dB and

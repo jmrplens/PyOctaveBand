@@ -229,7 +229,7 @@ cápsula omnidireccional de presión.
 La electrónica del micrófono y la carga de aire sobre su diafragma fijan un
 suelo de ruido, expresado como el **nivel de ruido equivalente**: el nivel
 de presión acústica cuya salida igualaría la tensión de ruido propio
-ponderada, $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$. La norma lo
+ponderada, $L_\mathrm{N} = 20\log_{10}\bigl((U_\mathrm{N}/M)/20\,\mu\text{Pa}\bigr)$. La norma lo
 declara con dos ponderaciones, y los números quedan muy separados sobre el
 papel. La cifra **ponderada A** (detector RMS) es la que citan la mayoría
 de las hojas de características, p. ej. 14 dB(A) para un buen condensador de estudio.
@@ -263,7 +263,7 @@ pasa como `MicrophoneNoise(spectrum=...)`, ponderado con `itu_r_468_weighting`
 del [módulo de electroacústica](/phonometry/es/devices/electroacoustics/electroacoustics/)
 y con ponderación A, y sumado después banda a banda.
 
-**Cómo se obtiene $U_N$** (apartado 17.2). El micrófono se aísla del sonido, del
+**Cómo se obtiene $U_\mathrm{N}$** (apartado 17.2). El micrófono se aísla del sonido, del
 viento, de los golpes, de la vibración y de los campos eléctricos o magnéticos,
 pero tiene que permanecer en **modo de funcionamiento acústico**: la norma
 advierte explícitamente de que sustituir el elemento transductor por un circuito
@@ -336,7 +336,7 @@ de solo repetirse:
   con simetría de revolución; el cardioide ideal devuelve $10\log_{10} 3 = 4{,}8$ dB.
 - **Nivel de ruido equivalente** (17.2). La tensión de ruido inherente
   ponderada sobre la sensibilidad nominal como nivel de presión acústica,
-  $L_N = 20\log_{10}\bigl((U_N/M)/20\,\mu\text{Pa}\bigr)$, con la relación
+  $L_\mathrm{N} = 20\log_{10}\bigl((U_\mathrm{N}/M)/20\,\mu\text{Pa}\bigr)$, con la relación
   señal-ruido re 1 Pa (94 dB SPL) derivada de él. El nivel de presión acústica de
   sobrecarga (15.2) se lee de una curva de distorsión frente a nivel en el
   límite de THD declarado.

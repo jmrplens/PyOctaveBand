@@ -86,19 +86,19 @@ temperatura. La ISO 9613-1:1993, Ec. (5) reúne todo esto en el coeficiente de
 atenuación de tono puro $\alpha$, en decibelios por metro:
 
 $$
-\alpha = 8{,}686\ f^2 \Big[ 1{,}84\times10^{-11} \big(p_a/p_r\big)^{-1} \big(T/T_0\big)^{1/2}
-       + \big(T/T_0\big)^{-5/2} \big( 0{,}01275\ \tfrac{e^{-2239{,}1/T}}{f_{rO} + f^2/f_{rO}}
-       + 0{,}1068\ \tfrac{e^{-3352{,}0/T}}{f_{rN} + f^2/f_{rN}} \big) \Big],
+\alpha = 8{,}686\ f^2 \Big[ 1{,}84\times10^{-11} \big(p_\mathrm{a}/p_\mathrm{r}\big)^{-1} \big(T/T_0\big)^{1/2}
+       + \big(T/T_0\big)^{-5/2} \big( 0{,}01275\ \tfrac{e^{-2239{,}1/T}}{f_\mathrm{rO} + f^2/f_\mathrm{rO}}
+       + 0{,}1068\ \tfrac{e^{-3352{,}0/T}}{f_\mathrm{rN} + f^2/f_\mathrm{rN}} \big) \Big],
 $$
 
-con las frecuencias de relajación del oxígeno y el nitrógeno $f_{rO}$, $f_{rN}$
+con las frecuencias de relajación del oxígeno y el nitrógeno $f_\mathrm{rO}$, $f_\mathrm{rN}$
 (Ec. (3)/(4)), las condiciones de referencia $T_0 = 293{,}15$ K y
-$p_r = 101{,}325$ kPa (apartado 4.2), y la concentración molar de vapor de agua $h$
+$p_\mathrm{r} = 101{,}325$ kPa (apartado 4.2), y la concentración molar de vapor de agua $h$
 obtenida de la humedad relativa mediante la conversión psicrométrica del anexo B.
 Dominan la forma dos rasgos: a baja frecuencia $\alpha \propto f^2$, por lo que
 sube con fuerza; y cerca de cada frecuencia de relajación el término
 correspondiente alcanza un máximo y decae. Entre ambos, $\alpha$ crece unas dos
-décadas de 50 Hz a 10 kHz y, al fijar la humedad la $f_{rO}$, barrer la humedad
+décadas de 50 Hz a 10 kHz y, al fijar la humedad la $f_\mathrm{rO}$, barrer la humedad
 desplaza un pico de relajación por la banda, así que el aire más seco no siempre
 es el que menos absorbe.
 
@@ -151,7 +151,7 @@ print(np.round(m, 5))                        # [0.00107 0.00683]
 `air_attenuation` devuelve dB/m (la Tabla 1 imprime dB/km, es decir $\times 1000$);
 está totalmente vectorizada sobre `frequencies`, con temperatura, humedad y
 presión escalares. Pasar `exact_midband=True` ajusta cada frecuencia solicitada a
-la frecuencia central exacta de tercio de octava $f_m = 1000 \cdot 10^{k/10}$
+la frecuencia central exacta de tercio de octava $f_\mathrm{m} = 1000 \cdot 10^{k/10}$
 (Ec. (6), Nota 5) empleada para calcular la Tabla 1, de modo que la biblioteca
 reproduce cada punto tabulado con menos del 0,4 %, la propia precisión de tres
 cifras significativas de la norma, muy dentro de su exactitud declarada de
@@ -173,7 +173,7 @@ $m$ a mano.
 | `temperature` | float | °C | def. `20.0` | −20…+50 tabulado; fuera avisa |
 | `relative_humidity` | float | % | def. `50.0` | 10…100 tabulado; se admite `[0, 100]` |
 | `pressure` | float | kPa | def. `101.325` | ≤ 200 válido (apartado 7); por encima avisa |
-| `exact_midband` | bool | — | def. `False` | Ajusta a $f_m = 1000\cdot10^{k/10}$ (reproduce la Tabla 1) |
+| `exact_midband` | bool | — | def. `False` | Ajusta a $f_\mathrm{m} = 1000\cdot10^{k/10}$ (reproduce la Tabla 1) |
 
 `air_attenuation` devuelve $\alpha$ en dB/m; `air_attenuation_m` devuelve
 $m = \alpha/(10 \log_{10} e)$ en 1/m para la ISO 354.
@@ -187,7 +187,7 @@ expone `.plot()` para la clásica curva de $\alpha$ frente a la frecuencia
 (dibujada en dB/km, la unidad de la Tabla 1, con ordenada lineal sobre un eje de
 frecuencia logarítmico). Pasar una `distance` también registra la atenuación
 total $A = \alpha\,d$, en decibelios, sobre ese trayecto como `total_attenuation`,
-el $A_{atm}$ de la ISO 9613-2 (Ec. (8)).
+el $A_\mathrm{atm}$ de la ISO 9613-2 (Ec. (8)).
 
 ```python
 from phonometry import environment
@@ -240,13 +240,13 @@ térmica moderada equivalente, apartado 5). El nivel continuo equivalente a favo
 del viento es
 
 $$
-L_{fT}(DW) = L_W + D_c - A, \qquad A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc},
+L_{fT}(DW) = L_W + D_\mathrm{c} - A, \qquad A = A_\mathrm{div} + A_\mathrm{atm} + A_\mathrm{gr} + A_\mathrm{bar} + A_\mathrm{misc},
 $$
 
 (Ec. (3)/(4)) donde $L_W$ es el nivel de potencia acústica por bandas de octava,
-$D_c$ la corrección de directividad (índice de directividad más un índice de
+$D_\mathrm{c}$ la corrección de directividad (índice de directividad más un índice de
 ángulo sólido $D_\Omega$) y $A$ la atenuación total. La biblioteca implementa los
-cuatro términos generales del apartado 7; el $A_{misc}$ informativo (vegetación,
+cuatro términos generales del apartado 7; el $A_\mathrm{misc}$ informativo (vegetación,
 zonas industriales, edificación; anexo A) y las reflexiones en obstáculos
 verticales (apartado 7.5) **no están implementados**: la norma los trata como
 informativos y se dejan a criterio del usuario.
@@ -265,7 +265,7 @@ condiciones de la norma a la vez: que las fuentes tengan aproximadamente la mism
 potencia y la misma altura sobre el plano local del suelo, que las condiciones de
 propagación desde cada una hasta el receptor sean las mismas, y que la distancia
 $d$ de la fuente equivalente al receptor supere el doble de la mayor dimensión
-$H_{max}$ del grupo ($d > 2H_{max}$). Si $d \le 2H_{max}$, o si las condiciones
+$H_\mathrm{max}$ del grupo ($d > 2H_\mathrm{max}$). Si $d \le 2H_\mathrm{max}$, o si las condiciones
 de propagación difieren entre subfuentes (una apantallada por un edificio y otra
 no), el apartado 4 exige volver a descomponer el grupo en sus componentes.
 
@@ -275,7 +275,7 @@ allá de 60 m, así que el receptor a 200 m de abajo es legítimo y uno a 50 m e
 mismo emplazamiento no lo es, y ahí la nave hay que modelarla cara por cara. La
 propia potencia acústica queda fuera del alcance: sale de una medición de la
 familia ISO 3740 o de la declaración del suministrador, en las ocho bandas de
-octava de 63 Hz a 8 kHz. Cuando solo se dispone de un $L_{WA}$ ponderado A, el
+octava de 63 Hz a 8 kHz. Cuando solo se dispone de un $L_{W\mathrm{A}}$ ponderado A, el
 recurso que la propia norma prevé (apartado 1, Nota 1) es evaluar los términos de
 atenuación a 500 Hz y aplicarlos a ese único número, que es una estimación y no
 una predicción por bandas. Las dos guías de emisión de CNOSSOS-EU,
@@ -287,11 +287,11 @@ alcance, así que elegir la longitud del tramo y sumar los tramos
 energéticamente es una decisión de ingeniería del usuario.
 
 La geometría del término de apantallamiento fija el vocabulario: el borde de
-difracción divide la distancia fuente-receptor en $d_{ss}$ y $d_{sr}$, y el
-exceso de recorrido sobre el borde es $z = d_{ss} + d_{sr} - d$. Cuando la
+difracción divide la distancia fuente-receptor en $d_\mathrm{ss}$ y $d_\mathrm{sr}$, y el
+exceso de recorrido sobre el borde es $z = d_\mathrm{ss} + d_\mathrm{sr} - d$. Cuando la
 línea de visión pasa *por encima* del borde superior, la norma da a $z$ signo
 negativo (`Barrier(line_of_sight_clear=True)`) y la Ec. (14) sigue
-aplicándose con $K_{met} = 1$: $D_z$ cae de forma continua desde
+aplicándose con $K_\mathrm{met} = 1$: $D_z$ cae de forma continua desde
 $10 \log_{10} 3 \approx 4{,}8$ dB en incidencia rasante hasta cero al aumentar el
 margen libre, sin bajar nunca de cero.
 
@@ -299,11 +299,11 @@ margen libre, sin bajar nunca de cero.
 
 ### Los cuatro términos de atenuación
 
-* **Divergencia geométrica** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
+* **Divergencia geométrica** $A_\mathrm{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Ec. (7)): expansión esférica desde una fuente puntual. Exactamente 51 dB a
   100 m, +6 dB por cada duplicación de la distancia. El $+11$ ($= 10 \log_{10} 4\pi$)
   fija el nivel a la distancia de referencia de 1 m.
-* **Absorción atmosférica** $A_{atm} = \alpha\ d$ (Ec. (8)) con $\alpha$ el
+* **Absorción atmosférica** $A_\mathrm{atm} = \alpha\ d$ (Ec. (8)) con $\alpha$ el
   coeficiente de la ISO 9613-1, despreciable a baja frecuencia y dominante a 8 kHz
   en recorridos largos. $\alpha$ se evalúa en la frecuencia central *exacta*
   en base 10 de cada banda nominal (7 943,3 Hz para «8 kHz»), la convención de
@@ -313,46 +313,46 @@ margen libre, sin bajar nunca de cero.
   una humedad relativa del 70 % (una de las atmósferas de referencia que la norma
   tabula en su Tabla 2), mientras que `air_attenuation` usa por defecto el 50 %
   habitual de la ISO 9613-1.
-* **Efecto del suelo** $A_{gr} = A_s + A_r + A_m$ (Ec. (9)) suma una región
+* **Efecto del suelo** $A_\mathrm{gr} = A_\mathrm{s} + A_\mathrm{r} + A_\mathrm{m}$ (Ec. (9)) suma una región
   fuente, receptor y media, cada una a partir de las funciones $a'/b'/c'/d'$ de
   la Tabla 3 y su factor de suelo $G$ (0 = duro/reflectante, 1 =
-  poroso/absorbente). Un $A_{gr}$ **negativo** es una *ganancia* neta por la
+  poroso/absorbente). Un $A_\mathrm{gr}$ **negativo** es una *ganancia* neta por la
   reflexión constructiva en el suelo.
 * **Apantallamiento** por una barrera es la pérdida por inserción debida a la difracción
-  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Ec. (14)),
+  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_\mathrm{met} \big]$ (Ec. (14)),
   limitada a 20 dB (un borde) o 25 dB (doble borde). Para una barrera de borde
   superior, el efecto del suelo del recorrido apantallado se integra en él,
-  $A_{bar} = D_z - A_{gr} \ge 0$ (Ec. (12), Nota 13); para una barrera lateral
-  $A_{bar} = D_z$ y se conserva el término del suelo (Ec. (13)).
+  $A_\mathrm{bar} = D_z - A_\mathrm{gr} \ge 0$ (Ec. (12), Nota 13); para una barrera lateral
+  $A_\mathrm{bar} = D_z$ y se conserva el término del suelo (Ec. (13)).
 
 ### Elegir los factores de suelo
 
-$G_s$, $G_m$ y $G_r$ no son una blandura difusa: cada uno es la *fracción porosa*
+$G_\mathrm{s}$, $G_\mathrm{m}$ y $G_\mathrm{r}$ no son una blandura difusa: cada uno es la *fracción porosa*
 de una región cuya extensión fija la norma (7.3.1, figura 1). Medida a lo largo
-de la distancia $d_p$ proyectada sobre el suelo, la **región de la fuente** ocupa
-$30 h_s$ desde la fuente hacia el receptor (recortada a $d_p$), la **región del
-receptor** ocupa $30 h_r$ hacia atrás desde el receptor, y la **región media** es
+de la distancia $d_\mathrm{p}$ proyectada sobre el suelo, la **región de la fuente** ocupa
+$30 h_\mathrm{s}$ desde la fuente hacia el receptor (recortada a $d_\mathrm{p}$), la **región del
+receptor** ocupa $30 h_\mathrm{r}$ hacia atrás desde el receptor, y la **región media** es
 lo que quede entre ambas. La cubierta dura (pavimento, agua, hielo, hormigón,
 tierra apisonada) es $G = 0$; la cubierta porosa (hierba, arbolado, cultivos) es
 $G = 1$; una región mixta toma la fracción de su longitud que sea porosa.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_regions_es.svg" alt="Sección a escala de un recorrido de 200 m con fuente y receptor a 1,5 m del suelo: la región de la fuente sombreada sobre los primeros 45 m como 30 por hs, la región del receptor sombreada sobre los últimos 45 m como 30 por hr, y la región media de 110 m entre ellas rayada en 70 m de hierba y 40 m de asfalto con Gm = 70/110 = 0,64; un recuadro de fórmula da q = 1 menos 30 por (hs más hr) partido por dp, y un recuadro secundario repite el mismo recorrido a 60 m, donde las regiones de fuente y receptor se solapan, q = 0 y la región media no existe" width="92%" />
 
-En el ejemplo de 200 m de esta sección ($h_s = h_r = 1,5$ m, así que
-$d_p \approx d$) eso son 45 m de región de fuente, 45 m de región de receptor y
+En el ejemplo de 200 m de esta sección ($h_\mathrm{s} = h_\mathrm{r} = 1,5$ m, así que
+$d_\mathrm{p} \approx d$) eso son 45 m de región de fuente, 45 m de región de receptor y
 110 m de región media: poner los tres factores a 1,0 afirma que los 200 m enteros
 son hierba. Un camino que sale de la planta cruzando una explanada de hormigón de
-20 m toma $G_s = 25/45 \approx 0,55$, y una región media de 70 m de hierba y
-40 m de asfalto toma $G_m = 70/110 \approx 0,64$.
+20 m toma $G_\mathrm{s} = 25/45 \approx 0,55$, y una región media de 70 m de hierba y
+40 m de asfalto toma $G_\mathrm{m} = 70/110 \approx 0,64$.
 
 La región media también puede desaparecer. La nota 2 de la Tabla 3 define
-$q = 1 - 30(h_s + h_r)/d_p$ cuando $d_p > 30(h_s + h_r)$ y $q = 0$ por debajo, y
-$A_m$ es proporcional a $q$: con estas dos alturas el umbral queda en
-$d_p = 30(1,5 + 1,5) = 90$ m, así que en un recorrido de 60 m `ground_middle`
-**se ignora por completo**, y pasar 0.0 o 1.0 devuelve el mismo $A_{gr}$, en
+$q = 1 - 30(h_\mathrm{s} + h_\mathrm{r})/d_\mathrm{p}$ cuando $d_\mathrm{p} > 30(h_\mathrm{s} + h_\mathrm{r})$ y $q = 0$ por debajo, y
+$A_\mathrm{m}$ es proporcional a $q$: con estas dos alturas el umbral queda en
+$d_\mathrm{p} = 30(1,5 + 1,5) = 90$ m, así que en un recorrido de 60 m `ground_middle`
+**se ignora por completo**, y pasar 0.0 o 1.0 devuelve el mismo $A_\mathrm{gr}$, en
 silencio. Ese mismo $q$ da la comprobación de coherencia de todo el término. Sobre
-suelo duro en todas partes, $A_s = A_r = -1,5$ dB y $A_m = -3q$ en todas las
-bandas, así que el recorrido de 200 m tiene que devolver $A_{gr} = -4,65$ dB
+suelo duro en todas partes, $A_\mathrm{s} = A_\mathrm{r} = -1,5$ dB y $A_\mathrm{m} = -3q$ en todas las
+bandas, así que el recorrido de 200 m tiene que devolver $A_\mathrm{gr} = -4,65$ dB
 ($q = 0,55$) y el de 60 m los $-3$ dB conocidos de un plano perfectamente
 reflectante. Haz esa comprobación antes de fiarte de un factor de suelo: es el
 único caso con respuesta en forma cerrada. El agua y el hielo cuentan como suelo
@@ -373,7 +373,7 @@ bandas medias.
 planos a 200 m, la barrera satura en su tope de 20 dB desde 2 kHz, el aire solo
 muerde a 8 kHz (18,7 dB de los 95,8 dB del total) y el suelo es una **ganancia**
 de 4,65 dB a 63 Hz, razón por la que ahí la barrera tiene que gastarse el
-$A_{gr}$ antes de comprar nada.*
+$A_\mathrm{gr}$ antes de comprar nada.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -507,10 +507,10 @@ que el lector sepa que la pared ha saturado y que más altura no compra nada
 (aquí, desde 2 kHz hacia arriba). Solo para una barrera lateral
 (`lateral=True`, Ec. (13)) `a_bar` es igual a $D_z$.
 
-`predicted_receiver_level` compone $L_{fT}(DW) = L_W + D_c - A$ con
-$D_c$ el `DirectivityCorrection` (`index` $+$ `d_omega`). Pasa `c0=` para restar la corrección
-meteorológica $C_{met}$ (Ec. (21)/(22)) banda a banda y obtener una media a largo
-plazo; ten en cuenta que la norma aplica $C_{met}$ al nivel ponderado A, así
+`predicted_receiver_level` compone $L_{fT}(DW) = L_W + D_\mathrm{c} - A$ con
+$D_\mathrm{c}$ el `DirectivityCorrection` (`index` $+$ `d_omega`). Pasa `c0=` para restar la corrección
+meteorológica $C_\mathrm{met}$ (Ec. (21)/(22)) banda a banda y obtener una media a largo
+plazo; ten en cuenta que la norma aplica $C_\mathrm{met}$ al nivel ponderado A, así
 que la forma por bandas aquí es una **comodidad**, no una lectura literal del
 apartado 8.
 
@@ -518,24 +518,24 @@ apartado 8.
 
 Cuando solo importa el nivel ponderado A en el receptor y el sonido viaja sobre
 suelo poroso o mayoritariamente poroso (y no es un tono puro), el 7.3.2 ofrece
-una forma cerrada más simple $A_{gr} = 4{,}8 - \frac{2 h_m}{d}\left(17 + \frac{300}{d}\right) \ge 0$
+una forma cerrada más simple $A_\mathrm{gr} = 4{,}8 - \frac{2 h_\mathrm{m}}{d}\left(17 + \frac{300}{d}\right) \ge 0$
 (Ec. (10), los resultados negativos se recortan a cero), acompañada del índice de
-ángulo sólido $D_\Omega$ (Ec. (11)) que debe entonces sumarse a $D_c$. Se exponen
+ángulo sólido $D_\Omega$ (Ec. (11)) que debe entonces sumarse a $D_\mathrm{c}$. Se exponen
 como `ground_attenuation_alternative` y `directivity_omega`, pero **no se conectan
 automáticamente** en `outdoor_propagation_attenuation` (que siempre usa el método
 general por regiones del 7.3.1); combínalos a mano cuando proceda el método
 alternativo.
 
-$h_m$ **no** es el promedio de las dos alturas extremas. La Figura 3 la define
-como $h_m = F/d$, con $F$ el área encerrada entre la recta fuente-receptor y el
-perfil del terreno: sobre suelo plano se reduce a $(h_s + h_r)/2$, sobre un
+$h_\mathrm{m}$ **no** es el promedio de las dos alturas extremas. La Figura 3 la define
+como $h_\mathrm{m} = F/d$, con $F$ el área encerrada entre la recta fuente-receptor y el
+perfil del terreno: sobre suelo plano se reduce a $(h_\mathrm{s} + h_\mathrm{r})/2$, sobre un
 desmonte se derrumba hacia cero, y sobre un valle cruzado por un camino elevado
 crece muy por encima de cualquiera de las dos alturas extremas. Ese único término
 es la forma en que el método alternativo absorbe la forma del terreno, y leerlo
 como una altura es el error que embellece una predicción. Ojo a la dirección del
-recorte: $A_{gr}$ está acotado por abajo en 0, así que un camino que va alto
+recorte: $A_\mathrm{gr}$ está acotado por abajo en 0, así que un camino que va alto
 sobre el suelo no gana atenuación por suelo en absoluto (a $d = 200$ m,
-$h_m = 8$ m todavía da 3,32 dB, pero $h_m = 8$ m a 50 m da 0,00 dB), mientras
+$h_\mathrm{m} = 8$ m todavía da 3,32 dB, pero $h_\mathrm{m} = 8$ m a 50 m da 0,00 dB), mientras
 que un camino rasante gana los 4,8 dB completos. Las tres condiciones de validez
 viajan con la fórmula: solo el nivel ponderado A, suelo poroso o mayoritariamente
 poroso, y ningún tono puro. Cualquier otra cosa vuelve al método por regiones del
@@ -560,7 +560,7 @@ Cada entrada de la Tabla 3 es un ajuste de ingeniería a una única imagen
 física: el receptor oye dos copias de la fuente, el rayo directo $r_1$ y una
 reflexión que llega exactamente como si la radiara una **fuente imagen**
 reflejada bajo el plano del suelo. Las dos copias interfieren según la
-diferencia de camino $\delta = r_2 - r_1$ (aproximadamente $2 h_s h_r / d$
+diferencia de camino $\delta = r_2 - r_1$ (aproximadamente $2 h_\mathrm{s} h_\mathrm{r} / d$
 para un recorrido rasante en campo lejano): en fase suman hasta $+6$ dB; con
 $\delta = \lambda/2$ sobre un plano rígido se cancelan en un mínimo abrupto.
 
@@ -569,7 +569,7 @@ $\delta = \lambda/2$ sobre un plano rígido se cancelan en un mínimo abrupto.
 Sobre suelo acústicamente duro ($G = 0$) el coeficiente de reflexión se
 mantiene próximo a $+1$ en todas las octavas, la suma a longitudes de onda
 largas es totalmente constructiva y el método general devuelve, como debe,
-$A_{gr} = -3$ dB en cada banda. El suelo poroso vuelve el coeficiente de
+$A_\mathrm{gr} = -3$ dB en cada banda. El suelo poroso vuelve el coeficiente de
 reflexión complejo y dependiente del ángulo (para una fuente puntual en
 incidencia casi rasante, el coeficiente de onda esférica de la solución de
 Chien-Soroka, con un término de onda de suelo que ninguna imagen de onda plana
@@ -581,7 +581,7 @@ rayos reaparece en la atenuación lateral aeronáutica y en cualquier modelo
 exterior basado en rayos; Salomons y Attenborough & Van Renterghem desarrollan
 la teoría completa que el ajuste de ingeniería comprime.
 
-Un $A_{gr}$ negativo (una ganancia neta) es pura interferencia: la onda
+Un $A_\mathrm{gr}$ negativo (una ganancia neta) es pura interferencia: la onda
 reflejada en el suelo se suma a la directa. Abajo, una fuente de 400 Hz a
 1,5 m sobre suelo rígido construye el patrón de lóbulos de esa interferencia,
 y el nivel muestreado sobre un arco converge al modelo de fuente imagen de dos
@@ -603,7 +603,7 @@ delgada) deja `edge_separation=None` ($C_3 = 1$); dar la separación de bordes `
 selecciona la difracción doble (barrera gruesa) con el factor $C_3$ de la
 Ec. (15) y el límite de 25 dB. `ground_reflections_by_image=True` cambia $C_2$ de
 20 a 40 (reflexiones tratadas por fuentes imagen) y `lateral=True` selecciona la
-difracción por borde vertical (Ec. (13), $K_{met}=1$, se conserva el término del
+difracción por borde vertical (Ec. (13), $K_\mathrm{met}=1$, se conserva el término del
 suelo).
 
 La simulación siguiente muestra por qué $D_z$ crece con la frecuencia: frente a
@@ -626,12 +626,12 @@ corta frente a la diferencia de camino.
 | Parámetro | Tipo / forma | Unidades | Rango / def. | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `distance` | float | m | > 0 | Distancia fuente–receptor en línea recta $d$ |
-| `source_height` / `receiver_height` | float | m | ≥ 0 | $h_s$, $h_r$ sobre el suelo |
+| `source_height` / `receiver_height` | float | m | ≥ 0 | $h_\mathrm{s}$, $h_\mathrm{r}$ sobre el suelo |
 | `frequencies` | array 1D | Hz | def. 8 octavas 63–8000 | `DEFAULT_FREQUENCIES` |
 | `ground_source` / `ground_middle` / `ground_receiver` | float | — | `[0, 1]`, def. `0.0` | Factor de suelo $G$ (0 duro, 1 poroso) |
 | `barrier` | `Barrier` o None | — | def. `None` | Obstáculo de apantallamiento |
-| `temperature` / `relative_humidity` / `pressure` | float | °C / % / kPa | 20 / 70 / 101.325 | Pasados a $A_{atm}$ |
-| `projected_distance` | float o None | m | def. $\sqrt{d^2-(h_s-h_r)^2}$ | $d_p$ proyectada sobre el suelo |
+| `temperature` / `relative_humidity` / `pressure` | float | °C / % / kPa | 20 / 70 / 101.325 | Pasados a $A_\mathrm{atm}$ |
+| `projected_distance` | float o None | m | def. $\sqrt{d^2-(h_\mathrm{s}-h_\mathrm{r})^2}$ | $d_\mathrm{p}$ proyectada sobre el suelo |
 
 Devuelve un `OutdoorAttenuation` con `a_div`, `a_atm`, `a_gr`, `a_bar`,
 `a_total` y `d_omega`, todos un valor por banda; su `.plot()` dibuja el
@@ -643,7 +643,7 @@ ocho bandas de octava nominales de 63 Hz a 8 kHz, y su Tabla 3 no tiene más
 resolución, así que toda frecuencia que se pase se lleva a la *octava nominal
 más próxima* para el término de suelo, mientras que la divergencia y la
 absorción atmosférica siguen siendo continuas en frecuencia. Una llamada en
-tercios de octava devuelve por tanto un $A_{gr}$ escalonado, no uno más fino:
+tercios de octava devuelve por tanto un $A_\mathrm{gr}$ escalonado, no uno más fino:
 en 400 / 500 / 630 / 800 Hz sobre suelo poroso a 100 m, `a_gr` sale como
 7,65 / 7,65 / 7,65 / 1,76 dB (tres bandas que comparten la octava de 500 Hz y
 luego la de 1 kHz), mientras que `a_atm` avanza suavemente por
@@ -660,13 +660,13 @@ una evaluación en baja frecuencia queda fuera de este método.
 
 | Campo | Tipo | Unidades | Def. | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `source_to_edge` | float | m | — | $d_{ss}$, fuente al primer borde |
-| `edge_to_receiver` | float | m | — | $d_{sr}$, (último) borde al receptor |
+| `source_to_edge` | float | m | — | $d_\mathrm{ss}$, fuente al primer borde |
+| `edge_to_receiver` | float | m | — | $d_\mathrm{sr}$, (último) borde al receptor |
 | `parallel_distance` | float | m | `0.0` | Componente $a$ paralela al borde |
 | `edge_separation` | float o None | m | `None` | $e$; si se da ⇒ difracción doble (límite 25 dB) |
 | `ground_reflections_by_image` | bool | — | `False` | `True` ⇒ $C_2 = 40$ |
 | `lateral` | bool | — | `False` | `True` ⇒ difracción por borde vertical (Ec. (13)) |
-| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ la línea de visión pasa por encima del borde superior: la diferencia de camino toma signo negativo y $K_{met} = 1$ (texto tras la Ec. (16)) |
+| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ la línea de visión pasa por encima del borde superior: la diferencia de camino toma signo negativo y $K_\mathrm{met} = 1$ (texto tras la Ec. (16)) |
 
 ## 3. Alcance, hipótesis y errores habituales
 
@@ -685,7 +685,7 @@ suele ser menor y rara vez es apreciablemente mayor. La elección es
 deliberada. Las quejas llegan en las noches tranquilas en las que una planta
 lejana se oye con claridad, no en las tardes ventosas en las que desaparece, y
 un método que predice el caso audible protege la evaluación. El promedio a
-largo plazo se recupera restando $C_{met}$ (Ec. (21)/(22)), cuyo $C_0$
+largo plazo se recupera restando $C_\mathrm{met}$ (Ec. (21)/(22)), cuyo $C_0$
 codifica con qué frecuencia el viento favorece de verdad el camino (unos
 $+3$ dB cuando la mitad del tiempo es favorable; valores por encima de 2 dB ya
 son excepcionales, Notas 20/22). La exactitud declarada de $\pm 1$ a $\pm 3$ dB
@@ -705,11 +705,11 @@ deciden si una barrera real entrega su $D_z$ calculado:
   pantallas. La propia Ec. (14) es una curva de ingeniería suavizada en la
   tradición del ábaco de pantallas de Maekawa, un ajuste empírico sobre tres
   décadas del número de Fresnel $N = 2z/\lambda$.
-* **$K_{met}$ merma en silencio las barreras lejanas.** El factor
+* **$K_\mathrm{met}$ merma en silencio las barreras lejanas.** El factor
   meteorológico (Ec. (18)) descuenta el apantallamiento porque los mismos
   rayos curvados hacia abajo que hacen favorables las condiciones también
   pasan por encima del borde superior. A menos de 100 m de distancia
-  fuente-receptor $K_{met} \approx 1$ (Nota 17), pero en un camino largo con
+  fuente-receptor $K_\mathrm{met} \approx 1$ (Nota 17), pero en un camino largo con
   poca diferencia de recorrido puede quitar varios decibelios a una barrera
   que parecía generosa en el alzado.
 * **La difracción doble es una bonificación modesta.** Un obstáculo grueso
@@ -720,8 +720,8 @@ deciden si una barrera real entrega su $D_z$ calculado:
   cerrada.
 * **El efecto del suelo se gasta, no se conserva.** Para una barrera de borde
   superior la norma pliega el efecto del suelo del camino apantallado dentro
-  de la difracción: $A_{bar} = D_z - A_{gr}$ (Ec. (12), Nota 13). Sobre suelo
-  poroso que ya aportaba de 5 a 10 dB de $A_{gr}$ en las bandas medias, la
+  de la difracción: $A_\mathrm{bar} = D_z - A_\mathrm{gr}$ (Ec. (12), Nota 13). Sobre suelo
+  poroso que ya aportaba de 5 a 10 dB de $A_\mathrm{gr}$ en las bandas medias, la
   ganancia *neta* de construir la barrera es proporcionalmente menor que su
   $D_z$ nominal; los dos efectos no se apilan.
 
@@ -729,9 +729,9 @@ deciden si una barrera real entrega su $D_z$ calculado:
 
 *Izquierda: más altura deja de pagar en cuanto $D_z$ toca su tope; más allá de
 unos 7 m de pantalla en este recorrido, la curva de borde simple es plana en
-20 dB, y $K_{met}$ ya le ha quitado de 1 a 2 dB a 200 m. Derecha: las dos curvas
-son la misma barrera; la separación entre ellas es $A_{gr}$, y donde el suelo ya
-valía más que la difracción (la octava de 250 Hz) el $A_{bar}$ neto es cero.*
+20 dB, y $K_\mathrm{met}$ ya le ha quitado de 1 a 2 dB a 200 m. Derecha: las dos curvas
+son la misma barrera; la separación entre ellas es $A_\mathrm{gr}$, y donde el suelo ya
+valía más que la difracción (la octava de 250 Hz) el $A_\mathrm{bar}$ neto es cero.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -806,7 +806,7 @@ preguntas distintas:
   Agrupa modelos de *emisión* para fuentes viarias, ferroviarias e
   industriales (y delega las aeronaves en el Doc 29 de la CEAC) con su propia
   parte de propagación derivada del método francés NMPB 2008, produciendo los
-  indicadores $L_{den}$/$L_{night}$ que la Directiva exige. Esta biblioteca
+  indicadores $L_\mathrm{den}$/$L_\mathrm{night}$ que la Directiva exige. Esta biblioteca
   implementa la mitad de *emisión* de CNOSSOS-EU en
   [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/)
   y
@@ -820,7 +820,7 @@ Las partes de propagación discrepan por diseño, no por accidente. CNOSSOS-EU
 evalúa cada camino dos veces, una con atmósfera homogénea y otra en
 condiciones favorables (refracción descendente), y las combina a largo plazo
 con la probabilidad local de condiciones favorables por dirección de camino;
-la ISO 9613-2 calcula solo el caso favorable y resta un $C_{met}$ escalar. El
+la ISO 9613-2 calcula solo el caso favorable y resta un $C_\mathrm{met}$ escalar. El
 efecto del suelo en CNOSSOS-EU se construye con un factor de suelo promediado
 sobre un plano medio ajustado, con expresiones que cambian entre las dos
 atmósferas, mientras que la ISO 9613-2 usa la Tabla 3 fija de tres regiones.
@@ -854,7 +854,7 @@ barrera, nombra el modelo de difracción real que hay detrás del número.
 atenuación total por bandas de octava; pasa un `SourceEmission` (la potencia
 acústica de la fuente y su directividad) para añadir la potencia de la fuente y
 el nivel a favor del viento a la tabla y destacar en su lugar el nivel a favor
-del viento con ponderación A $L_{AT}(\text{DW})$ en el receptor. Un nivel límite
+del viento con ponderación A $L_{\mathrm{A}T}(\text{DW})$ en el receptor. Un nivel límite
 indicado mediante el `requirement` de los metadatos añade entonces un veredicto
 CUMPLE/NO CUMPLE (un nivel más bajo es mejor). Usa `language="es"` para la ficha
 en español.
@@ -935,7 +935,7 @@ coherente.
 ## Véase también
 
 - [Efecto suelo esférico y barreras avanzadas](/phonometry/es/environment/propagation/ground-barriers/): la acústica ondulatoria que hay debajo del ajuste de suelo de la Tabla 3 y de la curva de apantallamiento de la Ec. (14).
-- [Refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/): lo que la hipótesis de condiciones favorables y el $C_{met}$ vienen a sustituir.
+- [Refracción atmosférica](/phonometry/es/environment/propagation/atmospheric-refraction/): lo que la hipótesis de condiciones favorables y el $C_\mathrm{met}$ vienen a sustituir.
 - [Emisión de la fuente de tráfico viario CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-road-emission/) y [Emisión de la fuente ferroviaria CNOSSOS-EU](/phonometry/es/environment/sources/cnossos-rail-emission/): las potencias de fuente a las que se refiere la comparación de la sección 3.
 - [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): qué le pasa al nivel predicho cuando pasa a ser un nivel evaluado.
 - Referencia de la API: [`environment.propagation.outdoor_propagation`](/phonometry/es/reference/api/environment/outdoor-propagation/) y [`environment.propagation.air_absorption`](/phonometry/es/reference/api/environment/air-absorption/).

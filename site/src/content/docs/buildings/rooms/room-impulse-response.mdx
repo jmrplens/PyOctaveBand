@@ -220,11 +220,11 @@ sensitivity to changes in the environment, while one long sweep does not.
 **The MLS period.** A periodic excitation is different, and clause 6.2.2.2 is
 normative about it (Eq. (10)): the repetition period **shall not be shorter
 than $T$**, so that at least two spectral lines fall inside the bandwidth of
-any room mode. Since the period of an order-$N$ sequence is $(2^N-1)/f_s$,
+any room mode. Since the period of an order-$N$ sequence is $(2^N-1)/f_\mathrm{s}$,
 that fixes the order:
 
 $$
-N \geq \frac{\lg\!\left(T f_s + 1\right)}{\lg 2} .
+N \geq \frac{\lg\!\left(T f_\mathrm{s} + 1\right)}{\lg 2} .
 $$
 
 At 48 kHz, order 16 gives 1.37 s and order 18 gives 5.46 s, and a room with
@@ -430,7 +430,7 @@ fixed linear filter changes the shape of the early part but not the slope of
 the band decay, which is why reverberation times transfer between measurement
 systems. For the energy parameters it is not: the source's low-frequency
 roll-off and its high-frequency directivity redistribute early energy and
-shift C50, C80 and $T_s$, so those do **not** transfer. Two consequences
+shift C50, C80 and $T_\mathrm{s}$, so those do **not** transfer. Two consequences
 follow. Quote the source used whenever you report clarity or centre time; and
 remove the free-field response of the chain before auralising the response or
 comparing it across systems. It is also why the standard specifies the
@@ -565,7 +565,7 @@ Four placement mistakes bias the mean itself:
   sit on symmetry lines.
 - **Too close to the source.** Inside the direct field EDT collapses and
   C80 saturates upward no matter what the room does. ISO 3382-2 therefore
-  keeps every microphone at least $d_{min} = 2\sqrt{V/(c\,\hat T)}$ from
+  keeps every microphone at least $d_\mathrm{min} = 2\sqrt{V/(c\,\hat T)}$ from
   the source, with $\hat T$ an estimate of the expected reverberation time
   (2.0 m for the 10 × 6 × 3.5 m room of the drawings above, V = 210 m³, with
   an expected 0.6 s).
@@ -582,7 +582,7 @@ mistake in the result:
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/source_distance_bias.svg" alt="Two stacked panels sharing a source-receiver distance axis from 0.6 to 7 metres in the same 10 by 6 by 3.5 metre room as the setup drawings. Above, the 500 to 1000 Hz mean T30 stays between 0.54 and 0.66 seconds across the whole sweep while EDT climbs from 0.18 to about 0.45 seconds; below, clarity C80 falls from 17.5 to about 10.5 decibels. The region inside d_min = 2.0 metres is shaded as excluded and the critical distance of 1.5 metres is marked with a dotted line" width="90%" />
 
 *EDT, T30 and C80 of the room above against source distance, from synthetic
-impulse responses. Inside $d_{min}$, EDT is short by a factor of about 2.5 and
+impulse responses. Inside $d_\mathrm{min}$, EDT is short by a factor of about 2.5 and
 C80 is 7 dB high — many times the 5 % relative and 1 dB just-noticeable
 differences of ISO 3382-1 Table A.1 — while T30 wanders by 0.12 s over the
 whole sweep with no trend at the close end. That asymmetry is the trap: a

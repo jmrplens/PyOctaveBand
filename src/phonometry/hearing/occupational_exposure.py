@@ -14,11 +14,11 @@ the normative **Annex C** uncertainty budget.
 
 - *Task-based* (Clause 9): the nominal day is split into tasks; each task level is
   the energy average of ``I >= 3`` samples (Eq 7), its contribution is
-  :math:`L_{EX,8h,m} = L_{p,A,eqT,m} + 10 \log_{10}(T_m/T_0)` (Eq 8), and the
+  :math:`L_{\mathrm{EX,8h},m} = L_{p,\mathrm{A,eq}T,m} + 10 \log_{10}(T_m/T_0)` (Eq 8), and the
   daily level is the energy sum over tasks (Eq 9/10).
 - *Job-based* (Clause 10): ``N >= 5`` random samples over a homogeneous exposure
   group; the effective-day level is their energy average (Eq 11) and
-  :math:`L_{EX,8h} = L_{p,A,eqTe} + 10 \log_{10}(T_e/T_0)` (Eq 12). The minimum
+  :math:`L_\mathrm{EX,8h} = L_{p,\mathrm{A,eq}T\mathrm{e}} + 10 \log_{10}(T_\mathrm{e}/T_0)` (Eq 12). The minimum
   cumulative measurement duration follows Table 1.
 - *Full-day* (Clause 11): three (or more) whole-day measurements averaged (Eq 11),
   then Eq 13, the same arithmetic as the job method.
@@ -251,7 +251,7 @@ class TaskContribution:
 
     @property
     def variance_contribution(self) -> float:
-        r"""This task's contribution to :math:`u^2(L_{EX,8h})` (a term of
+        r"""This task's contribution to :math:`u^2(L_\mathrm{EX,8h})` (a term of
         Eq C.3), dB²."""
         return self.c1a**2 * (self.u1a**2 + self.u2**2 + self.u3**2) + (self.c1b * self.u1b) ** 2
 
@@ -271,7 +271,7 @@ class ExposureResult:
         default; individual tasks may override it): ``"class1"``, ``"class2"``
         or ``"personal_exposimeter"``. Printed on the ``.report()`` fiche
         (ISO 9612:2009 Clause 15 c).
-    :ivar upper_limit: :math:`L_{EX,8h} + U`, the value 95 % of readings fall
+    :ivar upper_limit: :math:`L_\mathrm{EX,8h} + U`, the value 95 % of readings fall
         below.
     """
 

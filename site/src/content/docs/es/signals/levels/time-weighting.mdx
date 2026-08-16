@@ -55,7 +55,7 @@ Dos páginas hermanas completan la cadena. La salida del detector es la
 traza de nivel sobre la que se definen los niveles percentiles $L_N$ de
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/),
 mientras que las métricas
-integradas ($L_{eq}$, SEL) se saltan el detector por completo; y la cadena
+integradas ($L_\mathrm{eq}$, SEL) se saltan el detector por completo; y la cadena
 completa de instrumento IEC 61672-1 que envuelve este detector
 (ponderación, rangos, verificaciones periódicas) es el asunto de
 [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/).
@@ -154,7 +154,7 @@ lenta, conmutando por muestra según el signo del cambio:
 
 $$
 y[n] = y[n-1] + \alpha \ (x^2[n] - y[n-1]), \qquad
-\alpha = \begin{cases}1 - e^{-1/(f_s \cdot 0{,}035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_s \cdot 1{,}5)} & \text{en otro caso}\end{cases}
+\alpha = \begin{cases}1 - e^{-1/(f_\mathrm{s} \cdot 0{,}035)} & x^2[n] > y[n-1]\\[2pt] 1 - e^{-1/(f_\mathrm{s} \cdot 1{,}5)} & \text{en otro caso}\end{cases}
 $$
 
 Una constante de tiempo y una velocidad de caída son la misma afirmación. Un
@@ -170,7 +170,7 @@ La asimetría tiene una consecuencia que merece decirse: a diferencia de F y S,
 Impulse no es un filtro. Su coeficiente depende de la señal, así que un nivel
 ponderado I no es aditivo; el nivel ponderado I de dos fuentes funcionando a la
 vez no se puede deducir de las dos medidas por separado, mientras que sus
-$L_{eq}$ sí.
+$L_\mathrm{eq}$ sí.
 
 ### Elegir F, S o I
 
@@ -178,7 +178,7 @@ $L_{eq}$ sí.
   niveles percentiles, detección de eventos impulsivos, ruido comunitario,
   la gráfica general de «nivel frente a tiempo». Su constante de 125 ms es
   del mismo orden que el tiempo de integración de sonoridad del propio oído,
-  así que una traza $L_{AF}$ sigue a grandes rasgos lo que un oyente percibe.
+  así que una traza $L_\mathrm{AF}$ sigue a grandes rasgos lo que un oyente percibe.
 - **Slow** conviene a fuentes cuasi estacionarias y a cualquier
   procedimiento que necesite una lectura estable: promedia el parpadeo de
   una fuente fluctuante al precio de perder los eventos cortos (una ráfaga
@@ -195,13 +195,13 @@ $L_{eq}$ sí.
   explica el porqué: los niveles ponderados I no son adecuados para
   valorar sonidos impulsivos. La práctica *internacional* moderna
   valora la impulsividad
-  con $L_{Aeq}$ más un ajuste (Tabla A.1 de ISO 1996-1, o el análisis de
+  con $L_\mathrm{Aeq}$ más un ajuste (Tabla A.1 de ISO 1996-1, o el análisis de
   inicio de
   [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/))
-  y evalúa el riesgo de daño auditivo con $L_{Cpeak}$, nunca con niveles
+  y evalúa el riesgo de daño auditivo con $L_\mathrm{Cpeak}$, nunca con niveles
   ponderados I. Algunas normas nacionales siguen exigiendo explícitamente la
   ponderación I: el RD 1367/2007 español gradúa su corrección por impulsividad
-  $K_i$ sobre $L_{AIeq} - L_{Aeq}$ (ver
+  $K_\mathrm{i}$ sobre $L_\mathrm{AIeq} - L_\mathrm{Aeq}$ (ver
   [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/)),
   y por eso `mode='impulse'` es aquí una opción de pleno derecho y no un parche
   de compatibilidad.
@@ -213,7 +213,7 @@ evento. Las curvas medidas caen sobre los puntos de referencia de la Tabla 4,
 así que toda la tabla es una línea de álgebra. La diferencia entre dos curvas a
 una duración dada es la razón por la que un nivel máximo tiene que nombrar su
 ponderación temporal; y la pérdida absoluta es la razón por la que los impulsos
-muy cortos se valoran con $L_{Cpeak}$ en su lugar: incluso Impulse, la balística
+muy cortos se valoran con $L_\mathrm{Cpeak}$ en su lugar: incluso Impulse, la balística
 diseñada para impactos, se queda 18 dB baja en una ráfaga de 1 ms.*
 
 <details>
@@ -267,10 +267,10 @@ usa las funciones de nivel, que lo hacen por ti.
 Esos valores de referencia no son una tabla de consulta sin fórmula detrás. La
 IEC 61672-1 los da en la nota 1 a la Tabla 4 como ecuación (7), la respuesta
 exacta del detector del apartado 1 a una ráfaga tonal aislada de 4 kHz de
-duración $T_b$:
+duración $T_\mathrm{b}$:
 
 $$
-\Delta_{\mathrm{ref}} = 10\log_{10}\left(1 - e^{-T_b/\tau}\right)\ \text{dB}
+\Delta_{\mathrm{ref}} = 10\log_{10}\left(1 - e^{-T_\mathrm{b}/\tau}\right)\ \text{dB}
 $$
 
 Léela en voz alta y sale la tabla entera. En Fast ($\tau = 125$ ms) una ráfaga
@@ -280,9 +280,9 @@ en Fast y $-10{,}21$ dB en Slow, y esos 7,6 dB son la cifra que cita la
 [guía de elección](#elegir-f-s-o-i) de más arriba. La física cabe en una frase:
 un detector con memoria $\tau$ no puede alcanzar su valor estacionario en un
 evento más corto que $\tau$, así que **todo sonómetro subestima todo evento
-corto**, en una cantidad que solo depende de $T_b/\tau$. Por eso un nivel máximo
+corto**, en una cantidad que solo depende de $T_\mathrm{b}/\tau$. Por eso un nivel máximo
 no significa nada sin su balística, y por eso los impulsos cortos frente a los
-125 ms se valoran con $L_{Cpeak}$ en su lugar.
+125 ms se valoran con $L_\mathrm{Cpeak}$ en su lugar.
 
 La respuesta de la envolvente Fast a ráfagas tonales de 4 kHz cae exactamente
 sobre los valores de referencia de la norma: el ejemplo de abajo verifica las
@@ -419,7 +419,7 @@ Sin numba, un fallback en Python puro produce resultados idénticos, solo que m�
 lento.
 
 Consulta [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/)
-para las métricas $L_{eq}$/$L_N$ construidas sobre estas envolventes, y
+para las métricas $L_\mathrm{eq}$/$L_N$ construidas sobre estas envolventes, y
 [Por qué phonometry](/phonometry/es/start/why-phonometry/) para la
 verificación con ráfagas tonales de IEC 61672-1.
 
@@ -443,7 +443,7 @@ página; es el asunto de [Construye un
 sonómetro](/phonometry/es/signals/sound-level-meter/). La ANSI S1.4-1983 se
 cita solo por el origen histórico de las constantes F y S, no se implementa
 como especificación de instrumento propia. La valoración moderna de
-impulsividad ($L_{Aeq}$ más un ajuste, o el análisis de inicio) está en la
+impulsividad ($L_\mathrm{Aeq}$ más un ajuste, o el análisis de inicio) está en la
 página de [Prominencia de sonidos
 impulsivos](/phonometry/es/environment/assessment/impulsive-sound/), no
 construida sobre la ponderación Impulse de aquí.
@@ -457,7 +457,7 @@ construida sobre la ponderación Impulse de aquí.
 - [Ponderación frecuencial](/phonometry/es/signals/levels/weighting/): los filtros A/C/Z aplicados antes del detector.
 - [Procesado por bloques](/phonometry/es/signals/filters/block-processing/): el detector en streaming sobre tramas sin discontinuidades de estado.
 - [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/): la valoración de impulsos por análisis de inicio a la que se pasaron las normas internacionales.
-- [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/): una valoración en vigor que sigue exigiendo la ponderación I, a través de la corrección por impulsividad $K_i$ sobre $L_{AIeq} - L_{Aeq}$.
+- [Normativa española de ruido](/phonometry/es/environment/assessment/spanish-noise-regulation/): una valoración en vigor que sigue exigiendo la ponderación I, a través de la corrección por impulsividad $K_\mathrm{i}$ sobre $L_\mathrm{AIeq} - L_\mathrm{Aeq}$.
 - [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/): los ensayos periódicos de IEC 61672-3, en los que esta balística se comprueba por muestreo contra los límites de clase sobre un instrumento real.
 - Referencia de la API: [`filters.weighting`](/phonometry/es/reference/api/filters/weighting/).
 - Teoría: [Integración temporal](/phonometry/es/reference/theory/signal-analysis/#integración-temporal): la ecuación de primer orden que resuelven los detectores exponenciales, y qué cambiaría integrarla en su lugar sobre un bloque fijo.

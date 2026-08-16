@@ -50,13 +50,13 @@ print(res.resolution_bandwidth)    # Be of the tapered segment, in Hz
 res.plot()                         # dB image over the time-frequency plane
 ```
 
-The segment length is the whole design decision: $T_B = \text{nperseg}/f_s$
-of time resolution against $B_e \approx 1/T_B$ of frequency resolution, a
+The segment length is the whole design decision: $T_B = \text{nperseg}/f_\mathrm{s}$
+of time resolution against $B_\mathrm{e} \approx 1/T_B$ of frequency resolution, a
 product of one
 (Section 12.6.4.2). Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
 *unaveraged* estimate, random data carries a per-cell normalized random
-error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
+error of 1 (Eq. 8.158 with $n_\mathrm{d} = 1$; Bendat & Piersol quote
 $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display) - the spectrogram is a tool for
 deterministic structure (tones, sweeps, transients), while the averaged
 [Welch estimate](spectral-analysis.md) is the low-variance
@@ -141,7 +141,7 @@ res.plot()                               # power spectrum in dB over the band
 One distinction matters and the result states it: the **grid** can be made
 arbitrarily fine (`n_points`), but the **resolution** - the ability to
 separate two tones - is set by the record length and taper, reported as
-`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T$
+`resolution_bandwidth` ($B_\mathrm{e} = f_\mathrm{s} \sum w^2/(\sum w)^2$, i.e. $1/T$
 untapered, $1.5/T$ for Hann). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
 

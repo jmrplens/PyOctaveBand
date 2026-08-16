@@ -103,7 +103,7 @@ $$
 
 with $f$ in kilohertz. $C$ is fixed by putting the peak of $W$ at 0 dB, so the
 companion **exposure function** $E(f) = K + C - W(f)$ has its minimum at the
-weighted TTS-onset threshold $T_w = K + C$. Below $f_1$ the filter falls at
+weighted TTS-onset threshold $T_\mathrm{w} = K + C$. Below $f_1$ the filter falls at
 $20a$ dB/decade and above $f_2$ at $20b$ dB/decade.
 
 Only the parameter table changes between versions, so the version is an

@@ -7,8 +7,8 @@ source with a **noise hemisphere**: one-third-octave-band sound pressure levels 
 a spherical grid of azimuth ``φ`` and polar angle ``θ`` at a fixed 60 m reference
 distance (at ICAO reference atmospheric conditions). Placing that source at a
 receiver adds the propagation adjustment
-:math:`\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g` (plus
-:math:`\Delta L_d` with shielding): spherical spreading, atmospheric
+:math:`\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}` (plus
+:math:`\Delta L_\mathrm{d}` with shielding): spherical spreading, atmospheric
 absorption, ground effect and, later, shielding. Those adjustments depend on the
 path and not on the rotorcraft, and live in
 :mod:`~phonometry.aircraft.rotorcraft_propagation`; this module is the source
@@ -484,9 +484,9 @@ def flight_condition_weights(
 
     The database flight conditions and the query are scaled by the database
     spans, :math:`\bar{V} = V/(V_{\mathrm{max}} - V_{\mathrm{min}})` and
-    :math:`\bar{\gamma} = F_{fc} \cdot \gamma
+    :math:`\bar{\gamma} = F_\mathrm{fc} \cdot \gamma
     / (\gamma_{\mathrm{max}} - \gamma_{\mathrm{min}})` with
-    the empirical flight-condition scaling factor :math:`F_{fc} = 2`: the
+    the empirical flight-condition scaling factor :math:`F_\mathrm{fc} = 2`: the
     guidance's
     normalisation (Eq. 3-6), which subtracts no minima -- a shared offset
     cancels in the distances ``δ_j`` (Eq. 7) either way. Inside the
@@ -682,7 +682,7 @@ class FlightPathKinematics:
         (Eq. 18), in rad/m, shape
         ``(N,)`` (zero where the ground speed vanishes).
     :ivar bank_angle: Bank angle
-        :math:`\Phi = \arctan(K \cdot V_g^2/g)` (Eq. 20), in degrees,
+        :math:`\Phi = \arctan(K \cdot V_\mathrm{g}^2/g)` (Eq. 20), in degrees,
         positive starboard down, shape ``(N,)``.
     :ivar path_angle: Path angle
         :math:`\gamma = \arctan(\Delta Z/\Delta S)` (Doc 32 Eq. 10), in
@@ -725,7 +725,7 @@ def flight_path_kinematics(
     (Eq. 16), the zero-wind airspeed ``V_A`` (Eq. 17), the heading
     :math:`\Theta = \operatorname{atan2}(\Delta X, \Delta Y)` (Eq. 19), the
     curvature :math:`K = \Delta\Theta/\Delta S` (Eq. 18), the
-    bank angle :math:`\Phi = \arctan(K \cdot V_g^2/g)` (Eq. 20) and the path
+    bank angle :math:`\Phi = \arctan(K \cdot V_\mathrm{g}^2/g)` (Eq. 20) and the path
     angle
     :math:`\gamma = \arctan(\Delta Z/\Delta S)` (Doc 32 Eq. 10). The
     airspeed, not the ground speed,
@@ -831,7 +831,7 @@ class RotorcraftEventResult:
 
     :ivar frequencies: Band centre frequencies, in Hz, shape ``(F,)``.
     :ivar emission_times: Emission times ``t_e``, in s, shape ``(K,)``.
-    :ivar times: Recorded times :math:`t_r = t_e + r/c` (Eq. 22), in s, shape
+    :ivar times: Recorded times :math:`t_\mathrm{r} = t_\mathrm{e} + r/c` (Eq. 22), in s, shape
         ``(K,)``.
     :ivar distance: Slant distance ``r`` per step, in metres, shape ``(K,)``.
     :ivar azimuth: Emission azimuth ``φ`` per step, in degrees, shape ``(K,)``.
@@ -1470,10 +1470,10 @@ def rotorcraft_event_level(
     For every track point the flight condition selects (or blends, Eq. 3-10)
     the hemispheres, the emission angles address the source level (Eq. 13-15)
     and the propagation adjustment
-    :math:`\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g` (Eq. 23-35)
+    :math:`\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}` (Eq. 23-35)
     places
     it at the receiver. The received one-third-octave history is expressed at
-    recorded time :math:`t_r = t_e + r/c` (Eq. 22) and integrated into
+    recorded time :math:`t_\mathrm{r} = t_\mathrm{e} + r/c` (Eq. 22) and integrated into
     ``LASmax``,
     ``SEL`` (Doc 32 Eq. 27) and ``EPNL`` (Doc 32 Eq. 28, ICAO Annex 16 App. 2,
     reusing

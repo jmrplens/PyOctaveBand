@@ -32,11 +32,11 @@ The equivalent sound absorption area of the specimen and its absorption
 coefficient (ISO 354:2003, Eq. (8) and Eq. (9)):
 
 $$
-A_T = A_2 - A_1 = 55.3 V \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - 4 V (m_2 - m_1)
+A_\mathrm{T} = A_2 - A_1 = 55.3 V \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - 4 V (m_2 - m_1)
 $$
 
 $$
-\alpha_s = \frac{A_T}{S}
+\alpha_\mathrm{s} = \frac{A_\mathrm{T}}{S}
 $$
 
 `alpha_s` may exceed 1.0 (e.g. from diffraction/edge effects) and is not a
@@ -113,15 +113,15 @@ using the empty-room reverberation time `T1` and the with-specimen time
 `T2`:
 
 $$
-A_T = A_2 - A_1 = 55.3 V \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - 4 V (m_2 - m_1)
+A_\mathrm{T} = A_2 - A_1 = 55.3 V \left( \frac{1}{c_2 T_2} - \frac{1}{c_1 T_1} \right) - 4 V (m_2 - m_1)
 $$
 
-then returns $\alpha_s = A_T / S$ (Eq. (9)).
+then returns $\alpha_\mathrm{s} = A_\mathrm{T} / S$ (Eq. (9)).
 
 The two measurements may be at different temperatures; `c1` and `c2` are
 resolved independently. `alpha_s` is returned unclamped and may exceed 1.0
 (Clause 3.7 NOTE 2). Because adding an absorber must reduce the
-reverberation time, $T_2 \ge T_1$ ($\alpha_s \le 0$) is
+reverberation time, $T_2 \ge T_1$ ($\alpha_\mathrm{s} \le 0$) is
 non-physical and emits an [`AbsorptionWarning`](/phonometry/reference/api/materials/sound-absorption/#absorptionwarning). A room volume below
 the 150 m3 minimum of clause 6.1.1, or a sample area outside the clause
 6.2.1.1 range ($10~\text{m}^2 \le S \le 12~\text{m}^2$, upper limit
@@ -197,7 +197,7 @@ reverberation times of the empty room (`T1`) and of the room with the
 specimen installed (`T2`). The equivalent sound absorption areas `A1`
 and `A2` follow from Sabine's equation (Eq. (5)/(7), delegated to
 [`absorption_area`](/phonometry/reference/api/materials/sound-absorption/#absorption_area)) and the sound absorption coefficient
-$\alpha_s = (A_2 - A_1)/S$ from Eq. (8)/(9) (delegated to
+$\alpha_\mathrm{s} = (A_2 - A_1)/S$ from Eq. (8)/(9) (delegated to
 [`absorption_coefficient`](/phonometry/reference/api/materials/sound-absorption/#absorption_coefficient)); no formula is re-derived here.
 
 Both measurements are taken at the same air temperature and, for the air
@@ -284,7 +284,7 @@ is therefore not produced here; pass `alpha_s` to
 
 *property*
 
-Equivalent sound absorption area $A_T = A_2 - A_1$.
+Equivalent sound absorption area $A_\mathrm{T} = A_2 - A_1$.
 
 The ISO 354:2003 Eq. (8) quantity, per band, in square metres; dividing
 it by the specimen area `S` gives `alpha_s` (Eq. (9)).

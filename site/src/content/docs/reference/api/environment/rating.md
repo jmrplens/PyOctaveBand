@@ -51,7 +51,7 @@ lden(
 Day-evening-night sound level Lden (ISO 1996-1:2016, 3.6.4).
 
 $$
-L_{den} = 10 \log_{10}\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}} + t_e \cdot 10^{0.1 (L_{evening}+5)} + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
+L_\mathrm{den} = 10 \log_{10}\left\{ (1/24) \left[ t_\mathrm{d} \cdot 10^{0.1 L_\mathrm{day}} + t_\mathrm{e} \cdot 10^{0.1 (L_\mathrm{evening}+5)} + t_\mathrm{n} \cdot 10^{0.1 (L_\mathrm{night}+10)} \right] \right\}
 $$
 
 **Parameters**
@@ -78,7 +78,7 @@ ldn(
 Day-night sound level Ldn (ISO 1996-1:2016, 3.6.5).
 
 $$
-L_{dn} = 10 \log_{10}\left\{ (1/24) \left[ t_d \cdot 10^{0.1 L_{day}} + t_n \cdot 10^{0.1 (L_{night}+10)} \right] \right\}
+L_\mathrm{dn} = 10 \log_{10}\left\{ (1/24) \left[ t_\mathrm{d} \cdot 10^{0.1 L_\mathrm{day}} + t_\mathrm{n} \cdot 10^{0.1 (L_\mathrm{night}+10)} \right] \right\}
 $$
 
 **Parameters**

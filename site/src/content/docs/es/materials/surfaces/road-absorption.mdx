@@ -47,8 +47,8 @@ límites de onda plana del tubo, y cierra con la elección entre ellos.
 
 En campo no hay cámara reverberante. ISO 13472-1 mide la absorción acústica de un
 pavimento (o de cualquier superficie plana extensa) *in situ* disparando un
-impulso desde un altavoz a la altura $d_s$ hacia la superficie y registrando la
-respuesta al impulso en un micrófono a la altura $d_m$. Las componentes
+impulso desde un altavoz a la altura $d_\mathrm{s}$ hacia la superficie y registrando la
+respuesta al impulso en un micrófono a la altura $d_\mathrm{m}$. Las componentes
 **incidente** y **reflejada** se separan en el tiempo con una ventana de
 Adrienne; su función de transferencia da el factor de reflexión y de ahí la
 absorción.
@@ -59,24 +59,24 @@ absorción.
 que la directa, así que se atenúa por el factor de divergencia geométrica
 
 $$
-K_r = \frac{d_s - d_m}{d_s + d_m},
+K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
-que vale $2/3$ para la geometría obligatoria $d_s = 1{,}25$ m, $d_m = 0{,}25$ m.
+que vale $2/3$ para la geometría obligatoria $d_\mathrm{s} = 1{,}25$ m, $d_\mathrm{m} = 0{,}25$ m.
 Las dos alturas se mantienen dentro de 0,005 m a lo largo del promediado, y los
 centros acústicos de fuente y micrófono quedan sobre una misma recta normal a la
 superficie, con el eje del micrófono paralelo a ella. La absorción se obtiene de
-los espectros incidente y reflejado enventanados $H_i$, $H_r$:
+los espectros incidente y reflejado enventanados $H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ### 1.1 Qué se sustrae
 
 El micrófono oye la onda directa y la reflexión del pavimento en la misma
 respuesta al impulso, y la geometría obligatoria las deja separadas solo
-$2 d_m / c \approx 1{,}5$ ms, muchísimo menos de lo necesario para separarlas
+$2 d_\mathrm{m} / c \approx 1{,}5$ ms, muchísimo menos de lo necesario para separarlas
 con una puerta en el extremo bajo de la banda declarada. Por eso la ISO 13472-1
 exige la **técnica de sustracción** (apartado 4.2) y no un simple enventanado
 temporal, y de ese paso salen los dos arrays que consumen las funciones de esta
@@ -90,15 +90,15 @@ página:
    estable: **al menos 50** respuestas (apartado 4.3), que es lo que vence al
    ruido de fondo y a la variación meteorológica.
 3. Repetir la medición idéntica con el conjunto apartado de cualquier superficie
-   reflectante. Esa respuesta de campo libre **es** $h_i$. Corregir cualquier
+   reflectante. Esa respuesta de campo libre **es** $h_\mathrm{i}$. Corregir cualquier
    desplazamiento temporal residual entre las dos tomas y hacerlas con poco
    tiempo de diferencia (la norma recomienda menos de 10 minutos), porque el
    retardo depende de la temperatura.
-4. Restar: $h_r = h_\text{pavimento} - h_i$. Todo lo que comparten las dos
+4. Restar: $h_\mathrm{r} = h_\text{pavimento} - h_\mathrm{i}$. Todo lo que comparten las dos
    tomas (la onda directa, el altavoz, el micrófono, la cadena entera) se
    cancela, y lo que sobrevive es únicamente la reflexión de la superficie.
-5. Enventanar $h_i$ y $h_r$ con la **misma** ventana aplicada en sus respectivos
-   tiempos de llegada ($T_{w,\text{directo}} = T_{w,\text{reflejado}}$),
+5. Enventanar $h_\mathrm{i}$ y $h_\mathrm{r}$ con la **misma** ventana aplicada en sus respectivos
+   tiempos de llegada ($T_{\mathrm{w},\text{direct}} = T_{\mathrm{w},\text{reflected}}$),
    transformar y formar $\alpha$ con $K_r$.
 
 De esa cadena cuelgan dos condiciones de aceptación. La relación señal-ruido
@@ -136,7 +136,7 @@ print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
 
 ### 1.2 La superficie de referencia (Anexo B)
 
-El cociente en bruto $|H_r/H_i|^2/K_r^2$ supone que la cadena electroacústica y
+El cociente en bruto $|H_\mathrm{r}/H_\mathrm{i}|^2/K_r^2$ supone que la cadena electroacústica y
 el factor geométrico se cancelan exactamente. No lo hacen: el altavoz y el
 micrófono tienen sus propias respuestas a lo largo de caminos de longitud
 distinta, y el $K_r = 2/3$ obligatorio es una idealización de onda plana de una
@@ -285,7 +285,7 @@ result.plot()   # diagrama de barras alpha(f) en 250-4000 Hz (requiere matplotli
 
 *La absorción crece con la frecuencia porque la superficie refleja menos energía
 de alta frecuencia, exactamente como dicta el factor de reflexión paso bajo
-$r_0(f)$ a través de $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
+$r_0(f)$ a través de $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -334,7 +334,7 @@ plt.show()
 **Área máxima muestreada (Anexo A).** La ventana temporal finita limita cuánta
 superficie contribuye a la reflexión. El área máxima muestreada es un círculo
 cuyo radio la biblioteca calcula a partir de la geometría y la anchura de la
-ventana; el ejemplo resuelto del Anexo A ($d_s = 1{,}25$ m, $d_m = 0{,}25$ m,
+ventana; el ejemplo resuelto del Anexo A ($d_\mathrm{s} = 1{,}25$ m, $d_\mathrm{m} = 0{,}25$ m,
 $c = 340$ m/s, ventana plana de 5 ms) da unos 1,34 m.
 
 ```python
@@ -383,7 +383,7 @@ carretera.
 - **El área máxima muestreada debe estar despejada.** Cualquier objeto que no
   sea el pavimento (una valla, una roca, una barrera, un coche aparcado) es un
   objeto reflectante. Ninguno puede estar dentro del área muestreada, y lo que
-  quede fuera debe estar más lejos del micrófono que $d_s$, es decir, a más de
+  quede fuera debe estar más lejos del micrófono que $d_\mathrm{s}$, es decir, a más de
   1,25 m. El propio trípode del micrófono no debe influir en la medición.
 - **La superficie debe ser visualmente homogénea** y estar libre de cambios de
   material, y debe estar **seca**. En una superficie con un contenido de huecos
@@ -486,11 +486,11 @@ una superficie que debe estar lisa, plana, libre de detritos y seca.
 debajo de
 
 $$
-f_u = 0{,}58\,\frac{c_0}{d},
+f_\mathrm{u} = 0{,}58\,\frac{c_0}{d},
 $$
 
 con $d$ el diámetro del tubo, y el espaciado de micrófonos $s$ debe situarse entre
-$0{,}05\,c_0/f_{min}$ y $0{,}45\,c_0/f_{max}$. El rango informado son las bandas de
+$0{,}05\,c_0/f_\mathrm{min}$ y $0{,}45\,c_0/f_\mathrm{max}$. El rango informado son las bandas de
 tercio de octava de 250 a 1600 Hz y, como la propia norma define un rango de
 frecuencia por los *bordes* de banda, esas frecuencias centrales significan de
 220 Hz a 1800 Hz en banda estrecha, que es de donde salen los dos argumentos de
@@ -512,7 +512,7 @@ techo de onda plana del calibre de 100 mm; el rango informado se detiene una
 banda por debajo porque una banda solo es utilizable cuando *toda* su anchura
 cae dentro del rango válido, y la banda de 1600 Hz llega hasta 1800 Hz. El
 suelo de 250 Hz es un límite de **espaciado**, no de longitud: por debajo de
-$f_{min}$ los dos micrófonos están a menos del 5 % de una longitud de onda uno
+$f_\mathrm{min}$ los dos micrófonos están a menos del 5 % de una longitud de onda uno
 de otro y no queda diferencia de fase que resolver. La longitud del tubo
 responde a otra pregunta: tiene que ser suficiente para que se forme una onda
 plana, lo que el apartado 5.4.2 consigue poniendo los micrófonos al menos a

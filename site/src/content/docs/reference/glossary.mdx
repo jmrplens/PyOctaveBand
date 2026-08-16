@@ -27,8 +27,8 @@ a measurement and a report. A decibel is always a ratio, so an entry whose unit
 reads *re* something — dB re 20 µPa in air, dB re 1 µPa in water, dB re 1 pW
 for power, dB re 1 pW/m² for intensity, dB re 50 nm/s for a velocity level — is
 an **absolute level**, and the reference quantity is part of the unit. An entry
-whose unit is a bare dB is a **level difference or a rating**: $D$, $R$, $R_w$,
-$C$, $C_{tr}$, $\Delta L_w$, $K_{ij}$, where the reference cancels and no
+whose unit is a bare dB is a **level difference or a rating**: $D$, $R$, $R_\mathrm{w}$,
+$C$, $C_\mathrm{tr}$, $\Delta L_\mathrm{w}$, $K_{ij}$, where the reference cancels and no
 reference applies. Two numbers can only be added or subtracted when they are of
 the same kind, and the commonest error in a report is subtracting two levels
 referred to different quantities, or adding a rating to a level.
@@ -51,14 +51,14 @@ the one case the grouping by domain cannot serve.
 | NR | The **noise rating** curve family of a room criterion, and the **noise reduction** $L_{p1} - L_{p2}$ between two rooms in noise control. |
 | $\alpha$ | The **absorption coefficient** of a surface, the **atmospheric attenuation coefficient** per unit length (dB/m here, dB/km in ISO 9613-2), the **volume absorption coefficient** of sea water (dB/km), and the **tortuosity** $\alpha_\infty$ of a porous model, which is not an absorption at all. |
 | $A$ | An **equivalent absorption area** in m², an **accelerance** in 1/kg, and the **total attenuation** of ISO 9613-2 in dB. |
-| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_c$ and barrier screening $D_z$ of ISO 9613-2, the spatial decay rate $D_{2,S}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
+| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_\mathrm{c}$ and barrier screening $D_z$ of ISO 9613-2, the spatial decay rate $D_{2,\mathrm{S}}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
 | $H$ | The **receptance** of ISO 7626-1, the **frequency response estimators** $H_1$ and $H_2$, and the **harmonic transfer functions** $H_n$ of a swept-sine measurement — where $H_2$ is the second harmonic, not the noise-on-input estimator. |
 | $\eta$ | The **loss factor** of a resilient element, the **coupling loss factor** $\eta_{ij}$ of a junction, and the **internal** and **total** loss factors of a building element. |
 | $\tau$ | The **transmission factor** of a partition, the **time constant** of a detector, the **lag** of a correlation, and the **air temperature** in CNOSSOS-EU. |
-| $T_s$ | The ISO 3382-1 **centre time** of a room impulse response, typically tens of milliseconds; the **structural reverberation time** of a plate, which is seconds; and the number of **months per year that studded tyres are fitted** in CNOSSOS-EU. |
+| $T_\mathrm{s}$ | The ISO 3382-1 **centre time** of a room impulse response, typically tens of milliseconds; the **structural reverberation time** of a plate, which is seconds; and the number of **months per year that studded tyres are fitted** in CNOSSOS-EU. |
 | $R$ | The **sound reduction index** in building acoustics, the **airflow resistance** in materials, the **roughness** in psychoacoustics, and the **cumulative stress variable** of ISO 2631-5. |
-| $\sigma$ | The **airflow resistivity** of a porous material, the **radiation efficiency** of a plate, and the **standard deviation** $\sigma_R$ of a building-acoustics measurement situation. |
-| $L_N$, $L_n$ | $L_N$ is a **percentile level** in environmental noise, a **loudness level** in phon, and the level equivalent to a microphone's **inherent noise**; $L_n$, with a lower-case subscript, is the **normalized impact sound pressure level** of ISO 10140-3. In building acoustics the case of the subscript is the whole difference. |
+| $\sigma$ | The **airflow resistivity** of a porous material, the **radiation efficiency** of a plate, and the **standard deviation** $\sigma_\mathrm{R}$ of a building-acoustics measurement situation. |
+| $L_N$, $L_\mathrm{n}$ | $L_N$ is a **percentile level** in environmental noise, a **loudness level** in phon, and the level equivalent to a microphone's **inherent noise**; $L_\mathrm{n}$, with a lower-case subscript, is the **normalized impact sound pressure level** of ISO 10140-3. In building acoustics the case of the subscript is the whole difference. |
 | $v_0$ | A **reference velocity** of 1 nm/s in EN 15657 and EN 12354-5, and of 50 nm/s in ISO/TS 7849 and ISO 9611 — 34 dB apart, in one section of one area. |
 | $F_0$ | A **reference force** of 1 N in ISO 16283-2, and of 1 µN in EN 15657 — 120 dB apart. |
 | $K_1$ | The ISO 3744 **background noise correction** in dB, and a CNOSSOS-EU **temperature coefficient** in dB/°C. |

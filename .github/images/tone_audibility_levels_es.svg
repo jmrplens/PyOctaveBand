@@ -1515,7 +1515,7 @@ L 75.023406 34.043625
 " style="fill: none; stroke: #9e9e9e; stroke-width: 1.2; stroke-linecap: round"/>
     </g>
     <g id="text_17">
-     <!-- ruido enmascarante $L_\mathrm{pn}$ (banda crítica) -->
+     <!-- ruido enmascarante $L_{p\mathrm{n}}$ (banda crítica) -->
      <g transform="translate(81.687406 36.959125) scale(0.0833 -0.0833)">
       <defs>
        <path id="DejaVuSans-50" d="M 3328 2828 
@@ -1555,6 +1555,38 @@ L 3181 525
 L 3078 0 
 L 172 0 
 L 1075 4666 
+z
+" transform="scale(0.015625)"/>
+       <path id="DejaVuSans-Oblique-53" d="M 3175 2156 
+Q 3175 2616 2975 2859 
+Q 2775 3103 2400 3103 
+Q 2144 3103 1911 2972 
+Q 1678 2841 1497 2591 
+Q 1319 2344 1212 1994 
+Q 1106 1644 1106 1300 
+Q 1106 863 1306 627 
+Q 1506 391 1875 391 
+Q 2147 391 2380 519 
+Q 2613 647 2778 891 
+Q 2956 1147 3065 1494 
+Q 3175 1841 3175 2156 
+z
+M 1394 2969 
+Q 1625 3272 1939 3428 
+Q 2253 3584 2638 3584 
+Q 3175 3584 3472 3232 
+Q 3769 2881 3769 2247 
+Q 3769 1728 3584 1258 
+Q 3400 788 3053 416 
+Q 2822 169 2531 39 
+Q 2241 -91 1919 -91 
+Q 1547 -91 1294 64 
+Q 1041 219 916 525 
+L 556 -1331 
+L -19 -1331 
+L 922 3500 
+L 1497 3500 
+L 1394 2969 
 z
 " transform="scale(0.015625)"/>
        <path id="DejaVuSans-b" d="M 1984 4856 
@@ -1620,7 +1652,7 @@ z
       <use xlink:href="#DejaVuSans-48" transform="translate(945.654297 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1007.177734 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(1038.964844 0.015625)"/>
-      <use xlink:href="#DejaVuSans-53" transform="translate(1094.677734 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-Oblique-53" transform="translate(1094.677734 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-51" transform="translate(1139.111328 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(1186.210938 0.015625)"/>
       <use xlink:href="#DejaVuSans-b" transform="translate(1217.998047 0.015625)"/>
@@ -1646,7 +1678,7 @@ z
      </g>
     </g>
     <g id="text_18">
-     <!-- nivel del tono $L_\mathrm{pt}$ -->
+     <!-- nivel del tono $L_{p\mathrm{t}}$ -->
      <g transform="translate(81.687406 49.953925) scale(0.0833 -0.0833)">
       <use xlink:href="#DejaVuSans-51" transform="translate(0 0.015625)"/>
       <use xlink:href="#DejaVuSans-4c" transform="translate(63.378906 0.015625)"/>
@@ -1664,7 +1696,7 @@ z
       <use xlink:href="#DejaVuSans-52" transform="translate(619.775391 0.015625)"/>
       <use xlink:href="#DejaVuSans-3" transform="translate(680.957031 0.015625)"/>
       <use xlink:href="#DejaVuSans-Oblique-2f" transform="translate(712.744141 0.015625)"/>
-      <use xlink:href="#DejaVuSans-53" transform="translate(768.457031 -14.984326) scale(0.7)"/>
+      <use xlink:href="#DejaVuSans-Oblique-53" transform="translate(768.457031 -14.984326) scale(0.7)"/>
       <use xlink:href="#DejaVuSans-57" transform="translate(812.890625 -14.984326) scale(0.7)"/>
      </g>
     </g>

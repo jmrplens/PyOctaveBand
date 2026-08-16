@@ -65,8 +65,8 @@ Modal densities for the usual subsystems are provided as well
 (:func:`flat_plate_modal_density`, :func:`cylindrical_shell_modal_density`,
 :func:`bar_modal_density`, :func:`beam_modal_density`), following Norton
 Eqs. 6.23-6.29. The flat-plate expression
-:math:`n(f) = S \sqrt{12} / (2 c_L t)` is the same quantity as EN 12354-4's
-:math:`n = \pi S f_c / c_0^2`
+:math:`n(f) = S \sqrt{12} / (2 c_\mathrm{L} t)` is the same quantity as EN 12354-4's
+:math:`n = \pi S f_\mathrm{c} / c_0^2`
 (:func:`~phonometry.building.measurement.flanking_transmission.modal_density`), only
 parametrised by the plate itself rather than by its critical frequency; the
 two agree identically and a regression test pins that.
@@ -112,11 +112,11 @@ _BANDWIDTH_FACTOR: dict[str, float] = {"third": 1.122, "octave": 1.414}
 def bar_modal_density(length: float, longitudinal_wave_speed: float) -> float:
     r"""Modal density of a uniform bar in longitudinal vibration (Eq. 6.23).
 
-    :math:`n(f) = 2 L / c_L`, independent of frequency.
+    :math:`n(f) = 2 L / c_\mathrm{L}`, independent of frequency.
 
     :param length: Bar length ``L``, in m (> 0).
     :param longitudinal_wave_speed: Bar wave speed
-        :math:`c_L = \sqrt{E/\rho}`, in m/s (> 0).
+        :math:`c_\mathrm{L} = \sqrt{E/\rho}`, in m/s (> 0).
     :return: The modal density ``n(f)``, in modes per hertz.
     :raises ValueError: for a non-positive input.
     """
@@ -158,9 +158,9 @@ def flat_plate_modal_density(
 ) -> float:
     r"""Modal density of a flat plate in flexure (Norton Eq. 6.25).
 
-    :math:`n(f) = S \sqrt{12} / (2 c_L t)`, independent of frequency, with
+    :math:`n(f) = S \sqrt{12} / (2 c_\mathrm{L} t)`, independent of frequency, with
     the plate (quasi-longitudinal) wave speed
-    :math:`c_L = \sqrt{E / (\rho (1 - \nu^2))}`.
+    :math:`c_\mathrm{L} = \sqrt{E / (\rho (1 - \nu^2))}`.
 
     :param area: Plate surface area ``S``, in m^2 (> 0).
     :param thickness: Plate thickness ``t``, in m (> 0).
@@ -177,7 +177,7 @@ def flat_plate_modal_density(
 def ring_frequency(mean_radius: float, longitudinal_wave_speed: float) -> float:
     r"""Ring frequency of a cylindrical shell (Norton Eq. 6.26).
 
-    :math:`f_r = c_L / (2\pi a_m)`: the frequency at which the shell vibrates
+    :math:`f_\mathrm{r} = c_\mathrm{L} / (2\pi a_\mathrm{m})`: the frequency at which the shell vibrates
     uniformly in the breathing mode. Above it a cylinder behaves like a flat
     plate; below it the modes group by circumferential order and the modal
     density is no longer a simple function of frequency.
@@ -204,18 +204,18 @@ def cylindrical_shell_modal_density(
     r"""Average modal density of a thin-walled cylinder (Norton 6.27-6.29).
 
     The semi-empirical approximations of Szechenyi, as collected by Clarkson &
-    Pope, in three regimes of :math:`x = f / f_r` around the ring frequency
+    Pope, in three regimes of :math:`x = f / f_\mathrm{r}` around the ring frequency
     :func:`ring_frequency`:
 
     .. math::
 
-       n = \frac{5 S}{\pi c_L t} \sqrt{x},
+       n = \frac{5 S}{\pi c_\mathrm{L} t} \sqrt{x},
        \qquad x \le 0.48 \tag{6.27}
 
-       n = \frac{7.2 S}{\pi c_L t}\, x,
+       n = \frac{7.2 S}{\pi c_\mathrm{L} t}\, x,
        \qquad 0.48 < x \le 0.83 \tag{6.28}
 
-       n = \frac{2 S}{\pi c_L t} \left[ 2 + \frac{0.596}{F - 1/F}
+       n = \frac{2 S}{\pi c_\mathrm{L} t} \left[ 2 + \frac{0.596}{F - 1/F}
        \left( F \arccos\frac{1.745}{F^2 x^2}
        - \frac{1}{F} \arccos\frac{1.745 F^2}{x^2} \right) \right],
        \qquad x > 0.83 \tag{6.29}

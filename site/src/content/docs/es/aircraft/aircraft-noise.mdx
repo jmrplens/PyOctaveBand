@@ -140,7 +140,7 @@ El método trae dos trampas. Un espectro rizado pero sin tonos puede producir un
 corrección, que la propia norma permite rechazar tras un reanálisis en banda
 estrecha (§4.3.1, paso 10). Y un tono que cae entre dos bandas reparte su
 exceso, de modo que la corrección en bruto sale demasiado pequeña; el **ajuste por
-compartición de banda** $\Delta_B$, el defecto de $C$ en el registro de
+compartición de banda** $\Delta_\mathrm{B}$, el defecto de $C$ en el registro de
 $\mathrm{PNLTM}$ frente a la media de los registros que quedan a menos de un
 segundo de él, lo devuelve antes de localizar la ventana de 10 dB por debajo.
 
@@ -371,10 +371,10 @@ En el método simplificado (§8.3) cada banda del espectro de $\mathrm{PNLTM}$ s
 lleva al día de referencia con
 
 $$
-\mathrm{SPL}_R(i) = \mathrm{SPL}(i)
- + 0{,}01\,[\alpha(i) - \alpha_R(i)]\,QK
- + 0{,}01\,\alpha_R(i)\,(QK - Q_rK_r)
- + 20\lg\frac{QK}{Q_rK_r},
+\mathrm{SPL}_\mathrm{R}(i) = \mathrm{SPL}(i)
+ + 0{,}01\,[\alpha(i) - \alpha_\mathrm{R}(i)]\,QK
+ + 0{,}01\,\alpha_\mathrm{R}(i)\,(QK - Q_\mathrm{r}K_\mathrm{r})
+ + 20\lg\frac{QK}{Q_\mathrm{r}K_\mathrm{r}},
 $$
 
 que cambia el coeficiente de absorción del día de ensayo por el de referencia
@@ -382,17 +382,17 @@ sobre el trayecto medido, reabsorbe sobre la longitud de trayecto corregida y
 aplica un término de inverso del cuadrado por el cambio de longitud de trayecto
 (§8.3.2.1). El espectro ajustado se vuelve a pasar por la ley de noys y por la
 corrección tonal, se devuelve el ajuste por compartición de banda del día de ensayo,
-y la diferencia $\Delta_1 = \mathrm{PNLTM}_R - \mathrm{PNLTM}$ es uno de los
+y la diferencia $\Delta_1 = \mathrm{PNLTM}_\mathrm{R} - \mathrm{PNLTM}$ es uno de los
 cuatro términos que se suman al EPNL medido:
 
 $$
-\mathrm{EPNL}_R = \mathrm{EPNL} + \Delta_1 + \Delta_{\text{peak}}
+\mathrm{EPNL}_\mathrm{R} = \mathrm{EPNL} + \Delta_1 + \Delta_{\text{peak}}
  + \Delta_2 + \Delta_3
 $$
 
 (§8.3.6). $\Delta_{\text{peak}}$ se ocupa de una cresta secundaria que quede a
 menos de 2 dB del $\mathrm{PNLTM}$ y que exceda el máximo ajustado (§8.3.3);
-$\Delta_2 = -7{,}5\lg(QK/Q_rK_r) + 10\lg(V_G/V_{GR})$ es el cambio de duración por
+$\Delta_2 = -7{,}5\lg(QK/Q_\mathrm{r}K_\mathrm{r}) + 10\lg(V_\mathrm{G}/V_\mathrm{GR})$ es el cambio de duración por
 la longitud de trayecto y la velocidad respecto al suelo (§8.3.4); y $\Delta_3$
 corrige la diferencia entre los parámetros operacionales de propulsión del vuelo
 de ensayo y los especificados para la condición de referencia, a partir de las
@@ -404,9 +404,9 @@ del Capítulo 3.
 
 La biblioteca aporta los ingredientes y no la contabilidad. `air_attenuation` y
 `sae_band_attenuation`, más abajo, son exactamente los $\alpha(i)$ y
-$\alpha_R(i)$ de los dos primeros términos, y la maquinaria del EPNL vuelve a
+$\alpha_\mathrm{R}(i)$ de los dos primeros términos, y la maquinaria del EPNL vuelve a
 pasar un espectro ajustado con la misma facilidad que uno medido; la geometría de
-la trayectoria $QK/Q_rK_r$ y los cuatro términos $\Delta$ en sí no están
+la trayectoria $QK/Q_\mathrm{r}K_\mathrm{r}$ y los cuatro términos $\Delta$ en sí no están
 implementados. Primero se ajusta y luego se informa: el EPNL que devuelve esta
 página es un valor del día de ensayo, y un veredicto de `requirement` solo es un
 veredicto de certificación una vez aplicado el §8.
@@ -463,7 +463,7 @@ la atenuación en bandas de tercio de octava sobre el trayecto. El coeficiente d
 tono puro es el de ISO 9613-1 (idéntico, según ARP 5534 §3.1) que da
 `air_attenuation`; `sae_band_attenuation` añade el **método SAE** (ARP 5534
 §3.2.2) que mapea la atenuación de trayecto de tono puro medio de banda
-$\delta_t = \alpha\,s$ a la atenuación de banda $\delta_B$, coherente con el
+$\delta_\mathrm{t} = \alpha\,s$ a la atenuación de banda $\delta_\mathrm{B}$, coherente con el
 método exacto mucho más allá del límite de 50 dB del método aproximado.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/aircraft_atmospheric_absorption_es.svg" alt="Absorción atmosférica aeronáutica frente a la frecuencia para dos distancias; la atenuación de banda del método SAE queda por debajo del valor de tono puro medio de banda a alta absorción" width="82%" />

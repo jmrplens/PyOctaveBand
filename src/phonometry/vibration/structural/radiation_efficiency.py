@@ -26,17 +26,17 @@ efficiently:
 
 .. math::
 
-   f_c = \frac{c_0^2}{2\pi} \sqrt{\frac{m''}{B'}} \tag{Eq. 2.201}
+   f_\mathrm{c} = \frac{c_0^2}{2\pi} \sqrt{\frac{m''}{B'}} \tag{Eq. 2.201}
 
 with ``m''`` the mass per unit area (kg/m^2) and ``B'`` the bending
 stiffness per unit width (N.m). This is the closed form
-:math:`f_c = 0.55\,c_0^2 / (c_L h)` in terms of the plate longitudinal wave
+:math:`f_\mathrm{c} = 0.55\,c_0^2 / (c_\mathrm{L} h)` in terms of the plate longitudinal wave
 speed ``cL`` and thickness ``h``.
 
 **Frequency-averaged efficiency (Hopkins 2.9.4, "method no. 1").** With
-:math:`\mu = \sqrt{f_c / f}` (Eq. 2.228), the perimeter ``U``, area ``S``,
-the boundary constant :math:`C_{BC}` (1 simply supported, 2 clamped) and the
-baffle-orientation constant :math:`C_{OB}` (1 plate flush in an infinite
+:math:`\mu = \sqrt{f_\mathrm{c} / f}` (Eq. 2.228), the perimeter ``U``, area ``S``,
+the boundary constant :math:`C_\mathrm{BC}` (1 simply supported, 2 clamped) and the
+baffle-orientation constant :math:`C_\mathrm{OB}` (1 plate flush in an infinite
 baffle, 2 baffles perpendicular to the edges), the efficiency below ``fc``
 is
 
@@ -44,18 +44,18 @@ is
 
    \sigma = \frac{U}{2\pi \mu k S \sqrt{\mu^2 - 1}}
    \left[ \ln\frac{\mu + 1}{\mu - 1} + \frac{2\mu}{\mu^2 - 1} \right]
-   \left[ C_{BC} C_{OB} - \mu^{-8} \left( C_{BC} C_{OB} - 1 \right) \right]
+   \left[ C_\mathrm{BC} C_\mathrm{OB} - \mu^{-8} \left( C_\mathrm{BC} C_\mathrm{OB} - 1 \right) \right]
    \tag{Eq. 2.227}
 
 with :math:`k = 2\pi f / c_0` the acoustic wavenumber. Above ``fc``,
-:math:`\sigma = 1 / \sqrt{1 - \mu^2} = (1 - f_c/f)^{-0.5}` (Eq. 2.229), so
+:math:`\sigma = 1 / \sqrt{1 - \mu^2} = (1 - f_\mathrm{c}/f)^{-0.5}` (Eq. 2.229), so
 :math:`\sigma \to 1` well above coincidence. In the band that contains
 ``fc``,
 
 .. math::
 
    \sigma \approx \left( 0.5 - 0.15 \frac{L_1}{L_2} \right)
-   \sqrt{k_{fc} L_1}, \qquad k_{fc} = \frac{2\pi f_c}{c_0}
+   \sqrt{k_{fc} L_1}, \qquad k_{fc} = \frac{2\pi f_\mathrm{c}}{c_0}
    \tag{Eq. 2.230}
 
 with ``L1`` the smaller and ``L2`` the larger plate dimension.
@@ -98,7 +98,7 @@ def coincidence_frequency(
 ) -> float:
     r"""Coincidence (critical) frequency ``fc`` of a thin plate (Hopkins 2.201).
 
-    :math:`f_c = (c_0^2 / 2\pi) \sqrt{m'' / B'}` (identical to Bies Eq. 7.3).
+    :math:`f_\mathrm{c} = (c_0^2 / 2\pi) \sqrt{m'' / B'}` (identical to Bies Eq. 7.3).
 
     :param mass_per_area: Mass per unit area ``m''``, in kg/m^2.
     :param bending_stiffness: Bending stiffness per unit width ``B'``, in N.m
@@ -202,10 +202,10 @@ def radiation_efficiency(
     :param length_y: Plate dimension ``Ly``, in m (> 0).
     :param critical_frequency: Coincidence frequency ``fc``, in hertz (> 0);
         see :func:`coincidence_frequency`.
-    :param boundary: ``"simply_supported"`` (:math:`C_{BC} = 1`) or
-        ``"clamped"`` (:math:`C_{BC} = 2`).
-    :param baffle: ``"infinite"`` (:math:`C_{OB} = 1`, plate flush in a rigid
-        baffle) or ``"perpendicular"`` (:math:`C_{OB} = 2`, baffles
+    :param boundary: ``"simply_supported"`` (:math:`C_\mathrm{BC} = 1`) or
+        ``"clamped"`` (:math:`C_\mathrm{BC} = 2`).
+    :param baffle: ``"infinite"`` (:math:`C_\mathrm{OB} = 1`, plate flush in a rigid
+        baffle) or ``"perpendicular"`` (:math:`C_\mathrm{OB} = 2`, baffles
         perpendicular to the edges).
     :param speed_of_sound: Speed of sound in air ``c0`` (Default: 343 m/s).
     :return: A :class:`RadiationEfficiencyResult`.

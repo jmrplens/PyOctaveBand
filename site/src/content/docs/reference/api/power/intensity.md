@@ -54,8 +54,8 @@ typical position on the initial measurement surface and qualifies the
 short-time-averaged samples of the normal intensity at that fixed
 point, and Table B.3 calls for action code (e) when it exceeds 0.6.
 The dynamic capability index is
-$L_d = \delta_{pI0} - K$ (ISO 9614-1 clause 3.12, equation (10));
-the instrument is adequate for a measurement when $L_d > F_2$
+$L_\mathrm{d} = \delta_{pI0} - K$ (ISO 9614-1 clause 3.12, equation (10));
+the instrument is adequate for a measurement when $L_\mathrm{d} > F_2$
 (criterion 1, Annex B equation (B.1)). The residual index
 $\delta_{pI0}$ that feeds it is classified against
 IEC 61043:1993 Table 2 by
@@ -74,14 +74,14 @@ dynamic_capability_index(
 
 Dynamic capability index Ld (ISO 9614-1:1993, clause 3.12).
 
-$L_d = \delta_{pI0} - K$ (equation (10)), where
+$L_\mathrm{d} = \delta_{pI0} - K$ (equation (10)), where
 $\delta_{pI0}$ is the
 instrument pressure-residual intensity index (clause 3.11, equation
 (9); determined per IEC 61043:1993, which requires the Table 2
 minima per class) and `K` the bias error factor of Table 1: 10 dB
 for precision (grade 1) and engineering (grade 2) measurements, 7 dB
 for survey (grade 3). The measurement arrangement is adequate when
-$L_d > F_2$ (criterion 1, Annex B equation (B.1)).
+$L_\mathrm{d} > F_2$ (criterion 1, Annex B equation (B.1)).
 
 **Parameters**
 
@@ -110,12 +110,12 @@ Given the sound pressure level `Lpi` (dB) and the signed normal
 sound intensity `Ini` (W/m^2) measured at each of the N discrete
 positions on the measurement surface:
 
-- $F_2 = L_p - L_{|I_n|}$ (equation (A.3)), with the surface
+- $F_2 = L_p - L_{|I_\mathrm{n}|}$ (equation (A.3)), with the surface
   pressure level from equation (A.4) and the level of the mean magnitude
   of the normal intensity from equation (A.5);
-- $F_3 = L_p - L_{I_n}$ (equation (A.6)), with the algebraic
+- $F_3 = L_p - L_{I_\mathrm{n}}$ (equation (A.6)), with the algebraic
   surface intensity level from equation (A.7);
-- $F_4 = \frac{1}{|\overline{I_n}|} \sqrt{ \sum_i ( I_{ni} - \overline{I_n} )^2 / (N - 1) }$ (equations (A.8)-(A.9)).
+- $F_4 = \frac{1}{|\overline{I_\mathrm{n}}|} \sqrt{ \sum_i ( I_{\mathrm{n}i} - \overline{I_\mathrm{n}} )^2 / (N - 1) }$ (equations (A.8)-(A.9)).
 
 F1, the temporal variability indicator (equation (A.1)), does not come
 from the surface scan: it is evaluated in the initial test at one
@@ -162,7 +162,7 @@ ISO 9614-1:1993 Annex A field indicators over a measurement surface.
 `f4` the field non-uniformity indicator (equation (A.8)).
 $F_3 - F_2 > 0$ reveals negative partial power flowing through
 parts of the surface. The instrument's dynamic capability index must
-satisfy $L_d > F_2$ (criterion 1, equation (B.1)); the number of
+satisfy $L_\mathrm{d} > F_2$ (criterion 1, equation (B.1)); the number of
 positions N must satisfy $N > C F_4^2$ (criterion 2, equation
 (B.2)).
 
@@ -235,7 +235,7 @@ Requires per-band data (call [`field_indicators`](/phonometry/reference/api/powe
 | Name | Description |
 | :--- | :--- |
 | `ax` | Existing axes, or `None` to create a figure. |
-| `dynamic_capability` | Optional instrument dynamic capability index `Ld` in dB (scalar or per band), drawn as the criterion-1 reference line ($L_d > F_2$, equation (B.1)); see [`dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index). |
+| `dynamic_capability` | Optional instrument dynamic capability index `Ld` in dB (scalar or per band), drawn as the criterion-1 reference line ($L_\mathrm{d} > F_2$, equation (B.1)); see [`dynamic_capability_index`](/phonometry/reference/api/power/intensity/#dynamic_capability_index). |
 | `language` | Label language, `"en"` (default) or `"es"`. |
 | `kwargs` | Forwarded to the F2 curve `plot` call. |
 
@@ -437,10 +437,10 @@ there M times with a short averaging time (clause 8.2). The indicator
 is the coefficient of variation of those samples:
 
 $$
-F_1 = \frac{1}{\overline{I_n}} \sqrt{ \frac{\sum_k \left( I_{nk} - \overline{I_n} \right)^2}{M - 1} }
+F_1 = \frac{1}{\overline{I_\mathrm{n}}} \sqrt{ \frac{\sum_k \left( I_{\mathrm{n}k} - \overline{I_\mathrm{n}} \right)^2}{M - 1} }
 $$
 
-with $\overline{I_n}$ the mean of the M samples (equation (A.2)).
+with $\overline{I_\mathrm{n}}$ the mean of the M samples (equation (A.2)).
 It is
 dimensionless, and it is zero for a perfectly steady field, so it
 qualifies the *stationarity of the field*, not the uniformity of the

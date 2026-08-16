@@ -4,7 +4,7 @@
 
 The simplified model of
 [Predicting Sound Insulation (EN 12354)](insulation-prediction.md) returns one
-number, $R'_w$ or $L'_{n,w}$, and hides everything that happens inside the
+number, $R'_\mathrm{w}$ or $L'_\mathrm{n,w}$, and hides everything that happens inside the
 spectrum. The **detailed model** (ISO 12354-1:2017 Clause 4.2 airborne,
 ISO 12354-2:2017 Clause 4.2 impact) carries every quantity through the
 one-third-octave bands instead: it converts the laboratory element data into
@@ -27,14 +27,14 @@ the sound reduction index from the material properties (Annex B):
 
 $$
 \tau = \left(\frac{2\rho_o c_o}{2\pi f m'}\right)^2 \cdot
-\frac{\pi f_c \sigma^2}{2 f \eta_\text{tot}} \quad (f > f_c)
+\frac{\pi f_\mathrm{c} \sigma^2}{2 f \eta_\mathrm{tot}} \quad (f > f_\mathrm{c})
 $$
 
 with the radiation factor for free bending waves $\sigma$ (Formulae B.4-B.6),
-the radiation factor for forced waves $\sigma_f$ (Formula B.3) below $f_c$,
-and a third branch for the band that straddles $f_c$. Above about 1 kHz a
+the radiation factor for forced waves $\sigma_\mathrm{f}$ (Formula B.3) below $f_\mathrm{c}$,
+and a third branch for the band that straddles $f_\mathrm{c}$. Above about 1 kHz a
 thick element stops improving, and Formula (B.10) floors the transmission
-factor at a plateau set by $\rho c_L$. Only homogeneous elements are
+factor at a plateau set by $\rho c_\mathrm{L}$. Only homogeneous elements are
 calculated this way: the spectrum of a lightweight, double or composite
 element enters the chain as an input, from
 [Predicting Panel Sound Insulation](panel-sound-insulation.md) or from a test
@@ -45,46 +45,46 @@ the building than in the test frame. The total loss factor in situ is
 (Formula C.1)
 
 $$
-\eta_\text{tot} = \eta_\text{int}
+\eta_\mathrm{tot} = \eta_\mathrm{int}
 + \frac{2\rho_o c_o \sigma}{2\pi f m'}
-+ \frac{c_o}{\pi^2 S \sqrt{f f_c}} \sum_k l_k \alpha_k
++ \frac{c_o}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
 $$
 
 the three terms being the internal losses of the material, the radiation into
 the air, and the losses at the perimeter. The perimeter coefficients follow
-from the junctions themselves, $\alpha_k = \sum_j \sqrt{f_{c,j}/f_\text{ref}}
-\, 10^{-K_{ij}/10}$ (Formula C.4). From $\eta_\text{tot}$ come the structural
-reverberation time $T_s = 2{,}2/(f\,\eta_\text{tot})$ and the equivalent
-absorption length $a_\text{situ} = 2{,}2\pi^2 S \sqrt{f_\text{ref}/f} /
-(c_o T_{s,\text{situ}})$ (Formula 11).
+from the junctions themselves, $\alpha_k = \sum_j \sqrt{f_{\mathrm{c},j}/f_\mathrm{ref}}
+\, 10^{-K_{ij}/10}$ (Formula C.4). From $\eta_\mathrm{tot}$ come the structural
+reverberation time $T_\mathrm{s} = 2{,}2/(f\,\eta_\mathrm{tot})$ and the equivalent
+absorption length $a_\mathrm{situ} = 2{,}2\pi^2 S \sqrt{f_\mathrm{ref}/f} /
+(c_o T_\mathrm{s,situ})$ (Formula 11).
 
 **3. Junctions.** The situation-invariant $K_{ij}$ becomes the level drop the
 junction actually produces (Formula 10):
 
 $$
-\overline{D}_{v,ij,\text{situ}} = K_{ij}
-- 10\log_{10}\!\left(\frac{l_{ij}}{\sqrt{a_{i,\text{situ}}\,a_{j,\text{situ}}}}\right)
+\overline{D}_{v,ij,\mathrm{situ}} = K_{ij}
+- 10\log_{10}\!\left(\frac{l_{ij}}{\sqrt{a_{i,\mathrm{situ}}\,a_{j,\mathrm{situ}}}}\right)
 \ \ge 0\ \text{dB}
 $$
 
-**4. Paths.** The direct path is $R_{Dd} = R_{s,\text{situ}} +
-\Delta R_{D,\text{situ}} + \Delta R_{d,\text{situ}}$ (Formula 14) and every
+**4. Paths.** The direct path is $R_\mathrm{Dd} = R_\mathrm{s,situ} +
+\Delta R_\mathrm{D,situ} + \Delta R_\mathrm{d,situ}$ (Formula 14) and every
 flanking path (Formula 15)
 
 $$
-R_{ij} = \frac{R_{i,\text{situ}}}{2} + \Delta R_{i,\text{situ}}
-+ \frac{R_{j,\text{situ}}}{2} + \Delta R_{j,\text{situ}}
-+ \overline{D}_{v,ij,\text{situ}}
-+ 10\log_{10}\!\left(\frac{S_s}{\sqrt{S_i S_j}}\right)
+R_{ij} = \frac{R_{i,\mathrm{situ}}}{2} + \Delta R_{i,\mathrm{situ}}
++ \frac{R_{j,\mathrm{situ}}}{2} + \Delta R_{j,\mathrm{situ}}
++ \overline{D}_{v,ij,\mathrm{situ}}
++ 10\log_{10}\!\left(\frac{S_\mathrm{s}}{\sqrt{S_i S_j}}\right)
 $$
 
 The impact side runs in parallel: the bare slab's per-band level is
-$L_n = 155 - 30\log_{10} m' + 10\log_{10} T_s + 10\log_{10}\sigma + 10\log_{10}(f/f_\text{ref})$
+$L_\mathrm{n} = 155 - 30\log_{10} m' + 10\log_{10} T_\mathrm{s} + 10\log_{10}\sigma + 10\log_{10}(f/f_\mathrm{ref})$
 (Part 2 Formula B.2), the direct path subtracts the covering and any ceiling
 (Formula 11), and each flanking path is Formula (12).
 
 **5. Assembly.** $R' = -10\log_{10}\sum 10^{-R/10}$ over the thirteen paths of a
-four-flanking-element room, and $L'_n = 10\log_{10}\sum 10^{L_n/10}$ over the five
+four-flanking-element room, and $L'_\mathrm{n} = 10\log_{10}\sum 10^{L_\mathrm{n}/10}$ over the five
 impact paths, then ISO 717.
 
 ## The worked building of Annex L / Annex G
@@ -177,7 +177,7 @@ separating floor itself is the problem, so a heavier slab or a better floating
 floor would help; it fades through the 80 Hz to 160 Hz transition and from
 200 Hz upwards it has left the budget entirely, the flanking paths across the
 walls setting $R'$ on their own, so no amount of work on the floor would move
-the result there. The single number $R'_w = 57$ dB says none of that.*
+the result there. The single number $R'_\mathrm{w} = 57$ dB says none of that.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -283,8 +283,8 @@ print(imp.rating.rating, imp.rating.ci)        # 41 2           printed 41,0 (2)
 ## Simplified against detailed
 
 The standard applies its simplified model to the same building (Tables L.10 /
-G.10): $R'_w = 57{,}0$ dB and $L'_{n,w} = 39{,}7$ dB against the detailed
-model's $R'_w = 57$ dB and $L'_{n,w} = 41$ dB. The two agree well inside the
+G.10): $R'_\mathrm{w} = 57{,}0$ dB and $L'_\mathrm{n,w} = 39{,}7$ dB against the detailed
+model's $R'_\mathrm{w} = 57$ dB and $L'_\mathrm{n,w} = 41$ dB. The two agree well inside the
 models' own stated spread, and the library's test suite pins that agreement.
 The detailed model's advantage is not accuracy on the single number but the
 spectrum behind it: the airborne prediction of the detailed model carries no
@@ -294,15 +294,15 @@ about 2 dB for the simplified one.
 ## Lightweight constructions (Type B)
 
 For elements whose structural reverberation time is *not* set by the connected
-elements the standard takes $T_{s,\text{situ}} = T_{s,\text{lab}}$ and
+elements the standard takes $T_\mathrm{s,situ} = T_\mathrm{s,lab}$ and
 describes the junction with the **normalized** velocity level difference
-$\overline{D}_{v,ij,n}$ instead of $K_{ij}$ (Formula 17), or with a laboratory
-measurement of the flanking level difference $D_{n,f}$ (Formula 16). Below
-$f_c$ the element indices must first be corrected to resonant transmission
+$\overline{D}_{v,ij,\mathrm{n}}$ instead of $K_{ij}$ (Formula 17), or with a laboratory
+measurement of the flanking level difference $D_\mathrm{n,f}$ (Formula 16). Below
+$f_\mathrm{c}$ the element indices must first be corrected to resonant transmission
 only (Annex B.1/B.2, an 8 dB estimate for single frame elements without a
 cavity). The impact side offers the same two routes: Part 2 Formula (14) from
-$\overline{D}_{v,ij,n}$ and Part 2 Formula (13) from a measured normalized
-flanking impact level $L_{n,f}$.
+$\overline{D}_{v,ij,\mathrm{n}}$ and Part 2 Formula (13) from a measured normalized
+flanking impact level $L_\mathrm{n,f}$.
 
 ```python
 from phonometry import (flanking_impact_level_from_flanking_level,
@@ -337,20 +337,20 @@ dominate" the transmission.
 
 Two identities let a spectrum check itself. For a homogeneous floor the
 airborne index and the impact level add up to a function of frequency alone
-(Part 2 Formulae B.3/B.4), $R + L_n = 38 + 30\log_{10} f$ in one-third-octave bands
+(Part 2 Formulae B.3/B.4), $R + L_\mathrm{n} = 38 + 30\log_{10} f$ in one-third-octave bands
 and $43 + 30\log_{10} f$ in octave bands, valid where forced transmission is
 negligible; `reciprocity_impact_level` implements it. And Table B.2 of Part 2
-tabulates the octave-band $L_n$ of four monolithic floors calculated the way
+tabulates the octave-band $L_\mathrm{n}$ of four monolithic floors calculated the way
 this module does, a useful sanity target for a new floor build-up.
 
 ## `in_situ_element()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `element` | `HomogeneousElement` | — | — | Area, side lengths, $m'$, $f_c$, $\eta_\text{int}$, $\sum l_k \alpha_k$, and optionally $\rho$/$c_L$ |
+| `element` | `HomogeneousElement` | — | — | Area, side lengths, $m'$, $f_\mathrm{c}$, $\eta_\mathrm{int}$, $\sum l_k \alpha_k$, and optionally $\rho$/$c_\mathrm{L}$ |
 | `frequencies` | array | Hz | > 0 | Band centres |
-| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_c$ branch |
-| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_c$ (Annex B.1, flanking paths) |
+| `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_\mathrm{c}$ branch |
+| `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_\mathrm{c}$ (Annex B.1, flanking paths) |
 | `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
 | `air_density` | float | kg/m³ | default `1.29` | $\rho_o$ of the Annex B model |
 
@@ -363,7 +363,7 @@ this module does, a useful sanity target for a new floor build-up.
 | `element_i` / `element_j` | `InSituElementResult` | — | — | Source-room and receiving-room elements (`floor` / `element_j` for impact) |
 | `vibration_reduction_index` | float or array | dB | — | $K_{ij}$ of this path |
 | `coupling_length` | float | m | > 0 | Junction coupling length $l_{ij}$ |
-| `separating_area` | float | m² | > 0 | $S_s$ (airborne only) |
+| `separating_area` | float | m² | > 0 | $S_\mathrm{s}$ (airborne only) |
 | `delta_r_i` / `delta_r_j` | float or array | dB | default `0` | Lining improvements |
 | `delta_l` | float or array | dB | default `0` | Floor-covering improvement (impact only) |
 
@@ -373,7 +373,7 @@ this module does, a useful sanity target for a new floor build-up.
 per-band counterpart of the simplified prediction fiches: the same one-page
 layout, a basis line naming ISO 12354-1/-2:2017 Clause 4.2, the per-path
 share-of-energy table beside the per-band path-contribution figure, the boxed
-$R'_w$ / $L'_{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
+$R'_\mathrm{w}$ / $L'_\mathrm{n,w}$, the detailed model's 1,5 dB to 2,5 dB standard deviation and a
 PASS/FAIL verdict against a `requirement`. `verbose=True` annexes the band in
 which each path peaks. Both need the ISO 717 rating, so the spectrum must cover
 100 Hz to 3150 Hz (or 125 Hz to 2000 Hz in octaves).
@@ -431,7 +431,7 @@ printed tables are recorded in [Errata](../../ERRATA.md).
 - [Laboratory Flanking Transmission (ISO 10848)](../insulation/flanking-lab.md): where the
   measured $K_{ij}$ and the equivalent absorption length come from.
 - [Insulation Ratings (ISO 717)](../insulation/insulation-ratings.md): the reference-curve
-  engine that turns the predicted spectrum into $R'_w$ / $L'_{n,w}$.
+  engine that turns the predicted spectrum into $R'_\mathrm{w}$ / $L'_\mathrm{n,w}$.
 - [Field Insulation Measurement (ISO 16283)](../insulation/insulation-field.md): the built
   result the prediction is checked against.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](../../materials/resilient/dynamic-stiffness.md):

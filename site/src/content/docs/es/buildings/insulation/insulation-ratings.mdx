@@ -33,15 +33,15 @@ import Video from '../../../../../components/Video.astro';
 
 Toda magnitud de aislamiento acústico de esta documentación termina su viaje
 igual: entra un espectro por bandas y sale un número único. Sea el espectro
-un $R$ de laboratorio, un $R'$ o $D_{nT}$ de campo, un $D_{2m,nT}$ de
-fachada, un $L_n$ o $L'_{nT}$ de impactos o un $D_{n,f}$ de flancos, lo que
+un $R$ de laboratorio, un $R'$ o $D_\mathrm{nT}$ de campo, un $D_{2\mathrm{m,nT}}$ de
+fachada, un $L_\mathrm{n}$ o $L'_\mathrm{nT}$ de impactos o un $D_\mathrm{n,f}$ de flancos, lo que
 citan las normativas es el número único ponderado de ISO 717, y dos motores
 de curva de referencia los producen todos: **ISO 717-1** para las
 magnitudes aéreas, donde una desviación desfavorable es una banda que cae
 *por debajo* de la referencia, e **ISO 717-2** para las de impactos, con el
 signo invertido porque un nivel de impactos más alto es peor. Esta guía
 cubre los propios motores: la regla de desplazamiento, los términos de
-adaptación espectral $C$, $C_{tr}$ y $C_I$, las variantes de rango ampliado
+adaptación espectral $C$, $C_\mathrm{tr}$ y $C_\mathrm{I}$, las variantes de rango ampliado
 y con un decimal, y la ficha ISO 717. Las mediciones que producen los
 espectros viven en las guías de
 [campo](/phonometry/es/buildings/insulation/insulation-field/),
@@ -56,9 +56,9 @@ los índices es [EN 12354](/phonometry/es/buildings/design/insulation-prediction
 Pasa los 16 valores en tercios de octava de 100 Hz a 3150 Hz a
 `building.weighted_rating(R)`. Desplaza la curva de referencia de ISO 717-1 y
 devuelve el índice leído a 500 Hz, junto con los términos de adaptación
-espectral $C$ y $C_{tr}$. Para el espectro medido que se usa abajo,
-`w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_w\ (C\ ;\ C_{tr}) = 30\ (-2\ ;\ -3)$. La
-misma llamada valora $R'$, $D_n$ y $D_{nT}$.
+espectral $C$ y $C_\mathrm{tr}$. Para el espectro medido que se usa abajo,
+`w.rating, w.c, w.ctr` imprime `30 -2 -3`: $R_\mathrm{w}\ (C\ ;\ C_\mathrm{tr}) = 30\ (-2\ ;\ -3)$. La
+misma llamada valora $R'$, $D_\mathrm{n}$ y $D_\mathrm{nT}$.
 
 ## Índices de ruido aéreo (ISO 717-1)
 
@@ -70,7 +70,7 @@ mayor posible pero no mayor que 32,0 dB (16 bandas de tercio de octava) o
 10,0 dB (5 bandas de octava). Los dos topes son una sola regla, no dos
 constantes: $32{,}0 = 2{,}0 \times 16$ y $10{,}0 = 2{,}0 \times 5$, así que lo
 que el método permite en realidad es **una desviación desfavorable media de
-2 dB por banda**. El índice ($R_w$, $R'_w$, $D_{nT,w}$ …) es la
+2 dB por banda**. El índice ($R_\mathrm{w}$, $R'_\mathrm{w}$, $D_\mathrm{nT,w}$ …) es la
 referencia desplazada leída a 500 Hz.
 
 La curva de referencia en sí (ISO 717-1:2020, Tabla 3) tampoco es arbitraria.
@@ -78,7 +78,7 @@ Sube 9 dB por octava de 100 Hz a 500 Hz, después solo 4 dB en la octava
 siguiente, y es plana a partir de 1250 Hz. Un motor de valoración que lleve esa
 forma es deliberadamente indulgente en baja frecuencia e implacable por encima
 de 1 kHz, que es la razón por la que una construcción con un valle en baja
-frecuencia puede valorarse bien, y la razón por la que existe $C_{tr}$: para
+frecuencia puede valorarse bien, y la razón por la que existe $C_\mathrm{tr}$: para
 devolverle la penalización. El objeto de resultado entrega la curva en su
 posición desplazada, así que la curva sin desplazar está a una resta de
 distancia:
@@ -99,15 +99,15 @@ print(reference.astype(int).tolist())
 # [33, 36, 39, 42, 45, 48, 51, 52, 53, 54, 55, 56, 56, 56, 56, 56]
 ```
 
-Los **términos de adaptación espectral** $C$ (ruido rosa) y $C_{tr}$ (tráfico
+Los **términos de adaptación espectral** $C$ (ruido rosa) y $C_\mathrm{tr}$ (tráfico
 urbano) añaden la penalización en baja frecuencia de una fuente real. Los dos
 salen de una única definición (apartado 4.5, Fórmulas (1) y (2)): revalorar el
 espectro medido frente a un espectro de fuente normalizado y restar el índice
 basado en la curva,
 
 $$
-C_j = X_{A,j} - X_w, \qquad
-X_{A,j} = -10\log_{10}\sum_i 10^{(L_{i,j} - X_i)/10},
+C_j = X_{\mathrm{A},j} - X_\mathrm{w}, \qquad
+X_{\mathrm{A},j} = -10\log_{10}\sum_i 10^{(L_{i,j} - X_i)/10},
 $$
 
 donde $L_{i,j}$ es el nivel del espectro de fuente $j$ en la banda $i$ (los dos
@@ -116,25 +116,25 @@ aislamiento medido en esa banda, con un decimal. Los dos términos se
 diferencian **solo** en qué espectro se sustituye: el n.º 1, ruido rosa
 ponderado A, representativo de las actividades domésticas (habla, música,
 radio, televisión), da $C$; el n.º 2, tráfico rodado urbano ponderado A, cuya
-energía se concentra en baja frecuencia, da $C_{tr}$. De modo que el
-índice más el término ($R_w + C$ para un índice de laboratorio, $R'_w + C$ o
-$D_{nT,w} + C$ para las magnitudes de la
+energía se concentra en baja frecuencia, da $C_\mathrm{tr}$. De modo que el
+índice más el término ($R_\mathrm{w} + C$ para un índice de laboratorio, $R'_\mathrm{w} + C$ o
+$D_\mathrm{nT,w} + C$ para las magnitudes de la
 [guía de campo](/phonometry/es/buildings/insulation/insulation-field/), e igual
-con $C_{tr}$) es la diferencia de nivel ponderada A que la construcción
+con $C_\mathrm{tr}$) es la diferencia de nivel ponderada A que la construcción
 consigue frente a esa fuente, que es lo que hace que lo que merece la pena
 especificar sea la suma y no el índice a secas. Para leerlos:
 
 * $C$ se mantiene pequeño en la mayoría de construcciones (0 a −2 dB es lo
   típico): el espectro rosa se parece a la ponderación ya implícita en la
   curva de referencia.
-* $C_{tr}$ castiga el aislamiento débil en baja frecuencia. Una doble hoja
+* $C_\mathrm{tr}$ castiga el aislamiento débil en baja frecuencia. Una doble hoja
   ligera con su resonancia masa-aire-masa cerca de 100 Hz puede llevar un
-  $C_{tr}$ de −5 a −10 dB, mientras que una pared monolítica pesada con el
-  mismo $R_w$ pierde mucho menos: dos construcciones con la misma
+  $C_\mathrm{tr}$ de −5 a −10 dB, mientras que una pared monolítica pesada con el
+  mismo $R_\mathrm{w}$ pierde mucho menos: dos construcciones con la misma
   valoración pueden diferir de forma audible frente al tráfico.
 * Diseña con el descriptor que corresponda al ruido, sobre la magnitud de
-  campo que el requisito valora: $R'_w + C_{tr}$ para una fachada a una
-  calle con tráfico, $D_{nT,w} + C$ (o el índice a secas, donde la
+  campo que el requisito valora: $R'_\mathrm{w} + C_\mathrm{tr}$ para una fachada a una
+  calle con tráfico, $D_\mathrm{nT,w} + C$ (o el índice a secas, donde la
   reglamentación lo diga) entre viviendas, los dos requisitos de ejemplo de
   ISO 717-1, 5.3.
 
@@ -143,10 +143,10 @@ especificar sea la suma y no el índice a secas. Para leerlos:
 *Dos construcciones, un mismo índice. Los dos espectros salen de los propios
 modelos de panel de la biblioteca, el método de Sharp para la hoja de hormigón
 y el modelo masa-aire-masa de doble pared para la ligera, y los dos se valoran
-en $R_w = 49$ dB, así que una especificación escrita solo sobre $R_w$ las trata
+en $R_\mathrm{w} = 49$ dB, así que una especificación escrita solo sobre $R_\mathrm{w}$ las trata
 como intercambiables. No lo son: la doble hoja entra en el rango valorado
 todavía saliendo de su resonancia masa-aire-masa de 82 Hz y, frente al tráfico,
-cede 6 dB más que el muro de hormigón. $R_w + C_{tr}$ es aquello sobre lo que
+cede 6 dB más que el muro de hormigón. $R_\mathrm{w} + C_\mathrm{tr}$ es aquello sobre lo que
 realmente se especifica una fachada a una calle con tráfico.*
 
 <details>
@@ -228,7 +228,7 @@ ISO 717-1:2020 y del 4.3.1 de ISO 717-2:2020.*
 suma 31,8 dB: un paso hacia atrás se pasaría del tope, con 44,1 dB, y un paso
 más hacia abajo desaprovecharía el margen, con 20,6 dB.
 El índice se lee después sobre esa curva a 500 Hz, no sobre la medición: el
-espectro medido toca ahí 26,6 dB, y $R_w$ es 30 dB.*
+espectro medido toca ahí 26,6 dB, y $R_\mathrm{w}$ es 30 dB.*
 
 ```python
 # `building`, `R` y `w` vienen del bloque de la curva de referencia de arriba.
@@ -274,7 +274,7 @@ plt.show()
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $R$, $R'$, $D_{nT}$ … medidos por banda |
+| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $R$, $R'$, $D_\mathrm{nT}$ … medidos por banda |
 | `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
 
 `weighted_rating()` devuelve un `WeightedRatingResult` (`rating`, `c`, `ctr`,
@@ -287,35 +287,35 @@ que se dibujan las figuras de esta página: `band_centers`, `measured` y
 El índice de un solo número (ISO 717-2) desplaza el mismo estilo de curva de
 referencia, pero una **desviación desfavorable se produce ahora donde la
 medición *supera* la referencia** (el ruido de impactos es peor cuanto más
-alto), el signo opuesto a ISO 717-1. El índice ($L_{n,w}$, $L'_{n,w}$,
-$L'_{nT,w}$) es la referencia desplazada leída a 500 Hz; para bandas de octava se reduce además
-en 5 dB. El término de adaptación espectral $C_I = L_{n,\text{sum}} - 15 - L_{n,w}$
+alto), el signo opuesto a ISO 717-1. El índice ($L_\mathrm{n,w}$, $L'_\mathrm{n,w}$,
+$L'_\mathrm{nT,w}$) es la referencia desplazada leída a 500 Hz; para bandas de octava se reduce además
+en 5 dB. El término de adaptación espectral $C_\mathrm{I} = L_\mathrm{n,sum} - 15 - L_\mathrm{n,w}$
 (Fórmulas (A.1) a (A.3) de ISO 717-2:2020)
 usa la suma energética sobre 100–2500 Hz (los primeros 15 tercios, excluyendo
 3150 Hz) o 125–2000 Hz (octavas).
 
 Los $-15$ dB son un desplazamiento de normalización, no un hecho físico: se
-eligen para que $C_I$ salga **en torno a cero** en un forjado macizo con un
+eligen para que $C_\mathrm{I}$ salga **en torno a cero** en un forjado macizo con un
 revestimiento eficaz, ligeramente positivo en un forjado de viguetas de madera
 cuyos picos de baja frecuencia dominan, y hasta $-15$ dB en un forjado de
-hormigón desnudo o mal revestido (A.1). Leído así, el $C_I = -11$ dB del
+hormigón desnudo o mal revestido (A.1). Leído así, el $C_\mathrm{I} = -11$ dB del
 ejemplo de más abajo dice que el espectro medido es mucho más plano y está
 mucho más cargado hacia la alta frecuencia que la curva de referencia, es
 decir, una losa desnuda y no un forjado con revestimiento, así que el forjado
 es mejor en las bajas frecuencias que excitan las pisadas de lo que sugiere por
-sí solo $L'_{nT,w} = 79$ dB. El corolario es una trampa de diseño: un
+sí solo $L'_\mathrm{nT,w} = 79$ dB. El corolario es una trampa de diseño: un
 revestimiento blando actúa donde la curva de referencia es más exigente, así
 que mejora el número único más de lo que mejora lo que oye el vecino. La suma
-sin ponderar sobre la que se construye $C_I$ existe precisamente porque se
+sin ponderar sobre la que se construye $C_\mathrm{I}$ existe precisamente porque se
 correlaciona mejor con el ruido de pisadas ponderado A que la valoración por
 curva de referencia, y por eso los requisitos se escriben a veces sobre
-$L'_{n,w} + C_I$ en lugar de sobre $L'_{n,w}$.
+$L'_\mathrm{n,w} + C_\mathrm{I}$ en lugar de sobre $L'_\mathrm{n,w}$.
 
 Para mediciones ampliadas hasta 50 Hz,
 `weighted_impact_rating_extended` devuelve además el término de rango ampliado
-$C_{I,50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice en
+$C_{\mathrm{I},50\text{–}2500}$ (NOTA de A.2.1) y, con `one_decimal=True`, el índice en
 pasos de 0,1 dB usado en las declaraciones de incertidumbre (reproduce los
-valores impresos $L_{n,r,0,w} = 77{,}6$ dB y $C_{I,r,0} = -10{,}3$ dB de
+valores impresos $L_\mathrm{n,r,0,w} = 77{,}6$ dB y $C_\mathrm{I,r,0} = -10{,}3$ dB de
 A.2.2).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/impact_rating_es.svg" alt="Nivel de presión acústica de impactos normalizado medido en tercios de octava con la curva de referencia de ISO 717-2 desplazada y el índice ponderado resultante leído a 500 Hz" width="80%" />
@@ -384,14 +384,14 @@ plt.show()
 </details>
 
 Pasar el espectro estandarizado a `weighted_impact_rating` reproduce los
-valores del Anexo C de ISO 717-2 (tercios $L'_{nT,w} = 79$, $C_I = -11$;
-octavas 54, $C_I = 0$).
+valores del Anexo C de ISO 717-2 (tercios $L'_\mathrm{nT,w} = 79$, $C_\mathrm{I} = -11$;
+octavas 54, $C_\mathrm{I} = 0$).
 
 ### Parámetros de `weighted_impact_rating()`
 
 | Parámetro | Tipo | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
-| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $L_n$, $L'_n$ o $L'_{nT}$ medidos por banda |
+| `values_by_band` | array 1D | dB | 16 (tercios) o 5 (octavas) | $L_\mathrm{n}$, $L'_\mathrm{n}$ o $L'_\mathrm{nT}$ medidos por banda |
 | `bands` | str o `None` | — | `'third-octave'` / `'octave'` / `None` | `None` lo infiere del número de bandas |
 
 `weighted_impact_rating()` devuelve un `ImpactRatingResult` (`rating`,
@@ -403,11 +403,11 @@ que el resultado aéreo: `band_centers`, `measured` y `shifted_reference`.
 Cuando la medición cubre más que las 16 bandas básicas de 100–3150 Hz, el
 Anexo B de ISO 717-1 define términos de adaptación adicionales con el rango
 como subíndice ($C_{50\text{–}3150}$, $C_{50\text{–}5000}$,
-$C_{100\text{–}5000}$ y sus homólogos $C_{tr}$), calculados con los espectros de
+$C_{100\text{–}5000}$ y sus homólogos $C_\mathrm{tr}$), calculados con los espectros de
 la Tabla B.1 sobre el rango ampliado. `weighted_rating_extended` toma los
 valores por banda *con sus frecuencias centrales* y devuelve el índice básico
 más todos los términos ampliados que cubra la entrada (la variante de impactos
-`weighted_impact_rating_extended` añade $C_{I,50\text{–}2500}$). Con
+`weighted_impact_rating_extended` añade $C_{\mathrm{I},50\text{–}2500}$). Con
 `one_decimal=True` la curva de referencia se desplaza en pasos de 0,1 dB y
 todas las reducciones conservan un decimal: la variante que ISO 717 prescribe
 «para la expresión de la incertidumbre» y que el Anexo B de ISO 12999-1 exige
@@ -490,9 +490,9 @@ la tabla de tercios de octava junto a la gráfica de la curva medida frente a la
 referencia desplazada (el propio `.plot()` del resultado), el número único en
 un recuadro, una fila de veredicto opcional y un pie con el descargo fijo.
 `WeightedRatingResult.report()` etiqueta la ficha aérea de ISO 717-1
-($R_w\ (C\ ;\ C_{tr})$, desviaciones donde la referencia supera a la medida);
+($R_\mathrm{w}\ (C\ ;\ C_\mathrm{tr})$, desviaciones donde la referencia supera a la medida);
 `ImpactRatingResult.report()` etiqueta la ficha de impactos de ISO 717-2
-($L_{n,w}(C_I)$, con el signo contrario). `SoundReductionResult.report()` es
+($L_\mathrm{n,w}(C_\mathrm{I})$, con el signo contrario). `SoundReductionResult.report()` es
 una utilidad que valora el $R(f)$ predicho y escribe su ficha en una sola
 llamada; ese resultado sale de los modelos de panel EN 12354 de
 [Aislamiento acústico de paneles](/phonometry/es/buildings/design/panel-sound-insulation/),
@@ -594,9 +594,9 @@ rango físico.
 El índice aéreo por curva de referencia de ISO 717-1:2020 (la regla de
 desplazamiento de 1 dB con los topes de desviaciones desfavorables de 32,0 dB
 / 10,0 dB, leído a 500 Hz) con los términos de adaptación espectral $C$ y
-$C_{tr}$ del Anexo A, mediante `building.weighted_rating`; el índice de
+$C_\mathrm{tr}$ del Anexo A, mediante `building.weighted_rating`; el índice de
 impactos de ISO 717-2:2020 con el signo de desviación opuesto, la reducción de
-−5 dB en octavas y el término $C_I$, mediante
+−5 dB en octavas y el término $C_\mathrm{I}$, mediante
 `building.weighted_impact_rating`; los términos de rango ampliado del Anexo B
 / A.2.1 y las variantes con un decimal en pasos de 0,1 dB mediante
 `building.weighted_rating_extended` y
@@ -613,7 +613,7 @@ Nada en esta página mide: cada función toma un espectro por bandas ya medido
 [intensidad](/phonometry/es/buildings/insulation/insulation-intensity/),
 [método de control](/phonometry/es/buildings/insulation/insulation-survey/) o
 [flancos](/phonometry/es/buildings/insulation/flanking-lab/). El número único
-de fachada del Anexo F de ISO 16283-3 y el $D_{n,f,w}$ de flancos reutilizan
+de fachada del Anexo F de ISO 16283-3 y el $D_\mathrm{n,f,w}$ de flancos reutilizan
 estos motores desde sus propias guías en lugar de duplicarlos. Un miembro de
 la familia ISO 717 falta a propósito: el nivel máximo de impactos ponderado A
 del **Anexo D de ISO 717-2:2020**, que valora la pelota de caucho y la máquina
@@ -630,15 +630,15 @@ blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
   los espectros aéreos, de impacto y de fachada que estos motores valoran en
   campo.
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
-  los $R$ y $L_n$ de laboratorio tras $R_w$ y $L_{n,w}$.
+  los $R$ y $L_\mathrm{n}$ de laboratorio tras $R_\mathrm{w}$ y $L_\mathrm{n,w}$.
 - [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/):
   los índices por intensidad valorados con el mismo motor aéreo.
 - [Método de control del aislamiento (ISO 10052)](/phonometry/es/buildings/insulation/insulation-survey/):
   las magnitudes del método de control y sus índices automáticos.
 - [Transmisión por flancos en laboratorio (ISO 10848)](/phonometry/es/buildings/insulation/flanking-lab/):
-  los descriptores de flanco $D_{n,f,w}$ y $L_{n,f,w}$.
+  los descriptores de flanco $D_\mathrm{n,f,w}$ y $L_\mathrm{n,f,w}$.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
-  la mejora ponderada $\Delta L_w$ construida sobre el suelo de referencia de
+  la mejora ponderada $\Delta L_\mathrm{w}$ construida sobre el suelo de referencia de
   ISO 717-2.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
   el modelo de número único que consume estos índices.
@@ -652,8 +652,8 @@ blandas](/phonometry/es/buildings/insulation/heavy-impact-sources/).
 
 Ambos vuelven a valorar la misma curva medida frente a los dos espectros de
 fuente del Anexo A de ISO 717-1: $C$ frente a ruido rosa ponderado A
-(actividades domésticas: habla, música, radio, televisión) y $C_{tr}$
+(actividades domésticas: habla, música, radio, televisión) y $C_\mathrm{tr}$
 frente a tráfico rodado urbano ponderado A, cuya energía se concentra en
 baja frecuencia. $C$ suele estar entre 0 y −2 dB, mientras que una doble
 hoja ligera con resonancia masa-aire-masa cerca de 100 Hz puede llevar un
-$C_{tr}$ de −5 a −10 dB.
+$C_\mathrm{tr}$ de −5 a −10 dB.

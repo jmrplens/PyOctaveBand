@@ -258,10 +258,10 @@ def generate_intensity_insulation(output_dir: str) -> None:
     ax.fill_between(x, result.r_i, result.r_i_modified, color=COLOR_TERTIARY,
                     alpha=0.18, zorder=0, label=r"$K_\mathrm{c}$ adaptation")
     ax.plot(x, result.r_i, "-", color=COLOR_PRIMARY, linewidth=2.6, marker="o",
-            markersize=6, zorder=5, label=r"$R_I$ (intensity)")
+            markersize=6, zorder=5, label=r"$R_\mathrm{I}$ (intensity)")
     ax.plot(x, result.r_i_modified, "--", color=COLOR_TERTIARY, linewidth=2.2,
             marker="s", markersize=6, zorder=5,
-            label=r"$R_{I,\mathrm{M}} = R_I + K_\mathrm{c}$")
+            label=r"$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$")
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(f)}" for f in freqs], rotation=45, ha="right",
@@ -269,7 +269,7 @@ def generate_intensity_insulation(output_dir: str) -> None:
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Sound reduction index [dB]")
     ax.set_title(r"ISO 15186-1 Intensity Sound Reduction Index "
-                 r"($R_I$ and $R_{I,\mathrm{M}}$)",
+                 r"($R_\mathrm{I}$ and $R_\mathrm{I,M}$)",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -278,8 +278,8 @@ def generate_intensity_insulation(output_dir: str) -> None:
     # Data-only info box (language-neutral); the Kc lift is explained by the
     # shaded "Kc adaptation" legend entry, which the ES translator handles.
     info = [
-        rf"$R_{{I,\mathrm{{w}}}}$ = {result.rating.rating} dB",
-        rf"$R_{{I,\mathrm{{M,w}}}}$ = {result.rating_modified.rating} dB",
+        rf"$R_\mathrm{{I,w}}$ = {result.rating.rating} dB",
+        rf"$R_\mathrm{{I,M,w}}$ = {result.rating_modified.rating} dB",
     ]
     ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
             va="bottom", ha="right", fontsize=11, color=COLOR_FG,
@@ -919,7 +919,7 @@ def generate_intensity_element_insulation(output_dir: str) -> None:
     ax.legend(loc="upper left", fontsize=9)
 
     info = [
-        (rf"$D_{{I,\mathrm{{n,e,w}}}}$($C$;$C_\mathrm{{tr}}$) = {res.rating.rating}"
+        (rf"$D_\mathrm{{I,n,e,w}}$($C$;$C_\mathrm{{tr}}$) = {res.rating.rating}"
          f"({_fmt_minus(res.rating.c)};{_fmt_minus(res.rating.ctr)}) dB"),
         (r"$D_{I,\mathrm{n,e}} = L_{p1} - 6 - [L_{I\mathrm{n}} + "
          r"10\,\log_{10}(S_\mathrm{m}/A_0)] + 10\,\log_{10} N$"),

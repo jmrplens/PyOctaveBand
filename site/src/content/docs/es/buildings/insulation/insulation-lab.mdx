@@ -48,7 +48,7 @@ Para valorar un elemento constructivo por sí mismo (un tipo de pared, un
 suelo flotante, una ventana) se lleva a un laboratorio cualificado, donde
 los flancos suprimidos hacen de la transmisión directa toda la historia.
 Esta página cubre la cadena de laboratorio de ISO 10140: el índice de
-reducción acústica $R$, el nivel de impactos normalizado $L_n$, la
+reducción acústica $R$, el nivel de impactos normalizado $L_\mathrm{n}$, la
 corrección de ruido de fondo y las fichas de ensayo acreditadas. Tres
 métodos de laboratorio hermanos tienen guías propias:
 [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/),
@@ -71,14 +71,14 @@ absorción del recinto receptor $A = 0{,}16\ V/T$ pasa a ser una propiedad
 conocida de la instalación en lugar de una magnitud del edificio, de modo que
 la misma pared medida en Madrid y en Múnich debería dar el mismo número. Eso es
 lo que hace posible un catálogo, y es la razón por la que toda predicción de
-este sitio toma como entrada el $R$ y el $L_n$ de laboratorio. Nada más en
+este sitio toma como entrada el $R$ y el $L_\mathrm{n}$ de laboratorio. Nada más en
 acústica de la edificación es transferible de esa manera. Las dos magnitudes
 son el **índice de reducción acústica** $R$ (no $R'$) y el **nivel de impactos
-normalizado** $L_n$ (no $L'_n$):
+normalizado** $L_\mathrm{n}$ (no $L'_\mathrm{n}$):
 
 $$
 R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
-L_n = L_i + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
+L_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
 $$
 
 La propia instalación es la que suprime los flancos: dos cámaras reverberantes
@@ -95,7 +95,7 @@ lo cualifica sobre construcciones representativas y no en abstracto, seis de
 ellas, desde una partición ligera de doble hoja hasta un muro de fábrica de
 (400 ± 40) kg/m² con trasdosado independiente, y los valores obtenidos valen
 solo para las configuraciones ensayadas. Su propia tabla ilustrativa, para una
-cámara capaz de medir paredes y forjados de tipo C hasta $R_w = 55$ dB, va de
+cámara capaz de medir paredes y forjados de tipo C hasta $R_\mathrm{w} = 55$ dB, va de
 45,0 dB a 100 Hz a 86,0 dB a 3150 Hz, y la norma dice con todas las letras que
 son ejemplos y no objetivos. Cuando se espera que un elemento choque con ese
 techo, la vía de intensidad de
@@ -103,34 +103,34 @@ techo, la vía de intensidad de
 lee en su lugar la potencia transmitida sobre la cara radiante y es la
 herramienta preferida cuando la transmisión por flancos es alta, que es
 también, exactamente, para lo que existe el índice de intensidad modificado con
-$K_c$: para volver a hacerla comparable.
+$K_\mathrm{c}$: para volver a hacerla comparable.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_lab_es.svg" alt="Vista en planta de las cámaras de transmisión de laboratorio ISO 10140: recintos emisor y receptor reverberantes desacoplados estructuralmente de unos 59 y 51 metros cúbicos, el elemento de ensayo montado en la abertura de ensayo de 10 metros cuadrados entre ambos, un altavoz en esquina en el recinto emisor y un micrófono en movimiento continuo con radio de barrido de al menos 1 m en cada recinto" width="92%" />
 
 | | Campo (ISO 16283) | Laboratorio (ISO 10140) |
 | :--- | :--- | :--- |
 | Índice aéreo de elemento | $R'$ aparente (con flancos) | $R$ directo (flancos suprimidos) |
-| Aéreo de pareja de salas | $D_{nT}$, $D_n$ (sin prima: magnitudes de sala) | — |
-| Impactos | $L'_n$, $L'_{nT}$ aparentes | $L_n$ directo |
-| Índice global | $R'_w$, $D_{nT,w}$, $L'_{n,w}$, $L'_{nT,w}$ | $R_w$, $L_{n,w}$ |
+| Aéreo de pareja de salas | $D_\mathrm{nT}$, $D_\mathrm{n}$ (sin prima: magnitudes de sala) | — |
+| Impactos | $L'_\mathrm{n}$, $L'_\mathrm{nT}$ aparentes | $L_\mathrm{n}$ directo |
+| Índice global | $R'_\mathrm{w}$, $D_\mathrm{nT,w}$, $L'_\mathrm{n,w}$, $L'_\mathrm{nT,w}$ | $R_\mathrm{w}$, $L_\mathrm{n,w}$ |
 | Área de absorción | medida en la sala | propiedad de la instalación |
 
 La prima es el marcador de flancos de la acústica de edificios, y viaja
-con la magnitud hasta su índice global: $R_w$ valora un espectro de
-laboratorio, $R'_w$ uno de campo. Las diferencias de nivel estandarizada y
-normalizada $D_{nT}$ y $D_n$ no llevan prima porque describen la pareja de
+con la magnitud hasta su índice global: $R_\mathrm{w}$ valora un espectro de
+laboratorio, $R'_\mathrm{w}$ uno de campo. Las diferencias de nivel estandarizada y
+normalizada $D_\mathrm{nT}$ y $D_\mathrm{n}$ no llevan prima porque describen la pareja de
 salas y no un elemento, así que no hay contraparte sin flancos que marcar. En
-una construcción bien ejecutada $R'_w$ queda unos pocos dB por debajo del
-$R_w$ de laboratorio de la misma partición; una diferencia mucho mayor dice
+una construcción bien ejecutada $R'_\mathrm{w}$ queda unos pocos dB por debajo del
+$R_\mathrm{w}$ de laboratorio de la misma partición; una diferencia mucho mayor dice
 que dominan los flancos, y el
 [modelo EN 12354](/phonometry/es/buildings/design/insulation-prediction/) dice qué vía
 domina. La figura de más abajo dibuja las tres curvas de una misma pared.
 
 Los índices de un solo número reutilizan los mismísimos motores de ISO 717-1/2
-(`weighted_rating`, `weighted_impact_rating`): un espectro $R$ se valora a $R_w$
-exactamente igual que un espectro $R'$ se valoraba a $R'_w$. Antes de formar el
+(`weighted_rating`, `weighted_impact_rating`): un espectro $R$ se valora a $R_\mathrm{w}$
+exactamente igual que un espectro $R'$ se valoraba a $R'_\mathrm{w}$. Antes de formar el
 índice, los niveles del recinto receptor deben **corregirse por ruido de fondo**
-(apartado 4.3): la resta energética $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$
+(apartado 4.3): la resta energética $10 \log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$
 (Fórmula (4)) se aplica para un margen por encima de 6 dB y por debajo de
 15 dB, una corrección fija de 1,3 dB
 (el *límite de medición*) en 6 dB o por debajo, y ninguna corrección en 15 dB o
@@ -217,18 +217,18 @@ print(np.round(corrected, 1))                 # [28.7 31.7 50.0]  (saturación d
 lab.rating.plot()   # R medido frente a la referencia ISO 717-1 desplazada (requiere matplotlib)
 ```
 
-Lee los números en lugar de coleccionarlos. $R_w = 30$ dB es una partición
+Lee los números en lugar de coleccionarlos. $R_\mathrm{w} = 30$ dB es una partición
 ligera, una sola hoja de placa de yeso o un acristalamiento fino, muy por
 debajo de los 45 a 55 dB con los que normalmente se especifica una pared
-separadora de vivienda, y su $C_{tr} = -3$ dB dice que cede otros 3 dB frente
+separadora de vivienda, y su $C_\mathrm{tr} = -3$ dB dice que cede otros 3 dB frente
 al tráfico, así que se declararía como 27 dB frente a una carretera.
-$L_{n,w} = 79$ dB es un forjado estructural desnudo, sin revestimiento ni suelo
+$L_\mathrm{n,w} = 79$ dB es un forjado estructural desnudo, sin revestimiento ni suelo
 flotante: los límites europeos de impacto para vivienda rondan los 50 a 60 dB,
-así que este forjado los incumple todos por unos 20 dB. Su $C_I = -11$ dB es la
-mitad interesante: un $C_I$ muy negativo significa que el espectro medido está
+así que este forjado los incumple todos por unos 20 dB. Su $C_\mathrm{I} = -11$ dB es la
+mitad interesante: un $C_\mathrm{I}$ muy negativo significa que el espectro medido está
 mucho más cargado hacia la alta frecuencia que la curva de referencia, así que
 el forjado es *mejor* en las bajas frecuencias que realmente excitan las
-pisadas de lo que sugiere el $L_{n,w}$ por sí solo, y un revestimiento blando
+pisadas de lo que sugiere el $L_\mathrm{n,w}$ por sí solo, y un revestimiento blando
 (que actúa en alta frecuencia) mejorará el número único más de lo que mejora lo
 que oye el vecino. Los dos índices globales se forman solo cuando se
 suministran exactamente 16 valores en tercio de octava o 5 en octava (`rating`
@@ -240,7 +240,7 @@ con `warnings.simplefilter("error", LabInsulationWarning)`.
 
 *Las dos magnitudes de laboratorio de ISO 10140 con sus índices ISO 717: el
 $R$ aéreo se evalúa donde la referencia queda **por encima** de la medición,
-y el $L_n$ de impactos donde la medición queda **por encima** de la
+y el $L_\mathrm{n}$ de impactos donde la medición queda **por encima** de la
 referencia (un nivel de impactos mayor es peor). `lab.plot()` e `imp.plot()`
 dibujan cada panel por separado.*
 
@@ -432,7 +432,7 @@ La propia abertura de ensayo forma parte de ello: unos 10 m² para paredes, de
 encuentro perimetral no debe amortiguarlo hasta darle un resultado mejor, así
 que el factor de pérdidas del elemento de ensayo debe ser al menos
 $\eta_\text{min} = 0{,}01 + 0{,}3/\sqrt{f}$ (Fórmula (2)), comprobado con un
-muro de ladrillo o bloque de (400 ± 40) kg/m² enfoscado por una cara. Un $R_w$
+muro de ladrillo o bloque de (400 ± 40) kg/m² enfoscado por una cara. Un $R_\mathrm{w}$
 de catálogo declarado sin su etiqueta de montaje y sin la geometría de su
 abertura no es una propiedad del producto, y el mismo elemento de ensayo en una
 abertura distinta es una medición distinta.
@@ -460,7 +460,7 @@ ISO 10140 en una página, con el formato de los informes de laboratorio
 acreditados valorados según ISO 717. `LabAirborneInsulationResult.report()`
 genera la ficha del índice de reducción acústica $R$ (ISO 10140-2:2010) y
 `LabImpactInsulationResult.report()` la del nivel de presión acústica de
-impactos normalizado $L_n$ (ISO 10140-3:2010). Cada ficha nombra la norma de
+impactos normalizado $L_\mathrm{n}$ (ISO 10140-3:2010). Cada ficha nombra la norma de
 laboratorio en su línea de base, evalúa el índice global de ISO 717-1 /
 ISO 717-2 (16 bandas de tercio de octava de 100 Hz a 3150 Hz, o las 5 bandas de
 octava), presenta la magnitud con un decimal tanto en forma de tabla como en
@@ -468,8 +468,8 @@ forma de curva frente a la curva de referencia desplazada, enmarca el índice de
 laboratorio (`Rw (C; Ctr)` o `Ln,w (CI)`) e imprime la declaración de que la
 evaluación se basa en resultados de medidas en laboratorio obtenidos mediante un
 método de precisión. Como un laboratorio cualificado suprime la transmisión por
-flancos, la magnitud declarada es la *directa* $R$ / $L_n$, no la in situ
-$R'$ / $L'_n$.
+flancos, la magnitud declarada es la *directa* $R$ / $L_\mathrm{n}$, no la in situ
+$R'$ / $L'_\mathrm{n}$.
 
 `verbose=True` anexa el área de absorción acústica equivalente por bandas
 $A = 0{,}16\,V/T$ (ISO 10140-4:2010) junto a la magnitud declarada, el dato de
@@ -550,7 +550,7 @@ datos de unión que consume la predicción EN 12354 se miden según
 <ScopeClaim status="covered" label="Cubierto">
 ISO 10140-2:2010 (el índice de reducción acústica de laboratorio $R$ con la
 corrección de ruido de fondo del apartado 4.3) e ISO 10140-3:2010 (el nivel de
-impactos normalizado de laboratorio $L_n$), mediante
+impactos normalizado de laboratorio $L_\mathrm{n}$), mediante
 `building.lab_airborne_insulation`, `building.lab_impact_insulation` y
 `building.background_correction`; los índices globales reutilizan los motores
 verificados de ISO 717-1/ISO 717-2, y ambos resultados escriben la ficha ISO
@@ -585,7 +585,7 @@ por flancos (ISO 10848).
   las mediciones aéreas, de impacto y de fachada en el edificio, sus índices
   globales y su incertidumbre.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
-  el modelo de flancos que consume los $R$, $L_n$ y $K_{ij}$ de laboratorio.
+  el modelo de flancos que consume los $R$, $L_\mathrm{n}$ y $K_{ij}$ de laboratorio.
 - [Aislamiento acústico por intensidad (ISO 15186)](/phonometry/es/buildings/insulation/insulation-intensity/):
   la alternativa de potencia directa para situaciones con muchos flancos.
 - [Mejora del aislamiento a impacto de suelos (ISO 16251-1)](/phonometry/es/buildings/design/impact-improvement/):
@@ -596,7 +596,7 @@ por flancos (ISO 10848).
   la pelota de caucho que el Anexo F de ISO 10140-5:2010 especifica junto a la
   máquina de impactos del Anexo E, y la valoración del Anexo D que la acompaña.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
-  el motor de curva de referencia tras $R_w$ y $L_{n,w}$.
+  el motor de curva de referencia tras $R_\mathrm{w}$ y $L_\mathrm{n,w}$.
 - [Potencia acústica](/phonometry/es/devices/emission/sound-power/): los métodos de $L_W$
   que comparten la maquinaria de área de absorción del recinto receptor.
 - Referencia de la API: [`building.measurement.lab_insulation`](/phonometry/es/reference/api/building/lab-insulation/).

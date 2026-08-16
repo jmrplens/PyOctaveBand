@@ -24,8 +24,8 @@ phonometry (a passive medium has :math:`\operatorname{Im}(k) < 0`):
   narrow-channel effective density and bulk modulus (Appl. Sci. Eq. (6);
   Appl. Phys. Lett. Eqs. (A1)-(A2)):
 
-  :math:`\rho_s = \rho_0 [1 - \tanh((h/2) G_\rho) / ((h/2) G_\rho)]^{-1}`
-  and :math:`\kappa_s = \kappa_0 [1 + (\gamma - 1) \tanh((h/2) G_\kappa) /
+  :math:`\rho_\mathrm{s} = \rho_0 [1 - \tanh((h/2) G_\rho) / ((h/2) G_\rho)]^{-1}`
+  and :math:`\kappa_\mathrm{s} = \kappa_0 [1 + (\gamma - 1) \tanh((h/2) G_\kappa) /
   ((h/2) G_\kappa)]^{-1}`
 
   with :math:`G_\rho = \sqrt{j \omega \rho_0 / \eta}` and
@@ -147,9 +147,9 @@ def slit_effective_properties(
 
     .. math::
 
-       \rho_s = \rho_0 \left[1 - \frac{\tanh(x_\rho)}{x_\rho}\right]^{-1}
+       \rho_\mathrm{s} = \rho_0 \left[1 - \frac{\tanh(x_\rho)}{x_\rho}\right]^{-1}
 
-       \kappa_s = \kappa_0 \left[1
+       \kappa_\mathrm{s} = \kappa_0 \left[1
        + (\gamma - 1) \frac{\tanh(x_\kappa)}{x_\kappa}\right]^{-1}
 
     with :math:`x_\rho = (h/2) \sqrt{j \omega \rho_0 / \eta}` and
@@ -283,10 +283,10 @@ def _neck_slit_correction_2d(neck_width: float, slit_height: float) -> float:
 
     The 2-D ducts use their half-width as the radiation radius, so the
     Dubos fit is evaluated with the width ratio directly and
-    :math:`0.82 (w_n / 2) = 0.41 w_n` as printed in the source, exactly as
+    :math:`0.82 (w_\mathrm{n} / 2) = 0.41 w_\mathrm{n}` as printed in the source, exactly as
     the paper applies it. The fit was derived for a neck narrower than
     the main waveguide; optimised metadiffuser geometries can present
-    :math:`w_n > h`, where the polynomial turns negative and the resonator
+    :math:`w_\mathrm{n} > h`, where the polynomial turns negative and the resonator
     effectively decouples from the slit (the caller warns about it).
     """
     x = neck_width / slit_height
@@ -384,15 +384,15 @@ def helmholtz_resonator_impedance(
 
     .. math::
 
-       Z_{\mathrm{HR}} = -j \frac{\cos(k_n l_n) \cos(k_c l_c)
-       - Z_n k_n \mathrm{dl} \cos(k_n l_n) \sin(k_c l_c) / Z_c
-       - Z_n \sin(k_n l_n) \sin(k_c l_c) / Z_c}
-       {\sin(k_n l_n) \cos(k_c l_c) / Z_n
-       - k_n \mathrm{dl} \sin(k_n l_n) \sin(k_c l_c) / Z_c
-       + \cos(k_n l_n) \sin(k_c l_c) / Z_c}
+       Z_{\mathrm{HR}} = -j \frac{\cos(k_\mathrm{n} l_\mathrm{n}) \cos(k_\mathrm{c} l_\mathrm{c})
+       - Z_\mathrm{n} k_\mathrm{n} \mathrm{dl} \cos(k_\mathrm{n} l_\mathrm{n}) \sin(k_\mathrm{c} l_\mathrm{c}) / Z_\mathrm{c}
+       - Z_\mathrm{n} \sin(k_\mathrm{n} l_\mathrm{n}) \sin(k_\mathrm{c} l_\mathrm{c}) / Z_\mathrm{c}}
+       {\sin(k_\mathrm{n} l_\mathrm{n}) \cos(k_\mathrm{c} l_\mathrm{c}) / Z_\mathrm{n}
+       - k_\mathrm{n} \mathrm{dl} \sin(k_\mathrm{n} l_\mathrm{n}) \sin(k_\mathrm{c} l_\mathrm{c}) / Z_\mathrm{c}
+       + \cos(k_\mathrm{n} l_\mathrm{n}) \sin(k_\mathrm{c} l_\mathrm{c}) / Z_\mathrm{c}}
 
-    with :math:`Z_n = \sqrt{\kappa_n \rho_n} / w_n^2`,
-    :math:`k_n = \omega \sqrt{\rho_n / \kappa_n}` (and likewise for the
+    with :math:`Z_\mathrm{n} = \sqrt{\kappa_\mathrm{n} \rho_\mathrm{n}} / w_\mathrm{n}^2`,
+    :math:`k_\mathrm{n} = \omega \sqrt{\rho_\mathrm{n} / \kappa_\mathrm{n}}` (and likewise for the
     cavity), reducing to Eq. (A22) when ``dl = 0``.
 
     With ``geometry="slit"`` the resonator is two-dimensional (the neck and
@@ -603,7 +603,7 @@ def slit_helmholtz_absorber(
     closed slits of height ``h``, each loaded from its upper wall by the given
     ``resonators`` spaced by the lattice step ``a`` (Appl. Sci. 2017,
     Section 2). The total chain matrix is
-    :math:`T = M_{\mathrm{dl}} (M_s M_{\mathrm{HR}} M_s) \cdots` over the
+    :math:`T = M_{\mathrm{dl}} (M_\mathrm{s} M_{\mathrm{HR}} M_\mathrm{s}) \cdots` over the
     ``N`` resonators, where each resonator sits between two half-lattice
     slit steps; the rigidly-backed reflection factor is
     :math:`R = (T_{11} \cos(\theta) - Z_0 T_{21}) /

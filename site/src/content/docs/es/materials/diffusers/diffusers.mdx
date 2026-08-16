@@ -98,8 +98,8 @@ que cambia es si la **muestra de ensayo** está sobre la placa y si la placa
 | $T_4$ | presente | girando |
 
 $(T_1, T_2)$ es una medición de absorción ISO 354 corriente de la probeta y da
-el $\alpha_s$ de incidencia aleatoria; $(T_3, T_4)$ la repite bajo rotación y
-da el $\alpha_{spec}$ especular. El área $S$ de ambas fórmulas es el área de la
+el $\alpha_\mathrm{s}$ de incidencia aleatoria; $(T_3, T_4)$ la repite bajo rotación y
+da el $\alpha_\mathrm{spec}$ especular. El área $S$ de ambas fórmulas es el área de la
 **probeta**, no la de la placa base. La pareja $(T_1, T_3)$ tampoco se
 desperdicia: es la comprobación de calidad de la placa base de la ec. (6), más
 abajo.
@@ -119,7 +119,7 @@ excitación sobre muchas orientaciones suma por tanto las partes especulares en
 fase mientras las dispersadas interfieren de forma destructiva, y el
 decaimiento que sobrevive es el que habría dado una superficie puramente
 especular con algo de pérdida aparente de más. Esa pérdida aparente de más es
-la energía dispersada, que es la razón de que $\alpha_{spec} \ge \alpha_s$ y de
+la energía dispersada, que es la razón de que $\alpha_\mathrm{spec} \ge \alpha_\mathrm{s}$ y de
 que la ec. (5) se lea como una fracción de energía no especular. De ahí se
 siguen directamente dos consecuencias, fáciles de incumplir: el promediado debe
 ser síncrono con la adquisición, así que una plataforma girando libremente que
@@ -162,7 +162,7 @@ las rompió.
   pero **no** encajonarse con un borde rígido de altura fija (apartado 6.3.3),
   una probeta con simetría de revolución debe desplazarse del eje al menos $d/8$
   para que la rotación cambie de verdad la orientación, y la absorción de la
-  propia probeta debería quedarse por debajo de $\alpha_s = 0{,}50$
+  propia probeta debería quedarse por debajo de $\alpha_\mathrm{s} = 0{,}50$
   (apartado 6.3.4).
 - **Excitación y promediado.** Una señal determinista, evaluada por el método de
   la respuesta al impulso integrada (apartado 7.1): ruido pseudoaleatorio
@@ -200,19 +200,19 @@ $$
 donde $V$ es el volumen de la sala, $S$ el área de la muestra, $T$ el tiempo de
 reverberación, $c$ la velocidad del sonido (ec. (2): $c = 343{,}2\sqrt{(273{,}15+t)/293{,}15}$)
 y $m$ el coeficiente de atenuación en potencia del aire. El par **inmóvil**
-$(T_1, T_2)$ da la absorción de incidencia aleatoria $\alpha_s$ (ec. (1)); el
-par **en rotación** $(T_3, T_4)$ da la absorción especular $\alpha_{spec}$
+$(T_1, T_2)$ da la absorción de incidencia aleatoria $\alpha_\mathrm{s}$ (ec. (1)); el
+par **en rotación** $(T_3, T_4)$ da la absorción especular $\alpha_\mathrm{spec}$
 (ec. (4)).
 
 **Coeficiente de dispersión (ec. (5)).** Ambos se combinan en
 
 $$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s}.
+s = \frac{\alpha_\mathrm{spec} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}}.
 $$
 
 Una superficie totalmente especular refleja toda su energía no absorbida en la
-dirección especular, de modo que $\alpha_{spec} = \alpha_s$ y $s = 0$; un difusor
-fuerte envía energía en todas direcciones, elevando $\alpha_{spec}$ hacia 1 y $s$
+dirección especular, de modo que $\alpha_\mathrm{spec} = \alpha_\mathrm{s}$ y $s = 0$; un difusor
+fuerte envía energía en todas direcciones, elevando $\alpha_\mathrm{spec}$ hacia 1 y $s$
 hacia 1.
 
 ```python
@@ -273,7 +273,7 @@ quiera la sala intacta y el apartado 7.3 quiera la tanda terminada deprisa; la
 corrección repara una deriva que se midió, no una que se adivinó después.
 
 Sobre una medición completa en tercios de octava, `scattering_coefficient_spectrum`
-empareja los $\alpha_{spec}$ y $\alpha_s$ por banda con sus centros de banda y
+empareja los $\alpha_\mathrm{spec}$ y $\alpha_\mathrm{s}$ por banda con sus centros de banda y
 devuelve un `ScatteringResult` representable:
 
 ```python
@@ -296,12 +296,12 @@ result.plot()   # s(f) en eje de frecuencia logarítmico, de 0 a 1 (requiere mat
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient_es.svg" alt="Dos paneles apilados sobre las 13 bandas de tercio de octava de 250 a 4000 Hz: arriba, el coeficiente de absorción de incidencia aleatoria plano medido con la plataforma inmóvil y el coeficiente de absorción especular medido con la plataforma en rotación subiendo por encima de él, con el hueco entre ambos sombreado como numerador de la ecuación 5; abajo, el coeficiente de dispersión resultante creciendo desde casi cero hasta 0,84 a 4 kHz" width="88%" />
 
 *La ec. (5) dibujada tal como se calcula. El hueco sombreado del panel superior
-es el numerador, $\alpha_{spec} - \alpha_s$: la pareja inmóvil $(T_1, T_2)$ da
+es el numerador, $\alpha_\mathrm{spec} - \alpha_\mathrm{s}$: la pareja inmóvil $(T_1, T_2)$ da
 la curva inferior y la pareja en rotación $(T_3, T_4)$ la superior, así que toda
 la medición existe para abrir ese hueco. El coeficiente de dispersión de abajo
 asciende con la frecuencia porque el relieve de la superficie es pequeño frente
 a la longitud de onda en el extremo bajo de la banda ($s \to 0$) y comparable
-con ella en el alto ($s \to 1$). El denominador $1 - \alpha_s$ es la curva
+con ella en el alto ($s \to 1$). El denominador $1 - \alpha_\mathrm{s}$ es la curva
 inferior plana, que es la razón de que una probeta absorbente vuelva incierto
 el $s$.*
 
@@ -356,12 +356,12 @@ de dispersión espurio de la propia disposición, con la misma aritmética de la
 ec. (5) aplicada a la pareja que no lleva probeta:
 
 $$
-s_{base} = 55{,}3\,\frac{V}{S}\left(\frac{1}{c_3 T_3} - \frac{1}{c_1 T_1}\right)
+s_\mathrm{base} = 55{,}3\,\frac{V}{S}\left(\frac{1}{c_3 T_3} - \frac{1}{c_1 T_1}\right)
         - 4\,\frac{V}{S}\,(m_3 - m_1).
 $$
 
 Se supone que el error persiste cuando la probeta está presente, así que
-ISO 17497-1 limita $s_{base}$ por banda de tercio de octava (Tabla 1) y la
+ISO 17497-1 limita $s_\mathrm{base}$ por banda de tercio de octava (Tabla 1) y la
 disposición queda descalificada por encima del techo.
 
 ```python
@@ -384,7 +384,7 @@ materials.check_base_plate_scattering([0.02] * len(materials.BASE_PLATE_BANDS))
 
 **Incertidumbre (Anexo A).** Las seis mediciones de posición de cada situación
 dan una incertidumbre típica de su tiempo de reverberación medio (ecs. (A.1) y
-(A.2)); esas se propagan a $u(\alpha_s)$ y $u(\alpha_{spec})$ (ecs. (A.3) y
+(A.2)); esas se propagan a $u(\alpha_\mathrm{s})$ y $u(\alpha_\mathrm{spec})$ (ecs. (A.3) y
 (A.4)) y de ahí a $u_s$ (ec. (A.5)), con la incertidumbre expandida
 $U = 2u_s$ al nivel del 95 %.
 
@@ -422,19 +422,19 @@ print(round(float(materials.scattering_coefficient_uncertainty(
 Esa última pareja de números es el límite práctico del método: el mismo banco y
 la misma repetibilidad dan una incertidumbre expandida de 0,010 sobre una
 probeta poco absorbente y de 0,017 en cuanto la probeta absorbe la mitad de la
-energía incidente, porque la ec. (5) divide por $1 - \alpha_s$. Es también la
-razón de que el apartado 6.3.4 pida $\alpha_s \le 0{,}50$ de entrada.
+energía incidente, porque la ec. (5) divide por $1 - \alpha_\mathrm{s}$. Es también la
+razón de que el apartado 6.3.4 pida $\alpha_\mathrm{s} \le 0{,}50$ de entrada.
 
 ### Ficha de informe de ensayo de dispersión
 
 `ScatteringResult.report(path)` genera un informe de ensayo de dispersión
 acreditado de una página (ISO 17497-1): una cabecera de metadatos (probeta, área
 de muestra $S$, volumen de sala $V$, sala de ensayo, clima), la tabla por tercio
-de octava de la absorción de incidencia aleatoria $\alpha_s$ y el coeficiente de
+de octava de la absorción de incidencia aleatoria $\alpha_\mathrm{s}$ y el coeficiente de
 dispersión $s$ junto a la curva $s(f)$ sobre un eje de bandas categórico, y un
 titular de caracterización enmarcado. Es una caracterización, por lo que no hay
 veredicto de cumple/no cumple. `verbose=True` añade la columna de absorción especular
-$\alpha_{spec}$ y `language="es"` genera la ficha en español. Requiere el extra de
+$\alpha_\mathrm{spec}$ y `language="es"` genera la ficha en español. Requiere el extra de
 informes (`pip install phonometry[report]`).
 
 <ReportPreview
@@ -556,7 +556,7 @@ referencia, y los micrófonos deben responder a todo camino de reflexión
 concebible dentro de $\pm 1$ dB y $\pm 10°$ (apartado 7.2). Y **la misma
 cadena, sobre el mismo banco, debe ejecutarse de nuevo sobre un panel plano de
 referencia de la misma huella**: ese segundo juego de niveles es el que aporta
-el $d_{ref}$ del coeficiente normalizado $d_\mathrm{norm}$ de la fórmula (7).
+el $d_\mathrm{ref}$ del coeficiente normalizado $d_\mathrm{norm}$ de la fórmula (7).
 Un coeficiente normalizado citado contra una referencia medida en otro sitio no
 es un coeficiente normalizado.
 
@@ -946,7 +946,7 @@ periódica.
 Del propio dibujo se deducen unas cuantas reglas de diseño:
 
 - **La frecuencia de diseño fija la profundidad.** El pozo más profundo es
-  $d_{max} = \max(s_n)\,\lambda_0/(2N)$, cerca de media longitud de onda para
+  $d_\mathrm{max} = \max(s_n)\,\lambda_0/(2N)$, cerca de media longitud de onda para
   $N$ grande; reducir $f_0$ a la mitad duplica la profundidad del difusor.
   Este es el coste que ataca el
   [metadifusor](/phonometry/es/materials/diffusers/metadiffusers/): a 500 Hz un diseño
@@ -960,7 +960,7 @@ Del propio dibujo se deducen unas cuantas reglas de diseño:
 - **La anchura del pozo fija el techo.** Cada pozo es una pequeña guía de
   ondas; la imagen de una única onda plana en su interior solo vale mientras
   la anchura $w$ quede por debajo de media longitud de onda, lo que da un
-  límite superior de trabajo cercano a $f_{max} = c/(2w)$. Pozos más
+  límite superior de trabajo cercano a $f_\mathrm{max} = c/(2w)$. Pozos más
   estrechos suben el techo, pero añaden pérdidas viscosas y aletas.
 - **La periodicidad concentra, la modulación reparte.** Repetir un periodo
   encierra la energía reflejada en lóbulos de red en
@@ -982,7 +982,7 @@ verdad, y el modelo reproduce las dos.
 centros de banda para que las dos queden resueltas. En $N f_0 = 3500$ Hz todos
 los pozos tienen un número entero de medias longitudes de onda de profundidad,
 la secuencia de fases se anula y la difusión predicha del panel cae sobre la
-referencia plana. Por encima de $f_{max} = c/(2w) = 1715$ Hz la imagen de una
+referencia plana. Por encima de $f_\mathrm{max} = c/(2w) = 1715$ Hz la imagen de una
 única onda plana dentro de un pozo de 10 cm deja de valer, así que lo que el
 modelo dibuja ahí es una extrapolación y no una predicción.*
 

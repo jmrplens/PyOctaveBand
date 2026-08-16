@@ -84,7 +84,7 @@ print(result["bands"][0])
 ```
 
 **How far up the mask the verdict actually reaches.** `checked_to_omega` is the
-highest normalized frequency $\Omega = f/f_m$ at which that band was evaluated,
+highest normalized frequency $\Omega = f/f_\mathrm{m}$ at which that band was evaluated,
 and on a multirate bank it is the band's own decimated Nyquist rather than the
 end of the Table 1 mask. On the bank above it runs from 3.81 down to 1.20, so
 the far-stopband requirement — at least 70 dB for class 1 beyond roughly
@@ -121,7 +121,7 @@ the best a compliant design can report against this mask.
 
 The Table 1 acceptance mask itself is public too: `class_limits(fraction,
 filter_class, omega)` returns the minimum/maximum relative-attenuation
-limits at normalized frequencies $\Omega = f/f_m$, the same limits the
+limits at normalized frequencies $\Omega = f/f_\mathrm{m}$, the same limits the
 verifier and the figure below use.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay.svg" alt="Butterworth band response threading between the forbidden regions of the IEC 61260-1 class 1 acceptance mask" width="80%" />

@@ -52,14 +52,14 @@ source):
 
 - the **equivalent blocked force level** (Formula 15, dB re
   $F_0 = 10^{-6}$ N):
-  $L_{Fb,eq} = L_{Ws,low} - 10 \log_{10}( \operatorname{Re}\{Y_{R,low,eq}\} / Y_0 )$
+  $L_{F\mathrm{b,eq}} = L_{Ws,low} - 10 \log_{10}( \operatorname{Re}\{Y_{R,low,eq}\} / Y_0 )$
   with the measured low-mobility-plate mobility and $Y_0 = 1$
   m/(N.s);
 - the **characteristic reception-plate power level** used by EN 12354-5
   (Formula 17), referred to the standard 10 cm concrete plate of
   characteristic mobility $Y_{R,\infty,low} = 5 \cdot 10^{-6}$
   m/(N.s) (clause 7.2.4):
-  $L_{Wsn} = L_{Fb,eq} + 10 \log_{10}( Y_{R,\infty,low} / Y_0 )$;
+  $L_{Wsn} = L_{F\mathrm{b,eq}} + 10 \log_{10}( Y_{R,\infty,low} / Y_0 )$;
 - the **equivalent free velocity level** (Formula 18, dB re `1e-9 m/s`)
   from the high-mobility plate, and the **source mobility** from both
   (Formula 19). `L_Wsn` plus the mobility corrections of EN 12354-5
@@ -86,7 +86,7 @@ characteristic_reception_plate_power(
 
 Characteristic reception-plate power level (EN 15657:2018, Formula 17).
 
-$L_{Wsn} = L_{Fb,eq} + 10 \log_{10}(|Y_{R,\infty,low}|/Y_0)$ with the
+$L_{Wsn} = L_{F\mathrm{b,eq}} + 10 \log_{10}(|Y_{R,\infty,low}|/Y_0)$ with the
 characteristic
 mobility of the standard 10 cm concrete reception plate
 $Y_{R,\infty,low} = 5 \cdot 10^{-6}$ m/(N.s) (clause 7.2.4) and
@@ -122,7 +122,7 @@ equivalent_blocked_force_level(
 
 Equivalent blocked force level, squared (EN 15657:2018, Formula 15).
 
-$L_{Fb,eq} = L_{Ws,low} - 10 \log_{10}(\operatorname{Re}\{Y_{R,low,eq}\}/Y_0)$
+$L_{F\mathrm{b,eq}} = L_{Ws,low} - 10 \log_{10}(\operatorname{Re}\{Y_{R,low,eq}\}/Y_0)$
 in dB re $F_0 = 10^{-6}$ N,
 from the power injected into the *low-mobility* reception plate
 (Formula 14) and the equivalent point mobility of that plate (the
@@ -277,7 +277,7 @@ source_mobility_from_levels(
 
 Equivalent source mobility magnitude (EN 15657:2018, Formula 19).
 
-$|Y_{S,eq}|^2 / Y_0^2 = 10^{(L_{vf,eq} - L_{Fb,eq})/10} \cdot 10^{-6}$, the ratio
+$|Y_{S,eq}|^2 / Y_0^2 = 10^{(L_{vf,eq} - L_{F\mathrm{b,eq}})/10} \cdot 10^{-6}$, the ratio
 of the free-velocity (re 1e-9 m/s) and blocked-force (re 1e-6 N)
 references makes the constant
 $(10^{-9}/10^{-6})^2 = 10^{-6}$.

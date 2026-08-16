@@ -17,24 +17,24 @@ with the reference area $A_0 = 10$ m²):
 sound reduction index of a façade for diffuse incidence (Formula 10):
 
 $$
-R' = -10 \log_{10}\!\left( \sum \tau_{e,i} \right)
+R' = -10 \log_{10}\!\left( \sum \tau_{\mathrm{e},i} \right)
 $$
 
 $$
-\tau_{e,i} = \frac{S_i}{S}\, 10^{-R_i/10} \tag{Formula 15}
+\tau_{\mathrm{e},i} = \frac{S_i}{S}\, 10^{-R_i/10} \tag{Formula 15}
 $$
 
 $$
-\tau_{e,i} = \frac{A_0}{S}\, 10^{-D_{n,e,i}/10} \tag{Formula 14}
+\tau_{\mathrm{e},i} = \frac{A_0}{S}\, 10^{-D_{\mathrm{n,e},i}/10} \tag{Formula 14}
 $$
 
 from which the loudspeaker- and traffic-referenced indices
-$R_{45} = R' + 1$ (Formula 11) and $R_{tr,s} = R'$ (Formula 12),
+$R_{45} = R' + 1$ (Formula 11) and $R_\mathrm{tr,s} = R'$ (Formula 12),
 and the primary output, the standardized level difference at 2 m
 (Formula 13):
 
 $$
-D_{2m,nT} = R' + \Delta L_{fs} + 10 \log_{10}\!\left( \frac{V}{6 T_0 S} \right) \qquad T_0 = 0.5~\text{s}
+D_{2\mathrm{m,nT}} = R' + \Delta L_\mathrm{fs} + 10 \log_{10}\!\left( \frac{V}{6 T_0 S} \right) \qquad T_0 = 0.5~\text{s}
 $$
 
 with the façade-shape term `ΔLfs` (Annex C; 0 dB for a flat reflecting
@@ -44,11 +44,11 @@ façade).
 power level radiated by a segment (Formulas 2-3):
 
 $$
-R' = -10 \log_{10}\!\left( \sum \frac{S_i}{S}\, 10^{-R_i/10} + \sum \frac{A_0}{S}\, 10^{-D_{n,e,i}/10} \right)
+R' = -10 \log_{10}\!\left( \sum \frac{S_i}{S}\, 10^{-R_i/10} + \sum \frac{A_0}{S}\, 10^{-D_{\mathrm{n,e},i}/10} \right)
 $$
 
 $$
-L_W = L_{p,\text{in}} + C_d - R' + 10 \log_{10}\!\left( \frac{S}{S_0} \right) \qquad S_0 = 1~\text{m}^2
+L_W = L_{p,\mathrm{in}} + C_\mathrm{d} - R' + 10 \log_{10}\!\left( \frac{S}{S_0} \right) \qquad S_0 = 1~\text{m}^2
 $$
 
 with the inside-field diffusivity term `Cd` (Annex B; -6 dB ideal diffuse,
@@ -60,10 +60,10 @@ This is NOT the standard's Formula (4), which treats a segment made up *only*
 of openings with a different area normalization (`S` = the opening area) and
 sums its `LW` with the envelope segments only at the final energetic stage.
 The exterior level follows from the simplified Annex E attenuation `Atot` of
-a finite radiating side and $L_p = L_W - A_{tot}$.
+a finite radiating side and $L_p = L_W - A_\mathrm{tot}$.
 
 Single-number ratings reuse EN ISO 717-1 via [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating)
-(exact for $R'_w + C_{tr}$, a good approximation for `R'w`, Part 3
+(exact for $R'_\mathrm{w} + C_\mathrm{tr}$, a good approximation for `R'w`, Part 3
 NOTE 7).
 
 Clause/formula citations refer to EN 12354-3:2000 or EN 12354-4:2000.
@@ -211,9 +211,9 @@ Predicted façade airborne insulation (EN 12354-3:2000).
 | :--- | :--- |
 | `r_prime` | Apparent sound reduction index `R'` per band, in dB (Formula 10). |
 | `r_45` | $R_{45} = R' + 1$ (loudspeaker method, Formula 11), in dB. |
-| `r_tr_s` | $R_{tr,s} = R'$ (traffic, Formula 12), in dB. |
+| `r_tr_s` | $R_\mathrm{tr,s} = R'$ (traffic, Formula 12), in dB. |
 | `d_2m_nt` | Standardized level difference `D2m,nT` per band, in dB (Formula 13). |
-| `element_r` | Per-element partial index $R_p = -10 \log_{10} \tau$ per band, in dB. |
+| `element_r` | Per-element partial index $R_\mathrm{p} = -10 \log_{10} \tau$ per band, in dB. |
 | `r_tr_s_w` | Single-number `Rtr,s,w` (ISO 717-1); `None` if the bands are not the ISO 717-1 octave/third-octave set. |
 | `d_2m_nt_w` | Single-number `D2m,nT,w` (ISO 717-1); `None` as above. |
 | `c_tr` | Spectrum adaptation term `Ctr` of `R'` (ISO 717-1). |
@@ -349,7 +349,7 @@ outdoor_level(
 
 Exterior level from one or more radiating sides (EN 12354-4 Formula E.1).
 
-$L_p = 10 \log_{10}( \sum 10^{L_{W,k}/10} ) - A_{tot}$ for sides sharing
+$L_p = 10 \log_{10}( \sum 10^{L_{W,k}/10} ) - A_\mathrm{tot}$ for sides sharing
 a reception point,
 or the per-side `LW - Atot` energetically summed. Pass matching sequences
 of side power levels and their attenuations, or scalars for a single side; a
@@ -410,7 +410,7 @@ radiated_sound_power(
 Predict the sound power radiated outside by a segment (EN 12354-4).
 
 `R'` combines the element transmission factors (Formula 3); the radiated
-power level is $L_W = L_{p,in} + C_d - R' + 10 \log_{10}(S/S_0)$
+power level is $L_W = L_{p,\mathrm{in}} + C_\mathrm{d} - R' + 10 \log_{10}(S/S_0)$
 (Formula 2). Openings
 may be included as [`FacadeElement`](/phonometry/reference/api/building/facade/#facadeelement) entries with an `insertion_loss`
 (0 for a bare opening); see the module docstring for how this differs from

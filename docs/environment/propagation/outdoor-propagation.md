@@ -23,19 +23,19 @@ relaxation frequency. ISO 9613-1:1993, Eq. (5) collects all of this into the
 pure-tone attenuation coefficient $\alpha$, in decibels per metre:
 
 $$
-\alpha = 8.686\ f^2 \Big[ 1.84\times10^{-11} \big(p_a/p_r\big)^{-1} \big(T/T_0\big)^{1/2}
-       + \big(T/T_0\big)^{-5/2} \big( 0.01275\ \tfrac{e^{-2239.1/T}}{f_{rO} + f^2/f_{rO}}
-       + 0.1068\ \tfrac{e^{-3352.0/T}}{f_{rN} + f^2/f_{rN}} \big) \Big],
+\alpha = 8.686\ f^2 \Big[ 1.84\times10^{-11} \big(p_\mathrm{a}/p_\mathrm{r}\big)^{-1} \big(T/T_0\big)^{1/2}
+       + \big(T/T_0\big)^{-5/2} \big( 0.01275\ \tfrac{e^{-2239.1/T}}{f_\mathrm{rO} + f^2/f_\mathrm{rO}}
+       + 0.1068\ \tfrac{e^{-3352.0/T}}{f_\mathrm{rN} + f^2/f_\mathrm{rN}} \big) \Big],
 $$
 
-with the oxygen and nitrogen relaxation frequencies $f_{rO}$, $f_{rN}$
-(Eq. (3)/(4)), the reference conditions $T_0 = 293.15$ K and $p_r = 101.325$ kPa
+with the oxygen and nitrogen relaxation frequencies $f_\mathrm{rO}$, $f_\mathrm{rN}$
+(Eq. (3)/(4)), the reference conditions $T_0 = 293.15$ K and $p_\mathrm{r} = 101.325$ kPa
 (Clause 4.2), and the molar water-vapour concentration $h$ obtained from the
 relative humidity by the Annex B psychrometric conversion. Two features dominate
 the shape: at low frequency $\alpha \propto f^2$, so it rises steeply; and near
 each relaxation frequency the matching term peaks and rolls off. Between them
 $\alpha$ climbs about two decades from 50 Hz to 10 kHz, and, because humidity
-sets $f_{rO}$, sweeping the humidity moves a relaxation peak across the band, so
+sets $f_\mathrm{rO}$, sweeping the humidity moves a relaxation peak across the band, so
 the driest air is not always the least absorbing.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/air_absorption_alpha.svg" alt="ISO 9613-1 pure-tone atmospheric attenuation coefficient alpha in dB/km against frequency on log-log axes, for four temperature and humidity combinations, showing the f-squared low-frequency growth and the humidity-dependent relaxation roll-off" width="80%"></picture>
@@ -87,7 +87,7 @@ print(np.round(m, 5))                        # [0.00107 0.00683]
 `air_attenuation` returns dB/m (Table 1 prints dB/km, i.e. $\times 1000$); it is
 fully vectorized over `frequencies` with scalar temperature, humidity and
 pressure. Passing `exact_midband=True` snaps each requested frequency onto the
-exact one-third-octave midband $f_m = 1000 \cdot 10^{k/10}$ (Eq. (6), Note 5)
+exact one-third-octave midband $f_\mathrm{m} = 1000 \cdot 10^{k/10}$ (Eq. (6), Note 5)
 used to compute Table 1, so the library reproduces every tabulated point to under
 0.4 %, the standard's own three-significant-figure precision, far inside its
 stated $\pm 10$ % accuracy (Clause 7.1). Inputs outside the tabulated ranges
@@ -107,7 +107,7 @@ atmospheric conditions straight into `absorption_area` /
 | `temperature` | float | °C | default `20.0` | −20…+50 tabulated; outside warns |
 | `relative_humidity` | float | % | default `50.0` | 10…100 tabulated; `[0, 100]` allowed |
 | `pressure` | float | kPa | default `101.325` | ≤ 200 valid (Clause 7); above warns |
-| `exact_midband` | bool | — | default `False` | Snap to $f_m = 1000\cdot10^{k/10}$ (reproduces Table 1) |
+| `exact_midband` | bool | — | default `False` | Snap to $f_\mathrm{m} = 1000\cdot10^{k/10}$ (reproduces Table 1) |
 
 `air_attenuation` returns $\alpha$ in dB/m; `air_attenuation_m` returns
 $m = \alpha/(10 \log_{10} e)$ in 1/m for ISO 354.
@@ -120,7 +120,7 @@ grid, the coefficient $\alpha$ and the atmospheric conditions, and exposes
 `.plot()` for the classic $\alpha$-versus-frequency curve (drawn in dB/km, the
 Table 1 unit, on a linear ordinate over a logarithmic frequency axis). Passing a
 `distance` also records the total attenuation $A = \alpha\,d$, in decibels, over
-that path as `total_attenuation`, the ISO 9613-2 $A_{atm}$ of Eq. (8).
+that path as `total_attenuation`, the ISO 9613-2 $A_\mathrm{atm}$ of Eq. (8).
 
 ```python
 from phonometry import environment
@@ -171,34 +171,34 @@ point source (or under the equivalent moderate temperature inversion, Clause 5).
 The equivalent-continuous downwind level is
 
 $$
-L_{fT}(DW) = L_W + D_c - A, \qquad A = A_{div} + A_{atm} + A_{gr} + A_{bar} + A_{misc},
+L_{fT}(DW) = L_W + D_\mathrm{c} - A, \qquad A = A_\mathrm{div} + A_\mathrm{atm} + A_\mathrm{gr} + A_\mathrm{bar} + A_\mathrm{misc},
 $$
 
-(Eq. (3)/(4)) where $L_W$ is the octave-band sound power level, $D_c$ the
+(Eq. (3)/(4)) where $L_W$ is the octave-band sound power level, $D_\mathrm{c}$ the
 directivity correction (directivity index plus a solid-angle index
 $D_\Omega$), and $A$ the total attenuation. The library implements the four
-general terms of Clause 7; the informative $A_{misc}$ (foliage, industrial
+general terms of Clause 7; the informative $A_\mathrm{misc}$ (foliage, industrial
 sites, housing; Annex A) and reflections off vertical obstacles (Clause 7.5) are
 **not implemented**: the standard treats them as informative and they are left
 to the caller.
 
 The geometry of the screening term fixes the vocabulary: the diffraction edge
-splits the source-to-receiver distance into $d_{ss}$ and $d_{sr}$, and the extra
-path length over the edge is $z = d_{ss} + d_{sr} - d$. When the line of sight
+splits the source-to-receiver distance into $d_\mathrm{ss}$ and $d_\mathrm{sr}$, and the extra
+path length over the edge is $z = d_\mathrm{ss} + d_\mathrm{sr} - d$. When the line of sight
 passes *above* the top edge, the standard gives $z$ a negative sign
 (`Barrier(line_of_sight_clear=True)`) and Eq. (14) still applies with
-$K_{met} = 1$: $D_z$ falls continuously from $10 \log_{10} 3 \approx 4.8$ dB at
+$K_\mathrm{met} = 1$: $D_z$ falls continuously from $10 \log_{10} 3 \approx 4.8$ dB at
 grazing incidence to zero as the clearance deepens, never below zero.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_outdoor_geometry.svg" alt="ISO 9613-2 source-barrier-receiver geometry: a point source at height hs, a barrier whose top edge splits the path into dss and dsr, and a receiver at height hr, with the blocked direct ray and the diffracted ray over the edge, the path difference z and the Dz formula" width="92%"></picture>
 
 ### The four attenuation terms
 
-* **Geometrical divergence** $A_{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
+* **Geometrical divergence** $A_\mathrm{div} = 20 \log_{10}(d/d_0) + 11$ dB, $d_0 = 1$ m
   (Eq. (7)): spherical spreading from a point source. Exactly 51 dB at 100 m,
   +6 dB per distance doubling. The $+11$ ($= 10 \log_{10} 4\pi$) sets the level at the
   1 m reference distance.
-* **Atmospheric absorption** $A_{atm} = \alpha\ d$ (Eq. (8)) with $\alpha$ the
+* **Atmospheric absorption** $A_\mathrm{atm} = \alpha\ d$ (Eq. (8)) with $\alpha$ the
   ISO 9613-1 coefficient, negligible at low frequency and dominant at 8 kHz over
   long paths. $\alpha$ is evaluated at the *exact* base-10 midband behind each
   nominal band label (7 943.3 Hz for "8 kHz"), the convention behind the
@@ -207,16 +207,16 @@ grazing incidence to zero as the clearance deepens, never below zero.
   relative humidity (one of the Table 2 reference atmospheres the standard
   tabulates) while `air_attenuation` itself defaults to the ISO 9613-1
   usual 50 %.
-* **Ground effect** $A_{gr} = A_s + A_r + A_m$ (Eq. (9)) sums a source, receiver
+* **Ground effect** $A_\mathrm{gr} = A_\mathrm{s} + A_\mathrm{r} + A_\mathrm{m}$ (Eq. (9)) sums a source, receiver
   and middle region, each from the Table 3 functions $a'/b'/c'/d'$ and its
   ground factor $G$ (0 = hard/reflective, 1 = porous/absorbing). A **negative**
-  $A_{gr}$ is a net *gain* from constructive ground reflection.
+  $A_\mathrm{gr}$ is a net *gain* from constructive ground reflection.
 * **Screening** by a barrier is the diffraction insertion loss
-  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_{met} \big]$ (Eq. (14)),
+  $D_z = 10 \log_{10}\big[ 3 + (C_2/\lambda)\ C_3\ z\ K_\mathrm{met} \big]$ (Eq. (14)),
   capped at 20 dB (single edge) or 25 dB (double edge). For a top-edge barrier
   the ground effect of the screened path folds into it,
-  $A_{bar} = D_z - A_{gr} \ge 0$ (Eq. (12), Note 13); for a lateral barrier
-  $A_{bar} = D_z$ and the ground term is retained (Eq. (13)).
+  $A_\mathrm{bar} = D_z - A_\mathrm{gr} \ge 0$ (Eq. (12), Note 13); for a lateral barrier
+  $A_\mathrm{bar} = D_z$ and the ground term is retained (Eq. (13)).
 
 `outdoor_propagation_attenuation` assembles the four terms into an
 `OutdoorAttenuation` result whose per-band arrays sum, band by band, to
@@ -308,19 +308,19 @@ lp = environment.predicted_receiver_level(
 print(np.round(lp, 1))            # [28.8 26.7 24.  21.1 17.9 16.2 12.7 -1. ]
 ```
 
-`predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_c - A$ with
-$D_c$ the `DirectivityCorrection` (`index` $+$ `d_omega`). Pass `c0=` to subtract the
-meteorological correction $C_{met}$ (Eq. (21)/(22)) band by band for a long-term
-average; note that the standard applies $C_{met}$ to the A-weighted level, so the
+`predicted_receiver_level` composes $L_{fT}(DW) = L_W + D_\mathrm{c} - A$ with
+$D_\mathrm{c}$ the `DirectivityCorrection` (`index` $+$ `d_omega`). Pass `c0=` to subtract the
+meteorological correction $C_\mathrm{met}$ (Eq. (21)/(22)) band by band for a long-term
+average; note that the standard applies $C_\mathrm{met}$ to the A-weighted level, so the
 per-band form here is a **convenience**, not a literal reading of Clause 8.
 
 ### Ground: the alternative A-weighted method
 
 When only the A-weighted receiver level matters and the sound travels over
 porous or mostly-porous ground (and is not a pure tone), 7.3.2 offers a simpler
-closed form $A_{gr} = 4.8 - \frac{2 h_m}{d}\left(17 + \frac{300}{d}\right) \ge 0$ (Eq. (10), negative
+closed form $A_\mathrm{gr} = 4.8 - \frac{2 h_\mathrm{m}}{d}\left(17 + \frac{300}{d}\right) \ge 0$ (Eq. (10), negative
 results clamped to zero), paired with the solid-angle index $D_\Omega$
-(Eq. (11)) that must then be added to $D_c$. These are exposed as
+(Eq. (11)) that must then be added to $D_\mathrm{c}$. These are exposed as
 `ground_attenuation_alternative` and `directivity_omega`, but they are **not
 auto-wired** into `outdoor_propagation_attenuation` (which always uses the
 general per-region method of 7.3.1); combine them by hand when the alternative
@@ -343,7 +343,7 @@ Every entry of Table 3 is an engineering fit to one physical picture: the
 receiver hears two copies of the source, the direct ray $r_1$ and a reflection
 that arrives exactly as if it were radiated by an **image source** mirrored
 below the ground plane. The two copies interfere according to the path
-difference $\delta = r_2 - r_1$ (about $2 h_s h_r / d$ for a grazing far-field
+difference $\delta = r_2 - r_1$ (about $2 h_\mathrm{s} h_\mathrm{r} / d$ for a grazing far-field
 path): in phase they add up to $+6$ dB; at $\delta = \lambda/2$ over a rigid
 plane they cancel into a sharp dip.
 
@@ -351,7 +351,7 @@ plane they cancel into a sharp dip.
 
 Over acoustically hard ground ($G = 0$) the reflection coefficient stays close
 to $+1$ in every octave, the long-wavelength sum is fully constructive, and the
-general method duly returns $A_{gr} = -3$ dB in each band. Porous ground turns
+general method duly returns $A_\mathrm{gr} = -3$ dB in each band. Porous ground turns
 the reflection coefficient complex and angle-dependent (for a point source
 near grazing incidence, the spherical-wave coefficient of the Chien-Soroka
 solution, with a ground-wave term no plane-wave picture captures): part of the
@@ -362,7 +362,7 @@ behaviours. The same two-ray geometry carries over to aircraft lateral
 attenuation and to every ray-based outdoor model; Salomons and Attenborough &
 Van Renterghem develop the full theory that the engineering fit compresses.
 
-A negative $A_{gr}$ (a net gain) is plain interference: the ground-reflected
+A negative $A_\mathrm{gr}$ (a net gain) is plain interference: the ground-reflected
 wave adds to the direct one. Below, a 400 Hz source 1.5 m over rigid ground
 builds the lobe pattern of that interference, and the level sampled on an arc
 converges to the two-path image-source model, dips included.
@@ -379,7 +379,7 @@ leaves `edge_separation=None` ($C_3 = 1$); giving the edge spacing `e` selects
 double (thick-barrier) diffraction with the $C_3$ factor of Eq. (15) and the
 25 dB cap. `ground_reflections_by_image=True` switches $C_2$ from 20 to 40
 (reflections handled by image sources), and `lateral=True` selects vertical-edge
-diffraction (Eq. (13), $K_{met}=1$, ground term retained).
+diffraction (Eq. (13), $K_\mathrm{met}=1$, ground term retained).
 
 The simulation below shows why $D_z$ grows with frequency: against the same
 2.5 m screen, a 100 Hz wavefront ($\lambda \approx 3.4\ \text{m}$) diffracts
@@ -396,12 +396,12 @@ works when the wavelength is short next to the path difference.
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `distance` | float | m | > 0 | Straight-line source–receiver distance $d$ |
-| `source_height` / `receiver_height` | float | m | ≥ 0 | $h_s$, $h_r$ above ground |
+| `source_height` / `receiver_height` | float | m | ≥ 0 | $h_\mathrm{s}$, $h_\mathrm{r}$ above ground |
 | `frequencies` | 1D array | Hz | default 8 octaves 63–8000 | `DEFAULT_FREQUENCIES` |
 | `ground_source` / `ground_middle` / `ground_receiver` | float | — | `[0, 1]`, default `0.0` | Ground factor $G$ (0 hard, 1 porous) |
 | `barrier` | `Barrier` or None | — | default `None` | Screening obstacle |
-| `temperature` / `relative_humidity` / `pressure` | float | °C / % / kPa | 20 / 70 / 101.325 | Passed to $A_{atm}$ |
-| `projected_distance` | float or None | m | default $\sqrt{d^2-(h_s-h_r)^2}$ | Ground-plane $d_p$ |
+| `temperature` / `relative_humidity` / `pressure` | float | °C / % / kPa | 20 / 70 / 101.325 | Passed to $A_\mathrm{atm}$ |
+| `projected_distance` | float or None | m | default $\sqrt{d^2-(h_\mathrm{s}-h_\mathrm{r})^2}$ | Ground-plane $d_\mathrm{p}$ |
 
 Returns an `OutdoorAttenuation` with `a_div`, `a_atm`, `a_gr`, `a_bar`,
 `a_total` and `d_omega`, all one value per band; its `.plot()` draws the
@@ -411,13 +411,13 @@ stacked per-band breakdown with the total overlaid (the figure above).
 
 | Field | Type | Units | Default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `source_to_edge` | float | m | — | $d_{ss}$, source to first edge |
-| `edge_to_receiver` | float | m | — | $d_{sr}$, (last) edge to receiver |
+| `source_to_edge` | float | m | — | $d_\mathrm{ss}$, source to first edge |
+| `edge_to_receiver` | float | m | — | $d_\mathrm{sr}$, (last) edge to receiver |
 | `parallel_distance` | float | m | `0.0` | Component $a$ parallel to the edge |
 | `edge_separation` | float or None | m | `None` | $e$; given ⇒ double diffraction (25 dB cap) |
 | `ground_reflections_by_image` | bool | — | `False` | `True` ⇒ $C_2 = 40$ |
 | `lateral` | bool | — | `False` | `True` ⇒ vertical-edge diffraction (Eq. (13)) |
-| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and $K_{met} = 1$ (text after Eq. (16)) |
+| `line_of_sight_clear` | bool | — | `False` | `True` ⇒ the sight line passes above the top edge: the path difference takes a negative sign and $K_\mathrm{met} = 1$ (text after Eq. (16)) |
 
 ## 3. Scope, assumptions and pitfalls
 
@@ -435,7 +435,7 @@ year the actual level is usually lower and rarely meaningfully higher. The
 choice is deliberate. Complaints arrive on the still nights when a distant
 plant is clearly audible, not on the gusty afternoons when it vanishes, and a
 method that predicts the audible case protects the assessment. The long-term
-average is recovered by subtracting $C_{met}$ (Eq. (21)/(22)), whose $C_0$
+average is recovered by subtracting $C_\mathrm{met}$ (Eq. (21)/(22)), whose $C_0$
 encodes how often the wind actually favours the path (about $+3$ dB when half
 the time is favourable, values above 2 dB already exceptional, Notes 20/22).
 The stated $\pm 1$ to $\pm 3$ dB accuracy (Table 5) holds under favourable
@@ -454,10 +454,10 @@ whether a real barrier delivers its computed $D_z$:
   roughly 20 dB is enclosure territory, not screen territory. Eq. (14) itself
   is a smoothed engineering curve in the tradition of Maekawa's screen chart,
   an empirical fit over three decades of Fresnel number $N = 2z/\lambda$.
-* **$K_{met}$ quietly erodes distant barriers.** The meteorological factor
+* **$K_\mathrm{met}$ quietly erodes distant barriers.** The meteorological factor
   (Eq. (18)) discounts the screening because the same downward-curved rays
   that make conditions favourable also pass over the top edge. Within 100 m
-  of source-receiver distance $K_{met} \approx 1$ (Note 17), but for a long
+  of source-receiver distance $K_\mathrm{met} \approx 1$ (Note 17), but for a long
   path with a small path difference it can strip several decibels off a
   barrier that looks generous on the section drawing.
 * **Double diffraction is a modest bonus.** A thick obstacle (two edges
@@ -467,8 +467,8 @@ whether a real barrier delivers its computed $D_z$:
   continuous and the roof between them is closed.
 * **The ground effect is spent, not kept.** For a top-edge barrier the
   standard folds the screened path's ground effect into the diffraction:
-  $A_{bar} = D_z - A_{gr}$ (Eq. (12), Note 13). Over porous ground that was
-  already providing 5 to 10 dB of $A_{gr}$ in the mid bands, the *net* gain
+  $A_\mathrm{bar} = D_z - A_\mathrm{gr}$ (Eq. (12), Note 13). Over porous ground that was
+  already providing 5 to 10 dB of $A_\mathrm{gr}$ in the mid bands, the *net* gain
   of building the barrier is correspondingly smaller than its nominal $D_z$;
   the two effects do not stack.
 
@@ -494,7 +494,7 @@ different questions:
   [Commission Directive (EU) 2015/996](https://eur-lex.europa.eu/eli/dir/2015/996/oj/eng).
   It bundles *emission* models for road, rail and industrial sources (and
   delegates aircraft to ECAC Doc 29) with its own propagation part derived
-  from the French NMPB 2008 method, producing the $L_{den}$/$L_{night}$
+  from the French NMPB 2008 method, producing the $L_\mathrm{den}$/$L_\mathrm{night}$
   indicators the Directive reports.
 
 The propagation parts disagree by design, not by accident. CNOSSOS-EU
@@ -502,7 +502,7 @@ evaluates every path twice, once under a homogeneous atmosphere and once
 under favourable (downward-refracting) conditions, and combines the two
 long-term with the local occurrence probability of favourable conditions per
 path direction; ISO 9613-2 computes only the favourable case and subtracts a
-scalar $C_{met}$. The ground effect in CNOSSOS-EU is built from a
+scalar $C_\mathrm{met}$. The ground effect in CNOSSOS-EU is built from a
 path-averaged ground factor over a fitted mean plane, with expressions that
 change between the two atmospheres, where ISO 9613-2 uses the fixed
 three-region Table 3. Diffraction, too, follows a different formulation that
@@ -530,7 +530,7 @@ diffraction model behind the number.
 `OutdoorAttenuation.report(path)` boxes the octave-band range of the total
 attenuation on its own; pass a `SourceEmission` (the source sound power and
 directivity) to add the source power and downwind level to the table and box the
-A-weighted downwind level $L_{AT}(\text{DW})$ at the receiver instead. A limit
+A-weighted downwind level $L_{\mathrm{A}T}(\text{DW})$ at the receiver instead. A limit
 level supplied through the metadata `requirement` then adds a PASS/FAIL verdict
 (a lower level is better). Pass `language="es"` for the Spanish fiche.
 
@@ -603,7 +603,7 @@ against the exact half-plane and coherent-ground models.
 ## See also
 
 - [Spherical ground effect and advanced barriers](ground-barriers.md): the wave acoustics underneath the Table 3 ground fit and the Eq. (14) screening curve.
-- [Atmospheric refraction](atmospheric-refraction.md): what the favourable-condition assumption and $C_{met}$ stand in for.
+- [Atmospheric refraction](atmospheric-refraction.md): what the favourable-condition assumption and $C_\mathrm{met}$ stand in for.
 - [CNOSSOS-EU road emission](../sources/cnossos-road-emission.md) and [CNOSSOS-EU rail emission](../sources/cnossos-rail-emission.md): the source strengths the comparison in section 3 refers to.
 - [Environmental noise levels](../assessment/environmental-levels.md): what happens to the predicted level once it becomes an assessed one.
 - API reference: [`environment.propagation.outdoor_propagation`](https://jmrplens.github.io/phonometry/reference/api/environment/outdoor-propagation/) and [`environment.propagation.air_absorption`](https://jmrplens.github.io/phonometry/reference/api/environment/air-absorption/).
@@ -616,7 +616,7 @@ against the exact half-plane and coherent-ground models.
   [doi:10.1007/978-94-010-0660-6](https://doi.org/10.1007/978-94-010-0660-6).
   The wave-based theory (parabolic equation, fast field program, refraction
   and turbulence) that quantifies what the favourable-condition assumption
-  and the $K_{met}$ factor approximate.
+  and the $K_\mathrm{met}$ factor approximate.
 - Attenborough, K., & Van Renterghem, T. (2021). *Predicting outdoor sound*
   (2nd ed.). CRC Press.
   [doi:10.1201/9780429470806](https://doi.org/10.1201/9780429470806).

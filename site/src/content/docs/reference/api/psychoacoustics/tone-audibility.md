@@ -15,19 +15,19 @@ threshold of the surrounding noise.
 
 **Critical band about the tone (Clause 5.2).** The width of the critical band
 around a tone of frequency `fT` is
-$\Delta f_c = 25.0 + 75.0 (1.0 + 1.4 (f_T/1000)^2)^{0.69}$ Hz
+$\Delta f_\mathrm{c} = 25.0 + 75.0 (1.0 + 1.4 (f_\mathrm{T}/1000)^2)^{0.69}$ Hz
 (Formula (2)). Assuming a geometric placement of the corner frequencies,
-$f_T = \sqrt{f_1 f_2}$ (Formula (3)),
-$f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f_T^2}/2$ (Formula (4))
-and $f_2 = f_1 + \Delta f_c$ (Formula (5)).
+$f_\mathrm{T} = \sqrt{f_1 f_2}$ (Formula (3)),
+$f_1 = -\Delta f_\mathrm{c}/2 + \sqrt{\Delta f_\mathrm{c}^2 + 4 f_\mathrm{T}^2}/2$ (Formula (4))
+and $f_2 = f_1 + \Delta f_\mathrm{c}$ (Formula (5)).
 
 **Audibility of a single tone (Clause 5.3).** From the mean narrow-band level
 `LS` of the masking noise (Formula (6)) the critical-band level of the
-masking noise is $L_G = L_S + 10 \log_{10}(\Delta f_c/\Delta f)$
+masking noise is $L_\mathrm{G} = L_\mathrm{S} + 10 \log_{10}(\Delta f_\mathrm{c}/\Delta f)$
 (Formula (12), `Δf` the line spacing). The masking index is
-$a_v = -2 - \log_{10}[1 + (f/502)^{2.5}]$ dB (Formula (13)) and the
+$a_\mathrm{v} = -2 - \log_{10}[1 + (f/502)^{2.5}]$ dB (Formula (13)) and the
 audibility of a tone of level `LT` (Formula (8)) is
-$\Delta L = L_T - L_G - a_v$ dB (Formula (14)). A tone is present when
+$\Delta L = L_\mathrm{T} - L_\mathrm{G} - a_\mathrm{v}$ dB (Formula (14)). A tone is present when
 $\Delta L > 0$.
 
 **Decisive and mean audibility (Clauses 5.3.8/5.3.9).** The decisive audibility
@@ -43,7 +43,7 @@ Formula (6)/Annex D (energy average, dropping any line more than 6 dB above the
 running mean, with the −1.76 dB Hanning bandwidth correction), and
 [`tone_level`](/phonometry/reference/api/psychoacoustics/tone-audibility/#tone_level) sums the tonal lines contiguous with the peak for `LT`
 (Formula (8)). Both reproduce the ISO/PAS 20065 Annex E worked example
-($L_S = 49.22$ dB, $L_T = 67.96$ dB for the 137.3 Hz tone) and
+($L_\mathrm{S} = 49.22$ dB, $L_\mathrm{T} = 67.96$ dB for the 137.3 Hz tone) and
 are confirmed against the parent standard DIN 45681:2005-03.
 
 **Whole-spectrum detection.** [`analyze_spectrum`](/phonometry/reference/api/psychoacoustics/tone-audibility/#analyze_spectrum) runs the full front-end
@@ -55,7 +55,7 @@ critical band have their tone levels energy-summed (Formula (17), via
 rated at the most audible member, unless the exactly-two-tones-below-1000-Hz
 exception (Formulae (18)/(19)) keeps them separate. On the Annex E example
 this recovers the three tones, their combined tone level
-$L_T = 72.15$ dB and the decisive FG audibility
+$L_\mathrm{T} = 72.15$ dB and the decisive FG audibility
 $\Delta L = 9.18$ dB. A decisive audibility
 reproduced exactly needs the *complete* narrow-band spectrum: a spectrum
 truncated to one critical band mis-estimates the mean narrow-band level of
@@ -63,7 +63,7 @@ tones near its edges.
 
 **Two tones below 1000 Hz.** When *exactly two* tones share a critical band and
 both lie below 1000 Hz, the ear can still resolve them if their spacing exceeds
-$f_D = 21 \cdot 10^{1.2 |\log_{10}(f_T/212)|^{1.8}}$ Hz
+$f_\mathrm{D} = 21 \cdot 10^{1.2 |\log_{10}(f_\mathrm{T}/212)|^{1.8}}$ Hz
 (Formulae (18)/(19)); they are then
 rated separately instead of combined. [`two_tone_separation_frequency`](/phonometry/reference/api/psychoacoustics/tone-audibility/#two_tone_separation_frequency) and
 [`resolve_tones_separately`](/phonometry/reference/api/psychoacoustics/tone-audibility/#resolve_tones_separately) implement this branch (Clause 5.3.8), which no
@@ -85,13 +85,13 @@ A-weighted); it does not apply the weighting itself.
 
 **Application frequency range.** The functions accept any positive tone
 frequency, but the standards state narrower ranges: DIN 45681:2005-03 (5.3.2)
-restricts the method to $f_T \ge 90$ Hz and the ISO/PAS 20065 scope
+restricts the method to $f_\mathrm{T} \ge 90$ Hz and the ISO/PAS 20065 scope
 starts at 50 Hz; the two-tone separation frequency (Formula (19)) is printed
-for $f_T < 1000$ Hz (with a lower bound of 88 Hz in the DIN print,
+for $f_\mathrm{T} < 1000$ Hz (with a lower bound of 88 Hz in the DIN print,
 50 Hz in the ISO one). Results outside these ranges are extrapolations.
 
 **Distinctness edge steepness (DIN-vs-ISO print difference).** The 5.3.4
-edge-steepness test follows the DIN 45681 $f_T/\sqrt{2}$-on-both-edges
+edge-steepness test follows the DIN 45681 $f_\mathrm{T}/\sqrt{2}$-on-both-edges
 reading, matching its executable Annex J reference program; the ISO/PAS
 20065 print shows asymmetric formulas that contradict it (see
 `_is_distinct` and docs/ERRATA.md).
@@ -140,7 +140,7 @@ the wrong mean narrow-band level for tones near its edges.
 | `levels` | Narrow-band levels `Li` of the spectrum, in dB. |
 | `frequencies` | The line frequencies, in Hz (strictly increasing). |
 | `line_spacing` | Line spacing (frequency resolution) `Δf`, in Hz. |
-| `effective_bandwidth_factor` | $\Delta f_e/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. |
+| `effective_bandwidth_factor` | $\Delta f_\mathrm{e}/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. |
 
 **Returns:** A [`ToneAudibilityResult`](/phonometry/reference/api/psychoacoustics/tone-audibility/#toneaudibilityresult) of the detected audible tones and their same-band FG combinations.
 
@@ -199,7 +199,7 @@ audibility_from_levels(
 
 Audibility `ΔL` from the levels and masking index (Formula (14)).
 
-$\Delta L = L_T - L_G - a_v$ dB.
+$\Delta L = L_\mathrm{T} - L_\mathrm{G} - a_\mathrm{v}$ dB.
 
 **Parameters**
 
@@ -237,7 +237,7 @@ Gaussian propagation through Formula (14) with a uniform narrow-band
 level uncertainty (Formulae (22)-(27) and (29)):
 
 $$
-\sigma^2 = \left[ \frac{\sum w_T^2}{\left(\sum w_T\right)^2} + \frac{\sum w_S^2}{\left(\sum w_S\right)^2} \right] \sigma_L^2 + \left( 4.34 \, \frac{\Delta f}{\Delta f_c} \right)^2
+\sigma^2 = \left[ \frac{\sum w_\mathrm{T}^2}{\left(\sum w_\mathrm{T}\right)^2} + \frac{\sum w_\mathrm{S}^2}{\left(\sum w_\mathrm{S}\right)^2} \right] \sigma_L^2 + \left( 4.34 \, \frac{\Delta f}{\Delta f_\mathrm{c}} \right)^2
 $$
 
 with $w = 10^{0.1 L}$ over the `K`
@@ -249,7 +249,7 @@ uncertainty (3.21 dB) where a union of the individual tonal lines does
 not -- and the most audible tone's noise lines.
 $U = k \sigma$ with $k = 1.645$ (90 % bilateral coverage). No
 uncertainty is assumed for the masking index or the line spacing; the
-critical-bandwidth term uses $\sigma_{\Delta f_c} = \Delta f$
+critical-bandwidth term uses $\sigma_{\Delta f_\mathrm{c}} = \Delta f$
 (Formula (26)). The
 DIN 45681 Annex J reference program computes the same quantity (its
 `LT_Delta`/`Ls_Delta` accumulators), differing only in printing the
@@ -294,7 +294,7 @@ combined_tone_level(
 
 Combined tone level `LT` of several tones in one critical band (Formula (17)).
 
-$L_{Tm} = 10 \log_{10}[\sum_n 10^{L_{Tm,n}/10}]$, the energy sum of the
+$L_{\mathrm{T}m} = 10 \log_{10}[\sum_n 10^{L_{\mathrm{T}m,n}/10}]$, the energy sum of the
 tonal lines of all
 the tones, each spectral line counted at most once. Use it when more than one
 audible tone falls in a critical band (Clause 5.3.8 Step 3); the group is
@@ -308,7 +308,7 @@ then rated at the frequency of its most audible tone.
 | `frequencies` | The line frequencies, in Hz (strictly increasing). |
 | `tone_frequencies` | The tone frequencies sharing the critical band, Hz. |
 | `mean_narrowband_levels` | Each tone's mean narrow-band level `LS`, dB (same length as `tone_frequencies`). |
-| `effective_bandwidth_factor` | $\Delta f_e/\Delta f$; 1.5 for a Hanning window. |
+| `effective_bandwidth_factor` | $\Delta f_\mathrm{e}/\Delta f$; 1.5 for a Hanning window. |
 
 **Returns:** Combined tone level `LT`, in dB.
 
@@ -327,9 +327,9 @@ critical_band_corners(tone_frequency: float) -> tuple[float, float]
 Lower/upper corner frequencies of the critical band (Formulae (3)-(5)).
 
 With a geometric placement of the corners about the tone,
-$f_1 = -\Delta f_c/2 + \sqrt{\Delta f_c^2 + 4 f_T^2}/2$ and
-$f_2 = f_1 + \Delta f_c$, so that $\sqrt{f_1 f_2} = f_T$ and
-$f_2 - f_1 = \Delta f_c$.
+$f_1 = -\Delta f_\mathrm{c}/2 + \sqrt{\Delta f_\mathrm{c}^2 + 4 f_\mathrm{T}^2}/2$ and
+$f_2 = f_1 + \Delta f_\mathrm{c}$, so that $\sqrt{f_1 f_2} = f_\mathrm{T}$ and
+$f_2 - f_1 = \Delta f_\mathrm{c}$.
 
 **Parameters**
 
@@ -357,7 +357,7 @@ critical_band_level(
 
 Critical-band level `LG` of the masking noise (Formula (12)).
 
-$L_G = L_S + 10 \log_{10}(\Delta f_c/\Delta f)$ dB, spreading the mean
+$L_\mathrm{G} = L_\mathrm{S} + 10 \log_{10}(\Delta f_\mathrm{c}/\Delta f)$ dB, spreading the mean
 narrow-band level `LS`
 over the critical bandwidth `Δfc` relative to the line spacing `Δf`.
 
@@ -385,7 +385,7 @@ critical_bandwidth_engineering(tone_frequency: float) -> float
 
 Width `Δfc` of the critical band about a tone (Formula (2)).
 
-$\Delta f_c = 25.0 + 75.0 (1.0 + 1.4 (f_T/1000)^2)^{0.69}$ Hz.
+$\Delta f_\mathrm{c} = 25.0 + 75.0 (1.0 + 1.4 (f_\mathrm{T}/1000)^2)^{0.69}$ Hz.
 This is the
 continuous ISO/PAS 20065 engineering-method bandwidth, distinct from the
 stepped ISO 1996-2 Annex C [`critical_bandwidth`](/phonometry/reference/api/environment/measurement/#critical_bandwidth) (100 Hz / 20 %).
@@ -417,14 +417,14 @@ energy_sum_level(
 Energy sum of the tonal spectral lines with window correction (Formulae (7)/(8)).
 
 For a single line ($K = 1$) the tone level is that line's level with
-*no* bandwidth correction, $L_T = L_1$ (Formula (7)). For
+*no* bandwidth correction, $L_\mathrm{T} = L_1$ (Formula (7)). For
 $K > 1$ lines,
-$L_T = 10 \log_{10}[\sum_i 10^{L_i/10}] + 10 \log_{10}(\Delta f/\Delta f_e)$ dB
+$L_\mathrm{T} = 10 \log_{10}[\sum_i 10^{L_i/10}] + 10 \log_{10}(\Delta f/\Delta f_\mathrm{e})$ dB
 (Formula (8)); the window correction
-$10 \log_{10}(\Delta f/\Delta f_e)$ is `−1.76 dB` for a Hanning window
-($\Delta f_e = 1.5 \Delta f$, Annex A) and `0 dB` for a
+$10 \log_{10}(\Delta f/\Delta f_\mathrm{e})$ is `−1.76 dB` for a Hanning window
+($\Delta f_\mathrm{e} = 1.5 \Delta f$, Annex A) and `0 dB` for a
 rectangular window
-($\Delta f_e = \Delta f$). The DIN 45681:2005-03 Annex J reference
+($\Delta f_\mathrm{e} = \Delta f$). The DIN 45681:2005-03 Annex J reference
 program applies the same split
 (`If l = 1 Then LT = 10*Log(LT)/Log(10)` with no `−1.76`).
 (The mean narrow-band level `LS` of Formula (6) is the analogous *energy
@@ -437,7 +437,7 @@ spectrum.)
 | Name | Description |
 | :--- | :--- |
 | `line_levels` | Narrow-band levels `Li` of the tonal lines to sum, in dB. |
-| `effective_bandwidth_factor` | $\Delta f_e/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. Ignored for a single line (Formula (7) applies no correction at $K = 1$). |
+| `effective_bandwidth_factor` | $\Delta f_\mathrm{e}/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. Ignored for a single line (Formula (7) applies no correction at $K = 1$). |
 
 **Returns:** Corrected energy-sum level, in dB.
 
@@ -463,7 +463,7 @@ masking_index(frequency: float) -> float
 
 Masking index `av` of the auditory system (Formula (13)).
 
-$a_v = -2 - \log_{10}[1 + (f/502)^{2.5}]$ dB. The value is negative and
+$a_\mathrm{v} = -2 - \log_{10}[1 + (f/502)^{2.5}]$ dB. The value is negative and
 grows more
 negative with frequency (see Annex C).
 
@@ -561,7 +561,7 @@ mean_narrowband_level(
 Mean narrow-band level `LS` of the masking noise (Formula (6), Annex D).
 
 $$
-L_S = 10 \log_{10}\!\left[ \frac{1}{M} \sum_i 10^{L_i/10} \right] + 10 \log_{10}\frac{\Delta f}{\Delta f_e}
+L_\mathrm{S} = 10 \log_{10}\!\left[ \frac{1}{M} \sum_i 10^{L_i/10} \right] + 10 \log_{10}\frac{\Delta f}{\Delta f_\mathrm{e}}
 $$
 
 in dB, determined iteratively over the lines of the critical band about
@@ -570,9 +570,9 @@ frequency is excluded; the average then
 drops any line more than `6 dB` above the current `LS` and repeats until
 `LS` is stable within `±0.005 dB` or fewer than five lines remain on
 either side of the tone (Annex D). The window correction
-$10 \log_{10}(\Delta f/\Delta f_e)$ is
+$10 \log_{10}(\Delta f/\Delta f_\mathrm{e})$ is
 `−1.76 dB` for the recommended Hanning window
-($\Delta f_e = 1.5 \Delta f$).
+($\Delta f_\mathrm{e} = 1.5 \Delta f$).
 
 **Parameters**
 
@@ -581,7 +581,7 @@ $10 \log_{10}(\Delta f/\Delta f_e)$ is
 | `levels` | Narrow-band levels `Li` of the spectrum, in dB. |
 | `frequencies` | The line frequencies, in Hz (strictly increasing). |
 | `tone_frequency` | Tone frequency `fT`, in Hz. |
-| `effective_bandwidth_factor` | $\Delta f_e/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. |
+| `effective_bandwidth_factor` | $\Delta f_\mathrm{e}/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. |
 
 **Returns:** Mean narrow-band level `LS`, in dB.
 
@@ -615,7 +615,7 @@ Whether two tones in one critical band are rated separately (Clause 5.3.8).
 Returns `True` when two tones sharing a critical band are evaluated on their
 own instead of being combined into a single FG tone (Formula (17)): both tone
 frequencies lie below 1000 Hz *and* their frequency difference
-$|f_{T1} - f_{T2}|$ (Formula (18)) exceeds the separation
+$|f_{\mathrm{T}1} - f_{\mathrm{T}2}|$ (Formula (18)) exceeds the separation
 frequency `fD`
 (Formula (19)) evaluated at the more prominent tone (the larger audibility
 `ΔL`). Otherwise the tones are combined. This mirrors the DIN 45681 Annex J
@@ -655,7 +655,7 @@ Audibility `ΔL` of one tone from its levels (Formulae (12)-(14)).
 
 Chains the critical-band level `LG` (Formula (12)), the masking index
 `av` (Formula (13)) and the audibility
-$\Delta L = L_T - L_G - a_v$
+$\Delta L = L_\mathrm{T} - L_\mathrm{G} - a_\mathrm{v}$
 (Formula (14)) for a single tone.
 
 **Parameters**
@@ -691,8 +691,8 @@ tone_level(
 Tone level `LT` from the tonal lines about a tone (Formula (8)).
 
 The tone energy is carried by the run of lines contiguous with the peak at
-`tone_frequency` whose level stays above both $L_S + 6$ dB and
-$L_{peak} - 10$ dB (Clause 5.3.3); their energy sum with the window
+`tone_frequency` whose level stays above both $L_\mathrm{S} + 6$ dB and
+$L_\mathrm{peak} - 10$ dB (Clause 5.3.3); their energy sum with the window
 correction is `LT` (via [`energy_sum_level`](/phonometry/reference/api/psychoacoustics/tone-audibility/#energy_sum_level)). A single-line run
 takes its level unchanged (Formula (7), no bandwidth correction).
 
@@ -704,7 +704,7 @@ takes its level unchanged (Formula (7), no bandwidth correction).
 | `frequencies` | The line frequencies, in Hz (strictly increasing). |
 | `tone_frequency` | Tone frequency `fT` (the peak), in Hz. |
 | `mean_narrowband_level` | Mean narrow-band level `LS` of the masking noise, in dB (see [`mean_narrowband_level`](/phonometry/reference/api/psychoacoustics/tone-audibility/#mean_narrowband_level)). |
-| `effective_bandwidth_factor` | $\Delta f_e/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. |
+| `effective_bandwidth_factor` | $\Delta f_\mathrm{e}/\Delta f$; 1.5 for a Hanning window (the default), 1.0 for a rectangular window. |
 
 **Returns:** Tone level `LT`, in dB.
 
@@ -857,16 +857,16 @@ two_tone_separation_frequency(tone_frequency: float) -> float
 
 Frequency-difference threshold `fD` for resolving two tones (Formula (19)).
 
-$f_D = 21 \cdot 10^{1.2 |\log_{10}(f_T/212)|^{1.8}}$ Hz. When *exactly
+$f_\mathrm{D} = 21 \cdot 10^{1.2 |\log_{10}(f_\mathrm{T}/212)|^{1.8}}$ Hz. When *exactly
 two* tones fall in one
 critical band and both lie below 1000 Hz, the human ear can still tell them
 apart (they are then rated *separately* rather than combined into a
 single "FG" tone, Formula (17)) if their frequency difference
-$|f_{T1} - f_{T2}|$ (Formula (18)) exceeds this threshold. `fT` is
+$|f_{\mathrm{T}1} - f_{\mathrm{T}2}|$ (Formula (18)) exceeds this threshold. `fT` is
 the frequency
 of the more prominent tone (the larger audibility `ΔL`). The threshold is
-`21 Hz` at $f_T = 212$ Hz and grows on either side; Formula (19)
-is stated for $50~\text{Hz} < f_T < 1000~\text{Hz}$ (Clause 5.3.8,
+`21 Hz` at $f_\mathrm{T} = 212$ Hz and grows on either side; Formula (19)
+is stated for $50~\text{Hz} < f_\mathrm{T} < 1000~\text{Hz}$ (Clause 5.3.8,
 Annex D, Note 3).
 
 :::note

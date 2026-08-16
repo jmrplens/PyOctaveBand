@@ -242,15 +242,15 @@ with the source directivity factor $Q$ (1 omnidirectional, 2 on a hard floor,
 from 400 Pa·s/m and is omitted by default. The **critical distance**
 
 $$
-r_c = \sqrt{Q R / (16 \pi)}
+r_\mathrm{c} = \sqrt{Q R / (16 \pi)}
 $$
 
 is where the two fields are equal (the crossover of Equation (6.43)); closer
-than $r_c$ the direct field dominates, farther the reverberant field does.
-Kuttruff's reverberation distance (Equation (5.44), $r_c = \sqrt{A / 16 \pi}$
+than $r_\mathrm{c}$ the direct field dominates, farther the reverberant field does.
+Kuttruff's reverberation distance (Equation (5.44), $r_\mathrm{c} = \sqrt{A / 16 \pi}$
 for $Q = 1$) uses the Sabine absorption area $A = S \bar\alpha$ instead of the
 room constant $R = A / (1 - \bar\alpha)$; the two coincide for a small
-$\bar\alpha$ and this module uses $R$, so $r_c$ is exactly the crossover of its
+$\bar\alpha$ and this module uses $R$, so $r_\mathrm{c}$ is exactly the crossover of its
 own `steady_state_spl`.
 
 ```python
@@ -275,7 +275,7 @@ print(round(float(room.steady_state_spl(90.0, 5.0, 25.0)), 2))    # far-field le
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/steady_state_field.svg" alt="Steady-state room field of a 90 dB source in a workshop with a room constant of 62 square metres: the total sound pressure level follows the 6 dB-per-doubling direct field close to the source, crosses the constant reverberant plateau at the 1.11 m critical distance and flattens onto it beyond" width="80%"></picture>
 
 *A 90 dB re 1 pW source in a 12 x 8 x 4 m workshop with a mean absorption of
-0.15: within $r_c = 1.11$ m moving away drops the level 6 dB per doubling;
+0.15: within $r_\mathrm{c} = 1.11$ m moving away drops the level 6 dB per doubling;
 beyond it the reverberant plateau takes over and only absorption, not
 distance, lowers the level (Bies 5e, §6.4).*
 
@@ -335,12 +335,12 @@ that raises `Q` also raises the radiated power is a modelling choice worth up to
 The **Schroeder frequency**
 
 $$
-f_s = 2000 \sqrt{T / V} \quad \text{(Kuttruff Equation (3.44))}
+f_\mathrm{s} = 2000 \sqrt{T / V} \quad \text{(Kuttruff Equation (3.44))}
 $$
 
 ($V$ in m³, $T$ in s) roughly marks the modal-to-diffuse transition, a
 heuristic crossover rather than a sharp cutoff: well below it discrete room
-modes dominate and the diffuse assumptions of $R$ and $r_c$ grow unreliable,
+modes dominate and the diffuse assumptions of $R$ and $r_\mathrm{c}$ grow unreliable,
 well above it the modes overlap and the statistical field of this section
 holds. In borderline rooms it is worth checking band by band.
 

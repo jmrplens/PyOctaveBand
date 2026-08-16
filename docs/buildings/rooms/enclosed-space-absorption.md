@@ -22,8 +22,8 @@ coefficient, the equivalent absorption areas of the objects, the object arrays
 and the air absorption (Formula 1):
 
 $$
-A = \sum_i \alpha_{s,i}\,S_i + \sum_j A_{\mathrm{obj},j}
-    + \sum_k \alpha_{s,k}\,S_k + A_{\mathrm{air}}.
+A = \sum_i \alpha_{\mathrm{s},i}\,S_i + \sum_j A_{\mathrm{obj},j}
+    + \sum_k \alpha_{\mathrm{s},k}\,S_k + A_{\mathrm{air}}.
 $$
 
 For hard, irregular objects whose absorption is not measured, an empirical
@@ -122,7 +122,7 @@ reverberation time in [Room Acoustics](room-acoustics.md)
 
 ## 3. Where the input data comes from
 
-**Surface coefficients.** The standard expects the $\alpha_{s,i}$ to come
+**Surface coefficients.** The standard expects the $\alpha_{\mathrm{s},i}$ to come
 from laboratory measurements to EN ISO 354, the reverberation-room method of
 [Sound Absorption Measurement and Rating](../../materials/absorbers/absorption-measurement.md);
 theoretical, empirical or field
@@ -135,16 +135,16 @@ because the same diffuse-field convention that produced it is the one the
 model assumes.
 
 **Furniture and occupants.** Objects contribute through three routes:
-a measured equivalent absorption area $A_{obj}$ when one exists (persons
+a measured equivalent absorption area $A_\mathrm{obj}$ when one exists (persons
 and seating have tabulated values in the informative Annex C), the
-Formula 4 estimate $V_{obj}^{2/3}$ for hard, irregular, unmeasured objects
+Formula 4 estimate $V_\mathrm{obj}^{2/3}$ for hard, irregular, unmeasured objects
 (furniture, machinery), and object *arrays* rated as an absorbing surface
-$\alpha_s S_k$ when many similar objects cover a zone (an audience, a
+$\alpha_\mathrm{s} S_k$ when many similar objects cover a zone (an audience, a
 storage rack). Objects also displace air: their summed volume enters the
 object fraction $\psi$ that shortens $T$ in Formula 5 beyond what their
 absorption alone would.
 
-**Air.** The air term $A_{air} = 4mV(1-\psi)$ uses the power attenuation
+**Air.** The air term $A_\mathrm{air} = 4mV(1-\psi)$ uses the power attenuation
 coefficient $m$ from the standard's Table 1, resolved by the
 `air_condition` strings (temperature and relative-humidity class, derived
 from ISO 9613-1); it only matters above 1 kHz and grows with the volume.
@@ -235,11 +235,11 @@ repository. Click the preview to open the PDF:
 - [Room acoustic parameters (ISO 3382-1/2)](room-acoustics.md):
   the measured counterpart of the reverberation time predicted here.
 - [Sound Absorption Measurement and Rating](../../materials/absorbers/absorption-measurement.md):
-  where the $\alpha_s$ come from (ISO 354) and where $\alpha_w$ is defined
+  where the $\alpha_\mathrm{s}$ come from (ISO 354) and where $\alpha_\mathrm{w}$ is defined
   (ISO 11654) — the rating §3 forbids as an input.
 - [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md):
   the family member that consumes the $A$ computed here, through
-  $D_{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
+  $D_\mathrm{nT} = D + 10\lg(T/T_0)$ and $R' = D + 10\lg(S/A)$.
 - [Conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   the three Annex E cases these implementations are checked against.
 - [Outdoor Sound Propagation](../../environment/propagation/outdoor-propagation.md): the full ISO 9613-1

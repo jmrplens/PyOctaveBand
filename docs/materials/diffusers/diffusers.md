@@ -44,18 +44,18 @@ $$
 where $V$ is the room volume, $S$ the sample area, $T$ the reverberation time,
 $c$ the speed of sound (Eq. (2): $c = 343.2\sqrt{(273.15+t)/293.15}$) and $m$ the
 power attenuation coefficient of air. The **stationary** pair gives the
-random-incidence absorption $\alpha_s$ (Eq. (1)); the **rotating** pair gives the
-specular absorption $\alpha_{spec}$ (Eq. (4)).
+random-incidence absorption $\alpha_\mathrm{s}$ (Eq. (1)); the **rotating** pair gives the
+specular absorption $\alpha_\mathrm{spec}$ (Eq. (4)).
 
 **Scattering coefficient (Eq. (5)).** The two combine into
 
 $$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s}.
+s = \frac{\alpha_\mathrm{spec} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}}.
 $$
 
 A fully specular surface reflects all its non-absorbed energy in the specular
-direction, so $\alpha_{spec} = \alpha_s$ and $s = 0$; a strong diffuser sends
-energy everywhere, raising $\alpha_{spec}$ towards 1 and $s$ towards 1.
+direction, so $\alpha_\mathrm{spec} = \alpha_\mathrm{s}$ and $s = 0$; a strong diffuser sends
+energy everywhere, raising $\alpha_\mathrm{spec}$ towards 1 and $s$ towards 1.
 
 ```python
 from phonometry import materials
@@ -74,7 +74,7 @@ print(round(float(s), 4))           # 0.0931
 ```
 
 Over a full one-third-octave measurement, `scattering_coefficient_spectrum`
-pairs the per-band $\alpha_{spec}$ and $\alpha_s$ with their band centres and
+pairs the per-band $\alpha_\mathrm{spec}$ and $\alpha_\mathrm{s}$ with their band centres and
 returns a plottable `ScatteringResult`:
 
 ```python
@@ -153,10 +153,10 @@ materials.check_base_plate_scattering([0.02] * len(materials.BASE_PLATE_BANDS))
 
 **Test-report fiche.** `ScatteringResult.report(path)` renders a one-page
 accredited scattering test report (ISO 17497-1): a metadata header, the
-per-one-third-octave table of the random-incidence absorption $\alpha_s$ and the
+per-one-third-octave table of the random-incidence absorption $\alpha_\mathrm{s}$ and the
 scattering coefficient $s$ beside the $s(f)$ curve on a categorical band axis,
 and a boxed characterisation headline (no pass/fail). `verbose=True` adds the
-specular absorption $\alpha_{spec}$ column and `language="es"` renders the
+specular absorption $\alpha_\mathrm{spec}$ column and `language="es"` renders the
 Spanish fiche; it needs the report extra (`pip install phonometry[report]`).
 
 [![ISO 17497-1 scattering example report: a metadata header, the per-one-third-octave table of the random-incidence absorption and the scattering coefficient beside the s(f) band-axis curve, and the boxed characterisation headline over the tested frequency range](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_scattering_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso17497_scattering_example.pdf)
@@ -428,7 +428,7 @@ surface can.
 A handful of design rules follow directly from the geometry:
 
 - **The design frequency sets the depth.** The deepest well is
-  $d_{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
+  $d_\mathrm{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
   $N$; halve $f_0$ and the diffuser gets twice as deep. This is the cost that
   the [metadiffuser](metadiffusers.md) attacks: at 500 Hz an $N = 5$ design
   already calls for wells 27.4 cm deep.
@@ -440,7 +440,7 @@ A handful of design rules follow directly from the geometry:
 - **The well width sets the ceiling.** Each well is a small waveguide; the
   single-plane-wave picture inside it holds only while the width $w$ stays
   below half a wavelength, giving an upper working limit near
-  $f_{max} = c/(2w)$. Narrower wells raise the ceiling but add viscous losses
+  $f_\mathrm{max} = c/(2w)$. Narrower wells raise the ceiling but add viscous losses
   and fins.
 - **Periodicity concentrates, modulation spreads.** Repeating one period
   locks the reflected energy into grating lobes at

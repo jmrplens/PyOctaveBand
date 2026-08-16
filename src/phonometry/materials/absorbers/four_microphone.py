@@ -142,13 +142,13 @@ def plane_wave_frequency_range_astm(
     r"""Working plane-wave frequency range ``(f_l, f_u)`` (ASTM E2611-19).
 
     The upper limit is the smaller of the microphone-spacing bound
-    :math:`s \le 0.8 c / (2 f_u)`, i.e. :math:`f_u s < 0.40 c` (6.5.4), and,
+    :math:`s \le 0.8 c / (2 f_\mathrm{u})`, i.e. :math:`f_\mathrm{u} s < 0.40 c` (6.5.4), and,
     when the tube ``diameter`` is given, the cut-on bound
-    :math:`f_u < K c / d` with :math:`K = 0.586` for a circular tube
+    :math:`f_\mathrm{u} < K c / d` with :math:`K = 0.586` for a circular tube
     (6.2.4.1, Eq. (2)) or :math:`K = 0.500` for a rectangular tube with ``d``
     the largest section dimension (6.2.5). The lower limit follows 6.2.3: the
     spacing shall be greater than 1 % of the wavelength, i.e.
-    :math:`f_l = c / (100 s)`.
+    :math:`f_\mathrm{l} = c / (100 s)`.
 
     With two different spacings ``s1``/``s2``, call with the larger one for
     the upper bound and the smaller one for the lower bound (each bound is

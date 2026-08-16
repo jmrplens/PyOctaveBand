@@ -6,7 +6,7 @@ This page collects the theory behind the measurement chain itself: the standardi
 
 ## Octave Band Frequencies (ANSI S1.11 / IEC 61260)
 
-The mid-band frequencies ($f_m$) and edges ($f_1$, $f_2$) use a base-10 ratio:
+The mid-band frequencies ($f_\mathrm{m}$) and edges ($f_1$, $f_2$) use a base-10 ratio:
 
 $$
 G = 10^{0.3}
@@ -15,7 +15,7 @@ $$
 **Mid-band:**
 
 $$
-f_m = 1000 \cdot G^{x/b}
+f_\mathrm{m} = 1000 \cdot G^{x/b}
 $$
 
 (for odd $b$)
@@ -23,7 +23,7 @@ $$
 **Band edges:**
 
 $$
-f_1 = f_m \cdot G^{-1/(2b)}, \quad f_2 = f_m \cdot G^{1/(2b)}
+f_1 = f_\mathrm{m} \cdot G^{-1/(2b)}, \quad f_2 = f_\mathrm{m} \cdot G^{1/(2b)}
 $$
 
 ## Frequency Resolution vs FFT Bin Spacing
@@ -103,7 +103,7 @@ for f, pxx in zip(freq_bins[in_band], psd[in_band]):
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_response_fraction_3.svg" alt="One-third-octave spectrum analysis of a six-tone signal with the raw PSD in the background" width="80%"></picture>
 
 *The two objects on one axis, for a six-tone signal at 20, 100, 500, 2000,
-4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_s$ = 48 kHz,
+4000 and 15 000 Hz. The grey trace is a Welch PSD ($f_\mathrm{s}$ = 48 kHz,
 `nperseg = 8192`, so a fixed 5.86 Hz bin everywhere); the markers are the
 standardized third-octave levels of the same signal. The bin width never
 changes and the band width does: 4.60 Hz at the 20 Hz band, narrower than one
@@ -130,13 +130,13 @@ The library implements standard classical filter prototypes:
 **1. Butterworth:** Maximally flat passband.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_c)^{2n}}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + (\omega/\omega_\mathrm{c})^{2n}}}
 $$
 
 **2. Chebyshev I:** Equiripple in passband, steeper roll-off.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_c)}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 T_n^2(\omega/\omega_\mathrm{c})}}
 $$
 
 **3. Chebyshev II:** Inverse Chebyshev, equiripple in stopband, flat passband.
@@ -148,7 +148,7 @@ $$
 **4. Elliptic:** Equiripple in both, maximum selectivity.
 
 $$
-|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_c, L)}}
+|H(j\omega)| = \frac{1}{\sqrt{1 + \epsilon^2 R_n^2(\omega/\omega_\mathrm{c}, L)}}
 $$
 
 **5. Bessel:** Maximally flat group delay (linear phase).
@@ -198,7 +198,7 @@ critical strategies:
 2. **Multi-rate Decimation:** Whenever half the sample rate still clears the
    band's upper edge by a factor of 1.25, the signal is automatically
    downsampled (decimated) by
-   $M = \lfloor (f_s/2) / (1.25\,f_\text{upper}) \rfloor$ before filtering,
+   $M = \lfloor (f_\mathrm{s}/2) / (1.25\,f_\text{upper}) \rfloor$ before filtering,
    which is most bands rather than only the low ones (29 of the 33
    one-third-octave bands at 48 kHz). This keeps the digital pole locations far
    from the unit circle boundary, preventing oscillation and noise. The band
@@ -211,11 +211,11 @@ critical strategies:
 The A-weighting transfer function:
 
 $$
-R_A(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}
+R_\mathrm{A}(f) = \frac{12194^2 \cdot f^4}{(f^2 + 20.6^2)\sqrt{(f^2 + 107.7^2)(f^2 + 737.9^2)}(f^2 + 12194^2)}
 $$
 
 $$
-A(f) = 20 \log_{10}(R_A(f)) + 2.00
+A(f) = 20 \log_{10}(R_\mathrm{A}(f)) + 2.00
 $$
 
 The digital filter is obtained from the analog poles/zeros via the bilinear
@@ -236,7 +236,7 @@ y[n] = \alpha \cdot x^2[n] + (1 - \alpha) \cdot y[n-1]
 $$
 
 $$
-\alpha = 1 - e^{-1 / (f_s \cdot \tau)}
+\alpha = 1 - e^{-1 / (f_\mathrm{s} \cdot \tau)}
 $$
 
 Where $\tau$ is the time constant (e.g., 125 ms for Fast).
@@ -274,22 +274,22 @@ Table 2 nominal values: 0 dB at the 10 Hz anchor, the +12 dB/octave climb
 through the infrasound decade below it, and the two 24 dB/octave roll-offs
 that fence the curve off below 1 Hz and above 20 Hz.*
 
-Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_s = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
+Since G acts on 0.25 Hz – 315 Hz, far below the Nyquist frequency at audio rates, the frequency warping of the plain bilinear transform (applied without prewarping) is negligible there: about 0.014 % at 315 Hz for $f_\mathrm{s} = 48$ kHz, under 0.01 dB on the response. The internal oversampling used for the A/C designs (whose action extends to 16 kHz) is therefore not applied.
 
 See the [Special Weightings guide](../../signals/levels/special-weightings.md) for usage.
 
 ## Event and dose metrics
 
-**Sound exposure level** (SEL; $L_{AE}$ with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
+**Sound exposure level** (SEL; $L_{\mathrm{A}E}$ with A-weighting, IEC 61672-1:2013) normalizes the energy of a discrete event (aircraft flyover, train pass) to a 1 s reference duration:
 
 $$
-\mathrm{SEL} = L_{eq,T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
+\mathrm{SEL} = L_{\mathrm{eq},T} + 10 \log_{10}\left(\frac{T}{T_0}\right), \qquad T_0 = 1\ \text{s}
 $$
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sel_concept.svg" alt="A vehicle pass-by level history with its Leq over the whole event and the equal-energy one-second SEL block" width="80%"></picture>
 
 *What the formula does to an event: the pass-by is replaced by a one-second
-block of the same total energy, which is why SEL exceeds the event's $L_{eq}$
+block of the same total energy, which is why SEL exceeds the event's $L_\mathrm{eq}$
 whenever the event lasts longer than a second, and why two events of the same
 SEL are interchangeable in a dose even when one is loud and short and the
 other quiet and long.*
@@ -297,18 +297,18 @@ other quiet and long.*
 **Sound exposure** $E$ (IEC 61252, 3.1) is the time integral of the squared A-weighted sound pressure, expressed in pascal-squared hours:
 
 $$
-E = \int_0^T p_A^2(t)\ dt = \overline{p_A^2} \cdot T \quad [\text{Pa}^2\text{h}]
+E = \int_0^T p_\mathrm{A}^2(t)\ dt = \overline{p_\mathrm{A}^2} \cdot T \quad [\text{Pa}^2\text{h}]
 $$
 
 When the recording is a representative sample of a longer shift, $E$ scales the measured mean square by the actual exposure duration. The **normalized 8 h level** (IEC 61252, 3.3) converts exposure to the steady level that carries the same energy over a nominal working day:
 
 $$
-L_{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
+L_\mathrm{EX,8h} = 10 \log_{10}\left(\frac{E}{8\ \text{h} \cdot p_0^2}\right), \qquad p_0 = 20\ \mu\text{Pa}
 $$
 
-It is identical to $L_{EP,d}$ of Directive 86/188/EEC and $L_{EX,8h}$ of ISO 1999 (IEC 61252, 3.3 NOTES 5–6). The anchor of IEC 61252 (3.3 NOTE 4): an exposure of **3.2 Pa²h corresponds to $L_{EX,8h}$ of exactly 90 dB**.
+It is identical to $L_\mathrm{EP,d}$ of Directive 86/188/EEC and $L_\mathrm{EX,8h}$ of ISO 1999 (IEC 61252, 3.3 NOTES 5–6). The anchor of IEC 61252 (3.3 NOTE 4): an exposure of **3.2 Pa²h corresponds to $L_\mathrm{EX,8h}$ of exactly 90 dB**.
 
-**$L_{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_{Cpeak} = 20\log_{10}(\max|p_C(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
+**$L_\mathrm{Cpeak}$** (IEC 61672-1:2013, subclause 5.13) is the absolute maximum of the C-weighted sound pressure expressed in dB, $L_\mathrm{Cpeak} = 20\log_{10}(\max|p_\mathrm{C}(t)|/p_0)$, the quantity behind the 135/137/140 dB(C) occupational action limits. The implementation is verified against the one-cycle and half-cycle reference responses of Table 5.
 
 See the [Levels guide](../../signals/levels/levels.md) for usage and the [Calibration guide](../../signals/metrology/calibration.md) for absolute-scale setup.
 
@@ -342,7 +342,7 @@ IEC 61043 clause 7.3 specifies the probe intensity response with exactly this ar
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_pp_probe.svg" alt="A two-microphone p-p sound intensity probe: two pressure microphones separated by a spacer, from which the pressure gradient and hence the normal intensity are estimated" width="88%"></picture>
 
-The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
+The **pressure-intensity index** $\delta_{pI} = L_p - L_I$ measures how reactive the field is: in a free plane progressive wave it equals $10 \log_{10}(\rho_0 c / 400) = 0.14$ dB, while large values flag reactive or noisy fields in which the inter-channel phase error dominates. ISO 9614-1:1993 Annex A generalizes it over a measurement surface as the indicator F2 (with F3 for negative partial power and F4 for field non-uniformity), and the instrument's **dynamic capability** $L_\mathrm{d} = \delta_{pI0} - K$ (pressure-residual intensity index minus the bias error factor: 10 dB for grades 1/2, 7 dB for grade 3) must exceed F2 for the measurement to be valid (criterion 1).
 
 See the [Sound Intensity guide](../../devices/emission/intensity.md) for usage.
 
@@ -359,7 +359,7 @@ model $y = f(x_1, \ldots, x_N)$, the law of propagation of uncertainty
 coefficients:
 
 $$
-u_c^2(y) = \sum_{i=1}^{N} \left( \frac{\partial f}{\partial x_i} \right)^2 u^2(x_i),
+u_\mathrm{c}^2(y) = \sum_{i=1}^{N} \left( \frac{\partial f}{\partial x_i} \right)^2 u^2(x_i),
 $$
 
 generalized to $(c \odot u)^{\top} r\ (c \odot u)$ for correlated inputs. The
@@ -367,12 +367,12 @@ sensitivities are obtained by central differences on the user's model callable
 (step scaled to $10^{-3}$ of each input uncertainty), so no hand-derived
 partials are needed. Type B inputs enter through the clause 4.3 half-width
 rules: rectangular $a/\sqrt{3}$ (4.3.7), triangular $a/\sqrt{6}$ (4.3.9),
-U-shaped $a/\sqrt{2}$. The expanded uncertainty $U = k\,u_c$ takes $k$ from
+U-shaped $a/\sqrt{2}$. The expanded uncertainty $U = k\,u_\mathrm{c}$ takes $k$ from
 the t-distribution at the Welch–Satterthwaite effective degrees of freedom
 (Annex G.4):
 
 $$
-\nu_{\mathrm{eff}} = \frac{u_c^4}{\sum_i u_i^4 / \nu_i}.
+\nu_{\mathrm{eff}} = \frac{u_\mathrm{c}^4}{\sum_i u_i^4 / \nu_i}.
 $$
 
 **Supplement 1** (ISO/IEC Guide 98-3-1:2008) propagates the full distributions
@@ -380,7 +380,7 @@ instead: $10^6$ Monte Carlo draws (clause 6.4) through the same model give
 $u(y)$ and the probabilistically symmetric coverage interval from the
 $\frac{1}{2}(1 \mp p)$ fractiles (clause 7.7): the route when the model is
 non-linear or the output visibly non-Gaussian. The Guides' own examples are
-reproduced: the four-term additive model gives $u_c = 2.0$ and the Monte Carlo
+reproduced: the four-term additive model gives $u_\mathrm{c} = 2.0$ and the Monte Carlo
 95 % interval $\pm 3.88$ of Supplement 1 clause 9.2/Table 3 (four rectangular
 inputs; the output is nearly trapezoidal, not Gaussian, so the interval is
 narrower than $\pm 1.96\,u$), and the GUM Annex H.1 end-gauge example gives

@@ -78,9 +78,9 @@ Para la fracción de banda $1/b$, las frecuencias centrales y los bordes de
 banda siguen (5.2-5.5):
 
 $$
-f_m = 1000 \cdot G^{x/b}\ (b\ \text{impar}), \qquad
-f_m = 1000 \cdot G^{(2x+1)/2b}\ (b\ \text{par}), \qquad
-f_1 = f_m G^{-1/2b}, \quad f_2 = f_m G^{+1/2b}
+f_\mathrm{m} = 1000 \cdot G^{x/b}\ (b\ \text{impar}), \qquad
+f_\mathrm{m} = 1000 \cdot G^{(2x+1)/2b}\ (b\ \text{par}), \qquad
+f_1 = f_\mathrm{m} G^{-1/2b}, \quad f_2 = f_\mathrm{m} G^{+1/2b}
 $$
 
 de modo que cada banda de tercio de octava abarca
@@ -144,7 +144,7 @@ Un paso banda digital es una constelación de polos y ceros en el plano z: los
 ceros en DC y Nyquist, o cerca de ellos, sujetan la respuesta lejos de la
 banda (hasta el suelo de la banda atenuada, en los diseños de rizado
 constante), y los polos se agrupan justo dentro del círculo unidad en los
-ángulos $\omega = 2\pi f / f_s$ que abarca la banda de paso. De ahí salen dos
+ángulos $\omega = 2\pi f / f_\mathrm{s}$ que abarca la banda de paso. De ahí salen dos
 intuiciones. Primera, la selectividad es proximidad: cuanto más cerca del
 círculo unidad están los polos, más abrupta es la banda y más tiempo resuena
 el filtro (los picos de retardo de grupo de la sección 4 son esa resonancia,
@@ -152,13 +152,13 @@ medida). Segunda, la estabilidad es un margen, no una propiedad de la
 arquitectura: un filtro IIR es estable solo mientras todos sus polos
 permanecen estrictamente dentro del círculo unidad, y una banda estrecha a
 una frecuencia de muestreo alta los empuja hacia fuera (radio del polo
-$\approx 1 - \pi B / f_s$ para un ancho de banda $B$) y los aprieta entre
+$\approx 1 - \pi B / f_\mathrm{s}$ para un ancho de banda $B$) y los aprieta entre
 sí, hasta que los coeficientes en doble precisión ya no pueden representar
 sus posiciones con exactitud. Las secciones de segundo orden (SOS) desactivan
 la mitad del problema: cada par de polos conserva sus propios coeficientes,
 de modo que los errores de redondeo quedan localizados en lugar de acumularse
 en un único polinomio de orden alto. La otra mitad, la minúscula razón
-$B / f_s$ en sí, es lo que arregla el diezmado.
+$B / f_\mathrm{s}$ en sí, es lo que arregla el diezmado.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/pole_migration_es.svg" alt="Tres paneles para la banda de tercio de octava de 25 Hz de un banco a 48 kHz. A la izquierda, la constelación en el plano z de la banda diseñada a la frecuencia completa: todos los polos colapsados sobre z = 1, con un recuadro ampliado que muestra los seis polos repartidos en menos de una milésima del radio y la anotación 1 menos r igual a 8,7e-05. En el centro, esa misma banda tal como la realiza de verdad el banco, a 96 Hz tras diezmar por 500: los polos aparecen claramente separados alrededor del círculo unidad, con 1 menos r igual a 4,6e-02. A la derecha, el mayor radio de polo de todas las bandas del banco en ejes log-log: el diseño a una sola frecuencia sube de forma sostenida desde 4e-05 a 12,5 Hz hasta 5e-02 a 20 kHz, mientras que el banco multitasa se mantiene fijo cerca de 5e-02 en todo el rango" width="94%" />
 
@@ -210,7 +210,7 @@ posterior puede eliminarla.
 El banco protege sus propias etapas de diezmado, pero solo puede analizar lo
 que la cadena de captura le entrega:
 
-- **Plegado en el ADC.** La energía por encima de $f_s/2$ que llega al
+- **Plegado en el ADC.** La energía por encima de $f_\mathrm{s}/2$ que llega al
   conversor sin un filtro antialiasing analógico se pliega dentro del rango
   de análisis y es indistinguible del sonido real dentro de banda. Las
   tarjetas de sonido lo filtran internamente; las cadenas de instrumentación
@@ -221,7 +221,7 @@ que la cadena de captura le entrega:
   más sencillo, analiza a la frecuencia nativa: todas las funciones de
   phonometry aceptan `fs` directamente.
 - **Bandas cerca de Nyquist.** Una banda cuyo borde superior se acerca a
-  $f_s/2$ no puede realizar su respuesta de diseño: la transformada bilineal
+  $f_\mathrm{s}/2$ no puede realizar su respuesta de diseño: la transformada bilineal
   comprime allí el eje de frecuencias (el mismo efecto que los filtros de
   ponderación contrarrestan con `high_accuracy`). Mantén el borde de la banda
   superior holgadamente por debajo de Nyquist o sube `fs`, y deja que
@@ -231,8 +231,8 @@ que la cadena de captura le entrega:
 
 Un nivel de banda no se lee de una señal, se *estima* a partir de ella, y cuanto
 más estrecha es la banda más tarda esa estimación. El ancho de banda de una
-banda de $1/b$ de octava es $B = f_m\,(G^{1/2b} - G^{-1/2b})$, que para tercios
-de octava vale $0{,}231\,f_m$, y de ahí se siguen dos consecuencias.
+banda de $1/b$ de octava es $B = f_\mathrm{m}\,(G^{1/2b} - G^{-1/2b})$, que para tercios
+de octava vale $0{,}231\,f_\mathrm{m}$, y de ahí se siguen dos consecuencias.
 
 El filtro tiene que **asentarse**: una banda resuena durante unas pocas veces
 $1/B$, así que ese trozo del principio del registro es transitorio y no nivel, y
@@ -312,7 +312,7 @@ banda sobre todo el registro, que es lo que toda norma entiende por «nivel de
 banda». `'peak'` da $20\log_{10}$ de la mayor muestra en valor absoluto dentro
 de la banda, contra la misma referencia de 20 µPa; es un pico instantáneo de
 banda, no una lectura de retención de pico, está limitado en banda y sin
-ponderar, así que *no* es el pico ponderado C $L_{C\text{peak}}$ de la guía de
+ponderar, así que *no* es el pico ponderado C $L_\mathrm{Cpeak}$ de la guía de
 [Niveles](/phonometry/es/signals/levels/levels/), y en señales impulsivas lo
 domina la propia resonancia del filtro: pertenece al diagnóstico de transitorios,
 no a la comunicación de niveles. No hay modo `'sum'`: un total entre bandas es
@@ -523,7 +523,7 @@ grupo y distorsión de fase.
 
 ### El retardo de grupo, cuantificado
 
-El retardo de grupo $\tau_g(\omega) = -\frac{d\phi(\omega)}{d\omega}$ de la
+El retardo de grupo $\tau_\mathrm{g}(\omega) = -\frac{d\phi(\omega)}{d\omega}$ de la
 banda de octava de 1 kHz muestra el compromiso directamente: Bessel se mantiene
 casi plano en la banda de paso (los transitorios sobreviven), mientras que
 Chebyshev I y el Elíptico pagan su caída abrupta con fuertes picos de retardo en
@@ -669,9 +669,9 @@ respecto a Nyquist, o sube `fs`, y confirma el margen con
 IEC 61260-1:2014 (apartados 5.2-5.5) construye cada banda a partir de la
 razón de octava en base 10 $G = 10^{3/10} \approx 1{,}99526$, de modo que
 una octava no es exactamente 2. Las frecuencias centrales siguen
-$f_m = 1000 \cdot G^{x/b}$ para $b$ impar y
-$f_m = 1000 \cdot G^{(2x+1)/2b}$ para $b$ par — de modo que 1 kHz es una
+$f_\mathrm{m} = 1000 \cdot G^{x/b}$ para $b$ impar y
+$f_\mathrm{m} = 1000 \cdot G^{(2x+1)/2b}$ para $b$ par — de modo que 1 kHz es una
 frecuencia central de banda en las fracciones impares y un *borde* de banda
-en las pares — y los bordes son $f_1 = f_m G^{-1/2b}$ y
-$f_2 = f_m G^{+1/2b}$ en ambos casos; cada banda de tercio de
+en las pares — y los bordes son $f_1 = f_\mathrm{m} G^{-1/2b}$ y
+$f_2 = f_\mathrm{m} G^{+1/2b}$ en ambos casos; cada banda de tercio de
 octava abarca $G^{1/3} \approx 1{,}2589$, diez bandas por década.

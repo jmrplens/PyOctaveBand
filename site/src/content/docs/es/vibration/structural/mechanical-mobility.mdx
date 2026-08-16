@@ -139,12 +139,12 @@ línea de masa, que la sección 4 muestra sobre la gráfica.
 
 Que $P = \tfrac{1}{2}\operatorname{Re}\{Y\}|F|^2$ es solo la mitad de la
 historia, porque la fuerza en un contacto no viene dada: es lo que acuerdan las
-dos estructuras. Acopla una fuente de velocidad libre $v_f$ y movilidad
+dos estructuras. Acopla una fuente de velocidad libre $v_\mathrm{f}$ y movilidad
 $Y_\text{fuente}$ a un receptor de movilidad $Y_\text{receptor}$ y la fuerza de
 contacto es
 
 $$
-F = \frac{v_f}{Y_\text{fuente} + Y_\text{receptor}},
+F = \frac{v_\mathrm{f}}{Y_\text{fuente} + Y_\text{receptor}},
 $$
 
 de modo que la potencia que cruza depende de **ambas** movilidades a través de
@@ -328,12 +328,12 @@ compatibles con la sensibilidad; y si eso no basta, compensar.
 
 - **Cuándo actuar.** Debe considerarse la compensación electrónica cuando la
   magnitud de la movilidad en el punto de excitación de la estructura supere
-  $0{,}01/(f\,m_t)$ en todas las frecuencias de interés, siendo $m_t$ la masa
+  $0{,}01/(f\,m_\mathrm{t})$ en todas las frecuencias de interés, siendo $m_\mathrm{t}$ la masa
   efectiva total de los accesorios de acoplo más la masa de extremo efectiva
   del transductor de fuerza o de la cabeza de impedancia (y la de un
   acelerómetro independiente en el punto de excitación, si se monta uno).
 - **En qué consiste.** «Cancelación de masa»: multiplicar la aceleración en el
-  punto de excitación por $m_t$ y restar el producto de la señal de fuerza, en
+  punto de excitación por $m_\mathrm{t}$ y restar el producto de la señal de fuerza, en
   analógico o digitalmente. Una medición de movilidad *de transferencia*
   necesita por tanto un acelerómetro aparte en el punto de excitación que
   suministre esa señal.
@@ -351,7 +351,7 @@ compatibles con la sensibilidad; y si eso no basta, compensar.
 
 Para el resonador de la sección 2 el umbral es fácil de situar. Su movilidad en
 el punto de excitación alcanza $1/c = 0,2$ m/(N·s) a 10,07 Hz; con una cabeza de
-impedancia y accesorios de 20 g ($m_t = 0,02$ kg) el umbral $0{,}01/(f\,m_t)$
+impedancia y accesorios de 20 g ($m_\mathrm{t} = 0,02$ kg) el umbral $0{,}01/(f\,m_\mathrm{t})$
 vale allí 0,050 m/(N·s), así que en su pico la estructura está cuatro veces por
 encima. Toma en su lugar una cabeza de 2 g y el umbral sube a 0,50 m/(N·s), por
 encima del pico. El umbral baja cuando sube la masa añadida, que es justo su
@@ -624,10 +624,10 @@ Cremer, Heckl y Petersson:
 - la **placa infinita** es una resistencia real pura, $Y = 1/(8\sqrt{B'm''})$,
   independiente de la frecuencia: absorbe igual a todas las frecuencias y no
   tiene pico del que leer un amortiguamiento;
-- la **viga infinita** es $Y = (1-\mathrm{j})/(4m'c_B)$, es decir, $-45°$ de
+- la **viga infinita** es $Y = (1-\mathrm{j})/(4m'c_\mathrm{B})$, es decir, $-45°$ de
   fase a toda frecuencia y una magnitud que cae como $\omega^{-1/2}$, porque la
-  propia velocidad de la onda de flexión $c_B$ crece como $\sqrt{\omega}$;
-- una **barra en movimiento longitudinal** es $Y = 1/(\rho c_L S)$, otra vez
+  propia velocidad de la onda de flexión $c_\mathrm{B}$ crece como $\sqrt{\omega}$;
+- una **barra en movimiento longitudinal** es $Y = 1/(\rho c_\mathrm{L} S)$, otra vez
   real y plana: el análogo mecánico de una línea de transmisión adaptada.
 
 ```python

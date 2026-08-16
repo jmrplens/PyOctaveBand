@@ -58,7 +58,7 @@ acústica en bandas de tercio de octava sobre una malla esférica de acimut
 $\varphi$ y ángulo polar $\theta$, definidos a una distancia de referencia
 fija de **60 m** en condiciones atmosféricas de referencia de la OACI. Situar
 esa fuente en un receptor añade el ajuste de propagación
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$.
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$.
 
 El EPNL que calcula esta página es la misma magnitud que pide la certificación de
 ala fija; lo único que cambia es la descripción de la fuente. El Capítulo 8 del
@@ -222,8 +222,8 @@ plt.show()
 ## Ajustes de propagación
 
 El nivel del hemisferio a 60 m se lleva al receptor con tres ajustes (§A.4):
-`spherical_spreading_adjustment` ($\Delta L_s = -20\log_{10}(r/60)$, Ec. 24),
-`atmospheric_adjustment` ($\Delta L_a = -\alpha(f)\,(r - 60)$ con el
+`spherical_spreading_adjustment` ($\Delta L_\mathrm{s} = -20\log_{10}(r/60)$, Ec. 24),
+`atmospheric_adjustment` ($\Delta L_\mathrm{a} = -\alpha(f)\,(r - 60)$ con el
 coeficiente de
 ISO 9613-1, Ec. 26/27) y `ground_effect_adjustment` (interferencia directo/
 reflejado sobre un plano de impedancia, Chien-Soroka Ec. 28-35, con la impedancia
@@ -446,7 +446,7 @@ dirección de 0° (Enfoque 2, pasada como `offset_db`) o las constantes
 publicadas del Enfoque 3: +12 dB para HOGE, −12 dB para el ralentí a régimen
 reducido y −2,5 dB para el ralentí a régimen pleno, todas desde el disco
 HIGE. Un desplazamiento espectral constante mueve el nivel ponderado A
-exactamente ese valor, que es como la Tabla 3 (definida sobre niveles $L_A$)
+exactamente ese valor, que es como la Tabla 3 (definida sobre niveles $L_\mathrm{A}$)
 se extiende a espectros de bandas.
 
 ```python
@@ -562,7 +562,7 @@ este módulo (que consume hemisferios ya reducidos) no modela.
 `flight_path_kinematics` deriva de una trayectoria con marcas de tiempo, por
 diferencias finitas centradas, todo lo que necesita el evento (Ec. 16-21 /
 Doc 32 Ec. 8-10): velocidad respecto al suelo, velocidad aerodinámica (sin
-viento), rumbo, curvatura, ángulo de alabeo $\Phi = \arctan(K V_g^2 / g)$ y
+viento), rumbo, curvatura, ángulo de alabeo $\Phi = \arctan(K V_\mathrm{g}^2 / g)$ y
 ángulo de trayectoria $\gamma = \arctan(\Delta Z / \Delta S)$. La guía
 recomienda suavizar las trazas radar
 (p. ej. remuestreo con splines a cadencia de 0,5 s) antes de derivar.
@@ -622,7 +622,7 @@ receptor: por punto de trayectoria la condición de vuelo selecciona (o mezcla)
 los hemisferios, los ángulos de emisión direccionan el nivel de fuente (el
 marco se orienta con el rumbo y se inclina con el alabeo en virajes; la actitud
 de cabeceo está implícita en los hemisferios), y el historial recibido en
-tercios de octava se expresa en tiempo registrado $t_r = t_e + r/c$ (Ec. 22,
+tercios de octava se expresa en tiempo registrado $t_\mathrm{r} = t_\mathrm{e} + r/c$ (Ec. 22,
 $c = 346{,}1\ \text{m/s}$) y se integra: `LASmax`, `SEL` sobre el historial
 completo y
 sobre la ventana de certificación de 10 dB por debajo (Doc 32 Ec. 27), y `EPNL`
@@ -654,7 +654,7 @@ de 88,8 dB(A). El LASmax y el SEL se usan para contornos y para estudios de
 molestia, y el EPNL solo contra niveles de certificación.
 
 La forma del historial también merece leerse. Cada emisión se estampa en el
-tiempo registrado $t_r = t_e + r/c$, y $r$ es mayor lejos del punto de máxima
+tiempo registrado $t_\mathrm{r} = t_\mathrm{e} + r/c$, y $r$ es mayor lejos del punto de máxima
 aproximación y menor en él, así que el historial recibido se comprime a la ida y
 se estira a la vuelta: la curva es asimétrica antes de que intervenga
 directividad ninguna. Dónde cae entonces el LASmax depende del hemisferio: con el
@@ -666,7 +666,7 @@ la razón por la que el método lleva un hemisferio y no un nivel de fuente.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flyover_event_es.svg" alt="Nivel ponderado A frente al tiempo registrado para un sobrevuelo nivelado de un helicóptero: subida suave hasta LASmax sobre la ventana de 10 dB por debajo y descenso más lento, anotado con el SEL y el EPNL del evento" width="82%" />
 
 *Dos asimetrías en una misma curva, y ninguna es un artefacto del modelo. El
-$L_{AS,max}$ = 78,5 dB(A) llega a los 64,56 s, un segundo entero **antes** que
+$L_\mathrm{AS,max}$ = 78,5 dB(A) llega a los 64,56 s, un segundo entero **antes** que
 el sonido emitido en el punto de máxima aproximación (65,56 s), porque la
 dirección más ruidosa del hemisferio se alcanza un poco antes del través. Y la
 ventana de 10 dB por debajo ocupa 9,4 s por delante del máximo y 11,5 s por
@@ -978,7 +978,7 @@ la divergencia inversa al cuadrado de forma cerrada, los límites analíticos de
 suelo rígido y rasante del efecto de suelo, consultas bilineales fuera de nodo
 sobre los hemisferios de referencia de los once tipos de helicóptero, símplices
 de interpolación comprobados a mano, cinemática de forma cerrada y la integral
-lorentziana $\mathrm{SEL} - L_{ASmax}$ del sobrevuelo. De extremo a extremo
+lorentziana $\mathrm{SEL} - L_\mathrm{ASmax}$ del sobrevuelo. De extremo a extremo
 reproduce los casos ARP de verificación del prototipo NORAH2:
 
 | Magnitud | Oráculo | Coincidencia |
@@ -987,7 +987,7 @@ reproduce los casos ARP de verificación del prototipo NORAH2:
 | Ángulos de emisión | prototipo NORAH2, casos ARP | 0,01° |
 | Tiempo retardado | el mismo | 0,02 s |
 | Nivel por paso, suelo duro, hasta 18 km | el mismo | 0,08 dB(A) |
-| $L_{ASmax}$ | el mismo | 0,03 dB |
+| $L_\mathrm{ASmax}$ | el mismo | 0,03 dB |
 | `SEL` | el mismo | 0,05 dB en suelo duro, 0,4 dB en blando |
 | Malla de contorno, 187 micrófonos | caso 3 ARP | 0,7 dB en el peor caso |
 | $\mathrm{PNLTM}$ | el mismo | 0,1 dB |

@@ -61,21 +61,21 @@ plt.show()
 
 ## 1. Wave parameters χ and ψ (Eqs 5.10, 5.11)
 
-With plate $i$ of thickness $h_i$, quasi-longitudinal wave speed $c_{L,i}$ and
-surface density $\rho_{s,i}$, the whole family of coefficients depends on just
+With plate $i$ of thickness $h_i$, quasi-longitudinal wave speed $c_{\mathrm{L},i}$ and
+surface density $\rho_{\mathrm{s},i}$, the whole family of coefficients depends on just
 two dimensionless ratios (Cremer et al. 1973):
 
 $$
-\chi = \frac{k_{B2}}{k_{B1}}
-     = \left(\frac{\rho_{s2} B_1}{\rho_{s1} B_2}\right)^{1/4}
-     = \sqrt{\frac{h_1 c_{L1}}{h_2 c_{L2}}}
-     = \sqrt{\frac{f_{c2}}{f_{c1}}}
+\chi = \frac{k_{\mathrm{B}2}}{k_{\mathrm{B}1}}
+     = \left(\frac{\rho_{\mathrm{s}2} B_1}{\rho_{\mathrm{s}1} B_2}\right)^{1/4}
+     = \sqrt{\frac{h_1 c_{\mathrm{L}1}}{h_2 c_{\mathrm{L}2}}}
+     = \sqrt{\frac{f_{\mathrm{c}2}}{f_{\mathrm{c}1}}}
 $$
 
 $$
-\psi = \frac{B_2 k_{B2}^2}{B_1 k_{B1}^2}
-     = \frac{h_2 c_{L2} \rho_{s2}}{h_1 c_{L1} \rho_{s1}}
-     = \frac{\rho_{s2} f_{c1}}{\rho_{s1} f_{c2}}
+\psi = \frac{B_2 k_{\mathrm{B}2}^2}{B_1 k_{\mathrm{B}1}^2}
+     = \frac{h_2 c_{\mathrm{L}2} \rho_{\mathrm{s}2}}{h_1 c_{\mathrm{L}1} \rho_{\mathrm{s}1}}
+     = \frac{\rho_{\mathrm{s}2} f_{\mathrm{c}1}}{\rho_{\mathrm{s}1} f_{\mathrm{c}2}}
 $$
 
 $\chi$ is the ratio of the plates' bending wavenumbers (equivalently the square
@@ -184,24 +184,24 @@ computed.
 
 The angular average is the bridge to the two junction descriptors used in
 SEA-based building models. The **coupling loss factor** (Eq. 2.154) for a
-source plate $i$ of area $S_i$, bending-wave group velocity $c_{g,i}$ and
+source plate $i$ of area $S_i$, bending-wave group velocity $c_{\mathrm{g},i}$ and
 junction length $L_{ij}$ is
 
 $$
-\eta_{ij} = \frac{c_{g,i} L_{ij} \tau_{ij}}{2\pi^2 f S_i}
+\eta_{ij} = \frac{c_{\mathrm{g},i} L_{ij} \tau_{ij}}{2\pi^2 f S_i}
 $$
 
 and the wave-approach **vibration reduction index** (Eq. 5.116) is
 
 $$
-K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{c,j}/f_\text{ref}),
+K_{ij} = 10\log_{10}(1/\tau_{ij}) + 5\log_{10}(f_{\mathrm{c},j}/f_\text{ref}),
 \qquad f_\text{ref} = 1000\ \text{Hz}
 $$
 
-with $f_{c,j}$ the critical frequency of the *receiving* plate. Combined with
+with $f_{\mathrm{c},j}$ the critical frequency of the *receiving* plate. Combined with
 the Eq. 5.7 reciprocity this form is symmetric, $K_{ij} = K_{ji}$, as EN 12354
 requires of the junction descriptor. For the identical 100 mm concrete
-X-junction ($f_c \approx 203\ \text{Hz}$),
+X-junction ($f_\mathrm{c} \approx 203\ \text{Hz}$),
 $K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7.3\ \text{dB}$.
 
 ```python
@@ -288,7 +288,7 @@ print(pred.dominant.label, round(pred.dominant.fraction, 2))   # Dd 0.68
 ```
 
 One junction with a moderate $K_{ij}$ already trims 1.6 dB off the direct
-$R_w = 57\ \text{dB}$; a full building repeats this for every junction, which
+$R_\mathrm{w} = 57\ \text{dB}$; a full building repeats this for every junction, which
 is the [EN 12354 prediction guide](../../buildings/design/insulation-prediction.md).
 
 The measured, EN 12354 counterpart of $K_{ij}$ (from the direction-averaged
@@ -335,8 +335,8 @@ Norton Section 6.4.1 alongside it: `flat_plate_modal_density` (Eq. 6.25),
 `bar_modal_density` (6.23), `beam_modal_density` (6.24) and
 `cylindrical_shell_modal_density` (6.27 to 6.29, the Szechenyi approximations
 in three regimes about the `ring_frequency` of Eq. 6.26). The flat-plate
-expression $n(f) = S\sqrt{12}/(2 c_L t)$ is the same quantity as EN 12354-4's
-$n = \pi S f_c / c_0^2$ used by the [flanking model](../../buildings/insulation/flanking-lab.md), only
+expression $n(f) = S\sqrt{12}/(2 c_\mathrm{L} t)$ is the same quantity as EN 12354-4's
+$n = \pi S f_\mathrm{c} / c_0^2$ used by the [flanking model](../../buildings/insulation/flanking-lab.md), only
 parametrised by the plate itself rather than by its critical frequency.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/experimental_sea_clf.svg" alt="Two-panel figure. Left panel: coupling loss factor on a logarithmic axis against the octave bands from 125 hertz to 2 kilohertz for two aluminium plates at right angles, with the welded line junction falling from about 3 times 10 to the minus 3 to 8 times 10 to the minus 4 as one over the square root of frequency, the twelve-bolt point connection falling twice as steeply from about 1.4 times 10 to the minus 2 to 9 times 10 to the minus 4 as one over frequency, and a dashed horizontal line marking an internal loss factor of 10 to the minus 2. Right panel: a bar chart of the four loss factors of a satellite platform and cylinder in the 500 hertz octave on a logarithmic axis, the internal loss factors 4.40 times 10 to the minus 3 and 2.40 times 10 to the minus 3 clearly above the coupling loss factors 4.26 times 10 to the minus 4 and 3.91 times 10 to the minus 4, with the injected power of 1.31 watts annotated" width="92%"></picture>
@@ -408,7 +408,7 @@ normally compared against.
 of a right-angle plate junction without any angular integration (Eqs. 6.53 to
 6.55, after Bies & Hamid and Cremer et al.); feeding it to
 `coupling_loss_factor` reproduces Norton Eq. (6.52) identically, because that
-equation and Hopkins Eq. (2.154) are the same expression once $c_g = 2 c_B$.
+equation and Hopkins Eq. (2.154) are the same expression once $c_\mathrm{g} = 2 c_\mathrm{B}$.
 And `point_connection_coupling_loss_factor` covers plates joined at $N$
 discrete points instead of along a line (Eq. 6.56). Which one applies is
 decided by the bending wavelength: use the point form when it is shorter than

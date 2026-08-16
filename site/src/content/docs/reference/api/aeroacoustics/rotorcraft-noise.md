@@ -12,8 +12,8 @@ source with a **noise hemisphere**: one-third-octave-band sound pressure levels 
 a spherical grid of azimuth `φ` and polar angle `θ` at a fixed 60 m reference
 distance (at ICAO reference atmospheric conditions). Placing that source at a
 receiver adds the propagation adjustment
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ (plus
-$\Delta L_d$ with shielding): spherical spreading, atmospheric
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$ (plus
+$\Delta L_\mathrm{d}$ with shielding): spherical spreading, atmospheric
 absorption, ground effect and, later, shielding. Those adjustments depend on the
 path and not on the rotorcraft, and live in
 [`rotorcraft_propagation`](/phonometry/reference/api/aeroacoustics/rotorcraft-propagation/); this module is the source
@@ -71,8 +71,8 @@ Hemisphere blending weights for a flight condition (Eq. 3-10).
 
 The database flight conditions and the query are scaled by the database
 spans, $\bar{V} = V/(V_{\mathrm{max}} - V_{\mathrm{min}})$ and
-$\bar{\gamma} = F_{fc} \cdot \gamma / (\gamma_{\mathrm{max}} - \gamma_{\mathrm{min}})$ with
-the empirical flight-condition scaling factor $F_{fc} = 2$: the
+$\bar{\gamma} = F_\mathrm{fc} \cdot \gamma / (\gamma_{\mathrm{max}} - \gamma_{\mathrm{min}})$ with
+the empirical flight-condition scaling factor $F_\mathrm{fc} = 2$: the
 guidance's
 normalisation (Eq. 3-6), which subtracts no minima -- a shared offset
 cancels in the distances `δ_j` (Eq. 7) either way. Inside the
@@ -128,7 +128,7 @@ Computes, at every point of a time-stamped track, the ground speed `V_g`
 (Eq. 16), the zero-wind airspeed `V_A` (Eq. 17), the heading
 $\Theta = \operatorname{atan2}(\Delta X, \Delta Y)$ (Eq. 19), the
 curvature $K = \Delta\Theta/\Delta S$ (Eq. 18), the
-bank angle $\Phi = \arctan(K \cdot V_g^2/g)$ (Eq. 20) and the path
+bank angle $\Phi = \arctan(K \cdot V_\mathrm{g}^2/g)$ (Eq. 20) and the path
 angle
 $\gamma = \arctan(\Delta Z/\Delta S)$ (Doc 32 Eq. 10). The
 airspeed, not the ground speed,
@@ -201,7 +201,7 @@ All rates come from central finite differences around each track point.
 | `airspeed` | Airspeed `V_A` (Eq. 17, zero-wind), in m/s, shape `(N,)`. |
 | `heading` | Heading $\Theta = \operatorname{atan2}(\Delta X, \Delta Y)$ (Eq. 19), in degrees, shape `(N,)`. |
 | `curvature` | Track curvature $K = \Delta\Theta/\Delta S$ (Eq. 18), in rad/m, shape `(N,)` (zero where the ground speed vanishes). |
-| `bank_angle` | Bank angle $\Phi = \arctan(K \cdot V_g^2/g)$ (Eq. 20), in degrees, positive starboard down, shape `(N,)`. |
+| `bank_angle` | Bank angle $\Phi = \arctan(K \cdot V_\mathrm{g}^2/g)$ (Eq. 20), in degrees, positive starboard down, shape `(N,)`. |
 | `path_angle` | Path angle $\gamma = \arctan(\Delta Z/\Delta S)$ (Doc 32 Eq. 10), in degrees, positive climbing, shape `(N,)`. |
 
 :::note
@@ -438,10 +438,10 @@ Rotorcraft single-event level at a receiver (Doc 32 §6.1 / guidance §A.5.1).
 For every track point the flight condition selects (or blends, Eq. 3-10)
 the hemispheres, the emission angles address the source level (Eq. 13-15)
 and the propagation adjustment
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$ (Eq. 23-35)
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$ (Eq. 23-35)
 places
 it at the receiver. The received one-third-octave history is expressed at
-recorded time $t_r = t_e + r/c$ (Eq. 22) and integrated into
+recorded time $t_\mathrm{r} = t_\mathrm{e} + r/c$ (Eq. 22) and integrated into
 `LASmax`,
 `SEL` (Doc 32 Eq. 27) and `EPNL` (Doc 32 Eq. 28, ICAO Annex 16 App. 2,
 reusing
@@ -591,7 +591,7 @@ A rotorcraft single-event time history at a receiver (Doc 32 §6.1).
 | :--- | :--- |
 | `frequencies` | Band centre frequencies, in Hz, shape `(F,)`. |
 | `emission_times` | Emission times `t_e`, in s, shape `(K,)`. |
-| `times` | Recorded times $t_r = t_e + r/c$ (Eq. 22), in s, shape `(K,)`. |
+| `times` | Recorded times $t_\mathrm{r} = t_\mathrm{e} + r/c$ (Eq. 22), in s, shape `(K,)`. |
 | `distance` | Slant distance `r` per step, in metres, shape `(K,)`. |
 | `azimuth` | Emission azimuth `φ` per step, in degrees, shape `(K,)`. |
 | `polar` | Emission polar angle `θ` per step, in degrees, shape `(K,)`. |

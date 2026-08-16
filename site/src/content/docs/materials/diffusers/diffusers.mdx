@@ -96,8 +96,8 @@ is on the plate and whether the plate **turns** (Table 2):
 | $T_4$ | present | rotating |
 
 $(T_1, T_2)$ is an ordinary ISO 354 absorption measurement of the specimen and
-yields the random-incidence $\alpha_s$; $(T_3, T_4)$ repeats it under rotation
-and yields the specular $\alpha_{spec}$. The area $S$ in both formulas is the
+yields the random-incidence $\alpha_\mathrm{s}$; $(T_3, T_4)$ repeats it under rotation
+and yields the specular $\alpha_\mathrm{spec}$. The area $S$ in both formulas is the
 **specimen** area, not the base-plate area. The pair $(T_1, T_3)$ is not waste
 either: it is the base-plate quality check of Eq. (6), below.
 
@@ -115,7 +115,7 @@ Averaging the impulse responses *phase-locked* to the excitation over many
 orientations therefore adds the specular parts in phase while the scattered
 parts interfere destructively, and the surviving decay is the one a purely
 specular surface with some extra apparent loss would have given. That apparent
-extra loss is the scattered energy, which is why $\alpha_{spec} \ge \alpha_s$
+extra loss is the scattered energy, which is why $\alpha_\mathrm{spec} \ge \alpha_\mathrm{s}$
 and why Eq. (5) reads as a fraction of non-specular energy. Two consequences
 follow directly and are easy to violate: the averaging must be synchronous
 with the acquisition, so a freely spinning turntable that smears the impulse
@@ -155,7 +155,7 @@ snippets further down cannot repair a run that broke them.
   height (Clause 6.3.3), a rotationally symmetric specimen must be displaced
   from the axis by at least $d/8$ so that rotation really changes the
   orientation, and the specimen's own absorption should stay under
-  $\alpha_s = 0.50$ (Clause 6.3.4).
+  $\alpha_\mathrm{s} = 0.50$ (Clause 6.3.4).
 - **Excitation and averaging.** A deterministic signal, evaluated by the
   integrated impulse-response method (Clause 7.1): periodic pseudo-random
   noise or a sweep per ISO 18233. Either radiate continuously for one whole
@@ -190,18 +190,18 @@ $$
 where $V$ is the room volume, $S$ the sample area, $T$ the reverberation time,
 $c$ the speed of sound (Eq. (2): $c = 343.2\sqrt{(273.15+t)/293.15}$) and $m$ the
 power attenuation coefficient of air. The **static** pair $(T_1, T_2)$ gives the
-random-incidence absorption $\alpha_s$ (Eq. (1)); the **rotating** pair
-$(T_3, T_4)$ gives the specular absorption $\alpha_{spec}$ (Eq. (4)).
+random-incidence absorption $\alpha_\mathrm{s}$ (Eq. (1)); the **rotating** pair
+$(T_3, T_4)$ gives the specular absorption $\alpha_\mathrm{spec}$ (Eq. (4)).
 
 **Scattering coefficient (Eq. (5)).** The two combine into
 
 $$
-s = \frac{\alpha_{spec} - \alpha_s}{1 - \alpha_s}.
+s = \frac{\alpha_\mathrm{spec} - \alpha_\mathrm{s}}{1 - \alpha_\mathrm{s}}.
 $$
 
 A fully specular surface reflects all its non-absorbed energy in the specular
-direction, so $\alpha_{spec} = \alpha_s$ and $s = 0$; a strong diffuser sends
-energy everywhere, raising $\alpha_{spec}$ towards 1 and $s$ towards 1.
+direction, so $\alpha_\mathrm{spec} = \alpha_\mathrm{s}$ and $s = 0$; a strong diffuser sends
+energy everywhere, raising $\alpha_\mathrm{spec}$ towards 1 and $s$ towards 1.
 
 ```python
 from phonometry import materials
@@ -261,7 +261,7 @@ untouched and Clause 7.3 wants the run finished quickly; the correction
 repairs a drift that was measured, not one that was guessed at afterwards.
 
 Over a full one-third-octave measurement, `scattering_coefficient_spectrum`
-pairs the per-band $\alpha_{spec}$ and $\alpha_s$ with their band centres and
+pairs the per-band $\alpha_\mathrm{spec}$ and $\alpha_\mathrm{s}$ with their band centres and
 returns a plottable `ScatteringResult`:
 
 ```python
@@ -284,12 +284,12 @@ result.plot()   # s(f) on a log-frequency axis, 0 to 1 (needs matplotlib)
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/scattering_coefficient.svg" alt="Two stacked panels over the 13 one-third-octave bands from 250 to 4000 Hz: on top the flat random-incidence absorption coefficient measured with the static turntable and the specular absorption coefficient measured with the rotating turntable climbing above it, with the gap between them shaded as the numerator of Equation 5; below, the resulting scattering coefficient rising from near zero towards 0.84 at 4 kHz" width="88%" />
 
 *Eq. (5) drawn as it is computed. The shaded gap in the upper panel is the
-numerator, $\alpha_{spec} - \alpha_s$: the static pair $(T_1, T_2)$ gives the
+numerator, $\alpha_\mathrm{spec} - \alpha_\mathrm{s}$: the static pair $(T_1, T_2)$ gives the
 lower curve and the rotating pair $(T_3, T_4)$ the upper one, so the whole
 measurement exists to open that gap. The scattering coefficient below climbs
 with frequency because the surface relief is small against the wavelength at
 the bottom of the band ($s \to 0$) and comparable with it at the top
-($s \to 1$). The denominator $1 - \alpha_s$ is the flat lower curve, which is
+($s \to 1$). The denominator $1 - \alpha_\mathrm{s}$ is the flat lower curve, which is
 why an absorbing specimen makes $s$ uncertain.*
 
 <details>
@@ -343,12 +343,12 @@ scattering coefficient of the arrangement itself — the same arithmetic as
 Eq. (5), applied to the pair that carries no specimen:
 
 $$
-s_{base} = 55.3\,\frac{V}{S}\left(\frac{1}{c_3 T_3} - \frac{1}{c_1 T_1}\right)
+s_\mathrm{base} = 55.3\,\frac{V}{S}\left(\frac{1}{c_3 T_3} - \frac{1}{c_1 T_1}\right)
         - 4\,\frac{V}{S}\,(m_3 - m_1).
 $$
 
 The error is assumed to persist when the specimen is present, so ISO 17497-1
-caps $s_{base}$ per one-third-octave band (Table 1) and the arrangement is
+caps $s_\mathrm{base}$ per one-third-octave band (Table 1) and the arrangement is
 disqualified above the cap.
 
 ```python
@@ -371,7 +371,7 @@ materials.check_base_plate_scattering([0.02] * len(materials.BASE_PLATE_BANDS))
 
 **Uncertainty (Annex A).** The six position measurements of each situation
 give a standard uncertainty of its mean reverberation time (Eqs. (A.1) and
-(A.2)); those propagate into $u(\alpha_s)$ and $u(\alpha_{spec})$
+(A.2)); those propagate into $u(\alpha_\mathrm{s})$ and $u(\alpha_\mathrm{spec})$
 (Eqs. (A.3) and (A.4)) and on into $u_s$ (Eq. (A.5)), with the expanded
 uncertainty $U = 2u_s$ at the 95 % level.
 
@@ -407,18 +407,18 @@ print(round(float(materials.scattering_coefficient_uncertainty(
 That last pair of numbers is the practical limit of the method: the same rig
 and the same repeatability give an expanded uncertainty of 0.010 on a
 lightly absorbing specimen and 0.017 once the specimen absorbs half the
-incident energy, because Eq. (5) divides by $1 - \alpha_s$. It is also why
-Clause 6.3.4 asks for $\alpha_s \le 0.50$ in the first place.
+incident energy, because Eq. (5) divides by $1 - \alpha_\mathrm{s}$. It is also why
+Clause 6.3.4 asks for $\alpha_\mathrm{s} \le 0.50$ in the first place.
 
 ### Scattering test-report fiche
 
 `ScatteringResult.report(path)` renders a one-page accredited scattering test
 report (ISO 17497-1): a metadata header (specimen, sample area $S$, room volume
 $V$, test room, climate), the per-one-third-octave table of the random-incidence
-absorption $\alpha_s$ and the scattering coefficient $s$ beside the $s(f)$ curve
+absorption $\alpha_\mathrm{s}$ and the scattering coefficient $s$ beside the $s(f)$ curve
 on a categorical band axis, and a boxed characterisation headline. It is a
 characterisation, so there is no pass/fail verdict. `verbose=True` adds the
-specular absorption $\alpha_{spec}$ column, and `language="es"` renders the
+specular absorption $\alpha_\mathrm{spec}$ column, and `language="es"` renders the
 Spanish fiche. It needs the report extra (`pip install phonometry[report]`).
 
 <ReportPreview
@@ -537,7 +537,7 @@ $\pm 2$ dB in magnitude and $\pm 20°$ in phase over the reference flat surface,
 and the microphones must respond to every conceivable reflection path within
 $\pm 1$ dB and $\pm 10°$ (Clause 7.2). And the **same chain, on the same rig,
 must be run again over a flat reference panel of the same footprint**: that
-second set of levels is what supplies the $d_{ref}$ of the normalised
+second set of levels is what supplies the $d_\mathrm{ref}$ of the normalised
 coefficient $d_\mathrm{norm}$ of Formula (7). A normalised coefficient quoted
 against a reference measured elsewhere is not a normalised coefficient.
 
@@ -907,7 +907,7 @@ surface can.
 A handful of design rules follow directly from the geometry:
 
 - **The design frequency sets the depth.** The deepest well is
-  $d_{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
+  $d_\mathrm{max} = \max(s_n)\,\lambda_0/(2N)$, close to half a wavelength for large
   $N$; halve $f_0$ and the diffuser gets twice as deep. This is the cost that
   the [metadiffuser](/phonometry/materials/diffusers/metadiffusers/) attacks: at 500 Hz an
   $N = 5$ design already calls for wells 27.4 cm deep.
@@ -919,7 +919,7 @@ A handful of design rules follow directly from the geometry:
 - **The well width sets the ceiling.** Each well is a small waveguide; the
   single-plane-wave picture inside it holds only while the width $w$ stays
   below half a wavelength, giving an upper working limit near
-  $f_{max} = c/(2w)$. Narrower wells raise the ceiling but add viscous losses
+  $f_\mathrm{max} = c/(2w)$. Narrower wells raise the ceiling but add viscous losses
   and fins.
 - **Periodicity concentrates, modulation spreads.** Repeating one period
   locks the reflected energy into grating lobes at
@@ -939,7 +939,7 @@ the model reproduces both.
 *The two design rules, drawn on a fine grid rather than at band centres so
 that both are resolved. At $N f_0 = 3500$ Hz every well is a whole number of
 half-wavelengths deep, the phase sequence vanishes, and the panel's predicted
-diffusion falls onto the flat reference. Above $f_{max} = c/(2w) = 1715$ Hz
+diffusion falls onto the flat reference. Above $f_\mathrm{max} = c/(2w) = 1715$ Hz
 the single-plane-wave picture inside a 10 cm well no longer holds, so what the
 model draws there is an extrapolation rather than a prediction.*
 

@@ -323,10 +323,10 @@ detector (the roll-off of a fourth-order Butterworth applied forward and
 backward; the rejection is finite, and the zero-phase pass leaves small
 transients at the record edges).
 
-For an AM tone $A_0 (1 + m \cos(2\pi f_m t)) \cos(2\pi f_c t)$ with $f_m$
+For an AM tone $A_0 (1 + m \cos(2\pi f_\mathrm{m} t)) \cos(2\pi f_\mathrm{c} t)$ with $f_\mathrm{m}$
 on an analysis bin the closed forms are:
 
-| `kind` | mean level | line at $f_m$ | line at $2f_m$ |
+| `kind` | mean level | line at $f_\mathrm{m}$ | line at $2f_m$ |
 |---|---|---|---|
 | `'magnitude'` | $A_0$ | $A_0 m$ | - |
 | `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |

@@ -252,7 +252,7 @@ nothing and costs the band edge.
 
 `fractional_delay` shifts a record by any number of samples, including
 sub-sample amounts, by multiplying the spectrum with the phase ramp
-$e^{-j 2\pi f D/f_s}$: every component is delayed by exactly `D` samples. Two
+$e^{-j 2\pi f D/f_\mathrm{s}}$: every component is delayed by exactly `D` samples. Two
 boundary conventions cover the two use cases:
 
 - `mode="linear"` (default) zero-pads the record past the shift, so samples
@@ -264,7 +264,7 @@ boundary conventions cover the two use cases:
 - `mode="circular"` applies the ramp over the record itself and wraps. For
   periodic records it is exact: a tone centered on a DFT bin delayed by
   `D` samples equals the analytically delayed tone to machine precision,
-  and its phase changes by exactly $-2\pi f D/f_s$ radians.
+  and its phase changes by exactly $-2\pi f D/f_\mathrm{s}$ radians.
 
 ```python
 import numpy as np
@@ -329,7 +329,7 @@ accuracy claims are closed-form, not normative.
 
 - [Time Weighting](/phonometry/signals/levels/time-weighting/): the detector ballistics the tone bursts exercise (IEC 61672-1 Table 4).
 - [Correlation and delay](/phonometry/signals/spectra/correlation-delay/): the alignment work built on the fractional-delay kernel.
-- [Synchronous averaging](/phonometry/signals/spectra/synchronous-averaging/): period alignment with the same band-limited shift when $f_s T$ is not an integer.
+- [Synchronous averaging](/phonometry/signals/spectra/synchronous-averaging/): period alignment with the same band-limited shift when $f_\mathrm{s} T$ is not an integer.
 - [Spectral analysis](/phonometry/signals/spectra/spectral-analysis/): the colored-noise verification and the window metrics.
 - [Room acoustics](/phonometry/buildings/rooms/room-acoustics/): the MLS and exponential-sweep excitations of the family portrait, as ISO 18233 uses them.
 - [System measurement](/phonometry/signals/spectra/system-measurement/): the Golay pair and the shaped sweep, the other two members of the family.

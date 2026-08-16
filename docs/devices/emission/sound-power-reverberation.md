@@ -37,8 +37,8 @@ interior microphones miss. $C_1$ (reference-quantity) and $C_2$
 conditions of 23 °C and 101.325 kPa,
 
 $$
-C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
-C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
 $$
 
 with the speed of sound $c = 20.05\sqrt{273 + \theta}$. The
@@ -96,7 +96,7 @@ rev.plot()   # reverberation-room LW spectrum, LWA in the title (needs matplotli
 
 *The mean room level carried through the absorption-area, Waterhouse and
 meteorological terms of Eq. 20 gives the one-third-octave $L_W(f)$, and the
-A-weighted energy sum across the 21 bands gives the $L_{WA}$ in the title.*
+A-weighted energy sum across the 21 bands gives the $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -158,7 +158,7 @@ either, so an impulsive or single-event source falls outside this guide.
 | `t60` | float or 1D array | s | > 0 | Room reverberation time (scalar broadcasts) |
 | `volume` | float | m³ | > 0 | Room volume $V$ |
 | `surface_area` | float | m² | > 0 | Total room surface $S$ (Waterhouse, $A/S$) |
-| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{WA}$ |
+| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{W\mathrm{A}}$ |
 | `background_levels` | 1D or 2D array | dB | matches `levels` | $K_{1i}$ per microphone position (Eq. 14/15, before the Eq. 16 average; frequency-dependent criterion) |
 | `temperature` | float | °C | default `23.0` | Sets $c$, $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | default `101.325` | Sets $C_1$, $C_2$ |
@@ -196,10 +196,10 @@ names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
 method was used, the direct method using the room equivalent absorption area
 (Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
 per-band table lists the mean room sound-pressure level $L_p$ and the band
-sound-power level $L_W$, and the boxed $L_{WA}$ carries the total $L_W$ and the
+sound-power level $L_W$, and the boxed $L_{W\mathrm{A}}$ carries the total $L_W$ and the
 determination method (the reverberation result has no expanded uncertainty $U$).
 `verbose=True` adds the background correction $K_1$ and, for the direct method,
-the equivalent absorption area $A$ and the Waterhouse boundary correction $C_w$;
+the equivalent absorption area $A$ and the Waterhouse boundary correction $C_\mathrm{w}$;
 the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
 meteorological corrections $C_1$/$C_2$ and the speed of sound, and cites the
 Annex F A-weighting.
@@ -248,21 +248,21 @@ repository. Click the preview to open the PDF:
 
 *Reverberation-room sound power fiche (`ReverberationSoundPowerResult.report`),
 an ISO 3741 precision-grade direct-method determination with the Waterhouse and
-$C_1$/$C_2$ corrections and the boxed $L_{WA}$.*
+$C_1$/$C_2$ corrections and the boxed $L_{W\mathrm{A}}$.*
 
 
 ## See also
 
 - [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured $L_{WA}$ feeds.
+  declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Power by Pressure Methods (ISO 3744 / ISO 3746 / ISO 3745)](sound-power-pressure.md):
   the in-situ enveloping surface and the precision anechoic array.
 - [Sound Power by Intensity Scanning (ISO 9614)](sound-power-intensity.md):
   the routes that tolerate steady background noise.
 - [Room Acoustics](../../buildings/rooms/room-acoustics.md): measuring the reverberation time
   $T_{60}$ that sets the Sabine absorption area.
-- [Levels](../../signals/levels/levels.md): energy averaging and the A-weighting behind $L_{WA}$.
+- [Levels](../../signals/levels/levels.md): energy averaging and the A-weighting behind $L_{W\mathrm{A}}$.
 - [Theory](../../reference/theory/environment-transport.md): the Waterhouse and $C_1$/$C_2$
   derivations.
 - API reference: [`emission.sound_power_reverberation`](https://jmrplens.github.io/phonometry/reference/api/power/sound-power-reverberation/).

@@ -33,8 +33,8 @@ passive medium has $\operatorname{Im}(k) < 0$):
     *Predicting Outdoor Sound* 2e, Eqs. (5.13)-(5.14)). The returned
     equivalent-fluid density and bulk modulus are the surface-normalised
     quantities (they absorb the porosity), so
-    $Z_c = \sqrt{\rho_e K_e}$ and
-    $k = \omega \sqrt{\rho_e / K_e}$ hold for every model.
+    $Z_\mathrm{c} = \sqrt{\rho_\mathrm{e} K_\mathrm{e}}$ and
+    $k = \omega \sqrt{\rho_\mathrm{e} / K_\mathrm{e}}$ hold for every model.
   - the **limp-frame** correction of any of the three rigid-frame models
     (Allard & Atalla, *Propagation of Sound in Porous Media* 2e, Sect. 11.3.4,
     Eqs. (11.53)-(11.55), printed pp. 251-253): a light frame is dragged along
@@ -115,7 +115,7 @@ decoupling_frequency(
 
 Zwikker-Kosten decoupling frequency `Fd` of a porous frame.
 
-$F_d = \sigma \phi^2 / (2 \pi \rho_1)$ (Allard & Atalla 2e,
+$F_\mathrm{d} = \sigma \phi^2 / (2 \pi \rho_1)$ (Allard & Atalla 2e,
 Sect. 11.3.4, printed p. 251; the same closed form as their Eq. (6.90),
 printed p. 126).
 Above `Fd` the visco-inertial coupling between the pore fluid and the
@@ -159,7 +159,7 @@ delany_bazley(
 
 Delany-Bazley one-parameter porous model (power laws in `X`).
 
-$Z_c = \rho c (1 + C_1 X^{-C_2} - j C_3 X^{-C_4})$ and
+$Z_\mathrm{c} = \rho c (1 + C_1 X^{-C_2} - j C_3 X^{-C_4})$ and
 $k = (\omega/c)(1 + C_5 X^{-C_6} - j C_7 X^{-C_8})$ with
 $X = \rho f / \sigma$
 (Mechel 2e Sect. G.11 Eqs. (1)-(2); Bies 5e Eqs. (D.22)-(D.23) with the
@@ -254,22 +254,22 @@ Johnson-Champoux-Allard five-parameter rigid-frame model.
 Effective density (Cox & D'Antonio 3e, Eq. (6.19)):
 
 $$
-\rho_e = \frac{T \rho}{\phi} \left[1 + \frac{\sigma \phi}{j \omega \rho T} \sqrt{1 + \frac{4 j T^2 \eta \rho \omega}{\sigma^2 L^2 \phi^2}} \right]
+\rho_\mathrm{e} = \frac{T \rho}{\phi} \left[1 + \frac{\sigma \phi}{j \omega \rho T} \sqrt{1 + \frac{4 j T^2 \eta \rho \omega}{\sigma^2 L^2 \phi^2}} \right]
 $$
 
 and effective bulk modulus (Eq. (6.20)):
 
 $$
-K_e = \frac{\gamma P_0 / \phi}{\gamma - (\gamma - 1) \left[1 + \frac{8 \eta}{j {L'}^2 \mathrm{Pr}\, \omega \rho} \sqrt{1 + \frac{j \rho \omega \mathrm{Pr}\, {L'}^2}{16 \eta}} \right]^{-1}}
+K_\mathrm{e} = \frac{\gamma P_0 / \phi}{\gamma - (\gamma - 1) \left[1 + \frac{8 \eta}{j {L'}^2 \mathrm{Pr}\, \omega \rho} \sqrt{1 + \frac{j \rho \omega \mathrm{Pr}\, {L'}^2}{16 \eta}} \right]^{-1}}
 $$
 
 with tortuosity `T`, porosity `phi`, viscous/thermal characteristic
-lengths `L` / `L'`; then $Z_c = \sqrt{K_e \rho_e}$ and
-$k = \omega \sqrt{\rho_e / K_e}$ (Eqs. (6.24)-(6.25)). Both
+lengths `L` / `L'`; then $Z_\mathrm{c} = \sqrt{K_\mathrm{e} \rho_\mathrm{e}}$ and
+$k = \omega \sqrt{\rho_\mathrm{e} / K_\mathrm{e}}$ (Eqs. (6.24)-(6.25)). Both
 quantities are surface-normalised (the $1/\phi$ factors are
 included). The model has the exact limits
-$j \omega \rho_e \to \sigma$ as $\omega \to 0$ and
-$\rho_e \to (T \rho / \phi)(1 + (1 - j) \delta_v / L)$ as
+$j \omega \rho_\mathrm{e} \to \sigma$ as $\omega \to 0$ and
+$\rho_\mathrm{e} \to (T \rho / \phi)(1 + (1 - j) \delta_v / L)$ as
 $\omega \to \infty$ (Johnson et al. 1987), pinned in the tests.
 
 **Parameters**
@@ -314,11 +314,11 @@ bulk modulus and a corrected effective density (Allard & Atalla 2e,
 Eqs. (11.53)-(11.55), printed pp. 252-253, after Panneton 2007):
 
 $$
-\rho_{\mathrm{limp}} = \frac{\rho_t \rho_{\mathrm{eq}} - \rho_0^2} {\rho_t + \rho_{\mathrm{eq}} - 2 \rho_0}
+\rho_{\mathrm{limp}} = \frac{\rho_\mathrm{t} \rho_{\mathrm{eq}} - \rho_0^2} {\rho_\mathrm{t} + \rho_{\mathrm{eq}} - 2 \rho_0}
 $$
 
 with `rho_eq` the rigid-frame effective density of *medium*, `rho0`
-the density of the pore fluid and $\rho_t = \rho_1 + \phi \rho_0$
+the density of the pore fluid and $\rho_\mathrm{t} = \rho_1 + \phi \rho_0$
 the apparent total density of the material. What anchors this
 expression is the printed
 equation itself, transcribed term by term; Allard & Atalla tabulate no
@@ -336,7 +336,7 @@ They corroborate the transcription rather than determine it:
 * **low frequency**: since
   $\rho_{\mathrm{eq}} \to \sigma / (j \omega)$ as
   $\omega \to 0$ (Eq. (5.37)),
-  $\rho_{\mathrm{limp}} \to \rho_t$, a finite real density, where
+  $\rho_{\mathrm{limp}} \to \rho_\mathrm{t}$, a finite real density, where
   the rigid-frame model diverges. The rigid frame forbids rigid-body
   motion of the sample; the limp one allows it, which is why the two
   differ mainly
@@ -384,9 +384,9 @@ Whether the limp-frame model may be used, by published rule of thumb.
 Both published criteria compare the bulk modulus of the frame *in vacuum*
 `K_c` with that of the fluid in the pores `K_f` (Allard & Atalla 2e,
 printed pp. 253-254): Beranek (1947) requires
-$\lvert K_c/K_f \rvert < 0.05$, and the frame structural
+$\lvert K_c/K_\mathrm{f} \rvert < 0.05$, and the frame structural
 interaction study of Doutres et al. (2007) relaxes it to
-$\lvert K_c/K_f \rvert < 0.2$. With `K_f` taken as the
+$\lvert K_c/K_\mathrm{f} \rvert < 0.2$. With `K_f` taken as the
 isothermal bulk modulus of air, $P_0 = 101.3$ kPa, the relaxed
 criterion is the book's statement that
 "the limp model is applicable for materials having a bulk modulus lower
@@ -402,7 +402,7 @@ vibrating structure by an air gap behaves limply well above the limit.
 | `criterion` | Key into [`LIMP_FRAME_CRITERIA`](/phonometry/reference/api/materials/porous/#limp_frame_criteria), `"doutres"` (Default, 0,2) or `"beranek"` (0,05). |
 | `fluid_bulk_modulus` | Bulk modulus of the pore fluid `K_f`, in Pa (Default: 101 325, the isothermal value for air). |
 
-**Returns:** `True` when $\lvert K_c/K_f \rvert$ does not exceed the threshold.
+**Returns:** `True` when $\lvert K_c/K_\mathrm{f} \rvert$ does not exceed the threshold.
 
 **Raises**
 
@@ -541,7 +541,7 @@ miki(
 Miki (1990) positive-real modification of the Delany-Bazley model.
 
 In the variable $Y = f / \sigma$ (Miki 1990, Eqs. (30)-(34)):
-$Z_c = \rho c (1 + 0.070 Y^{-0.632} - j 0.107 Y^{-0.632})$ and,
+$Z_\mathrm{c} = \rho c (1 + 0.070 Y^{-0.632} - j 0.107 Y^{-0.632})$ and,
 from the propagation constant $\gamma = \alpha + j \beta$ via
 $k = \beta - j \alpha$,
 $k = (\omega/c)(1 + 0.109 Y^{-0.618} - j 0.160 Y^{-0.618})$. The
@@ -700,11 +700,11 @@ All arrays share the shape of `frequency`. `characteristic_impedance`
 is the complex characteristic impedance `Zc` in Pa s/m as seen from the
 material surface, `wavenumber` the complex wavenumber `k` in rad/m
 ($\operatorname{Im}(k) < 0$ for the $e^{+j \omega t}$
-convention), `effective_density` $= Z_c k / \omega$ and
-`bulk_modulus` $= Z_c \omega / k$ the surface-normalised
+convention), `effective_density` $= Z_\mathrm{c} k / \omega$ and
+`bulk_modulus` $= Z_\mathrm{c} \omega / k$ the surface-normalised
 equivalent-fluid density and bulk modulus, so that
-$Z_c = \sqrt{\rho_e K_e}$ and
-$k = \omega \sqrt{\rho_e / K_e}$ for every model.
+$Z_\mathrm{c} = \sqrt{\rho_\mathrm{e} K_\mathrm{e}}$ and
+$k = \omega \sqrt{\rho_\mathrm{e} / K_\mathrm{e}}$ for every model.
 
 ### PorousMediumResult.normalized_impedance
 

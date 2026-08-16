@@ -12,9 +12,9 @@ open-plan fit-out, and it is *not* what a partition's ``Rw`` describes.
 **The one-dimensional model (Vigran Eqs. (9.14) to (9.20)).** Mechel's
 one-dimensional variant treats the plenum as a duct lined on one side. The
 ceiling on each side has a transmission factor
-:math:`\tau_S = \tau_{S,pl} \, \tau_{S,a}` (plates times the prospective
+:math:`\tau_\mathrm{S} = \tau_\mathrm{S,pl} \, \tau_\mathrm{S,a}` (plates times the prospective
 plenum absorber, Eq. (9.14)); the power injected into the plenum splits, a
-fraction :math:`s_S` heading for the partition, and decays as
+fraction :math:`s_\mathrm{S}` heading for the partition, and decays as
 :math:`\exp(-m x)` with the power attenuation coefficient
 :math:`m = 2 \operatorname{Re}\{\Gamma\} = -2 \operatorname{Im}\{k'\}`
 (Eqs. (9.15) and (9.16)). Integrating over the ceiling length on both sides
@@ -22,61 +22,62 @@ gives
 
 .. math::
 
-   \tau_{cl} = \frac{s_S s_R \tau_S \tau_R L_R}{m_S L_S \, m'_R L_R \, h}
-   \left( 1 - \exp(-\epsilon m_S L_S) \right)
-   \left( 1 - \exp(-\epsilon m'_R L_R) \right) \tag{Eq. 9.18}
+   \tau_\mathrm{cl} = \frac{s_\mathrm{S} s_\mathrm{R} \tau_\mathrm{S} \tau_\mathrm{R}
+   L_\mathrm{R}}{m_\mathrm{S} L_\mathrm{S} \, m'_\mathrm{R} L_\mathrm{R} \, h}
+   \left( 1 - \exp(-\epsilon m_\mathrm{S} L_\mathrm{S}) \right)
+   \left( 1 - \exp(-\epsilon m'_\mathrm{R} L_\mathrm{R}) \right) \tag{Eq. 9.18}
 
 with the receiving-side coefficient increased by the leakage back into the
-room, :math:`m'_R = m_R + s_R \tau_R / h` (Eq. (9.17)). Vigran prints the
+room, :math:`m'_\mathrm{R} = m_\mathrm{R} + s_\mathrm{R} \tau_\mathrm{R} / h` (Eq. (9.17)). Vigran prints the
 exponents with a factor 2 for totally reflecting plenum sidewalls and states
 that totally absorbing ones give the same expression "without the factor 2",
 so the factor is the same :math:`\epsilon` that the compact form carries.
 
 .. warning::
 
-   Vigran prints the **unprimed** :math:`m_R` in that denominator. That is a
+   Vigran prints the **unprimed** :math:`m_\mathrm{R}` in that denominator. That is a
    misprint (see ``docs/ERRATA.md``): the receiving-side integral
-   :math:`\int_0^{L_R} \exp(-\epsilon m'_R x) \, dx =
-   (1 - \exp(-\epsilon m'_R L_R))/(\epsilon m'_R)` carries :math:`m'_R`,
-   exactly as the source-side one carries :math:`m_S`, and the printed
-   reading leaves :math:`\tau_{cl}` unbounded as :math:`m_R \to 0`, where the
+   :math:`\int_0^{L_\mathrm{R}} \exp(-\epsilon m'_\mathrm{R} x) \, dx =
+   (1 - \exp(-\epsilon m'_\mathrm{R} L_\mathrm{R}))/(\epsilon m'_\mathrm{R})` carries :math:`m'_\mathrm{R}`,
+   exactly as the source-side one carries :math:`m_\mathrm{S}`, and the printed
+   reading leaves :math:`\tau_\mathrm{cl}` unbounded as :math:`m_\mathrm{R} \to 0`, where the
    derived reading stays bounded by the leakage term. This module implements
-   the derived :math:`m'_R`.
+   the derived :math:`m'_\mathrm{R}`.
 
-For a plenum with little attenuation on both sides (:math:`m_S L_S \ll 1`
-**and** :math:`m'_R L_R \ll 1`, which needs a fairly insulating ceiling as
-well as a weakly damped plenum, since :math:`m'_R` never falls below
-:math:`s_R \tau_R / h`) and :math:`s_S = s_R = 0.5` it collapses to the
+For a plenum with little attenuation on both sides (:math:`m_\mathrm{S} L_\mathrm{S} \ll 1`
+**and** :math:`m'_\mathrm{R} L_\mathrm{R} \ll 1`, which needs a fairly insulating ceiling as
+well as a weakly damped plenum, since :math:`m'_\mathrm{R}` never falls below
+:math:`s_\mathrm{R} \tau_\mathrm{R} / h`) and :math:`s_\mathrm{S} = s_\mathrm{R} = 0.5` it collapses to the
 result that makes the geometry visible:
 
 .. math::
 
-   \tau_{cl} = \frac{\epsilon^2 \tau_S \tau_R L_R}{4 h} \tag{Eq. 9.19}
+   \tau_\mathrm{cl} = \frac{\epsilon^2 \tau_\mathrm{S} \tau_\mathrm{R} L_\mathrm{R}}{4 h} \tag{Eq. 9.19}
 
-   R_{cl} = R_S + R_R - 10 \log_{10}\!\left[ \frac{\epsilon^2 L_R}{4 h} \right]
+   R_\mathrm{cl} = R_\mathrm{S} + R_\mathrm{R} - 10 \log_{10}\!\left[ \frac{\epsilon^2 L_\mathrm{R}}{4 h} \right]
    \tag{Eq. 9.20}
 
 with :math:`\epsilon = 1` for totally absorbing plenum sidewalls and
 :math:`\epsilon = 2` for totally reflecting ones. Referred to the partition
-area instead of the ceiling, :math:`R_{cl,p} = R_{cl} + 10 \log_{10}(H_S/L_S)`
+area instead of the ceiling, :math:`R_\mathrm{cl,p} = R_\mathrm{cl} + 10 \log_{10}(H_\mathrm{S}/L_\mathrm{S})`
 (Eq. (9.13)). A deep plenum helps (the :math:`-10 \log_{10}` term shrinks), a long
 room hurts, and doubling the tile insulation helps twice over because
-:math:`R_S` and :math:`R_R` both appear.
+:math:`R_\mathrm{S}` and :math:`R_\mathrm{R}` both appear.
 
 **The measured quantity (ISO 140-9:1985 clause 3.3, ISO 10848-2).** A ceiling
-is not rated by :math:`R_{cl}` but by the **normalized ceiling attenuation**
-:math:`D_{n,c} = D - 10 \log_{10}(A/A_0)`, with ``A`` the receiving-room equivalent
+is not rated by :math:`R_\mathrm{cl}` but by the **normalized ceiling attenuation**
+:math:`D_\mathrm{n,c} = D - 10 \log_{10}(A/A_0)`, with ``A`` the receiving-room equivalent
 absorption area and the reference :math:`A_0 = 10` m2. The laboratory has two
 rooms of at least 50 m3 whose volumes differ by at least 10 %, a dividing
 wall tapered to at most 100 mm at the top, and a plenum 650 mm to 760 mm deep
 with one sidewall and both end walls lined; the standard prints the required
-lining absorption :math:`\alpha_s \ge 0.65` at 125 Hz and :math:`\ge 0.80`
+lining absorption :math:`\alpha_\mathrm{s} \ge 0.65` at 125 Hz and :math:`\ge 0.80`
 from 250 Hz to 4000 Hz, and requires :math:`\alpha < 0.10` on the other
 sidewall and on the plenum ceiling. The North American counterpart,
 ASTM E1414, uses :math:`A_0 = 12` m2, so an ASTM value runs about
 :math:`10 \log_{10}(12/10) = 0.79` dB higher than the ISO one.
 
-**Single number.** ISO rates :math:`D_{n,c}` with the ISO 717-1 curve
+**Single number.** ISO rates :math:`D_\mathrm{n,c}` with the ISO 717-1 curve
 (:func:`phonometry.weighted_rating`, giving ``Dn,c,w``); ASTM E1414 rates it
 through ASTM E413 as the **ceiling attenuation class** (CAC). E413 rounds the
 data to the nearest integer (clause 5.2), shifts its reference contour upward in
@@ -92,7 +93,7 @@ the shifted contour at 500 Hz (clause 5.5). See
    (Sections I.21 and I.22) is a figure. The functions here are anchored on the
    closed forms, on the derivation of Eq. (9.18) from the two side integrals,
    and on structural properties that a wrong reading breaks: the bound
-   :math:`\tau_{cl} \le 1`, a bare plenum no worse than the undamped
+   :math:`\tau_\mathrm{cl} \le 1`, a bare plenum no worse than the undamped
    Eq. (9.20) value, and the small-attenuation limit taken where it applies
    rather than only where the Eq. (9.17) leakage term happens to vanish.
    The measurement chain
@@ -158,10 +159,10 @@ _SIDEWALLS: dict[str, float] = {"absorbing": 1.0, "reflecting": 2.0}
 def _require_transmission_factor(tau: np.ndarray) -> None:
     r"""Reject a ceiling/plenum transmission factor above unity.
 
-    :math:`\tau_{cl}` is a ratio of powers referred to the ceiling area, so a
+    :math:`\tau_\mathrm{cl}` is a ratio of powers referred to the ceiling area, so a
     value above 1 means the model has been pushed outside the range where its
     diffuse-field power balance means anything, which happens once the ceiling
-    itself is nearly transparent (roughly :math:`R_S + R_R` below the
+    itself is nearly transparent (roughly :math:`R_\mathrm{S} + R_\mathrm{R}` below the
     geometry term). Failing loudly beats returning a negative sound reduction
     index.
     """
@@ -178,7 +179,7 @@ def _require_transmission_factor(tau: np.ndarray) -> None:
 def _require_split(value: float, name: str) -> float:
     r"""Require a power-split ratio in ``(0, 1]`` (Vigran Section 9.2.3.2).
 
-    :math:`s_S` and :math:`s_R` are the fraction of the power injected into
+    :math:`s_\mathrm{S}` and :math:`s_\mathrm{R}` are the fraction of the power injected into
     the plenum that heads towards the partition, so a value above 1 is not a
     split.
     """
@@ -197,7 +198,7 @@ def normalized_ceiling_attenuation(
 ) -> np.ndarray:
     r"""Normalized ceiling attenuation ``Dn,c`` (ISO 140-9:1985, clause 3.3).
 
-    :math:`D_{n,c} = (L_1 - L_2) - 10 \log_{10}(A/A_0)`, the level difference
+    :math:`D_\mathrm{n,c} = (L_1 - L_2) - 10 \log_{10}(A/A_0)`, the level difference
     between two rooms sharing a common ceiling plenum, normalized to a
     reference equivalent absorption area. ISO 140-9 and ISO 10848-2 use
     :math:`A_0 = 10` m2; ASTM E1414 uses :math:`A_0 = 12` m2, which makes an
@@ -342,9 +343,9 @@ class PlenumFlankingResult:
     :ivar reduction_index_source: Source-side ceiling ``RS`` per band, in dB.
     :ivar reduction_index_receiving: Receiving-side ceiling ``RR`` per band, in dB.
     :ivar geometry_term: The geometry penalty
-        :math:`10 \log_{10}[\epsilon^2 L_R/(4h)]`, in dB, or ``None`` for the
+        :math:`10 \log_{10}[\epsilon^2 L_\mathrm{R}/(4h)]`, in dB, or ``None`` for the
         attenuated model, whose penalty is per band.
-    :ivar penalty: The per-band difference :math:`R_S + R_R - R_{cl}`, in dB:
+    :ivar penalty: The per-band difference :math:`R_\mathrm{S} + R_\mathrm{R} - R_\mathrm{cl}`, in dB:
         what the plenum takes off the sum of the two ceilings.
     :ivar model: ``"undamped"`` (Eq. (9.20)) or ``"attenuated"`` (Eq. (9.18)).
     :ivar epsilon: The sidewall constant ``eps`` (1 absorbing, 2 reflecting).
@@ -395,18 +396,18 @@ def plenum_flanking_reduction_index(
     Eqs. (9.18)-(9.20)).
 
     With no attenuation coefficients this is the compact undamped form
-    :math:`R_{cl} = R_S + R_R - 10 \log_{10}[\epsilon^2 L_R/(4h)]` (Eq. (9.20)).
-    Supplying the plenum power attenuation coefficients :math:`m_S` and
-    :math:`m_R` (Eq. (9.16), :math:`m = -2 \operatorname{Im}\{k'\}` of the
+    :math:`R_\mathrm{cl} = R_\mathrm{S} + R_\mathrm{R} - 10 \log_{10}[\epsilon^2 L_\mathrm{R}/(4h)]` (Eq. (9.20)).
+    Supplying the plenum power attenuation coefficients :math:`m_\mathrm{S}` and
+    :math:`m_\mathrm{R}` (Eq. (9.16), :math:`m = -2 \operatorname{Im}\{k'\}` of the
     lined duct) switches to the full Eq. (9.18), whose receiving side carries
-    the leakage term :math:`m'_R = m_R + s_R \tau_R/h` (Eq. (9.17)) in both
+    the leakage term :math:`m'_\mathrm{R} = m_\mathrm{R} + s_\mathrm{R} \tau_\mathrm{R}/h` (Eq. (9.17)) in both
     the exponent and the denominator. Vigran prints the denominator with the
-    unprimed :math:`m_R`; that is a misprint and the derived reading is
+    unprimed :math:`m_\mathrm{R}`; that is a misprint and the derived reading is
     implemented here (see ``docs/ERRATA.md``).
 
-    Because :math:`m'_R` never falls below :math:`s_R \tau_R / h`, the
+    Because :math:`m'_\mathrm{R}` never falls below :math:`s_\mathrm{R} \tau_\mathrm{R} / h`, the
     attenuated form approaches Eq. (9.20) only when the ceiling is insulating
-    enough for :math:`m'_R L_R` to be small as well; at :math:`R = 20` dB
+    enough for :math:`m'_\mathrm{R} L_\mathrm{R}` to be small as well; at :math:`R = 20` dB
     with the geometry of Vigran's own example the leakage term is still worth
     about 0.24 dB.
 
@@ -523,7 +524,7 @@ def partition_referenced_reduction_index(
     r"""Refer ``Rcl`` to the partition area instead of the ceiling
     (Eq. (9.13)).
 
-    :math:`R_{cl,p} = R_{cl} + 10 \log_{10}(H_S/L_S)`, with ``HS`` the height and
+    :math:`R_\mathrm{cl,p} = R_\mathrm{cl} + 10 \log_{10}(H_\mathrm{S}/L_\mathrm{S})`, with ``HS`` the height and
     ``LS`` the length of the sending room. Referring every path to one common
     area (the partition) is what lets the ceiling path be added to the direct
     path as transmission factors.

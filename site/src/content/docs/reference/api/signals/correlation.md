@@ -260,7 +260,7 @@ Auto- or cross-correlation estimate (B&P Sections 5.1, 8.4, 11.4).
 | `kind` | `'autocorrelation'` or `'cross-correlation'`. |
 | `fs` | Sample rate, in Hz. |
 | `n_samples` | Record length `N`, in samples. |
-| `duration` | Record length $T = N/f_s$, in seconds. |
+| `duration` | Record length $T = N/f_\mathrm{s}$, in seconds. |
 
 ### CorrelationResult.plot()
 
@@ -347,7 +347,7 @@ the Welch-averaged GCC).
 
 Sub-sample accuracy presumes the IR is band-limited below Nyquist;
 the synthetic fractional-delay tests pin the achievable accuracy
-(about 1e-3 samples for a $0.4 f_s$ band-limited pulse at the
+(about 1e-3 samples for a $0.4 f_\mathrm{s}$ band-limited pulse at the
 default `upsample=8`).
 
 **Parameters**

@@ -42,7 +42,7 @@ Con el micrófono de referencia sobre una placa en el suelo a la distancia
 horizontal $R_0 = H + D/2$ (altura de buje $H$, diámetro de rotor $D$), la
 distancia oblicua al centro del rotor es $R_1 = \sqrt{H^2 + R_0^2}$ y el nivel
 de potencia acústica aparente es
-$L_{WA,i} = L_{p,i} - 6 + 10\log_{10}(4\pi R_1^2/S_0)$ por banda
+$L_{W\mathrm{A},i} = L_{p,i} - 6 + 10\log_{10}(4\pi R_1^2/S_0)$ por banda
 ($S_0 = 1\ \text{m}^2$), sumado energéticamente sobre las bandas. Los −6 dB
 dan cuenta de la duplicación de presión en la placa del suelo.
 
@@ -98,7 +98,7 @@ la máquina, no para promediarse con ella.
 
 ### Por qué «aparente»
 
-$L_{WA}$ se escribe como un nivel de potencia acústica, pero no lo es en el
+$L_{W\mathrm{A}}$ se escribe como un nivel de potencia acústica, pero no lo es en el
 sentido de la ISO 3744 de muestrear el campo de presión sobre una
 superficie envolvente. La norma reduce toda la máquina a una fuente puntual
 equivalente en el centro del rotor y pregunta qué potencia necesitaría esa
@@ -112,7 +112,7 @@ del patrón en planta existen precisamente para documentar cómo varía la
 emisión alrededor de la máquina. Las potencias aparentes de aerogeneradores
 distintos son comparables porque la geometría escala con la máquina
 ($R_0 = H + D/2$, de modo que todo rotor se ve bajo un ángulo parecido), que
-es el objetivo de la definición, pero un $L_{WA}$ introducido en una
+es el objetivo de la definición, pero un $L_{W\mathrm{A}}$ introducido en una
 predicción ISO 9613-2 arrastra consigo su sesgo de sotavento. La placa en el
 suelo, a su vez, es la razón de los 6 dB restados: una cápsula tumbada sobre
 una placa dura recibe una reflexión perfectamente coherente (duplicación de
@@ -125,7 +125,7 @@ suelo](/phonometry/es/environment/propagation/outdoor-propagation/)).
 
 La emisión de ruido de un aerogenerador crece con la velocidad del viento
 hacia la potencia nominal, así que un número único no significaría nada sin
-su punto de operación: la IEC 61400-11 declara $L_{WA}$ *en función de la
+su punto de operación: la IEC 61400-11 declara $L_{W\mathrm{A}}$ *en función de la
 velocidad del viento*.
 
 **Cómo se llena un intervalo.** Sonido y viento se registran en promedios
@@ -148,8 +148,8 @@ a 10 m de altura para una máquina grande).
 **Por qué la abscisa se declara dos veces.** Por comparabilidad con condiciones
 de licencia y ediciones anteriores, la Fórmula (29) también convierte cada
 resultado a la velocidad de viento a 10 m de altura sobre una **longitud de
-rugosidad de referencia** $z_{0ref} = 0{,}05$ m (un perfil de viento
-logarítmico), dando $L_{WA,10m}$ a velocidades enteras a 10 m sea cual sea el
+rugosidad de referencia** $z_{0\mathrm{ref}} = 0{,}05$ m (un perfil de viento
+logarítmico), dando $L_{W\mathrm{A},10\mathrm{m}}$ a velocidades enteras a 10 m sea cual sea el
 terreno real del emplazamiento. La biblioteca implementa las magnitudes en forma
 cerrada de esta cadena (distancia oblicua, potencia aparente por banda,
 audibilidad tonal); la clasificación en intervalos, el promediado y la maquinaria
@@ -161,7 +161,7 @@ alcance.
 *La magnitud que declara esta norma es una curva, no un número: la misma máquina
 da 98,6 dB(A) a 4 m/s y 109,9 dB(A) a 12 m/s. La forma es la estrategia de
 control de la máquina, más pronunciada donde el rotor acelera y plana una vez a
-potencia nominal, así que citar un $L_{WA}$ único sin su velocidad de viento no
+potencia nominal, así que citar un $L_{W\mathrm{A}}$ único sin su velocidad de viento no
 dice nada. El intervalo tachado y el marcado con asterisco son la propia
 contabilidad de la norma: por debajo de un margen total-menos-fondo de 3 dB el
 intervalo se anula, y entre 3 y 6 dB se declara con una marca. El eje superior
@@ -198,7 +198,7 @@ plt.show()
 
 A partir de un espectro de banda estrecha (resolución 1–2 Hz), las líneas en la
 **banda crítica** alrededor del tono,
-$\mathrm{CBW} = 25 + 75\,[\,1 + 1{,}4\,(f_c/1000)^2\,]^{0{,}69}$
+$\mathrm{CBW} = 25 + 75\,[\,1 + 1{,}4\,(f_\mathrm{c}/1000)^2\,]^{0{,}69}$
 Hz, se clasifican en ruido de enmascaramiento y líneas de tono (la media
 energética del 70 % más bajo, los criterios de +6 dB; las líneas de tono
 deben además quedar a menos de 10 dB de la línea *más alta* por encima del
@@ -216,11 +216,11 @@ tipo y la banda *no está centrada en el tono*, razón por la que un
 fórmula impresa más arriba. Para un aerogenerador eso no es un caso raro: los
 armónicos del paso de pala y los tonos de multiplicadora a baja velocidad viven
 exactamente ahí. El nivel
-de enmascaramiento $L_{pn}$ sigue la Fórmula 31, la tonalidad es
-$\Delta L_{tn} = L_{pt} - L_{pn}$ y la audibilidad tonal es
-$\Delta L_a = \Delta L_{tn} - L_a$ con
-$L_a = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, declarada cuando
-$\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
+de enmascaramiento $L_{p\mathrm{n}}$ sigue la Fórmula 31, la tonalidad es
+$\Delta L_\mathrm{tn} = L_{p\mathrm{t}} - L_{p\mathrm{n}}$ y la audibilidad tonal es
+$\Delta L_\mathrm{a} = \Delta L_\mathrm{tn} - L_\mathrm{a}$ con
+$L_\mathrm{a} = -2 - \log_{10}\!\big[1 + (f/502)^{2{,}5}\big]$, declarada cuando
+$\Delta L_\mathrm{a} \ge -3\ \text{dB}$ y audible cuando $\Delta L_\mathrm{a} > 0$.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/wind_turbine_audibility_criterion_es.svg" alt="Dos paneles frente a la frecuencia del tono en eje logarítmico de 20 Hz a 10 kHz. Izquierda: el ancho de banda crítico de la IEC 61400-11, plano cerca de 100 Hz en las bandas bajas y medias y abriéndose con fuerza por encima de 500 Hz hasta 2 kHz de ancho a 10 kHz, con la banda fija de baja frecuencia de 20 a 120 Hz del apartado 9.5.3 dibujada como un segmento plano aparte sobre el rango de candidatos de 20 a 70 Hz y el ancho de banda de la Tabla C.1 de ISO 1996-2 dibujado como línea escalonada a trazos para contrastar. Derecha: el criterio de audibilidad La, que baja de menos 2 dB a baja frecuencia hasta menos 4,5 dB a 5 kHz, redibujado como la tonalidad que un tono tiene que alcanzar para ser audible y para ser declarable, de modo que un tono de 100 Hz necesita alrededor de medio decibelio más de emergencia que uno de 1 kHz" width="88%" />
 
@@ -228,7 +228,7 @@ $\Delta L_a \ge -3\ \text{dB}$ y audible cuando $\Delta L_a > 0$.
 banda de Zwicker de la IEC 61400-11 es la que declara
 `WindTurbineTonalityResult.critical_bandwidth` (117,3 Hz para el tono de 500 Hz
 de la ficha de abajo), mientras que `environment.critical_bandwidth` es la banda
-de la **Tabla C.1 de ISO 1996-2**, 100 Hz hasta 500 Hz y el 20 % de $f_c$ por
+de la **Tabla C.1 de ISO 1996-2**, 100 Hz hasta 500 Hz y el 20 % de $f_\mathrm{c}$ por
 encima, que usa la vía de audibilidad tonal de ISO en la página de niveles
 ambientales. No son intercambiables. Derecha: el criterio es casi plano por
 debajo de 500 Hz y luego se estrecha, así que un tono de baja frecuencia se juzga
@@ -270,10 +270,10 @@ plt.show()
 
 *Lo que el método compara de verdad. La línea de 200 Hz sobresale 22 dB sobre
 el fondo conformado, pero el veredicto no es ese número: dentro de la banda
-crítica de 102,9 Hz las líneas clasificadas como tono suman $L_{pt}$ = 62,2 dB
-y el ruido de enmascaramiento $L_{pn}$ = 55,6 dB, así que la tonalidad es
-6,6 dB. Solo al restar el criterio de audibilidad $L_a = -2{,}0$ dB a esta
-frecuencia aparece la magnitud declarable, $\Delta L_a$ = 8,6 dB, muy por
+crítica de 102,9 Hz las líneas clasificadas como tono suman $L_{p\mathrm{t}}$ = 62,2 dB
+y el ruido de enmascaramiento $L_{p\mathrm{n}}$ = 55,6 dB, así que la tonalidad es
+6,6 dB. Solo al restar el criterio de audibilidad $L_\mathrm{a} = -2{,}0$ dB a esta
+frecuencia aparece la magnitud declarable, $\Delta L_\mathrm{a}$ = 8,6 dB, muy por
 encima de los 0 dB que hacen audible el tono. Lo que lo fija es la banda
 sombreada, no la altura de la línea.*
 
@@ -314,26 +314,26 @@ res.plot()   # espectro + banda crítica + nivel de enmascaramiento (requiere ma
 `has_identified_tone`. Cuando el candidato no supera el cribado de 9.5.2 o
 ninguna línea se clasifica como «tono», `has_identified_tone` es `False`: los
 campos numéricos son valores de respaldo fuera de la norma y esos espectros
-deben **excluirse** del promediado energético de $\Delta L_a$ sobre los
+deben **excluirse** del promediado energético de $\Delta L_\mathrm{a}$ sobre los
 espectros de un intervalo de velocidad de viento (9.5.1); `is_audible` también
-exige un tono identificado. La frecuencia del tono y el criterio $L_a$ se
+exige un tono identificado. La frecuencia del tono y el criterio $L_\mathrm{a}$ se
 anclan a la
 línea de tono clasificada más alta, no al candidato sondeado. La fórmula de
 audibilidad coincide con la del Anexo C de la ISO 1996-2; lo específico de la
 IEC 61400-11 es la determinación de los niveles de tono y enmascaramiento y la
 banda crítica de Zwicker a partir del espectro. La IEC 61400-11 se detiene en
-$\Delta L_a$ y no prescribe ningún ajuste, así que qué mapeo da el ajuste de
-valoración $K_t$ depende de la edición bajo la que se haga la evaluación. El
+$\Delta L_\mathrm{a}$ y no prescribe ningún ajuste, así que qué mapeo da el ajuste de
+valoración $K_\mathrm{t}$ depende de la edición bajo la que se haga la evaluación. El
 promedio energético de 9.5.1 sobre los espectros de un intervalo de velocidad
 de viento es una audibilidad *media*, que es la magnitud para la que se
 escribió la Tabla J.1 de la ISO 1996-2:2017:
 [`tonal_adjustment_from_mean_audibility`](/phonometry/es/environment/assessment/environmental-levels/),
 entero de 0 a 6 dB (o `coarse=True` para la escala 0/3/6 de su nota). La ley a
 tramos (C.4)-(C.6) de `tonal_adjustment` es el mapeo del Anexo C de 2007 y se
-aplica al $\Delta L_{ta}$ de un único espectro, y las dos difieren entre 1 y
-2 dB con la misma entrada: $\Delta L = 5$ dB da $K_t = 3$ por la Tabla J.1 y
+aplica al $\Delta L_\mathrm{ta}$ de un único espectro, y las dos difieren entre 1 y
+2 dB con la misma entrada: $\Delta L = 5$ dB da $K_\mathrm{t} = 3$ por la Tabla J.1 y
 1,0 dB por el Anexo C, y $\Delta L = 9$ dB da 4 dB y 5,0 dB. También difiere la
-notación: el $\Delta L_a$ de esta página es el $\Delta L_{ta}$ de aquella, y
+notación: el $\Delta L_\mathrm{a}$ de esta página es el $\Delta L_\mathrm{ta}$ de aquella, y
 las dos impresiones llevan el criterio con signos opuestos.
 
 ### Informe de evaluación (`.report()`)
@@ -344,17 +344,17 @@ ambiental, según la **IEC 61400-11:2012+A1:2018** (apartados 9.5.2 a 9.5.8):
 una línea con la base normativa, un bloque opcional de metadatos (fuente o
 situación, cliente, posición de medida, instrumentación y fecha), una tabla de
 análisis en la banda crítica (frecuencia del tono, ancho de banda crítica,
-nivel del tono $L_{pt}$, nivel de ruido de enmascaramiento $L_{pn}$, tonalidad
-$\Delta L_{tn}$, criterio de audibilidad $L_a$ y audibilidad tonal
-$\Delta L_a$) junto al gráfico del espectro de banda estrecha con la banda
+nivel del tono $L_{p\mathrm{t}}$, nivel de ruido de enmascaramiento $L_{p\mathrm{n}}$, tonalidad
+$\Delta L_\mathrm{tn}$, criterio de audibilidad $L_\mathrm{a}$ y audibilidad tonal
+$\Delta L_\mathrm{a}$) junto al gráfico del espectro de banda estrecha con la banda
 crítica, el nivel de enmascaramiento y el tono marcados, la audibilidad tonal
-$\Delta L_a$ enmarcada junto con la frecuencia del tono y la decisión de
+$\Delta L_\mathrm{a}$ enmarcada junto con la frecuencia del tono y la decisión de
 audibilidad, una fila opcional de veredicto CUMPLE/NO CUMPLE y una nota sobre cómo
-se construye $\Delta L_a$, y un pie con el descargo fijo.
+se construye $\Delta L_\mathrm{a}$, y un pie con el descargo fijo.
 
 Usa el mismo contenedor `ReportMetadata` y el mismo motor de renderizado que la
 [ficha de sonoridad ISO 532-1](/phonometry/es/perception/psychoacoustics/loudness/#informe-de-iso-532-1-report);
-un `requirement` indicado se interpreta como la audibilidad tonal $\Delta L_a$
+un `requirement` indicado se interpreta como la audibilidad tonal $\Delta L_\mathrm{a}$
 máxima admisible en dB (un tono menos audible cumple). El renderizado necesita
 reportlab y, para la figura que incrusta la ficha, matplotlib (`pip install
 "phonometry[report,plot]"`); solo se admite `engine="reportlab"`. La ficha se
@@ -406,14 +406,14 @@ posición de medida están dibujadas.
 La propia campaña de medida: el promediado de 10 s, la clasificación en
 intervalos de velocidad de viento de 0,5 m/s con sus 10 + 10 periodos, la
 corrección por fondo, la interpolación a los centros de intervalo, la
-conversión de la Fórmula (29) a $z_{0ref} = 0{,}05$ m y el balance de
+conversión de la Fórmula (29) a $z_{0\mathrm{ref}} = 0{,}05$ m y el balance de
 incertidumbre del apartado 9.3 operan todos sobre campañas completas y son
 cosa del usuario. Tampoco está implementada la vía de declaración de la IEC TS
 61400-14, que convierte un lote de máquinas medidas en el número único que
 recibe la administración competente. Y dos cosas que un lector interesado en
 aerogeneradores viene a buscar a menudo quedan fuera de la IEC 61400-11 por
 completo: la **modulación de amplitud** (el «silbido», que queda englobado en
-el $L_{WA}$ y que esta norma no valora en ningún sitio) y el **infrasonido**.
+el $L_{W\mathrm{A}}$ y que esta norma no valora en ningún sitio) y el **infrasonido**.
 Las dos figuran en el 7.2.1 como medidas *opcionales* sin método de valoración
 asociado, así que su evaluación recae en las guías nacionales; la vía
 psicoacústica hacia ellas empieza en [Intensidad de fluctuación y
@@ -425,7 +425,7 @@ para el nivel de infrasonido con ponderación G.
 
 ## Véase también
 
-- [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): el ajuste del nivel de evaluación de ISO 1996-2 que alimenta el $\Delta L_a$ de esta página.
+- [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/): el ajuste del nivel de evaluación de ISO 1996-2 que alimenta el $\Delta L_\mathrm{a}$ de esta página.
 - [Audibilidad de tonos](/phonometry/es/perception/psychoacoustics/tone-audibility/): la misma idea de audibilidad tonal fuera del contexto de los aerogeneradores.
-- [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/): la cadena que lleva el $L_{WA}$ del rotor hasta una vivienda.
+- [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/): la cadena que lleva el $L_{W\mathrm{A}}$ del rotor hasta una vivienda.
 - Referencia de la API: [`environment.sources.wind_turbine`](/phonometry/es/reference/api/environment/wind-turbine/).

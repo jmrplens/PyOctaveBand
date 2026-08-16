@@ -15,7 +15,7 @@ finite-difference method", *Geophysics* 51(4), 889-901 (1986):
   centres of the acoustic solver (:class:`~phonometry.simulation.FDTD2D`)
   and the velocities live on the cell faces;
 * the Courant stability condition
-  :math:`c_P \Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2} < 1`
+  :math:`c_\mathrm{P} \Delta t \sqrt{1/\Delta x^2 + 1/\Delta y^2} < 1`
   (Eqs. 6-7), which depends only on the P-wave speed, and the numerical
   dispersion relations of Eqs. 13-14 with the 10-cells-per-wavelength rule;
 * liquids as the ``c_s = 0`` limit: shear-free cells propagate the acoustic
@@ -44,11 +44,11 @@ random numbers and single-threaded numpy execution, so identical inputs give
 bit-identical outputs on the same platform.
 
 Validated against analytic oracles: P- and S-wave times of flight
-:math:`c_P = \sqrt{(\lambda + 2\mu) / \rho}` and
-:math:`c_S = \sqrt{\mu / \rho}`, the
+:math:`c_\mathrm{P} = \sqrt{(\lambda + 2\mu) / \rho}` and
+:math:`c_\mathrm{S} = \sqrt{\mu / \rho}`, the
 Rayleigh-wave speed from the exact characteristic equation (Cremer, Heckl &
 Petersson 2005, Eq. 3.149), the Kirchhoff thin-plate flexural dispersion
-:math:`c_B = (B'/m'')^{1/4} \sqrt{\omega}` in its :math:`\lambda_B \gg h`
+:math:`c_\mathrm{B} = (B'/m'')^{1/4} \sqrt{\omega}` in its :math:`\lambda_\mathrm{B} \gg h`
 domain
 (Eqs. 3.83-3.89), the normal-incidence fluid-solid reflection coefficient
 :math:`(Z_2 - Z_1)/(Z_2 + Z_1)`, the normal-incidence mass law of a thin
@@ -60,7 +60,7 @@ Layered Media I* (Springer 1990), Eqs. 4.2.22-4.2.26 (with the shear-wave
 mode conversion active), to the Scholte interface-wave speed from the exact
 characteristic equation of Eq. 4.4.20 (see :func:`scholte_speed`), and to
 the exact three-media transmission of an immersed plate (B&G Eqs. 2.4.10,
-2.4.14) including its first thickness resonance :math:`f_1 = c_P / (2 h)`
+2.4.14) including its first thickness resonance :math:`f_1 = c_\mathrm{P} / (2 h)`
 (Eq. 2.4.19), following the fluid-solid finite-difference benchmark of
 van Vossen, Robertsson & Chapman, *Geophysics* 67(2), 618-624 (2002).
 """
@@ -184,14 +184,14 @@ class Material:
     r"""An isotropic elastic medium as measurable wave speeds and density.
 
     The three numbers the solver's material maps are built from: the
-    compressional speed :math:`c_p = \sqrt{(\lambda + 2\mu) / \rho}`, the
-    shear
-    speed :math:`c_s = \sqrt{\mu / \rho}` and the density ``rho``.
+    compressional speed :math:`c_\mathrm{P} = \sqrt{(\lambda + 2\mu) / \rho}`,
+    the shear
+    speed :math:`c_\mathrm{S} = \sqrt{\mu / \rho}` and the density ``rho``.
     ``c_s = 0``
     marks a fluid (the acoustic ``mu = 0`` limit of the elastic scheme,
     Virieux 1986), so the same dataclass names both fluids and solids.
-    Every material must satisfy :math:`c_p^2 \ge 2 c_s^2` (non-negative
-    first
+    Every material must satisfy :math:`c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2`
+    (non-negative first
     Lame parameter), the constructor bound of :class:`ElasticFDTD2D`.
 
     The module constants :data:`AIR`, :data:`WATER`, :data:`STEEL`,
@@ -269,8 +269,8 @@ def scholte_speed(
     sound speed and the solid shear speed, and solves the exact
     characteristic equation of Brekhovskikh & Godin, *Acoustics of Layered
     Media I* (1990), Eq. 4.4.20, written in the notation of Eq. 4.4.18
-    (:math:`q = c_S^2/c_P^2`, :math:`r = c_S^2/c^2`,
-    :math:`s = v^2/c_S^2`,
+    (:math:`q = c_\mathrm{S}^2/c_\mathrm{P}^2`, :math:`r = c_\mathrm{S}^2/c^2`,
+    :math:`s = v^2/c_\mathrm{S}^2`,
     :math:`m = \rho_{\mathrm{solid}}/\rho_{\mathrm{fluid}}`):
 
     .. math::
@@ -283,7 +283,7 @@ def scholte_speed(
     root hugs the fluid speed (water over steel: 1479.6 m/s, 0.027 % below
     ``c``) while for soft sediments it drops well below it, which is why
     measured seabed interface waves probe the sediment shear speed
-    (:math:`v \approx 0.85 c_S` rule, Jensen et al. Section 5.10.5).
+    (:math:`v \approx 0.85 c_\mathrm{S}` rule, Jensen et al. Section 5.10.5).
 
     :param fluid: Fluid half-space: a :class:`Material` with ``c_s = 0``
         (or a ``(c_p, 0.0, rho)`` triple).
@@ -371,7 +371,8 @@ class ElasticFDTD2D:
     selected sides into traction-free surfaces via stress imaging and sponge
     layers into absorbing ones. Material maps are given as the measurable
     wave speeds and converted internally to the Lame parameters
-    :math:`\mu = \rho c_s^2` and :math:`\lambda = \rho (c_p^2 - 2 c_s^2)`;
+    :math:`\mu = \rho c_\mathrm{S}^2` and
+    :math:`\lambda = \rho (c_\mathrm{P}^2 - 2 c_\mathrm{S}^2)`;
     density is
     arithmetically averaged onto the faces and ``mu`` harmonically averaged
     onto the corners (zero whenever any neighbour is a fluid), the Moczo
@@ -382,12 +383,13 @@ class ElasticFDTD2D:
         explicit ``shape`` is also accepted.
     :param c_s: S-wave speed map [m/s]; scalar or ``(ny, nx)`` array.
         ``c_s = 0`` marks a fluid cell (the acoustic limit); every cell must
-        satisfy :math:`c_p^2 \ge 2 c_s^2` (non-negative ``lambda``).
+        satisfy :math:`c_\mathrm{P}^2 \ge 2 c_\mathrm{S}^2` (non-negative
+        ``lambda``).
     :param dx: Grid spacing [m] (square cells).
     :param rho: Density map [kg/m3]; scalar or ``(ny, nx)`` array.
     :param cfl: Courant number
-        :math:`C_N = c_{p,\max}\, \Delta t \sqrt{2} / \Delta x`; the scheme
-        is stable for :math:`C_N < 1` (Virieux Eqs. 6-7, a bound on ``c_P``
+        :math:`C_\mathrm{N} = c_{\mathrm{p},\max}\, \Delta t \sqrt{2} / \Delta x`; the scheme
+        is stable for :math:`C_\mathrm{N} < 1` (Virieux Eqs. 6-7, a bound on ``c_P``
         alone, independent of ``c_S`` and of the Poisson ratio) and values
         in ``(0, 1)`` are accepted. The default 0.6 keeps a wide stability
         margin with moderate numerical dispersion.
@@ -1177,7 +1179,7 @@ def elastic_fdtd_simulation(
     The grid covers ``(nx * dx, ny * dx)`` metres; a cell index ``(ix, iy)``
     maps to the physical cell centre ``((ix + 0.5) * dx, (iy + 0.5) * dx)``.
     Resolve at least 10 cells per shortest wavelength
-    (:math:`\Delta x \le c_{s,\min} / (10 f)` with ``c_s_min`` the smallest
+    (:math:`\Delta x \le c_{\mathrm{s},\min} / (10 f)` with ``c_s_min`` the smallest
     non-zero
     ``c_s`` over the solid cells, since the S wave is always the shortest;
     a wholly fluid map falls back to the acoustic rule on the smallest
@@ -1198,7 +1200,7 @@ def elastic_fdtd_simulation(
     :param rho: Density map [kg/m3]; scalar or ``(ny, nx)`` array.
     :param shape: Grid shape ``(ny, nx)``, required when ``c_p`` is scalar.
     :param cfl: Courant number in ``(0, 1)`` (Virieux Eqs. 6-7); the time
-        step is :math:`\Delta t = C_N\, \Delta x / (c_{p,\max} \sqrt{2})`.
+        step is :math:`\Delta t = C_\mathrm{N}\, \Delta x / (c_{\mathrm{p},\max} \sqrt{2})`.
         Default 0.6.
     :param recording: What the run records (:class:`ElasticRecording`): the
         probe cells and their fields, and the snapshot cadence and field.

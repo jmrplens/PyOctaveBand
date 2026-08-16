@@ -162,7 +162,7 @@ def generate_envelope_spectrum(output_dir: str) -> None:
     ax.legend(loc="upper right", fontsize=9)
     ax.text(0.985, 0.70,
             "the carrier is at 1 kHz; its amplitude modulation\n"
-            "appears as one line at exactly $f_m$",
+            "appears as one line at exactly $f_\\mathrm{m}$",
             transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
             color=COLOR_FG)
     plt.tight_layout()

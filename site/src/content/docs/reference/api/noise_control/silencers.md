@@ -29,7 +29,7 @@ and a **side branch** of acoustic impedance `Z_b` is the shunt element
 (Bies Eq. (8.144))
 
 $$
-\begin{bmatrix} 1 & 0 \\ 1 / Z_b & 1 \end{bmatrix}.
+\begin{bmatrix} 1 & 0 \\ 1 / Z_\mathrm{b} & 1 \end{bmatrix}.
 $$
 
 **Transmission loss** from the compound matrix `T` (Munjal, *Acoustics of
@@ -56,13 +56,13 @@ termination. The **insertion loss** for a source of internal impedance
 attenuation of inserting the silencer in place of a direct connection,
 
 $$
-\mathrm{IL} = 20 \log_{10} \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}} {Z_s + Z_r} \right\rvert,
+\mathrm{IL} = 20 \log_{10} \left\lvert \frac{T_{11} Z_\mathrm{r} + T_{12} + Z_\mathrm{s} Z_\mathrm{r} T_{21} + Z_\mathrm{s} T_{22}} {Z_\mathrm{s} + Z_\mathrm{r}} \right\rvert,
 $$
 
 which is `0` when the silencer reduces to a through connection
 ($T = I$)
 and, for equal inlet/outlet areas, equals the transmission loss for the
-anechoic reference $Z_s = Z_r = \rho c / S$ (with unequal areas the
+anechoic reference $Z_\mathrm{s} = Z_\mathrm{r} = \rho c / S$ (with unequal areas the
 direct
 connection contains the same area jump, so its mismatch loss cancels from
 the insertion loss but not from the transmission loss).
@@ -254,10 +254,10 @@ helmholtz_impedance(
 
 Acoustic impedance of a Helmholtz side branch (Bies Eq. (8.152)).
 
-$Z = R + j(\rho \omega l_e / S_{\mathrm{neck}} - \rho c^2 / (\omega V))$ with acoustic
-mass $\rho l_e / S_{\mathrm{neck}}$ and compliance
+$Z = R + j(\rho \omega l_\mathrm{e} / S_{\mathrm{neck}} - \rho c^2 / (\omega V))$ with acoustic
+mass $\rho l_\mathrm{e} / S_{\mathrm{neck}}$ and compliance
 $V / (\rho c^2)$; the resonance
-$f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}$
+$f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_\mathrm{e} V)}$
 (Bies Eq. (8.46)) is where the
 reactance vanishes, leaving $Z = R$: a lossless branch
 (`resistance = 0`) shorts the duct there, and a resistive one presents
@@ -312,7 +312,7 @@ Side-branch Helmholtz resonator on a duct (Bies Eqs. (8.144), (8.152)).
 | `source_impedance` | Optional source impedance `Z_s`, Pa s/m3. |
 | `radiation_impedance` | Optional radiation impedance `Z_r`, Pa s/m3. |
 
-**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds $f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_e V)}$.
+**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds $f_0 = (c / 2 \pi) \sqrt{S_{\mathrm{neck}} / (l_\mathrm{e} V)}$.
 
 ## insertion_loss
 
@@ -332,7 +332,7 @@ length) connection between a source of internal impedance `Z_s` and a
 radiation (termination) impedance `Z_r`:
 
 $$
-\mathrm{IL} = 20 \log_{10} \left\lvert \frac{T_{11} Z_r + T_{12} + Z_s Z_r T_{21} + Z_s T_{22}} {Z_s + Z_r} \right\rvert.
+\mathrm{IL} = 20 \log_{10} \left\lvert \frac{T_{11} Z_\mathrm{r} + T_{12} + Z_\mathrm{s} Z_\mathrm{r} T_{21} + Z_\mathrm{s} T_{22}} {Z_\mathrm{s} + Z_\mathrm{r}} \right\rvert.
 $$
 
 **Parameters**
@@ -409,8 +409,8 @@ quarter_wave_impedance(
 
 Acoustic impedance of a closed quarter-wave side branch (Bies Eq. (8.146)).
 
-$Z = -j (\rho c / S) \cot(k l_e)$; the reactance vanishes at
-$l_e = \lambda / 4$ ($f = c / 4 l_e$), where the closed tube
+$Z = -j (\rho c / S) \cot(k l_\mathrm{e})$; the reactance vanishes at
+$l_\mathrm{e} = \lambda / 4$ ($f = c / 4 l_\mathrm{e}$), where the closed tube
 presents a
 pressure node and shorts the duct.
 
@@ -457,7 +457,7 @@ Closed quarter-wave side-branch tube on a duct (Bies Eqs. (8.144), (8.146)).
 | `source_impedance` | Optional source impedance `Z_s`, Pa s/m3. |
 | `radiation_impedance` | Optional radiation impedance `Z_r`, Pa s/m3. |
 
-**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds the odd multiples of $f = c / (4 l_e)$ within the frequency range.
+**Returns:** A [`ReactiveSilencerResult`](/phonometry/reference/api/noise_control/silencers/#reactivesilencerresult); `resonances` holds the odd multiples of $f = c / (4 l_\mathrm{e})$ within the frequency range.
 
 ## ReactiveSilencerResult
 

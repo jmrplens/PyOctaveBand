@@ -155,9 +155,9 @@ for block in sf.blocks("measurement.wav", blocksize=256, overlap=0):
 ## Acumular un nivel entre bloques
 
 La tarea de streaming más común es justamente la que las trampas del streaming
-dan por fácil: el $L_{eq}$, o el espectro de bandas, de una grabación que no
+dan por fácil: el $L_\mathrm{eq}$, o el espectro de bandas, de una grabación que no
 cabe en memoria. Y *es* fácil, y además es exacta y no aproximada, porque el
-$L_{eq}$ no tiene constante de tiempo ni detector: solo una suma de cuadrados y
+$L_\mathrm{eq}$ no tiene constante de tiempo ni detector: solo una suma de cuadrados y
 un recuento de muestras.
 
 ```python
@@ -247,7 +247,7 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
   una operación ligeramente distinta: las salidas ya no se concatenan en el
   resultado continuo. Por eso `detrend` debe ser `False` en modo con estado.
 - **No toda métrica admite streaming.** Las métricas de energía se acumulan
-  limpiamente (un $L_{eq}$ acumulado es una suma de energía acumulada), pero
+  limpiamente (un $L_\mathrm{eq}$ acumulado es una suma de energía acumulada), pero
   los estadísticos de rango no: el $L_{90}$ de una grabación no es ninguna
   combinación de los $L_{90}$ por bloque. Procesa la *envolvente* en
   streaming y calcula los percentiles una vez, sobre el resultado conjunto.
@@ -255,7 +255,7 @@ $y[n-1]$, que es el mismo valor que la API funcional devuelve como
   empieza en reposo, así que el filtro se asienta durante los primeros
   instantes igual que en una sola pasada. Cuánto dura se deduce del ancho de
   banda: una banda se asienta en unas pocas veces $1/B$, y con
-  $B = 0{,}231\,f_m$ para tercios de octava eso es alrededor de un segundo a
+  $B = 0{,}231\,f_\mathrm{m}$ para tercios de octava eso es alrededor de un segundo a
   12,5 Hz, una décima de segundo a 125 Hz y trece milisegundos a 1 kHz (la
   regla de duración del registro de [Bancos de
   filtros](/phonometry/es/signals/filters/filter-banks/#cuánto-tiene-que-durar-el-registro)).
@@ -364,7 +364,7 @@ Fast de 125 ms, un bloque de 20 a 100 ms sigue la envolvente fielmente; bloques
 mucho más largos que $\tau$ convierten la indicación en un muestreo disperso de
 ella. El máximo acumulado de arriba existe por lo mismo: un pico que ocurra a
 mitad de bloque no aparece nunca en las muestras mostradas, así que el
-$L_{AFmax}$ hay que acumularlo como el máximo *dentro* de cada bloque. Y los
+$L_\mathrm{AFmax}$ hay que acumularlo como el máximo *dentro* de cada bloque. Y los
 primeros bloques contienen la propia rampa de ataque del detector ($5\tau$:
 0,6 s en Fast, 5 s en Slow), que hay que excluir de cualquier máximo o
 percentil.

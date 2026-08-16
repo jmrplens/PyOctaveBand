@@ -87,8 +87,8 @@ informa la etapa de tercios de octava del paso 5, y un fichero a 44,1 kHz no
 deja banda alguna por encima de 22 kHz sobre la que sostener la ponderación A de
 clase 1 del paso 3 cerca de 16 kHz. **Elige la ganancia a partir del evento más
 ruidoso que la medida tenga que poder demostrar**, dejando unos 12 dB de margen
-por encima de su pico: el $L_{Cpeak}$ del paso 4 lee el verdadero pico entre
-muestras, y una sola racha saturada lo invalida, y con él el $L_{Aeq}$.
+por encima de su pico: el $L_\mathrm{Cpeak}$ del paso 4 lee el verdadero pico entre
+muestras, y una sola racha saturada lo invalida, y con él el $L_\mathrm{Aeq}$.
 
 Hay otras dos decisiones que son de la sesión y no del grabador. Graba el tono
 del calibrador por esa misma cadena bloqueada inmediatamente antes *y*
@@ -102,7 +102,7 @@ Una hoja de campo que merece copiarse:
 
 - Ganancia fijada a mano y anotada; AGC, limitador y supresión de ruido
   desactivados.
-- PCM sin comprimir, 24 bits, $f_s \ge 48$ kHz, un canal por micrófono.
+- PCM sin comprimir, 24 bits, $f_\mathrm{s} \ge 48$ kHz, un canal por micrófono.
 - Margen de pico de unos 12 dB sobre el evento más ruidoso previsto.
 - Tono de calibrador antes y después, misma ganancia, misma cadena, misma
   sesión.
@@ -132,8 +132,8 @@ del calibrador, la regla del formato entero y el modo digital dBFS que se usa
 cuando no existe referencia física. Sin ningún calibrador, el factor puede
 calcularse a partir de la sensibilidad nominal de la cadena en vez de medirse
 — un micrófono de sensibilidad nominal $M$ mV/Pa a través de un preamplificador
-de ganancia lineal $G$ hacia un convertidor cuyo fondo de escala es $V_{FS}$
-voltios da $S = V_{FS} / (M G / 1000)$ pascales por unidad digital —, pero un
+de ganancia lineal $G$ hacia un convertidor cuyo fondo de escala es $V_\mathrm{FS}$
+voltios da $S = V_\mathrm{FS} / (M G / 1000)$ pascales por unidad digital —, pero un
 factor nominal arrastra la tolerancia de la hoja de características y no los ±0,4 dB de un
 calibrador de clase 1, así que no puede informarse como una medición calibrada.
 
@@ -143,7 +143,7 @@ El sonómetro nunca muestra la presión en bruto. La señal pasa primero por la
 **ponderación frecuencial A** (la curva de respuesta del oído de
 IEC 61672-1), se eleva al cuadrado y se suaviza con el **detector
 exponencial Fast** (constante de tiempo de 125 ms). El resultado es el nivel
-móvil que sigue la pantalla de un sonómetro, $L_{AF}(t)$:
+móvil que sigue la pantalla de un sonómetro, $L_\mathrm{AF}(t)$:
 
 ```python
 pressure = cal * recording                          # unidades digitales -> Pa
@@ -167,7 +167,7 @@ diferencian en un solo número, la constante de tiempo, y por eso Fast atrapa un
 evento que Slow suaviza hasta borrarlo. Rara vez escribirás esta cadena a mano:
 todas las funciones de nivel del paso siguiente aplican la ponderación
 frecuencial internamente, y los niveles percentiles reconstruyen por ti esta
-envolvente Fast. Las métricas de energía ($L_{eq}$, SEL) integran directamente
+envolvente Fast. Las métricas de energía ($L_\mathrm{eq}$, SEL) integran directamente
 la señal ponderada al cuadrado, sin balística ninguna — y por eso no muestran
 ningún movimiento de aguja al que seguir. La cadena se muestra aquí porque *es*
 la pantalla del sonómetro.
@@ -181,7 +181,7 @@ IEC 61672-1.
 ## 4. Integra: los números que da un sonómetro
 
 Una sola pasada sobre la grabación calibrada produce las lecturas estándar:
-el **$L_{Aeq}$** equivalente en energía, los **niveles percentiles** que
+el **$L_\mathrm{Aeq}$** equivalente en energía, los **niveles percentiles** que
 describen cómo fluctuó el nivel ($L_{90}$ es el fondo, $L_{10}$ los eventos),
 el **nivel de
 exposición sonora** que normaliza el evento a un segundo, y el **pico** con
@@ -204,10 +204,10 @@ Fíjate en la aritmética que codifican los números. El segundo del evento mide
 evento aporta $1 \times 10^{8{,}00}$ y el fondo
 $9 \times 10^{5{,}50} = 2{,}9 \times 10^{6}$: una razón de unos 35:1, o 15,5 dB.
 La ventaja de 25 dB del evento gana a los 9,5 dB ($10\log_{10}9$) que el fondo
-recupera por duración, y por eso el $L_{Aeq}$ de 10 s de 70,2 dB queda solo
+recupera por duración, y por eso el $L_\mathrm{Aeq}$ de 10 s de 70,2 dB queda solo
 0,1 dB por encima de los 70,0 dB que daría el evento solo repartido sobre esos
-mismos 10 s: el fondo es casi invisible en el promedio energético. El $L_{AE}$
-es ese $L_{Aeq}$ más $10\log_{10}(10\ \mathrm{s}/1\ \mathrm{s}) = 10$ dB, toda
+mismos 10 s: el fondo es casi invisible en el promedio energético. El $L_{\mathrm{A}E}$
+es ese $L_\mathrm{Aeq}$ más $10\log_{10}(10\ \mathrm{s}/1\ \mathrm{s}) = 10$ dB, toda
 la energía comprimida en un segundo. Los percentiles se leen al revés: el evento
 ocupa exactamente el 10 % del registro, así que sube el $L_{10}$ a 78,0 dB y
 deja el $L_{90}$ en 54,9 dB, el nivel de fondo.
@@ -215,7 +215,7 @@ deja el $L_{90}$ en 54,9 dB, el nivel de fondo.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/slm_level_track_es.svg" alt="Historial de nivel ponderado A con respuesta Fast de la grabación de diez segundos de esta página, que sube desde unos 55 dB de fondo rosa hasta 80 dB durante el evento de un segundo en el segundo cuatro, con líneas horizontales en LAeq 70,2 dB, L10 78,0 dB, L50 55,1 dB y L90 54,9 dB, el segundo del evento sombreado, y una anotación que dice LAE 80,2 dB, toda la energía del evento comprimida en un segundo" width="88%" />
 
 *Las lecturas de este paso dibujadas sobre la grabación que las produjo: el
-segundo del evento sube el $L_{Aeq}$ y el $L_{10}$, y deja el $L_{50}$ y el
+segundo del evento sube el $L_\mathrm{Aeq}$ y el $L_{10}$, y deja el $L_{50}$ y el
 $L_{90}$ sobre el fondo.*
 
 <details>
@@ -244,8 +244,8 @@ plt.show()
 
 Guía de fondo:
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/), que
-añade el nivel máximo con ponderación temporal $L_{AFmax}$ que da esta misma
-traza `laf_t`, la dosis de ruido y los espectrogramas de octava; el $L_{den}$ y
+añade el nivel máximo con ponderación temporal $L_\mathrm{AFmax}$ que da esta misma
+traza `laf_t`, la dosis de ruido y los espectrogramas de octava; el $L_\mathrm{den}$ y
 los niveles de evaluación continúan en
 [Niveles ambientales](/phonometry/es/environment/assessment/environmental-levels/).
 
@@ -269,7 +269,7 @@ print(dict(zip(bands, np.round(spl, 1))))
 
 Estos son **niveles de banda sin ponderar (Z)**: `octave_filter` se ejecutó
 sobre `recording` y no sobre la señal `weighted` del paso 3, así que su suma
-energética reproduce el $L_{eq}$ sin ponderar y no el $L_{Aeq}$ del paso 4. Esa
+energética reproduce el $L_\mathrm{eq}$ sin ponderar y no el $L_\mathrm{Aeq}$ del paso 4. Esa
 suma es la comprobación de coherencia que merece la pena hacer una vez en cada
 medición:
 
@@ -394,7 +394,7 @@ explica por qué esa misma diferencia es el término de deriva del balance de
 incertidumbre.
 
 Aprende la huella del fallo que el nivel de banda ancha esconde. La saturación
-apenas mueve el $L_{Aeq}$ (recortar duramente un tono de 1 kHz al 80 % de su
+apenas mueve el $L_\mathrm{Aeq}$ (recortar duramente un tono de 1 kHz al 80 % de su
 pico cuesta 0,9 dB) mientras inyecta una escalera de armónicos impares que sube
 la banda de tercio de octava de 3,15 kHz en 37 dB, la de 5 kHz en 37 dB y la de
 8 kHz en 25 dB. Un espectro de tercios de octava con picos regularmente
@@ -410,7 +410,7 @@ comprobación (b).
 <ScopeClaim status="covered" label="Cubierto">
 Esta página compone etapas ya implementadas en otras guías en la cadena que
 describe IEC 61672-1:2013: la ponderación frecuencial A y la ponderación
-temporal exponencial Fast, el $L_{Aeq}$, los niveles percentiles, el nivel de
+temporal exponencial Fast, el $L_\mathrm{Aeq}$, los niveles percentiles, el nivel de
 exposición sonora y el pico con ponderación C, los filtros de banda de octava
 de IEC 61260-1:2014 de `octave_filter`, y los límites de aceptación de clase
 de la Tabla 3 (ponderación) y la Tabla 1 (filtro) que comprueban
@@ -439,7 +439,7 @@ de calibración](/phonometry/es/signals/metrology/calibration/) para lo que
 El sonómetro construido aquí es el tronco; el resto del núcleo crece de él.
 
 - [Incertidumbre de medida (GUM y Monte Carlo)](/phonometry/es/signals/metrology/gum-uncertainty/):
-  acompaña de una incertidumbre el $L_{Aeq}$ que acabas de calcular, término de
+  acompaña de una incertidumbre el $L_\mathrm{Aeq}$ que acabas de calcular, término de
   calibración incluido.
 - [Análisis espectral calibrado](/phonometry/es/signals/spectra/spectral-analysis/):
   cuando las bandas se quedan cortas, la PSD de Welch con intervalos de

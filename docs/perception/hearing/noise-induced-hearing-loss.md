@@ -21,12 +21,12 @@ of the excess of the noise exposure level over a frequency-dependent cut-off
 $L_0$ (ISO 1999 clause 6.3.1, Formula 2, Table 1):
 
 $$
-N_{50} = \left[u + v\,\log_{10}\!\frac{t}{t_0}\right](L_{EX,8h} - L_0)^2,
+N_{50} = \left[u + v\,\log_{10}\!\frac{t}{t_0}\right](L_\mathrm{EX,8h} - L_0)^2,
 $$
 
 with $t$ the exposure in years and $t_0 = 1$ year; below $L_0$ the effect is
 zero. A population **fractile** follows from two half-Gaussians whose spreads
-$d_u$ (worse than the median) and $d_l$ (better) are given by Formulae 6/7 and
+$d_\mathrm{u}$ (worse than the median) and $d_\mathrm{l}$ (better) are given by Formulae 6/7 and
 Table 3: $N_{50} + z\,d$ with $z$ the standard-normal quantile, clamped at
 zero (clause 6.3.2).
 
@@ -84,7 +84,7 @@ The notch at 3 kHz to 4 kHz, with partial recovery at 6 kHz, is the signature
 of noise damage and the reason audiometric surveillance tests those
 frequencies. It comes out of the model rather than being imposed on it: the
 cut-off level $L_0$ and the coefficients $u$, $v$ of Table 1 are lowest where
-the ear is most vulnerable, so the same $L_{EX,8h}$ buys far more shift at
+the ear is most vulnerable, so the same $L_\mathrm{EX,8h}$ buys far more shift at
 4 kHz than at 500 Hz.
 
 **Test-report fiche.** `NiptsResult.report(path)` renders the one-page
@@ -94,11 +94,11 @@ metadata header (company, worker or group, workplace, date of assessment), a
 table of the median $N_{50}$ and the fractile NIPTS at the six audiometric
 frequencies beside the spectrum plot with its fractile band, and the boxed
 shift averaged over the 2/3/4 kHz hearing-handicap set together with the
-exposure conditions — $L_{EX,8h}$, the duration in years and the population
+exposure conditions — $L_\mathrm{EX,8h}$, the duration in years and the population
 percentage $Q$. Two notes keep it honest and both are printed on the fiche:
 the values are a statistical prediction for the exposed population, not
 anyone's audiogram, and ISO 1999 leaves the choice of handicap frequencies to
-the user. `verbose=True` adds the $d_u$/$d_l$ spread columns; a `requirement`
+the user. `verbose=True` adds the $d_\mathrm{u}$/$d_\mathrm{l}$ spread columns; a `requirement`
 in the metadata is read as the maximum acceptable representative NIPTS and adds
 a PASS/FAIL row, so a *smaller* shift passes. Rendering needs reportlab and
 matplotlib (`pip install "phonometry[report,plot]"`), only
@@ -234,7 +234,7 @@ table has three columns — the age component $H$, the noise component $N$ and
 the combined $H'$ at each audiometric frequency — beside the three-curve plot,
 and the boxed value is the threshold averaged over the 2/3/4 kHz
 hearing-handicap set, printed with the listener and exposure conditions (age
-and sex, $L_{EX,8h}$ over the exposure years, and the population percentage
+and sex, $L_\mathrm{EX,8h}$ over the exposure years, and the population percentage
 $Q$). One note is specific to this fiche: the age component is database A
 evaluated from ISO 7029:2017, whose values differ from the illustrative
 Table A.3 selection of ISO 1999, which derives from an earlier edition.
@@ -261,7 +261,7 @@ res.report(
 ## See also
 
 - [Occupational noise exposure](occupational-exposure.md): the
-  ISO 9612 survey that produces the $L_{EX,8h}$ this model consumes, and the
+  ISO 9612 survey that produces the $L_\mathrm{EX,8h}$ this model consumes, and the
   uncertainty that comes with it.
 - [Hearing threshold](hearing-threshold.md): the ISO 7029 age
   component $H$ this model adds the noise component to, and the ISO 389-7 zero

@@ -72,17 +72,17 @@ martillo es una masa de 0,5 kg que cae desde 40 mm, de modo que llega a
 $v_\text{h} = \sqrt{2gh} = 0{,}886\ \text{m/s}$, diez veces por segundo. Si el impacto
 fuese corto frente a los 0,1 s entre golpes, la cantidad de movimiento fijaría
 por sí sola la fuerza y daría el espectro de líneas $|F_n| = 2 m v_\text{h} / T_i$ y
-la fuerza cuadrática media por banda $F_\text{rms}^2 = 3{,}9 B$ con la que se
+la fuerza cuadrática media por banda $F_\mathrm{rms}^2 = 3{,}9 B$ con la que se
 reducen habitualmente las medidas ISO 10140 sobre hormigón.
 
 Los suelos reales se deforman. El martillo, la rigidez de contacto $K$ que
-comprime y la impedancia de punto de excitación del suelo $Z_\text{dp}$ forman
+comprime y la impedancia de punto de excitación del suelo $Z_\mathrm{dp}$ forman
 un sistema masa-resorte-amortiguador cuyo impulso se divide en dos casos:
 
-- **sobrecrítico**, $K m \ge 4 Z_\text{dp}^2$: un único impulso positivo, sin
+- **sobrecrítico**, $K m \ge 4 Z_\mathrm{dp}^2$: un único impulso positivo, sin
   rebote. Es el caso de una superficie de paso ligera (tablero de partículas,
   OSB), donde el espectro tiende a $|F_n|_\text{lower} = m v_\text{h}/T_i$;
-- **subcrítico**, $K m < 4 Z_\text{dp}^2$: el martillo rebota y solo cuenta el
+- **subcrítico**, $K m < 4 Z_\mathrm{dp}^2$: el martillo rebota y solo cuenta el
   primer lóbulo positivo. Es el caso de una losa de hormigón o una solera,
   donde el espectro queda a menos de 1 dB de
   $|F_n|_\text{upper} = 2 m v_\text{h}/T_i$ por debajo de 4 kHz y la estimación de
@@ -94,13 +94,13 @@ puede comparar sin más con uno sobre hormigón. Por encima de la frecuencia de
 corte
 
 $$
-f_\text{co} = \frac{1}{2\pi}\sqrt{\frac{K}{m}}\quad\text{(subcrítico)},
+f_\mathrm{co} = \frac{1}{2\pi}\sqrt{\frac{K}{m}}\quad\text{(subcrítico)},
 \qquad
-f_\text{co} = \frac{1}{2\pi}\left[\frac{K}{2Z_\text{dp}} - \sqrt{\left(\frac{K}{2Z_\text{dp}}\right)^2 - \frac{K}{m}}\right]\quad\text{(sobrecrítico)},
+f_\mathrm{co} = \frac{1}{2\pi}\left[\frac{K}{2Z_\mathrm{dp}} - \sqrt{\left(\frac{K}{2Z_\mathrm{dp}}\right)^2 - \frac{K}{m}}\right]\quad\text{(sobrecrítico)},
 $$
 
 la fuerza decae, y por encima de la frecuencia límite
-$f_\text{limit} = Z_\text{dp}/(2\pi m)$ es la impedancia de masa del propio
+$f_\mathrm{limit} = Z_\mathrm{dp}/(2\pi m)$ es la impedancia de masa del propio
 martillo, y no el suelo, la que limita la potencia inyectada.
 
 ```python
@@ -136,7 +136,7 @@ el rango de la acústica de la edificación, con su corte en 6948 Hz y su
 frecuencia límite del martillo en 120 kHz — las dos muy fuera de lo que se
 valora. Sobre el tablero de partículas de 22 mm la superficie cede, el martillo
 no rebota (**sobrecrítico**) y las dos frecuencias se desploman hasta la mitad
-del rango: $f_\text{co}$ = 589 Hz y $f_\text{limit}$ = 555 Hz, así que el
+del rango: $f_\mathrm{co}$ = 589 Hz y $f_\mathrm{limit}$ = 555 Hz, así que el
 espectro se dobla hacia la asíntota inferior $mv_\text{h}/T_i$ justo donde cae
 una banda valorada. Las dos asíntotas están separadas 6,0 dB en valor cuadrático
 medio, y ese salto es toda la razón por la que un nivel de máquina de impactos
@@ -183,10 +183,10 @@ $$
 
 y todo el diseño se reduce a un número, la frecuencia de corte del propio
 revestimiento, fijada por su rigidez de contacto $K = E \pi r^2 / d$ con el
-radio del martillo $r = 15$ mm. Por debajo de $f_\text{co}$ el revestimiento no
+radio del martillo $r = 15$ mm. Por debajo de $f_\mathrm{co}$ el revestimiento no
 hace nada; por encima, la mejora sube 12 dB por octava. Dos rectas son
 entonces una estimación utilizable, y engrosar un revestimiento homogéneo baja
-$f_\text{co}$ y compra mejora en todo lo que hay por encima.
+$f_\mathrm{co}$ y compra mejora en todo lo que hay por encima.
 
 Un detalle decide si los números sirven. La máquina de impactos excita un
 espectro de **líneas**, en múltiplos de la cadencia de 10 impactos por
@@ -194,7 +194,7 @@ segundo, así que la fórmula de arriba habla de una sola componente de Fourier;
 el valor por banda es el cociente de las fuerzas cuadráticas medias sobre las
 líneas que caen dentro de la banda. La diferencia no es cosmética: la
 transformada del modelo tiene ceros exactos en los múltiplos impares de
-$f_\text{co}$, de modo que una frecuencia central de banda que caiga sobre uno
+$f_\mathrm{co}$, de modo que una frecuencia central de banda que caiga sobre uno
 de ellos se lee decenas de dB alta. Con la frecuencia de corte de 100 Hz de
 abajo, la línea suelta de 500 Hz da 66,8 dB frente a una estimación de diseño
 de 27,9 dB, mientras que el valor por banda es 33,3 dB. `improvement` es el
@@ -204,11 +204,11 @@ ceros donde les corresponde.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/soft_covering_prediction_es.svg" alt="Mejora prevista del aislamiento a ruido de impactos de dos revestimientos de suelo blandos sobre una losa de hormigón de 140 mm: un revestimiento rígido de PVC cuya frecuencia de corte de 2318 Hz lo deja inútil en todo el rango de edificación, y un revestimiento con soporte elástico cuya frecuencia de corte de 100 Hz da 70 dB a 5 kHz, cada uno frente a su estimación de dos rectas de 12 dB por octava" width="80%" />
 
 *Dos revestimientos de 5 mm sobre la misma losa, que solo se diferencian en el
-módulo, y toda la distancia entre ellos es $f_\text{co}$. El PVC rígido la sitúa
+módulo, y toda la distancia entre ellos es $f_\mathrm{co}$. El PVC rígido la sitúa
 en 2318 Hz, por encima de casi todo el rango de valoración, así que a 3150 Hz
 todavía vale 3,4 dB y no compra nada donde vive el ruido de pisadas; el de
 soporte elástico, con 100 Hz, ya vale 17,0 dB a 250 Hz y llega a 69,6 dB a
-5 kHz. Por encima de $f_\text{co}$ ambos suben a 12 dB por octava, y la
+5 kHz. Por encima de $f_\mathrm{co}$ ambos suben a 12 dB por octava, y la
 construcción punteada de dos rectas sigue los valores por banda dentro de unos
 3 dB salvo alrededor de los ceros de la transformada, donde la banda de 315 Hz
 queda 7,8 dB alta.*
@@ -287,7 +287,7 @@ se aplica es una pregunta sobre el amortiguamiento, no sobre la capa:
 | --- | --- | --- |
 | `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | resultado de placa infinita de Cremer; soleras de asfalto y suelos flotantes secos, cuyas pérdidas internas bastan para comportarse como placas infinitas (fórmula C.3 de ISO 12354-2). La deducción se declara válida en $f_0 < f < 4f_0$, así que la rama muy por encima de la resonancia es una extrapolación |
 | `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | soleras de mortero de cemento y de sulfato de calcio, cuyo bajo factor de pérdidas las convierte en placas finitas con campo reverberante de flexión (fórmula C.1) |
-| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | superficie de paso ligera, donde la impedancia del martillo ya no es despreciable; tiende a 18 dB por octava |
+| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\mathrm{limit})^2]$ | superficie de paso ligera, donde la impedancia del martillo ya no es despreciable; tiende a 18 dB por octava |
 
 Las tres leyes están escritas para $f > f_0$, y la biblioteca las recorta a cero
 en la resonancia y por debajo de ella. Ese recorte es un convenio, no un
@@ -296,7 +296,7 @@ amplifica, y los suelos medidos caen ahí entre unos $-5$ dB y $0$ dB — el
 *peor que la desnuda en $f_0$* de la introducción, que ningún modelo de esta
 página reproduce. Mientras $f_0$ quede por debajo del rango valorado la
 diferencia es inocua, pero una capa rígida o una solera ligera que sitúe $f_0$
-cerca de 100 Hz produce un $\Delta L_w$ optimista justo en la banda que decide
+cerca de 100 Hz produce un $\Delta L_\mathrm{w}$ optimista justo en la banda que decide
 la valoración. Comprueba dónde cae $f_0$ antes de fiarte del número.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_es.svg" alt="Mejora del aislamiento a ruido de impactos de una solera flotante de 35 mm y 73,5 kg por metro cuadrado sobre una capa elástica de 8 meganewton por metro cúbico: nada por debajo de la resonancia masa-resorte de 52,8 Hz y después la ley 30 lg de EN 12354-2 alcanzando 59 dB a 5 kHz, frente a la ley 40 lg de Cremer, más pronunciada, y a la rama de 18 dB por octava que incluye la impedancia del martillo de la máquina de impactos" width="80%" />
@@ -364,7 +364,7 @@ double_floating_floor_resonances(7.25e6, 12.78, 7.25e6, 12.78)  # (74, 194) Hz
 
 Las magnitudes globales salen directamente de esos mismos dos datos, así que
 un suelo flotante se puede dimensionar sin dibujar un solo espectro:
-$\Delta L_w = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB para una solera de mortero
+$\Delta L_\mathrm{w} = 13\log_{10} m' - 14{,}2\log_{10} s' + 20{,}8$ dB para una solera de mortero
 de cemento (fórmula C.4) y el ajuste más pronunciado de la fórmula (C.5) para
 asfalto y suelos secos. Soleras más pesadas y capas más blandas puntúan mejor,
 y ambas estimaciones están deliberadamente del lado de la seguridad.
@@ -408,7 +408,7 @@ resonancia unas mil veces menor.
 
 La tabla D.1 lee entonces la mejora ponderada en $f_0$, redondeada a la banda
 de tercio de octava en la que cae. Por debajo de 200 Hz la capa adicional ayuda,
-en $74{,}4 - 20\log_{10} f_0 - R_w/2$ dB, y cuanto mejor sea la pared desnuda menos
+en $74{,}4 - 20\log_{10} f_0 - R_\mathrm{w}/2$ dB, y cuanto mejor sea la pared desnuda menos
 hay que ganar. De 200 Hz hacia arriba cuesta: 1 dB a 200 Hz bajando hasta
 10 dB de 630 Hz a 1600 Hz, y recuperando a 5 dB por encima. Llevar la
 resonancia bien por debajo del rango de interés es, por tanto, todo el
@@ -460,7 +460,7 @@ $30\lg\sqrt{2} = 4{,}5$ dB con la ley de 30 lg y 6,0 dB con la de 40 lg. La
 enseña qué hace la placa de carga y por qué es como es.
 
 **La ley en serie lleva una condición impresa debajo.** A la Fórmula (C.6),
-$s'_\text{tot} = (\sum 1/s'_i)^{-1}$, le sigue literalmente esto: solo se
+$s'_\mathrm{tot} = (\sum 1/s'_i)^{-1}$, le sigue literalmente esto: solo se
 sostiene si cada capa elástica cubre toda la superficie del suelo sin
 separaciones ni cortes, por ejemplo por tuberías de calefacción o de
 abastecimiento de agua o por dispositivos eléctricos. Las instalaciones que
@@ -512,9 +512,9 @@ ISO 12354-2:2017, cuyos 21 valores impresos, de 0,0 dB a 50 Hz a 59,3 dB a
 5 kHz, la biblioteca reproduce con la precisión impresa de 0,1 dB.
 
 De ese anclaje en la tabla G.4 conviene saber tres cosas. Su columna se rotula
-$\Delta L_\text{situ}$, la mejora *in situ*, y sirve de sustituto de la
+$\Delta L_\mathrm{situ}$, la mejora *in situ*, y sirve de sustituto de la
 $\Delta L$ de laboratorio solo porque la fórmula (4) del apartado 4.2.2.1
-declara $\Delta L_\text{situ} = \Delta L$ sin más. La resonancia
+declara $\Delta L_\mathrm{situ} = \Delta L$ sin más. La resonancia
 $f_0 = 52{,}8$ Hz es un *dato de entrada* del ejemplo, impreso en los datos de
 construcción del apartado G.1.1 y repetido en el recuadro bajo la tabla, no un
 valor deducido de la retícula. Y el 0,0 dB inicial a 50 Hz exige un recorte
@@ -522,7 +522,7 @@ por debajo de $f_0$ que ninguna fórmula impresa establece: la fórmula (C.1)
 está escrita como $\Delta L = 30\log_{10}(f/f_0)$ sin rango de validez alguno, y la
 única condición impresa en todo el documento es el informal «for $f > f_0$»
 de ese mismo recuadro. La tabla L.4 de ISO 12354-1:2017 imprime los mismos 21
-números como $\Delta R_\text{d,situ}$, lo que confirma la transcripción en un
+números como $\Delta R_\mathrm{d,situ}$, lo que confirma la transcripción en un
 segundo documento publicado, pero su propio recuadro dice que la columna
 procede de «ISO 12354-2:2017, Formula (C.1)» con los mismos $m'$, $s'$ y
 $f_0$, así que es el mismo cálculo vuelto a publicar y no uno independiente.
@@ -578,7 +578,7 @@ caucho) no las cubre ninguno de estos modelos.
 - [Rigidez dinámica de materiales resilientes (EN 29052-1)](/phonometry/es/materials/resilient/dynamic-stiffness/):
   de dónde sale $s'$.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
-  el modelo simplificado que consume $\Delta L_w$ y $\Delta R_w$.
+  el modelo simplificado que consume $\Delta L_\mathrm{w}$ y $\Delta R_\mathrm{w}$.
 - [Predicción detallada por bandas (ISO 12354)](/phonometry/es/buildings/design/detailed-prediction/):
   el modelo por bandas cuyo término de suelo flotante es
   `floating_floor_improvement`.

@@ -78,9 +78,9 @@ res.plot(language="es")            # imagen en dB en el plano tiempo-frecuencia
 ```
 
 La longitud del segmento es toda la decisión de diseño:
-$T_B = \text{nperseg}/f_s$ de resolución temporal contra
-$B_e = \mathrm{ENBW}/T_B$ de resolución frecuencial, así que su producto
-$T_B B_e$ lo fija solo la ventana: 1 para una ventana rectangular y **1,5 para
+$T_B = \text{nperseg}/f_\mathrm{s}$ de resolución temporal contra
+$B_\mathrm{e} = \mathrm{ENBW}/T_B$ de resolución frecuencial, así que su producto
+$T_B B_\mathrm{e}$ lo fija solo la ventana: 1 para una ventana rectangular y **1,5 para
 la Hann por defecto que se usa aquí** (sección 12.6.4.2, y las figuras de
 mérito de ventana de la
 [página de análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/#6-elegir-la-ventana)).
@@ -92,7 +92,7 @@ Los segmentos largos fijan las
 frecuencias y emborronan los transitorios; los cortos, lo contrario. Y como
 cada celda es una única estimación *sin promediar*, los datos aleatorios
 llevan un error aleatorio normalizado de 1 por celda (ec. 8.158 con
-$n_d = 1$; Bendat y Piersol citan $\sqrt{2}/1{,}25 \approx 1{,}13$ para la
+$n_\mathrm{d} = 1$; Bendat y Piersol citan $\sqrt{2}/1{,}25 \approx 1{,}13$ para la
 representación en
 magnitud): el espectrograma es una herramienta para la estructura
 determinista (tonos, barridos, transitorios), mientras que la
@@ -126,7 +126,7 @@ entonces en unos 190 Hz, la quieras o no.
 
 **Para una componente cuya frecuencia se mueve** a un ritmo $r$ en Hz/s, el tono
 se sale de su propio ancho de banda de resolución dentro de un mismo segmento
-salvo que $B_e \ge r\,T_B$. Con $B_e = 1{,}5/T_B$ eso da un óptimo
+salvo que $B_\mathrm{e} \ge r\,T_B$. Con $B_\mathrm{e} = 1{,}5/T_B$ eso da un óptimo
 $T_B = \sqrt{1{,}5/r}$. La sirena de abajo barre hasta unos 950 Hz/s, así que
 segmentos de menos de **40 ms** mantienen la cresta afilada, y la elección de
 1024 puntos a 16 kHz son 64 ms, ya pasado ese límite, que es por lo que la
@@ -136,7 +136,7 @@ largo.
 
 Los dos requisitos entran en conflicto a menudo, como pasa en la
 propia escena de la figura. La receta honesta: elige $T_B$ a partir de lo más
-rápido que tenga que quedar nítido, contrasta el $B_e$ resultante con las dos
+rápido que tenga que quedar nítido, contrasta el $B_\mathrm{e}$ resultante con las dos
 componentes más próximas que tengan que quedar separadas y, cuando no se puedan
 cumplir las dos cosas, dilo en el pie en lugar de partir la diferencia.
 `res.time_resolution` y `res.resolution_bandwidth` informan del par realmente
@@ -153,10 +153,10 @@ franja de altura completa que parece exactamente un evento de banda ancha.
 mete toda su potencia dentro de un ancho de banda de resolución y la celda
 `'spectrum'` es por tanto su valor cuadrático medio. El fondo rosa **no** marca
 45 dB en ninguna parte. Esos 45 dB son su nivel de *banda ancha* repartido por
-toda la banda, y cada celda solo lleva la parte que cae dentro de un $B_e$: unos
+toda la banda, y cada celda solo lleva la parte que cae dentro de un $B_\mathrm{e}$: unos
 25 dB por debajo aquí, para un segmento de 1024 puntos a 16 kHz. Para recuperar
 un nivel a partir del ruido, convierte las celdas en densidad restando
-$10\log_{10} B_e$ e integra en la banda que interese, o usa `'density'` e integra
+$10\log_{10} B_\mathrm{e}$ e integra en la banda que interese, o usa `'density'` e integra
 directamente. Y la celda de pico del impacto tampoco es el nivel del impacto: un
 transitorio más corto que el segmento reparte su energía por toda la columna, así
 que esa lectura depende de `nperseg`. La barra de color es una escala absoluta
@@ -247,9 +247,9 @@ Una distinción importa y el resultado la declara: la **malla** puede
 hacerse arbitrariamente fina (`n_points`), pero la **resolución** - la
 capacidad de separar dos tonos - la fijan la longitud del registro y la
 ventana, y se informa como `resolution_bandwidth`
-($B_e = f_s \sum w^2/(\sum w)^2$, es decir, $1/T_r$ sin ventana y $1{,}5/T_r$
+($B_\mathrm{e} = f_\mathrm{s} \sum w^2/(\sum w)^2$, es decir, $1/T_\mathrm{r}$ sin ventana y $1{,}5/T_\mathrm{r}$
 con Hann; el mismo factor de ventana del apartado 1, aplicado aquí a la
-duración del registro $T_r$ en lugar de a un segmento, porque la FFT con zoom
+duración del registro $T_\mathrm{r}$ en lugar de a un segmento, porque la FFT con zoom
 transforma el registro entero). El
 zoom refina el muestreo del mismo espectro subyacente; solo un registro
 más largo separa tonos más próximos.
@@ -263,7 +263,7 @@ la Hann está a −31,5 dB, que no da ni de lejos para ver una banda lateral 50 
 por debajo de una portadora a unos pocos hercios. El control es el argumento
 `window` (por defecto `"hann"`): pasa `window="blackman"`, o una Kaiser con beta
 alta, para cambiar anchura de lóbulo principal por rechazo de lóbulos laterales,
-recordando que un lóbulo principal más ancho sube $B_e$ y con él la separación
+recordando que un lóbulo principal más ancho sube $B_\mathrm{e}$ y con él la separación
 mínima que puedes resolver, de modo que los dos objetivos tiran en sentidos
 opuestos. Las
 [figuras de mérito de las ventanas](/phonometry/es/signals/spectra/spectral-analysis/#6-elegir-la-ventana)

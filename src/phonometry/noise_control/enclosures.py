@@ -11,18 +11,18 @@ Control* 5th ed., §7.4.2 (Eqs. (7.103), (7.111)) write the net reduction as
 
    \mathrm{IL} = R - C, \qquad
    C = 10 \log_{10}\!\left[0.3 +
-   \frac{S_E (1 - \alpha_i)}{S_i \alpha_i}\right],
+   \frac{S_\mathrm{E} (1 - \alpha_\mathrm{i})}{S_\mathrm{i} \alpha_\mathrm{i}}\right],
 
 where ``R`` is the field-incidence transmission loss of the enclosure panels,
 ``S_E`` the external surface area, ``S_i`` the internal surface area (including
 the machine) and ``alpha_i`` the mean absorption of the enclosure interior. The
 reverberant term is exactly ``S_E`` over the interior **room constant**
-:math:`R_i = S_i \alpha_i / (1 - \alpha_i)`
+:math:`R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i} / (1 - \alpha_\mathrm{i})`
 (:func:`phonometry.room.room_constant`), so
 
 .. math::
 
-   C = 10 \log_{10}(0.3 + S_E / R_i).
+   C = 10 \log_{10}(0.3 + S_\mathrm{E} / R_\mathrm{i}).
 
 A hard interior (``alpha_i`` small) makes ``C`` large and wastes much of the
 panel ``R``; lining the enclosure drives ``C`` toward its floor
@@ -37,11 +37,11 @@ power balance but **without the ``0.3``**:
 
 .. math::
 
-   \mathrm{IL} = R - 10 \log_{10}(S_E / R_i),
+   \mathrm{IL} = R - 10 \log_{10}(S_\mathrm{E} / R_\mathrm{i}),
 
 so a well-lined enclosure keeps rising instead of levelling off at
 :math:`R + 5.2`. The two agree to a few tenths of a decibel while
-:math:`S_E / R_i` stays above about
+:math:`S_\mathrm{E} / R_\mathrm{i}` stays above about
 unity (a hard or lightly lined interior) and diverge once the lining takes over,
 where Bies' floor is the safer statement. ``model`` selects between them, and
 the difference is the reason a published worked answer has to be reproduced with
@@ -144,7 +144,7 @@ class EnclosureResult:
         bands with the external and internal surface areas, an optional verdict
         row against a declared minimum, and a method-basis strip stating
         :math:`\mathrm{IL} = R - C` with
-        :math:`C = 10 \log_{10}(0.3 + S_E / R_i)`.
+        :math:`C = 10 \log_{10}(0.3 + S_\mathrm{E} / R_\mathrm{i})`.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying
@@ -297,8 +297,8 @@ def enclosure_insertion_loss(
     r"""Net insertion loss of a machine enclosure (Bies Eqs. (7.103), (7.111)).
 
     :math:`\mathrm{IL} = R - C` with
-    :math:`C = 10 \log_{10}(0.3 + S_E / R_i)` and the interior room
-    constant :math:`R_i = S_i \alpha_i / (1 - \alpha_i)`.
+    :math:`C = 10 \log_{10}(0.3 + S_\mathrm{E} / R_\mathrm{i})` and the interior room
+    constant :math:`R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i} / (1 - \alpha_\mathrm{i})`.
 
     :param panel_transmission_loss: Panel transmission loss ``R`` per band, dB.
         One of: a per-band array (measured); a callable mapping a frequency
@@ -321,7 +321,7 @@ def enclosure_insertion_loss(
         label the result and the plot).
     :param model: Interior build-up model, one of :data:`ENCLOSURE_MODELS`:
         ``"bies"`` (default) carries the ``0.3`` floor of Bies Equation (7.111),
-        ``"norton"`` the bare :math:`C = 10 \log_{10}(S_E / R_i)` of Norton & Karczub
+        ``"norton"`` the bare :math:`C = 10 \log_{10}(S_\mathrm{E} / R_\mathrm{i})` of Norton & Karczub
         Equation (4.115).
     :return: An :class:`EnclosureResult`.
     """

@@ -230,8 +230,8 @@ segunda palanca: definir la magnitud objetivo $|H(f)|$, hacer crecer el
 retardo de grupo en proporción a la potencia del objetivo,
 
 $$
-\tau_G(f) = \tau_G(f - df) + C\,|H(f)|^2,\qquad
-C = \frac{\tau_G(f_{end}) - \tau_G(f_{start})}{\sum |H(f)|^2},
+\tau_\mathrm{G}(f) = \tau_\mathrm{G}(f - df) + C\,|H(f)|^2,\qquad
+C = \frac{\tau_\mathrm{G}(f_\mathrm{end}) - \tau_\mathrm{G}(f_\mathrm{start})}{\sum |H(f)|^2},
 $$
 
 (Ecs. (11)-(12)), integrar el retardo de grupo en una fase, y aplicar la FFT
@@ -409,11 +409,11 @@ banda (Secs. 3.1, 4.5); la forma general de ese confinamiento es la
 regularización de Tikhonov dependiente de la frecuencia de Kirkeby y Nelson,
 
 $$
-H_{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
+H_\mathrm{inv}(f) = \frac{H^*(f)}{|H(f)|^2 + \varepsilon(f)},
 $$
 
 con $\varepsilon(f)$ pequeña dentro de la banda a ecualizar y grande fuera. En
-banda, la magnitud ecualizada $|H \cdot H_{inv}|$ se desvía de la unidad
+banda, la magnitud ecualizada $|H \cdot H_\mathrm{inv}|$ se desvía de la unidad
 exactamente en $\varepsilon/(|H|^2 + \varepsilon)$ - una forma cerrada que la
 batería de conformidad comprueba bin a bin - y fuera de banda la ganancia del
 filtro nunca puede superar $1/(2\sqrt{\varepsilon})$, el máximo analítico de

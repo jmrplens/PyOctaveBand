@@ -336,7 +336,7 @@ def ray_trace(
 
     The travel time is a third state of that same Runge-Kutta step rather than a
     quadrature run over the finished path: with the range-invariant Snell
-    parameter :math:`\xi = \cos\theta_0 / c(z_s)` it obeys
+    parameter :math:`\xi = \cos\theta_0 / c(z_\mathrm{s})` it obeys
     :math:`dt/dr = 1/(\xi c^2)`, so it is integrated with the very stages that
     place the ray and cannot drift from the geometry actually returned. This is
     the same ray core, and the same travel-time equation, as the atmospheric

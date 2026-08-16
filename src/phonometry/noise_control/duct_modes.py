@@ -14,12 +14,12 @@ This module implements the cut-on analysis of Norton & Karczub, *Fundamentals
 of Noise and Vibration Analysis for Engineers* 2nd ed., section 7.3:
 
 * circular ducts (Eq. 7.6),
-  :math:`(f_{co})_{pq} = \pi \alpha_{pq} c / (2 \pi a_i)`, with the
+  :math:`(f_\mathrm{co})_{pq} = \pi \alpha_{pq} c / (2 \pi a_\mathrm{i})`, with the
   :math:`\pi \alpha_{pq}` eigenvalues of Table 7.1 that solve
-  :math:`J'_p(\kappa_{pq} a_i) = 0` (the first is 1.8412, which sets the
-  plane-wave limit :math:`k a_i < 1.8412`);
+  :math:`J'_p(\kappa_{pq} a_\mathrm{i}) = 0` (the first is 1.8412, which sets the
+  plane-wave limit :math:`k a_\mathrm{i} < 1.8412`);
 * rectangular ducts (Eq. 7.10),
-  :math:`(f_{co})_{pq} = (c / 2) \sqrt{(p / a)^2 + (q / b)^2}`;
+  :math:`(f_\mathrm{co})_{pq} = (c / 2) \sqrt{(p / a)^2 + (q / b)^2}`;
 * the **mean-flow correction** (Eq. 7.8): a uniform axial flow of Mach number
   ``M`` lowers every cut-on frequency by :math:`\sqrt{1 - M^2}` and moves the
   cut-on from :math:`k_x = 0` to
@@ -161,10 +161,10 @@ def circular_duct_cut_on(
 
     .. math::
 
-       (f_{co})_{pq} = \frac{\pi \alpha_{pq} c \sqrt{1 - M^2}}{2 \pi a_i}
+       (f_\mathrm{co})_{pq} = \frac{\pi \alpha_{pq} c \sqrt{1 - M^2}}{2 \pi a_\mathrm{i}}
 
        k_x = \frac{-M \kappa_{pq}}{\sqrt{1 - M^2}}, \qquad
-       \kappa_{pq} = \frac{\pi \alpha_{pq}}{a_i}
+       \kappa_{pq} = \frac{\pi \alpha_{pq}}{a_\mathrm{i}}
 
     The flow lowers every cut-on frequency and shifts the cut-on away from
     :math:`k_x = 0`: the mode is already travelling upstream, against the
@@ -218,7 +218,7 @@ def rectangular_duct_cut_on(
 
     .. math::
 
-       (f_{co})_{pq} = \frac{c}{2}
+       (f_\mathrm{co})_{pq} = \frac{c}{2}
        \sqrt{\left(\frac{p}{a}\right)^2 + \left(\frac{q}{b}\right)^2}
        \sqrt{1 - M^2}
 

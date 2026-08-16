@@ -35,7 +35,7 @@ La **EN 12354-5:2009** predice el nivel de presión acústica en un recinto rece
 causado por equipamientos del edificio (bombas, ventiladores, ascensores,
 instalaciones de agua) que inyectan **ruido estructural** en el edificio. Cierra
 la cadena de vibroacústica estructural: la fuente se describe por su nivel de
-potencia acústica estructural característica $L_{Ws,c}$, derivado de la medición
+potencia acústica estructural característica $L_{W\mathrm{s,c}}$, derivado de la medición
 sobre placa receptora de EN 15657 mediante la conversión de las Fórmulas
 (15)/(17) y una corrección de movilidad (**no** el nivel bruto inyectado en la
 placa; véase [EN 15657](/phonometry/es/buildings/design/structure-borne-power/)); las
@@ -43,10 +43,10 @@ movilidades puntuales de fuente y receptor fijan cuánta potencia se acopla
 realmente a la estructura, y la transmisión del edificio la lleva al recinto
 receptor. La corrección de movilidad del Anexo I,
 `installed_power_from_reception_plate`, refiere el nivel característico de
-placa receptora $L_{Ws,n}$ al receptor real,
-$L_{Ws,\mathrm{inst}} = L_{Ws,n} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
+placa receptora $L_{W\mathrm{s,n}}$ al receptor real,
+$L_{W\mathrm{s,inst}} = L_{W\mathrm{s,n}} + 10\log_{10}(Y_{\infty,i} / Y_{\infty,\mathrm{rec}})$
 con $Y_{\infty,\mathrm{rec}} = 5\cdot 10^{-6}\ \text{m/(N·s)}$;
-con la movilidad de la fuente en su lugar da $L_{Ws,c}$ (Anexo I.3, Tabla I.8).
+con la movilidad de la fuente en su lugar da $L_{W\mathrm{s,c}}$ (Anexo I.3, Tabla I.8).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/installed_structure_borne_es.svg" alt="La cascada de EN 12354-5 por banda de octava: potencia característica, potencia instalada tras el término de acoplamiento, niveles de presión acústica por trayectoria y su total energético" width="82%" loading="eager" />
 
@@ -54,7 +54,7 @@ con la movilidad de la fuente en su lugar da $L_{Ws,c}$ (Anexo I.3, Tabla I.8).
 acoplamiento no es un peaje fijo: se lleva 6,6 dB de la potencia característica
 a 63 Hz y 20,8 dB a 4 kHz, así que el espectro instalado ya se inclina hacia
 abajo antes de aplicar ninguna trayectoria. Cada trayectoria resta después su
-propio $D_{sa}$, su índice de flancos y su término de superficie, y aquí la
+propio $D_\mathrm{sa}$, su índice de flancos y su término de superficie, y aquí la
 pared de flanco, más pequeña, le saca al forjado entre 1,3 y 2,3 dB. El nivel
 del recinto receptor es la **suma energética** de las trayectorias, de 2,0 a
 2,4 dB por encima de la mayor de las dos: arreglar solo la peor trayectoria
@@ -95,52 +95,52 @@ plt.show()
 ## 1. Acoplamiento y potencia instalada
 
 Solo parte de la potencia característica se inyecta en el elemento soporte; la
-pérdida es el **término de acoplamiento** $D_C$, fijado para una excitación
-puntual por la movilidad de la fuente $Y_s$ y la del receptor $Y_i$
+pérdida es el **término de acoplamiento** $D_\mathrm{C}$, fijado para una excitación
+puntual por la movilidad de la fuente $Y_\mathrm{s}$ y la del receptor $Y_i$
 (Fórmula 19b):
 
 $$
-D_{C,i} = 10\log_{10}\frac{|Y_s + Y_i|^2}{|Y_s|\,\mathrm{Re}\{Y_i\}},
+D_{\mathrm{C},i} = 10\log_{10}\frac{|Y_\mathrm{s} + Y_i|^2}{|Y_\mathrm{s}|\,\mathrm{Re}\{Y_i\}},
 $$
 
-que se reduce a $10\log_{10}(|Y_s|/\mathrm{Re}\{Y_i\})$ para una **fuente de fuerza** (movilidad
-de fuente alta, Fórmula 19c) y a $-10\log_{10}(|Y_s|\,\mathrm{Re}\{Z_i\})$ para una **fuente de
+que se reduce a $10\log_{10}(|Y_\mathrm{s}|/\mathrm{Re}\{Y_i\})$ para una **fuente de fuerza** (movilidad
+de fuente alta, Fórmula 19c) y a $-10\log_{10}(|Y_\mathrm{s}|\,\mathrm{Re}\{Z_i\})$ para una **fuente de
 velocidad** (movilidad de fuente baja, Fórmula 19d); un soporte elástico añade su
 movilidad de transferencia $Y_k$ dentro del módulo (Fórmula 19e). El nivel de
-potencia **instalada** es entonces (Fórmula 18b) $L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$.
+potencia **instalada** es entonces (Fórmula 18b) $L_{W\mathrm{s,inst}} = L_{W\mathrm{s,c}} - D_\mathrm{C}$.
 
 Los dos límites son utilizables en cuanto las movilidades se diferencian en un
-orden de magnitud aproximadamente: con $|Y_s|/|Y_i| = 10$ la forma de fuente de
+orden de magnitud aproximadamente: con $|Y_\mathrm{s}|/|Y_i| = 10$ la forma de fuente de
 fuerza queda 0,8 dB por debajo del valor exacto de la Fórmula 19b y con 100 queda
 0,1 dB por debajo, mientras que entre esos extremos es la relación de fases la
 que decide la respuesta y hay que evaluar la Fórmula 19b con movilidades
 complejas y no con módulos. Lee las dos idealizaciones en términos físicos: una
 **fuente de fuerza** impone su fuerza haga lo que haga el receptor, así que un
-receptor más rígido simplemente vibra menos y acepta menos potencia, y $D_C$ deja
+receptor más rígido simplemente vibra menos y acepta menos potencia, y $D_\mathrm{C}$ deja
 de depender del módulo del receptor; una **fuente de velocidad** impone su
 movimiento, así que un receptor más rígido le saca ahora *más* potencia y la
 dependencia se invierte. Una bomba sobre una losa de hormigón es la fuente de
 fuerza de libro; una máquina pesada atornillada rígidamente a un forjado ligero
 de madera es el caso en el que la intuición se da la vuelta, y la zona intermedia
-— una máquina montada cerca de la resonancia de sus apoyos — es donde $D_C$ es
-menor e incluso puede hacerse negativo, porque el numerador $|Y_s + Y_i|^2$ se
+— una máquina montada cerca de la resonancia de sus apoyos — es donde $D_\mathrm{C}$ es
+menor e incluso puede hacerse negativo, porque el numerador $|Y_\mathrm{s} + Y_i|^2$ se
 desploma cuando las dos movilidades son comparables y están en oposición de fase.
 La curva exacta toca fondo con las movilidades igualadas, que es la mejor
 transferencia de potencia y, por tanto, el peor aislamiento.
 
-Este $L_{Ws,\mathrm{inst}}$ es el mismo que el de la corrección por movilidad
+Este $L_{W\mathrm{s,inst}}$ es el mismo que el de la corrección por movilidad
 del Anexo I de la introducción, alcanzado por otra trayectoria: usa la Fórmula (18b)
-cuando $D_C$ se conoce a partir de las dos movilidades, y la corrección directa
-$L_{Ws,n} + 10\log_{10}(Y_{\infty,i}/Y_{\infty,\mathrm{rec}})$ cuando no. Sobre
+cuando $D_\mathrm{C}$ se conoce a partir de las dos movilidades, y la corrección directa
+$L_{W\mathrm{s,n}} + 10\log_{10}(Y_{\infty,i}/Y_{\infty,\mathrm{rec}})$ cuando no. Sobre
 la cisterna del Anexo I.3 las dos dan 68,2 dB a 63 Hz, a partir de
-$L_{Ws,c} = 84,4$ dB y $D_C = 16,2$ dB. Fíjate en qué magnitud te entregan:
-$L_{Ws,c}$ es la entrada que toma esta página, y *no* es los 68,2 dB que la
+$L_{W\mathrm{s,c}} = 84,4$ dB y $D_\mathrm{C} = 16,2$ dB. Fíjate en qué magnitud te entregan:
+$L_{W\mathrm{s,c}}$ es la entrada que toma esta página, y *no* es los 68,2 dB que la
 [página de EN 15657](/phonometry/es/buildings/design/structure-borne-power/)
-imprime como su nivel instalado — meter ese valor aquí resta $D_C$ dos veces.
+imprime como su nivel instalado — meter ese valor aquí resta $D_\mathrm{C}$ dos veces.
 
-La física detrás de $D_C$ es la clásica potencia de entrada de una placa
+La física detrás de $D_\mathrm{C}$ es la clásica potencia de entrada de una placa
 excitada en un punto: solo la parte real de la movilidad en el punto de
-excitación del receptor absorbe potencia, y el desajuste entre $Y_s$ e $Y_i$
+excitación del receptor absorbe potencia, y el desajuste entre $Y_\mathrm{s}$ e $Y_i$
 decide cuánta de la capacidad de la fuente entra realmente en la estructura
 (Hopkins 2007, Sección 2.8). Las propias movilidades vienen de la
 [cadena de movilidad mecánica](/phonometry/es/vibration/structural/mechanical-mobility/):
@@ -148,7 +148,7 @@ medidas según ISO 7626, o de las formas cerradas de placa infinita de la
 [teoría de paneles](/phonometry/es/buildings/design/panel-sound-insulation/) cuando no
 hay medición. Una bomba sobre una losa de hormigón es la fuente de fuerza de
 libro: la movilidad de su carcasa queda órdenes de magnitud por encima de la
-de la losa, así que $D_C$ se reduce a la Fórmula 19c y la potencia inyectada
+de la losa, así que $D_\mathrm{C}$ se reduce a la Fórmula 19c y la potencia inyectada
 deja de depender del receptor.
 
 ```python
@@ -168,8 +168,8 @@ print(round(float(building.coupling_term_velocity_source(2e-4 + 1e-4j, 1 / (3e-5
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/coupling_term_regimes_es.svg" alt="Término de acoplamiento frente a la relación de movilidades fuente-receptor: la curva exacta de la Fórmula 19b con sus asíntotas de fuente de fuerza y de fuente de velocidad, el mínimo con las movilidades igualadas, el ejemplo de la bomba marcado, y dos curvas con apoyo elástico que muestran los decibelios que compra un soporte" width="92%" />
 
 *Toda la Fórmula 19b sobre un mismo eje. Muy a la derecha la fuente es una fuente
-de fuerza y $D_C$ sigue a $10\lg(|Y_s|/\mathrm{Re}\{Y_i\})$; muy a la izquierda
-es una fuente de velocidad y sigue a $-10\lg(|Y_s|\,\mathrm{Re}\{Z_i\})$; la
+de fuerza y $D_\mathrm{C}$ sigue a $10\lg(|Y_\mathrm{s}|/\mathrm{Re}\{Y_i\})$; muy a la izquierda
+es una fuente de velocidad y sigue a $-10\lg(|Y_\mathrm{s}|\,\mathrm{Re}\{Z_i\})$; la
 curva exacta se separa de las dos asíntotas dentro de una década alrededor de las
 movilidades igualadas, donde alcanza su mínimo de 6,2 dB — máxima transferencia
 de potencia, mínimo aislamiento. La bomba del fragmento de código está en una
@@ -213,7 +213,7 @@ plt.show()
 
 </details>
 
-### Tabla D.1: $Y_s$ a partir de las piezas de la propia máquina
+### Tabla D.1: $Y_\mathrm{s}$ a partir de las piezas de la propia máquina
 
 Nada mide la movilidad de fuente de una caldera. El apartado D.1.3 la construye
 a partir de las piezas que llevan la vibración hasta las patas, y la Tabla D.1
@@ -222,10 +222,10 @@ da las seis formas cerradas que usa. `typical_element_mobility` es esa tabla:
 | Fila | Magnitudes que la describen | $\lvert Y\rvert$ en m/N.s |
 | --- | --- | --- |
 | `"mass"` | $M$ [kg] | $[2\pi f M]^{-1}$ |
-| `"bar_end"` | $\rho$ [kg/m3], $c_L$ [m/s], $S$ [m²] | $[\rho c_L S]^{-1}$ |
-| `"beam"` | $\rho$, $c_L$, $t$ [m], $w$ [m] | $[7{,}6\,\rho t w\sqrt{c_L t f}]^{-1}$ |
-| `"plate"` | $\rho$, $c_L$, $t$ [m] | $[2{,}3\,c_L\rho t^2]^{-1}$ |
-| `"pipe"` | $\rho$, $c_L$, $t$ [m], $r$ [m] | $[63\,\rho t r\sqrt{c_L r f}]^{-1}$ |
+| `"bar_end"` | $\rho$ [kg/m3], $c_\mathrm{L}$ [m/s], $S$ [m²] | $[\rho c_\mathrm{L} S]^{-1}$ |
+| `"beam"` | $\rho$, $c_\mathrm{L}$, $t$ [m], $w$ [m] | $[7{,}6\,\rho t w\sqrt{c_\mathrm{L} t f}]^{-1}$ |
+| `"plate"` | $\rho$, $c_\mathrm{L}$, $t$ [m] | $[2{,}3\,c_\mathrm{L}\rho t^2]^{-1}$ |
+| `"pipe"` | $\rho$, $c_\mathrm{L}$, $t$ [m], $r$ [m] | $[63\,\rho t r\sqrt{c_\mathrm{L} r f}]^{-1}$ |
 | `"mass_spring"` | $M$ [kg], $s$ [N/m], $\eta$ [-] | $\left[\left(\frac{2\pi f\eta}{s(1+\eta^2)}\right)^2 + \left(\frac{2\pi f}{s(1+\eta^2)} - \frac{1}{2\pi f M}\right)^2\right]^{1/2}$ |
 
 La frecuencia no está en la columna de magnitudes que describen el elemento,
@@ -235,7 +235,7 @@ cuatro filas admiten `frequency` y las otras dos la rechazan. Elige la fila por
 lo que realmente transporta la vibración: una máquina pequeña y compacta es su
 masa total, una máquina sobre patas no rígidas es la fila masa-muelle, y la
 tubería que sale de una bomba es la fila de tubo. Fíjate en que `"plate"` es de
-nuevo la Fórmula (F.4), escrita en $\rho$, $c_L$ y $t$ en lugar de en masa y
+nuevo la Fórmula (F.4), escrita en $\rho$, $c_\mathrm{L}$ y $t$ en lugar de en masa y
 rigidez a flexión: el mismo número que `vibration.infinite_plate_mobility`.
 
 ```python
@@ -261,10 +261,10 @@ print(round(float(dc), 1))                          # 9.2 dB
 La fila masa-muelle es la única con un punto de retorno. Es la suma en serie de
 una movilidad de muelle y una de masa, de modo que su segundo paréntesis
 contiene las dos reactancias, que se cancelan en
-$f_0 = (2\pi)^{-1}\sqrt{s(1+\eta^2)/M}$ y dejan $\lvert Y_s\rvert$ en su
+$f_0 = (2\pi)^{-1}\sqrt{s(1+\eta^2)/M}$ y dejan $\lvert Y_\mathrm{s}\rvert$ en su
 *mínimo* limitado por el amortiguamiento — que es la frecuencia a la que el
 montaje inyecta **más** potencia, porque una movilidad de fuente pequeña es un
-$D_C$ pequeño. Esa es la resonancia del montaje, y $\eta$ es lo único que fija
+$D_\mathrm{C}$ pequeño. Esa es la resonancia del montaje, y $\eta$ es lo único que fija
 cuánto empeora. Una fila llamada con una magnitud que no la describe, o con una
 `frequency` que su expresión no contiene, lanza un error en lugar de aplicar
 un valor por defecto en silencio.
@@ -285,10 +285,10 @@ importante con la fuente, que en cambio se aísla o se suspende libremente.
 **Calculada, en el centro del panel.** Para una excitación en la zona central de
 un elemento homogéneo grande, la Fórmula (F.4) da el valor de placa infinita,
 real e independiente de la frecuencia,
-$Y_{i,\infty} = 1/(8\sqrt{m'B'}) = (2{,}3\,c_L\rho t^2)^{-1}$, que en la
+$Y_{i,\infty} = 1/(8\sqrt{m'B'}) = (2{,}3\,c_\mathrm{L}\rho t^2)^{-1}$, que en la
 biblioteca es `vibration.infinite_plate_mobility(B, m)`. Solo vale *por encima*
 de la resonancia más baja del elemento,
-$f_{11} = (c_0^2/4f_c)(1/l_1^2 + 1/l_2^2)$ (Fórmula F.5); por debajo de $f_{11}$
+$f_{11} = (c_0^2/4f_\mathrm{c})(1/l_1^2 + 1/l_2^2)$ (Fórmula F.5); por debajo de $f_{11}$
 la movilidad se vuelve compleja y la fija la rigidez de los apoyos del elemento,
 no su propia masa y rigidez a flexión. Para el forjado de hormigón de 220 mm y
 5,00 m × 4,00 m del edificio resuelto, $f_{11}$ vale 39 Hz, holgadamente por
@@ -301,7 +301,7 @@ placa y la excitación sobre una viga usa la movilidad de la propia viga.
 
 **Corregida por la posición de fijación.** Cerca de un borde rígido la parte real
 se desploma como
-$\mathrm{Re}\{Y_i\} = \mathrm{Re}\{Y_{i,\infty}\}\,[1 - J_0(2k_Ba)]$
+$\mathrm{Re}\{Y_i\} = \mathrm{Re}\{Y_{i,\infty}\}\,[1 - J_0(2k_\mathrm{B}a)]$
 (Fórmula F.6a, con una forma de esquina F.6b), siendo $a$ la distancia al borde.
 Eso convierte la distancia de fijación en una variable de proyecto y no en un
 detalle: en ese mismo forjado de hormigón, a 63 Hz, atornillar la máquina a
@@ -358,10 +358,10 @@ $10^{-6}$ N pese al «re 1 pN» que imprime el pie; véase el
 
 El apartado D.1.3 trata entonces la máquina como fuente de fuerza con la
 movilidad tipo masa de sus martillos de 0,5 kg, lo que convierte la tabla en las
-dos entradas que toma esta página: $L_{Ws,c} = L_F - 5 - 10\log_{10}f$
+dos entradas que toma esta página: $L_{W\mathrm{s,c}} = L_F - 5 - 10\log_{10}f$
 (Fórmula D.9a) y
-$D_{C,i} = -10\log_{10}(\omega M Y_i) + 10\log_{10}[1 + (\omega M Y_i)^2]$
-(Fórmula D.9b, que es la Fórmula 19b con $Y_s = 1/\mathrm{j}\omega M$).
+$D_{\mathrm{C},i} = -10\log_{10}(\omega M Y_i) + 10\log_{10}[1 + (\omega M Y_i)^2]$
+(Fórmula D.9b, que es la Fórmula 19b con $Y_\mathrm{s} = 1/\mathrm{j}\omega M$).
 
 ```python
 import numpy as np
@@ -419,19 +419,19 @@ antes en un único $R_{ij,\mathrm{ref}}$ efectivo. Donde las trayectorias se
 multiplican, el Anexo F.1 remite a un modelo SEA completo.
 
 Cada trayectoria de transmisión $i \to j$ da un nivel de presión acústica normalizado a
-partir de la potencia instalada, el término de ajuste estructura-a-aéreo $D_{sa}$,
+partir de la potencia instalada, el término de ajuste estructura-a-aéreo $D_\mathrm{sa}$,
 el índice de reducción acústica de flancos $R_{ij,\mathrm{ref}}$ (EN 12354-1)
 y el área del
 elemento (Fórmula 18a):
 
 $$
-L_{n,s,ij} = L_{Ws,\mathrm{inst},i} - D_{sa,i} - R_{ij,\mathrm{ref}}
+L_{\mathrm{n,s},ij} = L_{W\mathrm{s,inst},i} - D_{\mathrm{sa},i} - R_{ij,\mathrm{ref}}
              - 10\log_{10}\frac{S_i}{S_0} - 10\log_{10}\frac{A_0}{4},
 $$
 
 con $S_0 = A_0 = 10\ \text{m}^2$. Lee los cinco términos en orden, porque cada uno
-deshace una normalización distinta. $L_{Ws,\mathrm{inst},i}$ es la potencia que
-entró realmente en el elemento $i$. $D_{sa,i}$ convierte esa excitación
+deshace una normalización distinta. $L_{W\mathrm{s,inst},i}$ es la potencia que
+entró realmente en el elemento $i$. $D_{\mathrm{sa},i}$ convierte esa excitación
 estructural en la excitación *aérea* equivalente, para que el término siguiente
 pueda ser una magnitud aérea siquiera. $R_{ij,\mathrm{ref}}$ es ese índice aéreo
 de flancos, definido para un elemento de referencia de $S_0 = 10\ \text{m}^2$.
@@ -450,7 +450,7 @@ un tiempo de reverberación de 0,5 s, y las dos no son intercambiables.
 Las trayectorias se combinan después energéticamente, banda a banda (Fórmula 17):
 
 $$
-L_{n,s} = 10\log_{10}\sum_{ij} 10^{L_{n,s,ij}/10}.
+L_\mathrm{n,s} = 10\log_{10}\sum_{ij} 10^{L_{\mathrm{n,s},ij}/10}.
 $$
 
 `res.total_level` es esa combinación por bandas y `res.overall_level` la suma de
@@ -458,10 +458,10 @@ ella sobre el espectro. Para la cisterna del Anexo I.3 las cuatro trayectorias
 suman 41,4 dB a 63 Hz y el espectro entero cierra en 29 dB(A) — véase la nota
 sobre la ponderación que hay debajo del fragmento de código.
 
-### El término de ajuste $D_{sa}$
+### El término de ajuste $D_\mathrm{sa}$
 
 Una fuerza puntual bombea energía a ondas de flexión *libres*, mientras que un
-campo acústico incidente excita además ondas *forzadas*. $D_{sa}$ es el factor
+campo acústico incidente excita además ondas *forzadas*. $D_\mathrm{sa}$ es el factor
 de contabilidad que permite reutilizar el índice de flancos aéreo
 $R_{ij,\mathrm{ref}}$ — una magnitud aérea — para un elemento excitado
 estructuralmente: convierte la potencia estructural inyectada en la potencia
@@ -470,27 +470,27 @@ aérea incidente que dejaría al elemento con la misma energía de vibración li
 homogéneo eso se convierte en la Fórmula (20b),
 
 $$
-D_{sa,i} = 10\log_{10}\frac{2\pi m_i\,2.2\,\tau_i}{\rho_0 c_0 T_{s,i}\sigma_i}\ \text{dB},
+D_{\mathrm{sa},i} = 10\log_{10}\frac{2\pi m_i\,2.2\,\tau_i}{\rho_0 c_0 T_{\mathrm{s},i}\sigma_i}\ \text{dB},
 $$
 
 con $R_i = -10\log_{10}\tau_i$, y el Anexo F.2 da la forma de trabajo
 
 $$
-D_{sa,i} = 10\log_{10}\frac{400\,f_{c,i}\,\sigma_i}{m_i\,f^2}\ \text{dB}
+D_{\mathrm{sa},i} = 10\log_{10}\frac{400\,f_{\mathrm{c},i}\,\sigma_i}{m_i\,f^2}\ \text{dB}
 \qquad\text{(Fórmula F.3)},
 $$
 
 exacta por encima de la frecuencia crítica ($\sigma_i \approx 1$) y buena
 aproximación en todo el rango. Léela así: los elementos más pesados y las
-frecuencias más altas hacen $D_{sa}$ *más negativo*, a razón de
+frecuencias más altas hacen $D_\mathrm{sa}$ *más negativo*, a razón de
 $-20\log_{10}f$ una vez que $\sigma$ se ha saturado.
 
 :::caution
-**$D_{sa}$ es normalmente negativo — pasa el valor tabulado con el signo con el
+**$D_\mathrm{sa}$ es normalmente negativo — pasa el valor tabulado con el signo con el
 que está impreso.**
 Las columnas del Anexo I de la propia norma van de unos $-14$ dB a 63 Hz a
 $-45$ dB a 2 kHz para elementos corrientes de hormigón y de fábrica. El término
-entra en la Fórmula (18a) con signo menos, así que un $D_{sa}$ negativo *sube*
+entra en la Fórmula (18a) con signo menos, así que un $D_\mathrm{sa}$ negativo *sube*
 el nivel previsto. Revisiones anteriores de esta página pasaban
 `"adjustment_term": 5.0` y `6.0`; copiar ese patrón poniendo en su lugar un
 valor real del Anexo F dejaría la predicción entre unos 20 y 40 dB por debajo en
@@ -539,11 +539,11 @@ cascada.
 
 ### `overall_level` no es el número que limita un reglamento
 
-`overall_level` es la suma energética simple de los $L_{n,s}$ por banda sobre las
+`overall_level` es la suma energética simple de los $L_\mathrm{n,s}$ por banda sobre las
 bandas que hayas dado. **No** está ponderado A, y la magnitud en la que está
 escrita cualquier exigencia nacional de ruido de equipamientos — y la magnitud
 que produce la medición en campo de ISO 16032 — es el número único ponderado A
-$L_{n,s}(A)$. Los dos ejemplos resueltos de EN 12354-5 cierran en uno: 26 dB(A)
+$L_\mathrm{n,s}(A)$. Los dos ejemplos resueltos de EN 12354-5 cierran en uno: 26 dB(A)
 para la bañera de hidromasaje del Anexo I.2 y 29 dB(A) para la cisterna del
 Anexo I.3. La diferencia no es pequeña. Los espectros de equipamientos están
 cargados hacia las bandas bajas, justo donde la ponderación A es más abrupta, así
@@ -576,16 +576,16 @@ etiquetada como predicción, no como medición**: una línea de base de predicci
 que nombra la EN 12354-5:2009, una cabecera de metadatos opcional (cliente,
 equipo fuente, recinto receptor, instrumentación, clima, fecha), una tabla por
 bandas (frecuencia nominal de octava/tercio de octava, el nivel de potencia
-acústica estructural instalada $L_{Ws,inst}$, el NPS normalizado de cada trayectoria
-de transmisión $L_{n,s,ij}$ y el total combinado $L_{n,s}$), los espectros
-$L_{n,s}(f)$ por trayectoria y total, y el total sumado en bandas $L_{n,s}$ (dB)
+acústica estructural instalada $L_{W\mathrm{s,inst}}$, el NPS normalizado de cada trayectoria
+de transmisión $L_{\mathrm{n,s},ij}$ y el total combinado $L_\mathrm{n,s}$), los espectros
+$L_\mathrm{n,s}(f)$ por trayectoria y total, y el total sumado en bandas $L_\mathrm{n,s}$ (dB)
 recuadrado, con la potencia instalada total y el número de trayectorias.
 
 Los metadatos se aportan mediante un `ReportMetadata`, cuyos campos aplicables
 aquí son el **equipo fuente** (`specimen`), el **recinto receptor**
 (`test_room`), el **cliente**, la **instrumentación** y la identidad del pie
 (`laboratory`, `operator`, `report_id`, `notes`). Aportar `requirement` añade un
-veredicto CUMPLE/NO CUMPLE frente a un límite superior declarado sobre el $L_{n,s}$
+veredicto CUMPLE/NO CUMPLE frente a un límite superior declarado sobre el $L_\mathrm{n,s}$
 global (menos es mejor). `verbose=True` añade una columna por trayectoria de
 transmisión (hasta cinco); en otro caso solo se muestran la potencia instalada
 y el total combinado. `language="es"` genera la ficha en español con comas
@@ -647,10 +647,10 @@ el repositorio; pulsa la vista previa para abrir el PDF.
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-La EN 12354-5:2009: el término de acoplamiento $D_C$ (apartado 4.4.3, Fórmulas
+La EN 12354-5:2009: el término de acoplamiento $D_\mathrm{C}$ (apartado 4.4.3, Fórmulas
 19b-e, con sus límites de fuente de fuerza y de fuente de velocidad) mediante
 `coupling_term`, el nivel de potencia instalada
-$L_{Ws,\mathrm{inst}} = L_{Ws,c} - D_C$ (Fórmula 18b) mediante
+$L_{W\mathrm{s,inst}} = L_{W\mathrm{s,c}} - D_\mathrm{C}$ (Fórmula 18b) mediante
 `installed_structure_borne_power_level`, y el nivel de presión acústica
 normalizado por trayectoria y su total energético (Fórmulas 18a, 17) mediante
 `installed_source_prediction`. Validado contra los propios ejemplos resueltos
@@ -679,10 +679,10 @@ edición de 2009, no la revisión de 2023.
 ## Véase también
 
 - [Potencia acústica estructural de equipos (EN 15657)](/phonometry/es/buildings/design/structure-borne-power/):
-  la caracterización sobre placa receptora que aporta $L_{Ws,c}$ y la movilidad
+  la caracterización sobre placa receptora que aporta $L_{W\mathrm{s,c}}$ y la movilidad
   de fuente que consume esta predicción.
 - [Movilidad mecánica y la familia de FRF (ISO 7626-1)](/phonometry/es/vibration/structural/mechanical-mobility/):
-  las $Y_s$ e $Y_i$ medidas tras el término de acoplamiento.
+  las $Y_\mathrm{s}$ e $Y_i$ medidas tras el término de acoplamiento.
 - [Transmisión de onda de flexión en uniones de placas](/phonometry/es/vibration/structural/junction-transmission/):
   la física de unión que lleva la potencia instalada a los radiadores por
   flancos.

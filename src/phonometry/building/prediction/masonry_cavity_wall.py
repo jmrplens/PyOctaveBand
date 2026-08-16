@@ -15,7 +15,7 @@ leaf to the other, which caps the insulation the pair can reach.
 single number ``sX mm``, its dynamic stiffness at a cavity width ``X``,
 measured on two nominally identical 100 mm concrete cubes from the
 mass-spring-mass resonance of the pair,
-:math:`s_{X\,\mathrm{mm}} = 2 \pi^2 f_{msm}^2 m_{av}` (Eq. 3.202).
+:math:`s_{X\,\mathrm{mm}} = 2 \pi^2 f_\mathrm{msm}^2 m_\mathrm{av}` (Eq. 3.202).
 :data:`WALL_TIE_STIFFNESS` carries Hopkins' Table A4, whose 50 mm
 rows come from Hopkins, Wilson & Craik (1999) and whose 100 mm row comes from
 Hall & Hopkins (2001).
@@ -26,8 +26,8 @@ over a plate of area ``S`` add :math:`N k / S` to the cavity air stiffness
 
 .. math::
 
-   f_{msm} = \frac{1}{2\pi} \sqrt{ \frac{s_a + N k / S}
-   {\rho_{s1} \rho_{s2} / (\rho_{s1} + \rho_{s2})} } \tag{Eq. 4.89}
+   f_\mathrm{msm} = \frac{1}{2\pi} \sqrt{ \frac{s_\mathrm{a} + N k / S}
+   {\rho_{\mathrm{s}1} \rho_{\mathrm{s}2} / (\rho_{\mathrm{s}1} + \rho_{\mathrm{s}2})} } \tag{Eq. 4.89}
 
 Below ``fmsm`` the two leaves move as one plate of the combined mass. Stiff ties
 are therefore doubly bad: they raise the resonance into the rating range *and*
@@ -40,20 +40,20 @@ as ``tie_stiffness_per_area`` to
 connection between two plates. With the driving-point mobilities ``Yi``,
 ``Yj`` of the two leaves (infinite thin plates,
 :math:`Y = 1/(8 \sqrt{B' m''})`, Eq. 2.190) and the connector mobility of a
-linear spring :math:`Y_c = i \omega / k` (Eq. 4.88), ``N`` identical
+linear spring :math:`Y_\mathrm{c} = i \omega / k` (Eq. 4.88), ``N`` identical
 uncorrelated connections give the coupling loss factor
 
 .. math::
 
    \eta_{ij} = \frac{N}{\omega m_i}
-   \frac{\operatorname{Re}\{Y_j\}}{| Y_i + Y_j + Y_c |^2} \tag{Eq. 4.87}
+   \frac{\operatorname{Re}\{Y_j\}}{| Y_i + Y_j + Y_\mathrm{c} |^2} \tag{Eq. 4.87}
 
-The plate area cancels (:math:`N/m_i = n/\rho_{s1}` with ``n`` ties per m2),
+The plate area cancels (:math:`N/m_i = n/\rho_{\mathrm{s}1}` with ``n`` ties per m2),
 so :func:`wall_tie_coupling_loss_factor` needs only the tie density. A rigid
 connection (screw, nail, bolt, or a tie so stiff it never yields) is the
-limit :math:`Y_c = 0`, where the only frequency dependence left is the
+limit :math:`Y_\mathrm{c} = 0`, where the only frequency dependence left is the
 :math:`1/\omega` and :math:`\eta_{ij}` falls as :math:`1/f`. Once
-:math:`|Y_c| = \omega/k` overtakes the plate mobilities a resilient tie adds
+:math:`|Y_\mathrm{c}| = \omega/k` overtakes the plate mobilities a resilient tie adds
 two more powers, so :math:`\eta_{ij}` falls as :math:`1/f^3` and the *ratio*
 to the rigid ceiling as :math:`1/f^2`. That is exactly why a butterfly tie at
 1.7 MN/m and a vertical-twist tie at 94 MN/m behave so differently: the soft
@@ -72,8 +72,8 @@ stays on the rigid ceiling for another two octaves.
    it. The *output* is not printed anywhere: every published sound reduction
    index of a bridged masonry cavity wall is a figure, so the per-band
    transmission-loss penalty from wall ties has no numeric oracle. The
-   resonance shift does: Hopkins Fig. 4.35 prints :math:`f_{msm} = 26` Hz
-   without ties and :math:`f_{msm} = 50` Hz with them for the same wall.
+   resonance shift does: Hopkins Fig. 4.35 prints :math:`f_\mathrm{msm} = 26` Hz
+   without ties and :math:`f_\mathrm{msm} = 50` Hz with them for the same wall.
 """
 
 from __future__ import annotations
@@ -171,12 +171,12 @@ class WallTieCouplingResult:
     :ivar mobility1: Driving-point mobility ``Yi`` of leaf 1, in m/(N.s).
     :ivar mobility2: Driving-point mobility ``Yj`` of leaf 2, in m/(N.s).
     :ivar connector_mobility: Magnitude
-        :math:`\lvert Y_c \rvert = \omega/k` of the tie mobility
+        :math:`\lvert Y_\mathrm{c} \rvert = \omega/k` of the tie mobility
         per frequency, in m/(N.s); all zeros for a rigid connection.
     :ivar ties_per_area: Number of ties per unit area ``n``, in 1/m^2.
     :ivar tie_stiffness: Dynamic stiffness ``k`` of one tie, in N/m, or ``None``
         for a rigid connection.
-    :ivar rigid_coupling_loss_factor: The :math:`Y_c = 0` coupling loss
+    :ivar rigid_coupling_loss_factor: The :math:`Y_\mathrm{c} = 0` coupling loss
         factor per frequency, the ceiling a resilient tie is measured
         against.
     """
@@ -218,12 +218,12 @@ def wall_tie_coupling_loss_factor(
     .. math::
 
        \eta_{ij} = \frac{N}{\omega m_i}
-       \frac{\operatorname{Re}\{Y_j\}}{| Y_i + Y_j + Y_c |^2} \tag{Eq. 4.87}
+       \frac{\operatorname{Re}\{Y_j\}}{| Y_i + Y_j + Y_\mathrm{c} |^2} \tag{Eq. 4.87}
 
     for ``N`` identical, uncorrelated point connections, with the leaves
     modelled as infinite thin plates (:math:`Y = 1/(8 \sqrt{B' m''})`,
-    Eq. 2.190) and each tie as a linear spring (:math:`Y_c = i \omega / k`,
-    Eq. 4.88). Since :math:`m_i = \rho_{s1} S` and :math:`N = n S`, the plate
+    Eq. 2.190) and each tie as a linear spring (:math:`Y_\mathrm{c} = i \omega / k`,
+    Eq. 4.88). Since :math:`m_i = \rho_{\mathrm{s}1} S` and :math:`N = n S`, the plate
     area cancels and only the tie density ``n`` enters.
 
     :param frequency: Frequencies ``f``, in hertz (array, > 0).
@@ -236,7 +236,7 @@ def wall_tie_coupling_loss_factor(
     :param ties_per_area: Number of ties per unit area ``n``, in 1/m^2 (> 0).
     :param tie: A name from :data:`WALL_TIE_STIFFNESS`, an explicit dynamic
         stiffness ``k`` in N/m, or ``None`` for a rigid connection
-        (:math:`Y_c = 0`, the screw/nail/bolt limit).
+        (:math:`Y_\mathrm{c} = 0`, the screw/nail/bolt limit).
     :return: A :class:`WallTieCouplingResult`.
     :raises ValueError: for a non-positive input or an unknown tie name.
     """

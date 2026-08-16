@@ -37,7 +37,7 @@ a **ray model** and a **parabolic-equation (PE)** solver.
 
 Whether refraction matters is mostly a question of range. A representative
 surface-layer gradient of ±0.1 s⁻¹ curves rays with a radius
-$R_c = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
+$R_\mathrm{c} = c_0/|g| \approx 3.4$ km, so over the first hundred metres the paths are
 sensibly straight and the homogeneous models above are accurate. Beyond a few
 hundred metres the geometry takes over: downwind, or under a nocturnal
 temperature inversion, the downward-curved rays close over the ground and hold
@@ -47,7 +47,7 @@ same wind profile opens an acoustic shadow into which the level collapses by
 familiar upwind/downwind asymmetry of any steady outdoor source: the same
 machine at the same distance, tens of decibels apart depending on which side
 you stand. It is also why ISO 9613-2 fixes its "favourable" downwind
-atmosphere by decree, and what its scalar $C_{met}$ compresses; the models on
+atmosphere by decree, and what its scalar $C_\mathrm{met}$ compresses; the models on
 this page compute the physics that decides both.
 
 The sketch below puts both sides in one scene: one source, a receiver 350 m
@@ -60,7 +60,7 @@ away on each side, and the wind profile deciding which of them hears anything.
 *The two halves of the same atmosphere. The ray fan says **where** the shadow
 starts — every ray has left the ground by about 110 m — and the GFPE field says
 **how deep** it is once you are inside it. Neither picture exists in an
-octave-band engineering method: this is what $C_{met}$ replaces with one number.*
+octave-band engineering method: this is what $C_\mathrm{met}$ replaces with one number.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -141,17 +141,17 @@ opens an acoustic **shadow** near the ground.
 ### Setting `b` and `z0` from a site
 
 $b$ is not a taste setting. The effective profile is
-$c_\text{eff}(z) = \sqrt{\gamma R_\text{gas} T(z)} + u_{SR}(z)$
+$c_\text{eff}(z) = \sqrt{\gamma R_\text{gas} T(z)} + u_\mathrm{SR}(z)$
 (Attenborough & Van Renterghem 2021, Eq. 1.18), so the coefficient of the
 logarithmic term follows from a wind speed measured at a stated height once
 $z_0$ is fixed: matching the profile at that height gives
-$b = u_{SR}(z_1)\,/\,\ln(1 + z_1/z_0)$. A 10 m mast reading of 4 m/s blowing
+$b = u_\mathrm{SR}(z_1)\,/\,\ln(1 + z_1/z_0)$. A 10 m mast reading of 4 m/s blowing
 straight down the propagation path over grassland ($z_0 = 0.1$ m) therefore
 gives $b = 4 / \ln(101) = 0.87$ m/s — close to the "+1 m/s typical" above, and
 `log_linear_sound_speed_profile(0.867)` duly returns 344.0 m/s at 10 m.
 
 Only the **component along the propagation direction** enters $c_\text{eff}$:
-$u_{SR}(z) = u(z)\cos(\pi - \alpha)$ with $\alpha$ the angle between the
+$u_\mathrm{SR}(z) = u(z)\cos(\pi - \alpha)$ with $\alpha$ the angle between the
 meteorological wind direction (the direction the wind blows *from*) and the
 direction the sound travels (Eq. 1.19). The same 4 m/s at 60° to the path is
 worth 2 m/s along it, so $b = 0.43$ m/s downwind and $-0.43$ m/s upwind — one
@@ -267,26 +267,26 @@ For a **linear** profile every ray is an exact **circular arc** of radius of
 curvature (Salomons Sec. 4.4; Attenborough Ch. 11):
 
 $$
-R_c = \frac{c_0}{|g|\cos\theta_0},
+R_\mathrm{c} = \frac{c_0}{|g|\cos\theta_0},
 $$
 
 exposed as `ray_curvature_radius`. A ray launched at angle $\theta_0$ in
-downward refraction turns at the height $R_c(1 - \cos\theta_0)$. For an
+downward refraction turns at the height $R_\mathrm{c}(1 - \cos\theta_0)$. For an
 **upward-refracting**
 linear profile the ground-grazing ray bounds a region beyond which no direct or
 once-reflected ray arrives, at the closed-form **shadow-zone distance**
 (`shadow_zone_distance`):
 
 $$
-x_\text{shadow} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
-\qquad R_c = \frac{c_0}{|g|},
+x_\text{shadow} = \sqrt{2 R_\mathrm{c}}\left(\sqrt{h_\mathrm{s}} + \sqrt{h_\mathrm{r}}\right),
+\qquad R_\mathrm{c} = \frac{c_0}{|g|},
 $$
 
-where this second $R_c$ is the grazing ($\theta_0 = 0$) special case of the
+where this second $R_\mathrm{c}$ is the grazing ($\theta_0 = 0$) special case of the
 expression above, since the bounding ray leaves the source horizontally.
 
 These closed forms are the exact oracle for the ray tracer: a circle fit of a
-traced ray recovers $R_c$ to machine precision. They are also the cheapest
+traced ray recovers $R_\mathrm{c}$ to machine precision. They are also the cheapest
 answer to the question the whole page turns on — *is my range long enough for
 refraction to matter?*
 
@@ -361,7 +361,7 @@ the 400 Hz level at 600 m by more than 30 dB.
 
 *One source, one distance, one ground, three atmospheres: at 600 m the sign of
 the gradient alone is worth more than 30 dB. Any single-number meteorological
-correction — $C_{met}$ included — is an average over this spread, not a
+correction — $C_\mathrm{met}$ included — is an average over this spread, not a
 prediction of where on it a given night sits.*
 
 <details>

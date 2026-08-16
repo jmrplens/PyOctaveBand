@@ -109,7 +109,7 @@ class MultitaperSpectralDensityResult:
     :ivar n_tapers: Number of tapers ``K`` averaged.
     :ivar resolution_bandwidth: The resolution bandwidth :math:`2W` of
         the estimator, in Hz - the multitaper analog of the Welch
-        :math:`B_e`
+        :math:`B_\mathrm{e}`
         (P&W call :math:`2W` *the* natural resolution measure of the
         method).
     :ivar adaptive: Whether Thomson's adaptive weights were used.
@@ -363,7 +363,7 @@ def multitaper_psd(
     :param fs: Sample rate, in Hz.
     :param time_half_bandwidth: Duration x half-bandwidth product ``NW``
         (dimensionless; default 4, P&W's worked choice). The design
-        half-bandwidth is :math:`W = NW f_s / N` Hz; larger ``NW``
+        half-bandwidth is :math:`W = NW f_\mathrm{s} / N` Hz; larger ``NW``
         admits more
         tapers (lower variance) at the cost of resolution :math:`2W`.
     :param n_tapers: Number of tapers ``K``; ``None`` picks

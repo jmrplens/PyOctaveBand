@@ -751,7 +751,7 @@ def level_crossing_rate(
     low-pass white noise of bandwidth ``B`` the expectation is
     :math:`N_0 = 2B/\sqrt{3}` -- an apparent frequency of ``0.58 B`` (B&P
     Example 5.12) -- and for bandwidth-limited white noise centred on
-    ``fc``, :math:`N_0 = 2\sqrt{f_c^2 + B^2/12}` (Example 5.13).
+    ``fc``, :math:`N_0 = 2\sqrt{f_\mathrm{c}^2 + B^2/12}` (Example 5.13).
 
     The record mean is removed first (the formulas hold for zero mean
     value records); ``levels`` are then relative to that mean. Crossings

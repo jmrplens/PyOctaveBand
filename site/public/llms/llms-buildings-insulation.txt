@@ -150,7 +150,7 @@ To rate a building element on its own (a wall type, a floating floor, a
 window) you take it to a qualified laboratory, where suppressed flanking
 makes the direct transmission the whole story. This page covers the
 ISO 10140 laboratory chain: the sound reduction index $R$, the normalized
-impact level $L_n$, the background-noise correction and the accredited test
+impact level $L_\mathrm{n}$, the background-noise correction and the accredited test
 fiches. Three sibling laboratory methods have guides of their own: the
 sound-intensity route in
 [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/), the
@@ -168,18 +168,18 @@ prediction that consumes these laboratory ratings in
 ## Laboratory measurement (ISO 10140)
 
 An [ISO 16283 field measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/) yields the primed
-quantities ($R'$, $L'_n$): the number a real building achieves, flanking
+quantities ($R'$, $L'_\mathrm{n}$): the number a real building achieves, flanking
 transmission and all. To rate an
 element on its own (a wall type, a floating floor, a window), you take it to a
 qualified **laboratory** (ISO 10140), where suppressed flanking makes the
 *direct* transmission the whole story. The formulas lose their primes: the
 **sound reduction index** $R$ (not $R'$) and the **normalized impact level**
-$L_n$ (not $L'_n$), with the receiving room's absorption area $A = 0.16\ V/T$
+$L_\mathrm{n}$ (not $L'_\mathrm{n}$), with the receiving room's absorption area $A = 0.16\ V/T$
 now a known property of the facility:
 
 $$
 R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
-L_n = L_i + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
+L_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
 $$
 
 The facility itself is what suppresses the flanking: two structurally
@@ -191,25 +191,25 @@ test mounted in a test opening of about 10 m² between them.
 | | Field (ISO 16283) | Laboratory (ISO 10140) |
 | :--- | :--- | :--- |
 | Airborne element index | $R'$ apparent (with flanking) | $R$ direct (flanking suppressed) |
-| Airborne room pair | $D_{nT}$, $D_n$ (no prime: room quantities) | — |
-| Impact | $L'_n$, $L'_{nT}$ apparent | $L_n$ direct |
-| Single number | $R'_w$, $D_{nT,w}$, $L'_{n,w}$, $L'_{nT,w}$ | $R_w$, $L_{n,w}$ |
+| Airborne room pair | $D_\mathrm{nT}$, $D_\mathrm{n}$ (no prime: room quantities) | — |
+| Impact | $L'_\mathrm{n}$, $L'_\mathrm{nT}$ apparent | $L_\mathrm{n}$ direct |
+| Single number | $R'_\mathrm{w}$, $D_\mathrm{nT,w}$, $L'_\mathrm{n,w}$, $L'_\mathrm{nT,w}$ | $R_\mathrm{w}$, $L_\mathrm{n,w}$ |
 | Absorption area | measured in the room | property of the facility |
 
 The apostrophe is the flanking marker of building acoustics, and it travels
-with the quantity into its single number: $R_w$ rates a laboratory spectrum,
-$R'_w$ a field one. The standardized and normalized level differences
-$D_{nT}$ and $D_n$ carry no prime because they describe the room pair rather
+with the quantity into its single number: $R_\mathrm{w}$ rates a laboratory spectrum,
+$R'_\mathrm{w}$ a field one. The standardized and normalized level differences
+$D_\mathrm{nT}$ and $D_\mathrm{n}$ carry no prime because they describe the room pair rather
 than an element, so there is no flanking-free counterpart to mark. In a
-well-built construction $R'_w$ lands a few dB below the laboratory $R_w$ of
+well-built construction $R'_\mathrm{w}$ lands a few dB below the laboratory $R_\mathrm{w}$ of
 the same partition; a much larger gap says flanking dominates, and the
 [EN 12354 model](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) tells you which path carries it.
 
 The single-number ratings reuse the very same ISO 717-1/2 engines
-(`weighted_rating`, `weighted_impact_rating`): an $R$ spectrum rates to $R_w$
-exactly as an $R'$ spectrum rated to $R'_w$. Before forming the index the
+(`weighted_rating`, `weighted_impact_rating`): an $R$ spectrum rates to $R_\mathrm{w}$
+exactly as an $R'$ spectrum rated to $R'_\mathrm{w}$. Before forming the index the
 receiving-room levels must be **corrected for background noise** (Clause 4.3):
-the energy subtraction $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ applies for a
+the energy subtraction $10 \log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$ applies for a
 6–15 dB signal-to-background margin, a fixed 1.3 dB correction (the *limit of
 measurement*) at or below 6 dB, and no correction at or above 15 dB.
 
@@ -250,7 +250,7 @@ one-third-octave or 5 octave values are supplied (`rating` is `None` otherwise).
 
 *The two laboratory quantities of ISO 10140 with their ISO 717 ratings: the
 airborne $R$ is rated where the reference sits **above** the measurement,
-the impact $L_n$ where the measurement sits **above** the reference (a
+the impact $L_\mathrm{n}$ where the measurement sits **above** the reference (a
 higher impact level is worse). `lab.plot()` and `imp.plot()` draw either
 panel on its own.*
 
@@ -320,7 +320,7 @@ Both laboratory results write the one-page ISO 10140 test report directly, laid
 out like the accredited laboratory reports rated per ISO 717.
 `LabAirborneInsulationResult.report()` renders the sound reduction index $R$
 fiche (ISO 10140-2:2010) and `LabImpactInsulationResult.report()` the
-normalized impact sound pressure level $L_n$ fiche (ISO 10140-3:2010). Each
+normalized impact sound pressure level $L_\mathrm{n}$ fiche (ISO 10140-3:2010). Each
 fiche names the laboratory standard in its basis line, evaluates the
 ISO 717-1 / ISO 717-2 single-number rating (16 one-third-octave bands from
 100 Hz to 3150 Hz, or the 5 octave bands), states the quantity to one decimal
@@ -328,8 +328,8 @@ place both in tabular form and as a curve against the shifted reference curve,
 boxes the laboratory rating (`Rw (C; Ctr)` or `Ln,w (CI)`) and prints the
 statement that the evaluation is based on laboratory measurement results
 obtained by a precision method. Because a qualified suite suppresses flanking
-transmission, the reported quantity is the *direct* $R$ / $L_n$, not the
-field $R'$ / $L'_n$.
+transmission, the reported quantity is the *direct* $R$ / $L_\mathrm{n}$, not the
+field $R'$ / $L'_\mathrm{n}$.
 
 `verbose=True` annexes the per-band equivalent sound absorption area
 $A = 0.16\,V/T$ (ISO 10140-4:2010) beside the reported quantity, the
@@ -413,7 +413,7 @@ junction data the EN 12354 prediction consumes is measured per
 ## Standards
 
 ISO 10140-2:2010, ISO 10140-3:2010 and ISO 10140-4:2010, which provide the
-laboratory $R$ and $L_n$ with the background-noise correction and the measurement
+laboratory $R$ and $L_\mathrm{n}$ with the background-noise correction and the measurement
 procedures behind them.
 
 **Not covered.** The ISO 10140-4:2010 procedure and the ISO 10140-1:2010 and
@@ -435,7 +435,7 @@ their own pages: intensity (ISO 15186), the floor-covering improvement
   the in-building airborne, impact and façade measurements, their single-number
   ratings and their uncertainty.
 - [Predicting Sound Insulation (EN 12354)](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/):
-  the flanking model that consumes the laboratory $R$, $L_n$ and $K_{ij}$.
+  the flanking model that consumes the laboratory $R$, $L_\mathrm{n}$ and $K_{ij}$.
 - [Sound Insulation by Intensity (ISO 15186)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-intensity/): the
   direct-power alternative for high-flanking situations.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](https://jmrplens.github.io/phonometry/buildings/design/impact-improvement/):
@@ -443,7 +443,7 @@ their own pages: intensity (ISO 15186), the floor-covering improvement
 - [Laboratory Flanking Transmission (ISO 10848)](https://jmrplens.github.io/phonometry/buildings/insulation/flanking-lab/): the
   measured junction vibration reduction index.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
-  engine behind $R_w$ and $L_{n,w}$.
+  engine behind $R_\mathrm{w}$ and $L_\mathrm{n,w}$.
 - [Sound Power](https://jmrplens.github.io/phonometry/devices/emission/sound-power/): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
 - API reference: [`building.measurement.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).
@@ -463,7 +463,7 @@ it, and the absorption area converts the room level back into a power. The
 direct reading: a p-p intensity probe scans a measurement surface that
 encloses the specimen and measures the power radiated by the test element
 alone, so flanking transmission stays out of the number. This guide covers
-the intensity sound reduction index $R_I$ and its $K_c$-modified form, the
+the intensity sound reduction index $R_\mathrm{I}$ and its $K_\mathrm{c}$-modified form, the
 element-normalized level difference of small building elements, the surface
 qualification indicator and the accredited test fiches. The pressure-based
 laboratory chain lives in
@@ -482,22 +482,22 @@ paths leak power the room integrates in anyway. The **sound-intensity** method
 encloses the specimen and measures the radiated power *directly*, so only the
 element under test contributes. It is the tool of choice when flanking is high
 (ISO 15186-1:2000, Clause 1). From the source-room level $L_{p1}$ and the
-average normal intensity level $L_{In}$ over the surface (area $S_m$), for a
+average normal intensity level $L_{I\mathrm{n}}$ over the surface (area $S_\mathrm{m}$), for a
 specimen of area $S$,
 
 $$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
+R_\mathrm{I} = L_{p1} - 6 - \left[ L_{I\mathrm{n}} + 10 \log_{10}\frac{S_\mathrm{m}}{S} \right],
 $$
 
 where the $6$ dB is the diffuse-field offset between the sound pressure level
 and the incident intensity level. The same formula gives the apparent index
-$R'_I$ in the field (ISO 15186-2). Because the intensity method slightly
+$R'_\mathrm{I}$ in the field (ISO 15186-2). Because the intensity method slightly
 *underestimates* the power radiated into a real receiving room, a **modified
-index** $R_{I,M} = R_I + K_c$ reproduces the ISO 10140-2 pressure result; the
-adaptation term $K_c$ (Annex B) is $10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ for a
+index** $R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ reproduces the ISO 10140-2 pressure result; the
+adaptation term $K_\mathrm{c}$ (Annex B) is $10 \log_{10}(1 + S_{\mathrm{b}2}\lambda/8V_2)$ for a
 well-defined room, or the room-independent $10 \log_{10}(1 + 61.4/f)$. For small
-elements the **element normalized level difference** replaces $10\log_{10}(S_m/S)$
-with $10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ element units).
+elements the **element normalized level difference** replaces $10\log_{10}(S_\mathrm{m}/S)$
+with $10\log_{10}(S_\mathrm{m}/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ element units).
 
 ```python
 import numpy as np
@@ -525,14 +525,14 @@ res.plot()   # measured RI vs shifted ISO 717-1 reference (needs matplotlib)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_insulation.svg" alt="Intensity sound reduction index RI and the Kc-modified index RI,M across the one-third-octave bands, with the Annex B adaptation lift shaded between the two curves" width="80%"></picture>
 
-*The modified index $R_{I,M} = R_I + K_c$ lifts $R_I$ (most at the low bands,
-where $K_c$ is largest), so an intensity measurement reproduces the ISO 10140-2
+*The modified index $R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ lifts $R_\mathrm{I}$ (most at the low bands,
+where $K_\mathrm{c}$ is largest), so an intensity measurement reproduces the ISO 10140-2
 pressure result. The automatic rating is formed only for exactly 16
 one-third-octave or 5 octave values (`rating`/`rating_modified` are `None`
 otherwise). Subareas scanned separately are combined first with
 `combine_subareas` (Formulas (11)-(12)); a subarea whose net energy flows back
 towards the specimen enters with a negative area, applying the minus-sign rule
-of Clause 6.4.6 while $S_m$ keeps the unsigned area sum.*
+of Clause 6.4.6 while $S_\mathrm{m}$ keeps the unsigned area sum.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -569,7 +569,7 @@ plt.show()
 
 Both levels are already-measured inputs: the scanning probe, the
 two-microphone acquisition and the phase-mismatch calibration behind $L_{p1}$
-and $L_{In}$ are not implemented, and nothing here enforces the Clause 6.4
+and $L_{I\mathrm{n}}$ are not implemented, and nothing here enforces the Clause 6.4
 acquisition either — the 0.1 m to 0.3 m measurement distance, the 0.1 m/s to
 0.3 m/s scan speed, the 90°-rotated second scan with its 1.0 dB validity
 test, the 10 dB background margin — so a single scan will produce a number
@@ -581,11 +581,11 @@ just as readily as a qualified pair.
 | :--- | :--- | :--- | :--- | :--- |
 | `lp1` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source-room sound pressure level |
 | `l_in` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Normal intensity level over the surface |
-| `measurement_area` | float | m² | > 0 | Measurement-surface area $S_m$ |
+| `measurement_area` | float | m² | > 0 | Measurement-surface area $S_\mathrm{m}$ |
 | `area` | float | m² | > 0 | Specimen area $S$ |
 | `kc` | 1D array | dB | one per band / `None` | Adaptation term for the modified index |
 | `freq` | 1D array | Hz | > 0 | Midband frequencies (`adaptation_term_kc`) |
-| `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room $S_{b2}$ / $V_2$ for Formula (B.1) |
+| `boundary_area` / `volume` | float | m² / m³ | > 0, both or neither | Room $S_{\mathrm{b}2}$ / $V_2$ for Formula (B.1) |
 
 `intensity_sound_reduction()` returns an `IntensityReductionResult` (`r_i`,
 `r_i_modified`, `rating`, `rating_modified`);
@@ -596,15 +596,15 @@ just as readily as a qualified pair.
 ## ISO 15186-1 intensity test report (`.report()`)
 
 `IntensityReductionResult.report()` writes the one-page ISO 15186-1:2000 test
-report of the intensity sound reduction index $R_I$, reusing the same
+report of the intensity sound reduction index $R_\mathrm{I}$, reusing the same
 accredited two-panel layout as the ISO 10140 and ISO 16283 fiches. Because
-$R_I$ is an ordinary sound reduction index, its single-number rating $R_{I,w}$
+$R_\mathrm{I}$ is an ordinary sound reduction index, its single-number rating $R_\mathrm{I,w}$
 is the ISO 717-1 airborne rating evaluated on the intensity spectrum: the fiche
-names ISO 15186-1 in its basis line, tabulates $R_I$ to one decimal place
+names ISO 15186-1 in its basis line, tabulates $R_\mathrm{I}$ to one decimal place
 beside the measured-versus-shifted-reference curve, boxes `RI,w (C; Ctr)` and
 prints the statement that the transmitted sound power was measured directly
-over the measurement surface. `verbose=True` annexes the $K_c$-modified index
-$R_{I,M}$ (Formula (9)) beside $R_I$ when an adaptation term was supplied.
+over the measurement surface. `verbose=True` annexes the $K_\mathrm{c}$-modified index
+$R_\mathrm{I,M}$ (Formula (9)) beside $R_\mathrm{I}$ when an adaptation term was supplied.
 
 The applicable `ReportMetadata` fields describe the intensity measurement:
 `specimen` (the tested element), `area` (specimen area $S$), `client`,
@@ -646,12 +646,12 @@ repository. Click the preview to open the PDF:
 
 [![Intensity ISO 15186-1 example report: metadata header, one-third-octave RI table beside the measured-versus-shifted-reference curve, boxed RI,w (C; Ctr), the intensity-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_intensity_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_intensity_example.pdf)
 
-*Intensity fiche (`IntensityReductionResult.report`), $R_{I,w}(C; C_{tr})$.*
+*Intensity fiche (`IntensityReductionResult.report`), $R_\mathrm{I,w}(C; C_\mathrm{tr})$.*
 
 ## Small building elements: the element-normalized level difference
 
 For a **small building element** (a ventilator, a socket, a small window) the
-intensity method reports the element-normalized level difference $D_{I,n,e}$
+intensity method reports the element-normalized level difference $D_\mathrm{I,n,e}$
 (Formula (8)) instead, normalized to the reference absorption area
 $A_0 = 10\ \text{m}^2$.
 `IntensityElementNormalizedResult.report()` writes the same one-page fiche
@@ -682,9 +682,9 @@ res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation.svg" alt="Element-normalized level difference DI,n,e of a trickle ventilator per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the DI,n,e,w rating annotated" width="80%"></picture>
 
-*The small element is rated exactly like a wall: $D_{I,n,e}$ feeds the
+*The small element is rated exactly like a wall: $D_\mathrm{I,n,e}$ feeds the
 ISO 717-1 engine and the unfavourable deviations (reference above the
-measurement) set $D_{I,n,e,w}$. The $10\log_{10}(S_m/A_0)$ normalization replaces
+measurement) set $D_\mathrm{I,n,e,w}$. The $10\log_{10}(S_\mathrm{m}/A_0)$ normalization replaces
 the specimen-area term, so the number describes the element irrespective of
 the wall it sits in.*
 
@@ -728,15 +728,15 @@ plt.show()
 
 [![Intensity ISO 15186-1 element example report: metadata header, one-third-octave DI,n,e table beside the measured-versus-shifted-reference curve, boxed DI,n,e,w (C; Ctr), the intensity-method statement and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_element_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso15186_element_example.pdf)
 
-*Element intensity fiche (`IntensityElementNormalizedResult.report`), $D_{I,n,e,w}(C; C_{tr})$.*
+*Element intensity fiche (`IntensityElementNormalizedResult.report`), $D_\mathrm{I,n,e,w}(C; C_\mathrm{tr})$.*
 
 ## Laboratory or field (ISO 15186-2)
 
 Part 1 is a laboratory method: the specimen sits in a test opening between
-two rooms, and the suppressed flanking of the facility makes $R_I$ a
+two rooms, and the suppressed flanking of the facility makes $R_\mathrm{I}$ a
 property of the element. ISO 15186-2 takes the same probe, the same surface
 scan and the same formula into the finished building, where the result is
-the apparent index $R'_I$ of the installed element, flanking radiation and
+the apparent index $R'_\mathrm{I}$ of the installed element, flanking radiation and
 all. The selectivity that motivated the method in the laboratory doubles in
 the field: because the probe reads only what its measurement surface
 radiates, partial surfaces isolate which element (the wall itself, a window,
@@ -760,31 +760,31 @@ unchanged to field data, but nothing checks how that data was acquired.
   using sound intensity — Part 1: Laboratory measurements*
   (ISO 15186-1:2000).
   [iso.org catalogue](https://www.iso.org/standard/26097.html).
-  The intensity sound reduction index, the $K_c$ adaptation and the element
+  The intensity sound reduction index, the $K_\mathrm{c}$ adaptation and the element
   normalized level difference this page implements.
 - International Organization for Standardization. (2003). *Acoustics —
   Measurement of sound insulation in buildings and of building elements
   using sound intensity — Part 2: Field measurements* (ISO 15186-2:2003).
   [iso.org catalogue](https://www.iso.org/standard/30105.html).
-  The field counterpart, giving the apparent index $R'_I$ of the installed
+  The field counterpart, giving the apparent index $R'_\mathrm{I}$ of the installed
   element.
 
 ## Standards
 
-ISO 15186-1:2000, which defines the intensity sound reduction index $R_I$,
-its $K_c$-modified form $R_{I,M}$ (Annex B), the element normalized level
-difference $D_{I,n,e}$ and the surface pressure-intensity indicator;
+ISO 15186-1:2000, which defines the intensity sound reduction index $R_\mathrm{I}$,
+its $K_\mathrm{c}$-modified form $R_\mathrm{I,M}$ (Annex B), the element normalized level
+difference $D_\mathrm{I,n,e}$ and the surface pressure-intensity indicator;
 ISO 15186-2:2003, which carries the same quantities into the field as the
-apparent $R'_I$. The single-number ratings reuse ISO 717-1.
+apparent $R'_\mathrm{I}$. The single-number ratings reuse ISO 717-1.
 
 ## See also
 
 - [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
-  pressure method that the $K_c$ adaptation reproduces.
+  pressure method that the $K_\mathrm{c}$ adaptation reproduces.
 - [Field Insulation Measurement (ISO 16283)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-field/): the
   pressure-based field quantities and their single-number ratings.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
-  reference-curve engine behind $R_{I,w}$ and $D_{I,n,e,w}$.
+  reference-curve engine behind $R_\mathrm{I,w}$ and $D_\mathrm{I,n,e,w}$.
 - [Sound Intensity](https://jmrplens.github.io/phonometry/devices/emission/intensity/): the two-microphone probe, its field
   indicators and the residual-index qualification behind every scan.
 - API reference: [`building.measurement.intensity_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/intensity-insulation/).
@@ -802,7 +802,7 @@ junction gets its number. Two structurally decoupled elements meet in a
 laboratory junction rig; shakers and tapping machines drive one, and the
 velocity level differences across the junction condense into the
 **vibration reduction index** $K_{ij}$, together with the overall flanking
-descriptors $D_{n,f}$ (airborne) and $L_{n,f}$ (impact). This guide covers
+descriptors $D_\mathrm{n,f}$ (airborne) and $L_\mathrm{n,f}$ (impact). This guide covers
 that measurement chain: the direction-averaged velocity level difference,
 the equivalent absorption lengths, the SEA validity checks of Part 4 and
 the three accredited fiches. The empirical junction values a prediction
@@ -815,8 +815,8 @@ wave-theory $K_{ij}$ of ideal plate junctions is derived in
 
 ISO 10848:2006/2010 is the laboratory method that **measures** the junction
 **vibration reduction index** $K_{ij}$ that the [EN 12354 prediction](https://jmrplens.github.io/phonometry/buildings/design/insulation-prediction/) takes
-as an input, together with the overall flanking descriptors $D_{n,f}$
-(airborne) and $L_{n,f}$ (impact). It is the measurement counterpart of the
+as an input, together with the overall flanking descriptors $D_\mathrm{n,f}$
+(airborne) and $L_\mathrm{n,f}$ (impact). It is the measurement counterpart of the
 empirical `junction_vibration_reduction()` of that prediction.
 
 **Vibration reduction index (Formula (13)).**
@@ -824,14 +824,14 @@ $K_{ij} = \overline{D}_{v,ij} + 10\log_{10}\!\big(l_{ij} / \sqrt{a_i a_j}\big)$ 
 the direction-averaged velocity level difference
 $\overline{D}_{v,ij} = \tfrac{1}{2}(D_{v,ij} + D_{v,ji})$ (Formula (11), which
 makes $K_{ij}$ symmetric), the common-edge junction length $l_{ij}$ and the
-**equivalent absorption lengths** $a_j = 2.2\pi^2 S_j /(T_{s,j} c_0)\sqrt{f_\text{ref}/f}$
-(Formula (12), $f_\text{ref} = 1000$ Hz). For lightweight well-damped elements
+**equivalent absorption lengths** $a_j = 2.2\pi^2 S_j /(T_{\mathrm{s},j} c_0)\sqrt{f_\mathrm{ref}/f}$
+(Formula (12), $f_\mathrm{ref} = 1000$ Hz). For lightweight well-damped elements
 $a_j = S_j / l_0$ ($l_0 = 1$ m) and Formula (13) reduces to the simplified
-Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_s)$.
+Formula (14). The related **total loss factor** is $\eta = 2.2/(f T_\mathrm{s})$.
 
-**Overall descriptors.** $D_{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
-airborne) and $L_{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
-$A_0 = 10\ \text{m}^2$; their $D_{n,f,w}$ / $L_{n,f,w}$ single numbers reuse the
+**Overall descriptors.** $D_\mathrm{n,f} = L_1 - L_2 - 10\log_{10}(A/A_0)$ (Formula (4),
+airborne) and $L_\mathrm{n,f} = L_2 + 10\log_{10}(A/A_0)$ (Formula (5), tapping machine),
+$A_0 = 10\ \text{m}^2$; their $D_\mathrm{n,f,w}$ / $L_\mathrm{n,f,w}$ single numbers reuse the
 ISO 717 rating engines. The single-number $\overline{K}_{ij}$ is the arithmetic
 mean over 200–1250 Hz for one-third-octave bands, or over 125–1000 Hz for
 octave bands (Annex A).
@@ -871,12 +871,12 @@ to `vibration_reduction_index(..., modal_overlap=M)`: bands with $M < 0.25$
 are flagged in `result.bracketed` and excluded from the single-number
 $\overline{K}_{ij}$, as Part 4 Clause 9 requires. Because ISO 10848 contains no
 worked numeric example, conformance is anchored on closed-form identities
-(simplified $K_{ij}$, $a_j$ at $f_\text{ref}$, $\eta$).
+(simplified $K_{ij}$, $a_j$ at $f_\mathrm{ref}$, $\eta$).
 
 Those checks are the only enforcement there is. The acquisition itself —
 shielding the other elements, a shield meeting $\Delta R_\text{min}$, the
 position counts and separations, the accelerometer mass-loading inequality,
-$T_s$ measured on the elements in their installed state rather than assumed —
+$T_\mathrm{s}$ measured on the elements in their installed state rather than assumed —
 is the operator's responsibility, and nothing here checks any of it.
 
 ```python
@@ -913,10 +913,10 @@ res_m.bracketed    # per-band flags; bracketed bands leave the single number
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/flanking_level_difference.svg" alt="Normalized flanking level difference Dn,f per one-third-octave band against the shifted ISO 717-1 reference curve, with the unfavourable deviations shaded and the Dn,f,w rating annotated" width="80%"></picture>
 
-*The overall flanking descriptor $D_{n,f}$ is an airborne quantity, so its
-single number $D_{n,f,w}$ comes from the unchanged ISO 717-1 engine; it
+*The overall flanking descriptor $D_\mathrm{n,f}$ is an airborne quantity, so its
+single number $D_\mathrm{n,f,w}$ comes from the unchanged ISO 717-1 engine; it
 drops straight into the EN 12354-1 model as the flanking-path datum of the
-tested junction (the impact counterpart $L_{n,f}$ rates per ISO 717-2 the
+tested junction (the impact counterpart $L_\mathrm{n,f}$ rates per ISO 717-2 the
 same way).*
 
 <details>
@@ -964,7 +964,7 @@ Two offices separated by a partition that stops at the suspended ceiling share
 one continuous plenum above it. Sound leaves the source room through the
 ceiling tiles, travels sideways over the partition and comes back down through
 the tiles of the receiving room. That path is often the weakest link in an
-open-plan fit-out, and it is not what a partition's $R_w$ describes.
+open-plan fit-out, and it is not what a partition's $R_\mathrm{w}$ describes.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/ceiling_plenum_flanking.svg" alt="Two panels: the ceiling-plenum flanking reduction index Rcl per octave band for two plenum depths against the sum of the two ceiling reduction indices, and the normalized ceiling attenuation of an accredited ASTM E1414 test report with the fitted ASTM E413 contour and its shaded deficiencies giving CAC 34" width="92%"></picture>
 
@@ -974,29 +974,29 @@ rated as a ceiling attenuation class.*
 
 **The one-dimensional model.** Mechel's one-dimensional variant, as presented
 by Vigran in Section 9.2.3, treats the plenum as a duct lined on one side. The
-ceiling on each side has a transmission factor $\tau_S = \tau_{S,pl}\tau_{S,a}$
+ceiling on each side has a transmission factor $\tau_\mathrm{S} = \tau_\mathrm{S,pl}\tau_\mathrm{S,a}$
 (plates times any plenum absorber, Eq. (9.14)); the injected power splits,
-a fraction $s_S$ heading for the partition, and decays as $\exp(-mx)$ with the
+a fraction $s_\mathrm{S}$ heading for the partition, and decays as $\exp(-mx)$ with the
 power attenuation coefficient $m = 2\,\mathrm{Re}\{\Gamma\} = -2\,\mathrm{Im}\{k'\}$
 (Eqs. (9.15) and (9.16)). Integrating over the ceiling length on both sides
 gives Eq. (9.18), whose receiving side carries the leakage back into the room,
-$m'_R = m_R + s_R\tau_R/h$ (Eq. (9.17)). Vigran prints the *unprimed* $m_R$ in
+$m'_\mathrm{R} = m_\mathrm{R} + s_\mathrm{R}\tau_\mathrm{R}/h$ (Eq. (9.17)). Vigran prints the *unprimed* $m_\mathrm{R}$ in
 that expression's denominator; that is a misprint, recorded in
-[the errata register](https://jmrplens.github.io/phonometry/reference/errata/), and the derived $m'_R$ is used here. Read
+[the errata register](https://jmrplens.github.io/phonometry/reference/errata/), and the derived $m'_\mathrm{R}$ is used here. Read
 literally, the printed form is non-monotonic in the plenum damping (adding
-absorber would predict a worse path than none) and unbounded as $m_R \to 0$. For a plenum with little
-attenuation and $s_S = s_R = 0{,}5$ that collapses to the compact form that
+absorber would predict a worse path than none) and unbounded as $m_\mathrm{R} \to 0$. For a plenum with little
+attenuation and $s_\mathrm{S} = s_\mathrm{R} = 0{,}5$ that collapses to the compact form that
 makes the geometry visible (Eqs. (9.19) and (9.20)):
 
 $$
-R_{cl} = R_S + R_R - 10\log_{10}\!\left[\frac{\varepsilon^2 L_R}{4h}\right],
+R_\mathrm{cl} = R_\mathrm{S} + R_\mathrm{R} - 10\log_{10}\!\left[\frac{\varepsilon^2 L_\mathrm{R}}{4h}\right],
 $$
 
 with $\varepsilon = 1$ for totally absorbing plenum sidewalls and
 $\varepsilon = 2$ for totally reflecting ones. A deep plenum helps, a long room
-hurts, and doubling the tile insulation helps twice over because $R_S$ and
-$R_R$ both appear. Referred to the partition area instead of the ceiling,
-$R_{cl,p} = R_{cl} + 10\log_{10}(H_S/L_S)$ (Eq. (9.13)), which is what lets the
+hurts, and doubling the tile insulation helps twice over because $R_\mathrm{S}$ and
+$R_\mathrm{R}$ both appear. Referred to the partition area instead of the ceiling,
+$R_\mathrm{cl,p} = R_\mathrm{cl} + 10\log_{10}(H_\mathrm{S}/L_\mathrm{S})$ (Eq. (9.13)), which is what lets the
 ceiling path be added to the direct path as transmission factors.
 
 ```python
@@ -1025,19 +1025,19 @@ damped = plenum_flanking_reduction_index(
 print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
-**The measured quantity.** A ceiling is not rated by $R_{cl}$ but by the
-**normalized ceiling attenuation** $D_{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
+**The measured quantity.** A ceiling is not rated by $R_\mathrm{cl}$ but by the
+**normalized ceiling attenuation** $D_\mathrm{n,c} = D - 10\log_{10}(A/A_0)$ (ISO 140-9:1985
 clause 3.3), with $A$ the receiving-room equivalent absorption area and the
 reference $A_0 = 10\ \text{m}^2$. The facility has two rooms of at least
 50 m³ whose volumes differ by at least 10 %, a dividing wall tapered to at most
 100 mm at the top, and a plenum 650 mm to 760 mm deep with one sidewall and
 both end walls lined; the standard prints the required lining absorption
-$\alpha_s \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
+$\alpha_\mathrm{s} \ge 0{,}65$ at 125 Hz and $\ge 0{,}80$ from 250 Hz to 4000 Hz, and
 requires $\alpha < 0{,}10$ on the other sidewall and on the plenum ceiling.
 The North American counterpart, ASTM E1414, uses $A_0 = 12\ \text{m}^2$, so an
 ASTM value runs about $10\log_{10}(12/10) = 0{,}79$ dB higher for the same rooms.
 
-ISO rates $D_{n,c}$ with the ISO 717-1 curve, giving $D_{n,c,w}$; ASTM E1414
+ISO rates $D_\mathrm{n,c}$ with the ISO 717-1 curve, giving $D_\mathrm{n,c,w}$; ASTM E1414
 rates it through ASTM E413 as the **ceiling attenuation class**. E413 rounds the
 data to the nearest integer (clause 5.2), raises its reference contour in 1 dB
 steps while the sum of the deficiencies stays at or below 32 dB and no single
@@ -1079,15 +1079,15 @@ excluded from the mean; `verbose=True` adds a column stating whether each band
 enters the mean.
 
 `FlankingLevelDifferenceResult.report()` and `FlankingImpactLevelResult.report()`
-write **measurement** reports of the overall descriptors $D_{n,f}$
-(airborne) and $L_{n,f}$ (impact, tapping machine), reusing the same
+write **measurement** reports of the overall descriptors $D_\mathrm{n,f}$
+(airborne) and $L_\mathrm{n,f}$ (impact, tapping machine), reusing the same
 two-panel insulation layout: the per-band quantity beside the
 measured-versus-shifted-ISO 717-reference curve and the boxed single number
-$D_{n,f,w}$ (C; Ctr) (ISO 717-1) or $L_{n,f,w}$ (CI) (ISO 717-2).
+$D_\mathrm{n,f,w}$ (C; Ctr) (ISO 717-1) or $L_\mathrm{n,f,w}$ (CI) (ISO 717-2).
 `verbose=True`
 annexes the ISO 717 evaluation per band (the value, the shifted reference and
 the unfavourable deviation). A `requirement` supplied on the `ReportMetadata`
-adds a verdict ($D_{n,f,w}$ passes at or above it, $L_{n,f,w}$ at or below
+adds a verdict ($D_\mathrm{n,f,w}$ passes at or above it, $L_\mathrm{n,f,w}$ at or below
 it), and
 `language="es"` renders every fiche in Spanish. reportlab is required, and
 matplotlib too for the figure the fiche embeds (`pip install
@@ -1132,11 +1132,11 @@ repository. Click a preview to open the PDF:
 
 [![ISO 10848-2 airborne flanking report: per-band Dn,f table beside the measured-versus-shifted-reference curve, boxed Dn,f,w (C; Ctr) and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_dnf_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_dnf_example.pdf)
 
-*Flanking level difference fiche (`FlankingLevelDifferenceResult.report`), $D_{n,f,w}$ (C; Ctr).*
+*Flanking level difference fiche (`FlankingLevelDifferenceResult.report`), $D_\mathrm{n,f,w}$ (C; Ctr).*
 
 [![ISO 10848-2 impact flanking report: per-band Ln,f table beside the measured-versus-shifted-reference curve, boxed Ln,f,w (CI) and a PASS verdict](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_lnf_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso10848_lnf_example.pdf)
 
-*Flanking impact level fiche (`FlankingImpactLevelResult.report`), $L_{n,f,w}$ (CI).*
+*Flanking impact level fiche (`FlankingImpactLevelResult.report`), $L_\mathrm{n,f,w}$ (CI).*
 
 ## References
 
@@ -1166,7 +1166,7 @@ repository. Click a preview to open the PDF:
   Part 9: Laboratory measurement of room-to-room airborne sound insulation of
   a suspended ceiling with a plenum above it* (ISO 140-9:1985).
   [iso.org catalogue](https://www.iso.org/standard/3944.html).
-  The normalized ceiling attenuation $D_{n,c}$ (clause 3.3) and the plenum
+  The normalized ceiling attenuation $D_\mathrm{n,c}$ (clause 3.3) and the plenum
   test facility.
 - ASTM International. (2022). *Classification for Rating Sound Insulation*
   (ASTM E413-22).
@@ -1183,25 +1183,25 @@ repository. Click a preview to open the PDF:
 ISO 10848-1:2006, ISO 10848-2:2006, ISO 10848-3:2006 and ISO 10848-4:2010,
 which cover the laboratory measurement of flanking transmission: the
 vibration reduction index $K_{ij}$, the equivalent absorption length, the
-normalized flanking descriptors $D_{n,f}$ / $L_{n,f}$ and the modal-overlap
+normalized flanking descriptors $D_\mathrm{n,f}$ / $L_\mathrm{n,f}$ and the modal-overlap
 validity checks that feed the EN 12354 prediction. Parts 2, 3 and 4 differ in
 which junction and specimen types they apply to; phonometry implements only
 the Part 1 formulae generically, plus the Part 4 modal-overlap validity
 check, not the facility-specific test setups the other parts describe.
 Because ISO 10848 contains no worked numeric example, conformance is
 anchored on closed-form identities (simplified $K_{ij}$, $a_j$ at
-$f_\text{ref}$, $\eta$).
+$f_\mathrm{ref}$, $\eta$).
 
 
 The suspended-ceiling branch adds ISO 140-9:1985, which defines the normalized
-ceiling attenuation $D_{n,c}$ and its laboratory, and ASTM E413-22, the rating
+ceiling attenuation $D_\mathrm{n,c}$ and its laboratory, and ASTM E413-22, the rating
 classification that ASTM E1414 invokes for the ceiling attenuation class. The
 one-dimensional plenum model itself is not standardized: it comes from Mechel
 through Vigran Section 9.2.3, and every published output of it is a figure, so
 it is anchored on its closed forms and on structural properties a wrong
 reading breaks: monotonicity in the plenum damping, the bound
-$\tau_{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
-$D_{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
+$\tau_\mathrm{cl} \le 1$, and the convergence of Eq. (9.18) to Eq. (9.20). The
+$D_\mathrm{n,c}$ measurement chain and the class are anchored on accredited ASTM E1414
 laboratory reports. The plenum propagation constant $k'$ of a lined duct is an
 input here, not a prediction.
 
@@ -1216,7 +1216,7 @@ input here, not a prediction.
 - [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/): the ISO 10140
   suite whose direct transmission these flanking paths bypass.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the
-  reference-curve engines behind $D_{n,f,w}$ and $L_{n,f,w}$.
+  reference-curve engines behind $D_\mathrm{n,f,w}$ and $L_\mathrm{n,f,w}$.
 - [Room-to-room and open-plan acoustics](https://jmrplens.github.io/phonometry/buildings/rooms/open-plan-acoustics/): the
   open-plan context the ceiling flanking path usually appears in.
 - API reference: [`building.measurement.flanking_transmission`](https://jmrplens.github.io/phonometry/reference/api/building/flanking-transmission/)
@@ -1233,8 +1233,8 @@ Source: https://jmrplens.github.io/phonometry/buildings/insulation/insulation-fi
 This guide continues from the [Room Acoustics guide](https://jmrplens.github.io/phonometry/buildings/rooms/room-acoustics/): the
 same impulse response, measured either side of a partition, yields its sound
 insulation. This page covers the engineering-grade measurement of ISO 16283
-in the finished building: the airborne level differences $D$, $D_{nT}$ and
-$R'$, the impact levels $L'_{nT}$ and $L'_n$, the field test report, and the
+in the finished building: the airborne level differences $D$, $D_\mathrm{nT}$ and
+$R'$, the impact levels $L'_\mathrm{nT}$ and $L'_\mathrm{n}$, the field test report, and the
 ISO 12999-1 uncertainty that qualifies every field value. Three close
 relatives have guides of their own: the reference-curve engine behind every
 single number in [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/), the
@@ -1253,12 +1253,12 @@ room ($L_1$) and the **receiving** room ($L_2$) per one-third-octave band
 and form the level difference $D = L_1 - L_2$. Two normalisations make it
 comparable between rooms. The **standardized level difference** references
 the receiving-room reverberation time $T$ to $T_0 = 0.5$ s (so with
-$T = 0.5$ s, $D_{nT} = D$ exactly), and the **apparent sound reduction
+$T = 0.5$ s, $D_\mathrm{nT} = D$ exactly), and the **apparent sound reduction
 index** normalises by the partition area $S$ and the Sabine absorption area
 $A$:
 
 $$
-D_{nT} = D + 10 \log_{10} \frac{T}{T_0}, \qquad
+D_\mathrm{nT} = D + 10 \log_{10} \frac{T}{T_0}, \qquad
 R' = D + 10 \log_{10} \frac{S}{A}, \qquad A = \frac{0.16\ V}{T}.
 $$
 
@@ -1268,8 +1268,8 @@ $L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)$.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup.svg" alt="Field airborne insulation setup: a loudspeaker in the source room, microphones energy-averaged in source and receiving rooms across the common partition" width="92%"></picture>
 
 The prime on $R'$ is a convention, not decoration: primed quantities ($R'$,
-$L'_n$, $L'_{nT}$) are measured **in the building** and include every
-flanking path, while the unprimed $R$ and $L_n$ are laboratory properties of
+$L'_\mathrm{n}$, $L'_\mathrm{nT}$) are measured **in the building** and include every
+flanking path, while the unprimed $R$ and $L_\mathrm{n}$ are laboratory properties of
 the element alone, measured with flanking suppressed. The full lab-to-field
 map lives in [Laboratory Insulation Measurement](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-lab/); the
 prediction that bridges the two is
@@ -1315,7 +1315,7 @@ ISO 717-1 reference curve.
 
 `airborne_insulation()` returns an `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` or `None`). The reference-curve engine that turns any of those
-spectra into $R_w$, $R'_w$ or $D_{nT,w}$, its spectrum adaptation terms and its
+spectra into $R_\mathrm{w}$, $R'_\mathrm{w}$ or $D_\mathrm{nT,w}$, its spectrum adaptation terms and its
 enlarged-range variants are in
 [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/).
 
@@ -1324,21 +1324,21 @@ enlarged-range variants are in
 Footstep noise is rated the other way round. Instead of how much a floor
 *blocks*, impact insulation measures how much a standardized **tapping
 machine** on the floor above puts into the room below, so a *higher* number
-is *worse*. The energy-average impact sound pressure level $L_i$ in the
+is *worse*. The energy-average impact sound pressure level $L_\mathrm{i}$ in the
 receiving room is normalised like the airborne case, but with a sign flip on
 the reverberation term:
 
 $$
-L'_{nT} = L_i - 10 \log_{10} \frac{T}{T_0}, \qquad
-L'_n = L_i + 10 \log_{10} \frac{A}{A_0}, \quad
+L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10} \frac{T}{T_0}, \qquad
+L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10} \frac{A}{A_0}, \quad
 A_0 = 10\ \text{m}^2,\ A = \frac{0.16\ V}{T}.
 $$
 
-The **standardized** impact level $L'_{nT}$ ($T_0 = 0.5$ s for dwellings)
-needs only the receiving-room $T$, so with $T = 0.5$ s it equals $L_i$; the
-**normalized** level $L'_n$ (referenced to a 10 m² absorption area) also needs
+The **standardized** impact level $L'_\mathrm{nT}$ ($T_0 = 0.5$ s for dwellings)
+needs only the receiving-room $T$, so with $T = 0.5$ s it equals $L_\mathrm{i}$; the
+**normalized** level $L'_\mathrm{n}$ (referenced to a 10 m² absorption area) also needs
 the receiving-room volume. Note the **minus** sign: more reverberation
-*lowers* $L'_{nT}$, opposite to the airborne $D_{nT}$.
+*lowers* $L'_\mathrm{nT}$, opposite to the airborne $D_\mathrm{nT}$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_impact_setup.svg" alt="Field impact insulation setup: a standardized tapping machine on the floor of the source room above, microphones energy-averaged in the receiving room below, and the receiving-room reverberation time" width="92%"></picture>
 
@@ -1366,8 +1366,8 @@ print(building.weighted_impact_rating(octave).rating)  # 54
 ```
 
 Feed `impact_insulation`'s `l_n_t` (or `l_n`) straight into
-`weighted_impact_rating`; the rating and $C_I$ reproduce the ISO 717-2 Annex C
-values (thirds $L'_{nT,w} = 79$, $C_I = -11$; octave 54, $C_I = 0$).
+`weighted_impact_rating`; the rating and $C_\mathrm{I}$ reproduce the ISO 717-2 Annex C
+values (thirds $L'_\mathrm{nT,w} = 79$, $C_\mathrm{I} = -11$; octave 54, $C_\mathrm{I} = 0$).
 
 ### `impact_insulation()` parameters
 
@@ -1375,7 +1375,7 @@ values (thirds $L'_{nT,w} = 79$, $C_I = -11$; octave 54, $C_I = 0$).
 | :--- | :--- | :--- | :--- | :--- |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Energy-average impact SPL (2D is averaged over positions) |
 | `t2` | 1D array | s | > 0, one per band | Receiving-room reverberation time |
-| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $L'_n$) |
+| `volume` | float, optional | m³ | > 0 | Receiving-room $V$ (enables $L'_\mathrm{n}$) |
 | `t0` | float | s | default `0.5` | Reference reverberation time $T_0$ |
 
 `impact_insulation()` returns an `ImpactInsulationResult` (`l_n_t`, `l_n` or
@@ -1388,10 +1388,10 @@ The per-band field results write the test report of ISO 16283-1:2014 /
 ISO 16283-2:2020 Clause 14 directly, laid out like the recommended results
 forms (Annex B / Annex C) and the accredited field reports built on them.
 `AirborneInsulationResult.report()` renders the standardized level difference
-$D_{nT}$ fiche (Figure B.1) or, with `quantity="r_prime"`, the apparent sound
+$D_\mathrm{nT}$ fiche (Figure B.1) or, with `quantity="r_prime"`, the apparent sound
 reduction index $R'$ fiche (Figure B.2); `ImpactInsulationResult.report()`
-renders the standardized $L'_{nT}$ fiche (Figure C.1) or, with
-`quantity="l_n"`, the normalized $L'_n$ fiche (Figure C.2). Each fiche names the field standard
+renders the standardized $L'_\mathrm{nT}$ fiche (Figure C.1) or, with
+`quantity="l_n"`, the normalized $L'_\mathrm{n}$ fiche (Figure C.2). Each fiche names the field standard
 in its basis line, evaluates the ISO 717-1 / ISO 717-2 single-number rating
 over the 16 core one-third-octave bands (100-3150 Hz), states the quantity to
 one decimal place both in tabular form and as a curve against the shifted
@@ -1401,7 +1401,7 @@ statement that the evaluation is based on field measurement results obtained
 by an engineering method.
 
 `verbose=True` swaps the two-column table for the per-band measurement chain
-(the energy-average $L_1$ and $L_2$, or $L_i$, and the reverberation time $T$
+(the energy-average $L_1$ and $L_2$, or $L_\mathrm{i}$, and the reverberation time $T$
 beside the reported quantity), the content accredited field reports annex; it
 needs a result built by `airborne_insulation()` / `impact_insulation()`, which
 retain those inputs on the result (`l1`, `l2`/`li`, `t2`, `t0`). Metadata, the
@@ -1449,9 +1449,9 @@ imp.report("LnTw_field.pdf",
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation.svg" alt="Field airborne measurement chain: the raw level difference D and the standardized DnT across the sixteen one-third-octave bands, with the reverberation correction shaded between them and the resulting DnT,w and R'w ratings annotated" width="80%"></picture>
 
 *The receiving-room reverberation time turns the raw level difference $D$
-into the standardized $D_{nT}$ band by band; with $T$ above $T_0 = 0.5$ s
+into the standardized $D_\mathrm{nT}$ band by band; with $T$ above $T_0 = 0.5$ s
 across the range, the correction lifts the curve slightly. The rating box
-carries both single numbers of this measurement, $D_{nT,w}$ and $R'_w$.*
+carries both single numbers of this measurement, $D_\mathrm{nT,w}$ and $R'_\mathrm{w}$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -1513,9 +1513,9 @@ how to expand and combine it. Which standard deviation is $u$ depends on the
 
 | Situation | Meaning | Standard uncertainty $u$ |
 | :--- | :--- | :--- |
-| **A** | laboratory characterisation (ISO 10140) | reproducibility $\sigma_R$ |
-| **B** | same location, different teams | in-situ $\sigma_{situ}$ |
-| **C** | same location, same operator repeated | repeatability $\sigma_r$ |
+| **A** | laboratory characterisation (ISO 10140) | reproducibility $\sigma_\mathrm{R}$ |
+| **B** | same location, different teams | in-situ $\sigma_\mathrm{situ}$ |
+| **C** | same location, same operator repeated | repeatability $\sigma_\mathrm{r}$ |
 
 The expanded uncertainty is $U = k\ u$ (Formula 2) with the coverage factor $k$
 of Table 8. A two-sided interval $Y = y \pm U$ (Formula 3, $k = 1.96$ at 95 %)
@@ -1588,7 +1588,7 @@ plt.show()
 | `value` | float | dB | — | Best estimate $y$ to attach $U$ to |
 | `coverage` | float | — | default `0.95` | Confidence level (Table 8) |
 | `one_sided` | bool | — | default `False` | One-sided factor for conformity checks |
-| `upper_limit` | bool | — | default `False` | Select the $\sigma_{R95}$ upper limit (airborne, situation A) |
+| `upper_limit` | bool | — | default `False` | Select the $\sigma_\mathrm{R95}$ upper limit (airborne, situation A) |
 
 `band_uncertainty()` returns a `BandUncertainty` (`frequencies`,
 `uncertainties`, `.to_arrays()`); `single_number_uncertainty()` a float;
@@ -1614,8 +1614,8 @@ radiating face instead of the receiving-room level, is
 
 ### What does DnT,w mean?
 
-$D_{nT,w}$ is the weighted standardized level difference. Per
-one-third-octave band, $D_{nT} = D + 10 \log_{10}(T/T_0)$ references the
+$D_\mathrm{nT,w}$ is the weighted standardized level difference. Per
+one-third-octave band, $D_\mathrm{nT} = D + 10 \log_{10}(T/T_0)$ references the
 receiving-room reverberation time $T$ to $T_0 = 0.5$ s, with
 $D = L_1 - L_2$ the source-to-receiving level difference (ISO 16283-1).
 The ISO 717-1 reference-curve method then collapses the 16 bands from
@@ -1624,8 +1624,8 @@ The ISO 717-1 reference-curve method then collapses the 16 bands from
 ### What is the difference between R and R' in sound insulation?
 
 The prime marks where the measurement was made: primed quantities ($R'$,
-$L'_n$, $L'_{nT}$) are measured in the building and include every flanking
-path, while the unprimed $R$ and $L_n$ are laboratory properties of the
+$L'_\mathrm{n}$, $L'_\mathrm{nT}$) are measured in the building and include every flanking
+path, while the unprimed $R$ and $L_\mathrm{n}$ are laboratory properties of the
 element alone, measured with flanking suppressed. In the field
 (ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ with partition area $S$ and
 Sabine absorption area $A = 0.16\ V/T$.
@@ -1741,18 +1741,18 @@ level** it delivers into a rigid floor (ISO 16283-2:2020 Formula (A.1) =
 JIS A 1418-2:2019 Formula (1)):
 
 $$
-L_{FE} = 10\log_{10}\!\left[\frac{1}{T_\text{ref}}
+L_{F\mathrm{E}} = 10\log_{10}\!\left[\frac{1}{T_\mathrm{ref}}
 \int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
 $$
 
-with $F_0 = 1$ N, $T_\text{ref} = 1$ s and $t_2 - t_1$ the duration of the
+with $F_0 = 1$ N, $T_\mathrm{ref} = 1$ s and $t_2 - t_1$ the duration of the
 impact. Both characteristics require a **single-peak** waveform of
 $20 \pm 2$ ms (JIS A 1418-2:2019 A.2 b)). The octave-band values are printed
 identically in ISO 16283-2:2020 Table A.1, ISO 10140-5:2010 Table F.1 and
 JIS A 1418-2:2019 Table A.2 for the ball; the bang machine appears only in
 JIS A 1418-2:2019 Table A.1.
 
-| Octave (Hz) | Rubber ball $L_{FE}$ (dB re 1 N) | Bang machine $L_{FE}$ (dB re 1 N) |
+| Octave (Hz) | Rubber ball $L_{F\mathrm{E}}$ (dB re 1 N) | Bang machine $L_{F\mathrm{E}}$ (dB re 1 N) |
 |---|---|---|
 | 31.5 | 39.0 ± 1.0 | 47.0 ± 1.0 |
 | 63 | 31.0 ± 1.5 | 40.0 ± 1.5 |
@@ -1832,7 +1832,7 @@ to saturate. ISO 16283-2:2020 (definition 3.16, Formulae (4), (5) and (6))
 therefore uses
 
 $$
-L'_{i,F\max,V,T} = L_{i,F\max} + 10\log_{10}\frac{V}{V_0}
+L'_{\mathrm{i,Fmax},V,T} = L_\mathrm{i,Fmax} + 10\log_{10}\frac{V}{V_0}
 - 10\log_{10}\frac{g(C)}{g(C_0)},\qquad
 C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
 $$
@@ -1875,7 +1875,7 @@ ISO 717-2:2020 Annex D is normative and does not use a reference curve at all.
 The rating is an energy sum of A-weighted band levels (Formula (D.1)):
 
 $$
-X_{iA,F\max} = 10\log_{10}\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
+X_\mathrm{iA,Fmax} = 10\log_{10}\!\left(\sum_j 10^{(X_{\mathrm{i,Fmax},j} + A_j)/10}\right),
 $$
 
 over the one-third-octave bands 50 Hz to 630 Hz **or** the octave bands 63 Hz
@@ -1883,8 +1883,8 @@ to 500 Hz, with the Table D.3 corrections $A_j$, rounded half-up to an integer.
 A one-third-octave measurement is rated in one-third octaves; the standard
 warns explicitly against summing thirds into octaves first, because the two
 routes do not give the same answer. The same formula rates all four quantities
-of Tables D.1 and D.2: $L_{iA,F\max}$, $L_{iA,F\max,V,T}$, $L'_{iA,F\max}$ and
-$L'_{iA,F\max,V,T}$.
+of Tables D.1 and D.2: $L_\mathrm{iA,Fmax}$, $L_{\mathrm{iA,Fmax},V,T}$, $L'_\mathrm{iA,Fmax}$ and
+$L'_{\mathrm{iA,Fmax},V,T}$.
 
 The worked example of Table D.4 is reproduced exactly, including the
 deliberately unrounded intermediate the standard prints:
@@ -1931,7 +1931,7 @@ that takes a floor construction to a heavy-impact level; Hopkins states
 plainly that the complexity of the input force and the use of a
 time-weighted maximum leave no simple counterpart to the tapping-machine
 prediction. No accredited worked example exists anywhere that carries a real
-floor from measured $L_{i,F\max}$ through to $L'_{iA,F\max,V,T}$, so the
+floor from measured $L_\mathrm{i,Fmax}$ through to $L'_{\mathrm{iA,Fmax},V,T}$, so the
 standardization chain is anchored on its own $T = T_0$ identity and on a
 published 25-band reproduction of Formula (4).
 
@@ -2004,11 +2004,11 @@ in a dwelling, ISO 10052 defines a **survey (control) method**: octave bands, a
 hand-held meter, and a single quantity, the **reverberation index**
 $k = 10\log_{10}(T/T_0)$ ($T_0 = 0.5\ \text{s}$), to carry the receiving-room
 correction. Every survey quantity is then just an addition of $k$: the
-standardized level difference $D_{nT} = D + k$, the normalized
-$D_n = D + k + 10\log_{10}(A_0 T_0/(0.16\,V))$, the apparent
+standardized level difference $D_\mathrm{nT} = D + k$, the normalized
+$D_\mathrm{n} = D + k + 10\log_{10}(A_0 T_0/(0.16\,V))$, the apparent
 $R' = D + k + 10\log_{10}(S T_0/(0.16\,V))$ (using $V/7.5$ for $S$ where
-that is larger), and, for impacts and façades, $L'_{nT} = L_i - k$ and
-$D_{2m,nT} = D_{2m} + k$. The clause references follow ISO 10052:2021; the formulas
+that is larger), and, for impacts and façades, $L'_\mathrm{nT} = L_\mathrm{i} - k$ and
+$D_{2\mathrm{m,nT}} = D_{2\mathrm{m}} + k$. The clause references follow ISO 10052:2021; the formulas
 and the reverberation-index table are identical in the harmonized
 EN ISO 10052:2004+A1:2010.
 
@@ -2048,7 +2048,7 @@ res.plot()   # DnT vs shifted ISO 717-1 reference (needs matplotlib)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation.svg" alt="Survey-method airborne insulation: the raw level difference D and the standardized DnT across the five octave bands, with the reverberation-index correction k shaded between them" width="80%"></picture>
 
 *The reverberation index $k = 10\log_{10}(T/T_0)$ shifts the raw level difference
-$D$ into the standardized $D_{nT}$: up where the room is live ($T > T_0$),
+$D$ into the standardized $D_\mathrm{nT}$: up where the room is live ($T > T_0$),
 down where
 it is dead. The automatic rating is formed only for exactly 5 octave (or 16
 one-third-octave) values.*
@@ -2089,7 +2089,7 @@ plt.show()
 | `l1` / `l2` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source / receiving (or outdoor `l1_2m`) levels |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Impact levels (energy-averaged over positions) |
 | `reverberation_index` | scalar or 1D array | dB | one per band | $k$ from `reverberation_index` or `estimate_reverberation_index`; `survey_service_equipment_level()` also accepts a scalar $k$ |
-| `volume` | float | m³ | > 0 | Receiving-room $V$ (for $D_n$ / $L'_n$ / $R'$ / normalized) |
+| `volume` | float | m³ | > 0 | Receiving-room $V$ (for $D_\mathrm{n}$ / $L'_\mathrm{n}$ / $R'$ / normalized) |
 | `area` | float | m² | > 0 | Common-partition $S$ (airborne $R'$; $V/7.5$ rule applied) |
 | `measurements` | array | dB | exactly 3 | Service-equipment positions (`survey_service_equipment_level`) |
 | `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | `estimate_reverberation_index` room class (Table 4) |
@@ -2121,8 +2121,8 @@ The airborne, impact and façade survey results each carry a `.report(path)` tha
 writes the one-page ISO 10052 survey (control) method field report: the
 standard-basis line naming ISO 10052 (octave bands), an optional metadata
 header, the octave-band table beside the measured-versus-shifted-reference
-curve, the boxed field rating ($D_{nT,w}$/$R'_w$, $L'_{nT,w}$ or
-$D_{2m,nT,w}$), the
+curve, the boxed field rating ($D_\mathrm{nT,w}$/$R'_\mathrm{w}$, $L'_\mathrm{nT,w}$ or
+$D_{2\mathrm{m,nT,w}}$), the
 survey-method statement, an optional requirement verdict (level differences pass
 at or above it, the impact level at or below it) and a footer. The airborne
 result reports `quantity="dnt"` (default) or `"r_prime"`; `verbose=True`,
@@ -2151,7 +2151,7 @@ facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation.svg" alt="Survey-method impact insulation: the measured octave-band impact level Li and the standardized L'nT with the reverberation-index correction shaded between them, the L'nT,w rating annotated and a note that a live room lowers the standardized impact level" width="80%"></picture>
 
 *The impact survey applies the reverberation index with the opposite sign,
-$L'_{nT} = L_i - k$: a live receiving room ($T > T_0$) **lowers** the standardized
+$L'_\mathrm{nT} = L_\mathrm{i} - k$: a live receiving room ($T > T_0$) **lowers** the standardized
 impact level. As in the airborne case, the automatic rating appears for
 exactly 5 octave (or 16 one-third-octave) values.*
 

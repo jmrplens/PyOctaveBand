@@ -429,7 +429,7 @@ def _segment_angles(
 
     §4.5.5 equivalent level path (Fig. 4-6): rotating the observer-segment
     triangle about the ground track makes the elevation of the perpendicular
-    point :math:`\beta = \arccos(\ell/d_p)`, which differs from
+    point :math:`\beta = \arccos(\ell/d_\mathrm{p})`, which differs from
     :math:`\operatorname{atan2}(z, \ell)` on inclined
     segments. Alongside the segment ``β`` uses that equivalent angle; behind or
     ahead it uses the nearest segment end over the same horizontal offset.

@@ -74,9 +74,9 @@ print(res.resolution_bandwidth)    # Be of the tapered segment, in Hz
 res.plot()                         # dB image over the time-frequency plane
 ```
 
-The segment length is the whole design decision: $T_B = \text{nperseg}/f_s$
-of time resolution against $B_e = \mathrm{ENBW}/T_B$ of frequency resolution,
-so their product $T_B B_e$ is fixed by the taper alone — 1 for a rectangular
+The segment length is the whole design decision: $T_B = \text{nperseg}/f_\mathrm{s}$
+of time resolution against $B_\mathrm{e} = \mathrm{ENBW}/T_B$ of frequency resolution,
+so their product $T_B B_\mathrm{e}$ is fixed by the taper alone — 1 for a rectangular
 window, **1.5 for the Hann default used here** (Section 12.6.4.2, and the
 window figures of merit on the
 [spectral-analysis page](/phonometry/signals/spectra/spectral-analysis/#6-choosing-the-window)).
@@ -86,7 +86,7 @@ half the frequency resolution; nothing buys both.
 Long segments pin frequencies and smear transients;
 short segments do the opposite. And because each cell is a single
 *unaveraged* estimate, random data carries a per-cell normalized random
-error of 1 (Eq. 8.158 with $n_d = 1$; Bendat & Piersol quote
+error of 1 (Eq. 8.158 with $n_\mathrm{d} = 1$; Bendat & Piersol quote
 $\sqrt{2}/1.25 \approx 1.13$ for the magnitude display) - the spectrogram is a tool for
 deterministic structure (tones, sweeps, transients), while the averaged
 [Welch estimate](/phonometry/signals/spectra/spectral-analysis/) is the low-variance
@@ -116,8 +116,8 @@ about 256 samples at 48 kHz — and the frequency resolution then follows at abo
 190 Hz, whether you wanted it or not.
 
 **For a component whose frequency moves** at a rate $r$ in Hz/s, the tone leaves
-its own resolution bandwidth inside a single segment unless $B_e \ge r\,T_B$.
-With $B_e = 1.5/T_B$ that gives an optimum $T_B = \sqrt{1.5/r}$. The siren below
+its own resolution bandwidth inside a single segment unless $B_\mathrm{e} \ge r\,T_B$.
+With $B_\mathrm{e} = 1.5/T_B$ that gives an optimum $T_B = \sqrt{1.5/r}$. The siren below
 sweeps at up to about 950 Hz/s, so segments shorter than **40 ms** keep the ridge
 sharp — and the 1024-point choice at 16 kHz is 64 ms, already past it, which is
 why the ridge thickens at the steepest part of the sweep. A run-up sweeping a
@@ -125,7 +125,7 @@ why the ridge thickens at the steepest part of the sweep. A run-up sweeping a
 
 The two requirements routinely conflict, as they do in the figure's own scene.
 The honest recipe: choose $T_B$ from the fastest thing that must stay sharp,
-check the resulting $B_e$ against the closest two components that must stay
+check the resulting $B_\mathrm{e}$ against the closest two components that must stay
 separate, and when the two cannot both be met, say so in the caption instead of
 splitting the difference. `res.time_resolution` and `res.resolution_bandwidth`
 report the pair actually delivered, so the choice can be stated in a report.
@@ -141,9 +141,9 @@ stripe that looks exactly like a broadband event.
 its power inside one resolution bandwidth and the `'spectrum'` cell is therefore
 its mean square. The pink background does **not** read 45 dB anywhere. That
 45 dB is its *broadband* level spread over the whole band, and each cell carries
-only the part inside one $B_e$ — some 25 dB lower here, for a 1024-point segment
+only the part inside one $B_\mathrm{e}$ — some 25 dB lower here, for a 1024-point segment
 at 16 kHz. To recover a level from noise, convert cells to a density by
-subtracting $10\log_{10} B_e$ and integrate over the band of interest, or use
+subtracting $10\log_{10} B_\mathrm{e}$ and integrate over the band of interest, or use
 `'density'` and integrate directly. And the impact's peak cell is not the
 impact's level either: a transient shorter than the segment spreads its energy
 over the whole column, so that reading depends on `nperseg`. The colour bar is an
@@ -228,9 +228,9 @@ res.plot()                               # power spectrum in dB over the band
 One distinction matters and the result states it: the **grid** can be made
 arbitrarily fine (`n_points`), but the **resolution** - the ability to
 separate two tones - is set by the record length and taper, reported as
-`resolution_bandwidth` ($B_e = f_s \sum w^2/(\sum w)^2$, i.e. $1/T_r$
-untapered and $1.5/T_r$ for Hann — the same taper factor as section 1, applied
-here to the record duration $T_r$ rather than to a segment, because the zoom FFT
+`resolution_bandwidth` ($B_\mathrm{e} = f_\mathrm{s} \sum w^2/(\sum w)^2$, i.e. $1/T_\mathrm{r}$
+untapered and $1.5/T_\mathrm{r}$ for Hann — the same taper factor as section 1, applied
+here to the record duration $T_\mathrm{r}$ rather than to a segment, because the zoom FFT
 transforms the whole record). Zooming refines the sampling of the same underlying spectrum;
 only a longer record separates closer tones.
 
@@ -242,7 +242,7 @@ grid, not rejection. Hann's first sidelobe is −31.5 dB, which is nowhere near
 enough to see a sideband 50 dB below a carrier a few hertz away. The control is
 the `window` argument (default `"hann"`): pass `window="blackman"`, or a Kaiser
 with a high beta, to trade main-lobe width for sidelobe rejection — remembering
-that the wider main lobe raises $B_e$ and therefore the closest spacing you can
+that the wider main lobe raises $B_\mathrm{e}$ and therefore the closest spacing you can
 separate, so the two goals pull against each other. The
 [window figures of merit](/phonometry/signals/spectra/spectral-analysis/#6-choosing-the-window)
 put numbers on that trade. When even the best taper is not enough, pre-filter or

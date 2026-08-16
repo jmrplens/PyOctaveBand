@@ -23,14 +23,14 @@ or slowly-oscillating flow. Both parts share the same three quantities and units
 
 $$
 R = \frac{\Delta p}{q_v}\ \left[\text{Pa·s/m}^3\right], \qquad
-R_s = R\,A\ \left[\text{Pa·s/m}\right], \qquad
-\sigma = \frac{R_s}{d}\ \left[\text{Pa·s/m}^2\right],
+R_\mathrm{s} = R\,A\ \left[\text{Pa·s/m}\right], \qquad
+\sigma = \frac{R_\mathrm{s}}{d}\ \left[\text{Pa·s/m}^2\right],
 $$
 
 with $\Delta p$ the pressure difference across the specimen, $q_v$ the volumetric
 flow, $A$ the cross-section and $d$ the thickness. Note the specific airflow
-resistance $R_s$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
-is $R_s$ per metre of thickness.
+resistance $R_\mathrm{s}$ is in **Pa·s/m** (not Pa·s/m²); the airflow resistivity $\sigma$
+is $R_\mathrm{s}$ per metre of thickness.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_airflow_resistance.svg" alt="Airflow resistance measurement rigs: the ISO 9053-1 static method with a specimen in a holder, a steady laminar flow q_v and a differential manometer reading the pressure drop; and the ISO 9053-2 alternating method with an oscillating piston driving a cavity terminated by the specimen or an airtight plug, and a microphone reading the cavity level" width="92%"></picture>
 
@@ -39,9 +39,9 @@ is $R_s$ per metre of thickness.
 In the static method (ISO 9053-1:2018) a steady laminar flow is stepped up and the
 pressure difference plotted against the linear velocity $u = q_v/A$. A regression
 of at least second order **constrained through the origin**, $\Delta p = a\,u +
-b\,u^2$, is fitted, and $\Delta p$ and $R_s$ are read at the reference velocity
+b\,u^2$, is fitted, and $\Delta p$ and $R_\mathrm{s}$ are read at the reference velocity
 $u = 0.5\ \text{mm/s}$ (Clause 7.5); the highest velocity must not exceed
-15 mm/s. Because $R_s = \Delta p/u = a + b\,u$, the linear term $a$ is the
+15 mm/s. Because $R_\mathrm{s} = \Delta p/u = a + b\,u$, the linear term $a$ is the
 zero-velocity specific airflow resistance.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/airflow_resistance.svg" alt="ISO 9053-1 static-method airflow resistance: the measured pressure drop against linear airflow velocity, fitted with a through-origin quadratic, with the specific airflow resistance evaluated at the 0.5 mm/s reference velocity" width="80%"></picture>
@@ -100,10 +100,10 @@ r.plot()   # the figure above: the fitted dp(u) with the evaluation point
 accredited airflow-resistance test report (ISO 9053-1:2018, static method): a
 standard-basis line, an optional metadata header block, a two-panel body with a
 metrics table (the evaluation velocity, the fitted pressure difference, the
-airflow resistance $R$, the specific airflow resistance $R_s$, the airflow
+airflow resistance $R$, the specific airflow resistance $R_\mathrm{s}$, the airflow
 resistivity $\sigma$ when a thickness is available, and the through-origin fit
 coefficients $a$ and $b$) beside the fitted $\Delta p(u)$ curve (the result's
-own `.plot()`), the boxed specific airflow resistance $R_s$ with $R$ and
+own `.plot()`), the boxed specific airflow resistance $R_\mathrm{s}$ with $R$ and
 $\sigma$ alongside, and a footer with the fixed disclaimer. ISO 9053-1 is a
 material characterisation, so the fiche carries no pass/fail verdict.
 
@@ -139,7 +139,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 9053-1 static airflow-resistance example report: metadata header with the specimen thickness, the metrics table with the evaluation velocity, the fitted pressure difference, the airflow resistance R, the specific airflow resistance R_s, the airflow resistivity sigma and the through-origin fit coefficients beside the fitted pressure-drop curve, and the boxed specific airflow resistance R_s with R and sigma alongside](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9053_airflow_resistance_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso9053_airflow_resistance_example.pdf)
 
-*Static airflow-resistance fiche (`StaticAirflowResult.report`), $R_s$, $R$ and $\sigma$ at 0.5 mm/s.*
+*Static airflow-resistance fiche (`StaticAirflowResult.report`), $R_\mathrm{s}$, $R$ and $\sigma$ at 0.5 mm/s.*
 
 
 ## 3. Alternating method (ISO 9053-2)
@@ -150,8 +150,8 @@ airtight plug; the resistance follows from the sound-pressure-level difference
 between the two terminations (Formula (2)):
 
 $$
-R = \frac{\kappa'\,P_S}{2\pi f\,V}\cdot\frac{h_t}{h_s}\cdot
-    10^{(L_{p,s} - L_{p,t})/20},
+R = \frac{\kappa'\,P_\mathrm{S}}{2\pi f\,V}\cdot\frac{h_\mathrm{t}}{h_\mathrm{s}}\cdot
+    10^{(L_{p,\mathrm{s}} - L_{p,\mathrm{t}})/20},
 $$
 
 where $\kappa'$ is the **effective** ratio of specific heats. Heat conduction
@@ -213,7 +213,7 @@ front face before the pores can absorb it. Between the two lies the classic
 design window for the total flow resistance of a layer of thickness $d$,
 
 $$
-\rho_0 c_0 \;\lesssim\; R_s = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
+\rho_0 c_0 \;\lesssim\; R_\mathrm{s} = \sigma\,d \;\lesssim\; 4\,\rho_0 c_0,
 $$
 
 that is, a specific flow resistance of one to four times the characteristic

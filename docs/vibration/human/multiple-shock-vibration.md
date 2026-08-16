@@ -63,8 +63,8 @@ $$
 D_z = 1.07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
 $$
 
-A daily dose scales the measured dose to the daily exposure time $t_d$ over
-the measurement time $t_m$ (Formula 4): $D_{zd} = D_z\,(t_d/t_m)^{1/6}$.
+A daily dose scales the measured dose to the daily exposure time $t_\mathrm{d}$ over
+the measurement time $t_\mathrm{m}$ (Formula 4): $D_{z\mathrm{d}} = D_z\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$.
 
 ```python
 from phonometry import vibration
@@ -75,15 +75,15 @@ print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 
 ## 3. Injury risk (Annex C)
 
-The daily dose becomes a daily **compressive stress** $S_d = m_z\,D_{zd}$
+The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_z\,D_{z\mathrm{d}}$
 (Formula C.1), where $m_z$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
 64 kg female) converts acceleration to vertebral stress. The stress accumulates
 over the exposure years against the ageing spine's reducing ultimate strength
-$S_u = 6.75 - S_{\mathrm{age}}\,(b+i)$ (Formulae C.3/C.4):
+$S_\mathrm{u} = 6.75 - S_{\mathrm{age}}\,(b+i)$ (Formulae C.3/C.4):
 
 $$
 R = \left[\sum_{i=0}^{n-1}
-\left(\frac{S_d\,N^{1/6}}{S_{u,i} - S_{\mathrm{stat}}}\right)^{6}\right]^{1/6},
+\left(\frac{S_\mathrm{d}\,N^{1/6}}{S_{\mathrm{u},i} - S_{\mathrm{stat}}}\right)^{6}\right]^{1/6},
 $$
 
 and a Weibull model gives the probability of lumbar injury (Formula C.5):
@@ -153,8 +153,8 @@ plt.show()
 
 </details>
 
-The `MultipleShockResult` carries the dose $D_z$, the daily dose $D_{zd}$, the
-compressive stress $S_d$, the stress variable $R$, the injury probability and
+The `MultipleShockResult` carries the dose $D_z$, the daily dose $D_{z\mathrm{d}}$, the
+compressive stress $S_\mathrm{d}$, the stress variable $R$, the injury probability and
 the response peaks, and its `.plot()` draws the injury-probability curve with
 the 10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
 clause 4 neglects the horizontal contributions to spinal compression by design,
@@ -174,8 +174,8 @@ free-text fields of `ReportMetadata`), the exposure-scenario grid (subject sex,
 the age $b$ at which the exposure started, the number of exposure years $n$,
 the number of exposure days per year $N$ and the number of counted response
 shocks), and the dose-and-stress analysis table with the acceleration dose
-$D_z$ (Formula 3), the daily dose $D_{zd}$ (Formula 4), the daily compressive
-stress $S_d$ (Formula C.1), the cumulative stress variable $R$ (Formula C.3)
+$D_z$ (Formula 3), the daily dose $D_{z\mathrm{d}}$ (Formula 4), the daily compressive
+stress $S_\mathrm{d}$ (Formula C.1), the cumulative stress variable $R$ (Formula C.3)
 and the probability of lumbar injury $\Pi$ (Formula C.5).
 
 Because ISO 2631-5:2018 defines no exposure limit, the fiche carries a risk-band

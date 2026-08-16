@@ -45,7 +45,7 @@ la *fuerza de bloqueo* en el lado de salida (receptor) y el desplazamiento en
 el lado de entrada (fuente) (ISO 10846-1, 3.7):
 
 $$
-k_{2,1} = \frac{F_{2,b}}{u_1} \quad [\mathrm{N/m}].
+k_{2,1} = \frac{F_{2,\mathrm{b}}}{u_1} \quad [\mathrm{N/m}].
 $$
 
 Como un aislador de vibraciones solo es eficaz entre estructuras de gran rigidez
@@ -140,22 +140,22 @@ Esas condiciones van en la ficha de la sección 6 junto con el resultado:
 ### Tres métodos, no dos
 
 El **método directo** (ISO 10846-2) mide la fuerza de salida bloqueada y el
-desplazamiento de entrada, $k_{2,1} = F_{2,b}/u_1$. El **método indirecto**
+desplazamiento de entrada, $k_{2,1} = F_{2,\mathrm{b}}/u_1$. El **método indirecto**
 (ISO 10846-3) carga la salida con una masa de bloqueo compacta $m_2$ y mide la
 transmisibilidad de vibración $T = u_2/u_1$; la fuerza de bloqueo es entonces la
 fuerza de inercia de la masa (ISO 10846-3, Ec. 1):
 
 $$
-k_{2,1} = -(2\pi f)^2\,(m_2 + m_f)\,T \qquad (T \ll 1),
+k_{2,1} = -(2\pi f)^2\,(m_2 + m_\mathrm{f})\,T \qquad (T \ll 1),
 $$
 
-con $m_f$ la masa de la brida de salida, que transporta la palabra clave
+con $m_\mathrm{f}$ la masa de la brida de salida, que transporta la palabra clave
 `flange_mass=` (vale cero por defecto). No es un refinamiento: la ISO 10846-3
 mide la vibración del centro de masas del *cuerpo compacto* que forman la masa
-de bloqueo junto con la brida de salida del elemento de ensayo, así que $m_f$
+de bloqueo junto con la brida de salida del elemento de ensayo, así que $m_\mathrm{f}$
 es todo lo que se pese con ella — la brida y cualquier utillaje auxiliar que se
 mueva como parte del elemento de ensayo. Dejada en cero, declara una rigidez
-baja en un factor $m_2/(m_2 + m_f)$. La aproximación es válida bastante por
+baja en un factor $m_2/(m_2 + m_\mathrm{f})$. La aproximación es válida bastante por
 encima de la resonancia masa/resorte, donde $T$ es pequeña.
 
 ```python
@@ -379,9 +379,9 @@ inercia dentro del elemento son despreciables.*
 
 La propia idealización de la fuerza de bloqueo la cuantifica la ISO 10846-1,
 Ec. (6): para un aislador con rigidez en el punto de excitación de salida
-$k_{2,2}$ sobre una terminación de rigidez $k_t$, la fuerza entregada es
-$F_2/F_{2,b} = 1/(1 + k_{2,2}/k_t)$, dentro del 10 % de la fuerza de bloqueo para
-$|k_{2,2}| < 0{,}1\,|k_t|$ (Ec. 7):
+$k_{2,2}$ sobre una terminación de rigidez $k_\mathrm{t}$, la fuerza entregada es
+$F_2/F_{2,\mathrm{b}} = 1/(1 + k_{2,2}/k_\mathrm{t})$, dentro del 10 % de la fuerza de bloqueo para
+$|k_{2,2}| < 0{,}1\,|k_\mathrm{t}|$ (Ec. 7):
 
 ```python
 import warnings
@@ -429,7 +429,7 @@ for k_t in (3e9, 2e6, 5e5):
     print(f"{k_t:.0e}", round(ratio, 3))     # 1.0 / 0.667 / 0.333
 ```
 
-Sobre el forjado de hormigón ($k_t = 3$ GN/m) la fuerza entregada *es* la
+Sobre el forjado de hormigón ($k_\mathrm{t} = 3$ GN/m) la fuerza entregada *es* la
 fuerza bloqueada, la Ecuación (7) se cumple con tres órdenes de magnitud de
 margen y el número de la hoja de características es directamente utilizable.
 Sobre un forjado ligero de 2 MN/m no: solo llegan dos tercios de la fuerza
@@ -511,7 +511,7 @@ res.report(
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-La definición $k_{2,1} = F_{2,b}/u_1$ de la ISO 10846-1:2008, el nivel (ISO
+La definición $k_{2,1} = F_{2,\mathrm{b}}/u_1$ de la ISO 10846-1:2008, el nivel (ISO
 10846-2 y -3, 3.17) y el factor de pérdidas (ISO 10846-1, 3.8)
 (`transfer_stiffness_level`, `loss_factor`), el método directo de la ISO
 10846-2:2008 (`transfer_stiffness_direct`) y el método indirecto de la ISO

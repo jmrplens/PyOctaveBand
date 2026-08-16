@@ -28,7 +28,7 @@ tnr.plot()   # the tone against its prominence criterion (needs matplotlib)
 ```
 
 The methods hinge on the **critical band**, the ear's analysis bandwidth,
-$\Delta f_c = 25 + 75\ [1 + 1.4(f/1000)^2]^{0.69}$ Hz (162 Hz at 1 kHz): a
+$\Delta f_\mathrm{c} = 25 + 75\ [1 + 1.4(f/1000)^2]^{0.69}$ Hz (162 Hz at 1 kHz): a
 tone is masked only by the noise *inside* its critical band, so both methods
 focus on that band rather than the whole spectrum, but they use it
 differently. The tone-to-noise ratio works within the band, separating its
@@ -38,15 +38,15 @@ on the tone with the mean of its two contiguous critical bands (clause 12,
 Formula 23):
 
 $$
-\mathrm{TNR} = L_t - L_n, \qquad
-\mathrm{PR} = 10\,\log_{10}\!\frac{W_M}{\tfrac{1}{2}(W_L + W_U)}\ \text{dB},
+\mathrm{TNR} = L_\mathrm{t} - L_\mathrm{n}, \qquad
+\mathrm{PR} = 10\,\log_{10}\!\frac{W_\mathrm{M}}{\tfrac{1}{2}(W_\mathrm{L} + W_\mathrm{U})}\ \text{dB},
 $$
 
-where $L_t$ is the tone level (the energy sum of the tonal lines above the
-band-edge baseline, Formula 9), $L_n$ the level of the masking noise that
+where $L_\mathrm{t}$ is the tone level (the energy sum of the tonal lines above the
+band-edge baseline, Formula 9), $L_\mathrm{n}$ the level of the masking noise that
 remains in the critical band, rescaled to the full critical bandwidth
-(Formulae 10–11), and $W_M$, $W_L$, $W_U$ the powers in the middle, lower and
-upper critical bands (below $f_t = 171.4$ Hz the truncated lower band is
+(Formulae 10–11), and $W_\mathrm{M}$, $W_\mathrm{L}$, $W_\mathrm{U}$ the powers in the middle, lower and
+upper critical bands (below $f_\mathrm{t} = 171.4$ Hz the truncated lower band is
 rescaled to a 100 Hz bandwidth, Formula 24).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_spectrum_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tonality_spectrum.svg" alt="Averaged spectrum of a tone in noise with the critical band shaded and the tone-to-noise ratio annotated against its prominence criterion" width="80%"></picture>
@@ -81,9 +81,9 @@ plt.show()
 
 </details>
 
-A TNR at or above $8 + 8.33\log_{10}(1000/f_t)$ dB below 1 kHz (a flat 8 dB for
-$f_t \ge 1$ kHz) classifies the tone as *prominent*; the PR criterion is
-$9 + 10\log_{10}(1000/f_t)$ dB below 1 kHz and 9 dB from there up, likewise
+A TNR at or above $8 + 8.33\log_{10}(1000/f_\mathrm{t})$ dB below 1 kHz (a flat 8 dB for
+$f_\mathrm{t} \ge 1$ kHz) classifies the tone as *prominent*; the PR criterion is
+$9 + 10\log_{10}(1000/f_\mathrm{t})$ dB below 1 kHz and 9 dB from there up, likewise
 applied with $\ge$. Low frequencies get higher thresholds because wider
 relative bands mask more.
 
@@ -137,7 +137,7 @@ the critical band into tonal and noise lines first, so it degrades when that
 separation is ambiguous: a tone riding a steep noise slope, or closely
 spaced components whose skirts overlap. PR needs no separation, which makes
 it the robust, automatable choice when **several tones share the critical
-band** (they all land in $W_M$); in exchange it reads low when a
+band** (they all land in $W_\mathrm{M}$); in exchange it reads low when a
 *neighbouring* band also carries a tone (the flanking bands are then not
 noise) and is biased on sharply sloping spectra, where the two flanking
 bands no longer estimate the masking at the tone. In practice: prefer TNR

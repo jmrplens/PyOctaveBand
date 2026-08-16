@@ -23,17 +23,17 @@ hammer is a 0.5 kg mass dropped 40 mm, so it lands at
 $v_0 = \sqrt{2gh} = 0.886\ \text{m/s}$, ten times a second. If the impact were
 short compared with the 0.1 s between impacts, the momentum alone would fix
 the force, giving the line spectrum $|F_n| = 2 m v_0 / T_i$ and the band
-mean-square force $F_\text{rms}^2 = 3.9 B$ that ISO 10140 measurements on
+mean-square force $F_\mathrm{rms}^2 = 3.9 B$ that ISO 10140 measurements on
 concrete are usually reduced with.
 
 Real floors deform. The hammer, the contact stiffness $K$ it presses into and
-the floor's driving-point impedance $Z_\text{dp}$ form a
+the floor's driving-point impedance $Z_\mathrm{dp}$ form a
 mass-spring-dashpot whose pulse splits into two cases:
 
-- **over-critical**, $K m \ge 4 Z_\text{dp}^2$: a single positive pulse, no
+- **over-critical**, $K m \ge 4 Z_\mathrm{dp}^2$: a single positive pulse, no
   rebound. This is a lightweight walking surface (chipboard, OSB), where the
   spectrum tends to $|F_n|_\text{lower} = m v_0/T_i$;
-- **under-critical**, $K m < 4 Z_\text{dp}^2$: the hammer rebounds and only the
+- **under-critical**, $K m < 4 Z_\mathrm{dp}^2$: the hammer rebounds and only the
   first positive lobe counts. This is a concrete slab or a screed, where the
   spectrum sits within 1 dB of $|F_n|_\text{upper} = 2 m v_0/T_i$ below 4 kHz
   and the short-pulse estimate is adequate.
@@ -43,13 +43,13 @@ tapping-machine level on a timber floor cannot be compared with one on
 concrete without thinking. Above the cut-off frequency
 
 $$
-f_\text{co} = \frac{1}{2\pi}\sqrt{\frac{K}{m}}\quad\text{(under-critical)},
+f_\mathrm{co} = \frac{1}{2\pi}\sqrt{\frac{K}{m}}\quad\text{(under-critical)},
 \qquad
-f_\text{co} = \frac{1}{2\pi}\left[\frac{K}{2Z_\text{dp}} - \sqrt{\left(\frac{K}{2Z_\text{dp}}\right)^2 - \frac{K}{m}}\right]\quad\text{(over-critical)},
+f_\mathrm{co} = \frac{1}{2\pi}\left[\frac{K}{2Z_\mathrm{dp}} - \sqrt{\left(\frac{K}{2Z_\mathrm{dp}}\right)^2 - \frac{K}{m}}\right]\quad\text{(over-critical)},
 $$
 
 the force falls away, and above the limiting frequency
-$f_\text{limit} = Z_\text{dp}/(2\pi m)$ the hammer's own mass impedance, not
+$f_\mathrm{limit} = Z_\mathrm{dp}/(2\pi m)$ the hammer's own mass impedance, not
 the floor, caps the injected power.
 
 ```python
@@ -88,9 +88,9 @@ $$
 
 and the whole design collapses to one number, the covering's own cut-off
 frequency, set by its contact stiffness $K = E \pi r^2 / d$ with the hammer
-radius $r = 15$ mm. Below $f_\text{co}$ the covering does nothing; above it
+radius $r = 15$ mm. Below $f_\mathrm{co}$ the covering does nothing; above it
 the improvement rises at 12 dB per octave. Two straight lines are therefore a
-usable estimate, and thickening a homogeneous covering lowers $f_\text{co}$
+usable estimate, and thickening a homogeneous covering lowers $f_\mathrm{co}$
 and buys improvement everywhere above it.
 
 One detail decides whether the numbers are usable. The tapping machine
@@ -98,7 +98,7 @@ excites a **line** spectrum, at multiples of the 10 Hz impact rate, so the
 formula above is a statement about one Fourier component; a band value is the
 ratio of the band mean-square forces over the lines the band contains. The
 difference is not cosmetic: the model's transform has exact nulls at odd
-multiples of $f_\text{co}$, so a band centre landing on one reads tens of dB
+multiples of $f_\mathrm{co}$, so a band centre landing on one reads tens of dB
 high. With the 100 Hz cut-off below, the single line at 500 Hz gives 66.8 dB
 against a design estimate of 27.9 dB, while the band value is 33.3 dB.
 `improvement` is the band value; `line_improvement` is the per-line ratio, and
@@ -179,7 +179,7 @@ applies is a question about damping, not about the layer:
 | --- | --- | --- |
 | `"cremer"` | $\Delta L = 40 \log_{10} (f/f_0)$ | Cremer's infinite-plate result; asphalt screeds and dry floating floors, whose internal losses are high enough to behave as infinite plates (ISO 12354-2 Formula C.3) |
 | `"en12354"` | $\Delta L = 30 \log_{10} (f/f_0)$ | sand-cement and calcium-sulfate screeds, whose low loss factor makes them finite plates with a reverberant bending field (Formula C.1) |
-| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\text{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
+| `"cremer_hammer"` | $40 \log_{10} (f/f_0) + 10 \log_{10}[1 + (f/f_\mathrm{limit})^2]$ | a lightweight walking surface, where the hammer impedance is no longer negligible; tends to 18 dB per octave |
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/floating_floor_prediction.svg" alt="Improvement of impact sound insulation of a 35 mm floating screed of 73.5 kg per square metre on an 8 meganewton per cubic metre resilient layer: nothing below the 52.8 Hz mass-spring resonance, then the 30 lg law of EN 12354-2 reaching 59 dB at 5 kHz against the steeper 40 lg law of Cremer and the 18 dB per octave branch that includes the tapping-machine hammer impedance" width="80%"></picture>
 
@@ -239,7 +239,7 @@ double_floating_floor_resonances(7.25e6, 12.78, 7.25e6, 12.78)  # (74, 194) Hz
 
 The weighted single numbers come straight from the same two inputs, so a
 floating floor can be sized without ever drawing a spectrum:
-$\Delta L_w = 13\log_{10} m' - 14.2\log_{10} s' + 20.8$ dB for a sand-cement screed
+$\Delta L_\mathrm{w} = 13\log_{10} m' - 14.2\log_{10} s' + 20.8$ dB for a sand-cement screed
 (Formula C.4) and the steeper Formula (C.5) fit for asphalt and dry floors.
 Heavier slabs and softer layers rate better, and both estimates are
 deliberately on the safe side.
@@ -283,7 +283,7 @@ too low.
 
 Table D.1 then reads the weighted improvement off $f_0$, rounded to the
 one-third-octave band it falls in. Below 200 Hz the lining helps, by
-$74.4 - 20\log_{10} f_0 - R_w/2$ dB, and the better the bare wall the less there is
+$74.4 - 20\log_{10} f_0 - R_\mathrm{w}/2$ dB, and the better the bare wall the less there is
 to gain. From 200 Hz upwards it costs: 1 dB at 200 Hz falling to 10 dB from
 630 Hz to 1600 Hz, recovering to 5 dB above. Getting the resonance well below
 the range of interest is therefore the entire design brief.
@@ -329,16 +329,16 @@ values from 0.0 dB at 50 Hz to 59.3 dB at 5 kHz the library reproduces to
 their printed precision of 0.1 dB.
 
 Three things are worth knowing about that Table G.4 anchor. Its column is
-labelled $\Delta L_\text{situ}$, the *in-situ* improvement, and it stands in
+labelled $\Delta L_\mathrm{situ}$, the *in-situ* improvement, and it stands in
 for the laboratory $\Delta L$ only because Clause 4.2.2.1 Formula (4) states
-$\Delta L_\text{situ} = \Delta L$ outright. The resonance $f_0 = 52.8$ Hz is
+$\Delta L_\mathrm{situ} = \Delta L$ outright. The resonance $f_0 = 52.8$ Hz is
 an *input* of the example, printed in Clause G.1.1's construction data and
 repeated in the box under the table, not a value derived from the grid. And
 the leading 0.0 dB at 50 Hz needs a clamp below $f_0$ that no printed formula
 states: Formula (C.1) is written as $\Delta L = 30\log_{10}(f/f_0)$ with no range of
 validity at all, and the only condition printed anywhere is the informal
 "for $f > f_0$" inside that same input box. ISO 12354-1:2017 Table L.4 prints
-the identical 21 numbers as $\Delta R_\text{d,situ}$, which confirms the
+the identical 21 numbers as $\Delta R_\mathrm{d,situ}$, which confirms the
 transcription in a second published document, but its own box says the column
 comes from "ISO 12354-2:2017, Formula (C.1)" with the same $m'$, $s'$ and
 $f_0$, so it is the same calculation republished rather than an independent
@@ -429,7 +429,7 @@ set out in "What is anchored on a published number, and what is not" above.
 - [Dynamic stiffness of resilient materials (EN 29052-1)](../../materials/resilient/dynamic-stiffness.md):
   where $s'$ comes from.
 - [Predicting Sound Insulation (EN 12354)](insulation-prediction.md):
-  the simplified model that consumes $\Delta L_w$ and $\Delta R_w$.
+  the simplified model that consumes $\Delta L_\mathrm{w}$ and $\Delta R_\mathrm{w}$.
 - [Detailed Per-Band Prediction (ISO 12354)](detailed-prediction.md):
   the per-band model whose floating-floor term is `floating_floor_improvement`.
 - [Predicting Panel Sound Insulation](panel-sound-insulation.md):

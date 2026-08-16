@@ -41,20 +41,20 @@ $$
 over the positive response peaks, scaled to a daily dose
 
 $$
-D_{zd} = D_z \, (t_d/t_m)^{1/6} \tag{Formula 4/5}
+D_{z\mathrm{d}} = D_z \, (t_\mathrm{d}/t_\mathrm{m})^{1/6} \tag{Formula 4/5}
 $$
 
 Annex C turns the daily dose into an injury risk: the daily compressive
-stress $S_d$ (Formula C.1), the age-cumulated stress variable
+stress $S_\mathrm{d}$ (Formula C.1), the age-cumulated stress variable
 $R$ (Formulae C.3/C.4) and the Weibull probability of lumbar injury
 $P$ (Formula C.5, Table C.1):
 
 $$
-S_d = m_z D_{zd} \tag{Formula C.1}
+S_\mathrm{d} = m_z D_{z\mathrm{d}} \tag{Formula C.1}
 $$
 
 $$
-R = \left[ \sum_i \left( S_d N^{1/6} / (S_{u,i} - S_\text{stat}) \right)^6 \right]^{1/6} \tag{Formulae C.3/C.4}
+R = \left[ \sum_i \left( S_\mathrm{d} N^{1/6} / (S_{\mathrm{u},i} - S_\text{stat}) \right)^6 \right]^{1/6} \tag{Formulae C.3/C.4}
 $$
 
 $$
@@ -95,16 +95,16 @@ Formula 3. The input must be conditioned (DC-removed); see
 compression_dose(daily_dose_value: float, *, mz: float = 0.029) -> float
 ```
 
-Daily compressive stress $S_d$ (Annex C, Formula C.1).
+Daily compressive stress $S_\mathrm{d}$ (Annex C, Formula C.1).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `daily_dose_value` | The daily acceleration dose $D_{zd}$, m/s2. |
+| `daily_dose_value` | The daily acceleration dose $D_{z\mathrm{d}}$, m/s2. |
 | `mz` | Stress conversion $m_z$ (MPa per m/s2); default the 82 kg male value `MZ_MALE`. See `MZ_FEMALE`. |
 
-**Returns:** The daily compressive stress $S_d = m_z D_{zd}$, MPa.
+**Returns:** The daily compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$, MPa.
 
 ## daily_dose
 
@@ -116,17 +116,17 @@ daily_dose(
 ) -> float
 ```
 
-Daily acceleration dose $D_{zd}$ (clause 5.3, Formula 4).
+Daily acceleration dose $D_{z\mathrm{d}}$ (clause 5.3, Formula 4).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
 | `dose` | The measured acceleration dose $D_z$, m/s2. |
-| `exposure_time` | Daily exposure period $t_d$ (any time unit). |
-| `measurement_time` | Period $t_m$ over which $D_z$ was measured (same unit as `exposure_time`). |
+| `exposure_time` | Daily exposure period $t_\mathrm{d}$ (any time unit). |
+| `measurement_time` | Period $t_\mathrm{m}$ over which $D_z$ was measured (same unit as `exposure_time`). |
 
-**Returns:** The daily dose $D_{zd} = D_z (t_d/t_m)^{1/6}$, m/s2.
+**Returns:** The daily dose $D_{z\mathrm{d}} = D_z (t_\mathrm{d}/t_\mathrm{m})^{1/6}$, m/s2.
 
 ## daily_dose_multi
 
@@ -145,10 +145,10 @@ Daily dose from several exposure conditions (clause 5.3, Formula 5).
 | Name | Description |
 | :--- | :--- |
 | `doses` | Acceleration dose $D_{z,j}$ of each condition, m/s2. |
-| `exposure_times` | Daily exposure duration $t_{d,j}$ of each condition. |
-| `measurement_times` | Measurement duration $t_{m,j}$ of each condition. |
+| `exposure_times` | Daily exposure duration $t_{\mathrm{d},j}$ of each condition. |
+| `measurement_times` | Measurement duration $t_{\mathrm{m},j}$ of each condition. |
 
-**Returns:** The combined daily dose $D_{zd} = \left[ \sum_j D_{z,j}^6 \, (t_{d,j}/t_{m,j}) \right]^{1/6}$, m/s2.
+**Returns:** The combined daily dose $D_{z\mathrm{d}} = \left[ \sum_j D_{z,j}^6 \, (t_{\mathrm{d},j}/t_{\mathrm{m},j}) \right]^{1/6}$, m/s2.
 
 ## dose_from_peaks
 
@@ -211,7 +211,7 @@ weighted by the reducing ultimate strength of the ageing spine.
 
 | Name | Description |
 | :--- | :--- |
-| `daily_compression` | The daily compressive stress $S_d$, MPa. |
+| `daily_compression` | The daily compressive stress $S_\mathrm{d}$, MPa. |
 | `start_age` | Age $b$ at which the exposure started, in years. |
 | `years` | Number of exposure years `n`. |
 | `days_per_year` | Number of exposure days per year `N`. |
@@ -224,7 +224,7 @@ weighted by the reducing ultimate strength of the ageing spine.
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | if `years` is not positive or the spine strength is exhausted ($S_u - S_\text{stat} \le 0$) within the exposure period. |
+| ValueError | if `years` is not positive or the spine strength is exhausted ($S_\mathrm{u} - S_\text{stat} \le 0$) within the exposure period. |
 
 ## multiple_shock_assessment
 
@@ -266,8 +266,8 @@ horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
 | `start_age` | Age `b` at which the exposure started, in years. |
 | `years` | Number of exposure years `n`. |
 | `days_per_year` | Number of exposure days per year `N`. |
-| `exposure_time` | Daily exposure period $t_d$; when given with `measurement_time` the dose is scaled to a daily dose (Formula 4), otherwise the measured dose is taken as the daily dose. |
-| `measurement_time` | Period $t_m$ over which the record was measured. |
+| `exposure_time` | Daily exposure period $t_\mathrm{d}$; when given with `measurement_time` the dose is scaled to a daily dose (Formula 4), otherwise the measured dose is taken as the daily dose. |
+| `measurement_time` | Period $t_\mathrm{m}$ over which the record was measured. |
 | `sex` | `"male"` or `"female"`. |
 | `mz` | Stress conversion $m_z$ (MPa per m/s2); defaults to the sex-specific value. |
 
@@ -300,8 +300,8 @@ Annex C).
 | :--- | :--- |
 | `sex` | `"male"` or `"female"`. |
 | `acceleration_dose` | The acceleration dose $D_z$, m/s2. |
-| `daily_dose` | The daily acceleration dose $D_{zd}$, m/s2. |
-| `compression_dose` | The daily compressive stress $S_d$, MPa. |
+| `daily_dose` | The daily acceleration dose $D_{z\mathrm{d}}$, m/s2. |
+| `compression_dose` | The daily compressive stress $S_\mathrm{d}$, MPa. |
 | `risk` | The cumulative stress variable $R$. |
 | `probability` | The probability of lumbar injury $P(R)$ in 0-1. |
 | `start_age` | Age at which the exposure started, in years. |
@@ -351,8 +351,8 @@ calibration), the exposure-scenario grid (subject sex, the age
 `n`, the number of exposure days per year `N` and the number
 of counted response shocks), the dose-and-stress analysis table
 (the acceleration dose $D_z$ of Formula 3, the daily dose
-$D_{zd}$ of Formula 4, the daily compressive stress
-$S_d$ of Formula C.1, the cumulative stress variable
+$D_{z\mathrm{d}}$ of Formula 4, the daily compressive stress
+$S_\mathrm{d}$ of Formula C.1, the cumulative stress variable
 $R$ of Formula C.3 and the probability of lumbar injury
 $P$ of Formula C.5), the injury-probability chart, the boxed
 $R$ and $P$ with the Annex C risk classification, a
@@ -471,7 +471,7 @@ ultimate_strength(
 ) -> np.ndarray
 ```
 
-Ultimate lumbar strength $S_u$ at an age (Annex C,
+Ultimate lumbar strength $S_\mathrm{u}$ at an age (Annex C,
 Formula C.4).
 
 **Parameters**
@@ -481,4 +481,4 @@ Formula C.4).
 | `age` | Age $b + i$, in years. |
 | `sex` | `"male"` or `"female"` (sets the age slope $S_\text{age}$). |
 
-**Returns:** The ultimate strength $S_u = 6.75 - S_\text{age} (b+i)$, MPa.
+**Returns:** The ultimate strength $S_\mathrm{u} = 6.75 - S_\text{age} (b+i)$, MPa.

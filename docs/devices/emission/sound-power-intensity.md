@@ -51,7 +51,7 @@ F_{pI} = [L_p] - L_W + 10 \log_{10}\frac{S}{S_0}, \qquad
 F_{+/-} = 10 \log_{10}\frac{\sum_i \lvert P_i \rvert}{\lvert \sum_i P_i \rvert} .
 $$
 
-The probe's **dynamic capability** $L_d = \delta_{pI0} - K$ (pressure-residual
+The probe's **dynamic capability** $L_\mathrm{d} = \delta_{pI0} - K$ (pressure-residual
 intensity index minus the bias factor $K$, 10 dB for grade 2 and 7 dB for
 grade 3) must exceed $F_{pI}$ (criterion 1); $F_{+/-} \le 3\ \text{dB}$ is
 criterion 2 (mandatory for grade 2); and the two repeated sweeps must agree
@@ -153,8 +153,8 @@ frequency-dependent bias handled in the [intensity guide](intensity.md).
 | `areas` | 1D array | m² | > 0, `(N_seg,)` | Segment areas $S_i$ |
 | `normal_intensity_2` | 2D array | W/m² | same shape | Second sweep → criterion 3 and averaging |
 | `pressure_levels` | 2D array | dB | same shape | Segment SPL $L_{pi}$ → $F_{pI}$ |
-| `pressure_residual_index` | float or 1D array | dB | — | $\delta_{pI0}$ → $L_d$ / criterion 1 |
-| `frequencies` | 1D array | Hz | nominal centres | $L_{WA}$ and Table 2 limits |
+| `pressure_residual_index` | float or 1D array | dB | — | $\delta_{pI0}$ → $L_\mathrm{d}$ / criterion 1 |
+| `frequencies` | 1D array | Hz | nominal centres | $L_{W\mathrm{A}}$ and Table 2 limits |
 | `band_type` | str | — | `'third'` (default) / `'octave'` | Table 2 lookup |
 | `grade` | str | — | `'engineering'` (default) / `'survey'` | Selects $K$ |
 | `repeatability_limit` | float or 1D array | dB | default Table 2 | Override criterion-3 $s$ |
@@ -163,7 +163,7 @@ Returns a `SoundPowerIntensityResult`: `partial_power`/`partial_power_level`
 per segment and band, `sound_power`/`sound_power_level` (band total, `NaN`
 where `negative_band`), `surface_pressure_intensity_index` ($F_{pI}$),
 `negative_partial_power_index` ($F_{+/-}$), `repeatability`,
-`dynamic_capability_index` ($L_d$), `achieved_grade`, `surface_area`,
+`dynamic_capability_index` ($L_\mathrm{d}$), `achieved_grade`, `surface_area`,
 `sound_power_level_a` and `grade`.
 
 ## 2. Precision intensity scanning (ISO 9614-3)
@@ -178,8 +178,8 @@ scan, tighter field-indicator criteria and an explicit uncertainty budget.
 $P_i = I_{n,i}\,S_i$; the total $P = \sum_i P_i$ gives
 $L_W = 10\log_{10}(P/P_0)$, $P_0 = 1\ \text{pW}$. A band whose net intensity is
 negative (more power flowing in than out) is flagged not-applicable rather than
-logged. The field indicators (temporal variability $F_T$, the signed and
-unsigned pressure–intensity indicators, and the non-uniformity $F_S$) drive the
+logged. The field indicators (temporal variability $F_\mathrm{T}$, the signed and
+unsigned pressure–intensity indicators, and the non-uniformity $F_\mathrm{S}$) drive the
 five acceptance criteria.
 
 ```python
@@ -280,7 +280,7 @@ its own `.report()`, sharing the layout and the `ReportMetadata` container of
 the [pressure-method fiche](sound-power-pressure.md#3-the-measurement-report-report).
 The standard-basis line
 names ISO 9614-2:1996 and the measurement grade, the per-band table lists the
-intensity-derived band sound-power level $L_W$, and the boxed $L_{WA}$ carries
+intensity-derived band sound-power level $L_W$, and the boxed $L_{W\mathrm{A}}$ carries
 the total $L_W$, the measurement surface $S$ and the determination grade
 (the intensity result has no expanded uncertainty $U$). `verbose=True` adds the
 field indicators $F_{pI}$ (surface pressure-intensity) and $F_{+/-}$
@@ -326,7 +326,7 @@ repository. Click the preview to open the PDF:
 
 *Sound power by intensity fiche (`SoundPowerIntensityResult.report`), an
 ISO 9614-2 engineering-grade scan with the field indicators and the boxed
-$L_{WA}$.*
+$L_{W\mathrm{A}}$.*
 
 ### The precision sheet (ISO 9614-3)
 
@@ -339,7 +339,7 @@ band; the caption names the frequency range the determination covers, because
 clause 4.3 asks for it whenever that range is narrower than 50 Hz to 6.3 kHz.
 A one-third-octave set is printed in two column groups side by side, the way
 an accredited sheet fits that many bands on a page. `verbose=True` tabulates
-the four Annex B indicators $F_T$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_S$ per band,
+the four Annex B indicators $F_\mathrm{T}$, $F_{p|I_n|}$, $F_{pI_n}$ and $F_\mathrm{S}$ per band,
 the tabulation clause 10 f) 1) asks for, over the measurement surface as
 Annex B defines them, and the qualification cell the criteria decide.
 
@@ -347,15 +347,15 @@ Hand it an Annex C qualification and the sheet does what clause 10 f) 2)
 makes mandatory: the bands whose criteria are not satisfied are dropped from
 the A-weighted determination and named on the sheet, next to the bands the
 method is not applicable to at all (clause 9.2). That is why the boxed
-$L_{WA}$ can differ from `result.sound_power_level_a`, which is computed
+$L_{W\mathrm{A}}$ can differ from `result.sound_power_level_a`, which is computed
 before any criterion is evaluated and therefore sums every applicable band.
-Beside it the box states the normalized $L_{WA0}$, since clause 10 f) 2)
+Beside it the box states the normalized $L_{W\mathrm{A}0}$, since clause 10 f) 2)
 reports the normalized quantity while the headline number is the level a
 declared limit is written against.
 Without `criteria` the fiche boxes the result's own value and says that no
 qualification was supplied. `residual_index` puts the probe's
 pressure-residual intensity index on the sheet (clause 10 d) 5)) with the
-dynamic capability $L_d$ it yields; the clause 10 items that are free
+dynamic capability $L_\mathrm{d}$ it yields; the clause 10 items that are free
 description rather than numbers, the scan geometry and speed, the scanning
 time and the probe-reversal checks, go in the metadata `notes`.
 
@@ -424,7 +424,7 @@ normalized levels, the per-band uncertainty and the Annex C omission stated.*
 
 - [Sound Power](sound-power.md): choosing among the five determination
   routes, what the accuracy grades promise, and the ISO 4871 noise-emission
-  declaration a measured $L_{WA}$ feeds.
+  declaration a measured $L_{W\mathrm{A}}$ feeds.
 - [Sound Intensity (p-p)](intensity.md): the two-microphone probe, its
   finite-difference bias and the ISO 9614-1 field indicators behind the
   scanning methods.

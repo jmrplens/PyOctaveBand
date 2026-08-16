@@ -153,8 +153,8 @@ dominant[np.argmin(abs(f - 2500.0))]   # 1 (input 2 drives the high band)
 
 The random errors follow Section 9.3. Conditioning on the $i-1$ preceding
 inputs costs $i-1$ degrees of freedom, so the $i$-th ordered input carries
-$n_d-(i-1)$ effective averages (Eqs. 9.100/9.101) and the $q$-input multiple
-coherence carries $n_d-(q-1)$ (Eq. 9.98). The result exposes
+$n_\mathrm{d}-(i-1)$ effective averages (Eqs. 9.100/9.101) and the $q$-input multiple
+coherence carries $n_\mathrm{d}-(q-1)$ (Eq. 9.98). The result exposes
 `multiple_coherence_random_error` and `coherent_output_random_error` alongside
 the effective average count `n_averages`.
 

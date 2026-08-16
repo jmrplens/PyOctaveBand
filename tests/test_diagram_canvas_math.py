@@ -108,12 +108,13 @@ def test_baseline_restored_after_script() -> None:
 
 def test_braced_subscript_retokenized_at_script_size() -> None:
     # Letters inside a braced script are variables at script size; the
-    # comma stays upright at script size beside them.
-    assert _math_runs("$L_{p,s}$") == [
+    # comma stays upright at script size beside them. `i` and `j` are
+    # indices, so both halves take the italic default.
+    assert _math_runs("$L_{i,j}$") == [
         ("L", True, 0.0, 1.0),
-        ("p", True, 0.22, 0.70),
+        ("i", True, 0.22, 0.70),
         (",", False, 0.22, 0.70),
-        ("s", True, 0.22, 0.70),
+        ("j", True, 0.22, 0.70),
     ]
 
 
@@ -198,13 +199,13 @@ def test_multicharacter_script_without_braces_raises() -> None:
 
 
 def test_comma_glued_to_unbraced_script_raises() -> None:
-    # $L_p,s$ would set p as the subscript and push ",s" back to the
+    # $L_p,i$ would set p as the subscript and push ",i" back to the
     # baseline; the guard demands braces. A spaced-off comma is a list
     # separator and stays legal.
     with pytest.raises(ValueError) as excinfo:
-        _element("$L_p,s$")
-    assert "ambiguous comma '_p,s'" in str(excinfo.value)
-    assert "'$L_p,s$'" in str(excinfo.value)
+        _element("$L_p,i$")
+    assert "ambiguous comma '_p,i'" in str(excinfo.value)
+    assert "'$L_p,i$'" in str(excinfo.value)
     assert _math_runs("$a_x , a_y , a_z$") == [
         ("a", True, 0.0, 1.0), ("x", True, 0.22, 0.70),
         (" , ", False, 0.0, 1.0),
@@ -213,13 +214,14 @@ def test_comma_glued_to_unbraced_script_raises() -> None:
         ("a", True, 0.0, 1.0), ("z", True, 0.22, 0.70),
     ]
     # Braced, the comma composes inside the script, mixing the italic
-    # indices and the roman descriptive run.
+    # indices and the roman descriptive runs. `w` and `eq` are descriptive
+    # and merge into one upright run; `n` cannot join them, because this
+    # set cannot tell the normalized `n` of $L_n$ from the harmonic order
+    # of $H_n$ and so leaves the run italic.
     assert _math_runs("$L_{n,w,eq}$") == [
         ("L", True, 0.0, 1.0),
         ("n", True, 0.22, 0.70),
-        (",", False, 0.22, 0.70),
-        ("w", True, 0.22, 0.70),
-        (",eq", False, 0.22, 0.70),
+        (",w,eq", False, 0.22, 0.70),
     ]
 
 
@@ -287,10 +289,10 @@ def test_capital_greek_is_upright_and_lowercase_stays_italic() -> None:
     # and are set upright at every level, matching the roman Δ of
     # difference of ISO 80000-2, the Δ_SOR print of ECAC Doc 29 §4.5.7 and
     # the upright \Delta mathtext sets in the matplotlib figures.
-    assert _math_runs("$ΔL_s$") == [
+    assert _math_runs("$ΔL_i$") == [
         ("Δ", False, 0.0, 1.0),
         ("L", True, 0.0, 1.0),
-        ("s", True, 0.22, 0.70),
+        ("i", True, 0.22, 0.70),
     ]
     # Doc 29 prints the SOR subscript in italic (eq. 4-23): it is not on
     # the curated roman list, so it takes the italic index default.

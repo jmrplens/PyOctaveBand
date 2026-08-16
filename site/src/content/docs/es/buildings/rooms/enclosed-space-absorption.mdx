@@ -52,11 +52,11 @@ hace este cálculo. El área de absorción equivalente $A$ no es solo un fin en 
 misma: es la magnitud que convierte una predicción de aislamiento en una
 predicción valorada. Una predicción produce una diferencia de niveles $D$, y las
 valoraciones solo quedan definidas una vez que se conoce la absorción del recinto
-receptor — $D_{nT} = D + 10\lg(T/T_0)$ y $R' = D + 10\lg(S/A)$ —, mientras que la
+receptor — $D_\mathrm{nT} = D + 10\lg(T/T_0)$ y $R' = D + 10\lg(S/A)$ —, mientras que la
 EN 12354-5 necesita esa misma $A$ para convertir la potencia acústica de una
 instalación de servicio en un nivel de sala. La dirección del error importa:
-sobrestimar la absorción del recinto receptor *favorece* el $D_{nT}$ previsto, de
-modo que los mismos datos optimistas de $\alpha_s$ que acortan el tiempo de
+sobrestimar la absorción del recinto receptor *favorece* el $D_\mathrm{nT}$ previsto, de
+modo que los mismos datos optimistas de $\alpha_\mathrm{s}$ que acortan el tiempo de
 reverberación previsto inflan también la valoración de aislamiento prevista. Por
 eso la norma insiste en que se declare en el informe la procedencia de cada
 coeficiente.
@@ -72,8 +72,8 @@ los conjuntos de objetos (grupos de objetos idénticos tratados como una
 superficie absorbente de área $S_k$) y la absorción del aire (Fórmula 1):
 
 $$
-A = \sum_i \alpha_{s,i}\,S_i + \sum_j A_{\mathrm{obj},j}
-    + \sum_k \alpha_{s,k}\,S_k + A_{\mathrm{air}}.
+A = \sum_i \alpha_{\mathrm{s},i}\,S_i + \sum_j A_{\mathrm{obj},j}
+    + \sum_k \alpha_{\mathrm{s},k}\,S_k + A_{\mathrm{air}}.
 $$
 
 Para objetos duros e irregulares cuya absorción no se mide, se usa una
@@ -290,7 +290,7 @@ $$
 
 que hay que evaluar **banda a banda**, porque el objetivo suele ser un intervalo
 de 125 Hz a 4 kHz y no un número único. Resta la absorción que la sala sin tratar
-ya tiene para obtener el déficit por banda, divide el déficit por el $\alpha_s$
+ya tiene para obtener el déficit por banda, divide el déficit por el $\alpha_\mathrm{s}$
 por banda del producto candidato para obtener la superficie a instalar, y
 comprueba después que esa superficie cabe de verdad en los paramentos
 disponibles.
@@ -335,7 +335,7 @@ recoge las mismas referencias con sus reglas de forma en frecuencia.
 
 ## 3. De dónde salen los datos de entrada
 
-**Coeficientes de superficie.** La norma espera que los $\alpha_{s,i}$
+**Coeficientes de superficie.** La norma espera que los $\alpha_{\mathrm{s},i}$
 procedan de mediciones de laboratorio según EN ISO 354, el método de cámara
 reverberante de
 [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/); se admiten
@@ -349,7 +349,7 @@ misma convención de campo difuso que lo produjo es la que supone el modelo.
 
 **Nunca la valoración de número único.** La norma admite *solo datos por bandas
 de frecuencia*. La NOTA del apartado 3.2.1 dice de forma explícita que una
-valoración de número único obtenida según la EN ISO 11654 — $\alpha_w$, y por el
+valoración de número único obtenida según la EN ISO 11654 — $\alpha_\mathrm{w}$, y por el
 mismo argumento el NRC y el SAA de la práctica norteamericana — puede usarse para
 comparar o especificar productos, pero **no puede usarse directamente para
 calcular las prestaciones in situ**. Esta es la forma más habitual de equivocar
@@ -360,12 +360,12 @@ en una dirección conocida. Es una *curva de referencia desplazada* leída a
 500 Hz, ajustada moviendo la curva en pasos de 0,05 hasta que las desviaciones
 desfavorables sumadas caen a 0,10 o menos, de modo que una banda que rinde de
 menos se absorbe en esa tolerancia en lugar de declararse. Sus entradas, los
-coeficientes prácticos $\alpha_p$, ya vienen redondeadas en pasos de 0,05 y
+coeficientes prácticos $\alpha_\mathrm{p}$, ya vienen redondeadas en pasos de 0,05 y
 limitadas a 1,00. Y su curva de referencia se detiene en la octava de 250 Hz, así
 que la ISO 11654 declara que la valoración **no es apropiada por debajo de esa
-frecuencia** en absoluto: un $\alpha_w$ a secas no lleva ninguna información
+frecuencia** en absoluto: un $\alpha_\mathrm{w}$ a secas no lleva ninguna información
 sobre la banda de 125 Hz, que es donde las salas suelen fallar. Compara la placa
-de 20 mm del §2, cuyo $\alpha_s$ va de 0,15 a 125 Hz a 0,85 a 1 kHz, con la única
+de 20 mm del §2, cuyo $\alpha_\mathrm{s}$ va de 0,15 a 125 Hz a 0,85 a 1 kHz, con la única
 cifra «Clase A» que imprimiría su hoja de características. Toma la tabla por tercios de
 octava del informe de ensayo ISO 354 y promedia los tres tercios en cada octava;
 cuando solo se disponga de una valoración, trata la predicción como orientativa y
@@ -373,17 +373,17 @@ dilo en el informe. La valoración en sí está definida en
 [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/).
 
 **Mobiliario y ocupantes.** Los objetos contribuyen por tres vías: un área
-de absorción equivalente medida $A_{obj}$ cuando existe (personas y
+de absorción equivalente medida $A_\mathrm{obj}$ cuando existe (personas y
 asientos tienen valores tabulados en el Anexo C informativo), la estimación
-de la Fórmula 4 $V_{obj}^{2/3}$ para objetos duros, irregulares y sin
+de la Fórmula 4 $V_\mathrm{obj}^{2/3}$ para objetos duros, irregulares y sin
 medir (mobiliario, maquinaria), y los *conjuntos* de objetos valorados como
-una superficie absorbente $\alpha_s S_k$ cuando muchos objetos similares
+una superficie absorbente $\alpha_\mathrm{s} S_k$ cuando muchos objetos similares
 cubren una zona (un público sentado, una estantería de almacén). Los objetos
 también desplazan aire: su volumen sumado entra en la fracción de objetos
 $\psi$ que acorta $T$ en la Fórmula 5 más allá de lo que haría su absorción
 sola.
 
-**Aire.** El término de aire $A_{air} = 4mV(1-\psi)$ usa el coeficiente de
+**Aire.** El término de aire $A_\mathrm{air} = 4mV(1-\psi)$ usa el coeficiente de
 atenuación de potencia $m$ de la Tabla 1 de la norma, resuelto por las
 cadenas `air_condition` (clase de temperatura y humedad relativa, derivada
 de ISO 9613-1); solo importa por encima de 1 kHz y crece con el volumen.
@@ -615,11 +615,11 @@ EN 12354-6 da una estimación de campo difuso, y un objetivo pasado por
 - [Parámetros acústicos de salas (ISO 3382-1/2)](/phonometry/es/buildings/rooms/room-acoustics/):
   la contraparte medida del tiempo de reverberación que aquí se predice.
 - [Medida y clasificación de la absorción sonora](/phonometry/es/materials/absorbers/absorption-measurement/):
-  de dónde salen los $\alpha_s$ (ISO 354) y dónde se define $\alpha_w$
+  de dónde salen los $\alpha_\mathrm{s}$ (ISO 354) y dónde se define $\alpha_\mathrm{w}$
   (ISO 11654), la valoración que el §3 prohíbe como entrada.
 - [Predicción del aislamiento acústico (EN 12354)](/phonometry/es/buildings/design/insulation-prediction/):
   el miembro de la familia que consume la $A$ que aquí se calcula, a través de
-  $D_{nT} = D + 10\lg(T/T_0)$ y $R' = D + 10\lg(S/A)$.
+  $D_\mathrm{nT} = D + 10\lg(T/T_0)$ y $R' = D + 10\lg(S/A)$.
 - [Informe de conformidad](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md):
   los tres casos del Anexo E frente a los que se comprueban estas
   implementaciones.

@@ -23,7 +23,7 @@ barriers) are [Outdoor sound propagation](../environment/propagation/outdoor-pro
 ## 1. The noise-power-distance engine
 
 The ECAC Doc 29 airport-noise method describes an aircraft with **noise-power-
-distance (NPD)** tables that give the event level ($L_{Amax}$ or `SEL`) of steady straight
+distance (NPD)** tables that give the event level ($L_\mathrm{Amax}$ or `SEL`) of steady straight
 flight versus engine power and slant distance. `npd_level` reads an event level
 for an arbitrary power and distance, interpolating **linearly in power**
 (Eq. 4-3) and **log-linearly in distance** (Eq. 4-4), extrapolating from the
@@ -196,7 +196,7 @@ plt.show()
 </details>
 
 `event_level` assembles these (Eq. 4-8/4-9) and sums the segments into the exposure
-level `SEL` (Eq. 4-11) or the maximum level $L_{Amax}$ (Eq. 4-10); `noise_contour`
+level `SEL` (Eq. 4-11) or the maximum level $L_\mathrm{Amax}$ (Eq. 4-10); `noise_contour`
 evaluates `event_level` over a ground grid to produce a noise contour. Mark the
 takeoff ground-roll segments with the boolean `ground_roll` mask.
 
@@ -246,7 +246,7 @@ events of the reference workbook are reproduced end-to-end in the test suite.
 - [Outdoor sound propagation](../environment/propagation/outdoor-propagation.md): the ISO 9613-2
   attenuation terms and the ground effect the lateral attenuation condenses
   into one curve.
-- [Environmental levels](../environment/assessment/environmental-levels.md): the $L_{den}$-style
+- [Environmental levels](../environment/assessment/environmental-levels.md): the $L_\mathrm{den}$-style
   long-term indices that a full airport study accumulates from single events.
 - API reference: [`aircraft.airport_noise`](https://jmrplens.github.io/phonometry/reference/api/aeroacoustics/airport-noise/).
 

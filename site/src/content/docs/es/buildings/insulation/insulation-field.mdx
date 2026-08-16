@@ -62,7 +62,7 @@ Esta guía continúa desde la [guía de Acústica de salas](/phonometry/es/build
 la misma respuesta al impulso, medida a ambos lados de un cerramiento, da su
 aislamiento acústico. Esta página cubre la medición con método de ingeniería
 de ISO 16283 en el edificio terminado: las diferencias de niveles aéreas $D$,
-$D_{nT}$ y $R'$, los niveles de impactos $L'_{nT}$ y $L'_n$, el informe de
+$D_\mathrm{nT}$ y $R'$, los niveles de impactos $L'_\mathrm{nT}$ y $L'_\mathrm{n}$, el informe de
 ensayo in situ y la incertidumbre de ISO 12999-1 que cualifica cada valor de
 campo. Tres parientes cercanos tienen guías propias: el motor de curva de
 referencia tras cada número único en
@@ -100,12 +100,12 @@ el recinto **emisor** ($L_1$) y en el recinto **receptor** ($L_2$) por banda de
 tercio de octava y forma la diferencia de niveles $D = L_1 - L_2$. Dos
 normalizaciones la hacen comparable entre recintos. La **diferencia de niveles
 estandarizada** refiere el tiempo de reverberación del recinto receptor $T$ a
-$T_0 = 0{,}5$ s (de modo que con $T = 0{,}5$ s, $D_{nT} = D$ exactamente), y el
+$T_0 = 0{,}5$ s (de modo que con $T = 0{,}5$ s, $D_\mathrm{nT} = D$ exactamente), y el
 **índice de reducción acústica aparente** normaliza por la superficie del
 cerramiento $S$ y el área de absorción de Sabine $A$:
 
 $$
-D_{nT} = D + 10 \log_{10} \frac{T}{T_0}, \qquad
+D_\mathrm{nT} = D + 10 \log_{10} \frac{T}{T_0}, \qquad
 R' = D + 10 \log_{10} \frac{S}{A}, \qquad A = \frac{0{,}16\ V}{T}.
 $$
 
@@ -115,8 +115,8 @@ $L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)$.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_es.svg" alt="Montaje de aislamiento a ruido aéreo en campo: un altavoz en el recinto emisor, micrófonos promediados en energía en los recintos emisor y receptor a través del cerramiento común" width="92%" loading="eager" />
 
 La prima de $R'$ es una convención, no un adorno: las magnitudes con prima
-($R'$, $L'_n$, $L'_{nT}$) se miden **en el edificio** e incluyen todas las
-trayectorias por flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
+($R'$, $L'_\mathrm{n}$, $L'_\mathrm{nT}$) se miden **en el edificio** e incluyen todas las
+trayectorias por flancos, mientras que las $R$ y $L_\mathrm{n}$ sin prima son propiedades de
 laboratorio del elemento solo, medidas con los flancos suprimidos. El mapa
 completo laboratorio-campo vive en
 [Medición del aislamiento en
@@ -125,17 +125,17 @@ la predicción que tiende el puente entre ambos es
 [EN 12354](/phonometry/es/buildings/design/insulation-prediction/).
 
 Una sola medición da las tres magnitudes, así que **cuál de ellas va al informe
-es una cuestión reglamentaria, no de medición.** $D_{nT}$ describe la pareja de
+es una cuestión reglamentaria, no de medición.** $D_\mathrm{nT}$ describe la pareja de
 recintos tal como la viven los ocupantes, y es en lo que la mayoría de los
 códigos nacionales para vivienda declaran sus exigencias. $R'$ describe la
 partición, normalizada por su área, y es lo que necesita una comparación frente
-a un $R_w$ de laboratorio o a una predicción EN 12354. Mide una vez y declara
+a un $R_\mathrm{w}$ de laboratorio o a una predicción EN 12354. Mide una vez y declara
 después la magnitud en la que está escrita la exigencia, diciendo cuál es: un
-$R'_A$ no se puede contrastar con un límite en $D_{nT,A}$ sin convertirlo antes
+$R'_\mathrm{A}$ no se puede contrastar con un límite en $D_\mathrm{nT,A}$ sin convertirlo antes
 a través de la $T$ del recinto y del área de la partición; véase
 [Código Técnico de la Edificación (CTE DB-HR)](/phonometry/es/buildings/insulation/spanish-building-code/),
-que declara su exigencia entre recintos en $D_{nT,A}$ y la de la tabiquería en
-$R_A$.
+que declara su exigencia entre recintos en $D_\mathrm{nT,A}$ y la de la tabiquería en
+$R_\mathrm{A}$.
 
 ```python
 import numpy as np
@@ -166,7 +166,7 @@ función a `weighted_rating`, de modo que cada banda quede alineada índice a
 
 Vale la pena llevarse la escala: en una pared o un forjado separador entre
 viviendas las exigencias nacionales se sitúan típicamente en torno a
-$D_{nT,w} = 50$ dB y rara vez por debajo de 45 dB, así que los 40 dB de este
+$D_\mathrm{nT,w} = 50$ dB y rara vez por debajo de 45 dB, así que los 40 dB de este
 ejemplo deliberadamente plano las incumplirían todas. En una magnitud aérea más
 alto es mejor, y 5 dB son más o menos el escalón entre una solución
 constructiva que funciona y otra que genera quejas.
@@ -184,7 +184,7 @@ constructiva que funciona y otra que genera quejas.
 
 `airborne_insulation()` devuelve un `AirborneInsulationResult` (`d`, `dnt`,
 `r_prime` o `None`). El motor de curva de referencia que convierte cualquiera
-de esos espectros en $R_w$, $R'_w$ o $D_{nT,w}$, sus términos de adaptación
+de esos espectros en $R_\mathrm{w}$, $R'_\mathrm{w}$ o $D_\mathrm{nT,w}$, sus términos de adaptación
 espectral y sus variantes de rango ampliado están en
 [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/).
 
@@ -225,11 +225,11 @@ retícula regular.
 
 Mide otra vez el recinto receptor con la fuente apagada, en las mismas
 posiciones y con el mismo promediado, y compara banda a banda con el nivel
-combinado de señal más fondo $L_{sb}$:
+combinado de señal más fondo $L_\mathrm{sb}$:
 
-- margen $\ge 10$ dB: usa $L_{sb}$ sin tocarlo;
+- margen $\ge 10$ dB: usa $L_\mathrm{sb}$ sin tocarlo;
 - $6 < \text{margen} < 10$ dB: resta el fondo en energía,
-  $L = 10\log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ (Fórmula 14), con los dos
+  $L = 10\log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$ (Fórmula 14), con los dos
   niveles reducidos antes a un decimal;
 - margen $\le 6$ dB: aplica la corrección fija de 1,3 dB y señala la banda en
   el informe como que está en el límite de la medición.
@@ -260,13 +260,13 @@ Para niveles de campo usa la expresión de tres regímenes de arriba.
 
 Con **varios altavoces funcionando simultáneamente** (apartado 7.3.3) hay una
 sola medición: promedia en energía las posiciones de cada recinto, corrige por
-ruido de fondo y forma $D_{nT}$ o $R'$ una sola vez. Con un **único altavoz
+ruido de fondo y forma $D_\mathrm{nT}$ o $R'$ una sola vez. Con un **único altavoz
 desplazado entre posiciones** (apartado 7.3.4) la norma *no* promedia los
 niveles entre posiciones de altavoz. Forma el resultado para cada posición y
 promedia los *resultados* como factores de transmisión,
 
 $$
-D_{nT} = -10\log_{10}\left[\frac{1}{m}\sum_{j=1}^{m} 10^{-D_{nT,j}/10}\right],
+D_\mathrm{nT} = -10\log_{10}\left[\frac{1}{m}\sum_{j=1}^{m} 10^{-D_{\mathrm{nT},j}/10}\right],
 $$
 
 que es lo que da más peso a la peor posición. Las dos vías no dan el mismo
@@ -334,10 +334,10 @@ varias posiciones de altavoz, promedia en energía esos máximos por posición
 defecto en una ponderación 1:2 (Fórmula (13)):
 
 $$
-L_{LF} = 10\log_{10}\left[\frac{10^{0,1 L_\text{Corner}} + 2 \cdot 10^{0,1 L}}{3}\right].
+L_\mathrm{LF} = 10\log_{10}\left[\frac{10^{0,1 L_\text{Corner}} + 2 \cdot 10^{0,1 L}}{3}\right].
 $$
 
-$L_{LF}$ sustituye a $L$ en esas tres bandas, y $D_{nT}$ o $R'$ se forman
+$L_\mathrm{LF}$ sustituye a $L$ en esas tres bandas, y $D_\mathrm{nT}$ o $R'$ se forman
 después exactamente igual que antes. Como $L_\text{Corner}$ puede superar a $L$
 en varios decibelios, el procedimiento sube por igual el nivel del recinto
 emisor y el del receptor: el efecto sobre la *diferencia* de niveles es lo que
@@ -373,21 +373,21 @@ print(np.round(l_lf - l_default, 1))      # [2.4 2.8 1.8]  dB por encima del val
 El ruido de pisadas se valora al revés. En lugar de cuánto *bloquea* un
 forjado, el aislamiento a impactos mide cuánto introduce en la sala inferior
 una **máquina de impactos normalizada** situada en el forjado superior, así que
-un número *mayor* es *peor*. El nivel de presión acústica de impactos $L_i$
+un número *mayor* es *peor*. El nivel de presión acústica de impactos $L_\mathrm{i}$
 promediado en energía en el recinto receptor se normaliza igual que el caso
 aéreo, pero con un cambio de signo en el término de reverberación:
 
 $$
-L'_{nT} = L_i - 10 \log_{10} \frac{T}{T_0}, \qquad
-L'_n = L_i + 10 \log_{10} \frac{A}{A_0}, \quad
+L'_\mathrm{nT} = L_\mathrm{i} - 10 \log_{10} \frac{T}{T_0}, \qquad
+L'_\mathrm{n} = L_\mathrm{i} + 10 \log_{10} \frac{A}{A_0}, \quad
 A_0 = 10\ \text{m}^2,\ A = \frac{0{,}16\ V}{T}.
 $$
 
-El nivel de impactos **estandarizado** $L'_{nT}$ ($T_0 = 0{,}5$ s para viviendas)
+El nivel de impactos **estandarizado** $L'_\mathrm{nT}$ ($T_0 = 0{,}5$ s para viviendas)
 solo necesita el $T$ del recinto receptor, así que con $T = 0{,}5$ s es igual a
-$L_i$; el nivel **normalizado** $L'_n$ (referido a un área de absorción de
+$L_\mathrm{i}$; el nivel **normalizado** $L'_\mathrm{n}$ (referido a un área de absorción de
 10 m²) necesita además el volumen del recinto receptor. Fíjate en el signo
-**menos**: más reverberación *reduce* $L'_{nT}$, al contrario que el $D_{nT}$
+**menos**: más reverberación *reduce* $L'_\mathrm{nT}$, al contrario que el $D_\mathrm{nT}$
 aéreo.
 
 La máquina de impactos no es la única fuente que especifica ISO 16283-2. Sus
@@ -426,12 +426,12 @@ print(building.weighted_impact_rating(octave).rating)  # 54
 ```
 
 Pasa el `l_n_t` (o `l_n`) de `impact_insulation` directamente a
-`weighted_impact_rating`; el índice y $C_I$ reproducen los valores del Anexo C
-de ISO 717-2 (tercios $L'_{nT,w} = 79$, $C_I = -11$; octava 54, $C_I = 0$).
+`weighted_impact_rating`; el índice y $C_\mathrm{I}$ reproducen los valores del Anexo C
+de ISO 717-2 (tercios $L'_\mathrm{nT,w} = 79$, $C_\mathrm{I} = -11$; octava 54, $C_\mathrm{I} = 0$).
 
 Aquí el signo de la escala se invierte: en una magnitud de impacto **más bajo
 es mejor**. Los límites nacionales para vivienda se sitúan en la franja de 50 a
-60 dB, así que $L'_{nT,w} = 79$ dB es un forjado estructural desnudo, sin
+60 dB, así que $L'_\mathrm{nT,w} = 79$ dB es un forjado estructural desnudo, sin
 revestimiento y sin capa flotante, que incumple por unos 20 dB: el ejemplo del
 Anexo C es un caso pésimo, no uno típico. Cerrar un hueco de ese tamaño pide un
 suelo flotante sobre una capa elástica o un techo desolidarizado, no una
@@ -446,7 +446,7 @@ y
 | :--- | :--- | :--- | :--- | :--- |
 | `li` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | SPL de impactos promediado en energía (2D se promedia sobre las posiciones) |
 | `t2` | array 1D | s | > 0, uno por banda | Tiempo de reverberación del recinto receptor |
-| `volume` | float, opcional | m³ | > 0 | $V$ del recinto receptor (habilita $L'_n$) |
+| `volume` | float, opcional | m³ | > 0 | $V$ del recinto receptor (habilita $L'_\mathrm{n}$) |
 | `t0` | float | s | por defecto `0.5` | Tiempo de reverberación de referencia $T_0$ |
 
 `impact_insulation()` devuelve un `ImpactInsulationResult` (`l_n_t`, `l_n` o
@@ -460,11 +460,11 @@ del apartado 14 de ISO 16283-1:2014 / ISO 16283-2:2020, con el formato de los
 formularios de resultados recomendados (Anexo B / Anexo C) y de los informes de
 campo acreditados construidos sobre ellos.
 `AirborneInsulationResult.report()` genera la ficha de la diferencia de niveles
-estandarizada $D_{nT}$ (Figura B.1) o, con `quantity="r_prime"`, la ficha del
+estandarizada $D_\mathrm{nT}$ (Figura B.1) o, con `quantity="r_prime"`, la ficha del
 índice de reducción acústica aparente $R'$ (Figura B.2);
 `ImpactInsulationResult.report()` genera la ficha del nivel estandarizado
-$L'_{nT}$ (Figura C.1) o, con `quantity="l_n"`, la del nivel normalizado
-$L'_n$ (Figura C.2). Cada ficha nombra la norma de campo en su línea de base,
+$L'_\mathrm{nT}$ (Figura C.1) o, con `quantity="l_n"`, la del nivel normalizado
+$L'_\mathrm{n}$ (Figura C.2). Cada ficha nombra la norma de campo en su línea de base,
 evalúa el índice de un solo número de ISO 717-1 / ISO 717-2 sobre las 16 bandas
 de tercio de octava del rango básico (100–3150 Hz), expresa la magnitud con un
 decimal tanto en tabla como en curva frente a la curva de referencia desplazada
@@ -474,7 +474,7 @@ evaluación se basa en resultados de medidas in situ obtenidos mediante un
 método de ingeniería.
 
 `verbose=True` cambia la tabla de dos columnas por la cadena de medición por
-bandas (los niveles medios energéticos $L_1$ y $L_2$, o $L_i$, y el tiempo de
+bandas (los niveles medios energéticos $L_1$ y $L_2$, o $L_\mathrm{i}$, y el tiempo de
 reverberación $T$ junto a la magnitud informada), el contenido que anexan los
 informes de campo acreditados; necesita un resultado construido con
 `airborne_insulation()` / `impact_insulation()`, que conservan esas entradas en
@@ -524,10 +524,10 @@ imp.report("LnTw_insitu.pdf", language="es",
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/field_airborne_insulation_es.svg" alt="Cadena de medida aérea in situ: la diferencia de niveles bruta D y la DnT estandarizada en las dieciséis bandas de tercio de octava, con la corrección de reverberación sombreada entre ambas y los índices DnT,w y R'w anotados" width="80%" />
 
 *El tiempo de reverberación del recinto receptor convierte la diferencia de
-niveles bruta $D$ en la $D_{nT}$ estandarizada banda a banda; con $T$ por
+niveles bruta $D$ en la $D_\mathrm{nT}$ estandarizada banda a banda; con $T$ por
 encima de $T_0 = 0{,}5$ s en todo el rango, la corrección eleva ligeramente
 la curva. El recuadro recoge los dos valores únicos de esta medición,
-$D_{nT,w}$ y $R'_w$.*
+$D_\mathrm{nT,w}$ y $R'_\mathrm{w}$.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -597,9 +597,9 @@ de medición** (apartado 5.2):
 
 | Situación | Significado | Incertidumbre típica $u$ |
 | :--- | :--- | :--- |
-| **A** | caracterización en laboratorio (ISO 10140) | reproducibilidad $\sigma_R$ |
-| **B** | misma ubicación, equipos distintos | in situ $\sigma_{situ}$ |
-| **C** | misma ubicación, mismo operador repetido | repetibilidad $\sigma_r$ |
+| **A** | caracterización en laboratorio (ISO 10140) | reproducibilidad $\sigma_\mathrm{R}$ |
+| **B** | misma ubicación, equipos distintos | in situ $\sigma_\mathrm{situ}$ |
+| **C** | misma ubicación, mismo operador repetido | repetibilidad $\sigma_\mathrm{r}$ |
 
 La incertidumbre expandida es $U = k\ u$ (Fórmula 2) con el factor de cobertura
 $k$ de la Tabla 8. Un intervalo bilateral $Y = y \pm U$ (Fórmula 3, $k = 1{,}96$ al
@@ -697,7 +697,7 @@ plt.show()
 | `value` | float | dB | — | Mejor estimación $y$ a la que adjuntar $U$ |
 | `coverage` | float | — | por defecto `0.95` | Nivel de confianza (Tabla 8) |
 | `one_sided` | bool | — | por defecto `False` | Factor unilateral para verificaciones de conformidad |
-| `upper_limit` | bool | — | por defecto `False` | Selecciona el límite superior $\sigma_{R95}$ (ruido aéreo, situación A) |
+| `upper_limit` | bool | — | por defecto `False` | Selecciona el límite superior $\sigma_\mathrm{R95}$ (ruido aéreo, situación A) |
 
 `band_uncertainty()` devuelve una `BandUncertainty` (`frequencies`,
 `uncertainties`, `.to_arrays()`); `single_number_uncertainty()` un float;
@@ -726,7 +726,7 @@ receptor, es
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
 La ISO 16283-1:2014 (aislamiento a ruido aéreo de campo: la diferencia de
-niveles, la $D_{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12 a
+niveles, la $D_\mathrm{nT}$ estandarizada y el $R'$ aparente de los apartados 3.12 a
 3.15 y el promediado de posiciones del apartado 7.8) y la ISO 16283-2:2020
 (aislamiento a ruido de impactos de campo, las mismas normalizaciones con el
 signo invertido) mediante `building.energy_average_level`,
@@ -803,8 +803,8 @@ intensidad](/phonometry/es/buildings/insulation/insulation-intensity/)).
 
 ### ¿Qué significa DnT,w?
 
-$D_{nT,w}$ es la diferencia de niveles estandarizada ponderada. Por banda
-de tercio de octava, $D_{nT} = D + 10 \log_{10}(T/T_0)$ refiere el tiempo
+$D_\mathrm{nT,w}$ es la diferencia de niveles estandarizada ponderada. Por banda
+de tercio de octava, $D_\mathrm{nT} = D + 10 \log_{10}(T/T_0)$ refiere el tiempo
 de reverberación del recinto receptor $T$ a $T_0 = 0{,}5$ s, con
 $D = L_1 - L_2$ la diferencia de niveles entre el recinto emisor y el
 receptor (ISO 16283-1). El método de la curva de referencia de ISO 717-1
@@ -814,8 +814,8 @@ reduce después las 16 bandas de 100 Hz a 3150 Hz al número único leído a
 ### ¿Cuál es la diferencia entre R y R' en el aislamiento acústico?
 
 La prima indica dónde se hizo la medición: las magnitudes con prima ($R'$,
-$L'_n$, $L'_{nT}$) se miden en el edificio e incluyen todas las trayectorias
-por flancos, mientras que las $R$ y $L_n$ sin prima son propiedades de
+$L'_\mathrm{n}$, $L'_\mathrm{nT}$) se miden en el edificio e incluyen todas las trayectorias
+por flancos, mientras que las $R$ y $L_\mathrm{n}$ sin prima son propiedades de
 laboratorio del elemento solo, medidas con los flancos suprimidos. En campo
 (ISO 16283-1), $R' = D + 10 \log_{10}(S/A)$ con la superficie del
 cerramiento $S$ y el área de absorción de Sabine $A = 0{,}16\ V/T$.

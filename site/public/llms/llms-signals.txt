@@ -289,7 +289,7 @@ The meter never shows raw pressure. The signal first passes the **A
 frequency weighting** (the ear-response curve of IEC 61672-1), is squared,
 and is then smoothed by the **Fast exponential detector** (time constant
 125 ms). The result is the moving level a meter's display follows,
-$L_{AF}(t)$:
+$L_\mathrm{AF}(t)$:
 
 ```python
 pressure = cal * recording                                # digital units -> Pa
@@ -308,7 +308,7 @@ charging and draining on the squared signal. The three needles differ in one
 number, the time constant, which is why Fast catches an event that Slow
 smooths away. You rarely write this chain yourself: every level function of
 the next step applies the frequency weighting internally, and the percentile
-levels rebuild this Fast envelope for you. The energy metrics ($L_{eq}$, SEL)
+levels rebuild this Fast envelope for you. The energy metrics ($L_\mathrm{eq}$, SEL)
 integrate the squared weighted signal directly, with no ballistics at all —
 which is why they show no needle movement to follow. The chain is shown here
 because it *is* the meter's display.
@@ -320,7 +320,7 @@ apart against the IEC 61672-1 tone-burst table.
 ## 4. Integrate: the numbers a meter reports
 
 One pass over the calibrated recording yields the standard readouts: the
-energy-equivalent **$L_{Aeq}$**, the **percentile levels** that describe how
+energy-equivalent **$L_\mathrm{Aeq}$**, the **percentile levels** that describe how
 the level fluctuated ($L_{90}$ is the background, $L_{10}$ the events), the
 **sound exposure level** that normalizes the event to one second, and the
 C-weighted **peak** for impulsive content.
@@ -337,14 +337,14 @@ print(f"LAeq {la_eq:.1f} dB | L10 {ln[10]:.1f} | L90 {ln[90]:.1f} "
       f"| LAE {lae:.1f} | LCpeak {lc_pk:.1f}")
 ```
 
-Note the arithmetic the numbers encode: the 1 s event dominates $L_{Aeq}$ (it
+Note the arithmetic the numbers encode: the 1 s event dominates $L_\mathrm{Aeq}$ (it
 sits 25 dB above the background, far more than the 10 dB the
-nine-times-longer background gets back in duration), $L_{AE}$ is $L_{Aeq}$
+nine-times-longer background gets back in duration), $L_{\mathrm{A}E}$ is $L_\mathrm{Aeq}$
 plus $10\log_{10}$ of the 10 s duration, and $L_{90}$ barely notices the event at
 all.
 
 Deep guide: [Integrated and Statistical Levels](https://jmrplens.github.io/phonometry/signals/levels/levels/),
-which adds noise dose and octave spectrograms; the $L_{den}$ and rating levels
+which adds noise dose and octave spectrograms; the $L_\mathrm{den}$ and rating levels
 continue in [Environmental levels](https://jmrplens.github.io/phonometry/environment/assessment/environmental-levels/).
 
 ## 5. Band-filter: the spectrum view (IEC 61260-1)
@@ -397,7 +397,7 @@ Table 1 mask, class 0 and the compliance fiche).
 The meter built here is the trunk; the rest of the core grows from it.
 
 - [Measurement uncertainty (GUM and Monte Carlo)](https://jmrplens.github.io/phonometry/signals/metrology/gum-uncertainty/):
-  attach an uncertainty to the $L_{Aeq}$ you just computed, calibration term
+  attach an uncertainty to the $L_\mathrm{Aeq}$ you just computed, calibration term
   included.
 - [Calibrated spectral analysis](https://jmrplens.github.io/phonometry/signals/spectra/spectral-analysis/): when
   bands are too coarse, the Welch PSD with confidence intervals.
@@ -410,7 +410,7 @@ The meter built here is the trunk; the rest of the core grows from it.
 
 **Covered.** This page composes stages implemented elsewhere into the pipeline
 IEC 61672-1:2013 describes: the A frequency weighting and the Fast exponential
-detector, $L_{Aeq}$, the percentile levels, the sound exposure level and the
+detector, $L_\mathrm{Aeq}$, the percentile levels, the sound exposure level and the
 C-weighted peak, the IEC 61260-1:2014 octave filters of `octave_filter`, and
 the Table 3 (weighting) and Table 1 (filter) class acceptance limits checked by
 `verify_weighting_class` and `verify_filter_class`. Each stage's own guide

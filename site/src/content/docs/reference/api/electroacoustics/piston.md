@@ -18,10 +18,10 @@ Mellow, *Acoustics: Sound Fields, Transducers and Vibration* 2nd ed., §4.4;
 Bies, Hansen & Howard, *Engineering Noise Control* 5th ed.).
 
 **Radiation impedance.** The reaction force of the air on the piston is
-$F = Z_r u$ with the mechanical radiation impedance
+$F = Z_\mathrm{r} u$ with the mechanical radiation impedance
 
 $$
-Z_r = \rho c S \left( R_1(2ka) + j X_1(2ka) \right), \qquad S = \pi a^2
+Z_\mathrm{r} = \rho c S \left( R_1(2ka) + j X_1(2ka) \right), \qquad S = \pi a^2
 $$
 
 where $k = \omega / c$ is the wavenumber, $\rho c$ the
@@ -40,14 +40,14 @@ function, both of order one, evaluated at $x = 2ka$.
   radiated power
   rises as $f^2$, and $X_1 \to (8 / 3\pi) ka$. The reactance is
   mass-like,
-  $X_r = \rho c S X_1 = \omega M_r$ with the **radiation (accreted)
-  mass** $M_r = 8 \rho a^3 / 3$
+  $X_\mathrm{r} = \rho c S X_1 = \omega M_\mathrm{r}$ with the **radiation (accreted)
+  mass** $M_\mathrm{r} = 8 \rho a^3 / 3$
   (Beranek & Mellow Eq. (4.32)): the piston drags an extra
   $8 \rho a^3 / 3$ of
   air, equivalent to a layer $8a / 3\pi$ thick over its face.
 * **High frequency** ($ka \gg 1$): $R_1 \to 1$ and
   $X_1 \to 0$, so
-  $Z_r \to \rho c S$ -- the piston radiates as if into an infinite tube
+  $Z_\mathrm{r} \to \rho c S$ -- the piston radiates as if into an infinite tube
   and the
   air loads it purely resistively.
 
@@ -325,11 +325,11 @@ Radiation impedance and directivity of a baffled circular piston.
 | :--- | :--- |
 | `frequencies` | Frequencies `f`, Hz. |
 | `ka` | Wavenumber-radius product `ka` at each frequency. |
-| `resistance` | Normalized piston resistance $R_1(2ka)$ (real part of $Z_r / (\rho c S)$). |
-| `reactance` | Normalized piston reactance $X_1(2ka)$ (imaginary part of $Z_r / (\rho c S)$). |
+| `resistance` | Normalized piston resistance $R_1(2ka)$ (real part of $Z_\mathrm{r} / (\rho c S)$). |
+| `reactance` | Normalized piston reactance $X_1(2ka)$ (imaginary part of $Z_\mathrm{r} / (\rho c S)$). |
 | `radiation_resistance` | Mechanical radiation resistance $\rho c S R_1$, N s/m. |
 | `radiation_reactance` | Mechanical radiation reactance $\rho c S X_1$, N s/m. |
-| `radiation_mass` | Low-frequency accreted air mass $M_r = 8 \rho a^3/3$, kg (a single value; the mass limit of `radiation_reactance / omega`). |
+| `radiation_mass` | Low-frequency accreted air mass $M_\mathrm{r} = 8 \rho a^3/3$, kg (a single value; the mass limit of `radiation_reactance / omega`). |
 | `directivity_index` | Directivity index $DI = 10 \log_{10} Q$, dB. |
 | `angles` | Polar angles of `directivity`, rad, or `None` if not requested. |
 | `directivity` | Far-field directivity $D(\theta)$ as a `(n_freq, n_angle)` array, or `None` if `angles` was not given. |

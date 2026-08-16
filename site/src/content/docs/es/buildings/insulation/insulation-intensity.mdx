@@ -38,7 +38,7 @@ inferencia por una lectura directa: una sonda de intensidad p-p barre una
 superficie de medición que envuelve el elemento de ensayo y mide la potencia
 radiada solo por él, así que la transmisión por flancos queda fuera del
 número. Esta guía cubre el índice de reducción acústica por intensidad
-$R_I$ y su forma modificada con $K_c$, la diferencia de niveles normalizada
+$R_\mathrm{I}$ y su forma modificada con $K_\mathrm{c}$, la diferencia de niveles normalizada
 de elemento para elementos constructivos pequeños, el indicador de
 cualificación de la superficie y las fichas de ensayo acreditadas. La cadena
 de laboratorio por presión vive en
@@ -72,33 +72,33 @@ absorción, y la sala integra cada vatio que llega, sea cual sea la trayectoria
 que lo trajo. El método por intensidad es por eso la herramienta preferida
 cuando la transmisión por flancos es alta
 (ISO 15186-1:2000, apartado 1). A partir del nivel del recinto emisor $L_{p1}$ y
-del nivel medio de intensidad normal $L_{In}$ sobre la superficie (área $S_m$),
+del nivel medio de intensidad normal $L_{I\mathrm{n}}$ sobre la superficie (área $S_\mathrm{m}$),
 para un elemento de ensayo de área $S$,
 
 $$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right],
+R_\mathrm{I} = L_{p1} - 6 - \left[ L_{I\mathrm{n}} + 10 \log_{10}\frac{S_\mathrm{m}}{S} \right],
 $$
 
 donde los $6$ dB son el desplazamiento de campo difuso entre el nivel de
 presión acústica y el nivel de intensidad incidente. La misma fórmula da el
-índice aparente $R'_I$ en campo (ISO 15186-2). El barrido de intensidad mide
+índice aparente $R'_\mathrm{I}$ en campo (ISO 15186-2). El barrido de intensidad mide
 directamente la potencia transmitida. El método por presión en cámara reverberante no: infiere
 la potencia a partir del nivel del recinto receptor y por eso la *subestima*,
 lo que hace que el $R$ de ISO 10140-2 salga ligeramente alto. El **índice
-modificado** $R_{I,M} = R_I + K_c$ vuelve a añadir ese mismo sesgo al resultado
+modificado** $R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ vuelve a añadir ese mismo sesgo al resultado
 por intensidad, de modo que una medición por intensidad pueda contrastarse con
 datos del método por presión (ISO 15186-1, apartado 3.10 NOTA 1). Informa
-de $R_I$ cuando lo que se busca es la potencia transmitida real; informa
-de $R_{I,M}$ cuando lo que se busca es la comparabilidad con un resultado de
+de $R_\mathrm{I}$ cuando lo que se busca es la potencia transmitida real; informa
+de $R_\mathrm{I,M}$ cuando lo que se busca es la comparabilidad con un resultado de
 ISO 10140-2. Revisiones anteriores de esta guía achacaban el sesgo al propio
-método por intensidad, lo que habría exigido restar $K_c$ en lugar de sumarlo.
-El término de adaptación $K_c$ (Anexo B) es
-$10 \log_{10}(1 + S_{b2}\lambda/8V_2)$ para una sala bien definida, o el
+método por intensidad, lo que habría exigido restar $K_\mathrm{c}$ en lugar de sumarlo.
+El término de adaptación $K_\mathrm{c}$ (Anexo B) es
+$10 \log_{10}(1 + S_{\mathrm{b}2}\lambda/8V_2)$ para una sala bien definida, o el
 independiente de la sala $10 \log_{10}(1 + 61{,}4/f)$. La primera forma es el
 término de energía de contorno de Waterhouse, lo que deja leer la segunda como
-ese mismo término evaluado a un $S_{b2}/V_2$ fijo. Para elementos pequeños, la
-**diferencia de niveles normalizada por elemento** sustituye $10\log_{10}(S_m/S)$ por
-$10\log_{10}(S_m/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
+ese mismo término evaluado a un $S_{\mathrm{b}2}/V_2$ fijo. Para elementos pequeños, la
+**diferencia de niveles normalizada por elemento** sustituye $10\log_{10}(S_\mathrm{m}/S)$ por
+$10\log_{10}(S_\mathrm{m}/A_0) + 10\log_{10} N$ ($A_0 = 10\ \text{m}^2$, $N$ unidades de elemento).
 
 ```python
 import numpy as np
@@ -130,8 +130,8 @@ res.plot()   # RI medido vs curva de referencia ISO 717-1 desplazada (necesita m
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_insulation_es.svg" alt="Índice de reducción acústica por intensidad RI y el índice modificado RI,M a lo largo de las bandas de tercio de octava, con el aumento de adaptación del Anexo B sombreado entre las dos curvas" width="80%" loading="eager" />
 
-*El índice modificado $R_{I,M} = R_I + K_c$ eleva $R_I$ (más en las bandas
-bajas, donde $K_c$ es mayor), de modo que una medición por intensidad reproduce
+*El índice modificado $R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ eleva $R_\mathrm{I}$ (más en las bandas
+bajas, donde $K_\mathrm{c}$ es mayor), de modo que una medición por intensidad reproduce
 el resultado por presión de la ISO 10140-2. El índice automático solo se forma
 con exactamente 16 valores de tercio de octava o 5 de octava.*
 
@@ -184,9 +184,9 @@ elemento vibrante hace que la intensidad cambie de signo repetidamente y la
 integral deja de converger; por encima de 0,3 m una superficie en forma de caja
 recoge demasiada sala.
 
-**Cualificar la superficie (apartado 6.4.2).** Mide $L_{In}$ y, a ser posible
+**Cualificar la superficie (apartado 6.4.2).** Mide $L_{I\mathrm{n}}$ y, a ser posible
 simultáneamente, el nivel de presión promediado sobre la superficie $L_p$, y
-forma el indicador superficial presión-intensidad $F_{pI} = L_p - L_{In}$
+forma el indicador superficial presión-intensidad $F_{pI} = L_p - L_{I\mathrm{n}}$
 (Fórmula (10)). La superficie no queda cualificada si la intensidad medida es
 negativa, o si $F_{pI} > 10$ dB en un elemento reflectante o $> 6$ dB en uno
 con una superficie absorbente mirando al recinto receptor. El remedio está
@@ -282,13 +282,13 @@ $F_{pI}$ se mueve menos de 1 dB, el requisito se cumple.
 ### Combinar subáreas, y el signo que las acompaña
 
 Un elemento de ensayo grande o no homogéneo se barre como varias subáreas
-$S_{mi}$, y `combine_subareas` hace el promedio energético ponderado por área
-de la Fórmula (11) con $S_m = \sum_i |S_{mi}|$ (Fórmula (12)). El
+$S_{\mathrm{m}i}$, y `combine_subareas` hace el promedio energético ponderado por área
+de la Fórmula (11) con $S_\mathrm{m} = \sum_i |S_{\mathrm{m}i}|$ (Fórmula (12)). El
 apartado 6.4.6 añade la regla que no tiene equivalente en ningún método por
 presión: cuando la intensidad neta de una subárea apunta al *lado equivocado*,
-con la energía volviendo hacia el objeto de ensayo, delante de ese $S_{mi}$ va
+con la energía volviendo hacia el objeto de ensayo, delante de ese $S_{\mathrm{m}i}$ va
 un signo menos en la Fórmula (11). Exprésalo pasando el área de esa subárea
-como número negativo; su energía se resta entonces del numerador mientras $S_m$
+como número negativo; su energía se resta entonces del numerador mientras $S_\mathrm{m}$
 conserva la suma sin signo.
 
 ```python
@@ -314,9 +314,9 @@ Una subárea que lee hacia dentro no es una curiosidad que se despache con un
 signo. Significa que la superficie envolvente está cortando el campo de algo
 que queda *fuera* de ella, un elemento de flanco o una segunda fuente en el
 recinto receptor, así que conviene rehacer la cualificación del apartado 6.4.2
-antes siquiera de declarar el número. $S_m$ conserva el área sin signo porque
+antes siquiera de declarar el número. $S_\mathrm{m}$ conserva el área sin signo porque
 es el área realmente barrida, que es lo que necesita el término
-$10\log_{10}(S_m/S)$ de $R_I$.
+$10\log_{10}(S_\mathrm{m}/S)$ de $R_\mathrm{I}$.
 
 ### Parámetros de `intensity_sound_reduction()` / `adaptation_term_kc()`
 
@@ -324,11 +324,11 @@ $10\log_{10}(S_m/S)$ de $R_I$.
 | :--- | :--- | :--- | :--- | :--- |
 | `lp1` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de presión del recinto emisor |
 | `l_in` | array 1D o 2D | dB | uno/banda, o `(posiciones, bandas)` | Nivel de intensidad normal sobre la superficie |
-| `measurement_area` | float | m² | > 0 | Área de la superficie de medición $S_m$ |
+| `measurement_area` | float | m² | > 0 | Área de la superficie de medición $S_\mathrm{m}$ |
 | `area` | float | m² | > 0 | Área del elemento de ensayo $S$ |
 | `kc` | array 1D | dB | uno por banda / `None` | Término de adaptación para el índice modificado |
 | `freq` | array 1D | Hz | > 0 | Frecuencias centrales (`adaptation_term_kc`) |
-| `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala $S_{b2}$ / $V_2$ para la Fórmula (B.1) |
+| `boundary_area` / `volume` | float | m² / m³ | > 0, ambos o ninguno | Sala $S_{\mathrm{b}2}$ / $V_2$ para la Fórmula (B.1) |
 | `n` | int | unidades de elemento | ≥ 1, por defecto `1` | Número de elementos idénticos (solo `intensity_element_normalized_difference`) |
 
 `intensity_sound_reduction()` devuelve un `IntensityReductionResult` (`r_i`,
@@ -346,16 +346,16 @@ ISO 717-1 antes de poder valorarlo.
 ## Informe de ensayo por intensidad de ISO 15186-1 (`.report()`)
 
 `IntensityReductionResult.report()` escribe el informe de ensayo de una página
-de ISO 15186-1:2000 del índice de reducción acústica por intensidad $R_I$,
+de ISO 15186-1:2000 del índice de reducción acústica por intensidad $R_\mathrm{I}$,
 reutilizando la misma disposición acreditada de dos paneles que las fichas de
-ISO 10140 e ISO 16283. Como $R_I$ es un índice de reducción acústica ordinario,
-su valor único $R_{I,w}$ es el índice a ruido aéreo de ISO 717-1 evaluado sobre
+ISO 10140 e ISO 16283. Como $R_\mathrm{I}$ es un índice de reducción acústica ordinario,
+su valor único $R_\mathrm{I,w}$ es el índice a ruido aéreo de ISO 717-1 evaluado sobre
 el espectro por intensidad: la ficha nombra ISO 15186-1 en su línea de base,
-tabula $R_I$ con un decimal junto a la curva medida frente a la referencia
+tabula $R_\mathrm{I}$ con un decimal junto a la curva medida frente a la referencia
 desplazada, enmarca `RI,w (C; Ctr)` e imprime la declaración de que la potencia
 acústica transmitida se midió directamente sobre la superficie de medición. Con
-`verbose=True` se anexa el índice modificado por $K_c$, $R_{I,M}$ (Fórmula (9)),
-junto a $R_I$ cuando se suministró un término de adaptación.
+`verbose=True` se anexa el índice modificado por $K_\mathrm{c}$, $R_\mathrm{I,M}$ (Fórmula (9)),
+junto a $R_\mathrm{I}$ cuando se suministró un término de adaptación.
 
 Los campos aplicables de `ReportMetadata` describen la medición por intensidad:
 `specimen` (el elemento ensayado), `area` (superficie de la muestra $S$),
@@ -407,7 +407,7 @@ repositorio. Pulsa la vista previa para abrir el PDF:
 
 Para un **elemento constructivo pequeño** (un aireador, una caja de enchufe, una
 ventana pequeña) el método por intensidad informa en su lugar de la diferencia
-de niveles normalizada de elementos $D_{I,n,e}$ (Fórmula (8)), normalizada al área
+de niveles normalizada de elementos $D_\mathrm{I,n,e}$ (Fórmula (8)), normalizada al área
 de absorción de referencia $A_0 = 10\ \text{m}^2$.
 `IntensityElementNormalizedResult.report()` escribe la misma ficha de una página
 a través del renderizador compartido, con `DI,n,e,w (C; Ctr)` en un recuadro
@@ -438,10 +438,10 @@ res.report("DIne.pdf", metadata=metadata)               # DI,n,e,w (C; Ctr)
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/intensity_element_insulation_es.svg" alt="Diferencia de niveles normalizada de elemento DI,n,e de un aireador por banda de tercio de octava frente a la curva de referencia ISO 717-1 desplazada, con las desviaciones desfavorables sombreadas y el índice DI,n,e,w anotado" width="80%" />
 
-*El elemento pequeño se evalúa exactamente como un muro: $D_{I,n,e}$
+*El elemento pequeño se evalúa exactamente como un muro: $D_\mathrm{I,n,e}$
 alimenta el motor de ISO 717-1 y las desviaciones desfavorables (referencia
-por encima de la medición) fijan $D_{I,n,e,w}$. La normalización
-$10\log_{10}(S_m/A_0)$ sustituye al término de superficie de la muestra, de modo
+por encima de la medición) fijan $D_\mathrm{I,n,e,w}$. La normalización
+$10\log_{10}(S_\mathrm{m}/A_0)$ sustituye al término de superficie de la muestra, de modo
 que el número describe el elemento con independencia del muro en el que se
 monte.*
 
@@ -495,9 +495,9 @@ plt.show()
 
 La parte 1 es un método de laboratorio: el elemento de ensayo ocupa una abertura de
 ensayo entre dos recintos, y los flancos suprimidos de la instalación hacen de
-$R_I$ una propiedad del elemento. ISO 15186-2 lleva la misma sonda, el mismo
+$R_\mathrm{I}$ una propiedad del elemento. ISO 15186-2 lleva la misma sonda, el mismo
 barrido de superficie y la misma fórmula al edificio terminado, donde el
-resultado es el índice aparente $R'_I$ del elemento instalado, con su
+resultado es el índice aparente $R'_\mathrm{I}$ del elemento instalado, con su
 radiación por flancos incluida. La selectividad que motivó el método en el
 laboratorio se duplica en campo: como la sonda lee solo lo que radia su
 superficie de medición, las superficies parciales aíslan qué elemento (la
@@ -512,8 +512,8 @@ rango útil en baja frecuencia.
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-El índice de reducción acústica por intensidad $R_I$ de ISO 15186-1:2000
-(apartado 3.8), su $R_{I,M}$ modificado con $K_c$ (Anexo B) y la $D_{I,n,e}$
+El índice de reducción acústica por intensidad $R_\mathrm{I}$ de ISO 15186-1:2000
+(apartado 3.8), su $R_\mathrm{I,M}$ modificado con $K_\mathrm{c}$ (Anexo B) y la $D_\mathrm{I,n,e}$
 normalizada de elemento (apartado 3.9), con la combinación de subáreas de las
 Fórmulas (11)-(12) y el indicador presión-intensidad de la superficie,
 mediante `building.intensity_sound_reduction`, `building.adaptation_term_kc`,
@@ -526,7 +526,7 @@ resultados escriben la ficha de ensayo de una página con `.report()`.
 <ScopeClaim status="not-covered" label="No cubierto">
 La propia medición de intensidad acústica (la sonda de barrido, la adquisición
 con dos micrófonos y la calibración del desajuste de fase tras $L_{p1}$ y
-$L_{In}$) no está implementada: ambos niveles se toman como entradas ya
+$L_{I\mathrm{n}}$) no está implementada: ambos niveles se toman como entradas ya
 medidas, y la ficha de ISO 15186-1 declara explícitamente que no tiene campo
 para la geometría de la superficie de medición ni para el método de
 adquisición por barrido o por puntos discretos. Aquí tampoco se impone la
@@ -544,11 +544,11 @@ cambios a datos de campo, pero nada comprueba cómo se adquirieron.
 ## Véase también
 
 - [Medición del aislamiento en laboratorio](/phonometry/es/buildings/insulation/insulation-lab/):
-  el método por presión de ISO 10140 que la adaptación $K_c$ reproduce.
+  el método por presión de ISO 10140 que la adaptación $K_\mathrm{c}$ reproduce.
 - [Medición del aislamiento en campo (ISO 16283)](/phonometry/es/buildings/insulation/insulation-field/):
   las magnitudes de campo por presión y sus índices globales.
 - [Índices globales de aislamiento (ISO 717)](/phonometry/es/buildings/insulation/insulation-ratings/):
-  el motor de curva de referencia tras $R_{I,w}$ y $D_{I,n,e,w}$.
+  el motor de curva de referencia tras $R_\mathrm{I,w}$ y $D_\mathrm{I,n,e,w}$.
 - [Intensidad acústica](/phonometry/es/devices/emission/intensity/): la sonda de dos
   micrófonos, sus indicadores de campo y la cualificación por índice
   residual tras cada barrido.

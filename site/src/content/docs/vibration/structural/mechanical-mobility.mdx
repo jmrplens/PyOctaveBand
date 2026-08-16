@@ -132,12 +132,12 @@ stiffness line, a peak and a mass line — which section 4 shows on the plot.
 
 That $P = \tfrac{1}{2}\operatorname{Re}\{Y\}|F|^2$ is only half the story,
 because the force at a contact is not given: it is what the two structures
-agree on. Couple a source of free velocity $v_f$ and mobility
+agree on. Couple a source of free velocity $v_\mathrm{f}$ and mobility
 $Y_\text{source}$ to a receiver of mobility $Y_\text{receiver}$ and the contact
 force is
 
 $$
-F = \frac{v_f}{Y_\text{source} + Y_\text{receiver}},
+F = \frac{v_\mathrm{f}}{Y_\text{source} + Y_\text{receiver}},
 $$
 
 so the power that crosses depends on **both** mobilities through their sum. Two
@@ -308,12 +308,12 @@ consistent with sensitivity; then, if that is not enough, compensate.
 
 - **When to act.** Electronic compensation shall be considered when the
   magnitude of the structure's driving-point mobility exceeds
-  $0{,}01/(f\,m_t)$ at all frequencies of interest, with $m_t$ the total
+  $0{,}01/(f\,m_\mathrm{t})$ at all frequencies of interest, with $m_\mathrm{t}$ the total
   effective mass of the attachment hardware plus the effective end mass of the
   force transducer or impedance head (and of a separate driving-point
   accelerometer, if one is fitted).
 - **What it is.** "Mass cancellation": multiply the driving-point acceleration
-  by $m_t$ and subtract the product from the force signal, in analogue or
+  by $m_\mathrm{t}$ and subtract the product from the force signal, in analogue or
   digitally. A *transfer*-mobility measurement therefore needs a separate
   accelerometer at the driving point to supply that signal.
 - **What it cannot do.** It compensates translational inertia at the driving
@@ -329,7 +329,7 @@ consistent with sensitivity; then, if that is not enough, compensate.
 
 For the resonator of section 2 the trigger is easy to place. Its driving-point
 mobility peaks at $1/c = 0.2$ m/(N·s) at 10.07 Hz; with a 20 g impedance head
-and attachment hardware ($m_t = 0.02$ kg) the trigger $0{,}01/(f\,m_t)$ is
+and attachment hardware ($m_\mathrm{t} = 0.02$ kg) the trigger $0{,}01/(f\,m_\mathrm{t})$ is
 0.050 m/(N·s) there, so at its peak the structure is four times above it. Take
 a 2 g head instead and the trigger rises to 0.50 m/(N·s), above the peak. The
 trigger falls as the added mass rises, which is the whole point of it: the same
@@ -590,10 +590,10 @@ from Cremer, Heckl & Petersson Table 5.1:
 - the **infinite plate** is a pure real resistance, $Y = 1/(8\sqrt{B'm''})$,
   independent of frequency: it absorbs at every frequency alike and has no peak
   to read a damping from;
-- the **infinite beam** is $Y = (1-\mathrm{j})/(4m'c_B)$, so $-45°$ of phase at
+- the **infinite beam** is $Y = (1-\mathrm{j})/(4m'c_\mathrm{B})$, so $-45°$ of phase at
   every frequency and a magnitude falling as $\omega^{-1/2}$, because the
-  bending wave speed $c_B$ itself grows as $\sqrt{\omega}$;
-- a **rod in longitudinal motion** is $Y = 1/(\rho c_L S)$, real and flat
+  bending wave speed $c_\mathrm{B}$ itself grows as $\sqrt{\omega}$;
+- a **rod in longitudinal motion** is $Y = 1/(\rho c_\mathrm{L} S)$, real and flat
   again — the mechanical analogue of a matched transmission line.
 
 ```python

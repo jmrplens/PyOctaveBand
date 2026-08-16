@@ -25,12 +25,12 @@ $\log_{10}(r/r_0)$, scaled to a per-doubling figure using only the 2–16 m
 positions,
 
 $$
-D_{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
+D_\mathrm{2,S} = -\log_{10}(2)\ b, \qquad L = a + b\ \log_{10}(r/r_0),\ r_0 = 1\ \text{m},
 $$
 
-with **$L_{p,A,S,4m}$** read off the same line at 4 m. The **distraction
-distance** $r_D$ (STI = 0.50) and **privacy distance** $r_P$ (STI = 0.20) come
-from a linear regression of STI against distance. Good offices push $r_D$
+with **$L_{p,\mathrm{A,S},4\,\mathrm{m}}$** read off the same line at 4 m. The **distraction
+distance** $r_\mathrm{D}$ (STI = 0.50) and **privacy distance** $r_\mathrm{P}$ (STI = 0.20) come
+from a linear regression of STI against distance. Good offices push $r_\mathrm{D}$
 below ~5 m; poor ones leave speech distracting past 10 m.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_open_plan.svg" alt="ISO 3382-3 open-plan measurement line from the source at 1 m along positions from 2 m to 16 m, feeding the four single-number quantities D2,S, Lp,A,S,4m, rD and rP" width="86%"></picture>
@@ -121,7 +121,7 @@ the axis, and a result that retained its positions redraws its own line with
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/open_plan_line_geometry.svg" alt="To-scale plan of the open-plan measurement line: the red source star at the origin, six blue microphone dots from 2 m to 16 m on a dotted line through the grey workstation blocks, the dashed distraction distance rD = 6.5 m and privacy distance rP = 13 m marked across the line and the 16 m span dimensioned" width="86%"></picture>
 
 *Every ISO 3382-3 quantity comes off this one line: six microphones from 2 m
-to 16 m through the workstations, with $r_D$ and $r_P$ landing between them.*
+to 16 m through the workstations, with $r_\mathrm{D}$ and $r_\mathrm{P}$ landing between them.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -147,7 +147,7 @@ plt.show()
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `positions_m` | 1D array | m | ≥ 4 positions, all > 0 | Source-to-receiver distances |
-| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,A,S,n}$ per position |
+| `spl_a_speech` | 1D array | dB | same length | A-weighted speech level $L_{p,\mathrm{A,S},n}$ per position |
 | `sti_values` | 1D array | — | same length | STI per position (full IEC 60268-16 method) |
 
 Returns an `OpenPlanResult` with `d2s`, `lp_as_4m`, `rd` and `rp`; its
@@ -159,7 +159,7 @@ STI can itself be measured with the STIPA tools in the
 [Speech Transmission Index guide](../../perception/speech/speech-transmission.md).
 
 Two things stay outside the function. The fourth required single number, the
-average A-weighted background noise $L_{p,A,B}$, is not computed here — it is
+average A-weighted background noise $L_{p,\mathrm{A,B}}$, is not computed here — it is
 the energetic A-weighted average of the per-position octave-band background
 levels, and it belongs in the report alongside the quantities this page
 produces. And nothing checks the measurement conditions of clauses 5.1 and
@@ -172,15 +172,15 @@ the background capture are the operator's responsibility, not the library's.
 `OpenPlanResult.report(path)` renders a one-page PDF fiche laid out like an
 open-plan-office speech-privacy measurement report: a standard-basis line, an
 optional metadata header block, a compact metrics table of the four
-single-number quantities of Clause 4 ($D_{2,S}$, $L_{p,A,S,4m}$, the
-distraction distance $r_D$ and the privacy distance $r_P$) stacked above the
+single-number quantities of Clause 4 ($D_\mathrm{2,S}$, $L_{p,\mathrm{A,S},4\,\mathrm{m}}$, the
+distraction distance $r_\mathrm{D}$ and the privacy distance $r_\mathrm{P}$) stacked above the
 full-width spatial-decay plot (`.plot()`, the Clause 6.2 regression on the
-logarithmic distance axis with the 4 m read-off and the $r_D$ / $r_P$ crossings
-marked), the boxed $D_{2,S}$ with the other quantities alongside, and a footer with the
+logarithmic distance axis with the 4 m read-off and the $r_\mathrm{D}$ / $r_\mathrm{P}$ crossings
+marked), the boxed $D_\mathrm{2,S}$ with the other quantities alongside, and a footer with the
 fixed disclaimer. ISO 3382-3 **characterises** a space rather than defining an
 intrinsic pass/fail, so a verdict row appears only when a target spatial decay
 rate is supplied through the metadata's `requirement` field
-(`ReportMetadata(requirement=...)`, read as the minimum acceptable $D_{2,S}$ in
+(`ReportMetadata(requirement=...)`, read as the minimum acceptable $D_\mathrm{2,S}$ in
 dB, reflecting the informative quality ranges of Annex A where a larger spatial
 decay is better; the room passes at or above it). It uses the same
 `ReportMetadata` container as the [ISO 3382-1/-2 room-acoustics fiche](room-acoustics.md#iso-3382-report-report);
@@ -223,7 +223,7 @@ repository. Click the preview to open the PDF:
 
 [![ISO 3382-3 open-plan office acoustics example report: metadata header, the metrics table of the four single-number quantities (D2,S = 7.0 dB per doubling, Lp,A,S,4m = 48.0 dB, rD = 5.0 m, rP = 15.0 m) above the spatial-decay plot on a logarithmic distance axis with the D2,S regression, the 4 m read-off and the rD and rP crossings, boxed D2,S and a PASS verdict against a 7.0 dB target](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3382_3_open_plan_example.webp)](https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/reports/iso3382_3_open_plan_example.pdf)
 
-*Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_{2,S}$, $L_{p,A,S,4m}$, $r_D$, $r_P$ and the spatial-decay curve.*
+*Open-plan office acoustics fiche (`OpenPlanResult.report`), $D_\mathrm{2,S}$, $L_{p,\mathrm{A,S},4\,\mathrm{m}}$, $r_\mathrm{D}$, $r_\mathrm{P}$ and the spatial-decay curve.*
 
 ## Crowd self-noise in an occupied room
 
@@ -265,7 +265,7 @@ Subtracting the two gives the **speech-to-noise ratio**, and this is the result
 worth remembering:
 
 $$
-L_{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
+L_\mathrm{SN} = 10\log_{10}\!\left[\frac{Q}{4\pi r^2}\right]
 + 10\log_{10}\!\left[\frac{A_\text{tab}}{4}\right]
 \quad \text{(Eq. (17.52))}
 $$
@@ -273,8 +273,8 @@ $$
 Neither $L_W$ nor $N$ survives. A busier room is not intrinsically worse,
 because each new table brings both a talker and its own share of absorption.
 What decides whether a restaurant works is the absorption **per table**, not
-the absorption of the room. Requiring $L_{SN} > -6$ dB for adequate
-cross-table communication at a separation $r_s$, and $L_{SN} < -9$ dB so a
+the absorption of the room. Requiring $L_\mathrm{SN} > -6$ dB for adequate
+cross-table communication at a separation $r_s$, and $L_\mathrm{SN} < -9$ dB so a
 neighbouring table $r_t$ away is not overheard, turns into a pair of design
 bounds:
 
@@ -346,12 +346,12 @@ absorption or where in the room a given table sits.
 ## Standards
 
 ISO 3382-3:2012 (open-plan office speech metrics: the spatial decay rate
-$D_{2,S}$, the A-weighted speech level at 4 m, and the distraction and
+$D_\mathrm{2,S}$, the A-weighted speech level at 4 m, and the distraction and
 privacy distances from STI). Validated against the standard's own quantity
 definitions in the [conformance report](../../CONFORMANCE.md). The
 implemented edition is frozen at ISO 3382-3:2012; the superseding
-ISO 3382-3:2022 revision removes the privacy distance $r_P$, adds the
-comfort distance $r_C$ and moves the per-position STI to the indirect
+ISO 3382-3:2022 revision removes the privacy distance $r_\mathrm{P}$, adds the
+comfort distance $r_\mathrm{C}$ and moves the per-position STI to the indirect
 IEC 60268-16 method, and is not the one checked here.
 
 ## See also

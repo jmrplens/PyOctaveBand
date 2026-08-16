@@ -30,14 +30,14 @@ a beam (N.m^2) and ``B'`` the bending stiffness of a plate *per unit width*
 
 .. math::
 
-   \text{Longitudinal rod:} \quad Z = \rho c_L S, \qquad
-   Y = \frac{1}{\rho c_L S}
+   \text{Longitudinal rod:} \quad Z = \rho c_\mathrm{L} S, \qquad
+   Y = \frac{1}{\rho c_\mathrm{L} S}
 
    \text{Slender beam, bending, centre:} \quad
-   Z = 2 m' c_B (1 + j), \qquad Y = \frac{1 - j}{4 m' c_B}
+   Z = 2 m' c_\mathrm{B} (1 + j), \qquad Y = \frac{1 - j}{4 m' c_\mathrm{B}}
 
    \text{Slender beam, bending, end:} \quad
-   Z = \frac{m' c_B}{2} (1 + j), \qquad Y = \frac{1 - j}{m' c_B}
+   Z = \frac{m' c_\mathrm{B}}{2} (1 + j), \qquad Y = \frac{1 - j}{m' c_\mathrm{B}}
 
    \text{Thin plate, bending, centre:} \quad
    Z = 8 \sqrt{B' m''}, \qquad Y = \frac{1}{8 \sqrt{B' m''}}
@@ -48,11 +48,11 @@ a beam (N.m^2) and ``B'`` the bending stiffness of a plate *per unit width*
 The thin-plate driving-point impedance :math:`Z = 8 \sqrt{B' m''}` is real
 and frequency independent (the plate behaves as a pure resistance to a point
 force), so a plate absorbs power like a matched resistance. The beam
-impedance grows as :math:`c_B = (B \omega^2 / m')^{1/4}` (the bending wave
+impedance grows as :math:`c_\mathrm{B} = (B \omega^2 / m')^{1/4}` (the bending wave
 speed), so its mobility falls as :math:`\omega^{-1/2}`; the
 :math:`(1 - j)` factor means half the input goes into a reactive near field.
 A moment excitation of the beam has the mobility (Cremer Eq. 5.75)
-:math:`Y_M = \omega (1 + j) / (4 B k_B)` with :math:`k_B = \omega / c_B` the
+:math:`Y_\mathrm{M} = \omega (1 + j) / (4 B k_\mathrm{B})` with :math:`k_\mathrm{B} = \omega / c_\mathrm{B}` the
 bending wavenumber.
 """
 
@@ -114,7 +114,7 @@ def beam_bending_wave_speed(
     frequency: ArrayLike, bending_stiffness: float, mass_per_length: float
 ) -> NDArray[np.float64]:
     r"""Free bending wave speed of a beam
-    :math:`c_B = (B \omega^2 / m')^{1/4}`.
+    :math:`c_\mathrm{B} = (B \omega^2 / m')^{1/4}`.
 
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
     :param bending_stiffness: Beam bending stiffness :math:`B = E I`, in N.m^2.
@@ -132,7 +132,7 @@ def plate_bending_wave_speed(
     frequency: ArrayLike, bending_stiffness: float, mass_per_area: float
 ) -> NDArray[np.float64]:
     r"""Free bending wave speed of a plate
-    :math:`c_B = (B' \omega^2 / m'')^{1/4}`.
+    :math:`c_\mathrm{B} = (B' \omega^2 / m'')^{1/4}`.
 
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
     :param bending_stiffness: Plate bending stiffness per unit width ``B'``,
@@ -222,9 +222,9 @@ def infinite_beam_impedance(
 ) -> NDArray[np.complex128]:
     r"""Point impedance of an infinite beam in bending (Cremer Table 5.1).
 
-    :math:`Z = 2 m' c_B (1 + j)` for a force at the centre of the beam and
-    :math:`Z = (m' c_B / 2)(1 + j)` for a force at a free end, with the
-    bending wave speed :math:`c_B = (B \omega^2 / m')^{1/4}`
+    :math:`Z = 2 m' c_\mathrm{B} (1 + j)` for a force at the centre of the beam and
+    :math:`Z = (m' c_\mathrm{B} / 2)(1 + j)` for a force at a free end, with the
+    bending wave speed :math:`c_\mathrm{B} = (B \omega^2 / m')^{1/4}`
     (:func:`beam_bending_wave_speed`).
 
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
@@ -251,8 +251,8 @@ def infinite_beam_mobility(
 ) -> NDArray[np.complex128]:
     r"""Point mobility of an infinite beam in bending (Cremer Table 5.1).
 
-    :math:`Y = (1 - j) / (4 m' c_B)` for a force at the centre and
-    :math:`Y = (1 - j) / (m' c_B)` for a force at a free end, the reciprocal
+    :math:`Y = (1 - j) / (4 m' c_\mathrm{B})` for a force at the centre and
+    :math:`Y = (1 - j) / (m' c_\mathrm{B})` for a force at a free end, the reciprocal
     of :func:`infinite_beam_impedance`. The mobility falls as
     :math:`\omega^{-1/2}`.
 
@@ -274,8 +274,8 @@ def infinite_beam_moment_mobility(
 ) -> NDArray[np.complex128]:
     r"""Moment (rotational) mobility of an infinite beam (Cremer Eq. 5.75).
 
-    :math:`Y_M = \omega (1 + j) / (4 B k_B)` with the bending wavenumber
-    :math:`k_B = \omega / c_B`, the angular velocity per unit applied moment
+    :math:`Y_\mathrm{M} = \omega (1 + j) / (4 B k_\mathrm{B})` with the bending wavenumber
+    :math:`k_\mathrm{B} = \omega / c_\mathrm{B}`, the angular velocity per unit applied moment
     at the driving point.
 
     :param frequency: Frequency ``f``, in hertz (scalar or array, > 0).
@@ -303,7 +303,7 @@ def longitudinal_rod_impedance(
 ) -> float:
     r"""Point impedance of an infinite rod in longitudinal motion (Table 5.1).
 
-    :math:`Z = \rho c_L S`, real and frequency independent.
+    :math:`Z = \rho c_\mathrm{L} S`, real and frequency independent.
 
     :param density: Material density ``rho``, in kg/m^3.
     :param longitudinal_wave_speed: Longitudinal wave speed ``cL``, in m/s.
@@ -320,7 +320,7 @@ def longitudinal_rod_impedance(
 def longitudinal_rod_mobility(
     density: float, longitudinal_wave_speed: float, cross_section_area: float
 ) -> float:
-    r"""Point mobility of an infinite rod :math:`Y = 1 / (\rho c_L S)`
+    r"""Point mobility of an infinite rod :math:`Y = 1 / (\rho c_\mathrm{L} S)`
     (Table 5.1).
 
     :param density: Material density ``rho``, in kg/m^3.

@@ -22,7 +22,7 @@ average normal sound intensity level `LIn` over the measurement surface,
 in dB,
 
 $$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
+R_\mathrm{I} = L_{p1} - 6 - \left[ L_{I\mathrm{n}} + 10 \log_{10}\frac{S_\mathrm{m}}{S} \right]
 $$
 
 with the measurement-surface area `Sm` and the specimen area `S`. The
@@ -33,22 +33,22 @@ difference being the measurement condition (flanking is not suppressed), not
 the arithmetic.
 
 **Modified intensity sound reduction index (Clause 3.10, Formula (9)).**
-$R_{I,M} = R_I + K_c$ corrects `RI` so that it reproduces the
+$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ corrects `RI` so that it reproduces the
 ISO 140-3 (now ISO 10140-2) pressure result, which slightly overestimates
 `R` because the power radiated into the receiving room is underestimated.
 The adaptation term `Kc` (Annex B) is
-$10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))$ (Formula (B.1)) for a
+$10 \log_{10}(1 + S_{\mathrm{b}2} \lambda / (8 V_2))$ (Formula (B.1)) for a
 well-defined receiving room of boundary area `Sb2` and volume `V2`, or
 the room-independent approximation $10 \log_{10}(1 + 61.4 / f)$
 (Formula (B.2)); both use the speed of sound $c = 340$ m/s so that
-(B.1) with the reference room $S_{b2} = 117$ m², $V_2 = 81$ m³
+(B.1) with the reference room $S_{\mathrm{b}2} = 117$ m², $V_2 = 81$ m³
 reduces to (B.2).
 
 **Intensity element normalized level difference (Clause 3.9, Formula (8)).**
 For small building elements, in dB,
 
 $$
-D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0} \right) + 10 \log_{10} N
+D_\mathrm{I,n,e} = L_{p1} - 6 - \left( L_{I\mathrm{n}} + 10 \log_{10}\frac{S_\mathrm{m}}{A_0} \right) + 10 \log_{10} N
 $$
 
 with the reference absorption area $A_0 = 10$ m² and the number `N`
@@ -59,7 +59,7 @@ Formula (12); the corrected per-unit form is implemented (see
 `docs/ERRATA.md`).
 
 **Surface pressure-intensity indicator (Clause 3.6 / 6.4.2, Formula (10)).**
-$F_{pI} = L_p - L_{In}$ qualifies the measurement surface: it must not
+$F_{pI} = L_p - L_{I\mathrm{n}}$ qualifies the measurement surface: it must not
 exceed 10 dB for a sound-reflecting specimen (6 dB when the receiving side is
 sound absorbing), and the probe's pressure-residual intensity index must
 exceed $F_{pI} + 10$ dB (Clause 4.1) for the dynamic capability to be
@@ -89,15 +89,15 @@ Adaptation term `Kc` per ISO 15186-1:2000, Annex B.
 
 Returns, per one-third-octave midband frequency, the term `Kc` that
 turns the intensity sound reduction index `RI` into the modified index
-$R_{I,M} = R_I + K_c$ (Clause 3.10). Two forms are available:
+$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ (Clause 3.10). Two forms are available:
 
 - **Well-defined receiving room (Formula (B.1)):** when both
   `boundary_area` (`Sb2`) and `volume` (`V2`) are supplied,
-  $K_c = 10 \log_{10}(1 + S_{b2} \lambda / (8 V_2))$ with the midband
+  $K_\mathrm{c} = 10 \log_{10}(1 + S_{\mathrm{b}2} \lambda / (8 V_2))$ with the midband
   wavelength $\lambda = c / f$ and $c = 340$ m/s.
 - **Room-independent approximation (Formula (B.2)):** when neither is
-  supplied, $K_c = 10 \log_{10}(1 + 61.4 / f)$, the exact reduction of
-  (B.1) for the reference room $S_{b2} = 117$ m²,
+  supplied, $K_\mathrm{c} = 10 \log_{10}(1 + 61.4 / f)$, the exact reduction of
+  (B.1) for the reference room $S_{\mathrm{b}2} = 117$ m²,
   $V_2 = 81$ m³.
 
 **Parameters**
@@ -132,10 +132,10 @@ individually, the normal sound intensity level over the whole surface is
 the area-weighted energy average, in dB,
 
 $$
-L_{In} = 10 \log_{10}\!\left[ \frac{1}{S_m} \sum_i S_{mi}\, 10^{0.1 L_{Ini}} \right]
+L_{I\mathrm{n}} = 10 \log_{10}\!\left[ \frac{1}{S_\mathrm{m}} \sum_i S_{\mathrm{m}i}\, 10^{0.1 L_{I\mathrm{n}i}} \right]
 $$
 
-with the total measured area $S_m = \sum_i |S_{mi}|$
+with the total measured area $S_\mathrm{m} = \sum_i |S_{\mathrm{m}i}|$
 (Formula (12)).
 
 **Negative-direction subareas (Clause 6.4.6).** When the sound intensity
@@ -152,7 +152,7 @@ unsigned area sum.
 | `l_in` | Per-subarea intensity levels as a `(subareas, bands)` array (one row per subarea), in dB (magnitude of the intensity). |
 | `measurement_area` | Subarea areas `Smi`, in m² (one per row). Negative values mark reverse-flow subareas per Clause 6.4.6; zero is invalid. |
 
-**Returns:** A tuple `(LIn, Sm)` with the combined level per band, in dB, and the total measured area $S_m = \sum \lvert S_{mi} \rvert$, in m².
+**Returns:** A tuple `(LIn, Sm)` with the combined level per band, in dB, and the total measured area $S_\mathrm{m} = \sum \lvert S_{\mathrm{m}i} \rvert$, in m².
 
 **Raises**
 
@@ -178,7 +178,7 @@ Computes, per frequency band, the intensity element normalized level
 difference of a single element unit, in dB,
 
 $$
-D_{I,n,e} = L_{p1} - 6 - \left( L_{In} + 10 \log_{10}\frac{S_m}{A_0} \right) + 10 \log_{10} N
+D_\mathrm{I,n,e} = L_{p1} - 6 - \left( L_{I\mathrm{n}} + 10 \log_{10}\frac{S_\mathrm{m}}{A_0} \right) + 10 \log_{10} N
 $$
 
 from the average source-room sound pressure level `Lp1`, the average
@@ -237,7 +237,7 @@ Intensity sound reduction index per ISO 15186-1:2000 (Formula (7)).
 Computes, per frequency band, the intensity sound reduction index, in dB,
 
 $$
-R_I = L_{p1} - 6 - \left[ L_{In} + 10 \log_{10}\frac{S_m}{S} \right]
+R_\mathrm{I} = L_{p1} - 6 - \left[ L_{I\mathrm{n}} + 10 \log_{10}\frac{S_\mathrm{m}}{S} \right]
 $$
 
 from the average source-room sound pressure level `Lp1` and the average
@@ -246,7 +246,7 @@ normal sound intensity level `LIn` over the measurement surface of area
 The same formula gives the apparent index `R'I` in the field
 (ISO 15186-2). When an adaptation term `kc` is supplied (see
 [`adaptation_term_kc`](/phonometry/reference/api/building/intensity-insulation/#adaptation_term_kc)), the modified index
-$R_{I,M} = R_I + K_c$
+$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$
 (Formula (9)) is also formed. Weighted ratings `RI,w` (and `RI,M,w`)
 are computed via [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when
 exactly 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz)
@@ -292,7 +292,7 @@ Per-band intensity element normalized level difference (ISO 15186-1).
 
 | Name | Description |
 | :--- | :--- |
-| `d_i_n_e` | Intensity element normalized level difference $D_{I,n,e} = L_{p1} - 6 - (L_{In} + 10 \log_{10}(S_m/A_0)) + 10 \log_{10} N$ per band, in dB (Clause 3.9, Formula (8) with the corrected sign of its $10 \log_{10} N$ term; see `docs/ERRATA.md`). |
+| `d_i_n_e` | Intensity element normalized level difference $D_\mathrm{I,n,e} = L_{p1} - 6 - (L_{I\mathrm{n}} + 10 \log_{10}(S_\mathrm{m}/A_0)) + 10 \log_{10} N$ per band, in dB (Clause 3.9, Formula (8) with the corrected sign of its $10 \log_{10} N$ term; see `docs/ERRATA.md`). |
 | `rating` | Single-number weighted rating `DI,n,e,w` with `C` / `Ctr` (ISO 717-1), or `None` when the band count is neither 16 (one-third octave) nor 5 (octave). |
 | `measurement_area` | Measurement-surface area `Sm`, in m², or `None` on a manually built result (Clause 8 g). |
 | `n` | Number `N` of element units within the measurement surface. |
@@ -399,8 +399,8 @@ Per-band intensity sound reduction index (ISO 15186-1:2000).
 
 | Name | Description |
 | :--- | :--- |
-| `r_i` | Intensity sound reduction index $R_I = L_{p1} - 6 - [L_{In} + 10 \log_{10}(S_m/S)]$ per band, in dB (Clause 3.8, Formula (7)). In the field (ISO 15186-2) this is the apparent index `R'I`. |
-| `r_i_modified` | Modified index $R_{I,M} = R_I + K_c$ per band, in dB (Clause 3.10, Formula (9)), or `None` when no adaptation term was supplied. |
+| `r_i` | Intensity sound reduction index $R_\mathrm{I} = L_{p1} - 6 - [L_{I\mathrm{n}} + 10 \log_{10}(S_\mathrm{m}/S)]$ per band, in dB (Clause 3.8, Formula (7)). In the field (ISO 15186-2) this is the apparent index `R'I`. |
+| `r_i_modified` | Modified index $R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ per band, in dB (Clause 3.10, Formula (9)), or `None` when no adaptation term was supplied. |
 | `rating` | Single-number weighted rating `RI,w` with `C` / `Ctr` (ISO 717-1), or `None` when the band count is neither 16 (one-third octave) nor 5 (octave). |
 | `rating_modified` | Weighted rating `RI,M,w` of the modified index, or `None` when unavailable. |
 | `area` | Test-object area `S`, in m², or `None` on a manually built result. Carried so the report can state it (Clause 8 g). |
@@ -496,7 +496,7 @@ surface_pressure_intensity_indicator(
 
 Surface pressure-intensity indicator `FpI` (ISO 15186-1, Formula (10)).
 
-Returns $F_{pI} = L_p - L_{In}$ per band from the surface- and
+Returns $F_{pI} = L_p - L_{I\mathrm{n}}$ per band from the surface- and
 time-averaged
 sound pressure level `Lp` and normal sound intensity level `LIn` on
 the measurement surface (Clause 3.6 / 6.4.2). The measurement surface is

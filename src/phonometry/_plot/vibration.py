@@ -90,7 +90,7 @@ _STRINGS: dict[str, str] = {
     "Plate radiation efficiency (Leppington / Maidanik)": "Eficiencia de radiación de placa (Leppington / Maidanik)",
     "Frequency weighting {name} (ISO 8041-1)": "Ponderación en frecuencia {name} (ISO 8041-1)",
     "Weighted $W_i a_i$ ({name})": "Ponderada $W_i a_i$ ({name})",
-    "{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s²)": "{designation} espectro de aceleración ponderada  ($a_w$ = {aw} m/s²)",
+    "{designation} weighted acceleration spectrum  ($a_\\mathrm{{w}}$ = {aw} m/s²)": "{designation} espectro de aceleración ponderada  ($a_\\mathrm{{w}}$ = {aw} m/s²)",
     "Directive 2002/44/EC daily {kind} exposure  ($A(8)$ = {a8} m/s², {zone})": "Directiva 2002/44/CE exposición diaria {kind}  ($A(8)$ = {a8} m/s², {zone})",
     "below action": "por debajo de la acción",
     "action": "acción",
@@ -213,7 +213,7 @@ def plot_weighted_spectrum(
     # Wh is the hand-arm weighting of ISO 5349-1; the others (Wk, Wd, Wm...)
     # are the whole-body weightings of ISO 2631.
     designation = "ISO 5349-1" if str(result.weighting_name) == "Wh" else "ISO 2631"
-    ax.set_title(_t("{designation} weighted acceleration spectrum  ($a_w$ = {aw} m/s²)", language).format(
+    ax.set_title(_t("{designation} weighted acceleration spectrum  ($a_\\mathrm{{w}}$ = {aw} m/s²)", language).format(
         designation=designation,
         aw=format_number(float(result.overall), language, decimals=3),
     ))
@@ -489,7 +489,7 @@ def plot_radiation_efficiency(
         color=_C_REFERENCE,
         ls="--",
         lw=1.0,
-        label=f"$f_c$ = {result.critical_frequency:.0f} Hz",
+        label=f"$f_\\mathrm{{c}}$ = {result.critical_frequency:.0f} Hz",
     )
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))

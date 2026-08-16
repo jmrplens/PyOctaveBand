@@ -78,7 +78,7 @@ losses of the sub-millimetre slit and the resonator necks make *perfect*
 absorption possible: when the intrinsic loss balances the leakage, the
 reflection zero lands on the real-frequency axis and $\alpha = 1$ (critical
 coupling). The panel transfer matrix is the chain
-$T = M_{\Delta l}\,\prod_n (M_s\,M_{HR}^{(n)}\,M_s)$; the rigidly-backed
+$T = M_{\Delta l}\,\prod_n (M_\mathrm{s}\,M_\mathrm{HR}^{(n)}\,M_\mathrm{s})$; the rigidly-backed
 reflection factor is
 $R = (T_{11}\cos\theta - Z_0 T_{21})/(T_{11}\cos\theta + Z_0 T_{21})$ with
 $Z_0 = \rho_0 c_0 / S_0$. The slit uses the narrow-channel visco-thermal

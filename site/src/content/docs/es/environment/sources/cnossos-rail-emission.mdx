@@ -106,7 +106,7 @@ y una vía seis.
 | Dígito del vehículo | Qué selecciona | Códigos | Biblioteca |
 | :--- | :--- | :--- | :--- |
 | 1 | Tipo de vehículo | `h` alta velocidad (> 200 km/h), `m` coche de viajeros automotor, `p` coche de viajeros remolcado, `c` tranvía urbano o metro ligero, `d` locomotora diésel, `e` locomotora eléctrica, `a` mercancías genérico, `o` otros | Elige la fila de `TractionVehicle` de la Tabla G-5 y si aplica el término de superestructura de mercancías |
-| 2 | Número de ejes por vehículo | el número real | `RollingStock(axles=...)`, el $10\log_{10} N_a$ de (2.3.8) |
+| 2 | Número de ejes por vehículo | el número real | `RollingStock(axles=...)`, el $10\log_{10} N_\mathrm{a}$ de (2.3.8) |
 | 3 | Tipo de freno | `c` zapata de fundición, `k` zapata de material compuesto o sinterizado, `n` sin freno sobre la banda de rodadura (disco, tambor, magnético) | `BrakeType.CAST_IRON` / `.COMPOSITE` / `.NON_TREAD` → la rugosidad de rueda de G-1a |
 | 4 | Medida en la rueda | `n` ninguna, `d` amortiguadores, `s` pantallas, `o` otras | No selecciona ninguna tabla en el Apéndice G |
 
@@ -260,16 +260,16 @@ El ruido de rodadura es la rueda y el carril excitándose mutuamente a través d
 la rugosidad de las dos superficies de rodadura. El método separa la causa de la
 radiación:
 
-- **causa**: la rugosidad del carril $L_{r,TR}$ (la segunda tabla de la G-1,
+- **causa**: la rugosidad del carril $L_\mathrm{r,TR}$ (la segunda tabla de la G-1,
   aquí G-1b, que selecciona el
-  dígito 2 del descriptor de vía) y la rugosidad de la rueda $L_{r,VEH}$
+  dígito 2 del descriptor de vía) y la rugosidad de la rueda $L_\mathrm{r,VEH}$
   (la primera, G-1a, que selecciona el tipo de freno, dígito 3 del descriptor
   de vehículo), sumadas energéticamente y filtradas después por el **filtro de
   contacto** $A_3$ (Tabla G-2), que da cuenta del tamaño finito de la huella de
   contacto:
 
 $$
-L_{R,\mathrm{TOT},i} = 10\,\log_{10}\!\left(10^{L_{r,TR,i}/10} + 10^{L_{r,VEH,i}/10}\right) + A_{3,i};
+L_{\mathrm{R,TOT},i} = 10\,\log_{10}\!\left(10^{L_{\mathrm{r,TR},i}/10} + 10^{L_{\mathrm{r,VEH},i}/10}\right) + A_{3,i};
 $$
 
 - **radiación**: tres funciones de transferencia independientes de la velocidad
@@ -280,7 +280,7 @@ $$
   todas las bandas):
 
 $$
-L_{W,0,TR,i} = L_{R,\mathrm{TOT},i} + L_{H,TR,i} + 10\,\log_{10} N_a,
+L_{W,0,\mathrm{TR},i} = L_{\mathrm{R,TOT},i} + L_{H,\mathrm{TR},i} + 10\,\log_{10} N_\mathrm{a},
 $$
 
 y la misma suma para la rueda y la superestructura. Las tres componentes se
@@ -383,7 +383,7 @@ las funciones de transferencia (2.3.11). La Tabla G-4 se da para una junta cada
 100 m, y cualquier otra densidad la escala (2.3.12):
 
 $$
-L_{R,\mathrm{IMPACT},i} = L_{R,\mathrm{IMPACT-SINGLE},i}
+L_{\mathrm{R,IMPACT},i} = L_{\mathrm{R,IMPACT-SINGLE},i}
   + 10\,\log_{10}\!\left(\frac{n_l}{0{,}01}\right).
 $$
 
@@ -465,7 +465,7 @@ idénticamente nula para $\psi \le 0$:
 $$
 \Delta L_{W,\mathrm{dir,ver},i} = \frac{40}{3}
   \left[\tfrac{2}{3}\sin 2\psi - \sin\psi\right]
-  \log_{10}\!\left(\frac{f_{c,i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
+  \log_{10}\!\left(\frac{f_{\mathrm{c},i} + 600}{200}\right), \quad 0 < \psi < \pi/2,
 $$
 
 y nula en el resto. Las dos ediciones discrepan en todo el semiespacio inferior,
@@ -544,8 +544,8 @@ construida exactamente como una componente de rodadura pero con la función de
 transferencia de puente de la Tabla G-7 (2.3.18):
 
 $$
-L_{W,0,\mathrm{bridge},i} = L_{R,\mathrm{TOT},i} + L_{H,\mathrm{bridge},i}
-  + 10\,\log_{10} N_a.
+L_{W,0,\mathrm{bridge},i} = L_{\mathrm{R,TOT},i} + L_{H,\mathrm{bridge},i}
+  + 10\,\log_{10} N_\mathrm{a}.
 $$
 
 El ruido de rodadura del vehículo sobre el puente se sigue calculando de forma
@@ -675,5 +675,5 @@ estaciones y megafonía, se tratan por el método industrial.
 - [Propagación del sonido en exteriores](/phonometry/es/environment/propagation/outdoor-propagation/):
   la cadena ISO 9613-2 que lleva una potencia de fuente hasta un receptor.
 - [Niveles de ruido ambiental](/phonometry/es/environment/assessment/environmental-levels/): los
-  indicadores $L_{den}$ y $L_{night}$ para los que se trazan los mapas
+  indicadores $L_\mathrm{den}$ y $L_\mathrm{night}$ para los que se trazan los mapas
   resultantes.

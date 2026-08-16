@@ -130,11 +130,11 @@ la fuerza de impacto** que entrega a un forjado rígido (ISO 16283-2:2020
 Fórmula (A.1) = JIS A 1418-2:2019 Fórmula (1)):
 
 $$
-L_{FE} = 10\log_{10}\!\left[\frac{1}{T_\text{ref}}
+L_{F\mathrm{E}} = 10\log_{10}\!\left[\frac{1}{T_\mathrm{ref}}
 \int_{t_1}^{t_2}\frac{F^2(t)}{F_0^2}\,\mathrm{d}t\right]\ \text{dB re 1 N},
 $$
 
-con $F_0 = 1$ N (ISO 16283-2:2020 Anexo A), $T_\text{ref} = 1$ s y
+con $F_0 = 1$ N (ISO 16283-2:2020 Anexo A), $T_\mathrm{ref} = 1$ s y
 $t_2 - t_1$ la duración del impacto. Ojo con la referencia: la EN 15657 refiere
 sus niveles de fuerza bloqueada a $F_0 = 10^{-6}$ N, 120 dB más abajo, así que
 un nivel de fuerza que pase entre esta página y
@@ -147,7 +147,7 @@ imprimen de forma idéntica en la Tabla A.1 de ISO 16283-2:2020, la Tabla F.1 de
 ISO 10140-5:2010 y la Tabla A.2 de JIS A 1418-2:2019 para la pelota; la máquina
 de neumático solo aparece en la Tabla A.1 de JIS A 1418-2:2019.
 
-| Octava (Hz) | Pelota de caucho $L_{FE}$ (dB re 1 N) | Máquina de neumático $L_{FE}$ (dB re 1 N) |
+| Octava (Hz) | Pelota de caucho $L_{F\mathrm{E}}$ (dB re 1 N) | Máquina de neumático $L_{F\mathrm{E}}$ (dB re 1 N) |
 |---|---|---|
 | 31,5 | 39,0 ± 1,0 | 47,0 ± 1,0 |
 | 63 | 31,0 ± 1,5 | 40,0 ± 1,5 |
@@ -248,7 +248,7 @@ de caída, de modo que la corrección tiene que saturarse. ISO 16283-2:2020
 (definición 3.16, Fórmulas (4), (5) y (6)) usa por tanto
 
 $$
-L'_{i,F\max,V,T} = L_{i,F\max} + 10\log_{10}\frac{V}{V_0}
+L'_{\mathrm{i,Fmax},V,T} = L_\mathrm{i,Fmax} + 10\log_{10}\frac{V}{V_0}
 - 10\log_{10}\frac{g(C)}{g(C_0)},\qquad
 C = \frac{T}{1{,}7275},\quad C_0 = \frac{T_0}{1{,}7275},
 $$
@@ -397,7 +397,7 @@ La valoración es una suma energética de niveles por banda ponderados A
 (Fórmula (D.1)):
 
 $$
-X_{iA,F\max} = 10\log_{10}\!\left(\sum_j 10^{(X_{i,F\max,j} + A_j)/10}\right),
+X_\mathrm{iA,Fmax} = 10\log_{10}\!\left(\sum_j 10^{(X_{\mathrm{i,Fmax},j} + A_j)/10}\right),
 $$
 
 sobre las bandas de tercio de octava de 50 Hz a 630 Hz **o** las de octava de
@@ -405,8 +405,8 @@ sobre las bandas de tercio de octava de 50 Hz a 630 Hz **o** las de octava de
 entero por exceso en los medios. Una medición en tercios se valora en tercios;
 la norma advierte explícitamente contra sumar antes los tercios en octavas,
 porque las dos vías no dan la misma respuesta. La misma fórmula valora las
-cuatro magnitudes de las Tablas D.1 y D.2: $L_{iA,F\max}$,
-$L_{iA,F\max,V,T}$, $L'_{iA,F\max}$ y $L'_{iA,F\max,V,T}$.
+cuatro magnitudes de las Tablas D.1 y D.2: $L_\mathrm{iA,Fmax}$,
+$L_{\mathrm{iA,Fmax},V,T}$, $L'_\mathrm{iA,Fmax}$ y $L'_{\mathrm{iA,Fmax},V,T}$.
 
 El ejemplo resuelto de la Tabla D.4 se reproduce exactamente, incluido el
 resultado intermedio sin redondear que imprime la norma:
@@ -431,12 +431,12 @@ encima de ella.
 
 Lee esos 55 dB como se lee una magnitud de impacto: **más alto es peor**, igual
 que cualquier nivel de impacto de este sitio. Es un máximo, no un promedio, así
-que no es comparable con un $L'_{nT,w}$ ni con un $L'_{n,w}$ de la máquina de
+que no es comparable con un $L'_\mathrm{nT,w}$ ni con un $L'_\mathrm{n,w}$ de la máquina de
 impactos, y ISO no le fija ningún límite: los criterios de impacto pesado son
 nacionales. El más desarrollado es el de Corea, donde el ruido de impacto en
 vivienda colectiva está regulado desde 2004 y las reglas se reescribieron en
 agosto de 2022: la fuente pesada pasó a ser la pelota de caucho, el índice de
-evaluación pasó a ser exactamente el $L'_{iA,F\max}$ de esta sección (a través
+evaluación pasó a ser exactamente el $L'_\mathrm{iA,Fmax}$ de esta sección (a través
 de KS F ISO 10140-5 y KS F ISO 717-2), y el requisito obligatorio de prestación
 se fijó en **49 dB**, más estricto que los 50 dB del esquema anterior con
 máquina de neumático. Por encima de ese umbral hay cuatro grados a intervalos
@@ -481,7 +481,7 @@ constructiva a un nivel de impacto pesado; Hopkins afirma sin rodeos que la
 complejidad de la fuerza de entrada y el uso de un máximo con ponderación
 temporal no dejan ningún equivalente sencillo a la predicción de la máquina de
 impactos. No existe en ninguna parte un ejemplo resuelto acreditado que lleve
-un forjado real desde el $L_{i,F\max}$ medido hasta $L'_{iA,F\max,V,T}$, de
+un forjado real desde el $L_\mathrm{i,Fmax}$ medido hasta $L'_{\mathrm{iA,Fmax},V,T}$, de
 modo que la cadena de estandarización se ancla en su propia identidad con
 $T = T_0$ y en una reproducción publicada de 25 bandas de la Fórmula (4).
 </ScopeClaim>

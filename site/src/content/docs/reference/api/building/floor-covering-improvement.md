@@ -26,8 +26,8 @@ $L_a = 10 \log_{10}(\overline{a^2}/a_0^2)$.
 **Background correction (Formula (2)).** Each measured level `L'` is
 corrected
 against the background `Lb` per accelerometer position, by the margin
-$L' - L_b$: unchanged for $\ge 15$ dB; energy subtraction
-$10 \log_{10}(10^{L'/10} - 10^{L_b/10})$ for
+$L' - L_\mathrm{b}$: unchanged for $\ge 15$ dB; energy subtraction
+$10 \log_{10}(10^{L'/10} - 10^{L_\mathrm{b}/10})$ for
 $6 \le \mathrm{margin} < 15$ dB; and the fixed
 $L' - 1.3$ dB limit for $< 6$ dB. Bands hitting the 1.3 dB limit
 are flagged
@@ -43,7 +43,7 @@ their arithmetic mean over all tapping-machine (t) and accelerometer (a)
 positions, $\Delta L = (1/(t \cdot a)) \sum_t \sum_a \Delta L_{t,a}$.
 
 **Octave bands (Formula (5)).**
-$\Delta L_{oct} = -10 \log_{10}[(1/3) \sum 10^{-\Delta L_n/10}]$ dB from
+$\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum 10^{-\Delta L_n/10}]$ dB from
 the three one-third-octave values in each octave.
 
 **Weighted improvement.** `ΔLw` is the ISO 717-2 weighted reduction of impact
@@ -69,7 +69,7 @@ acceleration_level(
 
 Vibratory acceleration level `La` (ISO 16251-1 Formula (1)).
 
-$L_a = 10 \log_{10}(a_{rms}^2 / a_0^2) = 20 \log_{10}(a_{rms} / a_0)$ dB.
+$L_a = 10 \log_{10}(a_\mathrm{rms}^2 / a_0^2) = 20 \log_{10}(a_\mathrm{rms} / a_0)$ dB.
 
 **Parameters**
 
@@ -193,7 +193,7 @@ rating bands 100-3150 Hz), an optional verdict row and a footer.
 | `path` | Destination path of the PDF file. |
 | `metadata` | Optional [`ReportMetadata`](/phonometry/reference/api/building/insulation/#reportmetadata); `None` produces a body-and-disclaimer fiche whose header shows only the measured frequency range. The applicable descriptive fields are `client`, `manufacturer`, `specimen` (the floor covering under test), `mounting`, `mass_per_area`, `test_room`, `test_date`, `temperature`, `pressure`, `measurement_standard`, `laboratory`, `operator`, `report_id` and `notes`. The bare reference floor is the standardised heavyweight floor of ISO 717-2:2020 Table 4, fixed by the standard. When `requirement` is set the fiche adds a verdict row (a higher weighted improvement is better, so the result passes at or above the requirement). |
 | `engine` | Rendering back end; only `"reportlab"` is supported. |
-| `verbose` | When `True`, the per-band table gains the reference-floor-with-covering column $L_{n,r} = L_{n,r,0} - \Delta L$ (ISO 717-2:2020 Formula (1)), the derivation basis of `ΔLw`, when the spectrum is exactly the 16 rating bands 100-3150 Hz. |
+| `verbose` | When `True`, the per-band table gains the reference-floor-with-covering column $L_\mathrm{n,r} = L_\mathrm{n,r,0} - \Delta L$ (ISO 717-2:2020 Formula (1)), the derivation basis of `ΔLw`, when the spectrum is exactly the 16 rating bands 100-3150 Hz. |
 | `language` | Fiche language: `"en"` (default, English, decimal point) or `"es"` (Spanish, decimal comma). |
 
 **Returns:** The written `path` as a `str`.
@@ -262,7 +262,7 @@ improvement_octave_bands(
 
 Convert a one-third-octave improvement spectrum to octaves (F. (5)).
 
-$\Delta L_{oct} = -10 \log_{10}[(1/3) \sum_{n=1}^{3} 10^{-\Delta L_n/10}]$
+$\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum_{n=1}^{3} 10^{-\Delta L_n/10}]$
 dB over the three thirds of
 each octave.
 

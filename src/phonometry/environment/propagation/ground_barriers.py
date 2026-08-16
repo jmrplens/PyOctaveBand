@@ -25,9 +25,9 @@ distance and (Attenborough Eq. (2.40c) / Salomons Eq. (D.58)):
 
 .. math::
 
-   Q = R_p + (1 - R_p) F(w)
+   Q = R_\mathrm{p} + (1 - R_\mathrm{p}) F(w)
 
-   R_p = \frac{Z \cos\theta - 1}{Z \cos\theta + 1}
+   R_\mathrm{p} = \frac{Z \cos\theta - 1}{Z \cos\theta + 1}
    \tag{Salomons Eq. D.59}
 
    F(w) = 1 + i \sqrt{\pi} \, w \exp(-w^2) \operatorname{erfc}(-i w)
@@ -38,7 +38,7 @@ distance and (Attenborough Eq. (2.40c) / Salomons Eq. (D.58)):
 
 Here ``Z`` is the normalized (by ``rho c``) surface impedance of the ground,
 ``theta`` is the angle of incidence from the ground normal
-(:math:`\cos\theta = (h_s + h_r)/R_2`) and :math:`F(w)` is the boundary-loss
+(:math:`\cos\theta = (h_\mathrm{s} + h_\mathrm{r})/R_2`) and :math:`F(w)` is the boundary-loss
 factor written through the scaled complementary error function
 :math:`\exp(-w^2) \operatorname{erfc}(-i w)`, i.e.
 the Faddeeva function :func:`scipy.special.wofz`. The relative sound level (the
@@ -50,12 +50,12 @@ the Faddeeva function :func:`scipy.special.wofz`. The relative sound level (the
    e^{i k (R_2 - R_1)} \right| \tag{Salomons Eq. 3.4}
 
 Limits reproduced by the implementation: an acoustically hard ground
-(:math:`|Z| \to \infty`) gives :math:`R_p \to 1`, so
-:math:`(1 - R_p) \to 0` and :math:`Q \to 1`
+(:math:`|Z| \to \infty`) gives :math:`R_\mathrm{p} \to 1`, so
+:math:`(1 - R_\mathrm{p}) \to 0` and :math:`Q \to 1`
 regardless of the boundary loss (the ground wave vanishes), and
 :math:`\Delta L` reaches
 ``+6 dB`` in phase (Salomons Sec. 3.4); at grazing incidence
-(:math:`h_s, h_r \to 0`, :math:`\cos\theta \to 0`) :math:`R_p \to -1`; and as
+(:math:`h_\mathrm{s}, h_\mathrm{r} \to 0`, :math:`\cos\theta \to 0`) :math:`R_\mathrm{p} \to -1`; and as
 the range grows (:math:`R_2 \to \infty`) :math:`|w| \to \infty` and
 :math:`F \to 0`. The ground impedance is taken in
 the :math:`e^{-i \omega t}` time convention of Salomons, in which a passive
@@ -260,7 +260,7 @@ def spherical_reflection_coefficient(
 ) -> Complex:
     r"""Spherical-wave reflection coefficient ``Q`` (Weyl-Van der Pol).
 
-    Implements :math:`Q = R_p + (1 - R_p) F(w)` (Attenborough Eq. (2.40c);
+    Implements :math:`Q = R_\mathrm{p} + (1 - R_\mathrm{p}) F(w)` (Attenborough Eq. (2.40c);
     Salomons Eq. (D.58)) with the plane-wave coefficient ``Rp`` (Eq. (D.59)),
     the boundary-loss factor
     :math:`F(w) = 1 + i \sqrt{\pi} \, w \exp(-w^2) \operatorname{erfc}(-i w)`
@@ -471,7 +471,7 @@ def _auxiliary_fresnel(x: Real) -> tuple[Real, Real]:
 def _diffraction_integral(x: Real) -> Complex:
     r"""Diffraction integral of the flat-wedge screen solution (Eq. (9.19e)).
 
-    :math:`A_D(X) = \operatorname{sgn}(X) \, (f(|X|) - i \, g(|X|))`. At
+    :math:`A_\mathrm{D}(X) = \operatorname{sgn}(X) \, (f(|X|) - i \, g(|X|))`. At
     :math:`X = 0` (a source-edge-receiver exactly on the sight line) the sign
     is taken as ``+1``, the shadow-side (:math:`X \to 0^{+}`) limit, so the
     diffracted term stays continuous through the shadow boundary instead of
@@ -496,8 +496,8 @@ def _screen_field(
 
     .. math::
 
-       p_d = \frac{e^{ikR'}}{4 \pi R'} \, \frac{1+i}{2}
-       \left[ A_D(X_-) + A_D(X_+) \right]
+       p_\mathrm{d} = \frac{e^{ikR'}}{4 \pi R'} \, \frac{1+i}{2}
+       \left[ A_\mathrm{D}(X_-) + A_\mathrm{D}(X_+) \right]
 
     with :math:`R' = A + e + B` the shortest diffracted path over the barrier
     top (``A`` source to near edge, ``e`` the top width between the two edges,

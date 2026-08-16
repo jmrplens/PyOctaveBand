@@ -340,7 +340,7 @@ repository. Click the preview to open the PDF:
 ## See also
 
 - [Sound Absorption Measurement and Rating](../../materials/absorbers/absorption-measurement.md):
-  the ISO 354 measurement every $\alpha_s$ on this page comes from, its mounting
+  the ISO 354 measurement every $\alpha_\mathrm{s}$ on this page comes from, its mounting
   dependence, and the ISO 11654 rating that must *not* be substituted for the
   per-band table (§0).
 - [Room acoustic parameters (ISO 3382-1/2)](room-acoustics.md#how-much-decay-range-do-i-need-for-a-valid-t20-or-t30):

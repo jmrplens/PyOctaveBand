@@ -28,7 +28,7 @@ partition against the power the receiving room absorbs and the power that leaks
 back, and arrive at Equation (4.101):
 
 $$
-\mathrm{NR} = \mathrm{TL} - 10 \log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+\mathrm{NR} = \mathrm{TL} - 10 \log_{10}\!\left[\frac{S_\mathrm{w}}{S_2 \alpha_2 + \tau S_\mathrm{w}}\right],
 $$
 
 with $\mathrm{NR} = L_{p1} - L_{p2}$ the noise reduction between the two
@@ -252,7 +252,7 @@ Partition `TL` that would just meet the criterion, per band, dB.
 The chain of Equation (4.101) solved for the transmission loss,
 
 $$
-\mathrm{TL}_{req} = L_{p1} - L_{p2,\mathrm{target}} + 10 \log_{10}(S_w / S_2 \alpha_2) + \text{penalty},
+\mathrm{TL}_\mathrm{req} = L_{p1} - L_{p2,\mathrm{target}} + 10 \log_{10}(S_\mathrm{w} / S_2 \alpha_2) + \text{penalty},
 $$
 
 with $L_{p2,\mathrm{target}}$ the design criterion curve. The

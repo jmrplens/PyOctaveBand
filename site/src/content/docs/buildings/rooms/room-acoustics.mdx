@@ -99,7 +99,7 @@ D_{50} = \frac{\int_0^{0.05} p^2\ dt}{\int_0^{\infty} p^2\ dt},
 $$
 
 with $te = 50$ ms → C50 (speech) and $te = 80$ ms → C80 (music), plus the
-**centre time** $T_s = \int t\ p^2\ dt / \int p^2\ dt$. Each parameter has a
+**centre time** $T_\mathrm{s} = \int t\ p^2\ dt / \int p^2\ dt$. Each parameter has a
 **just-noticeable difference** (ISO 3382-1 Table A.1: EDT 5 %, C80 1 dB,
 D50 0.05, Ts 10 ms) that sets how precisely it is worth reporting.
 
@@ -111,9 +111,9 @@ that trigger per band before integrating, so any propagation and system delay
 carried by the recording is removed automatically — a measured IR needs no
 manual trimming. It matters asymmetrically. The reverberation times use only the
 *slope* of the decay and are indifferent to where it starts, but C50, C80 and
-$T_s$ integrate *from* $t = 0$, so an onset placed one millisecond late throws
+$T_\mathrm{s}$ integrate *from* $t = 0$, so an onset placed one millisecond late throws
 away part of the direct sound and can move C50 and C80 by several decibels and
-$T_s$ by tens of milliseconds, while leaving T20 and T30 almost untouched — the
+$T_\mathrm{s}$ by tens of milliseconds, while leaving T20 and T30 almost untouched — the
 error is invisible in the number everyone checks. The detector deliberately errs
 early, which is the harmless direction. Two working rules follow: never trim an
 IR by hand to remove its pre-delay, and be suspicious of C50/C80 from a
@@ -207,7 +207,7 @@ point quoting both as if they were independent evidence. For music, C80 in
 unoccupied concert and multi-purpose halls up to 25 000 m³ typically runs
 between −5 dB and +5 dB (the "typical range" column of ISO 3382-1 Table A.1),
 with negative values reading as blended or reverberant and values above about
-+3 dB as dry; $T_s$ in the same halls runs between 60 ms and 260 ms and moves
++3 dB as dry; $T_\mathrm{s}$ in the same halls runs between 60 ms and 260 ms and moves
 inversely with clarity, and $D_{50}$ between 0.3 and 0.7. Two cautions go with
 those ranges. They are single-position values in *unoccupied* halls, and an
 audience shortens the decay and raises clarity, so an occupied hall is not
@@ -447,14 +447,14 @@ plt.show()
 ### Below the Schroeder frequency: modes, not decay
 
 Below the **Schroeder frequency**
-$f_s \approx 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s) these
+$f_\mathrm{s} \approx 2000\sqrt{T/V}$ ($V$ in m³, $T$ in s) these
 decay statistics stop telling the whole story: the field is ruled by
 discrete **room modes**. The constant is not a physical one. Each mode damped to
 a reverberation time $T$ has a half-power bandwidth of about $2.2/T$ hertz, the
 modal density grows as $4\pi Vf^2/c_0^3$, and requiring roughly three modes
 inside one bandwidth gives $2000\sqrt{T/V}$ — a *choice* of how much overlap
 counts as diffuse, which is why stricter texts quote 4000 for the same physics.
-The transition is soft, so a band straddling $f_s$ should be checked position by
+The transition is soft, so a band straddling $f_\mathrm{s}$ should be checked position by
 position rather than trusted, and the
 [mode ladder](/phonometry/buildings/rooms/room-image-sources/#3-modes-of-a-rectangular-room)
 of the image-sources guide enumerates what is actually down there. The
@@ -554,7 +554,7 @@ room-acoustics measurement report (a performance space per ISO 3382-1:2009 or
 an ordinary room per ISO 3382-2:2008, both evaluated by the integrated
 impulse-response method): a standard-basis line, an optional metadata header
 block, the full-width per-band parameter table ($T_{20}$, $T_{30}$, EDT,
-$C_{50}$, $C_{80}$, $D_{50}$, $T_s$) above the result's own per-band
+$C_{50}$, $C_{80}$, $D_{50}$, $T_\mathrm{s}$) above the result's own per-band
 decay-time plot (`.plot()`), the boxed mid-frequency reverberation time
 $T_\text{mid}$ (the mean of the 500 Hz and 1000 Hz octave $T_{30}$, the
 customary room descriptor) with the mid-frequency EDT alongside, and a footer

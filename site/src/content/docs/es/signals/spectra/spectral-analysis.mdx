@@ -103,13 +103,13 @@ de esta página.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_spectral_analysis_es.svg" alt="Diagrama de bloques de la cadena de la PSD de Welch: un registro de ruido rosa de 20 segundos a 48 kilohercios se divide en segmentos de 4096 muestras con 50 por ciento de solape dando 467 segmentos y una separación de bins de 11,7 hercios, cada segmento se enventana con Hann para un ancho de banda de resolución de 17,6 hercios, los periodogramas unilaterales del cuadrado de la FFT se promedian en 442 promedios efectivos, y el resultado es Gxx de f con intervalo de confianza chi-cuadrado, un error aleatorio de 1 entre la raíz de n d igual al 4,8 por ciento y unos 885 grados de libertad; una nota final enuncia el compromiso de que los segmentos largos compran resolución pero gastan promedios" width="92%" />
 
-Promediar $n_d$ segmentos independientes da al estimador $2 n_d$ grados de
+Promediar $n_\mathrm{d}$ segmentos independientes da al estimador $2 n_\mathrm{d}$ grados de
 libertad chi-cuadrado (ec. 8.162), de donde sale todo lo demás:
 
 $$
-\varepsilon_r[\hat{G}_{xx}] = \frac{1}{\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[\hat{G}_{xx}] = \frac{1}{\sqrt{n_\mathrm{d}}}, \qquad
 \frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,\alpha/2}} \le G_{xx} \le
-\frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_d .
+\frac{n\,\hat{G}_{xx}}{\chi^2_{n;\,1-\alpha/2}}, \quad n = 2 n_\mathrm{d} .
 $$
 
 Con segmentos solapados y con ventana los promedios están correlacionados, así
@@ -136,15 +136,15 @@ res.plot()                                        # PSD en dB con la banda de IC
 ```
 
 El **sesgo de resolución** es la otra mitad del presupuesto de error: un
-ancho de banda de análisis finito $B_e$ (expuesto como
+ancho de banda de análisis finito $B_\mathrm{e}$ (expuesto como
 `resolution_bandwidth`, el ancho de banda de ruido efectivo de la ventana)
 suaviza los rasgos espectrales abruptos, siempre en la dirección de reducir
 el rango dinámico (ec. 8.139). Para un pico resonante de ancho de banda de
-media potencia $B_r$, el sesgo normalizado de primer orden es la forma
+media potencia $B_\mathrm{r}$, el sesgo normalizado de primer orden es la forma
 cerrada de la ec. 8.141, expuesta como `resolution_bias_error`:
 
 $$
-\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -\frac{1}{3}\left(\frac{B_e}{B_r}\right)^2 .
+\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -\frac{1}{3}\left(\frac{B_\mathrm{e}}{B_\mathrm{r}}\right)^2 .
 $$
 
 ```python
@@ -153,7 +153,7 @@ from phonometry import resolution_bias_error
 eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # pico de Br = 25 Hz
 ```
 
-Un $B_e$ estrecho (segmentos largos) suprime el sesgo pero deja menos
+Un $B_\mathrm{e}$ estrecho (segmentos largos) suprime el sesgo pero deja menos
 promedios y un error aleatorio mayor; los dos requisitos sobre la longitud
 de segmento tiran en direcciones opuestas, y ese es exactamente el
 compromiso que los números expuestos hacen visible.
@@ -161,19 +161,19 @@ compromiso que los números expuestos hacen visible.
 ### Elegir la longitud del segmento, y después la del registro
 
 La fórmula del sesgo es más útil leída al revés. Mantener el sesgo del pico de
-una resonancia por debajo de 1 dB significa $\varepsilon_b \ge -0{,}2$, y por
-tanto $B_e \le 0{,}775\,B_r$; mantenerlo por debajo de una décima de decibelio
-significa $B_e \le 0{,}263\,B_r$. La regla empírica de siempre, tres o cuatro
+una resonancia por debajo de 1 dB significa $\varepsilon_\mathrm{b} \ge -0{,}2$, y por
+tanto $B_\mathrm{e} \le 0{,}775\,B_\mathrm{r}$; mantenerlo por debajo de una décima de decibelio
+significa $B_\mathrm{e} \le 0{,}263\,B_\mathrm{r}$. La regla empírica de siempre, tres o cuatro
 anchos de banda de análisis a lo ancho de la anchura a media potencia del rasgo
 más estrecho que importe, es exactamente esta fórmula, y ahora lleva un número
 al lado.
 
 Trabaja hacia delante desde la medición y no desde un `nperseg` de costumbre. Un
-modo a 100 Hz con $Q = 50$ tiene $B_r = f/Q = 2$ Hz. Mantener su sesgo por debajo
-del 2 % (0,09 dB) pide $B_e \le B_r\sqrt{3 \times 0{,}02} = 0{,}49$ Hz y, para la
-ventana de Hann, $B_e = 1{,}5\,f_s/\texttt{nperseg}$, así que a 48 kHz eso es
+modo a 100 Hz con $Q = 50$ tiene $B_\mathrm{r} = f/Q = 2$ Hz. Mantener su sesgo por debajo
+del 2 % (0,09 dB) pide $B_\mathrm{e} \le B_\mathrm{r}\sqrt{3 \times 0{,}02} = 0{,}49$ Hz y, para la
+ventana de Hann, $B_\mathrm{e} = 1{,}5\,f_\mathrm{s}/\texttt{nperseg}$, así que a 48 kHz eso es
 `nperseg` $\ge 147\,000$, es decir, segmentos de al menos **3,1 s**. Pedir
-después un error aleatorio del 10 % necesita $n_d = 100$ promedios efectivos, lo
+después un error aleatorio del 10 % necesita $n_\mathrm{d} = 100$ promedios efectivos, lo
 que con un solape del 50 % significa un registro de unos **150 s**:
 
 ```python
@@ -192,7 +192,7 @@ Con `nperseg = 512` el ancho de banda de análisis es de 140,6 Hz, cinco veces l
 anchura de la resonancia, y el pico se lee unos 8 dB de menos y mucho más ancho de
 la cuenta; con 4096 el ancho de banda es de 17,6 Hz y el pico está esencialmente
 resuelto. El panel derecho pone los dos errores en un mismo eje: el sesgo cae
-como $B_e^2$ y el error aleatorio sube como $n_d^{-1/2}$, y se igualan cerca de
+como $B_\mathrm{e}^2$ y el error aleatorio sube como $n_\mathrm{d}^{-1/2}$, y se igualan cerca de
 `nperseg = 7400` para esta resonancia, que es la longitud de segmento a elegir si
 no hay razón para preferir un error sobre el otro.*
 
@@ -283,15 +283,15 @@ lugar del valor verdadero desconocido, como recomienda el libro para datos
 medidos):
 
 $$
-\varepsilon_r[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
+\varepsilon_\mathrm{r}[|\hat{G}_{xy}|] = \frac{1}{|\gamma_{xy}|\sqrt{n_\mathrm{d}}}, \qquad
 \mathrm{s.d.}[\hat{\theta}_{xy}] =
-\frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_d}} .
+\frac{\left(1-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{2 n_\mathrm{d}}} .
 $$
 
 Ambos se reducen cuando la coherencia se acerca a uno: un par fuertemente
 coherente necesita muchos menos promedios para la misma confianza. La fase
 se devuelve desenrollada, así que su pendiente frente a la frecuencia es el
-retardo de grupo $\tau_g = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; para un
+retardo de grupo $\tau_\mathrm{g} = -\mathrm{d}\varphi/(2\pi\,\mathrm{d}f)$; para un
 camino de retardo puro la fase es lineal y esa pendiente lee directamente el
 retardo de propagación.
 
@@ -370,9 +370,9 @@ la salida coherente (ec. 9.73), más la propagación de primer orden del error
 de la coherencia a través de la SNR:
 
 $$
-\varepsilon_r[\hat{G}_{vv}] =
-\frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_d}}, \qquad
-\varepsilon_r[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_d}} .
+\varepsilon_\mathrm{r}[\hat{G}_{vv}] =
+\frac{\left(2-\gamma^2_{xy}\right)^{1/2}}{|\gamma_{xy}|\sqrt{n_\mathrm{d}}}, \qquad
+\varepsilon_\mathrm{r}[\widehat{\mathrm{SNR}}] = \frac{\sqrt{2}}{|\gamma_{xy}|\sqrt{n_\mathrm{d}}} .
 $$
 
 Para ruido aditivo no correlacionado en la salida con nivel conocido, la
@@ -442,8 +442,8 @@ plt.show()
 </details>
 
 El campo `coherence_bias` informa del pequeño sesgo positivo del estimador
-de coherencia, $b[\hat{\gamma}^2] \approx (1-\gamma^2)^2/n_d$ (ec. 9.75):
-despreciable en cuanto $n_d$
+de coherencia, $b[\hat{\gamma}^2] \approx (1-\gamma^2)^2/n_\mathrm{d}$ (ec. 9.75):
+despreciable en cuanto $n_\mathrm{d}$
 llega a unos cientos, y otra razón para promediar con generosidad antes de
 fiarse de una coherencia baja.
 
@@ -475,12 +475,12 @@ distintos:
 | :--- | :--- | :--- |
 | Coherencia plana en toda la banda, coherente con $\gamma^2 = \mathrm{SNR}/(1+\mathrm{SNR})$ | ruido no correlacionado en alguno de los sensores, el caso modelado del §3 | promedia más, sube el nivel, acércate |
 | Coherencia que cae progresivamente con la frecuencia, peor cuanto más corto se segmenta el registro | un retardo global de propagación comparable con la longitud del segmento | alinea antes los registros, o sube `nperseg` muy por encima del retardo; ver [Correlación y retardo](/phonometry/es/signals/spectra/correlation-delay/) |
-| Hundimientos abruptos justo en las resonancias | sesgo de resolución: el ancho de banda de análisis emborrona el pico de forma distinta en cada canal | alarga el segmento; la fórmula de $\varepsilon_b$ del §1 dice cuánto |
+| Hundimientos abruptos justo en las resonancias | sesgo de resolución: el ancho de banda de análisis emborrona el pico de forma distinta en cada canal | alarga el segmento; la fórmula de $\varepsilon_\mathrm{b}$ del §1 dice cuánto |
 | Baja en los armónicos de un tono fuerte mientras la coherencia de banda ancha sigue alta | no linealidad, un traqueteo o un canal recortado | arregla el camino, o trabaja por debajo del nivel al que aparece |
 | Baja en toda una banda sin estructura evidente | una segunda fuente no correlacionada está excitando también la salida | la [página de MISO](/phonometry/es/signals/spectra/miso-coherence/): una entrada no puede explicar dos fuentes |
 
 Dos advertencias de cierre. La estimación de coherencia está sesgada **al alza**
-en $(1-\gamma^2)^2/n_d$, así que una coherencia baja leída con un puñado de
+en $(1-\gamma^2)^2/n_\mathrm{d}$, así que una coherencia baja leída con un puñado de
 promedios es todavía más baja de lo que parece. Y, leído al revés, una coherencia
 cercana a uno *es* el criterio de aceptación que permite declarar toda la
 estimación: decláralo banda a banda junto a la función de transferencia, porque
@@ -536,12 +536,12 @@ espectro de banco de filtros sin convertir y las dos discreparán en 20 o 30 dB,
 ninguna estará equivocada.
 
 La conversión es un solo término. Una banda de fracción de octava de frecuencia
-central $f_c$ tiene un ancho de banda $B_n = f_c\,(2^{1/2n} - 2^{-1/2n})$, es
-decir, $0{,}2316\,f_c$ en un tercio de octava y $0{,}7071\,f_c$ en una octava
+central $f_\mathrm{c}$ tiene un ancho de banda $B_n = f_\mathrm{c}\,(2^{1/2n} - 2^{-1/2n})$, es
+decir, $0{,}2316\,f_\mathrm{c}$ en un tercio de octava y $0{,}7071\,f_\mathrm{c}$ en una octava
 completa, así que
 
 $$
-L_\text{banda} = 10\log_{10}\!\left(\frac{G(f_c)\,B_n}{p_0^2}\right),
+L_\text{banda} = 10\log_{10}\!\left(\frac{G(f_\mathrm{c})\,B_n}{p_0^2}\right),
 $$
 
 que a 1 kHz en tercio de octava añade $10\log_{10}(0{,}2316 \times 1000) =
@@ -593,7 +593,7 @@ del valor exacto: la batería de conformidad fija la pendiente rosa en
 Esas pendientes son pendientes de densidad, y no son lo que muestra una
 representación en fracciones de octava de la misma señal. La anchura de una banda
 crece en proporción a su frecuencia central, así que un nivel de banda es la
-densidad más $10\log_{10} B_n$ con $B_n \propto f_c$: **todos los colores se leen
+densidad más $10\log_{10} B_n$ con $B_n \propto f_\mathrm{c}$: **todos los colores se leen
 3 dB por octava más altos en una representación por bandas de lo que sugiere su
 pendiente de densidad.** El ruido blanco, cuya densidad es plana, sube por tanto
 3 dB por octava a través de un banco de filtros de octava, y el ruido rosa, a
@@ -731,8 +731,8 @@ no correlacionados, así que el promedio acarrea unos $2K$ grados de libertad
 chi-cuadrado de un único registro - la misma maquinaria estadística que el
 resultado de Welch (error aleatorio, intervalo de confianza chi-cuadrado),
 sin segmentar. El parámetro de diseño es el producto adimensional de duración
-por semiancho de banda $p = NW$ (4 por defecto), y para un registro de $N_r$
-muestras a $f_s$ fija el semiancho $W = p\,f_s/N_r$ en hercios. $2W$ es la
+por semiancho de banda $p = NW$ (4 por defecto), y para un registro de $N_\mathrm{r}$
+muestras a $f_\mathrm{s}$ fija el semiancho $W = p\,f_\mathrm{s}/N_\mathrm{r}$ en hercios. $2W$ es la
 resolución de la estimación (informada como `resolution_bandwidth`), y solo las
 ventanas por debajo del número de Shannon $2p$ mantienen la energía de su ventana
 espectral dentro de la banda de diseño - sus concentraciones $\lambda_k$ se
@@ -786,7 +786,7 @@ la batería de tests.
 
 *A la izquierda, el caso en el que el texto sostiene que gana la multitaper: un
 registro de 171 ms. Welch con un segmento de 2048 muestras solo mete
-$n_d = 6{,}7$ promedios efectivos dentro de él, así que su banda de confianza es
+$n_\mathrm{d} = 6{,}7$ promedios efectivos dentro de él, así que su banda de confianza es
 visiblemente la más ancha de las dos y su curva la más rugosa, mientras que la
 estimación adaptativa de 7 ventanas acarrea 13,7 grados de libertad equivalentes
 del mismo registro. A la derecha, la otra razón para echar mano de ella: un tono

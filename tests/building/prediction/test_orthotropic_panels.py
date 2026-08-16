@@ -552,7 +552,7 @@ def test_orthotropic_plot_shades_the_coincidence_range() -> None:
         BANDS, FIG627_MASS, critical_frequency=FIG627_FC1
     )
     labels = _legend(flat.plot())
-    assert any(label.startswith("$f_c$") for label in labels), labels
+    assert any(label.startswith("$f_\\mathrm{c}$") for label in labels), labels
     plt.close("all")
 
 

@@ -112,12 +112,12 @@ evanescent and die within a few water depths. The field is the modal sum
 (Eq. 5.14),
 
 $$
-p(r, z) \simeq \frac{i\,e^{-i\pi/4}}{\rho(z_s)\sqrt{8\pi r}}
-  \sum_m \Psi_m(z_s)\,\Psi_m(z)\,
+p(r, z) \simeq \frac{i\,e^{-i\pi/4}}{\rho(z_\mathrm{s})\sqrt{8\pi r}}
+  \sum_m \Psi_m(z_\mathrm{s})\,\Psi_m(z)\,
   \frac{e^{\,i k_{rm} r}}{\sqrt{k_{rm}}},
 $$
 
-each mode weighted by its excitation at the source depth $\Psi_m(z_s)$ and
+each mode weighted by its excitation at the source depth $\Psi_m(z_\mathrm{s})$ and
 its amplitude at the receiver depth $\Psi_m(z)$, and the coherent
 propagation loss follows as $PL = -20 \log_{10}\,\lvert p(r,z)/p_0(1\,\mathrm{m})
 \rvert$ (Eq. 5.15). `normal_modes` discretises the depth equation by finite
@@ -160,15 +160,15 @@ with $s$ the arc length and $(\xi, \zeta)$ the ray slowness. In a
 range-independent profile the horizontal slowness is conserved along each
 ray, which is **Snell's law** in continuous form,
 $\cos\theta(z)/c(z) = \cos\theta_0/c(z_0)$: a ray bends toward lower sound
-speed, flattens as $c$ grows, and turns where $c(z_t) =
-c(z_s)/\cos\theta_0$. In a linear gradient $c(z) = c_0 + gz$ the arcs are
+speed, flattens as $c$ grows, and turns where $c(z_\mathrm{t}) =
+c(z_\mathrm{s})/\cos\theta_0$. In a linear gradient $c(z) = c_0 + gz$ the arcs are
 exactly circular with radius $R = c_0/(g \cos\theta_0)$, the closed form
 the solver is validated against; in a deep-water profile the family of rays
 refocuses periodically into the **convergence zones** of the section 1
 figure. `ray_trace` integrates all launch angles at once with a fixed-step
 fourth-order Runge-Kutta scheme, reflecting at the surface and the bottom, and
 carries the travel time along with them as a third state of the same step
-($dt/dr = 1/(\xi c^2)$, with $\xi = \cos\theta_0/c(z_s)$ the Snell invariant):
+($dt/dr = 1/(\xi c^2)$, with $\xi = \cos\theta_0/c(z_\mathrm{s})$ the Snell invariant):
 
 ```python
 import numpy as np

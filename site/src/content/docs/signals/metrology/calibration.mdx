@@ -580,7 +580,7 @@ C-minus-Z difference. These are the quantities you can legitimately get from an
 uncalibrated recording, and most of `signals/spectra` lives here.
 
 **Frame-dependent** (plausible, wrong, and silent without a calibration):
-$L_{Aeq}$ against a limit, SEL, noise dose and exposure, the percentile levels
+$L_\mathrm{Aeq}$ against a limit, SEL, noise dose and exposure, the percentile levels
 $L_N$, every psychoacoustic quantity anchored to 20 µPa (loudness in sones,
 sharpness, the ECMA-418-2 chain), the peak criteria of hearing-conservation
 rules, and every conformance verdict in the library. None of these functions
@@ -602,11 +602,11 @@ The band signal overshoots to 0.582 before settling, so `mode='peak'` reads
 Levels can be read two ways, and both are in use in commercial analysers:
 
 - **RMS (`mode='rms'`)** integrates energy over the frame, which is what every
-  standardized level ($L_{eq}$, $L_{Aeq}$, $L_N$) is defined on.
+  standardized level ($L_\mathrm{eq}$, $L_\mathrm{Aeq}$, $L_N$) is defined on.
 - **Peak (`mode='peak'`)** holds the largest instantaneous value in the frame,
-  which is what impact and peak-limit criteria such as $L_{Cpeak}$ are checked
+  which is what impact and peak-limit criteria such as $L_\mathrm{Cpeak}$ are checked
   against. Note that the band peak returned here is band-limited and
-  unweighted, so it is not itself $L_{Cpeak}$.
+  unweighted, so it is not itself $L_\mathrm{Cpeak}$.
 
 ```python
 import numpy as np

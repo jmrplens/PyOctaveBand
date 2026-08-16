@@ -44,15 +44,15 @@ For a person older than 18, the **median** hearing threshold deviation from the
 value at age 18 grows as a power law of age (ISO 7029 clause 4.2, Table 1):
 
 $$
-\Delta H_{md} = a\,(Y - 18)^{b},
+\Delta H_\mathrm{md} = a\,(Y - 18)^{b},
 $$
 
 with coefficients $a$, $b$ per frequency and sex. The spread around the median
-is modelled by two half-Gaussians whose standard deviations $s_u$ (worse than
-the median) and $s_l$ (better) are fifth-degree polynomials in $(Y - 18)$
+is modelled by two half-Gaussians whose standard deviations $s_\mathrm{u}$ (worse than
+the median) and $s_\mathrm{l}$ (better) are fifth-degree polynomials in $(Y - 18)$
 (clause 4.3, Tables 2–5). Any **population fractile** $Q$ follows from the
-standard-normal quantile $z(Q)$ (clause 4.4): $\Delta H_Q = \Delta H_{md} +
-z(Q)\,s$, using $s_u$ when $z \ge 0$ and $s_l$ otherwise.
+standard-normal quantile $z(Q)$ (clause 4.4): $\Delta H_Q = \Delta H_\mathrm{md} +
+z(Q)\,s$, using $s_\mathrm{u}$ when $z \ge 0$ and $s_\mathrm{l}$ otherwise.
 
 ```python
 from phonometry import hearing
@@ -104,7 +104,7 @@ prediction for a person: `fractile=0.9` returns the threshold that 90 % of
 otologically normal people of that age and sex are *better* than (only the
 worst-hearing tenth exceeds it), and `fractile=0.5` the median: half above,
 half below. The spread is deliberately asymmetric (two half-Gaussians, with
-$s_u > s_l$ over most of the range): ageing drags a minority far down while the
+$s_\mathrm{u} > s_\mathrm{l}$ over most of the range): ageing drags a minority far down while the
 better-hearing half stays bunched near the median, so the far percentiles on
 the bad side move much faster with age than the good side ever improves. An
 individual audiogram can sit anywhere in that fan; the model tells you how
@@ -119,7 +119,7 @@ individual audiogram can sit anywhere in that fan; the model tells you how
 *Both claims of the paragraph above, drawn at 4 kHz. Left: men and women follow
 different coefficients, and the gap grows with age — 4.9 dB at 60 years and
 6.8 dB at 80 — so a fractile statement without a sex attached is meaningless.
-Right: the asymmetry is real but not permanent. $s_u$ pulls away from $s_l$
+Right: the asymmetry is real but not permanent. $s_\mathrm{u}$ pulls away from $s_\mathrm{l}$
 until about 64 years, then falls back and crosses under it at 75. That reversal
 is an artefact with a name: from 3 kHz upwards the threshold of many of the
 oldest subjects could not be measured at all, which is why ISO 7029 clause 4.1
@@ -337,7 +337,7 @@ component, is the subject of the
 <Scope>
 <ScopeClaim status="covered" label="Covered">
 ISO 7029:2017's age model: the median power-law deviation from age 18 (clause
-4.2, Table 1), the asymmetric half-Gaussian spreads $s_u$ and $s_l$ (clause
+4.2, Table 1), the asymmetric half-Gaussian spreads $s_\mathrm{u}$ and $s_\mathrm{l}$ (clause
 4.3, Tables 2–5), and the population-fractile calculation of clause 4.4, all
 implemented by `age_threshold(age, sex, fractile)`. ISO 389-7:2005 Table 1's
 free-field and diffuse-field reference threshold of hearing at the eleven

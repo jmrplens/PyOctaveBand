@@ -9,9 +9,9 @@ power, in watts, is (ISO/TS 7849-1, Equation 6):
 
 .. math::
 
-   P = Z_c \, \langle v^2 \rangle \, S \, \epsilon
+   P = Z_\mathrm{c} \, \langle v^2 \rangle \, S \, \epsilon
 
-with :math:`Z_c` the characteristic impedance of air and
+with :math:`Z_\mathrm{c}` the characteristic impedance of air and
 :math:`\langle v^2 \rangle` the mean-square vibratory velocity averaged over
 the radiating area :math:`S`. The vibratory velocity is reported as a
 **level**, in decibels, re :math:`v_0 = 5 \times 10^{-8}` m/s (Equation 3):
@@ -26,11 +26,11 @@ so the A-weighted sound power level follows in logarithmic form, in decibels
 .. math::
 
    L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon
-   + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
+   + 10 \log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}}
 
 where :math:`S_0 = 1~\text{m}^2`, the normalized characteristic impedance
-:math:`Z_{c,n} = 411~\text{N s/m}^3` (at 23 degC, 101.3 kPa) and the
-reference acoustic impedance :math:`Z_{c,0} = 400~\text{N s/m}^3` give the
+:math:`Z_\mathrm{c,n} = 411~\text{N s/m}^3` (at 23 degC, 101.3 kPa) and the
+reference acoustic impedance :math:`Z_{\mathrm{c},0} = 400~\text{N s/m}^3` give the
 fixed :math:`10 \log_{10}(411/400) = 0.118` dB term.
 
 The two parts differ only in ``epsilon``:
@@ -40,7 +40,7 @@ The two parts differ only in ``epsilon``:
   :math:`\langle v^2 \rangle` and ``S``.
 * **Part 2 (engineering)** applies a frequency-band radiation factor
   ``epsilon_j`` determined (per ISO 9614) as
-  :math:`\epsilon_j = P_j / (Z_{c,n} \langle v_j^2 \rangle S)` (Equation 8).
+  :math:`\epsilon_j = P_j / (Z_\mathrm{c,n} \langle v_j^2 \rangle S)` (Equation 8).
 
 This module feeds the structure-borne source characterisation standards
 (ISO 9611, EN 15657, EN 12354-5).
@@ -159,7 +159,7 @@ def radiation_factor(
 ) -> np.ndarray:
     r"""A-weighted radiation factor ``epsilon`` (ISO/TS 7849-1 Eq. 4, -2 Eq. 8).
 
-    :math:`\epsilon = P / (Z_c \langle v^2 \rangle S)`, the sound-radiation
+    :math:`\epsilon = P / (Z_\mathrm{c} \langle v^2 \rangle S)`, the sound-radiation
     efficiency, from an independently measured radiated power (ISO 9614), the
     surface area and the mean-square vibratory velocity.
 
@@ -193,7 +193,7 @@ def radiated_sound_power_level(
     .. math::
 
        L_W = L_v + 10 \log_{10}\frac{S}{S_0} + 10 \log_{10} \epsilon
-       + 10 \log_{10}\frac{Z_{c,n}}{Z_{c,0}}
+       + 10 \log_{10}\frac{Z_\mathrm{c,n}}{Z_{\mathrm{c},0}}
 
     With the default ``radiation_factor = 1`` this is the Part 1 *upper limit*
     ``L_W,max``; pass a measured ``epsilon`` for the Part 2 engineering value.
@@ -328,7 +328,7 @@ class VibrationSoundPowerResult:
         area ``S`` and the applied method, an optional verdict row against a
         declared limit, and a measurement-basis strip stating the sound-power
         relation :math:`L_W = L_v + 10 \log_{10}(S/S_0) + 10 \log_{10} \epsilon
-        + 10 \log_{10}(Z_{c,n}/Z_{c,0})`.
+        + 10 \log_{10}(Z_\mathrm{c,n}/Z_{\mathrm{c},0})`.
 
         :param path: Destination path of the PDF file.
         :param metadata: Optional :class:`~phonometry.ReportMetadata` supplying

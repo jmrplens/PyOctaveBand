@@ -38,7 +38,7 @@ un **modelo de rayos** y una **ecuación parabólica (PE)** que avanza en distan
 
 Que la refracción importe es, sobre todo, cuestión de distancia. Un gradiente
 representativo de la capa superficial de ±0,1 s⁻¹ curva los rayos con un radio
-$R_c = c_0/|g| \approx 3{,}4$ km, de modo que en los primeros cien metros los
+$R_\mathrm{c} = c_0/|g| \approx 3{,}4$ km, de modo que en los primeros cien metros los
 caminos son razonablemente rectos y los modelos homogéneos anteriores son
 precisos. Más allá de unos cientos de metros manda la geometría: a favor del
 viento, o bajo una inversión térmica nocturna, los rayos curvados hacia abajo
@@ -50,7 +50,7 @@ viento a favor / viento en contra de cualquier fuente exterior estacionaria:
 la misma máquina a la misma distancia, con decenas de decibelios de
 diferencia según el lado en que uno se sitúe. Es también la razón por la que
 la ISO 9613-2 fija por decreto su atmósfera «favorable», y lo que comprime su
-$C_{met}$ escalar; los modelos de esta página calculan la física que decide
+$C_\mathrm{met}$ escalar; los modelos de esta página calculan la física que decide
 ambas cosas.
 
 El esquema siguiente reúne ambos lados en una sola escena: una fuente, un
@@ -64,7 +64,7 @@ dos oye algo.
 *Las dos mitades de la misma atmósfera. El abanico de rayos dice **dónde**
 empieza la sombra (todos los rayos han abandonado el suelo hacia los 110 m) y el
 campo GFPE dice **cuán profunda** es una vez dentro. Ninguna de las dos imágenes
-existe en un método de ingeniería por bandas de octava: esto es lo que $C_{met}$
+existe en un método de ingeniería por bandas de octava: esto es lo que $C_\mathrm{met}$
 sustituye por un solo número.*
 
 <details>
@@ -149,18 +149,18 @@ suelo.
 ### Fijar `b` y `z0` a partir del emplazamiento
 
 $b$ no es un ajuste al gusto. El perfil efectivo es
-$c_\text{eff}(z) = \sqrt{\gamma R_\text{gas} T(z)} + u_{SR}(z)$
+$c_\text{eff}(z) = \sqrt{\gamma R_\text{gas} T(z)} + u_\mathrm{SR}(z)$
 (Attenborough y Van Renterghem 2021, Ec. 1.18), así que el coeficiente del
 término logarítmico sale de una velocidad de viento medida a una altura
 declarada en cuanto se fija $z_0$: igualar el perfil a esa altura da
-$b = u_{SR}(z_1)\,/\,\ln(1 + z_1/z_0)$. Una lectura de 4 m/s en un mástil de
+$b = u_\mathrm{SR}(z_1)\,/\,\ln(1 + z_1/z_0)$. Una lectura de 4 m/s en un mástil de
 10 m soplando justo a lo largo de la trayectoria de propagación sobre pradera
 ($z_0 = 0,1$ m) da por tanto $b = 4 / \ln(101) = 0,87$ m/s, cerca del «+1 m/s
 típico» de arriba, y `log_linear_sound_speed_profile(0.867)` devuelve
 efectivamente 344,0 m/s a 10 m.
 
 En $c_\text{eff}$ solo entra la **componente en la dirección de propagación**:
-$u_{SR}(z) = u(z)\cos(\pi - \alpha)$ con $\alpha$ el ángulo entre la dirección
+$u_\mathrm{SR}(z) = u(z)\cos(\pi - \alpha)$ con $\alpha$ el ángulo entre la dirección
 meteorológica del viento (la dirección *desde* la que sopla) y la dirección en
 que viaja el sonido (Ec. 1.19). Esos mismos 4 m/s a 60° de la trayectoria valen
 2 m/s a lo largo de ella, así que $b = 0,43$ m/s a favor del viento y
@@ -279,28 +279,28 @@ Para un perfil **lineal** cada rayo es un **arco de círculo** exacto de radio d
 curvatura (Salomons Sec. 4.4; Attenborough Cap. 11):
 
 $$
-R_c = \frac{c_0}{|g|\cos\theta_0},
+R_\mathrm{c} = \frac{c_0}{|g|\cos\theta_0},
 $$
 
 expuesto como `ray_curvature_radius`. Un rayo lanzado con ángulo $\theta_0$ en
 refracción hacia abajo alcanza su punto de retorno a la altura
-$R_c(1 - \cos\theta_0)$. Para un perfil lineal con **refracción hacia arriba**
+$R_\mathrm{c}(1 - \cos\theta_0)$. Para un perfil lineal con **refracción hacia arriba**
 el rayo
 que roza el suelo delimita una región más allá de la cual no llega ningún rayo
 directo ni reflejado una vez, a la **distancia de zona de sombra** en forma
 cerrada (`shadow_zone_distance`):
 
 $$
-x_\text{sombra} = \sqrt{2 R_c}\left(\sqrt{h_s} + \sqrt{h_r}\right),
-\qquad R_c = \frac{c_0}{|g|},
+x_\text{sombra} = \sqrt{2 R_\mathrm{c}}\left(\sqrt{h_\mathrm{s}} + \sqrt{h_\mathrm{r}}\right),
+\qquad R_\mathrm{c} = \frac{c_0}{|g|},
 $$
 
-donde este segundo $R_c$ es el caso particular rasante ($\theta_0 = 0$) de la
+donde este segundo $R_\mathrm{c}$ es el caso particular rasante ($\theta_0 = 0$) de la
 expresión de arriba, ya que el rayo que delimita la zona sale de la fuente en
 horizontal.
 
 Estas formas cerradas son el oráculo exacto del trazador de rayos: un ajuste de
-círculo a un rayo trazado recupera $R_c$ con precisión de máquina. Son además la
+círculo a un rayo trazado recupera $R_\mathrm{c}$ con precisión de máquina. Son además la
 respuesta más barata a la pregunta sobre la que gira toda la página: *¿es mi
 distancia lo bastante larga como para que la refracción importe?*
 
@@ -378,7 +378,7 @@ gradiente mueve el nivel de 400 Hz a 600 m en más de 30 dB.
 
 *Una fuente, una distancia, un suelo, tres atmósferas: a 600 m el signo del
 gradiente vale por sí solo más de 30 dB. Cualquier corrección meteorológica de
-un solo número, $C_{met}$ incluido, es un promedio sobre esa dispersión, no una
+un solo número, $C_\mathrm{met}$ incluido, es un promedio sobre esa dispersión, no una
 predicción de en qué punto de ella cae una noche dada.*
 
 <details>

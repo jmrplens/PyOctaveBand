@@ -13,33 +13,33 @@ building. The chain closes the structural-vibroacoustics series:
    :mod:`phonometry.building.measurement.structure_borne_power`) and then referred to the
    actual receiver with the Annex I mobility correction
    (:func:`installed_power_from_reception_plate`),
-   :math:`L_{Ws,inst,i} = L_{Ws,n} + 10 \log_{10}( Y_{\infty,i} / Y_{\infty,rec} )`
+   :math:`L_{W\mathrm{s,inst},i} = L_{W\mathrm{s,n}} + 10 \log_{10}( Y_{\infty,i} / Y_{\infty,\mathrm{rec}} )`
    with the reference plate mobility
-   :math:`Y_{\infty,rec} = 5 \cdot 10^{-6}` m/(N.s), or equivalently to the
+   :math:`Y_{\infty,\mathrm{rec}} = 5 \cdot 10^{-6}` m/(N.s), or equivalently to the
    characteristic level
-   :math:`L_{Ws,c} = L_{Ws,n} + 10 \log_{10}( Y_s / Y_{\infty,rec} )` with the
+   :math:`L_{W\mathrm{s,c}} = L_{W\mathrm{s,n}} + 10 \log_{10}( Y_\mathrm{s} / Y_{\infty,\mathrm{rec}} )` with the
    source mobility (Annex I.3, Table I.8), from which ``D_C`` is subtracted.
 2. Only part of that power is actually injected into the supporting element; the
    loss is the **coupling term** ``D_C`` (clause 4.4.3), positive in the usual
    mobility-mismatched cases (see :func:`coupling_term` for the exception),
    set by the source mobility ``Y_s`` and the receiver mobility ``Y_i``
    (Formula 19b):
-   :math:`D_{C,i} = 10 \log_{10}\left( |Y_s + Y_i|^2 / (|Y_s|
+   :math:`D_{\mathrm{C},i} = 10 \log_{10}\left( |Y_\mathrm{s} + Y_i|^2 / (|Y_\mathrm{s}|
    \operatorname{Re}\{Y_i\}) \right)`, which reduces to
-   :math:`10 \log_{10}( |Y_s| / \operatorname{Re}\{Y_i\} )` for a force source
+   :math:`10 \log_{10}( |Y_\mathrm{s}| / \operatorname{Re}\{Y_i\} )` for a force source
    (high source mobility,
-   Formula 19c) and to :math:`-10 \log_{10}( |Y_s| \operatorname{Re}\{Z_i\} )`
+   Formula 19c) and to :math:`-10 \log_{10}( |Y_\mathrm{s}| \operatorname{Re}\{Z_i\} )`
    for a velocity source (low
    source mobility, Formula 19d). An elastic support adds its transfer
    mobility ``Y_k`` inside the modulus (Formula 19e).
 3. The **installed** power level is then
-   :math:`L_{Ws,inst,i} = L_{Ws,c} - D_{C,i}`
+   :math:`L_{W\mathrm{s,inst},i} = L_{W\mathrm{s,c}} - D_{\mathrm{C},i}`
    (Formula 18b).
 4. The normalised sound pressure level in the receiving room for one path (i->j)
    follows from the installed power, the structure-to-airborne adjustment term
    ``D_sa`` (clause 4.4.4), the flanking sound reduction index ``R_ij,ref`` and
    the element area (Formula 18a):
-   :math:`L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref}
+   :math:`L_{\mathrm{n,s},ij} = L_{W\mathrm{s,inst},i} - D_{\mathrm{sa},i} - R_{ij,\mathrm{ref}}
    - 10 \log_{10}(S_i/S_0) - 10 \log_{10}(A_0/4)`
    with :math:`S_0 = A_0 = 10` m²; the paths combine energetically
    (Formula 17).
@@ -146,7 +146,7 @@ def coupling_term(
 ) -> np.ndarray:
     r"""Coupling term ``D_C`` for a point excitation (EN 12354-5, Formula 19b/19e).
 
-    :math:`D_C = 10 \log_{10}\left( |Y_s + Y_i + Y_k|^2 / (|Y_s|
+    :math:`D_\mathrm{C} = 10 \log_{10}\left( |Y_\mathrm{s} + Y_i + Y_k|^2 / (|Y_\mathrm{s}|
     \operatorname{Re}\{Y_i\}) \right)` -- the loss between
     the characteristic and the injected structure-borne power. ``Y_k`` is the
     transfer mobility of an elastic support (Formula 19e; 0 for a rigid
@@ -163,11 +163,11 @@ def coupling_term(
         case), but **not** guaranteed non-negative: near a mounting
         resonance where ``Y_s`` and ``Y_i`` are of comparable magnitude and
         opposite phase the numerator
-        :math:`\lvert Y_s + Y_i \rvert^2` collapses and ``D_C``
+        :math:`\lvert Y_\mathrm{s} + Y_i \rvert^2` collapses and ``D_C``
         goes negative (the installed power then exceeds the characteristic
-        level; e.g. :math:`Y_s = j \cdot 10^{-4}`,
+        level; e.g. :math:`Y_\mathrm{s} = j \cdot 10^{-4}`,
         :math:`Y_i = 10^{-5} - j \cdot 10^{-4}` m/(N·s) gives
-        :math:`D_C \approx -10` dB).
+        :math:`D_\mathrm{C} \approx -10` dB).
     :raises ValueError: if ``Y_s`` is zero/non-finite or ``Re{Y_i}`` is not
         positive and finite.
     """
@@ -186,7 +186,7 @@ def coupling_term_force_source(
 
     .. math::
 
-       D_C = 10 \log_{10}\frac{|Y_s|}{\operatorname{Re}\{Y_i\}}
+       D_\mathrm{C} = 10 \log_{10}\frac{|Y_\mathrm{s}|}{\operatorname{Re}\{Y_i\}}
 
     :param source_mobility: Source point mobility ``Y_s`` (complex, non-zero).
     :param receiver_mobility: Receiver point mobility ``Y_i`` (complex,
@@ -207,7 +207,7 @@ def coupling_term_velocity_source(
 
     .. math::
 
-       D_C = -10 \log_{10}\left( |Y_s| \operatorname{Re}\{Z_i\} \right)
+       D_\mathrm{C} = -10 \log_{10}\left( |Y_\mathrm{s}| \operatorname{Re}\{Z_i\} \right)
 
     :param source_mobility: Source point mobility ``Y_s`` (complex, non-zero).
     :param receiver_impedance: Receiver point impedance ``Z_i`` (complex,
@@ -285,7 +285,7 @@ def _bar_end_mobility(
 
     .. math::
 
-       |Y| = \left[ \rho c_L S \right]^{-1}
+       |Y| = \left[ \rho c_\mathrm{L} S \right]^{-1}
 
     Frequency-independent: the end of a bar loaded in compression behaves as
     the characteristic impedance of the quasi-longitudinal wave.
@@ -314,7 +314,7 @@ def _beam_mobility(
 
     .. math::
 
-       |Y| = \left[ 7{,}6\, \rho\, t\, w \sqrt{c_L t f} \right]^{-1}
+       |Y| = \left[ 7{,}6\, \rho\, t\, w \sqrt{c_\mathrm{L} t f} \right]^{-1}
 
     :param frequency: Frequency ``f``, in hertz (scalar or per band, > 0).
     :param density: Density ``rho``, in kg/m^3 (> 0).
@@ -343,7 +343,7 @@ def _plate_mobility(
 
     .. math::
 
-       |Y| = \left[ 2{,}3\, c_L\, \rho\, t^2 \right]^{-1}
+       |Y| = \left[ 2{,}3\, c_\mathrm{L}\, \rho\, t^2 \right]^{-1}
 
     Frequency-independent above the lowest plate resonance, and the same
     quantity Annex F Formula (F.4) writes as
@@ -375,7 +375,7 @@ def _pipe_mobility(
 
     .. math::
 
-       |Y| = \left[ 63\, \rho\, t\, r \sqrt{c_L r f} \right]^{-1}
+       |Y| = \left[ 63\, \rho\, t\, r \sqrt{c_\mathrm{L} r f} \right]^{-1}
 
     :param frequency: Frequency ``f``, in hertz (scalar or per band, > 0).
     :param density: Density ``rho``, in kg/m^3 (> 0).
@@ -494,17 +494,17 @@ def typical_element_mobility(
     - ``"mass"``, described by ``mass`` :math:`M` [kg]:
       :math:`\lvert Y \rvert = \left[ 2 \pi f M \right]^{-1}`.
     - ``"bar_end"``, described by ``density`` :math:`\rho` [kg/m3],
-      ``longitudinal_velocity`` :math:`c_L` [m/s] and ``area`` :math:`S`
-      [m2]: :math:`\lvert Y \rvert = \left[ \rho c_L S \right]^{-1}`.
-    - ``"beam"``, described by :math:`\rho`, :math:`c_L`, ``thickness``
+      ``longitudinal_velocity`` :math:`c_\mathrm{L}` [m/s] and ``area`` :math:`S`
+      [m2]: :math:`\lvert Y \rvert = \left[ \rho c_\mathrm{L} S \right]^{-1}`.
+    - ``"beam"``, described by :math:`\rho`, :math:`c_\mathrm{L}`, ``thickness``
       :math:`t` [m] and ``width`` :math:`w` [m]:
-      :math:`\lvert Y \rvert = \left[ 7{,}6\, \rho t w \sqrt{c_L t f}
+      :math:`\lvert Y \rvert = \left[ 7{,}6\, \rho t w \sqrt{c_\mathrm{L} t f}
       \right]^{-1}`.
-    - ``"plate"``, described by :math:`\rho`, :math:`c_L` and :math:`t`:
-      :math:`\lvert Y \rvert = \left[ 2{,}3\, c_L \rho t^2 \right]^{-1}`.
-    - ``"pipe"``, described by :math:`\rho`, :math:`c_L`, :math:`t` and
+    - ``"plate"``, described by :math:`\rho`, :math:`c_\mathrm{L}` and :math:`t`:
+      :math:`\lvert Y \rvert = \left[ 2{,}3\, c_\mathrm{L} \rho t^2 \right]^{-1}`.
+    - ``"pipe"``, described by :math:`\rho`, :math:`c_\mathrm{L}`, :math:`t` and
       ``radius`` :math:`r` [m]:
-      :math:`\lvert Y \rvert = \left[ 63\, \rho t r \sqrt{c_L r f}
+      :math:`\lvert Y \rvert = \left[ 63\, \rho t r \sqrt{c_\mathrm{L} r f}
       \right]^{-1}`.
     - ``"mass_spring"``, described by :math:`M`, ``stiffness`` :math:`s`
       [N/m] and ``loss_factor`` :math:`\eta` [-]:
@@ -527,7 +527,7 @@ def typical_element_mobility(
     the ``"plate"`` row is the same quantity as Formula (F.4)
     :math:`Y_{i,\infty} = 1 / (8\sqrt{m B'})` and as
     :func:`phonometry.vibration.structural.point_mobility.infinite_plate_mobility`,
-    written in :math:`\rho`, :math:`c_L` and :math:`t` instead of mass and
+    written in :math:`\rho`, :math:`c_\mathrm{L}` and :math:`t` instead of mass and
     bending stiffness.
 
     The ``"mass_spring"`` row is the machine on non-rigid feet: its second
@@ -706,7 +706,7 @@ def tapping_machine_characteristic_power_level(
 
     .. math::
 
-       L_{Ws,c} = L_F - 5 - 10 \log_{10} f
+       L_{W\mathrm{s,c}} = L_F - 5 - 10 \log_{10} f
 
     The standard notes the result is about 115 dB re 1 pW per one-third octave
     for the ISO tapping machine, treated in clause D.1.3 as a force source with
@@ -739,7 +739,7 @@ def tapping_machine_coupling_term(
 
     .. math::
 
-       D_{C,i} = -10 \log_{10}(\omega M Y_i)
+       D_{\mathrm{C},i} = -10 \log_{10}(\omega M Y_i)
        + 10 \log_{10}\left[ 1 + (\omega M Y_i)^2 \right]
 
     with :math:`\omega = 2 \pi f` and ``M`` the hammer mass of clause D.1.3,
@@ -814,7 +814,7 @@ def structure_to_airborne_adjustment(
 
     .. math::
 
-       D_{sa,i} = 10 \log_{10} \frac{400 f_{c,i} \sigma_i}{m_i f^2}
+       D_{\mathrm{sa},i} = 10 \log_{10} \frac{400 f_{\mathrm{c},i} \sigma_i}{m_i f^2}
 
     the ratio of injected structure-borne power to incident airborne power that
     leaves the same free-vibration energy in the element. Clause F.2 gives it
@@ -856,11 +856,11 @@ def installed_power_from_reception_plate(
 ) -> np.ndarray:
     r"""Mobility correction of the reception-plate power (EN 12354-5, Annex I).
 
-    :math:`L_{Ws,inst,i} = L_{Ws,n,i} + 10 \log_{10}( Y_{\infty,i} /
-    Y_{\infty,rec} )`, which refers the
+    :math:`L_{W\mathrm{s,inst},i} = L_{W\mathrm{s,n},i} + 10 \log_{10}( Y_{\infty,i} /
+    Y_{\infty,\mathrm{rec}} )`, which refers the
     characteristic reception-plate power level ``L_Ws,n`` (EN 15657
     Formula (17), re the 10 cm concrete plate
-    :math:`Y_{\infty,rec} = 5 \cdot 10^{-6}` m/(N.s))
+    :math:`Y_{\infty,\mathrm{rec}} = 5 \cdot 10^{-6}` m/(N.s))
     to the characteristic mobility ``Y_inf,i`` of the actual receiving
     element (floor, wall), yielding the installed power of that element as in
     the Annex I.2 whirlpool example. The same correction with the *source*
@@ -878,7 +878,7 @@ def installed_power_from_reception_plate(
         m/(N.s).
     :param plate_mobility: Mobility the input level is referred to
         (Default: the EN 15657 reference plate,
-        :math:`Y_{\infty,rec} = 5 \cdot 10^{-6}` m/(N.s);
+        :math:`Y_{\infty,\mathrm{rec}} = 5 \cdot 10^{-6}` m/(N.s);
         pass the measured plate mobility when the input is a raw Formula (14)
         level).
     :return: The mobility-corrected power level, in dB re 1 pW.
@@ -901,7 +901,7 @@ def installed_structure_borne_power_level(
 
     .. math::
 
-       L_{Ws,inst,i} = L_{Ws,c} - D_{C,i}
+       L_{W\mathrm{s,inst},i} = L_{W\mathrm{s,c}} - D_{\mathrm{C},i}
 
     :param characteristic_power_level: Characteristic level ``L_Ws,c`` (per
         band), in dB: the EN 15657 reception-plate level converted with
@@ -927,7 +927,7 @@ def structure_borne_pressure_level_path(
 
     .. math::
 
-       L_{n,s,ij} = L_{Ws,inst,i} - D_{sa,i} - R_{ij,ref}
+       L_{\mathrm{n,s},ij} = L_{W\mathrm{s,inst},i} - D_{\mathrm{sa},i} - R_{ij,\mathrm{ref}}
        - 10 \log_{10}\frac{S_i}{S_0} - 10 \log_{10}\frac{A_0}{4}
 
     :param installed_power_level: Installed power level ``L_Ws,inst,i``, in dB.
@@ -958,7 +958,7 @@ def total_structure_borne_pressure_level(path_levels: ArrayLike) -> np.ndarray:
 
     .. math::
 
-       L_{n,s} = 10 \log_{10}\!\left( \sum_j 10^{L_{n,s,ij}/10} \right)
+       L_\mathrm{n,s} = 10 \log_{10}\!\left( \sum_j 10^{L_{\mathrm{n,s},ij}/10} \right)
 
     :param path_levels: Path levels ``L_n,s,ij``; sum is over the first axis
         (paths), broadcasting any trailing band axis.
@@ -987,7 +987,7 @@ class InstalledSourceResult:
 
     @property
     def overall_level(self) -> float:
-        r"""Band-summed total level :math:`10 \log_{10}(\sum 10^{0.1 L_{n,s}})`,
+        r"""Band-summed total level :math:`10 \log_{10}(\sum 10^{0.1 L_\mathrm{n,s}})`,
         in dB."""
         lt = np.atleast_1d(np.asarray(self.total_level, dtype=np.float64))
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lt))))

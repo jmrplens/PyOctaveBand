@@ -184,7 +184,7 @@ The correlation-peak methods refine the sample peak by three-point parabolic
 interpolation, optionally after **band-limited local upsampling**
 (`upsample=16` resamples a window around the peak sixteenfold before the
 parabola). Sub-sample accuracy presumes the peak is oversampled, i.e. the
-signals are band-limited below Nyquist; on a $0.4\,f_s$ band-limited pair the
+signals are band-limited below Nyquist; on a $0.4\,f_\mathrm{s}$ band-limited pair the
 tests pin the achievable error at ≲0.1 sample for the parabola alone and
 ≲2e-3 samples with `upsample=16`. For GCC the delay must fit within half a
 Welch segment; raise `nperseg` for longer delays.

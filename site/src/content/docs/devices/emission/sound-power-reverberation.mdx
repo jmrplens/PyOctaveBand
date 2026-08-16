@@ -85,8 +85,8 @@ interior microphones miss. $C_1$ (reference-quantity) and $C_2$
 conditions of 23 °C and 101.325 kPa,
 
 $$
-C_1 = -10 \log_{10}\frac{p_s}{p_{s0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
-C_2 = -10 \log_{10}\frac{p_s}{p_{s0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
+C_1 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 5 \log_{10}\frac{273.15 + \theta}{314}, \qquad
+C_2 = -10 \log_{10}\frac{p_\mathrm{s}}{p_{\mathrm{s}0}} + 15 \log_{10}\frac{273.15 + \theta}{296},
 $$
 
 with the speed of sound $c = 20.05\sqrt{273 + \theta}$.
@@ -166,12 +166,12 @@ another day is not it.
 
 The `SoundPowerWarning` at an inter-position spread of 1.5 dB is the entry point
 to the escalation, not a defect in itself. Clause 8.4.2.2 computes the standard
-deviation $s_M$ of the six initial levels band by band (Eq. 10); above 1,5 dB in
+deviation $s_\mathrm{M}$ of the six initial levels band by band (Eq. 10); above 1,5 dB in
 any band the source is radiating significant discrete components for this room,
 and the answer is *more sampling*, not a different formula: either qualify the
 room per Annex D, or read the required number of positions from Table 4 — six
 stays six up to 160 Hz, but 400 Hz to 630 Hz goes to 12 positions for
-$1{,}5 < s_M \le 3$ dB and 24 above 3 dB, and 800 Hz upwards to 15 and 30 — and
+$1{,}5 < s_\mathrm{M} \le 3$ dB and 24 above 3 dB, and 800 Hz upwards to 15 and 30 — and
 add source positions per Eq. 12 and Table 5. Averaging longer at six positions
 buys nothing here, because the scatter is spatial. The number of positions, the
 traverse geometry and the measurement time interval all belong in the test
@@ -211,7 +211,7 @@ rev.plot()   # reverberation-room LW spectrum, LWA in the title (needs matplotli
 
 *The mean room level carried through the absorption-area, Waterhouse and
 meteorological terms of Eq. 20 gives the one-third-octave $L_W(f)$, and the
-A-weighted energy sum across the 21 bands gives the $L_{WA}$ in the title.*
+A-weighted energy sum across the 21 bands gives the $L_{W\mathrm{A}}$ in the title.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -312,7 +312,7 @@ plt.show()
 | `t60` | float or 1D array | s | > 0 | Room reverberation time (scalar broadcasts) |
 | `volume` | float | m³ | > 0 | Room volume $V$ |
 | `surface_area` | float | m² | > 0 | Total room surface $S$ (Waterhouse, $A/S$) |
-| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{WA}$ |
+| `frequencies` | 1D array | Hz | one per band | Required (Waterhouse needs $f$); enables $L_{W\mathrm{A}}$ |
 | `background_levels` | 1D or 2D array | dB | matches `levels` | Per-band $K_1$ (frequency-dependent criterion) |
 | `temperature` | float | °C | default `23.0` | Sets $c$, $C_1$, $C_2$ |
 | `static_pressure` | float | kPa | default `101.325` | Sets $C_1$, $C_2$ |
@@ -353,8 +353,8 @@ humidity (clause 8.6.2).
 
 Because the RSS supplies the room constant, the minimum source-to-microphone
 distance may also be taken from the RSS reading itself (clause 8.3, Eq. 9),
-$d_{\min} = D_2 \cdot 10^{0.05 (L_{Wr} - L_{pr})}$ with $D_2 = 0.4$ and 0,8
-recommended below 5 kHz. On the example below, $L_{Wr} - L_{pr} = 7$ dB in the
+$d_{\min} = D_2 \cdot 10^{0.05 (L_{W\mathrm{r}} - L_{p\mathrm{r}})}$ with $D_2 = 0.4$ and 0,8
+recommended below 5 kHz. On the example below, $L_{W\mathrm{r}} - L_{p\mathrm{r}} = 7$ dB in the
 100 Hz band, so $d_{\min} = 0.90$ m, or 1.8 m at the recommended $D_2$ — close
 enough to the 0.8/1.6 m of Eq. 8 to be a useful cross-check.
 
@@ -397,10 +397,10 @@ names ISO 3741:2010 and the precision accuracy grade (grade 1) and states which
 method was used, the direct method using the room equivalent absorption area
 (Eq. 20) or the comparison method using a reference sound source (Eq. 21). The
 per-band table lists the mean room sound-pressure level $L_p$ and the band
-sound-power level $L_W$, and the boxed $L_{WA}$ carries the total $L_W$ and the
+sound-power level $L_W$, and the boxed $L_{W\mathrm{A}}$ carries the total $L_W$ and the
 determination method (the reverberation result has no expanded uncertainty $U$).
 `verbose=True` adds the background correction $K_1$ and, for the direct method,
-the equivalent absorption area $A$ and the Waterhouse boundary correction $C_w$;
+the equivalent absorption area $A$ and the Waterhouse boundary correction $C_\mathrm{w}$;
 the basis strip states the correction model (Eq. 20 or Eq. 21), the applied
 meteorological corrections $C_1$/$C_2$ and the speed of sound, and cites the
 Annex F A-weighting.
@@ -490,7 +490,7 @@ feeds, live in [Sound Power](/phonometry/devices/emission/sound-power/).
 - [Room Acoustics](/phonometry/buildings/rooms/room-acoustics/): measuring the
   reverberation time $T_{60}$ that sets the Sabine absorption area.
 - [Levels](/phonometry/signals/levels/levels/): energy averaging and the A-weighting
-  behind $L_{WA}$.
+  behind $L_{W\mathrm{A}}$.
 - [Theory](/phonometry/reference/theory/environment-transport/): the
   Waterhouse and $C_1$/$C_2$ derivations.
 - API reference: [`emission.sound_power_reverberation`](/phonometry/reference/api/power/sound-power-reverberation/).

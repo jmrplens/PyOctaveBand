@@ -8,7 +8,7 @@ into the hearing threshold level associated with age and noise (HTLAN), over
 the six audiometric frequencies 500 Hz to 6000 Hz.
 
 The median NIPTS for exposure durations of 10 to 40 years is
-:math:`N_{50} = [u + v \log_{10}(t/t_0)] \, (L_{EX,8h} - L_0)^2` (clause 6.3.1,
+:math:`N_{50} = [u + v \log_{10}(t/t_0)] \, (L_\mathrm{EX,8h} - L_0)^2` (clause 6.3.1,
 Formula 2, with
 the values ``u, v, L0`` of Table 1), extrapolated below 10 years by Formula 3.
 The statistical distribution about the median is two half-Gaussians whose

@@ -37,19 +37,19 @@ over the positive response peaks, scaled to a daily dose
 
 .. math::
 
-   D_{zd} = D_z \, (t_d/t_m)^{1/6} \tag{Formula 4/5}
+   D_{z\mathrm{d}} = D_z \, (t_\mathrm{d}/t_\mathrm{m})^{1/6} \tag{Formula 4/5}
 
 Annex C turns the daily dose into an injury risk: the daily compressive
-stress :math:`S_d` (Formula C.1), the age-cumulated stress variable
+stress :math:`S_\mathrm{d}` (Formula C.1), the age-cumulated stress variable
 :math:`R` (Formulae C.3/C.4) and the Weibull probability of lumbar injury
 :math:`P` (Formula C.5, Table C.1):
 
 .. math::
 
-   S_d = m_z D_{zd} \tag{Formula C.1}
+   S_\mathrm{d} = m_z D_{z\mathrm{d}} \tag{Formula C.1}
 
    R = \left[ \sum_i \left(
-   S_d N^{1/6} / (S_{u,i} - S_\text{stat})
+   S_\mathrm{d} N^{1/6} / (S_{\mathrm{u},i} - S_\text{stat})
    \right)^6 \right]^{1/6} \tag{Formulae C.3/C.4}
 
    P = 1 - \exp\left(-(R/\alpha)^\beta\right) \tag{Formula C.5}
@@ -243,14 +243,14 @@ def acceleration_dose(acceleration: ArrayLike, fs: float) -> float:
 
 
 def daily_dose(dose: float, exposure_time: float, measurement_time: float) -> float:
-    r"""Daily acceleration dose :math:`D_{zd}` (clause 5.3, Formula 4).
+    r"""Daily acceleration dose :math:`D_{z\mathrm{d}}` (clause 5.3, Formula 4).
 
     :param dose: The measured acceleration dose :math:`D_z`, m/s2.
-    :param exposure_time: Daily exposure period :math:`t_d` (any time
+    :param exposure_time: Daily exposure period :math:`t_\mathrm{d}` (any time
         unit).
-    :param measurement_time: Period :math:`t_m` over which :math:`D_z`
+    :param measurement_time: Period :math:`t_\mathrm{m}` over which :math:`D_z`
         was measured (same unit as ``exposure_time``).
-    :return: The daily dose :math:`D_{zd} = D_z (t_d/t_m)^{1/6}`, m/s2.
+    :return: The daily dose :math:`D_{z\mathrm{d}} = D_z (t_\mathrm{d}/t_\mathrm{m})^{1/6}`, m/s2.
     """
     exposure_time = require_positive(exposure_time, "exposure_time")
     measurement_time = require_positive(measurement_time, "measurement_time")
@@ -264,13 +264,13 @@ def daily_dose_multi(
 
     :param doses: Acceleration dose :math:`D_{z,j}` of each condition,
         m/s2.
-    :param exposure_times: Daily exposure duration :math:`t_{d,j}` of
+    :param exposure_times: Daily exposure duration :math:`t_{\mathrm{d},j}` of
         each condition.
-    :param measurement_times: Measurement duration :math:`t_{m,j}` of
+    :param measurement_times: Measurement duration :math:`t_{\mathrm{m},j}` of
         each condition.
     :return: The combined daily dose
-        :math:`D_{zd} = \left[ \sum_j D_{z,j}^6 \,
-        (t_{d,j}/t_{m,j}) \right]^{1/6}`, m/s2.
+        :math:`D_{z\mathrm{d}} = \left[ \sum_j D_{z,j}^6 \,
+        (t_{\mathrm{d},j}/t_{\mathrm{m},j}) \right]^{1/6}`, m/s2.
     """
     dz = np.asarray(doses, dtype=np.float64).ravel()
     td = np.asarray(exposure_times, dtype=np.float64).ravel()
@@ -291,13 +291,13 @@ def daily_dose_multi(
 
 
 def compression_dose(daily_dose_value: float, *, mz: float = MZ_MALE) -> float:
-    r"""Daily compressive stress :math:`S_d` (Annex C, Formula C.1).
+    r"""Daily compressive stress :math:`S_\mathrm{d}` (Annex C, Formula C.1).
 
-    :param daily_dose_value: The daily acceleration dose :math:`D_{zd}`,
+    :param daily_dose_value: The daily acceleration dose :math:`D_{z\mathrm{d}}`,
         m/s2.
     :param mz: Stress conversion :math:`m_z` (MPa per m/s2); default the
         82 kg male value :data:`MZ_MALE`. See :data:`MZ_FEMALE`.
-    :return: The daily compressive stress :math:`S_d = m_z D_{zd}`, MPa.
+    :return: The daily compressive stress :math:`S_\mathrm{d} = m_z D_{z\mathrm{d}}`, MPa.
     """
     return mz * daily_dose_value
 
@@ -309,14 +309,14 @@ def static_stress(mz: float = MZ_MALE) -> float:
 
 
 def ultimate_strength(age: ArrayLike, *, sex: Literal["male", "female"] = "male") -> np.ndarray:
-    r"""Ultimate lumbar strength :math:`S_u` at an age (Annex C,
+    r"""Ultimate lumbar strength :math:`S_\mathrm{u}` at an age (Annex C,
     Formula C.4).
 
     :param age: Age :math:`b + i`, in years.
     :param sex: ``"male"`` or ``"female"`` (sets the age slope
         :math:`S_\text{age}`).
     :return: The ultimate strength
-        :math:`S_u = 6.75 - S_\text{age} (b+i)`, MPa.
+        :math:`S_\mathrm{u} = 6.75 - S_\text{age} (b+i)`, MPa.
     """
     require_choice(sex, "sex", _SEXES)
     slope = STRENGTH_AGE_SLOPE_MALE if sex == "male" else STRENGTH_AGE_SLOPE_FEMALE
@@ -338,7 +338,7 @@ def injury_risk(
     Accumulates the daily compressive stress over the exposure years, each year
     weighted by the reducing ultimate strength of the ageing spine.
 
-    :param daily_compression: The daily compressive stress :math:`S_d`,
+    :param daily_compression: The daily compressive stress :math:`S_\mathrm{d}`,
         MPa.
     :param start_age: Age :math:`b` at which the exposure started, in
         years.
@@ -350,7 +350,7 @@ def injury_risk(
         sex-specific value.
     :return: The stress variable :math:`R`.
     :raises ValueError: if ``years`` is not positive or the spine strength
-        is exhausted (:math:`S_u - S_\text{stat} \le 0`) within the
+        is exhausted (:math:`S_\mathrm{u} - S_\text{stat} \le 0`) within the
         exposure period.
     """
     require_choice(sex, "sex", _SEXES)
@@ -399,8 +399,8 @@ class MultipleShockResult:
 
     :ivar sex: ``"male"`` or ``"female"``.
     :ivar acceleration_dose: The acceleration dose :math:`D_z`, m/s2.
-    :ivar daily_dose: The daily acceleration dose :math:`D_{zd}`, m/s2.
-    :ivar compression_dose: The daily compressive stress :math:`S_d`, MPa.
+    :ivar daily_dose: The daily acceleration dose :math:`D_{z\mathrm{d}}`, m/s2.
+    :ivar compression_dose: The daily compressive stress :math:`S_\mathrm{d}`, MPa.
     :ivar risk: The cumulative stress variable :math:`R`.
     :ivar probability: The probability of lumbar injury :math:`P(R)` in
         0-1.
@@ -457,8 +457,8 @@ class MultipleShockResult:
         ``n``, the number of exposure days per year ``N`` and the number
         of counted response shocks), the dose-and-stress analysis table
         (the acceleration dose :math:`D_z` of Formula 3, the daily dose
-        :math:`D_{zd}` of Formula 4, the daily compressive stress
-        :math:`S_d` of Formula C.1, the cumulative stress variable
+        :math:`D_{z\mathrm{d}}` of Formula 4, the daily compressive stress
+        :math:`S_\mathrm{d}` of Formula C.1, the cumulative stress variable
         :math:`R` of Formula C.3 and the probability of lumbar injury
         :math:`P` of Formula C.5), the injury-probability chart, the boxed
         :math:`R` and :math:`P` with the Annex C risk classification, a
@@ -535,11 +535,11 @@ def multiple_shock_assessment(
     :param start_age: Age ``b`` at which the exposure started, in years.
     :param years: Number of exposure years ``n``.
     :param days_per_year: Number of exposure days per year ``N``.
-    :param exposure_time: Daily exposure period :math:`t_d`; when given
+    :param exposure_time: Daily exposure period :math:`t_\mathrm{d}`; when given
         with ``measurement_time`` the dose is scaled to a daily dose
         (Formula 4), otherwise the measured dose is taken as the daily
         dose.
-    :param measurement_time: Period :math:`t_m` over which the record was
+    :param measurement_time: Period :math:`t_\mathrm{m}` over which the record was
         measured.
     :param sex: ``"male"`` or ``"female"``.
     :param mz: Stress conversion :math:`m_z` (MPa per m/s2); defaults to

@@ -19,7 +19,7 @@ después ancla ese análisis a un tono de calibrador para que los niveles sean
 decibelios re 20 µPa y no decibelios re nada, los reduce a un único nivel
 ponderado A y dice qué tiene que cumplir una grabación para que todo eso se
 sostenga. Se queda a una etapa de un sonómetro: las balísticas Fast y Slow,
-$L_{AE}$, $L_{Cpeak}$ y los niveles percentiles están en [Construye un
+$L_{\mathrm{A}E}$, $L_\mathrm{Cpeak}$ y los niveles percentiles están en [Construye un
 sonómetro](/phonometry/es/signals/sound-level-meter/), que recorre la cadena
 entera de principio a fin en una sola página, y [Calibración y
 dBFS](/phonometry/es/signals/metrology/calibration/) es la guía de fondo del

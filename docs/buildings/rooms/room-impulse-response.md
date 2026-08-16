@@ -241,7 +241,7 @@ mistakes bias the mean itself:
   sit on symmetry lines.
 - **Too close to the source.** Inside the direct field EDT collapses and
   C80 saturates upward no matter what the room does. ISO 3382-2 therefore
-  keeps every microphone at least $d_{min} = 2\sqrt{V/(c\,\hat T)}$ from
+  keeps every microphone at least $d_\mathrm{min} = 2\sqrt{V/(c\,\hat T)}$ from
   the source, with $\hat T$ an estimate of the expected reverberation time
   (about 2.2 m for a 200 m³ classroom with an expected 0.5 s).
 - **Low-frequency luck.** Below the Schroeder frequency (see the

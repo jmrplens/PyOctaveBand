@@ -386,11 +386,11 @@ def normalized_diffusion_coefficient(
 ) -> Real:
     r"""Normalised directional diffusion coefficient (ISO 17497-2, Formula (7)).
 
-    :math:`d_{\theta,n} = (d_\theta - d_{\theta,r}) / (1 - d_{\theta,r})`,
+    :math:`d_{\theta,\mathrm{n}} = (d_\theta - d_{\theta,\mathrm{r}}) / (1 - d_{\theta,\mathrm{r}})`,
     removing the
     finite-panel diffusion of the reference flat surface ``d_theta_r`` (same
     projected footprint as the test surface). It maps
-    :math:`d_\theta = d_{\theta,r}`
+    :math:`d_\theta = d_{\theta,\mathrm{r}}`
     to 0 and :math:`d_\theta = 1` to 1.
 
     :param d_theta: Directional diffusion coefficient of the test surface.

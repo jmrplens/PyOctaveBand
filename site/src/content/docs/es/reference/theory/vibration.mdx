@@ -63,7 +63,7 @@ Esta página reúne la teoría de la vibración en humanos: las ponderaciones fr
 La respuesta humana a la vibración depende de la frecuencia, el eje y la parte
 del cuerpo, así que la aceleración se filtra con las ponderaciones
 frecuenciales de ISO 8041-1:2017 antes de cualquier métrica. Cada ponderación
-es la cascada analógica $H(s) = H_h(s) H_l(s) H_t(s) H_s(s)$ (Fórmula 5):
+es la cascada analógica $H(s) = H_\mathrm{h}(s) H_\mathrm{l}(s) H_\mathrm{t}(s) H_\mathrm{s}(s)$ (Fórmula 5):
 etapas Butterworth de dos polos de limitación de banda paso alto y paso bajo
 (Fórmulas 1/2), una transición aceleración–velocidad (Fórmula 3, que porta la
 única ganancia no unitaria, $K = 1{,}024$ para Wb) y un escalón ascendente
@@ -75,15 +75,15 @@ vibración:
 
 | Ponderación | Qué pondera | Eje o punto de contacto | Norma | Rango nominal | Alimenta |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `Wk` | Cuerpo entero vertical | z, superficie del asiento o suelo | ISO 2631-1 | 0,5–80 Hz | $a_w$, VDV, $A(8)$ |
-| `Wd` | Cuerpo entero horizontal | x e y, superficie del asiento o suelo | ISO 2631-1 | 0,5–80 Hz | $a_w$, VDV, $A(8)$ |
-| `Wc` | Respaldo | x, respaldo | ISO 2631-1 | 0,5–80 Hz | $a_w$ (confort) |
-| `We` | Rotacional | rx, ry, rz (por rad) | ISO 2631-1 | 0,5–80 Hz | $a_w$ (confort) |
-| `Wj` | Tumbado, bajo la cabeza | z | ISO 2631-1 | 0,5–80 Hz | $a_w$ (confort) |
-| `Wm` | Ocupantes de edificios | todos los ejes | ISO 2631-2 | 1–80 Hz | $a_w$ |
-| `Wb` | Confort de marcha ferroviaria | z | ISO 2631-4 | 0,5–80 Hz | $a_w$ |
+| `Wk` | Cuerpo entero vertical | z, superficie del asiento o suelo | ISO 2631-1 | 0,5–80 Hz | $a_\mathrm{w}$, VDV, $A(8)$ |
+| `Wd` | Cuerpo entero horizontal | x e y, superficie del asiento o suelo | ISO 2631-1 | 0,5–80 Hz | $a_\mathrm{w}$, VDV, $A(8)$ |
+| `Wc` | Respaldo | x, respaldo | ISO 2631-1 | 0,5–80 Hz | $a_\mathrm{w}$ (confort) |
+| `We` | Rotacional | rx, ry, rz (por rad) | ISO 2631-1 | 0,5–80 Hz | $a_\mathrm{w}$ (confort) |
+| `Wj` | Tumbado, bajo la cabeza | z | ISO 2631-1 | 0,5–80 Hz | $a_\mathrm{w}$ (confort) |
+| `Wm` | Ocupantes de edificios | todos los ejes | ISO 2631-2 | 1–80 Hz | $a_\mathrm{w}$ |
+| `Wb` | Confort de marcha ferroviaria | z | ISO 2631-4 | 0,5–80 Hz | $a_\mathrm{w}$ |
 | `Wf` | Mareo | z | ISO 2631-1, apartado 9 | 0,1–0,5 Hz | MSDV |
-| `Wh` | Transmitida a la mano | los tres ejes de la mano | ISO 5349-1 | 8–1000 Hz | $a_{hv}$, $A(8)$ |
+| `Wh` | Transmitida a la mano | los tres ejes de la mano | ISO 5349-1 | 8–1000 Hz | $a_\mathrm{hv}$, $A(8)$ |
 
 Los rangos nominales son las columnas de la Tabla 1 de ISO 8041-1, no las
 esquinas de limitación de banda de la Tabla 3: `Wh` está limitada en banda a
@@ -150,9 +150,9 @@ lista de fallos.
 
 Las métricas ponderadas siguen ISO 2631-1:1997: rms móvil con integración
 lineal o exponencial (Ecs. 2/3), el **MTVV** como su máximo (Ec. 4), el
-**VDV** de cuarta potencia $= (\int a_w^4\, dt)^{1/4}$ en
+**VDV** de cuarta potencia $= (\int a_\mathrm{w}^4\, dt)^{1/4}$ en
 $\mathrm{m/s}^{1{,}75}$ (Ec. 5) y el valor total de vibración
-$a_v = \sqrt{\sum_j k_j^2 a_{wj}^2}$ (Ec. 10), cuyos factores multiplicadores
+$a_\mathrm{v} = \sqrt{\sum_j k_j^2 a_{\mathrm{w}j}^2}$ (Ec. 10), cuyos factores multiplicadores
 $k_j$ pertenecen a la postura y al eje y no a la métrica: en una persona sentada
 evaluada por salud, 1,4 sobre x e y ponderadas con `Wd` y 1,0 sobre z ponderada
 con `Wk` (apartado 7.2.3).
@@ -168,17 +168,17 @@ cresta se mantenga en 9 o por debajo, y manda a los métodos adicionales del
 apartado 6.3 todo lo que quede por encima, porque unos pocos picos altos aportan
 poco a un valor eficaz y muchísimo a una dosis de cuarta potencia. Dos cocientes
 deciden la misma cuestión sin fiarlo todo al factor de cresta (apartado 6.3.3):
-se declara además el valor adicional en cuanto $\mathrm{MTVV}/a_w$ supera 1,5 o
-$\mathrm{VDV}/(a_w T^{1/4})$ supera 1,75. Los dos se miden sobre el intervalo de
+se declara además el valor adicional en cuanto $\mathrm{MTVV}/a_\mathrm{w}$ supera 1,5 o
+$\mathrm{VDV}/(a_\mathrm{w} T^{1/4})$ supera 1,75. Los dos se miden sobre el intervalo de
 evaluación real, así que trocear un registro en bloques cortos rebaja el factor
 de cresta artificialmente; y cuando se usa un método adicional, el valor básico
 se sigue declarando a su lado (apartado 5.6).
 
 La exposición mano-brazo sigue
-ISO 5349-1:2001: $a_{hv}$ (Ec. 1, todos los $k = 1$), exposición diaria
-$A(8) = a_{hv} \sqrt{T/T_0}$ con $T_0 = 8$ h (Ec. 2), exposiciones parciales
+ISO 5349-1:2001: $a_\mathrm{hv}$ (Ec. 1, todos los $k = 1$), exposición diaria
+$A(8) = a_\mathrm{hv} \sqrt{T/T_0}$ con $T_0 = 8$ h (Ec. 2), exposiciones parciales
 combinadas en cuadratura (ISO 5349-2:2001, Ecs. 1–3), y el modelo de riesgo
-vascular del Anexo C, $D_y = 31{,}8\ A(8)^{-1{,}06}$, para los años hasta una
+vascular del Anexo C, $D_\mathrm{y} = 31{,}8\ A(8)^{-1{,}06}$, para los años hasta una
 prevalencia del 10 % de dedo blanco (sin relación con la dosis de aceleración
 $D_z$ de más abajo). Los valores de acción y límite de la
 Directiva 2002/44/CE están incorporados: mano-brazo $A(8)$ 2,5/5,0 m/s²,
@@ -187,9 +187,9 @@ $\mathrm{m/s}^{1{,}75}$ (Artículo 3), aplicándose la vía del VDV allí donde 
 Estado miembro la haya adoptado.
 
 **Los dos límites se evalúan sobre magnitudes construidas de forma distinta.**
-La exposición mano-brazo se evalúa sobre el total vectorial $a_{hv}$, con todos
+La exposición mano-brazo se evalúa sobre el total vectorial $a_\mathrm{hv}$, con todos
 los $k = 1$. La exposición de cuerpo entero se evalúa sobre el *eje dominante
-único*, el mayor de $1{,}4a_{wx}$, $1{,}4a_{wy}$ y $a_{wz}$ (Anexo, parte B de
+único*, el mayor de $1{,}4a_{\mathrm{w}x}$, $1{,}4a_{\mathrm{w}y}$ y $a_{\mathrm{w}z}$ (Anexo, parte B de
 la Directiva, con los factores del apartado 7.2.3; el apartado 7.2.2 de
 ISO 2631-1 evalúa cada eje por separado), y nunca sobre el total vectorial, que
 es la magnitud de confort del apartado 8. `vibration.wbv_exposure_basis`
@@ -215,19 +215,19 @@ respuesta espinal con una dosis de sexta potencia (Palmgren-Miner)
 
 $$
 D_z = 1{,}07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{zd} = D_z\ (t_d / t_m)^{1/6}.
+D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
 El Anexo C convierte la dosis diaria en una tensión compresiva
-$S_d = m_z D_{zd}$ ($m_z = 0{,}029/0{,}025$ MPa por m/s² para el hombre de
+$S_\mathrm{d} = m_z D_{z\mathrm{d}}$ ($m_z = 0{,}029/0{,}025$ MPa por m/s² para el hombre de
 82 kg / la mujer de 64 kg), sigue la resistencia última decreciente con la
-edad $S_u = 6{,}75 - S_{age}(b + i)$ y forma la variable de tensión acumulada
+edad $S_\mathrm{u} = 6{,}75 - S_\mathrm{age}(b + i)$ y forma la variable de tensión acumulada
 $R$ (Fórmulas C.3/C.4), llevada a una probabilidad de lesión por la ley de
 Weibull de la Tabla C.1, $\Pi = 1 - e^{-(R/\alpha)^\beta}$. El filtro espinal
 se evalúa analíticamente en el dominio de la frecuencia y se valida frente a
 la tabulación del filtro digital a 256 Hz del Anexo D dentro de la tolerancia
 del apartado 5.2; el ejemplo resuelto del Anexo C (cinco choques de 40 m/s²
-al día durante 20 años) se reproduce: $D_{zd} = 55{,}97$ m/s², $R = 1{,}22$,
+al día durante 20 años) se reproduce: $D_{z\mathrm{d}} = 55{,}97$ m/s², $R = 1{,}22$,
 $\Pi = 0{,}37$. El modelo espinal de elementos finitos del Anexo A
 (distribuido por ISO como software aparte) queda fuera de alcance.
 
@@ -236,7 +236,7 @@ $\Pi = 0{,}37$. El modelo espinal de elementos finitos del Anexo A
 *Los dos objetos del modelo. A la izquierda, la transmisibilidad
 asiento-columna del apartado 5.2: unidad en continua, máximo en
 $|H| \approx 1{,}54$ cerca de 5 Hz y caída por encima, que es la razón por la
-que hubo que sustituir $W_k$ para los choques. A la derecha, la ley de Weibull
+que hubo que sustituir $W_\mathrm{k}$ para los choques. A la derecha, la ley de Weibull
 $\Pi(R)$ de la Tabla C.1 con el ejemplo resuelto del Anexo C marcado en
 $R = 1{,}22$, $\Pi = 0{,}37$: el riesgo sube abruptamente en una banda estrecha
 de $R$, así que una dosis que se duplica no duplica la probabilidad.*
@@ -258,10 +258,10 @@ absorbe la estructura. Para estructuras infinitas son formas cerradas (Cremer
 Tabla 5.1): una placa delgada infinita es una resistencia pura
 $Z = 8\sqrt{B'\,m''}$ (real, independiente de la frecuencia, con $B'$ la rigidez
 a flexión por unidad de anchura y $m''$ la masa por unidad de superficie), una
-viga infinita tiene $Y = (1-\mathrm{j})/(4 m' c_B)$ (fase de 45 grados,
+viga infinita tiene $Y = (1-\mathrm{j})/(4 m' c_\mathrm{B})$ (fase de 45 grados,
 decayendo como $\omega^{-1/2}$ a través de la velocidad de la onda de flexión
-$c_B$), y una
-barra longitudinal tiene $Z = \rho c_L S$. Aportan la movilidad de receptor que
+$c_\mathrm{B}$), y una
+barra longitudinal tiene $Z = \rho c_\mathrm{L} S$. Aportan la movilidad de receptor que
 EN 12354-5 necesita cuando no hay medida, y son las contrapartes teóricas de las
 movilidades medidas de ISO 7626.
 
@@ -298,26 +298,26 @@ radia realmente y la que radiaría al mismo semiespacio un pistón de la misma
 área vibrando con la misma velocidad cuadrática media promediada en el espacio.
 Así, $\sigma = 1$ es el caso plenamente acoplado, y un valor pequeño significa
 que la placa se está cortocircuitando a sí misma. Por debajo de la frecuencia
-crítica $f_c$, la frecuencia a la que la longitud de onda de flexión en la placa
+crítica $f_\mathrm{c}$, la frecuencia a la que la longitud de onda de flexión en la placa
 iguala a la del aire, la longitud de onda de flexión es la más corta de las dos,
 así que semiceldas contiguas de la placa se bombean aire la una a la otra y la
 radiación solo sobrevive allí donde esa cancelación se interrumpe, en los bordes
 y en las esquinas. La $\sigma$ subcrítica depende por tanto del perímetro y del
 área de la placa además de su material, y es pequeña: una placa de cartón-yeso
-de 12,5 mm y 4 × 3 m ($f_c \approx 2{,}6$ kHz) va de $\sigma = 0{,}0017$ a
+de 12,5 mm y 4 × 3 m ($f_\mathrm{c} \approx 2{,}6$ kHz) va de $\sigma = 0{,}0017$ a
 31,5 Hz hasta 0,080 a 2 kHz, mientras que una losa de hormigón de 100 mm del
-mismo tamaño ($f_c \approx 180$ Hz) ya está en 0,12 a 31,5 Hz. Por encima de
-$f_c$ se aplica el límite citado $\sigma \to (1 - f_c/f)^{-1/2} \to 1$
+mismo tamaño ($f_\mathrm{c} \approx 180$ Hz) ya está en 0,12 a 31,5 Hz. Por encima de
+$f_\mathrm{c}$ se aplica el límite citado $\sigma \to (1 - f_\mathrm{c}/f)^{-1/2} \to 1$
 (Leppington/Maidanik, Hopkins Ec. 2.227-2.230), pero es singular justo en
-$f = f_c$, así que la banda de coincidencia se evalúa con la expresión aparte
-en la coincidencia (Ec. 2.230) y el máximo justo por encima de $f_c$ es finito
+$f = f_\mathrm{c}$, así que la banda de coincidencia se evalúa con la expresión aparte
+en la coincidencia (Ec. 2.230) y el máximo justo por encima de $f_\mathrm{c}$ es finito
 (1,89 para esa losa de hormigón) y lo fijan el tamaño y el amortiguamiento de la
 placa. Como $\sigma$ es exactamente el factor de radiación
 $\varepsilon$ de ISO 7849, predecirla cierra la cadena de potencia acústica a
 partir de la vibración sin una medida de potencia, y alimenta la trayectoria
 de transmisión resonante de la [teoría de aislamiento de
 paneles](/phonometry/es/reference/theory/rooms-buildings/#predicción-del-aislamiento-de-paneles-bies-72-hopkins-294310-cremer-5),
-donde se define la propia $f_c$.
+donde se define la propia $f_\mathrm{c}$.
 
 Consulta la guía [Predicción del aislamiento de paneles](/phonometry/es/buildings/design/panel-sound-insulation/)
 para su uso.

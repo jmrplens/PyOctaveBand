@@ -25,7 +25,7 @@ back, and arrive at Equation (4.101):
 .. math::
 
    \mathrm{NR} = \mathrm{TL} -
-   10 \log_{10}\!\left[\frac{S_w}{S_2 \alpha_2 + \tau S_w}\right],
+   10 \log_{10}\!\left[\frac{S_\mathrm{w}}{S_2 \alpha_2 + \tau S_\mathrm{w}}\right],
 
 with :math:`\mathrm{NR} = L_{p1} - L_{p2}` the noise reduction between the two
 reverberant
@@ -238,8 +238,8 @@ class RoomToRoomResult:
 
         .. math::
 
-           \mathrm{TL}_{req} = L_{p1} - L_{p2,\mathrm{target}}
-           + 10 \log_{10}(S_w / S_2 \alpha_2) + \text{penalty},
+           \mathrm{TL}_\mathrm{req} = L_{p1} - L_{p2,\mathrm{target}}
+           + 10 \log_{10}(S_\mathrm{w} / S_2 \alpha_2) + \text{penalty},
 
         with :math:`L_{p2,\mathrm{target}}` the design criterion curve. The
         ``tau S_w`` term is

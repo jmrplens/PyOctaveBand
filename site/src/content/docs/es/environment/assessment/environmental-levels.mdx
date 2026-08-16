@@ -35,21 +35,21 @@ import Scope from '../../../../../components/Scope.astro';
 import ScopeClaim from '../../../../../components/ScopeClaim.astro';
 import ThemeImage from '../../../../../components/ThemeImage.astro';
 
-Una comunidad no oye un único $L_{Aeq}$: oye un día cuyas tardes y noches pesan
+Una comunidad no oye un único $L_\mathrm{Aeq}$: oye un día cuyas tardes y noches pesan
 más, una fuente cuyos tonos o impulsos molestan más allá de su energía, y
 una medición tomada sobre un fondo residual con una confianza finita. La mitad
 tonal de esa frase es esta página; la mitad impulsiva pertenece a
 [Prominencia de sonidos impulsivos](/phonometry/es/environment/assessment/impulsive-sound/),
 que mide el ajuste que la Tabla A.1 de ISO 1996-1 solo tabula. Esta
 página es la cadena de evaluación regulatoria construida sobre los niveles
-por periodo medidos: los descriptores de jornada completa $L_{den}$/$L_{dn}$ y
+por periodo medidos: los descriptores de jornada completa $L_\mathrm{den}$/$L_\mathrm{dn}$ y
 los niveles de evaluación compuestos de ISO 1996-1, y los procedimientos de
 determinación de ISO 1996-2 que hacen defendible el número declarado: el
 ajuste tonal, la corrección de ruido residual y el balance de incertidumbre
 de medida.
 
 El cálculo de niveles en sí, las integrales de
-$L_{eq}$/$L_{Aeq}$, los niveles percentiles $L_N$, el SEL y la dosis de
+$L_\mathrm{eq}$/$L_\mathrm{Aeq}$, los niveles percentiles $L_N$, el SEL y la dosis de
 ruido que producen los niveles por periodo que esta página consume, es
 [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/); todo lo
 de aquí supone que esos valores por periodo ya están calculados.
@@ -84,7 +84,7 @@ ISO 1996-1 y sus ajustes por franja horaria ya rellenados.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/lden_profile_es.svg" alt="Perfil LAeq urbano sintético de 24 horas con las bandas de día, tarde y noche, los niveles por periodo ponderados con +5 y +10 dB y el Lden resultante" width="80%" />
 
 *El mismo día ponderado de tres maneras: la banda de tarde se eleva 5 dB y la de
-noche 10 dB antes del promedio energético 12/4/8 h, y por eso un $L_{den}$ de
+noche 10 dB antes del promedio energético 12/4/8 h, y por eso un $L_\mathrm{den}$ de
 64,3 dB queda por encima de cualquier nivel horario de la noche.*
 
 **Qué significan esos 64,3 dB.** Conviene llevar la escala encima: una noche
@@ -92,17 +92,17 @@ rural se queda en cuarenta y tantos dB, una calle residencial tranquila a mitad
 de los cincuenta, una fachada en una arteria urbana con tráfico en la parte alta
 de los sesenta, y la
 Directiva de ruido ambiental publica los mapas estratégicos en bandas de
-$L_{den}$ de 5 dB a partir de 55 dB. Las ponderaciones de +5 y +10 dB son el
+$L_\mathrm{den}$ de 5 dB a partir de 55 dB. Las ponderaciones de +5 y +10 dB son el
 precio de la exposición a las horas en que la gente está en casa y durmiendo, así
-que una fuente de tarde o de noche mueve el $L_{den}$ mucho más de lo que sugiere
+que una fuente de tarde o de noche mueve el $L_\mathrm{den}$ mucho más de lo que sugiere
 su cuota de energía: en el perfil de arriba la tarde es 1,8 dB *más silenciosa*
 que el día y dura un tercio, y aun así la ponderación de +5 dB le da el 36 % de
 la energía que compone los 64,3 dB frente al 51 % del día. Dos límites al
 leerlo. El indicador declarado es un promedio a **largo plazo**: ISO 1996-1
 define sus periodos sobre un intervalo de tiempo de largo plazo, normalmente un
-año, así que el día resuelto aquí es una muestra de un $L_{den}$ y no un
-$L_{den}$. Y el número es una exposición, no una respuesta; ISO 1996-1 lleva
-anexos que traducen un $L_{den}$ o un $L_{dn}$ ajustado en un porcentaje estimado
+año, así que el día resuelto aquí es una muestra de un $L_\mathrm{den}$ y no un
+$L_\mathrm{den}$. Y el número es una exposición, no una respuesta; ISO 1996-1 lleva
+anexos que traducen un $L_\mathrm{den}$ o un $L_\mathrm{dn}$ ajustado en un porcentaje estimado
 de población altamente molesta, que es informativo y no está implementado aquí.
 
 <details>
@@ -147,7 +147,7 @@ plt.show()
 
 | Función | Parámetros clave | Notas |
 | :--- | :--- | :--- |
-| `lden(lday, levening, lnight, hours=(12, 4, 8))` | $L_{Aeq}$ por periodo [dB]; `hours` debe sumar 24 | +5 dB tarde, +10 dB noche (3.6.4) |
+| `lden(lday, levening, lnight, hours=(12, 4, 8))` | $L_\mathrm{Aeq}$ por periodo [dB]; `hours` debe sumar 24 | +5 dB tarde, +10 dB noche (3.6.4) |
 | `ldn(lday, lnight, hours=(15, 9))` | | +10 dB noche (3.6.5) |
 | `composite_rating_level(periods)` | iterable de `(level_db, hours, adjustment_db)`; horas positivas, finitas y sumando 24 | Fórmulas generales (5)-(6); ajustes según la Tabla A.1 |
 
@@ -187,13 +187,13 @@ corrección, regla que la norma enuncia en ese mismo apartado y razón por la qu
 un indicador de fachada de la Directiva de ruido ambiental, que está *definido*
 para incluir la reflexión, no debe corregirse en absoluto.
 
-Combínalo con `laeq()` por periodo para ir de grabaciones a $L_{den}$. El propio
+Combínalo con `laeq()` por periodo para ir de grabaciones a $L_\mathrm{den}$. El propio
 ajuste tonal se justifica por la vía de audibilidad tonal de la sección
 siguiente (alimentada, para el método de ISO/PAS 20065, por
 [Audibilidad objetiva de tonos en ruido](/phonometry/es/perception/psychoacoustics/tone-audibility/));
 los veredictos `tone_to_noise_ratio()` / `prominence_ratio()` de
 [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/) son un
-cribado de emisión complementario, no la base del $K_t$.
+cribado de emisión complementario, no la base del $K_\mathrm{t}$.
 
 ## Determinación de niveles: ajuste tonal, ruido residual e incertidumbre (ISO 1996-2)
 
@@ -257,20 +257,20 @@ de 2017 abandonó el algoritmo autocontenido y remite en su lugar a ISO/PAS 2006
 lo que conserva es la tabla del Anexo J que convierte una audibilidad *media* en
 un ajuste entero. El algoritmo de 2007 es el implementado aquí, porque funciona
 sobre un único espectro. A partir del nivel tonal
-sumado en energía $L_{pt}$ y el nivel de ruido enmascarante $L_{pn}$ en la banda
+sumado en energía $L_{p\mathrm{t}}$ y el nivel de ruido enmascarante $L_{p\mathrm{n}}$ en la banda
 crítica alrededor de un tono, la audibilidad sobre el umbral de enmascaramiento es
-$\Delta L_{ta} = L_{pt} - L_{pn} + 2 + \log_{10}[1 + (f_c/502)^{2{,}5}]$ dB (Fórmula (C.3)),
-y el ajuste es $K_t = 0$ para $\Delta L_{ta} < 4$, $K_t = \Delta L_{ta} - 4$ para
-$4 \le \Delta L_{ta} \le 10$ y $K_t = 6$ por encima (Fórmulas (C.4)–(C.6)). El
-ancho de banda crítico es 100 Hz hasta 500 Hz y el 20 % de $f_c$ por encima
+$\Delta L_\mathrm{ta} = L_{p\mathrm{t}} - L_{p\mathrm{n}} + 2 + \log_{10}[1 + (f_\mathrm{c}/502)^{2{,}5}]$ dB (Fórmula (C.3)),
+y el ajuste es $K_\mathrm{t} = 0$ para $\Delta L_\mathrm{ta} < 4$, $K_\mathrm{t} = \Delta L_\mathrm{ta} - 4$ para
+$4 \le \Delta L_\mathrm{ta} \le 10$ y $K_\mathrm{t} = 6$ por encima (Fórmulas (C.4)–(C.6)). El
+ancho de banda crítico es 100 Hz hasta 500 Hz y el 20 % de $f_\mathrm{c}$ por encima
 (Tabla C.1). El **método de cribado** en tercios de octava (`tonal_seeking_survey`)
 marca una banda que supera a ambas vecinas en 15/8/5 dB (baja/media/alta), y
 `tonal_adjustment_from_mean_audibility` mapea la audibilidad media de ISO/PAS 20065
-a $K_t$ (Tabla J.1).
+a $K_\mathrm{t}$ (Tabla J.1).
 
 La cadena son tres funciones, no una: `tonal_audibility(Lpt, Lpn, fc)` devuelve
-$\Delta L_{ta}$ a partir de la Fórmula (C.3), `tonal_adjustment(dLta)` lo lleva a
-$K_t$ por las Fórmulas (C.4)-(C.6), y `assess_tonal_audibility(...)` combina las
+$\Delta L_\mathrm{ta}$ a partir de la Fórmula (C.3), `tonal_adjustment(dLta)` lo lleva a
+$K_\mathrm{t}$ por las Fórmulas (C.4)-(C.6), y `assess_tonal_audibility(...)` combina las
 dos con `critical_bandwidth` en el resultado representable que usan los
 fragmentos de abajo. Las dos funciones de nivel más bajo son las que la
 [guía de la normativa española](/phonometry/es/environment/assessment/spanish-noise-regulation/)
@@ -282,7 +282,7 @@ se quiere un paso.
 
 *El ajuste satura por los dos extremos: por debajo de 4 dB de audibilidad un tono
 no cuesta nada y por encima de 10 dB no cuesta más de 6 dB, así que toda la
-decisión vive en una ventana de 6 dB de $\Delta L_{ta}$. Los cuatro ejemplos del
+decisión vive en una ventana de 6 dB de $\Delta L_\mathrm{ta}$. Los cuatro ejemplos del
 Anexo C.5 caen dentro de esa ventana o por encima de ella.*
 
 <details>
@@ -349,11 +349,11 @@ ISO 1996-2:2017 y cada entrada tiene nombre, origen y tamaño:
 
 | Contribución | De dónde sale | $c_j u_j$ |
 | :--- | :--- | :--- |
-| Nivel medido $L_{eq,1h}$ | $u = 0{,}5$ dB, que ya absorbe los 0,5 dB por defecto del propio sonómetro de clase 1, multiplicado por la sensibilidad $c_{L'}$ de la corrección residual de la Fórmula (F.7) | 0,59 dB |
+| Nivel medido $L_\mathrm{eq,1h}$ | $u = 0{,}5$ dB, que ya absorbe los 0,5 dB por defecto del propio sonómetro de clase 1, multiplicado por la sensibilidad $c_{L'}$ de la corrección residual de la Fórmula (F.7) | 0,59 dB |
 | Condiciones de funcionamiento de la fuente | 1 000 vehículos contados, $10/\sqrt{1000}$ (Fórmula (8)) | 0,30 dB |
 | **Meteorología** | condiciones favorables, Fórmula (12) | **2,00 dB** |
 | Posición del micrófono | la corrección de +5,7 dB de enrasado en fachada del Anexo B | 0,40 dB |
-| Sonido residual | $L_{res} = 50$ dB con $u = 2$ dB, a través de la sensibilidad $c_{res}$ de la Fórmula (F.8) | 0,38 dB |
+| Sonido residual | $L_\mathrm{res} = 50$ dB con $u = 2$ dB, a través de la sensibilidad $c_\mathrm{res}$ de la Fórmula (F.8) | 0,38 dB |
 
 `combined_standard_uncertainty` también acepta **pares** $(u_j, c_j)$, así que no
 hace falta premultiplicar a mano los coeficientes de sensibilidad, y
@@ -375,7 +375,7 @@ más a menudo, que es para lo que está
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-El $L_{den}$, el $L_{dn}$ y el nivel de evaluación compuesto de la ISO
+El $L_\mathrm{den}$, el $L_\mathrm{dn}$ y el nivel de evaluación compuesto de la ISO
 1996-1:2016 (apartado 6.5, `environment.lden`/`ldn`/`composite_rating_level`);
 y el ajuste tonal del anexo C de la ISO 1996-2:2007 junto con la corrección de
 ruido residual (apartado 10.4), el balance de incertidumbre de medida
@@ -393,10 +393,10 @@ implementados, solo la aritmética que sigue una vez aplicados.
 
 ## Véase también
 
-- [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): los niveles $L_{eq}$/$L_{Aeq}$, percentiles y de suceso con los que se componen los indicadores de esta página.
-- [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/): el ajuste por impulsividad medido $K_I$, y `rating_level`, que combina subintervalos ya ajustados por impulso sobre un tiempo de referencia, la contraparte subdiaria del `composite_rating_level` de aquí, que combina periodos completos con sus ajustes por franja horaria y por carácter (apartado 6.5 de ISO 1996-1).
+- [Niveles integrados y estadísticos](/phonometry/es/signals/levels/levels/): los niveles $L_\mathrm{eq}$/$L_\mathrm{Aeq}$, percentiles y de suceso con los que se componen los indicadores de esta página.
+- [Prominencia de sonidos impulsivos (NT ACOU 112)](/phonometry/es/environment/assessment/impulsive-sound/): el ajuste por impulsividad medido $K_\mathrm{I}$, y `rating_level`, que combina subintervalos ya ajustados por impulso sobre un tiempo de referencia, la contraparte subdiaria del `composite_rating_level` de aquí, que combina periodos completos con sus ajustes por franja horaria y por carácter (apartado 6.5 de ISO 1996-1).
 - [Normativa española de ruido (RD 1367/2007)](/phonometry/es/environment/assessment/spanish-noise-regulation/): una aplicación nacional de exactamente esta cadena, con sus propias correcciones tonal, de baja frecuencia e impulsiva.
-- [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste $K_t$ (Tabla J.1).
+- [Audibilidad objetiva de tonos en ruido (ISO/PAS 20065)](/phonometry/es/perception/psychoacoustics/tone-audibility/): la audibilidad tonal cuyo valor medio se traduce en el ajuste $K_\mathrm{t}$ (Tabla J.1).
 - [Tonos discretos prominentes](/phonometry/es/perception/psychoacoustics/tone-prominence/): los veredictos de relación tono-ruido y de prominencia de ECMA-418-1, cribado de emisión complementario para la cuestión tonal.
 - [Exposición laboral (ISO 9612)](/phonometry/es/perception/hearing/occupational-exposure/): la contraparte en el puesto de trabajo, de las muestras por tarea al nivel de exposición diario con su balance de incertidumbre.
 - Referencia de la API: [`environment.assessment.measurement`](/phonometry/es/reference/api/environment/measurement/) y [`environment.assessment.rating`](/phonometry/es/reference/api/environment/rating/).
@@ -406,8 +406,8 @@ implementados, solo la aritmética que sigue una vez aplicados.
 
 ### ¿Qué penalizaciones aplica Lden a la tarde y a la noche?
 
-$L_{den}$, el nivel día-tarde-noche de ISO 1996-1:2016 (3.6.4), suma +5 dB
+$L_\mathrm{den}$, el nivel día-tarde-noche de ISO 1996-1:2016 (3.6.4), suma +5 dB
 al nivel de tarde y +10 dB al de noche antes de promediar energéticamente el
 día completo, con periodos por defecto de 12, 4 y 8 horas, ajustables porque
-cada país los define distinto. La variante día-noche $L_{dn}$ (3.6.5)
+cada país los define distinto. La variante día-noche $L_\mathrm{dn}$ (3.6.5)
 conserva solo la penalización de +10 dB de noche.

@@ -17,8 +17,8 @@ plane-wave limits of the tube, and closes with the choice between them.
 
 Out in the field there is no reverberation room. ISO 13472-1 measures the sound
 absorption of a road surface (or any extended flat surface) *in situ* by firing
-an impulse from a loudspeaker at height $d_s$ down onto the surface and recording
-the impulse response at a microphone at height $d_m$. The **incident** and
+an impulse from a loudspeaker at height $d_\mathrm{s}$ down onto the surface and recording
+the impulse response at a microphone at height $d_\mathrm{m}$. The **incident** and
 **reflected** components are separated in time with an Adrienne window; their
 transfer function gives the reflection factor and hence the absorption.
 
@@ -28,15 +28,15 @@ transfer function gives the reflection factor and hence the absorption.
 the direct wave, so it is attenuated by the geometrical-spreading factor
 
 $$
-K_r = \frac{d_s - d_m}{d_s + d_m},
+K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
-which equals $2/3$ for the mandatory geometry $d_s = 1.25$ m, $d_m = 0.25$ m.
+which equals $2/3$ for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m.
 The absorption follows from the windowed incident and reflected spectra
-$H_i$, $H_r$:
+$H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_r(f)}{H_i(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ```python
@@ -110,7 +110,7 @@ result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
 
 *The absorption rises with frequency because the surface reflects less of the
 high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
-dictates through $\alpha = 1 - (1/K_r^2)\,|H_r/H_i|^2$.*
+dictates through $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -159,7 +159,7 @@ plt.show()
 **Maximum sampled area (Annex A).** The finite time window limits how much of the
 surface contributes to the reflection. The maximum sampled area is a circle whose
 radius the library computes from the geometry and window width; the Annex A worked
-example ($d_s = 1.25$ m, $d_m = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
+example ($d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m, $c = 340$ m/s, 5 ms flat window) gives
 about 1.34 m.
 
 ```python
@@ -228,11 +228,11 @@ and dry.
 **Plane-wave limits (Clause 5.4).** The tube supports only plane waves below
 
 $$
-f_u = 0.58\,\frac{c_0}{d},
+f_\mathrm{u} = 0.58\,\frac{c_0}{d},
 $$
 
 with $d$ the tube diameter, and the microphone spacing $s$ must sit between
-$0.05\,c_0/f_{min}$ and $0.45\,c_0/f_{max}$. The reported range is the
+$0.05\,c_0/f_\mathrm{min}$ and $0.45\,c_0/f_\mathrm{max}$. The reported range is the
 one-third-octave bands 250–1600 Hz.
 
 ```python

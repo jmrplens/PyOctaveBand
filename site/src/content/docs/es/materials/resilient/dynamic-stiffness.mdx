@@ -77,14 +77,14 @@ son
 
 $$
 f_0 = \frac{1}{2\pi}\sqrt{\frac{s'}{m'}}, \qquad
-f_r = \frac{1}{2\pi}\sqrt{\frac{s'_t}{m'_t}},
+f_\mathrm{r} = \frac{1}{2\pi}\sqrt{\frac{s'_\mathrm{t}}{m'_\mathrm{t}}},
 $$
 
 por lo que la rigidez dinámica **aparente** se obtiene de la resonancia
 (Fórmula 4):
 
 $$
-s'_t = 4\pi^2\,m'_t\,f_r^2 .
+s'_\mathrm{t} = 4\pi^2\,m'_\mathrm{t}\,f_\mathrm{r}^2 .
 $$
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_dynamic_stiffness_rig_es.svg" alt="Banco de resonancia de EN 29052-1 en tres paneles: las tres disposiciones de excitación de las figuras 1 a 3, una sobre cimentación rígida con la placa de carga excitada y medida, y dos sobre una placa base aislada de al menos 100 kg donde se miden las dos placas y el excitador ataca o la placa de carga o la placa base; debajo, los requisitos de probeta y de carga con el lecho de yeso, la placa de carga de acero y el cordón de vaselina, y el modelo masa-resorte cuyo pico de respuesta da la frecuencia de resonancia" width="92%" />
@@ -95,12 +95,12 @@ de carga cuya masa total por unidad de superficie, placa más carga añadida, es
 estática de un suelo flotante típico, unos 2 kPa, y es la razón de que el
 alcance de la norma se detenga por debajo de 0,4 kPa y por encima de 4 kPa de
 carga. Un excitador vertical mueve el sistema, un acelerómetro recoge su
-respuesta y la resonancia vertical fundamental $f_r$ del sistema placa-probeta
-se lee del pico de la respuesta; la Fórmula 4 la convierte en $s'_t$.
+respuesta y la resonancia vertical fundamental $f_\mathrm{r}$ del sistema placa-probeta
+se lee del pico de la respuesta; la Fórmula 4 la convierte en $s'_\mathrm{t}$.
 
-### 1.1 Obtener $f_r$
+### 1.1 Obtener $f_\mathrm{r}$
 
-La biblioteca toma $f_r$ como entrada, y el apartado 7 es cómo la produce un
+La biblioteca toma $f_\mathrm{r}$ como entrada, y el apartado 7 es cómo la produce un
 laboratorio. Se ofrecen tres señales de excitación y se declaran
 **equivalentes**: sinusoidal, ruido blanco e impulso. La sinusoidal es el
 método de referencia en caso de discrepancia; las excitaciones por ruido blanco
@@ -114,7 +114,7 @@ movimiento vertical, sin componentes de rotación, y se declara junto al
 resultado.
 
 El procedimiento sinusoidal es un barrido a **fuerza de excitación constante**.
-El problema está en que $f_r$ suele depender de esa fuerza, porque una capa
+El problema está en que $f_\mathrm{r}$ suele depender de esa fuerza, porque una capa
 resiliente es no lineal: excítala más fuerte y se ablanda, y el pico se desplaza
 hacia abajo en frecuencia. Así que la norma no pide una resonancia, pide la
 resonancia que tendría el material a amplitud tendente a cero:
@@ -124,8 +124,8 @@ resonancia que tendría el material a amplitud tendente a cero:
    selecciona la rigidez esperada: $0{,}2\ \text{N} \le F \le 0{,}8\ \text{N}$
    para $s' > 50$ MN/m³, y $0{,}1\ \text{N} \le F \le 0{,}4\ \text{N}$ para
    $s' \le 50$ MN/m³.
-3. Extrapolar linealmente los puntos $(F, f_r)$ hasta fuerza nula. **Esa
-   ordenada en el origen** es la $f_r$ que espera la biblioteca.
+3. Extrapolar linealmente los puntos $(F, f_\mathrm{r})$ hasta fuerza nula. **Esa
+   ordenada en el origen** es la $f_\mathrm{r}$ que espera la biblioteca.
 
 ```python
 import numpy as np
@@ -151,7 +151,7 @@ amortiguamiento interno es alto, el máximo de vibración vertical no queda
 pronunciado, y la respuesta de la norma es dejar de mirar el módulo: localizar
 la resonancia a partir del **desfase** entre la señal de excitación y la de
 vibración. Esa fase no es una lectura de repuesto de lo mismo: es una lectura
-más afilada, y ver un barrido pasar por $f_r$ enseña por qué.
+más afilada, y ver un barrido pasar por $f_\mathrm{r}$ enseña por qué.
 
 <Video
   name="anim_dynamic_stiffness_sweep"
@@ -162,7 +162,7 @@ más afilada, y ver un barrido pasar por $f_r$ enseña por qué.
 />
 
 El pico del módulo es ancho, que es lo que hace de él el factor de pérdidas,
-mientras que la fase pasa por $-90°$ de forma abrupta y lo cruza en $f_r$ sea
+mientras que la fase pasa por $-90°$ de forma abrupta y lo cruza en $f_\mathrm{r}$ sea
 cual sea el amortiguamiento. Esa es toda la razón de que la norma ofrezca la
 lectura de fase para materiales amortiguados, y merece la pena tenerla en
 cualquier banco, porque un pico de 2 Hz de ancho es un pico que se puede leer
@@ -170,7 +170,7 @@ con 2 Hz de error.
 
 ### 1.2 Preparar la probeta y el banco
 
-La $f_r$ medida la deciden el asiento y las tolerancias del banco al menos
+La $f_\mathrm{r}$ medida la deciden el asiento y las tolerancias del banco al menos
 tanto como el material, y las dos cosas son normativas.
 
 - **Probetas.** Al menos tres, de 200 mm × 200 mm cada una (apartado 6). Sus
@@ -181,7 +181,7 @@ tanto como el material, y las dos cosas son normativas.
   menos 5 mm de espesor para que quede cubierta cualquier irregularidad, y
   asentar sobre ella la placa de carga **antes de que fragüe el yeso**. Un
   contacto seco o parcial hace que la carga descanse sobre parte del área de la
-  probeta, rigidiza la lectura y sesga $f_r$ hacia arriba.
+  probeta, rigidiza la lectura y sesga $f_\mathrm{r}$ hacia arriba.
 - **Materiales de celda cerrada.** Sellar la junta entre la probeta y la base
   alrededor del perímetro con un cordón de vaselina. Un perímetro sin sellar
   cambia lo que puede hacer el gas encerrado de la sección 2.
@@ -234,10 +234,10 @@ plt.show()
 
 En un material permeable al aire, el aire de los poros añade una rigidez en
 paralelo por su compresión isoterma (Fórmula 7):
-$s'_a = p_0/(d\,\varepsilon)$, con $p_0$ la presión atmosférica, $d$ el
+$s'_\mathrm{a} = p_0/(d\,\varepsilon)$, con $p_0$ la presión atmosférica, $d$ el
 espesor bajo carga y $\varepsilon$ la porosidad. La NOTA resuelta de la
 norma ($p_0 = 0{,}1\ \text{MPa}$, $\varepsilon = 0{,}9$) es
-$s'_a = 111/d$ MN/m³ con $d$ en milímetros:
+$s'_\mathrm{a} = 111/d$ MN/m³ con $d$ en milímetros:
 
 ```python
 from phonometry import materials
@@ -253,9 +253,9 @@ es el aire de los poros y no el material.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/enclosed_gas_stiffness_es.svg" alt="Gráfico log-log de la rigidez dinámica por unidad de área frente al espesor bajo carga de 5 a 60 milímetros: la rigidez del esqueleto es una línea horizontal en 4,94 meganewtons por metro cúbico, el término del gas encerrado cae como 111 partido por el espesor y la cruza cerca de 22 milímetros, y su suma es la rigidez instalada, con la determinación resuelta marcada en 20 milímetros y un eje a la derecha que da la frecuencia natural de un recrecido de 120 kilogramos por metro cuadrado" width="88%" />
 
 *La inversión que decide si una capa delgada puede llegar a ser blanda. La
-rigidez de esqueleto $s'_t$ es una propiedad del material y le da igual el
+rigidez de esqueleto $s'_\mathrm{t}$ es una propiedad del material y le da igual el
 espesor de la capa; el término del gas encerrado
-$s'_a = p_0/(d\varepsilon)$ no, y crece sin límite según se adelgaza la capa.
+$s'_\mathrm{a} = p_0/(d\varepsilon)$ no, y crece sin límite según se adelgaza la capa.
 Por debajo del cruce, cerca de 22 mm, el aire de los poros es el más rígido de
 los dos resortes, así que una capa permeable de 10 mm no puede ser blanda por
 blando que sea su esqueleto: 11 MN/m³ solo de gas devuelven $f_0$ por encima de
@@ -289,10 +289,10 @@ plt.show()
 </details>
 
 La rigidez dinámica del material *instalado* la fija entonces la resistividad
-lateral al flujo $r$ (apartado 8.2): $s' = s'_t$ para
-$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_t + s'_a$ para
+lateral al flujo $r$ (apartado 8.2): $s' = s'_\mathrm{t}$ para
+$r \ge 100\ \text{kPa}\cdot\text{s/m}^2$, $s' = s'_\mathrm{t} + s'_\mathrm{a}$ para
 $10 \le r < 100\ \text{kPa}\cdot\text{s/m}^2$, y para
-$r < 10\ \text{kPa}\cdot\text{s/m}^2$ el método solo resuelve $s' = s'_t$
+$r < 10\ \text{kPa}\cdot\text{s/m}^2$ el método solo resuelve $s' = s'_\mathrm{t}$
 cuando el término del gas es despreciable.
 
 **Por qué decide algo la resistividad lateral.** Bajo la placa de carga la capa
@@ -302,16 +302,16 @@ esqueleto. Solo en el segundo caso es un resorte en paralelo con el esqueleto, y
 la resistividad lateral al flujo es exactamente lo que decide cuál de las dos
 ocurre. Eso se corresponde con las tres ramas. Con $r$ **alta** el aire queda
 atrapado tanto en la probeta de 200 mm como bajo un suelo completo, así que la
-$s'_t$ que midió el banco ya lo contiene y no se añade nada. Con $r$
+$s'_\mathrm{t}$ que midió el banco ya lo contiene y no se añade nada. Con $r$
 **intermedia** escapa de la probeta pequeña pero no de un suelo de varios metros
-de lado, así que la norma calcula $s'_a$ y lo vuelve a sumar. Con $r$ **baja**
+de lado, así que la norma calcula $s'_\mathrm{a}$ y lo vuelve a sumar. Con $r$ **baja**
 escapa de los dos: no hay resorte de gas que sumar, pero el método tampoco puede
-ya separar las dos contribuciones. En ese tercer caso, declarar $s' = s'_t$ con
-la reserva, y enunciar el error estimado de despreciar $s'_a$: la norma pide
+ya separar las dos contribuciones. En ese tercer caso, declarar $s' = s'_\mathrm{t}$ con
+la reserva, y enunciar el error estimado de despreciar $s'_\mathrm{a}$: la norma pide
 exactamente eso. Fíjate además en de dónde sale $r$: es la misma propiedad
 viscosa que mide la ISO 9053, pero a lo largo de la capa en lugar de a través
 de ella, y aquí es una entrada y no algo que determine el método. Toma la
-porosidad $\varepsilon$ de $s'_a$ como el 0,9 de la norma salvo que se haya
+porosidad $\varepsilon$ de $s'_\mathrm{a}$ como el 0,9 de la norma salvo que se haya
 medido.
 
 **Ojo al prefijo.** $r$ es la magnitud que la ISO 9053 llama $\sigma$ y da
@@ -351,15 +351,15 @@ y su `.plot()` dibuja la curva de diseño $f_0(s')$.
 
 `DynamicStiffnessResult.report(path)` genera un informe de ensayo de rigidez
 dinámica acreditado de una página (EN 29052-1:1992 = ISO 9052-1:1989): una
-cabecera de metadatos (probeta, la masa total por unidad de superficie $m'_t$
+cabecera de metadatos (probeta, la masa total por unidad de superficie $m'_\mathrm{t}$
 empleada durante el ensayo, el espesor bajo carga $d$ (en metros, mostrado en
 mm), instalación de ensayo,
-clima), una tabla compacta de resultados (la frecuencia de resonancia $f_r$, la
-rigidez aparente $s'_t$ de la Fórmula 4, el término del gas encerrado $s'_a$
+clima), una tabla compacta de resultados (la frecuencia de resonancia $f_\mathrm{r}$, la
+rigidez aparente $s'_\mathrm{t}$ de la Fórmula 4, el término del gas encerrado $s'_\mathrm{a}$
 cuando procede, la rigidez instalada $s'$ del apartado 8.2 y la frecuencia
 natural $f_0$ de la Fórmula 2) junto a la curva de diseño $f_0(s')$, y una
-rigidez dinámica aparente $s'_t$ enmarcada con la instalada $s'$ y la resonancia
-$f_r$ al lado. El apartado 9 redondea cada rigidez al MN/m³ más próximo. Es una
+rigidez dinámica aparente $s'_\mathrm{t}$ enmarcada con la instalada $s'$ y la resonancia
+$f_\mathrm{r}$ al lado. El apartado 9 redondea cada rigidez al MN/m³ más próximo. Es una
 caracterización, por lo que no hay veredicto de cumple/no cumple; `language="es"`
 genera la ficha en español. La ficha siempre incrusta la curva de diseño
 $f_0(s')$, por lo que requiere los extras de informes y de gráficos
@@ -397,7 +397,7 @@ res.report(
 La evaluación trata el banco como un sistema de un grado de libertad: la
 placa de carga se mueve como un pistón rígido sobre un resorte sin masa. Eso
 se cumple mientras la probeta sea ligera frente a la placa y su primera
-resonancia interna quede bastante por encima de $f_r$; una capa pesada o muy
+resonancia interna quede bastante por encima de $f_\mathrm{r}$; una capa pesada o muy
 gruesa empieza a comportarse como un sistema distribuido y la lectura simple
 de la Fórmula 4 se degrada. De la precarga se derivan tres trampas prácticas:
 
@@ -414,11 +414,11 @@ de la Fórmula 4 se degrada. De la precarga se derivan tres trampas prácticas:
 * **Cuidar el contacto.** La norma asienta la placa de carga sobre una capa
   fina de unión (una pasta de yeso) para que toda el área de la probeta
   soporte la carga. Un contacto seco e irregular concentra la fuerza,
-  rigidiza la respuesta localmente y sesga $f_r$ hacia arriba.
+  rigidiza la respuesta localmente y sesga $f_\mathrm{r}$ hacia arriba.
 
 ### 3.1 Leer $s'$, y qué compra
 
-La frecuencia natural que importa al final no es la $f_r$ del banco sino la
+La frecuencia natural que importa al final no es la $f_\mathrm{r}$ del banco sino la
 $f_0$ del suelo instalado según la Fórmula 2. De ahí salen dos preguntas, y la
 página le debe respuesta a las dos.
 
@@ -499,8 +499,8 @@ apartado 9.
 
 <ScopeClaim status="not-covered" label="No cubierto">
 El procedimiento de medición del apartado 7, que extrae la frecuencia de
-resonancia $f_r$ de la señal bruta de excitación-respuesta por métodos
-sinusoidal, de ruido blanco o de impulso, no está implementado: pasa una $f_r$
+resonancia $f_\mathrm{r}$ de la señal bruta de excitación-respuesta por métodos
+sinusoidal, de ruido blanco o de impulso, no está implementado: pasa una $f_\mathrm{r}$
 ya extrapolada, obtenida como describe la sección 1.1 (la extrapolación en sí
 es un ajuste por recta, que la sección 1.1 muestra). La resistividad al flujo
 lateral $r$ del apartado 8.2 también se toma como entrada en lugar de medirse;

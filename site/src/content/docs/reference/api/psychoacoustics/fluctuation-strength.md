@@ -21,7 +21,7 @@ Two routes are provided:
 * [`fluctuation_strength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/#fluctuation_strength) -- the signal model of Osses, García &
   Kohlrausch (2016), which estimates `F` from an arbitrary calibrated pressure
   signal. It sums specific contributions over 47 auditory filters,
-  $F = C_{FS} \sum_i (m^*_i)^{p_m} |k_{i-2} k_i|^{p_k} g(z_i)^{p_g}$
+  $F = C_\mathrm{FS} \sum_i (m^*_i)^{p_m} |k_{i-2} k_i|^{p_k} g(z_i)^{p_g}$
   (Osses 2016 Eq. 1),
   where `m*` is a generalised modulation depth, `k` a cross-covariance
   between neighbouring bands and `g(z)` a frequency weighting.
@@ -87,14 +87,14 @@ FM tones. For an exact figure on AM broadband noise use
 it is derived once from the 1-vacil reference stimulus (1 kHz, 60 dB,
 $m = 1$, 4 Hz) run through this implementation's front-end, so
 the reference returns **exactly 1.00 vacil by construction**
-($C_{FS} \approx 0.28$; see `_c_fs`).
+($C_\mathrm{FS} \approx 0.28$; see `_c_fs`).
 
 **Achieved tolerance** (against Osses 2016 Table 1 literature values):
 the reference tone is 1.00 vacil exactly; the AM-tone 70 dB sweep
-($f_{mod} = 1, 2, 4, 8, 16, 32$ Hz) has Pearson correlation
+($f_\mathrm{mod} = 1, 2, 4, 8, 16, 32$ Hz) has Pearson correlation
 ≈ 0.98 with
 the literature, peaks at 4 Hz and stays within a factor ≈ 2.1 at every
-point; the AM-tone carrier sweep at $f_{mod} = 4$ Hz reproduces
+point; the AM-tone carrier sweep at $f_\mathrm{mod} = 4$ Hz reproduces
 the
 Fastl & Zwicker Fig. 10.5 trend (low-mid plateau, roll-off at 8 kHz);
 the AM broadband-noise 60 dB sweep shows the correct band-pass shape
@@ -132,7 +132,7 @@ fluctuation_strength_am_noise(
 Fluctuation strength of AM broadband noise (Fastl & Zwicker Eq. 10.2).
 
 $$
-F = \frac{5.8 \, (1.25 m - 0.25) \left[ 0.05 \, (L/\text{dB}) - 1 \right]}{(f_{mod}/5~\text{Hz})^2 + (4~\text{Hz}/f_{mod}) + 1.5}
+F = \frac{5.8 \, (1.25 m - 0.25) \left[ 0.05 \, (L/\text{dB}) - 1 \right]}{(f_\mathrm{mod}/5~\text{Hz})^2 + (4~\text{Hz}/f_\mathrm{mod}) + 1.5}
 $$
 
 in vacil, the closed form for a sinusoidally amplitude-modulated

@@ -54,7 +54,7 @@ reference-value pitfall, is covered in
 The rigid circular **piston in an infinite baffle** is the canonical radiator
 behind a loudspeaker cone, the open end of a duct and the radiation efficiency
 of any finite vibrating surface (Beranek & Mellow §4.19, §13.7). Its mechanical
-radiation impedance is $Z_r = \rho c S\,(R_1 + jX_1)$ with $S = \pi a^2$ and the
+radiation impedance is $Z_\mathrm{r} = \rho c S\,(R_1 + jX_1)$ with $S = \pi a^2$ and the
 dimensionless resistance and reactance functions (Eqs. (13.117), (13.118))
 
 $$
@@ -64,7 +64,7 @@ $$
 
 with $J_1$ the Bessel function and $H_1$ the Struve function of order one. At
 low frequency $R_1 \to (ka)^2/2$ and the reactance is mass-like with the
-radiation mass $M_r = 8\rho a^3/3$ (Eq. (4.151)); at high frequency
+radiation mass $M_\mathrm{r} = 8\rho a^3/3$ (Eq. (4.151)); at high frequency
 $R_1 \to 1$, $X_1 \to 0$ and the piston radiates as into an infinite tube. The
 far field follows the directivity
 $D(\theta) = 2 J_1(ka\sin\theta)/(ka\sin\theta)$, whose first null is at
@@ -369,21 +369,21 @@ Equations (18.13) to (18.24)) writes that loop with two decibel gains:
 
 $$
 \begin{aligned}
-Z_S &= L_{H\text{-}L} - L_{T\text{-}M}
+Z_\mathrm{S} &= L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}
   && \text{(Eq. (18.17))  open-loop system gain} \\
-G_S &= L_{H\text{-}M} - L_{H\text{-}L} + D_M(\theta)
+G_\mathrm{S} &= L_{\mathrm{H}\text{-}\mathrm{M}} - L_{\mathrm{H}\text{-}\mathrm{L}} + D_\mathrm{M}(\theta)
   && \text{(Eq. (18.18))  feedback-loop gain}
 \end{aligned}
 $$
 
-$Z_S$ is the level the loudspeaker produces at an average listener minus the
-level the talker produces at the microphone; $Z_S = -6$ dB, typical of an
+$Z_\mathrm{S}$ is the level the loudspeaker produces at an average listener minus the
+level the talker produces at the microphone; $Z_\mathrm{S} = -6$ dB, typical of an
 auditorium or a church, means a comfortable conversational level at twice the
-talker-to-microphone distance. $D_M(\theta)$ is the directivity index of the
+talker-to-microphone distance. $D_\mathrm{M}(\theta)$ is the directivity index of the
 microphone toward the loudspeaker *relative to* the talker: zero for an
 omnidirectional microphone, about −2 to −3 dB for a cardioid pointed at the
 talker. Summing the infinite series of round trips, the system oscillates when
-the loop gain reaches unity, that is $Z_S + G_S = 0$ (Equation (18.16)).
+the loop gain reaches unity, that is $Z_\mathrm{S} + G_\mathrm{S} = 0$ (Equation (18.16)).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/sound_reinforcement_geometry.svg" alt="Schematic of a sound-reinforcement feedback loop: the talker 0.3 metres in front of the microphone, the flown loudspeaker 4 metres from the microphone and 12 metres from the average listener, with the signal path drawn solid and the feedback path dashed" width="85%"></picture>
 
@@ -397,11 +397,11 @@ equalised system (other authors quote 12 dB unequalised and 6 dB carefully
 equalised): 6 dB of it covers a sustained tone adding in phase with a reflection
 off a hard surface, and the remaining 4 dB is safety. With several microphones
 open at once the returned signals add at the mixer, which the
-number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_m$
+number-of-open-microphones correction $\Delta L_\text{nom} = 10\log_{10} N_\mathrm{m}$
 accounts for (Equation (18.23)). The criterion is then
 
 $$
-Z_S + L_{H\text{-}M} + \Delta L_\text{nom} \le L_{H\text{-}L} - D_M(\theta) - 10.
+Z_\mathrm{S} + L_{\mathrm{H}\text{-}\mathrm{M}} + \Delta L_\text{nom} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 10.
 $$
 
 ```python
@@ -423,8 +423,8 @@ res.plot()      # the gain structure against the oscillation and margin lines
 ```
 
 Those two special cases are Long's own (Equations (18.21) and (18.22)): with
-$Z_S = -6$ dB the criterion collapses to
-$L_{H\text{-}M} \le L_{H\text{-}L} - D_M(\theta) - 4$, so an omnidirectional
+$Z_\mathrm{S} = -6$ dB the criterion collapses to
+$L_{\mathrm{H}\text{-}\mathrm{M}} \le L_{\mathrm{H}\text{-}\mathrm{L}} - D_\mathrm{M}(\theta) - 4$, so an omnidirectional
 microphone must see the loudspeaker 4 dB below the average level in the
 audience, while a cardioid may let it rise to 2 dB below.
 
@@ -432,18 +432,18 @@ audience, while a cardioid may let it rise to 2 dB below.
 > `+ D_M(theta)` on the right-hand side, which contradicts the Equations (18.20) to
 > (18.22) it generalises and would turn the benefit of a directional microphone
 > into a penalty. `feedback_stability` implements the sign of Equation (18.20),
-> so that $N_m = 1$ reproduces Long's own special cases exactly. The defect is
+> so that $N_\mathrm{m} = 1$ reproduces Long's own special cases exactly. The defect is
 > recorded in the [errata registry](../../ERRATA.md).
 
 ### `feedback_stability()` parameters
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_loop_gain` | float | dB | finite | $Z_S = L_{H\text{-}L} - L_{T\text{-}M}$; about −6 dB in an auditorium |
-| `level_loudspeaker_at_microphone` | float | dB | finite | $L_{H\text{-}M}$ |
-| `level_loudspeaker_at_listener` | float | dB | finite | $L_{H\text{-}L}$ |
-| `microphone_directivity` | float | dB | default 0 | $D_M(\theta)$, 0 omni, about −2 cardioid |
-| `open_microphones` | int | — | ≥ 1, default 1 | $N_m$ |
+| `open_loop_gain` | float | dB | finite | $Z_\mathrm{S} = L_{\mathrm{H}\text{-}\mathrm{L}} - L_{\mathrm{T}\text{-}\mathrm{M}}$; about −6 dB in an auditorium |
+| `level_loudspeaker_at_microphone` | float | dB | finite | $L_{\mathrm{H}\text{-}\mathrm{M}}$ |
+| `level_loudspeaker_at_listener` | float | dB | finite | $L_{\mathrm{H}\text{-}\mathrm{L}}$ |
+| `microphone_directivity` | float | dB | default 0 | $D_\mathrm{M}(\theta)$, 0 omni, about −2 cardioid |
+| `open_microphones` | int | — | ≥ 1, default 1 | $N_\mathrm{m}$ |
 | `stability_margin` | float | dB | ≥ 0, default 10 | Long's equalised-system margin |
 
 Returns a `FeedbackStabilityResult` (`open_loop_gain`, `feedback_loop_gain`,

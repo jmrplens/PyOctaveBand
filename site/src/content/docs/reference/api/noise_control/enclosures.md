@@ -13,18 +13,18 @@ inside the small, hard cavity. Bies, Hansen & Howard, *Engineering Noise
 Control* 5th ed., §7.4.2 (Eqs. (7.103), (7.111)) write the net reduction as
 
 $$
-\mathrm{IL} = R - C, \qquad C = 10 \log_{10}\!\left[0.3 + \frac{S_E (1 - \alpha_i)}{S_i \alpha_i}\right],
+\mathrm{IL} = R - C, \qquad C = 10 \log_{10}\!\left[0.3 + \frac{S_\mathrm{E} (1 - \alpha_\mathrm{i})}{S_\mathrm{i} \alpha_\mathrm{i}}\right],
 $$
 
 where `R` is the field-incidence transmission loss of the enclosure panels,
 `S_E` the external surface area, `S_i` the internal surface area (including
 the machine) and `alpha_i` the mean absorption of the enclosure interior. The
 reverberant term is exactly `S_E` over the interior **room constant**
-$R_i = S_i \alpha_i / (1 - \alpha_i)$
+$R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i} / (1 - \alpha_\mathrm{i})$
 ([`phonometry.room.room_constant`](/phonometry/reference/api/rooms/steady-field/#room_constant)), so
 
 $$
-C = 10 \log_{10}(0.3 + S_E / R_i).
+C = 10 \log_{10}(0.3 + S_\mathrm{E} / R_\mathrm{i}).
 $$
 
 A hard interior (`alpha_i` small) makes `C` large and wastes much of the
@@ -39,12 +39,12 @@ Norton & Karczub, *Fundamentals of Noise and Vibration Analysis for Engineers*
 power balance but **without the `0.3`**:
 
 $$
-\mathrm{IL} = R - 10 \log_{10}(S_E / R_i),
+\mathrm{IL} = R - 10 \log_{10}(S_\mathrm{E} / R_\mathrm{i}),
 $$
 
 so a well-lined enclosure keeps rising instead of levelling off at
 $R + 5.2$. The two agree to a few tenths of a decibel while
-$S_E / R_i$ stays above about
+$S_\mathrm{E} / R_\mathrm{i}$ stays above about
 unity (a hard or lightly lined interior) and diverge once the lining takes over,
 where Bies' floor is the safer statement. `model` selects between them, and
 the difference is the reason a published worked answer has to be reproduced with
@@ -82,8 +82,8 @@ enclosure_insertion_loss(
 Net insertion loss of a machine enclosure (Bies Eqs. (7.103), (7.111)).
 
 $\mathrm{IL} = R - C$ with
-$C = 10 \log_{10}(0.3 + S_E / R_i)$ and the interior room
-constant $R_i = S_i \alpha_i / (1 - \alpha_i)$.
+$C = 10 \log_{10}(0.3 + S_\mathrm{E} / R_\mathrm{i})$ and the interior room
+constant $R_\mathrm{i} = S_\mathrm{i} \alpha_\mathrm{i} / (1 - \alpha_\mathrm{i})$.
 
 **Parameters**
 
@@ -94,7 +94,7 @@ constant $R_i = S_i \alpha_i / (1 - \alpha_i)$.
 | `internal_area` | Internal surface area `S_i` (including the machine), m2. |
 | `internal_absorption` | Mean interior absorption `alpha_i` in `(0, 1)` (scalar or per-band). |
 | `frequencies` | Band centre frequencies, Hz; required when `panel_transmission_loss` is a callable, optional otherwise (used to label the result and the plot). |
-| `model` | Interior build-up model, one of [`ENCLOSURE_MODELS`](/phonometry/reference/api/noise_control/enclosures/#enclosure_models): `"bies"` (default) carries the `0.3` floor of Bies Equation (7.111), `"norton"` the bare $C = 10 \log_{10}(S_E / R_i)$ of Norton & Karczub Equation (4.115). |
+| `model` | Interior build-up model, one of [`ENCLOSURE_MODELS`](/phonometry/reference/api/noise_control/enclosures/#enclosure_models): `"bies"` (default) carries the `0.3` floor of Bies Equation (7.111), `"norton"` the bare $C = 10 \log_{10}(S_\mathrm{E} / R_\mathrm{i})$ of Norton & Karczub Equation (4.115). |
 
 **Returns:** An [`EnclosureResult`](/phonometry/reference/api/noise_control/enclosures/#enclosureresult).
 
@@ -213,7 +213,7 @@ and `IL` curves, the boxed mean insertion loss over the analysis
 bands with the external and internal surface areas, an optional verdict
 row against a declared minimum, and a method-basis strip stating
 $\mathrm{IL} = R - C$ with
-$C = 10 \log_{10}(0.3 + S_E / R_i)$.
+$C = 10 \log_{10}(0.3 + S_\mathrm{E} / R_\mathrm{i})$.
 
 **Parameters**
 

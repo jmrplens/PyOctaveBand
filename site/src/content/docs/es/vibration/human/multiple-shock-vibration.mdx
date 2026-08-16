@@ -198,10 +198,10 @@ significativa a la Fórmula (3). La dosis de una jornada la deciden por tanto un
 puñado de impactos, que es también la razón de que el recuento de picos sea
 robusto frente a cómo trate la regla de cruces por cero a los pequeños.
 
-Una dosis diaria escala la dosis medida al tiempo de exposición diario $t_d$
-sobre el tiempo de medida $t_m$ (Fórmula 4):
-$D_{zd} = D_z\,(t_d/t_m)^{1/6}$. Para comparar exposiciones distintas, la norma
-recomienda $t_d$ = 8 h.
+Una dosis diaria escala la dosis medida al tiempo de exposición diario $t_\mathrm{d}$
+sobre el tiempo de medida $t_\mathrm{m}$ (Fórmula 4):
+$D_{z\mathrm{d}} = D_z\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$. Para comparar exposiciones distintas, la norma
+recomienda $t_\mathrm{d}$ = 8 h.
 
 ```python
 from phonometry import vibration
@@ -261,19 +261,19 @@ plt.show()
 ## 5. Riesgo de lesión (Anexo C)
 
 La dosis diaria se convierte en una **tensión compresiva** diaria
-$S_d = m_z\,D_{zd}$ (Fórmula C.1), donde $m_z$ (0,029 MPa por m/s² para un
+$S_\mathrm{d} = m_z\,D_{z\mathrm{d}}$ (Fórmula C.1), donde $m_z$ (0,029 MPa por m/s² para un
 hombre de 82 kg, 0,025 para una mujer de 64 kg) convierte la aceleración en
 tensión vertebral. La tensión se acumula sobre los años de exposición frente a
 la resistencia última decreciente de la columna que envejece
-$S_u = 6{,}75\ \mathrm{MPa} - S_{\mathrm{age}}\,(b+i)$ (Fórmulas C.3/C.4):
+$S_\mathrm{u} = 6{,}75\ \mathrm{MPa} - S_{\mathrm{age}}\,(b+i)$ (Fórmulas C.3/C.4):
 
 $$
 R = \left[\sum_{i=0}^{n-1}
-\left(\frac{S_d\,N^{1/6}}{S_{u,i} - S_{\mathrm{stat}}}\right)^{6}\right]^{1/6},
+\left(\frac{S_\mathrm{d}\,N^{1/6}}{S_{\mathrm{u},i} - S_{\mathrm{stat}}}\right)^{6}\right]^{1/6},
 $$
 
 donde $b$ es la edad a la que empezó la exposición, $n$ el número de años de
-exposición, $i$ el contador de años $0 \le i \le n-1$ (de modo que $S_{u,i}$ es
+exposición, $i$ el contador de años $0 \le i \le n-1$ (de modo que $S_{\mathrm{u},i}$ es
 la resistencia última a la edad $b+i$) y $N$ el número de días de exposición al
 año. $S_{\mathrm{stat}} = m_z \times 9{,}81\ \mathrm{m/s^2}$ es la tensión
 compresiva estática que la columna ya soporta bajo la gravedad — 0,284 MPa con
@@ -341,7 +341,7 @@ for sex, mz in (("male", 0.029), ("female", 0.025)):
 La tensión compresiva más baja cae en la banda más alta, porque los umbrales
 femeninos de la Tabla C.2 son todavía más bajos. La NOTA 5 del Anexo C recoge el
 mismo resultado para esta exposición y cita $R$ = 0,97 frente al 0,96 calculado
-aquí, un redondeo de su propio $S_d$ impreso; la banda, y por tanto el veredicto,
+aquí, un redondeo de su propio $S_\mathrm{d}$ impreso; la banda, y por tanto el veredicto,
 es la misma. Los coeficientes $\alpha$ y $\beta$ de la Fórmula (C.5) y los
 umbrales de la Tabla C.2 para sujetos femeninos se apoyan en un conjunto de datos
 más pequeño, como anota la norma al pie de ambas tablas.
@@ -374,7 +374,7 @@ result.plot()   # la curva de probabilidad de lesión con la R de esta evaluaci�
 Si se omiten, la dosis medida se toma sin cambios como dosis diaria, lo cual
 solo es correcto cuando el registro ya cubre toda la exposición diaria: para
 este registro de 10 s y una jornada de 4 h ese atajo divide la dosis entre
-$(t_d/t_m)^{1/6} = 3{,}36$ y declara $R = 0{,}46$ en lugar de $1{,}53$ — un 3 %
+$(t_\mathrm{d}/t_\mathrm{m})^{1/6} = 3{,}36$ y declara $R = 0{,}46$ en lugar de $1{,}53$ — un 3 %
 de probabilidad de lesión donde la exposición da un 58 %.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/multiple_shock_es.svg" alt="Izquierda: la transmisibilidad asiento-columna sube hasta cerca de 1,6 en una resonancia de 5 Hz y luego cae casi a cero en 80 Hz. Derecha: la probabilidad de lesión lumbar de Weibull frente a la variable de tensión R para hombre y mujer, con los niveles de riesgo del 10, 50 y 90 por ciento y el ejemplo masculino del Anexo C en R = 1,22, en torno al 37 por ciento" width="96%" />
@@ -419,8 +419,8 @@ plt.show()
 
 </details>
 
-El `MultipleShockResult` lleva la dosis $D_z$, la dosis diaria $D_{zd}$, la
-tensión compresiva $S_d$, la variable de tensión $R$, la probabilidad de lesión
+El `MultipleShockResult` lleva la dosis $D_z$, la dosis diaria $D_{z\mathrm{d}}$, la
+tensión compresiva $S_\mathrm{d}$, la variable de tensión $R$, la probabilidad de lesión
 y los picos de respuesta, y su `.plot()` dibuja la curva de probabilidad de
 lesión con los umbrales de riesgo del 10/50/90 % de la Tabla C.2. El modelo es
 solo para el
@@ -441,8 +441,8 @@ instrumentación, calibración), la rejilla del escenario de exposición (sexo d
 sujeto, la edad $b$ al inicio de la exposición, el número de años de exposición
 $n$, el número de días de exposición por año $N$ y el número de choques de
 respuesta contabilizados) y la tabla de análisis de dosis y tensión con la dosis
-de aceleración $D_z$ (Fórmula 3), la dosis diaria $D_{zd}$ (Fórmula 4), la
-tensión compresiva diaria $S_d$ (Fórmula C.1), la variable de tensión acumulada
+de aceleración $D_z$ (Fórmula 3), la dosis diaria $D_{z\mathrm{d}}$ (Fórmula 4), la
+tensión compresiva diaria $S_\mathrm{d}$ (Fórmula C.1), la variable de tensión acumulada
 $R$ (Fórmula C.3) y la probabilidad de lesión lumbar $\Pi$ (Fórmula C.5).
 
 Como la ISO 2631-5:2018 no define ningún límite de exposición, la ficha lleva

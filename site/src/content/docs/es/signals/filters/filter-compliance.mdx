@@ -86,7 +86,7 @@ print(result["bands"][0])
 ```
 
 **Hasta dónde de la máscara llega realmente el veredicto.**
-`checked_to_omega` es la frecuencia normalizada $\Omega = f/f_m$ más alta a la
+`checked_to_omega` es la frecuencia normalizada $\Omega = f/f_\mathrm{m}$ más alta a la
 que se evaluó esa banda, y en un banco multitasa es el propio Nyquist diezmado
 de la banda, no el final de la máscara de la Tabla 1. En el banco de arriba va
 de 3,81 a 1,20, así que el requisito de banda atenuada lejana — al menos 70 dB
@@ -127,7 +127,7 @@ máscara.
 La propia máscara de aceptación de la Tabla 1 también es pública:
 `class_limits(fraction, filter_class, omega)` devuelve los límites
 mínimo/máximo de atenuación relativa en frecuencias normalizadas
-$\Omega = f/f_m$,
+$\Omega = f/f_\mathrm{m}$,
 los mismos límites que usan el verificador y la figura de abajo.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/class_mask_overlay_es.svg" alt="Respuesta Butterworth serpenteando entre las regiones prohibidas de la máscara de clase 1 de IEC 61260-1" width="80%" />

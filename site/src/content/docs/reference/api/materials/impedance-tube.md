@@ -65,7 +65,7 @@ air_density_iso(
 
 Air density (ISO 10534-2:2001, Eq. (7)).
 
-$\rho = \rho_0 (p_a T_0) / (p_0 T)$ with $\rho_0 = 1.186$
+$\rho = \rho_0 (p_\mathrm{a} T_0) / (p_0 T)$ with $\rho_0 = 1.186$
 kg/m3, $T_0 = 293$ K and $p_0 = 101.325$ kPa.
 
 **Parameters**
@@ -88,7 +88,7 @@ apply_mic_calibration(
 
 Apply the microphone calibration factor (ISO 10534-2, Eq. (13)).
 
-$H_{12} = H_{12,\text{uncorrected}} / H_c$.
+$H_{12} = H_{12,\text{uncorrected}} / H_\mathrm{c}$.
 
 **Parameters**
 
@@ -129,7 +129,7 @@ Hydraulic diameter of a rectangular tube, $4A/P$ (ISO 10534-2, A.2.1.5).
 
 For a rectangular cross-section of side lengths `w` and `h` the ratio
 of four times the area to the perimeter reduces to
-$d_h = 2wh/(w + h)$; a square tube gives `d_h` equal to the side
+$d_\mathrm{h} = 2wh/(w + h)$; a square tube gives `d_h` equal to the side
 length. This is the `d` the Eq. (A.18) attenuation estimate expects for
 rectangular tubes (see [`tube_attenuation_constant`](/phonometry/reference/api/materials/impedance-tube/#tube_attenuation_constant)).
 
@@ -140,7 +140,7 @@ rectangular tubes (see [`tube_attenuation_constant`](/phonometry/reference/api/m
 | `width` | Inner side length `w`, in metres. |
 | `height` | Inner side length `h`, in metres. |
 
-**Returns:** Hydraulic diameter $d_h = 4A/P$, in metres.
+**Returns:** Hydraulic diameter $d_\mathrm{h} = 4A/P$, in metres.
 
 ## ImpedanceTubeResult
 
@@ -274,7 +274,7 @@ mic_calibration_factor(
 
 Microphone-mismatch calibration factor `Hc` (ISO 10534-2, Eq. (10)).
 
-$H_c = \sqrt{H_{12}^{I} / H_{12}^{II}}$ from a transfer function measured on an
+$H_\mathrm{c} = \sqrt{H_{12}^{I} / H_{12}^{II}}$ from a transfer function measured on an
 absorptive specimen in the standard configuration (I) and with the two
 microphones physically interchanged (II) - the cabling to the analyser is
 **not** swapped (Clause 7.5.2).
@@ -339,11 +339,11 @@ plane_wave_frequency_range(
 Working plane-wave frequency range `(f_l, f_u)` (ISO 10534-2, 4.2-4.5).
 
 The upper limit is the smaller of the microphone-spacing bound
-$f_u s < 0.45 c_0$ (Eq. (4)) and, when the tube `diameter` is
-given, the cut-on bound $f_u d < 0.58 c_0$ for a circular tube
-(Eq. (2)) or $f_u d < 0.50 c_0$ for a rectangular tube (Eq. (3)).
+$f_\mathrm{u} s < 0.45 c_0$ (Eq. (4)) and, when the tube `diameter` is
+given, the cut-on bound $f_\mathrm{u} d < 0.58 c_0$ for a circular tube
+(Eq. (2)) or $f_\mathrm{u} d < 0.50 c_0$ for a rectangular tube (Eq. (3)).
 The lower limit uses the Clause 4.2 guideline that the spacing exceed
-5 % of the wavelength, i.e. $f_l = c_0 / (20 s)$.
+5 % of the wavelength, i.e. $f_\mathrm{l} = c_0 / (20 s)$.
 
 **Parameters**
 
@@ -459,11 +459,11 @@ reflection_factor(
 Complex reflection factor at the sample surface (ISO 10534-2, Eq. (17)).
 
 $$
-r = \frac{H_{12} - H_I}{H_R - H_{12}} \, e^{+2jk_0x_1}
+r = \frac{H_{12} - H_\mathrm{I}}{H_\mathrm{R} - H_{12}} \, e^{+2jk_0x_1}
 $$
 
 with the incident- and reflected-wave transfer functions
-$H_I = e^{-jk_0s}$ (Eq. (D.5)) and $H_R = e^{+jk_0s}$
+$H_\mathrm{I} = e^{-jk_0s}$ (Eq. (D.5)) and $H_\mathrm{R} = e^{+jk_0s}$
 (Eq. (D.6)), `s` the microphone spacing and `x1` the distance from
 the sample to the **farther** microphone (Clause 7.7).
 

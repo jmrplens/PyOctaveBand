@@ -2,9 +2,9 @@
 
 # Spanish Noise Regulation (RD 1367/2007)
 
-Acoustic assessment in Spain does not stop at an $L_{Aeq}$. Real Decreto
+Acoustic assessment in Spain does not stop at an $L_\mathrm{Aeq}$. Real Decreto
 1367/2007, which develops Ley 37/2003 del Ruido, defines an index of its own,
-the **corrected equivalent continuous sound pressure level** $L_{Keq,T}$, and
+the **corrected equivalent continuous sound pressure level** $L_{\mathrm{Keq},T}$, and
 builds the whole compliance chain on it: the day is split into evaluation
 periods, each period into noise phases, each phase is corrected for tonal,
 low-frequency and impulsive character, the result is integrated up to an
@@ -13,7 +13,7 @@ off the same limit table. This page implements that chain end to end.
 
 The per-period levels that feed it come from
 [Integrated & Statistical Levels](../../signals/levels/levels.md), and the European
-$L_{den}$/$L_{dn}$ indicators they coexist with, from
+$L_\mathrm{den}$/$L_\mathrm{dn}$ indicators they coexist with, from
 [Environmental levels](environmental-levels.md).
 
 ## The corrected level LKeq and its three corrections
@@ -21,10 +21,10 @@ $L_{den}$/$L_{dn}$ indicators they coexist with, from
 The index of the regulation is (Annex I A.2 c):
 
 $$
-L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i
+L_{\mathrm{Keq},T} = L_{\mathrm{Aeq},T} + K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}
 $$
 
-where $L_{Aeq,T}$ is the A-weighted equivalent continuous sound pressure level,
+where $L_{\mathrm{Aeq},T}$ is the A-weighted equivalent continuous sound pressure level,
 already corrected for background noise, and the three corrections penalise the
 character of the noise. Each is 0, 3 or 6 dB, and their sum is capped at 9 dB
 (Annex IV A.3.3), a cap exposed as `RD1367_MAX_CORRECTION`. Although the index
@@ -32,12 +32,12 @@ derives from an A-weighted level, the regulation expresses it in dB.
 
 | Correction | Input quantity | Thresholds | Function |
 | :--- | :--- | :--- | :--- |
-| $K_t$, emergent tonal components | **Unweighted** one-third-octave spectrum; $L_t = L_f - L_s$, with $L_s$ the **arithmetic** mean of the two adjacent bands | 8/12 dB (20 to 125 Hz), 5/8 dB (160 to 400 Hz), 3/5 dB (500 Hz to 10 kHz) | `tonal_correction()` |
-| $K_f$, low-frequency components | $L_f = L_{Ceq,Ti} - L_{Aeq,Ti}$ | 0 dB up to 10 dB, 3 dB for $10 < L_f \le 15$, 6 dB above | `low_frequency_correction()` |
-| $K_i$, impulsive components | $L_i = L_{AIeq,Ti} - L_{Aeq,Ti}$ | the same 10 and 15 dB | `impulsive_correction()` |
+| $K_\mathrm{t}$, emergent tonal components | **Unweighted** one-third-octave spectrum; $L_\mathrm{t} = L_f - L_s$, with $L_s$ the **arithmetic** mean of the two adjacent bands | 8/12 dB (20 to 125 Hz), 5/8 dB (160 to 400 Hz), 3/5 dB (500 Hz to 10 kHz) | `tonal_correction()` |
+| $K_\mathrm{f}$, low-frequency components | $L_f = L_{\mathrm{Ceq},Ti} - L_{\mathrm{Aeq},Ti}$ | 0 dB up to 10 dB, 3 dB for $10 < L_f \le 15$, 6 dB above | `low_frequency_correction()` |
+| $K_\mathrm{i}$, impulsive components | $L_\mathrm{i} = L_{\mathrm{AIeq},Ti} - L_{\mathrm{Aeq},Ti}$ | the same 10 and 15 dB | `impulsive_correction()` |
 
-$K_t$ is evaluated band by band and, when several emergent tones are present,
-the largest of the resulting $K_t$ governs (step d):
+$K_\mathrm{t}$ is evaluated band by band and, when several emergent tones are present,
+the largest of the resulting $K_\mathrm{t}$ governs (step d):
 
 ```python
 from phonometry import environment
@@ -63,8 +63,8 @@ already implements, but they are **not interchangeable**, which is why this
 module implements the RD's own variants instead of delegating to them:
 
 - `tonal_audibility()` / `tonal_adjustment()` are the engineering method of
-  ISO 1996-2 Annex C, based on the audibility $\Delta L_{ta}$ within the
-  critical band around the tone, and return a **continuous** $K_t$ between 0
+  ISO 1996-2 Annex C, based on the audibility $\Delta L_\mathrm{ta}$ within the
+  critical band around the tone, and return a **continuous** $K_\mathrm{t}$ between 0
   and 6 dB. The RD works on one-third-octave band differences and produces
   only 0, 3 or 6 dB.
 - `tonal_seeking_survey()` (survey method, ISO 1996-2:2017 Annex K) is the
@@ -73,9 +73,9 @@ module implements the RD's own variants instead of delegating to them:
   returns a prominence flag; the RD compares against the **mean** of the
   neighbours with 8/5/3 dB thresholds and grades the result.
 - `impulsive_sound_adjustment()` is the onset-rate method of ISO/PAS 1996-3 on
-  a calibrated signal. The RD's $K_i$ is the classic $L_{AIeq} - L_{Aeq}$
+  a calibrated signal. The RD's $K_\mathrm{i}$ is the classic $L_\mathrm{AIeq} - L_\mathrm{Aeq}$
   difference read off a sound level meter, not the same quantity.
-- $K_f$ has no counterpart in ISO 1996 at all: the $L_{Ceq} - L_{Aeq}$
+- $K_\mathrm{f}$ has no counterpart in ISO 1996 at all: the $L_\mathrm{Ceq} - L_\mathrm{Aeq}$
   difference is specific to the Spanish regulation.
 
 ## Evaluation periods and noise phases
@@ -86,16 +86,16 @@ to 19:00 (12 h), evening from 19:00 to 23:00 (4 h) and night from 23:00 to
 `RD1367_PERIOD_CLOCK_LIMITS`.
 
 When emission varies within a period, the period is split into **noise phases**
-$T_i$ of uniformly perceived level. $L_{Aeq,Ti}$ is measured over at least 5 s
+$T_i$ of uniformly perceived level. $L_{\mathrm{Aeq},Ti}$ is measured over at least 5 s
 in each phase and corrected, and the period level is the energy mean weighted
 by phase duration (Annex IV A.3.4.2 b):
 
 $$
-L_{Keq,T} = 10 \log_{10} \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{Keq,Ti}/10} \right]
+L_{\mathrm{Keq},T} = 10 \log_{10} \left[ \frac{1}{T} \sum_i T_i \, 10^{L_{\mathrm{Keq},Ti}/10} \right]
 $$
 
-The annual average $L_{K,x}$ of each period is in turn the energy mean of the
-daily $L_{Keq,x}$ over the year (Annex I A.2 d). The regulation also fixes its
+The annual average $L_{\mathrm{K},x}$ of each period is in turn the energy mean of the
+daily $L_{\mathrm{Keq},x}$ over the year (Annex I A.2 d). The regulation also fixes its
 own rounding: add 0.5 dB to the result and take the integer part, which is what
 `round_reported_level()` does.
 
@@ -128,7 +128,7 @@ III are what a single emitter is held to.
 | Annex II, Table A | Outdoor objectives by acoustic area type: e 60/60/50, a 65/65/55, d 70/70/65, c 73/73/63, b 75/75/65 dB (as amended by RD 1038/2012) | `outdoor_quality_objectives()` |
 | Annex II, Table B | Indoor objectives by building use and room type | `indoor_quality_objectives()` |
 | Annex II, Table C | Vibration objective $Law$ | `vibration_quality_objective()` |
-| Annex III, Tables A1 and A2 | Limit values for new road, rail and airport infrastructure, and $L_{Amax}$ | `infrastructure_limits()`, `max_infrastructure_limit()` |
+| Annex III, Tables A1 and A2 | Limit values for new road, rail and airport infrastructure, and $L_\mathrm{Amax}$ | `infrastructure_limits()`, `max_infrastructure_limit()` |
 | Annex III, Table B1 | Limit values for port infrastructure and activities | `activity_limits()` |
 | Annex III, Table B2 | Noise transmitted by activities to acoustically adjacent premises | `adjacent_premises_limits()` |
 
@@ -155,8 +155,8 @@ environment.vibration_quality_objective("residential")            # 75 dB
 
 Meeting an immission limit value is not simply staying below the number in the
 table. For activities and port infrastructure, Article 25.1 b) demands three
-things at once: no annual average $L_{K,x}$ above the table value, no daily
-$L_{Keq,x}$ more than 3 dB above it, and no $L_{Keq,Ti}$ measured in a noise
+things at once: no annual average $L_{\mathrm{K},x}$ above the table value, no daily
+$L_{\mathrm{Keq},x}$ more than 3 dB above it, and no $L_{\mathrm{Keq},Ti}$ measured in a noise
 phase more than 5 dB above it. For the inspection of an activity already in
 operation, Article 25.2 applies only the last two.
 
@@ -168,19 +168,19 @@ the opening hours the levels are steady, and while the activity is shut down it
 emits nothing. The levels measured outdoors, already corrected for background
 noise, are:
 
-| Phase | $L_{Aeq,5s}$ | $K_t$ | $K_f$ | $K_i$ | $K$ | $L_{Keq,5s}$ |
+| Phase | $L_\mathrm{Aeq,5s}$ | $K_\mathrm{t}$ | $K_\mathrm{f}$ | $K_\mathrm{i}$ | $K$ | $L_\mathrm{Keq,5s}$ |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | With the noisy machine | 50 dB | 6 | 3 | 0 | 9 | 59 dB |
 | Rest of the opening hours | 48 dB | 3 | 3 | 0 | 6 | 54 dB |
 
 The day period splits into three phases (2 h closed, 6 h with the machine, 4 h
-with the remaining sources) and gives $L_{Keq,d} = 57$ dB; the evening period
-splits into two (2 h open, 2 h closed) and gives $L_{Keq,e} = 51$ dB. The
+with the remaining sources) and gives $L_\mathrm{Keq,d} = 57$ dB; the evening period
+splits into two (2 h open, 2 h closed) and gives $L_\mathrm{Keq,e} = 51$ dB. The
 activity opens 303 days a year and closes 62 (July and August), from which
-$L_{K,d} = 56$ dB and $L_{K,e} = 50$ dB. The limit values for area type a
+$L_\mathrm{K,d} = 56$ dB and $L_\mathrm{K,e} = 50$ dB. The limit values for area type a
 (Annex III, Table B1) are 55/55/45 dB, so the applicable criteria are 60 dB on
-each $L_{Keq,Ti}$, 58 dB on the daily $L_{Keq,x}$ and 55 dB on the annual
-$L_{K,x}$:
+each $L_{\mathrm{Keq},Ti}$, 58 dB on the daily $L_{\mathrm{Keq},x}$ and 55 dB on the annual
+$L_{\mathrm{K},x}$:
 
 ```python
 from phonometry import environment
@@ -226,9 +226,9 @@ plt.show()
 
 </details>
 
-The verdict is the fine point of the example. The measured $L_{Keq,Ti}$ (59 and
+The verdict is the fine point of the example. The measured $L_{\mathrm{Keq},Ti}$ (59 and
 54 dB) stay below 60 dB, and the daily values (57 and 51 dB) below 58 dB, but
-the annual average of the day period, $L_{K,d} = 56$ dB, exceeds the 55 dB of
+the annual average of the day period, $L_\mathrm{K,d} = 56$ dB, exceeds the 55 dB of
 the table. A **new** activity does not comply. An activity already in
 operation, judged under Article 25.2, would comply, because only the phase and
 daily values are required of it; building the verdict with
@@ -239,11 +239,11 @@ daily values are required of it; building the verdict with
 `ActivityAssessment.plot()` draws the three indices of each period against
 their three criteria, as in the figure above, and
 `TonalCorrectionResult.plot()` draws the one-third-octave spectrum with the
-$L_t$ differences that justify the applied $K_t$.
+$L_\mathrm{t}$ differences that justify the applied $K_\mathrm{t}$.
 
 `ActivityAssessment.report()` goes one step further and renders a one-page
 acoustic inspection fiche: identification header, per-phase measurement table
-with the $K_t$/$K_f$/$K_i$ corrections, per-period assessment against the
+with the $K_\mathrm{t}$/$K_\mathrm{f}$/$K_\mathrm{i}$ corrections, per-period assessment against the
 applicable limit values and the boxed verdict. The default language is Spanish,
 the language of the regulation; `language="en"` translates it.
 
@@ -272,12 +272,12 @@ repository. Click the preview to open the PDF:
 *Acoustic inspection fiche (`ActivityAssessment.report`), the three per-period
 criteria of RD 1367/2007 and the boxed verdict. The day period clears the
 phase criterion (59 against 60) and the daily one (57 against 58) and fails
-only the annual $L_{K,x}$ (56 against 55) — which is why the fiche prints all
+only the annual $L_{\mathrm{K},x}$ (56 against 55) — which is why the fiche prints all
 three: any one of them is enough to fail.*
 
 ## What this guide covers
 
-**Covered.** The corrected level $L_{Keq,T}$ and the $K_t$, $K_f$ and $K_i$
+**Covered.** The corrected level $L_{\mathrm{Keq},T}$ and the $K_\mathrm{t}$, $K_\mathrm{f}$ and $K_\mathrm{i}$
 corrections of RD 1367/2007 (Annex I A.2 c and Annex IV A.3.3), the evaluation
 periods and the noise-phase and annual integration (Annex I A.1 and Annex IV
 A.3.4.2 b) with the regulation's own rounding, the acoustic quality objective
@@ -295,23 +295,23 @@ not implemented either: this page starts where the sound level meter ends.
 ### What is the LKeq level of RD 1367/2007?
 
 It is the **corrected** equivalent continuous sound pressure level:
-$L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i$ (Annex I A.2 c), where $K_t$, $K_f$
-and $K_i$ penalise the presence of emergent tonal, low-frequency and impulsive
+$L_{\mathrm{Keq},T} = L_{\mathrm{Aeq},T} + K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}$ (Annex I A.2 c), where $K_\mathrm{t}$, $K_\mathrm{f}$
+and $K_\mathrm{i}$ penalise the presence of emergent tonal, low-frequency and impulsive
 components with 0, 3 or 6 dB each. The sum of the three corrections never
 exceeds 9 dB.
 
 ## See also
 
-- [Environmental levels](environmental-levels.md): the $L_{den}$ and $L_{dn}$
+- [Environmental levels](environmental-levels.md): the $L_\mathrm{den}$ and $L_\mathrm{dn}$
   indicators and the ISO 1996-2 adjustments the corrections of the regulation
   coexist with.
-- [Integrated & Statistical Levels](../../signals/levels/levels.md): the per-phase $L_{Aeq}$,
-  $L_{Ceq}$ and $L_{AIeq}$ levels that feed the three corrections.
+- [Integrated & Statistical Levels](../../signals/levels/levels.md): the per-phase $L_\mathrm{Aeq}$,
+  $L_\mathrm{Ceq}$ and $L_\mathrm{AIeq}$ levels that feed the three corrections.
 - [Spanish Building Code (CTE DB-HR)](../../buildings/insulation/spanish-building-code.md): the other half
-  of the Spanish framework, which shares the site's day noise index $L_d$ with
+  of the Spanish framework, which shares the site's day noise index $L_\mathrm{d}$ with
   this page.
 - [Impulsive-sound prominence](impulsive-sound.md): the ISO/PAS 1996-3
-  impulsive adjustment, the relative of $K_i$ that is not interchangeable with
+  impulsive adjustment, the relative of $K_\mathrm{i}$ that is not interchangeable with
   it.
 - API reference: [`environment.assessment.spain`](https://jmrplens.github.io/phonometry/reference/api/environment/spain/).
 
@@ -337,7 +337,7 @@ exceeds 9 dB.
 
 RD 1367/2007 (BOE-A-2007-18397), the regulation that develops Ley 37/2003 del
 Ruido on acoustic zoning, quality objectives and acoustic emissions: the
-corrected level $L_{Keq,T}$ and the corrections $K_t$, $K_f$ and $K_i$
+corrected level $L_{\mathrm{Keq},T}$ and the corrections $K_\mathrm{t}$, $K_\mathrm{f}$ and $K_\mathrm{i}$
 (Annex I A.2 c, Annex
 IV A.3.3), the evaluation periods and the noise-phase integration (Annex I
 A.1, Annex IV A.3.4.2 b), the acoustic quality objectives of Annex II (Table A

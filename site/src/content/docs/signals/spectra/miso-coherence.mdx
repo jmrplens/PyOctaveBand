@@ -227,7 +227,7 @@ the *references* separate, so the reference sensors are the measurement.
 - **Fixed gains for the whole run**, and every source running together at the
   operating point being diagnosed.
 - **Averages to spare.** Each conditioning step spends one, so the last-ordered
-  input carries $n_d - (q-1)$; aim for a few hundred effective averages before
+  input carries $n_\mathrm{d} - (q-1)$; aim for a few hundred effective averages before
   reading a small partial coherence as a physical zero.
 - **Record with the result:** sensor model, position and sensitivity per
   channel, the machine speed and load, the segment length, and the conditioning
@@ -238,8 +238,8 @@ the *references* separate, so the reference sensors are the measurement.
 
 The random errors follow Section 9.3. Conditioning on the $i-1$ preceding
 inputs costs $i-1$ degrees of freedom, so the $i$-th ordered input carries
-$n_d-(i-1)$ effective averages (Eqs. 9.100/9.101) and the $q$-input multiple
-coherence carries $n_d-(q-1)$ (Eq. 9.98). The result exposes
+$n_\mathrm{d}-(i-1)$ effective averages (Eqs. 9.100/9.101) and the $q$-input multiple
+coherence carries $n_\mathrm{d}-(q-1)$ (Eq. 9.98). The result exposes
 `multiple_coherence_random_error` and `coherent_output_random_error`
 alongside the effective average count `n_averages`.
 

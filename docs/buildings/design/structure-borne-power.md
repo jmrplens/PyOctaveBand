@@ -10,7 +10,7 @@ plate of known mass per unit area $m$ and area $S$ whose structural loss
 factor $\eta$ is known, and the plate's spatial-average vibratory velocity is
 measured. Formula (14) gives the power *injected into that particular plate*;
 the plate-independent source quantities (the equivalent blocked force,
-Formula 15; the characteristic reception-plate power level $L_{Wsn}$,
+Formula 15; the characteristic reception-plate power level $L_{W\mathrm{sn}}$,
 Formula 17; and the equivalent free velocity and source mobility,
 Formulae 18/19) are derived from it and are what the EN 12354-5
 installed-equipment prediction consumes.
@@ -45,7 +45,7 @@ ax.bar(x - 0.2, low.power_level, width=0.4, label="low-mobility plate")
 ax.bar(x + 0.2, high.power_level, width=0.4, label="high-mobility plate")
 ax.set_xticks(x, [f"{b:g}" for b in bands])
 ax.set(xlabel="Frequency [Hz]",
-       ylabel=r"Structure-borne power level $L_{W\mathrm{s}}$ [dB re 1 pW]")
+       ylabel="Structure-borne power level $L_{Ws}$ [dB re 1 pW]")
 ax.legend()
 plt.show()
 ```
@@ -78,12 +78,12 @@ with references $f_0 = 1\ \text{Hz}$, $m_0 = 1\ \text{kg}$,
 $S_0 = 1\ \text{m}^2$; the $-60\ \text{dB}$ term is $10\log_{10}(v_0^2/P_0)$ for
 the EN 15657 velocity reference $v_0 = 10^{-9}\ \text{m/s}$. The plate
 velocity is the energetic spatial average over the $N$ positions (Formula 12)
-and the loss factor comes from the structural reverberation time $T_s$
+and the loss factor comes from the structural reverberation time $T_\mathrm{s}$
 (Formula 13, identical to the ISO 10848 total loss factor):
 
 $$
 L_v = 10\log_{10}\!\Big(\tfrac{1}{N}\textstyle\sum 10^{L_{v,i}/10}\Big), \qquad
-\eta = \frac{2.2}{f\,T_s}.
+\eta = \frac{2.2}{f\,T_\mathrm{s}}.
 $$
 
 ```python
@@ -123,25 +123,25 @@ plate-independent quantities: the **equivalent blocked force level**
 (Formula 15, re $F_0 = 10^{-6}\ \text{N}$) from the low-mobility plate,
 
 $$
-L_{Fb,eq} = L_{Ws,\mathrm{low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_{R,\mathrm{low,eq}}\}}{Y_0},
+L_{F\mathrm{b,eq}} = L_{W\mathrm{s,low}} - 10\log_{10}\frac{\mathrm{Re}\{Y_\mathrm{R,low,eq}\}}{Y_0},
 $$
 
 the **characteristic reception-plate power level** that EN 12354-5 consumes
 (Formula 17), referred to the standard 10 cm concrete plate of characteristic
-mobility $Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
+mobility $Y_{\mathrm{R},\infty,\mathrm{low}} = 5\times10^{-6}\ \text{m/(N·s)}$
 (clause 7.2.4),
 
 $$
-L_{Wsn} = L_{Fb,eq} + 10\log_{10}\frac{Y_{R,\infty,\mathrm{low}}}{Y_0},
+L_{W\mathrm{sn}} = L_{F\mathrm{b,eq}} + 10\log_{10}\frac{Y_{\mathrm{R},\infty,\mathrm{low}}}{Y_0},
 $$
 
 and, from the high-mobility plate, the **equivalent free velocity level**
 (Formula 18, re $10^{-9}\ \text{m/s}$) and the **source mobility**
-$|Y_{S,\text{eq}}|$
+$|Y_\mathrm{S,eq}|$
 (Formula 19). The EN 12354-5 Annex I mobility correction
 (`installed_power_from_reception_plate`, see
 [installed structure-borne sound](installed-structure-borne.md)) then refers
-$L_{Wsn}$ to the actual receiving element.
+$L_{W\mathrm{sn}}$ to the actual receiving element.
 
 ```python
 from phonometry import building
@@ -256,10 +256,10 @@ EN 15657:2018, *Acoustic properties of building elements and
 buildings — Laboratory measurement of structure-borne sound from building
 service equipment for all installation conditions*: the reception-plate method
 (clause 7), the spatial mean velocity level (Formula 12), the plate loss factor
-$\eta = 2.2/(f\,T_s)$ (Formula 13), the plate-injected power level $L_{W\mathrm{s}}$
+$\eta = 2.2/(f\,T_\mathrm{s})$ (Formula 13), the plate-injected power level $L_{W\mathrm{s}}$
 (Formula 14) and the source-quantity chain: equivalent blocked force
 (Formula 15), characteristic reception-plate power level (Formula 17,
-$Y_{R,\infty,\text{low}} = 5\times10^{-6}\ \text{m/(N·s)}$), equivalent free
+$Y_{\mathrm{R},\infty,\mathrm{low}} = 5\times10^{-6}\ \text{m/(N·s)}$), equivalent free
 velocity (Formula 18) and source mobility (Formula 19). ISO 9611:1996: the
 free-velocity source characterization (equation (9),
 $v_0 = 5\times10^{-8}\ \text{m/s}$). The plate velocity levels are referred to

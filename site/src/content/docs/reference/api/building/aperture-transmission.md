@@ -47,7 +47,7 @@ R = -10 \log_{10}\!\left[ \frac{1}{\sum S_n} \sum S_n \, 10^{-R_n/10} \right]
 $$
 
 so a bare opening ($R = 0$, $\tau = 1$) of relative area
-$S_a/S$ caps the composite at $10 \log_{10}(S / S_a)$. This is the same
+$S_\mathrm{a}/S$ caps the composite at $10 \log_{10}(S / S_\mathrm{a})$. This is the same
 energetic combination used by the EN 12354-3/-4 facade model of
 [`phonometry.building.prediction.facade`](/phonometry/reference/api/building/facade/).
 

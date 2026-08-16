@@ -97,7 +97,7 @@ def sound_exposure_level(
     r"""Sound exposure level (ISO 18405 / ISO 18406 Formulae 3-4).
 
     :math:`\mathrm{SEL} = 10 \log_{10}(E/E_0)` dB re 1 µPa²·s, with the sound
-    exposure :math:`E = \int p^2 \, dt \approx (1/f_s) \sum p^2` over the
+    exposure :math:`E = \int p^2 \, dt \approx (1/f_\mathrm{s}) \sum p^2` over the
     record.
 
     :param pressure: Sound-pressure time series (1-D), in Pa.

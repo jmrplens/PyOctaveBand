@@ -20,7 +20,7 @@ R = \frac{\rho_2 c_2 \sin\varphi - \rho_1 c_1 \cos\theta_2} {\rho_2 c_2 \sin\var
 $$
 
 * [`critical_angle`](/phonometry/reference/api/underwater/seabed-reflection/#critical_angle) -- the critical grazing angle
-  $\varphi_c = \arccos(c_1/c_2)$ (only when `c2 > c1`); below it the
+  $\varphi_\mathrm{c} = \arccos(c_1/c_2)$ (only when `c2 > c1`); below it the
   wave is totally reflected ($\lvert R \rvert = 1$).
 * [`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient) -- the complex `R` per grazing angle.
 * [`seabed_reflection`](/phonometry/reference/api/underwater/seabed-reflection/#seabed_reflection) -- the complex `R`, its magnitude `|R|` and the
@@ -116,7 +116,7 @@ Plot the bottom loss versus grazing angle with the critical angle.
 critical_angle(c1: float, c2: float) -> float
 ```
 
-Critical grazing angle $\varphi_c = \arccos(c_1/c_2)$, in
+Critical grazing angle $\varphi_\mathrm{c} = \arccos(c_1/c_2)$, in
 degrees.
 
 Defined only when the sediment is faster than the water (`c2 > c1`); at and

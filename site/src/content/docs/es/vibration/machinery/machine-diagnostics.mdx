@@ -89,18 +89,18 @@ y un *recuento* en las secciones 2 y 4.
 | Símbolo | Significado | Unidad | Sección |
 |---|---|---|---|
 | $N$ | velocidad del eje (el primer argumento posicional de la API) | r/min | 1 |
-| $f_s$ | frecuencia de giro del eje, $f_s = N/60$ | Hz | todas |
+| $f_\mathrm{s}$ | frecuencia de giro del eje, $f_\mathrm{s} = N/60$ | Hz | todas |
 | $Z$ | número de elementos rodantes del rodamiento | — | 1 |
 | $d$, $D$ | diámetro del elemento rodante, diámetro primitivo | la misma para ambos | 1 |
 | $\phi$ | ángulo de contacto, desde el plano radial | grados | 1 |
 | $g$ | el factor común $g = (d/D)\cos\phi$ | — | 1 |
 | $N$ | número de dientes de la rueda (Ec. 8.3 de Norton) | — | 2 |
 | $R$, $p$ | barras de rotor, polos magnéticos (no pares de polos) | — | 3 |
-| $s$, $f_e$ | deslizamiento (una fracción, no un porcentaje), frecuencia de alimentación | —, Hz | 3 |
+| $s$, $f_\mathrm{e}$ | deslizamiento (una fracción, no un porcentaje), frecuencia de alimentación | —, Hz | 3 |
 | $N$, $V$ | número de palas del rotor, número de álabes del estátor | — | 4 |
 | $N$ | número de eventos de bombeo por vuelta | — | 4 |
 | $n$ | índice de armónico (de ranura de rotor en la sección 3, de pala en la 4) | — | 3, 4 |
-| $m_L$ | número de lóbulos de un patrón rotativo de interacción | — | 4 |
+| $m_\mathrm{L}$ | número de lóbulos de un patrón rotativo de interacción | — | 4 |
 
 Nada en la biblioteca reutiliza el nombre: `bearing_fault_frequencies`,
 `gear_mesh_frequencies` y `blade_pass_frequencies` toman todas la velocidad del
@@ -118,17 +118,17 @@ filas que ya están en la tabla: o idénticas a ellas dos a dos, o alcanzables
 mediante el argumento `rotating_race`. Con la velocidad del eje $N$ en r/min, $Z$
 elementos rodantes de diámetro $d$ sobre un diámetro primitivo $D$, un
 ángulo de contacto $\phi$, y escribiendo $g = (d/D)\cos\phi$ y
-$f_s = N/60$:
+$f_\mathrm{s} = N/60$:
 
 | Nombre | Significado | Expresión | Ec. de Norton |
 |---|---|---|---|
-| `shaft` | frecuencia de giro del eje | $f_s = N/60$ | (8.4) |
-| `FTF` | frecuencia de la jaula (tren fundamental) | $(f_s/2)(1 - g)$ | (8.5) |
-| `FTF_rel` | jaula relativa a la pista que gira | $f_s - \text{FTF}$ | (8.11) |
-| `BSF` | frecuencia de rotación del elemento rodante | $(f_s/2)(D/d)(1 - g^2)$ | (8.7) |
+| `shaft` | frecuencia de giro del eje | $f_\mathrm{s} = N/60$ | (8.4) |
+| `FTF` | frecuencia de la jaula (tren fundamental) | $(f_\mathrm{s}/2)(1 - g)$ | (8.5) |
+| `FTF_rel` | jaula relativa a la pista que gira | $f_\mathrm{s} - \text{FTF}$ | (8.11) |
+| `BSF` | frecuencia de rotación del elemento rodante | $(f_\mathrm{s}/2)(D/d)(1 - g^2)$ | (8.7) |
 | `BDF` | frecuencia de giro del elemento rodante | $2\,\text{BSF}$ | (8.10) |
-| `BPFO` | frecuencia de paso por la pista exterior | $Z(f_s/2)(1 - g)$ | (8.8) |
-| `BPFI` | frecuencia de paso por la pista interior | $Z(f_s/2)(1 + g)$ | (8.9) |
+| `BPFO` | frecuencia de paso por la pista exterior | $Z(f_\mathrm{s}/2)(1 - g)$ | (8.8) |
+| `BPFI` | frecuencia de paso por la pista interior | $Z(f_\mathrm{s}/2)(1 + g)$ | (8.9) |
 
 Esas tres magnitudes geométricas cargan con toda la familia, y dos de ellas se
 confunden a menudo. El diámetro **primitivo** se mide entre los centros de los
@@ -143,7 +143,7 @@ $g = (d/D)\cos\phi$ lleve un coseno.
 Las dos identidades exactas en las que se apoya la sección son afirmaciones
 geométricas que esta figura hace evidentes: todo elemento rodante pasa o por el
 defecto de la pista exterior o por el de la interior, así que
-$\text{BPFO} + \text{BPFI} = Z f_s$; y con la pista exterior quieta la jaula
+$\text{BPFO} + \text{BPFI} = Z f_\mathrm{s}$; y con la pista exterior quieta la jaula
 lleva los $Z$ elementos por delante del defecto una vez por vuelta de jaula, así
 que $\text{BPFO} = Z \times \text{FTF}$.
 
@@ -159,7 +159,7 @@ de la jaula `FTF`, mientras que la línea que la figura dibuja en 91,7 Hz es la
 frecuencia de rotación del elemento rodante, la `BSF`. Conviene recordar dos
 identidades, porque son
 exactas y detectan al instante los errores de introducción de datos:
-$\text{BPFO} + \text{BPFI} = Z f_s$ siempre, y
+$\text{BPFO} + \text{BPFI} = Z f_\mathrm{s}$ siempre, y
 $\text{BPFO} = Z \times \text{FTF}$ siempre que la pista exterior esté
 quieta.
 
@@ -175,7 +175,7 @@ deduce de la misma geometría:
 - un defecto en la **pista interior** gira con el eje, así que entra y sale de
   la zona de carga una vez por vuelta. El tren de impactos está modulado en
   amplitud a la frecuencia del eje, y la BPFI lleva bandas laterales a
-  $\pm f_s$ alrededor de la línea y de cada armónico, a menudo más visibles que
+  $\pm f_\mathrm{s}$ alrededor de la línea y de cada armónico, a menudo más visibles que
   la propia portadora;
 - un defecto en un **elemento rodante** golpea las dos pistas alternativamente
   mientras viaja con la jaula, así que está modulado a la frecuencia de la
@@ -185,7 +185,7 @@ deduce de la misma geometría:
 El *espaciado* de las bandas laterales es por tanto el criterio de desempate
 siempre que dos familias previstas caigan cerca, y es el mismo argumento que
 hace el párrafo de bandas laterales de engrane de la sección 2 para otro
-componente. Resolver una banda lateral a $\pm f_s$ cuesta longitud de registro,
+componente. Resolver una banda lateral a $\pm f_\mathrm{s}$ cuesta longitud de registro,
 que es la razón de que la adquisición de la sección 5 importe aquí, y no solo
 en principio.
 
@@ -213,7 +213,7 @@ está en la línea».
 ### La velocidad es toda la previsión
 
 Todas las frecuencias de esta página son estrictamente proporcionales a
-$f_s = N/60$: las siete líneas del rodamiento, el engrane y sus bandas
+$f_\mathrm{s} = N/60$: las siete líneas del rodamiento, el engrane y sus bandas
 laterales, el `1x`, el `2x` y la familia de ranura de rotor del motor, las
 líneas de paso de pala. Un error de velocidad se propaga por tanto uno a uno a
 todas las líneas previstas, y la velocidad del eje es el único dato de entrada
@@ -248,7 +248,7 @@ sobreviva al promediado síncrono y la de engranaje no.
 ## 2. Engranajes
 
 La frecuencia de engrane (paso de dientes) de una rueda de $N$ dientes es
-$\text{GMF} = N f_s$ (Ec. 8.3), con armónicos enteros. Lo que distingue los tipos de
+$\text{GMF} = N f_\mathrm{s}$ (Ec. 8.3), con armónicos enteros. Lo que distingue los tipos de
 fallo es la familia de **bandas laterales** en torno a cada armónico: un solo
 diente astillado o una rueda excéntrica modula el engrane una vez por vuelta y
 produce bandas laterales bajas y planas espaciadas la frecuencia de giro del
@@ -282,7 +282,7 @@ estática o dinámica del entrehierro se leen sobre los **armónicos de ranura d
 rotor** de la Ec. (8.20),
 
 $$
-f_{sh} = f_e \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
+f_\mathrm{sh} = f_\mathrm{e} \left[(2R/p)(1 - s) \pm 2(n - 1)\right]
 $$
 
 con $R$ barras de rotor, $p$ polos magnéticos (no pares de polos),
@@ -309,14 +309,14 @@ con el ajuste del variador: los 360 Hz de arriba son el doble de 180 Hz, y una
 máquina de seis polos con red de 50 Hz giraría cerca de 1000 r/min con `2fe` en
 100 Hz. El `fsh` = 3600 Hz impreso es la comprobación por la que aboga el
 párrafo siguiente: con deslizamiento nulo, la Ec. (8.20) debe reducirse a la
-frecuencia física de paso de barras $R f_s = 60 \times 60$ Hz.
+frecuencia física de paso de barras $R f_\mathrm{s} = 60 \times 60$ Hz.
 
 El deslizamiento se da directamente, o se da la frecuencia de red
 `supply_frequency` y el deslizamiento se deduce de ella y de la velocidad medida
 del eje. La frecuencia de alimentación se toma como
-$f_e = f_s\,p / (2(1 - s))$; la Ec. (8.19) de Norton escribe
-$f_e = f_s\,p/2$, que es la misma expresión con deslizamiento nulo pero no
-reduce la Ec. (8.20) a la frecuencia física de paso de barras $R f_s$
+$f_\mathrm{e} = f_\mathrm{s}\,p / (2(1 - s))$; la Ec. (8.19) de Norton escribe
+$f_\mathrm{e} = f_\mathrm{s}\,p/2$, que es la misma expresión con deslizamiento nulo pero no
+reduce la Ec. (8.20) a la frecuencia física de paso de barras $R f_\mathrm{s}$
 cuando la máquina está cargada. Con carga, el resultado incluye además la
 frecuencia de deslizamiento y la línea de paso de polos
 $\text{FP} = p \times f_\text{slip}$, el espaciado de bandas laterales que
@@ -327,7 +327,7 @@ misma imagen: están a tres décadas de distancia.
 
 ## 4. Ventiladores, soplantes y bombas
 
-La frecuencia de paso de pala de un rodete de $N$ palas es $f_b = n N f_s$
+La frecuencia de paso de pala de un rodete de $N$ palas es $f_\mathrm{b} = n N f_\mathrm{s}$
 (Ec. 8.15). Las pulsaciones hidráulicas de una bomba siguen la misma forma, con
 el recuento de palas sustituido por el número de eventos de bombeo por vuelta
 (Ec. 8.18). Y una soplante volumétrica rotativa repite cuatro veces por vuelta,
@@ -343,7 +343,7 @@ print(round(res["BPF"], 1))        # 80.0 Hz, la frecuencia de pulsación
 print(round(res.shaft_rate, 1))    # 80.0 Hz - NO la del eje, que es 20
 ```
 
-El truco cuesta la línea del eje: `shaft_rate` vuelve valiendo $4 f_s$, así que
+El truco cuesta la línea del eje: `shaft_rate` vuelve valiendo $4 f_\mathrm{s}$, así que
 lee la frecuencia del eje de una llamada aparte a la velocidad verdadera (o de
 `bearing_fault_frequencies`) antes de combinar familias con
 `combine_fault_lines`, o se dibujará un cuarto armónico del eje como si fuera
@@ -351,8 +351,8 @@ evidencia de rodamiento.
 
 En un **ventilador axial entubado** las palas interaccionan además con los
 álabes del estátor y establecen patrones de presión rotativos con
-$m_L = nN \pm kV$ lóbulos para $V$ álabes (Ec. 8.16), que giran a
-$n N f_s / m_L$ (Ec. 8.17). Un patrón que gira más rápido que las propias palas
+$m_\mathrm{L} = nN \pm kV$ lóbulos para $V$ álabes (Ec. 8.16), que giran a
+$n N f_\mathrm{s} / m_\mathrm{L}$ (Ec. 8.17). Un patrón que gira más rápido que las propias palas
 radia con mucha más fuerza, y por eso importa la elección de $N$ y $V$, y por
 eso esas velocidades son las que hay que contrastar con las frecuencias de corte
 del conducto. Cada línea se llama `lobe n=<n> m=<mL>`: el armónico de pala forma
@@ -369,11 +369,11 @@ print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35
 
 Esos dos números son el principio, resuelto. Los dos patrones salen del *mismo*
 armónico de pala del *mismo* ventilador; la única diferencia es el signo de $k$
-en $m_L = nN \pm kV$, que es la razón de que el recuento de lóbulos tenga que
-formar parte del nombre de la línea. El patrón de $m_L = 2$ gira a
-$nNf_s/m_L = 6 \times 58{,}3/2 = 175$ Hz, tres veces la velocidad del eje, así
+en $m_\mathrm{L} = nN \pm kV$, que es la razón de que el recuento de lóbulos tenga que
+formar parte del nombre de la línea. El patrón de $m_\mathrm{L} = 2$ gira a
+$nNf_\mathrm{s}/m_\mathrm{L} = 6 \times 58{,}3/2 = 175$ Hz, tres veces la velocidad del eje, así
 que es el que radia con fuerza y la línea que hay que contrastar con la
-frecuencia de corte del conducto. El patrón de $m_L = 10$ gira a 35 Hz, por
+frecuencia de corte del conducto. El patrón de $m_\mathrm{L} = 10$ gira a 35 Hz, por
 debajo de la velocidad del eje, así que radia poco. Seis palas contra cuatro
 álabes es una decisión de diseño, y esto es lo que decide.
 
@@ -382,10 +382,10 @@ debajo de la velocidad del eje, así que radia poco. Seis palas contra cuatro
 *Una familia de fallos se reconoce por su patrón, no por un solo número. Los dos
 paneles de engranaje son el mismo piñón de 28 dientes a 1500 r/min con dos
 fallos distintos: un diente astillado da bandas laterales bajas y planas a
-$\pm f_s$ y armónicos que caen; un desgaste distribuido da grupos altos de
+$\pm f_\mathrm{s}$ y armónicos que caen; un desgaste distribuido da grupos altos de
 bandas laterales y levanta los armónicos superiores. El panel del motor abarca
 tres décadas de amplitud, que es la razón de que el armónico de ranura de rotor
-y sus bandas laterales a $\pm f_s$ necesiten un eje logarítmico para verse
+y sus bandas laterales a $\pm f_\mathrm{s}$ necesiten un eje logarítmico para verse
 siquiera al lado del `1x`. El panel del ventilador pone los dos patrones
 lobulados junto a la frecuencia de pala de la que salen.*
 
@@ -452,10 +452,10 @@ la resonancia que suena: 20 kHz para una resonancia de soporte de 3 kHz deja
 sitio para que trabajen el filtro de banda y el detector. El registro debe
 contener vueltas suficientes para que el espectro de envolvente resuelva la
 frecuencia del eje, porque la resolución que se obtiene es $1/T$ y el espaciado
-de bandas laterales que hay que resolver es el propio $f_s$. Dos segundos a
+de bandas laterales que hay que resolver es el propio $f_\mathrm{s}$. Dos segundos a
 2000 r/min son 67 vueltas y 0,5 Hz de resolución frente a una frecuencia de eje
 de 33 Hz, que es la razón de que la línea del eje y las bandas laterales a
-$\pm f_s$ de la sección 1 sean separables siquiera. Registra más tiempo si la
+$\pm f_\mathrm{s}$ de la sección 1 sean separables siquiera. Registra más tiempo si la
 velocidad es baja o si las bandas laterales son el diagnóstico; registra menos
 solo si la velocidad no se va a mantener quieta (véase *La velocidad es toda la
 previsión* más arriba).

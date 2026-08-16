@@ -24,16 +24,16 @@ three flanking paths ``Ff``, ``Df`` and ``Fd``:
 
 .. math::
 
-   R'_w = -10 \log_{10}\!\left[ 10^{-R_{Dd,w}/10} + \sum 10^{-R_{Ff,w}/10}
-   + \sum 10^{-R_{Df,w}/10} + \sum 10^{-R_{Fd,w}/10} \right]
+   R'_\mathrm{w} = -10 \log_{10}\!\left[ 10^{-R_\mathrm{Dd,w}/10} + \sum 10^{-R_\mathrm{Ff,w}/10}
+   + \sum 10^{-R_\mathrm{Df,w}/10} + \sum 10^{-R_\mathrm{Fd,w}/10} \right]
 
-with the direct path :math:`R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}` (Formula 27)
+with the direct path :math:`R_\mathrm{Dd,w} = R_\mathrm{s,w} + \Delta R_\mathrm{Dd,w}` (Formula 27)
 and each flanking path (Formula 28a)
 
 .. math::
 
-   R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-   + 10 \log_{10}\frac{S_s}{l_0 l_f}
+   R_{ij,\mathrm{w}} = \frac{R_{i,\mathrm{w}} + R_{j,\mathrm{w}}}{2} + \Delta R_{ij,\mathrm{w}} + K_{ij}
+   + 10 \log_{10}\frac{S_\mathrm{s}}{l_0 l_\mathrm{f}}
 
 where :math:`l_0 = 1` m is the reference coupling length.
 
@@ -46,7 +46,7 @@ ratio :math:`M = \log_{10}(m'_{\perp,i} / m'_i)`. A minimum value ``Kij,min``
 follows from the Kij,min relation of Clause 4.4.2 (printed as Eq. (23)
 in the BS EN 12354-1:2000 edition).
 
-**Impact, Formula (21).** :math:`L'_{n,w} = L_{n,w,eq} - \Delta L_w + K` with
+**Impact, Formula (21).** :math:`L'_\mathrm{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K` with
 the bare-floor equivalent level ``Ln,w,eq`` (Annex B
 :math:`164 - 35 \log_{10}(m'/m'_0)`), the covering improvement ``ΔLw`` (ISO 717-2)
 and the flanking correction ``K`` from Table 1.
@@ -605,7 +605,7 @@ def junction_min_vibration_reduction(
 
     Printed as Formula (29) in the EN 12354-1:2000 edition.
 
-    :math:`K_{ij,\mathrm{min}} = 10 \log_{10}[l_f \, l_0 \, (1/S_i + 1/S_j)]` with
+    :math:`K_{ij,\mathrm{min}} = 10 \log_{10}[l_\mathrm{f} \, l_0 \, (1/S_i + 1/S_j)]` with
     the reference coupling
     length :math:`l_0 = 1` m. When the tabulated ``Kij`` is below this value,
     the minimum is used (Clause 4.4.2).
@@ -650,7 +650,7 @@ def combine_linings(delta_a: float, delta_b: float) -> float:
 
 
 def _coupling_term(separating_area: float, coupling_length: float) -> float:
-    r"""The :math:`10 \log_{10}(S_s/(l_0 l_f))` term of Formula (28a)."""
+    r"""The :math:`10 \log_{10}(S_\mathrm{s}/(l_0 l_\mathrm{f}))` term of Formula (28a)."""
     ss = _check_finite(separating_area, "separating_area")
     lf = _check_finite(coupling_length, "coupling_length")
     if ss <= 0.0 or lf <= 0.0:
@@ -676,11 +676,11 @@ def flanking_path(
 
     .. math::
 
-       R_{ij,w} = \frac{R_{i,w} + R_{j,w}}{2} + \Delta R_{ij,w} + K_{ij}
-       + 10 \log_{10}\frac{S_s}{l_0 l_f}
+       R_{ij,\mathrm{w}} = \frac{R_{i,\mathrm{w}} + R_{j,\mathrm{w}}}{2} + \Delta R_{ij,\mathrm{w}} + K_{ij}
+       + 10 \log_{10}\frac{S_\mathrm{s}}{l_0 l_\mathrm{f}}
 
-    with ``r_source`` and ``r_receive`` as :math:`R_{i,w}` / :math:`R_{j,w}`,
-    ``delta_r`` as :math:`\Delta R_{ij,w}` and ``k_ij`` as :math:`K_{ij}`.
+    with ``r_source`` and ``r_receive`` as :math:`R_{i,\mathrm{w}}` / :math:`R_{j,\mathrm{w}}`,
+    ``delta_r`` as :math:`\Delta R_{ij,\mathrm{w}}` and ``k_ij`` as :math:`K_{ij}`.
     The two element indices depend on the path: for ``Ff`` both are the flanking
     element (``RF,w``, ``Rf,w``); for ``Fd`` they are the flanking (source) and
     separating (receive) elements; for ``Df`` the separating (source) and
@@ -745,10 +745,10 @@ def flanking_element(
 
     **Kij,min (Clause 4.4.2).** When ``flanking_area`` is given, the mandatory
     floor :math:`K_{ij} \ge K_{ij,\mathrm{min}}` is applied automatically per
-    path: ``KFf`` is clamped to :math:`10 \log_{10}[l_f l_0 (2/S_F)]` (both
+    path: ``KFf`` is clamped to :math:`10 \log_{10}[l_\mathrm{f} l_0 (2/S_\mathrm{F})]` (both
     junction elements are
     the flanking element) and ``KFd``/``KDf`` to
-    :math:`10 \log_{10}[l_f l_0 (1/S_F + 1/S_s)]` (flanking and separating
+    :math:`10 \log_{10}[l_\mathrm{f} l_0 (1/S_\mathrm{F} + 1/S_\mathrm{s})]` (flanking and separating
     element), via
     :func:`junction_min_vibration_reduction`. Without ``flanking_area`` the
     per-path floors cannot be formed from the available geometry, so the raw
@@ -767,7 +767,7 @@ def flanking_element(
     :param delta_r_ff: Combined lining improvement for the Ff path, in dB.
     :param delta_r_fd: Combined lining improvement for the Fd path, in dB.
     :param delta_r_df: Combined lining improvement for the Df path, in dB.
-    :param flanking_area: Flanking-element area :math:`S_F = S_f`, in m².
+    :param flanking_area: Flanking-element area :math:`S_\mathrm{F} = S_\mathrm{f}`, in m².
         Enables
         the automatic ``Kij,min`` clamp (Clause 4.4.2); ``None`` skips it.
     :return: The ``(Ff, Df, Fd)`` :class:`FlankingPath` triple.
@@ -813,13 +813,13 @@ def predicted_airborne_insulation(
     r"""Predict the apparent airborne insulation ``R'w`` (EN 12354-1 Formula 26).
 
     Energetically combines the direct path
-    :math:`R_{Dd,w} = R_{s,w} + \Delta R_{Dd,w}` (Formula 27, from
+    :math:`R_\mathrm{Dd,w} = R_\mathrm{s,w} + \Delta R_\mathrm{Dd,w}` (Formula 27, from
     ``r_direct`` and ``delta_r_direct``) with the supplied flanking paths:
 
     .. math::
 
-       R'_w = -10 \log_{10}\!\left[ 10^{-R_{Dd,w}/10}
-       + \sum 10^{-R_{ij,w}/10} \right]
+       R'_\mathrm{w} = -10 \log_{10}\!\left[ 10^{-R_\mathrm{Dd,w}/10}
+       + \sum 10^{-R_{ij,\mathrm{w}}/10} \right]
 
     With no flanking paths the result equals the direct path ``RDd,w``; each
     added path strictly lowers ``R'w``. The result exposes every path's share of
@@ -866,7 +866,7 @@ def predicted_airborne_insulation(
 def equivalent_impact_level(mass_per_area: float) -> float:
     r"""Bare-floor equivalent weighted impact level ``Ln,w,eq`` (Part 2, Annex B).
 
-    :math:`L_{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)` with :math:`m'_0 = 1` kg/m²,
+    :math:`L_\mathrm{n,w,eq} = 164 - 35 \log_{10}(m'/m'_0)` with :math:`m'_0 = 1` kg/m²,
     the closed form
     used in the Annex E worked example for a homogeneous concrete floor. The
     Annex B relation is stated for homogeneous floors of 100 kg/m² to
@@ -929,7 +929,7 @@ def predicted_impact_insulation(
 ) -> ImpactPredictionResult:
     r"""Predict the apparent impact insulation ``L'n,w`` (EN 12354-2 Formula 21).
 
-    :math:`L'_{n,w} = L_{n,w,eq} - \Delta L_w + K`. The bare-floor equivalent
+    :math:`L'_\mathrm{n,w} = L_\mathrm{n,w,eq} - \Delta L_\mathrm{w} + K`. The bare-floor equivalent
     level may come from
     :func:`equivalent_impact_level` and the flanking correction from
     :func:`impact_flanking_correction`.
@@ -956,8 +956,8 @@ def standardized_impact_level(l_prime_n_w: float, volume: float) -> float:
 
     .. math::
 
-       L'_{nT,w} = L'_{n,w} - 10 \log_{10}\frac{0.16\,V}{A_0 T_0}
-       = L'_{n,w} - 10 \log_{10}(0.032\,V)
+       L'_\mathrm{nT,w} = L'_\mathrm{n,w} - 10 \log_{10}\frac{0.16\,V}{A_0 T_0}
+       = L'_\mathrm{n,w} - 10 \log_{10}(0.032\,V)
 
     with :math:`A_0 = 10` m² and :math:`T_0 = 0.5` s, the exact Formula (3)
     form. The standard's own Annex E.3 worked example rounds the factor to
@@ -983,15 +983,15 @@ def standardized_level_difference(
 
     .. math::
 
-       D_{nT} = R' + 10 \log_{10}\frac{0.16\,V}{T_0 S_s}
-       = R' + 10 \log_{10}\frac{0.32\,V}{S_s}
+       D_\mathrm{nT} = R' + 10 \log_{10}\frac{0.16\,V}{T_0 S_\mathrm{s}}
+       = R' + 10 \log_{10}\frac{0.32\,V}{S_\mathrm{s}}
 
     with :math:`T_0 = 0.5` s, the exact Formula (5b) form, applied to the
     weighted single numbers of the simplified model (Clause 4.4). The Annex
-    H.3 worked example rounds the factor to :math:`10 \log_{10}(V/(3 S_s))`
+    H.3 worked example rounds the factor to :math:`10 \log_{10}(V/(3 S_\mathrm{s}))`
     (:math:`1/0.32 = 3.125 \approx 3`), printing :math:`52.2 + 1.6 = 53.8` dB
     where the exact form gives 53.6 dB;
-    both round to the same :math:`D_{nT,w} = 54` dB.
+    both round to the same :math:`D_\mathrm{nT,w} = 54` dB.
 
     :param r_prime_w: Apparent weighted sound reduction index ``R'w``, in dB
         (see :func:`predicted_airborne_insulation`).

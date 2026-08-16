@@ -13,25 +13,25 @@ following Bendat & Piersol, *Random Data: Analysis and Measurement
 Procedures* (4th ed., 2010):
 
 * the **number of averages**: the raw segment count and the effective number
-  of independent averages $n_d$ once the correlation between
+  of independent averages $n_\mathrm{d}$ once the correlation between
   overlapped,
   tapered segments is accounted for (Section 11.5.2.2 and its Ref. 11,
   Welch 1967);
 * the **normalized random error** of the autospectrum estimate,
-  $\varepsilon[\hat{G}_{xx}] = 1/\sqrt{n_d}$ (Eq. 8.158), and of
+  $\varepsilon[\hat{G}_{xx}] = 1/\sqrt{n_\mathrm{d}}$ (Eq. 8.158), and of
   the cross-spectrum magnitude and phase,
-  $\varepsilon[\lvert \hat{G}_{xy} \rvert] = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_d})$ (Eq. 9.33) and
-  $\mathrm{s.d.}[\hat{\theta}_{xy}] = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})$ (Eq. 9.52);
+  $\varepsilon[\lvert \hat{G}_{xy} \rvert] = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_\mathrm{d}})$ (Eq. 9.33) and
+  $\mathrm{s.d.}[\hat{\theta}_{xy}] = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_\mathrm{d}})$ (Eq. 9.52);
 * **chi-square confidence intervals** for the autospectrum: the sampling
   distribution is $n \hat{G}_{xx}/G_{xx} \sim \chi^2_n$ with
-  $n = 2 n_d$ degrees of freedom
+  $n = 2 n_\mathrm{d}$ degrees of freedom
   (Eq. 8.162), giving the interval
   $n \hat{G}_{xx}/\chi^2_{n;\alpha/2} \le G_{xx} \le n \hat{G}_{xx}/\chi^2_{n;1-\alpha/2}$ (Eq. 8.163);
 * the **first-order resolution-bias error**:
-  $b[\hat{G}_{xx}] \approx (B_e^2/24) \, G''_{xx}$
+  $b[\hat{G}_{xx}] \approx (B_\mathrm{e}^2/24) \, G''_{xx}$
   (Eq. 8.139), which for a resonance peak of half-power bandwidth
-  $B_r$
-  becomes $\varepsilon_b \approx -(B_e/B_r)^2/3$ (Eq. 8.141) -
+  $B_\mathrm{r}$
+  becomes $\varepsilon_\mathrm{b} \approx -(B_\mathrm{e}/B_\mathrm{r})^2/3$ (Eq. 8.141) -
   exposed here as
   [`resolution_bias_error`](/phonometry/reference/api/signals/spectra/#resolution_bias_error);
 * the **coherent output spectrum**
@@ -40,7 +40,7 @@ Procedures* (4th ed., 2010):
   single-input/single-output model
   (Eqs. 9.55-9.56), with the spectral signal-to-noise ratio
   $\gamma^2/(1 - \gamma^2)$ and the random error
-  $\varepsilon[\hat{G}_{vv}] = (2 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{n_d})$ (Eq. 9.73).
+  $\varepsilon[\hat{G}_{vv}] = (2 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{n_\mathrm{d}})$ (Eq. 9.73).
 
 The same Welch core (Hann taper and 50% overlap by default, `detrend`
 off so absolute calibration is preserved) also backs the H1/H2 frequency
@@ -159,12 +159,12 @@ $G_{yy} = G_{vv} + G_{nn}$
 | `coherence` | Ordinary coherence $\hat{\gamma}^2_{xy}(f) \in [0, 1]$. |
 | `snr` | Spectral signal-to-noise ratio $\hat{\gamma}^2/(1 - \hat{\gamma}^2)$ ($\infty$ at $\hat{\gamma}^2 = 1$). |
 | `snr_db` | $10 \log_{10}$ of `snr`, in dB. |
-| `random_error` | Normalized random error of $\hat{G}_{vv}$, $\varepsilon = (2 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{n_d})$ (Eq. 9.73), with the measured coherence in place of the true value. |
-| `snr_random_error` | Normalized random error of the SNR, $\varepsilon = \sqrt{2} / (\lvert \gamma_{xy} \rvert \sqrt{n_d})$, first-order propagation of the coherence random error of Eq. 9.82 through $\gamma^2/(1 - \gamma^2)$. |
-| `coherence_bias` | First-order bias of the coherence estimate, $b[\hat{\gamma}^2] \approx (1 - \gamma^2)^2 / n_d$ (Eq. 9.75). |
+| `random_error` | Normalized random error of $\hat{G}_{vv}$, $\varepsilon = (2 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{n_\mathrm{d}})$ (Eq. 9.73), with the measured coherence in place of the true value. |
+| `snr_random_error` | Normalized random error of the SNR, $\varepsilon = \sqrt{2} / (\lvert \gamma_{xy} \rvert \sqrt{n_\mathrm{d}})$, first-order propagation of the coherence random error of Eq. 9.82 through $\gamma^2/(1 - \gamma^2)$. |
+| `coherence_bias` | First-order bias of the coherence estimate, $b[\hat{\gamma}^2] \approx (1 - \gamma^2)^2 / n_\mathrm{d}$ (Eq. 9.75). |
 | `n_segments` | Raw number of segments averaged. |
-| `n_averages` | Effective number of independent averages $n_d$. |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$, in Hz. |
+| `n_averages` | Effective number of independent averages $n_\mathrm{d}$. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |
@@ -209,9 +209,9 @@ Calibrated cross-spectral density with statistical error analysis.
 Welch's method on both channels; alongside
 $\hat{G}_{xy}(f)$ the result
 reports the ordinary coherence and the Bendat & Piersol random errors:
-$\varepsilon[\lvert \hat{G}_{xy} \rvert] = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_d})$ (Eq. 9.33) for the
+$\varepsilon[\lvert \hat{G}_{xy} \rvert] = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_\mathrm{d}})$ (Eq. 9.33) for the
 magnitude and
-$\mathrm{s.d.}[\hat{\theta}_{xy}] = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})$ (Eq. 9.52) for the phase,
+$\mathrm{s.d.}[\hat{\theta}_{xy}] = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_\mathrm{d}})$ (Eq. 9.52) for the phase,
 with the measured coherence in place of the unknown true value.
 
 **Parameters**
@@ -269,11 +269,11 @@ estimate, as Bendat & Piersol recommend for measured data (Section 9.2).
 | `magnitude` | $\lvert \hat{G}_{xy}(f) \rvert$. |
 | `phase` | Cross-spectrum phase $\hat{\theta}_{xy}(f)$, in radians (unwrapped). |
 | `coherence` | Ordinary coherence $\hat{\gamma}^2_{xy}(f) \in [0, 1]$. |
-| `magnitude_random_error` | Normalized random error of $\lvert \hat{G}_{xy} \rvert$, $\varepsilon = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_d})$ (Eq. 9.33). |
-| `phase_std` | Standard deviation of the phase estimate, in radians, $\mathrm{s.d.} = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_d})$ (Eq. 9.52). |
+| `magnitude_random_error` | Normalized random error of $\lvert \hat{G}_{xy} \rvert$, $\varepsilon = 1/(\lvert \gamma_{xy} \rvert \sqrt{n_\mathrm{d}})$ (Eq. 9.33). |
+| `phase_std` | Standard deviation of the phase estimate, in radians, $\mathrm{s.d.} = (1 - \gamma^2_{xy})^{1/2} / (\lvert \gamma_{xy} \rvert \sqrt{2 n_\mathrm{d}})$ (Eq. 9.52). |
 | `n_segments` | Raw number of segments averaged. |
-| `n_averages` | Effective number of independent averages $n_d$. |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$, in Hz. |
+| `n_averages` | Effective number of independent averages $n_\mathrm{d}$. |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$, in Hz. |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |
@@ -365,10 +365,10 @@ Welch's method (Bendat & Piersol Section 11.5.2: tapered, overlapped
 segment averaging, no detrending so absolute calibration is preserved).
 Alongside $\hat{G}_{xx}(f)$ the result reports the effective
 number of
-independent averages $n_d$, the normalized random error
-$\varepsilon = 1/\sqrt{n_d}$ (Eq. 8.158) and the chi-square
+independent averages $n_\mathrm{d}$, the normalized random error
+$\varepsilon = 1/\sqrt{n_\mathrm{d}}$ (Eq. 8.158) and the chi-square
 confidence interval with
-$2 n_d$ degrees of freedom (Eq. 8.163). For the first-order
+$2 n_\mathrm{d}$ degrees of freedom (Eq. 8.163). For the first-order
 resolution-bias error at a resonance peak see
 [`resolution_bias_error`](/phonometry/reference/api/signals/spectra/#resolution_bias_error).
 
@@ -379,7 +379,7 @@ resolution-bias error at a resonance peak see
 | `x` | Signal, 1-D. |
 | `fs` | Sample rate, in Hz. |
 | `window` | Segment taper (any scipy window name; default Hann, the B&P Section 11.5.2 recommendation for side-lobe suppression). |
-| `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_e$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
+| `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_\mathrm{e}$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5, which with a Hann taper retrieves most of the stability lost to tapering, B&P Section 11.5.2.2). |
 | `scaling` | `'density'` (units²/Hz) or `'spectrum'` (units² per segment bandwidth). |
 | `confidence` | Confidence level for the chi-square interval. |
@@ -403,19 +403,19 @@ resolution_bias_error(
 
 First-order resolution-bias error at a resonance peak (Eq. 8.141).
 
-$\varepsilon_b[\hat{G}_{xx}(f_r)] \approx -(B_e/B_r)^2/3$ for
+$\varepsilon_\mathrm{b}[\hat{G}_{xx}(f_\mathrm{r})] \approx -(B_\mathrm{e}/B_\mathrm{r})^2/3$ for
 a resonance of half-power bandwidth
-$B_r$ analysed with resolution bandwidth $B_e$: peaks are
+$B_\mathrm{r}$ analysed with resolution bandwidth $B_\mathrm{e}$: peaks are
 underestimated (and valleys overestimated) by frequency smoothing, in
 the direction of reduced dynamic range (B&P Section 8.5.1). The
-approximation assumes $B_e < B_r$.
+approximation assumes $B_\mathrm{e} < B_\mathrm{r}$.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `resolution_bandwidth` | Analysis resolution bandwidth $B_e$, Hz ([`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
-| `half_power_bandwidth` | Half-power (-3 dB) bandwidth $B_r$ of the spectral peak, in Hz. |
+| `resolution_bandwidth` | Analysis resolution bandwidth $B_\mathrm{e}$, Hz ([`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
+| `half_power_bandwidth` | Half-power (-3 dB) bandwidth $B_\mathrm{r}$ of the spectral peak, in Hz. |
 
 **Returns:** Normalized bias error (dimensionless, negative at a peak).
 
@@ -454,14 +454,14 @@ Welch autospectral density with its statistical error (B&P Ch. 8).
 | :--- | :--- |
 | `frequencies` | One-sided frequency axis, in Hz. |
 | `psd` | Autospectral density $\hat{G}_{xx}(f)$ (units²/Hz for `'density'` scaling, units² for `'spectrum'`). |
-| `ci_lower` | Lower chi-square confidence bound on $G_{xx}$ (Eq. 8.163; the DC bin, and the Nyquist bin for an even segment length, use $n = n_d$ degrees of freedom - a wider interval - because those bins carry a single real Fourier component). |
+| `ci_lower` | Lower chi-square confidence bound on $G_{xx}$ (Eq. 8.163; the DC bin, and the Nyquist bin for an even segment length, use $n = n_\mathrm{d}$ degrees of freedom - a wider interval - because those bins carry a single real Fourier component). |
 | `ci_upper` | Upper chi-square confidence bound on $G_{xx}$. |
 | `confidence` | Confidence level of the interval (e.g. `0.95`). |
-| `random_error` | Normalized random error $\varepsilon[\hat{G}_{xx}] = 1/\sqrt{n_d}$ (Eq. 8.158) of the interior bins ($\sqrt{2/n_d}$ at DC/Nyquist). |
+| `random_error` | Normalized random error $\varepsilon[\hat{G}_{xx}] = 1/\sqrt{n_\mathrm{d}}$ (Eq. 8.158) of the interior bins ($\sqrt{2/n_\mathrm{d}}$ at DC/Nyquist). |
 | `n_segments` | Raw number of (possibly overlapped) segments averaged. |
-| `n_averages` | Effective number of independent averages $n_d$ (equals `n_segments` without overlap; smaller with overlap). |
-| `degrees_of_freedom` | Chi-square degrees of freedom $n = 2 n_d$ of the interior bins (Eq. 8.162; $n_d$ at DC/Nyquist). |
-| `resolution_bandwidth` | Effective noise bandwidth $B_e$ of the tapered segment, in Hz (drives the bias error of Eq. 8.139). |
+| `n_averages` | Effective number of independent averages $n_\mathrm{d}$ (equals `n_segments` without overlap; smaller with overlap). |
+| `degrees_of_freedom` | Chi-square degrees of freedom $n = 2 n_\mathrm{d}$ of the interior bins (Eq. 8.162; $n_\mathrm{d}$ at DC/Nyquist). |
+| `resolution_bandwidth` | Effective noise bandwidth $B_\mathrm{e}$ of the tapered segment, in Hz (drives the bias error of Eq. 8.139). |
 | `window` | Taper name. |
 | `nperseg` | Segment length, in samples. |
 | `overlap` | Segment overlap fraction. |

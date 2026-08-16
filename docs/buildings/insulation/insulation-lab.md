@@ -6,7 +6,7 @@ To rate a building element on its own (a wall type, a floating floor, a
 window) you take it to a qualified laboratory, where suppressed flanking
 makes the direct transmission the whole story. This page covers the
 ISO 10140 laboratory chain: the sound reduction index $R$, the normalized
-impact level $L_n$, the background-noise correction and the accredited test
+impact level $L_\mathrm{n}$, the background-noise correction and the accredited test
 fiches. Three sibling laboratory methods have guides of their own: the
 sound-intensity route in
 [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md), the
@@ -24,18 +24,18 @@ prediction that consumes these laboratory ratings in
 ## Laboratory measurement (ISO 10140)
 
 An [ISO 16283 field measurement](insulation-field.md) yields the primed
-quantities ($R'$, $L'_n$): the number a real building achieves, flanking
+quantities ($R'$, $L'_\mathrm{n}$): the number a real building achieves, flanking
 transmission and all. To rate an
 element on its own (a wall type, a floating floor, a window), you take it to a
 qualified **laboratory** (ISO 10140), where suppressed flanking makes the
 *direct* transmission the whole story. The formulas lose their primes: the
 **sound reduction index** $R$ (not $R'$) and the **normalized impact level**
-$L_n$ (not $L'_n$), with the receiving room's absorption area $A = 0.16\ V/T$
+$L_\mathrm{n}$ (not $L'_\mathrm{n}$), with the receiving room's absorption area $A = 0.16\ V/T$
 now a known property of the facility:
 
 $$
 R = L_1 - L_2 + 10 \log_{10}\frac{S}{A}, \qquad
-L_n = L_i + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
+L_\mathrm{n} = L_\mathrm{i} + 10 \log_{10}\frac{A}{A_0}, \quad A_0 = 10\ \text{m}^2.
 $$
 
 The facility itself is what suppresses the flanking: two structurally
@@ -47,25 +47,25 @@ test mounted in a test opening of about 10 m² between them.
 | | Field (ISO 16283) | Laboratory (ISO 10140) |
 | :--- | :--- | :--- |
 | Airborne element index | $R'$ apparent (with flanking) | $R$ direct (flanking suppressed) |
-| Airborne room pair | $D_{nT}$, $D_n$ (no prime: room quantities) | — |
-| Impact | $L'_n$, $L'_{nT}$ apparent | $L_n$ direct |
-| Single number | $R'_w$, $D_{nT,w}$, $L'_{n,w}$, $L'_{nT,w}$ | $R_w$, $L_{n,w}$ |
+| Airborne room pair | $D_\mathrm{nT}$, $D_\mathrm{n}$ (no prime: room quantities) | — |
+| Impact | $L'_\mathrm{n}$, $L'_\mathrm{nT}$ apparent | $L_\mathrm{n}$ direct |
+| Single number | $R'_\mathrm{w}$, $D_\mathrm{nT,w}$, $L'_\mathrm{n,w}$, $L'_\mathrm{nT,w}$ | $R_\mathrm{w}$, $L_\mathrm{n,w}$ |
 | Absorption area | measured in the room | property of the facility |
 
 The apostrophe is the flanking marker of building acoustics, and it travels
-with the quantity into its single number: $R_w$ rates a laboratory spectrum,
-$R'_w$ a field one. The standardized and normalized level differences
-$D_{nT}$ and $D_n$ carry no prime because they describe the room pair rather
+with the quantity into its single number: $R_\mathrm{w}$ rates a laboratory spectrum,
+$R'_\mathrm{w}$ a field one. The standardized and normalized level differences
+$D_\mathrm{nT}$ and $D_\mathrm{n}$ carry no prime because they describe the room pair rather
 than an element, so there is no flanking-free counterpart to mark. In a
-well-built construction $R'_w$ lands a few dB below the laboratory $R_w$ of
+well-built construction $R'_\mathrm{w}$ lands a few dB below the laboratory $R_\mathrm{w}$ of
 the same partition; a much larger gap says flanking dominates, and the
 [EN 12354 model](../design/insulation-prediction.md) tells you which path carries it.
 
 The single-number ratings reuse the very same ISO 717-1/2 engines
-(`weighted_rating`, `weighted_impact_rating`): an $R$ spectrum rates to $R_w$
-exactly as an $R'$ spectrum rated to $R'_w$. Before forming the index the
+(`weighted_rating`, `weighted_impact_rating`): an $R$ spectrum rates to $R_\mathrm{w}$
+exactly as an $R'$ spectrum rated to $R'_\mathrm{w}$. Before forming the index the
 receiving-room levels must be **corrected for background noise** (Clause 4.3):
-the energy subtraction $10 \log_{10}(10^{L_{sb}/10} - 10^{L_b/10})$ applies for a
+the energy subtraction $10 \log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$ applies for a
 6–15 dB signal-to-background margin, a fixed 1.3 dB correction (the *limit of
 measurement*) at or below 6 dB, and no correction at or above 15 dB.
 
@@ -106,7 +106,7 @@ one-third-octave or 5 octave values are supplied (`rating` is `None` otherwise).
 
 *The two laboratory quantities of ISO 10140 with their ISO 717 ratings: the
 airborne $R$ is rated where the reference sits **above** the measurement,
-the impact $L_n$ where the measurement sits **above** the reference (a
+the impact $L_\mathrm{n}$ where the measurement sits **above** the reference (a
 higher impact level is worse). `lab.plot()` and `imp.plot()` draw either
 panel on its own.*
 
@@ -176,7 +176,7 @@ Both laboratory results write the one-page ISO 10140 test report directly, laid
 out like the accredited laboratory reports rated per ISO 717.
 `LabAirborneInsulationResult.report()` renders the sound reduction index $R$
 fiche (ISO 10140-2:2010) and `LabImpactInsulationResult.report()` the
-normalized impact sound pressure level $L_n$ fiche (ISO 10140-3:2010). Each
+normalized impact sound pressure level $L_\mathrm{n}$ fiche (ISO 10140-3:2010). Each
 fiche names the laboratory standard in its basis line, evaluates the
 ISO 717-1 / ISO 717-2 single-number rating (16 one-third-octave bands from
 100 Hz to 3150 Hz, or the 5 octave bands), states the quantity to one decimal
@@ -184,8 +184,8 @@ place both in tabular form and as a curve against the shifted reference curve,
 boxes the laboratory rating (`Rw (C; Ctr)` or `Ln,w (CI)`) and prints the
 statement that the evaluation is based on laboratory measurement results
 obtained by a precision method. Because a qualified suite suppresses flanking
-transmission, the reported quantity is the *direct* $R$ / $L_n$, not the
-field $R'$ / $L'_n$.
+transmission, the reported quantity is the *direct* $R$ / $L_\mathrm{n}$, not the
+field $R'$ / $L'_\mathrm{n}$.
 
 `verbose=True` annexes the per-band equivalent sound absorption area
 $A = 0.16\,V/T$ (ISO 10140-4:2010) beside the reported quantity, the
@@ -269,7 +269,7 @@ junction data the EN 12354 prediction consumes is measured per
 ## Standards
 
 ISO 10140-2:2010, ISO 10140-3:2010 and ISO 10140-4:2010, which provide the
-laboratory $R$ and $L_n$ with the background-noise correction and the measurement
+laboratory $R$ and $L_\mathrm{n}$ with the background-noise correction and the measurement
 procedures behind them.
 
 **Not covered.** The ISO 10140-4:2010 procedure and the ISO 10140-1:2010 and
@@ -291,7 +291,7 @@ their own pages: intensity (ISO 15186), the floor-covering improvement
   the in-building airborne, impact and façade measurements, their single-number
   ratings and their uncertainty.
 - [Predicting Sound Insulation (EN 12354)](../design/insulation-prediction.md):
-  the flanking model that consumes the laboratory $R$, $L_n$ and $K_{ij}$.
+  the flanking model that consumes the laboratory $R$, $L_\mathrm{n}$ and $K_{ij}$.
 - [Sound Insulation by Intensity (ISO 15186)](insulation-intensity.md): the
   direct-power alternative for high-flanking situations.
 - [Floor-Covering Impact Improvement (ISO 16251-1)](../design/impact-improvement.md):
@@ -299,7 +299,7 @@ their own pages: intensity (ISO 15186), the floor-covering improvement
 - [Laboratory Flanking Transmission (ISO 10848)](flanking-lab.md): the
   measured junction vibration reduction index.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  engine behind $R_w$ and $L_{n,w}$.
+  engine behind $R_\mathrm{w}$ and $L_\mathrm{n,w}$.
 - [Sound Power](../../devices/emission/sound-power.md): the $L_W$ methods that share the
   absorption-area machinery of the receiving room.
 - API reference: [`building.measurement.lab_insulation`](https://jmrplens.github.io/phonometry/reference/api/building/lab-insulation/).

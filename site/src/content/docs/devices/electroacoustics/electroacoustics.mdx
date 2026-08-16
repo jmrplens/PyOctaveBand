@@ -123,7 +123,7 @@ number of periods) or a low-leakage window so the amplitudes are read without
 spectral leakage.
 
 Only the harmonics that fall **below Nyquist** are summed — the implementation
-stops the sum at the first order that reaches $f_s/2$ — so the effective order
+stops the sum at the first order that reaches $f_\mathrm{s}/2$ — so the effective order
 count shrinks as the test frequency rises: at 48 kHz a 1 kHz test sums ten
 orders and a 7 kHz test sums two, and a THD sweep at fixed `n_harmonics` is not
 measuring the same quantity at both ends. Sample at 96 kHz or higher when
@@ -378,14 +378,14 @@ of the second, and the bullets run in clause order:
   chosen far apart (60 Hz and 7 kHz here) so the sidebands are resolvable and
   $f_2 - 2f_1$ stays above the highest significant harmonic of $f_1$. The
   per-order values are *arithmetic* sums of the sideband amplitudes relative to
-  the $f_2$ output: $d_{m,2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
-  $d_{m,3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
+  the $f_2$ output: $d_{\mathrm{m},2} = (a_{f_2+f_1} + a_{f_2-f_1})/a_{f_2}$ and
+  $d_{\mathrm{m},3} = (a_{f_2+2f_1} + a_{f_2-2f_1})/a_{f_2}$. The result also carries the
   combined-RMS `smpte` value that SMPTE-type analyzers report (not an IEC
   quantity).
 - **Difference-frequency distortion** (14.12.8): two equal high tones
   $f_1 < f_2$, referenced to $U_{2,\text{ref}} = 2U_{2,f_2}$ (the sum of both
-  tone amplitudes): $d_{d,2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
-  $d_{d,3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
+  tone amplitudes): $d_{\mathrm{d},2} = a_{f_2-f_1}/(a_{f_1}+a_{f_2})$ and the arithmetic
+  $d_{\mathrm{d},3} = (a_{2f_2-f_1} + a_{2f_1-f_2})/(a_{f_1}+a_{f_2})$.
 - **Dynamic intermodulation** (DIM, 14.12.9): a 15 kHz sine plus a
   low-pass-filtered 3.15 kHz square wave (1:4 peak-to-peak). The DIM is the
   RMS of the intermodulation products $|k\,f_\text{square} \pm f_\text{sine}|$
@@ -410,9 +410,9 @@ amplifier, a woofer Doppler-shifting a tweeter's output — can show a low THD
 and poor modulation distortion.
 
 One warning about the reference. IEC 60268-3 admits two presentations of the
-same sidebands: against the output at $f_2$, which is the $d_m$ this function
+same sidebands: against the output at $f_2$, which is the $d_\mathrm{m}$ this function
 returns, and against the 4:1 combined reference voltage
-$U_{2,\text{ref}} = 5\,U_{2,f_2}$, which gives $d'_m = 5\,d_m$. A figure lifted
+$U_{2,\text{ref}} = 5\,U_{2,f_2}$, which gives $d'_\mathrm{m} = 5\,d_\mathrm{m}$. A figure lifted
 from a datasheet may therefore be five times (14 dB) the one computed here, so
 the reference has to be quoted with the number.
 
@@ -551,7 +551,7 @@ and bias errors — leakage where the resolution is too coarse near a sharp
 resonance, and above all a delay longer than the segment. Averaging is what
 converts the coherence into an error bar: the normalised random error of the
 $|H_1|$ estimate is
-$\varepsilon = \sqrt{1-\gamma^2}\,/\,(|\gamma|\sqrt{2 n_d})$ for $n_d$
+$\varepsilon = \sqrt{1-\gamma^2}\,/\,(|\gamma|\sqrt{2 n_\mathrm{d}})$ for $n_\mathrm{d}$
 averages, so $\gamma^2 = 0.9$ needs about 22 averages for a 5 % magnitude
 error. As a working rule, a band whose coherence stays below roughly 0.9 is
 **unmeasured** rather than measured badly, and its $H_1$ magnitude should not

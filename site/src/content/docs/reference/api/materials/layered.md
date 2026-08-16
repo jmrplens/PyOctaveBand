@@ -18,7 +18,7 @@ $\operatorname{Im}(k) < 0$):
   $[[\cos(k_x d), jZ_x\sin(k_x d)], [j\sin(k_x d)/Z_x, \cos(k_x d)]]$
   with the in-depth wavenumber
   $k_x = \sqrt{k^2 - k_0^2 \sin^2 \theta}$ from Snell's law and
-  $Z_x = Z_c k / k_x$ (Cox & D'Antonio Eqs. (2.29)-(2.32); Bies
+  $Z_x = Z_\mathrm{c} k / k_x$ (Cox & D'Antonio Eqs. (2.29)-(2.32); Bies
   Eq. (D.83); equivalent to the layer-recursion of Bies Eq. (D.95) and
   Mechel Sect. D.4). Thin resonant sheets (perforated plate, microperforated
   plate, limp membrane) enter as series transfer impedances
@@ -163,7 +163,7 @@ the coupling matrices of Sect. 11.4. The chain is closed by a rigid wall
 (`termination="rigid"`), by radiation into free air behind
 (`termination="free"`, $Z_L = \rho c / \cos(\theta)$) or by an
 arbitrary complex impedance. The reflection factor is
-$R = (Z_s \cos(\theta) - \rho c) / (Z_s \cos(\theta) + \rho c)$
+$R = (Z_\mathrm{s} \cos(\theta) - \rho c) / (Z_\mathrm{s} \cos(\theta) + \rho c)$
 and $\alpha = 1 - \lvert R \rvert^2$ (Mechel 2e Sect. D.3
 Eq. (2)).
 
@@ -206,7 +206,7 @@ LayeredAbsorberResult(
 Oblique-incidence prediction of a layered absorber.
 
 All arrays share the shape of `frequency`. `surface_impedance` is the
-specific impedance $Z_s = p / u_n$ at the front face (may be
+specific impedance $Z_\mathrm{s} = p / u_n$ at the front face (may be
 `inf` for a lossless-sheet stack over a rigid wall), `reflection`
 the complex plane-wave reflection factor $R(\theta)$,
 `absorption` the coefficient
@@ -368,7 +368,7 @@ Sect. D.5).
 
 | Name | Description |
 | :--- | :--- |
-| `normalized_impedance` | Normalised surface impedance $z = Z_s / (\rho c)$ (complex scalar or array), with $\operatorname{Re}(z) > 0$. |
+| `normalized_impedance` | Normalised surface impedance $z = Z_\mathrm{s} / (\rho c)$ (complex scalar or array), with $\operatorname{Re}(z) > 0$. |
 | `angle_limit` | Upper integration angle `theta_lim`, in radians (0 \< theta_lim \<= pi/2; default pi/2). |
 
 **Returns:** Statistical absorption coefficient `alpha_dif`.

@@ -5,7 +5,7 @@ Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007).
 Real Decreto 1367/2007 develops Ley 37/2003 del Ruido on acoustic zoning,
 quality objectives and emitter limit values. Its assessment chain is built on
 one index the ISO 1996 family does not define: the **corrected equivalent
-continuous level** :math:`L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i`
+continuous level** :math:`L_{\mathrm{Keq},T} = L_{\mathrm{Aeq},T} + K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}`
 (Annex I A.2 c), where the
 three corrections penalise emergent tonal components, low-frequency components
 and impulsive character. Each is 0, 3 or 6 dB and their sum is capped at 9 dB
@@ -14,15 +14,15 @@ and impulsive character. Each is 0, 3 or 6 dB and their sum is capped at 9 dB
 **Corrections (Annex IV A.3.3).** The reference procedures are:
 
 * ``Kt``: unweighted one-third-octave analysis; for the band ``f`` holding the
-  tone, :math:`L_t = L_f - L_s` with ``Ls`` the *arithmetic* mean of the two
+  tone, :math:`L_\mathrm{t} = L_f - L_s` with ``Ls`` the *arithmetic* mean of the two
   adjacent
   band levels. ``Kt`` is 0/3/6 dB by the thresholds 8/12 dB (20 to 125 Hz),
   5/8 dB (160 to 400 Hz) and 3/5 dB (500 Hz to 10 kHz); with several emergent
   tones the largest applies.
-* ``Kf``: :math:`L_f = L_{Ceq,Ti} - L_{Aeq,Ti}` (background-corrected),
+* ``Kf``: :math:`L_f = L_{\mathrm{Ceq},Ti} - L_{\mathrm{Aeq},Ti}` (background-corrected),
   giving 0 dB for
   :math:`L_f \le 10`, 3 dB for :math:`10 < L_f \le 15` and 6 dB above.
-* ``Ki``: :math:`L_i = L_{AIeq,Ti} - L_{Aeq,Ti}` (background-corrected),
+* ``Ki``: :math:`L_\mathrm{i} = L_{\mathrm{AIeq},Ti} - L_{\mathrm{Aeq},Ti}` (background-corrected),
   with the same
   0/3/6 dB thresholds as ``Kf``.
 
@@ -42,10 +42,10 @@ variants rather than delegating:
   *mean* of the neighbours with 8/5/3 dB thresholds and grades the result.
 * :func:`~phonometry.environment.assessment.impulsive_sound.impulsive_sound_adjustment`
   is the ISO/PAS 1996-3 onset-rate method on a calibrated time signal. The
-  RD's ``Ki`` is the classic :math:`L_{AIeq} - L_{Aeq}` impulse-vs-fast
+  RD's ``Ki`` is the classic :math:`L_\mathrm{AIeq} - L_\mathrm{Aeq}` impulse-vs-fast
   difference read
   off a sound level meter.
-* No ISO 1996 counterpart exists for ``Kf``: the :math:`L_{Ceq} - L_{Aeq}`
+* No ISO 1996 counterpart exists for ``Kf``: the :math:`L_\mathrm{Ceq} - L_\mathrm{Aeq}`
   difference is
   specific to the RD.
 
@@ -57,7 +57,7 @@ A.3.4.2 b):
 
 .. math::
 
-   L_{Keq,T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{Keq,Ti}/10} \right]
+   L_{\mathrm{Keq},T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot 10^{L_{\mathrm{Keq},Ti}/10} \right]
 
 The result is
 rounded by adding 0.5 dB and taking the integer part. The long-term index
@@ -344,7 +344,7 @@ class TonalCorrectionResult:
 
     :ivar frequencies: One-third-octave band centre frequencies, in Hz.
     :ivar levels: Unweighted band sound pressure levels, in dB.
-    :ivar differences: :math:`L_t = L_f - L_s` per band, in dB, where ``Ls``
+    :ivar differences: :math:`L_\mathrm{t} = L_f - L_s` per band, in dB, where ``Ls``
         is the
         arithmetic mean of the two adjacent band levels. ``NaN`` for bands
         that cannot be evaluated (the two end bands, and bands outside the
@@ -452,12 +452,12 @@ def tonal_correction(
 
     The spectrum must be **unweighted** (no frequency weighting applied, as
     required by step a). For every interior band ``f`` the procedure forms
-    :math:`L_t = L_f - L_s` with ``Ls`` the arithmetic mean of the levels of
+    :math:`L_\mathrm{t} = L_f - L_s` with ``Ls`` the arithmetic mean of the levels of
     the bands
     immediately above and below (step b), and reads ``Kt`` off the table of
-    step c: with 20 Hz to 125 Hz bands :math:`L_t < 8` gives 0 dB,
-    :math:`8 \le L_t \le 12`
-    gives 3 dB and :math:`L_t > 12` gives 6 dB; the thresholds are 5/8 dB over
+    step c: with 20 Hz to 125 Hz bands :math:`L_\mathrm{t} < 8` gives 0 dB,
+    :math:`8 \le L_\mathrm{t} \le 12`
+    gives 3 dB and :math:`L_\mathrm{t} > 12` gives 6 dB; the thresholds are 5/8 dB over
     160 Hz to 400 Hz and 3/5 dB over 500 Hz to 10 kHz. With more than one
     emergent tone the largest ``Kt`` governs (step d).
 
@@ -515,10 +515,10 @@ def low_frequency_correction(lceq: float, laeq: float) -> float:
 
     From the C- and A-weighted equivalent levels of the same noise phase, both
     already corrected for background noise,
-    :math:`L_f = L_{Ceq,Ti} - L_{Aeq,Ti}` gives
-    :math:`K_f = 0` for :math:`L_f \le 10` dB, :math:`K_f = 3` for
+    :math:`L_f = L_{\mathrm{Ceq},Ti} - L_{\mathrm{Aeq},Ti}` gives
+    :math:`K_\mathrm{f} = 0` for :math:`L_f \le 10` dB, :math:`K_\mathrm{f} = 3` for
     :math:`10 < L_f \le 15` dB and
-    :math:`K_f = 6` above.
+    :math:`K_\mathrm{f} = 6` above.
 
     .. note::
        The printed table reads "Si 10 >Lf <=15" for the 3 dB row, a misprint
@@ -542,9 +542,9 @@ def impulsive_correction(laieq: float, laeq: float) -> float:
 
     From the impulse- and fast-time-weighted equivalent levels of the same
     noise phase, both already corrected for background noise,
-    :math:`L_i = L_{AIeq,Ti} - L_{Aeq,Ti}` gives :math:`K_i = 0` for
-    :math:`L_i \le 10` dB,
-    :math:`K_i = 3` for :math:`10 < L_i \le 15` dB and :math:`K_i = 6` above.
+    :math:`L_\mathrm{i} = L_{\mathrm{AIeq},Ti} - L_{\mathrm{Aeq},Ti}` gives :math:`K_\mathrm{i} = 0` for
+    :math:`L_\mathrm{i} \le 10` dB,
+    :math:`K_\mathrm{i} = 3` for :math:`10 < L_\mathrm{i} \le 15` dB and :math:`K_\mathrm{i} = 6` above.
 
     .. note::
        This is the classic sound-level-meter route. The onset-rate method of
@@ -570,7 +570,7 @@ RD1367_CORRECTION_VALUES: tuple[float, float, float] = (0.0, 3.0, 6.0)
 
 
 def total_correction(kt: float = 0.0, kf: float = 0.0, ki: float = 0.0) -> float:
-    r"""Summed correction :math:`K = K_t + K_f + K_i`, capped at 9 dB
+    r"""Summed correction :math:`K = K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}`, capped at 9 dB
     (Annex IV A.3.3).
 
     Each of the three tables of Annex IV A.3.3 grades its parameter 0, 3 or
@@ -601,7 +601,7 @@ def corrected_level(
 ) -> float:
     r"""Corrected equivalent continuous level ``LKeq,T`` (Annex I A.2 c).
 
-    :math:`L_{Keq,T} = L_{Aeq,T} + K_t + K_f + K_i` with the sum of the
+    :math:`L_{\mathrm{Keq},T} = L_{\mathrm{Aeq},T} + K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}` with the sum of the
     corrections capped
     at 9 dB. Although it is derived from an A-weighted level, the index is
     expressed in dB by definition.
@@ -657,7 +657,7 @@ class NoisePhase:
 
     @property
     def correction(self) -> float:
-        r"""Summed correction :math:`K = K_t + K_f + K_i`, capped at 9 dB."""
+        r"""Summed correction :math:`K = K_\mathrm{t} + K_\mathrm{f} + K_\mathrm{i}`, capped at 9 dB."""
         return total_correction(self.kt, self.kf, self.ki)
 
     @property
@@ -671,8 +671,8 @@ def evaluation_period_level(
 ) -> float:
     r"""Evaluation-period level ``LKeq,T`` from its noise phases.
 
-    :math:`L_{Keq,T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot
-    10^{L_{Keq,Ti}/10} \right]` (Annex IV
+    :math:`L_{\mathrm{Keq},T} = 10 \log_{10}\left[ (1/T) \sum_i T_i \cdot
+    10^{L_{\mathrm{Keq},Ti}/10} \right]` (Annex IV
     A.3.4.2 b): the duration-weighted energy mean of the phase levels. The
     returned value is **not** rounded; apply :func:`round_reported_level` for the value
     the regulation asks to report.
@@ -710,7 +710,7 @@ def long_term_corrected_level(
 ) -> float:
     r"""Long-term index ``LK,x`` from the daily period levels (Annex I A.2 d).
 
-    :math:`L_{K,x} = 10 \log_{10}\left[ (1/n) \sum_i 10^{L_{Keq,x,i}/10} \right]`:
+    :math:`L_{\mathrm{K},x} = 10 \log_{10}\left[ (1/n) \sum_i 10^{L_{\mathrm{Keq},x,i}/10} \right]`:
     the energy mean of the
     daily corrected levels of the same evaluation period over a year. With
     ``weights`` the mean is weighted, which lets a whole block of identical

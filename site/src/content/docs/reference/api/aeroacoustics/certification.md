@@ -79,7 +79,7 @@ epnl_from_pnlt(
 EPNL from a tone-corrected perceived-noise-level time history (App. 2 §4.5-4.6).
 
 $$
-\mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_F..k_L} 10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right) - 10 \cdot \log_{10}(T_0)
+\mathrm{EPNL} = 10 \cdot \log_{10}\left( \sum_{k_\mathrm{F}..k_\mathrm{L}} 10^{\mathrm{PNLT}(k)/10} \cdot \Delta t(k) \right) - 10 \cdot \log_{10}(T_0)
 $$
 
 with the

@@ -78,7 +78,7 @@ the requested band.
 | :--- | :--- |
 | `inverse` | Inverse-filter samples (time domain, length `n_fft`). |
 | `frequencies` | Frequency grid of the design, in Hz. |
-| `spectrum` | Complex inverse spectrum on `frequencies`, including the $\exp(-j 2 \pi f \, \text{delay} / f_s)$ modeling delay. |
+| `spectrum` | Complex inverse spectrum on `frequencies`, including the $\exp(-j 2 \pi f \, \text{delay} / f_\mathrm{s})$ modeling delay. |
 | `response_spectrum` | Complex spectrum of the measured response the filter was designed from, on the same grid. |
 | `regularization` | The frequency-dependent profile $\epsilon(f)$ (absolute units of $\lvert H \rvert^2$). |
 | `f_range` | `(f1, f2)` band equalized to unity, in Hz. |

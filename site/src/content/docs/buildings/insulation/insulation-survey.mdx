@@ -45,15 +45,15 @@ normally read off a table from the room's construction and volume. Every
 survey quantity is then an addition or subtraction of $k$:
 
 $$
-D_{nT} = D + k, \qquad
-D_n = D + k + 10\log_{10}\frac{A_0 T_0}{0.16\,V}, \qquad
+D_\mathrm{nT} = D + k, \qquad
+D_\mathrm{n} = D + k + 10\log_{10}\frac{A_0 T_0}{0.16\,V}, \qquad
 R' = D + k + 10\log_{10}\frac{S T_0}{0.16\,V},
 $$
 
 $$
-L'_{nT} = L_i - k, \qquad
-L'_n = L_i - k - 10\log_{10}\frac{A_0 T_0}{0.16\,V}, \qquad
-D_{2m,nT} = D_{2m} + k,
+L'_\mathrm{nT} = L_\mathrm{i} - k, \qquad
+L'_\mathrm{n} = L_\mathrm{i} - k - 10\log_{10}\frac{A_0 T_0}{0.16\,V}, \qquad
+D_{2\mathrm{m,nT}} = D_{2\mathrm{m}} + k,
 $$
 
 with $A_0 = 10\ \text{m}^2$ and $V$ the receiving-room volume. The two
@@ -139,7 +139,7 @@ res.plot()   # DnT vs shifted ISO 717-1 reference (needs matplotlib)
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_insulation.svg" alt="Survey-method airborne insulation: the raw level difference D and the standardized DnT across the five octave bands, with the reverberation-index correction k shaded between them" width="80%" />
 
 *The reverberation index $k = 10\log_{10}(T/T_0)$ shifts the raw level difference
-$D$ into the standardized $D_{nT}$: up where the room is live ($T > T_0$),
+$D$ into the standardized $D_\mathrm{nT}$: up where the room is live ($T > T_0$),
 down where
 it is dead. The automatic rating is formed only for exactly 5 octave (or 16
 one-third-octave) values.*
@@ -180,7 +180,7 @@ plt.show()
 | `l1` / `l2` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Source / receiving (or outdoor `l1_2m`) levels |
 | `li` | 1D or 2D array | dB | one/band, or `(positions, bands)` | Impact levels (energy-averaged over positions) |
 | `reverberation_index` | scalar or 1D array | dB | one per band | $k$ from `reverberation_index` or `estimate_reverberation_index`; `survey_service_equipment_level()` also accepts a scalar $k$ |
-| `volume` | float | m³ | > 0 | Receiving-room $V$ (for $D_n$ / $L'_n$ / $R'$ / normalized) |
+| `volume` | float | m³ | > 0 | Receiving-room $V$ (for $D_\mathrm{n}$ / $L'_\mathrm{n}$ / $R'$ / normalized) |
 | `area` | float | m² | > 0 | Common-partition $S$ (airborne $R'$; $V/7.5$ rule applied) |
 | `measurements` | array | dB | exactly 3 | Service-equipment positions (`survey_service_equipment_level`) |
 | `room` | str | — | `"kitchen"`/`"bathroom"`/`"furnished"`/`"a"`–`"h"`/`"a+e"`… | `estimate_reverberation_index` room class (Table 3; the index itself is Table 4) |
@@ -230,7 +230,7 @@ and lowering the arm gently during each traverse. The four rotations take
 about **30 s in total**, which is also the integration time. A rotating
 microphone on a stand is the accepted alternative: at least 10° to the
 horizontal, sweep radius at least 1 m. Without a real-time octave analyser,
-repeat the whole sweep once per band and read each 30 s $L_{eq}$.
+repeat the whole sweep once per band and read each 30 s $L_\mathrm{eq}$.
 
 **The tapping machine (Clause 6.2.3).** Near the centre of the floor in the
 source room, with the hammer line on the room diagonal. One position is enough
@@ -240,7 +240,7 @@ hammer line at 45° to the ribs and every position at least 0.5 m from the
 edges of the floor.
 
 **The rubber ball (Clause 6.3.2).** The heavy/soft branch measures the
-**Fast-weighted maximum** level $L_{i,Fmax}$ in octave bands, about 10 s per
+**Fast-weighted maximum** level $L_\mathrm{i,Fmax}$ in octave bands, about 10 s per
 measurement, from at least two fixed positions — one near the centre and one
 at a different height — separated by more than 0.7 m, at least 0.5 m from any
 boundary and at least 1.0 m from the impact position, averaged over positions
@@ -320,8 +320,8 @@ The airborne, impact and façade survey results each carry a `.report(path)` tha
 writes the one-page ISO 10052 survey (control) method field report: the
 standard-basis line naming ISO 10052 (octave bands), an optional metadata
 header, the octave-band table beside the measured-versus-shifted-reference
-curve, the boxed field rating ($D_{nT,w}$/$R'_w$, $L'_{nT,w}$ or
-$D_{2m,nT,w}$), the
+curve, the boxed field rating ($D_\mathrm{nT,w}$/$R'_\mathrm{w}$, $L'_\mathrm{nT,w}$ or
+$D_{2\mathrm{m,nT,w}}$), the
 survey-method statement, an optional requirement verdict (level differences pass
 at or above it, the impact level at or below it) and a footer. The airborne
 result reports `quantity="dnt"` (default) or `"r_prime"`; `verbose=True`,
@@ -350,7 +350,7 @@ facade.report("D2mnTw_survey.pdf")                       # D2m,nT,w (C; Ctr)
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/survey_impact_insulation.svg" alt="Survey-method impact insulation: the measured octave-band impact level Li and the standardized L'nT with the reverberation-index correction shaded between them, the L'nT,w rating annotated and a note that a live room lowers the standardized impact level" width="80%" />
 
 *The impact survey applies the reverberation index with the opposite sign,
-$L'_{nT} = L_i - k$: a live receiving room ($T > T_0$) **lowers** the standardized
+$L'_\mathrm{nT} = L_\mathrm{i} - k$: a live receiving room ($T > T_0$) **lowers** the standardized
 impact level. As in the airborne case, the automatic rating appears for
 exactly 5 octave (or 16 one-third-octave) values.*
 
@@ -416,8 +416,8 @@ The ISO 10052:2021 survey method: the reverberation index
 $k = 10\log_{10}(T/T_0)$ measured with `building.reverberation_index` or
 estimated from the Table 3 room classes with
 `building.estimate_reverberation_index`; the survey airborne, impact and
-façade quantities ($D_{nT}$, $D_n$, $R'$ with the $V/7.5$ rule, $L'_{nT}$,
-$L'_n$, $D_{2m,nT}$) via `building.survey_airborne_insulation`,
+façade quantities ($D_\mathrm{nT}$, $D_\mathrm{n}$, $R'$ with the $V/7.5$ rule, $L'_\mathrm{nT}$,
+$L'_\mathrm{n}$, $D_{2\mathrm{m,nT}}$) via `building.survey_airborne_insulation`,
 `building.survey_impact_insulation` and `building.survey_facade_insulation`;
 service-equipment noise $L_{XY}$ from exactly three positions via
 `building.survey_service_equipment_level`; the automatic ISO 717 ratings on

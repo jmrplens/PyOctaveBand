@@ -28,7 +28,7 @@ left half-plane ($s = -1/\tau$).
 | Output | Continuous time-weighted envelope (one value per sample) | Stepped output (one value every $\tau$ seconds) |
 | Input units | Raw sound pressure (Pa); squared internally | Energetic quantity (Pa²) expected as input |
 | Filter | Stable exponential averaging (pole at $s=-1/\tau$) | Theoretically unstable design (pole in the right half-plane) stabilized by resetting the filter state every $\tau$ seconds |
-| Behavior | True IEC time weighting | Closer to a block integrator ($L_{eq,\tau}$) |
+| Behavior | True IEC time weighting | Closer to a block integrator ($L_{\mathrm{eq},\tau}$) |
 
 A pole on the negative real axis corresponds to a decaying exponential impulse
 response ($h(t) \propto e^{-t/\tau}$), exactly what "exponential time
@@ -107,7 +107,7 @@ plt.show()
 - If you need **standard-compliant Fast/Slow/Impulse envelopes** (sound level
   meter behavior, one level per sample), use phonometry's
   [`time_weighting`](../signals/levels/time-weighting.md).
-- If you need **block-averaged $L_{eq}$ per interval**, that is a different, equally
+- If you need **block-averaged $L_\mathrm{eq}$ per interval**, that is a different, equally
   valid metric; you can compute it with [`leq`](../signals/levels/levels.md) over consecutive
   slices.
 - Both approaches are useful; they just answer different questions. The
@@ -124,7 +124,7 @@ sample from the metrology core:
 | Standard | What is verified | Test file |
 | :--- | :--- | :--- |
 | IEC 61672-1:2013 Table 3 | A/C/Z weighting at all 34 nominal frequencies, class 1 limits, at 48 and 96 kHz | `tests/filters/test_iec_weighting_table3.py` |
-| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{AE}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
+| IEC 61672-1:2013 Table 4 | F/S tone-burst responses (1 s to 1 ms) and the $L_{\mathrm{A}E}$ column for `sel()` | `tests/filters/test_iec_compliance.py` |
 | IEC 61672-1:2013 Table 5 | `lc_peak()` one-cycle/half-cycle peak responses, class 1 limits | `tests/signals/test_levels.py` |
 | IEC 61260-1:2014 Table 1 | Filter-bank class 1/2 acceptance limits via `verify_filter_class()` | `tests/filters/test_compliance.py` |
 | ISO 7196:1995 Table 2 | G weighting (infrasound) at every nominal response value, 0.25–315 Hz | `tests/filters/test_g_weighting.py` |

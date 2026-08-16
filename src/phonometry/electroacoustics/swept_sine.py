@@ -141,7 +141,7 @@ def synchronized_sweep_signal(
     :param fs: Sampling frequency in Hz.
     :param f1: Start frequency in Hz. Must be > 0.
     :param f2: Stop frequency in Hz. Must satisfy
-        :math:`f_1 < f_2 \le f_s/2`. When :math:`f_2/f_1` is an integer
+        :math:`f_1 < f_2 \le f_\mathrm{s}/2`. When :math:`f_2/f_1` is an integer
         the sweep also *ends* with zero phase
         (Novak et al. 2015, Sec. 2.5).
     :param seconds: Approximate sweep duration in seconds; the exact
@@ -152,7 +152,7 @@ def synchronized_sweep_signal(
         unfaded sweep, and fades only reshape the band edges). Keep it
         small if the playback chain needs one, and pass the same value to
         :func:`swept_sine_distortion`.
-    :return: The sweep samples, length :math:`\lceil T f_s \rceil`.
+    :return: The sweep samples, length :math:`\lceil T f_\mathrm{s} \rceil`.
     """
     fs_v = _positive(fs, "fs")
     f1_v = _positive(f1, "f1")
@@ -435,7 +435,7 @@ def _sweep_timing(
 
     Mirrors the exact quantization of the matching excitation:
     :func:`synchronized_sweep_signal` rounds the rate (Novak Eq. 49) and
-    lasts :math:`\lceil T f_s \rceil` samples;
+    lasts :math:`\lceil T f_\mathrm{s} \rceil` samples;
     :func:`phonometry.sweep_signal` rounds
     the duration to ``round(seconds*fs)`` samples.
     """

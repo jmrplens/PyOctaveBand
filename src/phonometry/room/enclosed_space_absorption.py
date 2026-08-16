@@ -12,8 +12,8 @@ absorption:
 
 .. math::
 
-   A = \sum_i \alpha_{s,i} S_i + \sum_j A_{\text{obj},j}
-   + \sum_k \alpha_{s,k} S_k + A_{\text{air}} \tag{Formula 1}
+   A = \sum_i \alpha_{\mathrm{s},i} S_i + \sum_j A_{\text{obj},j}
+   + \sum_k \alpha_{\mathrm{s},k} S_k + A_{\text{air}} \tag{Formula 1}
 
 with the air term :math:`A_{\text{air}} = 4 m V (1 - \psi)` (Formula 2),
 the object fraction :math:`\psi = \sum V_{\text{obj}} / V` (Formula 3) and,

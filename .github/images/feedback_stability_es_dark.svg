@@ -54,7 +54,7 @@ L 0 3.5
       </g>
      </g>
      <g id="text_1">
-      <!-- Ganancia en lazo abierto $Z_S$ -->
+      <!-- Ganancia en lazo abierto $Z_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(74.337837 320.078984) scale(0.08 -0.08)">
        <defs>
         <path id="DejaVuSans-2a" d="M 3809 666 
@@ -312,35 +312,35 @@ L 738 4134
 L 838 4666 
 z
 " transform="scale(0.015625)"/>
-        <path id="DejaVuSans-Oblique-36" d="M 3859 4513 
-L 3738 3897 
-Q 3422 4066 3111 4152 
-Q 2800 4238 2509 4238 
-Q 1944 4238 1609 3991 
-Q 1275 3744 1275 3334 
-Q 1275 3109 1398 2989 
-Q 1522 2869 2034 2731 
-L 2413 2638 
-Q 3053 2472 3303 2217 
-Q 3553 1963 3553 1503 
-Q 3553 797 2998 353 
-Q 2444 -91 1538 -91 
-Q 1166 -91 791 -17 
-Q 416 56 38 206 
-L 166 856 
-Q 513 641 861 531 
-Q 1209 422 1556 422 
-Q 2147 422 2503 684 
-Q 2859 947 2859 1369 
-Q 2859 1650 2717 1795 
-Q 2575 1941 2106 2059 
-L 1728 2156 
-Q 1081 2325 845 2545 
-Q 609 2766 609 3163 
-Q 609 3859 1145 4304 
-Q 1681 4750 2541 4750 
-Q 2875 4750 3203 4690 
-Q 3531 4631 3859 4513 
+        <path id="DejaVuSans-36" d="M 3425 4513 
+L 3425 3897 
+Q 3066 4069 2747 4153 
+Q 2428 4238 2131 4238 
+Q 1616 4238 1336 4038 
+Q 1056 3838 1056 3469 
+Q 1056 3159 1242 3001 
+Q 1428 2844 1947 2747 
+L 2328 2669 
+Q 3034 2534 3370 2195 
+Q 3706 1856 3706 1288 
+Q 3706 609 3251 259 
+Q 2797 -91 1919 -91 
+Q 1588 -91 1214 -16 
+Q 841 59 441 206 
+L 441 856 
+Q 825 641 1194 531 
+Q 1563 422 1919 422 
+Q 2459 422 2753 634 
+Q 3047 847 3047 1241 
+Q 3047 1584 2836 1778 
+Q 2625 1972 2144 2069 
+L 1759 2144 
+Q 1053 2284 737 2584 
+Q 422 2884 422 3419 
+Q 422 4038 858 4394 
+Q 1294 4750 2059 4750 
+Q 2388 4750 2728 4690 
+Q 3069 4631 3425 4513 
 z
 " transform="scale(0.015625)"/>
        </defs>
@@ -370,7 +370,7 @@ z
        <use xlink:href="#DejaVuSans-52" transform="translate(1188.232422 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(1249.414062 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(1281.201172 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(1349.707031 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(1349.707031 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>
@@ -386,7 +386,7 @@ L 295.00881 23.998281
       </g>
      </g>
      <g id="text_2">
-      <!-- Ganancia del lazo de realimentación $G_S$ -->
+      <!-- Ganancia del lazo de realimentación $G_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(215.68881 320.398984) scale(0.08 -0.08)">
        <defs>
         <path id="DejaVuSans-47" d="M 2906 2969 
@@ -539,7 +539,7 @@ z
        <use xlink:href="#DejaVuSans-51" transform="translate(1762.746094 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(1826.125 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-2a" transform="translate(1857.912109 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(1935.402344 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(1935.402344 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>
@@ -1560,7 +1560,7 @@ L 130.217837 349.798281
       </g>
      </g>
      <g id="text_22">
-      <!-- Ganancia en lazo abierto $Z_S$ -->
+      <!-- Ganancia en lazo abierto $Z_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(74.337837 645.878984) scale(0.08 -0.08)">
        <use xlink:href="#DejaVuSans-2a" transform="translate(0 0.015625)"/>
        <use xlink:href="#DejaVuSans-44" transform="translate(77.490234 0.015625)"/>
@@ -1588,7 +1588,7 @@ L 130.217837 349.798281
        <use xlink:href="#DejaVuSans-52" transform="translate(1188.232422 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(1249.414062 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-3d" transform="translate(1281.201172 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(1349.707031 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(1349.707031 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>
@@ -1604,7 +1604,7 @@ L 295.00881 349.798281
       </g>
      </g>
      <g id="text_23">
-      <!-- Ganancia del lazo de realimentación $G_S$ -->
+      <!-- Ganancia del lazo de realimentación $G_\mathrm{S}$ -->
       <g style="fill: #ffffff" transform="translate(215.68881 646.198984) scale(0.08 -0.08)">
        <use xlink:href="#DejaVuSans-2a" transform="translate(0 0.015625)"/>
        <use xlink:href="#DejaVuSans-44" transform="translate(77.490234 0.015625)"/>
@@ -1643,7 +1643,7 @@ L 295.00881 349.798281
        <use xlink:href="#DejaVuSans-51" transform="translate(1762.746094 0.015625)"/>
        <use xlink:href="#DejaVuSans-3" transform="translate(1826.125 0.015625)"/>
        <use xlink:href="#DejaVuSans-Oblique-2a" transform="translate(1857.912109 0.015625)"/>
-       <use xlink:href="#DejaVuSans-Oblique-36" transform="translate(1935.402344 -14.984326) scale(0.7)"/>
+       <use xlink:href="#DejaVuSans-36" transform="translate(1935.402344 -14.984326) scale(0.7)"/>
       </g>
      </g>
     </g>

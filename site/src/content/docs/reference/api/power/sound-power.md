@@ -17,7 +17,7 @@ background correction $K_1$, the environmental correction $K_2$
 and the surface area (ISO 3744:2010 clause 8.2, equations (12), (16)-(18)):
 
 $$
-\overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 12}
+\overline{L_p} = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 L_{pi}} \right] \tag{Eq. 12}
 $$
 
 $$
@@ -48,13 +48,13 @@ A-weighting band corrections $C_k$ of ISO 3744 Annex E (Tables
 E.1/E.2):
 
 $$
-L_{WA} = 10 \log_{10}\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right] \tag{Eq. E.1}
+L_{W\mathrm{A}} = 10 \log_{10}\!\left[ \sum_k 10^{0.1 (L_{Wk} + C_k)} \right] \tag{Eq. E.1}
 $$
 
 ISO 3746:2010 shares the surfaces, the energy average and the LW/K1/K2 forms
 but is coarser: fewer microphone positions (clause 8.2.1), a background
 criterion of 3 dB instead of 6 dB (clause 8.4.1) and validity up to
-$K_{2A} \le 7$ dB instead of 4 dB (clause 4.3).
+$K_{2\mathrm{A}} \le 7$ dB instead of 4 dB (clause 4.3).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -270,7 +270,7 @@ surface-averaged level is corrected for background noise (`K1`, from
 `room` absorption data) and combined with the measurement surface area:
 
 $$
-L_W = 10 \log_{10}\!\left[ \frac{1}{N_M} \sum_i 10^{0.1 L_{pi}} \right] - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0}
+L_W = 10 \log_{10}\!\left[ \frac{1}{N_\mathrm{M}} \sum_i 10^{0.1 L_{pi}} \right] - K_1 - K_2 + 10 \log_{10}\frac{S}{S_0}
 $$
 
 The surface area `S` is computed from the geometry: `radius` for a
@@ -328,7 +328,7 @@ without `frequencies` it is `NaN` (A-weighting needs the band centres).
 microphone position and frequency band, shape `(NM, NB)` (Eq. 7,
 evaluated per band per clause 8.4). `uncertainty` is the expanded
 uncertainty
-$U = 2\sqrt{\sigma_{R0}^2 + \sigma_{omc}^2}$ (95 %, ISO 3744
+$U = 2\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}$ (95 %, ISO 3744
 clause 9.5).
 
 ### SoundPowerResult.declare()
@@ -355,7 +355,7 @@ Wraps the A-weighted sound power level `LWA` of this measurement as the
 declared measured value `L_WA` of a single operating mode, with the
 uncertainty `K_WA` defaulting to the result's own expanded uncertainty
 `U` (ISO 3744/3746 clause 9.5). The declared single-number value is
-$L_{WAd} = L_{WA} + K_{WA}$ (ISO 4871 clause 3.15).
+$L_{W\mathrm{Ad}} = L_{W\mathrm{A}} + K_{W\mathrm{A}}$ (ISO 4871 clause 3.15).
 
 **Parameters**
 

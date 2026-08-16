@@ -58,7 +58,7 @@ levels on a spherical grid of azimuth $\varphi$ and polar angle $\theta$,
 defined at a fixed **60 m** reference distance under ICAO reference
 atmospheric conditions. Placing that source at a receiver adds the
 propagation adjustment
-$\Delta L_p = \Delta L_s + \Delta L_a + \Delta L_g$.
+$\Delta L_p = \Delta L_\mathrm{s} + \Delta L_\mathrm{a} + \Delta L_\mathrm{g}$.
 
 The EPNL this page computes is the same quantity fixed-wing certification asks
 for; only the source description differs. ICAO Annex 16 Chapter 8 flies the
@@ -215,8 +215,8 @@ plt.show()
 ## Propagation adjustments
 
 The 60 m hemisphere level is carried to the receiver by three adjustments
-(§A.4): `spherical_spreading_adjustment` ($\Delta L_s = -20\log_{10}(r/60)$,
-Eq. 24), `atmospheric_adjustment` ($\Delta L_a = -\alpha(f)\,(r - 60)$ with
+(§A.4): `spherical_spreading_adjustment` ($\Delta L_\mathrm{s} = -20\log_{10}(r/60)$,
+Eq. 24), `atmospheric_adjustment` ($\Delta L_\mathrm{a} = -\alpha(f)\,(r - 60)$ with
 the ISO 9613-1 coefficient,
 Eq. 26/27), and `ground_effect_adjustment` (direct/reflected interference over an
 impedance plane, Chien-Soroka Eq. 28-35, with the Delany-Bazley impedance and the
@@ -430,7 +430,7 @@ hemisphere by a uniform level offset: a measured 0°-direction difference
 (Approach 2, passed as `offset_db`), or the published Approach 3 constants —
 +12 dB for HOGE, −12 dB for reduced-rpm idle and −2.5 dB for full-rpm idle,
 all from the HIGE disk. A constant spectral shift moves the A-weighted level
-by exactly that value, which is how Table 3 (stated on $L_A$ levels) extends
+by exactly that value, which is how Table 3 (stated on $L_\mathrm{A}$ levels) extends
 to band spectra.
 
 ```python
@@ -544,7 +544,7 @@ hemispheres — does not model.
 `flight_path_kinematics` derives, from a time-stamped track by central finite
 differences, everything the event needs (Eq. 16-21 / Doc 32 Eq. 8-10): ground
 speed, airspeed (zero wind), heading, curvature, bank angle
-$\Phi = \arctan(K V_g^2 / g)$ and path angle
+$\Phi = \arctan(K V_\mathrm{g}^2 / g)$ and path angle
 $\gamma = \arctan(\Delta Z / \Delta S)$. The guidance recommends
 smoothing radar tracks (e.g. spline resampling to a 0.5 s cadence) before
 differentiating.
@@ -604,7 +604,7 @@ per track point the flight condition selects (or blends) the hemispheres, the
 emission angles address the source level (the frame is oriented by the heading
 and tilted by the bank angle in turns; pitch attitude is implicit in the
 hemispheres), and the received one-third-octave history is expressed at
-recorded time $t_r = t_e + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$) and
+recorded time $t_\mathrm{r} = t_\mathrm{e} + r/c$ (Eq. 22, $c = 346.1\ \text{m/s}$) and
 integrated:
 `LASmax`, `SEL` over the full history and over the certification 10 dB-down
 window (Doc 32 Eq. 27), and `EPNL` per ICAO Annex 16 (Doc 32 Eq. 28).
@@ -634,7 +634,7 @@ Use LASmax and SEL for contour and annoyance work, and EPNL only against
 certification levels.
 
 The shape of the history is worth reading too. Each emission is stamped at
-recorded time $t_r = t_e + r/c$, and $r$ is largest far from the closest point
+recorded time $t_\mathrm{r} = t_\mathrm{e} + r/c$, and $r$ is largest far from the closest point
 of approach and smallest at it, so the received history is compressed on the way
 in and stretched on the way out — the curve is asymmetric before any directivity
 is involved. Where LASmax actually falls then depends on the hemisphere: with
@@ -646,7 +646,7 @@ hemisphere rather than a source level.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_flyover_event.svg" alt="A-weighted level versus recorded time for a level rotorcraft flyover: a smooth rise to LASmax over the 10 dB-down window and a slower decay, annotated with the SEL and EPNL of the event" width="82%" />
 
 *Two asymmetries in one curve, and neither is a modelling artefact.
-$L_{AS,max}$ = 78.5 dB(A) arrives at 64.56 s, a full second **before** the sound
+$L_\mathrm{AS,max}$ = 78.5 dB(A) arrives at 64.56 s, a full second **before** the sound
 emitted at the closest point of approach (65.56 s), because the hemisphere's
 loudest direction is reached slightly before abeam. And the 10 dB-down window
 runs 9.4 s up and 11.5 s down about the peak — the retarded time compresses the
@@ -949,7 +949,7 @@ the closed-form inverse-square spreading, the analytic rigid-ground and grazing
 limits of the ground effect, off-node bilinear lookups on the reference
 hemispheres of all eleven rotorcraft types, hand-checked interpolation
 simplices, closed-form kinematics and the Lorentzian
-$\mathrm{SEL} - L_{ASmax}$ flyover integral. End to end it reproduces the
+$\mathrm{SEL} - L_\mathrm{ASmax}$ flyover integral. End to end it reproduces the
 NORAH2 prototype's ARP verification cases:
 
 | Quantity | Oracle | Agreement |
@@ -958,7 +958,7 @@ NORAH2 prototype's ARP verification cases:
 | Emission angles | NORAH2 prototype, ARP cases | 0.01° |
 | Retarded time | same | 0.02 s |
 | Per-step level, hard ground, to 18 km | same | 0.08 dB(A) |
-| $L_{ASmax}$ | same | 0.03 dB |
+| $L_\mathrm{ASmax}$ | same | 0.03 dB |
 | `SEL` | same | 0.05 dB hard ground, 0.4 dB soft |
 | Contour grid, 187 microphones | ARP Case 3 | 0.7 dB worst case |
 | $\mathrm{PNLTM}$ | same | 0.1 dB |

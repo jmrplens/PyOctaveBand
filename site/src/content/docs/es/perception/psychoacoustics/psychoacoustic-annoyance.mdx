@@ -256,7 +256,7 @@ argumentos es el modelo exacto).
 La **intensidad de fluctuación** $F$ (vacil) cuantifica la percepción de la
 fluctuación *lenta* de la sonoridad. Como la aspereza, es una sensación de paso
 de banda de la frecuencia de modulación, pero su máximo se sitúa aproximadamente
-un orden de magnitud más abajo, en $f_{mod} \approx 4\ \text{Hz}$ en lugar del
+un orden de magnitud más abajo, en $f_\mathrm{mod} \approx 4\ \text{Hz}$ en lugar del
 máximo de la
 aspereza en ~70 Hz. Por definición, un tono de 1 kHz a 60 dB, modulado en
 amplitud al 100 % a 4 Hz, produce 1 vacil. Esta página cubre dos de los tres
@@ -318,15 +318,15 @@ plt.show()
 
 Para ruido de banda ancha modulado sinusoidalmente en amplitud, Fastl y Zwicker
 dan una forma cerrada (Ec. 10.2) en función del factor de modulación $m$, el
-nivel $L$ y la frecuencia de modulación $f_{mod}$:
+nivel $L$ y la frecuencia de modulación $f_\mathrm{mod}$:
 
 $$
 F = \frac{5{,}8\,(1{,}25\,m - 0{,}25)\,[0{,}05\,(L/\mathrm{dB}) - 1]}
-{(f_{mod}/5\,\mathrm{Hz})^2 + (4\,\mathrm{Hz}/f_{mod}) + 1{,}5}\ \ \mathrm{vacil}.
+{(f_\mathrm{mod}/5\,\mathrm{Hz})^2 + (4\,\mathrm{Hz}/f_\mathrm{mod}) + 1{,}5}\ \ \mathrm{vacil}.
 $$
 
 El denominador es el paso de banda a 4 Hz: alcanza su mínimo cerca de
-$f_{mod} \approx 3{,}7\ \text{Hz}$ y crece a ambos lados. El resultado se
+$f_\mathrm{mod} \approx 3{,}7\ \text{Hz}$ y crece a ambos lados. El resultado se
 limita a 0 (la sensación
 desaparece por debajo de ~20 dB o $m < 0{,}2$). Esta forma exacta es el valor a
 citar para el ruido de banda ancha AM.
@@ -406,7 +406,7 @@ calibrada para que el tono AM de 1 kHz / 60 dB / $m = 1$ / 4 Hz marque
 la Tabla 1 de Osses 2016 y con la referencia abierta SQAT (usada solo como
 oráculo numérico).
 En el barrido de tono AM a 70 dB
-$f_{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ da
+$f_\mathrm{mod} \in \{1, 2, 4, 8, 16, 32\}\ \text{Hz}$ da
 `[0,40, 0,79, 1,09, 1,05, 0,17, 0,09]` vacil frente a la literatura
 `[0,39, 0,84, 1,25, 1,30, 0,36, 0,06]` ($r$ de Pearson $= 0{,}98$, máximo
 correcto a 4 Hz, dentro de ~2,1×). La exactitud para tonos FM no se persigue

@@ -23,10 +23,10 @@ of the rest of the package, exactly as printed:
 
 * **Elastic coefficients** `P`, `Q` and `R` for the usual case of a
   frame built from a material far stiffer than the frame itself
-  ($K_s \to \infty$), Eqs. (6.26)-(6.29) printed pp. 116-117:
-  $R = \phi K_f$, $Q = (1 - \phi) K_f$,
-  $P = 4N/3 + K_b + (1 - \phi)^2 K_f / \phi$ with the frame bulk
-  modulus $K_b = 2N(1 + \nu)/(3(1 - 2\nu))$.
+  ($K_\mathrm{s} \to \infty$), Eqs. (6.26)-(6.29) printed pp. 116-117:
+  $R = \phi K_\mathrm{f}$, $Q = (1 - \phi) K_\mathrm{f}$,
+  $P = 4N/3 + K_\mathrm{b} + (1 - \phi)^2 K_\mathrm{f} / \phi$ with the frame bulk
+  modulus $K_\mathrm{b} = 2N(1 + \nu)/(3(1 - 2\nu))$.
 * **Modified densities** `rho11`, `rho12`, `rho22` (Eq. (6.56), printed
   p. 120) built from the inertial coupling
   $\rho_a = \phi \rho_0 (\alpha_\infty - 1)$ and the visco-inertial
@@ -70,11 +70,11 @@ assembly reproduces the chapter 6 closed form Eq. (6.107) to machine precision.
 The book does print four *output* numbers for the fully specified glass wool of
 Table 6.1, and all four are reproduced: the airborne branch changes from
 $(\delta_1, \mu_1)$ to $(\delta_2, \mu_2)$ at 495 Hz,
-$\lvert \mu_a \rvert > 40$ above 50 Hz, and `mu_b` runs from 1.0 at
+$\lvert \mu_\mathrm{a} \rvert > 40$ above 50 Hz, and `mu_b` runs from 1.0 at
 50 Hz to 0.82 at 1500 Hz (all printed pp. 124-125), while the impedance peak
 of a 5.6 cm layer sits at 860 Hz (printed p. 129). The third of those is
-reproduced by $\operatorname{Re}(\mu_b)$: the printed sentence calls it
-a modulus, but $\lvert \mu_b \rvert$ is 0.939 at 1500 Hz against the
+reproduced by $\operatorname{Re}(\mu_\mathrm{b})$: the printed sentence calls it
+a modulus, but $\lvert \mu_\mathrm{b} \rvert$ is 0.939 at 1500 Hz against the
 printed 0.82, and `docs/ERRATA.md` records why. See
 `tests/materials/absorbers/test_biot.py`.
 
@@ -164,9 +164,9 @@ $\rho_a = \phi \rho_0 (\alpha_\infty - 1)$ (Eq. (6.44)):
   $\rho_{11} = \rho_1 + \rho_a - j\sigma\phi^2 G(\omega)/\omega$
   (Eq. (6.56), printed p. 120), the visco-inertial term being recovered as
   $\phi \rho_0 \alpha_\infty - \rho_{22}$;
-* $K_f = \phi K_{\mathrm{eq}}$, then $R = \phi K_f$,
-  $Q = (1 - \phi) K_f$ and
-  $P = 4N/3 + K_b + (1 - \phi)^2 K_f / \phi$ (Eqs. (6.26)-(6.28));
+* $K_\mathrm{f} = \phi K_{\mathrm{eq}}$, then $R = \phi K_\mathrm{f}$,
+  $Q = (1 - \phi) K_\mathrm{f}$ and
+  $P = 4N/3 + K_\mathrm{b} + (1 - \phi)^2 K_\mathrm{f} / \phi$ (Eqs. (6.26)-(6.28));
 * $\delta_1^2$ and $\delta_2^2$ from Eqs. (6.67)-(6.69),
   $\delta_3^2$ from
   Eq. (6.83), `mu1`, `mu2` from Eq. (6.71) and `mu3` from Eq. (6.84).
@@ -315,7 +315,7 @@ frame_bulk_modulus(shear_modulus: complex, poisson_ratio: float) -> complex
 
 Bulk modulus `Kb` of the frame in vacuum from `N` and `nu`.
 
-$K_b = 2 N (\nu + 1) / (3 (1 - 2 \nu))$ (Allard & Atalla 2e,
+$K_\mathrm{b} = 2 N (\nu + 1) / (3 (1 - 2 \nu))$ (Allard & Atalla 2e,
 Eq. (6.29), printed p. 116). `Kb` is the quantity the jacketed
 "gedanken experiment" of Eq. (6.7) measures, and the one the limp-frame
 rules of thumb of
@@ -349,7 +349,7 @@ frame_elastic_coefficient(
 Longitudinal elastic coefficient `Kc` of the frame in vacuum.
 
 $$
-K_c = \lambda + 2 \mu = K_b + 4 N / 3 = 2 (1 - \nu) N / (1 - 2 \nu)
+K_c = \lambda + 2 \mu = K_\mathrm{b} + 4 N / 3 = 2 (1 - \nu) N / (1 - 2 \nu)
 $$
 
 (Allard & Atalla 2e, Eqs. (1.76) and (6.111), printed pp. 12 and 130).
@@ -394,7 +394,7 @@ frame-in-vacuum wavenumber $\omega \sqrt{\rho_1 / K_c}$ of
 Eq. (6.88), the resonance sits at
 
 $$
-f_r = \frac{1}{4 l} \sqrt{\operatorname{Re}(K_c) / \rho_1} \tag{Eq. 6.110}
+f_\mathrm{r} = \frac{1}{4 l} \sqrt{\operatorname{Re}(K_c) / \rho_1} \tag{Eq. 6.110}
 $$
 
 This is the frequency at which the peak that no
@@ -455,7 +455,7 @@ is written around and the one an external multilayer chain expects.
 | :--- | :--- |
 | `waves` | The [`BiotWavesResult`](/phonometry/reference/api/materials/biot/#biotwavesresult) of the material. |
 | `thickness` | Layer thickness `h`, in metres (> 0). |
-| `transverse_wavenumber` | In-plane wavenumber $k_t = k \sin(\theta)$, in rad/m (Default: 0, normal incidence). Scalar or one value per frequency. |
+| `transverse_wavenumber` | In-plane wavenumber $k_\mathrm{t} = k \sin(\theta)$, in rad/m (Default: 0, normal incidence). Scalar or one value per frequency. |
 
 **Returns:** The transfer matrix with shape `(len(frequency), 6, 6)`.
 
