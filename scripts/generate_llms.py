@@ -498,12 +498,13 @@ def _summary(version: str) -> list[str]:
         ),
         "",
         (
-            "One caveat about `[full]`: numba declares `numpy<2.5`, so "
-            "`phonometry[full]` (like `phonometry[perf]`) resolves NumPy below "
-            "2.5 while a plain install gets the newest release. numba only makes "
-            "the `impulse` time weighting faster, so install "
-            "`phonometry[plot,report]` instead if you would rather keep NumPy "
-            "current."
+            "One caveat about `[full]`: numba is the only extra that caps "
+            "NumPy, and it raises that cap only once it supports a new NumPy "
+            "minor, so in the weeks after a NumPy minor release "
+            "`phonometry[full]` (like `phonometry[perf]`) can resolve one minor "
+            "behind what a plain install gets. numba only makes the `impulse` "
+            "time weighting faster, so install `phonometry[plot,report]` "
+            "instead if you need the newest NumPy the day it ships."
         ),
         "",
         (

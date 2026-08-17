@@ -10,11 +10,19 @@ landing page said 427 checks while *Why phonometry* still said 371.
 The Astro page bodies import the numbers from
 ``site/src/data/conformance-stats.mjs``, so they cannot drift. What is left is
 the text that has no build step to interpolate through: the plain-markdown
-mirror under ``docs/``, the ``.zenodo.json`` description, and the YAML
+mirror under ``docs/``, the ``README.md`` and generated ``README_PYPI.md`` at
+the repository root, the ``.zenodo.json`` description, and the YAML
 frontmatter of the site pages (the landing-page meta descriptions and the
 JSON-LD blocks on the conformance pages, which are static data parsed before
 MDX ever runs). Those used to be edited by hand after every change that moved
 a count.
+
+The READMEs are why the file set reaches the repository root at all, instead
+of stopping at ``docs/``. They sat outside it, said "more than 250 standards"
+while the report said 365, and the gate called the corpus consistent
+throughout. The PyPI one is the worse of the two to get wrong: PyPI freezes a
+long description at upload, so a count that is stale on release day stays
+published.
 
 This script owns them instead. It has two modes over **one** list of patterns,
 so the two can never disagree:
@@ -136,9 +144,23 @@ def expected_counts(root: pathlib.Path = ROOT) -> dict[str, int]:
 def sources(root: pathlib.Path = ROOT) -> list[pathlib.Path]:
     """Every prose file that could quote a count.
 
-    ``.zenodo.json`` is in here because its description is prose too: it is the
-    text the archived record shows, it states the counts, and it has no build
-    step to interpolate them through.
+    Three places, for three reasons.
+
+    The guides and their site mirrors, walked from ``docs/`` and
+    ``site/src/content/docs/``.
+
+    The markdown at the repository root, non-recursively. This is where the
+    two most-read pages of prose in the project live, and they were outside
+    the walk: ``README.md``, and the ``README_PYPI.md`` generated from it,
+    whose text is the PyPI long description. That one matters most of all,
+    because PyPI freezes a description at upload, so a count that is stale
+    when the release goes out is published wrong for good. The glob is
+    deliberately not ``rglob``: recursing from the root would pull in
+    ``stub/``, ``site/`` and every vendored tree under them.
+
+    ``.zenodo.json``, because its description is prose too: it is the text the
+    archived record shows, it states the counts, and it has no build step to
+    interpolate them through.
 
     :param root: Repository root to walk.
     :return: The files to check or rewrite, in a stable order.
@@ -151,6 +173,7 @@ def sources(root: pathlib.Path = ROOT) -> list[pathlib.Path]:
             continue
         for pattern in ("*.md", "*.mdx"):
             found += sorted(base.rglob(pattern))
+    found += sorted(root.glob("*.md"))
     kept = [
         path
         for path in found
@@ -295,9 +318,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     """Check, or with ``--write`` correct, the counts quoted in the prose."""
     parser = argparse.ArgumentParser(
         description=(
-            "Check that every conformance count quoted in the docs, the site "
-            "frontmatter and .zenodo.json equals the headline of "
-            "docs/CONFORMANCE.md."
+            "Check that every conformance count quoted in the docs, the root "
+            "READMEs, the site frontmatter and .zenodo.json equals the "
+            "headline of docs/CONFORMANCE.md."
         )
     )
     parser.add_argument(

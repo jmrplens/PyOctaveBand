@@ -1,16 +1,24 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 
 """
-Tests ensuring the package does not hijack the global matplotlib backend.
+Tests ensuring the package treats matplotlib as the optional dependency it is.
 
-Importing phonometry must not force a specific (e.g. non-interactive)
-backend, so the package can be used during interactive exploration
-(IPython, Jupyter). See issue #52.
+Two promises are kept here. Importing phonometry must not force a specific
+(e.g. non-interactive) backend, so the package can be used during interactive
+exploration (IPython, Jupyter); see issue #52. And the base install must run on
+NumPy and SciPy alone, so ``import phonometry`` has to succeed with matplotlib
+absent, plotting failing only when a plot is actually asked for.
 """
 
+import ast
 import os
 import subprocess
 import sys
+from pathlib import Path
+
+import pytest
+
+SRC = Path(__file__).resolve().parent.parent / "src" / "phonometry"
 
 
 def test_import_does_not_override_matplotlib_backend() -> None:
@@ -39,31 +47,198 @@ def test_import_does_not_override_matplotlib_backend() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_filters_design_has_no_toplevel_matplotlib_import() -> None:
-    """matplotlib must be imported lazily so the package works without it."""
-    import ast
-    import inspect
+def _imports_matplotlib(node: ast.stmt) -> bool:
+    """Whether ``node`` is an import statement that pulls in matplotlib."""
+    if isinstance(node, ast.Import):
+        names = [alias.name for alias in node.names]
+    elif isinstance(node, ast.ImportFrom):
+        # A relative import (level > 0) names a module of this package, never
+        # matplotlib, whatever the module happens to be called.
+        names = [node.module or ""] if node.level == 0 else []
+    else:
+        return False
+    return any(name == "matplotlib" or name.startswith("matplotlib.") for name in names)
 
-    from phonometry.filters import design
 
-    tree = ast.parse(inspect.getsource(design))
+def _is_type_checking_guard(test: ast.expr) -> bool:
+    """Whether ``test`` is the one condition that never runs.
 
-    # Only imports inside a function body are lazy; module-scope imports
-    # (even wrapped in try/if blocks) still run at import time.
-    inside_functions: set[ast.AST] = set()
-    for func in ast.walk(tree):
-        if isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            for sub in ast.walk(func):
-                inside_functions.add(sub)
+    Only a bare ``TYPE_CHECKING`` or ``typing.TYPE_CHECKING`` qualifies. This
+    used to ask whether the unparsed test *contained* the name, which is the
+    same question with the wrong answer for the two conditions that matter:
+    ``if not TYPE_CHECKING:`` runs exactly when the guard does not, and
+    ``if TYPE_CHECKING or enabled:`` runs whenever ``enabled`` is true. Both
+    read as guarded to a substring search, so an import placed in either would
+    have been waved through by the gate meant to catch it.
+    """
+    if isinstance(test, ast.Name):
+        return test.id == "TYPE_CHECKING"
+    return isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING"
 
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            module = getattr(node, "module", None) or ""
-            aliases = [a.name for a in node.names]
-            if any("matplotlib" in n for n in [module, *aliases]):
-                assert node in inside_functions, (
-                    "matplotlib imported at module scope in filters.design"
-                )
+
+def _eager_matplotlib_imports(
+    body: list[ast.stmt], *, guarded: bool = False
+) -> list[int]:
+    """Line numbers of the matplotlib imports that run at import time.
+
+    Only two placements are lazy: inside a function body, and under
+    ``if TYPE_CHECKING:``, which never executes. Everything else at module
+    scope runs the moment the package is imported, including a class body and
+    the branches of a runtime ``if``, a ``try``, a ``with``, a loop or a
+    ``match`` -- so this descends into those rather than assuming a bare
+    top-level statement is the only way to import something eagerly.
+
+    The compound statements are enumerated rather than walked generically
+    because the distinction being drawn is exactly the one a generic walk
+    erases: a function body is the *point* of the lazy placement and must not
+    be descended into, while every other block runs on import and must be.
+    """
+    eager: list[int] = []
+    for node in body:
+        if _imports_matplotlib(node):
+            if not guarded:
+                eager.append(node.lineno)
+        elif isinstance(node, ast.If):
+            # ``else`` is the runtime branch of a TYPE_CHECKING guard.
+            deferred = guarded or _is_type_checking_guard(node.test)
+            eager += _eager_matplotlib_imports(node.body, guarded=deferred)
+            eager += _eager_matplotlib_imports(node.orelse, guarded=guarded)
+        elif isinstance(node, ast.Try):
+            for block in (
+                node.body,
+                node.orelse,
+                node.finalbody,
+                *(handler.body for handler in node.handlers),
+            ):
+                eager += _eager_matplotlib_imports(block, guarded=guarded)
+        elif isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            # A loop that never iterates still executes its ``else``.
+            for block in (node.body, node.orelse):
+                eager += _eager_matplotlib_imports(block, guarded=guarded)
+        elif isinstance(node, ast.Match):
+            for case in node.cases:
+                eager += _eager_matplotlib_imports(case.body, guarded=guarded)
+        elif isinstance(node, (ast.With, ast.AsyncWith, ast.ClassDef)):
+            eager += _eager_matplotlib_imports(node.body, guarded=guarded)
+    return eager
+
+
+def test_no_module_scope_matplotlib_import_anywhere() -> None:
+    """No module in the package may import matplotlib at import time.
+
+    Scoped to the whole package rather than to one module: this used to check
+    ``filters.design`` alone, which is where the first such import was found,
+    and a later one in a rendering leaf sailed past it and broke
+    ``import phonometry`` on a base install.
+    """
+    offenders = [
+        f"{path.relative_to(SRC)}:{lineno}"
+        for path in sorted(SRC.rglob("*.py"))
+        for lineno in _eager_matplotlib_imports(
+            ast.parse(path.read_text(encoding="utf-8")).body
+        )
+    ]
+    assert not offenders, (
+        "matplotlib imported at module scope (import it inside the function "
+        "that needs it, or under TYPE_CHECKING when it is only a type):\n"
+        + "\n".join(offenders)
+    )
+
+
+#: ``(label, module source, is it eager?)``. The gate above is only as good as
+#: this classifier, and a gate that quietly answers "nothing to report" is
+#: worse than no gate, so the classifier is pinned against the placements that
+#: decide it: the two conditions that merely mention ``TYPE_CHECKING`` without
+#: being it, the block statements that run on import, and the two placements
+#: that genuinely are lazy and must stay unreported.
+_PLACEMENTS = [
+    ("type-checking guard", "if TYPE_CHECKING:\n    import matplotlib\n", False),
+    ("qualified guard", "if typing.TYPE_CHECKING:\n    import matplotlib\n", False),
+    ("function body", "def f():\n    import matplotlib\n", False),
+    ("negated guard", "if not TYPE_CHECKING:\n    import matplotlib\n", True),
+    ("guard in an or", "if TYPE_CHECKING or x:\n    import matplotlib\n", True),
+    (
+        "guard's else",
+        "if TYPE_CHECKING:\n    pass\nelse:\n    import matplotlib\n",
+        True,
+    ),
+    ("for body", "for i in x:\n    import matplotlib\n", True),
+    ("for else", "for i in x:\n    pass\nelse:\n    import matplotlib\n", True),
+    ("while body", "while x:\n    import matplotlib\n", True),
+    ("match case", "match v:\n    case _:\n        import matplotlib\n", True),
+    ("with body", "with ctx():\n    import matplotlib\n", True),
+    ("class body", "class C:\n    import matplotlib\n", True),
+    ("try body", "try:\n    import matplotlib\nexcept ImportError:\n    pass\n", True),
+]
+
+
+@pytest.mark.parametrize(
+    ("label", "source", "eager"),
+    _PLACEMENTS,
+    ids=[label for label, _, _ in _PLACEMENTS],
+)
+def test_eager_import_classifier(label: str, source: str, eager: bool) -> None:
+    """The classifier behind the gate reports exactly the eager placements."""
+    found = _eager_matplotlib_imports(ast.parse(source).body)
+    assert bool(found) is eager, (
+        f"{label}: expected {'an eager' if eager else 'no'} import, got {found}"
+    )
+
+
+#: Run in a subprocess: matplotlib is imported by the time the suite reaches
+#: this file, and a blocker installed in-process cannot undo that. A fresh
+#: interpreter is the only place the base install can honestly be simulated.
+_IMPORT_WITHOUT_MATPLOTLIB = """
+import sys
+
+
+class Blocker:
+    '''Deny matplotlib and every submodule of it.
+
+    The hook Python consults is ``find_spec``. A blocker written against the
+    long-removed ``find_module`` protocol is simply never called, so matplotlib
+    imports normally and the test passes while proving nothing at all.
+    '''
+
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == "matplotlib" or fullname.startswith("matplotlib."):
+            raise ImportError("No module named %r (blocked)" % fullname)
+        return None
+
+
+for name in [n for n in sys.modules if n.split(".")[0] == "matplotlib"]:
+    del sys.modules[name]
+sys.meta_path.insert(0, Blocker())
+
+# Prove the blocker bites before trusting what it certifies.
+try:
+    import matplotlib
+except ImportError:
+    pass
+else:
+    raise AssertionError("the blocker let matplotlib through: gate proves nothing")
+
+import phonometry
+
+print(phonometry.__version__)
+"""
+
+
+def test_import_succeeds_without_matplotlib() -> None:
+    """The base install is NumPy and SciPy: importing must not need plotting."""
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join(sys.path)
+    result = subprocess.run(
+        [sys.executable, "-c", _IMPORT_WITHOUT_MATPLOTLIB],
+        capture_output=True,
+        text=True,
+        env=env,
+        timeout=120,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        "import phonometry failed without matplotlib:\n" + result.stderr
+    )
 
 
 def test_showfilter_raises_helpful_error_without_matplotlib(monkeypatch) -> None:
