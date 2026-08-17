@@ -146,11 +146,13 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     s.text(548, 288, "the calibrator (5.1.1)", 13, th.fg)
 
     # -- Windscreen, off to one side ---------------------------------------
-    s.circle(548, 386, 28, th.panel, th.muted, sw=2)
+    # Set left of the panel it would otherwise reach: "la verificación,
+    # puesta al medir" is 201 px against the 176 of its English twin.
+    s.circle(529, 386, 28, th.panel, th.muted, sw=2)
     for k in range(-2, 3):
-        s.line(524, 386 + k * 10, 572, 386 + k * 10, th.muted, 0.9)
-    s.text(548, 436, "windscreen: off for the", 13, th.muted)
-    s.text(548, 456, "check, back on to measure", 13, th.muted)
+        s.line(505, 386 + k * 10, 553, 386 + k * 10, th.muted, 0.9)
+    s.text(529, 436, "windscreen: off for the", 13, th.muted)
+    s.text(529, 456, "check, back on to measure", 13, th.muted)
 
     # -- Right panel: the background check ---------------------------------
     # 240 px wide on "leer ≥ 30 dB por debajo del", 216 px against the 185

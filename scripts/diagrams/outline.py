@@ -469,11 +469,12 @@ def _collisions() -> list[_Hit]:
     of the sources could tell which of six and a half thousand of them
     had come to rest on something.
 
-    Four kinds are reported. *overprint*, two labels sharing a line whose
+    Five kinds are reported. *overprint*, two labels sharing a line whose
     ink boxes meet, or come within :data:`_TIGHT` of doing so; *escapes*,
     a label crossing the border of a stroked box it sits inside;
-    *struck*, a rule or a circle drawn through a label's ink box; and
-    *painted over*, a filled panel drawn after a label and across it.
+    *crosses*, a label reaching into a box it sits outside; *struck*, a
+    rule or a circle drawn through a label's ink box; and *painted over*,
+    a filled panel drawn after a label and across it.
 
     Advisory, and deliberately not a gate. A dimension callout is drawn
     beside the room it measures and reads as "escaping" it; a leader
@@ -594,13 +595,23 @@ def _collisions() -> list[_Hit]:
                 for box in svg.boxes:
                     inside = (box.x0 < mid_x < box.x1
                               and box.y0 < mid_y < box.y1)
-                    if inside and box.stroke != "none":
-                        over = max(box.x0 - lab.x0, lab.x1 - box.x1)
-                        if over > -0.5:
+                    if box.stroke != "none":
+                        if inside:
+                            over = max(box.x0 - lab.x0, lab.x1 - box.x1)
+                            if over > -0.5:
+                                hits.append(_Hit(
+                                    plate, "escapes",
+                                    f"{over:.1f} px past "
+                                    f"{box.x0:.0f}..{box.x1:.0f}", lab.text))
+                        elif any(crosses(edge, pad) for edge in (
+                                (box.x0, box.y0, box.x0, box.y1),
+                                (box.x1, box.y0, box.x1, box.y1),
+                                (box.x0, box.y0, box.x1, box.y0),
+                                (box.x0, box.y1, box.x1, box.y1))):
                             hits.append(_Hit(
-                                plate, "escapes",
-                                f"{over:.1f} px past "
-                                f"{box.x0:.0f}..{box.x1:.0f}", lab.text))
+                                plate, "crosses",
+                                f"the box at {box.x0:.0f}..{box.x1:.0f}",
+                                lab.text))
                     if (box.fill != "none" and box.seq > lab.seq
                             and min(lab.x1, box.x1) - max(lab.x0, box.x0) > 1.0
                             and min(lab.bottom, box.y1)
