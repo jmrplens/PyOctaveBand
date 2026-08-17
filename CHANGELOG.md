@@ -149,17 +149,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - A second census measures the labels against the drawings, which is where the
   wider face actually put them: `outline.py --collisions` reports two labels
   sharing a line whose ink meets, a label crossing the border of a stroked box
-  it sits inside, a rule or a circle drawn through a label, and a filled panel
-  drawn after a label and across it. It counted 298 collisions that the
-  typeface change had introduced, and it is how they were worked off. Thirteen
-  survived the scale conversion and were given room one at a time; ten boxes
-  that had been measured on their English contents are now cut to whichever of
-  the two languages is the longer, the Spanish of this corpus running about a
-  quarter longer throughout; and the two-channel FRF plate's signal generator
-  has a box wide enough for its own caption for the first time, having been
-  190 px around a 195 px Spanish caption before any of this. The corpus now
-  carries 310 hits against origin/main's 411, and every one of the 310 is a hit
-  origin/main already had.
+  it sits inside or reaching into one it sits outside, a rule or a circle drawn
+  through a label, and a filled panel drawn after a label and across it. It
+  counted 298 collisions that the typeface change had introduced, and it is how
+  they were worked off. Thirteen survived the scale conversion and were given
+  room one at a time; ten boxes that had been measured on their English
+  contents are now cut to whichever of the two languages is the longer, the
+  Spanish of this corpus running about a quarter longer throughout; and the
+  two-channel FRF plate's signal generator has a box wide enough for its own
+  caption for the first time, having been 190 px around a 195 px Spanish
+  caption before any of this. The corpus carries 356 hits where the same census
+  counts 471 on the release before it, every text-on-text overprint in it is
+  gone, and nothing in the 356 is a collision that release did not already
+  have.
 - The corpus typography is finished end to end: figure titles at text weight
   (the ISO 80000 justification for mixed weights dissolved on reading the
   standard, which regulates slope and never weight), the prime composed as a
