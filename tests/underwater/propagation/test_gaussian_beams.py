@@ -74,6 +74,35 @@ nothing with the solver.
   agreeing while their positions slip. Doubling the beam width moves the same
   cut by 12 dB. So the two tests above are white box on purpose: a field-value
   oracle sharp enough to see the branch does not exist here.
+
+Two further candidates were tried and rejected, with the measurements that ruled
+them out, so that nobody spends the afternoon on them again.
+
+* **Fig. 3.17** (book p. 185) is the obvious target on paper: transmission loss
+  for the :math:`n^2`-linear profile at F = 2000 Hz, SD = 1000 m, RD = 800 m
+  over 3.000 to 3.100 km, the exact solution against Gaussian beam theory,
+  straight through the caustic that Fig. 3.14 spikes on, and every parameter of
+  it printed on the figure. Nothing is tabulated anywhere in the chapter,
+  though, and the "exact solution" it is drawn against is a Chapter 4 spectral
+  integral that would have to be built first. Digitising a printed curve is good
+  to perhaps half a decibel and would make the oracle an image, which is not the
+  standard the rest of this file holds itself to. The three falsifiable things
+  that figure does say are asserted instead, and separately: the level stays
+  finite through a caustic where the classical amplitude provably diverges, the
+  caustic is located by a construction the solver never performs, and the shadow
+  beyond decays gradually rather than off a cliff.
+
+* **Agreement with :func:`normal_modes` and :func:`parabolic_equation`** on a
+  refracting range-independent case is the criterion the guide already uses to
+  set those two against each other, but as a test here it measures the wrong
+  thing. On the 200 m, 50 Hz, 1500 to 1530 m/s case their own trend test uses,
+  the beams sit 8.8 dB from the modes and 6.8 dB from the PE, energy-averaged,
+  while the two siblings agree with each other to 2.0 dB on the same cut. That
+  gap is the quarter-depth clamp putting :math:`W_0` at 1.7 wavelengths and
+  nothing else: it closes as the width is opened, and it is absent from the same
+  comparison in deep water. A test written around the number would be pinning
+  the clamp rather than the beams, and the Airy oracle below pins the beams
+  properly, so it is not worth having as well.
 """
 
 from __future__ import annotations
