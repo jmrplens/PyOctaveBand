@@ -85,6 +85,13 @@ DARK = Theme(
 #: the italic default. Every other letter run inside a script is an index
 #: and is set in italic ($K_{ij}$, $η_{ij}$); extend this set only for a
 #: subscript that abbreviates a word, never for letter-indices.
+#:
+#: Being keyed on the run alone is also why the plates sit outside the
+#: file-level rule the prose follows, where a symbol is set by what it
+#: means in the module or the guide that carries it and two files may
+#: legitimately disagree (CONTRIBUTING.md, "Setting a subscript"). A plate
+#: has no such scope to appeal to, so a run that has to be italic anywhere
+#: stays italic everywhere.
 _ROMAN_SCRIPTS = frozenset((
     "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
     "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "mod",
