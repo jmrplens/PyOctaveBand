@@ -130,6 +130,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   asks for. Three plates rendered under an emptied fontconfig are
   pixel-identical to the normal render, which is the property the whole change
   exists for.
+- Every label the wider face pushed off its sheet is recomposed. The census
+  that measures all 6,550 plate labels in both languages against their 900 px
+  sheets named 330 of them, across 196 plates, once the typeface changed.
+  Nearly half were plate titles, the one label on a plate whose width nobody
+  chose: a title is a sentence centred on the sheet, and half the corpus is
+  written right up to the edge of it, so a title now measures itself and takes
+  the largest of 26, 24 and 22 px that clears the sheet. The floor is 22
+  because 22 px of this face reads at about the apparent size and the line
+  length the narrower one set 26 px at, so a stepped-down title is the shipped
+  title restored rather than a shrunken one; below it there is no step, and the
+  fit gate names the composition instead. The remaining 186 are recomposed by
+  wording, by a better line break or by a wider box, never by shrinking type
+  across the corpus, and the signal generator of the two-channel FRF plate has
+  a box wide enough for its own caption for the first time: it was 190 px
+  around a 195 px Spanish caption before any of this, which is a defect the
+  sheet census structurally cannot see. The census reports zero.
 - The corpus typography is finished end to end: figure titles at text weight
   (the ISO 80000 justification for mixed weights dissolved on reading the
   standard, which regulates slope and never weight), the prime composed as a
