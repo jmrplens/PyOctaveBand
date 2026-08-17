@@ -67,6 +67,55 @@ if (readFileSync(TARGET, 'utf8') === redirectModuleSource(redirects)) {
 	);
 }
 
+// --- The prose quotes the count the map actually has ---------------------
+// Four files explain this map in prose and each of them states its size. That
+// number is the first thing a reader takes on trust and the last thing anyone
+// thinks to update, and it had already gone wrong once here: two of these
+// files disagreed, one still quoting the count from before the Spanish
+// fallback was counted, which is the very correction the derivation exists to
+// make. So the prose is checked against the map like everything else in this
+// file. The generated header states the size too, and the comparison above
+// already keeps that one honest.
+const flatten = (text) => text.replace(/^[\t ]*(?:\/\/|#|\*)[\t ]?/gm, '').replace(/\s+/g, ' ');
+const prose = [
+	{
+		file: join(siteDir, 'scripts', 'shared', 'redirects.mjs'),
+		pattern: /against (\d+) addresses that had gone dead/g,
+		expected: redirects.size,
+	},
+	{
+		file: join(siteDir, 'scripts', 'check-redirects.mjs'),
+		pattern: /(\d+) published addresses were in the same state/g,
+		expected: redirects.size,
+	},
+	{
+		file: join(siteDir, '..', '.github', 'workflows', 'docs.yml'),
+		pattern: /(\d+) published addresses turned out to be/g,
+		expected: redirects.size,
+	},
+	{
+		// Stated per language rather than in total, so it is half the map.
+		file: join(siteDir, 'astro.config.mjs'),
+		pattern: /moved (\d+) pages in each language/g,
+		expected: redirects.size / 2,
+	},
+];
+const misquoted = [];
+for (const { file, pattern, expected } of prose) {
+	const where = file.slice(join(siteDir, '..').length + 1);
+	const found = [...flatten(readFileSync(file, 'utf8')).matchAll(pattern)];
+	if (found.length !== 1) {
+		misquoted.push(`${where}: expected one statement of the count, found ${found.length}`);
+	} else if (Number(found[0][1]) !== expected) {
+		misquoted.push(`${where}: says ${found[0][1]}, the map has ${expected}`);
+	}
+}
+if (misquoted.length > 0) {
+	fail(`the prose disagrees with the map it describes:\n       ${misquoted.join('\n       ')}`);
+} else {
+	ok(`every comment that states the size of the map states ${redirects.size}`);
+}
+
 // --- Every redirect the build emitted lands on a real page ---------------
 if (!existsSync(dist)) {
 	console.log(

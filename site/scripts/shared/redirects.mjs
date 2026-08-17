@@ -4,7 +4,7 @@
 // pages, then filed into topic folders, then given subgroups. Each of those
 // moves changed the URL of every page it touched, and a moved page leaves its
 // old address behind as a 404 unless something is done about it. Almost
-// nothing was: `astro.config.mjs` carried eight redirect entries against 386
+// nothing was: `astro.config.mjs` carried eight redirect entries against 432
 // addresses that had gone dead, so `/guides/room-acoustics/`,
 // `/guides/sound-power/`, `/reference/why-phonometry/` and hundreds more
 // answered 404 to anyone arriving from a search result, a bookmark or a
@@ -54,8 +54,9 @@ export const FIRST_DEPLOY = '1114b84b17ad7607dd20e8222867b4855ac5b109';
  * page, but a reader who bookmarked the psychoacoustics guide wants the
  * psychoacoustics section, not one page inside it. So a split lands on the
  * overview of the subsection its content became, which is a better answer than
- * any one of the pages it was split into. The four entries the site already
- * carried are kept verbatim; the two below them are the ones it lacked.
+ * any one of the pages it was split into. The first four below are the
+ * destinations `astro.config.mjs` already carried, kept verbatim; the
+ * impulse-prominence entry is the one it lacked.
  *
  * Keyed by the locale-independent route, so one entry covers `/x/` and
  * `/es/x/` alike.
