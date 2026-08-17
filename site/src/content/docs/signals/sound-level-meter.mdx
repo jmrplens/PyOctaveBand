@@ -108,10 +108,12 @@ A field sheet worth copying:
 ## 2. Calibrate: give the samples physical meaning
 
 Digital samples are dimensionless; the **sensitivity factor** converts them
-to pascals. `sensitivity()` computes it from the calibrator recording and, at
-the same time, validates the recording's short-term stability the way
-IEC 60942 qualifies the calibrator itself, so a badly coupled microphone is
-caught here instead of corrupting every level downstream.
+to pascals. `sensitivity()` computes it from the calibrator recording and, when
+you pass `fs` as below and leave `validate` at its default `True`, also
+validates the recording's short-term stability the way IEC 60942 qualifies the
+calibrator itself, so a badly coupled microphone is caught here instead of
+corrupting every level downstream. Drop either one and you get the factor on
+its own, with no check.
 
 ```python
 cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)

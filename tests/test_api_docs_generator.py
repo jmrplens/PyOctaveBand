@@ -404,3 +404,49 @@ def test_quick_table_covers_public_api() -> None:
     )
     markdown = path.read_text(encoding="utf-8")
     assert car.missing_names(markdown, list(phonometry.__all__)) == []
+
+
+_VERSION_ROW = """\
+| Name | Type | Description | Usage |
+| :--- | :--- | :--- | :--- |
+| `__version__` | `str` | **Package version string.** | `phonometry.__version__  # '3.3.0'` |
+"""
+
+
+def test_version_problems_flags_a_literal_that_drifted() -> None:
+    """A release bump leaves the literal behind; the gate must say so."""
+    assert car.version_problems(_VERSION_ROW, "3.3.0") == []
+    assert car.version_problems(_VERSION_ROW, "3.4.0") == ["shows '3.3.0'"]
+    assert car.version_problems(_VERSION_ROW, "4.0.0") == ["shows '3.3.0'"]
+
+
+def test_version_problems_flags_a_row_that_shows_no_version_at_all() -> None:
+    """Finding nothing must fail, not pass while claiming the version is fine.
+
+    Deleting the row breaks the coverage check, but emptying its example
+    cell leaves the row in place, and a check that only compares literals it
+    finds would report the current version for a page that shows none.
+    """
+    emptied = _VERSION_ROW.replace("  # '3.3.0'", "")
+    assert "__version__" in emptied
+    assert car.version_problems(emptied, "3.3.0") == [
+        "no `phonometry.__version__  # '...'` example to check"
+    ]
+
+
+def test_version_problems_ignores_a_lookalike_comment() -> None:
+    """Only ``phonometry.__version__  # '...'`` counts, not any old string."""
+    unrelated = "| `leq` | `function` | Level | `leq(x)  # '3.2.0' looking text` |"
+    assert car.version_problems(_VERSION_ROW + unrelated, "3.3.0") == []
+
+
+def test_quick_table_version_literal_is_current() -> None:
+    """The committed table shows the version the package actually reports."""
+    path = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "docs" / "reference" / "api" / "index.md"
+    )
+    markdown = path.read_text(encoding="utf-8")
+    assert car.version_problems(markdown, phonometry.__version__) == []
+    # And it says it exactly once, so no second copy can drift unseen.
+    assert car._VERSION_LITERAL.findall(markdown) == [phonometry.__version__]

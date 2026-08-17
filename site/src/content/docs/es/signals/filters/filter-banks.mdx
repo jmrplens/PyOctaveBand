@@ -296,7 +296,7 @@ constructor y `bank.filter()` es el método por llamada.
 | `sigbands` | función, `.filter()` | bool | — | por defecto `False` | Devuelve también las señales temporales por banda |
 | `mode` | función, `.filter()` | str | — | `'rms'` (por defecto) o `'peak'` | Estadístico por banda devuelto |
 | `nominal` | función, `.filter()` | bool | — | por defecto `False` | Devuelve etiquetas nominales (p. ej. `1000`) en vez de las frecuencias centrales exactas |
-| `detrend` | función, `.filter()` | bool | — | por defecto `True` | Elimina el offset DC de cada banda antes del nivel (mejora la precisión en graves) |
+| `detrend` | función, `.filter()` | bool | — | por defecto `True` | Elimina el offset DC de la señal de entrada una sola vez, antes de filtrar (mejora la precisión en graves) |
 | `zero_phase` | solo `.filter()` | bool | — | por defecto `False` | Filtrado adelante-atrás (offline); ver el apartado 5 |
 | `calculate_level` | solo `.filter()` | bool | — | por defecto `True` | Con `False` devuelve las señales de banda sin calcular niveles (usar con `sigbands=True`) |
 

@@ -135,7 +135,7 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
 | `mode` | str | — | `'rms'` (default) or `'peak'` | Per-band statistic returned |
 | `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
-| `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `detrend` | bool | — | default `True` | Remove the input signal's DC offset once, before filtering (improves low-frequency accuracy) |
 | `calibration.factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
 | `calibration.dbfs` | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
 | `response_plot.file` | str or `None` | — | default `None` | Save the bank-response plot to this path |

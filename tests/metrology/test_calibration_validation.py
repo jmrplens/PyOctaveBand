@@ -53,6 +53,21 @@ def test_validation_can_be_disabled() -> None:
         sensitivity(_cal_tone(am_depth=0.05), fs=FS, validate=False)
 
 
+def test_validation_needs_fs_and_is_skipped_without_it() -> None:
+    """`validate=True` alone buys nothing: the check is gated on `fs`.
+
+    The same recording that warns with `fs` passes silently without it, and
+    still returns the same factor. The guides now state that precondition
+    on the `validate` row instead of only three lines above it.
+    """
+    unstable = _cal_tone(am_depth=0.05)
+    with pytest.warns(CalibrationWarning, match="fluctuation"):
+        with_fs = sensitivity(unstable, fs=FS, validate=True)
+    with _assert_no_calibration_warning():
+        without_fs = sensitivity(unstable, validate=True)
+    assert without_fs == pytest.approx(with_fs, rel=1e-12)
+
+
 def test_custom_fluctuation_limit() -> None:
     with pytest.warns(CalibrationWarning):
         sensitivity(_cal_tone(am_depth=0.05), fs=FS, max_fluctuation_db=0.1)

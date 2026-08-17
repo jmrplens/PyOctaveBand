@@ -406,7 +406,7 @@ plt.show()
 | `target_spl` | float | dB re 20 µPa | defecto `94.0` | Nivel nominal del calibrador (calibradores de 114 dB: pasa `114.0`) |
 | `ref_pressure` | float | Pa | defecto `2e-5` | Presión de referencia $p_0$; rara vez se cambia |
 | `fs` | int, opcional | Hz | > 0; defecto `None` | Necesario para la validación de estabilidad; omítelo para saltarla |
-| `validate` | bool | — | defecto `True` | Emite `CalibrationWarning` con grabaciones inestables/cortas |
+| `validate` | bool | — | defecto `True` | Emite `CalibrationWarning` con grabaciones inestables/cortas; necesita `fs` y sin él no hace nada |
 | `max_fluctuation_db` | float, opcional | dB | defecto `None` → Tabla 2 clase 1 | Sobrescritura explícita del límite de estabilidad |
 | `frequency` | float | Hz | defecto `1000.0` | Frecuencia nominal del calibrador; elige la fila de la Tabla 2 de IEC 60942 |
 | `narrowband` | bool | — | defecto `False` | Estima el tono con un detector coherente (Goertzel) cerca de `frequency` (requiere `fs`) en lugar del RMS de banda completa; rechaza el zumbido/ruido de banda ancha que si no infla el RMS y reduce todos los niveles posteriores (−0,41 dB a 10 dB de SNR, −0,04 dB a 20 dB; ver la figura de arriba). Actívalo para grabaciones de acoplador ruidosas |

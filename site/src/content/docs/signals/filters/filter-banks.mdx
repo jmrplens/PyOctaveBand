@@ -278,7 +278,7 @@ the one-shot function, `OctaveFilterBank(...)` is the constructor, and
 | `sigbands` | function, `.filter()` | bool | — | default `False` | Also return the per-band time signals |
 | `mode` | function, `.filter()` | str | — | `'rms'` (default) or `'peak'` | Per-band statistic returned |
 | `nominal` | function, `.filter()` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
-| `detrend` | function, `.filter()` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `detrend` | function, `.filter()` | bool | — | default `True` | Remove the input signal's DC offset once, before filtering (improves low-frequency accuracy) |
 | `zero_phase` | `.filter()` only | bool | — | default `False` | Forward-backward filtering (offline); see section 5 |
 | `calculate_level` | `.filter()` only | bool | — | default `True` | `False` returns the band signals without computing levels (use with `sigbands=True`) |
 

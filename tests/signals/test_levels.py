@@ -3,6 +3,11 @@
 Tests for integrated and statistical sound levels (Leq, LAeq, LN).
 """
 
+import inspect
+import pathlib
+import re
+import string
+
 import numpy as np
 import pytest
 
@@ -26,6 +31,19 @@ def test_leq_dbfs() -> None:
     """RMS of a full-scale sine is -3.01 dBFS."""
     x = _tone(1000)
     assert leq(x, dbfs=True) == pytest.approx(-3.01, abs=0.05)
+
+
+def test_leq_dbfs_zero_reference_is_rms_one_not_a_full_scale_sine() -> None:
+    """0 dBFS is RMS 1.0, not the AES17 full-scale sine.
+
+    Pins the convention the guides quote. Under AES17 a full-scale sine reads
+    0 dBFS; here it reads -3.01, and it takes a sine of amplitude sqrt(2)
+    (RMS 1.0) to reach 0. Anything else is a 3.01 dB systematic offset.
+    """
+    assert leq(_tone(1000, amp=np.sqrt(2.0)), dbfs=True) == pytest.approx(0.0, abs=1e-6)
+    assert leq(_tone(1000), dbfs=True) == pytest.approx(-3.0103, abs=1e-3)
+    # Any RMS-1.0 waveform hits 0 dBFS: the reference is RMS, not a shape.
+    assert leq(np.ones(FS), dbfs=True) == pytest.approx(0.0, abs=1e-9)
 
 
 def test_leq_multichannel_returns_per_channel() -> None:
@@ -380,3 +398,155 @@ def test_sound_exposure_rejects_nonpositive_duration() -> None:
         sound_exposure(tone, FS, duration_hours=0)
     with pytest.raises(ValueError, match="duration_hours"):
         lex_8h(tone, FS, duration_hours=-1.0)
+
+
+# ---------------------------------------------------------------------------
+# The guide's parameter tables must not overstate what they list
+# ---------------------------------------------------------------------------
+
+#: The levels guide exists three times over: the plain-markdown edition under
+#: ``docs/`` that GitHub and the llms artifacts read, and the two published
+#: site editions. They are written by hand, one per language, so a table
+#: drifts in one copy at a time; every check below runs on all three.
+_LEVELS_GUIDE_COPIES = (
+    "docs/signals/levels/levels.md",
+    "site/src/content/docs/signals/levels/levels.mdx",
+    "site/src/content/docs/es/signals/levels/levels.mdx",
+)
+
+
+def _levels_guide(relative_path: str) -> str:
+    """The text of one copy of the levels guide."""
+    path = pathlib.Path(__file__).resolve().parents[2] / relative_path
+    assert path.is_file(), f"missing guide copy: {relative_path}"
+    return path.read_text(encoding="utf-8")
+
+
+#: A first-column cell of the "Peak / event / dose parameters" table, e.g.
+#: ``| `sel(x, fs, weighting=None, ...)` | ...``.
+_SIGNATURE_CELL = re.compile(r"^\|\s*`([a-z_0-9]+)\((.*?)\)`\s*\|")
+
+
+def _documented_signatures(markdown: str) -> dict[str, list[str]]:
+    """Function name -> the parameter tokens its guide row spells out."""
+    found: dict[str, list[str]] = {}
+    for line in markdown.splitlines():
+        match = _SIGNATURE_CELL.match(line.strip())
+        if match is None:
+            continue
+        params = [tok.strip() for tok in match.group(2).split(",") if tok.strip()]
+        found[match.group(1)] = params
+    return found
+
+
+def _real_signature_tokens(func: object) -> list[str]:
+    """The full parameter list of ``func`` rendered the way the guide writes it."""
+    tokens = []
+    for name, param in inspect.signature(func).parameters.items():  # type: ignore[arg-type]
+        if param.default is inspect.Parameter.empty:
+            tokens.append(name)
+        else:
+            tokens.append(f"{name}={param.default!r}")
+    return tokens
+
+
+@pytest.mark.parametrize("relative_path", _LEVELS_GUIDE_COPIES)
+def test_guide_signature_cells_match_the_code(relative_path: str) -> None:
+    """Rows that omit parameters must say so with an explicit ellipsis.
+
+    Three rows of the peak/event/dose table elide their tail with ``...``,
+    which makes a row *without* one read as the complete signature. This
+    checks both readings: an elided row must be a true prefix of the real
+    signature, and a plain row must list it in full.
+
+    Signatures are code, not prose, so they read the same in every copy and
+    the same check applies to each: the published site editions are the ones
+    a reader actually meets.
+    """
+    import phonometry
+    from phonometry.signals import levels as levels_module
+
+    documented = _documented_signatures(_levels_guide(relative_path))
+    checked = 0
+    for name, params in documented.items():
+        func = getattr(levels_module, name, None) or getattr(phonometry, name, None)
+        if func is None or not callable(func):
+            continue
+        real = _real_signature_tokens(func)
+        checked += 1
+        if params and params[-1] == "...":
+            listed = params[:-1]
+            assert listed == real[: len(listed)], (name, listed, real)
+            assert len(listed) < len(real), f"{name}: '...' elides nothing"
+        else:
+            assert params == real, (name, params, real)
+    assert checked >= 4, f"expected the peak/event/dose rows, checked {checked}"
+
+
+#: The ``weighting`` row of the LN parameter table, whose values column names
+#: the curves. Curve letters are identifiers, so they are the same in both
+#: languages even though the prose around them is not.
+_WEIGHTING_ROW = re.compile(r"^\|\s*`weighting`\s*\|")
+_QUOTED_CURVE = re.compile(r"`'([A-Za-z]+)'`")
+
+
+def _accepted_weighting_curves() -> set[str]:
+    """Every curve `weighting_filter` really takes, found by asking it."""
+    from phonometry import weighting_filter
+
+    silence = np.zeros(256)
+    accepted = set()
+    for candidate in [*string.ascii_uppercase, "AU"]:
+        try:
+            weighting_filter(silence, FS, curve=candidate)
+        except ValueError:
+            continue
+        accepted.add(candidate)
+    return accepted
+
+
+@pytest.mark.parametrize("relative_path", _LEVELS_GUIDE_COPIES)
+def test_guide_weighting_row_lists_every_curve_the_code_takes(
+    relative_path: str,
+) -> None:
+    """The LN table's `weighting` row must name the real accepted set.
+
+    It used to name four of the seven curves, which reads as a closed list
+    and hides 'B', 'D' and 'AU'. Listing one that does not exist would be
+    the same defect the other way round, so this compares the two sets.
+    """
+    rows = [
+        line
+        for line in _levels_guide(relative_path).splitlines()
+        if _WEIGHTING_ROW.match(line.strip())
+    ]
+    assert len(rows) == 1, f"expected one `weighting` row, found {len(rows)}"
+    columns = rows[0].strip().strip("|").split("|")
+    assert len(columns) == 5, columns
+    documented = set(_QUOTED_CURVE.findall(columns[3]))
+    assert documented == _accepted_weighting_curves(), sorted(documented)
+
+
+@pytest.mark.parametrize("curve", ["A", "B", "C", "D", "G", "AU", "Z"])
+def test_ln_levels_and_sel_accept_every_weighting_filter_curve(curve: str) -> None:
+    """Both functions forward `weighting` straight to `weighting_filter`.
+
+    The docstrings used to advertise only 'A', 'C', 'Z' and the guides only
+    'A', 'C', 'G', 'Z'; the real accepted set is whatever `weighting_filter`
+    takes. Only an unknown letter raises.
+    """
+    from phonometry import ln_levels, sel
+
+    x = _tone(1000, seconds=2.0)
+    assert np.isfinite(ln_levels(x, FS, n=(50,), weighting=curve)[50])
+    assert np.isfinite(sel(x, FS, weighting=curve))
+
+
+def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
+    from phonometry import ln_levels, sel
+
+    x = _tone(1000)
+    with pytest.raises(ValueError, match="Weighting curve"):
+        ln_levels(x, FS, weighting="Q")
+    with pytest.raises(ValueError, match="Weighting curve"):
+        sel(x, FS, weighting="Q")

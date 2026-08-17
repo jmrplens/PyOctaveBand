@@ -177,7 +177,7 @@ plt.show()
 | `x` | array 1D o 2D | unidades digitales (o Pa si está calibrada) | no vacío | 2D es `[channels, samples]`; devuelve un nivel por canal |
 | `fs` | int | Hz | > 0 (solo `laeq`) | `leq` no necesita frecuencia de muestreo (integral RMS pura) |
 | `calibration_factor` | float | Pa por unidad digital | por defecto `1.0` | De `sensitivity()` |
-| `dbfs` | bool | — | por defecto `False` | `True`: 0 dBFS = seno RMS a fondo de escala; ignora la calibración |
+| `dbfs` | bool | — | por defecto `False` | `True`: 0 dBFS = RMS 1.0; ignora la calibración |
 
 ## Niveles percentiles (LN)
 
@@ -245,7 +245,7 @@ plt.show()
 </details>
 
 Opciones: `mode` selecciona la ponderación temporal de la envolvente (`'fast'`, `'slow'`,
-`'impulse'`), `weighting` aplica antes la ponderación A/C, y
+`'impulse'`), `weighting` aplica antes la curva de ponderación elegida, y
 `calibration_factor`/`dbfs` se comportan como en `leq`. `ln_levels` descarta
 los primeros $5\tau$ de la envolvente antes de calcular los percentiles (0,625 s
 en Fast, 5 s en Slow) porque a los $5\tau$ el integrador está asentado al
@@ -348,7 +348,7 @@ lo que hace el `composite_rating_level` de
 | `fs` | int | Hz | > 0 | Lo necesita el detector de envolvente |
 | `n` | tupla de ints | % | por defecto `(10, 50, 90)` | Cualquier porcentaje de excedencia, p. ej. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | Ponderación temporal IEC 61672-1 de la envolvente |
-| `weighting` | str o None | — | `'A'`, `'C'`, `'G'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente |
+| `weighting` | str o None | — | cualquier curva de `weighting_filter`: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente (`None` y `'Z'` dejan la señal sin ponderar) |
 | `calibration_factor` / `dbfs` | float / bool | — | como `leq` | Misma semántica que en `leq()` |
 
 ## Nivel máximo con ponderación temporal (LAFmax, LASmax)
@@ -680,7 +680,7 @@ plt.show()
 
 | Función | Parámetros clave | Devuelve | Ancla normativa |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` referencia el *pico* a fondo de escala (`1.0`), no el RMS | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, ráfagas tonales de la Tabla 5 |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False, oversample=8)` | `dbfs=True` referencia el *pico* a fondo de escala (`1.0`), no el RMS; con `oversample=1` el pico se lee en la rejilla de muestreo | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, ráfagas tonales de la Tabla 5 |
 | `sel(x, fs, weighting=None, ...)` | `weighting='A'` da el $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Tabla 4 (columna $L_{\mathrm{A}E}$) |
 | `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` trata `x` como muestra de ese periodo | $E$ [Pa²h] | IEC 61252 |
 | `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
@@ -766,7 +766,7 @@ plt.show()
 | `window_time` | float | s | > 0; por defecto `0.125` | Longitud de la ventana (0,125 s replica Fast) |
 | `overlap` | float | — | 0 ≤ overlap < 1; por defecto `0.5` | Fracción de solape entre ventanas (0 = sin solape) |
 | `mode` | str | — | `'rms'` (por defecto) o `'peak'` | Detector por ventana |
-| `detrend` | bool | — | por defecto `True` | Elimina el offset DC de cada banda antes del nivel (mejora la precisión en graves) |
+| `detrend` | bool | — | por defecto `True` | Elimina el offset DC de la señal de entrada una sola vez, antes de filtrar (mejora la precisión en graves) |
 | `zero_phase` | bool | — | por defecto `False` | Filtrado hacia delante y atrás (solo offline) |
 | `calibration_factor` / `dbfs` | — | — | solo constructor | Se fijan en `OctaveFilterBank(...)`, no por llamada |
 

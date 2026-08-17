@@ -150,7 +150,7 @@ distribution), L90 the level exceeded 90% of the time, etc.
 | `fs` | Sample rate in Hz. |
 | `n` | Percentile exceedance values, e.g. (10, 50, 90). |
 | `mode` | Time weighting for the envelope: 'fast', 'slow' or 'impulse'. |
-| `weighting` | Optional frequency weighting: 'A', 'C', 'Z' or None. |
+| `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
 | `calibration_factor` | Multiplier converting digital units to Pascals. |
 | `dbfs` | If True, return dBFS instead of dB SPL. |
 
@@ -182,7 +182,7 @@ reference responses, Equation 8, in the test suite).
 | :--- | :--- |
 | `x` | Input signal covering the whole event (1D or 2D). |
 | `fs` | Sample rate in Hz. |
-| `weighting` | Optional frequency weighting: 'A', 'C', 'Z' or None. |
+| `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
 | `calibration_factor` | Multiplier converting digital units to Pascals. |
 | `dbfs` | If True, reference digital full scale instead of 20 uPa. |
 

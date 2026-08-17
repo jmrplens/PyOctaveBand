@@ -94,7 +94,10 @@ def ln_levels(
     :param fs: Sample rate in Hz.
     :param n: Percentile exceedance values, e.g. (10, 50, 90).
     :param mode: Time weighting for the envelope: 'fast', 'slow' or 'impulse'.
-    :param weighting: Optional frequency weighting: 'A', 'C', 'Z' or None.
+    :param weighting: Optional frequency weighting, any curve accepted by
+        :func:`~phonometry.filters.weighting.weighting_filter`: 'A', 'B', 'C',
+        'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the
+        signal unweighted.
     :param calibration_factor: Multiplier converting digital units to Pascals.
     :param dbfs: If True, return dBFS instead of dB SPL.
     :return: Dict mapping each N to its level (scalar for 1D input,
@@ -186,7 +189,10 @@ def sel(
 
     :param x: Input signal covering the whole event (1D or 2D).
     :param fs: Sample rate in Hz.
-    :param weighting: Optional frequency weighting: 'A', 'C', 'Z' or None.
+    :param weighting: Optional frequency weighting, any curve accepted by
+        :func:`~phonometry.filters.weighting.weighting_filter`: 'A', 'B', 'C',
+        'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the
+        signal unweighted.
     :param calibration_factor: Multiplier converting digital units to Pascals.
     :param dbfs: If True, reference digital full scale instead of 20 uPa.
     :return: Scalar for 1D input, array of shape (channels,) for 2D input.
