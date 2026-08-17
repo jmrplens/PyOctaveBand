@@ -4,8 +4,15 @@
 # NOTE: this is the subpath copy, served at /phonometry/robots.txt. Crawlers
 # only read the file at the domain root, so the authoritative one is
 # https://jmrplens.github.io/robots.txt; this copy exists so anything that does
-# fetch it reads the same policy, and it is kept in step with the root file by
-# hand.
+# fetch it is told the same thing.
+#
+# The two files are not identical, and no check here can make them so: the root
+# file lives in another repository. Each names a few crawlers the other does
+# not. What they share is the policy, which is the part a crawler is asking
+# about: both open with `User-agent: *` / `Allow: /`, and every per-crawler rule
+# in either file is another `Allow: /`. So a crawler reading this copy is
+# granted exactly what the root file grants it, whether or not it is named in
+# both.
 #
 # Structured context for LLMs:
 #   https://jmrplens.github.io/phonometry/llms.txt
@@ -17,7 +24,7 @@ Allow: /
 # `ai-input` and `ai-retrieval` name the same grounding/RAG use: the IETF draft
 # uses one token and contentsignals.org publishes the other, so both are
 # declared rather than betting on which vocabulary a given parser implements.
-# Mirrors the four keys declared in the root file.
+# The root file declares the same four keys.
 Content-Signal: search=yes, ai-train=yes, ai-input=yes, ai-retrieval=yes
 
 # AI / generative-engine crawlers (explicitly welcomed for GEO).
