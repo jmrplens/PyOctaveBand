@@ -46,7 +46,7 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
 
 ## 1. Los cuatro métodos de un vistazo
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide_es.svg" alt="La guía de ondas distancia-profundidad que los tres métodos toman como entrada: la distancia creciendo hacia la derecha y la profundidad hacia abajo, una superficie del mar de presión nula, un fondo de presión nula o rígido, el perfil de velocidad del sonido dibujado junto a la columna con su eje de canal, una fuente a la profundidad z_s, un receptor a la profundidad z y la distancia r, y un rayo que gira donde la velocidad del sonido local cumple la condición de Snell, anotada con lo que calcula cada uno de los tres métodos en ese mismo marco" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide_es.svg" alt="La guía de ondas distancia-profundidad que los cuatro métodos toman como entrada: la distancia creciendo hacia la derecha y la profundidad hacia abajo, una superficie del mar de presión nula, un fondo de presión nula o rígido, el perfil de velocidad del sonido dibujado junto a la columna con su eje de canal, una fuente a la profundidad z_s, un receptor a la profundidad z y la distancia r, y un rayo que gira donde la velocidad del sonido local cumple la condición de Snell, anotada con lo que calcula cada uno de los cuatro métodos en ese mismo marco" width="92%" />
 
 - **`normal_modes`** resuelve el problema de autovalores de Sturm-Liouville
   separado en profundidad por diferencias finitas y suma los modos
@@ -671,7 +671,7 @@ plt.show()
 
 ### Preparar un cálculo
 
-Los tres métodos los configura quien llama, y todos los fragmentos anteriores
+Los cuatro métodos los configura quien llama, y todos los fragmentos anteriores
 fijan una malla sin decir por qué. Las reglas son cortas.
 
 **La malla en profundidad.** La transformada de senos de la PE, y el
@@ -702,6 +702,21 @@ abanico abarque los rayos que el canal atrapa, en vez de los ±12° redondos del
 fragmento de arriba. El número de pasos tiene que mantener la longitud de arco
 por paso pequeña frente a la escala vertical del perfil, o un punto de giro se
 salta de una zancada.
+
+**El abanico de haces y la anchura del haz.** `gaussian_beams` toma ese mismo
+abanico y le añade dos mandos. `n_beams` decide si los haces vecinos siguen
+solapándose allí donde más se han ensanchado: dos haces contiguos distan
+$s\,\delta\theta_0$ a la longitud de arco $s$ mientras cada uno se ha
+ensanchado hasta $s\lambda/(\pi W_0)$, así que la condición de solape
+$\delta\theta_0 \lesssim \lambda/(\pi W_0)$ es independiente de la distancia
+y el valor por defecto toma cuatro veces ese margen. Un abanico demasiado basto
+no se lee como un nivel equivocado sino como un rizado periódico en distancia al
+paso de los haces, fácil de confundir con interferencia física. `beam_width` es
+el $W_0$ de la sección 4, cuyo valor por defecto es el óptimo solo donde el
+canal no lo recorta, así que en aguas someras pásalo explícitamente. Y abrir
+`max_angle_deg` obliga a recortar `range_step` con él, porque un paso tiene que
+resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
+distancia.
 
 **La disciplina de convergencia.** Refinar, recalcular, comparar; y solo
 entonces comparar métodos. Que los modos y la PE coincidan, que es lo que la

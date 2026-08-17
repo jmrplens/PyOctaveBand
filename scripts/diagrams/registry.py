@@ -473,7 +473,7 @@ DIAGRAMS = {
         "Sonar equation geometry: passive and active (ISO 18405)", 660),
     "diagram_underwater_waveguide": (
         _d_underwater_waveguide,
-        "The range-independent waveguide the three solvers share", 580),
+        "The range-independent waveguide the four solvers share", 606),
     "diagram_marine_mammal_exposure": (
         _d_marine_mammal_exposure,
         "Marine-mammal exposure: measured here, assessed there", 620),

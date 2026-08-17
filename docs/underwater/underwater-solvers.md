@@ -27,6 +27,12 @@ computed numerically. Four solvers are provided (Jensen et al.,
   the surface and bottom, and carries the travel time along each ray as a state
   of the same integration. Validated against the circular-arc paths of a linear
   gradient and the closed-form travel time along them.
+- **`gaussian_beams`** hangs a Gaussian beam on each of those rays and sums
+  them into a propagation-loss field, which stays finite at the caustics where
+  the classical ray amplitude is infinite and decays into the shadow zones
+  where it is not defined at all. Validated against free-field spherical
+  spreading, the two-ray Lloyd-mirror field and the image-source sum of the
+  ideal waveguide.
 - **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
   Fourier algorithm. Validated against free-field spherical spreading; it agrees
   with the normal-mode propagation loss in trend.

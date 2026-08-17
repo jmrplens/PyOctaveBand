@@ -49,8 +49,9 @@ respuesta,
 [Métodos numéricos de propagación
 submarina](/phonometry/es/underwater/underwater-solvers/)
 calcula el campo en su lugar: la expansión en modos normales, el trazado de
-rayos y la ecuación parabólica split-step de Fourier, con la guía para
-elegir entre ellos y las formas cerradas.
+rayos, la suma de haces gaussianos construida sobre esos mismos rayos y la
+ecuación parabólica split-step de Fourier, con la guía para elegir entre
+ellos y las formas cerradas.
 
 Una etapa de **receptor** cierra el círculo.
 [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/)
@@ -75,9 +76,9 @@ de teoría.
   pérdida de propagación, velocidad del sonido, ecuación del sonar, reflexión
   en el lecho y ruido ambiente oceánico, en forma cerrada.
 - [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los métodos de modos normales, trazado de rayos y ecuación parabólica de
-  la guía de ondas estratificada, cada uno validado contra una forma cerrada
-  exacta, y cómo elegir modelo de propagación.
+  los métodos de modos normales, trazado de rayos, haces gaussianos y
+  ecuación parabólica de la guía de ondas estratificada, cada uno validado
+  contra una forma cerrada exacta, y cómo elegir modelo de propagación.
 - [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
   audiogramas de grupo, las funciones de ponderación auditiva regulatorias con
   la versión de guía seleccionable, los criterios de inicio de TTS y de lesión,
@@ -100,16 +101,22 @@ continuo no tiene forma cerrada aquí ni en ningún otro lugar de la biblioteca.
 <ScopeClaim status="not-covered">
 **El lecho marino es delgado.** La página de formas cerradas lo modela como
 una reflexión de Rayleigh fluido-fluido sin pérdidas, así que la atenuación
-del sedimento queda fuera de alcance, y los tres métodos suponen una columna
+del sedimento queda fuera de alcance, y los cuatro métodos suponen una columna
 de agua **independiente de la distancia**, sin fondo absorbente ni elástico y
 sin batimetría real — lo que deja fuera por completo los problemas
-dependientes de la distancia. El trazado de rayos devuelve caminos y tiempos
-de propagación pero no amplitudes (sin intensidad de tubo de rayos, sin
-corrección de cáusticas), y la ecuación parabólica es la forma estándar de
-ángulos pequeños de Tappert y no una variante de gran angular de Padé. Para la
-física del lecho elástico que estos métodos fluidos dejan fuera, el [esquema
-de ondas elásticas](/phonometry/es/simulation/elastic-waves/) es lo más
-parecido que tiene la biblioteca.
+dependientes de la distancia. El trazado de rayos sigue devolviendo caminos y
+tiempos de propagación y ningún nivel propio; el nivel lo da `gaussian_beams`,
+que ensancha cada uno de esos rayos hasta convertirlo en un haz y así responde
+un número finito en una cáustica y uno graduado en una zona de sombra, a tres
+precios: suma el abanico de lanzamiento entero en lugar de buscar los
+eigenrayos que unen una fuente y un receptor dados, no tiene campo cercano
+dentro de unas tres anchuras de haz de la fuente, y la variante de haces
+geométricos con su índice KMAH y su suelo de anchura mínima no está
+implementada. La ecuación parabólica es la forma estándar de ángulos pequeños
+de Tappert y no una variante de gran angular de Padé. Para la física del lecho
+elástico que estos métodos fluidos dejan fuera, el [esquema de ondas
+elásticas](/phonometry/es/simulation/elastic-waves/) es lo más parecido que
+tiene la biblioteca.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">

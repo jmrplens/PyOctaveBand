@@ -46,7 +46,7 @@ Schmidt, *Computational Ocean Acoustics*.
 
 ## 1. The four solvers at a glance
 
-<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide.svg" alt="The range-depth waveguide all three solvers take as input: range increasing to the right and depth downward, a pressure-release sea surface, a bottom that is either pressure-release or rigid, the sound-speed profile drawn beside the column with its channel axis, a source at depth z_s, a receiver at depth z and range r, and one ray turning where the local sound speed satisfies Snell's condition, annotated with what each of the three solvers computes in that same frame" width="92%" />
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide.svg" alt="The range-depth waveguide all four solvers take as input: range increasing to the right and depth downward, a pressure-release sea surface, a bottom that is either pressure-release or rigid, the sound-speed profile drawn beside the column with its channel axis, a source at depth z_s, a receiver at depth z and range r, and one ray turning where the local sound speed satisfies Snell's condition, annotated with what each of the four solvers computes in that same frame" width="92%" />
 
 - **`normal_modes`** solves the depth-separated Sturm-Liouville eigenvalue
   problem by finite differences and sums the propagating modes into the
@@ -57,6 +57,12 @@ Schmidt, *Computational Ocean Acoustics*.
   the surface and bottom, and carries the travel time along each ray as a state
   of the same integration. Validated against the circular-arc paths of a linear
   gradient and the closed-form travel time along them.
+- **`gaussian_beams`** hangs a Gaussian beam on each of those rays and sums
+  them into a propagation-loss field, which stays finite at the caustics where
+  the classical ray amplitude is infinite and decays into the shadow zones
+  where it is not defined at all. Validated against free-field spherical
+  spreading, the two-ray Lloyd-mirror field and the image-source sum of the
+  ideal waveguide.
 - **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
   Fourier algorithm. Validated against free-field spherical spreading; it agrees
   with the normal-mode propagation loss in trend.
@@ -639,7 +645,7 @@ plt.show()
 
 ### Setting up a run
 
-The three solvers are configured by the caller, and every snippet above sets a
+The four solvers are configured by the caller, and every snippet above sets a
 grid without saying why. The rules are short.
 
 **The depth grid.** The sine transform of the PE, and the finite-difference
@@ -666,6 +672,19 @@ either: pick them from Snell's turning condition so the fan spans the rays the
 channel traps, rather than the round $\pm 12°$ of the snippet above. The number
 of steps has to keep the arc length per step small against the vertical scale of
 the profile, or a turning point is stepped straight over.
+
+**The beam fan and the beam width.** `gaussian_beams` takes that same fan and
+adds two knobs to it. `n_beams` decides whether neighbouring beams still overlap
+where they have spread most: adjacent beams are $s\,\delta\theta_0$ apart at
+arc length $s$ while each has spread to $s\lambda/(\pi W_0)$, so the overlap
+condition $\delta\theta_0 \lesssim \lambda/(\pi W_0)$ is range-independent
+and the default takes four times that margin. Too coarse a fan does not read as
+a wrong level but as a periodic ripple in range at the beam spacing, which is
+easy to mistake for physical interference. `beam_width` is the $W_0$ of section
+4, whose default is the optimum only where the channel does not clamp it, so
+pass it explicitly in shallow water. And opening `max_angle_deg` means cutting
+`range_step` with it, since one step has to resolve $\tan\theta_{\max}$ depth
+units of climb per unit range.
 
 **The convergence discipline.** Refine, re-run, compare; only then compare
 solvers. Agreement between the modes and the PE, which section 5 calls the

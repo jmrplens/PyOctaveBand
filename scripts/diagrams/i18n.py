@@ -2459,9 +2459,9 @@ _ES: dict[str, str] = {
     "drives SE to zero, re m²":
         "Todos los términos al mismo ancho de banda; la figura de mérito es "
         "la PL que anula SE, re m²",
-    # The waveguide the three numerical solvers share
-    "The range-independent waveguide the three solvers share":
-        "La guía de ondas que comparten los tres solucionadores",
+    # The waveguide the four numerical solvers share
+    "The range-independent waveguide the four solvers share":
+        "La guía de ondas que comparten los cuatro métodos",
     "channel axis": "eje del canal",
     "sea surface: pressure release, $p = 0$":
         "superficie: presión nula, $p = 0$",
@@ -2473,14 +2473,17 @@ _ES: dict[str, str] = {
         "profundidad de retorno $z_t$:  $c(z_t) = c(z_s)/cos θ_0$",
     "modes:": "modos:",
     "rays:": "rayos:",
+    "beams:": "haces:",
     "standing waves in $z$, travelling as $exp(i k_{rm} r)$":
         "ondas estacionarias en $z$, que viajan como $exp(i k_{rm} r)$",
     "trajectories, travel times, convergence zones":
         "trayectorias, tiempos de viaje, zonas de convergencia",
+    "those rays widened, summed into PL($z$, $r$)":
+        "esos rayos ensanchados, sumados en PL($z$, $r$)",
     "the envelope marched in $r$, one step $Δr$ at a time":
         "la envolvente avanzada en $r$, un paso $Δr$ cada vez",
-    "All three take the same range-independent $c(z)$: no sediment attenuation, no bathymetry":
-        "Los tres toman el mismo $c(z)$ independiente de la distancia: sin "
+    "All four take the same range-independent $c(z)$: no sediment attenuation, no bathymetry":
+        "Los cuatro toman el mismo $c(z)$ independiente de la distancia: sin "
         "sedimento ni batimetría",
     # Marine-mammal exposure assessment
     "Marine-mammal exposure: measured here, assessed there":

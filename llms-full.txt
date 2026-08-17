@@ -34606,7 +34606,7 @@ it; the list grows as guides gain their References sections.
   *Computational ocean acoustics* (2nd ed.). Springer.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   The reference monograph on numerical propagation: normal modes, ray
-  tracing and the parabolic equation.
+  tracing, Gaussian beams and the parabolic equation.
   Cited by [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
 - Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
   with application to SOFAR. *The Journal of the Acoustical Society of
@@ -47925,9 +47925,10 @@ equation with its detection-range inversion, Rayleigh seabed reflection loss,
 and the Wenz ambient-noise spectrum with JOMOPANS-ECHO ship traffic. When refraction and
 boundaries decide the answer,
 [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
-computes the field instead: the normal-mode expansion, ray tracing and the
-split-step Fourier parabolic equation, with the guidance for choosing
-between them and the closed forms.
+computes the field instead: the normal-mode expansion, ray tracing, the
+Gaussian beam sum built on those same rays and the split-step Fourier
+parabolic equation, with the guidance for choosing between them and the
+closed forms.
 
 A **receiver** stage closes the loop.
 [Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/)
@@ -47951,9 +47952,9 @@ lives inline with the guides rather than in the theory reference.
   propagation loss, sound speed, the sonar equation, seabed reflection and
   ocean ambient noise, in closed form.
 - [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/):
-  the normal-mode, ray-tracing and parabolic-equation solvers of the
-  stratified waveguide, each validated against an exact closed form, and
-  how to choose a propagation model.
+  the normal-mode, ray-tracing, Gaussian-beam and parabolic-equation solvers
+  of the stratified waveguide, each validated against an exact closed form,
+  and how to choose a propagation model.
 - [Marine-mammal noise exposure](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/):
   group audiograms, the regulatory auditory weighting functions with the
   guidance version selectable, the TTS and injury onset criteria, and a worked
@@ -47971,14 +47972,20 @@ pile-driving noise has no closed form here or anywhere in the library.
 
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
-all three solvers assume a **range-independent** water column with no
+all four solvers assume a **range-independent** water column with no
 absorbing or elastic bottom and no real bathymetry — which rules out
-range-dependent problems entirely. The ray solver returns paths and travel
-times but not amplitudes (no ray-tube intensity, no caustic correction), and
-the parabolic equation is the standard small-angle Tappert form rather than a
-wide-angle Padé variant. For the elastic seabed physics these fluid solvers
-leave out, the [elastic wave solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/) is
-the nearest thing the library has.
+range-dependent problems entirely. The ray solver still returns paths and
+travel times and no level of its own; the level comes from `gaussian_beams`,
+which widens each of those rays into a beam and so answers a finite number at
+a caustic and a graded one in a shadow zone, at three prices: it sums the
+whole launch fan rather than searching for the eigenrays that join a given
+source and receiver, it has no near field within about three beam widths of
+the source, and the geometric-beam variant with its KMAH index and its
+minimum-width floor is not implemented. The parabolic equation is the standard
+small-angle Tappert form rather than a wide-angle Padé variant. For the
+elastic seabed physics these fluid solvers leave out, the [elastic wave
+solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/) is the nearest thing the
+library has.
 
 **The exposure page rates hearing, not behaviour.** Only the auditory-effect
 criteria are implemented; behavioural-disturbance thresholds, the ones a
@@ -49113,16 +49120,17 @@ Every closed form above stops being enough when refraction and boundaries
 decide the answer: a sound-speed minimum that traps energy, surface and
 bottom reflections in shallow water, or a detection range that swings with
 the choice of spreading law. At that point the field has to be computed,
-and the normal-mode, ray-tracing and parabolic-equation solvers of the
-module, together with the guidance for choosing between them and these
-closed forms, have their own guide:
+and the normal-mode, ray-tracing, Gaussian-beam and parabolic-equation
+solvers of the module, together with the guidance for choosing between them
+and these closed forms, have their own guide:
 [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
 
 ## See also
 
 - [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/):
-  the normal-mode, ray-tracing and parabolic-equation solvers for the cases
-  where these closed forms are not enough, and the model-selection guidance.
+  the normal-mode, ray-tracing, Gaussian-beam and parabolic-equation solvers
+  for the cases where these closed forms are not enough, and the
+  model-selection guidance.
 - API reference: [`underwater.propagation.closed_form`](https://jmrplens.github.io/phonometry/reference/api/underwater/closed-form/) and [`underwater.propagation.sound_speed`](https://jmrplens.github.io/phonometry/reference/api/underwater/sound-speed/).
 
 ## References
@@ -49271,6 +49279,12 @@ computed numerically. Four solvers are provided (Jensen et al.,
   the surface and bottom, and carries the travel time along each ray as a state
   of the same integration. Validated against the circular-arc paths of a linear
   gradient and the closed-form travel time along them.
+- **`gaussian_beams`** hangs a Gaussian beam on each of those rays and sums
+  them into a propagation-loss field, which stays finite at the caustics where
+  the classical ray amplitude is infinite and decays into the shadow zones
+  where it is not defined at all. Validated against free-field spherical
+  spreading, the two-ray Lloyd-mirror field and the image-source sum of the
+  ideal waveguide.
 - **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
   Fourier algorithm. Validated against free-field spherical spreading; it agrees
   with the normal-mode propagation loss in trend.
