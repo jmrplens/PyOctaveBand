@@ -474,7 +474,10 @@ def _d_room_measurement(s: SVG, th: Theme) -> None:
     s.text(212.0, 182.0, "2.4 m $> d_{min}$", 13, th.primary, "middle")
 
     # Legend + ISO 3382-1 rules, to the right of the plan.
-    lx = rx + rw + 24
+    # 32 px off the room, not 24: the source-clearance circle bulges 30 px
+    # past the wall it is centred on, and the legend column has to start
+    # outside it.
+    lx = rx + rw + 32
     s.circle(lx + 8, ry + 16, 7, th.secondary, th.fg, 1.4)
     s.text(lx + 24, ry + 22, "Microphone position", 15, th.fg, "start")
     s.rect(lx, ry + 40, 16, 14, th.primary, th.fg, rx=2, sw=1.4)

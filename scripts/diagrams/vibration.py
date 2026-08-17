@@ -390,7 +390,10 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     # The pitch diameter, dimensioned between two opposite element centres.
     s.arrow(cx - 6, cy, cx - r_pitch, cy, th.muted, 1.3)
     s.arrow(cx + 6, cy, cx + r_pitch, cy, th.muted, 1.3)
-    s.rect(cx - 74, cy - 25, 148, 21, th.panel)
+    # The halo is cut to the label it hides the raceway for, which in
+    # Spanish is 147 px and in English 122; a fixed 148 fits one of them.
+    halo = s.text_width("$D$ = 34 mm (pitch)", 13) + 16.0
+    s.rect(cx - halo / 2, cy - 25, halo, 21, th.panel)
     s.text(cx, cy - 9, "$D$ = 34 mm (pitch)", 13, th.fg)
     # One element dimensioned, with a leader out of the drawing.
     bax = cx + r_pitch * math.cos(math.radians(38.0))
@@ -608,11 +611,15 @@ def _d_mobility_rig(s: SVG, th: Theme) -> None:
     s.line(dx, beam_bot + 16, dx, 412, th.fg, 2.2)
     s.line(dx - 5, 352, dx + 5, 352, th.accent, 3.0)
     s.line(dx - 5, 392, dx + 5, 392, th.accent, 3.0)
-    s.text(56, 440, "drive rod: stiff axially,", 12, th.accent,
+    # The note sits in the 163 px between the sheet margin and the exciter
+    # box, which is drawn over it; its leader leaves above the box's top
+    # corner rather than through it, and joins the rod under the
+    # impedance-head caption.
+    s.text(44, 440, "drive rod: stiff axially,", 12, th.accent,
            anchor="start")
-    s.text(56, 458, "flexible in every other", 12, th.accent, anchor="start")
-    s.text(56, 476, "direction (6.4.4)", 12, th.accent, anchor="start")
-    s.line(186, 448, dx - 8, 372, th.muted, 1.0, dash="3,3")
+    s.text(44, 458, "flexible in every other", 12, th.accent, anchor="start")
+    s.text(44, 476, "direction (6.4.4)", 12, th.accent, anchor="start")
+    s.line(200, 416, dx - 8, 392, th.muted, 1.0, dash="3,3")
     s.rect(dx - 37, 412, 74, 48, th.panel, th.primary, rx=9, sw=2)
     s.text(dx, 486, "Exciter", 15, th.fg, bold=True)
     s.text(60, 380, "Impedance head", 14, th.fg, anchor="start", bold=True)

@@ -2024,9 +2024,9 @@ _ES: dict[str, str] = {
         "un apoyo trabaja a cortante además de a compresión, y la rigidez "
         "transversal suele ser la menor de las dos",
     # Mobility rig: the drive rod and the ISO 7626-2 Figure 4 decision
-    "drive rod: stiff axially,": "varilla de arrastre: rígida axialmente,",
-    "flexible in every other": "y flexible en todas las demás",
-    "direction (6.4.4)": "direcciones (6.4.4)",
+    "drive rod: stiff axially,": "varilla de arrastre: rígida",
+    "flexible in every other": "axialmente, flexible en las",
+    "direction (6.4.4)": "demás direcciones (6.4.4)",
     "Where the accelerometer and the force transducer go (clause 6.4.4)":
         "Dónde van el acelerómetro y el transductor de fuerza (capítulo 6.4.4)",
     "accelerometer through the rod": "acelerómetro a través de la varilla",

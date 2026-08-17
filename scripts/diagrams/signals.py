@@ -1375,7 +1375,11 @@ def _d_tsa_setup(s: SVG, th: Theme) -> None:
     shaft_y = 252.0
     px, pr = 214.0, 38.0
     wx, wr = 330.0, 78.0
-    for cx, r, label, dy in ((px, pr, "pinion, 37 teeth", pr + 26),
+    # The pinion's caption drops past the wheel instead of stopping beside
+    # it: at 138 px in Spanish it does not fit the 128 px between the
+    # pedestal bearing and the wheel's tooth circle, at any size the row
+    # can be set in.
+    for cx, r, label, dy in ((px, pr, "pinion, 37 teeth", 128.0),
                              (wx, wr, "wheel, 89 teeth", wr + 26)):
         s.circle(cx, shaft_y, r, th.bg, th.primary, 2.2)
         s.circle(cx, shaft_y, 6, th.fg)
