@@ -113,6 +113,17 @@ The limits are worth knowing before the numbers are believed.
 * **The beam must be small compared to the channel**, which the default
   `beam_width` enforces and an explicit one is checked against.
 
+What it costs is `n_beams` times the size of the receiver grid, and none
+of the three factors depends on the frequency: the ray core does not have to
+resolve a wavelength on a grid, and the fan only widens as
+$\lambda/W_0$, which the default width holds nearly fixed. On a
+5000 m Munk column at 100 Hz over 10 km, everything left at its default
+(512 beams, a 200 by 401 field), this takes 14 s against 0.1 s for
+[`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) and 177 s for [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes); raise the
+frequency and the first number stays where it is while the other two climb.
+Shrinking `n_depth_points` or handing in a coarser `ranges_m` is the
+direct way to trade resolution for time.
+
 **Parameters**
 
 | Name | Description |
