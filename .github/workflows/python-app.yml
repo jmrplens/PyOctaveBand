@@ -520,10 +520,19 @@ jobs:
     - uses: actions/checkout@v7
       with:
         persist-credentials: false
-    - name: Set up Python 3.13
+    # The newest Python the package supports. This job used to sit on 3.13
+    # because numba trails a new interpreter by a release or two, and while it
+    # did, the jitted kernel was never built against the newest Python we ship
+    # for. numba 0.67.0 publishes cp314 wheels and carries the 3.14 classifier,
+    # and the floor in pyproject.toml (numba>=0.66.0) already resolves to it.
+    # Tracking the newest version is the strictest single choice for this job:
+    # a compiled extension meeting a new interpreter is the thing most likely
+    # to break, and the pure-Python kernel is covered on both versions by the
+    # main matrix regardless.
+    - name: Set up Python 3.14
       uses: actions/setup-python@v7
       with:
-        python-version: "3.13"
+        python-version: "3.14"
         cache: 'pip'
     - name: Install dependencies (with numba)
       run: |
