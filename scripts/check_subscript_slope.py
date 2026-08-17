@@ -87,7 +87,9 @@ _SUFFIXES = {".py", ".md", ".mdx"}
 _EXCLUDED = re.compile(r"errata|/_plot/|/_report/", re.IGNORECASE)
 
 #: Pages that carry both meanings on purpose, with the reason. Keyed on the
-#: path and the ``(base, subscript)`` pair.
+#: repository-relative path and the ``(base, subscript)`` pair; the path is
+#: matched against the tail of the file's own, so the gate declares the same
+#: page whether it is run from the repository root or given absolute roots.
 DECLARED: dict[str, dict[tuple[str, str], str]] = {
     "docs/reference/glossary.md": {
         ("L", "N"): (
@@ -189,6 +191,15 @@ def collect(roots: list[str]) -> list[pathlib.Path]:
     return [p for p in paths if not _EXCLUDED.search(str(p))]
 
 
+def declared(path: pathlib.Path) -> dict[tuple[str, str], str]:
+    """The symbols *path* is registered as carrying both ways, if any."""
+    posix = path.as_posix()
+    for key, symbols in DECLARED.items():
+        if posix == key or posix.endswith("/" + key):
+            return symbols
+    return {}
+
+
 def check(paths: list[pathlib.Path]) -> tuple[int, list[str]]:
     """``(files read, one report per undeclared collision)``."""
     failures: list[str] = []
@@ -197,9 +208,9 @@ def check(paths: list[pathlib.Path]) -> tuple[int, list[str]]:
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             continue
-        declared = DECLARED.get(path.as_posix(), {})
+        registered = declared(path)
         for (base, sub), slopes in sorted(sightings(text, path.suffix).items()):
-            if len(slopes) < 2 or (base, sub) in declared:
+            if len(slopes) < 2 or (base, sub) in registered:
                 continue
             italic = ", ".join(str(n) for n in sorted(set(slopes["italic"])))
             upright = ", ".join(str(n) for n in sorted(set(slopes["upright"])))
