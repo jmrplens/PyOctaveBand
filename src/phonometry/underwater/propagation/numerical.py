@@ -783,6 +783,44 @@ def _beam_influence(
     slowness times depth offset, the paraxial phase term; dropping it leaves the
     near-horizontal interference pattern wrong.
 
+    THE ONE FACTOR NOTHING ELSE PROTECTS. Eq. (3.88) divides by :math:`r q`,
+    which is the Jacobian :math:`J` of Eq. (3.46), and Eq. (3.46) factors it as
+    range times ray-tube width. Complex initial data keeps the *second* factor
+    off zero for good (see the Wronskian argument above), and that is the whole
+    point of the method; the *first* has no such protection, and it vanishes on
+    the axis, where every ray of the fan begins. That is the ordinary point
+    source singularity the book flags on p. 167, "the amplitude goes to infinity
+    as :math:`s \to 0`", and it is not rare here but guaranteed: the foot of the
+    perpendicular from a receiver lands exactly on the source for whichever beam
+    is launched perpendicular to the source-receiver line, and a fan dense enough
+    to sum always has one. Refining the fan aims at it more accurately rather
+    than avoiding it. Measured, before this floor was put in, on a deep
+    isovelocity column at 100 Hz with everything at its default: a receiver 50 m
+    down range and 50 m below the source drew the beam launched at exactly
+    -45.0 degrees, whose foot landed at :math:`r = 1.4\times10^{-14}` m, and the
+    single term :math:`\sqrt{c/r} = 3.2\times10^{8}` carried the answer to
+    :math:`|p| = 8.9\times10^{3}` against an exact :math:`1.4\times10^{-2}`, a
+    propagation loss of -79 dB. Over a +-500 m cut the error reached 116 dB and
+    it was one-directional, always too loud.
+
+    The floor is one wavelength of the local sound speed, which is Sect. 3.4.2's
+    own criterion ("the wavelength should be substantially smaller than any
+    physical scale in the problem") applied to the one length that appears here:
+    a foot within a wavelength of the axis is a physical scale the ray
+    description does not resolve, so the spreading is held at its value there
+    rather than allowed to run away. It bounds the term without touching
+    anything the method can actually say. That -79 dB cell now reads 37.51 dB
+    against an exact 36.99 dB. Measured on the same column, worst error against
+    :math:`20\lg R` over a +-500 m cut: 116 dB before the floor and 4.93 dB
+    after at 100 m, 108 dB and 0.62 dB at 200 m, 67.7 dB and 0.058 dB at 400 m,
+    0.0007 dB before and 0.0006 dB after from 700 m out. On the ideal 1000 m
+    guide against the image-source sum at 2, 5 and 10 km the floor is invisible:
+    0.00044 dB worst with it and without. Dropping the extrapolation of ``r``
+    altogether removes the singularity too, and is *not* the fix, because that
+    same guide then comes out 0.0077 dB off instead, seventeen times worse. What
+    is left inside a few hundred metres is the method declining to have a near
+    field, not this clamp: see :func:`gaussian_beams`.
+
     Nothing here is an eigenray hunt and nothing interpolates between rays, so
     the interpolation hazard of Sect. 3.7.5.1 (Fig. 3.34) does not arise: the
     beams are summed independently, which is the structural advantage of beam
@@ -821,6 +859,7 @@ def _beam_influence(
         phase2d, time2d = s.phase[rows], s.time[rows]
         speed = speed2d[:, :, None]
         speed_sq = speed**2
+        wavelength = 2.0 * np.pi * speed / omega
         spreading = spread2d[:, :, None]
         slope = slope2d[:, :, None]
         # A block of receiver depths at a time, sized so the temporaries stay
@@ -832,17 +871,18 @@ def _beam_influence(
             along = xi * offset + vertical * dz  # s / c
             normal = speed * (xi * dz - vertical * offset)
             q_infl = spreading + speed_sq * slope * along
-            r_infl = column + speed_sq * xi * along
+            # Held off the axis by a wavelength; see the note above on why the
+            # cylindrical half of the Jacobian is the one factor nothing else
+            # protects.
+            r_infl = np.maximum(column + speed_sq * xi * along, wavelength)
             # Admit a cell when n^2/W^2 < cutoff^2 with W = 2|q|/(omega W_0),
             # written as a comparison of squares so that neither side needs a
             # square root: this test runs over the whole block while everything
             # after it runs over the survivors, which in a waveguide are around
             # a third of the cells, so it must stay arithmetic.
-            hits = np.flatnonzero((
-                (r_infl > 0.0)
-                & ((normal * half_omega_width) ** 2
-                   < cutoff_sq * (q_infl.real**2 + q_infl.imag**2))
-            ).ravel())
+            hits = np.flatnonzero(
+                ((normal * half_omega_width) ** 2
+                 < cutoff_sq * (q_infl.real**2 + q_infl.imag**2)).ravel())
             if hits.size == 0:
                 continue
             beam_at, within = np.divmod(hits, n_ranges * zr.size)

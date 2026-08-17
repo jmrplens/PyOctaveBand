@@ -96,6 +96,46 @@ def test_the_free_field_is_the_unit_point_source_in_magnitude_and_in_phase() -> 
     assert np.abs(res.propagation_loss - 20.0 * np.log10(slant)).max() < 0.01
 
 
+def test_the_near_field_survives_a_beam_whose_foot_lands_on_the_source() -> None:
+    r"""The one place Eq. (3.88) still divides by something unprotected.
+
+    ``r q`` is the Jacobian of Eq. (3.46), range times ray-tube width. Complex
+    initial data keeps the second factor off zero, which is the method; nothing
+    keeps the *first* off zero, and it vanishes on the axis every ray starts
+    from. The geometry that finds it is not exotic: the foot of the
+    perpendicular from a receiver lands exactly on the source for whichever beam
+    is launched perpendicular to the source-receiver line, so it is built here
+    on purpose. A fan of 321 beams over +-80 degrees is spaced 0.5 degrees and
+    therefore contains -45.0 exactly, and the receivers sit exactly 45 degrees
+    below the source, well inside the fan so its truncation is not in the
+    answer.
+
+    Unfloored, the surviving cell had ``r`` at 1.4e-14 m and the field came out
+    119 dB too loud, which is a *negative* propagation loss: louder at 71 m than
+    at the 1 m the result is normalised to. That is the assertion below, and it
+    is the one worth making, because it is the failure that cannot be mistaken
+    for physics.
+    """
+    f, rmax = 100.0, 2000.0
+    depth = _free_space_column(rmax)
+    zs = depth / 2.0
+    offs = np.array([50.0, 100.0, 200.0, 400.0])
+    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=rmax, ranges_m=offs, receiver_depths_m=zs + offs,
+                         max_angle_deg=80.0, n_beams=321)
+    assert -45.0 in res.launch_angles, "the singular beam has to be in the fan"
+    slant = np.hypot(res.ranges[None, :], res.depths[:, None] - zs)
+    err = res.propagation_loss - 20.0 * np.log10(slant)
+    assert np.all(np.isfinite(res.propagation_loss))
+    # Measured -82.09 dB before the floor, +37.52 after.
+    assert res.propagation_loss.min() > 0.0, "no receiver is louder than the source"
+    # On the 45-degree diagonal, worst 0.73 dB after and 119 dB before.
+    diagonal = np.diag(err)
+    assert np.abs(diagonal).max() < 1.5
+    # By 400 m the floor is out of the answer entirely: 0.003 dB after, 2.7 before.
+    assert abs(diagonal[-1]) < 0.05
+
+
 def test_one_reflection_is_the_two_ray_field() -> None:
     """Source and its negative image, with the source many beams off the surface.
 
