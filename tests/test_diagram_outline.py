@@ -247,3 +247,31 @@ def test_collision_census_names_each_way_a_label_can_land_wrong(
                         {"plate": (build, "Title", 560)})
     kinds = {hit.kind for hit in outline._collisions()}
     assert kinds == {"overprint", "escapes", "struck", "painted over"}
+
+
+def test_a_panel_over_the_title_is_reported(monkeypatch) -> None:
+    """The title is painted first, so a body panel can bury it.
+
+    The collision census records every element as it is drawn and reports a
+    label as painted over only when the covering box was drawn later. The
+    title used to be recorded after the builder had finished, which gave it
+    the highest sequence on the plate and made that test unable to fire for
+    it, while `canvas.SVG.render` emits the title ahead of the body and so
+    lets any panel cover it. This pins the order rather than the symptom.
+    """
+    from diagrams import outline, registry
+
+    def build(svg, th) -> None:
+        # An opaque panel across the top strip, where the title is set.
+        svg.rect(100, 10, 700, 60, fill=th.fg)
+
+    monkeypatch.setitem(
+        registry.DIAGRAMS, "diagram_title_under_a_panel",
+        (build, "A title a panel covers", 200),
+    )
+    hits = [h for h in outline._collisions()
+            if h.plate.startswith("diagram_title_under_a_panel")]
+    assert any(h.kind == "painted over" for h in hits), (
+        "a filled panel drawn over the title was not reported: "
+        f"{[(h.kind, h.label) for h in hits]}"
+    )

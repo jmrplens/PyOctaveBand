@@ -573,8 +573,15 @@ def _collisions() -> list[_Hit]:
             visit(name, lang)
             svg = Recording(900, height, canvas.LIGHT, lang)
             svg.plate = f"{name}{lang_suffix}"
-            builder(svg, canvas.LIGHT)
+            # The title is recorded FIRST, because that is the order it is
+            # painted in: `canvas.SVG.render` emits the title fragment ahead
+            # of `self.parts`, so every body element paints over it. Taking
+            # it last, as this used to, gave the title the highest sequence
+            # on the plate, and the painted-over test below only fires when
+            # `box.seq > lab.seq`. So the one label a panel can actually
+            # bury was the one label the test could never report.
             svg.render(title)
+            builder(svg, canvas.LIGHT)
             plate = svg.plate
             for i, a in enumerate(svg.labels):
                 for b in svg.labels[i + 1:]:
