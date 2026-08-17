@@ -311,7 +311,10 @@ def _d_intensity_scan(s: SVG, th: Theme) -> None:
     _box_wire(s, th, bx, gy, 150, 120, 240, th.primary)
     _box_solid(s, th, bx, gy, 45, 34, 70)
     s.text(bx, gy - 82, "Source", 15, th.fg, bold=True)
-    s.text(bx, 214, "Measurement surface (segments $S_i$)", 15, th.primary,
+    # Above the wireframe's topmost edge rather than across its back
+    # corners: the caption is 325 px in Spanish and 305 in English, and
+    # both reach the box's slanted edges where it used to sit.
+    s.text(bx, 150, "Measurement surface (segments $S_i$)", 15, th.primary,
            bold=True)
 
     # Segment grid on the front face (3 x 3 segments Sᵢ).
