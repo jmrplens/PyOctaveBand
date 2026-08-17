@@ -826,8 +826,8 @@ adiabatic; the normative Annex A corrects $\kappa$ down to
 $$
 \kappa' = \frac{\kappa}{\sqrt{1 + (\kappa-1)\tfrac{S}{V}b
           + \tfrac{1}{2}\big((\kappa-1)\tfrac{S}{V}b\big)^2}},
-\qquad b = \sqrt{\frac{2 c_0 l_h}{\omega}},\quad
-l_h = \frac{k_a}{\rho_0 c_0 C_P},
+\qquad b = \sqrt{\frac{2 c_0 l_\mathrm{h}}{\omega}},\quad
+l_\mathrm{h} = \frac{k_\mathrm{a}}{\rho_0 c_0 C_\mathrm{P}},
 $$
 
 with $S$ and $V$ the cavity surface and volume and $b$ the thermal

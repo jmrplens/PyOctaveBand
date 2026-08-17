@@ -26,12 +26,12 @@ the report never merely repeats a manufacturer number:
   level referred to 1 W into the rated impedance `R` at 1 m is
 
   $$
-  L_M = L_\text{band} + 20 \log_{10}(d / d_0) + 20 \log_{10}(U_p / U), \qquad d_0 = 1\ \mathrm{m}
+  L_M = L_\text{band} + 20 \log_{10}(d / d_0) + 20 \log_{10}(U_\mathrm{p} / U), \qquad d_0 = 1\ \mathrm{m}
   $$
 
   where $L_\text{band}$ is the energetic mean of the on-axis level
   over a stated band (20.1.2.4: the r.m.s. of the band pressures) and
-  $U_p = \sqrt{R P_0}$ with $P_0 = 1$ W is the voltage that
+  $U_\mathrm{p} = \sqrt{R P_0}$ with $P_0 = 1$ W is the voltage that
   drives 1 W into `R` (20.3.2). With the default drive
   $U = \sqrt{R}$ at $d = 1$ m the two corrections vanish and
   the sensitivity level equals the band mean, which for $R = 8$ ohm

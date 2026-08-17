@@ -35,7 +35,7 @@ R' = D + 10 \log_{10} \frac{S}{A}, \qquad A = \frac{0.16\ V}{T}.
 $$
 
 Positions are energy-averaged with
-$L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)$.
+$L = 10 \log_{10}\left( \frac{1}{n} \sum_j 10^{L_j/10} \right)$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup.svg" alt="Field airborne insulation setup: a loudspeaker in the source room, microphones energy-averaged in source and receiving rooms across the common partition" width="92%"></picture>
 

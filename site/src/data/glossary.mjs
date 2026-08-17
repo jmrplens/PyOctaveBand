@@ -2461,7 +2461,7 @@ export const glossary = [
       },
       {
         id: "l-n-2",
-        symbol: "$L_N$",
+        symbol: "$L_\\mathrm{N}$",
         unit: {
           en: "phon",
           es: "fonio",

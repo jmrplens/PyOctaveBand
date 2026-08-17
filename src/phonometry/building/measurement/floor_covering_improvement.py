@@ -38,7 +38,7 @@ their arithmetic mean over all tapping-machine (t) and accelerometer (a)
 positions, :math:`\Delta L = (1/(t \cdot a)) \sum_t \sum_a \Delta L_{t,a}`.
 
 **Octave bands (Formula (5)).**
-:math:`\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum 10^{-\Delta L_n/10}]` dB from
+:math:`\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum 10^{-\Delta L_j/10}]` dB from
 the three one-third-octave values in each octave.
 
 **Weighted improvement.** ``ΔLw`` is the ISO 717-2 weighted reduction of impact
@@ -377,7 +377,7 @@ def improvement_octave_bands(
 ) -> tuple[np.ndarray, np.ndarray]:
     r"""Convert a one-third-octave improvement spectrum to octaves (F. (5)).
 
-    :math:`\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum_{n=1}^{3} 10^{-\Delta L_n/10}]`
+    :math:`\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum_{j=1}^{3} 10^{-\Delta L_j/10}]`
     dB over the three thirds of
     each octave.
 

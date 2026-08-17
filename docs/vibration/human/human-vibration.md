@@ -177,7 +177,8 @@ ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("r.m.s. acceleration [m/s²]")
-ax.set_title(f"Weighted acceleration ($a_w$ = {result.overall:.3f} m/s²)")
+ax.set_title(rf"Weighted acceleration ($a_\mathrm{{w}}$ = "
+             rf"{result.overall:.3f} m/s²)")
 ax.legend()
 plt.show()
 ```

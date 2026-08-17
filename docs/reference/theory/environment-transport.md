@@ -49,7 +49,7 @@ $$
 and the whole-day rating level combines the adjusted periods energetically (clause 8, Note 1):
 
 $$
-L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{\mathrm{Aeq},N} + K_{\mathrm{I},N})/10} \Big].
 $$
 
 $K_\mathrm{I}$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_\mathrm{I}(P{=}10) = 9.0$ dB are reproduced exactly.

@@ -73,8 +73,8 @@ _STRINGS: dict[str, str] = {
     "Phase [rad]": "Fase [rad]",
     "Spectral density [dB re 1/Hz]": "Densidad espectral [dB re 1/Hz]",
     "Power spectrum [dB]": "Espectro de potencia [dB]",
-    r"{pct} % confidence ($\chi^2$, $n_d$ = {nd})":
-        r"{pct} % de confianza ($\chi^2$, $n_d$ = {nd})",
+    r"{pct} % confidence ($\chi^2$, $n_\mathrm{{d}}$ = {nd})":
+        r"{pct} % de confianza ($\chi^2$, $n_\mathrm{{d}}$ = {nd})",
     r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %":
         r"Densidad espectral de Welch — $\varepsilon_\mathrm{{r}}$ = {er} %",
     "Cross-spectral density (Bendat & Piersol)":
@@ -294,7 +294,8 @@ def plot_spectral_density(
         kwargs,
         band_color=None,  # the band shares the line color, translucent
         band_alpha=0.25,
-        band_label=_t(r"{pct} % confidence ($\chi^2$, $n_d$ = {nd})", language, pct=pct, nd=nd),
+        band_label=_t(r"{pct} % confidence ($\chi^2$, $n_\mathrm{{d}}$ = {nd})",
+                      language, pct=pct, nd=nd),
         line_label="$\\hat{G}_{xx}(f)$",
         title=_t(r"Welch spectral density — $\varepsilon_\mathrm{{r}}$ = {er} %", language, er=er),
     )

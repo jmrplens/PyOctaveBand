@@ -583,7 +583,7 @@ implementation follows the formulae rather than the printed rows.
   airborne and impact flanking models of EN 12354-1/2 that share the
   transmission-factor summation used here.
 - [Insulation Ratings (ISO 717)](insulation-ratings.md): the reference-curve
-  engine behind the $D_{2\mathrm{m,nT,w}}$, $R'_{45,w}$ and $R'_\mathrm{tr,s,w}$ single
+  engine behind the $D_{2\mathrm{m,nT,w}}$, $R'_{45,\mathrm{w}}$ and $R'_\mathrm{tr,s,w}$ single
   numbers.
 - [Sound Insulation Survey Method (ISO 10052)](insulation-survey.md): the
   octave-band façade quantity of the quick survey method.

@@ -259,6 +259,96 @@ installed in this environment, so it is not wired up. If it is added, the
 comparison has to be **asymmetric**: flag tokens that OCR sees and the
 extraction lacks, which is the direction a dropped glyph shows up in.
 
+### 7. Setting a subscript
+
+The slope of a subscript is a claim about what the subscript is, and
+ISO 80000-2 fixes it. A subscript that is itself a **quantity symbol** stays
+italic: the $p$ of $L_p$ is the pressure and the $W$ of $L_W$ is the power,
+so both keep the slope they have standing alone. A subscript that is a
+**word, a name or an abbreviation** is upright: the w of $R_\mathrm{w}$ is
+"weighted". A subscript that is a **number** is upright by definition, and an
+**index** that runs over a sum is a variable, so it is italic.
+
+Where nothing in this documentation expands the letter, leave it italic.
+Setting a subscript upright asserts that it abbreviates something; leaving it
+italic merely omits the claim, and an omission costs less than a wrong claim.
+That is why the pass which applied this rule stopped where the meaning was not
+established rather than guessing, and why a new upright subscript is expected
+to arrive with the sentence in this corpus, or the clause in its standard,
+that expands the letter.
+
+The drawn labels reach the same result by another route. The plate composer
+keys the slope on the letter run alone (`_ROMAN_SCRIPTS` in
+`scripts/diagrams/canvas.py`), so a run is upright in every plate or in none,
+and the nine runs that have to stay italic somewhere are deliberately absent
+from that set. Extend it only for a run that abbreviates a word.
+
+**One meaning per subscript per file.** The rule above settles a subscript
+once its meaning is known, and some glyphs honestly have two meanings. $D_z$
+is the ISO 9613-2 barrier screening, whose *z* is the difference between the
+diffracted and the direct path length — a quantity, italic — and it is the
+ISO 2631-5 acceleration dose, whose *z* names a direction — upright. Both
+documents print `D_z`, so neither spelling is ours to change, and a single
+slope applied to that pair across the whole tree would be wrong in one of the
+two modules by construction. Twenty pairs behave this way here: $L_N$ is a
+percentile level, a loudness level and a microphone's inherent noise; $K_c$ is
+a bulk modulus in the Biot model and the ISO 15186 intensity correction.
+
+So the unit of decision is the file, not the glyph. Every module opens with
+the standard it implements and every guide with the standard it explains, so
+within one file a subscript has one meaning, and it is set once accordingly.
+Across files, nothing is required to agree, and requiring it would force a
+false claim onto one side of every pair above.
+
+**Re-letter an index; never re-letter a quantity.** When the collision does
+fall inside one file, look first at whether one of the two is an index. An
+index is a bound variable: the letter is ours, it means nothing outside the
+formula it runs over, and re-lettering it changes no claim. A named quantity's
+letter belongs to the standard that defines it, and changing that breaks the
+citation. `insulation.py` energy-averaged microphone positions with
+$\sum_i 10^{L_i/10}$ on the same page as ISO 16283-2's impact sound pressure
+level $L_\mathrm{i}$; the index moved to *j* and the quantity could not move at
+all. Before proposing any rename, check what the source prints: in this corpus
+the clash is nearly always the standards' and not ours.
+
+**A page whose subject is the collision registers it.** The glossary exists to
+put colliding symbols side by side, and cannot do that without printing both
+slopes. Such a page is listed in `DECLARED` in the checker below, with both
+meanings named. That list is the escape hatch for a page about the ambiguity,
+not a way to land one, and it is meant to stay short.
+
+A collision where **both uses take the same slope** is a different problem, and
+typography cannot solve it: $L_\mathrm{U}$ is the magnitude of the ISO 226
+linear transfer function and the upper contiguous critical band of the
+prominence ratio, one section apart on one page, and $C_\mathrm{P}$ is a
+specific heat capacity in a porous absorber and a propulsion coefficient in
+CNOSSOS-EU. Those belong in the ambiguity table at the top of
+[the glossary](docs/reference/glossary.md), beside $T_\mathrm{s}$, $R$ and
+$L_N$, which is where a reader holding a symbol from someone else's report
+goes to find out which one they have.
+
+The file-level invariant is a gate; the reading behind it is not:
+
+```bash
+python scripts/check_subscript_slope.py   # or: make subscripts
+```
+
+It fails when one file writes the same base and subscript both ways, and
+prints the lines of each. A comma-separated subscript is read component by
+component, because that is how it is written: $\alpha_{\mathrm{s},i}$ is one
+abbreviation and one index, and the run inside a single wrapper
+($L_\mathrm{n,w,eq}$) is upright throughout.
+
+It cannot check that the slope a file chose is the right one for its
+standard — that is a reading of a source document, and no script does it. It
+does not read `docs/ERRATA.md`, where a symbol reproduces what a published
+page prints and restyling it would make the citation say something its source
+does not. And it does not read the drawing modules (`src/phonometry/_plot`,
+`src/phonometry/_report`, `scripts/`), which are filed by domain rather than
+by standard: one plotting module holds the figures of a dozen of them, so the
+file is not the scope in which a letter has one meaning. The guide that embeds
+the figure is, and its snippets are read here.
+
 ## 🏷️ Naming Conventions
 
 All identifiers follow PEP 8 with the project-specific rules below (validated

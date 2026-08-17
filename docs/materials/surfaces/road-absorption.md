@@ -28,7 +28,7 @@ transfer function gives the reflection factor and hence the absorption.
 the direct wave, so it is attenuated by the geometrical-spreading factor
 
 $$
-K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
+K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
 which equals $2/3$ for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m.
@@ -36,7 +36,7 @@ The absorption follows from the windowed incident and reflected spectra
 $H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ```python
@@ -110,7 +110,7 @@ result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
 
 *The absorption rises with frequency because the surface reflects less of the
 high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
-dictates through $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
+dictates through $\alpha = 1 - (1/K_\mathrm{r}^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Show the code for this figure</summary>

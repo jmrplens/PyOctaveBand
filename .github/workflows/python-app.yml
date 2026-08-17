@@ -428,6 +428,29 @@ jobs:
     - name: Check the hand-written markdown
       run: python scripts/check_markdown_hazards.py
 
+  # ISO 80000-2 sets a subscript by what it is, and a glyph pair can honestly
+  # take both slopes: the z of the ISO 9613-2 barrier screening is a
+  # path-length difference, the z of the ISO 2631-5 dose is a direction, and
+  # both documents print D_z. So the slope is decided per file, which opens
+  # with the standard it implements, and two slopes for one symbol inside one
+  # file is a page contradicting itself. Static and dependency-free, so it runs
+  # on its own rather than waiting behind an install.
+  subscript-slope:
+    name: One meaning per subscript per file
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    - name: Check that no file sets one subscript both ways
+      run: python scripts/check_subscript_slope.py
+
   # The committed example .report() fiches (.github/reports) must match a fresh
   # `make reports` run. Same drift gate as the figures, one layer further down
   # the pipeline: the fiches are what the documentation links to as worked

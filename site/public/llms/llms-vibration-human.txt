@@ -263,7 +263,8 @@ ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("r.m.s. acceleration [m/s²]")
-ax.set_title(f"Weighted acceleration ($a_w$ = {result.overall:.3f} m/s²)")
+ax.set_title(rf"Weighted acceleration ($a_\mathrm{{w}}$ = "
+             rf"{result.overall:.3f} m/s²)")
 ax.legend()
 plt.show()
 ```
@@ -548,16 +549,16 @@ is quantitative: when the band-limited vertical peak acceleration exceeds
 
 A seat-to-spine transfer function $H(f)$ (one complex zero and six complex
 poles, unity transmissibility at 0 Hz and a resonance near 5 Hz) maps the
-measured seat acceleration to the vertical spinal response $A_z(t)$
+measured seat acceleration to the vertical spinal response $A_\mathrm{z}(t)$
 (Formula 1/2):
 
 $$
-A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
+A_\mathrm{z}(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_\mathrm{z}(t)]\right].
 $$
 
 The input record must be **conditioned (DC-removed)**: because $H$ is unity at
 0 Hz by design, a DC offset (e.g. the 1 g gravity component of a DC-coupled
-accelerometer) passes straight into $A_z(t)$ and corrupts the positive
+accelerometer) passes straight into $A_\mathrm{z}(t)$ and corrupts the positive
 response peaks of the dose. Subtract the mean (or high-pass) before processing.
 The rest of the conditioning chain is the caller's too: `spinal_response`
 assumes a record that has already been sign-checked, split at the
@@ -573,16 +574,16 @@ print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 
 ## 2. Acceleration dose (clause 5.3)
 
-The **acceleration dose** combines the positive response peaks $A_{z,i}$
+The **acceleration dose** combines the positive response peaks $A_{\mathrm{z},i}$
 (each the maximum between two consecutive zero crossings) with a sixth-power
 law, so the largest shocks dominate (Formula 3):
 
 $$
-D_z = 1.07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
+D_\mathrm{z} = 1.07\left(\sum_i A_{\mathrm{z},i}^{\,6}\right)^{1/6}.
 $$
 
 A daily dose scales the measured dose to the daily exposure time $t_\mathrm{d}$ over
-the measurement time $t_\mathrm{m}$ (Formula 4): $D_{z\mathrm{d}} = D_z\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$.
+the measurement time $t_\mathrm{m}$ (Formula 4): $D_\mathrm{zd} = D_\mathrm{z}\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$.
 
 ```python
 from phonometry import vibration
@@ -593,8 +594,8 @@ print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 
 ## 3. Injury risk (Annex C)
 
-The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_z\,D_{z\mathrm{d}}$
-(Formula C.1), where $m_z$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
+The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_\mathrm{z}\,D_\mathrm{zd}$
+(Formula C.1), where $m_\mathrm{z}$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
 64 kg female) converts acceleration to vertebral stress. The stress accumulates
 over the exposure years against the ageing spine's reducing ultimate strength
 $S_\mathrm{u} = 6.75 - S_{\mathrm{age}}\,(b+i)$ (Formulae C.3/C.4):
@@ -671,7 +672,7 @@ plt.show()
 
 </details>
 
-The `MultipleShockResult` carries the dose $D_z$, the daily dose $D_{z\mathrm{d}}$, the
+The `MultipleShockResult` carries the dose $D_\mathrm{z}$, the daily dose $D_\mathrm{zd}$, the
 compressive stress $S_\mathrm{d}$, the stress variable $R$, the injury probability and
 the response peaks, and its `.plot()` draws the injury-probability curve with
 the 10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
@@ -692,7 +693,7 @@ free-text fields of `ReportMetadata`), the exposure-scenario grid (subject sex,
 the age $b$ at which the exposure started, the number of exposure years $n$,
 the number of exposure days per year $N$ and the number of counted response
 shocks), and the dose-and-stress analysis table with the acceleration dose
-$D_z$ (Formula 3), the daily dose $D_{z\mathrm{d}}$ (Formula 4), the daily compressive
+$D_\mathrm{z}$ (Formula 3), the daily dose $D_\mathrm{zd}$ (Formula 4), the daily compressive
 stress $S_\mathrm{d}$ (Formula C.1), the cumulative stress variable $R$ (Formula C.3)
 and the probability of lumbar injury $\Pi$ (Formula C.5).
 

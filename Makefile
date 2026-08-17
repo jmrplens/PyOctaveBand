@@ -94,6 +94,16 @@ figure-contrast:
 mathtext:
 	$(PYTHON) scripts/check_mathtext.py
 
+# ISO 80000-2 sets a subscript by what it is, so a glyph pair can honestly take
+# both slopes: the z of the ISO 9613-2 barrier screening is a path-length
+# difference and the z of the ISO 2631-5 dose is a direction, and both
+# documents print D_z. The decision therefore belongs to the file, which opens
+# with the standard it implements -- and inside one file two slopes for one
+# symbol is a page contradicting itself. That is what this reads. It needs no
+# dependencies and no generation run.
+subscripts:
+	$(PYTHON) scripts/check_subscript_slope.py
+
 # The blind spot of the Spanish pass, and the reason it needs a check of its
 # own. That pass ends with the decimal comma, guarded by `"$" not in s` because
 # a bare comma inside `$...$` sets with maths spacing -- but the guard tests the
@@ -289,4 +299,4 @@ check: lint security test
 .PHONY: install lint format security snyk sonar graphs figure-contrast figure-language figures reports \
 	animations animation-freshness posters brand lighthouse \
 	llms pypi-readme api-docs site-reports conformance install-hooks test coverage check \
-	snippets snippets-static claims
+	snippets snippets-static claims subscripts

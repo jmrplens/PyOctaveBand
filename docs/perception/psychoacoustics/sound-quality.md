@@ -169,7 +169,7 @@ rate and depth, and correlates the modulation across bands; the result $R$ is
 in **asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
 70 Hz, overall level 60 dB SPL) is defined as 1 asper; this clean-room
 implementation returns 0.9999 asper with the tabulated calibration constant
-$c_R$ (Formula 104) used **without** reverse-fitting to the target.
+$c_\mathrm{R}$ (Formula 104) used **without** reverse-fitting to the target.
 
 ```python
 import numpy as np
@@ -259,7 +259,7 @@ quieter periods, then weights the dominant harmonic complex and scales it
 with an HSA-based specific loudness. The reference sound (1 kHz carrier,
 100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
 1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
-by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
+by 12 s with the tabulated calibration constant $c_\mathrm{F}$ (Formula 163) used
 **without** reverse-fitting to the target and without the ±0.25 % adjustment
 that footnote 47 permits (the 8 s example below prints 0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
 *prominent* fluctuation strength (Clause 9.2).

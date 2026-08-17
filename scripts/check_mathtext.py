@@ -32,6 +32,10 @@ Three kinds of string carry a dollar without being a label:
 Each is recognised by its own shape rather than by an exclusion list, so a new
 file gets the same treatment without being registered anywhere.
 
+It judges nothing about how a label is *set*, either. A subscript on the wrong
+slope parses perfectly; ``check_subscript_slope.py`` is the gate for the one
+part of that which a script can settle.
+
 Exit status 0 when every run parses, 1 otherwise.
 """
 

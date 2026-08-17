@@ -62,19 +62,19 @@ $|H| \approx 1.54$ at 5 Hz) and accumulates the positive spinal-response peaks w
 sixth-power (Palmgren-Miner) dose (clause 5.3, Formulae 3/4):
 
 $$
-D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
+D_\mathrm{z} = 1.07 \left( \sum_i A_{\mathrm{z},i}^6 \right)^{1/6}, \qquad
+D_\mathrm{zd} = D_\mathrm{z}\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
-Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$
-($m_z = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
+Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd}$
+($m_\mathrm{z} = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
 the age-declining ultimate strength $S_\mathrm{u} = 6.75 - S_\mathrm{age}(b + i)$ and forms
 the cumulative stress variable $R$ (Formulae C.3/C.4), mapped to an injury
 probability by the Table C.1 Weibull law $\Pi = 1 - e^{-(R/\alpha)^\beta}$.
 The spinal filter is evaluated analytically in the frequency domain and
 validated against the Annex D 256 Hz digital-filter tabulation within the
 clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
-over 20 years) is reproduced: $D_{z\mathrm{d}} = 55.97$ m/s², $R = 1.22$,
+over 20 years) is reproduced: $D_\mathrm{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 

@@ -59,7 +59,7 @@ absorción.
 que la directa, así que se atenúa por el factor de divergencia geométrica
 
 $$
-K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
+K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
 que vale $2/3$ para la geometría obligatoria $d_\mathrm{s} = 1{,}25$ m, $d_\mathrm{m} = 0{,}25$ m.
@@ -69,7 +69,7 @@ superficie, con el eje del micrófono paralelo a ella. La absorción se obtiene 
 los espectros incidente y reflejado enventanados $H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ### 1.1 Qué se sustrae
@@ -99,7 +99,7 @@ página:
    cancela, y lo que sobrevive es únicamente la reflexión de la superficie.
 5. Enventanar $h_\mathrm{i}$ y $h_\mathrm{r}$ con la **misma** ventana aplicada en sus respectivos
    tiempos de llegada ($T_{\mathrm{w},\text{direct}} = T_{\mathrm{w},\text{reflected}}$),
-   transformar y formar $\alpha$ con $K_r$.
+   transformar y formar $\alpha$ con $K_\mathrm{r}$.
 
 De esa cadena cuelgan dos condiciones de aceptación. La relación señal-ruido
 debe superar **10 dB en todas las bandas de tercio de octava de 250 Hz a
@@ -136,10 +136,10 @@ print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
 
 ### 1.2 La superficie de referencia (Anexo B)
 
-El cociente en bruto $|H_\mathrm{r}/H_\mathrm{i}|^2/K_r^2$ supone que la cadena electroacústica y
+El cociente en bruto $|H_\mathrm{r}/H_\mathrm{i}|^2/K_\mathrm{r}^2$ supone que la cadena electroacústica y
 el factor geométrico se cancelan exactamente. No lo hacen: el altavoz y el
 micrófono tienen sus propias respuestas a lo largo de caminos de longitud
-distinta, y el $K_r = 2/3$ obligatorio es una idealización de onda plana de una
+distinta, y el $K_\mathrm{r} = 2/3$ obligatorio es una idealización de onda plana de una
 geometría finita. En el extremo bajo de la banda, donde un pavimento denso
 absorbe un pequeño porcentaje, ese error residual es comparable con la magnitud
 que se mide, que es la razón de que el Anexo B haga la **medición de referencia
@@ -151,7 +151,7 @@ El remedio es una medición extra por montaje. Colocar una placa muy reflectante
 ella sin cambiar la geometría del conjunto. El factor de reflexión de presión
 medido de la referencia es entonces la función de error $e(f)$ de la propia
 cadena, porque la placa lo refleja todo; dividir el factor medido del pavimento
-por él elimina $e(f)$ y, como la geometría es idéntica, con él el factor $K_r$:
+por él elimina $e(f)$ y, como la geometría es idéntica, con él el factor $K_\mathrm{r}$:
 
 $$
 \alpha_\text{pavimento}(f) = 1 -
@@ -285,7 +285,7 @@ result.plot()   # diagrama de barras alpha(f) en 250-4000 Hz (requiere matplotli
 
 *La absorción crece con la frecuencia porque la superficie refleja menos energía
 de alta frecuencia, exactamente como dicta el factor de reflexión paso bajo
-$r_0(f)$ a través de $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
+$r_0(f)$ a través de $\alpha = 1 - (1/K_\mathrm{r}^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Mostrar el código de esta figura</summary>
@@ -401,7 +401,7 @@ La medición en sí es un procedimiento de trece pasos cuyo orden importa:
 comprobar la superficie y el tiempo, colocar el conjunto, calcular y caminar el
 radio, elegir la fuente y la señal, promediar al menos 50 respuestas sobre el
 pavimento, tomar la referencia de campo libre con el conjunto lejos de todo,
-restar, enventanar, transformar, formar el factor de reflexión con $K_r$,
+restar, enventanar, transformar, formar el factor de reflexión con $K_\mathrm{r}$,
 repetirlo todo sobre la placa de referencia y solo entonces promediar en tercios
 de octava. Un resultado declarado sin la forma y las duraciones de la ventana, y
 sin la medición de referencia, no es un resultado de ISO 13472-1.
@@ -414,7 +414,7 @@ disposición oblicua, y la biblioteca lo sigue. Cambian dos cosas y las dos est�
 expuestas:
 
 - El factor de divergencia geométrica adquiere una forma angular,
-  $K_{r,\theta}^2 = 1 - \cos^2\theta\,(1 - K_r^2)$, que calcula
+  $K_{\mathrm{r},\theta}^2 = 1 - \cos^2\theta\,(1 - K_\mathrm{r}^2)$, que calcula
   `geometric_spreading_factor_angle` y que usa automáticamente
   `insitu_absorption_spectrum` cuando se le da un `incidence_angle`. Las dos
   toman el ángulo en **radianes**, al contrario que los grados que cita el resto

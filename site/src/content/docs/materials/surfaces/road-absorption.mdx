@@ -57,7 +57,7 @@ transfer function gives the reflection factor and hence the absorption.
 the direct wave, so it is attenuated by the geometrical-spreading factor
 
 $$
-K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
+K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
 which equals $2/3$ for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m.
@@ -67,7 +67,7 @@ surface with the microphone axis parallel to it. The absorption follows from
 the windowed incident and reflected spectra $H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ### 1.1 What is subtracted
@@ -96,7 +96,7 @@ step the two arrays this page's functions consume come out of:
    cancels, and what survives is the surface reflection alone.
 5. Window $h_\mathrm{i}$ and $h_\mathrm{r}$ with the **same** window applied at their own
    arrival times ($T_{\mathrm{w},\text{direct}} = T_{\mathrm{w},\text{reflected}}$), transform,
-   and form $\alpha$ with $K_r$.
+   and form $\alpha$ with $K_\mathrm{r}$.
 
 Two acceptance conditions ride on that chain. The signal-to-noise ratio must
 exceed **10 dB in every one-third-octave band from 250 Hz to 4 kHz**
@@ -132,10 +132,10 @@ print(round(float(band[2]), 3))    # 0.84  (alpha = 1 - 0.4^2 = 0.84)
 
 ### 1.2 The reference surface (Annex B)
 
-The raw ratio $|H_\mathrm{r}/H_\mathrm{i}|^2/K_r^2$ assumes that the electro-acoustic chain and
+The raw ratio $|H_\mathrm{r}/H_\mathrm{i}|^2/K_\mathrm{r}^2$ assumes that the electro-acoustic chain and
 the geometry factor cancel exactly. They do not: the loudspeaker and the
 microphone have their own responses along paths of different length, and the
-mandatory $K_r = 2/3$ is a plane-wave idealisation of a finite geometry. At
+mandatory $K_\mathrm{r} = 2/3$ is a plane-wave idealisation of a finite geometry. At
 the bottom of the band, where a dense road absorbs a few percent, that
 residual error is comparable with the quantity being measured — which is why
 Annex B makes a **reference measurement mandatory**, not advisory.
@@ -146,7 +146,7 @@ maximum sampled area — on the same spot, and repeat the entire procedure over
 it with the rig geometry unchanged. The measured pressure reflection factor of
 the reference is then the chain's own error function $e(f)$, because the plate
 itself reflects everything; dividing the road's measured factor by it removes
-$e(f)$ and, since the geometry is identical, the $K_r$ factor with it:
+$e(f)$ and, since the geometry is identical, the $K_\mathrm{r}$ factor with it:
 
 $$
 \alpha_\text{road}(f) = 1 -
@@ -278,7 +278,7 @@ result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
 
 *The absorption rises with frequency because the surface reflects less of the
 high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
-dictates through $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
+dictates through $\alpha = 1 - (1/K_\mathrm{r}^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -393,7 +393,7 @@ The measurement itself is a thirteen-step procedure whose order matters:
 check the surface and the weather, place the rig, compute and walk the
 radius, choose the source and the signal, average at least 50 responses over
 the road, take the free-field reference with the rig clear of everything,
-subtract, window, transform, form the reflection factor with $K_r$, repeat the
+subtract, window, transform, form the reflection factor with $K_\mathrm{r}$, repeat the
 whole thing over the reference plate, and only then average into one-third
 octaves. A result reported without the window shape and durations, and without
 the reference measurement, is not an ISO 13472-1 result.
@@ -406,7 +406,7 @@ oblique arrangement, and the library follows it. Two things change and both
 are exposed:
 
 - The geometrical-spreading factor acquires an angular form,
-  $K_{r,\theta}^2 = 1 - \cos^2\theta\,(1 - K_r^2)$, computed by
+  $K_{\mathrm{r},\theta}^2 = 1 - \cos^2\theta\,(1 - K_\mathrm{r}^2)$, computed by
   `geometric_spreading_factor_angle` and used automatically when
   `insitu_absorption_spectrum` is given an `incidence_angle`. Both take the
   angle in **radians**, unlike the degrees the rest of this page quotes.

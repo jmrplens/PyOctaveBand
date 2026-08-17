@@ -56,13 +56,13 @@ is quantitative: when the band-limited vertical peak acceleration exceeds
 
 ## 1. Getting the record (clauses 5.1.2 and 5.1.4)
 
-Everything below starts from a measured $a_z(t)$, and ISO 2631-5 adds four
+Everything below starts from a measured $a_\mathrm{z}(t)$, and ISO 2631-5 adds four
 acquisition requirements on top of the ISO 2631-1 ones, each of them specific to
 shock exposure.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_setup.svg" alt="Left: the seat pan in section with a seated occupant's ischial tuberosities resting on the ISO 10326-1 semi-rigid mounting disc of 250 plus or minus 50 mm diameter and at most 12 mm height, carrying a 75 plus or minus 5 mm by 1.5 mm metal disc for the accelerometers, taped to the cushion, with a contact switch beside it and the z axis positive to cranial, on a suspension seat. Right: a recorded acceleration with two shaded windows where contact is lost, excluded from the exposure, splitting the record into three contact segments that are conditioned separately. Below: the hardware requirements of clause 5.1.2 and the duration requirement of clause 5.1.4" width="94%" />
 
-**Where (5.1.2).** $a_z(t)$ is measured at the interface between the seat and
+**Where (5.1.2).** $a_\mathrm{z}(t)$ is measured at the interface between the seat and
 the **ischial tuberosities**. The measurement location on the seat and the
 design of the accelerometer disc on the seat pad follow **ISO 10326-1**: a
 semi-rigid moulded disc of 250 ± 50 mm diameter and at most 12 mm height, 80 to
@@ -149,16 +149,16 @@ print(high.shape, low.shape)                          # (1, 6) (2, 6)
 
 A seat-to-spine transfer function $H(f)$ (one complex zero and six complex
 poles, unity transmissibility at 0 Hz and a resonance near 5 Hz) maps the
-conditioned seat acceleration to the vertical spinal response $A_z(t)$
+conditioned seat acceleration to the vertical spinal response $A_\mathrm{z}(t)$
 (Formula 1/2):
 
 $$
-A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
+A_\mathrm{z}(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_\mathrm{z}(t)]\right].
 $$
 
 The conditioning of section 2 is not optional here: because $H$ is unity at
 0 Hz by design, a DC offset — the 1 g gravity component of a DC-coupled
-accelerometer, say — passes straight into $A_z(t)$ and corrupts the positive
+accelerometer, say — passes straight into $A_\mathrm{z}(t)$ and corrupts the positive
 response peaks the dose is built from.
 
 ```python
@@ -171,12 +171,12 @@ print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 
 ## 4. Acceleration dose (clause 5.3)
 
-The **acceleration dose** combines the positive response peaks $A_{z,i}$
+The **acceleration dose** combines the positive response peaks $A_{\mathrm{z},i}$
 (each the maximum between two consecutive zero crossings) with a sixth-power
 law, so the largest shocks dominate (Formula 3):
 
 $$
-D_z = 1.07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
+D_\mathrm{z} = 1.07\left(\sum_i A_{\mathrm{z},i}^{\,6}\right)^{1/6}.
 $$
 
 The 1.07 is not a calibration fudge: NOTE 1 to clause 5.3 says that Formula (1)
@@ -189,7 +189,7 @@ therefore decided by a handful of impacts, which is also why the peak count is
 robust to how the zero-crossing rule treats the small stuff.
 
 A daily dose scales the measured dose to the daily exposure time $t_\mathrm{d}$ over
-the measurement time $t_\mathrm{m}$ (Formula 4): $D_{z\mathrm{d}} = D_z\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$. To
+the measurement time $t_\mathrm{m}$ (Formula 4): $D_\mathrm{zd} = D_\mathrm{z}\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$. To
 compare different exposures the standard recommends $t_\mathrm{d}$ = 8 h.
 
 ```python
@@ -234,8 +234,8 @@ print(peaks.size, round(float(peaks.max()), 1), round(float(shares.max()), 1))
 # 28 30.3 98.6
 
 fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
-ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_z(t)$")
-ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_z(t)$")
+ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_\mathrm{z}(t)$")
+ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_\mathrm{z}(t)$")
 ax_p.plot(time, response, lw=1.2, color="#1f77b4")
 ax_p.axhline(peaks.max() / 3.0, ls="--", color="#2ca02c")
 ax_t.legend(loc="upper left")
@@ -247,8 +247,8 @@ plt.show()
 
 ## 5. Injury risk (Annex C)
 
-The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_z\,D_{z\mathrm{d}}$
-(Formula C.1), where $m_z$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
+The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_\mathrm{z}\,D_\mathrm{zd}$
+(Formula C.1), where $m_\mathrm{z}$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
 64 kg female) converts acceleration to vertebral stress. The stress accumulates
 over the exposure years against the ageing spine's reducing ultimate strength
 $S_\mathrm{u} = 6.75\ \mathrm{MPa} - S_{\mathrm{age}}\,(b+i)$ (Formulae C.3/C.4):
@@ -261,8 +261,8 @@ $$
 where $b$ is the age at which the exposure started, $n$ the number of exposure
 years, $i$ the year counter $0 \le i \le n-1$ (so $S_{\mathrm{u},i}$ is the ultimate
 strength at age $b+i$), and $N$ the number of exposure days per year.
-$S_{\mathrm{stat}} = m_z \times 9.81\ \mathrm{m/s^2}$ is the static compressive
-stress the spine already carries under gravity — 0.284 MPa for the male $m_z$,
+$S_{\mathrm{stat}} = m_\mathrm{z} \times 9.81\ \mathrm{m/s^2}$ is the static compressive
+stress the spine already carries under gravity — 0.284 MPa for the male $m_\mathrm{z}$,
 0.245 MPa for the female one (`vibration.static_stress`) — and
 $S_{\mathrm{age}}$ is the annual loss of ultimate strength, 0.052 MPa/year for
 males and 0.039 MPa/year for females (`vibration.ultimate_strength`, which
@@ -402,7 +402,7 @@ plt.show()
 
 </details>
 
-The `MultipleShockResult` carries the dose $D_z$, the daily dose $D_{z\mathrm{d}}$, the
+The `MultipleShockResult` carries the dose $D_\mathrm{z}$, the daily dose $D_\mathrm{zd}$, the
 compressive stress $S_\mathrm{d}$, the stress variable $R$, the injury probability and
 the response peaks, and its `.plot()` draws the injury-probability curve with
 the 10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
@@ -421,8 +421,8 @@ model), an optional metadata header (client, subject, workplace/vehicle,
 instrumentation, calibration), the exposure-scenario grid (subject sex, the age
 $b$ at which the exposure started, the number of exposure years $n$, the number
 of exposure days per year $N$ and the number of counted response shocks), and
-the dose-and-stress analysis table with the acceleration dose $D_z$ (Formula 3),
-the daily dose $D_{z\mathrm{d}}$ (Formula 4), the daily compressive stress $S_\mathrm{d}$
+the dose-and-stress analysis table with the acceleration dose $D_\mathrm{z}$ (Formula 3),
+the daily dose $D_\mathrm{zd}$ (Formula 4), the daily compressive stress $S_\mathrm{d}$
 (Formula C.1), the cumulative stress variable $R$ (Formula C.3) and the
 probability of lumbar injury $\Pi$ (Formula C.5).
 

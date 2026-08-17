@@ -15,19 +15,19 @@ opposite ends of the absorption scale and are **not** interchangeable:
   .. math::
 
      \alpha(f) = 1 - Q_W(f)
-     = 1 - \frac{1}{K_r^{2}}
+     = 1 - \frac{1}{K_\mathrm{r}^{2}}
      \left\lvert \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right\rvert^{2}
 
   with ``Hi``/``Hr`` the incident/reflected transfer functions and ``Kr`` the
-  geometrical-spreading factor :math:`K_r = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})` for the
+  geometrical-spreading factor :math:`K_\mathrm{r} = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})` for the
   mandatory geometry :math:`d_\mathrm{s} = 1.25` m (source-to-plane) and
-  :math:`d_\mathrm{m} = 0.25` m (mic-to-plane), giving :math:`K_r = 2/3` (Clause 4.2 /
+  :math:`d_\mathrm{m} = 0.25` m (mic-to-plane), giving :math:`K_\mathrm{r} = 2/3` (Clause 4.2 /
   Annex C). The complex pressure reflection factor
-  :math:`Q_p = (1/K_r)(H_\mathrm{r}/H_\mathrm{i})\, e^{+j 2 \pi f \Delta\tau}` with
+  :math:`Q_p = (1/K_\mathrm{r})(H_\mathrm{r}/H_\mathrm{i})\, e^{+j 2 \pi f \Delta\tau}` with
   :math:`\Delta\tau = 2 d_\mathrm{m} / c` (Annex C) is available for theory comparison.
   A highly reflective reference surface removes the electro-acoustic chain
   error and the geometry factor by a ratio (Annex B), and non-normal incidence
-  uses :math:`K_{r,\theta}` (Annex F).
+  uses :math:`K_{\mathrm{r},\theta}` (Annex F).
 
 * **BS ISO 13472-2:2010** - *spot method*. This is an **in-situ application of
   the ISO 10534-2 two-microphone impedance tube** for reflective surfaces
@@ -160,16 +160,16 @@ def geometric_spreading_factor(
 ) -> float:
     r"""Geometrical-spreading factor ``Kr`` (ISO 13472-1:2002, Clause 4.1).
 
-    :math:`K_r = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})`. It corrects the reflected path
+    :math:`K_\mathrm{r} = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})`. It corrects the reflected path
     for the extra spherical spreading over the image-source distance
     :math:`d_\mathrm{s} + d_\mathrm{m}` relative to the direct distance :math:`d_\mathrm{s} - d_\mathrm{m}`
     (Annex C). The mandatory geometry :math:`d_\mathrm{s} = 1.25` m,
-    :math:`d_\mathrm{m} = 0.25` m gives :math:`K_r = 2/3` (Clause 4.2).
+    :math:`d_\mathrm{m} = 0.25` m gives :math:`K_\mathrm{r} = 2/3` (Clause 4.2).
 
     :param source_height: Source-to-reference-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-reference-plane distance ``dm``, in metres.
     :return: Geometrical-spreading factor ``Kr`` (dimensionless,
-        :math:`0 < K_r < 1`).
+        :math:`0 < K_\mathrm{r} < 1`).
     :raises ValueError: If ``ds`` or ``dm`` is not positive or
         :math:`d_\mathrm{s} \le d_\mathrm{m}`.
     """
@@ -184,7 +184,7 @@ def geometric_spreading_factor_angle(
 ) -> float:
     r"""Oblique geometrical-spreading factor (ISO 13472-1, Annex F).
 
-    :math:`K_{r,\theta}^2 = 1 - \cos^2(\theta) (1 - K_r^2)` with ``Kr`` the
+    :math:`K_{\mathrm{r},\theta}^2 = 1 - \cos^2(\theta) (1 - K_\mathrm{r}^2)` with ``Kr`` the
     normal-incidence factor of :func:`geometric_spreading_factor`. At
     :math:`\theta = 0` the
     cosine is unity and ``Kr,theta`` collapses to ``Kr`` (Clause 4.1).
@@ -364,7 +364,7 @@ def insitu_reflection_factor(
 ) -> Complex:
     r"""Complex pressure reflection factor ``r(f)`` (ISO 13472-1, Clause 4.1).
 
-    :math:`r(f) = (1 / K_r) H_\mathrm{r}(f) / H_\mathrm{i}(f)` from the windowed reflected and
+    :math:`r(f) = (1 / K_\mathrm{r}) H_\mathrm{r}(f) / H_\mathrm{i}(f)` from the windowed reflected and
     incident
     impulse responses, with ``Hr``/``Hi`` their real FFTs and ``Kr`` the
     geometrical-spreading factor (or ``Kr,theta`` when ``incidence_angle`` is
@@ -412,7 +412,7 @@ def insitu_absorption_from_reflection(reflection: ArrayLike) -> Real:
     r"""Absorption coefficient from the reflection factor (ISO 13472-1, 4.1).
 
     :math:`\alpha = 1 - \lvert r \rvert^2`. With ``r`` already carrying the
-    :math:`1 / K_r` factor
+    :math:`1 / K_\mathrm{r}` factor
     (see :func:`insitu_reflection_factor`) this is the **reflection-factor route** to
     ``alpha`` and equals the direct energy route of
     :func:`insitu_absorption_coefficient`.
@@ -436,7 +436,7 @@ def power_reflection_coefficient(
     r"""Sound-power reflection factor ``QW(f)`` (ISO 13472-1, 4.1 / Annex C).
 
     The **direct energy route**
-    :math:`Q_W(f) = (1 / K_r^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2`
+    :math:`Q_W(f) = (1 / K_\mathrm{r}^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2`
     (``Kr,theta`` for oblique incidence). It equals
     :math:`\lvert r \rvert^2` from
     :func:`insitu_reflection_factor` but is formed from magnitudes only, so it is
@@ -470,7 +470,7 @@ def insitu_absorption_coefficient(
     r"""Normal-incidence absorption coefficient ``alpha(f)`` (ISO 13472-1, 4.1).
 
     :math:`\alpha(f) = 1 - Q_W(f)
-    = 1 - (1 / K_r^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2` (the direct
+    = 1 - (1 / K_\mathrm{r}^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2` (the direct
     energy route via :func:`power_reflection_coefficient`; for oblique incidence
     ``Kr`` is replaced by ``Kr,theta``, Annex F). Non-specularly reflected energy
     is treated as absorbed, so ``alpha`` may be slightly overestimated

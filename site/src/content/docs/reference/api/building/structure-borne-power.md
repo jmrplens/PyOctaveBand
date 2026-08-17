@@ -39,7 +39,7 @@ and the plate loss factor follows from its structural reverberation time `Ts`
 (Formula 13, identical to the ISO 10848 total loss factor):
 
 $$
-\eta = \frac{2.2}{f\, T_s}
+\eta = \frac{2.2}{f\, T_\mathrm{s}}
 $$
 
 **Formula (14) is plate-specific, not a source descriptor.** The same source
@@ -210,7 +210,7 @@ plate_loss_factor(
 ) -> np.ndarray
 ```
 
-Plate loss factor $\eta = 2.2 / (f\, T_s)$ (EN 15657, Formula 13).
+Plate loss factor $\eta = 2.2 / (f\, T_\mathrm{s})$ (EN 15657, Formula 13).
 
 Estimated from the plate's structural reverberation time; identical to the
 ISO 10848 total loss factor.
@@ -241,7 +241,7 @@ reception_plate_power(
 Reception-plate injected structure-borne sound power (EN 15657, clause 7).
 
 Provide the plate loss factor directly, or its structural reverberation
-time `Ts` (from which $\eta = 2.2/(f\, T_s)$ is computed,
+time `Ts` (from which $\eta = 2.2/(f\, T_\mathrm{s})$ is computed,
 Formula 13).
 The result is the power injected into *this* plate (Formula 14); see the
 module docstring for the conversion chain to the EN 12354-5 source

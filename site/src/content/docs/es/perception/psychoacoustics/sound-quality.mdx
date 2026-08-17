@@ -369,7 +369,7 @@ de modulación por la tasa y la profundidad de modulación, y correlaciona la
 modulación entre bandas; el resultado $R$ se da en **asper**. El sonido de
 referencia (portadora de 1 kHz, modulada en amplitud al 100 % a 70 Hz, nivel
 global de 60 dB SPL) se define como 1 asper; esta implementación de sala
-limpia devuelve 0,9999 asper con la constante de calibración tabulada $c_R$
+limpia devuelve 0,9999 asper con la constante de calibración tabulada $c_\mathrm{R}$
 (Fórmula 104) usada **sin** reajustarla hacia atrás al objetivo.
 
 ```python
@@ -513,7 +513,7 @@ escala con una sonoridad específica basada en el HSA. El sonido de
 referencia (portadora de 1 kHz, modulada en amplitud al 100 % a 4 Hz, nivel
 global de 60 dB SPL) se define como 1 vacil_HMS; esta implementación de
 sala limpia converge a 0,9958 vacil_HMS a los 12 s con la constante de
-calibración tabulada $c_F$ (fórmula 163) usada **sin** reajustarla al objetivo
+calibración tabulada $c_\mathrm{F}$ (fórmula 163) usada **sin** reajustarla al objetivo
 (el ejemplo de 8 s de abajo imprime 0,9957). Una señal cuyo valor único $F$
 supera 0,2 vacil_HMS tiene una intensidad de fluctuación *prominente*
 (apartado 9.2).
@@ -636,7 +636,7 @@ binaurales de media cuadrática de la Fórmula 112 (apartado 7.1.11) y la
 Fórmula 170 (apartado 9.1.15) no están implementadas, así que analiza cada
 canal por separado. La ponderación de entropía opcional del apartado 7.1.6
 necesita una señal externa de velocidad de giro y queda fuera, igual que el
-ajuste de ±0,25 % de $c_F$ que permite la nota al pie 47. La sonoridad de
+ajuste de ±0,25 % de $c_\mathrm{F}$ que permite la nota al pie 47. La sonoridad de
 ECMA-418-2 que comparte este front-end está en [Sonoridad
 avanzada](/phonometry/es/perception/psychoacoustics/advanced-loudness/), y los
 modelos de intensidad de fluctuación de Fastl y Zwicker, en [Molestia

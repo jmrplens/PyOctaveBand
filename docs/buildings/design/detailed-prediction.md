@@ -26,7 +26,7 @@ airborne and impact chains read the same in-situ element data.
 the sound reduction index from the material properties (Annex B):
 
 $$
-\tau = \left(\frac{2\rho_o c_o}{2\pi f m'}\right)^2 \cdot
+\tau = \left(\frac{2\rho_\mathrm{o} c_\mathrm{o}}{2\pi f m'}\right)^2 \cdot
 \frac{\pi f_\mathrm{c} \sigma^2}{2 f \eta_\mathrm{tot}} \quad (f > f_\mathrm{c})
 $$
 
@@ -46,8 +46,8 @@ the building than in the test frame. The total loss factor in situ is
 
 $$
 \eta_\mathrm{tot} = \eta_\mathrm{int}
-+ \frac{2\rho_o c_o \sigma}{2\pi f m'}
-+ \frac{c_o}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
++ \frac{2\rho_\mathrm{o} c_\mathrm{o} \sigma}{2\pi f m'}
++ \frac{c_\mathrm{o}}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
 $$
 
 the three terms being the internal losses of the material, the radiation into
@@ -56,7 +56,7 @@ from the junctions themselves, $\alpha_k = \sum_j \sqrt{f_{\mathrm{c},j}/f_\math
 \, 10^{-K_{ij}/10}$ (Formula C.4). From $\eta_\mathrm{tot}$ come the structural
 reverberation time $T_\mathrm{s} = 2{,}2/(f\,\eta_\mathrm{tot})$ and the equivalent
 absorption length $a_\mathrm{situ} = 2{,}2\pi^2 S \sqrt{f_\mathrm{ref}/f} /
-(c_o T_\mathrm{s,situ})$ (Formula 11).
+(c_\mathrm{o} T_\mathrm{s,situ})$ (Formula 11).
 
 **3. Junctions.** The situation-invariant $K_{ij}$ becomes the level drop the
 junction actually produces (Formula 10):
@@ -352,7 +352,7 @@ this module does, a useful sanity target for a new floor build-up.
 | `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_\mathrm{c}$ branch |
 | `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_\mathrm{c}$ (Annex B.1, flanking paths) |
 | `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
-| `air_density` | float | kg/m³ | default `1.29` | $\rho_o$ of the Annex B model |
+| `air_density` | float | kg/m³ | default `1.29` | $\rho_\mathrm{o}$ of the Annex B model |
 
 ## `airborne_flanking_path()` / `impact_flanking_path()` parameters
 

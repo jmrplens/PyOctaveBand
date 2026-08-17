@@ -89,11 +89,11 @@ A rectangular room reflects a point source in its walls; each reflection equals 
 
 $$
 g(t) = \sum_n A_n\ \delta(t - t_n), \qquad
-A_n = \frac{1}{4\pi r_n}\ e^{-m r_n / 2} \prod_{\text{walls}} R_w^{\,k_{w,n}}, \qquad
+A_n = \frac{1}{4\pi r_n}\ e^{-m r_n / 2} \prod_{\text{walls}} R_q^{\,k_{q,n}}, \qquad
 t_n = \frac{r_n}{c},
 $$
 
-with the $1/(4\pi r_n)$ spherical spreading, the product of the wall **pressure reflection factors** $R_w = \sqrt{1 - \alpha_w}$ (Vorländer Eq. 11.39; $|R|^2 = 1-\alpha$ in energy) each raised to the number of reflections $k_{w,n}$ that image made off wall $w$, and the air pressure attenuation $e^{-m r_n/2}$ ($m$ the *intensity* attenuation constant). Along one axis the reflection counts of the image at lattice index $n$ and parity $p$ are $|n-p|$ and $|n|$ off the two walls (Allen & Berkley 1979), so the total order is $\sum_i |2 n_i - p_i|$; a shoebox has $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order $i_0$ (Kuttruff Eq. 9.23), and the reflection density grows as $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$ (Kuttruff Eq. 4.6).
+with the $1/(4\pi r_n)$ spherical spreading, the product of the wall **pressure reflection factors** $R_q = \sqrt{1 - \alpha_q}$ (Vorländer Eq. 11.39; $|R|^2 = 1-\alpha$ in energy) each raised to the number of reflections $k_{q,n}$ that image made off wall $q$, and the air pressure attenuation $e^{-m r_n/2}$ ($m$ the *intensity* attenuation constant). Along one axis the reflection counts of the image at lattice index $n$ and parity $p$ are $|n-p|$ and $|n|$ off the two walls (Allen & Berkley 1979), so the total order is $\sum_i |2 n_i - p_i|$; a shoebox has $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order $i_0$ (Kuttruff Eq. 9.23), and the reflection density grows as $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$ (Kuttruff Eq. 4.6).
 
 The initial decay rate of the specular reverberant energy recovers the **Eyring** reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff Eq. 5.23), because the mean reflection rate $cS/4V$ equals $\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$. The match is exact only near cubic geometry; an elongated room sustains energy along its long axis, so the pure specular decay runs slower than Eyring's diffuse-field estimate (the anisotropy the Fitzroy/Arau-Puchades models correct). The model is specular only — no diffraction or diffuse scattering — and exact only for real, angle-independent reflection factors.
 
@@ -237,7 +237,7 @@ parts (the normative Clause 4 model). The total (Formula 1) sums the surfaces,
 the objects and the air:
 
 $$
-A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{obj,j} + \sum_k \alpha_{s,k}\ S_k + A_\mathrm{air},
+A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{\mathrm{obj},j} + \sum_k \alpha_{\mathrm{s},k}\ S_k + A_\mathrm{air},
 \qquad A_\mathrm{air} = 4\ m\ V\ (1 - \psi),
 $$
 

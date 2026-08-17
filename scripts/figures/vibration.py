@@ -816,9 +816,10 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
     _fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
 
     ax_t.plot(time, seat, color=COLOR_MUTED, linewidth=0.9,
-              label="$a_z(t)$, conditioned seat acceleration", zorder=2)
+              label=r"$a_\mathrm{z}(t)$, conditioned seat acceleration",
+              zorder=2)
     ax_t.plot(time, response, color=COLOR_PRIMARY, linewidth=1.5,
-              label="$A_z(t)$, spinal response (Formula 2)", zorder=3)
+              label=r"$A_\mathrm{z}(t)$, spinal response (Formula 2)", zorder=3)
     ax_t.axhline(-9.81, color=COLOR_SECONDARY, linestyle=":", linewidth=1.2,
                  zorder=1)
     ax_t.annotate("0.4 s of free fall at $-1\\,g$:\nthe 0.01 Hz high pass of "
@@ -837,7 +838,7 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
     ax_p.axhline(0.0, color=COLOR_FG, linewidth=0.9, alpha=0.6, zorder=1)
     ax_p.plot(time[indices], peaks, linestyle="none", marker="o",
               markersize=5, color=COLOR_SECONDARY, zorder=4,
-              label=f"{peaks.size} counted positive peaks $A_{{z,i}}$")
+              label=rf"{peaks.size} counted positive peaks $A_{{\mathrm{{z}},i}}$")
     largest = int(np.argmax(peaks))
     ax_p.axhline(peaks[largest] / 3.0, color=COLOR_TERTIARY, linestyle="--",
                  linewidth=1.4, zorder=3,
@@ -848,10 +849,11 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
                       xy=(time[indices[rank]], peaks[rank]),
                       xytext=(time[indices[rank]] + 0.18, peaks[rank] + 1.6),
                       fontsize=9, color=COLOR_FG)
-    ax_p.set_ylabel("$A_z$ [m/s²]")
+    ax_p.set_ylabel(r"$A_\mathrm{z}$ [m/s²]")
     ax_p.set_xlabel("Time [s]")
     ax_p.set_title(
-        f"(b)  Each peak's share of $\\sum A_{{z,i}}^6$ — dose $D_z$ = "
+        f"(b)  Each peak's share of $\\sum A_{{\\mathrm{{z}},i}}^6$ — "
+        f"dose $D_\\mathrm{{z}}$ = "
         f"{dose:.1f} m/s²", fontsize=10, loc="left",
         pad=6)
     ax_p.legend(loc="upper left", fontsize=9)

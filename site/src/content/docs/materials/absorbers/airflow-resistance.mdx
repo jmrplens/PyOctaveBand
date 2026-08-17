@@ -337,15 +337,15 @@ adiabatic; the normative Annex A corrects $\kappa$ down to
 $$
 \kappa' = \frac{\kappa}{\sqrt{1 + (\kappa-1)\tfrac{S}{V}b
           + \tfrac{1}{2}\big((\kappa-1)\tfrac{S}{V}b\big)^2}},
-\qquad b = \sqrt{\frac{2 c_0 l_h}{\omega}},\quad
-l_h = \frac{k_a}{\rho_0 c_0 C_P},
+\qquad b = \sqrt{\frac{2 c_0 l_\mathrm{h}}{\omega}},\quad
+l_\mathrm{h} = \frac{k_\mathrm{a}}{\rho_0 c_0 C_\mathrm{P}},
 $$
 
 with $S$ and $V$ the cavity surface and volume, $b$ the thermal boundary-layer
-thickness (`thermal_boundary_layer_thickness`), $l_h$ the characteristic
-thermal diffusion length built from the thermal conductivity $k_a$, the density
+thickness (`thermal_boundary_layer_thickness`), $l_\mathrm{h}$ the characteristic
+thermal diffusion length built from the thermal conductivity $k_\mathrm{a}$, the density
 $\rho_0$, the speed of sound $c_0$ and the specific heat at constant pressure
-$C_P$, and $\omega = 2\pi f$. For the Annex A.3 example cavity this gives
+$C_\mathrm{P}$, and $\omega = 2\pi f$. For the Annex A.3 example cavity this gives
 $\kappa' = 1.370$, about 2 % below the adiabatic 1.4008.
 
 ```python

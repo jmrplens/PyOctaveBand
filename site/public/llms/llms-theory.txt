@@ -116,7 +116,7 @@ $$
 and the whole-day rating level combines the adjusted periods energetically (clause 8, Note 1):
 
 $$
-L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{\mathrm{Aeq},N} + K_{\mathrm{I},N})/10} \Big].
 $$
 
 $K_\mathrm{I}$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_\mathrm{I}(P{=}10) = 9.0$ dB are reproduced exactly.
@@ -584,14 +584,14 @@ leading edge, a mandated 5 ms flat top and a Blackman-Harris trailing edge),
 and
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
-\qquad K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
+\qquad K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
 $$
 
 for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m (clause 4.2,
-Annex C); $K_r$ is the spherical-spreading ratio between the direct and the
+Annex C); $K_\mathrm{r}$ is the spherical-spreading ratio between the direct and the
 image path. Ratioing the road measurement against one on a highly reflective
-reference surface cancels the entire electro-acoustic chain along with $K_r$
+reference surface cancels the entire electro-acoustic chain along with $K_\mathrm{r}$
 (Annex B). The 5 ms window bounds the sampled area (Annex A closed form:
 radius ≈ 1.34 m for the standard geometry) and the valid range is
 250 Hz – 4 kHz in one-third octaves. ISO 13472-2:2010 (spot method,
@@ -658,7 +658,7 @@ $$
 Only a level *difference* enters, so the sound-level device needs no
 absolute calibration. The effective exponent $\kappa'$ (Annex A,
 Formula A.7) corrects the adiabatic $\kappa$ for wall heat conduction through
-the thermal boundary layer $b = \sqrt{2 c_0 l_h / \omega}$ (Formulae A.4/A.5).
+the thermal boundary layer $b = \sqrt{2 c_0 l_\mathrm{h} / \omega}$ (Formulae A.4/A.5).
 The Annex A.3 worked example (100 mm closed cylinder at 2 Hz: $b = 1.83$ mm,
 $\kappa' = 1.370 = 0.978\,\kappa$) is reproduced, and the validity guards of
 Formula 3 (transfer ratio < 0.3) and Formula 4 (10 dB background margin) are
@@ -791,22 +791,22 @@ This page collects the theory behind hearing and psychoacoustics: the equal-loud
 
 ## Equal-loudness contours (ISO 226:2023)
 
-A tone has a *loudness level* of $L_N$ phon when it is judged equally loud as a 1 kHz pure tone at $L_N$ dB SPL. ISO 226:2023 Formula (1) (clause 4.1, p. 2) gives the SPL of a pure tone at frequency $f$ that reaches loudness level $L_N$:
+A tone has a *loudness level* of $L_\mathrm{N}$ phon when it is judged equally loud as a 1 kHz pure tone at $L_\mathrm{N}$ dB SPL. ISO 226:2023 Formula (1) (clause 4.1, p. 2) gives the SPL of a pure tone at frequency $f$ that reaches loudness level $L_\mathrm{N}$:
 
 $$
-L_f = \frac{10}{\alpha_f} \log_{10}\left[ \left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f} \left( 10^{\ 0.03 L_N} - 10^{\ 0.072} \right) + 10^{\ \alpha_f (T_f + L_U)/10} \right] - L_U
+L_f = \frac{10}{\alpha_f} \log_{10}\left[ \left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f} \left( 10^{\ 0.03 L_\mathrm{N}} - 10^{\ 0.072} \right) + 10^{\ \alpha_f (T_f + L_\mathrm{U})/10} \right] - L_\mathrm{U}
 $$
 
 Formula (2) (clause 4.2) inverts it, returning the loudness level of a tone at SPL $L_f$:
 
 $$
-L_N = \frac{100}{3} \log_{10}\left[ \frac{10^{\ \alpha_f (L_f + L_U)/10} - 10^{\ \alpha_f (T_f + L_U)/10}}{\left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f}} + 10^{\ 0.072} \right]
+L_\mathrm{N} = \frac{100}{3} \log_{10}\left[ \frac{10^{\ \alpha_f (L_f + L_\mathrm{U})/10} - 10^{\ \alpha_f (T_f + L_\mathrm{U})/10}}{\left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f}} + 10^{\ 0.072} \right]
 $$
 
 The three parameters come from Table 1 (p. 4), tabulated at the 29 preferred third-octave frequencies of ISO 266 from 20 Hz to 12.5 kHz:
 
 - $\alpha_f$: exponent for loudness perception at frequency $f$,
-- $L_U$: magnitude of the linear transfer function, normalized at 1 kHz ($L_U = 0$ at 1 kHz),
+- $L_\mathrm{U}$: magnitude of the linear transfer function, normalized at 1 kHz ($L_\mathrm{U} = 0$ at 1 kHz),
 - $T_f$: threshold of hearing at $f$, in dB.
 
 The standard specifies **no interpolation** between the tabulated frequencies. Formula (1) is specified for **20 phon to 90 phon** between 20 Hz and 4 kHz, and only up to **80 phon between 5 kHz and 12.5 kHz**; above 80 phon the contour therefore stops at 4 kHz. Values outside these limits from Formula (2) are extrapolations the standard labels as informative only.
@@ -833,7 +833,7 @@ $$
 \mathrm{TNR}_{\text{crit}} = \begin{cases} 8.0 + 8.33 \log_{10}(1000/f_\mathrm{t}) \ \text{dB} & f_\mathrm{t} < 1\ \text{kHz} \\ 8.0 \ \text{dB} & f_\mathrm{t} \ge 1\ \text{kHz} \end{cases}
 $$
 
-**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_\mathrm{t} \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_\mathrm{t} \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_\mathrm{t})$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
+**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_\mathrm{U}$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_\mathrm{t} \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_\mathrm{t} \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_\mathrm{t})$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
 
@@ -872,10 +872,10 @@ For time-varying sounds a nonlinear temporal decay (time constants 5/15/75 ms, c
 **Sone and phon** are tied together by the 1 kHz anchor (1 sone = 40 phon; clause 5.6):
 
 $$
-N = 2^{(L_N - 40)/10} \ \text{sone} \qquad \Longleftrightarrow \qquad L_N = 40 + 10 \log_2 N \ \text{phon} \qquad (N \ge 1)
+N = 2^{(L_\mathrm{N} - 40)/10} \ \text{sone} \qquad \Longleftrightarrow \qquad L_\mathrm{N} = 40 + 10 \log_2 N \ \text{phon} \qquad (N \ge 1)
 $$
 
-below 1 sone the reference program uses $L_N = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
+below 1 sone the reference program uses $L_\mathrm{N} = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" width="80%"></picture>
 
@@ -919,7 +919,7 @@ using a fast time constant on the attack and a slower one on the release. This y
 
 ### Sottek Hearing Model (ECMA-418-2:2025)
 
-ECMA-418-2 builds all three of its metrics on one auditory front-end (Clause 5): an outer/middle-ear filter, a bank of 53 overlapping gammatone-like band-pass filters spaced on the Bark_HMS scale ($z = 0.5$ to $26.5$), half-wave rectification, and a short-block RMS $\tilde{p}(l, z)$ per band $z$ and time block $l$. A compressive nonlinearity (Formula 23) turns the band RMS into the **specific basis loudness** $N'_{\mathrm{basis}}(l, z)$, whose calibration constant $c_N$ fixes a 1 kHz / 40 dB SPL tone at 1 sone_HMS. The loudness assembles the tonal and noise loudness (below) over bands and time (Formulae 113–117); it grows about $1.65\times$ per 10 dB, more slowly than Zwicker's factor of 2, an intrinsic property of the Sottek summation.
+ECMA-418-2 builds all three of its metrics on one auditory front-end (Clause 5): an outer/middle-ear filter, a bank of 53 overlapping gammatone-like band-pass filters spaced on the Bark_HMS scale ($z = 0.5$ to $26.5$), half-wave rectification, and a short-block RMS $\tilde{p}(l, z)$ per band $z$ and time block $l$. A compressive nonlinearity (Formula 23) turns the band RMS into the **specific basis loudness** $N'_{\mathrm{basis}}(l, z)$, whose calibration constant $c_\mathrm{N}$ fixes a 1 kHz / 40 dB SPL tone at 1 sone_HMS. The loudness assembles the tonal and noise loudness (below) over bands and time (Formulae 113–117); it grows about $1.65\times$ per 10 dB, more slowly than Zwicker's factor of 2, an intrinsic property of the Sottek summation.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing close to 1 sone at 40 dB SPL" width="80%"></picture>
 
@@ -942,20 +942,20 @@ $$
 A windowed spectral estimate of $\phi_z$ separates a **tonal loudness** $N'_{\mathrm{tonal}}(l, z)$ from the **noise loudness** $N'_{\mathrm{noise}}(l, z)$ (Formulae 36–48). The specific tonality is the tonal loudness scaled by a smooth signal-to-noise gate $q(l)$ (Formulae 49–51),
 
 $$
-T'(l, z) = c_T\ q(l)\ N'_{\mathrm{tonal}}(l, z)
+T'(l, z) = c_\mathrm{T}\ q(l)\ N'_{\mathrm{tonal}}(l, z)
 $$
 
-and the single value $T$ (tu_HMS) is the gated time-average of the per-block maximum over bands (Formulae 61–64). The constant $c_T$ fixes the 1 kHz / 40 dB tone at 1 tu_HMS, and the band of the ACF peak gives the tonal frequency $f_{\mathrm{ton}}$.
+and the single value $T$ (tu_HMS) is the gated time-average of the per-block maximum over bands (Formulae 61–64). The constant $c_\mathrm{T}$ fixes the 1 kHz / 40 dB tone at 1 tu_HMS, and the band of the ACF peak gives the tonal frequency $f_{\mathrm{ton}}$.
 
 ### Roughness: envelope modulation (ECMA-418-2)
 
-Roughness is the sensation of fast (roughly 20–300 Hz) amplitude modulation, strongest near 70 Hz. From each band's envelope $p_E(n)$ (Hilbert magnitude), a modulation spectrum is formed and weighted by a modulation-rate function peaking near 70 Hz and by the modulation depth; correlating the modulation across neighbouring bands and applying the specified temporal filtering yields the **specific roughness** $R'(l_{50}, z)$ and the time-dependent roughness
+Roughness is the sensation of fast (roughly 20–300 Hz) amplitude modulation, strongest near 70 Hz. From each band's envelope $p_\mathrm{E}(n)$ (Hilbert magnitude), a modulation spectrum is formed and weighted by a modulation-rate function peaking near 70 Hz and by the modulation depth; correlating the modulation across neighbouring bands and applying the specified temporal filtering yields the **specific roughness** $R'(l_{50}, z)$ and the time-dependent roughness
 
 $$
 R(l_{50}) = \sum_z R'(l_{50}, z) \ \ \text{asper}
 $$
 
-(Formulae 65–111). The single value $R$ is the 90th percentile of $R(l_{50})$ over time (Clause 7.1.10); the constant $c_R$ (Formula 104) calibrates the reference sound (a 1 kHz carrier 100 % amplitude-modulated at 70 Hz at 60 dB SPL) to 1 asper.
+(Formulae 65–111). The single value $R$ is the 90th percentile of $R(l_{50})$ over time (Clause 7.1.10); the constant $c_\mathrm{R}$ (Formula 104) calibrates the reference sound (a 1 kHz carrier 100 % amplitude-modulated at 70 Hz at 60 dB SPL) to 1 asper.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="ECMA-418-2 slow vs fast modulation perception: fluctuation strength forms a band-pass over modulation frequency peaking near 4 to 6 Hz while roughness of the same 1 kHz amplitude-modulated tones peaks near 70 Hz" width="80%"></picture>
 
@@ -1264,11 +1264,11 @@ A rectangular room reflects a point source in its walls; each reflection equals 
 
 $$
 g(t) = \sum_n A_n\ \delta(t - t_n), \qquad
-A_n = \frac{1}{4\pi r_n}\ e^{-m r_n / 2} \prod_{\text{walls}} R_w^{\,k_{w,n}}, \qquad
+A_n = \frac{1}{4\pi r_n}\ e^{-m r_n / 2} \prod_{\text{walls}} R_q^{\,k_{q,n}}, \qquad
 t_n = \frac{r_n}{c},
 $$
 
-with the $1/(4\pi r_n)$ spherical spreading, the product of the wall **pressure reflection factors** $R_w = \sqrt{1 - \alpha_w}$ (Vorländer Eq. 11.39; $|R|^2 = 1-\alpha$ in energy) each raised to the number of reflections $k_{w,n}$ that image made off wall $w$, and the air pressure attenuation $e^{-m r_n/2}$ ($m$ the *intensity* attenuation constant). Along one axis the reflection counts of the image at lattice index $n$ and parity $p$ are $|n-p|$ and $|n|$ off the two walls (Allen & Berkley 1979), so the total order is $\sum_i |2 n_i - p_i|$; a shoebox has $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order $i_0$ (Kuttruff Eq. 9.23), and the reflection density grows as $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$ (Kuttruff Eq. 4.6).
+with the $1/(4\pi r_n)$ spherical spreading, the product of the wall **pressure reflection factors** $R_q = \sqrt{1 - \alpha_q}$ (Vorländer Eq. 11.39; $|R|^2 = 1-\alpha$ in energy) each raised to the number of reflections $k_{q,n}$ that image made off wall $q$, and the air pressure attenuation $e^{-m r_n/2}$ ($m$ the *intensity* attenuation constant). Along one axis the reflection counts of the image at lattice index $n$ and parity $p$ are $|n-p|$ and $|n|$ off the two walls (Allen & Berkley 1979), so the total order is $\sum_i |2 n_i - p_i|$; a shoebox has $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order $i_0$ (Kuttruff Eq. 9.23), and the reflection density grows as $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$ (Kuttruff Eq. 4.6).
 
 The initial decay rate of the specular reverberant energy recovers the **Eyring** reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff Eq. 5.23), because the mean reflection rate $cS/4V$ equals $\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$. The match is exact only near cubic geometry; an elongated room sustains energy along its long axis, so the pure specular decay runs slower than Eyring's diffuse-field estimate (the anisotropy the Fitzroy/Arau-Puchades models correct). The model is specular only — no diffraction or diffuse scattering — and exact only for real, angle-independent reflection factors.
 
@@ -1412,7 +1412,7 @@ parts (the normative Clause 4 model). The total (Formula 1) sums the surfaces,
 the objects and the air:
 
 $$
-A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{obj,j} + \sum_k \alpha_{s,k}\ S_k + A_\mathrm{air},
+A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{\mathrm{obj},j} + \sum_k \alpha_{\mathrm{s},k}\ S_k + A_\mathrm{air},
 \qquad A_\mathrm{air} = 4\ m\ V\ (1 - \psi),
 $$
 
@@ -2156,19 +2156,19 @@ $|H| \approx 1.54$ at 5 Hz) and accumulates the positive spinal-response peaks w
 sixth-power (Palmgren-Miner) dose (clause 5.3, Formulae 3/4):
 
 $$
-D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
+D_\mathrm{z} = 1.07 \left( \sum_i A_{\mathrm{z},i}^6 \right)^{1/6}, \qquad
+D_\mathrm{zd} = D_\mathrm{z}\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
-Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$
-($m_z = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
+Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd}$
+($m_\mathrm{z} = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
 the age-declining ultimate strength $S_\mathrm{u} = 6.75 - S_\mathrm{age}(b + i)$ and forms
 the cumulative stress variable $R$ (Formulae C.3/C.4), mapped to an injury
 probability by the Table C.1 Weibull law $\Pi = 1 - e^{-(R/\alpha)^\beta}$.
 The spinal filter is evaluated analytically in the frequency domain and
 validated against the Annex D 256 Hz digital-filter tabulation within the
 clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
-over 20 years) is reproduced: $D_{z\mathrm{d}} = 55.97$ m/s², $R = 1.22$,
+over 20 years) is reproduced: $D_\mathrm{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 

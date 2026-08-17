@@ -27,8 +27,8 @@ spectra are known and the dominant path per band matters.
    .. math::
 
       \eta_\mathrm{tot} = \eta_\mathrm{int}
-      + \frac{2 \rho_o c_o \sigma}{2 \pi f m'}
-      + \frac{c_o}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
+      + \frac{2 \rho_\mathrm{o} c_\mathrm{o} \sigma}{2 \pi f m'}
+      + \frac{c_\mathrm{o}}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
 
    (:func:`in_situ_total_loss_factor`), with the perimeter absorption
    coefficients deduced from the junctions' vibration reduction indices
@@ -37,7 +37,7 @@ spectra are known and the dominant path per band matters.
    (:func:`structural_reverberation_time`), the in-situ index
    :math:`R_\mathrm{situ} = R - 10 \log_{10}(T_\mathrm{s,situ}/T_\mathrm{s,lab})` (Formula 9,
    :func:`in_situ_reduction_index`) and the equivalent absorption length
-   :math:`a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_o T_\mathrm{s,situ})`
+   :math:`a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_\mathrm{o} T_\mathrm{s,situ})`
    (Formula 11).
 3. Junctions (Formula 10).
    :math:`D_{v,ij,\mathrm{situ}} = K_{ij}
@@ -251,18 +251,18 @@ def bending_radiation_factor(
     The three candidate factors of Formula (B.4) are
 
     - :math:`\sigma_1 = 1/\sqrt{1 - f_\mathrm{c}/f}` (above the critical frequency),
-    - :math:`\sigma_2 = 4 l_1 l_2 (f/c_o)^2` (the plate acting as a small
+    - :math:`\sigma_2 = 4 l_1 l_2 (f/c_\mathrm{o})^2` (the plate acting as a small
       piston),
-    - :math:`\sigma_3 = \sqrt{2 \pi f (l_1 + l_2)/(16 c_o)}` (corner and
+    - :math:`\sigma_3 = \sqrt{2 \pi f (l_1 + l_2)/(16 c_\mathrm{o})}` (corner and
       edge modes),
 
     and the first plate mode
-    :math:`f_{11} = c_o^2/(4 f_\mathrm{c}) \cdot (1/l_1^2 + 1/l_2^2)` selects
+    :math:`f_{11} = c_\mathrm{o}^2/(4 f_\mathrm{c}) \cdot (1/l_1^2 + 1/l_2^2)` selects
     between the two regimes. For :math:`f_{11} \le f_\mathrm{c}/2` the element is mode
     dense at its critical frequency and Formula (B.5) applies:
     :math:`\sigma = \sigma_1` at and above ``fc``, and below it the
     edge/corner sum
-    :math:`\sigma = 2(l_1+l_2)/(l_1 l_2) \cdot (c_o/f_\mathrm{c}) \cdot \delta_1
+    :math:`\sigma = 2(l_1+l_2)/(l_1 l_2) \cdot (c_\mathrm{o}/f_\mathrm{c}) \cdot \delta_1
     + \delta_2` with :math:`\lambda = \sqrt{f/f_\mathrm{c}}` and ``δ2``
     vanishing above ``fc/2``. For :math:`f_{11} > f_\mathrm{c}/2` Formula (B.6) picks
     ``σ3`` unless ``σ2`` (below ``fc``) or ``σ1`` (above ``fc``) is smaller.
@@ -274,7 +274,7 @@ def bending_radiation_factor(
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param critical_frequency: Critical frequency
-        :math:`f_\mathrm{c} = c_o^2/(1.8\,c_\mathrm{L} t)`, Hz.
+        :math:`f_\mathrm{c} = c_\mathrm{o}^2/(1.8\,c_\mathrm{L} t)`, Hz.
     :param length1: One side length of the rectangular element, in m.
     :param length2: The other side length, in m.
     :param speed_of_sound: Speed of sound in air ``co``, in m/s
@@ -341,8 +341,8 @@ def forced_radiation_factor(
 ) -> np.ndarray:
     r"""Radiation factor for forced waves ``σf`` (Formula B.3).
 
-    :math:`\sigma_\mathrm{f} = 0.5 (\ln(k_o \sqrt{l_1 l_2}) - \Lambda)` capped at
-    :math:`\sigma_\mathrm{f} \le 2`, with :math:`k_o = 2 \pi f / c_o` and, for
+    :math:`\sigma_\mathrm{f} = 0.5 (\ln(k_\mathrm{o} \sqrt{l_1 l_2}) - \Lambda)` capped at
+    :math:`\sigma_\mathrm{f} \le 2`, with :math:`k_\mathrm{o} = 2 \pi f / c_\mathrm{o}` and, for
     :math:`l_1 > l_2`,
 
     .. math::
@@ -350,7 +350,7 @@ def forced_radiation_factor(
        \Lambda = -0.964 - \left(0.5 + \frac{l_2}{\pi l_1}\right)
        \ln\frac{l_2}{l_1} + \frac{5 l_2}{2 \pi l_1} - E
 
-    with :math:`E = 1/(4 \pi l_1 l_2 k_o^2)`.
+    with :math:`E = 1/(4 \pi l_1 l_2 k_\mathrm{o}^2)`.
 
     ISO 12354-1:2017 Table B.1 tabulates :math:`10 \log_{10} \sigma_\mathrm{f}` for the
     two standard laboratory openings (2 m² and 10 m²), which this
@@ -406,13 +406,13 @@ def calculated_sound_reduction_index(
     :math:`R = -10 \log_{10} \tau` with the three-branch transmission factor
 
     - :math:`f > f_\mathrm{c}`:
-      :math:`\tau = (2 \rho_o c_o/(2 \pi f m'))^2
+      :math:`\tau = (2 \rho_\mathrm{o} c_\mathrm{o}/(2 \pi f m'))^2
       \cdot \pi f_\mathrm{c} \sigma^2/(2 f \eta_\mathrm{tot})`,
     - :math:`f \approx f_\mathrm{c}`:
-      :math:`\tau = (2 \rho_o c_o/(2 \pi f m'))^2
+      :math:`\tau = (2 \rho_\mathrm{o} c_\mathrm{o}/(2 \pi f m'))^2
       \cdot \pi \sigma^2/(2 \eta_\mathrm{tot})`,
     - :math:`f < f_\mathrm{c}`:
-      :math:`\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot (F + R)` with the
+      :math:`\tau = (2 \rho_\mathrm{o} c_\mathrm{o}/(2 \pi f m'))^2 \cdot (F + R)` with the
       forced term :math:`F = 2 \sigma_\mathrm{f} [1 - f^2/f_\mathrm{c}^2]^{-2}` and the
       resonant term :math:`R = 2 (\pi f_\mathrm{c}/(4 f)) \sigma^2/\eta_\mathrm{tot}`.
 
@@ -429,7 +429,7 @@ def calculated_sound_reduction_index(
     **High-frequency plateau (Formula B.10).** At high frequency the index of
     a thick element stops growing; the standard bounds the transmission factor
     from below by
-    :math:`\tau_\mathrm{plateau} = (4 \rho_o c_o/(1.1\,\rho c_\mathrm{L}))^2
+    :math:`\tau_\mathrm{plateau} = (4 \rho_\mathrm{o} c_\mathrm{o}/(1.1\,\rho c_\mathrm{L}))^2
     \cdot 0.02/\eta_\mathrm{tot}`. Supplying
     both ``density`` and ``longitudinal_velocity`` applies that floor,
     :math:`\tau = \max(\tau, \tau_\mathrm{plateau})`, as the Annex L example does
@@ -600,8 +600,8 @@ def in_situ_total_loss_factor(
 ) -> np.ndarray:
     r"""Total loss factor in situ ``ηtot,situ`` (Formula C.1).
 
-    :math:`\eta_\mathrm{tot} = \eta_\mathrm{int} + 2 \rho_o c_o \sigma/(2 \pi f m')
-    + c_o/(\pi^2 S \sqrt{f f_\mathrm{c}}) \cdot \sum_k l_k \alpha_k`: the
+    :math:`\eta_\mathrm{tot} = \eta_\mathrm{int} + 2 \rho_\mathrm{o} c_\mathrm{o} \sigma/(2 \pi f m')
+    + c_\mathrm{o}/(\pi^2 S \sqrt{f f_\mathrm{c}}) \cdot \sum_k l_k \alpha_k`: the
     internal losses of the material, the losses by radiation into the air
     and the losses at the perimeter of the element.
     :math:`\sum l_k \alpha_k` is the junction-length-weighted sum of the
@@ -748,7 +748,7 @@ def in_situ_equivalent_absorption_length(
 ) -> np.ndarray:
     r"""In-situ equivalent absorption length ``asitu`` (Formula 11).
 
-    :math:`a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_o T_\mathrm{s,situ})` with
+    :math:`a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_\mathrm{o} T_\mathrm{s,situ})` with
     :math:`f_\mathrm{ref} = 1000` Hz. Note
     the :math:`\sqrt{f_\mathrm{ref}/f}` dependence: the absorption length grows as
     the element
@@ -757,7 +757,7 @@ def in_situ_equivalent_absorption_length(
 
     This is the ISO 10848 Formula (12) quantity
     (:func:`phonometry.equivalent_absorption_length`) evaluated with the
-    ISO 12354 value :math:`c_o = 340` m/s.
+    ISO 12354 value :math:`c_\mathrm{o} = 340` m/s.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param area: Element area ``S``, in m².
@@ -1229,12 +1229,12 @@ def floating_floor_improvement(
 ) -> np.ndarray:
     r"""Improvement of a floating floor ``ΔL`` per band (Part 2, Formula C.1).
 
-    :math:`\Delta L = 30 \log_{10}(f/f_o)` for sand/cement or calcium-sulfate
+    :math:`\Delta L = 30 \log_{10}(f/f_\mathrm{o})` for sand/cement or calcium-sulfate
     screeds and
-    :math:`\Delta L = 40 \log_{10}(f/f_o)` (``slope=40``, Formula C.3) for asphalt
+    :math:`\Delta L = 40 \log_{10}(f/f_\mathrm{o})` (``slope=40``, Formula C.3) for asphalt
     or dry
     floating floors, with the system resonance
-    :math:`f_o = 160 \sqrt{s'/m'}`
+    :math:`f_\mathrm{o} = 160 \sqrt{s'/m'}`
     (Formula C.2) and no improvement at or below it. The Annex L airborne
     example reuses the same curve as ``ΔR``, noting explicitly that assuming
     :math:`\Delta R = \Delta L` is rough.

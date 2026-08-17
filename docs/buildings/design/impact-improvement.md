@@ -33,7 +33,7 @@ follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
 for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
 The improvement is the position-averaged difference
 $\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\mathrm{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+$\Delta L_\mathrm{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_j/10}]$ (Formula (5)).
 
 **Weighted improvement.** $\Delta L_\mathrm{w}$ is the ISO 717-2 weighted reduction: the
 improvement is applied to the heavyweight **reference floor** $L_\mathrm{n,r,0}$
