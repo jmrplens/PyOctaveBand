@@ -153,19 +153,33 @@ def test_cross_package_edges_are_whitelisted() -> None:
 
 
 def test_render_modules_only_type_check_domain_imports() -> None:
+    """A rendering leaf must not reach domain code at module level.
+
+    ``rglob``, not ``glob``: the rendering trees grew subpackages, and a
+    non-recursive scan left every module inside them outside this gate.
+
+    How many dots escape the tree depends on how deep the module sits, so the
+    threshold is measured rather than fixed at ``level == 2``. For
+    ``_plot/common.py`` one dot is ``_plot`` and two reach the package root;
+    for ``_plot/geometry/emission.py`` two dots are still ``_plot`` and it
+    takes three. An import escapes when its level exceeds the module's own
+    depth below the rendering root.
+    """
     checked = False
     for sub in ("_plot", "_report"):
         render_dir = SRC / sub
         if not render_dir.is_dir():
             continue
         checked = True
-        for path in render_dir.glob("*.py"):
+        for path in sorted(render_dir.rglob("*.py")):
+            depth = len(path.relative_to(render_dir).parts)
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for node in tree.body:  # module level only
-                if isinstance(node, ast.ImportFrom) and node.level == 2:
+                if isinstance(node, ast.ImportFrom) and node.level > depth:
                     pytest.fail(
-                        f"{sub}/{path.name}: module-level import of domain code "
-                        "(must live under TYPE_CHECKING)"
+                        f"{path.relative_to(SRC)}:{node.lineno}: module-level "
+                        f"import of domain code '{'.' * node.level}"
+                        f"{node.module or ''}' (must live under TYPE_CHECKING)"
                     )
     if not checked:
         pytest.skip("neither _plot nor _report created yet")
