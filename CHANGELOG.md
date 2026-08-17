@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Gaussian beam tracing joins the underwater solvers. `gaussian_beams` hangs a
+  beam on every ray of a launch fan (Jensen Eq. 3.88) and sums them into a
+  propagation-loss field on the same grid, the same reference and the same
+  plot frame as `parabolic_equation`, so the two subtract. What the beams buy
+  over the rays they are built on is a finite answer: the dynamic pair `(q, p)`
+  is started from the complex conditions of Eq. (3.91), whose conserved
+  Wronskian keeps `q` off zero for good, so there is no caustic singularity to
+  patch, no KMAH index to count and no minimum-width floor to impose, and a
+  shadow zone is entered gradually instead of off a cliff. The `-pi/2` per
+  caustic that ray theory has to apply by hand falls out of the branch of the
+  complex square root instead, which is checked against Eq. (3.79) rather than
+  assumed. Both boundary conditions come out of a ladder of folded receiver
+  images rather than being imposed, the beam half-width and wavefront curvature
+  are returned along every ray, and the cost is independent of frequency: a
+  5000 m Munk column at 100 Hz over 10 km takes 14 s against 177 s for
+  `normal_modes`, and raising the frequency does not move the first number.
+  Validated against the free field in magnitude and phase, the two-ray
+  Lloyd-mirror field, and the image-source sum of the ideal pressure-release
+  waveguide to 0.0004 dB. It has no near field: read nothing inside about three
+  initial beam widths of the source, where the far-field weighting of
+  Eq. (3.92) has nothing to converge to.
 - The ISO 9614-3 precision determination renders its own accredited-style
   fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
   sheet carrying what part 3 asks a report to state (clause 10), which is not
@@ -1219,6 +1240,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   +0.009 and +0.008 dB at 48 kHz (headroom +0.700 dB to +0.691 and +0.692 dB),
   the A row at 96 kHz to +0.002 dB, and the worst D-weighting point from
   −0.131 dB to −0.127 dB at 8 kHz. Every conformance row still passes.
+
+- `ray_trace` resolves a sound-speed node by the direction the ray is going
+  through it, so a ray leaving a gradient discontinuity upward gets the
+  gradient of the segment above rather than the one below. The node was looked
+  up with `searchsorted(..., "right")` whatever the direction, which is correct
+  only for a descending ray; an ascending one was handed the wrong side of the
+  kink for its first step. On a profile kinked exactly at the source
+  (`z = [0, 500, 1000]`, `c = [1500, 1490, 1520]`, source at 500 m) the
+  upgoing ray now agrees with an independent `solve_ivp` integration at
+  rtol/atol 1e-12 to 4e-12 m at 4 km, where it was 7e-3 m out. This moves
+  published numbers wherever the source or a boundary sits on a profile node:
+  on a Munk profile with the source on one, ray depths at 20 km move by up to
+  0.43 m and travel times by 2.7e-05 s.
 
 - `extended_tube_chamber` cascades its straight chamber element over the length
   the extensions leave, `L - L_a - L_b`, not the full chamber length. The
