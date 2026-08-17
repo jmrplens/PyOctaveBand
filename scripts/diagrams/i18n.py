@@ -85,7 +85,7 @@ _ES: dict[str, str] = {
         "$ψ ≤ 0$: la corrección vertical de A es nula",
     "track axis": "eje de la vía",
     "0 dB broadside": "0 dB en perpendicular",
-    "−20 dB along the track": "−20 dB sobre la vía",
+    "−20 dB along the track": "−20 dB en el eje de vía",
     "receiver bearing": "dirección al receptor",
     "Impact noise applies from 50 m": "Ruido de impacto desde 50 m",
     "before a joint to 50 m after it": "de la junta a 50 m después",
@@ -432,7 +432,7 @@ _ES: dict[str, str] = {
     "furnished, nobody present but the":
         "amueblada, sin más personas que los",
     "operators, HVAC and any masking system":
-        "operadores, clima y enmascaramiento",
+        "operadores, climatización, enmascaramiento",
     "at working-day power": "a la potencia de un día normal",
     "Line (5.2.2):": "Línea (5.2.2):",
     "6 to 10 positions preferred, 4 the minimum;":
@@ -449,7 +449,7 @@ _ES: dict[str, str] = {
     "• source height 1.5 m": "• fuente a 1,5 m de altura",
     "• off the symmetry axes": "• fuera de los ejes de simetría",
     "ISO 3382-2 (source clearance):":
-        "ISO 3382-2 (separación fuente):",
+        "ISO 3382-2 (dist. a la fuente):",
     "$d_{min} = 2√(V/(c·T̂))$ = 2.0 m": "$d_{min} = 2√(V/(c·T̂))$ = 2,0 m",
     "for $V$ = 210 m³, $T̂$ = 0.6 s": "para $V$ = 210 m³, $T̂$ = 0,6 s",
     # The measuring chain in section (ISO 3382-1, 4.2 and 4.3)
@@ -871,8 +871,8 @@ _ES: dict[str, str] = {
         "así que $a > 0,27$ no es una sola reflexión especular",
     "The reflection has to arrive before the record ends and at least 10 dB "
     "above its noise floor;":
-        "La reflexión debe llegar antes de que acabe el registro y 10 dB por "
-        "encima de su ruido de fondo;",
+        "La reflexión debe llegar antes del final del registro y al menos 10 "
+        "dB sobre su ruido de fondo;",
     "$c$ moves about 0.6 m/s per kelvin, so convert the delay with the "
     "temperature you measured":
         "$c$ cambia unos 0,6 m/s por kelvin: convierte el retardo con la "
@@ -1338,7 +1338,7 @@ _ES: dict[str, str] = {
         "difusores  0,8–3 m² cada uno, ≈ 5 kg/m² (Anexo A)",
     "Test specimen  $S$ = 10.8 m²": "Probeta de ensayo  $S$ = 10,8 m²",
     "10–12 m², width/length 0.7–1, no edge parallel to the room":
-        "10–12 m², ancho/largo 0,7–1, ningún borde paralelo",
+        "10–12 m², ancho/largo 0,7–1, bordes no paralelos a la sala",
     "microphones ≥ 1.5 m apart, ≥ 2 m from a source, ≥ 1 m from any "
     "surface and from the specimen":
         "micrófonos separados ≥ 1,5 m, a ≥ 2 m de una fuente y a ≥ 1 m de "
@@ -1484,7 +1484,7 @@ _ES: dict[str, str] = {
     "Reflecting plane (hemi-anechoic)": "Plano reflectante (semianecoica)",
     "Anechoic wedges": "Cuñas anecoicas",
     "Source (DUT)": "Fuente (DUT)",
-    "20 / 40 mic positions": "20 / 40 micrófonos",
+    "20 / 40 mic positions": "20 / 40 posiciones",
     "radius $r$": "radio $r$",
     "$S = 2πr^2$ (hemi-anechoic) · $4πr^2$ (anechoic)":
         "$S = 2πr^2$ (semianecoica) · $4πr^2$ (anecoica)",
@@ -2209,7 +2209,7 @@ _ES: dict[str, str] = {
     "rotor centre": "centro del rotor",
     "Microphone on a ground board": "Micrófono sobre placa en el suelo",
     "Met mast": "Mástil meteorológico",
-    "wind speed + direction": "velocidad y dirección",
+    "wind speed + direction": "viento: velocidad y dirección",
     "Plan view (Figure 3)": "Planta (Figura 3)",
     "reference 1 (downwind)": "referencia 1 (a sotavento)",
     "optional positions 2–4": "posiciones opcionales 2–4",
@@ -2367,7 +2367,7 @@ _ES: dict[str, str] = {
     "Hydrophone depths from the 15°, 30° and 45° depression angles at r = dCPA; L = ship length":
         "Profundidades de hidrófono por los ángulos de depresión 15°, 30° y "
         "45° a r = dCPA; L = eslora",
-    "Run schedule (not to scale)": "Pasadas (sin escala)",
+    "Run schedule (not to scale)": "Orden de pasadas (sin escala)",
     "reverse course; 4 runs, 2 per side":
         "vuelta en redondo; 4 pasadas, 2/banda",
     "background: stopped, ≥ 2 km, ≥ 30 s,":
@@ -2505,8 +2505,8 @@ _ES: dict[str, str] = {
     "196 / 202 dB re 1 µPa flat": "196 / 202 dB re 1 µPa plano",
     "An isopleth is the contour where a criterion is exactly met: the answer "
     "is a radius, not a verdict":
-        "Una isopleta es la curva donde el criterio se cumple justo: la "
-        "respuesta es un radio",
+        "Una isopleta es la curva donde el criterio se cumple: la respuesta "
+        "es un radio, no un veredicto",
     "A cumulative level means nothing without its range and the window the "
     "strikes were counted in":
         "Un nivel acumulado no dice nada sin su distancia y la ventana en la "
