@@ -412,7 +412,7 @@ plt.show()
 | `window_time` | float | s | > 0; default `0.125` | Frame length (0.125 s mirrors Fast) |
 | `overlap` | float | — | 0 ≤ overlap < 1; default `0.5` | Fraction of window overlap (0 = none) |
 | `mode` | str | — | `'rms'` (default) or `'peak'` | Per-window detector |
-| `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `detrend` | bool | — | default `True` | Remove the input signal's DC offset once, before filtering (improves low-frequency accuracy) |
 | `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline only) |
 | `calibration_factor` / `dbfs` | — | — | constructor-only | Set on `OctaveFilterBank(...)`, not per call |
 

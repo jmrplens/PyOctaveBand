@@ -766,7 +766,7 @@ plt.show()
 | `window_time` | float | s | > 0; por defecto `0.125` | Longitud de la ventana (0,125 s replica Fast) |
 | `overlap` | float | — | 0 ≤ overlap < 1; por defecto `0.5` | Fracción de solape entre ventanas (0 = sin solape) |
 | `mode` | str | — | `'rms'` (por defecto) o `'peak'` | Detector por ventana |
-| `detrend` | bool | — | por defecto `True` | Elimina el offset DC de cada banda antes del nivel (mejora la precisión en graves) |
+| `detrend` | bool | — | por defecto `True` | Elimina el offset DC de la señal de entrada una sola vez, antes de filtrar (mejora la precisión en graves) |
 | `zero_phase` | bool | — | por defecto `False` | Filtrado hacia delante y atrás (solo offline) |
 | `calibration_factor` / `dbfs` | — | — | solo constructor | Se fijan en `OctaveFilterBank(...)`, no por llamada |
 
