@@ -115,9 +115,10 @@ def assert_capabilities() -> None:
     """Fail fast when the environment cannot outline the plates faithfully.
 
     Without libraqm, combining marks get their own advance and ``T̂``
-    silently becomes ``T ˆ``; a face missing from the wheel would drop
-    its strings down the chain and quietly change every metric it sets.
-    Checked once per process.
+    silently becomes ``T ˆ``; a face missing from the wheel would either
+    drop its strings down the chain and change their metrics or, where
+    the chain ends, fail deep inside FreeType, so every file of every
+    chain is checked here. Checked once per process.
     """
     global _capabilities_checked
     if _capabilities_checked:
