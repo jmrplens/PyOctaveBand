@@ -116,8 +116,9 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     # Annotations on the left.
     s.line(cx - half - wall - 6, ref_y, 214, ref_y, th.secondary, 1.3,
            dash="7,4,2,4")
-    s.text(210, ref_y - 8, "reference plane (3.12)", 17, th.secondary,
-           bold=True, anchor="end")
+    s.text(210, ref_y - 28, "reference plane", 17, th.secondary, bold=True,
+           anchor="end")
+    s.text(210, ref_y - 8, "(3.12)", 17, th.secondary, anchor="end")
     s.arrow(216, dia_y + 26, cx - half - 6, dia_y + 22, th.accent, 1.6)
     s.text(212, dia_y + 10, "effective load", 17, th.accent, bold=True,
            anchor="end")
@@ -162,8 +163,8 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     s.text(762, 390, "for a 94 dB calibrator", 16, th.fg)
     s.text(762, 418, "(B.4.2; 40 dB in A.5.3)", 16, th.muted)
 
-    s.text(450, 528, "The specified level is the level at the diaphragm of the "
-           "inserted microphone (5.3.1.2), and it holds for", 18, th.fg)
+    s.text(450, 528, "The specified level is the level at the diaphragm of "
+                     "the inserted microphone (5.3.1.2), and holds for", 18, th.fg)
     s.text(450, 552, "the microphone models and configurations listed in the "
            "manual (5.3.1.3, 6.3 a) — IEC 60942:2017", 18, th.muted)
 
@@ -372,8 +373,8 @@ def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
     s.text(bx + bw / 2, by + 312, "calibration terms correlated, not two rows",
            15, th.secondary)
 
-    s.text(450, 552, "Budgets fail by omission, not by arithmetic: every row "
-           "here is a piece of hardware or a decision about geometry", 17,
+    s.text(450, 552, "Budgets fail by omission, not arithmetic: every row is "
+                     "a piece of hardware or a decision about geometry", 17,
            th.muted)
 
 
@@ -873,7 +874,8 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
 
     # --- captions ----------------------------------------------------------
     s.text(80.0, 590.0,
-           "every stimulus is deterministic and repeatable; synchronous averaging then lowers uncorrelated noise",
+           "every stimulus is deterministic and repeatable; synchronous "
+           "averaging lowers uncorrelated noise",
            16, th.fg, anchor="start")
     s.text(80.0, 616.0,
            "sweeps separate harmonic distortion, MLS smears it across the period, bursts probe dynamics",

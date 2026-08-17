@@ -529,8 +529,8 @@ def _d_tone_audibility_acquisition(s: SVG, th: Theme) -> None:
         s.text(tx, 162, f"{6 * k} s", 13, th.muted, mono=True)
 
     # --- 2: basic spectra merged into ~3 s averaged spectra -----------------
-    s.text(x0, 196, "2 — the analyser's basic spectra (under 1 s each) are "
-           "merged line by line into 3 s spectra (clause 4.3)", 16, th.fg,
+    s.text(x0, 196, "2 — basic spectra (under 1 s) are merged line by line "
+                    "into 3 s spectra (clause 4.3)", 16, th.fg,
            "start", bold=True)
     for j in range(slots):
         base = x0 + j * slot
@@ -643,7 +643,7 @@ def _d_dosimeter(s: SVG, th: Theme) -> None:
     # Strategy 1: task-based; the day split into tasks, >= 3 samples each.
     y1 = 190.0
     strip(y1, "Task-based (Clause 9)",
-          "split the day into tasks — ≥ 3 samples (│) per task, plus each duration")
+          "split the day into tasks — ≥ 3 samples (│) each, and a duration")
     edges = [0.0, 0.1875, 0.8125, 1.0]      # the Annex D welder: 1.5 h / 5 h / 1.5 h
     cols = [th.accent, th.primary, th.secondary]
     for k in range(3):
@@ -675,7 +675,8 @@ def _d_dosimeter(s: SVG, th: Theme) -> None:
     # All three land in the same deliverable. LEX,8h stays plain: same
     # upright EX,8h subscript as on the ISO 1999 plate, not composable
     # while the roman list has no run for the "8h" unit inside a script.
-    s.text(620, 520, "choose by work pattern (Table B.1)  →  LEX,8h + Annex C uncertainty",
+    s.text(620, 520, "by work pattern (Table B.1)  →  LEX,8h + Annex C "
+                     "uncertainty",
            17, th.fg)
 
 

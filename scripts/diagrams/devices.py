@@ -1208,8 +1208,8 @@ def _d_duct_path(s: SVG, th: Theme) -> None:
                     "is one row of the sheet, stamped with its code", 15,
            th.fg, anchor="start")
     s.text(60, 546, "attenuates only: 4, 5, 6 (supply) and 4, 5 (return) — "
-                    "attenuates and regenerates: 2, 3 — self-noise only: "
-                    "8 and the return grille", 14, th.muted, anchor="start")
+                    "attenuates and regenerates: 2, 3 — self-noise only: 8 "
+                    "and the grille", 14, th.muted, anchor="start")
     s.text(60, 574, "the return wins above 1 kHz: its silencer floors the room "
                     "near 25 dB, and no amount of supply attenuation moves that",
            14, th.muted, anchor="start")
@@ -1874,7 +1874,7 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
         ("anechoic room; the spherical wave counts as plane at least $λ/2$ "
          "from the centre of curvature at the lowest frequency"),
         ("substitution: the microphone under test and a calibrated reference "
-         "at the same point, one after the other (highest accuracy)"),
+         "at the same point, in turn (highest accuracy)"),
         ("simultaneous comparison at two nearby points only after showing it "
          "agrees with substitution within ± 1 dB"),
     )
@@ -1885,7 +1885,7 @@ def _d_microphone_references(s: SVG, th: Theme) -> None:
            anchor="end", mono=True)
 
     s.text(450, 528, "Polar cuts (13.1.2 a): distance, sound pressure and "
-           "frequency held constant while $θ$ is stepped, preferably by 10° "
-           "or 15°,", 16, th.fg)
+                     "frequency held constant while $θ$ is stepped, by 10° or "
+                     "15°,", 16, th.fg)
     s.text(450, 552, "at the octave centres 125 Hz to 16 kHz, with the "
            "reference axis as 0° of the polar diagram.", 16, th.muted)

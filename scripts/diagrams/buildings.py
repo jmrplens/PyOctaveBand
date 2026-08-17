@@ -1523,8 +1523,8 @@ def _d_room_image_sources(s: SVG, th: Theme) -> None:
 
     # --- captions ----------------------------------------------------------
     s.text(80, 612,
-           "every reflection is the free-field arrival of a mirror image: "
-           "$t = r/c$, $√(1−α)$ per bounce, $1/(4πr)$ spreading",
+           "every reflection is the free-field arrival of a mirror image: $t "
+           "= r/c$, $√(1−α)$ per bounce, $1/(4πr)$",
            17, th.fg, anchor="start")
     s.text(80, 638,
            "in-plane images up to order 2 shown; the full lattice adds floor, ceiling and outer mirror rooms",

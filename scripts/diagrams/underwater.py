@@ -187,7 +187,8 @@ def _d_sofar_channel(s: SVG, th: Theme) -> None:
            16, th.muted, italic=True)
 
     # Physics of the channel.
-    s.text(80, 560, "$c$ rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound",
+    s.text(80, 560, "$c$ rises toward the surface (temperature) and the "
+                    "bottom (pressure); the minimum traps sound",
            17, th.fg, anchor="start")
     s.text(80, 588, "rays launched within about ±12° of the axis stay trapped and can cross entire oceans",
            17, th.fg, anchor="start")

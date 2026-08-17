@@ -763,7 +763,7 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
            14, th.muted, anchor="start")
     # b) frame + actuator + decoupling springs
     s.rect(464, 664, 388, 196, "none", th.primary, rx=10, sw=1.6)
-    s.text(486, 692, "b) frame and actuator, with decoupling springs", 17,
+    s.text(486, 692, "b) frame, actuator and decoupling springs", 17,
            th.fg, anchor="start", bold=True)
     s.line(500, 706, 820, 706, th.fg, 2.6)                    # frame traverse
     s.line(500, 706, 500, 822, th.fg, 2.2)
