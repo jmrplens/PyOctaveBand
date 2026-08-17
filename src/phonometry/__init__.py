@@ -1415,9 +1415,11 @@ from .underwater.propagation.closed_form import (
     spreading_loss,
 )
 from .underwater.propagation.numerical import (
+    GaussianBeamResult,
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,
+    gaussian_beams,
     normal_modes,
     parabolic_equation,
     ray_trace,
@@ -1845,6 +1847,7 @@ __all__ = [
     "FlyoverResult",
     "ForceSource",
     "FrequencyResponseResult",
+    "GaussianBeamResult",
     "GaussianPulse",
     "GroundFactors",
     "HarmonicDistortionResult",
@@ -2351,6 +2354,7 @@ __all__ = [
     "frequency_weighting",
     "fresnel_number",
     "full_day_exposure",
+    "gaussian_beams",
     "gaussian_residual_level",
     "gear_mesh_frequencies",
     "geometric_divergence",

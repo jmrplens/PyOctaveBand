@@ -549,8 +549,13 @@ class GaussianBeamResult:
     :ivar ranges: Range grid of the field, in metres.
     :ivar depths: Depth grid of the field, in metres.
     :ivar propagation_loss: Propagation-loss field ``PL(z, r)``, in dB, shape
-        ``(n_depths, n_ranges)``. Infinite only where the field is exactly
-        zero, which for this solver means the source range itself.
+        ``(n_depths, n_ranges)``. Infinite where the field is exactly zero,
+        which happens at the source range itself and in the wedge no beam of
+        the fan reaches: each beam is summed out to four half-widths, 140 dB
+        below its own axis, so a point that far from every one of them is
+        outside the traced aperture rather than merely in shadow. The graded
+        penumbra just past a limiting ray, which is the part of a shadow zone
+        worth having, is finite and carries the beams' tails.
     :ivar pressure: The complex field the loss was taken from, same shape, in
         the module's own :math:`e^{-i\\omega t}` convention (the conjugate of
         the one Jensen Eq. (3.88) is printed in) and normalised to unit
@@ -1122,7 +1127,8 @@ def _assemble_beam_field(
     per range step is small while a principal-value square root taken sample by
     sample would jump by :math:`\pi` at the first caustic.
     """
-    assert march.spreadings is not None and march.spreading_slopes is not None
+    if march.spreadings is None or march.spreading_slopes is None:  # pragma: no cover
+        raise ValueError("the march must carry the dynamic ray states.")
     q = np.asarray(march.spreadings, dtype=np.complex128)
     p = np.asarray(march.spreading_slopes, dtype=np.complex128)
     speed = np.interp(march.positions, z_prof, c_prof)

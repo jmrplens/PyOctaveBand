@@ -1,6 +1,6 @@
 ---
 title: "Métodos numéricos de propagación submarina"
-description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
+description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, el trazado de haces gaussianos para un campo que se mantiene finito en las cáusticas, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
 references:
   - type: book
     authors: ["Jensen, F. B.", "Kuperman, W. A.", "Porter, M. B.", "Schmidt, H."]
@@ -9,7 +9,7 @@ references:
     edition: "2.ª ed."
     publisher: "Springer"
     doi: "10.1007/978-1-4419-8678-8"
-    note: "La monografía de referencia implementada aquí: la derivación modal de la sección 2 (cap. 5, Ecs. 5.3-5.17), las ecuaciones de rayos de la sección 3 (cap. 3, Ecs. 3.23-3.24), la ecuación parabólica split-step de Fourier de la sección 4 (cap. 6) y la guía de selección de modelo de la sección 5 (cap. 1)."
+    note: "La monografía de referencia implementada aquí: la derivación modal de la sección 2 (cap. 5, Ecs. 5.3-5.17), las ecuaciones de rayos de la sección 3 (cap. 3, Ecs. 3.23-3.24), los haces gaussianos de la sección 4 (cap. 3, §3.5, Ecs. 3.88-3.92), la ecuación parabólica split-step de Fourier de la sección 5 (cap. 6) y la guía de selección de modelo de la sección 6 (cap. 1)."
   - type: article
     authors: ["Munk, W. H."]
     year: 1974
@@ -37,14 +37,14 @@ La pérdida de propagación en forma cerrada de la
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/)
 no sabe nada del perfil de velocidad del sonido, del fondo ni de la
 superficie. Cuando la refracción y los contornos deciden la respuesta, el
-campo hay que **calcularlo**: esta guía cubre los tres métodos numéricos del
+campo hay que **calcularlo**: esta guía cubre los cuatro métodos numéricos del
 módulo `underwater`, la física que cada uno discretiza, y cómo elegir entre
-ellos y las formas cerradas. Los tres suponen un océano independiente de la
+ellos y las formas cerradas. Los cuatro suponen un océano independiente de la
 distancia (estratificado horizontalmente) con superficie de
 presión nula, toman como entrada el mismo perfil $c(z)$ y siguen a
 Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
 
-## 1. Los tres métodos de un vistazo
+## 1. Los cuatro métodos de un vistazo
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_underwater_waveguide_es.svg" alt="La guía de ondas distancia-profundidad que los tres métodos toman como entrada: la distancia creciendo hacia la derecha y la profundidad hacia abajo, una superficie del mar de presión nula, un fondo de presión nula o rígido, el perfil de velocidad del sonido dibujado junto a la columna con su eje de canal, una fuente a la profundidad z_s, un receptor a la profundidad z y la distancia r, y un rayo que gira donde la velocidad del sonido local cumple la condición de Snell, anotada con lo que calcula cada uno de los tres métodos en ese mismo marco" width="92%" />
 
@@ -59,6 +59,12 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
   misma integración. Validado contra los arcos de círculo de un gradiente
   lineal y contra la forma cerrada del tiempo de propagación a lo largo de
   ellos.
+- **`gaussian_beams`** cuelga un haz gaussiano de cada uno de esos rayos y los
+  suma en un campo de pérdida de propagación, que se mantiene finito en las
+  cáusticas donde la amplitud clásica de un rayo es infinita y decae en las
+  zonas de sombra donde no está definida. Validado contra la divergencia
+  esférica en campo libre, el campo de dos rayos del espejo de Lloyd y la suma
+  de fuentes imagen de la guía de ondas ideal.
 - **`parabolic_equation`** hace avanzar en distancia la PE estándar (Tappert)
   con el algoritmo split-step de Fourier. Validado contra la divergencia esférica en campo
   libre; coincide en tendencia con la pérdida de propagación de los modos
@@ -376,10 +382,139 @@ del sonido de la interpolación que esas etapas ya hacen, describe el camino que
 de verdad se devuelve y no una segunda lectura de él, y coincide con la forma
 cerrada de un gradiente constante (Medwin y Clay 1998, Ec. (3.3.20)) hasta unos
 $10^{-14}$ s. Lo que aquí no llevan es una amplitud completa: la intensidad
-geométrica del tubo de rayos diverge en las cáusticas, así que el objeto de
-resultado deja el nivel al campo modal o de la PE.
+geométrica del tubo de rayos diverge en las cáusticas, así que `RayTraceResult`
+no informa de ningún nivel. La sección 4 es la que lo arregla, sobre los mismos
+rayos y con el mismo integrador.
 
-## 4. La ecuación parabólica: un campo de un solo sentido que avanza en distancia
+## 4. Haces gaussianos: un campo donde los rayos se rinden
+
+La sección 3 se queda en la geometría a propósito. La amplitud clásica de un
+rayo (Jensen Ec. 3.65) divide por la divergencia del tubo de rayos $q$, y $q$
+se anula allí donde la familia de rayos se pliega sobre sí misma. Ese pliegue
+es una **cáustica**: la teoría de rayos responde infinito mientras el campo
+verdadero solo es intenso, y un rayo que la atraviesa se lleva un $-\pi/2$ del
+que depende todo el patrón de interferencia posterior (Jensen §3.4.1,
+Figs. 3.13-3.14). Más allá del último rayo de una familia queda una **zona de
+sombra**, donde la teoría de rayos no devuelve un número pequeño sino ningún
+número.
+
+El **trazado de haces gaussianos** elimina ambas cosas a la vez, ensanchando
+cada rayo hasta convertirlo en un haz. La divergencia obedece a las ecuaciones
+*dinámicas* de rayos (Jensen Ec. 3.58),
+
+$$
+\frac{dq}{ds} = c\,p, \qquad \frac{dp}{ds} = -\frac{c_{nn}}{c^2}\,q ,
+$$
+
+que el integrador de rayos resuelve junto a la trayectoria. Partiendo de
+condiciones iniciales **complejas**, $p(0) = 1$ y $q(0) = i\omega W_0^2/2$
+(Ec. 3.91), cada rayo pasa a ser el eje de un haz de semianchura inicial $W_0$
+y frente de onda plano, y el campo de ese haz es (Ec. 3.88)
+
+$$
+p^{\text{haz}}(s, n) = A\,\sqrt{\frac{c(s)}{r\,q(s)}}\;
+  \exp\left\{-i\omega\left[\tau(s) + \frac{p(s)}{2\,q(s)}\,n^2\right]\right\},
+$$
+
+con $n$ la distancia al rayo central y $\tau$ el tiempo de propagación a lo
+largo de él. El campo total es esa expresión sumada sobre el abanico de
+lanzamiento con los pesos de la Ec. (3.92).
+
+**Por qué se mantiene finito.** La Ec. (3.58) es lineal con coeficientes
+reales, así que las partes real e imaginaria de $(q, p)$ son dos soluciones
+reales de ella, y su wronskiano $q_R p_I - q_I p_R$ se conserva. Los impulsos
+que la divergencia recibe en un quiebro del perfil y en una reflexión son
+cizallas de determinante unidad, de modo que tampoco pueden cambiarlo. Arranca
+en $-\omega W_0^2/2$ y ahí se queda, y esa única constante carga con todo el
+método: $q$ no puede anularse nunca, así que **no queda ninguna singularidad
+de cáustica que parchear**, ningún índice KMAH que contar ni ningún suelo de
+anchura mínima que imponer; $\mathrm{Im}[p/q] < 0$ siempre, así que el haz
+decae siempre al alejarse de su eje; y la semianchura del haz de la Ec. (3.89)
+se reduce a $W(s) = 2|q(s)|/(\omega W_0)$, una hipérbola en espacio libre con
+su cintura en la fuente y la distancia de Rayleigh $kW_0^2/2$ por escala.
+
+```python
+import numpy as np
+from phonometry import underwater
+
+# El perfil n^2-lineal de Jensen, c(z) = c0/sqrt(1 + 2,4 z/c0) (Ec. 3.77). Con
+# la fuente cerca del fondo los rayos ascendentes giran, su envolvente es una
+# cáustica, y por encima el abanico se agota en una zona de sombra.
+c_bottom_ref = 1550.0
+z_beam = np.linspace(0.0, 1000.0, 201)
+c_beam = c_bottom_ref / np.sqrt(1.0 + 2.4 * z_beam / c_bottom_ref)
+
+beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
+                                  max_range=2500.0, range_step=25.0,
+                                  max_angle_deg=45.0, n_depth_points=80)
+print(beams.propagation_loss.shape)            # (80, 101)  profundidad x distancia
+print(beams.launch_angles.size)                # 439 haces entre +-45 grados
+print(round(beams.initial_beam_width, 1))      # 35,9 m: W0 de la Ec. (3.86)
+beams.plot(language="es")   # el campo de PL, en el marco de parabolic_equation
+```
+
+**El único parámetro libre.** $W_0$ lo es, y el libro reconoce sin rodeos que
+«la elección óptima de estas condiciones iniciales es materia de investigación
+actual», recomendando de 10 a 50 longitudes de onda. Aquí el valor por defecto
+es más afilado que una regla empírica porque el §3.5.1 hace la optimización de
+forma explícita: derivar la anchura en espacio libre de la Ec. (3.86) respecto
+del desplazamiento complejo da $W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, la anchura
+que mejor resuelve el campo en el extremo lejano del recorrido, que es donde
+peor se resuelve. Es también donde la integral en ángulo de lanzamiento que hay
+detrás de la Ec. (3.92) es una gaussiana de verdad y no una integral de
+Fresnel, y por eso no es solo una elección elegante: frente al campo libre a
+100 Hz el error en $|p|$ es de $7,5\times10^{-5}$ con esa anchura y el mismo a
+todas las distancias probadas, y sube a $5\times10^{-4}$ con la quinta parte de
+ella y a $0,36$ con quince veces. La banda de 10 a 50 longitudes de onda del
+libro y un cuarto de la profundidad de la columna lo acotan, y el límite del
+canal tiene la última palabra: un haz comparable a la profundidad del agua
+rompe la contabilidad que pliega un rayo reflejado de vuelta a la columna, en
+vez de costar solo exactitud.
+
+**Contra qué está validado.** La divergencia esférica en campo libre, hasta
+$10^{-3}$ dB, que es la única comparación que fija a la vez la normalización de
+la amplitud y el convenio de fase; el campo de dos rayos del espejo de Lloyd
+con una reflexión en superficie, hasta 0,01 dB; y la suma de fuentes imagen de
+la guía de ondas ideal de presión nula, hasta 0,02 dB con el abanico abierto a
+88 grados.
+
+**Dónde se acaba.** Tres límites, en el orden en que aprietan.
+
+- **El régimen propio de la teoría de rayos** (Jensen §3.4.2): «la longitud de
+  onda debería ser sustancialmente menor que cualquier escala física del
+  problema». A 20 Hz en 100 m de agua la profundidad son 1,3 longitudes de onda
+  y se propagan dos o tres modos; la suma de haces se dispersa entonces unas
+  décimas de decibelio frente al campo exacto y no converge en nada. Léelo por
+  encima de unos cientos de hercios en aguas someras, y usa `normal_modes` por
+  debajo.
+- **El abanico está truncado** en `max_angle_deg`, y una guía de ondas con dos
+  contornos perfectamente reflectantes es el peor caso posible para eso, porque
+  nada salvo $1/R$ atenúa los rebotes múltiples más inclinados. En la guía ideal
+  de 1000 m a 300 Hz, frente a la suma de fuentes imagen: 0,15 dB a 2 km con los
+  80 grados por defecto, pero 4,1 dB a 5 km, que bajan a 0,0005 dB al abrir el
+  abanico a 88 grados. Recortar el *oráculo* al mismo semiángulo lo mueve
+  otro tanto, así que esto es el abanico y no el método. Un fondo real y
+  disipativo absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
+  el abanico obliga a recortar `range_step` con él, porque un paso tiene que
+  resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
+  distancia; el método avisa cuando ese emparejamiento está mal.
+- **La sombra lejana tiene suelo.** Cada haz se suma hasta cuatro semianchuras,
+  140 dB por debajo de su propio eje, así que un receptor al que ningún haz del
+  abanico se acerque tanto recibe exactamente cero y una pérdida infinita. Esa
+  es la cuña sin iluminar fuera de la apertura trazada, no la penumbra graduada
+  justo detrás del rayo límite, que es donde está lo interesante de una zona de
+  sombra y que los haces sí resuelven.
+
+El otro sabor, los **haces geométricos** (Jensen §3.3.5.5, Ecs. 3.72-3.76), no
+está implementado. Mantiene $q$ real y toma la anchura del propio tubo de
+rayos, $W(s) = |q(s)\,\delta\theta_0|$, así que la anchura se anula en una
+cáustica y hay que apuntalarla con el suelo $\pi\lambda$ de Weinberg-Keenan y
+el índice KMAH de la Ec. (3.79). Ese es el enfoque parcheado que aquí se evita
+a propósito, y de todos modos vale la pena citar el veredicto del propio libro:
+los haces geométricos «han demostrado en general ser más satisfactorios» a baja
+frecuencia, donde la física hace que el haz sea grande comparado con el canal.
+
+## 5. La ecuación parabólica: un campo de un solo sentido que avanza en distancia
 
 La ecuación parabólica cambia el problema de contorno de Helmholtz por un
 problema de valores iniciales en distancia. Factoriza la oscilación
@@ -528,7 +663,7 @@ entonces comparar métodos. Que los modos y la PE coincidan, que es lo que la
 sección 5 llama la prueba práctica de convergencia, no vale nada si ninguno de
 los dos ha convergido en su propia malla.
 
-## 5. Elegir modelo
+## 6. Elegir modelo
 
 Todas las funciones de propagación del módulo `underwater` responden a la
 misma pregunta, «cuánto nivel sobrevive al camino», a distinto precio en
@@ -594,18 +729,24 @@ cap. 1):
 
 | Método | Régimen natural | Qué aporta |
 |---|---|---|
-| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia |
+| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia, y ninguna amplitud |
+| `gaussian_beams` | Alta frecuencia, siempre que de los rayos haga falta un *nivel* | Esa misma geometría convertida en PL($z$,$r$): finita en las cáusticas, graduada en las zonas de sombra y, como los rayos sobre los que se apoya, con un coste que no crece con la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($M \approx kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
-| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | PL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los tres métodos |
+| `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | PL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los cuatro métodos |
 
 En la práctica las fronteras se difuminan: los rayos siguen siendo útiles a
 frecuencias sorprendentemente bajas para trabajo de tiempos de propagación, y
 la PE sigue siendo el caballo de batalla bastante por encima de su régimen
-formal de ángulos pequeños. Cuando dos de los tres coinciden en un caso, como
+formal de ángulos pequeños. Cuando dos de los cuatro coinciden en un caso, como
 hacen los modos y la PE en la figura de la sección 1, esa coincidencia es la
-prueba práctica de convergencia.
+prueba práctica de convergencia. Los dos extremos se reparten el trabajo con
+limpieza: `normal_modes` y `parabolic_equation` se encarecen al subir la
+frecuencia, porque ambos tienen que resolver la longitud de onda sobre una
+malla, mientras que el núcleo de rayos no, así que `gaussian_beams` es el que
+sigue siendo asequible justo donde los otros dejan de serlo, y es también aquel
+cuya aproximación está mejor justificada allí.
 
-## 6. Un presupuesto de sonar resuelto
+## 7. Un presupuesto de sonar resuelto
 
 Encadenando las piezas de punta a punta: una fuente de 140 dB re 1 µPa²/Hz a
 10 kHz, un nivel espectral de ruido ambiental de 60 dB, una ganancia de array de
@@ -699,15 +840,18 @@ del sonar es la razón de que todos vivan en un mismo módulo.
 
 <Scope>
 <ScopeClaim status="covered" label="Cubierto">
-`normal_modes`, `ray_trace` y `parabolic_equation` implementan los métodos
+`normal_modes`, `ray_trace`, `gaussian_beams` y `parabolic_equation`
+implementan los métodos
 numéricos de Jensen et al. (2011) para un océano estratificado independiente
 de la distancia: la suma modal de Sturm-Liouville por diferencias finitas
 (cap. 5, Ecs. 5.3-5.17), la integración Runge-Kutta de las trayectorias de
-rayos (cap. 3, Ecs. 3.23-3.24) y la PE estándar split-step de Fourier (cap.
+rayos (cap. 3, Ecs. 3.23-3.24), la suma de haces gaussianos construida sobre
+ella (cap. 3, §3.5, Ecs. 3.88-3.92) y la PE estándar split-step de Fourier (cap.
 6), con la terminología de la ISO 18405:2017 en toda la página. `ray_trace`
 devuelve además el tiempo de propagación de cada rayo, integrado como un
 tercer estado del mismo paso Runge-Kutta. Cada uno está validado contra una
-forma cerrada exacta: los modos de la guía de ondas ideal de presión nula, los
+forma cerrada exacta: los modos de la guía de ondas ideal de presión nula y su
+suma de fuentes imagen, los
 rayos en arco de círculo de un gradiente lineal junto con el tiempo de
 propagación publicado a lo largo de ellos (Medwin y Clay 1998, Ec. (3.3.20)) y
 la divergencia esférica en campo libre, más la coincidencia mutua de la
@@ -715,14 +859,17 @@ pérdida de propagación modal y de la PE.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
-Los tres métodos suponen una columna de agua independiente de la distancia con
-un contorno de presión nula (o, para los modos, opcionalmente rígido): no hay
+Los cuatro métodos suponen una columna de agua independiente de la distancia
+con un contorno de presión nula (o, para los modos y los haces, opcionalmente
+rígido): no hay
 fondo absorbente ni elástico, ni atenuación del sedimento, ni batimetría real,
 así que los problemas dependientes de la distancia quedan fuera de alcance. El
-trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes: la
-intensidad de tubo de rayos con correcciones de cáusticas no se calcula, y
-nada busca los eigenrayos que unen una fuente y un receptor dados. La PE
-es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
+trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes, y
+nada busca los eigenrayos que unen una fuente y un receptor dados:
+`gaussian_beams` es lo que da un nivel, y lo hace sumando haces en vez de
+buscando rayos. Su alternativa de haces geométricos (cap. 3, §3.3.5.5) con el
+índice KMAH y el suelo de anchura de Weinberg-Keenan no está implementada. La
+PE es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
 angular de Padé. Para la física del lecho elástico que estos métodos fluidos
 dejan fuera, véase [Ondas elásticas y acoplamiento
 fluido-sólido](/phonometry/es/simulation/elastic-waves/).
@@ -754,7 +901,10 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
 alta frecuencia y océano profundo (geometría de los caminos de rayos, tiempos
 de propagación y zonas de convergencia a un coste independiente de la
-frecuencia), modos normales para baja frecuencia en aguas someras (pocos modos
+frecuencia, y ningún nivel), haces gaussianos cuando de esa misma geometría de
+alta frecuencia haga falta un nivel (el campo PL($z$,$r$), finito en las
+cáusticas y graduado en las zonas de sombra), modos normales para baja
+frecuencia en aguas someras (pocos modos
 propagantes, $M \approx kD/\pi$,
 la solución de referencia en su régimen) y la ecuación parabólica para caminos
 largos de un solo sentido a baja frecuencia (el campo completo PL($z$,$r$)

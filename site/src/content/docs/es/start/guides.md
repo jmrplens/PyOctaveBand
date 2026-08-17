@@ -601,8 +601,9 @@ ISO 17208-1/-2, ISO 18406 y JOMOPANS-ECHO.
   en agua de mar, la ecuación del sonar, las pérdidas por reflexión en el fondo y
   el espectro de ruido ambiente.
 - [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/):
-  los métodos de modos normales, trazado de rayos y ecuación parabólica de la
-  guía de ondas estratificada, y cómo elegir modelo de propagación.
+  los métodos de modos normales, trazado de rayos, haces gaussianos y ecuación
+  parabólica de la guía de ondas estratificada, y cómo elegir modelo de
+  propagación.
 - [Exposición a ruido de mamíferos marinos](/phonometry/es/underwater/marine-mammal-exposure/):
   la cara auditiva de ese ruido: los audiogramas de grupo, las funciones de
   ponderación reglamentarias con su versión de guía, y la exposición de una
