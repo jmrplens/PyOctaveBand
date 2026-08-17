@@ -1061,6 +1061,31 @@ def test_a_step_that_cannot_follow_the_steepest_beam_is_warned_about() -> None:
                        max_angle_deg=85.0)
 
 
+def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
+    """The call site, not the module the check happens to live in.
+
+    One of the three checks runs inside a helper of its own and so stands a
+    frame further from the caller than the other two; a single ``stacklevel``
+    for all three would report that one against ``numerical.py``, where the
+    reader has nothing to change. The filename is the assertion because it is
+    what a caller actually sees, and it is wrong in exactly the case a shared
+    constant would make wrong.
+    """
+    z = np.array([0.0, 100.0, 300.0, 1000.0])
+    c = np.array([1500.0, 1510.0, 1488.0, 1512.0])
+    with pytest.warns(PhonometryWarning) as kink:
+        gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
+                       ranges_m=np.array([1000.0]), n_depth_points=2, n_beams=9,
+                       range_step=100.0, max_angle_deg=30.0)
+    with pytest.warns(PhonometryWarning) as wide:
+        gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
+                       max_range=1000.0, ranges_m=np.array([1000.0]),
+                       n_depth_points=2, n_beams=9, range_step=100.0,
+                       max_angle_deg=30.0, beam_width=150.0)
+    for caught in (kink, wide):
+        assert caught[0].filename == __file__
+
+
 def test_invalid_inputs_rejected() -> None:
     iso = ([0.0, 1000.0], [_C, _C])
     with pytest.raises(ValueError, match="source_depth"):

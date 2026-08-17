@@ -950,14 +950,21 @@ def _beam_influence(
 
 
 def _warn_beams(
-    message: str,
+    message: str, *, nested: int = 0,
 ) -> None:
-    """Raise a :class:`~phonometry.PhonometryWarning` from the caller's frame."""
+    """Raise a :class:`~phonometry.PhonometryWarning` at the caller's call site.
+
+    The frame the warning is reported against is the one that called
+    :func:`gaussian_beams`, which is where the input that provoked it was
+    written. ``nested`` counts the frames between this one and
+    :func:`gaussian_beams` for a check that lives in a helper of its own.
+    """
     import warnings
 
     from ..._internal.warnings import PhonometryWarning
 
-    warnings.warn(f"gaussian_beams: {message}", PhonometryWarning, stacklevel=3)
+    warnings.warn(f"gaussian_beams: {message}", PhonometryWarning,
+                  stacklevel=3 + nested)
 
 
 def _check_source_on_kink(
@@ -981,7 +988,7 @@ def _check_source_on_kink(
         _warn_beams(
             "'source_depth' sits on a gradient discontinuity of the profile,"
             " which concentrates the near-horizontal beams into a spurious jet;"
-            " offset the source or smooth the profile there.")
+            " offset the source or smooth the profile there.", nested=1)
 
 
 def gaussian_beams(
