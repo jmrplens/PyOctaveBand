@@ -119,6 +119,17 @@ jobs:
       - name: Build site
         run: pnpm install --frozen-lockfile && pnpm build
         working-directory: site
+      - name: Check no published address was left behind
+        # Renaming a page changes its URL, and nothing here noticed: Astro does
+        # not know an address used to exist and the link validator only reads
+        # the links the pages carry today. Two renames went out with no
+        # redirect and stayed broken for a month, and 432 published addresses
+        # turned out to be in the same state. This derives the redirect map
+        # from the rename history again and fails if the committed one has
+        # fallen behind, then checks it against the pages the build wrote.
+        # Needs the full history the checkout above already fetches.
+        run: pnpm run check:redirects
+        working-directory: site
       - name: Validate HTML
         run: pnpm run html-validate
         working-directory: site

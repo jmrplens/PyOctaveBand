@@ -18,7 +18,7 @@
     "identity:sync": "node scripts/sync-identity.mjs",
     "lighthouse": "node scripts/lighthouse-audit.mjs",
     "pa11y": "node scripts/with-preview.mjs -- ./node_modules/.bin/pa11y-ci",
-    "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-doctype.mjs && node scripts/optimize-images.mjs && node scripts/emit-page-markdown.mjs",
+    "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-stubs.mjs && node scripts/optimize-images.mjs && node scripts/emit-page-markdown.mjs",
     "prebuild": "node scripts/stage-media.mjs && node scripts/copy-llms.mjs",
     "preview": "astro preview",
     "redirects": "node scripts/generate-redirects.mjs"
