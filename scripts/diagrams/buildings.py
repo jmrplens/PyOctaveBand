@@ -1696,7 +1696,9 @@ def _d_iso16251_mockup(s: SVG, th: Theme) -> None:
     _accel_wall(s, sx0 + 232, slab_top + slab_h + 11)
     s.line(sx0 + 240, slab_top + slab_h + 11, sx0 + 316,
            slab_top + slab_h + 11, th.fg, 1.3)
-    s.text(sx0 + sw_ - 10, slab_top + slab_h + 46,
+    # One line each: the Spanish pair is 375 px of type against the 372 px
+    # of section they would have to share.
+    s.text(sx0 + sw_ - 10, slab_top + slab_h + 66,
            "accelerometer screwed or glued underneath", 12, th.secondary,
            anchor="end")
     s.text(sx0 + 40, slab_top + slab_h + 46, "elastic pads", 12, th.accent,
@@ -1706,7 +1708,7 @@ def _d_iso16251_mockup(s: SVG, th: Theme) -> None:
             "four elastic pads at the corners, each ≤ 100 × 100 mm",
             "vertical resonance of the slab on its pads < 20 Hz",
             "top flat to ± 1 mm in a line edge to edge")):
-        s.text(sx0 + sw_ / 2, slab_top + slab_h + 82 + 24 * i, txt, 13,
+        s.text(sx0 + sw_ / 2, slab_top + slab_h + 96 + 24 * i, txt, 13,
                th.secondary if i == 1 else th.fg, bold=(i == 1))
 
     # ===== Right: the plan of the slab =====
@@ -2309,10 +2311,19 @@ def _d_heavy_impact_sources(s: SVG, th: Theme) -> None:
 
     # -- the calibration chain, where the filter position decides the answer
     s.rect(60, 508, 780, 60, th.panel, th.muted, rx=8, sw=1.4)
-    for i, (label, colour) in enumerate((
+    stages = (
         ("source", th.fg), ("rigid floor +\nforce plate", th.fg),
         ("octave filter", th.primary), ("analyser → $L_{FE}$", th.fg),
-    )):
+    )
+    # Each connector spans the gap its two stages leave, measured: at a
+    # fixed length the arrowhead lands inside "filtro de octava", which is
+    # 129 px against the 101 of "octave filter".
+    half = [
+        max(s.text_width(part, 15, bold=(colour == th.primary))
+            for part in label.split("\n")) / 2
+        for label, colour in stages
+    ]
+    for i, (label, colour) in enumerate(stages):
         px = 150.0 + i * 200.0
         if "\n" in label:
             a, b = label.split("\n")
@@ -2320,8 +2331,9 @@ def _d_heavy_impact_sources(s: SVG, th: Theme) -> None:
             s.text(px, 552, b, 15, colour)
         else:
             s.text(px, 543, label, 15, colour, bold=(colour == th.primary))
-        if i < 3:
-            s.arrow(px + 66, 538, px + 132, 538, th.muted, 1.8)
+        if i < len(stages) - 1:
+            s.arrow(px + half[i] + 14, 538,
+                    px + 200.0 - half[i + 1] - 14, 538, th.muted, 1.8)
     s.text(450, 592, "JIS A 1418-2 Annex C: the filter goes BEFORE the "
                      "analyser,", 15, th.secondary, bold=True)
     s.text(450, 613, "so $L_{FE}$ is evaluated once per band", 15,
