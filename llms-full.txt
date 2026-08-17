@@ -2199,7 +2199,7 @@ airborne and impact chains read the same in-situ element data.
 the sound reduction index from the material properties (Annex B):
 
 $$
-\tau = \left(\frac{2\rho_o c_o}{2\pi f m'}\right)^2 \cdot
+\tau = \left(\frac{2\rho_\mathrm{o} c_\mathrm{o}}{2\pi f m'}\right)^2 \cdot
 \frac{\pi f_\mathrm{c} \sigma^2}{2 f \eta_\mathrm{tot}} \quad (f > f_\mathrm{c})
 $$
 
@@ -2219,8 +2219,8 @@ the building than in the test frame. The total loss factor in situ is
 
 $$
 \eta_\mathrm{tot} = \eta_\mathrm{int}
-+ \frac{2\rho_o c_o \sigma}{2\pi f m'}
-+ \frac{c_o}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
++ \frac{2\rho_\mathrm{o} c_\mathrm{o} \sigma}{2\pi f m'}
++ \frac{c_\mathrm{o}}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
 $$
 
 the three terms being the internal losses of the material, the radiation into
@@ -2229,7 +2229,7 @@ from the junctions themselves, $\alpha_k = \sum_j \sqrt{f_{\mathrm{c},j}/f_\math
 \, 10^{-K_{ij}/10}$ (Formula C.4). From $\eta_\mathrm{tot}$ come the structural
 reverberation time $T_\mathrm{s} = 2{,}2/(f\,\eta_\mathrm{tot})$ and the equivalent
 absorption length $a_\mathrm{situ} = 2{,}2\pi^2 S \sqrt{f_\mathrm{ref}/f} /
-(c_o T_\mathrm{s,situ})$ (Formula 11).
+(c_\mathrm{o} T_\mathrm{s,situ})$ (Formula 11).
 
 **3. Junctions.** The situation-invariant $K_{ij}$ becomes the level drop the
 junction actually produces (Formula 10):
@@ -2525,7 +2525,7 @@ this module does, a useful sanity target for a new floor build-up.
 | `bands` | str | — | `'third'` (default) / `'octave'` | Sets the band that carries the $f \approx f_\mathrm{c}$ branch |
 | `resonant_only` | bool | — | default `False` | Drops the forced-transmission term below $f_\mathrm{c}$ (Annex B.1, flanking paths) |
 | `speed_of_sound` | float | m/s | default `340` | The value ISO 12354-1 Annex A fixes |
-| `air_density` | float | kg/m³ | default `1.29` | $\rho_o$ of the Annex B model |
+| `air_density` | float | kg/m³ | default `1.29` | $\rho_\mathrm{o}$ of the Annex B model |
 
 ## `airborne_flanking_path()` / `impact_flanking_path()` parameters
 
@@ -12979,7 +12979,7 @@ referred to an input of 1 W into the rated impedance; expressed as a level re
 20 µPa (clause 20.4) it is the familiar "dB @ 1 W/1 m". Two normalizations
 hide in that sentence:
 
-- *The electrical one.* The test voltage is $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+- *The electrical one.* The test voltage is $U_\mathrm{p} = \sqrt{R \cdot 1\,\text{W}}$,
   numerically $\sqrt{R}$: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
   4 Ω loudspeaker is feeding it 2 W, which flatters the figure by 3 dB
   against a true 1 W/1 m rating; check the rated impedance before comparing.
@@ -13131,8 +13131,8 @@ computed from the response rather than merely repeated:
 
 - **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
   over a stated band, referred to 1 W into the rated impedance $R$ at 1 m:
-  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ with
-  $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
+  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_\mathrm{p}/U)$ with
+  $U_\mathrm{p} = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
   The default drive is that $\sqrt R$ (2.83 V into 8 Ω), so with a 1 m response
   the sensitivity level is the band mean.
 - **Effective frequency range** (21.2). The band over which the response stays
@@ -23719,8 +23719,8 @@ adiabatic; the normative Annex A corrects $\kappa$ down to
 $$
 \kappa' = \frac{\kappa}{\sqrt{1 + (\kappa-1)\tfrac{S}{V}b
           + \tfrac{1}{2}\big((\kappa-1)\tfrac{S}{V}b\big)^2}},
-\qquad b = \sqrt{\frac{2 c_0 l_h}{\omega}},\quad
-l_h = \frac{k_a}{\rho_0 c_0 C_P},
+\qquad b = \sqrt{\frac{2 c_0 l_\mathrm{h}}{\omega}},\quad
+l_\mathrm{h} = \frac{k_\mathrm{a}}{\rho_0 c_0 C_\mathrm{P}},
 $$
 
 with $S$ and $V$ the cavity surface and volume and $b$ the thermal
@@ -27467,7 +27467,7 @@ transfer function gives the reflection factor and hence the absorption.
 the direct wave, so it is attenuated by the geometrical-spreading factor
 
 $$
-K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
+K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}},
 $$
 
 which equals $2/3$ for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m.
@@ -27475,7 +27475,7 @@ The absorption follows from the windowed incident and reflected spectra
 $H_\mathrm{i}$, $H_\mathrm{r}$:
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2}\left|\frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)}\right|^2.
 $$
 
 ```python
@@ -27549,7 +27549,7 @@ result.plot()   # alpha(f) bar chart over 250-4000 Hz (needs matplotlib)
 
 *The absorption rises with frequency because the surface reflects less of the
 high-frequency energy, exactly as the low-pass reflection factor $r_0(f)$
-dictates through $\alpha = 1 - (1/K_r^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
+dictates through $\alpha = 1 - (1/K_\mathrm{r}^2)\,|H_\mathrm{r}/H_\mathrm{i}|^2$.*
 
 <details>
 <summary>Show the code for this figure</summary>
@@ -29502,10 +29502,10 @@ Returns a `ZwickerLoudness` dataclass: `loudness` ($N$, sones), `loudness_level`
 
 `ZwickerLoudness.report(path)` renders a one-page PDF fiche laid out like an
 accredited loudness report: a standard-basis line, an optional metadata header
-block, a compact metrics table (total loudness $N$, loudness level $L_N$,
+block, a compact metrics table (total loudness $N$, loudness level $L_\mathrm{N}$,
 and the $N_5$/$N_{10}$ percentiles for a time-varying result)
 beside the specific-loudness pattern $N'(z)$ (the result's own `.plot()`), the
-boxed $N = X\ \text{sone}$ ($L_N = Y\ \text{phon}$) single number, an optional
+boxed $N = X\ \text{sone}$ ($L_\mathrm{N} = Y\ \text{phon}$) single number, an optional
 verdict row and a
 footer with the fixed disclaimer. It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/#report-metadata-reportmetadata))
@@ -30163,7 +30163,7 @@ rate and depth, and correlates the modulation across bands; the result $R$ is
 in **asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
 70 Hz, overall level 60 dB SPL) is defined as 1 asper; this clean-room
 implementation returns 0.9999 asper with the tabulated calibration constant
-$c_R$ (Formula 104) used **without** reverse-fitting to the target.
+$c_\mathrm{R}$ (Formula 104) used **without** reverse-fitting to the target.
 
 ```python
 import numpy as np
@@ -30253,7 +30253,7 @@ quieter periods, then weights the dominant harmonic complex and scales it
 with an HSA-based specific loudness. The reference sound (1 kHz carrier,
 100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
 1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
-by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
+by 12 s with the tabulated calibration constant $c_\mathrm{F}$ (Formula 163) used
 **without** reverse-fitting to the target and without the ±0.25 % adjustment
 that footnote 47 permits (the 8 s example below prints 0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
 *prominent* fluctuation strength (Clause 9.2).
@@ -35009,21 +35009,21 @@ the one case the grouping by domain cannot serve.
 | NR | The **noise rating** curve family of a room criterion, and the **noise reduction** $L_{p1} - L_{p2}$ between two rooms in noise control. |
 | $\alpha$ | The **absorption coefficient** of a surface, the **atmospheric attenuation coefficient** per unit length (dB/m here, dB/km in ISO 9613-2), the **volume absorption coefficient** of sea water (dB/km), and the **tortuosity** $\alpha_\infty$ of a porous model, which is not an absorption at all. |
 | $A$ | An **equivalent absorption area** in m², an **accelerance** in 1/kg, and the **total attenuation** of ISO 9613-2 in dB. |
-| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_\mathrm{c}$ and barrier screening $D_z$ of ISO 9613-2, the **acceleration dose** $D_z$ of ISO 2631-5 — the same two characters, whose subscript is a path-length difference in one and a direction in the other — the spatial decay rate $D_{2,\mathrm{S}}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
+| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_\mathrm{c}$ and barrier screening $D_z$ of ISO 9613-2, the **acceleration dose** $D_\mathrm{z}$ of ISO 2631-5 — the same two letters, whose subscript is a path-length difference in one and a direction in the other, which is why one is italic and the other upright — the spatial decay rate $D_{2,\mathrm{S}}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
 | $H$ | The **receptance** of ISO 7626-1, the **frequency response estimators** $H_1$ and $H_2$, and the **harmonic transfer functions** $H_n$ of a swept-sine measurement — where $H_2$ is the second harmonic, not the noise-on-input estimator. |
 | $\eta$ | The **loss factor** of a resilient element, the **coupling loss factor** $\eta_{ij}$ of a junction, and the **internal** and **total** loss factors of a building element. |
 | $\tau$ | The **transmission factor** of a partition, the **time constant** of a detector, the **lag** of a correlation, and the **air temperature** in CNOSSOS-EU. |
 | $T_\mathrm{s}$ | The ISO 3382-1 **centre time** of a room impulse response, typically tens of milliseconds; the **structural reverberation time** of a plate, which is seconds; and the number of **months per year that studded tyres are fitted** in CNOSSOS-EU. |
 | $R$ | The **sound reduction index** in building acoustics, the **airflow resistance** in materials, the **roughness** in psychoacoustics, and the **cumulative stress variable** of ISO 2631-5. |
 | $\sigma$ | The **airflow resistivity** of a porous material, the **radiation efficiency** of a plate, and the **standard deviation** $\sigma_\mathrm{R}$ of a building-acoustics measurement situation. |
-| $L_N$, $L_\mathrm{n}$ | $L_N$ is a **percentile level** in environmental noise, a **loudness level** in phon, and the level equivalent to a microphone's **inherent noise**; $L_\mathrm{n}$, with a lower-case subscript, is the **normalized impact sound pressure level** of ISO 10140-3. In building acoustics the case of the subscript is the whole difference. |
+| $L_N$, $L_\mathrm{N}$, $L_\mathrm{n}$ | $L_N$, with a sloped N, is a **percentile level** in environmental noise, where the N is the percentage. $L_\mathrm{N}$, with an upright one, is a **loudness level** in phon, which is how ISO 226:2023 prints it, and the level equivalent to a microphone's **inherent noise**. $L_\mathrm{n}$, with a lower-case subscript, is the **normalized impact sound pressure level** of ISO 10140-3. In building acoustics the case of the subscript is the whole difference; here so is its slope. |
 | $v_0$ | A **reference velocity** of 1 nm/s in EN 15657 and EN 12354-5, and of 50 nm/s in ISO/TS 7849 and ISO 9611 — 34 dB apart, in one section of one area. |
 | $F_0$ | A **reference force** of 1 N in ISO 16283-2, and of 1 µN in EN 15657 — 120 dB apart. |
 | $K_1$ | The ISO 3744 **background noise correction** in dB, and a CNOSSOS-EU **temperature coefficient** in dB/°C. |
 | $F$ | **Fluctuation strength** in vacil, the **Fast** time weighting, and the **modulation frequency** in $m(F)$ — all three on this page. |
-| $L_U$ | The **magnitude of the linear transfer function** of ISO 226, normalized to zero at 1 kHz, and the level of the **upper contiguous critical band** of the prominence ratio — both on [Perception](https://jmrplens.github.io/phonometry/reference/theory/perception/), one section apart. |
+| $L_\mathrm{U}$ | The **magnitude of the linear transfer function** of ISO 226, normalized to zero at 1 kHz, and the level of the **upper contiguous critical band** of the prominence ratio — both on [Perception](https://jmrplens.github.io/phonometry/reference/theory/perception/), one section apart. |
 | $L_s$ | The **arithmetic mean of the two adjacent bands** a candidate tone is compared against in the Spanish tonal test, the **start level** an impulsive onset rises from, the **spherical spreading** term of the rotorcraft propagation chain, and the ISO 17208-2 **equivalent monopole source level** of a ship. The sonar equation's own source level is $L_\mathrm{S}$, with a capital. |
-| $C_P$ | The **specific heat capacity at constant pressure** of the air in a porous absorber's thermal length (ISO 9053-2 Annex A), and the CNOSSOS-EU **propulsion coefficient** of a road junction (Table F-3), which sits beside $C_R$ for rolling. |
+| $C_\mathrm{P}$ | The **specific heat capacity at constant pressure** of the air in a porous absorber's thermal length (ISO 9053-2 Annex A), and the CNOSSOS-EU **propulsion coefficient** of a road junction (Table F-3), which sits beside $C_\mathrm{R}$ for rolling. |
 | $f_\mathrm{m}$ | The exact **midband frequency** of a fractional-octave band, and the **modulation frequency** of an amplitude-modulated tone or of a modulation transfer function. |
 
 Where two meanings meet inside one navigation section, the guide says so at
@@ -35896,14 +35896,14 @@ leading edge, a mandated 5 ms flat top and a Blackman-Harris trailing edge),
 and
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
-\qquad K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
+\qquad K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
 $$
 
 for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m (clause 4.2,
-Annex C); $K_r$ is the spherical-spreading ratio between the direct and the
+Annex C); $K_\mathrm{r}$ is the spherical-spreading ratio between the direct and the
 image path. Ratioing the road measurement against one on a highly reflective
-reference surface cancels the entire electro-acoustic chain along with $K_r$
+reference surface cancels the entire electro-acoustic chain along with $K_\mathrm{r}$
 (Annex B). The 5 ms window bounds the sampled area (Annex A closed form:
 radius ≈ 1.34 m for the standard geometry) and the valid range is
 250 Hz – 4 kHz in one-third octaves. ISO 13472-2:2010 (spot method,
@@ -35970,7 +35970,7 @@ $$
 Only a level *difference* enters, so the sound-level device needs no
 absolute calibration. The effective exponent $\kappa'$ (Annex A,
 Formula A.7) corrects the adiabatic $\kappa$ for wall heat conduction through
-the thermal boundary layer $b = \sqrt{2 c_0 l_h / \omega}$ (Formulae A.4/A.5).
+the thermal boundary layer $b = \sqrt{2 c_0 l_\mathrm{h} / \omega}$ (Formulae A.4/A.5).
 The Annex A.3 worked example (100 mm closed cylinder at 2 Hz: $b = 1.83$ mm,
 $\kappa' = 1.370 = 0.978\,\kappa$) is reproduced, and the validity guards of
 Formula 3 (transfer ratio < 0.3) and Formula 4 (10 dB background margin) are
@@ -36103,22 +36103,22 @@ This page collects the theory behind hearing and psychoacoustics: the equal-loud
 
 ## Equal-loudness contours (ISO 226:2023)
 
-A tone has a *loudness level* of $L_N$ phon when it is judged equally loud as a 1 kHz pure tone at $L_N$ dB SPL. ISO 226:2023 Formula (1) (clause 4.1, p. 2) gives the SPL of a pure tone at frequency $f$ that reaches loudness level $L_N$:
+A tone has a *loudness level* of $L_\mathrm{N}$ phon when it is judged equally loud as a 1 kHz pure tone at $L_\mathrm{N}$ dB SPL. ISO 226:2023 Formula (1) (clause 4.1, p. 2) gives the SPL of a pure tone at frequency $f$ that reaches loudness level $L_\mathrm{N}$:
 
 $$
-L_f = \frac{10}{\alpha_f} \log_{10}\left[ \left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f} \left( 10^{\ 0.03 L_N} - 10^{\ 0.072} \right) + 10^{\ \alpha_f (T_f + L_U)/10} \right] - L_U
+L_f = \frac{10}{\alpha_f} \log_{10}\left[ \left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f} \left( 10^{\ 0.03 L_\mathrm{N}} - 10^{\ 0.072} \right) + 10^{\ \alpha_f (T_f + L_\mathrm{U})/10} \right] - L_\mathrm{U}
 $$
 
 Formula (2) (clause 4.2) inverts it, returning the loudness level of a tone at SPL $L_f$:
 
 $$
-L_N = \frac{100}{3} \log_{10}\left[ \frac{10^{\ \alpha_f (L_f + L_U)/10} - 10^{\ \alpha_f (T_f + L_U)/10}}{\left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f}} + 10^{\ 0.072} \right]
+L_\mathrm{N} = \frac{100}{3} \log_{10}\left[ \frac{10^{\ \alpha_f (L_f + L_\mathrm{U})/10} - 10^{\ \alpha_f (T_f + L_\mathrm{U})/10}}{\left(4 \cdot 10^{-10}\right)^{0.3 - \alpha_f}} + 10^{\ 0.072} \right]
 $$
 
 The three parameters come from Table 1 (p. 4), tabulated at the 29 preferred third-octave frequencies of ISO 266 from 20 Hz to 12.5 kHz:
 
 - $\alpha_f$: exponent for loudness perception at frequency $f$,
-- $L_U$: magnitude of the linear transfer function, normalized at 1 kHz ($L_U = 0$ at 1 kHz),
+- $L_\mathrm{U}$: magnitude of the linear transfer function, normalized at 1 kHz ($L_\mathrm{U} = 0$ at 1 kHz),
 - $T_f$: threshold of hearing at $f$, in dB.
 
 The standard specifies **no interpolation** between the tabulated frequencies. Formula (1) is specified for **20 phon to 90 phon** between 20 Hz and 4 kHz, and only up to **80 phon between 5 kHz and 12.5 kHz**; above 80 phon the contour therefore stops at 4 kHz. Values outside these limits from Formula (2) are extrapolations the standard labels as informative only.
@@ -36145,7 +36145,7 @@ $$
 \mathrm{TNR}_{\text{crit}} = \begin{cases} 8.0 + 8.33 \log_{10}(1000/f_\mathrm{t}) \ \text{dB} & f_\mathrm{t} < 1\ \text{kHz} \\ 8.0 \ \text{dB} & f_\mathrm{t} \ge 1\ \text{kHz} \end{cases}
 $$
 
-**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_U$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_\mathrm{t} \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_\mathrm{t} \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_\mathrm{t})$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
+**PR** (clause 12) compares the level of the critical band centred on the tone, $L_M$, with the mean power of the two **contiguous** critical bands $L_L$, $L_\mathrm{U}$ (edges from the fitted Formulae 21–22 with Tables 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Formula 23). For $f_\mathrm{t} \le 171.4$ Hz the lower band is truncated at 20 Hz and its power rescaled to a **100 Hz bandwidth** (Formula 24). The criterion (Formulae 25–26) is 9.0 dB at $f_\mathrm{t} \ge 1$ kHz, rising as $9.0 + 10.0\log_{10}(1000/f_\mathrm{t})$ below. Tones are assessed within the 89.1 Hz – 11.2 kHz range of interest (clauses 11.5 / 12.6).
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment.svg" alt="Tone-to-noise ratio of a 250 Hz fan tone plotted against the ECMA-418-1 prominence criterion: the criterion falls from about 17 dB at 89 Hz to a flat 8 dB above 1 kHz, and the assessed tone sits at 15.1 dB, 2.1 dB above the 13.0 dB criterion at 250 Hz, so it is prominent" width="88%"></picture>
 
@@ -36184,10 +36184,10 @@ For time-varying sounds a nonlinear temporal decay (time constants 5/15/75 ms, c
 **Sone and phon** are tied together by the 1 kHz anchor (1 sone = 40 phon; clause 5.6):
 
 $$
-N = 2^{(L_N - 40)/10} \ \text{sone} \qquad \Longleftrightarrow \qquad L_N = 40 + 10 \log_2 N \ \text{phon} \qquad (N \ge 1)
+N = 2^{(L_\mathrm{N} - 40)/10} \ \text{sone} \qquad \Longleftrightarrow \qquad L_\mathrm{N} = 40 + 10 \log_2 N \ \text{phon} \qquad (N \ge 1)
 $$
 
-below 1 sone the reference program uses $L_N = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
+below 1 sone the reference program uses $L_\mathrm{N} = 40 (N + 0.0005)^{0.35}$, floored at 3 phon.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_pattern.svg" alt="Specific loudness patterns over the Bark scale for a 1 kHz narrowband sound and a broadband sound of equal band level" width="80%"></picture>
 
@@ -36231,7 +36231,7 @@ using a fast time constant on the attack and a slower one on the release. This y
 
 ### Sottek Hearing Model (ECMA-418-2:2025)
 
-ECMA-418-2 builds all three of its metrics on one auditory front-end (Clause 5): an outer/middle-ear filter, a bank of 53 overlapping gammatone-like band-pass filters spaced on the Bark_HMS scale ($z = 0.5$ to $26.5$), half-wave rectification, and a short-block RMS $\tilde{p}(l, z)$ per band $z$ and time block $l$. A compressive nonlinearity (Formula 23) turns the band RMS into the **specific basis loudness** $N'_{\mathrm{basis}}(l, z)$, whose calibration constant $c_N$ fixes a 1 kHz / 40 dB SPL tone at 1 sone_HMS. The loudness assembles the tonal and noise loudness (below) over bands and time (Formulae 113–117); it grows about $1.65\times$ per 10 dB, more slowly than Zwicker's factor of 2, an intrinsic property of the Sottek summation.
+ECMA-418-2 builds all three of its metrics on one auditory front-end (Clause 5): an outer/middle-ear filter, a bank of 53 overlapping gammatone-like band-pass filters spaced on the Bark_HMS scale ($z = 0.5$ to $26.5$), half-wave rectification, and a short-block RMS $\tilde{p}(l, z)$ per band $z$ and time block $l$. A compressive nonlinearity (Formula 23) turns the band RMS into the **specific basis loudness** $N'_{\mathrm{basis}}(l, z)$, whose calibration constant $c_\mathrm{N}$ fixes a 1 kHz / 40 dB SPL tone at 1 sone_HMS. The loudness assembles the tonal and noise loudness (below) over bands and time (Formulae 113–117); it grows about $1.65\times$ per 10 dB, more slowly than Zwicker's factor of 2, an intrinsic property of the Sottek summation.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison.svg" alt="Loudness of a 1 kHz tone as a function of level for the Zwicker, Moore-Glasberg and Sottek models, all passing close to 1 sone at 40 dB SPL" width="80%"></picture>
 
@@ -36254,20 +36254,20 @@ $$
 A windowed spectral estimate of $\phi_z$ separates a **tonal loudness** $N'_{\mathrm{tonal}}(l, z)$ from the **noise loudness** $N'_{\mathrm{noise}}(l, z)$ (Formulae 36–48). The specific tonality is the tonal loudness scaled by a smooth signal-to-noise gate $q(l)$ (Formulae 49–51),
 
 $$
-T'(l, z) = c_T\ q(l)\ N'_{\mathrm{tonal}}(l, z)
+T'(l, z) = c_\mathrm{T}\ q(l)\ N'_{\mathrm{tonal}}(l, z)
 $$
 
-and the single value $T$ (tu_HMS) is the gated time-average of the per-block maximum over bands (Formulae 61–64). The constant $c_T$ fixes the 1 kHz / 40 dB tone at 1 tu_HMS, and the band of the ACF peak gives the tonal frequency $f_{\mathrm{ton}}$.
+and the single value $T$ (tu_HMS) is the gated time-average of the per-block maximum over bands (Formulae 61–64). The constant $c_\mathrm{T}$ fixes the 1 kHz / 40 dB tone at 1 tu_HMS, and the band of the ACF peak gives the tonal frequency $f_{\mathrm{ton}}$.
 
 ### Roughness: envelope modulation (ECMA-418-2)
 
-Roughness is the sensation of fast (roughly 20–300 Hz) amplitude modulation, strongest near 70 Hz. From each band's envelope $p_E(n)$ (Hilbert magnitude), a modulation spectrum is formed and weighted by a modulation-rate function peaking near 70 Hz and by the modulation depth; correlating the modulation across neighbouring bands and applying the specified temporal filtering yields the **specific roughness** $R'(l_{50}, z)$ and the time-dependent roughness
+Roughness is the sensation of fast (roughly 20–300 Hz) amplitude modulation, strongest near 70 Hz. From each band's envelope $p_\mathrm{E}(n)$ (Hilbert magnitude), a modulation spectrum is formed and weighted by a modulation-rate function peaking near 70 Hz and by the modulation depth; correlating the modulation across neighbouring bands and applying the specified temporal filtering yields the **specific roughness** $R'(l_{50}, z)$ and the time-dependent roughness
 
 $$
 R(l_{50}) = \sum_z R'(l_{50}, z) \ \ \text{asper}
 $$
 
-(Formulae 65–111). The single value $R$ is the 90th percentile of $R(l_{50})$ over time (Clause 7.1.10); the constant $c_R$ (Formula 104) calibrates the reference sound (a 1 kHz carrier 100 % amplitude-modulated at 70 Hz at 60 dB SPL) to 1 asper.
+(Formulae 65–111). The single value $R$ is the 90th percentile of $R(l_{50})$ over time (Clause 7.1.10); the constant $c_\mathrm{R}$ (Formula 104) calibrates the reference sound (a 1 kHz carrier 100 % amplitude-modulated at 70 Hz at 60 dB SPL) to 1 asper.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hms_modulation_bandpass.svg" alt="ECMA-418-2 slow vs fast modulation perception: fluctuation strength forms a band-pass over modulation frequency peaking near 4 to 6 Hz while roughness of the same 1 kHz amplitude-modulated tones peaks near 70 Hz" width="80%"></picture>
 
@@ -37468,19 +37468,19 @@ $|H| \approx 1.54$ at 5 Hz) and accumulates the positive spinal-response peaks w
 sixth-power (Palmgren-Miner) dose (clause 5.3, Formulae 3/4):
 
 $$
-D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
+D_\mathrm{z} = 1.07 \left( \sum_i A_{\mathrm{z},i}^6 \right)^{1/6}, \qquad
+D_\mathrm{zd} = D_\mathrm{z}\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
-Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$
-($m_z = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
+Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd}$
+($m_\mathrm{z} = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
 the age-declining ultimate strength $S_\mathrm{u} = 6.75 - S_\mathrm{age}(b + i)$ and forms
 the cumulative stress variable $R$ (Formulae C.3/C.4), mapped to an injury
 probability by the Table C.1 Weibull law $\Pi = 1 - e^{-(R/\alpha)^\beta}$.
 The spinal filter is evaluated analytically in the frequency domain and
 validated against the Annex D 256 Hz digital-filter tabulation within the
 clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
-over 20 years) is reproduced: $D_{z\mathrm{d}} = 55.97$ m/s², $R = 1.22$,
+over 20 years) is reproduced: $D_\mathrm{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 
@@ -50171,16 +50171,16 @@ is quantitative: when the band-limited vertical peak acceleration exceeds
 
 A seat-to-spine transfer function $H(f)$ (one complex zero and six complex
 poles, unity transmissibility at 0 Hz and a resonance near 5 Hz) maps the
-measured seat acceleration to the vertical spinal response $A_z(t)$
+measured seat acceleration to the vertical spinal response $A_\mathrm{z}(t)$
 (Formula 1/2):
 
 $$
-A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
+A_\mathrm{z}(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_\mathrm{z}(t)]\right].
 $$
 
 The input record must be **conditioned (DC-removed)**: because $H$ is unity at
 0 Hz by design, a DC offset (e.g. the 1 g gravity component of a DC-coupled
-accelerometer) passes straight into $A_z(t)$ and corrupts the positive
+accelerometer) passes straight into $A_\mathrm{z}(t)$ and corrupts the positive
 response peaks of the dose. Subtract the mean (or high-pass) before processing.
 The rest of the conditioning chain is the caller's too: `spinal_response`
 assumes a record that has already been sign-checked, split at the
@@ -50196,16 +50196,16 @@ print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 
 ## 2. Acceleration dose (clause 5.3)
 
-The **acceleration dose** combines the positive response peaks $A_{z,i}$
+The **acceleration dose** combines the positive response peaks $A_{\mathrm{z},i}$
 (each the maximum between two consecutive zero crossings) with a sixth-power
 law, so the largest shocks dominate (Formula 3):
 
 $$
-D_z = 1.07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
+D_\mathrm{z} = 1.07\left(\sum_i A_{\mathrm{z},i}^{\,6}\right)^{1/6}.
 $$
 
 A daily dose scales the measured dose to the daily exposure time $t_\mathrm{d}$ over
-the measurement time $t_\mathrm{m}$ (Formula 4): $D_{z\mathrm{d}} = D_z\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$.
+the measurement time $t_\mathrm{m}$ (Formula 4): $D_\mathrm{zd} = D_\mathrm{z}\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$.
 
 ```python
 from phonometry import vibration
@@ -50216,8 +50216,8 @@ print(round(vibration.dose_from_peaks([40.0] * 5), 2))  # 55.97  m/s2
 
 ## 3. Injury risk (Annex C)
 
-The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_z\,D_{z\mathrm{d}}$
-(Formula C.1), where $m_z$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
+The daily dose becomes a daily **compressive stress** $S_\mathrm{d} = m_\mathrm{z}\,D_\mathrm{zd}$
+(Formula C.1), where $m_\mathrm{z}$ (0.029 MPa per m/s² for an 82 kg male, 0.025 for a
 64 kg female) converts acceleration to vertebral stress. The stress accumulates
 over the exposure years against the ageing spine's reducing ultimate strength
 $S_\mathrm{u} = 6.75 - S_{\mathrm{age}}\,(b+i)$ (Formulae C.3/C.4):
@@ -50294,7 +50294,7 @@ plt.show()
 
 </details>
 
-The `MultipleShockResult` carries the dose $D_z$, the daily dose $D_{z\mathrm{d}}$, the
+The `MultipleShockResult` carries the dose $D_\mathrm{z}$, the daily dose $D_\mathrm{zd}$, the
 compressive stress $S_\mathrm{d}$, the stress variable $R$, the injury probability and
 the response peaks, and its `.plot()` draws the injury-probability curve with
 the 10/50/90 % risk thresholds of Table C.2. The model is vertical-axis only:
@@ -50315,7 +50315,7 @@ free-text fields of `ReportMetadata`), the exposure-scenario grid (subject sex,
 the age $b$ at which the exposure started, the number of exposure years $n$,
 the number of exposure days per year $N$ and the number of counted response
 shocks), and the dose-and-stress analysis table with the acceleration dose
-$D_z$ (Formula 3), the daily dose $D_{z\mathrm{d}}$ (Formula 4), the daily compressive
+$D_\mathrm{z}$ (Formula 3), the daily dose $D_\mathrm{zd}$ (Formula 4), the daily compressive
 stress $S_\mathrm{d}$ (Formula C.1), the cumulative stress variable $R$ (Formula C.3)
 and the probability of lumbar injury $\Pi$ (Formula C.5).
 

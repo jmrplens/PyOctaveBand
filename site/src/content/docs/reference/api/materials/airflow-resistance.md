@@ -375,11 +375,11 @@ thermal_boundary_layer_thickness(
 Thermal boundary-layer thickness `b` (ISO 9053-2:2020, Formulae (A.4)/(A.5)).
 
 $$
-l_h = \frac{k_a}{\rho_0 c_0 C_P} \tag{A.5}
+l_\mathrm{h} = \frac{k_\mathrm{a}}{\rho_0 c_0 C_\mathrm{P}} \tag{A.5}
 $$
 
 $$
-b = \sqrt{\frac{2 c_0 l_h}{\omega}}, \qquad \omega = 2\pi f \tag{A.4}
+b = \sqrt{\frac{2 c_0 l_\mathrm{h}}{\omega}}, \qquad \omega = 2\pi f \tag{A.4}
 $$
 
 `frequency` is the piston frequency `f` (Hz); `speed_of_sound` `c0` (m/s),

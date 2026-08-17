@@ -503,7 +503,7 @@ referred to an input of 1 W into the rated impedance; expressed as a level re
 20 µPa (clause 20.4) it is the familiar "dB @ 1 W/1 m". Two normalizations
 hide in that sentence:
 
-- *The electrical one.* The test voltage is $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+- *The electrical one.* The test voltage is $U_\mathrm{p} = \sqrt{R \cdot 1\,\text{W}}$,
   numerically $\sqrt{R}$: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
   4 Ω loudspeaker is feeding it 2 W, which flatters the figure by 3 dB
   against a true 1 W/1 m rating; check the rated impedance before comparing.
@@ -655,8 +655,8 @@ computed from the response rather than merely repeated:
 
 - **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
   over a stated band, referred to 1 W into the rated impedance $R$ at 1 m:
-  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ with
-  $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
+  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_\mathrm{p}/U)$ with
+  $U_\mathrm{p} = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
   The default drive is that $\sqrt R$ (2.83 V into 8 Ω), so with a 1 m response
   the sensitivity level is the band mean.
 - **Effective frequency range** (21.2). The band over which the response stays

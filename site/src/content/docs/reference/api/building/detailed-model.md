@@ -30,7 +30,7 @@ spectra are known and the dominant path per band matters.
    from Annex C Formula (C.1),
 
    $$
-   \eta_\mathrm{tot} = \eta_\mathrm{int} + \frac{2 \rho_o c_o \sigma}{2 \pi f m'} + \frac{c_o}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
+   \eta_\mathrm{tot} = \eta_\mathrm{int} + \frac{2 \rho_\mathrm{o} c_\mathrm{o} \sigma}{2 \pi f m'} + \frac{c_\mathrm{o}}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
    $$
 
    ([`in_situ_total_loss_factor`](/phonometry/reference/api/building/detailed-model/#in_situ_total_loss_factor)), with the perimeter absorption
@@ -40,7 +40,7 @@ spectra are known and the dominant path per band matters.
    ([`structural_reverberation_time`](/phonometry/reference/api/building/detailed-model/#structural_reverberation_time)), the in-situ index
    $R_\mathrm{situ} = R - 10 \log_{10}(T_\mathrm{s,situ}/T_\mathrm{s,lab})$ (Formula 9,
    [`in_situ_reduction_index`](/phonometry/reference/api/building/detailed-model/#in_situ_reduction_index)) and the equivalent absorption length
-   $a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_o T_\mathrm{s,situ})$
+   $a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_\mathrm{o} T_\mathrm{s,situ})$
    (Formula 11).
 3. Junctions (Formula 10).
    $D_{v,ij,\mathrm{situ}} = K_{ij} - 10 \log_{10}(l_{ij}/\sqrt{a_{i,\mathrm{situ}} a_{j,\mathrm{situ}}})$,
@@ -218,18 +218,18 @@ Radiation factor for free bending waves `σ` (Formulae B.4 to B.6).
 The three candidate factors of Formula (B.4) are
 
 - $\sigma_1 = 1/\sqrt{1 - f_\mathrm{c}/f}$ (above the critical frequency),
-- $\sigma_2 = 4 l_1 l_2 (f/c_o)^2$ (the plate acting as a small
+- $\sigma_2 = 4 l_1 l_2 (f/c_\mathrm{o})^2$ (the plate acting as a small
   piston),
-- $\sigma_3 = \sqrt{2 \pi f (l_1 + l_2)/(16 c_o)}$ (corner and
+- $\sigma_3 = \sqrt{2 \pi f (l_1 + l_2)/(16 c_\mathrm{o})}$ (corner and
   edge modes),
 
 and the first plate mode
-$f_{11} = c_o^2/(4 f_\mathrm{c}) \cdot (1/l_1^2 + 1/l_2^2)$ selects
+$f_{11} = c_\mathrm{o}^2/(4 f_\mathrm{c}) \cdot (1/l_1^2 + 1/l_2^2)$ selects
 between the two regimes. For $f_{11} \le f_\mathrm{c}/2$ the element is mode
 dense at its critical frequency and Formula (B.5) applies:
 $\sigma = \sigma_1$ at and above `fc`, and below it the
 edge/corner sum
-$\sigma = 2(l_1+l_2)/(l_1 l_2) \cdot (c_o/f_\mathrm{c}) \cdot \delta_1 + \delta_2$ with $\lambda = \sqrt{f/f_\mathrm{c}}$ and `δ2`
+$\sigma = 2(l_1+l_2)/(l_1 l_2) \cdot (c_\mathrm{o}/f_\mathrm{c}) \cdot \delta_1 + \delta_2$ with $\lambda = \sqrt{f/f_\mathrm{c}}$ and `δ2`
 vanishing above `fc/2`. For $f_{11} > f_\mathrm{c}/2$ Formula (B.6) picks
 `σ3` unless `σ2` (below `fc`) or `σ1` (above `fc`) is smaller.
 Every branch is capped at $\sigma \le 2.0$.
@@ -243,7 +243,7 @@ modes) to 4 (corner modes) times more efficiently well below `fc`.
 | Name | Description |
 | :--- | :--- |
 | `frequencies` | Band centre frequencies `f`, in Hz. |
-| `critical_frequency` | Critical frequency $f_\mathrm{c} = c_o^2/(1.8\,c_\mathrm{L} t)$, Hz. |
+| `critical_frequency` | Critical frequency $f_\mathrm{c} = c_\mathrm{o}^2/(1.8\,c_\mathrm{L} t)$, Hz. |
 | `length1` | One side length of the rectangular element, in m. |
 | `length2` | The other side length, in m. |
 | `speed_of_sound` | Speed of sound in air `co`, in m/s (Default: 340 m/s, the value ISO 12354-1 Annex A fixes). |
@@ -281,11 +281,11 @@ Sound reduction index of a homogeneous element (Formulae B.2, B.10).
 $R = -10 \log_{10} \tau$ with the three-branch transmission factor
 
 - $f > f_\mathrm{c}$:
-  $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot \pi f_\mathrm{c} \sigma^2/(2 f \eta_\mathrm{tot})$,
+  $\tau = (2 \rho_\mathrm{o} c_\mathrm{o}/(2 \pi f m'))^2 \cdot \pi f_\mathrm{c} \sigma^2/(2 f \eta_\mathrm{tot})$,
 - $f \approx f_\mathrm{c}$:
-  $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot \pi \sigma^2/(2 \eta_\mathrm{tot})$,
+  $\tau = (2 \rho_\mathrm{o} c_\mathrm{o}/(2 \pi f m'))^2 \cdot \pi \sigma^2/(2 \eta_\mathrm{tot})$,
 - $f < f_\mathrm{c}$:
-  $\tau = (2 \rho_o c_o/(2 \pi f m'))^2 \cdot (F + R)$ with the
+  $\tau = (2 \rho_\mathrm{o} c_\mathrm{o}/(2 \pi f m'))^2 \cdot (F + R)$ with the
   forced term $F = 2 \sigma_\mathrm{f} [1 - f^2/f_\mathrm{c}^2]^{-2}$ and the
   resonant term $R = 2 (\pi f_\mathrm{c}/(4 f)) \sigma^2/\eta_\mathrm{tot}$.
 
@@ -302,7 +302,7 @@ worked example keeps it on every path, so the default is `False`.
 **High-frequency plateau (Formula B.10).** At high frequency the index of
 a thick element stops growing; the standard bounds the transmission factor
 from below by
-$\tau_\mathrm{plateau} = (4 \rho_o c_o/(1.1\,\rho c_\mathrm{L}))^2 \cdot 0.02/\eta_\mathrm{tot}$. Supplying
+$\tau_\mathrm{plateau} = (4 \rho_\mathrm{o} c_\mathrm{o}/(1.1\,\rho c_\mathrm{L}))^2 \cdot 0.02/\eta_\mathrm{tot}$. Supplying
 both `density` and `longitudinal_velocity` applies that floor,
 $\tau = \max(\tau, \tau_\mathrm{plateau})$, as the Annex L example does
 from about 1250 Hz
@@ -924,12 +924,12 @@ floating_floor_improvement(
 
 Improvement of a floating floor `ΔL` per band (Part 2, Formula C.1).
 
-$\Delta L = 30 \log_{10}(f/f_o)$ for sand/cement or calcium-sulfate
+$\Delta L = 30 \log_{10}(f/f_\mathrm{o})$ for sand/cement or calcium-sulfate
 screeds and
-$\Delta L = 40 \log_{10}(f/f_o)$ (`slope=40`, Formula C.3) for asphalt
+$\Delta L = 40 \log_{10}(f/f_\mathrm{o})$ (`slope=40`, Formula C.3) for asphalt
 or dry
 floating floors, with the system resonance
-$f_o = 160 \sqrt{s'/m'}$
+$f_\mathrm{o} = 160 \sqrt{s'/m'}$
 (Formula C.2) and no improvement at or below it. The Annex L airborne
 example reuses the same curve as `ΔR`, noting explicitly that assuming
 $\Delta R = \Delta L$ is rough.
@@ -964,15 +964,15 @@ forced_radiation_factor(
 
 Radiation factor for forced waves `σf` (Formula B.3).
 
-$\sigma_\mathrm{f} = 0.5 (\ln(k_o \sqrt{l_1 l_2}) - \Lambda)$ capped at
-$\sigma_\mathrm{f} \le 2$, with $k_o = 2 \pi f / c_o$ and, for
+$\sigma_\mathrm{f} = 0.5 (\ln(k_\mathrm{o} \sqrt{l_1 l_2}) - \Lambda)$ capped at
+$\sigma_\mathrm{f} \le 2$, with $k_\mathrm{o} = 2 \pi f / c_\mathrm{o}$ and, for
 $l_1 > l_2$,
 
 $$
 \Lambda = -0.964 - \left(0.5 + \frac{l_2}{\pi l_1}\right) \ln\frac{l_2}{l_1} + \frac{5 l_2}{2 \pi l_1} - E
 $$
 
-with $E = 1/(4 \pi l_1 l_2 k_o^2)$.
+with $E = 1/(4 \pi l_1 l_2 k_\mathrm{o}^2)$.
 
 ISO 12354-1:2017 Table B.1 tabulates $10 \log_{10} \sigma_\mathrm{f}$ for the
 two standard laboratory openings (2 m² and 10 m²), which this
@@ -1126,7 +1126,7 @@ in_situ_equivalent_absorption_length(
 
 In-situ equivalent absorption length `asitu` (Formula 11).
 
-$a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_o T_\mathrm{s,situ})$ with
+$a_\mathrm{situ} = 2.2\,\pi^2 S \sqrt{f_\mathrm{ref}/f}/(c_\mathrm{o} T_\mathrm{s,situ})$ with
 $f_\mathrm{ref} = 1000$ Hz. Note
 the $\sqrt{f_\mathrm{ref}/f}$ dependence: the absorption length grows as
 the element
@@ -1135,7 +1135,7 @@ replaces it by the element area, $a_\mathrm{situ} = S/l_o$ (Formula 13).
 
 This is the ISO 10848 Formula (12) quantity
 ([`phonometry.equivalent_absorption_length`](/phonometry/reference/api/building/flanking-transmission/#equivalent_absorption_length)) evaluated with the
-ISO 12354 value $c_o = 340$ m/s.
+ISO 12354 value $c_\mathrm{o} = 340$ m/s.
 
 **Parameters**
 
@@ -1241,7 +1241,7 @@ in_situ_total_loss_factor(
 
 Total loss factor in situ `ηtot,situ` (Formula C.1).
 
-$\eta_\mathrm{tot} = \eta_\mathrm{int} + 2 \rho_o c_o \sigma/(2 \pi f m') + c_o/(\pi^2 S \sqrt{f f_\mathrm{c}}) \cdot \sum_k l_k \alpha_k$: the
+$\eta_\mathrm{tot} = \eta_\mathrm{int} + 2 \rho_\mathrm{o} c_\mathrm{o} \sigma/(2 \pi f m') + c_\mathrm{o}/(\pi^2 S \sqrt{f f_\mathrm{c}}) \cdot \sum_k l_k \alpha_k$: the
 internal losses of the material, the losses by radiation into the air
 and the losses at the perimeter of the element.
 $\sum l_k \alpha_k$ is the junction-length-weighted sum of the

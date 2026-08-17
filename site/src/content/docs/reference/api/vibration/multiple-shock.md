@@ -13,7 +13,7 @@ assessment of adverse health effects for the vertical (`z`) axis.
 The 2018 edition is vertical-axis only by design: clause 4 (delineation,
 item a) neglects the `x` and `y` contributions to spinal compression, the
 seat-to-spine transfer function of clause 5.2 is the vertical seat-to-lumbar
-response, and the Annex C stress conversion $m_z$ is the vertical one.
+response, and the Annex C stress conversion $m_\mathrm{z}$ is the vertical one.
 The horizontal spinal model of the withdrawn 2004 edition is not reproduced.
 Assess horizontal whole-body exposure with the ISO 2631-1 metrics in this
 domain instead: the weighted r.m.s. acceleration
@@ -21,27 +21,27 @@ domain instead: the weighted r.m.s. acceleration
 value ([`vibration_dose_value`](/phonometry/reference/api/vibration/exposure/#vibration_dose_value)).
 
 A seat-to-spine transfer function $H(\omega)$ (clause 5.2, Formula 1)
-maps the measured seat acceleration $a_z(t)$ to the spinal response
+maps the measured seat acceleration $a_\mathrm{z}(t)$ to the spinal response
 acceleration
 
 $$
-A_z(t) = F^{-1}[H(\omega) \, F[a_z(t)]] \tag{Formula 2}
+A_\mathrm{z}(t) = F^{-1}[H(\omega) \, F[a_\mathrm{z}(t)]] \tag{Formula 2}
 $$
 
 The standard assumes a *conditioned* input: $H$ has unity
 transmissibility at 0 Hz, so any DC offset in the record (e.g. the gravity
 component of a non-AC-coupled accelerometer) passes straight into
-$A_z(t)$ and corrupts the response peaks; remove the mean (high-pass)
+$A_\mathrm{z}(t)$ and corrupts the response peaks; remove the mean (high-pass)
 before processing. The acceleration dose is
 
 $$
-D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6} \tag{Formula 3}
+D_\mathrm{z} = 1.07 \left( \sum_i A_{\mathrm{z},i}^6 \right)^{1/6} \tag{Formula 3}
 $$
 
 over the positive response peaks, scaled to a daily dose
 
 $$
-D_{z\mathrm{d}} = D_z \, (t_\mathrm{d}/t_\mathrm{m})^{1/6} \tag{Formula 4/5}
+D_\mathrm{zd} = D_\mathrm{z} \, (t_\mathrm{d}/t_\mathrm{m})^{1/6} \tag{Formula 4/5}
 $$
 
 Annex C turns the daily dose into an injury risk: the daily compressive
@@ -50,7 +50,7 @@ $R$ (Formulae C.3/C.4) and the Weibull probability of lumbar injury
 $P$ (Formula C.5, Table C.1):
 
 $$
-S_\mathrm{d} = m_z D_{z\mathrm{d}} \tag{Formula C.1}
+S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd} \tag{Formula C.1}
 $$
 
 $$
@@ -73,7 +73,7 @@ text and is out of scope.
 acceleration_dose(acceleration: ArrayLike, fs: float) -> float
 ```
 
-Acceleration dose $D_z$ from a seat acceleration time history.
+Acceleration dose $D_\mathrm{z}$ from a seat acceleration time history.
 
 Filters the acceleration through the seat-to-spine transfer function
 (Formula 2), takes the positive response peaks and combines them by
@@ -84,10 +84,10 @@ Formula 3. The input must be conditioned (DC-removed); see
 
 | Name | Description |
 | :--- | :--- |
-| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_z(t)$, m/s2. |
+| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. |
 | `fs` | Sampling frequency, in hertz. |
 
-**Returns:** The acceleration dose $D_z$, m/s2.
+**Returns:** The acceleration dose $D_\mathrm{z}$, m/s2.
 
 ## compression_dose
 
@@ -101,10 +101,10 @@ Daily compressive stress $S_\mathrm{d}$ (Annex C, Formula C.1).
 
 | Name | Description |
 | :--- | :--- |
-| `daily_dose_value` | The daily acceleration dose $D_{z\mathrm{d}}$, m/s2. |
-| `mz` | Stress conversion $m_z$ (MPa per m/s2); default the 82 kg male value `MZ_MALE`. See `MZ_FEMALE`. |
+| `daily_dose_value` | The daily acceleration dose $D_\mathrm{zd}$, m/s2. |
+| `mz` | Stress conversion $m_\mathrm{z}$ (MPa per m/s2); default the 82 kg male value `MZ_MALE`. See `MZ_FEMALE`. |
 
-**Returns:** The daily compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$, MPa.
+**Returns:** The daily compressive stress $S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd}$, MPa.
 
 ## daily_dose
 
@@ -116,17 +116,17 @@ daily_dose(
 ) -> float
 ```
 
-Daily acceleration dose $D_{z\mathrm{d}}$ (clause 5.3, Formula 4).
+Daily acceleration dose $D_\mathrm{zd}$ (clause 5.3, Formula 4).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `dose` | The measured acceleration dose $D_z$, m/s2. |
+| `dose` | The measured acceleration dose $D_\mathrm{z}$, m/s2. |
 | `exposure_time` | Daily exposure period $t_\mathrm{d}$ (any time unit). |
-| `measurement_time` | Period $t_\mathrm{m}$ over which $D_z$ was measured (same unit as `exposure_time`). |
+| `measurement_time` | Period $t_\mathrm{m}$ over which $D_\mathrm{z}$ was measured (same unit as `exposure_time`). |
 
-**Returns:** The daily dose $D_{z\mathrm{d}} = D_z (t_\mathrm{d}/t_\mathrm{m})^{1/6}$, m/s2.
+**Returns:** The daily dose $D_\mathrm{zd} = D_\mathrm{z} (t_\mathrm{d}/t_\mathrm{m})^{1/6}$, m/s2.
 
 ## daily_dose_multi
 
@@ -144,11 +144,11 @@ Daily dose from several exposure conditions (clause 5.3, Formula 5).
 
 | Name | Description |
 | :--- | :--- |
-| `doses` | Acceleration dose $D_{z,j}$ of each condition, m/s2. |
+| `doses` | Acceleration dose $D_{\mathrm{z},j}$ of each condition, m/s2. |
 | `exposure_times` | Daily exposure duration $t_{\mathrm{d},j}$ of each condition. |
 | `measurement_times` | Measurement duration $t_{\mathrm{m},j}$ of each condition. |
 
-**Returns:** The combined daily dose $D_{z\mathrm{d}} = \left[ \sum_j D_{z,j}^6 \, (t_{\mathrm{d},j}/t_{\mathrm{m},j}) \right]^{1/6}$, m/s2.
+**Returns:** The combined daily dose $D_\mathrm{zd} = \left[ \sum_j D_{\mathrm{z},j}^6 \, (t_{\mathrm{d},j}/t_{\mathrm{m},j}) \right]^{1/6}$, m/s2.
 
 ## dose_from_peaks
 
@@ -156,16 +156,16 @@ Daily dose from several exposure conditions (clause 5.3, Formula 5).
 dose_from_peaks(peaks: ArrayLike) -> float
 ```
 
-Acceleration dose $D_z$ from response peaks (clause 5.3,
+Acceleration dose $D_\mathrm{z}$ from response peaks (clause 5.3,
 Formula 3).
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `peaks` | The positive response peaks $A_{z,i}$, m/s2. |
+| `peaks` | The positive response peaks $A_{\mathrm{z},i}$, m/s2. |
 
-**Returns:** The acceleration dose $D_z = 1.07 \left( \sum A_{z,i}^6 \right)^{1/6}$, m/s2.
+**Returns:** The acceleration dose $D_\mathrm{z} = 1.07 \left( \sum A_{\mathrm{z},i}^6 \right)^{1/6}$, m/s2.
 
 ## injury_probability
 
@@ -216,7 +216,7 @@ weighted by the reducing ultimate strength of the ageing spine.
 | `years` | Number of exposure years `n`. |
 | `days_per_year` | Number of exposure days per year `N`. |
 | `sex` | `"male"` or `"female"`. |
-| `mz` | Stress conversion for the static stress $S_\text{stat} = m_z \cdot 9.81$; defaults to the sex-specific value. |
+| `mz` | Stress conversion for the static stress $S_\text{stat} = m_\mathrm{z} \cdot 9.81$; defaults to the sex-specific value. |
 
 **Returns:** The stress variable $R$.
 
@@ -261,7 +261,7 @@ horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
 
 | Name | Description |
 | :--- | :--- |
-| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_z(t)$, m/s2. |
+| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. |
 | `fs` | Sampling frequency, in hertz. |
 | `start_age` | Age `b` at which the exposure started, in years. |
 | `years` | Number of exposure years `n`. |
@@ -269,7 +269,7 @@ horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
 | `exposure_time` | Daily exposure period $t_\mathrm{d}$; when given with `measurement_time` the dose is scaled to a daily dose (Formula 4), otherwise the measured dose is taken as the daily dose. |
 | `measurement_time` | Period $t_\mathrm{m}$ over which the record was measured. |
 | `sex` | `"male"` or `"female"`. |
-| `mz` | Stress conversion $m_z$ (MPa per m/s2); defaults to the sex-specific value. |
+| `mz` | Stress conversion $m_\mathrm{z}$ (MPa per m/s2); defaults to the sex-specific value. |
 
 **Returns:** The [`MultipleShockResult`](/phonometry/reference/api/vibration/multiple-shock/#multipleshockresult).
 
@@ -299,15 +299,15 @@ Annex C).
 | Name | Description |
 | :--- | :--- |
 | `sex` | `"male"` or `"female"`. |
-| `acceleration_dose` | The acceleration dose $D_z$, m/s2. |
-| `daily_dose` | The daily acceleration dose $D_{z\mathrm{d}}$, m/s2. |
+| `acceleration_dose` | The acceleration dose $D_\mathrm{z}$, m/s2. |
+| `daily_dose` | The daily acceleration dose $D_\mathrm{zd}$, m/s2. |
 | `compression_dose` | The daily compressive stress $S_\mathrm{d}$, MPa. |
 | `risk` | The cumulative stress variable $R$. |
 | `probability` | The probability of lumbar injury $P(R)$ in 0-1. |
 | `start_age` | Age at which the exposure started, in years. |
 | `years` | Number of exposure years. |
 | `days_per_year` | Number of exposure days per year. |
-| `peaks` | The positive response peaks $A_{z,i}$ used for the dose, m/s2. |
+| `peaks` | The positive response peaks $A_{\mathrm{z},i}$ used for the dose, m/s2. |
 | `risk_thresholds` | The $R$ values for 10 %, 50 % and 90 % risk of injury for this sex (Table C.2). |
 
 ### MultipleShockResult.plot()
@@ -350,8 +350,8 @@ calibration), the exposure-scenario grid (subject sex, the age
 `b` at which the exposure started, the number of exposure years
 `n`, the number of exposure days per year `N` and the number
 of counted response shocks), the dose-and-stress analysis table
-(the acceleration dose $D_z$ of Formula 3, the daily dose
-$D_{z\mathrm{d}}$ of Formula 4, the daily compressive stress
+(the acceleration dose $D_\mathrm{z}$ of Formula 3, the daily dose
+$D_\mathrm{zd}$ of Formula 4, the daily compressive stress
 $S_\mathrm{d}$ of Formula C.1, the cumulative stress variable
 $R$ of Formula C.3 and the probability of lumbar injury
 $P$ of Formula C.5), the injury-probability chart, the boxed
@@ -391,7 +391,7 @@ moderate band matching the Annex C worked example.
 response_peaks(response: ArrayLike) -> np.ndarray
 ```
 
-Positive response peaks $A_{z,i}$ (clause 5.3).
+Positive response peaks $A_{\mathrm{z},i}$ (clause 5.3).
 
 A peak is the maximum value of the response between two consecutive zero
 crossings; only positive peaks are counted.
@@ -400,7 +400,7 @@ crossings; only positive peaks are counted.
 
 | Name | Description |
 | :--- | :--- |
-| `response` | The spinal response acceleration $A_z(t)$. |
+| `response` | The spinal response acceleration $A_\mathrm{z}(t)$. |
 
 **Returns:** The positive peak values, in the order they occur.
 
@@ -430,7 +430,7 @@ the vertical spinal response; the transmissibility is unity at 0 Hz.
 spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray
 ```
 
-Vertical spinal response $A_z(t)$ (clause 5.2, Formula 2).
+Vertical spinal response $A_\mathrm{z}(t)$ (clause 5.2, Formula 2).
 
 Applies the seat-to-spine transfer function to the measured conditioned
 seat acceleration in the frequency domain and returns the time-domain
@@ -439,18 +439,18 @@ response by the inverse transform.
 The input must be **conditioned (DC-removed)**: the transfer function is
 unity at 0 Hz by design (clause 5.2), so a DC offset (e.g. the 1 g
 gravity component of a DC-coupled accelerometer) is passed unattenuated
-and produces a spurious constant shift in $A_z(t)$ that corrupts
+and produces a spurious constant shift in $A_\mathrm{z}(t)$ that corrupts
 the positive response peaks of the dose. Subtract the mean (or
-high-pass) of $a_z(t)$ before calling.
+high-pass) of $a_\mathrm{z}(t)$ before calling.
 
 **Parameters**
 
 | Name | Description |
 | :--- | :--- |
-| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_z(t)$, m/s2. |
+| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. |
 | `fs` | Sampling frequency, in hertz. |
 
-**Returns:** The spinal response acceleration $A_z(t)$, m/s2, same length.
+**Returns:** The spinal response acceleration $A_\mathrm{z}(t)$, m/s2, same length.
 
 ## static_stress
 
@@ -458,7 +458,7 @@ high-pass) of $a_z(t)$ before calling.
 static_stress(mz: float = 0.029) -> float
 ```
 
-Static compressive stress $S_\text{stat} = m_z \cdot 9.81$
+Static compressive stress $S_\text{stat} = m_\mathrm{z} \cdot 9.81$
 (Annex C), MPa.
 
 ## ultimate_strength

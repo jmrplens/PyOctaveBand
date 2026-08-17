@@ -18,19 +18,19 @@ opposite ends of the absorption scale and are **not** interchangeable:
   is (Clause 4.1):
 
   $$
-  \alpha(f) = 1 - Q_W(f) = 1 - \frac{1}{K_r^{2}} \left\lvert \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right\rvert^{2}
+  \alpha(f) = 1 - Q_W(f) = 1 - \frac{1}{K_\mathrm{r}^{2}} \left\lvert \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right\rvert^{2}
   $$
 
   with `Hi`/`Hr` the incident/reflected transfer functions and `Kr` the
-  geometrical-spreading factor $K_r = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})$ for the
+  geometrical-spreading factor $K_\mathrm{r} = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})$ for the
   mandatory geometry $d_\mathrm{s} = 1.25$ m (source-to-plane) and
-  $d_\mathrm{m} = 0.25$ m (mic-to-plane), giving $K_r = 2/3$ (Clause 4.2 /
+  $d_\mathrm{m} = 0.25$ m (mic-to-plane), giving $K_\mathrm{r} = 2/3$ (Clause 4.2 /
   Annex C). The complex pressure reflection factor
-  $Q_p = (1/K_r)(H_\mathrm{r}/H_\mathrm{i})\, e^{+j 2 \pi f \Delta\tau}$ with
+  $Q_p = (1/K_\mathrm{r})(H_\mathrm{r}/H_\mathrm{i})\, e^{+j 2 \pi f \Delta\tau}$ with
   $\Delta\tau = 2 d_\mathrm{m} / c$ (Annex C) is available for theory comparison.
   A highly reflective reference surface removes the electro-acoustic chain
   error and the geometry factor by a ratio (Annex B), and non-normal incidence
-  uses $K_{r,\theta}$ (Annex F).
+  uses $K_{\mathrm{r},\theta}$ (Annex F).
 
 * **BS ISO 13472-2:2010** - *spot method*. This is an **in-situ application of
   the ISO 10534-2 two-microphone impedance tube** for reflective surfaces
@@ -211,11 +211,11 @@ geometric_spreading_factor(
 
 Geometrical-spreading factor `Kr` (ISO 13472-1:2002, Clause 4.1).
 
-$K_r = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})$. It corrects the reflected path
+$K_\mathrm{r} = (d_\mathrm{s} - d_\mathrm{m}) / (d_\mathrm{s} + d_\mathrm{m})$. It corrects the reflected path
 for the extra spherical spreading over the image-source distance
 $d_\mathrm{s} + d_\mathrm{m}$ relative to the direct distance $d_\mathrm{s} - d_\mathrm{m}$
 (Annex C). The mandatory geometry $d_\mathrm{s} = 1.25$ m,
-$d_\mathrm{m} = 0.25$ m gives $K_r = 2/3$ (Clause 4.2).
+$d_\mathrm{m} = 0.25$ m gives $K_\mathrm{r} = 2/3$ (Clause 4.2).
 
 **Parameters**
 
@@ -224,7 +224,7 @@ $d_\mathrm{m} = 0.25$ m gives $K_r = 2/3$ (Clause 4.2).
 | `source_height` | Source-to-reference-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-reference-plane distance `dm`, in metres. |
 
-**Returns:** Geometrical-spreading factor `Kr` (dimensionless, $0 < K_r < 1$).
+**Returns:** Geometrical-spreading factor `Kr` (dimensionless, $0 < K_\mathrm{r} < 1$).
 
 **Raises**
 
@@ -244,7 +244,7 @@ geometric_spreading_factor_angle(
 
 Oblique geometrical-spreading factor (ISO 13472-1, Annex F).
 
-$K_{r,\theta}^2 = 1 - \cos^2(\theta) (1 - K_r^2)$ with `Kr` the
+$K_{\mathrm{r},\theta}^2 = 1 - \cos^2(\theta) (1 - K_\mathrm{r}^2)$ with `Kr` the
 normal-incidence factor of [`geometric_spreading_factor`](/phonometry/reference/api/materials/road-absorption/#geometric_spreading_factor). At
 $\theta = 0$ the
 cosine is unity and `Kr,theta` collapses to `Kr` (Clause 4.1).
@@ -275,7 +275,7 @@ insitu_absorption_coefficient(
 
 Normal-incidence absorption coefficient `alpha(f)` (ISO 13472-1, 4.1).
 
-$\alpha(f) = 1 - Q_W(f) = 1 - (1 / K_r^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2$ (the direct
+$\alpha(f) = 1 - Q_W(f) = 1 - (1 / K_\mathrm{r}^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2$ (the direct
 energy route via [`power_reflection_coefficient`](/phonometry/reference/api/materials/road-absorption/#power_reflection_coefficient); for oblique incidence
 `Kr` is replaced by `Kr,theta`, Annex F). Non-specularly reflected energy
 is treated as absorbed, so `alpha` may be slightly overestimated
@@ -303,7 +303,7 @@ insitu_absorption_from_reflection(reflection: ArrayLike) -> Real
 Absorption coefficient from the reflection factor (ISO 13472-1, 4.1).
 
 $\alpha = 1 - \lvert r \rvert^2$. With `r` already carrying the
-$1 / K_r$ factor
+$1 / K_\mathrm{r}$ factor
 (see [`insitu_reflection_factor`](/phonometry/reference/api/materials/road-absorption/#insitu_reflection_factor)) this is the **reflection-factor route** to
 `alpha` and equals the direct energy route of
 [`insitu_absorption_coefficient`](/phonometry/reference/api/materials/road-absorption/#insitu_absorption_coefficient).
@@ -383,7 +383,7 @@ insitu_reflection_factor(
 
 Complex pressure reflection factor `r(f)` (ISO 13472-1, Clause 4.1).
 
-$r(f) = (1 / K_r) H_\mathrm{r}(f) / H_\mathrm{i}(f)$ from the windowed reflected and
+$r(f) = (1 / K_\mathrm{r}) H_\mathrm{r}(f) / H_\mathrm{i}(f)$ from the windowed reflected and
 incident
 impulse responses, with `Hr`/`Hi` their real FFTs and `Kr` the
 geometrical-spreading factor (or `Kr,theta` when `incidence_angle` is
@@ -655,7 +655,7 @@ power_reflection_coefficient(
 Sound-power reflection factor `QW(f)` (ISO 13472-1, 4.1 / Annex C).
 
 The **direct energy route**
-$Q_W(f) = (1 / K_r^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2$
+$Q_W(f) = (1 / K_\mathrm{r}^2) \lvert H_\mathrm{r}(f) / H_\mathrm{i}(f) \rvert^2$
 (`Kr,theta` for oblique incidence). It equals
 $\lvert r \rvert^2$ from
 [`insitu_reflection_factor`](/phonometry/reference/api/materials/road-absorption/#insitu_reflection_factor) but is formed from magnitudes only, so it is
