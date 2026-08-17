@@ -78,10 +78,12 @@ axis of a beam of initial half-width `beam_width` and flat wavefront.
 The point of the beams is that the answer stays finite. Ray theory's
 amplitude, Eq. (3.65), divides by the ray-tube spreading, which vanishes on
 a caustic and gives an infinity there (Sect. 3.4.1) and nothing at all in a
-shadow zone. Complex $q$ cannot vanish, so this field is finite
-everywhere, needs no KMAH index and no minimum-width floor, and falls into a
-shadow zone gradually rather than off a cliff, which is what the exact
-solution does (Figs. 3.11, 3.17).
+shadow zone. Complex $q$ cannot vanish, so this field needs no KMAH
+index and no minimum-width floor, is finite wherever a beam reaches, and
+falls into a shadow zone gradually rather than off a cliff, which is what
+the exact solution does (Figs. 3.11, 3.17). See
+[`GaussianBeamResult`](/phonometry/reference/api/underwater/numerical/#gaussianbeamresult) for the one place it still reports an infinity,
+which is the wedge no beam of the fan illuminates at all.
 
 The limits are worth knowing before the numbers are believed.
 
@@ -94,13 +96,16 @@ The limits are worth knowing before the numbers are believed.
 * **The fan is truncated** at `max_angle_deg`, and a waveguide with two
   perfectly reflecting boundaries is the worst case for that, because
   nothing but $1/R$ attenuates the steep multiple bounces. Measured on
-  the ideal 1000 m guide at 300 Hz against the image-source sum: a fan to
-  80 degrees is 0.15 dB out at 2 km but 4.1 dB out at 5 km, a fan to 85
-  degrees 1.3 dB, and a fan to 88 degrees 0.0005 dB. A real seabed absorbs
-  those bounces and the default is then ample; a perfect reflector needs the
+  the ideal 1000 m guide at 300 Hz, source at 300 m and receiver at 600 m,
+  against the image-source sum at 2, 5 and 10 km: a fan to 80 degrees is
+  0.27, 4.06 and 2.52 dB out, a fan to 85 degrees 0.21, 1.32 and 1.91 dB,
+  and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
+  to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
+  at 80 degrees is the fan and not the method. A real seabed absorbs those
+  bounces and the default is then ample; a perfect reflector needs the
   fan opened and `range_step` cut with it, since a step has to resolve
   $\tan\theta_\mathrm{max}$ depth units of climb per unit range. The
-  warning below says when it matters.
+  warning below says when that pairing is wrong.
 * **The beam must be small compared to the channel**, which the default
   `beam_width` enforces and an explicit one is checked against.
 

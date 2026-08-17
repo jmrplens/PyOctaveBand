@@ -292,7 +292,10 @@ ray back into the column, rather than merely costing accuracy.
 $10^{-3}$ dB, which is the one comparison that pins the amplitude
 normalisation and the phase convention together; the two-ray Lloyd-mirror field
 with one surface reflection, to 0.01 dB; and the image-source sum of the ideal
-pressure-release waveguide, to 0.02 dB with the fan opened to 88 degrees.
+pressure-release waveguide, to 0.0004 dB with the fan opened to 88 degrees.
+Both boundary conditions come out of the beam sum rather than being imposed:
+the field at a pressure-release surface or bottom is 3 parts in $10^5$ of its
+mid-column value, and a rigid bottom doubles it.
 
 **Where it stops.** Three limits, in the order they bite.
 
@@ -305,10 +308,11 @@ pressure-release waveguide, to 0.02 dB with the fan opened to 88 degrees.
 - **The fan is truncated** at `max_angle_deg`, and a waveguide with two
   perfectly reflecting boundaries is the worst case for that, because nothing
   but $1/R$ attenuates the steep multiple bounces. On the ideal 1000 m guide at
-  300 Hz, against the image-source sum: 0.15 dB at 2 km with the default
-  80 degrees, but 4.1 dB at 5 km, falling to 0.0005 dB when the fan is opened
-  to 88 degrees. Cutting the *oracle* to the same half-angle moves it by the
-  same amount, so this is the fan and not the method. A real, lossy seabed
+  300 Hz, against the image-source sum at 2, 5 and 10 km: 0.27, 4.06 and
+  2.52 dB with the default 80 degrees, falling to 0.0002, 0.0003 and 0.0004 dB
+  when the fan is opened to 88 degrees. Cutting the *oracle* to the same
+  half-angle moves it by 0.25, 3.95 and 2.31 dB, so this is the fan and not the
+  method. A real, lossy seabed
   absorbs those bounces and the default is then ample. Opening the fan means
   cutting `range_step` with it, since one step has to resolve
   $\tan\theta_{\max}$ depth units of climb per unit range; the solver warns

@@ -475,8 +475,10 @@ vez de costar solo exactitud.
 $10^{-3}$ dB, que es la única comparación que fija a la vez la normalización de
 la amplitud y el convenio de fase; el campo de dos rayos del espejo de Lloyd
 con una reflexión en superficie, hasta 0,01 dB; y la suma de fuentes imagen de
-la guía de ondas ideal de presión nula, hasta 0,02 dB con el abanico abierto a
-88 grados.
+la guía de ondas ideal de presión nula, hasta 0,0004 dB con el abanico abierto
+a 88 grados. Las dos condiciones de contorno salen de la propia suma de haces
+en vez de imponerse: el campo en una superficie o un fondo de presión nula es
+3 partes en $10^5$ de su valor a media columna, y un fondo rígido lo duplica.
 
 **Dónde se acaba.** Tres límites, en el orden en que aprietan.
 
@@ -490,10 +492,11 @@ la guía de ondas ideal de presión nula, hasta 0,02 dB con el abanico abierto a
 - **El abanico está truncado** en `max_angle_deg`, y una guía de ondas con dos
   contornos perfectamente reflectantes es el peor caso posible para eso, porque
   nada salvo $1/R$ atenúa los rebotes múltiples más inclinados. En la guía ideal
-  de 1000 m a 300 Hz, frente a la suma de fuentes imagen: 0,15 dB a 2 km con los
-  80 grados por defecto, pero 4,1 dB a 5 km, que bajan a 0,0005 dB al abrir el
-  abanico a 88 grados. Recortar el *oráculo* al mismo semiángulo lo mueve
-  otro tanto, así que esto es el abanico y no el método. Un fondo real y
+  de 1000 m a 300 Hz, frente a la suma de fuentes imagen a 2, 5 y 10 km: 0,27,
+  4,06 y 2,52 dB con los 80 grados por defecto, que bajan a 0,0002, 0,0003 y
+  0,0004 dB al abrir el abanico a 88 grados. Recortar el *oráculo* al mismo
+  semiángulo lo mueve 0,25, 3,95 y 2,31 dB, así que esto es el abanico y no el
+  método. Un fondo real y
   disipativo absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
   el abanico obliga a recortar `range_step` con él, porque un paso tiene que
   resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de

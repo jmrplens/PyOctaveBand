@@ -392,7 +392,10 @@ def test_the_field_is_finite_where_the_classical_amplitude_is_not() -> None:
     # its own median along the very same ray, and unbounded under refinement.
     assert np.sqrt(np.median(tube) / abs(r_caustic * q_c[0, column])) > 1e6
 
-    offsets = np.linspace(-120.0, 120.0, 121)
+    # A cut across the caustic, kept inside the water column: the solver has
+    # nothing to say about a receiver under the seabed and refuses to pretend.
+    reach = min(120.0, z_caustic - 1.0, _N2_DEPTH - z_caustic - 1.0)
+    offsets = np.linspace(-reach, reach, 121)
     res = gaussian_beams(600.0, _N2_DEPTHS, _N2_SPEEDS, source_depth=zs,
                          max_range=rmax, ranges_m=np.array([r_caustic]),
                          receiver_depths_m=z_caustic + offsets,
@@ -402,7 +405,7 @@ def test_the_field_is_finite_where_the_classical_amplitude_is_not() -> None:
     assert pl.min() > 30.0  # finite, and not absurdly loud either
     # And it is a real focus rather than merely finite: the caustic stands well
     # above the interference either side of it.
-    near = np.abs(offsets) < 20.0
+    near = np.abs(offsets) < 0.2 * reach
     assert float(pl[near].min()) < float(np.median(pl)) - 5.0
 
 
@@ -541,6 +544,14 @@ def test_invalid_inputs_rejected() -> None:
     with pytest.raises(ValueError, match="receiver_depths_m"):
         gaussian_beams(200.0, *iso, source_depth=500.0,
                        ranges_m=[500.0], receiver_depths_m=[])
+    with pytest.raises(ValueError, match="receiver_depths_m"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[500.0],
+                       receiver_depths_m=[1200.0])  # below the seabed
+    with pytest.raises(ValueError, match="ranges_m"):
+        # Past the march there is no column to read a beam off, and answering
+        # by extrapolating the last one would be a silent wrong answer.
+        gaussian_beams(200.0, *iso, source_depth=500.0, max_range=1000.0,
+                       ranges_m=[2000.0])
     with pytest.raises(ValueError, match="n_depth_points"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[500.0],
                        n_depth_points=1)
