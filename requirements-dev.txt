@@ -1,7 +1,7 @@
-ruff>=0.16.2
+ruff>=0.16.3
 mypy>=2.3.0
 bandit>=1.9.4
-types-setuptools>=83.0.0.20260807
+types-setuptools>=84.0.0.20260812
 pytest>=9.1.1
 pytest-cov>=7.1.0
 pytest-xdist>=3.8.0  # parallel test execution (`pytest -n auto`); coverage is combined across workers by pytest-cov
@@ -9,5 +9,5 @@ matplotlib>=3.11.1  # required by the result-object .plot() tests
 reportlab>=5.0.0  # required by the result-object .report() tests (ISO 717 PDF fiche)
 pystoi>=0.4.1  # test-only external cross-check for STOI/ESTOI (reproduces the authors' MATLAB); the library reimplements from the papers and never imports it at runtime
 svglib>=2.1.0
-pypdf>=6.15.0  # one-page assertion in the ISO 717 report tests
-pypdfium2>=5.12.1  # rasterizes the .report() PDFs to committed WebP previews (scripts/generate_reports.py); no system Poppler needed
+pypdf>=6.16.0  # one-page assertion in the ISO 717 report tests
+pypdfium2>=5.13.0  # rasterizes the .report() PDFs to committed WebP previews (scripts/generate_reports.py); no system Poppler needed
