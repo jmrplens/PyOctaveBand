@@ -231,6 +231,13 @@ class RayMarch(NamedTuple):
     :ivar reflections: Boundary reflections resolved inside each range step
         (zero in the first column, which is the launch point). Crossings of a
         profile node are not reflections and are not counted here.
+    :ivar upper_reflections: The subset of ``reflections`` taken at the
+        ``upper`` boundary, so ``reflections - upper_reflections`` are the ones
+        taken at ``lower``. The two carry different reflection coefficients (a
+        pressure-release sea surface inverts the pressure, a seabed need not),
+        so a caller building a field has to tell them apart; a caller wanting
+        only the geometry can ignore this and read ``reflections``. Always zero
+        for a medium with no upper boundary.
     :ivar spreadings: Ray-tube spreading :math:`q`, or ``None`` when the march
         was not asked to carry it.
     :ivar spreading_slopes: Its conjugate :math:`p`, :math:`p = \\xi\\,dq/dr`,
@@ -244,6 +251,7 @@ class RayMarch(NamedTuple):
     times: NDArray[np.float64]
     verticals: NDArray[np.float64]
     reflections: NDArray[np.int_]
+    upper_reflections: NDArray[np.int_]
     spreadings: DynamicArray | None = None
     spreading_slopes: DynamicArray | None = None
 
@@ -282,6 +290,7 @@ class _Step(NamedTuple):
     vertical: NDArray[np.float64]
     time: NDArray[np.float64]
     reflections: NDArray[np.int_]
+    upper_reflections: NDArray[np.int_]
     dynamic: _Dynamic | None = None
 
 
@@ -518,6 +527,7 @@ def _advance_one_step(
     h = np.full(z.size, float(range_step))
     elapsed = np.zeros(z.size)
     bounces = np.zeros(z.size, dtype=np.int_)
+    bounces_upper = np.zeros(z.size, dtype=np.int_)
     # Crossing a profile node is not pathological the way sixteen bounces in
     # one step would be: a steep ray through a finely sampled profile meets
     # them legitimately, so the budget grows by one per node it could meet.
@@ -541,6 +551,10 @@ def _advance_one_step(
             target = np.where(kink, dyn.impulses.interfaces[idx], target)
             reflects = reflects & ~kink
             crossed = crossed | kink
+        # Which boundary a reflection happened at is settled by the same test
+        # the target was: everything that left the medium and is not below the
+        # lower boundary went out through the upper one.
+        at_upper = reflects & ~(z_end < lower)
         if not crossed.any():
             z = np.where(moving, z_end, z)
             zeta = np.where(moving, zeta_end, zeta)
@@ -566,7 +580,8 @@ def _advance_one_step(
         elapsed += np.where(moving, dt_sub, 0.0)
         h = np.where(moving, h - h_sub, 0.0)
         bounces += reflects.astype(np.int_)
-    return _Step(z, zeta, elapsed, bounces, dyn)
+        bounces_upper += at_upper.astype(np.int_)
+    return _Step(z, zeta, elapsed, bounces, bounces_upper, dyn)
 
 
 def march_rays(
@@ -608,6 +623,7 @@ def march_rays(
     times = np.zeros((z.size, ns))
     verticals = np.zeros((z.size, ns))
     reflections = np.zeros((z.size, ns), dtype=np.int_)
+    upper_reflections = np.zeros((z.size, ns), dtype=np.int_)
     positions[:, 0] = z
     verticals[:, 0] = zeta
 
@@ -633,11 +649,13 @@ def march_rays(
         verticals[:, s] = zeta
         times[:, s] = times[:, s - 1] + step.time
         reflections[:, s] = step.reflections
+        upper_reflections[:, s] = step.upper_reflections
         dyn = step.dynamic
         if dyn is not None:
             spreadings[:, s] = dyn.spreading
             slopes[:, s] = dyn.slope
 
     if dynamic is None:
-        return RayMarch(positions, times, verticals, reflections)
-    return RayMarch(positions, times, verticals, reflections, spreadings, slopes)
+        return RayMarch(positions, times, verticals, reflections, upper_reflections)
+    return RayMarch(positions, times, verticals, reflections, upper_reflections,
+                    spreadings, slopes)

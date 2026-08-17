@@ -233,6 +233,40 @@ def test_reflections_leave_the_spreading_alone_in_an_isovelocity_channel(
     assert np.allclose(march.spreadings[0], exact, rtol=1e-13, atol=1e-9)
 
 
+def test_the_two_boundaries_are_counted_apart_and_add_up_to_the_total() -> None:
+    """Which boundary a bounce happened at, against the geometry it left behind.
+
+    A field solver has to tell them apart, because a pressure-release sea
+    surface inverts the pressure and a seabed need not, so the running parity
+    that multiplies the amplitude is not the one the total gives. The oracle
+    here is the trajectory itself: a range step that ends a bounce puts the ray
+    on its way back from whichever boundary it touched, so the sign of the
+    vertical slowness at the end of the step names the boundary it came off,
+    downward after the surface and upward after the seabed. That reading is
+    independent of the counter under test, and it holds because the geometry
+    below rules out two bounces inside one step: 40 m of range at 20 degrees
+    crosses 15 m of a 1000 m column.
+    """
+    rmax, ns = 24_000.0, 601
+    march, _ = _march(_ISO, 500.0, [20.0], max_range=rmax, n_steps=ns)
+    total, upper = march.reflections[0], march.upper_reflections[0]
+    assert np.all(total <= 1) and np.all(upper <= total)
+    assert upper.sum() > 0 and (total - upper).sum() > 0
+    off_seabed = (total == 1) & (march.verticals[0] < 0.0)
+    off_surface = (total == 1) & (march.verticals[0] > 0.0)
+    assert np.array_equal(upper.astype(bool), off_seabed)
+    assert np.array_equal((total - upper).astype(bool), off_surface)
+
+
+def test_a_medium_open_above_never_reports_an_upper_reflection() -> None:
+    # The atmosphere has no boundary over it, so every bounce is the ground's
+    # and the upper counter stays empty however far the rays climb.
+    march, _ = _march(_CAPPED, _CAPPED_SOURCE, [-6.0, 3.0, 30.0],
+                      max_range=8000.0, n_steps=801, water_depth=None)
+    assert march.reflections.sum() > 0
+    assert march.upper_reflections.sum() == 0
+
+
 # --- Profile nodes ----------------------------------------------------------
 
 
