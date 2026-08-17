@@ -70,13 +70,20 @@ function isIndexedPng(file, buffer) {
 	return extname(file).toLowerCase() === '.png' && buffer.length > 25 && buffer[25] === 3;
 }
 
-let totalBefore = 0;
-let totalAfter = 0;
-for (const file of walk(dist)) {
+// How many images are in flight at once. The step used to run one image at
+// a time and took two minutes over the ~630 rasters a build emits, almost
+// all of it inside sharp's native encoders, which do their work off the
+// event loop, on libuv's thread pool. Four matches the CI runner's cores;
+// the encode order changes, the bytes written do not, and the log is
+// printed per file as before, merely interleaved.
+const IN_FLIGHT = 4;
+
+/** @param {string} file - Absolute path of one raster inside dist/. */
+async function optimize(file) {
 	const encode = encoders[extname(file).toLowerCase()];
-	if (!encode) continue;
+	if (!encode) return null;
 	const original = readFileSync(file);
-	if (isIndexedPng(file, original)) continue;
+	if (isIndexedPng(file, original)) return null;
 	let optimized;
 	try {
 		optimized = await (await encode(sharp(original))).toBuffer();
@@ -86,17 +93,33 @@ for (const file of walk(dist)) {
 		console.warn(
 			`[optimize-images] skipping ${file.slice(dist.length + 1)}: ${error.message}`,
 		);
-		continue;
+		return null;
 	}
 	const kept = optimized.length < original.length ? optimized : original;
 	if (kept !== original) writeFileSync(file, kept);
-	totalBefore += original.length;
-	totalAfter += kept.length;
 	console.log(
 		`[optimize-images] ${file.slice(dist.length + 1)}: ` +
 			`${(original.length / 1024).toFixed(0)} KiB -> ${(kept.length / 1024).toFixed(0)} KiB`,
 	);
+	return { before: original.length, after: kept.length };
 }
+
+let totalBefore = 0;
+let totalAfter = 0;
+const files = [...walk(dist)];
+let next = 0;
+await Promise.all(
+	Array.from({ length: IN_FLIGHT }, async () => {
+		while (next < files.length) {
+			const file = files[next++];
+			const result = await optimize(file);
+			if (result) {
+				totalBefore += result.before;
+				totalAfter += result.after;
+			}
+		}
+	}),
+);
 if (totalBefore === 0) {
 	console.log('[optimize-images] nothing to recompress in dist/');
 } else {
