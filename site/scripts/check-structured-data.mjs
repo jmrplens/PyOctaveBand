@@ -23,14 +23,16 @@
 //
 // Usage: node scripts/check-structured-data.mjs [dist-directory]
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, relative, sep } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { basePath, siteUrl } from '../src/data/site.mjs';
 import { topicForSlug } from '../src/data/topics.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const DIST = process.argv[2] ? join(process.cwd(), process.argv[2]) : join(here, '..', 'dist');
+// An explicit directory is for reproducing a defect against a build kept aside;
+// with none, the check reads the build that is there.
+const DIST = process.argv[2] ? resolve(process.argv[2]) : join(here, '..', 'dist');
 const ORIGIN = `${siteUrl}${basePath}`;
 
 let failures = 0;
@@ -69,7 +71,6 @@ const nodeOfType = (nodes, type) => nodes.find((node) => typesOf(node).includes(
 
 /** Fields every article node carries, whatever its type. */
 const ARTICLE_FIELDS = [
-	'@id',
 	'about',
 	'author',
 	'dateModified',
@@ -86,8 +87,11 @@ const ARTICLE_FIELDS = [
 	'wordCount',
 ];
 
-/** The site-wide nodes, by the `@id` the per-page nodes point at. */
+/** The nodes astro.config.mjs puts on every page for the per-page ones to join. */
 const SITE_NODES = ['Person', 'WebSite', 'SoftwareApplication', 'SoftwareSourceCode'];
+
+/** Every JSON-LD block of a document, whatever else the script tag carries. */
+const LD_JSON = /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g;
 
 const files = walk(DIST).sort();
 if (files.length === 0) throw new Error(`no HTML under ${DIST}: build the site first`);
@@ -104,14 +108,15 @@ for (const file of files) {
 	// carry no graph on purpose and are not pages a reader lands on.
 	if (/http-equiv="refresh"/.test(html)) {
 		seen.redirects += 1;
-		const stray = /<script[^>]*type="application\/ld\+json"/.test(html);
-		if (stray) fail(`${file}: a redirect stub publishes structured data`);
+		if (html.includes('application/ld+json')) {
+			fail(`${file}: a redirect stub publishes structured data`);
+		}
 		continue;
 	}
 	seen.pages += 1;
 
 	const route = routeOf(file);
-	const lang = route === '/es/' || route.startsWith('/es/') ? 'es' : 'en';
+	const lang = route.startsWith('/es/') ? 'es' : 'en';
 	const slug = route.replace(/^\/(es\/)?/, '').replace(/\/$/, '');
 	const canonical = `${ORIGIN}${route}`;
 	const is404 = slug === '404';
@@ -120,7 +125,7 @@ for (const file of files) {
 	// Parsing is the whole point: a JSON-LD consumer reads each <script> as one
 	// document, and a block that does not parse is not "mostly fine", it is a
 	// page with no structured data at all.
-	const blocks = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)];
+	const blocks = [...html.matchAll(LD_JSON)];
 	if (blocks.length === 0) {
 		fail(`${route}: no application/ld+json block`);
 		continue;
@@ -206,16 +211,37 @@ for (const file of files) {
 		fail(`${route}: article inLanguage is ${JSON.stringify(article.inLanguage)}, not ${lang}`);
 	}
 
+	// The per-page nodes join the site-wide ones by `@id`. A reference that
+	// resolves to nothing on the page that makes it is the failure the single
+	// `@graph` in Head.astro exists to prevent: a plain JSON-LD processor
+	// expands each script as its own document, and there the target is a node
+	// with no properties at all. (`about` also cites the bibliography, whose
+	// nodes are defined on the bibliography page, so only its first entry, the
+	// software, is answerable here.)
+	const defined = new Set(ids);
+	const joins = {
+		author: article.author,
+		publisher: article.publisher,
+		isPartOf: article.isPartOf,
+		about: Array.isArray(article.about) ? article.about[0] : article.about,
+	};
+	for (const [key, value] of Object.entries(joins)) {
+		const target = value?.['@id'];
+		if (target && !defined.has(target)) {
+			fail(`${route}: article ${key} points at ${target}, which no node on the page defines`);
+		}
+	}
+
 	// The two locales are one work. English pages point forward to their
 	// translation, Spanish pages point back at the original; a page carrying
 	// both, or neither, is claiming something else.
-	const forward = article.workTranslation;
-	const backward = article.translationOfWork;
-	const expected = lang === 'en' ? 'workTranslation' : 'translationOfWork';
-	if ((forward ? 1 : 0) + (backward ? 1 : 0) !== 1) {
-		fail(`${route}: the article declares ${forward && backward ? 'both' : 'neither'} of workTranslation and translationOfWork`);
-	} else if (!article[expected]) {
-		fail(`${route}: a ${lang} page declares ${expected === 'workTranslation' ? 'translationOfWork' : 'workTranslation'}`);
+	const pairing = lang === 'en' ? 'workTranslation' : 'translationOfWork';
+	const opposite = lang === 'en' ? 'translationOfWork' : 'workTranslation';
+	if (article[pairing] === undefined || article[opposite] !== undefined) {
+		const declared =
+			['workTranslation', 'translationOfWork'].filter((key) => article[key] !== undefined).join(' and ') ||
+			'neither';
+		fail(`${route}: a ${lang} page has to declare ${pairing} alone, and declares ${declared}`);
 	}
 
 	// The generated API tree is documentation of modules, not a guide.

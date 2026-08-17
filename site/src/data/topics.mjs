@@ -529,7 +529,9 @@ export const topicSections = topics
  * The ids of the topics that teach, in tree order. They are also the content
  * directory names, since a domain topic's link is its id.
  */
-export const domainIds = topics.filter((topic) => !NOT_A_DOMAIN.has(topic.id)).map((topic) => topic.id);
+export const domainIds = topics
+  .filter((topic) => !NOT_A_DOMAIN.has(topic.id))
+  .map((topic) => topic.id);
 
 /**
  * The topic that owns a slug, or `undefined` for a page outside every topic
