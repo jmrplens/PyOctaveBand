@@ -54,10 +54,12 @@ jobs:
       run: python scripts/check_animation_freshness.py
     - name: Lint with Ruff
       run: ruff check .
-    # `stub/src` is in the list because it was in no list at all. The
+    # `stub/src` is in this list because it was in no path list at all. The
     # PyOctaveBand transition shim lives outside the package this repository
-    # installs, so nothing here ever imported, linted or type checked it, and
-    # two defects reached its published page that way.
+    # installs, so nothing here ever imported or type checked it, and two
+    # defects reached its published page that way. Ruff walks the tree from
+    # `.` and has always reached the shim; mypy takes the paths it is given,
+    # and this one was never among them.
     - name: Type check with Mypy
       run: mypy src scripts stub/src
     - name: Security check with Bandit
