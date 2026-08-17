@@ -97,6 +97,11 @@ DECLARED: dict[str, dict[tuple[str, str], str]] = {
             "N is the percentage, against the sonar noise level of "
             "ISO 18405, whose N is the noise"
         ),
+        ("L", "s"): (
+            "likewise: the mean of the two bands adjacent to a candidate "
+            "tone, whose s is unexpanded anywhere in this corpus, against "
+            "the equivalent monopole source level of ISO 17208-2"
+        ),
     },
 }
 

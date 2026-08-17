@@ -35009,7 +35009,7 @@ the one case the grouping by domain cannot serve.
 | NR | The **noise rating** curve family of a room criterion, and the **noise reduction** $L_{p1} - L_{p2}$ between two rooms in noise control. |
 | $\alpha$ | The **absorption coefficient** of a surface, the **atmospheric attenuation coefficient** per unit length (dB/m here, dB/km in ISO 9613-2), the **volume absorption coefficient** of sea water (dB/km), and the **tortuosity** $\alpha_\infty$ of a porous model, which is not an absorption at all. |
 | $A$ | An **equivalent absorption area** in m², an **accelerance** in 1/kg, and the **total attenuation** of ISO 9613-2 in dB. |
-| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_\mathrm{c}$ and barrier screening $D_z$ of ISO 9613-2, the spatial decay rate $D_{2,\mathrm{S}}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
+| $D$ | A **level difference**, the definition $D_{50}$, the withdrawn **D-weighting**, the directivity correction $D_\mathrm{c}$ and barrier screening $D_z$ of ISO 9613-2, the **acceleration dose** $D_z$ of ISO 2631-5 — the same two characters, whose subscript is a path-length difference in one and a direction in the other — the spatial decay rate $D_{2,\mathrm{S}}$ of an open-plan office, and a microphone's **directivity index** $D = 20\log_{10}(M_0/M_\mathrm{diff})$. |
 | $H$ | The **receptance** of ISO 7626-1, the **frequency response estimators** $H_1$ and $H_2$, and the **harmonic transfer functions** $H_n$ of a swept-sine measurement — where $H_2$ is the second harmonic, not the noise-on-input estimator. |
 | $\eta$ | The **loss factor** of a resilient element, the **coupling loss factor** $\eta_{ij}$ of a junction, and the **internal** and **total** loss factors of a building element. |
 | $\tau$ | The **transmission factor** of a partition, the **time constant** of a detector, the **lag** of a correlation, and the **air temperature** in CNOSSOS-EU. |
@@ -35021,6 +35021,10 @@ the one case the grouping by domain cannot serve.
 | $F_0$ | A **reference force** of 1 N in ISO 16283-2, and of 1 µN in EN 15657 — 120 dB apart. |
 | $K_1$ | The ISO 3744 **background noise correction** in dB, and a CNOSSOS-EU **temperature coefficient** in dB/°C. |
 | $F$ | **Fluctuation strength** in vacil, the **Fast** time weighting, and the **modulation frequency** in $m(F)$ — all three on this page. |
+| $L_U$ | The **magnitude of the linear transfer function** of ISO 226, normalized to zero at 1 kHz, and the level of the **upper contiguous critical band** of the prominence ratio — both on [Perception](https://jmrplens.github.io/phonometry/reference/theory/perception/), one section apart. |
+| $L_s$ | The **arithmetic mean of the two adjacent bands** a candidate tone is compared against in the Spanish tonal test, the **start level** an impulsive onset rises from, the **spherical spreading** term of the rotorcraft propagation chain, and the ISO 17208-2 **equivalent monopole source level** of a ship. The sonar equation's own source level is $L_\mathrm{S}$, with a capital. |
+| $C_P$ | The **specific heat capacity at constant pressure** of the air in a porous absorber's thermal length (ISO 9053-2 Annex A), and the CNOSSOS-EU **propulsion coefficient** of a road junction (Table F-3), which sits beside $C_R$ for rolling. |
+| $f_\mathrm{m}$ | The exact **midband frequency** of a fractional-octave band, and the **modulation frequency** of an amplitude-modulated tone or of a modulation transfer function. |
 
 Where two meanings meet inside one navigation section, the guide says so at
 first use; this table is the site-wide list.
