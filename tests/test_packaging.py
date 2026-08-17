@@ -176,6 +176,26 @@ def test_pypi_readme_header_warns_that_its_links_are_dead_on_main() -> None:
     )
 
 
+def test_release_procedure_regenerates_the_pypi_page() -> None:
+    """The documented release steps include the regeneration a bump needs.
+
+    ``VERSION`` is an input to this page now, so a release PR that bumps it and
+    stops there leaves every pinned link naming the previous tag. Nothing
+    closes that gap on its own: no workflow calls the generator, the pre-commit
+    hook rewrites only ``docs/CONFORMANCE.md``, and the pull request template
+    asks for ``make pypi-readme`` "after editing README.md", which a
+    version-only bump does not do. It fails safe, because the two tests above
+    turn the release PR red, but the checklist a maintainer follows has to name
+    the step rather than leave it to be discovered from a failure.
+    """
+    contributing = (_ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    releasing = contributing.split("## 📦 Releasing", 1)[-1].split("\n## ", 1)[0]
+    assert "make pypi-readme" in releasing, (
+        "CONTRIBUTING.md's release procedure must ask for `make pypi-readme`; "
+        "bumping VERSION without it pins the published page to the previous tag"
+    )
+
+
 def test_the_full_extra_caveat_quotes_no_numpy_version() -> None:
     """The install caveat states the mechanism, never a version number.
 
