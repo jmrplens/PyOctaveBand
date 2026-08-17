@@ -139,3 +139,26 @@ def test_sel_tone_burst_iec_table4(duration: float, ref: float, upper: float, lo
         f"LAE {duration * 1000:g} ms burst: {measured:.2f} dB vs delta_ref {ref} dB "
         f"(class 1 limits {upper:+}/{lower:+})"
     )
+
+
+def test_delta_ref_equation8_consistency() -> None:
+    """
+    Sanity-check the transcription: the ``LAE - LA`` column of Table 4 follows
+    Equation (8), ``delta_ref = 10*lg(Tb/T0)`` with ``T0 = 1 s``.
+
+    The counterpart of :func:`test_delta_ref_equation7_consistency` for the
+    third column. Without it, ``SEL_CASES`` is ten numbers copied out of the
+    standard that nothing recomputes: a digit slipped while transcribing them
+    would move the target the burst response is measured against, and the only
+    thing standing between that and a green run is the class 1 tolerance the
+    same row carries.
+
+    Equation (8) is exact where Equation (7) is not: every row is the table's
+    own 0.1 dB rounding of ``10*lg(Tb)``, with no rounding quirks to allow for,
+    so this compares the rounded value outright rather than within a band.
+    """
+    for duration, ref, _, _ in SEL_CASES:
+        eq8 = 10 * np.log10(duration / 1.0)
+        assert round(eq8, 1) == pytest.approx(ref), (
+            f"Tb={duration}: table {ref} vs Eq.(8) {eq8:.4f} (rounds to {round(eq8, 1)})"
+        )
