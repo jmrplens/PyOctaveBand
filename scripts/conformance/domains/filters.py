@@ -16,10 +16,10 @@ from __future__ import annotations
 
 import numpy as np
 import reference_data as ref
-from scipy import signal as sg
 
 import phonometry as ph
 from phonometry import FilterDesign, OctaveFilterBank, WeightingFilter
+from phonometry.filters.weighting import _runtime_frequency_response
 
 from ..registry import Outcome, numeric, register
 from ..render import _snap
@@ -166,10 +166,9 @@ def _chk_d_weighting() -> Outcome:
     # residuals below 0.1 dB, so the acceptance bound is 0.2 dB (0.45 dB at
     # the two outlier cells).
     wf = WeightingFilter(48000, "D")
-    design_fs = wf.fs * wf._oversample
     freqs = np.array([r[0] for r in ref.IEC537_NASA_TABLE_SLD1], dtype=float)
     table = np.array([r[1] for r in ref.IEC537_NASA_TABLE_SLD1], dtype=float)
-    _, h = sg.sosfreqz(wf.sos, worN=np.concatenate([freqs, [1000.0]]), fs=design_fs)
+    h = _runtime_frequency_response(wf, np.concatenate([freqs, [1000.0]]))
     gain = 20.0 * np.log10(np.abs(h))
     dev = (gain[:-1] - gain[-1]) - table
     bound = np.where(np.isin(freqs, (1600.0, 2500.0)), 0.45, 0.2)
