@@ -91,14 +91,14 @@ leading edge, a mandated 5 ms flat top and a Blackman-Harris trailing edge),
 and
 
 $$
-\alpha(f) = 1 - \frac{1}{K_r^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
-\qquad K_r = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
+\alpha(f) = 1 - \frac{1}{K_\mathrm{r}^2} \left| \frac{H_\mathrm{r}(f)}{H_\mathrm{i}(f)} \right|^2,
+\qquad K_\mathrm{r} = \frac{d_\mathrm{s} - d_\mathrm{m}}{d_\mathrm{s} + d_\mathrm{m}} = \frac{2}{3}
 $$
 
 for the mandatory geometry $d_\mathrm{s} = 1.25$ m, $d_\mathrm{m} = 0.25$ m (clause 4.2,
-Annex C); $K_r$ is the spherical-spreading ratio between the direct and the
+Annex C); $K_\mathrm{r}$ is the spherical-spreading ratio between the direct and the
 image path. Ratioing the road measurement against one on a highly reflective
-reference surface cancels the entire electro-acoustic chain along with $K_r$
+reference surface cancels the entire electro-acoustic chain along with $K_\mathrm{r}$
 (Annex B). The 5 ms window bounds the sampled area (Annex A closed form:
 radius ≈ 1.34 m for the standard geometry) and the valid range is
 250 Hz – 4 kHz in one-third octaves. ISO 13472-2:2010 (spot method,
