@@ -2650,7 +2650,7 @@ follows the ISO 10140 three-branch rule (unchanged ≥ 15 dB; energy subtraction
 for 6 ≤ margin < 15 dB; the 1.3 dB limit below 6 dB, flagged as $> \Delta L$).
 The improvement is the position-averaged difference
 $\Delta L = L_0 - L_1$ (Formulae (3)/(4)); octaves follow
-$\Delta L_\mathrm{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_n/10}]$ (Formula (5)).
+$\Delta L_\mathrm{oct} = -10\log_{10}[\tfrac{1}{3}\sum 10^{-\Delta L_j/10}]$ (Formula (5)).
 
 **Weighted improvement.** $\Delta L_\mathrm{w}$ is the ISO 717-2 weighted reduction: the
 improvement is applied to the heavyweight **reference floor** $L_\mathrm{n,r,0}$
@@ -6088,7 +6088,7 @@ implementation follows the formulae rather than the printed rows.
   airborne and impact flanking models of EN 12354-1/2 that share the
   transmission-factor summation used here.
 - [Insulation Ratings (ISO 717)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-ratings/): the reference-curve
-  engine behind the $D_{2\mathrm{m,nT,w}}$, $R'_{45,w}$ and $R'_\mathrm{tr,s,w}$ single
+  engine behind the $D_{2\mathrm{m,nT,w}}$, $R'_{45,\mathrm{w}}$ and $R'_\mathrm{tr,s,w}$ single
   numbers.
 - [Sound Insulation Survey Method (ISO 10052)](https://jmrplens.github.io/phonometry/buildings/insulation/insulation-survey/): the
   octave-band façade quantity of the quick survey method.
@@ -6985,7 +6985,7 @@ R' = D + 10 \log_{10} \frac{S}{A}, \qquad A = \frac{0.16\ V}{T}.
 $$
 
 Positions are energy-averaged with
-$L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)$.
+$L = 10 \log_{10}\left( \frac{1}{n} \sum_j 10^{L_j/10} \right)$.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_insulation_setup.svg" alt="Field airborne insulation setup: a loudspeaker in the source room, microphones energy-averaged in source and receiving rooms across the common partition" width="92%"></picture>
 
@@ -35364,7 +35364,7 @@ $$
 and the whole-day rating level combines the adjusted periods energetically (clause 8, Note 1):
 
 $$
-L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{Aeq,N} + K_{I,N})/10} \Big].
+L_{\mathrm{Ar},T} = 10 \log_{10}\Big[ \frac{1}{T} \sum_N \Delta t_N\ 10^{(L_{\mathrm{Aeq},N} + K_{\mathrm{I},N})/10} \Big].
 $$
 
 $K_\mathrm{I}$ is exactly the kind of source-character adjustment that enters the ISO 1996-1 composite rating level above. The anchors $P(1000\ \text{dB/s}, 30\ \text{dB}) = 9 + 2\log_{10} 30 = 11.95$ and $K_\mathrm{I}(P{=}10) = 9.0$ dB are reproduced exactly.
@@ -36572,11 +36572,11 @@ A rectangular room reflects a point source in its walls; each reflection equals 
 
 $$
 g(t) = \sum_n A_n\ \delta(t - t_n), \qquad
-A_n = \frac{1}{4\pi r_n}\ e^{-m r_n / 2} \prod_{\text{walls}} R_w^{\,k_{w,n}}, \qquad
+A_n = \frac{1}{4\pi r_n}\ e^{-m r_n / 2} \prod_{\text{walls}} R_q^{\,k_{q,n}}, \qquad
 t_n = \frac{r_n}{c},
 $$
 
-with the $1/(4\pi r_n)$ spherical spreading, the product of the wall **pressure reflection factors** $R_w = \sqrt{1 - \alpha_w}$ (Vorländer Eq. 11.39; $|R|^2 = 1-\alpha$ in energy) each raised to the number of reflections $k_{w,n}$ that image made off wall $w$, and the air pressure attenuation $e^{-m r_n/2}$ ($m$ the *intensity* attenuation constant). Along one axis the reflection counts of the image at lattice index $n$ and parity $p$ are $|n-p|$ and $|n|$ off the two walls (Allen & Berkley 1979), so the total order is $\sum_i |2 n_i - p_i|$; a shoebox has $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order $i_0$ (Kuttruff Eq. 9.23), and the reflection density grows as $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$ (Kuttruff Eq. 4.6).
+with the $1/(4\pi r_n)$ spherical spreading, the product of the wall **pressure reflection factors** $R_q = \sqrt{1 - \alpha_q}$ (Vorländer Eq. 11.39; $|R|^2 = 1-\alpha$ in energy) each raised to the number of reflections $k_{q,n}$ that image made off wall $q$, and the air pressure attenuation $e^{-m r_n/2}$ ($m$ the *intensity* attenuation constant). Along one axis the reflection counts of the image at lattice index $n$ and parity $p$ are $|n-p|$ and $|n|$ off the two walls (Allen & Berkley 1979), so the total order is $\sum_i |2 n_i - p_i|$; a shoebox has $\tfrac{2}{3}(2 i_0^3 + 3 i_0^2 + 4 i_0)$ audible images up to order $i_0$ (Kuttruff Eq. 9.23), and the reflection density grows as $\mathrm{d}N/\mathrm{d}t = 4\pi c^3 t^2 / V$ (Kuttruff Eq. 4.6).
 
 The initial decay rate of the specular reverberant energy recovers the **Eyring** reverberation time $T = -24 V \ln 10 / (c S \ln(1 - \bar\alpha))$ (Kuttruff Eq. 5.23), because the mean reflection rate $cS/4V$ equals $\tfrac{c}{2}(1/L_x + 1/L_y + 1/L_z)$. The match is exact only near cubic geometry; an elongated room sustains energy along its long axis, so the pure specular decay runs slower than Eyring's diffuse-field estimate (the anisotropy the Fitzroy/Arau-Puchades models correct). The model is specular only — no diffraction or diffuse scattering — and exact only for real, angle-independent reflection factors.
 
@@ -36720,7 +36720,7 @@ parts (the normative Clause 4 model). The total (Formula 1) sums the surfaces,
 the objects and the air:
 
 $$
-A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{obj,j} + \sum_k \alpha_{s,k}\ S_k + A_\mathrm{air},
+A = \sum_i \alpha_{\mathrm{s},i}\ S_i + \sum_j A_{\mathrm{obj},j} + \sum_k \alpha_{\mathrm{s},k}\ S_k + A_\mathrm{air},
 \qquad A_\mathrm{air} = 4\ m\ V\ (1 - \psi),
 $$
 
@@ -43056,7 +43056,7 @@ transients at the record edges).
 For an AM tone $A_0 (1 + m \cos(2\pi f_\mathrm{m} t)) \cos(2\pi f_\mathrm{c} t)$ with $f_\mathrm{m}$
 on an analysis bin the closed forms are:
 
-| `kind` | mean level | line at $f_\mathrm{m}$ | line at $2f_m$ |
+| `kind` | mean level | line at $f_\mathrm{m}$ | line at $2f_\mathrm{m}$ |
 |---|---|---|---|
 | `'magnitude'` | $A_0$ | $A_0 m$ | - |
 | `'squared'` | $A_0^2 (1 + m^2/2)$ | $2 A_0^2 m$ | $A_0^2 m^2/2$ |
@@ -49802,7 +49802,8 @@ ax.set_xticks(pos)
 ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
 ax.set_xlabel("Frequency [Hz]")
 ax.set_ylabel("r.m.s. acceleration [m/s²]")
-ax.set_title(f"Weighted acceleration ($a_w$ = {result.overall:.3f} m/s²)")
+ax.set_title(rf"Weighted acceleration ($a_\mathrm{{w}}$ = "
+             rf"{result.overall:.3f} m/s²)")
 ax.legend()
 plt.show()
 ```
