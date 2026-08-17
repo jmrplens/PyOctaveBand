@@ -39,7 +39,7 @@ _ES: dict[str, str] = {
     "$d_p$ = 60 m: the regions overlap, so there is no middle region":
         "$d_p$ = 60 m: las regiones se solapan y no hay región intermedia",
     "below $30(h_s + h_r)$ = 90 m: $q = 0$, $A_m = 0$":
-        "por debajo de $30(h_s + h_r)$ = 90 m: $q = 0$, $A_m = 0$",
+        "bajo $30(h_s + h_r)$ = 90 m: $q = 0$, $A_m = 0$",
     "and ground_middle is ignored entirely":
         "y ground_middle se ignora por completo",
     # The four diffracted paths (environment/propagation/ground-barriers).
@@ -74,7 +74,7 @@ _ES: dict[str, str] = {
     "CNOSSOS-EU railway source lines and directivity angles":
         "Líneas fuente ferroviarias y directividad CNOSSOS-EU",
     "datum: the plane tangent to the two rail heads":
-        "referencia: plano tangente a las dos cabezas de carril",
+        "referencia: plano tangente a los dos carriles",
     "A — rolling, impact, squeal,": "A — rodadura, impacto, chirrido,",
     "bridge, low traction": "puente, tracción baja",
     "B — exhausts, roof apparatus,": "B — escapes, equipos de techo,",
@@ -85,10 +85,10 @@ _ES: dict[str, str] = {
         "$ψ ≤ 0$: la corrección vertical de A es nula",
     "track axis": "eje de la vía",
     "0 dB broadside": "0 dB en perpendicular",
-    "−20 dB along the track": "−20 dB en el eje de la vía",
+    "−20 dB along the track": "−20 dB en el eje de vía",
     "receiver bearing": "dirección al receptor",
-    "Impact noise applies from 50 m": "Ruido de impacto aplicado desde 50 m",
-    "before a joint to 50 m after it": "antes de una junta hasta 50 m después",
+    "Impact noise applies from 50 m": "Ruido de impacto desde 50 m",
+    "before a joint to 50 m after it": "de la junta a 50 m después",
     "Curve squeal needs ≥ 50 m": "El chirrido en curva exige ≥ 50 m",
     "of continuous curve": "de curva continua",
     # IEC 61400-11 ground board (environment/sources/wind-turbine-noise).
@@ -170,18 +170,18 @@ _ES: dict[str, str] = {
     "1.5 m": "1,5 m",
     "above the": "por encima del",
     "receiving-room floor": "suelo del recinto receptor",
-    "Element method → $R′_{45°}$ (loudspeaker) or $R′_{tr,s}$ (traffic): "
-    "one component, comparable with a laboratory $R$.":
+    "Element method → $R′_{45°}$ or $R′_{tr,s}$: one component, comparable "
+    "with a laboratory $R$.":
         "Método de elemento → $R′_{45°}$ o $R′_{tr,s}$: un componente, "
         "comparable con una $R$ de laboratorio.",
     "Global method → D2m,nT: the whole facade as built, "
     "not comparable with a laboratory $R$.":
-        "Método global → D2m,nT: la fachada tal como está construida; "
-        "no comparable con una $R$ de laboratorio.",
-    "Road traffic replaces the loudspeaker at all angles: "
-    "simultaneous inside and outside, ≥ 50 pass-bys.":
-        "El tráfico rodado incide desde todos los ángulos: medición "
-        "simultánea dentro y fuera, ≥ 50 pasos.",
+        "Método global → D2m,nT: la fachada tal como está; no comparable con "
+        "una $R$ de laboratorio.",
+    "Road traffic replaces the loudspeaker at all angles: inside and outside "
+    "at once, ≥ 50 pass-bys.":
+        "El tráfico rodado incide desde todos los ángulos: dentro y fuera a "
+        "la vez, ≥ 50 pasos.",
     "Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "
     "by the functions.":
         "Apartados 9.4, 9.5.1, 9.6.1 y 10.2. Nada de esto lo comprueban "
@@ -239,23 +239,22 @@ _ES: dict[str, str] = {
     "Elevation: the same sweep": "Alzado: el mismo barrido",
     "raise and lower the arm": "subir y bajar el brazo",
     "during each traverse": "durante cada barrido",
-    "Alternative (Clause 6.3.1): a rotating microphone on a stand, ≥ 10° to "
-    "the horizontal, sweep radius ≥ 1 m.":
-        "Alternativa (apartado 6.3.1): micrófono giratorio, ≥ 10° sobre la "
-        "horizontal, radio de barrido ≥ 1 m.",
-    "Without a real-time octave analyser, repeat the whole sweep once per "
-    "band and read each 30 s $L_{eq}$.":
-        "Sin analizador de octavas en tiempo real, repetir el barrido una "
-        "vez por banda y leer cada $L_{eq}$ de 30 s.",
-    "Tapping machine (6.2.3): centre of the floor, on the diagonal; "
+    "Alternative (6.3.1): a rotating microphone on a stand, ≥ 10° to the "
+    "horizontal, radius ≥ 1 m.":
+        "Alternativa (6.3.1): micrófono giratorio en soporte, ≥ 10° sobre la "
+        "horizontal, radio ≥ 1 m.",
+    "Without a real-time octave analyser, repeat the sweep per band and read "
+    "each 30 s $L_{eq}$.":
+        "Sin analizador de octavas en tiempo real, repetir el barrido por "
+        "banda y leer los $L_{eq}$ de 30 s.",
+    "Tapping machine (6.2.3): floor centre, on the diagonal; "
     "three positions at 45° to the ribs.":
-        "Máquina de impactos (6.2.3): centro del forjado, en la diagonal; "
-        "tres posiciones a 45° con las viguetas.",
+        "Máquina de impactos (6.2.3): centro del forjado, en diagonal; "
+        "3 a 45° con las viguetas.",
     # Rooms / prediction: the EN 12354-6 take-off plate and the directivity
     # plate (buildings/rooms/enclosed-space-absorption, room-image-sources).
     "Room take-off: one room, three input lists (EN 12354-6)":
-        "Levantamiento del recinto: una sala, tres listas de entrada "
-        "(EN 12354-6)",
+        "Levantamiento del recinto: tres listas de entrada (EN 12354-6)",
     "1000 Hz octave band": "banda de octava de 1000 Hz",
     "$V$ = 29.75 m³": "$V$ = 29,75 m³",
     "ceiling  12.39 m²  $α_s$ 0.02": "techo  12,39 m²  $α_s$ 0,02",
@@ -354,7 +353,7 @@ _ES: dict[str, str] = {
     "supply duct": "conducto de impulsión",
     "diffuser": "difusor",
     "air handler": "climatizadora",
-    "design condition": "en su régimen de diseño",
+    "design condition": "en régimen de diseño",
     "0.6 m": "0,6 m",
     "1.2 m": "1,2 m",
     "2.4 m": "2,4 m",
@@ -433,7 +432,7 @@ _ES: dict[str, str] = {
     "furnished, nobody present but the":
         "amueblada, sin más personas que los",
     "operators, HVAC and any masking system":
-        "operadores, climatización y enmascaramiento",
+        "operadores, climatización, enmascaramiento",
     "at working-day power": "a la potencia de un día normal",
     "Line (5.2.2):": "Línea (5.2.2):",
     "6 to 10 positions preferred, 4 the minimum;":
@@ -450,7 +449,7 @@ _ES: dict[str, str] = {
     "• source height 1.5 m": "• fuente a 1,5 m de altura",
     "• off the symmetry axes": "• fuera de los ejes de simetría",
     "ISO 3382-2 (source clearance):":
-        "ISO 3382-2 (separación a la fuente):",
+        "ISO 3382-2 (dist. a la fuente):",
     "$d_{min} = 2√(V/(c·T̂))$ = 2.0 m": "$d_{min} = 2√(V/(c·T̂))$ = 2,0 m",
     "for $V$ = 210 m³, $T̂$ = 0.6 s": "para $V$ = 210 m³, $T̂$ = 0,6 s",
     # The measuring chain in section (ISO 3382-1, 4.2 and 4.3)
@@ -500,7 +499,7 @@ _ES: dict[str, str] = {
     "kept by default: the linear impulse response and its tail":
         "se conserva por defecto: la respuesta al impulso lineal y su cola",
     "discarded, or read as distortion":
-        "se descarta, o se lee como distorsión",
+        "se descarta o es distorsión",
     "the linear deconvolution's own decaying noise tail — not the room":
         "la cola de ruido decreciente de la propia deconvolución — no la sala",
     "Arrival time relative to the linear impulse response [s]":
@@ -761,7 +760,7 @@ _ES: dict[str, str] = {
     "which is reported and excluded from the exposure":
         "que se documenta y se excluye de la exposición",
     "The record, split where contact is lost":
-        "El registro, partido donde se pierde el contacto",
+        "El registro, partido al perder contacto",
     "accelerations recorded while contact is lost":
         "las aceleraciones registradas sin contacto no",
     "shall not be counted as exposure, and the":
@@ -784,8 +783,8 @@ _ES: dict[str, str] = {
     "equipment and calibration method reported (5.1.2)":
         "equipo apto para la mayor amplitud prevista; se documentan el "
         "equipo y su calibración (5.1.2)",
-    "long enough to be representative: a complete work cycle for a "
-    "repeatable task, longer where the terrain varies (5.1.4)":
+    "long enough to be representative: a complete work cycle for a repeatable "
+    "task, longer where terrain varies (5.1.4)":
         "duración representativa: un ciclo de trabajo completo si la tarea "
         "se repite, más si el terreno varía (5.1.4)",
     "Sound calibrator": "Calibrador acústico",
@@ -804,10 +803,13 @@ _ES: dict[str, str] = {
     # The calibrator tone: a unit symbol, the same in Spanish. Shared by the
     # calibration-chain, coupling and sound-level-meter-chain plates.
     "1 kHz": "1 kHz",
-    "reference plane (3.12)": "plano de referencia (3.12)",
+    "reference plane": "plano de referencia",
+    # A clause number, the same in both languages; entered so the lookup
+    # records it as translated rather than as a string nobody added.
+    "(3.12)": "(3.12)",
     "effective load": "volumen de carga",
     "volume (3.13)": "efectivo (3.13)",
-    "the generated level moves": "el nivel generado cambia",
+    "the generated level shifts": "el nivel generado varía",
     "with that volume (6.3 k)": "con ese volumen (6.3 k)",
     "1/2 in capsule": "cápsula de 1/2 in",
     "+ preamplifier": "+ preamplificador",
@@ -842,10 +844,10 @@ _ES: dict[str, str] = {
     "one pulse per revolution": "un pulso por vuelta",
     "the pulse is the block boundary": "el pulso marca el bloque",
     "record $N + 1$ revolutions": "registra $N + 1$ vueltas",
-    "A tacho pulse per revolution and an accelerometer in the load direction: "
-    "the period is measured, never assumed":
-        "Un pulso de tacómetro por vuelta y un acelerómetro en la dirección de "
-        "carga: el periodo se mide, nunca se supone",
+    "One tacho pulse per turn, an accelerometer in the load direction: the "
+    "period is measured, not assumed":
+        "Un pulso de tacómetro por vuelta y un acelerómetro en la carga: el "
+        "periodo se mide, no se supone",
     # The geometry behind an echo's quefrency (signals/spectra/cepstrum-echoes).
     "Where the quefrency comes from: the geometry of one reflection":
         "De dónde sale la quefrencia: la geometría de una reflexión",
@@ -869,8 +871,8 @@ _ES: dict[str, str] = {
         "así que $a > 0,27$ no es una sola reflexión especular",
     "The reflection has to arrive before the record ends and at least 10 dB "
     "above its noise floor;":
-        "La reflexión debe llegar antes de que acabe el registro y al menos "
-        "10 dB por encima de su ruido de fondo;",
+        "La reflexión debe llegar antes del final del registro y al menos "
+        "10 dB sobre su ruido de fondo;",
     "$c$ moves about 0.6 m/s per kelvin, so convert the delay with the "
     "temperature you measured":
         "$c$ cambia unos 0,6 m/s por kelvin: convierte el retardo con la "
@@ -905,10 +907,10 @@ _ES: dict[str, str] = {
     "the leakage is what correlates the two inputs":
         "la fuga es lo que correlaciona las dos entradas",
     "0.3 m": "0,3 m",
-    "The conditioning separates only what the references separate: one sensor "
-    "per source, all sampled together":
+    "Conditioning separates only what the references separate: one sensor per "
+    "source, all sampled together":
         "El condicionamiento solo separa lo que separan las referencias: un "
-        "sensor por fuente, todos muestreados a la vez",
+        "sensor por fuente, a la vez",
     # Where an acoustic budget's terms come from (signals/metrology/gum).
     "Where an acoustic budget's terms come from":
         "De dónde salen los términos de un balance acústico",
@@ -922,18 +924,18 @@ _ES: dict[str, str] = {
         "Tipo B - del capítulo de propagación",
     "Position scatter": "Dispersión entre posiciones",
     "Type A - $s/√n$, $v = n − 1$": "Tipo A - $s/√n$, $v = n − 1$",
-    "Instrument class tolerance": "Tolerancia de clase del instrumento",
+    "Instrument class tolerance": "Tolerancia de clase: instrumento",
     "Type B - rectangular, $a$ = 0.3 dB":
         "Tipo B - rectangular, $a$ = 0,3 dB",
-    "Calibrator class tolerance": "Tolerancia de clase del calibrador",
+    "Calibrator class tolerance": "Tolerancia de clase: calibrador",
     "Type B - rectangular, $a$ = 0.4 dB":
         "Tipo B - rectangular, $a$ = 0,4 dB",
     "one calibrator for two channels makes their":
         "un solo calibrador para dos canales correlaciona",
     "calibration terms correlated, not two rows":
         "sus términos de calibración: no son dos filas",
-    "Budgets fail by omission, not by arithmetic: every row here is a piece "
-    "of hardware or a decision about geometry":
+    "Budgets fail by omission, not arithmetic: every row is a piece of "
+    "hardware or a decision about geometry":
         "Los balances fallan por omisión, no por aritmética: cada fila es un "
         "equipo o una decisión de geometría",
     "3 m/s  12 °C": "3 m/s  12 °C",
@@ -944,7 +946,7 @@ _ES: dict[str, str] = {
     "for a 94 dB calibrator": "para uno de 94 dB",
     "(B.4.2; 40 dB in A.5.3)": "(B.4.2; 40 dB en A.5.3)",
     "The specified level is the level at the diaphragm of the inserted "
-    "microphone (5.3.1.2), and it holds for":
+    "microphone (5.3.1.2), and holds for":
         "El nivel especificado es el nivel en el diafragma del micrófono "
         "insertado (5.3.1.2), y vale para",
     "the microphone models and configurations listed in the manual "
@@ -953,7 +955,7 @@ _ES: dict[str, str] = {
         "(5.3.1.3, 6.3 a) — IEC 60942:2017",
     "Environmental noise measurement positions (ISO 1996-2)":
         "Posiciones de medida de ruido ambiental (ISO 1996-2)",
-    "Building façade": "Fachada del edificio",
+    "Building façade": "Fachada",
     "A — free field": "A — campo libre",
     "B — 2 m from façade": "B — a 2 m de la fachada",
     "C — flush-mounted": "C — enrasado en fachada",
@@ -961,7 +963,7 @@ _ES: dict[str, str] = {
     "Emission measurement positions (ECMA-74)":
         "Posiciones de medida de emisión (ECMA-74)",
     "Operator — seated (P2)": "Operador — sentado (P2)",
-    "Bystanders — top view": "Observadores — vista en planta",
+    "Bystanders — top view": "Observadores, en planta",
     "height 1.50 m": "altura 1,50 m",
     "0.25 m": "0,25 m",
     "1.20 m": "1,20 m",
@@ -1011,10 +1013,10 @@ _ES: dict[str, str] = {
         "hay que cubrirlos todos)",
     "idle": "ralentí",
     "full load": "plena carga",
-    "2 — the analyser's basic spectra (under 1 s each) are merged line by "
-    "line into 3 s spectra (clause 4.3)":
+    "2 — basic spectra (under 1 s) are merged line by line into 3 s spectra "
+    "(clause 4.3)":
         "2 — los espectros básicos (menos de 1 s) se combinan línea a línea "
-        "en espectros de 3 s (capítulo 4.3)",
+        "en espectros de 3 s (4.3)",
     "3 — each merged spectrum gives one decisive audibility $ΔL_j$ "
     "(clause 5.3.8)":
         "3 — cada espectro combinado da una audibilidad decisiva $ΔL_j$ "
@@ -1052,7 +1054,7 @@ _ES: dict[str, str] = {
     "2 — the same microphone, reverberant or in-situ field":
         "2 — el mismo micrófono, campo reverberante o in situ",
     "Table 1 diffuse-field transfer":
-        "función de transferencia de campo difuso (Tabla 1)",
+        "transferencia de campo difuso (Tabla 1)",
     "also for diffuse-field earphones":
         "también para auriculares de campo difuso",
     "3 — probe microphone in the ear canal":
@@ -1293,8 +1295,8 @@ _ES: dict[str, str] = {
         "   (Ec. 26)",
     "Two-load method: repeat with two terminations; the one-load "
     "variant uses a single anechoic end":
-        "Método de dos cargas: repetir con dos terminaciones; la variante "
-        "de una carga usa un único extremo anecoico",
+        "Método de dos cargas: repetir con dos terminaciones; con una carga "
+        "basta un extremo anecoico",
     # Airflow resistance (ISO 9053) setup
     "Airflow resistance: static and alternating methods (ISO 9053-1/-2)":
         "Resistencia al flujo: métodos estático y alternante (ISO 9053-1/-2)",
@@ -1335,8 +1337,8 @@ _ES: dict[str, str] = {
     "diffusers  0.8–3 m² each, ≈ 5 kg/m² (Annex A)":
         "difusores  0,8–3 m² cada uno, ≈ 5 kg/m² (Anexo A)",
     "Test specimen  $S$ = 10.8 m²": "Probeta de ensayo  $S$ = 10,8 m²",
-    "10–12 m², width/length 0.7–1, edges not parallel to the room":
-        "10–12 m², anchura/longitud 0,7–1, bordes no paralelos a la cámara",
+    "10–12 m², width/length 0.7–1, no edge parallel to the room":
+        "10–12 m², ancho/largo 0,7–1, bordes no paralelos a la sala",
     "microphones ≥ 1.5 m apart, ≥ 2 m from a source, ≥ 1 m from any "
     "surface and from the specimen":
         "micrófonos separados ≥ 1,5 m, a ≥ 2 m de una fuente y a ≥ 1 m de "
@@ -1357,17 +1359,18 @@ _ES: dict[str, str] = {
         "$A = 55,3 V/(c T) − 4 V m$   ·   $c = 331 + 0,6 t$  (15–30 °C)",
     "≥ 12 spatially independent decays = ≥ 3 microphones × ≥ 2 sources "
     "· $T_{20}$ read from −5 dB over 20 dB":
-        "≥ 12 curvas de caída espacialmente independientes = ≥ 3 micrófonos "
-        "× ≥ 2 fuentes · $T_{20}$ leído desde −5 dB sobre 20 dB",
+        "≥ 12 caídas independientes = ≥ 3 micrófonos × ≥ 2 fuentes · $T_{20}$ "
+        "leído desde −5 dB sobre 20 dB",
     "the empty-room $A_1$ must clear the Table 1 ceiling, and $T_1$ is "
     "measured without the specimen frame":
         "$A_1$ de la cámara vacía debe quedar bajo el techo de la Tabla 1, y "
         "$T_1$ se mide sin el marco de la probeta",
     # d25 - ISO 10534-1 standing-wave-ratio apparatus
-    # Measured against the 900 px canvas (Arial metrics): the previous
-    # wording ("recorrido de la sonda y los mínimos") ran 960 px and was
-    # clipped on both sides; this one is 887 px, the same tightness as the
-    # 877 px English title.
+    # The Spanish is deliberately terser than a literal rendering: the
+    # fuller "recorrido de la sonda y los mínimos" measures 87 px wider
+    # again. On the DejaVu metrics the plates now set, both titles overrun
+    # the 900 px sheet (1054 px here, 1063 px for the English), so the
+    # tightness is still doing work and both still want cutting.
     "Standing-wave-ratio tube: probe traverse and the minima (ISO 10534-1)":
         "Tubo de onda estacionaria: recorrido de sonda y mínimos "
         "(ISO 10534-1)",
@@ -1390,12 +1393,12 @@ _ES: dict[str, str] = {
     # the article and "en la pared" -> "de pared" brings it to 664 px.
     "minima far from the specimen fill in (wall losses, exaggerated "
     "here): read the nearest one":
-        "mínimos lejanos a la probeta se rellenan (pérdidas de pared, "
-        "exageradas aquí): leer el más cercano",
+        "los mínimos lejanos se rellenan (pérdidas de pared, exageradas): "
+        "leer el más cercano",
     "one channel: the microphone sensitivity cancels and there is no "
-    "inter-channel phase mismatch":
+    "inter-channel phase error":
         "un solo canal: la sensibilidad del micrófono se cancela y no hay "
-        "desajuste de fase entre canales",
+        "desajuste de fase",
     "magnitude from the ratio, phase from the position — which is why "
     "Part 1 is the arbitration method":
         "magnitud por la razón, fase por la posición — por eso la Parte 1 es "
@@ -1481,7 +1484,7 @@ _ES: dict[str, str] = {
     "Reflecting plane (hemi-anechoic)": "Plano reflectante (semianecoica)",
     "Anechoic wedges": "Cuñas anecoicas",
     "Source (DUT)": "Fuente (DUT)",
-    "20 / 40 mic positions": "20 / 40 puntos de micrófono",
+    "20 / 40 mic positions": "20 / 40 posiciones",
     "radius $r$": "radio $r$",
     "$S = 2πr^2$ (hemi-anechoic) · $4πr^2$ (anechoic)":
         "$S = 2πr^2$ (semianecoica) · $4πr^2$ (anecoica)",
@@ -1540,7 +1543,7 @@ _ES: dict[str, str] = {
         "La cláusula 4 exige además el ruido de fondo medio ponderado A  "
         "$L_{p,A,B}$  (cl. 6.4)",
     "Measurement uncertainty from tables to expanded U (ISO 12999-1)":
-        "Incertidumbre de medición: de las tablas a la U expandida (ISO 12999-1)",
+        "Incertidumbre de medición: de tablas a la U expandida (ISO 12999-1)",
     "Single-number sound-absorption rating (ISO 11654)":
         "Valoración de la absorción acústica en índice único (ISO 11654)",
     "Zwicker loudness model chain (ISO 532-1)":
@@ -1735,13 +1738,14 @@ _ES: dict[str, str] = {
     "full radius = 25 dB (clause 3)": "radio completo = 25 dB (apartado 3)",
     # "Índice de directividad" would push the line 50 px past the English
     # extent; D_i in the formula still names the index.
-    "Directivity index: free field on axis against a reverberation room, "
-    "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB (23.3.2.1),":
+    "Directivity: free field on axis against a reverberation room, "
+    "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB":
         "Directividad: campo libre en eje contra cámara reverberante, "
-        "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB "
-        "(23.3.2.1),",
-    "or by integrating these polar curves over the sphere (23.3.2.2).":
-        "o integrando estas curvas polares sobre la esfera (23.3.2.2).",
+        "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB",
+    "(23.3.2.1), or by integrating these polar curves over the sphere "
+    "(23.3.2.2).":
+        "(23.3.2.1), o integrando estas curvas polares sobre la esfera "
+        "(23.3.2.2).",
     # The three microphone sensitivity fields (IEC 60268-4)
     "The three fields a microphone sensitivity is defined in (IEC 60268-4)":
         "Los tres campos de la sensibilidad de un micrófono (IEC 60268-4)",
@@ -1771,8 +1775,8 @@ _ES: dict[str, str] = {
     "from the centre of curvature at the lowest frequency":
         "cámara anecoica; la onda esférica cuenta como plana a $λ/2$ o más "
         "del centro de curvatura a la frecuencia más baja",
-    "substitution: the microphone under test and a calibrated reference "
-    "at the same point, one after the other (highest accuracy)":
+    "substitution: the microphone under test and a calibrated reference at "
+    "the same point, in turn (highest accuracy)":
         "sustitución: el micrófono en ensayo y una referencia calibrada "
         "en el mismo punto, uno tras otro (máxima exactitud)",
     "simultaneous comparison at two nearby points only after showing it "
@@ -1782,9 +1786,9 @@ _ES: dict[str, str] = {
     "overall accuracy ± 2 dB or better":
         "exactitud global de ± 2 dB o mejor",
     "Polar cuts (13.1.2 a): distance, sound pressure and frequency held "
-    "constant while $θ$ is stepped, preferably by 10° or 15°,":
-        "Cortes polares (13.1.2 a): distancia, presión acústica y "
-        "frecuencia fijas al barrer $θ$, preferentemente a 10° o 15°,",
+    "constant while $θ$ is stepped, by 10° or 15°,":
+        "Cortes polares (13.1.2 a): distancia, presión acústica y frecuencia "
+        "fijas al barrer $θ$, a 10° o 15°,",
     "at the octave centres 125 Hz to 16 kHz, with the reference axis as "
     "0° of the polar diagram.":
         "en los centros de octava de 125 Hz a 16 kHz, con el eje de "
@@ -1853,14 +1857,14 @@ _ES: dict[str, str] = {
         "fuente y micrófono a 1,20 m sobre suelo duro",
     "reflected path 2.60 m": "camino reflejado de 2,60 m",
     "$d$ = 1.00 m": "$d$ = 1,00 m",
-    "Reflection-free time $t_g$ = (2.60 − 1.00) m / (343 m/s) = 4.7 ms: "
-    "past that the record is the room, not the loudspeaker.":
-        "Tiempo libre de reflexiones $t_g$ = (2,60 − 1,00) m / (343 m/s) "
-        "= 4,7 ms: después, la grabación es la sala, no el altavoz.",
-    "The recording, on the sweep's own time axis: $f_1$ = 20 Hz, "
-    "$f_2$ = 6 kHz, $T$ = 4 s, so $L = T / ln(f_2/f_1)$ = 0.70 s":
-        "La grabación, en el eje temporal del barrido: $f_1$ = 20 Hz, "
-        "$f_2$ = 6 kHz, $T$ = 4 s, y $L = T / ln(f_2/f_1)$ = 0,70 s",
+    "Reflection-free time $t_g$ = (2.60 − 1.00) m / (343 m/s) = 4.7 ms: past "
+    "that the record is the room, not the box.":
+        "Tiempo libre de reflexiones $t_g$ = (2,60 − 1,00) m / (343 m/s) = "
+        "4,7 ms: después se graba la sala, no el altavoz.",
+    "Recording on the sweep's time axis: $f_1$ = 20 Hz, $f_2$ = 6 kHz, $T$ = "
+    "4 s, $L = T / ln(f_2/f_1)$ = 0.70 s":
+        "La grabación, en el eje del barrido: $f_1$ = 20 Hz, $f_2$ = 6 kHz, "
+        "$T$ = 4 s, $L = T / ln(f_2/f_1)$ = 0,70 s",
     "$h_1$ (linear)": "$h_1$ (lineal)",
     "$h_2$  −0.49 s": "$h_2$  −0,49 s",
     "$h_3$  −0.77 s": "$h_3$  −0,77 s",
@@ -1869,9 +1873,9 @@ _ES: dict[str, str] = {
     "$L ln(3/2)$ = 0.28 s: the closest pair of arrivals":
         "$L ln(3/2)$ = 0,28 s: el par de llegadas más próximo",
     "Record until the decay has died, or the pre-arrivals wrap round the "
-    "circular deconvolution into the end of $h_1$.":
+    "circular deconvolution into $h_1$.":
         "Se graba hasta que muere la caída, o las prellegadas rodean la "
-        "deconvolución circular hasta el final de $h_1$.",
+        "deconvolución circular al final de $h_1$.",
     "State the drive amplitude and the fade with the result, and pass "
     "the same fade to the analysis.":
         "La amplitud de excitación y el fundido se declaran con el "
@@ -1879,7 +1883,7 @@ _ES: dict[str, str] = {
     # Occupational noise exposure (ISO 9612)
     "Occupational noise exposure measurement (ISO 9612)":
         "Medición de la exposición al ruido en el trabajo (ISO 9612)",
-    "Worn instrument (Clause 12.3)": "Instrumento portado (apartado 12.3)",
+    "Worn instrument (Clause 12.3)": "Instrumento portado (12.3)",
     "≈ 0.04 m": "≈ 0,04 m",
     "above the shoulder": "sobre el hombro",
     "≥ 0.1 m from the ear canal,": "≥ 0,1 m del canal auditivo,",
@@ -1890,19 +1894,19 @@ _ES: dict[str, str] = {
         "Estrategias de medición (apartados 9–11)",
     "Working day": "Jornada laboral",
     "Task-based (Clause 9)": "Basada en tareas (apartado 9)",
-    "split the day into tasks — ≥ 3 samples (│) per task, plus each duration":
-        "dividir la jornada en tareas — ≥ 3 muestras (│) y la duración por tarea",
+    "split the day into tasks — ≥ 3 samples (│) each, and a duration":
+        "dividir la jornada en tareas — ≥ 3 muestras (│) y su duración",
     "Job-based (Clause 10)": "Basada en la función (apartado 10)",
     "$N ≥ 5$ random samples over the homogeneous exposure group":
-        "$N ≥ 5$ muestras aleatorias sobre el grupo de exposición homogéneo",
+        "$N ≥ 5$ muestras aleatorias del grupo de exposición homogéneo",
     "Full-day (Clause 11)": "Jornada completa (apartado 11)",
     "the whole shift, at least 3 times (5 if the days differ by > 3 dB)":
-        "toda la jornada, al menos 3 veces (5 si los días difieren en > 3 dB)",
+        "toda la jornada, 3 veces al menos (5 si los días difieren > 3 dB)",
     "Task 1": "Tarea 1",
     "Task 2": "Tarea 2",
     "Task 3": "Tarea 3",
     "day 1": "día 1",
-    "choose by work pattern (Table B.1)  →  LEX,8h + Annex C uncertainty":
+    "by work pattern (Table B.1)  →  LEX,8h + Annex C uncertainty":
         "según el patrón de trabajo (Tabla B.1)  →  LEX,8h + U del Anexo C",
     # Dynamic-stiffness resonance rig (EN 29052-1)
     "Dynamic-stiffness resonance rig (EN 29052-1)":
@@ -1998,15 +2002,15 @@ _ES: dict[str, str] = {
     "$W$ = load": "$W$ = carga",
     "simple, but unstable for large isolators at high loads":
         "sencillo, pero inestable con precargas altas",
-    "b) frame and actuator, with decoupling springs":
-        "b) bastidor y actuador, con muelles de desacoplo",
+    "b) frame, actuator and decoupling springs":
+        "b) bastidor, actuador y desacoplo elástico",
     "actuator: 100 % of the": "actuador: 100 % de la",
     "permissible static load": "carga estática admisible",
     "auxiliary springs decouple $m_2$ from the frame":
         "los muelles auxiliares desacoplan $m_2$ del bastidor",
     "Transverse translations are standardised too (ISO 10846-2, 5.2)":
-        "Las traslaciones transversales también están normalizadas "
-        "(ISO 10846-2, 5.2)",
+        "Las traslaciones transversales también se normalizan (ISO 10846-2, "
+        "5.2)",
     "force-distribution plate": "placa de reparto de fuerza",
     "test element in shear": "elemento a cortante",
     "roller bearings, or two symmetrical": "los rodamientos, o dos elementos",
@@ -2020,9 +2024,9 @@ _ES: dict[str, str] = {
         "un apoyo trabaja a cortante además de a compresión, y la rigidez "
         "transversal suele ser la menor de las dos",
     # Mobility rig: the drive rod and the ISO 7626-2 Figure 4 decision
-    "drive rod: stiff axially,": "varilla de arrastre: rígida axialmente,",
-    "flexible in every other": "y flexible en todas las demás",
-    "direction (6.4.4)": "direcciones (6.4.4)",
+    "drive rod: stiff axially,": "varilla de arrastre: rígida",
+    "flexible in every other": "axialmente, flexible en las",
+    "direction (6.4.4)": "demás direcciones (6.4.4)",
     "Where the accelerometer and the force transducer go (clause 6.4.4)":
         "Dónde van el acelerómetro y el transductor de fuerza (capítulo 6.4.4)",
     "accelerometer through the rod": "acelerómetro a través de la varilla",
@@ -2033,8 +2037,8 @@ _ES: dict[str, str] = {
     "WITH CAUTION": "CON PRECAUCIÓN",
     "the exciter attachment must be at least 10× more mobile, laterally and "
     "rotationally, than the structure (6.4.4)":
-        "el acoplo del excitador debe ser al menos 10 veces más móvil, "
-        "lateral y rotacionalmente, que la estructura (6.4.4)",
+        "el acoplo del excitador debe ser 10 veces más móvil, lateral y "
+        "rotacionalmente, que la estructura (6.4.4)",
     "and the suspension at least 10× more mobile than the structure at each "
     "attachment point (5.3)":
         "y la suspensión al menos 10 veces más móvil que la estructura en "
@@ -2056,15 +2060,15 @@ _ES: dict[str, str] = {
     "$Π_{in} = ½ Re{F v*}$ at the drive point, from an impedance head — "
     "not the amplifier setting":
         "$Π_{in} = ½ Re{F v*}$ en el punto de excitación, con cabeza de "
-        "impedancia y no con el ajuste del amplificador",
+        "impedancia, no con el ajuste del amplificador",
     "$⟨v^2⟩$ space-averaged over several positions per subsystem, away "
     "from the edges and from the drive point":
-        "$⟨v^2⟩$ promediada en el espacio sobre varias posiciones por "
-        "subsistema, lejos de los bordes y del punto de excitación",
-    "one run inverts to $η_{12}$ only if $η_1$ and $η_2$ are known from a "
-    "decay measurement; two runs solve all four":
+        "$⟨v^2⟩$ promediada en varias posiciones por subsistema, lejos de los "
+        "bordes y del punto de excitación",
+    "one run gives $η_{12}$ only if $η_1$ and $η_2$ come from a decay "
+    "measurement; two runs solve all four":
         "un ensayo despeja $η_{12}$ solo si $η_1$ y $η_2$ se miden por "
-        "decaimiento; dos ensayos resuelven los cuatro",
+        "decaimiento; dos resuelven los cuatro",
     "bands wide enough to hold several modes of each subsystem: the modal "
     "densities decide how wide":
         "bandas anchas para contener varios modos de cada subsistema: las "
@@ -2091,10 +2095,10 @@ _ES: dict[str, str] = {
     "inner ring": "aro interior",
     "radial plane": "plano radial",
     "contact line,  $φ$ = 12.96°": "línea de contacto,  $φ$ = 12,96°",
-    "the contact angle exists only in this view: it is measured":
+    "the contact angle exists only in this view: measured":
         "el ángulo de contacto solo existe en esta vista: se mide",
-    "from the radial plane, so $φ = 0$ for a deep-groove ball bearing":
-        "desde el plano radial: $φ = 0$ en un rodamiento de bolas",
+    "from the radial plane: $φ = 0$ for a deep-groove bearing":
+        "desde el plano radial: $φ = 0$ en un rodamiento rígido",
     "and $φ > 0$ for angular-contact and tapered-roller types":
         "y $φ > 0$ en los de contacto angular y de rodillos cónicos",
     "chipped tooth": "diente desconchado",
@@ -2108,9 +2112,9 @@ _ES: dict[str, str] = {
         "$GMF = N f_s = 28 × 25$ = 700 Hz, y un diente desconchado la modula "
         "una vez por vuelta: bandas laterales a $± f_s$",
     "$m_L = n·N ± k·V = 6 ± 4$ → 2 or 10 lobes, turning at $n·N·f_s/m_L$ = "
-    "175 or 35 Hz: the faster pattern radiates far more strongly":
+    "175 or 35 Hz: the faster radiates much more":
         "$m_L = n·N ± k·V = 6 ± 4$ → 2 o 10 lóbulos, que giran a "
-        "$n·N·f_s/m_L$ = 175 o 35 Hz: el patrón más rápido radia mucho más",
+        "$n·N·f_s/m_L$ = 175 o 35 Hz: el más rápido radia mucho más",
     # Condition monitoring on a machine train (Norton & Karczub Section 8.4)
     "Condition monitoring on a motor-gearbox train (Norton Section 8.4)":
         "Monitorización de estado en un tren motor-reductora (Norton 8.4)",
@@ -2118,10 +2122,10 @@ _ES: dict[str, str] = {
     "gearbox": "reductora",
     "coupling": "acoplamiento",
     "axial": "axial",
-    "radial, in the load zone, on the housing itself: no joint between the "
-    "bearing and the sensor":
-        "radial, en la zona de carga y sobre el propio soporte: sin junta "
-        "entre el rodamiento y el sensor",
+    "radial, in the load zone, on the housing itself: no joint between "
+    "bearing and sensor":
+        "radial, en la zona de carga y sobre el soporte: sin junta entre "
+        "rodamiento y sensor",
     "once-per-revolution": "captador de una",
     "pickup on a mark": "marca por vuelta",
     "Analyser": "Analizador",
@@ -2143,14 +2147,14 @@ _ES: dict[str, str] = {
     "marginal there and a hand-held probe is useless":
         "queda justa y una punta manual no sirve",
     "Acquisition": "Adquisición",
-    "$f_s$ = 20 kHz clears the 3 kHz housing resonance":
-        "$f_s$ = 20 kHz supera la resonancia de 3 kHz del soporte",
+    "20 kHz sample rate clears the 3 kHz resonance":
+        "muestreo a 20 kHz supera la resonancia de 3 kHz",
     "$T$ = 2 s at 2000 r/min = 67 revolutions":
         "$T$ = 2 s a 2000 r/min = 67 vueltas",
     "$Δf = 1/T$ = 0.5 Hz, against $f_s$ = 33.3 Hz":
         "$Δf = 1/T$ = 0,5 Hz, frente a $f_s$ = 33,3 Hz",
     "enough to resolve the $± f_s$ sidebands, which are":
-        "suficiente para resolver las bandas laterales a $± f_s$, que son",
+        "basta para resolver las bandas laterales a $± f_s$, que son",
     "what separates an inner-race defect from an":
         "lo que distingue un defecto de pista interior de uno",
     "outer-race one": "de pista exterior",
@@ -2158,12 +2162,12 @@ _ES: dict[str, str] = {
     "Reception-plate measurement of structure-borne power (EN 15657)":
         "Medición en placa receptora de la potencia estructural (EN 15657)",
     "Source under test (pump, fan, boiler …)":
-        "Fuente bajo ensayo (bomba, ventilador, caldera …)",
+        "Fuente en ensayo (bomba, ventilador …)",
     "Reception plate  ($m$, $S$, $η$)": "Placa receptora  ($m$, $S$, $η$)",
     "velocity positions → $L_v$": "posiciones de velocidad → $L_v$",
     "injected structure-borne power": "potencia estructural inyectada",
     "resilient supports": "apoyos resilientes",
-    "Plate power balance": "Balance de potencia de la placa",
+    "Plate power balance": "Balance de potencia",
     "$η = 2.2 / (f·T_s)$   (Formula 13)":
         "$η = 2,2 / (f·T_s)$   (Fórmula 13)",
     # Formula 14, symbols only: reads the same in Spanish.
@@ -2171,7 +2175,7 @@ _ES: dict[str, str] = {
         "$L_{Ws} = 10 log_{10}(2πf·η·m·S / f_0 m_0 S_0)$",
     "$+ L_v − 60$   (Formula 14)": "$+ L_v − 60$   (Fórmula 14)",
     "→ source quantities (Formulae 15–19):":
-        "→ magnitudes de fuente (Fórmulas 15–19):",
+        "→ magnitudes de fuente (15–19):",
     "equivalent blocked force $L_{Fb,eq}$ ,":
         "fuerza bloqueada equivalente $L_{Fb,eq}$ ,",
     "$L_{Wsn}$ consumed by EN 12354-5": "$L_{Wsn}$ que consume EN 12354-5",
@@ -2205,9 +2209,9 @@ _ES: dict[str, str] = {
     "rotor centre": "centro del rotor",
     "Microphone on a ground board": "Micrófono sobre placa en el suelo",
     "Met mast": "Mástil meteorológico",
-    "wind speed + direction": "velocidad y dirección del viento",
+    "wind speed + direction": "viento: velocidad y dirección",
     "Plan view (Figure 3)": "Planta (Figura 3)",
-    "reference position 1 (downwind)": "referencia 1 (a sotavento)",
+    "reference 1 (downwind)": "referencia 1 (a sotavento)",
     "optional positions 2–4": "posiciones opcionales 2–4",
     "$R_1 = √(H^2 + R_0^2)$   slant distance, rotor centre → microphone":
         "$R_1 = √(H^2 + R_0^2)$   distancia oblicua, centro del rotor → micrófono",
@@ -2230,8 +2234,8 @@ _ES: dict[str, str] = {
     "p ∝ e^(jkr1)/r1 + Q · e^(jkr2)/r2   (Q = ground reflection coefficient)":
         "p ∝ e^(jkr1)/r1 + Q · e^(jkr2)/r2   (Q = coeficiente de reflexión del suelo)",
     "in phase ($δ ≈ nλ$): up to +6 dB    ·    out of phase ($δ ≈ λ/2$ on hard ground): a deep dip":
-        "en fase ($δ ≈ nλ$): hasta +6 dB    ·    en oposición ($δ ≈ λ/2$ sobre "
-        "suelo duro): un mínimo profundo",
+        "en fase ($δ ≈ nλ$): hasta +6 dB  ·  en oposición ($δ ≈ λ/2$, suelo "
+        "duro): mínimo profundo",
     # 2D FDTD wave simulation
     "Domain  $c(x, y)$, $ρ(x, y)$, $dx$":
         "Dominio  $c(x, y)$, $ρ(x, y)$, $dx$",
@@ -2316,7 +2320,7 @@ _ES: dict[str, str] = {
     "≥ 4 excitation positions on $i$; accelerometers ≥ 0.25 m from edges, "
     "≥ 0.5 m apart":
         "≥ 4 posiciones de excitación en $i$; acelerómetros a ≥ 0,25 m de "
-        "los bordes y ≥ 0,5 m entre sí",
+        "bordes y ≥ 0,5 m entre sí",
     "$K_{ij} = D̄_{v,ij} + 10 log_{10}( l_{ij} / √(a_i·a_j) )$,   $a_i$ = "
     "equivalent absorption length":
         "$K_{ij} = D̄_{v,ij} + 10 log_{10}( l_{ij} / √(a_i·a_j) )$,   "
@@ -2327,7 +2331,7 @@ _ES: dict[str, str] = {
     "Vibrating measurement surface $S$": "Superficie de medición vibrante $S$",
     "Machine under test": "Máquina en ensayo",
     "radiated airborne sound": "sonido aéreo radiado",
-    "Initial number of positions $N$": "Número inicial de posiciones $N$",
+    "Initial number of positions $N$": "Nº inicial de posiciones $N$",
     "one accelerometer per cell of area $S/N$":
         "un acelerómetro por celda de área $S/N$",
     "Survey sound power": "Potencia acústica de control",
@@ -2359,14 +2363,14 @@ _ES: dict[str, str] = {
     "water depth ≥ 150 m (or 1.5·L)": "profundidad ≥ 150 m (o 1,5·L)",
     "Four runs, two per side; levels averaged while the ship crosses the data window":
         "Cuatro pasadas, dos por banda; niveles promediados mientras el buque "
-        "cruza la ventana de datos",
+        "cruza la ventana",
     "Hydrophone depths from the 15°, 30° and 45° depression angles at r = dCPA; L = ship length":
-        "Profundidades de hidrófono según los ángulos de depresión de 15°, "
-        "30° y 45° a r = dCPA; L = eslora",
-    "Run schedule (not to scale)": "Secuencia de pasada (sin escala)",
+        "Profundidades de hidrófono por los ángulos de depresión 15°, 30° y "
+        "45° a r = dCPA; L = eslora",
+    "Run schedule (not to scale)": "Orden de pasadas (sin escala)",
     "reverse course; 4 runs, 2 per side":
-        "vuelta en redondo; 4 pasadas, 2 por banda",
-    "background: ship stopped, ≥ 2 km, ≥ 30 s,":
+        "vuelta en redondo; 4 pasadas, 2/banda",
+    "background: stopped, ≥ 2 km, ≥ 30 s,":
         "fondo: buque parado, ≥ 2 km, ≥ 30 s,",
     "at the start and end of each test period":
         "al inicio y al final de cada periodo",
@@ -2378,14 +2382,15 @@ _ES: dict[str, str] = {
     "sea surface": "superficie del mar",
     "source on the channel axis": "fuente en el eje del canal",
     "rays that stay in the channel meet no surface or bottom loss":
-        "los rayos que permanecen en el canal no sufren pérdidas en "
-        "superficie ni en fondo",
-    "$c$ rises toward the surface (temperature) and toward the bottom (pressure); the minimum traps sound":
-        "$c$ aumenta hacia la superficie (temperatura) y hacia el fondo "
+        "los rayos que siguen en el canal no sufren pérdidas en superficie ni "
+        "en fondo",
+    "$c$ rises toward the surface (temperature) and the bottom (pressure); "
+    "the minimum traps sound":
+        "$c$ sube hacia la superficie (temperatura) y hacia el fondo "
         "(presión); el mínimo atrapa el sonido",
     "rays launched within about ±12° of the axis stay trapped and can cross entire oceans":
-        "los rayos lanzados a menos de unos ±12° del eje quedan atrapados "
-        "y pueden cruzar océanos enteros",
+        "los rayos lanzados a menos de ±12° del eje quedan atrapados y cruzan "
+        "océanos enteros",
     # Percussive pile-driving survey geometry (ISO 18406)
     "Percussive pile-driving survey geometry (ISO 18406)":
         "Geometría de medición del hincado percusivo de pilotes (ISO 18406)",
@@ -2415,16 +2420,17 @@ _ES: dict[str, str] = {
     "(radii not to scale)": "(radios sin escala)",
     "Percussive driving only, in 4 m to 100 m of water: vibro- and sheet-piling are out of scope":
         "Solo hincado percusivo, en 4 m a 100 m de agua: vibrohincado y "
-        "tablestacas quedan fuera del alcance",
+        "tablestacas fuera del alcance",
     "750 m is a comparability convention, not a regulatory limit; the actual range is reported, to 5 %":
-        "750 m es un convenio de comparabilidad, no un límite normativo; se "
-        "informa la distancia real, con un 5 %",
+        "750 m es un convenio de comparabilidad, no un límite; se informa la "
+        "distancia real, con un 5 %",
     "The station records the entire driving sequence, soft start included, at one fixed range":
         "La estación registra toda la secuencia de hincado, arranque suave "
         "incluido, a una distancia fija",
-    "Record hydrophone depth, GPS, water depth and tide, seabed class and the hammer energy per blow":
+    "Record hydrophone depth, GPS, water depth and tide, seabed class and "
+    "energy per blow":
         "Anota profundidad del hidrófono, GPS, profundidad y marea, clase de "
-        "fondo y la energía por golpe",
+        "fondo y energía por golpe",
     # Sonar equation geometry (underwater/underwater-propagation)
     "Sonar equation geometry: passive and active (ISO 18405)":
         "Geometría de la ecuación del sonar: pasiva y activa (ISO 18405)",
@@ -2445,10 +2451,12 @@ _ES: dict[str, str] = {
         "RL: dispersión superficie/volumen/fondo",
     "replaces $NL − DI$ when reverberation-limited":
         "sustituye a $NL − DI$ si domina la reverberación",
-    "Field levels are re 1 µPa; a source level carries the squared metre of its reference range, re 1 µPa²m²":
-        "Niveles de campo re 1 µPa; un nivel de fuente lleva el metro "
-        "cuadrado de su distancia, re 1 µPa²m²",
-    "Every term refers to the same bandwidth; the figure of merit is the PL that drives SE to zero, quoted re m²":
+    "Field levels are re 1 µPa; a source level carries the squared metre of "
+    "its range, re 1 µPa²m²":
+        "Niveles de campo re 1 µPa; el nivel de fuente lleva el cuadrado de "
+        "su distancia, re 1 µPa²m²",
+    "Every term is in the same bandwidth; the figure of merit is the PL that "
+    "drives SE to zero, re m²":
         "Todos los términos al mismo ancho de banda; la figura de mérito es "
         "la PL que anula SE, re m²",
     # The waveguide the three numerical solvers share
@@ -2473,7 +2481,7 @@ _ES: dict[str, str] = {
         "la envolvente avanzada en $r$, un paso $Δr$ cada vez",
     "All three take the same range-independent $c(z)$: no sediment attenuation, no bathymetry":
         "Los tres toman el mismo $c(z)$ independiente de la distancia: sin "
-        "atenuación del sedimento ni batimetría",
+        "sedimento ni batimetría",
     # Marine-mammal exposure assessment
     "Marine-mammal exposure: measured here, assessed there":
         "Exposición de mamíferos marinos: se mide aquí, se evalúa allí",
@@ -2495,10 +2503,12 @@ _ES: dict[str, str] = {
     "VHF, impulsive, NMFS 2024:": "VHF, impulsivo, NMFS 2024:",
     "144 / 159 dB re 1 µPa²·s weighted": "144 / 159 dB re 1 µPa²·s ponderado",
     "196 / 202 dB re 1 µPa flat": "196 / 202 dB re 1 µPa plano",
-    "An isopleth is the contour on which a criterion is exactly met, so the answer is a radius, not a verdict":
-        "Una isopleta es la curva donde el criterio se cumple justo: la "
-        "respuesta es un radio, no un veredicto",
-    "A cumulative level means nothing without its range and the window the strikes were counted over":
+    "An isopleth is the contour where a criterion is exactly met: the answer "
+    "is a radius, not a verdict":
+        "Una isopleta es la curva donde el criterio se cumple: la respuesta "
+        "es un radio, no un veredicto",
+    "A cumulative level means nothing without its range and the window the "
+    "strikes were counted in":
         "Un nivel acumulado no dice nada sin su distancia y la ventana en la "
         "que se contaron los golpes",
     # Atmospheric refraction (Salomons / Attenborough & Van Renterghem)
@@ -2506,13 +2516,15 @@ _ES: dict[str, str] = {
         "Refracción atmosférica: multitrayecto y sombra por el viento",
     "wind $u(z)$": "viento $u(z)$",
     "acoustic shadow": "sombra acústica",
-    "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level collapses by over 20 dB":
+    "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level "
+    "collapses over 20 dB":
         "Contra el viento: los rayos suben; desde ≈ 220 m se abre una "
         "sombra y el nivel cae más de 20 dB",
     "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)":
         "A favor del viento: los rayos bajan y llegan la directa y la "
         "rebotada en el suelo (multitrayecto)",
-    "a ±0.1 (m/s)/m gradient curves rays with radius $R_c = c_0/|g|$ ≈ 3.4 km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m":
+    "a ±0.1 (m/s)/m gradient curves rays with $R_c = c_0/|g|$ ≈ 3.4 km; "
+    "source $h_s$ = 2 m, receiver $h_r$ = 1.5 m":
         "gradiente de ±0,1 (m/s)/m → radio $R_c = c_0/|g|$ ≈ 3,4 km; fuente "
         "$h_s$ = 2 m, receptor $h_r$ = 1,5 m",
     # Aircraft noise certification points (ICAO Annex 16, Chapter 3)
@@ -2529,30 +2541,31 @@ _ES: dict[str, str] = {
     "where take-off noise is greatest": "donde el ruido de despegue es máximo",
     "symmetric lateral point (measured on both sides)":
         "punto lateral simétrico (se mide a ambos lados)",
-    "Microphones 1.2 m above the ground; the certification metric at the three points is EPNL, in EPNdB":
-        "Micrófonos a 1,2 m sobre el suelo; la métrica de certificación en "
-        "los tres puntos es el EPNL, en EPNdB",
+    "Microphones 1.2 m above ground; the certification metric at the three points is EPNL, in EPNdB":
+        "Micrófonos a 1,2 m del suelo; la métrica de certificación en los "
+        "tres puntos es el EPNL (EPNdB)",
     "Lateral: full take-off power · Flyover: 6.5 km from brake release · Approach: 3° ± 0.5° glide path":
-        "Lateral: máxima potencia de despegue · Sobrevuelo: a 6,5 km de "
-        "soltar frenos · Aproximación: senda de 3° ± 0,5°",
-    "the approach point lies 120 m below the 3° path, which meets the ground 300 m beyond the threshold":
-        "el punto de aproximación queda 120 m bajo la senda de 3°, que corta "
-        "el suelo 300 m más allá del umbral",
+        "Lateral: potencia máxima · Sobrevuelo: 6,5 km tras soltar frenos · "
+        "Aproximación: senda 3° ± 0,5°",
+    "the approach point lies 120 m below the 3° path, which meets the ground 300 m past the threshold":
+        "el punto de aproximación queda 120 m bajo la senda de 3°, que toca "
+        "suelo 300 m tras el umbral",
     # Helicopter overflight certification (ICAO Annex 16, Chapter 8)
     "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)":
         "Certificación de ruido de helicópteros (Anexo 16 OACI, Capítulo 8)",
     "level flight at 0.9 $V_H$": "vuelo nivelado a 0,9 $V_H$",
     "centre microphone": "micrófono central",
     "track": "trayectoria",
-    "3 microphones on a line perpendicular to the track":
-        "3 micrófonos en una línea perpendicular a la trayectoria",
+    "3 microphones on a line across the track":
+        "3 micrófonos en línea transversal a la trayectoria",
     "Speed: the least of 0.9 $V_H$, 0.9 $V_{NE}$, 0.45 $V_H$ + 120 km/h and 0.45 $V_{NE}$ + 120 km/h":
         "Velocidad: la menor de 0,9 $V_H$, 0,9 $V_{NE}$, 0,45 $V_H$ + "
         "120 km/h y 0,45 $V_{NE}$ + 120 km/h",
     "EPNL in EPNdB at the three points; at least six overflights, headwind and tailwind in equal number":
-        "EPNL en EPNdB en los tres puntos; al menos seis pasadas, con viento "
-        "en cara y en cola a partes iguales",
-    "microphones 1.2 m above ground; the sideline pair sees the overhead helicopter at 45° (slant ≈ 212 m)":
+        "EPNL en EPNdB en los tres puntos; al menos seis pasadas, viento en "
+        "cara y en cola a partes iguales",
+    "microphones 1.2 m above ground; the sideline pair sees the helicopter "
+    "overhead at 45° (≈ 212 m)":
         "micrófonos a 1,2 m del suelo; el par lateral ve el helicóptero en "
         "la vertical con 45° (oblicua ≈ 212 m)",
     # Swept-sine distortion (Farina / Novak)
@@ -2576,9 +2589,9 @@ _ES: dict[str, str] = {
     "$L·ln 2$ = 0.49 s": "$L·ln 2$ = 0,49 s",
     "$L·ln 3$ = 0.77 s": "$L·ln 3$ = 0,77 s",
     "time": "tiempo",
-    "$L = T / ln(f_2/f_1)$ = 0.70 s here; the order-$n$ products compress $L·ln n$ ahead of the linear response":
-        "$L = T / ln(f_2/f_1)$ = 0,70 s aquí; los productos de orden $n$ se "
-        "comprimen $L·ln n$ antes de la respuesta lineal",
+    "$L = T / ln(f_2/f_1)$ = 0.70 s; the order-$n$ products compress $L·ln n$ ahead of the linear response":
+        "$L = T / ln(f_2/f_1)$ = 0,70 s; los productos de orden $n$ se "
+        "adelantan $L·ln n$ a la respuesta lineal",
     "window each arrival  →  $H_{1}(f)$, $H_{2}(f)$, $H_{3}(f)$, …  →  $THD(f) = √( Σ |H_{n}(n f)|^2 ) / |H_{1}(f)|$":
         "enventanar cada llegada  →  $H_{1}(f)$, $H_{2}(f)$, $H_{3}(f)$, …  →"
         "  $THD(f) = √( Σ |H_{n}(n f)|^2 ) / |H_{1}(f)|$",
@@ -2586,7 +2599,7 @@ _ES: dict[str, str] = {
     "Two-channel FRF measurement: the H1 estimator and coherence":
         "Medición de FRF a dos canales: el estimador H1 y la coherencia",
     "Signal generator": "Generador de señal",
-    "broadband noise or a sweep": "ruido de banda ancha o barrido",
+    "broadband noise or a sweep": "banda ancha o barrido",
     "its gain is in H1": "su ganancia va en H1",
     "Power amplifier": "Amplificador",
     "Loudspeaker under test": "Altavoz en ensayo",
@@ -2609,9 +2622,10 @@ _ES: dict[str, str] = {
         "entrada)",
     "1 for a noiseless linear path; less with output noise":
         "1 en un camino lineal sin ruido; menor con ruido a la salida",
-    "trust $|H_1|$ only where $γ^2$ stays near 1: coherence dips flag noise, distortion or an unresolved delay":
+    "trust $|H_1|$ only where $γ^2$ is near 1: coherence dips flag noise, "
+    "distortion or unresolved delay":
         "fiarse de $|H_1|$ solo donde $γ^2$ ronda 1: las caídas delatan "
-        "ruido, distorsión o retardo sin resolver",
+        "ruido, distorsión o retardo",
     # Test-signal family panel
     "The test-signal family at a glance":
         "La familia de señales de ensayo de un vistazo",
@@ -2636,12 +2650,13 @@ _ES: dict[str, str] = {
     "whole periods, starting at": "periodos completos, empezando en",
     "a zero crossing (IEC 60268-1)": "un paso por cero (IEC 60268-1)",
     "25 periods of 5 kHz = 5 ms": "25 periodos de 5 kHz = 5 ms",
-    "every stimulus is deterministic and repeatable; synchronous averaging then lowers uncorrelated noise":
-        "todos los estímulos son deterministas y repetibles; promediar "
-        "pasadas reduce el ruido no correlacionado",
+    "every stimulus is deterministic and repeatable; synchronous averaging "
+    "lowers uncorrelated noise":
+        "los estímulos son deterministas y repetibles; promediar pasadas "
+        "reduce el ruido no correlacionado",
     "sweeps separate harmonic distortion, MLS smears it across the period, bursts probe dynamics":
-        "los barridos separan la distorsión armónica, la MLS la reparte por "
-        "el periodo y las salvas sondean la dinámica",
+        "los barridos separan la distorsión armónica, la MLS la reparte y las "
+        "salvas sondean la dinámica",
     # Welch PSD pipeline (Bendat & Piersol)
     "The Welch PSD pipeline: segment, taper, average (Bendat & Piersol)":
         "PSD de Welch: segmentar, enventanar, promediar (Bendat & Piersol)",
@@ -2662,8 +2677,8 @@ _ES: dict[str, str] = {
     "One-sided $|FFT|^2$ periodogram of each segment, then average":
         "Periodograma unilateral $|FFT|^2$ de cada segmento, y promedio",
     "overlap correlation (Welch 1967): 467 segments → $n_d$ = 442 effective averages":
-        "correlación por solape (Welch 1967): 467 segmentos → $n_d$ = 442 "
-        "promedios efectivos",
+        "correlación por solape (Welch 1967): 467 segmentos → $n_d$ = "
+        "442 promedios efectivos",
     "$G_{xx}(f)$ with its chi-square confidence interval":
         "$G_{xx}(f)$ con su intervalo de confianza chi-cuadrado",
     "random error $ε_r = 1/√n_d$ = 4.8 %;  $2·n_d ≈ 885$ degrees of freedom":
@@ -2786,8 +2801,8 @@ _ES: dict[str, str] = {
         "un tono en un orden no entero solo se atenúa: elige $N$ para "
         "que un nodo del peine caiga sobre él",
     "McFadden's example: $N$ = 20 nulls the 32.05-order tone (20·32.05 = 641); the habitual $N$ = 32 does not":
-        "el ejemplo de McFadden: $N$ = 20 anula el tono de orden 32,05 "
-        "(20·32,05 = 641); el habitual $N$ = 32 no",
+        "el ejemplo de McFadden: $N$ = 20 anula el tono de orden "
+        "32,05 (20·32,05 = 641); el habitual $N$ = 32 no",
     # Correlation-based time-delay estimation (Knapp & Carter)
     "Time-delay estimation: two microphones and one correlation peak":
         "Estimación del retardo: dos micrófonos y un pico de correlación",
@@ -3095,11 +3110,11 @@ _ES: dict[str, str] = {
         "Ley de masas en campo difuso: $R$ sube 6 dB por octava y 6 dB por "
         "duplicación de $m″$",
     "At $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz the free bending wave matches the trace wavelength":
-        "En $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz la onda libre de flexión "
-        "iguala la longitud de onda de traza",
-    "Sharp's prediction rates at $R_w$ = 27 dB; the dip collects the unfavourable deviations":
-        "La predicción de Sharp puntúa $R_w$ = 27 dB; el valle concentra las "
-        "desviaciones desfavorables",
+        "En $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz la onda de flexión iguala "
+        "la longitud de onda de traza",
+    "Sharp's prediction rates $R_w$ = 27 dB; the dip takes the unfavourable deviations":
+        "Sharp predice $R_w$ = 27 dB; el valle concentra las desviaciones "
+        "desfavorables",
     # Porous layer on a rigid wall
     "Porous absorber on a rigid wall: microstructure to absorption":
         "Absorbente poroso sobre pared rígida: microestructura y absorción",
@@ -3116,15 +3131,15 @@ _ES: dict[str, str] = {
     "$α_∞$ = 1.0  (tortuosity)": "$α_∞$ = 1,0  (tortuosidad)",
     "$Λ = Λ′$ = 87 µm  (viscous / thermal lengths)":
         "$Λ = Λ′$ = 87 µm  (longitudes viscosa y térmica)",
-    "JCA equivalent fluid: the five parameters give $Z_c$ and $k$; "
-    "a hard-backed layer has $Z_s = −j Z_c cot(k·d)$":
+    "JCA equivalent fluid: five parameters give $Z_c$ and $k$; a hard-backed "
+    "layer has $Z_s = −j Z_c cot(k·d)$":
         "Fluido equivalente JCA: los cinco parámetros dan $Z_c$ y $k$; con "
         "respaldo rígido $Z_s = −j Z_c cot(k·d)$",
     "$α = 1 − |R|^2$ = 0.91 at 1 kHz for this 50 mm layer":
         "$α = 1 − |R|^2$ = 0,91 a 1 kHz para esta capa de 50 mm",
     "viscous friction in the pores and heat exchange with the frame dissipate the sound energy":
-        "la fricción viscosa en los poros y el intercambio de calor con el "
-        "esqueleto disipan la energía sonora",
+        "la fricción viscosa en los poros y el calor cedido al esqueleto "
+        "disipan la energía sonora",
     # Barrier diffraction over ground (Fresnel number)
     "Barrier diffraction over ground: the Fresnel number at work":
         "Difracción en barrera sobre el suelo: el número de Fresnel en acción",
@@ -3135,11 +3150,12 @@ _ES: dict[str, str] = {
     "1.0 m": "1,0 m",
     "4.0 m": "4,0 m",
     "path difference $δ = A + B − d$ = 0.15 m; Fresnel number $N = 2δ/λ$ = 0.44 at 500 Hz":
-        "diferencia de caminos $δ = A + B − d$ = 0,15 m; número de Fresnel "
-        "$N = 2δ/λ$ = 0,44 a 500 Hz",
-    "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz":
-        "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10,0 dB "
-        "a 500 Hz",
+        "diferencia de caminos $δ = A + B − d$ = 0,15 m; Fresnel $N = 2δ/λ$ = "
+        "0,44 (500 Hz)",
+    "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB, "
+    "500 Hz":
+        "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = "
+        "10,0 dB, 500 Hz",
     "$N$ grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)":
         "$N$ crece con la frecuencia: la misma pantalla da 15,5 dB a 2 kHz "
         "(escala vertical exagerada)",
@@ -3159,10 +3175,10 @@ _ES: dict[str, str] = {
     "plan at the source plane $z$ = 1.5 m":
         "planta en el plano de la fuente $z$ = 1,5 m",
     "7.0 m": "7,0 m",
-    "every reflection is the free-field arrival of a mirror image: "
-    "$t = r/c$, $√(1−α)$ per bounce, $1/(4πr)$ spreading":
+    "every reflection is the free-field arrival of a mirror image: $t = r/c$, "
+    "$√(1−α)$ per bounce, $1/(4πr)$":
         "cada reflexión llega como campo libre de su imagen: $t = r/c$, "
-        "$√(1−α)$ por rebote, esparcimiento $1/(4πr)$",
+        "$√(1−α)$ por rebote, $1/(4πr)$",
     "in-plane images up to order 2 shown; the full lattice adds floor, ceiling and outer mirror rooms":
         "imágenes en planta hasta orden 2; la retícula completa añade suelo, "
         "techo y salas más lejanas",
@@ -3194,7 +3210,8 @@ _ES: dict[str, str] = {
         "encapsulado y cabina: $IL = R − C$, con "
         "$C = 10 log_{10}(0,3 + S_E/R_i)$ = 4,9 dB (interior revestido, "
         "$ᾱ = 0,3$)",
-    "reactive silencer: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 sin^{2}(k·L)]$, peaking where the 0.3 m chamber is a quarter wavelength":
+    "reactive silencer: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 sin^{2}(k·L)]$, "
+    "peaking where the 0.3 m chamber is $λ/4$":
         "silenciador reactivo: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 "
         "sin^{2}(k·L)]$, máximo donde la cámara de 0,3 m mide $λ/4$",
     # Sound level meter pipeline (IEC 61672-1), one function per stage
@@ -3277,15 +3294,15 @@ _ES: dict[str, str] = {
         "Placas receptoras de baja y alta movilidad de la EN 15657",
     "Low-mobility plate (7.2.2)": "Placa de baja movilidad (7.2.2)",
     "3,15 m x 2,23 m": "3,15 m x 2,23 m",
-    "100 mm concrete, $ρ$ = 2 300 ± 200 kg/m³":
-        "hormigón de 100 mm, $ρ$ = 2 300 ± 200 kg/m³",
+    "100 mm concrete, 2 300 ± 200 kg/m³":
+        "hormigón 100 mm, 2 300 ± 200 kg/m³",
     "$S$ = 7,0 m² (≥ 5 m²), sides ≈ $√2$ : 1":
         "$S$ = 7,0 m² (≥ 5 m²), lados ≈ $√2$ : 1",
     "$η ≥ 0,08$ over 50 Hz to 100 Hz": "$η ≥ 0,08$ de 50 Hz a 100 Hz",
     "≥ 6 velocity positions, ≈ 0,5 m apart":
-        "≥ 6 posiciones de velocidad, a ≈ 0,5 m entre sí",
+        "≥ 6 posiciones de velocidad, a ≈ 0,5 m",
     "and ≥ 0,1 m from any contact point":
-        "y a ≥ 0,1 m de cualquier punto de contacto",
+        "y a ≥ 0,1 m de todo punto de contacto",
     "elastic pads ≤ 100 × 100 mm": "apoyos elásticos ≤ 100 × 100 mm",
     "High-mobility plate (7.3.2)": "Placa de alta movilidad (7.3.2)",
     "source bolted rigidly": "fuente atornillada rígidamente",
@@ -3298,7 +3315,7 @@ _ES: dict[str, str] = {
     "cannot drive the sheet": "no excite la lámina",
     "$T_s$ and $Y$ measured with the": "$T_s$ e $Y$ medidos con la",
     "source fitted (7.1)": "fuente instalada (7.1)",
-    "Three-plate bench (Figure 2)": "Banco de tres placas (figura 2)",
+    "Three-plate bench (Fig. 2)": "Banco de tres placas (fig. 2)",
     "whirlpool bath": "bañera de hidromasaje",
     "> 10 dB between plates": "> 10 dB entre placas",
     "up to three isolated plates,": "hasta tres placas aisladas,",
@@ -3324,9 +3341,9 @@ _ES: dict[str, str] = {
         "acelerómetro atornillado o pegado por debajo",
     "elastic pads": "apoyos elásticos",
     "four elastic pads at the corners, each ≤ 100 × 100 mm":
-        "cuatro apoyos elásticos en las esquinas, cada uno ≤ 100 × 100 mm",
+        "cuatro apoyos elásticos en las esquinas, ≤ 100 × 100 mm",
     "vertical resonance of the slab on its pads < 20 Hz":
-        "resonancia vertical de la losa sobre sus apoyos < 20 Hz",
+        "resonancia vertical de la losa sobre los apoyos < 20 Hz",
     "top flat to ± 1 mm in a line edge to edge":
         "cara superior plana a ± 1 mm en línea de borde a borde",
     "Plan": "Planta",
@@ -3336,7 +3353,7 @@ _ES: dict[str, str] = {
     "≥ 2 machine positions, skew to the edges,":
         "≥ 2 posiciones de la máquina, oblicuas a los bordes,",
     "no hammer within 100 mm of an edge, all feet on the specimen":
-        "ningún martillo a menos de 100 mm del borde, las patas sobre la probeta",
+        "ningún martillo a < 100 mm del borde; patas sobre la probeta",
     "≥ 4 accelerometer positions, uniform but random,":
         "≥ 4 posiciones de acelerómetro, uniformes pero aleatorias,",
     "off the symmetry lines and ≥ 100 mm from every edge":
@@ -3364,9 +3381,12 @@ _ES: dict[str, str] = {
     "lightweight double leaf:": "doble hoja ligera:",
     "$M = lg(m′_{perp,i} / m′_i)$: $m′_i$ is the element carrying the path, so the ratio is per path, not per junction.":
         "$M = lg(m′_{perp,i} / m′_i)$: $m′_i$ es el elemento que lleva la vía, así que el cociente es por vía, no por unión.",
-    "The functions take the RATIO, not $M$. Annex H.3 floor, ratio 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB":
-        "Las funciones toman el COCIENTE, no $M$. Forjado H.3, cociente 1,61: 'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB",
-    "$ℓ_f$ is the coupling length along the junction line, measured surface to surface. Annex E values are read at 500 Hz, ± 3 dB.":
+    "The functions take the RATIO, not $M$. Floor H.3, ratio 1,61: 'through' "
+    "-> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB":
+        "Las funciones toman el COCIENTE, no $M$. Forjado H.3, 1,61: "
+        "'through' $K_{13}$ = 12,5 dB; 'corner' $K_{12}$ = 8,9 dB",
+    "$ℓ_f$ is the coupling length along the junction line, surface to "
+    "surface. Annex E values are read at 500 Hz, ± 3 dB.":
         "$ℓ_f$ es la longitud de acoplamiento en la unión, medida entre superficies. El anexo E se lee a 500 Hz, ± 3 dB.",
     "ISO 12354-1 Annex L worked building: elements, junctions, paths":
         "Edificio resuelto del anexo L (ISO 12354-1): elementos, uniones y vías",
@@ -3389,11 +3409,11 @@ _ES: dict[str, str] = {
     "external wall (T)": "muro exterior (T)",
     "internal wall (X)": "tabique interior (X)",
     "two external and two internal walls meet the floor, with":
-        "dos muros exteriores y dos interiores llegan al forjado, con",
+        "dos muros exteriores y dos interiores llegan al forjado,",
     "5,00 m of junction along each long edge and 4,00 m along":
         "5,00 m de unión en cada borde largo y 4,00 m en",
-    "each short one: perimeter sum 9 m external + 9 m internal":
-        "cada borde corto: suma del perímetro 9 m exterior + 9 m interior",
+    "each short one: perimeter 9 m external + 9 m internal":
+        "cada borde corto: perímetro 9 m exterior + 9 m interior",
     "13 airborne paths = 1 direct (Dd) + 4 flanking elements × 3 branches (Ff, Df, Fd)":
         "13 vías aéreas = 1 directa (Dd) + 4 elementos de flanco × 3 ramas (Ff, Df, Fd)",
     "5 impact paths = 1 direct + 4 Df: only the floor is excited, so there is no Ff or Fd":
@@ -3468,12 +3488,12 @@ _ES: dict[str, str] = {
         "recorrido continuo: $≥ d_{min}$ de la fuente · ≥ 1,0 m de cualquier superficie · ≥ 0,5 m de un difusor",
     "· not within 10° of a room surface · length $≥ 3λ$ or 10,3 m, whichever is smaller":
         "· fuera de todo plano a menos de 10° de una superficie · longitud $≥ 3λ$ o 10,3 m, la menor",
-    "comparison method: the same six positions, and no $A$, no $V$, no $S$, no Waterhouse and no $C_1$ in Eq. 21":
-        "método de comparación: las mismas seis posiciones, y sin $A$, sin $V$, sin $S$, sin Waterhouse y sin $C_1$ en la Ec. 21",
-    "averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · background at the same positions, just before or after":
-        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · ruido de fondo en las mismas posiciones, antes o después",
-    "hard walls, $α < 0,06$ within one wavelength of the source · $T_{60}$ per ISO 3382-2 from the first 10 dB or 15 dB only":
-        "paredes duras, $α < 0,06$ a menos de una longitud de onda de la fuente · $T_{60}$ según ISO 3382-2, solo los primeros 10 o 15 dB",
+    "comparison method: the same six positions, and Eq. 21 without $A$, $V$, $S$, Waterhouse or $C_1$":
+        "método de comparación: las mismas seis posiciones, y la Ec. 21 sin $A$, $V$, $S$, Waterhouse ni $C_1$",
+    "averaging ≥ 30 s to 160 Hz, ≥ 10 s from 200 Hz · background at those positions, before or after":
+        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · fondo en esas posiciones, antes o después",
+    "hard walls, $α < 0,06$ within one wavelength of the source · $T_{60}$ per ISO 3382-2, first 10 dB or 15 dB only":
+        "paredes duras, $α < 0,06$ a una longitud de onda de la fuente · $T_{60}$ (ISO 3382-2) solo de los 10 o 15 dB primeros",
     # --- ISO 3744 parallelepiped measurement surface ---
     "ISO 3744 parallelepiped measurement surface":
         "Superficie de medición paralelepipédica ISO 3744",
@@ -3488,7 +3508,8 @@ _ES: dict[str, str] = {
     "key positions: the centre of every partial area, plus its corners except those in the reflecting plane":
         "posiciones fundamentales: el centro de cada área parcial y sus esquinas, salvo las del plano reflectante",
     "nine is the minimum, for one partial area per plane; here $2a > 3d$, so the long faces split and the array grows":
-        "nueve es el mínimo, con un área parcial por plano; aquí $2a > 3d$, así que las caras largas se dividen y la malla crece",
+        "nueve es el mínimo, un área parcial por plano; aquí $2a > 3d$: las "
+        "caras largas se dividen y la malla crece",
     "the survey method (ISO 3746) keeps only the partial-area centres":
         "el método de control (ISO 3746) conserva solo los centros de las áreas parciales",
     # --- ISO/TS 7849-2 radiation factor ---
@@ -3496,7 +3517,7 @@ _ES: dict[str, str] = {
         "Determinación del factor de radiación (ISO/TS 7849-2)",
     "$⟨v_j^2⟩$ on the casing": "$⟨v_j^2⟩$ en la carcasa",
     "ISO 9614 measurement surface": "Superficie de medición ISO 9614",
-    "Determining $ε_j$ (Part 2)": "Determinación de $ε_j$ (Parte 2)",
+    "Determining $ε_j$ (Part 2)": "Determinar $ε_j$ (Parte 2)",
     "$P_j$ : ISO 9614 band power": "$P_j$ : potencia de banda ISO 9614",
     "$⟨v_j^2⟩$ : surface-averaged": "$⟨v_j^2⟩$ : velocidad normal promediada",
     "normal velocity, same bands": "en la superficie, mismas bandas",
@@ -3561,7 +3582,8 @@ _ES: dict[str, str] = {
     "$Q = 2$, flush in the ceiling": "$Q = 2$, enrasado en el techo",
     "blue: the supply path — red: the return path — each box is one row of the sheet, stamped with its code":
         "azul: ramal de impulsión; rojo: ramal de retorno; cada caja es una fila de la hoja con su código",
-    "attenuates only: 4, 5, 6 (supply) and 4, 5 (return) — attenuates and regenerates: 2, 3 — self-noise only: 8 and the return grille":
+    "attenuates only: 4, 5, 6 (supply) and 4, 5 (return) — attenuates and "
+    "regenerates: 2, 3 — self-noise only: 8 and the grille":
         "solo atenúan: 4, 5, 6 (impulsión) y 4, 5 (retorno); atenúan y regeneran: 2, 3; solo ruido propio: 8 y la rejilla",
     "the return wins above 1 kHz: its silencer floors the room near 25 dB, and no amount of supply attenuation moves that":
         "por encima de 1 kHz manda el retorno: su silenciador deja un suelo de 25 dB que la impulsión no puede bajar",
@@ -3577,7 +3599,7 @@ _ES: dict[str, str] = {
     "transition": "transición",
     "test duct, anechoic termination": "conducto de ensayo, terminación anecoica",
     "three positions on a line inclined to the axis, at mid-length":
-        "tres posiciones en una línea inclinada respecto al eje, a media longitud",
+        "tres posiciones en línea inclinada respecto al eje, a media longitud",
     "$r ≤ 0.3$ planes": "planos $r ≤ 0,3$",
     "$D_i = L_{pI} − L_{pII}$, one third octave at a time":
         "$D_i = L_{pI} − L_{pII}$, tercio de octava a tercio de octava",
@@ -3600,7 +3622,8 @@ _ES: dict[str, str] = {
     "the reported figure is an insertion loss against a substitution duct, not a transmission loss":
         "lo que se declara es una pérdida por inserción frente a un conducto de sustitución, no por transmisión",
     "and the facility's own limiting insertion loss — flanking along the duct walls — caps what it can report at all":
-        "y la pérdida por inserción límite de la instalación, por flancos en las paredes del conducto, acota lo que puede declarar",
+        "y la pérdida por inserción límite de la instalación, por flancos en "
+        "las paredes, acota lo que puede declarar",
     # Room-to-room chain in section (devices/noise-control/room-to-room).
     "Plant room to operator room: every symbol of the balance, in section":
         "De la sala de máquinas a la de control: el balance en sección",
@@ -3623,8 +3646,10 @@ _ES: dict[str, str] = {
         "$NR = TL − 10 log_{10}[S_w / (S_{2}α_{2} + τ S_w)]$",
     "$S_{2}α_{2}$ passes the 15 m² of the wall between 250 and 500 Hz: below it the wall delivers less than its TL":
         "$S_{2}α_{2}$ supera los 15 m² del muro entre 250 y 500 Hz: por debajo, el muro entrega menos que su TL",
-    "both levels are reverberant-field spatial averages, and the balance says nothing below 163 Hz (Schroeder, 75 m³)":
-        "ambos niveles son promedios espaciales del campo reverberante; el balance calla por debajo de 163 Hz (Schroeder, 75 m³)",
+    "both levels are reverberant-field spatial averages; the balance says "
+    "nothing below 163 Hz (Schroeder, 75 m³)":
+        "ambos niveles promedian el campo reverberante en el espacio; el "
+        "balance calla bajo 163 Hz (Schroeder, 75 m³)",
     # Machine enclosure in section (devices/noise-control/noise-control).
     "Machine enclosure in section: what IL = R − C really depends on":
         "Encapsulamiento de máquina en sección: de qué depende IL = R − C",
@@ -3632,7 +3657,7 @@ _ES: dict[str, str] = {
         "$S_E$ = 24 m² de envolvente expuesta: una caja de 3,0 × 2,0 × 1,8 m, cinco caras",
     "lined cooling outlet": "salida de refrigeración revestida",
     "a short lined duct, never a bare hole":
-        "un conducto corto revestido, nunca un agujero desnudo",
+        "conducto corto revestido, nunca un agujero",
     "cable and pipe entry, sealed sleeve":
         "paso de cables y tuberías con manguito estanco",
     "$S_i$ = 30 m², $ᾱ_i = 0.30$  →  $R_i$ = 12.9 m²":
@@ -3667,7 +3692,7 @@ _ES: dict[str, str] = {
     "(c) In the plane normal to the flight path":
         "(c) En el plano normal a la trayectoria",
     "(d) Behind the take-off roll, in plan":
-        "(d) Detrás de la carrera de despegue, en planta",
+        "(d) Tras la carrera de despegue, en planta",
     "$d_p$ = 526 m": "$d_p$ = 526 m",
     "$d_1$ = 568 m": "$d_1$ = 568 m",
     "$d_2$ = 582 m": "$d_2$ = 582 m",
@@ -3698,10 +3723,10 @@ _ES: dict[str, str] = {
     "180° astern, the jet lobe peaking near 120°":
         "estribor y $β − ε$ a babor · $ψ = arccos(q/d_{SOR})$, de 90° al "
         "través a 180° a popa, lóbulo de chorro máximo a 120°",
-    "NPD lookup: $d_p$ for exposure levels, $d_s$ for maximum levels, "
-    "floored at 30 m; $Δ_{SOR}$ scaled by 762 m/$d_{SOR}$ beyond 762 m":
-        "consulta NPD: $d_p$ para exposición, $d_s$ para máximos, cota "
-        "inferior 30 m; $Δ_{SOR}$ escalado por 762 m/$d_{SOR}$ desde 762 m",
+    "NPD lookup: $d_p$ for exposure, $d_s$ for maxima, floored at 30 m; "
+    "$Δ_{SOR}$ scaled by 762 m/$d_{SOR}$ beyond 762 m":
+        "consulta NPD: $d_p$ para exposición, $d_s$ para máximos, cota 30 m; "
+        "$Δ_{SOR}$ escalado por 762 m/$d_{SOR}$ desde 762 m",
     "receiver, 1.2 m": "receptor, 1,2 m",
     "wing plane": "plano alar",
     "β elevation of the path over the ground line · ε bank, positive with the starboard wing up":
@@ -3752,13 +3777,18 @@ _ES: dict[str, str] = {
     "met mast, within 2 000 m of the station":
         "torre meteorológica, a menos de 2 000 m de la estación",
     "Test window (aeroplanes): no precipitation; −10 to 35 °C and 20 to 95 % RH over the path above 10 m;":
-        "Ventana de ensayo (aviones): sin precipitación; de −10 a 35 °C y de 20 a 95 % HR en el recorrido por encima de 10 m;",
+        "Ventana de ensayo (aviones): sin precipitación; de −10 a 35 °C y "
+        "20 a 95 % HR en el recorrido sobre 10 m;",
     "8 kHz attenuation ≤ 12 dB/100 m; wind ≤ 6.2 m/s average and 7.7 m/s peak, crosswind ≤ 3.6 and 5.1 m/s":
-        "atenuación a 8 kHz ≤ 12 dB/100 m; viento ≤ 6,2 m/s medio y 7,7 m/s máximo, viento cruzado ≤ 3,6 y 5,1 m/s",
-    "Helicopters: average wind ≤ 5.1 m/s and crosswind ≤ 2.6 m/s, the temperature and humidity limits at 10 m only":
-        "Helicópteros: viento medio ≤ 5,1 m/s y viento cruzado ≤ 2,6 m/s, con los límites de temperatura y humedad solo a 10 m",
+        "atenuación a 8 kHz ≤ 12 dB/100 m; viento ≤ 6,2 m/s medio y 7,7 m/s "
+        "máximo, cruzado ≤ 3,6 y 5,1 m/s",
+    "Helicopters: average wind ≤ 5.1 m/s and crosswind ≤ 2.6 m/s, temperature "
+    "and humidity limits at 10 m only":
+        "Helicópteros: viento medio ≤ 5,1 m/s y cruzado ≤ 2,6 m/s; "
+        "temperatura y humedad solo a 10 m",
     "At least six valid runs per measurement point, with a 90 % confidence limit not exceeding ±1.5 EPNdB":
-        "Al menos seis pasadas válidas por punto de medición, con un límite de confianza del 90 % que no exceda ±1,5 EPNdB",
+        "Al menos seis pasadas válidas por punto, con un límite de confianza "
+        "del 90 % que no exceda ±1,5 EPNdB",
     # ECAC Doc 32 noise hemisphere (aircraft/rotorcraft-noise).
     "The rotorcraft noise hemisphere and its angles (ECAC Doc 32)":
         "El hemisferio de ruido del giroavión y sus ángulos (ECAC Doc 32)",
@@ -3795,7 +3825,8 @@ _ES: dict[str, str] = {
     "19 azimuths × 19 polar angles at 10°, 31 one-third-octave bands from 10 Hz to 10 kHz":
         "19 acimutes × 19 ángulos polares cada 10°, 31 bandas de tercio de octava de 10 Hz a 10 kHz",
     "unmeasured bins are NaN, never 0 dB; mirrored-rotor class members read the same data at $−φ$":
-        "las celdas no medidas son NaN, nunca 0 dB; los miembros de clase con rotor espejado leen los mismos datos en $−φ$",
+        "las celdas no medidas son NaN, nunca 0 dB; con rotor espejado, la "
+        "clase lee los mismos datos en $−φ$",
     # Sound-field audiometry (ISO 389-7 / ISO 8253-2) — B15b
     "Sound-field audiometry and the ISO 389-7 reference zero":
         "Audiometría en campo sonoro y el cero de referencia de ISO 389-7",
@@ -3804,8 +3835,9 @@ _ES: dict[str, str] = {
     "B · Diffuse field": "B · Campo difuso",
     "third-octave noise band · binaural":
         "banda de ruido de tercio de octava · biaural",
-    "C · Earphone: not this standard": "C · Auricular: no es esta norma",
-    "supra-aural or insert · monaural": "supraaural o de inserción · monoaural",
+    "C · Earphone": "C · Auricular",
+    "supra-aural or insert · monaural": "supraaural o de inserción · "
+                                         "monoaural",
     "level measured here,": "el nivel se mide aquí,",
     "subject and chair absent": "sin el sujeto ni la silla",
     "on the reference axis, 0° azimuth": "sobre el eje de referencia, 0° de acimut",
@@ -3819,8 +3851,9 @@ _ES: dict[str, str] = {
     "≥ 500 Hz: loudest and quietest directions":
         "≥ 500 Hz: las direcciones de nivel máximo y mínimo",
     "within 5 dB  (Table 1)": "dentro de 5 dB  (tabla 1)",
-    "the level lives in the coupler,": "el nivel vive en el acoplador,",
-    "not at a point in a room": "no en un punto de una sala",
+    "not this standard: the level lives": "no es esta norma: el nivel vive",
+    "in a coupler, not a point in a room": "en un acoplador, no en un punto "
+                                           "de la sala",
     "coupler /": "acoplador /",
     "ear simulator": "simulador de oído",
     "0 dB HL here is the RETSPL of the earphone":
@@ -3894,7 +3927,7 @@ _ES: dict[str, str] = {
     "system off:": "sistema apagado:",
     "ambient": "ruido de fondo",
     "injected near the normal input, so the whole chain is in (7.4)":
-        "inyectada junto a la entrada normal, para incluir toda la cadena (7.4)",
+        "inyectada junto a la entrada normal: toda la cadena entra (7.4)",
     "one position per coverage zone, at listening height":
         "una posición por zona de cobertura, a la altura de escucha",
     "spread over the served area, worst corners included":
@@ -3945,15 +3978,15 @@ _ES: dict[str, str] = {
     "sponge, 60 cells": "esponja, 60 celdas",
     "capture contour": "contorno de captura",
     "plane-wave injection line": "línea de onda plana",
-    "Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz the grid holds 343 cells per wavelength":
-        "Dominio de 980 × 346 celdas con dx = 0,5 mm (490 × 173 mm); a 2 kHz, 343 celdas por longitud de onda",
+    "Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz there are 343 cells per wavelength":
+        "Dominio de 980 × 346 celdas, dx = 0,5 mm (490 × 173 mm); a 2 kHz, 343 celdas por longitud de onda",
     "Panel: five 70 mm cells, 20 mm slits on a 3 mm backing; the 3.2 mm neck sets dx, not the wavelength":
         "Panel: cinco celdas de 70 mm, ranuras de 20 mm sobre fondo de 3 mm; dx lo fija el cuello de 3,2 mm",
     "Clearances in cells: 40 ahead of the panel, 20 behind and to the sides, 60 to every sponge":
         "Holguras en celdas: 40 por delante del panel, 20 por detrás y a los lados, 60 hasta cada esponja",
-    "Sources outside the contour integrate to zero (extinction), so the total-field phasors give the scattered far field":
+    "Sources outside the contour integrate to zero (extinction): the total-field phasors give the scattered field":
         "Las fuentes fuera del contorno integran a cero (extinción): los fasores dan el campo lejano dispersado",
-    "Reference run: the identical scene without the panel → ContourPhasors.subtract() removes the grid-dispersion residual":
+    "Reference run: the same scene with no panel → ContourPhasors.subtract() removes the grid residual":
         "Referencia: la misma escena sin panel → ContourPhasors.subtract() elimina el residuo numérico",
     # Fluid-solid contact at three incidences (simulation/elastic-waves).
     "A fluid-solid contact at three incidences, and where it sits on the grid":
@@ -3991,7 +4024,7 @@ _ES: dict[str, str] = {
     "critical angles 14.5° and 27.5°": "ángulos críticos 14,5° y 27,5°",
     "between them P is evanescent and": "entre ellos P es evanescente y",
     "the shear wave carries the power": "la onda de cizalla lleva la potencia",
-    "over steel the deficit is 0.03 %": "sobre acero el déficit es del 0,03 %",
+    "over steel the deficit is 0.03 %": "en acero el déficit es del 0,03 %",
     "the tail reaches ~7 $λ$ up, so no":
         "la cola llega a ~7 $λ$, así que ningún",
     "time of flight can separate it": "tiempo de vuelo la separa",
@@ -4016,10 +4049,10 @@ _ES: dict[str, str] = {
         "$f_n = n c_P / (2h)$ = 295 kHz para 10 mm de acero",
     "the plate goes transparent there, three decades above audio":
         "allí la placa se vuelve transparente, tres décadas sobre el audio",
-    "1.5 mm plane pulse at 0.25 m": "pulso plano 1,5 mm en 0,25 m",
+    "1.5 mm plane pulse, 0.25 m": "pulso plano 1,5 mm a 0,25 m",
     "one-way; usable to 340 kHz": "unidireccional; hasta 340 kHz",
     "probe A, 30 mm above": "sonda A, 30 mm por encima",
-    "10 mm STEEL at $y$ = 0.35 m": "STEEL de 10 mm en $y$ = 0,35 m",
+    "10 mm STEEL at $y$ = 0.35 m": "STEEL 10 mm en $y$ = 0,35 m",
     "painted into WATER": "pintado dentro de WATER",
     "probe B, 50 mm below": "sonda B, 50 mm por debajo",
     "probe A": "sonda A",
@@ -4030,12 +4063,11 @@ _ES: dict[str, str] = {
     # Infrasound measurement chain (signals/levels/special-weightings).
     "Measuring infrasound: the chain that must deliver 0,25 Hz":
         "Medir infrasonido: la cadena que debe llegar a 0,25 Hz",
-    "Below 20 Hz the wind is louder": "Por debajo de 20 Hz el viento suena",
+    "Below 20 Hz the wind is louder": "Bajo 20 Hz el viento suena",
     "than the source": "más que la fuente",
     "static-pressure equalisation": "orificio de compensación de",
-    "vent: a first-order high-pass,": "presión estática: un paso alto de",
-    "and the chain's real corner":
-        "primer orden, la esquina real de la cadena",
+    "vent: a first-order high-pass,": "presión: paso alto de primer",
+    "and the chain's real corner": "orden, la esquina real de la cadena",
     "hard board on the ground": "tablero rígido sobre el suelo",
     "capsule flush at its centre": "cápsula enrasada en su centro",
     "primary foam screen (solid)": "pantalla primaria de espuma (continua)",
@@ -4056,13 +4088,13 @@ _ES: dict[str, str] = {
     "green: the G weighting": "verde: la ponderación G",
     "dashed: a chain with a 2 Hz vent corner":
         "discontinua: cadena con esquina de 2 Hz",
-    "usable band = the overlap of the two":
-        "banda utilizable = el solape de ambas",
+    "usable band = the overlap":
+        "banda utilizable = el solape",
     "ISO 7196:1995, Annex A": "ISO 7196:1995, anexo A",
     # Capturing a microphone array (signals/filters/multichannel).
     "Capturing an array: one clock, locked gains, a written row map":
         "Capturar un array: un reloj, ganancias fijas, mapa de filas escrito",
-    "Four positions, four sensitivities": "Cada posición, su sensibilidad",
+    "Each position, its sensitivity": "Cada posición, su sensibilidad",
     "mV/Pa, one per capsule": "mV/Pa, una por cápsula",
     "one capsule at a time,": "una cápsula cada vez,",
     "gains locked throughout": "con las ganancias fijas",

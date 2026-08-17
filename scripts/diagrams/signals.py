@@ -27,10 +27,10 @@ def _d_calibration_chain(s: SVG, th: Theme) -> None:
     # Calibrator on top of the microphone (left column)
     mx = 150.0
     cal_y = 110.0
-    s.text(mx, cal_y - 22, "Sound calibrator", 22, th.fg, bold=True)
+    s.text(mx, cal_y - 22, "Sound calibrator", 19, th.fg, bold=True)
     s.rect(mx - 62, cal_y, 124, 86, th.panel, th.fg, rx=10, sw=2)
-    s.text(mx, cal_y + 38, "94.0 dB", 26, th.secondary, bold=True, mono=True)
-    s.text(mx, cal_y + 66, "1 kHz", 20, th.muted, mono=True)
+    s.text(mx, cal_y + 38, "94.0 dB", 22, th.secondary, bold=True, mono=True)
+    s.text(mx, cal_y + 66, "1 kHz", 17, th.muted, mono=True)
     s.rect(mx - 15, cal_y + 86, 30, 12, th.fg, rx=3)   # coupler cavity
     s.mic(mx, cal_y + 98, gy, 1.3)
 
@@ -40,18 +40,20 @@ def _d_calibration_chain(s: SVG, th: Theme) -> None:
     prev_x = mx + 62
     for bx, l1, l2 in boxes:
         s.rect(bx - bw / 2, by, bw, bh, th.panel, th.primary, rx=12, sw=2)
-        s.text(bx, by + 33, l1, 22, th.fg, bold=True)
-        s.text(bx, by + 60, l2, 22, th.fg, bold=True)
+        s.text(bx, by + 33, l1, 19, th.fg, bold=True)
+        s.text(bx, by + 60, l2, 19, th.fg, bold=True)
         s.arrow(prev_x, by + bh / 2, bx - bw / 2 - 6, by + bh / 2, th.fg, 2)
         prev_x = bx + bw / 2 + 6
     s.arrow(prev_x, by + bh / 2, 862, by + bh / 2, th.accent, 2.4)
-    s.text(796, by + bh / 2 + 34, "Pa per", 20, th.accent, mono=True)
-    s.text(796, by + bh / 2 + 58, "digital unit", 20, th.accent, mono=True)
+    s.text(796, by + bh / 2 + 34, "Pa per", 17, th.accent, mono=True)
+    s.text(796, by + bh / 2 + 58, "digital unit", 17, th.accent, mono=True)
 
-    # Stability annotation, clearly separated below the chain
-    s.rect(250, 340, 560, 96, "none", th.secondary, rx=12, dash="6,5")
-    s.text(530, 376, "Stability: |max − mean| and |min − mean| ≤ 0.07 dB", 22, th.secondary, bold=True)
-    s.text(530, 408, "(IEC 60942:2017 Table 2, class 1) — else CalibrationWarning", 20, th.fg)
+    # Stability annotation, clearly separated below the chain. The box is
+    # sized on the Spanish tolerance line, which sets six vertical bars, a
+    # minus and a ≤ and so runs wider than its English twin.
+    s.rect(220, 340, 620, 96, "none", th.secondary, rx=12, dash="6,5")
+    s.text(530, 376, "Stability: |max − mean| and |min − mean| ≤ 0.07 dB", 19, th.secondary, bold=True)
+    s.text(530, 408, "(IEC 60942:2017 Table 2, class 1) — else CalibrationWarning", 17, th.fg)
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +89,7 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     while x < cx + half + wall - 6:
         s.line(x, cav_top - 32, x + 12, cav_top - 54, th.muted, 0.9)
         x += 12
-    s.text(cx, cav_top - 70, "Sound calibrator (class 1)", 20, th.fg, bold=True)
+    s.text(cx, cav_top - 70, "Sound calibrator (class 1)", 17, th.fg, bold=True)
 
     # Driver radiating down into the cavity.
     s.rect(cx - 40, cav_top - 28, 80, 14, th.primary, th.fg, sw=1.4)
@@ -95,8 +97,8 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
         s.path(f"M {cx - r:.0f} {cav_top + 4:.0f} Q {cx:.0f} "
                f"{cav_top + 4 + r * 0.42:.0f} {cx + r:.0f} {cav_top + 4:.0f}",
                stroke=th.accent, sw=1.4)
-    s.text(cx, cav_top + 56, "94.0 dB", 21, th.secondary, bold=True, mono=True)
-    s.text(cx, cav_top + 80, "1 kHz", 18, th.muted, mono=True)
+    s.text(cx, cav_top + 56, "94.0 dB", 18, th.secondary, bold=True, mono=True)
+    s.text(cx, cav_top + 80, "1 kHz", 15, th.muted, mono=True)
 
     # -- Effective load volume: cavity floor is the diaphragm ---------------
     s.add(f'<rect x="{cx - half}" y="{dia_y}" width="{2 * half}" '
@@ -108,64 +110,74 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     s.rect(cx - half, dia_y, 2 * half, 7, th.fg, rx=2)          # diaphragm
     s.rect(cx - half, ref_y, 2 * half, 132, th.panel, th.primary, rx=6, sw=2)
     s.line(cx - half - wall, ref_y, cx + half + wall, ref_y, th.secondary, 2.6)
-    s.text(cx, ref_y + 52, "1/2 in capsule", 19, th.fg, bold=True)
-    s.text(cx, ref_y + 76, "+ preamplifier", 19, th.muted)
+    s.text(cx, ref_y + 52, "1/2 in capsule", 16, th.fg, bold=True)
+    s.text(cx, ref_y + 76, "+ preamplifier", 16, th.muted)
     s.line(cx, ref_y + 132, cx, 470, th.fg, 2.2)
-    s.dim(cx - half, ref_y + 104, cx + half, ref_y + 104, "12.7 mm", size=17)
+    s.dim(cx - half, ref_y + 104, cx + half, ref_y + 104, "12.7 mm", size=15)
 
     # Annotations on the left.
     s.line(cx - half - wall - 6, ref_y, 214, ref_y, th.secondary, 1.3,
            dash="7,4,2,4")
-    s.text(210, ref_y - 8, "reference plane (3.12)", 17, th.secondary,
-           bold=True, anchor="end")
+    s.text(210, ref_y - 28, "reference plane", 15, th.secondary, bold=True,
+           anchor="end")
+    s.text(210, ref_y - 8, "(3.12)", 15, th.secondary, anchor="end")
     s.arrow(216, dia_y + 26, cx - half - 6, dia_y + 22, th.accent, 1.6)
-    s.text(212, dia_y + 10, "effective load", 17, th.accent, bold=True,
+    # Two lines each, and the two blocks stack in the same 212 px column:
+    # the green one sits above its own arrow so the red one keeps the
+    # baseline pair it needs. The Spanish "plano de referencia (3.12)" is
+    # 220 px on one line, which is wider than the column, so both are set
+    # broken and both need the room.
+    s.text(212, dia_y - 10, "effective load", 15, th.accent, bold=True,
            anchor="end")
-    s.text(212, dia_y + 32, "volume (3.13)", 17, th.accent, anchor="end")
-    s.text(212, ref_y + 30, "the generated level moves", 16, th.muted,
+    s.text(212, dia_y + 12, "volume (3.13)", 15, th.accent, anchor="end")
+    s.text(212, ref_y + 30, "the generated level shifts", 14, th.muted,
            anchor="end")
-    s.text(212, ref_y + 50, "with that volume (6.3 k)", 16, th.muted,
+    s.text(212, ref_y + 50, "with that volume (6.3 k)", 14, th.muted,
            anchor="end")
 
     # -- Adaptor inset ------------------------------------------------------
     s.rect(468, 104, 160, 214, "none", th.fg, rx=10, sw=1.6, dash="6,5")
-    s.text(548, 132, "1/4 in capsule", 18, th.fg, bold=True)
+    s.text(548, 132, "1/4 in capsule", 15, th.fg, bold=True)
     ax0, aq = 548.0, 6.35 / 2 * scale
     s.rect(ax0 - 30, 150, 60, 24, th.panel, th.fg, sw=1.6)     # adaptor sleeve
     s.rect(ax0 - aq, 174, 2 * aq, 66, th.panel, th.primary, rx=3, sw=1.8)
     s.line(ax0 - 30, 150, ax0 + 30, 150, th.secondary, 2.2)
-    s.text(548, 266, "the adaptor is part of", 15, th.fg)
-    s.text(548, 288, "the calibrator (5.1.1)", 15, th.fg)
+    s.text(548, 266, "the adaptor is part of", 13, th.fg)
+    s.text(548, 288, "the calibrator (5.1.1)", 13, th.fg)
 
     # -- Windscreen, off to one side ---------------------------------------
-    s.circle(548, 386, 28, th.panel, th.muted, sw=2)
+    # Set left of the panel it would otherwise reach: "la verificación,
+    # puesta al medir" is 201 px against the 176 of its English twin.
+    s.circle(529, 386, 28, th.panel, th.muted, sw=2)
     for k in range(-2, 3):
-        s.line(524, 386 + k * 10, 572, 386 + k * 10, th.muted, 0.9)
-    s.text(548, 436, "windscreen: off for the", 15, th.muted)
-    s.text(548, 456, "check, back on to measure", 15, th.muted)
+        s.line(505, 386 + k * 10, 553, 386 + k * 10, th.muted, 0.9)
+    s.text(529, 436, "windscreen: off for the", 13, th.muted)
+    s.text(529, 456, "check, back on to measure", 13, th.muted)
 
     # -- Right panel: the background check ---------------------------------
-    s.rect(650, 104, 224, 340, "none", th.primary, rx=12, sw=1.8)
-    s.text(762, 134, "Before switching it on", 19, th.primary, bold=True)
-    s.rect(736, 158, 56, 52, th.panel, th.fg, rx=6, sw=1.8)
-    s.rect(750, 210, 28, 62, th.panel, th.primary, rx=4, sw=1.8)
-    s.text(764, 190, "OFF", 17, th.muted, bold=True, mono=True)
+    # 240 px wide on "leer ≥ 30 dB por debajo del", 216 px against the 185
+    # of its English twin.
+    s.rect(636, 104, 240, 340, "none", th.primary, rx=12, sw=1.8)
+    s.text(756, 134, "Before switching it on", 16, th.primary, bold=True)
+    s.rect(730, 158, 56, 52, th.panel, th.fg, rx=6, sw=1.8)
+    s.rect(744, 210, 28, 62, th.panel, th.primary, rx=4, sw=1.8)
+    s.text(758, 190, "OFF", 15, th.muted, bold=True, mono=True)
     for r in (26, 40):
-        s.path(f"M {682 + r * 0.2:.0f} {224 - r * 0.5:.0f} A {r} {r} 0 0 1 "
-               f"{682 + r * 0.5:.0f} {224 + r * 0.3:.0f}", stroke=th.secondary,
+        s.path(f"M {676 + r * 0.2:.0f} {224 - r * 0.5:.0f} A {r} {r} 0 0 1 "
+               f"{676 + r * 0.5:.0f} {224 + r * 0.3:.0f}", stroke=th.secondary,
                sw=1.5)
-    s.arrow(700, 232, 730, 240, th.secondary, 1.6)
-    s.text(694, 282, "source in use", 14, th.secondary)
-    s.text(762, 324, "the coupled capsule must", 16, th.fg)
-    s.text(762, 346, "read ≥ 30 dB below the", 16, th.fg, bold=True)
-    s.text(762, 368, "calibrator level: under 64 dB", 16, th.fg)
-    s.text(762, 390, "for a 94 dB calibrator", 16, th.fg)
-    s.text(762, 418, "(B.4.2; 40 dB in A.5.3)", 16, th.muted)
+    s.arrow(694, 232, 724, 240, th.secondary, 1.6)
+    s.text(698, 282, "source in use", 12, th.secondary)
+    s.text(756, 324, "the coupled capsule must", 14, th.fg)
+    s.text(756, 346, "read ≥ 30 dB below the", 14, th.fg, bold=True)
+    s.text(756, 368, "calibrator level: under 64 dB", 14, th.fg)
+    s.text(756, 390, "for a 94 dB calibrator", 14, th.fg)
+    s.text(756, 418, "(B.4.2; 40 dB in A.5.3)", 14, th.muted)
 
-    s.text(450, 528, "The specified level is the level at the diaphragm of the "
-           "inserted microphone (5.3.1.2), and it holds for", 18, th.fg)
+    s.text(450, 528, "The specified level is the level at the diaphragm of "
+                     "the inserted microphone (5.3.1.2), and holds for", 15, th.fg)
     s.text(450, 552, "the microphone models and configurations listed in the "
-           "manual (5.3.1.3, 6.3 a) — IEC 60942:2017", 18, th.muted)
+           "manual (5.3.1.3, 6.3 a) — IEC 60942:2017", 15, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -187,11 +199,11 @@ def _d_signal_chain(s: SVG, th: Theme) -> None:
     y = 170.0
     for i, (title, sub, color) in enumerate(stages):
         s.rect(x, y, bw, bh, th.panel, color, rx=12, sw=2)
-        s.text(x + bw / 2, y + 40, title, 22, th.fg, bold=True)
+        s.text(x + bw / 2, y + 40, title, 19, th.fg, bold=True)
         # Mono is the code voice: it styles the literal stage tags, while a
         # sub carrying $...$ mathematics composes in the text face (mono
         # plus markup is refused by the canvas).
-        s.text(x + bw / 2, y + 68, sub, 19, color, mono="$" not in sub)
+        s.text(x + bw / 2, y + 68, sub, 16, color, mono="$" not in sub)
         if i < len(stages) - 1:
             s.arrow(x + bw + 1, y + bh / 2, x + bw + gap - 2, y + bh / 2, th.fg, 2)
         x += bw + gap
@@ -204,8 +216,8 @@ def _d_signal_chain(s: SVG, th: Theme) -> None:
 def _d_multirate(s: SVG, th: Theme) -> None:
     # Input on the left
     s.rect(36, 150, 136, 70, th.panel, th.fg, rx=10, sw=2)
-    s.text(104, 180, "Signal", 22, th.fg, bold=True)
-    s.text(104, 205, "$f_s$ = 48 kHz", 18, th.muted)
+    s.text(104, 180, "Signal", 19, th.fg, bold=True)
+    s.text(104, 205, "$f_s$ = 48 kHz", 15, th.muted)
 
     rows = [
         (120.0, "16 kHz band", "$f_s$", "no decimation", th.secondary),
@@ -217,18 +229,18 @@ def _d_multirate(s: SVG, th: Theme) -> None:
         if "no" not in eff:
             s.arrow(172, 185, 240, y + 35, th.fg, 1.6)
             s.rect(250, y, 150, 70, th.panel, th.muted, rx=10, sw=1.6)
-            s.text(325, y + 30, "Anti-alias", 20, th.fg)
-            s.text(325, y + 54, "LPF + \u2193$M$", 18, th.muted)
+            s.text(325, y + 30, "Anti-alias", 17, th.fg)
+            s.text(325, y + 54, "LPF + \u2193$M$", 15, th.muted)
             s.arrow(400, y + 35, 448, y + 35, th.fg, 1.6)
         else:
             s.arrow(172, 185, 448, y + 35, th.fg, 1.6)
         s.rect(bx, y, 190, 70, th.panel, color, rx=10, sw=2)
-        s.text(bx + 95, y + 30, band, 20, th.fg, bold=True)
-        s.text(bx + 95, y + 54, f"SOS @ {rate}", 18, color)
-        s.text(660, y + 40, eff, 18, th.muted, "start", mono=True)
+        s.text(bx + 95, y + 30, band, 17, th.fg, bold=True)
+        s.text(bx + 95, y + 54, f"SOS @ {rate}", 15, color)
+        s.text(660, y + 40, eff, 15, th.muted, "start", mono=True)
 
-    s.text(450, 480, "Low bands are filtered at a decimated rate: the relative", 20, th.fg)
-    s.text(450, 508, "bandwidth stays wide, so the SOS stays numerically healthy.", 20, th.fg)
+    s.text(450, 480, "Low bands are filtered at a decimated rate: the relative", 17, th.fg)
+    s.text(450, 508, "bandwidth stays wide, so the SOS stays numerically healthy.", 17, th.fg)
 
 
 def _d_uncertainty(s: SVG, th: Theme) -> None:
@@ -242,10 +254,10 @@ def _d_uncertainty(s: SVG, th: Theme) -> None:
     cx = 450.0
     iw, ih = 560.0, 62.0
     s.rect(cx - iw / 2, 56, iw, ih, th.panel, th.fg, rx=10, sw=2)
-    s.text(cx, 84, "Measurement model  $y = f(x_1, …, x_N)$", 20, th.fg,
+    s.text(cx, 84, "Measurement model  $y = f(x_1, …, x_N)$", 17, th.fg,
            "middle", bold=True)
     s.text(cx, 106, "input estimates $x_i$ with standard uncertainties $u(x_i)$",
-           15, th.muted, "middle")
+           13, th.muted, "middle")
 
     lxc, rxc = 232.0, 668.0
     s.arrow(cx, 118, lxc, 158, th.fg, 1.8)
@@ -255,9 +267,9 @@ def _d_uncertainty(s: SVG, th: Theme) -> None:
 
     def _step(cxx: float, y: float, l1: str, l2: str, color: str) -> None:
         s.rect(cxx - bw / 2, y, bw, bh, th.panel, color, rx=10, sw=2)
-        s.text(cxx, y + 27, l1, 18, th.fg, "middle", bold=True)
+        s.text(cxx, y + 27, l1, 15, th.fg, "middle", bold=True)
         if l2:
-            s.text(cxx, y + 48, l2, 14, th.muted, "middle")
+            s.text(cxx, y + 48, l2, 12, th.muted, "middle")
 
     # --- Left lane: GUM law of propagation (clause 5) -----------------------
     _step(lxc, 158, "Law of propagation  (GUM 5)",
@@ -270,8 +282,8 @@ def _d_uncertainty(s: SVG, th: Theme) -> None:
     s.arrow(lxc, 312, lxc, 342, th.fg, 1.8)
     s.arrow(lxc, 404, lxc, 434, th.fg, 1.8)
     s.rect(lxc - bw / 2, 434, bw, 58, "none", th.primary, rx=10, sw=2.4)
-    s.text(lxc, 462, "$U = k · u_c$", 22, th.fg, "middle", bold=True)
-    s.text(lxc, 482, "$k = t_{p}(v_{eff})$   (clause 6)", 14, th.muted, "middle")
+    s.text(lxc, 462, "$U = k · u_c$", 19, th.fg, "middle", bold=True)
+    s.text(lxc, 482, "$k = t_{p}(v_{eff})$   (clause 6)", 12, th.muted, "middle")
 
     # --- Right lane: Monte Carlo (Supplement 1, clause 7) -------------------
     _step(rxc, 158, "Monte Carlo  (Suppl. 1, 7)",
@@ -284,8 +296,8 @@ def _d_uncertainty(s: SVG, th: Theme) -> None:
     s.arrow(rxc, 312, rxc, 342, th.fg, 1.8)
     s.arrow(rxc, 404, rxc, 434, th.fg, 1.8)
     s.rect(rxc - bw / 2, 434, bw, 58, "none", th.secondary, rx=10, sw=2.4)
-    s.text(rxc, 462, "coverage interval", 22, th.fg, "middle", bold=True)
-    s.text(rxc, 482, "$[y_{low}, y_{high}]$   (clause 7.7)", 14, th.muted, "middle")
+    s.text(rxc, 462, "coverage interval", 19, th.fg, "middle", bold=True)
+    s.text(rxc, 482, "$[y_{low}, y_{high}]$   (clause 7.7)", 12, th.muted, "middle")
 
 
 def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
@@ -302,14 +314,14 @@ def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
 
     # -- Facade at the right of the scene ----------------------------------
     s.rect(496, 168, 26, gy - 168, th.panel, th.fg, sw=2)
-    s.text(490, 200, "facade", 15, th.muted, anchor="end")
+    s.text(490, 200, "facade", 13, th.muted, anchor="end")
 
     # -- Source ------------------------------------------------------------
     s.rect(44, 372, 42, 52, th.panel, th.primary, rx=6, sw=2)
     s.circle(65, 391, 9, th.primary)
     s.circle(65, 391, 3.5, th.bg)
     s.circle(65, 411, 5.5, th.primary)
-    s.text(65, 362, "source", 15, th.fg, bold=True)
+    s.text(65, 362, "source", 13, th.fg, bold=True)
     for r in (20, 32, 44):
         s.path(f"M {90 + r * 0.30:.0f} {398 - r * 0.55:.0f} "
                f"A {r} {r} 0 0 1 {90 + r * 0.55:.0f} {398 + r * 0.30:.0f}",
@@ -319,10 +331,10 @@ def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
     mic_x, mic_y = 256.0, gy - 1.5 * scale
     s.mic(mic_x, mic_y, gy, 1.1)
     s.rect(mic_x + 16, 372, 48, 64, th.panel, th.primary, rx=6, sw=1.8)
-    s.text(mic_x + 40, 410, "SLM", 15, th.fg, bold=True, mono=True)
-    s.dim(mic_x - 40, mic_y, mic_x - 40, gy, "1.5 m", size=15)
+    s.text(mic_x + 40, 410, "SLM", 13, th.fg, bold=True, mono=True)
+    s.dim(mic_x - 40, mic_y, mic_x - 40, gy, "1.5 m", size=13)
     s.line(mic_x - 40, mic_y, mic_x - 6, mic_y, th.muted, 0.9, dash="3,3")
-    s.dim(mic_x, gy + 40, 496, gy + 40, "4 m", size=15)
+    s.dim(mic_x, gy + 40, 496, gy + 40, "4 m", size=13)
     s.line(mic_x, gy, mic_x, gy + 44, th.muted, 0.9, dash="3,3")
     s.line(496, gy, 496, gy + 44, th.muted, 0.9, dash="3,3")
 
@@ -332,17 +344,17 @@ def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
         s.line(mic_x + dx, mic_y + 7, mic_x + dx, gy, th.secondary, 1.1,
                dash="5,4")
     s.dim(mic_x - 2 * scale, mic_y - 36, mic_x + 2 * scale, mic_y - 36,
-          "3 positions, 2 m apart", size=15)
+          "3 positions, 2 m apart", size=13)
 
     # -- Calibrator lying beside the meter ---------------------------------
     s.rect(340, gy - 52, 22, 48, th.panel, th.secondary, rx=5, sw=1.8)
-    s.text(351, 380, "calibrator", 15, th.secondary)
+    s.text(351, 380, "calibrator", 13, th.secondary)
 
     # -- Weather station, high on the facade side --------------------------
     s.rect(300, 104, 154, 74, th.panel, th.fg, rx=8, sw=1.6)
-    s.text(377, 128, "weather", 16, th.fg, bold=True)
-    s.text(377, 150, "3 m/s  12 °C", 14, th.muted, mono=True)
-    s.text(377, 170, "68 % RH", 14, th.muted, mono=True)
+    s.text(377, 128, "weather", 14, th.fg, bold=True)
+    s.text(377, 150, "3 m/s  12 °C", 12, th.muted, mono=True)
+    s.text(377, 170, "68 % RH", 12, th.muted, mono=True)
 
     # -- Budget table on the right, rows in the order the leaders run ------
     bx, by, bw = 552.0, 96.0, 322.0
@@ -357,23 +369,23 @@ def _d_uncertainty_sources(s: SVG, th: Theme) -> None:
          th.secondary, (362.0, gy - 30)),
     )
     s.rect(bx, by, bw, 252, "none", th.fg, rx=10, sw=1.8)
-    s.text(bx + bw / 2, by - 14, "The budget it feeds", 19, th.fg, bold=True)
+    s.text(bx + bw / 2, by - 14, "The budget it feeds", 16, th.fg, bold=True)
     for i, (name, kind, color, (from_x, from_y)) in enumerate(rows):
         ry = by + 26 + i * 60
         if i:
             s.line(bx + 12, ry - 18, bx + bw - 12, ry - 18, th.muted, 0.8)
         s.circle(bx + 20, ry + 4, 5, color)
-        s.text(bx + 34, ry + 10, name, 17, th.fg, anchor="start", bold=True)
-        s.text(bx + 34, ry + 32, kind, 14, th.muted, anchor="start")
+        s.text(bx + 34, ry + 10, name, 15, th.fg, anchor="start", bold=True)
+        s.text(bx + 34, ry + 32, kind, 12, th.muted, anchor="start")
         s.line(from_x, from_y, bx - 6, ry + 4, color, 1.0, dash="4,4")
 
     s.text(bx + bw / 2, by + 292, "one calibrator for two channels makes their",
-           15, th.secondary)
+           13, th.secondary)
     s.text(bx + bw / 2, by + 312, "calibration terms correlated, not two rows",
-           15, th.secondary)
+           13, th.secondary)
 
-    s.text(450, 552, "Budgets fail by omission, not by arithmetic: every row "
-           "here is a piece of hardware or a decision about geometry", 17,
+    s.text(450, 552, "Budgets fail by omission, not arithmetic: every row is "
+                     "a piece of hardware or a decision about geometry", 15,
            th.muted)
 
 
@@ -382,11 +394,11 @@ def _d_time_weighting(s: SVG, th: Theme) -> None:
     # The decibel stage spells out the logarithm and is the widest title of the
     # chain, so it takes a smaller face to keep the padding inside its box.
     stages = [
-        ("$p(t)$", "band signal", th.fg, 21),
-        ("$( · )^2$", "square", th.primary, 21),
-        ("one-pole RC", "time constant $τ$", th.primary, 21),
-        ("$10·log_{10}(·/p_0^2)$", "to decibels", th.accent, 18),
-        ("$L_{τ}(t)$", "time-weighted level", th.secondary, 21),
+        ("$p(t)$", "band signal", th.fg, 18),
+        ("$( · )^2$", "square", th.primary, 18),
+        ("one-pole RC", "time constant $τ$", th.primary, 18),
+        ("$10·log_{10}(·/p_0^2)$", "to decibels", th.accent, 15),
+        ("$L_{τ}(t)$", "time-weighted level", th.secondary, 18),
     ]
     bw, bh, gap = 150.0, 90.0, 12.0
     total = len(stages) * bw + (len(stages) - 1) * gap
@@ -397,7 +409,7 @@ def _d_time_weighting(s: SVG, th: Theme) -> None:
         fill = "none" if i in (0, last) else th.panel
         s.rect(x, y, bw, bh, fill, color, rx=12, sw=2.2)
         s.text(x + bw / 2, y + 38, title, size, th.fg, "middle", bold=True)
-        s.text(x + bw / 2, y + 64, sub, 14, color, "middle")
+        s.text(x + bw / 2, y + 64, sub, 12, color, "middle")
         if i < last:
             s.arrow(x + bw + 1, y + bh / 2, x + bw + gap - 2, y + bh / 2, th.fg, 2)
         x += bw + gap
@@ -408,9 +420,9 @@ def _d_time_weighting(s: SVG, th: Theme) -> None:
     # stays plain until that family is adjudicated.
     s.rect(130, 246, 640, 70, th.panel, th.muted, rx=10, sw=1.6)
     s.text(450, 275, "y[n] = α·x²[n] + (1 − α)·y[n−1],   α = 1 − e^(−1/(fs·τ))",
-           18, th.fg, "middle", bold=True, mono=True)
+           15, th.fg, "middle", bold=True, mono=True)
     s.text(450, 299, "a first-order low-pass on the squared signal → the mean-square "
-           "envelope", 14, th.muted, "middle")
+           "envelope", 12, th.muted, "middle")
 
     # The three standardized time constants.
     chips = [
@@ -422,8 +434,8 @@ def _d_time_weighting(s: SVG, th: Theme) -> None:
     cx = (900 - (len(chips) * cw + (len(chips) - 1) * cgap)) / 2
     for title, sub, color in chips:
         s.rect(cx, 350, cw, 74, "none", color, rx=10, sw=2.2)
-        s.text(cx + cw / 2, 380, title, 18, th.fg, "middle", bold=True)
-        s.text(cx + cw / 2, 404, sub, 14, th.muted, "middle")
+        s.text(cx + cw / 2, 380, title, 15, th.fg, "middle", bold=True)
+        s.text(cx + cw / 2, 404, sub, 12, th.muted, "middle")
         cx += cw + cgap
 
 
@@ -447,7 +459,7 @@ def _d_block_processing(s: SVG, th: Theme) -> None:
                 pts.append((x0 + (k + frac) * blk_w, gy - amp * v))
             d = "M " + " L ".join(f"{px:.1f} {py:.1f}" for px, py in pts)
             s.path(d, stroke=color, sw=2.6)
-            s.text(x0 + (k + 0.5) * blk_w, gy + 30, f"block {k + 1}", 13,
+            s.text(x0 + (k + 0.5) * blk_w, gy + 30, f"block {k + 1}", 11,
                    th.muted, "middle")
         if reset:
             # Mark the discontinuity where each block restarts from rest.
@@ -460,18 +472,18 @@ def _d_block_processing(s: SVG, th: Theme) -> None:
             for k in range(1, nblk):
                 bx = x0 + k * blk_w
                 s.rect(bx - 27, gy - amp - 40, 54, 22, th.bg, color, rx=6, sw=1.4)
-                s.text(bx, gy - amp - 25, "y[-1]", 12, th.fg, "middle", mono=True)
+                s.text(bx, gy - amp - 25, "y[-1]", 10, th.fg, "middle", mono=True)
 
-    s.text(450, 62, "State carried across blocks — TimeWeighting.process()", 19,
+    s.text(450, 62, "State carried across blocks — TimeWeighting.process()", 16,
            th.fg, "middle", bold=True)
     s.text(450, 84, "y[-1] (or the sosfilt zi vector) seeds the next block → identical "
-           "to one continuous call", 13, th.muted, "middle")
+           "to one continuous call", 11, th.muted, "middle")
     _lane(200.0, reset=False, color=th.primary)
 
-    s.text(450, 300, "State reset each block — reset() or a fresh call", 19,
+    s.text(450, 300, "State reset each block — reset() or a fresh call", 16,
            th.fg, "middle", bold=True)
     s.text(450, 322, "every block restarts from rest → spurious discontinuities at "
-           "the seams", 13, th.muted, "middle")
+           "the seams", 11, th.muted, "middle")
     _lane(430.0, reset=True, color=th.secondary)
 
 
@@ -486,24 +498,24 @@ def _d_multichannel(s: SVG, th: Theme) -> None:
 
     # 1-D lane.
     _grid(64, 120, 1, 8, th.primary)
-    s.text(64 + 4 * cell, 108, "1-D:  (samples,)", 15, th.fg, "middle", bold=True)
+    s.text(64 + 4 * cell, 108, "1-D:  (samples,)", 13, th.fg, "middle", bold=True)
     s.rect(610, 120, cell, cell, "none", th.accent, sw=2)
-    s.text(610 + cell / 2, 108, "scalar", 15, th.fg, "middle", bold=True)
+    s.text(610 + cell / 2, 108, "scalar", 13, th.fg, "middle", bold=True)
 
     # 2-D lane.
     _grid(64, 250, 3, 8, th.primary)
-    s.text(64 + 4 * cell, 238, "2-D:  (channels, samples)", 15, th.fg, "middle",
+    s.text(64 + 4 * cell, 238, "2-D:  (channels, samples)", 13, th.fg, "middle",
            bold=True)
     for r in range(3):
         s.rect(610, 250 + r * cell, cell, cell, "none", th.accent, sw=2)
-    s.text(610 + cell / 2, 238, "(channels,)", 15, th.fg, "middle", bold=True)
+    s.text(610 + cell / 2, 238, "(channels,)", 13, th.fg, "middle", bold=True)
 
     # Shared processing box.
     s.rect(360, 96, 190, 200, th.panel, th.fg, rx=12, sw=2)
-    s.text(455, 178, "reduce along", 17, th.fg, "middle", bold=True)
-    s.text(455, 202, "axis = −1  (time)", 17, th.primary, "middle", bold=True, mono=True)
-    s.text(455, 236, "the channel axis 0", 14, th.muted, "middle")
-    s.text(455, 256, "rides through untouched", 14, th.muted, "middle")
+    s.text(455, 178, "reduce along", 15, th.fg, "middle", bold=True)
+    s.text(455, 202, "axis = −1  (time)", 15, th.primary, "middle", bold=True, mono=True)
+    s.text(455, 236, "the channel axis 0", 12, th.muted, "middle")
+    s.text(455, 256, "rides through untouched", 12, th.muted, "middle")
 
     s.arrow(64 + 8 * cell + 4, 131, 358, 150, th.fg, 1.6)
     s.arrow(64 + 8 * cell + 4, 283, 358, 244, th.fg, 1.6)
@@ -511,9 +523,9 @@ def _d_multichannel(s: SVG, th: Theme) -> None:
     s.arrow(552, 244, 606, 283, th.fg, 1.6)
 
     s.text(450, 350, "A mono call returns a scalar; a $C$-channel call returns $C$ results.",
-           15, th.fg, "middle")
+           13, th.fg, "middle")
     s.text(450, 374, "Band metrics widen the reduced axis instead: (…, bands).",
-           14, th.muted, "middle")
+           12, th.muted, "middle")
 
 
 # ISO 226:2023 Table 1 (p. 4): frequency Hz -> (alpha_f, L_U dB, T_f dB), the
@@ -578,8 +590,8 @@ def _d_equal_loudness_weighting(s: SVG, th: Theme) -> None:
         for f, lab in ((20.0, "20"), (100.0, "100"), (1000.0, "1k"), (10000.0, "10k")):
             x = fx(f)
             s.line(x, by1, x, by1 + 5, th.muted, 1.2)
-            s.text(x, by1 + 21, lab, 13, th.muted, "middle")
-        s.text((bx0 + bx1) / 2, by1 + 42, "Frequency [Hz]", 14, th.fg, "middle")
+            s.text(x, by1 + 21, lab, 11, th.muted, "middle")
+        s.text((bx0 + bx1) / 2, by1 + 42, "Frequency [Hz]", 12, th.fg, "middle")
 
     # --- Left panel: the equal-loudness contours ----------------------------
     lx0, lx1, ly0, ly1 = 70.0, 390.0, 110.0, 430.0
@@ -588,14 +600,14 @@ def _d_equal_loudness_weighting(s: SVG, th: Theme) -> None:
     def l_fy(db: float) -> float:  # 0 dB at the bottom, 120 dB at the top
         return ly1 - db / 120.0 * (ly1 - ly0)
 
-    s.text((lx0 + lx1) / 2, 92, "Equal-loudness contours (ISO 226)", 17, th.fg,
+    s.text((lx0 + lx1) / 2, 92, "Equal-loudness contours (ISO 226)", 15, th.fg,
            "middle", bold=True)
     axes(lx0, ly0, lx1, ly1, l_fx)
     for db in (0, 40, 80, 120):
         y = l_fy(db)
         s.line(lx0 - 5, y, lx0, y, th.muted, 1.2)
-        s.text(lx0 - 9, y + 5, str(db), 13, th.muted, "end")
-    s.text(lx0 - 20, ly0 - 12, "dB SPL", 12, th.muted, "middle")
+        s.text(lx0 - 9, y + 5, str(db), 11, th.muted, "end")
+    s.text(lx0 - 20, ly0 - 12, "dB SPL", 10, th.muted, "middle")
 
     for phon in (20, 40, 60, 80):
         main = phon == 40
@@ -607,13 +619,13 @@ def _d_equal_loudness_weighting(s: SVG, th: Theme) -> None:
         # Label each contour above its 160 Hz point, where the curves spread.
         yl = l_fy(_iso226_spl(0.391, -4.6, 17.9, phon)) - 10
         if main:
-            s.text(l_fx(160.0), yl, "40 phon", 14, th.primary, "middle", bold=True)
+            s.text(l_fx(160.0), yl, "40 phon", 12, th.primary, "middle", bold=True)
         else:
-            s.text(l_fx(160.0), yl, str(phon), 12, th.muted, "middle")
+            s.text(l_fx(160.0), yl, str(phon), 10, th.muted, "middle")
 
     # --- Middle: the inversion step ------------------------------------------
-    s.text(462, 226, "invert", 16, th.fg, "middle", bold=True)
-    s.text(462, 248, "0 dB at 1 kHz", 13, th.muted, "middle")
+    s.text(462, 226, "invert", 14, th.fg, "middle", bold=True)
+    s.text(462, 248, "0 dB at 1 kHz", 11, th.muted, "middle")
     s.arrow(400, 272, 546, 272, th.fg, 2.2)
 
     # --- Right panel: inverted contour vs the A-curve ------------------------
@@ -623,14 +635,14 @@ def _d_equal_loudness_weighting(s: SVG, th: Theme) -> None:
     def r_fy(db: float) -> float:  # +10 dB at the top, -70 dB at the bottom
         return ly0 + (10.0 - db) / 80.0 * (ly1 - ly0)
 
-    s.text((rx0 + rx1) / 2, 92, "A-weighting (IEC 61672-1)", 17, th.fg,
+    s.text((rx0 + rx1) / 2, 92, "A-weighting (IEC 61672-1)", 15, th.fg,
            "middle", bold=True)
     axes(rx0, ly0, rx1, ly1, r_fx)
     for db in (0, -20, -40, -60):
         y = r_fy(db)
         s.line(rx0 - 5, y, rx0, y, th.muted, 1.2)
-        s.text(rx0 - 9, y + 5, str(db), 13, th.muted, "end")
-    s.text(rx0 - 20, ly0 - 12, "dB", 12, th.muted, "middle")
+        s.text(rx0 - 9, y + 5, str(db), 11, th.muted, "end")
+    s.text(rx0 - 20, ly0 - 12, "dB", 10, th.muted, "middle")
     s.line(rx0, r_fy(0.0), rx1, r_fy(0.0), th.muted, 0.9, dash="3,4")
 
     # Inverted 40-phon contour, relative to its 1 kHz value (dashed reference).
@@ -647,15 +659,15 @@ def _d_equal_loudness_weighting(s: SVG, th: Theme) -> None:
 
     # Legend, bottom right of the panel (the curves live top left).
     s.line(636, 386, 668, 386, th.primary, 2.8)
-    s.text(676, 391, "A-weighting (IEC 61672-1)", 13, th.fg, "start")
+    s.text(676, 391, "A-weighting (IEC 61672-1)", 11, th.fg, "start")
     s.line(636, 408, 668, 408, th.secondary, 2.0, dash="6,5")
-    s.text(676, 413, "inverted 40-phon contour", 13, th.fg, "start")
+    s.text(676, 413, "inverted 40-phon contour", 11, th.fg, "start")
 
     # --- Footer ---------------------------------------------------------------
     s.text(450, 507, "A is the 40-phon contour flipped into a realizable filter: "
-           "quiet sounds, where the ear discards bass hardest.", 14, th.fg, "middle")
+           "quiet sounds, where the ear discards bass hardest.", 12, th.fg, "middle")
     s.text(450, 529, "The match is deliberately loose (a 1930s convention, not a "
-           "loudness model); C mirrors the flatter ~100-phon contour.", 13,
+           "loudness model); C mirrors the flatter ~100-phon contour.", 11,
            th.muted, "middle")
 
 
@@ -672,15 +684,15 @@ def _d_slm_chain(s: SVG, th: Theme) -> None:
 
     # --- Acoustic calibrator, coupled onto the capsule for the level check --
     mx = 165.0
-    s.text(mx, 68.0, "Sound calibrator (class 1)", 20, th.fg, bold=True)
+    s.text(mx, 68.0, "Sound calibrator (class 1)", 17, th.fg, bold=True)
     s.rect(mx - 62, 82.0, 124, 84, th.panel, th.fg, rx=10, sw=2)
-    s.text(mx, 118.0, "94.0 dB", 26, th.secondary, bold=True, mono=True)
-    s.text(mx, 146.0, "1 kHz", 20, th.muted, mono=True)
+    s.text(mx, 118.0, "94.0 dB", 22, th.secondary, bold=True, mono=True)
+    s.text(mx, 146.0, "1 kHz", 17, th.muted, mono=True)
     s.rect(mx - 15, 166.0, 30, 12, th.fg, rx=3)            # coupler cavity
     s.arrow(mx, 184.0, mx, 236.0, th.secondary, 2.0)
-    s.text(mx - 16, 202.0, "coupled for", 15, th.muted, anchor="end",
+    s.text(mx - 16, 202.0, "coupled for", 13, th.muted, anchor="end",
            italic=True)
-    s.text(mx - 16, 222.0, "the level check", 15, th.muted, anchor="end",
+    s.text(mx - 16, 222.0, "the level check", 13, th.muted, anchor="end",
            italic=True)
 
     # --- Microphone on a stand; the windscreen is fitted for measurement ----
@@ -688,10 +700,12 @@ def _d_slm_chain(s: SVG, th: Theme) -> None:
     s.mic(mx, cap_top, gy, 1.25)
     s.ellipse(mx, cap_top + 18, 42, 42, "none", th.muted, 1.6, dash="5,4")
     s.line(mx - 30, cap_top + 49, mx - 65, cap_top + 76, th.muted, 1.0)
-    s.text(mx - 79, cap_top + 94, "Windscreen", 17, th.fg)
+    s.text(mx - 79, cap_top + 94, "Windscreen", 15, th.fg)
 
     # --- The four-stage level chain (vertical) ------------------------------
-    cx, bw, bh = 610.0, 400.0, 78.0
+    # 440 px wide, on the Spanish "Cuadrado + ponderación temporal  F / S",
+    # which is the longest stage title of the chain in either language.
+    cx, bw, bh = 610.0, 440.0, 78.0
     x0 = cx - bw / 2
     chain = [
         (96.0, "Microphone + preamplifier",
@@ -703,11 +717,11 @@ def _d_slm_chain(s: SVG, th: Theme) -> None:
     ]
     for by, l1, l2 in chain:
         s.rect(x0, by, bw, bh, th.panel, th.primary, rx=12, sw=2)
-        s.text(cx, by + 33, l1, 21, th.fg, bold=True)
-        s.text(cx, by + 59, l2, 17, th.muted)
+        s.text(cx, by + 33, l1, 18, th.fg, bold=True)
+        s.text(cx, by + 59, l2, 15, th.muted)
     s.rect(x0, 432.0, bw, bh, "none", th.accent, rx=12, sw=2.4)
-    s.text(cx, 465.0, "Display", 21, th.fg, bold=True)
-    s.text(cx, 491.0, "$L_{AF}(t)$, $L_{AS}(t)$ in dB re 20 µPa", 17, th.accent)
+    s.text(cx, 465.0, "Display", 18, th.fg, bold=True)
+    s.text(cx, 491.0, "$L_{AF}(t)$, $L_{AS}(t)$ in dB re 20 µPa", 15, th.accent)
     for y0 in (174.0, 286.0, 398.0):
         s.arrow(cx, y0, cx, y0 + 32, th.fg, 2.0)
     # Sound pressure into the front end.
@@ -725,14 +739,17 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
     def box(x0: float, x1: float, y0: float, h: float, l1: str, l2: str,
             color: str) -> None:
         s.rect(x0, y0, x1 - x0, h, th.panel, color, rx=10, sw=2)
-        s.text((x0 + x1) / 2, y0 + 30.0, l1, 18, th.fg, bold=True)
-        s.text((x0 + x1) / 2, y0 + 54.0, l2, 14, th.muted)
+        s.text((x0 + x1) / 2, y0 + 30.0, l1, 15, th.fg, bold=True)
+        s.text((x0 + x1) / 2, y0 + 54.0, l2, 12, th.muted)
 
-    box(60, 250, 68, 72.0, "Signal generator", "broadband noise or a sweep",
+    # 222 px wide, not 190: "Generador de señal" over "broadband noise or a
+    # sweep" is 199 px of heading over 198 px of caption, and the box has to
+    # hold the wider of the two languages, not the narrower.
+    box(60, 282, 68, 72.0, "Signal generator", "broadband noise or a sweep",
         th.fg)
     box(310, 460, 68, 72.0, "Power amplifier",
         "its gain is in H1", th.fg)
-    s.arrow(250.0, 104.0, 306.0, 104.0, th.fg, 2.0)
+    s.arrow(282.0, 104.0, 306.0, 104.0, th.fg, 2.0)
     s.arrow(460.0, 104.0, 496.0, 104.0, th.fg, 2.0)
 
     # Loudspeaker under test and the measurement microphone.
@@ -740,14 +757,14 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
     s.circle(522.0, 96.0, 10.0, th.primary)
     s.circle(522.0, 96.0, 4.0, th.bg)
     s.circle(522.0, 119.0, 5.5, th.primary)
-    s.text(522.0, 60.0, "Loudspeaker under test", 15, th.fg, bold=True)
+    s.text(522.0, 60.0, "Loudspeaker under test", 13, th.fg, bold=True)
     for r in (22, 38, 54):
         s.path(f"M {548 + r * 0.30:.0f} {104 - r * 0.55:.0f} "
                f"A {r} {r} 0 0 1 {548 + r * 0.55:.0f} {104 + r * 0.30:.0f}",
                stroke=th.accent, sw=1.5)
     s.rect(640, 99, 12, 10, th.fg, rx=2.5)                 # capsule
     s.rect(652, 96, 30, 16, th.primary, rx=5)              # mic body
-    s.text(680.0, 76.0, "measurement microphone", 15, th.fg, bold=True)
+    s.text(680.0, 76.0, "measurement microphone", 13, th.fg, bold=True)
     s.line(682.0, 104.0, 706.0, 104.0, th.fg, 1.8)
     s.line(706.0, 104.0, 706.0, 176.0, th.fg, 1.8)
 
@@ -777,8 +794,9 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
     s.arrow(620.0, 372.0, 636.0, 400.0, th.fg, 1.8)
 
     s.text(450.0, 528.0,
-           "trust $|H_1|$ only where $γ^2$ stays near 1: coherence dips flag noise, distortion or an unresolved delay",
-           17, th.fg, bold=True)
+           "trust $|H_1|$ only where $γ^2$ is near 1: coherence dips flag "
+           "noise, distortion or unresolved delay",
+           15, th.fg, bold=True)
 
 
 # ---------------------------------------------------------------------------
@@ -793,12 +811,12 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
 
     def tile(x: float, y: float, w: float, title: str) -> None:
         s.rect(x, y, w, 240.0, th.panel, th.fg, rx=10, sw=1.8)
-        s.text(x + w / 2, y + 26.0, title, 17, th.fg, bold=True)
+        s.text(x + w / 2, y + 26.0, title, 15, th.fg, bold=True)
 
     def spectrum_axes(x: float, y: float) -> None:
         s.line(x, y, x + 190.0, y, th.muted, 1.2)
         s.line(x, y, x, y - 58.0, th.muted, 1.2)
-        s.text(x + 190.0, y + 15.0, "$log_{10} f$", 12, th.muted, anchor="end")
+        s.text(x + 190.0, y + 15.0, "$log_{10} f$", 10, th.muted, anchor="end")
 
     # --- white noise -------------------------------------------------------
     tile(55, 62, 250, "White noise")
@@ -810,8 +828,8 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
     s.path(d, stroke=th.primary, sw=1.3)
     spectrum_axes(85.0, 268.0)
     s.line(90.0, 226.0, 270.0, 226.0, th.accent, 2.2)
-    s.text(180.0, 250.0, "flat PSD: 0 dB/octave", 14, th.fg)
-    s.text(180.0, 294.0, "equal power per hertz", 13, th.muted)
+    s.text(180.0, 250.0, "flat PSD: 0 dB/octave", 12, th.fg)
+    s.text(180.0, 294.0, "equal power per hertz", 11, th.muted)
 
     # --- pink noise --------------------------------------------------------
     tile(325, 62, 250, "Pink noise")
@@ -823,8 +841,8 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
     s.path(d, stroke=th.primary, sw=1.3)
     spectrum_axes(355.0, 268.0)
     s.line(360.0, 214.0, 540.0, 248.0, th.accent, 2.2)
-    s.text(422.0, 204.0, "−3 dB/octave PSD", 14, th.fg)
-    s.text(450.0, 294.0, "equal power per octave", 13, th.muted)
+    s.text(422.0, 204.0, "−3 dB/octave PSD", 12, th.fg)
+    s.text(450.0, 294.0, "equal power per octave", 11, th.muted)
 
     # --- MLS ---------------------------------------------------------------
     tile(595, 62, 250, "MLS")
@@ -837,27 +855,27 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
     s.path(d, stroke=th.primary, sw=1.6)
     spectrum_axes(625.0, 268.0)
     s.line(630.0, 226.0, 810.0, 226.0, th.accent, 2.2)
-    s.text(720.0, 250.0, "flat, line spectrum", 14, th.fg)
-    s.text(720.0, 294.0, "binary ±1, period $2^m − 1$ samples", 13, th.muted)
+    s.text(720.0, 250.0, "flat, line spectrum", 12, th.fg)
+    s.text(720.0, 294.0, "binary ±1, period $2^m − 1$ samples", 11, th.muted)
 
     # --- sweeps: linear vs exponential (wide tile) -------------------------
     tile(55, 318, 520, "Sweeps: linear vs exponential")
     s.line(95.0, 520.0, 545.0, 520.0, th.muted, 1.2)
     s.arrow(95.0, 520.0, 95.0, 372.0, th.muted, 1.2)
-    s.text(82.0, 372.0, "$f$", 13, th.muted)
-    s.text(548.0, 534.0, "$t$", 13, th.muted)
+    s.text(82.0, 372.0, "$f$", 11, th.muted)
+    s.text(548.0, 534.0, "$t$", 11, th.muted)
     s.line(95.0, 516.0, 540.0, 380.0, th.primary, 2.2)
-    s.text(268.0, 428.0, "linear", 14, th.primary)
+    s.text(268.0, 428.0, "linear", 12, th.primary)
     pts = [(95, 519), (206, 517), (295, 513), (362, 505), (410, 494),
            (451, 475), (473, 460), (495, 441), (518, 415), (540, 380)]
     d = "M 95 519"
     for px_, py_ in pts[1:]:
         d += f" L {px_} {py_}"
     s.path(d, stroke=th.secondary, sw=2.2)
-    s.text(438.0, 508.0, "exponential", 14, th.secondary)
+    s.text(438.0, 508.0, "exponential", 12, th.secondary)
     s.text(315.0, 548.0,
            "exponential: equal time (and energy) per octave; linear: equal time per hertz",
-           13, th.muted)
+           11, th.muted)
 
     # --- tone burst --------------------------------------------------------
     tile(595, 318, 250, "Tone burst")
@@ -867,17 +885,18 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
         d += f" L {665 + i:.0f} {440 - 42 * math.sin(2 * math.pi * i / 22):.1f}"
     s.path(d, stroke=th.primary, sw=1.6)
     s.rect(663, 394, 114, 92, "none", th.secondary, rx=4, sw=1.2, dash="5,4")
-    s.text(720.0, 508.0, "whole periods, starting at", 13, th.muted)
-    s.text(720.0, 526.0, "a zero crossing (IEC 60268-1)", 13, th.muted)
-    s.text(720.0, 548.0, "25 periods of 5 kHz = 5 ms", 12, th.fg, mono=True)
+    s.text(720.0, 508.0, "whole periods, starting at", 11, th.muted)
+    s.text(720.0, 526.0, "a zero crossing (IEC 60268-1)", 11, th.muted)
+    s.text(720.0, 548.0, "25 periods of 5 kHz = 5 ms", 10, th.fg, mono=True)
 
     # --- captions ----------------------------------------------------------
     s.text(80.0, 590.0,
-           "every stimulus is deterministic and repeatable; synchronous averaging then lowers uncorrelated noise",
-           16, th.fg, anchor="start")
+           "every stimulus is deterministic and repeatable; synchronous "
+           "averaging lowers uncorrelated noise",
+           14, th.fg, anchor="start")
     s.text(80.0, 616.0,
            "sweeps separate harmonic distortion, MLS smears it across the period, bursts probe dynamics",
-           16, th.muted, anchor="start")
+           14, th.muted, anchor="start")
 
 
 # ---------------------------------------------------------------------------
@@ -893,8 +912,8 @@ def _d_spectral_analysis(s: SVG, th: Theme) -> None:
 
     def step(y: float, l1: str, l2: str, color: str, h: float = 58.0) -> None:
         s.rect(x0, y, bw, h, th.panel, color, rx=10, sw=2)
-        s.text(cx, y + 25, l1, 17, th.fg, bold=True)
-        s.text(cx, y + 45, l2, 13, th.muted)
+        s.text(cx, y + 25, l1, 15, th.fg, bold=True)
+        s.text(cx, y + 45, l2, 11, th.muted)
 
     step(52, "Record $x(t)$ — $f_s$ = 48 kHz, 20 s of pink noise",
          "960 000 samples, calibrated end to end: pascals in, Pa²/Hz out",
@@ -906,22 +925,22 @@ def _d_spectral_analysis(s: SVG, th: Theme) -> None:
          "ENBW = 1.5 bins → resolution bandwidth $B_e = 1.5·Δf$ = 17.6 Hz",
          th.primary)
     step(310, "One-sided $|FFT|^2$ periodogram of each segment, then average",
-         "overlap correlation (Welch 1967): 467 segments → $n_d$ = 442 "
-         "effective averages", th.fg)
+         "overlap correlation (Welch 1967): 467 segments → $n_d$ = "
+         "442 effective averages", th.fg)
     s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
-    s.text(cx, 421, "$G_{xx}(f)$ with its chi-square confidence interval", 17,
+    s.text(cx, 421, "$G_{xx}(f)$ with its chi-square confidence interval", 15,
            th.fg, bold=True)
     s.text(cx, 443, "random error $ε_r = 1/√n_d$ = 4.8 %;  $2·n_d ≈ 885$ degrees "
-           "of freedom", 13, th.muted)
+           "of freedom", 11, th.muted)
     for y0, y1 in ((110, 134), (196, 220), (282, 306), (368, 392),
                    (456, 484)):
         s.arrow(cx, y0, cx, y1, th.fg, 1.8)
 
     s.rect(130, 488, 640, 72, "none", th.secondary, rx=10, sw=1.6, dash="6,5")
     s.text(cx, 517, "The trade-off: segment length buys resolution or "
-           "stability, never both", 16, th.secondary, bold=True)
+           "stability, never both", 14, th.secondary, bold=True)
     s.text(cx, 543, "longer segments → finer $B_e$ but fewer averages (larger "
-           "$ε_r$); shorter → the reverse", 13, th.fg)
+           "$ε_r$); shorter → the reverse", 11, th.fg)
 
 
 # ---------------------------------------------------------------------------
@@ -933,14 +952,14 @@ def _d_miso_coherence(s: SVG, th: Theme) -> None:
     Welch cross-spectral matrix, the conditioning and the per-source split,
     with the guide's measured numbers (ordinary 0.32 vs partial 0.00)."""
     def box(x0: float, x1: float, y0: float, h: float, l1: str, l2: str,
-            color: str, s1: int = 16, s2: int = 12) -> None:
+            color: str, s1: int = 14, s2: int = 10) -> None:
         s.rect(x0, y0, x1 - x0, h, th.panel, color, rx=10, sw=2)
         s.text((x0 + x1) / 2, y0 + 24.0, l1, s1, th.fg, bold=True)
         s.text((x0 + x1) / 2, y0 + 44.0, l2, s2, th.muted)
 
     box(60, 280, 64, 56, "Input $x_1$", "white noise", th.primary)
     box(60, 280, 168, 56, "Input $x_2 = 0.7·x_1$ + noise", "correlated with $x_1$",
-        th.primary, s1=14)
+        th.primary, s1=12)
     s.line(110, 120, 110, 168, th.muted, 1.4, dash="5,4")
 
     box(340, 540, 64, 56, "Path $H_{1}(f)$", "low-pass, 400 Hz", th.fg)
@@ -949,10 +968,10 @@ def _d_miso_coherence(s: SVG, th: Theme) -> None:
     s.arrow(280, 196, 336, 196, th.fg, 1.8)
 
     s.circle(600, 144, 16, th.panel, th.fg, 2)
-    s.text(600, 151, "+", 22, th.fg, bold=True)
+    s.text(600, 151, "+", 19, th.fg, bold=True)
     s.arrow(540, 92, 588, 134, th.fg, 1.8)
     s.arrow(540, 196, 588, 154, th.fg, 1.8)
-    s.text(600, 74, "noise $n(t)$", 13, th.muted)
+    s.text(600, 74, "noise $n(t)$", 11, th.muted)
     s.arrow(600, 82, 600, 124, th.muted, 1.4)
 
     box(660, 850, 116, 56, "Output $y(t)$", "$G_{yy}(f)$", th.secondary)
@@ -961,29 +980,29 @@ def _d_miso_coherence(s: SVG, th: Theme) -> None:
     s.arrow(755, 172, 755, 236, th.fg, 1.8)
     s.rect(90, 240, 720, 64, th.panel, th.fg, rx=10, sw=2)
     s.text(450, 265, "Welch cross-spectral matrix — $G_{xx}$ (2×2) and $G_{xy}$, "
-           "nperseg = 2048", 16, th.fg, bold=True)
+           "nperseg = 2048", 14, th.fg, bold=True)
     s.text(450, 287, "conditioning: Schur steps $G_{ij·r!}$ (Eq. 7.94), inputs "
-           "ordered by descending ordinary coherence", 13, th.muted)
+           "ordered by descending ordinary coherence", 11, th.muted)
 
     s.arrow(270, 304, 270, 340, th.fg, 1.8)
     s.arrow(630, 304, 630, 340, th.fg, 1.8)
 
     s.rect(70, 344, 370, 88, th.panel, th.primary, rx=10, sw=2)
-    s.text(255, 370, "Multiple and partial coherence", 15, th.fg, bold=True)
+    s.text(255, 370, "Multiple and partial coherence", 13, th.fg, bold=True)
     s.text(255, 392, "input 2 in the 100-300 Hz band: ordinary 0.32 → "
-           "partial 0.00", 12, th.muted)
-    s.text(255, 412, "multiple $γ^2_{y:x} = 1 − G_{nn}/G_{yy}$ ≈ 1.00 (100-300 Hz)", 12,
+           "partial 0.00", 10, th.muted)
+    s.text(255, 412, "multiple $γ^2_{y:x} = 1 − G_{nn}/G_{yy}$ ≈ 1.00 (100-300 Hz)", 10,
            th.muted)
 
     s.rect(460, 344, 370, 88, th.panel, th.accent, rx=10, sw=2)
-    s.text(645, 370, "Contribution of each source", 15, th.fg, bold=True)
-    s.text(645, 392, "$G_{vi} = γ^2_{iy·(i−1)!}·G_{yy}$ per input", 12, th.muted)
-    s.text(645, 412, "$ΣG_{vi} + G_{nn} = G_{yy}$, band by band", 12, th.muted)
+    s.text(645, 370, "Contribution of each source", 13, th.fg, bold=True)
+    s.text(645, 392, "$G_{vi} = γ^2_{iy·(i−1)!}·G_{yy}$ per input", 10, th.muted)
+    s.text(645, 412, "$ΣG_{vi} + G_{nn} = G_{yy}$, band by band", 10, th.muted)
 
     s.text(450, 482, "each conditioning step spends one average: the $i$-th "
-           "ordered input carries $n_d − (i − 1)$; here $n_d$ = 242", 14, th.fg)
+           "ordered input carries $n_d − (i − 1)$; here $n_d$ = 242", 12, th.fg)
     s.text(450, 506, "average generously before reading a small partial "
-           "coherence as zero", 13, th.muted)
+           "coherence as zero", 11, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1004,7 +1023,7 @@ def _d_time_frequency(s: SVG, th: Theme) -> None:
     )
     top, bot, w = 112.0, 392.0, 288.0
     for x0, cw, rh, header, res, verdict, ty, tth, cxx, cw2 in panels:
-        s.text(x0 + w / 2, 74, header, 17, th.fg, bold=True)
+        s.text(x0 + w / 2, 74, header, 15, th.fg, bold=True)
         # tone band (frequency stripe) and click band (time stripe)
         s.rect(x0, ty, w, tth, th.primary)
         s.rect(cxx, top, cw2, bot - top, th.secondary)
@@ -1020,17 +1039,17 @@ def _d_time_frequency(s: SVG, th: Theme) -> None:
         # axes
         s.arrow(x0, bot, x0 + w + 24, bot, th.fg, 1.6)
         s.arrow(x0, bot, x0, top - 16, th.fg, 1.6)
-        s.text(x0 + w + 30, bot + 16, "$t$", 14, th.muted)
-        s.text(x0 - 14, top - 8, "$f$", 14, th.muted)
-        s.text(x0 - 8, ty + tth / 2 + 5, "tone", 12, th.fg, anchor="end")
-        s.text(cxx + cw2 / 2, 104, "click", 12, th.fg)
-        s.text(x0 + w / 2, 426, res, 14, th.fg)
-        s.text(x0 + w / 2, 450, verdict, 13, th.muted, italic=True)
+        s.text(x0 + w + 30, bot + 16, "$t$", 12, th.muted)
+        s.text(x0 - 14, top - 8, "$f$", 12, th.muted)
+        s.text(x0 - 8, ty + tth / 2 + 5, "tone", 10, th.fg, anchor="end")
+        s.text(cxx + cw2 / 2, 104, "click", 10, th.fg)
+        s.text(x0 + w / 2, 426, res, 12, th.fg)
+        s.text(x0 + w / 2, 450, verdict, 11, th.muted, italic=True)
 
     s.text(450, 498, "each cell is one unaveraged estimate: $B_e·T_B ≈ 1$ and "
-           "$ε_r = 1$ ($n_d = 1$)", 15, th.fg, bold=True)
+           "$ε_r = 1$ ($n_d = 1$)", 13, th.fg, bold=True)
     s.text(450, 524, "the record fixes the product; nperseg only chooses how "
-           "to spend it ($f_s$ = 16 kHz here)", 14, th.muted)
+           "to spend it ($f_s$ = 16 kHz here)", 12, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1044,21 +1063,25 @@ def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
     def box(x0: float, x1: float, l1: str, l2: str, l3: str,
             color: str) -> None:
         s.rect(x0, 64, x1 - x0, 86, th.panel, color, rx=10, sw=2)
-        s.text((x0 + x1) / 2, 90, l1, 15, th.fg, bold=True)
-        s.text((x0 + x1) / 2, 112, l2, 12, th.muted)
-        s.text((x0 + x1) / 2, 132, l3, 12, th.muted)
+        s.text((x0 + x1) / 2, 90, l1, 13, th.fg, bold=True)
+        s.text((x0 + x1) / 2, 112, l2, 10, th.muted)
+        s.text((x0 + x1) / 2, 132, l3, 10, th.muted)
 
-    box(48, 238, "Signal with one echo", "$x = s(t) + a·s(t − t_0)$",
+    # The four boxes are not equal: each is its own widest line plus the
+    # same padding, so the ripply-spectrum box, which carries the longest
+    # heading in Spanish, is the widest of the row and the inverse-FFT
+    # box, whose Spanish caption is the longer one, is next.
+    box(48, 228, "Signal with one echo", "$x = s(t) + a·s(t − t_0)$",
         "$a$ = 0.5,  $t_0$ = 8 ms", th.fg)
-    box(262, 442, "Ripply spectrum $|X(f)|$", "cosine ripple of period",
+    box(252, 458, "Ripply spectrum $|X(f)|$", "cosine ripple of period",
         "$1/t_0$ = 125 Hz", th.primary)
-    box(466, 646, "Take the log: $ln |X|^2$", "the multiplicative echo",
+    box(482, 652, "Take the log: $ln |X|^2$", "the multiplicative echo",
         "becomes an additive ripple", th.primary)
-    box(670, 860, "Inverse FFT", "quefrency axis, in seconds",
+    box(676, 860, "Inverse FFT", "quefrency axis, in seconds",
         "the cepstrum", th.secondary)
-    for xa in (238.0, 442.0, 646.0):
+    for xa in (228.0, 458.0, 652.0):
         s.arrow(xa + 2, 107, xa + 22, 107, th.fg, 1.8)
-    s.arrow(765, 152, 765, 196, th.fg, 1.8)
+    s.arrow(768, 152, 768, 196, th.fg, 1.8)
 
     # Quefrency panel: source envelope, rahmonics, lifter split.
     s.rect(70, 200, 760, 240, th.panel, th.fg, rx=10, sw=1.8)
@@ -1067,41 +1090,41 @@ def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
     x_of = 110.0
     s.line(x_of, base, 790, base, th.fg, 1.6)
     s.arrow(790, base, 806, base, th.fg, 1.6)
-    s.text(800, 390, "quefrency", 13, th.muted, anchor="end")
+    s.text(800, 390, "quefrency", 11, th.muted, anchor="end")
     # source wavelet envelope below 2 ms
     s.path(f"M {x_of:.0f} {base - 76:.0f} "
            f"Q {x_of + 22:.0f} {base - 10:.0f} {x_of + 68:.0f} {base:.0f}",
            stroke=th.muted, sw=2.0)
-    s.text(170, 244, "source wavelet,", 12, th.muted)
-    s.text(170, 262, "below 2 ms", 12, th.muted)
+    s.text(170, 244, "source wavelet,", 10, th.muted)
+    s.text(170, 262, "below 2 ms", 10, th.muted)
     # first rahmonic at t0 = 8 ms, height a = 0.5 (scale 220 px per unit)
     x1 = x_of + 8 * px_ms
     s.line(x1, base, x1, base - 110, th.primary, 2.6)
     s.circle(x1, base - 110, 3.5, th.primary)
-    s.text(x1, 246, "$a$ = 0.5 at $t_0$ = 8 ms", 14, th.primary, bold=True)
+    s.text(x1, 246, "$a$ = 0.5 at $t_0$ = 8 ms", 12, th.primary, bold=True)
     # second rahmonic at 2 t0, height -a^2/2 = -0.125
     x2 = x_of + 16 * px_ms
     s.line(x2, base, x2, base + 27, th.secondary, 2.2)
     s.circle(x2, base + 27, 3.0, th.secondary)
-    s.text(x2 + 14, base + 34, "$−a^2/2$ = −0.125", 12, th.secondary,
+    s.text(x2 + 14, base + 34, "$−a^2/2$ = −0.125", 10, th.secondary,
            anchor="start")
     # lifter cutoff
     xc = x_of + 4 * px_ms
     s.line(xc, 224, xc, 414, th.accent, 1.6, dash="6,5")
-    s.text(xc, 432, "lifter cutoff 4 ms", 12, th.accent)
-    s.text(176, 218, "lowpass: envelope", 12, th.fg)
-    s.text(450, 218, "highpass: the echo ripple alone", 12, th.fg)
+    s.text(xc, 432, "lifter cutoff 4 ms", 10, th.accent)
+    s.text(176, 218, "lowpass: envelope", 10, th.fg)
+    s.text(450, 218, "highpass: the echo ripple alone", 10, th.fg)
     # the 16 ms label sits lower to clear the downward second rahmonic
     for ms, lbl, dy in ((0.0, "0", 22.0), (8.0, "8 ms", 22.0),
                         (16.0, "16 ms", 50.0)):
         xt = x_of + ms * px_ms
         s.line(xt, base, xt, base + 6, th.fg, 1.4)
-        s.text(xt, base + dy, lbl, 12, th.muted)
+        s.text(xt, base + dy, lbl, 10, th.muted)
 
     s.text(450, 478, "rahmonics at $n·t_0$ with heights $a$, $−a^2/2$, $a^3/3$, …, "
-           "whatever the source spectrum does", 15, th.fg, bold=True)
+           "whatever the source spectrum does", 13, th.fg, bold=True)
     s.text(450, 504, "the highpass ripple swings between $20·log_{10}(1 ± a)$ = +3.5 "
-           "and −6.0 dB; echo_detection reads $t_0$ and $a$ off the peak", 13,
+           "and −6.0 dB; echo_detection reads $t_0$ and $a$ off the peak", 11,
            th.muted)
 
 
@@ -1128,53 +1151,53 @@ def _d_echo_geometry(s: SVG, th: Theme) -> None:
     top = gy - 1.2 * scale
     s.rect(sx - 20, top - 22, 40, 44, th.panel, th.primary, rx=5, sw=2)
     s.circle(sx, top, 8, th.primary)
-    s.text(sx, top - 34, "source", 17, th.fg, bold=True)
+    s.text(sx, top - 34, "source", 15, th.fg, bold=True)
     s.mic(mx, top - 8, gy, 1.0)
-    s.text(mx + 30, top - 6, "microphone", 17, th.fg, bold=True, anchor="start")
+    s.text(mx + 30, top - 6, "microphone", 15, th.fg, bold=True, anchor="start")
     s.line(sx + 22, top, mx - 8, top, th.primary, 2.4)
-    s.text((sx + mx) / 2 + 28, top - 14, "$r_d$ = 1.00 m", 16, th.primary,
+    s.text((sx + mx) / 2 + 28, top - 14, "$r_d$ = 1.00 m", 14, th.primary,
            bold=True)
 
     # Image source under the floor, and the reflected path through it.
     iy = gy + 1.2 * scale
     s.circle(sx, iy, 8, "none", th.muted, 1.6)
-    s.text(sx, iy + 24, "image source", 16, th.muted)
+    s.text(sx, iy + 24, "image source", 14, th.muted)
     s.line(sx, top, sx, iy, th.muted, 1.0, dash="4,4")
     bounce_x = sx + (mx - sx) / 2.0
     s.line(sx, top, bounce_x, gy, th.secondary, 2.2)
     s.line(bounce_x, gy, mx, top - 8, th.secondary, 2.2)
     s.line(sx, iy, mx, top - 8, th.muted, 1.0, dash="4,4")
     s.circle(bounce_x, gy, 4, th.secondary)
-    s.text(bounce_x - 70, gy - 46, "$r_r$ = 2.60 m", 16, th.secondary,
+    s.text(bounce_x - 70, gy - 46, "$r_r$ = 2.60 m", 14, th.secondary,
            bold=True)
-    s.dim(mx + 46, top, mx + 46, gy, "1.20 m", size=16, label_side="right")
+    s.dim(mx + 46, top, mx + 46, gy, "1.20 m", size=14, label_side="right")
     s.line(mx, top - 8, mx + 46, top, th.muted, 0.9, dash="3,3")
-    s.dim(sx, gy + 44, mx, gy + 44, "1.00 m", size=16)
+    s.dim(sx, gy + 44, mx, gy + 44, "1.00 m", size=14)
 
     box_x = 500.0
     s.rect(box_x, 120, 356, 150, "none", th.fg, rx=10, sw=1.6)
-    s.text(box_x + 178, 150, "Floor reflection", 20, th.fg, bold=True)
+    s.text(box_x + 178, 150, "Floor reflection", 17, th.fg, bold=True)
     dd = 2.6 - 1.0
-    s.text(box_x + 178, 182, f"$Δd = r_r − r_d$ = {dd:.2f} m", 18, th.fg)
+    s.text(box_x + 178, 182, f"$Δd = r_r − r_d$ = {dd:.2f} m", 15, th.fg)
     s.text(box_x + 178, 210, f"$t_0 = Δd / c$ = {1000 * dd / c:.1f} ms",
-           18, th.secondary, bold=True)
-    s.text(box_x + 178, 240, "$a = R · r_d / r_r = 0.38 R$", 18, th.fg)
+           15, th.secondary, bold=True)
+    s.text(box_x + 178, 240, "$a = R · r_d / r_r = 0.38 R$", 15, th.fg)
 
     # ---- Panel B: the side wall that gives 8 ms ------------------------
     s.rect(box_x, 292, 356, 168, "none", th.secondary, rx=10, sw=1.6)
-    s.text(box_x + 178, 322, "The 8 ms example of this page", 20, th.secondary,
+    s.text(box_x + 178, 322, "The 8 ms example of this page", 17, th.secondary,
            bold=True)
-    s.text(box_x + 178, 352, "$Δd = c · 8 ms$ = 2.74 m", 18, th.fg)
-    s.text(box_x + 178, 380, "a side wall 1.37 m from the direct path", 17,
+    s.text(box_x + 178, 352, "$Δd = c · 8 ms$ = 2.74 m", 15, th.fg)
+    s.text(box_x + 178, 380, "a side wall 1.37 m from the direct path", 15,
            th.fg)
-    s.text(box_x + 178, 408, "$R = a · r_r / r_d = 3.74 a ≤ 1$", 18, th.fg)
-    s.text(box_x + 178, 436, "so $a > 0.27$ is not one specular reflection", 16,
+    s.text(box_x + 178, 408, "$R = a · r_r / r_d = 3.74 a ≤ 1$", 15, th.fg)
+    s.text(box_x + 178, 436, "so $a > 0.27$ is not one specular reflection", 14,
            th.muted)
 
     s.text(450, 512, "The reflection has to arrive before the record ends and "
-           "at least 10 dB above its noise floor;", 17, th.muted)
+           "at least 10 dB above its noise floor;", 15, th.muted)
     s.text(450, 534, "$c$ moves about 0.6 m/s per kelvin, so convert the delay "
-           "with the temperature you measured", 17, th.muted)
+           "with the temperature you measured", 15, th.muted)
 
 
 def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
@@ -1183,16 +1206,16 @@ def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
     noise reduction, and McFadden's 32.05-order node example."""
     import math
 
-    s.text(450, 64, "Tachometer: one trigger pulse per revolution", 16,
+    s.text(450, 64, "Tachometer: one trigger pulse per revolution", 14,
            th.fg, bold=True)
     s.line(80, 112, 840, 112, th.muted, 1.4)
     pulses = [120.0, 280.0, 440.0, 600.0, 760.0]
     for px_ in pulses:
         s.rect(px_ - 3, 86, 6, 26, th.accent, rx=1.5)
-    s.dim(280, 133, 440, 133, "$T$ = 1/32 s = 256 samples", size=14)
+    s.dim(280, 133, 440, 133, "$T$ = 1/32 s = 256 samples", size=12)
 
     s.text(450, 152, "Recording $y(t)$ at $f_s$ = 8192 Hz: the synchronous "
-           "signature buried in noise", 14, th.fg)
+           "signature buried in noise", 12, th.fg)
     d = "M 80 196"
     for i in range(1, 191):
         x = 80 + i * 4
@@ -1202,45 +1225,45 @@ def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
     s.path(d, stroke=th.primary, sw=1.2)
     for px_ in pulses:
         s.line(px_, 168, px_, 224, th.fg, 1.1, dash="4,4")
-    s.text(450, 246, "slice at every trigger", 13, th.muted)
+    s.text(450, 246, "slice at every trigger", 11, th.muted)
 
     # Stack of aligned one-period blocks
     for i in (2, 1, 0):
         s.rect(100 + 10 * i, 280 + 10 * i, 190, 54, th.panel, th.muted,
                rx=8, sw=1.4)
-    s.text(205, 302, "$N$ aligned blocks", 14, th.fg, bold=True)
-    s.text(205, 322, "one period $T$ each", 12, th.muted)
+    s.text(205, 302, "$N$ aligned blocks", 12, th.fg, bold=True)
+    s.text(205, 322, "one period $T$ each", 10, th.muted)
     s.arrow(190, 254, 195, 276, th.fg, 1.8)
 
     s.rect(360, 288, 220, 78, th.panel, th.primary, rx=10, sw=2)
-    s.text(470, 312, "Coherent average", 16, th.fg, bold=True)
-    s.text(470, 334, "$a(t) = (1/N) Σ y(t + n T)$", 13, th.primary)
-    s.text(470, 354, "$N$ = 40 here", 12, th.muted)
+    s.text(470, 312, "Coherent average", 14, th.fg, bold=True)
+    s.text(470, 334, "$a(t) = (1/N) Σ y(t + n T)$", 11, th.primary)
+    s.text(470, 354, "$N$ = 40 here", 10, th.muted)
     s.arrow(310, 322, 356, 322, th.fg, 1.8)
 
     s.rect(640, 288, 220, 78, th.panel, th.accent, rx=10, sw=2)
-    s.text(750, 312, "The periodic part survives", 14, th.fg, bold=True)
-    s.text(750, 334, "comb teeth of unit gain", 12, th.muted)
-    s.text(750, 354, "at every order $k/T$", 12, th.muted)
+    s.text(750, 312, "The periodic part survives", 12, th.fg, bold=True)
+    s.text(750, 334, "comb teeth of unit gain", 10, th.muted)
+    s.text(750, 354, "at every order $k/T$", 10, th.muted)
     s.arrow(580, 327, 636, 327, th.fg, 1.8)
 
     s.rect(100, 420, 460, 64, "none", th.accent, rx=10, sw=1.6, dash="6,5")
-    s.text(330, 446, "Asynchronous noise falls as $1/√N$", 15, th.accent,
+    s.text(330, 446, "Asynchronous noise falls as $1/√N$", 13, th.accent,
            bold=True)
     s.text(330, 470, "power $−10·log_{10} N$ = −16 dB for $N$ = 40;  amplitude gain "
-           "$√N$ = 6.3", 13, th.fg)
+           "$√N$ = 6.3", 11, th.fg)
     s.arrow(470, 366, 470, 416, th.fg, 1.6)
 
     s.rect(640, 420, 220, 64, th.panel, th.secondary, rx=10, sw=2)
-    s.text(750, 442, "Residual", 14, th.fg, bold=True)
-    s.text(750, 460, "record − tiled average:", 12, th.muted)
-    s.text(750, 476, "everything not synchronous", 12, th.muted)
+    s.text(750, 442, "Residual", 12, th.fg, bold=True)
+    s.text(750, 460, "record − tiled average:", 10, th.muted)
+    s.text(750, 476, "everything not synchronous", 10, th.muted)
     s.arrow(750, 366, 750, 416, th.fg, 1.6)
 
     s.text(450, 526, "a tone on a non-integer order is only attenuated: "
-           "choose $N$ so a comb node lands on it", 14, th.fg)
+           "choose $N$ so a comb node lands on it", 12, th.fg)
     s.text(450, 550, "McFadden's example: $N$ = 20 nulls the 32.05-order tone "
-           "(20·32.05 = 641); the habitual $N$ = 32 does not", 13, th.muted)
+           "(20·32.05 = 641); the habitual $N$ = 32 does not", 11, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1261,7 +1284,7 @@ def _d_miso_setup(s: SVG, th: Theme) -> None:
     x0, y0 = 46.0, 92.0
     room_w, room_h = 9.2 * scale, 5.2 * scale
     s.rect(x0, y0, room_w, room_h, th.panel, th.fg, rx=4, sw=2.4)
-    s.text(x0 + 12, y0 + 24, "Plant room — plan", 17, th.muted, anchor="start")
+    s.text(x0 + 12, y0 + 24, "Plant room — plan", 15, th.muted, anchor="start")
 
     # -- Machine A: a fan on resilient mounts ------------------------------
     ax, ay = x0 + 1.6 * scale, y0 + 3.4 * scale
@@ -1271,70 +1294,70 @@ def _d_miso_setup(s: SVG, th: Theme) -> None:
         a = math.radians(45 + 90 * k)
         s.line(ax, ay, ax + 22 * math.cos(a), ay + 22 * math.sin(a),
                th.primary, 1.6)
-    s.text(ax, ay - 52, "A — fan", 18, th.fg, bold=True)
+    s.text(ax, ay - 52, "A — fan", 15, th.fg, bold=True)
     for k in (-1, 1):
         s.rect(ax + k * 26 - 8, ay + 40, 16, 9, th.muted, rx=2)
     s.rect(ax + 26 - 7, ay + 26, 14, 14, th.secondary, th.fg, rx=2, sw=1.2)
-    s.text(ax + 6, ay + 74, "ref 1", 16, th.secondary, bold=True)
+    s.text(ax + 6, ay + 74, "ref 1", 14, th.secondary, bold=True)
 
     # -- Machine B: a compressor -------------------------------------------
     bx, by = ax + 3.0 * scale, ay
     s.rect(bx - 36, by - 36, 72, 72, th.bg, th.primary, rx=6, sw=2.2)
     s.rect(bx - 20, by - 16, 40, 32, th.panel, th.primary, rx=3, sw=1.4)
-    s.text(bx, by - 48, "B — compressor", 18, th.fg, bold=True)
+    s.text(bx, by - 48, "B — compressor", 15, th.fg, bold=True)
     mic2_x = bx + 36 + 0.3 * scale
     s.circle(mic2_x, by, 7, th.bg, th.secondary, 2.0)
-    s.dim(bx + 36, by + 52, mic2_x, by + 52, "0.3 m", size=15)
+    s.dim(bx + 36, by + 52, mic2_x, by + 52, "0.3 m", size=13)
     s.line(mic2_x, by + 10, mic2_x, by + 50, th.muted, 0.9, dash="3,3")
-    s.text(mic2_x + 20, by + 6, "ref 2", 16, th.secondary, bold=True,
+    s.text(mic2_x + 20, by + 6, "ref 2", 14, th.secondary, bold=True,
            anchor="start")
-    s.dim(ax, y0 + room_h - 22, bx, y0 + room_h - 22, "3.0 m", size=16)
+    s.dim(ax, y0 + room_h - 22, bx, y0 + room_h - 22, "3.0 m", size=14)
 
     # -- Receiver microphone at the operator position ----------------------
     rx_, ry = x0 + 7.6 * scale, y0 + 1.0 * scale
     s.circle(rx_, ry, 8, th.bg, th.accent, 2.4)
-    s.text(rx_, ry - 18, "receiver", 17, th.accent, bold=True)
-    s.text(rx_ - 16, ry + 6, "1.5 m high", 15, th.muted, anchor="end")
+    s.text(rx_, ry - 18, "receiver", 15, th.accent, bold=True)
+    s.text(rx_ - 16, ry + 6, "1.5 m high", 13, th.muted, anchor="end")
     s.line(ax, ay, rx_, ry, th.accent, 1.2, dash="6,5")
     s.line(bx, by, rx_, ry, th.accent, 1.2, dash="6,5")
-    s.dim(ax, ay - 74, rx_, ry - 40, "4.0 m", size=15)
+    s.dim(ax, ay - 74, rx_, ry - 40, "4.0 m", size=13)
 
     # -- The leakage that correlates the two references --------------------
     s.arrow(ax + 44, ay + 16, mic2_x - 11, by + 6, th.secondary, 1.8)
-    s.text((ax + mic2_x) / 2 + 10, ay + 40, "leakage", 15, th.secondary,
+    s.text((ax + mic2_x) / 2 + 10, ay + 40, "leakage", 13, th.secondary,
            bold=True)
 
     # -- Legend under the room ---------------------------------------------
     ly = y0 + room_h + 26
     s.circle(x0 + 8, ly - 5, 5, th.secondary)
     s.text(x0 + 22, ly, "ref 1: accelerometer stud-mounted on the fan foot",
-           16, th.fg, anchor="start")
+           14, th.fg, anchor="start")
     s.circle(x0 + 8, ly + 21, 5, th.secondary)
-    s.text(x0 + 22, ly + 26, "ref 2: microphone 0.3 m from the casing", 16,
+    s.text(x0 + 22, ly + 26, "ref 2: microphone 0.3 m from the casing", 14,
            th.fg, anchor="start")
     s.circle(x0 + 8, ly + 47, 5, th.secondary)
     s.text(x0 + 22, ly + 52, "the leakage is what correlates the two inputs",
-           16, th.secondary, anchor="start")
+           14, th.secondary, anchor="start")
 
     # -- Acquisition column -------------------------------------------------
     cx = x0 + room_w + 88
     s.rect(cx - 78, 100, 156, 172, "none", th.primary, rx=10, sw=1.8)
-    s.text(cx, 126, "One front end", 18, th.primary, bold=True)
+    s.text(cx, 126, "One front end", 15, th.primary, bold=True)
     for i, name in enumerate(("ref 1  $x_1$", "ref 2  $x_2$",
                               "receiver  $y$")):
         s.rect(cx - 62, 140 + i * 32, 124, 24, th.panel, th.fg, rx=4, sw=1.2)
-        s.text(cx, 157 + i * 32, name, 14, th.fg)
-    s.text(cx, 258, "one clock, fixed gains", 14, th.muted)
+        s.text(cx, 157 + i * 32, name, 12, th.fg)
+    s.text(cx, 258, "one clock, fixed gains", 12, th.muted)
 
     s.rect(cx - 78, 292, 156, 128, "none", th.secondary, rx=10, sw=1.8)
-    s.text(cx, 318, "Before reading", 17, th.secondary, bold=True)
-    s.text(cx, 338, "the split", 17, th.secondary, bold=True)
-    s.text(cx, 364, "coherence between", 14, th.fg)
-    s.text(cx, 382, "$x_1$ and $x_2$ > 0.9", 14, th.fg, bold=True)
-    s.text(cx, 402, "⇒ do not attribute", 14, th.fg)
+    s.text(cx, 318, "Before reading", 15, th.secondary, bold=True)
+    s.text(cx, 338, "the split", 15, th.secondary, bold=True)
+    s.text(cx, 364, "coherence between", 12, th.fg)
+    s.text(cx, 382, "$x_1$ and $x_2$ > 0.9", 12, th.fg, bold=True)
+    s.text(cx, 402, "⇒ do not attribute", 12, th.fg)
 
-    s.text(450, 552, "The conditioning separates only what the references "
-           "separate: one sensor per source, all sampled together", 17,
+    s.text(450, 552, "Conditioning separates only what the references "
+                     "separate: one sensor per source, all sampled together", 15,
            th.muted)
 
 
@@ -1351,12 +1374,16 @@ def _d_tsa_setup(s: SVG, th: Theme) -> None:
     gy = 400.0
     s.ground(gy, 40, 470)
     s.rect(70, 140, 380, gy - 140, th.panel, th.fg, rx=6, sw=2.2)
-    s.text(80, 164, "Gearbox — elevation", 17, th.muted, anchor="start")
+    s.text(80, 164, "Gearbox — elevation", 15, th.muted, anchor="start")
 
     shaft_y = 252.0
     px, pr = 214.0, 38.0
     wx, wr = 330.0, 78.0
-    for cx, r, label, dy in ((px, pr, "pinion, 37 teeth", pr + 26),
+    # The pinion's caption drops past the wheel instead of stopping beside
+    # it: at 138 px in Spanish it does not fit the 128 px between the
+    # pedestal bearing and the wheel's tooth circle, at any size the row
+    # can be set in.
+    for cx, r, label, dy in ((px, pr, "pinion, 37 teeth", 128.0),
                              (wx, wr, "wheel, 89 teeth", wr + 26)):
         s.circle(cx, shaft_y, r, th.bg, th.primary, 2.2)
         s.circle(cx, shaft_y, 6, th.fg)
@@ -1365,42 +1392,42 @@ def _d_tsa_setup(s: SVG, th: Theme) -> None:
             s.line(cx + r * math.cos(a), shaft_y + r * math.sin(a),
                    cx + (r + 7) * math.cos(a), shaft_y + (r + 7) * math.sin(a),
                    th.primary, 1.4)
-        s.text(cx, shaft_y + dy, label, 16, th.fg, bold=True)
+        s.text(cx, shaft_y + dy, label, 14, th.fg, bold=True)
 
     # Input shaft, the reflective tape and the optical tacho head.
     s.line(78, shaft_y, px, shaft_y, th.fg, 4.0)
     s.rect(150, shaft_y - 9, 12, 18, th.secondary, rx=2)
-    s.text(156, shaft_y - 18, "tape", 15, th.secondary, bold=True)
+    s.text(156, shaft_y - 18, "tape", 13, th.secondary, bold=True)
     s.rect(130, shaft_y - 86, 52, 32, th.panel, th.secondary, rx=5, sw=1.8)
-    s.text(156, shaft_y - 64, "tacho", 15, th.secondary, bold=True)
+    s.text(156, shaft_y - 64, "tacho", 13, th.secondary, bold=True)
     s.arrow(156, shaft_y - 52, 156, shaft_y - 16, th.secondary, 1.6)
-    s.dim(196, shaft_y - 52, 196, shaft_y - 14, "20 mm", size=14,
+    s.dim(196, shaft_y - 52, 196, shaft_y - 14, "20 mm", size=12,
           label_side="right")
 
     # Pedestal bearing on the input shaft, with the accelerometer on its face.
     s.rect(96, shaft_y + 10, 36, gy - shaft_y - 10, th.bg, th.fg, rx=3, sw=1.8)
-    s.text(114, gy - 12, "bearing", 14, th.muted)
+    s.text(114, gy - 12, "bearing", 12, th.muted)
     s.rect(74, shaft_y + 46, 22, 26, th.primary, th.fg, rx=3, sw=1.4)
     s.arrow(72, shaft_y + 59, 44, shaft_y + 59, th.primary, 1.8)
-    s.text(42, shaft_y + 96, "accel.", 15, th.fg, bold=True, anchor="start")
-    s.text(42, shaft_y + 114, "(stud)", 14, th.muted, anchor="start")
-    s.text(44, shaft_y + 44, "load direction", 15, th.primary, anchor="start")
+    s.text(42, shaft_y + 96, "accel.", 13, th.fg, bold=True, anchor="start")
+    s.text(42, shaft_y + 114, "(stud)", 12, th.muted, anchor="start")
+    s.text(44, shaft_y + 44, "load direction", 13, th.primary, anchor="start")
 
-    s.text(260, 442, "1800 r/min  →  $T$ = 33.3 ms per revolution", 17,
+    s.text(260, 442, "1800 r/min  →  $T$ = 33.3 ms per revolution", 15,
            th.fg, bold=True)
     s.text(260, 468, "mesh frequency 37 × 30 = 1110 Hz; five mesh harmonics",
-           16, th.muted)
-    s.text(260, 490, "need $f_s ≥ 2.56 × 5550$ = 14.2 kHz", 16, th.muted)
+           14, th.muted)
+    s.text(260, 490, "need $f_s ≥ 2.56 × 5550$ = 14.2 kHz", 14, th.muted)
 
     # -- Right column: the acquisition and the slicing --------------------
     cx = 700.0
     s.rect(cx - 160, 130, 320, 116, "none", th.primary, rx=10, sw=1.8)
-    s.text(cx, 158, "One front end, one clock", 18, th.primary, bold=True)
+    s.text(cx, 158, "One front end, one clock", 15, th.primary, bold=True)
     s.rect(cx - 140, 174, 130, 26, th.panel, th.fg, rx=4, sw=1.2)
-    s.text(cx - 75, 192, "tacho", 15, th.fg, mono=True)
+    s.text(cx - 75, 192, "tacho", 13, th.fg, mono=True)
     s.rect(cx + 10, 174, 130, 26, th.panel, th.fg, rx=4, sw=1.2)
-    s.text(cx + 75, 192, "vibration", 15, th.fg, mono=True)
-    s.text(cx, 226, "$f_s$ = 25.6 kHz, gains fixed", 15, th.muted)
+    s.text(cx + 75, 192, "vibration", 13, th.fg, mono=True)
+    s.text(cx, 226, "$f_s$ = 25.6 kHz, gains fixed", 13, th.muted)
 
     base = 330.0
     s.line(cx - 160, base, cx + 160, base, th.fg, 1.4)
@@ -1411,18 +1438,18 @@ def _d_tsa_setup(s: SVG, th: Theme) -> None:
         s.line(x + 8, base - 34, x + 8, base, th.secondary, 2.2)
         if k < 4:
             s.line(x, base + 12, x, base + 96, th.muted, 1.0, dash="5,4")
-    s.text(cx, base - 50, "one pulse per revolution", 16, th.secondary,
+    s.text(cx, base - 50, "one pulse per revolution", 14, th.secondary,
            bold=True)
     wave = "M " + " L ".join(
         f"{cx - 150 + i * 3:.0f} "
         f"{base + 56 + 22 * math.sin(i * 0.9) * math.cos(i * 0.21):.0f}"
         for i in range(101))
     s.path(wave, stroke=th.primary, sw=1.2)
-    s.text(cx, base + 122, "the pulse is the block boundary", 16, th.fg)
-    s.text(cx, base + 146, "record $N + 1$ revolutions", 16, th.muted)
+    s.text(cx, base + 122, "the pulse is the block boundary", 14, th.fg)
+    s.text(cx, base + 146, "record $N + 1$ revolutions", 14, th.muted)
 
-    s.text(450, 552, "A tacho pulse per revolution and an accelerometer in the "
-           "load direction: the period is measured, never assumed", 17,
+    s.text(450, 552, "One tacho pulse per turn, an accelerometer in the load "
+                     "direction: the period is measured, not assumed", 15,
            th.muted)
 
 
@@ -1438,7 +1465,7 @@ def _d_correlation_delay(s: SVG, th: Theme) -> None:
     s.circle(98, 80, 8, th.primary)
     s.circle(98, 80, 3, th.bg)
     s.circle(98, 98, 4.5, th.primary)
-    s.text(98, 52, "source", 13, th.fg, bold=True)
+    s.text(98, 52, "source", 11, th.fg, bold=True)
     for r in (18, 30):
         s.path(f"M {120 + r * 0.30:.0f} {86 - r * 0.55:.0f} "
                f"A {r} {r} 0 0 1 {120 + r * 0.55:.0f} {86 + r * 0.30:.0f}",
@@ -1450,40 +1477,40 @@ def _d_correlation_delay(s: SVG, th: Theme) -> None:
     # Wavefront arc through mic 1 crossing the second ray at P
     s.path("M 330 188 A 232 232 0 0 0 346 139", stroke=th.fg, sw=1.6)
     s.line(346.4, 139.3, 570, 188, th.secondary, 2.6)
-    s.text(470, 120, "$Δr = c·τ_0$ ≈ 0.84 m  ($c$ = 343 m/s)", 14, th.secondary,
+    s.text(470, 120, "$Δr = c·τ_0$ ≈ 0.84 m  ($c$ = 343 m/s)", 12, th.secondary,
            bold=True)
 
     s.mic(330, 190, gy, 1.0)
     s.mic(570, 190, gy, 1.0)
-    s.text(314, 258, "mic 1 — $x(t)$", 13, th.fg, bold=True, anchor="end")
-    s.text(586, 258, "mic 2 — $y(t)$", 13, th.fg, bold=True, anchor="start")
-    s.dim(330, 272, 570, 272, "spacing $d$", size=14)
-    s.text(450, 242, "$sin θ = c·τ_0 / d$", 14, th.fg)
+    s.text(314, 258, "mic 1 — $x(t)$", 11, th.fg, bold=True, anchor="end")
+    s.text(586, 258, "mic 2 — $y(t)$", 11, th.fg, bold=True, anchor="start")
+    s.dim(330, 272, 570, 272, "spacing $d$", size=12)
+    s.text(450, 242, "$sin θ = c·τ_0 / d$", 12, th.fg)
 
     # Correlogram panel
     s.rect(70, 340, 760, 210, th.panel, th.fg, rx=10, sw=1.8)
     s.text(450, 366, "cross-correlation against lag — $y(t) = α·x(t − τ_0) + "
-           "n(t)$", 15, th.fg, bold=True)
+           "n(t)$", 13, th.fg, bold=True)
     base = 505.0
     s.line(110, base, 770, base, th.fg, 1.6)
     s.arrow(770, base, 790, base, th.fg, 1.6)
     x_tau = 518.0
     s.path(f"M 388 {base:.0f} Q {x_tau:.0f} 415 648 {base:.0f}",
            stroke=th.muted, sw=2.0)
-    s.text(688, 432, "direct correlator: broad peak", 13, th.muted)
+    s.text(688, 432, "direct correlator: broad peak", 11, th.muted)
     s.line(x_tau, base, x_tau, 400, th.primary, 2.6)
     s.circle(x_tau, 400, 3.5, th.primary)
-    s.text(x_tau, 388, "GCC-PHAT: sharp spike", 13, th.primary, bold=True)
-    s.text(150, 400, "$ψ(f) = 1/|G_{xy}|$", 13, th.fg, anchor="start")
+    s.text(x_tau, 388, "GCC-PHAT: sharp spike", 11, th.primary, bold=True)
+    s.text(150, 400, "$ψ(f) = 1/|G_{xy}|$", 11, th.fg, anchor="start")
     s.line(250, base - 5, 250, base + 5, th.fg, 1.4)
-    s.text(250, base + 21, "0", 12, th.muted)
-    s.text(x_tau, base + 21, "$τ_0$ = 20 samples / 8192 Hz = 2.44 ms", 13,
+    s.text(250, base + 21, "0", 10, th.muted)
+    s.text(x_tau, base + 21, "$τ_0$ = 20 samples / 8192 Hz = 2.44 ms", 11,
            th.fg)
 
     s.text(450, 580, "parabolic peak interpolation + ×16 local upsampling → "
-           "error below 0.002 samples", 14, th.fg)
+           "error below 0.002 samples", 12, th.fg)
     s.text(450, 604, "the 'phase' route reads the same $τ_0$ from the slope of "
-           "the unwrapped cross-spectrum phase", 13, th.muted)
+           "the unwrapped cross-spectrum phase", 11, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1499,8 +1526,8 @@ def _d_data_qualification(s: SVG, th: Theme) -> None:
 
     def step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, 54, th.panel, color, rx=10, sw=2)
-        s.text(cx, y + 23, l1, 16, th.fg, bold=True)
-        s.text(cx, y + 43, l2, 12, th.muted)
+        s.text(cx, y + 23, l1, 14, th.fg, bold=True)
+        s.text(cx, y + 43, l2, 10, th.muted)
 
     step(52, "Time record $x(t)$",
          "before trusting any PSD, Leq or GUM average", th.fg)
@@ -1516,30 +1543,30 @@ def _d_data_qualification(s: SVG, th: Theme) -> None:
     # Decision diamond
     s.path(f"M 240 340 L {cx:.0f} 296 L 660 340 L {cx:.0f} 384 Z",
            fill=th.panel, stroke=th.fg, sw=2)
-    s.text(cx, 336, "$64 < A ≤ 125$ ?", 17, th.fg, bold=True)
-    s.text(cx, 358, "(Table A.6, $α = 0.05$)", 12, th.muted)
+    s.text(cx, 336, "$64 < A ≤ 125$ ?", 15, th.fg, bold=True)
+    s.text(cx, 358, "(Table A.6, $α = 0.05$)", 10, th.muted)
 
     s.arrow(390, 380, 250, 426, th.secondary, 1.8)
-    s.text(298, 392, "no", 14, th.secondary, bold=True)
+    s.text(298, 392, "no", 12, th.secondary, bold=True)
     s.arrow(510, 380, 650, 426, th.accent, 1.8)
-    s.text(602, 392, "yes", 14, th.accent, bold=True)
+    s.text(602, 392, "yes", 12, th.accent, bold=True)
 
     s.rect(60, 430, 360, 96, th.panel, th.secondary, rx=10, sw=2.2)
-    s.text(240, 458, "Nonstationary: do not average", 15, th.fg, bold=True)
-    s.text(240, 482, "+20 % gain ramp: $A = 7$ → rejected", 13, th.secondary)
+    s.text(240, 458, "Nonstationary: do not average", 13, th.fg, bold=True)
+    s.text(240, 482, "+20 % gain ramp: $A = 7$ → rejected", 11, th.secondary)
     s.text(240, 504, "split at the change, or go short-time (spectrogram)",
-           12, th.muted)
+           10, th.muted)
 
     s.rect(480, 430, 360, 96, th.panel, th.accent, rx=10, sw=2.2)
-    s.text(660, 458, "Stationary: analyse", 15, th.fg, bold=True)
-    s.text(660, 482, "steady noise: $A = 91$ → accepted", 13, th.accent)
-    s.text(660, 504, "the chi-square CIs and error formulas hold", 12,
+    s.text(660, 458, "Stationary: analyse", 13, th.fg, bold=True)
+    s.text(660, 482, "steady noise: $A = 91$ → accepted", 11, th.accent)
+    s.text(660, 504, "the chi-square CIs and error formulas hold", 10,
            th.muted)
 
     s.text(cx, 566, "the runs test (method=\"runs\") is the two-sided "
-           "companion: too many runs is as suspect as too few", 14, th.fg)
+           "companion: too many runs is as suspect as too few", 12, th.fg)
     s.text(cx, 590, "a frequency glide can hide from the mean square: test "
-           "statistic=\"mean\" or band-filtered copies too", 13, th.muted)
+           "statistic=\"mean\" or band-filtered copies too", 11, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1556,24 +1583,24 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
     for x0, l1, l2 in ((40.0, "Calibrator tone", "94 dB at 1 kHz  (IEC 60942)"),
                        (480.0, "Measurement recording", "same microphone, same gain")):
         s.rect(x0, 54, 380, 68, th.panel, th.primary, rx=12, sw=2)
-        s.text(x0 + 190, 84, l1, 21, th.fg, bold=True)
-        s.text(x0 + 190, 108, l2, 16, th.muted)
+        s.text(x0 + 190, 84, l1, 18, th.fg, bold=True)
+        s.text(x0 + 190, 108, l2, 14, th.muted)
 
     # --- The sensitivity factor, derived from the calibrator tone ----------
     s.arrow(230, 122, 230, 150, th.fg, 2.0)
     s.rect(40, 150, 380, 78, th.panel, th.primary, rx=12, sw=2)
-    s.text(230, 182, "sensitivity(calibrator, target_spl=94.0, fs=fs)", 13,
+    s.text(230, 182, "sensitivity(calibrator, target_spl=94.0, fs=fs)", 11,
            th.fg, bold=True, mono=True)
-    s.text(230, 208, "the factor $S$ in pascals per digital unit", 15, th.muted)
+    s.text(230, 208, "the factor $S$ in pascals per digital unit", 13, th.muted)
 
     # --- Calibrated pressure: where both inputs meet -----------------------
     s.arrow(230, 228, 230, 266, th.fg, 2.0)
     s.arrow(670, 122, 670, 266, th.fg, 2.0)
     s.rect(120, 266, 660, 64, "none", th.accent, rx=12, sw=2.4)
-    s.text(450, 296, "Calibrated pressure   $p(t) = S · x(t)$   in pascals", 21,
+    s.text(450, 296, "Calibrated pressure   $p(t) = S · x(t)$   in pascals", 18,
            th.fg, bold=True)
     s.text(450, 320, "every level function takes $S$ as calibration_factor=",
-           16, th.accent)
+           14, th.accent)
 
     # --- Three readout branches, one guide section each --------------------
     branches = [
@@ -1592,28 +1619,28 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
         cx = x0 + 130
         s.arrow(cx, 330, cx, 370, th.fg, 2.0)
         s.rect(x0, 370, 260, 104, th.panel, th.primary, rx=12, sw=2)
-        s.text(cx, 400, head, 19, th.fg, bold=True)
+        s.text(cx, 400, head, 16, th.fg, bold=True)
         # A branch with a single call keeps its one line centred in the gap the
         # two-line branches use, rather than leaving a hole under the heading.
-        s.text(cx, 426 if code2 else 437, code1, 14, th.fg, mono=True)
+        s.text(cx, 426 if code2 else 437, code1, 12, th.fg, mono=True)
         if code2:
-            s.text(cx, 448, code2, 14, th.fg, mono=True)
-        s.text(cx, 468, note, 14, th.muted)
+            s.text(cx, 448, code2, 12, th.fg, mono=True)
+        s.text(cx, 468, note, 12, th.muted)
         s.arrow(cx, 474, cx, 510, th.fg, 2.0)
         s.rect(x0, 510, 260, 62, "none", th.accent, rx=12, sw=2.2)
-        s.text(cx, 538, out, 15, th.accent, bold=True)
-        s.text(cx, 560, "dB re 20 µPa", 14, th.muted)
+        s.text(cx, 538, out, 13, th.accent, bold=True)
+        s.text(cx, 560, "dB re 20 µPa", 12, th.muted)
 
     # --- Class verification closes the guide -------------------------------
     for cx in (170.0, 730.0):
         s.line(cx, 572, cx, 588, th.muted, 1.4, dash="5,4")
         s.arrow(cx, 588, cx, 596, th.muted, 1.4)
     s.rect(40, 596, 820, 62, "none", th.secondary, rx=12, sw=2, dash="7,5")
-    s.text(450, 624, "Class verification against the acceptance limits", 18,
+    s.text(450, 624, "Class verification against the acceptance limits", 15,
            th.secondary, bold=True)
     s.text(450, 648,
            "verify_weighting_class (IEC 61672-1 Table 3)  ·  "
-           "verify_filter_class (IEC 61260-1 Table 1)", 14, th.muted)
+           "verify_filter_class (IEC 61260-1 Table 1)", 12, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1629,28 +1656,28 @@ def _d_calibration_dataflow(s: SVG, th: Theme) -> None:
     for x0, l1, l2 in ((40.0, "Calibrator recording", "1 kHz tone through the chain"),
                        (500.0, "Measurement recording", "the same chain, untouched")):
         s.rect(x0, 54, 360, 72, th.panel, th.primary, rx=12, sw=2)
-        s.text(x0 + 180, 84, l1, 21, th.fg, bold=True)
-        s.text(x0 + 180, 108, l2, 16, th.muted)
+        s.text(x0 + 180, 84, l1, 18, th.fg, bold=True)
+        s.text(x0 + 180, 108, l2, 14, th.muted)
     s.line(400, 90, 500, 90, th.muted, 1.4, dash="6,5")
-    s.text(450, 152, "nothing in the chain may change between the two", 15,
+    s.text(450, 152, "nothing in the chain may change between the two", 13,
            th.muted, italic=True)
 
     # --- sensitivity(): the equation of the guide, plus its stability check -
     s.arrow(220, 126, 220, 166, th.fg, 2.0)
     s.rect(40, 166, 360, 88, th.panel, th.primary, rx=12, sw=2)
-    s.text(220, 196, "sensitivity(calibrator, target_spl=94.0, fs=fs)", 12,
+    s.text(220, 196, "sensitivity(calibrator, target_spl=94.0, fs=fs)", 10,
            th.fg, bold=True, mono=True)
     # Parked: the 10^(L_cal / 20) exponent carries a subscript inside
     # the superscript, one script level more than the composer sets, so
     # the formula stays plain until that family is adjudicated.
-    s.text(220, 222, "S = p_ref · 10^(L_cal / 20) / x̃_ref", 16, th.fg)
-    s.text(220, 244, "fs enables the IEC 60942 stability check", 14, th.muted)
+    s.text(220, 222, "S = p_ref · 10^(L_cal / 20) / x̃_ref", 14, th.fg)
+    s.text(220, 244, "fs enables the IEC 60942 stability check", 12, th.muted)
 
     # --- The factor itself --------------------------------------------------
     s.arrow(220, 254, 220, 290, th.fg, 2.0)
     s.rect(40, 290, 360, 72, "none", th.accent, rx=12, sw=2.4)
-    s.text(220, 320, "calibration_factor  S", 18, th.fg, bold=True, mono=True)
-    s.text(220, 344, "pascals per digital unit", 16, th.accent)
+    s.text(220, 320, "calibration_factor  S", 15, th.fg, bold=True, mono=True)
+    s.text(220, 344, "pascals per digital unit", 14, th.accent)
 
     # --- Where the factor and the samples meet ------------------------------
     s.arrow(240, 362, 320, 400, th.fg, 2.0)
@@ -1658,20 +1685,20 @@ def _d_calibration_dataflow(s: SVG, th: Theme) -> None:
     s.rect(60, 400, 780, 86, th.panel, th.fg, rx=12, sw=2)
     s.text(450, 430,
            "octave_filter · leq · laeq · sel · ln_levels · lc_peak · OctaveFilterBank",
-           14, th.fg, mono=True)
-    s.text(450, 456, "every level function accepts calibration_factor=", 17,
+           12, th.fg, mono=True)
+    s.text(450, 456, "every level function accepts calibration_factor=", 15,
            th.fg, bold=True)
-    s.text(450, 478, "one factor for the whole library", 14, th.muted)
+    s.text(450, 478, "one factor for the whole library", 12, th.muted)
 
     # --- The physical result, and the dBFS branch beside it -----------------
     s.arrow(450, 486, 450, 522, th.fg, 2.0)
     s.rect(270, 522, 360, 64, "none", th.accent, rx=12, sw=2.4)
-    s.text(450, 550, "Levels in dB SPL", 21, th.fg, bold=True)
-    s.text(450, 574, "re 20 µPa", 16, th.accent, mono=True)
+    s.text(450, 550, "Levels in dB SPL", 18, th.fg, bold=True)
+    s.text(450, 574, "re 20 µPa", 14, th.accent, mono=True)
     s.rect(650, 514, 210, 80, "none", th.secondary, rx=12, sw=1.8, dash="7,5")
-    s.text(755, 542, "No calibrator?", 16, th.secondary, bold=True)
-    s.text(755, 564, "$S = 1$, samples read as Pa", 13, th.muted)
-    s.text(755, 584, "use dbfs=True for dBFS", 13, th.fg)
+    s.text(755, 542, "No calibrator?", 14, th.secondary, bold=True)
+    s.text(755, 564, "$S = 1$, samples read as Pa", 11, th.muted)
+    s.text(755, 584, "use dbfs=True for dBFS", 11, th.fg)
 
 
 # ---------------------------------------------------------------------------
@@ -1685,54 +1712,54 @@ def _d_bank_dataflow(s: SVG, th: Theme) -> None:
     also brings the band signal back to the input rate."""
     # --- Input and the per-band decision ------------------------------------
     s.rect(290, 54, 320, 64, th.panel, th.fg, rx=12, sw=2)
-    s.text(450, 84, "Input signal  $x(t)$", 21, th.fg, bold=True)
-    s.text(450, 108, "sample rate $f_s$", 16, th.muted)
+    s.text(450, 84, "Input signal  $x(t)$", 18, th.fg, bold=True)
+    s.text(450, 108, "sample rate $f_s$", 14, th.muted)
     s.arrow(450, 118, 450, 132, th.fg, 2.0)
     s.path("M 450 132 L 610 184 L 450 236 L 290 184 Z", th.panel, th.primary,
            sw=2)
-    s.text(450, 180, "Room to decimate?", 20, th.fg, bold=True)
-    s.text(450, 204, "$f_s / 2 ≥ 1.25 · f_{upper}$", 14, th.muted)
+    s.text(450, 180, "Room to decimate?", 17, th.fg, bold=True)
+    s.text(450, 204, "$f_s / 2 ≥ 1.25 · f_{upper}$", 12, th.muted)
 
     s.line(290, 184, 190, 184, th.fg, 2.0)
     s.arrow(190, 184, 190, 244, th.fg, 2.0)
-    s.text(240, 172, "yes", 15, th.accent, bold=True)
+    s.text(240, 172, "yes", 13, th.accent, bold=True)
     s.line(610, 184, 710, 184, th.fg, 2.0)
     s.arrow(710, 184, 710, 360, th.fg, 2.0)
-    s.text(660, 172, "no", 15, th.secondary, bold=True)
+    s.text(660, 172, "no", 13, th.secondary, bold=True)
 
     # --- The decimated branch ----------------------------------------------
     s.rect(50, 244, 280, 80, th.panel, th.primary, rx=12, sw=2)
-    s.text(190, 274, "resample_poly(1, M)", 15, th.fg, bold=True, mono=True)
-    s.text(190, 298, "$M = floor[(f_s / 2) / (1.25 · f_{upper})]$", 13, th.muted)
-    s.text(190, 318, "poles stay clear of $z = 1$", 14, th.muted)
+    s.text(190, 274, "resample_poly(1, M)", 13, th.fg, bold=True, mono=True)
+    s.text(190, 298, "$M = floor[(f_s / 2) / (1.25 · f_{upper})]$", 11, th.muted)
+    s.text(190, 318, "poles stay clear of $z = 1$", 12, th.muted)
     s.arrow(190, 324, 190, 360, th.fg, 2.0)
 
     # --- Both branches are the same biquad cascade at a different rate ------
     for x0, head in ((50.0, "SOS band filter at $f_s / M$"),
                      (570.0, "SOS band filter at $f_s$")):
         s.rect(x0, 360, 280, 84, th.panel, th.primary, rx=12, sw=2)
-        s.text(x0 + 140, 390, head, 18, th.fg, bold=True)
-        s.text(x0 + 140, 414, "cascaded biquads", 15, th.muted)
-        s.text(x0 + 140, 434, "designed on the IEC 61260-1 band edges", 12,
+        s.text(x0 + 140, 390, head, 15, th.fg, bold=True)
+        s.text(x0 + 140, 414, "cascaded biquads", 13, th.muted)
+        s.text(x0 + 140, 434, "designed on the IEC 61260-1 band edges", 10,
                th.muted)
     s.rect(340, 260, 220, 96, "none", th.secondary, rx=12, sw=1.8, dash="7,5")
-    s.text(450, 288, "Every band filter", 14, th.secondary, bold=True)
-    s.text(450, 308, "is a biquad cascade", 14, th.secondary, bold=True)
-    s.text(450, 332, "not one high-order", 14, th.muted)
-    s.text(450, 350, "(b, a) pair", 14, th.muted)
+    s.text(450, 288, "Every band filter", 12, th.secondary, bold=True)
+    s.text(450, 308, "is a biquad cascade", 12, th.secondary, bold=True)
+    s.text(450, 332, "not one high-order", 12, th.muted)
+    s.text(450, 350, "(b, a) pair", 12, th.muted)
 
     # --- The band level, and the optional band signal -----------------------
     s.arrow(190, 444, 330, 496, th.fg, 2.0)
     s.arrow(710, 444, 570, 496, th.fg, 2.0)
     s.rect(270, 500, 360, 76, "none", th.accent, rx=12, sw=2.4)
-    s.text(450, 530, "Band level", 21, th.fg, bold=True)
-    s.text(450, 554, "RMS or peak, in dB re 20 µPa", 16, th.accent)
+    s.text(450, 530, "Band level", 18, th.fg, bold=True)
+    s.text(450, 554, "RMS or peak, in dB re 20 µPa", 14, th.accent)
     s.rect(50, 604, 800, 62, "none", th.secondary, rx=12, sw=1.8, dash="7,5")
-    s.text(450, 632, "sigbands=True also returns the band signal at $f_s$", 17,
+    s.text(450, 632, "sigbands=True also returns the band signal at $f_s$", 15,
            th.secondary, bold=True)
     s.text(450, 654,
            "the decimated branch is interpolated back with resample_poly(M, 1)",
-           14, th.muted)
+           12, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1776,19 +1803,19 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
     cx = 168.0
     s.ground(gy, 34, 300)
     s.rect(cx - 118, gy - 12, 236, 12, th.panel, th.fg, sw=2)   # hard board
-    s.text(cx, gy + 40, "hard board on the ground", 18, th.fg, bold=True)
-    s.text(cx, gy + 62, "capsule flush at its centre", 16, th.muted)
+    s.text(cx, gy + 40, "hard board on the ground", 15, th.fg, bold=True)
+    s.text(cx, gy + 62, "capsule flush at its centre", 14, th.muted)
 
     # Capsule, drawn flush with the board, plus its equalisation vent.
     s.rect(cx - 26, gy - 40, 52, 28, th.panel, th.primary, rx=4, sw=2)
     s.rect(cx - 26, gy - 44, 52, 6, th.fg, rx=2)                # diaphragm
     s.circle(cx + 20, gy - 26, 4.5, th.secondary)               # vent
     s.arrow(120, 244, cx + 20, gy - 30, th.secondary, 1.4)
-    s.text(38, 190, "static-pressure equalisation", 17, th.secondary,
+    s.text(38, 190, "static-pressure equalisation", 15, th.secondary,
            bold=True, anchor="start")
-    s.text(38, 212, "vent: a first-order high-pass,", 17, th.secondary,
+    s.text(38, 212, "vent: a first-order high-pass,", 15, th.secondary,
            anchor="start")
-    s.text(38, 234, "and the chain's real corner", 17, th.secondary,
+    s.text(38, 234, "and the chain's real corner", 15, th.secondary,
            anchor="start")
 
     # Primary and secondary windscreens over it.
@@ -1796,14 +1823,17 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
            stroke=th.muted, sw=2.2)
     s.path(f"M {cx - 104} {gy - 12} A 104 104 0 0 1 {cx + 104} {gy - 12}",
            stroke=th.muted, sw=2.2, dash="8,5")
-    s.text(cx, gy + 88, "primary foam screen (solid)", 16, th.muted)
-    s.text(cx, gy + 108, "secondary in wind (dashed),", 16, th.muted)
-    s.text(cx, gy + 128, "with its loss corrected", 16, th.muted)
-    s.text(cx, 92, "Below 20 Hz the wind is louder", 19, th.fg, bold=True)
-    s.text(cx, 114, "than the source", 19, th.fg, bold=True)
+    s.text(cx, gy + 88, "primary foam screen (solid)", 14, th.muted)
+    s.text(cx, gy + 108, "secondary in wind (dashed),", 14, th.muted)
+    s.text(cx, gy + 128, "with its loss corrected", 14, th.muted)
+    s.text(cx, 92, "Below 20 Hz the wind is louder", 16, th.fg, bold=True)
+    s.text(cx, 114, "than the source", 16, th.fg, bold=True)
 
     # -- Middle: the electrical chain ---------------------------------------
-    bx, bw, bh = 336.0, 226.0, 92.0
+    # 264 px on "ponderación G + integrador", 267 px at the box title size
+    # against the 239 of "G weighting + integrator"; the Spanish one drops a
+    # step on top of that.
+    bx, bw, bh = 320.0, 264.0, 92.0
     stages = (
         ("Preamplifier", "corner << 0,25 Hz", th.primary),
         ("Recorder", "low-cut switch OFF", th.primary),
@@ -1812,17 +1842,18 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
     y = 132.0
     for title, detail, color in stages:
         s.rect(bx, y, bw, bh, th.panel, color, rx=12, sw=2)
-        s.text(bx + bw / 2, y + 38, title, 20, th.fg, bold=True)
+        tsize = 17 if s.text_width(title, 17, bold=True) <= bw - 24 else 15
+        s.text(bx + bw / 2, y + 38, title, tsize, th.fg, bold=True)
         # Mono is the code voice of the literal switch settings; the
         # averaging-time detail carries $...$ mathematics and composes in
         # the text face (mono plus markup is refused by the canvas).
-        s.text(bx + bw / 2, y + 66, detail, 18, th.muted, mono="$" not in detail)
+        s.text(bx + bw / 2, y + 66, detail, 15, th.muted, mono="$" not in detail)
         if y > 140:
             s.arrow(bx + bw / 2, y - 34, bx + bw / 2, y - 6, th.fg, 2)
         y += bh + 34
     s.arrow(cx + 120, gy - 6, bx - 8, 200, th.fg, 2)
-    s.text(bx + bw / 2, y + 4, "report $L_{pG}$ with the chain corner,", 17, th.fg)
-    s.text(bx + bw / 2, y + 26, "the screens and the averaging time", 17, th.fg)
+    s.text(bx + bw / 2, y + 4, "report $L_{pG}$ with the chain corner,", 15, th.fg)
+    s.text(bx + bw / 2, y + 26, "the screens and the averaging time", 15, th.fg)
 
     # -- Right: the G curve against the chain's own corner ------------------
     px, py, pw, ph = 604.0, 132.0, 268.0, 236.0
@@ -1860,23 +1891,23 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
           f'stroke="{th.secondary}" stroke-width="2.2" stroke-dasharray="7,5"/>')
     s.line(fx(corner), py + 2, fx(corner), py + ph - 2, th.secondary, 1.2,
            dash="3,4")
-    s.text(px + pw / 2, py - 14, "What the chain lets through", 18, th.fg,
+    s.text(px + pw / 2, py - 14, "What the chain lets through", 15, th.fg,
            bold=True)
     for f_tick, label in ((0.1, "0,1"), (1.0, "1"), (10.0, "10"),
                           (100.0, "100"), (1000.0, "1k")):
-        s.text(fx(f_tick), py + ph + 22, label, 15, th.muted, mono=True)
-    s.text(px + pw / 2, py + ph + 46, "Frequency [Hz]", 16, th.muted)
-    s.text(fx(0.27), fy(-55.0), "A.2: 0,25 - 315 Hz", 15, th.accent,
+        s.text(fx(f_tick), py + ph + 22, label, 13, th.muted, mono=True)
+    s.text(px + pw / 2, py + ph + 46, "Frequency [Hz]", 14, th.muted)
+    s.text(fx(0.27), fy(-55.0), "A.2: 0,25 - 315 Hz", 13, th.accent,
            bold=True, anchor="start")
     s.arrow(fx(0.45), fy(-33.0), fx(0.45), fy(-16.0), th.secondary, 1.5)
-    s.text(fx(0.12), fy(-40.0), "lost", 15, th.secondary, bold=True,
+    s.text(fx(0.12), fy(-40.0), "lost", 13, th.secondary, bold=True,
            anchor="start")
-    s.text(px + pw / 2, py + ph + 70, "green: the G weighting", 15, th.accent)
+    s.text(px + pw / 2, py + ph + 70, "green: the G weighting", 13, th.accent)
     s.text(px + pw / 2, py + ph + 90,
-           "dashed: a chain with a 2 Hz vent corner", 15, th.secondary)
-    s.text(px + pw / 2, py + ph + 116, "usable band = the overlap of the two",
-           17, th.fg, bold=True)
-    s.text(px + pw / 2, py + ph + 138, "ISO 7196:1995, Annex A", 16, th.muted)
+           "dashed: a chain with a 2 Hz vent corner", 13, th.secondary)
+    s.text(px + pw / 2, py + ph + 116, "usable band = the overlap",
+           15, th.fg, bold=True)
+    s.text(px + pw / 2, py + ph + 138, "ISO 7196:1995, Annex A", 14, th.muted)
 
 
 # ---------------------------------------------------------------------------
@@ -1892,64 +1923,64 @@ def _d_multichannel_capture(s: SVG, th: Theme) -> None:
     """
     gy = 372.0
     s.ground(gy, 30, 312)
-    s.text(172, 92, "Four positions, four sensitivities", 19, th.fg, bold=True)
+    s.text(172, 92, "Each position, its sensitivity", 16, th.fg, bold=True)
 
     xs = (66.0, 132.0, 198.0, 264.0)
     sens = ("11,8", "12,3", "11,9", "12,1")
     cap_y = gy - 120.0                       # capsule height, 1,2 m to scale
     for i, (x, mv) in enumerate(zip(xs, sens)):
         s.mic(x, cap_y, gy, 0.95)
-        s.text(x, gy + 24, f"P{i + 1}", 17, th.fg, bold=True)
-        s.text(x, gy + 44, mv, 14, th.muted, mono=True)
-    s.text(172, gy + 66, "mV/Pa, one per capsule", 14, th.muted)
-    s.dim(40, cap_y, 40, gy, "1,2 m", size=15, label_side="right")
+        s.text(x, gy + 24, f"P{i + 1}", 15, th.fg, bold=True)
+        s.text(x, gy + 44, mv, 12, th.muted, mono=True)
+    s.text(172, gy + 66, "mV/Pa, one per capsule", 12, th.muted)
+    s.dim(40, cap_y, 40, gy, "1,2 m", size=13, label_side="right")
 
     # Calibrator coupled onto P2 and moved along the row.
     s.rect(xs[1] - 22, cap_y - 56, 44, 56, th.panel, th.secondary, rx=6, sw=2)
-    s.text(xs[1], cap_y - 30, "94,0", 15, th.secondary, bold=True, mono=True)
-    s.text(xs[1], cap_y - 12, "dB", 13, th.muted, mono=True)
+    s.text(xs[1], cap_y - 30, "94,0", 13, th.secondary, bold=True, mono=True)
+    s.text(xs[1], cap_y - 12, "dB", 11, th.muted, mono=True)
     s.path(f"M {xs[0]:.0f} {cap_y - 78:.0f} Q {xs[1] + 34:.0f} "
            f"{cap_y - 116:.0f} {xs[3]:.0f} {cap_y - 78:.0f}",
            stroke=th.secondary, sw=1.6, dash="7,5")
-    s.text(172, cap_y - 128, "one capsule at a time,", 15, th.secondary)
-    s.text(172, cap_y - 110, "gains locked throughout", 15, th.secondary)
+    s.text(172, cap_y - 128, "one capsule at a time,", 13, th.secondary)
+    s.text(172, cap_y - 110, "gains locked throughout", 13, th.secondary)
 
     # -- Middle: one preamplifier, one interface, one clock -----------------
     bx, bw = 352.0, 214.0
     s.rect(bx, 150, bw, 82, th.panel, th.primary, rx=10, sw=2)
-    s.text(bx + bw / 2, 196, "4-channel preamplifier", 19, th.fg, bold=True)
+    s.text(bx + bw / 2, 196, "4-channel preamplifier", 16, th.fg, bold=True)
     for i, x in enumerate(xs):
         s.arrow(x + 10, gy - 46, bx - 6, 168 + i * 16, th.muted, 1.2)
 
     s.rect(bx, 268, bw, 96, th.panel, th.primary, rx=10, sw=2)
-    s.text(bx + bw / 2, 298, "audio interface", 19, th.fg, bold=True)
+    s.text(bx + bw / 2, 298, "audio interface", 16, th.fg, bold=True)
     s.rect(bx + 14, 312, bw - 28, 34, th.panel, th.accent, rx=6, sw=2)
-    s.text(bx + bw / 2, 328, "single sample clock", 16, th.accent, bold=True)
-    s.text(bx + bw / 2, 344, "$f_s$ = 48 kHz", 15, th.accent)
+    s.text(bx + bw / 2, 328, "single sample clock", 14, th.accent, bold=True)
+    s.text(bx + bw / 2, 344, "$f_s$ = 48 kHz", 13, th.accent)
     s.arrow(bx + bw / 2, 236, bx + bw / 2, 262, th.fg, 2)
 
     s.rect(bx + 24, 400, bw - 48, 60, th.panel, th.muted, rx=10, sw=2,
            dash="6,5")
-    s.text(bx + bw / 2, 428, "a second interface", 15, th.muted)
-    s.text(bx + bw / 2, 448, "= two clocks, not one array", 15, th.muted)
+    s.text(bx + bw / 2, 428, "a second interface", 13, th.muted)
+    s.text(bx + bw / 2, 448, "= two clocks, not one array", 13, th.muted)
     s.line(bx + 24, 400, bx + bw - 24, 460, th.secondary, 2.4)
     s.line(bx + 24, 460, bx + bw - 24, 400, th.secondary, 2.4)
 
     # -- Right: the array, row by row --------------------------------------
     ax0, row_h = 620.0, 44.0
-    s.text(748, 122, "$x$, the array you analyse", 19, th.fg, bold=True)
+    s.text(748, 122, "$x$, the array you analyse", 16, th.fg, bold=True)
     for i in range(4):
         y = 150 + i * row_h
         s.rect(ax0, y, 232, row_h - 8, th.panel, th.primary, rx=6, sw=1.8)
-        s.text(ax0 + 116, y + 24, f"ch{i} = P{i + 1}", 18, th.fg, mono=True)
-    s.text(748, 150 + 4 * row_h + 12, "shape (4, N)", 18, th.accent, bold=True,
+        s.text(ax0 + 116, y + 24, f"ch{i} = P{i + 1}", 15, th.fg, mono=True)
+    s.text(748, 150 + 4 * row_h + 12, "shape (4, N)", 15, th.accent, bold=True,
            mono=True)
     s.arrow(bx + bw + 6, 300, ax0 - 8, 240, th.fg, 2)
 
     s.rect(600, 372, 272, 96, "none", th.fg, rx=10, sw=1.8)
-    s.text(736, 398, "Write down, with the file:", 16, th.fg, bold=True)
-    s.text(736, 420, "one clock  |  locked gains", 15, th.fg)
-    s.text(736, 442, "the row-to-position map", 15, th.fg)
+    s.text(736, 398, "Write down, with the file:", 14, th.fg, bold=True)
+    s.text(736, 420, "one clock  |  locked gains", 13, th.fg)
+    s.text(736, 442, "the row-to-position map", 13, th.fg)
     s.text(450, 520, "A swapped pair gives perfectly valid levels attributed "
-           "to the wrong positions,", 17, th.fg)
-    s.text(450, 542, "and no later check can detect it", 17, th.muted)
+           "to the wrong positions,", 15, th.fg)
+    s.text(450, 542, "and no later check can detect it", 15, th.muted)

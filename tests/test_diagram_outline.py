@@ -37,7 +37,14 @@ from diagrams.outline import (
 
 _SANS = (False, False, False)
 _SANS_FACE = _FACES[_SANS][0]
-_FALLBACK_FACE = _FACES[_SANS][1]
+
+#: The mono faces are the one chain that still carries a fallback: they
+#: lack characters this corpus sets, and defer to the proportional face
+#: of the same weight. The proportional chains stand alone now that every
+#: face comes from the one DejaVu family.
+_MONO = (True, False, False)
+_MONO_FACE = _FACES[_MONO][0]
+_FALLBACK_FACE = _FACES[_MONO][1]
 
 
 def test_capabilities_hold_here() -> None:
@@ -86,8 +93,9 @@ def test_combining_marks_shape_in_all_four_sans_faces() -> None:
 
 def test_six_face_matrix_measures_and_shapes() -> None:
     for face_key, chain in _FACES.items():
-        assert chain[0].is_file()
-        assert chain[1].is_file()
+        assert chain
+        for path in chain:
+            assert path.is_file()
         runs = segment("Level 3", face_key)
         assert runs == [FaceRun("Level 3", chain[0])]
         assert advance("Level 3", chain[0], 20) > 0.0
@@ -95,26 +103,26 @@ def test_six_face_matrix_measures_and_shapes() -> None:
 
 
 def test_segmentation_prefers_the_primary_face() -> None:
-    # ⟨ is one of the ten corpus glyphs Liberation lacks: it moves to
-    # DejaVu while its neighbours stay primary, and the pieces are
-    # maximal substrings.
-    runs = segment("a⟨b", _SANS)
+    # ℓ is one of the corpus glyphs the mono faces lack: it moves to the
+    # proportional face while its neighbours stay primary, and the pieces
+    # are maximal substrings.
+    runs = segment("aℓb", _MONO)
     assert runs == [
-        FaceRun("a", _SANS_FACE),
-        FaceRun("⟨", _FALLBACK_FACE),
-        FaceRun("b", _SANS_FACE),
+        FaceRun("a", _MONO_FACE),
+        FaceRun("ℓ", _FALLBACK_FACE),
+        FaceRun("b", _MONO_FACE),
     ]
 
 
 def test_fallback_never_splits_a_combining_cluster() -> None:
-    # The circumflex is covered by both faces, its base ⟨ only by the
+    # The circumflex is covered by both faces, its base ℓ only by the
     # fallback: the whole cluster must move together so the mark is
     # shaped against the base it modifies.
-    runs = segment("a⟨̂b", _SANS)
+    runs = segment("aℓ̂b", _MONO)
     assert runs == [
-        FaceRun("a", _SANS_FACE),
-        FaceRun("⟨̂", _FALLBACK_FACE),
-        FaceRun("b", _SANS_FACE),
+        FaceRun("a", _MONO_FACE),
+        FaceRun("ℓ̂", _FALLBACK_FACE),
+        FaceRun("b", _MONO_FACE),
     ]
 
 
@@ -147,7 +155,10 @@ def test_atlas_ids_are_content_derived() -> None:
     match = re.search(r'id="([^"]+)"', defs)
     assert match is not None
     ref = match.group(1)
-    assert ref.startswith("LiberationSans-Regular-")
+    # Stem plus hexadecimal glyph index, and the stem is the exact face:
+    # "DejaVuSans" is a prefix of the bold and oblique stems, so only the
+    # full match rules them out.
+    assert re.fullmatch(r"DejaVuSans-[0-9a-f]+", ref)
     assert not ref.startswith(("axes_", "figure_"))
     # The same glyph in a fresh document gets the same id: content-derived,
     # never positional.
@@ -209,3 +220,58 @@ def test_emission_carries_fill_and_no_style_attribute() -> None:
     markup = emit_runs(GlyphStore(), _label_runs("ab"), 0.0, 0.0, 20, "#123456")
     assert 'fill="#123456"' in markup
     assert "style=" not in markup
+
+
+def test_collision_census_names_each_way_a_label_can_land_wrong(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """One plate composed to fail all four ways, and every way reported."""
+    from diagrams import outline, registry
+    from diagrams.canvas import SVG, Theme
+
+    def build(s: SVG, th: Theme) -> None:
+        # Two labels meeting on one line.
+        s.text(60, 100, "left run", 16, th.fg, anchor="start")
+        s.text(110, 100, "right run", 16, th.fg, anchor="start")
+        # A label wider than the stroked box it sits in.
+        s.rect(60, 160, 80, 40, "none", th.fg)
+        s.text(100, 185, "wider than its box", 16, th.fg)
+        # A rule drawn through a label.
+        s.text(400, 300, "struck through", 16, th.fg)
+        s.line(400, 260, 400, 340, th.fg)
+        # A filled panel drawn after the label it covers.
+        s.text(400, 400, "covered", 16, th.fg)
+        s.rect(340, 380, 120, 40, th.panel, "none")
+
+    monkeypatch.setattr(registry, "DIAGRAMS",
+                        {"plate": (build, "Title", 560)})
+    kinds = {hit.kind for hit in outline._collisions()}
+    assert kinds == {"overprint", "escapes", "struck", "painted over"}
+
+
+def test_a_panel_over_the_title_is_reported(monkeypatch) -> None:
+    """The title is painted first, so a body panel can bury it.
+
+    The collision census records every element as it is drawn and reports a
+    label as painted over only when the covering box was drawn later. The
+    title used to be recorded after the builder had finished, which gave it
+    the highest sequence on the plate and made that test unable to fire for
+    it, while `canvas.SVG.render` emits the title ahead of the body and so
+    lets any panel cover it. This pins the order rather than the symptom.
+    """
+    from diagrams import outline, registry
+
+    def build(svg, th) -> None:
+        # An opaque panel across the top strip, where the title is set.
+        svg.rect(100, 10, 700, 60, fill=th.fg)
+
+    monkeypatch.setitem(
+        registry.DIAGRAMS, "diagram_title_under_a_panel",
+        (build, "A title a panel covers", 200),
+    )
+    hits = [h for h in outline._collisions()
+            if h.plate.startswith("diagram_title_under_a_panel")]
+    assert any(h.kind == "painted over" for h in hits), (
+        "a filled panel drawn over the title was not reported: "
+        f"{[(h.kind, h.label) for h in hits]}"
+    )

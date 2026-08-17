@@ -120,14 +120,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   viewer for a generic sans, so any label carrying mathematics arrived
   letter-spaced on every machine without DejaVu, which is all of them; the
   plates asked for Segoe UI first, a face neither the maintainer's machine nor
-  CI has ever had. Both now bake outlines: the figures from the DejaVu that
-  matplotlib ships, the plates from a vendored Liberation Sans whose metrics
-  are the ones the hand-tuned compositions were adjusted against (measured:
-  width ratio 1.000 over all 6,550 drawn strings, against 1.14 for DejaVu,
-  which would have broken ninety-five plates), with a deterministic per-glyph
-  fallback and a hard error for a character no face covers. Three plates
-  rendered under an emptied fontconfig are pixel-identical to the normal
-  render, which is the property the whole change exists for.
+  CI has ever had. Both now bake outlines, and both take them from the same
+  place: the DejaVu Sans inside the pinned matplotlib wheel, so a plate and a
+  figure on one documentation page are set in one typeface rather than two and
+  a single pin fixes the letters of the whole drawn corpus. The plates keep a
+  deterministic per-glyph fallback for what the monospaced cuts lack and a hard
+  error for a character no face covers; all 185 distinct characters the 6,552
+  plate labels set, in both languages, are carried by the face their own run
+  asks for. Three plates rendered under an emptied fontconfig are
+  pixel-identical to the normal render, which is the property the whole change
+  exists for.
+- The plates' type scale is stated in the px of the face that draws them.
+  Every size in a builder is px of the outliner's face, and that face changed
+  under them: DejaVu runs about 16 % wider than the Helvetica-metric face these
+  compositions were measured in, 1.156 over all 6,552 labels of the corpus in
+  both languages. A px of the old face is not a px of this one, so every label
+  came out 16 % longer than the box, the column or the gap it was written into,
+  and the plates filled with labels running under panels, through walls and
+  over each other. The scale is converted once, at 0.86 with a floor of 10 px,
+  rather than patched where it showed: it restores the line lengths the
+  drawings were composed around, and a hand-tuned plate has no other invariant
+  to hold to. The title keeps a ladder of 22, 21 and 20 px and gains a margin,
+  because clearing the sheet was never the property wanted: a title whose first
+  and last letters sit on the sheet border, on a plate whose artwork keeps
+  thirty pixels, reads as having run off the page. Two hundred and forty-five
+  titles keep the top size, thirty-nine take one step and twelve take two, and
+  none reaches the floor, so the floor stays a backstop rather than a size the
+  corpus is set at. The census that measures every label against its 900 px
+  sheet reports zero.
+- A second census measures the labels against the drawings, which is where the
+  wider face actually put them: `outline.py --collisions` reports two labels
+  sharing a line whose ink meets, a label crossing the border of a stroked box
+  it sits inside or reaching into one it sits outside, a rule or a circle drawn
+  through a label, and a filled panel drawn after a label and across it. It
+  counted 298 collisions that the typeface change had introduced, and it is how
+  they were worked off. Thirteen survived the scale conversion and were given
+  room one at a time; ten boxes that had been measured on their English
+  contents are now cut to whichever of the two languages is the longer, the
+  Spanish of this corpus running about a quarter longer throughout; and the
+  two-channel FRF plate's signal generator has a box wide enough for its own
+  caption for the first time, having been 190 px around a 195 px Spanish
+  caption before any of this. The corpus carries 356 hits where the same census
+  counts 471 on the release before it, every text-on-text overprint in it is
+  gone, and nothing in the 356 is a collision that release did not already
+  have.
 - The corpus typography is finished end to end: figure titles at text weight
   (the ISO 80000 justification for mixed weights dissolved on reading the
   standard, which regulates slope and never weight), the prime composed as a

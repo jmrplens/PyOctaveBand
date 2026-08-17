@@ -30,10 +30,24 @@ from diagrams.canvas import LIGHT, SVG, _label_runs, _math_runs
 from diagrams.i18n import _ES
 from diagrams.outline import measure
 
-_REG = "LiberationSans-Regular-"
-_BOLD = "LiberationSans-Bold-"
-_ITAL = "LiberationSans-Italic-"
-_BOLDITAL = "LiberationSans-BoldItalic-"
+#: The glyph-id stem each face writes, one per DejaVu file the plates set.
+_REG = "DejaVuSans"
+_BOLD = "DejaVuSans-Bold"
+_ITAL = "DejaVuSans-Oblique"
+_BOLDITAL = "DejaVuSans-BoldOblique"
+
+
+def _uses(markup: str, stem: str) -> int:
+    """How many glyph ids of exactly this face the markup carries.
+
+    Both the ``<defs>`` atlas and the ``<use>`` references are counted. A
+    bare substring test would not do here: ``DejaVuSans`` is a prefix of
+    ``DejaVuSans-Bold``, and that of ``DejaVuSans-BoldOblique``, so a
+    regular-face assertion would silently count the bold and italic
+    glyphs too. The hexadecimal glyph index that closes every id is what
+    pins the stem exactly.
+    """
+    return len(re.findall(rf'="#?{re.escape(stem)}-[0-9a-f]+"', markup))
 
 
 def _element(s: str, **kwargs: object) -> str:
@@ -57,7 +71,7 @@ def test_plain_string_bakes_to_one_commented_group() -> None:
     assert 'fill="#1a1a1a"' in element
     # One <use> per inked glyph; the three spaces advance the pen only.
     assert element.count("<use ") == len("probe A, 30 mm above".replace(" ", ""))
-    assert element.count(_REG) == element.count("<use ")
+    assert _uses(element, _REG) == element.count("<use ")
     assert "<text" not in element
     assert "tspan" not in element
 
@@ -85,7 +99,7 @@ def test_subscript_composition() -> None:
     # size (4.4 px at 20 px), never of the script size.
     assert "scale(0.2 -0.2)" in element
     assert "104.4) scale(0.14 -0.14)" in element
-    assert element.count(_ITAL) == 2
+    assert _uses(element, _ITAL) == 2
 
 
 def test_superscript_composition() -> None:
@@ -95,8 +109,8 @@ def test_superscript_composition() -> None:
     ]
     # The superscript rises by 0.38 of the element size: 100 - 7.6.
     assert "92.4) scale(0.14 -0.14)" in element
-    assert element.count(_ITAL) == 1
-    assert element.count(_REG) == 1
+    assert _uses(element, _ITAL) == 1
+    assert _uses(element, _REG) == 1
 
 
 def test_baseline_restored_after_script() -> None:
@@ -141,7 +155,7 @@ def test_combining_mark_travels_with_its_letter() -> None:
     # One italic group, two glyphs: the base and its attached mark.
     assert element.count("<g ") == 1
     assert element.count("<use ") == 2
-    assert element.count(_ITAL) == 2
+    assert _uses(element, _ITAL) == 2
 
 
 def test_prose_and_math_share_one_pen_with_whitespace_verbatim() -> None:
@@ -164,8 +178,8 @@ def test_anchor_resolves_from_the_measured_width() -> None:
     first_x = float(re.search(r"translate\(([\d.\-]+) ", element).group(1))  # type: ignore[union-attr]
     assert first_x == pytest.approx(450 - width, abs=0.02)
     # Bold styles the math's italic runs into BoldItalic.
-    assert _BOLDITAL in element
-    assert _BOLD in element
+    assert _uses(element, _BOLDITAL)
+    assert _uses(element, _BOLD)
 
 
 def test_math_and_prose_escape_metacharacters_in_the_comment() -> None:
@@ -338,12 +352,12 @@ def test_translation_happens_before_composition(
     # The pipeline is strictly tr -> compose -> measure -> outline:
     # the comment and the composed runs both carry the Spanish string.
     assert svg.parts[0].startswith("<!-- celeridad $c_0$ -->")
-    assert _ITAL in svg.parts[0]
+    assert _uses(svg.parts[0], _ITAL)
 
 
 def test_fit_gate_raises_on_overflow_and_passes_the_boundary() -> None:
     svg = SVG(900, 560, LIGHT)
-    width = measure(_label_runs("overhang"), 20)
+    width = measure(_label_runs("overhang"), 17)
     # Just inside the half-pixel grace: no error.
     svg.text(900 - width + 0.4, 100, "overhang", anchor="start")
     assert svg.parts
@@ -369,15 +383,49 @@ def test_render_routes_the_title_through_the_same_emission() -> None:
     assert "<title>Plain title</title>" in plain
     assert "<!-- Plain title -->" in plain
     assert "<defs>" in plain
-    assert plain.count(_BOLD) >= 2  # bold outlined glyphs, defs + uses
+    assert _uses(plain, _BOLD) >= 2  # bold outlined glyphs, defs + uses
     composed = SVG(900, 560, LIGHT).render("Rating $R_w$ measured")
     assert "<title>Rating $R_w$ measured</title>" in composed
-    # The w subscript drops 0.22 of the 26 px title: y = 30 + 5.72, at
+    # The w subscript drops 0.22 of the 22 px title: y = 30 + 4.84, at
     # 0.7 of the title size.
-    assert "35.72) scale(0.182 -0.182)" in composed
-    assert _BOLDITAL in composed
+    assert "34.84) scale(0.154 -0.154)" in composed
+    assert _uses(composed, _BOLDITAL)
     assert "<text" not in composed
     assert "xml:space" not in composed
+
+
+def test_title_steps_down_only_as_far_as_the_sheet_demands() -> None:
+    svg = SVG(900, 560, LIGHT)
+    assert svg.title_size("Plain title") == canvas._TITLE_SIZES[0]
+    # Each step is taken at the width the step above stops keeping its
+    # margin at, and the floor is returned rather than a further step.
+    room = 900 - 2 * canvas._TITLE_MARGIN
+    for larger, smaller in zip(canvas._TITLE_SIZES, canvas._TITLE_SIZES[1:]):
+        wide = "W" * (int(room / measure(_label_runs("W", bold=True), larger)) + 1)
+        assert svg.title_size(wide) <= smaller
+    assert svg.title_size("W" * 200) == canvas._TITLE_SIZES[-1]
+
+
+def test_title_steps_down_for_the_margin_not_only_for_the_sheet() -> None:
+    # A title that clears the sheet at the top size but eats into the
+    # white the plate keeps at its edges still steps down: the defect
+    # this catches is a title reading as if it had run off the page.
+    svg = SVG(900, 560, LIGHT)
+    unit = measure(_label_runs("W", bold=True), canvas._TITLE_SIZES[0])
+    wide = "W" * int((900 - canvas._TITLE_MARGIN) / unit)
+    assert measure(_label_runs(wide, bold=True), canvas._TITLE_SIZES[0]) < 900
+    assert svg.title_size(wide) < canvas._TITLE_SIZES[0]
+
+
+def test_a_stepped_down_title_carries_its_scripts_down_with_it() -> None:
+    # Long enough to need the floor, short enough that the floor holds it.
+    title = "Rating $R_w$ against a reference" + " curve" * 8
+    assert SVG(900, 560, LIGHT).title_size(title) == 20
+    out = SVG(900, 560, LIGHT).render(title)
+    # The w subscript drops 0.22 of the size the element got, not of the
+    # nominal one: y = 30 + 4.40, at 0.7 of 20 px.
+    assert "34.4) scale(0.14 -0.14)" in out
+    assert "34.84) scale(0.154 -0.154)" not in out
 
 
 def test_emission_carries_no_style_attribute_and_no_checker_ids() -> None:
