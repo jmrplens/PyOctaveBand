@@ -406,6 +406,18 @@ def _census_labels() -> list[_Label]:
     return records
 
 
+#: Ink box of a label as fractions of its size, above and below the
+#: baseline. Cap height and descender of the face, rounded out: what the
+#: collision census compares is ink against ink, and a label's advance
+#: already comes from the shaper.
+_ASCENT, _DESCENT = 0.76, 0.24
+
+#: How close two labels on one line may come before the census calls it a
+#: run-together, as a fraction of the smaller size. A word space is about
+#: 0.3 em in this family, so a gap under that reads as one word.
+_TIGHT = 0.30
+
+
 class _Hit(NamedTuple):
     """One label found touching something it is not meant to touch."""
 
@@ -444,18 +456,6 @@ class _Box(NamedTuple):
     stroke: str
     fill: str
     seq: int
-
-
-#: Ink box of a label as fractions of its size, above and below the
-#: baseline. Cap height and descender of the face, rounded out: what the
-#: collision census compares is ink against ink, and a label's advance
-#: already comes from the shaper.
-_ASCENT, _DESCENT = 0.76, 0.24
-
-#: How close two labels on one line may come before the census calls it a
-#: run-together, as a fraction of the smaller size. A word space is about
-#: 0.3 em in this family, so a gap under that reads as one word.
-_TIGHT = 0.30
 
 
 def _collisions() -> list[_Hit]:
