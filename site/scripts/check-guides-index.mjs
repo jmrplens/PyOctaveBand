@@ -17,18 +17,13 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { topics } from '../src/data/topics.mjs';
+// The topics whose pages are guides: every one that teaches, which is every
+// topic except the three carrying no teaching prose. Read from the navigation
+// data rather than listed here, so a new domain is covered the day it is added.
+import { domainIds as DOMAINS } from '../src/data/topics.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const CONTENT = join(here, '..', 'src', 'content', 'docs');
-
-/**
- * The topics whose pages are guides: every one that teaches, which is every
- * topic except the three carrying no teaching prose. Derived rather than
- * listed, for the same reason the byline derives it (src/components/PageTitle).
- */
-const NOT_A_DOMAIN = new Set(['start', 'reference', 'api']);
-const DOMAINS = topics.map((topic) => topic.id).filter((id) => id && !NOT_A_DOMAIN.has(id));
 
 /** Every markdown file under `dir`, at any depth. */
 function walk(dir, out = []) {

@@ -34,6 +34,12 @@
  *     by Starlight's locale fallback, so the whole subtree is excluded:
  *     sending a Spanish speaker to an English page with a fallback notice
  *     would be worse than leaving them where they are.
+ *   - The 404 page is excluded as well. Starlight builds one 404.html for the
+ *     whole site and no /es/404/ route exists, so the counterpart this
+ *     component computes for every other page is the one address on the site
+ *     that is not a page. GitHub Pages happens to answer it with the same
+ *     404.html, which is why the offer looked like it worked, but it is a
+ *     link to nothing and it is the only one the site emits.
  *
  * The banner is rendered in the language it offers, since that is the
  * language the reader is assumed to understand.
@@ -56,6 +62,8 @@ const current: 'en' | 'es' = isEs ? 'es' : 'en';
 // English-only generated subtree: no useful counterpart exists.
 const bare = isEs ? rel.replace(/^\/es/, '') || '/' : rel;
 const isApiReference = bare.startsWith('/reference/api');
+// The single site-wide error page: its counterpart is not a route.
+const is404 = bare === '/404' || bare === '/404/';
 
 // Counterpart URL under this site's scheme: ES mirrors EN under /es/.
 const counterpart = isEs ? `${BASE}${bare}` : `${BASE}/es${bare === '/' ? '/' : bare}`;
@@ -82,7 +90,7 @@ const copy = COPY[other];
 ---
 
 {
-	ENABLED && !isApiReference && (
+	ENABLED && !isApiReference && !is404 && (
 		<div
 			id="lang-suggest"
 			class="lang-suggest"

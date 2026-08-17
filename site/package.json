@@ -10,6 +10,7 @@
     "check:icons": "node scripts/icon-sheet.mjs --check",
     "check:math": "node scripts/check-math-render.mjs",
     "check:sidebar": "node scripts/with-preview.mjs -- node scripts/check-sidebar.mjs",
+    "check:structured-data": "node scripts/check-structured-data.mjs",
     "check:visual": "node scripts/with-preview.mjs -- sh -c 'node scripts/check-contrast.mjs && node scripts/check-home-headings.mjs && node scripts/check-lang-suggest.mjs && node scripts/check-page-chips.mjs'",
     "dev": "astro dev",
     "html-validate": "html-validate 'dist/**/*.html'",

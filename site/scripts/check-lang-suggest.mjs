@@ -111,6 +111,17 @@ expect(
 	{ url: `${BASE_PATH}/reference/api/signals/levels/`, banner: 'absent', stored: null },
 );
 
+// 8b. So does the 404. Starlight builds one 404.html for the whole site, so
+//     the counterpart the bar computes for every other page, /es/404/, is the
+//     one address here that is not a page: GitHub Pages answers it with the
+//     same 404.html, which is exactly why an offer to nowhere looked like it
+//     worked. It was the only broken internal link the site emitted.
+expect(
+	'the 404 page renders no banner at all',
+	await visit('/404/'),
+	{ url: `${BASE_PATH}/404/`, banner: 'absent', stored: null },
+);
+
 // 9. Nothing ever navigates on its own: the same first visit that a redirect
 //    would have moved stays exactly where it was asked to be.
 expect(
