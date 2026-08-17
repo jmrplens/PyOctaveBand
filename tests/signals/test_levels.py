@@ -6,6 +6,7 @@ Tests for integrated and statistical sound levels (Leq, LAeq, LN).
 import inspect
 import pathlib
 import re
+import string
 
 import numpy as np
 import pytest
@@ -400,8 +401,26 @@ def test_sound_exposure_rejects_nonpositive_duration() -> None:
 
 
 # ---------------------------------------------------------------------------
-# The guide's signature cells must not overstate what they list
+# The guide's parameter tables must not overstate what they list
 # ---------------------------------------------------------------------------
+
+#: The levels guide exists three times over: the plain-markdown edition under
+#: ``docs/`` that GitHub and the llms artifacts read, and the two published
+#: site editions. They are written by hand, one per language, so a table that
+#: drifts drifts in one copy at a time; every check below runs on all three.
+_LEVELS_GUIDE_COPIES = (
+    "docs/signals/levels/levels.md",
+    "site/src/content/docs/signals/levels/levels.mdx",
+    "site/src/content/docs/es/signals/levels/levels.mdx",
+)
+
+
+def _levels_guide(relative_path: str) -> str:
+    """The text of one copy of the levels guide."""
+    path = pathlib.Path(__file__).resolve().parents[2] / relative_path
+    assert path.is_file(), f"missing guide copy: {relative_path}"
+    return path.read_text(encoding="utf-8")
+
 
 #: A first-column cell of the "Peak / event / dose parameters" table, e.g.
 #: ``| `sel(x, fs, weighting=None, ...)` | ...``.
@@ -431,22 +450,23 @@ def _real_signature_tokens(func: object) -> list[str]:
     return tokens
 
 
-def test_guide_signature_cells_match_the_code() -> None:
+@pytest.mark.parametrize("relative_path", _LEVELS_GUIDE_COPIES)
+def test_guide_signature_cells_match_the_code(relative_path: str) -> None:
     """Rows that omit parameters must say so with an explicit ellipsis.
 
     Three rows of the peak/event/dose table elide their tail with ``...``,
     which makes a row *without* one read as the complete signature. This
     checks both readings: an elided row must be a true prefix of the real
     signature, and a plain row must list it in full.
+
+    Signatures are code, not prose, so they read the same in every copy and
+    the same check applies to each: the published site editions are the ones
+    a reader actually meets.
     """
     import phonometry
     from phonometry.signals import levels as levels_module
 
-    guide = (
-        pathlib.Path(__file__).resolve().parents[2]
-        / "docs" / "signals" / "levels" / "levels.md"
-    )
-    documented = _documented_signatures(guide.read_text(encoding="utf-8"))
+    documented = _documented_signatures(_levels_guide(relative_path))
     checked = 0
     for name, params in documented.items():
         func = getattr(levels_module, name, None) or getattr(phonometry, name, None)
@@ -461,6 +481,50 @@ def test_guide_signature_cells_match_the_code() -> None:
         else:
             assert params == real, (name, params, real)
     assert checked >= 4, f"expected the peak/event/dose rows, checked {checked}"
+
+
+#: The ``weighting`` row of the LN parameter table, whose values column names
+#: the curves. Curve letters are identifiers, so they are the same in both
+#: languages even though the prose around them is not.
+_WEIGHTING_ROW = re.compile(r"^\|\s*`weighting`\s*\|")
+_QUOTED_CURVE = re.compile(r"`'([A-Za-z]+)'`")
+
+
+def _accepted_weighting_curves() -> set[str]:
+    """Every curve `weighting_filter` really takes, found by asking it."""
+    from phonometry import weighting_filter
+
+    silence = np.zeros(256)
+    accepted = set()
+    for candidate in [*string.ascii_uppercase, "AU"]:
+        try:
+            weighting_filter(silence, FS, curve=candidate)
+        except ValueError:
+            continue
+        accepted.add(candidate)
+    return accepted
+
+
+@pytest.mark.parametrize("relative_path", _LEVELS_GUIDE_COPIES)
+def test_guide_weighting_row_lists_every_curve_the_code_takes(
+    relative_path: str,
+) -> None:
+    """The LN table's `weighting` row must name the real accepted set.
+
+    It used to name four of the seven curves, which reads as a closed list
+    and hides 'B', 'D' and 'AU'. Listing one that does not exist would be
+    the same defect the other way round, so this compares the two sets.
+    """
+    rows = [
+        line
+        for line in _levels_guide(relative_path).splitlines()
+        if _WEIGHTING_ROW.match(line.strip())
+    ]
+    assert len(rows) == 1, f"expected one `weighting` row, found {len(rows)}"
+    columns = rows[0].strip().strip("|").split("|")
+    assert len(columns) == 5, columns
+    documented = set(_QUOTED_CURVE.findall(columns[3]))
+    assert documented == _accepted_weighting_curves(), sorted(documented)
 
 
 @pytest.mark.parametrize("curve", ["A", "B", "C", "D", "G", "AU", "Z"])
