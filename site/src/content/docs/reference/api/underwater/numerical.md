@@ -127,7 +127,24 @@ The limits are worth knowing before the numbers are believed.
   $\tan\theta_\mathrm{max}$ depth units of climb per unit range. The
   warning below says when that pairing is wrong.
 * **The beam must be small compared to the channel**, which the default
-  `beam_width` enforces and an explicit one is checked against.
+  `beam_width` enforces and an explicit one is checked against. In
+  shallow water that clamp, and not the method, is the largest error left:
+  it holds $W_0$ at a quarter of the water depth while the optimum
+  the same function computes first is several times larger, and the field
+  comes out systematically too quiet. Measured against the closed-form Airy
+  modes of an $n^2$-linear 200 m guide at 200 Hz, source at 30.5 m and
+  receiver at 120.5 m, energy-averaged over 0.5 to 4 km: the default
+  $W_0$ of 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
+  100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about
+  refraction is wrong there, and the same profile in 1000 m of water, where
+  the clamp does not bite, comes out at +0.72 dB with a 1.37 dB worst bin,
+  closer to the exact field than [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) on the same cut. Pass
+  `beam_width` explicitly, above the cap and up to about the water depth,
+  when the channel is shallow and the profile refracts; the warning it
+  raises is then the expected cost of the better answer. Sect. 3.5 says the
+  same thing from the other side, that "at lower frequencies the physics may
+  imply that the beam is large compared to the channel, which causes a
+  variety of problems".
 
 What it costs is `n_beams` times the size of the receiver grid, and none
 of the three factors depends on the frequency: the ray core does not have to

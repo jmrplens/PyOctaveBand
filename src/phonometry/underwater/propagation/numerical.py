@@ -678,6 +678,21 @@ def _default_beam_width(
     channel, and it has the final word over the other two, because a beam
     comparable to the water depth breaks the bookkeeping that folds a reflected
     ray back into the column rather than merely costing accuracy.
+
+    That last sentence is the one to read sceptically, because it is where this
+    default is at its worst and the measurement does not support the reasoning
+    behind it. The folded-image ladder of :func:`_image_ladder` restores what the
+    folding drops, and with it in place a beam as wide as the channel is not
+    merely tolerable but better: on an :math:`n^2`-linear 200 m guide at 200 Hz,
+    against the exact Airy modes, the quarter-depth width of 50 m is +3.08 dB in
+    the mean while 200 m is -0.22 dB, and on the isovelocity 200 m guide at
+    50 Hz the same two widths give +0.48 and +0.001 dB against the modal sum.
+    What the clamp protects is the folding of a beam whose *central ray* has
+    reflected, which the ladder does not reach; what it costs is a shallow-water
+    bias of a few decibels, always in the same direction. It is left in place
+    because a silent error is worse than a documented one, and
+    :func:`gaussian_beams` says there when to override it, but a caller in
+    shallow refracting water should override it.
     """
     return float(min(max(np.sqrt(wavelength * max_range / np.pi),
                          10.0 * wavelength),
@@ -1046,7 +1061,24 @@ def gaussian_beams(
       :math:`\tan\theta_\mathrm{max}` depth units of climb per unit range. The
       warning below says when that pairing is wrong.
     * **The beam must be small compared to the channel**, which the default
-      ``beam_width`` enforces and an explicit one is checked against.
+      ``beam_width`` enforces and an explicit one is checked against. In
+      shallow water that clamp, and not the method, is the largest error left:
+      it holds :math:`W_0` at a quarter of the water depth while the optimum
+      the same function computes first is several times larger, and the field
+      comes out systematically too quiet. Measured against the closed-form Airy
+      modes of an :math:`n^2`-linear 200 m guide at 200 Hz, source at 30.5 m and
+      receiver at 120.5 m, energy-averaged over 0.5 to 4 km: the default
+      :math:`W_0` of 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
+      100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about
+      refraction is wrong there, and the same profile in 1000 m of water, where
+      the clamp does not bite, comes out at +0.72 dB with a 1.37 dB worst bin,
+      closer to the exact field than :func:`normal_modes` on the same cut. Pass
+      ``beam_width`` explicitly, above the cap and up to about the water depth,
+      when the channel is shallow and the profile refracts; the warning it
+      raises is then the expected cost of the better answer. Sect. 3.5 says the
+      same thing from the other side, that "at lower frequencies the physics may
+      imply that the beam is large compared to the channel, which causes a
+      variety of problems".
 
     What it costs is ``n_beams`` times the size of the receiver grid, and none
     of the three factors depends on the frequency: the ray core does not have to
