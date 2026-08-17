@@ -35,6 +35,23 @@ const here = dirname(fileURLToPath(import.meta.url));
 const DIST = process.argv[2] ? resolve(process.argv[2]) : join(here, '..', 'dist');
 const ORIGIN = `${siteUrl}${basePath}`;
 
+/**
+ * Whether `url` addresses a page of this site.
+ *
+ * The boundary matters: `basePath` is a path segment, not a prefix, so a
+ * plain `startsWith(ORIGIN)` would also accept a sibling whose name merely
+ * begins the same way, `/phonometry-old/` passing as `/phonometry/`. Nothing
+ * emits such a URL today, but a check that accepts an address it was written
+ * to reject reports success without having looked.
+ *
+ * @param {unknown} url The crumb's `item`, which may be absent or not a string.
+ * @returns {boolean} True when the URL is this site's root or below it.
+ */
+const isOnThisSite = (url) => {
+	const value = String(url ?? '');
+	return value === ORIGIN || value.startsWith(`${ORIGIN}/`);
+};
+
 let failures = 0;
 const fail = (message) => {
 	console.error(`FAIL ${message}`);
@@ -307,7 +324,7 @@ for (const file of files) {
 		if (last && last.item !== canonical) {
 			fail(`${route}: the last crumb points at ${last.item}, not ${canonical}`);
 		}
-		const dangling = items.filter((item) => !String(item.item ?? '').startsWith(ORIGIN));
+		const dangling = items.filter((item) => !isOnThisSite(item.item));
 		if (dangling.length > 0) {
 			fail(`${route}: ${dangling.length} crumb(s) point outside the site`);
 		}
