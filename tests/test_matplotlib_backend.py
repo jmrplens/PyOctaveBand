@@ -16,6 +16,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 SRC = Path(__file__).resolve().parent.parent / "src" / "phonometry"
 
 
@@ -58,6 +60,22 @@ def _imports_matplotlib(node: ast.stmt) -> bool:
     return any(name == "matplotlib" or name.startswith("matplotlib.") for name in names)
 
 
+def _is_type_checking_guard(test: ast.expr) -> bool:
+    """Whether ``test`` is the one condition that never runs.
+
+    Only a bare ``TYPE_CHECKING`` or ``typing.TYPE_CHECKING`` qualifies. This
+    used to ask whether the unparsed test *contained* the name, which is the
+    same question with the wrong answer for the two conditions that matter:
+    ``if not TYPE_CHECKING:`` runs exactly when the guard does not, and
+    ``if TYPE_CHECKING or enabled:`` runs whenever ``enabled`` is true. Both
+    read as guarded to a substring search, so an import placed in either would
+    have been waved through by the gate meant to catch it.
+    """
+    if isinstance(test, ast.Name):
+        return test.id == "TYPE_CHECKING"
+    return isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING"
+
+
 def _eager_matplotlib_imports(
     body: list[ast.stmt], *, guarded: bool = False
 ) -> list[int]:
@@ -66,9 +84,14 @@ def _eager_matplotlib_imports(
     Only two placements are lazy: inside a function body, and under
     ``if TYPE_CHECKING:``, which never executes. Everything else at module
     scope runs the moment the package is imported, including a class body and
-    the branches of a runtime ``if``, a ``try`` or a ``with`` -- so this
-    descends into those rather than assuming a bare top-level statement is the
-    only way to import something eagerly.
+    the branches of a runtime ``if``, a ``try``, a ``with``, a loop or a
+    ``match`` -- so this descends into those rather than assuming a bare
+    top-level statement is the only way to import something eagerly.
+
+    The compound statements are enumerated rather than walked generically
+    because the distinction being drawn is exactly the one a generic walk
+    erases: a function body is the *point* of the lazy placement and must not
+    be descended into, while every other block runs on import and must be.
     """
     eager: list[int] = []
     for node in body:
@@ -77,7 +100,7 @@ def _eager_matplotlib_imports(
                 eager.append(node.lineno)
         elif isinstance(node, ast.If):
             # ``else`` is the runtime branch of a TYPE_CHECKING guard.
-            deferred = guarded or "TYPE_CHECKING" in ast.unparse(node.test)
+            deferred = guarded or _is_type_checking_guard(node.test)
             eager += _eager_matplotlib_imports(node.body, guarded=deferred)
             eager += _eager_matplotlib_imports(node.orelse, guarded=guarded)
         elif isinstance(node, ast.Try):
@@ -88,7 +111,14 @@ def _eager_matplotlib_imports(
                 *(handler.body for handler in node.handlers),
             ):
                 eager += _eager_matplotlib_imports(block, guarded=guarded)
-        elif isinstance(node, (ast.With, ast.ClassDef)):
+        elif isinstance(node, (ast.For, ast.AsyncFor, ast.While)):
+            # A loop that never iterates still executes its ``else``.
+            for block in (node.body, node.orelse):
+                eager += _eager_matplotlib_imports(block, guarded=guarded)
+        elif isinstance(node, ast.Match):
+            for case in node.cases:
+                eager += _eager_matplotlib_imports(case.body, guarded=guarded)
+        elif isinstance(node, (ast.With, ast.AsyncWith, ast.ClassDef)):
             eager += _eager_matplotlib_imports(node.body, guarded=guarded)
     return eager
 
@@ -112,6 +142,46 @@ def test_no_module_scope_matplotlib_import_anywhere() -> None:
         "matplotlib imported at module scope (import it inside the function "
         "that needs it, or under TYPE_CHECKING when it is only a type):\n"
         + "\n".join(offenders)
+    )
+
+
+#: ``(label, module source, is it eager?)``. The gate above is only as good as
+#: this classifier, and a gate that quietly answers "nothing to report" is
+#: worse than no gate, so the classifier is pinned against the placements that
+#: decide it: the two conditions that merely mention ``TYPE_CHECKING`` without
+#: being it, the block statements that run on import, and the two placements
+#: that genuinely are lazy and must stay unreported.
+_PLACEMENTS = [
+    ("type-checking guard", "if TYPE_CHECKING:\n    import matplotlib\n", False),
+    ("qualified guard", "if typing.TYPE_CHECKING:\n    import matplotlib\n", False),
+    ("function body", "def f():\n    import matplotlib\n", False),
+    ("negated guard", "if not TYPE_CHECKING:\n    import matplotlib\n", True),
+    ("guard in an or", "if TYPE_CHECKING or x:\n    import matplotlib\n", True),
+    (
+        "guard's else",
+        "if TYPE_CHECKING:\n    pass\nelse:\n    import matplotlib\n",
+        True,
+    ),
+    ("for body", "for i in x:\n    import matplotlib\n", True),
+    ("for else", "for i in x:\n    pass\nelse:\n    import matplotlib\n", True),
+    ("while body", "while x:\n    import matplotlib\n", True),
+    ("match case", "match v:\n    case _:\n        import matplotlib\n", True),
+    ("with body", "with ctx():\n    import matplotlib\n", True),
+    ("class body", "class C:\n    import matplotlib\n", True),
+    ("try body", "try:\n    import matplotlib\nexcept ImportError:\n    pass\n", True),
+]
+
+
+@pytest.mark.parametrize(
+    ("label", "source", "eager"),
+    _PLACEMENTS,
+    ids=[label for label, _, _ in _PLACEMENTS],
+)
+def test_eager_import_classifier(label: str, source: str, eager: bool) -> None:
+    """The classifier behind the gate reports exactly the eager placements."""
+    found = _eager_matplotlib_imports(ast.parse(source).body)
+    assert bool(found) is eager, (
+        f"{label}: expected {'an eager' if eager else 'no'} import, got {found}"
     )
 
 
