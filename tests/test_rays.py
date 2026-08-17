@@ -320,22 +320,25 @@ def _capped_layer_paths(
 ) -> tuple[np.ndarray, float]:
     """``z(r)`` in closed form for a gradient layer under a homogeneous cap.
 
-    In the layer the ray is the usual circular arc, which the angle from the
-    horizontal writes without a square root twice over: differentiating Snell's
-    law :math:`\\cos\\theta = c\\,\\xi` gives
+    In the layer the ray is the usual circular arc, and the angle from the
+    horizontal is what writes it down without solving anything: differentiating
+    Snell's law :math:`\\cos\\theta = c\\,\\xi` along the ray gives
     :math:`d\\theta/dr = -\\xi g/\\cos\\theta`, hence
-    :math:`\\sin\\theta(r) = \\sin\\theta_0 - \\xi g r` and
-    :math:`z - z_\\mathrm{s} = (\\cos\\theta - \\cos\\theta_0)/(\\xi g)`. Above
-    the cap the sound speed is constant and the ray is the straight line it
-    arrives as. No integrator and no ray-tube quantity anywhere in it, which is
-    what makes the family below an oracle rather than a restatement.
+    :math:`\\sin\\theta(r) = \\sin\\theta_0 - \\xi g r`, and Snell's law itself
+    then gives :math:`z - z_\\mathrm{s} = (\\cos\\theta - \\cos\\theta_0)/
+    (\\xi g)`. Above the cap the sound speed is constant and the ray is the
+    straight line it arrives as. No integrator and no ray-tube quantity anywhere
+    in it, which is what makes the family below an oracle rather than a
+    restatement.
     """
     g, height = _CAPPED_GRADIENT, _CAPPED_HEIGHT
     c_ground = float(_CAPPED[1][0])
     c_s = c_ground + g * _CAPPED_SOURCE
     th0 = np.radians(angle_deg)
     xi = float(np.cos(th0) / c_s)
-    th_top = np.arccos((c_ground + g * height) * xi)
+    cos_top = (c_ground + g * height) * xi
+    assert cos_top <= 1.0, "the ray must clear the cap for this form to hold"
+    th_top = np.arccos(cos_top)
     r_top = (np.sin(th0) - np.sin(th_top)) / (xi * g)
     sin_th = np.sin(th0) - xi * g * np.minimum(ranges, r_top)
     in_layer = _CAPPED_SOURCE + (np.sqrt(1.0 - sin_th**2) - np.cos(th0)) / (xi * g)
@@ -413,8 +416,8 @@ def test_a_near_tangential_crossing_costs_what_a_square_one_does_not() -> None:
     # meets the kink. Both rays here clear the same cap, the first by a
     # hundredth of a degree and the second at 25 degrees, and the first pays
     # more than two orders of magnitude for it. Pinning that here is what keeps
-    # the figure in the docstring honest, and what would catch a sub-step that
-    # stopped landing on the node at all.
+    # the numbers in the module docstring honest, and what would catch a
+    # sub-step that stopped landing on the node at all.
     rmax, coarse, fine = 4000.0, 401, 1601
     grazing = np.degrees(np.arccos(
         (_CAPPED[1][0] + _CAPPED_GRADIENT * _CAPPED_SOURCE) / _CAPPED[1][1]))

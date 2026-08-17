@@ -94,6 +94,13 @@ applies one rule at all three kinds of level. In particular an isovelocity
 layer against a boundary leaves the pair untouched, as the image-source
 construction requires.
 
+Which of the two a level is depends on the medium and not on where the profile
+happens to stop. The ocean's profile ends on its two boundaries, so its end
+nodes are reflections; the atmosphere's ends in mid air with nothing above it
+but the homogeneous half space the clamped interpolation of the sound speed
+implies, so its last node is an interface, and a ray that climbs out through it
+takes the plain gradient jump on the way.
+
 Carrying the pair is opt-in (``dynamic=`` on :func:`march_rays`), for two
 reasons worth stating rather than leaving to be discovered. It costs the
 atmospheric tracer, which has no use for an amplitude, nothing at all. And
@@ -200,7 +207,12 @@ class DynamicRays(NamedTuple):
     :ivar slope: Per-ray :math:`p(0)`, in the same dtype as ``spreading``.
     :ivar profile_depths: Node coordinates of the sound-speed profile,
         ascending, in the marcher's own ``z``. This must be the profile the
-        ``deriv`` closes over: the impulses live at its nodes.
+        ``deriv`` closes over, in full: the impulses live at its nodes, and
+        beyond its ends the medium is taken to be homogeneous, which is what
+        the :func:`numpy.interp` both callers read their sound speed with
+        already says. So a node that ends the profile away from a reflecting
+        boundary is an interface like any other, and the ``deriv`` has to hold
+        its gradient flat past it for the two to agree.
     :ivar profile_speeds: Sound speed at each node, in m/s.
     """
 
@@ -343,7 +355,7 @@ def _prepare_impulses(
     clamped interpolation makes the medium homogeneous, and the last node is
     then a kink the rays climb through like any other. Dropping it would put
     them back on the free-space spreading this whole apparatus exists to avoid,
-    silently and by roughly the size of the gradient the profile ends on.
+    silently, and in proportion to the gradient the profile ends on.
     """
     z_prof = np.asarray(dynamic.profile_depths, dtype=np.float64).ravel()
     c_prof = np.asarray(dynamic.profile_speeds, dtype=np.float64).ravel()
