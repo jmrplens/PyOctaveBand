@@ -125,13 +125,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   figure on one documentation page are set in one typeface rather than two and
   a single pin fixes the letters of the whole drawn corpus. The plates keep a
   deterministic per-glyph fallback for what the monospaced cuts lack and a hard
-  error for a character no face covers; all 185 distinct characters the 6,550
+  error for a character no face covers; all 185 distinct characters the 6,552
   plate labels set, in both languages, are carried by the face their own run
   asks for. Three plates rendered under an emptied fontconfig are
   pixel-identical to the normal render, which is the property the whole change
   exists for.
 - Every label the wider face pushed off its sheet is recomposed. The census
-  that measures all 6,550 plate labels in both languages against their 900 px
+  that measures all 6,552 plate labels in both languages against their 900 px
   sheets named 330 of them, across 196 plates, once the typeface changed.
   Nearly half were plate titles, the one label on a plate whose width nobody
   chose: a title is a sentence centred on the sheet, and half the corpus is
