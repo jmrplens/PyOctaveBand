@@ -8,6 +8,7 @@ transcription are cross-checked against the independent ``reference_data``
 copy shared with the CI conformance report, so a typo in either surfaces.
 """
 
+import inspect
 import math
 
 import pytest
@@ -77,6 +78,38 @@ def test_high_accuracy_weighting_verdicts(fs: int, curve: str) -> None:
         off = [b for b in result["bands"] if b["class"] != 1]
         assert len(off) == 1
         assert off[0]["freq"] == max(b["freq"] for b in result["bands"])
+
+
+def test_high_accuracy_docstring_states_the_32_khz_verdict_per_curve() -> None:
+    """The ``high_accuracy`` paragraph serves every curve, so a verdict stated
+    in it without naming one reads as a verdict for all of them, and at 32 kHz
+    the curves do not agree: the same -16.0 dB class 1 lower limit that the A
+    response misses the C response clears. Each verdict the paragraph states
+    for that rate must therefore name its curve and match what the verifier
+    measures for it, so the prose cannot drift from the code.
+    """
+    doc = inspect.getdoc(WeightingFilter.__init__) or ""
+    assert ":param high_accuracy:" in doc
+    # ``high_accuracy`` is the last parameter, so the rest of the docstring is
+    # its paragraph; collapse the wrapping so phrases survive a line break.
+    paragraph = " ".join(doc.split(":param high_accuracy:", 1)[1].split())
+
+    verdicts = {
+        curve: verify_weighting_class(WeightingFilter(32000, curve))["overall_class"]
+        for curve in ("A", "C")
+    }
+    # The premise of the check: at 32 kHz the verdict depends on the curve.
+    assert verdicts["A"] != verdicts["C"]
+    for curve, verdict in verdicts.items():
+        assert f"{verdict} for {curve}" in paragraph, (
+            f"the 32 kHz verdict of the {curve} curve is class {verdict}, which "
+            f"the high_accuracy paragraph does not state for it: {paragraph}"
+        )
+    # At 16 kHz the two curves do agree, so one unqualified verdict is honest.
+    assert all(
+        verify_weighting_class(WeightingFilter(16000, curve))["overall_class"] is None
+        for curve in ("A", "C")
+    )
 
 
 def test_z_weighting_zero_deviation() -> None:

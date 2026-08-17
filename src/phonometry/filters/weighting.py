@@ -95,12 +95,15 @@ class WeightingFilter:
             low sample rates, because the resampling stages it adds around
             the sections carry an anti-alias transition band centred on the
             input Nyquist frequency: above roughly 0.9 x fs/2 the response
-            rolls off steeply whatever the design rate. At fs = 32 kHz the
-            15 848.9 Hz nominal point falls 16.2 dB below the design goal
-            (class 1 allows -16.0 dB there, class 2 has no lower limit), and
-            at fs = 16 kHz the 7 943.3 Hz point falls 12.0 dB below it
-            (class 1 allows -2.5 dB, class 2 -5.0 dB), so the verified class
-            is 2 at 32 kHz and none at all at 16 kHz. The plain bilinear
+            rolls off steeply whatever the design rate. What the roll-off
+            costs is per curve, since each is graded against its own design
+            goal: at fs = 32 kHz the 15 848.9 Hz nominal point falls 16.2 dB
+            below the A goal but 15.3 dB below the C one (class 1 allows
+            -16.0 dB there, class 2 has no lower limit), so the verified
+            class at 32 kHz is 2 for A and still 1 for C. At fs = 16 kHz the
+            7 943.3 Hz point falls 12.0 dB below the A goal and 13.7 dB below
+            the C one (class 1 allows -2.5 dB, class 2 -5.0 dB), so neither
+            curve verifies to any class there. The plain bilinear
             design holds class 1 for fs >= 40 kHz (-2.8 dB at the 12.5 kHz
             nominal frequency at 48 kHz, -3.5 dB at 44.1 kHz, inside the
             +2.0/-5.0 class 1 limits), degrades to class 2 between 22.05 and
