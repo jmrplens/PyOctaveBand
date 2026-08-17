@@ -317,11 +317,12 @@ slopes. Such a page is listed in `DECLARED` in the checker below, with both
 meanings named. That list is the escape hatch for a page about the ambiguity,
 not a way to land one, and it is meant to stay short.
 
-A collision where **both uses take the same slope** is a different problem and
-typography cannot solve it: $c_R$ is an ECMA-418-2 calibration factor and the
-Rayleigh wave speed, $C_P$ is a specific heat capacity and a CNOSSOS
-propulsion coefficient, and both members of each pair are upright. Those
-belong in the ambiguity table at the top of
+A collision where **both uses take the same slope** is a different problem, and
+typography cannot solve it: $L_U$ is the magnitude of the ISO 226 linear
+transfer function and the upper contiguous critical band of the prominence
+ratio, one section apart on one page, and $C_P$ is a specific heat capacity in
+a porous absorber and a propulsion coefficient in CNOSSOS-EU. Those belong in
+the ambiguity table at the top of
 [the glossary](docs/reference/glossary.md), beside $T_\mathrm{s}$, $R$ and
 $L_N$, which is where a reader holding a symbol from someone else's report
 goes to find out which one they have.
