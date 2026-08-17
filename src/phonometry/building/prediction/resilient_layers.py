@@ -38,11 +38,11 @@ ratio :math:`\Delta L = 20 \log_{10}(|F_n|_{\text{without}}/|F_n|_{\text{with}})
 the whole design question (:func:`covering_improvement`).
 
 **3. Floating floors (Hopkins 4.4.4, ISO 12354-2 Annex C, Vigran 8.4).** Above
-the mass-spring resonance :math:`f_o = 160 \sqrt{s'/m'}` (Formula C.2) the
+the mass-spring resonance :math:`f_\mathrm{o} = 160 \sqrt{s'/m'}` (Formula C.2) the
 improvement follows one of three laws
 (:func:`floating_floor_improvement_spectrum`): the infinite-plate result of
-Cremer, :math:`\Delta L = 40 \log_{10}(f/f_o)` (Eq. 4.119, Vigran Eq. 8.40), the
-empirical :math:`\Delta L = 30 \log_{10}(f/f_o)` that EN 12354-2 adopted for
+Cremer, :math:`\Delta L = 40 \log_{10}(f/f_\mathrm{o})` (Eq. 4.119, Vigran Eq. 8.40), the
+empirical :math:`\Delta L = 30 \log_{10}(f/f_\mathrm{o})` that EN 12354-2 adopted for
 sand-cement screeds (Formula C.1, Eq. 4.124), and the same 40 lg law with the
 hammer-impedance term :math:`10 \log_{10}[1 + (f/f_\mathrm{limit})^{2}]` that a lightweight
 walking surface needs (Eq. 4.123, Vigran Eq. 8.48). A floating floor on
@@ -746,7 +746,7 @@ def covering_improvement(
 def floating_floor_resonance_frequency(
     dynamic_stiffness: float, mass_per_area: float
 ) -> float:
-    r"""Resonance :math:`f_o = 160 \sqrt{s'/m'}` of a floating floor
+    r"""Resonance :math:`f_\mathrm{o} = 160 \sqrt{s'/m'}` of a floating floor
     (Formula C.2).
 
     ISO 12354-2:2017 Formula (C.2), with ``s'`` the EN 29052-1 dynamic
@@ -756,7 +756,7 @@ def floating_floor_resonance_frequency(
     :math:`1000/(2 \pi) = 159.15` that
     :func:`phonometry.materials.natural_frequency` applies, so the two differ
     by 0.5 %; this function reproduces the standard, whose own Annex G
-    example prints :math:`f_o = 52.8` Hz for :math:`s' = 8` MN/m³,
+    example prints :math:`f_\mathrm{o} = 52.8` Hz for :math:`s' = 8` MN/m³,
     :math:`m' = 73.5` kg/m².
 
     :param dynamic_stiffness: Dynamic stiffness per unit area ``s'``, in N/m³
@@ -926,26 +926,26 @@ def floating_floor_improvement_spectrum(
     and all give :math:`\Delta L = 0` at and below it (in the band containing
     ``fo``, ``ΔL`` is in practice between −5 dB and 0 dB):
 
-    * ``"cremer"``: :math:`\Delta L = 40 \log_{10}(f/f_o)`, Cremer's 1952 result for
+    * ``"cremer"``: :math:`\Delta L = 40 \log_{10}(f/f_\mathrm{o})`, Cremer's 1952 result for
       two infinite, locally reacting plates coupled by a spring layer (Hopkins
       Eq. 4.119, Vigran Eq. 8.40), i.e. 12 dB per octave. It holds for
       constructions with high internal damping, such as asphalt screeds, and is
       the branch ISO 12354-2 Formula (C.3) prescribes for asphalt and dry
       floating floors.
-    * ``"en12354"`` (default): :math:`\Delta L = 30 \log_{10}(f/f_o)`, the empirical
+    * ``"en12354"`` (default): :math:`\Delta L = 30 \log_{10}(f/f_\mathrm{o})`, the empirical
       law of ISO 12354-2 Formula (C.1) for sand-cement and calcium-sulfate
       screeds (Hopkins Eq. 4.124). Sand-cement screeds have a low internal
       loss factor and act as finite plates with a reverberant bending field,
       for which the 40 lg law overestimates ``ΔL``.
     * ``"cremer_hammer"``:
-      :math:`\Delta L = 40 \log_{10}(f/f_o) + 10 \log_{10}[1 + (f/f_\mathrm{limit})^{2}]`, the
+      :math:`\Delta L = 40 \log_{10}(f/f_\mathrm{o}) + 10 \log_{10}[1 + (f/f_\mathrm{limit})^{2}]`, the
       40 lg law with the reduction in power input above the limiting frequency
       of the hammer's own impedance (Hopkins Eq. 4.123, Vigran Eq. 8.48). A
       lightweight walking surface such as chipboard needs it, and tends to
       18 dB per octave well above ``flimit``.
 
     The laws are stated as valid above ``fo``, and Cremer's derivation is
-    reported to hold in :math:`f_o < f < 4 f_o`.
+    reported to hold in :math:`f_\mathrm{o} < f < 4 f_\mathrm{o}`.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param resonance_frequency: Mass-spring resonance ``fo``, in Hz.
@@ -1033,8 +1033,8 @@ def resilient_mount_improvement(
 
     Vigran's Eq. (8.45) is a sum of three terms, :math:`Z_1/Z_2`,
     :math:`m_1 \eta_1/(m_2 \eta_2)` and
-    :math:`Z_1 \eta_1 N f^{3}/(2 \pi m_1 f_o^{4})` with
-    :math:`f_o = \sqrt{N k/m_1}/(2 \pi)`. Only the
+    :math:`Z_1 \eta_1 N f^{3}/(2 \pi m_1 f_\mathrm{o}^{4})` with
+    :math:`f_\mathrm{o} = \sqrt{N k/m_1}/(2 \pi)`. Only the
     **third** of them is the model implemented here, and that term is
     algebraically identical to Hopkins Eq. (4.118); the first two are the
     low-frequency floor, negligible once the third dominates, which is the

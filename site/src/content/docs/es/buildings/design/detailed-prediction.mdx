@@ -94,7 +94,7 @@ el índice de reducción acústica a partir de las propiedades del material
 (Anexo B):
 
 $$
-\tau = \left(\frac{2\rho_o c_o}{2\pi f m'}\right)^2 \cdot
+\tau = \left(\frac{2\rho_\mathrm{o} c_\mathrm{o}}{2\pi f m'}\right)^2 \cdot
 \frac{\pi f_\mathrm{c} \sigma^2}{2 f \eta_\mathrm{tot}} \quad (f > f_\mathrm{c})
 $$
 
@@ -111,8 +111,8 @@ en el edificio y en el marco de ensayo. El factor de pérdidas total in situ es
 
 $$
 \eta_\mathrm{tot} = \eta_\mathrm{int}
-+ \frac{2\rho_o c_o \sigma}{2\pi f m'}
-+ \frac{c_o}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
++ \frac{2\rho_\mathrm{o} c_\mathrm{o} \sigma}{2\pi f m'}
++ \frac{c_\mathrm{o}}{\pi^2 S \sqrt{f f_\mathrm{c}}} \sum_k l_k \alpha_k
 $$
 
 siendo los tres términos las pérdidas internas del material, la radiación al
@@ -121,7 +121,7 @@ de las propias uniones, $\alpha_k = \sum_j \sqrt{f_{\mathrm{c},j}/f_\mathrm{ref}
 \, 10^{-K_{ij}/10}$ (fórmula C.4). De $\eta_\mathrm{tot}$ salen el tiempo de
 reverberación estructural $T_\mathrm{s} = 2{,}2/(f\,\eta_\mathrm{tot})$ y la longitud de
 absorción equivalente $a_\mathrm{situ} = 2{,}2\pi^2 S \sqrt{f_\mathrm{ref}/f} /
-(c_o T_\mathrm{s,situ})$ (fórmula 11).
+(c_\mathrm{o} T_\mathrm{s,situ})$ (fórmula 11).
 
 **3. Uniones.** El $K_{ij}$, invariante frente a la situación, se convierte en
 la caída de nivel que la unión produce realmente (fórmula 10):
@@ -580,7 +580,7 @@ constructiva nueva.
 | `bands` | str | — | `'third'` (por defecto) / `'octave'` | Fija la banda que lleva la rama $f \approx f_\mathrm{c}$ |
 | `resonant_only` | bool | — | por defecto `False` | Elimina el término de transmisión forzada por debajo de $f_\mathrm{c}$ (Anexo B.1, trayectorias por flancos) |
 | `speed_of_sound` | float | m/s | por defecto `340` | El valor que fija el Anexo A de ISO 12354-1 |
-| `air_density` | float | kg/m³ | por defecto `1.29` | $\rho_o$ del modelo del Anexo B |
+| `air_density` | float | kg/m³ | por defecto `1.29` | $\rho_\mathrm{o}$ del modelo del Anexo B |
 
 ## Parámetros de `airborne_flanking_path()` / `impact_flanking_path()`
 

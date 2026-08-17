@@ -143,11 +143,11 @@ def lining_resonance_frequency(
 
     * ``dynamic_stiffness`` (Formula D.1), for an insulation layer fixed
       **directly** to the basic construction, without studs or battens:
-      :math:`f_o = \sqrt{s' (1/m'_1 + 1/m'_2)}/(2 \pi)`.
+      :math:`f_\mathrm{o} = \sqrt{s' (1/m'_1 + 1/m'_2)}/(2 \pi)`.
     * ``cavity_depth`` (Formula D.2), for a layer built on metal or wooden
       studs **not** connected to the basic element, with the cavity filled by a
       porous layer of airflow resistivity :math:`r \ge 5` kPa·s/m²:
-      :math:`f_o = \sqrt{(0.111/d)(1/m'_1 + 1/m'_2)}/(2 \pi)`, i.e. the
+      :math:`f_\mathrm{o} = \sqrt{(0.111/d)(1/m'_1 + 1/m'_2)}/(2 \pi)`, i.e. the
       near-isothermal stiffness of the filled cavity replaces ``s'``.
 
     :param base_mass_per_area: Mass per unit area ``m'1`` of the basic
@@ -210,7 +210,7 @@ def weighted_lining_improvement(
     ISO 12354-1:2017 Table D.1 reads ``ΔRw`` off the lining's resonance
     frequency, rounded to the centre of the one-third-octave band in which it
     falls. Below 200 Hz the improvement also depends on the bare element:
-    :math:`\Delta R_\mathrm{w} = 74.4 - 20 \log_{10}(f_o) - R_\mathrm{w}/2`, never below 0 dB
+    :math:`\Delta R_\mathrm{w} = 74.4 - 20 \log_{10}(f_\mathrm{o}) - R_\mathrm{w}/2`, never below 0 dB
     (NOTE 1). At and above 200 Hz the lining *degrades* the insulation, by
     1 dB at 200 Hz down to 10 dB from 630 Hz to 1 600 Hz, recovering to 5 dB
     from 1 600 Hz to 5 000 Hz.
@@ -318,15 +318,15 @@ def lining_improvement(
 
     * ``system="mineral_wool"`` (Formula D.3), an exterior thermal system on
       mineral wool with 40 % glued area and no anchors:
-      :math:`\Delta R_\mathrm{w} = -36 \log_{10}(f_o) + 82.5`,
-      :math:`\Delta R_\mathrm{A} = -42 \log_{10}(f_o) + 92.0`,
-      :math:`\Delta R_\mathrm{A,tr} = -39 \log_{10}(f_o) + 87.7`, each floored at −4 dB.
+      :math:`\Delta R_\mathrm{w} = -36 \log_{10}(f_\mathrm{o}) + 82.5`,
+      :math:`\Delta R_\mathrm{A} = -42 \log_{10}(f_\mathrm{o}) + 92.0`,
+      :math:`\Delta R_\mathrm{A,tr} = -39 \log_{10}(f_\mathrm{o}) + 87.7`, each floored at −4 dB.
     * ``system="foam"`` (Formula D.4), the same on PS, EPS or EEPS foams:
-      :math:`-33 \log_{10}(f_o) + 76.0`, :math:`-33 \log_{10}(f_o) + 74.0`,
-      :math:`-36 \log_{10}(f_o) + 77.0`, floored at −3 dB.
+      :math:`-33 \log_{10}(f_\mathrm{o}) + 76.0`, :math:`-33 \log_{10}(f_\mathrm{o}) + 74.0`,
+      :math:`-36 \log_{10}(f_\mathrm{o}) + 77.0`, floored at −3 dB.
     * ``system="studs"`` (Formula D.7), a layer on studs not directly fixed to
-      the basic wall: :math:`-20 \log_{10}(f_o) + 48`, :math:`-22 \log_{10}(f_o) + 51`,
-      :math:`-24 \log_{10}(f_o) + 54`, floored at −4 dB.
+      the basic wall: :math:`-20 \log_{10}(f_\mathrm{o}) + 48`, :math:`-22 \log_{10}(f_\mathrm{o}) + 51`,
+      :math:`-24 \log_{10}(f_\mathrm{o}) + 54`, floored at −4 dB.
 
     ``anchors=True`` applies Formula (D.5) for 4 to 10 anchors or battens per
     m² (:math:`0.66 \Delta R_\mathrm{w,ref} - 1.2` and its two companions), and
@@ -412,7 +412,7 @@ def lining_improvement_in_situ(
     still depends on the basic element it sits on, so ISO 12354-1:2017
     Formula (D.8) shifts the laboratory rating by :math:`a X` with
 
-    :math:`a = 1.35 \log_{10}(f_o) - 3.5`, capped at 0, and
+    :math:`a = 1.35 \log_{10}(f_\mathrm{o}) - 3.5`, capped at 0, and
     :math:`X = R_\mathrm{w,situ} - 53`, clamped to ``[−10, +7]``.
 
     The same formula applies to ``ΔRw``, ``ΔRA`` and ``ΔRA,tr``.

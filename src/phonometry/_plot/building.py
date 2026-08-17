@@ -1790,10 +1790,10 @@ def plot_floating_floor_improvement(
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    label = f"{result.model} ({result.slope:.0f} log10(f/$f_o$))"
+    label = rf"{result.model} ({result.slope:.0f} log10(f/$f_\mathrm{{o}}$))"
     _plot_improvement_spectrum(
         ax, freqs, [(result.improvement, label, _C_PRIMARY, "-")],
-        result.resonance_frequency, "$f_o$", language, kwargs,
+        result.resonance_frequency, r"$f_\mathrm{o}$", language, kwargs,
     )
     title = _t("Floating floor improvement (ISO 12354-2 Annex C)", language)
     if result.delta_lw is not None:
@@ -1846,7 +1846,8 @@ def plot_lining_improvement(
     ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_\mathrm{A,tr}$")
     ax.plot([result.resonance_frequency], [result.delta_rw], marker="o", ms=8,
             color=_C_REFERENCE, ls="",
-            label=f"$f_o$ = {_format_freq(result.resonance_frequency)} Hz")
+            label=rf"$f_\mathrm{{o}}$ = "
+                  rf"{_format_freq(result.resonance_frequency)} Hz")
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Sound reduction index improvement [dB]", language))
     ax.set_title(
