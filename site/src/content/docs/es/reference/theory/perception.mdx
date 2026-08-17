@@ -168,32 +168,32 @@ pero la tabla está aquí para quien vuelva atrás buscando una fórmula:
 | $S$ | Agudeza, en acum | Agudeza (DIN 45692) |
 | $T$ | $T_f$, umbral de audición en $f$, en dB | Líneas isofónicas (ISO 226) |
 | $T$ | Tonalidad, en tu$_\mathrm{HMS}$ | Modelo de Sottek (ECMA-418-2) |
-| $L_U$ | Magnitud de la función de transferencia lineal, normalizada en 1 kHz | Líneas isofónicas (ISO 226) |
-| $L_U$ | Nivel medio de la banda crítica contigua superior | Prominencia tonal, PR (ECMA-418-1) |
-| $L_N$ | Nivel de sonoridad, en fonios | Líneas isofónicas, Zwicker |
+| $L_\mathrm{U}$ | Magnitud de la función de transferencia lineal, normalizada en 1 kHz | Líneas isofónicas (ISO 226) |
+| $L_\mathrm{U}$ | Nivel medio de la banda crítica contigua superior | Prominencia tonal, PR (ECMA-418-1) |
+| $L_\mathrm{N}$ | Nivel de sonoridad, en fonios | Líneas isofónicas, Zwicker |
 
 ## Líneas isofónicas (ISO 226:2023)
 
-Un tono tiene un *nivel de sonoridad* de $L_N$ fonios cuando se juzga igual de
-sonoro que un tono puro de 1 kHz a $L_N$ dB SPL. La Fórmula (1) de ISO
+Un tono tiene un *nivel de sonoridad* de $L_\mathrm{N}$ fonios cuando se juzga igual de
+sonoro que un tono puro de 1 kHz a $L_\mathrm{N}$ dB SPL. La Fórmula (1) de ISO
 226:2023 (apartado 4.1, p. 2) da el SPL de un tono puro a la frecuencia $f$
-que alcanza el nivel de sonoridad $L_N$:
+que alcanza el nivel de sonoridad $L_\mathrm{N}$:
 
 $$
-L_f = \frac{10}{\alpha_f} \log_{10}\left[ \left(4 \cdot 10^{-10}\right)^{0{,}3 - \alpha_f} \left( 10^{\ 0{,}03 L_N} - 10^{\ 0{,}072} \right) + 10^{\ \alpha_f (T_f + L_U)/10} \right] - L_U
+L_f = \frac{10}{\alpha_f} \log_{10}\left[ \left(4 \cdot 10^{-10}\right)^{0{,}3 - \alpha_f} \left( 10^{\ 0{,}03 L_\mathrm{N}} - 10^{\ 0{,}072} \right) + 10^{\ \alpha_f (T_f + L_\mathrm{U})/10} \right] - L_\mathrm{U}
 $$
 
 La Fórmula (2) (apartado 4.2) la invierte, devolviendo el nivel de sonoridad
 de un tono a SPL $L_f$:
 
 $$
-L_N = \frac{100}{3} \log_{10}\left[ \frac{10^{\ \alpha_f (L_f + L_U)/10} - 10^{\ \alpha_f (T_f + L_U)/10}}{\left(4 \cdot 10^{-10}\right)^{0{,}3 - \alpha_f}} + 10^{\ 0{,}072} \right]
+L_\mathrm{N} = \frac{100}{3} \log_{10}\left[ \frac{10^{\ \alpha_f (L_f + L_\mathrm{U})/10} - 10^{\ \alpha_f (T_f + L_\mathrm{U})/10}}{\left(4 \cdot 10^{-10}\right)^{0{,}3 - \alpha_f}} + 10^{\ 0{,}072} \right]
 $$
 
 Los tres parámetros provienen de la Tabla 1 (p. 4), tabulados en las 29 frecuencias preferentes de tercio de octava de ISO 266 desde 20 Hz hasta 12,5 kHz:
 
 - $\alpha_f$: exponente de la percepción de sonoridad a la frecuencia $f$,
-- $L_U$: magnitud de la función de transferencia lineal, normalizada en 1 kHz ($L_U = 0$ en 1 kHz),
+- $L_\mathrm{U}$: magnitud de la función de transferencia lineal, normalizada en 1 kHz ($L_\mathrm{U} = 0$ en 1 kHz),
 - $T_f$: umbral de audición en $f$, en dB.
 
 La norma **no especifica interpolación** entre las frecuencias tabuladas. La Fórmula (1) está especificada para **20 fonios a 90 fonios** entre 20 Hz y 4 kHz, y solo hasta **80 fonios entre 5 kHz y 12,5 kHz**; por encima de 80 fonios la línea isofónica se detiene, por tanto, en 4 kHz. Los valores fuera de estos límites obtenidos con la Fórmula (2) son extrapolaciones que la norma califica de meramente informativas.
@@ -234,10 +234,10 @@ de la duración de la sonoridad total (paso bajos de 3,5 ms y 70 ms ponderados
 **Sonios y fonios** quedan ligados por el ancla de 1 kHz (1 sonio = 40 fonios; apartado 5.6):
 
 $$
-N = 2^{(L_N - 40)/10} \ \text{sonios} \qquad \Longleftrightarrow \qquad L_N = 40 + 10 \log_2 N \ \text{fonios} \qquad (N \ge 1)
+N = 2^{(L_\mathrm{N} - 40)/10} \ \text{sonios} \qquad \Longleftrightarrow \qquad L_\mathrm{N} = 40 + 10 \log_2 N \ \text{fonios} \qquad (N \ge 1)
 $$
 
-por debajo de 1 sonio el programa de referencia usa $L_N = 40 (N + 0{,}0005)^{0{,}35}$, con suelo en 3 fonios.
+por debajo de 1 sonio el programa de referencia usa $L_\mathrm{N} = 40 (N + 0{,}0005)^{0{,}35}$, con suelo en 3 fonios.
 
 Consulta la [guía de sonoridad](/phonometry/es/perception/psychoacoustics/loudness/) para su uso.
 
@@ -422,7 +422,7 @@ $$
 \mathrm{TNR}_{\text{crit}} = \begin{cases} 8{,}0 + 8{,}33 \log_{10}(1000/f_\mathrm{t}) \ \text{dB} & f_\mathrm{t} < 1\ \text{kHz} \\ 8{,}0 \ \text{dB} & f_\mathrm{t} \ge 1\ \text{kHz} \end{cases}
 $$
 
-**PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_U$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_\mathrm{t} \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_\mathrm{t} \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_\mathrm{t})$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
+**PR** (apartado 12) compara el nivel de la banda crítica centrada en el tono, $L_M$, con la potencia media de las dos bandas críticas **contiguas** $L_L$, $L_\mathrm{U}$ (bordes según las Fórmulas ajustadas 21–22 con las Tablas 2–3): $\mathrm{PR} = 10\log_{10} P_M - 10\log_{10}\left[(P_L + P_U)/2\right]$ (Fórmula 23). Para $f_\mathrm{t} \le 171{,}4$ Hz la banda inferior se trunca en 20 Hz y su potencia se reescala a un **ancho de banda de 100 Hz** (Fórmula 24). El criterio (Fórmulas 25–26) es 9,0 dB para $f_\mathrm{t} \ge 1$ kHz, y crece como $9{,}0 + 10{,}0\log_{10}(1000/f_\mathrm{t})$ por debajo. Los tonos se evalúan dentro del rango de interés de 89,1 Hz – 11,2 kHz (apartados 11.5 / 12.6).
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/tone_prominence_assessment_es.svg" alt="Relación tono-ruido de un tono de ventilador de 250 Hz representada frente al criterio de prominencia de ECMA-418-1: el criterio cae desde unos 17 dB a 89 Hz hasta 8 dB constantes por encima de 1 kHz, y el tono evaluado se sitúa en 15,1 dB, 2,1 dB por encima del criterio de 13,0 dB a 250 Hz, así que es prominente" width="88%" />
 

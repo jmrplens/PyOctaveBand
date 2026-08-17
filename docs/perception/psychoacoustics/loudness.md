@@ -124,10 +124,10 @@ Returns a `ZwickerLoudness` dataclass: `loudness` ($N$, sones), `loudness_level`
 
 `ZwickerLoudness.report(path)` renders a one-page PDF fiche laid out like an
 accredited loudness report: a standard-basis line, an optional metadata header
-block, a compact metrics table (total loudness $N$, loudness level $L_N$,
+block, a compact metrics table (total loudness $N$, loudness level $L_\mathrm{N}$,
 and the $N_5$/$N_{10}$ percentiles for a time-varying result)
 beside the specific-loudness pattern $N'(z)$ (the result's own `.plot()`), the
-boxed $N = X\ \text{sone}$ ($L_N = Y\ \text{phon}$) single number, an optional
+boxed $N = X\ \text{sone}$ ($L_\mathrm{N} = Y\ \text{phon}$) single number, an optional
 verdict row and a
 footer with the fixed disclaimer. It uses the same `ReportMetadata` container
 (documented under [Insulation ratings](../../buildings/insulation/insulation-ratings.md#report-metadata-reportmetadata))
