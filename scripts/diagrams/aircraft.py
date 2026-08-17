@@ -469,7 +469,8 @@ def _d_aircraft_noise_station(s: SVG, th: Theme) -> None:
            "8 kHz attenuation ≤ 12 dB/100 m; wind ≤ 6.2 m/s average and 7.7 m/s peak, crosswind ≤ 3.6 and 5.1 m/s",
            15, th.fg, anchor="start")
     s.text(70.0, 694.0,
-           "Helicopters: average wind ≤ 5.1 m/s and crosswind ≤ 2.6 m/s, the temperature and humidity limits at 10 m only",
+           "Helicopters: average wind ≤ 5.1 m/s and crosswind ≤ 2.6 m/s, "
+           "temperature and humidity limits at 10 m only",
            15, th.muted, anchor="start")
     s.text(70.0, 718.0,
            "At least six valid runs per measurement point, with a 90 % confidence limit not exceeding ±1.5 EPNdB",

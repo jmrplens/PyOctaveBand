@@ -1333,8 +1333,8 @@ def _d_miso_setup(s: SVG, th: Theme) -> None:
     s.text(cx, 382, "$x_1$ and $x_2$ > 0.9", 14, th.fg, bold=True)
     s.text(cx, 402, "⇒ do not attribute", 14, th.fg)
 
-    s.text(450, 552, "The conditioning separates only what the references "
-           "separate: one sensor per source, all sampled together", 17,
+    s.text(450, 552, "Conditioning separates only what the references "
+                     "separate: one sensor per source, all sampled together", 17,
            th.muted)
 
 
@@ -1421,8 +1421,8 @@ def _d_tsa_setup(s: SVG, th: Theme) -> None:
     s.text(cx, base + 122, "the pulse is the block boundary", 16, th.fg)
     s.text(cx, base + 146, "record $N + 1$ revolutions", 16, th.muted)
 
-    s.text(450, 552, "A tacho pulse per revolution and an accelerometer in the "
-           "load direction: the period is measured, never assumed", 17,
+    s.text(450, 552, "One tacho pulse per turn, an accelerometer in the load "
+                     "direction: the period is measured, not assumed", 17,
            th.muted)
 
 

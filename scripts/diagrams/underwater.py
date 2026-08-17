@@ -317,7 +317,8 @@ def _d_pile_driving_deployment(s: SVG, th: Theme) -> None:
            17, th.fg, anchor="start")
     s.text(70, 608, "The station records the entire driving sequence, soft start included, at one fixed range",
            17, th.fg, anchor="start")
-    s.text(70, 636, "Record hydrophone depth, GPS, water depth and tide, seabed class and the hammer energy per blow",
+    s.text(70, 636, "Record hydrophone depth, GPS, water depth and tide, "
+                    "seabed class and energy per blow",
            17, th.fg, anchor="start")
 
 
@@ -420,9 +421,11 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
            th.fg, anchor="middle")
 
     # --- Reference conventions ---------------------------------------------
-    s.text(70, 620, "Field levels are re 1 µPa; a source level carries the squared metre of its reference range, re 1 µPa²m²",
+    s.text(70, 620, "Field levels are re 1 µPa; a source level carries the "
+                    "squared metre of its range, re 1 µPa²m²",
            17, th.fg, anchor="start")
-    s.text(70, 648, "Every term refers to the same bandwidth; the figure of merit is the PL that drives SE to zero, quoted re m²",
+    s.text(70, 648, "Every term is in the same bandwidth; the figure of merit "
+                    "is the PL that drives SE to zero, re m²",
            17, th.fg, anchor="start")
 
 

@@ -2129,12 +2129,12 @@ def _d_junction_catalogue(s: SVG, th: Theme) -> None:
            "path, so the ratio is per path, not per junction.", 15, th.fg,
            anchor="start")
     s.text(70, 620,
-           "The functions take the RATIO, not $M$. Annex H.3 floor, ratio 1,61: "
+           "The functions take the RATIO, not $M$. Floor H.3, ratio 1,61: "
            "'through' -> $K_{13}$ = 12,5 dB, 'corner' -> $K_{12}$ = 8,9 dB",
            15, th.fg, anchor="start")
     s.text(70, 646,
-           "$ℓ_f$ is the coupling length along the junction line, measured "
-           "surface to surface. Annex E values are read at 500 Hz, ± 3 dB.",
+           "$ℓ_f$ is the coupling length along the junction line, surface to "
+           "surface. Annex E values are read at 500 Hz, ± 3 dB.",
            15, th.accent, anchor="start")
 
 
@@ -2212,16 +2212,16 @@ def _d_facade_setup(s: SVG, th: Theme) -> None:
     s.text(556, 444, "receiving-room floor", 16, th.muted, anchor="end")
 
     for y, txt in (
-        (600, ("Element method → $R′_{45°}$ (loudspeaker) or $R′_{tr,s}$ "
-              "(traffic): one component, comparable with a laboratory $R$.")),
+        (600, ("Element method → $R′_{45°}$ or $R′_{tr,s}$: one component, "
+               "comparable with a laboratory $R$.")),
         # The 2 m of the quantity's subscript is a value with its unit,
         # which the composer has no roman run for yet; that one symbol
         # stays plain until the case is adjudicated (as does the L1,2m
         # label above), while the R beside it is set like its twin.
         (626, ("Global method → D2m,nT: the whole facade as built, "
               "not comparable with a laboratory $R$.")),
-        (652, ("Road traffic replaces the loudspeaker at all angles: "
-              "simultaneous inside and outside, ≥ 50 pass-bys.")),
+        (652, ("Road traffic replaces the loudspeaker at all angles: inside "
+               "and outside at once, ≥ 50 pass-bys.")),
         (678, ("Clauses 9.4, 9.5.1, 9.6.1 and 10.2. None of it is checked "
               "by the functions.")),
     ):

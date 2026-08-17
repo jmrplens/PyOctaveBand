@@ -1112,8 +1112,7 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
            15, th.fg, anchor="start")
     s.text(80, 596,
            "reactive silencer: $TL = 10 log_{10}[1 + ¼ (m − 1/m)^2 "
-           "sin^{2}(k·L)]$, peaking where the 0.3 m chamber is a quarter "
-           "wavelength",
+           "sin^{2}(k·L)]$, peaking where the 0.3 m chamber is $λ/4$",
            15, th.muted, anchor="start")
 
 
@@ -1408,8 +1407,8 @@ def _d_room_to_room(s: SVG, th: Theme) -> None:
     s.text(50, 584, "$S_{2}α_{2}$ passes the 15 m² of the wall between 250 and "
                     "500 Hz: below it the wall delivers less than its TL",
            15, th.primary, anchor="start")
-    s.text(50, 608, "both levels are reverberant-field spatial averages, and "
-                    "the balance says nothing below 163 Hz (Schroeder, 75 m³)",
+    s.text(50, 608, "both levels are reverberant-field spatial averages; the "
+                    "balance says nothing below 163 Hz (Schroeder, 75 m³)",
            15, th.muted, anchor="start")
     s.add("</g>")
 
@@ -1646,16 +1645,16 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
     s.text(fx, gy - 10, "reflected path 2.60 m", 14, th.secondary)
 
     # ---- what the room costs, under both panels ---------------------------
-    s.text(450, 296, "Reflection-free time $t_g$ = (2.60 − 1.00) m / "
-           "(343 m/s) = 4.7 ms: past that the record is the room, not the "
-           "loudspeaker.",
+    s.text(450, 296, "Reflection-free time $t_g$ = (2.60 − 1.00) m / (343 "
+                     "m/s) = 4.7 ms: past that the record is the room, not "
+                     "the box.",
            16, th.fg)
 
     # ---- the shared time budget of the harmonic arrivals -------------------
     x0, x1, ty = 90.0, 830.0, 412.0
-    s.text(450, 336, "The recording, on the sweep's own time axis: "
-           "$f_1$ = 20 Hz, $f_2$ = 6 kHz, $T$ = 4 s, so "
-           "$L = T / ln(f_2/f_1)$ = 0.70 s",
+    s.text(450, 336, "Recording on the sweep's time axis: $f_1$ = 20 Hz, "
+                     "$f_2$ = 6 kHz, $T$ = 4 s, $L = T / ln(f_2/f_1)$ = 0.70 "
+                     "s",
            17, th.fg, bold=True)
     s.line(x0, ty, x1, ty, th.fg, 2.0)
     s.arrow(x1 - 30, ty, x1, ty, th.fg, 2.0)
@@ -1680,8 +1679,9 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
           "$L ln(3/2)$ = 0.28 s: the closest pair of arrivals", offset=0,
           size=15)
 
-    s.text(40, ty + 144, "Record until the decay has died, or the pre-arrivals "
-           "wrap round the circular deconvolution into the end of $h_1$.",
+    s.text(40, ty + 144, "Record until the decay has died, or the "
+                         "pre-arrivals wrap round the circular deconvolution "
+                         "into $h_1$.",
            16, th.fg, anchor="start")
     s.text(40, ty + 168, "State the drive amplitude and the fade with the "
            "result, and pass the same fade to the analysis.",

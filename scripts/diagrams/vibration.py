@@ -437,10 +437,10 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
            f"{bx + 50 * math.sin(phi):.1f} {by - 50 * math.cos(phi):.1f}",
            stroke=th.secondary, sw=1.6)
     s.text(690, axy + 186,
-           "the contact angle exists only in this view: it is measured",
+           "the contact angle exists only in this view: measured",
            15, th.muted)
     s.text(690, axy + 206,
-           "from the radial plane, so $φ = 0$ for a deep-groove ball bearing",
+           "from the radial plane: $φ = 0$ for a deep-groove bearing",
            15, th.muted)
     s.text(690, axy + 226,
            "and $φ > 0$ for angular-contact and tapered-roller types", 15,
@@ -489,8 +489,8 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
            "modulates it once per revolution: sidebands at $± f_s$", 16,
            th.fg)
     s.text(450, 758, "$m_L = n·N ± k·V = 6 ± 4$ → 2 or 10 lobes, turning at "
-           "$n·N·f_s/m_L$ = 175 or 35 Hz: the faster pattern radiates far "
-           "more strongly", 16, th.fg)
+                     "$n·N·f_s/m_L$ = 175 or 35 Hz: the faster radiates much "
+                     "more", 16, th.fg)
 
 
 def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
@@ -940,8 +940,8 @@ def _d_power_injection_rig(s: SVG, th: Theme) -> None:
     s.text(450, 592, "$⟨v^2⟩$ space-averaged over several positions per "
            "subsystem, away from the edges and from the drive point", 17,
            th.fg)
-    s.text(450, 618, "one run inverts to $η_{12}$ only if $η_1$ and $η_2$ "
-           "are known from a decay measurement; two runs solve all four", 17,
+    s.text(450, 618, "one run gives $η_{12}$ only if $η_1$ and $η_2$ come "
+                     "from a decay measurement; two runs solve all four", 17,
            th.primary, bold=True)
     s.text(450, 644, "bands wide enough to hold several modes of each "
            "subsystem: the modal densities decide how wide", 15, th.muted)
