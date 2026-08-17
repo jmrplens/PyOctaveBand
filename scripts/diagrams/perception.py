@@ -1011,7 +1011,7 @@ def _d_soundfield_audiometry(s: SVG, th: Theme) -> None:
 
     # ---------------- C - the earphone condition, for contrast ------------
     xc = px0[2]
-    room(xc, "C · Earphone: not this standard",
+    room(xc, "C · Earphone",
          "supra-aural or insert · monaural", th.secondary)
     s.ground(gy, xc, xc + pw)
     sx = xc + 74.0
@@ -1026,9 +1026,9 @@ def _d_soundfield_audiometry(s: SVG, th: Theme) -> None:
     s.text(cx0 + 52, ref_y + 8, "coupler /", 13, th.muted)
     s.text(cx0 + 52, ref_y + 26, "ear simulator", 13, th.muted)
     s.arrow(sx + 32, ref_y, cx0 - 6, ref_y, th.secondary, 1.6)
-    s.text(xc + pw / 2, 148, "the level lives in the coupler,", 13,
+    s.text(xc + pw / 2, 148, "not this standard: the level lives", 13,
            th.secondary)
-    s.text(xc + pw / 2, 166, "not at a point in a room", 13, th.secondary)
+    s.text(xc + pw / 2, 166, "in a coupler, not a point in a room", 13, th.secondary)
     notes(xc, th.secondary, "0 dB HL here is the RETSPL of the earphone",
           "fitted (ISO 389-1 / -2 / -8), referred to a",
           "coupler — never an ISO 389-7 value")

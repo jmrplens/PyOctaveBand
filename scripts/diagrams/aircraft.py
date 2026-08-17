@@ -196,7 +196,7 @@ def _d_rotorcraft_certification(s: SVG, th: Theme) -> None:
           label_side="right")
     for wy_ in (120.0, 190.0, 260.0):
         s.line(741.0, wy_, 772.0, wy_, th.muted, 0.9, dash="3,3")
-    s.text(725.0, 296.0, "3 microphones on a line perpendicular to the track",
+    s.text(725.0, 296.0, "3 microphones on a line across the track",
            14, th.muted)
 
     # --- normative context -------------------------------------------------
@@ -207,7 +207,8 @@ def _d_rotorcraft_certification(s: SVG, th: Theme) -> None:
            "EPNL in EPNdB at the three points; at least six overflights, headwind and tailwind in equal number",
            16, th.fg, anchor="start")
     s.text(80.0, 592.0,
-           "microphones 1.2 m above ground; the sideline pair sees the overhead helicopter at 45° (slant ≈ 212 m)",
+           "microphones 1.2 m above ground; the sideline pair sees the "
+           "helicopter overhead at 45° (≈ 212 m)",
            16, th.muted, anchor="start")
 
 

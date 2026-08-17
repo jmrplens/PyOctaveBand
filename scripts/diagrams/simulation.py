@@ -359,7 +359,7 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
         s.circle((x_l + x_r) / 2, gy(y_m), 6.0, th.primary)
 
     for y_txt, y_feat, txt, colour, bold in (
-        (170.0, gy(0.25), "1.5 mm plane pulse at 0.25 m", th.secondary, True),
+        (170.0, gy(0.25), "1.5 mm plane pulse, 0.25 m", th.secondary, True),
         (192.0, gy(0.25), "one-way; usable to 340 kHz", th.muted, False),
         (300.0, gy(0.32), "probe A, 30 mm above", th.primary, True),
         (352.0, gy(0.355), "10 mm STEEL at $y$ = 0.35 m", th.fg, True),

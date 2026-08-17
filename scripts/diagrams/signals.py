@@ -123,7 +123,7 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     s.text(212, dia_y + 10, "effective load", 17, th.accent, bold=True,
            anchor="end")
     s.text(212, dia_y + 32, "volume (3.13)", 17, th.accent, anchor="end")
-    s.text(212, ref_y + 30, "the generated level moves", 16, th.muted,
+    s.text(212, ref_y + 30, "the generated level shifts", 16, th.muted,
            anchor="end")
     s.text(212, ref_y + 50, "with that volume (6.3 k)", 16, th.muted,
            anchor="end")
@@ -778,7 +778,8 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
     s.arrow(620.0, 372.0, 636.0, 400.0, th.fg, 1.8)
 
     s.text(450.0, 528.0,
-           "trust $|H_1|$ only where $γ^2$ stays near 1: coherence dips flag noise, distortion or an unresolved delay",
+           "trust $|H_1|$ only where $γ^2$ is near 1: coherence dips flag "
+           "noise, distortion or unresolved delay",
            17, th.fg, bold=True)
 
 
@@ -1876,7 +1877,7 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
     s.text(px + pw / 2, py + ph + 70, "green: the G weighting", 15, th.accent)
     s.text(px + pw / 2, py + ph + 90,
            "dashed: a chain with a 2 Hz vent corner", 15, th.secondary)
-    s.text(px + pw / 2, py + ph + 116, "usable band = the overlap of the two",
+    s.text(px + pw / 2, py + ph + 116, "usable band = the overlap",
            17, th.fg, bold=True)
     s.text(px + pw / 2, py + ph + 138, "ISO 7196:1995, Annex A", 16, th.muted)
 
@@ -1894,7 +1895,7 @@ def _d_multichannel_capture(s: SVG, th: Theme) -> None:
     """
     gy = 372.0
     s.ground(gy, 30, 312)
-    s.text(172, 92, "Four positions, four sensitivities", 19, th.fg, bold=True)
+    s.text(172, 92, "Each position, its sensitivity", 19, th.fg, bold=True)
 
     xs = (66.0, 132.0, 198.0, 264.0)
     sens = ("11,8", "12,3", "11,9", "12,1")

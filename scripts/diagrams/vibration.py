@@ -354,7 +354,7 @@ def _d_iso2631_5_setup(s: SVG, th: Theme) -> None:
         ("equipment adequate for the highest amplitude anticipated; "
          "equipment and calibration method reported (5.1.2)"),
         ("long enough to be representative: a complete work cycle for a "
-         "repeatable task, longer where the terrain varies (5.1.4)"),
+         "repeatable task, longer where terrain varies (5.1.4)"),
     )
     for i, rule in enumerate(rules):
         s.circle(62, 542 + 21 * i - 5, 3.4, th.secondary)
@@ -520,7 +520,7 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     s.line(553, 204, 566, 204, th.fg, 1.3)
     s.text(572, 209, "axial", 15, th.secondary, anchor="start")
     s.text(328, 322, "radial, in the load zone, on the housing itself: no "
-           "joint between the bearing and the sensor", 15, th.muted)
+                     "joint between bearing and sensor", 15, th.muted)
     s.line(282, 300, 276, 262, th.muted, 1.0, dash="3,3")
     s.line(374, 300, 380, 262, th.muted, 1.0, dash="3,3")
 

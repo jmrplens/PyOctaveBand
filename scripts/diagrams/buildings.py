@@ -1545,7 +1545,9 @@ def _d_reception_plate_rigs(s: SVG, th: Theme) -> None:
     # position spacing of clause 7.1 is the length the dimension states.
     px0, py0, pw, ph = 48.0, top + 52.0, 226.0, 160.0
     cx1 = px0 + pw / 2
-    s.text(cx1, top + 22, "Low-mobility plate (7.2.2)", 19, th.fg, bold=True)
+    # 18 px, not 19: the outer two panels are centred close enough to the
+    # sheet edge that their Spanish headings run off it at 19.
+    s.text(cx1, top + 22, "Low-mobility plate (7.2.2)", 18, th.fg, bold=True)
     s.rect(px0, py0, pw, ph, th.panel, th.fg, sw=2.4)
     for cx, cy in ((px0 + 13, py0 + 13), (px0 + pw - 13, py0 + 13),
                    (px0 + 13, py0 + ph - 13), (px0 + pw - 13, py0 + ph - 13)):
@@ -1570,7 +1572,7 @@ def _d_reception_plate_rigs(s: SVG, th: Theme) -> None:
           offset=0, size=16)
 
     for i, txt in enumerate((
-            "100 mm concrete, $ρ$ = 2 300 ± 200 kg/m³",
+            "100 mm concrete, 2 300 ± 200 kg/m³",
             "$S$ = 7,0 m² (≥ 5 m²), sides ≈ $√2$ : 1",
             "$η ≥ 0,08$ over 50 Hz to 100 Hz",
             "≥ 6 velocity positions, ≈ 0,5 m apart",
@@ -1580,7 +1582,7 @@ def _d_reception_plate_rigs(s: SVG, th: Theme) -> None:
 
     # ===== Panel 2: the high-mobility plate (clause 7.3.2) =====
     cx2 = 450.0
-    s.text(cx2, top + 22, "High-mobility plate (7.3.2)", 19, th.fg, bold=True)
+    s.text(cx2, top + 22, "High-mobility plate (7.3.2)", 18, th.fg, bold=True)
     frame_y = top + 128.0
     s.rect(cx2 - 118, frame_y - 18, 236, 112, "none", th.muted, rx=5, sw=3.0)
     s.rect(cx2 - 104, frame_y, 208, 22, th.panel, th.fg, sw=2.2)
@@ -1608,7 +1610,7 @@ def _d_reception_plate_rigs(s: SVG, th: Theme) -> None:
 
     # ===== Panel 3: the Figure 2 three-plate bench =====
     cx3 = 748.0
-    s.text(cx3, top + 22, "Three-plate bench (Figure 2)", 19, th.fg, bold=True)
+    s.text(cx3, top + 22, "Three-plate bench (Fig. 2)", 18, th.fg, bold=True)
     bench_y = top + 138.0
     plate_x = (cx3 - 118, cx3 - 34, cx3 + 50)
     for bx in plate_x:
@@ -2478,7 +2480,7 @@ def _d_iso12354_annexl(s: SVG, th: Theme) -> None:
     for i, txt in enumerate((
             "two external and two internal walls meet the floor, with",
             "5,00 m of junction along each long edge and 4,00 m along",
-            "each short one: perimeter sum 9 m external + 9 m internal")):
+            "each short one: perimeter 9 m external + 9 m internal")):
         s.text(bx0 + bw / 2, by0 + bh + 92 + 22 * i, txt, 15,
                th.accent if i == 2 else th.fg)
 

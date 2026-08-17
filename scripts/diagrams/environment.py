@@ -282,7 +282,7 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
     s.line(pcx, pcy, p1x, p1y, th.muted, 0.9, dash="3,4")
     s.text(pcx - 34, pcy + 52.0, "60°", 13, th.muted)
     s.text(pcx + 34, pcy + 52.0, "60°", 13, th.muted)
-    s.text(pcx, pcy + pr + 30.0, "reference position 1 (downwind)", 14,
+    s.text(pcx, pcy + pr + 30.0, "reference 1 (downwind)", 14,
            th.secondary)
     s.text(pcx, pcy + pr + 50.0, "optional positions 2–4", 14, th.muted)
 
@@ -461,13 +461,15 @@ def _d_atmospheric_refraction(s: SVG, th: Theme) -> None:
 
     # --- physics captions --------------------------------------------------
     s.text(80.0, 540.0,
-           "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and the level collapses by over 20 dB",
+           "Upwind: rays bend up; beyond ≈ 220 m a ground shadow opens and "
+           "the level collapses over 20 dB",
            16, th.fg, anchor="start")
     s.text(80.0, 566.0,
            "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)",
            16, th.fg, anchor="start")
     s.text(80.0, 592.0,
-           "a ±0.1 (m/s)/m gradient curves rays with radius $R_c = c_0/|g|$ ≈ 3.4 km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m",
+           "a ±0.1 (m/s)/m gradient curves rays with $R_c = c_0/|g|$ ≈ 3.4 "
+           "km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m",
            16, th.muted, anchor="start")
 
 
@@ -535,7 +537,8 @@ def _d_ground_barrier(s: SVG, th: Theme) -> None:
     # prints the "bar" subscript upright (Eq. 12, p. 9) and
     # _ROMAN_SCRIPTS has no "bar", so $Δ_{bar}$ would set it as an index.
     s.text(80, 448,
-           "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB at 500 Hz",
+           "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = "
+           "10.0 dB, 500 Hz",
            18, th.primary, anchor="start", bold=True)
     s.text(80, 476,
            "$N$ grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)",

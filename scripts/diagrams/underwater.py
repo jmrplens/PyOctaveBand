@@ -114,7 +114,7 @@ def _d_hydrophone_deployment(s: SVG, th: Theme) -> None:
            dash="6,4")
     s.arrow(660, 470, 640, 470, th.muted, 1.4)
     s.text(752, 490, "reverse course; 4 runs, 2 per side", 14, th.fg)
-    s.text(752, 512, "background: ship stopped, ≥ 2 km, ≥ 30 s,", 14, th.muted)
+    s.text(752, 512, "background: stopped, ≥ 2 km, ≥ 30 s,", 14, th.muted)
     s.text(752, 530, "at the start and end of each test period", 14, th.muted)
 
     # Normative context.
@@ -587,7 +587,9 @@ def _d_marine_mammal_exposure(s: SVG, th: Theme) -> None:
     s.text(cx_, cy_ + 236, "196 / 202 dB re 1 µPa flat", 14, th.fg)
 
     # Normative context.
-    s.text(70, 566, "An isopleth is the contour on which a criterion is exactly met, so the answer is a radius, not a verdict",
+    s.text(70, 566, "An isopleth is the contour where a criterion is exactly "
+                    "met: the answer is a radius, not a verdict",
            17, th.fg, anchor="start")
-    s.text(70, 594, "A cumulative level means nothing without its range and the window the strikes were counted over",
+    s.text(70, 594, "A cumulative level means nothing without its range and "
+                    "the window the strikes were counted in",
            17, th.fg, anchor="start")

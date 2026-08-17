@@ -763,7 +763,8 @@ def _d_porous_layer(s: SVG, th: Theme) -> None:
 
     # --- captions ----------------------------------------------------------
     s.text(80, 500,
-           "JCA equivalent fluid: the five parameters give $Z_c$ and $k$; a hard-backed layer has $Z_s = −j Z_c cot(k·d)$",
+           "JCA equivalent fluid: five parameters give $Z_c$ and $k$; a "
+           "hard-backed layer has $Z_s = −j Z_c cot(k·d)$",
            17, th.fg, anchor="start")
     s.text(80, 528, "$α = 1 − |R|^2$ = 0.91 at 1 kHz for this 50 mm layer",
            18, th.primary, anchor="start", bold=True)
@@ -805,7 +806,8 @@ def _d_iso354_room(s: SVG, th: Theme) -> None:
         s.line(ax_ + t * (bx - ax_), ay + t * (by - ay),
                dx_ + t * (cx_ - dx_), dy + t * (cy - dy), th.secondary, 1.0)
     s.text(226, 262, "Test specimen  $S$ = 10.8 m²", 17, th.secondary, bold=True)
-    s.text(226, 452, "10–12 m², width/length 0.7–1, edges not parallel to the room",
+    s.text(226, 452, "10–12 m², width/length 0.7–1, no edge parallel to the "
+                     "room",
            15, th.muted)
     # Clearance from the nearest room boundary (Clause 6.2.1.2).
     s.dim(66.0, 340.0, 122.0, 340.0, "≥ 0.75 m", offset=0, size=15)
@@ -979,7 +981,7 @@ def _d_standing_wave_tube(s: SVG, th: Theme) -> None:
         s.text(450, 490 + 24 * i, txt, 17, th.fg)
     s.text(450, 622,
            "one channel: the microphone sensitivity cancels and there is no "
-           "inter-channel phase mismatch", 17, th.accent, bold=True)
+           "inter-channel phase error", 17, th.accent, bold=True)
     s.text(450, 648,
            "magnitude from the ratio, phase from the position — which is why "
            "Part 1 is the arbitration method", 15, th.muted)
