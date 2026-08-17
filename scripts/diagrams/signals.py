@@ -48,8 +48,10 @@ def _d_calibration_chain(s: SVG, th: Theme) -> None:
     s.text(796, by + bh / 2 + 34, "Pa per", 17, th.accent, mono=True)
     s.text(796, by + bh / 2 + 58, "digital unit", 17, th.accent, mono=True)
 
-    # Stability annotation, clearly separated below the chain
-    s.rect(250, 340, 560, 96, "none", th.secondary, rx=12, dash="6,5")
+    # Stability annotation, clearly separated below the chain. The box is
+    # sized on the Spanish tolerance line, which sets six vertical bars, a
+    # minus and a ≤ and so runs wider than its English twin.
+    s.rect(220, 340, 620, 96, "none", th.secondary, rx=12, dash="6,5")
     s.text(530, 376, "Stability: |max − mean| and |min − mean| ≤ 0.07 dB", 19, th.secondary, bold=True)
     s.text(530, 408, "(IEC 60942:2017 Table 2, class 1) — else CalibrationWarning", 17, th.fg)
 
@@ -120,9 +122,14 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
            anchor="end")
     s.text(210, ref_y - 8, "(3.12)", 15, th.secondary, anchor="end")
     s.arrow(216, dia_y + 26, cx - half - 6, dia_y + 22, th.accent, 1.6)
-    s.text(212, dia_y + 10, "effective load", 15, th.accent, bold=True,
+    # Two lines each, and the two blocks stack in the same 212 px column:
+    # the green one sits above its own arrow so the red one keeps the
+    # baseline pair it needs. The Spanish "plano de referencia (3.12)" is
+    # 220 px on one line, which is wider than the column, so both are set
+    # broken and both need the room.
+    s.text(212, dia_y - 10, "effective load", 15, th.accent, bold=True,
            anchor="end")
-    s.text(212, dia_y + 32, "volume (3.13)", 15, th.accent, anchor="end")
+    s.text(212, dia_y + 12, "volume (3.13)", 15, th.accent, anchor="end")
     s.text(212, ref_y + 30, "the generated level shifts", 14, th.muted,
            anchor="end")
     s.text(212, ref_y + 50, "with that volume (6.3 k)", 14, th.muted,
@@ -692,7 +699,9 @@ def _d_slm_chain(s: SVG, th: Theme) -> None:
     s.text(mx - 79, cap_top + 94, "Windscreen", 15, th.fg)
 
     # --- The four-stage level chain (vertical) ------------------------------
-    cx, bw, bh = 610.0, 400.0, 78.0
+    # 440 px wide, on the Spanish "Cuadrado + ponderación temporal  F / S",
+    # which is the longest stage title of the chain in either language.
+    cx, bw, bh = 610.0, 440.0, 78.0
     x0 = cx - bw / 2
     chain = [
         (96.0, "Microphone + preamplifier",
@@ -1054,17 +1063,21 @@ def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
         s.text((x0 + x1) / 2, 112, l2, 10, th.muted)
         s.text((x0 + x1) / 2, 132, l3, 10, th.muted)
 
-    box(48, 238, "Signal with one echo", "$x = s(t) + a·s(t − t_0)$",
+    # The four boxes are not equal: each is its own widest line plus the
+    # same padding, so the ripply-spectrum box, which carries the longest
+    # heading in Spanish, is the widest of the row and the inverse-FFT
+    # box, whose Spanish caption is the longer one, is next.
+    box(48, 228, "Signal with one echo", "$x = s(t) + a·s(t − t_0)$",
         "$a$ = 0.5,  $t_0$ = 8 ms", th.fg)
-    box(262, 442, "Ripply spectrum $|X(f)|$", "cosine ripple of period",
+    box(252, 458, "Ripply spectrum $|X(f)|$", "cosine ripple of period",
         "$1/t_0$ = 125 Hz", th.primary)
-    box(466, 646, "Take the log: $ln |X|^2$", "the multiplicative echo",
+    box(482, 652, "Take the log: $ln |X|^2$", "the multiplicative echo",
         "becomes an additive ripple", th.primary)
-    box(670, 860, "Inverse FFT", "quefrency axis, in seconds",
+    box(676, 860, "Inverse FFT", "quefrency axis, in seconds",
         "the cepstrum", th.secondary)
-    for xa in (238.0, 442.0, 646.0):
+    for xa in (228.0, 458.0, 652.0):
         s.arrow(xa + 2, 107, xa + 22, 107, th.fg, 1.8)
-    s.arrow(765, 152, 765, 196, th.fg, 1.8)
+    s.arrow(768, 152, 768, 196, th.fg, 1.8)
 
     # Quefrency panel: source envelope, rahmonics, lifter split.
     s.rect(70, 200, 760, 240, th.panel, th.fg, rx=10, sw=1.8)

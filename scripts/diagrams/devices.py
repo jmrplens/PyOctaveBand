@@ -1199,7 +1199,8 @@ def _d_duct_path(s: SVG, th: Theme) -> None:
 
     # --- the receiver ------------------------------------------------------
     s.person(room_x + 214, floor_y, 82, seated=True)
-    s.dim(780.0, ceil_y + 6, 780.0, floor_y - 68, "$r$ = 1.83 m", size=11)
+    # Clear of the room's caption block, which in Spanish reaches x = 782.
+    s.dim(788.0, ceil_y + 6, 788.0, floor_y - 68, "$r$ = 1.83 m", size=11)
     s.text(room_x + 12, 392, "$Q = 2$, flush in the ceiling", 11, th.muted,
            anchor="start")
 

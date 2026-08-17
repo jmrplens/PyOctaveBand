@@ -493,7 +493,10 @@ def _d_room_measurement(s: SVG, th: Theme) -> None:
     )):
         bold = line.endswith(":")
         color = th.secondary if i >= 7 else th.fg
-        s.text(lx, ry + 88 + i * 28, line, 15, color, "start", bold=bold)
+        # 24 px of leading, so the last line of the column clears the
+        # table heading that runs under it: the Spanish heading is 600 px
+        # long and passes right below this column.
+        s.text(lx, ry + 84 + i * 24, line, 15, color, "start", bold=bold)
 
     # --- ISO 3382-2 Table 1: minimum measurement positions per grade ---------
     ty = ry + rh + 46.0

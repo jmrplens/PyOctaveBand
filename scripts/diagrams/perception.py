@@ -414,7 +414,10 @@ def _d_mg_capture_routes(s: SVG, th: Theme) -> None:
     rows = (76.0, 216.0, 356.0, 496.0)
     for y in rows:
         s.rect(x0, y, w, 128, th.panel, th.muted, rx=10, sw=1.6)
-        s.line(500, y + 10, 500, y + 118, th.muted, 1.0, dash="4,4")
+        # The divider parts the drawing from the arguments it implies. It
+        # starts under the heading, which is the row's own title and spans
+        # both columns in either language.
+        s.line(500, y + 40, 500, y + 118, th.muted, 1.0, dash="4,4")
 
     def result(y: float, line1: str, line2: str, note: str) -> None:
         s.arrow(456, y + 64, 496, y + 64, th.fg, 1.8)

@@ -748,9 +748,10 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     # ===== How the static preload is applied (Part 1, clause 6.3.3.1) =======
     s.text(450, 640, "The two ways the static preload is applied "
            "(ISO 10846-1, 6.3.3.1)", 18, th.fg, bold=True)
-    # a) gravity loading
-    s.rect(48, 664, 388, 196, "none", th.fg, rx=10, sw=1.6)
-    s.text(70, 692, "a) gravity: the output-side mass is the preload", 15,
+    # a) gravity loading. Both panels are sized on their own headings,
+    # which are the widest lines they carry in either language.
+    s.rect(44, 664, 400, 196, "none", th.fg, rx=10, sw=1.6)
+    s.text(62, 692, "a) gravity: the output-side mass is the preload", 14,
            th.fg, anchor="start", bold=True)
     s.rect(150, 712, 130, 30, th.panel, th.fg, rx=4, sw=2.0)
     _spring_v(s, 215, 742, 786, th.accent, coils=3, width=10.0, sw=2.0)
@@ -762,18 +763,20 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     s.text(70, 848, "simple, but unstable for large isolators at high loads",
            12, th.muted, anchor="start")
     # b) frame + actuator + decoupling springs
-    s.rect(464, 664, 388, 196, "none", th.primary, rx=10, sw=1.6)
-    s.text(486, 692, "b) frame, actuator and decoupling springs", 15,
+    s.rect(456, 664, 400, 196, "none", th.primary, rx=10, sw=1.6)
+    s.text(474, 692, "b) frame, actuator and decoupling springs", 14,
            th.fg, anchor="start", bold=True)
     s.line(500, 706, 820, 706, th.fg, 2.6)                    # frame traverse
     s.line(500, 706, 500, 822, th.fg, 2.2)
     s.line(820, 706, 820, 822, th.fg, 2.2)
     s.rect(628, 712, 64, 34, th.panel, th.secondary, rx=4, sw=2.0)
     s.arrow(660, 748, 660, 768, th.secondary, 2.2)
-    s.text(676, 734, "actuator: 100 % of the", 12, th.secondary,
-           anchor="start")
-    s.text(676, 752, "permissible static load", 12, th.secondary,
-           anchor="start")
+    # Right-aligned on the frame's own leg: set from the left, the Spanish
+    # second line runs through it.
+    s.text(812, 734, "actuator: 100 % of the", 12, th.secondary,
+           anchor="end")
+    s.text(812, 752, "permissible static load", 12, th.secondary,
+           anchor="end")
     _spring_v(s, 660, 768, 800, th.accent, coils=3, width=10.0, sw=2.0)
     s.rect(600, 800, 120, 26, th.panel, th.fg, rx=4, sw=2.2)
     s.text(660, 818, "$m_2$", 13, th.fg)

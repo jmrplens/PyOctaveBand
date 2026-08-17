@@ -234,8 +234,12 @@ def _d_wind_turbine(s: SVG, th: Theme) -> None:
     s.ellipse(mx, gy - 3.0, 36.0, 7.0, fill=th.panel, stroke=th.fg, sw=1.6)
     s.rect(mx - 16, gy - 10.0, 20, 6, th.fg, rx=2.5)              # capsule flat
     s.rect(mx + 4, gy - 11.0, 10, 8, th.primary, rx=2)            # body
-    s.text(mx - 84, gy - 42.0, "Microphone on a ground board", 14, th.fg,
-           bold=True, anchor="end")
+    # Under the ground line and to the right of the R0 dimension: set above
+    # the board, the label runs back across the hub-height dimension and
+    # into the tower itself, and it is the longer of the two languages that
+    # gets there first.
+    s.text(740.0, gy + 62.0, "Microphone on a ground board", 14, th.fg,
+           bold=True)
 
     # Slant distance R1 from the rotor centre to the microphone.
     s.line(rx_, hub_y, mx - 12, gy - 8.0, th.primary, 2.2, dash="9,6")
@@ -710,7 +714,11 @@ def _d_cnossos_road(s: SVG, th: Theme) -> None:
     py = 150.0
     rx0, rx1 = 70.0, 700.0
     lane = 44.0
-    s.text(rx0, 70.0, "Plan — two-lane urban arterial", 17, th.fg,
+    # The heading takes the band right under the plate title and the
+    # 60 m dimension takes the one under it: the Spanish heading runs to
+    # x = 409, past the source the dimension starts from, so the two
+    # cannot share a line.
+    s.text(rx0, 56.0, "Plan — two-lane urban arterial", 17, th.fg,
            anchor="start", bold=True)
     s.rect(rx0, py - lane, rx1 - rx0, 2 * lane, th.panel, th.muted, sw=1.2)
     s.line(rx0, py, rx1, py, th.muted, 1.6, dash="14,10")
@@ -743,8 +751,8 @@ def _d_cnossos_road(s: SVG, th: Theme) -> None:
     s.line(jx, py - lane - 20, jx, py + lane + 20, th.primary, 2.4)
     s.text(jx + 8, py - lane - 26, "signal-controlled junction", 15, th.primary,
            anchor="start")
-    s.dim(hx, py - lane - 44, jx, py - lane - 44, "$x$ = 60 m", 0, 15)
-    s.line(hx, py - lane - 52, hx, py - lane - 4, th.muted, 0.9, dash="3,3")
+    s.dim(hx, py - lane - 23, jx, py - lane - 23, "$x$ = 60 m", 0, 15)
+    s.line(hx, py - lane - 29, hx, py - lane - 4, th.muted, 0.9, dash="3,3")
 
     # A small inline graph of the taper, clear of the road.
     gx0, gx1, gy0 = 720.0, 850.0, 300.0
@@ -810,9 +818,12 @@ def _d_cnossos_rail(s: SVG, th: Theme) -> None:
         s.rect(cx + dx - 7, gy - 62, 14, 20, th.fg)
     datum = gy - 62.0
     s.line(cx - 120, datum, cx + 150, datum, th.secondary, 2.0, dash="9,5")
-    s.text(cx + 158, datum + 26,
+    # Both captions of the section end on the same right edge, clear of
+    # the receiver's stand at x = 800: set from the left they run into it
+    # in either language.
+    s.text(782, datum + 26,
            "datum: the plane tangent to the two rail heads", 15, th.secondary,
-           anchor="start")
+           anchor="end")
     s.dim(cx - gauge / 2, gy - 76, cx + gauge / 2, gy - 76, "1,435 m", 0, 15)
 
     # Source A and source B on the track centre.
@@ -837,8 +848,8 @@ def _d_cnossos_rail(s: SVG, th: Theme) -> None:
     s.line(cx, by, rx, ry, th.accent, 1.8)
     s.line(cx, ay, rx + 10, ay, th.muted, 1.2, dash="5,4")
     s.text(cx + 250, ay - 14, "$ψ > 0$", 16, th.primary)
-    s.text(cx + 340, ay + 34, "$ψ ≤ 0$: the vertical correction of A is zero",
-           15, th.secondary)
+    s.text(782, ay + 34, "$ψ ≤ 0$: the vertical correction of A is zero",
+           15, th.secondary, anchor="end")
     s.text(rx, ry - 24, "receiver, 4 m", 15, th.fg, bold=True)
 
     s.circle(cx - 12, ay, 0.1, th.primary)
@@ -925,9 +936,11 @@ def _d_wind_turbine_board(s: SVG, th: Theme) -> None:
            th.muted)
     s.text(bx0 - 20, 330.0, "Section", 17, th.fg, anchor="start", bold=True)
 
-    # Tolerance box.
-    s.rect(70.0, 400.0, 340.0, 156.0, th.panel, th.muted, rx=8, sw=1.2)
-    s.text(84.0, 430.0, "Position (clause 7.1)", 16, th.fg, anchor="start",
+    # Tolerance box, sized on its longest line in either language and set
+    # against the sheet's own left margin, so it still stops short of the
+    # ground the section stands on.
+    s.rect(40.0, 400.0, 392.0, 156.0, th.panel, th.muted, rx=8, sw=1.2)
+    s.text(56.0, 430.0, "Position (clause 7.1)", 16, th.fg, anchor="start",
            bold=True)
     for i, line in enumerate((
         "within ±15° of downwind",
@@ -935,7 +948,7 @@ def _d_wind_turbine_board(s: SVG, th: Theme) -> None:
         "board inclination $φ$ between 25° and 40°",
         "reflections from structures < 0,2 dB",
     )):
-        s.text(84.0, 458.0 + i * 24.0, line, 15, th.fg, anchor="start")
+        s.text(56.0, 458.0 + i * 24.0, line, 15, th.fg, anchor="start")
 
 
 # ---------------------------------------------------------------------------
