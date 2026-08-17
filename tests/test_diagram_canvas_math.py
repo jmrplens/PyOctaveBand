@@ -394,6 +394,28 @@ def test_render_routes_the_title_through_the_same_emission() -> None:
     assert "xml:space" not in composed
 
 
+def test_title_steps_down_only_as_far_as_the_sheet_demands() -> None:
+    svg = SVG(900, 560, LIGHT)
+    assert svg.title_size("Plain title") == canvas._TITLE_SIZES[0]
+    # Each step is taken at the width the step above stops clearing the
+    # sheet at, and the floor is returned rather than a fifth step.
+    for larger, smaller in zip(canvas._TITLE_SIZES, canvas._TITLE_SIZES[1:]):
+        wide = "W" * (int(900 / measure(_label_runs("W", bold=True), larger)) + 1)
+        assert svg.title_size(wide) <= smaller
+    assert svg.title_size("W" * 200) == canvas._TITLE_SIZES[-1]
+
+
+def test_a_stepped_down_title_carries_its_scripts_down_with_it() -> None:
+    # Long enough to need the floor, short enough that the floor holds it.
+    title = "Rating $R_w$ against a reference" + " curve" * 6
+    assert SVG(900, 560, LIGHT).title_size(title) == 22
+    out = SVG(900, 560, LIGHT).render(title)
+    # The w subscript drops 0.22 of the size the element got, not of the
+    # nominal one: y = 30 + 4.84, at 0.7 of 22 px.
+    assert "34.84) scale(0.154 -0.154)" in out
+    assert "35.72) scale(0.182 -0.182)" not in out
+
+
 def test_emission_carries_no_style_attribute_and_no_checker_ids() -> None:
     svg = SVG(900, 560, LIGHT)
     svg.text(450, 100, "$L_{Aeq}$ over ⟨range⟩", bold=True)

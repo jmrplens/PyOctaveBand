@@ -116,10 +116,29 @@ _SUB_DROP = 0.22
 _SUP_RISE = -0.38
 _SCRIPT_SCALE = 0.70
 
-#: Font size of the title :meth:`SVG.render` sets across the top. The
-#: ``$...$`` composer scales scripts against the size the ``<text>`` is
-#: given, so the two must always be the same number.
-_TITLE_SIZE = 26
+#: Font sizes :meth:`SVG.render` will set the title across the top at,
+#: largest first, the first that clears the sheet winning.
+#:
+#: The title is the one label of a plate whose width nobody chose. Every
+#: other label is written into a box, a column or a gap the builder knows
+#: the size of; the title is a sentence centred on the sheet, and the
+#: sheet edge is the only thing holding it. Half the corpus is written
+#: right up to that edge, so a single fixed size makes the whole set
+#: hostage to the widest glyph the family draws.
+#:
+#: Stepping down is what the plates already do wherever a label has to
+#: clear something it did not choose -- a stage-box title measures itself
+#: against its box and drops a step -- and this is that decision taken
+#: against the sheet. The floor is 22 px, not lower, because 22 px of
+#: DejaVu is about what 26 px of the narrower face this corpus used to
+#: set read as: the same apparent size and the same line length, not a
+#: shrunken title. A title that will not clear the sheet at 22 px is a
+#: composition to rewrite, and the fit gate in :meth:`_emit_text` is what
+#: catches one.
+#:
+#: The ``$...$`` composer scales scripts against the size the element is
+#: given, so a stepped-down title carries its subscripts down with it.
+_TITLE_SIZES = (26, 24, 22)
 
 
 def _esc(s: str) -> str:
@@ -430,6 +449,22 @@ class SVG:
         runs = _label_runs(self.tr(s), mono=mono, bold=bold, italic=italic)
         return measure(runs, size) if runs else 0.0
 
+    def title_size(self, t: str) -> int:
+        """The largest of :data:`_TITLE_SIZES` the title clears the sheet at.
+
+        Takes the title *already translated*, so the string measured is
+        the one the sheet will draw -- the Spanish of a plate runs about a
+        quarter longer than its English, and it is the caller that holds
+        the single translation the whole pipeline runs on. Returns the
+        floor when nothing fits, leaving the fit gate to name the
+        composition that has to be rewritten.
+        """
+        runs = _label_runs(t, bold=True)
+        for size in _TITLE_SIZES:
+            if measure(runs, size) <= self.w:
+                return size
+        return _TITLE_SIZES[-1]
+
     def text(self, x: float, y: float, s: str, size: int = 20,
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:
@@ -567,13 +602,14 @@ class SVG:
         loudest string on every plate takes the same translation-once,
         measurement, fit gate, comment and outlining as every body label;
         the root ``<title>`` keeps a direct open accessible while the MDX
-        alt text stays the site's accessible name. The ``<defs>`` atlas
-        is assembled after the artwork, but its ids are content-derived,
-        so document order stays deterministic either way.
+        alt text stays the site's accessible name. Its size comes from
+        :meth:`title_size`, measured on that one translation. The
+        ``<defs>`` atlas is assembled after the artwork, but its ids are
+        content-derived, so document order stays deterministic either way.
         """
         th = self.th
         t = self.tr(title)
-        title_fragment = self._emit_text(self.w / 2, 30, t, _TITLE_SIZE,
+        title_fragment = self._emit_text(self.w / 2, 30, t, self.title_size(t),
                                          th.fg, "middle", bold=True)
         return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" '
                 f'height="{self.h}" viewBox="0 0 {self.w} {self.h}">'

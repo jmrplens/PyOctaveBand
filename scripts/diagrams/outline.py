@@ -368,21 +368,26 @@ def _census_labels() -> list[_Label]:
     records: list[_Label] = []
 
     class MeasuringSVG(canvas.SVG):
+        """A canvas that files where every label lands and draws nothing.
+
+        It intercepts the *emission* core, not :meth:`~canvas.SVG.text`,
+        so translation, composition and the title's measured size are the
+        canvas's own and cannot drift from what generation does. Only the
+        fit gate is left behind, which is the point: the census reports
+        the whole worklist where a run would stop at the first label.
+        """
+
         plate = ""
 
-        def text(self, x: float, y: float, s: str, size: int = 20,
-                 fill: str = "", anchor: str = "middle", bold: bool = False,
-                 mono: bool = False, italic: bool = False) -> None:
-            s = self.tr(s)
+        def _emit_text(self, x: float, y: float, s: str, size: int,
+                       fill: str, anchor: str, *, bold: bool = False,
+                       mono: bool = False, italic: bool = False) -> str:
             runs = canvas._label_runs(s, mono=mono, bold=bold, italic=italic)
-            if not runs:
-                return
-            width = measure(runs, size)
-            x0 = x - {"start": 0.0, "middle": width / 2, "end": width}[anchor]
-            records.append(_Label(self.plate, s, x0, x0 + width, self.w))
-
-        def render(self, title: str) -> str:
-            self.text(self.w / 2, 30, title, canvas._TITLE_SIZE, bold=True)
+            if runs:
+                width = measure(runs, size)
+                x0 = x - {"start": 0.0, "middle": width / 2,
+                          "end": width}[anchor]
+                records.append(_Label(self.plate, s, x0, x0 + width, self.w))
             return ""
 
     for name, (builder, title, height) in DIAGRAMS.items():

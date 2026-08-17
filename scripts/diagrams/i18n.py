@@ -254,8 +254,7 @@ _ES: dict[str, str] = {
     # Rooms / prediction: the EN 12354-6 take-off plate and the directivity
     # plate (buildings/rooms/enclosed-space-absorption, room-image-sources).
     "Room take-off: one room, three input lists (EN 12354-6)":
-        "Levantamiento del recinto: una sala, tres listas de entrada "
-        "(EN 12354-6)",
+        "Levantamiento del recinto: tres listas de entrada (EN 12354-6)",
     "1000 Hz octave band": "banda de octava de 1000 Hz",
     "$V$ = 29.75 m³": "$V$ = 29,75 m³",
     "ceiling  12.39 m²  $α_s$ 0.02": "techo  12,39 m²  $α_s$ 0,02",
@@ -1541,7 +1540,7 @@ _ES: dict[str, str] = {
         "La cláusula 4 exige además el ruido de fondo medio ponderado A  "
         "$L_{p,A,B}$  (cl. 6.4)",
     "Measurement uncertainty from tables to expanded U (ISO 12999-1)":
-        "Incertidumbre de medición: de las tablas a la U expandida (ISO 12999-1)",
+        "Incertidumbre de medición: de tablas a la U expandida (ISO 12999-1)",
     "Single-number sound-absorption rating (ISO 11654)":
         "Valoración de la absorción acústica en índice único (ISO 11654)",
     "Zwicker loudness model chain (ISO 532-1)":
