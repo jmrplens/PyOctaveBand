@@ -130,22 +130,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   asks for. Three plates rendered under an emptied fontconfig are
   pixel-identical to the normal render, which is the property the whole change
   exists for.
-- Every label the wider face pushed off its sheet is recomposed. The census
-  that measures all 6,552 plate labels in both languages against their 900 px
-  sheets named 330 of them, across 196 plates, once the typeface changed.
-  Nearly half were plate titles, the one label on a plate whose width nobody
-  chose: a title is a sentence centred on the sheet, and half the corpus is
-  written right up to the edge of it, so a title now measures itself and takes
-  the largest of 26, 24 and 22 px that clears the sheet. The floor is 22
-  because 22 px of this face reads at about the apparent size and the line
-  length the narrower one set 26 px at, so a stepped-down title is the shipped
-  title restored rather than a shrunken one; below it there is no step, and the
-  fit gate names the composition instead. The remaining 186 are recomposed by
-  wording, by a better line break or by a wider box, never by shrinking type
-  across the corpus, and the signal generator of the two-channel FRF plate has
-  a box wide enough for its own caption for the first time: it was 190 px
-  around a 195 px Spanish caption before any of this, which is a defect the
-  sheet census structurally cannot see. The census reports zero.
+- The plates' type scale is stated in the px of the face that draws them.
+  Every size in a builder is px of the outliner's face, and that face changed
+  under them: DejaVu runs about 16 % wider than the Helvetica-metric face these
+  compositions were measured in, 1.156 over all 6,552 labels of the corpus in
+  both languages. A px of the old face is not a px of this one, so every label
+  came out 16 % longer than the box, the column or the gap it was written into,
+  and the plates filled with labels running under panels, through walls and
+  over each other. The scale is converted once, at 0.86 with a floor of 10 px,
+  rather than patched where it showed: it restores the line lengths the
+  drawings were composed around, and a hand-tuned plate has no other invariant
+  to hold to. The title keeps a ladder of 22, 21 and 20 px and gains a margin,
+  because clearing the sheet was never the property wanted: a title whose first
+  and last letters sit on the sheet border, on a plate whose artwork keeps
+  thirty pixels, reads as having run off the page. No title in either language
+  needs more than one step to keep that white. The census that measures every
+  label against its 900 px sheet reports zero.
+- A second census measures the labels against the drawings, which is where the
+  wider face actually put them: `outline.py --collisions` reports two labels
+  sharing a line whose ink meets, a label crossing the border of a stroked box
+  it sits inside, a rule or a circle drawn through a label, and a filled panel
+  drawn after a label and across it. It counted 298 collisions that the
+  typeface change had introduced, and it is how they were worked off. Thirteen
+  survived the scale conversion and were given room one at a time; ten boxes
+  that had been measured on their English contents are now cut to whichever of
+  the two languages is the longer, the Spanish of this corpus running about a
+  quarter longer throughout; and the two-channel FRF plate's signal generator
+  has a box wide enough for its own caption for the first time, having been
+  190 px around a 195 px Spanish caption before any of this. The corpus now
+  carries 310 hits against origin/main's 411, and every one of the 310 is a hit
+  origin/main already had.
 - The corpus typography is finished end to end: figure titles at text weight
   (the ISO 80000 justification for mixed weights dissolved on reading the
   standard, which regulates slope and never weight), the prime composed as a
