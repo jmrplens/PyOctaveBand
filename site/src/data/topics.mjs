@@ -495,3 +495,52 @@ export const navigationTree = topics
     collapsed: true,
     items: topic.items,
   }));
+
+/**
+ * The three topics that are not a domain of acoustics: the entry point, the
+ * reference shelf and the generated API tree. Everything else teaches, which
+ * is what makes its pages guides.
+ */
+const NOT_A_DOMAIN = new Set(['start', 'reference', 'api']);
+
+/**
+ * The topics as URL prefixes, for everything that has to answer "which topic
+ * owns this page?" from a slug alone: the `articleSection` of the structured
+ * data and the article type that says the page teaches.
+ *
+ * The prefix comes from the topic's own `link`, not from its id, because the
+ * two differ where a topic lives inside another one's path: the API tree is
+ * the topic `api` and it lives at `reference/api`. Sorted longest first, so a
+ * page under `reference/api/` resolves to the API topic rather than to
+ * Reference, whose prefix it also starts with.
+ *
+ * @type {{id: string, prefix: string, label: {en: string, es: string}, isDomain: boolean}[]}
+ */
+export const topicSections = topics
+  .map((topic) => ({
+    id: topic.id,
+    prefix: topic.link.replace(/^\/+|\/+$/g, ''),
+    label: topic.label,
+    isDomain: !NOT_A_DOMAIN.has(topic.id),
+  }))
+  .sort((a, b) => b.prefix.length - a.prefix.length);
+
+/**
+ * The ids of the topics that teach, in tree order. They are also the content
+ * directory names, since a domain topic's link is its id.
+ */
+export const domainIds = topics
+  .filter((topic) => !NOT_A_DOMAIN.has(topic.id))
+  .map((topic) => topic.id);
+
+/**
+ * The topic that owns a slug, or `undefined` for a page outside every topic
+ * (the home page and the 404).
+ *
+ * @param {string} slug Page slug without the locale prefix, e.g. `signals/levels/weighting`.
+ */
+export function topicForSlug(slug) {
+  return topicSections.find(
+    (topic) => slug === topic.prefix || slug.startsWith(`${topic.prefix}/`),
+  );
+}

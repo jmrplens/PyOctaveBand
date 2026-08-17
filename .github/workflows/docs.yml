@@ -122,6 +122,16 @@ jobs:
       - name: Validate HTML
         run: pnpm run html-validate
         working-directory: site
+      - name: Check the structured data every page publishes
+        # The JSON-LD graph is the only part of a page written for machines
+        # alone, and nothing else here reads it: html-validate does not look
+        # inside a <script>, pa11y has no reason to, and the link checker sees
+        # no links there. A renamed topic left one section of the site
+        # publishing no articleSection at all, on all 54 of its pages across
+        # the two locales, and every check in this job stayed green for the
+        # twelve days it took to notice.
+        run: pnpm run check:structured-data
+        working-directory: site
       - name: Check every formula rendered
         # KaTeX does not fail a build on a parse error: it emits a
         # `katex-error` span and ships the page. A display block whose `$$`

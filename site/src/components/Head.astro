@@ -16,6 +16,7 @@
 import Default from '@astrojs/starlight/components/Head.astro';
 import { getCollection } from 'astro:content';
 import { breadcrumbsFor } from '../lib/breadcrumbs.mjs';
+import { topicForSlug } from '../data/topics.mjs';
 import { firstPublished } from '../lib/page-dates.mjs';
 import { citationsFor, referenceId, referenceNode } from '../lib/citations.mjs';
 
@@ -90,21 +91,24 @@ const slug = rel.replace(/^\/(es\/)?/, '').replace(/\/$/, '');
 // The generated API tree documents modules, and schema.org has an exact type
 // for that. APIReference is a subclass of TechArticle, so nothing is lost.
 const isApiPage = slug.startsWith('reference/api/');
+// The topic that owns this page, resolved from the array the sidebar, the
+// breadcrumb trails and the topic switcher all read. It answers two questions
+// at once: whether the page teaches, and what to call its section in the
+// reader's own language.
+//
+// Both used to be answered here by lists written out by hand, and the second
+// one drifted. The signal chapter was renamed `signals` and the topic list
+// twelve lines up was swept, but the section-name map below it kept saying
+// `signal`, so a topic of 54 pages published no `articleSection` at all on any
+// of them while its breadcrumbs, which read topics.mjs, stayed right the whole
+// time. Reading the same file removes the second spelling rather than
+// correcting it.
+const topic = topicForSlug(slug);
 // Guides teach a method as well as document it; the dual type is free and adds
 // the learning-resource properties.
-const GUIDE_TOPICS = [
-  'signals',
-  'perception',
-  'buildings',
-  'materials',
-  'vibration',
-  'environment',
-  'aircraft',
-  'underwater',
-  'devices',
-  'simulation',
-];
-const isGuide = GUIDE_TOPICS.some((topic) => slug === topic || slug.startsWith(`${topic}/`));
+const isGuide = topic?.isDomain ?? false;
+// Human-readable section for articleSection, in the page's own language.
+const articleSection = topic?.label[lang];
 const isBibliography = slug === 'reference/bibliography';
 
 const bibliographyUrl = `${SITE}${BASE}${lang === 'es' ? '/es' : ''}/reference/bibliography/`;
@@ -146,29 +150,6 @@ const proseBody = rawBody
   .replace(/^import\s.+$/gm, ' ')
   .replace(/<\/?[A-Za-z][^>]*>/g, ' ');
 const wordCount = proseBody.split(/\s+/).filter(Boolean).length;
-
-// Human-readable section for articleSection, in the page's own language.
-const sectionNames: Record<string, [string, string]> = {
-  'reference/api': ['API reference', 'Referencia de la API'],
-  reference: ['Reference', 'Referencia'],
-  start: ['Start', 'Inicio'],
-  signal: ['Signal analysis', 'Análisis de señal'],
-  perception: ['Hearing and perception', 'Audición y percepción'],
-  buildings: ['Rooms and buildings', 'Salas y edificación'],
-  materials: ['Materials and surfaces', 'Materiales y superficies'],
-  vibration: ['Vibration', 'Vibración'],
-  environment: ['Environment and transport', 'Medio ambiente y transporte'],
-  aircraft: ['Aircraft noise', 'Ruido de aeronaves'],
-  underwater: ['Underwater acoustics', 'Acústica submarina'],
-  devices: ['Sources and devices', 'Fuentes y dispositivos'],
-  simulation: ['Wave simulation', 'Simulación de ondas'],
-};
-const sectionKey = Object.keys(sectionNames).find(
-  (k) => slug === k || slug.startsWith(`${k}/`),
-);
-const articleSection = sectionKey
-  ? sectionNames[sectionKey][lang === 'es' ? 1 : 0]
-  : undefined;
 
 const article =
   isHome || is404
