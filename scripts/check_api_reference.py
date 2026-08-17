@@ -17,14 +17,15 @@ Row *content* is otherwise outside this gate, with one exception: the
 ``__version__`` row shows the package version as a literal
 (``phonometry.__version__  # '3.3.0'``). Nothing else re-reads that literal
 after a release bump, so it is checked against the installed
-``phonometry.__version__`` here.
+``phonometry.__version__`` here. A page showing no literal fails too, so the
+check cannot pass by finding nothing.
 
 Usage::
 
     python scripts/check_api_reference.py
 
-Exit status 0 when every public name has a row and the version literal is
-current, 1 otherwise.
+Exit status 0 when every public name has a row and the page shows the current
+version, 1 otherwise.
 """
 
 from __future__ import annotations
@@ -71,19 +72,24 @@ def missing_names(markdown: str, public: list[str]) -> list[str]:
     return [name for name in public if name not in documented]
 
 
-def stale_versions(markdown: str, version: str) -> list[str]:
-    """Version literals in ``markdown`` that disagree with ``version``.
+def version_problems(markdown: str, version: str) -> list[str]:
+    """Everything wrong with the version literals in ``markdown``.
 
     The ``__version__`` row spells the package version out as a literal, and
     a release bump has no reason to touch this file, so the literal goes
-    stale silently.
+    stale silently. Showing none at all is the other half of the same
+    defect: a check that finds nothing would pass while reporting a version
+    the page does not actually show.
 
     :param markdown: The ``docs/reference/api/index.md`` source.
     :param version: ``phonometry.__version__``.
-    :return: The literals that do not match, in order of appearance. Empty
-        when they all match, and also when the file shows none at all.
+    :return: One message per problem, in order of appearance. Empty when the
+        page shows the version and every literal agrees with it.
     """
-    return [found for found in _VERSION_LITERAL.findall(markdown) if found != version]
+    found = _VERSION_LITERAL.findall(markdown)
+    if not found:
+        return ["no `phonometry.__version__  # '...'` example to check"]
+    return [f"shows {literal!r}" for literal in found if literal != version]
 
 
 def main() -> int:
@@ -105,14 +111,14 @@ def main() -> int:
             print(f"  - {name}")
         print("Add a table row for each name (see the file's existing style).")
         return 1
-    stale = stale_versions(markdown, phonometry.__version__)
-    if stale:
+    problems = version_problems(markdown, phonometry.__version__)
+    if problems:
         print(
-            "docs/reference/api/index.md shows a stale version literal "
+            "docs/reference/api/index.md does not show the current version "
             f"(phonometry.__version__ is {phonometry.__version__!r}):"
         )
-        for found in stale:
-            print(f"  - {found!r}")
+        for problem in problems:
+            print(f"  - {problem}")
         print("Update the __version__ row's example to the current version.")
         return 1
     print(

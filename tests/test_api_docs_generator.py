@@ -413,17 +413,31 @@ _VERSION_ROW = """\
 """
 
 
-def test_stale_versions_flags_a_literal_that_drifted() -> None:
+def test_version_problems_flags_a_literal_that_drifted() -> None:
     """A release bump leaves the literal behind; the gate must say so."""
-    assert car.stale_versions(_VERSION_ROW, "3.3.0") == []
-    assert car.stale_versions(_VERSION_ROW, "3.4.0") == ["3.3.0"]
-    assert car.stale_versions(_VERSION_ROW, "4.0.0") == ["3.3.0"]
+    assert car.version_problems(_VERSION_ROW, "3.3.0") == []
+    assert car.version_problems(_VERSION_ROW, "3.4.0") == ["shows '3.3.0'"]
+    assert car.version_problems(_VERSION_ROW, "4.0.0") == ["shows '3.3.0'"]
 
 
-def test_stale_versions_ignores_files_without_a_version_literal() -> None:
+def test_version_problems_flags_a_row_that_shows_no_version_at_all() -> None:
+    """Finding nothing must fail, not pass while claiming the version is fine.
+
+    Deleting the row breaks the coverage check, but emptying its example
+    cell leaves the row in place, and a check that only compares literals it
+    finds would report the current version for a page that shows none.
+    """
+    emptied = _VERSION_ROW.replace("  # '3.3.0'", "")
+    assert "__version__" in emptied
+    assert car.version_problems(emptied, "3.3.0") == [
+        "no `phonometry.__version__  # '...'` example to check"
+    ]
+
+
+def test_version_problems_ignores_a_lookalike_comment() -> None:
     """Only ``phonometry.__version__  # '...'`` counts, not any old string."""
     unrelated = "| `leq` | `function` | Level | `leq(x)  # '3.2.0' looking text` |"
-    assert car.stale_versions(unrelated, "3.3.0") == []
+    assert car.version_problems(_VERSION_ROW + unrelated, "3.3.0") == []
 
 
 def test_quick_table_version_literal_is_current() -> None:
@@ -433,6 +447,6 @@ def test_quick_table_version_literal_is_current() -> None:
         / "docs" / "reference" / "api" / "index.md"
     )
     markdown = path.read_text(encoding="utf-8")
-    assert car.stale_versions(markdown, phonometry.__version__) == []
-    # And the row exists at all, so the check cannot pass by finding nothing.
+    assert car.version_problems(markdown, phonometry.__version__) == []
+    # And it says it exactly once, so no second copy can drift unseen.
     assert car._VERSION_LITERAL.findall(markdown) == [phonometry.__version__]
