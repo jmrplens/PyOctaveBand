@@ -553,6 +553,20 @@ def _plot_loss_field(
     ``imshow`` renders it as a single raster image rather than one vector quad
     per cell, which avoids moiré and keeps the figure light; ``pcolormesh``
     would put tens of thousands of paths into an SVG for the same picture.
+
+    THE WINDOW IS ANCHORED AT THE LOUD END. 50 dB of range has to be placed
+    somewhere, and the only robust end to hang it on is the strong one: a loss
+    field is bounded below by the strongest arrival and unbounded above, because
+    a shadow zone runs off to whatever number the solver's own noise floor
+    allows. Anchoring on a *high* percentile instead lets the empty part of the
+    picture decide where the window sits, and the emptier the field the further
+    it drags it: on the caustic case of the solvers guide, 18% of the Gaussian
+    beam field is infinite and its 95th percentile of finite loss is 160 dB, so
+    a window hung there covers 110 to 160 dB and 85% of the field clips to one
+    flat colour. It is not only the beams. The parabolic equation on the same
+    case puts 74% of its cells under such a window. Hung at the 5th percentile
+    and run 50 dB up, both show their caustics and their interference lobes,
+    with 5% saturating at the bright end by construction.
     """
     from .._i18n import localize_axes
 
@@ -561,15 +575,16 @@ def _plot_loss_field(
     z = np.asarray(depths, dtype=np.float64)
     pl = np.asarray(pl, dtype=np.float64)
     finite = pl[np.isfinite(pl)]
-    vmax = float(np.percentile(finite, 95)) if finite.size else 100.0
-    # The source column is infinite (the field is exactly zero there); clip
-    # non-finite samples to vmax so imshow does not render them as a stripe.
+    vmin = float(np.percentile(finite, 5)) if finite.size else 50.0
+    vmax = vmin + 50.0
+    # The un-illuminated wedge is infinite; clip it to the quiet end of the
+    # window so imshow renders it as the deepest shadow rather than as a hole.
     pl = np.where(np.isfinite(pl), pl, vmax)
     img = ax.imshow(
         pl,
         **{
             "cmap": "viridis_r",
-            "vmin": vmax - 50.0,
+            "vmin": vmin,
             "vmax": vmax,
             "aspect": "auto",
             "origin": "upper",
@@ -611,9 +626,17 @@ def plot_gaussian_beams(
 ) -> Axes:
     """Gaussian beam propagation-loss field (range x depth).
 
-    Drawn on the same axes, colour map and 50 dB window as
-    :func:`plot_parabolic_equation`, so the two fields can be read against each
-    other without adjusting for the frame.
+    Drawn on the same axes, the same colour map and a window of the same 50 dB
+    width as :func:`plot_parabolic_equation`. The width is shared; the
+    *placement* is not, because each anchors on its own field, and two solvers
+    over the same ocean do not agree on the loudest twentieth of it. Measured on
+    the caustic case of the solvers guide the beams come out on [50.2, 100.2] dB
+    and the parabolic equation on [53.3, 103.3], so a difference read off the
+    two colour bars carries 3.1 dB that is the framing rather than the physics.
+    Pass an explicit ``vmin`` and ``vmax`` to both, which go straight to
+    ``imshow``, whenever they are meant to be compared cell by cell; the depth
+    grids want pinning together the same way, since ``n_depth_points`` defaults
+    to 200 here and 1024 there.
 
     :param result: A
         :class:`~phonometry.underwater.propagation.numerical.GaussianBeamResult`.

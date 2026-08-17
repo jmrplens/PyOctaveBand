@@ -615,3 +615,35 @@ def test_the_result_lines_up_with_the_parabolic_equation_grid_and_plots() -> Non
                            -20.0 * np.log10(np.abs(beams.pressure)))
     assert beams.plot() is not None
     assert beams.plot(language="es") is not None
+
+
+def test_the_colour_window_lands_on_the_field_and_not_beside_it() -> None:
+    """That a raster came out is not evidence that anything is visible in it.
+
+    A loss field is bounded below by its strongest arrival and unbounded above,
+    so hanging a fixed 50 dB window on a *high* percentile lets the empty part
+    of the picture decide where the window sits. This is the case that shows it:
+    the source sits 7.5 m off the bottom of an n^2-linear profile, the up-going
+    fan turns into a caustic ladder, and 18 per cent of the field is the wedge
+    no beam reaches at all. Anchored at the 95th percentile the window was
+    [110, 160] dB and 85 per cent of the finite field fell below it and clipped
+    to one flat colour, caustics and all.
+
+    The assertion is on the fraction of the field the window actually resolves,
+    which is what "the picture shows something" means in numbers.
+    """
+    c0 = 1550.0
+    z = np.linspace(0.0, 1000.0, 201)
+    c = c0 / np.sqrt(1.0 + 2.4 * z / c0)
+    beams = gaussian_beams(600.0, z, c, source_depth=992.5, max_range=2500.0,
+                           range_step=25.0, max_angle_deg=45.0, n_depth_points=80)
+    pl = beams.propagation_loss
+    finite = pl[np.isfinite(pl)]
+    assert np.isinf(pl).mean() > 0.1, "the un-illuminated wedge has to be there"
+    ax = beams.plot()
+    vmin, vmax = ax.get_images()[0].get_clim()
+    assert vmax - vmin == pytest.approx(50.0)
+    resolved = float(((finite > vmin) & (finite < vmax)).mean())
+    assert resolved > 0.75, f"only {resolved:.1%} of the field is inside the window"
+    # The bright end is where the window is pinned, so only the tail saturates.
+    assert float((finite < vmin).mean()) < 0.1
