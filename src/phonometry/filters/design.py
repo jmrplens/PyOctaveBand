@@ -111,11 +111,11 @@ def _design_sos_filter(
             # Wn in cheby2 is the STOPBAND edge; map the desired -3 dB band
             # edges to stopband edges so the passband matches the ANSI band.
             f1_stop, f2_stop = _cheby2_stopband_edges(lower, upper, order, attenuation, fsd)
+            # No Nyquist clamp is needed here. Called with a sample rate, the
+            # mapping returns through (fsd/pi)*arctan(...), and arctan is
+            # bounded by pi/2, so f2_stop < fsd/2 strictly however wide the
+            # prototype's transition or however close the band sits to Nyquist.
             nyq = fsd / 2
-            if f2_stop >= nyq:
-                # Top band without decimation margin: compress the upper
-                # transition to stay below Nyquist (edge gain degrades there).
-                f2_stop = 0.999 * nyq
             wn_stop = np.array([f1_stop, f2_stop]) / nyq
             sos[idx] = signal.cheby2(N=order, rs=attenuation, Wn=wn_stop, btype="bandpass", output="sos")
         elif filter_type == "ellip":

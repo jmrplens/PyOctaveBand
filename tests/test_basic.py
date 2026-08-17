@@ -79,6 +79,30 @@ def test_octave_filter_sigbands() -> None:
     assert xb[0].shape == y.shape
 
 
+def test_detrend_acts_on_the_input_once_not_per_band() -> None:
+    """`detrend` removes the input's DC offset before filtering, not per band.
+
+    Pins what the parameter tables promise. The DC offset never reaches a
+    band signal either way, because the bandpass already rejects it; what
+    `detrend` changes is the level, by keeping the offset's onset step out
+    of the filters in the first place.
+    """
+    fs = 48000
+    t = np.arange(2 * fs) / fs
+    y = np.sin(2 * np.pi * 1000 * t) + 5.0  # 1 kHz tone riding a DC offset
+
+    bank = phonometry.OctaveFilterBank(fs=fs, fraction=1, limits=[12, 20000])
+    spl_on, _, bands_on = bank.filter(y, sigbands=True, detrend=True)
+    spl_off, _, bands_off = bank.filter(y, sigbands=True, detrend=False)
+
+    # The lowest band swings by tens of dB: the flag is doing real work.
+    assert spl_off[0] - spl_on[0] > 20.0
+    # Yet no band signal carries the offset in either mode, so the operation
+    # cannot be the per-band DC removal the tables used to describe.
+    assert abs(float(np.mean(bands_on[0]))) < 1e-4
+    assert abs(float(np.mean(bands_off[0]))) < 1e-4
+
+
 def test_octave_filter_reuses_cached_bank(monkeypatch) -> None:
     """Repeated octave_filter calls with identical params must not redesign the bank."""
     from phonometry.filters.core import OctaveFilterBank

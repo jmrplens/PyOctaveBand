@@ -272,7 +272,7 @@ plt.show()
 | `target_spl` | float | dB re 20 µPa | default `94.0` | The calibrator's nominal level (114 dB calibrators: pass `114.0`) |
 | `ref_pressure` | float | Pa | default `2e-5` | Reference pressure $p_0$; rarely changed |
 | `fs` | int, optional | Hz | > 0; default `None` | Required for the stability validation; omit to skip it |
-| `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings |
+| `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings; needs `fs`, and does nothing without it |
 | `max_fluctuation_db` | float, optional | dB | default `None` → Table 2 class 1 | Explicit override of the stability limit |
 | `frequency` | float | Hz | default `1000.0` | Calibrator's nominal frequency; selects the IEC 60942 Table 2 row |
 | `narrowband` | bool | — | default `False` | Estimate the tone with a coherent Goertzel detector near `frequency` (needs `fs`) instead of full-band RMS; rejects broadband hum/noise that otherwise inflates the RMS and shrinks every later level (~−0.44 dB at 20 dB SNR). Enable for noisy coupler recordings |
