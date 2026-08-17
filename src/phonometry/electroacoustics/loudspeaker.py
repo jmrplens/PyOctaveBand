@@ -22,12 +22,12 @@ the report never merely repeats a manufacturer number:
 
   .. math::
 
-     L_M = L_\text{band} + 20 \log_{10}(d / d_0) + 20 \log_{10}(U_p / U),
+     L_M = L_\text{band} + 20 \log_{10}(d / d_0) + 20 \log_{10}(U_\mathrm{p} / U),
      \qquad d_0 = 1\ \mathrm{m}
 
   where :math:`L_\text{band}` is the energetic mean of the on-axis level
   over a stated band (20.1.2.4: the r.m.s. of the band pressures) and
-  :math:`U_p = \sqrt{R P_0}` with :math:`P_0 = 1` W is the voltage that
+  :math:`U_\mathrm{p} = \sqrt{R P_0}` with :math:`P_0 = 1` W is the voltage that
   drives 1 W into ``R`` (20.3.2). With the default drive
   :math:`U = \sqrt{R}` at :math:`d = 1` m the two corrections vanish and
   the sensitivity level equals the band mean, which for :math:`R = 8` ohm
@@ -523,7 +523,7 @@ def _characteristic_sensitivity_level(
     if not np.any(in_band):
         raise ValueError("'sensitivity_band' selects no on-axis response samples.")
     band_level = _energetic_mean_db(spl[in_band])
-    # The drive-voltage and distance corrections; U_p = sqrt(R) drives 1 W into R.
+    # The drive-voltage and distance corrections; U_\mathrm{p} = sqrt(R) drives 1 W into R.
     return float(
         band_level + 20.0 * np.log10(d) + 20.0 * np.log10(float(np.sqrt(r)) / u)
     )

@@ -81,7 +81,7 @@ libre, referida a una entrada de 1 W en la impedancia nominal; expresada como
 nivel re 20 µPa (apartado 20.4) es el familiar «dB @ 1 W/1 m». En esa frase se
 esconden dos normalizaciones:
 
-- *La eléctrica.* La tensión de ensayo es $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+- *La eléctrica.* La tensión de ensayo es $U_\mathrm{p} = \sqrt{R \cdot 1\,\text{W}}$,
   numéricamente $\sqrt{R}$: 2,83 V en una impedancia nominal de 8 Ω. Una hoja de características que anuncia
   «dB @ 2,83 V/1 m» para un altavoz de 4 Ω le está entregando 2 W, lo que
   infla la cifra en 3 dB frente a una especificación real de 1 W/1 m;
@@ -146,10 +146,10 @@ con **ruido rosa** limitado en banda, no con un tono barrido (20.1.2): la cadena
 es un generador de ruido rosa, un filtro paso banda con pendientes de al menos
 24 dB/octava que limita la señal a la banda que se mide, el altavoz y el
 micrófono a la distancia declarada; la excitación es una tensión declarada
-$U_p$, que para la sensibilidad característica vale numéricamente $\sqrt{R}$
+$U_\mathrm{p}$, que para la sensibilidad característica vale numéricamente $\sqrt{R}$
 (20.3.2). Donde no exista un filtro del ancho de banda adecuado, el apartado
 20.1.2.4 da el sustituto práctico: partir la banda en $n$ bandas de tercio de
-octava según IEC 61260, excitar cada una a $U_p/\sqrt{n}$ y recombinar como el
+octava según IEC 61260, excitar cada una a $U_\mathrm{p}/\sqrt{n}$ y recombinar como el
 valor eficaz de las presiones de banda. La cadena de instrumentos — generador,
 amplificador, altavoz, amplificador de micrófono — tiene que ser plana dentro de
 ±0,5 dB en todo el rango y con no linealidad de amplitud despreciable, y todos
@@ -357,8 +357,8 @@ números se calculan a partir de la respuesta en lugar de solo repetirse:
 
 - **Nivel de sensibilidad característica** (20.3/20.4). El nivel en el eje
   promediado en una banda declarada, referido a 1 W en la impedancia nominal
-  $R$ a 1 m: $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ con
-  $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$. La excitación por defecto es ese
+  $R$ a 1 m: $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_\mathrm{p}/U)$ con
+  $U_\mathrm{p} = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$. La excitación por defecto es ese
   $\sqrt R$ (2,83 V en 8 Ω), de modo que con una respuesta a 1 m el nivel de
   sensibilidad es la media de banda.
 - **Rango de frecuencias efectivo** (21.2). La banda en la que la respuesta se

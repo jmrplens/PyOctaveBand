@@ -79,7 +79,7 @@ referred to an input of 1 W into the rated impedance; expressed as a level re
 20 µPa (clause 20.4) it is the familiar "dB @ 1 W/1 m". Two normalizations
 hide in that sentence:
 
-- *The electrical one.* The test voltage is $U_p = \sqrt{R \cdot 1\,\text{W}}$,
+- *The electrical one.* The test voltage is $U_\mathrm{p} = \sqrt{R \cdot 1\,\text{W}}$,
   numerically $\sqrt{R}$: 2.83 V into a rated 8 Ω. A datasheet quoting "dB @ 2.83 V/1 m" for a
   4 Ω loudspeaker is feeding it 2 W, which flatters the figure by 3 dB
   against a true 1 W/1 m rating; check the rated impedance before comparing.
@@ -139,10 +139,10 @@ measured with band-limited **pink noise**, not a swept tone (20.1.2): the chain
 is a pink-noise generator, a band-pass filter with slopes of at least
 24 dB/octave limiting the signal to the band being measured, the loudspeaker,
 and the microphone at the stated distance; the drive is a stated voltage
-$U_p$, which for the characteristic sensitivity is numerically $\sqrt{R}$
+$U_\mathrm{p}$, which for the characteristic sensitivity is numerically $\sqrt{R}$
 (20.3.2). Where no filter of the right bandwidth exists, clause 20.1.2.4 gives
 the practical substitute: split the band into $n$ third-octave bands per
-IEC 61260, drive each at $U_p/\sqrt{n}$, and recombine as the r.m.s. of the
+IEC 61260, drive each at $U_\mathrm{p}/\sqrt{n}$, and recombine as the r.m.s. of the
 band pressures. The instrument chain — generator, amplifier, loudspeaker,
 microphone amplifier — must be flat to ±0.5 dB over the range with negligible
 amplitude non-linearity, and all meters must be true r.m.s. (clause 8); the
@@ -339,7 +339,7 @@ computed from the response rather than merely repeated:
 
 - **Characteristic sensitivity level** (20.3/20.4). The on-axis level averaged
   over a stated band, referred to 1 W into the rated impedance $R$ at 1 m:
-  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_p/U)$ with $U_p = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
+  $L_M = \overline{L} + 20\log_{10}(d/d_0) + 20\log_{10}(U_\mathrm{p}/U)$ with $U_\mathrm{p} = \sqrt{R\cdot 1\,\text{W}} = \sqrt R$.
   The default drive is that $\sqrt R$ (2.83 V into 8 Ω), so with a 1 m response
   the sensitivity level is the band mean.
 - **Effective frequency range** (21.2). The band over which the response stays
