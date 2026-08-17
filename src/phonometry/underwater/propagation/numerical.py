@@ -550,12 +550,23 @@ class GaussianBeamResult:
     :ivar depths: Depth grid of the field, in metres.
     :ivar propagation_loss: Propagation-loss field ``PL(z, r)``, in dB, shape
         ``(n_depths, n_ranges)``. Infinite where the field is exactly zero,
-        which happens at the source range itself and in the wedge no beam of
-        the fan reaches: each beam is summed out to four half-widths, 140 dB
-        below its own axis, so a point that far from every one of them is
-        outside the traced aperture rather than merely in shadow. The graded
-        penumbra just past a limiting ray, which is the part of a shadow zone
-        worth having, is finite and carries the beams' tails.
+        which happens in the wedge no beam of the fan reaches: each beam is
+        summed out to four half-widths, 140 dB below its own axis, so a point
+        that far from every one of them is outside the traced aperture rather
+        than merely in shadow. The graded penumbra just past a limiting ray,
+        which is the part of a shadow zone worth having, is finite and carries
+        the beams' tails. Many ordinary cases have no infinity at all: an
+        isovelocity 1000 m guide at 300 Hz over 10 km, everything default, has
+        none in 80200 cells.
+
+        The source column is **not** one of the infinities, and is not to be
+        read. :func:`parabolic_equation` divides by :math:`\\sqrt{r}` and so
+        genuinely diverges at ``r = 0``; the beam sum does not, and hands back a
+        finite number there instead, 13.6 dB in the case above. It means
+        nothing, and neither does anything else within about three initial beam
+        widths of the source: see :func:`gaussian_beams` on why this method has
+        no near field. The plausible size of these numbers is the point worth
+        knowing about them.
     :ivar pressure: The complex field the loss was taken from, same shape, in
         the module's own :math:`e^{-i\\omega t}` convention (the conjugate of
         the one Jensen Eq. (3.88) is printed in) and normalised to unit
@@ -644,11 +655,20 @@ def _default_beam_width(
     genuine Gaussian rather than a Fresnel integral: the quadratic coefficient
     of that integral is proportional to :math:`q(0)/q(r)`, whose real part
     vanishes as :math:`q(0)` grows, and the sum then stops converging on a
-    truncated fan. Measured against the free field at 100 Hz, the relative error
-    in :math:`|p|` is 7.5e-5 at this width at every range tried (500 m, 2 km,
-    8 km); it grows to 5e-4 at a fifth of it, where each beam accepts too wide a
-    cone of launch angles for the paraxial expansion, and to 2.4e-2 and 3.6e-1
-    at six and fifteen times it, where the Fresnel behaviour sets in.
+    truncated fan. Measured against the free field at 100 Hz at 2, 5 and 8 km,
+    the relative error in :math:`|p|` is 7.5e-5 at this width; it is 2.7e-2 at a
+    fifth of it, where each beam accepts too wide a cone of launch angles for
+    the paraxial expansion, and 3.7e-3 and 4.1e-2 at six and fifteen times it,
+    where the Fresnel behaviour sets in. The shallowest part of the curve is a
+    little above the formula rather than on it, 1.9e-5 at twice the width, which
+    is as close to the optimum as this measurement can place it.
+
+    The range set matters and is quoted above for that reason. Taken on a set
+    reaching in to 500 m these last two numbers come out 5.4e-2 and 6.3e-2, an
+    order of magnitude worse at six times the width, because a wide beam is
+    exactly what pushes the perpendicular feet of the fan in towards the source:
+    that is the axis floor of :func:`_beam_influence` being read as a property
+    of the width, and it is not one.
 
     Two clamps stand around it. The floor of ten wavelengths and the ceiling of
     fifty are the band the book recommends ("typically, this will lead to an
@@ -996,6 +1016,22 @@ def gaussian_beams(
       the fan is opened or the beam count multiplied by 150, so there is nothing
       it is converging to. Use :func:`normal_modes` there, which is exact in
       that regime for the cost of two modes.
+    * **There is no near field**, and this is the largest error the function
+      makes. Eq. (3.92) weights the fan by matching it to a point source in the
+      far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
+      on the axis every ray leaves from, so close in the sum has nothing to
+      converge to. :func:`_beam_influence` floors that range at a wavelength,
+      which is what keeps the answer bounded rather than what makes it right.
+      The scale it recovers on is the initial beam width, not a fixed distance.
+      Worst error against :math:`20\lg R` over a +-500 m depth cut in an
+      unbounded medium at 100 Hz, at three settings whose :math:`W_0` spans
+      150 to 437 m: 17, 13 and 4.1 dB at a quarter of :math:`W_0`, 1.2, 0.64 and
+      0.36 dB at :math:`W_0`, 0.012, 0.005 and 0.002 dB at 2.5 :math:`W_0`, and
+      a thousandth of a decibel or better from 3 :math:`W_0` out. Read nothing
+      inside about three beam widths of the source; since the default
+      :math:`W_0` grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run pushes
+      that boundary out rather than in. :func:`parabolic_equation` is the
+      solver to reach for close to the source.
     * **The fan is truncated** at ``max_angle_deg``, and a waveguide with two
       perfectly reflecting boundaries is the worst case for that, because
       nothing but :math:`1/R` attenuates the steep multiple bounces. Measured on
@@ -1235,11 +1271,6 @@ def _assemble_beam_field(
         samples, receivers, water_depth=water_depth,
         bottom_reflection=bottom_reflection, omega=omega, beam_width=w0)
     return field, widths, curvatures
-
-
-# ===========================================================================
-# 4. Parabolic equation (Jensen Ch. 6, split-step Fourier)
-# ===========================================================================
 
 
 # ===========================================================================
