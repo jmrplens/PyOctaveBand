@@ -256,7 +256,7 @@ def _d_zwicker(s: SVG, th: Theme) -> None:
 
     def _step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, bh, th.panel, color, rx=10, sw=2)
-        size = 15 if s.text_width(l1, 15, bold=True) <= bw - 28 else 14
+        size = s.fit_size([l1], (15, 14), bw - 28, bold=True)
         s.text(cx, y + 25, l1, size, th.fg, "middle", bold=True)
         s.text(cx, y + 45, l2, 11, th.muted, "middle")
 

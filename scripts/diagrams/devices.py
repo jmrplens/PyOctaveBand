@@ -677,8 +677,7 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
     # One size for the row, chosen on its longest heading: "1 · Ensayo de
     # intensidad residual" is 281 px against the 233 of its English twin,
     # and a panel that holds one does not hold the other.
-    hsize = 15 if max(s.text_width(h, 15, bold=True)
-                      for h in heads) <= w - 24 else 13
+    hsize = s.fit_size(heads, (15, 13), w - 24, bold=True)
     for x0, head in zip(tops, heads, strict=True):
         s.rect(x0, 62, w, 300, th.panel, th.muted, rx=12, sw=1.6)
         s.text(x0 + w / 2, 90, head, hsize, th.fg, bold=True)

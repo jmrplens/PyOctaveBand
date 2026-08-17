@@ -515,7 +515,7 @@ def _d_iso11654(s: SVG, th: Theme) -> None:
         # "Desplazar la curva de referencia en pasos de 0,05 hasta el mejor
         # ajuste" is 735 px against the 522 of its English twin, and it is
         # the only line of the chart that has to drop a step.
-        size = 15 if s.text_width(l1, 15, bold=True) <= bw - 28 else 14
+        size = s.fit_size([l1], (15, 14), bw - 28, bold=True)
         s.text(cx, y + 23, l1, size, th.fg, "middle", bold=True)
         s.text(cx, y + 42, l2, 11, th.muted, "middle")
 

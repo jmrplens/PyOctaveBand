@@ -33,7 +33,7 @@ from __future__ import annotations
 import os
 import re
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from .i18n import lookup, visit
@@ -477,6 +477,28 @@ class SVG:
         """
         runs = _label_runs(self.tr(s), mono=mono, bold=bold, italic=italic)
         return measure(runs, size) if runs else 0.0
+
+    def fit_size(self, labels: Sequence[str], sizes: Sequence[int],
+                 width: float, *, bold: bool = False, mono: bool = False,
+                 italic: bool = False) -> int:
+        """The first of ``sizes`` at which every label fits ``width``.
+
+        The body counterpart of :meth:`title_size`, and the same decision
+        the plates kept making by hand: try the size the design wants, drop
+        to the next when the Spanish runs longer than the English, and take
+        the last as the floor. Passing several labels sizes a row on its
+        longest member, so the panels of that row stay set alike rather
+        than each shrinking on its own.
+
+        ``sizes`` is read in preference order, largest first by convention;
+        the last is returned when none fits, because a plate that overflows
+        its box is still better than one that raises here.
+        """
+        for size in sizes:
+            if all(self.text_width(s, size, bold=bold, mono=mono,
+                                   italic=italic) <= width for s in labels):
+                return size
+        return sizes[-1]
 
     def title_size(self, t: str) -> int:
         """The largest of :data:`_TITLE_SIZES` the title keeps its margin at.
