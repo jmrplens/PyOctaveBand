@@ -10,15 +10,18 @@ wide it is (:func:`advance`), where each glyph lands (:func:`shape`),
 the per-document outline atlas (:class:`GlyphStore`) and the writer that
 turns styled runs into ``<g>``/``<use>`` markup (:func:`emit_runs`).
 
-Two decisions carry the whole design. **Metrics are Liberation Sans**,
-vendored under ``fonts/`` (see its README): the plates' hand-tuned
-composition encodes Helvetica/Arial-metric advances, and Liberation is
-the metric-compatible face, so no label moves. **Coverage is the
-chain**, not the primary face: a glyph Liberation lacks falls back
-per-cluster to the matching DejaVu Sans face inside the pinned
-matplotlib wheel, resolved deterministically at generation time -- which
-replaces today's silent, machine-dependent fontconfig substitution. No
-face in the chain covering a character is a hard error, never a blank.
+Two decisions carry the whole design. **One typeface across the drawn
+corpus**: every face in :data:`_FACES` is a DejaVu face out of the
+pinned matplotlib wheel, the same family and the same pin that sets the
+figures, so a plate and a figure sitting on one documentation page are
+set in one typeface instead of two. Nothing else fixes the plates'
+metrics -- the compositions are held against these advances by the
+canvas's fit gate and by the census below. **Coverage is the chain**,
+not the primary face: a glyph the primary lacks falls back per-cluster
+to the next face, resolved deterministically at generation time --
+which replaces the silent, machine-dependent fontconfig substitution
+the live-text plates used to take. No face in the chain covering a
+character is a hard error, never a blank.
 
 Every face is loaded by file path; fontconfig is never consulted. All
 measurement is the **pen advance** of the shaped string, never the ink
@@ -54,23 +57,25 @@ if TYPE_CHECKING:
 #: acute, grave, breve and dot below.
 _COMBINING = "\u0302\u0304\u0305\u0307\u0303\u0301\u0300\u0306\u0323"
 
-_FONT_DIR = Path(__file__).parent / "fonts"
 _MPL_TTF = Path(matplotlib.get_data_path()) / "fonts" / "ttf"
 
 #: A face request: ``(mono, bold, italic)``.
 FaceKey = tuple[bool, bool, bool]
 
-#: (mono, bold, italic) -> ordered chain: primary, fallback. There is no
-#: mono italic face on purpose: no plate sets code in italic.
+#: (mono, bold, italic) -> the ordered chain of face files, every one of
+#: them out of the pinned matplotlib wheel. The proportional faces stand
+#: alone: one family leaves no second family to put under them, and what
+#: the oblique cuts lack against the upright is Arabic, Tifinagh, N'Ko,
+#: Ogham and the pre-italicised Mathematical Alphanumerics, none of which
+#: a plate can set. The mono faces do fall back, to the proportional face
+#: of the same weight, because they lack characters this corpus really
+#: does set (``ℓ`` and ``∥``). There is no mono italic face on purpose:
+#: no plate sets code in italic.
 _FACES: dict[FaceKey, tuple[Path, ...]] = {
-    (False, False, False): (_FONT_DIR / "LiberationSans-Regular.ttf",
-                            _MPL_TTF / "DejaVuSans.ttf"),
-    (False, True, False): (_FONT_DIR / "LiberationSans-Bold.ttf",
-                           _MPL_TTF / "DejaVuSans-Bold.ttf"),
-    (False, False, True): (_FONT_DIR / "LiberationSans-Italic.ttf",
-                           _MPL_TTF / "DejaVuSans-Oblique.ttf"),
-    (False, True, True): (_FONT_DIR / "LiberationSans-BoldItalic.ttf",
-                          _MPL_TTF / "DejaVuSans-BoldOblique.ttf"),
+    (False, False, False): (_MPL_TTF / "DejaVuSans.ttf",),
+    (False, True, False): (_MPL_TTF / "DejaVuSans-Bold.ttf",),
+    (False, False, True): (_MPL_TTF / "DejaVuSans-Oblique.ttf",),
+    (False, True, True): (_MPL_TTF / "DejaVuSans-BoldOblique.ttf",),
     (True, False, False): (_MPL_TTF / "DejaVuSansMono.ttf",
                            _MPL_TTF / "DejaVuSans.ttf"),
     (True, True, False): (_MPL_TTF / "DejaVuSansMono-Bold.ttf",
@@ -110,8 +115,9 @@ def assert_capabilities() -> None:
     """Fail fast when the environment cannot outline the plates faithfully.
 
     Without libraqm, combining marks get their own advance and ``T̂``
-    silently becomes ``T ˆ``; without the vendored faces, the fallback
-    chain would quietly change every metric. Checked once per process.
+    silently becomes ``T ˆ``; a face missing from the wheel would drop
+    its strings down the chain and quietly change every metric it sets.
+    Checked once per process.
     """
     global _capabilities_checked
     if _capabilities_checked:
