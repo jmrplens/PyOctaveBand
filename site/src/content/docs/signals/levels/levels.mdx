@@ -344,7 +344,7 @@ of [Environmental Levels](/phonometry/environment/assessment/environmental-level
 | `fs` | int | Hz | > 0 | Needed by the envelope detector |
 | `n` | tuple of ints | % | default `(10, 50, 90)` | Any exceedance percentages, e.g. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | IEC 61672-1 ballistics of the envelope |
-| `weighting` | str or None | — | `'A'`, `'C'`, `'G'`, `'Z'`, `None` (default) | Frequency weighting before the envelope |
+| `weighting` | str or None | — | any `weighting_filter` curve: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (default) | Frequency weighting before the envelope (`None` and `'Z'` both leave it unweighted) |
 | `calibration_factor` / `dbfs` | float / bool | — | as `leq` | Same semantics as in `leq()` |
 
 ## Maximum time-weighted level (LAFmax, LASmax)

@@ -348,7 +348,7 @@ lo que hace el `composite_rating_level` de
 | `fs` | int | Hz | > 0 | Lo necesita el detector de envolvente |
 | `n` | tupla de ints | % | por defecto `(10, 50, 90)` | Cualquier porcentaje de excedencia, p. ej. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | Ponderación temporal IEC 61672-1 de la envolvente |
-| `weighting` | str o None | — | `'A'`, `'C'`, `'G'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente |
+| `weighting` | str o None | — | cualquier curva de `weighting_filter`: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente (`None` y `'Z'` dejan la señal sin ponderar) |
 | `calibration_factor` / `dbfs` | float / bool | — | como `leq` | Misma semántica que en `leq()` |
 
 ## Nivel máximo con ponderación temporal (LAFmax, LASmax)

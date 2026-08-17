@@ -461,3 +461,28 @@ def test_guide_signature_cells_match_the_code() -> None:
         else:
             assert params == real, (name, params, real)
     assert checked >= 4, f"expected the peak/event/dose rows, checked {checked}"
+
+
+@pytest.mark.parametrize("curve", ["A", "B", "C", "D", "G", "AU", "Z"])
+def test_ln_levels_and_sel_accept_every_weighting_filter_curve(curve: str) -> None:
+    """Both functions forward `weighting` straight to `weighting_filter`.
+
+    The docstrings used to advertise only 'A', 'C', 'Z' and the guides only
+    'A', 'C', 'G', 'Z'; the real accepted set is whatever `weighting_filter`
+    takes. Only an unknown letter raises.
+    """
+    from phonometry import ln_levels, sel
+
+    x = _tone(1000, seconds=2.0)
+    assert np.isfinite(ln_levels(x, FS, n=(50,), weighting=curve)[50])
+    assert np.isfinite(sel(x, FS, weighting=curve))
+
+
+def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
+    from phonometry import ln_levels, sel
+
+    x = _tone(1000)
+    with pytest.raises(ValueError, match="Weighting curve"):
+        ln_levels(x, FS, weighting="Q")
+    with pytest.raises(ValueError, match="Weighting curve"):
+        sel(x, FS, weighting="Q")
