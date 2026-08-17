@@ -205,7 +205,12 @@ def collect(roots: list[str]) -> list[pathlib.Path]:
             continue
         paths.extend(p for p in sorted(target.rglob("*"))
                      if p.suffix in _SUFFIXES and p.is_file())
-    return [p for p in paths if not _EXCLUDED.search(str(p))]
+    # Matched on the posix spelling, not on ``str(p)``: the pattern writes its
+    # directory anchors with forward slashes, and on Windows ``str`` hands back
+    # backslashes, so every exclusion silently stopped matching there and the
+    # drawing modules were read after all. The same normalisation is why
+    # ``declared`` below reads ``as_posix``.
+    return [p for p in paths if not _EXCLUDED.search(p.as_posix())]
 
 
 def declared(path: pathlib.Path) -> dict[tuple[str, str], str]:
