@@ -9,6 +9,7 @@
     "check:i18n": "node scripts/check-i18n-parity.mjs",
     "check:icons": "node scripts/icon-sheet.mjs --check",
     "check:math": "node scripts/check-math-render.mjs",
+    "check:redirects": "node scripts/check-redirects.mjs",
     "check:sidebar": "node scripts/with-preview.mjs -- node scripts/check-sidebar.mjs",
     "check:structured-data": "node scripts/check-structured-data.mjs",
     "check:visual": "node scripts/with-preview.mjs -- sh -c 'node scripts/check-contrast.mjs && node scripts/check-home-headings.mjs && node scripts/check-lang-suggest.mjs && node scripts/check-page-chips.mjs'",
@@ -18,9 +19,10 @@
     "identity:sync": "node scripts/sync-identity.mjs",
     "lighthouse": "node scripts/lighthouse-audit.mjs",
     "pa11y": "node scripts/with-preview.mjs -- ./node_modules/.bin/pa11y-ci",
-    "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-doctype.mjs && node scripts/optimize-images.mjs && node scripts/emit-page-markdown.mjs",
+    "postbuild": "node scripts/add-sitemap-lastmod.mjs && node scripts/fix-redirect-stubs.mjs && node scripts/optimize-images.mjs && node scripts/emit-page-markdown.mjs",
     "prebuild": "node scripts/stage-media.mjs && node scripts/copy-llms.mjs",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "redirects": "node scripts/generate-redirects.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.7",

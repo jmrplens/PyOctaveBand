@@ -10,6 +10,7 @@ import starlightSidebarTopics from 'starlight-sidebar-topics';
 
 import { topics } from './src/data/topics.mjs';
 import { doi, doiUrl } from './src/data/citation.mjs';
+import { redirects } from './src/data/redirects.mjs';
 import { basePath, siteUrl } from './src/data/site.mjs';
 import { isOurMedia, mediaUrl, REMOTE_PREFIXES } from './src/lib/media.mjs';
 import { rehypeWrappableMath } from './src/lib/wrappable-math.mjs';
@@ -413,20 +414,14 @@ const jsonLd = JSON.stringify({
 export default defineConfig({
   site: siteUrl,
   base: basePath,
-  // Four pages that were split before the site was published. Each now lands
-  // on the overview of the subsection its content became, which is a better
-  // answer than one of the pages it was split into. Nothing new is added here:
-  // the taxonomy move drops its old addresses outright.
-  redirects: {
-    '/guides/building-acoustics/': `${basePath}/buildings/insulation/`,
-    '/es/guides/building-acoustics/': `${basePath}/es/buildings/insulation/`,
-    '/guides/psychoacoustics/': `${basePath}/perception/psychoacoustics/`,
-    '/es/guides/psychoacoustics/': `${basePath}/es/perception/psychoacoustics/`,
-    '/guides/materials/': `${basePath}/materials/absorbers/`,
-    '/es/guides/materials/': `${basePath}/es/materials/absorbers/`,
-    '/guides/surface-scattering/': `${basePath}/materials/diffusers/`,
-    '/es/guides/surface-scattering/': `${basePath}/es/materials/diffusers/`,
-  },
+  // Every address this site has published and no longer serves. The eight
+  // entries that used to be written out here covered the four guides that were
+  // split, and nothing else: the reorganisations that followed moved 216 pages
+  // in each language and left every one of their old addresses answering 404,
+  // to search results, bookmarks and citations alike. The map is derived from
+  // the rename history of the content tree and committed, so it is reviewable
+  // in a diff; src/data/redirects.mjs says how it is kept honest.
+  redirects,
   build: {
     // Render prerendered pages in parallel batches (default is 1 at a time).
     // At ~340 pages the static-generation phase is a small slice of the
