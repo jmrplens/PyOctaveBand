@@ -77,9 +77,10 @@ DARK = Theme(
 #: symbol it belongs to, so a run is upright everywhere or nowhere. Nine
 #: runs the prose sets upright somewhere are therefore deliberately absent,
 #: because the same run has to stay italic elsewhere: ``i`` and ``n``
-#: (indices in $S_i$, $L_i$, $H_n$), ``d`` ($n_d$, the disjoint averages),
-#: ``p`` ($L_p$), ``v`` ($L_v$), ``S`` ($w_S$), ``a`` ($L_{a1}$,
-#: $L_{a2}$), ``r`` ($K_r$) and ``I`` ($L_{I0}$, the residual intensity
+#: (indices in $S_i$, $L_i$, $H_n$), ``d`` and ``r`` (the direct and
+#: reflected path lengths $r_d$ and $r_r$ of the echo geometry, neither
+#: expanded anywhere), ``p`` ($L_p$), ``v`` ($L_v$), ``S`` ($w_S$), ``a``
+#: ($L_{a1}$, $L_{a2}$) and ``I`` ($L_{I0}$, the residual intensity
 #: level). Romanising those would romanise a quantity symbol or an index,
 #: which is the error the whole policy exists to avoid; those labels keep
 #: the italic default. Every other letter run inside a script is an index
@@ -91,7 +92,10 @@ DARK = Theme(
 #: means in the module or the guide that carries it and two files may
 #: legitimately disagree (CONTRIBUTING.md, "Setting a subscript"). A plate
 #: has no such scope to appeal to, so a run that has to be italic anywhere
-#: stays italic everywhere.
+#: stays italic everywhere. That is why the plates still draw $n_d$ and
+#: $K_r$ sloped where the prose, holding one page against one standard,
+#: now sets both upright: the ``d`` and the ``r`` they share are spoken
+#: for by the two path lengths above.
 _ROMAN_SCRIPTS = frozenset((
     "Aeq", "eq", "EQ", "EX", "max", "MAX", "min", "upper", "lower", "sup",
     "low", "high", "limit", "ref", "rms", "tot", "TOT", "eff", "mod",
