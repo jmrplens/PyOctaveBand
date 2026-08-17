@@ -88,11 +88,15 @@ which is the wedge no beam of the fan illuminates at all.
 The limits are worth knowing before the numbers are believed.
 
 * **Ray theory's own regime** (Sect. 3.4.2): "the wavelength should be
-  substantially smaller than any physical scale in the problem". At 20 Hz in
-  100 m of water the depth is 1.3 wavelengths and two or three modes
-  propagate; the beam sum then scatters by a few tenths of a decibel against
-  the exact field and converges in nothing. Read it above a few hundred
-  hertz in shallow water.
+  substantially smaller than any physical scale in the problem". This is the
+  limit that bites hardest and the one a plausible-looking answer hides
+  best. At 20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes
+  propagate, and the quarter-depth cap on the beam width leaves a beam a
+  third of a wavelength across: against the image-source sum from 200 m to
+  5 km the loss then comes out 2 to 8 dB high, and it moves by decibels when
+  the fan is opened or the beam count multiplied by 150, so there is nothing
+  it is converging to. Use [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) there, which is exact in
+  that regime for the cost of two modes.
 * **The fan is truncated** at `max_angle_deg`, and a waveguide with two
   perfectly reflecting boundaries is the worst case for that, because
   nothing but $1/R$ attenuates the steep multiple bounces. Measured on

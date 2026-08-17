@@ -484,11 +484,15 @@ en vez de imponerse: el campo en una superficie o un fondo de presión nula es
 
 - **El régimen propio de la teoría de rayos** (Jensen §3.4.2): «la longitud de
   onda debería ser sustancialmente menor que cualquier escala física del
-  problema». A 20 Hz en 100 m de agua la profundidad son 1,3 longitudes de onda
-  y se propagan dos o tres modos; la suma de haces se dispersa entonces unas
-  décimas de decibelio frente al campo exacto y no converge en nada. Léelo por
-  encima de unos cientos de hercios en aguas someras, y usa `normal_modes` por
-  debajo.
+  problema». Es el límite que más aprieta y el que mejor esconde una respuesta
+  de aspecto verosímil. A 20 Hz en 100 m de agua la profundidad son 1,3
+  longitudes de onda, se propagan dos modos y el tope de un cuarto de la
+  profundidad deja un haz de un tercio de longitud de onda de ancho: frente a
+  la suma de fuentes imagen, de 200 m a 5 km la pérdida sale entre 2 y 8 dB
+  alta, y se mueve decibelios al abrir el abanico o al multiplicar por 150 el
+  número de haces, así que no hay nada a lo que esté convergiendo. Lee los
+  haces por encima de unos cientos de hercios en aguas someras, y usa
+  `normal_modes` por debajo, donde dos modos son la respuesta exacta.
 - **El abanico está truncado** en `max_angle_deg`, y una guía de ondas con dos
   contornos perfectamente reflectantes es el peor caso posible para eso, porque
   nada salvo $1/R$ atenúa los rebotes múltiples más inclinados. En la guía ideal
