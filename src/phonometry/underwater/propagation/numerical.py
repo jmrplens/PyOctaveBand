@@ -676,10 +676,11 @@ def _image_ladder(
     :math:`\\theta` to the horizontal spans :math:`W/\\cos\\theta` in depth at
     fixed range, so any beam steep enough, or wide enough, straddles a boundary
     and its folded copies overlap. Summing only the copy nearest the receiver
-    throws the rest away, and it does so silently and always downward: measured
-    on the ideal 1000 m guide at 300 Hz against the image-source sum, the loss
-    at 5 km is 5.7 dB too high with the nearest copy alone and 0.0005 dB too
-    high with the copies restored.
+    throws the rest away, and it does so silently and in one direction: measured
+    on the ideal 1000 m guide at 300 Hz against the image-source sum, with the
+    fan at 88 degrees, the loss at 2, 5 and 10 km comes out -0.49, +4.50 and
+    +4.97 dB off with the nearest copy alone, and +0.0002, +0.0003 and
+    -0.0004 dB off with the ladder restored.
 
     Restoring them is the method of images applied to the receiver rather than
     to the source, which reciprocity allows. In the folded frame the images of a
@@ -849,8 +850,9 @@ def _beam_influence(
             q_hit = q_infl.ravel()[hits]
             spread_hit = spread2d[beam_at, range_at]
             # The travel-time phase, the tracked branch of 1/sqrt(q) and the
-            # transverse Gaussian all ride in one exponent: two complex
-            # exponentials over tens of millions of survivors are the run time.
+            # transverse Gaussian all ride in one exponent rather than three,
+            # because a complex exponential over tens of millions of survivors
+            # is where the run time goes.
             exponent = (
                 -0.5j * (phase2d[beam_at, range_at]
                          + np.angle(q_hit * np.conj(spread_hit)))
