@@ -27,6 +27,20 @@ nothing with the solver.
   steep multiple bounces, so the same image sum truncated to the fan's own
   half-angle is used to separate the fan's truncation from the method's error.
 
+* **The same guide, expanded over modes instead of paths.** Jensen Eq. (5.13)
+  is a second closed form of that same exact field, built from the boundary
+  conditions rather than from a stack of ray paths, and normalised by Eq. (5.16)
+  rather than by anything fitted. It reaches the absolute phase, which the image
+  lattice is used for level only, and it puts the beams on the footing
+  :func:`normal_modes` and :func:`parabolic_equation` are already held to.
+
+* **A refracting guide.** Everything isovelocity leaves the refracting half of
+  the marcher untested: :math:`c''` vanishes there, so the coupling coefficient
+  of the dynamic ray equations is zero and the boundary impulse with it. The
+  :math:`n^2`-linear profile of Eq. (3.77) has exactly linear :math:`k^2(z)`,
+  which makes its modes Airy functions in closed form, eigenvalues included, so
+  the bent case gets an oracle of the same standard as the straight one.
+
 * **Beam width and wavefront curvature.** In free space Sect. 3.5.1 gives both
   in closed form, Eqs. (3.85)-(3.86), and the second of them is a real
   cross-check rather than a restatement: it is derived there from a complex
@@ -282,6 +296,291 @@ def test_both_boundary_conditions_fall_out_of_the_folded_images(
     scale = np.abs(res.pressure[1, 0])
     assert np.abs(res.pressure[0, 0]) / scale < 1e-3
     assert np.abs(res.pressure[2, 0]) / scale == pytest.approx(at_bottom, abs=0.2)
+
+
+# --- The same field, expanded the other way ---------------------------------
+#
+# The image lattice above and the modal sum below are two expansions of one
+# exact field, and they are wrong in different ways when they are wrong: the
+# lattice is a sum over paths that closes only by cancellation, the modal sum a
+# sum over the eigenfunctions of the depth operator that closes term by term.
+# The second is worth building because it is the expansion the other two solvers
+# of this module use, so anchoring the beams to it puts all three on one
+# footing, and because it can be written down from the boundary conditions
+# alone, absolute phase included.
+
+_MODAL_GUIDE = {"water_depth": 1000.0, "frequency": 290.0,
+                "source_depth": 300.0, "receiver_depth": 600.0}
+
+
+def _modal_pressure(
+    ranges: np.ndarray, *, water_depth: float, frequency: float,
+    source_depth: float, receiver_depth: float, n_evanescent: int = 200,
+) -> np.ndarray:
+    r"""The ideal guide's field as its own eigenfunction expansion.
+
+    A pressure-release plane at each end makes the depth operator
+    :math:`Z'' + (k^2 - k_r^2)Z = 0` an eigenproblem with
+    :math:`Z_m = \sqrt{2/D}\,\sin(m\pi z/D)`, orthonormal at constant density,
+    and Jensen Eq. (5.13) then reads
+
+    .. math::
+
+        p = \frac{i}{4\rho(z_s)} \sum_m \Psi_m(z_s)\,\Psi_m(z)\,
+            H_0^{(1)}(k_{rm} r), \qquad k_{rm} = \sqrt{k^2 - (m\pi/D)^2},
+
+    whose free field is the :math:`e^{ikr}/(4\pi r)` of Eq. (5.16). Multiplying
+    through by :math:`4\pi` puts it on this module's unit-pressure-at-1-m
+    normalisation, and that is the entire content of the comparison: there is no
+    fitted constant left anywhere in it, so the test below reaches the absolute
+    level and the absolute phase at once.
+
+    The modes past cutoff are carried rather than dropped. Theirs is
+    :math:`k_r = i\gamma`, and :math:`H_0^{(1)}(i\gamma r) =
+    -2i K_0(\gamma r)/\pi` turns the same term into
+    :math:`2\Psi\Psi K_0(\gamma r)`: real, decaying, and evaluated through the
+    exponentially scaled :math:`K_0` so that a deep tail neither overflows nor
+    underflows to a NaN. That makes this the exact field at every range rather
+    than the far-field one of Eq. (5.14), which is what lets the phase be
+    asserted at all.
+
+    One geometry has to be avoided rather than handled: a mode sitting exactly
+    at cutoff has :math:`k_r = 0` and an infinite :math:`H_0^{(1)}(0)`, which
+    happens when :math:`kD/\pi` is an integer. It is 386.7 here, and 400 at the
+    300 Hz of ``_GUIDE`` above, which is why this oracle is anchored at 290 Hz.
+    """
+    from scipy.special import hankel1, k0e
+
+    k = 2.0 * np.pi * frequency / _C
+    n_modes = int(np.floor(k * water_depth / np.pi)) + n_evanescent
+    kz = (np.arange(1, n_modes + 1) * np.pi / water_depth)[:, None]
+    excitation = (2.0 / water_depth) * (np.sin(kz * source_depth)
+                                        * np.sin(kz * receiver_depth))
+    r = np.asarray(ranges, dtype=np.float64)[None, :]
+    below = (kz < k).ravel()
+    field = 1j * np.pi * (excitation[below]
+                          * hankel1(0, np.sqrt(k**2 - kz[below] ** 2) * r)).sum(axis=0)
+    beyond = np.sqrt(kz[~below] ** 2 - k**2) * r
+    return np.asarray(
+        field + 2.0 * (excitation[~below] * k0e(beyond) * np.exp(-beyond)).sum(axis=0),
+        dtype=np.complex128)
+
+
+def test_the_ideal_waveguide_matches_its_own_modal_expansion() -> None:
+    """Level and phase together, against a sum over modes rather than paths.
+
+    Nothing about this oracle resembles the beam sum: it never mentions a ray, a
+    launch angle or an arc length, and its range dependence is a Hankel function
+    rather than a stack of straight-line delays. What survives the comparison is
+    therefore the whole calibration at once, and in a channel this one is worth
+    something: at 290 Hz over a kilometre of water 386 modes propagate and the
+    beams that carry them have bounced up to a few dozen times by 2 km.
+
+    Measured: 0.034 and 0.018 dB in level and 2.0e-5 and 8.4e-4 rad in phase,
+    at 1.5 and 2 km. The bounds below sit an order of magnitude above that and
+    orders below anything the test exists to catch, all of which are gross: a
+    missing 4 pi is 21.98 dB, the printed ``e^(+i pi/4)`` of Eq. (3.92) is a
+    quarter turn, a dropped conjugation reverses the phase, and losing the
+    folded receiver images costs several decibels.
+    """
+    r = np.array([1500.0, 2000.0])
+    exact = _modal_pressure(r, **_MODAL_GUIDE)
+    res = gaussian_beams(
+        _MODAL_GUIDE["frequency"], [0.0, _MODAL_GUIDE["water_depth"]], [_C, _C],
+        source_depth=_MODAL_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
+        receiver_depths_m=np.array([_MODAL_GUIDE["receiver_depth"]]),
+        max_angle_deg=88.0, range_step=2.0, beam_width=100.0)
+    assert np.abs(res.propagation_loss[0] + 20.0 * np.log10(np.abs(exact))).max() < 0.1
+    assert np.abs(np.angle(res.pressure[0] / exact)).max() < 5e-3
+
+
+# --- A guide the beams have to bend through ---------------------------------
+#
+# Everything above is isovelocity, and an isovelocity channel says nothing about
+# refraction: c'' vanishes, so the coupling coefficient of the dynamic ray
+# equations is zero, p is constant, q is a straight line and the impulse the
+# marcher applies at a flat boundary is identically zero. The oracle below is
+# built to fill exactly that gap, and it is the only one here that does.
+
+_AIRY_GUIDE = {"water_depth": 200.0, "frequency": 200.0, "bottom_speed": 1530.0,
+               "source_depth": 30.5, "receiver_depth": 120.5}
+
+
+def _n2_linear_speeds(depths: np.ndarray, *, bottom_speed: float,
+                      water_depth: float) -> np.ndarray:
+    r"""Jensen's :math:`n^2`-linear profile, Eq. (3.77), scaled to two speeds.
+
+    :math:`c(z) = c_0/\sqrt{1 + 2az/c_0}` makes :math:`k^2(z) = \omega^2/c^2`
+    exactly linear in depth, which is what the closed-form modes below need.
+    The ``a`` returned by the algebra carries ``_C`` at the surface to
+    ``bottom_speed`` at the bottom.
+    """
+    a = _C / (2.0 * water_depth) * ((_C / bottom_speed) ** 2 - 1.0)
+    return np.asarray(_C / np.sqrt(1.0 + 2.0 * a * np.asarray(depths) / _C))
+
+
+def _airy_shape(x: float, pair: tuple[float, float]) -> float:
+    """``alpha Ai(x) + beta Bi(x)``, the mode read at one depth."""
+    from scipy.special import airy
+
+    ai, _, bi, _ = airy(x)
+    return float(pair[0] * ai + pair[1] * bi)
+
+
+def _airy_square_integral(x: float, pair: tuple[float, float]) -> float:
+    r"""Antiderivative of that mode squared, in :math:`x`.
+
+    :math:`\int\mathrm{Ai}^2 = x\mathrm{Ai}^2 - \mathrm{Ai}'^2`,
+    :math:`\int\mathrm{Ai}\,\mathrm{Bi} = x\mathrm{Ai}\mathrm{Bi} -
+    \mathrm{Ai}'\mathrm{Bi}'` and :math:`\int\mathrm{Bi}^2 = x\mathrm{Bi}^2 -
+    \mathrm{Bi}'^2`, each of which differentiates straight back through
+    :math:`\mathrm{Ai}'' = x\mathrm{Ai}`.
+    """
+    from scipy.special import airy
+
+    alpha, beta = pair
+    ai, aip, bi, bip = airy(x)
+    return float(alpha**2 * (x * ai * ai - aip * aip)
+                 + 2.0 * alpha * beta * (x * ai * bi - aip * bip)
+                 + beta**2 * (x * bi * bi - bip * bip))
+
+
+def _airy_mode_pressure(
+    ranges: np.ndarray, *, water_depth: float, frequency: float,
+    bottom_speed: float, source_depth: float, receiver_depth: float,
+) -> np.ndarray:
+    r"""The refracting guide's exact field, mode by mode, in closed form.
+
+    With :math:`k^2(z) = A + Bz` the depth equation is Airy's own. Substituting
+    :math:`x = \mu(z - z_t)`, :math:`\mu = (-B)^{1/3}`,
+    :math:`z_t = (k_r^2 - A)/B`, turns :math:`Z'' + (A + Bz - k_r^2)Z = 0` into
+    :math:`y'' = xy` with no approximation whatever, so
+
+    .. math::
+
+        Z(z) = \mathrm{Bi}(x_0)\,\mathrm{Ai}(x) - \mathrm{Ai}(x_0)\,\mathrm{Bi}(x)
+
+    already vanishes at the surface, and the eigenvalues are the roots of
+    :math:`\mathrm{Ai}(x_0)\mathrm{Bi}(x_D) - \mathrm{Ai}(x_D)\mathrm{Bi}(x_0)`,
+    hunted here by bracketing a scan and polishing with Brent. The normalisation
+    is closed form too, since
+    :math:`\int\mathrm{Ai}^2 = x\mathrm{Ai}^2 - \mathrm{Ai}'^2` and its two
+    companions differentiate straight back through :math:`\mathrm{Ai}'' =
+    x\mathrm{Ai}`; against a 40001-point quadrature it agrees to 3.9e-14.
+
+    So this is a genuine closed form, not a fine numerical solution of the same
+    problem: no eigenvalue matrix, no depth grid, no far-field approximation of
+    the Hankel function. Checked in scratch against a DOP853 shooting
+    integration of the same boundary-value problem at ``rtol=1e-12``, which is
+    stable for the 45 of the 52 modes whose turning point lies below the bottom:
+    the eigenvalues agree to 4.0e-13 1/m and the normalised modal products
+    :math:`Z(z_s)Z(z_r)` to 6.1e-11 relative. The mode count, 52, is the 52.8 a
+    WKB integral gives.
+
+    Only the propagating modes are summed. The first one past cutoff decays as
+    :math:`e^{-65}` by the shortest range used below, so it is not an
+    approximation at these ranges, it is a rounding.
+    """
+    from scipy.optimize import brentq
+    from scipy.special import airy, hankel1
+
+    omega = 2.0 * np.pi * frequency
+    a = _C / (2.0 * water_depth) * ((_C / bottom_speed) ** 2 - 1.0)
+    coef_a = (omega / _C) ** 2
+    coef_b = 2.0 * a * omega**2 / _C**3
+    mu = (-coef_b) ** (1.0 / 3.0)
+
+    def edges(kr: np.ndarray | float) -> tuple[np.ndarray, np.ndarray]:
+        turning = (np.asarray(kr) ** 2 - coef_a) / coef_b
+        return -mu * turning, mu * (water_depth - turning)
+
+    def determinant(kr: float) -> float:
+        x0, xd = edges(kr)
+        ai0, _, bi0, _ = airy(x0)
+        aid, _, bid, _ = airy(xd)
+        return float(ai0 * bid - aid * bi0)
+
+    scan = np.linspace(1e-6, np.sqrt(coef_a) * (1.0 - 1e-12), 100_001)
+    scan_x0, scan_xd = edges(scan)
+    ai0s, _, bi0s, _ = airy(scan_x0)
+    aids, _, bids, _ = airy(scan_xd)
+    values = ai0s * bids - aids * bi0s
+    brackets = np.flatnonzero(np.sign(values[:-1]) * np.sign(values[1:]) < 0.0)
+
+    r = np.asarray(ranges, dtype=np.float64)
+    field = np.zeros(r.size, dtype=np.complex128)
+    for lo in brackets:
+        kr = brentq(determinant, scan[lo], scan[lo + 1], xtol=1e-14, rtol=8.9e-16)
+        x0, xd = edges(kr)
+        ai0, _, bi0, _ = airy(x0)
+        pair = (float(bi0), -float(ai0))
+        turning = (kr**2 - coef_a) / coef_b
+        norm = (_airy_square_integral(float(xd), pair)
+                - _airy_square_integral(float(x0), pair)) / mu
+        at_source = _airy_shape(mu * (source_depth - turning), pair)
+        at_receiver = _airy_shape(mu * (receiver_depth - turning), pair)
+        field += (1j * np.pi * at_source * at_receiver / norm
+                  * hankel1(0, kr * r))
+    return np.asarray(field, dtype=np.complex128)
+
+
+def _incoherent(loss: np.ndarray, window: int = 11) -> np.ndarray:
+    """Energy-average a loss curve over neighbouring ranges.
+
+    The two fields interfere on the same fringes but not with the same phase to
+    the last degree, so a point-by-point comparison in a null measures the null
+    and not the method. Averaging in intensity, which is what
+    :func:`normal_modes`' own trend test does, leaves the quantity a
+    transmission-loss curve is read for.
+    """
+    kernel = np.ones(window) / window
+    return np.asarray(-10.0 * np.log10(
+        np.convolve(10.0 ** (-np.asarray(loss) / 10.0), kernel, mode="same")))
+
+
+def test_a_refracting_guide_matches_its_exact_airy_modes() -> None:
+    """The one test here that puts a bend in the rays and an exact number on it.
+
+    Measured over 0.5 to 4 km, energy-averaged, against the closed form above:
+    a mean of -0.22 dB with a 1.32 dB scatter and a 3.3 dB worst bin. The mean
+    is the assertion that means something, since a mistake in the refracting
+    half of the marcher shows as a bias and not as scatter; the scatter is
+    fringes that have slipped by a fraction of a period and is bounded here at
+    the same 2 dB the module's other cross-solver comparison uses.
+
+    ``beam_width`` is set deliberately, and to four times what the default would
+    give, because THIS is where the default is worst and the number is worth
+    writing down. :func:`_default_beam_width` clamps :math:`W_0` to a quarter of
+    the water depth, which in 200 m of water is 50 m, a fifth of the
+    :math:`\\sqrt{\\lambda r_\\mathrm{max}/\\pi}` optimum the same function
+    computes first. Same configuration, same oracle, default width: +3.08 dB
+    mean, 5.86 dB worst, i.e. the field comes out systematically too quiet. It
+    is not a defect in the beams. Their own convergence says so: 100 m gives
+    +1.13, 150 m +0.26, 200 m -0.22, and the same profile in 1000 m of water,
+    where the clamp does not bite and the default is the optimum, comes out at
+    +0.72 dB mean with a 1.37 dB worst bin, better than :func:`normal_modes`
+    manages against the same closed form. It is the clamp, in shallow water
+    only, and Sect. 3.5's own remark that "at lower frequencies the physics may
+    imply that the beam is large compared to the channel, which causes a variety
+    of problems" is the book saying the same thing from the other side.
+    """
+    r = np.linspace(500.0, 4000.0, 100)
+    exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **_AIRY_GUIDE)))
+    depths = np.linspace(0.0, _AIRY_GUIDE["water_depth"], 21)
+    speeds = _n2_linear_speeds(depths, bottom_speed=_AIRY_GUIDE["bottom_speed"],
+                               water_depth=_AIRY_GUIDE["water_depth"])
+    with warnings.catch_warnings():
+        # The width is over the quarter-depth cap on purpose; see the docstring.
+        warnings.simplefilter("ignore", PhonometryWarning)
+        res = gaussian_beams(
+            _AIRY_GUIDE["frequency"], depths, speeds,
+            source_depth=_AIRY_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+            receiver_depths_m=np.array([_AIRY_GUIDE["receiver_depth"]]),
+            max_angle_deg=80.0, range_step=5.0, beam_width=200.0)
+    # The convolution's own edges are not an average of anything, so they go.
+    difference = (_incoherent(res.propagation_loss[0]) - _incoherent(exact))[10:-10]
+    assert abs(float(difference.mean())) < 1.0
+    assert float(difference.std()) < 2.0
 
 
 # --- What the beam itself does ----------------------------------------------
