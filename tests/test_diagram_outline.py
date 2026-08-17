@@ -220,3 +220,30 @@ def test_emission_carries_fill_and_no_style_attribute() -> None:
     markup = emit_runs(GlyphStore(), _label_runs("ab"), 0.0, 0.0, 20, "#123456")
     assert 'fill="#123456"' in markup
     assert "style=" not in markup
+
+
+def test_collision_census_names_each_way_a_label_can_land_wrong(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """One plate composed to fail all four ways, and every way reported."""
+    from diagrams import outline, registry
+    from diagrams.canvas import SVG, Theme
+
+    def build(s: SVG, th: Theme) -> None:
+        # Two labels meeting on one line.
+        s.text(60, 100, "left run", 16, th.fg, anchor="start")
+        s.text(110, 100, "right run", 16, th.fg, anchor="start")
+        # A label wider than the stroked box it sits in.
+        s.rect(60, 160, 80, 40, "none", th.fg)
+        s.text(100, 185, "wider than its box", 16, th.fg)
+        # A rule drawn through a label.
+        s.text(400, 300, "struck through", 16, th.fg)
+        s.line(400, 260, 400, 340, th.fg)
+        # A filled panel drawn after the label it covers.
+        s.text(400, 400, "covered", 16, th.fg)
+        s.rect(340, 380, 120, 40, th.panel, "none")
+
+    monkeypatch.setattr(registry, "DIAGRAMS",
+                        {"plate": (build, "Title", 560)})
+    kinds = {hit.kind for hit in outline._collisions()}
+    assert kinds == {"overprint", "escapes", "struck", "painted over"}

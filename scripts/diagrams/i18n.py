@@ -4066,9 +4066,8 @@ _ES: dict[str, str] = {
     "Below 20 Hz the wind is louder": "Bajo 20 Hz el viento suena",
     "than the source": "más que la fuente",
     "static-pressure equalisation": "orificio de compensación de",
-    "vent: a first-order high-pass,": "presión estática: un paso alto de",
-    "and the chain's real corner":
-        "primer orden, la esquina real de la cadena",
+    "vent: a first-order high-pass,": "presión estática: paso alto de primer",
+    "and the chain's real corner": "orden, la esquina real de la cadena",
     "hard board on the ground": "tablero rígido sobre el suelo",
     "capsule flush at its centre": "cápsula enrasada en su centro",
     "primary foam screen (solid)": "pantalla primaria de espuma (continua)",
