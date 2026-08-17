@@ -49525,9 +49525,9 @@ $W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, the width that resolves the field best
 at the far end of the run, where it is resolved worst. That is also where the
 launch-angle integral behind Eq. (3.92) is a genuine Gaussian rather than a
 Fresnel integral, which is why it is not merely a tidy choice: against the free
-field at 100 Hz the error in $|p|$ is $7.5\times10^{-5}$ at that width and the
-same at every range tried, growing to $5\times10^{-4}$ at a fifth of it and to
-$0.36$ at fifteen times it. The book's 10-50 wavelength band and a quarter of
+field at 100 Hz at 2, 5 and 8 km the error in $|p|$ is $7.5\times10^{-5}$ at
+that width, $2.7\times10^{-2}$ at a fifth of it and $4.1\times10^{-2}$ at
+fifteen times it. The book's 10-50 wavelength band and a quarter of
 the water depth clamp it, and the channel clamp has the last word: a beam
 comparable to the water depth breaks the bookkeeping that folds a reflected
 ray back into the column, rather than merely costing accuracy.
@@ -49541,8 +49541,19 @@ Both boundary conditions come out of the beam sum rather than being imposed:
 the field at a pressure-release surface or bottom is 3 parts in $10^5$ of its
 mid-column value, and a rigid bottom doubles it.
 
-**Where it stops.** Three limits, in the order they bite.
+**Where it stops.** Four limits, in the order they bite.
 
+- **There is no near field**, and this is the biggest error of the four.
+  Eq. (3.92) weights the fan by matching it to a point source in the far field,
+  and Eq. (3.88) divides by a cylindrical range that goes to zero on the axis
+  every ray leaves from, so close in the sum has nothing to converge to. The
+  scale it recovers on is $W_0$, not a fixed distance: over three settings
+  whose $W_0$ spans 150 to 437 m, the worst error against $20\lg R$ in an
+  unbounded medium is 17, 13 and 4.1 dB at a quarter of $W_0$, around 0.6 dB at
+  $W_0$, a hundredth of a decibel at $2.5\,W_0$ and a thousandth from
+  $3\,W_0$ out. Read nothing inside about three beam widths of the source, and
+  note that since the default $W_0$ grows as $\sqrt{r_{\max}}$, a longer run
+  pushes that boundary further out. Use `parabolic_equation` close in.
 - **Ray theory's own regime** (Jensen §3.4.2): "the wavelength should be
   substantially smaller than any physical scale in the problem". This is the
   limit that bites hardest and that a plausible-looking answer hides best. At

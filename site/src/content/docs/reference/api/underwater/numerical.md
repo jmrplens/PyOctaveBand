@@ -97,6 +97,22 @@ The limits are worth knowing before the numbers are believed.
   the fan is opened or the beam count multiplied by 150, so there is nothing
   it is converging to. Use [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) there, which is exact in
   that regime for the cost of two modes.
+* **There is no near field**, and this is the largest error the function
+  makes. Eq. (3.92) weights the fan by matching it to a point source in the
+  far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
+  on the axis every ray leaves from, so close in the sum has nothing to
+  converge to. `_beam_influence` floors that range at a wavelength,
+  which is what keeps the answer bounded rather than what makes it right.
+  The scale it recovers on is the initial beam width, not a fixed distance.
+  Worst error against $20\lg R$ over a +-500 m depth cut in an
+  unbounded medium at 100 Hz, at three settings whose $W_0$ spans
+  150 to 437 m: 17, 13 and 4.1 dB at a quarter of $W_0$, 1.2, 0.64 and
+  0.36 dB at $W_0$, 0.012, 0.005 and 0.002 dB at 2.5 $W_0$, and
+  a thousandth of a decibel or better from 3 $W_0$ out. Read nothing
+  inside about three beam widths of the source; since the default
+  $W_0$ grows as $\sqrt{r_\mathrm{max}}$, a longer run pushes
+  that boundary out rather than in. [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) is the
+  solver to reach for close to the source.
 * **The fan is truncated** at `max_angle_deg`, and a waveguide with two
   perfectly reflecting boundaries is the worst case for that, because
   nothing but $1/R$ attenuates the steep multiple bounces. Measured on
@@ -192,7 +208,7 @@ can be subtracted.
 | `frequency` | Source frequency, in Hz. |
 | `ranges` | Range grid of the field, in metres. |
 | `depths` | Depth grid of the field, in metres. |
-| `propagation_loss` | Propagation-loss field `PL(z, r)`, in dB, shape `(n_depths, n_ranges)`. Infinite where the field is exactly zero, which happens at the source range itself and in the wedge no beam of the fan reaches: each beam is summed out to four half-widths, 140 dB below its own axis, so a point that far from every one of them is outside the traced aperture rather than merely in shadow. The graded penumbra just past a limiting ray, which is the part of a shadow zone worth having, is finite and carries the beams' tails. |
+| `propagation_loss` | Propagation-loss field `PL(z, r)`, in dB, shape `(n_depths, n_ranges)`. Infinite where the field is exactly zero, which happens in the wedge no beam of the fan reaches: each beam is summed out to four half-widths, 140 dB below its own axis, so a point that far from every one of them is outside the traced aperture rather than merely in shadow. The graded penumbra just past a limiting ray, which is the part of a shadow zone worth having, is finite and carries the beams' tails. Many ordinary cases have no infinity at all: an isovelocity 1000 m guide at 300 Hz over 10 km, everything default, has none in 80200 cells. The source column is **not** one of the infinities, and is not to be read. [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) divides by $\sqrt{r}$ and so genuinely diverges at `r = 0`; the beam sum does not, and hands back a finite number there instead, 13.6 dB in the case above. It means nothing, and neither does anything else within about three initial beam widths of the source: see [`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) on why this method has no near field. The plausible size of these numbers is the point worth knowing about them. |
 | `pressure` | The complex field the loss was taken from, same shape, in the module's own $e^{-i\omega t}$ convention (the conjugate of the one Jensen Eq. (3.88) is printed in) and normalised to unit pressure at 1 m, so `propagation_loss = -20 lg\|pressure\|`. |
 | `launch_angles` | Launch angle of each beam's central ray, from the horizontal, in degrees. |
 | `ray_ranges` | Range of each central ray at each marching step, in metres, shape `(n_beams, n_steps)`. This is the marching grid, which is finer than (and independent of) `ranges`. |

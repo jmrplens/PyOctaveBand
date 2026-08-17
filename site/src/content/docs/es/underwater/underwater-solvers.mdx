@@ -463,9 +463,9 @@ que mejor resuelve el campo en el extremo lejano del recorrido, que es donde
 peor se resuelve. Es también donde la integral en ángulo de lanzamiento que hay
 detrás de la Ec. (3.92) es una gaussiana de verdad y no una integral de
 Fresnel, y por eso no es solo una elección elegante: frente al campo libre a
-100 Hz el error en $|p|$ es de $7,5\times10^{-5}$ con esa anchura y el mismo a
-todas las distancias probadas, y sube a $5\times10^{-4}$ con la quinta parte de
-ella y a $0,36$ con quince veces. La banda de 10 a 50 longitudes de onda del
+100 Hz a 2, 5 y 8 km el error en $|p|$ es de $7,5\times10^{-5}$ con esa
+anchura, de $2,7\times10^{-2}$ con la quinta parte de ella y de
+$4,1\times10^{-2}$ con quince veces. La banda de 10 a 50 longitudes de onda del
 libro y un cuarto de la profundidad de la columna lo acotan, y el límite del
 canal tiene la última palabra: un haz comparable a la profundidad del agua
 rompe la contabilidad que pliega un rayo reflejado de vuelta a la columna, en
@@ -480,8 +480,20 @@ a 88 grados. Las dos condiciones de contorno salen de la propia suma de haces
 en vez de imponerse: el campo en una superficie o un fondo de presión nula es
 3 partes en $10^5$ de su valor a media columna, y un fondo rígido lo duplica.
 
-**Dónde se acaba.** Tres límites, en el orden en que aprietan.
+**Dónde se acaba.** Cuatro límites, en el orden en que aprietan.
 
+- **No hay campo cercano**, y este es el mayor error de los cuatro. La
+  Ec. (3.92) pesa el abanico ajustándolo a una fuente puntual en campo lejano,
+  y la Ec. (3.88) divide por una distancia cilíndrica que se anula sobre el eje
+  del que sale cada rayo, así que de cerca la suma no tiene a qué converger. La
+  escala a la que se recupera es $W_0$, no una distancia fija: en tres ajustes
+  cuyo $W_0$ abarca de 150 a 437 m, el peor error frente a $20\lg R$ en un
+  medio no acotado es de 17, 13 y 4,1 dB con un cuarto de $W_0$, de unos 0,6 dB
+  con $W_0$, de una centésima de decibelio con $2,5\,W_0$ y de una milésima a
+  partir de $3\,W_0$. No leas nada dentro de unas tres anchuras de haz de la
+  fuente, y ten en cuenta que, como el $W_0$ por defecto crece como
+  $\sqrt{r_{\max}}$, un recorrido más largo aleja aún más esa frontera. De
+  cerca, usa `parabolic_equation`.
 - **El régimen propio de la teoría de rayos** (Jensen §3.4.2): «la longitud de
   onda debería ser sustancialmente menor que cualquier escala física del
   problema». Es el límite que más aprieta y el que mejor esconde una respuesta
