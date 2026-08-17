@@ -19,11 +19,13 @@ from .canvas import SVG, Theme
 def _d_fdtd(s: SVG, th: Theme) -> None:
     """2D acoustic FDTD pipeline (Attenborough & Van Renterghem 2021, Ch. 4)."""
     cx = 450.0
-    bw, bh = 660.0, 58.0
+    bw, bh = 700.0, 58.0
     x0 = cx - bw / 2
 
     # --- Inputs (two feeder boxes) -----------------------------------------
-    iw = 320.0
+    # 340 px on the Spanish boundary subtitle, which is 315 px against the
+    # 262 of its English twin.
+    iw = 340.0
     s.rect(x0, 48, iw, bh, th.panel, th.fg, rx=10, sw=2)
     s.text(x0 + iw / 2, 72, "Domain  $c(x, y)$, $ρ(x, y)$, $dx$", 15, th.fg,
            "middle", bold=True)

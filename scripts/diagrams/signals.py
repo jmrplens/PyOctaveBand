@@ -153,22 +153,24 @@ def _d_calibration_coupling(s: SVG, th: Theme) -> None:
     s.text(548, 456, "check, back on to measure", 13, th.muted)
 
     # -- Right panel: the background check ---------------------------------
-    s.rect(650, 104, 224, 340, "none", th.primary, rx=12, sw=1.8)
-    s.text(762, 134, "Before switching it on", 16, th.primary, bold=True)
-    s.rect(736, 158, 56, 52, th.panel, th.fg, rx=6, sw=1.8)
-    s.rect(750, 210, 28, 62, th.panel, th.primary, rx=4, sw=1.8)
-    s.text(764, 190, "OFF", 15, th.muted, bold=True, mono=True)
+    # 240 px wide on "leer ≥ 30 dB por debajo del", 216 px against the 185
+    # of its English twin.
+    s.rect(636, 104, 240, 340, "none", th.primary, rx=12, sw=1.8)
+    s.text(756, 134, "Before switching it on", 16, th.primary, bold=True)
+    s.rect(730, 158, 56, 52, th.panel, th.fg, rx=6, sw=1.8)
+    s.rect(744, 210, 28, 62, th.panel, th.primary, rx=4, sw=1.8)
+    s.text(758, 190, "OFF", 15, th.muted, bold=True, mono=True)
     for r in (26, 40):
-        s.path(f"M {682 + r * 0.2:.0f} {224 - r * 0.5:.0f} A {r} {r} 0 0 1 "
-               f"{682 + r * 0.5:.0f} {224 + r * 0.3:.0f}", stroke=th.secondary,
+        s.path(f"M {676 + r * 0.2:.0f} {224 - r * 0.5:.0f} A {r} {r} 0 0 1 "
+               f"{676 + r * 0.5:.0f} {224 + r * 0.3:.0f}", stroke=th.secondary,
                sw=1.5)
-    s.arrow(700, 232, 730, 240, th.secondary, 1.6)
-    s.text(694, 282, "source in use", 12, th.secondary)
-    s.text(762, 324, "the coupled capsule must", 14, th.fg)
-    s.text(762, 346, "read ≥ 30 dB below the", 14, th.fg, bold=True)
-    s.text(762, 368, "calibrator level: under 64 dB", 14, th.fg)
-    s.text(762, 390, "for a 94 dB calibrator", 14, th.fg)
-    s.text(762, 418, "(B.4.2; 40 dB in A.5.3)", 14, th.muted)
+    s.arrow(694, 232, 724, 240, th.secondary, 1.6)
+    s.text(698, 282, "source in use", 12, th.secondary)
+    s.text(756, 324, "the coupled capsule must", 14, th.fg)
+    s.text(756, 346, "read ≥ 30 dB below the", 14, th.fg, bold=True)
+    s.text(756, 368, "calibrator level: under 64 dB", 14, th.fg)
+    s.text(756, 390, "for a 94 dB calibrator", 14, th.fg)
+    s.text(756, 418, "(B.4.2; 40 dB in A.5.3)", 14, th.muted)
 
     s.text(450, 528, "The specified level is the level at the diaphragm of "
                      "the inserted microphone (5.3.1.2), and holds for", 15, th.fg)
@@ -1826,7 +1828,10 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
     s.text(cx, 114, "than the source", 16, th.fg, bold=True)
 
     # -- Middle: the electrical chain ---------------------------------------
-    bx, bw, bh = 336.0, 226.0, 92.0
+    # 264 px on "ponderación G + integrador", 267 px at the box title size
+    # against the 239 of "G weighting + integrator"; the Spanish one drops a
+    # step on top of that.
+    bx, bw, bh = 320.0, 264.0, 92.0
     stages = (
         ("Preamplifier", "corner << 0,25 Hz", th.primary),
         ("Recorder", "low-cut switch OFF", th.primary),
@@ -1835,7 +1840,8 @@ def _d_infrasound_chain(s: SVG, th: Theme) -> None:
     y = 132.0
     for title, detail, color in stages:
         s.rect(bx, y, bw, bh, th.panel, color, rx=12, sw=2)
-        s.text(bx + bw / 2, y + 38, title, 17, th.fg, bold=True)
+        tsize = 17 if s.text_width(title, 17, bold=True) <= bw - 24 else 15
+        s.text(bx + bw / 2, y + 38, title, tsize, th.fg, bold=True)
         # Mono is the code voice of the literal switch settings; the
         # averaging-time detail carries $...$ mathematics and composes in
         # the text face (mono plus markup is refused by the canvas).

@@ -48,7 +48,9 @@ def _d_human_vibration(s: SVG, th: Theme) -> None:
     s.text(150, gy + 34, "Seat/body interface", 15, th.fg, "middle")
 
     # --- Right: the vertical signal-processing chain ---
-    cx, bw, bh = 650.0, 320.0, 72.0
+    # 348 px on "Limitación de banda + Wk / Wd", 317 px at the stage title
+    # size against the 247 of its English twin.
+    cx, bw, bh = 650.0, 348.0, 72.0
     x0 = cx - bw / 2
     chain = [
         (96.0, "Triaxial accelerometer", "$a_x , a_y , a_z$  (m/s²)"),

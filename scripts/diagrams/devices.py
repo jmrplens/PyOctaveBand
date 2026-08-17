@@ -668,12 +668,17 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
     panel 2 the clause 14 b) pressure calibration of both channels; panel 3
     the ISO 9614-2 clause 6.2.2 probe-reversal test in situ.
     """
-    tops, w = (46.0, 322.0, 598.0), 256.0
+    tops, w = (30.0, 315.0, 600.0), 270.0
     heads = ("1 · Residual-intensity test", "2 · Pressure check",
              "3 · Probe reversal, in situ")
+    # One size for the row, chosen on its longest heading: "1 · Ensayo de
+    # intensidad residual" is 281 px against the 233 of its English twin,
+    # and a panel that holds one does not hold the other.
+    hsize = 15 if max(s.text_width(h, 15, bold=True)
+                      for h in heads) <= w - 24 else 13
     for x0, head in zip(tops, heads, strict=True):
         s.rect(x0, 62, w, 300, th.panel, th.muted, rx=12, sw=1.6)
-        s.text(x0 + w / 2, 90, head, 15, th.fg, bold=True)
+        s.text(x0 + w / 2, 90, head, hsize, th.fg, bold=True)
 
     def capsules(cx: float, cy: float, col: str) -> None:
         for dx in (-30.0, 30.0):
@@ -730,7 +735,7 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
     s.text(cx, cy + 124, "acoustic centre held in place", 12, th.muted)
 
     # --- verdict strip ------------------------------------------------------
-    s.rect(46, 390, 808, 62, th.panel, th.secondary, rx=10, sw=2.0)
+    s.rect(30, 390, 840, 62, th.panel, th.secondary, rx=10, sw=2.0)
     s.text(450, 416, "accepted when the two readings have opposite signs and "
            "differ by less than 1,5 dB", 15, th.fg, bold=True)
     s.text(450, 440, "in the band of maximum level (ISO 9614-2, clause 6.2.2)",
@@ -742,7 +747,7 @@ def _d_residual_intensity_check(s: SVG, th: Theme) -> None:
         ("$δ_{pI0}$ belongs to the probe, its spacer and the analyser "
          "together — not to the microphones"),
     )):
-        s.text(60, 482 + k * 24, txt, 13, th.muted, anchor="start")
+        s.text(44, 482 + k * 24, txt, 13, th.muted, anchor="start")
 
 
 def _d_loudspeaker_freefield(s: SVG, th: Theme) -> None:

@@ -886,10 +886,12 @@ def _d_room_noise_setup(s: SVG, th: Theme) -> None:
     s.text(mic_x + 14, floor_y - 1.6 * ppm + 5, "1.6 m", 12, th.muted, "start")
 
     # --- Reading the section ------------------------------------------------
-    s.text(x0 - 74, 448, "$L_{EQ}$ at the named position — or scan the whole "
+    # Below the right-hand column's last line rather than beside it: in
+    # Spanish this caption runs to x = 610 and the column starts at 616.
+    s.text(x0 - 74, 462, "$L_{EQ}$ at the named position — or scan the whole "
                          "space at ≤ 0.5 m/s for ≥ 20 s", 13, th.primary,
            "start", bold=True)
-    s.text(x0 - 74, 470, "green dashed: microphone exclusion zones (5.2.5)",
+    s.text(x0 - 74, 480, "green dashed: microphone exclusion zones (5.2.5)",
            12, th.muted, "start")
 
     # --- Right column: heights, standoffs and the meter ---------------------
@@ -1092,7 +1094,7 @@ def _d_reception_plate(s: SVG, th: Theme) -> None:
 
     # ===== Reception plate on resilient supports =====
     s.rect(100, 302, 460, 32, th.panel, th.primary, rx=3, sw=2.4)
-    s.text(455, 324, "Reception plate  ($m$, $S$, $η$)", 14, th.fg, bold=True)
+    s.text(430, 324, "Reception plate  ($m$, $S$, $η$)", 14, th.fg, bold=True)
     for ax_ in (140.0, 190.0, 400.0, 500.0):
         _accel(s, ax_, 302)
     s.text(560, 272, "velocity positions → $L_v$", 14, th.secondary,
@@ -2197,12 +2199,14 @@ def _d_facade_setup(s: SVG, th: Theme) -> None:
     s.path(f"M {fx - 26:.0f} {cy:.0f} A 18 18 0 0 1 {fx + 10:.0f} {cy:.0f}",
            stroke=th.primary, sw=2.2)
     s.line(fx - 26, cy, 560, 150, th.muted, 1.0)
-    s.rect(300, 92, 262, 76, th.panel, th.primary, rx=8, sw=1.6)
-    s.text(310, 116, "$L_{1,s}$  element method", 16, th.primary, bold=True,
+    # Sized on "de 3 a 10 posiciones, nunca en rejilla", 279 px against the
+    # 240 of its English twin.
+    s.rect(272, 92, 308, 76, th.panel, th.primary, rx=8, sw=1.6)
+    s.text(282, 116, "$L_{1,s}$  element method", 16, th.primary, bold=True,
            anchor="start")
-    s.text(310, 138, "≤ 10 mm parallel / ≤ 3 mm normal", 15, th.muted,
+    s.text(282, 138, "≤ 10 mm parallel / ≤ 3 mm normal", 15, th.muted,
            anchor="start")
-    s.text(310, 158, "3 to 10 positions, never gridded", 15, th.muted,
+    s.text(282, 158, "3 to 10 positions, never gridded", 15, th.muted,
            anchor="start")
 
     # -- global method: microphone 2 m out, 1.5 m above the room floor ---

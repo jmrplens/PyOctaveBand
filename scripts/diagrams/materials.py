@@ -501,7 +501,7 @@ def _d_spot_tube(s: SVG, th: Theme) -> None:
 def _d_iso11654(s: SVG, th: Theme) -> None:
     """ISO 11654 single-number absorption rating: from αs to the absorption class."""
     cx = 450.0
-    bw, bh = 664.0, 54.0
+    bw, bh = 760.0, 54.0
     x0 = cx - bw / 2
 
     s.rect(x0, 46, bw, bh, th.panel, th.fg, rx=10, sw=2)
@@ -512,7 +512,11 @@ def _d_iso11654(s: SVG, th: Theme) -> None:
 
     def _step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, bh, th.panel, color, rx=10, sw=2)
-        s.text(cx, y + 23, l1, 15, th.fg, "middle", bold=True)
+        # "Desplazar la curva de referencia en pasos de 0,05 hasta el mejor
+        # ajuste" is 735 px against the 522 of its English twin, and it is
+        # the only line of the chart that has to drop a step.
+        size = 15 if s.text_width(l1, 15, bold=True) <= bw - 28 else 14
+        s.text(cx, y + 23, l1, size, th.fg, "middle", bold=True)
         s.text(cx, y + 42, l2, 11, th.muted, "middle")
 
     _step(128, "Practical  $α_p$  per octave band, 250 Hz to 4000 Hz  (Clause 4.1)",
@@ -833,8 +837,11 @@ def _d_iso354_room(s: SVG, th: Theme) -> None:
            "surface and from the specimen", 13, th.muted)
 
     # --- Right column: the two states the whole method rests on -----------
-    s.rect(628, 82, 244, 342, th.bg, th.muted, rx=8, sw=1.6)
-    s.text(750, 114, "The measurement is a difference", 14, th.fg, bold=True)
+    # The panel and its title are sized on the English "The measurement is
+    # a difference", 260 px against the 223 of its Spanish twin: here it is
+    # the English that is the longer of the two.
+    s.rect(618, 82, 264, 342, th.bg, th.muted, rx=8, sw=1.6)
+    s.text(750, 114, "The measurement is a difference", 13, th.fg, bold=True)
     for top, title, note, col in (
         (146.0, "1 · empty room", "$T_1$  →  $A_1$", th.primary),
         (274.0, "2 · specimen installed", "$T_2$  →  $A_2$", th.secondary),

@@ -242,7 +242,9 @@ def _d_nihl(s: SVG, th: Theme) -> None:
 def _d_zwicker(s: SVG, th: Theme) -> None:
     """ISO 532-1 Zwicker loudness: from band levels to N (sone) and LN (phon)."""
     cx = 450.0
-    bw, bh = 668.0, 58.0
+    # 760 px on "Corrección de igual sonoridad y bandas críticas inferiores
+    # (Cláusula 5.4, Tabla A.3)", 700 px against the 624 of its English twin.
+    bw, bh = 760.0, 58.0
     x0 = cx - bw / 2
 
     s.rect(x0, 46, bw, bh, th.panel, th.fg, rx=10, sw=2)
@@ -254,7 +256,8 @@ def _d_zwicker(s: SVG, th: Theme) -> None:
 
     def _step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, bh, th.panel, color, rx=10, sw=2)
-        s.text(cx, y + 25, l1, 15, th.fg, "middle", bold=True)
+        size = 15 if s.text_width(l1, 15, bold=True) <= bw - 28 else 14
+        s.text(cx, y + 25, l1, size, th.fg, "middle", bold=True)
         s.text(cx, y + 45, l2, 11, th.muted, "middle")
 
     _step(132, "Equal-loudness correction and lower critical bands  "
@@ -1283,7 +1286,7 @@ def _d_stoi_bench(s: SVG, th: Theme) -> None:
     s.path(f"M 122 {ly - 14:.0f} C 168 {ly - 14:.0f} 168 {fy + 26:.0f} "
            f"212 {fy + 26:.0f}", stroke=th.primary, sw=2.2)
     s.arrow(200, fy + 26, 214, fy + 26, th.primary, 2.2)
-    s.arrow(122, ly, 214, ly, th.secondary, 2.2)
+    s.arrow(122, ly, 140, ly, th.secondary, 2.2)
 
     # --- upper lane: the reference goes straight to the comparison --------
     box(214, fy, 300, 56, "reference path",
@@ -1291,20 +1294,27 @@ def _d_stoi_bench(s: SVG, th: Theme) -> None:
     s.arrow(514, fy + 28, 596, fy + 28, th.primary, 2.2)
 
     # --- lower lane: playback, device under test, capture ------------------
-    box(214, ly - 26, 118, 52, "playback", "amp + loudspeaker", th.secondary)
-    s.arrow(332, ly, 356, ly, th.secondary, 2.2)
-    s.rect(356, ly - 74, 172, 148, "none", th.muted, rx=8, sw=1.6, dash="6,5")
-    s.text(442, ly - 84, "test box", 12, th.muted)
+    # Every box of this lane is sized on its Spanish contents, which run a
+    # third longer than the English throughout: "amplificador + altavoz",
+    # "equipo bajo ensayo", "o auriculares sobre un simulador de torso".
+    # The capture box is the one that cannot be widened -- the lane has to
+    # end where the cable turns up to the alignment gate -- so its caption
+    # is lettered under it instead of inside it.
+    box(140, ly - 26, 150, 52, "playback", "amp + loudspeaker", th.secondary)
+    s.arrow(290, ly, 312, ly, th.secondary, 2.2)
+    s.rect(312, ly - 74, 244, 148, "none", th.muted, rx=8, sw=1.6, dash="6,5")
+    s.text(434, ly - 84, "test box", 12, th.muted)
     # No second line inside the box on purpose: what the device may be
     # takes two lines and is lettered under it, below.
-    box(370, ly - 52, 144, 46, "device under test", "", th.secondary)
-    s.text(442, ly + 20, "hearing aid on an artificial ear,", 11, th.muted)
-    s.text(442, ly + 40, "or a headset on a torso simulator", 11, th.muted)
-    s.arrow(528, ly, 552, ly, th.secondary, 2.2)
-    box(552, ly - 26, 116, 52, "capture", "mic + preamp", th.secondary)
-    s.path(f"M 668 {ly:.0f} C 696 {ly:.0f} 696 {ly - 40:.0f} 696 "
+    box(336, ly - 52, 196, 46, "device under test", "", th.secondary)
+    s.text(434, ly + 20, "hearing aid on an artificial ear,", 10, th.muted)
+    s.text(434, ly + 38, "or a headset on a torso simulator", 10, th.muted)
+    s.arrow(556, ly, 578, ly, th.secondary, 2.2)
+    box(578, ly - 26, 112, 52, "capture", "", th.secondary)
+    s.text(634, ly + 44, "mic + preamp", 10, th.muted)
+    s.path(f"M 690 {ly:.0f} C 714 {ly:.0f} 714 {ly - 40:.0f} 714 "
            f"{ly - 62:.0f}", stroke=th.secondary, sw=2.2)
-    s.arrow(696, ly - 50, 696, fy + 88, th.secondary, 2.2)
+    s.arrow(714, ly - 50, 714, fy + 88, th.secondary, 2.2)
 
     # --- the alignment gate both lanes pass through -----------------------
     s.rect(596, fy - 6, 200, 88, th.panel, th.accent, rx=10, sw=2.4)
@@ -1317,13 +1327,15 @@ def _d_stoi_bench(s: SVG, th: Theme) -> None:
     s.text(846, fy + 52, "ESTOI", 13, th.fg, bold=True)
 
     # --- the bypass measurement ------------------------------------------
-    s.rect(214, 392, 454, 56, "none", th.primary, rx=10, sw=1.6, dash="6,5")
-    s.text(441, 416, "run it once with the device bypassed", 13, th.primary,
+    s.rect(140, 392, 550, 56, "none", th.primary, rx=10, sw=1.6, dash="6,5")
+    s.text(415, 416, "run it once with the device bypassed", 13, th.primary,
            bold=True)
-    s.text(441, 438, "the loudspeaker, the box noise and the microphone "
+    s.text(415, 438, "the loudspeaker, the box noise and the microphone "
            "are scored as degradation too", 11, th.muted)
-    s.line(268, 392, 268, ly + 30, th.primary, 1.2, dash="5,4")
-    s.line(610, 392, 610, ly + 30, th.primary, 1.2, dash="5,4")
+    # The leaders stop below the capture caption, which is lettered under
+    # its box and reaches x = 713 in Spanish.
+    s.line(200, 392, 200, ly + 58, th.primary, 1.2, dash="5,4")
+    s.line(634, 392, 634, ly + 58, th.primary, 1.2, dash="5,4")
 
     # --- footer ----------------------------------------------------------
     s.rect(26, 468, 850, 62, "none", th.fg, rx=10, sw=1.4, dash="6,5")
