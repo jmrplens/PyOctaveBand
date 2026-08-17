@@ -406,8 +406,8 @@ def test_sound_exposure_rejects_nonpositive_duration() -> None:
 
 #: The levels guide exists three times over: the plain-markdown edition under
 #: ``docs/`` that GitHub and the llms artifacts read, and the two published
-#: site editions. They are written by hand, one per language, so a table that
-#: drifts drifts in one copy at a time; every check below runs on all three.
+#: site editions. They are written by hand, one per language, so a table
+#: drifts in one copy at a time; every check below runs on all three.
 _LEVELS_GUIDE_COPIES = (
     "docs/signals/levels/levels.md",
     "site/src/content/docs/signals/levels/levels.mdx",
