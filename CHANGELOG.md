@@ -120,14 +120,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   viewer for a generic sans, so any label carrying mathematics arrived
   letter-spaced on every machine without DejaVu, which is all of them; the
   plates asked for Segoe UI first, a face neither the maintainer's machine nor
-  CI has ever had. Both now bake outlines: the figures from the DejaVu that
-  matplotlib ships, the plates from a vendored Liberation Sans whose metrics
-  are the ones the hand-tuned compositions were adjusted against (measured:
-  width ratio 1.000 over all 6,550 drawn strings, against 1.14 for DejaVu,
-  which would have broken ninety-five plates), with a deterministic per-glyph
-  fallback and a hard error for a character no face covers. Three plates
-  rendered under an emptied fontconfig are pixel-identical to the normal
-  render, which is the property the whole change exists for.
+  CI has ever had. Both now bake outlines, and both take them from the same
+  place: the DejaVu Sans inside the pinned matplotlib wheel, so a plate and a
+  figure on one documentation page are set in one typeface rather than two and
+  a single pin fixes the letters of the whole drawn corpus. The plates keep a
+  deterministic per-glyph fallback for what the monospaced cuts lack and a hard
+  error for a character no face covers; all 185 distinct characters the 6,550
+  plate labels set, in both languages, are carried by the face their own run
+  asks for. Three plates rendered under an emptied fontconfig are
+  pixel-identical to the normal render, which is the property the whole change
+  exists for.
 - The corpus typography is finished end to end: figure titles at text weight
   (the ISO 80000 justification for mixed weights dissolved on reading the
   standard, which regulates slope and never weight), the prime composed as a

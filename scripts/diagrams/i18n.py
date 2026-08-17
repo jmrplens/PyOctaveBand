@@ -1364,10 +1364,11 @@ _ES: dict[str, str] = {
         "$A_1$ de la cámara vacía debe quedar bajo el techo de la Tabla 1, y "
         "$T_1$ se mide sin el marco de la probeta",
     # d25 - ISO 10534-1 standing-wave-ratio apparatus
-    # Measured against the 900 px canvas (Arial metrics): the previous
-    # wording ("recorrido de la sonda y los mínimos") ran 960 px and was
-    # clipped on both sides; this one is 887 px, the same tightness as the
-    # 877 px English title.
+    # The Spanish is deliberately terser than a literal rendering: the
+    # fuller "recorrido de la sonda y los mínimos" measures 87 px wider
+    # again. On the DejaVu metrics the plates now set, both titles overrun
+    # the 900 px sheet (1054 px here, 1063 px for the English), so the
+    # tightness is still doing work and both still want cutting.
     "Standing-wave-ratio tube: probe traverse and the minima (ISO 10534-1)":
         "Tubo de onda estacionaria: recorrido de sonda y mínimos "
         "(ISO 10534-1)",
