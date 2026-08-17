@@ -25,7 +25,7 @@ references:
     title: "Electroacoustics — Sound level meters — Part 1: Specifications"
     designation: "IEC 61672-1:2013"
     url: "https://webstore.iec.ch/en/publication/5708"
-    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB a 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
+    note: "Las curvas de ponderación frecuencial A, C y Z normativas (la definición analítica del Anexo E a partir de cuatro frecuencias de esquina, normalizadas a 0 dB a 1 kHz), las tolerancias de clase 1 que el diseño high_accuracy mantiene hasta 16 kHz a 44,1 kHz y por encima, y los límites de aceptación de clase 1 y clase 2 de la Tabla 3 que comprueba verify_weighting_class en la sección 6."
 ---
 
 import Scope from '../../../../../components/Scope.astro';
@@ -293,7 +293,7 @@ C y para G.
 | `x` | array 1D o 2D | cualquiera | no vacío | 2D es `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
 | `curve` | str | — | `'A'` (por defecto), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` según ISO 7196 (infrasonido), `'B'`/`'D'` históricas y `'AU'` según IEC 61012 se tratan en [Ponderaciones especiales](/phonometry/es/signals/levels/special-weightings/); `'Z'` se implementa como un paso directo de una respuesta que la norma especifica plana |
-| `high_accuracy` | bool | — | por defecto `True` (función); en la clase, `None` se resuelve a `not stateful` | Sobremuestreo interno que mantiene A/C en clase 1 hasta 16 kHz; detalles en el §5 |
+| `high_accuracy` | bool | — | por defecto `True` (función); en la clase, `None` se resuelve a `not stateful` | Sobremuestreo interno que mantiene A/C en clase 1 hasta 16 kHz cuando $f_\mathrm{s} \ge 40$ kHz; detalles en el §5 |
 | `stateful` | bool (solo clase) | — | por defecto `False` | Conserva el estado del filtro entre bloques (streaming) |
 | `steady_ic` | bool (solo clase) | — | por defecto `False` | Condiciones iniciales estacionarias (sin transitorio de arranque) |
 
@@ -327,6 +327,25 @@ ponderación a una frecuencia interna sobremuestreada (hasta 8×, alcanzando
 ≥ 144 kHz a frecuencias de audio habituales; una entrada de 96 kHz funciona
 a ×2) y diezma de vuelta, manteniendo la respuesta dentro de las tolerancias
 de clase 1 hasta 16 kHz (error ≈ −0,5 dB a 12,5 kHz para $f_\mathrm{s} = 48$ kHz).
+
+El sobremuestreo corrige la deformación bilineal, no la frecuencia de
+muestreo. Las etapas de interpolación y diezmado que añade alrededor del
+filtro llevan un filtro antialias cuya banda de transición se sitúa sobre la
+frecuencia de Nyquist *de entrada*, así que por encima de aproximadamente el
+90 % de esa frecuencia la respuesta cae por mucho que suba la frecuencia
+interna de diseño. Eso solo importa cuando ahí cae una fila de la Tabla 3,
+que es lo que ocurre por debajo de 40 kHz: a $f_\mathrm{s} = 32$ kHz la fila
+de 15 848,9 Hz queda 16,2 dB por debajo del objetivo de diseño de la A (la
+clase 1 admite ahí −16,0 dB y la clase 2 no fija límite inferior) y a
+$f_\mathrm{s} = 16$ kHz la de 7 943,3 Hz queda 12,0 dB por debajo (la clase 1
+admite −2,5 dB; la clase 2, −5,0 dB). `verify_weighting_class` mide toda esa
+cadena, de modo que para la A informa de clase 2 a 32 kHz y de ninguna clase
+a 16 kHz en lugar de un grado que el filtro no puede dar. El resultado es por
+curva, porque cada una se juzga frente a su propio objetivo de diseño: la
+respuesta C queda 15,3 dB por debajo a 32 kHz, dentro de ese mismo límite de
+−16,0 dB, así que ahí conserva la clase 1, y 13,7 dB por debajo a 16 kHz,
+donde tampoco cumple ninguna clase. Para una ponderación A de clase 1 en
+toda la tabla, muestrea a 44,1 kHz o más.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_es.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño sobremuestreado, con error" width="80%" />
 
@@ -509,8 +528,9 @@ plt.show()
 <ScopeClaim status="covered" label="Cubierto">
 IEC 61672-1:2013 para las curvas A, C y Z: la definición analítica del Anexo E
 a partir de cuatro frecuencias de esquina, el diseño `high_accuracy` que
-mantiene las tolerancias de clase 1 hasta 16 kHz, y los límites de aceptación
-de clase 1/clase 2 de la Tabla 3 que comprueba `verify_weighting_class`.
+mantiene las tolerancias de clase 1 hasta 16 kHz a 44,1 kHz y por encima, y
+los límites de aceptación de clase 1/clase 2 de la Tabla 3 que comprueba
+`verify_weighting_class`.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
@@ -545,4 +565,4 @@ Usa la ponderación C para presión acústica de pico y ruido de alto nivel, y u
 
 ### ¿Es precisa la ponderación A cerca de 16 kHz con una frecuencia de muestreo de 48 kHz?
 
-No con un diseño bilineal simple: a $f_\mathrm{s} = 48$ kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz.
+No con un diseño bilineal simple: a $f_\mathrm{s} = 48$ kHz el error de la curva A alcanza −2,7 dB a 12,5 kHz, fuera de la tolerancia de clase 1 de IEC 61672-1 (+2,0/−2,5 dB). El `high_accuracy=True` por defecto sobremuestrea internamente (hasta 8×, alcanzando 144 kHz o más a frecuencias de audio habituales) y mantiene la respuesta dentro de las tolerancias de clase 1 hasta 16 kHz, con un error de aproximadamente −0,5 dB a 12,5 kHz. Eso vale mientras 16 kHz quede lejos de Nyquist, es decir a partir de unos $f_\mathrm{s} = 40$ kHz; el §5 explica lo que cuesta por debajo la banda de transición del filtro antialias del remuestreador.

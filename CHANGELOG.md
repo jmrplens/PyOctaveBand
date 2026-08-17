@@ -1198,6 +1198,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `verify_weighting_class` grades the filter over the whole path a signal
+  travels through `WeightingFilter.filter`, not over the designed second-order
+  sections alone. With the default `high_accuracy` those sections are reached
+  through an interpolation and a decimation stage, and the anti-alias filter of
+  those stages carries its transition band on the *input* Nyquist frequency, so
+  it dominates the response above roughly `0.9 * fs / 2`. Whenever the highest
+  IEC 61672-1 Table 3 row still below Nyquist lands in that band, a verdict read
+  from the sections attested a filter nobody runs: at `fs = 16` kHz the
+  7 943.3 Hz row came back 0.077 dB from its design goal and earned class 1,
+  while a tone through `filter()` at that frequency comes out 12.0 dB low.
+  Verdicts change for exactly the rates where that happens. A and C at 16 kHz
+  go from class 1 to no class at all (12.0 and 13.7 dB below their design
+  goals, against a −2.5 dB class 1 and a −5.0 dB class 2 lower limit), and A
+  at 32 kHz from class 1 to class 2 (16.2 dB below its goal, past the −16.0 dB
+  class 1 lower limit); C at 32 kHz lands 15.3 dB below its own goal and keeps
+  class 1, so the verdict there is per curve. At 44.1 kHz and above nothing
+  moves. The published conformance figures follow the same corrected path: the
+  A and C deviations at their 1 kHz binding frequency go from +0.000 dB to
+  +0.009 and +0.008 dB at 48 kHz (headroom +0.700 dB to +0.691 and +0.692 dB),
+  the A row at 96 kHz to +0.002 dB, and the worst D-weighting point from
+  −0.131 dB to −0.127 dB at 8 kHz. Every conformance row still passes.
+
 - `extended_tube_chamber` cascades its straight chamber element over the length
   the extensions leave, `L - L_a - L_b`, not the full chamber length. The
   junction where each extended pipe ends is where its three ducts meet, so the

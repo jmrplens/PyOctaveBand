@@ -8,6 +8,7 @@ transcription are cross-checked against the independent ``reference_data``
 copy shared with the CI conformance report, so a typo in either surfaces.
 """
 
+import inspect
 import math
 
 import pytest
@@ -48,14 +49,67 @@ def test_weighting_class_limits_shape_and_known_values() -> None:
     assert (lower1[i16k], upper1[i16k]) == (-16.0, 2.5)
 
 
-@pytest.mark.parametrize("fs", [48000, 96000])
+# The class each default (high-accuracy) filter actually earns, per curve and
+# sample rate. Oversampling fixes the bilinear warping but not the anti-alias
+# transition band the resampling stages put on the input Nyquist frequency, so
+# at 16 and 32 kHz the top Table 3 row below Nyquist is judged inside it: A
+# lands 12.0 dB low at 16 kHz (no class) and 16.2 dB low at 32 kHz (class 2),
+# C lands 13.7 dB low at 16 kHz (no class) and 15.3 dB low at 32 kHz, still
+# inside its -16.0 dB class 1 limit. Z is a bypass and is always class 1.
+_EXPECTED_CLASS: dict[tuple[str, int], int | None] = {
+    ("A", 16000): None, ("A", 32000): 2, ("A", 48000): 1, ("A", 96000): 1,
+    ("C", 16000): None, ("C", 32000): 1, ("C", 48000): 1, ("C", 96000): 1,
+    ("Z", 16000): 1, ("Z", 32000): 1, ("Z", 48000): 1, ("Z", 96000): 1,
+}
+
+
+@pytest.mark.parametrize("fs", [16000, 32000, 48000, 96000])
 @pytest.mark.parametrize("curve", ["A", "C", "Z"])
-def test_high_accuracy_weightings_are_class1(fs: int, curve: str) -> None:
-    """A/C/Z high-accuracy filters meet class 1 at every in-range frequency."""
+def test_high_accuracy_weighting_verdicts(fs: int, curve: str) -> None:
+    """The verdict of each default A/C/Z filter, at four sample rates."""
+    expected = _EXPECTED_CLASS[(curve, fs)]
     result = verify_weighting_class(WeightingFilter(fs, curve))
-    assert result["overall_class"] == 1
-    assert all(b["class"] == 1 for b in result["bands"])
-    assert all(b["margin_class1_db"] >= 0 for b in result["bands"])
+    assert result["overall_class"] == expected
+    if expected == 1:
+        assert all(b["class"] == 1 for b in result["bands"])
+        assert all(b["margin_class1_db"] >= 0 for b in result["bands"])
+    else:
+        # Exactly one row, the one nearest Nyquist, is what costs the class.
+        off = [b for b in result["bands"] if b["class"] != 1]
+        assert len(off) == 1
+        assert off[0]["freq"] == max(b["freq"] for b in result["bands"])
+
+
+def test_high_accuracy_docstring_states_the_32_khz_verdict_per_curve() -> None:
+    """The ``high_accuracy`` paragraph serves every curve, so a verdict stated
+    in it without naming one reads as a verdict for all of them, and at 32 kHz
+    the curves do not agree: the same -16.0 dB class 1 lower limit that the A
+    response misses the C response clears. Each verdict the paragraph states
+    for that rate must therefore name its curve and match what the verifier
+    measures for it, so the prose cannot drift from the code.
+    """
+    doc = inspect.getdoc(WeightingFilter.__init__) or ""
+    assert ":param high_accuracy:" in doc
+    # ``high_accuracy`` is the last parameter, so the rest of the docstring is
+    # its paragraph; collapse the wrapping so phrases survive a line break.
+    paragraph = " ".join(doc.split(":param high_accuracy:", 1)[1].split())
+
+    verdicts = {
+        curve: verify_weighting_class(WeightingFilter(32000, curve))["overall_class"]
+        for curve in ("A", "C")
+    }
+    # The premise of the check: at 32 kHz the verdict depends on the curve.
+    assert verdicts["A"] != verdicts["C"]
+    for curve, verdict in verdicts.items():
+        assert f"{verdict} for {curve}" in paragraph, (
+            f"the 32 kHz verdict of the {curve} curve is class {verdict}, which "
+            f"the high_accuracy paragraph does not state for it: {paragraph}"
+        )
+    # At 16 kHz the two curves do agree, so one unqualified verdict is honest.
+    assert all(
+        verify_weighting_class(WeightingFilter(16000, curve))["overall_class"] is None
+        for curve in ("A", "C")
+    )
 
 
 def test_z_weighting_zero_deviation() -> None:
@@ -101,22 +155,40 @@ def test_low_fs_verdict_is_flagged_range_limited() -> None:
 
 
 def test_deviation_evaluated_at_exact_base10_frequency() -> None:
-    """The SOS is evaluated at the exact base-10 frequency behind each nominal
-    label (Table 3 NOTE; IEC 61672-3 subclause 13.3), not at the label itself:
-    the reported deviation at "16 kHz" equals the response at 15 848.9 Hz
-    minus the Table 3 design goal."""
-    import numpy as np
-    from scipy import signal as sg
-
+    """The response is taken at the exact base-10 frequency behind each
+    nominal label (Table 3 NOTE; IEC 61672-3 subclause 13.3), not at the
+    label itself: the reported deviation at "16 kHz" follows a tone at
+    15 848.9 Hz and not one at 16 000 Hz, which the A curve puts about
+    0.1 dB lower."""
     wf = WeightingFilter(96000, "A")
-    result = verify_weighting_class(wf)
-    band = next(b for b in result["bands"] if b["freq"] == 16000.0)
-    exact = 10.0 ** (np.round(10.0 * np.log10(16000.0)) / 10.0)  # 15848.93 Hz
-    fs_proc = wf.fs * wf._oversample
-    _, h = sg.sosfreqz(wf.sos, worN=np.array([exact, 1000.0]), fs=fs_proc)
-    response = 20.0 * np.log10(np.abs(h))
-    deviation = (response[0] - response[1]) - (-6.6)  # Table 3 A @ 16 kHz
-    assert band["deviation_db"] == pytest.approx(deviation, abs=1e-9)
+    band = next(
+        b for b in verify_weighting_class(wf)["bands"] if b["freq"] == 16000.0
+    )
+    ref_1k = _tone_gain_db(wf, 96000, 1000.0)
+    at_exact = _tone_gain_db(wf, 96000, 15848.93192) - ref_1k - (-6.6)
+    at_label = _tone_gain_db(wf, 96000, 16000.0) - ref_1k - (-6.6)
+    assert band["deviation_db"] == pytest.approx(at_exact, abs=0.02)
+    assert abs(band["deviation_db"] - at_label) > 0.05
+
+
+@pytest.mark.parametrize("fs,label", [(16000, 8000.0), (32000, 16000.0), (48000, 16000.0)])
+def test_verdict_measures_the_resampled_path(fs: int, label: float) -> None:
+    """The row nearest Nyquist is judged on what ``filter()`` really does.
+
+    With the default ``high_accuracy`` the sections are reached through an
+    interpolation and a decimation stage, whose anti-alias filter has its
+    transition band on the input Nyquist frequency. Reading the response
+    from the sections alone put the 7 943.3 Hz row of a 16 kHz system
+    0.08 dB off its design goal when a tone through ``filter()`` measures
+    12.0 dB off, and certified class 1 for a filter that meets neither
+    class there.
+    """
+    wf = WeightingFilter(fs, "A")
+    band = next(b for b in verify_weighting_class(wf)["bands"] if b["freq"] == label)
+    exact = 10.0 ** (round(10.0 * math.log10(label)) / 10.0)
+    design = {row[0]: row[1] for row in _WEIGHTING_TABLE3}[label]
+    measured = _tone_gain_db(wf, fs, exact) - _tone_gain_db(wf, fs, 1000.0) - design
+    assert band["deviation_db"] == pytest.approx(measured, abs=0.05)
 
 
 def test_notch_between_nominals_fails_the_sweep() -> None:
@@ -176,12 +248,13 @@ def _tone_gain_db(wf: WeightingFilter, fs: int, f0: float) -> float:
 
 
 def test_deviation_matches_independent_tone_measurement() -> None:
-    """Cross-check the sosfreqz deviations against a time-domain tone RMS.
+    """Cross-check the closed-form deviations against a time-domain tone RMS.
 
-    ``verify_weighting_class`` reads the designed SOS in the frequency domain;
-    this recomputes the deviation from a filtered pure tone (relative to the
-    1 kHz tone, matching the verifier's normalization), an independent method.
-    They must agree to within the RMS-estimation error.
+    ``verify_weighting_class`` computes the response of the whole filter path
+    in the frequency domain; this recomputes the deviation from a filtered
+    pure tone (relative to the 1 kHz tone, matching the verifier's
+    normalization), an independent method. They must agree to within the
+    RMS-estimation error.
     """
     fs = 48000
     wf = WeightingFilter(fs, "A")  # stateless, so it can be reused per tone
@@ -194,7 +267,7 @@ def test_deviation_matches_independent_tone_measurement() -> None:
 
 
 def test_response_is_deterministic() -> None:
-    """The verifier reads the designed SOS, so repeated runs are identical."""
+    """The response is computed in closed form, so repeated runs are identical."""
     a = verify_weighting_class(WeightingFilter(48000, "A"))
     b = verify_weighting_class(WeightingFilter(48000, "A"))
     assert [x["deviation_db"] for x in a["bands"]] == [

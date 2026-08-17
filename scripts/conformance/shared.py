@@ -25,6 +25,7 @@ from scipy import signal as sg
 
 from phonometry import FilterDesign, OctaveFilterBank, WeightingFilter
 from phonometry.filters.compliance import class_limits, verify_filter_class
+from phonometry.filters.weighting import _runtime_frequency_response
 
 _FILTER_ARCHS = ["butter", "cheby1", "cheby2", "ellip", "bessel"]
 
@@ -128,13 +129,15 @@ def _weighting_deviation(curve: str, fs: int) -> WeightingDeviation:
     """Weighting deviation vs the normative curve, informational maximum plus
     the binding-frequency compliance margin.
 
-    The weighting filter's designed SOS (at its internal oversampled rate)
-    is evaluated against the standard's nominal response. For A/C the
-    normative band is the IEC 61672-1 Table 3 class-1 acceptance limits;
-    for G it is the ISO 7196 Annex A.3 +/-1 dB instrumentation tolerance.
+    The weighting filter is evaluated over the whole path a signal travels
+    through ``filter()`` - the designed SOS *and* the resampling stages the
+    default high-accuracy mode wraps around them, whose anti-alias filter
+    dominates the response above roughly 0.9 x fs/2 - against the standard's
+    nominal response. For A/C the normative band is the IEC 61672-1 Table 3
+    class-1 acceptance limits; for G it is the ISO 7196 Annex A.3 +/-1 dB
+    instrumentation tolerance.
     """
     wf = WeightingFilter(fs, curve)
-    design_fs = wf.fs * wf._oversample
     if curve == "G":
         rows = [r for r in ref.ISO7196_TABLE2 if r[0] < fs / 2]
         # Table 2 lists nominal one-third-octave labels; evaluate at the
@@ -176,15 +179,14 @@ def _weighting_deviation(curve: str, fs: int) -> WeightingDeviation:
         rows = [r for r in ref.IEC61672_TABLE3 if r[0] < fs / 2]
         # Table 3 NOTE: the design goals are computed at the exact base-10
         # frequencies 1000 * 10^(0.1 (n - 30)) behind the nominal labels
-        # (15 848.9 Hz for "16 k"); evaluate the SOS there, as the G branch
-        # above and IEC 61672-3:2013 subclause 13.3 do.
+        # (15 848.9 Hz for "16 k"); evaluate the filter there, as the G
+        # branch above and IEC 61672-3:2013 subclause 13.3 do.
         freqs = np.array([10 ** (round(10 * math.log10(r[0])) / 10) for r in rows])
         nominal = np.array([r[col] for r in rows])
         upper = np.array([r[3] for r in rows])
         lower = np.array([r[4] for r in rows])
 
-    _, h = sg.sosfreqz(wf.sos, worN=freqs, fs=design_fs)
-    response = 20.0 * np.log10(np.abs(h))
+    response = 20.0 * np.log10(np.abs(_runtime_frequency_response(wf, freqs)))
     deviation = response - nominal
     worst_idx = int(np.argmax(np.abs(deviation)))
     headroom = np.minimum(upper - deviation, deviation - lower)

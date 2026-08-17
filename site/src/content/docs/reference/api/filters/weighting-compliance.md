@@ -84,11 +84,18 @@ violation narrower than the grid spacing could in principle fall between
 samples, so raise `sweep_points` for higher-Q suspects (the verdict
 attests the sampled grid, not a continuous proof).
 
-The response is taken from the designed second-order sections (evaluated
-with `sosfreqz` at their design rate), so it is exact and deterministic;
-it does not model the runtime resampling stages that `high_accuracy`
-adds around them, whose anti-alias response is flat across the audio band
-checked here. The `Z` weighting is a flat bypass and always complies.
+The response is taken over the whole path a signal travels through
+[`filter`](/phonometry/reference/api/filters/weighting/#weightingfilterfilter), not over the designed
+second-order sections alone: with `high_accuracy` the sections are
+reached through an interpolation and a decimation stage, and the
+anti-alias filter of those stages has its transition band on the input
+Nyquist frequency, so it dominates the response above roughly
+`0.9 * fs / 2`. Whenever the highest checked row falls there (the
+8 kHz row of a 16 kHz system, the 16 kHz row of a 32 kHz one) a verdict
+read from the sections alone would attest a filter the user never runs.
+The response is still computed in closed form (the L folded spectral
+images of the cascade), so it stays exact and deterministic. The `Z`
+weighting is a flat bypass and always complies.
 
 When rows that carry a *finite lower* acceptance limit fall at or
 above the Nyquist frequency (e.g. the 8-16 kHz class 1 rows of a 16 kHz

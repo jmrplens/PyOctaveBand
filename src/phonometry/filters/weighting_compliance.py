@@ -32,9 +32,8 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-from scipy import signal
 
-from .weighting import WeightingFilter
+from .weighting import WeightingFilter, _runtime_frequency_response
 
 __all__ = [
     "verify_weighting_class",
@@ -350,13 +349,16 @@ def _curve_design_and_limits(
 
 
 def _weighting_response_db(wf: WeightingFilter, frequencies: np.ndarray) -> np.ndarray:
-    """Relative steady-state response of *wf* in dB, normalized to 1 kHz."""
+    """Relative steady-state response of *wf* in dB, normalized to 1 kHz.
+
+    Measured over the whole path the signal takes, resampling stages
+    included (see :func:`_runtime_frequency_response`), not over the
+    second-order sections alone.
+    """
     if wf.curve == "Z" or wf.sos.size == 0:
         return np.zeros_like(frequencies)
-    # The SOS are designed at the (possibly oversampled) processing rate.
-    fs_proc = wf.fs * wf._oversample
     worn = np.concatenate([frequencies, [1000.0]])
-    _, h = signal.sosfreqz(wf.sos, worN=worn, fs=fs_proc)
+    h = _runtime_frequency_response(wf, worn)
     gain_db = 20.0 * np.log10(np.abs(h) + np.finfo(float).eps)
     return np.asarray(gain_db[:-1] - gain_db[-1], dtype=np.float64)  # relative to 1 kHz
 
@@ -485,11 +487,18 @@ def verify_weighting_class(
     samples, so raise ``sweep_points`` for higher-Q suspects (the verdict
     attests the sampled grid, not a continuous proof).
 
-    The response is taken from the designed second-order sections (evaluated
-    with ``sosfreqz`` at their design rate), so it is exact and deterministic;
-    it does not model the runtime resampling stages that ``high_accuracy``
-    adds around them, whose anti-alias response is flat across the audio band
-    checked here. The ``Z`` weighting is a flat bypass and always complies.
+    The response is taken over the whole path a signal travels through
+    :meth:`~phonometry.WeightingFilter.filter`, not over the designed
+    second-order sections alone: with ``high_accuracy`` the sections are
+    reached through an interpolation and a decimation stage, and the
+    anti-alias filter of those stages has its transition band on the input
+    Nyquist frequency, so it dominates the response above roughly
+    ``0.9 * fs / 2``. Whenever the highest checked row falls there (the
+    8 kHz row of a 16 kHz system, the 16 kHz row of a 32 kHz one) a verdict
+    read from the sections alone would attest a filter the user never runs.
+    The response is still computed in closed form (the L folded spectral
+    images of the cascade), so it stays exact and deterministic. The ``Z``
+    weighting is a flat bypass and always complies.
 
     When rows that carry a *finite lower* acceptance limit fall at or
     above the Nyquist frequency (e.g. the 8-16 kHz class 1 rows of a 16 kHz

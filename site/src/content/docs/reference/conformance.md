@@ -89,9 +89,9 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 
 | Curve | fs | Max dev. from nominal (info) | Binding freq | Deviation there | Tolerance band | Headroom |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| A | 48 kHz | -0.867 dB @ 19953 Hz | 1000 Hz | +0.000 dB | [-0.70, +0.70] dB | +0.700 dB |
-| A | 96 kHz | -0.482 dB @ 19953 Hz | 1000 Hz | +0.000 dB | [-0.70, +0.70] dB | +0.700 dB |
-| C | 48 kHz | -0.900 dB @ 19953 Hz | 1000 Hz | +0.000 dB | [-0.70, +0.70] dB | +0.700 dB |
+| A | 48 kHz | -0.855 dB @ 19953 Hz | 1000 Hz | +0.009 dB | [-0.70, +0.70] dB | +0.691 dB |
+| A | 96 kHz | -0.479 dB @ 19953 Hz | 1000 Hz | +0.002 dB | [-0.70, +0.70] dB | +0.698 dB |
+| C | 48 kHz | -0.887 dB @ 19953 Hz | 1000 Hz | +0.008 dB | [-0.70, +0.70] dB | +0.692 dB |
 | G | 48 kHz | +0.047 dB @ 1 Hz | 1 Hz | +0.047 dB | [-1.00, +1.00] dB | +0.953 dB |
 
 </details>
@@ -105,12 +105,12 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | IEC 61260-1:2014 Table 1 | One-third-octave filter class (butterworth, fs=48 kHz) | class 1 | class 1 (margin +0.400 dB) | +0.400 dB | &#9989; |
 | IEC 61260:1995 / ANSI S1.11-2004 Table 1 | Class 0 (strictest) octave-band filter (butterworth, fs=48 kHz) | class 0 | class 0 (margin +0.150 dB) | +0.150 dB | &#9989; |
 | IEC 61260-1:2014 Table F.1 | Formula (9) breakpoint mapping, b=3, Omega at G**(1/2) | 1.12202 (+/-0.00001) | 1.12202 | 0 | &#9989; |
-| IEC 61672-1:2013 Table 3 | A-weighting deviation vs class-1 limits (fs=48 kHz) | deviation within limits @ 1000 Hz | +0.000 dB in [-0.70, +0.70] dB | headroom +0.700 dB | &#9989; |
-| IEC 61672-1:2013 Table 3 | C-weighting deviation vs class-1 limits (fs=48 kHz) | deviation within limits @ 1000 Hz | +0.000 dB in [-0.70, +0.70] dB | headroom +0.700 dB | &#9989; |
+| IEC 61672-1:2013 Table 3 | A-weighting deviation vs class-1 limits (fs=48 kHz) | deviation within limits @ 1000 Hz | +0.009 dB in [-0.70, +0.70] dB | headroom +0.691 dB | &#9989; |
+| IEC 61672-1:2013 Table 3 | C-weighting deviation vs class-1 limits (fs=48 kHz) | deviation within limits @ 1000 Hz | +0.008 dB in [-0.70, +0.70] dB | headroom +0.692 dB | &#9989; |
 | ISO 7196:1995 Table 2 / A.3 | G-weighting deviation vs +/-1 dB tolerance (fs=48 kHz) | deviation within limits @ 1 Hz | +0.047 dB in [-1.00, +1.00] dB | headroom +0.953 dB | &#9989; |
 | ANSI S1.4-1983 Tables IV/V | B-weighting (historical) deviation vs Type 0 limits (fs=48 kHz) | deviation within limits @ 200 Hz | -0.049 dB in [-0.70, +0.70] dB | headroom +0.651 dB | &#9989; |
 | IEC 61012:1990 Table 1 / 2.2 | AU-weighting deviation vs separate-unit tolerances (fs=96 kHz) | deviation within limits @ 10000 Hz | -0.072 dB in [-1.00, +1.00] dB | headroom +0.928 dB | &#9989; |
-| IEC 537:1976 (withdrawn) via NASA CR-3406 Table SLD-I | D-weighting response vs the published tabulated curve (fs=48 kHz) | abs(response - table) <= 0.2 dB (0.45 dB at 1600/2500 Hz) | -0.131 dB @ 8000 Hz (bound 0.20 dB) | headroom +0.069 dB | &#9989; |
+| IEC 537:1976 (withdrawn) via NASA CR-3406 Table SLD-I | D-weighting response vs the published tabulated curve (fs=48 kHz) | abs(response - table) <= 0.2 dB (0.45 dB at 1600/2500 Hz) | -0.127 dB @ 8000 Hz (bound 0.20 dB) | headroom +0.073 dB | &#9989; |
 
 </details>
 

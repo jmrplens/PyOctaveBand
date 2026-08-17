@@ -164,7 +164,7 @@ with its own response chart, in [Special Weightings](special-weightings.md).
 | `x` | 1D or 2D array | any | non-empty | 2D is `[channels, samples]` |
 | `fs` | int | Hz | > 0 | |
 | `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](special-weightings.md); `'Z'` is a bypass |
-| `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz; details in §5 |
+| `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz when $f_\mathrm{s} \ge 40$ kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |
 | `steady_ic` | bool (class only) | — | default `False` | Steady-state initial conditions (no onset transient) |
 
@@ -197,6 +197,23 @@ filter at an internally oversampled rate (up to 8×, reaching ≥ 144 kHz at
 common audio rates; a 96 kHz input runs ×2) and decimates back, keeping
 the response within class 1 tolerances up to 16 kHz (error ≈ −0.5 dB at
 12.5 kHz for $f_\mathrm{s} = 48$ kHz).
+
+Oversampling repairs the bilinear warping, not the sample rate. The
+interpolation and decimation stages it adds around the filter carry an
+anti-alias filter whose transition band sits on the *input* Nyquist
+frequency, so above roughly 90 % of that frequency the response rolls off
+however high the internal design rate is. That only bites when a Table 3 row
+lands there, which is what happens below 40 kHz: at $f_\mathrm{s} = 32$ kHz
+the 15 848.9 Hz row falls 16.2 dB below the A design goal (class 1 allows
+−16.0 dB there, class 2 sets no lower limit) and at $f_\mathrm{s} = 16$ kHz
+the 7 943.3 Hz row falls 12.0 dB below it (class 1 allows −2.5 dB, class 2
+−5.0 dB). `verify_weighting_class` measures that whole path, so for A it
+reports class 2 at 32 kHz and no class at all at 16 kHz rather than a grade
+the filter cannot deliver. The verdict is per curve, each graded against its
+own design goal: the C response lands 15.3 dB low at 32 kHz, inside that
+same −16.0 dB limit, so C keeps class 1 there, and 13.7 dB low at 16 kHz,
+where it meets no class either. Sample at 44.1 kHz or above for a class 1
+A-weighting across the full table.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf.svg" alt="A-weighting high-frequency accuracy at 48 kHz: analytic curve versus plain bilinear versus oversampled design, with error subplot" width="80%"></picture>
 
@@ -356,7 +373,7 @@ Use C-weighting for peak sound pressure and high-level noise, and use the differ
 
 ### Is A-weighting accurate near 16 kHz at a 48 kHz sample rate?
 
-Not with a plain bilinear design: at $f_\mathrm{s} = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz.
+Not with a plain bilinear design: at $f_\mathrm{s} = 48$ kHz the A-curve error reaches −2.7 dB at 12.5 kHz, outside the IEC 61672-1 class 1 tolerance (+2.0/−2.5 dB). The default `high_accuracy=True` oversamples internally (up to 8×, reaching 144 kHz or more at common audio rates) and keeps the response within class 1 tolerances up to 16 kHz, with an error of about −0.5 dB at 12.5 kHz. That holds while 16 kHz stays clear of Nyquist, so from about $f_\mathrm{s} = 40$ kHz upwards; §5 covers what the resampler's anti-alias transition band costs below that.
 
 ## See also
 
@@ -390,6 +407,7 @@ IEC 61672-1:2013, *Electroacoustics — Sound level meters —
 Part 1: Specifications*: the A, C and Z frequency-weighting curves (the
 Annex E analytic definition from four corner frequencies, normalized to 0 dB
 at 1 kHz), the class 1 tolerances the `high_accuracy` design keeps up to
-16 kHz, and the Table 3 class 1/class 2 acceptance limits checked by
+16 kHz at 44.1 kHz and above, and the Table 3 class 1/class 2 acceptance
+limits checked by
 `verify_weighting_class`; the special G, B, D and AU curves are covered in
 [Special Weightings](special-weightings.md).
