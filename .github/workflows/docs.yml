@@ -80,27 +80,35 @@ jobs:
           # and check:redirects re-derives the redirect map from renames.
           fetch-depth: 0
           # ... but the history those two need is commits and trees, never
-          # blob contents, and the repository's pack is dominated by the
-          # committed artwork's blobs (2.4 GiB, over half of it
-          # .github/images, which nothing in this job reads: the site
-          # references the figures remotely). Fetching the pack whole made
-          # the checkout the third-largest step of the job at close to
-          # three minutes. `blob:none` defers blob download to first use,
-          # and the sparse set below keeps first use to the trees this job
-          # actually walks. Rename detection in check:redirects can still
-          # demand the odd content blob when a page was edited in the same
-          # commit that moved it; those are small text files served by the
-          # same promisor remote, which is why this stays correct rather
-          # than merely fast.
+          # blob contents, while a plain fetch-depth-0 downloads the whole
+          # 2.4 GiB pack, most of it superseded generations of the
+          # committed artwork. That made the checkout the third-largest
+          # step of the job at close to three minutes. `blob:none` fetches
+          # blobs only for what is checked out, so the artwork arrives at
+          # its HEAD size once instead of every size it has ever been.
+          # Rename detection in check:redirects can still demand the odd
+          # historical blob when a page was edited in the same commit that
+          # moved it; those are small text files served on demand by the
+          # same remote, which is why this stays correct rather than
+          # merely fast.
           filter: blob:none
           # Cone mode: these directories plus every repository-root file.
           # docs/ and scripts/ feed the mirror, glossary and llms checks;
-          # site/ is the build itself; .github/workflows is a few kilobytes
-          # that check-redirects reads to hold this very file's redirect
-          # count in step, and naming the subdirectory keeps its sibling
-          # images/ (the half-gigabyte artwork tree) out of the cone.
+          # site/ is the build itself. .github goes in whole, because the
+          # site reaches into it three ways, each found the hard way when
+          # a narrower cone broke the build: stage-media.mjs copies
+          # images/ and reports/ into the site's own asset tree (the pages
+          # stopped hotlinking raw.githubusercontent long ago, and
+          # repo-stats.mjs refuses to recognise a repository root without
+          # the images tree), brand.ts inlines brand/lockup.svg, and
+          # check-redirects reads workflows/docs.yml to hold this very
+          # file's redirect count in step. Everything .github holds beyond
+          # the artwork is kilobytes, so there is nothing left worth
+          # excluding; the saving all comes from the blob filter, which
+          # fetches the artwork at its HEAD size once instead of every
+          # size it has ever been.
           sparse-checkout: |
-            .github/workflows
+            .github
             docs
             scripts
             site
