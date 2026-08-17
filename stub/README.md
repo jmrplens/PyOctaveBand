@@ -4,8 +4,9 @@
 
 This is a transition package: installing or upgrading `PyOctaveBand` installs
 `phonometry` and provides a `pyoctaveband` module that re-exports the full,
-unchanged API with a `DeprecationWarning`. Your existing code keeps working,
-but new code should use the new name:
+unchanged API with a `FutureWarning`, which Python shows by default so the
+migration notice actually reaches you. Your existing code keeps working, but
+new code should use the new name:
 
 ```bash
 pip install phonometry
@@ -26,6 +27,12 @@ import phonometry  # instead of: import pyoctaveband
 ```
 
 The API is identical — renaming the import is a complete migration.
+
+This package requires `phonometry>=3.0.0,<4`. The 3.x line is the one whose
+API is the API of the last release under the old name, so that pin is what
+makes the sentence above true: it cannot hand you a release that has retired a
+name `pyoctaveband` promises. Later lines are reached by renaming the import,
+which is the whole of the migration.
 
 - Documentation: https://jmrplens.github.io/phonometry/
 - Repository: https://github.com/jmrplens/phonometry

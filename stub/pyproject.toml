@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyOctaveBand"
-version = "2.1.0"
+version = "2.1.1"
 authors = [
   { name="José Manuel Requena Plens", email="mail@jmrp.io" },
 ]
@@ -16,7 +16,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
-    "phonometry>=3.0.0",
+    # Capped below the next major on purpose. This package exists to keep
+    # `import pyoctaveband` working, and it can only keep that promise while
+    # the resolved phonometry still exports what the last release under the
+    # old name exported. A major release is exactly where those names go, so
+    # an uncapped pin would silently upgrade a user into a phonometry that
+    # raises AttributeError for them. The migration path off 3.x is renaming
+    # the import, not a newer stub.
+    "phonometry>=3.0.0,<4",
 ]
 
 [project.urls]

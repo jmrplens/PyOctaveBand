@@ -2383,6 +2383,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   detailed prediction and CNOSSOS road emission (two). The Spanish tree now
   references no English asset at all.
 
+- The PyOctaveBand transition stub, on both counts its published page got
+  wrong, and the reason nothing had noticed. `stub/README.md` is the rendered
+  long description of PyOctaveBand on PyPI, and it said the shim re-exports
+  the API with a `DeprecationWarning`. It raises a `FutureWarning`, and
+  deliberately so, because that is the class Python shows by default; a reader
+  acting on the published sentence and calling
+  `warnings.simplefilter("ignore", DeprecationWarning)` silenced nothing. The
+  3.0.0 entry above repeated the same wrong class and says `FutureWarning`
+  now. Second, the stub asked for `phonometry>=3.0.0` with no ceiling, so the
+  day the next major ships, `pip install -U PyOctaveBand` would resolve to a
+  phonometry that has retired the `octavefilter`, `getansifrequencies`,
+  `normalizedfreq` and `calculate_sensitivity` aliases the 3.x `__all__` still
+  carries, and `pyoctaveband.octavefilter(...)` would raise `AttributeError`
+  with nothing naming the cause. That falsifies exactly the two promises this
+  package is for, that a plain rename of the import is a complete migration
+  and that upgrading keeps existing code working. The pin is
+  `phonometry>=3.0.0,<4` now, which ties the transition package to the line
+  whose API is the API of the last release under the old name, and the README
+  says so; the stub is 2.1.1. Underneath both defects was the same gap: the
+  stub is built straight from the tree by a manual workflow and nothing else
+  in the repository imported, type checked or tested it. It now has a test
+  module of its own in the ordinary suite, which executes the shipped shim,
+  asserts the class it warns with, asserts that the class the README names is
+  that same class, and asserts the pin admits every 3.x and no 4.0. `mypy`
+  covers `stub/src`, and the stub is built and `twine check`ed on every pull
+  request rather than first at publish time, with the cap re-asserted against
+  the `Requires-Dist` of the built wheel and sdist, which is what a resolver
+  actually reads.
+
 ## [3.3.0] - 2026-07-27
 
 ### Added
@@ -5941,10 +5970,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - **The library is now `phonometry`** (formerly `PyOctaveBand`). Install with
   `pip install phonometry` and `import phonometry`. The API is unchanged — a
-  plain rename of the import is a complete migration. The final
-  `PyOctaveBand 2.1.0` release on PyPI is a transition stub that depends on
+  plain rename of the import is a complete migration. The `PyOctaveBand 2.1.0`
+  release on PyPI is a transition stub that depends on
   `phonometry` and re-exports it under the old `pyoctaveband` module name with
-  a `DeprecationWarning`, so `pip install -U PyOctaveBand` keeps existing code
+  a `FutureWarning`, so `pip install -U PyOctaveBand` keeps existing code
   working. The last state under the old name is preserved in the locked
   [`pyoctaveband-v2`](https://github.com/jmrplens/phonometry/tree/pyoctaveband-v2) branch.
 - **Python >= 3.13 required** (was >= 3.11). CI now tests 3.13 and 3.14
