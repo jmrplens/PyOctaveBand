@@ -81,15 +81,15 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "numpy>=2.4.4",
+    "numpy>=2.5.2",
     "scipy>=1.18.0",
 ]
 
 [project.optional-dependencies]
-perf = ["numba>=0.66.0"]
+perf = ["numba>=0.67.0"]
 plot = ["matplotlib>=3.11.1"]
 report = ["reportlab>=5.0.0", "svglib>=2.1.0"]
-full = ["numba>=0.66.0", "matplotlib>=3.11.1", "reportlab>=5.0.0", "svglib>=2.1.0"]
+full = ["numba>=0.67.0", "matplotlib>=3.11.1", "reportlab>=5.0.0", "svglib>=2.1.0"]
 
 [project.urls]
 "Homepage" = "https://github.com/jmrplens/phonometry"
