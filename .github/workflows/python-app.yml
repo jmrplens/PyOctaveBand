@@ -54,10 +54,45 @@ jobs:
       run: python scripts/check_animation_freshness.py
     - name: Lint with Ruff
       run: ruff check .
+    # `stub/src` is in the list because it was in no list at all. The
+    # PyOctaveBand transition shim lives outside the package this repository
+    # installs, so nothing here ever imported, linted or type checked it, and
+    # two defects reached its published page that way.
     - name: Type check with Mypy
-      run: mypy src scripts
+      run: mypy src scripts stub/src
     - name: Security check with Bandit
       run: bandit -r src
+
+  # The PyOctaveBand transition stub under stub/ is built from the tree by a
+  # workflow_dispatch publish job, so until now the first time anything looked
+  # at it was the moment it went to PyPI: a README that named the wrong
+  # warning class and a dependency line with no ceiling were both discovered
+  # after they had shipped. Building it on every pull request costs seconds
+  # and moves `twine check` (which is what renders the long description and
+  # would reject a malformed one) to where a mistake is still cheap.
+  transition-stub:
+    name: Transition stub builds and its metadata is sound
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v7
+      with:
+        python-version: "3.13"
+    - name: Build the stub and check its long description
+      run: |
+        python -m pip install --upgrade pip build twine
+        python -m build stub/
+        twine check stub/dist/*
+    # The resolver reads the built metadata, not stub/pyproject.toml, so the
+    # cap that keeps `pip install -U PyOctaveBand` on the line whose API the
+    # shim re-exports is asserted where it will actually be enforced.
+    - name: Fail if the built metadata does not cap phonometry below the next major
+      run: python scripts/check_stub_metadata.py
 
   # Fast gate (~12 s harness, runtime deps only, no pytest): the committed
   # docs/CONFORMANCE.md, and every count quoted from it, must equal a fresh

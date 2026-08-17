@@ -2372,7 +2372,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   asserts the class it warns with, asserts that the class the README names is
   that same class, and asserts the pin admits every 3.x and no 4.0. `mypy`
   covers `stub/src`, and the stub is built and `twine check`ed on every pull
-  request rather than first at publish time.
+  request rather than first at publish time, with the cap re-asserted against
+  the `Requires-Dist` of the built wheel and sdist, which is what a resolver
+  actually reads.
 
 ## [3.3.0] - 2026-07-27
 
