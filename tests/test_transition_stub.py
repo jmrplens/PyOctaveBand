@@ -74,7 +74,8 @@ def _import_shim() -> tuple[types.ModuleType, list[warnings.WarningMessage]]:
     spec = importlib.util.spec_from_file_location(
         "_pyoctaveband_transition_shim", _SHIM, submodule_search_locations=[]
     )
-    assert spec is not None and spec.loader is not None
+    assert spec is not None
+    assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
