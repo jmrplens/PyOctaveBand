@@ -12,6 +12,17 @@ links to the release tag instead, and the tests below hold that pin: no ``main``
 ref may reach the page, every ref must be the tag of the version in ``VERSION``,
 and every path behind one must exist in this checkout, which is the tree the tag
 will be cut from.
+
+The last test guards the other thing the install prose quoted from outside
+this repository: the NumPy ceiling numba declares. The pages said numba
+declares ``numpy<2.5``, so ``phonometry[full]`` "resolves NumPy below 2.5
+while a plain install gets the newest release", and advised installing
+``phonometry[plot,report]`` to keep NumPy current. numba 0.67.0 declares
+``numpy<2.6``, NumPy is at 2.5.2, and ``pip install --dry-run
+phonometry[full]`` resolves numba 0.67.0 with NumPy 2.5.2, so the ceiling,
+the consequence and the workaround were all wrong at once. The number came
+from another project's metadata, which nothing here regenerates and nothing
+here can gate, so the prose keeps the mechanism and drops the number.
 """
 
 import pathlib
@@ -35,6 +46,30 @@ _REPO_URL = re.compile(
     r"https://(?:github\.com/jmrplens/phonometry/blob"
     r"|raw\.githubusercontent\.com/jmrplens/phonometry)"
     r"/(?P<ref>[^/]+)/(?P<path>[^)\"'\s#?]+)"
+)
+
+#: Every authored copy of the ``[full]`` NumPy caveat, in both languages, plus
+#: the generator that writes it into the llms artifacts. README_PYPI.md,
+#: llms.txt, llms-full.txt and site/public/llms/ are derived from these, so
+#: holding the sources holds all nine copies.
+_INSTALL_CAVEAT_PAGES = (
+    "README.md",
+    "docs/start/getting-started.md",
+    "site/src/content/docs/start/getting-started.mdx",
+    "site/src/content/docs/es/start/getting-started.mdx",
+    "scripts/generate_llms.py",
+)
+
+#: The opening of that caveat in each language, so the test cannot pass by the
+#: paragraph having been deleted.
+_CAVEAT_OPENINGS = ("One caveat about `[full]`", "Un matiz sobre `[full]`")
+
+#: A NumPy version bound stated in prose: a requirement specifier, or the same
+#: thing spelled out in English or Spanish.
+_NUMPY_BOUND = re.compile(
+    r"numpy\s*(?:[<>]=?|[=!~]=)\s*\d"
+    r"|numpy\s+(?:below|under|above|over|por debajo de|por encima de)\s+\d",
+    re.IGNORECASE,
 )
 
 
@@ -108,6 +143,30 @@ def test_pinned_pypi_links_resolve_in_this_checkout() -> None:
         "README_PYPI.md links to paths that are not in this checkout, so they "
         f"will not be in the release tag either: {dangling}"
     )
+
+
+def test_the_full_extra_caveat_quotes_no_numpy_version() -> None:
+    """The install caveat states the mechanism, never a version number.
+
+    Any number here is a copy of numba's declared NumPy ceiling. This
+    repository does not own it, does not regenerate it and has no gate that
+    could notice it moving, so it goes stale silently and takes the advice
+    around it with it: the ceiling numba declared moved to ``<2.6``, and the
+    pages went on telling readers to give up numba to keep NumPy current when
+    ``[full]`` was already resolving the newest NumPy there is.
+    """
+    for name in _INSTALL_CAVEAT_PAGES:
+        text = (_ROOT / name).read_text(encoding="utf-8")
+        assert any(opening in text for opening in _CAVEAT_OPENINGS), (
+            f"{name} no longer carries the `[full]` caveat; the mirrored copies "
+            "must stay in step"
+        )
+        quoted = _NUMPY_BOUND.search(text)
+        assert quoted is None, (
+            f"{name} quotes a NumPy bound ({quoted.group(0)!r}) that belongs to "
+            "another project's metadata; nothing here regenerates it, so state "
+            "the mechanism instead of the number"
+        )
 
 
 def test_pinning_leaves_unrelated_urls_alone() -> None:
