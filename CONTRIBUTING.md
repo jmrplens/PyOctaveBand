@@ -426,8 +426,13 @@ Renames of **published** API keep the old name working for one cycle:
 
 Releases are fully automated from the repository-root `VERSION` file:
 
-1. Open a PR that bumps `VERSION` (semver) and moves the `[Unreleased]`
-   CHANGELOG section to the new version.
+1. Open a PR that bumps `VERSION` (semver), moves the `[Unreleased]`
+   CHANGELOG section to the new version, and runs `make pypi-readme` with
+   `README_PYPI.md` committed. That last step is not optional: the PyPI page
+   pins every link into this repository to the release tag, and it reads the
+   tag from `VERSION`, so a bump on its own leaves the whole guide map on the
+   published page pointing at the previous release. The packaging tests fail
+   until the page is regenerated.
 2. When the PR merges to `main`, the release workflow validates the version,
    builds the package, publishes to PyPI and creates the GitHub Release
    (tag included). Zenodo registers the DOI from the release webhook.

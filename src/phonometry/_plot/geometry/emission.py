@@ -18,7 +18,6 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from matplotlib.colors import to_rgb
 from numpy.typing import ArrayLike
 
 from ..common import (
@@ -105,6 +104,8 @@ def _number_points(ax: Any, pts: np.ndarray, colours: Any) -> None:
     as well as the index and never has to compete with the mesh underneath.
     Its ink is whichever of black or white the chip can actually carry.
     """
+    from matplotlib.colors import to_rgb
+
     if isinstance(colours, str) or not isinstance(colours, Sequence):
         colours = [colours] * len(pts)
     for index, ((x, y, z), chip) in enumerate(zip(pts, colours, strict=True), start=1):

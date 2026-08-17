@@ -24,10 +24,11 @@ materials, vibration, environmental, aircraft and underwater acoustics,
 electroacoustics and wave simulation. Every metric is implemented from its
 governing standard and numerically checked against it: the auto-generated
 [conformance report](https://github.com/jmrplens/phonometry/blob/main/docs/CONFORMANCE.md)
-pins hundreds of expected normative values, spanning more than 250 standards,
-to the values the library computes, and CI regenerates it on every pull
-request. Filters are class 1 per **IEC 61260-1:2014 / ANSI S1.11-2004** and
-weightings and levels class 1 per **IEC 61672-1:2013**.
+runs 536 conformance checks across 57 domains and 365 standards, each pinning
+an expected normative value to the value the library computes, and CI
+regenerates it on every pull request. Filters are class 1 per
+**IEC 61260-1:2014 / ANSI S1.11-2004** and weightings and levels class 1 per
+**IEC 61672-1:2013**.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall_dark.gif"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/anim_fdtd_pillar_hall.gif" alt="Animation: an 800 Hz plane wavefront sweeps through a hall of rigid columns in a 2D FDTD simulation; every column diffracts the front and the scattered wavelets interfere until the whole hall is filled" width="100%"></picture>
 
@@ -55,11 +56,12 @@ leaves unavailable are the figures (`.plot()` and the filter response plots),
 the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
 the `impulse` time weighting.
 
-One caveat about `[full]`: numba declares `numpy<2.5`, so `phonometry[full]`
-(like `phonometry[perf]`) resolves NumPy below 2.5 while a plain install gets
-the newest release. numba only makes the `impulse` time weighting faster, so if
-you would rather keep NumPy current, install `phonometry[plot,report]` and
-leave `[perf]` out.
+One caveat about `[full]`: numba is the only extra that caps NumPy, and it
+raises that cap only once it supports a new NumPy minor. So in the weeks after
+a NumPy minor release, `phonometry[full]` (like `phonometry[perf]`) can resolve
+one minor behind what a plain install gets. numba only makes the `impulse` time
+weighting faster, so if you need the newest NumPy the day it ships, install
+`phonometry[plot,report]` and leave `[perf]` out.
 
 ## ⚡ Quick start
 

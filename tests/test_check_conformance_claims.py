@@ -6,7 +6,9 @@
 count say the same thing. Two properties matter more than the happy path:
 
 * it must move the number wherever it is quoted, in either language, in
-  markdown prose, in MDX frontmatter and in the ``.zenodo.json`` description;
+  markdown prose, in the root ``README.md`` and the ``README_PYPI.md``
+  published to PyPI, in MDX frontmatter and in the ``.zenodo.json``
+  description;
 * it must move *only* those numbers. A blind ``str.replace`` of the old count
   for the new one has already corrupted an unrelated figure in this repository
   (``replace("303", "316")`` also hit "303 operating days"), so the writer
@@ -67,6 +69,20 @@ def corpus(tmp_path: pathlib.Path) -> pathlib.Path:
     """
     root = tmp_path / "repo"
     _write(root / "docs" / "CONFORMANCE.md", REPORT)
+    # The two most-read pages of prose, and the two that were outside the walk
+    # for as long as it started at docs/. README_PYPI.md is the PyPI long
+    # description, which PyPI freezes at upload.
+    _write(
+        root / "README.md",
+        f"The report runs {OLD_TOTAL} conformance checks across {OLD_DOMAINS} "
+        f"domains and {OLD_STANDARDS} standards, each pinning a value.\n"
+        + DECOY_LINES,
+    )
+    _write(
+        root / "README_PYPI.md",
+        f"The report runs {OLD_TOTAL} conformance checks across {OLD_DOMAINS} "
+        f"domains and {OLD_STANDARDS} standards, each pinning a value.\n",
+    )
     _write(
         root / "docs" / "start" / "getting-started.md",
         f"- [Conformance report](CONFORMANCE.md): the value of all "
@@ -112,6 +128,14 @@ def corpus(tmp_path: pathlib.Path) -> pathlib.Path:
         root / "docs" / "superpowers" / "notes.md",
         f"- a local plan quoting {OLD_TOTAL} conformance checks.\n",
     )
+    # The root markdown is globbed, not walked: a README one level down belongs
+    # to something else (the compatibility stub keeps its own, pinned to the
+    # release it describes) and must not be rewritten from this repository's
+    # report.
+    _write(
+        root / "stub" / "README.md",
+        f"- the stub quotes {OLD_TOTAL} conformance checks of its own.\n",
+    )
     return root
 
 
@@ -124,6 +148,8 @@ def test_check_reports_every_stale_claim(corpus, capsys):
     assert _run(corpus) == 1
     errors = capsys.readouterr().err
     for quoted in (
+        "README.md",
+        "README_PYPI.md",
         "docs/start/getting-started.md",
         "site/src/content/docs/index.mdx",
         "site/src/content/docs/es/index.mdx",
@@ -139,6 +165,13 @@ def test_write_moves_every_quoted_count(corpus, capsys):
     """Every place that quotes a count is brought into line in one run."""
     assert _run(corpus, "--write") == 0
     assert "Rewrote" in capsys.readouterr().out
+
+    for readme in ("README.md", "README_PYPI.md"):
+        text = (corpus / readme).read_text(encoding="utf8")
+        assert (
+            f"{TOTAL} conformance checks across {DOMAINS} domains and "
+            f"{STANDARDS} standards" in text
+        ), f"{readme} was not brought into line"
 
     started = (corpus / "docs" / "start" / "getting-started.md").read_text(encoding="utf8")
     assert f"all {TOTAL} checks" in started
@@ -179,6 +212,8 @@ def test_write_leaves_the_decoys_alone(corpus):
     assert started.endswith(DECOY_LINES)
     assert f"one for each of the {OLD_TOTAL} rows of Annex {OLD_DOMAINS}." in started
 
+    assert (corpus / "README.md").read_text(encoding="utf8").endswith(DECOY_LINES)
+
     english = (corpus / "site/src/content/docs/index.mdx").read_text(encoding="utf8")
     assert f"measured over {OLD_DOMAINS} weeks" in english
 
@@ -200,12 +235,18 @@ def test_write_is_idempotent(corpus):
 
 
 def test_write_touches_only_the_files_that_quote_a_count(corpus):
-    """Excluded and count-free files come out byte-identical."""
+    """Excluded and count-free files come out byte-identical.
+
+    ``stub/README.md`` is in the list for the same reason the root markdown is
+    globbed rather than walked: it is a different package's page, describing a
+    different release, and this report says nothing about it.
+    """
     untouched = [
         corpus / "CHANGELOG.md",
         corpus / "docs" / "ERRATA.md",
         corpus / "docs" / "superpowers" / "notes.md",
         corpus / "docs" / "CONFORMANCE.md",
+        corpus / "stub" / "README.md",
     ]
     before = {p: p.read_bytes() for p in untouched}
     assert _run(corpus, "--write") == 0
