@@ -13,7 +13,7 @@ Formula (2)), and the apparent sound reduction index
 :math:`A = 0.16 V / T` (Clause 3.14/3.15, Formula (4) and (5)). Source and
 receiving levels may be supplied already averaged (one value per band) or
 as several microphone positions, which are then energy-averaged with
-:math:`10 \log_{10}\left( \frac{1}{n} \sum 10^{L_i/10} \right)` (Clause 7.8,
+:math:`10 \log_{10}\left( \frac{1}{n} \sum 10^{L_j/10} \right)` (Clause 7.8,
 Formula (9)). All
 quantities are evaluated per one-third-octave band over the core range
 100 Hz to 3150 Hz (Clause 5), the caller having already applied any
@@ -589,7 +589,7 @@ def energy_average_level(
 
     Combines sound pressure levels measured at several microphone
     positions into
-    :math:`L = 10 \log_{10}\left( \frac{1}{n} \sum_i 10^{L_i/10} \right)`.
+    :math:`L = 10 \log_{10}\left( \frac{1}{n} \sum_j 10^{L_j/10} \right)`.
 
     :param levels: Sound pressure levels, in dB, at the ``n`` positions to
         be averaged along ``axis``.
