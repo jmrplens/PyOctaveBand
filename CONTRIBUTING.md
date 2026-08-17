@@ -320,7 +320,7 @@ not a way to land one, and it is meant to stay short.
 A collision where **both uses take the same slope** is a different problem, and
 typography cannot solve it: $L_U$ is the magnitude of the ISO 226 linear
 transfer function and the upper contiguous critical band of the prominence
-ratio, one section apart on one page, and $C_P$ is a specific heat capacity in
+ratio, one section apart on one page, and $C_\mathrm{P}$ is a specific heat capacity in
 a porous absorber and a propulsion coefficient in CNOSSOS-EU. Those belong in
 the ambiguity table at the top of
 [the glossary](docs/reference/glossary.md), beside $T_\mathrm{s}$, $R$ and

@@ -165,7 +165,7 @@ $$
 Only a level *difference* enters, so the sound-level device needs no
 absolute calibration. The effective exponent $\kappa'$ (Annex A,
 Formula A.7) corrects the adiabatic $\kappa$ for wall heat conduction through
-the thermal boundary layer $b = \sqrt{2 c_0 l_h / \omega}$ (Formulae A.4/A.5).
+the thermal boundary layer $b = \sqrt{2 c_0 l_\mathrm{h} / \omega}$ (Formulae A.4/A.5).
 The Annex A.3 worked example (100 mm closed cylinder at 2 Hz: $b = 1.83$ mm,
 $\kappa' = 1.370 = 0.978\,\kappa$) is reproduced, and the validity guards of
 Formula 3 (transfer ratio < 0.3) and Formula 4 (10 dB background margin) are
