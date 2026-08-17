@@ -87,14 +87,26 @@ class WeightingFilter:
         :param steady_ic: If True, calculate steady state initial conditions for filter.
         :param high_accuracy: If True, design and run the filter at an internal
             oversampled rate (target >= 144 kHz) so the response stays within
-            IEC 61672-1 class 1 tolerances up to 16 kHz. At 48 kHz this
-            oversamples x3, keeping the deviation from the analytic curve to
-            about -0.44 dB @16k / -0.85 dB @20k. The plain bilinear design
-            still holds class 1 at fs = 44.1/48 kHz (about -2.7 dB at
-            12.5 kHz, inside the +2.0/-5.0 class 1 limits) but degrades to
-            class 2 for fs <= 32 kHz. Defaults to True except in stateful
-            mode (the internal FIR resampling is incompatible with block
-            processing).
+            IEC 61672-1 class 1 tolerances up to 16 kHz, provided 16 kHz is
+            well clear of the input Nyquist frequency (fs >= 40 kHz). At
+            48 kHz this oversamples x3, keeping the deviation from the design
+            goal to -0.44 dB at the 16 kHz nominal frequency and -0.86 dB at
+            the 20 kHz one. Oversampling cannot rescue the top of the band at
+            low sample rates, because the resampling stages it adds around
+            the sections carry an anti-alias transition band centred on the
+            input Nyquist frequency: above roughly 0.9 x fs/2 the response
+            rolls off steeply whatever the design rate. At fs = 32 kHz the
+            15 848.9 Hz nominal point falls 16.2 dB below the design goal
+            (class 1 allows -16.0 dB there, class 2 has no lower limit), and
+            at fs = 16 kHz the 7 943.3 Hz point falls 12.0 dB below it
+            (class 1 allows -2.5 dB, class 2 -5.0 dB), so the verified class
+            is 2 at 32 kHz and none at all at 16 kHz. The plain bilinear
+            design holds class 1 for fs >= 40 kHz (-2.8 dB at the 12.5 kHz
+            nominal frequency at 48 kHz, -3.5 dB at 44.1 kHz, inside the
+            +2.0/-5.0 class 1 limits), degrades to class 2 between 22.05 and
+            32 kHz and meets no class at fs <= 20 kHz. Defaults to True
+            except in stateful mode (the internal FIR resampling is
+            incompatible with block processing).
         """
         if fs <= 0:
             raise ValueError(_FS_POSITIVE)
@@ -324,6 +336,77 @@ class WeightingFilter:
             y = signal.sosfilt(self.sos, x_proc, axis=-1)
 
         return cast(np.ndarray, y)
+
+
+def _resample_poly_fir(rate: int) -> np.ndarray:
+    """Anti-alias FIR that ``resample_poly`` designs for a 1:*rate* ratio.
+
+    ``scipy.signal.resample_poly`` documents (and implements) its default
+    filter as ``firwin(2 * half_len + 1, f_c, window=('kaiser', 5.0))`` with
+    ``half_len = 10 * max(up, down)`` and ``f_c = 1 / max(up, down)``
+    relative to Nyquist, then scales it by ``up``. Both stages of the
+    high-accuracy path use ``max(up, down) = rate``, so they share these taps;
+    the ``up`` scaling of the interpolation stage exactly offsets the energy
+    lost to zero-stuffing and is left out here, giving unit passband gain.
+    The cutoff lands on the *input* Nyquist frequency, so the transition band
+    straddles ``fs / 2``.
+    """
+    return np.asarray(
+        signal.firwin(2 * (10 * rate) + 1, 1.0 / rate, window=("kaiser", 5.0)),
+        dtype=np.float64,
+    )
+
+
+def _runtime_frequency_response(
+    wf: WeightingFilter, frequencies: np.ndarray
+) -> np.ndarray:
+    """Complex steady-state response of the *whole* filter path.
+
+    A non-stateful ``WeightingFilter`` with ``high_accuracy`` does not apply
+    its second-order sections to the input directly: it interpolates by
+    ``L = _oversample``, filters at ``L * fs`` and decimates back, so the
+    signal passes the ``resample_poly`` anti-alias FIR twice as well. That
+    cascade is linear and time-invariant at the input rate (interpolating by
+    L, filtering, then decimating by L convolves the input with
+    ``h[nL]``), and its response is the sum of the L spectral images that
+    the decimation folds onto each output frequency,
+
+    .. math::
+
+       G(f) = \\sum_{k=0}^{L-1} H_\\mathrm{FIR}^2(f - k f_s)\\,
+              H_\\mathrm{SOS}(f - k f_s),
+
+    evaluated at the ``L * fs`` design rate (the transfer functions are
+    periodic there, so images beyond the design Nyquist frequency need no
+    wrapping, and Hermitian symmetry gives the negative ones). Only the
+    ``k = 0`` term matters until the image at ``fs - f`` enters the
+    anti-alias transition band, which is exactly what happens as *f*
+    approaches ``fs / 2``.
+
+    :param wf: The weighting filter whose path is measured.
+    :param frequencies: Frequencies in Hz, below the input Nyquist frequency.
+    :return: Complex voltage response at each frequency (not normalized).
+    """
+    f = np.asarray(frequencies, dtype=np.float64)
+    if wf.curve == "Z" or wf.sos.size == 0:
+        return np.ones_like(f, dtype=np.complex128)
+
+    fs_proc = wf.fs * wf._oversample
+    if wf._oversample == 1:
+        # Nothing is resampled, so the sections are the whole path. This also
+        # covers stateful mode, which is rejected at construction time
+        # together with ``high_accuracy`` and therefore always has an
+        # oversample factor of 1.
+        _, h = signal.sosfreqz(wf.sos, worN=f, fs=fs_proc)
+        return np.asarray(h, dtype=np.complex128)
+
+    images = f[None, :] - np.arange(wf._oversample)[:, None] * float(wf.fs)
+    flat = np.abs(images).ravel()
+    _, h_sos = signal.sosfreqz(wf.sos, worN=flat, fs=fs_proc)
+    _, h_fir = signal.freqz(_resample_poly_fir(wf._oversample), worN=flat, fs=fs_proc)
+    terms = (h_sos * h_fir**2).reshape(images.shape)
+    terms = np.where(images < 0.0, np.conj(terms), terms)
+    return np.asarray(terms.sum(axis=0), dtype=np.complex128)
 
 
 @lru_cache(maxsize=32)
