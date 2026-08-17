@@ -163,9 +163,10 @@ _TITLE_SIZES = (22, 21, 20)
 #: The measure is a margin and not "does it overflow" because the failure
 #: this catches is not an overflowing title, which the fit gate would
 #: refuse anyway: it is a title whose first and last letters sit on the
-#: sheet border while every other element of the plate keeps 30 px or
-#: more, so the title alone reads as having run off the page. 30 px is
-#: what the artwork below it keeps.
+#: sheet border while the drawing under it keeps 50 px on a median plate,
+#: so the title alone reads as having run off the page. 30 px is well
+#: inside that and still leaves the longest sentence of the corpus a size
+#: it can be set at.
 _TITLE_MARGIN = 30
 
 
