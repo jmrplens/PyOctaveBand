@@ -180,7 +180,7 @@ $A(8) = a_\mathrm{hv} \sqrt{T/T_0}$ con $T_0 = 8$ h (Ec. 2), exposiciones parcia
 combinadas en cuadratura (ISO 5349-2:2001, Ecs. 1–3), y el modelo de riesgo
 vascular del Anexo C, $D_\mathrm{y} = 31{,}8\ A(8)^{-1{,}06}$, para los años hasta una
 prevalencia del 10 % de dedo blanco (sin relación con la dosis de aceleración
-$D_z$ de más abajo). Los valores de acción y límite de la
+$D_\mathrm{z}$ de más abajo). Los valores de acción y límite de la
 Directiva 2002/44/CE están incorporados: mano-brazo $A(8)$ 2,5/5,0 m/s²,
 cuerpo entero $A(8)$ 0,5/1,15 m/s² o VDV 9,1/21,0
 $\mathrm{m/s}^{1{,}75}$ (Artículo 3), aplicándose la vía del VDV allí donde un
@@ -214,12 +214,12 @@ respuesta espinal con una dosis de sexta potencia (Palmgren-Miner)
 (apartado 5.3, Fórmulas 3/4):
 
 $$
-D_z = 1{,}07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
+D_\mathrm{z} = 1{,}07 \left( \sum_i A_{\mathrm{z},i}^6 \right)^{1/6}, \qquad
+D_\mathrm{zd} = D_\mathrm{z}\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
 El Anexo C convierte la dosis diaria en una tensión compresiva
-$S_\mathrm{d} = m_z D_{z\mathrm{d}}$ ($m_z = 0{,}029/0{,}025$ MPa por m/s² para el hombre de
+$S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd}$ ($m_\mathrm{z} = 0{,}029/0{,}025$ MPa por m/s² para el hombre de
 82 kg / la mujer de 64 kg), sigue la resistencia última decreciente con la
 edad $S_\mathrm{u} = 6{,}75 - S_\mathrm{age}(b + i)$ y forma la variable de tensión acumulada
 $R$ (Fórmulas C.3/C.4), llevada a una probabilidad de lesión por la ley de
@@ -227,7 +227,7 @@ Weibull de la Tabla C.1, $\Pi = 1 - e^{-(R/\alpha)^\beta}$. El filtro espinal
 se evalúa analíticamente en el dominio de la frecuencia y se valida frente a
 la tabulación del filtro digital a 256 Hz del Anexo D dentro de la tolerancia
 del apartado 5.2; el ejemplo resuelto del Anexo C (cinco choques de 40 m/s²
-al día durante 20 años) se reproduce: $D_{z\mathrm{d}} = 55{,}97$ m/s², $R = 1{,}22$,
+al día durante 20 años) se reproduce: $D_\mathrm{zd} = 55{,}97$ m/s², $R = 1{,}22$,
 $\Pi = 0{,}37$. El modelo espinal de elementos finitos del Anexo A
 (distribuido por ISO como software aparte) queda fuera de alcance.
 

@@ -90,19 +90,31 @@ _EXCLUDED = re.compile(r"errata|/_plot/|/_report/", re.IGNORECASE)
 #: repository-relative path and the ``(base, subscript)`` pair; the path is
 #: matched against the tail of the file's own, so the gate declares the same
 #: page whether it is run from the repository root or given absolute roots.
+_GLOSSARY: dict[tuple[str, str], str] = {
+    ("L", "N"): (
+        "the ambiguity table's own subject: the percentile level, whose "
+        "N is the percentage, against the sonar noise level of "
+        "ISO 18405, whose N is the noise"
+    ),
+    ("L", "s"): (
+        "likewise: the mean of the two bands adjacent to a candidate "
+        "tone, whose s is unexpanded anywhere in this corpus, against "
+        "the equivalent monopole source level of ISO 17208-2"
+    ),
+    ("D", "z"): (
+        "the pair the ambiguity table exists to separate: the barrier "
+        "screening of ISO 9613-2, whose z is the difference between the "
+        "diffracted and the direct path length, against the acceleration "
+        "dose of ISO 2631-5, whose z names the vertical direction. The "
+        "table prints the two slopes side by side because that is the "
+        "distinction it is describing"
+    ),
+}
+
 DECLARED: dict[str, dict[tuple[str, str], str]] = {
-    "docs/reference/glossary.md": {
-        ("L", "N"): (
-            "the ambiguity table's own subject: the percentile level, whose "
-            "N is the percentage, against the sonar noise level of "
-            "ISO 18405, whose N is the noise"
-        ),
-        ("L", "s"): (
-            "likewise: the mean of the two bands adjacent to a candidate "
-            "tone, whose s is unexpanded anywhere in this corpus, against "
-            "the equivalent monopole source level of ISO 17208-2"
-        ),
-    },
+    "docs/reference/glossary.md": _GLOSSARY,
+    "site/src/content/docs/reference/glossary.mdx": _GLOSSARY,
+    "site/src/content/docs/es/reference/glossary.mdx": _GLOSSARY,
 }
 
 

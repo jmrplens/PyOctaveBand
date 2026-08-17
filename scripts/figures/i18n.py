@@ -1290,22 +1290,23 @@ _ES_EXACT = {
         r"$a_\mathrm{w}\,t^{1/4}$ (el método básico)",
     "dose [m/s$^{1.75}$]": "dosis [m/s$^{1{,}75}$]",
     # spinal_response_peaks: the ISO 2631-5 response and its counted peaks.
-    "$a_z(t)$, conditioned seat acceleration":
-        "$a_z(t)$, aceleración acondicionada del asiento",
-    "$A_z(t)$, spinal response (Formula 2)":
-        "$A_z(t)$, respuesta espinal (Fórmula 2)",
+    r"$a_\mathrm{z}(t)$, conditioned seat acceleration":
+        r"$a_\mathrm{z}(t)$, aceleración acondicionada del asiento",
+    r"$A_\mathrm{z}(t)$, spinal response (Formula 2)":
+        r"$A_\mathrm{z}(t)$, respuesta espinal (Fórmula 2)",
     "(a)  The seat-to-spine filter turns an impact into a ringing response":
         "(a)  El filtro asiento-columna convierte un impacto en una "
         "respuesta que resuena",
-    "(b)  Each peak's share of $\\sum A_{z,i}^6$ — dose $D_z$ = 32.5 m/s²":
-        "(b)  La parte de cada pico en $\\sum A_{z,i}^6$ — dosis $D_z$ = "
-        "32,5 m/s²",
+    "(b)  Each peak's share of $\\sum A_{\\mathrm{z},i}^6$ — "
+    "dose $D_\\mathrm{z}$ = 32.5 m/s²":
+        "(b)  La parte de cada pico en $\\sum A_{\\mathrm{z},i}^6$ — "
+        "dosis $D_\\mathrm{z}$ = 32,5 m/s²",
     "0.4 s of free fall at $-1\\,g$:\n"
     "the 0.01 Hz high pass of 5.1.3 keeps it":
         "0,4 s de caída libre a $-1\\,g$:\n"
         "el paso alto de 0,01 Hz de 5.1.3 la conserva",
-    "28 counted positive peaks $A_{z,i}$":
-        "28 picos positivos contabilizados $A_{z,i}$",
+    r"28 counted positive peaks $A_{\mathrm{z},i}$":
+        r"28 picos positivos contabilizados $A_{\mathrm{z},i}$",
     "a third of the largest peak: below this, no contribution":
         "un tercio del pico mayor: por debajo, sin contribución",
     # hav_vwf_lifetime: the ISO 5349-1 Annex C years-to-VWF curve.

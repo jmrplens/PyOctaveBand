@@ -59,13 +59,13 @@ libre), se aplican el apartado 5 y el Anexo C.
 
 ## 1. Conseguir el registro (apartados 5.1.2 y 5.1.4)
 
-Todo lo que viene después parte de un $a_z(t)$ medido, y la ISO 2631-5 añade
+Todo lo que viene después parte de un $a_\mathrm{z}(t)$ medido, y la ISO 2631-5 añade
 cuatro requisitos de adquisición sobre los de la ISO 2631-1, cada uno propio de
 la exposición a choques.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_iso2631_5_setup_es.svg" alt="Izquierda: la banqueta del asiento en sección con las tuberosidades isquiáticas de un ocupante sentado apoyadas sobre el disco de montaje semirrígido de ISO 10326-1 de 250 más menos 50 mm de diámetro y 12 mm de altura como máximo, que sostiene un disco metálico de 75 más menos 5 mm por 1,5 mm para los acelerómetros, fijado con cinta al cojín, con un interruptor de contacto al lado y el eje z positivo hacia craneal, sobre un asiento con suspensión. Derecha: una aceleración registrada con dos ventanas sombreadas en las que se pierde el contacto, excluidas de la exposición, que parten el registro en tres tramos de contacto que se acondicionan por separado. Debajo: los requisitos de equipo del apartado 5.1.2 y el requisito de duración del apartado 5.1.4" width="94%" />
 
-**Dónde (5.1.2).** $a_z(t)$ se mide en la interfaz entre el asiento y las
+**Dónde (5.1.2).** $a_\mathrm{z}(t)$ se mide en la interfaz entre el asiento y las
 **tuberosidades isquiáticas**. La ubicación de medida sobre el asiento y el
 diseño del disco de acelerómetros sobre la almohadilla siguen la
 **ISO 10326-1**: un disco semirrígido moldeado de 250 ± 50 mm de diámetro y
@@ -159,15 +159,15 @@ print(high.shape, low.shape)                          # (1, 6) (2, 6)
 Una función de transferencia asiento-columna $H(f)$ (un cero complejo y seis
 polos complejos, transmisibilidad unidad a 0 Hz y una resonancia cerca de 5 Hz)
 transforma la aceleración acondicionada del asiento en la respuesta espinal
-vertical $A_z(t)$ (Fórmula 1/2):
+vertical $A_\mathrm{z}(t)$ (Fórmula 1/2):
 
 $$
-A_z(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_z(t)]\right].
+A_\mathrm{z}(t) = \mathcal{F}^{-1}\!\left[H(f)\,\mathcal{F}[a_\mathrm{z}(t)]\right].
 $$
 
 El acondicionamiento de la sección 2 no es opcional aquí: como $H$ es unidad a
 0 Hz por diseño, un offset de continua (la componente de gravedad de 1 g de un
-acelerómetro acoplado en continua, por ejemplo) pasa directamente a $A_z(t)$ y
+acelerómetro acoplado en continua, por ejemplo) pasa directamente a $A_\mathrm{z}(t)$ y
 corrompe los picos positivos de respuesta con los que se construye la dosis.
 
 ```python
@@ -181,11 +181,11 @@ print(round(abs(vibration.seat_to_spine_transfer([5.0])[0]), 2))  # 1.54
 ## 4. Dosis de aceleración (apartado 5.3)
 
 La **dosis de aceleración** combina los picos positivos de la respuesta
-$A_{z,i}$ (cada uno el máximo entre dos cruces por cero consecutivos) con una
+$A_{\mathrm{z},i}$ (cada uno el máximo entre dos cruces por cero consecutivos) con una
 ley de sexta potencia, de modo que dominan los choques mayores (Fórmula 3):
 
 $$
-D_z = 1{,}07\left(\sum_i A_{z,i}^{\,6}\right)^{1/6}.
+D_\mathrm{z} = 1{,}07\left(\sum_i A_{\mathrm{z},i}^{\,6}\right)^{1/6}.
 $$
 
 El 1,07 no es un apaño de calibración: la NOTA 1 al apartado 5.3 dice que la
@@ -200,7 +200,7 @@ robusto frente a cómo trate la regla de cruces por cero a los pequeños.
 
 Una dosis diaria escala la dosis medida al tiempo de exposición diario $t_\mathrm{d}$
 sobre el tiempo de medida $t_\mathrm{m}$ (Fórmula 4):
-$D_{z\mathrm{d}} = D_z\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$. Para comparar exposiciones distintas, la norma
+$D_\mathrm{zd} = D_\mathrm{z}\,(t_\mathrm{d}/t_\mathrm{m})^{1/6}$. Para comparar exposiciones distintas, la norma
 recomienda $t_\mathrm{d}$ = 8 h.
 
 ```python
@@ -247,8 +247,8 @@ print(peaks.size, round(float(peaks.max()), 1), round(float(shares.max()), 1))
 # 28 30.3 98.6
 
 fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
-ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_z(t)$")
-ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_z(t)$")
+ax_t.plot(time, seat, lw=0.9, color="#9e9e9e", label="$a_\mathrm{z}(t)$")
+ax_t.plot(time, response, lw=1.5, color="#1f77b4", label="$A_\mathrm{z}(t)$")
 ax_p.plot(time, response, lw=1.2, color="#1f77b4")
 ax_p.axhline(peaks.max() / 3.0, ls="--", color="#2ca02c")
 ax_t.legend(loc="upper left")
@@ -261,7 +261,7 @@ plt.show()
 ## 5. Riesgo de lesión (Anexo C)
 
 La dosis diaria se convierte en una **tensión compresiva** diaria
-$S_\mathrm{d} = m_z\,D_{z\mathrm{d}}$ (Fórmula C.1), donde $m_z$ (0,029 MPa por m/s² para un
+$S_\mathrm{d} = m_\mathrm{z}\,D_\mathrm{zd}$ (Fórmula C.1), donde $m_\mathrm{z}$ (0,029 MPa por m/s² para un
 hombre de 82 kg, 0,025 para una mujer de 64 kg) convierte la aceleración en
 tensión vertebral. La tensión se acumula sobre los años de exposición frente a
 la resistencia última decreciente de la columna que envejece
@@ -275,9 +275,9 @@ $$
 donde $b$ es la edad a la que empezó la exposición, $n$ el número de años de
 exposición, $i$ el contador de años $0 \le i \le n-1$ (de modo que $S_{\mathrm{u},i}$ es
 la resistencia última a la edad $b+i$) y $N$ el número de días de exposición al
-año. $S_{\mathrm{stat}} = m_z \times 9{,}81\ \mathrm{m/s^2}$ es la tensión
+año. $S_{\mathrm{stat}} = m_\mathrm{z} \times 9{,}81\ \mathrm{m/s^2}$ es la tensión
 compresiva estática que la columna ya soporta bajo la gravedad — 0,284 MPa con
-el $m_z$ masculino, 0,245 MPa con el femenino (`vibration.static_stress`) — y
+el $m_\mathrm{z}$ masculino, 0,245 MPa con el femenino (`vibration.static_stress`) — y
 $S_{\mathrm{age}}$ es la pérdida anual de resistencia última, 0,052 MPa/año en
 hombres y 0,039 MPa/año en mujeres (`vibration.ultimate_strength`, que devuelve
 5,71 MPa a los 20 años y 4,67 MPa a los 40 en un hombre). El denominador es,
@@ -419,7 +419,7 @@ plt.show()
 
 </details>
 
-El `MultipleShockResult` lleva la dosis $D_z$, la dosis diaria $D_{z\mathrm{d}}$, la
+El `MultipleShockResult` lleva la dosis $D_\mathrm{z}$, la dosis diaria $D_\mathrm{zd}$, la
 tensión compresiva $S_\mathrm{d}$, la variable de tensión $R$, la probabilidad de lesión
 y los picos de respuesta, y su `.plot()` dibuja la curva de probabilidad de
 lesión con los umbrales de riesgo del 10/50/90 % de la Tabla C.2. El modelo es
@@ -441,7 +441,7 @@ instrumentación, calibración), la rejilla del escenario de exposición (sexo d
 sujeto, la edad $b$ al inicio de la exposición, el número de años de exposición
 $n$, el número de días de exposición por año $N$ y el número de choques de
 respuesta contabilizados) y la tabla de análisis de dosis y tensión con la dosis
-de aceleración $D_z$ (Fórmula 3), la dosis diaria $D_{z\mathrm{d}}$ (Fórmula 4), la
+de aceleración $D_\mathrm{z}$ (Fórmula 3), la dosis diaria $D_\mathrm{zd}$ (Fórmula 4), la
 tensión compresiva diaria $S_\mathrm{d}$ (Fórmula C.1), la variable de tensión acumulada
 $R$ (Fórmula C.3) y la probabilidad de lesión lumbar $\Pi$ (Fórmula C.5).
 

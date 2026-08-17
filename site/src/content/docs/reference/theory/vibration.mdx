@@ -170,7 +170,7 @@ Hand-arm exposure follows ISO 5349-1:2001: $a_\mathrm{hv}$ (Eq. 1, all $k = 1$),
 exposure $A(8) = a_\mathrm{hv} \sqrt{T/T_0}$ with $T_0 = 8$ h (Eq. 2), partial
 exposures combined in quadrature (ISO 5349-2:2001, Eqs. 1–3), and the Annex C
 vascular-risk model $D_\mathrm{y} = 31.8\ A(8)^{-1.06}$ for the years to 10 %
-white-finger prevalence (unrelated to the acceleration dose $D_z$ below). The
+white-finger prevalence (unrelated to the acceleration dose $D_\mathrm{z}$ below). The
 Directive 2002/44/EC action and limit values are built in: hand-arm $A(8)$
 2.5/5.0 m/s², whole-body $A(8)$ 0.5/1.15 m/s² or VDV 9.1/21.0
 $\mathrm{m/s}^{1.75}$ (Article 3), the VDV route applying where a member state
@@ -203,19 +203,19 @@ $|H| \approx 1.54$ at 5 Hz) and accumulates the positive spinal-response peaks w
 sixth-power (Palmgren-Miner) dose (clause 5.3, Formulae 3/4):
 
 $$
-D_z = 1.07 \left( \sum_i A_{z,i}^6 \right)^{1/6}, \qquad
-D_{z\mathrm{d}} = D_z\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
+D_\mathrm{z} = 1.07 \left( \sum_i A_{\mathrm{z},i}^6 \right)^{1/6}, \qquad
+D_\mathrm{zd} = D_\mathrm{z}\ (t_\mathrm{d} / t_\mathrm{m})^{1/6}.
 $$
 
-Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_z D_{z\mathrm{d}}$
-($m_z = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
+Annex C converts the daily dose to a compressive stress $S_\mathrm{d} = m_\mathrm{z} D_\mathrm{zd}$
+($m_\mathrm{z} = 0.029/0.025$ MPa per m/s² for the 82 kg male / 64 kg female), tracks
 the age-declining ultimate strength $S_\mathrm{u} = 6.75 - S_\mathrm{age}(b + i)$ and forms
 the cumulative stress variable $R$ (Formulae C.3/C.4), mapped to an injury
 probability by the Table C.1 Weibull law $\Pi = 1 - e^{-(R/\alpha)^\beta}$.
 The spinal filter is evaluated analytically in the frequency domain and
 validated against the Annex D 256 Hz digital-filter tabulation within the
 clause 5.2 tolerance; the Annex C worked example (five 40 m/s² shocks per day
-over 20 years) is reproduced: $D_{z\mathrm{d}} = 55.97$ m/s², $R = 1.22$,
+over 20 years) is reproduced: $D_\mathrm{zd} = 55.97$ m/s², $R = 1.22$,
 $\Pi = 0.37$. The Annex A finite-element spinal model (distributed by ISO as
 separate software) is out of scope.
 
