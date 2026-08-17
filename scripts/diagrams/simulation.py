@@ -25,23 +25,23 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
     # --- Inputs (two feeder boxes) -----------------------------------------
     iw = 320.0
     s.rect(x0, 48, iw, bh, th.panel, th.fg, rx=10, sw=2)
-    s.text(x0 + iw / 2, 72, "Domain  $c(x, y)$, $ρ(x, y)$, $dx$", 17, th.fg,
+    s.text(x0 + iw / 2, 72, "Domain  $c(x, y)$, $ρ(x, y)$, $dx$", 15, th.fg,
            "middle", bold=True)
     s.text(x0 + iw / 2, 92, "square cells; dt from the Courant number",
-           13, th.muted, "middle")
+           11, th.muted, "middle")
     s.rect(x0 + bw - iw, 48, iw, bh, th.panel, th.fg, rx=10, sw=2)
-    s.text(x0 + bw - iw / 2, 72, "Geometry and boundaries", 17, th.fg,
+    s.text(x0 + bw - iw / 2, 72, "Geometry and boundaries", 15, th.fg,
            "middle", bold=True)
     s.text(x0 + bw - iw / 2, 92,
-           "rigid, impedance or absorbing edges; obstacles", 13,
+           "rigid, impedance or absorbing edges; obstacles", 11,
            th.muted, "middle")
     s.arrow(x0 + iw / 2, 106, cx - 60, 150, th.fg, 1.8)
     s.arrow(x0 + bw - iw / 2, 106, cx + 60, 150, th.fg, 1.8)
 
     def _step(y: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y, bw, bh, th.panel, color, rx=10, sw=2)
-        s.text(cx, y + 25, l1, 17, th.fg, "middle", bold=True)
-        s.text(cx, y + 45, l2, 13, th.muted, "middle")
+        s.text(cx, y + 25, l1, 15, th.fg, "middle", bold=True)
+        s.text(cx, y + 45, l2, 11, th.muted, "middle")
 
     _step(150, "Sources  $s(t)$ injected at cells  (Eq. 4.11-4.12 grid)",
           "Gaussian pulse, ramped tone or arbitrary sampled signal", th.fg)
@@ -57,8 +57,8 @@ def _d_fdtd(s: SVG, th: Theme) -> None:
     # --- Output -------------------------------------------------------------
     s.rect(x0, 414, bw, bh, "none", th.primary, rx=10, sw=2.4)
     s.text(cx, 439, "FDTDResult:  probe histories $p(t)$, field snapshots, .plot()",
-           17, th.fg, "middle", bold=True)
-    s.text(cx, 459, "deterministic: same inputs, bit-identical outputs", 13,
+           15, th.fg, "middle", bold=True)
+    s.text(cx, 459, "deterministic: same inputs, bit-identical outputs", 11,
            th.muted, "middle")
 
 
@@ -122,7 +122,7 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
     for arrow_col in (240, 400, 580, 740):
         s.arrow(gx(arrow_col), y_src + 4, gx(arrow_col), y_src + 26,
                 th.primary, 1.6)
-    s.text(gx(490), y_src + 34, "PlaneWaveSource(\"down\", offset = 60)", 15,
+    s.text(gx(490), y_src + 34, "PlaneWaveSource(\"down\", offset = 60)", 13,
            th.primary, "middle", bold=True)
 
     # --- The panel: five 70 mm cells, 20 mm slits on a 3 mm backing -------
@@ -145,12 +145,12 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
         (cx1, gy(173), cx1 + 22, gy(173), cx1 + 34, gy(173) + 5),
     ):
         s.arrow(ax, ay, bx, by, th.secondary, 1.6)
-        s.text(lx, ly, "$n$", 15, th.secondary, "middle", bold=True)
+        s.text(lx, ly, "$n$", 13, th.secondary, "middle", bold=True)
 
     # Two clearances worth drafting; the other two are in the notes.
     s.dim(gx(178), cy0, gx(178), py_t, "40", offset=0, label_side="left",
-          size=15)
-    s.dim(gx(sponge), gy(300), cx0, gy(300), "60", offset=0, size=15)
+          size=13)
+    s.dim(gx(sponge), gy(300), cx0, gy(300), "60", offset=0, size=13)
     s.line(cx0, cy1, cx0, gy(304), th.muted, 0.9, dash="3,3")
     s.line(gx(sponge), gy(sponge), gx(sponge), gy(304), th.muted, 0.9,
            dash="3,3")
@@ -158,7 +158,7 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
     # --- Far field: an arc that is deliberately outside the domain --------
     ox, oy = gx(490), py_t                     # far-field origin
     s.circle(ox, oy, 5.0, th.accent)
-    s.text(ox, gy(148), "far-field origin: the centre of the panel face", 14,
+    s.text(ox, gy(148), "far-field origin: the centre of the panel face", 12,
            th.accent, "middle", bold=True)
     r = 322.0
     pts = []
@@ -173,27 +173,27 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
         s.arrow(ox + 0.62 * r * math.sin(a), oy - 0.62 * r * math.cos(a),
                 ox + r * math.sin(a), oy - r * math.cos(a), th.accent, 1.8)
         if ang == 0.0:
-            s.text(ox + 12, oy - r + 30, lab, 16, th.accent, "start",
+            s.text(ox + 12, oy - r + 30, lab, 14, th.accent, "start",
                    bold=True)
         else:
             s.text(ox + (r + 12) * math.sin(a), oy - r * math.cos(a) - 14,
-                   lab, 16, th.accent, anc, bold=True)
+                   lab, 14, th.accent, anc, bold=True)
     s.line(ox, oy, ox, oy - 0.6 * r, th.accent, 1.0, dash="4,4")
     s.text(ox, oy - r - 40,
            "The far field is evaluated at $r → ∞$, and lives nowhere on the "
-           "grid:", 17, th.accent, "middle", bold=True)
+           "grid:", 15, th.accent, "middle", bold=True)
     s.text(ox, oy - r - 18,
            "far_field_from_contour propagates the captured phasors with the "
-           "free-space Green function", 15, th.muted, "middle")
+           "free-space Green function", 13, th.muted, "middle")
 
     # --- Legend and notes -------------------------------------------------
     ny = gy(346) + 30
     _hatch_band(s, th, x0, ny - 13, 26, 16)
-    s.text(x0 + 34, ny, "sponge, 60 cells", 15, th.fg, "start")
+    s.text(x0 + 34, ny, "sponge, 60 cells", 13, th.fg, "start")
     s.line(x0 + 168, ny - 5, x0 + 204, ny - 5, th.secondary, 2.4)
-    s.text(x0 + 212, ny, "capture contour", 15, th.fg, "start")
+    s.text(x0 + 212, ny, "capture contour", 13, th.fg, "start")
     s.line(x0 + 350, ny - 5, x0 + 386, ny - 5, th.primary, 2.6)
-    s.text(x0 + 394, ny, "plane-wave injection line", 15, th.fg, "start")
+    s.text(x0 + 394, ny, "plane-wave injection line", 13, th.fg, "start")
 
     notes = (
         (("Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz "
@@ -208,7 +208,7 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
           "ContourPhasors.subtract() removes the grid residual"), th.muted),
     )
     for k, (txt, col) in enumerate(notes):
-        s.text(x0, ny + 32 + 24 * k, txt, 15, col, "start")
+        s.text(x0, ny + 32 + 24 * k, txt, 13, col, "start")
 
 
 def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
@@ -247,21 +247,21 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
         for hx in range(int(x0) + 6, int(x1) - 4, 14):
             s.line(hx, bot, hx + 12, bot - 12, th.muted, 0.8)
         s.line(x0, y_if, x1, y_if, th.primary, 2.6)
-        s.text((x0 + x1) / 2, top - 16, head, 16, th.fg, "middle", bold=True)
+        s.text((x0 + x1) / 2, top - 16, head, 14, th.fg, "middle", bold=True)
         for k, (txt, col, bold) in enumerate(cap):
-            s.text((x0 + x1) / 2, 482 + 22 * k, txt, 15 if bold else 14, col,
+            s.text((x0 + x1) / 2, 482 + 22 * k, txt, 13 if bold else 12, col,
                    "middle", bold=bold)
 
     # --- (a) normal incidence ---------------------------------------------
     ax = 180.0
-    s.text(48, top + 18, "water 1480", 13, th.muted, "start")
-    s.text(48, y_if + 20, "steel 5900 / 3200", 13, th.muted, "start")
+    s.text(48, top + 18, "water 1480", 11, th.muted, "start")
+    s.text(48, y_if + 20, "steel 5900 / 3200", 11, th.muted, "start")
     s.arrow(ax - 26, top + 30, ax - 26, y_if - 8, th.fg, 2.2)
     s.arrow(ax + 26, y_if - 8, ax + 26, top + 30, th.accent, 2.2)
-    s.text(ax - 34, top + 74, "incident", 14, th.fg, "end")
-    s.text(ax + 34, top + 74, "reflected", 14, th.accent, "start")
+    s.text(ax - 34, top + 74, "incident", 12, th.fg, "end")
+    s.text(ax + 34, top + 74, "reflected", 12, th.accent, "start")
     s.arrow(ax, y_if + 8, ax, y_if + 72, th.primary, 2.0)
-    s.text(ax + 10, y_if + 56, "P only", 14, th.primary, "start")
+    s.text(ax + 10, y_if + 56, "P only", 12, th.primary, "start")
 
     # --- (b) oblique incidence with mode conversion -----------------------
     bx = 470.0
@@ -277,19 +277,19 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
         s.arrow(bx, y_if + 4, bx + 88 * math.sin(a), y_if + 88 * math.cos(a),
                 col, 2.0)
         s.text(bx + 98 * math.sin(a) + 6, y_if + 88 * math.cos(a) + 5, lab,
-               15, col, "start", bold=True)
-    s.text(bx - 12, y_if - 58, "$θ$", 16, th.fg, "end")
+               13, col, "start", bold=True)
+    s.text(bx - 12, y_if - 58, "$θ$", 14, th.fg, "end")
     s.circle(bx, y_if - 96, 5.5, th.primary)
-    s.text(bx + 12, y_if - 116, "probe on the normal,", 13, th.primary,
+    s.text(bx + 12, y_if - 116, "probe on the normal,", 11, th.primary,
            "start")
-    s.text(bx + 12, y_if - 100, "0.12 m up", 13, th.primary, "start")
+    s.text(bx + 12, y_if - 100, "0.12 m up", 11, th.primary, "start")
 
     # --- (c) the Scholte case ---------------------------------------------
     cx = 755.0
-    s.text(628, top + 18, "water 1500", 13, th.muted, "start")
-    s.text(628, y_if + 74, "sediment 3500 / 2000", 13, th.muted, "start")
+    s.text(628, top + 18, "water 1500", 11, th.muted, "start")
+    s.text(628, y_if + 74, "sediment 3500 / 2000", 11, th.muted, "start")
     s.circle(cx - 78, y_if - 92, 6.0, th.secondary)
-    s.text(cx - 68, y_if - 96, "shot, 10 m up", 13, th.secondary, "start")
+    s.text(cx - 68, y_if - 96, "shot, 10 m up", 11, th.secondary, "start")
     pts = []
     for k in range(41):
         pts.append(f"{cx - 46 + 2.7 * k:.1f} "
@@ -298,9 +298,9 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
     for dy in (-34.0, 34.0):
         s.line(cx - 46, y_if + dy, cx + 62, y_if + dy, th.primary, 1.0,
                dash="3,4")
-    s.text(cx + 6, y_if - 46, "evanescent both sides", 13, th.muted)
+    s.text(cx + 6, y_if - 46, "evanescent both sides", 11, th.muted)
     s.arrow(cx + 68, y_if - 14, cx + 110, y_if - 14, th.accent, 1.8)
-    s.text(cx + 89, y_if - 20, "1436 m/s", 13, th.accent)
+    s.text(cx + 89, y_if - 20, "1436 m/s", 11, th.accent)
 
     # --- Where the interface physically is --------------------------------
     ix0, iy0 = 190.0, 556.0
@@ -311,21 +311,21 @@ def _d_elastic_fluid_solid(s: SVG, th: Theme) -> None:
                th.muted, 0.8, dash="3,3")
     s.line(ix0 + 26, iy0 + 20, ix0 + 146, iy0 + 20, th.muted, 0.8, dash="3,3")
     s.line(ix0 + 26, iy0 + 76, ix0 + 146, iy0 + 76, th.muted, 0.8, dash="3,3")
-    s.text(ix0 + 86, iy0 + 16, "last fluid row", 13, th.muted)
-    s.text(ix0 + 86, iy0 + 90, "first solid row", 13, th.muted)
+    s.text(ix0 + 86, iy0 + 16, "last fluid row", 11, th.muted)
+    s.text(ix0 + 86, iy0 + 90, "first solid row", 11, th.muted)
     s.text(ix0 + 164, iy0 + 30,
-           "A region painted from row $i$ down puts the contact on the", 14,
+           "A region painted from row $i$ down puts the contact on the", 12,
            th.fg, "start")
     s.text(ix0 + 164, iy0 + 52,
-           "face plane $y = i·dx$: density averaged arithmetically onto", 14,
+           "face plane $y = i·dx$: density averaged arithmetically onto", 12,
            th.fg, "start")
     s.text(ix0 + 164, iy0 + 74,
-           "the faces, shear modulus harmonically onto the corners", 14,
+           "the faces, shear modulus harmonically onto the corners", 12,
            th.fg, "start")
 
     s.text(450, 686,
            "Sponge bands line the outer edges of every panel; no side is "
-           "both free and absorbing", 14, th.muted)
+           "both free and absorbing", 12, th.muted)
 
 
 def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
@@ -366,17 +366,17 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
         (374.0, gy(0.355), "painted into WATER", th.muted, False),
         (430.0, gy(0.41), "probe B, 50 mm below", th.primary, True),
     ):
-        s.text(232.0, y_txt, txt, 14, colour, "end", bold=bold)
+        s.text(232.0, y_txt, txt, 12, colour, "end", bold=bold)
         if bold:
             leader(y_txt, y_feat, colour)
 
     s.dim(x_r + 42, y_top, x_r + 42, y_bot, "0.75 m", offset=0,
-          label_side="right", size=15)
+          label_side="right", size=13)
     s.line(x_r, y_top, x_r + 42, y_top, th.muted, 0.9, dash="3,3")
     s.line(x_r, y_bot, x_r + 42, y_bot, th.muted, 0.9, dash="3,3")
-    s.text((x_l + x_r) / 2, 616.0, "Three cells wide:", 14, th.muted)
+    s.text((x_l + x_r) / 2, 616.0, "Three cells wide:", 12, th.muted)
     s.text((x_l + x_r) / 2, 636.0, "a 1D problem in a 2D solver, dx = 0.5 mm",
-           14, th.muted)
+           12, th.muted)
 
     # --- What the two probes record ---------------------------------------
     tx0, tw = 408.0, 420.0
@@ -395,34 +395,34 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
     s.rect(tx0, ta - 44, x_gate - tx0, 44, th.panel, th.accent, sw=1.4,
            dash="5,4")
     s.text((tx0 + x_gate) / 2, ta - 52, "65 µs gate: the incident pulse alone",
-           14, th.accent, bold=True)
+           12, th.accent, bold=True)
     for base, lab in ((ta, "probe A"), (tb, "probe B")):
         s.line(tx0, base, tx0 + tw, base, th.muted, 1.2)
-        s.text(tx0 - 10, base + 5, lab, 14, th.primary, "end", bold=True)
+        s.text(tx0 - 10, base + 5, lab, 12, th.primary, "end", bold=True)
     _pulse(47.0, ta, th.secondary, 30.0)
     _pulse(88.0, ta, th.fg, 18.0)
-    s.text(tx0 + tw * 47.0 / 160.0, ta + 20, "incident, 47 µs", 13,
+    s.text(tx0 + tw * 47.0 / 160.0, ta + 20, "incident, 47 µs", 11,
            th.secondary)
-    s.text(tx0 + tw * 88.0 / 160.0, ta + 20, "reflection, 88 µs", 13, th.fg)
+    s.text(tx0 + tw * 88.0 / 160.0, ta + 20, "reflection, 88 µs", 11, th.fg)
     _pulse(74.0, tb, th.primary, 13.0)
-    s.text(tx0 + tw * 74.0 / 160.0, tb - 44, "transmitted ring-down;", 13,
+    s.text(tx0 + tw * 74.0 / 160.0, tb - 44, "transmitted ring-down;", 11,
            th.primary)
-    s.text(tx0 + tw * 74.0 / 160.0, tb - 28, "no echo in the record", 13,
+    s.text(tx0 + tw * 74.0 / 160.0, tb - 28, "no echo in the record", 11,
            th.muted)
     for tick in (0, 40, 80, 120, 160):
         xx = tx0 + tw * tick / 160.0
         s.line(xx, tb + 6, xx, tb + 13, th.muted, 1.0)
-        s.text(xx, tb + 30, str(tick), 12, th.muted)
-    s.text(tx0 + tw / 2, tb + 52, "time [µs]", 13, th.muted)
+        s.text(xx, tb + 30, str(tick), 10, th.muted)
+    s.text(tx0 + tw / 2, tb + 52, "time [µs]", 11, th.muted)
 
-    s.text(618, 400, "$TL(f) = 20 log_{10} |I(f) / T(f)|$", 20, th.fg,
+    s.text(618, 400, "$TL(f) = 20 log_{10} |I(f) / T(f)|$", 17, th.fg,
            bold=True)
-    s.text(618, 424, "$I$ from the gated probe A, $T$ from probe B", 14,
+    s.text(618, 424, "$I$ from the gated probe A, $T$ from probe B", 12,
            th.muted)
 
     # --- The half-wave resonance inside the plate -------------------------
     s.rect(408, 448, 420, 140, "none", th.muted, rx=10, sw=1.4, dash="6,5")
-    s.text(618, 476, "Inside the plate, at half-wave thickness", 16, th.fg,
+    s.text(618, 476, "Inside the plate, at half-wave thickness", 14, th.fg,
            bold=True)
     pl, pr, pmid = 528.0, 708.0, 508.0
     s.rect(pl, pmid - 16, pr - pl, 32, th.muted, th.fg, sw=1.4)
@@ -431,7 +431,7 @@ def _d_immersed_plate_tl(s: SVG, th: Theme) -> None:
         xx = pl + (pr - pl) * k / 60.0
         pts.append(f"{xx:.1f} {pmid - 22 * math.sin(math.pi * k / 60.0):.1f}")
     s.path("M " + " L ".join(pts), stroke=th.accent, sw=2.2)
-    s.text(618, 550, "$f_n = n c_P / (2h)$ = 295 kHz for 10 mm of steel", 15,
+    s.text(618, 550, "$f_n = n c_P / (2h)$ = 295 kHz for 10 mm of steel", 13,
            th.accent, bold=True)
     s.text(618, 572, "the plate goes transparent there, three decades "
-           "above audio", 13, th.muted)
+           "above audio", 11, th.muted)

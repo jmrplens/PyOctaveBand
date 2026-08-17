@@ -16,7 +16,10 @@ pinned matplotlib wheel, the same family and the same pin that sets the
 figures, so a plate and a figure sitting on one documentation page are
 set in one typeface instead of two. Nothing else fixes the plates'
 metrics -- the compositions are held against these advances by the
-canvas's fit gate and by the census below. **Coverage is the chain**,
+canvas's fit gate and by the census below, and because this face runs
+about 16 % wider than the Helvetica-metric one the corpus was composed
+in, the plates' type scale is stated in its px and not in the old
+face's (see :mod:`diagrams.canvas`). **Coverage is the chain**,
 not the primary face: a glyph the primary lacks falls back per-cluster
 to the next face, resolved deterministically at generation time --
 which replaces the silent, machine-dependent fontconfig substitution

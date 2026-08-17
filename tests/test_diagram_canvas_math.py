@@ -357,7 +357,7 @@ def test_translation_happens_before_composition(
 
 def test_fit_gate_raises_on_overflow_and_passes_the_boundary() -> None:
     svg = SVG(900, 560, LIGHT)
-    width = measure(_label_runs("overhang"), 20)
+    width = measure(_label_runs("overhang"), 17)
     # Just inside the half-pixel grace: no error.
     svg.text(900 - width + 0.4, 100, "overhang", anchor="start")
     assert svg.parts
@@ -386,9 +386,9 @@ def test_render_routes_the_title_through_the_same_emission() -> None:
     assert _uses(plain, _BOLD) >= 2  # bold outlined glyphs, defs + uses
     composed = SVG(900, 560, LIGHT).render("Rating $R_w$ measured")
     assert "<title>Rating $R_w$ measured</title>" in composed
-    # The w subscript drops 0.22 of the 26 px title: y = 30 + 5.72, at
+    # The w subscript drops 0.22 of the 22 px title: y = 30 + 4.84, at
     # 0.7 of the title size.
-    assert "35.72) scale(0.182 -0.182)" in composed
+    assert "34.84) scale(0.154 -0.154)" in composed
     assert _uses(composed, _BOLDITAL)
     assert "<text" not in composed
     assert "xml:space" not in composed
@@ -397,23 +397,35 @@ def test_render_routes_the_title_through_the_same_emission() -> None:
 def test_title_steps_down_only_as_far_as_the_sheet_demands() -> None:
     svg = SVG(900, 560, LIGHT)
     assert svg.title_size("Plain title") == canvas._TITLE_SIZES[0]
-    # Each step is taken at the width the step above stops clearing the
-    # sheet at, and the floor is returned rather than a fifth step.
+    # Each step is taken at the width the step above stops keeping its
+    # margin at, and the floor is returned rather than a further step.
+    room = 900 - 2 * canvas._TITLE_MARGIN
     for larger, smaller in zip(canvas._TITLE_SIZES, canvas._TITLE_SIZES[1:]):
-        wide = "W" * (int(900 / measure(_label_runs("W", bold=True), larger)) + 1)
+        wide = "W" * (int(room / measure(_label_runs("W", bold=True), larger)) + 1)
         assert svg.title_size(wide) <= smaller
     assert svg.title_size("W" * 200) == canvas._TITLE_SIZES[-1]
 
 
+def test_title_steps_down_for_the_margin_not_only_for_the_sheet() -> None:
+    # A title that clears the sheet at the top size but eats into the
+    # white the plate keeps at its edges still steps down: the defect
+    # this catches is a title reading as if it had run off the page.
+    svg = SVG(900, 560, LIGHT)
+    unit = measure(_label_runs("W", bold=True), canvas._TITLE_SIZES[0])
+    wide = "W" * int((900 - canvas._TITLE_MARGIN) / unit)
+    assert measure(_label_runs(wide, bold=True), canvas._TITLE_SIZES[0]) < 900
+    assert svg.title_size(wide) < canvas._TITLE_SIZES[0]
+
+
 def test_a_stepped_down_title_carries_its_scripts_down_with_it() -> None:
     # Long enough to need the floor, short enough that the floor holds it.
-    title = "Rating $R_w$ against a reference" + " curve" * 6
-    assert SVG(900, 560, LIGHT).title_size(title) == 22
+    title = "Rating $R_w$ against a reference" + " curve" * 8
+    assert SVG(900, 560, LIGHT).title_size(title) == 20
     out = SVG(900, 560, LIGHT).render(title)
     # The w subscript drops 0.22 of the size the element got, not of the
-    # nominal one: y = 30 + 4.84, at 0.7 of 22 px.
-    assert "34.84) scale(0.154 -0.154)" in out
-    assert "35.72) scale(0.182 -0.182)" not in out
+    # nominal one: y = 30 + 4.40, at 0.7 of 20 px.
+    assert "34.4) scale(0.14 -0.14)" in out
+    assert "34.84) scale(0.154 -0.154)" not in out
 
 
 def test_emission_carries_no_style_attribute_and_no_checker_ids() -> None:

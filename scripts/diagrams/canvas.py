@@ -9,6 +9,22 @@ the technical-drawing helpers a setup diagram needs (dimension lines,
 microphones on stands, people, hatched ground). :func:`_write` renders a
 builder the four ways the documentation embeds it: English and Spanish,
 each light and dark.
+
+**The type scale is the face's.** Every ``size`` in a builder is px of
+the face :mod:`diagrams.outline` sets, and that face changed: DejaVu
+runs about 16 % wider than the Helvetica-metric face this corpus was
+composed in, measured over all 6 552 labels of the corpus in both
+languages. A px of the old face is therefore not a px of this one, and
+the sizes were converted once, corpus-wide, at 0.86 with a floor of
+10 px -- the same conversion the title took when it went from 26 px to
+22. Nothing else would do: a plate is a hand-tuned composition where
+every label was measured into a box, a column or a gap, and 16 % of
+extra advance on 6 552 labels is not a set of local defects to patch
+but one metric to restore. Sizes are integers because the corpus's are,
+and the floor exists because 9 px of caption is not a caption.
+
+A size chosen for a new label is px of *this* face; do not convert it
+again.
 """
 
 from __future__ import annotations
@@ -117,28 +133,39 @@ _SUP_RISE = -0.38
 _SCRIPT_SCALE = 0.70
 
 #: Font sizes :meth:`SVG.render` will set the title across the top at,
-#: largest first, the first that clears the sheet winning.
+#: largest first, the first that leaves :data:`_TITLE_MARGIN` of white at
+#: each sheet edge winning. 22 px is the corpus title size, the other two
+#: are its steps down.
 #:
 #: The title is the one label of a plate whose width nobody chose. Every
 #: other label is written into a box, a column or a gap the builder knows
 #: the size of; the title is a sentence centred on the sheet, and the
 #: sheet edge is the only thing holding it. Half the corpus is written
 #: right up to that edge, so a single fixed size makes the whole set
-#: hostage to the widest glyph the family draws.
+#: hostage to the longest sentence the two languages produce -- and it is
+#: the Spanish twin that is longest almost every time.
 #:
 #: Stepping down is what the plates already do wherever a label has to
 #: clear something it did not choose -- a stage-box title measures itself
 #: against its box and drops a step -- and this is that decision taken
-#: against the sheet. The floor is 22 px, not lower, because 22 px of
-#: DejaVu is about what 26 px of the narrower face this corpus used to
-#: set read as: the same apparent size and the same line length, not a
-#: shrunken title. A title that will not clear the sheet at 22 px is a
-#: composition to rewrite, and the fit gate in :meth:`_emit_text` is what
+#: against the sheet. Two steps are enough: no title in the corpus, in
+#: either language, reaches the floor, so a title that does is a
+#: composition to rewrite and the fit gate in :meth:`_emit_text` is what
 #: catches one.
 #:
 #: The ``$...$`` composer scales scripts against the size the element is
 #: given, so a stepped-down title carries its subscripts down with it.
-_TITLE_SIZES = (26, 24, 22)
+_TITLE_SIZES = (22, 21, 20)
+
+#: White the title has to keep at each sheet edge, in px.
+#:
+#: The measure is a margin and not "does it overflow" because the failure
+#: this catches is not an overflowing title, which the fit gate would
+#: refuse anyway: it is a title whose first and last letters sit on the
+#: sheet border while every other element of the plate keeps 30 px or
+#: more, so the title alone reads as having run off the page. 30 px is
+#: what the artwork below it keeps.
+_TITLE_MARGIN = 30
 
 
 def _esc(s: str) -> str:
@@ -450,7 +477,7 @@ class SVG:
         return measure(runs, size) if runs else 0.0
 
     def title_size(self, t: str) -> int:
-        """The largest of :data:`_TITLE_SIZES` the title clears the sheet at.
+        """The largest of :data:`_TITLE_SIZES` the title keeps its margin at.
 
         Takes the title *already translated*, so the string measured is
         the one the sheet will draw -- the Spanish of a plate runs about a
@@ -461,11 +488,11 @@ class SVG:
         """
         runs = _label_runs(t, bold=True)
         for size in _TITLE_SIZES:
-            if measure(runs, size) <= self.w:
+            if measure(runs, size) <= self.w - 2 * _TITLE_MARGIN:
                 return size
         return _TITLE_SIZES[-1]
 
-    def text(self, x: float, y: float, s: str, size: int = 20,
+    def text(self, x: float, y: float, s: str, size: int = 17,
              fill: str = "", anchor: str = "middle", bold: bool = False,
              mono: bool = False, italic: bool = False) -> None:
         s = self.tr(s)
@@ -523,7 +550,7 @@ class SVG:
                   f"L {bx - W * px:.1f} {by - W * py:.1f} Z", fill=stroke)
 
     def dim(self, x1: float, y1: float, x2: float, y2: float, label: str,
-            offset: float = 0.0, size: int = 18, label_side: str = "left") -> None:
+            offset: float = 0.0, size: int = 15, label_side: str = "left") -> None:
         """Dimension between two measured points, drafting style.
 
         The dimension line is placed ``offset`` px away (perpendicular);
