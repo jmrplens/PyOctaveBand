@@ -32,6 +32,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Eq. (3.92) has nothing to converge to. New section in the underwater solvers
   guide with its own figure, the caustic and the shadow zone behind it, in
   English and Spanish.
+- The beams can carry the water's own absorption. `gaussian_beams` accepts
+  `absorption_model` (`"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`,
+  the same names, arguments and defaults as `seawater_absorption`, off by
+  default so every published validation number stays reproducible bit for bit)
+  and multiplies each beam by `exp(-alpha s)` with `s` the arc length along
+  its central ray, which is Jensen Sect. 3.6.2 as printed (Eq. 3.116): the
+  loss integral runs along the path flown, not along the range axis, and the
+  `alpha r` shortcut the section notes "is used in many ray models"
+  under-charges every steep or multiply-reflected path by the obliquity of its
+  climb. The ray marcher integrates that arc length as a fourth state of the
+  very Runge-Kutta stages that place the ray (`ds/dr = 1/(xi c)`), so it
+  cannot drift from the geometry actually summed, and `ray_trace` exposes it
+  per ray as `arc_lengths` next to the travel times. The applied coefficient
+  is recorded on the result (`absorption_coefficient`, dB/km, evaluated at the
+  source frequency and depth), and the oracle tests pin the absorbed free
+  field against `20 lg R + alpha R` with the alphas transcribed from the
+  published formulas independently of the closed-form module, to 2e-4 dB, with
+  a steep-receiver case whose arc length exceeds its range by 1.24 dB of loss
+  separating the two measures directly.
 - The ISO 9614-3 precision determination renders its own accredited-style
   fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
   sheet carrying what part 3 asks a report to state (clause 10), which is not

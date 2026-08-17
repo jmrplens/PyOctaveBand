@@ -153,12 +153,12 @@ field.plot()  # campo PL sobre distancia x profundidad
 
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
 `mode_functions`, `propagation_loss`); `ray_trace` un `RayTraceResult`
-(`ranges`, `depths` y `travel_times` por rayo); `gaussian_beams` un
-`GaussianBeamResult` (el campo `propagation_loss`, más el rayo central y la
-anchura de cada haz); `parabolic_equation` un `ParabolicEquationResult` (el
-campo `propagation_loss`). Los cuatro difieren en lo que aproximan, no en lo
-que modelan, así que elegir entre ellos es una cuestión de régimen: la tabla
-de la sección 6 es la respuesta corta.
+(`ranges`, `depths`, `travel_times` y `arc_lengths` por rayo);
+`gaussian_beams` un `GaussianBeamResult` (el campo `propagation_loss`, más el
+rayo central y la anchura de cada haz); `parabolic_equation` un
+`ParabolicEquationResult` (el campo `propagation_loss`). Los cuatro difieren
+en lo que aproximan, no en lo que modelan, así que elegir entre ellos es una
+cuestión de régimen: la tabla de la sección 6 es la respuesta corta.
 
 ## 2. Modos normales: la guía de ondas como suma de ondas estacionarias
 
@@ -533,6 +533,28 @@ haces los siguen hasta 0,22 dB en media. Las dos condiciones de contorno salen
 de la propia suma de haces en vez de imponerse: el campo en una superficie o un
 fondo de presión nula es 3 partes en $10^5$ de su valor a media columna, y un
 fondo rígido lo duplica.
+
+**La absorción de volumen del agua** está desactivada por defecto, así que todos
+los números de arriba se midieron sin ella y siguen siendo reproducibles tal
+cual están impresos; el precio es que el nivel más allá de unos kilómetros a
+frecuencias de sonar resulta optimista. Pasar `absorption_model`
+(`"francois-garrison"`, `"ainslie-mccolm"` o `"thorp"`, los mismos nombres,
+argumentos y valores por defecto que
+[`seawater_absorption`](/phonometry/es/underwater/underwater-propagation/#perdida-de-propagacion))
+multiplica cada haz por $e^{-\alpha s}$ con $s$ la **longitud de arco a lo
+largo de su rayo central**, que es la §3.6.2 de Jensen tal como está impresa:
+perturbar la eikonal con la velocidad del sonido compleja que implica una
+pérdida de volumen deja en pie los rayos reales y cuelga de cada uno el factor
+$e^{-\int_0^s \alpha\,ds'}$ (Ec. 3.116). No es $\alpha r$ sobre la distancia
+horizontal, el atajo que la misma sección señala que «se usa en muchos modelos
+de rayos»: un trayecto a 60° es el doble de largo que la distancia que cubre,
+y los rebotes múltiples más inclinados de una guía de ondas son exactamente
+las llegadas que la absorción tiene que drenar. El integrador de rayos
+acumula $s$ con las mismas etapas Runge-Kutta que colocan el rayo
+($ds/dr = 1/(\xi c)$),
+`ray_trace` la expone por rayo como `arc_lengths`, y el coeficiente, un solo
+$\alpha$ por ejecución evaluado a la frecuencia y la profundidad de la fuente,
+queda registrado en el resultado como `absorption_coefficient`.
 
 **Dónde se acaba.** Cinco límites, en el orden en que aprietan.
 

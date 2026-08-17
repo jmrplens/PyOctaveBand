@@ -48,6 +48,7 @@ import numpy as np
 
 from ..._internal.rays import DynamicRays, march_rays
 from ..._internal.validation import require_positive
+from .closed_form import _ABSORPTION_MODELS, _M_PER_KM, seawater_absorption
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -97,7 +98,7 @@ def _ocean_ray_derivative(
 
     March in range :math:`r` (not arc length): every valid ray then spans
     ``[0, max_range]`` in the same number of steps regardless of its launch
-    angle. The state is :math:`(z, \zeta, t)` and
+    angle. The state is :math:`(z, \zeta, t, s)` and
     :math:`\xi = \cos\theta_0/c(z_\mathrm{s})` is invariant for a
     range-independent :math:`c(z)`, so from
     :math:`dz/ds`, :math:`d\zeta/ds`, :math:`dt/ds = 1/c` and
@@ -107,13 +108,17 @@ def _ocean_ray_derivative(
 
         \frac{dz}{dr} = \frac{\zeta}{\xi}, \qquad
         \frac{d\zeta}{dr} = -\frac{dc/dz}{c^3 \xi}, \qquad
-        \frac{dt}{dr} = \frac{1}{\xi c^2} .
+        \frac{dt}{dr} = \frac{1}{\xi c^2}, \qquad
+        \frac{ds}{dr} = \frac{1}{\xi c} .
 
     The time shares the sound speed the other two derivatives already need, so
     carrying it costs one multiply per stage and inherits the Runge-Kutta order:
     at the default step it reproduces the linear-gradient closed form to
     ~1e-14 s, where accumulating :math:`dr/(\xi c^2)` over the finished path
-    would be first order.
+    would be first order. The arc length rides along on the same argument, and
+    is kept as its own expression rather than derived from the time's, so that
+    the three states already there come out bit for bit what they were before
+    it existed.
 
     The profile is piecewise linear, so :math:`c(z)` interpolates exactly and
     :math:`dc/dz` is piecewise *constant* with jumps at the nodes; evaluating
@@ -127,13 +132,15 @@ def _ocean_ray_derivative(
 
     def deriv(
         z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
+               NDArray[np.float64]]:
         cc = np.interp(z_arr, z_prof, c_prof)
         seg = np.where(zeta_arr >= 0.0,
                        np.searchsorted(z_prof, z_arr, side="right") - 1,
                        np.searchsorted(z_prof, z_arr, side="left") - 1)
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
-        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2))
+        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2),
+                1.0 / (xi * cc))
 
     return deriv
 
@@ -371,6 +378,16 @@ class RayTraceResult:
     :ivar depths: Per-ray depths, in metres, shape ``(n_rays, n_steps)``.
     :ivar travel_times: Per-ray cumulative travel times, in seconds, shape
         ``(n_rays, n_steps)`` (zero at the source, increasing along the ray).
+    :ivar arc_lengths: Per-ray cumulative arc length along the ray, in metres,
+        same shape (zero at the source). It is never less than the range
+        column it stands in, exceeds it by the obliquity of the path, and a
+        reflection leaves it continuous. This, and not the range, is the
+        measure seawater absorption acts along: Jensen Sect. 3.6.2 carries a
+        volume loss :math:`\\alpha` into the ray solution by perturbing the
+        eikonal and lands on :math:`e^{-\\int_0^s \\alpha(s')\\,ds'}`
+        (Eq. 3.116), an integral over the path actually flown, so a caller
+        hanging amplitudes on these rays multiplies by
+        :math:`e^{-\\alpha s}` with the :math:`s` read off here.
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
     """
@@ -379,6 +396,7 @@ class RayTraceResult:
     ranges: NDArray[np.float64]
     depths: NDArray[np.float64]
     travel_times: NDArray[np.float64]
+    arc_lengths: NDArray[np.float64]
     source_depth: float
     water_depth: float
 
@@ -409,11 +427,15 @@ def ray_trace(
     quadrature run over the finished path: with the range-invariant Snell
     parameter :math:`\xi = \cos\theta_0 / c(z_\mathrm{s})` it obeys
     :math:`dt/dr = 1/(\xi c^2)`, so it is integrated with the very stages that
-    place the ray and cannot drift from the geometry actually returned. This is
+    place the ray and cannot drift from the geometry actually returned. The arc
+    length is a fourth state on the same footing, :math:`ds/dr = 1/(\xi c)`,
+    because it is the measure volume absorption needs (see
+    :class:`RayTraceResult`) and reading it off the finished path would demote
+    it to first order. This is
     the same ray core, and the same travel-time equation, as the atmospheric
     :func:`~phonometry.environment.propagation.refraction.atmospheric_ray_paths`
     (which reflects at the ground instead of at the sea surface). Reflections
-    cost no time, so the accumulated time stays continuous across them.
+    cost no time and no path, so both odometers stay continuous across them.
 
     :param depths: Depth samples of the profile, in metres, from ``z = 0``.
     :param sound_speeds: Sound speed at each depth, in m/s.
@@ -459,6 +481,7 @@ def ray_trace(
         ranges=ray_r,
         depths=march.positions,
         travel_times=march.times,
+        arc_lengths=march.arc_lengths,
         source_depth=zs,
         water_depth=water_depth,
     )
@@ -593,6 +616,14 @@ class GaussianBeamResult:
         number.
     :ivar initial_beam_width: The :math:`W_0` of Eq. (3.91) actually used, in
         metres, whether it was passed or defaulted.
+    :ivar absorption_model: The seawater absorption model applied along the
+        beams, or ``None`` when the run propagated without volume absorption
+        (the default).
+    :ivar absorption_coefficient: The absorption coefficient :math:`\\alpha`
+        actually applied, in dB/km (0.0 when ``absorption_model`` is ``None``),
+        as :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`
+        evaluated it at the source frequency and depth. Recorded so a run's
+        loss can be decomposed without re-deriving what was subtracted.
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
     """
@@ -608,6 +639,8 @@ class GaussianBeamResult:
     beam_widths: NDArray[np.float64]
     wavefront_curvatures: NDArray[np.float64]
     initial_beam_width: float
+    absorption_model: str | None
+    absorption_coefficient: float
     source_depth: float
     water_depth: float
 
@@ -764,6 +797,9 @@ class _BeamSamples(NamedTuple):
         coefficients the central ray has accumulated by that column.
     :ivar phase: The argument of ``spreading``, unwrapped along the ray, which
         is the branch the square root of Eq. (3.88) is taken on.
+    :ivar path: Cumulative arc length of the central ray at the column, in
+        metres: the odometer the marcher integrated with the very stages that
+        placed the ray, which is what a volume absorption multiplies on.
     :ivar reach: How far in depth, at fixed range, the beam still counts:
         ``_BEAM_CUTOFF`` half-widths divided by the cosine of the local ray
         angle, at the widest point of the ray. Used to admit each beam to as
@@ -779,6 +815,7 @@ class _BeamSamples(NamedTuple):
     spreading: NDArray[np.complex128]
     slope: NDArray[np.complex128]
     time: NDArray[np.float64]
+    path: NDArray[np.float64]
     phase: NDArray[np.float64]
     weight: NDArray[np.complex128]
     reach: NDArray[np.float64]
@@ -787,7 +824,7 @@ class _BeamSamples(NamedTuple):
 def _beam_influence(
     s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
     water_depth: float, bottom_reflection: float, omega: float,
-    beam_width: float,
+    beam_width: float, attenuation: float,
 ) -> NDArray[np.complex128]:
     r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
 
@@ -867,6 +904,28 @@ def _beam_influence(
     beams are summed independently, which is the structural advantage of beam
     tracing over ray interpolation.
 
+    VOLUME ABSORPTION rides in the same exponent when ``attenuation`` is
+    nonzero. Sect. 3.6.2 derives it by perturbing the eikonal with a complex
+    sound speed: the real rays stand, and each acquires the factor
+    :math:`e^{-\int_0^s \alpha(s')\,ds'}` of Eq. (3.116), an integral along the
+    ray's own arc length, "a loss proportional to the path length times the
+    loss per meter" for constant :math:`\alpha`. The path length here is the
+    marcher's cumulative arc length at the bracketing column continued to the
+    foot of the perpendicular by :math:`c \cdot (s/c)`, the same closed-form
+    continuation the travel time takes three lines up, so the loss is charged
+    over exactly the path whose phase is summed. It is *not*
+    :math:`\alpha \times` range: the section closes by noting that adding
+    :math:`\alpha r` "is used in many ray models", and that approximation is
+    precisely what a steep or many-times-reflected path breaks, its arc length
+    exceeding its range by the obliquity the marcher already integrated. The
+    continued length is floored at zero because the foot of a perpendicular can
+    land marginally behind the source, where a negative path would read as
+    gain; the clamp is dormant everywhere the method has anything to say (the
+    near field within a few beam widths is already not to be read, see
+    :func:`gaussian_beams`).
+
+    :param attenuation: Volume absorption :math:`\alpha` in nepers per metre
+        (0.0 propagates without absorption and skips the work).
     :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
         convention Eq. (3.88) is printed in; the caller conjugates it.
     """
@@ -898,6 +957,7 @@ def _beam_influence(
         speed2d, slope2d = s.speed[rows], s.slope[rows]
         spread2d, weight2d = s.spreading[rows], s.weight[rows]
         phase2d, time2d = s.phase[rows], s.time[rows]
+        path2d = s.path[rows]
         speed = speed2d[:, :, None]
         speed_sq = speed**2
         wavelength = 2.0 * np.pi * speed / omega
@@ -930,6 +990,7 @@ def _beam_influence(
             range_at, depth_at = np.divmod(within, zr.size)
             q_hit = q_infl.ravel()[hits]
             spread_hit = spread2d[beam_at, range_at]
+            along_hit = along.ravel()[hits]
             # The travel-time phase, the tracked branch of 1/sqrt(q) and the
             # transverse Gaussian all ride in one exponent rather than three,
             # because a complex exponential over tens of millions of survivors
@@ -937,10 +998,18 @@ def _beam_influence(
             exponent = (
                 -0.5j * (phase2d[beam_at, range_at]
                          + np.angle(q_hit * np.conj(spread_hit)))
-                - 1j * omega * (time2d[beam_at, range_at] + along.ravel()[hits]
+                - 1j * omega * (time2d[beam_at, range_at] + along_hit
                                 + slope2d[beam_at, range_at] / (2.0 * q_hit)
                                 * normal.ravel()[hits] ** 2)
             )
+            if attenuation > 0.0:
+                # e^{-alpha s} of Eq. (3.116): the marched arc length continued
+                # to the foot of the perpendicular (along = s/c), floored at
+                # zero; see the docstring. Real, so it joins the exponent as
+                # pure decay whichever time convention the caller settles on.
+                exponent -= attenuation * np.maximum(
+                    path2d[beam_at, range_at]
+                    + speed2d[beam_at, range_at] * along_hit, 0.0)
             value = (
                 weight2d[beam_at, range_at] * strength
                 * np.sqrt(speed2d[beam_at, range_at] / r_infl.ravel()[hits])
@@ -1080,6 +1149,10 @@ def gaussian_beams(
     beam_width: float | None = None,
     range_step: float = 25.0,
     bottom: str = "pressure-release",
+    absorption_model: str | None = None,
+    temperature: float = 10.0,
+    salinity: float = 35.0,
+    ph: float = 8.0,
 ) -> GaussianBeamResult:
     r"""Propagation-loss field from Gaussian beam tracing.
 
@@ -1161,6 +1234,32 @@ def gaussian_beams(
       imply that the beam is large compared to the channel, which causes a
       variety of problems".
 
+    **Seawater absorption is off by default** and the field is then optimistic
+    beyond a few kilometres at sonar frequencies, exactly as ray theory without
+    a volume loss must be. Passing ``absorption_model`` multiplies each beam by
+    :math:`e^{-\alpha s}` with :math:`s` the **arc length along its central
+    ray**, which is Sect. 3.6.2 done as printed: perturbing the eikonal with
+    the complex sound speed a volume loss implies leaves the real rays standing
+    and attaches :math:`e^{-\int_0^s \alpha(s')\,ds'}` to each (Eq. 3.116),
+    an integral along the path flown, not along the range axis. The distinction
+    is not pedantry. The same section notes that adding :math:`\alpha r` to the
+    loss "is used in many ray models", and that shortcut under-charges every
+    steep or multiply-reflected path by the obliquity of its climb: a path at
+    60 degrees is twice as long as the range it covers, and it is precisely the
+    steep multiples of a waveguide that absorption is supposed to be killing.
+    The marcher integrates :math:`s` with the very Runge-Kutta stages that
+    place the ray (:math:`ds/dr = 1/(\xi c)`), so the length the loss is
+    charged over is the length of the geometry actually summed. The
+    coefficient itself comes from
+    :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`,
+    one :math:`\alpha` per run, evaluated at the source frequency and at the
+    source depth (the same point the reference sound speed :math:`c_0` is read
+    at); over a water column the coefficient's own depth terms move it by
+    around a percent per hundred metres, which is far inside the method's
+    error budget. The default stays off so the validation figures quoted
+    throughout, all measured without absorption, remain reproducible as
+    printed.
+
     What it costs is ``n_beams`` times the size of the receiver grid, and none
     of the three factors depends on the frequency: the ray core does not have to
     resolve a wavelength on a grid, and the fan only widens as
@@ -1206,6 +1305,18 @@ def gaussian_beams(
         default ``ranges_m``.
     :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
         surface is always pressure-release.
+    :param absorption_model: Seawater volume absorption applied along each
+        beam's central ray: ``"francois-garrison"``, ``"ainslie-mccolm"`` or
+        ``"thorp"``, the same models, spelled the same way, as
+        :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`.
+        Default (``None``): no volume absorption, so the published validation
+        numbers of this module are what the solver returns.
+    :param temperature: Temperature ``T`` for the absorption model, in degrees
+        Celsius (ignored when ``absorption_model`` is ``None``).
+    :param salinity: Salinity ``S`` for the absorption model, in parts per
+        thousand (ignored when ``absorption_model`` is ``None``).
+    :param ph: Acidity for the absorption model (ignored when
+        ``absorption_model`` is ``None``; Thorp ignores it always).
     :return: A :class:`GaussianBeamResult`.
     :raises ValueError: If the inputs are invalid.
     :warns PhonometryWarning: when the source sits on a kink of the profile
@@ -1231,6 +1342,20 @@ def gaussian_beams(
     theta_max = float(max_angle_deg)
     if not (0.0 < theta_max < 90.0):
         raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
+
+    absorption_key: str | None = None
+    alpha = 0.0
+    if absorption_model is not None:
+        absorption_key = absorption_model.strip().lower()
+        if absorption_key not in _ABSORPTION_MODELS:
+            raise ValueError(
+                f"'absorption_model' must be one of {_ABSORPTION_MODELS} or"
+                f" None, got {absorption_model!r}.")
+        alpha = float(seawater_absorption(
+            f, temperature=temperature, salinity=salinity, depth=zs, ph=ph,
+            model=absorption_key)[0])
+    # dB/km to nepers/m: N dB is e^(N ln 10 / 20) in amplitude.
+    attenuation = alpha * np.log(10.0) / (20.0 * _M_PER_KM)
 
     omega = 2.0 * np.pi * f
     c0 = float(np.interp(zs, z_prof, c_prof))
@@ -1275,7 +1400,8 @@ def gaussian_beams(
     field, widths, curvatures = _assemble_beam_field(
         march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
         z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
-        water_depth=water_depth, bottom_reflection=_BOTTOM_REFLECTION[key])
+        water_depth=water_depth, bottom_reflection=_BOTTOM_REFLECTION[key],
+        attenuation=attenuation)
 
     # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
     # here hands back a field in the exp(-i omega t) one the rest of the module
@@ -1299,6 +1425,8 @@ def gaussian_beams(
         beam_widths=widths,
         wavefront_curvatures=curvatures,
         initial_beam_width=float(w0),
+        absorption_model=absorption_key,
+        absorption_coefficient=alpha,
         source_depth=zs,
         water_depth=water_depth,
     )
@@ -1309,7 +1437,7 @@ def _assemble_beam_field(
     receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
     omega: float, c0: float, w0: float, water_depth: float,
-    bottom_reflection: float,
+    bottom_reflection: float, attenuation: float,
 ) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
     r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
 
@@ -1352,13 +1480,15 @@ def _assemble_beam_field(
         spreading=q[:, column],
         slope=p[:, column],
         time=march.times[:, column],
+        path=march.arc_lengths[:, column],
         phase=np.unwrap(np.angle(q), axis=1)[:, column],
         weight=(weight[:, None] * reflected[:, column]).astype(np.complex128),
         reach=_BEAM_CUTOFF * widths[:, column].max(axis=1) / cosine.min(axis=1),
     )
     field = _beam_influence(
         samples, receivers, water_depth=water_depth,
-        bottom_reflection=bottom_reflection, omega=omega, beam_width=w0)
+        bottom_reflection=bottom_reflection, omega=omega, beam_width=w0,
+        attenuation=attenuation)
     return field, widths, curvatures
 
 

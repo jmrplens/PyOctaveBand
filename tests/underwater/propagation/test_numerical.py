@@ -206,6 +206,55 @@ def test_ray_travel_time_constant_profile_is_range_over_speed() -> None:
                        rtol=0.0, atol=1e-12)
 
 
+# --- Ray arc lengths --------------------------------------------------------
+
+
+def test_ray_arc_length_constant_profile_is_range_over_cosine() -> None:
+    # The straight ray's own geometry: r/cos(theta0) of path to cover r of
+    # range. The integrand 1/(xi c) is constant, so this is exact and the
+    # tolerance is accumulation arithmetic.
+    res = ray_trace(*_ISO, source_depth=50.0, launch_angles_deg=[0.0, 20.0],
+                    max_range=1500.0, n_steps=2000)
+    r = res.ranges[0]
+    assert res.arc_lengths.shape == res.depths.shape
+    assert res.arc_lengths[0, 0] == 0.0
+    assert np.allclose(res.arc_lengths[0], r, rtol=0.0, atol=1e-9)
+    assert np.allclose(res.arc_lengths[1], r / np.cos(np.radians(20.0)),
+                       rtol=0.0, atol=1e-9)
+
+
+def test_ray_arc_length_matches_the_circular_arc_through_the_turn() -> None:
+    r"""Arc length against the circular-arc closed form, through a turning point.
+
+    In a layer of constant gradient the ray is an arc of a circle of radius
+    :math:`R = 1/(\xi g)` (the geometry test above pins that radius from the
+    traced path), and Snell's law makes the sine of the local angle fall
+    linearly in range, :math:`\sin\theta_2 = \sin\theta_1 - \xi g r` (Medwin &
+    Clay 1998, Eq. (3.3.21) in this library's variables, as derived over the
+    travel-time table). The length of a circular arc is its radius times the
+    angle it subtends, so
+
+    .. math::
+
+        s(r) = \frac{\theta_1 - \arcsin(\sin\theta_1 - \xi g r)}{\xi g},
+
+    valid straight through the turning point, where the arcsin argument changes
+    sign. Every quantity on the right is launch data, so the oracle shares
+    nothing with the marcher's fourth state.
+    """
+    prof = (np.array([0.0, 2000.0]),
+            np.array([_MEDWIN_C0, _MEDWIN_C0 + _MEDWIN_G * 2000.0]))
+    th0 = np.radians(10.0)
+    res = ray_trace(*prof, source_depth=0.0, launch_angles_deg=[10.0],
+                    max_range=10_000.0, n_steps=20_001)
+    xi = np.cos(th0) / _MEDWIN_C0
+    r = res.ranges[0]
+    exact = (th0 - np.arcsin(np.sin(th0) - xi * _MEDWIN_G * r)) / (xi * _MEDWIN_G)
+    # The turn is at 5289.8 m, well inside the run, so both branches are hit.
+    assert exact[-1] > 10_000.0
+    assert np.abs(res.arc_lengths[0] - exact).max() < 1e-6
+
+
 # A ray steep enough to reach the bottom before it turns (it would only turn at
 # 4098 m, five times the column), launched deep enough to work both boundaries.
 _BOUNCE_C0, _BOUNCE_G = 1500.0, 0.06  # c(z) = 1500 + 0.06 z

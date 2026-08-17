@@ -10,10 +10,23 @@ range as
 
     \frac{dz}{dr} = \frac{\zeta}{\xi}, \qquad
     \frac{d\zeta}{dr} = -\frac{dc/dz}{c^3 \xi}, \qquad
-    \frac{dt}{dr} = \frac{1}{\xi c^2},
+    \frac{dt}{dr} = \frac{1}{\xi c^2}, \qquad
+    \frac{ds}{dr} = \frac{1}{\xi c},
 
 the travel time being a third state of the very step that places the ray rather
-than a quadrature run over the finished path.
+than a quadrature run over the finished path, and the arc length :math:`s` a
+fourth, for the same reason and at the same order: both odometers share the
+sound speed the geometric stages already evaluate, so carrying them costs a
+division per stage and cannot drift from the trajectory actually returned. The
+arc length is what volume absorption multiplies on. Jensen, Kuperman, Porter &
+Schmidt, *Computational Ocean Acoustics* (2nd ed., Springer 2011), Sect. 3.6.2
+carries a loss :math:`\alpha` in nepers/m into the eikonal by perturbation and
+lands on the factor :math:`e^{-\int_0^s \alpha(s')\,ds'}` of Eq. (3.116), an
+integral along the *ray path*, not along the range axis: the two agree only for
+a horizontal ray, and a steep or many-times-reflected path is longer than the
+range it spans by exactly the factor the marcher integrates here. A reflection
+is instantaneous and adds no path, so the accumulated arc length stays
+continuous across it, like the time.
 
 Those are the equations behind
 :func:`phonometry.underwater.propagation.numerical.ray_trace`, and the same ones
@@ -180,8 +193,9 @@ _GRAZING_VERTICAL = 1e-12
 class RayDerivative(Protocol):
     """The right-hand side of the ray equations, vectorised over rays.
 
-    Returns ``(dz/dr, dzeta/dr, dt/dr)`` at the given state. The implementation
-    closes over its own sound-speed profile and over :math:`\\xi`.
+    Returns ``(dz/dr, dzeta/dr, dt/dr, ds/dr)`` at the given state. The
+    implementation closes over its own sound-speed profile and over
+    :math:`\\xi`.
 
     ``zeta`` is passed as well as ``z`` because a caller that asks for dynamic
     ray tracing gets sub-steps landing *exactly* on its profile nodes, where a
@@ -193,7 +207,8 @@ class RayDerivative(Protocol):
 
     def __call__(
         self, z: NDArray[np.float64], zeta: NDArray[np.float64], /
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]: ...
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
+               NDArray[np.float64]]: ...
 
 
 class DynamicRays(NamedTuple):
@@ -227,6 +242,14 @@ class RayMarch(NamedTuple):
 
     :ivar positions: ``z`` at each range sample.
     :ivar times: Cumulative travel time at each range sample, zero at the start.
+    :ivar arc_lengths: Cumulative arc length along the ray at each range sample,
+        zero at the start. :math:`ds/dr = 1/(\\xi c) = 1/\\cos\\theta \\ge 1`
+        with :math:`\\theta` the local ray angle, so it never falls below the
+        range spanned and exceeds it by exactly the obliquity of the path; a
+        reflection adds no path, so it stays continuous across one, like the
+        time. This is the measure a volume absorption
+        :math:`e^{-\\int \\alpha\\,ds}` multiplies on (Jensen Sect. 3.6.2,
+        Eq. 3.116).
     :ivar verticals: Vertical slowness :math:`\\zeta` at each range sample.
     :ivar reflections: Boundary reflections resolved inside each range step
         (zero in the first column, which is the launch point). Crossings of a
@@ -249,6 +272,7 @@ class RayMarch(NamedTuple):
 
     positions: NDArray[np.float64]
     times: NDArray[np.float64]
+    arc_lengths: NDArray[np.float64]
     verticals: NDArray[np.float64]
     reflections: NDArray[np.int_]
     upper_reflections: NDArray[np.int_]
@@ -289,6 +313,7 @@ class _Step(NamedTuple):
     position: NDArray[np.float64]
     vertical: NDArray[np.float64]
     time: NDArray[np.float64]
+    path: NDArray[np.float64]
     reflections: NDArray[np.int_]
     upper_reflections: NDArray[np.int_]
     dynamic: _Dynamic | None = None
@@ -297,15 +322,22 @@ class _Step(NamedTuple):
 def _rk4(
     deriv: RayDerivative, z: NDArray[np.float64], zeta: NDArray[np.float64],
     h: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """One Runge-Kutta step of per-ray range size ``h``; the time as increment."""
-    k1z, k1zeta, k1t = deriv(z, zeta)
-    k2z, k2zeta, k2t = deriv(z + 0.5 * h * k1z, zeta + 0.5 * h * k1zeta)
-    k3z, k3zeta, k3t = deriv(z + 0.5 * h * k2z, zeta + 0.5 * h * k2zeta)
-    k4z, k4zeta, k4t = deriv(z + h * k3z, zeta + h * k3zeta)
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
+           NDArray[np.float64]]:
+    """One Runge-Kutta step of per-ray range size ``h``.
+
+    The time and the arc length come back as *increments*: they are quadratures
+    riding on the geometric stages, they feed nothing back into them, and the
+    caller accumulates them itself.
+    """
+    k1z, k1zeta, k1t, k1s = deriv(z, zeta)
+    k2z, k2zeta, k2t, k2s = deriv(z + 0.5 * h * k1z, zeta + 0.5 * h * k1zeta)
+    k3z, k3zeta, k3t, k3s = deriv(z + 0.5 * h * k2z, zeta + 0.5 * h * k2zeta)
+    k4z, k4zeta, k4t, k4s = deriv(z + h * k3z, zeta + h * k3zeta)
     return (z + h / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z),
             zeta + h / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta),
-            h / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t))
+            h / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t),
+            h / 6.0 * (k1s + 2 * k2s + 2 * k3s + k4s))
 
 
 def _gradients_with_half_spaces(
@@ -495,7 +527,7 @@ def _polish_fraction(
     value, which is exactly the case where the interpolant is best.
     """
     for _ in range(_BOUNDARY_NEWTON_STEPS):
-        z_try, zeta_try, _unused = _rk4(deriv, z, zeta, frac * h)
+        z_try, zeta_try, _unused_t, _unused_s = _rk4(deriv, z, zeta, frac * h)
         slope = h * zeta_try / xi
         usable = np.abs(slope) > _GRAZING_SLOPE
         # Both branches of np.where are evaluated, so the divisor has to be
@@ -577,6 +609,7 @@ def _advance_one_step(
     """
     h = np.full(z.size, float(range_step))
     elapsed = np.zeros(z.size)
+    travelled = np.zeros(z.size)
     bounces = np.zeros(z.size, dtype=np.int_)
     bounces_upper = np.zeros(z.size, dtype=np.int_)
     # Crossing a profile node is not pathological the way sixteen bounces in
@@ -590,13 +623,14 @@ def _advance_one_step(
         # update, so it costs arithmetic and nothing else. Once every ray is
         # spent nothing crosses and the loop leaves below.
         moving = h > 0.0
-        z_end, zeta_end, dt = _rk4(deriv, z, zeta, h)
+        z_end, zeta_end, dt, ds = _rk4(deriv, z, zeta, h)
         target, crossed, reflects, at_upper = _levels_reached(
             z, z_end, moving, lower=lower, upper=upper, dyn=dyn)
         if not crossed.any():
             z = np.where(moving, z_end, z)
             zeta = np.where(moving, zeta_end, zeta)
             elapsed += np.where(moving, dt, 0.0)
+            travelled += np.where(moving, ds, 0.0)
             if dyn is not None:
                 dyn = _advance_spreading(dyn, h, xi)
             break
@@ -605,21 +639,22 @@ def _advance_one_step(
         )
         frac = _polish_fraction(deriv, xi, z, zeta, h, target, frac)
         h_sub = np.where(crossed, frac, 1.0) * h
-        z_sub, zeta_sub, dt_sub = _rk4(deriv, z, zeta, h_sub)
+        z_sub, zeta_sub, dt_sub, ds_sub = _rk4(deriv, z, zeta, h_sub)
         if dyn is not None:
             dyn = _apply_impulse(_advance_spreading(dyn, h_sub, xi), xi, zeta_sub,
                                  target, crossed)
-        # A reflection is specular and instantaneous: zeta changes sign and no
-        # time is added, so only the sub-step before it is charged. Crossing a
-        # profile node changes neither: the ray goes straight on through, only
-        # its spreading feels the kink.
+        # A reflection is specular and instantaneous: zeta changes sign and
+        # neither time nor path is added, so only the sub-step before it is
+        # charged. Crossing a profile node changes neither: the ray goes
+        # straight on through, only its spreading feels the kink.
         z = np.where(moving, np.where(crossed, target, z_sub), z)
         zeta = np.where(moving, np.where(reflects, -zeta_sub, zeta_sub), zeta)
         elapsed += np.where(moving, dt_sub, 0.0)
+        travelled += np.where(moving, ds_sub, 0.0)
         h = np.where(moving, h - h_sub, 0.0)
         bounces += reflects.astype(np.int_)
         bounces_upper += at_upper.astype(np.int_)
-    return _Step(z, zeta, elapsed, bounces, bounces_upper, dyn)
+    return _Step(z, zeta, elapsed, travelled, bounces, bounces_upper, dyn)
 
 
 def march_rays(
@@ -659,6 +694,7 @@ def march_rays(
 
     positions = np.zeros((z.size, ns))
     times = np.zeros((z.size, ns))
+    arcs = np.zeros((z.size, ns))
     verticals = np.zeros((z.size, ns))
     reflections = np.zeros((z.size, ns), dtype=np.int_)
     upper_reflections = np.zeros((z.size, ns), dtype=np.int_)
@@ -686,6 +722,7 @@ def march_rays(
         positions[:, s] = z
         verticals[:, s] = zeta
         times[:, s] = times[:, s - 1] + step.time
+        arcs[:, s] = arcs[:, s - 1] + step.path
         reflections[:, s] = step.reflections
         upper_reflections[:, s] = step.upper_reflections
         dyn = step.dynamic
@@ -694,6 +731,7 @@ def march_rays(
             slopes[:, s] = dyn.slope
 
     if dynamic is None:
-        return RayMarch(positions, times, verticals, reflections, upper_reflections)
-    return RayMarch(positions, times, verticals, reflections, upper_reflections,
-                    spreadings, slopes)
+        return RayMarch(positions, times, arcs, verticals, reflections,
+                        upper_reflections)
+    return RayMarch(positions, times, arcs, verticals, reflections,
+                    upper_reflections, spreadings, slopes)

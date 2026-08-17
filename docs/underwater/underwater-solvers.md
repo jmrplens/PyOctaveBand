@@ -88,15 +88,15 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 ```
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
-`propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
-`travel_times` per ray); `gaussian_beams` a `GaussianBeamResult` (the
-`propagation_loss` field, plus each beam's central ray and width);
-`parabolic_equation` a `ParabolicEquationResult` (the `propagation_loss`
-field). All assume a range-independent water column with a pressure-release
-surface, and the bottom is pressure-release too (or, for the modes and the
-beams, optionally rigid): there is no absorbing or elastic bottom, no sediment
-attenuation and no real bathymetry, so range-dependent problems are out of
-scope. For the
+`propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths`,
+`travel_times` and `arc_lengths` per ray); `gaussian_beams` a
+`GaussianBeamResult` (the `propagation_loss` field, plus each beam's central
+ray and width); `parabolic_equation` a `ParabolicEquationResult` (the
+`propagation_loss` field). All assume a range-independent water column with a
+pressure-release surface, and the bottom is pressure-release too (or, for the
+modes and the beams, optionally rigid): there is no absorbing or elastic
+bottom, no sediment attenuation and no real bathymetry, so range-dependent
+problems are out of scope. For the
 elastic seabed physics these fluid solvers leave out, see
 [Elastic waves and fluid-solid coupling](../simulation/elastic-waves.md).
 
@@ -358,6 +358,25 @@ closed-form eigenvalues, and the beams track them to 0.22 dB in the mean.
 Both boundary conditions come out of the beam sum rather than being imposed:
 the field at a pressure-release surface or bottom is 3 parts in $10^5$ of its
 mid-column value, and a rigid bottom doubles it.
+
+**The water's own absorption** is off by default, so every number above was
+measured without it and stays reproducible as printed; the price is that the
+level beyond a few kilometres at sonar frequencies is optimistic. Passing
+`absorption_model` (`"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`,
+the same names, arguments and defaults as
+[`seawater_absorption`](underwater-propagation.md)) multiplies each beam by
+$e^{-\alpha s}$ with $s$ the **arc length along its central ray**, which is
+Jensen §3.6.2 as printed: perturbing the eikonal with the complex sound speed
+a volume loss implies leaves the real rays standing and attaches
+$e^{-\int_0^s \alpha\,ds'}$ to each (Eq. 3.116). It is not $\alpha r$ over the
+horizontal range, the shortcut the same section notes "is used in many ray
+models": a path at 60° is twice as long as the range it covers, and the steep
+multiple bounces of a waveguide are exactly the arrivals absorption is
+supposed to be draining. The marcher integrates $s$ with the same Runge-Kutta
+stages that place the ray ($ds/dr = 1/(\xi c)$), `ray_trace` exposes it per
+ray as `arc_lengths`, and the coefficient, one $\alpha$ per run evaluated at
+the source frequency and depth, is recorded on the result as
+`absorption_coefficient`.
 
 **Where it stops.** Five limits, in the order they bite.
 

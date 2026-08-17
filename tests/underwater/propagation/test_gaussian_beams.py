@@ -21,6 +21,17 @@ nothing with the solver.
   coefficient and the impulse the marcher applies to the spreading at a
   boundary.
 
+* **Volume absorption.** Jensen Sect. 3.6.2 perturbs the eikonal with the
+  complex sound speed a volume loss implies and attaches
+  :math:`e^{-\int_0^s \alpha\,ds'}` to each ray (Eq. 3.116), so in a
+  homogeneous medium the absorbed field is the free field times
+  :math:`e^{-\alpha R}` with :math:`R` the slant distance. The
+  :math:`\alpha` here is transcribed into this file from the published
+  formulas (Thorp 1967 as printed by Etter 2003; Ainslie & McColm, JASA 103,
+  1998), independently of the ``closed_form`` module the solver reuses, and a
+  steep-receiver case separates arc length from range, which no on-axis
+  comparison can.
+
 * **The ideal waveguide.** A pressure-release surface and bottom over
   isovelocity water is an image lattice, summed here to convergence. It is the
   worst case for a beam fan, because nothing but :math:`1/R` attenuates the
@@ -225,6 +236,169 @@ def test_one_reflection_is_the_two_ray_field() -> None:
                          max_range=4200.0, ranges_m=r,
                          receiver_depths_m=np.array([zr]), range_step=10.0)
     assert np.abs(res.propagation_loss[0] - exact).max() < 0.05
+
+
+# --- Volume absorption ------------------------------------------------------
+#
+# The published formulas, transcribed here from their sources and shared with
+# nothing in src/. Both give alpha in dB/km for f in Hz.
+
+
+def _thorp_1967(f_hz: float) -> float:
+    """Thorp (1967) as printed by Etter (2003): dB/kyd in f kHz, per km."""
+    f2 = (f_hz / 1000.0) ** 2
+    return 1.0936 * (0.1 * f2 / (1.0 + f2) + 40.0 * f2 / (4100.0 + f2))
+
+
+def _ainslie_mccolm_1998(
+    f_hz: float, t_c: float, s_ppt: float, z_km: float, ph: float,
+) -> float:
+    """Ainslie & McColm, JASA 103 (1998), Eqs. (2)-(4): dB/km, f in kHz."""
+    f = f_hz / 1000.0
+    f1 = 0.78 * np.sqrt(s_ppt / 35.0) * np.exp(t_c / 26.0)
+    f2 = 42.0 * np.exp(t_c / 17.0)
+    boric = 0.106 * f1 * f**2 / (f**2 + f1**2) * np.exp((ph - 8.0) / 0.56)
+    mgso4 = (0.52 * (1.0 + t_c / 43.0) * (s_ppt / 35.0)
+             * f2 * f**2 / (f**2 + f2**2) * np.exp(-z_km / 6.0))
+    water = 0.00049 * f**2 * np.exp(-(t_c / 27.0 + z_km / 17.0))
+    return float(boric + mgso4 + water)
+
+
+def test_absorption_multiplies_the_free_field_by_exp_minus_alpha_R() -> None:
+    r"""The absorbed free field against :math:`20\lg R + \alpha R`, exactly.
+
+    A 4000 m homogeneous column with the source in the middle and a 30 degree
+    fan keeps every beam off both boundaries over the 3 km run, so the exact
+    field is :math:`e^{ikR - \alpha_e R}/R` with :math:`R` the slant distance
+    and :math:`\alpha_e` the loss in nepers/m (Jensen Eq. 3.116 with constant
+    :math:`\alpha`): in loss form, spherical spreading plus
+    :math:`\alpha R / 1000` with :math:`\alpha` in dB/km. The two alphas are
+    the test's own transcriptions above; the environmental arguments handed to
+    the solver are repeated in the transcription, the depth being the source
+    depth the solver documents it evaluates the coefficient at. Measured
+    residuals are at or below 2e-4 dB, so the 0.02 dB bound keeps two orders
+    in hand while a wrong measure (range for arc length) or a wrong unit
+    (a factor ln(10)/20 = 0.115) would blow through it at every range.
+    """
+    depth, zs = 4000.0, 2000.0
+    r = np.array([1000.0, 2000.0, 3000.0])
+    # Off-axis rows stay inside the 30 degree fan at the nearest range
+    # (atan(300/1000) = 16.7 degrees); outside it the field is legitimately
+    # not illuminated at all.
+    dz = np.array([-300.0, 0.0, 300.0])
+    cases = [
+        ("thorp", 3000.0, _thorp_1967(3000.0)),
+        ("thorp", 10_000.0, _thorp_1967(10_000.0)),
+        ("ainslie-mccolm", 20_000.0,
+         _ainslie_mccolm_1998(20_000.0, 10.0, 35.0, zs / 1000.0, 8.0)),
+    ]
+    for model, f, alpha in cases:
+        res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                             max_range=3000.0, ranges_m=r,
+                             receiver_depths_m=zs + dz, max_angle_deg=30.0,
+                             absorption_model=model)
+        assert res.absorption_model == model
+        # The recorded coefficient is the same published number, digit for
+        # digit, which pins the solver's model wiring as well as its arithmetic.
+        assert res.absorption_coefficient == pytest.approx(alpha, rel=1e-12)
+        slant = np.hypot(r[None, :], dz[:, None])
+        oracle = 20.0 * np.log10(slant) + alpha * slant / 1000.0
+        worst = np.abs(res.propagation_loss - oracle).max()
+        assert worst < 0.02, f"{model} at {f} Hz: worst {worst:.4f} dB"
+        assert alpha * r[-1] / 1000.0 > 0.5, "the loss under test must be material"
+
+
+def test_absorption_is_charged_along_the_arc_and_not_along_the_range() -> None:
+    r"""A steep receiver separates the two measures by the obliquity.
+
+    Jensen Eq. (3.116) integrates the loss along the ray path; the closing
+    remark of Sect. 3.6.2 notes that "many ray models" charge
+    :math:`\alpha r` over the horizontal range instead. On the axis the two
+    coincide, which is why the test above cannot tell them apart. Here the
+    receiver sits 1500 m below the source at 500 m of range, a slant of
+    1581 m at 71.6 degrees from the horizontal, and Thorp at 10 kHz makes the
+    two measures differ by :math:`\alpha (R - r) = 1.24` dB: the assertion
+    band of 0.05 dB around the arc-length answer is twenty-five times
+    narrower than that gap, so charging the range cannot pass. Thorp on
+    purpose, since it ignores every environmental argument and leaves the
+    geometry as the only thing under test.
+    """
+    f, rmax = 10_000.0, 600.0
+    depth = _free_space_column(rmax)
+    zs = depth / 2.0
+    r, dz = 500.0, 1500.0
+    alpha = _thorp_1967(f)
+    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=rmax, ranges_m=np.array([r]),
+                         receiver_depths_m=np.array([zs + dz]),
+                         range_step=10.0, absorption_model="thorp")
+    slant = float(np.hypot(r, dz))
+    along_arc = 20.0 * np.log10(slant) + alpha * slant / 1000.0
+    along_range = 20.0 * np.log10(slant) + alpha * r / 1000.0
+    got = float(res.propagation_loss[0, 0])
+    assert abs(got - along_arc) < 0.05
+    assert got - along_range > 1.0, "the range measure must be far outside the band"
+
+
+def test_absorption_is_off_by_default_and_bit_for_bit_identical() -> None:
+    """OFF is the default and leaves every bit of the field where it was.
+
+    The published validation numbers of this module were all measured without
+    absorption, so the default has to reproduce them exactly, not merely
+    closely; and the environmental arguments must be inert while the model is
+    ``None``, which the deliberately absurd values below would betray at the
+    first floating-point operation that touched them.
+    """
+    f, rmax = 100.0, 1500.0
+    depth = _free_space_column(rmax, 30.0)
+    zs = depth / 2.0
+    kwargs = {"source_depth": zs, "max_range": rmax,
+              "ranges_m": np.array([500.0, 1500.0]),
+              "receiver_depths_m": np.array([zs - 200.0, zs + 350.0]),
+              "max_angle_deg": 30.0}
+    default = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs)
+    explicit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs,
+                              absorption_model=None, temperature=97.0,
+                              salinity=350.0, ph=1.0)
+    assert default.absorption_model is None
+    assert default.absorption_coefficient == 0.0
+    assert np.array_equal(default.pressure, explicit.pressure)
+    withit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs,
+                            absorption_model="francois-garrison")
+    assert withit.absorption_coefficient > 0.0
+    assert not np.array_equal(default.pressure, withit.pressure)
+
+
+def test_absorption_defaults_route_to_francois_garrison_at_the_source() -> None:
+    """The advertised seam: the same model names, defaults and machinery as
+    ``seawater_absorption``, evaluated at the source depth.
+
+    This is wiring, not an oracle: Francois-Garrison itself is validated
+    digit for digit against its published tables in the closed-form tests,
+    and the two transcription oracles above own the field-level assertion.
+    What is pinned here is that the beams apply exactly the coefficient they
+    record, and that the recorded one is ``seawater_absorption`` evaluated
+    with the same arguments the docstring names.
+    """
+    from phonometry.underwater.propagation.closed_form import seawater_absorption
+
+    depth, zs = 4000.0, 2000.0
+    f = 10_000.0
+    r = np.array([1000.0, 2500.0])
+    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=2500.0, ranges_m=r,
+                         receiver_depths_m=np.array([zs]), max_angle_deg=30.0,
+                         absorption_model="francois-garrison",
+                         temperature=4.0, salinity=34.0, ph=7.9)
+    expected = float(seawater_absorption(f, temperature=4.0, salinity=34.0,
+                                         depth=zs, ph=7.9,
+                                         model="francois-garrison")[0])
+    assert res.absorption_coefficient == expected
+    off = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=2500.0, ranges_m=r,
+                         receiver_depths_m=np.array([zs]), max_angle_deg=30.0)
+    added = res.propagation_loss[0] - off.propagation_loss[0]
+    assert np.abs(added - expected * r / 1000.0).max() < 1e-3
 
 
 # --- The ideal waveguide ----------------------------------------------------
@@ -876,13 +1050,15 @@ def test_the_influence_sum_uses_the_tracked_branch_and_not_the_principal_one() -
         spreading=np.array([[q]]),
         slope=np.array([[p]]),
         time=one * tau,
+        path=one * r_col,
         # A ray two caustics along: one full turn under the principal value.
         phase=np.array([[np.angle(q) - 2.0 * np.pi]]),
         weight=np.array([[1.0 + 0.0j]]),
         reach=np.array([50.0]),
     )
     got = _beam_influence(samples, np.array([z_ray]), water_depth=1.0e6,
-                          bottom_reflection=1.0, omega=omega, beam_width=w0)
+                          bottom_reflection=1.0, omega=omega, beam_width=w0,
+                          attenuation=0.0)
 
     expected = (np.sqrt(c / r_col) / np.sqrt(abs(q))
                 * np.exp(-0.5j * (np.angle(q) - 2.0 * np.pi) - 1j * omega * tau))
@@ -1115,6 +1291,9 @@ def test_invalid_inputs_rejected() -> None:
     with pytest.raises(ValueError, match="n_depth_points"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[500.0],
                        n_depth_points=1)
+    with pytest.raises(ValueError, match="absorption_model"):
+        gaussian_beams(200.0, *iso, source_depth=500.0,
+                       absorption_model="mud")
 
 
 def test_the_result_lines_up_with_the_parabolic_equation_grid_and_plots() -> None:

@@ -111,7 +111,7 @@ def _march(
 
     def deriv(
         z_arr: np.ndarray, zeta_arr: np.ndarray, /,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         cc = np.interp(z_arr, z_prof, c_prof)
         seg = np.where(zeta_arr >= 0.0,
                        np.searchsorted(z_prof, z_arr, side="right") - 1,
@@ -119,7 +119,8 @@ def _march(
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
         if open_above:
             grad = np.where(z_arr > top, 0.0, grad)
-        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2))
+        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2),
+                1.0 / (xi * cc))
 
     dyn = None
     if dynamic:
@@ -268,6 +269,39 @@ def test_a_medium_open_above_never_reports_an_upper_reflection() -> None:
                       max_range=8000.0, n_steps=801, water_depth=None)
     assert march.reflections.sum() > 0
     assert march.upper_reflections.sum() == 0
+
+
+# --- Arc length -------------------------------------------------------------
+
+
+@pytest.mark.parametrize("angle", [-20.0, 0.0, 15.0])
+def test_arc_length_is_range_over_cosine_through_every_bounce(
+    angle: float,
+) -> None:
+    # In an isovelocity channel the unfolded path is one straight line at the
+    # launch angle, so the arc length is exactly r / cos(theta0) through any
+    # number of reflections: a bounce redirects the ray and adds no path. The
+    # integrand 1/(xi c) is constant here, so the tolerance is accumulation
+    # arithmetic and not discretisation.
+    rmax, ns = 6000.0, 601
+    march, _ = _march(_ISO, 500.0, [angle], max_range=rmax, n_steps=ns)
+    if angle != 0.0:
+        assert march.reflections.sum() >= 2
+    exact = np.linspace(0.0, rmax, ns) / np.cos(np.radians(angle))
+    assert np.allclose(march.arc_lengths[0], exact, rtol=1e-13, atol=1e-8)
+
+
+def test_arc_length_only_grows_and_never_undercuts_the_range() -> None:
+    # ds/dr = 1/(xi c) = 1/cos(theta) >= 1 whatever the profile does, so the
+    # odometer is monotone and never reads less than the range spanned; the
+    # thermocline's kinks, its turning points and its bounces change the local
+    # obliquity, never the sign or the bound.
+    rmax, ns = 8000.0, 801
+    march, _ = _march(_KINK, 500.0, [-40.0, -12.0, 0.0, 9.0, 33.0],
+                      max_range=rmax, n_steps=ns)
+    r = np.linspace(0.0, rmax, ns)
+    assert np.all(np.diff(march.arc_lengths, axis=1) > 0.0)
+    assert np.all(march.arc_lengths >= r[None, :] - 1e-9)
 
 
 # --- Profile nodes ----------------------------------------------------------

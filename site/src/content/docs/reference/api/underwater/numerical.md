@@ -63,6 +63,10 @@ gaussian_beams(
     beam_width: float | None = None,
     range_step: float = 25.0,
     bottom: str = 'pressure-release',
+    absorption_model: str | None = None,
+    temperature: float = 10.0,
+    salinity: float = 35.0,
+    ph: float = 8.0,
 ) -> GaussianBeamResult
 ```
 
@@ -146,6 +150,32 @@ The limits are worth knowing before the numbers are believed.
   imply that the beam is large compared to the channel, which causes a
   variety of problems".
 
+**Seawater absorption is off by default** and the field is then optimistic
+beyond a few kilometres at sonar frequencies, exactly as ray theory without
+a volume loss must be. Passing `absorption_model` multiplies each beam by
+$e^{-\alpha s}$ with $s$ the **arc length along its central
+ray**, which is Sect. 3.6.2 done as printed: perturbing the eikonal with
+the complex sound speed a volume loss implies leaves the real rays standing
+and attaches $e^{-\int_0^s \alpha(s')\,ds'}$ to each (Eq. 3.116),
+an integral along the path flown, not along the range axis. The distinction
+is not pedantry. The same section notes that adding $\alpha r$ to the
+loss "is used in many ray models", and that shortcut under-charges every
+steep or multiply-reflected path by the obliquity of its climb: a path at
+60 degrees is twice as long as the range it covers, and it is precisely the
+steep multiples of a waveguide that absorption is supposed to be killing.
+The marcher integrates $s$ with the very Runge-Kutta stages that
+place the ray ($ds/dr = 1/(\xi c)$), so the length the loss is
+charged over is the length of the geometry actually summed. The
+coefficient itself comes from
+[`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption),
+one $\alpha$ per run, evaluated at the source frequency and at the
+source depth (the same point the reference sound speed $c_0$ is read
+at); over a water column the coefficient's own depth terms move it by
+around a percent per hundred metres, which is far inside the method's
+error budget. The default stays off so the validation figures quoted
+throughout, all measured without absorption, remain reproducible as
+printed.
+
 What it costs is `n_beams` times the size of the receiver grid, and none
 of the three factors depends on the frequency: the ray core does not have to
 resolve a wavelength on a grid, and the fan only widens as
@@ -174,6 +204,10 @@ direct way to trade resolution for time.
 | `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity. Default (`None`): the free-space optimum $W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}$ of Sect. 3.5.1, held inside the book's recommended band of 10 to 50 wavelengths and clamped to a quarter of the water depth, and the clamp has the last word. |
 | `range_step` | Marching step in range, in metres, and the spacing of the default `ranges_m`. |
 | `bottom` | `"pressure-release"` (default) or `"rigid"`. The sea surface is always pressure-release. |
+| `absorption_model` | Seawater volume absorption applied along each beam's central ray: `"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`, the same models, spelled the same way, as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption). Default (`None`): no volume absorption, so the published validation numbers of this module are what the solver returns. |
+| `temperature` | Temperature `T` for the absorption model, in degrees Celsius (ignored when `absorption_model` is `None`). |
+| `salinity` | Salinity `S` for the absorption model, in parts per thousand (ignored when `absorption_model` is `None`). |
+| `ph` | Acidity for the absorption model (ignored when `absorption_model` is `None`; Thorp ignores it always). |
 
 **Returns:** A [`GaussianBeamResult`](/phonometry/reference/api/underwater/numerical/#gaussianbeamresult).
 
@@ -204,6 +238,8 @@ GaussianBeamResult(
     beam_widths: NDArray[np.float64],
     wavefront_curvatures: NDArray[np.float64],
     initial_beam_width: float,
+    absorption_model: str | None,
+    absorption_coefficient: float,
     source_depth: float,
     water_depth: float,
 )
@@ -230,6 +266,8 @@ can be subtracted.
 | `beam_widths` | Beam half-width $W(s)$ on that grid, in metres: Jensen Eq. (3.89), the distance at which the beam's own pressure has fallen by $e^{-1}$ and its intensity by $e^{-2}$. |
 | `wavefront_curvatures` | Beam wavefront curvature $K(s)$ on that grid, in 1/m: Jensen Eq. (3.90) with the sign that belongs to the conjugated field this result exposes, so that a beam spreading in free space reproduces Eq. (3.85), $K = x/(x^2 + a^2)$, as a positive number. |
 | `initial_beam_width` | The $W_0$ of Eq. (3.91) actually used, in metres, whether it was passed or defaulted. |
+| `absorption_model` | The seawater absorption model applied along the beams, or `None` when the run propagated without volume absorption (the default). |
+| `absorption_coefficient` | The absorption coefficient $\alpha$ actually applied, in dB/km (0.0 when `absorption_model` is `None`), as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption) evaluated it at the source frequency and depth. Recorded so a run's loss can be decomposed without re-deriving what was subtracted. |
 | `source_depth` | Source depth, in metres. |
 | `water_depth` | Water-column depth, in metres. |
 
@@ -456,11 +494,15 @@ The travel time is a third state of that same Runge-Kutta step rather than a
 quadrature run over the finished path: with the range-invariant Snell
 parameter $\xi = \cos\theta_0 / c(z_\mathrm{s})$ it obeys
 $dt/dr = 1/(\xi c^2)$, so it is integrated with the very stages that
-place the ray and cannot drift from the geometry actually returned. This is
+place the ray and cannot drift from the geometry actually returned. The arc
+length is a fourth state on the same footing, $ds/dr = 1/(\xi c)$,
+because it is the measure volume absorption needs (see
+[`RayTraceResult`](/phonometry/reference/api/underwater/numerical/#raytraceresult)) and reading it off the finished path would demote
+it to first order. This is
 the same ray core, and the same travel-time equation, as the atmospheric
 [`atmospheric_ray_paths`](/phonometry/reference/api/environment/refraction/#atmospheric_ray_paths)
 (which reflects at the ground instead of at the sea surface). Reflections
-cost no time, so the accumulated time stays continuous across them.
+cost no time and no path, so both odometers stay continuous across them.
 
 **Parameters**
 
@@ -489,6 +531,7 @@ RayTraceResult(
     ranges: NDArray[np.float64],
     depths: NDArray[np.float64],
     travel_times: NDArray[np.float64],
+    arc_lengths: NDArray[np.float64],
     source_depth: float,
     water_depth: float,
 )
@@ -504,6 +547,7 @@ Ray-tracing solution through a sound-speed profile.
 | `ranges` | Per-ray horizontal ranges, in metres, shape `(n_rays, n_steps)`. |
 | `depths` | Per-ray depths, in metres, shape `(n_rays, n_steps)`. |
 | `travel_times` | Per-ray cumulative travel times, in seconds, shape `(n_rays, n_steps)` (zero at the source, increasing along the ray). |
+| `arc_lengths` | Per-ray cumulative arc length along the ray, in metres, same shape (zero at the source). It is never less than the range column it stands in, exceeds it by the obliquity of the path, and a reflection leaves it continuous. This, and not the range, is the measure seawater absorption acts along: Jensen Sect. 3.6.2 carries a volume loss $\alpha$ into the ray solution by perturbing the eikonal and lands on $e^{-\int_0^s \alpha(s')\,ds'}$ (Eq. 3.116), an integral over the path actually flown, so a caller hanging amplitudes on these rays multiplies by $e^{-\alpha s}$ with the $s$ read off here. |
 | `source_depth` | Source depth, in metres. |
 | `water_depth` | Water-column depth, in metres. |
 
