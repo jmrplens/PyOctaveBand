@@ -3,6 +3,10 @@
 Tests for integrated and statistical sound levels (Leq, LAeq, LN).
 """
 
+import inspect
+import pathlib
+import re
+
 import numpy as np
 import pytest
 
@@ -393,3 +397,67 @@ def test_sound_exposure_rejects_nonpositive_duration() -> None:
         sound_exposure(tone, FS, duration_hours=0)
     with pytest.raises(ValueError, match="duration_hours"):
         lex_8h(tone, FS, duration_hours=-1.0)
+
+
+# ---------------------------------------------------------------------------
+# The guide's signature cells must not overstate what they list
+# ---------------------------------------------------------------------------
+
+#: A first-column cell of the "Peak / event / dose parameters" table, e.g.
+#: ``| `sel(x, fs, weighting=None, ...)` | ...``.
+_SIGNATURE_CELL = re.compile(r"^\|\s*`([a-z_0-9]+)\((.*?)\)`\s*\|")
+
+
+def _documented_signatures(markdown: str) -> dict[str, list[str]]:
+    """Function name -> the parameter tokens its guide row spells out."""
+    found: dict[str, list[str]] = {}
+    for line in markdown.splitlines():
+        match = _SIGNATURE_CELL.match(line.strip())
+        if match is None:
+            continue
+        params = [tok.strip() for tok in match.group(2).split(",") if tok.strip()]
+        found[match.group(1)] = params
+    return found
+
+
+def _real_signature_tokens(func: object) -> list[str]:
+    """The full parameter list of ``func`` rendered the way the guide writes it."""
+    tokens = []
+    for name, param in inspect.signature(func).parameters.items():  # type: ignore[arg-type]
+        if param.default is inspect.Parameter.empty:
+            tokens.append(name)
+        else:
+            tokens.append(f"{name}={param.default!r}")
+    return tokens
+
+
+def test_guide_signature_cells_match_the_code() -> None:
+    """Rows that omit parameters must say so with an explicit ellipsis.
+
+    Three rows of the peak/event/dose table elide their tail with ``...``,
+    which makes a row *without* one read as the complete signature. This
+    checks both readings: an elided row must be a true prefix of the real
+    signature, and a plain row must list it in full.
+    """
+    import phonometry
+    from phonometry.signals import levels as levels_module
+
+    guide = (
+        pathlib.Path(__file__).resolve().parents[2]
+        / "docs" / "signals" / "levels" / "levels.md"
+    )
+    documented = _documented_signatures(guide.read_text(encoding="utf-8"))
+    checked = 0
+    for name, params in documented.items():
+        func = getattr(levels_module, name, None) or getattr(phonometry, name, None)
+        if func is None or not callable(func):
+            continue
+        real = _real_signature_tokens(func)
+        checked += 1
+        if params and params[-1] == "...":
+            listed = params[:-1]
+            assert listed == real[: len(listed)], (name, listed, real)
+            assert len(listed) < len(real), f"{name}: '...' elides nothing"
+        else:
+            assert params == real, (name, params, real)
+    assert checked >= 4, f"expected the peak/event/dose rows, checked {checked}"
