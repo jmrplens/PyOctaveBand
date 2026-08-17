@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
-title: "phonometry: acoustic measurement toolkit for Python (formerly PyOctaveBand)"
+title: "phonometry: acoustic measurement, analysis and prediction for Python (formerly PyOctaveBand)"
 authors:
   - family-names: "Requena-Plens"
     given-names: "José M."
