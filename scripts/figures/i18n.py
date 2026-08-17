@@ -4926,9 +4926,9 @@ _ES_PATTERNS = [
      r"$f = 2f_\\mathrm{c}$ = \1 Hz, incidencia a 45°"),
     (r"^below \$f_\\mathrm\{c\}\$: the mass law holds: (.+) dB \(it predicts (.+)\)$",
      r"bajo $f_\\mathrm{c}$: manda la ley de masas: \1 dB (predice \2)"),
-    ((r"^above \$f_\\mathrm\{c\}\$: trace matches \$\\lambda_B\$: (.+) dB, "
+    ((r"^above \$f_\\mathrm\{c\}\$: trace matches \$\\lambda_\\mathrm\{B\}\$: (.+) dB, "
       r"the mass law said (.+)$"),
-     r"sobre $f_\\mathrm{c}$: la traza iguala $\\lambda_B$: \1 dB, la ley de masas decía \2"),
+     r"sobre $f_\\mathrm{c}$: la traza iguala $\\lambda_\\mathrm{B}$: \1 dB, la ley de masas decía \2"),
     (r"^coincidence_frequency: \$f_\\mathrm\{c\}\$ = (\d+) Hz \(10 mm steel\)$",
      r"coincidence_frequency: $f_\\mathrm{c}$ = \1 Hz (acero de 10 mm)"),
     # anim_elastic_plate_junction: the junction readout. Its own entry
@@ -5695,18 +5695,18 @@ _ES_PATTERNS = [
       r"faster than sound$"),
      ("$f = 2f_\\\\mathrm{c}$ = \\1 Hz, sobre coincidencia: la onda de la placa es más "
       "rápida que el sonido")),
-    ((r"^\$\\lambda_B\$ = (\d+)\.(\d+) m is shorter than \$\\lambda\$ = "
+    ((r"^\$\\lambda_\\mathrm\{B\}\$ = (\d+)\.(\d+) m is shorter than \$\\lambda\$ = "
       r"(\d+)\.(\d+) m in air\n"
-      r"no angle solves \$\\sin\\theta = \\lambda/\\lambda_B\$: "
+      r"no angle solves \$\\sin\\theta = \\lambda/\\lambda_\\mathrm\{B\}\$: "
       r"the skin dies in (\d+)\.(\d+) m$"),
-     ("$\\\\lambda_B$ = \\1,\\2 m es menor que $\\\\lambda$ = \\3,\\4 m "
+     ("$\\\\lambda_\\\\mathrm{B}$ = \\1,\\2 m es menor que $\\\\lambda$ = \\3,\\4 m "
       "en el aire\n"
       "ningún ángulo cumple $\\\\mathrm{sen}\\\\,\\\\theta = "
-      "\\\\lambda/\\\\lambda_B$: la piel se apaga en \\5,\\6 m")),
-    ((r"^\$\\lambda_B\$ = (\d+)\.(\d+) m is longer than \$\\lambda\$ = "
+      "\\\\lambda/\\\\lambda_\\\\mathrm{B}$: la piel se apaga en \\5,\\6 m")),
+    ((r"^\$\\lambda_\\mathrm\{B\}\$ = (\d+)\.(\d+) m is longer than \$\\lambda\$ = "
       r"(\d+)\.(\d+) m in air\n"
       r"the trace match sends a beam out at (\d+)°$"),
-     ("$\\\\lambda_B$ = \\1,\\2 m es mayor que $\\\\lambda$ = \\3,\\4 m "
+     ("$\\\\lambda_\\\\mathrm{B}$ = \\1,\\2 m es mayor que $\\\\lambda$ = \\3,\\4 m "
       "en el aire\n"
       "la coincidencia de traza lanza un haz a \\5°")),
     ((r"^elastic 2D FDTD, 10 mm steel plate, \$f_\\mathrm\{c\}\$ = (.+) Hz · overlaid "
