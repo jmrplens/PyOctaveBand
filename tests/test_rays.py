@@ -5,9 +5,13 @@ The oracles for the ray-tube spreading are geometry and nothing else. Two are
 closed forms derived below; the third is the Jacobian of the ray family itself,
 finite-differenced from traced ray paths, which is what :math:`q` is *defined*
 to be (Jensen Eq. 3.64) and so is independent of every line the marcher runs;
-and the fourth integrates the smooth form of the equations with SciPy on a
-profile the marcher can only approximate, which is what pins the impulsive
-treatment of a piecewise-linear profile's second derivative.
+the fourth integrates the smooth form of the equations with SciPy on a profile
+the marcher can only approximate, which is what pins the impulsive treatment of
+a piecewise-linear profile's second derivative; and the fifth is that same
+Jacobian read off a family written in closed form, circular arcs inside a
+gradient layer and straight lines above the homogeneous cap on top of it, which
+carries no discretisation error of its own and so can be aimed at the crossings
+the marcher resolves least well.
 
 The closed forms. In a range-independent medium the pair obeys
 :math:`dq/dr = p/\xi` and :math:`dp/dr = -\xi\,c''(z)\,q/c(z)`, so wherever the
@@ -388,6 +392,38 @@ def test_the_last_node_of_an_open_medium_kinks_the_spreading_like_any_other(
     ignored = rmax / np.cos(np.radians(25.0))
     exact = _capped_layer_spreading(25.0, np.array([rmax]))[0]
     assert abs(ignored - exact) / exact > 1e-1
+
+
+def _capped_layer_error(angle_deg: float, n_steps: int, max_range: float) -> float:
+    """How far the marched ``q`` sits from the closed-form family, relatively."""
+    ranges = np.linspace(0.0, max_range, n_steps)
+    march, _ = _march(_CAPPED, _CAPPED_SOURCE, [angle_deg], max_range=max_range,
+                      n_steps=n_steps, water_depth=None)
+    oracle = _capped_layer_spreading(angle_deg, ranges)
+    assert march.positions.max() > _CAPPED_HEIGHT, "the ray must cross the cap"
+    assert march.spreadings is not None
+    return float(np.max(np.abs(march.spreadings[0] - oracle))
+                 / np.max(np.abs(oracle)))
+
+
+def test_a_near_tangential_crossing_costs_what_a_square_one_does_not() -> None:
+    # The one stage of first-order error a crossing still costs lands in zeta,
+    # and the impulse divides by |zeta| (module docstring), so the same range
+    # step buys wildly different accuracy depending on how squarely the ray
+    # meets the kink. Both rays here clear the same cap, the first by a
+    # hundredth of a degree and the second at 25 degrees, and the first pays
+    # more than two orders of magnitude for it. Pinning that here is what keeps
+    # the figure in the docstring honest, and what would catch a sub-step that
+    # stopped landing on the node at all.
+    rmax, coarse, fine = 4000.0, 401, 1601
+    grazing = np.degrees(np.arccos(
+        (_CAPPED[1][0] + _CAPPED_GRADIENT * _CAPPED_SOURCE) / _CAPPED[1][1]))
+    tangential = _capped_layer_error(grazing + 0.01, coarse, rmax)
+    square = _capped_layer_error(25.0, coarse, rmax)
+    assert square < 2e-4
+    assert tangential > 100.0 * square
+    # An accuracy limit and not a wrong answer: the range step buys it back.
+    assert _capped_layer_error(grazing + 0.01, fine, rmax) < tangential / 4.0
 
 
 # --- Complex initial conditions ---------------------------------------------
