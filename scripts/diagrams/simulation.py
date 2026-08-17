@@ -197,17 +197,15 @@ def _d_ntff_contour(s: SVG, th: Theme) -> None:
 
     notes = (
         (("Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz "
-          "the grid holds 343 cells per wavelength"), th.fg),
+          "there are 343 cells per wavelength"), th.fg),
         (("Panel: five 70 mm cells, 20 mm slits on a 3 mm backing; the "
           "3.2 mm neck sets dx, not the wavelength"), th.fg),
         (("Clearances in cells: 40 ahead of the panel, 20 behind and to the "
           "sides, 60 to every sponge"), th.fg),
-        (("Sources outside the contour integrate to zero (extinction), so "
-          "the total-field phasors give the scattered far field"),
-         th.secondary),
-        (("Reference run: the identical scene without the panel → "
-          "ContourPhasors.subtract() removes the grid-dispersion residual"),
-         th.muted),
+        (("Sources outside the contour integrate to zero (extinction): the "
+          "total-field phasors give the scattered field"), th.secondary),
+        (("Reference run: the same scene with no panel → "
+          "ContourPhasors.subtract() removes the grid residual"), th.muted),
     )
     for k, (txt, col) in enumerate(notes):
         s.text(x0, ny + 32 + 24 * k, txt, 15, col, "start")

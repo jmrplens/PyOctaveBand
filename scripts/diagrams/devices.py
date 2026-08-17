@@ -465,14 +465,12 @@ def _d_reverberation_power(s: SVG, th: Theme) -> None:
           "surface · ≥ 0,5 m from a diffuser"), th.fg, False),
         (("· not within 10° of a room surface · length $≥ 3λ$ or 10,3 m, "
           "whichever is smaller"), th.fg, False),
-        (("comparison method: the same six positions, and no $A$, no $V$, "
-          "no $S$, no Waterhouse and no $C_1$ in Eq. 21"), th.accent, True),
-        (("averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · "
-          "background at the same positions, just before or after"),
-         th.secondary, True),
+        (("comparison method: the same six positions, and Eq. 21 without "
+          "$A$, $V$, $S$, Waterhouse or $C_1$"), th.accent, True),
+        (("averaging ≥ 30 s to 160 Hz, ≥ 10 s from 200 Hz · background at "
+          "those positions, before or after"), th.secondary, True),
         (("hard walls, $α < 0,06$ within one wavelength of the source · "
-          "$T_{60}$ per ISO 3382-2 from the first 10 dB or 15 dB only"),
-         th.muted, False),
+          "$T_{60}$ per ISO 3382-2, first 10 dB or 15 dB only"), th.muted, False),
     )):
         s.text(58, 412 + k * 23, txt, 15, col, anchor="start", bold=bold)
 
@@ -957,8 +955,8 @@ def _d_swept_sine(s: SVG, th: Theme) -> None:
     s.dim(440.0, ax_y, 640.0, ax_y, "$L·ln 3$ = 0.77 s", offset=80, size=15)
 
     s.text(450.0, 562.0,
-           "$L = T / ln(f_2/f_1)$ = 0.70 s here; the order-$n$ products "
-           "compress $L·ln n$ ahead of the linear response",
+           "$L = T / ln(f_2/f_1)$ = 0.70 s; the order-$n$ products compress "
+           "$L·ln n$ ahead of the linear response",
            17, th.fg, bold=True)
     s.text(450.0, 590.0,
            "window each arrival  →  $H_{1}(f)$, $H_{2}(f)$, $H_{3}(f)$, …  →  "
@@ -1786,11 +1784,11 @@ def _d_loudspeaker_polar(s: SVG, th: Theme) -> None:
            th.muted)
     s.text(728, iy + ir + 56, "full radius = 25 dB (clause 3)", 14, th.muted)
 
-    s.text(450, 542, "Directivity index: free field on axis against a "
+    s.text(450, 542, "Directivity: free field on axis against a "
            "reverberation room, $D_i = L_{ax} − L_p + 10 lg(T/T_0) − "
-           "10 lg(V/V_0)$ + 25 dB (23.3.2.1),", 16, th.fg)
-    s.text(450, 566, "or by integrating these polar curves over the sphere "
-           "(23.3.2.2).", 16, th.muted)
+           "10 lg(V/V_0)$ + 25 dB", 16, th.fg)
+    s.text(450, 566, "(23.3.2.1), or by integrating these polar curves over "
+           "the sphere (23.3.2.2).", 16, th.muted)
 
 
 # ---------------------------------------------------------------------------

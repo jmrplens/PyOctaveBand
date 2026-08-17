@@ -130,13 +130,13 @@ def _d_aircraft_certification(s: SVG, th: Theme) -> None:
 
     # --- normative context -------------------------------------------------
     s.text(80.0, 552.0,
-           "Microphones 1.2 m above the ground; the certification metric at the three points is EPNL, in EPNdB",
+           "Microphones 1.2 m above ground; the certification metric at the three points is EPNL, in EPNdB",
            17, th.fg, anchor="start")
     s.text(80.0, 580.0,
            "Lateral: full take-off power · Flyover: 6.5 km from brake release · Approach: 3° ± 0.5° glide path",
            16, th.fg, anchor="start")
     s.text(80.0, 608.0,
-           "the approach point lies 120 m below the 3° path, which meets the ground 300 m beyond the threshold",
+           "the approach point lies 120 m below the 3° path, which meets the ground 300 m past the threshold",
            16, th.muted, anchor="start")
 
 

@@ -239,18 +239,18 @@ _ES: dict[str, str] = {
     "Elevation: the same sweep": "Alzado: el mismo barrido",
     "raise and lower the arm": "subir y bajar el brazo",
     "during each traverse": "durante cada barrido",
-    "Alternative (Clause 6.3.1): a rotating microphone on a stand, ≥ 10° to "
-    "the horizontal, sweep radius ≥ 1 m.":
-        "Alternativa (apartado 6.3.1): micrófono giratorio, ≥ 10° sobre la "
-        "horizontal, radio de barrido ≥ 1 m.",
-    "Without a real-time octave analyser, repeat the whole sweep once per "
-    "band and read each 30 s $L_{eq}$.":
-        "Sin analizador de octavas en tiempo real, repetir el barrido una "
-        "vez por banda y leer cada $L_{eq}$ de 30 s.",
-    "Tapping machine (6.2.3): centre of the floor, on the diagonal; "
+    "Alternative (6.3.1): a rotating microphone on a stand, ≥ 10° to the "
+    "horizontal, radius ≥ 1 m.":
+        "Alternativa (6.3.1): micrófono giratorio en soporte, ≥ 10° sobre la "
+        "horizontal, radio ≥ 1 m.",
+    "Without a real-time octave analyser, repeat the sweep per band and read "
+    "each 30 s $L_{eq}$.":
+        "Sin analizador de octavas en tiempo real, repetir el barrido por "
+        "banda y leer los $L_{eq}$ de 30 s.",
+    "Tapping machine (6.2.3): floor centre, on the diagonal; "
     "three positions at 45° to the ribs.":
-        "Máquina de impactos (6.2.3): centro del forjado, en la diagonal; "
-        "tres posiciones a 45° con las viguetas.",
+        "Máquina de impactos (6.2.3): centro del forjado, en diagonal; "
+        "3 a 45° con las viguetas.",
     # Rooms / prediction: the EN 12354-6 take-off plate and the directivity
     # plate (buildings/rooms/enclosed-space-absorption, room-image-sources).
     "Room take-off: one room, three input lists (EN 12354-6)":
@@ -1735,13 +1735,14 @@ _ES: dict[str, str] = {
     "full radius = 25 dB (clause 3)": "radio completo = 25 dB (apartado 3)",
     # "Índice de directividad" would push the line 50 px past the English
     # extent; D_i in the formula still names the index.
-    "Directivity index: free field on axis against a reverberation room, "
-    "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB (23.3.2.1),":
+    "Directivity: free field on axis against a reverberation room, "
+    "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB":
         "Directividad: campo libre en eje contra cámara reverberante, "
-        "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB "
-        "(23.3.2.1),",
-    "or by integrating these polar curves over the sphere (23.3.2.2).":
-        "o integrando estas curvas polares sobre la esfera (23.3.2.2).",
+        "$D_i = L_{ax} − L_p + 10 lg(T/T_0) − 10 lg(V/V_0)$ + 25 dB",
+    "(23.3.2.1), or by integrating these polar curves over the sphere "
+    "(23.3.2.2).":
+        "(23.3.2.1), o integrando estas curvas polares sobre la esfera "
+        "(23.3.2.2).",
     # The three microphone sensitivity fields (IEC 60268-4)
     "The three fields a microphone sensitivity is defined in (IEC 60268-4)":
         "Los tres campos de la sensibilidad de un micrófono (IEC 60268-4)",
@@ -2529,15 +2530,15 @@ _ES: dict[str, str] = {
     "where take-off noise is greatest": "donde el ruido de despegue es máximo",
     "symmetric lateral point (measured on both sides)":
         "punto lateral simétrico (se mide a ambos lados)",
-    "Microphones 1.2 m above the ground; the certification metric at the three points is EPNL, in EPNdB":
-        "Micrófonos a 1,2 m sobre el suelo; la métrica de certificación en "
-        "los tres puntos es el EPNL, en EPNdB",
+    "Microphones 1.2 m above ground; the certification metric at the three points is EPNL, in EPNdB":
+        "Micrófonos a 1,2 m del suelo; la métrica de certificación en los "
+        "tres puntos es el EPNL (EPNdB)",
     "Lateral: full take-off power · Flyover: 6.5 km from brake release · Approach: 3° ± 0.5° glide path":
-        "Lateral: máxima potencia de despegue · Sobrevuelo: a 6,5 km de "
-        "soltar frenos · Aproximación: senda de 3° ± 0,5°",
-    "the approach point lies 120 m below the 3° path, which meets the ground 300 m beyond the threshold":
-        "el punto de aproximación queda 120 m bajo la senda de 3°, que corta "
-        "el suelo 300 m más allá del umbral",
+        "Lateral: potencia máxima · Sobrevuelo: 6,5 km tras soltar frenos · "
+        "Aproximación: senda 3° ± 0,5°",
+    "the approach point lies 120 m below the 3° path, which meets the ground 300 m past the threshold":
+        "el punto de aproximación queda 120 m bajo la senda de 3°, que toca "
+        "suelo 300 m tras el umbral",
     # Helicopter overflight certification (ICAO Annex 16, Chapter 8)
     "Helicopter overflight noise certification (ICAO Annex 16, Chapter 8)":
         "Certificación de ruido de helicópteros (Anexo 16 OACI, Capítulo 8)",
@@ -2576,9 +2577,9 @@ _ES: dict[str, str] = {
     "$L·ln 2$ = 0.49 s": "$L·ln 2$ = 0,49 s",
     "$L·ln 3$ = 0.77 s": "$L·ln 3$ = 0,77 s",
     "time": "tiempo",
-    "$L = T / ln(f_2/f_1)$ = 0.70 s here; the order-$n$ products compress $L·ln n$ ahead of the linear response":
-        "$L = T / ln(f_2/f_1)$ = 0,70 s aquí; los productos de orden $n$ se "
-        "comprimen $L·ln n$ antes de la respuesta lineal",
+    "$L = T / ln(f_2/f_1)$ = 0.70 s; the order-$n$ products compress $L·ln n$ ahead of the linear response":
+        "$L = T / ln(f_2/f_1)$ = 0,70 s; los productos de orden $n$ se "
+        "adelantan $L·ln n$ a la respuesta lineal",
     "window each arrival  →  $H_{1}(f)$, $H_{2}(f)$, $H_{3}(f)$, …  →  $THD(f) = √( Σ |H_{n}(n f)|^2 ) / |H_{1}(f)|$":
         "enventanar cada llegada  →  $H_{1}(f)$, $H_{2}(f)$, $H_{3}(f)$, …  →"
         "  $THD(f) = √( Σ |H_{n}(n f)|^2 ) / |H_{1}(f)|$",
@@ -3095,11 +3096,11 @@ _ES: dict[str, str] = {
         "Ley de masas en campo difuso: $R$ sube 6 dB por octava y 6 dB por "
         "duplicación de $m″$",
     "At $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz the free bending wave matches the trace wavelength":
-        "En $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz la onda libre de flexión "
-        "iguala la longitud de onda de traza",
-    "Sharp's prediction rates at $R_w$ = 27 dB; the dip collects the unfavourable deviations":
-        "La predicción de Sharp puntúa $R_w$ = 27 dB; el valle concentra las "
-        "desviaciones desfavorables",
+        "En $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz la onda de flexión iguala "
+        "la longitud de onda de traza",
+    "Sharp's prediction rates $R_w$ = 27 dB; the dip takes the unfavourable deviations":
+        "Sharp predice $R_w$ = 27 dB; el valle concentra las desviaciones "
+        "desfavorables",
     # Porous layer on a rigid wall
     "Porous absorber on a rigid wall: microstructure to absorption":
         "Absorbente poroso sobre pared rígida: microestructura y absorción",
@@ -3468,12 +3469,12 @@ _ES: dict[str, str] = {
         "recorrido continuo: $≥ d_{min}$ de la fuente · ≥ 1,0 m de cualquier superficie · ≥ 0,5 m de un difusor",
     "· not within 10° of a room surface · length $≥ 3λ$ or 10,3 m, whichever is smaller":
         "· fuera de todo plano a menos de 10° de una superficie · longitud $≥ 3λ$ o 10,3 m, la menor",
-    "comparison method: the same six positions, and no $A$, no $V$, no $S$, no Waterhouse and no $C_1$ in Eq. 21":
-        "método de comparación: las mismas seis posiciones, y sin $A$, sin $V$, sin $S$, sin Waterhouse y sin $C_1$ en la Ec. 21",
-    "averaging ≥ 30 s at and below 160 Hz, ≥ 10 s from 200 Hz up · background at the same positions, just before or after":
-        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · ruido de fondo en las mismas posiciones, antes o después",
-    "hard walls, $α < 0,06$ within one wavelength of the source · $T_{60}$ per ISO 3382-2 from the first 10 dB or 15 dB only":
-        "paredes duras, $α < 0,06$ a menos de una longitud de onda de la fuente · $T_{60}$ según ISO 3382-2, solo los primeros 10 o 15 dB",
+    "comparison method: the same six positions, and Eq. 21 without $A$, $V$, $S$, Waterhouse or $C_1$":
+        "método de comparación: las mismas seis posiciones, y la Ec. 21 sin $A$, $V$, $S$, Waterhouse ni $C_1$",
+    "averaging ≥ 30 s to 160 Hz, ≥ 10 s from 200 Hz · background at those positions, before or after":
+        "promediado ≥ 30 s hasta 160 Hz, ≥ 10 s desde 200 Hz · fondo en esas posiciones, antes o después",
+    "hard walls, $α < 0,06$ within one wavelength of the source · $T_{60}$ per ISO 3382-2, first 10 dB or 15 dB only":
+        "paredes duras, $α < 0,06$ a una longitud de onda de la fuente · $T_{60}$ (ISO 3382-2) solo de los 10 o 15 dB primeros",
     # --- ISO 3744 parallelepiped measurement surface ---
     "ISO 3744 parallelepiped measurement surface":
         "Superficie de medición paralelepipédica ISO 3744",
@@ -3945,15 +3946,15 @@ _ES: dict[str, str] = {
     "sponge, 60 cells": "esponja, 60 celdas",
     "capture contour": "contorno de captura",
     "plane-wave injection line": "línea de onda plana",
-    "Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz the grid holds 343 cells per wavelength":
-        "Dominio de 980 × 346 celdas con dx = 0,5 mm (490 × 173 mm); a 2 kHz, 343 celdas por longitud de onda",
+    "Domain 980 × 346 cells at dx = 0.5 mm (490 × 173 mm); at 2 kHz there are 343 cells per wavelength":
+        "Dominio de 980 × 346 celdas, dx = 0,5 mm (490 × 173 mm); a 2 kHz, 343 celdas por longitud de onda",
     "Panel: five 70 mm cells, 20 mm slits on a 3 mm backing; the 3.2 mm neck sets dx, not the wavelength":
         "Panel: cinco celdas de 70 mm, ranuras de 20 mm sobre fondo de 3 mm; dx lo fija el cuello de 3,2 mm",
     "Clearances in cells: 40 ahead of the panel, 20 behind and to the sides, 60 to every sponge":
         "Holguras en celdas: 40 por delante del panel, 20 por detrás y a los lados, 60 hasta cada esponja",
-    "Sources outside the contour integrate to zero (extinction), so the total-field phasors give the scattered far field":
+    "Sources outside the contour integrate to zero (extinction): the total-field phasors give the scattered field":
         "Las fuentes fuera del contorno integran a cero (extinción): los fasores dan el campo lejano dispersado",
-    "Reference run: the identical scene without the panel → ContourPhasors.subtract() removes the grid-dispersion residual":
+    "Reference run: the same scene with no panel → ContourPhasors.subtract() removes the grid residual":
         "Referencia: la misma escena sin panel → ContourPhasors.subtract() elimina el residuo numérico",
     # Fluid-solid contact at three incidences (simulation/elastic-waves).
     "A fluid-solid contact at three incidences, and where it sits on the grid":

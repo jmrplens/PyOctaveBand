@@ -1443,7 +1443,7 @@ def _d_panel_insulation(s: SVG, th: Theme) -> None:
            "At $f_c = (c_0^2/2π) √(m″/B′)$ = 2619 Hz the free bending wave matches the trace wavelength",
            18, th.fg, anchor="start")
     s.text(80, 508,
-           "Sharp's prediction rates at $R_w$ = 27 dB; the dip collects the unfavourable deviations",
+           "Sharp's prediction rates $R_w$ = 27 dB; the dip takes the unfavourable deviations",
            18, th.primary, anchor="start", bold=True)
 
 
@@ -2388,11 +2388,11 @@ def _d_survey_sweep(s: SVG, th: Theme) -> None:
     s.text(ex0 + 150, ey_bot - 210, "during each traverse", 18, th.accent)
 
     for y, txt in (
-        (470, ("Alternative (Clause 6.3.1): a rotating microphone on a stand, "
-              "≥ 10° to the horizontal, sweep radius ≥ 1 m.")),
-        (496, ("Without a real-time octave analyser, repeat the whole sweep "
-              "once per band and read each 30 s $L_{eq}$.")),
-        (522, ("Tapping machine (6.2.3): centre of the floor, on the diagonal; "
+        (470, ("Alternative (6.3.1): a rotating microphone on a stand, "
+              "≥ 10° to the horizontal, radius ≥ 1 m.")),
+        (496, ("Without a real-time octave analyser, repeat the sweep per "
+              "band and read each 30 s $L_{eq}$.")),
+        (522, ("Tapping machine (6.2.3): floor centre, on the diagonal; "
               "three positions at 45° to the ribs.")),
     ):
         s.text(60, y, txt, 18, th.fg, anchor="start")
