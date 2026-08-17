@@ -404,3 +404,35 @@ def test_quick_table_covers_public_api() -> None:
     )
     markdown = path.read_text(encoding="utf-8")
     assert car.missing_names(markdown, list(phonometry.__all__)) == []
+
+
+_VERSION_ROW = """\
+| Name | Type | Description | Usage |
+| :--- | :--- | :--- | :--- |
+| `__version__` | `str` | **Package version string.** | `phonometry.__version__  # '3.3.0'` |
+"""
+
+
+def test_stale_versions_flags_a_literal_that_drifted() -> None:
+    """A release bump leaves the literal behind; the gate must say so."""
+    assert car.stale_versions(_VERSION_ROW, "3.3.0") == []
+    assert car.stale_versions(_VERSION_ROW, "3.4.0") == ["3.3.0"]
+    assert car.stale_versions(_VERSION_ROW, "4.0.0") == ["3.3.0"]
+
+
+def test_stale_versions_ignores_files_without_a_version_literal() -> None:
+    """Only ``phonometry.__version__  # '...'`` counts, not any old string."""
+    unrelated = "| `leq` | `function` | Level | `leq(x)  # '3.2.0' looking text` |"
+    assert car.stale_versions(unrelated, "3.3.0") == []
+
+
+def test_quick_table_version_literal_is_current() -> None:
+    """The committed table shows the version the package actually reports."""
+    path = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "docs" / "reference" / "api" / "index.md"
+    )
+    markdown = path.read_text(encoding="utf-8")
+    assert car.stale_versions(markdown, phonometry.__version__) == []
+    # And the row exists at all, so the check cannot pass by finding nothing.
+    assert car._VERSION_LITERAL.findall(markdown) == [phonometry.__version__]
