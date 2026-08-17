@@ -40949,13 +40949,16 @@ anti-alias filter whose transition band sits on the *input* Nyquist
 frequency, so above roughly 90 % of that frequency the response rolls off
 however high the internal design rate is. That only bites when a Table 3 row
 lands there, which is what happens below 40 kHz: at $f_\mathrm{s} = 32$ kHz
-the 15 848.9 Hz row falls 16.2 dB below its design goal (class 1 allows
+the 15 848.9 Hz row falls 16.2 dB below the A design goal (class 1 allows
 −16.0 dB there, class 2 sets no lower limit) and at $f_\mathrm{s} = 16$ kHz
 the 7 943.3 Hz row falls 12.0 dB below it (class 1 allows −2.5 dB, class 2
-−5.0 dB). `verify_weighting_class` measures that whole path, so it reports
-class 2 at 32 kHz and no class at all at 16 kHz rather than a grade the
-filter cannot deliver. Sample at 44.1 kHz or above for a class 1 A-weighting
-across the full table.
+−5.0 dB). `verify_weighting_class` measures that whole path, so for A it
+reports class 2 at 32 kHz and no class at all at 16 kHz rather than a grade
+the filter cannot deliver. The verdict is per curve, each graded against its
+own design goal: the C response lands 15.3 dB low at 32 kHz, inside that
+same −16.0 dB limit, so C keeps class 1 there, and 13.7 dB low at 16 kHz,
+where it meets no class either. Sample at 44.1 kHz or above for a class 1
+A-weighting across the full table.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf.svg" alt="A-weighting high-frequency accuracy at 48 kHz: analytic curve versus plain bilinear versus oversampled design, with error subplot" width="80%"></picture>
 

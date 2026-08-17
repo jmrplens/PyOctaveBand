@@ -335,13 +335,17 @@ frecuencia de Nyquist *de entrada*, así que por encima de aproximadamente el
 90 % de esa frecuencia la respuesta cae por mucho que suba la frecuencia
 interna de diseño. Eso solo importa cuando ahí cae una fila de la Tabla 3,
 que es lo que ocurre por debajo de 40 kHz: a $f_\mathrm{s} = 32$ kHz la fila
-de 15 848,9 Hz queda 16,2 dB por debajo de su objetivo de diseño (la clase 1
-admite ahí −16,0 dB y la clase 2 no fija límite inferior) y a
+de 15 848,9 Hz queda 16,2 dB por debajo del objetivo de diseño de la A (la
+clase 1 admite ahí −16,0 dB y la clase 2 no fija límite inferior) y a
 $f_\mathrm{s} = 16$ kHz la de 7 943,3 Hz queda 12,0 dB por debajo (la clase 1
 admite −2,5 dB; la clase 2, −5,0 dB). `verify_weighting_class` mide toda esa
-cadena, de modo que informa de clase 2 a 32 kHz y de ninguna clase a 16 kHz
-en lugar de un grado que el filtro no puede dar. Para una ponderación A de
-clase 1 en toda la tabla, muestrea a 44,1 kHz o más.
+cadena, de modo que para la A informa de clase 2 a 32 kHz y de ninguna clase
+a 16 kHz en lugar de un grado que el filtro no puede dar. El resultado es por
+curva, porque cada una se juzga frente a su propio objetivo de diseño: la
+respuesta C queda 15,3 dB por debajo a 32 kHz, dentro de ese mismo límite de
+−16,0 dB, así que ahí conserva la clase 1, y 13,7 dB por debajo a 16 kHz,
+donde tampoco cumple ninguna clase. Para una ponderación A de clase 1 en
+toda la tabla, muestrea a 44,1 kHz o más.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/weighting_accuracy_hf_es.svg" alt="Precisión en alta frecuencia de la ponderación A a 48 kHz: curva analítica frente a bilineal simple y diseño sobremuestreado, con error" width="80%" />
 
