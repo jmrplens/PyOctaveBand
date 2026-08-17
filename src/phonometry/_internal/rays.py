@@ -268,20 +268,40 @@ def _rk4(
             h / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t))
 
 
+def _gradients_with_half_spaces(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    """Per-segment ``dc/dz``, with the half spaces beyond the profile's ends.
+
+    The profile arrays *are* the medium: both callers read the sound speed off
+    them with :func:`numpy.interp`, which clamps, so past either end the medium
+    is homogeneous and its gradient is zero there. Padding the segment gradients
+    with that zero at both ends covers the whole line, one entry per gap between
+    consecutive nodes plus one for each half space, which buys two things at
+    once. A :func:`numpy.searchsorted` over the nodes then indexes it without
+    clipping, so a boundary standing outside the sampled profile sees the
+    homogeneous half space it is really in rather than an extrapolation of the
+    last segment; and one :func:`numpy.diff` gives the gradient jump at *every*
+    node, the two end ones included, which is what an end node needs when the
+    medium is open on that side and it is a discontinuity like any other.
+    """
+    return np.concatenate(([0.0], np.diff(c_prof) / np.diff(z_prof), [0.0]))
+
+
 def _segment_gradient(
     z_prof: NDArray[np.float64], grad: NDArray[np.float64], level: float, *,
     inward: float,
 ) -> float:
     """``dc/dz`` of the profile segment on the medium side of ``level``.
 
-    ``inward`` is the sign of the direction that leads into the medium, so the
-    segment picked is the one holding ``level`` plus an infinitesimal step that
-    way. Clipping covers a boundary that sits outside the sampled profile, the
-    profile then being read as constant beyond its ends.
+    ``grad`` is the padded array above, so the segment picked is the one holding
+    ``level`` plus an infinitesimal step in the ``inward`` direction, the sign
+    that leads into the medium, whether that lands inside the profile or in a
+    half space beyond it.
     """
     seg = int(np.searchsorted(
-        z_prof, level, side="right" if inward > 0.0 else "left")) - 1
-    return float(grad[min(max(seg, 0), grad.size - 1)])
+        z_prof, level, side="right" if inward > 0.0 else "left"))
+    return float(grad[seg])
 
 
 def _prepare_impulses(
@@ -294,17 +314,27 @@ def _prepare_impulses(
     gradient at a reflection (Eq. 3.123), which is the jump the mirrored profile
     of the image medium shows at that boundary. Everything here depends only on
     depth, so it is computed once for the whole march.
+
+    What makes a node an interface is that ``dc/dz`` jumps there and that the
+    ray can reach it, i.e. that it lies strictly inside the medium; being an end
+    of the sampled profile has nothing to do with it. For the ocean the two ends
+    are the sea surface and the bottom, so they are boundaries and get the image
+    medium's doubled strength instead. For a medium open on one side they are
+    not: the atmosphere ends its profile in mid air, above which the caller's
+    clamped interpolation makes the medium homogeneous, and the last node is
+    then a kink the rays climb through like any other. Dropping it would put
+    them back on the free-space spreading this whole apparatus exists to avoid,
+    silently and by roughly the size of the gradient the profile ends on.
     """
     z_prof = np.asarray(dynamic.profile_depths, dtype=np.float64).ravel()
     c_prof = np.asarray(dynamic.profile_speeds, dtype=np.float64).ravel()
-    grad = np.diff(c_prof) / np.diff(z_prof)
-    jumps = np.diff(grad)  # per interior node: segment below minus above
-    inner = z_prof[1:-1]
-    keep = (inner > lower) & (jumps != 0.0)
+    grad = _gradients_with_half_spaces(z_prof, c_prof)
+    jumps = np.diff(grad)  # per node: segment below minus segment above
+    keep = (z_prof > lower) & (jumps != 0.0)
     if upper is not None:
-        keep &= inner < upper
-    interfaces = inner[keep]
-    speeds = np.interp(interfaces, z_prof, c_prof)
+        keep &= z_prof < upper
+    interfaces = z_prof[keep]
+    speeds = c_prof[keep]
 
     levels = [np.array([lower])]
     strengths = [np.array([2.0 * _segment_gradient(z_prof, grad, lower, inward=1.0)

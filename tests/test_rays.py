@@ -67,12 +67,21 @@ _GRAD = (np.array([0.0, 1000.0]), np.array([1500.0, 1520.0]))
 #: A thermocline: three segments, so two nodes where dc/dz jumps hard.
 _KINK = (np.array([0.0, 100.0, 300.0, 1000.0]),
          np.array([1500.0, 1510.0, 1488.0, 1512.0]))
+#: A downwind atmosphere sampled to 200 m, 0.05 s^-1, and homogeneous above it:
+#: the shape the marcher meets with no boundary over it, where the last node of
+#: the profile is an ordinary kink rather than the top of the medium.
+_CAPPED_GRADIENT = 0.05
+_CAPPED_HEIGHT = 200.0
+_CAPPED_SOURCE = 5.0
+_CAPPED = (np.array([0.0, _CAPPED_HEIGHT]),
+           np.array([340.0, 340.0 + _CAPPED_GRADIENT * _CAPPED_HEIGHT]))
 
 
 def _march(
     profile: tuple[np.ndarray, np.ndarray], source_depth: float,
     angles_deg: list[float], *, max_range: float, n_steps: int,
-    water_depth: float = 1000.0, spreading: complex | np.ndarray | None = None,
+    water_depth: float | None = 1000.0,
+    spreading: complex | np.ndarray | None = None,
     slope: complex | np.ndarray | None = None, dynamic: bool = True,
 ) -> tuple[RayMarch, np.ndarray]:
     """Trace a fan through ``profile``, optionally carrying (q, p).
@@ -82,9 +91,16 @@ def _march(
     segment lookup resolves the tie by the direction of travel rather than by
     rounding. Without it one Runge-Kutta stage per crossing reads the gradient
     on the far side of the kink.
+
+    ``water_depth=None`` takes the boundary above away, which is the atmospheric
+    tracer's geometry: above the last node :func:`numpy.interp` holds the speed
+    flat, so the derivative holds the gradient flat with it, exactly as
+    :func:`atmospheric_ray_paths` does.
     """
     z_prof, c_prof = profile
     seg_grad = np.diff(c_prof) / np.diff(z_prof)
+    top = float(z_prof[-1])
+    open_above = water_depth is None
     c0 = float(np.interp(source_depth, z_prof, c_prof))
     th = np.radians(np.asarray(angles_deg, dtype=np.float64))
     xi = np.cos(th) / c0
@@ -96,8 +112,10 @@ def _march(
         seg = np.where(zeta_arr >= 0.0,
                        np.searchsorted(z_prof, z_arr, side="right") - 1,
                        np.searchsorted(z_prof, z_arr, side="left") - 1)
-        seg = np.clip(seg, 0, seg_grad.size - 1)
-        return (zeta_arr / xi, -seg_grad[seg] / (cc**3 * xi), 1.0 / (xi * cc**2))
+        grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
+        if open_above:
+            grad = np.where(z_arr > top, 0.0, grad)
+        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2))
 
     dyn = None
     if dynamic:
@@ -112,7 +130,7 @@ def _march(
 
 def _jacobian_spreading(
     profile: tuple[np.ndarray, np.ndarray], source_depth: float, angle_deg: float,
-    *, max_range: float, n_steps: int, water_depth: float = 1000.0,
+    *, max_range: float, n_steps: int, water_depth: float | None = 1000.0,
     delta_deg: float = 1e-4,
 ) -> np.ndarray:
     """``q`` read off the ray family: ``c xi dz/dtheta0`` at fixed range.
@@ -291,6 +309,85 @@ def test_the_spreading_is_continuous_across_a_node_and_its_slope_is_not() -> Non
     increments = np.abs(np.diff(q))
     assert np.max(increments) < 3.0 * float(np.median(increments))
     assert np.all(np.diff(q) > 0.0)
+
+
+def _capped_layer_paths(
+    angle_deg: float, ranges: np.ndarray,
+) -> tuple[np.ndarray, float]:
+    """``z(r)`` in closed form for a gradient layer under a homogeneous cap.
+
+    In the layer the ray is the usual circular arc, which the angle from the
+    horizontal writes without a square root twice over: differentiating Snell's
+    law :math:`\\cos\\theta = c\\,\\xi` gives
+    :math:`d\\theta/dr = -\\xi g/\\cos\\theta`, hence
+    :math:`\\sin\\theta(r) = \\sin\\theta_0 - \\xi g r` and
+    :math:`z - z_\\mathrm{s} = (\\cos\\theta - \\cos\\theta_0)/(\\xi g)`. Above
+    the cap the sound speed is constant and the ray is the straight line it
+    arrives as. No integrator and no ray-tube quantity anywhere in it, which is
+    what makes the family below an oracle rather than a restatement.
+    """
+    g, height = _CAPPED_GRADIENT, _CAPPED_HEIGHT
+    c_ground = float(_CAPPED[1][0])
+    c_s = c_ground + g * _CAPPED_SOURCE
+    th0 = np.radians(angle_deg)
+    xi = float(np.cos(th0) / c_s)
+    th_top = np.arccos((c_ground + g * height) * xi)
+    r_top = (np.sin(th0) - np.sin(th_top)) / (xi * g)
+    sin_th = np.sin(th0) - xi * g * np.minimum(ranges, r_top)
+    in_layer = _CAPPED_SOURCE + (np.sqrt(1.0 - sin_th**2) - np.cos(th0)) / (xi * g)
+    above = height + (ranges - r_top) * np.tan(th_top)
+    return np.where(ranges <= r_top, in_layer, above), xi
+
+
+def _capped_layer_spreading(
+    angle_deg: float, ranges: np.ndarray, delta_deg: float = 1e-3,
+) -> np.ndarray:
+    """``q = c(z) xi dz/dtheta0`` at fixed range, off the closed-form family.
+
+    The paths carry no discretisation error, so the difference quotient has only
+    its own truncation in it and the answer is the same to six figures whether
+    the neighbours are a thousandth of a degree away or a hundredth.
+    """
+    z_mid, xi = _capped_layer_paths(angle_deg, ranges)
+    hi, _ = _capped_layer_paths(angle_deg + delta_deg, ranges)
+    lo, _ = _capped_layer_paths(angle_deg - delta_deg, ranges)
+    c_at = np.minimum(_CAPPED[1][0] + _CAPPED_GRADIENT * z_mid, _CAPPED[1][1])
+    return c_at * xi * (hi - lo) / (2.0 * np.radians(delta_deg))
+
+
+def test_the_last_node_of_an_open_medium_kinks_the_spreading_like_any_other(
+) -> None:
+    # A medium with no boundary above ends its profile in mid air: the caller
+    # reads the sound speed off a clamped interpolation, so past the last node
+    # the medium is homogeneous and that node is a discontinuity of dc/dz the
+    # rays climb through. It is not an end of the medium and there is no image
+    # medium at it, so it takes the plain gradient jump of an interface. This
+    # ray leaves the profile at 25 degrees and meets exactly one, which is what
+    # lets the closed form above stand in for the whole of q.
+    rmax = 2000.0
+    errors = []
+    for ns in (201, 1601):
+        ranges = np.linspace(0.0, rmax, ns)
+        march, _ = _march(_CAPPED, _CAPPED_SOURCE, [25.0], max_range=rmax,
+                          n_steps=ns, water_depth=None)
+        oracle = _capped_layer_spreading(25.0, ranges)
+        assert march.positions.max() > _CAPPED_HEIGHT, "the ray must leave it"
+        assert march.reflections.sum() == 0
+        assert march.spreadings is not None
+        errors.append(float(np.max(np.abs(march.spreadings[0][1:] / oracle[1:]
+                                          - 1.0))))
+    # Refining the march drives it onto the family, which is the signature of a
+    # crossing resolved at the right range rather than one merely accounted for.
+    assert errors[0] < 1e-4
+    assert errors[1] < errors[0] / 4.0
+
+    # And the failure mode, which is the reason for the test: the layer below
+    # the cap has no curvature and the half space above it none either, so with
+    # that one impulse missing q is the straight line r / cos(theta0) of a
+    # medium that never refracted at all, eleven per cent adrift and silent.
+    ignored = rmax / np.cos(np.radians(25.0))
+    exact = _capped_layer_spreading(25.0, np.array([rmax]))[0]
+    assert abs(ignored - exact) / exact > 1e-1
 
 
 # --- Complex initial conditions ---------------------------------------------
