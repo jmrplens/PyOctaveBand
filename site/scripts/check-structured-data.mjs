@@ -11,7 +11,7 @@
 //
 // It did. `Head.astro` resolved the section name from a map written out by
 // hand beside the topic list, the signal chapter was renamed `signals` and
-// only the list was swept, so all 54 pages of the largest topic on the site
+// only the list was swept, so all 54 pages of the signal analysis topic
 // shipped with no `articleSection` for as long as nobody looked. The
 // breadcrumb trail on those same pages named the section correctly throughout,
 // because it reads src/data/topics.mjs.

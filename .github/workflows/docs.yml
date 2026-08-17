@@ -126,9 +126,9 @@ jobs:
         # The JSON-LD graph is the only part of a page written for machines
         # alone, and nothing else here reads it: html-validate does not look
         # inside a <script>, pa11y has no reason to, and the link checker sees
-        # no links there. A renamed topic left the largest section of the site
-        # publishing no articleSection at all, on 54 pages in both locales, and
-        # every check in this job stayed green for a week.
+        # no links there. A renamed topic left one section of the site
+        # publishing no articleSection at all, on all 54 of its pages across
+        # the two locales, and every check in this job stayed green for a week.
         run: pnpm run check:structured-data
         working-directory: site
       - name: Check every formula rendered
