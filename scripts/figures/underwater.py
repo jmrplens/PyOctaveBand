@@ -891,6 +891,126 @@ def generate_ray_turning_point(output_dir: str) -> None:
     plt.close(fig)
 
 
+def generate_gaussian_beam_caustic(output_dir: str) -> None:
+    """A finite level on the caustic and a graded one in the shadow behind it."""
+    print("Generating gaussian_beam_caustic...")
+    from phonometry import gaussian_beams, ray_trace
+
+    # Jensen's n^2-linear profile, Eq. (3.77): c(z) = c0/sqrt(1 + 2.4 z/c0), the
+    # one profile whose modes are Airy functions in closed form, and the one the
+    # book draws its caustic and its shadow zone on (Figs. 3.13-3.17). The
+    # source sits 7.5 m off the bottom, so the up-going fan turns inside the
+    # column and its envelope is a caustic; the 201-point grid puts no node at
+    # 992.5 m, which would be a gradient kink under the source and a spurious
+    # horizontal jet in the field.
+    c0 = 1550.0
+    z_prof = np.linspace(0.0, 1000.0, 201)
+    c_prof = c0 / np.sqrt(1.0 + 2.4 * z_prof / c0)
+    freq, z_src, r_max = 600.0, 992.5, 2500.0
+
+    beams = gaussian_beams(freq, z_prof, c_prof, source_depth=z_src,
+                           max_range=r_max, range_step=12.5,
+                           max_angle_deg=45.0, n_depth_points=400)
+    pl = np.asarray(beams.propagation_loss, dtype=float)
+    ranges = np.asarray(beams.ranges, dtype=float)
+    depths = np.asarray(beams.depths, dtype=float)
+
+    fig, ax = plt.subplots(figsize=(11.6, 6.4))
+
+    # contourf, not imshow: a loss field drawn as a raster inside an SVG is a
+    # base64 bitmap, which the figure policy keeps out of the vector corpus, and
+    # the bands are what the reader actually measures the picture with. Six 8 dB
+    # bands from 50 dB, with both ends open: below 50 dB is the near field the
+    # sum does not resolve (inside three beam widths of the source the level
+    # runs down to 0.7 dB, which is arithmetic and not physics), and above 98 dB
+    # is the shadow, which has no bottom -- the wedge no beam reaches at all is
+    # 18.4% of these cells and is exactly infinite, so it is folded into the
+    # quiet end rather than left as a hole.
+    #
+    # The band colours are sampled by hand, evenly along the whole ramp,
+    # because the spread matplotlib picks for ``extend="both"`` crowds its
+    # quiet end: it left the 90 to 98 dB band and the open band above it
+    # #481f70 and #440154, a CIEDE2000 distance of 6.8, which is inside the
+    # shadow zone and is exactly where the reader is trying to tell one band
+    # from the next. Sampled evenly the closest pair is 12.1.
+    #
+    # Taking the ramp whole then needs no theme switch, which for a sequential
+    # map is worth checking rather than assuming: its quiet end is dE00 = 26.4
+    # from the dark theme's black axes and 81.4 from the white ones, and its
+    # loud end (#fde725) is 29.8 from white, all clear of the 10 the contrast
+    # gate asks for. Stopping short of the dark end, which is what a family of
+    # curves has to do (see theme.series_colors), would have cost 23 of those
+    # points on white to buy 5 on black.
+    edges = np.arange(50.0, 99.0, 8.0)
+    bands = plt.get_cmap("viridis_r")(np.linspace(0.0, 1.0, edges.size + 1))
+    field = np.where(np.isfinite(pl), pl, edges[-1] + 1.0)
+    filled = ax.contourf(ranges, depths, field, levels=edges,
+                         colors=[tuple(rgba) for rgba in bands], extend="both")
+
+    # The rays the beams are hung on, from the same profile and the same source:
+    # every second one of a 15-ray up-going fan, so the fold that makes the
+    # caustic is visible as geometry over the level it produces.
+    rays = ray_trace(z_prof, c_prof, source_depth=z_src,
+                     launch_angles_deg=np.linspace(-45.0, -3.0, 15),
+                     max_range=r_max, n_steps=4000)
+    # Grey rather than COLOR_FG: these lines cross the whole ramp, and each end
+    # of it takes a different ink (black vanishes in the shadow band, white in
+    # the bright core). COLOR_MUTED is the one grey that reads on both.
+    for i in range(0, rays.ranges.shape[0], 2):
+        ax.plot(rays.ranges[i], rays.depths[i], color=COLOR_MUTED,
+                linewidth=0.7, zorder=3)
+
+    ax.plot([0.0], [z_src], "o", color=COLOR_FG, markersize=7, zorder=5)
+    ax.annotate("source, 992.5 m", xy=(0.0, z_src), xytext=(16, 20),
+                textcoords="offset points", fontsize=9, color=COLOR_FG,
+                bbox={"boxstyle": "round,pad=0.3", "facecolor": COLOR_PANEL,
+                      "edgecolor": COLOR_GRID})
+
+    # The two things the reader is here for, pinned to where they are: the
+    # caustic apex (the shallowest point the 70 dB contour reaches, 162 m at
+    # 1588 m) and the graded shadow above it. Both labels are boxed on
+    # COLOR_PANEL because they sit over the field, where neither ink reads on
+    # its own, and both are placed inside the axes so the saved canvas is the
+    # picture rather than the picture plus a margin of captions.
+    ax.annotate(
+        "caustic: the ray fan folds on itself here,\n"
+        "and the beam sum answers 59 dB, not infinity",
+        xy=(1600.0, 190.0), xytext=(0.975, 0.74), textcoords="axes fraction",
+        fontsize=9, color=COLOR_FG, ha="right", va="center",
+        bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+              "edgecolor": COLOR_GRID},
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED, "linewidth": 1.2})
+    ax.text(0.025, 0.955,
+            "shadow zone: no ray reaches it, and the field\n"
+            "grades into it rather than stopping at an edge\n"
+            "(+88 dB over the 100 m above the caustic)",
+            transform=ax.transAxes, fontsize=9, color=COLOR_FG,
+            ha="left", va="top",
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+
+    ax.text(0.985, 0.06,
+            f"{int(freq)} Hz, $n^2$-linear profile (Jensen Eq. 3.77)\n"
+            f"{beams.launch_angles.size} beams over ±45°, "
+            f"$W_0$ = {beams.initial_beam_width:.1f} m",
+            transform=ax.transAxes, fontsize=8.5, color=COLOR_FG,
+            ha="right", va="bottom",
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+
+    fig.colorbar(filled, ax=ax, label="Propagation loss [dB]")
+    ax.set_xlim(0.0, r_max)
+    ax.set_ylim(1000.0, 0.0)
+    ax.set_xlabel("Range [m]")
+    ax.set_ylabel("Depth [m]")
+    ax.set_title("Where Rays Give Infinity and Nothing, Beams Give a Level",
+                 pad=12)
+    ax.grid(False)
+    plt.tight_layout()
+    save_figure(output_dir, "gaussian_beam_caustic.svg")
+    plt.close(fig)
+
+
 def generate_pe_paraxial_error(output_dir: str) -> None:
     """Where the small-angle PE disagrees with the modal reference, and why."""
     print("Generating pe_paraxial_error...")
