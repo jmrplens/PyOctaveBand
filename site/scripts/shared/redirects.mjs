@@ -74,8 +74,37 @@ export const SPLIT_DESTINATIONS = new Map([
 	],
 ]);
 
-const git = (...args) =>
-	execFileSync('git', ['-C', repoDir, ...args], { encoding: 'utf8', maxBuffer: 1 << 28 });
+function git(...args) {
+	try {
+		return execFileSync('git', ['-C', repoDir, ...args], {
+			encoding: 'utf8',
+			maxBuffer: 1 << 28,
+			// stderr captured rather than inherited, so probing for a ref that may
+			// not be in this checkout does not print an error that is not one.
+			stdio: ['ignore', 'pipe', 'pipe'],
+		});
+	} catch (error) {
+		error.message = `${error.message}\n${error.stderr ?? ''}`.trim();
+		throw error;
+	}
+}
+
+/**
+ * What to tell whoever is looking at an address the replay cannot place.
+ *
+ * Shared by the generator and the check so the two say the same thing, because
+ * whichever of them the reader hits first is the one that has to explain it.
+ */
+export function unresolvedMessage(unresolved) {
+	return (
+		`${unresolved.length} published address(es) are no longer served and cannot be traced\n` +
+		`     to a page that is. They were split or dropped rather than renamed, so their\n` +
+		`     destination is a judgement call: add each to SPLIT_DESTINATIONS in\n` +
+		`     scripts/shared/redirects.mjs, pointing at the overview of the subsection its\n` +
+		`     content became.\n` +
+		unresolved.map((route) => `       ${route}`).join('\n')
+	);
+}
 
 /** True for a content page (the tree also holds images and data files). */
 const isPage = (path) => path.startsWith(CONTENT) && /\.mdx?$/.test(path);
@@ -132,7 +161,12 @@ function pagesAt(commit) {
 
 /** The renames, additions and deletions of pages between two commits. */
 function changesBetween(from, to) {
-	const out = git('diff', '--name-status', '--find-renames', from, to, '--', CONTENT).trim();
+	// `-l0` lifts the rename-detection limit: one of these steps moved 272 pages
+	// at once, and a git whose diff.renameLimit is set low enough would quietly
+	// report those as deletions and additions instead. The map has to come out
+	// the same on every machine that derives it, including the CI worker that
+	// fails the build when it disagrees with the committed one.
+	const out = git('diff', '--name-status', '--find-renames', '-l0', from, to, '--', CONTENT).trim();
 	const renames = [];
 	const added = [];
 	const deleted = [];
@@ -161,11 +195,13 @@ function replay(steps) {
 	const create = (route) => {
 		const page = { routes: new Set([route]), current: route };
 		pages.push(page);
-		live.set(route, page);
 		return page;
 	};
 
-	for (const page of pagesAt(steps[0])) create(routeOf(page));
+	for (const file of pagesAt(steps[0])) {
+		const route = routeOf(file);
+		live.set(route, create(route));
+	}
 
 	for (let i = 1; i < steps.length; i += 1) {
 		const { renames, added, deleted } = changesBetween(steps[i - 1], steps[i]);
@@ -174,7 +210,7 @@ function replay(steps) {
 		for (const [from, to] of renames) {
 			const page = live.get(from);
 			if (!page) {
-				create(to);
+				next.set(to, create(to));
 				continue;
 			}
 			next.delete(from);
@@ -202,9 +238,10 @@ function replay(steps) {
  *
  * Starlight serves the default locale at the root and falls back to it for a
  * page the other locale has not translated, so an English-only page such as an
- * API reference page is published at its Spanish address too. Leaving those
- * fallbacks out would have missed 159 dead Spanish addresses, every one of
- * which returns 404 today.
+ * API reference page is published at its Spanish address too. Counting source
+ * files alone would have missed 47 dead Spanish addresses that never had a
+ * Spanish file, every one of which answers 404 today, and would have claimed
+ * one address was dead that the fallback still serves.
  */
 export function routesFor(sourceRoutes) {
 	const routes = new Set();

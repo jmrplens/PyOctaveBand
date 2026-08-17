@@ -22,7 +22,12 @@ import { fileURLToPath } from 'node:url';
 
 import { basePath } from '../src/data/site.mjs';
 import { redirects as committed } from '../src/data/redirects.mjs';
-import { deriveRedirects, redirectModuleSource, TARGET } from './shared/redirects.mjs';
+import {
+	deriveRedirects,
+	redirectModuleSource,
+	TARGET,
+	unresolvedMessage,
+} from './shared/redirects.mjs';
 
 const siteDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(siteDir, 'dist');
@@ -38,14 +43,7 @@ const ok = (message) => console.log(`ok   ${message}`);
 const { redirects, unresolved } = deriveRedirects();
 
 if (unresolved.length > 0) {
-	fail(
-		`${unresolved.length} published address(es) are no longer served and cannot be traced\n` +
-			`     to a page that is. They were split or dropped rather than renamed, so their\n` +
-			`     destination is a judgement call: add each to SPLIT_DESTINATIONS in\n` +
-			`     scripts/shared/redirects.mjs, pointing at the overview of the subsection its\n` +
-			`     content became.\n` +
-			unresolved.map((route) => `       ${route}`).join('\n'),
-	);
+	fail(unresolvedMessage(unresolved));
 } else {
 	ok(`every address the site has published is either served or redirected`);
 }

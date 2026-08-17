@@ -11,19 +11,17 @@
 // Usage: node scripts/generate-redirects.mjs   (or `pnpm run redirects`)
 import { writeFileSync } from 'node:fs';
 
-import { deriveRedirects, redirectModuleSource, TARGET } from './shared/redirects.mjs';
+import {
+	deriveRedirects,
+	redirectModuleSource,
+	TARGET,
+	unresolvedMessage,
+} from './shared/redirects.mjs';
 
 const { redirects, unresolved } = deriveRedirects();
 
 if (unresolved.length > 0) {
-	console.error(
-		`FAIL ${unresolved.length} published address(es) no longer served and not traceable to a\n` +
-			`     page that is: they were split or dropped rather than renamed, so their\n` +
-			`     destination is a judgement call. Add each to SPLIT_DESTINATIONS in\n` +
-			`     scripts/shared/redirects.mjs, pointing at the overview of the subsection\n` +
-			`     its content became:\n` +
-			unresolved.map((route) => `       ${route}`).join('\n'),
-	);
+	console.error(`FAIL ${unresolvedMessage(unresolved)}`);
 	process.exit(1);
 }
 
