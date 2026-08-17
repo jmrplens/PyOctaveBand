@@ -169,7 +169,7 @@ plt.show()
 </details>
 
 Options: `mode` selects the envelope ballistics (`'fast'`, `'slow'`,
-`'impulse'`), `weighting` applies A/C weighting first, and
+`'impulse'`), `weighting` applies the chosen weighting curve first, and
 `calibration_factor`/`dbfs` behave as in `leq`. The integrator attack transient
 (~5τ) is discarded before taking percentiles, so the leading settling ramp is
 not counted in the low percentiles.

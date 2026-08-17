@@ -115,10 +115,11 @@ Una hoja de campo que merece copiarse:
 
 Las muestras digitales son adimensionales; el **factor de sensibilidad** las
 convierte a pascales. `sensitivity()` lo calcula a partir de la grabación del
-calibrador y, si se le pasa `fs` como aquí, valida además la estabilidad a corto
-plazo de la grabación igual que IEC 60942 cualifica el propio calibrador, de
-modo que un micrófono mal acoplado se detecta aquí en lugar de corromper todos
-los niveles posteriores. Sin `fs` se obtiene solo el factor, sin comprobación.
+calibrador y, si se le pasa `fs` como aquí y `validate` se deja en su valor por
+defecto `True`, valida además la estabilidad a corto plazo de la grabación igual
+que IEC 60942 cualifica el propio calibrador, de modo que un micrófono mal
+acoplado se detecta aquí en lugar de corromper todos los niveles posteriores. Si
+falta cualquiera de los dos se obtiene solo el factor, sin comprobación.
 
 ```python
 cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)
