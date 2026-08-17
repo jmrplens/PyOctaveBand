@@ -32417,9 +32417,9 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `TimeWeighting` | `class` | **Stateful time weighting.**<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast') | `tw = TimeWeighting(fs, mode='fast')`<br>`env = tw.process(block)` per block<br>`tw.reset()` to start over |
 | `leq` | `function` | **Equivalent level (Leq).**<br>• `x`: Signal array (1D or 2D)<br>• `calibration_factor`: Sensitivity multiplier (Default: 1.0)<br>• `dbfs`: Output in dBFS (Default: False) | `level = leq(x, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
 | `laeq` | `function` | **A-weighted Leq (LAeq).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `calibration_factor` / `dbfs`: as `leq` | `level = laeq(x, fs, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
-| `ln_levels` | `function` | **Statistical levels (LN).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `n`: Exceedance percentiles (Default: (10, 50, 90))<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast')<br>• `weighting`: 'A', 'C', 'G', 'Z' or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `stats = ln_levels(x, fs, n=(10, 50, 90), weighting='A')`<br><br>• `stats`: Dict `{10: L10, 50: L50, 90: L90}` |
+| `ln_levels` | `function` | **Statistical levels (LN).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `n`: Exceedance percentiles (Default: (10, 50, 90))<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast')<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `stats = ln_levels(x, fs, n=(10, 50, 90), weighting='A')`<br><br>• `stats`: Dict `{10: L10, 50: L50, 90: L90}` |
 | `lc_peak` | `function` | **C-weighted peak (LCpeak).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `calibration_factor`: as `leq`<br>• `dbfs`: 0 dBFS = full-scale *peak* (amplitude 1.0), unlike the RMS reference of `leq`<br>• `oversample`: HF inter-sample peak recovery (Default: 8; 1 = on-grid, under-reads up to ~1.15 dB at 48 kHz) | `peak = lc_peak(x, fs)`<br><br>• IEC 61672-1 §5.13; verified against Table 5 |
-| `sel` | `function` | **Sound exposure level (SEL/LAE).**<br>• `x`: Whole-event signal (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `weighting`: 'A', 'C', 'G', 'Z' or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `lae = sel(x, fs, weighting='A')`<br><br>• Event level normalized to 1 s |
+| `sel` | `function` | **Sound exposure level (SEL/LAE).**<br>• `x`: Whole-event signal (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `lae = sel(x, fs, weighting='A')`<br><br>• Event level normalized to 1 s |
 | `sound_exposure` | `function` | **A-weighted exposure E (IEC 61252).**<br>• `x`: Signal (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `duration_hours`: exposure period represented (Default: recording length)<br>• `calibration_factor` | `E = sound_exposure(x, fs, duration_hours=8)`<br><br>• `E`: Pa²·h |
 | `lex_8h` | `function` | **Daily exposure LEX,8h / LEP,d.**<br>• Same params as `sound_exposure` | `lex = lex_8h(x, fs, duration_hours=4)`<br><br>• Normalized 8 h level [dB] |
 | `loudness_zwicker` | `function` | **Zwicker loudness (ISO 532-1:2017).**<br>• `x`: Calibrated signal in Pa (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free' or 'diffuse' (Default: 'free')<br>• `stationary`: Clause 5 stationary method (Default: False)<br>• `time_skip`: seconds excluded from the stationary mean square (Annex B.1 uses 0.2 s; Default: 0.0)<br>• `calibration_factor`: Digital units to Pa (Default: 1.0) | `res = loudness_zwicker(x, fs)`<br><br>• `ZwickerLoudness`; time-varying runs add N5/N10 and the 500 Hz N(t) trace |
@@ -33616,7 +33616,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `FilterBankWarning` | `warning class` | **Fractional-octave filter-bank advisory.**<br>Emitted for filter-bank processing pitfalls | `warnings.simplefilter('error', FilterBankWarning)` |
 | `TonalityWarning` | `warning class` | **Tonality advisory.**<br>Emitted for biased tonality estimates (e.g. coarse FFT resolution) | `warnings.simplefilter('error', TonalityWarning)` |
 | `STIWarning` | `warning class` | **STI/STIPA advisory.**<br>Emitted for suspect speech-intelligibility measurements or inputs | `warnings.simplefilter('error', STIWarning)` |
-| `__version__` | `str` | **Package version string.**<br>(no parameters) | `phonometry.__version__  # '3.2.0'` |
+| `__version__` | `str` | **Package version string.**<br>(no parameters) | `phonometry.__version__  # '3.3.0'` |
 | `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
 
 ## Notes
@@ -37931,7 +37931,7 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 | `sigbands` | bool | — | default `False` | Also return the per-band time signals |
 | `mode` | str | — | `'rms'` (default) or `'peak'` | Per-band statistic returned |
 | `nominal` | bool | — | default `False` | Return nominal band labels (e.g. `1000`) instead of exact centre frequencies |
-| `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `detrend` | bool | — | default `True` | Remove the input signal's DC offset once, before filtering (improves low-frequency accuracy) |
 | `calibration.factor` | float | — | default `1.0` | Scales the input to pascals (see the Calibration guide) |
 | `calibration.dbfs` | bool | — | default `False` | Reference levels to digital full scale instead of 20 µPa |
 | `response_plot.file` | str or `None` | — | default `None` | Save the bank-response plot to this path |
@@ -39739,7 +39739,7 @@ everywhere else, energy.
 | `x` | 1D or 2D array | digital units (or Pa if calibrated) | non-empty | 2D is `[channels, samples]`; returns one level per channel |
 | `fs` | int | Hz | > 0 (`laeq` only) | `leq` needs no sample rate (pure RMS integral) |
 | `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
-| `dbfs` | bool | — | default `False` | `True`: 0 dBFS = full-scale RMS sine; ignores calibration |
+| `dbfs` | bool | — | default `False` | `True`: 0 dBFS = RMS 1.0; ignores calibration |
 
 ## Percentile levels (LN)
 
@@ -39856,7 +39856,7 @@ of [Environmental levels](https://jmrplens.github.io/phonometry/environment/asse
 | `fs` | int | Hz | > 0 | Needed by the envelope detector |
 | `n` | tuple of ints | % | default `(10, 50, 90)` | Any exceedance percentages, e.g. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | IEC 61672-1 ballistics of the envelope |
-| `weighting` | str or None | — | `'A'`, `'C'`, `'G'`, `'Z'`, `None` (default) | Frequency weighting before the envelope |
+| `weighting` | str or None | — | any `weighting_filter` curve: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (default) | Frequency weighting before the envelope (`None` and `'Z'` both leave it unweighted) |
 | `calibration_factor` / `dbfs` | float / bool | — | as `leq` | Same semantics as in `leq()` |
 
 ## Peak, event and occupational metrics
@@ -39967,7 +39967,7 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False)` | `dbfs=True` references full-scale *peak* (1.0), not RMS | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False, oversample=8)` | `dbfs=True` references full-scale *peak* (1.0), not RMS; `oversample=1` reads the peak on the sample grid | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
 | `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
 | `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
 | `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
@@ -40050,7 +40050,7 @@ plt.show()
 | `window_time` | float | s | > 0; default `0.125` | Frame length (0.125 s mirrors Fast) |
 | `overlap` | float | — | 0 ≤ overlap < 1; default `0.5` | Fraction of window overlap (0 = none) |
 | `mode` | str | — | `'rms'` (default) or `'peak'` | Per-window detector |
-| `detrend` | bool | — | default `True` | Remove each band's DC offset before the level (improves low-frequency accuracy) |
+| `detrend` | bool | — | default `True` | Remove the input signal's DC offset once, before filtering (improves low-frequency accuracy) |
 | `zero_phase` | bool | — | default `False` | Forward-backward filtering (offline only) |
 | `calibration_factor` / `dbfs` | — | — | constructor-only | Set on `OctaveFilterBank(...)`, not per call |
 
@@ -41308,7 +41308,7 @@ plt.show()
 | `target_spl` | float | dB re 20 µPa | default `94.0` | The calibrator's nominal level (114 dB calibrators: pass `114.0`) |
 | `ref_pressure` | float | Pa | default `2e-5` | Reference pressure $p_0$; rarely changed |
 | `fs` | int, optional | Hz | > 0; default `None` | Required for the stability validation; omit to skip it |
-| `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings |
+| `validate` | bool | — | default `True` | Emit `CalibrationWarning` on unstable/short recordings; needs `fs`, and does nothing without it |
 | `max_fluctuation_db` | float, optional | dB | default `None` → Table 2 class 1 | Explicit override of the stability limit |
 | `frequency` | float | Hz | default `1000.0` | Calibrator's nominal frequency; selects the IEC 60942 Table 2 row |
 | `narrowband` | bool | — | default `False` | Estimate the tone with a coherent Goertzel detector near `frequency` (needs `fs`) instead of full-band RMS; rejects broadband hum/noise that otherwise inflates the RMS and shrinks every later level (~−0.44 dB at 20 dB SNR). Enable for noisy coupler recordings |
@@ -42533,10 +42533,11 @@ recording[4 * fs : 5 * fs] += 0.2 * np.sqrt(2) * np.sin(
 ## 2. Calibrate: give the samples physical meaning
 
 Digital samples are dimensionless; the **sensitivity factor** converts them
-to pascals. `sensitivity()` computes it from the calibrator recording and, at
-the same time, validates the recording's short-term stability the way
-IEC 60942 qualifies the calibrator itself, so a badly coupled microphone is
-caught here instead of corrupting every level downstream.
+to pascals. `sensitivity()` computes it from the calibrator recording and, when
+you pass `fs` as below, also validates the recording's short-term stability the
+way IEC 60942 qualifies the calibrator itself, so a badly coupled microphone is
+caught here instead of corrupting every level downstream. Omit `fs` and you get
+the factor on its own, with no check.
 
 ```python
 cal = metrology.sensitivity(calibrator, target_spl=94.0, fs=fs)
