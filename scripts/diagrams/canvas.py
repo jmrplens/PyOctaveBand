@@ -16,12 +16,13 @@ runs about 16 % wider than the Helvetica-metric face this corpus was
 composed in, measured over all 6 552 labels of the corpus in both
 languages. A px of the old face is therefore not a px of this one, and
 the sizes were converted once, corpus-wide, at 0.86 with a floor of
-10 px -- the same conversion the title took when it went from 26 px to
-22. Nothing else would do: a plate is a hand-tuned composition where
-every label was measured into a box, a column or a gap, and 16 % of
-extra advance on 6 552 labels is not a set of local defects to patch
-but one metric to restore. Sizes are integers because the corpus's are,
-and the floor exists because 9 px of caption is not a caption.
+10 px, which is the conversion the title had already taken on its own
+when it went from 26 px to 22. Nothing else would do: a plate is a
+hand-tuned composition where every label was measured into a box, a
+column or a gap, and 16 % of extra advance on 6 552 labels is not a set
+of local defects to patch but one metric to restore. Sizes stay
+integers because the corpus's are, and the floor exists because 9 px of
+caption is not a caption.
 
 A size chosen for a new label is px of *this* face; do not convert it
 again.
