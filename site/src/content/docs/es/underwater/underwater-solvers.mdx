@@ -453,6 +453,45 @@ print(round(beams.initial_beam_width, 1))      # 35,9 m: W0 de la Ec. (3.86)
 beams.plot(language="es")   # el campo de PL, en el marco de parabolic_equation
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic_es.svg" alt="Un campo de pérdida de propagación sobre 2,5 kilómetros de distancia y 1000 metros de profundidad a 600 hercios: una cúpula luminosa de nivel que asciende desde una fuente cercana al fondo, limitada por arriba por un arco nítido donde el abanico de rayos ascendentes se pliega sobre sí mismo, con el nivel finito sobre ese arco y desvaneciéndose de forma gradual hacia la zona de sombra oscura que hay encima y a la que no llega ningún rayo, con los rayos trazados dibujados como líneas grises finas sobre el campo" width="92%" />
+
+*El agua del propio fragmento, sobre una malla más fina: 600 Hz sobre el
+perfil $n^2$-lineal, la fuente a 7,5 m del fondo, 439 haces entre ±45°. El
+abanico ascendente gira dentro de la columna, y allí donde se pliega sobre sí
+mismo la suma de haces responde **59 dB, no infinito** — ese pliegue es el arco
+luminoso que cruza lo alto de la cúpula, y es la cáustica. Por encima del arco
+no llega ningún rayo, y el campo no se corta en ese borde: sube 88 dB en los
+100 m que hay por encima, que es la penumbra graduada que tiene la solución
+exacta y que la teoría geométrica de rayos no tiene (Jensen Figs. 3.11, 3.17).
+Las líneas grises finas son los propios rayos, trazados sobre el mismo perfil
+con `ray_trace`; de cada uno cuelga un haz. Dos cosas que la figura no puede
+enseñar: las tres primeras anchuras de haz, unos 108 m de distancia, donde la
+ponderación en campo lejano de la Ec. (3.92) no tiene a qué converger, y el
+18 % de celdas a las que no llega ningún haz, que son exactamente infinitas y
+se dibujan en el extremo silencioso de la escala.*
+
+<details>
+<summary>Mostrar el código de esta figura</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import underwater
+
+c_ref = 1550.0
+z_caustic = np.linspace(0.0, 1000.0, 201)
+c_caustic = c_ref / np.sqrt(1.0 + 2.4 * z_caustic / c_ref)
+
+caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
+                                    source_depth=992.5, max_range=2500.0,
+                                    range_step=12.5, max_angle_deg=45.0,
+                                    n_depth_points=400)
+caustic.plot(language="es")   # el mismo campo; la figura lo dibuja por bandas
+plt.show()
+```
+
+</details>
+
 **El único parámetro libre.** $W_0$ lo es, y el libro reconoce sin rodeos que
 «la elección óptima de estas condiciones iniciales es materia de investigación
 actual», recomendando de 10 a 50 longitudes de onda. Aquí el valor por defecto

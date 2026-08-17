@@ -278,6 +278,47 @@ print(round(beams.initial_beam_width, 1))      # 35.9 m: W0 from Eq. (3.86)
 beams.plot()   # the PL field, on the same frame as parabolic_equation
 ```
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic.svg" alt="A propagation-loss field over 2.5 kilometres of range and 1000 metres of depth at 600 hertz: a bright dome of level rising from a source near the bottom, bounded above by a sharp arc where the up-going ray fan folds on itself, with the level finite on that arc and fading smoothly into the dark shadow zone above it that no ray reaches, the traced rays drawn as thin grey lines through the field" width="100%">
+</picture>
+
+*The snippet's own water, on a finer grid: 600 Hz over the $n^2$-linear
+profile, the source 7.5 m off the bottom, 439 beams over ±45°. The up-going fan
+turns inside the column, and where it folds on itself the beam sum answers
+**59 dB, not infinity** — that fold is the bright arc across the top of the
+dome, and it is the caustic. Above the arc no ray arrives at all, and the field
+does not stop at that edge: it climbs 88 dB over the 100 m above it, which is
+the graded penumbra the exact solution has and geometric ray theory does not
+(Jensen Figs. 3.11, 3.17). The thin grey lines are the rays themselves, traced
+through the same profile by `ray_trace`; one beam is hung on each. Two things
+the picture cannot show: the first three beam widths, about 108 m of range,
+where the far-field weighting of Eq. (3.92) has nothing to converge to, and the
+18% of cells that no beam reaches at all, which are exactly infinite and drawn
+at the quiet end of the scale.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import underwater
+
+c_ref = 1550.0
+z_caustic = np.linspace(0.0, 1000.0, 201)
+c_caustic = c_ref / np.sqrt(1.0 + 2.4 * z_caustic / c_ref)
+
+caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
+                                    source_depth=992.5, max_range=2500.0,
+                                    range_step=12.5, max_angle_deg=45.0,
+                                    n_depth_points=400)
+caustic.plot()   # same field; the figure below bands it and draws the rays
+plt.show()
+```
+
+</details>
+
 **The one free parameter.** $W_0$ is it, and the book is candid that "the
 optimal choice of these initial conditions is a matter of current research",
 recommending 10 to 50 wavelengths. The default here is sharper than a rule of
