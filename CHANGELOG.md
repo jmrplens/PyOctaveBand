@@ -143,9 +143,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   to hold to. The title keeps a ladder of 22, 21 and 20 px and gains a margin,
   because clearing the sheet was never the property wanted: a title whose first
   and last letters sit on the sheet border, on a plate whose artwork keeps
-  thirty pixels, reads as having run off the page. No title in either language
-  needs more than one step to keep that white. The census that measures every
-  label against its 900 px sheet reports zero.
+  thirty pixels, reads as having run off the page. Two hundred and forty-five
+  titles keep the top size, thirty-nine take one step and twelve take two, and
+  none reaches the floor, so the floor stays a backstop rather than a size the
+  corpus is set at. The census that measures every label against its 900 px
+  sheet reports zero.
 - A second census measures the labels against the drawings, which is where the
   wider face actually put them: `outline.py --collisions` reports two labels
   sharing a line whose ink meets, a label crossing the border of a stroked box

@@ -149,10 +149,10 @@ _SCRIPT_SCALE = 0.70
 #: Stepping down is what the plates already do wherever a label has to
 #: clear something it did not choose -- a stage-box title measures itself
 #: against its box and drops a step -- and this is that decision taken
-#: against the sheet. Two steps are enough: no title in the corpus, in
-#: either language, reaches the floor, so a title that does is a
-#: composition to rewrite and the fit gate in :meth:`_emit_text` is what
-#: catches one.
+#: against the sheet. Two steps are enough: 245 titles keep the top size,
+#: 39 take one step and 12 take two, and none in either language reaches
+#: the floor, so a title that does is a composition to rewrite and the
+#: fit gate in :meth:`_emit_text` is what catches one.
 #:
 #: The ``$...$`` composer scales scripts against the size the element is
 #: given, so a stepped-down title carries its subscripts down with it.
