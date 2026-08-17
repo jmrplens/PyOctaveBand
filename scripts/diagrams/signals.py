@@ -729,11 +729,14 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
         s.text((x0 + x1) / 2, y0 + 30.0, l1, 18, th.fg, bold=True)
         s.text((x0 + x1) / 2, y0 + 54.0, l2, 14, th.muted)
 
-    box(60, 250, 68, 72.0, "Signal generator", "broadband noise or a sweep",
+    # 222 px wide, not 190: "Generador de señal" over "broadband noise or a
+    # sweep" is 199 px of heading over 198 px of caption, and the box has to
+    # hold the wider of the two languages, not the narrower.
+    box(60, 282, 68, 72.0, "Signal generator", "broadband noise or a sweep",
         th.fg)
     box(310, 460, 68, 72.0, "Power amplifier",
         "its gain is in H1", th.fg)
-    s.arrow(250.0, 104.0, 306.0, 104.0, th.fg, 2.0)
+    s.arrow(282.0, 104.0, 306.0, 104.0, th.fg, 2.0)
     s.arrow(460.0, 104.0, 496.0, 104.0, th.fg, 2.0)
 
     # Loudspeaker under test and the measurement microphone.

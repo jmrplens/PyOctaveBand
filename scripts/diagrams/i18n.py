@@ -2599,7 +2599,7 @@ _ES: dict[str, str] = {
     "Two-channel FRF measurement: the H1 estimator and coherence":
         "Medición de FRF a dos canales: el estimador H1 y la coherencia",
     "Signal generator": "Generador de señal",
-    "broadband noise or a sweep": "ruido de banda ancha o barrido",
+    "broadband noise or a sweep": "banda ancha o barrido",
     "its gain is in H1": "su ganancia va en H1",
     "Power amplifier": "Amplificador",
     "Loudspeaker under test": "Altavoz en ensayo",
