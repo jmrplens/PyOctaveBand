@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     )
     from ..underwater.propagation.closed_form import PropagationLossResult
     from ..underwater.propagation.numerical import (
+        GaussianBeamResult,
         NormalModeResult,
         ParabolicEquationResult,
         RayTraceResult,
@@ -117,6 +118,7 @@ _STRINGS: dict[str, str] = {
     "Source": "Fuente",
     "Ray trace": "Trazado de rayos",
     "Parabolic-equation propagation loss": "Pérdida de propagación por ecuación parabólica",
+    "Gaussian beam propagation loss": "Pérdida de propagación por haces gaussianos",
     "Weston regimes": "Regímenes de Weston",
     "Composite": "Compuesto",
     r"Spherical ($20\,\log_{10} r$)": r"Esférica ($20\,\log_{10} r$)",
@@ -542,32 +544,27 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     localize_axes(ax, language)
     return ax
 
-def plot_parabolic_equation(
-    result: ParabolicEquationResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+def _plot_loss_field(
+    ax: Axes | None, ranges: np.ndarray, depths: np.ndarray, pl: np.ndarray, *,
+    title: str, language: str, kwargs: dict[str, Any],
 ) -> Axes:
-    """Parabolic-equation propagation-loss field (range x depth).
+    """A propagation-loss field on a range-depth grid, shared by two solvers.
 
-    :param result: A
-        :class:`~phonometry.underwater.propagation.numerical.ParabolicEquationResult`.
-    :param ax: Existing axes, or ``None`` to create a figure.
-    :param language: Label language, ``"en"`` (default) or ``"es"``.
-    :param kwargs: Forwarded to ``imshow``.
-    :return: The axes.
+    ``imshow`` renders it as a single raster image rather than one vector quad
+    per cell, which avoids moiré and keeps the figure light; ``pcolormesh``
+    would put tens of thousands of paths into an SVG for the same picture.
     """
     from .._i18n import localize_axes
 
     ax = ax if ax is not None else _new_axes()
-    r = np.asarray(result.ranges, dtype=np.float64) / 1000.0
-    z = np.asarray(result.depths, dtype=np.float64)
-    pl = np.asarray(result.propagation_loss, dtype=np.float64)
+    r = np.asarray(ranges, dtype=np.float64) / 1000.0
+    z = np.asarray(depths, dtype=np.float64)
+    pl = np.asarray(pl, dtype=np.float64)
     finite = pl[np.isfinite(pl)]
     vmax = float(np.percentile(finite, 95)) if finite.size else 100.0
-    # The zero-range column is infinite (1/√r); clip non-finite samples to vmax
-    # so imshow does not render them as a spurious stripe.
+    # The source column is infinite (the field is exactly zero there); clip
+    # non-finite samples to vmax so imshow does not render them as a stripe.
     pl = np.where(np.isfinite(pl), pl, vmax)
-    # imshow renders the field as a single raster image (no per-cell vector
-    # quads), which avoids moiré and keeps the figure light.
     img = ax.imshow(
         pl,
         **{
@@ -584,9 +581,51 @@ def plot_parabolic_equation(
     ax.figure.colorbar(img, ax=ax, label=_t(_PROPAGATION_LOSS_LABEL, language))
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
     ax.set_ylabel(_t(_DEPTH_LABEL, language))
-    ax.set_title(_t("Parabolic-equation propagation loss", language))
+    ax.set_title(_t(title, language))
     localize_axes(ax, language)
     return ax
+
+
+def plot_parabolic_equation(
+    result: ParabolicEquationResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Parabolic-equation propagation-loss field (range x depth).
+
+    :param result: A
+        :class:`~phonometry.underwater.propagation.numerical.ParabolicEquationResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to ``imshow``.
+    :return: The axes.
+    """
+    return _plot_loss_field(
+        ax, result.ranges, result.depths, result.propagation_loss,
+        title="Parabolic-equation propagation loss", language=language,
+        kwargs=kwargs)
+
+
+def plot_gaussian_beams(
+    result: GaussianBeamResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Gaussian beam propagation-loss field (range x depth).
+
+    Drawn on the same axes, colour map and 50 dB window as
+    :func:`plot_parabolic_equation`, so the two fields can be read against each
+    other without adjusting for the frame.
+
+    :param result: A
+        :class:`~phonometry.underwater.propagation.numerical.GaussianBeamResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to ``imshow``.
+    :return: The axes.
+    """
+    return _plot_loss_field(
+        ax, result.ranges, result.depths, result.propagation_loss,
+        title="Gaussian beam propagation loss", language=language,
+        kwargs=kwargs)
 
 
 def _plottable(levels: Any) -> np.ndarray:

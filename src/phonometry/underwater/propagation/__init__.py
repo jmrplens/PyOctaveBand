@@ -16,9 +16,11 @@ from .closed_form import (
     spreading_loss,
 )
 from .numerical import (
+    GaussianBeamResult,
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,
+    gaussian_beams,
     normal_modes,
     parabolic_equation,
     ray_trace,
@@ -56,6 +58,7 @@ __all__ = [
     "WESTON_REGIMES",
     "WESTON_SEABEDS",
     "BottomLossResult",
+    "GaussianBeamResult",
     "NormalModeResult",
     "ParabolicEquationResult",
     "PropagationLossResult",
@@ -70,6 +73,7 @@ __all__ = [
     "critical_grazing_angle",
     "depth_to_pressure",
     "effective_depth",
+    "gaussian_beams",
     "loss_parameter",
     "normal_modes",
     "parabolic_equation",
