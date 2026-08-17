@@ -137,6 +137,26 @@ if (cff.version !== version) {
 }
 
 /**
+ * `.zenodo.json` carries the title a third time, and it is the copy that wins
+ * where it matters: Zenodo reads that file when a release is archived, so its
+ * title is the one stamped on the DOI record a reader lands on. `CITATION.cff`
+ * is what GitHub's "Cite this repository" widget and the APA and BibTeX blocks
+ * on the About pages render. Nothing tied the two together, and they drifted:
+ * the 3.3.0 record was archived as "acoustic measurement, analysis and
+ * prediction for Python" while the CFF, the widget and the site all still said
+ * "acoustic measurement toolkit for Python". Assert them equal so a title
+ * edited in one file has to reach the other.
+ */
+const zenodoTitle = JSON.parse(readFileSync(root('.zenodo.json'), 'utf8')).title;
+if (zenodoTitle !== cff.title) {
+  throw new Error(
+    `.zenodo.json: title "${zenodoTitle}" does not match CITATION.cff "${cff.title}". ` +
+      'Zenodo stamps the archived record from .zenodo.json and GitHub cites ' +
+      'CITATION.cff, so the two have to say the same thing.',
+  );
+}
+
+/**
  * The Zenodo *concept* DOI, which resolves to the newest archived release.
  *
  * The BibTeX entry below is not the only thing that cites it: the site's
@@ -332,8 +352,27 @@ const apaNames = cff.authors.map((author) => {
   return `${author['family-names']}, ${initials}`;
 });
 
-for (const page of ['start/about.md', 'es/start/about.md']) {
-  const path = `site/src/content/docs/${page}`;
+/**
+ * The pages that restate the citation, as repository-relative paths.
+ *
+ * The two Starlight pages are the ones the site renders. `docs/start/about.md`
+ * is the plain-markdown mirror, written by hand for people reading the
+ * repository on GitHub, and it restates the citation verbatim: the same APA
+ * reference and the same BibTeX entry, version included. It is checked here
+ * for the same reason the other two are, and it needs it more: the snippet
+ * checker deliberately does not pair the `docs/` mirror with anything, so
+ * nothing else in the build ever looks at it. Without this line a release
+ * would bump `VERSION`, `CITATION.cff` and both Starlight pages, and leave the
+ * mirror quietly citing the previous version on the very file a reader
+ * browsing the repository lands on.
+ */
+const citingPages = [
+  'site/src/content/docs/start/about.md',
+  'site/src/content/docs/es/start/about.md',
+  'docs/start/about.md',
+];
+
+for (const path of citingPages) {
   const source = readFileSync(root(path), 'utf8');
   const fail = (problem) => {
     throw new Error(`${path}: ${problem}`);

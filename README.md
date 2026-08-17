@@ -166,7 +166,8 @@ a map of where to start:
 
 If phonometry is useful in your research, cite the archived release:
 
-> Requena-Plens, J. M. *phonometry: acoustic measurement toolkit for Python.*
+> Requena-Plens, J. M. *phonometry: acoustic measurement, analysis and
+> prediction for Python.*
 > Zenodo. https://doi.org/10.5281/zenodo.21215280
 
 The repository ships a

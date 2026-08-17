@@ -505,7 +505,6 @@ _LABEL_FREQUENCY_HZ: Final = "Frequency [Hz]"
 
 #: Common axis labels reused across the underwater-propagation plots.
 _LABEL_DEPTH_M: Final = "Depth [m]"
-_LABEL_TL_DB: Final = "Transmission loss [dB]"
 _LABEL_RANGE_KM: Final = "Range [km]"
 
 #: Spanish translations of the handful of fixed strings these *shared*

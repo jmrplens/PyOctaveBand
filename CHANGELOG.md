@@ -6038,7 +6038,7 @@ output in line with the governing standards:
 - PEP 561 `py.typed` marker: downstream type checkers now receive the
   library's strict annotations.
 - Documentation website (English/Español) at
-  https://jmrplens.github.io/PyOctaveBand/ with theme-aware auto-generated
+  https://jmrplens.github.io/phonometry/ with theme-aware auto-generated
   figures, plus topic pages under `docs/`. ([#61](https://github.com/jmrplens/PyOctaveBand/pull/61))
 
 ### Fixed

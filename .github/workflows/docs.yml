@@ -25,14 +25,18 @@ on:
       # the first entry already.)
       - ".github/brand/**"
       - "scripts/generate_llms.py"
-      # The release commit. site/src/data/citation.mjs reads all three of these
+      # The release commit. site/src/data/citation.mjs reads all four of these
       # from the repository root, and repo-stats.mjs reads VERSION: without
       # them here, publishing a release rebuilt nothing, and the site kept
       # citing the previous version until something under site/ happened to
-      # change.
+      # change. .zenodo.json earns its place a second way: the build is the
+      # only thing that checks its title against CITATION.cff, so a pull
+      # request editing that title alone has to reach this job or the check it
+      # was written for never runs.
       - "VERSION"
       - "CHANGELOG.md"
       - "CITATION.cff"
+      - ".zenodo.json"
       - ".github/workflows/docs.yml"
   pull_request:
     branches: ["main"]
@@ -48,6 +52,7 @@ on:
       - "VERSION"
       - "CHANGELOG.md"
       - "CITATION.cff"
+      - ".zenodo.json"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 

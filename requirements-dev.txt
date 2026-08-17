@@ -11,3 +11,4 @@ pystoi>=0.4.1  # test-only external cross-check for STOI/ESTOI (reproduces the a
 svglib>=2.1.0
 pypdf>=6.16.0  # one-page assertion in the ISO 717 report tests
 pypdfium2>=5.13.0  # rasterizes the .report() PDFs to committed WebP previews (scripts/generate_reports.py); no system Poppler needed
+pyyaml>=6.0.2  # the repository-config tests parse .coderabbit.yaml and the workflow triggers; bandit already pulls it in, this makes the direct import declared

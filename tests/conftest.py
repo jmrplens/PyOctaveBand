@@ -1,8 +1,6 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 import os
 
-import pytest
-
 # Select a non-interactive matplotlib backend for the headless test suite.
 # The library no longer forces a backend (see issue #52), so the test harness
 # must opt into Agg itself; otherwise matplotlib picks a GUI backend (e.g.
@@ -80,16 +78,3 @@ def pytest_report_header(config):
 
     lines = [oracle_data.resolve(d).describe() for d in oracle_data.DATASETS]
     return ["oracle data:", *[f"  {line}" for line in lines]]
-
-
-@pytest.fixture(autouse=True)
-def handle_performance_tests(request):
-    """
-    Special fixture to re-enable JIT for performance tests.
-    """
-    if "test_performance.py" in request.node.fspath.strpath:
-        # Re-enable JIT for performance measurements
-        os.environ["NUMBA_DISABLE_JIT"] = "0"
-        # Note: Numba might have already compiled/cached some things, 
-        # but this ensures the performance test runs at native speed.
-    yield

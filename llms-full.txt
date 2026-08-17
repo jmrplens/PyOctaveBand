@@ -47311,17 +47311,17 @@ Cite the version you actually ran.
 
 APA:
 
-> Requena-Plens, J. M. (2026). *phonometry: acoustic measurement toolkit for
-> Python (formerly PyOctaveBand)* (Version 3.3.0) [Computer software].
-> https://doi.org/10.5281/zenodo.21215280
+> Requena-Plens, J. M. (2026). *phonometry: acoustic measurement, analysis and
+> prediction for Python (formerly PyOctaveBand)* (Version 3.3.0)
+> [Computer software]. https://doi.org/10.5281/zenodo.21215280
 
 BibTeX:
 
 ```bibtex
 @software{requenaplens_phonometry,
   author  = {Requena-Plens, Jos{\'e} M.},
-  title   = {phonometry: acoustic measurement toolkit for Python
-             (formerly PyOctaveBand)},
+  title   = {phonometry: acoustic measurement, analysis and prediction for
+             Python (formerly PyOctaveBand)},
   year    = {2026},
   version = {3.3.0},
   doi     = {10.5281/zenodo.21215280},
