@@ -1208,8 +1208,8 @@ def _d_duct_path(s: SVG, th: Theme) -> None:
                     "is one row of the sheet, stamped with its code", 15,
            th.fg, anchor="start")
     s.text(60, 546, "attenuates only: 4, 5, 6 (supply) and 4, 5 (return) — "
-                    "attenuates and regenerates: 2, 3 — self-noise only: 8 "
-                    "and the grille", 14, th.muted, anchor="start")
+                    "attenuates and regenerates: 2, 3 — self-noise only: "
+                    "8 and the grille", 14, th.muted, anchor="start")
     s.text(60, 574, "the return wins above 1 kHz: its silencer floors the room "
                     "near 25 dB, and no amount of supply attenuation moves that",
            14, th.muted, anchor="start")
@@ -1653,8 +1653,8 @@ def _d_sweep_bench(s: SVG, th: Theme) -> None:
     # ---- the shared time budget of the harmonic arrivals -------------------
     x0, x1, ty = 90.0, 830.0, 412.0
     s.text(450, 336, "Recording on the sweep's time axis: $f_1$ = 20 Hz, "
-                     "$f_2$ = 6 kHz, $T$ = 4 s, $L = T / ln(f_2/f_1)$ = 0.70 "
-                     "s",
+                     "$f_2$ = 6 kHz, $T$ = 4 s, $L = T / ln(f_2/f_1)$ = "
+                     "0.70 s",
            17, th.fg, bold=True)
     s.line(x0, ty, x1, ty, th.fg, 2.0)
     s.arrow(x1 - 30, ty, x1, ty, th.fg, 2.0)

@@ -871,8 +871,8 @@ _ES: dict[str, str] = {
         "así que $a > 0,27$ no es una sola reflexión especular",
     "The reflection has to arrive before the record ends and at least 10 dB "
     "above its noise floor;":
-        "La reflexión debe llegar antes del final del registro y al menos 10 "
-        "dB sobre su ruido de fondo;",
+        "La reflexión debe llegar antes del final del registro y al menos "
+        "10 dB sobre su ruido de fondo;",
     "$c$ moves about 0.6 m/s per kelvin, so convert the delay with the "
     "temperature you measured":
         "$c$ cambia unos 0,6 m/s por kelvin: convierte el retardo con la "
@@ -2677,8 +2677,8 @@ _ES: dict[str, str] = {
     "One-sided $|FFT|^2$ periodogram of each segment, then average":
         "Periodograma unilateral $|FFT|^2$ de cada segmento, y promedio",
     "overlap correlation (Welch 1967): 467 segments → $n_d$ = 442 effective averages":
-        "correlación por solape (Welch 1967): 467 segmentos → $n_d$ = 442 "
-        "promedios efectivos",
+        "correlación por solape (Welch 1967): 467 segmentos → $n_d$ = "
+        "442 promedios efectivos",
     "$G_{xx}(f)$ with its chi-square confidence interval":
         "$G_{xx}(f)$ con su intervalo de confianza chi-cuadrado",
     "random error $ε_r = 1/√n_d$ = 4.8 %;  $2·n_d ≈ 885$ degrees of freedom":
@@ -2801,8 +2801,8 @@ _ES: dict[str, str] = {
         "un tono en un orden no entero solo se atenúa: elige $N$ para "
         "que un nodo del peine caiga sobre él",
     "McFadden's example: $N$ = 20 nulls the 32.05-order tone (20·32.05 = 641); the habitual $N$ = 32 does not":
-        "el ejemplo de McFadden: $N$ = 20 anula el tono de orden 32,05 "
-        "(20·32,05 = 641); el habitual $N$ = 32 no",
+        "el ejemplo de McFadden: $N$ = 20 anula el tono de orden "
+        "32,05 (20·32,05 = 641); el habitual $N$ = 32 no",
     # Correlation-based time-delay estimation (Knapp & Carter)
     "Time-delay estimation: two microphones and one correlation peak":
         "Estimación del retardo: dos micrófonos y un pico de correlación",
@@ -3154,8 +3154,8 @@ _ES: dict[str, str] = {
         "0,44 (500 Hz)",
     "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10.0 dB, "
     "500 Hz":
-        "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = 10,0 "
-        "dB, 500 Hz",
+        "Kurze–Anderson: Δbar = 5 + 20 log10( √(2πN) / tanh √(2πN) ) = "
+        "10,0 dB, 500 Hz",
     "$N$ grows with frequency: the same screen gives 15.5 dB at 2 kHz (vertical scale exaggerated)":
         "$N$ crece con la frecuencia: la misma pantalla da 15,5 dB a 2 kHz "
         "(escala vertical exagerada)",
@@ -3777,8 +3777,8 @@ _ES: dict[str, str] = {
     "met mast, within 2 000 m of the station":
         "torre meteorológica, a menos de 2 000 m de la estación",
     "Test window (aeroplanes): no precipitation; −10 to 35 °C and 20 to 95 % RH over the path above 10 m;":
-        "Ventana de ensayo (aviones): sin precipitación; de −10 a 35 °C y 20 "
-        "a 95 % HR en el recorrido sobre 10 m;",
+        "Ventana de ensayo (aviones): sin precipitación; de −10 a 35 °C y "
+        "20 a 95 % HR en el recorrido sobre 10 m;",
     "8 kHz attenuation ≤ 12 dB/100 m; wind ≤ 6.2 m/s average and 7.7 m/s peak, crosswind ≤ 3.6 and 5.1 m/s":
         "atenuación a 8 kHz ≤ 12 dB/100 m; viento ≤ 6,2 m/s medio y 7,7 m/s "
         "máximo, cruzado ≤ 3,6 y 5,1 m/s",

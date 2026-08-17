@@ -912,8 +912,8 @@ def _d_spectral_analysis(s: SVG, th: Theme) -> None:
          "ENBW = 1.5 bins → resolution bandwidth $B_e = 1.5·Δf$ = 17.6 Hz",
          th.primary)
     step(310, "One-sided $|FFT|^2$ periodogram of each segment, then average",
-         "overlap correlation (Welch 1967): 467 segments → $n_d$ = 442 "
-         "effective averages", th.fg)
+         "overlap correlation (Welch 1967): 467 segments → $n_d$ = "
+         "442 effective averages", th.fg)
     s.rect(x0, 396, bw, 60, "none", th.accent, rx=10, sw=2.4)
     s.text(cx, 421, "$G_{xx}(f)$ with its chi-square confidence interval", 17,
            th.fg, bold=True)

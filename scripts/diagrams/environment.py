@@ -468,8 +468,8 @@ def _d_atmospheric_refraction(s: SVG, th: Theme) -> None:
            "Downwind: rays bend down; the receiver hears the direct and the ground-bounced arrival (multipath)",
            16, th.fg, anchor="start")
     s.text(80.0, 592.0,
-           "a ±0.1 (m/s)/m gradient curves rays with $R_c = c_0/|g|$ ≈ 3.4 "
-           "km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m",
+           "a ±0.1 (m/s)/m gradient curves rays with $R_c = c_0/|g|$ ≈ "
+           "3.4 km; source $h_s$ = 2 m, receiver $h_r$ = 1.5 m",
            16, th.muted, anchor="start")
 
 

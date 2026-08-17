@@ -2487,8 +2487,8 @@ def _d_iso12354_annexl(s: SVG, th: Theme) -> None:
     # ===== Footer: the path count =====
     s.rect(40, 508, 820, 84, "none", th.muted, rx=10, dash="6,5")
     s.text(450, 536,
-           "13 airborne paths = 1 direct (Dd) + 4 flanking elements × 3 "
-           "branches (Ff, Df, Fd)", 16, th.fg)
+           "13 airborne paths = 1 direct (Dd) + 4 flanking elements × "
+           "3 branches (Ff, Df, Fd)", 16, th.fg)
     s.text(450, 564,
            "5 impact paths = 1 direct + 4 Df: only the floor is excited, so "
            "there is no Ff or Fd", 16, th.primary)

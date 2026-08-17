@@ -358,8 +358,8 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
            "starboard and $β − ε$ to port · $ψ = arccos(q/d_{SOR})$, 90° abeam to 180° astern, the jet lobe peaking near 120°",
            15, th.muted, anchor="start")
     s.text(60.0, 680.0,
-           "NPD lookup: $d_p$ for exposure, $d_s$ for maxima, floored at 30 "
-           "m; $Δ_{SOR}$ scaled by 762 m/$d_{SOR}$ beyond 762 m",
+           "NPD lookup: $d_p$ for exposure, $d_s$ for maxima, floored at "
+           "30 m; $Δ_{SOR}$ scaled by 762 m/$d_{SOR}$ beyond 762 m",
            15, th.muted, anchor="start")
 
 
