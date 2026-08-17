@@ -354,7 +354,7 @@ rate and depth, and correlates the modulation across bands; the result $R$ is
 in **asper**. The reference sound (1 kHz carrier, 100 % amplitude-modulated at
 70 Hz, overall level 60 dB SPL) is defined as 1 asper; this clean-room
 implementation returns 0.9999 asper with the tabulated calibration constant
-$c_R$ (Formula 104) used **without** reverse-fitting to the target.
+$c_\mathrm{R}$ (Formula 104) used **without** reverse-fitting to the target.
 
 ```python
 import numpy as np
@@ -493,7 +493,7 @@ quieter periods, then weights the dominant harmonic complex and scales it
 with an HSA-based specific loudness. The reference sound (1 kHz carrier,
 100 % amplitude-modulated at 4 Hz, overall level 60 dB SPL) is defined as
 1 vacil_HMS; this clean-room implementation converges to 0.9958 vacil_HMS
-by 12 s with the tabulated calibration constant $c_F$ (Formula 163) used
+by 12 s with the tabulated calibration constant $c_\mathrm{F}$ (Formula 163) used
 **without** reverse-fitting to the target (the 8 s example below prints
 0.9957). A signal whose single value $F$ exceeds 0.2 vacil_HMS has a
 *prominent* fluctuation strength (Clause 9.2).
@@ -610,7 +610,7 @@ The three ECMA-418-2 entry points are monaural: the binaural quadratic-mean
 combinations of Formula 112 (clause 7.1.11) and Formula 170 (clause 9.1.15)
 are not implemented, so analyse each channel separately. The optional entropy
 weighting of clause 7.1.6 needs an external rotational-speed signal and is
-left out, as is the ±0.25 % adjustment of $c_F$ that footnote 47 permits. The
+left out, as is the ±0.25 % adjustment of $c_\mathrm{F}$ that footnote 47 permits. The
 ECMA-418-2 loudness that shares this front-end lives in [Advanced
 Loudness](/phonometry/perception/psychoacoustics/advanced-loudness/), and the
 Fastl and Zwicker fluctuation-strength models in [Psychoacoustic

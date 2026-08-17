@@ -523,7 +523,7 @@ def _characteristic_sensitivity_level(
     if not np.any(in_band):
         raise ValueError("'sensitivity_band' selects no on-axis response samples.")
     band_level = _energetic_mean_db(spl[in_band])
-    # The drive-voltage and distance corrections; U_\mathrm{p} = sqrt(R) drives 1 W into R.
+    # The drive-voltage and distance corrections; U_p = sqrt(R) drives 1 W into R.
     return float(
         band_level + 20.0 * np.log10(d) + 20.0 * np.log10(float(np.sqrt(r)) / u)
     )

@@ -310,7 +310,7 @@ uso y la tabla de elección de modelo.
 
 ### Modelo de Sottek (ECMA-418-2:2025)
 
-ECMA-418-2 construye sus tres métricas sobre un único front-end auditivo (apartado 5): un filtro de oído externo/medio, un banco de 53 filtros paso banda solapados de tipo gammatone espaciados en la escala Bark_HMS ($z = 0{,}5$ a $26{,}5$), rectificación de media onda y un RMS de bloque corto $\tilde{p}(l, z)$ por banda $z$ y bloque temporal $l$. Una no linealidad compresiva (Fórmula 23) convierte el RMS de banda en la **sonoridad de base específica** $N'_{\mathrm{basis}}(l, z)$, cuya constante de calibración $c_N$ fija un tono de 1 kHz / 40 dB SPL en 1 sone_HMS. La sonoridad ensambla las sonoridades tonal y de ruido (abajo) sobre bandas y tiempo (Fórmulas 113–117); crece unas $1{,}65\times$ por cada 10 dB, más lentamente que el factor de 2 de Zwicker, una propiedad intrínseca de la suma de Sottek.
+ECMA-418-2 construye sus tres métricas sobre un único front-end auditivo (apartado 5): un filtro de oído externo/medio, un banco de 53 filtros paso banda solapados de tipo gammatone espaciados en la escala Bark_HMS ($z = 0{,}5$ a $26{,}5$), rectificación de media onda y un RMS de bloque corto $\tilde{p}(l, z)$ por banda $z$ y bloque temporal $l$. Una no linealidad compresiva (Fórmula 23) convierte el RMS de banda en la **sonoridad de base específica** $N'_{\mathrm{basis}}(l, z)$, cuya constante de calibración $c_\mathrm{N}$ fija un tono de 1 kHz / 40 dB SPL en 1 sone_HMS. La sonoridad ensambla las sonoridades tonal y de ruido (abajo) sobre bandas y tiempo (Fórmulas 113–117); crece unas $1{,}65\times$ por cada 10 dB, más lentamente que el factor de 2 de Zwicker, una propiedad intrínseca de la suma de Sottek.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/loudness_models_comparison_es.svg" alt="Sonoridad de un tono de 1 kHz en función del nivel para los modelos de Zwicker, Moore-Glasberg y Sottek, los tres pasando cerca de 1 sonio a 40 dB SPL" width="80%" />
 
@@ -333,24 +333,24 @@ $$
 Una estimación espectral con ventana de $\phi_z$ separa una **sonoridad tonal** $N'_{\mathrm{tonal}}(l, z)$ de la **sonoridad de ruido** $N'_{\mathrm{noise}}(l, z)$ (Fórmulas 36–48). La tonalidad específica es la sonoridad tonal escalada por una puerta suave de relación señal-ruido $q(l)$ (Fórmulas 49–51),
 
 $$
-T'(l, z) = c_T\ q(l)\ N'_{\mathrm{tonal}}(l, z)
+T'(l, z) = c_\mathrm{T}\ q(l)\ N'_{\mathrm{tonal}}(l, z)
 $$
 
 y el valor único $T$ (tu_HMS) es el promedio temporal con puerta del máximo
-por bloque sobre las bandas (Fórmulas 61–64). La constante $c_T$ fija el tono
+por bloque sobre las bandas (Fórmulas 61–64). La constante $c_\mathrm{T}$ fija el tono
 de 1 kHz / 40 dB a 1 tu_HMS, y la banda del pico de la ACF da la frecuencia
 tonal $f_{\mathrm{ton}}$.
 
 ### Aspereza: modulación de la envolvente (ECMA-418-2)
 
-La aspereza es la sensación de modulación de amplitud rápida (aproximadamente 20–300 Hz), máxima cerca de 70 Hz. A partir de la envolvente de cada banda $p_E(n)$ (magnitud de Hilbert) se forma un espectro de modulación ponderado por una función de tasa de modulación con pico cerca de 70 Hz y por la profundidad de modulación; correlacionando la modulación entre bandas vecinas y aplicando el filtrado temporal especificado se obtiene la **aspereza específica** $R'(l_{50}, z)$ y la aspereza dependiente del tiempo
+La aspereza es la sensación de modulación de amplitud rápida (aproximadamente 20–300 Hz), máxima cerca de 70 Hz. A partir de la envolvente de cada banda $p_\mathrm{E}(n)$ (magnitud de Hilbert) se forma un espectro de modulación ponderado por una función de tasa de modulación con pico cerca de 70 Hz y por la profundidad de modulación; correlacionando la modulación entre bandas vecinas y aplicando el filtrado temporal especificado se obtiene la **aspereza específica** $R'(l_{50}, z)$ y la aspereza dependiente del tiempo
 
 $$
 R(l_{50}) = \sum_z R'(l_{50}, z) \ \ \text{asper}
 $$
 
 (Fórmulas 65–111). El valor único $R$ es el percentil 90 de $R(l_{50})$ en el
-tiempo (apartado 7.1.10); la constante $c_R$ (Fórmula 104) calibra el sonido
+tiempo (apartado 7.1.10); la constante $c_\mathrm{R}$ (Fórmula 104) calibra el sonido
 de referencia (un portador de 1 kHz modulado en amplitud al 100 % a 70 Hz y 60
 dB SPL) a 1 asper.
 
