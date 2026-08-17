@@ -370,7 +370,12 @@ def _prepare_impulses(
     c_prof = np.asarray(dynamic.profile_speeds, dtype=np.float64).ravel()
     grad = _gradients_with_half_spaces(z_prof, c_prof)
     jumps = np.diff(grad)  # per node: segment below minus segment above
-    keep = (z_prof > lower) & (jumps != 0.0)
+    # A jump of exactly zero is a node the profile runs straight through, and
+    # `astype(bool)` is that test: no tolerance is wanted here, because a jump
+    # of any size at all is an impulse the spreading has to take, while a
+    # tolerance would silently delete the small ones a finely sampled profile
+    # is made of.
+    keep = (z_prof > lower) & jumps.astype(bool)
     if upper is not None:
         keep &= z_prof < upper
     interfaces = z_prof[keep]
@@ -500,6 +505,54 @@ def _polish_fraction(
     return frac
 
 
+class _Levels(NamedTuple):
+    """Which level each ray meets inside the sub-step, and what kind it is.
+
+    :ivar target: The depth the sub-step is aimed at, per ray. Meaningless
+        where ``crossed`` is false, and never read there.
+    :ivar crossed: Rays that meet a level of either kind and so have their
+        step split.
+    :ivar reflects: The subset of them that meet a reflecting boundary. A ray
+        that meets a profile node instead is in ``crossed`` and not here: it
+        goes straight on through, and only its spreading feels the kink.
+    :ivar at_upper: The subset of ``reflects`` that leave through ``upper``.
+    """
+
+    target: NDArray[np.float64]
+    crossed: NDArray[np.bool_]
+    reflects: NDArray[np.bool_]
+    at_upper: NDArray[np.bool_]
+
+
+def _levels_reached(
+    z: NDArray[np.float64], z_end: NDArray[np.float64],
+    moving: NDArray[np.bool_], *, lower: float, upper: float | None,
+    dyn: _Dynamic | None,
+) -> _Levels:
+    """The nearest level ahead of each ray, boundaries and profile nodes alike.
+
+    An interface always lies strictly inside the medium, so a step that would
+    cross both meets the interface first and the boundary is left to the
+    sub-step after it; that ordering is what the unconditional overwrite of
+    ``target`` below expresses.
+    """
+    out = z_end < lower if upper is None else (z_end < lower) | (z_end > upper)
+    reflects = out & moving
+    crossed = reflects
+    target = (np.full(z.size, lower) if upper is None
+              else np.where(z_end < lower, lower, float(upper)))
+    if dyn is not None and dyn.impulses.interfaces.size:
+        kink, idx = _next_interface(z, z_end, dyn.impulses.interfaces)
+        kink &= moving
+        target = np.where(kink, dyn.impulses.interfaces[idx], target)
+        reflects = reflects & ~kink
+        crossed = crossed | kink
+    # Which boundary a reflection happened at is settled by the same test the
+    # target was: everything that left the medium and is not below the lower
+    # boundary went out through the upper one.
+    return _Levels(target, crossed, reflects, reflects & ~(z_end < lower))
+
+
 def _advance_one_step(
     deriv: RayDerivative, *, xi: NDArray[np.float64],
     z: NDArray[np.float64], zeta: NDArray[np.float64],
@@ -519,10 +572,8 @@ def _advance_one_step(
 
     With ``dyn`` the same splitting is asked of the profile nodes, because the
     impulse in ``p`` has to be applied where the ray actually meets the kink and
-    not at the end of whatever step happened to contain it. The two kinds of
-    level are found together and the nearest one wins; an interface always lies
-    strictly inside the medium, so a step that crosses both meets the interface
-    first and the boundary is left to the sub-step after it.
+    not at the end of whatever step happened to contain it. Both kinds of level
+    are found together by :func:`_levels_reached`.
     """
     h = np.full(z.size, float(range_step))
     elapsed = np.zeros(z.size)
@@ -540,21 +591,8 @@ def _advance_one_step(
         # spent nothing crosses and the loop leaves below.
         moving = h > 0.0
         z_end, zeta_end, dt = _rk4(deriv, z, zeta, h)
-        out = z_end < lower if upper is None else (z_end < lower) | (z_end > upper)
-        reflects = out & moving
-        crossed = reflects
-        target = (np.full(z.size, lower) if upper is None
-                  else np.where(z_end < lower, lower, float(upper)))
-        if dyn is not None and dyn.impulses.interfaces.size:
-            kink, idx = _next_interface(z, z_end, dyn.impulses.interfaces)
-            kink &= moving
-            target = np.where(kink, dyn.impulses.interfaces[idx], target)
-            reflects = reflects & ~kink
-            crossed = crossed | kink
-        # Which boundary a reflection happened at is settled by the same test
-        # the target was: everything that left the medium and is not below the
-        # lower boundary went out through the upper one.
-        at_upper = reflects & ~(z_end < lower)
+        target, crossed, reflects, at_upper = _levels_reached(
+            z, z_end, moving, lower=lower, upper=upper, dyn=dyn)
         if not crossed.any():
             z = np.where(moving, z_end, z)
             zeta = np.where(moving, zeta_end, zeta)

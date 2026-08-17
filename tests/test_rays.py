@@ -172,7 +172,8 @@ def test_spreading_is_range_over_cosine_where_the_profile_has_no_curvature(
     rmax, ns = 2000.0, 201
     march, _ = _march(profile, 500.0, [angle], max_range=rmax, n_steps=ns)
     assert march.reflections.sum() == 0
-    assert march.spreadings is not None and march.spreading_slopes is not None
+    assert march.spreadings is not None
+    assert march.spreading_slopes is not None
     exact = np.linspace(0.0, rmax, ns) / np.cos(np.radians(angle))
     # Machine precision, not a discretisation tolerance: q is a polynomial of
     # degree one in range here, which the step reproduces to the last bit.
@@ -250,8 +251,10 @@ def test_the_two_boundaries_are_counted_apart_and_add_up_to_the_total() -> None:
     rmax, ns = 24_000.0, 601
     march, _ = _march(_ISO, 500.0, [20.0], max_range=rmax, n_steps=ns)
     total, upper = march.reflections[0], march.upper_reflections[0]
-    assert np.all(total <= 1) and np.all(upper <= total)
-    assert upper.sum() > 0 and (total - upper).sum() > 0
+    assert np.all(total <= 1)
+    assert np.all(upper <= total)
+    assert upper.sum() > 0
+    assert (total - upper).sum() > 0
     off_seabed = (total == 1) & (march.verticals[0] < 0.0)
     off_surface = (total == 1) & (march.verticals[0] > 0.0)
     assert np.array_equal(upper.astype(bool), off_seabed)
@@ -333,7 +336,8 @@ def test_the_spreading_is_continuous_across_a_node_and_its_slope_is_not() -> Non
     rmax, ns = 4000.0, 4001
     march, _ = _march(_KINK, 50.0, [6.0], max_range=rmax, n_steps=ns)
     assert march.reflections.sum() == 0
-    assert march.spreadings is not None and march.spreading_slopes is not None
+    assert march.spreadings is not None
+    assert march.spreading_slopes is not None
     q, p = march.spreadings[0], march.spreading_slopes[0]
 
     treads = np.flatnonzero(np.diff(p) != 0.0)
@@ -477,8 +481,10 @@ def test_complex_initial_conditions_ride_the_same_linear_march() -> None:
     q0 = 0.5j * 2.0 * np.pi * 200.0 * 60.0**2 / 1490.0
     beam, _ = _march(_KINK, 200.0, [6.0], spreading=q0, slope=1.0, **kw)
 
-    assert beam.spreadings is not None and beam.spreadings.dtype == np.complex128
-    assert from_slope.spreadings is not None and from_spread.spreadings is not None
+    assert beam.spreadings is not None
+    assert beam.spreadings.dtype == np.complex128
+    assert from_slope.spreadings is not None
+    assert from_spread.spreadings is not None
     superposed = from_slope.spreadings[0] + q0 * from_spread.spreadings[0]
     assert np.allclose(beam.spreadings[0], superposed, rtol=1e-12, atol=1e-9)
     # The trajectory does not care which of them was launched.

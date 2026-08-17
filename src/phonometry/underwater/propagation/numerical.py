@@ -56,6 +56,12 @@ if TYPE_CHECKING:
     from ..._internal.rays import RayDerivative, RayMarch
 
 _BOTTOM_TYPES = ("pressure-release", "rigid")
+#: What every solver here says when the source is handed to it outside the
+#: water column. One string rather than four copies: the three field solvers
+#: and the ray tracer all reject the same thing for the same reason, and a
+#: caller who has read the message once should not have to notice which of
+#: them phrased it.
+_SOURCE_OUTSIDE = "'source_depth' must lie within the water column."
 #: Pressure reflection coefficient of each bottom kind. The sea surface is
 #: always pressure-release, so its own coefficient is the -1 below.
 _BOTTOM_REFLECTION = {"pressure-release": -1.0, "rigid": 1.0}
@@ -423,7 +429,7 @@ def ray_trace(
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     if not (0.0 <= zs <= water_depth):
-        raise ValueError("'source_depth' must lie within the water column.")
+        raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     if int(n_steps) < 2:
         raise ValueError("'n_steps' must be at least 2.")
@@ -983,12 +989,80 @@ def _check_source_on_kink(
     if z_prof.size < 3:
         return
     grad = np.diff(c_prof) / np.diff(z_prof)
-    kinked = z_prof[1:-1][np.diff(grad) != 0.0]
+    # A jump of exactly zero is a node the profile runs straight through; any
+    # jump at all is a kink, so the test is deliberately exact and carries no
+    # tolerance (see :func:`phonometry._internal.rays._prepare_impulses`).
+    kinked = z_prof[1:-1][np.diff(grad).astype(bool)]
     if kinked.size and np.min(np.abs(kinked - source_depth)) <= 1e-6:
         _warn_beams(
             "'source_depth' sits on a gradient discontinuity of the profile,"
             " which concentrates the near-horizontal beams into a spurious jet;"
             " offset the source or smooth the profile there.", nested=1)
+
+
+def _beam_range_grid(
+    ranges_m: NDArray[np.float64] | list[float] | None, *,
+    n_steps: int, dr: float, rmax: float,
+) -> NDArray[np.float64]:
+    """The ranges the field is evaluated at, defaulting to the marching grid.
+
+    Past the end of the march there is nothing to read a beam off, and the
+    nearest-column arithmetic of :func:`_beam_influence` would answer with a
+    silent extrapolation of the last column rather than with an error, so a
+    range beyond it is refused. Half a step of slack is allowed because the
+    last column is the one nearest ``max_range`` and a caller who asks for
+    exactly that is asking for a column that exists.
+    """
+    ranges = np.asarray(
+        np.arange(n_steps) * dr if ranges_m is None else ranges_m,
+        dtype=np.float64).ravel()
+    if ranges.size == 0 or not np.all(np.isfinite(ranges)) or np.any(ranges < 0.0):
+        raise ValueError("'ranges_m' must be finite, non-negative and non-empty.")
+    if np.any(ranges > rmax + 0.5 * dr):
+        raise ValueError("'ranges_m' must not run past 'max_range'.")
+    return ranges
+
+
+def _beam_receiver_grid(
+    receiver_depths_m: NDArray[np.float64] | list[float] | None, *,
+    n_depth_points: int, water_depth: float,
+) -> NDArray[np.float64]:
+    """The depths the field is evaluated at.
+
+    The default is the interior grid :func:`parabolic_equation` uses, so the
+    two fields land on the same depths and subtract. An explicit grid has to
+    stay inside the column: the image ladder of :func:`_image_ladder` folds the
+    receiver about the two boundaries, which only means anything between them.
+    """
+    if receiver_depths_m is None:
+        n_z = int(n_depth_points)
+        if n_z < 2:
+            raise ValueError("'n_depth_points' must be at least 2.")
+        dz = water_depth / (n_z + 1)
+        return np.asarray(dz * np.arange(1, n_z + 1), dtype=np.float64)
+    receivers = np.asarray(receiver_depths_m, dtype=np.float64).ravel()
+    if receivers.size == 0 or not np.all(np.isfinite(receivers)):
+        raise ValueError("'receiver_depths_m' must be finite and non-empty.")
+    if np.any(receivers < 0.0) or np.any(receivers > water_depth):
+        raise ValueError("'receiver_depths_m' must lie within the water column.")
+    return receivers
+
+
+class _Fan(NamedTuple):
+    """The launch fan, in the three forms the beam sum reads it in.
+
+    They are one quantity written three ways and have to agree, which is why
+    they travel together: ``xi`` is the Snell invariant the marcher is handed,
+    and ``dtheta`` is the spacing the weight of Eq. (3.92) integrates over.
+
+    :ivar launch: Launch angle of each beam from the horizontal, in radians.
+    :ivar xi: ``cos(launch) / c(z_s)``, per beam, in s/m.
+    :ivar dtheta: Spacing of the fan, in radians.
+    """
+
+    launch: NDArray[np.float64]
+    xi: NDArray[np.float64]
+    dtheta: float
 
 
 def gaussian_beams(
@@ -1146,7 +1220,7 @@ def gaussian_beams(
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     if not (0.0 < zs < water_depth):
-        raise ValueError("'source_depth' must lie within the water column.")
+        raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     dr_step = require_positive(range_step, "range_step")
     if dr_step > rmax:
@@ -1176,42 +1250,20 @@ def gaussian_beams(
     if n_fan < 2:
         raise ValueError("'n_beams' must be at least 2.")
     launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
-    dtheta = float(launch[1] - launch[0])
+    fan = _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]))
 
     n_steps = int(np.ceil(rmax / dr_step)) + 1
     dr = rmax / (n_steps - 1)
-    xi = np.cos(launch) / c0
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof, xi), xi=xi,
+        _ocean_ray_derivative(z_prof, c_prof, fan.xi), xi=fan.xi,
         z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
         n_steps=n_steps, lower=0.0, upper=water_depth,
         dynamic=DynamicRays(np.full(n_fan, 0.5j * omega * w0**2),
                             np.full(n_fan, 1.0 + 0.0j), z_prof, c_prof))
 
-    ranges = np.asarray(
-        np.arange(n_steps) * dr if ranges_m is None else ranges_m,
-        dtype=np.float64).ravel()
-    if ranges.size == 0 or not np.all(np.isfinite(ranges)) or np.any(ranges < 0.0):
-        raise ValueError("'ranges_m' must be finite, non-negative and non-empty.")
-    # Past the end of the march there is nothing to read a beam off, and the
-    # nearest-column arithmetic would answer with a silent extrapolation of the
-    # last one rather than with an error.
-    if np.any(ranges > rmax + 0.5 * dr):
-        raise ValueError("'ranges_m' must not run past 'max_range'.")
-    if receiver_depths_m is None:
-        n_z = int(n_depth_points)
-        if n_z < 2:
-            raise ValueError("'n_depth_points' must be at least 2.")
-        dz = water_depth / (n_z + 1)
-        receivers = np.asarray(dz * np.arange(1, n_z + 1), dtype=np.float64)
-    else:
-        receivers = np.asarray(receiver_depths_m, dtype=np.float64).ravel()
-        if receivers.size == 0 or not np.all(np.isfinite(receivers)):
-            raise ValueError("'receiver_depths_m' must be finite and non-empty.")
-        # The image ladder folds the receiver about the two boundaries, which
-        # only means anything for a receiver between them.
-        if np.any(receivers < 0.0) or np.any(receivers > water_depth):
-            raise ValueError("'receiver_depths_m' must lie within the water column.")
+    ranges = _beam_range_grid(ranges_m, n_steps=n_steps, dr=dr, rmax=rmax)
+    receivers = _beam_receiver_grid(receiver_depths_m, n_depth_points=n_depth_points,
+                                    water_depth=water_depth)
 
     climb = dr * np.tan(np.radians(theta_max))
     if climb > _MAX_STEEP_CLIMB * water_depth:
@@ -1220,12 +1272,10 @@ def gaussian_beams(
             f" across a {water_depth:.0f} m column, so its trajectory is not"
             " resolved; cut 'range_step' or narrow 'max_angle_deg'.")
 
-    result = _assemble_beam_field(
-        march, ranges=ranges, receivers=receivers, launch=launch, xi=xi,
-        dtheta=dtheta, dr=dr, z_prof=z_prof, c_prof=c_prof, omega=omega,
-        c0=c0, w0=w0, water_depth=water_depth,
-        bottom_reflection=_BOTTOM_REFLECTION[key])
-    field, widths, curvatures = result
+    field, widths, curvatures = _assemble_beam_field(
+        march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
+        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
+        water_depth=water_depth, bottom_reflection=_BOTTOM_REFLECTION[key])
 
     # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
     # here hands back a field in the exp(-i omega t) one the rest of the module
@@ -1256,8 +1306,7 @@ def gaussian_beams(
 
 def _assemble_beam_field(
     march: RayMarch, *, ranges: NDArray[np.float64],
-    receivers: NDArray[np.float64], launch: NDArray[np.float64],
-    xi: NDArray[np.float64], dtheta: float, dr: float,
+    receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
     omega: float, c0: float, w0: float, water_depth: float,
     bottom_reflection: float,
@@ -1287,13 +1336,14 @@ def _assemble_beam_field(
     at_surface = np.cumsum(march.reflections - march.upper_reflections, axis=1)
     reflected = (_SURFACE_REFLECTION**at_surface) * (bottom_reflection**at_bottom)
     # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and positive.
-    weight = dtheta * (omega * w0 / (2.0 * c0)) * np.sqrt(np.cos(launch) / np.pi)
+    weight = (fan.dtheta * (omega * w0 / (2.0 * c0))
+              * np.sqrt(np.cos(fan.launch) / np.pi))
 
     column = np.clip(np.rint(ranges / dr).astype(np.intp), 0,
                      march.positions.shape[1] - 1)
-    cosine = speed[:, column] * xi[:, None]
+    cosine = speed[:, column] * fan.xi[:, None]
     samples = _BeamSamples(
-        xi=xi[:, None],
+        xi=fan.xi[:, None],
         column_range=np.asarray(column * dr, dtype=np.float64)[None, :],
         range_offset=(ranges - column * dr)[None, :],
         depth=march.positions[:, column],
@@ -1387,7 +1437,7 @@ def parabolic_equation(
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     if not (0.0 < zs < water_depth):
-        raise ValueError("'source_depth' must lie within the water column.")
+        raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     dr = require_positive(range_step, "range_step")
     if dr > rmax:
