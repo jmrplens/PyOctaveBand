@@ -76,8 +76,34 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-          # Full history: add-sitemap-lastmod.mjs stamps per-file git dates.
+          # Full history: add-sitemap-lastmod.mjs stamps per-file git dates
+          # and check:redirects re-derives the redirect map from renames.
           fetch-depth: 0
+          # ... but the history those two need is commits and trees, never
+          # blob contents, and the repository's pack is dominated by the
+          # committed artwork's blobs (2.4 GiB, over half of it
+          # .github/images, which nothing in this job reads: the site
+          # references the figures remotely). Fetching the pack whole made
+          # the checkout the third-largest step of the job at close to
+          # three minutes. `blob:none` defers blob download to first use,
+          # and the sparse set below keeps first use to the trees this job
+          # actually walks. Rename detection in check:redirects can still
+          # demand the odd content blob when a page was edited in the same
+          # commit that moved it; those are small text files served by the
+          # same promisor remote, which is why this stays correct rather
+          # than merely fast.
+          filter: blob:none
+          # Cone mode: these directories plus every repository-root file.
+          # docs/ and scripts/ feed the mirror, glossary and llms checks;
+          # site/ is the build itself; .github/workflows is a few kilobytes
+          # that check-redirects reads to hold this very file's redirect
+          # count in step, and naming the subdirectory keeps its sibling
+          # images/ (the half-gigabyte artwork tree) out of the cone.
+          sparse-checkout: |
+            .github/workflows
+            docs
+            scripts
+            site
       - uses: actions/setup-node@v7
         with:
           node-version: 22

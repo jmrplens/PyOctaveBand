@@ -3,6 +3,7 @@
     "standard": "WCAG2AA",
     "timeout": 15000,
     "wait": 2000,
+    "concurrency": 4,
     "chromeLaunchConfig": {
       "args": [
         "--no-sandbox",
