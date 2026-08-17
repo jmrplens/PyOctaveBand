@@ -28,6 +28,19 @@ def test_leq_dbfs() -> None:
     assert leq(x, dbfs=True) == pytest.approx(-3.01, abs=0.05)
 
 
+def test_leq_dbfs_zero_reference_is_rms_one_not_a_full_scale_sine() -> None:
+    """0 dBFS is RMS 1.0, not the AES17 full-scale sine.
+
+    Pins the convention the guides quote. Under AES17 a full-scale sine reads
+    0 dBFS; here it reads -3.01, and it takes a sine of amplitude sqrt(2)
+    (RMS 1.0) to reach 0. Anything else is a 3.01 dB systematic offset.
+    """
+    assert leq(_tone(1000, amp=np.sqrt(2.0)), dbfs=True) == pytest.approx(0.0, abs=1e-6)
+    assert leq(_tone(1000), dbfs=True) == pytest.approx(-3.0103, abs=1e-3)
+    # Any RMS-1.0 waveform hits 0 dBFS: the reference is RMS, not a shape.
+    assert leq(np.ones(FS), dbfs=True) == pytest.approx(0.0, abs=1e-9)
+
+
 def test_leq_multichannel_returns_per_channel() -> None:
     x = np.stack([_tone(1000), 0.5 * _tone(1000)])
     out = leq(x)

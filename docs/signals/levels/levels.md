@@ -101,7 +101,7 @@ everywhere else, energy.
 | `x` | 1D or 2D array | digital units (or Pa if calibrated) | non-empty | 2D is `[channels, samples]`; returns one level per channel |
 | `fs` | int | Hz | > 0 (`laeq` only) | `leq` needs no sample rate (pure RMS integral) |
 | `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
-| `dbfs` | bool | — | default `False` | `True`: 0 dBFS = full-scale RMS sine; ignores calibration |
+| `dbfs` | bool | — | default `False` | `True`: 0 dBFS = RMS 1.0; ignores calibration |
 
 ## Percentile levels (LN)
 
