@@ -524,7 +524,8 @@ jobs:
     # because numba trails a new interpreter by a release or two, and while it
     # did, the jitted kernel was never built against the newest Python we ship
     # for. numba 0.67.0 publishes cp314 wheels and carries the 3.14 classifier,
-    # and the floor in pyproject.toml (numba>=0.66.0) already resolves to it.
+    # and it is the floor in pyproject.toml (numba>=0.67.0), so nothing older
+    # can resolve here.
     # Tracking the newest version is the strictest single choice for this job:
     # a compiled extension meeting a new interpreter is the thing most likely
     # to break, and the pure-Python kernel is covered on both versions by the
