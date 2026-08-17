@@ -37,6 +37,29 @@ nothing with the solver.
   zero by bisection on the launch angle, which is a construction the beam solver
   never performs, and which makes the classical amplitude of Eq. (3.65) diverge
   at a point of the field the beams then have to answer for.
+
+* **The branch of the square root**, in two steps, because no single comparison
+  reaches it. Eq. (3.58) is linear with real coefficients and Eq. (3.91) starts
+  :math:`q` on the imaginary axis with :math:`p` real, so :math:`\mathrm{Re}[q]`
+  *is* the geometric spreading and every caustic puts :math:`q` on that axis.
+  The unwrapped argument then has to read :math:`-(2k+1)\pi/2` at the
+  :math:`k`-th caustic, a closed-form ladder which says :math:`\sqrt{q}` turns
+  by :math:`-\pi/2` there: Jensen Eq. (3.79)'s :math:`(-i)^m` recovered instead
+  of imposed. That pins the branch; a hand-built single beam handed to
+  :func:`_beam_influence` with its argument set one turn below the principal
+  value then pins that the sum spends it, since one turn in :math:`\arg q` is a
+  factor of -1 in the field.
+
+  It is worth saying what is *not* here, because it was looked for. The branch
+  changes the summed field by 1.7 to 3.9 dB, and only at a caustic. That is
+  under the beam method's own reproducibility in the only configurations that
+  cross one: against the parabolic equation on a caustic cut the two disagree by
+  5 dB in the mean, against :func:`normal_modes` by 5.4 dB, and against a
+  closed-form two-ray sum with the KMAH factor put in by hand (exact parabolic
+  rays for this profile, checked to millimetres) by 4.4 dB, the fringe periods
+  agreeing while their positions slip. Doubling the beam width moves the same
+  cut by 12 dB. So the two tests above are white box on purpose: a field-value
+  oracle sharp enough to see the branch does not exist here.
 """
 
 from __future__ import annotations
@@ -399,6 +422,146 @@ def _geometric_spreading(
         dynamic=DynamicRays(np.zeros(th.size), np.full(th.size, 1.0 / c0),
                             _N2_DEPTHS, _N2_SPEEDS))
     return np.asarray(march.spreadings, dtype=np.float64), march.positions
+
+
+def _beam_spreading(
+    source_depth: float, angles_deg: np.ndarray | list[float], *,
+    max_range: float, n_steps: int, omega: float, beam_width: float,
+) -> np.ndarray:
+    """``q`` for the *beam* initial conditions of Eq. (3.91), same marcher."""
+    th = np.radians(np.atleast_1d(np.asarray(angles_deg, dtype=np.float64)))
+    c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
+    xi = np.cos(th) / c0
+    march = march_rays(
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS, xi), xi=xi,
+        z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
+        range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
+        upper=_N2_DEPTH,
+        dynamic=DynamicRays(np.full(th.size, 0.5j * omega * beam_width**2),
+                            np.full(th.size, 1.0 + 0.0j), _N2_DEPTHS, _N2_SPEEDS))
+    return np.asarray(march.spreadings, dtype=np.complex128)
+
+
+def test_the_tracked_branch_of_the_square_root_is_the_kmah_index() -> None:
+    r"""Eq. (3.79)'s :math:`(-i)^m`, recovered from the branch rather than imposed.
+
+    Ray theory has to count caustics and multiply by :math:`(-i)^m` by hand;
+    Sect. 3.5's claim is that a complex :math:`q` carries that phase on its own,
+    which is why this module has no KMAH index in it. The claim is exactly
+    checkable, because Eq. (3.58) is linear with real coefficients and
+    Eq. (3.91) starts :math:`q` at :math:`i\omega W_0^2/2` with :math:`p` real:
+    the real and imaginary parts evolve independently, and
+    :math:`\mathrm{Re}[q]` is then the *geometric* spreading of Eq. (3.63) to
+    the last bits. So a caustic, where the geometric spreading vanishes, is
+    exactly where the beam's :math:`q` is purely imaginary, and the question of
+    the branch is the question of which way it goes round.
+
+    It goes round one way, always, by :math:`\pi` per caustic. The unwrapped
+    argument starts at :math:`+\pi/2` and reads :math:`-(2k+1)\pi/2` at the
+    :math:`k`-th caustic, a descending ladder with no jumps in it, so
+    :math:`\sqrt{q}` picks up :math:`e^{-i\pi/2} = -i` at each one. That is
+    Eq. (3.79), arrived at from the other end.
+
+    A principal-value square root taken sample by sample sees the same ladder
+    folded into :math:`\pm\pi/2` and is wrong from the first caustic on, by
+    :math:`2\pi` in the argument on rays that cross one and by :math:`6\pi` on
+    the shallow rays that cross six. That difference is asserted too, so this
+    stays a test of something the solver actually depends on.
+    """
+    zs, rmax, n_steps = 992.5, 4000.0, 4001
+    omega, w0 = 2.0 * np.pi * 600.0, 35.9
+    angles = np.array([-25.0, -20.0, -13.3886, -8.0, -3.0, 3.0, 10.0, 20.0, 30.0])
+    q = _beam_spreading(zs, angles, max_range=rmax, n_steps=n_steps,
+                        omega=omega, beam_width=w0)
+
+    # Re[q] is the geometric spreading, which is what puts caustics on the axis.
+    geometric, _z = _geometric_spreading(zs, angles, max_range=rmax, n_steps=n_steps)
+    c0 = float(np.interp(zs, _N2_DEPTHS, _N2_SPEEDS))
+    assert np.abs(q.real - c0 * geometric).max() / np.abs(q.real).max() < 1e-10
+
+    crossed, deep = 0, 0
+    for i in range(angles.size):
+        real, phase = q[i].real, np.unwrap(np.angle(q[i]))
+        assert phase[0] == pytest.approx(0.5 * np.pi)
+        # Interpolate onto each zero of Re[q] rather than the sample beside it.
+        zeros = np.flatnonzero(np.sign(real[1:-1]) != np.sign(real[2:])) + 1
+        for k_th, k in enumerate(zeros):
+            frac = real[k] / (real[k] - real[k + 1])
+            at = phase[k] + frac * (phase[k + 1] - phase[k])
+            assert at == pytest.approx(-(2 * k_th + 1) * 0.5 * np.pi, abs=5e-3)
+        crossed += zeros.size
+        # The whole point: past the second caustic the ladder has left the
+        # principal strip, and a principal value is a different function.
+        if zeros.size >= 2:
+            assert np.abs(phase - np.angle(q[i])).max() > 6.0
+            deep += 1
+    assert crossed >= 20, "the fan has to cross plenty of caustics"
+    assert deep >= 4, "and several rays have to get past the second one"
+
+    # And the march resolves the winding rather than aliasing it: at a twentieth
+    # of the sampling the ladder is the same one, so no rung was ever skipped.
+    coarse = _beam_spreading(zs, angles, max_range=rmax, n_steps=201,
+                             omega=omega, beam_width=w0)
+    fine_turn = np.unwrap(np.angle(q), axis=1)[:, -1]
+    coarse_turn = np.unwrap(np.angle(coarse), axis=1)[:, -1]
+    assert np.abs(fine_turn - coarse_turn).max() < 0.5 * np.pi
+
+
+def test_the_influence_sum_uses_the_tracked_branch_and_not_the_principal_one() -> None:
+    r"""One beam, by hand, with a winding the principal value cannot see.
+
+    The test above pins the branch as a property of :math:`q`; this one pins
+    that the sum actually spends it. A single horizontal beam is handed to
+    :func:`_beam_influence` with the receiver exactly on its axis, so
+    :math:`n = 0`, the extrapolation along the ray is nothing, and Eq. (3.88)
+    collapses to :math:`A\sqrt{c/(r q)}\,e^{-i\omega\tau}` with only the branch
+    left to get wrong. Its tracked argument is set a full turn below the
+    principal value, which is what a ray that has passed two caustics carries,
+    and a full turn in :math:`\arg q` is half a turn in :math:`\sqrt{q}`: the
+    two readings differ by a factor of exactly -1, not by a little.
+
+    The water column is made enormous and the beam's reach tiny so the folded
+    images of the receiver are all thrown out and the one beam is the whole
+    answer.
+    """
+    from phonometry.underwater.propagation.numerical import (
+        _beam_influence,
+        _BeamSamples,
+    )
+
+    c, r_col, omega, w0 = 1500.0, 3000.0, 2.0 * np.pi * 100.0, 40.0
+    q = 1.0e6 * (0.3 + 0.7j)
+    p = 2.0e-4 * (1.0 - 0.5j)
+    tau, z_ray = 2.0, 5.0e5
+    one = np.array([[1.0]])
+    samples = _BeamSamples(
+        xi=np.array([[1.0 / c]]),
+        column_range=np.array([[r_col]]),
+        range_offset=np.array([[0.0]]),
+        depth=np.array([[z_ray]]),
+        vertical=np.array([[0.0]]),
+        speed=one * c,
+        spreading=np.array([[q]]),
+        slope=np.array([[p]]),
+        time=one * tau,
+        # A ray two caustics along: one full turn under the principal value.
+        phase=np.array([[np.angle(q) - 2.0 * np.pi]]),
+        weight=np.array([[1.0 + 0.0j]]),
+        reach=np.array([50.0]),
+    )
+    got = _beam_influence(samples, np.array([z_ray]), water_depth=1.0e6,
+                          bottom_reflection=1.0, omega=omega, beam_width=w0)
+
+    expected = (np.sqrt(c / r_col) / np.sqrt(abs(q))
+                * np.exp(-0.5j * (np.angle(q) - 2.0 * np.pi) - 1j * omega * tau))
+    assert got.shape == (1, 1)
+    assert got[0, 0] == pytest.approx(expected, rel=1e-12)
+    # The principal value is the same number with the opposite sign, so this is
+    # not a tolerance that a rounding change could drift across.
+    principal = (np.sqrt(c / r_col) / np.sqrt(abs(q))
+                 * np.exp(-0.5j * np.angle(q) - 1j * omega * tau))
+    assert principal == pytest.approx(-expected, rel=1e-12)
+    assert abs(got[0, 0] - principal) == pytest.approx(2.0 * abs(expected), rel=1e-12)
 
 
 def test_the_field_is_finite_where_the_classical_amplitude_is_not() -> None:
