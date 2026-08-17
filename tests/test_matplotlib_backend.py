@@ -55,11 +55,12 @@ def _imports_matplotlib(node: ast.stmt) -> bool:
         names = [node.module or ""] if node.level == 0 else []
     else:
         return False
-    return any(name == "matplotlib" or name.startswith("matplotlib.")
-               for name in names)
+    return any(name == "matplotlib" or name.startswith("matplotlib.") for name in names)
 
 
-def _eager_matplotlib_imports(body: list[ast.stmt], *, guarded: bool = False) -> list[int]:
+def _eager_matplotlib_imports(
+    body: list[ast.stmt], *, guarded: bool = False
+) -> list[int]:
     """Line numbers of the matplotlib imports that run at import time.
 
     Only two placements are lazy: inside a function body, and under
@@ -80,8 +81,12 @@ def _eager_matplotlib_imports(body: list[ast.stmt], *, guarded: bool = False) ->
             eager += _eager_matplotlib_imports(node.body, guarded=deferred)
             eager += _eager_matplotlib_imports(node.orelse, guarded=guarded)
         elif isinstance(node, ast.Try):
-            for block in (node.body, node.orelse, node.finalbody,
-                          *(handler.body for handler in node.handlers)):
+            for block in (
+                node.body,
+                node.orelse,
+                node.finalbody,
+                *(handler.body for handler in node.handlers),
+            ):
                 eager += _eager_matplotlib_imports(block, guarded=guarded)
         elif isinstance(node, (ast.With, ast.ClassDef)):
             eager += _eager_matplotlib_imports(node.body, guarded=guarded)
