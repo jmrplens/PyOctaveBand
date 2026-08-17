@@ -146,7 +146,11 @@ def test_the_near_field_survives_a_beam_whose_foot_lands_on_the_source() -> None
     res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
                          max_range=rmax, ranges_m=offs, receiver_depths_m=zs + offs,
                          max_angle_deg=80.0, n_beams=321)
-    assert -45.0 in res.launch_angles, "the singular beam has to be in the fan"
+    # Not asserted as exact equality: the fan is built in radians and read back
+    # in degrees, so -45 lands on a rung to within a rounding rather than by
+    # construction. A rounding of a degree is close enough to be the same test.
+    assert np.abs(res.launch_angles + 45.0).min() < 1e-9, (
+        "the singular beam has to be in the fan")
     slant = np.hypot(res.ranges[None, :], res.depths[:, None] - zs)
     err = res.propagation_loss - 20.0 * np.log10(slant)
     assert np.all(np.isfinite(res.propagation_loss))
