@@ -75,15 +75,26 @@ _HEADER = (
 _PICTURE = re.compile(r"<picture>.*?</picture>", re.DOTALL)
 _IMG = re.compile(r"<img\b[^>]*>", re.DOTALL)
 
-#: A URL into this repository at the ``main`` branch, in either of the two
-#: forms the README uses: ``github.com/<owner>/<repo>/blob/main/...`` for
-#: files rendered on GitHub and ``raw.githubusercontent.com/<owner>/<repo>/
-#: main/...`` for images served raw. Group 1 is everything up to and
-#: including the ref position, so substituting the ref leaves the rest of
-#: the URL untouched.
+#: This repository, spelled once so the pattern below cannot drift from it.
+_SLUG = "jmrplens/phonometry"
+
+#: A URL into **this** repository at the ``main`` branch, in the forms the
+#: README uses: ``github.com/<slug>/blob/main/...`` for a file rendered on
+#: GitHub, ``github.com/<slug>/tree/main/...`` for a directory, and
+#: ``raw.githubusercontent.com/<slug>/main/...`` for an image served raw.
+#: Group 1 is everything up to and including the ref position, so
+#: substituting the ref leaves the rest of the URL untouched.
+#:
+#: The owner and repository are matched literally rather than as wildcards.
+#: A wildcard reads as harmless generality and is not: it would rewrite a
+#: link to somebody else's repository to a tag of *ours*, which does not
+#: exist over there, turning a working link into a 404 in the very file this
+#: script exists to keep from rotting. The README has no third-party
+#: ``main`` links today, so this is a guard on the next one added rather
+#: than a fix to a live break.
 _MAIN_REF = re.compile(
-    r"(https://github\.com/[\w.-]+/[\w.-]+/blob/"
-    r"|https://raw\.githubusercontent\.com/[\w.-]+/[\w.-]+/)main/"
+    rf"(https://github\.com/{_SLUG}/(?:blob|tree)/"
+    rf"|https://raw\.githubusercontent\.com/{_SLUG}/)main/"
 )
 
 
@@ -122,8 +133,8 @@ def pypi_readme(readme: str, tag: str) -> str:
         if swapped != img:
             # The still is no longer an animation; fix the alt prefix.
             swapped = re.sub(
-                r'alt="Animation: (.)',
-                lambda m: 'alt="' + m.group(1).upper(), swapped)
+                r'alt="Animation: (.)', lambda m: 'alt="' + m.group(1).upper(), swapped
+            )
         return swapped
 
     return pin_to_tag(_HEADER + _PICTURE.sub(collapse, readme), tag)

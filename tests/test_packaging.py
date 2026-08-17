@@ -224,6 +224,7 @@ def test_pinning_leaves_unrelated_urls_alone() -> None:
     """Only the ref moves: other hosts, other refs and the path are untouched."""
     text = (
         "[guide](https://github.com/jmrplens/phonometry/blob/main/docs/main/x.md) "
+        "[dir](https://github.com/jmrplens/phonometry/tree/main/docs/) "
         "![img](https://raw.githubusercontent.com/jmrplens/phonometry/main/a.svg) "
         "[ci](https://github.com/jmrplens/phonometry/actions/workflows/main.yml) "
         "[badge](https://img.shields.io/pypi/v/phonometry?logo=main) "
@@ -231,8 +232,29 @@ def test_pinning_leaves_unrelated_urls_alone() -> None:
     )
     assert generate_pypi_readme.pin_to_tag(text, "v9.9.9") == (
         "[guide](https://github.com/jmrplens/phonometry/blob/v9.9.9/docs/main/x.md) "
+        "[dir](https://github.com/jmrplens/phonometry/tree/v9.9.9/docs/) "
         "![img](https://raw.githubusercontent.com/jmrplens/phonometry/v9.9.9/a.svg) "
         "[ci](https://github.com/jmrplens/phonometry/actions/workflows/main.yml) "
         "[badge](https://img.shields.io/pypi/v/phonometry?logo=main) "
         "[tagged](https://github.com/jmrplens/phonometry/blob/v1.0.0/LICENSE)"
     )
+
+
+def test_pinning_leaves_other_repositories_alone() -> None:
+    """A third party's ``main`` link is theirs, and our tag does not exist there.
+
+    Rewriting it would invent a ref in somebody else's repository and publish
+    a 404, which is the exact failure the pinning exists to prevent in ours.
+    """
+    text = (
+        "[toolbox](https://github.com/Universite-Gustave-Eiffel/acoustic-toolbox"
+        "/blob/main/README.md) "
+        "[numpy](https://github.com/numpy/numpy/tree/main/doc/) "
+        "![logo](https://raw.githubusercontent.com/scipy/scipy/main/doc/logo.svg) "
+        "[ours](https://github.com/jmrplens/phonometry/blob/main/LICENSE)"
+    )
+    pinned = generate_pypi_readme.pin_to_tag(text, "v9.9.9")
+    assert "acoustic-toolbox/blob/main/README.md" in pinned
+    assert "numpy/numpy/tree/main/doc/" in pinned
+    assert "scipy/scipy/main/doc/logo.svg" in pinned
+    assert "jmrplens/phonometry/blob/v9.9.9/LICENSE" in pinned
