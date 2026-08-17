@@ -467,22 +467,35 @@ Fresnel, y por eso no es solo una elección elegante: frente al campo libre a
 anchura, de $2,7\times10^{-2}$ con la quinta parte de ella y de
 $4,1\times10^{-2}$ con quince veces. La banda de 10 a 50 longitudes de onda del
 libro y un cuarto de la profundidad de la columna lo acotan, y el límite del
-canal tiene la última palabra: un haz comparable a la profundidad del agua
-rompe la contabilidad que pliega un rayo reflejado de vuelta a la columna, en
-vez de costar solo exactitud.
+canal tiene la última palabra. Ese último tope es además donde peor está este
+valor por defecto, y la razón que se daba para él no sobrevive a la medida: lo
+que decía proteger, la contabilidad que pliega un rayo reflejado de vuelta a la
+columna, ya lo restituye la escalera de imágenes del receptor. En aguas someras
+cuesta unos decibelios de nivel en vez de comprar nada, que es el quinto límite
+de más abajo.
 
 **Contra qué está validado.** La divergencia esférica en campo libre, hasta
 $10^{-3}$ dB, que es la única comparación que fija a la vez la normalización de
 la amplitud y el convenio de fase; el campo de dos rayos del espejo de Lloyd
 con una reflexión en superficie, hasta 0,01 dB; y la suma de fuentes imagen de
 la guía de ondas ideal de presión nula, hasta 0,0004 dB con el abanico abierto
-a 88 grados. Las dos condiciones de contorno salen de la propia suma de haces
-en vez de imponerse: el campo en una superficie o un fondo de presión nula es
-3 partes en $10^5$ de su valor a media columna, y un fondo rígido lo duplica.
+a 88 grados. Esa misma guía desarrollada sobre sus modos en vez de sobre sus
+imágenes (Ec. 5.13) es una segunda forma cerrada de un mismo campo exacto, y
+concuerda hasta 0,03 dB *y* $8\times10^{-4}$ rad: es la comparación que alcanza
+la fase absoluta, y pone a los haces en el mismo plano en el que ya se sostienen
+`normal_modes` y `parabolic_equation`. La última dobla los rayos, cosa que
+ninguna de las otras hace, porque en un canal isovelocidad $c''$ se anula y se
+lleva consigo el coeficiente de acoplamiento de las ecuaciones dinámicas de
+rayos: el perfil $n^2$-lineal de la Ec. (3.77) tiene $k^2(z)$ exactamente lineal,
+así que sus modos son funciones de Airy con autovalores en forma cerrada, y los
+haces los siguen hasta 0,22 dB en media. Las dos condiciones de contorno salen
+de la propia suma de haces en vez de imponerse: el campo en una superficie o un
+fondo de presión nula es 3 partes en $10^5$ de su valor a media columna, y un
+fondo rígido lo duplica.
 
-**Dónde se acaba.** Cuatro límites, en el orden en que aprietan.
+**Dónde se acaba.** Cinco límites, en el orden en que aprietan.
 
-- **No hay campo cercano**, y este es el mayor error de los cuatro. La
+- **No hay campo cercano**, y este es el mayor error de los cinco. La
   Ec. (3.92) pesa el abanico ajustándolo a una fuente puntual en campo lejano,
   y la Ec. (3.88) divide por una distancia cilíndrica que se anula sobre el eje
   del que sale cada rayo, así que de cerca la suma no tiene a qué converger. La
@@ -517,6 +530,19 @@ en vez de imponerse: el campo en una superficie o un fondo de presión nula es
   el abanico obliga a recortar `range_step` con él, porque un paso tiene que
   resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
   distancia; el método avisa cuando ese emparejamiento está mal.
+- **La anchura del haz la acota el canal**, y en aguas someras ese tope, y no
+  el método, es el mayor error que queda. Mantiene $W_0$ en un cuarto de la
+  profundidad de la columna cuando el óptimo de más arriba es varias veces
+  mayor, y el campo sale entonces sistemáticamente demasiado flojo. Frente a los
+  modos de Airy exactos de una guía $n^2$-lineal de 200 m a 200 Hz, promediando
+  en energía de 0,5 a 4 km: los 50 m por defecto dan +3,08 dB en media y
+  +5,86 dB en el peor caso, mientras que 100, 150 y 200 m dan +1,13, +0,26 y
+  -0,22 dB. Ahí no hay nada mal con la refracción. El mismo perfil en 1000 m de
+  agua, donde el tope no aprieta, sale a +0,72 dB con 1,37 dB en el peor tramo,
+  más cerca del campo exacto que `normal_modes` en el mismo corte. Pasa
+  `beam_width` a mano, por encima del tope y hasta más o menos la profundidad
+  del agua, cuando el canal es somero y el perfil refracta; el aviso que eso
+  levanta es el precio esperado de la respuesta mejor.
 - **La sombra lejana tiene suelo.** Cada haz se suma hasta cuatro semianchuras,
   140 dB por debajo de su propio eje, así que un receptor al que ningún haz del
   abanico se acerque tanto recibe exactamente cero y una pérdida infinita. Esa

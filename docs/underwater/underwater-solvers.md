@@ -284,22 +284,34 @@ Fresnel integral, which is why it is not merely a tidy choice: against the free
 field at 100 Hz at 2, 5 and 8 km the error in $|p|$ is $7.5\times10^{-5}$ at
 that width, $2.7\times10^{-2}$ at a fifth of it and $4.1\times10^{-2}$ at
 fifteen times it. The book's 10-50 wavelength band and a quarter of
-the water depth clamp it, and the channel clamp has the last word: a beam
-comparable to the water depth breaks the bookkeeping that folds a reflected
-ray back into the column, rather than merely costing accuracy.
+the water depth clamp it, and the channel clamp has the last word. That last
+clamp is also where this default is at its worst, and the reason given for it
+does not survive measurement: what it was said to protect, the bookkeeping that
+folds a reflected ray back into the column, the receiver image ladder already
+restores. In shallow water it costs a few decibels of level rather than buying
+anything, which is the fifth limit below.
 
 **What it is validated against.** Free-field spherical spreading, to
 $10^{-3}$ dB, which is the one comparison that pins the amplitude
 normalisation and the phase convention together; the two-ray Lloyd-mirror field
 with one surface reflection, to 0.01 dB; and the image-source sum of the ideal
 pressure-release waveguide, to 0.0004 dB with the fan opened to 88 degrees.
+That same guide expanded over its modes instead of its images (Eq. 5.13) is a
+second closed form of one exact field, and it agrees to 0.03 dB *and*
+$8\times10^{-4}$ rad: it is the comparison that reaches the absolute phase, and
+it puts the beams on the footing `normal_modes` and `parabolic_equation` are
+already held to. The last one bends the rays, which none of the others do,
+since $c''$ vanishes in an isovelocity channel and takes the coupling
+coefficient of the dynamic ray equations with it: the $n^2$-linear profile of
+Eq. (3.77) has exactly linear $k^2(z)$, so its modes are Airy functions with
+closed-form eigenvalues, and the beams track them to 0.22 dB in the mean.
 Both boundary conditions come out of the beam sum rather than being imposed:
 the field at a pressure-release surface or bottom is 3 parts in $10^5$ of its
 mid-column value, and a rigid bottom doubles it.
 
-**Where it stops.** Four limits, in the order they bite.
+**Where it stops.** Five limits, in the order they bite.
 
-- **There is no near field**, and this is the biggest error of the four.
+- **There is no near field**, and this is the biggest error of the five.
   Eq. (3.92) weights the fan by matching it to a point source in the far field,
   and Eq. (3.88) divides by a cylindrical range that goes to zero on the axis
   every ray leaves from, so close in the sum has nothing to converge to. The
@@ -332,6 +344,19 @@ mid-column value, and a rigid bottom doubles it.
   cutting `range_step` with it, since one step has to resolve
   $\tan\theta_{\max}$ depth units of climb per unit range; the solver warns
   when that pairing is wrong.
+- **The beam width is clamped by the channel**, and in shallow water that
+  clamp, and not the method, is the largest error left. It holds $W_0$ at a
+  quarter of the water depth while the optimum above is several times larger,
+  and the field then comes out systematically too quiet. Against the exact Airy
+  modes of an $n^2$-linear 200 m guide at 200 Hz, energy-averaged over 0.5 to
+  4 km: the default 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
+  100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about refraction is
+  wrong there. The same profile in 1000 m of water, where the clamp does not
+  bite, comes out at +0.72 dB with a 1.37 dB worst bin, closer to the exact
+  field than `normal_modes` on the same cut. Pass `beam_width` explicitly, above
+  the cap and up to about the water depth, when the channel is shallow and the
+  profile refracts; the warning it raises is then the expected cost of the
+  better answer.
 - **The far shadow is floored.** Each beam is summed out to four half-widths,
   140 dB below its own axis, so a receiver that no beam of the fan comes that
   close to gets exactly zero and an infinite loss. That is the unilluminated
