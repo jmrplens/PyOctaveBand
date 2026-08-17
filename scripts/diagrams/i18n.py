@@ -2147,8 +2147,8 @@ _ES: dict[str, str] = {
     "marginal there and a hand-held probe is useless":
         "queda justa y una punta manual no sirve",
     "Acquisition": "Adquisición",
-    "$f_s$ = 20 kHz clears the 3 kHz housing resonance":
-        "$f_s$ = 20 kHz supera la resonancia de 3 kHz",
+    "20 kHz sample rate clears the 3 kHz resonance":
+        "muestreo a 20 kHz supera la resonancia de 3 kHz",
     "$T$ = 2 s at 2000 r/min = 67 revolutions":
         "$T$ = 2 s a 2000 r/min = 67 vueltas",
     "$Δf = 1/T$ = 0.5 Hz, against $f_s$ = 33.3 Hz":

@@ -570,7 +570,7 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     # --- Acquisition: why 20 kHz and why 2 s --------------------------------
     s.rect(470, 356, 382, 244, "none", th.primary, rx=10, sw=1.6)
     s.text(492, 386, "Acquisition", 15, th.fg, anchor="start", bold=True)
-    s.text(492, 420, "$f_s$ = 20 kHz clears the 3 kHz housing resonance", 14,
+    s.text(492, 420, "20 kHz sample rate clears the 3 kHz resonance", 14,
            th.fg, anchor="start")
     s.text(492, 450, "$T$ = 2 s at 2000 r/min = 67 revolutions", 14, th.fg,
            anchor="start")
