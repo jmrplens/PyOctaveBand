@@ -961,7 +961,12 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
                 linewidth=0.7, zorder=3)
 
     ax.plot([0.0], [z_src], "o", color=COLOR_FG, markersize=7, zorder=5)
-    ax.annotate("source, 992.5 m", xy=(0.0, z_src), xytext=(16, 20),
+    # "source at 992.5 m" rather than "source, 992.5 m": the clip fingerprint
+    # selects an exact-table key by the pieces left when its numbers are taken
+    # out, and "source, " is written inside the title of anim_power_two_rooms
+    # ("One source, two rooms, one sound power"), so the comma form attaches
+    # this figure's translation to that clip and reports it stale.
+    ax.annotate("source at 992.5 m", xy=(0.0, z_src), xytext=(16, 20),
                 textcoords="offset points", fontsize=9, color=COLOR_FG,
                 bbox={"boxstyle": "round,pad=0.3", "facecolor": COLOR_PANEL,
                       "edgecolor": COLOR_GRID})

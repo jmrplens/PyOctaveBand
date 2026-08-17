@@ -2776,7 +2776,7 @@ _ES_EXACT = {
     # comma pass skips, so its Spanish twin bakes the comma of 35,9 m.
     "Where Rays Give Infinity and Nothing, Beams Give a Level":
         "Donde los rayos dan infinito y nada, los haces dan un nivel",
-    "source, 992.5 m": "fuente, 992.5 m",
+    "source at 992.5 m": "fuente a 992.5 m",
     "caustic: the ray fan folds on itself here,\n"
     "and the beam sum answers 59 dB, not infinity":
         "cáustica: aquí el abanico de rayos se pliega sobre sí mismo,\n"
