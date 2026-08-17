@@ -29,7 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Lloyd-mirror field, and the image-source sum of the ideal pressure-release
   waveguide to 0.0004 dB. It has no near field: read nothing inside about three
   initial beam widths of the source, where the far-field weighting of
-  Eq. (3.92) has nothing to converge to.
+  Eq. (3.92) has nothing to converge to. New section in the underwater solvers
+  guide with its own figure, the caustic and the shadow zone behind it, in
+  English and Spanish.
 - The ISO 9614-3 precision determination renders its own accredited-style
   fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
   sheet carrying what part 3 asks a report to state (clause 10), which is not
