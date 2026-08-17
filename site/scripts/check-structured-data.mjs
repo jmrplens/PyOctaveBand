@@ -27,7 +27,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { basePath, siteUrl } from '../src/data/site.mjs';
-import { topicForSlug } from '../src/data/topics.mjs';
+import { topicForSlug, topicSections } from '../src/data/topics.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 // An explicit directory is for reproducing a defect against a build kept aside;
@@ -41,6 +41,46 @@ const fail = (message) => {
 	failures += 1;
 };
 const ok = (message) => console.log(`ok   ${message}`);
+
+// The lookup the rest of this file rests on, pinned before it is used: a wrong
+// answer here would not fail anything, it would make the check agree with
+// whatever the site happens to emit.
+//
+// Every topic has to answer for its own landing page, which is what catches a
+// prefix that shadows another, and the case that matters is the pair sharing a
+// first segment: the API tree is its own topic and it lives inside the
+// reference section's path, so `reference/api/...` must not fall through to
+// Reference. Longest prefix first is what decides that, and it is the property
+// the map this check replaced encoded as the order its keys were written in.
+{
+	let wrong = 0;
+	for (const section of topicSections) {
+		const got = topicForSlug(section.prefix)?.id;
+		if (got !== section.id) {
+			fail(`topics.mjs: the landing page of ${section.id} resolves to the topic ${got}`);
+			wrong += 1;
+		}
+	}
+	const NESTED = [
+		['signals/filters/filter-banks', 'signals'],
+		['reference/conformance', 'reference'],
+		['reference/api/signals/levels', 'api'],
+		['start/guides', 'start'],
+		// Outside every topic: the home page and the error page.
+		['', undefined],
+		['404', undefined],
+	];
+	for (const [slug, id] of NESTED) {
+		const got = topicForSlug(slug)?.id;
+		if (got !== id) {
+			fail(`topicForSlug(${JSON.stringify(slug)}) is ${got}, not ${id}`);
+			wrong += 1;
+		}
+	}
+	if (wrong === 0) {
+		ok(`each of the ${topicSections.length} topics owns its own landing page, and reference/api resolves past reference`);
+	}
+}
 
 /** Every .html file under `dir`, at any depth, as paths relative to DIST. */
 function walk(dir, out = []) {
