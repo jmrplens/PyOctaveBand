@@ -1,6 +1,6 @@
 ← [Documentation index](../README.md)
 
-# Underwater propagation solvers: normal modes, rays and the parabolic equation
+# Underwater propagation solvers: modes, rays, beams and the parabolic equation
 
 The closed-form propagation loss of
 [Underwater sound propagation](underwater-propagation.md) knows nothing of

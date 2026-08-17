@@ -1375,7 +1375,7 @@ and these closed forms, have their own guide:
 <!-- source: docs/underwater/underwater-solvers.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/
 
-# Underwater propagation solvers: normal modes, rays and the parabolic equation
+# Underwater propagation solvers: modes, rays, beams and the parabolic equation
 
 The closed-form propagation loss of
 [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) knows nothing of
@@ -1688,7 +1688,7 @@ caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
                                     source_depth=992.5, max_range=2500.0,
                                     range_step=12.5, max_angle_deg=45.0,
                                     n_depth_points=400)
-caustic.plot()   # the committed figure adds the ray fan and the two labels
+caustic.plot()   # same field; the figure below bands it and draws the rays
 plt.show()
 ```
 

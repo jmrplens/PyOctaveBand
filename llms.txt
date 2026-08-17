@@ -245,7 +245,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Overview](https://jmrplens.github.io/phonometry/underwater/)
 - [Underwater acoustics: radiated noise and pile driving (ISO 18405 / 17208 / 18406)](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/)
 - [Underwater sound propagation: propagation loss, sound speed, sonar, seabed and ambient noise](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/)
-- [Underwater propagation solvers: normal modes, rays and the parabolic equation](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
+- [Underwater propagation solvers: modes, rays, beams and the parabolic equation](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
 - [Marine-mammal noise exposure: audiograms, auditory weighting and injury criteria](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/)
 
 ## Sources and devices

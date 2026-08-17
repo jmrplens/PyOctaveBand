@@ -245,7 +245,7 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Overview](https://jmrplens.github.io/phonometry/underwater/)
 - [Underwater acoustics: radiated noise and pile driving (ISO 18405 / 17208 / 18406)](https://jmrplens.github.io/phonometry/underwater/underwater-acoustics/)
 - [Underwater sound propagation: propagation loss, sound speed, sonar, seabed and ambient noise](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/)
-- [Underwater propagation solvers: normal modes, rays and the parabolic equation](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
+- [Underwater propagation solvers: modes, rays, beams and the parabolic equation](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/)
 - [Marine-mammal noise exposure: audiograms, auditory weighting and injury criteria](https://jmrplens.github.io/phonometry/underwater/marine-mammal-exposure/)
 
 ## Sources and devices
@@ -32374,7 +32374,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.vibration` | Three families: `structural` (mobility ISO 7626, plate junctions, radiation, experimental SEA, transfer stiffness ISO 10846), `human` (ISO 2631/5349/8041 exposure and multiple shocks) and `machinery` (fault frequencies and condition monitoring) |
 | `phonometry.environment` | Three subgroups: `sources` (CNOSSOS road and rail emission, wind-turbine apparent sound power), `propagation` (ISO 9613-1/-2, ground effect and barriers, refraction by ray tracing and the parabolic equation) and `assessment` (ISO 1996-1/-2 rating and measurement, impulsive prominence, RD 1367/2007) |
 | `phonometry.aircraft` | EPNL (ICAO Annex 16), SAE ARP 5534 absorption, airport contours (ECAC Doc 29), rotorcraft (ECAC Doc 32) |
-| `phonometry.underwater` | Three families: `sources` (ISO 17208 ship radiated noise, traffic, pile driving, wind and thermal ambient noise), `propagation` (closed-form and Weston propagation loss, normal modes, rays and the parabolic equation, seabed reflection, sound speed) and `bioacoustics` (marine-mammal audiograms and regulatory auditory weighting), over the ISO 18405 quantities and the sonar equation at the root |
+| `phonometry.underwater` | Three families: `sources` (ISO 17208 ship radiated noise, traffic, pile driving, wind and thermal ambient noise), `propagation` (closed-form and Weston propagation loss, normal modes, rays, Gaussian beams and the parabolic equation, seabed reflection, sound speed) and `bioacoustics` (marine-mammal audiograms and regulatory auditory weighting), over the ISO 18405 quantities and the sonar equation at the root |
 | `phonometry.electroacoustics` | Distortion (IEC 60268-3 / AES17), transfer function and coherence, radiating piston |
 | `phonometry.noise_control` | Reactive silencers (four-pole method), HVAC duct attenuation, machine-enclosure insertion loss |
 | `phonometry.broadcast` | Programme loudness and true peak (ITU-R BS.1770-5, EBU R 128 with Tech 3341/3342) |
@@ -49252,7 +49252,7 @@ and these closed forms, have their own guide:
 <!-- source: docs/underwater/underwater-solvers.md | canonical: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/ -->
 Source: https://jmrplens.github.io/phonometry/underwater/underwater-solvers/
 
-# Underwater propagation solvers: normal modes, rays and the parabolic equation
+# Underwater propagation solvers: modes, rays, beams and the parabolic equation
 
 The closed-form propagation loss of
 [Underwater sound propagation](https://jmrplens.github.io/phonometry/underwater/underwater-propagation/) knows nothing of
@@ -49565,7 +49565,7 @@ caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
                                     source_depth=992.5, max_range=2500.0,
                                     range_step=12.5, max_angle_deg=45.0,
                                     n_depth_points=400)
-caustic.plot()   # the committed figure adds the ray fan and the two labels
+caustic.plot()   # same field; the figure below bands it and draws the rays
 plt.show()
 ```
 
