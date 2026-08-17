@@ -174,6 +174,36 @@ def test_cheby2_stopband_edges_near_nyquist_stay_valid() -> None:
     assert fu < f2 < fs / 2
 
 
+def test_cheby2_stopband_edges_never_reach_nyquist() -> None:
+    """The prewarped upper stopband edge stays strictly below fs/2, always.
+
+    The designer therefore needs no Nyquist clamp on ``f2_stop``: the mapping
+    returns through ``(fs/pi) * arctan(...)`` and arctan is bounded by pi/2.
+    This sweeps the parameter space the bank can reach to confirm it, rather
+    than trusting the algebra alone.
+    """
+    from phonometry.filters.design import _cheby2_stopband_edges
+
+    worst = 0.0
+    combinations = 0
+    for fs in (2000.0, 2400.0, 8000.0, 44100.0, 48000.0, 96000.0, 192000.0):
+        nyquist = fs / 2
+        for order in range(2, 13):
+            for attenuation in (3.5, 10.0, 40.0, 60.0, 70.0, 72.0, 100.0, 150.0):
+                for share_of_nyquist in (0.05, 0.5, 0.9, 0.99, 0.999, 0.9999999999):
+                    fu = share_of_nyquist * nyquist
+                    for bandwidth in (1.02, 1.12, 1.26, 2.0, 4.0):
+                        _, f2 = _cheby2_stopband_edges(
+                            fu / bandwidth, fu, order, attenuation, fs
+                        )
+                        combinations += 1
+                        worst = max(worst, f2 / nyquist)
+                        assert f2 < nyquist, (fs, order, attenuation, fu, bandwidth)
+    assert combinations > 10000, combinations
+    # It gets arbitrarily close, which is why the clamp looked plausible.
+    assert 0.999 < worst < 1.0, worst
+
+
 @pytest.mark.parametrize("fraction", [1, 3])
 def test_cheby2_default_bank_meets_class1(fraction: float) -> None:
     """The default cheby2 bank must pass IEC 61260-1:2014 class 1 (audit N1 A5).
