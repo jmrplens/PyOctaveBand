@@ -710,7 +710,7 @@ def long_term_corrected_level(
 ) -> float:
     r"""Long-term index ``LK,x`` from the daily period levels (Annex I A.2 d).
 
-    :math:`L_{\mathrm{K},x} = 10 \log_{10}\left[ (1/n) \sum_i 10^{L_{\mathrm{Keq},x,i}/10} \right]`:
+    :math:`L_{\mathrm{K},x} = 10 \log_{10}\left[ (1/n) \sum_j 10^{L_{\mathrm{Keq},x,j}/10} \right]`:
     the energy mean of the
     daily corrected levels of the same evaluation period over a year. With
     ``weights`` the mean is weighted, which lets a whole block of identical

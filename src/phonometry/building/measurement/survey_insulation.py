@@ -51,7 +51,7 @@ difference :math:`D_{2\mathrm{m}} = L_{1,2\mathrm{m}} - L_2` (Clause 3.13), the 
 **Service equipment (Clauses 3.16-3.18).** From three A- or C-weighted sound
 pressure levels (one near a room corner, two in the reverberant field) the
 service-equipment level
-:math:`L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,i}}]`
+:math:`L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,j}}]`
 (Clause 3.16), its standardized form :math:`L_{XY,\mathrm{nT}} = L_{XY} - k`
 (Clause 3.17) and
 normalized form :math:`L_{XY,\mathrm{n}} = L_{XY} - k - 10 \log_{10}(A_0 T_0 / (0.16\,V))`
@@ -764,7 +764,7 @@ def survey_service_equipment_level(
     Service-equipment sound pressure level, survey method (ISO 10052:2021).
 
     Computes the service-equipment level
-    :math:`L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,i}}]`
+    :math:`L_{XY} = 10 \log_{10}[(1/3) \sum 10^{0.1 L_{XY,j}}]`
     (Clause 3.16) as the energy average of the three measurement
     positions (one near a corner, two in the reverberant field, Clause 6.3.3),
     the standardized level :math:`L_{XY,\mathrm{nT}} = L_{XY} - k` (Clause 3.17) and,
