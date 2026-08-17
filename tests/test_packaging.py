@@ -13,6 +13,13 @@ ref may reach the page, every ref must be the tag of the version in ``VERSION``,
 and every path behind one must exist in this checkout, which is the tree the tag
 will be cut from.
 
+Those three hold the page PyPI serves, not the copy committed here. Between
+releases ``VERSION`` still names the last release, so the committed copy pins
+to a tag that already exists and whose tree predates the README it was
+generated from: 86 of its 95 paths are absent from ``v3.3.0``. That state
+cannot be gated without giving up the property that matters, so the page says
+so in its own header and a test below holds the sentence there.
+
 The last test guards the other thing the install prose quoted from outside
 this repository: the NumPy ceiling numba declares. The pages said numba
 declares ``numpy<2.5``, so ``phonometry[full]`` "resolves NumPy below 2.5
@@ -129,10 +136,14 @@ def test_pypi_readme_pins_every_repository_link_to_the_release_tag() -> None:
 def test_pinned_pypi_links_resolve_in_this_checkout() -> None:
     """Every pinned path exists in the tree the tag will be cut from.
 
-    The tag itself does not exist until the release workflow creates it, so
-    there is a window on ``main`` where these URLs 404 over HTTP by design.
-    Checking the working tree instead verifies the same thing without waiting
-    for the release: what the tag will point at is right here.
+    This is the release-time guarantee and nothing wider. At the release commit
+    the tag does not exist yet, so checking the working tree verifies what the
+    tag will point at without waiting for the workflow to create it; for the
+    rest of the cycle the tag does exist, and this says nothing about it, since
+    the tree it names is the *previous* release and is not what the next page
+    will be published from. Resolving these paths against the pinned tag would
+    therefore fail on ``main`` almost always while telling us nothing about the
+    page being published.
     """
     dangling = sorted(
         match["path"]
@@ -142,6 +153,26 @@ def test_pinned_pypi_links_resolve_in_this_checkout() -> None:
     assert not dangling, (
         "README_PYPI.md links to paths that are not in this checkout, so they "
         f"will not be in the release tag either: {dangling}"
+    )
+
+
+def test_pypi_readme_header_warns_that_its_links_are_dead_on_main() -> None:
+    """The committed page tells its reader the pinned links do not resolve.
+
+    The pin is right on the page PyPI serves and wrong in the repository for
+    the whole stretch between releases: ``VERSION`` still names the last
+    release, so the tag exists and its tree predates the README the page was
+    generated from. Resolving the committed page against ``git ls-tree -r
+    v3.3.0`` puts 86 of its 95 paths outside that tree, the banner at the top
+    of the page included, and the checks above cannot see it because they ask
+    about the tree the *next* tag is cut from. So the page carries the warning
+    itself, and this holds it there.
+    """
+    header = _committed_pypi_readme().split("-->", 1)[0]
+    assert "do not resolve from main" in header, (
+        "README_PYPI.md must warn that its links are pinned to the release tag "
+        "and not to main, or a reader follows one from the repository and gets "
+        "a 404"
     )
 
 

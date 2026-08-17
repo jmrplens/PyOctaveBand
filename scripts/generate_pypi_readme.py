@@ -22,14 +22,31 @@ plus the contents of the repository-root ``VERSION`` file: the published
 page points at the tree it was published from, and stays right forever
 because that tree never changes again.
 
-The tag is created by the release workflow, from the commit that lands the
-``VERSION`` bump on ``main``, so between the bump and the release there is a
-window in which ``README_PYPI.md`` names a tag that does not exist yet. That
-is deliberate, and it is why the packaging tests resolve the pinned paths
-against **this checkout** rather than over the network: the working tree is
-what the tag will point at, so the paths can be verified on ``main`` without
-waiting for the release. Anything that checks these URLs over HTTP has to
-tolerate the unreleased tag the same way.
+That pin is right on the page PyPI serves and wrong on the copy committed
+here, which is a build input rather than a page to read from ``main``. The
+release workflow cuts the tag from the commit that lands the ``VERSION`` bump,
+so the committed file is always in one of two states:
+
+* **At the release commit, and only there.** ``VERSION`` has just been bumped,
+  the pinned tag does not exist yet, and the paths behind it are right because
+  this tree is what the tag is about to point at. The URLs 404 for the minutes
+  it takes the workflow to create it.
+* **For the whole rest of the cycle**, which is where ``main`` sits almost
+  always. ``VERSION`` still names the last release, so the pinned tag exists
+  and its tree is older than the README the page was generated from, and every
+  path added or moved since that release 404s. ``v3.3.0`` predates the
+  documentation reorganisation: measured against ``git ls-tree -r v3.3.0``, 86
+  of the 95 paths on today's page are absent from it, the banner at the top of
+  the page included.
+
+Neither state ever reaches PyPI, because the page is regenerated at the
+release commit and the tag is cut from that same commit. That is the property
+the packaging tests hold, and it is why they resolve the pinned paths against
+**this checkout** rather than over the network: the working tree is the tree
+the tag will be cut from, so it answers the only question that decides whether
+the published page is right. It says nothing about the tag already on the
+remote, and the second state above is therefore ungated by design. Anything
+that checks these URLs over HTTP has to skip this file in both states.
 
 Run through ``make pypi-readme``; the packaging tests fail if the committed
 file drifts from the README or from ``VERSION``.
@@ -50,7 +67,9 @@ _HEADER = (
     "  strips the picture and source tags, and every link into this\n"
     "  repository is pinned to the release tag, because a published\n"
     "  description is frozen while main keeps moving. Edit README.md\n"
-    "  instead. -->\n\n"
+    "  instead, and follow its links rather than these: between\n"
+    "  releases the pin names the last release, whose tree predates\n"
+    "  these paths, so they do not resolve from main. -->\n\n"
 )
 
 _PICTURE = re.compile(r"<picture>.*?</picture>", re.DOTALL)

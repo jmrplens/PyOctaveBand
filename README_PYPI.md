@@ -6,7 +6,9 @@
   strips the picture and source tags, and every link into this
   repository is pinned to the release tag, because a published
   description is frozen while main keeps moving. Edit README.md
-  instead. -->
+  instead, and follow its links rather than these: between
+  releases the pin names the last release, whose tree predates
+  these paths, so they do not resolve from main. -->
 
 <a href="https://jmrplens.github.io/phonometry/"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/v3.3.0/.github/brand/banner.webp" alt="phonometry, acoustic measurement toolkit for Python" width="100%"></a>
 
