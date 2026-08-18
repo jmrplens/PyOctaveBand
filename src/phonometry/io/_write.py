@@ -191,20 +191,27 @@ def _resolve_subtype(data: np.ndarray, subtype: str | None) -> str:
 
 
 def _quantise(
-    data: NDArray[np.float64], bits: int, dither: str | None
+    data: NDArray[np.float64],
+    bits: int,
+    dither: str | None,
+    rng: np.random.Generator | int | None = None,
 ) -> tuple[NDArray[np.int64], int, float]:
     """Map float samples to ``bits``-bit codes; count saturated samples.
 
     Returns the codes, the number of samples whose ideal code fell outside
     the representable range (saturated, never wrapped), and the signal peak
     in dBFS for the warning message. See the module docstring for the
-    scaling, the +1.0 edge and the dither derivation.
+    scaling, the +1.0 edge and the dither derivation. ``rng`` seeds the
+    dither noise; ``None`` draws fresh entropy (see :func:`write` for why
+    that is the right default).
     """
     scale = float(2 ** (bits - 1))
     ideal = data * scale
     if dither == "tpdf":
-        rng = np.random.default_rng()
-        ideal = ideal + (rng.random(data.shape) - rng.random(data.shape))
+        generator = np.random.default_rng(rng)
+        ideal = ideal + (
+            generator.random(data.shape) - generator.random(data.shape)
+        )
     codes = np.rint(ideal)
     lo, hi = -scale, scale - 1.0
     clipped = int(np.count_nonzero((codes < lo) | (codes > hi)))
@@ -531,10 +538,11 @@ def _write_pcm24(
     rate: int,
     resolved: str,
     dither: str | None,
+    rng: np.random.Generator | int | None,
     bext_payload: bytes | None,
 ) -> None:
     """Quantise to 24-bit codes and write through the in-house packer."""
-    codes, clipped, peak_dbfs = _quantise(data, 24, dither)
+    codes, clipped, peak_dbfs = _quantise(data, 24, dither, rng)
     if clipped:
         _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
     write_wav(
@@ -552,11 +560,14 @@ def _write_through_scipy(
     rate: int,
     resolved: str,
     dither: str | None,
+    rng: np.random.Generator | int | None,
 ) -> None:
     """Quantise (PCM) or narrow (float) and hand scipy finished samples."""
     tag, sample_bytes = _SUBTYPE_SPEC[resolved]
     if tag == 0x0001:
-        codes, clipped, peak_dbfs = _quantise(data, 8 * sample_bytes, dither)
+        codes, clipped, peak_dbfs = _quantise(
+            data, 8 * sample_bytes, dither, rng
+        )
         if clipped:
             _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
         _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2
@@ -574,6 +585,7 @@ def write(
     subtype: str | None = None,
     bext: BroadcastMetadata | str | None = None,
     dither: str | None = None,
+    rng: np.random.Generator | int | None = None,
     sidecar: bool = False,
 ) -> None:
     """Write a signal to an audio file, without ever touching its level.
@@ -622,6 +634,15 @@ def write(
         quantising to ``PCM_16`` (Lipshitz et al. 1992; see the module
         docstring); ``None`` (default) quantises plainly. Refused for any
         other subtype, where it would only add noise.
+    :param rng: Randomness for the dither noise: a seeded
+        :class:`numpy.random.Generator` (or an int seed) makes the
+        written bytes reproducible, which is what a test or a pinned
+        pipeline needs. ``None`` (default) draws fresh entropy on every
+        write, and that default is deliberate: dither exists to
+        decorrelate the quantisation error, and repeating one noise
+        pattern across multiple writes would correlate the files with
+        each other, undoing exactly what the dither is for. Refused
+        without ``dither``, the only thing it seeds.
     :param sidecar: When true, also write the calibration sidecar
         (:mod:`phonometry.io._sidecar`) beside the file, carrying the
         :class:`Signal`'s ``calibration_factor`` and channel labels so
@@ -629,7 +650,8 @@ def write(
         argument at all. Requires a calibrated :class:`Signal`: a sidecar
         without a calibration would be a promise with nothing behind it.
     :raises ValueError: For an unknown suffix or subtype, a missing or
-        conflicting ``fs``, a dither request outside ``PCM_16``, bext
+        conflicting ``fs``, a dither request outside ``PCM_16``, an
+        ``rng`` without a ``dither`` for it to seed, bext
         metadata that violates Tech 3285 (oversize field, version too old
         for a carried UMID or loudness), or a sidecar request without a
         calibrated :class:`Signal`.
@@ -637,9 +659,14 @@ def write(
     target = Path(path)
     _check_target_suffix(path, target)
     _check_sidecar_request(x, sidecar)
+    if rng is not None and dither is None:
+        raise ValueError(
+            "rng seeds the TPDF dither noise and does nothing without it; "
+            "pass dither='tpdf' alongside it or drop it"
+        )
     data, rate = _resolve_input(x, fs)
     if target.suffix.lower() == ".flac":
-        _write_flac(path, x, data, rate, subtype, bext, dither)
+        _write_flac(path, x, data, rate, subtype, bext, dither, rng)
         _write_signal_sidecar(path, x, sidecar)
         return
     resolved = _resolve_subtype(data, subtype)
@@ -649,11 +676,11 @@ def write(
         _refuse_passthrough_dither(dither)
         _scipy_write(path, rate, data)
     elif resolved == "PCM_24":
-        _write_pcm24(path, data, rate, resolved, dither, bext_payload)
+        _write_pcm24(path, data, rate, resolved, dither, rng, bext_payload)
         _write_signal_sidecar(path, x, sidecar)
         return
     else:
-        _write_through_scipy(path, data, rate, resolved, dither)
+        _write_through_scipy(path, data, rate, resolved, dither, rng)
     if bext_payload is not None:
         append_riff_chunk(path, b"bext", bext_payload)
     _write_signal_sidecar(path, x, sidecar)
@@ -712,6 +739,7 @@ def _flac_quantised_codes(
     data: np.ndarray,
     subtype: str | None,
     dither: str | None,
+    rng: np.random.Generator | int | None,
 ) -> tuple[str, np.ndarray]:
     """Quantise float data to the integer codes a FLAC subtype stores."""
     if data.dtype.kind != "f":
@@ -727,7 +755,7 @@ def _flac_quantised_codes(
         )
     _check_dither(dither, resolved)
     bits = _SUBTYPE_BITS[resolved]
-    codes, clipped, peak_dbfs = _quantise(data, bits, dither)
+    codes, clipped, peak_dbfs = _quantise(data, bits, dither, rng)
     if clipped:
         _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
     out = (
@@ -745,6 +773,7 @@ def _write_flac(
     subtype: str | None,
     bext: BroadcastMetadata | str | None,
     dither: str | None,
+    rng: np.random.Generator | int | None,
 ) -> None:
     """Write a FLAC archive copy through the ``[audio]`` extra.
 
@@ -779,7 +808,7 @@ def _write_flac(
         resolved = "PCM_16"
         out = _flac_passthrough_codes(data, subtype, dither)
     else:
-        resolved, out = _flac_quantised_codes(path, data, subtype, dither)
+        resolved, out = _flac_quantised_codes(path, data, subtype, dither, rng)
     bext_payload = _resolve_bext(x, bext, data, fs, resolved,
                                  algorithm="FLAC")
     frames_first = np.ascontiguousarray(out.T)

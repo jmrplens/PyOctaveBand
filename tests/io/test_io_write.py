@@ -196,6 +196,8 @@ def test_tpdf_dither_renders_the_mean_code_unbiased(tmp_path: Path) -> None:
     codes so their mean converges on the true value (the first-moment
     independence of Lipshitz et al. 1992). With 20000 samples the standard
     error is about 0.005 LSB, so the 0.1 LSB tolerance is twenty sigma.
+    The seeded ``rng`` makes the draw, and so the whole file, exact: a
+    second write from an equally seeded generator is byte-identical.
     """
     value = 10000.4 / 32768
     x = np.full(20000, value)
@@ -205,10 +207,16 @@ def test_tpdf_dither_renders_the_mean_code_unbiased(tmp_path: Path) -> None:
     assert set(codes_plain.tolist()) == {10000.0}
 
     dithered = tmp_path / "dithered.wav"
-    write(dithered, x, FS, subtype="PCM_16", dither="tpdf")
+    write(dithered, x, FS, subtype="PCM_16", dither="tpdf",
+          rng=np.random.default_rng(1992))
     codes_dithered = np.asarray(read(dithered)) * 32768
     assert len(set(codes_dithered.tolist())) > 1
     assert abs(float(np.mean(codes_dithered)) - 10000.4) < 0.1
+
+    again = tmp_path / "again.wav"
+    write(again, x, FS, subtype="PCM_16", dither="tpdf",
+          rng=np.random.default_rng(1992))
+    assert again.read_bytes() == dithered.read_bytes()
 
 
 def test_dither_is_refused_outside_pcm16(tmp_path: Path) -> None:
@@ -218,6 +226,11 @@ def test_dither_is_refused_outside_pcm16(tmp_path: Path) -> None:
                   dither="tpdf")
     with pytest.raises(ValueError, match="dither"):
         write(tmp_path / "d.wav", np.zeros(4), FS, dither="rectangular")
+    # rng exists to seed the dither; alone it would promise a
+    # reproducibility nothing delivers.
+    silence = np.zeros(4)
+    with pytest.raises(ValueError, match="rng"):
+        write(tmp_path / "d.wav", silence, FS, rng=7)
 
 
 # ---------------------------------------------------------------------------

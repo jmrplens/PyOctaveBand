@@ -523,6 +523,7 @@ write(
     subtype: str | None = None,
     bext: BroadcastMetadata | str | None = None,
     dither: str | None = None,
+    rng: np.random.Generator | int | None = None,
     sidecar: bool = False,
 ) -> None
 ```
@@ -558,13 +559,14 @@ out of calibrated results.
 | `subtype` | Target sample format (see above); `None` picks `FLOAT` for float data and the matching depth for integer data. |
 | `bext` | The broadcast provenance chunk (EBU Tech 3285; see [`phonometry.io._bext`](/phonometry/reference/api/io/io/)). `None` carries the [`Signal`](/phonometry/reference/api/io/io/#signal)'s own provenance when it has one and writes no chunk otherwise; `"loudness"` additionally measures the five R 128 fields with the library's BS.1770 implementation on the samples being written (one extra pass, which is why it is opt-in); a [`BroadcastMetadata`](/phonometry/reference/api/io/io/#broadcastmetadata) is written as given. Every written chunk's CodingHistory is extended -- never replaced -- with phonometry's `A=,F=,W=,M=,T=` line. |
 | `dither` | `"tpdf"` adds +/-1 LSB triangular-PDF dither before quantising to `PCM_16` (Lipshitz et al. 1992; see the module docstring); `None` (default) quantises plainly. Refused for any other subtype, where it would only add noise. |
+| `rng` | Randomness for the dither noise: a seeded `numpy.random.Generator` (or an int seed) makes the written bytes reproducible, which is what a test or a pinned pipeline needs. `None` (default) draws fresh entropy on every write, and that default is deliberate: dither exists to decorrelate the quantisation error, and repeating one noise pattern across multiple writes would correlate the files with each other, undoing exactly what the dither is for. Refused without `dither`, the only thing it seeds. |
 | `sidecar` | When true, also write the calibration sidecar ([`phonometry.io._sidecar`](/phonometry/reference/api/io/io/)) beside the file, carrying the [`Signal`](/phonometry/reference/api/io/io/#signal)'s `calibration_factor` and channel labels so [`phonometry.io.read`](/phonometry/reference/api/io/io/#read) recovers the absolute level with no argument at all. Requires a calibrated [`Signal`](/phonometry/reference/api/io/io/#signal): a sidecar without a calibration would be a promise with nothing behind it. |
 
 **Raises**
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | For an unknown suffix or subtype, a missing or conflicting `fs`, a dither request outside `PCM_16`, bext metadata that violates Tech 3285 (oversize field, version too old for a carried UMID or loudness), or a sidecar request without a calibrated [`Signal`](/phonometry/reference/api/io/io/#signal). |
+| ValueError | For an unknown suffix or subtype, a missing or conflicting `fs`, a dither request outside `PCM_16`, an `rng` without a `dither` for it to seed, bext metadata that violates Tech 3285 (oversize field, version too old for a carried UMID or loudness), or a sidecar request without a calibrated [`Signal`](/phonometry/reference/api/io/io/#signal). |
 
 ## write_sidecar
 
