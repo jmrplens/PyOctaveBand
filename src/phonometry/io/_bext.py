@@ -236,7 +236,7 @@ def with_measured_loudness(
     from ..broadcast import program_loudness
 
     result = program_loudness(data[0] if data.shape[0] == 1 else data, fs)
-    return replace(
+    measured: BroadcastMetadata = replace(
         meta,
         version=max(meta.version, 2),
         loudness_value=result.integrated,
@@ -245,3 +245,4 @@ def with_measured_loudness(
         max_momentary_loudness=result.max_momentary,
         max_short_term_loudness=result.max_short_term,
     )
+    return measured
