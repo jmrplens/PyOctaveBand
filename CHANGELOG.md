@@ -51,6 +51,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   published formulas independently of the closed-form module, to 2e-4 dB, with
   a steep-receiver case whose arc length exceeds its range by 1.24 dB of loss
   separating the two measures directly.
+- The beams can bounce off a lossy seabed. `gaussian_beams` accepts
+  `seabed_density` and `seabed_sound_speed` (the same fluid description
+  `seabed_reflection` takes, with `density` for the water above; the perfect
+  reflector stays the default, bit for bit) and charges every bottom touch of
+  each beam with the Rayleigh coefficient at that beam's grazing angle,
+  magnitude and phase together, which is Jensen Sect. 3.6.3 as printed
+  (Eqs. 3.125-3.126). The angle is the one Snell's invariant fixes at the
+  bottom, `cos(phi) = xi c(D)`, the same at every touch of one beam, so the
+  coefficient is evaluated once per beam and raised to the marcher's count of
+  bottom touches, in the running product and in the receiver-image ladder
+  alike; `ray_trace` exposes those cumulative counts per boundary next to its
+  arc lengths. The phase matters and is spent conjugated on the way into the
+  beam sum, which is assembled in the conjugate time convention: below the
+  critical angle `|R| = 1` and only the phase carries the seabed, and the
+  oracle test, the image-source sum with `R(theta)^n` at each image's own
+  closed-form angle, measures 15.3 dB against the un-conjugated phase and
+  0.02 dB against the conjugate at the range where stripping the phase moves
+  the exact sum by 5.7 dB. Agreement is 0.07 dB at worst across ranges whose
+  dominant images sit above and below the critical angle, the seabed
+  parameters are recorded on the result, and the ideal-waveguide check is
+  tightened to 5e-4 dB to hold the default where it always was.
 - The ISO 9614-3 precision determination renders its own accredited-style
   fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
   sheet carrying what part 3 asks a report to state (clause 10), which is not

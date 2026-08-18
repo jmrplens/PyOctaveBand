@@ -97,8 +97,10 @@ pile-driving noise has no closed form here or anywhere in the library.
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
 all four solvers assume a **range-independent** water column with no
-absorbing or elastic bottom and no real bathymetry — which rules out
-range-dependent problems entirely. The ray solver still returns paths and
+elastic bottom and no real bathymetry — which rules out
+range-dependent problems entirely; the beam solver can bounce off that same
+Rayleigh seabed instead of a perfect reflector, and that is as much bottom as
+any of them has. The ray solver still returns paths and
 travel times and no level of its own; the level comes from `gaussian_beams`,
 which widens each of those rays into a beam and so answers a finite number at
 a caustic and a graded one in a shadow zone, at three prices: it sums the

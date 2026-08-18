@@ -28,7 +28,10 @@ All four are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 (Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24), the Gaussian
 beams of Sect. 3.5 (Eqs. 3.88-3.92) and the split-step Fourier PE (Ch. 6). They
 are validated against analytic oracles: the ideal (pressure-release) waveguide's
-exact modes and its image-source sum, the circular-arc ray paths of a linear
+exact modes and its image-source sum, that same image sum over a lossy fluid
+seabed with the Rayleigh coefficient of each image's own grazing angle raised
+to its count of bottom touches (Jensen Eq. 2.138 with Eq. 3.126 at every
+touch), the circular-arc ray paths of a linear
 sound-speed gradient together with the closed-form travel time along them
 (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press 1998,
 Eq. (3.3.20)), free-field spherical spreading, and mutual agreement of the PE
@@ -63,6 +66,9 @@ gaussian_beams(
     beam_width: float | None = None,
     range_step: float = 25.0,
     bottom: str = 'pressure-release',
+    seabed_density: float | None = None,
+    seabed_sound_speed: float | None = None,
+    density: float = 1000.0,
     absorption_model: str | None = None,
     temperature: float = 10.0,
     salinity: float = 35.0,
@@ -125,7 +131,8 @@ The limits are worth knowing before the numbers are believed.
   0.27, 4.06 and 2.52 dB out, a fan to 85 degrees 0.21, 1.32 and 1.91 dB,
   and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
   to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
-  at 80 degrees is the fan and not the method. A real seabed absorbs those
+  at 80 degrees is the fan and not the method. A real seabed (the
+  `seabed_density`/`seabed_sound_speed` pair below) absorbs those
   bounces and the default is then ample; a perfect reflector needs the
   fan opened and `range_step` cut with it, since a step has to resolve
   $\tan\theta_\mathrm{max}$ depth units of climb per unit range. The
@@ -176,6 +183,35 @@ error budget. The default stays off so the validation figures quoted
 throughout, all measured without absorption, remain reproducible as
 printed.
 
+**The seabed is a perfect reflector by default**, for the same reason, and
+real shallow-water propagation loss is dominated by what that default
+leaves out: the seabed absorbs part of every bottom bounce. Passing
+`seabed_density` and `seabed_sound_speed` replaces the perfect
+reflector with the lossy fluid half-space of
+[`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient)
+(the Rayleigh interface, `density` standing for the water above it and
+the profile's own bottom sound speed for its `c1`). This is Sect. 3.6.3
+done as printed: "most ray codes treat the bottom simply as a reflector",
+and each boundary touch multiplies the ray amplitude by
+$|\mathcal{R}(\theta)|$ and adds $\arg \mathcal{R}(\theta)$
+to its phase (Eqs. 3.125-3.126), while the dynamic pair $(q, p)$
+crosses the reflection exactly as before, the curvature term of
+Eq. (3.122) vanishing at a flat bottom, so the beam keeps its width and
+only its complex amplitude is docked. The phase is not a refinement to
+skip: below the critical angle $|\mathcal{R}| = 1$, *only* the
+phase distinguishes the lossy seabed from a perfect one, and it moves the
+interference fringes of every bottom-interacting path. The grazing angle
+each beam is charged at is the one Snell's invariant fixes,
+$\cos\theta = \xi\,c(z)$ along the whole ray, so at a flat seabed a
+given beam arrives at one and the same angle at every touch whatever the
+profile above did in between: its coefficient is evaluated once, exactly,
+and raised to the marcher's count of bottom touches, in the running
+product and in the receiver-image ladder alike. The book is candid that a
+plane-wave coefficient applied to a field that is not a plane wave is an
+approximation (p. 189), and it is the approximation the whole method
+already breathes; sediment attenuation and elasticity are outside the
+fluid-fluid model here as they are outside `seabed_reflection` itself.
+
 What it costs is `n_beams` times the size of the receiver grid, and none
 of the three factors depends on the frequency: the ray core does not have to
 resolve a wavelength on a grid, and the fan only widens as
@@ -203,7 +239,10 @@ direct way to trade resolution for time.
 | `n_beams` | Number of beams in the fan. Default (`None`): from the overlap condition. Adjacent beams are $s\,\delta\theta_0$ apart at arc length $s$ while each has spread to $W \to s\lambda/(\pi W_0)$, so the condition that they still overlap, $\delta\theta_0 \lesssim \lambda/(\pi W_0)$, is range-independent; the default takes four times that margin. Too coarse a fan shows as a periodic ripple in range at the beam spacing, which is easy to mistake for physical interference. |
 | `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity. Default (`None`): the free-space optimum $W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}$ of Sect. 3.5.1, held inside the book's recommended band of 10 to 50 wavelengths and clamped to a quarter of the water depth, and the clamp has the last word. |
 | `range_step` | Marching step in range, in metres, and the spacing of the default `ranges_m`. |
-| `bottom` | `"pressure-release"` (default) or `"rigid"`. The sea surface is always pressure-release. |
+| `bottom` | `"pressure-release"` (default) or `"rigid"`. The sea surface is always pressure-release. Superseded by the fluid seabed when the pair below is passed. |
+| `seabed_density` | Sediment density of a lossy fluid seabed, in the same unit as `density` (kg/m3 by convention; only the ratio enters). Default (`None`): the perfect reflector named by `bottom`, so every published validation number of this module is what the solver returns. Passed together with `seabed_sound_speed`, and not alongside `bottom="rigid"`. |
+| `seabed_sound_speed` | Sediment sound speed of that seabed, in m/s (`None` likewise). A sediment faster than the water at the bottom has a critical grazing angle, below which the reflection is total in magnitude and lossy in phase alone. |
+| `density` | Water density above the seabed, in kg/m3. Ignored unless the seabed pair is passed; it enters only through the seabed's impedance ratio, the field itself being density-normalised already. |
 | `absorption_model` | Seawater volume absorption applied along each beam's central ray: `"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`, the same models, spelled the same way, as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption). Default (`None`): no volume absorption, so the published validation numbers of this module are what the solver returns. |
 | `temperature` | Temperature `T` for the absorption model, in degrees Celsius (ignored when `absorption_model` is `None`). |
 | `salinity` | Salinity `S` for the absorption model, in parts per thousand (ignored when `absorption_model` is `None`). |
@@ -240,6 +279,8 @@ GaussianBeamResult(
     initial_beam_width: float,
     absorption_model: str | None,
     absorption_coefficient: float,
+    seabed_density: float | None,
+    seabed_sound_speed: float | None,
     source_depth: float,
     water_depth: float,
 )
@@ -268,6 +309,8 @@ can be subtracted.
 | `initial_beam_width` | The $W_0$ of Eq. (3.91) actually used, in metres, whether it was passed or defaulted. |
 | `absorption_model` | The seawater absorption model applied along the beams, or `None` when the run propagated without volume absorption (the default). |
 | `absorption_coefficient` | The absorption coefficient $\alpha$ actually applied, in dB/km (0.0 when `absorption_model` is `None`), as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption) evaluated it at the source frequency and depth. Recorded so a run's loss can be decomposed without re-deriving what was subtracted. |
+| `seabed_density` | Sediment density of the fluid seabed the bottom bounces were charged with, or `None` when the bottom was one of the perfect reflectors (the default). |
+| `seabed_sound_speed` | Sediment sound speed of that seabed, in m/s, or `None` likewise. Together the pair names the Rayleigh interface of [`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient) each beam's bottom reflections multiplied it by. |
 | `source_depth` | Source depth, in metres. |
 | `water_depth` | Water-column depth, in metres. |
 
@@ -503,6 +546,9 @@ the same ray core, and the same travel-time equation, as the atmospheric
 [`atmospheric_ray_paths`](/phonometry/reference/api/environment/refraction/#atmospheric_ray_paths)
 (which reflects at the ground instead of at the sea surface). Reflections
 cost no time and no path, so both odometers stay continuous across them.
+They are counted, though, per boundary: see [`RayTraceResult`](/phonometry/reference/api/underwater/numerical/#raytraceresult) on why
+the two cumulative counts, with the crossing angle Snell's invariant fixes
+per ray, are the entire per-bounce record a downstream amplitude needs.
 
 **Parameters**
 
@@ -532,6 +578,8 @@ RayTraceResult(
     depths: NDArray[np.float64],
     travel_times: NDArray[np.float64],
     arc_lengths: NDArray[np.float64],
+    surface_reflections: NDArray[np.int_],
+    bottom_reflections: NDArray[np.int_],
     source_depth: float,
     water_depth: float,
 )
@@ -548,6 +596,8 @@ Ray-tracing solution through a sound-speed profile.
 | `depths` | Per-ray depths, in metres, shape `(n_rays, n_steps)`. |
 | `travel_times` | Per-ray cumulative travel times, in seconds, shape `(n_rays, n_steps)` (zero at the source, increasing along the ray). |
 | `arc_lengths` | Per-ray cumulative arc length along the ray, in metres, same shape (zero at the source). It is never less than the range column it stands in, exceeds it by the obliquity of the path, and a reflection leaves it continuous. This, and not the range, is the measure seawater absorption acts along: Jensen Sect. 3.6.2 carries a volume loss $\alpha$ into the ray solution by perturbing the eikonal and lands on $e^{-\int_0^s \alpha(s')\,ds'}$ (Eq. 3.116), an integral over the path actually flown, so a caller hanging amplitudes on these rays multiplies by $e^{-\alpha s}$ with the $s$ read off here. |
+| `surface_reflections` | Per-ray cumulative count of sea-surface reflections by each range sample, same shape (zero at the source). |
+| `bottom_reflections` | The same count for the seabed. The two counts, and not the reflection coefficients themselves, are the whole of the per-bounce record an amplitude carrier needs from the geometry. Jensen Sect. 3.6.3 treats a boundary interaction as multiplying the ray amplitude by $\vert \mathcal{R}(\theta)\vert $ and adding $\arg \mathcal{R}(\theta)$ to its phase (Eqs. 3.125-3.126), with $\theta$ the local angle of incidence; and in a range-independent medium that angle is the *same* at every touch of the same flat boundary, because the direction a ray crosses a depth with is fixed by Snell's invariant, $\cos\theta = \xi\,c$, not by how many times it has bounced. Any boundary coefficient therefore enters a path's amplitude only as $\mathcal{R}^n$ with the $n$ read off here, which is how [`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) charges its lossy seabed and how an eigenray search can charge one later; `ray_trace` itself carries no amplitude, so the counts are what it can meaningfully expose. |
 | `source_depth` | Source depth, in metres. |
 | `water_depth` | Water-column depth, in metres. |
 

@@ -102,9 +102,11 @@ continuo no tiene forma cerrada aquí ni en ningún otro lugar de la biblioteca.
 **El lecho marino es delgado.** La página de formas cerradas lo modela como
 una reflexión de Rayleigh fluido-fluido sin pérdidas, así que la atenuación
 del sedimento queda fuera de alcance, y los cuatro métodos suponen una columna
-de agua **independiente de la distancia**, sin fondo absorbente ni elástico y
+de agua **independiente de la distancia**, sin fondo elástico y
 sin batimetría real — lo que deja fuera por completo los problemas
-dependientes de la distancia. El trazado de rayos sigue devolviendo caminos y
+dependientes de la distancia; el método de haces puede rebotar en ese mismo
+lecho de Rayleigh en lugar de en un reflector perfecto, y más fondo que ese
+no tiene ninguno. El trazado de rayos sigue devolviendo caminos y
 tiempos de propagación y ningún nivel propio; el nivel lo da `gaussian_beams`,
 que ensancha cada uno de esos rayos hasta convertirlo en un haz y así responde
 un número finito en una cáustica y uno graduado en una zona de sombra, a tres

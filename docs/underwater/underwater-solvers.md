@@ -89,14 +89,15 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
 `propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths`,
-`travel_times` and `arc_lengths` per ray); `gaussian_beams` a
-`GaussianBeamResult` (the `propagation_loss` field, plus each beam's central
-ray and width); `parabolic_equation` a `ParabolicEquationResult` (the
-`propagation_loss` field). All assume a range-independent water column with a
-pressure-release surface, and the bottom is pressure-release too (or, for the
-modes and the beams, optionally rigid): there is no absorbing or elastic
-bottom, no sediment attenuation and no real bathymetry, so range-dependent
-problems are out of scope. For the
+`travel_times`, `arc_lengths` and per-boundary reflection counts per ray);
+`gaussian_beams` a `GaussianBeamResult` (the `propagation_loss` field, plus
+each beam's central ray and width); `parabolic_equation` a
+`ParabolicEquationResult` (the `propagation_loss` field). All assume a
+range-independent water column with a pressure-release surface. The bottom is
+a perfect reflector by default, pressure-release (or, for the modes and the
+beams, optionally rigid), and the beams can trade it for a lossy fluid seabed
+(below); there is no elastic bottom, no sediment attenuation and no real
+bathymetry, so range-dependent problems are out of scope. For the
 elastic seabed physics these fluid solvers leave out, see
 [Elastic waves and fluid-solid coupling](../simulation/elastic-waves.md).
 
@@ -346,6 +347,9 @@ $10^{-3}$ dB, which is the one comparison that pins the amplitude
 normalisation and the phase convention together; the two-ray Lloyd-mirror field
 with one surface reflection, to 0.01 dB; and the image-source sum of the ideal
 pressure-release waveguide, to 0.0004 dB with the fan opened to 88 degrees.
+Over a lossy seabed the same lattice carries $\mathcal{R}(\theta)^n$ at each
+image's own closed-form angle, and the beams track it to 0.07 dB at worst
+across both sides of the critical angle.
 That same guide expanded over its modes instead of its images (Eq. 5.13) is a
 second closed form of one exact field, and it agrees to 0.03 dB *and*
 $8\times10^{-4}$ rad: it is the comparison that reaches the absolute phase, and
@@ -378,6 +382,29 @@ ray as `arc_lengths`, and the coefficient, one $\alpha$ per run evaluated at
 the source frequency and depth, is recorded on the result as
 `absorption_coefficient`.
 
+**A lossy seabed** is the other loss the default leaves out, and in shallow
+water the dominant one: a perfect bottom hands every steep multiple back
+undiminished, when what the seabed keeps is most of what decides real
+shallow-water propagation loss. Passing `seabed_density` and
+`seabed_sound_speed` (the same fluid description
+[`seabed_reflection`](underwater-propagation.md) takes, with `density` for
+the water above it) replaces the perfect reflector with the Rayleigh
+coefficient at each beam's own grazing angle: every bottom touch multiplies
+the beam's complex amplitude by $\mathcal{R}$, magnitude and phase together
+(Jensen §3.6.3, Eqs. 3.125-3.126). The phase is not a refinement to skip:
+below the critical angle $|\mathcal{R}| = 1$ and *only* the phase
+distinguishes the lossy seabed from a perfect one, and it moves the
+interference fringes of every bottom-interacting path. The angle a beam is
+charged at is the one Snell's invariant fixes at the bottom,
+$\cos\theta = \xi\,c(D)$, the same at every touch of that beam whatever the
+profile above did in between, so its coefficient is evaluated once, exactly,
+and raised to the marcher's count of bottom touches; `ray_trace` exposes
+those counts per boundary next to its arc lengths, which is all an amplitude
+needs of the geometry. Validated against the image lattice with
+$\mathcal{R}(\theta)^n$ at each image's own closed-form angle: 0.07 dB at
+worst across ranges whose dominant images sit above and below the critical
+angle, where stripping the phase from the oracle moves it by 5.7 dB.
+
 **Where it stops.** Five limits, in the order they bite.
 
 - **There is no near field**, and this is the biggest error of the five.
@@ -408,8 +435,9 @@ the source frequency and depth, is recorded on the result as
   2.52 dB with the default 80 degrees, falling to 0.0002, 0.0003 and 0.0004 dB
   when the fan is opened to 88 degrees. Cutting the *oracle* to the same
   half-angle moves it by 0.25, 3.95 and 2.31 dB, so this is the fan and not the
-  method. A real, lossy seabed
-  absorbs those bounces and the default is then ample. Opening the fan means
+  method. A real, lossy seabed (the `seabed_density`/`seabed_sound_speed`
+  pair above) absorbs those bounces and the default is then ample. Opening the
+  fan means
   cutting `range_step` with it, since one step has to resolve
   $\tan\theta_{\max}$ depth units of climb per unit range; the solver warns
   when that pairing is wrong.

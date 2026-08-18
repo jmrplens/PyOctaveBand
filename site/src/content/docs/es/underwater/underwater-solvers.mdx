@@ -153,12 +153,13 @@ field.plot()  # campo PL sobre distancia x profundidad
 
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
 `mode_functions`, `propagation_loss`); `ray_trace` un `RayTraceResult`
-(`ranges`, `depths`, `travel_times` y `arc_lengths` por rayo);
-`gaussian_beams` un `GaussianBeamResult` (el campo `propagation_loss`, más el
-rayo central y la anchura de cada haz); `parabolic_equation` un
-`ParabolicEquationResult` (el campo `propagation_loss`). Los cuatro difieren
-en lo que aproximan, no en lo que modelan, así que elegir entre ellos es una
-cuestión de régimen: la tabla de la sección 6 es la respuesta corta.
+(`ranges`, `depths`, `travel_times`, `arc_lengths` y los recuentos de
+reflexiones por contorno, por rayo); `gaussian_beams` un `GaussianBeamResult`
+(el campo `propagation_loss`, más el rayo central y la anchura de cada haz);
+`parabolic_equation` un `ParabolicEquationResult` (el campo
+`propagation_loss`). Los cuatro difieren en lo que aproximan, no en lo que
+modelan, así que elegir entre ellos es una cuestión de régimen: la tabla de
+la sección 6 es la respuesta corta.
 
 ## 2. Modos normales: la guía de ondas como suma de ondas estacionarias
 
@@ -276,7 +277,9 @@ lecho con los regímenes de Weston de
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/#regimenes-de-aguas-someras-de-weston),
 cuyo ángulo crítico y gradiente de pérdida por reflexión codifican exactamente
 lo que estas condiciones de contorno omiten, y lee la respuesta modal como una
-cota superior del nivel recibido.
+cota superior del nivel recibido. O dale a `gaussian_beams` el propio lecho
+fluido (sección 4), que tasa cada rebote en el fondo con el coeficiente de
+Rayleigh que estos dos extremos idealizan.
 
 ## 3. Trazado de rayos: puntos de giro y tiempos de propagación
 
@@ -520,7 +523,10 @@ $10^{-3}$ dB, que es la única comparación que fija a la vez la normalización 
 la amplitud y el convenio de fase; el campo de dos rayos del espejo de Lloyd
 con una reflexión en superficie, hasta 0,01 dB; y la suma de fuentes imagen de
 la guía de ondas ideal de presión nula, hasta 0,0004 dB con el abanico abierto
-a 88 grados. Esa misma guía desarrollada sobre sus modos en vez de sobre sus
+a 88 grados. Sobre un lecho disipativo la misma red de imágenes lleva
+$\mathcal{R}(\theta)^n$ al ángulo en forma cerrada de cada imagen, y los
+haces la siguen hasta 0,07 dB en el peor caso a ambos lados del ángulo
+crítico. Esa misma guía desarrollada sobre sus modos en vez de sobre sus
 imágenes (Ec. 5.13) es una segunda forma cerrada de un mismo campo exacto, y
 concuerda hasta 0,03 dB *y* $8\times10^{-4}$ rad: es la comparación que alcanza
 la fase absoluta, y pone a los haces en el mismo plano en el que ya se sostienen
@@ -556,6 +562,31 @@ acumula $s$ con las mismas etapas Runge-Kutta que colocan el rayo
 $\alpha$ por ejecución evaluado a la frecuencia y la profundidad de la fuente,
 queda registrado en el resultado como `absorption_coefficient`.
 
+**Un lecho marino disipativo** es la otra pérdida que el valor por defecto
+deja fuera, y en aguas someras la dominante: un fondo perfecto devuelve
+intactos todos los múltiples inclinados, cuando lo que el lecho se queda es
+lo que más pesa en la pérdida de propagación real en aguas someras. Pasar
+`seabed_density` y `seabed_sound_speed` (la misma descripción fluida que
+acepta
+[`seabed_reflection`](/phonometry/es/underwater/underwater-propagation/#perdida-por-reflexion-en-el-fondo),
+con `density` para el agua de encima) sustituye el reflector perfecto por el
+coeficiente de Rayleigh al ángulo rasante propio de cada haz: cada toque en
+el fondo multiplica la amplitud compleja del haz por $\mathcal{R}$, módulo y
+fase a la vez (Jensen §3.6.3, Ecs. 3.125-3.126). La fase no es un refinamiento
+prescindible: por debajo del ángulo crítico $|\mathcal{R}| = 1$ y *solo* la
+fase distingue el lecho disipativo de uno perfecto, y desplaza las franjas de
+interferencia de todos los trayectos que tocan el fondo. El ángulo al que se
+tasa cada haz es el que fija el invariante de Snell en el fondo,
+$\cos\theta = \xi\,c(D)$, el mismo en todos sus toques haga lo que haga el
+perfil de encima entre medias, así que su coeficiente se evalúa una sola
+vez, exacto, y se eleva al recuento de toques en el fondo del integrador;
+`ray_trace` expone esos recuentos por contorno junto a sus longitudes de
+arco, que es todo lo que una amplitud necesita de la geometría. Validado
+contra la red de imágenes con $\mathcal{R}(\theta)^n$ al ángulo en forma
+cerrada de cada imagen: 0,07 dB en el peor caso en distancias cuyas imágenes
+dominantes caen por encima y por debajo del ángulo crítico, donde despojar a
+la $\mathcal{R}$ del oráculo de su fase lo mueve 5,7 dB.
+
 **Dónde se acaba.** Cinco límites, en el orden en que aprietan.
 
 - **No hay campo cercano**, y este es el mayor error de los cinco. La
@@ -589,7 +620,8 @@ queda registrado en el resultado como `absorption_coefficient`.
   0,0004 dB al abrir el abanico a 88 grados. Recortar el *oráculo* al mismo
   semiángulo lo mueve 0,25, 3,95 y 2,31 dB, así que esto es el abanico y no el
   método. Un fondo real y
-  disipativo absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
+  disipativo (el par `seabed_density`/`seabed_sound_speed` de más arriba)
+  absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
   el abanico obliga a recortar `range_step` con él, porque un paso tiene que
   resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
   distancia; el método avisa cuando ese emparejamiento está mal.
@@ -983,9 +1015,10 @@ pérdida de propagación modal y de la PE.
 
 <ScopeClaim status="not-covered" label="No cubierto">
 Los cuatro métodos suponen una columna de agua independiente de la distancia
-con un contorno de presión nula (o, para los modos y los haces, opcionalmente
-rígido): no hay
-fondo absorbente ni elástico, ni atenuación del sedimento, ni batimetría real,
+con superficie de presión nula, y el fondo es un reflector perfecto por
+defecto, de presión nula o (para los modos y los haces) rígido. Los haces
+pueden cambiarlo por el lecho fluido disipativo del modelo de Rayleigh, pero
+no hay fondo elástico, ni atenuación del sedimento, ni batimetría real,
 así que los problemas dependientes de la distancia quedan fuera de alcance. El
 trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes, y
 nada busca los eigenrayos que unen una fuente y un receptor dados:
