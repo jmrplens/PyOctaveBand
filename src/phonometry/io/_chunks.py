@@ -187,8 +187,20 @@ class FormatChunk:
 
     @property
     def lossy(self) -> bool:
-        """Whether the resolved codec is a lossy/companded one."""
-        return self.resolved_tag in LOSSY_FORMAT_TAGS
+        """Whether the resolved codec cannot be trusted with the waveform.
+
+        True for the transcribed lossy tags of :data:`LOSSY_FORMAT_TAGS`,
+        and equally for any tag outside that transcription that is not
+        linear PCM or IEEE float: the RIFF registry holds hundreds of
+        codecs (MPEG audio 0x0050, AC-3, WMA, ...) and nearly all of them
+        are lossy, so an unrecognised codec fails closed as suspect
+        instead of passing as clean. The bias is deliberate: reporting
+        the rare lossless stranger (WMA Lossless, 0x0163) as lossy
+        provokes scrutiny of a file this library cannot vouch for, where
+        the opposite error would launder an MPEG recording into a
+        defensible-looking level.
+        """
+        return self.resolved_tag not in (WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT)
 
     def channel_labels(self) -> tuple[str, ...] | None:
         """Loudspeaker-position labels from ``dwChannelMask``, if usable.
@@ -420,8 +432,27 @@ def _parse_fmt(payload: bytes) -> FormatChunk:
 
 
 def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
-    """Decode the ``cue`` chunk's fixed-size records."""
+    """Decode the ``cue`` chunk's fixed-size records.
+
+    The record count is checked against the payload's actual length
+    before any record is unpacked, so a chunk that declares more points
+    than it holds raises the module's documented :exc:`ValueError`
+    instead of letting :func:`struct.unpack_from` escape with its own
+    :exc:`struct.error` (which a caller filtering on ``ValueError``, the
+    type every other malformed-chunk path here raises, would not catch).
+    """
+    if len(payload) < 4:
+        raise ValueError(
+            f"cue chunk is {len(payload)} bytes; its uint32 record count "
+            "requires 4"
+        )
     (count,) = struct.unpack_from("<I", payload)
+    needed = 4 + 24 * count
+    if len(payload) < needed:
+        raise ValueError(
+            f"cue chunk declares {count} points but is {len(payload)} "
+            f"bytes; the 24-byte records require {needed}"
+        )
     points = []
     for i in range(count):
         cue_id, position, chunk_id, chunk_start, block_start, sample_offset = (
@@ -508,6 +539,11 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
             if chunk_id == b"fmt ":
                 fmt = _parse_fmt(payload)
             elif chunk_id == b"ds64":
+                if len(payload) < 24:
+                    raise ValueError(
+                        f"{path}: ds64 chunk is {len(payload)} bytes; the "
+                        "riffSize, dataSize and sampleCount fields require 24"
+                    )
                 riff_size, chunk_data_size, sample_count = struct.unpack_from(
                     "<QQQ", payload
                 )
@@ -519,6 +555,11 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
             elif chunk_id == b"bext":
                 bext = _parse_bext(payload)
             elif chunk_id == b"fact":
+                if len(payload) < 4:
+                    raise ValueError(
+                        f"{path}: fact chunk is {len(payload)} bytes; its "
+                        "uint32 frame count requires 4"
+                    )
                 (fact_frames,) = struct.unpack_from("<I", payload)
             elif chunk_id == b"cue ":
                 cue_points = _parse_cue(payload)

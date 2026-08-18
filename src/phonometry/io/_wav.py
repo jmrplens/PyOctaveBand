@@ -75,8 +75,12 @@ class AudioFileInfo:
     ``bit_depth`` is the *valid* bits per sample where the notion applies
     (for an EXTENSIBLE container the ``wValidBitsPerSample`` field, so a
     20-in-24-bit file reports 20) and ``None`` for codecs that decode to
-    float. ``lossy`` marks codecs whose decoder approximates the recorded
-    waveform; :func:`phonometry.io.read` warns when asked to read one.
+    float. ``lossy`` marks codecs that cannot be trusted with the recorded
+    waveform: the transcribed lossy/companded tags, and any codec outside
+    the transcription that is not linear PCM/IEEE float, which fails
+    closed as suspect rather than passing as clean (the
+    ``FormatChunk.lossy`` property explains the bias);
+    :func:`phonometry.io.read` warns when asked to read one.
     ``channel_mask``/``channel_labels``, ``bext``, ``has_ixml`` and
     ``cue_points`` are WAV-family metadata and are ``None``/empty for other
     containers -- except ``bext``, which a FLAC can also carry in its
@@ -174,6 +178,18 @@ def read_wav(
     the module convention and transposed to the library's
     ``(channels, samples)`` axis order.
 
+    Before any sample is decoded, the ``data`` payload the header promises
+    is checked against the bytes the file actually holds. The walker never
+    verifies this (``info()`` on a header-only forgery is a feature, and it
+    seeks past the payload rather than reading it), and scipy cannot be
+    relied on to: its non-mmap path -- 24-bit, the depth field recorders
+    actually write -- tolerates a short read and returns the frames it
+    found. A truncated recording (interrupted copy, full card) would then
+    come back as a shorter file that looks right, and a level integrated
+    over it (Leq, SEL) would be a wrong number with nothing wrong-looking
+    about it. Refusing loudly here matches :func:`~phonometry.io.read_blocks`,
+    which already raises for the same defect.
+
     :param path: The file to read.
     :param chunks: An already-walked :class:`WavChunks` for this file, to
         avoid a second pass when the caller (the backend dispatcher) has one.
@@ -182,7 +198,8 @@ def read_wav(
         full-scale units and says so.
     :return: The signal with its metadata.
     :raises ValueError: If the file's codec is not linear PCM/float (those
-        files go through the ``[audio]`` backend, which decodes them).
+        files go through the ``[audio]`` backend, which decodes them), or
+        the file ends before the ``data`` payload its header declares.
     """
     parsed = parse_wav_chunks(path) if chunks is None else chunks
     fmt = parsed.fmt
@@ -190,6 +207,15 @@ def read_wav(
         raise ValueError(
             f"{path}: {fmt.format_name} is not linear PCM/float; "
             "read it through the [audio] backend"
+        )
+    payload_end = parsed.data_offset + parsed.data_size
+    actual = Path(path).stat().st_size
+    if actual < payload_end:
+        raise ValueError(
+            f"{path}: data chunk claims {parsed.data_size} bytes "
+            f"({parsed.frames} frames) but the file ends "
+            f"{payload_end - actual} bytes short; refusing to read a "
+            "truncated recording as if it were complete"
         )
     with warnings.catch_warnings():
         # The walker already kept what scipy is about to skip; warning about

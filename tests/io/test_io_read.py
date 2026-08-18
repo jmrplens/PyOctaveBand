@@ -219,6 +219,33 @@ def test_rf64_reads_through_the_ds64_sizes(tmp_path: Path) -> None:
     assert described.duration == pytest.approx(codes.size / FS)
 
 
+def test_truncated_data_is_refused_at_every_depth(tmp_path: Path) -> None:
+    """A data chunk that promises more frames than the file holds.
+
+    24-bit is the depth this check exists for: it is what field recorders
+    write, and it is the one path scipy reads without a memory map, where
+    a short read comes back silently as fewer frames -- a shortened Leq
+    period with nothing wrong-looking about it (an interrupted copy or a
+    full card is exactly such a file). The header claims 100 frames; 4
+    exist. ``info`` must still describe the header's claim (it is
+    header-only by design, the giant-RF64 test below depends on it);
+    ``read`` must refuse.
+    """
+    for bits in (16, 24):
+        image = riff_wave(
+            chunk(b"fmt ", fmt_payload(bits=bits)),
+            chunk(
+                b"data",
+                pcm_data(np.arange(4), bits),
+                declared_size=100 * (bits // 8),
+            ),
+        )
+        path = _write(tmp_path, image, f"trunc{bits}.wav")
+        assert info(path).frames == 100
+        with pytest.raises(ValueError, match="truncated recording"):
+            read(path)
+
+
 def _minimal_bext(originator: bytes) -> bytes:
     """A minimal v2 bext payload: originator at offset 256, version at 346."""
     buf = bytearray(602)

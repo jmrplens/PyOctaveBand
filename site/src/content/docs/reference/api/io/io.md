@@ -67,8 +67,12 @@ What [`phonometry.io.info`](/phonometry/reference/api/io/io/#info) learned witho
 `bit_depth` is the *valid* bits per sample where the notion applies
 (for an EXTENSIBLE container the `wValidBitsPerSample` field, so a
 20-in-24-bit file reports 20) and `None` for codecs that decode to
-float. `lossy` marks codecs whose decoder approximates the recorded
-waveform; [`phonometry.io.read`](/phonometry/reference/api/io/io/#read) warns when asked to read one.
+float. `lossy` marks codecs that cannot be trusted with the recorded
+waveform: the transcribed lossy/companded tags, and any codec outside
+the transcription that is not linear PCM/IEEE float, which fails
+closed as suspect rather than passing as clean (the
+`FormatChunk.lossy` property explains the bias);
+[`phonometry.io.read`](/phonometry/reference/api/io/io/#read) warns when asked to read one.
 `channel_mask`/`channel_labels`, `bext`, `has_ixml` and
 `cue_points` are WAV-family metadata and are `None`/empty for other
 containers -- except `bext`, which a FLAC can also carry in its

@@ -238,6 +238,26 @@ def test_unknown_extensible_guid_keeps_the_raw_tag(tmp_path: Path) -> None:
     assert not fmt.ambisonic
 
 
+def test_unknown_codec_tags_fail_closed_as_lossy(tmp_path: Path) -> None:
+    """A wFormatTag outside the transcribed set must not pass as clean.
+
+    The RIFF registry holds hundreds of codecs and nearly all of them are
+    lossy; tag 0x0050 (WAVE_FORMAT_MPEG, MPEG-1 audio layer I/II) is a
+    real one a transcoder can leave inside a WAV. If membership in the
+    transcribed lossy set were the only path to ``lossy=True``, every
+    untranscribed codec would be reported clean -- the wrong default for
+    the field the docs present as the honest carrier of lossiness.
+    """
+    image = riff_wave(
+        chunk(b"fmt ", fmt_payload(tag=0x0050)),
+        chunk(b"fact", struct.pack("<I", 4)),
+        chunk(b"data", bytes(8)),
+    )
+    fmt = parse_wav_chunks(_write(tmp_path, image)).fmt
+    assert fmt.lossy
+    assert fmt.format_name == "tag 0x0050"
+
+
 # ---------------------------------------------------------------------------
 # RF64 / ds64
 # ---------------------------------------------------------------------------
@@ -339,9 +359,34 @@ def test_data_before_metadata_chunks_is_still_walked(tmp_path: Path) -> None:
             riff_wave(chunk(b"bext", bytes(4), declared_size=4000)),
             "file ends after",
         ),
+        (
+            riff_wave(
+                chunk(b"fmt ", fmt_payload()),
+                chunk(b"cue ", struct.pack("<I", 3) + bytes(10)),
+                chunk(b"data", b"\x00\x00"),
+            ),
+            "cue chunk declares 3 points",
+        ),
+        (
+            riff_wave(
+                chunk(b"ds64", bytes(10)),
+                chunk(b"fmt ", fmt_payload()),
+                chunk(b"data", b"\x00\x00"),
+                fourcc=b"RF64",
+            ),
+            "ds64 chunk is 10 bytes",
+        ),
+        (
+            riff_wave(
+                chunk(b"fmt ", fmt_payload()),
+                chunk(b"fact", b"\x00\x00"),
+                chunk(b"data", b"\x00\x00"),
+            ),
+            "fact chunk is 2 bytes",
+        ),
     ],
     ids=["junk-form", "junk-fourcc", "no-data", "no-fmt", "short-fmt",
-         "truncated-chunk"],
+         "truncated-chunk", "short-cue", "short-ds64", "short-fact"],
 )
 def test_malformed_files_fail_loudly(
     tmp_path: Path, image: bytes, match: str
