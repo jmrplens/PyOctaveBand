@@ -175,7 +175,7 @@ plt.show()
 | Parámetro | Tipo / forma | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | unidades digitales (o Pa si está calibrada) | no vacío | 2D es `[channels, samples]`; devuelve un nivel por canal |
-| `fs` | int | Hz | > 0 (solo `laeq`; del `Signal` cuando `x` lo es) | `leq` no necesita frecuencia de muestreo (integral RMS pura) |
+| `fs` | int | Hz | > 0 (solo `laeq`; tomada de `x` cuando `x` es un `Signal`) | `leq` no necesita frecuencia de muestreo (integral RMS pura) |
 | `calibration_factor` | float | Pa por unidad digital | por defecto `None`: el factor propio de un `Signal` calibrado, si no `1.0` | De `sensitivity()` |
 | `dbfs` | bool | — | por defecto `False` | `True`: 0 dBFS = RMS 1.0; ignora la calibración |
 
@@ -353,7 +353,7 @@ lo que hace el `composite_rating_level` de
 | Parámetro | Tipo / forma | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | unidades digitales | no vacío | 2D devuelve diccionarios por canal |
-| `fs` | int | Hz | > 0; del `Signal` cuando `x` lo es | Lo necesita el detector de envolvente |
+| `fs` | int | Hz | > 0; tomada de `x` cuando `x` es un `Signal` | Lo necesita el detector de envolvente |
 | `n` | tupla de ints | % | por defecto `(10, 50, 90)` | Cualquier porcentaje de excedencia, p. ej. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | Ponderación temporal IEC 61672-1 de la envolvente |
 | `weighting` | str o None | — | cualquier curva de `weighting_filter`: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (por defecto) | Ponderación frecuencial previa a la envolvente (`None` y `'Z'` dejan la señal sin ponderar) |

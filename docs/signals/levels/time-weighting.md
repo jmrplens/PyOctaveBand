@@ -145,8 +145,8 @@ derived from the two measured separately, while their $L_\mathrm{eq}$ values can
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `x` | 1D or 2D array | pressure (any scale) | non-empty | Squared internally; output is a mean-square envelope |
-| `fs` | int | Hz | > 0 | |
+| `x` | 1D or 2D array, or `Signal` | pressure (any scale) | non-empty | Squared internally; output is a mean-square envelope |
+| `fs` | int | Hz | > 0; taken from `x` when `x` is a `Signal` | |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / 35 ms attack + 1.5 s decay |
 | `TimeWeighting(fs, mode)` (class) | — | — | — | Stateful variant for streaming: `process(x)` carries the integrator state between blocks |
 

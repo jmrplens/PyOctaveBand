@@ -52,7 +52,13 @@ from typing import cast
 import numpy as np
 from scipy import signal
 
-from .._internal.utils import _sos_initial_state, _sos_state_mismatch, _typesignal
+from .._internal.utils import _sos_initial_state, _sos_state_mismatch
+from ..io._resolve import (
+    refuse_foreign_rate,
+    resolve_fs,
+    resolve_samples,
+)
+from ..io._signal import Signal
 
 #: Rejection message shared by the three entry points that take ``fs``.
 _FS_POSITIVE = "Sample rate 'fs' must be positive."
@@ -314,14 +320,21 @@ class WeightingFilter:
         """Check whether ``zi`` must be (re)allocated for *x_proc*."""
         return _sos_state_mismatch(self.zi, x_proc)
 
-    def filter(self, x: list[float] | np.ndarray) -> np.ndarray:
+    def filter(self, x: Signal | list[float] | np.ndarray) -> np.ndarray:
         """
         Apply the weighting filter to a signal.
 
-        :param x: Input signal (1D or 2D [channels, samples]).
+        :param x: Input signal (1D or 2D [channels, samples]), or a
+            :class:`phonometry.io.Signal`. A Signal recorded at another rate
+            than this filter was designed for is refused rather than
+            weighted by the wrong response; a calibrated one is weighted in
+            pascals, exactly as :func:`weighting_filter` does, so the two
+            entry points cannot disagree about the same recording.
         :return: Weighted signal.
+        :raises ValueError: If a Signal's rate is not this filter's.
         """
-        x_proc = _typesignal(x)
+        refuse_foreign_rate(x, self.fs, "weighting filter")
+        x_proc = resolve_samples(x)
         if self.curve == "Z":
             return x_proc
 
@@ -428,13 +441,21 @@ def _cached_weighting_filter(
 
 
 def weighting_filter(
-    x: list[float] | np.ndarray, fs: int, curve: str = "A", high_accuracy: bool = True
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    curve: str = "A",
+    high_accuracy: bool = True,
 ) -> np.ndarray:
     """
     Apply a frequency weighting to a signal.
 
-    :param x: Input signal.
-    :param fs: Sample rate.
+    :param x: Input signal, or a :class:`phonometry.io.Signal` read from a
+        measurement file. A calibrated Signal is weighted in pascals, so the
+        weighted samples come back in pascals too; a bare array keeps
+        whatever unit it arrived in.
+    :param fs: Sample rate. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param curve: 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical),
         'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196
         infrasound), 'AU' (IEC 61012) or 'Z' (bypass).
@@ -442,8 +463,9 @@ def weighting_filter(
         accuracy at high frequencies (default True).
     :return: Weighted signal.
     """
+    fs = resolve_fs(x, fs)
     wf = _cached_weighting_filter(fs, curve, high_accuracy)
-    return wf.filter(x)
+    return wf.filter(resolve_samples(x))
 
 
 def _prepare_time_weighting_initial_state(
@@ -507,23 +529,29 @@ else:  # pragma: no cover - exercised only without numba installed
     _apply_impulse_kernel = _impulse_kernel_py
 
 def time_weighting(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     mode: str = "fast",
     initial_state: str | float | np.ndarray | None = None,
 ) -> np.ndarray:
     """
     Apply time weighting to a signal (Exponential averaging).
-    
-    :param x: Input signal (raw pressure/voltage). The function squares it internally.
-    :param fs: Sample rate.
+
+    :param x: Input signal (raw pressure/voltage), or a
+        :class:`phonometry.io.Signal` read from a measurement file. The
+        function squares it internally, so a calibrated Signal yields a
+        mean-square envelope in Pa2 rather than in digital units squared.
+    :param fs: Sample rate. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises.
     :param mode: 'fast' (125ms), 'slow' (1000ms), 'impulse' (35ms rise, 1500ms fall).
     :param initial_state: Previous mean-square output state ``y[-1]``. Use None/'zero' for
         zero initialization (default), 'first' to initialize from the first input energy,
         or a scalar/array broadcastable to the input shape without the time axis.
     :return: Time-weighted squared signal (sound pressure level envelope).
     """
-    x_proc = _typesignal(x)
+    fs = resolve_fs(x, fs)
+    x_proc = resolve_samples(x)
     if fs <= 0:
         raise ValueError(_FS_POSITIVE)
     x_sq = x_proc**2
@@ -585,9 +613,18 @@ class TimeWeighting:
         self.mode = mode.lower()
         self._state: np.ndarray | None = None
 
-    def process(self, x: list[float] | np.ndarray) -> np.ndarray:
-        """Apply time weighting to a block, continuing from the previous block."""
-        x_proc = _typesignal(x)
+    def process(self, x: Signal | list[float] | np.ndarray) -> np.ndarray:
+        """Apply time weighting to a block, continuing from the previous block.
+
+        :param x: The block, or a :class:`phonometry.io.Signal`. A Signal at
+            another rate than this integrator was built for is refused; a
+            calibrated one is squared in pascals, exactly as
+            :func:`time_weighting` does.
+        :return: Time-weighted mean-square envelope of the block.
+        :raises ValueError: If a Signal's rate is not this integrator's.
+        """
+        refuse_foreign_rate(x, self.fs, "time weighting")
+        x_proc = resolve_samples(x)
         if x_proc.shape[-1] == 0:
             return x_proc  # nothing to process; keep the carried state
         env = time_weighting(x_proc, self.fs, mode=self.mode, initial_state=self._state)
@@ -600,22 +637,32 @@ class TimeWeighting:
 
 
 def linkwitz_riley(
-    x: list[float] | np.ndarray, 
-    fs: int, 
-    freq: float, 
-    order: int = 4
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    freq: float | None = None,
+    order: int = 4,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Linkwitz-Riley crossover filter (Butterworth squared).
     Splits signal into low and high bands with flat sum response.
-    
-    :param x: Input signal.
-    :param fs: Sample rate.
-    :param freq: Crossover frequency.
+
+    :param x: Input signal, or a :class:`phonometry.io.Signal` read from a
+        measurement file. A calibrated Signal is split in pascals, so both
+        bands come back in pascals.
+    :param fs: Sample rate. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises. It keeps its position so that
+        ``linkwitz_riley(x, fs, freq)`` still reads as it always did; with a
+        Signal, name the crossover: ``linkwitz_riley(sig, freq=800)``.
+    :param freq: Crossover frequency. Required (it defaults to ``None`` only
+        so that ``fs`` can be omitted before it).
     :param order: Total order (must be even, typically 2 or 4).
     :return: (low_pass_signal, high_pass_signal)
     """
-    x_proc = _typesignal(x)
+    fs = resolve_fs(x, fs)
+    if freq is None:
+        raise ValueError("'freq' is required: the crossover frequency, in Hz.")
+    x_proc = resolve_samples(x)
     if order % 2 != 0:
         raise ValueError("Linkwitz-Riley order must be even (typically 2 or 4).")
     

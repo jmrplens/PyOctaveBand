@@ -86,10 +86,29 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 
 The object stands in for the bare array anywhere: `np.asarray(sig)` yields
 the samples (1-D for one channel, `(channels, samples)` for several), so
-every `(x, fs, ...)` function of the library accepts it today. The level
+every `(x, fs, ...)` function of the library already takes it in place of
+the array, with the rate still passed alongside. The level
 functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
-and `lex_8h`) go further and take the `Signal` itself — the object already knows its rate and its calibration, and
-asking you to repeat either is asking for a transcription error.
+and `lex_8h`) and the filters (`octave_filter`, `weighting_filter`,
+`time_weighting`, `linkwitz_riley`, `parametric_eq`, and the block-processing
+objects `OctaveFilterBank`, `WeightingFilter`, `TimeWeighting` and
+`ParametricEQ`) go further and take the `Signal` itself — the
+object already knows its rate and its calibration, and asking you to repeat
+either is asking for a transcription error. The rate it carries wins, and an
+explicit one that disagrees raises rather than being arbitrated.
+
+A calibrated `Signal` is *processed* in pascals, which is one rule with three
+readings depending on what the call returns: `weighting_filter`,
+`linkwitz_riley` and `parametric_eq` hand back a waveform, so that waveform is
+in pascals; `time_weighting` squares its input, so its envelope is in Pa²; and
+`octave_filter` and the level functions return a level, so what the
+calibration buys there is dB SPL re 20 µPa instead of a number in digital
+units. The `dbfs` routes are the deliberate exception: full scale is their
+reference, so they ignore the factor. For the same reason, do not chain a
+filter into a dBFS reading: `leq(weighting_filter(sig, curve="A"), dbfs=True)`
+measures pascals on a scale that claims to be full-scale referenced, and comes
+out `20 log10(factor)` off. That is what `laeq(sig, dbfs=True)` is for, which
+weights the raw samples before reading them.
 
 Integer samples are scaled by exactly $2^{B-1}$ for a $B$-bit container: a
 power of two, so the conversion to float64 is exact in binary floating
@@ -135,9 +154,15 @@ print(f"Leq = {float(signals.leq(sig)):.1f} dB")          # 70.0
 ```
 
 No `calibration_factor` argument, no `fs` argument at the level call: the
-`Signal` carries both. An explicit argument still wins over the carried one
-— the caller knows more than an object — and a bare array without `fs` is
-refused by name rather than guessed at.
+`Signal` carries both, and the two are carried under different rules. An
+explicit `calibration_factor` still wins over the one the object carries —
+the caller knows more than an object, after a re-calibration or for a
+deliberate what-if. An explicit `fs` does not win: the rate is a fact of the
+recording rather than a preference, so a value that disagrees with the
+object's raises instead of overriding it, and only a value that agrees is
+accepted. A bare array is refused by name rather than guessed at by the
+functions that need a rate at all, which `leq` does not: it integrates the
+whole record, so it never had an `fs` argument to omit.
 
 ### The same chain on a real meter's file
 

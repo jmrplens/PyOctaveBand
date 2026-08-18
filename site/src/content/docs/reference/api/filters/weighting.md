@@ -51,9 +51,9 @@ frequency from 50 Hz to 10 kHz except 1600 Hz (0.15 dB) and 2500 Hz
 
 ```python
 linkwitz_riley(
-    x: list[float] | np.ndarray,
-    fs: int,
-    freq: float,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    freq: float | None = None,
     order: int = 4,
 ) -> tuple[np.ndarray, np.ndarray]
 ```
@@ -65,9 +65,9 @@ Splits signal into low and high bands with flat sum response.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal. |
-| `fs` | Sample rate. |
-| `freq` | Crossover frequency. |
+| `x` | Input signal, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. A calibrated Signal is split in pascals, so both bands come back in pascals. |
+| `fs` | Sample rate. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. It keeps its position so that `linkwitz_riley(x, fs, freq)` still reads as it always did; with a Signal, name the crossover: `linkwitz_riley(sig, freq=800)`. |
+| `freq` | Crossover frequency. Required (it defaults to `None` only so that `fs` can be omitted before it). |
 | `order` | Total order (must be even, typically 2 or 4). |
 
 **Returns:** (low_pass_signal, high_pass_signal)
@@ -76,8 +76,8 @@ Splits signal into low and high bands with flat sum response.
 
 ```python
 time_weighting(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     mode: str = 'fast',
     initial_state: str | float | np.ndarray | None = None,
 ) -> np.ndarray
@@ -89,8 +89,8 @@ Apply time weighting to a signal (Exponential averaging).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (raw pressure/voltage). The function squares it internally. |
-| `fs` | Sample rate. |
+| `x` | Input signal (raw pressure/voltage), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. The function squares it internally, so a calibrated Signal yields a mean-square envelope in Pa2 rather than in digital units squared. |
+| `fs` | Sample rate. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. |
 | `mode` | 'fast' (125ms), 'slow' (1000ms), 'impulse' (35ms rise, 1500ms fall). |
 | `initial_state` | Previous mean-square output state `y[-1]`. Use None/'zero' for zero initialization (default), 'first' to initialize from the first input energy, or a scalar/array broadcastable to the input shape without the time axis. |
 
@@ -117,10 +117,24 @@ across blocks, so concatenated block outputs equal a single continuous call.
 ### TimeWeighting.process()
 
 ```python
-TimeWeighting.process(x: list[float] | np.ndarray) -> np.ndarray
+TimeWeighting.process(x: Signal | list[float] | np.ndarray) -> np.ndarray
 ```
 
 Apply time weighting to a block, continuing from the previous block.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `x` | The block, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal at another rate than this integrator was built for is refused; a calibrated one is squared in pascals, exactly as [`time_weighting`](/phonometry/reference/api/filters/weighting/#time_weighting) does. |
+
+**Returns:** Time-weighted mean-square envelope of the block.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a Signal's rate is not this integrator's. |
 
 ### TimeWeighting.reset()
 
@@ -134,8 +148,8 @@ Forget the carried state (the next block starts from rest).
 
 ```python
 weighting_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     curve: str = 'A',
     high_accuracy: bool = True,
 ) -> np.ndarray
@@ -147,8 +161,8 @@ Apply a frequency weighting to a signal.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal. |
-| `fs` | Sample rate. |
+| `x` | Input signal, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. A calibrated Signal is weighted in pascals, so the weighted samples come back in pascals too; a bare array keeps whatever unit it arrived in. |
+| `fs` | Sample rate. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012) or 'Z' (bypass). |
 | `high_accuracy` | Use internal oversampling for IEC 61672-1 class 1 accuracy at high frequencies (default True). |
 
@@ -184,7 +198,7 @@ Initialize the weighting filter.
 ### WeightingFilter.filter()
 
 ```python
-WeightingFilter.filter(x: list[float] | np.ndarray) -> np.ndarray
+WeightingFilter.filter(x: Signal | list[float] | np.ndarray) -> np.ndarray
 ```
 
 Apply the weighting filter to a signal.
@@ -193,6 +207,12 @@ Apply the weighting filter to a signal.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D [channels, samples]). |
+| `x` | Input signal (1D or 2D [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal recorded at another rate than this filter was designed for is refused rather than weighted by the wrong response; a calibrated one is weighted in pascals, exactly as [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter) does, so the two entry points cannot disagree about the same recording. |
 
 **Returns:** Weighted signal.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a Signal's rate is not this filter's. |

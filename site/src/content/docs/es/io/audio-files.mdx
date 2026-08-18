@@ -88,11 +88,29 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 
 El objeto sustituye al array desnudo en cualquier parte: `np.asarray(sig)`
 entrega las muestras (1D para un canal, `(canales, muestras)` para varios),
-así que toda función `(x, fs, ...)` de la biblioteca lo acepta hoy. Las
+así que toda función `(x, fs, ...)` de la biblioteca ya lo admite en lugar
+del array, pasando la frecuencia igualmente al lado. Las
 funciones de nivel (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
-`sound_exposure` y `lex_8h`) van más allá y aceptan el propio `Signal`: el objeto ya conoce su frecuencia y su
-calibración, y pedirte que repitas cualquiera de las dos es pedir un error
-de transcripción.
+`sound_exposure` y `lex_8h`) y los filtros (`octave_filter`,
+`weighting_filter`, `time_weighting`, `linkwitz_riley`, `parametric_eq`, y los
+objetos de proceso por bloques `OctaveFilterBank`, `WeightingFilter`,
+`TimeWeighting` y `ParametricEQ`) van más allá y aceptan el propio
+`Signal`: el objeto ya conoce su frecuencia y su calibración, y pedirte que
+repitas cualquiera de las dos es pedir un error de transcripción. La frecuencia
+que lleva manda, y una explícita que discrepe lanza en vez de arbitrarse.
+
+Un `Signal` calibrado se *procesa* en pascales, que es una sola regla con tres
+lecturas según lo que devuelva la llamada: `weighting_filter`, `linkwitz_riley`
+y `parametric_eq` devuelven una forma de onda, y esa forma de onda va en
+pascales; `time_weighting` eleva su entrada al cuadrado, así que su envolvente
+va en Pa²; y `octave_filter` y las funciones de nivel devuelven un nivel, así
+que lo que compra ahí la calibración es dB SPL re 20 µPa en vez de un número en
+unidades digitales. Las rutas `dbfs` son la excepción deliberada: su referencia
+es el fondo de escala, así que ignoran el factor. Por eso mismo no encadenes un
+filtro con una lectura en dBFS: `leq(weighting_filter(sig, curve="A"),
+dbfs=True)` mide en pascales una escala que dice ser de fondo de escala, y
+sale `20 log10(factor)` desviada. Para eso está `laeq(sig, dbfs=True)`, que
+pondera la señal cruda antes de leerla.
 
 Las muestras enteras se escalan dividiendo exactamente por $2^{B-1}$ para un
 contenedor de $B$ bits: una potencia de dos, así que la conversión a float64
@@ -140,9 +158,15 @@ print(f"Leq = {float(signals.leq(sig)):.1f} dB")          # 70.0
 ```
 
 Sin argumento `calibration_factor` y sin argumento `fs` en la llamada de
-nivel: el `Signal` lleva los dos. Un argumento explícito sigue ganando al
-que viene en el objeto — quien llama sabe más que un objeto — y un array
-desnudo sin `fs` se rechaza nombrando el argumento en vez de adivinarlo.
+nivel: el `Signal` lleva los dos, y cada uno se rige por una regla distinta.
+Un `calibration_factor` explícito sigue ganando al que viene en el objeto —
+quien llama sabe más que un objeto, tras una recalibración o para un supuesto
+deliberado. Un `fs` explícito no gana: la frecuencia de muestreo es un hecho
+de la grabación y no una preferencia, así que un valor que discrepe del que
+lleva el objeto lanza en vez de imponerse, y solo se acepta el que coincide.
+Un array desnudo se rechaza nombrando el argumento en vez de
+adivinarlo en las funciones que necesitan frecuencia, que no es el caso de
+`leq`: integra el registro entero, así que nunca tuvo un `fs` que omitir.
 
 ### La misma cadena sobre el archivo de un sonómetro real
 

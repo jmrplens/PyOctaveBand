@@ -13,8 +13,10 @@ from typing import Literal, cast, overload
 import numpy as np
 from scipy import signal
 
-from .._internal.utils import _downsamplingfactor, _resample_to_length, _typesignal
+from .._internal.utils import _downsamplingfactor, _resample_to_length
 from .._internal.warnings import PhonometryWarning
+from ..io._resolve import refuse_foreign_rate, resolve_fs, resolve_samples
+from ..io._signal import Signal
 from .design import _cheby2_headroom, _design_sos_filter
 from .frequencies import _genfreqs
 
@@ -192,6 +194,13 @@ class OctaveFilterBank:
         self.attenuation = design.attenuation
         self.calibration_factor = calibration.factor
         self.dbfs = calibration.dbfs
+        # Whether the caller left the whole calibration bundle alone, which is
+        # what decides if a calibrated Signal may supply its own factor. Asked
+        # of the bundle rather than of its float field: comparing the frozen
+        # dataclass to the default says "untouched" in one question, and it
+        # folds in the dBFS switch, since a dBFS bank is referenced to digital
+        # full scale and must not be handed pascals either.
+        self._default_calibration = calibration == _DEFAULT_CALIBRATION
         self.stateful = block_processing.stateful
 
         # Generate frequencies
@@ -243,7 +252,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[False] = False,
         mode: str = "rms",
         detrend: bool = True,
@@ -255,7 +264,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[True],
         mode: str = "rms",
         detrend: bool = True,
@@ -267,7 +276,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[False] = False,
         mode: str = "rms",
         detrend: bool = True,
@@ -279,7 +288,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[True],
         mode: str = "rms",
         detrend: bool = True,
@@ -291,7 +300,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[False] = False,
         mode: str = "rms",
         detrend: bool = True,
@@ -303,7 +312,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[True],
         mode: str = "rms",
         detrend: bool = True,
@@ -315,7 +324,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[False] = False,
         mode: str = "rms",
         detrend: bool = True,
@@ -327,7 +336,7 @@ class OctaveFilterBank:
     @overload
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: Literal[True],
         mode: str = "rms",
         detrend: bool = True,
@@ -338,7 +347,7 @@ class OctaveFilterBank:
 
     def filter(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         sigbands: bool = False,
         mode: str = "rms",
         detrend: bool = True,
@@ -349,7 +358,11 @@ class OctaveFilterBank:
         """
         Apply the pre-designed filter bank to a signal.
 
-        :param x: Input signal (1D array or 2D array [channels, samples]).
+        :param x: Input signal (1D array or 2D array [channels, samples]), or
+            a :class:`phonometry.io.Signal`. A Signal recorded at another rate
+            than the one this bank was designed for is refused rather than
+            filtered; a calibrated one is filtered in pascals unless the bank
+            carries a calibration factor of its own, or reads in dBFS.
         :param sigbands: If True, also return the signal in the time domain divided into bands.
         :param mode: 'rms' for energy-based level, 'peak' for peak-holding level.
             Note: 'peak' includes the filter's onset transient; a tone that
@@ -398,7 +411,7 @@ class OctaveFilterBank:
         return spl, freq_out
 
     def _prepare_signal(
-        self, x: list[float] | np.ndarray, detrend: bool
+        self, x: Signal | list[float] | np.ndarray, detrend: bool
     ) -> tuple[np.ndarray, bool]:
         """Coerce the input to a 2D ``[channels, samples]`` array for filtering.
 
@@ -406,8 +419,18 @@ class OctaveFilterBank:
         stateful bank, where it can introduce discontinuities between blocks)
         and reports whether the caller supplied multichannel input, so the
         caller can squeeze the results back to 1D.
+
+        A :class:`~phonometry.io.Signal` recorded at another rate is refused
+        here rather than filtered by a bank designed for a different one.
+        Its calibration is honoured only when the bank carries none of its
+        own: the bank's ``LevelCalibration`` is the explicit knob, and
+        applying both would square the factor. A dBFS bank ignores it
+        outright -- dBFS is referenced to digital full scale, so converting
+        the samples to pascals first would offset every band by
+        ``20*log10(factor)`` while still calling the result dBFS.
         """
-        x_proc = _typesignal(x)
+        refuse_foreign_rate(x, self.fs, "filter bank")
+        x_proc = resolve_samples(x, calibrate=self._default_calibration)
 
         if detrend:
             if self.stateful:
@@ -427,7 +450,7 @@ class OctaveFilterBank:
 
     def spectrogram(
         self,
-        x: list[float] | np.ndarray,
+        x: Signal | list[float] | np.ndarray,
         window_time: float = 0.125,
         overlap: float = 0.5,
         mode: str = "rms",
@@ -437,7 +460,13 @@ class OctaveFilterBank:
         """
         Short-time fractional-octave analysis: level per band over time.
 
-        :param x: Input signal (1D array or 2D array [channels, samples]).
+        :param x: Input signal (1D array or 2D array [channels, samples]), or
+            a :class:`phonometry.io.Signal`. It follows the same rate and
+            calibration rules as :meth:`filter`: a Signal at another rate is
+            refused, and a
+            calibrated one is analysed in pascals unless this bank carries a
+            calibration factor of its own or reads in dBFS. The two methods
+            must not report different levels for the same recording.
         :param window_time: Analysis window length in seconds.
         :param overlap: Window overlap fraction in [0, 1).
         :param mode: 'rms' or 'peak' (per window).
@@ -454,7 +483,8 @@ class OctaveFilterBank:
         if not 0 <= overlap < 1:
             raise ValueError("overlap must be in [0, 1).")
 
-        x_proc = _typesignal(x)
+        refuse_foreign_rate(x, self.fs, "filter bank")
+        x_proc = resolve_samples(x, calibrate=self._default_calibration)
         is_multichannel = x_proc.ndim > 1
         n_samples = x_proc.shape[-1]
         win = round(window_time * self.fs)
@@ -613,8 +643,8 @@ def _cached_filter_bank(
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
@@ -631,8 +661,8 @@ def octave_filter(
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
@@ -649,8 +679,8 @@ def octave_filter(
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
@@ -667,8 +697,8 @@ def octave_filter(
 
 @overload
 def octave_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
@@ -684,8 +714,8 @@ def octave_filter(
 
 
 def octave_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
@@ -707,10 +737,13 @@ def octave_filter(
 
     Multichannel support: If x is 2D (channels, samples), each channel is filtered.
 
-    :param x: Input signal (1D array or 2D array [channels, samples]).
-    :type x: Union[List[float], np.ndarray]
-    :param fs: Sample rate in Hz.
-    :type fs: int
+    :param x: Input signal (1D array or 2D array [channels, samples]), or a
+        :class:`phonometry.io.Signal` read from a measurement file.
+    :type x: Union[List[float], np.ndarray, phonometry.io.Signal]
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
+    :type fs: Optional[int]
     :param fraction: Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b=1.5. Default: 1.
     :type fraction: float
     :param order: Order of the filter. Default: 6.
@@ -730,7 +763,12 @@ def octave_filter(
         deep-stopband floor at exactly ``attenuation``, so it must be >= 70 dB
         to clear the class 1 limit (matches :class:`OctaveFilterBank`).
     :param calibration: How band energy becomes a level: calibration factor
-        and dBFS switch (:class:`LevelCalibration`).
+        and dBFS switch (:class:`LevelCalibration`). This is the explicit
+        knob: when its ``factor`` is left at 1.0, a calibrated
+        :class:`~phonometry.io.Signal` supplies its own and the band levels
+        come out in dB SPL; when it carries a factor, the object's is not
+        applied on top (that would square it). ``dbfs=True`` ignores both
+        the object and the factor, being referenced to digital full scale.
     :param response_plot: Whether to show or save the filter response plot
         (:class:`ResponsePlot`). Plotting bypasses the design cache.
     :return: A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals).
@@ -739,7 +777,7 @@ def octave_filter(
         Tuple[np.ndarray, List[float], List[np.ndarray]],
         Tuple[np.ndarray, List[str], List[np.ndarray]]]
     """
-    
+    fs = resolve_fs(x, fs)
     if response_plot.show or response_plot.file:
         # Plotting has side effects: bypass the cache.
         filter_bank = OctaveFilterBank(
