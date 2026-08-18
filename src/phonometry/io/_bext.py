@@ -63,7 +63,6 @@ module's design decisions the measurement runs only when asked for
 from __future__ import annotations
 
 import math
-from dataclasses import replace
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
@@ -236,13 +235,23 @@ def with_measured_loudness(
     from ..broadcast import program_loudness
 
     result = program_loudness(data[0] if data.shape[0] == 1 else data, fs)
-    measured: BroadcastMetadata = replace(
-        meta,
+    # Built through the constructor rather than dataclasses.replace():
+    # the stubs type replace() as a bare dataclass instance, which static
+    # analysis reads as a type change on the assignment and the return.
+    # Spelling every field keeps the copy verifiably the type it is.
+    return BroadcastMetadata(
+        description=meta.description,
+        originator=meta.originator,
+        originator_reference=meta.originator_reference,
+        origination_date=meta.origination_date,
+        origination_time=meta.origination_time,
+        time_reference=meta.time_reference,
         version=max(meta.version, 2),
+        umid=meta.umid,
         loudness_value=result.integrated,
         loudness_range=result.loudness_range,
         max_true_peak_level=result.true_peak,
         max_momentary_loudness=result.max_momentary,
         max_short_term_loudness=result.max_short_term,
+        coding_history=meta.coding_history,
     )
-    return measured
