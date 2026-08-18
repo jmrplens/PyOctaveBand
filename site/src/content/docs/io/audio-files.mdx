@@ -152,7 +152,9 @@ to land on the level the dataset publishes for this take: 113.7 dB.
 
 ```python
 import pathlib
+
 import phonometry
+from phonometry import io, signals
 
 # The committed take lives in the repository, so this runs from a checkout
 #   (or editable install); with your own meter's WAV, pass its path directly.
