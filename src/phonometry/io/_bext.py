@@ -20,7 +20,12 @@ Conventions the serialiser enforces, each from the Tech 3285 text:
   UMID or loudness under a version too old to hold them is refused
   loudly -- writing the bytes anyway would produce a chunk that lies
   about itself, and zeroing them would silently discard data.
-* **Loudness encoding.** Each field is ``int16 = round(100 x value)``.
+* **Loudness encoding.** Each field is the int16 of 100 x value rounded
+  to the nearest integer with ties away from zero -- the ``integer part
+  of (x + sgn(x) x 0.5)`` definition of Tech 3285 2.4, whose worked
+  examples carry -22.645 as F727h and 12.765 as 04FDh. (Python's
+  ``round`` would land both of those ties one code away: it rounds
+  half to even.)
   0x7FFF is Tech 3285's sentinel for "no value here" and is what ``None``
   serialises to, so it can never collide with a measurement; a real value
   therefore clamps to at most 0x7FFE (327.66) and at least -32768
@@ -83,7 +88,14 @@ _STRING_FIELDS: tuple[tuple[str, str, int], ...] = (
 
 
 def _encode_loudness(value: float | None) -> int:
-    """Encode one loudness field as ``int16 = round(100 x value)``.
+    """Encode one loudness field per the Tech 3285 2.4 integer rule.
+
+    The stored int16 is 100 x value rounded to the nearest integer with
+    ties away from zero: ``integer part of (x + sgn(x) x 0.5)`` with
+    ``x = 100 x value``, the rounding Tech 3285 2.4 defines and works
+    through (-22.645 -> F727h, 12.765 -> 04FDh). Python's ``round``
+    rounds half to even and lands both of those printed examples one
+    code away, which is why it is not used here.
 
     ``None`` becomes the Tech 3285 unset sentinel 0x7FFF; finite values
     clamp to [-32768, 0x7FFE] so they can never alias the sentinel; an
@@ -93,7 +105,11 @@ def _encode_loudness(value: float | None) -> int:
         return _LOUDNESS_UNSET
     if not math.isfinite(value):
         return -0x8000 if value < 0 else _LOUDNESS_UNSET - 1
-    return max(-0x8000, min(_LOUDNESS_UNSET - 1, round(value * 100)))
+    scaled = value * 100.0
+    ties_away = math.floor(abs(scaled) + 0.5)
+    if scaled < 0.0:
+        ties_away = -ties_away
+    return max(-0x8000, min(_LOUDNESS_UNSET - 1, ties_away))
 
 
 def serialize_bext(meta: BroadcastMetadata) -> bytes:
