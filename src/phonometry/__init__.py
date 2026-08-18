@@ -1415,10 +1415,12 @@ from .underwater.propagation.closed_form import (
     spreading_loss,
 )
 from .underwater.propagation.numerical import (
+    EigenrayResult,
     GaussianBeamResult,
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,
+    eigenrays,
     gaussian_beams,
     normal_modes,
     parabolic_equation,
@@ -1809,6 +1811,7 @@ __all__ = [
     "EcmaRoughness",
     "EcmaTonality",
     "EffectiveSoundSpeedProfile",
+    "EigenrayResult",
     "ElasticBoundaries",
     "ElasticFDTD2D",
     "ElasticFDTDResult",
@@ -2269,6 +2272,7 @@ __all__ = [
     "effective_depth",
     "effective_kappa",
     "effective_perceived_noise_level",
+    "eigenrays",
     "elastic_fdtd_simulation",
     "elbow_insertion_loss",
     "enclosed_gas_stiffness",

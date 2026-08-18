@@ -15,6 +15,11 @@ propagation loss of :mod:`phonometry.underwater.propagation.closed_form`:
 * :func:`gaussian_beams` -- Gaussian beam tracing. Hangs a beam on each of those
   rays and sums them into a propagation-loss field, which is finite at a caustic
   and decays smoothly into a shadow zone where ray theory has nothing to say.
+* :func:`eigenrays` -- the arrival structure. Takes a traced fan and a receiver
+  and refines, by bisection on fresh traces, the rays that actually connect the
+  source to that receiver, each with its travel time, launch and arrival
+  angles, boundary-touch counts and classical complex amplitude: the list the
+  sonar equation, a channel impulse response and communications work consume.
 * :func:`parabolic_equation` -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the propagation-loss field.
 
@@ -92,6 +97,57 @@ def _clean_profile(
     if np.any(c <= 0.0):
         raise ValueError("'sound_speeds' must be strictly positive.")
     return z, c
+
+
+def _resolve_boundary(
+    bottom: str, seabed_density: float | None, seabed_sound_speed: float | None,
+    density: float,
+) -> tuple[str, tuple[float, float, float] | None]:
+    """One bottom description out of the two ways a caller may give one.
+
+    ``bottom`` names a perfect reflector; the ``seabed_density`` /
+    ``seabed_sound_speed`` pair names the lossy fluid half-space of
+    :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`.
+    They describe the same boundary, so the pair must arrive whole and must not
+    arrive alongside ``bottom="rigid"``. Returns the validated bottom key and
+    the ``(water_density, sediment_density, sediment_speed)`` triple, or
+    ``None`` for a perfect reflector. Shared by :func:`gaussian_beams` and
+    :func:`eigenrays`, which charge the same coefficient to different carriers
+    (a beam's running product there, an arrival's amplitude here).
+    """
+    key = bottom.strip().lower()
+    if key not in _BOTTOM_TYPES:
+        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
+    seabed: tuple[float, float, float] | None = None
+    if seabed_density is not None or seabed_sound_speed is not None:
+        if seabed_density is None or seabed_sound_speed is None:
+            raise ValueError(
+                "'seabed_density' and 'seabed_sound_speed' describe one fluid"
+                " seabed and must be passed together.")
+        if key != "pressure-release":
+            raise ValueError(
+                "'bottom' and the seabed pair are two descriptions of the same"
+                " boundary; leave 'bottom' at its default when passing a fluid"
+                " seabed.")
+        seabed = (require_positive(density, "density"),
+                  require_positive(seabed_density, "seabed_density"),
+                  require_positive(seabed_sound_speed, "seabed_sound_speed"))
+    return key, seabed
+
+
+def _seabed_grazing_deg(
+    xi: NDArray[np.float64], c_bottom: float,
+) -> NDArray[np.float64]:
+    """The grazing angle Snell's invariant fixes at the seabed, in degrees.
+
+    :math:`\\cos\\varphi = \\xi\\,c(D)`: the same at every touch of one ray,
+    because the direction a ray crosses a depth with is set by the invariant
+    and not by how many times it has bounced. A ray that turns above the
+    seabed has :math:`\\xi\\,c(D) > 1` (clipped to a grazing angle of zero);
+    its bottom count stays zero, so the coefficient it never earned is never
+    applied.
+    """
+    return np.asarray(np.degrees(np.arccos(np.clip(xi * c_bottom, 0.0, 1.0))))
 
 
 def _ocean_ray_derivative(
@@ -407,11 +463,18 @@ class RayTraceResult:
         not by how many times it has bounced. Any boundary coefficient
         therefore enters a path's amplitude only as :math:`\\mathcal{R}^n`
         with the :math:`n` read off here, which is how
-        :func:`gaussian_beams` charges its lossy seabed and how an eigenray
-        search can charge one later; ``ray_trace`` itself carries no
-        amplitude, so the counts are what it can meaningfully expose.
+        :func:`gaussian_beams` charges its lossy seabed and how
+        :func:`eigenrays` charges each arrival; ``ray_trace`` itself carries
+        no amplitude, so the counts are what it can meaningfully expose.
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
+    :ivar profile_depths: Depth samples of the sound-speed profile the rays
+        were traced through, in metres, exactly as cleaned on the way in. The
+        pair below *is* the medium (both solvers interpolate it piecewise
+        linearly and nothing else about the water enters the geometry), so
+        recording it makes the result self-contained: :func:`eigenrays` needs
+        it to put fresh rays through the same water the fan flew.
+    :ivar profile_speeds: Sound speed at each of those depths, in m/s.
     """
 
     launch_angles: NDArray[np.float64]
@@ -423,6 +486,8 @@ class RayTraceResult:
     bottom_reflections: NDArray[np.int_]
     source_depth: float
     water_depth: float
+    profile_depths: NDArray[np.float64]
+    profile_speeds: NDArray[np.float64]
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the ray paths (depth increasing downward)."""
@@ -515,6 +580,462 @@ def ray_trace(
         surface_reflections=np.cumsum(
             march.reflections - march.upper_reflections, axis=1),
         bottom_reflections=np.cumsum(march.upper_reflections, axis=1),
+        source_depth=zs,
+        water_depth=water_depth,
+        profile_depths=z_prof,
+        profile_speeds=c_prof,
+    )
+
+
+# ===========================================================================
+# 2b. Eigenrays and the arrival structure (Jensen Sect. 3.3.5, Eqs. 3.65-3.68)
+# ===========================================================================
+#
+# A traced fan draws every path the profile supports and says nothing about
+# which of them pass through a given point. The pressure at a receiver is the
+# sum of Eq. (3.66) over precisely the rays that do, "the eigenrays, that is,
+# the rays which pass through that point" (Sect. 3.3.5.2), and the list of
+# them, each with its delay, its angles and its complex amplitude, is a
+# quantity in its own right: it is what the sonar equation consumes as
+# multipath structure, what a channel impulse response is made of, and what
+# communications work equalises against. The field solvers above collapse that
+# structure into one number per grid cell; this section keeps it apart.
+
+#: Bisection iterations refining an eigenray's launch angle inside its fan
+#: bracket. Each halving is one fresh march of the bracket set, so the cost is
+#: linear in this while the interval shrinks geometrically; the loop leaves as
+#: soon as every bracket is converged, which from a fan spaced in hundredths
+#: of a radian takes ~35 of the 60. The ceiling only stops a fan spaced in
+#: whole radians from spinning.
+_EIGENRAY_BISECTIONS = 60
+#: Interval width, in radians, at which a bracket is converged: a picoradian.
+#: The quantities an arrival reports move linearly with the launch angle at
+#: ordinary sensitivities (seconds per radian, and so on), so halving past
+#: this buys digits far below the marcher's own discretisation; it is not the
+#: float64 limit, which would cost twenty more marches to reach and change
+#: nothing an assertion can see.
+_EIGENRAY_CONVERGED = 1e-12
+#: Refined launch angles closer than this, in radians, are one eigenray found
+#: twice: a root landing within roundoff of a fan node gets bracketed from
+#: both sides, and bisection then walks both brackets to the same ray.
+_EIGENRAY_DISTINCT = 1e-9
+
+
+@dataclass(frozen=True)
+class EigenrayResult:
+    r"""The eigenrays connecting one source to one receiver, earliest first.
+
+    Every per-arrival array has one entry per eigenray, sorted by travel time.
+    The frequency-independent pieces of each arrival are recorded separately
+    (delay, complex amplitude, angles, boundary counts) so that one search
+    serves every frequency: in the module's :math:`e^{-i\omega t}` convention
+    the pressure a tone of angular frequency :math:`\omega` produces at the
+    receiver is
+
+    .. math::
+
+        p(\omega) = \sum_j a_j\, e^{i \omega \tau_j},
+
+    with :math:`a_j` the ``amplitudes`` and :math:`\tau_j` the
+    ``travel_times``; the band-limited channel impulse response is the inverse
+    transform of that sum, a spike of complex weight :math:`a_j` at each
+    :math:`\tau_j`.
+
+    :ivar launch_angles: Launch angle of each eigenray at the source, from the
+        horizontal, in degrees, positive downward: the same convention the
+        fan was launched with.
+    :ivar arrival_angles: The angle each eigenray crosses the receiver with,
+        same convention. In a range-independent medium its magnitude is fixed
+        by Snell's invariant at the receiver depth; its sign says whether the
+        arrival is descending or climbing, which is what a vertical array
+        steers on.
+    :ivar travel_times: Travel time of each eigenray, in seconds: the
+        marcher's third Runge-Kutta state read at the receiver, not a
+        quadrature over the finished path.
+    :ivar amplitudes: Complex amplitude of each arrival, dimensionless,
+        normalised to unit pressure at 1 m from the source (the reference of
+        Jensen Eqs. (3.67)-(3.68), the same one every field solver of this
+        module reports its loss against). The magnitude is the classical ray
+        amplitude of Eq. (3.65),
+        :math:`|c(z_\mathrm{R})\cos\theta_0 /
+        (c(z_\mathrm{S})\, r\, q(r))|^{1/2}` with :math:`q` integrated from
+        the point-source initial conditions of Eq. (3.63); the phase is the
+        caustic factor :math:`(-i)^m` of Eq. (3.79) times the boundary
+        factors :math:`(-1)^{n_\mathrm{s}}` and :math:`\mathcal{R}^{n_b}`
+        (Eqs. 3.125-3.126). See :func:`eigenrays` for why that convention and
+        not another.
+    :ivar surface_reflections: Sea-surface touches of each eigenray.
+    :ivar bottom_reflections: Seabed touches of each eigenray. The pair
+        classifies the arrivals the way Fig. 3.7 colours them: refracted
+        paths carry zeros, and every multipath family is named by its counts.
+    :ivar caustic_crossings: The KMAH index :math:`m` of Eq. (3.79): how many
+        times each eigenray's ray-tube spreading vanished on the way, each
+        crossing turning the amplitude by :math:`-\pi/2`. Zero for every path
+        in an isovelocity channel, where straight rays cannot form caustics.
+    :ivar receiver_range: Range of the receiver the list connects to, in m.
+    :ivar receiver_depth: Its depth, in metres.
+    :ivar source_depth: Source depth, in metres.
+    :ivar water_depth: Water-column depth, in metres.
+    """
+
+    launch_angles: NDArray[np.float64]
+    arrival_angles: NDArray[np.float64]
+    travel_times: NDArray[np.float64]
+    amplitudes: NDArray[np.complex128]
+    surface_reflections: NDArray[np.int_]
+    bottom_reflections: NDArray[np.int_]
+    caustic_crossings: NDArray[np.int_]
+    receiver_range: float
+    receiver_depth: float
+    source_depth: float
+    water_depth: float
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the arrival structure (per-path loss stems against delay)."""
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_eigenrays
+
+        return plot_eigenrays(self, ax=ax, language=check_language(language), **kwargs)
+
+
+def _march_arrival_rays(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], *,
+    source_depth: float, thetas: NDArray[np.float64], receiver_range: float,
+    n_steps: int,
+) -> RayMarch:
+    """March candidate eigenrays so the last sample lands on the receiver.
+
+    Geometry and amplitude in one call, which the marcher's own doctrine
+    requires (see :mod:`phonometry._internal.rays`): asking for the dynamic
+    pair makes the march split its steps at the profile nodes, so a ray traced
+    with it is not bit-for-bit the ray traced without, and an amplitude read
+    off one while the root was found on the other would answer for a slightly
+    different path. Every march of the search therefore carries the pair, with
+    the *real* point-source initial conditions of Jensen Eq. (3.63),
+    :math:`q(0) = 0`, :math:`p(0) = 1/c(0)`, under which :math:`r\\,q = J`
+    (Eq. 3.64) and the classical amplitude of Eq. (3.65) is a read-off. The
+    receiver range is the last sample of the march by construction, so nothing
+    is interpolated at the point everything is asserted at.
+    """
+    c0 = float(np.interp(source_depth, z_prof, c_prof))
+    xi = np.cos(thetas) / c0
+    deriv = _ocean_ray_derivative(z_prof, c_prof, xi)
+    return march_rays(
+        deriv, xi=xi, z0=np.full(thetas.size, source_depth),
+        zeta0=np.sin(thetas) / c0,
+        range_step=receiver_range / (n_steps - 1), n_steps=n_steps,
+        lower=0.0, upper=float(z_prof[-1]),
+        dynamic=DynamicRays(np.zeros(thetas.size),
+                            np.full(thetas.size, 1.0 / c0), z_prof, c_prof))
+
+
+def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
+    """The KMAH index per ray: sign changes of the real spreading history.
+
+    With the initial conditions of Eq. (3.63) the pair is real, so
+    :math:`q \\propto J` (Eq. 3.64) and every caustic is a sign change of
+    ``q`` along the row: "the number of times J(s) vanishes in [0, s]"
+    (Eq. 3.79). The launch sample is q = 0 by those initial conditions and is
+    not a caustic, which is why zeros are dropped before the signs are
+    compared rather than counted as crossings of their own.
+    """
+    counts = np.zeros(spreadings.shape[0], dtype=np.int_)
+    for i, row in enumerate(spreadings):
+        signs = np.sign(row[row != 0.0])
+        counts[i] = int(np.count_nonzero(np.diff(signs)))
+    return counts
+
+
+def eigenrays(
+    trace: RayTraceResult,
+    *,
+    receiver_range: float,
+    receiver_depth: float,
+    bottom: str = "pressure-release",
+    seabed_density: float | None = None,
+    seabed_sound_speed: float | None = None,
+    density: float = 1000.0,
+    max_arrivals: int = 64,
+    n_steps: int | None = None,
+) -> EigenrayResult:
+    r"""The eigenrays a traced fan brackets between a source and a receiver.
+
+    Finding an eigenray is finding a launch angle whose ray's depth at the
+    receiver range equals the receiver depth: a root of
+    :math:`f(\theta_0) = z(r_\mathrm{R}; \theta_0) - z_\mathrm{R}`, which is
+    continuous in :math:`\theta_0` because a specular reflection folds the
+    trajectory continuously. The fan of ``trace`` supplies the brackets, one
+    per adjacent pair of rays whose :math:`f` changes sign, and each bracket
+    is then closed by bisection on *fresh marches through the same profile*,
+    never by interpolating between the traced rays: interpolation across a
+    fan is exactly the hazard Jensen Sect. 3.7.5.1 illustrates (two rays of
+    one bracket taking different bounce histories have no path between them),
+    and a root polished on real traces is a real ray, whose travel time,
+    bounce counts and amplitude are its own rather than a blend's. The
+    marcher that traces the fan is the marcher that closes the brackets, with
+    the dynamic pair of Eq. (3.58) riding along under the real point-source
+    initial conditions of Eq. (3.63), so every arrival's amplitude is the
+    Jacobian of the very trajectory that hit the receiver.
+
+    **The amplitude convention, stated once.** Each arrival's complex
+    amplitude is
+
+    .. math::
+
+        a_j = \left| \frac{c(z_\mathrm{R})\,\cos\theta_0}
+        {c(z_\mathrm{S})\, r_\mathrm{R}\, q_j} \right|^{1/2}
+        (-i)^{m_j}\, (-1)^{n_{\mathrm{s},j}}\, \mathcal{R}^{n_{b,j}},
+
+    in the module's :math:`e^{-i\omega t}` convention, normalised to unit
+    pressure at 1 m. Why each factor:
+
+    * The magnitude is Eq. (3.65) with the :math:`1/(4\pi)` cancelled against
+      the free-field reference of Eqs. (3.67)-(3.68), which is how the book
+      itself defines transmission loss from these amplitudes and how every
+      solver of this module already normalises: the coherent sum
+      :math:`\sum_j a_j e^{i\omega\tau_j}` over a complete arrival set is
+      directly comparable to :attr:`GaussianBeamResult.pressure`, and
+      :math:`-20\lg|{\sum}|` to every propagation loss here.
+    * :math:`(-i)^m` is Eq. (3.79) exactly as printed. Sect. 3.3 writes the
+      ray field as :math:`A\,e^{i\omega\tau}` (Eq. 3.57), which *is* the
+      :math:`e^{-i\omega t}` convention, so the printed factor transfers
+      unchanged; it is the same :math:`-\pi/2` per caustic the beam solver's
+      tracked square-root branch spends continuously, taken here in the
+      discrete form the classical amplitude needs, since with real initial
+      conditions :math:`q` passes through zero instead of around it.
+    * :math:`(-1)^{n_\mathrm{s}}` and :math:`\mathcal{R}^{n_b}` are
+      Eqs. (3.125)-(3.126) applied at every boundary touch, collapsed to
+      powers because Snell's invariant fixes one crossing angle per ray at a
+      flat boundary. With the ``seabed_density`` / ``seabed_sound_speed``
+      pair, :math:`\mathcal{R}` is the Rayleigh coefficient of
+      :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+      at that angle, **not conjugated**: that function returns the
+      coefficient in the :math:`e^{-i\omega t}` convention these amplitudes
+      are declared in, so it enters as printed. (:func:`gaussian_beams`
+      conjugates the very same coefficient because its internal sum is
+      assembled in the conjugate convention and conjugated once at the end;
+      neither solver's choice transfers to the other, which is why both
+      spell it out.)
+
+    A receiver standing exactly on a caustic is the one place the list is
+    honest rather than useful: :math:`q_j \to 0` there and the classical
+    amplitude of Eq. (3.65) diverges, as Sect. 3.4.1 says it must. The
+    infinity is ray theory's own, not an artefact to clamp;
+    :func:`gaussian_beams` is the solver whose field stays finite there.
+
+    **What the fan resolves is what the search can find.** A bracket exists
+    where :math:`f` changes sign between adjacent fan rays, so a pair of
+    eigenrays standing between the same two rays (the two sides of a fold
+    near a caustic do this first) merges into no bracket at all, and an
+    eigenray steeper than the fan's aperture does not exist to it. The fan's
+    density and half-angle are the completeness levers, and they belong to
+    the caller's :func:`ray_trace`, where they are visible, rather than to a
+    hidden retrace here. Tangential contact (an :math:`f` that touches zero
+    without crossing) is likewise invisible, which is also why a receiver on
+    a boundary is rejected: a folded trajectory only ever grazes the
+    boundaries.
+
+    **The cap.** The multipath count grows without bound as paths steepen: in
+    an ideal waveguide nothing but spreading attenuates the high-order
+    bounces, and every extra :math:`2D` of unfolded depth is two more
+    arrivals. ``max_arrivals`` bounds what is returned: the earliest
+    ``max_arrivals`` arrivals are kept, because the early paths are the flat,
+    least-bounced, least-attenuated ones that carry the energy, and the tail
+    being discarded is the part every physical seabed drains fastest. A
+    :class:`~phonometry.PhonometryWarning` says when the cap truncated; raise
+    it to keep everything the fan bracketed.
+
+    :param trace: A :func:`ray_trace` result: the fan to bracket on, the
+        profile to retrace through, and the source the rays leave from.
+    :param receiver_range: Receiver range, in metres, within the traced range.
+    :param receiver_depth: Receiver depth, in metres, strictly inside the
+        water column.
+    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``: the
+        perfect reflector whose coefficient (:math:`-1` or :math:`+1`) each
+        bottom touch multiplies into the amplitude. The sea surface is always
+        pressure-release. Superseded by the fluid seabed when the pair below
+        is passed. The choice touches amplitudes only; the geometry, times
+        and angles of the eigenrays are specular either way.
+    :param seabed_density: Sediment density of a lossy fluid seabed (kg/m3 by
+        convention; only the ratio to ``density`` enters), passed together
+        with ``seabed_sound_speed`` and not alongside ``bottom="rigid"``.
+        Default (``None``): the perfect reflector named by ``bottom``.
+    :param seabed_sound_speed: Sediment sound speed of that seabed, in m/s
+        (``None`` likewise).
+    :param density: Water density above the seabed, in kg/m3. Ignored unless
+        the seabed pair is passed.
+    :param max_arrivals: Most arrivals to return (earliest kept, see above).
+    :param n_steps: Range samples per refinement march, receiver column
+        included. Default (``None``): the step of ``trace`` itself carried
+        over, so the search resolves what the fan resolved.
+    :return: An :class:`EigenrayResult`, possibly with zero arrivals: a
+        receiver the traced fan never crosses (a shadow zone, or simply
+        outside the aperture) has no eigenrays to list, which is an answer
+        and not an error.
+    :raises ValueError: If the inputs are invalid.
+    """
+    key, seabed = _resolve_boundary(bottom, seabed_density, seabed_sound_speed,
+                                    density)
+    z_prof = np.asarray(trace.profile_depths, dtype=np.float64)
+    c_prof = np.asarray(trace.profile_speeds, dtype=np.float64)
+    water_depth = float(trace.water_depth)
+    zs = float(trace.source_depth)
+    r_rec = require_positive(receiver_range, "receiver_range")
+    r_grid = np.asarray(trace.ranges[0], dtype=np.float64)
+    if r_rec > float(r_grid[-1]):
+        raise ValueError("'receiver_range' must not run past the traced fan.")
+    z_rec = float(receiver_depth)
+    if not (0.0 < z_rec < water_depth):
+        raise ValueError(
+            "'receiver_depth' must lie strictly inside the water column: a"
+            " folded ray only ever grazes the boundaries, so a receiver on"
+            " one is touched tangentially and never crossed.")
+    if int(max_arrivals) < 1:
+        raise ValueError("'max_arrivals' must be at least 1.")
+    if trace.launch_angles.size < 2:
+        raise ValueError("'trace' must carry at least two rays to bracket between.")
+    if n_steps is None:
+        ns = max(2, int(np.ceil(r_rec / float(r_grid[1] - r_grid[0]))) + 1)
+    else:
+        ns = int(n_steps)
+        if ns < 2:
+            raise ValueError("'n_steps' must be at least 2.")
+
+    # Read the fan at the receiver range (linear between the two bracketing
+    # columns: this is only the bracket hunt, and every sign found here is
+    # re-established on a fresh march before bisection trusts it).
+    launch = np.radians(np.sort(np.asarray(trace.launch_angles,
+                                           dtype=np.float64).ravel()))
+    col = int(np.clip(np.searchsorted(r_grid, r_rec), 1, r_grid.size - 1))
+    w = (r_rec - r_grid[col - 1]) / (r_grid[col] - r_grid[col - 1])
+    fan_order = np.argsort(np.asarray(trace.launch_angles, dtype=np.float64).ravel())
+    fan_depth = (trace.depths[fan_order, col - 1] * (1.0 - w)
+                 + trace.depths[fan_order, col] * w)
+    # A fan ray landing exactly on the receiver depth counts to one side, so
+    # the root right under it still raises exactly one bracket.
+    sign = np.where(fan_depth == z_rec, 1.0, np.sign(fan_depth - z_rec))
+    crossing = np.flatnonzero(sign[:-1] * sign[1:] < 0.0)
+    lo, hi = launch[crossing], launch[crossing + 1]
+
+    if lo.size:
+        # The brackets are only as good as the fan's reading of them; make
+        # both endpoints real marches before bisecting between them.
+        ends = _march_arrival_rays(
+            z_prof, c_prof, source_depth=zs,
+            thetas=np.concatenate([lo, hi]), receiver_range=r_rec, n_steps=ns)
+        f_lo = ends.positions[:lo.size, -1] - z_rec
+        f_hi = ends.positions[lo.size:, -1] - z_rec
+        # A root standing within the two integrations' disagreement of a fan
+        # rung (the fan was traced at its own step, the search marches at ns)
+        # can slip just past the endpoint and un-bracket itself; one rung of
+        # slack on each side recovers it before the bracket is disbelieved.
+        bad = np.flatnonzero(np.sign(f_lo) * np.sign(f_hi) > 0.0)
+        if bad.size:
+            wide_lo = launch[np.maximum(crossing[bad] - 1, 0)]
+            wide_hi = launch[np.minimum(crossing[bad] + 2, launch.size - 1)]
+            wide = _march_arrival_rays(
+                z_prof, c_prof, source_depth=zs,
+                thetas=np.concatenate([wide_lo, wide_hi]),
+                receiver_range=r_rec, n_steps=ns)
+            lo[bad], hi[bad] = wide_lo, wide_hi
+            f_lo[bad] = wide.positions[:bad.size, -1] - z_rec
+            f_hi[bad] = wide.positions[bad.size:, -1] - z_rec
+        exact_lo, exact_hi = f_lo == 0.0, f_hi == 0.0
+        keep = (np.sign(f_lo) * np.sign(f_hi) < 0.0) | exact_lo | exact_hi
+        lo, hi, f_lo = lo[keep], hi[keep], f_lo[keep]
+        exact_lo, exact_hi = exact_lo[keep], exact_hi[keep]
+        hi = np.where(exact_lo, lo, hi)
+        lo = np.where(exact_hi & ~exact_lo, hi, lo)
+        s_lo = np.sign(f_lo)
+        for _ in range(_EIGENRAY_BISECTIONS):
+            open_ = (hi - lo) > _EIGENRAY_CONVERGED
+            if not open_.any():
+                break
+            mid = 0.5 * (lo + hi)
+            f_mid = _march_arrival_rays(
+                z_prof, c_prof, source_depth=zs, thetas=mid,
+                receiver_range=r_rec, n_steps=ns).positions[:, -1] - z_rec
+            s_mid = np.sign(f_mid)
+            hit = (s_mid == 0.0) & open_
+            same = (s_mid == s_lo) & open_ & ~hit
+            lo = np.where(hit | same, mid, lo)
+            hi = np.where(hit | (open_ & ~same), mid, hi)
+        refined = 0.5 * (lo + hi)
+        if refined.size:
+            refined = refined[np.concatenate(
+                ([True], np.diff(refined) > _EIGENRAY_DISTINCT))]
+    else:
+        refined = np.zeros(0)
+
+    if refined.size == 0:
+        empty = np.zeros(0)
+        return EigenrayResult(
+            launch_angles=empty, arrival_angles=np.zeros(0),
+            travel_times=np.zeros(0),
+            amplitudes=np.zeros(0, dtype=np.complex128),
+            surface_reflections=np.zeros(0, dtype=np.int_),
+            bottom_reflections=np.zeros(0, dtype=np.int_),
+            caustic_crossings=np.zeros(0, dtype=np.int_),
+            receiver_range=r_rec, receiver_depth=z_rec, source_depth=zs,
+            water_depth=water_depth)
+
+    final = _march_arrival_rays(z_prof, c_prof, source_depth=zs,
+                                thetas=refined, receiver_range=r_rec,
+                                n_steps=ns)
+    assert final.spreadings is not None  # dynamic march always carries them
+    c0 = float(np.interp(zs, z_prof, c_prof))
+    z_end = final.positions[:, -1]
+    c_end = np.asarray(np.interp(z_end, z_prof, c_prof))
+    q_end = np.asarray(final.spreadings[:, -1], dtype=np.float64)
+    # Eq. (3.65) over the 1 m reference of Eqs. (3.67)-(3.68). A receiver on a
+    # caustic has q = 0 and honestly infinite classical amplitude; the
+    # errstate only keeps numpy from narrating what the docstring already has.
+    with np.errstate(divide="ignore"):
+        magnitude = np.sqrt(np.abs(
+            c_end * np.cos(refined) / (c0 * r_rec * q_end)))
+    n_bottom = np.asarray(final.upper_reflections.sum(axis=1))
+    n_surface = np.asarray((final.reflections - final.upper_reflections).sum(axis=1))
+    kmah = _caustic_crossings(np.asarray(final.spreadings, dtype=np.float64))
+    xi = np.cos(refined) / c0
+    if seabed is not None:
+        rho1, rho2, c2 = seabed
+        c_bottom = float(c_prof[-1])
+        # As printed, unconjugated: see the docstring's convention note.
+        bottom_coeff = np.asarray(reflection_coefficient(
+            _seabed_grazing_deg(xi, c_bottom), rho1=rho1, c1=c_bottom,
+            rho2=rho2, c2=c2), dtype=np.complex128)
+    else:
+        bottom_coeff = np.full(refined.size, _BOTTOM_REFLECTION[key],
+                               dtype=np.complex128)
+    amplitudes = (magnitude * (-1j) ** kmah
+                  * _SURFACE_REFLECTION ** n_surface * bottom_coeff ** n_bottom)
+    times = final.times[:, -1]
+    arrival = np.degrees(np.arcsin(np.clip(
+        final.verticals[:, -1] * c_end, -1.0, 1.0)))
+
+    order = np.argsort(times, kind="stable")
+    if order.size > int(max_arrivals):
+        import warnings
+
+        from ..._internal.warnings import PhonometryWarning
+
+        warnings.warn(
+            f"eigenrays: {order.size} eigenrays connect the receiver within"
+            f" the traced fan; keeping the {int(max_arrivals)} earliest."
+            " Raise 'max_arrivals' to keep them all.",
+            PhonometryWarning, stacklevel=2)
+        order = order[:int(max_arrivals)]
+
+    return EigenrayResult(
+        launch_angles=np.degrees(refined[order]),
+        arrival_angles=np.asarray(arrival)[order],
+        travel_times=np.asarray(times)[order],
+        amplitudes=np.asarray(amplitudes, dtype=np.complex128)[order],
+        surface_reflections=n_surface[order],
+        bottom_reflections=n_bottom[order],
+        caustic_crossings=kmah[order],
+        receiver_range=r_rec,
+        receiver_depth=z_rec,
         source_depth=zs,
         water_depth=water_depth,
     )
@@ -1517,27 +2038,11 @@ def gaussian_beams(
     dr_step = require_positive(range_step, "range_step")
     if dr_step > rmax:
         raise ValueError("'range_step' must not exceed 'max_range'.")
-    key = bottom.strip().lower()
-    if key not in _BOTTOM_TYPES:
-        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
+    key, seabed = _resolve_boundary(bottom, seabed_density, seabed_sound_speed,
+                                    density)
     theta_max = float(max_angle_deg)
     if not (0.0 < theta_max < 90.0):
         raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
-
-    seabed: tuple[float, float, float] | None = None
-    if seabed_density is not None or seabed_sound_speed is not None:
-        if seabed_density is None or seabed_sound_speed is None:
-            raise ValueError(
-                "'seabed_density' and 'seabed_sound_speed' describe one fluid"
-                " seabed and must be passed together.")
-        if key != "pressure-release":
-            raise ValueError(
-                "'bottom' and the seabed pair are two descriptions of the same"
-                " boundary; leave 'bottom' at its default when passing a fluid"
-                " seabed.")
-        seabed = (require_positive(density, "density"),
-                  require_positive(seabed_density, "seabed_density"),
-                  require_positive(seabed_sound_speed, "seabed_sound_speed"))
 
     absorption_key: str | None = None
     alpha = 0.0
@@ -1586,13 +2091,10 @@ def gaussian_beams(
     if seabed is not None:
         rho1, rho2, c2 = seabed
         c_bottom = float(c_prof[-1])
-        # The grazing angle a beam meets the seabed with is Snell's invariant
-        # read at the bottom sound speed, cos(phi) = xi c(D): the same at every
-        # touch of that beam, so one coefficient per beam is exact rather than
-        # sampled. A beam that turns above the seabed has xi c(D) > 1 (clipped
-        # to a grazing angle of zero); its bottom count stays zero, so the
-        # coefficient it never earned is never applied.
-        grazing = np.degrees(np.arccos(np.clip(fan.xi * c_bottom, 0.0, 1.0)))
+        # One coefficient per beam is exact rather than sampled: see
+        # :func:`_seabed_grazing_deg` for why Snell's invariant fixes a single
+        # grazing angle per ray at a flat seabed.
+        grazing = _seabed_grazing_deg(fan.xi, c_bottom)
         # Conjugated, deliberately. The beam sum is assembled in the
         # exp(+i omega t) convention Eq. (3.88) is printed in and conjugated
         # once at the end (see the sign-convention note above the result
