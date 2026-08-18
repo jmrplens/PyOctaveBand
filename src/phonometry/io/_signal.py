@@ -38,8 +38,15 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
-class SignalSource:
+class SignalOrigin:
     """Where a :class:`Signal` came from, as read from the file itself.
+
+    The name is deliberately not ``SignalSource``: phonometry already exports
+    a :class:`~phonometry.simulation.fdtd.SignalSource` (an FDTD excitation
+    driven by an arbitrary sample sequence), and two public classes sharing a
+    name across subpackages would collide the moment both are imported flat
+    from ``phonometry``. This one is a passive record -- an origin, not a
+    source of sound.
 
     ``bit_depth`` is the *valid* bits per sample (an EXTENSIBLE container
     holding 20 valid bits in 24 reports 20), or ``None`` where the notion
@@ -86,7 +93,7 @@ class Signal:
     calibration_factor: float | None = None
     channel_labels: tuple[str, ...] | None = None
     provenance: BroadcastMetadata | None = None
-    source: SignalSource | None = None
+    source: SignalOrigin | None = None
 
     def __post_init__(self) -> None:
         data = np.atleast_2d(np.asarray(self.data, dtype=np.float64))

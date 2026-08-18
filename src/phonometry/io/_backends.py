@@ -44,7 +44,7 @@ from .._internal.warnings import PhonometryWarning
 from ._chunks import WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_PCM, parse_wav_chunks
 from ._flac import read_flac_bext
 from ._sidecar import read_sidecar
-from ._signal import Signal, SignalSource
+from ._signal import Signal, SignalOrigin
 from ._wav import AudioFileInfo, read_wav, wav_info
 
 if TYPE_CHECKING:
@@ -171,7 +171,7 @@ def _read_soundfile(
         calibration_factor=calibration_factor,
         channel_labels=chunks.fmt.channel_labels() if chunks is not None else None,
         provenance=provenance,
-        source=SignalSource(
+        source=SignalOrigin(
             path=str(path),
             container=chunks.container if chunks is not None else str(file_info.format),
             format_name=str(file_info.subtype),

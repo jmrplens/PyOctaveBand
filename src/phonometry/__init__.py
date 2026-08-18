@@ -789,6 +789,24 @@ from .hearing.threshold import (
     age_threshold,
     reference_threshold,
 )
+from .io import (
+    AudioFileInfo,
+    BroadcastMetadata,
+    CalibrationSidecar,
+    ClippingWarning,
+    CuePoint,
+    LossyCompressionWarning,
+    Signal,
+    SignalOrigin,
+    convert,
+    info,
+    read,
+    read_blocks,
+    read_sidecar,
+    sidecar_path,
+    write,
+    write_sidecar,
+)
 from .materials.absorbers.airflow_resistance import (
     AirflowResistanceWarning,
     StaticAirflowResult,
@@ -1619,8 +1637,6 @@ from .vibration.structural.transfer_stiffness import (
 
 # Public methods
 __all__ = [
-    # ISO 17497-1/-2 scattering & diffusion,
-    # ISO 8041-1 / ISO 2631 / ISO 5349 / Directive 2002/44/EC human vibration,
     "ACOUSTIC_AREA_TYPES",
     "AERODYNAMIC_REFERENCE_SPEED",
     "AERODYNAMIC_THRESHOLD_SPEED",
@@ -1752,6 +1768,7 @@ __all__ = [
     "AtmosphericConditions",
     "AtmosphericPEResult",
     "AtmosphericRayResult",
+    "AudioFileInfo",
     "AudiogramParameters",
     "AudiogramResult",
     "AuditoryWeightingResult",
@@ -1764,10 +1781,13 @@ __all__ = [
     "BottomLossResult",
     "BrakeType",
     "BridgeType",
+    "BroadcastMetadata",
     "CWSource",
+    "CalibrationSidecar",
     "CalibrationWarning",
     "CeilingAttenuationResult",
     "CepstrumResult",
+    "ClippingWarning",
     "CoherentOutputSpectrumResult",
     "ContactFilter",
     "ContourPhasors",
@@ -1777,6 +1797,7 @@ __all__ = [
     "CriticalCouplingResult",
     "CrossSpectralDensityResult",
     "CrowdNoiseResult",
+    "CuePoint",
     "DailyVibrationExposure",
     "DbHrAssessment",
     "DbHrCheck",
@@ -1890,6 +1911,7 @@ __all__ = [
     "LevelCrossingResult",
     "LifterResult",
     "LiningImprovementResult",
+    "LossyCompressionWarning",
     "LoudspeakerCharacteristics",
     "LoudspeakerDirectivity",
     "LoudspeakerRatings",
@@ -2006,6 +2028,8 @@ __all__ = [
     "ShapedSweepResult",
     "ShipSourceLevelResult",
     "ShipTrafficSpectrum",
+    "Signal",
+    "SignalOrigin",
     "SignalSource",
     "SilencerChain",
     "SilencerChainElement",
@@ -2193,6 +2217,7 @@ __all__ = [
     "composite_transmission_loss",
     "compression_dose",
     "contact_filter",
+    "convert",
     "convert_frf",
     "corner_transmission_coefficient",
     "corrected_level",
@@ -2426,6 +2451,7 @@ __all__ = [
     "infinite_plate_impedance",
     "infinite_plate_mobility",
     "infinite_plate_point_mobility",
+    "info",
     "infrastructure_limits",
     "injected_power",
     "injury_probability",
@@ -2680,6 +2706,9 @@ __all__ = [
     "ray_curvature_radius",
     "ray_trace",
     "rc_curve",
+    "read",
+    "read_blocks",
+    "read_sidecar",
     "reception_plate_power",
     "reciprocity_impact_level",
     "rectangular",
@@ -2759,6 +2788,7 @@ __all__ = [
     "ship_source_spectrum",
     "short_pulse_mean_square_force",
     "shunt_matrix",
+    "sidecar_path",
     "sii_procedure",
     "silencer_self_noise",
     "sinad",
@@ -2948,6 +2978,8 @@ __all__ = [
     "wind_turbine_tonality",
     "window_metrics",
     "window_size_correction",
+    "write",
+    "write_sidecar",
     "zoom_fft",
 ]
 
@@ -2969,6 +3001,7 @@ from . import emission as emission
 from . import environment as environment
 from . import filters as filters
 from . import hearing as hearing
+from . import io as io
 from . import materials as materials
 from . import metrology as metrology
 from . import noise_control as noise_control

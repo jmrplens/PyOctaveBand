@@ -60,7 +60,7 @@ from ._chunks import (
     WavChunks,
     parse_wav_chunks,
 )
-from ._signal import Signal, SignalSource
+from ._signal import Signal, SignalOrigin
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -207,7 +207,7 @@ def read_wav(
         calibration_factor=calibration_factor,
         channel_labels=fmt.channel_labels(),
         provenance=parsed.bext,
-        source=SignalSource(
+        source=SignalOrigin(
             path=str(path),
             container=parsed.container,
             format_name=fmt.format_name,

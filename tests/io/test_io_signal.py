@@ -12,7 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from phonometry import leq
-from phonometry.io import Signal, SignalSource
+from phonometry.io import Signal, SignalOrigin
 
 FS = 48000
 
@@ -92,7 +92,7 @@ def test_metadata_fields_default_to_none() -> None:
 
 
 def test_source_metadata_travels_with_the_signal() -> None:
-    source = SignalSource(
+    source = SignalOrigin(
         path="m.wav", container="WAV", format_name="PCM",
         bit_depth=24, lossy=False,
     )
