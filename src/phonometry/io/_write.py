@@ -90,6 +90,8 @@ from ._chunks import BroadcastMetadata
 from ._signal import Signal
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from numpy.typing import NDArray
 
 
@@ -428,6 +430,52 @@ def _resolve_bext(
     return serialize_bext(meta)
 
 
+def write_wav_stream(
+    path: str | Path,
+    blocks: Iterable[np.ndarray],
+    fs: int,
+    channels: int,
+    subtype: str,
+    frames: int,
+    *,
+    metadata_chunks: bytes = b"",
+) -> None:
+    """Stream ``(channels, n)`` blocks (codes or floats) into one WAV file.
+
+    The in-house writer: because ``frames`` is known up front, the header
+    (RF64 automatic past 4 GiB) is exact before the first sample lands
+    and nothing is ever seeked back and patched -- each block is encoded,
+    interleaved and appended, so an hour of RF64 flows through a
+    block-sized memory window. The blocks carry quantised codes for the
+    PCM subtypes and float samples for the float ones; no scaling happens
+    here.
+
+    :raises ValueError: If the blocks do not add up to exactly ``frames``
+        frames -- the header already promised that length, so a mismatch
+        is a corrupt file, not a rounding detail.
+    """
+    header = build_wav_header(
+        fs=fs, channels=channels, subtype=subtype, frames=frames,
+        metadata_chunks=metadata_chunks,
+    )
+    written = 0
+    odd = False
+    with Path(path).open("wb") as fh:
+        fh.write(header)
+        for block in blocks:
+            payload = _encode_frames(block, subtype)
+            fh.write(payload)
+            written += int(block.shape[-1])
+            odd ^= bool(len(payload) % 2)
+        if odd:
+            fh.write(b"\x00")  # RIFF word alignment; not counted in the size
+    if written != frames:
+        raise ValueError(
+            f"{path}: the block stream carried {written} frames but the "
+            f"header promised {frames}; the file is inconsistent"
+        )
+
+
 def write_wav(
     path: str | Path,
     data: np.ndarray,
@@ -436,25 +484,11 @@ def write_wav(
     *,
     metadata_chunks: bytes = b"",
 ) -> None:
-    """Write ``(channels, samples)`` data (codes or floats) as one WAV file.
-
-    The in-house writer: exact-size header (RF64 automatic), interleaved
-    payload, pad byte for an odd payload. ``data`` carries quantised codes
-    for the PCM subtypes and float samples for the float ones; no scaling
-    happens here.
-    """
-    frames = int(data.shape[-1])
-    channels = int(data.shape[0])
-    header = build_wav_header(
-        fs=fs, channels=channels, subtype=subtype, frames=frames,
+    """Write ``(channels, samples)`` data as one WAV file, in one block."""
+    write_wav_stream(
+        path, [data], fs, int(data.shape[0]), subtype, int(data.shape[-1]),
         metadata_chunks=metadata_chunks,
     )
-    payload = _encode_frames(data, subtype)
-    with Path(path).open("wb") as fh:
-        fh.write(header)
-        fh.write(payload)
-        if len(payload) % 2:
-            fh.write(b"\x00")  # RIFF word alignment; not counted in the size
 
 
 def write(
@@ -467,15 +501,18 @@ def write(
     dither: str | None = None,
     sidecar: bool = False,
 ) -> None:
-    """Write a signal to a WAV file, without ever touching its level.
+    """Write a signal to an audio file, without ever touching its level.
 
     The counterpart of :func:`phonometry.io.read` and the export path for
     everything the library generates (IEC 60268-1 test tones, sweeps, MLS,
-    processed measurements). The subtypes are ``PCM_16``, ``PCM_24``
+    processed measurements). The WAV subtypes are ``PCM_16``, ``PCM_24``
     (packed in-house; scipy cannot), ``PCM_32``, ``FLOAT`` (float32, the
     default: exact for anything that came from a container of up to
     24 bits) and ``DOUBLE`` (float64, bit-exact for computed signals).
-    Files past the 4 GiB RIFF limit promote to RF64 automatically.
+    Files past the 4 GiB RIFF limit promote to RF64 automatically. A
+    ``.flac`` destination writes the lossless archive format through the
+    ``[audio]`` extra (integer subtypes up to ``PCM_24``, the default
+    there; see :func:`_write_flac`).
 
     What this function will never do, each a documented ecosystem default
     that destroys a measurement: normalise (python-acoustics ``to_wav``),
@@ -485,8 +522,10 @@ def write(
     quantisation math, the +1.0 edge, and why the scaling choice cancels
     out of calibrated results.
 
-    :param path: Destination file; the suffix picks the container (the WAV
-        family: ``.wav``, ``.wave``, ``.bwf``).
+    :param path: Destination file; the suffix picks the container: the
+        WAV family (``.wav``, ``.wave``, ``.bwf``) on the base install,
+        ``.flac`` with the ``[audio]`` extra. Lossy suffixes are refused
+        by decided policy.
     :param x: A :class:`Signal`, or an array in the library's channel
         convention (1-D mono, 2-D ``(channels, samples)``). Float data is
         quantised per ``subtype``; ``int16``/``int32`` arrays are written

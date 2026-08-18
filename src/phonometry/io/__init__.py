@@ -6,6 +6,7 @@ from __future__ import annotations
 from ._backends import LossyCompressionWarning, info, read
 from ._blocks import read_blocks
 from ._chunks import BroadcastMetadata, CuePoint
+from ._convert import convert
 from ._sidecar import (
     CalibrationSidecar,
     read_sidecar,
@@ -25,6 +26,7 @@ __all__ = [
     "LossyCompressionWarning",
     "Signal",
     "SignalSource",
+    "convert",
     "info",
     "read",
     "read_blocks",
