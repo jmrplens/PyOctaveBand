@@ -56,6 +56,32 @@ frequencies in Hz. The water column has a pressure-release surface at z = 0.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
+## BeamFan
+
+```python
+BeamFan(
+    max_angle_deg: float = 80.0,
+    n_beams: int | None = None,
+    beam_width: float | None = None,
+)
+```
+
+The launch fan [`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) hangs its beams on.
+
+Aperture, density and initial width travel together because they are one
+bargain: the overlap condition that sizes the default fan reads the
+width, and the width's own default is per launch angle. Every field has
+a default, so `BeamFan()` is the stock fan and one field is named to
+move one lever.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `max_angle_deg` | Half-angle of the fan, in degrees from the horizontal. Beams are spread symmetrically over `[-max_angle_deg, +max_angle_deg]`. |
+| `n_beams` | Number of beams in the fan. Default (`None`): from the overlap condition. Adjacent beams are $s\,\delta\theta_0$ apart at arc length $s$ while each has spread to $W \to s\lambda/(\pi W_0)$, so the condition that they still overlap, $\delta\theta_0 \lesssim \lambda/(\pi W_0)$, is range-independent; the default takes four times that margin. Too coarse a fan shows as a periodic ripple in range at the beam spacing, which is easy to mistake for physical interference. |
+| `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity, applied to every beam of the fan when passed. Default (`None`): one width per launch angle, the free-space optimum of each beam's own flight; see `_default_beam_widths`. |
+
 ## EigenrayResult
 
 ```python
@@ -129,10 +155,7 @@ eigenrays(
     *,
     receiver_range: float,
     receiver_depth: float,
-    bottom: str = 'pressure-release',
-    seabed_density: float | None = None,
-    seabed_sound_speed: float | None = None,
-    density: float = 1000.0,
+    bottom: str | FluidSeabed = 'pressure-release',
     max_arrivals: int = 64,
     n_steps: int | None = None,
 ) -> EigenrayResult
@@ -184,8 +207,8 @@ pressure at 1 m. Why each factor:
 * $(-1)^{n_\mathrm{s}}$ and $\mathcal{R}^{n_b}$ are
   Eqs. (3.125)-(3.126) applied at every boundary touch, collapsed to
   powers because Snell's invariant fixes one crossing angle per ray at a
-  flat boundary. With the `seabed_density` / `seabed_sound_speed`
-  pair, $\mathcal{R}$ is the Rayleigh coefficient of
+  flat boundary. With a [`FluidSeabed`](/phonometry/reference/api/underwater/numerical/#fluidseabed) as the `bottom`,
+  $\mathcal{R}$ is the Rayleigh coefficient of
   [`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient)
   at that angle, **not conjugated**: that function returns the
   coefficient in the $e^{-i\omega t}$ convention these amplitudes
@@ -230,10 +253,7 @@ it to keep everything the fan bracketed.
 | `trace` | A [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) result: the fan to bracket on, the profile to retrace through, and the source the rays leave from. |
 | `receiver_range` | Receiver range, in metres, within the traced range. |
 | `receiver_depth` | Receiver depth, in metres, strictly inside the water column. |
-| `bottom` | `"pressure-release"` (default) or `"rigid"`: the perfect reflector whose coefficient ($-1$ or $+1$) each bottom touch multiplies into the amplitude. The sea surface is always pressure-release. Superseded by the fluid seabed when the pair below is passed. The choice touches amplitudes only; the geometry, times and angles of the eigenrays are specular either way. |
-| `seabed_density` | Sediment density of a lossy fluid seabed (kg/m3 by convention; only the ratio to `density` enters), passed together with `seabed_sound_speed` and not alongside `bottom="rigid"`. Default (`None`): the perfect reflector named by `bottom`. |
-| `seabed_sound_speed` | Sediment sound speed of that seabed, in m/s (`None` likewise). |
-| `density` | Water density above the seabed, in kg/m3. Ignored unless the seabed pair is passed. |
+| `bottom` | `"pressure-release"` (default) or `"rigid"`, the perfect reflector whose coefficient ($-1$ or $+1$) each bottom touch multiplies into the amplitude; or a [`FluidSeabed`](/phonometry/reference/api/underwater/numerical/#fluidseabed), whose complex Rayleigh coefficient is charged instead. The sea surface is always pressure-release. The choice touches amplitudes only; the geometry, times and angles of the eigenrays are specular either way. |
 | `max_arrivals` | Most arrivals to return (earliest kept, see above). |
 | `n_steps` | Range samples per refinement march, receiver column included. Default (`None`): the step of `trace` itself carried over, so the search resolves what the fan resolved. |
 
@@ -244,6 +264,35 @@ it to keep everything the fan bracketed.
 | Exception | When |
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
+
+## FluidSeabed
+
+```python
+FluidSeabed(
+    density: float,
+    sound_speed: float,
+    water_density: float = 1000.0,
+)
+```
+
+A lossy fluid seabed, passed as the `bottom` of a solver.
+
+The fluid half-space of
+[`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient)
+under the water column: handing one to [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) or
+[`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) as `bottom=` replaces the perfect reflector with
+the Rayleigh interface, and every bottom touch of a path is charged the
+complex coefficient at the one grazing angle Snell's invariant fixes for
+it. The water's own sound speed at the interface comes from the
+sound-speed profile, so it is not repeated here.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `density` | Sediment density $\rho_2$, in the same unit as `water_density` (kg/m³ by convention; only the ratio enters). |
+| `sound_speed` | Sediment sound speed $c_2$, in m/s. A sediment faster than the water at the bottom has a critical grazing angle, below which the reflection is total in magnitude and lossy in phase alone. |
+| `water_density` | Water density $\rho_1$ above the seabed (default 1000 kg/m³). It enters only through the impedance ratio, the fields themselves being density-normalised already. |
 
 ## gaussian_beams
 
@@ -258,20 +307,11 @@ gaussian_beams(
     ranges_m: NDArray[np.float64] | list[float] | None = None,
     receiver_depths_m: NDArray[np.float64] | list[float] | None = None,
     n_depth_points: int = 200,
-    max_angle_deg: float = 80.0,
-    n_beams: int | None = None,
-    beam_width: float | None = None,
+    fan: BeamFan | None = None,
     range_step: float = 25.0,
-    bottom: str = 'pressure-release',
-    seabed_density: float | None = None,
-    seabed_sound_speed: float | None = None,
-    density: float = 1000.0,
-    absorption_model: str | None = None,
-    temperature: float = 10.0,
-    salinity: float = 35.0,
-    ph: float = 8.0,
-    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
-    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
+    bottom: str | FluidSeabed = 'pressure-release',
+    absorption: str | VolumeAbsorption | None = None,
+    bathymetry: tuple[NDArray[np.float64] | list[float], NDArray[np.float64] | list[float]] | None = None,
 ) -> GaussianBeamResult
 ```
 
@@ -282,7 +322,8 @@ them over the fan with the weight of Eq. (3.92). The rays are the ones
 [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) draws, integrated by the same marcher through the same
 profile; what is added is the dynamic pair $(q, p)$ of Eq. (3.58),
 started from the complex conditions of Eq. (3.91) that make each ray the
-axis of a beam of initial half-width `beam_width` and flat wavefront.
+axis of a beam of initial half-width `fan.beam_width` and flat
+wavefront.
 
 The point of the beams is that the answer stays finite. Ray theory's
 amplitude, Eq. (3.65), divides by the ray-tube spreading, which vanishes on
@@ -329,7 +370,8 @@ The limits are worth knowing before the numbers are believed.
   free-space term grows as $\sqrt{r_\mathrm{max}}$, a longer run
   pushes that boundary out rather than in. [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) is
   the solver to reach for close to the source.
-* **The fan is truncated** at `max_angle_deg`, and a waveguide with two
+* **The fan is truncated** at `fan.max_angle_deg`, and a waveguide with
+  two
   perfectly reflecting boundaries is the worst case for that, because
   nothing but $1/R$ attenuates the steep multiple bounces. Measured on
   the ideal 1000 m guide at 300 Hz, source at 300 m and receiver at 600 m,
@@ -338,7 +380,7 @@ The limits are worth knowing before the numbers are believed.
   and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
   to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
   at 80 degrees is the fan and not the method. A real seabed (the
-  `seabed_density`/`seabed_sound_speed` pair below) absorbs those
+  [`FluidSeabed`](/phonometry/reference/api/underwater/numerical/#fluidseabed) below) absorbs those
   bounces and the default is then ample; a perfect reflector needs the
   fan opened and `range_step` cut with it, since a step has to resolve
   $\tan\theta_\mathrm{max}$ depth units of climb per unit range. The
@@ -360,13 +402,14 @@ The limits are worth knowing before the numbers are believed.
   where the modal criterion is out of the band's reach and the free-space
   optimum stands, comes out at +0.72 dB with a 1.37 dB worst bin, closer
   to the exact field than [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) on the same cut. An
-  explicit `beam_width` is taken as given, whatever its size: the old
+  explicit `fan.beam_width` is taken as given, whatever its size: the
+  old
   quarter-depth warning went with the cap, since the measurements put the
   fault on the cap's side.
 
 **Seawater absorption is off by default** and the field is then optimistic
 beyond a few kilometres at sonar frequencies, exactly as ray theory without
-a volume loss must be. Passing `absorption_model` multiplies each beam by
+a volume loss must be. Passing `absorption` multiplies each beam by
 $e^{-\alpha s}$ with $s$ the **arc length along its central
 ray**, which is Sect. 3.6.2 done as printed: perturbing the eikonal with
 the complex sound speed a volume loss implies leaves the real rays standing
@@ -393,7 +436,7 @@ printed.
 **The seabed is a perfect reflector by default**, for the same reason, and
 real shallow-water propagation loss is dominated by what that default
 leaves out: the seabed absorbs part of every bottom bounce. Passing
-`seabed_density` and `seabed_sound_speed` replaces the perfect
+a [`FluidSeabed`](/phonometry/reference/api/underwater/numerical/#fluidseabed) as the `bottom` replaces the perfect
 reflector with the lossy fluid half-space of
 [`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient)
 (the Rayleigh interface, `density` standing for the water above it and
@@ -419,8 +462,8 @@ approximation (p. 189), and it is the approximation the whole method
 already breathes; sediment attenuation and elasticity are outside the
 fluid-fluid model here as they are outside `seabed_reflection` itself.
 
-**The bottom may slope.** The `bathymetry_ranges_m` /
-`bathymetry_depths_m` pair replaces the level bottom with the same
+**The bottom may slope.** The `bathymetry` pair replaces the level
+bottom with the same
 piecewise-linear `depth(r)` polyline [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) takes, and it is
 the first range dependence in this module; the sound-speed profile stays
 range independent, deliberately -- see [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace)'s scope note for
@@ -468,7 +511,8 @@ arrivals near their own turning point, which is where a one-way marcher
 pays its way; the test module's docstring records the measurements and
 their stability under step, width and aperture.
 
-What it costs is `n_beams` times the size of the receiver grid, and none
+What it costs is `fan.n_beams` times the size of the receiver grid,
+and none
 of the three factors depends on the frequency: the ray core does not have to
 resolve a wavelength on a grid, and the fan only widens as
 $\lambda/W_0$, which the default width holds nearly fixed. On a
@@ -491,20 +535,11 @@ direct way to trade resolution for time.
 | `ranges_m` | Ranges at which to evaluate the field, in metres. Default (`None`): the marching grid itself, which puts every receiver on a column the rays were actually sampled at. |
 | `receiver_depths_m` | Depths at which to evaluate the field, in metres. Default (`None`): `n_depth_points` points spread over the water column, on the interior grid [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) uses, so the two fields land on the same depths. |
 | `n_depth_points` | Size of that default depth grid. |
-| `max_angle_deg` | Half-angle of the launch fan, in degrees from the horizontal. Beams are spread symmetrically over `[-max_angle_deg, +max_angle_deg]`. |
-| `n_beams` | Number of beams in the fan. Default (`None`): from the overlap condition. Adjacent beams are $s\,\delta\theta_0$ apart at arc length $s$ while each has spread to $W \to s\lambda/(\pi W_0)$, so the condition that they still overlap, $\delta\theta_0 \lesssim \lambda/(\pi W_0)$, is range-independent; the default takes four times that margin. Too coarse a fan shows as a periodic ripple in range at the beam spacing, which is easy to mistake for physical interference. |
-| `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity, applied to every beam of the fan when passed. Default (`None`): one width per launch angle, the free-space optimum of each beam's own flight; see `_default_beam_widths`. |
+| `fan` | The launch fan, as a [`BeamFan`](/phonometry/reference/api/underwater/numerical/#beamfan): its half-angle `max_angle_deg`, its density `n_beams` and its initial width `beam_width`, each with the default that class documents. Default (`None`): the stock `BeamFan()`, the fan every published validation number of this module was measured with. |
 | `range_step` | Marching step in range, in metres, and the spacing of the default `ranges_m`. |
-| `bottom` | `"pressure-release"` (default) or `"rigid"`. The sea surface is always pressure-release. Superseded by the fluid seabed when the pair below is passed. |
-| `seabed_density` | Sediment density of a lossy fluid seabed, in the same unit as `density` (kg/m3 by convention; only the ratio enters). Default (`None`): the perfect reflector named by `bottom`, so every published validation number of this module is what the solver returns. Passed together with `seabed_sound_speed`, and not alongside `bottom="rigid"`. |
-| `seabed_sound_speed` | Sediment sound speed of that seabed, in m/s (`None` likewise). A sediment faster than the water at the bottom has a critical grazing angle, below which the reflection is total in magnitude and lossy in phase alone. |
-| `density` | Water density above the seabed, in kg/m3. Ignored unless the seabed pair is passed; it enters only through the seabed's impedance ratio, the field itself being density-normalised already. |
-| `absorption_model` | Seawater volume absorption applied along each beam's central ray: `"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`, the same models, spelled the same way, as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption). Default (`None`): no volume absorption, so the published validation numbers of this module are what the solver returns. |
-| `temperature` | Temperature `T` for the absorption model, in degrees Celsius (ignored when `absorption_model` is `None`). |
-| `salinity` | Salinity `S` for the absorption model, in parts per thousand (ignored when `absorption_model` is `None`). |
-| `ph` | Acidity for the absorption model (ignored when `absorption_model` is `None`; Thorp ignores it always). |
-| `bathymetry_ranges_m` | Node ranges of a piecewise-linear bottom profile, in metres, strictly increasing from `r = 0`; level past the last node. Default (`None`): the level bottom at the profile's last depth, which is every validation number of this module. Passed together with `bathymetry_depths_m`, and not alongside the seabed pair. |
-| `bathymetry_depths_m` | Bottom depth at each node, in metres, strictly positive and never below the sound-speed profile's last depth (`None` likewise). |
+| `bottom` | `"pressure-release"` (default) or `"rigid"`, perfect reflectors; or a [`FluidSeabed`](/phonometry/reference/api/underwater/numerical/#fluidseabed), the lossy fluid half-space whose complex Rayleigh coefficient every bottom touch is charged. The sea surface is always pressure-release, and the perfect default is what every published validation number of this module returns. |
+| `absorption` | Seawater volume absorption applied along each beam's central ray: the bare model name (`"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`) for the standard water of [`VolumeAbsorption`](/phonometry/reference/api/underwater/numerical/#volumeabsorption)'s defaults, or a [`VolumeAbsorption`](/phonometry/reference/api/underwater/numerical/#volumeabsorption) naming its own temperature, salinity and pH. Default (`None`): no volume absorption, so the published validation numbers of this module are what the solver returns. |
+| `bathymetry` | A `(ranges_m, depths_m)` pair of arrays describing a piecewise-linear bottom profile, the same pair [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) takes: node ranges in metres, strictly increasing from `r = 0` and level past the last node, with the bottom depth at each node in metres, strictly positive and never below the sound-speed profile's last depth. Not alongside a [`FluidSeabed`](/phonometry/reference/api/underwater/numerical/#fluidseabed). Default (`None`): the level bottom at the profile's last depth, which is every validation number of this module. |
 
 **Returns:** A [`GaussianBeamResult`](/phonometry/reference/api/underwater/numerical/#gaussianbeamresult).
 
@@ -518,7 +553,7 @@ direct way to trade resolution for time.
 
 | Warning | When |
 | :--- | :--- |
-| PhonometryWarning | when the source sits on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), and when one marching step carries the steepest beam of the fan across more than a quarter of the water column, which is the pairing between `max_angle_deg` and `range_step` that is easiest to get wrong. |
+| PhonometryWarning | when the source sits on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), and when one marching step carries the steepest beam of the fan across more than a quarter of the water column, which is the pairing between `fan.max_angle_deg` and `range_step` that is easiest to get wrong. |
 
 ## GaussianBeamResult
 
@@ -566,7 +601,7 @@ can be subtracted.
 | `ray_depths` | Depth of each central ray on that grid, in metres. |
 | `beam_widths` | Beam half-width $W(s)$ on that grid, in metres: Jensen Eq. (3.89), the distance at which the beam's own pressure has fallen by $e^{-1}$ and its intensity by $e^{-2}$. |
 | `wavefront_curvatures` | Beam wavefront curvature $K(s)$ on that grid, in 1/m: Jensen Eq. (3.90) with the sign that belongs to the conjugated field this result exposes, so that a beam spreading in free space reproduces Eq. (3.85), $K = x/(x^2 + a^2)$, as a positive number. |
-| `initial_beam_widths` | The $W_0$ of Eq. (3.91) actually used by each beam of the fan, in metres, shape `(n_beams,)`. An explicit `beam_width` fills it with one value; the default is per launch angle (see `_default_beam_widths`), widest on the axis of the fan whenever a shallow channel's modal-resolution term is in play and flat across it otherwise. |
+| `initial_beam_widths` | The $W_0$ of Eq. (3.91) actually used by each beam of the fan, in metres, shape `(n_beams,)`. An explicit `fan.beam_width` fills it with one value; the default is per launch angle (see `_default_beam_widths`), widest on the axis of the fan whenever a shallow channel's modal-resolution term is in play and flat across it otherwise. |
 | `absorption_model` | The seawater absorption model applied along the beams, or `None` when the run propagated without volume absorption (the default). |
 | `absorption_coefficient` | The absorption coefficient $\alpha$ actually applied, in dB/km (0.0 when `absorption_model` is `None`), as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption) evaluated it at the source frequency and depth. Recorded so a run's loss can be decomposed without re-deriving what was subtracted. |
 | `seabed_density` | Sediment density of the fluid seabed the bottom bounces were charged with, or `None` when the bottom was one of the perfect reflectors (the default). |
@@ -786,8 +821,7 @@ ray_trace(
     launch_angles_deg: NDArray[np.float64] | list[float],
     max_range: float = 10000.0,
     n_steps: int = 2000,
-    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
-    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
+    bathymetry: tuple[NDArray[np.float64] | list[float], NDArray[np.float64] | list[float]] | None = None,
 ) -> RayTraceResult
 ```
 
@@ -797,8 +831,8 @@ Integrates the ray-trajectory equations (Jensen Eqs. 3.23-3.24) with a
 fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
 surface (`z = 0`) and the bottom (`z = water_depth`).
 
-**The bottom may slope.** Passing the `bathymetry_ranges_m` /
-`bathymetry_depths_m` pair replaces the level bottom with a
+**The bottom may slope.** Passing the `bathymetry` pair replaces the
+level bottom with a
 piecewise-linear depth profile `depth(r)`, the faceted boundary model of
 Jensen Fig. 3.20, and the first range dependence in this module; the
 sound-speed profile stays range independent (see the scope note below).
@@ -856,8 +890,7 @@ per ray, are the entire per-bounce record a downstream amplitude needs.
 | `launch_angles_deg` | Launch angles from the horizontal, in degrees (positive downward). |
 | `max_range` | Maximum horizontal range to trace, in metres. |
 | `n_steps` | Number of integration steps per ray. |
-| `bathymetry_ranges_m` | Node ranges of a piecewise-linear bottom profile, in metres, strictly increasing from `r = 0`; level past the last node. Default (`None`): the level bottom at the profile's last depth. Passed together with `bathymetry_depths_m`. |
-| `bathymetry_depths_m` | Bottom depth at each node, in metres, strictly positive and never below the sound-speed profile's last depth (`None` likewise). |
+| `bathymetry` | A `(ranges_m, depths_m)` pair of arrays describing a piecewise-linear bottom profile: node ranges in metres, strictly increasing from `r = 0` and level past the last node, with the bottom depth at each node in metres, strictly positive and never below the sound-speed profile's last depth. Default (`None`): the level bottom at the profile's last depth. |
 
 **Returns:** A [`RayTraceResult`](/phonometry/reference/api/underwater/numerical/#raytraceresult).
 
@@ -919,3 +952,32 @@ RayTraceResult.plot(
 ```
 
 Plot the ray paths (depth increasing downward).
+
+## VolumeAbsorption
+
+```python
+VolumeAbsorption(
+    model: str,
+    temperature: float = 10.0,
+    salinity: float = 35.0,
+    ph: float = 8.0,
+)
+```
+
+Seawater volume absorption: a model and the water it is evaluated in.
+
+The same models, spelled the same way, as
+[`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption);
+[`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) evaluates the coefficient once, at the source
+frequency and the source depth, and charges it along each beam's own arc
+length (Jensen Eq. 3.116). Passing the bare model name to the solver is
+the same as passing this class with its defaults.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `model` | `"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`. |
+| `temperature` | Temperature `T`, in degrees Celsius. |
+| `salinity` | Salinity `S`, in parts per thousand. |
+| `ph` | Acidity (Thorp ignores it always). |
