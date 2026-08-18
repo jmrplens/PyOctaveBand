@@ -61,6 +61,7 @@ kilobytes of header reads.
 
 from __future__ import annotations
 
+import os
 import struct
 from dataclasses import dataclass
 from pathlib import Path
@@ -516,10 +517,33 @@ def _read_wave_header(fh: BinaryIO, path: str | Path) -> str:
     return containers[fourcc]
 
 
+def _check_chunk_extent(
+    chunk_id: bytes, size: int, offset: int, file_size: int, path: str | Path
+) -> None:
+    """Refuse a chunk whose declared payload runs past the end of the file.
+
+    Checked before a byte of the payload is read or skipped: a truncated
+    file or a lying size field must produce this clear refusal, not a
+    short read interpreted somewhere deep inside a field parser (or, for
+    a skipped chunk, a seek past EOF that silently succeeds). The pad
+    byte is deliberately not demanded: some writers omit the final pad
+    of an odd last chunk, and the payload itself is whole either way.
+    """
+    if offset + size > file_size:
+        raise ValueError(
+            f"{path}: chunk {chunk_id!r} claims {size} bytes but only "
+            f"{file_size - offset} remain in the file"
+        )
+
+
 def _read_chunk_payload(
     fh: BinaryIO, chunk_id: bytes, size: int, path: str | Path
 ) -> bytes:
-    """Read one chunk's payload whole, honouring RIFF word alignment."""
+    """Read one chunk's payload whole, honouring RIFF word alignment.
+
+    The extent was already checked against the file size; the short-read
+    guard stays for the race where the file shrinks under the walker.
+    """
     payload = fh.read(size)
     if len(payload) < size:
         raise ValueError(
@@ -545,6 +569,13 @@ def _true_data_size(
     return ds64.data_size
 
 
+#: Chunk kinds whose payload the walker decodes. Everything else is
+#: skipped by seeking, never read: a ``JUNK`` (or any unknown) chunk can
+#: legitimately be huge, and loading it would break the walker's promise
+#: that header inspection costs kilobytes whatever the file size.
+_DECODED_CHUNKS = frozenset({b"fmt ", b"ds64", b"bext", b"fact", b"cue "})
+
+
 @dataclass
 class _WalkedChunks:
     """The non-``data`` chunks gathered so far, mutable while walking."""
@@ -557,7 +588,7 @@ class _WalkedChunks:
     has_ixml: bool = False
 
     def absorb(self, chunk_id: bytes, payload: bytes, path: str | Path) -> None:
-        """Decode one chunk into its slot; unknown kinds pass in silence."""
+        """Decode one chunk of :data:`_DECODED_CHUNKS` into its slot."""
         if chunk_id == b"fmt ":
             self.fmt = _parse_fmt(payload)
         elif chunk_id == b"ds64":
@@ -568,8 +599,6 @@ class _WalkedChunks:
             self.fact_frames = _parse_fact(payload, path)
         elif chunk_id == b"cue ":
             self.cue_points = _parse_cue(payload)
-        elif chunk_id == b"iXML":
-            self.has_ixml = True
 
 
 def parse_wav_chunks(path: str | Path) -> WavChunks:
@@ -580,21 +609,29 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
     presence of ``iXML`` are decoded; the ``data`` payload is located
     (offset and true size, resolved through ``ds64`` when the 32-bit field
     holds the RF64 sentinel 0xFFFFFFFF) but never read, so the cost is
-    independent of file size. Unknown chunks are skipped without comment:
-    unlike :func:`scipy.io.wavfile.read` there is nothing to warn about,
-    because nothing understood is being dropped.
+    independent of file size. Unknown chunks are skipped without comment
+    (unlike :func:`scipy.io.wavfile.read` there is nothing to warn about,
+    because nothing understood is being dropped) and without being read,
+    so a huge ``JUNK`` or ``iXML`` costs a seek, not its size in memory.
+    Every chunk's declared extent except ``data``'s is checked against
+    the file size before its payload is touched, so a truncated file or
+    a lying size field refuses loudly up front; the ``data`` extent is
+    exempt on purpose (describing a header-only forgery is a feature the
+    tests rely on) and is verified by the sample readers instead.
 
     :param path: The file to walk.
     :return: The decoded headers as a :class:`WavChunks`.
     :raises ValueError: If the file is not RIFF/RF64/BW64 + WAVE, a
-        mandatory chunk is missing or malformed, or an RF64 file lacks the
-        ``ds64`` its data size lives in.
+        mandatory chunk is missing or malformed, a non-``data`` chunk
+        declares more bytes than the file holds, or an RF64 file lacks
+        the ``ds64`` its data size lives in.
     """
     seen = _WalkedChunks()
     data_offset: int | None = None
     data_size: int | None = None
 
     with Path(path).open("rb") as fh:
+        file_size = os.fstat(fh.fileno()).st_size
         container = _read_wave_header(fh, path)
         while True:
             chunk_header = fh.read(8)
@@ -606,12 +643,25 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
                 size = _true_data_size(size, container, seen.ds64, path)
                 data_offset = fh.tell()
                 data_size = size
-                # Seek, never read: the payload may be gigabytes.
+                # Seek, never read: the payload may be gigabytes. Its
+                # extent is deliberately not checked against the file
+                # either -- info() on a header-only forgery is a feature,
+                # and the sample readers verify the payload before
+                # decoding a frame of it.
                 fh.seek(size + size % 2, 1)
                 continue
-            seen.absorb(
-                chunk_id, _read_chunk_payload(fh, chunk_id, size, path), path
-            )
+            _check_chunk_extent(chunk_id, size, fh.tell(), file_size, path)
+            if chunk_id in _DECODED_CHUNKS:
+                seen.absorb(
+                    chunk_id, _read_chunk_payload(fh, chunk_id, size, path),
+                    path,
+                )
+                continue
+            if chunk_id == b"iXML":
+                seen.has_ixml = True
+            # Skipped, not read: unknown chunks (and iXML, kept only as a
+            # presence flag) can be arbitrarily large.
+            fh.seek(size + size % 2, 1)
 
     if seen.fmt is None:
         raise ValueError(f"{path}: no fmt chunk found")

@@ -24,6 +24,7 @@ from wav_forge import (
     riff_wave,
 )
 
+from phonometry.io import _chunks
 from phonometry.io._chunks import WAVE_FORMAT_IMA_ADPCM, parse_wav_chunks
 
 TONE = np.array([0, 8000, -8000, 32000], dtype=np.int64)
@@ -337,6 +338,36 @@ def test_odd_sized_chunk_keeps_the_walker_aligned(tmp_path: Path) -> None:
     assert parsed.frames == TONE.size
 
 
+def test_skipped_chunks_are_seeked_past_never_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unknown chunks and iXML cost a seek, not their size in memory.
+
+    The walker's promise is that header inspection costs kilobytes
+    whatever the file holds; a recorder's multi-megabyte JUNK padding or
+    iXML production dump must therefore be stepped over, with only the
+    decoded kinds ever read whole.
+    """
+    read_ids: list[bytes] = []
+    original = _chunks._read_chunk_payload
+
+    def spy(fh: object, chunk_id: bytes, size: int, path: object) -> bytes:
+        read_ids.append(chunk_id)
+        return original(fh, chunk_id, size, path)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(_chunks, "_read_chunk_payload", spy)
+    image = pcm_wav(
+        TONE,
+        extra_chunks=chunk(b"JUNK", bytes(1 << 16)) + chunk(b"iXML", b"<x/>"),
+    )
+    parsed = parse_wav_chunks(_write(tmp_path, image))
+    assert parsed.has_ixml
+    assert parsed.frames == TONE.size
+    assert b"JUNK" not in read_ids
+    assert b"iXML" not in read_ids
+    assert b"fmt " in read_ids
+
+
 def test_data_before_metadata_chunks_is_still_walked(tmp_path: Path) -> None:
     """Chunks after ``data`` (where some recorders put bext) are reached."""
     image = riff_wave(
@@ -359,7 +390,19 @@ def test_data_before_metadata_chunks_is_still_walked(tmp_path: Path) -> None:
         (riff_wave(chunk(b"fmt ", fmt_payload()[:8])), "at least 16"),
         (
             riff_wave(chunk(b"bext", bytes(4), declared_size=4000)),
-            "file ends after",
+            "remain in the file",
+        ),
+        (
+            riff_wave(
+                chunk(b"fmt ", fmt_payload()),
+                chunk(b"data", b"\x00\x00"),
+                chunk(b"JUNK", bytes(4), declared_size=4000),
+            ),
+            "remain in the file",
+        ),
+        (
+            riff_wave(chunk(b"fmt ", fmt_payload()[:8], declared_size=16)),
+            "remain in the file",
         ),
         (
             riff_wave(
@@ -388,7 +431,8 @@ def test_data_before_metadata_chunks_is_still_walked(tmp_path: Path) -> None:
         ),
     ],
     ids=["junk-form", "junk-fourcc", "no-data", "no-fmt", "short-fmt",
-         "truncated-chunk", "short-cue", "short-ds64", "short-fact"],
+         "truncated-chunk", "overdeclared-skipped-chunk", "truncated-fmt",
+         "short-cue", "short-ds64", "short-fact"],
 )
 def test_malformed_files_fail_loudly(
     tmp_path: Path, image: bytes, match: str
