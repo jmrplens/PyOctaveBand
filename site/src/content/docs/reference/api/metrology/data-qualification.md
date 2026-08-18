@@ -76,8 +76,8 @@ expectations.
 
 ```python
 level_crossing_rate(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     levels: NDArray[np.float64] | list[float] | None = None,
     nperseg: int | None = None,
@@ -108,8 +108,8 @@ miss crossings between samples.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, which means `levels` has to be given in the same units, so pascals rather than digital ones, and `sigma` comes out in Pa. The crossing rates themselves are scale-free. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `levels` | Crossing levels in signal units about the mean (default: 13 levels evenly spaced over +-3 RMS). |
 | `nperseg` | Welch segment length for the spectral moments (default: the [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density) default). |
 
@@ -183,8 +183,8 @@ Plot measured crossing rates against the Rice curve.
 
 ```python
 peak_statistics(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     nperseg: int | None = None,
 ) -> PeakStatisticsResult
@@ -212,8 +212,8 @@ record to the physically meaningful band first.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so `sigma` comes out in Pa. The peak heights are standardized by it, so they and the rates do not move. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `nperseg` | Welch segment length for the spectral moments (default: the [`power_spectral_density`](/phonometry/reference/api/signals/spectra/#power_spectral_density) default). |
 
 **Returns:** A [`PeakStatisticsResult`](/phonometry/reference/api/metrology/data-qualification/#peakstatisticsresult).
@@ -329,8 +329,8 @@ Plot the empirical peak exceedance against the Rice curves.
 
 ```python
 stationarity_test(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     n_segments: int = 20,
     statistic: str = 'mean_square',
@@ -361,8 +361,8 @@ segment must remain long against the record's lowest frequencies.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the per-segment values come out in Pa² for the squared statistics (`'mean_square'`, the default, and `'variance'`) and in Pa for `'rms'` and `'mean'`. The verdict, the bounds and the p-value are scale-free. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `n_segments` | Number of equal intervals (default 20, as in B&P Example 10.3); at least 10, at most the record length in samples. |
 | `statistic` | Per-segment statistic: `"mean_square"` (default, the book's choice), `"rms"`, `"mean"` or `"variance"`. |
 | `method` | Trend test: `"reverse_arrangements"` (default) or `"runs"`. |

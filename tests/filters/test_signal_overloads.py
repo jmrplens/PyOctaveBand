@@ -4,8 +4,9 @@ Every public filter takes a ``phonometry.io.Signal`` in place of ``(x, fs)``.
 
 The contract is the one ``signals.levels`` established and
 ``phonometry.io._resolve`` now holds for the whole library: the
-object's rate wins and a disagreeing explicit one raises, a bare array still
-demands its rate by name, and a calibrated Signal is filtered in pascals.
+object supplies the rate when ``fs`` is omitted and a disagreeing explicit
+one raises, a bare array still demands its rate by name, and a calibrated
+Signal is filtered in pascals.
 
 Every equality below is exact (``==`` / :func:`numpy.array_equal`, not
 ``approx``): the overload must resolve to the identical bare-array call, never

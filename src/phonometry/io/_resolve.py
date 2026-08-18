@@ -8,9 +8,9 @@ object read from a measurement file already knows its sample rate and,
 when calibrated, its digital-to-pascal factor, so asking the caller to
 repeat either is asking for a transcription error. The helpers here are
 that contract, in one place, so that the surfaces adopting it cannot
-drift apart. ``signals.levels`` and ``filters`` are on it; the rest of
-the library still takes the bare pair, and moves over surface by
-surface.
+drift apart. ``signals.levels``, ``filters`` and ``signals`` are on it;
+the rest of the library still takes the bare pair, and moves over
+surface by surface.
 
 They live beside :class:`Signal` rather than in ``_internal`` because that
 tree is a leaf every package may import: a resolver there would have to
@@ -155,3 +155,57 @@ def resolve_samples(x: SignalInput, *, calibrate: bool = True) -> np.ndarray:
     if calibrate and x.calibration_factor is not None:
         return samples * x.calibration_factor
     return samples
+
+
+def apply_calibration(x: SignalInput, samples: np.ndarray) -> np.ndarray:
+    """Scale already-validated samples to pascals, if *x* carried a factor.
+
+    The two-step sibling of :func:`resolve_samples`, for the functions that
+    validate their input through a checker of their own. Calling
+    :func:`resolve_samples` there instead would route the input through a
+    second coercion and change which complaint a malformed array gets: a
+    0-d input would stop being "must be one-dimensional" and start being
+    "signal too short", for no reason a caller could act on.
+
+    :param x: The signal argument as the caller passed it.
+    :param samples: The validated samples derived from it.
+    :return: The samples, in pascals when the object knew how.
+    """
+    if isinstance(x, Signal) and x.calibration_factor is not None:
+        return samples * x.calibration_factor
+    return samples
+
+
+def resolve_pair_fs[Rate: (int, float)](
+    x: SignalInput,
+    y: SignalInput,
+    fs: Rate | None,
+    *,
+    names: tuple[str, str] = ("x", "y"),
+    rate: str = "fs",
+) -> Rate:
+    """Resolve one sample rate from two signal arguments.
+
+    Two recordings are only comparable at one rate, so two Signals that
+    disagree are refused for the same reason a Signal and an explicit
+    argument are: nothing here can say which of them is the truth, and
+    picking one silently mis-times the result. Either one may be a bare
+    array -- pairing a read measurement with a synthesized reference is
+    the common case -- and then the Signal supplies the rate.
+
+    :param x: The first signal argument.
+    :param y: The second signal argument.
+    :param fs: The explicitly passed rate, or ``None``.
+    :param names: Names of the two signal parameters, for the messages.
+    :param rate: Name of the rate parameter, for the messages.
+    :return: The resolved sample rate.
+    :raises ValueError: On any disagreement, or when nothing knows the rate.
+    """
+    if isinstance(x, Signal) and isinstance(y, Signal) and x.fs != y.fs:
+        raise ValueError(
+            f"'{names[0]}' and '{names[1]}' are Signals recorded at "
+            f"different rates ({x.fs} Hz and {y.fs} Hz); resample one of "
+            "them before comparing them"
+        )
+    known = x if isinstance(x, Signal) else y
+    return resolve_fs(known, fs, name=names[0], rate=rate)

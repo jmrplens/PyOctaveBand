@@ -177,7 +177,7 @@ ventana de Kaiser, a partir de dos números que controla quien llama:
 from phonometry import noise_signal, resample_signal
 
 x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
+res = resample_signal(x, 44100, fs_new=48000)   # 120 dB de rechazo de alias
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # FIR diseñado, 20947.5 Hz
 res.plot()   # el filtro antisolapamiento entregado frente a su especificación
@@ -201,7 +201,7 @@ from scipy import signal
 from phonometry import noise_signal, resample_signal
 
 x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, 48000)   # 120 dB de rechazo de alias
+res = resample_signal(x, 44100, fs_new=48000)   # 120 dB de rechazo de alias
 
 # res es el ResampledSignalResult calculado en el ejemplo de arriba.
 # Una línea: el filtro antisolapamiento entregado frente a su especificación:

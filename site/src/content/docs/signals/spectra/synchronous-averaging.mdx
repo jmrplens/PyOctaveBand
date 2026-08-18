@@ -60,7 +60,7 @@ periodic = (
     - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
 )
 recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-res = time_synchronous_average(recording, fs, period, n_averages=n_avg)
+res = time_synchronous_average(recording, fs, period=period, n_averages=n_avg)
 
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
 t_ms = 1e3 * res.times
@@ -143,7 +143,7 @@ That is a power reduction of $10\log_{10} N$ dB, reported as
 `amplitude_snr_gain`:
 
 ```python
-res = time_synchronous_average(recording, fs, period, n_averages=100)
+res = time_synchronous_average(recording, fs, period=period, n_averages=100)
 res.noise_reduction_db      # 20.0 dB = 10*log10(100)
 res.amplitude_snr_gain      # 10.0   = sqrt(100)
 res.plot()                  # averaged waveform + the comb it applied
@@ -177,7 +177,7 @@ recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
 counts = [1, 2, 4, 8, 16, 32, 64, 128]
 errors = []
 for n in counts:
-    res = time_synchronous_average(recording[:n * samples], fs, period,
+    res = time_synchronous_average(recording[:n * samples], fs, period=period,
                                    n_averages=n)
     errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
 
@@ -228,8 +228,8 @@ average confirms it:
 phase = np.arange(41 * 256) / 256
 recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
 
-leak_20 = time_synchronous_average(recording, fs, period, n_averages=20)
-leak_32 = time_synchronous_average(recording, fs, period, n_averages=32)
+leak_20 = time_synchronous_average(recording, fs, period=period, n_averages=20)
+leak_32 = time_synchronous_average(recording, fs, period=period, n_averages=32)
 # leak_20.period_waveform matches the clean 8th-order tone; leak_32 does not
 ```
 
@@ -315,7 +315,7 @@ fs = 8192.0
 period = 1.0 / 31.7                       # fs * period is not an integer
 t = np.arange(int(40 * period * fs)) / fs
 recording = np.cos(2.0 * np.pi * t / period)  # one cycle per revolution
-res = time_synchronous_average(recording, fs, period)
+res = time_synchronous_average(recording, fs, period=period)
 res.interpolated                          # True: fractional-delay alignment
 res.samples_per_period                    # integer samples of one period
 ```

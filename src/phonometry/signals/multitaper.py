@@ -31,6 +31,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .spectra import (
     _positive,
     _validate_confidence,
@@ -309,8 +311,8 @@ def _chi2_interval_pointwise(
 
 
 def multitaper_psd(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     time_half_bandwidth: float = 4.0,
     n_tapers: int | None = None,
@@ -359,8 +361,13 @@ def multitaper_psd(
     ``'density'`` scaling is spread over
     the resolution bandwidth :math:`2W`).
 
-    :param x: Signal, 1-D (used whole; no segmentation).
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D (used whole; no segmentation). Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the density and its
+        confidence interval come out in Pa²/Hz, or Pa² for
+        ``scaling='spectrum'``.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param time_half_bandwidth: Duration x half-bandwidth product ``NW``
         (dimensionless; default 4, P&W's worked choice). The design
         half-bandwidth is :math:`W = NW f_\mathrm{s} / N` Hz; larger ``NW``
@@ -379,7 +386,7 @@ def multitaper_psd(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     conf = _validate_confidence(confidence)
     nw, k = _validate_multitaper_params(xa.size, time_half_bandwidth, n_tapers)

@@ -34,8 +34,8 @@ of the same record are directly comparable.
 
 ```python
 multitaper_psd(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     time_half_bandwidth: float = 4.0,
     n_tapers: int | None = None,
@@ -90,8 +90,8 @@ the resolution bandwidth $2W$).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D (used whole; no segmentation). |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D (used whole; no segmentation). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the density and its confidence interval come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `time_half_bandwidth` | Duration x half-bandwidth product `NW` (dimensionless; default 4, P&W's worked choice). The design half-bandwidth is $W = NW f_\mathrm{s} / N$ Hz; larger `NW` admits more tapers (lower variance) at the cost of resolution $2W$. |
 | `n_tapers` | Number of tapers `K`; `None` picks $2 NW - 1$ (all tapers with near-unity concentration, P&W Section 7.1). At most the Shannon number $2 NW$. |
 | `adaptive` | Use Thomson's adaptive weights (default) or the eigenvalue-weighted average. |

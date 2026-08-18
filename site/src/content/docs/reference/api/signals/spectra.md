@@ -67,9 +67,9 @@ is [`phonometry.signals.multitaper.multitaper_psd`](/phonometry/reference/api/si
 
 ```python
 coherent_output_spectrum(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = 'hann',
     nperseg: int | None = None,
@@ -98,9 +98,9 @@ the implementation.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input (reference) signal, 1-D. |
-| `y` | Output (response) signal, 1-D, same length as `x`. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Input (reference) signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so all three densities come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. The coherence and the signal-to-noise ratio are ratios and do not move. |
+| `y` | Output (response) signal, 1-D, same length as `x`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so all three densities come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. The coherence and the signal-to-noise ratio are ratios and do not move. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `window` | Segment taper (default Hann). |
 | `nperseg` | Welch segment length; `None` picks a default. |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5). |
@@ -193,9 +193,9 @@ Plot the output/coherent/noise spectra and the spectral SNR.
 
 ```python
 cross_spectral_density(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = 'hann',
     nperseg: int | None = None,
@@ -218,9 +218,9 @@ with the measured coherence in place of the unknown true value.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | First signal, 1-D. |
-| `y` | Second signal, 1-D, same length as `x`. |
-| `fs` | Sample rate, in Hz. |
+| `x` | First signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the cross-spectrum and its magnitude come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. The coherence and the phase are ratios and do not move. |
+| `y` | Second signal, 1-D, same length as `x`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the cross-spectrum and its magnitude come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. The coherence and the phase are ratios and do not move. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `window` | Segment taper (default Hann). |
 | `nperseg` | Welch segment length; `None` picks a default. |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5). |
@@ -348,8 +348,8 @@ are copied unchanged.
 
 ```python
 power_spectral_density(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = 'hann',
     nperseg: int | None = None,
@@ -376,8 +376,8 @@ resolution-bias error at a resonance peak see
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the density and its confidence interval come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `window` | Segment taper (any scipy window name; default Hann, the B&P Section 11.5.2 recommendation for side-lobe suppression). |
 | `nperseg` | Welch segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the resolution bandwidth $B_\mathrm{e}$ further depends on the taper; see [`SpectralDensityResult.resolution_bandwidth`](/phonometry/reference/api/signals/spectra/#spectraldensityresult)). |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5, which with a Hann taper retrieves most of the stability lost to tapering, B&P Section 11.5.2.2). |

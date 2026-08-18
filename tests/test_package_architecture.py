@@ -53,6 +53,9 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     # the caller to repeat either is asking for a transcription error. Same
     # direction as ("signals", "io"), so the graph stays acyclic
     ("filters", "io"),
+    # data qualification runs on the record as read, so it takes the object
+    # the reader returns for the same reason
+    ("metrology", "io"),
 }
 
 

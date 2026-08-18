@@ -59,6 +59,8 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from .._internal.warnings import PhonometryWarning
+from ..io._resolve import apply_calibration, resolve_fs
+from ..io._signal import Signal
 from .spectra import _positive
 
 if TYPE_CHECKING:
@@ -100,7 +102,7 @@ def noise_signal(
     shaped by an exact frequency-domain filter (see the module docstring),
     zero-mean and rescaled to the requested RMS exactly.
 
-    :param fs: Sample rate, in Hz.
+    :param fs: Rate to generate at, in Hz.
     :param seconds: Duration, in seconds (at least 16 samples).
     :param color: Noise color: ``'white'``, ``'pink'``, ``'red'``,
         ``'blue'`` or ``'violet'``.
@@ -154,8 +156,15 @@ def noise_signal(
 
 
 def _validate_1d_finite(
-    x: NDArray[np.float64] | list[float], name: str
+    x: Signal | NDArray[np.float64] | list[float], name: str
 ) -> NDArray[np.float64]:
+    """Coerce, check and calibrate a one-dimensional record.
+
+    The sibling of ``spectra._validate_signal`` for the consumers that do
+    not need its minimum length: same contract, so a
+    :class:`phonometry.io.Signal` arrives in pascals here too and a
+    multichannel one is refused by the same complaint a 2-D array gets.
+    """
     xa = np.asarray(x, dtype=np.float64)
     if xa.ndim != 1:
         raise ValueError(f"'{name}' must be one-dimensional.")
@@ -163,7 +172,7 @@ def _validate_1d_finite(
         raise ValueError(f"'{name}' must have at least 2 samples.")
     if not np.all(np.isfinite(xa)):
         raise ValueError(f"'{name}' must be finite.")
-    return xa
+    return apply_calibration(x, xa)
 
 
 # ---------------------------------------------------------------------------
@@ -314,7 +323,7 @@ def tone_burst(
     481); a :class:`~phonometry.PhonometryWarning` quantifies the
     realized residual.
 
-    :param fs: Sample rate, in Hz.
+    :param fs: Rate to generate at, in Hz.
     :param frequency: Tone frequency, in Hz (below the Nyquist rate).
     :param cycles: Full tone periods per burst (positive integer).
     :param amplitude: Peak amplitude of the tone.
@@ -471,10 +480,10 @@ class ResampledSignalResult:
 
 
 def resample_signal(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
-    fs_new: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
+    fs_new: float,
     stopband_attenuation_db: float = 120.0,
     transition_width: float = 0.05,
     max_denominator: int = 1000,
@@ -491,8 +500,12 @@ def resample_signal(
     the spec is a property of the returned filter, not of a library
     default.
 
-    :param x: Input record, 1-D.
-    :param fs: Sample rate of ``x``, in Hz.
+    :param x: Input record, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the resampled record comes
+        out in Pa.
+    :param fs: Sample rate of ``x``, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fs_new: Target sample rate, in Hz. The ratio ``fs_new/fs``
         must be a rational number with denominator at most
         ``max_denominator`` (e.g. 48000/44100 = 160/147).
@@ -509,7 +522,7 @@ def resample_signal(
     from fractions import Fraction
 
     xa = _validate_1d_finite(x, "x")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     fs_new_v = _positive(fs_new, "fs_new")
     atten = float(stopband_attenuation_db)
     if not np.isfinite(atten) or atten < 30.0:
@@ -612,7 +625,7 @@ def _fractional_advance(
 
 
 def fractional_delay(
-    x: NDArray[np.float64] | list[float],
+    x: Signal | NDArray[np.float64] | list[float],
     delay: float,
     *,
     mode: Literal["linear", "circular"] = "linear",
@@ -644,7 +657,9 @@ def fractional_delay(
     keep the signal band-limited below Nyquist - as any properly sampled
     signal is - or use odd lengths, and the operation is exact.
 
-    :param x: Input record, 1-D.
+    :param x: Input record, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the delayed record comes
+        out in Pa.
     :param delay: Delay in samples (fractional and negative allowed);
         magnitude less than the record length.
     :param mode: Boundary convention, ``'linear'`` or ``'circular'``.

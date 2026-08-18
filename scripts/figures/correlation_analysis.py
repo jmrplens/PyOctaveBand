@@ -190,7 +190,7 @@ def generate_synchronous_average(output_dir: str) -> None:
         - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
     )
     signal = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-    res = time_synchronous_average(signal, fs, period, n_averages=n_avg)
+    res = time_synchronous_average(signal, fs, period=period, n_averages=n_avg)
     true_one = periodic[:m]
 
     _fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
@@ -510,7 +510,7 @@ def generate_tsa_noise_reduction(output_dir: str) -> None:
     counts = [1, 2, 4, 8, 16, 32, 64, 128]
     errors = []
     for n in counts:
-        res = time_synchronous_average(x[: n * samples], fs, period,
+        res = time_synchronous_average(x[: n * samples], fs, period=period,
                                        n_averages=n)
         errors.append(float(np.sqrt(np.mean(
             (res.period_waveform - true) ** 2))))

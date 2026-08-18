@@ -387,7 +387,7 @@ def _chk_zoom_fft_demodulation_chain() -> Outcome:
     n = 4096
     t = np.arange(n) / fs
     x = 0.7 * np.cos(2.0 * np.pi * 1100.0 * t + 0.3)
-    res = ph.zoom_fft(x, fs, 1000.0, 1256.0, n_points=257, window="boxcar")
+    res = ph.zoom_fft(x, fs, f_min=1000.0, f_max=1256.0, n_points=257, window="boxcar")
     peak = int(np.argmax(res.amplitude))
     # Eqs. (11.128)-(11.130): demodulate by exp(-j*2*pi*1000*t), decimate
     # by d = fs/(2B) = 16 and read bin 50 ((1100-1000) Hz / 2 Hz) of the
@@ -634,7 +634,7 @@ def _chk_tsa_exact_recovery() -> Outcome:
     one = np.cos(2.0 * np.pi * phase) + 0.5 * np.cos(
         2.0 * np.pi * 3.0 * phase + 0.4
     )
-    res = ph.time_synchronous_average(np.tile(one, 24), fs, period)
+    res = ph.time_synchronous_average(np.tile(one, 24), fs, period=period)
     err = float(np.max(np.abs(res.period_waveform - one)))
     return numeric(0.0, err, 1e-10, places=12)
 
@@ -654,7 +654,7 @@ def _chk_tsa_sqrt_n_law() -> Outcome:
     rng = np.random.default_rng(2024)
     noise = rng.standard_normal(n_avg * m)
     res = ph.time_synchronous_average(
-        np.tile(one, n_avg) + noise, fs, period, n_averages=n_avg
+        np.tile(one, n_avg) + noise, fs, period=period, n_averages=n_avg
     )
     measured = float(np.std(res.period_waveform - one))
     return numeric(1.0 / math.sqrt(n_avg), measured, 0.15, rel=True, places=5)

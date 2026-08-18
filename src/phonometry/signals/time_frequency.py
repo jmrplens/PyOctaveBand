@@ -55,6 +55,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .spectra import (
     _DEFAULT_OVERLAP,
     _noverlap_samples,
@@ -160,8 +162,8 @@ class SpectrogramResult:
 
 
 def spectrogram(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = "hann",
     nperseg: int | None = None,
@@ -194,8 +196,12 @@ def spectrogram(
     structure -
     tones, sweeps, transients - not a low-variance spectral estimator.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so every frame's power come out in
+        Pa²/Hz, or Pa² for ``scaling='spectrum'``.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param window: Segment taper (any scipy window name; default Hann).
     :param nperseg: Segment length; ``None`` picks a length giving a bin
         spacing of at most 4 Hz (the Welch-module default).
@@ -205,7 +211,7 @@ def spectrogram(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x", context="a spectrogram")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
     nov = _noverlap_samples(seg, ovl)
@@ -301,11 +307,11 @@ class ZoomFFTResult:
 
 
 def zoom_fft(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     f_min: float,
     f_max: float,
-    *,
     n_points: int | None = None,
     window: str = "hann",
 ) -> ZoomFFTResult:
@@ -331,8 +337,12 @@ def zoom_fft(
     taper): the zoom refines the *grid*; only a longer record separates
     tones closer than :math:`B_\mathrm{e}` (Eq. 11.127).
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the spectrum and its
+        amplitude come out in Pa and the power in Pa².
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param f_min: Lower edge of the zoom band, in Hz (:math:`\ge 0`).
     :param f_max: Upper edge of the zoom band, in Hz (:math:`\le f_\mathrm{s}/2`).
     :param n_points: Grid points across ``[f_min, f_max]`` (endpoints
@@ -346,7 +356,7 @@ def zoom_fft(
     from scipy import signal as sp_signal
 
     xa = _validate_signal(x, "x", context="a zoom FFT")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     lo = float(f_min)
     hi = float(f_max)
     if not 0.0 <= lo < hi <= fs_v / 2.0:

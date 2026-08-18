@@ -58,9 +58,9 @@ $n_\mathrm{d} - (q-1)$ (Eqs. 9.98/9.99).
 
 ```python
 miso_coherence(
-    inputs: Sequence[NDArray[np.float64] | list[float]] | NDArray[np.float64],
-    output: NDArray[np.float64] | list[float],
-    fs: float,
+    inputs: Signal | Sequence[Signal | NDArray[np.float64] | list[float]] | NDArray[np.float64],
+    output: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     order: Sequence[int] | None = None,
     window: str = 'hann',
@@ -97,9 +97,9 @@ ordering the inputs by descending ordinary coherence with the output.
 
 | Name | Description |
 | :--- | :--- |
-| `inputs` | The `q` input records (`q >= 2`), a sequence of equal-length 1-D arrays or a 2-D `(q, n)` array. |
-| `output` | The output record, 1-D, same length as the inputs. |
-| `fs` | Sample rate, in Hz. |
+| `inputs` | The `q` input records (`q >= 2`), a sequence of equal-length 1-D arrays or a 2-D `(q, n)` array. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) whose channels are the records, or a sequence with Signals among its elements; their calibration is applied to the samples, and Signals recorded at different rates are refused rather than arbitrated. |
+| `output` | The output record, 1-D, same length as the inputs. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the output autospectrum and the coherent output spectra come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. Every coherence is a ratio and does not move. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `order` | Conditioning order as input indices (default `0..q-1`). |
 | `window` | Segment taper (default Hann). |
 | `nperseg` | Welch segment length; `None` picks a default. |

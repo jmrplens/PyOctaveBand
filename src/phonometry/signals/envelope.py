@@ -53,6 +53,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .spectra import _positive, _validate_signal
 
 if TYPE_CHECKING:
@@ -130,8 +132,8 @@ def _decimate_envelope(
 
 
 def envelope(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     decimation_factor: int = 1,
     antialias: bool = True,
@@ -157,8 +159,13 @@ def envelope(
     unwrapping and differentiated at full rate, are subsampled onto the
     same time axis.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the envelope and the
+        carried waveform come out in Pa. The phase and the instantaneous
+        frequency do not move.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param decimation_factor: Integer output decimation (default 1: off).
     :param antialias: Anti-alias filter the decimated envelope (default
         ``True``).
@@ -168,7 +175,7 @@ def envelope(
     from scipy import signal as sp_signal
 
     xa = _validate_signal(x, "x", context="envelope analysis")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     factor = int(decimation_factor)
     if factor < 1:
         raise ValueError("'decimation_factor' must be a positive integer.")
@@ -297,8 +304,8 @@ def _bandpass_pre_filter(
 
 
 def envelope_spectrum(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     kind: str = "magnitude",
     window: str = "hann",
@@ -343,8 +350,14 @@ def envelope_spectrum(
     record is band-pass filtered (zero-phase, so the modulation phase is
     untouched) before the detector, the Figure 13.11 front end.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the envelope, its spectral
+        amplitude and the mean level come out in Pa under the default
+        ``kind='magnitude'``, and in Pa² under ``'squared'``, which squares
+        the envelope before transforming it.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param kind: ``"magnitude"`` (default) or ``"squared"``.
     :param window: Taper (any scipy window name; default Hann). The
         amplitude is corrected for the taper's coherent gain.
@@ -365,7 +378,7 @@ def envelope_spectrum(
     from scipy import signal as sp_signal
 
     xa = _validate_signal(x, "x", context="an envelope spectrum")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     if kind not in ("magnitude", "squared"):
         raise ValueError(
             f"'kind' must be 'magnitude' or 'squared', got {kind!r}."

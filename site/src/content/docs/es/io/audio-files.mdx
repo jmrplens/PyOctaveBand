@@ -89,23 +89,52 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 El objeto sustituye al array desnudo en cualquier parte: `np.asarray(sig)`
 entrega las muestras (1D para un canal, `(canales, muestras)` para varios),
 así que toda función `(x, fs, ...)` de la biblioteca ya lo admite en lugar
-del array, pasando la frecuencia igualmente al lado. Las
-funciones de nivel (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
-`sound_exposure` y `lex_8h`) y los filtros (`octave_filter`,
-`weighting_filter`, `time_weighting`, `linkwitz_riley`, `parametric_eq`, y los
-objetos de proceso por bloques `OctaveFilterBank`, `WeightingFilter`,
-`TimeWeighting` y `ParametricEQ`) van más allá y aceptan el propio
-`Signal`: el objeto ya conoce su frecuencia y su calibración, y pedirte que
-repitas cualquiera de las dos es pedir un error de transcripción. La frecuencia
-que lleva manda, y una explícita que discrepe lanza en vez de arbitrarse.
+del array, pasando la frecuencia igualmente al lado. Buena parte de la
+biblioteca va más allá y acepta el propio `Signal`: el objeto ya conoce su
+frecuencia y su calibración, y pedirte que repitas cualquiera de las dos es
+pedir un error de transcripción. El objeto pone la frecuencia cuando se omite
+`fs`, y una `fs` explícita que discrepe lanza en vez de arbitrarse. Eso abarca las funciones
+de nivel (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure` y
+`lex_8h`), los filtros (`octave_filter`, `weighting_filter`, `time_weighting`,
+`linkwitz_riley`, `parametric_eq`, y los objetos de proceso por bloques
+`OctaveFilterBank`, `WeightingFilter`, `TimeWeighting` y `ParametricEQ`), y
+los estimadores de `signals`: espectros (`power_spectral_density`,
+`cross_spectral_density`, `coherent_output_spectrum`, `multitaper_psd`,
+`miso_coherence`), tiempo-frecuencia (`spectrogram`, `zoom_fft`), correlación
+y retardo (`correlation`, `time_delay`, `impulse_response_delay`,
+`align_impulse_responses`), envolvente (`envelope`, `envelope_spectrum`),
+cepstrum (`cepstrum`, `lifter`, `echo_detection`),
+`time_synchronous_average`, `regularized_inverse_filter`, `resample_signal` y
+`fractional_delay`, junto con las pruebas de cualificación de datos de
+`metrology` (`stationarity_test`, `level_crossing_rate`, `peak_statistics`).
 
-Un `Signal` calibrado se *procesa* en pascales, que es una sola regla con tres
-lecturas según lo que devuelva la llamada: `weighting_filter`, `linkwitz_riley`
-y `parametric_eq` devuelven una forma de onda, y esa forma de onda va en
-pascales; `time_weighting` eleva su entrada al cuadrado, así que su envolvente
-va en Pa²; y `octave_filter` y las funciones de nivel devuelven un nivel, así
-que lo que compra ahí la calibración es dB SPL re 20 µPa en vez de un número en
-unidades digitales. Las rutas `dbfs` son la excepción deliberada: su referencia
+Un `Signal` calibrado se *procesa* en pascales. Es una sola regla, pero no una
+sola unidad: lo que compra la calibración depende de lo que devuelva la
+llamada.
+
+| Lo que devuelve la llamada | Unidades con un `Signal` calibrado |
+| :--- | :--- |
+| Una forma de onda: `weighting_filter`, `linkwitz_riley`, `parametric_eq`, `envelope`, `time_synchronous_average`, `resample_signal`, `fractional_delay`, `align_impulse_responses` | Pa |
+| Una envolvente al cuadrado: `time_weighting` | Pa² |
+| Un nivel: `octave_filter`, `OctaveFilterBank` y las funciones de nivel | dB SPL re 20 µPa |
+| Una densidad espectral: `power_spectral_density`, `cross_spectral_density`, `coherent_output_spectrum`, `multitaper_psd`, `spectrogram`, `miso_coherence` | Pa²/Hz, o Pa² con `scaling='spectrum'` |
+| Una correlación: `correlation` | Pa² |
+| Un espectro de amplitud: `zoom_fft`, `envelope_spectrum` | Pa |
+| Un filtro inverso: `regularized_inverse_filter` | 1/Pa |
+
+Las razones y los tiempos no tienen escala y no se mueven en absoluto: toda
+coherencia, todo coeficiente de correlación normalizado, toda fase y todo
+retardo en segundos o en muestras, y por eso `time_delay`,
+`impulse_response_delay` y `echo_detection` devuelven con un `Signal`
+calibrado exactamente lo mismo que con el registro crudo. El cepstrum es el
+caso raro, por ser una transformada del espectro logarítmico: el factor cae
+entero sobre la quefrencia cero y deja intacta cualquier otra, así que
+`lifter` desplaza sus dos espectros en dB en 20 lg del factor y no mueve nada
+más. `level_crossing_rate` es el que te pide algo: sus `levels` se comparan
+con las muestras, así que con un `Signal` calibrado hay que darlos en
+pascales.
+
+Las rutas `dbfs` son la excepción deliberada: su referencia
 es el fondo de escala, así que ignoran el factor. Por eso mismo no encadenes un
 filtro con una lectura en dBFS: `leq(weighting_filter(sig, curve="A"),
 dbfs=True)` mide en pascales una escala que dice ser de fondo de escala, y

@@ -58,8 +58,8 @@ square) - consistent with the `'spectrum'` scaling of the Welch module.
 
 ```python
 spectrogram(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = 'hann',
     nperseg: int | None = None,
@@ -98,8 +98,8 @@ tones, sweeps, transients - not a low-variance spectral estimator.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so every frame's power come out in Pa²/Hz, or Pa² for `scaling='spectrum'`. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `window` | Segment taper (any scipy window name; default Hann). |
 | `nperseg` | Segment length; `None` picks a length giving a bin spacing of at most 4 Hz (the Welch-module default). |
 | `overlap` | Segment overlap fraction in [0, 1) (default 0.5). |
@@ -174,11 +174,11 @@ Plot the spectrogram in dB over the time-frequency plane.
 
 ```python
 zoom_fft(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     f_min: float,
     f_max: float,
-    *,
     n_points: int | None = None,
     window: str = 'hann',
 ) -> ZoomFFTResult
@@ -210,8 +210,8 @@ tones closer than $B_\mathrm{e}$ (Eq. 11.127).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the spectrum and its amplitude come out in Pa and the power in Pa². |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `f_min` | Lower edge of the zoom band, in Hz ($\ge 0$). |
 | `f_max` | Upper edge of the zoom band, in Hz ($\le f_\mathrm{s}/2$). |
 | `n_points` | Grid points across `[f_min, f_max]` (endpoints included); `None` places one point per record-length resolution $f_\mathrm{s}/N$. |

@@ -57,6 +57,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import resolve_fs, resolve_pair_fs
+from ..io._signal import Signal
 from .spectra import (
     _coherence_from_spectra,
     _noverlap_samples,
@@ -213,9 +215,9 @@ class CorrelationResult:
 
 
 def correlation(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float] | None = None,
-    fs: float = 1.0,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float] | None = None,
+    fs: float | None = None,
     *,
     normalization: _Normalization = "unbiased",
     max_lag: float | None = None,
@@ -241,9 +243,18 @@ def correlation(
       = \hat{C}_{xy}(\tau)/(\sigma_x \sigma_y) \in [-1, 1]` over the
       mean-removed records (Eq. 5.16).
 
-    :param x: First signal, 1-D.
-    :param y: Second signal, same length, or ``None`` for autocorrelation.
-    :param fs: Sample rate, in Hz.
+    :param x: First signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the correlation values
+        come out in Pa². The normalized ``coefficient`` divides them out and
+        does not move.
+    :param y: Second signal, same length, or ``None`` for autocorrelation. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the correlation values
+        come out in Pa². The normalized ``coefficient`` divides them out and
+        does not move.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param normalization: See above (default ``'unbiased'``).
     :param max_lag: Largest lag magnitude to keep, in seconds (default:
         the full ``N-1`` samples).
@@ -259,6 +270,14 @@ def correlation(
     )
     if xa.size != ya.size:
         raise ValueError("'x' and 'y' must have the same length.")
+    if isinstance(x, Signal) or isinstance(y, Signal):
+        fs = resolve_pair_fs(x, x if y is None else y, fs)
+    elif fs is None:
+        # The one place a bare pair may omit the rate: unlike every other
+        # estimate here, a correlation with no rate is still meaningful --
+        # its lag axis is in samples. That default predates the Signal and
+        # is kept, so `correlation(a, b)` reads exactly as it always did.
+        fs = 1.0
     fs_v = _positive(fs, "fs")
     n = xa.size
 
@@ -666,9 +685,9 @@ def _gcc_curve(
 
 
 def time_delay(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     method: _Method = "gcc",
     weighting: _Weighting = "phat",
@@ -724,9 +743,18 @@ def time_delay(
     peak-location uncertainty (Eq. 8.129) and its :math:`\pm 2\sigma`
     interval (Eq. 8.130).
 
-    :param x: Reference record, 1-D.
-    :param y: Delayed record, 1-D, same length.
-    :param fs: Sample rate, in Hz.
+    :param x: Reference record, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, though a delay is scale-free:
+        the Signal is taken here for the rate it carries, and nothing in the
+        result moves with the factor.
+    :param y: Delayed record, 1-D, same length. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, though a delay is scale-free:
+        the Signal is taken here for the rate it carries, and nothing in the
+        result moves with the factor.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param method: ``'gcc'`` (default), ``'direct'`` or ``'phase'``.
     :param weighting: GCC weighting (default ``'phat'``; ignored
         otherwise).
@@ -744,6 +772,7 @@ def time_delay(
     """
     xa = _validate_signal(x, "x", context="a time-delay estimate")
     ya = _validate_signal(y, "y", context="a time-delay estimate")
+    fs = resolve_pair_fs(x, y, fs)
     if xa.size != ya.size:
         raise ValueError("'x' and 'y' must have the same length.")
     if float(np.std(xa)) <= 0.0 or float(np.std(ya)) <= 0.0:
@@ -812,10 +841,10 @@ def time_delay(
 
 
 def impulse_response_delay(
-    ir: NDArray[np.float64] | list[float],
-    fs: float,
+    ir: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
-    reference: NDArray[np.float64] | list[float] | None = None,
+    reference: Signal | NDArray[np.float64] | list[float] | None = None,
     interpolation: _Interpolation = "parabolic",
     upsample: int = 8,
 ) -> float:
@@ -836,16 +865,27 @@ def impulse_response_delay(
     (about 1e-3 samples for a :math:`0.4 f_\mathrm{s}` band-limited pulse at the
     default ``upsample=8``).
 
-    :param ir: Impulse response, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param ir: Impulse response, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, though a delay is scale-free:
+        nothing in the result moves with the factor.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param reference: Optional reference IR (same length) the delay is
-        measured against.
+        measured against. Accepts a :class:`phonometry.io.Signal`, which may
+        be the side that supplies ``fs``; a delay is scale-free, so its
+        calibration does not move the result.
     :param interpolation: ``'parabolic'`` (default) or ``'none'``.
     :param upsample: Integer local-upsampling factor (default 8).
     :return: Delay in seconds (relative to :math:`t = 0` or to ``reference``).
     :raises ValueError: If the inputs or parameters are invalid.
     """
     ira = _validate_signal(ir, "ir", context=_DELAY_CONTEXT)
+    if reference is None:
+        fs = resolve_fs(ir, fs, name="ir")
+    else:
+        fs = resolve_pair_fs(ir, reference, fs, names=("ir", "reference"))
     fs_v = _positive(fs, "fs")
     factor = _validate_refinement(interpolation, upsample)
     if reference is not None:
@@ -896,9 +936,9 @@ class AlignedImpulseResponseResult:
 
 
 def align_impulse_responses(
-    ir: NDArray[np.float64] | list[float],
-    reference: NDArray[np.float64] | list[float],
-    fs: float,
+    ir: Signal | NDArray[np.float64] | list[float],
+    reference: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     interpolation: _Interpolation = "parabolic",
     upsample: int = 8,
@@ -911,9 +951,16 @@ def align_impulse_responses(
     zero-padded record). Use it to average IR ensembles or to compare
     measurements taken at slightly different distances.
 
-    :param ir: Impulse response to align, 1-D.
-    :param reference: Reference impulse response, same length.
-    :param fs: Sample rate, in Hz.
+    :param ir: Impulse response to align, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the aligned pair comes out
+        in Pa. The delay between them is scale-free and does not move.
+    :param reference: Reference impulse response, same length. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the aligned pair comes out
+        in Pa. The delay between them is scale-free and does not move.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param interpolation: ``'parabolic'`` (default) or ``'none'``.
     :param upsample: Integer local-upsampling factor (default 8).
     :return: An :class:`AlignedImpulseResponseResult`.
@@ -925,7 +972,7 @@ def align_impulse_responses(
     )
     if ira.size != refa.size:
         raise ValueError("'ir' and 'reference' must have the same length.")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_pair_fs(ir, reference, fs, names=("ir", "reference")), "fs")
     delay = impulse_response_delay(
         ira, fs_v, reference=refa, interpolation=interpolation,
         upsample=upsample,

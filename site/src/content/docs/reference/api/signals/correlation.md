@@ -57,9 +57,9 @@ consistent bin by bin.
 
 ```python
 align_impulse_responses(
-    ir: NDArray[np.float64] | list[float],
-    reference: NDArray[np.float64] | list[float],
-    fs: float,
+    ir: Signal | NDArray[np.float64] | list[float],
+    reference: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     interpolation: _Interpolation = 'parabolic',
     upsample: int = 8,
@@ -78,9 +78,9 @@ measurements taken at slightly different distances.
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Impulse response to align, 1-D. |
-| `reference` | Reference impulse response, same length. |
-| `fs` | Sample rate, in Hz. |
+| `ir` | Impulse response to align, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the aligned pair comes out in Pa. The delay between them is scale-free and does not move. |
+| `reference` | Reference impulse response, same length. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the aligned pair comes out in Pa. The delay between them is scale-free and does not move. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `interpolation` | `'parabolic'` (default) or `'none'`. |
 | `upsample` | Integer local-upsampling factor (default 8). |
 
@@ -139,9 +139,9 @@ Plot the reference and the aligned impulse response.
 
 ```python
 correlation(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float] | None = None,
-    fs: float = 1.0,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float] | None = None,
+    fs: float | None = None,
     *,
     normalization: _Normalization = 'unbiased',
     max_lag: float | None = None,
@@ -172,9 +172,9 @@ Normalizations:
 
 | Name | Description |
 | :--- | :--- |
-| `x` | First signal, 1-D. |
-| `y` | Second signal, same length, or `None` for autocorrelation. |
-| `fs` | Sample rate, in Hz. |
+| `x` | First signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the correlation values come out in Pa². The normalized `coefficient` divides them out and does not move. |
+| `y` | Second signal, same length, or `None` for autocorrelation. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the correlation values come out in Pa². The normalized `coefficient` divides them out and does not move. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `normalization` | See above (default `'unbiased'`). |
 | `max_lag` | Largest lag magnitude to keep, in seconds (default: the full `N-1` samples). |
 
@@ -324,10 +324,10 @@ return `inf`.
 
 ```python
 impulse_response_delay(
-    ir: NDArray[np.float64] | list[float],
-    fs: float,
+    ir: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
-    reference: NDArray[np.float64] | list[float] | None = None,
+    reference: Signal | NDArray[np.float64] | list[float] | None = None,
     interpolation: _Interpolation = 'parabolic',
     upsample: int = 8,
 ) -> float
@@ -354,9 +354,9 @@ default `upsample=8`).
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Impulse response, 1-D. |
-| `fs` | Sample rate, in Hz. |
-| `reference` | Optional reference IR (same length) the delay is measured against. |
+| `ir` | Impulse response, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though a delay is scale-free: nothing in the result moves with the factor. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
+| `reference` | Optional reference IR (same length) the delay is measured against. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which may be the side that supplies `fs`; a delay is scale-free, so its calibration does not move the result. |
 | `interpolation` | `'parabolic'` (default) or `'none'`. |
 | `upsample` | Integer local-upsampling factor (default 8). |
 
@@ -372,9 +372,9 @@ default `upsample=8`).
 
 ```python
 time_delay(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     method: _Method = 'gcc',
     weighting: _Weighting = 'phat',
@@ -435,9 +435,9 @@ interval (Eq. 8.130).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Reference record, 1-D. |
-| `y` | Delayed record, 1-D, same length. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Reference record, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though a delay is scale-free: the Signal is taken here for the rate it carries, and nothing in the result moves with the factor. |
+| `y` | Delayed record, 1-D, same length. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though a delay is scale-free: the Signal is taken here for the rate it carries, and nothing in the result moves with the factor. |
+| `fs` | Sample rate, in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `method` | `'gcc'` (default), `'direct'` or `'phase'`. |
 | `weighting` | GCC weighting (default `'phat'`; ignored otherwise). |
 | `window` | Welch taper for `'gcc'`/`'phase'` (default Hann). |

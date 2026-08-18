@@ -243,13 +243,13 @@ def test_echo_detection_rejects_bad_band() -> None:
 
 def test_lowpass_lifter_removes_the_echo_ripple() -> None:
     """Below the echo quefrency there is only the flat 0 dB source."""
-    res = ph.lifter(_impulse_echo(), FS, (DELAY - 50) / FS, mode="lowpass")
+    res = ph.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS, mode="lowpass")
     assert float(np.max(np.abs(res.liftered_db))) < 1e-4
 
 
 def test_highpass_lifter_keeps_the_ripple_extrema() -> None:
     """ln|1 + a e^{-j theta}| swings between ln(1+a) and ln(1-a)."""
-    res = ph.lifter(_impulse_echo(), FS, (DELAY - 50) / FS, mode="highpass")
+    res = ph.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS, mode="highpass")
     assert float(np.max(res.liftered_db)) == pytest.approx(
         20.0 * np.log10(1.0 + ALPHA), abs=1e-4
     )
@@ -260,8 +260,8 @@ def test_highpass_lifter_keeps_the_ripple_extrema() -> None:
 
 def test_lifter_modes_are_exactly_complementary() -> None:
     x = ph.noise_signal(FS, 0.5, color="pink", seed=3)
-    low = ph.lifter(x, FS, 0.002, mode="lowpass")
-    high = ph.lifter(x, FS, 0.002, mode="highpass")
+    low = ph.lifter(x, FS, cutoff=0.002, mode="lowpass")
+    high = ph.lifter(x, FS, cutoff=0.002, mode="highpass")
     np.testing.assert_allclose(
         low.liftered_db + high.liftered_db, low.spectrum_db, atol=1e-9
     )
@@ -270,11 +270,11 @@ def test_lifter_modes_are_exactly_complementary() -> None:
 def test_lifter_validates_inputs() -> None:
     x = _impulse_echo()
     with pytest.raises(ValueError, match="mode"):
-        ph.lifter(x, FS, 0.01, mode="bandpass")
+        ph.lifter(x, FS, cutoff=0.01, mode="bandpass")
     with pytest.raises(ValueError, match="cutoff"):
-        ph.lifter(x, FS, 10.0)  # beyond nfft/2
+        ph.lifter(x, FS, cutoff=10.0)  # beyond nfft/2
     with pytest.raises(ValueError, match="cutoff"):
-        ph.lifter(x, FS, 1e-9)  # below one sample
+        ph.lifter(x, FS, cutoff=1e-9)  # below one sample
 
 
 # ---------------------------------------------------------------------------
@@ -413,7 +413,7 @@ def test_echo_detection_plot_marks_the_peak() -> None:
 
 
 def test_lifter_plot_two_panels_and_external_ax() -> None:
-    res = ph.lifter(_impulse_echo(), FS, (DELAY - 50) / FS)
+    res = ph.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS)
     axes = res.plot()
     assert len(axes) == 2
     _fig, ext = plt.subplots()

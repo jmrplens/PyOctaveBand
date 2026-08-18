@@ -77,6 +77,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import special
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from ..signals.spectra import _positive, _validate_signal, power_spectral_density
 
 if TYPE_CHECKING:
@@ -566,8 +568,8 @@ def _segment_statistic(
 
 
 def stationarity_test(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     n_segments: int = 20,
     statistic: str = "mean_square",
@@ -593,8 +595,14 @@ def stationarity_test(
     The segment count trades resolution against independence: each
     segment must remain long against the record's lowest frequencies.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the per-segment values come
+        out in Pa² for the squared statistics (``'mean_square'``, the
+        default, and ``'variance'``) and in Pa for ``'rms'`` and ``'mean'``.
+        The verdict, the bounds and the p-value are scale-free.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param n_segments: Number of equal intervals (default 20, as in B&P
         Example 10.3); at least 10, at most the record length in samples.
     :param statistic: Per-segment statistic: ``"mean_square"`` (default,
@@ -606,7 +614,7 @@ def stationarity_test(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x", context="a stationarity test")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     if statistic not in _STATISTICS:
         raise ValueError(
             f"'statistic' must be one of {_STATISTICS}, got {statistic!r}."
@@ -732,8 +740,8 @@ class LevelCrossingResult:
 
 
 def level_crossing_rate(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     levels: NDArray[np.float64] | list[float] | None = None,
     nperseg: int | None = None,
@@ -759,8 +767,14 @@ def level_crossing_rate(
     must comfortably oversample the signal bandwidth for the count not to
     miss crossings between samples.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, which means ``levels`` has to
+        be given in the same units, so pascals rather than digital ones, and
+        ``sigma`` comes out in Pa. The crossing rates themselves are
+        scale-free.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param levels: Crossing levels in signal units about the mean
         (default: 13 levels evenly spaced over +-3 RMS).
     :param nperseg: Welch segment length for the spectral moments
@@ -769,7 +783,7 @@ def level_crossing_rate(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x", context="level-crossing statistics")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     xa = xa - float(np.mean(xa))
     sigma = float(np.sqrt(np.mean(xa**2)))
     if sigma <= 0.0:  # RMS is non-negative: <= 0 means a constant record
@@ -933,8 +947,8 @@ class PeakStatisticsResult:
 
 
 def peak_statistics(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     nperseg: int | None = None,
 ) -> PeakStatisticsResult:
@@ -957,15 +971,20 @@ def peak_statistics(
     the physical band inflates ``M`` and deflates ``r``: band-limit the
     record to the physically meaningful band first.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so ``sigma`` comes out in Pa.
+        The peak heights are standardized by it, so they and the rates do not
+        move.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param nperseg: Welch segment length for the spectral moments
         (default: the :func:`power_spectral_density` default).
     :return: A :class:`PeakStatisticsResult`.
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x", context="peak statistics")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     xa = xa - float(np.mean(xa))
     sigma = float(np.sqrt(np.mean(xa**2)))
     if sigma <= 0.0:  # RMS is non-negative: <= 0 means a constant record
