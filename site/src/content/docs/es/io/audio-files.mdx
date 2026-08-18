@@ -242,10 +242,13 @@ análisis modal), que tienen sus propios lectores en Python (`npTDMS`,
 
 Una noche de monitorado a 48 kHz y 24 bits son gigabytes; como float64 son
 ~5,5 GiB por hora estéreo, que ningún análisis necesita en memoria a la
-vez. `read_blocks()` entrega exactamente lo que `read()` devolvería, bloque
-a bloque — mismo escalado, mismo convenio de canales, y en la instalación
-base posicionamiento y descodificación propios para el WAV lineal, RF64
-incluido — de modo que los filtros con estado de la guía de
+vez. `read_blocks()` entrega bloques float64 desnudos, no objetos `Signal`:
+los mismos valores de muestra que `np.asarray(read(...))`, con el mismo
+escalado y el mismo convenio de canales (en la instalación base, con
+posicionamiento y descodificación propios para el WAV lineal, RF64
+incluido), pero sin calibración ni procedencia a bordo. El factor de
+calibración se aplica donde se calcula el nivel, como hace el bucle de
+abajo; los filtros con estado de la guía de
 [proceso por bloques](/phonometry/es/signals/filters/block-processing/)
 consumen el flujo sin cambios:
 

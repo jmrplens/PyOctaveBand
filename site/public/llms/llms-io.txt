@@ -291,9 +291,11 @@ Python readers (`npTDMS`, `pyuff`).
 
 A night of monitoring at 48 kHz/24-bit is gigabytes; as float64 it is
 ~5.5 GiB per stereo hour, which no analysis needs in memory at once.
-`read_blocks()` yields exactly what `read()` would return, block by block —
-same scaling, same channel convention, base-install seek-and-decode for
-linear WAV including RF64 — so the stateful filters of
+`read_blocks()` yields bare float64 blocks, not `Signal` objects: the same
+sample values as `np.asarray(read(...))`, with the same scaling and channel
+convention (base-install seek-and-decode for linear WAV including RF64),
+but no calibration or provenance riding along. Apply the calibration factor
+where the level is computed, as the loop below does; the stateful filters of
 [block processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/) consume
 the stream unchanged:
 
