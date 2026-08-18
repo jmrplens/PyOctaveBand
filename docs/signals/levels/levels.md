@@ -99,7 +99,7 @@ everywhere else, energy.
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units (or Pa if calibrated) | non-empty | 2D is `[channels, samples]`; returns one level per channel |
-| `fs` | int | Hz | > 0 (`laeq` only; from the `Signal` when `x` is one) | `leq` needs no sample rate (pure RMS integral) |
+| `fs` | int | Hz | > 0 (`laeq` only; taken from `x` when `x` is a `Signal`) | `leq` needs no sample rate (pure RMS integral) |
 | `calibration_factor` | float | Pa per digital unit | default `None`: a calibrated `Signal`'s own factor, else `1.0` | From `sensitivity()` |
 | `dbfs` | bool | — | default `False` | `True`: 0 dBFS = RMS 1.0; ignores calibration |
 
@@ -222,7 +222,7 @@ of [Environmental levels](../../environment/assessment/environmental-levels.md) 
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units | non-empty | 2D returns per-channel dicts |
-| `fs` | int | Hz | > 0; from the `Signal` when `x` is one | Needed by the envelope detector |
+| `fs` | int | Hz | > 0; taken from `x` when `x` is a `Signal` | Needed by the envelope detector |
 | `n` | tuple of ints | % | default `(10, 50, 90)` | Any exceedance percentages, e.g. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | IEC 61672-1 ballistics of the envelope |
 | `weighting` | str or None | — | any `weighting_filter` curve: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (default) | Frequency weighting before the envelope (`None` and `'Z'` both leave it unweighted) |

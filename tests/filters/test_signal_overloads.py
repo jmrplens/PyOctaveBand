@@ -67,7 +67,8 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> No
     sig = Signal(_tone(), FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         func(sig, FS + 1, **kwargs)
-    # The same number twice is agreement, not a conflict.
+    # The same number twice is agreement, not a conflict. Outside the block:
+    # this call must succeed, and inside it a failure would read as a pass.
     func(sig, FS, **kwargs)
 
 
@@ -82,8 +83,9 @@ def test_a_conflicting_rate_is_refused_a_matching_one_is_not(func, kwargs) -> No
     ],
 )
 def test_a_bare_array_still_requires_fs(func, kwargs) -> None:
+    x = _tone()
     with pytest.raises(ValueError, match="fs is required"):
-        func(_tone(), **kwargs)
+        func(x, **kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -180,8 +182,9 @@ def test_the_bank_refuses_a_signal_recorded_at_another_rate() -> None:
     the constructor and ``filter()`` has no argument to drop.
     """
     bank = OctaveFilterBank(fs=FS, fraction=3)
+    foreign = Signal(_tone(), FS // 2)
     with pytest.raises(ValueError, match="designed for 48000 Hz"):
-        bank.filter(Signal(_tone(), FS // 2))
+        bank.filter(foreign)
 
 
 def test_the_bank_honours_the_signals_calibration() -> None:
@@ -202,8 +205,9 @@ def test_a_bank_with_its_own_factor_does_not_apply_the_objects_too() -> None:
 
 def test_the_eq_cascade_refuses_a_signal_recorded_at_another_rate() -> None:
     eq = ParametricEQ(FS, EQSection("peaking", 1000.0, 3.0, 1.0))
+    foreign = Signal(_tone(), FS // 2)
     with pytest.raises(ValueError, match="designed for 48000 Hz"):
-        eq.filter(Signal(_tone(), FS // 2))
+        eq.filter(foreign)
 
 
 def test_the_eq_cascade_honours_the_signals_calibration() -> None:
@@ -303,5 +307,7 @@ def test_the_spectrogram_returns_pascal_levels_for_a_calibrated_signal() -> None
 )
 def test_the_pre_designed_objects_refuse_a_foreign_rate(build, call, what) -> None:
     obj = build()
+    method = getattr(obj, call)
+    foreign = Signal(_tone(), FS // 2)
     with pytest.raises(ValueError, match=f"this {what} was designed for"):
-        getattr(obj, call)(Signal(_tone(), FS // 2))
+        method(foreign)

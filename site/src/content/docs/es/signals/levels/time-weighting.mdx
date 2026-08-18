@@ -253,7 +253,7 @@ plt.show()
 | Parámetro | Tipo | Unidades | Rango / por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D, o `Signal` | presión (cualquier escala) | no vacío | Se eleva al cuadrado internamente; la salida es una envolvente cuadrática media |
-| `fs` | int | Hz | > 0; del `Signal` cuando `x` lo es | |
+| `fs` | int | Hz | > 0; tomada de `x` cuando `x` es un `Signal` | |
 | `mode` | str | — | `'fast'` (por defecto), `'slow'`, `'impulse'` | $\tau$ = 125 ms / 1 s / ataque de 35 ms + caída de 1,5 s |
 | `initial_state` | `None` / `'zero'` / `'first'` / float / array | cuadrado medio de $x$ | por defecto `None` (= `'zero'`) | Estado del integrador $y[-1]$; ver los apartados 5 y 6 |
 | `TimeWeighting(fs, mode)` (clase) | — | — | — | Variante con estado para streaming: `process(x)` conserva el estado del integrador entre bloques |

@@ -123,7 +123,7 @@ everyday arguments stay first: `FilterDesign` (`design`), `LevelCalibration`
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `x` | 1D or 2D array, or `Signal` | digital units, or Pa for a calibrated `Signal` | non-empty | 2D is `[channels, samples]` |
+| `x` | 1D or 2D array, or `Signal` | digital units, or Pa for a calibrated `Signal` | non-empty | 2D is `[channels, samples]`; a `dbfs` bank ignores the calibration and stays in digital units |
 | `fs` | int | Hz | > 0; required by the constructor, and taken from the `Signal` by `octave_filter()` and `bank.filter()` | |
 | `fraction` | int | — | default `1`; common `3`; any $b \ge 1$ | Bands per octave = $b$ |
 | `order` | int | — | default `6` | SOS order per band |

@@ -88,7 +88,8 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 
 El objeto sustituye al array desnudo en cualquier parte: `np.asarray(sig)`
 entrega las muestras (1D para un canal, `(canales, muestras)` para varios),
-así que toda función `(x, fs, ...)` de la biblioteca lo acepta hoy. Las
+así que toda función `(x, fs, ...)` de la biblioteca ya lo admite en lugar
+del array, pasando la frecuencia igualmente al lado. Las
 funciones de nivel (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
 `sound_exposure` y `lex_8h`) y los filtros (`octave_filter`,
 `weighting_filter`, `time_weighting`, `linkwitz_riley`, `parametric_eq`, y los
@@ -157,9 +158,14 @@ print(f"Leq = {float(signals.leq(sig)):.1f} dB")          # 70.0
 ```
 
 Sin argumento `calibration_factor` y sin argumento `fs` en la llamada de
-nivel: el `Signal` lleva los dos. Un argumento explícito sigue ganando al
-que viene en el objeto — quien llama sabe más que un objeto — y un array
-desnudo sin `fs` se rechaza nombrando el argumento en vez de adivinarlo.
+nivel: el `Signal` lleva los dos, y cada uno se rige por una regla distinta.
+Un `calibration_factor` explícito sigue ganando al que viene en el objeto —
+quien llama sabe más que un objeto, tras una recalibración o para un supuesto
+deliberado. Un `fs` explícito no gana: la frecuencia de muestreo es un hecho
+de la grabación y no una preferencia, así que un valor que discrepe del que
+lleva el objeto lanza en vez de imponerse, y solo se acepta el que coincide.
+Un array desnudo sin `fs` se rechaza nombrando el argumento en vez de
+adivinarlo.
 
 ### La misma cadena sobre el archivo de un sonómetro real
 

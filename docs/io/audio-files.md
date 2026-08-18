@@ -43,7 +43,8 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 
 The object stands in for the bare array anywhere: `np.asarray(sig)` yields
 the samples (1-D for one channel, `(channels, samples)` for several), so
-every `(x, fs, ...)` function of the library accepts it today. The level
+every `(x, fs, ...)` function of the library already takes it in place of
+the array, with the rate still passed alongside. The level
 functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
 and `lex_8h`) and the filters (`octave_filter`, `weighting_filter`,
 `time_weighting`, `linkwitz_riley`, `parametric_eq`, and the block-processing
@@ -110,9 +111,14 @@ print(f"Leq = {float(signals.leq(sig)):.1f} dB")          # 70.0
 ```
 
 No `calibration_factor` argument, no `fs` argument at the level call: the
-`Signal` carries both. An explicit argument still wins over the carried one
-— the caller knows more than an object — and a bare array without `fs` is
-refused by name rather than guessed at.
+`Signal` carries both, and the two are carried under different rules. An
+explicit `calibration_factor` still wins over the one the object carries —
+the caller knows more than an object, after a re-calibration or for a
+deliberate what-if. An explicit `fs` does not win: the rate is a fact of the
+recording rather than a preference, so a value that disagrees with the
+object's raises instead of overriding it, and only a value that agrees is
+accepted. A bare array without `fs` is refused by name rather than guessed
+at.
 
 ### The same chain on a real meter's file
 

@@ -194,6 +194,13 @@ class OctaveFilterBank:
         self.attenuation = design.attenuation
         self.calibration_factor = calibration.factor
         self.dbfs = calibration.dbfs
+        # Whether the caller left the whole calibration bundle alone, which is
+        # what decides if a calibrated Signal may supply its own factor. Asked
+        # of the bundle rather than of its float field: comparing the frozen
+        # dataclass to the default says "untouched" in one question, and it
+        # folds in the dBFS switch, since a dBFS bank is referenced to digital
+        # full scale and must not be handed pascals either.
+        self._default_calibration = calibration == _DEFAULT_CALIBRATION
         self.stateful = block_processing.stateful
 
         # Generate frequencies
@@ -423,8 +430,7 @@ class OctaveFilterBank:
         ``20*log10(factor)`` while still calling the result dBFS.
         """
         refuse_foreign_rate(x, self.fs, "filter bank")
-        calibrate = self.calibration_factor == 1.0 and not self.dbfs
-        x_proc = resolve_samples(x, calibrate=calibrate)
+        x_proc = resolve_samples(x, calibrate=self._default_calibration)
 
         if detrend:
             if self.stateful:
@@ -477,9 +483,7 @@ class OctaveFilterBank:
             raise ValueError("overlap must be in [0, 1).")
 
         refuse_foreign_rate(x, self.fs, "filter bank")
-        x_proc = resolve_samples(
-            x, calibrate=self.calibration_factor == 1.0 and not self.dbfs
-        )
+        x_proc = resolve_samples(x, calibrate=self._default_calibration)
         is_multichannel = x_proc.ndim > 1
         n_samples = x_proc.shape[-1]
         win = round(window_time * self.fs)
