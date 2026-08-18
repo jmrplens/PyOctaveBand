@@ -146,7 +146,8 @@ One biquad of the RBJ Audio EQ Cookbook.
 parametric_eq(
     x: Signal | list[float] | np.ndarray,
     fs: float | None = None,
-    sections: EQSection | Sequence[EQSection] | None = None,
+    *,
+    sections: EQSection | Sequence[EQSection],
 ) -> np.ndarray
 ```
 
@@ -159,8 +160,8 @@ Convenience wrapper around [`ParametricEQ`](/phonometry/reference/api/filters/eq
 | Name | Description |
 | :--- | :--- |
 | `x` | Input signal (1D or 2D `[channels, samples]`), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. A calibrated Signal is equalized in pascals, so the result is in pascals too. |
-| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. It keeps its position, so with a Signal name the cascade: `parametric_eq(sig, sections=...)`. |
-| `sections` | One [`EQSection`](/phonometry/reference/api/filters/equalizer/#eqsection) or a sequence of them. Required (it defaults to `None` only so that `fs` can be omitted before it). |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. |
+| `sections` | One [`EQSection`](/phonometry/reference/api/filters/equalizer/#eqsection) or a sequence of them. Keyword-only and required: it sits behind an optional `fs`, and a default here would be a signature that lies about what the call needs. |
 
 **Returns:** Equalized signal.
 

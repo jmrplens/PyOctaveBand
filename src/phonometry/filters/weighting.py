@@ -639,7 +639,8 @@ class TimeWeighting:
 def linkwitz_riley(
     x: Signal | list[float] | np.ndarray,
     fs: int | None = None,
-    freq: float | None = None,
+    *,
+    freq: float,
     order: int = 4,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
@@ -651,17 +652,14 @@ def linkwitz_riley(
         bands come back in pascals.
     :param fs: Sample rate. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
-        that disagrees with it raises. It keeps its position so that
-        ``linkwitz_riley(x, fs, freq)`` still reads as it always did; with a
-        Signal, name the crossover: ``linkwitz_riley(sig, freq=800)``.
-    :param freq: Crossover frequency. Required (it defaults to ``None`` only
-        so that ``fs`` can be omitted before it).
+        that disagrees with it raises.
+    :param freq: Crossover frequency, in Hz. Keyword-only and required: it
+        sits behind an optional ``fs``, and a default here would be a
+        signature that lies about what the call needs.
     :param order: Total order (must be even, typically 2 or 4).
     :return: (low_pass_signal, high_pass_signal)
     """
     fs = resolve_fs(x, fs)
-    if freq is None:
-        raise ValueError("'freq' is required: the crossover frequency, in Hz.")
     x_proc = resolve_samples(x)
     if order % 2 != 0:
         raise ValueError("Linkwitz-Riley order must be even (typically 2 or 4).")

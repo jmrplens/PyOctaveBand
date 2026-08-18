@@ -355,7 +355,7 @@ axes = res.plot()             # magnitude + phase of the cascade
 ```
 
 For block processing pass `stateful=True` (the same convention as
-`WeightingFilter`); the one-shot helper is `parametric_eq(x, fs, sections)`.
+`WeightingFilter`); the one-shot helper is `parametric_eq(x, fs, sections=...)`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_cascade.svg" alt="Two stacked panels drawn by the result object itself. Above, the magnitude of the three-section cascade of the snippet: plus 4 dB below 100 Hz from the low shelf, a one-octave-wide minus 6 dB bell at 1 kHz, and plus 3 dB above 8 kHz from the high shelf, with each individual section drawn in light grey underneath the thick cascade line. Below, the phase of the same cascade in degrees, swinging about twenty degrees either side of zero around the shelf and bell frequencies" width="88%" />
 

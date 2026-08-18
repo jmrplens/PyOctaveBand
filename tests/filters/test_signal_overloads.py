@@ -112,7 +112,7 @@ def test_time_weighting_envelope_is_in_pascals_squared() -> None:
 def test_linkwitz_riley_splits_the_calibrated_signal() -> None:
     x = _tone()
     low, high = linkwitz_riley(Signal(x, FS, calibration_factor=CAL), freq=800.0)
-    low_ref, high_ref = linkwitz_riley(CAL * x, FS, 800.0)
+    low_ref, high_ref = linkwitz_riley(CAL * x, FS, freq=800.0)
     assert np.array_equal(low, low_ref)
     assert np.array_equal(high, high_ref)
 
@@ -122,7 +122,7 @@ def test_parametric_eq_equalizes_in_pascals() -> None:
     section = EQSection("peaking", 1000.0, 3.0, 1.0)
     assert np.array_equal(
         parametric_eq(Signal(x, FS, calibration_factor=CAL), sections=section),
-        parametric_eq(CAL * x, FS, section),
+        parametric_eq(CAL * x, FS, sections=section),
     )
 
 
@@ -231,19 +231,23 @@ def test_a_multichannel_signal_filters_per_channel() -> None:
     assert np.array_equal(spl, spl_ref)
 
 
-def test_the_arguments_behind_fs_are_still_required() -> None:
-    """``freq`` and ``sections`` default to None only so ``fs`` can precede them."""
+def test_the_arguments_behind_fs_are_keyword_only_and_required() -> None:
+    """They sit behind an optional ``fs``, so Python itself enforces them.
+
+    A ``= None`` default there would be a signature that lies: the call does
+    need the value, and the reader would have to run it to find out.
+    """
     sig = Signal(_tone(), FS)
-    with pytest.raises(ValueError, match="'freq' is required"):
-        linkwitz_riley(sig)
-    with pytest.raises(ValueError, match="'sections' is required"):
-        parametric_eq(sig)
+    with pytest.raises(TypeError, match="required keyword-only argument"):
+        linkwitz_riley(sig)  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match="required keyword-only argument"):
+        parametric_eq(sig)  # type: ignore[call-arg]
 
 
-def test_the_positional_call_is_unchanged() -> None:
-    """``linkwitz_riley(x, fs, freq)`` still reads as it always did."""
+def test_the_rate_may_still_be_positional() -> None:
+    """``fs`` keeps its slot; only what sits behind it is keyword-only."""
     x = _tone()
-    low, high = linkwitz_riley(x, FS, 800.0)
+    low, high = linkwitz_riley(x, FS, freq=800.0)
     low_kw, high_kw = linkwitz_riley(x, fs=FS, freq=800.0)
     assert np.array_equal(low, low_kw)
     assert np.array_equal(high, high_kw)

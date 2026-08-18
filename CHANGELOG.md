@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `linkwitz_riley` and `parametric_eq` take their mandatory argument as
+  keyword-only: `linkwitz_riley(x, fs=None, *, freq, order=4)` and
+  `parametric_eq(x, fs=None, *, sections)`. Making `fs` optional had pushed
+  `freq` and `sections` into a `= None` default they never meant, with the
+  body raising when the default survived, so the signature said optional and
+  the call said otherwise. Python enforces them now, and the reader can see
+  it without running anything. `fs` keeps its position, so
+  `linkwitz_riley(x, fs, freq=1000)` still reads left to right.
+
 ### Added
 
 - The filters take the `Signal` the reader returns, as the level functions
