@@ -1018,6 +1018,103 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
     plt.close(fig)
 
 
+def generate_eigenray_arrivals(output_dir: str) -> None:
+    """The arrival structure at one receiver: per-path loss against delay."""
+    print("Generating eigenray_arrivals...")
+    from phonometry import eigenrays, ray_trace
+
+    # The solvers guide's own worked case, kept identical so every number the
+    # labels quote is checkable against the prose beside the figure: a 100 m
+    # isovelocity channel, whose image lattice makes every arrival closed form
+    # (the n-th flies straight to a mirror image of the receiver), a source at
+    # 36 m and a receiver 500 m out at 46 m. The 0.5-degree fan brackets all
+    # eleven arrivals inside its 48-degree half-angle.
+    fan = ray_trace([0.0, 100.0], [1500.0, 1500.0], source_depth=36.0,
+                    launch_angles_deg=np.arange(-48.0, 48.5, 0.5),
+                    max_range=600.0, n_steps=201)
+    arr = eigenrays(fan, receiver_range=500.0, receiver_depth=46.0)
+
+    t_ms = np.asarray(arr.travel_times, dtype=float) * 1e3
+    loss = -20.0 * np.log10(np.abs(np.asarray(arr.amplitudes)))
+    touches = np.asarray(arr.surface_reflections + arr.bottom_reflections,
+                         dtype=int)
+
+    fig, ax = plt.subplots(figsize=(11.6, 6.4))
+
+    # The library's own arrival picture (see plot_eigenrays): one stem per
+    # path at its delay, its head at that single path's loss, the loss axis
+    # inverted so louder is higher -- the channel's impulse-response skeleton.
+    # The stems hang from the quiet end of the window.
+    base = float(loss.max()) + 1.6
+    direct = touches == 0
+    reflected = ~direct
+    ax.vlines(t_ms[reflected], base, loss[reflected], color=COLOR_MUTED,
+              lw=0.9, alpha=0.75, zorder=2)
+    # Colour the multipath by its total count of boundary touches, the way
+    # Jensen Fig. 3.7 separates its eigenray families. The counts run 1 to 5
+    # here; sampling viridis on the closed interval keeps the loudest family
+    # dark against the page and the steepest clear of the caustic figure's
+    # yellow, and the discrete colorbar makes the count readable back off any
+    # marker.
+    sc = ax.scatter(t_ms[reflected], loss[reflected], c=touches[reflected],
+                    cmap="viridis", vmin=1, vmax=int(touches.max()),
+                    s=52, zorder=4, edgecolors=COLOR_FG, linewidths=0.6)
+    cbar = fig.colorbar(sc, ax=ax, pad=0.02,
+                        ticks=np.arange(1, int(touches.max()) + 1))
+    cbar.set_label("Boundary reflections")
+    ax.vlines(t_ms[direct], base, loss[direct], color=COLOR_PRIMARY, lw=2.0,
+              zorder=4)
+    ax.plot(t_ms[direct], loss[direct], "o", color=COLOR_PRIMARY, ms=8,
+            zorder=5)
+
+    # The arrow points at the stem, not the head: the head is where the
+    # surface echo's own arrow already lands, and the stem is the path.
+    ax.annotate(
+        "the direct path, first and loudest:\n"
+        "333.4 ms and exactly 1/R in amplitude",
+        xy=(float(t_ms[0]), base - 0.85), xytext=(0.06, 0.13),
+        textcoords="axes fraction", fontsize=9, color=COLOR_FG,
+        ha="left", va="center",
+        bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+              "edgecolor": COLOR_GRID},
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED, "linewidth": 1.2})
+    ax.annotate(
+        "one surface touch: sign flipped,\n4.4 ms behind the direct",
+        xy=(float(t_ms[1]), float(loss[1])), xytext=(20, 42),
+        textcoords="offset points", fontsize=9, color=COLOR_FG,
+        ha="left", va="bottom",
+        bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+              "edgecolor": COLOR_GRID},
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED, "linewidth": 1.2})
+    ax.text(0.975, 0.905,
+            "each touch unfolds one more image of the receiver,\n"
+            "so every arrival is a straight flight to an image:\n"
+            "later, steeper and a little quieter down the ladder",
+            transform=ax.transAxes, fontsize=9, color=COLOR_FG,
+            ha="right", va="top",
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+    ax.text(0.975, 0.06,
+            "100 m isovelocity channel, source at 36 m,\n"
+            "receiver 500 m out at 46 m\n"
+            "193 rays over ±48°, 11 eigenrays inside the fan",
+            transform=ax.transAxes, fontsize=8.5, color=COLOR_FG,
+            ha="right", va="bottom",
+            bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
+                  "edgecolor": COLOR_GRID})
+
+    ax.set_xlim(325.0, 492.0)
+    ax.set_ylim(base, float(loss.min()) - 1.2)
+    ax.set_xlabel("Travel time [ms]")
+    ax.set_ylabel("Per-path propagation loss [dB]")
+    ax.set_title("Every Arrival Is a Straight Flight to an Image", pad=12)
+    ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    plt.tight_layout()
+    save_figure(output_dir, "eigenray_arrivals.svg")
+    plt.close(fig)
+
+
 def generate_pe_paraxial_error(output_dir: str) -> None:
     """Where the small-angle PE disagrees with the modal reference, and why."""
     print("Generating pe_paraxial_error...")

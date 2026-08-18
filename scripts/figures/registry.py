@@ -511,6 +511,7 @@ from .system_measurement import (
 from .theme import set_theme
 from .underwater import (
     generate_detection_range,
+    generate_eigenray_arrivals,
     generate_gaussian_beam_caustic,
     generate_marine_mammal_assessment,
     generate_marine_mammal_audiograms,
@@ -949,6 +950,7 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_numerical_propagation,
     generate_normal_modes,
     generate_ray_turning_point,
+    generate_eigenray_arrivals,
     generate_gaussian_beam_caustic,
     generate_pe_paraxial_error,
     # Underwater propagation: the model choices and the budget they feed.
