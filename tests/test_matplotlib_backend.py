@@ -3,11 +3,14 @@
 """
 Tests ensuring the package treats matplotlib as the optional dependency it is.
 
-Two promises are kept here. Importing phonometry must not force a specific
+Three promises are kept here. Importing phonometry must not force a specific
 (e.g. non-interactive) backend, so the package can be used during interactive
-exploration (IPython, Jupyter); see issue #52. And the base install must run on
+exploration (IPython, Jupyter); see issue #52. The base install must run on
 NumPy and SciPy alone, so ``import phonometry`` has to succeed with matplotlib
-absent, plotting failing only when a plot is actually asked for.
+absent, plotting failing only when a plot is actually asked for. And the io
+module makes the same promise about soundfile (the ``[audio]`` extra):
+``phonometry.io`` must import, and read WAV files, with neither optional
+package present.
 """
 
 import ast
@@ -188,48 +191,92 @@ def test_eager_import_classifier(label: str, source: str, eager: bool) -> None:
 #: Run in a subprocess: matplotlib is imported by the time the suite reaches
 #: this file, and a blocker installed in-process cannot undo that. A fresh
 #: interpreter is the only place the base install can honestly be simulated.
-_IMPORT_WITHOUT_MATPLOTLIB = """
+#: The script is a template over the packages to deny and the modules whose
+#: import is being certified, so the same proven blocker serves every
+#: optional dependency instead of a per-package copy drifting apart.
+_IMPORT_WITH_BLOCKED_PACKAGES = """
 import sys
+
+BLOCKED = {blocked!r}
 
 
 class Blocker:
-    '''Deny matplotlib and every submodule of it.
+    '''Deny the blocked packages and every submodule of them.
 
     The hook Python consults is ``find_spec``. A blocker written against the
-    long-removed ``find_module`` protocol is simply never called, so matplotlib
-    imports normally and the test passes while proving nothing at all.
+    long-removed ``find_module`` protocol is simply never called, so the
+    package imports normally and the test passes while proving nothing at all.
     '''
 
     def find_spec(self, fullname, path=None, target=None):
-        if fullname == "matplotlib" or fullname.startswith("matplotlib."):
+        if fullname.split(".")[0] in BLOCKED:
             raise ImportError("No module named %r (blocked)" % fullname)
         return None
 
 
-for name in [n for n in sys.modules if n.split(".")[0] == "matplotlib"]:
+for name in [n for n in sys.modules if n.split(".")[0] in BLOCKED]:
     del sys.modules[name]
 sys.meta_path.insert(0, Blocker())
 
 # Prove the blocker bites before trusting what it certifies.
-try:
-    import matplotlib
-except ImportError:
-    pass
-else:
-    raise AssertionError("the blocker let matplotlib through: gate proves nothing")
+for package in BLOCKED:
+    try:
+        __import__(package)
+    except ImportError:
+        pass
+    else:
+        raise AssertionError(
+            "the blocker let %r through: gate proves nothing" % package
+        )
 
+for module in {imports!r}:
+    __import__(module)
+
+{payload}
 import phonometry
 
 print(phonometry.__version__)
 """
 
+#: Payload for the io test: forge a minimal 16-bit WAV with the stdlib and
+#: read it back, so the subprocess certifies not just that ``phonometry.io``
+#: imports on the base install but that its core job runs there.
+_READ_WAV_PAYLOAD = """
+import struct, tempfile, os
+import numpy as np
+import phonometry.io
 
-def test_import_succeeds_without_matplotlib() -> None:
-    """The base install is NumPy and SciPy: importing must not need plotting."""
+fmt = struct.pack("<HHIIHH", 1, 1, 48000, 96000, 2, 16)
+data = struct.pack("<4h", 16384, -32768, 0, 32767)
+image = (b"RIFF" + struct.pack("<I", 28 + len(data)) + b"WAVE"
+         + b"fmt " + struct.pack("<I", 16) + fmt
+         + b"data" + struct.pack("<I", len(data)) + data)
+fd, path = tempfile.mkstemp(suffix=".wav")
+try:
+    with os.fdopen(fd, "wb") as fh:
+        fh.write(image)
+    sig = phonometry.io.read(path)
+finally:
+    os.remove(path)
+assert np.asarray(sig).tolist() == [0.5, -1.0, 0.0, 32767 / 32768], sig
+assert sig.fs == 48000
+"""
+
+
+def _import_with_blocked(
+    blocked: tuple[str, ...], imports: tuple[str, ...], payload: str = ""
+) -> None:
+    """Run the template in a fresh interpreter and fail with its stderr."""
     env = os.environ.copy()
     env["PYTHONPATH"] = os.pathsep.join(sys.path)
     result = subprocess.run(
-        [sys.executable, "-c", _IMPORT_WITHOUT_MATPLOTLIB],
+        [
+            sys.executable,
+            "-c",
+            _IMPORT_WITH_BLOCKED_PACKAGES.format(
+                blocked=blocked, imports=imports, payload=payload
+            ),
+        ],
         capture_output=True,
         text=True,
         env=env,
@@ -237,7 +284,29 @@ def test_import_succeeds_without_matplotlib() -> None:
         check=False,
     )
     assert result.returncode == 0, (
-        "import phonometry failed without matplotlib:\n" + result.stderr
+        f"import of {imports} failed with {blocked} blocked:\n" + result.stderr
+    )
+
+
+def test_import_succeeds_without_matplotlib() -> None:
+    """The base install is NumPy and SciPy: importing must not need plotting."""
+    _import_with_blocked(("matplotlib",), ("phonometry",))
+
+
+def test_io_imports_and_reads_without_matplotlib_and_soundfile() -> None:
+    """The io module must import, and read WAV, on the bare base install.
+
+    soundfile is the ``[audio]`` extra, imported only inside the backend
+    functions that need it -- the same contract matplotlib has with
+    ``.plot()``. Blocking both at once certifies the whole promise: with
+    neither optional package present the module imports and a 16-bit WAV
+    reads correctly, and only a call that actually needs the missing
+    package may raise.
+    """
+    _import_with_blocked(
+        ("matplotlib", "soundfile"),
+        ("phonometry", "phonometry.io"),
+        _READ_WAV_PAYLOAD,
     )
 
 
