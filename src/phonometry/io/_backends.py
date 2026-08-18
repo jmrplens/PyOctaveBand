@@ -34,6 +34,7 @@ and the EXTENSIBLE channel labels ride along on the returned signal.
 from __future__ import annotations
 
 import warnings
+from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -42,6 +43,7 @@ import numpy as np
 from .._internal.warnings import PhonometryWarning
 from ._chunks import WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_PCM, parse_wav_chunks
 from ._flac import read_flac_bext
+from ._sidecar import read_sidecar
 from ._signal import Signal, SignalSource
 from ._wav import AudioFileInfo, read_wav, wav_info
 
@@ -202,29 +204,48 @@ def read(path: str | Path, *, calibration_factor: float | None = None) -> Signal
     ``lossy=True`` on ``signal.source``: a level computed from an
     approximation of the waveform is not a measurement.
 
+    A calibration sidecar beside the file
+    (:mod:`phonometry.io._sidecar`) is applied automatically: its
+    ``calibration_factor`` fills in when the argument here is ``None``
+    (the explicit argument always wins -- the caller knows more than a
+    file on disk), and its curated ``channel_labels`` replace labels
+    derived from the file's channel mask.
+
     :param path: The file to read.
     :param calibration_factor: Digital-to-pascal multiplier to attach to
         the returned signal when the calibration is known (typically from
         :func:`phonometry.sensitivity` on a calibrator recording read
-        through this same function). ``None`` (the default) leaves the
+        through this same function). ``None`` (the default) takes the
+        sidecar's factor when a sidecar exists, and otherwise leaves the
         signal in digital full-scale units.
     :return: The signal with its metadata.
-    :raises ValueError: If the file matches no known audio format.
+    :raises ValueError: If the file matches no known audio format, or a
+        sidecar exists but is invalid.
     :raises ImportError: If the format needs the ``[audio]`` extra and it
         is not installed.
     """
+    sidecar = read_sidecar(path)
+    if sidecar is not None and calibration_factor is None:
+        calibration_factor = sidecar.calibration_factor
     format_name = _sniff(path)
     if format_name is None:
         chunks = parse_wav_chunks(path)
         if chunks.fmt.resolved_tag in (WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT):
-            return read_wav(path, chunks, calibration_factor=calibration_factor)
-        return _read_soundfile(
-            path,
-            f"WAV {chunks.fmt.format_name}",
-            calibration_factor=calibration_factor,
-            chunks=chunks,
+            signal = read_wav(path, chunks, calibration_factor=calibration_factor)
+        else:
+            signal = _read_soundfile(
+                path,
+                f"WAV {chunks.fmt.format_name}",
+                calibration_factor=calibration_factor,
+                chunks=chunks,
+            )
+    else:
+        signal = _read_soundfile(
+            path, format_name, calibration_factor=calibration_factor
         )
-    return _read_soundfile(path, format_name, calibration_factor=calibration_factor)
+    if sidecar is not None and sidecar.channel_labels is not None:
+        signal = replace(signal, channel_labels=sidecar.channel_labels)
+    return signal
 
 
 def info(path: str | Path) -> AudioFileInfo:

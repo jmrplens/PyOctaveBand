@@ -465,6 +465,7 @@ def write(
     subtype: str | None = None,
     bext: BroadcastMetadata | str | None = None,
     dither: str | None = None,
+    sidecar: bool = False,
 ) -> None:
     """Write a signal to a WAV file, without ever touching its level.
 
@@ -507,10 +508,17 @@ def write(
         quantising to ``PCM_16`` (Lipshitz et al. 1992; see the module
         docstring); ``None`` (default) quantises plainly. Refused for any
         other subtype, where it would only add noise.
+    :param sidecar: When true, also write the calibration sidecar
+        (:mod:`phonometry.io._sidecar`) beside the file, carrying the
+        :class:`Signal`'s ``calibration_factor`` and channel labels so
+        :func:`phonometry.io.read` recovers the absolute level with no
+        argument at all. Requires a calibrated :class:`Signal`: a sidecar
+        without a calibration would be a promise with nothing behind it.
     :raises ValueError: For an unknown suffix or subtype, a missing or
-        conflicting ``fs``, a dither request outside ``PCM_16``, or bext
+        conflicting ``fs``, a dither request outside ``PCM_16``, bext
         metadata that violates Tech 3285 (oversize field, version too old
-        for a carried UMID or loudness).
+        for a carried UMID or loudness), or a sidecar request without a
+        calibrated :class:`Signal`.
     """
     target = Path(path)
     suffix = target.suffix.lower()
@@ -522,9 +530,16 @@ def write(
             "offered: a metrology library does not export approximations "
             "of its own data."
         )
+    if sidecar and (not isinstance(x, Signal) or x.calibration_factor is None):
+        raise ValueError(
+            "sidecar=True needs a Signal with a calibration_factor: the "
+            "sidecar exists to carry a calibration, and inventing one "
+            "is the single thing this library must never do"
+        )
     data, rate = _resolve_input(x, fs)
     if suffix == ".flac":
         _write_flac(path, x, data, rate, subtype, bext, dither)
+        _write_signal_sidecar(path, x, sidecar)
         return
     resolved = _resolve_subtype(data, subtype)
     _check_dither(dither, resolved)
@@ -547,6 +562,7 @@ def write(
                 if bext_payload is not None else b""
             ),
         )
+        _write_signal_sidecar(path, x, sidecar)
         return
     else:
         tag, sample_bytes = _SUBTYPE_SPEC[resolved]
@@ -563,6 +579,29 @@ def write(
                          else data.astype(np.float32))
     if bext_payload is not None:
         append_riff_chunk(path, b"bext", bext_payload)
+    _write_signal_sidecar(path, x, sidecar)
+
+
+def _write_signal_sidecar(
+    path: str | Path,
+    x: Signal | NDArray[np.generic] | list[float],
+    sidecar: bool,
+) -> None:
+    """Write the calibration sidecar for a just-written Signal, on request.
+
+    The precondition (a :class:`Signal` with a calibration) was validated
+    before any bytes hit the disk, so this step cannot fail after the
+    audio file already exists half-committed to the pair.
+    """
+    if not sidecar or not isinstance(x, Signal) or x.calibration_factor is None:
+        return
+    from ._sidecar import write_sidecar
+
+    write_sidecar(
+        path,
+        x.calibration_factor,
+        channel_labels=x.channel_labels,
+    )
 
 
 def _scipy_write(path: str | Path, fs: int, data: np.ndarray) -> None:
