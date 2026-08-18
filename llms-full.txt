@@ -33073,11 +33073,11 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `VESSEL_CLASSES` | `tuple` | **The 13 JOMOPANS-ECHO vessel classes.** | `"bulker" in VESSEL_CLASSES` |
 | `normal_modes` | `function` | **Normal-mode propagation loss (range-independent).**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` / `receiver_depth` [m] / `ranges_m` / `density` / `bottom`: `"pressure-release"`\|`"rigid"` / `n_depth_points` | `normal_modes(50, [0,200], [1500,1500], source_depth=50, receiver_depth=100)`<br><br>• `NormalModeResult` |
 | `ray_trace` | `function` | **Ray tracing and travel times through a sound-speed profile (vectorised).**<br>• `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `launch_angles_deg` / `max_range` [m] / `n_steps` | `ray_trace(z, c, source_depth=1000, launch_angles_deg=[-10,0,10])`<br><br>• `RayTraceResult` |
-| `gaussian_beams` | `function` | **Gaussian beam PL field: finite at caustics, graded into shadow zones.**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `max_range` [m] / `range_step` [m] / `ranges_m` / `receiver_depths_m`<br>• `max_angle_deg` / `n_beams` / `beam_width` W₀ [m] / `bottom` | `gaussian_beams(300, [0,1000], [1500,1500], source_depth=300)`<br><br>• `GaussianBeamResult` |
+| `gaussian_beams` | `function` | **Gaussian beam PL field: finite at caustics, graded into shadow zones.**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `max_range` [m] / `range_step` [m] / `ranges_m` / `receiver_depths_m` / `n_depth_points`<br>• `max_angle_deg` / `n_beams` / `beam_width` W₀ [m] / `bottom` | `gaussian_beams(300, [0,1000], [1500,1500], source_depth=300)`<br><br>• `GaussianBeamResult` |
 | `parabolic_equation` | `function` | **Split-step Fourier parabolic-equation PL field.**<br>• `frequency_hz` / `depths` [m] / `sound_speeds` [m/s]<br>• `source_depth` [m] / `max_range` [m] / `range_step` [m] / `n_depth_points` | `parabolic_equation(50, [0,200], [1500,1500], source_depth=50)`<br><br>• `ParabolicEquationResult` |
 | `NormalModeResult` | `dataclass` | **Normal-mode result.**<br>• `frequency` / `wavenumbers` [rad/m] / `mode_depths` [m] / `mode_functions`<br>• `ranges` [m] / `propagation_loss` [dB] / `receiver_depth` / `source_depth`<br>• `.plot()`: PL vs range | `res.wavenumbers, res.propagation_loss` |
 | `RayTraceResult` | `dataclass` | **Ray-tracing result.**<br>• `launch_angles` [°] `(n_rays,)`<br>• `ranges` [m] / `depths` [m] / `travel_times` [s] (all `(n_rays, n_steps)`)<br>• `source_depth` / `water_depth` [m]<br>• `.plot()`: ray paths | `res.ranges, res.depths, res.travel_times` |
-| `GaussianBeamResult` | `dataclass` | **Gaussian beam result.**<br>• `frequency` / `ranges` [m] / `depths` [m]<br>• `propagation_loss` [dB] and `pressure` (both `(n_depths, n_ranges)`)<br>• `launch_angles` [°] / `ray_ranges` / `ray_depths` [m] / `beam_widths` [m] / `wavefront_curvatures` [1/m] (all `(n_beams, n_steps)`)<br>• `initial_beam_width` [m] / `source_depth` / `water_depth` [m]<br>• `.plot()`: PL field | `res.propagation_loss, res.beam_widths` |
+| `GaussianBeamResult` | `dataclass` | **Gaussian beam result.**<br>• `frequency` [Hz] / `ranges` [m] / `depths` [m]<br>• `propagation_loss` [dB] and `pressure` (both `(n_depths, n_ranges)`)<br>• `launch_angles` [°] `(n_beams,)`<br>• `ray_ranges` / `ray_depths` [m] / `beam_widths` [m] / `wavefront_curvatures` [1/m] (all `(n_beams, n_steps)`)<br>• `initial_beam_width` [m] / `source_depth` [m] / `water_depth` [m]<br>• `.plot()`: PL field | `res.propagation_loss, res.beam_widths` |
 | `ParabolicEquationResult` | `dataclass` | **Parabolic-equation result.**<br>• `frequency` / `ranges` [m] / `depths` [m]<br>• `propagation_loss` [dB] `(n_depths, n_ranges)` / `source_depth`<br>• `.plot()`: PL field | `res.propagation_loss` |
 | `PileStrikeResult` | `dataclass` | **Pile-strike result.**<br>• `single_strike_sel` [dB re 1 µPa²·s]<br>• `peak_spl` / `spl` [dB re 1 µPa]<br>• `pulse_duration` [s]<br>• `pressure` [Pa] / `fs` [Hz]<br>• `.plot()`: waveform + cumulative energy | `res.single_strike_sel, res.peak_spl` |
 | `strike_sel_spectrum` | `function` | **Band-resolved single-strike SEL (ISO 18406).**<br>• `pressure`: one strike (1D) [Pa] / `fs` [Hz]<br>• `fraction`: 1 or 3 (Default: 3) / `limits` [Hz] (Default: (10, 20000))<br>Parseval band split of ∫p²dt | `strike_sel_spectrum(p, fs)`<br><br>• `StrikeSelSpectrum` |
@@ -49243,8 +49243,8 @@ and these closed forms, have their own guide:
 - Ship-traffic source level: MacGillivray & de Jong (2021),
   *J. Mar. Sci. Eng.* 9(4) 369 (CC-BY, JOMOPANS-ECHO), which also reproduces
   RANDI 3.1 and Wales & Heitmeyer (2002).
-- Numerical solvers (normal modes, ray tracing, parabolic equation):
-  covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
+- Numerical solvers (normal modes, ray tracing, Gaussian beams, parabolic
+  equation): covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
 
 ---
 
@@ -49291,7 +49291,7 @@ computed numerically. Four solvers are provided (Jensen et al.,
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="A Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
 </picture>
 
 <details>
@@ -49341,11 +49341,14 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
 `propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
-`travel_times` per ray); `parabolic_equation` a `ParabolicEquationResult` (the
-`propagation_loss` field). All assume a range-independent water column with a pressure-release
-surface, and the bottom is pressure-release too (or, for the modes, optionally
-rigid): there is no absorbing or elastic bottom, no sediment attenuation and
-no real bathymetry, so range-dependent problems are out of scope. For the
+`travel_times` per ray); `gaussian_beams` a `GaussianBeamResult` (the
+`propagation_loss` field, plus each beam's central ray and width);
+`parabolic_equation` a `ParabolicEquationResult` (the `propagation_loss`
+field). All assume a range-independent water column with a pressure-release
+surface, and the bottom is pressure-release too (or, for the modes and the
+beams, optionally rigid): there is no absorbing or elastic bottom, no sediment
+attenuation and no real bathymetry, so range-dependent problems are out of
+scope. For the
 elastic seabed physics these fluid solvers leave out, see
 [Elastic waves and fluid-solid coupling](https://jmrplens.github.io/phonometry/simulation/elastic-waves/).
 
@@ -49588,7 +49591,7 @@ clamp is also where this default is at its worst, and the reason given for it
 does not survive measurement: what it was said to protect, the bookkeeping that
 folds a reflected ray back into the column, the receiver image ladder already
 restores. In shallow water it costs a few decibels of level rather than buying
-anything, which is the fifth limit below.
+anything, which is the fourth limit below.
 
 **What it is validated against.** Free-field spherical spreading, to
 $10^{-3}$ dB, which is the one comparison that pins the amplitude
