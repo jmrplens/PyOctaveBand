@@ -323,6 +323,20 @@ print(round(float(arr.launch_angles[1]), 2))            # -9.31 degrees: up
 arr.plot()   # the impulse-response skeleton: per-path loss against delay
 ```
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals.svg" alt="The arrival structure at one receiver of a 100 metre isovelocity channel: eleven vertical stems against travel time from 333 to 480 milliseconds, each head marking its own path's propagation loss on an inverted axis, the direct path drawn first and loudest in blue, the reflected paths coloured by their count of boundary reflections from one to five, arriving later, steeper and slightly quieter along the image ladder, with a colour bar giving the count" width="100%">
+</picture>
+
+*The snippet's own channel, drawn: one stem per eigenray, its head at that
+single path's loss. The direct path arrives first and loudest; the first echo
+follows 4.4 ms behind, sign flipped by the surface; and each further touch
+unfolds one more image of the receiver, later, steeper and a little quieter
+down the ladder. Over perfect reflectors nothing but $1/R$ attenuates a path,
+so 147 ms of delay spread costs barely 3 dB: this list is the multipath the
+sonar equation consumes, and the skeleton a channel impulse response is built
+on.*
+
 One list serves every frequency. The amplitudes are normalised to unit
 pressure at 1 m, in the same $e^{-i\omega t}$ convention as the rest of the
 module, and the search never asks for a frequency at all: the tone a receiver

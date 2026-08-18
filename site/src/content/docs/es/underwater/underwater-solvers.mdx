@@ -497,6 +497,18 @@ print(round(float(arr.launch_angles[1]), 2))            # -9.31 grados: arriba
 arr.plot(language="es")   # el esqueleto de la respuesta al impulso
 ```
 
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals_es.svg" alt="La estructura de llegadas en un receptor de un canal isovelocidad de 100 metros: once barras verticales frente al tiempo de propagación de 333 a 480 milisegundos, cada cabeza marcando la pérdida de propagación de su propio camino sobre un eje invertido, el camino directo dibujado el primero y el más fuerte en azul, los caminos reflejados coloreados según su número de reflexiones en los contornos de uno a cinco, llegando más tarde, más empinados y algo más débiles a lo largo de la escalera de imágenes, con una barra de color que da el número" width="92%" />
+
+*El canal del propio fragmento, dibujado: una barra por eigenrayo, con la
+cabeza en la pérdida de ese único camino. El camino directo llega el primero y
+el más fuerte; el primer eco le sigue 4,4 ms por detrás, con el signo
+invertido por la superficie; y cada toque adicional despliega una imagen más
+del receptor, más tardía, más empinada y algo más débil escalera abajo. Sobre
+reflectores perfectos nada salvo $1/R$ atenúa un camino, así que 147 ms de
+dispersión de retardos cuestan apenas 3 dB: esta lista es el multitrayecto que
+consume la ecuación del sonar y el esqueleto sobre el que se construye una
+respuesta al impulso del canal.*
+
 Una sola lista sirve para todas las frecuencias. Las amplitudes están
 normalizadas a presión unidad a 1 m, en el mismo convenio $e^{-i\omega t}$
 que el resto del módulo, y la búsqueda no pregunta nunca por una frecuencia:

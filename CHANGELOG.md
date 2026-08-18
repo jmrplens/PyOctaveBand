@@ -60,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   relative amplitude with the census matching image for image, and against
   the n^2-linear profile's exact parabolic ray, whose quadrature-integrated
   closed-form travel time the upward-refracted eigenray reproduces to 2e-7 s.
-  New subsection in the underwater solvers guide, in English and Spanish.
+  New subsection and figure in the underwater solvers guide, in English and
+  Spanish.
 - Gaussian beam tracing joins the underwater solvers. `gaussian_beams` hangs a
   beam on every ray of a launch fan (Jensen Eq. 3.88) and sums them into a
   propagation-loss field on the same grid, the same reference and the same
