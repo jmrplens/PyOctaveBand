@@ -2461,7 +2461,8 @@ _ES: dict[str, str] = {
         "la PL que anula SE, re m²",
     # The waveguide the four numerical solvers share
     "The range-independent waveguide the four solvers share":
-        "La guía de ondas que comparten los cuatro métodos",
+        "La guía de ondas independiente de la distancia de los cuatro "
+        "métodos",
     "channel axis": "eje del canal",
     "sea surface: pressure release, $p = 0$":
         "superficie: presión nula, $p = 0$",
@@ -2484,7 +2485,7 @@ _ES: dict[str, str] = {
         "la envolvente avanzada en $r$, un paso $Δr$ cada vez",
     "All four take the same range-independent $c(z)$: no sediment attenuation, no bathymetry":
         "Los cuatro toman el mismo $c(z)$ independiente de la distancia: sin "
-        "sedimento ni batimetría",
+        "atenuación del sedimento ni batimetría",
     # Marine-mammal exposure assessment
     "Marine-mammal exposure: measured here, assessed there":
         "Exposición de mamíferos marinos: se mide aquí, se evalúa allí",
