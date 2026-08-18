@@ -16,7 +16,8 @@ import numpy as np
 import pytest
 from wav_forge import chunk, float_wav, fmt_payload, pcm_wav, rf64_wav, riff_wave
 
-from phonometry.io import LossyCompressionWarning, read, read_blocks
+from phonometry import filters, leq
+from phonometry.io import LossyCompressionWarning, read, read_blocks, write
 
 try:
     import soundfile as sf
@@ -161,8 +162,6 @@ def test_blocks_agree_with_read_on_a_written_measurement(
     tmp_path: Path,
 ) -> None:
     """End to end through the module's own writer at 24-bit."""
-    from phonometry.io import write
-
     rng = np.random.default_rng(99)
     x = rng.uniform(-0.9, 0.9, (2, 1000))
     path = tmp_path / "meas.wav"
@@ -171,3 +170,150 @@ def test_blocks_agree_with_read_on_a_written_measurement(
     assert np.concatenate(
         list(read_blocks(path, 256)), axis=-1
     ).tolist() == whole.tolist()
+
+
+# ---------------------------------------------------------------------------
+# The equivalence oracle: a level computed from the stream is the same
+# number as the level computed from the whole file. This is the property
+# that makes read_blocks usable for measurement at all -- streaming is an
+# implementation strategy, never a different answer -- so it is asserted
+# at float64 precision, not to some engineering tolerance.
+# ---------------------------------------------------------------------------
+
+def _streamed_leq(path: Path, block_size: int, overlap: int) -> float:
+    """Accumulate a running Leq from the block stream, dB re 20 uPa.
+
+    Energy metrics accumulate across blocks (the block-processing guide's
+    rule); with ``overlap`` the repeated head of each later block is
+    dropped so every frame is counted exactly once.
+    """
+    total, frames = 0.0, 0
+    for i, block in enumerate(read_blocks(path, block_size, overlap=overlap)):
+        fresh = block[..., overlap:] if i else block
+        total += float(np.sum(np.asarray(fresh) ** 2))
+        frames += fresh.shape[-1]
+    return float(10 * np.log10((total / frames) / (2e-5) ** 2))
+
+
+def _long_synthetic(seconds: float = 3.0) -> np.ndarray:
+    """A tone in noise, long enough that many blocks tile it unevenly."""
+    rng = np.random.default_rng(2026)
+    t = np.arange(int(seconds * FS)) / FS
+    return 0.05 * np.sin(2 * np.pi * 1000 * t) + 0.02 * rng.standard_normal(
+        t.size
+    )
+
+
+@pytest.mark.parametrize("overlap", [0, 480])
+def test_streamed_leq_equals_the_whole_file_leq(
+    tmp_path: Path, overlap: int
+) -> None:
+    """Block-accumulated Leq == whole-file Leq, with and without overlap."""
+    x = _long_synthetic()
+    path = tmp_path / "night.wav"
+    write(path, x, FS, subtype="DOUBLE")  # bit-exact container: no
+    # quantisation muddies the comparison; the only difference left
+    # between the two paths is summation order (~1e-13 dB).
+    whole = leq(np.asarray(read(path)))
+    # 4800-frame blocks do not divide 144000 - overlap tilings evenly.
+    assert _streamed_leq(path, 4800, overlap) == pytest.approx(
+        whole, abs=1e-9
+    )
+
+
+@pytest.mark.parametrize("overlap", [0, 1200])
+def test_streamed_stateful_laeq_equals_the_single_pass(
+    tmp_path: Path, overlap: int
+) -> None:
+    """read_blocks feeding a stateful WeightingFilter matches one pass.
+
+    The stream drives the existing block machinery exactly as the
+    block-processing guide prescribes (fresh frames only into the
+    filter, state carried across calls); the reference is the same
+    bilinear design run over the whole file in one call, which the
+    guide promises is bit-identical to the concatenated stream.
+    """
+    x = _long_synthetic()
+    path = tmp_path / "night.wav"
+    write(path, x, FS, subtype="DOUBLE")
+
+    aw = filters.WeightingFilter(FS, "A", stateful=True)
+    total, frames = 0.0, 0
+    for i, block in enumerate(read_blocks(path, 4800, overlap=overlap)):
+        fresh = block[overlap:] if i else block
+        y = aw.filter(fresh)
+        total += float(np.sum(y**2))
+        frames += y.shape[-1]
+    streamed = 10 * np.log10((total / frames) / (2e-5) ** 2)
+
+    offline = leq(
+        filters.WeightingFilter(FS, "A", high_accuracy=False).filter(
+            np.asarray(read(path))
+        )
+    )
+    assert streamed == pytest.approx(offline, abs=1e-9)
+
+
+def test_streamed_band_leq_through_a_stateful_bank(tmp_path: Path) -> None:
+    """read_blocks feeds BlockProcessing(stateful=True) unchanged.
+
+    The 1 kHz octave band of a stateful OctaveFilterBank, fed block by
+    block from the file, accumulates to the same band Leq as the
+    offline bank over the whole read.
+    """
+    x = _long_synthetic()
+    path = tmp_path / "night.wav"
+    write(path, x, FS, subtype="DOUBLE")
+
+    bank = filters.OctaveFilterBank(
+        FS,
+        fraction=1,
+        limits=[900, 1100],
+        design=filters.FilterDesign(resample=False),
+        block_processing=filters.BlockProcessing(stateful=True),
+    )
+    total, frames = 0.0, 0
+    for block in read_blocks(path, 4800):
+        band = bank.filter(
+            block, sigbands=True, detrend=False, calculate_level=False
+        )[2][0]
+        total += float(np.sum(band**2))
+        frames += band.shape[-1]
+    streamed = 10 * np.log10((total / frames) / (2e-5) ** 2)
+
+    offline_band = filters.OctaveFilterBank(
+        FS,
+        fraction=1,
+        limits=[900, 1100],
+        design=filters.FilterDesign(resample=False),
+    ).filter(
+        np.asarray(read(path)),
+        sigbands=True,
+        detrend=False,
+        calculate_level=False,
+    )[2][0]
+    assert streamed == pytest.approx(
+        leq(offline_band), abs=1e-9
+    )
+
+
+@needs_soundfile
+@pytest.mark.parametrize("overlap", [0, 800])
+def test_streamed_leq_matches_across_backends(
+    tmp_path: Path, overlap: int
+) -> None:
+    """WAV (base decoder) and FLAC (libsndfile) stream the same Leq.
+
+    The same 24-bit codes go into both containers, so the decoded
+    samples are bit-identical and the streamed levels must agree with
+    each other and with the whole-file read at float64 precision.
+    """
+    rng = np.random.default_rng(7)
+    codes = (rng.uniform(-0.5, 0.5, FS) * 2**23).astype(np.int64)
+    wav = _write(tmp_path, pcm_wav(codes, bits=24), "same.wav")
+    flac = tmp_path / "same.flac"
+    sf.write(str(flac), (codes << 8).astype(np.int32), FS, subtype="PCM_24")
+
+    whole = leq(np.asarray(read(wav)))
+    assert _streamed_leq(wav, 4800, overlap) == pytest.approx(whole, abs=1e-9)
+    assert _streamed_leq(flac, 4800, overlap) == pytest.approx(whole, abs=1e-9)
