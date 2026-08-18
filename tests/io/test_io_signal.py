@@ -118,6 +118,22 @@ def test_invalid_construction_is_rejected() -> None:
         Signal(data=np.zeros((2, 2, 2)), fs=FS)
 
 
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf"), 0, -FS])
+def test_non_finite_or_non_positive_fs_is_rejected(bad: float) -> None:
+    """NaN and infinity pass a bare <= 0 check; the constructor must not."""
+    with pytest.raises(ValueError, match="fs must be a positive finite"):
+        Signal(data=_tone(), fs=bad)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "bad", [float("nan"), float("inf"), float("-inf"), 0.0, -0.5]
+)
+def test_non_finite_or_non_positive_calibration_is_rejected(bad: float) -> None:
+    """A NaN calibration would flow into levels as a computed-looking wrong number."""
+    with pytest.raises(ValueError, match="calibration_factor must be a positive finite"):
+        Signal(data=_tone(), fs=FS, calibration_factor=bad)
+
+
 # ---------------------------------------------------------------------------
 # plot
 # ---------------------------------------------------------------------------

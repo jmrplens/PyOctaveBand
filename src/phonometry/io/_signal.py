@@ -107,10 +107,19 @@ class Signal:
                 f"{len(self.channel_labels)} channel labels for "
                 f"{data.shape[0]} channels"
             )
-        if self.fs <= 0:
-            raise ValueError("fs must be positive")
-        if self.calibration_factor is not None and self.calibration_factor <= 0:
-            raise ValueError("calibration_factor must be positive")
+        # Finiteness is checked alongside the sign: NaN and infinity pass
+        # every comparison against zero, and an fs or calibration of NaN
+        # would flow into durations and levels as a wrong number that
+        # looks computed.
+        if not np.isfinite(self.fs) or self.fs <= 0:
+            raise ValueError(f"fs must be a positive finite number; got {self.fs}")
+        if self.calibration_factor is not None and (
+            not np.isfinite(self.calibration_factor) or self.calibration_factor <= 0
+        ):
+            raise ValueError(
+                "calibration_factor must be a positive finite number; "
+                f"got {self.calibration_factor}"
+            )
 
     @property
     def _view(self) -> NDArray[np.float64]:
