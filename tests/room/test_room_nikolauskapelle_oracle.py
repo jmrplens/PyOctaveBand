@@ -40,6 +40,7 @@ from phonometry.room import room_parameters
 
 _NPZ = oracle_data.DATA / "audio" / "nikolauskapelle" / "s1_do_r1_w.npz"
 
+# fmt: off
 #: One-third-octave band centres of the engineering range asserted here.
 _BANDS = (100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
           1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000)
@@ -67,6 +68,7 @@ _D50 = (0.4552, 0.4075, 0.4352, 0.4514, 0.3617, 0.4439, 0.5076, 0.4519,
 _TS_MS = (226.79, 220.39, 232.98, 189.96, 260.19, 182.72, 162.69, 202.2,
           242.02, 213.45, 195.51, 153.0, 114.73, 104.2, 100.94, 90.64,
           64.43, 44.36)
+# fmt: on
 
 #: ISO 3382-1:2009, Table A.1 JNDs.
 _JND_DECAY_REL = 0.05
