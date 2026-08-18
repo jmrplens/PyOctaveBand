@@ -556,7 +556,8 @@ class ParametricEQ:
 def parametric_eq(
     x: Signal | list[float] | np.ndarray,
     fs: float | None = None,
-    sections: EQSection | Sequence[EQSection] | None = None,
+    *,
+    sections: EQSection | Sequence[EQSection],
 ) -> np.ndarray:
     """Apply a parametric-EQ cascade to a signal (RBJ Audio EQ Cookbook).
 
@@ -568,14 +569,12 @@ def parametric_eq(
         pascals too.
     :param fs: Sample rate in Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
-        that disagrees with it raises. It keeps its position, so with a
-        Signal name the cascade: ``parametric_eq(sig, sections=...)``.
-    :param sections: One :class:`EQSection` or a sequence of them. Required
-        (it defaults to ``None`` only so that ``fs`` can be omitted before
-        it).
+        that disagrees with it raises.
+    :param sections: One :class:`EQSection` or a sequence of them.
+        Keyword-only and required: it sits behind an optional ``fs``, and a
+        default here would be a signature that lies about what the call
+        needs.
     :return: Equalized signal.
     """
     fs = resolve_fs(x, fs)
-    if sections is None:
-        raise ValueError("'sections' is required: the EQ cascade to apply.")
     return ParametricEQ(fs, sections).filter(x)

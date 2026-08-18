@@ -147,7 +147,7 @@ bounds (clause 9.4.2).
 precision_positions(
     surface: PrecisionSurface,
     *,
-    radius: float | None = None,
+    radius: float,
     array: PrecisionArray = 'general',
     count: int = 40,
 ) -> np.ndarray
@@ -310,7 +310,7 @@ sound_power_anechoic(
     levels_positions: np.ndarray,
     surface: PrecisionSurface,
     *,
-    radius: float | None = None,
+    radius: float,
     background_levels: np.ndarray | None = None,
     frequencies: np.ndarray | None = None,
     areas: np.ndarray | None = None,

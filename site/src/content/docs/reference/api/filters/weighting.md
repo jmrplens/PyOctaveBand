@@ -53,7 +53,8 @@ frequency from 50 Hz to 10 kHz except 1600 Hz (0.15 dB) and 2500 Hz
 linkwitz_riley(
     x: Signal | list[float] | np.ndarray,
     fs: int | None = None,
-    freq: float | None = None,
+    *,
+    freq: float,
     order: int = 4,
 ) -> tuple[np.ndarray, np.ndarray]
 ```
@@ -66,8 +67,8 @@ Splits signal into low and high bands with flat sum response.
 | Name | Description |
 | :--- | :--- |
 | `x` | Input signal, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. A calibrated Signal is split in pascals, so both bands come back in pascals. |
-| `fs` | Sample rate. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. It keeps its position so that `linkwitz_riley(x, fs, freq)` still reads as it always did; with a Signal, name the crossover: `linkwitz_riley(sig, freq=800)`. |
-| `freq` | Crossover frequency. Required (it defaults to `None` only so that `fs` can be omitted before it). |
+| `fs` | Sample rate. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. |
+| `freq` | Crossover frequency, in Hz. Keyword-only and required: it sits behind an optional `fs`, and a default here would be a signature that lies about what the call needs. |
 | `order` | Total order (must be even, typically 2 or 4). |
 
 **Returns:** (low_pass_signal, high_pass_signal)

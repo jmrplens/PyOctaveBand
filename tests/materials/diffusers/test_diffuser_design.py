@@ -245,8 +245,9 @@ def test_non_positive_geometry_rejected() -> None:
 
 
 def test_spectrum_requires_depths() -> None:
-    with pytest.raises(ValueError, match="'depths' is required"):
-        predicted_diffusion_spectrum(0.10, [500.0])
+    """Keyword-only and required: the signature says so on its own now."""
+    with pytest.raises(TypeError, match="required keyword-only argument"):
+        predicted_diffusion_spectrum(0.10, [500.0])  # type: ignore[call-arg]
 
 
 def test_spectrum_reserved_reflection_argument() -> None:

@@ -186,7 +186,7 @@ axes = res.plot()             # magnitude + phase of the cascade
 ```
 
 For block processing pass `stateful=True` (the same convention as
-`WeightingFilter`); the one-shot helper is `parametric_eq(x, fs, sections)`.
+`WeightingFilter`); the one-shot helper is `parametric_eq(x, fs, sections=...)`.
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_family.svg" alt="Magnitude responses of the RBJ Audio EQ Cookbook biquad family: peaking, shelves, low/high-pass, band-pass and notch" width="80%"></picture>
 

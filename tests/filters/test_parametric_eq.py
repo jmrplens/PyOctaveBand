@@ -382,7 +382,7 @@ def test_filter_equals_sosfilt_and_convenience_wrapper() -> None:
     expected = signal.sosfilt(eq.sos, x)
     np.testing.assert_allclose(eq.filter(x), expected, rtol=0.0, atol=0.0)
     np.testing.assert_allclose(
-        ph.parametric_eq(x, FS, _three_sections()), expected, rtol=0.0, atol=0.0
+        ph.parametric_eq(x, FS, sections=_three_sections()), expected, rtol=0.0, atol=0.0
     )
 
 

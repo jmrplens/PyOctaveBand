@@ -377,7 +377,7 @@ axes = res.plot(language="es")  # magnitud + fase de la cascada
 
 Para procesado por bloques pasa `stateful=True` (la misma convención que
 `WeightingFilter`); el atajo de un solo uso es
-`parametric_eq(x, fs, sections)`.
+`parametric_eq(x, fs, sections=...)`.
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/parametric_eq_cascade_es.svg" alt="Dos paneles apilados dibujados por el propio objeto resultado. Arriba, la magnitud de la cascada de tres secciones del fragmento: más 4 dB por debajo de 100 Hz del shelving grave, una campana de menos 6 dB y una octava de ancho a 1 kHz, y más 3 dB por encima de 8 kHz del shelving agudo, con cada sección individual dibujada en gris claro por debajo de la línea gruesa de la cascada. Abajo, la fase de esa misma cascada en grados, oscilando unos veinte grados a cada lado de cero en torno a las frecuencias de los shelving y de la campana" width="88%" />
 
