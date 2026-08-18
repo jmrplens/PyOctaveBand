@@ -187,7 +187,7 @@ class TestZoomFFTExactness:
         amp = 0.7
         t = np.arange(n) / fs
         x = amp * np.cos(2.0 * np.pi * 1100.0 * t + 0.3)
-        res = zoom_fft(x, fs, 1000.0, 1256.0, n_points=257, window="boxcar")
+        res = zoom_fft(x, fs, f_min=1000.0, f_max=1256.0, n_points=257, window="boxcar")
 
         # Frequency recovered exactly on the zoom grid.
         peak = int(np.argmax(res.amplitude))
@@ -211,7 +211,7 @@ class TestZoomFFTExactness:
         x = rng.standard_normal(n)
         # Zoom grid at the record resolution fs/n = 2 Hz: every zoom
         # point sits on an rfft bin.
-        res = zoom_fft(x, fs, 500.0, 756.0, n_points=129, window="boxcar")
+        res = zoom_fft(x, fs, f_min=500.0, f_max=756.0, n_points=129, window="boxcar")
         bins = np.round(res.frequencies * n / fs).astype(int)
         full = np.fft.rfft(x)[bins] * 2.0 / n
         np.testing.assert_allclose(res.spectrum, full, rtol=1e-9, atol=1e-12)
@@ -228,7 +228,7 @@ class TestZoomFFTExactness:
         x = 0.8 * np.cos(2.0 * np.pi * 997.0 * t) + 0.5 * np.cos(
             2.0 * np.pi * 1000.0 * t
         )
-        res = zoom_fft(x, fs, 980.0, 1016.0, n_points=37)
+        res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=37)
         i1 = int(np.argmin(np.abs(res.frequencies - 997.0)))
         i2 = int(np.argmin(np.abs(res.frequencies - 1000.0)))
         assert res.amplitude[i1] == pytest.approx(0.8, rel=1e-6)
@@ -239,19 +239,19 @@ class TestZoomFFTExactness:
 
     def test_default_grid_matches_the_record_resolution(self) -> None:
         fs = 1000.0
-        res = zoom_fft(np.ones(2000), fs, 100.0, 200.0)
+        res = zoom_fft(np.ones(2000), fs, f_min=100.0, f_max=200.0)
         assert res.bin_spacing == pytest.approx(fs / 2000.0)
 
     def test_power_is_the_tone_mean_square(self) -> None:
         fs = 8192.0
         x = _tone(fs, 0.5, 1024.0, 2.0)
-        res = zoom_fft(x, fs, 1000.0, 1048.0, window="boxcar")
+        res = zoom_fft(x, fs, f_min=1000.0, f_max=1048.0, window="boxcar")
         peak = int(np.argmax(res.power))
         assert res.frequencies[peak] == 1024.0
         assert res.power[peak] == pytest.approx(2.0, rel=1e-12)  # A^2/2
 
     def test_result_fields(self) -> None:
-        res = zoom_fft(np.ones(1000), 1000.0, 100.0, 200.0, n_points=51)
+        res = zoom_fft(np.ones(1000), 1000.0, f_min=100.0, f_max=200.0, n_points=51)
         assert isinstance(res, ZoomFFTResult)
         assert res.n_points == 51
         assert res.frequencies[0] == 100.0
@@ -268,27 +268,27 @@ class TestZoomFFTValidation:
     def test_rejects_inverted_band(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="zoom band"):
-            zoom_fft(x, 1000.0, 300.0, 200.0)
+            zoom_fft(x, 1000.0, f_min=300.0, f_max=200.0)
 
     def test_rejects_band_above_nyquist(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="zoom band"):
-            zoom_fft(x, 1000.0, 100.0, 600.0)
+            zoom_fft(x, 1000.0, f_min=100.0, f_max=600.0)
 
     def test_rejects_negative_f_min(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="zoom band"):
-            zoom_fft(x, 1000.0, -10.0, 200.0)
+            zoom_fft(x, 1000.0, f_min=-10.0, f_max=200.0)
 
     def test_rejects_single_point_grid(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="n_points"):
-            zoom_fft(x, 1000.0, 100.0, 200.0, n_points=1)
+            zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0, n_points=1)
 
     def test_rejects_short_signal(self) -> None:
         x = np.ones(8)
         with pytest.raises(ValueError, match="too short"):
-            zoom_fft(x, 1000.0, 100.0, 200.0)
+            zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0)
 
 
 # ---------------------------------------------------------------------------
@@ -306,7 +306,7 @@ class TestSingleComponentBins:
 
     def test_zoom_fft_dc_reads_the_offset(self) -> None:
         res = zoom_fft(
-            np.full(1000, 3.0), 1000.0, 0.0, 100.0, window="boxcar"
+            np.full(1000, 3.0), 1000.0, f_min=0.0, f_max=100.0, window="boxcar"
         )
         assert res.amplitude[0] == pytest.approx(3.0, rel=1e-12)
         assert res.power[0] == pytest.approx(9.0, rel=1e-12)

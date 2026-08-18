@@ -98,7 +98,7 @@ def test_spectrogram_es() -> None:
 
 
 def test_zoom_fft_es() -> None:
-    res = ph.zoom_fft(_white(8192), FS, 1000.0, 2000.0)
+    res = ph.zoom_fft(_white(8192), FS, f_min=1000.0, f_max=2000.0)
     ax = res.plot(language="es")
     assert ax.get_title() == "FFT con zoom (Bendat y Piersol 11.5.4)"
     assert ax.get_ylabel() == "Espectro de potencia [dB]"
@@ -189,7 +189,7 @@ def test_echo_detection_es() -> None:
 
 
 def test_lifter_es() -> None:
-    axes = ph.lifter(_white(), FS, 0.002, mode="highpass").plot(language="es")
+    axes = ph.lifter(_white(), FS, cutoff=0.002, mode="highpass").plot(language="es")
     assert "Liftering a 2 ms (paso alto)" in _titles(axes)
     assert "Lifterado (paso alto)" in _labels(axes)
     plt.close("all")
@@ -216,8 +216,7 @@ def test_tone_burst_es_and_bad_language() -> None:
 
 def test_resampled_signal_es_and_bad_language() -> None:
     res = ph.resample_signal(
-        ph.noise_signal(FS, 0.2, seed=5), FS, 32000.0
-    )
+        ph.noise_signal(FS, 0.2, seed=5), FS, fs_new=32000.0)
     ax = res.plot(language="es")
     assert "Remuestreo polifásico" in ax.get_title()
     assert ax.get_xlabel() == "Frecuencia [Hz]"

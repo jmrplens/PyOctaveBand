@@ -143,7 +143,7 @@ Number of samples in the inverse filter.
 
 ```python
 regularized_inverse_filter(
-    response: list[float] | np.ndarray | Any,
+    response: Signal | list[float] | np.ndarray | Any,
     fs: float | None = None,
     *,
     f_range: tuple[float, float],
@@ -191,7 +191,7 @@ recordings (or the excitation, for pre-emphasis) and read
 
 | Name | Description |
 | :--- | :--- |
-| `response` | Measured impulse response (1-D array), or an [`phonometry.ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) from the sweep/MLS/Golay front ends (its sample rate is used when `fs` is omitted). |
+| `response` | Measured impulse response (1-D array), or an [`phonometry.ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) from the sweep/MLS/Golay front ends (its sample rate is used when `fs` is omitted). Also accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though an inverse filter undoes the response it is built from, so it comes out in 1/Pa, with the regularization floor in Pa². |
 | `fs` | Sample rate in Hz. Optional when `response` carries one. |
 | `f_range` | `(f1, f2)` band, in Hz, over which the response is equalized to unity. Choose it inside the band actually excited and radiated; inverting unexcited regions only amplifies noise. |
 | `regularization_inside` | In-band regularization, as a fraction of the peak spectral power $\max \lvert H \rvert^2$. Default 1e-6. |

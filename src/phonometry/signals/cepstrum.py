@@ -72,6 +72,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .spectra import _positive, _validate_signal
 
 if TYPE_CHECKING:
@@ -244,8 +246,8 @@ class CepstrumResult:
 
 
 def cepstrum(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     kind: str = "power",
     nfft: int | None = None,
@@ -267,8 +269,14 @@ def cepstrum(
       Havelock Ch. 87). Real-valued for a real record, and invertible:
       :meth:`CepstrumResult.invert` returns the signal.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, though a cepstrum is a
+        log-spectrum transform: the factor lands entirely on the zeroth
+        quefrency, as its natural logarithm (twice that for
+        ``kind='power'``), and every other quefrency is untouched.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param kind: ``"power"`` (default), ``"real"`` or ``"complex"``.
     :param nfft: Even FFT length, at least ``x.size`` (default: the record
         length, rounded up to even). Zero-padding reduces the cepstral
@@ -277,7 +285,7 @@ def cepstrum(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x", context="a cepstrum")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     if kind not in _KINDS:
         raise ValueError(f"'kind' must be one of {_KINDS}, got {kind!r}.")
     n = _validate_nfft(xa.size, nfft)
@@ -346,10 +354,10 @@ class LifterResult:
 
 
 def lifter(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
-    cutoff: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
+    cutoff: float,
     mode: str = "lowpass",
     nfft: int | None = None,
 ) -> LifterResult:
@@ -364,8 +372,16 @@ def lifter(
     **highpass** lifter keeps the complement, isolating the ripple. The two
     modes are exactly complementary in dB.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, though a cepstrum is a
+        log-spectrum transform: the factor lands on the zeroth quefrency
+        alone. ``spectrum_db`` shifts by 20 lg of it either way; the
+        zeroth quefrency shifts with it; and ``liftered_db`` shifts too
+        under ``mode='lowpass'``, which keeps that quefrency, but not
+        under ``'highpass'``, which is what lifters it away.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param cutoff: Cutoff quefrency, in seconds; must resolve to at least
         one sample and at most ``nfft/2`` samples.
     :param mode: ``"lowpass"`` (default) or ``"highpass"``.
@@ -375,7 +391,7 @@ def lifter(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x", context="liftering")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     if mode not in ("lowpass", "highpass"):
         raise ValueError(
             f"'mode' must be 'lowpass' or 'highpass', got {mode!r}."
@@ -486,8 +502,8 @@ class EchoDetectionResult:
 
 
 def echo_detection(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     min_quefrency: float | None = None,
     max_quefrency: float | None = None,
@@ -515,8 +531,13 @@ def echo_detection(
     caveat on the coefficient at off-sample delays.
 
     :param x: Signal (an impulse response, or any record with an in-record
-        echo), 1-D.
-    :param fs: Sample rate, in Hz.
+        echo), 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, though an echo delay and a
+        reflection coefficient are both scale-free: nothing in the result
+        moves with the factor.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param min_quefrency: Lower edge of the searched band, in seconds
         (default 16 samples, clearing the immediate quefrency-zero region;
         raise it above the source's envelope quefrencies when needed).

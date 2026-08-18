@@ -401,7 +401,7 @@ def generate_zoom_fft_resolution(output_dir: str) -> None:
 
     # 0.25 Hz grid: four points per record-length resolution, so the two
     # mainlobes are drawn as smooth curves with their exact peaks.
-    res = zoom_fft(x, fs, 980.0, 1016.0, n_points=145)
+    res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(coarse_f[band], 20.0 * np.log10(np.maximum(coarse[band], 1e-12)),

@@ -56,8 +56,8 @@ modulation lines read low by the taper's scalloping loss.
 
 ```python
 envelope(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     decimation_factor: int = 1,
     antialias: bool = True,
@@ -89,8 +89,8 @@ same time axis.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the envelope and the carried waveform come out in Pa. The phase and the instantaneous frequency do not move. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `decimation_factor` | Integer output decimation (default 1: off). |
 | `antialias` | Anti-alias filter the decimated envelope (default `True`). |
 
@@ -106,8 +106,8 @@ same time axis.
 
 ```python
 envelope_spectrum(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     kind: str = 'magnitude',
     window: str = 'hann',
@@ -158,8 +158,8 @@ untouched) before the detector, the Figure 13.11 front end.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the envelope, its spectral amplitude and the mean level come out in Pa under the default `kind='magnitude'`, and in Pa² under `'squared'`, which squares the envelope before transforming it. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `kind` | `"magnitude"` (default) or `"squared"`. |
 | `window` | Taper (any scipy window name; default Hann). The amplitude is corrected for the taper's coherent gain. |
 | `nfft` | FFT length, at least `x.size` (default: the record length). |

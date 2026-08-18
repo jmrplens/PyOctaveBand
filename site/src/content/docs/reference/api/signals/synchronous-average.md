@@ -184,10 +184,10 @@ With `ax` given, only the averaged-waveform panel is drawn on it.
 
 ```python
 time_synchronous_average(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
-    period: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
+    period: float,
     n_averages: int | None = None,
     n_harmonics: int = 8,
 ) -> SynchronousAverageResult
@@ -209,8 +209,8 @@ and recovered within that interpolation error.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D, containing the periodic component plus noise. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D, containing the periodic component plus noise. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the period waveform, the residual and its RMS come out in Pa. The noise reduction in dB is a ratio and does not move. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `period` | Known repetition period `T`, in seconds (e.g. one revolution of a rotating machine). |
 | `n_averages` | Number of whole periods to average (default: as many as the record holds). Choosing `N` so that $N q$ is an integer places a comb node on an interfering tone at order `q` and maximises its rejection (McFadden's revised-model result). |
 | `n_harmonics` | Number of harmonics of `1/T` spanned by the returned comb-filter response (default 8). |

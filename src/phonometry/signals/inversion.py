@@ -47,6 +47,9 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from .._internal.utils import _typesignal
+from ..io._resolve import apply_calibration
+from ..io._resolve import resolve_fs as _resolve_signal_fs
+from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -201,7 +204,7 @@ def _validated_response(response: Any) -> np.ndarray:
         raise ValueError("'response' must have at least 2 samples.")
     if not np.all(np.isfinite(h)):
         raise ValueError("'response' must be finite.")
-    return h
+    return apply_calibration(response, h)
 
 
 def _validated_band(
@@ -219,7 +222,15 @@ def _validated_band(
 
 
 def _resolve_fs(response: Any, fs: float | None) -> float:
-    """Take ``fs`` from the argument or from a result carrying one."""
+    """Take ``fs`` from the argument or from a result carrying one.
+
+    A :class:`phonometry.io.Signal` goes through the library-wide resolver,
+    which refuses an explicit rate that disagrees with the one the recording
+    carries. The duck-typed branch below stays for the result objects of the
+    sweep/MLS/Golay front ends, which carry a rate but no such contract.
+    """
+    if isinstance(response, Signal):
+        return float(_resolve_signal_fs(response, fs, name="response"))
     if fs is None:
         fs = getattr(response, "fs", None)
     if fs is None:
@@ -234,7 +245,7 @@ def _resolve_fs(response: Any, fs: float | None) -> float:
 
 
 def regularized_inverse_filter(
-    response: list[float] | np.ndarray | Any,
+    response: Signal | list[float] | np.ndarray | Any,
     fs: float | None = None,
     *,
     f_range: tuple[float, float],
@@ -280,7 +291,11 @@ def regularized_inverse_filter(
 
     :param response: Measured impulse response (1-D array), or an
         :class:`phonometry.ImpulseResponseResult` from the sweep/MLS/Golay
-        front ends (its sample rate is used when ``fs`` is omitted).
+        front ends (its sample rate is used when ``fs`` is omitted). Also
+        accepts a :class:`phonometry.io.Signal`, whose calibration is applied
+        to the samples, though an inverse filter undoes the response it is
+        built from, so it comes out in 1/Pa, with the regularization floor
+        in Pa².
     :param fs: Sample rate in Hz. Optional when ``response`` carries one.
     :param f_range: ``(f1, f2)`` band, in Hz, over which the response is
         equalized to unity. Choose it inside the band actually excited and

@@ -59,6 +59,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import resolve_fs, resolve_pair_fs, resolve_samples
+from ..io._signal import Signal
 from .spectra import (
     _noverlap_samples,
     _positive,
@@ -92,19 +94,74 @@ _PIVOT_FLOOR_REL = 1e-12
 # ---------------------------------------------------------------------------
 
 
+def _resolve_miso_fs(
+    inputs: (
+        Signal
+        | Sequence[Signal | NDArray[np.float64] | list[float]]
+        | NDArray[np.float64]
+    ),
+    output: Signal | NDArray[np.float64] | list[float],
+    fs: float | None,
+) -> float:
+    """The one rate of a MISO measurement, from whichever side knows it.
+
+    ``inputs`` may be the Signal itself (its channels are the records), or a
+    sequence in which some element is one; ``output`` may be one too. Every
+    Signal involved has to agree, because a MISO estimate cross-spectra them
+    against each other, and two rates would mis-time every phase in the
+    result.
+    """
+    carrier: Signal | NDArray[np.float64] | list[float]
+    if isinstance(inputs, (Signal, np.ndarray)):
+        carrier = inputs
+    else:
+        signals = [row for row in inputs if isinstance(row, Signal)]
+        # Every one of them, not just the first: two inputs recorded at
+        # different rates can hold the same number of samples, so the
+        # length check downstream would not notice, and the conditioning
+        # would cross-spectrum them on one frequency axis that is right
+        # for at most one of them.
+        rates = sorted({row.fs for row in signals})
+        if len(rates) > 1:
+            raise ValueError(
+                f"'inputs' holds Signals recorded at different rates ({rates} "
+                "Hz); a MISO estimate cross-spectra them against each other, "
+                "so resample them to a common rate first"
+            )
+        carrier = signals[0] if signals else np.asarray(output)
+    if isinstance(carrier, Signal) or isinstance(output, Signal):
+        return float(
+            resolve_pair_fs(carrier, output, fs, names=("inputs", "output"))
+        )
+    return float(resolve_fs(np.asarray(output), fs, name="output"))
+
+
 def _validate_inputs(
-    inputs: Sequence[NDArray[np.float64] | list[float]] | NDArray[np.float64],
-    output: NDArray[np.float64] | list[float],
+    inputs: (
+        Signal
+        | Sequence[Signal | NDArray[np.float64] | list[float]]
+        | NDArray[np.float64]
+    ),
+    output: Signal | NDArray[np.float64] | list[float],
 ) -> tuple[list[NDArray[np.float64]], NDArray[np.float64]]:
     """Validate the input records and the output, all one-dimensional.
 
     Accepts a sequence of 1-D arrays or a 2-D ``(q, n)`` array of inputs.
     """
-    rows: list[NDArray[np.float64]]
-    if isinstance(inputs, np.ndarray) and inputs.ndim == 2:
+    rows: list[Signal | NDArray[np.float64] | list[float]]
+    if isinstance(inputs, Signal):
+        # A multichannel Signal *is* the set of input records: the q channels
+        # of one recording are exactly what the model calls x1..xq. Its
+        # calibration is applied once, here, because the rows that come out
+        # are bare arrays and would otherwise reach the estimate in digital
+        # units.
+        rows = list(np.atleast_2d(resolve_samples(inputs)))
+    elif isinstance(inputs, np.ndarray) and inputs.ndim == 2:
         rows = [np.ascontiguousarray(row, dtype=np.float64) for row in inputs]
     else:
-        rows = [np.asarray(x, dtype=np.float64) for x in inputs]
+        # A sequence may hold Signals of its own; each element keeps its own
+        # calibration, applied by _validate_signal below.
+        rows = list(inputs)
     if len(rows) < 2:
         raise ValueError("'inputs' must hold at least two input records.")
     xs = [_validate_signal(x, f"inputs[{i}]") for i, x in enumerate(rows)]
@@ -426,9 +483,13 @@ class MISOCoherenceResult:
 
 
 def miso_coherence(
-    inputs: Sequence[NDArray[np.float64] | list[float]] | NDArray[np.float64],
-    output: NDArray[np.float64] | list[float],
-    fs: float,
+    inputs: (
+        Signal
+        | Sequence[Signal | NDArray[np.float64] | list[float]]
+        | NDArray[np.float64]
+    ),
+    output: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     order: Sequence[int] | None = None,
     window: str = "hann",
@@ -460,9 +521,19 @@ def miso_coherence(
     ordering the inputs by descending ordinary coherence with the output.
 
     :param inputs: The ``q`` input records (``q >= 2``), a sequence of
-        equal-length 1-D arrays or a 2-D ``(q, n)`` array.
-    :param output: The output record, 1-D, same length as the inputs.
-    :param fs: Sample rate, in Hz.
+        equal-length 1-D arrays or a 2-D ``(q, n)`` array. Accepts a
+        :class:`phonometry.io.Signal` whose channels are the records, or a
+        sequence with Signals among its elements; their calibration is
+        applied to the samples, and Signals recorded at different rates are
+        refused rather than arbitrated.
+    :param output: The output record, 1-D, same length as the inputs. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the output autospectrum
+        and the coherent output spectra come out in Pa²/Hz, or Pa² for
+        ``scaling='spectrum'``. Every coherence is a ratio and does not move.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param order: Conditioning order as input indices (default ``0..q-1``).
     :param window: Segment taper (default Hann).
     :param nperseg: Welch segment length; ``None`` picks a default.
@@ -473,7 +544,7 @@ def miso_coherence(
     """
     xs, ya = _validate_inputs(inputs, output)
     q = len(xs)
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(_resolve_miso_fs(inputs, output, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     perm = _validate_order(order, q)
     seg, ovl = _validate_welch_params(ya.size, fs_v, nperseg, overlap)

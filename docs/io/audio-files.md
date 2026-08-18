@@ -44,23 +44,51 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 The object stands in for the bare array anywhere: `np.asarray(sig)` yields
 the samples (1-D for one channel, `(channels, samples)` for several), so
 every `(x, fs, ...)` function of the library already takes it in place of
-the array, with the rate still passed alongside. The level
+the array, with the rate still passed alongside. Much of the library goes
+further and takes the `Signal` itself — the object already knows its rate and
+its calibration, and asking you to repeat either is asking for a
+transcription error. The object supplies the rate when `fs` is omitted, and
+an explicit `fs` that disagrees with it raises rather than being arbitrated. That covers the level
 functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
-and `lex_8h`) and the filters (`octave_filter`, `weighting_filter`,
+and `lex_8h`), the filters (`octave_filter`, `weighting_filter`,
 `time_weighting`, `linkwitz_riley`, `parametric_eq`, and the block-processing
 objects `OctaveFilterBank`, `WeightingFilter`, `TimeWeighting` and
-`ParametricEQ`) go further and take the `Signal` itself — the
-object already knows its rate and its calibration, and asking you to repeat
-either is asking for a transcription error. The rate it carries wins, and an
-explicit one that disagrees raises rather than being arbitrated.
+`ParametricEQ`), and the estimators of `signals`: spectra
+(`power_spectral_density`, `cross_spectral_density`,
+`coherent_output_spectrum`, `multitaper_psd`, `miso_coherence`),
+time-frequency (`spectrogram`, `zoom_fft`), correlation and delay
+(`correlation`, `time_delay`, `impulse_response_delay`,
+`align_impulse_responses`), envelope (`envelope`, `envelope_spectrum`),
+cepstrum (`cepstrum`, `lifter`, `echo_detection`),
+`time_synchronous_average`, `regularized_inverse_filter`, `resample_signal`
+and `fractional_delay`, together with the data-qualification tests of
+`metrology` (`stationarity_test`, `level_crossing_rate`, `peak_statistics`).
 
-A calibrated `Signal` is *processed* in pascals, which is one rule with three
-readings depending on what the call returns: `weighting_filter`,
-`linkwitz_riley` and `parametric_eq` hand back a waveform, so that waveform is
-in pascals; `time_weighting` squares its input, so its envelope is in Pa²; and
-`octave_filter` and the level functions return a level, so what the
-calibration buys there is dB SPL re 20 µPa instead of a number in digital
-units. The `dbfs` routes are the deliberate exception: full scale is their
+A calibrated `Signal` is *processed* in pascals. That is one rule but not one
+unit: what the calibration buys depends on what the call hands back.
+
+| What the call returns | Units under a calibrated `Signal` |
+| :--- | :--- |
+| A waveform: `weighting_filter`, `linkwitz_riley`, `parametric_eq`, `envelope`, `time_synchronous_average`, `resample_signal`, `fractional_delay`, `align_impulse_responses` | Pa |
+| A squared envelope: `time_weighting` | Pa² |
+| A level: `octave_filter`, `OctaveFilterBank`, and the level functions | dB SPL re 20 µPa |
+| A spectral density: `power_spectral_density`, `cross_spectral_density`, `coherent_output_spectrum`, `multitaper_psd`, `spectrogram`, `miso_coherence` | Pa²/Hz, or Pa² under `scaling='spectrum'` |
+| A correlation: `correlation` | Pa² |
+| An amplitude spectrum: `zoom_fft`, `envelope_spectrum` | Pa |
+| An inverse filter: `regularized_inverse_filter` | 1/Pa |
+
+Ratios and times are scale-free and do not move at all: every coherence,
+every normalized correlation coefficient, every phase, and every delay in
+seconds or samples, which is why `time_delay`, `impulse_response_delay` and
+`echo_detection` return for a calibrated `Signal` exactly what they return
+for the raw record. The cepstrum is the one odd case, being a log-spectrum
+transform: the factor lands entirely on the zeroth quefrency and leaves every
+other one untouched, so `lifter` shifts its two dB spectra by 20 lg of the
+factor and moves nothing else. `level_crossing_rate` is the one that asks
+something of you: its `levels` are compared against the samples, so for a
+calibrated `Signal` they have to be given in pascals.
+
+The `dbfs` routes are the deliberate exception: full scale is their
 reference, so they ignore the factor. For the same reason, do not chain a
 filter into a dBFS reading: `leq(weighting_filter(sig, curve="A"), dbfs=True)`
 measures pascals on a scale that claims to be full-scale referenced, and comes

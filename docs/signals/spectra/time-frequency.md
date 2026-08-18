@@ -130,7 +130,7 @@ frequency reads `amplitude` $= A$ and `power` $= A^2/2$ exactly:
 ```python
 from phonometry import zoom_fft
 
-res = zoom_fft(x, fs, 980.0, 1016.0)     # grid at the record resolution
+res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0)     # grid at the record resolution
 print(res.bin_spacing)                   # fs/N by default
 print(res.resolution_bandwidth)          # Be of the tapered record
 peak = res.amplitude.argmax()
@@ -166,7 +166,7 @@ coarse = 2.0 * np.abs(np.fft.rfft(x[:1024] * w)) / np.sum(w)
 coarse_f = np.fft.rfftfreq(1024, 1.0 / fs)
 band = (coarse_f >= 950.0) & (coarse_f <= 1050.0)
 
-res = zoom_fft(x, fs, 980.0, 1016.0, n_points=145)   # 0.25 Hz grid
+res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)   # 0.25 Hz grid
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(coarse_f[band], 20.0 * np.log10(coarse[band]), "o--",

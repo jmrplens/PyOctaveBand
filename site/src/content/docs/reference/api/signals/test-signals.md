@@ -59,7 +59,7 @@ with their accuracy stated instead of implied.
 
 ```python
 fractional_delay(
-    x: NDArray[np.float64] | list[float],
+    x: Signal | NDArray[np.float64] | list[float],
     delay: float,
     *,
     mode: Literal['linear', 'circular'] = 'linear',
@@ -97,7 +97,7 @@ signal is - or use odd lengths, and the operation is exact.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input record, 1-D. |
+| `x` | Input record, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the delayed record comes out in Pa. |
 | `delay` | Delay in samples (fractional and negative allowed); magnitude less than the record length. |
 | `mode` | Boundary convention, `'linear'` or `'circular'`. |
 
@@ -134,7 +134,7 @@ zero-mean and rescaled to the requested RMS exactly.
 
 | Name | Description |
 | :--- | :--- |
-| `fs` | Sample rate, in Hz. |
+| `fs` | Rate to generate at, in Hz. |
 | `seconds` | Duration, in seconds (at least 16 samples). |
 | `color` | Noise color: `'white'`, `'pink'`, `'red'`, `'blue'` or `'violet'`. |
 | `rms` | Root-mean-square value of the returned record. |
@@ -152,10 +152,10 @@ zero-mean and rescaled to the requested RMS exactly.
 
 ```python
 resample_signal(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
-    fs_new: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
+    fs_new: float,
     stopband_attenuation_db: float = 120.0,
     transition_width: float = 0.05,
     max_denominator: int = 1000,
@@ -178,8 +178,8 @@ default.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input record, 1-D. |
-| `fs` | Sample rate of `x`, in Hz. |
+| `x` | Input record, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the resampled record comes out in Pa. |
+| `fs` | Sample rate of `x`, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fs_new` | Target sample rate, in Hz. The ratio `fs_new/fs` must be a rational number with denominator at most `max_denominator` (e.g. 48000/44100 = 160/147). |
 | `stopband_attenuation_db` | Anti-alias stopband attenuation, in dB (at least 30). |
 | `transition_width` | Transition-band width as a fraction of the smaller Nyquist frequency, in (0, 0.5]. |
@@ -307,7 +307,7 @@ realized residual.
 
 | Name | Description |
 | :--- | :--- |
-| `fs` | Sample rate, in Hz. |
+| `fs` | Rate to generate at, in Hz. |
 | `frequency` | Tone frequency, in Hz (below the Nyquist rate). |
 | `cycles` | Full tone periods per burst (positive integer). |
 | `amplitude` | Peak amplitude of the tone. |

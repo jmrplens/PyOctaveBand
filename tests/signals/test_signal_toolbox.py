@@ -213,7 +213,7 @@ def test_designed_filter_meets_its_own_spec(
 
     x = ph.noise_signal(fs, 0.2, seed=5)
     res = ph.resample_signal(
-        x, fs, fs_new, stopband_attenuation_db=atten, transition_width=tw
+        x, fs, fs_new=fs_new, stopband_attenuation_db=atten, transition_width=tw
     )
     fs_up = res.original_fs * res.up
     freqs, h = sp_signal.freqz(res.filter_taps, worN=1 << 19, fs=fs_up)
@@ -233,7 +233,7 @@ def test_resampled_tone_matches_analytic_tone() -> None:
     fs, fs_new, atten = 48000.0, 32000.0, 120.0
     t = np.arange(int(fs * 0.5)) / fs
     tone = np.sin(2.0 * np.pi * 1000.0 * t)
-    res = ph.resample_signal(tone, fs, fs_new, stopband_attenuation_db=atten)
+    res = ph.resample_signal(tone, fs, fs_new=fs_new, stopband_attenuation_db=atten)
     t_new = np.arange(res.signal.size) / fs_new
     exact = np.sin(2.0 * np.pi * 1000.0 * t_new)
     edge = res.n_taps // res.up + 1
@@ -243,7 +243,7 @@ def test_resampled_tone_matches_analytic_tone() -> None:
 
 def test_rational_ratio_and_output_length() -> None:
     x = ph.noise_signal(44100.0, 0.1, seed=2)
-    res = ph.resample_signal(x, 44100.0, 48000.0)
+    res = ph.resample_signal(x, 44100.0, fs_new=48000.0)
     assert (res.up, res.down) == (160, 147)
     assert res.signal.size == int(np.ceil(x.size * 160 / 147))
     assert res.fs == 48000.0
@@ -252,7 +252,7 @@ def test_rational_ratio_and_output_length() -> None:
 
 def test_identity_ratio_returns_copy_without_filtering() -> None:
     x = ph.noise_signal(FS, 0.05, seed=3)
-    res = ph.resample_signal(x, FS, FS)
+    res = ph.resample_signal(x, FS, fs_new=FS)
     np.testing.assert_array_equal(res.signal, x)
     assert (res.up, res.down) == (1, 1)
     assert res.n_taps == 1
@@ -262,23 +262,23 @@ def test_irrational_ratio_raises() -> None:
     x = ph.noise_signal(FS, 0.05, seed=4)
     fs_irrational = FS * np.sqrt(2.0)
     with pytest.raises(ValueError, match="rational"):
-        ph.resample_signal(x, FS, fs_irrational)
+        ph.resample_signal(x, FS, fs_new=fs_irrational)
 
 
 def test_resample_invalid_parameters() -> None:
     x = ph.noise_signal(FS, 0.05, seed=4)
     two_dimensional = np.zeros((4, 4))
     with pytest.raises(ValueError, match="at least 30"):
-        ph.resample_signal(x, FS, 32000.0, stopband_attenuation_db=10.0)
+        ph.resample_signal(x, FS, fs_new=32000.0, stopband_attenuation_db=10.0)
     with pytest.raises(ValueError, match="transition_width"):
-        ph.resample_signal(x, FS, 32000.0, transition_width=0.9)
+        ph.resample_signal(x, FS, fs_new=32000.0, transition_width=0.9)
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.resample_signal(two_dimensional, FS, 32000.0)
+        ph.resample_signal(two_dimensional, FS, fs_new=32000.0)
 
 
 def test_resample_plot_filter_and_edges() -> None:
     x = ph.noise_signal(FS, 0.2, seed=5)
-    res = ph.resample_signal(x, FS, 32000.0, stopband_attenuation_db=100.0)
+    res = ph.resample_signal(x, FS, fs_new=32000.0, stopband_attenuation_db=100.0)
     ax = res.plot(linewidth=2)
     # The magnitude trace echoes the requested kwargs.
     assert any(line.get_linewidth() == 2.0 for line in ax.lines)

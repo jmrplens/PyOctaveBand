@@ -84,6 +84,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .spectra import _positive
 from .test_signals import _validate_1d_finite, fractional_delay
 
@@ -279,10 +281,10 @@ def _comb_grid(
 
 
 def time_synchronous_average(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
-    period: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
+    period: float,
     n_averages: int | None = None,
     n_harmonics: int = 8,
 ) -> SynchronousAverageResult:
@@ -298,8 +300,13 @@ def time_synchronous_average(
     fractional delay of :func:`~phonometry.signals.test_signals.fractional_delay`
     and recovered within that interpolation error.
 
-    :param x: Signal, 1-D, containing the periodic component plus noise.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D, containing the periodic component plus noise. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the period waveform, the
+        residual and its RMS come out in Pa. The noise reduction in dB is a
+        ratio and does not move.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param period: Known repetition period ``T``, in seconds (e.g. one
         revolution of a rotating machine).
     :param n_averages: Number of whole periods to average (default: as many
@@ -313,7 +320,7 @@ def time_synchronous_average(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_1d_finite(x, "x")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     period_v = _positive(period, "period")
     n_harmonics_v = int(n_harmonics)
     if n_harmonics_v < 1:

@@ -108,7 +108,7 @@ numbers the caller controls:
 from phonometry import noise_signal, resample_signal
 
 x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
+res = resample_signal(x, 44100, fs_new=48000)   # 120 dB alias rejection
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # designed FIR, 20947.5 Hz
 res.plot()   # the delivered anti-alias filter against its design spec
@@ -131,7 +131,7 @@ from scipy import signal
 from phonometry import noise_signal, resample_signal
 
 x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, 48000)   # 120 dB alias rejection
+res = resample_signal(x, 44100, fs_new=48000)   # 120 dB alias rejection
 
 # res is the ResampledSignalResult computed in the example above.
 # One line — the delivered anti-alias filter against its design spec:

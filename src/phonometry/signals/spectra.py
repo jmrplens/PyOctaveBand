@@ -69,6 +69,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import apply_calibration, resolve_fs, resolve_pair_fs
+from ..io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -105,11 +108,22 @@ def _positive(value: float, name: str) -> float:
 
 
 def _validate_signal(
-    x: NDArray[np.float64] | list[float],
+    x: Signal | NDArray[np.float64] | list[float],
     name: str,
     *,
     context: str = "a spectral estimate",
 ) -> NDArray[np.float64]:
+    """Coerce, check and calibrate the signal argument of an estimate.
+
+    Every one-dimensional consumer in ``signals`` and
+    ``metrology.data_qualification`` enters here, which is what lets a
+    :class:`phonometry.io.Signal` reach all of them at once and reach
+    them the same way: the samples come out in pascals when the object
+    carried a factor, and untouched otherwise. The shape and finiteness
+    complaints are unchanged, and a multichannel Signal is refused by the
+    same "must be one-dimensional" as a 2-D array, because these
+    estimates are defined on one record.
+    """
     xa = np.asarray(x, dtype=np.float64)
     if xa.ndim != 1:
         raise ValueError(f"'{name}' must be one-dimensional.")
@@ -119,7 +133,7 @@ def _validate_signal(
         )
     if not np.all(np.isfinite(xa)):
         raise ValueError(f"'{name}' must be finite.")
-    return xa
+    return apply_calibration(x, xa)
 
 
 def _validate_welch_params(
@@ -407,8 +421,8 @@ class SpectralDensityResult:
 
 
 def power_spectral_density(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = "hann",
     nperseg: int | None = None,
@@ -429,8 +443,13 @@ def power_spectral_density(
     resolution-bias error at a resonance peak see
     :func:`resolution_bias_error`.
 
-    :param x: Signal, 1-D.
-    :param fs: Sample rate, in Hz.
+    :param x: Signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the density and its
+        confidence interval come out in Pa²/Hz, or Pa² for
+        ``scaling='spectrum'``.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param window: Segment taper (any scipy window name; default Hann,
         the B&P Section 11.5.2 recommendation for side-lobe suppression).
     :param nperseg: Welch segment length; ``None`` picks a length giving a
@@ -447,7 +466,7 @@ def power_spectral_density(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     xa = _validate_signal(x, "x")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_fs(x, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     conf = _validate_confidence(confidence)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
@@ -570,9 +589,9 @@ class CrossSpectralDensityResult:
 
 
 def cross_spectral_density(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = "hann",
     nperseg: int | None = None,
@@ -591,9 +610,18 @@ def cross_spectral_density(
     (\lvert \gamma_{xy} \rvert \sqrt{2 n_\mathrm{d}})` (Eq. 9.52) for the phase,
     with the measured coherence in place of the unknown true value.
 
-    :param x: First signal, 1-D.
-    :param y: Second signal, 1-D, same length as ``x``.
-    :param fs: Sample rate, in Hz.
+    :param x: First signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the cross-spectrum and its
+        magnitude come out in Pa²/Hz, or Pa² for ``scaling='spectrum'``.
+        The coherence and the phase are ratios and do not move.
+    :param y: Second signal, 1-D, same length as ``x``. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the cross-spectrum and its
+        magnitude come out in Pa²/Hz, or Pa² for ``scaling='spectrum'``.
+        The coherence and the phase are ratios and do not move.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param window: Segment taper (default Hann).
     :param nperseg: Welch segment length; ``None`` picks a default.
     :param overlap: Segment overlap fraction in [0, 1) (default 0.5).
@@ -605,7 +633,7 @@ def cross_spectral_density(
     ya = _validate_signal(y, "y")
     if xa.size != ya.size:
         raise ValueError("'x' and 'y' must have the same length.")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_pair_fs(x, y, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
     nov = _noverlap_samples(seg, ovl)
@@ -730,9 +758,9 @@ class CoherentOutputSpectrumResult:
 
 
 def coherent_output_spectrum(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     window: str = "hann",
     nperseg: int | None = None,
@@ -755,9 +783,20 @@ def coherent_output_spectrum(
     closed-form oracle used to verify
     the implementation.
 
-    :param x: Input (reference) signal, 1-D.
-    :param y: Output (response) signal, 1-D, same length as ``x``.
-    :param fs: Sample rate, in Hz.
+    :param x: Input (reference) signal, 1-D. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so all three densities come out in
+        Pa²/Hz, or Pa² for ``scaling='spectrum'``.
+        The coherence and the signal-to-noise ratio are ratios and do not
+        move.
+    :param y: Output (response) signal, 1-D, same length as ``x``. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so all three densities come out in
+        Pa²/Hz, or Pa² for ``scaling='spectrum'``.
+        The coherence and the signal-to-noise ratio are ratios and do not
+        move.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param window: Segment taper (default Hann).
     :param nperseg: Welch segment length; ``None`` picks a default.
     :param overlap: Segment overlap fraction in [0, 1) (default 0.5).
@@ -769,7 +808,7 @@ def coherent_output_spectrum(
     ya = _validate_signal(y, "y")
     if xa.size != ya.size:
         raise ValueError("'x' and 'y' must have the same length.")
-    fs_v = _positive(fs, "fs")
+    fs_v = _positive(resolve_pair_fs(x, y, fs), "fs")
     scaling_v = _validate_scaling(scaling)
     seg, ovl = _validate_welch_params(xa.size, fs_v, nperseg, overlap)
     nov = _noverlap_samples(seg, ovl)

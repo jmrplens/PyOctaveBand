@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `miso_coherence` refuses a list of input records whose `Signal` elements
+  were recorded at different rates, instead of taking the rate of whichever
+  one happened to be first. Nothing downstream caught it: two records at
+  different rates can hold the same number of samples, so the equal-length
+  check passed, and the conditioning then cross-spectra them on a single
+  frequency axis that was right for at most one of them. The same call
+  returned an axis of 4 kHz or 8 kHz for the same data depending on the order
+  of the list. The module's own docstring already promised the agreement this
+  now enforces.
+
 ### Changed
 
 - `linkwitz_riley` and `parametric_eq` take their mandatory argument as
@@ -25,24 +37,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   radius, ...)`, `precision_positions(surface, *, radius, ...)` and
   `sound_power_anechoic(levels_positions, surface, *, radius, ...)` require
   the radius they measure over; and `predicted_diffusion_spectrum(well_width,
-  frequencies, *, depths, ...)` requires the well depths it predicts from. Each of them had
-  a `= None` default and a hand-written `ValueError` a few lines into the
-  body, so the signature and the docstring disagreed about what the call
-  needs. Python raises `TypeError: missing required argument` for the omitted
-  case now; the range checks that follow (a positive rate, a positive radius)
-  keep raising `ValueError` as before.
+  frequencies, *, depths, ...)` requires the well depths it predicts from.
+  Each of them had a `= None` default and a hand-written `ValueError` a few
+  lines into the body, so the signature and the docstring disagreed about
+  what the call needs. Python raises `TypeError: missing required argument`
+  for the omitted case now; the range checks that follow (a positive rate, a
+  positive radius) keep raising `ValueError` as before.
+
+- Five estimators do the same with the argument that sits behind their now
+  optional `fs`: `zoom_fft(x, fs=None, *, f_min, f_max, ...)`,
+  `lifter(x, fs=None, *, cutoff, ...)`,
+  `time_synchronous_average(x, fs=None, *, period, ...)`,
+  `regularized_inverse_filter(response, fs=None, *, f_range, ...)` and
+  `resample_signal(x, fs=None, *, fs_new, ...)`. The band, the quefrency
+  cutoff, the period, the inversion band and the target rate are what each
+  call is for, so they are required rather than defaulted to `None` and
+  checked in the body. `fs` keeps its position in all five.
 
 ### Added
+
+- The estimators take the `Signal` too, so a record read from a file goes
+  through the whole analysis chain without its rate or its calibration being
+  retyped: the spectral estimators (`power_spectral_density`,
+  `cross_spectral_density`, `coherent_output_spectrum`, `multitaper_psd`,
+  `miso_coherence`), the time-frequency pair (`spectrogram`, `zoom_fft`),
+  correlation and delay (`correlation`, `time_delay`,
+  `impulse_response_delay`, `align_impulse_responses`), the envelope pair
+  (`envelope`, `envelope_spectrum`), the cepstrum family (`cepstrum`,
+  `lifter`, `echo_detection`), `time_synchronous_average`,
+  `regularized_inverse_filter`, `resample_signal`, `fractional_delay`, and the
+  data-qualification tests of `metrology` (`stationarity_test`,
+  `level_crossing_rate`, `peak_statistics`).
+
+  "Processed in pascals" is one rule but not one unit here, and each function
+  now documents which one it lands in rather than repeating the phrase: a
+  density comes out in Pa²/Hz (Pa² under `scaling='spectrum'`), a correlation
+  in Pa², an amplitude spectrum or a waveform in Pa, and an inverse filter in
+  1/Pa, because it undoes the response it was built from. Ratios and times do
+  not move at all, so `time_delay`, `impulse_response_delay` and
+  `echo_detection` return for a calibrated `Signal` exactly what they return
+  for the raw record; a cepstrum takes the factor entirely on its zeroth
+  quefrency; and `level_crossing_rate` is the one that asks something back,
+  since its `levels` are compared against the samples and so have to be given
+  in pascals.
 
 - The filters take the `Signal` the reader returns, as the level functions
   already did: `octave_filter`, `weighting_filter`, `time_weighting`,
   `linkwitz_riley`, `parametric_eq`, and the block-processing objects
   `OctaveFilterBank` (both `.filter()` and `.spectrogram()`),
-  `WeightingFilter`, `TimeWeighting` and `ParametricEQ`. The rate the object
-  carries wins and an explicit one that disagrees raises rather than being
-  arbitrated; a bare array still demands its rate by name; and a calibrated
+  `WeightingFilter`, `TimeWeighting` and `ParametricEQ`. The object supplies
+  the rate when `fs` is omitted and an explicit one that disagrees raises
+  rather than being arbitrated; a bare array still demands its rate by name; and a calibrated
   `Signal` is processed in pascals, which reads as a waveform in pascals, a
-  squared envelope in Pa2 or a band level in dB SPL depending on what the call
+  squared envelope in Pa² or a band level in dB SPL depending on what the call
   returns. Two exemptions are stated where they apply: a dBFS reading is
   referenced to digital full scale and never sees pascals, and a bank carrying
   its own `LevelCalibration` is the explicit knob, so the object's factor is

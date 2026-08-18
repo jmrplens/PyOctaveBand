@@ -74,8 +74,8 @@ remedy, exactly like the `oversample` padding of
 
 ```python
 cepstrum(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     kind: str = 'power',
     nfft: int | None = None,
@@ -102,8 +102,8 @@ Cepstrum of a record: power, real or complex.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though a cepstrum is a log-spectrum transform: the factor lands entirely on the zeroth quefrency, as its natural logarithm (twice that for `kind='power'`), and every other quefrency is untouched. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `kind` | `"power"` (default), `"real"` or `"complex"`. |
 | `nfft` | Even FFT length, at least `x.size` (default: the record length, rounded up to even). Zero-padding reduces the cepstral time-aliasing of sharp log-spectrum features. |
 
@@ -193,8 +193,8 @@ Plot the cepstrum against quefrency (positive quefrencies).
 
 ```python
 echo_detection(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     min_quefrency: float | None = None,
     max_quefrency: float | None = None,
@@ -226,8 +226,8 @@ caveat on the coefficient at off-sample delays.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal (an impulse response, or any record with an in-record echo), 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal (an impulse response, or any record with an in-record echo), 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though an echo delay and a reflection coefficient are both scale-free: nothing in the result moves with the factor. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `min_quefrency` | Lower edge of the searched band, in seconds (default 16 samples, clearing the immediate quefrency-zero region; raise it above the source's envelope quefrencies when needed). |
 | `max_quefrency` | Upper edge of the searched band, in seconds (default and maximum: half the FFT length, the end of the unambiguous quefrency axis). |
 | `nfft` | Even FFT length, at least `x.size` (default: the record length, rounded up to even). |
@@ -293,10 +293,10 @@ Plot the power cepstrum with the detected echo marked.
 
 ```python
 lifter(
-    x: NDArray[np.float64] | list[float],
-    fs: float,
-    cutoff: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
+    cutoff: float,
     mode: str = 'lowpass',
     nfft: int | None = None,
 ) -> LifterResult
@@ -316,8 +316,8 @@ modes are exactly complementary in dB.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Signal, 1-D. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Signal, 1-D. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though a cepstrum is a log-spectrum transform: the factor lands on the zeroth quefrency alone. `spectrum_db` shifts by 20 lg of it either way; the zeroth quefrency shifts with it; and `liftered_db` shifts too under `mode='lowpass'`, which keeps that quefrency, but not under `'highpass'`, which is what lifters it away. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `cutoff` | Cutoff quefrency, in seconds; must resolve to at least one sample and at most `nfft/2` samples. |
 | `mode` | `"lowpass"` (default) or `"highpass"`. |
 | `nfft` | Even FFT length, at least `x.size` (default: the record length, rounded up to even). |
