@@ -72,6 +72,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   dominant images sit above and below the critical angle, the seabed
   parameters are recorded on the result, and the ideal-waveguide check is
   tightened to 5e-4 dB to hold the default where it always was.
+- The beams choose their initial width per launch angle, and the quarter-depth
+  cap is retired. The default `W0` used to be clamped to a quarter of the
+  water depth, which in shallow water pushed beams under the book's own
+  ten-wavelength floor and biased the loss quiet by decibels, silently and
+  always in the same direction: against the exact Airy modes of an
+  `n^2`-linear 200 m guide at 200 Hz the cap's 50 m width measured +3.08 dB in
+  the mean, and +4.12 dB in a second 100 m guide at 250 Hz. What a shallow
+  channel actually demands is the opposite bound, a beam wide enough to
+  resolve the guide's modes in launch angle: adjacent modes stand
+  `lambda/(2D)` apart in the sine of that angle while a beam mixes angles over
+  its far-field divergence `lambda/(pi W0)`, so the default now raises the
+  free-space optimum `sqrt(lambda r_max/pi)` to `4 D cos(theta0)/pi` wherever
+  that is larger and the book's 10-50 wavelength band can hold it: one width
+  per launch angle, widest for the flat beams whose modes crowd together in
+  angle, every beam's vertical footprint the same `4D/pi`. The same two
+  oracles measure +0.19 and +0.39 dB at the new default, with no override and
+  no warning; the free-field, Lloyd-mirror, ideal-guide and lossy-seabed
+  validation numbers stand exactly where they were; and deep water is
+  untouched, the guide term standing down for the free-space optimum when
+  `4D/pi` exceeds fifty wavelengths. The result records `initial_beam_widths`
+  per beam in place of the old scalar, an explicit `beam_width` still applies
+  one width to the whole fan bit for bit, and the quarter-depth warning went
+  with the cap it policed; the 20 Hz two-mode guide the old guide prose read
+  as ray theory failing now measures within 0.03 dB of the image sum, the
+  cap's error all along.
 - The ISO 9614-3 precision determination renders its own accredited-style
   fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
   sheet carrying what part 3 asks a report to state (clause 10), which is not

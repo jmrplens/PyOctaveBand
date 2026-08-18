@@ -454,7 +454,7 @@ beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
                                   max_angle_deg=45.0, n_depth_points=80)
 print(beams.propagation_loss.shape)            # (80, 101)  profundidad x distancia
 print(beams.launch_angles.size)                # 439 haces entre +-45 grados
-print(round(beams.initial_beam_width, 1))      # 35,9 m: W0 de la Ec. (3.86)
+print(round(float(beams.initial_beam_widths[0]), 1))  # 35,9 m: W0, Ec. (3.86)
 beams.plot(language="es")   # el campo de PL, en el marco de parabolic_equation
 ```
 
@@ -500,23 +500,36 @@ plt.show()
 **El único parámetro libre.** $W_0$ lo es, y el libro reconoce sin rodeos que
 «la elección óptima de estas condiciones iniciales es materia de investigación
 actual», recomendando de 10 a 50 longitudes de onda. Aquí el valor por defecto
-es más afilado que una regla empírica porque el §3.5.1 hace la optimización de
-forma explícita: derivar la anchura en espacio libre de la Ec. (3.86) respecto
-del desplazamiento complejo da $W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, la anchura
-que mejor resuelve el campo en el extremo lejano del recorrido, que es donde
-peor se resuelve. Es también donde la integral en ángulo de lanzamiento que hay
-detrás de la Ec. (3.92) es una gaussiana de verdad y no una integral de
-Fresnel, y por eso no es solo una elección elegante: frente al campo libre a
-100 Hz a 2, 5 y 8 km el error en $|p|$ es de $7,5\times10^{-5}$ con esa
-anchura, de $2,7\times10^{-2}$ con la quinta parte de ella y de
-$4,1\times10^{-2}$ con quince veces. La banda de 10 a 50 longitudes de onda del
-libro y un cuarto de la profundidad de la columna lo acotan, y el límite del
-canal tiene la última palabra. Ese último tope es además donde peor está este
-valor por defecto, y la razón que se daba para él no sobrevive a la medida: lo
-que decía proteger, la contabilidad que pliega un rayo reflejado de vuelta a la
-columna, ya lo restituye la escalera de imágenes del receptor. En aguas someras
-cuesta unos decibelios de nivel en vez de comprar nada, que es el cuarto límite
-de más abajo.
+es más afilado que una regla empírica, y es una anchura por cada ángulo de
+lanzamiento en vez de una por corrida. En aguas abiertas el §3.5.1 hace la
+optimización de forma explícita: derivar la anchura en espacio libre de la
+Ec. (3.86) respecto del desplazamiento complejo da
+$W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, la anchura que mejor resuelve el campo
+en el extremo lejano del recorrido, que es donde peor se resuelve. Es también
+donde la integral en ángulo de lanzamiento que hay detrás de la Ec. (3.92) es
+una gaussiana de verdad y no una integral de Fresnel, y por eso no es solo una
+elección elegante: frente al campo libre a 100 Hz a 2, 5 y 8 km el error en
+$|p|$ es de $7,5\times10^{-5}$ con esa anchura, de $2,7\times10^{-2}$ con la
+quinta parte de ella y de $4,1\times10^{-2}$ con quince veces. Un canal somero
+añade encima su propia exigencia: su campo atrapado es un conjunto discreto de
+modos separados $\lambda/(2D)$ en el seno del ángulo de lanzamiento, y un haz
+mezcla ángulos de lanzamiento sobre su divergencia de campo lejano
+$\lambda/(\pi W_0)$, así que resolver los modos vecinos hasta la mitad de su
+separación pide $W_0 \ge 4D\cos\theta_0/\pi$: una anchura por cada ángulo de
+lanzamiento, máxima para los haces tendidos, cuyos modos se agolpan, y
+relajada por el coseno para los inclinados, con la huella vertical de todos
+los haces en el mismo $4D/\pi$. El valor por defecto toma el mayor de los dos,
+dentro de la banda de 10 a 50 longitudes de onda del libro, y entrega a todo
+el abanico el óptimo de espacio libre cuando el canal es demasiado profundo en
+longitudes de onda para que la anchura de guía quepa en la banda. Una versión
+anterior, en cambio, *acotaba* $W_0$ a un cuarto de la profundidad de la
+columna, leyendo el «no grandes en comparación con la profundidad del agua»
+del libro como un techo sobre la anchura y no sobre la huella; lo que ese tope
+decía proteger, la contabilidad que pliega un rayo reflejado de vuelta a la
+columna, ya lo restituye la escalera de imágenes del receptor, y en aguas
+someras costaba en silencio decibelios de nivel, siempre hacia lo demasiado
+flojo. Las medidas están dos párrafos más abajo, tope contra valor por
+defecto sobre los mismos oráculos exactos.
 
 **Contra qué está validado.** La divergencia esférica en campo libre, hasta
 $10^{-3}$ dB, que es la única comparación que fija a la vez la normalización de
@@ -535,7 +548,11 @@ ninguna de las otras hace, porque en un canal isovelocidad $c''$ se anula y se
 lleva consigo el coeficiente de acoplamiento de las ecuaciones dinámicas de
 rayos: el perfil $n^2$-lineal de la Ec. (3.77) tiene $k^2(z)$ exactamente lineal,
 así que sus modos son funciones de Airy con autovalores en forma cerrada, y los
-haces los siguen hasta 0,22 dB en media. Las dos condiciones de contorno salen
+haces, con su anchura por ángulo por defecto, los siguen hasta +0,19 dB en
+media en 200 m de agua a 200 Hz y hasta +0,39 dB en una segunda guía
+independiente de 100 m a 250 Hz. Esos dos cortes son además la medida que
+retiró el viejo tope de un cuarto de la profundidad, que sobre esos mismos
+oráculos salía +3,08 y +4,12 dB demasiado flojo. Las dos condiciones de contorno salen
 de la propia suma de haces en vez de imponerse: el campo en una superficie o un
 fondo de presión nula es 3 partes en $10^5$ de su valor a media columna, y un
 fondo rígido lo duplica.
@@ -587,9 +604,9 @@ cerrada de cada imagen: 0,07 dB en el peor caso en distancias cuyas imágenes
 dominantes caen por encima y por debajo del ángulo crítico, donde despojar a
 la $\mathcal{R}$ del oráculo de su fase lo mueve 5,7 dB.
 
-**Dónde se acaba.** Cinco límites, en el orden en que aprietan.
+**Dónde se acaba.** Cuatro límites, en el orden en que aprietan.
 
-- **No hay campo cercano**, y este es el mayor error de los cinco. La
+- **No hay campo cercano**, y este es el mayor error de los cuatro. La
   Ec. (3.92) pesa el abanico ajustándolo a una fuente puntual en campo lejano,
   y la Ec. (3.88) divide por una distancia cilíndrica que se anula sobre el eje
   del que sale cada rayo, así que de cerca la suma no tiene a qué converger. La
@@ -598,20 +615,24 @@ la $\mathcal{R}$ del oráculo de su fase lo mueve 5,7 dB.
   medio no acotado es de 17, 13 y 4,1 dB con un cuarto de $W_0$, de unos 0,6 dB
   con $W_0$, de una centésima de decibelio con $2,5\,W_0$ y de una milésima a
   partir de $3\,W_0$. No leas nada dentro de unas tres anchuras de haz de la
-  fuente, y ten en cuenta que, como el $W_0$ por defecto crece como
-  $\sqrt{r_{\max}}$, un recorrido más largo aleja aún más esa frontera. De
-  cerca, usa `parabolic_equation`.
+  fuente, y ten en cuenta que, como la anchura de espacio libre del valor por
+  defecto crece como $\sqrt{r_{\max}}$, un recorrido más largo aleja aún más
+  esa frontera. De cerca, usa `parabolic_equation`.
 - **El régimen propio de la teoría de rayos** (Jensen §3.4.2): «la longitud de
   onda debería ser sustancialmente menor que cualquier escala física del
   problema». Es el límite que más aprieta y el que mejor esconde una respuesta
-  de aspecto verosímil. A 20 Hz en 100 m de agua la profundidad son 1,3
-  longitudes de onda, se propagan dos modos y el tope de un cuarto de la
-  profundidad deja un haz de un tercio de longitud de onda de ancho: frente a
-  la suma de fuentes imagen, de 200 m a 5 km la pérdida sale entre 2 y 8 dB
-  alta, y se mueve decibelios al abrir el abanico o al multiplicar por 150 el
-  número de haces, así que no hay nada a lo que esté convergiendo. Lee los
-  haces por encima de unos cientos de hercios en aguas someras, y usa
-  `normal_modes` por debajo, donde dos modos son la respuesta exacta.
+  de aspecto verosímil, y una versión anterior de este punto le achacó un
+  error que en realidad era del tope de anchura: a 20 Hz en 100 m de agua,
+  donde la profundidad son 1,3 longitudes de onda y se propagan dos modos, el
+  haz acotado quedaba en un tercio de longitud de onda de ancho y la pérdida
+  salía decibelios alta frente a la suma de fuentes imagen. Retirado el tope,
+  la misma guía queda a 0,03 dB de esa suma con la anchura por defecto. El
+  aprobado es más estrecho de lo que parece: una columna isovelocidad entre
+  reflectores perfectos es pura geometría, que las imágenes plegadas del
+  receptor reproducen exactamente a cualquier frecuencia, así que no dice nada
+  de un canal por el que el campo de baja frecuencia de verdad refracta. Ahí
+  `normal_modes` sigue siendo el método en el que confiar, exacto al precio de
+  un puñado de modos.
 - **El abanico está truncado** en `max_angle_deg`, y una guía de ondas con dos
   contornos perfectamente reflectantes es el peor caso posible para eso, porque
   nada salvo $1/R$ atenúa los rebotes múltiples más inclinados. En la guía ideal
@@ -625,19 +646,6 @@ la $\mathcal{R}$ del oráculo de su fase lo mueve 5,7 dB.
   el abanico obliga a recortar `range_step` con él, porque un paso tiene que
   resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
   distancia; el método avisa cuando ese emparejamiento está mal.
-- **La anchura del haz la acota el canal**, y en aguas someras ese tope, y no
-  el método, es el mayor error que queda. Mantiene $W_0$ en un cuarto de la
-  profundidad de la columna cuando el óptimo de más arriba es varias veces
-  mayor, y el campo sale entonces sistemáticamente demasiado flojo. Frente a los
-  modos de Airy exactos de una guía $n^2$-lineal de 200 m a 200 Hz, promediando
-  en energía de 0,5 a 4 km: los 50 m por defecto dan +3,08 dB en media y
-  +5,86 dB en el peor caso, mientras que 100, 150 y 200 m dan +1,13, +0,26 y
-  -0,22 dB. Ahí no hay nada mal con la refracción. El mismo perfil en 1000 m de
-  agua, donde el tope no aprieta, sale a +0,72 dB con 1,37 dB en el peor tramo,
-  más cerca del campo exacto que `normal_modes` en el mismo corte. Pasa
-  `beam_width` a mano, por encima del tope y hasta más o menos la profundidad
-  del agua, cuando el canal es somero y el perfil refracta; el aviso que eso
-  levanta es el precio esperado de la respuesta mejor.
 - **La sombra lejana tiene suelo.** Cada haz se suma hasta cuatro semianchuras,
   140 dB por debajo de su propio eje, así que un receptor al que ningún haz del
   abanico se acerque tanto recibe exactamente cero y una pérdida infinita. Esa

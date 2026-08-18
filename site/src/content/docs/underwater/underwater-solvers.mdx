@@ -436,7 +436,7 @@ beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
                                   max_angle_deg=45.0, n_depth_points=80)
 print(beams.propagation_loss.shape)            # (80, 101)  depth x range
 print(beams.launch_angles.size)                # 439 beams over +-45 degrees
-print(round(beams.initial_beam_width, 1))      # 35.9 m: W0 from Eq. (3.86)
+print(round(float(beams.initial_beam_widths[0]), 1))  # 35.9 m: W0, Eq. (3.86)
 beams.plot()   # the PL field, on the same frame as parabolic_equation
 ```
 
@@ -481,21 +481,32 @@ plt.show()
 **The one free parameter.** $W_0$ is it, and the book is candid that "the
 optimal choice of these initial conditions is a matter of current research",
 recommending 10 to 50 wavelengths. The default here is sharper than a rule of
-thumb because §3.5.1 does the optimisation explicitly: differentiating the
-free-space width of Eq. (3.86) with respect to the complex offset gives
+thumb, and it is one width per launch angle rather than one per run. In open
+water §3.5.1 does the optimisation explicitly: differentiating the free-space
+width of Eq. (3.86) with respect to the complex offset gives
 $W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, the width that resolves the field best
 at the far end of the run, where it is resolved worst. That is also where the
 launch-angle integral behind Eq. (3.92) is a genuine Gaussian rather than a
-Fresnel integral, which is why it is not merely a tidy choice: against the free
-field at 100 Hz at 2, 5 and 8 km the error in $|p|$ is $7.5\times10^{-5}$ at
-that width, $2.7\times10^{-2}$ at a fifth of it and $4.1\times10^{-2}$ at
-fifteen times it. The book's 10-50 wavelength band and a quarter of
-the water depth clamp it, and the channel clamp has the last word. That last
-clamp is also where this default is at its worst, and the reason given for it
-does not survive measurement: what it was said to protect, the bookkeeping that
-folds a reflected ray back into the column, the receiver image ladder already
-restores. In shallow water it costs a few decibels of level rather than buying
-anything, which is the fourth limit below.
+Fresnel integral, which is why it is not merely a tidy choice: against the
+free field at 100 Hz at 2, 5 and 8 km the error in $|p|$ is
+$7.5\times10^{-5}$ at that width, $2.7\times10^{-2}$ at a fifth of it and
+$4.1\times10^{-2}$ at fifteen times it. A shallow channel then raises its own
+demand on top: its trapped field is a discrete set of modes standing
+$\lambda/(2D)$ apart in the sine of the launch angle, and a beam mixes launch
+angles over its far-field divergence $\lambda/(\pi W_0)$, so resolving
+neighbouring modes to half their gap takes $W_0 \ge 4D\cos\theta_0/\pi$: one
+width per launch angle, widest for the flat beams whose modes crowd together,
+relaxing by the cosine for the steep ones, every beam's vertical footprint
+the same $4D/\pi$. The default takes whichever of the two is larger, inside
+the book's 10-50 wavelength band, and hands the whole fan the free-space
+optimum when the channel is too deep in wavelengths for the guide width to
+fit the band. An earlier version instead *capped* $W_0$ at a quarter of the
+water depth, reading the book's "not large compared to the water depth" as a
+ceiling on the width rather than on the footprint; what that cap was said to
+protect, the bookkeeping that folds a reflected ray back into the column, the
+receiver image ladder already restores, and in shallow water it silently cost
+decibels of level, always toward too quiet. The measurements are two
+paragraphs down, cap against default on the same exact oracles.
 
 **What it is validated against.** Free-field spherical spreading, to
 $10^{-3}$ dB, which is the one comparison that pins the amplitude
@@ -513,7 +524,11 @@ already held to. The last one bends the rays, which none of the others do,
 since $c''$ vanishes in an isovelocity channel and takes the coupling
 coefficient of the dynamic ray equations with it: the $n^2$-linear profile of
 Eq. (3.77) has exactly linear $k^2(z)$, so its modes are Airy functions with
-closed-form eigenvalues, and the beams track them to 0.22 dB in the mean.
+closed-form eigenvalues, and the beams, at their default per-angle width,
+track them to +0.19 dB in the mean in 200 m of water at 200 Hz and to
++0.39 dB in a second, independent 100 m guide at 250 Hz. Those two cuts are
+also the measurement that retired the old quarter-depth width cap, which on
+the very same oracles came out +3.08 and +4.12 dB too quiet.
 Both boundary conditions come out of the beam sum rather than being imposed:
 the field at a pressure-release surface or bottom is 3 parts in $10^5$ of its
 mid-column value, and a rigid bottom doubles it.
@@ -560,9 +575,9 @@ $\mathcal{R}(\theta)^n$ at each image's own closed-form angle: 0.07 dB at
 worst across ranges whose dominant images sit above and below the critical
 angle, where stripping the phase from the oracle moves it by 5.7 dB.
 
-**Where it stops.** Five limits, in the order they bite.
+**Where it stops.** Four limits, in the order they bite.
 
-- **There is no near field**, and this is the biggest error of the five.
+- **There is no near field**, and this is the biggest error of the four.
   Eq. (3.92) weights the fan by matching it to a point source in the far field,
   and Eq. (3.88) divides by a cylindrical range that goes to zero on the axis
   every ray leaves from, so close in the sum has nothing to converge to. The
@@ -571,18 +586,23 @@ angle, where stripping the phase from the oracle moves it by 5.7 dB.
   unbounded medium is 17, 13 and 4.1 dB at a quarter of $W_0$, around 0.6 dB at
   $W_0$, a hundredth of a decibel at $2.5\,W_0$ and a thousandth from
   $3\,W_0$ out. Read nothing inside about three beam widths of the source, and
-  note that since the default $W_0$ grows as $\sqrt{r_{\max}}$, a longer run
-  pushes that boundary further out. Use `parabolic_equation` close in.
+  note that since the default's free-space width grows as $\sqrt{r_{\max}}$,
+  a longer run pushes that boundary further out. Use `parabolic_equation`
+  close in.
 - **Ray theory's own regime** (Jensen §3.4.2): "the wavelength should be
   substantially smaller than any physical scale in the problem". This is the
-  limit that bites hardest and that a plausible-looking answer hides best. At
-  20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes propagate,
-  and the quarter-depth cap leaves a beam a third of a wavelength across:
-  against the image-source sum from 200 m to 5 km the loss comes out 2 to 8 dB
-  high, and it moves by decibels when the fan is opened or the beam count
-  multiplied by 150, so there is nothing it is converging to. Read the beams
-  above a few hundred hertz in shallow water, and use `normal_modes` below
-  that, where two modes are the exact answer.
+  limit that bites hardest and that a plausible-looking answer hides best,
+  and an earlier version of this bullet blamed it for an error that was
+  really the width cap's: at 20 Hz in 100 m of water, where the depth is 1.3
+  wavelengths and two modes propagate, the capped beam was a third of a
+  wavelength across and the loss came out decibels high against the
+  image-source sum. With the cap retired the same guide measures within
+  0.03 dB of that sum at the default width. The clean bill is narrower than
+  it looks: an isovelocity column over perfect reflectors is pure geometry,
+  which the folded receiver images reproduce exactly at any frequency, so it
+  says nothing about a channel the low-frequency field actually refracts
+  through. There, `normal_modes` remains the solver to trust, exact for the
+  cost of a handful of modes.
 - **The fan is truncated** at `max_angle_deg`, and a waveguide with two
   perfectly reflecting boundaries is the worst case for that, because nothing
   but $1/R$ attenuates the steep multiple bounces. On the ideal 1000 m guide at
@@ -596,19 +616,6 @@ angle, where stripping the phase from the oracle moves it by 5.7 dB.
   cutting `range_step` with it, since one step has to resolve
   $\tan\theta_{\max}$ depth units of climb per unit range; the solver warns
   when that pairing is wrong.
-- **The beam width is clamped by the channel**, and in shallow water that
-  clamp, and not the method, is the largest error left. It holds $W_0$ at a
-  quarter of the water depth while the optimum above is several times larger,
-  and the field then comes out systematically too quiet. Against the exact Airy
-  modes of an $n^2$-linear 200 m guide at 200 Hz, energy-averaged over 0.5 to
-  4 km: the default 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
-  100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about refraction is
-  wrong there. The same profile in 1000 m of water, where the clamp does not
-  bite, comes out at +0.72 dB with a 1.37 dB worst bin, closer to the exact
-  field than `normal_modes` on the same cut. Pass `beam_width` explicitly, above
-  the cap and up to about the water depth, when the channel is shallow and the
-  profile refracts; the warning it raises is then the expected cost of the
-  better answer.
 - **The far shadow is floored.** Each beam is summed out to four half-widths,
   140 dB below its own axis, so a receiver that no beam of the fan comes that
   close to gets exactly zero and an infinite loss. That is the unilluminated

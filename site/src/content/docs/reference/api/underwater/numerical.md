@@ -98,20 +98,27 @@ which is the wedge no beam of the fan illuminates at all.
 The limits are worth knowing before the numbers are believed.
 
 * **Ray theory's own regime** (Sect. 3.4.2): "the wavelength should be
-  substantially smaller than any physical scale in the problem". This is the
-  limit that bites hardest and the one a plausible-looking answer hides
-  best. At 20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes
-  propagate, and the quarter-depth cap on the beam width leaves a beam a
-  third of a wavelength across: against the image-source sum from 200 m to
-  5 km the loss then comes out 2 to 8 dB high, and it moves by decibels when
-  the fan is opened or the beam count multiplied by 150, so there is nothing
-  it is converging to. Use [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) there, which is exact in
-  that regime for the cost of two modes.
+  substantially smaller than any physical scale in the problem". This is
+  the limit that bites hardest and the one a plausible-looking answer
+  hides best -- and one earlier version of this paragraph blamed it for an
+  error that was really the beam width's. At 20 Hz in 100 m of water the
+  depth is 1.3 wavelengths and two modes propagate; the quarter-depth cap
+  this module used to put on $W_0$ left a beam a third of a
+  wavelength across, and the loss came out decibels high against the
+  image-source sum. With the cap retired the same guide (source 36 m,
+  receiver 64 m, energy-averaged 0.2 to 5 km) measures -0.001 dB in the
+  mean and 0.03 dB at worst, at the ten-wavelength floor's 750 m width.
+  That clean bill is narrower than it looks: an isovelocity column over
+  perfect reflectors is pure geometry, which the folded receiver images
+  reproduce exactly at any frequency, so it says nothing about a channel
+  the low-frequency field actually refracts through, and there
+  [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) remains the solver to trust, exact in that regime
+  for the cost of two modes.
 * **There is no near field**, and this is the largest error the function
   makes. Eq. (3.92) weights the fan by matching it to a point source in the
   far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
   on the axis every ray leaves from, so close in the sum has nothing to
-  converge to. The cylindrical range is floored at one wavelength,
+  converge to. `_beam_influence` floors that range at a wavelength,
   which is what keeps the answer bounded rather than what makes it right.
   The scale it recovers on is the initial beam width, not a fixed distance.
   Worst error against $20\lg R$ over a +-500 m depth cut in an
@@ -119,10 +126,10 @@ The limits are worth knowing before the numbers are believed.
   150 to 437 m: 17, 13 and 4.1 dB at a quarter of $W_0$, 1.2, 0.64 and
   0.36 dB at $W_0$, 0.012, 0.005 and 0.002 dB at 2.5 $W_0$, and
   a thousandth of a decibel or better from 3 $W_0$ out. Read nothing
-  inside about three beam widths of the source; since the default
-  $W_0$ grows as $\sqrt{r_\mathrm{max}}$, a longer run pushes
-  that boundary out rather than in. [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) is the
-  solver to reach for close to the source.
+  inside about three beam widths of the source; since the default's
+  free-space term grows as $\sqrt{r_\mathrm{max}}$, a longer run
+  pushes that boundary out rather than in. [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) is
+  the solver to reach for close to the source.
 * **The fan is truncated** at `max_angle_deg`, and a waveguide with two
   perfectly reflecting boundaries is the worst case for that, because
   nothing but $1/R$ attenuates the steep multiple bounces. Measured on
@@ -137,25 +144,26 @@ The limits are worth knowing before the numbers are believed.
   fan opened and `range_step` cut with it, since a step has to resolve
   $\tan\theta_\mathrm{max}$ depth units of climb per unit range. The
   warning below says when that pairing is wrong.
-* **The beam must be small compared to the channel**, which the default
-  `beam_width` enforces and an explicit one is checked against. In
-  shallow water that clamp, and not the method, is the largest error left:
-  it holds $W_0$ at a quarter of the water depth while the optimum
-  the same function computes first is several times larger, and the field
-  comes out systematically too quiet. Measured against the closed-form Airy
-  modes of an $n^2$-linear 200 m guide at 200 Hz, source at 30.5 m and
-  receiver at 120.5 m, energy-averaged over 0.5 to 4 km: the default
-  $W_0$ of 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
-  100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about
-  refraction is wrong there, and the same profile in 1000 m of water, where
-  the clamp does not bite, comes out at +0.72 dB with a 1.37 dB worst bin,
-  closer to the exact field than [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) on the same cut. Pass
-  `beam_width` explicitly, above the cap and up to about the water depth,
-  when the channel is shallow and the profile refracts; the warning it
-  raises is then the expected cost of the better answer. Sect. 3.5 says the
-  same thing from the other side, that "at lower frequencies the physics may
-  imply that the beam is large compared to the channel, which causes a
-  variety of problems".
+* **A shallow channel sets its own width**, and the default now pays it
+  per launch angle rather than clamping against it. An earlier version of
+  this module capped $W_0$ at a quarter of the water depth, reading
+  Sect. 3.5's caution that a beam "large compared to the channel ...
+  causes a variety of problems" as a ceiling; measured against the
+  closed-form Airy modes of an $n^2$-linear 200 m guide at 200 Hz
+  (source 30.5 m, receiver 120.5 m, energy-averaged over 0.5 to 4 km),
+  that cap's 50 m width came out +3.08 dB in the mean and +5.86 dB at
+  worst, systematically too quiet, while the per-angle default measures
+  +0.19 dB on the same cut. What a shallow guide actually demands is the
+  opposite bound, a beam wide enough to resolve the channel's modes in
+  launch angle, and `_default_beam_widths` says why that is
+  $W_0 \ge 4D\cos\theta_0/\pi$ and what the folded receiver images
+  do to make the width affordable. The same profile in 1000 m of water,
+  where the modal criterion is out of the band's reach and the free-space
+  optimum stands, comes out at +0.72 dB with a 1.37 dB worst bin, closer
+  to the exact field than [`normal_modes`](/phonometry/reference/api/underwater/numerical/#normal_modes) on the same cut. An
+  explicit `beam_width` is taken as given, whatever its size: the old
+  quarter-depth warning went with the cap, since the measurements put the
+  fault on the cap's side.
 
 **Seawater absorption is off by default** and the field is then optimistic
 beyond a few kilometres at sonar frequencies, exactly as ray theory without
@@ -237,7 +245,7 @@ direct way to trade resolution for time.
 | `n_depth_points` | Size of that default depth grid. |
 | `max_angle_deg` | Half-angle of the launch fan, in degrees from the horizontal. Beams are spread symmetrically over `[-max_angle_deg, +max_angle_deg]`. |
 | `n_beams` | Number of beams in the fan. Default (`None`): from the overlap condition. Adjacent beams are $s\,\delta\theta_0$ apart at arc length $s$ while each has spread to $W \to s\lambda/(\pi W_0)$, so the condition that they still overlap, $\delta\theta_0 \lesssim \lambda/(\pi W_0)$, is range-independent; the default takes four times that margin. Too coarse a fan shows as a periodic ripple in range at the beam spacing, which is easy to mistake for physical interference. |
-| `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity. Default (`None`): the free-space optimum $W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}$ of Sect. 3.5.1, held inside the book's recommended band of 10 to 50 wavelengths and clamped to a quarter of the water depth, and the clamp has the last word. |
+| `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity, applied to every beam of the fan when passed. Default (`None`): one width per launch angle, the free-space optimum of each beam's own flight; see `_default_beam_widths`. |
 | `range_step` | Marching step in range, in metres, and the spacing of the default `ranges_m`. |
 | `bottom` | `"pressure-release"` (default) or `"rigid"`. The sea surface is always pressure-release. Superseded by the fluid seabed when the pair below is passed. |
 | `seabed_density` | Sediment density of a lossy fluid seabed, in the same unit as `density` (kg/m3 by convention; only the ratio enters). Default (`None`): the perfect reflector named by `bottom`, so every published validation number of this module is what the solver returns. Passed together with `seabed_sound_speed`, and not alongside `bottom="rigid"`. |
@@ -256,11 +264,13 @@ direct way to trade resolution for time.
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
 
-**Warns**
+.. warning::
 
-| Warning | When |
-| :--- | :--- |
-| PhonometryWarning | when the source sits on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), when an explicit `beam_width` exceeds a quarter of the water depth, and when one marching step carries the steepest beam of the fan across more than a quarter of the water column, which is the pairing between `max_angle_deg` and `range_step` that is easiest to get wrong. |
+   A [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) is emitted when the source sits
+   on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), and
+   when one marching step carries the steepest beam of the fan across more
+   than a quarter of the water column, which is the pairing between
+   `max_angle_deg` and `range_step` that is easiest to get wrong.
 
 ## GaussianBeamResult
 
@@ -276,7 +286,7 @@ GaussianBeamResult(
     ray_depths: NDArray[np.float64],
     beam_widths: NDArray[np.float64],
     wavefront_curvatures: NDArray[np.float64],
-    initial_beam_width: float,
+    initial_beam_widths: NDArray[np.float64],
     absorption_model: str | None,
     absorption_coefficient: float,
     seabed_density: float | None,
@@ -306,7 +316,7 @@ can be subtracted.
 | `ray_depths` | Depth of each central ray on that grid, in metres. |
 | `beam_widths` | Beam half-width $W(s)$ on that grid, in metres: Jensen Eq. (3.89), the distance at which the beam's own pressure has fallen by $e^{-1}$ and its intensity by $e^{-2}$. |
 | `wavefront_curvatures` | Beam wavefront curvature $K(s)$ on that grid, in 1/m: Jensen Eq. (3.90) with the sign that belongs to the conjugated field this result exposes, so that a beam spreading in free space reproduces Eq. (3.85), $K = x/(x^2 + a^2)$, as a positive number. |
-| `initial_beam_width` | The $W_0$ of Eq. (3.91) actually used, in metres, whether it was passed or defaulted. |
+| `initial_beam_widths` | The $W_0$ of Eq. (3.91) actually used by each beam of the fan, in metres, shape `(n_beams,)`. An explicit `beam_width` fills it with one value; the default is per launch angle (see `_default_beam_widths`), widest on the axis of the fan whenever a shallow channel's modal-resolution term is in play and flat across it otherwise. |
 | `absorption_model` | The seawater absorption model applied along the beams, or `None` when the run propagated without volume absorption (the default). |
 | `absorption_coefficient` | The absorption coefficient $\alpha$ actually applied, in dB/km (0.0 when `absorption_model` is `None`), as [`seawater_absorption`](/phonometry/reference/api/underwater/closed-form/#seawater_absorption) evaluated it at the source frequency and depth. Recorded so a run's loss can be decomposed without re-deriving what was subtracted. |
 | `seabed_density` | Sediment density of the fluid seabed the bottom bounces were charged with, or `None` when the bottom was one of the perfect reflectors (the default). |
