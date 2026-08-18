@@ -8,9 +8,12 @@ from ._chunks import (
     CuePoint,
     parse_wav_chunks,
 )
+from ._signal import Signal, SignalSource
 
 __all__ = [
     "BroadcastMetadata",
     "CuePoint",
+    "Signal",
+    "SignalSource",
     "parse_wav_chunks",
 ]
