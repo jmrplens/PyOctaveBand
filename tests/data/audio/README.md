@@ -27,7 +27,8 @@ Attribution: **"Calibration file and pass-by excerpts from: A. Grangeiro de
 Barros and C. Vuye, 'Psychoacoustic indicators of pass-by road traffic
 noise', Zenodo, 2023. DOI 10.5281/zenodo.7904680. Licensed CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/). Recorded with an NTi Audio
-XL2 sound level meter."**
+XL2 sound level meter."** Retrieved from the Zenodo deposit on
+2026-08-18 (archive checksum verified against the record).
 
 - `calibration_113_7dB.wav` is byte-identical to `Calibration file 1Hz
   113.7 dB.wav` of the deposit (renamed here; the "1Hz" of the original
@@ -58,7 +59,8 @@ XL2 sound level meter."**
 
 Attribution: **"A101_3.WAV from the wavinfo project
 (https://github.com/iluvcapra/wavinfo), MIT License, Copyright (c)
-2018-2023 Jamie Hardt."**
+2018-2023 Jamie Hardt."** Retrieved from the wavinfo repository on
+2026-08-18.
 
 A real BWF written by a Sound Devices 702T field recorder: `bext` version 1
 with every string field populated by the machine, plus a 5.2 kB `iXML`
@@ -72,7 +74,8 @@ with an independent reader (ffprobe) at import time.
 
 Attribution: **"rect_24bit_rf64.wav from the EBU libbw64 project
 (https://github.com/ebu/libbw64), Apache License 2.0
-(https://www.apache.org/licenses/LICENSE-2.0)."**
+(https://www.apache.org/licenses/LICENSE-2.0)."** Retrieved from the
+libbw64 repository on 2026-08-18.
 
 A genuine RF64 file (`RF64` FourCC with a `ds64` chunk), PCM 24-bit
 44.1 kHz stereo, byte-identical to `tests/test_data/rect_24bit_rf64.wav` of
@@ -86,7 +89,8 @@ Attribution: **"Omnidirectional channel of the S1-Do_R1 impulse response
 from: M. Zerwas and S. Kayku, 'Room acoustic measurement and simulation
 data of the St. Nicholas Chapel, Aachen Cathedral', Zenodo, 2026.
 DOI 10.5281/zenodo.20428705. Licensed CC BY 4.0
-(https://creativecommons.org/licenses/by/4.0/)."**
+(https://creativecommons.org/licenses/by/4.0/)."** Retrieved from the
+Zenodo deposit on 2026-08-18.
 
 `s1_do_r1_w.npz` holds the W (omnidirectional) channel of the B-format
 impulse response `S1-Do_R1.wav` from the deposit's
@@ -105,7 +109,9 @@ Attribution: **"Five-minute LAeq series from the Dublin City Council
 Ambient Sound Monitoring Network (Ballymun and Ringsend monitors, 2015),
 Smart Dublin / data.gov.ie open data, dataset 'Ambient Sound Monitoring
 Network'. Licensed CC BY 4.0
-(https://creativecommons.org/licenses/by/4.0/)."**
+(https://creativecommons.org/licenses/by/4.0/)."** Retrieved from
+data.gov.ie on 2026-08-18, together with the annual report from
+dublincity.ie.
 
 `dcc_laeq_5min_2015.npz` is a derived series, not audio: for each site,
 `<site>_time0_s` (first interval-end stamp, in seconds since 2015-01-01
