@@ -15,6 +15,7 @@ import tempfile
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import Rectangle
 
 from .i18n import _LANG
 from .theme import (
@@ -95,7 +96,7 @@ def generate_signal_provenance(output_dir: str) -> None:
     card = fig.add_subplot(grid[0, 1])
     card.set_axis_off()
     card.set_title("What travelled with them", pad=12)
-    card.add_patch(plt.Rectangle(
+    card.add_patch(Rectangle(
         (0.0, 0.0), 1.0, 1.0, transform=card.transAxes,
         facecolor=COLOR_PANEL, edgecolor=COLOR_GRID, linewidth=1.0,
         zorder=0,
