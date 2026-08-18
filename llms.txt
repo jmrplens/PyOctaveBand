@@ -85,6 +85,11 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 - [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/)
 
+## Audio files
+
+- [Overview](https://jmrplens.github.io/phonometry/io/)
+- [Reading and writing measurement audio](https://jmrplens.github.io/phonometry/io/audio-files/)
+
 ## Hearing and perception
 
 - [Overview](https://jmrplens.github.io/phonometry/perception/)
@@ -331,6 +336,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signals-levels.txt)
 - [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signals-spectra.txt)
 - [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signals-metrology.txt)
+- [Audio files](https://jmrplens.github.io/phonometry/llms/llms-io.txt)
 - [Hearing and perception](https://jmrplens.github.io/phonometry/llms/llms-perception.txt)
 - [Psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
 - [Speech](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)
@@ -432,6 +438,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
+- [io/io](https://jmrplens.github.io/phonometry/reference/api/io/io/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
 - [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
 - [materials/design](https://jmrplens.github.io/phonometry/reference/api/materials/design/)

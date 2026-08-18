@@ -122,15 +122,22 @@ Optional extras:
 pip install phonometry[plot]    # matplotlib, for filter response plots and result .plot() methods
 pip install phonometry[perf]    # numba, faster 'impulse' time weighting
 pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches (their figure panel needs [plot] too)
+pip install phonometry[audio]   # python-soundfile, so phonometry.io also reads FLAC, AIFF, Ogg/Opus, MP3 and compressed WAV
 pip install phonometry[full]    # all of the above (recommended)
 ```
 
 I recommend `pip install phonometry[full]`: it brings matplotlib, numba,
-reportlab and svglib in one go, so every feature of the library is enabled. The
-base install computes every metric on NumPy and SciPy alone; the only things it
-leaves unavailable are the figures (`.plot()` and the filter response plots),
-the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
-the `impulse` time weighting.
+reportlab, svglib and soundfile in one go, so every feature of the library is
+enabled. The base install computes every metric on NumPy and SciPy alone — and
+that includes reading every linear measurement WAV (24-bit, multichannel
+EXTENSIBLE, RF64) through `phonometry.io`; the only things it leaves
+unavailable are the figures (`.plot()` and the filter response plots), the
+normative PDF fiches (`.report()`), the compiled kernel that speeds up the
+`impulse` time weighting, and the compressed audio formats. One licensing note
+on `[audio]`: it installs python-soundfile, whose wheel bundles **libsndfile
+under the LGPL-2.1** (dynamically linked, the same pattern as librosa and
+torchaudio). The base install deliberately stays free of it, which is why the
+metrological formats need no extra.
 
 One caveat about `[full]`: numba is the only extra that caps NumPy, and it
 raises that cap only once it supports a new NumPy minor. So in the weeks after
@@ -228,6 +235,36 @@ plt.show()
 
 </details>
 
+## Read a sound level meter WAV
+
+With a real meter you have two WAVs — the calibrator take and the
+measurement — and `phonometry.io` reads both as measurements: native rate
+kept, integer PCM scaled exactly to full scale, channels first, nothing
+normalized. The `Signal` it returns carries the sample rate and, once you
+attach it, the calibration, so the level functions stop asking you to
+repeat either:
+
+```python
+import numpy as np
+from phonometry import io, metrology, signals
+
+# Both files come from the meter, in this order, through one untouched chain.
+cal_take = io.read("calibrator.wav")          # the 94 dB calibrator tone
+cal = metrology.sensitivity(np.asarray(cal_take), target_spl=94.0,
+                            fs=cal_take.fs)
+
+sig = io.read("measurement.wav", calibration_factor=cal)
+print(f"Leq = {float(signals.leq(sig)):.1f} dB")   # no fs, no factor to repeat
+```
+
+The base install reads everything a meter writes — 24-bit PCM, multichannel
+EXTENSIBLE, overnight RF64 — and warns if the file is a compressed listening
+copy rather than a linear recording. Write the factor into the sidecar once
+(`io.write_sidecar("measurement.wav", cal)`) and from then on
+`io.read("measurement.wav")` comes back calibrated with no arguments at all.
+[Reading and writing measurement audio](https://jmrplens.github.io/phonometry/io/audio-files/) is the full
+workflow: provenance, streaming, BWF writing and lossless conversion.
+
 ## Analyzing an audio file
 
 ```python
@@ -243,12 +280,14 @@ fs, signal = wavfile.read("measurement.wav")
 spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 ```
 
-Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it is
-safe to pass `wavfile.read` output directly.
+Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it
+is safe to pass `wavfile.read` output directly — but note it is *cast*, not
+rescaled to full scale, so keep calibrator and measurement in the same format;
+`io.read` in the previous section scales exactly and removes the concern.
 
 ## Where to go next
 
-The octave analysis above uses the `filters` core, one of eighteen domain
+The octave analysis above uses the `filters` core, one of nineteen domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.
