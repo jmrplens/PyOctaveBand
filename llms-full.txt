@@ -47985,10 +47985,11 @@ travel times and no level of its own; `eigenrays` searches its fan for the
 paths that join a source and a receiver and lists their arrivals with
 classical per-path amplitudes, and the field comes from `gaussian_beams`,
 which widens each of those rays into a beam and so answers a finite number at
-a caustic and a graded one in a shadow zone, at two prices: it has no near
-field within about three beam widths of the source, and the geometric-beam
-variant with its KMAH index and its
-minimum-width floor is not implemented. The parabolic equation is the standard
+a caustic and a graded one in a shadow zone, at three prices: it has no near
+field within about three beam widths of the source; it inherits ray theory's
+own high-frequency regime, so a refracting channel only a few wavelengths
+deep still belongs to `normal_modes`; and the geometric-beam variant with its
+KMAH index and its minimum-width floor is not implemented. The parabolic equation is the standard
 small-angle Tappert form rather than a wide-angle Padé variant. For the
 elastic seabed physics these fluid solvers leave out, the [elastic wave
 solver](https://jmrplens.github.io/phonometry/simulation/elastic-waves/) is the nearest thing the
@@ -49250,8 +49251,8 @@ and these closed forms, have their own guide:
 - Ship-traffic source level: MacGillivray & de Jong (2021),
   *J. Mar. Sci. Eng.* 9(4) 369 (CC-BY, JOMOPANS-ECHO), which also reproduces
   RANDI 3.1 and Wales & Heitmeyer (2002).
-- Numerical solvers (normal modes, ray tracing, parabolic equation):
-  covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
+- Numerical solvers (normal modes, ray tracing, Gaussian beams, parabolic
+  equation): covered in [Underwater propagation solvers](https://jmrplens.github.io/phonometry/underwater/underwater-solvers/).
 
 ---
 
@@ -49303,7 +49304,7 @@ computed numerically. Four solvers are provided (Jensen et al.,
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="A Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
 </picture>
 
 <details>
@@ -49354,13 +49355,15 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
 `propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths`,
 `travel_times`, `arc_lengths` and per-boundary reflection counts per ray);
-`parabolic_equation` a `ParabolicEquationResult` (the `propagation_loss`
-field). All assume a range-independent water column with a pressure-release
-surface. The bottom is a perfect reflector by default, pressure-release (or,
-for the modes, optionally rigid), and the beams can trade it for a lossy
-fluid seabed (below); `ray_trace` and `gaussian_beams` can also slope it
-over a piecewise-linear depth profile (section 3), and that boundary is the
-only range dependence there is. A range-dependent water column $c(r,z)$ is
+`gaussian_beams` a `GaussianBeamResult` (the `propagation_loss` field, plus
+each beam's central ray and width); `parabolic_equation` a
+`ParabolicEquationResult` (the `propagation_loss` field). All assume a
+range-independent water column with a pressure-release surface. The bottom is
+a perfect reflector by default, pressure-release (or, for the modes and the
+beams, optionally rigid), and the beams can trade it for a lossy fluid seabed
+(below); `ray_trace` and `gaussian_beams` can also slope it over a
+piecewise-linear depth profile (section 3), and that boundary is the only
+range dependence there is. A range-dependent water column $c(r,z)$ is
 excluded deliberately, not merely postponed: every solver here ships pinned
 to an exact published oracle, the sloping boundary has one (the ideal
 wedge's closed fan of images) while $c(r,z)$ has none, and a solver this
@@ -49579,6 +49582,20 @@ print(int(arr.surface_reflections[1]), int(arr.bottom_reflections[1]))  # 1 0
 print(round(float(arr.launch_angles[1]), 2))            # -9.31 degrees: up
 arr.plot()   # the impulse-response skeleton: per-path loss against delay
 ```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals.svg" alt="The arrival structure at one receiver of a 100 metre isovelocity channel: eleven vertical stems against travel time from 333 to 480 milliseconds, each head marking its own path's propagation loss on an inverted axis, the direct path drawn first and loudest in blue, the reflected paths coloured by their count of boundary reflections from one to five, arriving later, steeper and slightly quieter along the image ladder, with a colour bar giving the count" width="100%">
+</picture>
+
+*The snippet's own channel, drawn: one stem per eigenray, its head at that
+single path's loss. The direct path arrives first and loudest; the first echo
+follows 4.4 ms behind, sign flipped by the surface; and each further touch
+unfolds one more image of the receiver, later, steeper and a little quieter
+down the ladder. Over perfect reflectors nothing but $1/R$ attenuates a path,
+so 147 ms of delay spread costs barely 3 dB: this list is the multipath the
+sonar equation consumes, and the skeleton a channel impulse response is built
+on.*
 
 One list serves every frequency. The amplitudes are normalised to unit
 pressure at 1 m, in the same $e^{-i\omega t}$ convention as the rest of the
