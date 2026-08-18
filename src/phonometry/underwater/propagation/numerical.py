@@ -982,7 +982,8 @@ def eigenrays(
     final = _march_arrival_rays(z_prof, c_prof, source_depth=zs,
                                 thetas=refined, receiver_range=r_rec,
                                 n_steps=ns)
-    assert final.spreadings is not None  # dynamic march always carries them
+    if final.spreadings is None:  # pragma: no cover
+        raise ValueError("the march must carry the dynamic ray states.")
     c0 = float(np.interp(zs, z_prof, c_prof))
     z_end = final.positions[:, -1]
     c_end = np.asarray(np.interp(z_end, z_prof, c_prof))
