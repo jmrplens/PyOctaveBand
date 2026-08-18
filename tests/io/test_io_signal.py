@@ -62,13 +62,18 @@ def test_forwarding_matches_the_array_view() -> None:
 
 
 def test_existing_levels_function_accepts_the_object() -> None:
-    """leq(Signal) must equal leq(x): the (x, fs) API works unchanged."""
+    """leq(Signal) equals leq(x) with the Signal's own calibration applied.
+
+    The overloaded signature (the signals.levels pilot) takes the factor a
+    calibrated Signal carries when no explicit one is given; an explicit
+    argument still wins, and an uncalibrated Signal reads in digital units
+    exactly as a bare array does.
+    """
     x = _tone()
     sig = Signal(data=x, fs=FS, calibration_factor=2.0)
-    assert leq(sig) == leq(x)
-    # The calibration on the object is metadata: the array view is the raw
-    # digital signal, and applying the factor stays explicit.
-    assert leq(sig, calibration_factor=2.0) == leq(x, calibration_factor=2.0)
+    assert leq(sig) == leq(x, calibration_factor=2.0)
+    assert leq(sig, calibration_factor=5.0) == leq(x, calibration_factor=5.0)
+    assert leq(Signal(data=x, fs=FS)) == leq(x)
 
 
 def test_signal_properties() -> None:

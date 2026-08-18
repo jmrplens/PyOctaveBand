@@ -550,3 +550,89 @@ def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
         ln_levels(x, FS, weighting="Q")
     with pytest.raises(ValueError, match="Weighting curve"):
         sel(x, FS, weighting="Q")
+
+
+# ---------------------------------------------------------------------------
+# Signal overloads: leq / ln_levels / sel / lc_peak take a phonometry.io
+# Signal in place of the bare (x, fs) pair. Every equality below is exact
+# (==, not approx): the overload must resolve to the identical bare-array
+# call, never to a nearby number.
+# ---------------------------------------------------------------------------
+
+def test_leq_takes_the_signals_own_calibration() -> None:
+    from phonometry.io import Signal
+
+    x = _tone(1000)
+    sig = Signal(x, FS, calibration_factor=2.0)
+    assert leq(sig) == leq(x, calibration_factor=2.0)
+
+
+def test_explicit_calibration_beats_the_signals() -> None:
+    """The documented precedence: the caller knows more than the object."""
+    from phonometry.io import Signal
+
+    x = _tone(1000)
+    sig = Signal(x, FS, calibration_factor=2.0)
+    assert leq(sig, calibration_factor=10.0) == leq(x, calibration_factor=10.0)
+
+
+def test_uncalibrated_signal_levels_are_digital_unit_levels() -> None:
+    from phonometry.io import Signal
+
+    x = _tone(1000)
+    assert leq(Signal(x, FS)) == leq(x)
+
+
+def test_dbfs_ignores_the_signals_calibration() -> None:
+    """dBFS is relative to digital full scale whatever the object carries."""
+    from phonometry.io import Signal
+
+    x = _tone(1000)
+    assert leq(Signal(x, FS, calibration_factor=123.0), dbfs=True) == leq(
+        x, dbfs=True
+    )
+
+
+def test_fs_functions_take_the_signals_rate_and_calibration() -> None:
+    from phonometry import lc_peak, ln_levels, sel
+    from phonometry.io import Signal
+
+    x = _tone(1000, seconds=2.0)
+    sig = Signal(x, FS, calibration_factor=0.5)
+    assert lc_peak(sig) == lc_peak(x, FS, calibration_factor=0.5)
+    assert sel(sig, weighting="A") == sel(
+        x, FS, weighting="A", calibration_factor=0.5
+    )
+    assert ln_levels(sig, weighting="A") == ln_levels(
+        x, FS, weighting="A", calibration_factor=0.5
+    )
+
+
+def test_a_conflicting_fs_is_refused_a_matching_one_is_not() -> None:
+    from phonometry import lc_peak
+    from phonometry.io import Signal
+
+    sig = Signal(_tone(1000), FS)
+    with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
+        lc_peak(sig, FS + 1)
+    # The same number twice is agreement, not a conflict.
+    assert lc_peak(sig, FS) == lc_peak(sig)
+
+
+def test_a_bare_array_still_requires_fs() -> None:
+    from phonometry import lc_peak, ln_levels, sel
+
+    x = _tone(1000)
+    for func in (ln_levels, sel, lc_peak):
+        with pytest.raises(ValueError, match="fs is required"):
+            func(x)
+
+
+def test_multichannel_signal_returns_per_channel_levels() -> None:
+    from phonometry.io import Signal
+
+    x = np.stack([_tone(1000), 0.5 * _tone(1000)])
+    out = leq(Signal(x, FS, calibration_factor=2.0))
+    assert isinstance(out, np.ndarray)
+    assert out.shape == (2,)
+    assert out.tolist() == np.asarray(leq(x, calibration_factor=2.0)).tolist()
