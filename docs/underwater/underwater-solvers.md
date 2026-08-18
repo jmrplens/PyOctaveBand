@@ -336,7 +336,7 @@ clamp is also where this default is at its worst, and the reason given for it
 does not survive measurement: what it was said to protect, the bookkeeping that
 folds a reflected ray back into the column, the receiver image ladder already
 restores. In shallow water it costs a few decibels of level rather than buying
-anything, which is the fifth limit below.
+anything, which is the fourth limit below.
 
 **What it is validated against.** Free-field spherical spreading, to
 $10^{-3}$ dB, which is the one comparison that pins the amplitude
