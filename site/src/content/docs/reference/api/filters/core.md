@@ -198,7 +198,7 @@ Short-time fractional-octave analysis: level per band over time.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D array or 2D array [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). It takes the same door as `filter`: a Signal at another rate is refused, and a calibrated one is analysed in pascals unless this bank carries a calibration factor of its own or reads in dBFS. The two methods must not report different levels for the same recording. |
+| `x` | Input signal (1D array or 2D array [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). It follows the same rate and calibration rules as `filter`: a Signal at another rate is refused, and a calibrated one is analysed in pascals unless this bank carries a calibration factor of its own or reads in dBFS. The two methods must not report different levels for the same recording. |
 | `window_time` | Analysis window length in seconds. |
 | `overlap` | Window overlap fraction in [0, 1). |
 | `mode` | 'rms' or 'peak' (per window). |

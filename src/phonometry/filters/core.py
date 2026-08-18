@@ -461,8 +461,9 @@ class OctaveFilterBank:
         Short-time fractional-octave analysis: level per band over time.
 
         :param x: Input signal (1D array or 2D array [channels, samples]), or
-            a :class:`phonometry.io.Signal`. It takes the same door as
-            :meth:`filter`: a Signal at another rate is refused, and a
+            a :class:`phonometry.io.Signal`. It follows the same rate and
+            calibration rules as :meth:`filter`: a Signal at another rate is
+            refused, and a
             calibrated one is analysed in pascals unless this bank carries a
             calibration factor of its own or reads in dBFS. The two methods
             must not report different levels for the same recording.

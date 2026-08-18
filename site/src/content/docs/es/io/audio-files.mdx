@@ -164,8 +164,9 @@ quien llama sabe más que un objeto, tras una recalibración o para un supuesto
 deliberado. Un `fs` explícito no gana: la frecuencia de muestreo es un hecho
 de la grabación y no una preferencia, así que un valor que discrepe del que
 lleva el objeto lanza en vez de imponerse, y solo se acepta el que coincide.
-Un array desnudo sin `fs` se rechaza nombrando el argumento en vez de
-adivinarlo.
+Un array desnudo se rechaza nombrando el argumento en vez de
+adivinarlo en las funciones que necesitan frecuencia, que no es el caso de
+`leq`: integra el registro entero, así que nunca tuvo un `fs` que omitir.
 
 ### La misma cadena sobre el archivo de un sonómetro real
 
