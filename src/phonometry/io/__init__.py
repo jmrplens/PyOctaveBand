@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from ._backends import LossyCompressionWarning, info, read
+from ._blocks import read_blocks
 from ._chunks import BroadcastMetadata, CuePoint
 from ._sidecar import (
     CalibrationSidecar,
@@ -26,6 +27,7 @@ __all__ = [
     "SignalSource",
     "info",
     "read",
+    "read_blocks",
     "read_sidecar",
     "sidecar_path",
     "write",
