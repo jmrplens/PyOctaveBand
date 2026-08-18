@@ -89,7 +89,7 @@ guía que crees necesitar:
 - [Qué medida usar y cuándo](/phonometry/es/perception/speech/objective-intelligibility/#4-qué-medida-usar-y-cuándo) — el STI frente a las medidas intrusivas y no intrusivas.
 - [Qué métrica de tonalidad usar y cuándo](/phonometry/es/perception/psychoacoustics/tone-prominence/#3-qué-métrica-de-tonalidad-usar-y-cuándo).
 - [¿Directo o indirecto?](/phonometry/es/perception/speech/speech-transmission/#directo-o-indirecto-cómo-elegir) — el STI de matriz completa frente a STIPA.
-- [Elegir modelo](/phonometry/es/underwater/underwater-solvers/#5-elegir-modelo) — modos normales, rayos y ecuación parabólica.
+- [Elegir modelo](/phonometry/es/underwater/underwater-solvers/#6-elegir-modelo) — modos normales, rayos, haces gaussianos y ecuación parabólica.
 
 ## Antes de medir nada
 

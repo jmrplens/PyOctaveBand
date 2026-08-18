@@ -570,8 +570,8 @@ JOMOPANS-ECHO.
   spreading plus volume absorption, the speed of sound in sea water, the sonar
   equation, seabed reflection loss and the ambient-noise spectrum.
 - [Underwater propagation solvers](/phonometry/underwater/underwater-solvers/):
-  the normal-mode, ray-tracing and parabolic-equation solvers of the
-  stratified waveguide, and how to choose a propagation model.
+  the normal-mode, ray-tracing, Gaussian beam and parabolic-equation solvers
+  of the stratified waveguide, and how to choose a propagation model.
 - [Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/):
   the hearing side of that noise: the group audiograms, the regulatory weighting
   functions with their guidance version, and the exposure of a pile-driving

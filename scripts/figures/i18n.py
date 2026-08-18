@@ -2770,6 +2770,27 @@ _ES_EXACT = {
     "boric acid": "ácido bórico",
     "pure water": "agua pura",
     r"$\mathrm{MgSO_4}$": r"$\mathrm{MgSO_4}$",
+    # Gaussian beam tracing: the caustic and the shadow zone behind it.
+    # Vocabulary follows the Spanish solvers guide: cáustica, zona de sombra,
+    # abanico, haz. The parameter box carries mathtext, which the save-time
+    # comma pass skips, so its Spanish twin bakes the comma of 35,9 m.
+    "Where Rays Give Infinity and Nothing, Beams Give a Level":
+        "Donde los rayos dan infinito y nada, los haces dan un nivel",
+    "source at 992.5 m": "fuente a 992.5 m",
+    "caustic: the ray fan folds on itself here,\n"
+    "and the beam sum answers 59 dB, not infinity":
+        "cáustica: aquí el abanico de rayos se pliega sobre sí mismo,\n"
+        "y la suma de haces responde 59 dB, no infinito",
+    "shadow zone: no ray reaches it, and the field\n"
+    "grades into it rather than stopping at an edge\n"
+    "(+88 dB over the 100 m above the caustic)":
+        "zona de sombra: ningún rayo llega, y el campo se gradúa\n"
+        "hacia ella en lugar de cortarse en un borde\n"
+        "(+88 dB en los 100 m por encima de la cáustica)",
+    "600 Hz, $n^2$-linear profile (Jensen Eq. 3.77)\n"
+    "439 beams over ±45°, $W_0$ = 35.9 m":
+        "600 Hz, perfil $n^2$ lineal (Jensen Ec. 3.77)\n"
+        "439 haces sobre ±45°, $W_0$ = 35,9 m",
     "Four Equations, One Profile": "Cuatro ecuaciones, un perfil",
     "Sound speed $c$ [m/s]": "Velocidad del sonido $c$ [m/s]",
     "Difference from UNESCO / Chen-Millero [m/s]":

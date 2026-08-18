@@ -431,13 +431,13 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
 
 
 # ---------------------------------------------------------------------------
-# The waveguide the three numerical solvers share (underwater/underwater-solvers)
+# The waveguide the four numerical solvers share (underwater/underwater-solvers)
 # ---------------------------------------------------------------------------
 
 def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
     """Range-depth section with the coordinate frame, the two boundary
     conditions, the c(z) profile, the source and receiver depths, one turning
-    ray, and what each of the three solvers computes in that same frame."""
+    ray, and what each of the four solvers computes in that same frame."""
     import math
     surf, bot = 120.0, 400.0
     x0, x1 = 250.0, 850.0
@@ -502,11 +502,14 @@ def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
     s.text(96, 478, "rays:", 14, th.fg, bold=True, anchor="start")
     s.text(176, 478, "trajectories, travel times, convergence zones", 14, th.fg,
            anchor="start")
-    s.text(96, 504, "PE:", 14, th.fg, bold=True, anchor="start")
-    s.text(176, 504, "the envelope marched in $r$, one step $Δr$ at a time", 14,
+    s.text(96, 504, "beams:", 14, th.fg, bold=True, anchor="start")
+    s.text(176, 504, "those rays widened, summed into PL($z$, $r$)", 14, th.fg,
+           anchor="start")
+    s.text(96, 530, "PE:", 14, th.fg, bold=True, anchor="start")
+    s.text(176, 530, "the envelope marched in $r$, one step $Δr$ at a time", 14,
            th.fg, anchor="start")
 
-    s.text(96, 544, "All three take the same range-independent $c(z)$: no sediment attenuation, no bathymetry",
+    s.text(96, 570, "All four take the same range-independent $c(z)$: no sediment attenuation, no bathymetry",
            15, th.fg, anchor="start")
 
 

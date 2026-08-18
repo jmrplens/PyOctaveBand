@@ -1,21 +1,21 @@
 ← [Documentation index](../README.md)
 
-# Underwater propagation solvers: normal modes, rays and the parabolic equation
+# Underwater propagation solvers: modes, rays, beams and the parabolic equation
 
 The closed-form propagation loss of
 [Underwater sound propagation](underwater-propagation.md) knows nothing of
 the sound-speed profile, the seabed or the surface. When refraction and
 boundaries decide the answer, the field has to be **computed**: this guide
-covers the three numerical solvers of the `underwater` module, the physics
+covers the four numerical solvers of the `underwater` module, the physics
 each one discretises, and how to choose between them and the closed forms.
-All three assume a range-independent (horizontally stratified) ocean with a
+All four assume a range-independent (horizontally stratified) ocean with a
 pressure-release surface, take the same $c(z)$ profile as input, and follow
 Jensen, Kuperman, Porter & Schmidt, *Computational Ocean Acoustics*.
 
-## 1. The three solvers at a glance
+## 1. The four solvers at a glance
 
 For range-independent (horizontally stratified) environments the field can be
-computed numerically. Three solvers are provided (Jensen et al.,
+computed numerically. Four solvers are provided (Jensen et al.,
 *Computational Ocean Acoustics*):
 
 - **`normal_modes`** solves the depth-separated Sturm-Liouville eigenvalue
@@ -27,13 +27,19 @@ computed numerically. Three solvers are provided (Jensen et al.,
   the surface and bottom, and carries the travel time along each ray as a state
   of the same integration. Validated against the circular-arc paths of a linear
   gradient and the closed-form travel time along them.
+- **`gaussian_beams`** hangs a Gaussian beam on each of those rays and sums
+  them into a propagation-loss field, which stays finite at the caustics where
+  the classical ray amplitude is infinite and decays into the shadow zones
+  where it is not defined at all. Validated against free-field spherical
+  spreading, the two-ray Lloyd-mirror field and the image-source sum of the
+  ideal waveguide.
 - **`parabolic_equation`** marches the standard (Tappert) PE with the split-step
   Fourier algorithm. Validated against free-field spherical spreading; it agrees
   with the normal-mode propagation loss in trend.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="A Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
 </picture>
 
 <details>
@@ -83,11 +89,14 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
 `propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
-`travel_times` per ray); `parabolic_equation` a `ParabolicEquationResult` (the
-`propagation_loss` field). All assume a range-independent water column with a pressure-release
-surface, and the bottom is pressure-release too (or, for the modes, optionally
-rigid): there is no absorbing or elastic bottom, no sediment attenuation and
-no real bathymetry, so range-dependent problems are out of scope. For the
+`travel_times` per ray); `gaussian_beams` a `GaussianBeamResult` (the
+`propagation_loss` field, plus each beam's central ray and width);
+`parabolic_equation` a `ParabolicEquationResult` (the `propagation_loss`
+field). All assume a range-independent water column with a pressure-release
+surface, and the bottom is pressure-release too (or, for the modes and the
+beams, optionally rigid): there is no absorbing or elastic bottom, no sediment
+attenuation and no real bathymetry, so range-dependent problems are out of
+scope. For the
 elastic seabed physics these fluid solvers leave out, see
 [Elastic waves and fluid-solid coupling](../simulation/elastic-waves.md).
 
@@ -205,9 +214,216 @@ already do, it describes the path actually returned rather than a second
 reading of it, and it matches the closed form for a constant gradient
 (Medwin & Clay 1998, Eq. (3.3.20)) to about $10^{-14}$ s. What rays do not
 carry here is a full amplitude: the geometric ray-tube intensity diverges at
-caustics, so the result object leaves the level to the modal or PE field.
+caustics, so `RayTraceResult` reports no level at all. Section 4 is what fixes
+that, on the same rays and through the same marcher.
 
-## 4. The parabolic equation: a one-way field, marched in range
+## 4. Gaussian beams: a field where rays give up
+
+Section 3 stops at geometry on purpose. The classical ray amplitude
+(Jensen Eq. 3.65) divides by the ray-tube spreading $q$, and $q$ vanishes
+wherever the family of rays folds over on itself. That fold is a **caustic**:
+ray theory answers infinity there while the true field is merely loud, and a
+ray that crosses one picks up a $-\pi/2$ that the whole interference pattern
+beyond it depends on (Jensen §3.4.1, Figs. 3.13-3.14). Past the last ray of a
+family lies a **shadow zone**, where ray theory returns not a small number but
+no number at all.
+
+**Gaussian beam tracing** removes both at once, by widening every ray into a
+beam. The spreading obeys the *dynamic* ray equations (Jensen Eq. 3.58),
+
+$$
+\frac{dq}{ds} = c\,p, \qquad \frac{dp}{ds} = -\frac{c_{nn}}{c^2}\,q ,
+$$
+
+which the ray marcher integrates alongside the trajectory. Started from
+**complex** initial conditions, $p(0) = 1$ and $q(0) = i\omega W_0^2/2$
+(Eq. 3.91), each ray becomes the axis of a beam of initial half-width $W_0$
+and flat wavefront, and the field of that beam is (Eq. 3.88)
+
+$$
+p^{\text{beam}}(s, n) = A\,\sqrt{\frac{c(s)}{r\,q(s)}}\;
+  \exp\left\{-i\omega\left[\tau(s) + \frac{p(s)}{2\,q(s)}\,n^2\right]\right\},
+$$
+
+with $n$ the distance from the central ray and $\tau$ the travel time along
+it. The total field is that expression summed over the launch fan with the
+weights of Eq. (3.92).
+
+**Why it stays finite.** Eq. (3.58) is linear with real coefficients, so the
+real and imaginary parts of $(q, p)$ are two real solutions of it, and their
+Wronskian $q_R p_I - q_I p_R$ is conserved. The impulses the spreading takes
+at a profile kink and at a reflection are shears of unit determinant, so they
+cannot change it either. It starts at $-\omega W_0^2/2$ and stays there, and
+that single constant carries the whole method: $q$ can never reach zero, so
+**there is no caustic singularity left to patch**, no KMAH index to count and
+no minimum-width floor to impose; $\mathrm{Im}[p/q] < 0$ always, so the beam
+always decays away from its axis; and the beam half-width of Eq. (3.89)
+collapses to $W(s) = 2|q(s)|/(\omega W_0)$, a hyperbola in free space with its
+waist at the source and the Rayleigh range $kW_0^2/2$ for its scale.
+
+```python
+import numpy as np
+from phonometry import underwater
+
+# Jensen's n^2-linear profile, c(z) = c0/sqrt(1 + 2.4 z/c0) (Eq. 3.77). With
+# the source near the bottom the up-going rays turn, their envelope is a
+# caustic, and above it the fan runs out into a shadow zone.
+c0 = 1550.0
+z_beam = np.linspace(0.0, 1000.0, 201)
+c_beam = c0 / np.sqrt(1.0 + 2.4 * z_beam / c0)
+
+beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
+                                  max_range=2500.0, range_step=25.0,
+                                  max_angle_deg=45.0, n_depth_points=80)
+print(beams.propagation_loss.shape)            # (80, 101)  depth x range
+print(beams.launch_angles.size)                # 439 beams over +-45 degrees
+print(round(beams.initial_beam_width, 1))      # 35.9 m: W0 from Eq. (3.86)
+beams.plot()   # the PL field, on the same frame as parabolic_equation
+```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic_dark.svg">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/gaussian_beam_caustic.svg" alt="A propagation-loss field over 2.5 kilometres of range and 1000 metres of depth at 600 hertz: a bright dome of level rising from a source near the bottom, bounded above by a sharp arc where the up-going ray fan folds on itself, with the level finite on that arc and fading smoothly into the dark shadow zone above it that no ray reaches, the traced rays drawn as thin grey lines through the field" width="100%">
+</picture>
+
+*The snippet's own water, on a finer grid: 600 Hz over the $n^2$-linear
+profile, the source 7.5 m off the bottom, 439 beams over ±45°. The up-going fan
+turns inside the column, and where it folds on itself the beam sum answers
+**59 dB, not infinity** — that fold is the bright arc across the top of the
+dome, and it is the caustic. Above the arc no ray arrives at all, and the field
+does not stop at that edge: it climbs 88 dB over the 100 m above it, which is
+the graded penumbra the exact solution has and geometric ray theory does not
+(Jensen Figs. 3.11, 3.17). The thin grey lines are the rays themselves, traced
+through the same profile by `ray_trace`; one beam is hung on each. Two things
+the picture cannot show: the first three beam widths, about 108 m of range,
+where the far-field weighting of Eq. (3.92) has nothing to converge to, and the
+18% of cells that no beam reaches at all, which are exactly infinite and drawn
+at the quiet end of the scale.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import underwater
+
+c_ref = 1550.0
+z_caustic = np.linspace(0.0, 1000.0, 201)
+c_caustic = c_ref / np.sqrt(1.0 + 2.4 * z_caustic / c_ref)
+
+caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
+                                    source_depth=992.5, max_range=2500.0,
+                                    range_step=12.5, max_angle_deg=45.0,
+                                    n_depth_points=400)
+caustic.plot()   # same field; the figure below bands it and draws the rays
+plt.show()
+```
+
+</details>
+
+**The one free parameter.** $W_0$ is it, and the book is candid that "the
+optimal choice of these initial conditions is a matter of current research",
+recommending 10 to 50 wavelengths. The default here is sharper than a rule of
+thumb because §3.5.1 does the optimisation explicitly: differentiating the
+free-space width of Eq. (3.86) with respect to the complex offset gives
+$W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, the width that resolves the field best
+at the far end of the run, where it is resolved worst. That is also where the
+launch-angle integral behind Eq. (3.92) is a genuine Gaussian rather than a
+Fresnel integral, which is why it is not merely a tidy choice: against the free
+field at 100 Hz at 2, 5 and 8 km the error in $|p|$ is $7.5\times10^{-5}$ at
+that width, $2.7\times10^{-2}$ at a fifth of it and $4.1\times10^{-2}$ at
+fifteen times it. The book's 10-50 wavelength band and a quarter of
+the water depth clamp it, and the channel clamp has the last word. That last
+clamp is also where this default is at its worst, and the reason given for it
+does not survive measurement: what it was said to protect, the bookkeeping that
+folds a reflected ray back into the column, the receiver image ladder already
+restores. In shallow water it costs a few decibels of level rather than buying
+anything, which is the fourth limit below.
+
+**What it is validated against.** Free-field spherical spreading, to
+$10^{-3}$ dB, which is the one comparison that pins the amplitude
+normalisation and the phase convention together; the two-ray Lloyd-mirror field
+with one surface reflection, to 0.01 dB; and the image-source sum of the ideal
+pressure-release waveguide, to 0.0004 dB with the fan opened to 88 degrees.
+That same guide expanded over its modes instead of its images (Eq. 5.13) is a
+second closed form of one exact field, and it agrees to 0.03 dB *and*
+$8\times10^{-4}$ rad: it is the comparison that reaches the absolute phase, and
+it puts the beams on the footing `normal_modes` and `parabolic_equation` are
+already held to. The last one bends the rays, which none of the others do,
+since $c''$ vanishes in an isovelocity channel and takes the coupling
+coefficient of the dynamic ray equations with it: the $n^2$-linear profile of
+Eq. (3.77) has exactly linear $k^2(z)$, so its modes are Airy functions with
+closed-form eigenvalues, and the beams track them to 0.22 dB in the mean.
+Both boundary conditions come out of the beam sum rather than being imposed:
+the field at a pressure-release surface or bottom is 3 parts in $10^5$ of its
+mid-column value, and a rigid bottom doubles it.
+
+**Where it stops.** Five limits, in the order they bite.
+
+- **There is no near field**, and this is the biggest error of the five.
+  Eq. (3.92) weights the fan by matching it to a point source in the far field,
+  and Eq. (3.88) divides by a cylindrical range that goes to zero on the axis
+  every ray leaves from, so close in the sum has nothing to converge to. The
+  scale it recovers on is $W_0$, not a fixed distance: over three settings
+  whose $W_0$ spans 150 to 437 m, the worst error against $20\lg R$ in an
+  unbounded medium is 17, 13 and 4.1 dB at a quarter of $W_0$, around 0.6 dB at
+  $W_0$, a hundredth of a decibel at $2.5\,W_0$ and a thousandth from
+  $3\,W_0$ out. Read nothing inside about three beam widths of the source, and
+  note that since the default $W_0$ grows as $\sqrt{r_{\max}}$, a longer run
+  pushes that boundary further out. Use `parabolic_equation` close in.
+- **Ray theory's own regime** (Jensen §3.4.2): "the wavelength should be
+  substantially smaller than any physical scale in the problem". This is the
+  limit that bites hardest and that a plausible-looking answer hides best. At
+  20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes propagate,
+  and the quarter-depth cap leaves a beam a third of a wavelength across:
+  against the image-source sum from 200 m to 5 km the loss comes out 2 to 8 dB
+  high, and it moves by decibels when the fan is opened or the beam count
+  multiplied by 150, so there is nothing it is converging to. Read the beams
+  above a few hundred hertz in shallow water, and use `normal_modes` below
+  that, where two modes are the exact answer.
+- **The fan is truncated** at `max_angle_deg`, and a waveguide with two
+  perfectly reflecting boundaries is the worst case for that, because nothing
+  but $1/R$ attenuates the steep multiple bounces. On the ideal 1000 m guide at
+  300 Hz, against the image-source sum at 2, 5 and 10 km: 0.27, 4.06 and
+  2.52 dB with the default 80 degrees, falling to 0.0002, 0.0003 and 0.0004 dB
+  when the fan is opened to 88 degrees. Cutting the *oracle* to the same
+  half-angle moves it by 0.25, 3.95 and 2.31 dB, so this is the fan and not the
+  method. A real, lossy seabed
+  absorbs those bounces and the default is then ample. Opening the fan means
+  cutting `range_step` with it, since one step has to resolve
+  $\tan\theta_{\max}$ depth units of climb per unit range; the solver warns
+  when that pairing is wrong.
+- **The beam width is clamped by the channel**, and in shallow water that
+  clamp, and not the method, is the largest error left. It holds $W_0$ at a
+  quarter of the water depth while the optimum above is several times larger,
+  and the field then comes out systematically too quiet. Against the exact Airy
+  modes of an $n^2$-linear 200 m guide at 200 Hz, energy-averaged over 0.5 to
+  4 km: the default 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
+  100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about refraction is
+  wrong there. The same profile in 1000 m of water, where the clamp does not
+  bite, comes out at +0.72 dB with a 1.37 dB worst bin, closer to the exact
+  field than `normal_modes` on the same cut. Pass `beam_width` explicitly, above
+  the cap and up to about the water depth, when the channel is shallow and the
+  profile refracts; the warning it raises is then the expected cost of the
+  better answer.
+- **The far shadow is floored.** Each beam is summed out to four half-widths,
+  140 dB below its own axis, so a receiver that no beam of the fan comes that
+  close to gets exactly zero and an infinite loss. That is the unilluminated
+  wedge outside the traced aperture, not the graded penumbra just past the
+  limiting ray, which is where the interesting part of a shadow zone is and
+  which the beams do resolve.
+
+The other flavour, **geometric beams** (Jensen §3.3.5.5, Eqs. 3.72-3.76), is
+not implemented. It keeps $q$ real and takes the width from the ray tube
+itself, $W(s) = |q(s)\,\delta\theta_0|$, so the width vanishes at a caustic and
+has to be propped up with the Weinberg-Keenan $\pi\lambda$ floor and the KMAH
+index of Eq. (3.79). That is the patched approach this deliberately does not
+take, and the book's own verdict is worth quoting anyway: geometric beams
+"have generally proven to be more satisfactory" at low frequency, where the
+physics makes the beam large compared to the channel.
+
+## 5. The parabolic equation: a one-way field, marched in range
 
 The parabolic equation trades the boundary-value Helmholtz problem for an
 initial-value problem in range. Factor out the fast outgoing oscillation,
@@ -253,7 +469,7 @@ print(round(float(field.propagation_loss[iz, ir]), 2))   # 60.0 = 20 lg 1000
 
 and it does so to about $10^{-4}$ dB at the default range step.
 
-## 5. Choosing a model
+## 6. Choosing a model
 
 Every propagation function of the `underwater` module answers the same
 question, "how much level survives the path", at a different price in
@@ -307,15 +523,21 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 
 | Solver | Natural regime | What it buys you |
 |---|---|---|
-| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, travel times, convergence zones; cost independent of frequency |
+| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, travel times, convergence zones; cost independent of frequency, and no amplitude |
+| `gaussian_beams` | High frequency, wherever a *level* is wanted from rays | The same geometry turned into PL($z$,$r$): finite at caustics, graded into shadow zones, and like the rays it is built on, its cost does not grow with frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($m < kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
-| `parabolic_equation` | Low frequency, long one-way paths | Full-field PL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all three solvers assume |
+| `parabolic_equation` | Low frequency, long one-way paths | Full-field PL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all four solvers assume |
 
 The boundaries blur in practice: rays remain usable at surprisingly low
 frequencies for travel-time work, and the PE remains the workhorse well above
-its formal small-angle regime. When two of the three agree on a case, as the
+its formal small-angle regime. When two of the four agree on a case, as the
 modes and the PE do in the section 1 figure, that agreement is the practical
-convergence test.
+convergence test. The two extremes divide the labour cleanly: `normal_modes`
+and `parabolic_equation` both get more expensive as the frequency rises, since
+both have to resolve the wavelength on a grid, while the ray core does not,
+so `gaussian_beams` is the one that stays affordable exactly where the others
+stop being so, and it is also the one whose approximation is best justified
+there.
 
 **A worked sonar budget.** Chain the pieces end to end: a 140 dB re
 1 µPa²/Hz source at 10 kHz, a 60 dB ambient spectrum level, a 15 dB array
@@ -338,11 +560,13 @@ equation is why they all live in one module.
 
 Pick by frequency and geometry (Jensen et al. 2011, Ch. 1): rays for high
 frequency and deep water (ray-path geometry, travel times and convergence
-zones at a cost independent of frequency), normal modes for low frequency in
-shallow water (few propagating modes, $m < kD/\pi$, the reference solution for
-its regime) and the parabolic equation for low-frequency, long one-way paths
-(the full PL($z$, $r$) field with refraction). When two solvers agree on a
-case, that agreement is the practical convergence test.
+zones at a cost independent of frequency, and no level at all), Gaussian beams
+when that same high-frequency geometry has to yield a level (the PL($z$, $r$)
+field, finite at caustics and graded into shadow zones), normal modes for low
+frequency in shallow water (few propagating modes, $m < kD/\pi$, the reference
+solution for its regime) and the parabolic equation for low-frequency, long
+one-way paths (the full PL($z$, $r$) field with refraction). When two solvers
+agree on a case, that agreement is the practical convergence test.
 
 ### When is a closed-form propagation loss no longer enough?
 
@@ -375,8 +599,9 @@ compute the field.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   The reference monograph implemented here: the modal derivation of
   section 2 (Ch. 5, Eqs. 5.3-5.17), the ray equations of section 3
-  (Ch. 3, Eqs. 3.23-3.24), the split-step Fourier parabolic equation of
-  section 4 (Ch. 6) and the model-selection guidance of section 5 (Ch. 1).
+  (Ch. 3, Eqs. 3.23-3.24), the Gaussian beams of section 4
+  (Ch. 3, §3.5, Eqs. 3.88-3.92), the split-step Fourier parabolic equation of
+  section 5 (Ch. 6) and the model-selection guidance of section 6 (Ch. 1).
 - Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
   with application to SOFAR. *The Journal of the Acoustical Society of
   America*, 55(2), 220-226.
@@ -393,9 +618,11 @@ compute the field.
 No measurement standard governs the solvers themselves: they are
 implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 *Computational Ocean Acoustics* (2nd ed., Springer 2011), for normal modes
-(Ch. 5), ray tracing (Ch. 3) and the split-step Fourier parabolic equation
+(Ch. 5), ray tracing and Gaussian beams (Ch. 3, the latter §3.5) and the
+split-step Fourier parabolic equation
 (Ch. 6), with terminology per ISO 18405:2017. Validation is anchored to
-closed forms: the ideal pressure-release waveguide's exact modes, the
+closed forms: the ideal pressure-release waveguide's exact modes and its
+image-source sum, the
 circular-arc ray paths of a linear sound-speed gradient, free-field
-spherical spreading for the PE, and the mutual agreement of the modal and
+spherical spreading for the PE and for the beams, and the mutual agreement of the modal and
 PE propagation loss.

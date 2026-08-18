@@ -2,7 +2,7 @@
 """
 Numerical models of underwater sound propagation (range-independent ocean).
 
-Three complementary numerical solvers for the acoustic field in a
+Four complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
 propagation loss of :mod:`phonometry.underwater.propagation.closed_form`:
 
@@ -11,19 +11,29 @@ propagation loss of :mod:`phonometry.underwater.propagation.closed_form`:
   propagation loss from the propagating modes.
 * :func:`ray_trace` -- ray tracing. Integrates the ray-trajectory equations
   through a sound-speed profile (Runge-Kutta), returning the ray paths and the
-  travel time accumulated along each of them.
+  travel time accumulated along each of them, and no amplitude.
+* :func:`gaussian_beams` -- Gaussian beam tracing. Hangs a beam on each of those
+  rays and sums them into a propagation-loss field, which is finite at a caustic
+  and decays smoothly into a shadow zone where ray theory has nothing to say.
 * :func:`parabolic_equation` -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the propagation-loss field.
 
-All three are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
+All four are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 *Computational Ocean Acoustics* (2nd ed., Springer 2011): the modal derivation
-(Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24) and the
-split-step Fourier PE (Ch. 6). They are validated against analytic oracles: the
-ideal (pressure-release) waveguide's exact modes, the circular-arc ray paths of
-a linear sound-speed gradient together with the closed-form travel time along
-them (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press
-1998, Eq. (3.3.20)), and mutual agreement of the PE and normal-mode
-propagation loss for a range-independent waveguide.
+(Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24), the Gaussian
+beams of Sect. 3.5 (Eqs. 3.88-3.92) and the split-step Fourier PE (Ch. 6). They
+are validated against analytic oracles: the ideal (pressure-release) waveguide's
+exact modes and its image-source sum, the circular-arc ray paths of a linear
+sound-speed gradient together with the closed-form travel time along them
+(Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press 1998,
+Eq. (3.3.20)), free-field spherical spreading, and mutual agreement of the PE
+and normal-mode propagation loss for a range-independent waveguide.
+
+The three field solvers report the same quantity on the same terms, so their
+propagation losses can be laid side by side: ``normal_modes`` on a range slice
+at one receiver depth, ``gaussian_beams`` and ``parabolic_equation`` on a
+(depth, range) grid. Which of them to reach for is a question of frequency and
+of what is being asked; the guide's solver table sets it out.
 
 Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
 frequencies in Hz. The water column has a pressure-release surface at z = 0.
@@ -32,18 +42,30 @@ frequencies in Hz. The water column has a pressure-release surface at z = 0.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 
-from ..._internal.rays import march_rays
+from ..._internal.rays import DynamicRays, march_rays
 from ..._internal.validation import require_positive
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
 
+    from ..._internal.rays import RayDerivative, RayMarch
+
 _BOTTOM_TYPES = ("pressure-release", "rigid")
+#: What every solver here says when the source is handed to it outside the
+#: water column. One string rather than four copies: the three field solvers
+#: and the ray tracer all reject the same thing for the same reason, and a
+#: caller who has read the message once should not have to notice which of
+#: them phrased it.
+_SOURCE_OUTSIDE = "'source_depth' must lie within the water column."
+#: Pressure reflection coefficient of each bottom kind. The sea surface is
+#: always pressure-release, so its own coefficient is the -1 below.
+_BOTTOM_REFLECTION = {"pressure-release": -1.0, "rigid": 1.0}
+_SURFACE_REFLECTION = -1.0
 
 
 def _clean_profile(
@@ -65,6 +87,55 @@ def _clean_profile(
     if np.any(c <= 0.0):
         raise ValueError("'sound_speeds' must be strictly positive.")
     return z, c
+
+
+def _ocean_ray_derivative(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
+    xi: NDArray[np.float64],
+) -> RayDerivative:
+    r"""The ocean's ray equations in range, vectorised over rays.
+
+    March in range :math:`r` (not arc length): every valid ray then spans
+    ``[0, max_range]`` in the same number of steps regardless of its launch
+    angle. The state is :math:`(z, \zeta, t)` and
+    :math:`\xi = \cos\theta_0/c(z_\mathrm{s})` is invariant for a
+    range-independent :math:`c(z)`, so from
+    :math:`dz/ds`, :math:`d\zeta/ds`, :math:`dt/ds = 1/c` and
+    :math:`dr/ds = c\,\xi`,
+
+    .. math::
+
+        \frac{dz}{dr} = \frac{\zeta}{\xi}, \qquad
+        \frac{d\zeta}{dr} = -\frac{dc/dz}{c^3 \xi}, \qquad
+        \frac{dt}{dr} = \frac{1}{\xi c^2} .
+
+    The time shares the sound speed the other two derivatives already need, so
+    carrying it costs one multiply per stage and inherits the Runge-Kutta order:
+    at the default step it reproduces the linear-gradient closed form to
+    ~1e-14 s, where accumulating :math:`dr/(\xi c^2)` over the finished path
+    would be first order.
+
+    The profile is piecewise linear, so :math:`c(z)` interpolates exactly and
+    :math:`dc/dz` is piecewise *constant* with jumps at the nodes; evaluating
+    the gradient per segment keeps thermocline kinks sharp, where a smoothed
+    gradient on an interpolated fine grid biases turning depths by metres. Which
+    segment a node itself belongs to is settled by the direction of travel
+    rather than by rounding, which is what a march that lands its sub-steps
+    exactly on the nodes needs (see :mod:`phonometry._internal.rays`).
+    """
+    seg_grad = np.diff(c_prof) / np.diff(z_prof)
+
+    def deriv(
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        cc = np.interp(z_arr, z_prof, c_prof)
+        seg = np.where(zeta_arr >= 0.0,
+                       np.searchsorted(z_prof, z_arr, side="right") - 1,
+                       np.searchsorted(z_prof, z_arr, side="left") - 1)
+        grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
+        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2))
+
+    return deriv
 
 
 # ===========================================================================
@@ -358,7 +429,7 @@ def ray_trace(
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     if not (0.0 <= zs <= water_depth):
-        raise ValueError("'source_depth' must lie within the water column.")
+        raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     if int(n_steps) < 2:
         raise ValueError("'n_steps' must be at least 2.")
@@ -368,34 +439,12 @@ def ray_trace(
     if np.any(np.abs(angles) >= 90.0):
         raise ValueError("'launch_angles_deg' must be within (-90, 90) degrees (forward rays).")
 
-    # The profile is piecewise linear, so c(z) interpolates exactly and dc/dz
-    # is piecewise CONSTANT with jumps at the profile nodes; evaluating the
-    # gradient per segment keeps thermocline kinks sharp (a smoothed gradient
-    # on an interpolated fine grid biases turning depths by metres).
-    seg_grad = np.diff(c_prof) / np.diff(z_prof)
-
-    # March in range r (not arc length): every valid ray then spans [0, rmax] in
-    # n_steps regardless of its launch angle. State is (z, ζ, t); ξ = cosθ0/c(zs)
-    # is invariant for c(z). From dz/ds, dζ/ds, dt/ds = 1/c and dr/ds = c·ξ:
-    #   dz/dr = ζ/ξ,   dζ/dr = −(dc/dz)/(c³·ξ),   dt/dr = 1/(ξ·c²).
-    # The time shares the sound speed the other two derivatives already need, so
-    # carrying it costs one multiply per stage and inherits the RK4 order: at the
-    # default step it reproduces the linear-gradient closed form to ~1e-14 s,
-    # where accumulating dr/(ξc²) over the finished path would be first-order.
     ns = int(n_steps)
     ranges = np.linspace(0.0, rmax, ns)
     c0 = float(np.interp(zs, z_prof, c_prof))
     th = np.radians(angles)
     xi = np.cos(th) / c0  # Snell invariant per ray (> 0 since |θ0| < 90°)
-
-    def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-        # Vectorised over all rays at once (data-parallel).
-        cc = np.interp(z_arr, z_prof, c_prof)
-        seg = np.clip(np.searchsorted(z_prof, z_arr, side="right") - 1,
-                      0, seg_grad.size - 1)
-        return (zeta_arr / xi, -seg_grad[seg] / (cc**3 * xi), 1.0 / (xi * cc**2))
+    deriv = _ocean_ray_derivative(z_prof, c_prof, xi)
 
     # The marcher splits every range step at the surface or bottom it crosses,
     # so a reflected ray keeps the order the rest of the path is integrated
@@ -416,7 +465,905 @@ def ray_trace(
 
 
 # ===========================================================================
-# 3. Parabolic equation (Jensen Ch. 6, split-step Fourier)
+# 3. Gaussian beam tracing (Jensen Ch. 3, Sect. 3.5, Eqs. 3.88-3.92)
+# ===========================================================================
+#
+# A ray carries a travel time and nothing else; the amplitude lives in the
+# dynamic pair (q, p) of Eq. (3.58) that :func:`ray_trace`'s marcher can carry
+# alongside it. Give that pair the *complex* initial conditions of Eq. (3.91)
+# and each ray becomes the central ray of a Gaussian beam, Eq. (3.88):
+#
+#     p^beam(s, n) = A sqrt( c(s) / (r q(s)) )
+#                    exp{ -i omega [ tau(s) + (p(s)/(2 q(s))) n^2 ] }   (3.88)
+#
+# with ``n`` the normal distance from the central ray and ``r`` the cylindrical
+# range of the point on it, which is there because r q = J (Eq. 3.64) carries
+# the extra factor r that a point source in a cylindrically symmetric ocean
+# brings with it (Eqs. 3.39, 3.46). The field is the sum of Eq. (3.88) over the
+# launch fan, weighted by Eq. (3.92). Three things are worth stating up front,
+# because each of them is a way to be quietly wrong.
+#
+# WHY THE FIELD IS FINITE. Write the pair as q = q_R + i q_I, p = p_R + i p_I.
+# Eq. (3.58) is linear with real coefficients, so (q_R, p_R) and (q_I, p_I) are
+# two real solutions of the same equation, and their Wronskian
+# q_R p_I - q_I p_R is conserved: its derivative is
+# c p_R p_I - (c_nn/c^2) q_R q_I - c p_I p_R + (c_nn/c^2) q_I q_R = 0. The
+# impulse at a profile node and the one at a reflection are both q -> q,
+# p -> p + (something) q, of unit determinant, so they conserve it too. With
+# Eq. (3.91) it starts at -omega W_0^2 / 2 and stays there, which says three
+# things at once:
+#
+#   * q never vanishes, because vanishing needs q_R = q_I = 0. There is no
+#     caustic singularity to patch, and the KMAH index of Eq. (3.79) is not
+#     needed: the -pi/2 per caustic is carried by the complex square root.
+#   * Im[p/q] = Im[p conj(q)]/|q|^2 = -omega W_0^2/(2|q|^2) is strictly
+#     negative, so Eq. (3.88) always decays away from its central ray and the
+#     transverse exponent can never overflow.
+#   * the beam half-width of Eq. (3.89) has the closed form
+#     W(s) = sqrt(-2/(omega Im[p/q])) = 2|q(s)|/(omega W_0), which is what this
+#     module computes and what makes the reach of a beam cheap to bound.
+#
+# THE SIGN CONVENTIONS, WHICH DO NOT AGREE AS PRINTED. Eq. (3.89) needs
+# Im[p/q] < 0, and Eq. (3.91) delivers it, so Eq. (3.88) is written in the
+# exp(+i omega t) convention: its propagation factor is exp(-i omega tau), the
+# conjugate of the exp(i k_r r) of Eq. (5.14) that :func:`normal_modes` uses and
+# of the exp(i k_0 r) of the PE. Eq. (3.92) as printed carries e^(+i pi/4),
+# which belongs with the *other* convention; against Eqs. (3.88) and (3.91) it
+# puts the free field exactly pi/2 out of phase (measured: arg of the ratio to
+# exp(-i omega s/c_0)/s is +1.5712 rad with e^(+i pi/4) and +4.4e-4 rad with
+# e^(-i pi/4), at r = 2 km, 100 Hz, W_0 = 20 lambda). So Eqs. (3.88), (3.91) and
+# (3.92)-with-e^(-i pi/4) are implemented as one consistent triple and the
+# summed field is conjugated once at the end, which puts the exposed complex
+# pressure in the same exp(-i omega t) convention as the other two solvers.
+# This is a textbook inconsistency, not a defect of a published standard, so it
+# is recorded here rather than in docs/ERRATA.md.
+#
+# Substituting Eq. (3.91) into that corrected Eq. (3.92) makes sqrt(i) e^(-i
+# pi/4) = 1, and the weight comes out real and positive in closed form,
+#
+#     A(theta_0) = dtheta_0 (omega W_0 / (2 c_0)) sqrt(cos(theta_0) / pi),
+#
+# which agrees with the square-root form to 2.3e-16 relative and is cheaper and
+# branch-free. Its normalisation is the one of Sect. 3.5, Eq. (3.80),
+# p = e^(iks)/s, and NOT the 1/(4 pi s) of Eq. (3.51): the beam sum converges to
+# unit pressure at 1 m, so the propagation loss is -20 lg|sum| with no division
+# by p_0. (:func:`normal_modes` divides by p_0 = 1/(4 pi) because its own field
+# carries that factor.) Getting this wrong is a flat 20 lg(4 pi) = 21.98 dB.
+#
+# THE BRANCH OF THE SQUARE ROOT. sqrt(c/(r q)) with complex q has to be taken on
+# a continuously tracked branch: :func:`numpy.sqrt` jumps by pi whenever its
+# argument crosses the negative real axis, and it would do so exactly where the
+# geometric ray had its caustic, re-creating the phase error of Fig. 3.14 that
+# this whole method exists to remove. In free space q stays in one half plane
+# and never crosses, so a free-field test cannot catch it. The argument of q is
+# therefore unwrapped along each ray, and continued to the influence point by
+# the increment arg(q_infl conj(q_sample)): that increment can never reach
+# +-pi, because q_infl = q + c p ds runs along a straight line in the complex
+# plane which, by the Wronskian above, misses the origin, and every point of
+# such a line lies within an open half plane about it.
+
+
+@dataclass(frozen=True)
+class GaussianBeamResult:
+    """Gaussian beam solution of a range-independent waveguide.
+
+    The propagation-loss field is on the same footing as
+    :class:`ParabolicEquationResult`'s: same shape, same reference, so the two
+    can be subtracted.
+
+    :ivar frequency: Source frequency, in Hz.
+    :ivar ranges: Range grid of the field, in metres.
+    :ivar depths: Depth grid of the field, in metres.
+    :ivar propagation_loss: Propagation-loss field ``PL(z, r)``, in dB, shape
+        ``(n_depths, n_ranges)``. Infinite where the field is exactly zero,
+        which happens in the wedge no beam of the fan reaches: each beam is
+        summed out to four half-widths, 140 dB below its own axis, so a point
+        that far from every one of them is outside the traced aperture rather
+        than merely in shadow. The graded penumbra just past a limiting ray,
+        which is the part of a shadow zone worth having, is finite and carries
+        the beams' tails. Many ordinary cases have no infinity at all: an
+        isovelocity 1000 m guide at 300 Hz over 10 km, everything default, has
+        none in 80200 cells.
+
+        The source column is **not** one of the infinities, and is not to be
+        read. :func:`parabolic_equation` divides by :math:`\\sqrt{r}` and so
+        genuinely diverges at ``r = 0``; the beam sum does not, and hands back a
+        finite number there instead, 13.6 dB in the case above. It means
+        nothing, and neither does anything else within about three initial beam
+        widths of the source: see :func:`gaussian_beams` on why this method has
+        no near field. The plausible size of these numbers is the point worth
+        knowing about them.
+    :ivar pressure: The complex field the loss was taken from, same shape, in
+        the module's own :math:`e^{-i\\omega t}` convention (the conjugate of
+        the one Jensen Eq. (3.88) is printed in) and normalised to unit
+        pressure at 1 m, so ``propagation_loss = -20 lg|pressure|``.
+    :ivar launch_angles: Launch angle of each beam's central ray, from the
+        horizontal, in degrees.
+    :ivar ray_ranges: Range of each central ray at each marching step, in
+        metres, shape ``(n_beams, n_steps)``. This is the marching grid, which
+        is finer than (and independent of) ``ranges``.
+    :ivar ray_depths: Depth of each central ray on that grid, in metres.
+    :ivar beam_widths: Beam half-width :math:`W(s)` on that grid, in metres:
+        Jensen Eq. (3.89), the distance at which the beam's own pressure has
+        fallen by :math:`e^{-1}` and its intensity by :math:`e^{-2}`.
+    :ivar wavefront_curvatures: Beam wavefront curvature :math:`K(s)` on that
+        grid, in 1/m: Jensen Eq. (3.90) with the sign that belongs to the
+        conjugated field this result exposes, so that a beam spreading in free
+        space reproduces Eq. (3.85), :math:`K = x/(x^2 + a^2)`, as a positive
+        number.
+    :ivar initial_beam_width: The :math:`W_0` of Eq. (3.91) actually used, in
+        metres, whether it was passed or defaulted.
+    :ivar source_depth: Source depth, in metres.
+    :ivar water_depth: Water-column depth, in metres.
+    """
+
+    frequency: float
+    ranges: NDArray[np.float64]
+    depths: NDArray[np.float64]
+    propagation_loss: NDArray[np.float64]
+    pressure: NDArray[np.complex128]
+    launch_angles: NDArray[np.float64]
+    ray_ranges: NDArray[np.float64]
+    ray_depths: NDArray[np.float64]
+    beam_widths: NDArray[np.float64]
+    wavefront_curvatures: NDArray[np.float64]
+    initial_beam_width: float
+    source_depth: float
+    water_depth: float
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the propagation-loss field (depth increasing downward)."""
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_gaussian_beams
+
+        return plot_gaussian_beams(self, ax=ax, language=check_language(language), **kwargs)
+
+
+#: How many beam half-widths out the transverse Gaussian is still summed.
+#: exp(-16) is 1.1e-7 in pressure, 140 dB below the beam's own axis, so even a
+#: fan of a thousand beams adding in phase at the cut sits 80 dB under the
+#: field. It exists to bound the work, and the work is linear in it: the reach
+#: in depth of a beam is this many half-widths over the cosine of its angle,
+#: which is what decides both how many cells survive the admission test and how
+#: many times the transverse profile wraps the water column.
+_BEAM_CUTOFF = 4.0
+#: Ceiling on how many times the transverse profile of one beam is allowed to
+#: wrap the water column (see :func:`_image_ladder`). Only a fan within a
+#: degree of the vertical ever reaches it.
+_MAX_BEAM_WRAPS = 512
+#: Complex elements one block of the influence sum may hold, which sets how
+#: many receiver depths are evaluated at once. 2^20 keeps each temporary at
+#: 16 MB, so the peak is tens of megabytes whatever grid is asked for.
+_INFLUENCE_BLOCK = 1 << 20
+#: Fraction of the water column the steepest beam of the fan may climb in one
+#: marching step before the step is reported as too coarse to resolve it.
+_MAX_STEEP_CLIMB = 0.25
+
+
+def _default_beam_width(
+    wavelength: float, max_range: float, water_depth: float,
+) -> float:
+    r"""The :math:`W_0` of Eq. (3.91), from the book's own optimality argument.
+
+    Sect. 3.5.1 does the calculation explicitly for a beam in free space: with
+    the waist at the source the half-width evolves as Eq. (3.86),
+    :math:`W(x; a) = \sqrt{(2/k)(a + x^2/a)}` with :math:`a = k W_0^2/2`, and
+    "differentiating :math:`W(x; a)` with respect to :math:`a` and setting the
+    result to 0, we find that the optimal :math:`a` to minimize the beamwidth is
+    :math:`a = x`". Evaluated at the far end of the run that is
+
+    .. math::
+
+        W_0 = \sqrt{2 r_\mathrm{max} / k} = \sqrt{\lambda r_\mathrm{max}/\pi},
+
+    the width that resolves the field best where it is resolved worst. It is
+    also the width at which the launch-angle integral behind Eq. (3.92) is a
+    genuine Gaussian rather than a Fresnel integral: the quadratic coefficient
+    of that integral is proportional to :math:`q(0)/q(r)`, whose real part
+    vanishes as :math:`q(0)` grows, and the sum then stops converging on a
+    truncated fan. Measured against the free field at 100 Hz at 2, 5 and 8 km,
+    the relative error in :math:`|p|` is 7.5e-5 at this width; it is 2.7e-2 at a
+    fifth of it, where each beam accepts too wide a cone of launch angles for
+    the paraxial expansion, and 3.7e-3 and 4.1e-2 at six and fifteen times it,
+    where the Fresnel behaviour sets in. The shallowest part of the curve is a
+    little above the formula rather than on it, 1.9e-5 at twice the width, which
+    is as close to the optimum as this measurement can place it.
+
+    The range set matters and is quoted above for that reason. Taken on a set
+    reaching in to 500 m these last two numbers come out 5.4e-2 and 6.3e-2, an
+    order of magnitude worse at six times the width, because a wide beam is
+    exactly what pushes the perpendicular feet of the fan in towards the source:
+    that is the axis floor of :func:`_beam_influence` being read as a property
+    of the width, and it is not one.
+
+    Two clamps stand around it. The floor of ten wavelengths and the ceiling of
+    fifty are the band the book recommends ("typically, this will lead to an
+    initial beamwidth of 10-50 wavelengths"), and the formula lands inside them
+    on its own across most of the useful parameter space: over a 10 km run it
+    gives 14.6 wavelengths at 100 Hz and 46 at 1 kHz. The last clamp is the
+    channel, and it has the final word over the other two, because a beam
+    comparable to the water depth breaks the bookkeeping that folds a reflected
+    ray back into the column rather than merely costing accuracy.
+
+    That last sentence is the one to read sceptically, because it is where this
+    default is at its worst and the measurement does not support the reasoning
+    behind it. The folded-image ladder of :func:`_image_ladder` restores what the
+    folding drops, and with it in place a beam as wide as the channel is not
+    merely tolerable but better: on an :math:`n^2`-linear 200 m guide at 200 Hz,
+    against the exact Airy modes, the quarter-depth width of 50 m is +3.08 dB in
+    the mean while 200 m is -0.22 dB, and on the isovelocity 200 m guide at
+    50 Hz the same two widths give +0.48 and +0.001 dB against the modal sum.
+    What the clamp protects is the folding of a beam whose *central ray* has
+    reflected, which the ladder does not reach; what it costs is a shallow-water
+    bias of a few decibels, always in the same direction. It is left in place
+    because a silent error is worse than a documented one, and
+    :func:`gaussian_beams` says there when to override it, but a caller in
+    shallow refracting water should override it.
+    """
+    return float(min(max(np.sqrt(wavelength * max_range / np.pi),
+                         10.0 * wavelength),
+                     50.0 * wavelength, water_depth / 4.0))
+
+
+def _image_ladder(
+    water_depth: float, bottom_reflection: float, n_wrap: int,
+) -> list[tuple[float, float, float]]:
+    """``(shift, side, strength)`` of the receiver's images in the folded column.
+
+    The marcher folds a reflected ray back into the water column, which is the
+    right thing for the geometry and only half the story for a beam: what folds
+    is the *central ray*, while the beam's transverse profile keeps its full
+    unfolded extent. A beam of half-width :math:`W` crossing the column at
+    :math:`\\theta` to the horizontal spans :math:`W/\\cos\\theta` in depth at
+    fixed range, so any beam steep enough, or wide enough, straddles a boundary
+    and its folded copies overlap. Summing only the copy nearest the receiver
+    throws the rest away, and it does so silently and in one direction: measured
+    on the ideal 1000 m guide at 300 Hz against the image-source sum, with the
+    fan at 88 degrees, the loss at 2, 5 and 10 km comes out -0.49, +4.50 and
+    +4.97 dB off with the nearest copy alone, and +0.0002, +0.0003 and
+    -0.0004 dB off with the ladder restored.
+
+    Restoring them is the method of images applied to the receiver rather than
+    to the source, which reciprocity allows. In the folded frame the images of a
+    receiver at ``z_r`` sit at ``2 l D + z_r`` and ``2 l D - z_r`` for every
+    integer ``l``, and the strength of each is the product of the reflection
+    coefficients of the boundaries between it and the receiver: the surface
+    planes stand at even multiples of ``D`` and the bottom planes at odd ones,
+    so counting them gives the exponents below. Both boundary conditions come
+    out of that sum identically rather than approximately, for either bottom:
+    at ``z_r = 0`` the two families coincide with opposite signs and cancel, and
+    at ``z_r = D`` with a rigid bottom they coincide with equal signs, so the
+    field doubles and its depth derivative cancels.
+
+    :param n_wrap: How many wraps each way to carry. What it costs is bounded
+        per beam rather than globally: :func:`gaussian_beams` admits each beam
+        only to the wraps its own reach can populate.
+    :return: One entry per image, with ``side`` the sign multiplying ``z_r``.
+    """
+    surface = _SURFACE_REFLECTION
+    ladder = []
+    for wrap in range(-n_wrap, n_wrap + 1):
+        shift = 2.0 * wrap * water_depth
+        ladder.append((shift, 1.0, (surface * bottom_reflection) ** abs(wrap)))
+        mirrored = (bottom_reflection**wrap * surface ** (wrap - 1) if wrap >= 1
+                    else surface ** (abs(wrap) + 1) * bottom_reflection ** abs(wrap))
+        ladder.append((shift, -1.0, mirrored))
+    return ladder
+
+
+class _BeamSamples(NamedTuple):
+    """Each beam read at the marching column that brackets a receiver range.
+
+    All the ``(n_beams, n_ranges)`` fields are the march's own history indexed
+    at the column nearest each requested range, so the influence sum is
+    arithmetic on aligned arrays rather than a search. ``xi`` is
+    ``(n_beams, 1)`` and the two range fields are ``(1, n_ranges)``, so they
+    broadcast against the rest.
+
+    :ivar weight: :math:`A(\\theta_0)` of Eq. (3.92) times the reflection
+        coefficients the central ray has accumulated by that column.
+    :ivar phase: The argument of ``spreading``, unwrapped along the ray, which
+        is the branch the square root of Eq. (3.88) is taken on.
+    :ivar reach: How far in depth, at fixed range, the beam still counts:
+        ``_BEAM_CUTOFF`` half-widths divided by the cosine of the local ray
+        angle, at the widest point of the ray. Used to admit each beam to as
+        many wraps of the column as it can populate and no more.
+    """
+
+    xi: NDArray[np.float64]
+    column_range: NDArray[np.float64]
+    range_offset: NDArray[np.float64]
+    depth: NDArray[np.float64]
+    vertical: NDArray[np.float64]
+    speed: NDArray[np.float64]
+    spreading: NDArray[np.complex128]
+    slope: NDArray[np.complex128]
+    time: NDArray[np.float64]
+    phase: NDArray[np.float64]
+    weight: NDArray[np.complex128]
+    reach: NDArray[np.float64]
+
+
+def _beam_influence(
+    s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
+    water_depth: float, bottom_reflection: float, omega: float,
+    beam_width: float,
+) -> NDArray[np.complex128]:
+    r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
+
+    The ray-centred coordinates of Eqs. (3.182)-(3.183) collapse to arithmetic
+    here. ``march_rays`` samples every ray on one uniform range grid and
+    :math:`\xi > 0` for every valid ray, so no ray ever reverses in range and
+    the containment test of Eq. (3.181) is an index. With the receiver at
+    :math:`(r_\mathrm{R}, z_\mathrm{R})`, the ray's sample at
+    :math:`(r_j, z_j)`, the offsets :math:`\Delta r`, :math:`\Delta z` between
+    them, and the unit tangent and normal of Eqs. (3.25)-(3.26),
+    :math:`\mathbf{t} = c\,(\xi, \zeta)` and :math:`\mathbf{n} = c\,(-\zeta,
+    \xi)`,
+
+    .. math::
+
+        \frac{s}{c} = \xi\,\Delta r + \zeta\,\Delta z, \qquad
+        n = c\,(\xi\,\Delta z - \zeta\,\Delta r),
+
+    and the beam's state follows the central ray to the foot of that
+    perpendicular in closed form, because ``p`` is constant between events and
+    ``q`` is then a straight line in arc length:
+
+    .. math::
+
+        q_\mathrm{infl} = q_j + c^2 p_j (s/c), \qquad
+        \tau_\mathrm{infl} = \tau_j + s/c, \qquad
+        r_\mathrm{infl} = r_j + c^2 \xi\,(s/c) .
+
+    That is Eq. (3.184) done exactly rather than by the linear fit the book
+    settles for, and the bracketing column is the *nearest* one rather than the
+    one below, which halves :math:`|\Delta r|` and with it the only part of the
+    step the extrapolation cannot follow, a reflection falling between the
+    sample and the receiver. The correction to the travel time is vertical
+    slowness times depth offset, the paraxial phase term; dropping it leaves the
+    near-horizontal interference pattern wrong.
+
+    THE ONE FACTOR NOTHING ELSE PROTECTS. Eq. (3.88) divides by :math:`r q`,
+    which is the Jacobian :math:`J` of Eq. (3.46), and Eq. (3.46) factors it as
+    range times ray-tube width. Complex initial data keeps the *second* factor
+    off zero for good (see the Wronskian argument above), and that is the whole
+    point of the method; the *first* has no such protection, and it vanishes on
+    the axis, where every ray of the fan begins. That is the ordinary point
+    source singularity the book flags on p. 167, "the amplitude goes to infinity
+    as :math:`s \to 0`", and it is not rare here but guaranteed: the foot of the
+    perpendicular from a receiver lands exactly on the source for whichever beam
+    is launched perpendicular to the source-receiver line, and a fan dense enough
+    to sum always has one. Refining the fan aims at it more accurately rather
+    than avoiding it. Measured, before this floor was put in, on a deep
+    isovelocity column at 100 Hz with everything at its default: a receiver 50 m
+    down range and 50 m below the source drew the beam launched at exactly
+    -45.0 degrees, whose foot landed at :math:`r = 1.4\times10^{-14}` m, and the
+    single term :math:`\sqrt{c/r} = 3.2\times10^{8}` carried the answer to
+    :math:`|p| = 8.9\times10^{3}` against an exact :math:`1.4\times10^{-2}`, a
+    propagation loss of -79 dB. Over a +-500 m cut the error reached 116 dB and
+    it was one-directional, always too loud.
+
+    The floor is one wavelength of the local sound speed, which is Sect. 3.4.2's
+    own criterion ("the wavelength should be substantially smaller than any
+    physical scale in the problem") applied to the one length that appears here:
+    a foot within a wavelength of the axis is a physical scale the ray
+    description does not resolve, so the spreading is held at its value there
+    rather than allowed to run away. It bounds the term without touching
+    anything the method can actually say. That -79 dB cell now reads 37.51 dB
+    against an exact 36.99 dB. Measured on the same column, worst error against
+    :math:`20\lg R` over a +-500 m cut: 116 dB before the floor and 4.93 dB
+    after at 100 m, 108 dB and 0.62 dB at 200 m, 67.7 dB and 0.058 dB at 400 m,
+    0.0007 dB before and 0.0006 dB after from 700 m out. On the ideal 1000 m
+    guide against the image-source sum at 2, 5 and 10 km the floor is invisible:
+    0.00044 dB worst with it and without. Dropping the extrapolation of ``r``
+    altogether removes the singularity too, and is *not* the fix, because that
+    same guide then comes out 0.0077 dB off instead, seventeen times worse. What
+    is left inside a few hundred metres is the method declining to have a near
+    field, not this clamp: see :func:`gaussian_beams`.
+
+    Nothing here is an eigenray hunt and nothing interpolates between rays, so
+    the interpolation hazard of Sect. 3.7.5.1 (Fig. 3.34) does not arise: the
+    beams are summed independently, which is the structural advantage of beam
+    tracing over ray interpolation.
+
+    :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
+        convention Eq. (3.88) is printed in; the caller conjugates it.
+    """
+    n_ranges = s.depth.shape[1]
+    n_wrap = min(_MAX_BEAM_WRAPS,
+                 int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
+    plan = []
+    for shift, side, strength in _image_ladder(water_depth, bottom_reflection, n_wrap):
+        # This image sits at ``shift + side*z_r - z_j`` in depth, so with both
+        # depths inside the column its offset is at least ``|shift| - D`` away
+        # for the upright family and ``|shift| - 2D`` for the mirrored one,
+        # whose two depths subtract rather than cancel. A beam that cannot reach
+        # that far cannot contribute to the image at any receiver depth and is
+        # dropped before a single array is built for it.
+        span = water_depth if side > 0.0 else 2.0 * water_depth
+        rows = np.flatnonzero(s.reach >= abs(shift) - span)
+        if rows.size:
+            plan.append((shift, side, strength, rows))
+
+    half_omega_width = 0.5 * omega * beam_width
+    cutoff_sq = _BEAM_CUTOFF**2
+    field = np.zeros((receiver_depths.size, n_ranges), dtype=np.complex128)
+    for shift, side, strength, rows in plan:
+        xi = s.xi[rows][:, :, None]
+        offset = s.range_offset[:, :, None]
+        column = s.column_range[:, :, None]
+        depth = s.depth[rows][:, :, None]
+        vertical = s.vertical[rows][:, :, None]
+        speed2d, slope2d = s.speed[rows], s.slope[rows]
+        spread2d, weight2d = s.spreading[rows], s.weight[rows]
+        phase2d, time2d = s.phase[rows], s.time[rows]
+        speed = speed2d[:, :, None]
+        speed_sq = speed**2
+        wavelength = 2.0 * np.pi * speed / omega
+        spreading = spread2d[:, :, None]
+        slope = slope2d[:, :, None]
+        # A block of receiver depths at a time, sized so the temporaries stay
+        # bounded however large the requested grid is.
+        step = max(1, _INFLUENCE_BLOCK // (rows.size * n_ranges))
+        for lo in range(0, receiver_depths.size, step):
+            zr = receiver_depths[lo:lo + step]
+            dz = (shift + side * zr[None, None, :]) - depth
+            along = xi * offset + vertical * dz  # s / c
+            normal = speed * (xi * dz - vertical * offset)
+            q_infl = spreading + speed_sq * slope * along
+            # Held off the axis by a wavelength; see the note above on why the
+            # cylindrical half of the Jacobian is the one factor nothing else
+            # protects.
+            r_infl = np.maximum(column + speed_sq * xi * along, wavelength)
+            # Admit a cell when n^2/W^2 < cutoff^2 with W = 2|q|/(omega W_0),
+            # written as a comparison of squares so that neither side needs a
+            # square root: this test runs over the whole block while everything
+            # after it runs over the survivors, which in a waveguide are around
+            # a third of the cells, so it must stay arithmetic.
+            hits = np.flatnonzero(
+                ((normal * half_omega_width) ** 2
+                 < cutoff_sq * (q_infl.real**2 + q_infl.imag**2)).ravel())
+            if hits.size == 0:
+                continue
+            beam_at, within = np.divmod(hits, n_ranges * zr.size)
+            range_at, depth_at = np.divmod(within, zr.size)
+            q_hit = q_infl.ravel()[hits]
+            spread_hit = spread2d[beam_at, range_at]
+            # The travel-time phase, the tracked branch of 1/sqrt(q) and the
+            # transverse Gaussian all ride in one exponent rather than three,
+            # because a complex exponential over tens of millions of survivors
+            # is where the run time goes.
+            exponent = (
+                -0.5j * (phase2d[beam_at, range_at]
+                         + np.angle(q_hit * np.conj(spread_hit)))
+                - 1j * omega * (time2d[beam_at, range_at] + along.ravel()[hits]
+                                + slope2d[beam_at, range_at] / (2.0 * q_hit)
+                                * normal.ravel()[hits] ** 2)
+            )
+            value = (
+                weight2d[beam_at, range_at] * strength
+                * np.sqrt(speed2d[beam_at, range_at] / r_infl.ravel()[hits])
+                / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
+            )
+            cells = zr.size * n_ranges
+            target = depth_at * n_ranges + range_at
+            field[lo:lo + zr.size] += (
+                np.bincount(target, value.real, minlength=cells)
+                + 1j * np.bincount(target, value.imag, minlength=cells)
+            ).reshape(zr.size, n_ranges)
+    return field
+
+
+def _warn_beams(
+    message: str, *, nested: int = 0,
+) -> None:
+    """Raise a :class:`~phonometry.PhonometryWarning` at the caller's call site.
+
+    The frame the warning is reported against is the one that called
+    :func:`gaussian_beams`, which is where the input that provoked it was
+    written. ``nested`` counts the frames between this one and
+    :func:`gaussian_beams` for a check that lives in a helper of its own.
+    """
+    import warnings
+
+    from ..._internal.warnings import PhonometryWarning
+
+    warnings.warn(f"gaussian_beams: {message}", PhonometryWarning,
+                  stacklevel=3 + nested)
+
+
+def _check_source_on_kink(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], source_depth: float,
+) -> None:
+    """Warn when the source sits on a gradient discontinuity of the profile.
+
+    Sect. 3.7.4 records the artefact: "a further feature of interest is the
+    formation of an acoustic jet emanating horizontally from the source when
+    piecewise-linear interpolation is used, and when the source is located at
+    the discontinuity in the gradient of the sound speed". A measured profile
+    handed in with the source at one of its listed depths is the ordinary case
+    rather than a corner one, so it is worth saying out loud; moving the source
+    by a metre, or handing in a profile without the kink, removes it.
+    """
+    if z_prof.size < 3:
+        return
+    grad = np.diff(c_prof) / np.diff(z_prof)
+    # A jump of exactly zero is a node the profile runs straight through; any
+    # jump at all is a kink, so the test is deliberately exact and carries no
+    # tolerance (see :func:`phonometry._internal.rays._prepare_impulses`).
+    kinked = z_prof[1:-1][np.diff(grad).astype(bool)]
+    if kinked.size and np.min(np.abs(kinked - source_depth)) <= 1e-6:
+        _warn_beams(
+            "'source_depth' sits on a gradient discontinuity of the profile,"
+            " which concentrates the near-horizontal beams into a spurious jet;"
+            " offset the source or smooth the profile there.", nested=1)
+
+
+def _beam_range_grid(
+    ranges_m: NDArray[np.float64] | list[float] | None, *,
+    n_steps: int, dr: float, rmax: float,
+) -> NDArray[np.float64]:
+    """The ranges the field is evaluated at, defaulting to the marching grid.
+
+    Past the end of the march there is nothing to read a beam off, and the
+    nearest-column arithmetic of :func:`_beam_influence` would answer with a
+    silent extrapolation of the last column rather than with an error, so a
+    range beyond it is refused. Half a step of slack is allowed because the
+    last column is the one nearest ``max_range`` and a caller who asks for
+    exactly that is asking for a column that exists.
+    """
+    ranges = np.asarray(
+        np.arange(n_steps) * dr if ranges_m is None else ranges_m,
+        dtype=np.float64).ravel()
+    if ranges.size == 0 or not np.all(np.isfinite(ranges)) or np.any(ranges < 0.0):
+        raise ValueError("'ranges_m' must be finite, non-negative and non-empty.")
+    if np.any(ranges > rmax + 0.5 * dr):
+        raise ValueError("'ranges_m' must not run past 'max_range'.")
+    return ranges
+
+
+def _beam_receiver_grid(
+    receiver_depths_m: NDArray[np.float64] | list[float] | None, *,
+    n_depth_points: int, water_depth: float,
+) -> NDArray[np.float64]:
+    """The depths the field is evaluated at.
+
+    The default is the interior grid :func:`parabolic_equation` uses, so the
+    two fields land on the same depths and subtract. An explicit grid has to
+    stay inside the column: the image ladder of :func:`_image_ladder` folds the
+    receiver about the two boundaries, which only means anything between them.
+    """
+    if receiver_depths_m is None:
+        n_z = int(n_depth_points)
+        if n_z < 2:
+            raise ValueError("'n_depth_points' must be at least 2.")
+        dz = water_depth / (n_z + 1)
+        return np.asarray(dz * np.arange(1, n_z + 1), dtype=np.float64)
+    receivers = np.asarray(receiver_depths_m, dtype=np.float64).ravel()
+    if receivers.size == 0 or not np.all(np.isfinite(receivers)):
+        raise ValueError("'receiver_depths_m' must be finite and non-empty.")
+    if np.any(receivers < 0.0) or np.any(receivers > water_depth):
+        raise ValueError("'receiver_depths_m' must lie within the water column.")
+    return receivers
+
+
+class _Fan(NamedTuple):
+    """The launch fan, in the three forms the beam sum reads it in.
+
+    They are one quantity written three ways and have to agree, which is why
+    they travel together: ``xi`` is the Snell invariant the marcher is handed,
+    and ``dtheta`` is the spacing the weight of Eq. (3.92) integrates over.
+
+    :ivar launch: Launch angle of each beam from the horizontal, in radians.
+    :ivar xi: ``cos(launch) / c(z_s)``, per beam, in s/m.
+    :ivar dtheta: Spacing of the fan, in radians.
+    """
+
+    launch: NDArray[np.float64]
+    xi: NDArray[np.float64]
+    dtheta: float
+
+
+def gaussian_beams(
+    frequency_hz: float,
+    depths: NDArray[np.float64] | list[float],
+    sound_speeds: NDArray[np.float64] | list[float],
+    *,
+    source_depth: float,
+    max_range: float = 10_000.0,
+    ranges_m: NDArray[np.float64] | list[float] | None = None,
+    receiver_depths_m: NDArray[np.float64] | list[float] | None = None,
+    n_depth_points: int = 200,
+    max_angle_deg: float = 80.0,
+    n_beams: int | None = None,
+    beam_width: float | None = None,
+    range_step: float = 25.0,
+    bottom: str = "pressure-release",
+) -> GaussianBeamResult:
+    r"""Propagation-loss field from Gaussian beam tracing.
+
+    Hangs a Gaussian beam on each ray of a launch fan (Jensen Eq. 3.88) and sums
+    them over the fan with the weight of Eq. (3.92). The rays are the ones
+    :func:`ray_trace` draws, integrated by the same marcher through the same
+    profile; what is added is the dynamic pair :math:`(q, p)` of Eq. (3.58),
+    started from the complex conditions of Eq. (3.91) that make each ray the
+    axis of a beam of initial half-width ``beam_width`` and flat wavefront.
+
+    The point of the beams is that the answer stays finite. Ray theory's
+    amplitude, Eq. (3.65), divides by the ray-tube spreading, which vanishes on
+    a caustic and gives an infinity there (Sect. 3.4.1) and nothing at all in a
+    shadow zone. Complex :math:`q` cannot vanish, so this field needs no KMAH
+    index and no minimum-width floor, is finite wherever a beam reaches, and
+    falls into a shadow zone gradually rather than off a cliff, which is what
+    the exact solution does (Figs. 3.11, 3.17). See
+    :class:`GaussianBeamResult` for the one place it still reports an infinity,
+    which is the wedge no beam of the fan illuminates at all.
+
+    The limits are worth knowing before the numbers are believed.
+
+    * **Ray theory's own regime** (Sect. 3.4.2): "the wavelength should be
+      substantially smaller than any physical scale in the problem". This is the
+      limit that bites hardest and the one a plausible-looking answer hides
+      best. At 20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes
+      propagate, and the quarter-depth cap on the beam width leaves a beam a
+      third of a wavelength across: against the image-source sum from 200 m to
+      5 km the loss then comes out 2 to 8 dB high, and it moves by decibels when
+      the fan is opened or the beam count multiplied by 150, so there is nothing
+      it is converging to. Use :func:`normal_modes` there, which is exact in
+      that regime for the cost of two modes.
+    * **There is no near field**, and this is the largest error the function
+      makes. Eq. (3.92) weights the fan by matching it to a point source in the
+      far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
+      on the axis every ray leaves from, so close in the sum has nothing to
+      converge to. The cylindrical range is floored at one wavelength,
+      which is what keeps the answer bounded rather than what makes it right.
+      The scale it recovers on is the initial beam width, not a fixed distance.
+      Worst error against :math:`20\lg R` over a +-500 m depth cut in an
+      unbounded medium at 100 Hz, at three settings whose :math:`W_0` spans
+      150 to 437 m: 17, 13 and 4.1 dB at a quarter of :math:`W_0`, 1.2, 0.64 and
+      0.36 dB at :math:`W_0`, 0.012, 0.005 and 0.002 dB at 2.5 :math:`W_0`, and
+      a thousandth of a decibel or better from 3 :math:`W_0` out. Read nothing
+      inside about three beam widths of the source; since the default
+      :math:`W_0` grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run pushes
+      that boundary out rather than in. :func:`parabolic_equation` is the
+      solver to reach for close to the source.
+    * **The fan is truncated** at ``max_angle_deg``, and a waveguide with two
+      perfectly reflecting boundaries is the worst case for that, because
+      nothing but :math:`1/R` attenuates the steep multiple bounces. Measured on
+      the ideal 1000 m guide at 300 Hz, source at 300 m and receiver at 600 m,
+      against the image-source sum at 2, 5 and 10 km: a fan to 80 degrees is
+      0.27, 4.06 and 2.52 dB out, a fan to 85 degrees 0.21, 1.32 and 1.91 dB,
+      and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
+      to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
+      at 80 degrees is the fan and not the method. A real seabed absorbs those
+      bounces and the default is then ample; a perfect reflector needs the
+      fan opened and ``range_step`` cut with it, since a step has to resolve
+      :math:`\tan\theta_\mathrm{max}` depth units of climb per unit range. The
+      warning below says when that pairing is wrong.
+    * **The beam must be small compared to the channel**, which the default
+      ``beam_width`` enforces and an explicit one is checked against. In
+      shallow water that clamp, and not the method, is the largest error left:
+      it holds :math:`W_0` at a quarter of the water depth while the optimum
+      the same function computes first is several times larger, and the field
+      comes out systematically too quiet. Measured against the closed-form Airy
+      modes of an :math:`n^2`-linear 200 m guide at 200 Hz, source at 30.5 m and
+      receiver at 120.5 m, energy-averaged over 0.5 to 4 km: the default
+      :math:`W_0` of 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
+      100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about
+      refraction is wrong there, and the same profile in 1000 m of water, where
+      the clamp does not bite, comes out at +0.72 dB with a 1.37 dB worst bin,
+      closer to the exact field than :func:`normal_modes` on the same cut. Pass
+      ``beam_width`` explicitly, above the cap and up to about the water depth,
+      when the channel is shallow and the profile refracts; the warning it
+      raises is then the expected cost of the better answer. Sect. 3.5 says the
+      same thing from the other side, that "at lower frequencies the physics may
+      imply that the beam is large compared to the channel, which causes a
+      variety of problems".
+
+    What it costs is ``n_beams`` times the size of the receiver grid, and none
+    of the three factors depends on the frequency: the ray core does not have to
+    resolve a wavelength on a grid, and the fan only widens as
+    :math:`\lambda/W_0`, which the default width holds nearly fixed. On a
+    5000 m Munk column at 100 Hz over 10 km, everything left at its default
+    (512 beams, a 200 by 401 field), this takes 14 s against 0.1 s for
+    :func:`parabolic_equation` and 177 s for :func:`normal_modes`; raise the
+    frequency and the first number stays where it is while the other two climb.
+    Shrinking ``n_depth_points`` or handing in a coarser ``ranges_m`` is the
+    direct way to trade resolution for time.
+
+    :param frequency_hz: Source frequency, in Hz.
+    :param depths: Depth samples of the profile, in metres, from ``z = 0``.
+    :param sound_speeds: Sound speed at each depth, in m/s.
+    :param source_depth: Source depth, in metres, inside the water column.
+    :param max_range: Maximum range to march to, in metres.
+    :param ranges_m: Ranges at which to evaluate the field, in metres. Default
+        (``None``): the marching grid itself, which puts every receiver on a
+        column the rays were actually sampled at.
+    :param receiver_depths_m: Depths at which to evaluate the field, in metres.
+        Default (``None``): ``n_depth_points`` points spread over the water
+        column, on the interior grid :func:`parabolic_equation` uses, so the two
+        fields land on the same depths.
+    :param n_depth_points: Size of that default depth grid.
+    :param max_angle_deg: Half-angle of the launch fan, in degrees from the
+        horizontal. Beams are spread symmetrically over
+        ``[-max_angle_deg, +max_angle_deg]``.
+    :param n_beams: Number of beams in the fan. Default (``None``): from the
+        overlap condition. Adjacent beams are :math:`s\,\delta\theta_0` apart at
+        arc length :math:`s` while each has spread to
+        :math:`W \to s\lambda/(\pi W_0)`, so the condition that they still
+        overlap, :math:`\delta\theta_0 \lesssim \lambda/(\pi W_0)`, is
+        range-independent; the default takes four times that margin. Too coarse
+        a fan shows as a periodic ripple in range at the beam spacing, which is
+        easy to mistake for physical interference.
+    :param beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
+        initial half-width, at the :math:`e^{-2}` folding distance in intensity.
+        Default (``None``): the free-space optimum
+        :math:`W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}` of Sect. 3.5.1, held
+        inside the book's recommended band of 10 to 50 wavelengths and clamped
+        to a quarter of the water depth, and the clamp has the last word.
+    :param range_step: Marching step in range, in metres, and the spacing of the
+        default ``ranges_m``.
+    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
+        surface is always pressure-release.
+    :return: A :class:`GaussianBeamResult`.
+    :raises ValueError: If the inputs are invalid.
+    :warns PhonometryWarning: when the source sits on a kink of the profile
+        (Sect. 3.7.4's spurious horizontal jet), when an explicit
+        ``beam_width`` exceeds a quarter of the water depth, and when one
+        marching step carries the steepest beam of the fan across more than a
+        quarter of the water column, which is the pairing between
+        ``max_angle_deg`` and ``range_step`` that is easiest to get wrong.
+    """
+    f = require_positive(frequency_hz, "frequency_hz")
+    z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    water_depth = float(z_prof[-1])
+    zs = float(source_depth)
+    if not (0.0 < zs < water_depth):
+        raise ValueError(_SOURCE_OUTSIDE)
+    rmax = require_positive(max_range, "max_range")
+    dr_step = require_positive(range_step, "range_step")
+    if dr_step > rmax:
+        raise ValueError("'range_step' must not exceed 'max_range'.")
+    key = bottom.strip().lower()
+    if key not in _BOTTOM_TYPES:
+        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
+    theta_max = float(max_angle_deg)
+    if not (0.0 < theta_max < 90.0):
+        raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
+
+    omega = 2.0 * np.pi * f
+    c0 = float(np.interp(zs, z_prof, c_prof))
+    wavelength = c0 / f
+    w0 = (_default_beam_width(wavelength, rmax, water_depth) if beam_width is None
+          else require_positive(beam_width, "beam_width"))
+    if beam_width is not None and w0 > water_depth / 4.0:
+        _warn_beams(
+            "'beam_width' exceeds a quarter of the water depth, so the beams"
+            " straddle boundaries their central rays reflected off and the"
+            " folded field drifts from the true one.")
+    _check_source_on_kink(z_prof, c_prof, zs)
+
+    span = 2.0 * np.radians(theta_max)
+    n_fan = (int(np.ceil(span * 4.0 * np.pi * w0 / wavelength)) + 1
+             if n_beams is None else int(n_beams))
+    if n_fan < 2:
+        raise ValueError("'n_beams' must be at least 2.")
+    launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
+    fan = _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]))
+
+    n_steps = int(np.ceil(rmax / dr_step)) + 1
+    dr = rmax / (n_steps - 1)
+    march = march_rays(
+        _ocean_ray_derivative(z_prof, c_prof, fan.xi), xi=fan.xi,
+        z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
+        n_steps=n_steps, lower=0.0, upper=water_depth,
+        dynamic=DynamicRays(np.full(n_fan, 0.5j * omega * w0**2),
+                            np.full(n_fan, 1.0 + 0.0j), z_prof, c_prof))
+
+    ranges = _beam_range_grid(ranges_m, n_steps=n_steps, dr=dr, rmax=rmax)
+    receivers = _beam_receiver_grid(receiver_depths_m, n_depth_points=n_depth_points,
+                                    water_depth=water_depth)
+
+    climb = dr * np.tan(np.radians(theta_max))
+    if climb > _MAX_STEEP_CLIMB * water_depth:
+        _warn_beams(
+            f"one marching step carries the steepest beam of the fan {climb:.0f} m"
+            f" across a {water_depth:.0f} m column, so its trajectory is not"
+            " resolved; cut 'range_step' or narrow 'max_angle_deg'.")
+
+    field, widths, curvatures = _assemble_beam_field(
+        march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
+        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
+        water_depth=water_depth, bottom_reflection=_BOTTOM_REFLECTION[key])
+
+    # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
+    # here hands back a field in the exp(-i omega t) one the rest of the module
+    # speaks. The loss is untouched by that, and the weights of Eq. (3.92)
+    # normalise the sum to Eq. (3.80)'s unit pressure at 1 m, so there is no
+    # p_0 to divide by.
+    pressure = np.conj(field)
+    with np.errstate(divide="ignore"):
+        pl = -20.0 * np.log10(np.abs(pressure))
+
+    return GaussianBeamResult(
+        frequency=f,
+        ranges=ranges,
+        depths=receivers,
+        propagation_loss=np.asarray(pl, dtype=np.float64),
+        pressure=np.asarray(pressure, dtype=np.complex128),
+        launch_angles=np.degrees(launch),
+        ray_ranges=np.broadcast_to(np.arange(n_steps) * dr,
+                                   march.positions.shape).copy(),
+        ray_depths=march.positions,
+        beam_widths=widths,
+        wavefront_curvatures=curvatures,
+        initial_beam_width=float(w0),
+        source_depth=zs,
+        water_depth=water_depth,
+    )
+
+
+def _assemble_beam_field(
+    march: RayMarch, *, ranges: NDArray[np.float64],
+    receivers: NDArray[np.float64], fan: _Fan, dr: float,
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
+    omega: float, c0: float, w0: float, water_depth: float,
+    bottom_reflection: float,
+) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
+    r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
+
+    Two per-ray quantities are formed here and nowhere else. The reflection
+    factor is the running product of the coefficients the central ray has met,
+    which is why the marcher has to say *which* boundary each bounce was at: a
+    pressure-release sea surface inverts the pressure and a seabed need not.
+    And the branch of :math:`\sqrt{q}` is fixed by unwrapping the argument of
+    ``q`` along the ray before anything is sampled off it, since the increment
+    per range step is small while a principal-value square root taken sample by
+    sample would jump by :math:`\pi` at the first caustic.
+    """
+    if march.spreadings is None or march.spreading_slopes is None:  # pragma: no cover
+        raise ValueError("the march must carry the dynamic ray states.")
+    q = np.asarray(march.spreadings, dtype=np.complex128)
+    p = np.asarray(march.spreading_slopes, dtype=np.complex128)
+    speed = np.interp(march.positions, z_prof, c_prof)
+    # W = 2|q|/(omega W_0) is Eq. (3.89) with Im[p/q] replaced by the conserved
+    # Wronskian; K is Eq. (3.90) with the sign of the conjugated field.
+    widths = 2.0 * np.abs(q) / (omega * w0)
+    curvatures = speed * np.real(p / q)
+
+    at_bottom = np.cumsum(march.upper_reflections, axis=1)
+    at_surface = np.cumsum(march.reflections - march.upper_reflections, axis=1)
+    reflected = (_SURFACE_REFLECTION**at_surface) * (bottom_reflection**at_bottom)
+    # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and positive.
+    weight = (fan.dtheta * (omega * w0 / (2.0 * c0))
+              * np.sqrt(np.cos(fan.launch) / np.pi))
+
+    column = np.clip(np.rint(ranges / dr).astype(np.intp), 0,
+                     march.positions.shape[1] - 1)
+    cosine = speed[:, column] * fan.xi[:, None]
+    samples = _BeamSamples(
+        xi=fan.xi[:, None],
+        column_range=np.asarray(column * dr, dtype=np.float64)[None, :],
+        range_offset=(ranges - column * dr)[None, :],
+        depth=march.positions[:, column],
+        vertical=march.verticals[:, column],
+        speed=speed[:, column],
+        spreading=q[:, column],
+        slope=p[:, column],
+        time=march.times[:, column],
+        phase=np.unwrap(np.angle(q), axis=1)[:, column],
+        weight=(weight[:, None] * reflected[:, column]).astype(np.complex128),
+        reach=_BEAM_CUTOFF * widths[:, column].max(axis=1) / cosine.min(axis=1),
+    )
+    field = _beam_influence(
+        samples, receivers, water_depth=water_depth,
+        bottom_reflection=bottom_reflection, omega=omega, beam_width=w0)
+    return field, widths, curvatures
+
+
+# ===========================================================================
+# 4. Parabolic equation (Jensen Ch. 6, split-step Fourier)
 # ===========================================================================
 
 
@@ -490,7 +1437,7 @@ def parabolic_equation(
     water_depth = float(z_prof[-1])
     zs = float(source_depth)
     if not (0.0 < zs < water_depth):
-        raise ValueError("'source_depth' must lie within the water column.")
+        raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     dr = require_positive(range_step, "range_step")
     if dr > rmax:

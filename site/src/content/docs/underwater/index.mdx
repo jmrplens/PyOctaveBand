@@ -45,9 +45,10 @@ equation with its detection-range inversion, Rayleigh seabed reflection loss,
 and the Wenz ambient-noise spectrum with JOMOPANS-ECHO ship traffic. When refraction and
 boundaries decide the answer,
 [Underwater propagation solvers](/phonometry/underwater/underwater-solvers/)
-computes the field instead: the normal-mode expansion, ray tracing and the
-split-step Fourier parabolic equation, with the guidance for choosing
-between them and the closed forms.
+computes the field instead: the normal-mode expansion, ray tracing, the
+Gaussian beam sum built on those same rays and the split-step Fourier
+parabolic equation, with the guidance for choosing between them and the
+closed forms.
 
 A **receiver** stage closes the loop.
 [Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/)
@@ -71,9 +72,9 @@ lives inline with the guides rather than in the theory reference.
   propagation loss, sound speed, the sonar equation, seabed reflection and
   ocean ambient noise, in closed form.
 - [Underwater propagation solvers](/phonometry/underwater/underwater-solvers/):
-  the normal-mode, ray-tracing and parabolic-equation solvers of the
-  stratified waveguide, each validated against an exact closed form, and
-  how to choose a propagation model.
+  the normal-mode, ray-tracing, Gaussian-beam and parabolic-equation solvers
+  of the stratified waveguide, each validated against an exact closed form,
+  and how to choose a propagation model.
 - [Marine-mammal noise exposure](/phonometry/underwater/marine-mammal-exposure/):
   group audiograms, the regulatory auditory weighting functions with the
   guidance version selectable, the TTS and injury onset criteria, and a worked
@@ -95,14 +96,20 @@ pile-driving noise has no closed form here or anywhere in the library.
 <ScopeClaim status="not-covered">
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
-all three solvers assume a **range-independent** water column with no
+all four solvers assume a **range-independent** water column with no
 absorbing or elastic bottom and no real bathymetry — which rules out
-range-dependent problems entirely. The ray solver returns paths and travel
-times but not amplitudes (no ray-tube intensity, no caustic correction), and
-the parabolic equation is the standard small-angle Tappert form rather than a
-wide-angle Padé variant. For the elastic seabed physics these fluid solvers
-leave out, the [elastic wave solver](/phonometry/simulation/elastic-waves/) is
-the nearest thing the library has.
+range-dependent problems entirely. The ray solver still returns paths and
+travel times and no level of its own; the level comes from `gaussian_beams`,
+which widens each of those rays into a beam and so answers a finite number at
+a caustic and a graded one in a shadow zone, at three prices: it sums the
+whole launch fan rather than searching for the eigenrays that join a given
+source and receiver, it has no near field within about three beam widths of
+the source, and the geometric-beam variant with its KMAH index and its
+minimum-width floor is not implemented. The parabolic equation is the standard
+small-angle Tappert form rather than a wide-angle Padé variant. For the
+elastic seabed physics these fluid solvers leave out, the [elastic wave
+solver](/phonometry/simulation/elastic-waves/) is the nearest thing the
+library has.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered">

@@ -88,7 +88,7 @@ guide you think you need:
 - [Which measure, and when](/phonometry/perception/speech/objective-intelligibility/#4-which-measure-and-when) — STI against the intrusive and non-intrusive measures.
 - [Which tonality metric, and when](/phonometry/perception/psychoacoustics/tone-prominence/#3-which-tonality-metric-and-when).
 - [Direct or indirect](/phonometry/perception/speech/speech-transmission/#direct-or-indirect-choosing-between-them) — full-matrix STI against STIPA.
-- [Choosing a model](/phonometry/underwater/underwater-solvers/#5-choosing-a-model) — normal modes, rays and the parabolic equation.
+- [Choosing a model](/phonometry/underwater/underwater-solvers/#6-choosing-a-model) — normal modes, rays, Gaussian beams and the parabolic equation.
 
 ## Before you measure anything
 

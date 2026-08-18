@@ -952,7 +952,7 @@ it; the list grows as guides gain their References sections.
   *Computational ocean acoustics* (2nd ed.). Springer.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   The reference monograph on numerical propagation: normal modes, ray
-  tracing and the parabolic equation.
+  tracing, Gaussian beams and the parabolic equation.
   Cited by [Underwater propagation solvers](../underwater/underwater-solvers.md).
 - Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
   with application to SOFAR. *The Journal of the Acoustical Society of

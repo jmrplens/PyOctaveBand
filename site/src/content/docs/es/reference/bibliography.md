@@ -1174,7 +1174,7 @@ absorción de alcance decreciente y no tres alternativas.
   *Computational ocean acoustics* (2.ª ed.). Springer.
   [doi:10.1007/978-1-4419-8678-8](https://doi.org/10.1007/978-1-4419-8678-8).
   La monografía de referencia de la propagación numérica: modos normales,
-  trazado de rayos y ecuación parabólica.
+  trazado de rayos, haces gaussianos y ecuación parabólica.
   Citado por [Métodos numéricos de propagación submarina](/phonometry/es/underwater/underwater-solvers/).
 - Munk, W. H. (1974). Sound channel in an exponentially stratified ocean,
   with application to SOFAR. *The Journal of the Acoustical Society of

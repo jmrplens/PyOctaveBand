@@ -548,16 +548,17 @@ Every closed form above stops being enough when refraction and boundaries
 decide the answer: a sound-speed minimum that traps energy, surface and
 bottom reflections in shallow water, or a detection range that swings with
 the choice of spreading law. At that point the field has to be computed,
-and the normal-mode, ray-tracing and parabolic-equation solvers of the
-module, together with the guidance for choosing between them and these
-closed forms, have their own guide:
+and the normal-mode, ray-tracing, Gaussian-beam and parabolic-equation
+solvers of the module, together with the guidance for choosing between them
+and these closed forms, have their own guide:
 [Underwater propagation solvers](underwater-solvers.md).
 
 ## See also
 
 - [Underwater propagation solvers](underwater-solvers.md):
-  the normal-mode, ray-tracing and parabolic-equation solvers for the cases
-  where these closed forms are not enough, and the model-selection guidance.
+  the normal-mode, ray-tracing, Gaussian-beam and parabolic-equation solvers
+  for the cases where these closed forms are not enough, and the
+  model-selection guidance.
 - API reference: [`underwater.propagation.closed_form`](https://jmrplens.github.io/phonometry/reference/api/underwater/closed-form/) and [`underwater.propagation.sound_speed`](https://jmrplens.github.io/phonometry/reference/api/underwater/sound-speed/).
 
 ## References
@@ -670,5 +671,5 @@ closed forms, have their own guide:
 - Ship-traffic source level: MacGillivray & de Jong (2021),
   *J. Mar. Sci. Eng.* 9(4) 369 (CC-BY, JOMOPANS-ECHO), which also reproduces
   RANDI 3.1 and Wales & Heitmeyer (2002).
-- Numerical solvers (normal modes, ray tracing, parabolic equation):
-  covered in [Underwater propagation solvers](underwater-solvers.md).
+- Numerical solvers (normal modes, ray tracing, Gaussian beams, parabolic
+  equation): covered in [Underwater propagation solvers](underwater-solvers.md).
