@@ -23087,6 +23087,42 @@ No `calibration_factor` argument, no `fs` argument at the level call: the
 — the caller knows more than an object — and a bare array without `fs` is
 refused by name rather than guessed at.
 
+### The same chain on a real meter's file
+
+The repository versions a real calibration take for exactly this workflow:
+`tests/data/audio/xl2/calibration_113_7dB.wav`, recorded by an NTi Audio
+XL2 sound level meter during a road traffic pass-by campaign at the
+University of Antwerp (CC BY 4.0; provenance, licence and attribution in
+`tests/data/audio/README.md`). Being an instrument, the meter wrote its
+own `bext` chunk and declared its digital full scale in it. That
+declaration plus the file's RMS is the whole calibration chain, and it has
+to land on the level the dataset publishes for this take: 113.7 dB.
+
+```python
+import pathlib
+import phonometry
+
+# The committed take lives in the repository, so this runs from a checkout
+#   (or editable install); with your own meter's WAV, pass its path directly.
+repo = pathlib.Path(phonometry.__file__).resolve().parents[2]
+xl2_take = io.read(repo / "tests/data/audio/xl2/calibration_113_7dB.wav")
+print(xl2_take.provenance.originator)          # NTi Audio XL2 A2A-17367-E0
+
+declaration = xl2_take.provenance.description.splitlines()[0]
+print(declaration)                             # 0dBFS = 129.3 dBSPL
+full_scale_spl = float(declaration.split()[2])
+
+xl2_cal = 2e-5 * 10 ** (full_scale_spl / 20)   # what 0 dBFS is in pascals
+xl2_leq = float(signals.leq(xl2_take, calibration_factor=xl2_cal))
+print(f"Leq = {xl2_leq:.1f} dB")               # 113.7, the published level
+```
+
+No hand-typed sensitivity anywhere: the instrument's file carried its own
+full scale, the reader surfaced it, and the published 113.7 dB came out
+the other end. A recording made by the same meter is calibrated with the
+same two lines — which is why both files going through the same reader is
+the one rule that matters.
+
 The figure below is this page in one image: the same API wrote a 24-bit BWF
 with its `bext` chunk and its calibration sidecar, read it back, and the
 resulting `Signal` drew its calibrated waveform next to the card of what
