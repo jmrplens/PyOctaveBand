@@ -464,6 +464,37 @@ def test_slope_zero_beams_reproduce_the_level_field_bit_for_bit() -> None:
     assert level.bathymetry_ranges is None
 
 
+def test_slope_zero_impulse_matches_the_flat_impulse_through_a_gradient() -> None:
+    """The facet reflection impulse at slope zero is the flat impulse.
+
+    The isovelocity slope-zero test cannot see the dynamic pair's reflection
+    impulse, because a zero gradient zeroes both formulas. This one bounces
+    beams off the bottom of the n^2-linear guide, where the sound-speed
+    gradient is real and the flat machinery is already pinned to the Airy
+    modes, and holds the constant-polyline run to the level run. The two
+    compute Jensen Eq. (3.123) through different arithmetic (the flat path
+    from the folded image medium's precomputed ladder, the facet path from
+    the incident slownesses with the facet slope at zero), so the comparison
+    is a closed-form identity checked in floating point: measured 7.7e-13
+    relative, bounded at 1e-10 with headroom.
+    """
+    c0 = 1550.0
+    z = np.linspace(0.0, 200.0, 81)
+    c = c0 / np.sqrt(1.0 + 2.4 * z / c0)
+    kw = {"source_depth": 26.0, "max_range": 3000.0,
+          "ranges_m": np.array([1000.0, 2000.0, 2900.0]),
+          "receiver_depths_m": np.array([40.0, 100.0, 160.0]),
+          "max_angle_deg": 60.0, "range_step": 2.0, "beam_width": 80.0}
+    level = gaussian_beams(200.0, z, c, **kw)
+    poly = gaussian_beams(200.0, z, c, **kw,
+                          bathymetry_ranges_m=[0.0, 3000.0],
+                          bathymetry_depths_m=[200.0, 200.0])
+    assert level.ray_depths.shape == poly.ray_depths.shape
+    rel = (np.abs(poly.pressure - level.pressure)
+           / np.abs(level.pressure))
+    assert rel.max() < 1e-10
+
+
 def test_terminated_beams_leave_a_finite_field() -> None:
     """Beams the slope turns back retire cleanly from the sum.
 
