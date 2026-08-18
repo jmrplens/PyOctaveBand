@@ -553,10 +553,10 @@ def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Signal overloads: leq / ln_levels / sel / lc_peak take a phonometry.io
-# Signal in place of the bare (x, fs) pair. Every equality below is exact
-# (==, not approx): the overload must resolve to the identical bare-array
-# call, never to a nearby number.
+# Signal overloads: every public function here takes a phonometry.io Signal
+# in place of the bare (x, fs) pair. Every equality below is exact (==, not
+# approx): the overload must resolve to the identical bare-array call, never
+# to a nearby number.
 # ---------------------------------------------------------------------------
 
 def test_leq_takes_the_signals_own_calibration() -> None:
@@ -620,12 +620,43 @@ def test_a_conflicting_fs_is_refused_a_matching_one_is_not() -> None:
 
 
 def test_a_bare_array_still_requires_fs() -> None:
-    from phonometry import lc_peak, ln_levels, sel
+    from phonometry import laeq, lc_peak, lex_8h, ln_levels, sel, sound_exposure
 
     x = _tone(1000)
-    for func in (ln_levels, sel, lc_peak):
+    for func in (ln_levels, sel, lc_peak, laeq, sound_exposure, lex_8h):
         with pytest.raises(ValueError, match="fs is required"):
             func(x)
+
+
+def test_exposure_functions_take_the_signals_rate_and_calibration() -> None:
+    """laeq / sound_exposure / lex_8h honour the object like their siblings.
+
+    These three sit in the same module and the same docs table as the
+    functions above; a Signal accepted here but with its calibration
+    silently dropped (np.asarray sees only the samples) computed a level
+    ~10 dB off that looked perfectly plausible. All of them or none.
+    """
+    from phonometry import laeq, lex_8h, sound_exposure
+    from phonometry.io import Signal
+
+    x = _tone(1000, seconds=2.0)
+    sig = Signal(x, FS, calibration_factor=3.5)
+    assert laeq(sig) == laeq(x, FS, calibration_factor=3.5)
+    assert sound_exposure(sig) == sound_exposure(x, FS, calibration_factor=3.5)
+    assert sound_exposure(sig, duration_hours=8.0) == sound_exposure(
+        x, FS, duration_hours=8.0, calibration_factor=3.5
+    )
+    assert lex_8h(sig) == lex_8h(x, FS, calibration_factor=3.5)
+
+
+def test_exposure_functions_refuse_a_conflicting_fs() -> None:
+    from phonometry import laeq, lex_8h, sound_exposure
+    from phonometry.io import Signal
+
+    sig = Signal(_tone(1000), FS)
+    for func in (laeq, sound_exposure, lex_8h):
+        with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
+            func(sig, FS + 1)
 
 
 def test_multichannel_signal_returns_per_channel_levels() -> None:

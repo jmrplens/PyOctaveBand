@@ -34,7 +34,8 @@ su calibración, sus etiquetas de canal y su procedencia `bext` en un único
 objeto inmutable que se comporta como el array desnudo en todas partes
 (`np.asarray` entrega las muestras a cualquier función existente), se
 dibuja solo con `.plot()`, y entra directo en las funciones de nivel —
-`leq`, `ln_levels`, `sel`, `lc_peak` — sin repetir a mano ni la frecuencia
+`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`,
+`lex_8h` — sin repetir a mano ni la frecuencia
 ni la calibración. En la otra dirección, `write()` produce WAV/BWF (el de
 24 bits empaquetado en casa) y FLAC, se niega a recortar en silencio,
 extiende el `CodingHistory` en vez de sustituirlo, puede medir los cinco

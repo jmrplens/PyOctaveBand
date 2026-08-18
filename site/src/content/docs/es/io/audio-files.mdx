@@ -89,8 +89,8 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 El objeto sustituye al array desnudo en cualquier parte: `np.asarray(sig)`
 entrega las muestras (1D para un canal, `(canales, muestras)` para varios),
 así que toda función `(x, fs, ...)` de la biblioteca lo acepta hoy. Las
-funciones de nivel `leq`, `ln_levels`, `sel` y `lc_peak` van más allá y
-aceptan el propio `Signal`: el objeto ya conoce su frecuencia y su
+funciones de nivel (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
+`sound_exposure` y `lex_8h`) van más allá y aceptan el propio `Signal`: el objeto ya conoce su frecuencia y su
 calibración, y pedirte que repitas cualquiera de las dos es pedir un error
 de transcripción.
 

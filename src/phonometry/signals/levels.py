@@ -2,11 +2,14 @@
 """
 Integrated and statistical sound levels (Leq, LAeq, LN percentiles).
 
-:func:`leq`, :func:`ln_levels`, :func:`sel` and :func:`lc_peak` accept a
-:class:`phonometry.io.Signal` in place of the bare ``(x, fs)`` pair: the
-object read from a measurement file already knows its sample rate and,
-when calibrated, its digital-to-pascal factor, so asking the caller to
-repeat either is asking for a transcription error. The bare-array
+Every function here accepts a :class:`phonometry.io.Signal` in place of
+the bare ``(x, fs)`` pair: the object read from a measurement file
+already knows its sample rate and, when calibrated, its
+digital-to-pascal factor, so asking the caller to repeat either is
+asking for a transcription error. All of them or none: a function that
+took the object but silently dropped its calibration -- one row away
+from functions that honour it -- would compute a wrong level that looks
+right, the exact failure the object exists to prevent. The bare-array
 signatures are unchanged -- a plain array with an explicit ``fs`` and
 ``calibration_factor`` computes exactly what it always did.
 """
@@ -127,21 +130,30 @@ def leq(
 
 
 def laeq(
-    x: list[float] | np.ndarray,
-    fs: int,
-    calibration_factor: float = 1.0,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray:
     """
     A-weighted equivalent continuous sound level (LAeq).
 
-    :param x: Input signal (1D or 2D [channels, samples]), raw pressure units.
-    :param fs: Sample rate in Hz.
-    :param calibration_factor: Multiplier converting digital units to Pascals.
+    :param x: Input signal (1D or 2D [channels, samples]) in raw pressure
+        units, or a :class:`phonometry.io.Signal` read from a measurement
+        file.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises instead of silently winning.
+    :param calibration_factor: Multiplier converting digital units to
+        Pascals. Precedence as in :func:`leq`: explicit value, then a
+        calibrated Signal's own factor, then 1.0.
     :param dbfs: If True, return dBFS instead of dB SPL.
     :return: Scalar for 1D input, array of shape (channels,) for 2D input.
     """
-    return leq(weighting_filter(x, fs, "A"), calibration_factor, dbfs)
+    fs = _resolve_fs(x, fs)
+    calibration = _resolve_calibration(x, calibration_factor)
+    x_proc = _resolve_samples(x)
+    return leq(weighting_filter(x_proc, fs, "A"), calibration, dbfs)
 
 
 def ln_levels(
@@ -302,10 +314,10 @@ def sel(
 
 
 def sound_exposure(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     duration_hours: float | None = None,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> float | np.ndarray:
     """
     A-weighted sound exposure E in pascal-squared hours (IEC 61252, 3.1).
@@ -316,18 +328,25 @@ def sound_exposure(
     longer exposure period (E = mean-square * duration). Anchors from
     BS EN 61252:1995 (3.3 NOTE 4): 3.2 Pa²h <-> LEX,8h of exactly 90 dB.
 
-    :param x: Input signal in raw pressure units (1D or 2D).
-    :param fs: Sample rate in Hz.
+    :param x: Input signal in raw pressure units (1D or 2D), or a
+        :class:`phonometry.io.Signal` read from a measurement file.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises instead of silently winning.
     :param duration_hours: Exposure period the input represents, in hours.
         Default: the recording duration itself.
-    :param calibration_factor: Multiplier converting digital units to Pascals.
+    :param calibration_factor: Multiplier converting digital units to
+        Pascals. Precedence as in :func:`leq`: explicit value, then a
+        calibrated Signal's own factor, then 1.0.
     :return: Exposure in Pa²·h (scalar or per-channel array).
     """
-    x_proc = _typesignal(x)
-    _validate_level_input(x_proc, calibration_factor)
+    fs = _resolve_fs(x, fs)
+    calibration = _resolve_calibration(x, calibration_factor)
+    x_proc = _resolve_samples(x)
+    _validate_level_input(x_proc, calibration)
     if duration_hours is not None and duration_hours <= 0:
         raise ValueError("'duration_hours' must be positive.")
-    p_a = weighting_filter(x_proc, fs, "A") * calibration_factor
+    p_a = weighting_filter(x_proc, fs, "A") * calibration
     mean_square = np.mean(p_a ** 2, axis=-1)
     hours = duration_hours if duration_hours is not None else x_proc.shape[-1] / fs / 3600.0
     out = np.asarray(mean_square * hours)
@@ -335,10 +354,10 @@ def sound_exposure(
 
 
 def lex_8h(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     duration_hours: float | None = None,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> float | np.ndarray:
     """
     Normalized 8-h average sound level, LEX,8h (IEC 61252, 3.3).
@@ -348,11 +367,16 @@ def lex_8h(
     exposure as the measured event. Identical to LEP,d (Directive 86/188/EEC)
     and LEX,8h of ISO 1999 (BS EN 61252:1995, 3.3 NOTES 5-6).
 
-    :param x: Input signal in raw pressure units (1D or 2D).
-    :param fs: Sample rate in Hz.
+    :param x: Input signal in raw pressure units (1D or 2D), or a
+        :class:`phonometry.io.Signal` read from a measurement file.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises instead of silently winning.
     :param duration_hours: Exposure period the input represents, in hours.
         Default: the recording duration itself.
-    :param calibration_factor: Multiplier converting digital units to Pascals.
+    :param calibration_factor: Multiplier converting digital units to
+        Pascals. Precedence as in :func:`leq`: explicit value, then a
+        calibrated Signal's own factor, then 1.0.
     :return: LEX,8h in dB (scalar or per-channel array).
     """
     exposure = np.asarray(

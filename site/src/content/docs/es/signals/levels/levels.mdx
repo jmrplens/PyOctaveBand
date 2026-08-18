@@ -175,11 +175,12 @@ plt.show()
 | Parámetro | Tipo / forma | Unidades | Rango / valor por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | array 1D o 2D | unidades digitales (o Pa si está calibrada) | no vacío | 2D es `[channels, samples]`; devuelve un nivel por canal |
-| `fs` | int | Hz | > 0 (solo `laeq`) | `leq` no necesita frecuencia de muestreo (integral RMS pura) |
+| `fs` | int | Hz | > 0 (solo `laeq`; del `Signal` cuando `x` lo es) | `leq` no necesita frecuencia de muestreo (integral RMS pura) |
 | `calibration_factor` | float | Pa por unidad digital | por defecto `None`: el factor propio de un `Signal` calibrado, si no `1.0` | De `sensitivity()` |
 | `dbfs` | bool | — | por defecto `False` | `True`: 0 dBFS = RMS 1.0; ignora la calibración |
 
-`leq`, `ln_levels`, `sel` y `lc_peak` también aceptan un `Signal` de
+Todas las funciones de esta página (`leq`, `laeq`, `ln_levels`, `sel`,
+`lc_peak`, `sound_exposure`, `lex_8h`) aceptan también un `Signal` de
 `phonometry.io.read` en lugar del par `(x, fs)`: el objeto aporta su propia
 frecuencia de muestreo y, si está calibrado, su `calibration_factor`. Un
 argumento `calibration_factor` explícito prevalece sobre el del objeto; un
@@ -689,8 +690,8 @@ plt.show()
 | :--- | :--- | :--- | :--- |
 | `lc_peak(x, fs=None, calibration_factor=None, dbfs=False, oversample=8)` | `dbfs=True` referencia el *pico* a fondo de escala (`1.0`), no el RMS; con `oversample=1` el pico se lee en la rejilla de muestreo | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, ráfagas tonales de la Tabla 5 |
 | `sel(x, fs=None, weighting=None, ...)` | `weighting='A'` da el $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Tabla 4 (columna $L_{\mathrm{A}E}$) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` trata `x` como muestra de ese periodo | $E$ [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | misma semántica de muestreo | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
+| `sound_exposure(x, fs=None, duration_hours=None, ...)` | `duration_hours` trata `x` como muestra de ese periodo | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs=None, duration_hours=None, ...)` | misma semántica de muestreo | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
 
 `lex_8h` valora *una* grabación; componer una jornada laboral completa a
 partir de muestras por tarea o por función, con el balance de incertidumbre

@@ -23035,8 +23035,8 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 The object stands in for the bare array anywhere: `np.asarray(sig)` yields
 the samples (1-D for one channel, `(channels, samples)` for several), so
 every `(x, fs, ...)` function of the library accepts it today. The level
-functions `leq`, `ln_levels`, `sel` and `lc_peak` go further and take the
-`Signal` itself — the object already knows its rate and its calibration, and
+functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
+and `lex_8h`) go further and take the `Signal` itself — the object already knows its rate and its calibration, and
 asking you to repeat either is asking for a transcription error.
 
 Integer samples are scaled by exactly $2^{B-1}$ for a $B$-bit container: a
@@ -23432,7 +23432,8 @@ What comes back from a file is a `Signal`: the samples with their rate,
 calibration, channel labels and `bext` provenance in one immutable object
 that behaves as the bare array everywhere (`np.asarray` hands any existing
 function the samples), draws itself with `.plot()`, and walks straight into
-the level functions — `leq`, `ln_levels`, `sel`, `lc_peak` — without
+the level functions — `leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
+`sound_exposure`, `lex_8h` — without
 repeating the rate or the calibration by hand. In the other direction,
 `write()` produces WAV/BWF (24-bit packed in-house) and FLAC, refuses to
 clip silently, extends the `CodingHistory` rather than replacing it, can
@@ -32929,11 +32930,11 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `time_weighting` | `function` | **Energy capture.**<br>• `x`: Raw signal array (squared internally; time is the last axis)<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', or 'impulse'<br>• `initial_state`: None, 'zero', 'first', scalar, or array (Default: None) | `env = time_weighting(x, fs, mode='fast')`<br><br>• `env`: energy envelope (Mean Square), same shape as `x` |
 | `TimeWeighting` | `class` | **Stateful time weighting.**<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast') | `tw = TimeWeighting(fs, mode='fast')`<br>`env = tw.process(block)` per block<br>`tw.reset()` to start over |
 | `leq` | `function` | **Equivalent level (Leq).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `calibration_factor`: Sensitivity multiplier (Default: None: a calibrated `Signal`'s factor, else 1.0; explicit wins)<br>• `dbfs`: Output in dBFS (Default: False) | `level = leq(x, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
-| `laeq` | `function` | **A-weighted Leq (LAeq).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `calibration_factor` / `dbfs`: as `leq` | `level = laeq(x, fs, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
+| `laeq` | `function` | **A-weighted Leq (LAeq).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `calibration_factor` / `dbfs`: as `leq` | `level = laeq(x, fs, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
 | `ln_levels` | `function` | **Statistical levels (LN).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `n`: Exceedance percentiles (Default: (10, 50, 90))<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast')<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `stats = ln_levels(x, fs, n=(10, 50, 90), weighting='A')`<br><br>• `stats`: Dict `{10: L10, 50: L50, 90: L90}` |
 | `lc_peak` | `function` | **C-weighted peak (LCpeak).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `calibration_factor`: as `leq`<br>• `dbfs`: 0 dBFS = full-scale *peak* (amplitude 1.0), unlike the RMS reference of `leq`<br>• `oversample`: HF inter-sample peak recovery (Default: 8; 1 = on-grid, under-reads up to ~1.15 dB at 48 kHz) | `peak = lc_peak(x, fs)`<br><br>• IEC 61672-1 §5.13; verified against Table 5 |
 | `sel` | `function` | **Sound exposure level (SEL/LAE).**<br>• `x`: Whole-event signal (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `lae = sel(x, fs, weighting='A')`<br><br>• Event level normalized to 1 s |
-| `sound_exposure` | `function` | **A-weighted exposure E (IEC 61252).**<br>• `x`: Signal (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `duration_hours`: exposure period represented (Default: recording length)<br>• `calibration_factor` | `E = sound_exposure(x, fs, duration_hours=8)`<br><br>• `E`: Pa²·h |
+| `sound_exposure` | `function` | **A-weighted exposure E (IEC 61252).**<br>• `x`: Signal (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `duration_hours`: exposure period represented (Default: recording length)<br>• `calibration_factor` | `E = sound_exposure(x, fs, duration_hours=8)`<br><br>• `E`: Pa²·h |
 | `lex_8h` | `function` | **Daily exposure LEX,8h / LEP,d.**<br>• Same params as `sound_exposure` | `lex = lex_8h(x, fs, duration_hours=4)`<br><br>• Normalized 8 h level [dB] |
 | `loudness_zwicker` | `function` | **Zwicker loudness (ISO 532-1:2017).**<br>• `x`: Calibrated signal in Pa (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free' or 'diffuse' (Default: 'free')<br>• `stationary`: Clause 5 stationary method (Default: False)<br>• `time_skip`: seconds excluded from the stationary mean square (Annex B.1 uses 0.2 s; Default: 0.0)<br>• `calibration_factor`: Digital units to Pa (Default: 1.0) | `res = loudness_zwicker(x, fs)`<br><br>• `ZwickerLoudness`; time-varying runs add N5/N10 and the 500 Hz N(t) trace |
 | `loudness_zwicker_from_spectrum` | `function` | **Stationary loudness from band levels.**<br>• `levels`: 28 one-third-octave levels, 25 Hz-12.5 kHz [dB SPL]<br>• `field`: 'free' or 'diffuse' (Default: 'free') | `res = loudness_zwicker_from_spectrum(levels)`<br><br>• `res.loudness` [sone], `res.loudness_level` [phon] |
@@ -33067,7 +33068,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `read_blocks` | `function` | **Stream a file block by block.**<br>• `path`, `block_size` [samples]<br>• `overlap`: samples shared between consecutive blocks (Default: 0)<br>Yields exactly what `read` returns, in slices: feeds `BlockProcessing(stateful=True)` unchanged | `for block in io.read_blocks(p, 65536): ...`<br><br>• each `block`: float64 array, `read` conventions |
 | `write` | `function` | **Write WAV/BWF (FLAC with `[audio]`) without touching the level.**<br>• `path`, `x` (array or `Signal`), `fs` (from the `Signal` when `x` is one)<br>• `subtype`: 'PCM_16'/'PCM_24'/'PCM_32'/'FLOAT'/'DOUBLE' (Default: FLOAT for float data, the matching depth for integer pass-through; FLAC: PCM up to 24)<br>• `bext`: None (Default) carries a `Signal`'s own provenance; `"loudness"` also measures the five EBU R 128 fields in-house; a `BroadcastMetadata` is written as given<br>• `dither`: 'tpdf' at PCM_16 only (Default: None)<br>• `sidecar`: write the calibration sidecar too (Default: False)<br>Never normalizes; clipping saturates, is counted and warns (`ClippingWarning`); RF64 automatic past 4 GiB | `io.write("out.wav", sig, subtype="PCM_24")` |
 | `convert` | `function` | **Convert between lossless containers with the measurement intact.**<br>• `src`, `dst`: WAV/BWF/RF64 ↔ FLAC (lossy targets refused)<br>Samples bit-exact at full precision, `bext` carried (into FLAC via the `riff` APPLICATION block), sidecar copied byte for byte, CodingHistory extended one line; streams, so an hour of RF64 converts flat | `io.convert("night.wav", "night.flac")` |
-| `Signal` | `dataclass` | **Samples plus the metadata they need.**<br>• `data`: (channels, samples) float64<br>• `fs` [Hz]<br>• `calibration_factor`: Pa per digital unit, or None until known<br>• `channel_labels`, `provenance` (`bext`), `source` (`SignalOrigin`)<br>`np.asarray(sig)` yields the bare array (1D mono), so every `(x, fs, ...)` function accepts it; `leq`/`laeq`/`ln_levels`/`sel`/`lc_peak` read fs and calibration from it directly | `sig.duration`, `sig.n_channels`<br>`sig.plot()` draws the calibrated waveform |
+| `Signal` | `dataclass` | **Samples plus the metadata they need.**<br>• `data`: (channels, samples) float64<br>• `fs` [Hz]<br>• `calibration_factor`: Pa per digital unit, or None until known<br>• `channel_labels`, `provenance` (`bext`), `source` (`SignalOrigin`)<br>`np.asarray(sig)` yields the bare array (1D mono), so every `(x, fs, ...)` function accepts it; `leq`/`laeq`/`ln_levels`/`sel`/`lc_peak`/`sound_exposure`/`lex_8h` read fs and calibration from it directly | `sig.duration`, `sig.n_channels`<br>`sig.plot()` draws the calibrated waveform |
 | `SignalOrigin` | `dataclass` | **Where a `Signal` came from.**<br>• `path`, `container`, `format_name`<br>• `bit_depth`: valid bits, None for lossy codecs<br>• `lossy`: the read-time warning, kept attached to the data | `sig.source.lossy` |
 | `AudioFileInfo` | `dataclass` | **Everything `info()` reads from the headers.**<br>• `container`, `format_name`, `fs`, `channels`, `frames`, `duration`, `bit_depth`, `lossy`<br>• `channel_mask` / `channel_labels` (EXTENSIBLE speaker positions)<br>• `bext`, `has_ixml`, `cue_points` | `io.info(p).duration` |
 | `BroadcastMetadata` | `dataclass` | **The `bext` chunk of EBU Tech 3285 v2, field by field.**<br>• `description`, `originator`, `originator_reference`, `origination_date`/`_time`<br>• `time_reference`: 64-bit samples since midnight<br>• `version`, `umid`<br>• v2 loudness: `loudness_value`, `loudness_range`, `max_true_peak_level`, `max_momentary_loudness`, `max_short_term_loudness` (0x7FFF sentinel → None)<br>• `coding_history` (EBU R98) | `io.info(p).bext.time_reference` |
@@ -40270,11 +40271,12 @@ everywhere else, energy.
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units (or Pa if calibrated) | non-empty | 2D is `[channels, samples]`; returns one level per channel |
-| `fs` | int | Hz | > 0 (`laeq` only) | `leq` needs no sample rate (pure RMS integral) |
+| `fs` | int | Hz | > 0 (`laeq` only; from the `Signal` when `x` is one) | `leq` needs no sample rate (pure RMS integral) |
 | `calibration_factor` | float | Pa per digital unit | default `None`: a calibrated `Signal`'s own factor, else `1.0` | From `sensitivity()` |
 | `dbfs` | bool | — | default `False` | `True`: 0 dBFS = RMS 1.0; ignores calibration |
 
-`leq`, `ln_levels`, `sel` and `lc_peak` also take a `Signal` from
+Every function on this page (`leq`, `laeq`, `ln_levels`, `sel`,
+`lc_peak`, `sound_exposure`, `lex_8h`) also takes a `Signal` from
 `phonometry.io.read` in place of the bare `(x, fs)` pair: the object supplies
 its own sample rate and, when calibrated, its `calibration_factor`. An
 explicit `calibration_factor` argument overrides the object's; an explicit
@@ -40508,8 +40510,8 @@ is +3 dB.
 | :--- | :--- | :--- | :--- |
 | `lc_peak(x, fs=None, calibration_factor=None, dbfs=False, oversample=8)` | `dbfs=True` references full-scale *peak* (1.0), not RMS; `oversample=1` reads the peak on the sample grid | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
 | `sel(x, fs=None, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
+| `sound_exposure(x, fs=None, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs=None, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in

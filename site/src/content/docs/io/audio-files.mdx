@@ -87,8 +87,8 @@ print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
 The object stands in for the bare array anywhere: `np.asarray(sig)` yields
 the samples (1-D for one channel, `(channels, samples)` for several), so
 every `(x, fs, ...)` function of the library accepts it today. The level
-functions `leq`, `ln_levels`, `sel` and `lc_peak` go further and take the
-`Signal` itself — the object already knows its rate and its calibration, and
+functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
+and `lex_8h`) go further and take the `Signal` itself — the object already knows its rate and its calibration, and
 asking you to repeat either is asking for a transcription error.
 
 Integer samples are scaled by exactly $2^{B-1}$ for a $B$-bit container: a

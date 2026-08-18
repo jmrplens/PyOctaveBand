@@ -33,7 +33,8 @@ What comes back from a file is a `Signal`: the samples with their rate,
 calibration, channel labels and `bext` provenance in one immutable object
 that behaves as the bare array everywhere (`np.asarray` hands any existing
 function the samples), draws itself with `.plot()`, and walks straight into
-the level functions — `leq`, `ln_levels`, `sel`, `lc_peak` — without
+the level functions — `leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
+`sound_exposure`, `lex_8h` — without
 repeating the rate or the calibration by hand. In the other direction,
 `write()` produces WAV/BWF (24-bit packed in-house) and FLAC, refuses to
 clip silently, extends the `CodingHistory` rather than replacing it, can
