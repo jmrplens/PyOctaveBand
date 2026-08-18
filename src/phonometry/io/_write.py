@@ -71,6 +71,7 @@ from __future__ import annotations
 
 import struct
 import warnings
+from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -78,6 +79,14 @@ import numpy as np
 from scipy.io import wavfile
 
 from .._internal.warnings import PhonometryWarning
+from ._bext import (
+    coding_history_line,
+    extend_coding_history,
+    fresh_metadata,
+    serialize_bext,
+    with_measured_loudness,
+)
+from ._chunks import BroadcastMetadata
 from ._signal import Signal
 
 if TYPE_CHECKING:
@@ -304,6 +313,104 @@ def _encode_frames(data: np.ndarray, subtype: str) -> bytes:
     return interleaved.astype("<f8").tobytes()
 
 
+def frame_riff_chunk(chunk_id: bytes, payload: bytes) -> bytes:
+    """Frame a payload as one RIFF chunk: header, payload, alignment pad.
+
+    The pad byte of an odd payload is written but not counted in the size
+    field, per the 1991 RIFF specification's word-alignment rule.
+    """
+    padding = b"\x00" if len(payload) % 2 else b""
+    return chunk_id + struct.pack("<I", len(payload)) + payload + padding
+
+
+def append_riff_chunk(path: str | Path, chunk_id: bytes, payload: bytes) -> None:
+    """Append a chunk to a finished WAV/RF64 file and repair its size field.
+
+    The path for files scipy wrote (its writer offers no metadata): the
+    chunk lands after ``data`` -- a legal position, and the one the
+    package's own walker and every RIFF reader that honours chunk headers
+    handle -- the file is first padded to even length if the data payload
+    left it odd (scipy writes no alignment pad), and the container's
+    declared size is patched: the 32-bit RIFF size at offset 4, or for
+    RF64/BW64 the 64-bit ``ds64`` riff size at offset 20 (the fixed
+    position both scipy's writer and EBU Tech 3306 put it, ``ds64``
+    mandatory first after ``WAVE``).
+    """
+    with Path(path).open("r+b") as fh:
+        fourcc = fh.read(4)
+        if fourcc not in (b"RIFF", b"RF64", b"BW64"):
+            raise ValueError(f"{path}: not a RIFF/RF64/BW64 file")
+        fh.seek(0, 2)
+        if fh.tell() % 2:
+            fh.write(b"\x00")
+        fh.write(frame_riff_chunk(chunk_id, payload))
+        riff_size = fh.tell() - 8
+        if fourcc == b"RIFF":
+            if riff_size > 0xFFFFFFFF:
+                raise ValueError(
+                    f"{path}: appending {len(payload)} bytes overflows the "
+                    "32-bit RIFF size; the file needed to be RF64"
+                )
+            fh.seek(4)
+            fh.write(struct.pack("<I", riff_size))
+        else:
+            fh.seek(20)
+            fh.write(struct.pack("<Q", riff_size))
+
+
+#: subtype -> word length written to disk, for the CodingHistory ``W=``.
+_SUBTYPE_BITS = {
+    "PCM_16": 16, "PCM_24": 24, "PCM_32": 32, "FLOAT": 32, "DOUBLE": 64,
+}
+
+
+def _resolve_bext(
+    x: Signal | NDArray[np.generic] | list[float],
+    bext: BroadcastMetadata | str | None,
+    data: np.ndarray,
+    fs: int,
+    subtype: str,
+) -> bytes | None:
+    """Turn the ``bext`` argument into a serialised chunk payload, or None.
+
+    ``None`` carries a :class:`Signal`'s provenance when it has one (a
+    measurement's chain of custody should survive an export by default)
+    and writes no chunk otherwise; ``"loudness"`` additionally measures
+    the five R 128 fields with the library's BS.1770 implementation on
+    the very samples being written; a :class:`BroadcastMetadata` is
+    written as given. Whatever the source, the CodingHistory leaves with
+    phonometry's line appended below the existing audit trail (EBU R98:
+    extended, never replaced).
+    """
+    provenance = x.provenance if isinstance(x, Signal) else None
+    meta: BroadcastMetadata | None
+    if bext is None:
+        meta = provenance
+    elif isinstance(bext, BroadcastMetadata):
+        meta = bext
+    elif bext == "loudness":
+        base = provenance if provenance is not None else fresh_metadata()
+        if data.dtype.kind == "f":
+            full_scale = np.asarray(data, dtype=np.float64)
+        else:
+            full_scale = data / float(2 ** (8 * data.dtype.itemsize - 1))
+        meta = with_measured_loudness(base, full_scale, fs)
+    else:
+        raise ValueError(
+            f"unknown bext {bext!r}: pass None, 'loudness' or a "
+            "BroadcastMetadata"
+        )
+    if meta is None:
+        return None
+    line = coding_history_line(
+        fs=fs, bits=_SUBTYPE_BITS[subtype], channels=int(data.shape[0])
+    )
+    meta = replace(
+        meta, coding_history=extend_coding_history(meta.coding_history, line)
+    )
+    return serialize_bext(meta)
+
+
 def write_wav(
     path: str | Path,
     data: np.ndarray,
@@ -339,6 +446,7 @@ def write(
     fs: int | None = None,
     *,
     subtype: str | None = None,
+    bext: BroadcastMetadata | str | None = None,
     dither: str | None = None,
 ) -> None:
     """Write a signal to a WAV file, without ever touching its level.
@@ -369,12 +477,23 @@ def write(
         disagree with a :class:`Signal`'s own rate.
     :param subtype: Target sample format (see above); ``None`` picks
         ``FLOAT`` for float data and the matching depth for integer data.
+    :param bext: The broadcast provenance chunk (EBU Tech 3285; see
+        :mod:`phonometry.io._bext`). ``None`` carries the
+        :class:`Signal`'s own provenance when it has one and writes no
+        chunk otherwise; ``"loudness"`` additionally measures the five
+        R 128 fields with the library's BS.1770 implementation on the
+        samples being written (one extra pass, which is why it is
+        opt-in); a :class:`BroadcastMetadata` is written as given.
+        Every written chunk's CodingHistory is extended -- never
+        replaced -- with phonometry's ``A=,F=,W=,M=,T=`` line.
     :param dither: ``"tpdf"`` adds +/-1 LSB triangular-PDF dither before
         quantising to ``PCM_16`` (Lipshitz et al. 1992; see the module
         docstring); ``None`` (default) quantises plainly. Refused for any
         other subtype, where it would only add noise.
     :raises ValueError: For an unknown suffix or subtype, a missing or
-        conflicting ``fs``, or a dither request outside ``PCM_16``.
+        conflicting ``fs``, a dither request outside ``PCM_16``, or bext
+        metadata that violates Tech 3285 (oversize field, version too old
+        for a carried UMID or loudness).
     """
     target = Path(path)
     if target.suffix.lower() not in _WAV_SUFFIXES:
@@ -396,6 +515,7 @@ def write(
                 "below any microphone chain's noise floor, and dithering "
                 "float data only adds noise to it"
             )
+    bext_payload = _resolve_bext(x, bext, data, rate, resolved)
     if data.dtype in _PASSTHROUGH_SUBTYPES:
         if dither is not None:
             raise ValueError(
@@ -403,23 +523,33 @@ def write(
                 "bit-exact pass-through: there is nothing to dither"
             )
         _scipy_write(path, rate, data)
-        return
-    tag, sample_bytes = _SUBTYPE_SPEC[resolved]
-    if resolved == "PCM_24":
+    elif resolved == "PCM_24":
         codes, clipped, peak_dbfs = _quantise(data, 24, dither)
         if clipped:
             _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-        write_wav(path, codes, rate, resolved)
+        write_wav(
+            path, codes, rate, resolved,
+            metadata_chunks=(
+                frame_riff_chunk(b"bext", bext_payload)
+                if bext_payload is not None else b""
+            ),
+        )
         return
-    if tag == 0x0001:
-        codes, clipped, peak_dbfs = _quantise(data, 8 * sample_bytes, dither)
-        if clipped:
-            _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-        _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2
-                                              else "<i4"))
-        return
-    _scipy_write(path, rate,
-                 data if resolved == "DOUBLE" else data.astype(np.float32))
+    else:
+        tag, sample_bytes = _SUBTYPE_SPEC[resolved]
+        if tag == 0x0001:
+            codes, clipped, peak_dbfs = _quantise(
+                data, 8 * sample_bytes, dither
+            )
+            if clipped:
+                _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
+            _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2
+                                                  else "<i4"))
+        else:
+            _scipy_write(path, rate, data if resolved == "DOUBLE"
+                         else data.astype(np.float32))
+    if bext_payload is not None:
+        append_riff_chunk(path, b"bext", bext_payload)
 
 
 def _scipy_write(path: str | Path, fs: int, data: np.ndarray) -> None:
