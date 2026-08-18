@@ -415,8 +415,9 @@ def test_missing_audio_extra_is_named_in_the_error(
         chunk(b"fact", struct.pack("<I", 4)),
         chunk(b"data", bytes(4)),
     )
+    compressed = _write(tmp_path, alaw, "compressed.wav")
     with pytest.raises(ImportError, match=r"phonometry\[audio\]"):
-        read(_write(tmp_path, alaw, "compressed.wav"))
+        read(compressed)
     # info() on the same file needs no extra at all: headers are base work.
     described = info(_write(tmp_path, alaw, "compressed2.wav"))
     assert described.lossy

@@ -167,8 +167,9 @@ def test_bext_unset_loudness_sentinel_reads_as_none(tmp_path: Path) -> None:
 
 def test_bext_shorter_than_fixed_part_is_rejected(tmp_path: Path) -> None:
     image = pcm_wav(TONE, extra_chunks=chunk(b"bext", bytes(100)))
+    path = _write(tmp_path, image)
     with pytest.raises(ValueError, match="602"):
-        parse_wav_chunks(_write(tmp_path, image))
+        parse_wav_chunks(path)
 
 
 # ---------------------------------------------------------------------------
@@ -279,8 +280,9 @@ def test_rf64_sentinel_without_ds64_is_rejected(tmp_path: Path) -> None:
         chunk(b"data", pcm_data(TONE, 16), declared_size=0xFFFFFFFF),
         fourcc=b"RF64",
     )
+    path = _write(tmp_path, image)
     with pytest.raises(ValueError, match="ds64"):
-        parse_wav_chunks(_write(tmp_path, image))
+        parse_wav_chunks(path)
 
 
 def test_bw64_fourcc_is_accepted(tmp_path: Path) -> None:
@@ -391,5 +393,6 @@ def test_data_before_metadata_chunks_is_still_walked(tmp_path: Path) -> None:
 def test_malformed_files_fail_loudly(
     tmp_path: Path, image: bytes, match: str
 ) -> None:
+    path = _write(tmp_path, image)
     with pytest.raises(ValueError, match=match):
-        parse_wav_chunks(_write(tmp_path, image))
+        parse_wav_chunks(path)

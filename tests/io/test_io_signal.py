@@ -107,12 +107,13 @@ def test_source_metadata_travels_with_the_signal() -> None:
 # ---------------------------------------------------------------------------
 
 def test_invalid_construction_is_rejected() -> None:
+    tone = _tone()
     with pytest.raises(ValueError, match="channel labels"):
         Signal(data=np.zeros((2, 10)), fs=FS, channel_labels=("FL",))
     with pytest.raises(ValueError, match="fs"):
-        Signal(data=_tone(), fs=0)
+        Signal(data=tone, fs=0)
     with pytest.raises(ValueError, match="calibration_factor"):
-        Signal(data=_tone(), fs=FS, calibration_factor=0.0)
+        Signal(data=tone, fs=FS, calibration_factor=0.0)
     with pytest.raises(ValueError, match="1-D or"):
         Signal(data=np.zeros((2, 2, 2)), fs=FS)
 
@@ -160,5 +161,6 @@ def test_plot_spanish_labels() -> None:
 
 
 def test_plot_rejects_unknown_language() -> None:
+    sig = Signal(data=_tone(), fs=FS)
     with pytest.raises(ValueError, match="language"):
-        Signal(data=_tone(), fs=FS).plot(language="fr")
+        sig.plot(language="fr")

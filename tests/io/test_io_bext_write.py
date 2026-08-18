@@ -199,21 +199,21 @@ def test_loudness_encoding_pins_its_edges() -> None:
 # ---------------------------------------------------------------------------
 
 def test_oversize_fields_raise_instead_of_truncating(tmp_path: Path) -> None:
+    long_originator = replace(fresh_metadata(), originator="x" * 33)
     with pytest.raises(ValueError, match="Originator"):
-        write(tmp_path / "x.wav", np.zeros(4), FS,
-              bext=replace(fresh_metadata(), originator="x" * 33))
+        write(tmp_path / "x.wav", np.zeros(4), FS, bext=long_originator)
+    long_umid = replace(fresh_metadata(), umid=bytes(65))
     with pytest.raises(ValueError, match="UMID"):
-        write(tmp_path / "x.wav", np.zeros(4), FS,
-              bext=replace(fresh_metadata(), umid=bytes(65)))
+        write(tmp_path / "x.wav", np.zeros(4), FS, bext=long_umid)
 
 
 def test_version_gating_is_enforced_on_write(tmp_path: Path) -> None:
+    umid_on_v0 = replace(fresh_metadata(), version=0, umid=bytes(64))
     with pytest.raises(ValueError, match="version >= 1"):
-        write(tmp_path / "x.wav", np.zeros(4), FS,
-              bext=replace(fresh_metadata(), version=0, umid=bytes(64)))
+        write(tmp_path / "x.wav", np.zeros(4), FS, bext=umid_on_v0)
+    loudness_on_v1 = replace(fresh_metadata(), version=1, loudness_value=-23.0)
     with pytest.raises(ValueError, match="version >= 2"):
-        write(tmp_path / "x.wav", np.zeros(4), FS,
-              bext=replace(fresh_metadata(), version=1, loudness_value=-23.0))
+        write(tmp_path / "x.wav", np.zeros(4), FS, bext=loudness_on_v1)
 
 
 def test_unknown_bext_argument_is_refused(tmp_path: Path) -> None:

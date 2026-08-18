@@ -129,8 +129,9 @@ def test_lossy_sources_warn_when_streaming_begins(tmp_path: Path) -> None:
     x = 0.3 * np.sin(2 * np.pi * 1000 * np.arange(FS // 4) / FS)
     path = tmp_path / "note.mp3"
     sf.write(str(path), x, FS)
+    blocks = iter(read_blocks(path, 1024))
     with pytest.warns(LossyCompressionWarning, match="not metrologically"):
-        next(iter(read_blocks(path, 1024)))
+        next(blocks)
 
 
 def test_invalid_geometry_is_refused(tmp_path: Path) -> None:

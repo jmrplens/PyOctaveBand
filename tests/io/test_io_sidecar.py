@@ -140,9 +140,9 @@ def test_write_sidecar_true_requires_a_calibrated_signal(
 ) -> None:
     with pytest.raises(ValueError, match="calibration_factor"):
         write(tmp_path / "x.wav", np.zeros(8), FS, sidecar=True)
+    uncalibrated = Signal(data=np.zeros(8), fs=FS)
     with pytest.raises(ValueError, match="calibration_factor"):
-        write(tmp_path / "x.wav", Signal(data=np.zeros(8), fs=FS),
-              sidecar=True)
+        write(tmp_path / "x.wav", uncalibrated, sidecar=True)
 
 
 def test_write_sidecar_true_writes_the_signals_calibration(
