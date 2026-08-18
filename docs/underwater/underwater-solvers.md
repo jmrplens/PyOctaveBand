@@ -39,7 +39,7 @@ computed numerically. Four solvers are provided (Jensen et al.,
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation_dark.webp">
-  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="Three numerical solvers: a Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
+  <img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/numerical_propagation.webp" alt="A Munk sound-speed profile, ray paths forming convergence zones, and propagation loss versus range from the normal-mode and parabolic-equation solvers agreeing in trend" width="100%">
 </picture>
 
 <details>
@@ -89,11 +89,14 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
 `propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
-`travel_times` per ray); `parabolic_equation` a `ParabolicEquationResult` (the
-`propagation_loss` field). All assume a range-independent water column with a pressure-release
-surface, and the bottom is pressure-release too (or, for the modes, optionally
-rigid): there is no absorbing or elastic bottom, no sediment attenuation and
-no real bathymetry, so range-dependent problems are out of scope. For the
+`travel_times` per ray); `gaussian_beams` a `GaussianBeamResult` (the
+`propagation_loss` field, plus each beam's central ray and width);
+`parabolic_equation` a `ParabolicEquationResult` (the `propagation_loss`
+field). All assume a range-independent water column with a pressure-release
+surface, and the bottom is pressure-release too (or, for the modes and the
+beams, optionally rigid): there is no absorbing or elastic bottom, no sediment
+attenuation and no real bathymetry, so range-dependent problems are out of
+scope. For the
 elastic seabed physics these fluid solvers leave out, see
 [Elastic waves and fluid-solid coupling](../simulation/elastic-waves.md).
 

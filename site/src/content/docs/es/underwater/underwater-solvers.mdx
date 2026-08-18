@@ -153,10 +153,12 @@ field.plot()  # campo PL sobre distancia x profundidad
 
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
 `mode_functions`, `propagation_loss`); `ray_trace` un `RayTraceResult`
-(`ranges`, `depths` y `travel_times` por rayo); `parabolic_equation` un
-`ParabolicEquationResult` (el campo `propagation_loss`). Los tres difieren en
-lo que aproximan, no en lo que modelan, así que elegir entre ellos es una
-cuestión de régimen: la tabla de la sección 5 es la respuesta corta.
+(`ranges`, `depths` y `travel_times` por rayo); `gaussian_beams` un
+`GaussianBeamResult` (el campo `propagation_loss`, más el rayo central y la
+anchura de cada haz); `parabolic_equation` un `ParabolicEquationResult` (el
+campo `propagation_loss`). Los cuatro difieren en lo que aproximan, no en lo
+que modelan, así que elegir entre ellos es una cuestión de régimen: la tabla
+de la sección 6 es la respuesta corta.
 
 ## 2. Modos normales: la guía de ondas como suma de ondas estacionarias
 
@@ -759,7 +761,7 @@ distancia.
 
 **La disciplina de convergencia.** Refinar, recalcular, comparar; y solo
 entonces comparar métodos. Que los modos y la PE coincidan, que es lo que la
-sección 5 llama la prueba práctica de convergencia, no vale nada si ninguno de
+sección 6 llama la prueba práctica de convergencia, no vale nada si ninguno de
 los dos ha convergido en su propia malla.
 
 ## 6. Elegir modelo

@@ -39,7 +39,7 @@ knows nothing of the sound-speed profile, the seabed or the surface. When
 refraction and boundaries decide the answer, the field has to be
 **computed**: this guide covers the four numerical solvers of the
 `underwater` module, the physics each one discretises, and how to choose
-between them and the closed forms. All three assume a range-independent
+between them and the closed forms. All four assume a range-independent
 (horizontally stratified) ocean with a pressure-release surface, take the
 same $c(z)$ profile as input, and follow Jensen, Kuperman, Porter &
 Schmidt, *Computational Ocean Acoustics*.
@@ -147,10 +147,12 @@ field.plot()  # PL field over range x depth (needs matplotlib)
 
 `normal_modes` returns a `NormalModeResult` (`wavenumbers`, `mode_functions`,
 `propagation_loss`); `ray_trace` a `RayTraceResult` (`ranges`, `depths` and
-`travel_times` per ray); `parabolic_equation` a `ParabolicEquationResult` (the
-`propagation_loss` field). The three differ in what they approximate, not in
-what they model, so choosing between them is a regime question — the table in
-section 5 is the short answer.
+`travel_times` per ray); `gaussian_beams` a `GaussianBeamResult` (the
+`propagation_loss` field, plus each beam's central ray and width);
+`parabolic_equation` a `ParabolicEquationResult` (the `propagation_loss`
+field). The four differ in what they approximate, not in what they model, so
+choosing between them is a regime question — the table in section 6 is the
+short answer.
 
 ## 2. Normal modes: the waveguide as a sum of standing waves
 
@@ -725,7 +727,7 @@ pass it explicitly in shallow water. And opening `max_angle_deg` means cutting
 units of climb per unit range.
 
 **The convergence discipline.** Refine, re-run, compare; only then compare
-solvers. Agreement between the modes and the PE, which section 5 calls the
+solvers. Agreement between the modes and the PE, which section 6 calls the
 practical convergence test, is worth nothing if neither of them has converged on
 its own grid.
 
