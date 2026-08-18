@@ -229,7 +229,8 @@ def test_a_lossy_seabed_charges_R_at_each_arrivals_own_angle_as_printed() -> Non
         elif n_b:
             above += 1
             assert abs(lossy.amplitudes[i]) < abs(soft.amplitudes[i]) * 0.999
-    assert below >= 2 and above >= 2, "both regimes must actually be exercised"
+    assert below >= 2, "the total-reflection regime must actually be exercised"
+    assert above >= 2, "the lossy above-critical regime must actually be exercised"
 
 
 def test_the_cap_keeps_the_earliest_arrivals_and_says_so() -> None:
