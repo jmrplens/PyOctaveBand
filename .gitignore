@@ -69,7 +69,7 @@ issues_final*.json
 node_modules/
 
 # Local work plans (brainstorming specs, implementation plans, source library)
-plan/
+plan
 docs/superpowers/
 
 # Full copies of the heavy oracle sets that cannot be redistributed (the
