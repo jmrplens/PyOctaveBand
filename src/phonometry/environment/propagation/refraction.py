@@ -395,16 +395,21 @@ def atmospheric_ray_paths(
     th = np.radians(angles)
     xi = np.cos(th) / c0
 
-    # State is (z, zeta, t): dz/dr = zeta/xi, dzeta/dr = -(dc/dz)/(c^3 xi) and
-    # dt/dr = 1/(xi c^2). The time shares the sound speed the other two
-    # derivatives already need, so carrying it through the same four stages
-    # costs one multiply per stage and gives it the RK4 order of the geometry.
+    # State is (z, zeta, t, s): dz/dr = zeta/xi, dzeta/dr = -(dc/dz)/(c^3 xi),
+    # dt/dr = 1/(xi c^2) and ds/dr = 1/(xi c). The time shares the sound speed
+    # the other two derivatives already need, so carrying it through the same
+    # four stages costs one multiply per stage and gives it the RK4 order of
+    # the geometry. The arc length is the marcher's fourth state (the ocean
+    # solvers charge volume absorption along it); this tracer integrates it at
+    # the cost of a division per stage and does not expose it.
     def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
+        xi_arr: NDArray[np.float64], /,
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
+               NDArray[np.float64]]:
         cc = _speed_at(z_arr)
-        return (zeta_arr / xi, -_grad_at(z_arr) / (cc**3 * xi),
-                1.0 / (xi * cc**2))
+        return (zeta_arr / xi_arr, -_grad_at(z_arr) / (cc**3 * xi_arr),
+                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
 
     # The ground is the only boundary: the atmosphere is open above, so a ray
     # that climbs out of the profile simply keeps climbing. The march splits

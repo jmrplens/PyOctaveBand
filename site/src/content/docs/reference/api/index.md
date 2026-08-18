@@ -222,7 +222,7 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`underwater.sources.pile_driving_noise`](/phonometry/reference/api/underwater/pile-driving-noise/) | Radiated underwater sound from percussive pile driving (ISO 18406:2017). |
 | [`underwater.bioacoustics.audiograms`](/phonometry/reference/api/underwater/audiograms/) | Marine-mammal hearing thresholds (group audiograms and the orca audiogram). |
 | [`underwater.bioacoustics.weighting`](/phonometry/reference/api/underwater/weighting/) | Regulatory auditory weighting and exposure criteria for marine mammals. |
-| [`underwater.propagation.numerical`](/phonometry/reference/api/underwater/numerical/) | Numerical models of underwater sound propagation (range-independent ocean). |
+| [`underwater.propagation.numerical`](/phonometry/reference/api/underwater/numerical/) | Numerical models of underwater sound propagation (range-independent water, with an optionally sloping bottom for the ray-based solvers). |
 
 ## Sound power and intensity
 

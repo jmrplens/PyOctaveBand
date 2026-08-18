@@ -9,6 +9,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The bottom may slope: the first range dependence in the underwater module.
+  `ray_trace` and `gaussian_beams` accept a `bathymetry` pair of node
+  arrays, `(ranges_m, depths_m)`, describing a piecewise-linear depth profile
+  (Jensen's faceted boundary, Fig. 3.20) in place of the level bottom, while
+  the sound-speed profile stays range independent, deliberately: the sloping
+  boundary has an exact published oracle (the ideal wedge's closed fan of
+  images) and a range-dependent `c(r, z)` has none. The marcher bisects each
+  crossing against the interpolated polyline, vertices included, and reflects
+  the ray about the local facet (Eq. 3.121), a rotation of the slowness pair
+  that steepens a ray by twice the slope per upslope bounce; the dynamic pair
+  crosses the bounce with the impulse of Eqs. (3.122)-(3.124) on a facet of
+  zero curvature. A ray steepened past the vertical cannot be carried by a
+  range march and is terminated at that bounce, `NaN` from that sample on,
+  and a terminated beam retires from the field with its weight zeroed, the
+  one-way trade the parabolic equation also makes. The beam solver folds each
+  receiver column's image ladder about its own local facet, the dihedral fan
+  that is exact for a single facet, with its analytic tails trusted no
+  farther than two marched extents so they cannot price wedge geometry the
+  polyline never described. Both results record the polyline and draw it
+  under `plot()`. Slope zero reproduces the level solvers bit for bit;
+  validated against the exact folded wedge trajectory (1e-5 m over 4 km and
+  twenty-plus reflections), the single-facet two-path field (0.05 dB), a
+  tilted bottom out of every beam's reach (0.001 dB against the free-water
+  sum) and the ideal wedge's closed image fan (1.85 dB worst, 0.67 dB mean,
+  across dense multipath cells of a 2.8-degree wedge). The lossy fluid
+  seabed and `eigenrays` decline sloping runs, each with its reason stated.
+  New subsections in the underwater solvers guide, in English and Spanish.
+- The eigenrays and the arrival structure. `eigenrays` takes a `ray_trace`
+  fan and one receiver and returns the paths that actually connect them, each
+  with its travel time, launch and arrival angles, surface and bottom touch
+  counts, KMAH caustic count and complex amplitude: the list the sonar
+  equation consumes as multipath, the skeleton of a channel impulse response,
+  drawn by `EigenrayResult.plot()` as per-path loss stems against delay. The
+  search brackets the launch angles whose depth at the receiver range crosses
+  the receiver depth and closes each bracket by bisection on fresh marches
+  through the same profile, never by interpolating the fan, so every arrival
+  is a real ray; a root that slips within the integrations' disagreement of a
+  fan rung is recovered by widening the bracket one rung each way, and
+  `max_arrivals` caps the unbounded multipath ladder at the earliest
+  arrivals, with a warning when it truncates. Amplitudes are the classical
+  ray amplitude of Jensen Eq. (3.65) over the 1 m reference, with `(-1)` per
+  surface touch, the bottom's coefficient (perfect or Rayleigh, magnitude and
+  phase, unconjugated in the module's `exp(-i omega t)` convention) per
+  bottom touch, and the `(-i)^m` of Eq. (3.79) per caustic, so one
+  frequency-independent list serves every tone as `sum a_j exp(i omega
+  tau_j)`. `RayTraceResult` now records the profile it was traced through.
+  Validated against the ideal waveguide's image lattice, where the entire
+  arrival structure is closed form, to 1.2e-13 s, 1.4e-11 degrees and 2.4e-13
+  relative amplitude with the census matching image for image, and against
+  the n^2-linear profile's exact parabolic ray, whose quadrature-integrated
+  closed-form travel time the upward-refracted eigenray reproduces to 2e-7 s.
+  New subsection and figure in the underwater solvers guide, in English and
+  Spanish.
 - Gaussian beam tracing joins the underwater solvers. `gaussian_beams` hangs a
   beam on every ray of a launch fan (Jensen Eq. 3.88) and sums them into a
   propagation-loss field on the same grid, the same reference and the same
@@ -32,6 +85,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Eq. (3.92) has nothing to converge to. New section in the underwater solvers
   guide with its own figure, the caustic and the shadow zone behind it, in
   English and Spanish.
+- The beams can carry the water's own absorption. `gaussian_beams` accepts
+  `absorption` (the bare model name, `"francois-garrison"`,
+  `"ainslie-mccolm"` or `"thorp"`, or a `VolumeAbsorption` naming its own
+  temperature, salinity and pH; the same names, arguments and defaults as
+  `seawater_absorption`, off by default so every published validation number
+  stays reproducible bit for bit)
+  and multiplies each beam by `exp(-alpha s)` with `s` the arc length along
+  its central ray, which is Jensen Sect. 3.6.2 as printed (Eq. 3.116): the
+  loss integral runs along the path flown, not along the range axis, and the
+  `alpha r` shortcut the section notes "is used in many ray models"
+  under-charges every steep or multiply-reflected path by the obliquity of its
+  climb. The ray marcher integrates that arc length as a fourth state of the
+  very Runge-Kutta stages that place the ray (`ds/dr = 1/(xi c)`), so it
+  cannot drift from the geometry actually summed, and `ray_trace` exposes it
+  per ray as `arc_lengths` next to the travel times. The applied coefficient
+  is recorded on the result (`absorption_coefficient`, dB/km, evaluated at the
+  source frequency and depth), and the oracle tests pin the absorbed free
+  field against `20 lg R + alpha R` with the alphas transcribed from the
+  published formulas independently of the closed-form module, to 2e-4 dB, with
+  a steep-receiver case whose arc length exceeds its range by 1.24 dB of loss
+  separating the two measures directly.
+- The beams can bounce off a lossy seabed. `gaussian_beams` accepts a
+  `FluidSeabed` as its `bottom` (the same fluid description
+  `seabed_reflection` takes, with `water_density` for the water above; the
+  perfect reflector stays the default, bit for bit) and charges every bottom touch of
+  each beam with the Rayleigh coefficient at that beam's grazing angle,
+  magnitude and phase together, which is Jensen Sect. 3.6.3 as printed
+  (Eqs. 3.125-3.126). The angle is the one Snell's invariant fixes at the
+  bottom, `cos(phi) = xi c(D)`, the same at every touch of one beam, so the
+  coefficient is evaluated once per beam and raised to the marcher's count of
+  bottom touches, in the running product and in the receiver-image ladder
+  alike; `ray_trace` exposes those cumulative counts per boundary next to its
+  arc lengths. The phase matters and is spent conjugated on the way into the
+  beam sum, which is assembled in the conjugate time convention: below the
+  critical angle `|R| = 1` and only the phase carries the seabed, and the
+  oracle test, the image-source sum with `R(theta)^n` at each image's own
+  closed-form angle, measures 15.3 dB against the un-conjugated phase and
+  0.02 dB against the conjugate at the range where stripping the phase moves
+  the exact sum by 5.7 dB. Agreement is 0.07 dB at worst across ranges whose
+  dominant images sit above and below the critical angle, the seabed
+  parameters are recorded on the result, and the ideal-waveguide check is
+  tightened to 5e-4 dB to hold the default where it always was.
+- The beams choose their initial width per launch angle, and the quarter-depth
+  cap is retired. The default `W0` used to be clamped to a quarter of the
+  water depth, which in shallow water pushed beams under the book's own
+  ten-wavelength floor and biased the loss quiet by decibels, silently and
+  always in the same direction: against the exact Airy modes of an
+  `n^2`-linear 200 m guide at 200 Hz the cap's 50 m width measured +3.08 dB in
+  the mean, and +4.12 dB in a second 100 m guide at 250 Hz. What a shallow
+  channel actually demands is the opposite bound, a beam wide enough to
+  resolve the guide's modes in launch angle: adjacent modes stand
+  `lambda/(2D)` apart in the sine of that angle while a beam mixes angles over
+  its far-field divergence `lambda/(pi W0)`, so the default now raises the
+  free-space optimum `sqrt(lambda r_max/pi)` to `4 D cos(theta0)/pi` wherever
+  that is larger and the book's 10-50 wavelength band can hold it: one width
+  per launch angle, widest for the flat beams whose modes crowd together in
+  angle, every beam's vertical footprint the same `4D/pi`. The same two
+  oracles measure +0.19 and +0.39 dB at the new default, with no override and
+  no warning; the free-field, Lloyd-mirror, ideal-guide and lossy-seabed
+  validation numbers stand exactly where they were; and deep water is
+  untouched, the guide term standing down for the free-space optimum when
+  `4D/pi` exceeds fifty wavelengths. The result records `initial_beam_widths`
+  per beam in place of the old scalar, an explicit `beam_width` still applies
+  one width to the whole fan bit for bit, and the quarter-depth warning went
+  with the cap it policed; the 20 Hz two-mode guide the old guide prose read
+  as ray theory failing now measures within 0.03 dB of the image sum, the
+  cap's error all along.
 - The ISO 9614-3 precision determination renders its own accredited-style
   fiche. `PrecisionIntensityResult.report()` prints the one-page sound-power
   sheet carrying what part 3 asks a report to state (clause 10), which is not
@@ -1290,6 +1410,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `gaussian_beams` groups its options by the physics they describe, trimming
+  the signature from twenty-two parameters back to thirteen. The launch
+  fan's half-angle, density and initial width travel together as one
+  `BeamFan` (`fan=BeamFan(max_angle_deg=45.0)` where `max_angle_deg=45.0`
+  used to stand alone); the lossy fluid seabed is a `FluidSeabed` passed
+  directly as `bottom`, carrying the water density with it, so a
+  half-described seabed or a seabed alongside `bottom="rigid"` is unwritable
+  rather than checked; the volume absorption is the bare model name or a
+  `VolumeAbsorption` carrying its temperature, salinity and pH; and the
+  bottom profile is one `bathymetry` pair of node arrays, in `ray_trace`
+  too. `eigenrays` takes the same `bottom` union in place of its
+  seabed-and-density triple. The three classes are frozen dataclasses,
+  exported from `phonometry`, `phonometry.underwater` and
+  `phonometry.underwater.propagation` alike, and every result field keeps
+  its name, so recorded outputs read exactly as before.
 - The underwater domain calls its propagation quantity by the name the standard
   gives it. ISO 18405:2017 defines *propagation loss* in 3.4.1.4 as the
   difference between the source level in a specified direction and the

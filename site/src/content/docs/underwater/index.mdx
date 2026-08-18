@@ -97,15 +97,21 @@ pile-driving noise has no closed form here or anywhere in the library.
 **The seabed is thin.** The closed-form page models it as a lossless
 fluid-fluid Rayleigh reflection, so sediment attenuation is out of scope, and
 all four solvers assume a **range-independent** water column with no
-absorbing or elastic bottom and no real bathymetry — which rules out
-range-dependent problems entirely. The ray solver still returns paths and
-travel times and no level of its own; the level comes from `gaussian_beams`,
+elastic bottom; the beam solver can bounce off that same
+Rayleigh seabed instead of a perfect reflector, and the two ray-based
+solvers can slope the bottom over a piecewise-linear depth profile — the
+only range dependence there is, kept because that boundary has an exact
+oracle (the ideal wedge's closed fan of images) where a range-dependent
+water column has none. The ray solver still returns paths and
+travel times and no level of its own; `eigenrays` searches its fan for the
+paths that join a source and a receiver and lists their arrivals with
+classical per-path amplitudes, and the field comes from `gaussian_beams`,
 which widens each of those rays into a beam and so answers a finite number at
-a caustic and a graded one in a shadow zone, at three prices: it sums the
-whole launch fan rather than searching for the eigenrays that join a given
-source and receiver, it has no near field within about three beam widths of
-the source, and the geometric-beam variant with its KMAH index and its
-minimum-width floor is not implemented. The parabolic equation is the standard
+a caustic and a graded one in a shadow zone, at three prices: it has no near
+field within about three beam widths of the source; it inherits ray theory's
+own high-frequency regime, so a refracting channel only a few wavelengths
+deep still belongs to `normal_modes`; and the geometric-beam variant with its
+KMAH index and its minimum-width floor is not implemented. The parabolic equation is the standard
 small-angle Tappert form rather than a wide-angle Padé variant. For the
 elastic seabed physics these fluid solvers leave out, the [elastic wave
 solver](/phonometry/simulation/elastic-waves/) is the nearest thing the

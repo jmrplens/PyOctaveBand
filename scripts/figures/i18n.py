@@ -2791,6 +2791,35 @@ _ES_EXACT = {
     "439 beams over ±45°, $W_0$ = 35.9 m":
         "600 Hz, perfil $n^2$ lineal (Jensen Ec. 3.77)\n"
         "439 haces sobre ±45°, $W_0$ = 35,9 m",
+    # Eigenray arrivals: the impulse-response skeleton at one receiver.
+    # Vocabulary follows the library renderer's own Spanish table
+    # (_plot/underwater.py): eigenrayos, tiempo de propagación, reflexiones
+    # en los contornos. The plain strings carry their decimal points here;
+    # the save-time comma pass sets them, since none of them holds mathtext.
+    "Every Arrival Is a Straight Flight to an Image":
+        "Cada llegada es un vuelo recto hacia una imagen",
+    "Travel time [ms]": "Tiempo de propagación [ms]",
+    "Per-path propagation loss [dB]": "Pérdida de propagación por camino [dB]",
+    "Boundary reflections": "Reflexiones en los contornos",
+    "the direct path, first and loudest:\n"
+    "333.4 ms and exactly 1/R in amplitude":
+        "el camino directo, el primero y el más fuerte:\n"
+        "333.4 ms y amplitud exactamente 1/R",
+    "one surface touch: sign flipped,\n4.4 ms behind the direct":
+        "un toque en la superficie: signo invertido,\n"
+        "4.4 ms por detrás del directo",
+    "each touch unfolds one more image of the receiver,\n"
+    "so every arrival is a straight flight to an image:\n"
+    "later, steeper and a little quieter down the ladder":
+        "cada toque despliega una imagen más del receptor,\n"
+        "así que toda llegada es un vuelo recto hacia una imagen:\n"
+        "más tardía, más empinada y algo más débil escalera abajo",
+    "100 m isovelocity channel, source at 36 m,\n"
+    "receiver 500 m out at 46 m\n"
+    "193 rays over ±48°, 11 eigenrays inside the fan":
+        "canal isovelocidad de 100 m, fuente a 36 m,\n"
+        "receptor a 500 m de distancia y 46 m de profundidad\n"
+        "193 rayos sobre ±48°, 11 eigenrayos dentro del abanico",
     "Four Equations, One Profile": "Cuatro ecuaciones, un perfil",
     "Sound speed $c$ [m/s]": "Velocidad del sonido $c$ [m/s]",
     "Difference from UNESCO / Chen-Millero [m/s]":

@@ -21,11 +21,38 @@ nothing with the solver.
   coefficient and the impulse the marcher applies to the spreading at a
   boundary.
 
+* **Volume absorption.** Jensen Sect. 3.6.2 perturbs the eikonal with the
+  complex sound speed a volume loss implies and attaches
+  :math:`e^{-\int_0^s \alpha\,ds'}` to each ray (Eq. 3.116), so in a
+  homogeneous medium the absorbed field is the free field times
+  :math:`e^{-\alpha R}` with :math:`R` the slant distance. The
+  :math:`\alpha` here is transcribed into this file from the published
+  formulas (Thorp 1967 as printed by Etter 2003; Ainslie & McColm, JASA 103,
+  1998), independently of the ``closed_form`` module the solver reuses, and a
+  steep-receiver case separates arc length from range, which no on-axis
+  comparison can.
+
 * **The ideal waveguide.** A pressure-release surface and bottom over
   isovelocity water is an image lattice, summed here to convergence. It is the
   worst case for a beam fan, because nothing but :math:`1/R` attenuates the
   steep multiple bounces, so the same image sum truncated to the fan's own
   half-angle is used to separate the fan's truncation from the method's error.
+
+* **The same guide over a lossy seabed.** The image expansion survives an
+  absorbing bottom with one change (Jensen Eq. 2.138 for the geometry,
+  Eq. 3.126 for what a boundary touch does to amplitude and phase): each
+  image's term carries :math:`(-1)^{n_s}\,\mathcal{R}(\theta)^{n_b}` with the
+  counts read off the unfolding and :math:`\theta` the one grazing angle the
+  straight unfolded path makes with every bottom plane, closed form by
+  geometry. The :math:`\mathcal{R}` is ``reflection_coefficient`` called
+  directly on those angles, so the oracle shares nothing with the solver's
+  wiring, which never sees an image angle: it reads one angle per beam off
+  Snell's invariant. One geometry exercises both sides of the critical angle,
+  where the physics changes character: above it :math:`|\mathcal{R}| < 1` and
+  the seabed drains the steep multiples, below it :math:`|\mathcal{R}| = 1`
+  and *only* the phase of :math:`\mathcal{R}` carries the seabed, which is
+  what caught the field being assembled with that phase conjugated (15 dB
+  wrong at the range the fringes moved most).
 
 * **The same guide, expanded over modes instead of paths.** Jensen Eq. (5.13)
   is a second closed form of that same exact field, built from the boundary
@@ -96,13 +123,14 @@ them out, so that nobody spends the afternoon on them again.
   refracting range-independent case is the criterion the guide already uses to
   set those two against each other, but as a test here it measures the wrong
   thing. On the 200 m, 50 Hz, 1500 to 1530 m/s case their own trend test uses,
-  the beams sit 8.8 dB from the modes and 6.8 dB from the PE, energy-averaged,
-  while the two siblings agree with each other to 2.0 dB on the same cut. That
-  gap is the quarter-depth clamp putting :math:`W_0` at 1.7 wavelengths and
-  nothing else: it closes as the width is opened, and it is absent from the same
-  comparison in deep water. A test written around the number would be pinning
-  the clamp rather than the beams, and the Airy oracle below pins the beams
-  properly, so it is not worth having as well.
+  the beams sat 8.8 dB from the modes and 6.8 dB from the PE, energy-averaged,
+  while the two siblings agreed with each other to 2.0 dB on the same cut.
+  That gap was the quarter-depth width cap of the era putting :math:`W_0` at
+  1.7 wavelengths and nothing else: the cap is retired now (the default there
+  is the ten-wavelength floor, 300 m) and the gap goes with it, but the
+  comparison still contains no oracle, only three solvers agreeing, and the
+  Airy oracle below pins the beams against an exact closed form instead, so
+  it is not worth having.
 """
 
 from __future__ import annotations
@@ -118,7 +146,10 @@ import pytest
 from phonometry import PhonometryWarning
 from phonometry._internal.rays import DynamicRays, march_rays
 from phonometry.underwater.propagation.numerical import (
+    BeamFan,
+    FluidSeabed,
     GaussianBeamResult,
+    VolumeAbsorption,
     _ocean_ray_derivative,
     gaussian_beams,
     ray_trace,
@@ -188,7 +219,7 @@ def test_the_near_field_survives_a_beam_whose_foot_lands_on_the_source() -> None
     offs = np.array([50.0, 100.0, 200.0, 400.0])
     res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
                          max_range=rmax, ranges_m=offs, receiver_depths_m=zs + offs,
-                         max_angle_deg=80.0, n_beams=321)
+                         fan=BeamFan(max_angle_deg=80.0, n_beams=321))
     # Not asserted as exact equality: the fan is built in radians and read back
     # in degrees, so -45 lands on a rung to within a rounding rather than by
     # construction. A rounding of a degree is close enough to be the same test.
@@ -225,6 +256,172 @@ def test_one_reflection_is_the_two_ray_field() -> None:
                          max_range=4200.0, ranges_m=r,
                          receiver_depths_m=np.array([zr]), range_step=10.0)
     assert np.abs(res.propagation_loss[0] - exact).max() < 0.05
+
+
+# --- Volume absorption ------------------------------------------------------
+#
+# The published formulas, transcribed here from their sources and shared with
+# nothing in src/. Both give alpha in dB/km for f in Hz.
+
+
+def _thorp_1967(f_hz: float) -> float:
+    """Thorp (1967) as printed by Etter (2003): dB/kyd in f kHz, per km."""
+    f2 = (f_hz / 1000.0) ** 2
+    return 1.0936 * (0.1 * f2 / (1.0 + f2) + 40.0 * f2 / (4100.0 + f2))
+
+
+def _ainslie_mccolm_1998(
+    f_hz: float, t_c: float, s_ppt: float, z_km: float, ph: float,
+) -> float:
+    """Ainslie & McColm, JASA 103 (1998), Eqs. (2)-(4): dB/km, f in kHz."""
+    f = f_hz / 1000.0
+    f1 = 0.78 * np.sqrt(s_ppt / 35.0) * np.exp(t_c / 26.0)
+    f2 = 42.0 * np.exp(t_c / 17.0)
+    boric = 0.106 * f1 * f**2 / (f**2 + f1**2) * np.exp((ph - 8.0) / 0.56)
+    mgso4 = (0.52 * (1.0 + t_c / 43.0) * (s_ppt / 35.0)
+             * f2 * f**2 / (f**2 + f2**2) * np.exp(-z_km / 6.0))
+    water = 0.00049 * f**2 * np.exp(-(t_c / 27.0 + z_km / 17.0))
+    return float(boric + mgso4 + water)
+
+
+def test_absorption_multiplies_the_free_field_by_exp_minus_alpha_R() -> None:
+    r"""The absorbed free field against :math:`20\lg R + \alpha R`, exactly.
+
+    A 4000 m homogeneous column with the source in the middle and a 30 degree
+    fan keeps every beam off both boundaries over the 3 km run, so the exact
+    field is :math:`e^{ikR - \alpha_e R}/R` with :math:`R` the slant distance
+    and :math:`\alpha_e` the loss in nepers/m (Jensen Eq. 3.116 with constant
+    :math:`\alpha`): in loss form, spherical spreading plus
+    :math:`\alpha R / 1000` with :math:`\alpha` in dB/km. The two alphas are
+    the test's own transcriptions above; the environmental arguments handed to
+    the solver are repeated in the transcription, the depth being the source
+    depth the solver documents it evaluates the coefficient at. Measured
+    residuals are at or below 2e-4 dB, so the 0.02 dB bound keeps two orders
+    in hand while a wrong measure (range for arc length) or a wrong unit
+    (a factor ln(10)/20 = 0.115) would blow through it at every range.
+    """
+    depth, zs = 4000.0, 2000.0
+    r = np.array([1000.0, 2000.0, 3000.0])
+    # Off-axis rows stay inside the 30 degree fan at the nearest range
+    # (atan(300/1000) = 16.7 degrees); outside it the field is legitimately
+    # not illuminated at all.
+    dz = np.array([-300.0, 0.0, 300.0])
+    cases = [
+        ("thorp", 3000.0, _thorp_1967(3000.0)),
+        ("thorp", 10_000.0, _thorp_1967(10_000.0)),
+        ("ainslie-mccolm", 20_000.0,
+         _ainslie_mccolm_1998(20_000.0, 10.0, 35.0, zs / 1000.0, 8.0)),
+    ]
+    for model, f, alpha in cases:
+        res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                             max_range=3000.0, ranges_m=r,
+                             receiver_depths_m=zs + dz,
+                             fan=BeamFan(max_angle_deg=30.0),
+                             absorption=model)
+        assert res.absorption_model == model
+        # The recorded coefficient is the same published number, digit for
+        # digit, which pins the solver's model wiring as well as its arithmetic.
+        assert res.absorption_coefficient == pytest.approx(alpha, rel=1e-12)
+        slant = np.hypot(r[None, :], dz[:, None])
+        oracle = 20.0 * np.log10(slant) + alpha * slant / 1000.0
+        worst = np.abs(res.propagation_loss - oracle).max()
+        assert worst < 0.02, f"{model} at {f} Hz: worst {worst:.4f} dB"
+        assert alpha * r[-1] / 1000.0 > 0.5, "the loss under test must be material"
+
+
+def test_absorption_is_charged_along_the_arc_and_not_along_the_range() -> None:
+    r"""A steep receiver separates the two measures by the obliquity.
+
+    Jensen Eq. (3.116) integrates the loss along the ray path; the closing
+    remark of Sect. 3.6.2 notes that "many ray models" charge
+    :math:`\alpha r` over the horizontal range instead. On the axis the two
+    coincide, which is why the test above cannot tell them apart. Here the
+    receiver sits 1500 m below the source at 500 m of range, a slant of
+    1581 m at 71.6 degrees from the horizontal, and Thorp at 10 kHz makes the
+    two measures differ by :math:`\alpha (R - r) = 1.24` dB: the assertion
+    band of 0.05 dB around the arc-length answer is twenty-five times
+    narrower than that gap, so charging the range cannot pass. Thorp on
+    purpose, since it ignores every environmental argument and leaves the
+    geometry as the only thing under test.
+    """
+    f, rmax = 10_000.0, 600.0
+    depth = _free_space_column(rmax)
+    zs = depth / 2.0
+    r, dz = 500.0, 1500.0
+    alpha = _thorp_1967(f)
+    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=rmax, ranges_m=np.array([r]),
+                         receiver_depths_m=np.array([zs + dz]),
+                         range_step=10.0, absorption="thorp")
+    slant = float(np.hypot(r, dz))
+    along_arc = 20.0 * np.log10(slant) + alpha * slant / 1000.0
+    along_range = 20.0 * np.log10(slant) + alpha * r / 1000.0
+    got = float(res.propagation_loss[0, 0])
+    assert abs(got - along_arc) < 0.05
+    assert got - along_range > 1.0, "the range measure must be far outside the band"
+
+
+def test_absorption_is_off_by_default_and_bit_for_bit_identical() -> None:
+    """OFF is the default and leaves every bit of the field where it was.
+
+    The published validation numbers of this module were all measured without
+    absorption, so the default has to reproduce them exactly, not merely
+    closely; and the environmental arguments must be inert while the model is
+    ``None``, which the deliberately absurd values below would betray at the
+    first floating-point operation that touched them.
+    """
+    f, rmax = 100.0, 1500.0
+    depth = _free_space_column(rmax, 30.0)
+    zs = depth / 2.0
+    kwargs = {"source_depth": zs, "max_range": rmax,
+              "ranges_m": np.array([500.0, 1500.0]),
+              "receiver_depths_m": np.array([zs - 200.0, zs + 350.0]),
+              "fan": BeamFan(max_angle_deg=30.0)}
+    default = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs)
+    explicit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs,
+                              absorption=None)
+    assert default.absorption_model is None
+    assert default.absorption_coefficient == 0.0
+    assert np.array_equal(default.pressure, explicit.pressure)
+    withit = gaussian_beams(f, [0.0, depth], [_C, _C], **kwargs,
+                            absorption="francois-garrison")
+    assert withit.absorption_coefficient > 0.0
+    assert not np.array_equal(default.pressure, withit.pressure)
+
+
+def test_absorption_defaults_route_to_francois_garrison_at_the_source() -> None:
+    """The advertised seam: the same model names, defaults and machinery as
+    ``seawater_absorption``, evaluated at the source depth.
+
+    This is wiring, not an oracle: Francois-Garrison itself is validated
+    digit for digit against its published tables in the closed-form tests,
+    and the two transcription oracles above own the field-level assertion.
+    What is pinned here is that the beams apply exactly the coefficient they
+    record, and that the recorded one is ``seawater_absorption`` evaluated
+    with the same arguments the docstring names.
+    """
+    from phonometry.underwater.propagation.closed_form import seawater_absorption
+
+    depth, zs = 4000.0, 2000.0
+    f = 10_000.0
+    r = np.array([1000.0, 2500.0])
+    res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=2500.0, ranges_m=r,
+                         receiver_depths_m=np.array([zs]),
+                         fan=BeamFan(max_angle_deg=30.0),
+                         absorption=VolumeAbsorption(
+                             "francois-garrison", temperature=4.0,
+                             salinity=34.0, ph=7.9))
+    expected = float(seawater_absorption(f, temperature=4.0, salinity=34.0,
+                                         depth=zs, ph=7.9,
+                                         model="francois-garrison")[0])
+    assert res.absorption_coefficient == expected
+    off = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=zs,
+                         max_range=2500.0, ranges_m=r,
+                         receiver_depths_m=np.array([zs]),
+                         fan=BeamFan(max_angle_deg=30.0))
+    added = res.propagation_loss[0] - off.propagation_loss[0]
+    assert np.abs(added - expected * r / 1000.0).max() < 1e-3
 
 
 # --- The ideal waveguide ----------------------------------------------------
@@ -269,6 +466,11 @@ def test_the_ideal_waveguide_matches_the_image_source_sum() -> None:
     the square root through a path that has bounced dozens of times, and the
     ladder of folded receiver images without which the answer is several
     decibels light.
+
+    The bound is the measured 0.00024 dB doubled, not a loose ceiling, and
+    deliberately so: the perfect reflector is now the inert limit of the lossy
+    seabed machinery, and this is the assertion that the wiring for it left
+    the default exactly where it always was.
     """
     r = np.array([2000.0])
     exact = _image_source_loss(r, **_GUIDE)
@@ -276,8 +478,8 @@ def test_the_ideal_waveguide_matches_the_image_source_sum() -> None:
         _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
         source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
         receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-        max_angle_deg=88.0, range_step=2.0, beam_width=100.0)
-    assert np.abs(res.propagation_loss[0] - exact).max() < 0.02
+        fan=BeamFan(max_angle_deg=88.0, beam_width=100.0), range_step=2.0)
+    assert np.abs(res.propagation_loss[0] - exact).max() < 5e-4
 
 
 def test_a_narrower_fan_costs_exactly_what_cutting_the_image_sum_costs() -> None:
@@ -296,7 +498,7 @@ def test_a_narrower_fan_costs_exactly_what_cutting_the_image_sum_costs() -> None
         _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
         source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
         receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-        max_angle_deg=80.0, range_step=10.0, beam_width=100.0)
+        fan=BeamFan(max_angle_deg=80.0, beam_width=100.0), range_step=10.0)
     missed = float(np.abs(truncated - complete).max())
     assert missed > 0.1, "the fan has to bite for this test to mean anything"
     assert np.abs(res.propagation_loss[0] - truncated).max() < 0.5 * missed
@@ -321,10 +523,203 @@ def test_both_boundary_conditions_fall_out_of_the_folded_images(
         source_depth=_GUIDE["source_depth"], max_range=2200.0,
         ranges_m=np.array([2000.0]),
         receiver_depths_m=np.array([0.0, 0.5 * depth, depth]),
-        max_angle_deg=85.0, range_step=5.0, beam_width=100.0, bottom=bottom)
+        fan=BeamFan(max_angle_deg=85.0, beam_width=100.0), range_step=5.0,
+        bottom=bottom)
     scale = np.abs(res.pressure[1, 0])
     assert np.abs(res.pressure[0, 0]) / scale < 1e-3
     assert np.abs(res.pressure[2, 0]) / scale == pytest.approx(at_bottom, abs=0.2)
+
+
+# --- A lossy seabed ---------------------------------------------------------
+#
+# The image lattice above survives an absorbing bottom with one change: each
+# image's term carries the coefficients of the boundary planes standing
+# between it and the receiver. Jensen Eq. (2.138) writes the lattice as four
+# families per period m, and reading the counts off Fig. 2.17's unfolding
+# gives, for the family offsets in depth,
+#
+#     2Dm - zs + z:      m surface touches,   m bottom touches   (direct at m=0)
+#     2D(m+1) - zs - z:  m,                   m+1                (bottom first)
+#     2Dm + zs + z:      m+1,                 m                  (surface first)
+#     2D(m+1) + zs - z:  m+1,                 m+1
+#
+# which reproduces the book's signs for the ideal guide, (-1)^(touches), and
+# its naming of the first four terms (direct, bottom, surface, bottom-surface).
+# Checked against the two-sided lattice `_image_source_loss` sums, the four
+# families with R = -1 agree to 6e-10 dB. A boundary touch multiplies the
+# amplitude by |R| and adds arg R to the phase (Eq. 3.126), and in isovelocity
+# water every image path is one straight line, so all n_b of its bottom
+# touches share the single grazing angle that line makes with the horizontal:
+# atan2(|offset|, r), closed form by geometry, and the term's coefficient is
+# exactly (-1)^(n_s) R(theta)^(n_b).
+
+_SEABED = {"rho1": 1000.0, "rho2": 1800.0, "c2": 1700.0}  # sand-like, phi_c = 28.07 deg
+
+
+def _lossy_image_loss(
+    ranges: np.ndarray, *, water_depth: float, frequency: float,
+    source_depth: float, receiver_depth: float, rho1: float, rho2: float,
+    c2: float, n_images: int = 400, magnitude_only: bool = False,
+) -> np.ndarray:
+    """The lossy guide's loss as the image sum described above.
+
+    ``magnitude_only`` replaces every R by |R|, which below the critical angle
+    is exactly the perfect reflector each such touch would be if the phase of
+    R meant nothing: the degraded oracle the phase assertion needs.
+
+    Convergence is far faster than the ideal lattice's: above the critical
+    angle |R| < 1 caps every steep family geometrically (0.342 at normal
+    incidence for this sand), so 400 periods is already indistinguishable
+    from 1600 at the printed precision.
+    """
+    from phonometry.underwater.propagation.seabed_reflection import (
+        reflection_coefficient,
+    )
+
+    k = 2.0 * np.pi * frequency / _C
+    r = np.asarray(ranges, dtype=np.float64)
+    field = np.zeros(r.size, dtype=np.complex128)
+    for m in range(n_images):
+        families = [
+            (2.0 * water_depth * m - source_depth + receiver_depth, m, m),
+            (2.0 * water_depth * (m + 1) - source_depth - receiver_depth, m, m + 1),
+            (2.0 * water_depth * m + source_depth + receiver_depth, m + 1, m),
+            (2.0 * water_depth * (m + 1) + source_depth - receiver_depth, m + 1, m + 1),
+        ]
+        for offset, n_surface, n_bottom in families:
+            distance = np.hypot(r, offset)
+            grazing = np.degrees(np.arctan2(abs(offset), r))
+            refl = reflection_coefficient(grazing, rho1=rho1, c1=_C,
+                                          rho2=rho2, c2=c2)
+            if magnitude_only:
+                refl = np.abs(refl)
+            field = field + ((-1.0) ** n_surface * refl**n_bottom
+                             * np.exp(1j * k * distance) / distance)
+    return np.asarray(-20.0 * np.log10(np.abs(field)))
+
+
+def test_a_lossy_seabed_is_the_image_sum_with_R_at_each_images_own_angle() -> None:
+    r"""Above and below the critical angle at once, phase included.
+
+    The three ranges are chosen for what their dominant images do. At 2 km
+    every bottom-touching image lies *above* the 28.07 degree critical angle
+    (the shallowest touches the bottom at 28.8 degrees), so the comparison
+    there pins the magnitude of R and nothing else; replacing R by |R| moves
+    the oracle by exactly zero at that range. At 4 km the two dominant
+    bottom-touching images have slid *below* critical (15.4 and 23.0 degrees),
+    where |R| = 1 and the seabed survives only in the phase of R, and
+    replacing R by |R| now moves the oracle by 5.7 dB: that gap is the
+    fringes moving, it is asserted as material below, and the solver has to
+    land on the true side of it. This is also the configuration that caught
+    the phase being spent backwards: the beam sum is assembled in the
+    conjugate time convention and conjugated once at the end, so an
+    un-conjugated R survives to the exposed field as conj(R), which measured
+    15.3 dB wrong at this 4 km point while leaving every real-R
+    configuration, which is all the other tests, untouched.
+
+    Measured agreement with the settings below: 0.073, 0.042 and 0.019 dB at
+    2, 3 and 4 km. The 2 km error is the largest for a reason worth recording:
+    its shallowest bottom image sits 0.74 degrees above the critical kink,
+    where R varies fastest, and a beam reconstructs each arrival from a cone
+    of launch angles about a wavelength/(pi W0) = 0.9 degrees wide, so the
+    kink is smeared across the very arrival it matters most to; widening the
+    beams to 150 m narrows the cone and halves that error (0.031 dB), which
+    is what says it is angular smear and not a wrong coefficient. The 0.15 dB
+    bound keeps a hand's margin over all three while sitting fifty times
+    under the 8 dB the ideal guide differs by and far under either failure
+    the test exists to catch.
+    """
+    from phonometry.underwater.propagation.seabed_reflection import (
+        critical_angle,
+        reflection_coefficient,
+    )
+
+    r = np.array([2000.0, 3000.0, 4000.0])
+    exact = _lossy_image_loss(r, **_GUIDE, **_SEABED)
+    res = gaussian_beams(
+        _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
+        source_depth=_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+        receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
+        fan=BeamFan(max_angle_deg=85.0, beam_width=100.0), range_step=2.5,
+        bottom=FluidSeabed(density=_SEABED["rho2"],
+                           sound_speed=_SEABED["c2"],
+                           water_density=_SEABED["rho1"]))
+    assert np.abs(res.propagation_loss[0] - exact).max() < 0.15
+    assert res.seabed_density == _SEABED["rho2"]
+    assert res.seabed_sound_speed == _SEABED["c2"]
+
+    # The geometry really does straddle the critical angle: the shallowest
+    # bottom-touching image at 2 km is above it with |R| < 1, and at 4 km the
+    # dominant one is below it with |R| = 1 and a phase that means something.
+    phi_c = critical_angle(_C, _SEABED["c2"])
+    depth, zs, zr = (_GUIDE["water_depth"], _GUIDE["source_depth"],
+                     _GUIDE["receiver_depth"])
+    shallowest_touch = np.degrees(np.arctan2(2.0 * depth - zs - zr, r))
+    assert shallowest_touch[0] > phi_c > shallowest_touch[-1]
+    r_above = reflection_coefficient(float(shallowest_touch[0]),
+                                     rho1=_SEABED["rho1"], c1=_C,
+                                     rho2=_SEABED["rho2"], c2=_SEABED["c2"])
+    r_below = reflection_coefficient(float(shallowest_touch[-1]),
+                                     rho1=_SEABED["rho1"], c1=_C,
+                                     rho2=_SEABED["rho2"], c2=_SEABED["c2"])
+    assert np.abs(r_above[0]) < 0.999
+    assert np.abs(r_below[0]) == pytest.approx(1.0, abs=1e-12)
+    assert abs(np.angle(r_below[0])) > 0.3
+
+    # The phase of R is load-bearing, not decorative: strip it from the oracle
+    # and the 4 km point moves by decibels, while the solver stays with the
+    # phase-true sum. |R| = 1 below critical means the stripped oracle is what
+    # a solver that dropped, or conjugated, the phase would be chasing.
+    stripped = _lossy_image_loss(r, **_GUIDE, **_SEABED, magnitude_only=True)
+    assert abs(stripped[-1] - exact[-1]) > 3.0
+    assert abs(res.propagation_loss[0, -1] - exact[-1]) < 0.1
+
+    # And the seabed is material full stop: the ideal guide is decibels away.
+    ideal = _image_source_loss(r, **_GUIDE)
+    assert np.abs(exact - ideal).max() > 2.0
+
+
+def test_the_perfect_default_is_the_seabed_machinery_off_state() -> None:
+    """The perfect reflector is the seabed machinery's off state, bit for bit.
+
+    Every published validation number of this module was measured over a
+    perfect bottom, so the default has to reproduce it exactly, not merely
+    closely, and spelling the default out must change nothing.
+    """
+    r = np.array([2000.0])
+    kwargs = {"source_depth": _GUIDE["source_depth"], "max_range": 2200.0,
+              "ranges_m": r,
+              "receiver_depths_m": np.array([_GUIDE["receiver_depth"]]),
+              "fan": BeamFan(max_angle_deg=85.0, beam_width=100.0),
+              "range_step": 10.0}
+    default = gaussian_beams(_GUIDE["frequency"],
+                             [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs)
+    explicit = gaussian_beams(_GUIDE["frequency"],
+                              [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs,
+                              bottom="pressure-release")
+    assert default.seabed_density is None
+    assert default.seabed_sound_speed is None
+    assert np.array_equal(default.pressure, explicit.pressure)
+    lossy = gaussian_beams(_GUIDE["frequency"],
+                           [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs,
+                           bottom=FluidSeabed(density=_SEABED["rho2"],
+                                              sound_speed=_SEABED["c2"]))
+    assert not np.array_equal(default.pressure, lossy.pressure)
+
+
+def test_a_malformed_seabed_is_rejected() -> None:
+    """A ``FluidSeabed`` cannot half-arrive, so what is left to reject is a
+    nonphysical one, each field with its own message."""
+    iso = ([0.0, 1000.0], [_C, _C])
+    airy = FluidSeabed(density=-1.0, sound_speed=1700.0)
+    still = FluidSeabed(density=1800.0, sound_speed=0.0)
+    dry = FluidSeabed(density=1800.0, sound_speed=1700.0, water_density=0.0)
+    with pytest.raises(ValueError, match="density"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom=airy)
+    with pytest.raises(ValueError, match="sound_speed"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom=still)
+    with pytest.raises(ValueError, match="water_density"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom=dry)
 
 
 # --- The same field, expanded the other way ---------------------------------
@@ -418,7 +813,7 @@ def test_the_ideal_waveguide_matches_its_own_modal_expansion() -> None:
         _MODAL_GUIDE["frequency"], [0.0, _MODAL_GUIDE["water_depth"]], [_C, _C],
         source_depth=_MODAL_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
         receiver_depths_m=np.array([_MODAL_GUIDE["receiver_depth"]]),
-        max_angle_deg=88.0, range_step=2.0, beam_width=100.0)
+        fan=BeamFan(max_angle_deg=88.0, beam_width=100.0), range_step=2.0)
     assert np.abs(res.propagation_loss[0] + 20.0 * np.log10(np.abs(exact))).max() < 0.1
     assert np.abs(np.angle(res.pressure[0] / exact)).max() < 5e-3
 
@@ -568,48 +963,96 @@ def _incoherent(loss: np.ndarray, window: int = 11) -> np.ndarray:
 
 
 def test_a_refracting_guide_matches_its_exact_airy_modes() -> None:
-    """The one test here that puts a bend in the rays and an exact number on it.
+    r"""The one test here that puts a bend in the rays and an exact number on it.
 
-    Measured over 0.5 to 4 km, energy-averaged, against the closed form above:
-    a mean of -0.22 dB with a 1.32 dB scatter and a 3.3 dB worst bin. The mean
-    is the assertion that means something, since a mistake in the refracting
-    half of the marcher shows as a bias and not as scatter; the scatter is
-    fringes that have slipped by a fraction of a period and is bounded here at
-    the same 2 dB the module's other cross-solver comparison uses.
+    Measured over 0.5 to 4 km, energy-averaged, against the closed form above,
+    with everything at its default: a mean of +0.19 dB with a 1.31 dB scatter
+    and a 3.7 dB worst bin. The mean is the assertion that means something,
+    since a mistake in the refracting half of the marcher shows as a bias and
+    not as scatter; the scatter is fringes that have slipped by a fraction of
+    a period and is bounded here at the same 2 dB the module's other
+    cross-solver comparison uses.
 
-    ``beam_width`` is set deliberately, and to four times what the default would
-    give, because THIS is where the default is worst and the number is worth
-    writing down. :func:`_default_beam_width` clamps :math:`W_0` to a quarter of
-    the water depth, which in 200 m of water is 50 m, a fifth of the
-    :math:`\\sqrt{\\lambda r_\\mathrm{max}/\\pi}` optimum the same function
-    computes first. Same configuration, same oracle, default width: +3.08 dB
-    mean, 5.86 dB worst, i.e. the field comes out systematically too quiet. It
-    is not a defect in the beams. Their own convergence says so: 100 m gives
-    +1.13, 150 m +0.26, 200 m -0.22, and the same profile in 1000 m of water,
-    where the clamp does not bite and the default is the optimum, comes out at
-    +0.72 dB mean with a 1.37 dB worst bin, better than :func:`normal_modes`
-    manages against the same closed form. It is the clamp, in shallow water
-    only, and Sect. 3.5's own remark that "at lower frequencies the physics may
-    imply that the beam is large compared to the channel, which causes a variety
-    of problems" is the book saying the same thing from the other side.
+    The default width is under test on purpose, because THIS configuration is
+    the one that forced its overhaul and the numbers are worth keeping. An
+    earlier :func:`_default_beam_width` clamped :math:`W_0` to a quarter of
+    the water depth, 50 m here, half the
+    :math:`\sqrt{\lambda r_\mathrm{max}/\pi}` free-space optimum the same
+    function computed first: same configuration, same oracle, that width
+    measured +3.08 dB mean and 5.86 dB worst, systematically too quiet, while
+    explicit 100, 150 and 200 m gave +1.13, +0.26 and -0.22. It was never the
+    refraction: the same profile in 1000 m of water, where the cap did not
+    bite, came out at +0.72 dB mean with a 1.37 dB worst bin, better than
+    :func:`normal_modes` manages against the same closed form. The per-angle
+    default (100 to 255 m across the 80 degree fan, the guide's
+    :math:`4D\cos\theta_0/\pi` on the flat beams and the free-space optimum
+    on the steep ones) holds the same cut at +0.19 dB with no override and no
+    warning, and the shallow-guide test further down pins the retired cap's
+    cost against it on a second, independent configuration.
     """
     r = np.linspace(500.0, 4000.0, 100)
     exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **_AIRY_GUIDE)))
     depths = np.linspace(0.0, _AIRY_GUIDE["water_depth"], 21)
     speeds = _n2_linear_speeds(depths, bottom_speed=_AIRY_GUIDE["bottom_speed"],
                                water_depth=_AIRY_GUIDE["water_depth"])
-    with warnings.catch_warnings():
-        # The width is over the quarter-depth cap on purpose; see the docstring.
-        warnings.simplefilter("ignore", PhonometryWarning)
-        res = gaussian_beams(
-            _AIRY_GUIDE["frequency"], depths, speeds,
-            source_depth=_AIRY_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
-            receiver_depths_m=np.array([_AIRY_GUIDE["receiver_depth"]]),
-            max_angle_deg=80.0, range_step=5.0, beam_width=200.0)
+    res = gaussian_beams(
+        _AIRY_GUIDE["frequency"], depths, speeds,
+        source_depth=_AIRY_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+        receiver_depths_m=np.array([_AIRY_GUIDE["receiver_depth"]]),
+        fan=BeamFan(max_angle_deg=80.0), range_step=5.0)
     # The convolution's own edges are not an average of anything, so they go.
     difference = (_incoherent(res.propagation_loss[0]) - _incoherent(exact))[10:-10]
     assert abs(float(difference.mean())) < 1.0
     assert float(difference.std()) < 2.0
+    # The default is the per-angle rule, not a flat width: the flat beams
+    # carry the modal-resolution width 4 D / pi and the steep ones the
+    # free-space optimum, and the vertical footprint W_0 / cos(theta_0) of
+    # every guide-ruled beam is the same 4 D / pi.
+    four_d_over_pi = 4.0 * _AIRY_GUIDE["water_depth"] / np.pi
+    assert float(res.initial_beam_widths.max()) == pytest.approx(
+        four_d_over_pi, rel=1e-4)
+    assert res.initial_beam_widths[0] < res.initial_beam_widths.max()
+
+
+def test_a_shallow_guide_no_longer_pays_the_quarter_depth_caps_toll() -> None:
+    r"""The cap's cost measured against the width that replaced it, both in dB.
+
+    A second shallow refracting configuration, sharing nothing numerical with
+    the one above (half the depth, a different frequency, gradient, source and
+    receiver), against the same exact closed form. The quarter-depth cap this
+    solver used to clamp :math:`W_0` with would put 25 m here, under half the
+    ten-wavelength floor the book itself recommends; run explicitly at that
+    width, the loss comes out +4.12 dB high in the mean (7.5 dB at the worst
+    bin), energy-averaged over 0.3 to 2.5 km. The per-angle default (70.5 m
+    free-space optimum on the steep beams, rising to the guide's
+    :math:`4D/\pi = 127.3` m on the flat ones) measures +0.39 dB on the same
+    cut: over ninety per cent of the cap's error, gone with the cap. Both
+    numbers are asserted, the first from below and the second from above, so
+    this stays a measurement of the cap's cost and not a story about it.
+    """
+    guide = {"water_depth": 100.0, "frequency": 250.0, "bottom_speed": 1520.0,
+             "source_depth": 15.5, "receiver_depth": 70.5}
+    r = np.linspace(300.0, 2500.0, 100)
+    exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **guide)))
+    depths = np.linspace(0.0, guide["water_depth"], 21)
+    speeds = _n2_linear_speeds(depths, bottom_speed=guide["bottom_speed"],
+                               water_depth=guide["water_depth"])
+
+    def bias(beam_width: float | None) -> float:
+        res = gaussian_beams(
+            guide["frequency"], depths, speeds,
+            source_depth=guide["source_depth"], max_range=2600.0, ranges_m=r,
+            receiver_depths_m=np.array([guide["receiver_depth"]]),
+            fan=BeamFan(max_angle_deg=80.0, beam_width=beam_width),
+            range_step=2.5)
+        return float((_incoherent(res.propagation_loss[0])
+                      - _incoherent(exact))[10:-10].mean())
+
+    capped = bias(guide["water_depth"] / 4.0)  # what the retired cap forced
+    unclamped = bias(None)
+    assert capped > 3.0, f"the cap has to cost decibels here, measured {capped:.2f}"
+    assert abs(unclamped) < 0.8, f"the default has to remove it, measured {unclamped:.2f}"
+    assert abs(unclamped) < 0.2 * capped
 
 
 # --- What the beam itself does ----------------------------------------------
@@ -630,8 +1073,10 @@ def _free_space_beam() -> tuple[GaussianBeamResult, np.ndarray, float]:
     rmax = 2.0 * rayleigh * np.cos(np.radians(45.0))
     depth = _free_space_column(rmax, 45.0)
     res = gaussian_beams(f, [0.0, depth], [_C, _C], source_depth=depth / 2.0,
-                         max_range=rmax, max_angle_deg=45.0, beam_width=w0,
-                         n_beams=9, range_step=rmax / 400.0, n_depth_points=2,
+                         max_range=rmax,
+                         fan=BeamFan(max_angle_deg=45.0, beam_width=w0,
+                                     n_beams=9),
+                         range_step=rmax / 400.0, n_depth_points=2,
                          ranges_m=np.array([rmax]))
     arc = res.ray_ranges / np.cos(np.radians(res.launch_angles))[:, None]
     return res, arc, rayleigh
@@ -647,7 +1092,9 @@ def test_the_beam_half_width_is_the_free_space_hyperbola() -> None:
     the rays are straight.
     """
     res, arc, rayleigh = _free_space_beam()
-    w0 = res.initial_beam_width
+    # An explicit width is every beam's width, and the result records it so.
+    assert np.all(res.initial_beam_widths == _FREE_BEAM_WIDTH)
+    w0 = float(res.initial_beam_widths[0])
     exact = w0 * np.sqrt(1.0 + (arc / rayleigh) ** 2)
     assert res.beam_widths.shape == exact.shape
     assert np.allclose(res.beam_widths, exact, rtol=1e-12)
@@ -702,7 +1149,7 @@ def test_the_conserved_wronskian_is_why_the_spreading_never_vanishes() -> None:
     c0 = float(np.interp(200.0, z_prof, c_prof))
     xi = np.cos(angles) / c0
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof, xi), xi=xi,
+        _ocean_ray_derivative(z_prof, c_prof), xi=xi,
         z0=np.full(angles.size, 200.0), zeta0=np.sin(angles) / c0,
         range_step=10.0, n_steps=1201, lower=0.0, upper=depth,
         dynamic=DynamicRays(np.full(angles.size, 0.5j * omega * w0**2),
@@ -747,7 +1194,7 @@ def _geometric_spreading(
     c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
     xi = np.cos(th) / c0
     march = march_rays(
-        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS, xi), xi=xi,
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS), xi=xi,
         z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
         range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
         upper=_N2_DEPTH,
@@ -765,7 +1212,7 @@ def _beam_spreading(
     c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
     xi = np.cos(th) / c0
     march = march_rays(
-        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS, xi), xi=xi,
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS), xi=xi,
         z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
         range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
         upper=_N2_DEPTH,
@@ -876,13 +1323,15 @@ def test_the_influence_sum_uses_the_tracked_branch_and_not_the_principal_one() -
         spreading=np.array([[q]]),
         slope=np.array([[p]]),
         time=one * tau,
+        path=one * r_col,
         # A ray two caustics along: one full turn under the principal value.
         phase=np.array([[np.angle(q) - 2.0 * np.pi]]),
         weight=np.array([[1.0 + 0.0j]]),
         reach=np.array([50.0]),
     )
     got = _beam_influence(samples, np.array([z_ray]), water_depth=1.0e6,
-                          bottom_reflection=1.0, omega=omega, beam_width=w0)
+                          bottom_reflection=1.0, omega=omega, beam_width=w0,
+                          attenuation=0.0)
 
     expected = (np.sqrt(c / r_col) / np.sqrt(abs(q))
                 * np.exp(-0.5j * (np.angle(q) - 2.0 * np.pi) - 1j * omega * tau))
@@ -934,7 +1383,7 @@ def test_the_field_is_finite_where_the_classical_amplitude_is_not() -> None:
     res = gaussian_beams(600.0, _N2_DEPTHS, _N2_SPEEDS, source_depth=zs,
                          max_range=rmax, ranges_m=np.array([r_caustic]),
                          receiver_depths_m=z_caustic + offsets,
-                         max_angle_deg=45.0, range_step=2.0)
+                         fan=BeamFan(max_angle_deg=45.0), range_step=2.0)
     pl = res.propagation_loss[:, 0]
     assert np.all(np.isfinite(pl))
     assert pl.min() > 30.0  # finite, and not absurdly loud either
@@ -968,7 +1417,7 @@ def test_the_shadow_zone_decays_smoothly_without_going_silent() -> None:
     res = gaussian_beams(f, _N2_DEPTHS, _N2_SPEEDS, source_depth=zs,
                          max_range=1500.0, ranges_m=r,
                          receiver_depths_m=np.array([zs]),
-                         max_angle_deg=30.0, range_step=2.0)
+                         fan=BeamFan(max_angle_deg=30.0), range_step=2.0)
     pl = res.propagation_loss[0]
     assert np.all(np.isfinite(pl))
     # Nonzero everywhere: the beams' tails carry energy into the shadow, which
@@ -987,28 +1436,37 @@ def test_the_shadow_zone_decays_smoothly_without_going_silent() -> None:
 
 
 @pytest.mark.parametrize(
-    ("frequency", "max_range", "water_depth", "expected"),
+    ("frequency", "max_range", "water_depth", "axial", "edge"),
     [
-        # sqrt(lambda r / pi) inside the book's 10-50 wavelength band.
-        (100.0, 10_000.0, 5000.0, 218.6),
-        (1000.0, 10_000.0, 5000.0, 69.1),
+        # sqrt(lambda r / pi) inside the book's 10-50 wavelength band, flat
+        # across the fan: 5 km of water is beyond the guide term's reach.
+        (100.0, 10_000.0, 5000.0, 218.5, 218.5),
+        (1000.0, 10_000.0, 5000.0, 69.1, 69.1),
         # Too low a frequency for the optimum: the ten-wavelength floor lifts it.
-        (20.0, 10_000.0, 5000.0, 750.0),
-        # A shallow channel: the quarter-depth cap has the last word over both.
-        (100.0, 10_000.0, 200.0, 50.0),
+        (20.0, 10_000.0, 5000.0, 750.0, 750.0),
+        # A shallow channel: the modal-resolution width 4 D cos(theta_0)/pi
+        # rules wherever it beats the optimum, so the fan is widest on the
+        # axis (4 D/pi) and relaxes towards the edges. The retired
+        # quarter-depth cap would have forced 50 m on all nine beams.
+        (100.0, 10_000.0, 200.0, 254.6, 239.3),
     ],
 )
-def test_the_default_beam_width_is_the_optimum_inside_its_clamps(
-    frequency: float, max_range: float, water_depth: float, expected: float,
+def test_the_default_width_is_the_optimum_raised_to_the_guides_need(
+    frequency: float, max_range: float, water_depth: float,
+    axial: float, edge: float,
 ) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PhonometryWarning)
         res = gaussian_beams(
             frequency, [0.0, water_depth], [_C, _C],
             source_depth=0.5 * water_depth, max_range=max_range,
-            ranges_m=np.array([max_range]), n_depth_points=2, n_beams=9,
-            range_step=max_range / 4.0, max_angle_deg=20.0)
-    assert res.initial_beam_width == pytest.approx(expected, rel=1e-3)
+            ranges_m=np.array([max_range]), n_depth_points=2,
+            fan=BeamFan(max_angle_deg=20.0, n_beams=9),
+            range_step=max_range / 4.0)
+    assert res.initial_beam_widths.shape == (9,)
+    assert res.initial_beam_widths[4] == pytest.approx(axial, rel=1e-3)
+    assert res.initial_beam_widths[0] == pytest.approx(edge, rel=1e-3)
+    assert res.initial_beam_widths[-1] == pytest.approx(edge, rel=1e-3)
 
 
 def test_the_answer_does_not_care_which_width_inside_the_band_is_used() -> None:
@@ -1025,7 +1483,7 @@ def test_the_answer_does_not_care_which_width_inside_the_band_is_used() -> None:
             _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
             source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
             receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
-            max_angle_deg=85.0, range_step=5.0, beam_width=w0)
+            fan=BeamFan(max_angle_deg=85.0, beam_width=w0), range_step=5.0)
         losses.append(float(res.propagation_loss[0, 0]))
     assert max(losses) - min(losses) < 0.2  # measured 0.13 dB
 
@@ -1033,56 +1491,74 @@ def test_the_answer_does_not_care_which_width_inside_the_band_is_used() -> None:
 def test_a_source_on_a_profile_kink_is_warned_about() -> None:
     z = np.array([0.0, 100.0, 300.0, 1000.0])
     c = np.array([1500.0, 1510.0, 1488.0, 1512.0])
+    r = np.array([1000.0])
+    fan = BeamFan(max_angle_deg=30.0, n_beams=9)
     with pytest.warns(PhonometryWarning, match="gradient discontinuity"):
         gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
-                       ranges_m=np.array([1000.0]), n_depth_points=2, n_beams=9,
-                       range_step=100.0, max_angle_deg=30.0)
+                       ranges_m=r, n_depth_points=2, fan=fan,
+                       range_step=100.0)
     # A metre off the node is a different problem, and silent.
     with warnings.catch_warnings():
         warnings.simplefilter("error", PhonometryWarning)
         gaussian_beams(200.0, z, c, source_depth=101.0, max_range=1000.0,
-                       ranges_m=np.array([1000.0]), n_depth_points=2, n_beams=9,
-                       range_step=100.0, max_angle_deg=30.0)
+                       ranges_m=np.array([1000.0]), n_depth_points=2,
+                       fan=BeamFan(max_angle_deg=30.0, n_beams=9),
+                       range_step=100.0)
 
 
-def test_a_beam_wider_than_the_channel_is_warned_about() -> None:
-    with pytest.warns(PhonometryWarning, match="quarter of the water depth"):
+def test_a_beam_wider_than_a_quarter_of_the_channel_passes_in_silence() -> None:
+    """The quarter-depth warning went with the quarter-depth cap.
+
+    An explicit width above a quarter of the water depth used to warn that the
+    folded field would drift from the true one; the receiver-image ladder is
+    what makes that untrue, and the two shallow-guide oracles above measure the
+    wide width as the *better* answer. A warning against the better answer
+    trains callers to ignore warnings, so it is gone, and this pins that it
+    stays gone.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", PhonometryWarning)
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
                        max_range=1000.0, ranges_m=np.array([1000.0]),
-                       n_depth_points=2, n_beams=9, range_step=20.0,
-                       max_angle_deg=30.0, beam_width=150.0)
+                       n_depth_points=2, range_step=20.0,
+                       fan=BeamFan(max_angle_deg=30.0, n_beams=9,
+                                   beam_width=150.0))
 
 
 def test_a_step_that_cannot_follow_the_steepest_beam_is_warned_about() -> None:
+    r = np.array([2000.0])
+    steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
     with pytest.warns(PhonometryWarning, match="steepest beam"):
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=2000.0, ranges_m=np.array([2000.0]),
-                       n_depth_points=2, n_beams=9, range_step=100.0,
-                       max_angle_deg=85.0)
+                       max_range=2000.0, ranges_m=r, n_depth_points=2,
+                       fan=steep_fan, range_step=100.0)
 
 
 def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
     """The call site, not the module the check happens to live in.
 
-    One of the three checks runs inside a helper of its own and so stands a
-    frame further from the caller than the other two; a single ``stacklevel``
-    for all three would report that one against ``numerical.py``, where the
-    reader has nothing to change. The filename is the assertion because it is
-    what a caller actually sees, and it is wrong in exactly the case a shared
+    One of the two checks runs inside a helper of its own and so stands a
+    frame further from the caller than the other; a single ``stacklevel`` for
+    both would report that one against ``numerical.py``, where the reader has
+    nothing to change. The filename is the assertion because it is what a
+    caller actually sees, and it is wrong in exactly the case a shared
     constant would make wrong.
     """
     z = np.array([0.0, 100.0, 300.0, 1000.0])
     c = np.array([1500.0, 1510.0, 1488.0, 1512.0])
+    on_kink = np.array([1000.0])
+    flat_fan = BeamFan(max_angle_deg=30.0, n_beams=9)
+    far = np.array([2000.0])
+    steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
     with pytest.warns(PhonometryWarning) as kink:
         gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
-                       ranges_m=np.array([1000.0]), n_depth_points=2, n_beams=9,
-                       range_step=100.0, max_angle_deg=30.0)
-    with pytest.warns(PhonometryWarning) as wide:
+                       ranges_m=on_kink, n_depth_points=2, fan=flat_fan,
+                       range_step=100.0)
+    with pytest.warns(PhonometryWarning) as steep:
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=1000.0, ranges_m=np.array([1000.0]),
-                       n_depth_points=2, n_beams=9, range_step=100.0,
-                       max_angle_deg=30.0, beam_width=150.0)
-    for caught in (kink, wide):
+                       max_range=2000.0, ranges_m=far, n_depth_points=2,
+                       fan=steep_fan, range_step=100.0)
+    for caught in (kink, steep):
         assert caught[0].filename == __file__
 
 
@@ -1090,15 +1566,17 @@ def test_invalid_inputs_rejected() -> None:
     iso = ([0.0, 1000.0], [_C, _C])
     with pytest.raises(ValueError, match="source_depth"):
         gaussian_beams(200.0, *iso, source_depth=1200.0)
+    vertical = BeamFan(max_angle_deg=90.0)
     with pytest.raises(ValueError, match="max_angle_deg"):
-        gaussian_beams(200.0, *iso, source_depth=500.0, max_angle_deg=90.0)
+        gaussian_beams(200.0, *iso, source_depth=500.0, fan=vertical)
     with pytest.raises(ValueError, match="bottom"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom="sandy")
     with pytest.raises(ValueError, match="range_step"):
         gaussian_beams(200.0, *iso, source_depth=500.0, max_range=100.0,
                        range_step=200.0)
+    unpaired = BeamFan(n_beams=1)
     with pytest.raises(ValueError, match="n_beams"):
-        gaussian_beams(200.0, *iso, source_depth=500.0, n_beams=1)
+        gaussian_beams(200.0, *iso, source_depth=500.0, fan=unpaired)
     with pytest.raises(ValueError, match="ranges_m"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[-1.0])
     with pytest.raises(ValueError, match="receiver_depths_m"):
@@ -1115,6 +1593,8 @@ def test_invalid_inputs_rejected() -> None:
     with pytest.raises(ValueError, match="n_depth_points"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[500.0],
                        n_depth_points=1)
+    with pytest.raises(ValueError, match="absorption"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, absorption="mud")
 
 
 def test_the_result_lines_up_with_the_parabolic_equation_grid_and_plots() -> None:
@@ -1123,8 +1603,8 @@ def test_the_result_lines_up_with_the_parabolic_equation_grid_and_plots() -> Non
 
     iso = ([0.0, 1000.0], [_C, _C])
     beams = gaussian_beams(200.0, *iso, source_depth=500.0, max_range=2000.0,
-                           range_step=100.0, n_depth_points=32, n_beams=101,
-                           max_angle_deg=45.0)
+                           range_step=100.0, n_depth_points=32,
+                           fan=BeamFan(max_angle_deg=45.0, n_beams=101))
     pe = parabolic_equation(200.0, *iso, source_depth=500.0, max_range=2000.0,
                             range_step=100.0, n_depth_points=32)
     assert np.allclose(beams.depths, pe.depths)
@@ -1156,7 +1636,8 @@ def test_the_colour_window_lands_on_the_field_and_not_beside_it() -> None:
     z = np.linspace(0.0, 1000.0, 201)
     c = c0 / np.sqrt(1.0 + 2.4 * z / c0)
     beams = gaussian_beams(600.0, z, c, source_depth=992.5, max_range=2500.0,
-                           range_step=25.0, max_angle_deg=45.0, n_depth_points=80)
+                           range_step=25.0, fan=BeamFan(max_angle_deg=45.0),
+                           n_depth_points=80)
     pl = beams.propagation_loss
     finite = pl[np.isfinite(pl)]
     assert np.isinf(pl).mean() > 0.1, "the un-illuminated wedge has to be there"

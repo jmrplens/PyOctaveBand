@@ -1,6 +1,6 @@
 ---
 title: "Métodos numéricos de propagación submarina"
-description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, el trazado de haces gaussianos para un campo que se mantiene finito en las cáusticas, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
+description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, la búsqueda de eigenrayos que convierte un abanico trazado en la lista de llegadas de un receptor, un fondo libre de inclinarse como perfil lineal a trozos sujeto al abanico exacto de imágenes de la cuña ideal, el trazado de haces gaussianos para un campo que se mantiene finito en las cáusticas, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
 references:
   - type: book
     authors: ["Jensen, F. B.", "Kuperman, W. A.", "Porter, M. B.", "Schmidt, H."]
@@ -9,7 +9,7 @@ references:
     edition: "2.ª ed."
     publisher: "Springer"
     doi: "10.1007/978-1-4419-8678-8"
-    note: "La monografía de referencia implementada aquí: la derivación modal de la sección 2 (cap. 5, Ecs. 5.3-5.17), las ecuaciones de rayos de la sección 3 (cap. 3, Ecs. 3.23-3.24), los haces gaussianos de la sección 4 (cap. 3, §3.5, Ecs. 3.88-3.92), la ecuación parabólica split-step de Fourier de la sección 5 (cap. 6) y la guía de selección de modelo de la sección 6 (cap. 1)."
+    note: "La monografía de referencia implementada aquí: la derivación modal de la sección 2 (cap. 5, Ecs. 5.3-5.17), las ecuaciones de rayos de la sección 3 (cap. 3, Ecs. 3.23-3.24) y sus llegadas de eigenrayos (§3.3.5, Ecs. 3.65-3.68), los haces gaussianos de la sección 4 (cap. 3, §3.5, Ecs. 3.88-3.92), la ecuación parabólica split-step de Fourier de la sección 5 (cap. 6) y la guía de selección de modelo de la sección 6 (cap. 1)."
   - type: article
     authors: ["Munk, W. H."]
     year: 1974
@@ -39,10 +39,12 @@ no sabe nada del perfil de velocidad del sonido, del fondo ni de la
 superficie. Cuando la refracción y los contornos deciden la respuesta, el
 campo hay que **calcularlo**: esta guía cubre los cuatro métodos numéricos del
 módulo `underwater`, la física que cada uno discretiza, y cómo elegir entre
-ellos y las formas cerradas. Los cuatro suponen un océano independiente de la
-distancia (estratificado horizontalmente) con superficie de
-presión nula, toman como entrada el mismo perfil $c(z)$ y siguen a
-Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
+ellos y las formas cerradas. Los cuatro toman el mismo perfil $c(z)$
+independiente de la distancia (estratificado horizontalmente) y una
+superficie de presión nula, y siguen a Jensen, Kuperman, Porter y Schmidt,
+*Computational Ocean Acoustics*; los dos métodos basados en rayos pueden
+además inclinar el fondo con un perfil de profundidad lineal a trozos
+(sección 3), la única dependencia de la distancia del módulo.
 
 ## 1. Los cuatro métodos de un vistazo
 
@@ -58,7 +60,9 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
   arrastra el tiempo de propagación de cada rayo como un estado más de la
   misma integración. Validado contra los arcos de círculo de un gradiente
   lineal y contra la forma cerrada del tiempo de propagación a lo largo de
-  ellos.
+  ellos. `eigenrays` busca después en ese abanico trazado los caminos que
+  unen la fuente con un receptor y lista sus llegadas, validado contra la red
+  de imágenes de la guía de ondas ideal, donde cada llegada es forma cerrada.
 - **`gaussian_beams`** cuelga un haz gaussiano de cada uno de esos rayos y los
   suma en un campo de pérdida de propagación, que se mantiene finito en las
   cáusticas donde la amplitud clásica de un rayo es infinita y decae en las
@@ -153,12 +157,13 @@ field.plot()  # campo PL sobre distancia x profundidad
 
 `normal_modes` devuelve un `NormalModeResult` (`wavenumbers`,
 `mode_functions`, `propagation_loss`); `ray_trace` un `RayTraceResult`
-(`ranges`, `depths` y `travel_times` por rayo); `gaussian_beams` un
-`GaussianBeamResult` (el campo `propagation_loss`, más el rayo central y la
-anchura de cada haz); `parabolic_equation` un `ParabolicEquationResult` (el
-campo `propagation_loss`). Los cuatro difieren en lo que aproximan, no en lo
-que modelan, así que elegir entre ellos es una cuestión de régimen: la tabla
-de la sección 6 es la respuesta corta.
+(`ranges`, `depths`, `travel_times`, `arc_lengths` y los recuentos de
+reflexiones por contorno, por rayo); `gaussian_beams` un `GaussianBeamResult`
+(el campo `propagation_loss`, más el rayo central y la anchura de cada haz);
+`parabolic_equation` un `ParabolicEquationResult` (el campo
+`propagation_loss`). Los cuatro difieren en lo que aproximan, no en lo que
+modelan, así que elegir entre ellos es una cuestión de régimen: la tabla de
+la sección 6 es la respuesta corta.
 
 ## 2. Modos normales: la guía de ondas como suma de ondas estacionarias
 
@@ -276,7 +281,9 @@ lecho con los regímenes de Weston de
 [propagación submarina del sonido](/phonometry/es/underwater/underwater-propagation/#regimenes-de-aguas-someras-de-weston),
 cuyo ángulo crítico y gradiente de pérdida por reflexión codifican exactamente
 lo que estas condiciones de contorno omiten, y lee la respuesta modal como una
-cota superior del nivel recibido.
+cota superior del nivel recibido. O dale a `gaussian_beams` el propio lecho
+fluido (sección 4), que tasa cada rebote en el fondo con el coeficiente de
+Rayleigh que estos dos extremos idealizan.
 
 ## 3. Trazado de rayos: puntos de giro y tiempos de propagación
 
@@ -383,10 +390,159 @@ en las mismas cuatro etapas Runge-Kutta que la trayectoria, y toma su velocidad
 del sonido de la interpolación que esas etapas ya hacen, describe el camino que
 de verdad se devuelve y no una segunda lectura de él, y coincide con la forma
 cerrada de un gradiente constante (Medwin y Clay 1998, Ec. (3.3.20)) hasta unos
-$10^{-14}$ s. Lo que aquí no llevan es una amplitud completa: la intensidad
-geométrica del tubo de rayos diverge en las cáusticas, así que `RayTraceResult`
-no informa de ningún nivel. La sección 4 es la que lo arregla, sobre los mismos
-rayos y con el mismo integrador.
+$10^{-14}$ s. `RayTraceResult` sigue sin informar de ningún nivel propio: la
+amplitud clásica por camino pertenece a los eigenrayos de justo debajo, que
+son los caminos que un receptor dado de verdad recoge, y un *campo* que se
+mantenga finito donde la amplitud clásica diverge es el de la sección 4,
+sobre los mismos rayos y con el mismo integrador.
+
+### Un fondo en pendiente: la primera dependencia de la distancia
+
+Pasar un par `bathymetry` de nodos, `(ranges_m, depths_m)`, sustituye el
+fondo horizontal por un **perfil de profundidad lineal a trozos** — la frontera
+facetada de la Fig. 3.20 de Jensen — mientras el perfil de velocidad del
+sonido sigue siendo independiente de la distancia. El integrador localiza
+cada cruce contra la polilínea interpolada y refleja el rayo especularmente
+sobre la faceta local (Ec. 3.121), así que un rebote en una pendiente de
+ángulo $\beta$ gira el rayo $2\beta$: los rebotes pendiente arriba empinan
+el rayo, los rebotes pendiente abajo lo aplanan, y esa es toda la física en
+una línea de la propagación en cuña. El invariante de Snell pasa entonces a
+ser una constante de cada rayo solo *entre* rebotes de fondo, y una
+consecuencia se afronta en vez de taparse: un rayo empinado más allá de la
+vertical correría hacia atrás en distancia, cosa que un integrador cuya
+variable independiente es la distancia no puede llevar, así que se termina
+en ese rebote y sus muestras son `NaN` de ahí en adelante — un dibujo
+simplemente se acaba donde el rayo dio la vuelta. En una cuña isovelocidad
+todo rayo son líneas rectas y espejos, así que cada ángulo de abajo es
+exacto:
+
+```python
+import numpy as np
+from phonometry import underwater
+
+# Una cuña isovelocidad: el fondo sube de 1000 m a 650 m en 4 km, una
+# pendiente arriba de 5 grados. Un rebote en la superficie solo invierte el
+# rayo; un rebote en el fondo lo empina el doble de la pendiente.
+beta = np.radians(5.0)
+wedge = underwater.ray_trace(
+    [0.0, 1000.0], [1500.0, 1500.0], source_depth=400.0,
+    launch_angles_deg=[20.0], max_range=4000.0, n_steps=1601,
+    bathymetry=([0.0, 4000.0], [1000.0, 1000.0 - 4000.0 * np.tan(beta)]))
+r, z = wedge.ranges[0], wedge.depths[0]
+events = wedge.bottom_reflections[0] + wedge.surface_reflections[0]
+incline = np.degrees(np.arctan(np.abs(np.diff(z)) / np.diff(r)))
+for leg in range(int(events[-1]) + 1):
+    seg = np.flatnonzero(events[:-1] == leg)[1:-1]
+    print(leg, round(float(np.median(incline[seg])), 1))
+# 0 20.0   como se lanzó
+# 1 30.0   primer rebote de fondo: empinado 2 beta
+# 2 30.0   la superficie solo invierte el signo
+# 3 40.0   segundo rebote de fondo: 2 beta otra vez
+```
+
+La polilínea empieza en $r = 0$, de modo que la columna de agua en la fuente
+queda declarada y no extrapolada, y continúa horizontal más allá de su
+último nodo, la misma prolongación con la que vive el perfil de velocidad
+del sonido; un vértice refleja especularmente sobre una de sus dos facetas,
+y un accidente batimétrico más estrecho que un paso de distancia puede
+esconderse entre dos muestras de la búsqueda de cruces, así que `n_steps`
+tiene que resolver la batimetría además de los rayos. `eigenrays` rechaza un
+trazado en pendiente, y dice por qué: cada rebote en la pendiente rota el
+invariante de Snell, así que los toques de fondo de una llegada ya no
+comparten un único ángulo rasante y la convención de amplitud de un
+coeficiente por camino de abajo deja de sostenerse.
+
+### Eigenrayos: la estructura de llegadas en un receptor
+
+El abanico dibuja todos los caminos que el perfil admite; a un receptor solo
+llegan unos pocos. Esos son los **eigenrayos**, «los rayos que pasan por ese
+punto» (Jensen §3.3.5.2), y su lista — un retardo, un ángulo de salida y otro
+de llegada, los contadores de toques en los contornos y una amplitud compleja
+por camino — es la estructura de llegadas que la ecuación del sonar consume
+como multitrayecto, el esqueleto de una respuesta al impulso del canal, y
+aquello contra lo que ecualiza el trabajo de comunicaciones. `eigenrays` toma
+el abanico trazado y un receptor y los encuentra como raíces: hay un eigenrayo
+allí donde la profundidad de un rayo a la distancia del receptor cruza la
+profundidad del receptor, así que un par de rayos adyacentes del abanico que
+lo encajonan acota uno, y cada acotación se cierra por bisección **sobre
+trazados nuevos a través del mismo perfil**, nunca interpolando entre los
+rayos trazados — los dos rayos de una acotación pueden llevar historias de
+rebotes distintas, y una mezcla de ambos es un camino que el agua no contiene
+(el riesgo de interpolación de Jensen §3.7.5.1). Cada llegada es un rayo
+real, con su tiempo de propagación, sus ángulos y sus contadores de rebote
+leídos de su propia trayectoria, y con la divergencia $q$ de la sección
+siguiente montada en la misma marcha en su forma *real* de fuente puntual
+(Ec. 3.63), de modo que la amplitud clásica de la Ec. (3.65) pertenece
+exactamente al rayo que acertó:
+
+```python
+# El canal isóvelo de 100 m se despliega en imágenes especulares, así que
+# cada llegada se comprueba a mano: la n-ésima vuela en línea recta hasta una
+# imagen del receptor, a sqrt(r^2 + z_n^2) metros.
+fan = underwater.ray_trace([0.0, 100.0], [1500.0, 1500.0], source_depth=36.0,
+                           launch_angles_deg=np.arange(-48.0, 48.5, 0.5),
+                           max_range=600.0, n_steps=201)
+arr = underwater.eigenrays(fan, receiver_range=500.0, receiver_depth=46.0)
+print(arr.travel_times.size)          # 11 llegadas dentro del abanico de 48 grados
+
+# El camino directo: 500 m en distancia, 10 m hacia abajo, sin toques, 1/R.
+print(round(float(arr.travel_times[0]) * 1e3, 2))       # 333.4 ms
+print(round(float(abs(arr.amplitudes[0])) * 500.1, 6))  # 1.0: eso es 1/R
+
+# El primer eco salió de la fuente hacia arriba y llega desde arriba, con el
+# signo invertido una vez por la superficie de presión nula.
+print(int(arr.surface_reflections[1]), int(arr.bottom_reflections[1]))  # 1 0
+print(round(float(arr.launch_angles[1]), 2))            # -9.31 grados: arriba
+arr.plot(language="es")   # el esqueleto de la respuesta al impulso
+```
+
+<ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/eigenray_arrivals_es.svg" alt="La estructura de llegadas en un receptor de un canal isovelocidad de 100 metros: once barras verticales frente al tiempo de propagación de 333 a 480 milisegundos, cada cabeza marcando la pérdida de propagación de su propio camino sobre un eje invertido, el camino directo dibujado el primero y el más fuerte en azul, los caminos reflejados coloreados según su número de reflexiones en los contornos de uno a cinco, llegando más tarde, más empinados y algo más débiles a lo largo de la escalera de imágenes, con una barra de color que da el número" width="92%" />
+
+*El canal del propio fragmento, dibujado: una barra por eigenrayo, con la
+cabeza en la pérdida de ese único camino. El camino directo llega el primero y
+el más fuerte; el primer eco le sigue 4,4 ms por detrás, con el signo
+invertido por la superficie; y cada toque adicional despliega una imagen más
+del receptor, más tardía, más empinada y algo más débil escalera abajo. Sobre
+reflectores perfectos nada salvo $1/R$ atenúa un camino, así que 147 ms de
+dispersión de retardos cuestan apenas 3 dB: esta lista es el multitrayecto que
+consume la ecuación del sonar y el esqueleto sobre el que se construye una
+respuesta al impulso del canal.*
+
+Una sola lista sirve para todas las frecuencias. Las amplitudes están
+normalizadas a presión unidad a 1 m, en el mismo convenio $e^{-i\omega t}$
+que el resto del módulo, y la búsqueda no pregunta nunca por una frecuencia:
+el tono que oye un receptor es $p(\omega) = \sum_j a_j e^{i\omega\tau_j}$, su
+pérdida $-20\lg|p(\omega)|$ en la misma escala que los otros tres métodos, y
+la respuesta al impulso de una banda es esa suma transformada. Cada amplitud
+lleva un $(-1)$ por toque en la superficie y el coeficiente del fondo por
+toque en el fondo — el $\mp1$ de los reflectores perfectos o, con el mismo
+`FluidSeabed` que toman los haces, la
+$\mathcal{R}$ de Rayleigh del ángulo rasante propio de cada rayo, módulo y
+fase — y el $(-i)^m$ de la Ec. (3.79) por cada cáustica cruzada, la forma
+discreta del $-\pi/2$ que la rama de la raíz cuadrada del método de haces
+gasta de forma continua. Validado contra el único entorno cuya estructura de
+llegadas es forma cerrada entera, la red de imágenes de la guía de ondas
+ideal: el censo coincide imagen por imagen, y tiempos, ángulos y amplitudes
+concuerdan hasta $10^{-13}$ s, $10^{-11}$ grados y $10^{-13}$ relativo; y
+contra el rayo parabólico exacto del perfil $n^2$-lineal (Ec. 3.195), cuyo
+tiempo de propagación en forma cerrada, integrado por cuadratura hasta la
+precisión de máquina, el eigenrayo refractado hacia arriba reproduce hasta
+$2\times10^{-7}$ s, siendo el residuo el muestreo del perfil y no la
+búsqueda.
+
+Tres límites, todos deliberados. El abanico es el espacio de búsqueda: un
+eigenrayo más empinado que la apertura trazada no existe para él, y un par de
+llegadas que queden entre los mismos dos rayos del abanico se funde en
+ninguna acotación, así que la densidad y el semiángulo del abanico son las
+palancas de completitud, y quedan donde se ven, en la llamada a `ray_trace`.
+La escalera de multitrayecto de una guía de fondo duro no tiene fin, así que
+`max_arrivals` (64 por defecto) conserva las llegadas más tempranas, las
+llanas y con menos rebotes que llevan la energía, y avisa cuando trunca. Y la
+amplitud es clásica a propósito: a un receptor plantado exactamente sobre una
+cáustica se le responde con el infinito que la Ec. (3.65) de verdad tiene
+ahí, porque una lista de caminos discretos es teoría de rayos y lo dice; el
+campo que se mantiene finito sobre esa cáustica es el de la sección
+siguiente, construido ensanchando estos mismos rayos en haces.
 
 ## 4. Haces gaussianos: un campo donde los rayos se rinden
 
@@ -448,10 +604,11 @@ c_beam = c_bottom_ref / np.sqrt(1.0 + 2.4 * z_beam / c_bottom_ref)
 
 beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
                                   max_range=2500.0, range_step=25.0,
-                                  max_angle_deg=45.0, n_depth_points=80)
+                                  fan=underwater.BeamFan(max_angle_deg=45.0),
+                                  n_depth_points=80)
 print(beams.propagation_loss.shape)            # (80, 101)  profundidad x distancia
 print(beams.launch_angles.size)                # 439 haces entre +-45 grados
-print(round(beams.initial_beam_width, 1))      # 35,9 m: W0 de la Ec. (3.86)
+print(round(float(beams.initial_beam_widths[0]), 1))  # 35,9 m: W0, Ec. (3.86)
 beams.plot(language="es")   # el campo de PL, en el marco de parabolic_equation
 ```
 
@@ -486,7 +643,8 @@ c_caustic = c_ref / np.sqrt(1.0 + 2.4 * z_caustic / c_ref)
 
 caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
                                     source_depth=992.5, max_range=2500.0,
-                                    range_step=12.5, max_angle_deg=45.0,
+                                    range_step=12.5,
+                                    fan=underwater.BeamFan(max_angle_deg=45.0),
                                     n_depth_points=400)
 caustic.plot(language="es")   # el mismo campo; la figura lo dibuja por bandas
 plt.show()
@@ -497,30 +655,46 @@ plt.show()
 **El único parámetro libre.** $W_0$ lo es, y el libro reconoce sin rodeos que
 «la elección óptima de estas condiciones iniciales es materia de investigación
 actual», recomendando de 10 a 50 longitudes de onda. Aquí el valor por defecto
-es más afilado que una regla empírica porque el §3.5.1 hace la optimización de
-forma explícita: derivar la anchura en espacio libre de la Ec. (3.86) respecto
-del desplazamiento complejo da $W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, la anchura
-que mejor resuelve el campo en el extremo lejano del recorrido, que es donde
-peor se resuelve. Es también donde la integral en ángulo de lanzamiento que hay
-detrás de la Ec. (3.92) es una gaussiana de verdad y no una integral de
-Fresnel, y por eso no es solo una elección elegante: frente al campo libre a
-100 Hz a 2, 5 y 8 km el error en $|p|$ es de $7,5\times10^{-5}$ con esa
-anchura, de $2,7\times10^{-2}$ con la quinta parte de ella y de
-$4,1\times10^{-2}$ con quince veces. La banda de 10 a 50 longitudes de onda del
-libro y un cuarto de la profundidad de la columna lo acotan, y el límite del
-canal tiene la última palabra. Ese último tope es además donde peor está este
-valor por defecto, y la razón que se daba para él no sobrevive a la medida: lo
-que decía proteger, la contabilidad que pliega un rayo reflejado de vuelta a la
-columna, ya lo restituye la escalera de imágenes del receptor. En aguas someras
-cuesta unos decibelios de nivel en vez de comprar nada, que es el cuarto límite
-de más abajo.
+es más afilado que una regla empírica, y es una anchura por cada ángulo de
+lanzamiento en vez de una por corrida. En aguas abiertas el §3.5.1 hace la
+optimización de forma explícita: derivar la anchura en espacio libre de la
+Ec. (3.86) respecto del desplazamiento complejo da
+$W_0 = \sqrt{\lambda\,r_{\max}/\pi}$, la anchura que mejor resuelve el campo
+en el extremo lejano del recorrido, que es donde peor se resuelve. Es también
+donde la integral en ángulo de lanzamiento que hay detrás de la Ec. (3.92) es
+una gaussiana de verdad y no una integral de Fresnel, y por eso no es solo una
+elección elegante: frente al campo libre a 100 Hz a 2, 5 y 8 km el error en
+$|p|$ es de $7,5\times10^{-5}$ con esa anchura, de $2,7\times10^{-2}$ con la
+quinta parte de ella y de $4,1\times10^{-2}$ con quince veces. Un canal somero
+añade encima su propia exigencia: su campo atrapado es un conjunto discreto de
+modos separados $\lambda/(2D)$ en el seno del ángulo de lanzamiento, y un haz
+mezcla ángulos de lanzamiento sobre su divergencia de campo lejano
+$\lambda/(\pi W_0)$, así que resolver los modos vecinos hasta la mitad de su
+separación pide $W_0 \ge 4D\cos\theta_0/\pi$: una anchura por cada ángulo de
+lanzamiento, máxima para los haces tendidos, cuyos modos se agolpan, y
+relajada por el coseno para los inclinados, con la huella vertical de todos
+los haces en el mismo $4D/\pi$. El valor por defecto toma el mayor de los dos,
+dentro de la banda de 10 a 50 longitudes de onda del libro, y entrega a todo
+el abanico el óptimo de espacio libre cuando el canal es demasiado profundo en
+longitudes de onda para que la anchura de guía quepa en la banda. Una versión
+anterior, en cambio, *acotaba* $W_0$ a un cuarto de la profundidad de la
+columna, leyendo el «no grandes en comparación con la profundidad del agua»
+del libro como un techo sobre la anchura y no sobre la huella; lo que ese tope
+decía proteger, la contabilidad que pliega un rayo reflejado de vuelta a la
+columna, ya lo restituye la escalera de imágenes del receptor, y en aguas
+someras costaba en silencio decibelios de nivel, siempre hacia lo demasiado
+flojo. Las medidas están dos párrafos más abajo, tope contra valor por
+defecto sobre los mismos oráculos exactos.
 
 **Contra qué está validado.** La divergencia esférica en campo libre, hasta
 $10^{-3}$ dB, que es la única comparación que fija a la vez la normalización de
 la amplitud y el convenio de fase; el campo de dos rayos del espejo de Lloyd
 con una reflexión en superficie, hasta 0,01 dB; y la suma de fuentes imagen de
 la guía de ondas ideal de presión nula, hasta 0,0004 dB con el abanico abierto
-a 88 grados. Esa misma guía desarrollada sobre sus modos en vez de sobre sus
+a 88 grados. Sobre un lecho disipativo la misma red de imágenes lleva
+$\mathcal{R}(\theta)^n$ al ángulo en forma cerrada de cada imagen, y los
+haces la siguen hasta 0,07 dB en el peor caso a ambos lados del ángulo
+crítico. Esa misma guía desarrollada sobre sus modos en vez de sobre sus
 imágenes (Ec. 5.13) es una segunda forma cerrada de un mismo campo exacto, y
 concuerda hasta 0,03 dB *y* $8\times10^{-4}$ rad: es la comparación que alcanza
 la fase absoluta, y pone a los haces en el mismo plano en el que ya se sostienen
@@ -529,14 +703,104 @@ ninguna de las otras hace, porque en un canal isovelocidad $c''$ se anula y se
 lleva consigo el coeficiente de acoplamiento de las ecuaciones dinámicas de
 rayos: el perfil $n^2$-lineal de la Ec. (3.77) tiene $k^2(z)$ exactamente lineal,
 así que sus modos son funciones de Airy con autovalores en forma cerrada, y los
-haces los siguen hasta 0,22 dB en media. Las dos condiciones de contorno salen
+haces, con su anchura por ángulo por defecto, los siguen hasta +0,19 dB en
+media en 200 m de agua a 200 Hz y hasta +0,39 dB en una segunda guía
+independiente de 100 m a 250 Hz. Esos dos cortes son además la medida que
+retiró el viejo tope de un cuarto de la profundidad, que sobre esos mismos
+oráculos salía +3,08 y +4,12 dB demasiado flojo. Las dos condiciones de contorno salen
 de la propia suma de haces en vez de imponerse: el campo en una superficie o un
 fondo de presión nula es 3 partes en $10^5$ de su valor a media columna, y un
 fondo rígido lo duplica.
 
-**Dónde se acaba.** Cinco límites, en el orden en que aprietan.
+**La absorción de volumen del agua** está desactivada por defecto, así que todos
+los números de arriba se midieron sin ella y siguen siendo reproducibles tal
+cual están impresos; el precio es que el nivel más allá de unos kilómetros a
+frecuencias de sonar resulta optimista. Pasar `absorption`
+(`"francois-garrison"`, `"ainslie-mccolm"` o `"thorp"`, o un
+`VolumeAbsorption` que nombra su propia agua; los mismos nombres,
+argumentos y valores por defecto que
+[`seawater_absorption`](/phonometry/es/underwater/underwater-propagation/#perdida-de-propagacion))
+multiplica cada haz por $e^{-\alpha s}$ con $s$ la **longitud de arco a lo
+largo de su rayo central**, que es la §3.6.2 de Jensen tal como está impresa:
+perturbar la eikonal con la velocidad del sonido compleja que implica una
+pérdida de volumen deja en pie los rayos reales y cuelga de cada uno el factor
+$e^{-\int_0^s \alpha\,ds'}$ (Ec. 3.116). No es $\alpha r$ sobre la distancia
+horizontal, el atajo que la misma sección señala que «se usa en muchos modelos
+de rayos»: un trayecto a 60° es el doble de largo que la distancia que cubre,
+y los rebotes múltiples más inclinados de una guía de ondas son exactamente
+las llegadas que la absorción tiene que drenar. El integrador de rayos
+acumula $s$ con las mismas etapas Runge-Kutta que colocan el rayo
+($ds/dr = 1/(\xi c)$),
+`ray_trace` la expone por rayo como `arc_lengths`, y el coeficiente, un solo
+$\alpha$ por ejecución evaluado a la frecuencia y la profundidad de la fuente,
+queda registrado en el resultado como `absorption_coefficient`.
 
-- **No hay campo cercano**, y este es el mayor error de los cinco. La
+**Un lecho marino disipativo** es la otra pérdida que el valor por defecto
+deja fuera, y en aguas someras la dominante: un fondo perfecto devuelve
+intactos todos los múltiples inclinados, cuando lo que el lecho se queda es
+lo que más pesa en la pérdida de propagación real en aguas someras. Pasar
+un `FluidSeabed` como `bottom` (la misma descripción fluida que acepta
+[`seabed_reflection`](/phonometry/es/underwater/underwater-propagation/#pérdida-por-reflexión-en-el-fondo),
+con `water_density` para el agua de encima) sustituye el reflector perfecto
+por el
+coeficiente de Rayleigh al ángulo rasante propio de cada haz: cada toque en
+el fondo multiplica la amplitud compleja del haz por $\mathcal{R}$, módulo y
+fase a la vez (Jensen §3.6.3, Ecs. 3.125-3.126). La fase no es un refinamiento
+prescindible: por debajo del ángulo crítico $|\mathcal{R}| = 1$ y *solo* la
+fase distingue el lecho disipativo de uno perfecto, y desplaza las franjas de
+interferencia de todos los trayectos que tocan el fondo. El ángulo al que se
+tasa cada haz es el que fija el invariante de Snell en el fondo,
+$\cos\theta = \xi\,c(D)$, el mismo en todos sus toques haga lo que haga el
+perfil de encima entre medias, así que su coeficiente se evalúa una sola
+vez, exacto, y se eleva al recuento de toques en el fondo del integrador;
+`ray_trace` expone esos recuentos por contorno junto a sus longitudes de
+arco, que es todo lo que una amplitud necesita de la geometría. Validado
+contra la red de imágenes con $\mathcal{R}(\theta)^n$ al ángulo en forma
+cerrada de cada imagen: 0,07 dB en el peor caso en distancias cuyas imágenes
+dominantes caen por encima y por debajo del ángulo crítico, donde despojar a
+la $\mathcal{R}$ del oráculo de su fase lo mueve 5,7 dB.
+
+**El fondo también puede inclinarse aquí**: el mismo par `bathymetry` que
+toma `ray_trace` (sección 3)
+pone el rayo central de cada haz sobre la frontera facetada, y el par
+dinámico cruza cada rebote en pendiente con el impulso de reflexión de las
+Ecs. (3.122)-(3.123) evaluado en la faceta local. Dos de los dispositivos de
+la guía horizontal se generalizan con él, cada uno con su coste declarado.
+La escalera de imágenes del receptor pliega cada columna de receptores
+sobre su propia faceta — profundidad *e* inclinación, porque un plano de
+plegado equivocado en la inclinación de la faceta desplaza una imagen del
+primer pliegue metros frente a una longitud de onda — de modo que la pila
+vertical de espejos se convierte en el abanico diédrico en torno al vértice
+local, exacto para una sola faceta; a pendiente cero es la escalera
+horizontal bit a bit, cosa que un test deja clavada. Y los peldaños
+envueltos del abanico dejan que las colas analíticas de los haces lleven las
+llegadas que ningún eje integrado puede: un camino que subió la pendiente,
+se empinó más allá de la vertical y volvió es un peldaño envuelto, analítico
+en vez de integrado. El propio haz, una vez empinado más allá de la
+vertical, se termina en ese rebote con su peso a cero — una suma que avanza
+en distancia conserva solo lo que aún viaja hacia delante, exactamente igual
+que la ecuación parabólica de un solo sentido no conserva retrodispersión —
+y una cola no se acepta más allá de dos extensiones de la marcha desde su
+muestra, porque más allá estaría poniendo precio a geometría de cuña que la
+polilínea nunca describió (medido: hasta 11 dB de campo inventado sobre un
+fondo inclinado al que ningún haz llega siquiera, 0,001 dB con el
+presupuesto en su sitio). Validado contra la **cuña ideal**, que tiene
+solución exacta por imágenes — un abanico de $2\pi/\beta$ fuentes imagen
+con signo sobre una circunferencia en torno al vértice, construido en el
+test con geometría pura y probado contra las dos condiciones de contorno
+antes de juzgar: un solo rebote de faceta a 0,05 dB, y a 1,85 dB en el peor
+caso / 0,67 dB en media del campo *completo* a través de una cuña fina de
+2,8° en la que cada celda es multitrayecto denso, la mayor parte llegadas
+cerca de su propio punto de giro, números que se mueven en el cuarto
+decimal al partir en dos el paso de distancia. El lecho fluido disipativo
+de arriba no puede combinarse con una pendiente — un ángulo rasante por haz
+es un hecho de fondo horizontal, y el método se niega a fingir lo
+contrario — así que una pasada en pendiente toma los reflectores perfectos
+de `bottom`.
+
+**Dónde se acaba.** Cuatro límites, en el orden en que aprietan.
+
+- **No hay campo cercano**, y este es el mayor error de los cuatro. La
   Ec. (3.92) pesa el abanico ajustándolo a una fuente puntual en campo lejano,
   y la Ec. (3.88) divide por una distancia cilíndrica que se anula sobre el eje
   del que sale cada rayo, así que de cerca la suma no tiene a qué converger. La
@@ -545,21 +809,26 @@ fondo rígido lo duplica.
   medio no acotado es de 17, 13 y 4,1 dB con un cuarto de $W_0$, de unos 0,6 dB
   con $W_0$, de una centésima de decibelio con $2,5\,W_0$ y de una milésima a
   partir de $3\,W_0$. No leas nada dentro de unas tres anchuras de haz de la
-  fuente, y ten en cuenta que, como el $W_0$ por defecto crece como
-  $\sqrt{r_{\max}}$, un recorrido más largo aleja aún más esa frontera. De
-  cerca, usa `parabolic_equation`.
+  fuente, y ten en cuenta que, como la anchura de espacio libre del valor por
+  defecto crece como $\sqrt{r_{\max}}$, un recorrido más largo aleja aún más
+  esa frontera. De cerca, usa `parabolic_equation`.
 - **El régimen propio de la teoría de rayos** (Jensen §3.4.2): «la longitud de
   onda debería ser sustancialmente menor que cualquier escala física del
   problema». Es el límite que más aprieta y el que mejor esconde una respuesta
-  de aspecto verosímil. A 20 Hz en 100 m de agua la profundidad son 1,3
-  longitudes de onda, se propagan dos modos y el tope de un cuarto de la
-  profundidad deja un haz de un tercio de longitud de onda de ancho: frente a
-  la suma de fuentes imagen, de 200 m a 5 km la pérdida sale entre 2 y 8 dB
-  alta, y se mueve decibelios al abrir el abanico o al multiplicar por 150 el
-  número de haces, así que no hay nada a lo que esté convergiendo. Lee los
-  haces por encima de unos cientos de hercios en aguas someras, y usa
-  `normal_modes` por debajo, donde dos modos son la respuesta exacta.
-- **El abanico está truncado** en `max_angle_deg`, y una guía de ondas con dos
+  de aspecto verosímil, y una versión anterior de este punto le achacó un
+  error que en realidad era del tope de anchura: a 20 Hz en 100 m de agua,
+  donde la profundidad son 1,3 longitudes de onda y se propagan dos modos, el
+  haz acotado quedaba en un tercio de longitud de onda de ancho y la pérdida
+  salía decibelios alta frente a la suma de fuentes imagen. Retirado el tope,
+  la misma guía queda a 0,03 dB de esa suma con la anchura por defecto. El
+  aprobado es más estrecho de lo que parece: una columna isovelocidad entre
+  reflectores perfectos es pura geometría, que las imágenes plegadas del
+  receptor reproducen exactamente a cualquier frecuencia, así que no dice nada
+  de un canal por el que el campo de baja frecuencia de verdad refracta. Ahí
+  `normal_modes` sigue siendo el método en el que confiar, exacto al precio de
+  un puñado de modos.
+- **El abanico está truncado** en el `max_angle_deg` del abanico, y una guía
+  de ondas con dos
   contornos perfectamente reflectantes es el peor caso posible para eso, porque
   nada salvo $1/R$ atenúa los rebotes múltiples más inclinados. En la guía ideal
   de 1000 m a 300 Hz, frente a la suma de fuentes imagen a 2, 5 y 10 km: 0,27,
@@ -567,23 +836,11 @@ fondo rígido lo duplica.
   0,0004 dB al abrir el abanico a 88 grados. Recortar el *oráculo* al mismo
   semiángulo lo mueve 0,25, 3,95 y 2,31 dB, así que esto es el abanico y no el
   método. Un fondo real y
-  disipativo absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
+  disipativo (el `FluidSeabed` de más arriba)
+  absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
   el abanico obliga a recortar `range_step` con él, porque un paso tiene que
   resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
   distancia; el método avisa cuando ese emparejamiento está mal.
-- **La anchura del haz la acota el canal**, y en aguas someras ese tope, y no
-  el método, es el mayor error que queda. Mantiene $W_0$ en un cuarto de la
-  profundidad de la columna cuando el óptimo de más arriba es varias veces
-  mayor, y el campo sale entonces sistemáticamente demasiado flojo. Frente a los
-  modos de Airy exactos de una guía $n^2$-lineal de 200 m a 200 Hz, promediando
-  en energía de 0,5 a 4 km: los 50 m por defecto dan +3,08 dB en media y
-  +5,86 dB en el peor caso, mientras que 100, 150 y 200 m dan +1,13, +0,26 y
-  -0,22 dB. Ahí no hay nada mal con la refracción. El mismo perfil en 1000 m de
-  agua, donde el tope no aprieta, sale a +0,72 dB con 1,37 dB en el peor tramo,
-  más cerca del campo exacto que `normal_modes` en el mismo corte. Pasa
-  `beam_width` a mano, por encima del tope y hasta más o menos la profundidad
-  del agua, cuando el canal es somero y el perfil refracta; el aviso que eso
-  levanta es el precio esperado de la respuesta mejor.
 - **La sombra lejana tiene suelo.** Cada haz se suma hasta cuatro semianchuras,
   140 dB por debajo de su propio eje, así que un receptor al que ningún haz del
   abanico se acerque tanto recibe exactamente cero y una pérdida infinita. Esa
@@ -754,7 +1011,8 @@ y el valor por defecto toma cuatro veces ese margen. Un abanico demasiado basto
 no se lee como un nivel equivocado sino como un rizado periódico en distancia al
 paso de los haces, fácil de confundir con interferencia física. `beam_width` es
 el $W_0$ de la sección 4, cuyo valor por defecto es el óptimo solo donde el
-canal no lo recorta, así que en aguas someras pásalo explícitamente. Y abrir
+canal no lo recorta, así que en aguas someras pásalo explícitamente. Los tres
+viajan juntos como el `BeamFan` que toma el método. Y abrir
 `max_angle_deg` obliga a recortar `range_step` con él, porque un paso tiene que
 resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
 distancia.
@@ -830,8 +1088,8 @@ cap. 1):
 
 | Método | Régimen natural | Qué aporta |
 |---|---|---|
-| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, tiempos de propagación, zonas de convergencia; coste independiente de la frecuencia, y ninguna amplitud |
-| `gaussian_beams` | Alta frecuencia, siempre que de los rayos haga falta un *nivel* | Esa misma geometría convertida en PL($z$,$r$): finita en las cáusticas, graduada en las zonas de sombra y, como los rayos sobre los que se apoya, con un coste que no crece con la frecuencia |
+| `ray_trace` | Alta frecuencia (profundidad ≫ λ), océano profundo | Geometría de los caminos de rayos, profundidades de giro, tiempos de propagación, zonas de convergencia, sobre fondo horizontal o en pendiente; coste independiente de la frecuencia, y ninguna amplitud |
+| `gaussian_beams` | Alta frecuencia, siempre que de los rayos haga falta un *nivel* | Esa misma geometría convertida en PL($z$,$r$): finita en las cáusticas, graduada en las zonas de sombra, fondo en pendiente incluido y, como los rayos sobre los que se apoya, con un coste que no crece con la frecuencia |
 | `normal_modes` | Baja frecuencia, aguas someras, independiente de la distancia | Suma modal por diferencias finitas con pocos modos propagantes ($M \approx kD/\pi$); la solución de referencia en su régimen, validada frente a los modos exactos de la guía de ondas ideal |
 | `parabolic_equation` | Baja frecuencia, caminos largos de un solo sentido | PL($z$,$r$) de campo completo con refracción, avanzada en distancia sobre el $c(z)$ independiente de la distancia que suponen los cuatro métodos |
 
@@ -950,25 +1208,41 @@ rayos (cap. 3, Ecs. 3.23-3.24), la suma de haces gaussianos construida sobre
 ella (cap. 3, §3.5, Ecs. 3.88-3.92) y la PE estándar split-step de Fourier (cap.
 6), con la terminología de la ISO 18405:2017 en toda la página. `ray_trace`
 devuelve además el tiempo de propagación de cada rayo, integrado como un
-tercer estado del mismo paso Runge-Kutta. Cada uno está validado contra una
+tercer estado del mismo paso Runge-Kutta, y `eigenrays` busca en un abanico
+trazado las llegadas que unen una fuente con un receptor, cada una refinada
+por bisección sobre trazados nuevos y cargada con la amplitud clásica de rayo
+de la Ec. (3.65) con las fases de contorno y de cáustica en el registro
+(Ecs. 3.79, 3.125-3.126). `ray_trace` y `gaussian_beams` aceptan además un
+perfil de fondo lineal a trozos, la frontera facetada del cap. 3, que
+refleja cada rayo sobre la faceta local (Ec. 3.121) con el par dinámico
+cruzando el rebote según las Ecs. (3.122)-(3.123). Cada uno está validado contra una
 forma cerrada exacta: los modos de la guía de ondas ideal de presión nula y su
-suma de fuentes imagen, los
+suma de fuentes imagen (para los eigenrayos, la lista completa de llegadas de
+esa red: tiempo, ángulo, contadores y amplitud por imagen), los
 rayos en arco de círculo de un gradiente lineal junto con el tiempo de
-propagación publicado a lo largo de ellos (Medwin y Clay 1998, Ec. (3.3.20)) y
-la divergencia esférica en campo libre, más la coincidencia mutua de la
-pérdida de propagación modal y de la PE.
+propagación publicado a lo largo de ellos (Medwin y Clay 1998, Ec. (3.3.20)),
+la divergencia esférica en campo libre y, para el fondo en pendiente, el
+abanico cerrado exacto de imágenes de la cuña ideal, más la coincidencia
+mutua de la pérdida de propagación modal y de la PE.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="No cubierto">
 Los cuatro métodos suponen una columna de agua independiente de la distancia
-con un contorno de presión nula (o, para los modos y los haces, opcionalmente
-rígido): no hay
-fondo absorbente ni elástico, ni atenuación del sedimento, ni batimetría real,
-así que los problemas dependientes de la distancia quedan fuera de alcance. El
-trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes, y
-nada busca los eigenrayos que unen una fuente y un receptor dados:
-`gaussian_beams` es lo que da un nivel, y lo hace sumando haces en vez de
-buscando rayos. Su alternativa de haces geométricos (cap. 3, §3.3.5.5) con el
+con superficie de presión nula, y el fondo es un reflector perfecto por
+defecto, de presión nula o (para los modos y los haces) rígido. Los haces
+pueden cambiarlo por el lecho fluido disipativo del modelo de Rayleigh (solo
+con fondo horizontal), y los dos métodos basados en rayos pueden inclinar el
+fondo con un perfil de profundidad lineal a trozos, que es la única
+dependencia de la distancia que hay: una columna de agua dependiente de la
+distancia $c(r,z)$ queda excluida deliberadamente, porque la frontera en
+pendiente tiene un oráculo exacto (el abanico cerrado de imágenes de la cuña
+ideal) y $c(r,z)$ no tiene ninguno. No hay fondo elástico ni atenuación del
+sedimento. El
+trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes; el
+nivel por camino pertenece a `eigenrays`, cuya lista de llegadas es teoría de
+rayos clásica y diverge honestamente para un receptor plantado sobre una
+cáustica, mientras que `gaussian_beams` es lo que da un campo finito, sumando
+haces en vez de buscando rayos. Su alternativa de haces geométricos (cap. 3, §3.3.5.5) con el
 índice KMAH y el suelo de anchura de Weinberg-Keenan no está implementada. La
 PE es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
 angular de Padé. Para la física del lecho elástico que estos métodos fluidos
@@ -1002,7 +1276,9 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
 alta frecuencia y océano profundo (geometría de los caminos de rayos, tiempos
 de propagación y zonas de convergencia a un coste independiente de la
-frecuencia, y ningún nivel), haces gaussianos cuando de esa misma geometría de
+frecuencia, sobre fondo horizontal o en pendiente, más, a través de
+`eigenrays`, la lista de llegadas por receptor),
+haces gaussianos cuando de esa misma geometría de
 alta frecuencia haga falta un nivel (el campo PL($z$,$r$), finito en las
 cáusticas y graduado en las zonas de sombra), modos normales para baja
 frecuencia en aguas someras (pocos modos

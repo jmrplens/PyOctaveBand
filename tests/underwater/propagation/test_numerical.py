@@ -206,6 +206,55 @@ def test_ray_travel_time_constant_profile_is_range_over_speed() -> None:
                        rtol=0.0, atol=1e-12)
 
 
+# --- Ray arc lengths --------------------------------------------------------
+
+
+def test_ray_arc_length_constant_profile_is_range_over_cosine() -> None:
+    # The straight ray's own geometry: r/cos(theta0) of path to cover r of
+    # range. The integrand 1/(xi c) is constant, so this is exact and the
+    # tolerance is accumulation arithmetic.
+    res = ray_trace(*_ISO, source_depth=50.0, launch_angles_deg=[0.0, 20.0],
+                    max_range=1500.0, n_steps=2000)
+    r = res.ranges[0]
+    assert res.arc_lengths.shape == res.depths.shape
+    assert res.arc_lengths[0, 0] == 0.0
+    assert np.allclose(res.arc_lengths[0], r, rtol=0.0, atol=1e-9)
+    assert np.allclose(res.arc_lengths[1], r / np.cos(np.radians(20.0)),
+                       rtol=0.0, atol=1e-9)
+
+
+def test_ray_arc_length_matches_the_circular_arc_through_the_turn() -> None:
+    r"""Arc length against the circular-arc closed form, through a turning point.
+
+    In a layer of constant gradient the ray is an arc of a circle of radius
+    :math:`R = 1/(\xi g)` (the geometry test above pins that radius from the
+    traced path), and Snell's law makes the sine of the local angle fall
+    linearly in range, :math:`\sin\theta_2 = \sin\theta_1 - \xi g r` (Medwin &
+    Clay 1998, Eq. (3.3.21) in this library's variables, as derived over the
+    travel-time table). The length of a circular arc is its radius times the
+    angle it subtends, so
+
+    .. math::
+
+        s(r) = \frac{\theta_1 - \arcsin(\sin\theta_1 - \xi g r)}{\xi g},
+
+    valid straight through the turning point, where the arcsin argument changes
+    sign. Every quantity on the right is launch data, so the oracle shares
+    nothing with the marcher's fourth state.
+    """
+    prof = (np.array([0.0, 2000.0]),
+            np.array([_MEDWIN_C0, _MEDWIN_C0 + _MEDWIN_G * 2000.0]))
+    th0 = np.radians(10.0)
+    res = ray_trace(*prof, source_depth=0.0, launch_angles_deg=[10.0],
+                    max_range=10_000.0, n_steps=20_001)
+    xi = np.cos(th0) / _MEDWIN_C0
+    r = res.ranges[0]
+    exact = (th0 - np.arcsin(np.sin(th0) - xi * _MEDWIN_G * r)) / (xi * _MEDWIN_G)
+    # The turn is at 5289.8 m, well inside the run, so both branches are hit.
+    assert exact[-1] > 10_000.0
+    assert np.abs(res.arc_lengths[0] - exact).max() < 1e-6
+
+
 # A ray steep enough to reach the bottom before it turns (it would only turn at
 # 4098 m, five times the column), launched deep enough to work both boundaries.
 _BOUNCE_C0, _BOUNCE_G = 1500.0, 0.06  # c(z) = 1500 + 0.06 z
@@ -309,6 +358,53 @@ def test_ray_travel_time_survives_reflections() -> None:
                     max_range=5000.0, n_steps=3000)
     assert res.travel_times[0, -1] == pytest.approx(
         5000.0 / (1500.0 * np.cos(np.radians(60.0))), rel=1e-9)
+
+
+def test_ray_reflection_counts_match_the_folded_geometry() -> None:
+    r"""The cumulative bounce counts against the unfolded straight line, exactly.
+
+    In isovelocity water the unfolded ray is the straight line
+    :math:`u(r) = z_\mathrm{s} + r\tan\theta_0`, and folding it back into the
+    column touches the bottom wherever :math:`u` crosses an odd multiple of
+    the depth :math:`D` and the surface wherever it crosses a nonzero even
+    one, so both counts are floors of closed forms and the *whole history*
+    can be asserted rather than a final total. An upward launch is the mirror
+    :math:`z \mapsto D - z` of a downward one, which swaps the two boundaries
+    and nothing else, so the same two formulas serve it with the source
+    mirrored and the labels exchanged; that exchange is asserted too, because
+    the labels are the point. The counts are what make a boundary coefficient
+    usable downstream: every bottom touch of one ray arrives at one grazing
+    angle (Snell's invariant fixes the crossing angle per depth), so any
+    :math:`R(\theta)` enters a path's amplitude only as :math:`R^n` with the
+    :math:`n` recorded here, per boundary because the surface's coefficient
+    is not the seabed's.
+    """
+    zs, theta = 30.0, 35.0
+    depth = float(_ISO[0][-1])
+    res = ray_trace(*_ISO, source_depth=zs, launch_angles_deg=[theta, -theta],
+                    max_range=1000.0, n_steps=2001)
+    climb = res.ranges[0] * np.tan(np.radians(theta))
+    down_bottom = np.floor((zs + climb + depth) / (2.0 * depth)).astype(int)
+    down_surface = np.floor((zs + climb) / (2.0 * depth)).astype(int)
+    up_surface = np.floor((depth - zs + climb + depth) / (2.0 * depth)).astype(int)
+    up_bottom = np.floor((depth - zs + climb) / (2.0 * depth)).astype(int)
+
+    assert res.surface_reflections.shape == res.depths.shape
+    assert res.bottom_reflections.shape == res.depths.shape
+    np.testing.assert_array_equal(res.bottom_reflections[0], down_bottom)
+    np.testing.assert_array_equal(res.surface_reflections[0], down_surface)
+    np.testing.assert_array_equal(res.surface_reflections[1], up_surface)
+    np.testing.assert_array_equal(res.bottom_reflections[1], up_bottom)
+    # Zero at the source, only ever growing, and a total that means the ray
+    # really worked both walls: 4 + 3 down, 4 + 3 up with the labels swapped.
+    assert res.bottom_reflections[0, 0] == 0
+    assert res.surface_reflections[0, 0] == 0
+    assert res.bottom_reflections[0, -1] == 4
+    assert res.surface_reflections[0, -1] == 3
+    assert res.surface_reflections[1, -1] == 4
+    assert res.bottom_reflections[1, -1] == 3
+    assert np.all(np.diff(res.bottom_reflections, axis=1) >= 0)
+    assert np.all(np.diff(res.surface_reflections, axis=1) >= 0)
 
 
 def test_ray_travel_time_increases_monotonically_along_every_ray() -> None:

@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     )
     from ..underwater.propagation.closed_form import PropagationLossResult
     from ..underwater.propagation.numerical import (
+        EigenrayResult,
         GaussianBeamResult,
         NormalModeResult,
         ParabolicEquationResult,
@@ -116,7 +117,13 @@ _STRINGS: dict[str, str] = {
     "Range [km]": "Distancia [km]",
     "Normal-mode propagation loss": "Pérdida de propagación por modos normales",
     "Source": "Fuente",
+    "Seabed": "Fondo marino",
     "Ray trace": "Trazado de rayos",
+    "Eigenray arrivals": "Llegadas de eigenrayos",
+    "Travel time [s]": "Tiempo de propagación [s]",
+    "Boundary reflections": "Reflexiones en los contornos",
+    "Reflected paths": "Trayectos reflejados",
+    "Refracted or direct": "Refractados o directos",
     "Parabolic-equation propagation loss": "Pérdida de propagación por ecuación parabólica",
     "Gaussian beam propagation loss": "Pérdida de propagación por haces gaussianos",
     "Weston regimes": "Regímenes de Weston",
@@ -533,6 +540,7 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     z = np.asarray(result.depths, dtype=np.float64)
     for i in range(r.shape[0]):
         ax.plot(r[i] / 1000.0, z[i], **{"color": _C_PRIMARY, "lw": 0.7, "alpha": 0.7, **kwargs})
+    _draw_bathymetry(ax, result, float(np.max(r)), language, labelled=True)
     ax.plot([0.0], [result.source_depth], "o", color=_C_REFERENCE, label=_t("Source", language))
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
     ax.set_ylabel(_t(_DEPTH_LABEL, language))
@@ -543,6 +551,90 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     ax.legend(loc=_LEGEND_LOWER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
+
+def _draw_bathymetry(
+    ax: Axes, result: Any, r_max: float, language: str, *, labelled: bool,
+) -> None:
+    """Draw the bottom polyline of a sloping-bathymetry result, if it has one.
+
+    The polyline continues level past its last node, exactly as the solvers
+    clamp it, so the drawn line is the boundary the rays actually reflected
+    off rather than a segment that stops mid-picture.
+    """
+    br = getattr(result, "bathymetry_ranges", None)
+    bd = getattr(result, "bathymetry_depths", None)
+    if br is None or bd is None:
+        return
+    br = np.asarray(br, dtype=np.float64)
+    bd = np.asarray(bd, dtype=np.float64)
+    if br[-1] < r_max:
+        br = np.append(br, r_max)
+        bd = np.append(bd, bd[-1])
+    label = _t("Seabed", language) if labelled else None
+    ax.plot(br / 1000.0, bd, color=_C_SECONDARY, lw=1.4, label=label)
+
+
+def plot_eigenrays(
+    result: EigenrayResult, ax: Axes | None = None, *, language: str = "en",
+    **kwargs: Any
+) -> Axes:
+    """Arrival structure of the eigenrays: per-path loss stems against delay.
+
+    Each eigenray is a stem at its travel time whose head sits at the
+    propagation loss of that single path (``-20 lg|a|``, increasing downward
+    like every loss axis of the domain), so the picture is the channel's
+    impulse-response skeleton: the refracted or direct paths (no boundary
+    touches) in the primary colour, the reflected multipath coloured by its
+    total count of boundary touches, which is what separates the arrival
+    families the way Jensen Fig. 3.7 colours its eigenrays.
+
+    :param result: An
+        :class:`~phonometry.underwater.propagation.numerical.EigenrayResult`.
+    :param ax: Existing axes, or ``None`` to create a figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to the direct/refracted marker ``plot`` call.
+    :return: The axes.
+    """
+    from .._i18n import localize_axes
+
+    ax = ax if ax is not None else _new_axes()
+    t = np.asarray(result.travel_times, dtype=np.float64)
+    amp = np.abs(np.asarray(result.amplitudes))
+    tiny = np.finfo(np.float64).tiny
+    loss = -20.0 * np.log10(np.maximum(amp, tiny))
+    bounces = np.asarray(
+        result.surface_reflections + result.bottom_reflections, dtype=np.int_)
+    if t.size:
+        # Stems hang from the quiet end of the window (the axis is inverted
+        # below, so that end is the bottom of the picture).
+        base = float(loss.max()) + 6.0
+        direct = bounces == 0
+        reflected = ~direct
+        if np.any(reflected):
+            ax.vlines(t[reflected], base, loss[reflected], color=_C_MUTED,
+                      lw=0.6, alpha=0.6, zorder=2)
+            sc = ax.scatter(t[reflected], loss[reflected], c=bounces[reflected],
+                            cmap="viridis", s=16, zorder=3,
+                            label=_t("Reflected paths", language))
+            cbar = ax.figure.colorbar(sc, ax=ax, pad=0.02)
+            cbar.set_label(_t("Boundary reflections", language))
+        if np.any(direct):
+            ax.vlines(t[direct], base, loss[direct], color=_C_PRIMARY, lw=1.4,
+                      zorder=4)
+            ax.plot(t[direct], loss[direct], "o", color=_C_PRIMARY, ms=6,
+                    zorder=5, label=_t("Refracted or direct", language),
+                    **kwargs)
+        ax.set_ylim(base, float(loss.min()) - 3.0)
+        ax.legend(loc=_LEGEND_LOWER_RIGHT, fontsize="small")
+    elif not ax.yaxis_inverted():
+        ax.invert_yaxis()
+    ax.set_xlabel(_t("Travel time [s]", language))
+    ax.set_ylabel(_t(_PROPAGATION_LOSS_LABEL, language))
+    ax.set_title(_t("Eigenray arrivals", language))
+    ax.grid(True, alpha=0.3)
+    localize_axes(ax, language)
+    return ax
+
 
 def _plot_loss_field(
     ax: Axes | None, ranges: np.ndarray, depths: np.ndarray, pl: np.ndarray, *,
@@ -645,10 +737,13 @@ def plot_gaussian_beams(
     :param kwargs: Forwarded to ``imshow``.
     :return: The axes.
     """
-    return _plot_loss_field(
+    ax = _plot_loss_field(
         ax, result.ranges, result.depths, result.propagation_loss,
         title="Gaussian beam propagation loss", language=language,
         kwargs=kwargs)
+    _draw_bathymetry(ax, result, float(np.max(result.ranges)), language,
+                     labelled=False)
+    return ax
 
 
 def _plottable(levels: Any) -> np.ndarray:

@@ -1,6 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """
-Numerical models of underwater sound propagation (range-independent ocean).
+Numerical models of underwater sound propagation (range-independent water,
+with an optionally sloping bottom for the ray-based solvers).
 
 Four complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
@@ -15,6 +16,11 @@ propagation loss of :mod:`phonometry.underwater.propagation.closed_form`:
 * :func:`gaussian_beams` -- Gaussian beam tracing. Hangs a beam on each of those
   rays and sums them into a propagation-loss field, which is finite at a caustic
   and decays smoothly into a shadow zone where ray theory has nothing to say.
+* :func:`eigenrays` -- the arrival structure. Takes a traced fan and a receiver
+  and refines, by bisection on fresh traces, the rays that actually connect the
+  source to that receiver, each with its travel time, launch and arrival
+  angles, boundary-touch counts and classical complex amplitude: the list the
+  sonar equation, a channel impulse response and communications work consume.
 * :func:`parabolic_equation` -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the propagation-loss field.
 
@@ -23,11 +29,16 @@ All four are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 (Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24), the Gaussian
 beams of Sect. 3.5 (Eqs. 3.88-3.92) and the split-step Fourier PE (Ch. 6). They
 are validated against analytic oracles: the ideal (pressure-release) waveguide's
-exact modes and its image-source sum, the circular-arc ray paths of a linear
+exact modes and its image-source sum, that same image sum over a lossy fluid
+seabed with the Rayleigh coefficient of each image's own grazing angle raised
+to its count of bottom touches (Jensen Eq. 2.138 with Eq. 3.126 at every
+touch), the circular-arc ray paths of a linear
 sound-speed gradient together with the closed-form travel time along them
 (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press 1998,
-Eq. (3.3.20)), free-field spherical spreading, and mutual agreement of the PE
-and normal-mode propagation loss for a range-independent waveguide.
+Eq. (3.3.20)), free-field spherical spreading, mutual agreement of the PE
+and normal-mode propagation loss for a range-independent waveguide, and, for
+the sloping bottom the two ray-based solvers accept, the ideal wedge's exact
+image fan (the folded geometry to eleven digits, the beam field in dB).
 
 The three field solvers report the same quantity on the same terms, so their
 propagation losses can be laid side by side: ``normal_modes`` on a range slice
@@ -46,8 +57,10 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 
-from ..._internal.rays import DynamicRays, march_rays
+from ..._internal.rays import DynamicRays, SlopingBoundary, march_rays
 from ..._internal.validation import require_positive
+from .closed_form import _ABSORPTION_MODELS, _M_PER_KM, seawater_absorption
+from .seabed_reflection import reflection_coefficient
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -89,17 +102,131 @@ def _clean_profile(
     return z, c
 
 
+def _clean_bathymetry(
+    bathymetry: tuple[NDArray[np.float64] | list[float],
+                      NDArray[np.float64] | list[float]] | None,
+    z_prof: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
+    """One validated depth(r) polyline out of the node pair, or ``None``.
+
+    The polyline is clamped level beyond its last node (the same
+    :func:`numpy.interp` convention the sound-speed profile lives by), so it
+    need not reach ``max_range``; but it must start at ``r = 0`` so the water
+    column at the source is stated rather than extrapolated, and it may not
+    dive below the profile's last node, because the profile *is* the medium
+    and a bottom below it would put water where no sound speed was given.
+    """
+    if bathymetry is None:
+        return None
+    pair = tuple(bathymetry)
+    if len(pair) != 2 or pair[0] is None or pair[1] is None:
+        raise ValueError(
+            "'bathymetry' must be a (ranges_m, depths_m) pair of arrays.")
+    br = np.asarray(pair[0], dtype=np.float64).ravel()
+    bd = np.asarray(pair[1], dtype=np.float64).ravel()
+    if br.size < 2 or bd.shape != br.shape:
+        raise ValueError(
+            "the two halves of 'bathymetry' must be 1-D"
+            " arrays of equal length, at least two points.")
+    if not (np.all(np.isfinite(br)) and np.all(np.isfinite(bd))):
+        raise ValueError("the bathymetry must be finite.")
+    if np.any(np.diff(br) <= 0.0):
+        raise ValueError("the bathymetry ranges must be strictly increasing.")
+    if abs(float(br[0])) > 1e-9:
+        raise ValueError("the bathymetry must start at the source, r = 0.")
+    if np.any(bd <= 0.0):
+        raise ValueError(
+            "the bathymetry depths must be strictly positive: the wedge apex"
+            " itself, where the water ends, cannot carry a water column.")
+    if float(bd.max()) > float(z_prof[-1]) + 1e-9:
+        raise ValueError(
+            "the bathymetry depths must not run below the sound-speed"
+            " profile: the profile is the medium, so it must reach the"
+            " deepest point of the bottom.")
+    return br, bd
+
+
+@dataclass(frozen=True)
+class FluidSeabed:
+    r"""A lossy fluid seabed, passed as the ``bottom`` of a solver.
+
+    The fluid half-space of
+    :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+    under the water column: handing one to :func:`eigenrays` or
+    :func:`gaussian_beams` as ``bottom=`` replaces the perfect reflector with
+    the Rayleigh interface, and every bottom touch of a path is charged the
+    complex coefficient at the one grazing angle Snell's invariant fixes for
+    it. The water's own sound speed at the interface comes from the
+    sound-speed profile, so it is not repeated here.
+
+    :ivar density: Sediment density :math:`\rho_2`, in the same unit as
+        ``water_density`` (kg/m³ by convention; only the ratio enters).
+    :ivar sound_speed: Sediment sound speed :math:`c_2`, in m/s. A sediment
+        faster than the water at the bottom has a critical grazing angle,
+        below which the reflection is total in magnitude and lossy in phase
+        alone.
+    :ivar water_density: Water density :math:`\rho_1` above the seabed
+        (default 1000 kg/m³). It enters only through the impedance ratio,
+        the fields themselves being density-normalised already.
+    """
+
+    density: float
+    sound_speed: float
+    water_density: float = 1000.0
+
+
+def _resolve_boundary(
+    bottom: str | FluidSeabed,
+) -> tuple[str, tuple[float, float, float] | None]:
+    """One bottom description, whichever of its two forms the caller wrote.
+
+    ``bottom`` either names a perfect reflector or is the
+    :class:`FluidSeabed` of a lossy fluid half-space. Returns the validated
+    bottom key and the ``(water_density, sediment_density, sediment_speed)``
+    triple, or ``None`` for a perfect reflector. Shared by
+    :func:`gaussian_beams` and :func:`eigenrays`, which charge the same
+    coefficient to different carriers (a beam's running product there, an
+    arrival's amplitude here).
+    """
+    if isinstance(bottom, FluidSeabed):
+        return "pressure-release", (
+            require_positive(bottom.water_density, "water_density"),
+            require_positive(bottom.density, "density"),
+            require_positive(bottom.sound_speed, "sound_speed"))
+    key = bottom.strip().lower()
+    if key not in _BOTTOM_TYPES:
+        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
+    return key, None
+
+
+def _seabed_grazing_deg(
+    xi: NDArray[np.float64], c_bottom: float,
+) -> NDArray[np.float64]:
+    """The grazing angle Snell's invariant fixes at the seabed, in degrees.
+
+    :math:`\\cos\\varphi = \\xi\\,c(D)`: the same at every touch of one ray,
+    because the direction a ray crosses a depth with is set by the invariant
+    and not by how many times it has bounced. A ray that turns above the
+    seabed has :math:`\\xi\\,c(D) > 1` (clipped to a grazing angle of zero);
+    its bottom count stays zero, so the coefficient it never earned is never
+    applied.
+    """
+    return np.asarray(np.degrees(np.arccos(np.clip(xi * c_bottom, 0.0, 1.0))))
+
+
 def _ocean_ray_derivative(
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    xi: NDArray[np.float64],
 ) -> RayDerivative:
     r"""The ocean's ray equations in range, vectorised over rays.
 
     March in range :math:`r` (not arc length): every valid ray then spans
     ``[0, max_range]`` in the same number of steps regardless of its launch
-    angle. The state is :math:`(z, \zeta, t)` and
+    angle. The state is :math:`(z, \zeta, t, s)` and
     :math:`\xi = \cos\theta_0/c(z_\mathrm{s})` is invariant for a
-    range-independent :math:`c(z)`, so from
+    range-independent :math:`c(z)` between boundary reflections, which is why
+    the marcher passes it in per call rather than letting this closure freeze
+    it: a level boundary never touches it, and a sloping one rotates it at
+    each bounce (see :mod:`phonometry._internal.rays`). From
     :math:`dz/ds`, :math:`d\zeta/ds`, :math:`dt/ds = 1/c` and
     :math:`dr/ds = c\,\xi`,
 
@@ -107,13 +234,17 @@ def _ocean_ray_derivative(
 
         \frac{dz}{dr} = \frac{\zeta}{\xi}, \qquad
         \frac{d\zeta}{dr} = -\frac{dc/dz}{c^3 \xi}, \qquad
-        \frac{dt}{dr} = \frac{1}{\xi c^2} .
+        \frac{dt}{dr} = \frac{1}{\xi c^2}, \qquad
+        \frac{ds}{dr} = \frac{1}{\xi c} .
 
     The time shares the sound speed the other two derivatives already need, so
     carrying it costs one multiply per stage and inherits the Runge-Kutta order:
     at the default step it reproduces the linear-gradient closed form to
     ~1e-14 s, where accumulating :math:`dr/(\xi c^2)` over the finished path
-    would be first order.
+    would be first order. The arc length rides along on the same argument, and
+    is kept as its own expression rather than derived from the time's, so that
+    the three states already there come out bit for bit what they were before
+    it existed.
 
     The profile is piecewise linear, so :math:`c(z)` interpolates exactly and
     :math:`dc/dz` is piecewise *constant* with jumps at the nodes; evaluating
@@ -126,14 +257,17 @@ def _ocean_ray_derivative(
     seg_grad = np.diff(c_prof) / np.diff(z_prof)
 
     def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
+        xi_arr: NDArray[np.float64], /
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
+               NDArray[np.float64]]:
         cc = np.interp(z_arr, z_prof, c_prof)
         seg = np.where(zeta_arr >= 0.0,
                        np.searchsorted(z_prof, z_arr, side="right") - 1,
                        np.searchsorted(z_prof, z_arr, side="left") - 1)
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
-        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2))
+        return (zeta_arr / xi_arr, -grad / (cc**3 * xi_arr),
+                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
 
     return deriv
 
@@ -371,16 +505,77 @@ class RayTraceResult:
     :ivar depths: Per-ray depths, in metres, shape ``(n_rays, n_steps)``.
     :ivar travel_times: Per-ray cumulative travel times, in seconds, shape
         ``(n_rays, n_steps)`` (zero at the source, increasing along the ray).
+    :ivar arc_lengths: Per-ray cumulative arc length along the ray, in metres,
+        same shape (zero at the source). It is never less than the range
+        column it stands in, exceeds it by the obliquity of the path, and a
+        reflection leaves it continuous. This, and not the range, is the
+        measure seawater absorption acts along: Jensen Sect. 3.6.2 carries a
+        volume loss :math:`\\alpha` into the ray solution by perturbing the
+        eikonal and lands on :math:`e^{-\\int_0^s \\alpha(s')\\,ds'}`
+        (Eq. 3.116), an integral over the path actually flown, so a caller
+        hanging amplitudes on these rays multiplies by
+        :math:`e^{-\\alpha s}` with the :math:`s` read off here.
+    :ivar surface_reflections: Per-ray cumulative count of sea-surface
+        reflections by each range sample, same shape (zero at the source).
+    :ivar bottom_reflections: The same count for the seabed. The two counts,
+        and not the reflection coefficients themselves, are the whole of the
+        per-bounce record an amplitude carrier needs from the geometry.
+        Jensen Sect. 3.6.3 treats a boundary interaction as multiplying the
+        ray amplitude by :math:`|\\mathcal{R}(\\theta)|` and adding
+        :math:`\\arg \\mathcal{R}(\\theta)` to its phase (Eqs. 3.125-3.126),
+        with :math:`\\theta` the local angle of incidence; and in a
+        range-independent medium that angle is the *same* at every touch of
+        the same flat boundary, because the direction a ray crosses a depth
+        with is fixed by Snell's invariant, :math:`\\cos\\theta = \\xi\\,c`,
+        not by how many times it has bounced. Any boundary coefficient
+        therefore enters a path's amplitude only as :math:`\\mathcal{R}^n`
+        with the :math:`n` read off here, which is how
+        :func:`gaussian_beams` charges its lossy seabed and how
+        :func:`eigenrays` charges each arrival; ``ray_trace`` itself carries
+        no amplitude, so the counts are what it can meaningfully expose.
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
+    :ivar profile_depths: Depth samples of the sound-speed profile the rays
+        were traced through, in metres, exactly as cleaned on the way in. The
+        pair below *is* the medium (both solvers interpolate it piecewise
+        linearly and nothing else about the water enters the geometry), so
+        recording it makes the result self-contained: :func:`eigenrays` needs
+        it to put fresh rays through the same water the fan flew.
+    :ivar profile_speeds: Sound speed at each of those depths, in m/s.
+    :ivar bathymetry_ranges: Node ranges of the bottom profile the rays were
+        traced over, in metres, or ``None`` for the level bottom at
+        ``water_depth`` (the default). With a sloping bottom two of the flat
+        record's invariants fall, and the arrays here say so honestly rather
+        than quietly keep their old meaning. A ray reflected past the vertical
+        by the accumulating slope cannot be carried by a range march (see
+        :func:`ray_trace`); its ``depths``, ``travel_times`` and
+        ``arc_lengths`` are ``NaN`` from the sample of the terminating bounce
+        on, so a plot simply ends where the ray turned and nothing downstream
+        can mistake a frozen sample for a traced one (the reflection counts,
+        being integers, instead hold their last value). And the crossing angle
+        at the bottom is no longer one per ray: each slope bounce rotates
+        Snell's invariant, so the per-bounce record that sufficed for a flat
+        guide (counts alone) does not price a sloping one, which is why
+        :func:`eigenrays` declines such a trace.
+    :ivar bathymetry_depths: Bottom depth at each of those nodes, in metres
+        (``None`` likewise). Between nodes the bottom is the straight facet,
+        beyond the last node it continues level: exactly the boundary the
+        marcher reflected off.
     """
 
     launch_angles: NDArray[np.float64]
     ranges: NDArray[np.float64]
     depths: NDArray[np.float64]
     travel_times: NDArray[np.float64]
+    arc_lengths: NDArray[np.float64]
+    surface_reflections: NDArray[np.int_]
+    bottom_reflections: NDArray[np.int_]
     source_depth: float
     water_depth: float
+    profile_depths: NDArray[np.float64]
+    profile_speeds: NDArray[np.float64]
+    bathymetry_ranges: NDArray[np.float64] | None = None
+    bathymetry_depths: NDArray[np.float64] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the ray paths (depth increasing downward)."""
@@ -398,6 +593,8 @@ def ray_trace(
     launch_angles_deg: NDArray[np.float64] | list[float],
     max_range: float = 10_000.0,
     n_steps: int = 2000,
+    bathymetry: tuple[NDArray[np.float64] | list[float],
+                      NDArray[np.float64] | list[float]] | None = None,
 ) -> RayTraceResult:
     r"""Trace acoustic rays through a range-independent sound-speed profile.
 
@@ -405,15 +602,54 @@ def ray_trace(
     fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
     surface (``z = 0``) and the bottom (``z = water_depth``).
 
+    **The bottom may slope.** Passing the ``bathymetry`` pair replaces the
+    level bottom with a
+    piecewise-linear depth profile ``depth(r)``, the faceted boundary model of
+    Jensen Fig. 3.20, and the first range dependence in this module; the
+    sound-speed profile stays range independent (see the scope note below).
+    The marcher then finds each boundary crossing against the interpolated
+    polyline and reflects the ray specularly about the local facet
+    (Eq. 3.121), so a bounce off a slope of angle :math:`\beta` changes the
+    ray's inclination by :math:`2\beta`: upslope bounces steepen a ray, which
+    is the whole one-line physics of wedge propagation, and downslope bounces
+    flatten it. Snell's invariant :math:`\xi` is therefore no longer a
+    constant of each ray but a constant *between* its bottom bounces, and one
+    consequence is drawn honestly rather than papered over: a ray steepened
+    past the vertical runs backward in range, which a marcher whose
+    independent variable is range cannot carry (the same one-way surgery the
+    parabolic equation performs), so such a ray is terminated at that bounce
+    and its samples are ``NaN`` from there on -- see
+    :attr:`RayTraceResult.bathymetry_ranges`. The polyline continues level
+    past its last node exactly as :func:`numpy.interp` clamps the sound-speed
+    profile; a bathymetric feature narrower than one range step can hide
+    between two samples of the crossing search, so ``n_steps`` must resolve
+    the bathymetry as well as the rays.
+
+    **Scope, stated plainly.** Range dependence enters here through the
+    boundary alone: full :math:`c(r, z)` is *not* implemented, deliberately.
+    Every solver in this module ships with an exact published oracle, and the
+    sloping-bottom geometry has one (the ideal wedge unfolds into a closed
+    fan of images, which is what the tests hold it to), while a
+    range-dependent water column has none: there is no closed form to hold a
+    :math:`c(r, z)` marcher to, so it would ship on trust, and this module
+    does not ship on trust.
+
     The travel time is a third state of that same Runge-Kutta step rather than a
     quadrature run over the finished path: with the range-invariant Snell
     parameter :math:`\xi = \cos\theta_0 / c(z_\mathrm{s})` it obeys
     :math:`dt/dr = 1/(\xi c^2)`, so it is integrated with the very stages that
-    place the ray and cannot drift from the geometry actually returned. This is
+    place the ray and cannot drift from the geometry actually returned. The arc
+    length is a fourth state on the same footing, :math:`ds/dr = 1/(\xi c)`,
+    because it is the measure volume absorption needs (see
+    :class:`RayTraceResult`) and reading it off the finished path would demote
+    it to first order. This is
     the same ray core, and the same travel-time equation, as the atmospheric
     :func:`~phonometry.environment.propagation.refraction.atmospheric_ray_paths`
     (which reflects at the ground instead of at the sea surface). Reflections
-    cost no time, so the accumulated time stays continuous across them.
+    cost no time and no path, so both odometers stay continuous across them.
+    They are counted, though, per boundary: see :class:`RayTraceResult` on why
+    the two cumulative counts, with the crossing angle Snell's invariant fixes
+    per ray, are the entire per-bounce record a downstream amplitude needs.
 
     :param depths: Depth samples of the profile, in metres, from ``z = 0``.
     :param sound_speeds: Sound speed at each depth, in m/s.
@@ -422,13 +658,22 @@ def ray_trace(
         (positive downward).
     :param max_range: Maximum horizontal range to trace, in metres.
     :param n_steps: Number of integration steps per ray.
+    :param bathymetry: A ``(ranges_m, depths_m)`` pair of arrays describing a
+        piecewise-linear bottom profile: node ranges in metres, strictly
+        increasing from ``r = 0`` and level past the last node, with the
+        bottom depth at each node in metres, strictly positive and never
+        below the sound-speed profile's last depth. Default (``None``): the
+        level bottom at the profile's last depth.
     :return: A :class:`RayTraceResult`.
     :raises ValueError: If the inputs are invalid.
     """
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    bathy = _clean_bathymetry(bathymetry, z_prof)
     water_depth = float(z_prof[-1])
+    depth_at_source = (water_depth if bathy is None
+                       else float(bathy[1][0]))
     zs = float(source_depth)
-    if not (0.0 <= zs <= water_depth):
+    if not (0.0 <= zs <= depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     if int(n_steps) < 2:
@@ -444,21 +689,547 @@ def ray_trace(
     c0 = float(np.interp(zs, z_prof, c_prof))
     th = np.radians(angles)
     xi = np.cos(th) / c0  # Snell invariant per ray (> 0 since |θ0| < 90°)
-    deriv = _ocean_ray_derivative(z_prof, c_prof, xi)
+    deriv = _ocean_ray_derivative(z_prof, c_prof)
 
     # The marcher splits every range step at the surface or bottom it crosses,
     # so a reflected ray keeps the order the rest of the path is integrated
     # with; see :mod:`phonometry._internal.rays`.
+    upper: float | SlopingBoundary = (
+        water_depth if bathy is None else SlopingBoundary(*bathy))
     march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
                        zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
-                       n_steps=ns, lower=0.0, upper=water_depth)
+                       n_steps=ns, lower=0.0, upper=upper)
     ray_r = np.broadcast_to(ranges, march.positions.shape).copy()
+
+    ray_z, ray_t, ray_s = march.positions, march.times, march.arc_lengths
+    if bathy is not None and march.stopped_columns is not None and np.any(
+            march.stopped_columns < ns):
+        # A terminated ray's samples from the stopping bounce on are frozen at
+        # a point that is not on those columns' own ranges; NaN says "the ray
+        # ended here" in every consumer at once, plots included.
+        gone = np.arange(ns)[None, :] >= march.stopped_columns[:, None]
+        ray_z = np.where(gone, np.nan, ray_z)
+        ray_t = np.where(gone, np.nan, ray_t)
+        ray_s = np.where(gone, np.nan, ray_s)
 
     return RayTraceResult(
         launch_angles=angles,
         ranges=ray_r,
-        depths=march.positions,
-        travel_times=march.times,
+        depths=ray_z,
+        travel_times=ray_t,
+        arc_lengths=ray_s,
+        # The marcher reports per-step bounce counts and says which boundary
+        # each was at; accumulated along the ray they become the exponent any
+        # per-boundary reflection coefficient enters the amplitude with.
+        surface_reflections=np.cumsum(
+            march.reflections - march.upper_reflections, axis=1),
+        bottom_reflections=np.cumsum(march.upper_reflections, axis=1),
+        source_depth=zs,
+        water_depth=water_depth,
+        profile_depths=z_prof,
+        profile_speeds=c_prof,
+        bathymetry_ranges=None if bathy is None else bathy[0],
+        bathymetry_depths=None if bathy is None else bathy[1],
+    )
+
+
+# ===========================================================================
+# 2b. Eigenrays and the arrival structure (Jensen Sect. 3.3.5, Eqs. 3.65-3.68)
+# ===========================================================================
+#
+# A traced fan draws every path the profile supports and says nothing about
+# which of them pass through a given point. The pressure at a receiver is the
+# sum of Eq. (3.66) over precisely the rays that do, "the eigenrays, that is,
+# the rays which pass through that point" (Sect. 3.3.5.2), and the list of
+# them, each with its delay, its angles and its complex amplitude, is a
+# quantity in its own right: it is what the sonar equation consumes as
+# multipath structure, what a channel impulse response is made of, and what
+# communications work equalises against. The field solvers above collapse that
+# structure into one number per grid cell; this section keeps it apart.
+
+#: Bisection iterations refining an eigenray's launch angle inside its fan
+#: bracket. Each halving is one fresh march of the bracket set, so the cost is
+#: linear in this while the interval shrinks geometrically; the loop leaves as
+#: soon as every bracket is converged, which from a fan spaced in hundredths
+#: of a radian takes ~35 of the 60. The ceiling only stops a fan spaced in
+#: whole radians from spinning.
+_EIGENRAY_BISECTIONS = 60
+#: Interval width, in radians, at which a bracket is converged: a picoradian.
+#: The quantities an arrival reports move linearly with the launch angle at
+#: ordinary sensitivities (seconds per radian, and so on), so halving past
+#: this buys digits far below the marcher's own discretisation; it is not the
+#: float64 limit, which would cost twenty more marches to reach and change
+#: nothing an assertion can see.
+_EIGENRAY_CONVERGED = 1e-12
+#: Refined launch angles closer than this, in radians, are one eigenray found
+#: twice: a root landing within roundoff of a fan node gets bracketed from
+#: both sides, and bisection then walks both brackets to the same ray.
+_EIGENRAY_DISTINCT = 1e-9
+
+
+@dataclass(frozen=True)
+class EigenrayResult:
+    r"""The eigenrays connecting one source to one receiver, earliest first.
+
+    Every per-arrival array has one entry per eigenray, sorted by travel time.
+    The frequency-independent pieces of each arrival are recorded separately
+    (delay, complex amplitude, angles, boundary counts) so that one search
+    serves every frequency: in the module's :math:`e^{-i\omega t}` convention
+    the pressure a tone of angular frequency :math:`\omega` produces at the
+    receiver is
+
+    .. math::
+
+        p(\omega) = \sum_j a_j\, e^{i \omega \tau_j},
+
+    with :math:`a_j` the ``amplitudes`` and :math:`\tau_j` the
+    ``travel_times``; the band-limited channel impulse response is the inverse
+    transform of that sum, a spike of complex weight :math:`a_j` at each
+    :math:`\tau_j`.
+
+    :ivar launch_angles: Launch angle of each eigenray at the source, from the
+        horizontal, in degrees, positive downward: the same convention the
+        fan was launched with.
+    :ivar arrival_angles: The angle each eigenray crosses the receiver with,
+        same convention. In a range-independent medium its magnitude is fixed
+        by Snell's invariant at the receiver depth; its sign says whether the
+        arrival is descending or climbing, which is what a vertical array
+        steers on.
+    :ivar travel_times: Travel time of each eigenray, in seconds: the
+        marcher's third Runge-Kutta state read at the receiver, not a
+        quadrature over the finished path.
+    :ivar amplitudes: Complex amplitude of each arrival, dimensionless,
+        normalised to unit pressure at 1 m from the source (the reference of
+        Jensen Eqs. (3.67)-(3.68), the same one every field solver of this
+        module reports its loss against). The magnitude is the classical ray
+        amplitude of Eq. (3.65),
+        :math:`|c(z_\mathrm{R})\cos\theta_0 /
+        (c(z_\mathrm{S})\, r\, q(r))|^{1/2}` with :math:`q` integrated from
+        the point-source initial conditions of Eq. (3.63); the phase is the
+        caustic factor :math:`(-i)^m` of Eq. (3.79) times the boundary
+        factors :math:`(-1)^{n_\mathrm{s}}` and :math:`\mathcal{R}^{n_b}`
+        (Eqs. 3.125-3.126). See :func:`eigenrays` for why that convention and
+        not another.
+    :ivar surface_reflections: Sea-surface touches of each eigenray.
+    :ivar bottom_reflections: Seabed touches of each eigenray. The pair
+        classifies the arrivals the way Fig. 3.7 colours them: refracted
+        paths carry zeros, and every multipath family is named by its counts.
+    :ivar caustic_crossings: The KMAH index :math:`m` of Eq. (3.79): how many
+        times each eigenray's ray-tube spreading vanished on the way, each
+        crossing turning the amplitude by :math:`-\pi/2`. Zero for every path
+        in an isovelocity channel, where straight rays cannot form caustics.
+    :ivar receiver_range: Range of the receiver the list connects to, in m.
+    :ivar receiver_depth: Its depth, in metres.
+    :ivar source_depth: Source depth, in metres.
+    :ivar water_depth: Water-column depth, in metres.
+    """
+
+    launch_angles: NDArray[np.float64]
+    arrival_angles: NDArray[np.float64]
+    travel_times: NDArray[np.float64]
+    amplitudes: NDArray[np.complex128]
+    surface_reflections: NDArray[np.int_]
+    bottom_reflections: NDArray[np.int_]
+    caustic_crossings: NDArray[np.int_]
+    receiver_range: float
+    receiver_depth: float
+    source_depth: float
+    water_depth: float
+
+    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+        """Plot the arrival structure (per-path loss stems against delay)."""
+        from ..._i18n import check_language
+        from ..._plot.underwater import plot_eigenrays
+
+        return plot_eigenrays(self, ax=ax, language=check_language(language), **kwargs)
+
+
+def _march_arrival_rays(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], *,
+    source_depth: float, thetas: NDArray[np.float64], receiver_range: float,
+    n_steps: int,
+) -> RayMarch:
+    """March candidate eigenrays so the last sample lands on the receiver.
+
+    Geometry and amplitude in one call, which the marcher's own doctrine
+    requires (see :mod:`phonometry._internal.rays`): asking for the dynamic
+    pair makes the march split its steps at the profile nodes, so a ray traced
+    with it is not bit-for-bit the ray traced without, and an amplitude read
+    off one while the root was found on the other would answer for a slightly
+    different path. Every march of the search therefore carries the pair, with
+    the *real* point-source initial conditions of Jensen Eq. (3.63),
+    :math:`q(0) = 0`, :math:`p(0) = 1/c(0)`, under which :math:`r\\,q = J`
+    (Eq. 3.64) and the classical amplitude of Eq. (3.65) is a read-off. The
+    receiver range is the last sample of the march by construction, so nothing
+    is interpolated at the point everything is asserted at.
+    """
+    c0 = float(np.interp(source_depth, z_prof, c_prof))
+    xi = np.cos(thetas) / c0
+    deriv = _ocean_ray_derivative(z_prof, c_prof)
+    return march_rays(
+        deriv, xi=xi, z0=np.full(thetas.size, source_depth),
+        zeta0=np.sin(thetas) / c0,
+        range_step=receiver_range / (n_steps - 1), n_steps=n_steps,
+        lower=0.0, upper=float(z_prof[-1]),
+        dynamic=DynamicRays(np.zeros(thetas.size),
+                            np.full(thetas.size, 1.0 / c0), z_prof, c_prof))
+
+
+def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
+    """The KMAH index per ray: sign changes of the real spreading history.
+
+    With the initial conditions of Eq. (3.63) the pair is real, so
+    :math:`q \\propto J` (Eq. 3.64) and every caustic is a sign change of
+    ``q`` along the row: "the number of times J(s) vanishes in [0, s]"
+    (Eq. 3.79). The launch sample is q = 0 by those initial conditions and is
+    not a caustic, which is why zeros are dropped before the signs are
+    compared rather than counted as crossings of their own.
+    """
+    counts = np.zeros(spreadings.shape[0], dtype=np.int_)
+    for i, row in enumerate(spreadings):
+        # Exact nonzero mask, deliberately: only the launch sample is q = 0 by
+        # construction, and a tolerance would count the small real spreadings
+        # either side of a caustic as zeros and miss their sign change.
+        signs = np.sign(row[row.astype(bool)])
+        counts[i] = int(np.count_nonzero(np.diff(signs)))
+    return counts
+
+
+def _bracket_launches(
+    trace: RayTraceResult, r_grid: NDArray[np.float64], r_rec: float,
+    z_rec: float,
+) -> tuple[NDArray[np.float64], NDArray[np.intp]]:
+    """Read the fan at the receiver range and raise the sign-change brackets.
+
+    Linear between the two bracketing columns: this is only the bracket hunt,
+    and every sign found here is re-established on a fresh march before the
+    bisection of :func:`_refine_brackets` trusts it.
+    """
+    launch = np.radians(np.sort(np.asarray(trace.launch_angles,
+                                           dtype=np.float64).ravel()))
+    col = int(np.clip(np.searchsorted(r_grid, r_rec), 1, r_grid.size - 1))
+    w = (r_rec - r_grid[col - 1]) / (r_grid[col] - r_grid[col - 1])
+    fan_order = np.argsort(np.asarray(trace.launch_angles,
+                                      dtype=np.float64).ravel())
+    fan_depth = (trace.depths[fan_order, col - 1] * (1.0 - w)
+                 + trace.depths[fan_order, col] * w)
+    # A fan ray landing exactly on the receiver depth counts to one side, so
+    # the root right under it still raises exactly one bracket.
+    sign = np.where(fan_depth == z_rec, 1.0, np.sign(fan_depth - z_rec))
+    crossing = np.flatnonzero(sign[:-1] * sign[1:] < 0.0)
+    return launch, crossing
+
+
+def _refine_brackets(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], zs: float,
+    launch: NDArray[np.float64], crossing: NDArray[np.intp], *,
+    r_rec: float, z_rec: float, ns: int,
+) -> NDArray[np.float64]:
+    """Close each bracket by bisection on fresh marches through the profile.
+
+    Returns the distinct refined launch angles, possibly none: a bracket the
+    re-established endpoints disown is dropped rather than believed.
+    """
+    lo, hi = launch[crossing], launch[crossing + 1]
+    if lo.size == 0:
+        return np.zeros(0)
+    # The brackets are only as good as the fan's reading of them; make
+    # both endpoints real marches before bisecting between them.
+    ends = _march_arrival_rays(
+        z_prof, c_prof, source_depth=zs,
+        thetas=np.concatenate([lo, hi]), receiver_range=r_rec, n_steps=ns)
+    f_lo = ends.positions[:lo.size, -1] - z_rec
+    f_hi = ends.positions[lo.size:, -1] - z_rec
+    # A root standing within the two integrations' disagreement of a fan
+    # rung (the fan was traced at its own step, the search marches at ns)
+    # can slip just past the endpoint and un-bracket itself; one rung of
+    # slack on each side recovers it before the bracket is disbelieved.
+    bad = np.flatnonzero(np.sign(f_lo) * np.sign(f_hi) > 0.0)
+    if bad.size:
+        wide_lo = launch[np.maximum(crossing[bad] - 1, 0)]
+        wide_hi = launch[np.minimum(crossing[bad] + 2, launch.size - 1)]
+        wide = _march_arrival_rays(
+            z_prof, c_prof, source_depth=zs,
+            thetas=np.concatenate([wide_lo, wide_hi]),
+            receiver_range=r_rec, n_steps=ns)
+        lo[bad], hi[bad] = wide_lo, wide_hi
+        f_lo[bad] = wide.positions[:bad.size, -1] - z_rec
+        f_hi[bad] = wide.positions[bad.size:, -1] - z_rec
+    # An endpoint whose marched depth lands on the receiver to the last
+    # bit *is* the eigenray; the zero test is exact (a nonzero mask,
+    # inverted) because any tolerance would promote near-misses to roots
+    # and close their brackets before the bisection has refined them.
+    exact_lo, exact_hi = ~f_lo.astype(bool), ~f_hi.astype(bool)
+    keep = (np.sign(f_lo) * np.sign(f_hi) < 0.0) | exact_lo | exact_hi
+    lo, hi, f_lo = lo[keep], hi[keep], f_lo[keep]
+    exact_lo, exact_hi = exact_lo[keep], exact_hi[keep]
+    hi = np.where(exact_lo, lo, hi)
+    lo = np.where(exact_hi & ~exact_lo, hi, lo)
+    s_lo = np.sign(f_lo)
+    for _ in range(_EIGENRAY_BISECTIONS):
+        open_ = (hi - lo) > _EIGENRAY_CONVERGED
+        if not open_.any():
+            break
+        mid = 0.5 * (lo + hi)
+        f_mid = _march_arrival_rays(
+            z_prof, c_prof, source_depth=zs, thetas=mid,
+            receiver_range=r_rec, n_steps=ns).positions[:, -1] - z_rec
+        s_mid = np.sign(f_mid)
+        # A midpoint landing exactly on the receiver depth is a root the
+        # march itself certified; the exact test (sign code zero, taken as
+        # an inverted nonzero mask) keeps it, where a tolerance would
+        # declare roots the marcher never confirmed.
+        hit = ~s_mid.astype(bool) & open_
+        same = (s_mid == s_lo) & open_ & ~hit
+        lo = np.where(hit | same, mid, lo)
+        hi = np.where(hit | (open_ & ~same), mid, hi)
+    refined = 0.5 * (lo + hi)
+    if refined.size:
+        refined = refined[np.concatenate(
+            ([True], np.diff(refined) > _EIGENRAY_DISTINCT))]
+    return np.asarray(refined, dtype=np.float64)
+
+
+def _arrival_bottom_coefficient(
+    seabed: tuple[float, float, float] | None, key: str,
+    xi: NDArray[np.float64], c_bottom: float,
+) -> NDArray[np.complex128]:
+    """One bottom coefficient per arrival, at the angle its invariant fixes."""
+    if seabed is None:
+        return np.full(xi.size, _BOTTOM_REFLECTION[key], dtype=np.complex128)
+    rho1, rho2, c2 = seabed
+    # As printed, unconjugated: see the docstring's convention note.
+    return np.asarray(reflection_coefficient(
+        _seabed_grazing_deg(xi, c_bottom), rho1=rho1, c1=c_bottom,
+        rho2=rho2, c2=c2), dtype=np.complex128)
+
+
+def _earliest_arrivals(
+    times: NDArray[np.float64], max_arrivals: int,
+) -> NDArray[np.intp]:
+    """The stable order of the arrival times, truncated to the cap and said."""
+    order = np.argsort(times, kind="stable")
+    if order.size > int(max_arrivals):
+        import warnings
+
+        from ..._internal.warnings import PhonometryWarning
+
+        warnings.warn(
+            f"eigenrays: {order.size} eigenrays connect the receiver within"
+            f" the traced fan; keeping the {int(max_arrivals)} earliest."
+            " Raise 'max_arrivals' to keep them all.",
+            PhonometryWarning, stacklevel=3)
+        order = order[:int(max_arrivals)]
+    return order
+
+
+def eigenrays(
+    trace: RayTraceResult,
+    *,
+    receiver_range: float,
+    receiver_depth: float,
+    bottom: str | FluidSeabed = "pressure-release",
+    max_arrivals: int = 64,
+    n_steps: int | None = None,
+) -> EigenrayResult:
+    r"""The eigenrays a traced fan brackets between a source and a receiver.
+
+    Finding an eigenray is finding a launch angle whose ray's depth at the
+    receiver range equals the receiver depth: a root of
+    :math:`f(\theta_0) = z(r_\mathrm{R}; \theta_0) - z_\mathrm{R}`, which is
+    continuous in :math:`\theta_0` because a specular reflection folds the
+    trajectory continuously. The fan of ``trace`` supplies the brackets, one
+    per adjacent pair of rays whose :math:`f` changes sign, and each bracket
+    is then closed by bisection on *fresh marches through the same profile*,
+    never by interpolating between the traced rays: interpolation across a
+    fan is exactly the hazard Jensen Sect. 3.7.5.1 illustrates (two rays of
+    one bracket taking different bounce histories have no path between them),
+    and a root polished on real traces is a real ray, whose travel time,
+    bounce counts and amplitude are its own rather than a blend's. The
+    marcher that traces the fan is the marcher that closes the brackets, with
+    the dynamic pair of Eq. (3.58) riding along under the real point-source
+    initial conditions of Eq. (3.63), so every arrival's amplitude is the
+    Jacobian of the very trajectory that hit the receiver.
+
+    **The amplitude convention, stated once.** Each arrival's complex
+    amplitude is
+
+    .. math::
+
+        a_j = \left| \frac{c(z_\mathrm{R})\,\cos\theta_0}
+        {c(z_\mathrm{S})\, r_\mathrm{R}\, q_j} \right|^{1/2}
+        (-i)^{m_j}\, (-1)^{n_{\mathrm{s},j}}\, \mathcal{R}^{n_{b,j}},
+
+    in the module's :math:`e^{-i\omega t}` convention, normalised to unit
+    pressure at 1 m. Why each factor:
+
+    * The magnitude is Eq. (3.65) with the :math:`1/(4\pi)` cancelled against
+      the free-field reference of Eqs. (3.67)-(3.68), which is how the book
+      itself defines transmission loss from these amplitudes and how every
+      solver of this module already normalises: the coherent sum
+      :math:`\sum_j a_j e^{i\omega\tau_j}` over a complete arrival set is
+      directly comparable to :attr:`GaussianBeamResult.pressure`, and
+      :math:`-20\lg|{\sum}|` to every propagation loss here.
+    * :math:`(-i)^m` is Eq. (3.79) exactly as printed. Sect. 3.3 writes the
+      ray field as :math:`A\,e^{i\omega\tau}` (Eq. 3.57), which *is* the
+      :math:`e^{-i\omega t}` convention, so the printed factor transfers
+      unchanged; it is the same :math:`-\pi/2` per caustic the beam solver's
+      tracked square-root branch spends continuously, taken here in the
+      discrete form the classical amplitude needs, since with real initial
+      conditions :math:`q` passes through zero instead of around it.
+    * :math:`(-1)^{n_\mathrm{s}}` and :math:`\mathcal{R}^{n_b}` are
+      Eqs. (3.125)-(3.126) applied at every boundary touch, collapsed to
+      powers because Snell's invariant fixes one crossing angle per ray at a
+      flat boundary. With a :class:`FluidSeabed` as the ``bottom``,
+      :math:`\mathcal{R}` is the Rayleigh coefficient of
+      :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+      at that angle, **not conjugated**: that function returns the
+      coefficient in the :math:`e^{-i\omega t}` convention these amplitudes
+      are declared in, so it enters as printed. (:func:`gaussian_beams`
+      conjugates the very same coefficient because its internal sum is
+      assembled in the conjugate convention and conjugated once at the end;
+      neither solver's choice transfers to the other, which is why both
+      spell it out.)
+
+    A receiver standing exactly on a caustic is the one place the list is
+    honest rather than useful: :math:`q_j \to 0` there and the classical
+    amplitude of Eq. (3.65) diverges, as Sect. 3.4.1 says it must. The
+    infinity is ray theory's own, not an artefact to clamp;
+    :func:`gaussian_beams` is the solver whose field stays finite there.
+
+    **What the fan resolves is what the search can find.** A bracket exists
+    where :math:`f` changes sign between adjacent fan rays, so a pair of
+    eigenrays standing between the same two rays (the two sides of a fold
+    near a caustic do this first) merges into no bracket at all, and an
+    eigenray steeper than the fan's aperture does not exist to it. The fan's
+    density and half-angle are the completeness levers, and they belong to
+    the caller's :func:`ray_trace`, where they are visible, rather than to a
+    hidden retrace here. Tangential contact (an :math:`f` that touches zero
+    without crossing) is likewise invisible, which is also why a receiver on
+    a boundary is rejected: a folded trajectory only ever grazes the
+    boundaries.
+
+    **The cap.** The multipath count grows without bound as paths steepen: in
+    an ideal waveguide nothing but spreading attenuates the high-order
+    bounces, and every extra :math:`2D` of unfolded depth is two more
+    arrivals. ``max_arrivals`` bounds what is returned: the earliest
+    ``max_arrivals`` arrivals are kept, because the early paths are the flat,
+    least-bounced, least-attenuated ones that carry the energy, and the tail
+    being discarded is the part every physical seabed drains fastest. A
+    :class:`~phonometry.PhonometryWarning` says when the cap truncated; raise
+    it to keep everything the fan bracketed.
+
+    :param trace: A :func:`ray_trace` result: the fan to bracket on, the
+        profile to retrace through, and the source the rays leave from.
+    :param receiver_range: Receiver range, in metres, within the traced range.
+    :param receiver_depth: Receiver depth, in metres, strictly inside the
+        water column.
+    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``, the
+        perfect reflector whose coefficient (:math:`-1` or :math:`+1`) each
+        bottom touch multiplies into the amplitude; or a
+        :class:`FluidSeabed`, whose complex Rayleigh coefficient is charged
+        instead. The sea surface is always pressure-release. The choice
+        touches amplitudes only; the geometry, times and angles of the
+        eigenrays are specular either way.
+    :param max_arrivals: Most arrivals to return (earliest kept, see above).
+    :param n_steps: Range samples per refinement march, receiver column
+        included. Default (``None``): the step of ``trace`` itself carried
+        over, so the search resolves what the fan resolved.
+    :return: An :class:`EigenrayResult`, possibly with zero arrivals: a
+        receiver the traced fan never crosses (a shadow zone, or simply
+        outside the aperture) has no eigenrays to list, which is an answer
+        and not an error.
+    :raises ValueError: If the inputs are invalid.
+    """
+    key, seabed = _resolve_boundary(bottom)
+    if trace.bathymetry_ranges is not None:
+        raise ValueError(
+            "'trace' was made over a sloping bottom, which this search does"
+            " not price: each slope bounce rotates Snell's invariant, so an"
+            " arrival's bottom touches no longer share one grazing angle and"
+            " the amplitude convention below (one coefficient per ray, raised"
+            " to the touch count) stops holding. Trace over a level bottom to"
+            " list eigenrays.")
+    z_prof = np.asarray(trace.profile_depths, dtype=np.float64)
+    c_prof = np.asarray(trace.profile_speeds, dtype=np.float64)
+    water_depth = float(trace.water_depth)
+    zs = float(trace.source_depth)
+    r_rec = require_positive(receiver_range, "receiver_range")
+    r_grid = np.asarray(trace.ranges[0], dtype=np.float64)
+    if r_rec > float(r_grid[-1]):
+        raise ValueError("'receiver_range' must not run past the traced fan.")
+    z_rec = float(receiver_depth)
+    if not (0.0 < z_rec < water_depth):
+        raise ValueError(
+            "'receiver_depth' must lie strictly inside the water column: a"
+            " folded ray only ever grazes the boundaries, so a receiver on"
+            " one is touched tangentially and never crossed.")
+    if int(max_arrivals) < 1:
+        raise ValueError("'max_arrivals' must be at least 1.")
+    if trace.launch_angles.size < 2:
+        raise ValueError("'trace' must carry at least two rays to bracket between.")
+    if n_steps is None:
+        ns = max(2, int(np.ceil(r_rec / float(r_grid[1] - r_grid[0]))) + 1)
+    else:
+        ns = int(n_steps)
+        if ns < 2:
+            raise ValueError("'n_steps' must be at least 2.")
+
+    launch, crossing = _bracket_launches(trace, r_grid, r_rec, z_rec)
+    refined = _refine_brackets(z_prof, c_prof, zs, launch, crossing,
+                               r_rec=r_rec, z_rec=z_rec, ns=ns)
+
+    if refined.size == 0:
+        empty = np.zeros(0)
+        return EigenrayResult(
+            launch_angles=empty, arrival_angles=np.zeros(0),
+            travel_times=np.zeros(0),
+            amplitudes=np.zeros(0, dtype=np.complex128),
+            surface_reflections=np.zeros(0, dtype=np.int_),
+            bottom_reflections=np.zeros(0, dtype=np.int_),
+            caustic_crossings=np.zeros(0, dtype=np.int_),
+            receiver_range=r_rec, receiver_depth=z_rec, source_depth=zs,
+            water_depth=water_depth)
+
+    final = _march_arrival_rays(z_prof, c_prof, source_depth=zs,
+                                thetas=refined, receiver_range=r_rec,
+                                n_steps=ns)
+    if final.spreadings is None:  # pragma: no cover
+        raise ValueError("the march must carry the dynamic ray states.")
+    c0 = float(np.interp(zs, z_prof, c_prof))
+    z_end = final.positions[:, -1]
+    c_end = np.asarray(np.interp(z_end, z_prof, c_prof))
+    q_end = np.asarray(final.spreadings[:, -1], dtype=np.float64)
+    # Eq. (3.65) over the 1 m reference of Eqs. (3.67)-(3.68). A receiver on a
+    # caustic has q = 0 and honestly infinite classical amplitude; the
+    # errstate only keeps numpy from narrating what the docstring already has.
+    with np.errstate(divide="ignore"):
+        magnitude = np.sqrt(np.abs(
+            c_end * np.cos(refined) / (c0 * r_rec * q_end)))
+    n_bottom = np.asarray(final.upper_reflections.sum(axis=1))
+    n_surface = np.asarray((final.reflections - final.upper_reflections).sum(axis=1))
+    kmah = _caustic_crossings(np.asarray(final.spreadings, dtype=np.float64))
+    xi = np.cos(refined) / c0
+    bottom_coeff = _arrival_bottom_coefficient(seabed, key, xi,
+                                               float(c_prof[-1]))
+    amplitudes = (magnitude * (-1j) ** kmah
+                  * _SURFACE_REFLECTION ** n_surface * bottom_coeff ** n_bottom)
+    times = final.times[:, -1]
+    arrival = np.degrees(np.arcsin(np.clip(
+        final.verticals[:, -1] * c_end, -1.0, 1.0)))
+
+    order = _earliest_arrivals(times, max_arrivals)
+
+    return EigenrayResult(
+        launch_angles=np.degrees(refined[order]),
+        arrival_angles=np.asarray(arrival)[order],
+        travel_times=np.asarray(times)[order],
+        amplitudes=np.asarray(amplitudes, dtype=np.complex128)[order],
+        surface_reflections=n_surface[order],
+        bottom_reflections=n_bottom[order],
+        caustic_crossings=kmah[order],
+        receiver_range=r_rec,
+        receiver_depth=z_rec,
         source_depth=zs,
         water_depth=water_depth,
     )
@@ -516,7 +1287,12 @@ def ray_trace(
 # summed field is conjugated once at the end, which puts the exposed complex
 # pressure in the same exp(-i omega t) convention as the other two solvers.
 # This is a textbook inconsistency, not a defect of a published standard, so it
-# is recorded here rather than in docs/ERRATA.md.
+# is recorded here rather than in docs/ERRATA.md. The final conjugation has one
+# further consequence that stays invisible until a complex coefficient enters
+# the sum: everything multiplied into the field before it must be the conjugate
+# of its exp(-i omega t) self. The reflection coefficients of the perfect
+# boundaries are -1 and +1 and hid this; the complex R of a lossy seabed is
+# conjugated on the way in (see :func:`gaussian_beams`).
 #
 # Substituting Eq. (3.91) into that corrected Eq. (3.92) makes sqrt(i) e^(-i
 # pi/4) = 1, and the weight comes out real and positive in closed form,
@@ -591,10 +1367,42 @@ class GaussianBeamResult:
         conjugated field this result exposes, so that a beam spreading in free
         space reproduces Eq. (3.85), :math:`K = x/(x^2 + a^2)`, as a positive
         number.
-    :ivar initial_beam_width: The :math:`W_0` of Eq. (3.91) actually used, in
-        metres, whether it was passed or defaulted.
+    :ivar initial_beam_widths: The :math:`W_0` of Eq. (3.91) actually used by
+        each beam of the fan, in metres, shape ``(n_beams,)``. An explicit
+        ``fan.beam_width`` fills it with one value; the default is per launch
+        angle (see :func:`_default_beam_widths`), widest on the axis of the
+        fan whenever a shallow channel's modal-resolution term is in play and
+        flat across it otherwise.
+    :ivar absorption_model: The seawater absorption model applied along the
+        beams, or ``None`` when the run propagated without volume absorption
+        (the default).
+    :ivar absorption_coefficient: The absorption coefficient :math:`\\alpha`
+        actually applied, in dB/km (0.0 when ``absorption_model`` is ``None``),
+        as :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`
+        evaluated it at the source frequency and depth. Recorded so a run's
+        loss can be decomposed without re-deriving what was subtracted.
+    :ivar seabed_density: Sediment density of the fluid seabed the bottom
+        bounces were charged with, or ``None`` when the bottom was one of the
+        perfect reflectors (the default).
+    :ivar seabed_sound_speed: Sediment sound speed of that seabed, in m/s, or
+        ``None`` likewise. Together the pair names the Rayleigh interface of
+        :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+        each beam's bottom reflections multiplied it by.
     :ivar source_depth: Source depth, in metres.
-    :ivar water_depth: Water-column depth, in metres.
+    :ivar water_depth: Water-column depth, in metres: the sound-speed
+        profile's last depth, which over a sloping bottom is the deepest
+        water the medium description reaches while the column itself is the
+        bathymetry below.
+    :ivar bathymetry_ranges: Node ranges of the bottom profile the run was
+        marched over, in metres, or ``None`` for the level bottom (the
+        default). When present, the per-beam histories (``ray_depths``,
+        ``beam_widths``, ``wavefront_curvatures``) are ``NaN`` from the
+        column at which a beam was terminated by a reflection past the
+        vertical, the same convention :class:`RayTraceResult` uses and for
+        the same reason: from there on the beam no longer exists in the
+        forward field, and its weight in the sum is zero.
+    :ivar bathymetry_depths: Bottom depth at each of those nodes, in metres
+        (``None`` likewise).
     """
 
     frequency: float
@@ -607,9 +1415,15 @@ class GaussianBeamResult:
     ray_depths: NDArray[np.float64]
     beam_widths: NDArray[np.float64]
     wavefront_curvatures: NDArray[np.float64]
-    initial_beam_width: float
+    initial_beam_widths: NDArray[np.float64]
+    absorption_model: str | None
+    absorption_coefficient: float
+    seabed_density: float | None
+    seabed_sound_speed: float | None
     source_depth: float
     water_depth: float
+    bathymetry_ranges: NDArray[np.float64] | None = None
+    bathymetry_depths: NDArray[np.float64] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the propagation-loss field (depth increasing downward)."""
@@ -638,19 +1452,39 @@ _INFLUENCE_BLOCK = 1 << 20
 #: Fraction of the water column the steepest beam of the fan may climb in one
 #: marching step before the step is reported as too coarse to resolve it.
 _MAX_STEEP_CLIMB = 0.25
+#: How far from its sample a beam's analytic tail may still be evaluated at a
+#: *sloped* receiver column, in multiples of the marched range extent. The fan
+#: ladder has no admission floor on a slope (see :func:`_fold_margins`), so
+#: this budget is what stands between the influence sum and pricing wedge
+#: geometry the caller never described: a wrapped rung's image is the local
+#: facet's wedge continued clear around its apex, and where that apex stands
+#: tens of extents beyond the march (a locally tilted bottom in deep water),
+#: the arrivals those tails would reconstruct bounce on pure fiction --
+#: measured at up to 11 dB of pollution against a two-path oracle whose bottom
+#: no beam can even reach, against 0.001 dB with the budget in place. Two
+#: extents is the up-and-back allowance: the farthest genuine rung of the
+#: ideal-wedge oracle, a return leg that turns just past the far edge of the
+#: march, stands 1.9 extents out and is untouched (the oracle's numbers are
+#: identical with the budget at 2 or at 4), while one extent alone clips it
+#: and costs that field over 2 dB. Level columns are never capped, which is
+#: part of why a level polyline keeps the flat ladder bit for bit.
+_TAIL_TRUST = 2.0
 
 
-def _default_beam_width(
+def _default_beam_widths(
     wavelength: float, max_range: float, water_depth: float,
-) -> float:
-    r"""The :math:`W_0` of Eq. (3.91), from the book's own optimality argument.
+    launch: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    r"""The :math:`W_0` of Eq. (3.91) per launch angle: the free-space optimum,
+    raised in a shallow channel to the width that resolves the guide's modes.
 
-    Sect. 3.5.1 does the calculation explicitly for a beam in free space: with
-    the waist at the source the half-width evolves as Eq. (3.86),
-    :math:`W(x; a) = \sqrt{(2/k)(a + x^2/a)}` with :math:`a = k W_0^2/2`, and
-    "differentiating :math:`W(x; a)` with respect to :math:`a` and setting the
-    result to 0, we find that the optimal :math:`a` to minimize the beamwidth is
-    :math:`a = x`". Evaluated at the far end of the run that is
+    **The free-space term.** Sect. 3.5.1 does the calculation explicitly for a
+    beam in free space: with the waist at the source the half-width evolves as
+    Eq. (3.86), :math:`W(x; a) = \sqrt{(2/k)(a + x^2/a)}` with
+    :math:`a = k W_0^2/2`, and "differentiating :math:`W(x; a)` with respect
+    to :math:`a` and setting the result to 0, we find that the optimal
+    :math:`a` to minimize the beamwidth is :math:`a = x`". Evaluated at the
+    far end of the run that is
 
     .. math::
 
@@ -662,53 +1496,100 @@ def _default_beam_width(
     of that integral is proportional to :math:`q(0)/q(r)`, whose real part
     vanishes as :math:`q(0)` grows, and the sum then stops converging on a
     truncated fan. Measured against the free field at 100 Hz at 2, 5 and 8 km,
-    the relative error in :math:`|p|` is 7.5e-5 at this width; it is 2.7e-2 at a
-    fifth of it, where each beam accepts too wide a cone of launch angles for
+    the relative error in :math:`|p|` is 7.5e-5 at this width; it is 2.7e-2 at
+    a fifth of it, where each beam accepts too wide a cone of launch angles for
     the paraxial expansion, and 3.7e-3 and 4.1e-2 at six and fifteen times it,
     where the Fresnel behaviour sets in. The shallowest part of the curve is a
-    little above the formula rather than on it, 1.9e-5 at twice the width, which
-    is as close to the optimum as this measurement can place it.
+    little above the formula rather than on it, 1.9e-5 at twice the width,
+    which is as close to the optimum as this measurement can place it. (The
+    range set matters: taken on a set reaching in to 500 m the last two
+    numbers come out 5.4e-2 and 6.3e-2, because a wide beam is exactly what
+    pushes the perpendicular feet of the fan in towards the source; that is
+    the axis floor of :func:`_beam_influence` being read as a property of the
+    width, and it is not one. The same measurement is why widening a beam
+    beyond what a criterion asks for is never free.)
 
-    The range set matters and is quoted above for that reason. Taken on a set
-    reaching in to 500 m these last two numbers come out 5.4e-2 and 6.3e-2, an
-    order of magnitude worse at six times the width, because a wide beam is
-    exactly what pushes the perpendicular feet of the fan in towards the source:
-    that is the axis floor of :func:`_beam_influence` being read as a property
-    of the width, and it is not one.
+    **The guide term, and why it is per launch angle.** A waveguide's trapped
+    field is a discrete sum of modes, and mode :math:`m` of a channel of depth
+    :math:`D` stands at the launch angle :math:`\sin\theta_m = m\lambda/(2D)`
+    (its vertical wavenumber is :math:`m\pi/D`; Jensen Eq. 5.13's
+    :math:`\sin(m\pi z/D)` says the same thing for the ideal guide, and the
+    spacing is asymptotically the same for a refracting one). Adjacent modes
+    are therefore :math:`\delta(\sin\theta) = \lambda/(2D)` apart, which at
+    the launch angle :math:`\theta_0` is a gap of
+    :math:`\lambda/(2D\cos\theta_0)` in angle; and a beam of initial width
+    :math:`W_0` cannot tell launch angles apart more finely than its own
+    far-field divergence, :math:`\lambda/(\pi W_0)` by Eq. (3.86). Asking the
+    beam to resolve its neighbours' gap to half, so that the modal
+    interference a receiver kilometres out actually shows, gives
 
-    Two clamps stand around it. The floor of ten wavelengths and the ceiling of
-    fifty are the band the book recommends ("typically, this will lead to an
-    initial beamwidth of 10-50 wavelengths"), and the formula lands inside them
-    on its own across most of the useful parameter space: over a 10 km run it
-    gives 14.6 wavelengths at 100 Hz and 46 at 1 kHz. The last clamp is the
-    channel, and it has the final word over the other two, because a beam
-    comparable to the water depth breaks the bookkeeping that folds a reflected
-    ray back into the column rather than merely costing accuracy.
+    .. math::
 
-    That last sentence is the one to read sceptically, because it is where this
-    default is at its worst and the measurement does not support the reasoning
-    behind it. The folded-image ladder of :func:`_image_ladder` restores what the
-    folding drops, and with it in place a beam as wide as the channel is not
-    merely tolerable but better: on an :math:`n^2`-linear 200 m guide at 200 Hz,
-    against the exact Airy modes, the quarter-depth width of 50 m is +3.08 dB in
-    the mean while 200 m is -0.22 dB, and on the isovelocity 200 m guide at
-    50 Hz the same two widths give +0.48 and +0.001 dB against the modal sum.
-    What the clamp protects is the folding of a beam whose *central ray* has
-    reflected, which the ladder does not reach; what it costs is a shallow-water
-    bias of a few decibels, always in the same direction. It is left in place
-    because a silent error is worse than a documented one, and
-    :func:`gaussian_beams` says there when to override it, but a caller in
-    shallow refracting water should override it.
+        \frac{\lambda}{\pi W_0} \le \frac{1}{2}\,
+        \frac{\lambda}{2 D \cos\theta_0}
+        \quad\Longleftrightarrow\quad
+        W_0(\theta_0) \ge \frac{4 D \cos\theta_0}{\pi},
+
+    one width per launch angle, widest for the flat beams (whose modes crowd
+    together in angle) and relaxing by the cosine for the steep ones (whose
+    modes stand apart). Its vertical footprint :math:`W_0/\cos\theta_0` is the
+    constant :math:`4D/\pi`: every beam of the fan spans the one column. The
+    half-a-gap margin is a choice, and the oracle brackets it: on an
+    :math:`n^2`-linear 200 m guide at 200 Hz, against the exact Airy modes
+    (energy-averaged over 0.5 to 4 km), this default measures +0.19 dB in the
+    mean where the free-space optimum alone (100 m) is +1.15 dB, a full-gap
+    margin leaves +1.12 dB, a third of a gap overshoots to -0.62 dB, and flat
+    300 and 400 m widths to -0.91 and -1.18 dB; a 100 m guide at 250 Hz walks
+    the same ladder (+0.74, +0.39, +0.14 dB at full, half and a third of a
+    gap) without the overshoot, so half the gap is where the two cases agree.
+
+    The guide term stands only where the book's own band can hold it: for
+    :math:`4D/\pi > 50\lambda` (deep water, in wavelengths) no admissible
+    width resolves the modes, and rather than pinning every beam to the
+    ceiling, which the free-space measurement above prices at a percent-level
+    error for the refracted paths that dominate a deep field, the default
+    falls back to the free-space optimum for the whole fan. The changeover is
+    deliberately all-or-nothing: a criterion that cannot be met inside the
+    band is not met halfway.
+
+    **The band.** The floor of ten wavelengths and the ceiling of fifty are
+    the band the book recommends ("typically, this will lead to an initial
+    beamwidth of 10-50 wavelengths"), and the free-space term lands inside
+    them on its own across most of the useful parameter space: over a 10 km
+    run it gives 14.6 wavelengths at 100 Hz and 46 at 1 kHz.
+
+    **What the text supports, and what it cost here.** A quarter-depth cap
+    used to stand over all of this, :math:`W_0 \le D/4` whatever the angle,
+    and its retirement is worth the paragraph. The text following Eq. (3.91)
+    does ask for beams "not large compared to the water depth" (while calling
+    the choice "a matter of current research"), and p. 184 warns that a beam
+    large compared to the channel "causes a variety of problems": intuition
+    that presumes a beam summed only in the folded column, where a wide beam's
+    tail straddles the boundaries and is lost. The folded-image ladder of
+    :func:`_image_ladder` restores exactly what that folding drops, and with
+    it in place the measurements come down against the cap: on the 200 m guide
+    above the cap's 50 m width is +3.08 dB in the mean, one-sided and silent,
+    against this default's +0.19 dB; and on the isovelocity 200 m guide at
+    50 Hz (source 30.5 m, receiver 120.5 m, the same range window), where the
+    cap even undercut the book's own ten-wavelength floor (50 m against 300),
+    it costs +0.17 dB against the exact modal sum where the floor's 300 m
+    measures -0.001 dB. What survives of the water-depth intuition is its
+    geometry, made per-angle: the guide term holds every beam's *vertical
+    footprint* at :math:`4D/\pi`, about the water depth -- the cap misread
+    that footprint as the width itself, and charged the steep beams, which
+    fit the column many times over, the same toll as the flat ones.
     """
-    return float(min(max(np.sqrt(wavelength * max_range / np.pi),
-                         10.0 * wavelength),
-                     50.0 * wavelength, water_depth / 4.0))
+    widths = np.full(launch.shape, np.sqrt(wavelength * max_range / np.pi))
+    guide = 4.0 * water_depth / np.pi
+    if guide <= 50.0 * wavelength:
+        widths = np.maximum(widths, guide * np.cos(launch))
+    return np.asarray(np.clip(widths, 10.0 * wavelength, 50.0 * wavelength))
 
 
 def _image_ladder(
-    water_depth: float, bottom_reflection: float, n_wrap: int,
-) -> list[tuple[float, float, float]]:
-    """``(shift, side, strength)`` of the receiver's images in the folded column.
+    n_wrap: int,
+) -> list[tuple[int, float, int, int]]:
+    """The receiver's images in the folded column, as boundary-touch counts.
 
     The marcher folds a reflected ray back into the water column, which is the
     right thing for the geometry and only half the story for a beam: what folds
@@ -729,25 +1610,47 @@ def _image_ladder(
     integer ``l``, and the strength of each is the product of the reflection
     coefficients of the boundaries between it and the receiver: the surface
     planes stand at even multiples of ``D`` and the bottom planes at odd ones,
-    so counting them gives the exponents below. Both boundary conditions come
-    out of that sum identically rather than approximately, for either bottom:
-    at ``z_r = 0`` the two families coincide with opposite signs and cancel, and
-    at ``z_r = D`` with a rigid bottom they coincide with equal signs, so the
-    field doubles and its depth derivative cancels.
+    and *counting* them is all that happens here. The counts are returned
+    rather than the product, because the bottom's coefficient need not be a
+    number: a lossy seabed's :math:`\\mathcal{R}` depends on the grazing angle
+    and so differs beam by beam, while the count of planes between an image and
+    the receiver is geometry and differs only rung by rung.
+    :func:`_beam_influence` raises each beam's own coefficient to these
+    exponents, which for the unfolded beam is exact in an isovelocity column:
+    every bottom plane the straight unfolded beam crosses, it crosses at the
+    one angle its central ray makes with the horizontal. Both boundary
+    conditions come out of the resulting sum identically rather than
+    approximately, for either perfect bottom: at ``z_r = 0`` the two families
+    coincide with opposite signs and cancel, and at ``z_r = D`` with a rigid
+    bottom they coincide with equal signs, so the field doubles and its depth
+    derivative cancels.
+
+    With a sloping bottom there is no single ``D`` to fold at, and the rungs
+    returned here are the dimensionless part of the ladder only, the wrap
+    count and the two exponents: :func:`_beam_influence` prices the level
+    columns as ``shift = 2 l D`` and the sloping ones as the dihedral fan of
+    :func:`_fold_images`, whose rung ``(l, side)`` is the rotation of the
+    receiver by ``2 l`` facet angles about the local apex. The counts carry
+    over unchanged because the fan's plane-crossing structure is the stack's:
+    the image at angle :math:`2l\\beta \\pm \\gamma` stands behind exactly
+    ``l`` bottom planes and ``l`` (or ``l - 1``) surface planes, the same
+    words the level ladder counts, which is also where the sign consistency
+    condition (an even number of facets in the half turn) comes from.
 
     :param n_wrap: How many wraps each way to carry. What it costs is bounded
         per beam rather than globally: :func:`gaussian_beams` admits each beam
         only to the wraps its own reach can populate.
-    :return: One entry per image, with ``side`` the sign multiplying ``z_r``.
+    :return: One ``(wrap, side, n_surface, n_bottom)`` entry per image, with
+        ``wrap`` the integer ``l`` of the fold ``2 l D``, ``side`` the sign
+        multiplying ``z_r`` and the two counts the exponents of the surface
+        and bottom reflection coefficients.
     """
-    surface = _SURFACE_REFLECTION
     ladder = []
     for wrap in range(-n_wrap, n_wrap + 1):
-        shift = 2.0 * wrap * water_depth
-        ladder.append((shift, 1.0, (surface * bottom_reflection) ** abs(wrap)))
-        mirrored = (bottom_reflection**wrap * surface ** (wrap - 1) if wrap >= 1
-                    else surface ** (abs(wrap) + 1) * bottom_reflection ** abs(wrap))
-        ladder.append((shift, -1.0, mirrored))
+        ladder.append((wrap, 1.0, abs(wrap), abs(wrap)))
+        mirrored = ((wrap - 1, wrap) if wrap >= 1
+                    else (abs(wrap) + 1, abs(wrap)))
+        ladder.append((wrap, -1.0, *mirrored))
     return ladder
 
 
@@ -756,14 +1659,19 @@ class _BeamSamples(NamedTuple):
 
     All the ``(n_beams, n_ranges)`` fields are the march's own history indexed
     at the column nearest each requested range, so the influence sum is
-    arithmetic on aligned arrays rather than a search. ``xi`` is
-    ``(n_beams, 1)`` and the two range fields are ``(1, n_ranges)``, so they
-    broadcast against the rest.
+    arithmetic on aligned arrays rather than a search. The two range fields
+    are ``(1, n_ranges)``, so they broadcast against the rest. ``xi`` is the
+    marched horizontal slowness read per column like the other state, because
+    a sloping bottom rotates it at each bounce; over a level bottom every row
+    is its launch value repeated.
 
     :ivar weight: :math:`A(\\theta_0)` of Eq. (3.92) times the reflection
         coefficients the central ray has accumulated by that column.
     :ivar phase: The argument of ``spreading``, unwrapped along the ray, which
         is the branch the square root of Eq. (3.88) is taken on.
+    :ivar path: Cumulative arc length of the central ray at the column, in
+        metres: the odometer the marcher integrated with the very stages that
+        placed the ray, which is what a volume absorption multiplies on.
     :ivar reach: How far in depth, at fixed range, the beam still counts:
         ``_BEAM_CUTOFF`` half-widths divided by the cosine of the local ray
         angle, at the widest point of the ray. Used to admit each beam to as
@@ -779,15 +1687,378 @@ class _BeamSamples(NamedTuple):
     spreading: NDArray[np.complex128]
     slope: NDArray[np.complex128]
     time: NDArray[np.float64]
+    path: NDArray[np.float64]
     phase: NDArray[np.float64]
     weight: NDArray[np.complex128]
     reach: NDArray[np.float64]
 
 
+class _FoldColumns(NamedTuple):
+    """The local bottom each receiver column folds its images at.
+
+    One entry per receiver range: the receiver's own range, the bottom depth
+    there and the facet slope there (the facet ahead at a vertex, the level
+    clamp beyond the polyline's ends: the marcher's own conventions). A
+    column with slope zero folds like the level guide, bit for bit.
+    """
+
+    ranges: NDArray[np.float64]
+    depths: NDArray[np.float64]
+    slopes: NDArray[np.float64]
+
+
+def _fold_images(
+    fold: _FoldColumns, cols: NDArray[np.intp], wrap: int, side: float,
+    zr: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Receiver images of one ladder rung, per (column, receiver depth).
+
+    Where the column's facet is level this is the flat ladder's image,
+    ``z = 2 l D + side z_r`` at the receiver's own range, to the last bit.
+    Where it slopes, the surface plane and the extended facet plane meet at a
+    local apex, and the compositions of their two mirrors are the dihedral
+    fan about it: the rung ``(l, side)`` image sits at polar angle
+    :math:`2 l \\beta + \\mathrm{side}\\,\\gamma` on the receiver's own circle
+    of radius :math:`\\rho` about that apex, with :math:`\\beta` the facet
+    angle and :math:`(\\rho, \\gamma)` the receiver's polar coordinates. For
+    a single facet that is the exact unfolding (it is how the ideal wedge's
+    closed-form image fan is built), which is what lets the tail sum keep the
+    flat ladder's accuracy on a slope; a polyline of several facets makes it
+    local to each column's facet, the honest first order in facet changes.
+    Both slope signs map onto one canonical wedge by mirroring range about
+    the column, which preserves every distance the influence sum consumes.
+
+    :return: ``(z_i, r_i)`` arrays of shape ``(cols.size, zr.size)``: the
+        image positions in the water-column plane.
+    """
+    d_col = fold.depths[cols][:, None]
+    m_col = fold.slopes[cols][:, None]
+    r_col = fold.ranges[cols][:, None]
+    # Exact nonzero mask: a level facet has slope exactly 0.0 by construction
+    # (the polyline's own differences, or the level clamp past its ends), and
+    # a tolerance would fold gently sloping facets as if they were flat --
+    # small slopes are what a finely sampled bathymetry is made of.
+    sloped = m_col.astype(bool)
+    z_flat = 2.0 * wrap * d_col + side * zr[None, :]
+    # Distance from the local apex to the column along the surface, guarded
+    # where the facet is level (the apex is then at infinity and the flat
+    # branch above is the one selected).
+    x_col = d_col / np.abs(np.where(sloped, m_col, 1.0))
+    beta = np.arctan(np.abs(m_col))
+    rho = np.hypot(x_col, zr[None, :])
+    gamma = np.arctan2(zr[None, :], x_col)
+    angle = 2.0 * wrap * beta + side * gamma
+    z_i = np.where(sloped, rho * np.sin(angle), z_flat)
+    r_i = np.where(sloped,
+                   r_col + np.sign(m_col) * (rho * np.cos(angle) - x_col),
+                   r_col)
+    return z_i, r_i
+
+
+def _fold_margins(
+    fold: _FoldColumns, wrap: int, side: float,
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    """Per-column admission floor and validity of one ladder rung.
+
+    The floor is a lower bound on the *transverse* distance from the rung's
+    images to the beams, compared against the beams' reach so a rung no beam
+    can populate is never built. Level columns use the flat ladder's exact
+    ``|2 l D| - span``, which is transverse because a level fold displaces
+    the image in depth alone. Sloping columns get **no** floor at all, and
+    the reason is worth a sentence: a fold of the fan displaces the image in
+    range as much as in depth, and an image kilometres away *along* a beam's
+    axis is at zero transverse distance -- it is exactly how a wrapped tail
+    represents an arrival that went up the slope, turned past the vertical
+    and came back, which the marched axis cannot do but the analytic tail
+    does. An earlier chord-distance floor here silently pruned those
+    return-leg images and measured whole decibels against the ideal wedge;
+    only the per-cell admission test can prune a fan rung. What keeps that
+    freedom honest is the tail budget of :data:`_TAIL_TRUST`, applied inside
+    the per-cell test itself: a wrapped tail may carry an up-and-back
+    arrival, but no farther out than the march could have carried the beam
+    there and back, so a rung whose images stand on wedge geometry beyond
+    anything the caller described is refused by every beam at once.
+
+    Validity is the fan closing on itself: a wedge of angle :math:`\\beta`
+    has :math:`2\\pi/\\beta` distinct images in the whole circle, so a rung
+    rotated past :math:`\\pi` re-enters from the other side and would count
+    an image twice; it is dropped, and at exactly :math:`\\pi` (the seam,
+    where the two directions land on the same image) only the positive wrap
+    keeps it. Level columns have no fan to close and every rung is valid.
+    """
+    d_col = fold.depths
+    m_col = fold.slopes
+    # The same exact nonzero mask as :func:`_fold_images`, for the same
+    # physics: level means slope exactly 0.0, and a tolerance would hand a
+    # gently sloping column the flat ladder's floor it is not entitled to.
+    sloped = m_col.astype(bool)
+    span = d_col if side > 0.0 else 2.0 * d_col
+    flat_margin = np.abs(2.0 * wrap * d_col) - span
+    beta = np.arctan(np.abs(m_col))
+    margin = np.where(sloped, 0.0, flat_margin)
+    turned = 2.0 * abs(wrap) * beta
+    valid = ~sloped | (turned < np.pi - 1e-9) | (
+        (np.abs(turned - np.pi) <= 1e-9) & (wrap > 0))
+    return margin, valid
+
+
+class _Influence(NamedTuple):
+    """What every rung of one influence sum shares.
+
+    The receiver grid, the constants of Eq. (3.88) and the sloped-column tail
+    budget travel together so the rung workers take a context rather than an
+    argument list. ``capped`` and ``tail_limit`` are the fold's tail budget
+    (see :func:`_beam_influence` on :data:`_TAIL_TRUST`): ``None`` and an
+    unused limit over a level bottom, where no tail needs a leash.
+    """
+
+    receiver_depths: NDArray[np.float64]
+    water_depth: float
+    omega: float
+    attenuation: float
+    fold: _FoldColumns | None
+    half_omega_width: NDArray[np.float64]
+    cutoff_sq: float
+    capped: NDArray[np.bool_] | None
+    tail_limit: float
+
+
+def _wrap_count(
+    s: _BeamSamples, water_depth: float, fold: _FoldColumns | None,
+) -> int:
+    """How many rungs each way of the ladder the widest reach demands."""
+    if fold is None:
+        return min(_MAX_BEAM_WRAPS,
+                   int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
+    # Level columns ask for the depth-stack count the reach implies; the
+    # sloped ones ask for the whole half fan, seam included, because the
+    # wrapped tails carry the up-and-back arrivals whatever the reach.
+    n_wrap = int(np.ceil(float(s.reach.max()) / (2.0 * fold.depths.min())))
+    sloped = np.abs(fold.slopes) > 0.0
+    if np.any(sloped):
+        beta_min = float(np.arctan(np.abs(fold.slopes[sloped])).min())
+        n_wrap = max(n_wrap, int(np.ceil(0.5 * np.pi / beta_min)) + 1)
+    return min(_MAX_BEAM_WRAPS, n_wrap)
+
+
+def _fold_rung_extent(
+    s: _BeamSamples, fold: _FoldColumns, wrap: int, side: float,
+    reach_max: float,
+) -> tuple[NDArray[np.intp], NDArray[np.intp] | None] | None:
+    """The rows and columns of one rung over a fold, or ``None`` for no rung.
+
+    The floor and the rung's validity come from the local fan of
+    :func:`_fold_margins`; a rung only some columns can populate returns
+    those columns, and one no column admits returns nothing at all.
+    """
+    margin, valid = _fold_margins(fold, wrap, side)
+    usable = valid & (margin <= reach_max)
+    cols = None
+    if not usable.all():
+        cols = np.flatnonzero(usable)
+        if cols.size == 0:
+            return None
+    return np.flatnonzero(s.reach >= float(margin[usable].min())), cols
+
+
+def _rung_plan(
+    s: _BeamSamples, fold: _FoldColumns | None, water_depth: float,
+    r_bottom: NDArray[Any], n_wrap: int,
+) -> list[tuple[int, float, NDArray[Any], NDArray[np.intp],
+                NDArray[np.intp] | None]]:
+    """The rungs some beam can populate: strength, rows and columns of each.
+
+    Each image sits at ``shift + side*z_r - z_j`` in depth, so with both
+    depths inside the column its offset is at least ``|shift| - D`` away
+    for the upright family and ``|shift| - 2D`` for the mirrored one,
+    whose two depths subtract rather than cancel. A beam that cannot reach
+    that far cannot contribute to the image at any receiver depth and is
+    dropped before a single array is built for it. On a slope the floor
+    and the rung's validity come from the local fan instead.
+    """
+    reach_max = float(s.reach.max())
+    plan: list[tuple[int, float, NDArray[Any], NDArray[np.intp],
+                     NDArray[np.intp] | None]] = []
+    for wrap, side, n_surface, n_bottom in _image_ladder(n_wrap):
+        cols = None
+        if fold is None:
+            shift = 2.0 * wrap * water_depth
+            span = water_depth if side > 0.0 else 2.0 * water_depth
+            rows = np.flatnonzero(s.reach >= abs(shift) - span)
+        else:
+            extent = _fold_rung_extent(s, fold, wrap, side, reach_max)
+            if extent is None:
+                continue
+            rows, cols = extent
+        if rows.size == 0:
+            continue
+        strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
+        plan.append((wrap, side, strength, rows, cols))
+    return plan
+
+
+def _rung_samples(
+    s: _BeamSamples, rows: NDArray[np.intp], cols: NDArray[np.intp] | None,
+) -> _BeamSamples:
+    """The march history of ``rows``, at every column or at ``cols`` alone.
+
+    A rung only some columns can populate is priced on those columns alone;
+    ``np.ix_`` gathers the (row, column) cross product once. The subset is a
+    :class:`_BeamSamples` again, so the block worker reads whichever subset
+    it is handed with the same words.
+    """
+    if cols is None:
+        return _BeamSamples(
+            xi=s.xi[rows], column_range=s.column_range,
+            range_offset=s.range_offset, depth=s.depth[rows],
+            vertical=s.vertical[rows], speed=s.speed[rows],
+            spreading=s.spreading[rows], slope=s.slope[rows],
+            time=s.time[rows], path=s.path[rows], phase=s.phase[rows],
+            weight=s.weight[rows], reach=s.reach[rows])
+    sub = np.ix_(rows, cols)
+    return _BeamSamples(
+        xi=s.xi[sub], column_range=s.column_range[:, cols],
+        range_offset=s.range_offset[:, cols], depth=s.depth[sub],
+        vertical=s.vertical[sub], speed=s.speed[sub],
+        spreading=s.spreading[sub], slope=s.slope[sub],
+        time=s.time[sub], path=s.path[sub], phase=s.phase[sub],
+        weight=s.weight[sub], reach=s.reach[rows])
+
+
+def _image_offsets(
+    grid: _Influence, col_index: NDArray[np.intp], wrap: int, side: float,
+    zr: NDArray[np.float64], depth: NDArray[np.float64],
+    offset: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Depth and range offsets from each beam sample to one rung's images."""
+    if grid.fold is None:
+        shift = 2.0 * wrap * grid.water_depth
+        return (shift + side * zr[None, None, :]) - depth, offset
+    z_i, r_i = _fold_images(grid.fold, col_index, wrap, side, zr)
+    dz = z_i[None, :, :] - depth
+    # The image's own range enters through the offset to the sample column; a
+    # level column reduces to the receiver's.
+    d_r = offset + (r_i - grid.fold.ranges[col_index][:, None])[None, :, :]
+    return dz, d_r
+
+
+def _survivor_block(
+    r: _BeamSamples, grid: _Influence, strength: NDArray[Any], *,
+    admitted: NDArray[np.bool_], q_infl: NDArray[np.complex128],
+    r_infl: NDArray[np.float64], along: NDArray[np.float64],
+    normal: NDArray[np.float64], n_z: int,
+) -> NDArray[np.complex128] | None:
+    """Eq. (3.88) summed over one block's admitted cells, or ``None``."""
+    nc = r.depth.shape[1]
+    hits = np.flatnonzero(admitted.ravel())
+    if hits.size == 0:
+        return None
+    beam_at, within = np.divmod(hits, nc * n_z)
+    range_at, depth_at = np.divmod(within, n_z)
+    q_hit = q_infl.ravel()[hits]
+    spread_hit = r.spreading[beam_at, range_at]
+    along_hit = along.ravel()[hits]
+    # The travel-time phase, the tracked branch of 1/sqrt(q) and the
+    # transverse Gaussian all ride in one exponent rather than three,
+    # because a complex exponential over tens of millions of survivors
+    # is where the run time goes.
+    exponent = (
+        -0.5j * (r.phase[beam_at, range_at]
+                 + np.angle(q_hit * np.conj(spread_hit)))
+        - 1j * grid.omega * (r.time[beam_at, range_at] + along_hit
+                             + r.slope[beam_at, range_at] / (2.0 * q_hit)
+                             * normal.ravel()[hits] ** 2)
+    )
+    if grid.attenuation > 0.0:
+        # e^{-alpha s} of Eq. (3.116): the marched arc length continued
+        # to the foot of the perpendicular (along = s/c), floored at
+        # zero; see the docstring. Real, so it joins the exponent as
+        # pure decay whichever time convention the caller settles on.
+        exponent -= grid.attenuation * np.maximum(
+            r.path[beam_at, range_at]
+            + r.speed[beam_at, range_at] * along_hit, 0.0)
+    value = (
+        r.weight[beam_at, range_at] * strength[beam_at]
+        * np.sqrt(r.speed[beam_at, range_at] / r_infl.ravel()[hits])
+        / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
+    )
+    cells = n_z * nc
+    target = depth_at * nc + range_at
+    return (np.bincount(target, value.real, minlength=cells)
+            + 1j * np.bincount(target, value.imag, minlength=cells)
+            ).reshape(n_z, nc)
+
+
+def _sum_rung(
+    field: NDArray[np.complex128], s: _BeamSamples, grid: _Influence, *,
+    wrap: int, side: float, strength: NDArray[Any],
+    rows: NDArray[np.intp], cols: NDArray[np.intp] | None,
+) -> None:
+    """Add one rung's beams into ``field``, a block of depths at a time.
+
+    The block is sized so the temporaries stay bounded however large the
+    requested receiver grid is.
+    """
+    n_ranges = s.depth.shape[1]
+    nc = n_ranges if cols is None else cols.size
+    r = _rung_samples(s, rows, cols)
+    col_index = np.arange(n_ranges, dtype=np.intp) if cols is None else cols
+    xi = r.xi[:, :, None]
+    offset = r.range_offset[:, :, None]
+    column = r.column_range[:, :, None]
+    depth = r.depth[:, :, None]
+    vertical = r.vertical[:, :, None]
+    speed = r.speed[:, :, None]
+    speed_sq = speed**2
+    wavelength = 2.0 * np.pi * speed / grid.omega
+    spreading = r.spreading[:, :, None]
+    slope = r.slope[:, :, None]
+    half_width = grid.half_omega_width[rows][:, None, None]
+    # The tail cap is per column; a rung priced on a column subset reads it
+    # on that subset alone.
+    sub_capped = grid.capped
+    if sub_capped is not None and cols is not None:
+        sub_capped = sub_capped[cols]
+    step = max(1, _INFLUENCE_BLOCK // (rows.size * nc))
+    for lo in range(0, grid.receiver_depths.size, step):
+        zr = grid.receiver_depths[lo:lo + step]
+        dz, d_r = _image_offsets(grid, col_index, wrap, side, zr, depth,
+                                 offset)
+        along = xi * d_r + vertical * dz  # s / c
+        normal = speed * (xi * dz - vertical * d_r)
+        q_infl = spreading + speed_sq * slope * along
+        # Held off the axis by a wavelength; see the note above on why the
+        # cylindrical half of the Jacobian is the one factor nothing else
+        # protects.
+        r_infl = np.maximum(column + speed_sq * xi * along, wavelength)
+        # Admit a cell when n^2/W^2 < cutoff^2 with W = 2|q|/(omega W_0),
+        # written as a comparison of squares so that neither side needs a
+        # square root: this test runs over the whole block while everything
+        # after it runs over the survivors, which in a waveguide are around
+        # a third of the cells, so it must stay arithmetic.
+        admitted = ((normal * half_width) ** 2
+                    < grid.cutoff_sq * (q_infl.real**2 + q_infl.imag**2))
+        if sub_capped is not None and sub_capped.any():
+            admitted &= (~sub_capped[None, :, None]
+                         | (np.abs(speed * along) <= grid.tail_limit))
+        block = _survivor_block(r, grid, strength, admitted=admitted,
+                                q_infl=q_infl, r_infl=r_infl, along=along,
+                                normal=normal, n_z=zr.size)
+        if block is None:
+            continue
+        if cols is None:
+            field[lo:lo + zr.size] += block
+        else:
+            field[lo:lo + zr.size, cols] += block
+
+
 def _beam_influence(
     s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
-    water_depth: float, bottom_reflection: float, omega: float,
-    beam_width: float,
+    water_depth: float,
+    bottom_reflection: float | NDArray[np.complex128],
+    omega: float, beam_width: float | NDArray[np.float64],
+    attenuation: float, fold: _FoldColumns | None = None,
+    march_extent: float = np.inf,
 ) -> NDArray[np.complex128]:
     r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
 
@@ -867,91 +2138,97 @@ def _beam_influence(
     beams are summed independently, which is the structural advantage of beam
     tracing over ray interpolation.
 
+    VOLUME ABSORPTION rides in the same exponent when ``attenuation`` is
+    nonzero. Sect. 3.6.2 derives it by perturbing the eikonal with a complex
+    sound speed: the real rays stand, and each acquires the factor
+    :math:`e^{-\int_0^s \alpha(s')\,ds'}` of Eq. (3.116), an integral along the
+    ray's own arc length, "a loss proportional to the path length times the
+    loss per meter" for constant :math:`\alpha`. The path length here is the
+    marcher's cumulative arc length at the bracketing column continued to the
+    foot of the perpendicular by :math:`c \cdot (s/c)`, the same closed-form
+    continuation the travel time takes three lines up, so the loss is charged
+    over exactly the path whose phase is summed. It is *not*
+    :math:`\alpha \times` range: the section closes by noting that adding
+    :math:`\alpha r` "is used in many ray models", and that approximation is
+    precisely what a steep or many-times-reflected path breaks, its arc length
+    exceeding its range by the obliquity the marcher already integrated. The
+    continued length is floored at zero because the foot of a perpendicular can
+    land marginally behind the source, where a negative path would read as
+    gain; the clamp is dormant everywhere the method has anything to say (the
+    near field within a few beam widths is already not to be read, see
+    :func:`gaussian_beams`).
+
+    THE LADDER'S STRENGTHS ARE PER BEAM, because the bottom's coefficient may
+    be. ``bottom_reflection`` is either the scalar of a perfect reflector or
+    one complex Rayleigh coefficient per beam, evaluated by the caller at the
+    grazing angle Snell's invariant fixes for that beam at the seabed; each
+    rung of :func:`_image_ladder` says how many surface and bottom planes
+    stand between the image and the receiver, and the strength is the
+    coefficients raised to those counts. For the unfolded beam in an
+    isovelocity column that is exact, not paraxial: the unfolded beam is
+    straight, so it crosses every bottom plane at its central ray's own angle.
+
+    THE FOLD MAY BE A LOCAL WEDGE FAN. With ``fold`` given (a sloping bottom),
+    each receiver column folds its images at its own facet: the flat vertical
+    stack of mirrors becomes the dihedral fan about the local apex that
+    :func:`_fold_images` builds, which for a single facet is the exact
+    unfolding. The straight continuation the influence sum evaluates *is* the
+    unfolded beam, so evaluating it at those rotated image points keeps on a
+    slope the very property that makes the flat ladder exact: each stationary
+    image contributes :math:`e^{ikR}/R` of its own unfolded distance. What
+    breaks it is a fold plane that is wrong by the facet's tilt: an earlier
+    version of this branch folded at the local *depth* but not the local
+    *slope*, and the tilt displaces a first-fold image by
+    :math:`2\beta\,(D - z_\mathrm{r})`, metres against a wavelength, which
+    measured 5 to 21 dB of fringe displacement on the ideal wedge where the
+    fan ladder measures a small fraction of a decibel. The fan is local in
+    reach as well as in tilt: at a sloped column a tail is evaluated no
+    farther from its sample than :data:`_TAIL_TRUST` marched extents,
+    because a rung whose image circles an apex standing tens of extents
+    beyond the march represents bounces on boundary the polyline never
+    described, and evaluating those tails anyway measured up to 11 dB of
+    pollution on a configuration whose bottom no beam can even reach; two
+    extents is the out-and-back allowance that keeps every genuine return
+    leg of the ideal wedge (its farthest stands 1.9 extents out) while
+    refusing the fiction. A rung whose images
+    stand beyond every beam's reach at some columns but not others is
+    evaluated on the columns that need it alone, which is what keeps the
+    thinning column of a wedge from pricing every rung everywhere: near an
+    apex the local depth gets small, the wrap count the reach demands grows
+    as its inverse, and without the column subset the ladder would build
+    full-width arrays for rungs one column asked for.
+
+    :param attenuation: Volume absorption :math:`\alpha` in nepers per metre
+        (0.0 propagates without absorption and skips the work).
+    :param fold: Per-column fold geometry of a sloping bottom, or ``None``
+        for the level guide at ``water_depth`` (the flat ladder, bit for
+        bit; a ``fold`` whose slopes are all zero is that same ladder by
+        construction).
+    :param march_extent: Range span the beams were marched over, in metres;
+        with ``fold`` given it sets the tail budget
+        :data:`_TAIL_TRUST` ``* march_extent`` at the sloped columns.
     :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
         convention Eq. (3.88) is printed in; the caller conjugates it.
     """
-    n_ranges = s.depth.shape[1]
-    n_wrap = min(_MAX_BEAM_WRAPS,
-                 int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
-    plan = []
-    for shift, side, strength in _image_ladder(water_depth, bottom_reflection, n_wrap):
-        # This image sits at ``shift + side*z_r - z_j`` in depth, so with both
-        # depths inside the column its offset is at least ``|shift| - D`` away
-        # for the upright family and ``|shift| - 2D`` for the mirrored one,
-        # whose two depths subtract rather than cancel. A beam that cannot reach
-        # that far cannot contribute to the image at any receiver depth and is
-        # dropped before a single array is built for it.
-        span = water_depth if side > 0.0 else 2.0 * water_depth
-        rows = np.flatnonzero(s.reach >= abs(shift) - span)
-        if rows.size:
-            plan.append((shift, side, strength, rows))
-
-    half_omega_width = 0.5 * omega * beam_width
-    cutoff_sq = _BEAM_CUTOFF**2
-    field = np.zeros((receiver_depths.size, n_ranges), dtype=np.complex128)
-    for shift, side, strength, rows in plan:
-        xi = s.xi[rows][:, :, None]
-        offset = s.range_offset[:, :, None]
-        column = s.column_range[:, :, None]
-        depth = s.depth[rows][:, :, None]
-        vertical = s.vertical[rows][:, :, None]
-        speed2d, slope2d = s.speed[rows], s.slope[rows]
-        spread2d, weight2d = s.spreading[rows], s.weight[rows]
-        phase2d, time2d = s.phase[rows], s.time[rows]
-        speed = speed2d[:, :, None]
-        speed_sq = speed**2
-        wavelength = 2.0 * np.pi * speed / omega
-        spreading = spread2d[:, :, None]
-        slope = slope2d[:, :, None]
-        # A block of receiver depths at a time, sized so the temporaries stay
-        # bounded however large the requested grid is.
-        step = max(1, _INFLUENCE_BLOCK // (rows.size * n_ranges))
-        for lo in range(0, receiver_depths.size, step):
-            zr = receiver_depths[lo:lo + step]
-            dz = (shift + side * zr[None, None, :]) - depth
-            along = xi * offset + vertical * dz  # s / c
-            normal = speed * (xi * dz - vertical * offset)
-            q_infl = spreading + speed_sq * slope * along
-            # Held off the axis by a wavelength; see the note above on why the
-            # cylindrical half of the Jacobian is the one factor nothing else
-            # protects.
-            r_infl = np.maximum(column + speed_sq * xi * along, wavelength)
-            # Admit a cell when n^2/W^2 < cutoff^2 with W = 2|q|/(omega W_0),
-            # written as a comparison of squares so that neither side needs a
-            # square root: this test runs over the whole block while everything
-            # after it runs over the survivors, which in a waveguide are around
-            # a third of the cells, so it must stay arithmetic.
-            hits = np.flatnonzero(
-                ((normal * half_omega_width) ** 2
-                 < cutoff_sq * (q_infl.real**2 + q_infl.imag**2)).ravel())
-            if hits.size == 0:
-                continue
-            beam_at, within = np.divmod(hits, n_ranges * zr.size)
-            range_at, depth_at = np.divmod(within, zr.size)
-            q_hit = q_infl.ravel()[hits]
-            spread_hit = spread2d[beam_at, range_at]
-            # The travel-time phase, the tracked branch of 1/sqrt(q) and the
-            # transverse Gaussian all ride in one exponent rather than three,
-            # because a complex exponential over tens of millions of survivors
-            # is where the run time goes.
-            exponent = (
-                -0.5j * (phase2d[beam_at, range_at]
-                         + np.angle(q_hit * np.conj(spread_hit)))
-                - 1j * omega * (time2d[beam_at, range_at] + along.ravel()[hits]
-                                + slope2d[beam_at, range_at] / (2.0 * q_hit)
-                                * normal.ravel()[hits] ** 2)
-            )
-            value = (
-                weight2d[beam_at, range_at] * strength
-                * np.sqrt(speed2d[beam_at, range_at] / r_infl.ravel()[hits])
-                / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
-            )
-            cells = zr.size * n_ranges
-            target = depth_at * n_ranges + range_at
-            field[lo:lo + zr.size] += (
-                np.bincount(target, value.real, minlength=cells)
-                + 1j * np.bincount(target, value.imag, minlength=cells)
-            ).reshape(zr.size, n_ranges)
+    r_bottom = np.broadcast_to(np.asarray(bottom_reflection),
+                               (s.depth.shape[0],))
+    plan = _rung_plan(s, fold, water_depth, r_bottom,
+                      _wrap_count(s, water_depth, fold))
+    # One W_0 per beam (a scalar is every beam's): the admission test of
+    # :func:`_sum_rung` reads W = 2|q|/(omega W_0) with each row's own width.
+    half_omega_width = 0.5 * omega * np.broadcast_to(
+        np.asarray(beam_width, dtype=np.float64), (s.depth.shape[0],))
+    grid = _Influence(
+        receiver_depths=receiver_depths, water_depth=water_depth, omega=omega,
+        attenuation=attenuation, fold=fold,
+        half_omega_width=half_omega_width, cutoff_sq=_BEAM_CUTOFF**2,
+        capped=None if fold is None else np.abs(fold.slopes) > 0.0,
+        tail_limit=_TAIL_TRUST * march_extent)
+    field = np.zeros((receiver_depths.size, s.depth.shape[1]),
+                     dtype=np.complex128)
+    for wrap, side, strength, rows, cols in plan:
+        _sum_rung(field, s, grid, wrap=wrap, side=side, strength=strength,
+                  rows=rows, cols=cols)
     return field
 
 
@@ -1049,20 +2326,149 @@ def _beam_receiver_grid(
 
 
 class _Fan(NamedTuple):
-    """The launch fan, in the three forms the beam sum reads it in.
+    """The resolved launch fan, in the forms the beam sum reads it in.
 
-    They are one quantity written three ways and have to agree, which is why
-    they travel together: ``xi`` is the Snell invariant the marcher is handed,
-    and ``dtheta`` is the spacing the weight of Eq. (3.92) integrates over.
+    The first three are one quantity written three ways and have to agree,
+    which is why they travel together: ``xi`` is the Snell invariant the
+    marcher is handed, and ``dtheta`` is the spacing the weight of Eq. (3.92)
+    integrates over. ``width`` rides along because each beam's weight and
+    initial condition both spend it.
 
     :ivar launch: Launch angle of each beam from the horizontal, in radians.
     :ivar xi: ``cos(launch) / c(z_s)``, per beam, in s/m.
     :ivar dtheta: Spacing of the fan, in radians.
+    :ivar width: Initial half-width :math:`W_0` of each beam, in metres.
     """
 
     launch: NDArray[np.float64]
     xi: NDArray[np.float64]
     dtheta: float
+    width: NDArray[np.float64]
+
+
+@dataclass(frozen=True)
+class BeamFan:
+    r"""The launch fan :func:`gaussian_beams` hangs its beams on.
+
+    Aperture, density and initial width travel together because they are one
+    bargain: the overlap condition that sizes the default fan reads the
+    width, and the width's own default is per launch angle. Every field has
+    a default, so ``BeamFan()`` is the stock fan and one field is named to
+    move one lever.
+
+    :ivar max_angle_deg: Half-angle of the fan, in degrees from the
+        horizontal. Beams are spread symmetrically over
+        ``[-max_angle_deg, +max_angle_deg]``.
+    :ivar n_beams: Number of beams in the fan. Default (``None``): from the
+        overlap condition. Adjacent beams are :math:`s\,\delta\theta_0` apart
+        at arc length :math:`s` while each has spread to
+        :math:`W \to s\lambda/(\pi W_0)`, so the condition that they still
+        overlap, :math:`\delta\theta_0 \lesssim \lambda/(\pi W_0)`, is
+        range-independent; the default takes four times that margin. Too
+        coarse a fan shows as a periodic ripple in range at the beam spacing,
+        which is easy to mistake for physical interference.
+    :ivar beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
+        initial half-width, at the :math:`e^{-2}` folding distance in
+        intensity, applied to every beam of the fan when passed. Default
+        (``None``): one width per launch angle, the free-space optimum of
+        each beam's own flight; see :func:`_default_beam_widths`.
+    """
+
+    max_angle_deg: float = 80.0
+    n_beams: int | None = None
+    beam_width: float | None = None
+
+
+@dataclass(frozen=True)
+class VolumeAbsorption:
+    r"""Seawater volume absorption: a model and the water it is evaluated in.
+
+    The same models, spelled the same way, as
+    :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`;
+    :func:`gaussian_beams` evaluates the coefficient once, at the source
+    frequency and the source depth, and charges it along each beam's own arc
+    length (Jensen Eq. 3.116). Passing the bare model name to the solver is
+    the same as passing this class with its defaults.
+
+    :ivar model: ``"francois-garrison"``, ``"ainslie-mccolm"`` or ``"thorp"``.
+    :ivar temperature: Temperature ``T``, in degrees Celsius.
+    :ivar salinity: Salinity ``S``, in parts per thousand.
+    :ivar ph: Acidity (Thorp ignores it always).
+    """
+
+    model: str
+    temperature: float = 10.0
+    salinity: float = 35.0
+    ph: float = 8.0
+
+
+def _resolve_absorption(
+    absorption: str | VolumeAbsorption | None, frequency_hz: float, zs: float,
+) -> tuple[str | None, float]:
+    """The validated model key and its dB/km coefficient at the source."""
+    if absorption is None:
+        return None, 0.0
+    spec = (VolumeAbsorption(absorption) if isinstance(absorption, str)
+            else absorption)
+    key = spec.model.strip().lower()
+    if key not in _ABSORPTION_MODELS:
+        raise ValueError(
+            f"'absorption' must name one of {_ABSORPTION_MODELS} or be None,"
+            f" got {spec.model!r}.")
+    return key, float(seawater_absorption(
+        frequency_hz, temperature=spec.temperature, salinity=spec.salinity,
+        depth=zs, ph=spec.ph, model=key)[0])
+
+
+def _resolve_fan(
+    fan: BeamFan, wavelength: float, rmax: float, water_depth: float,
+    c0: float,
+) -> _Fan:
+    """The concrete fan a :class:`BeamFan` asks for, widths resolved."""
+    theta_max = float(fan.max_angle_deg)
+    if not (0.0 < theta_max < 90.0):
+        raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
+    # The width the fan's density is sized for has to exist before the fan
+    # does, and the overlap condition below must hold for every beam, so it
+    # is the *widest* width of the run: an explicit one applies everywhere,
+    # and both terms of the per-angle default are widest on the axis, so its
+    # maximum is its value at theta_0 = 0.
+    if fan.beam_width is not None:
+        w_fan = require_positive(fan.beam_width, "beam_width")
+    else:
+        w_fan = float(_default_beam_widths(
+            wavelength, rmax, water_depth, np.zeros(1))[0])
+    span = 2.0 * np.radians(theta_max)
+    n_fan = (int(np.ceil(span * 4.0 * np.pi * w_fan / wavelength)) + 1
+             if fan.n_beams is None else int(fan.n_beams))
+    if n_fan < 2:
+        raise ValueError("'n_beams' must be at least 2.")
+    launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
+    w0 = (np.full(n_fan, float(w_fan)) if fan.beam_width is not None
+          else _default_beam_widths(wavelength, rmax, water_depth, launch))
+    return _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]),
+                np.asarray(w0, dtype=np.float64))
+
+
+def _retire_stopped_beams(
+    march: RayMarch, sloping: bool, n_steps: int,
+    widths: NDArray[np.float64], curvatures: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """The per-ray records, ``NaN`` from each terminated beam's stop column on.
+
+    A terminated beam's history is frozen at its last bounce; the field has
+    already retired it there, and the per-ray records say so the same way
+    :func:`ray_trace` does. Over a level bottom no beam terminates and the
+    records pass through untouched.
+    """
+    ray_depths = march.positions
+    if (not sloping or march.stopped_columns is None
+            or not np.any(march.stopped_columns < n_steps)):
+        return ray_depths, widths, curvatures
+    gone = np.arange(n_steps)[None, :] >= march.stopped_columns[:, None]
+    return (np.where(gone, np.nan, ray_depths),
+            np.where(gone, np.nan, widths),
+            np.where(gone, np.nan, curvatures))
 
 
 def gaussian_beams(
@@ -1075,11 +2481,12 @@ def gaussian_beams(
     ranges_m: NDArray[np.float64] | list[float] | None = None,
     receiver_depths_m: NDArray[np.float64] | list[float] | None = None,
     n_depth_points: int = 200,
-    max_angle_deg: float = 80.0,
-    n_beams: int | None = None,
-    beam_width: float | None = None,
+    fan: BeamFan | None = None,
     range_step: float = 25.0,
-    bottom: str = "pressure-release",
+    bottom: str | FluidSeabed = "pressure-release",
+    absorption: str | VolumeAbsorption | None = None,
+    bathymetry: tuple[NDArray[np.float64] | list[float],
+                      NDArray[np.float64] | list[float]] | None = None,
 ) -> GaussianBeamResult:
     r"""Propagation-loss field from Gaussian beam tracing.
 
@@ -1088,7 +2495,8 @@ def gaussian_beams(
     :func:`ray_trace` draws, integrated by the same marcher through the same
     profile; what is added is the dynamic pair :math:`(q, p)` of Eq. (3.58),
     started from the complex conditions of Eq. (3.91) that make each ray the
-    axis of a beam of initial half-width ``beam_width`` and flat wavefront.
+    axis of a beam of initial half-width ``fan.beam_width`` and flat
+    wavefront.
 
     The point of the beams is that the answer stays finite. Ray theory's
     amplitude, Eq. (3.65), divides by the ray-tube spreading, which vanishes on
@@ -1103,15 +2511,22 @@ def gaussian_beams(
     The limits are worth knowing before the numbers are believed.
 
     * **Ray theory's own regime** (Sect. 3.4.2): "the wavelength should be
-      substantially smaller than any physical scale in the problem". This is the
-      limit that bites hardest and the one a plausible-looking answer hides
-      best. At 20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes
-      propagate, and the quarter-depth cap on the beam width leaves a beam a
-      third of a wavelength across: against the image-source sum from 200 m to
-      5 km the loss then comes out 2 to 8 dB high, and it moves by decibels when
-      the fan is opened or the beam count multiplied by 150, so there is nothing
-      it is converging to. Use :func:`normal_modes` there, which is exact in
-      that regime for the cost of two modes.
+      substantially smaller than any physical scale in the problem". This is
+      the limit that bites hardest and the one a plausible-looking answer
+      hides best -- and one earlier version of this paragraph blamed it for an
+      error that was really the beam width's. At 20 Hz in 100 m of water the
+      depth is 1.3 wavelengths and two modes propagate; the quarter-depth cap
+      this module used to put on :math:`W_0` left a beam a third of a
+      wavelength across, and the loss came out decibels high against the
+      image-source sum. With the cap retired the same guide (source 36 m,
+      receiver 64 m, energy-averaged 0.2 to 5 km) measures -0.001 dB in the
+      mean and 0.03 dB at worst, at the ten-wavelength floor's 750 m width.
+      That clean bill is narrower than it looks: an isovelocity column over
+      perfect reflectors is pure geometry, which the folded receiver images
+      reproduce exactly at any frequency, so it says nothing about a channel
+      the low-frequency field actually refracts through, and there
+      :func:`normal_modes` remains the solver to trust, exact in that regime
+      for the cost of two modes.
     * **There is no near field**, and this is the largest error the function
       makes. Eq. (3.92) weights the fan by matching it to a point source in the
       far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
@@ -1124,11 +2539,12 @@ def gaussian_beams(
       150 to 437 m: 17, 13 and 4.1 dB at a quarter of :math:`W_0`, 1.2, 0.64 and
       0.36 dB at :math:`W_0`, 0.012, 0.005 and 0.002 dB at 2.5 :math:`W_0`, and
       a thousandth of a decibel or better from 3 :math:`W_0` out. Read nothing
-      inside about three beam widths of the source; since the default
-      :math:`W_0` grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run pushes
-      that boundary out rather than in. :func:`parabolic_equation` is the
-      solver to reach for close to the source.
-    * **The fan is truncated** at ``max_angle_deg``, and a waveguide with two
+      inside about three beam widths of the source; since the default's
+      free-space term grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run
+      pushes that boundary out rather than in. :func:`parabolic_equation` is
+      the solver to reach for close to the source.
+    * **The fan is truncated** at ``fan.max_angle_deg``, and a waveguide with
+      two
       perfectly reflecting boundaries is the worst case for that, because
       nothing but :math:`1/R` attenuates the steep multiple bounces. Measured on
       the ideal 1000 m guide at 300 Hz, source at 300 m and receiver at 600 m,
@@ -1136,32 +2552,140 @@ def gaussian_beams(
       0.27, 4.06 and 2.52 dB out, a fan to 85 degrees 0.21, 1.32 and 1.91 dB,
       and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
       to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
-      at 80 degrees is the fan and not the method. A real seabed absorbs those
+      at 80 degrees is the fan and not the method. A real seabed (the
+      :class:`FluidSeabed` below) absorbs those
       bounces and the default is then ample; a perfect reflector needs the
       fan opened and ``range_step`` cut with it, since a step has to resolve
       :math:`\tan\theta_\mathrm{max}` depth units of climb per unit range. The
       warning below says when that pairing is wrong.
-    * **The beam must be small compared to the channel**, which the default
-      ``beam_width`` enforces and an explicit one is checked against. In
-      shallow water that clamp, and not the method, is the largest error left:
-      it holds :math:`W_0` at a quarter of the water depth while the optimum
-      the same function computes first is several times larger, and the field
-      comes out systematically too quiet. Measured against the closed-form Airy
-      modes of an :math:`n^2`-linear 200 m guide at 200 Hz, source at 30.5 m and
-      receiver at 120.5 m, energy-averaged over 0.5 to 4 km: the default
-      :math:`W_0` of 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
-      100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about
-      refraction is wrong there, and the same profile in 1000 m of water, where
-      the clamp does not bite, comes out at +0.72 dB with a 1.37 dB worst bin,
-      closer to the exact field than :func:`normal_modes` on the same cut. Pass
-      ``beam_width`` explicitly, above the cap and up to about the water depth,
-      when the channel is shallow and the profile refracts; the warning it
-      raises is then the expected cost of the better answer. Sect. 3.5 says the
-      same thing from the other side, that "at lower frequencies the physics may
-      imply that the beam is large compared to the channel, which causes a
-      variety of problems".
+    * **A shallow channel sets its own width**, and the default now pays it
+      per launch angle rather than clamping against it. An earlier version of
+      this module capped :math:`W_0` at a quarter of the water depth, reading
+      Sect. 3.5's caution that a beam "large compared to the channel ...
+      causes a variety of problems" as a ceiling; measured against the
+      closed-form Airy modes of an :math:`n^2`-linear 200 m guide at 200 Hz
+      (source 30.5 m, receiver 120.5 m, energy-averaged over 0.5 to 4 km),
+      that cap's 50 m width came out +3.08 dB in the mean and +5.86 dB at
+      worst, systematically too quiet, while the per-angle default measures
+      +0.19 dB on the same cut. What a shallow guide actually demands is the
+      opposite bound, a beam wide enough to resolve the channel's modes in
+      launch angle, and :func:`_default_beam_widths` says why that is
+      :math:`W_0 \ge 4D\cos\theta_0/\pi` and what the folded receiver images
+      do to make the width affordable. The same profile in 1000 m of water,
+      where the modal criterion is out of the band's reach and the free-space
+      optimum stands, comes out at +0.72 dB with a 1.37 dB worst bin, closer
+      to the exact field than :func:`normal_modes` on the same cut. An
+      explicit ``fan.beam_width`` is taken as given, whatever its size: the
+      old
+      quarter-depth warning went with the cap, since the measurements put the
+      fault on the cap's side.
 
-    What it costs is ``n_beams`` times the size of the receiver grid, and none
+    **Seawater absorption is off by default** and the field is then optimistic
+    beyond a few kilometres at sonar frequencies, exactly as ray theory without
+    a volume loss must be. Passing ``absorption`` multiplies each beam by
+    :math:`e^{-\alpha s}` with :math:`s` the **arc length along its central
+    ray**, which is Sect. 3.6.2 done as printed: perturbing the eikonal with
+    the complex sound speed a volume loss implies leaves the real rays standing
+    and attaches :math:`e^{-\int_0^s \alpha(s')\,ds'}` to each (Eq. 3.116),
+    an integral along the path flown, not along the range axis. The distinction
+    is not pedantry. The same section notes that adding :math:`\alpha r` to the
+    loss "is used in many ray models", and that shortcut under-charges every
+    steep or multiply-reflected path by the obliquity of its climb: a path at
+    60 degrees is twice as long as the range it covers, and it is precisely the
+    steep multiples of a waveguide that absorption is supposed to be killing.
+    The marcher integrates :math:`s` with the very Runge-Kutta stages that
+    place the ray (:math:`ds/dr = 1/(\xi c)`), so the length the loss is
+    charged over is the length of the geometry actually summed. The
+    coefficient itself comes from
+    :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`,
+    one :math:`\alpha` per run, evaluated at the source frequency and at the
+    source depth (the same point the reference sound speed :math:`c_0` is read
+    at); over a water column the coefficient's own depth terms move it by
+    around a percent per hundred metres, which is far inside the method's
+    error budget. The default stays off so the validation figures quoted
+    throughout, all measured without absorption, remain reproducible as
+    printed.
+
+    **The seabed is a perfect reflector by default**, for the same reason, and
+    real shallow-water propagation loss is dominated by what that default
+    leaves out: the seabed absorbs part of every bottom bounce. Passing
+    a :class:`FluidSeabed` as the ``bottom`` replaces the perfect
+    reflector with the lossy fluid half-space of
+    :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+    (the Rayleigh interface, ``density`` standing for the water above it and
+    the profile's own bottom sound speed for its ``c1``). This is Sect. 3.6.3
+    done as printed: "most ray codes treat the bottom simply as a reflector",
+    and each boundary touch multiplies the ray amplitude by
+    :math:`|\mathcal{R}(\theta)|` and adds :math:`\arg \mathcal{R}(\theta)`
+    to its phase (Eqs. 3.125-3.126), while the dynamic pair :math:`(q, p)`
+    crosses the reflection exactly as before, the curvature term of
+    Eq. (3.122) vanishing at a flat bottom, so the beam keeps its width and
+    only its complex amplitude is docked. The phase is not a refinement to
+    skip: below the critical angle :math:`|\mathcal{R}| = 1`, *only* the
+    phase distinguishes the lossy seabed from a perfect one, and it moves the
+    interference fringes of every bottom-interacting path. The grazing angle
+    each beam is charged at is the one Snell's invariant fixes,
+    :math:`\cos\theta = \xi\,c(z)` along the whole ray, so at a flat seabed a
+    given beam arrives at one and the same angle at every touch whatever the
+    profile above did in between: its coefficient is evaluated once, exactly,
+    and raised to the marcher's count of bottom touches, in the running
+    product and in the receiver-image ladder alike. The book is candid that a
+    plane-wave coefficient applied to a field that is not a plane wave is an
+    approximation (p. 189), and it is the approximation the whole method
+    already breathes; sediment attenuation and elasticity are outside the
+    fluid-fluid model here as they are outside ``seabed_reflection`` itself.
+
+    **The bottom may slope.** The ``bathymetry`` pair replaces the level
+    bottom with the same
+    piecewise-linear ``depth(r)`` polyline :func:`ray_trace` takes, and it is
+    the first range dependence in this module; the sound-speed profile stays
+    range independent, deliberately -- see :func:`ray_trace`'s scope note for
+    why full :math:`c(r, z)` is excluded (no exact oracle exists to hold it
+    to). Four things follow from the slope, each stated with its cost:
+
+    * Every beam's central ray reflects specularly off the local facet
+      (Eq. 3.121), so an upslope bounce steepens it by twice the slope, and
+      the dynamic pair takes the reflection impulse of Eqs. (3.122)-(3.123)
+      evaluated on that facet (curvature zero, since the facets are straight;
+      :mod:`phonometry._internal.rays` records the closed form and its
+      flat-bottom limit).
+    * A beam steepened past the vertical would run backward in range, which a
+      range-marching solver cannot carry: it is terminated at that bounce and
+      its weight is zero from there on, so the field keeps only what still
+      travels forward, exactly as the one-way parabolic equation keeps no
+      backscatter. Upslope propagation toward an apex therefore *loses* the
+      energy the wedge sends back down the slope; the ideal-wedge oracle in
+      the tests prices that truncation next to everything else.
+    * The receiver-image ladder folds each receiver column about its own
+      local facet: the vertical stack of mirrors becomes the dihedral fan
+      about the local apex, exact for a single facet and local to each
+      column's facet on a general polyline; at slope zero it is the level
+      ladder bit for bit, which a test pins. The fan is what lets the
+      *tails* keep representing paths the marched axes cannot: an arrival
+      that went up the slope, turned past the vertical and came back is a
+      wrapped rung of the fan, analytic rather than marched, and the solver
+      recovers most of it.
+    * The lossy fluid seabed cannot be combined with a slope, and the
+      rejection is of the wiring, not the physics: the one-coefficient-per-
+      beam collapse rests on Snell's invariant fixing a single grazing angle
+      per ray at the bottom, and a slope rotates that invariant at every
+      touch. A sloping run takes the perfect reflectors of ``bottom``.
+
+    Validated against the ideal wedge, which has an exact solution by images:
+    an isovelocity wedge under a pressure-release surface with a rigid sloping
+    bottom of angle :math:`\beta = \pi/n` (:math:`n` even) unfolds into a
+    closed fan of :math:`2\pi/\beta` image sources on a circle about the apex.
+    The tests build that fan from pure geometry and quantify the agreement in
+    dB, cross-sections in range and depth, upslope: a tenth of a decibel
+    where a single facet bounce carries the field, and within about two
+    decibels of the *complete* wedge field (mean two thirds of one) across a
+    thin 2.8-degree wedge whose every cell is dense multipath, most of it
+    arrivals near their own turning point, which is where a one-way marcher
+    pays its way; the test module's docstring records the measurements and
+    their stability under step, width and aperture.
+
+    What it costs is ``fan.n_beams`` times the size of the receiver grid,
+    and none
     of the three factors depends on the frequency: the ray core does not have to
     resolve a wavelength on a grid, and the fan only widens as
     :math:`\lambda/W_0`, which the default width holds nearly fixed. On a
@@ -1185,97 +2709,137 @@ def gaussian_beams(
         column, on the interior grid :func:`parabolic_equation` uses, so the two
         fields land on the same depths.
     :param n_depth_points: Size of that default depth grid.
-    :param max_angle_deg: Half-angle of the launch fan, in degrees from the
-        horizontal. Beams are spread symmetrically over
-        ``[-max_angle_deg, +max_angle_deg]``.
-    :param n_beams: Number of beams in the fan. Default (``None``): from the
-        overlap condition. Adjacent beams are :math:`s\,\delta\theta_0` apart at
-        arc length :math:`s` while each has spread to
-        :math:`W \to s\lambda/(\pi W_0)`, so the condition that they still
-        overlap, :math:`\delta\theta_0 \lesssim \lambda/(\pi W_0)`, is
-        range-independent; the default takes four times that margin. Too coarse
-        a fan shows as a periodic ripple in range at the beam spacing, which is
-        easy to mistake for physical interference.
-    :param beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
-        initial half-width, at the :math:`e^{-2}` folding distance in intensity.
-        Default (``None``): the free-space optimum
-        :math:`W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}` of Sect. 3.5.1, held
-        inside the book's recommended band of 10 to 50 wavelengths and clamped
-        to a quarter of the water depth, and the clamp has the last word.
+    :param fan: The launch fan, as a :class:`BeamFan`: its half-angle
+        ``max_angle_deg``, its density ``n_beams`` and its initial width
+        ``beam_width``, each with the default that class documents. Default
+        (``None``): the stock ``BeamFan()``, the fan every published
+        validation number of this module was measured with.
     :param range_step: Marching step in range, in metres, and the spacing of the
         default ``ranges_m``.
-    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
-        surface is always pressure-release.
+    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``, perfect
+        reflectors; or a :class:`FluidSeabed`, the lossy fluid half-space
+        whose complex Rayleigh coefficient every bottom touch is charged.
+        The sea surface is always pressure-release, and the perfect default
+        is what every published validation number of this module returns.
+    :param absorption: Seawater volume absorption applied along each beam's
+        central ray: the bare model name (``"francois-garrison"``,
+        ``"ainslie-mccolm"`` or ``"thorp"``) for the standard water of
+        :class:`VolumeAbsorption`'s defaults, or a :class:`VolumeAbsorption`
+        naming its own temperature, salinity and pH. Default (``None``): no
+        volume absorption, so the published validation numbers of this
+        module are what the solver returns.
+    :param bathymetry: A ``(ranges_m, depths_m)`` pair of arrays describing
+        a piecewise-linear bottom profile, the same pair :func:`ray_trace`
+        takes: node ranges in metres, strictly increasing from ``r = 0``
+        and level past the last node, with the bottom depth at each node in
+        metres, strictly positive and never below the sound-speed profile's
+        last depth. Not alongside a :class:`FluidSeabed`. Default
+        (``None``): the level bottom at the profile's last depth, which is
+        every validation number of this module.
     :return: A :class:`GaussianBeamResult`.
     :raises ValueError: If the inputs are invalid.
     :warns PhonometryWarning: when the source sits on a kink of the profile
-        (Sect. 3.7.4's spurious horizontal jet), when an explicit
-        ``beam_width`` exceeds a quarter of the water depth, and when one
-        marching step carries the steepest beam of the fan across more than a
-        quarter of the water column, which is the pairing between
-        ``max_angle_deg`` and ``range_step`` that is easiest to get wrong.
+        (Sect. 3.7.4's spurious horizontal jet), and when one marching step
+        carries the steepest beam of the fan across more than a quarter of
+        the water column, which is the pairing between
+        ``fan.max_angle_deg`` and ``range_step`` that is easiest to get
+        wrong.
     """
     f = require_positive(frequency_hz, "frequency_hz")
+    fan = BeamFan() if fan is None else fan
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    bathy = _clean_bathymetry(bathymetry, z_prof)
     water_depth = float(z_prof[-1])
+    depth_at_source = (water_depth if bathy is None
+                       else float(bathy[1][0]))
     zs = float(source_depth)
-    if not (0.0 < zs < water_depth):
+    if not (0.0 < zs < depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     dr_step = require_positive(range_step, "range_step")
     if dr_step > rmax:
         raise ValueError("'range_step' must not exceed 'max_range'.")
-    key = bottom.strip().lower()
-    if key not in _BOTTOM_TYPES:
-        raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
-    theta_max = float(max_angle_deg)
-    if not (0.0 < theta_max < 90.0):
-        raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
+    key, seabed = _resolve_boundary(bottom)
+    if seabed is not None and bathy is not None:
+        raise ValueError(
+            "a lossy fluid seabed and a sloping bottom cannot be combined:"
+            " the one-coefficient-per-beam collapse (and the image ladder's"
+            " powers of R) rests on Snell's invariant fixing a single grazing"
+            " angle per ray at a level bottom, and a slope rotates that"
+            " invariant at every touch. Sloping runs take the perfect"
+            " reflectors of 'bottom'.")
+    absorption_key, alpha = _resolve_absorption(absorption, f, zs)
+    # dB/km to nepers/m: N dB is e^(N ln 10 / 20) in amplitude.
+    attenuation = alpha * np.log(10.0) / (20.0 * _M_PER_KM)
 
     omega = 2.0 * np.pi * f
     c0 = float(np.interp(zs, z_prof, c_prof))
     wavelength = c0 / f
-    w0 = (_default_beam_width(wavelength, rmax, water_depth) if beam_width is None
-          else require_positive(beam_width, "beam_width"))
-    if beam_width is not None and w0 > water_depth / 4.0:
-        _warn_beams(
-            "'beam_width' exceeds a quarter of the water depth, so the beams"
-            " straddle boundaries their central rays reflected off and the"
-            " folded field drifts from the true one.")
     _check_source_on_kink(z_prof, c_prof, zs)
 
-    span = 2.0 * np.radians(theta_max)
-    n_fan = (int(np.ceil(span * 4.0 * np.pi * w0 / wavelength)) + 1
-             if n_beams is None else int(n_beams))
-    if n_fan < 2:
-        raise ValueError("'n_beams' must be at least 2.")
-    launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
-    fan = _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]))
+    launch_fan = _resolve_fan(fan, wavelength, rmax, water_depth, c0)
+    launch, w0 = launch_fan.launch, launch_fan.width
+    n_fan = launch.size
 
     n_steps = int(np.ceil(rmax / dr_step)) + 1
     dr = rmax / (n_steps - 1)
+
+    bottom_factor: float | NDArray[np.complex128] = _BOTTOM_REFLECTION[key]
+    if seabed is not None:
+        rho1, rho2, c2 = seabed
+        c_bottom = float(c_prof[-1])
+        # One coefficient per beam is exact rather than sampled: see
+        # :func:`_seabed_grazing_deg` for why Snell's invariant fixes a single
+        # grazing angle per ray at a flat seabed.
+        grazing = _seabed_grazing_deg(launch_fan.xi, c_bottom)
+        # Conjugated, deliberately. The beam sum is assembled in the
+        # exp(+i omega t) convention Eq. (3.88) is printed in and conjugated
+        # once at the end (see the sign-convention note above the result
+        # class), so every complex factor fed into it must be the conjugate of
+        # its exp(-i omega t) self or the final conjugation turns its phase
+        # backwards. The perfect reflectors are real and never showed this;
+        # a below-critical R is where it bites, |R| = 1 and only the phase
+        # carrying the seabed, and applying it un-conjugated measured 15 dB
+        # wrong against the lossy image sum at 4 km where the conjugate
+        # measures 0.02 dB.
+        bottom_factor = np.conj(reflection_coefficient(
+            grazing, rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2))
+
+    upper: float | SlopingBoundary = (
+        water_depth if bathy is None else SlopingBoundary(*bathy))
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof, fan.xi), xi=fan.xi,
+        _ocean_ray_derivative(z_prof, c_prof), xi=launch_fan.xi,
         z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
-        n_steps=n_steps, lower=0.0, upper=water_depth,
-        dynamic=DynamicRays(np.full(n_fan, 0.5j * omega * w0**2),
+        n_steps=n_steps, lower=0.0, upper=upper,
+        dynamic=DynamicRays(np.asarray(0.5j * omega * w0**2, dtype=np.complex128),
                             np.full(n_fan, 1.0 + 0.0j), z_prof, c_prof))
 
     ranges = _beam_range_grid(ranges_m, n_steps=n_steps, dr=dr, rmax=rmax)
     receivers = _beam_receiver_grid(receiver_depths_m, n_depth_points=n_depth_points,
                                     water_depth=water_depth)
 
-    climb = dr * np.tan(np.radians(theta_max))
+    climb = dr * np.tan(np.radians(float(fan.max_angle_deg)))
     if climb > _MAX_STEEP_CLIMB * water_depth:
         _warn_beams(
             f"one marching step carries the steepest beam of the fan {climb:.0f} m"
             f" across a {water_depth:.0f} m column, so its trajectory is not"
             " resolved; cut 'range_step' or narrow 'max_angle_deg'.")
 
+    # The image ladder folds each receiver column at its own local facet when
+    # the bottom slopes: depth and slope both, since a fold plane wrong by the
+    # facet's tilt displaces the images by wavelengths (see _beam_influence).
+    fold: _FoldColumns | None = None
+    if bathy is not None:
+        br, bd = bathy
+        facet = np.concatenate(([0.0], np.diff(bd) / np.diff(br), [0.0]))
+        fold = _FoldColumns(
+            ranges, np.asarray(np.interp(ranges, br, bd)),
+            facet[np.searchsorted(br, ranges, side="right")])
     field, widths, curvatures = _assemble_beam_field(
-        march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
-        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
-        water_depth=water_depth, bottom_reflection=_BOTTOM_REFLECTION[key])
+        march, ranges=ranges, receivers=receivers, fan=launch_fan, dr=dr,
+        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0,
+        water_depth=water_depth, bottom_reflection=bottom_factor,
+        attenuation=attenuation, fold=fold)
 
     # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
     # here hands back a field in the exp(-i omega t) one the rest of the module
@@ -1286,6 +2850,9 @@ def gaussian_beams(
     with np.errstate(divide="ignore"):
         pl = -20.0 * np.log10(np.abs(pressure))
 
+    ray_depths, ray_widths, ray_curvatures = _retire_stopped_beams(
+        march, bathy is not None, n_steps, widths, curvatures)
+
     return GaussianBeamResult(
         frequency=f,
         ranges=ranges,
@@ -1295,12 +2862,18 @@ def gaussian_beams(
         launch_angles=np.degrees(launch),
         ray_ranges=np.broadcast_to(np.arange(n_steps) * dr,
                                    march.positions.shape).copy(),
-        ray_depths=march.positions,
-        beam_widths=widths,
-        wavefront_curvatures=curvatures,
-        initial_beam_width=float(w0),
+        ray_depths=ray_depths,
+        beam_widths=ray_widths,
+        wavefront_curvatures=ray_curvatures,
+        initial_beam_widths=np.asarray(w0, dtype=np.float64),
+        absorption_model=absorption_key,
+        absorption_coefficient=alpha,
+        seabed_density=None if seabed is None else seabed[1],
+        seabed_sound_speed=None if seabed is None else seabed[2],
         source_depth=zs,
         water_depth=water_depth,
+        bathymetry_ranges=None if bathy is None else bathy[0],
+        bathymetry_depths=None if bathy is None else bathy[1],
     )
 
 
@@ -1308,8 +2881,10 @@ def _assemble_beam_field(
     march: RayMarch, *, ranges: NDArray[np.float64],
     receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    omega: float, c0: float, w0: float, water_depth: float,
-    bottom_reflection: float,
+    omega: float, c0: float,
+    water_depth: float,
+    bottom_reflection: float | NDArray[np.complex128], attenuation: float,
+    fold: _FoldColumns | None = None,
 ) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
     r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
 
@@ -1317,33 +2892,54 @@ def _assemble_beam_field(
     factor is the running product of the coefficients the central ray has met,
     which is why the marcher has to say *which* boundary each bounce was at: a
     pressure-release sea surface inverts the pressure and a seabed need not.
+    With a lossy seabed the bottom's coefficient is one complex
+    :math:`\mathcal{R}` per beam rather than a scalar, and the product is
+    Jensen Eq. (3.126) applied at every touch, magnitude and phase together;
+    it collapses to a power because the touches of one ray all share one
+    grazing angle (see :func:`gaussian_beams`).
     And the branch of :math:`\sqrt{q}` is fixed by unwrapping the argument of
     ``q`` along the ray before anything is sampled off it, since the increment
     per range step is small while a principal-value square root taken sample by
     sample would jump by :math:`\pi` at the first caustic.
+
+    A beam the sloping bottom terminated (see :func:`ray_trace` on rays
+    reflected past the vertical) has its weight zeroed from the stop column
+    on: its history there is a state frozen at the terminating bounce, and a
+    frozen beam summed as if it kept flying would shine from a point the ray
+    never passed. What the one-way march drops with it is the energy the
+    wedge sends back down the slope, exactly as a one-way parabolic equation
+    drops backscatter.
     """
-    if march.spreadings is None or march.spreading_slopes is None:  # pragma: no cover
+    if (march.spreadings is None or march.spreading_slopes is None
+            or march.horizontals is None
+            or march.stopped_columns is None):  # pragma: no cover
         raise ValueError("the march must carry the dynamic ray states.")
     q = np.asarray(march.spreadings, dtype=np.complex128)
     p = np.asarray(march.spreading_slopes, dtype=np.complex128)
     speed = np.interp(march.positions, z_prof, c_prof)
     # W = 2|q|/(omega W_0) is Eq. (3.89) with Im[p/q] replaced by the conserved
-    # Wronskian; K is Eq. (3.90) with the sign of the conjugated field.
-    widths = 2.0 * np.abs(q) / (omega * w0)
+    # Wronskian; K is Eq. (3.90) with the sign of the conjugated field. W_0 is
+    # per beam, so each row of the history divides by its own.
+    widths = 2.0 * np.abs(q) / (omega * fan.width[:, None])
     curvatures = speed * np.real(p / q)
 
     at_bottom = np.cumsum(march.upper_reflections, axis=1)
     at_surface = np.cumsum(march.reflections - march.upper_reflections, axis=1)
-    reflected = (_SURFACE_REFLECTION**at_surface) * (bottom_reflection**at_bottom)
-    # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and positive.
-    weight = (fan.dtheta * (omega * w0 / (2.0 * c0))
+    r_bottom = (bottom_reflection if isinstance(bottom_reflection, float)
+                else np.asarray(bottom_reflection)[:, None])
+    reflected = (_SURFACE_REFLECTION**at_surface) * (r_bottom**at_bottom)
+    # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and
+    # positive. The weight carries each beam's own q(0) through W_0, which is
+    # what lets the fan mix initial widths without renormalising anything.
+    weight = (fan.dtheta * (omega * fan.width / (2.0 * c0))
               * np.sqrt(np.cos(fan.launch) / np.pi))
 
     column = np.clip(np.rint(ranges / dr).astype(np.intp), 0,
                      march.positions.shape[1] - 1)
-    cosine = speed[:, column] * fan.xi[:, None]
+    cosine = speed[:, column] * march.horizontals[:, column]
+    alive = column[None, :] < march.stopped_columns[:, None]
     samples = _BeamSamples(
-        xi=fan.xi[:, None],
+        xi=march.horizontals[:, column],
         column_range=np.asarray(column * dr, dtype=np.float64)[None, :],
         range_offset=(ranges - column * dr)[None, :],
         depth=march.positions[:, column],
@@ -1352,13 +2948,18 @@ def _assemble_beam_field(
         spreading=q[:, column],
         slope=p[:, column],
         time=march.times[:, column],
+        path=march.arc_lengths[:, column],
         phase=np.unwrap(np.angle(q), axis=1)[:, column],
-        weight=(weight[:, None] * reflected[:, column]).astype(np.complex128),
+        weight=np.where(alive, weight[:, None] * reflected[:, column],
+                        0.0).astype(np.complex128),
         reach=_BEAM_CUTOFF * widths[:, column].max(axis=1) / cosine.min(axis=1),
     )
     field = _beam_influence(
         samples, receivers, water_depth=water_depth,
-        bottom_reflection=bottom_reflection, omega=omega, beam_width=w0)
+        bottom_reflection=bottom_reflection, omega=omega,
+        beam_width=fan.width,
+        attenuation=attenuation, fold=fold,
+        march_extent=(march.positions.shape[1] - 1) * dr)
     return field, widths, curvatures
 
 
