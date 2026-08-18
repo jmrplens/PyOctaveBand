@@ -652,8 +652,12 @@ class GaussianBeamResult:
         conjugated field this result exposes, so that a beam spreading in free
         space reproduces Eq. (3.85), :math:`K = x/(x^2 + a^2)`, as a positive
         number.
-    :ivar initial_beam_width: The :math:`W_0` of Eq. (3.91) actually used, in
-        metres, whether it was passed or defaulted.
+    :ivar initial_beam_widths: The :math:`W_0` of Eq. (3.91) actually used by
+        each beam of the fan, in metres, shape ``(n_beams,)``. An explicit
+        ``beam_width`` fills it with one value; the default is per launch
+        angle (see :func:`_default_beam_widths`), widest on the axis of the
+        fan whenever a shallow channel's modal-resolution term is in play and
+        flat across it otherwise.
     :ivar absorption_model: The seawater absorption model applied along the
         beams, or ``None`` when the run propagated without volume absorption
         (the default).
@@ -683,7 +687,7 @@ class GaussianBeamResult:
     ray_depths: NDArray[np.float64]
     beam_widths: NDArray[np.float64]
     wavefront_curvatures: NDArray[np.float64]
-    initial_beam_width: float
+    initial_beam_widths: NDArray[np.float64]
     absorption_model: str | None
     absorption_coefficient: float
     seabed_density: float | None
@@ -720,17 +724,20 @@ _INFLUENCE_BLOCK = 1 << 20
 _MAX_STEEP_CLIMB = 0.25
 
 
-def _default_beam_width(
+def _default_beam_widths(
     wavelength: float, max_range: float, water_depth: float,
-) -> float:
-    r"""The :math:`W_0` of Eq. (3.91), from the book's own optimality argument.
+    launch: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    r"""The :math:`W_0` of Eq. (3.91) per launch angle: the free-space optimum,
+    raised in a shallow channel to the width that resolves the guide's modes.
 
-    Sect. 3.5.1 does the calculation explicitly for a beam in free space: with
-    the waist at the source the half-width evolves as Eq. (3.86),
-    :math:`W(x; a) = \sqrt{(2/k)(a + x^2/a)}` with :math:`a = k W_0^2/2`, and
-    "differentiating :math:`W(x; a)` with respect to :math:`a` and setting the
-    result to 0, we find that the optimal :math:`a` to minimize the beamwidth is
-    :math:`a = x`". Evaluated at the far end of the run that is
+    **The free-space term.** Sect. 3.5.1 does the calculation explicitly for a
+    beam in free space: with the waist at the source the half-width evolves as
+    Eq. (3.86), :math:`W(x; a) = \sqrt{(2/k)(a + x^2/a)}` with
+    :math:`a = k W_0^2/2`, and "differentiating :math:`W(x; a)` with respect
+    to :math:`a` and setting the result to 0, we find that the optimal
+    :math:`a` to minimize the beamwidth is :math:`a = x`". Evaluated at the
+    far end of the run that is
 
     .. math::
 
@@ -742,47 +749,94 @@ def _default_beam_width(
     of that integral is proportional to :math:`q(0)/q(r)`, whose real part
     vanishes as :math:`q(0)` grows, and the sum then stops converging on a
     truncated fan. Measured against the free field at 100 Hz at 2, 5 and 8 km,
-    the relative error in :math:`|p|` is 7.5e-5 at this width; it is 2.7e-2 at a
-    fifth of it, where each beam accepts too wide a cone of launch angles for
+    the relative error in :math:`|p|` is 7.5e-5 at this width; it is 2.7e-2 at
+    a fifth of it, where each beam accepts too wide a cone of launch angles for
     the paraxial expansion, and 3.7e-3 and 4.1e-2 at six and fifteen times it,
     where the Fresnel behaviour sets in. The shallowest part of the curve is a
-    little above the formula rather than on it, 1.9e-5 at twice the width, which
-    is as close to the optimum as this measurement can place it.
+    little above the formula rather than on it, 1.9e-5 at twice the width,
+    which is as close to the optimum as this measurement can place it. (The
+    range set matters: taken on a set reaching in to 500 m the last two
+    numbers come out 5.4e-2 and 6.3e-2, because a wide beam is exactly what
+    pushes the perpendicular feet of the fan in towards the source; that is
+    the axis floor of :func:`_beam_influence` being read as a property of the
+    width, and it is not one. The same measurement is why widening a beam
+    beyond what a criterion asks for is never free.)
 
-    The range set matters and is quoted above for that reason. Taken on a set
-    reaching in to 500 m these last two numbers come out 5.4e-2 and 6.3e-2, an
-    order of magnitude worse at six times the width, because a wide beam is
-    exactly what pushes the perpendicular feet of the fan in towards the source:
-    that is the axis floor of :func:`_beam_influence` being read as a property
-    of the width, and it is not one.
+    **The guide term, and why it is per launch angle.** A waveguide's trapped
+    field is a discrete sum of modes, and mode :math:`m` of a channel of depth
+    :math:`D` stands at the launch angle :math:`\sin\theta_m = m\lambda/(2D)`
+    (its vertical wavenumber is :math:`m\pi/D`; Jensen Eq. 5.13's
+    :math:`\sin(m\pi z/D)` says the same thing for the ideal guide, and the
+    spacing is asymptotically the same for a refracting one). Adjacent modes
+    are therefore :math:`\delta(\sin\theta) = \lambda/(2D)` apart, which at
+    the launch angle :math:`\theta_0` is a gap of
+    :math:`\lambda/(2D\cos\theta_0)` in angle; and a beam of initial width
+    :math:`W_0` cannot tell launch angles apart more finely than its own
+    far-field divergence, :math:`\lambda/(\pi W_0)` by Eq. (3.86). Asking the
+    beam to resolve its neighbours' gap to half, so that the modal
+    interference a receiver kilometres out actually shows, gives
 
-    Two clamps stand around it. The floor of ten wavelengths and the ceiling of
-    fifty are the band the book recommends ("typically, this will lead to an
-    initial beamwidth of 10-50 wavelengths"), and the formula lands inside them
-    on its own across most of the useful parameter space: over a 10 km run it
-    gives 14.6 wavelengths at 100 Hz and 46 at 1 kHz. The last clamp is the
-    channel, and it has the final word over the other two, because a beam
-    comparable to the water depth breaks the bookkeeping that folds a reflected
-    ray back into the column rather than merely costing accuracy.
+    .. math::
 
-    That last sentence is the one to read sceptically, because it is where this
-    default is at its worst and the measurement does not support the reasoning
-    behind it. The folded-image ladder of :func:`_image_ladder` restores what the
-    folding drops, and with it in place a beam as wide as the channel is not
-    merely tolerable but better: on an :math:`n^2`-linear 200 m guide at 200 Hz,
-    against the exact Airy modes, the quarter-depth width of 50 m is +3.08 dB in
-    the mean while 200 m is -0.22 dB, and on the isovelocity 200 m guide at
-    50 Hz the same two widths give +0.48 and +0.001 dB against the modal sum.
-    What the clamp protects is the folding of a beam whose *central ray* has
-    reflected, which the ladder does not reach; what it costs is a shallow-water
-    bias of a few decibels, always in the same direction. It is left in place
-    because a silent error is worse than a documented one, and
-    :func:`gaussian_beams` says there when to override it, but a caller in
-    shallow refracting water should override it.
+        \frac{\lambda}{\pi W_0} \le \frac{1}{2}\,
+        \frac{\lambda}{2 D \cos\theta_0}
+        \quad\Longleftrightarrow\quad
+        W_0(\theta_0) \ge \frac{4 D \cos\theta_0}{\pi},
+
+    one width per launch angle, widest for the flat beams (whose modes crowd
+    together in angle) and relaxing by the cosine for the steep ones (whose
+    modes stand apart). Its vertical footprint :math:`W_0/\cos\theta_0` is the
+    constant :math:`4D/\pi`: every beam of the fan spans the one column. The
+    half-a-gap margin is a choice, and the oracle brackets it: on an
+    :math:`n^2`-linear 200 m guide at 200 Hz, against the exact Airy modes
+    (energy-averaged over 0.5 to 4 km), this default measures +0.19 dB in the
+    mean where the free-space optimum alone (100 m) is +1.15 dB, a full-gap
+    margin leaves +1.12 dB, a third of a gap overshoots to -0.62 dB, and flat
+    300 and 400 m widths to -0.91 and -1.18 dB; a 100 m guide at 250 Hz walks
+    the same ladder (+0.74, +0.39, +0.14 dB at full, half and a third of a
+    gap) without the overshoot, so half the gap is where the two cases agree.
+
+    The guide term stands only where the book's own band can hold it: for
+    :math:`4D/\pi > 50\lambda` (deep water, in wavelengths) no admissible
+    width resolves the modes, and rather than pinning every beam to the
+    ceiling, which the free-space measurement above prices at a percent-level
+    error for the refracted paths that dominate a deep field, the default
+    falls back to the free-space optimum for the whole fan. The changeover is
+    deliberately all-or-nothing: a criterion that cannot be met inside the
+    band is not met halfway.
+
+    **The band.** The floor of ten wavelengths and the ceiling of fifty are
+    the band the book recommends ("typically, this will lead to an initial
+    beamwidth of 10-50 wavelengths"), and the free-space term lands inside
+    them on its own across most of the useful parameter space: over a 10 km
+    run it gives 14.6 wavelengths at 100 Hz and 46 at 1 kHz.
+
+    **What the text supports, and what it cost here.** A quarter-depth cap
+    used to stand over all of this, :math:`W_0 \le D/4` whatever the angle,
+    and its retirement is worth the paragraph. The text following Eq. (3.91)
+    does ask for beams "not large compared to the water depth" (while calling
+    the choice "a matter of current research"), and p. 184 warns that a beam
+    large compared to the channel "causes a variety of problems": intuition
+    that presumes a beam summed only in the folded column, where a wide beam's
+    tail straddles the boundaries and is lost. The folded-image ladder of
+    :func:`_image_ladder` restores exactly what that folding drops, and with
+    it in place the measurements come down against the cap: on the 200 m guide
+    above the cap's 50 m width is +3.08 dB in the mean, one-sided and silent,
+    against this default's +0.19 dB; and on the isovelocity 200 m guide at
+    50 Hz (source 30.5 m, receiver 120.5 m, the same range window), where the
+    cap even undercut the book's own ten-wavelength floor (50 m against 300),
+    it costs +0.17 dB against the exact modal sum where the floor's 300 m
+    measures -0.001 dB. What survives of the water-depth intuition is its
+    geometry, made per-angle: the guide term holds every beam's *vertical
+    footprint* at :math:`4D/\pi`, about the water depth -- the cap misread
+    that footprint as the width itself, and charged the steep beams, which
+    fit the column many times over, the same toll as the flat ones.
     """
-    return float(min(max(np.sqrt(wavelength * max_range / np.pi),
-                         10.0 * wavelength),
-                     50.0 * wavelength, water_depth / 4.0))
+    widths = np.full(launch.shape, np.sqrt(wavelength * max_range / np.pi))
+    guide = 4.0 * water_depth / np.pi
+    if guide <= 50.0 * wavelength:
+        widths = np.maximum(widths, guide * np.cos(launch))
+    return np.asarray(np.clip(widths, 10.0 * wavelength, 50.0 * wavelength))
 
 
 def _image_ladder(
@@ -881,7 +935,8 @@ class _BeamSamples(NamedTuple):
 def _beam_influence(
     s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
     water_depth: float, bottom_reflection: float | NDArray[np.complex128],
-    omega: float, beam_width: float, attenuation: float,
+    omega: float, beam_width: float | NDArray[np.float64],
+    attenuation: float,
 ) -> NDArray[np.complex128]:
     r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
 
@@ -1015,7 +1070,10 @@ def _beam_influence(
             strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
             plan.append((shift, side, strength, rows))
 
-    half_omega_width = 0.5 * omega * beam_width
+    # One W_0 per beam (a scalar is every beam's): the admission test below
+    # reads W = 2|q|/(omega W_0) with each row's own width.
+    half_omega_width = 0.5 * omega * np.broadcast_to(
+        np.asarray(beam_width, dtype=np.float64), (s.depth.shape[0],))
     cutoff_sq = _BEAM_CUTOFF**2
     field = np.zeros((receiver_depths.size, n_ranges), dtype=np.complex128)
     for shift, side, strength, rows in plan:
@@ -1052,7 +1110,7 @@ def _beam_influence(
             # after it runs over the survivors, which in a waveguide are around
             # a third of the cells, so it must stay arithmetic.
             hits = np.flatnonzero(
-                ((normal * half_omega_width) ** 2
+                ((normal * half_omega_width[rows][:, None, None]) ** 2
                  < cutoff_sq * (q_infl.real**2 + q_infl.imag**2)).ravel())
             if hits.size == 0:
                 continue
@@ -1249,15 +1307,22 @@ def gaussian_beams(
     The limits are worth knowing before the numbers are believed.
 
     * **Ray theory's own regime** (Sect. 3.4.2): "the wavelength should be
-      substantially smaller than any physical scale in the problem". This is the
-      limit that bites hardest and the one a plausible-looking answer hides
-      best. At 20 Hz in 100 m of water the depth is 1.3 wavelengths, two modes
-      propagate, and the quarter-depth cap on the beam width leaves a beam a
-      third of a wavelength across: against the image-source sum from 200 m to
-      5 km the loss then comes out 2 to 8 dB high, and it moves by decibels when
-      the fan is opened or the beam count multiplied by 150, so there is nothing
-      it is converging to. Use :func:`normal_modes` there, which is exact in
-      that regime for the cost of two modes.
+      substantially smaller than any physical scale in the problem". This is
+      the limit that bites hardest and the one a plausible-looking answer
+      hides best -- and one earlier version of this paragraph blamed it for an
+      error that was really the beam width's. At 20 Hz in 100 m of water the
+      depth is 1.3 wavelengths and two modes propagate; the quarter-depth cap
+      this module used to put on :math:`W_0` left a beam a third of a
+      wavelength across, and the loss came out decibels high against the
+      image-source sum. With the cap retired the same guide (source 36 m,
+      receiver 64 m, energy-averaged 0.2 to 5 km) measures -0.001 dB in the
+      mean and 0.03 dB at worst, at the ten-wavelength floor's 750 m width.
+      That clean bill is narrower than it looks: an isovelocity column over
+      perfect reflectors is pure geometry, which the folded receiver images
+      reproduce exactly at any frequency, so it says nothing about a channel
+      the low-frequency field actually refracts through, and there
+      :func:`normal_modes` remains the solver to trust, exact in that regime
+      for the cost of two modes.
     * **There is no near field**, and this is the largest error the function
       makes. Eq. (3.92) weights the fan by matching it to a point source in the
       far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
@@ -1270,10 +1335,10 @@ def gaussian_beams(
       150 to 437 m: 17, 13 and 4.1 dB at a quarter of :math:`W_0`, 1.2, 0.64 and
       0.36 dB at :math:`W_0`, 0.012, 0.005 and 0.002 dB at 2.5 :math:`W_0`, and
       a thousandth of a decibel or better from 3 :math:`W_0` out. Read nothing
-      inside about three beam widths of the source; since the default
-      :math:`W_0` grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run pushes
-      that boundary out rather than in. :func:`parabolic_equation` is the
-      solver to reach for close to the source.
+      inside about three beam widths of the source; since the default's
+      free-space term grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run
+      pushes that boundary out rather than in. :func:`parabolic_equation` is
+      the solver to reach for close to the source.
     * **The fan is truncated** at ``max_angle_deg``, and a waveguide with two
       perfectly reflecting boundaries is the worst case for that, because
       nothing but :math:`1/R` attenuates the steep multiple bounces. Measured on
@@ -1288,25 +1353,26 @@ def gaussian_beams(
       fan opened and ``range_step`` cut with it, since a step has to resolve
       :math:`\tan\theta_\mathrm{max}` depth units of climb per unit range. The
       warning below says when that pairing is wrong.
-    * **The beam must be small compared to the channel**, which the default
-      ``beam_width`` enforces and an explicit one is checked against. In
-      shallow water that clamp, and not the method, is the largest error left:
-      it holds :math:`W_0` at a quarter of the water depth while the optimum
-      the same function computes first is several times larger, and the field
-      comes out systematically too quiet. Measured against the closed-form Airy
-      modes of an :math:`n^2`-linear 200 m guide at 200 Hz, source at 30.5 m and
-      receiver at 120.5 m, energy-averaged over 0.5 to 4 km: the default
-      :math:`W_0` of 50 m is +3.08 dB in the mean and +5.86 dB at worst, while
-      100, 150 and 200 m give +1.13, +0.26 and -0.22 dB. Nothing about
-      refraction is wrong there, and the same profile in 1000 m of water, where
-      the clamp does not bite, comes out at +0.72 dB with a 1.37 dB worst bin,
-      closer to the exact field than :func:`normal_modes` on the same cut. Pass
-      ``beam_width`` explicitly, above the cap and up to about the water depth,
-      when the channel is shallow and the profile refracts; the warning it
-      raises is then the expected cost of the better answer. Sect. 3.5 says the
-      same thing from the other side, that "at lower frequencies the physics may
-      imply that the beam is large compared to the channel, which causes a
-      variety of problems".
+    * **A shallow channel sets its own width**, and the default now pays it
+      per launch angle rather than clamping against it. An earlier version of
+      this module capped :math:`W_0` at a quarter of the water depth, reading
+      Sect. 3.5's caution that a beam "large compared to the channel ...
+      causes a variety of problems" as a ceiling; measured against the
+      closed-form Airy modes of an :math:`n^2`-linear 200 m guide at 200 Hz
+      (source 30.5 m, receiver 120.5 m, energy-averaged over 0.5 to 4 km),
+      that cap's 50 m width came out +3.08 dB in the mean and +5.86 dB at
+      worst, systematically too quiet, while the per-angle default measures
+      +0.19 dB on the same cut. What a shallow guide actually demands is the
+      opposite bound, a beam wide enough to resolve the channel's modes in
+      launch angle, and :func:`_default_beam_widths` says why that is
+      :math:`W_0 \ge 4D\cos\theta_0/\pi` and what the folded receiver images
+      do to make the width affordable. The same profile in 1000 m of water,
+      where the modal criterion is out of the band's reach and the free-space
+      optimum stands, comes out at +0.72 dB with a 1.37 dB worst bin, closer
+      to the exact field than :func:`normal_modes` on the same cut. An
+      explicit ``beam_width`` is taken as given, whatever its size: the old
+      quarter-depth warning went with the cap, since the measurements put the
+      fault on the cap's side.
 
     **Seawater absorption is off by default** and the field is then optimistic
     beyond a few kilometres at sonar frequencies, exactly as ray theory without
@@ -1399,11 +1465,10 @@ def gaussian_beams(
         a fan shows as a periodic ripple in range at the beam spacing, which is
         easy to mistake for physical interference.
     :param beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
-        initial half-width, at the :math:`e^{-2}` folding distance in intensity.
-        Default (``None``): the free-space optimum
-        :math:`W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}` of Sect. 3.5.1, held
-        inside the book's recommended band of 10 to 50 wavelengths and clamped
-        to a quarter of the water depth, and the clamp has the last word.
+        initial half-width, at the :math:`e^{-2}` folding distance in
+        intensity, applied to every beam of the fan when passed. Default
+        (``None``): one width per launch angle, the free-space optimum of
+        each beam's own flight; see :func:`_default_beam_widths`.
     :param range_step: Marching step in range, in metres, and the spacing of the
         default ``ranges_m``.
     :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
@@ -1437,11 +1502,10 @@ def gaussian_beams(
     :return: A :class:`GaussianBeamResult`.
     :raises ValueError: If the inputs are invalid.
     :warns PhonometryWarning: when the source sits on a kink of the profile
-        (Sect. 3.7.4's spurious horizontal jet), when an explicit
-        ``beam_width`` exceeds a quarter of the water depth, and when one
-        marching step carries the steepest beam of the fan across more than a
-        quarter of the water column, which is the pairing between
-        ``max_angle_deg`` and ``range_step`` that is easiest to get wrong.
+        (Sect. 3.7.4's spurious horizontal jet), and when one marching step
+        carries the steepest beam of the fan across more than a quarter of
+        the water column, which is the pairing between ``max_angle_deg`` and
+        ``range_step`` that is easiest to get wrong.
     """
     f = require_positive(frequency_hz, "frequency_hz")
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
@@ -1492,22 +1556,28 @@ def gaussian_beams(
     omega = 2.0 * np.pi * f
     c0 = float(np.interp(zs, z_prof, c_prof))
     wavelength = c0 / f
-    w0 = (_default_beam_width(wavelength, rmax, water_depth) if beam_width is None
-          else require_positive(beam_width, "beam_width"))
-    if beam_width is not None and w0 > water_depth / 4.0:
-        _warn_beams(
-            "'beam_width' exceeds a quarter of the water depth, so the beams"
-            " straddle boundaries their central rays reflected off and the"
-            " folded field drifts from the true one.")
     _check_source_on_kink(z_prof, c_prof, zs)
 
+    # The width the fan's density is sized for has to exist before the fan
+    # does, and the overlap condition below must hold for every beam, so it is
+    # the *widest* width of the run: an explicit one applies everywhere, and
+    # both terms of the per-angle default are widest on the axis, so its
+    # maximum is its value at theta_0 = 0.
+    if beam_width is not None:
+        w_fan = require_positive(beam_width, "beam_width")
+    else:
+        w_fan = float(_default_beam_widths(
+            wavelength, rmax, water_depth, np.zeros(1))[0])
+
     span = 2.0 * np.radians(theta_max)
-    n_fan = (int(np.ceil(span * 4.0 * np.pi * w0 / wavelength)) + 1
+    n_fan = (int(np.ceil(span * 4.0 * np.pi * w_fan / wavelength)) + 1
              if n_beams is None else int(n_beams))
     if n_fan < 2:
         raise ValueError("'n_beams' must be at least 2.")
     launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
     fan = _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]))
+    w0 = (np.full(n_fan, float(w_fan)) if beam_width is not None
+          else _default_beam_widths(wavelength, rmax, water_depth, launch))
 
     n_steps = int(np.ceil(rmax / dr_step)) + 1
     dr = rmax / (n_steps - 1)
@@ -1540,7 +1610,7 @@ def gaussian_beams(
         _ocean_ray_derivative(z_prof, c_prof, fan.xi), xi=fan.xi,
         z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
         n_steps=n_steps, lower=0.0, upper=water_depth,
-        dynamic=DynamicRays(np.full(n_fan, 0.5j * omega * w0**2),
+        dynamic=DynamicRays(np.asarray(0.5j * omega * w0**2, dtype=np.complex128),
                             np.full(n_fan, 1.0 + 0.0j), z_prof, c_prof))
 
     ranges = _beam_range_grid(ranges_m, n_steps=n_steps, dr=dr, rmax=rmax)
@@ -1581,7 +1651,7 @@ def gaussian_beams(
         ray_depths=march.positions,
         beam_widths=widths,
         wavefront_curvatures=curvatures,
-        initial_beam_width=float(w0),
+        initial_beam_widths=np.asarray(w0, dtype=np.float64),
         absorption_model=absorption_key,
         absorption_coefficient=alpha,
         seabed_density=None if seabed is None else seabed[1],
@@ -1595,7 +1665,7 @@ def _assemble_beam_field(
     march: RayMarch, *, ranges: NDArray[np.float64],
     receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    omega: float, c0: float, w0: float, water_depth: float,
+    omega: float, c0: float, w0: NDArray[np.float64], water_depth: float,
     bottom_reflection: float | NDArray[np.complex128], attenuation: float,
 ) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
     r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
@@ -1620,8 +1690,9 @@ def _assemble_beam_field(
     p = np.asarray(march.spreading_slopes, dtype=np.complex128)
     speed = np.interp(march.positions, z_prof, c_prof)
     # W = 2|q|/(omega W_0) is Eq. (3.89) with Im[p/q] replaced by the conserved
-    # Wronskian; K is Eq. (3.90) with the sign of the conjugated field.
-    widths = 2.0 * np.abs(q) / (omega * w0)
+    # Wronskian; K is Eq. (3.90) with the sign of the conjugated field. W_0 is
+    # per beam, so each row of the history divides by its own.
+    widths = 2.0 * np.abs(q) / (omega * w0[:, None])
     curvatures = speed * np.real(p / q)
 
     at_bottom = np.cumsum(march.upper_reflections, axis=1)
@@ -1629,7 +1700,9 @@ def _assemble_beam_field(
     r_bottom = (bottom_reflection if isinstance(bottom_reflection, float)
                 else np.asarray(bottom_reflection)[:, None])
     reflected = (_SURFACE_REFLECTION**at_surface) * (r_bottom**at_bottom)
-    # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and positive.
+    # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and
+    # positive. The weight carries each beam's own q(0) through W_0, which is
+    # what lets the fan mix initial widths without renormalising anything.
     weight = (fan.dtheta * (omega * w0 / (2.0 * c0))
               * np.sqrt(np.cos(fan.launch) / np.pi))
 

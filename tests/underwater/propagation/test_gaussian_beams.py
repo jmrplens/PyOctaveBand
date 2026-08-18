@@ -123,13 +123,14 @@ them out, so that nobody spends the afternoon on them again.
   refracting range-independent case is the criterion the guide already uses to
   set those two against each other, but as a test here it measures the wrong
   thing. On the 200 m, 50 Hz, 1500 to 1530 m/s case their own trend test uses,
-  the beams sit 8.8 dB from the modes and 6.8 dB from the PE, energy-averaged,
-  while the two siblings agree with each other to 2.0 dB on the same cut. That
-  gap is the quarter-depth clamp putting :math:`W_0` at 1.7 wavelengths and
-  nothing else: it closes as the width is opened, and it is absent from the same
-  comparison in deep water. A test written around the number would be pinning
-  the clamp rather than the beams, and the Airy oracle below pins the beams
-  properly, so it is not worth having as well.
+  the beams sat 8.8 dB from the modes and 6.8 dB from the PE, energy-averaged,
+  while the two siblings agreed with each other to 2.0 dB on the same cut.
+  That gap was the quarter-depth width cap of the era putting :math:`W_0` at
+  1.7 wavelengths and nothing else: the cap is retired now (the default there
+  is the ten-wavelength floor, 300 m) and the gap goes with it, but the
+  comparison still contains no oracle, only three solvers agreeing, and the
+  Airy oracle below pins the beams against an exact closed form instead, so
+  it is not worth having.
 """
 
 from __future__ import annotations
@@ -964,48 +965,95 @@ def _incoherent(loss: np.ndarray, window: int = 11) -> np.ndarray:
 
 
 def test_a_refracting_guide_matches_its_exact_airy_modes() -> None:
-    """The one test here that puts a bend in the rays and an exact number on it.
+    r"""The one test here that puts a bend in the rays and an exact number on it.
 
-    Measured over 0.5 to 4 km, energy-averaged, against the closed form above:
-    a mean of -0.22 dB with a 1.32 dB scatter and a 3.3 dB worst bin. The mean
-    is the assertion that means something, since a mistake in the refracting
-    half of the marcher shows as a bias and not as scatter; the scatter is
-    fringes that have slipped by a fraction of a period and is bounded here at
-    the same 2 dB the module's other cross-solver comparison uses.
+    Measured over 0.5 to 4 km, energy-averaged, against the closed form above,
+    with everything at its default: a mean of +0.19 dB with a 1.31 dB scatter
+    and a 3.7 dB worst bin. The mean is the assertion that means something,
+    since a mistake in the refracting half of the marcher shows as a bias and
+    not as scatter; the scatter is fringes that have slipped by a fraction of
+    a period and is bounded here at the same 2 dB the module's other
+    cross-solver comparison uses.
 
-    ``beam_width`` is set deliberately, and to four times what the default would
-    give, because THIS is where the default is worst and the number is worth
-    writing down. :func:`_default_beam_width` clamps :math:`W_0` to a quarter of
-    the water depth, which in 200 m of water is 50 m, a fifth of the
-    :math:`\\sqrt{\\lambda r_\\mathrm{max}/\\pi}` optimum the same function
-    computes first. Same configuration, same oracle, default width: +3.08 dB
-    mean, 5.86 dB worst, i.e. the field comes out systematically too quiet. It
-    is not a defect in the beams. Their own convergence says so: 100 m gives
-    +1.13, 150 m +0.26, 200 m -0.22, and the same profile in 1000 m of water,
-    where the clamp does not bite and the default is the optimum, comes out at
-    +0.72 dB mean with a 1.37 dB worst bin, better than :func:`normal_modes`
-    manages against the same closed form. It is the clamp, in shallow water
-    only, and Sect. 3.5's own remark that "at lower frequencies the physics may
-    imply that the beam is large compared to the channel, which causes a variety
-    of problems" is the book saying the same thing from the other side.
+    The default width is under test on purpose, because THIS configuration is
+    the one that forced its overhaul and the numbers are worth keeping. An
+    earlier :func:`_default_beam_width` clamped :math:`W_0` to a quarter of
+    the water depth, 50 m here, half the
+    :math:`\sqrt{\lambda r_\mathrm{max}/\pi}` free-space optimum the same
+    function computed first: same configuration, same oracle, that width
+    measured +3.08 dB mean and 5.86 dB worst, systematically too quiet, while
+    explicit 100, 150 and 200 m gave +1.13, +0.26 and -0.22. It was never the
+    refraction: the same profile in 1000 m of water, where the cap did not
+    bite, came out at +0.72 dB mean with a 1.37 dB worst bin, better than
+    :func:`normal_modes` manages against the same closed form. The per-angle
+    default (100 to 255 m across the 80 degree fan, the guide's
+    :math:`4D\cos\theta_0/\pi` on the flat beams and the free-space optimum
+    on the steep ones) holds the same cut at +0.19 dB with no override and no
+    warning, and the shallow-guide test further down pins the retired cap's
+    cost against it on a second, independent configuration.
     """
     r = np.linspace(500.0, 4000.0, 100)
     exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **_AIRY_GUIDE)))
     depths = np.linspace(0.0, _AIRY_GUIDE["water_depth"], 21)
     speeds = _n2_linear_speeds(depths, bottom_speed=_AIRY_GUIDE["bottom_speed"],
                                water_depth=_AIRY_GUIDE["water_depth"])
-    with warnings.catch_warnings():
-        # The width is over the quarter-depth cap on purpose; see the docstring.
-        warnings.simplefilter("ignore", PhonometryWarning)
-        res = gaussian_beams(
-            _AIRY_GUIDE["frequency"], depths, speeds,
-            source_depth=_AIRY_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
-            receiver_depths_m=np.array([_AIRY_GUIDE["receiver_depth"]]),
-            max_angle_deg=80.0, range_step=5.0, beam_width=200.0)
+    res = gaussian_beams(
+        _AIRY_GUIDE["frequency"], depths, speeds,
+        source_depth=_AIRY_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+        receiver_depths_m=np.array([_AIRY_GUIDE["receiver_depth"]]),
+        max_angle_deg=80.0, range_step=5.0)
     # The convolution's own edges are not an average of anything, so they go.
     difference = (_incoherent(res.propagation_loss[0]) - _incoherent(exact))[10:-10]
     assert abs(float(difference.mean())) < 1.0
     assert float(difference.std()) < 2.0
+    # The default is the per-angle rule, not a flat width: the flat beams
+    # carry the modal-resolution width 4 D / pi and the steep ones the
+    # free-space optimum, and the vertical footprint W_0 / cos(theta_0) of
+    # every guide-ruled beam is the same 4 D / pi.
+    four_d_over_pi = 4.0 * _AIRY_GUIDE["water_depth"] / np.pi
+    assert float(res.initial_beam_widths.max()) == pytest.approx(
+        four_d_over_pi, rel=1e-4)
+    assert res.initial_beam_widths[0] < res.initial_beam_widths.max()
+
+
+def test_a_shallow_guide_no_longer_pays_the_quarter_depth_caps_toll() -> None:
+    r"""The cap's cost measured against the width that replaced it, both in dB.
+
+    A second shallow refracting configuration, sharing nothing numerical with
+    the one above (half the depth, a different frequency, gradient, source and
+    receiver), against the same exact closed form. The quarter-depth cap this
+    solver used to clamp :math:`W_0` with would put 25 m here, under half the
+    ten-wavelength floor the book itself recommends; run explicitly at that
+    width, the loss comes out +4.12 dB high in the mean (7.5 dB at the worst
+    bin), energy-averaged over 0.3 to 2.5 km. The per-angle default (70.5 m
+    free-space optimum on the steep beams, rising to the guide's
+    :math:`4D/\pi = 127.3` m on the flat ones) measures +0.39 dB on the same
+    cut: over ninety per cent of the cap's error, gone with the cap. Both
+    numbers are asserted, the first from below and the second from above, so
+    this stays a measurement of the cap's cost and not a story about it.
+    """
+    guide = {"water_depth": 100.0, "frequency": 250.0, "bottom_speed": 1520.0,
+             "source_depth": 15.5, "receiver_depth": 70.5}
+    r = np.linspace(300.0, 2500.0, 100)
+    exact = -20.0 * np.log10(np.abs(_airy_mode_pressure(r, **guide)))
+    depths = np.linspace(0.0, guide["water_depth"], 21)
+    speeds = _n2_linear_speeds(depths, bottom_speed=guide["bottom_speed"],
+                               water_depth=guide["water_depth"])
+
+    def bias(beam_width: float | None) -> float:
+        res = gaussian_beams(
+            guide["frequency"], depths, speeds,
+            source_depth=guide["source_depth"], max_range=2600.0, ranges_m=r,
+            receiver_depths_m=np.array([guide["receiver_depth"]]),
+            max_angle_deg=80.0, range_step=2.5, beam_width=beam_width)
+        return float((_incoherent(res.propagation_loss[0])
+                      - _incoherent(exact))[10:-10].mean())
+
+    capped = bias(guide["water_depth"] / 4.0)  # what the retired cap forced
+    unclamped = bias(None)
+    assert capped > 3.0, f"the cap has to cost decibels here, measured {capped:.2f}"
+    assert abs(unclamped) < 0.8, f"the default has to remove it, measured {unclamped:.2f}"
+    assert abs(unclamped) < 0.2 * capped
 
 
 # --- What the beam itself does ----------------------------------------------
@@ -1043,7 +1091,9 @@ def test_the_beam_half_width_is_the_free_space_hyperbola() -> None:
     the rays are straight.
     """
     res, arc, rayleigh = _free_space_beam()
-    w0 = res.initial_beam_width
+    # An explicit width is every beam's width, and the result records it so.
+    assert np.all(res.initial_beam_widths == _FREE_BEAM_WIDTH)
+    w0 = float(res.initial_beam_widths[0])
     exact = w0 * np.sqrt(1.0 + (arc / rayleigh) ** 2)
     assert res.beam_widths.shape == exact.shape
     assert np.allclose(res.beam_widths, exact, rtol=1e-12)
@@ -1385,19 +1435,24 @@ def test_the_shadow_zone_decays_smoothly_without_going_silent() -> None:
 
 
 @pytest.mark.parametrize(
-    ("frequency", "max_range", "water_depth", "expected"),
+    ("frequency", "max_range", "water_depth", "axial", "edge"),
     [
-        # sqrt(lambda r / pi) inside the book's 10-50 wavelength band.
-        (100.0, 10_000.0, 5000.0, 218.6),
-        (1000.0, 10_000.0, 5000.0, 69.1),
+        # sqrt(lambda r / pi) inside the book's 10-50 wavelength band, flat
+        # across the fan: 5 km of water is beyond the guide term's reach.
+        (100.0, 10_000.0, 5000.0, 218.5, 218.5),
+        (1000.0, 10_000.0, 5000.0, 69.1, 69.1),
         # Too low a frequency for the optimum: the ten-wavelength floor lifts it.
-        (20.0, 10_000.0, 5000.0, 750.0),
-        # A shallow channel: the quarter-depth cap has the last word over both.
-        (100.0, 10_000.0, 200.0, 50.0),
+        (20.0, 10_000.0, 5000.0, 750.0, 750.0),
+        # A shallow channel: the modal-resolution width 4 D cos(theta_0)/pi
+        # rules wherever it beats the optimum, so the fan is widest on the
+        # axis (4 D/pi) and relaxes towards the edges. The retired
+        # quarter-depth cap would have forced 50 m on all nine beams.
+        (100.0, 10_000.0, 200.0, 254.6, 239.3),
     ],
 )
-def test_the_default_beam_width_is_the_optimum_inside_its_clamps(
-    frequency: float, max_range: float, water_depth: float, expected: float,
+def test_the_default_width_is_the_optimum_raised_to_the_guides_need(
+    frequency: float, max_range: float, water_depth: float,
+    axial: float, edge: float,
 ) -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", PhonometryWarning)
@@ -1406,7 +1461,10 @@ def test_the_default_beam_width_is_the_optimum_inside_its_clamps(
             source_depth=0.5 * water_depth, max_range=max_range,
             ranges_m=np.array([max_range]), n_depth_points=2, n_beams=9,
             range_step=max_range / 4.0, max_angle_deg=20.0)
-    assert res.initial_beam_width == pytest.approx(expected, rel=1e-3)
+    assert res.initial_beam_widths.shape == (9,)
+    assert res.initial_beam_widths[4] == pytest.approx(axial, rel=1e-3)
+    assert res.initial_beam_widths[0] == pytest.approx(edge, rel=1e-3)
+    assert res.initial_beam_widths[-1] == pytest.approx(edge, rel=1e-3)
 
 
 def test_the_answer_does_not_care_which_width_inside_the_band_is_used() -> None:
@@ -1443,8 +1501,18 @@ def test_a_source_on_a_profile_kink_is_warned_about() -> None:
                        range_step=100.0, max_angle_deg=30.0)
 
 
-def test_a_beam_wider_than_the_channel_is_warned_about() -> None:
-    with pytest.warns(PhonometryWarning, match="quarter of the water depth"):
+def test_a_beam_wider_than_a_quarter_of_the_channel_passes_in_silence() -> None:
+    """The quarter-depth warning went with the quarter-depth cap.
+
+    An explicit width above a quarter of the water depth used to warn that the
+    folded field would drift from the true one; the receiver-image ladder is
+    what makes that untrue, and the two shallow-guide oracles above measure the
+    wide width as the *better* answer. A warning against the better answer
+    trains callers to ignore warnings, so it is gone, and this pins that it
+    stays gone.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", PhonometryWarning)
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
                        max_range=1000.0, ranges_m=np.array([1000.0]),
                        n_depth_points=2, n_beams=9, range_step=20.0,
@@ -1462,11 +1530,11 @@ def test_a_step_that_cannot_follow_the_steepest_beam_is_warned_about() -> None:
 def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
     """The call site, not the module the check happens to live in.
 
-    One of the three checks runs inside a helper of its own and so stands a
-    frame further from the caller than the other two; a single ``stacklevel``
-    for all three would report that one against ``numerical.py``, where the
-    reader has nothing to change. The filename is the assertion because it is
-    what a caller actually sees, and it is wrong in exactly the case a shared
+    One of the two checks runs inside a helper of its own and so stands a
+    frame further from the caller than the other; a single ``stacklevel`` for
+    both would report that one against ``numerical.py``, where the reader has
+    nothing to change. The filename is the assertion because it is what a
+    caller actually sees, and it is wrong in exactly the case a shared
     constant would make wrong.
     """
     z = np.array([0.0, 100.0, 300.0, 1000.0])
@@ -1475,12 +1543,12 @@ def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
         gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
                        ranges_m=np.array([1000.0]), n_depth_points=2, n_beams=9,
                        range_step=100.0, max_angle_deg=30.0)
-    with pytest.warns(PhonometryWarning) as wide:
+    with pytest.warns(PhonometryWarning) as steep:
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=1000.0, ranges_m=np.array([1000.0]),
+                       max_range=2000.0, ranges_m=np.array([2000.0]),
                        n_depth_points=2, n_beams=9, range_step=100.0,
-                       max_angle_deg=30.0, beam_width=150.0)
-    for caught in (kink, wide):
+                       max_angle_deg=85.0)
+    for caught in (kink, steep):
         assert caught[0].filename == __file__
 
 

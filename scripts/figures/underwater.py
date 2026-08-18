@@ -997,7 +997,9 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
     ax.text(0.985, 0.06,
             f"{int(freq)} Hz, $n^2$-linear profile (Jensen Eq. 3.77)\n"
             f"{beams.launch_angles.size} beams over ±45°, "
-            f"$W_0$ = {beams.initial_beam_width:.1f} m",
+            # Deep water: the per-angle default collapses to one width here,
+            # so the label reads it off any beam of the fan.
+            f"$W_0$ = {float(beams.initial_beam_widths[0]):.1f} m",
             transform=ax.transAxes, fontsize=8.5, color=COLOR_FG,
             ha="right", va="bottom",
             bbox={"boxstyle": "round,pad=0.4", "facecolor": COLOR_PANEL,
