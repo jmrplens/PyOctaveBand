@@ -3,17 +3,18 @@
 
 from __future__ import annotations
 
-from ._chunks import (
-    BroadcastMetadata,
-    CuePoint,
-    parse_wav_chunks,
-)
+from ._backends import LossyCompressionWarning, info, read
+from ._chunks import BroadcastMetadata, CuePoint
 from ._signal import Signal, SignalSource
+from ._wav import AudioFileInfo
 
 __all__ = [
+    "AudioFileInfo",
     "BroadcastMetadata",
     "CuePoint",
+    "LossyCompressionWarning",
     "Signal",
     "SignalSource",
-    "parse_wav_chunks",
+    "info",
+    "read",
 ]

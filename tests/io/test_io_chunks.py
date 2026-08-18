@@ -24,8 +24,7 @@ from wav_forge import (
     riff_wave,
 )
 
-from phonometry.io import parse_wav_chunks
-from phonometry.io._chunks import WAVE_FORMAT_IMA_ADPCM
+from phonometry.io._chunks import WAVE_FORMAT_IMA_ADPCM, parse_wav_chunks
 
 TONE = np.array([0, 8000, -8000, 32000], dtype=np.int64)
 
