@@ -85,7 +85,7 @@ Four sections, following `tests/data/iso532_1/README.md`:
 
 | Folder | Kind | Size | Original |
 | :--- | :--- | ---: | :--- |
-| `audio/` | extract + derived | 7,4 MB | Real measurement audio with published values, five sources (see its README) |
+| `audio/` | extract + derived | 6,9 MB | Real measurement audio with published values, five sources (see its README) |
 | `broadcast/` | derived | 36 kB | EBU loudness test set (289 MB) |
 | `cnossos/` | derived + transcribed | 13 kB | CIRCABC CNOSSOS-EU emission test workbooks (10 MB) |
 | `iso532_1/` | extract + derived | 4,6 MB | ISO 532-1:2017 electronic attachment |
