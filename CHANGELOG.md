@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Real measurement audio, versioned as functional oracles. Five
+  licence-verified third-party sources live under `tests/data/audio/`
+  (6.9 MB, provenance, licences and CC BY attributions in its README), and
+  every one carries a value its authors published that the suite now
+  reproduces through `phonometry.io` and the measurement functions: the
+  NTi XL2 calibration take whose bext-declared full scale must land on the
+  campaign's published 113.7 dB; five 4-second pass-by excerpts (all four
+  vehicle categories of the Antwerp ISO 11819-1 campaign) held to the
+  published LA,eq, LA,max and L10 within 0.3 dB and to the median ISO
+  532-1 loudness N50 within 5 %; a Sound Devices 702T BWF and a genuine
+  EBU RF64 as exact-equality transcription oracles for the chunk parser;
+  the omnidirectional channel of a measured chapel impulse response held
+  to the deposit's ISO 3382-1 parameter table within the standard's own
+  just noticeable differences; and the 2015 five-minute LAeq year of two
+  Dublin City Council monitors, which must average to the annual report's
+  published night-time values before exercising `lden`, `ldn` and
+  `composite_rating_level`. The io guide gains a worked example that reads
+  the committed calibration take and closes the calibrator-to-measurement
+  chain on a real instrument's file, in English and Spanish.
 - The bottom may slope: the first range dependence in the underwater module.
   `ray_trace` and `gaussian_beams` accept a `bathymetry` pair of node
   arrays, `(ranges_m, depths_m)`, describing a piecewise-linear depth profile

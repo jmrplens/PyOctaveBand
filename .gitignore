@@ -63,6 +63,10 @@ pr_comment_body.md
 # (see tests/data/iso532_1/README.md for provenance and ISO attribution)
 !tests/data/iso532_1/**/*.wav
 !tests/data/iso532_1/*.wav
+# Real measurement audio with published values is tracked explicitly
+# (see tests/data/audio/README.md for provenance, licences and attribution)
+!tests/data/audio/**/*.wav
+!tests/data/audio/**/*.WAV
 tests/*.png
 snyk.sarif
 issues_final*.json

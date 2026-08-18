@@ -144,6 +144,46 @@ nivel: el `Signal` lleva los dos. Un argumento explícito sigue ganando al
 que viene en el objeto — quien llama sabe más que un objeto — y un array
 desnudo sin `fs` se rechaza nombrando el argumento en vez de adivinarlo.
 
+### La misma cadena sobre el archivo de un sonómetro real
+
+El repositorio versiona una toma de calibración real exactamente para este
+flujo: `tests/data/audio/xl2/calibration_113_7dB.wav`, grabada por un
+sonómetro NTi Audio XL2 durante una campaña de pasos de tráfico rodado de
+la Universidad de Amberes (CC BY 4.0; procedencia, licencia y atribución
+en `tests/data/audio/README.md`). Como instrumento que es, el sonómetro
+escribió su propio chunk `bext` y declaró en él su fondo de escala
+digital. Esa declaración más el RMS del archivo es toda la cadena de
+calibración, y tiene que caer en el nivel que el dataset publica para
+esta toma: 113,7 dB.
+
+```python
+import pathlib
+
+import phonometry
+from phonometry import io, signals
+
+# La toma versionada vive en el repositorio, así que esto funciona desde un
+#   checkout (o instalación editable); con el WAV de tu sonómetro, pasa su ruta.
+repo = pathlib.Path(phonometry.__file__).resolve().parents[2]
+xl2_take = io.read(repo / "tests/data/audio/xl2/calibration_113_7dB.wav")
+print(xl2_take.provenance.originator)          # NTi Audio XL2 A2A-17367-E0
+
+declaration = xl2_take.provenance.description.splitlines()[0]
+print(declaration)                             # 0dBFS = 129.3 dBSPL
+full_scale_spl = float(declaration.split()[2])
+
+xl2_cal = 2e-5 * 10 ** (full_scale_spl / 20)   # qué es 0 dBFS en pascales
+xl2_leq = float(signals.leq(xl2_take, calibration_factor=xl2_cal))
+print(f"Leq = {xl2_leq:.1f} dB")               # 113.7, el nivel publicado
+```
+
+Sin sensibilidad tecleada a mano en ninguna parte: el archivo del
+instrumento llevaba su propio fondo de escala, el lector lo sacó a la
+superficie, y por el otro extremo salió el 113,7 dB publicado. Una
+grabación hecha con el mismo sonómetro se calibra con las mismas dos
+líneas — por eso la única regla que importa es que los dos archivos pasen
+por el mismo lector.
+
 La figura de abajo es esta página en una imagen: la misma API escribió un
 BWF de 24 bits con su chunk `bext` y su sidecar de calibración, lo volvió a
 leer, y el `Signal` resultante dibujó su forma de onda calibrada junto a la
