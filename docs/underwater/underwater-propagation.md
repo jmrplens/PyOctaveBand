@@ -671,5 +671,5 @@ and these closed forms, have their own guide:
 - Ship-traffic source level: MacGillivray & de Jong (2021),
   *J. Mar. Sci. Eng.* 9(4) 369 (CC-BY, JOMOPANS-ECHO), which also reproduces
   RANDI 3.1 and Wales & Heitmeyer (2002).
-- Numerical solvers (normal modes, ray tracing, parabolic equation):
-  covered in [Underwater propagation solvers](underwater-solvers.md).
+- Numerical solvers (normal modes, ray tracing, Gaussian beams, parabolic
+  equation): covered in [Underwater propagation solvers](underwater-solvers.md).
