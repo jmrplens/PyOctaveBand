@@ -880,6 +880,134 @@ def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
     return counts
 
 
+def _bracket_launches(
+    trace: RayTraceResult, r_grid: NDArray[np.float64], r_rec: float,
+    z_rec: float,
+) -> tuple[NDArray[np.float64], NDArray[np.intp]]:
+    """Read the fan at the receiver range and raise the sign-change brackets.
+
+    Linear between the two bracketing columns: this is only the bracket hunt,
+    and every sign found here is re-established on a fresh march before the
+    bisection of :func:`_refine_brackets` trusts it.
+    """
+    launch = np.radians(np.sort(np.asarray(trace.launch_angles,
+                                           dtype=np.float64).ravel()))
+    col = int(np.clip(np.searchsorted(r_grid, r_rec), 1, r_grid.size - 1))
+    w = (r_rec - r_grid[col - 1]) / (r_grid[col] - r_grid[col - 1])
+    fan_order = np.argsort(np.asarray(trace.launch_angles,
+                                      dtype=np.float64).ravel())
+    fan_depth = (trace.depths[fan_order, col - 1] * (1.0 - w)
+                 + trace.depths[fan_order, col] * w)
+    # A fan ray landing exactly on the receiver depth counts to one side, so
+    # the root right under it still raises exactly one bracket.
+    sign = np.where(fan_depth == z_rec, 1.0, np.sign(fan_depth - z_rec))
+    crossing = np.flatnonzero(sign[:-1] * sign[1:] < 0.0)
+    return launch, crossing
+
+
+def _refine_brackets(
+    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], zs: float,
+    launch: NDArray[np.float64], crossing: NDArray[np.intp], *,
+    r_rec: float, z_rec: float, ns: int,
+) -> NDArray[np.float64]:
+    """Close each bracket by bisection on fresh marches through the profile.
+
+    Returns the distinct refined launch angles, possibly none: a bracket the
+    re-established endpoints disown is dropped rather than believed.
+    """
+    lo, hi = launch[crossing], launch[crossing + 1]
+    if lo.size == 0:
+        return np.zeros(0)
+    # The brackets are only as good as the fan's reading of them; make
+    # both endpoints real marches before bisecting between them.
+    ends = _march_arrival_rays(
+        z_prof, c_prof, source_depth=zs,
+        thetas=np.concatenate([lo, hi]), receiver_range=r_rec, n_steps=ns)
+    f_lo = ends.positions[:lo.size, -1] - z_rec
+    f_hi = ends.positions[lo.size:, -1] - z_rec
+    # A root standing within the two integrations' disagreement of a fan
+    # rung (the fan was traced at its own step, the search marches at ns)
+    # can slip just past the endpoint and un-bracket itself; one rung of
+    # slack on each side recovers it before the bracket is disbelieved.
+    bad = np.flatnonzero(np.sign(f_lo) * np.sign(f_hi) > 0.0)
+    if bad.size:
+        wide_lo = launch[np.maximum(crossing[bad] - 1, 0)]
+        wide_hi = launch[np.minimum(crossing[bad] + 2, launch.size - 1)]
+        wide = _march_arrival_rays(
+            z_prof, c_prof, source_depth=zs,
+            thetas=np.concatenate([wide_lo, wide_hi]),
+            receiver_range=r_rec, n_steps=ns)
+        lo[bad], hi[bad] = wide_lo, wide_hi
+        f_lo[bad] = wide.positions[:bad.size, -1] - z_rec
+        f_hi[bad] = wide.positions[bad.size:, -1] - z_rec
+    # An endpoint whose marched depth lands on the receiver to the last
+    # bit *is* the eigenray; the zero test is exact (a nonzero mask,
+    # inverted) because any tolerance would promote near-misses to roots
+    # and close their brackets before the bisection has refined them.
+    exact_lo, exact_hi = ~f_lo.astype(bool), ~f_hi.astype(bool)
+    keep = (np.sign(f_lo) * np.sign(f_hi) < 0.0) | exact_lo | exact_hi
+    lo, hi, f_lo = lo[keep], hi[keep], f_lo[keep]
+    exact_lo, exact_hi = exact_lo[keep], exact_hi[keep]
+    hi = np.where(exact_lo, lo, hi)
+    lo = np.where(exact_hi & ~exact_lo, hi, lo)
+    s_lo = np.sign(f_lo)
+    for _ in range(_EIGENRAY_BISECTIONS):
+        open_ = (hi - lo) > _EIGENRAY_CONVERGED
+        if not open_.any():
+            break
+        mid = 0.5 * (lo + hi)
+        f_mid = _march_arrival_rays(
+            z_prof, c_prof, source_depth=zs, thetas=mid,
+            receiver_range=r_rec, n_steps=ns).positions[:, -1] - z_rec
+        s_mid = np.sign(f_mid)
+        # A midpoint landing exactly on the receiver depth is a root the
+        # march itself certified; the exact test (sign code zero, taken as
+        # an inverted nonzero mask) keeps it, where a tolerance would
+        # declare roots the marcher never confirmed.
+        hit = ~s_mid.astype(bool) & open_
+        same = (s_mid == s_lo) & open_ & ~hit
+        lo = np.where(hit | same, mid, lo)
+        hi = np.where(hit | (open_ & ~same), mid, hi)
+    refined = 0.5 * (lo + hi)
+    if refined.size:
+        refined = refined[np.concatenate(
+            ([True], np.diff(refined) > _EIGENRAY_DISTINCT))]
+    return np.asarray(refined, dtype=np.float64)
+
+
+def _arrival_bottom_coefficient(
+    seabed: tuple[float, float, float] | None, key: str,
+    xi: NDArray[np.float64], c_bottom: float,
+) -> NDArray[np.complex128]:
+    """One bottom coefficient per arrival, at the angle its invariant fixes."""
+    if seabed is None:
+        return np.full(xi.size, _BOTTOM_REFLECTION[key], dtype=np.complex128)
+    rho1, rho2, c2 = seabed
+    # As printed, unconjugated: see the docstring's convention note.
+    return np.asarray(reflection_coefficient(
+        _seabed_grazing_deg(xi, c_bottom), rho1=rho1, c1=c_bottom,
+        rho2=rho2, c2=c2), dtype=np.complex128)
+
+
+def _earliest_arrivals(
+    times: NDArray[np.float64], max_arrivals: int,
+) -> NDArray[np.intp]:
+    """The stable order of the arrival times, truncated to the cap and said."""
+    order = np.argsort(times, kind="stable")
+    if order.size > int(max_arrivals):
+        import warnings
+
+        from ..._internal.warnings import PhonometryWarning
+
+        warnings.warn(
+            f"eigenrays: {order.size} eigenrays connect the receiver within"
+            f" the traced fan; keeping the {int(max_arrivals)} earliest."
+            " Raise 'max_arrivals' to keep them all.",
+            PhonometryWarning, stacklevel=3)
+        order = order[:int(max_arrivals)]
+    return order
+
+
 def eigenrays(
     trace: RayTraceResult,
     *,
@@ -1043,79 +1171,9 @@ def eigenrays(
         if ns < 2:
             raise ValueError("'n_steps' must be at least 2.")
 
-    # Read the fan at the receiver range (linear between the two bracketing
-    # columns: this is only the bracket hunt, and every sign found here is
-    # re-established on a fresh march before bisection trusts it).
-    launch = np.radians(np.sort(np.asarray(trace.launch_angles,
-                                           dtype=np.float64).ravel()))
-    col = int(np.clip(np.searchsorted(r_grid, r_rec), 1, r_grid.size - 1))
-    w = (r_rec - r_grid[col - 1]) / (r_grid[col] - r_grid[col - 1])
-    fan_order = np.argsort(np.asarray(trace.launch_angles, dtype=np.float64).ravel())
-    fan_depth = (trace.depths[fan_order, col - 1] * (1.0 - w)
-                 + trace.depths[fan_order, col] * w)
-    # A fan ray landing exactly on the receiver depth counts to one side, so
-    # the root right under it still raises exactly one bracket.
-    sign = np.where(fan_depth == z_rec, 1.0, np.sign(fan_depth - z_rec))
-    crossing = np.flatnonzero(sign[:-1] * sign[1:] < 0.0)
-    lo, hi = launch[crossing], launch[crossing + 1]
-
-    if lo.size:
-        # The brackets are only as good as the fan's reading of them; make
-        # both endpoints real marches before bisecting between them.
-        ends = _march_arrival_rays(
-            z_prof, c_prof, source_depth=zs,
-            thetas=np.concatenate([lo, hi]), receiver_range=r_rec, n_steps=ns)
-        f_lo = ends.positions[:lo.size, -1] - z_rec
-        f_hi = ends.positions[lo.size:, -1] - z_rec
-        # A root standing within the two integrations' disagreement of a fan
-        # rung (the fan was traced at its own step, the search marches at ns)
-        # can slip just past the endpoint and un-bracket itself; one rung of
-        # slack on each side recovers it before the bracket is disbelieved.
-        bad = np.flatnonzero(np.sign(f_lo) * np.sign(f_hi) > 0.0)
-        if bad.size:
-            wide_lo = launch[np.maximum(crossing[bad] - 1, 0)]
-            wide_hi = launch[np.minimum(crossing[bad] + 2, launch.size - 1)]
-            wide = _march_arrival_rays(
-                z_prof, c_prof, source_depth=zs,
-                thetas=np.concatenate([wide_lo, wide_hi]),
-                receiver_range=r_rec, n_steps=ns)
-            lo[bad], hi[bad] = wide_lo, wide_hi
-            f_lo[bad] = wide.positions[:bad.size, -1] - z_rec
-            f_hi[bad] = wide.positions[bad.size:, -1] - z_rec
-        # An endpoint whose marched depth lands on the receiver to the last
-        # bit *is* the eigenray; the zero test is exact (a nonzero mask,
-        # inverted) because any tolerance would promote near-misses to roots
-        # and close their brackets before the bisection has refined them.
-        exact_lo, exact_hi = ~f_lo.astype(bool), ~f_hi.astype(bool)
-        keep = (np.sign(f_lo) * np.sign(f_hi) < 0.0) | exact_lo | exact_hi
-        lo, hi, f_lo = lo[keep], hi[keep], f_lo[keep]
-        exact_lo, exact_hi = exact_lo[keep], exact_hi[keep]
-        hi = np.where(exact_lo, lo, hi)
-        lo = np.where(exact_hi & ~exact_lo, hi, lo)
-        s_lo = np.sign(f_lo)
-        for _ in range(_EIGENRAY_BISECTIONS):
-            open_ = (hi - lo) > _EIGENRAY_CONVERGED
-            if not open_.any():
-                break
-            mid = 0.5 * (lo + hi)
-            f_mid = _march_arrival_rays(
-                z_prof, c_prof, source_depth=zs, thetas=mid,
-                receiver_range=r_rec, n_steps=ns).positions[:, -1] - z_rec
-            s_mid = np.sign(f_mid)
-            # A midpoint landing exactly on the receiver depth is a root the
-            # march itself certified; the exact test (sign code zero, taken as
-            # an inverted nonzero mask) keeps it, where a tolerance would
-            # declare roots the marcher never confirmed.
-            hit = ~s_mid.astype(bool) & open_
-            same = (s_mid == s_lo) & open_ & ~hit
-            lo = np.where(hit | same, mid, lo)
-            hi = np.where(hit | (open_ & ~same), mid, hi)
-        refined = 0.5 * (lo + hi)
-        if refined.size:
-            refined = refined[np.concatenate(
-                ([True], np.diff(refined) > _EIGENRAY_DISTINCT))]
-    else:
-        refined = np.zeros(0)
+    launch, crossing = _bracket_launches(trace, r_grid, r_rec, z_rec)
+    refined = _refine_brackets(z_prof, c_prof, zs, launch, crossing,
+                               r_rec=r_rec, z_rec=z_rec, ns=ns)
 
     if refined.size == 0:
         empty = np.zeros(0)
@@ -1148,34 +1206,15 @@ def eigenrays(
     n_surface = np.asarray((final.reflections - final.upper_reflections).sum(axis=1))
     kmah = _caustic_crossings(np.asarray(final.spreadings, dtype=np.float64))
     xi = np.cos(refined) / c0
-    if seabed is not None:
-        rho1, rho2, c2 = seabed
-        c_bottom = float(c_prof[-1])
-        # As printed, unconjugated: see the docstring's convention note.
-        bottom_coeff = np.asarray(reflection_coefficient(
-            _seabed_grazing_deg(xi, c_bottom), rho1=rho1, c1=c_bottom,
-            rho2=rho2, c2=c2), dtype=np.complex128)
-    else:
-        bottom_coeff = np.full(refined.size, _BOTTOM_REFLECTION[key],
-                               dtype=np.complex128)
+    bottom_coeff = _arrival_bottom_coefficient(seabed, key, xi,
+                                               float(c_prof[-1]))
     amplitudes = (magnitude * (-1j) ** kmah
                   * _SURFACE_REFLECTION ** n_surface * bottom_coeff ** n_bottom)
     times = final.times[:, -1]
     arrival = np.degrees(np.arcsin(np.clip(
         final.verticals[:, -1] * c_end, -1.0, 1.0)))
 
-    order = np.argsort(times, kind="stable")
-    if order.size > int(max_arrivals):
-        import warnings
-
-        from ..._internal.warnings import PhonometryWarning
-
-        warnings.warn(
-            f"eigenrays: {order.size} eigenrays connect the receiver within"
-            f" the traced fan; keeping the {int(max_arrivals)} earliest."
-            " Raise 'max_arrivals' to keep them all.",
-            PhonometryWarning, stacklevel=2)
-        order = order[:int(max_arrivals)]
+    order = _earliest_arrivals(times, max_arrivals)
 
     return EigenrayResult(
         launch_angles=np.degrees(refined[order]),
