@@ -1841,6 +1841,26 @@ def _wrap_count(
     return min(_MAX_BEAM_WRAPS, n_wrap)
 
 
+def _fold_rung_extent(
+    s: _BeamSamples, fold: _FoldColumns, wrap: int, side: float,
+    reach_max: float,
+) -> tuple[NDArray[np.intp], NDArray[np.intp] | None] | None:
+    """The rows and columns of one rung over a fold, or ``None`` for no rung.
+
+    The floor and the rung's validity come from the local fan of
+    :func:`_fold_margins`; a rung only some columns can populate returns
+    those columns, and one no column admits returns nothing at all.
+    """
+    margin, valid = _fold_margins(fold, wrap, side)
+    usable = valid & (margin <= reach_max)
+    cols = None
+    if not usable.all():
+        cols = np.flatnonzero(usable)
+        if cols.size == 0:
+            return None
+    return np.flatnonzero(s.reach >= float(margin[usable].min())), cols
+
+
 def _rung_plan(
     s: _BeamSamples, fold: _FoldColumns | None, water_depth: float,
     r_bottom: NDArray[Any], n_wrap: int,
@@ -1866,13 +1886,10 @@ def _rung_plan(
             span = water_depth if side > 0.0 else 2.0 * water_depth
             rows = np.flatnonzero(s.reach >= abs(shift) - span)
         else:
-            margin, valid = _fold_margins(fold, wrap, side)
-            usable = valid & (margin <= reach_max)
-            if not usable.all():
-                cols = np.flatnonzero(usable)
-                if cols.size == 0:
-                    continue
-            rows = np.flatnonzero(s.reach >= float(margin[usable].min()))
+            extent = _fold_rung_extent(s, fold, wrap, side, reach_max)
+            if extent is None:
+                continue
+            rows, cols = extent
         if rows.size == 0:
             continue
         strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
@@ -1997,8 +2014,11 @@ def _sum_rung(
     spreading = r.spreading[:, :, None]
     slope = r.slope[:, :, None]
     half_width = grid.half_omega_width[rows][:, None, None]
-    sub_capped = (None if grid.capped is None
-                  else grid.capped if cols is None else grid.capped[cols])
+    # The tail cap is per column; a rung priced on a column subset reads it
+    # on that subset alone.
+    sub_capped = grid.capped
+    if sub_capped is not None and cols is not None:
+        sub_capped = sub_capped[cols]
     step = max(1, _INFLUENCE_BLOCK // (rows.size * nc))
     for lo in range(0, grid.receiver_depths.size, step):
         zr = grid.receiver_depths[lo:lo + step]
@@ -2430,6 +2450,27 @@ def _resolve_fan(
                 np.asarray(w0, dtype=np.float64))
 
 
+def _retire_stopped_beams(
+    march: RayMarch, sloping: bool, n_steps: int,
+    widths: NDArray[np.float64], curvatures: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """The per-ray records, ``NaN`` from each terminated beam's stop column on.
+
+    A terminated beam's history is frozen at its last bounce; the field has
+    already retired it there, and the per-ray records say so the same way
+    :func:`ray_trace` does. Over a level bottom no beam terminates and the
+    records pass through untouched.
+    """
+    ray_depths = march.positions
+    if (not sloping or march.stopped_columns is None
+            or not np.any(march.stopped_columns < n_steps)):
+        return ray_depths, widths, curvatures
+    gone = np.arange(n_steps)[None, :] >= march.stopped_columns[:, None]
+    return (np.where(gone, np.nan, ray_depths),
+            np.where(gone, np.nan, widths),
+            np.where(gone, np.nan, curvatures))
+
+
 def gaussian_beams(
     frequency_hz: float,
     depths: NDArray[np.float64] | list[float],
@@ -2809,17 +2850,8 @@ def gaussian_beams(
     with np.errstate(divide="ignore"):
         pl = -20.0 * np.log10(np.abs(pressure))
 
-    ray_depths = march.positions
-    ray_widths, ray_curvatures = widths, curvatures
-    if (bathy is not None and march.stopped_columns is not None
-            and np.any(march.stopped_columns < n_steps)):
-        # A terminated beam's history is frozen at its last bounce; the field
-        # above already retired it there, and the per-ray records say so the
-        # same way ray_trace does: NaN from the stop column on.
-        gone = np.arange(n_steps)[None, :] >= march.stopped_columns[:, None]
-        ray_depths = np.where(gone, np.nan, ray_depths)
-        ray_widths = np.where(gone, np.nan, ray_widths)
-        ray_curvatures = np.where(gone, np.nan, ray_curvatures)
+    ray_depths, ray_widths, ray_curvatures = _retire_stopped_beams(
+        march, bathy is not None, n_steps, widths, curvatures)
 
     return GaussianBeamResult(
         frequency=f,
