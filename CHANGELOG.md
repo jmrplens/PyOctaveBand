@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The filters take the `Signal` the reader returns, as the level functions
+  already did: `octave_filter`, `weighting_filter`, `time_weighting`,
+  `linkwitz_riley`, `parametric_eq`, and the block-processing objects
+  `OctaveFilterBank` (both `.filter()` and `.spectrogram()`),
+  `WeightingFilter`, `TimeWeighting` and `ParametricEQ`. The rate the object
+  carries wins and an explicit one that disagrees raises rather than being
+  arbitrated; a bare array still demands its rate by name; and a calibrated
+  `Signal` is processed in pascals, which reads as a waveform in pascals, a
+  squared envelope in Pa2 or a band level in dB SPL depending on what the call
+  returns. Two exemptions are stated where they apply: a dBFS reading is
+  referenced to digital full scale and never sees pascals, and a bank carrying
+  its own `LevelCalibration` is the explicit knob, so the object's factor is
+  not applied on top. The resolution rules move out of `signals/levels.py`
+  into `phonometry.io._resolve`, beside the `Signal` they describe, so that
+  the surfaces on the contract cannot drift apart.
+
 - Real measurement audio, versioned as functional oracles. Five
   licence-verified third-party sources live under `tests/data/audio/`
   (6.9 MB, provenance, licences and CC BY attributions in its README), and
