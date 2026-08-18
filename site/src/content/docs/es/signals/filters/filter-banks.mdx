@@ -280,8 +280,8 @@ constructor y `bank.filter()` es el método por llamada.
 
 | Parámetro | Dónde | Tipo | Unidades | Rango / por defecto | Notas |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `x` | función, `.filter()` | array 1D o 2D | unidades digitales | no vacío | 2D es `[channels, samples]` |
-| `fs` | función, constructor | int | Hz | > 0 | |
+| `x` | función, `.filter()` | array 1D o 2D, o `Signal` | unidades digitales, o Pa si el `Signal` está calibrado | no vacío | 2D es `[channels, samples]` |
+| `fs` | función, constructor | int | Hz | > 0; obligatorio en el constructor, y tomado del `Signal` por `octave_filter()` y `bank.filter()` | |
 | `fraction` | función, constructor | int | — | por defecto `1`; habitual `3`; cualquier $b \ge 1$ | Bandas por octava = $b$ |
 | `order` | función, constructor | int | — | por defecto `6` | Orden SOS por banda |
 | `limits` | función, constructor | lista `[lo, hi]` | Hz | por defecto `[12, 20000]` | Rango de análisis |

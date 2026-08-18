@@ -48,6 +48,11 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     # library's own BS.1770 implementation (a lazy import inside the
     # writer: reading a file never pays for it)
     ("io", "broadcast"),
+    # the filters detect io.Signal for the same reason the level functions
+    # do: a read measurement carries its own fs and calibration, and asking
+    # the caller to repeat either is asking for a transcription error. Same
+    # direction as ("signals", "io"), so the graph stays acyclic
+    ("filters", "io"),
 }
 
 

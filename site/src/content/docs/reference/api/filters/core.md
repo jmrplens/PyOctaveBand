@@ -72,8 +72,8 @@ How the energy in a band becomes a level reading.
 
 ```python
 octave_filter(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     fraction: float = 1,
     order: int = 6,
     limits: list[float] | None = None,
@@ -100,8 +100,8 @@ Multichannel support: If x is 2D (channels, samples), each channel is filtered.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | (*Union[List[float], np.ndarray]*) Input signal (1D array or 2D array [channels, samples]). |
-| `fs` | (*int*) Sample rate in Hz. |
+| `x` | (*Union[List[float], np.ndarray, phonometry.io.Signal]*) Input signal (1D array or 2D array [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | (*Optional[int]*) Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fraction` | (*float*) Bandwidth 'b'. Examples: 1/3-octave b=3, 1-octave b=1, 2/3-octave b=1.5. Default: 1. |
 | `order` | (*int*) Order of the filter. Default: 6. |
 | `limits` | (*Optional[List[float]]*) Minimum and maximum limit frequencies [f_min, f_max]. Default [12, 20000]. |
@@ -110,7 +110,7 @@ Multichannel support: If x is 2D (channels, samples), each channel is filtered.
 | `mode` | 'rms' or 'peak'. Default: 'rms'. |
 | `nominal` | If True, return IEC 61260-1 nominal frequency labels (List[str]) instead of exact floats. |
 | `design` | How the band filters are designed: family, ripple, stopband attenuation and multirate decimation ([`FilterDesign`](/phonometry/reference/api/filters/core/#filterdesign)). The default 'butter' family is the only one that meets IEC 61260-1 class 1 with the default parameters; for `cheby2` scipy pins the deep-stopband floor at exactly `attenuation`, so it must be >= 70 dB to clear the class 1 limit (matches [`OctaveFilterBank`](/phonometry/reference/api/filters/core/#octavefilterbank)). |
-| `calibration` | How band energy becomes a level: calibration factor and dBFS switch ([`LevelCalibration`](/phonometry/reference/api/filters/core/#levelcalibration)). |
+| `calibration` | How band energy becomes a level: calibration factor and dBFS switch ([`LevelCalibration`](/phonometry/reference/api/filters/core/#levelcalibration)). This is the explicit knob: when its `factor` is left at 1.0, a calibrated [`Signal`](/phonometry/reference/api/io/io/#signal) supplies its own and the band levels come out in dB SPL; when it carries a factor, the object's is not applied on top (that would square it). `dbfs=True` ignores both the object and the factor, being referenced to digital full scale. |
 | `response_plot` | Whether to show or save the filter response plot ([`ResponsePlot`](/phonometry/reference/api/filters/core/#responseplot)). Plotting bypasses the design cache. |
 
 **Returns:** A tuple containing (SPL_array, Frequencies_list) or (SPL_array, Frequencies_list, signals). When *nominal=True*, the frequency list contains `List[str]` labels instead of floats. (*Union[Tuple[np.ndarray, List[float]], Tuple[np.ndarray, List[str]], Tuple[np.ndarray, List[float], List[np.ndarray]], Tuple[np.ndarray, List[str], List[np.ndarray]]]*)
@@ -153,7 +153,7 @@ Initialize the Octave Filter Bank.
 
 ```python
 OctaveFilterBank.filter(
-    x: list[float] | np.ndarray,
+    x: Signal | list[float] | np.ndarray,
     sigbands: bool = False,
     mode: str = 'rms',
     detrend: bool = True,
@@ -169,7 +169,7 @@ Apply the pre-designed filter bank to a signal.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D array or 2D array [channels, samples]). |
+| `x` | Input signal (1D array or 2D array [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal recorded at another rate than the one this bank was designed for is refused rather than filtered; a calibrated one is filtered in pascals unless the bank carries a calibration factor of its own, or reads in dBFS. |
 | `sigbands` | If True, also return the signal in the time domain divided into bands. |
 | `mode` | 'rms' for energy-based level, 'peak' for peak-holding level. Note: 'peak' includes the filter's onset transient; a tone that starts abruptly can overshoot by ~1 dB. For steady signals, discard the first ~5/f_low seconds or use longer signals. |
 | `detrend` | If True, remove DC offset from signal before filtering (Default: True). |
@@ -183,7 +183,7 @@ Apply the pre-designed filter bank to a signal.
 
 ```python
 OctaveFilterBank.spectrogram(
-    x: list[float] | np.ndarray,
+    x: Signal | list[float] | np.ndarray,
     window_time: float = 0.125,
     overlap: float = 0.5,
     mode: str = 'rms',
@@ -198,7 +198,7 @@ Short-time fractional-octave analysis: level per band over time.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D array or 2D array [channels, samples]). |
+| `x` | Input signal (1D array or 2D array [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). It takes the same door as `filter`: a Signal at another rate is refused, and a calibrated one is analysed in pascals unless this bank carries a calibration factor of its own or reads in dBFS. The two methods must not report different levels for the same recording. |
 | `window_time` | Analysis window length in seconds. |
 | `overlap` | Window overlap fraction in [0, 1). |
 | `mode` | 'rms' or 'peak' (per window). |

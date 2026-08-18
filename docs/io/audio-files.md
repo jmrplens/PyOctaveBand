@@ -45,8 +45,26 @@ The object stands in for the bare array anywhere: `np.asarray(sig)` yields
 the samples (1-D for one channel, `(channels, samples)` for several), so
 every `(x, fs, ...)` function of the library accepts it today. The level
 functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
-and `lex_8h`) go further and take the `Signal` itself — the object already knows its rate and its calibration, and
-asking you to repeat either is asking for a transcription error.
+and `lex_8h`) and the filters (`octave_filter`, `weighting_filter`,
+`time_weighting`, `linkwitz_riley`, `parametric_eq`, and the block-processing
+objects `OctaveFilterBank`, `WeightingFilter`, `TimeWeighting` and
+`ParametricEQ`) go further and take the `Signal` itself — the
+object already knows its rate and its calibration, and asking you to repeat
+either is asking for a transcription error. The rate it carries wins, and an
+explicit one that disagrees raises rather than being arbitrated.
+
+A calibrated `Signal` is *processed* in pascals, which is one rule with three
+readings depending on what the call returns: `weighting_filter`,
+`linkwitz_riley` and `parametric_eq` hand back a waveform, so that waveform is
+in pascals; `time_weighting` squares its input, so its envelope is in Pa²; and
+`octave_filter` and the level functions return a level, so what the
+calibration buys there is dB SPL re 20 µPa instead of a number in digital
+units. The `dbfs` routes are the deliberate exception: full scale is their
+reference, so they ignore the factor. For the same reason, do not chain a
+filter into a dBFS reading: `leq(weighting_filter(sig, curve="A"), dbfs=True)`
+measures pascals on a scale that claims to be full-scale referenced, and comes
+out `20 log10(factor)` off. That is what `laeq(sig, dbfs=True)` is for, which
+weights the raw samples before reading them.
 
 Integer samples are scaled by exactly $2^{B-1}$ for a $B$-bit container: a
 power of two, so the conversion to float64 is exact in binary floating

@@ -161,8 +161,8 @@ with its own response chart, in [Special Weightings](special-weightings.md).
 
 | Parameter | Type | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| `x` | 1D or 2D array | any | non-empty | 2D is `[channels, samples]` |
-| `fs` | int | Hz | > 0 | |
+| `x` | 1D or 2D array, or `Signal` | any | non-empty | 2D is `[channels, samples]` |
+| `fs` | int | Hz | > 0; from the `Signal` when `x` is one | |
 | `curve` | str | — | `'A'` (default), `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'` | `'G'` per ISO 7196 (infrasound), `'B'`/`'D'` historical and `'AU'` per IEC 61012 are covered in [Special Weightings](special-weightings.md); `'Z'` is a bypass |
 | `high_accuracy` | bool | — | default `True` (function); class default `None` resolves to `not stateful` | Internal oversampling keeps A/C in class 1 up to 16 kHz when $f_\mathrm{s} \ge 40$ kHz; details in §5 |
 | `stateful` | bool (class only) | — | default `False` | Carries filter state across blocks (streaming) |

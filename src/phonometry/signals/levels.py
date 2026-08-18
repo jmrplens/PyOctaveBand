@@ -22,63 +22,19 @@ import numpy as np
 
 from .._internal.peaks import inter_sample_peak
 from .._internal.types import as_float_or_array
-from .._internal.utils import _typesignal
 from ..filters.weighting import time_weighting, weighting_filter
+from ..io._resolve import (
+    resolve_calibration as _resolve_calibration,
+)
+from ..io._resolve import (
+    resolve_fs as _resolve_fs,
+)
+from ..io._resolve import (
+    resolve_samples as _resolve_samples_raw,
+)
 from ..io._signal import Signal
 
 _REF_PRESSURE = 2e-5
-
-
-def _resolve_fs(x: Signal | list[float] | np.ndarray, fs: int | None) -> int:
-    """Resolve the sample rate from the argument or from the Signal itself.
-
-    A :class:`~phonometry.io.Signal` brings its own rate; an explicit one
-    that disagrees is refused rather than arbitrated (the same rule as
-    :func:`phonometry.io.write`): the sample rate is a fact of the
-    recording, not a preference, and silently trusting either side of a
-    disagreement mis-times every filter downstream. A bare array knows
-    nothing about time, so there the argument is mandatory.
-    """
-    if isinstance(x, Signal):
-        if fs is not None and fs != x.fs:
-            raise ValueError(
-                f"fs={fs} conflicts with the Signal's own fs={x.fs}; "
-                "pass one or the other, not a disagreement"
-            )
-        return x.fs
-    if fs is None:
-        raise ValueError("fs is required when 'x' is a bare array")
-    return fs
-
-
-def _resolve_calibration(
-    x: Signal | list[float] | np.ndarray, calibration_factor: float | None
-) -> float:
-    """Resolve the digital-to-pascal factor by the documented precedence.
-
-    An explicit argument always wins -- the caller knows more than the
-    object (a re-calibration after the file was written, a deliberate
-    what-if). Otherwise a calibrated :class:`~phonometry.io.Signal`
-    supplies the factor it carries. Otherwise 1.0: digital units straight
-    through, which is exactly what the bare-array signatures have always
-    computed when no factor was given.
-    """
-    if calibration_factor is not None:
-        return calibration_factor
-    if isinstance(x, Signal) and x.calibration_factor is not None:
-        return x.calibration_factor
-    return 1.0
-
-
-def _resolve_samples(x: Signal | list[float] | np.ndarray) -> np.ndarray:
-    """The float64 samples of the input, whichever form it arrived in.
-
-    A :class:`~phonometry.io.Signal` contributes its array view (1-D for
-    one channel, ``(channels, samples)`` for several), so a mono Signal
-    yields the same scalar level a mono array does; bare input passes
-    through :func:`_typesignal` untouched.
-    """
-    return _typesignal(np.asarray(x) if isinstance(x, Signal) else x)
 
 
 def _level_db(mean_square: np.ndarray, calibration_factor: float, dbfs: bool) -> np.ndarray:
@@ -122,7 +78,7 @@ def leq(
     :return: Scalar for 1D input, array of shape (channels,) for 2D input.
     """
     calibration = _resolve_calibration(x, calibration_factor)
-    x_proc = _resolve_samples(x)
+    x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration)
     ms = np.mean(x_proc**2, axis=-1)
     out = _level_db(np.asarray(ms), calibration, dbfs)
@@ -152,7 +108,7 @@ def laeq(
     """
     fs = _resolve_fs(x, fs)
     calibration = _resolve_calibration(x, calibration_factor)
-    x_proc = _resolve_samples(x)
+    x_proc = _resolve_samples_raw(x, calibrate=False)
     return leq(weighting_filter(x_proc, fs, "A"), calibration, dbfs)
 
 
@@ -192,7 +148,7 @@ def ln_levels(
     """
     fs = _resolve_fs(x, fs)
     calibration_factor = _resolve_calibration(x, calibration_factor)
-    x_proc = _resolve_samples(x)
+    x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration_factor)
     for value in n:
         if not 0 < value < 100:
@@ -260,7 +216,7 @@ def lc_peak(
         raise ValueError("oversample must be an integer >= 1.")
     fs = _resolve_fs(x, fs)
     calibration_factor = _resolve_calibration(x, calibration_factor)
-    x_proc = _resolve_samples(x)
+    x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration_factor)
     weighted = weighting_filter(x_proc, fs, "C")
     peak = inter_sample_peak(weighted, int(oversample))
@@ -301,7 +257,7 @@ def sel(
     """
     fs = _resolve_fs(x, fs)
     calibration_factor = _resolve_calibration(x, calibration_factor)
-    x_proc = _resolve_samples(x)
+    x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration_factor)
     if fs <= 0:
         raise ValueError("Sample rate 'fs' must be positive.")
@@ -342,7 +298,7 @@ def sound_exposure(
     """
     fs = _resolve_fs(x, fs)
     calibration = _resolve_calibration(x, calibration_factor)
-    x_proc = _resolve_samples(x)
+    x_proc = _resolve_samples_raw(x, calibrate=False)
     _validate_level_input(x_proc, calibration)
     if duration_hours is not None and duration_hours <= 0:
         raise ValueError("'duration_hours' must be positive.")

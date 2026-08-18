@@ -144,9 +144,9 @@ One biquad of the RBJ Audio EQ Cookbook.
 
 ```python
 parametric_eq(
-    x: list[float] | np.ndarray,
-    fs: float,
-    sections: EQSection | Sequence[EQSection],
+    x: Signal | list[float] | np.ndarray,
+    fs: float | None = None,
+    sections: EQSection | Sequence[EQSection] | None = None,
 ) -> np.ndarray
 ```
 
@@ -158,9 +158,9 @@ Convenience wrapper around [`ParametricEQ`](/phonometry/reference/api/filters/eq
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D `[channels, samples]`). |
-| `fs` | Sample rate in Hz. |
-| `sections` | One [`EQSection`](/phonometry/reference/api/filters/equalizer/#eqsection) or a sequence of them. |
+| `x` | Input signal (1D or 2D `[channels, samples]`), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. A calibrated Signal is equalized in pascals, so the result is in pascals too. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. It keeps its position, so with a Signal name the cascade: `parametric_eq(sig, sections=...)`. |
+| `sections` | One [`EQSection`](/phonometry/reference/api/filters/equalizer/#eqsection) or a sequence of them. Required (it defaults to `None` only so that `fs` can be omitted before it). |
 
 **Returns:** Equalized signal.
 
@@ -194,7 +194,7 @@ series as a numerically robust SOS cascade, following the house style of
 ### ParametricEQ.filter()
 
 ```python
-ParametricEQ.filter(x: list[float] | np.ndarray) -> np.ndarray
+ParametricEQ.filter(x: Signal | list[float] | np.ndarray) -> np.ndarray
 ```
 
 Apply the EQ cascade to a signal.
@@ -203,9 +203,15 @@ Apply the EQ cascade to a signal.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D `[channels, samples]`). |
+| `x` | Input signal (1D or 2D `[channels, samples]`), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal whose rate disagrees with the one this cascade was designed for is refused; a calibrated one is equalized in pascals. |
 
 **Returns:** Equalized signal.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If a Signal's rate is not the cascade's. |
 
 ### ParametricEQ.response()
 

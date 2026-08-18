@@ -65,7 +65,9 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 import numpy as np
 from scipy import signal
 
-from .._internal.utils import _sos_initial_state, _sos_state_mismatch, _typesignal
+from .._internal.utils import _sos_initial_state, _sos_state_mismatch
+from ..io._resolve import refuse_foreign_rate, resolve_fs, resolve_samples
+from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -484,13 +486,18 @@ class ParametricEQ:
             self.zi = np.array([])
             self._steady_ic = steady_ic
 
-    def filter(self, x: list[float] | np.ndarray) -> np.ndarray:
+    def filter(self, x: Signal | list[float] | np.ndarray) -> np.ndarray:
         """Apply the EQ cascade to a signal.
 
-        :param x: Input signal (1D or 2D ``[channels, samples]``).
+        :param x: Input signal (1D or 2D ``[channels, samples]``), or a
+            :class:`phonometry.io.Signal`. A Signal whose rate disagrees
+            with the one this cascade was designed for is refused; a
+            calibrated one is equalized in pascals.
         :return: Equalized signal.
+        :raises ValueError: If a Signal's rate is not the cascade's.
         """
-        x_proc = _typesignal(x)
+        refuse_foreign_rate(x, self.fs, "EQ cascade")
+        x_proc = resolve_samples(x)
         if not self.stateful:
             return cast(np.ndarray, signal.sosfilt(self.sos, x_proc, axis=-1))
 
@@ -547,17 +554,28 @@ class ParametricEQ:
 
 
 def parametric_eq(
-    x: list[float] | np.ndarray,
-    fs: float,
-    sections: EQSection | Sequence[EQSection],
+    x: Signal | list[float] | np.ndarray,
+    fs: float | None = None,
+    sections: EQSection | Sequence[EQSection] | None = None,
 ) -> np.ndarray:
     """Apply a parametric-EQ cascade to a signal (RBJ Audio EQ Cookbook).
 
     Convenience wrapper around :class:`ParametricEQ` for one-shot use.
 
-    :param x: Input signal (1D or 2D ``[channels, samples]``).
-    :param fs: Sample rate in Hz.
-    :param sections: One :class:`EQSection` or a sequence of them.
+    :param x: Input signal (1D or 2D ``[channels, samples]``), or a
+        :class:`phonometry.io.Signal` read from a measurement file. A
+        calibrated Signal is equalized in pascals, so the result is in
+        pascals too.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises. It keeps its position, so with a
+        Signal name the cascade: ``parametric_eq(sig, sections=...)``.
+    :param sections: One :class:`EQSection` or a sequence of them. Required
+        (it defaults to ``None`` only so that ``fs`` can be omitted before
+        it).
     :return: Equalized signal.
     """
+    fs = resolve_fs(x, fs)
+    if sections is None:
+        raise ValueError("'sections' is required: the EQ cascade to apply.")
     return ParametricEQ(fs, sections).filter(x)
