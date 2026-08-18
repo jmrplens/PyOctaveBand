@@ -238,10 +238,18 @@ def test_the_arguments_behind_fs_are_keyword_only_and_required() -> None:
     need the value, and the reader would have to run it to find out.
     """
     sig = Signal(_tone(), FS)
+    section = EQSection("peaking", 1000.0, 3.0, 1.0)
     with pytest.raises(TypeError, match="required keyword-only argument"):
         linkwitz_riley(sig)  # type: ignore[call-arg]
     with pytest.raises(TypeError, match="required keyword-only argument"):
         parametric_eq(sig)  # type: ignore[call-arg]
+    # Required is only half of it: the slot behind fs used to accept a
+    # positional value, and a call that still passes one must not be read as
+    # something else (an order, a second section) rather than refused.
+    with pytest.raises(TypeError, match="positional arguments"):
+        linkwitz_riley(sig, FS, 800.0)  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match="positional arguments"):
+        parametric_eq(sig, FS, section)  # type: ignore[call-arg]
 
 
 def test_the_rate_may_still_be_positional() -> None:

@@ -93,9 +93,12 @@ def test_precision_positions_invalid_surface_raises() -> None:
         precision_positions("box", radius=1.0)  # type: ignore[arg-type]
 
 
-def test_precision_positions_missing_radius_raises() -> None:
+def test_precision_positions_requires_a_radius() -> None:
+    """Keyword-only and required, so Python enforces it before the body runs."""
+    with pytest.raises(TypeError, match="required keyword-only argument"):
+        precision_positions("sphere")  # type: ignore[call-arg]
     with pytest.raises(ValueError, match="A positive 'radius' is required"):
-        precision_positions("sphere")
+        precision_positions("sphere", radius=0.0)
 
 
 def test_precision_positions_bad_count_raises() -> None:
@@ -365,10 +368,12 @@ def test_anechoic_invalid_surface_raises() -> None:
         sound_power_anechoic(levels, "box", radius=1.0)  # type: ignore[arg-type]
 
 
-def test_anechoic_missing_radius_raises() -> None:
+def test_anechoic_requires_a_radius() -> None:
     levels = np.full((40, 1), 70.0)
+    with pytest.raises(TypeError, match="required keyword-only argument"):
+        sound_power_anechoic(levels, "sphere")  # type: ignore[call-arg]
     with pytest.raises(ValueError, match="A positive 'radius' is required"):
-        sound_power_anechoic(levels, "sphere")
+        sound_power_anechoic(levels, "sphere", radius=0.0)
 
 
 def test_anechoic_areas_wrong_length_raises() -> None:

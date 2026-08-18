@@ -283,7 +283,7 @@ def _precision_table(surface: PrecisionSurface, array: PrecisionArray) -> np.nda
 def precision_positions(
     surface: PrecisionSurface,
     *,
-    radius: float | None = None,
+    radius: float,
     array: PrecisionArray = "general",
     count: int = 40,
 ) -> np.ndarray:
@@ -308,7 +308,7 @@ def precision_positions(
         raise ValueError(_SURFACE_CHOICE_MSG)
     if array not in ("general", "broadband"):
         raise ValueError("'array' must be 'general' or 'broadband'.")
-    if radius is None or radius <= 0:
+    if radius <= 0:
         raise ValueError("A positive 'radius' is required.")
     if count not in (20, 40):
         raise ValueError("'count' must be 20 (primary array) or 40 (full array).")
@@ -568,7 +568,7 @@ def sound_power_anechoic(
     levels_positions: np.ndarray,
     surface: PrecisionSurface,
     *,
-    radius: float | None = None,
+    radius: float,
     background_levels: np.ndarray | None = None,
     frequencies: np.ndarray | None = None,
     areas: np.ndarray | None = None,
@@ -619,7 +619,7 @@ def sound_power_anechoic(
     """
     if surface not in ("sphere", "hemisphere"):
         raise ValueError(_SURFACE_CHOICE_MSG)
-    if radius is None or radius <= 0:
+    if radius <= 0:
         raise ValueError("A positive 'radius' is required.")
     levels = np.atleast_2d(np.asarray(levels_positions, dtype=np.float64))
     if levels.ndim != 2:

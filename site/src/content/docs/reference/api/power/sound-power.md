@@ -143,7 +143,7 @@ with that shape; scalar inputs return a scalar, unchanged.
 measurement_positions(
     surface: Surface,
     *,
-    radius: float | None = None,
+    radius: float,
     reflecting_planes: int = 1,
     tones: bool = True,
     grade: Grade = 'engineering',

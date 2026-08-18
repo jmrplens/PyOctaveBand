@@ -440,7 +440,7 @@ def predicted_diffusion_spectrum(
     well_width: float,
     frequencies: ArrayLike,
     *,
-    depths: ArrayLike | None = None,
+    depths: ArrayLike,
     reflection_of: Any | None = None,
     angles: ArrayLike = DEFAULT_POLAR_ANGLES,
     source_angle: float = 0.0,
@@ -492,8 +492,6 @@ def predicted_diffusion_spectrum(
             "reflection model and must be None; build the spectrum from "
             "predict_diffuser_polar_response for an explicit reflection model."
         )
-    if depths is None:
-        raise ValueError("'depths' is required for a predicted diffusion spectrum.")
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if freqs.ndim != 1 or freqs.size == 0:
         raise ValueError("'frequencies' must be a non-empty 1-D sequence.")

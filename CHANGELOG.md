@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   it without running anything. `fs` keeps its position, so
   `linkwitz_riley(x, fs, freq=1000)` still reads left to right.
 
+- Six more signatures across the library stop advertising an optional
+  argument the body then demands. `adrienne_window(fs, *, ...)` and
+  `insitu_absorption_spectrum(incident_ir, reflected_ir, fs, *, ...)` take
+  their rate as a plain required argument; `measurement_positions(surface, *,
+  radius, ...)`, `precision_positions(surface, *, radius, ...)` and
+  `sound_power_anechoic(levels_positions, surface, *, radius, ...)` require
+  the radius they measure over; and `predicted_diffusion_spectrum(well_width,
+  frequencies, *, depths, ...)` requires the well depths it predicts from. Each of them had
+  a `= None` default and a hand-written `ValueError` a few lines into the
+  body, so the signature and the docstring disagreed about what the call
+  needs. Python raises `TypeError: missing required argument` for the omitted
+  case now; the range checks that follow (a positive rate, a positive radius)
+  keep raising `ValueError` as before.
+
 ### Added
 
 - The filters take the `Signal` the reader returns, as the level functions

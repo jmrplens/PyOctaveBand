@@ -259,7 +259,7 @@ def _edge(n_samples: int, shape: str, *, rising: bool) -> NDArray[np.float64]:
 
 
 def adrienne_window(
-    fs: float | None = None,
+    fs: float,
     *,
     flat_duration: float = _ADRIENNE_FLAT,
     leading_duration: float = _ADRIENNE_LEADING,
@@ -296,12 +296,10 @@ def adrienne_window(
         ``"cosine-squared"``.
     :return: The time-domain window, one sample per ``1 / fs`` (length
         ``round((leading + flat + trailing) * fs)`` samples).
-    :raises ValueError: If ``fs`` is missing or not positive, a duration is
+    :raises ValueError: If ``fs`` is not positive, a duration is
         negative, the flat duration is not positive, or an edge shape is
         unknown.
     """
-    if fs is None:
-        raise ValueError("adrienne_window() missing required argument: 'fs'.")
     if fs <= 0.0:
         raise ValueError(_FS_POSITIVE)
     if flat_duration <= 0.0:
@@ -634,7 +632,7 @@ class InsituAbsorptionResult:
 def insitu_absorption_spectrum(
     incident_ir: ArrayLike,
     reflected_ir: ArrayLike,
-    fs: float | None = None,
+    fs: float,
     *,
     source_height: float = DEFAULT_SOURCE_HEIGHT,
     mic_height: float = DEFAULT_MIC_HEIGHT,
@@ -663,13 +661,9 @@ def insitu_absorption_spectrum(
     :param f_max: Highest band centre to report, in hertz (default 4000 Hz).
     :param clip_negative: Clip negative band results to zero (default ``True``).
     :return: An :class:`InsituAbsorptionResult` with ``.plot()``.
-    :raises ValueError: On empty inputs, invalid geometry, or a missing or
+    :raises ValueError: On empty inputs, invalid geometry, or a
         non-positive ``fs``.
     """
-    if fs is None:
-        raise ValueError(
-            "insitu_absorption_spectrum() missing required argument: 'fs'."
-        )
     if fs <= 0.0:
         raise ValueError(_FS_POSITIVE)
     hi_t = np.atleast_1d(np.asarray(incident_ir, dtype=np.float64))

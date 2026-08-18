@@ -542,7 +542,7 @@ def _hemisphere_position_table(
 def measurement_positions(
     surface: Surface,
     *,
-    radius: float | None = None,
+    radius: float,
     reflecting_planes: int = 1,
     tones: bool = True,
     grade: Grade = "engineering",
@@ -570,7 +570,7 @@ def measurement_positions(
             "parallelepiped positions are defined by area subdivision "
             "(ISO 3744:2010 Annex C)."
         )
-    if radius is None or radius <= 0:
+    if radius <= 0:
         raise ValueError("A positive 'radius' is required for a hemisphere.")
     if reflecting_planes not in (1, 2, 3):
         raise ValueError("'reflecting_planes' must be 1, 2 or 3.")

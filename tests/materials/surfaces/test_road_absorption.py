@@ -384,10 +384,10 @@ def test_the_functions_that_took_a_deprecated_fs_alias_still_require_fs() -> Non
     """
     hi = _incident_ir()
     hr = 0.4 * np.roll(hi, 96)
-    with pytest.raises(ValueError, match="missing required argument: 'fs'"):
-        adrienne_window(flat_duration=0.005)
-    with pytest.raises(ValueError, match="missing required argument: 'fs'"):
-        insitu_absorption_spectrum(hi, hr)
+    with pytest.raises(TypeError, match="missing 1 required positional argument"):
+        adrienne_window(flat_duration=0.005)  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match="missing 1 required positional argument"):
+        insitu_absorption_spectrum(hi, hr)  # type: ignore[call-arg]
 
 
 def test_insitu_absorption_spectrum_plot_returns_axes() -> None:

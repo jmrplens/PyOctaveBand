@@ -104,7 +104,7 @@ to have absorption \< 0.05, Annex B).
 
 ```python
 adrienne_window(
-    fs: float | None = None,
+    fs: float,
     *,
     flat_duration: float = 0.005,
     leading_duration: float = 0.0005,
@@ -150,7 +150,7 @@ normative fixed set of timings. The lower usable frequency scales as
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | If `fs` is missing or not positive, a duration is negative, the flat duration is not positive, or an edge shape is unknown. |
+| ValueError | If `fs` is not positive, a duration is negative, the flat duration is not positive, or an edge shape is unknown. |
 
 ## check_spot_frequency_range
 
@@ -322,7 +322,7 @@ $1 / K_\mathrm{r}$ factor
 insitu_absorption_spectrum(
     incident_ir: ArrayLike,
     reflected_ir: ArrayLike,
-    fs: float | None = None,
+    fs: float,
     *,
     source_height: float = 1.25,
     mic_height: float = 0.25,
@@ -363,7 +363,7 @@ in a plottable [`InsituAbsorptionResult`](/phonometry/reference/api/materials/ro
 
 | Exception | When |
 | :--- | :--- |
-| ValueError | On empty inputs, invalid geometry, or a missing or non-positive `fs`. |
+| ValueError | On empty inputs, invalid geometry, or a non-positive `fs`. |
 
 ## insitu_reflection_factor
 
