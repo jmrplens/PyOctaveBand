@@ -364,12 +364,28 @@ _SUBTYPE_BITS = {
 }
 
 
+def _check_dither(dither: str | None, subtype: str) -> None:
+    """Validate the dither request against the target subtype."""
+    if dither is None:
+        return
+    if dither != "tpdf":
+        raise ValueError(f"unknown dither {dither!r}; offered: 'tpdf'")
+    if subtype != "PCM_16":
+        raise ValueError(
+            "dither='tpdf' applies only when quantising to PCM_16: at "
+            "24 bits and above the quantisation error is already far "
+            "below any microphone chain's noise floor, and dithering "
+            "float data only adds noise to it"
+        )
+
+
 def _resolve_bext(
     x: Signal | NDArray[np.generic] | list[float],
     bext: BroadcastMetadata | str | None,
     data: np.ndarray,
     fs: int,
     subtype: str,
+    algorithm: str = "PCM",
 ) -> bytes | None:
     """Turn the ``bext`` argument into a serialised chunk payload, or None.
 
@@ -403,7 +419,8 @@ def _resolve_bext(
     if meta is None:
         return None
     line = coding_history_line(
-        fs=fs, bits=_SUBTYPE_BITS[subtype], channels=int(data.shape[0])
+        fs=fs, bits=_SUBTYPE_BITS[subtype], channels=int(data.shape[0]),
+        algorithm=algorithm,
     )
     meta = replace(
         meta, coding_history=extend_coding_history(meta.coding_history, line)
@@ -496,25 +513,21 @@ def write(
         for a carried UMID or loudness).
     """
     target = Path(path)
-    if target.suffix.lower() not in _WAV_SUFFIXES:
+    suffix = target.suffix.lower()
+    if suffix not in _WAV_SUFFIXES and suffix != ".flac":
         raise ValueError(
             f"{path}: unsupported target {target.suffix!r}; the writer "
-            "produces the WAV family (.wav, .wave, .bwf). Lossy formats "
-            "are deliberately not offered: a metrology library does not "
-            "export approximations of its own data."
+            "produces the WAV family (.wav, .wave, .bwf) and, with the "
+            "[audio] extra, FLAC. Lossy formats are deliberately not "
+            "offered: a metrology library does not export approximations "
+            "of its own data."
         )
     data, rate = _resolve_input(x, fs)
+    if suffix == ".flac":
+        _write_flac(path, x, data, rate, subtype, bext, dither)
+        return
     resolved = _resolve_subtype(data, subtype)
-    if dither is not None:
-        if dither != "tpdf":
-            raise ValueError(f"unknown dither {dither!r}; offered: 'tpdf'")
-        if resolved != "PCM_16":
-            raise ValueError(
-                "dither='tpdf' applies only when quantising to PCM_16: at "
-                "24 bits and above the quantisation error is already far "
-                "below any microphone chain's noise floor, and dithering "
-                "float data only adds noise to it"
-            )
+    _check_dither(dither, resolved)
     bext_payload = _resolve_bext(x, bext, data, rate, resolved)
     if data.dtype in _PASSTHROUGH_SUBTYPES:
         if dither is not None:
@@ -563,3 +576,89 @@ def _scipy_write(path: str | Path, fs: int, data: np.ndarray) -> None:
     frames_first = np.ascontiguousarray(data.T)
     wavfile.write(str(path), fs, frames_first[:, 0] if data.shape[0] == 1
                   else frames_first)
+
+
+def _write_flac(
+    path: str | Path,
+    x: Signal | NDArray[np.generic] | list[float],
+    data: np.ndarray,
+    fs: int,
+    subtype: str | None,
+    bext: BroadcastMetadata | str | None,
+    dither: str | None,
+) -> None:
+    """Write a FLAC archive copy through the ``[audio]`` extra.
+
+    FLAC stores integers only, up to 24 bits in libsndfile, so float data
+    defaults to ``PCM_24`` (whose quantisation noise, roughly -146 dBFS,
+    sits far below any microphone chain's floor) and the quantisation is
+    done *here*, by the same documented rounding as the WAV paths, with
+    libsndfile handed finished codes: ``int16`` directly, and 24-bit
+    codes left-justified in ``int32``, which libsndfile's integer write
+    path stores bit-exactly (its own float-to-int scaling never runs, so
+    its conventions cannot disagree with ours). A ``bext`` rides in the
+    FLAC APPLICATION ``riff`` block afterwards (:mod:`._flac`), with the
+    CodingHistory line's ``A=FLAC`` naming the coding step.
+
+    ``int16`` input passes its codes through bit-exact; ``int32`` input
+    is refused rather than silently dropped to 24 bits.
+    """
+    from ._backends import _import_soundfile
+    from ._flac import embed_flac_bext
+
+    sf = _import_soundfile("FLAC")
+    implied = _PASSTHROUGH_SUBTYPES.get(data.dtype)
+    out: np.ndarray
+    if implied == "PCM_32":
+        raise ValueError(
+            f"{path}: FLAC stores integers up to 24 bits (libsndfile), so "
+            "int32 codes cannot pass through bit-exact. Convert to float64 "
+            "and choose subtype='PCM_24' to accept the 8-bit truncation "
+            "explicitly."
+        )
+    if implied == "PCM_16":
+        if subtype not in (None, "PCM_16"):
+            raise ValueError(
+                "integer int16 input is a bit-exact pass-through of PCM_16; "
+                f"requesting subtype={subtype!r} would resample the codes"
+            )
+        if dither is not None:
+            raise ValueError(
+                "dither applies to quantisation, and integer input is a "
+                "bit-exact pass-through: there is nothing to dither"
+            )
+        resolved = "PCM_16"
+        out = data.astype(np.int16)
+    else:
+        if data.dtype.kind != "f":
+            raise ValueError(
+                f"unsupported input dtype {data.dtype}: pass float data, "
+                "or int16 codes for bit-exact pass-through"
+            )
+        resolved = "PCM_24" if subtype is None else subtype
+        if resolved not in ("PCM_16", "PCM_24"):
+            raise ValueError(
+                f"FLAC holds integer PCM up to 24 bits; subtype "
+                f"{resolved!r} is not available (choose PCM_16 or PCM_24)"
+            )
+        _check_dither(dither, resolved)
+        bits = _SUBTYPE_BITS[resolved]
+        codes, clipped, peak_dbfs = _quantise(data, bits, dither)
+        if clipped:
+            _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
+        out = (
+            codes.astype(np.int16) if resolved == "PCM_16"
+            else np.left_shift(codes.astype(np.int32), 8)
+        )
+    bext_payload = _resolve_bext(x, bext, data, fs, resolved,
+                                 algorithm="FLAC")
+    frames_first = np.ascontiguousarray(out.T)
+    sf.write(
+        str(path),
+        frames_first[:, 0] if out.shape[0] == 1 else frames_first,
+        fs,
+        subtype=resolved,
+        format="FLAC",
+    )
+    if bext_payload is not None:
+        embed_flac_bext(path, bext_payload)

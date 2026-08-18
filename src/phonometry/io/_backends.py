@@ -41,6 +41,7 @@ import numpy as np
 
 from .._internal.warnings import PhonometryWarning
 from ._chunks import WAVE_FORMAT_IEEE_FLOAT, WAVE_FORMAT_PCM, parse_wav_chunks
+from ._flac import read_flac_bext
 from ._signal import Signal, SignalSource
 from ._wav import AudioFileInfo, read_wav, wav_info
 
@@ -154,12 +155,20 @@ def _read_soundfile(
     if lossy:
         _warn_lossy(f"{format_name} ({file_info.subtype})", path)
     data, fs = sf.read(str(path), dtype="float64", always_2d=True)
+    if chunks is not None:
+        provenance = chunks.bext
+    elif format_name == "FLAC":
+        # A FLAC written by phonometry (or by flac --keep-foreign-metadata)
+        # carries the bext chunk in an APPLICATION 'riff' block.
+        provenance = read_flac_bext(path)
+    else:
+        provenance = None
     return Signal(
         data=np.ascontiguousarray(data.T),
         fs=int(fs),
         calibration_factor=calibration_factor,
         channel_labels=chunks.fmt.channel_labels() if chunks is not None else None,
-        provenance=chunks.bext if chunks is not None else None,
+        provenance=provenance,
         source=SignalSource(
             path=str(path),
             container=chunks.container if chunks is not None else str(file_info.format),
@@ -253,4 +262,5 @@ def info(path: str | Path) -> AudioFileInfo:
         duration=frames / float(fs) if fs else 0.0,
         bit_depth=_SUBTYPE_BITS.get(str(file_info.subtype)),
         lossy=_soundfile_lossy(str(file_info.subtype)),
+        bext=read_flac_bext(path) if format_name == "FLAC" else None,
     )

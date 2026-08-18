@@ -79,7 +79,8 @@ class AudioFileInfo:
     waveform; :func:`phonometry.io.read` warns when asked to read one.
     ``channel_mask``/``channel_labels``, ``bext``, ``has_ixml`` and
     ``cue_points`` are WAV-family metadata and are ``None``/empty for other
-    containers.
+    containers -- except ``bext``, which a FLAC can also carry in its
+    APPLICATION ``riff`` block (see :mod:`phonometry.io._flac`).
     """
 
     path: str
