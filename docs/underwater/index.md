@@ -93,12 +93,13 @@ elastic bottom and no real bathymetry — which rules out
 range-dependent problems entirely; the beam solver can bounce off that same
 Rayleigh seabed instead of a perfect reflector, and that is as much bottom as
 any of them has. The ray solver still returns paths and
-travel times and no level of its own; the level comes from `gaussian_beams`,
+travel times and no level of its own; `eigenrays` searches its fan for the
+paths that join a source and a receiver and lists their arrivals with
+classical per-path amplitudes, and the field comes from `gaussian_beams`,
 which widens each of those rays into a beam and so answers a finite number at
-a caustic and a graded one in a shadow zone, at three prices: it sums the
-whole launch fan rather than searching for the eigenrays that join a given
-source and receiver, it has no near field within about three beam widths of
-the source, and the geometric-beam variant with its KMAH index and its
+a caustic and a graded one in a shadow zone, at two prices: it has no near
+field within about three beam widths of the source, and the geometric-beam
+variant with its KMAH index and its
 minimum-width floor is not implemented. The parabolic equation is the standard
 small-angle Tappert form rather than a wide-angle Padé variant. For the
 elastic seabed physics these fluid solvers leave out, the [elastic wave

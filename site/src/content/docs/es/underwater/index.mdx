@@ -107,11 +107,12 @@ sin batimetría real — lo que deja fuera por completo los problemas
 dependientes de la distancia; el método de haces puede rebotar en ese mismo
 lecho de Rayleigh en lugar de en un reflector perfecto, y más fondo que ese
 no tiene ninguno. El trazado de rayos sigue devolviendo caminos y
-tiempos de propagación y ningún nivel propio; el nivel lo da `gaussian_beams`,
+tiempos de propagación y ningún nivel propio; `eigenrays` busca en su abanico
+los caminos que unen una fuente y un receptor dados y lista sus llegadas con
+amplitudes clásicas por camino, y el campo lo da `gaussian_beams`,
 que ensancha cada uno de esos rayos hasta convertirlo en un haz y así responde
-un número finito en una cáustica y uno graduado en una zona de sombra, a tres
-precios: suma el abanico de lanzamiento entero en lugar de buscar los
-eigenrayos que unen una fuente y un receptor dados, no tiene campo cercano
+un número finito en una cáustica y uno graduado en una zona de sombra, a dos
+precios: no tiene campo cercano
 dentro de unas tres anchuras de haz de la fuente, y la variante de haces
 geométricos con su índice KMAH y su suelo de anchura mínima no está
 implementada. La ecuación parabólica es la forma estándar de ángulos pequeños

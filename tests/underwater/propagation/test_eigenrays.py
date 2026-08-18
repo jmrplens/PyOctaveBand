@@ -439,6 +439,6 @@ def test_the_arrival_plot_is_the_impulse_response_picture() -> None:
     assert ax.get_ylabel() == "Propagation loss [dB]"
     assert ax.yaxis_inverted()
     ax_es = res.plot(language="es")
-    assert ax_es.get_title() == "Llegadas de los rayos propios"
-    assert ax_es.get_xlabel() == "Tiempo de recorrido [s]"
+    assert ax_es.get_title() == "Llegadas de eigenrayos"
+    assert ax_es.get_xlabel() == "Tiempo de propagación [s]"
     plt.close("all")

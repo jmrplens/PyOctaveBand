@@ -20,6 +20,11 @@ propagation loss of [`phonometry.underwater.propagation.closed_form`](/phonometr
 * [`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) -- Gaussian beam tracing. Hangs a beam on each of those
   rays and sums them into a propagation-loss field, which is finite at a caustic
   and decays smoothly into a shadow zone where ray theory has nothing to say.
+* [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) -- the arrival structure. Takes a traced fan and a receiver
+  and refines, by bisection on fresh traces, the rays that actually connect the
+  source to that receiver, each with its travel time, launch and arrival
+  angles, boundary-touch counts and classical complex amplitude: the list the
+  sonar equation, a channel impulse response and communications work consume.
 * [`parabolic_equation`](/phonometry/reference/api/underwater/numerical/#parabolic_equation) -- the standard (Tappert) parabolic equation, solved
   with the split-step Fourier algorithm, returning the propagation-loss field.
 
@@ -47,6 +52,195 @@ Densities are in kg/m3, sound speeds in m/s, depths and ranges in metres,
 frequencies in Hz. The water column has a pressure-release surface at z = 0.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
+
+## EigenrayResult
+
+```python
+EigenrayResult(
+    launch_angles: NDArray[np.float64],
+    arrival_angles: NDArray[np.float64],
+    travel_times: NDArray[np.float64],
+    amplitudes: NDArray[np.complex128],
+    surface_reflections: NDArray[np.int_],
+    bottom_reflections: NDArray[np.int_],
+    caustic_crossings: NDArray[np.int_],
+    receiver_range: float,
+    receiver_depth: float,
+    source_depth: float,
+    water_depth: float,
+)
+```
+
+The eigenrays connecting one source to one receiver, earliest first.
+
+Every per-arrival array has one entry per eigenray, sorted by travel time.
+The frequency-independent pieces of each arrival are recorded separately
+(delay, complex amplitude, angles, boundary counts) so that one search
+serves every frequency: in the module's $e^{-i\omega t}$ convention
+the pressure a tone of angular frequency $\omega$ produces at the
+receiver is
+
+$$
+p(\omega) = \sum_j a_j\, e^{i \omega \tau_j},
+$$
+
+with $a_j$ the `amplitudes` and $\tau_j$ the
+`travel_times`; the band-limited channel impulse response is the inverse
+transform of that sum, a spike of complex weight $a_j$ at each
+$\tau_j$.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `launch_angles` | Launch angle of each eigenray at the source, from the horizontal, in degrees, positive downward: the same convention the fan was launched with. |
+| `arrival_angles` | The angle each eigenray crosses the receiver with, same convention. In a range-independent medium its magnitude is fixed by Snell's invariant at the receiver depth; its sign says whether the arrival is descending or climbing, which is what a vertical array steers on. |
+| `travel_times` | Travel time of each eigenray, in seconds: the marcher's third Runge-Kutta state read at the receiver, not a quadrature over the finished path. |
+| `amplitudes` | Complex amplitude of each arrival, dimensionless, normalised to unit pressure at 1 m from the source (the reference of Jensen Eqs. (3.67)-(3.68), the same one every field solver of this module reports its loss against). The magnitude is the classical ray amplitude of Eq. (3.65), $\vert c(z_\mathrm{R})\cos\theta_0 / (c(z_\mathrm{S})\, r\, q(r))\vert ^{1/2}$ with $q$ integrated from the point-source initial conditions of Eq. (3.63); the phase is the caustic factor $(-i)^m$ of Eq. (3.79) times the boundary factors $(-1)^{n_\mathrm{s}}$ and $\mathcal{R}^{n_b}$ (Eqs. 3.125-3.126). See [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) for why that convention and not another. |
+| `surface_reflections` | Sea-surface touches of each eigenray. |
+| `bottom_reflections` | Seabed touches of each eigenray. The pair classifies the arrivals the way Fig. 3.7 colours them: refracted paths carry zeros, and every multipath family is named by its counts. |
+| `caustic_crossings` | The KMAH index $m$ of Eq. (3.79): how many times each eigenray's ray-tube spreading vanished on the way, each crossing turning the amplitude by $-\pi/2$. Zero for every path in an isovelocity channel, where straight rays cannot form caustics. |
+| `receiver_range` | Range of the receiver the list connects to, in m. |
+| `receiver_depth` | Its depth, in metres. |
+| `source_depth` | Source depth, in metres. |
+| `water_depth` | Water-column depth, in metres. |
+
+### EigenrayResult.plot()
+
+```python
+EigenrayResult.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the arrival structure (per-path loss stems against delay).
+
+## eigenrays
+
+```python
+eigenrays(
+    trace: RayTraceResult,
+    *,
+    receiver_range: float,
+    receiver_depth: float,
+    bottom: str = 'pressure-release',
+    seabed_density: float | None = None,
+    seabed_sound_speed: float | None = None,
+    density: float = 1000.0,
+    max_arrivals: int = 64,
+    n_steps: int | None = None,
+) -> EigenrayResult
+```
+
+The eigenrays a traced fan brackets between a source and a receiver.
+
+Finding an eigenray is finding a launch angle whose ray's depth at the
+receiver range equals the receiver depth: a root of
+$f(\theta_0) = z(r_\mathrm{R}; \theta_0) - z_\mathrm{R}$, which is
+continuous in $\theta_0$ because a specular reflection folds the
+trajectory continuously. The fan of `trace` supplies the brackets, one
+per adjacent pair of rays whose $f$ changes sign, and each bracket
+is then closed by bisection on *fresh marches through the same profile*,
+never by interpolating between the traced rays: interpolation across a
+fan is exactly the hazard Jensen Sect. 3.7.5.1 illustrates (two rays of
+one bracket taking different bounce histories have no path between them),
+and a root polished on real traces is a real ray, whose travel time,
+bounce counts and amplitude are its own rather than a blend's. The
+marcher that traces the fan is the marcher that closes the brackets, with
+the dynamic pair of Eq. (3.58) riding along under the real point-source
+initial conditions of Eq. (3.63), so every arrival's amplitude is the
+Jacobian of the very trajectory that hit the receiver.
+
+**The amplitude convention, stated once.** Each arrival's complex
+amplitude is
+
+$$
+a_j = \left| \frac{c(z_\mathrm{R})\,\cos\theta_0} {c(z_\mathrm{S})\, r_\mathrm{R}\, q_j} \right|^{1/2} (-i)^{m_j}\, (-1)^{n_{\mathrm{s},j}}\, \mathcal{R}^{n_{b,j}},
+$$
+
+in the module's $e^{-i\omega t}$ convention, normalised to unit
+pressure at 1 m. Why each factor:
+
+* The magnitude is Eq. (3.65) with the $1/(4\pi)$ cancelled against
+  the free-field reference of Eqs. (3.67)-(3.68), which is how the book
+  itself defines transmission loss from these amplitudes and how every
+  solver of this module already normalises: the coherent sum
+  $\sum_j a_j e^{i\omega\tau_j}$ over a complete arrival set is
+  directly comparable to [`GaussianBeamResult.pressure`](/phonometry/reference/api/underwater/numerical/#gaussianbeamresult), and
+  $-20\lg|{\sum}|$ to every propagation loss here.
+* $(-i)^m$ is Eq. (3.79) exactly as printed. Sect. 3.3 writes the
+  ray field as $A\,e^{i\omega\tau}$ (Eq. 3.57), which *is* the
+  $e^{-i\omega t}$ convention, so the printed factor transfers
+  unchanged; it is the same $-\pi/2$ per caustic the beam solver's
+  tracked square-root branch spends continuously, taken here in the
+  discrete form the classical amplitude needs, since with real initial
+  conditions $q$ passes through zero instead of around it.
+* $(-1)^{n_\mathrm{s}}$ and $\mathcal{R}^{n_b}$ are
+  Eqs. (3.125)-(3.126) applied at every boundary touch, collapsed to
+  powers because Snell's invariant fixes one crossing angle per ray at a
+  flat boundary. With the `seabed_density` / `seabed_sound_speed`
+  pair, $\mathcal{R}$ is the Rayleigh coefficient of
+  [`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient)
+  at that angle, **not conjugated**: that function returns the
+  coefficient in the $e^{-i\omega t}$ convention these amplitudes
+  are declared in, so it enters as printed. ([`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams)
+  conjugates the very same coefficient because its internal sum is
+  assembled in the conjugate convention and conjugated once at the end;
+  neither solver's choice transfers to the other, which is why both
+  spell it out.)
+
+A receiver standing exactly on a caustic is the one place the list is
+honest rather than useful: $q_j \to 0$ there and the classical
+amplitude of Eq. (3.65) diverges, as Sect. 3.4.1 says it must. The
+infinity is ray theory's own, not an artefact to clamp;
+[`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) is the solver whose field stays finite there.
+
+**What the fan resolves is what the search can find.** A bracket exists
+where $f$ changes sign between adjacent fan rays, so a pair of
+eigenrays standing between the same two rays (the two sides of a fold
+near a caustic do this first) merges into no bracket at all, and an
+eigenray steeper than the fan's aperture does not exist to it. The fan's
+density and half-angle are the completeness levers, and they belong to
+the caller's [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace), where they are visible, rather than to a
+hidden retrace here. Tangential contact (an $f$ that touches zero
+without crossing) is likewise invisible, which is also why a receiver on
+a boundary is rejected: a folded trajectory only ever grazes the
+boundaries.
+
+**The cap.** The multipath count grows without bound as paths steepen: in
+an ideal waveguide nothing but spreading attenuates the high-order
+bounces, and every extra $2D$ of unfolded depth is two more
+arrivals. `max_arrivals` bounds what is returned: the earliest
+`max_arrivals` arrivals are kept, because the early paths are the flat,
+least-bounced, least-attenuated ones that carry the energy, and the tail
+being discarded is the part every physical seabed drains fastest. A
+[`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) says when the cap truncated; raise
+it to keep everything the fan bracketed.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `trace` | A [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) result: the fan to bracket on, the profile to retrace through, and the source the rays leave from. |
+| `receiver_range` | Receiver range, in metres, within the traced range. |
+| `receiver_depth` | Receiver depth, in metres, strictly inside the water column. |
+| `bottom` | `"pressure-release"` (default) or `"rigid"`: the perfect reflector whose coefficient ($-1$ or $+1$) each bottom touch multiplies into the amplitude. The sea surface is always pressure-release. Superseded by the fluid seabed when the pair below is passed. The choice touches amplitudes only; the geometry, times and angles of the eigenrays are specular either way. |
+| `seabed_density` | Sediment density of a lossy fluid seabed (kg/m3 by convention; only the ratio to `density` enters), passed together with `seabed_sound_speed` and not alongside `bottom="rigid"`. Default (`None`): the perfect reflector named by `bottom`. |
+| `seabed_sound_speed` | Sediment sound speed of that seabed, in m/s (`None` likewise). |
+| `density` | Water density above the seabed, in kg/m3. Ignored unless the seabed pair is passed. |
+| `max_arrivals` | Most arrivals to return (earliest kept, see above). |
+| `n_steps` | Range samples per refinement march, receiver column included. Default (`None`): the step of `trace` itself carried over, so the search resolves what the fan resolved. |
+
+**Returns:** An [`EigenrayResult`](/phonometry/reference/api/underwater/numerical/#eigenrayresult), possibly with zero arrivals: a receiver the traced fan never crosses (a shadow zone, or simply outside the aperture) has no eigenrays to list, which is an answer and not an error.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If the inputs are invalid. |
 
 ## gaussian_beams
 
@@ -592,6 +786,8 @@ RayTraceResult(
     bottom_reflections: NDArray[np.int_],
     source_depth: float,
     water_depth: float,
+    profile_depths: NDArray[np.float64],
+    profile_speeds: NDArray[np.float64],
 )
 ```
 
@@ -607,9 +803,11 @@ Ray-tracing solution through a sound-speed profile.
 | `travel_times` | Per-ray cumulative travel times, in seconds, shape `(n_rays, n_steps)` (zero at the source, increasing along the ray). |
 | `arc_lengths` | Per-ray cumulative arc length along the ray, in metres, same shape (zero at the source). It is never less than the range column it stands in, exceeds it by the obliquity of the path, and a reflection leaves it continuous. This, and not the range, is the measure seawater absorption acts along: Jensen Sect. 3.6.2 carries a volume loss $\alpha$ into the ray solution by perturbing the eikonal and lands on $e^{-\int_0^s \alpha(s')\,ds'}$ (Eq. 3.116), an integral over the path actually flown, so a caller hanging amplitudes on these rays multiplies by $e^{-\alpha s}$ with the $s$ read off here. |
 | `surface_reflections` | Per-ray cumulative count of sea-surface reflections by each range sample, same shape (zero at the source). |
-| `bottom_reflections` | The same count for the seabed. The two counts, and not the reflection coefficients themselves, are the whole of the per-bounce record an amplitude carrier needs from the geometry. Jensen Sect. 3.6.3 treats a boundary interaction as multiplying the ray amplitude by $\vert \mathcal{R}(\theta)\vert $ and adding $\arg \mathcal{R}(\theta)$ to its phase (Eqs. 3.125-3.126), with $\theta$ the local angle of incidence; and in a range-independent medium that angle is the *same* at every touch of the same flat boundary, because the direction a ray crosses a depth with is fixed by Snell's invariant, $\cos\theta = \xi\,c$, not by how many times it has bounced. Any boundary coefficient therefore enters a path's amplitude only as $\mathcal{R}^n$ with the $n$ read off here, which is how [`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) charges its lossy seabed and how an eigenray search can charge one later; `ray_trace` itself carries no amplitude, so the counts are what it can meaningfully expose. |
+| `bottom_reflections` | The same count for the seabed. The two counts, and not the reflection coefficients themselves, are the whole of the per-bounce record an amplitude carrier needs from the geometry. Jensen Sect. 3.6.3 treats a boundary interaction as multiplying the ray amplitude by $\vert \mathcal{R}(\theta)\vert $ and adding $\arg \mathcal{R}(\theta)$ to its phase (Eqs. 3.125-3.126), with $\theta$ the local angle of incidence; and in a range-independent medium that angle is the *same* at every touch of the same flat boundary, because the direction a ray crosses a depth with is fixed by Snell's invariant, $\cos\theta = \xi\,c$, not by how many times it has bounced. Any boundary coefficient therefore enters a path's amplitude only as $\mathcal{R}^n$ with the $n$ read off here, which is how [`gaussian_beams`](/phonometry/reference/api/underwater/numerical/#gaussian_beams) charges its lossy seabed and how [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) charges each arrival; `ray_trace` itself carries no amplitude, so the counts are what it can meaningfully expose. |
 | `source_depth` | Source depth, in metres. |
 | `water_depth` | Water-column depth, in metres. |
+| `profile_depths` | Depth samples of the sound-speed profile the rays were traced through, in metres, exactly as cleaned on the way in. The pair below *is* the medium (both solvers interpolate it piecewise linearly and nothing else about the water enters the geometry), so recording it makes the result self-contained: [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) needs it to put fresh rays through the same water the fan flew. |
+| `profile_speeds` | Sound speed at each of those depths, in m/s. |
 
 ### RayTraceResult.plot()
 

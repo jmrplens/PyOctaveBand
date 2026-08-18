@@ -1,6 +1,6 @@
 ---
 title: "Underwater propagation solvers"
-description: "Computing the underwater sound field when closed forms are not enough: the normal-mode expansion of the stratified waveguide, ray tracing with Snell's invariant and convergence zones, Gaussian beam tracing for a field that stays finite at caustics, and the split-step Fourier parabolic equation, each validated against an exact closed form, with the model-selection guidance to choose between them."
+description: "Computing the underwater sound field when closed forms are not enough: the normal-mode expansion of the stratified waveguide, ray tracing with Snell's invariant and convergence zones, the eigenray search that turns a traced fan into a receiver's arrival list, Gaussian beam tracing for a field that stays finite at caustics, and the split-step Fourier parabolic equation, each validated against an exact closed form, with the model-selection guidance to choose between them."
 references:
   - type: book
     authors: ["Jensen, F. B.", "Kuperman, W. A.", "Porter, M. B.", "Schmidt, H."]
@@ -9,7 +9,7 @@ references:
     edition: "2nd ed."
     publisher: "Springer"
     doi: "10.1007/978-1-4419-8678-8"
-    note: "The reference monograph implemented here: the modal derivation of section 2 (Ch. 5, Eqs. 5.3-5.17), the ray equations of section 3 (Ch. 3, Eqs. 3.23-3.24), the Gaussian beams of section 4 (Ch. 3, §3.5, Eqs. 3.88-3.92), the split-step Fourier parabolic equation of section 5 (Ch. 6) and the model-selection guidance of section 6 (Ch. 1)."
+    note: "The reference monograph implemented here: the modal derivation of section 2 (Ch. 5, Eqs. 5.3-5.17), the ray equations of section 3 (Ch. 3, Eqs. 3.23-3.24) and its eigenray arrivals (§3.3.5, Eqs. 3.65-3.68), the Gaussian beams of section 4 (Ch. 3, §3.5, Eqs. 3.88-3.92), the split-step Fourier parabolic equation of section 5 (Ch. 6) and the model-selection guidance of section 6 (Ch. 1)."
   - type: article
     authors: ["Munk, W. H."]
     year: 1974
@@ -56,7 +56,10 @@ Schmidt, *Computational Ocean Acoustics*.
   vectorised over all rays at once) through a sound-speed profile, reflecting at
   the surface and bottom, and carries the travel time along each ray as a state
   of the same integration. Validated against the circular-arc paths of a linear
-  gradient and the closed-form travel time along them.
+  gradient and the closed-form travel time along them. `eigenrays` then
+  searches that traced fan for the paths that join the source to one receiver
+  and lists their arrivals, validated against the image lattice of the ideal
+  waveguide, where every arrival is closed form.
 - **`gaussian_beams`** hangs a Gaussian beam on each of those rays and sums
   them into a propagation-loss field, which stays finite at the caustics where
   the classical ray amplitude is infinite and decays into the shadow zones
@@ -371,10 +374,86 @@ frequency. Because the time rides the same four Runge-Kutta stages as the
 trajectory, and takes its sound speed from the interpolation those stages
 already do, it describes the path actually returned rather than a second
 reading of it, and it matches the closed form for a constant gradient
-(Medwin & Clay 1998, Eq. (3.3.20)) to about $10^{-14}$ s. What rays do not
-carry here is a full amplitude: the geometric ray-tube intensity diverges at
-caustics, so `RayTraceResult` reports no level at all. Section 4 is what fixes
-that, on the same rays and through the same marcher.
+(Medwin & Clay 1998, Eq. (3.3.20)) to about $10^{-14}$ s. `RayTraceResult`
+still reports no level of its own: the classical per-path amplitude belongs
+to the eigenrays below, which are the paths a given receiver actually
+collects, and a *field* that stays finite where the classical amplitude
+diverges is section 4's, on the same rays and through the same marcher.
+
+### Eigenrays: the arrival structure at one receiver
+
+The fan draws every path the profile supports; a receiver is reached by only
+a few of them. Those are the **eigenrays**, "the rays which pass through that
+point" (Jensen §3.3.5.2), and their list — a delay, a launch and an arrival
+angle, the boundary-touch counts and a complex amplitude per path — is the
+arrival structure the sonar equation consumes as multipath, the skeleton of a
+channel impulse response, and what communications work equalises against.
+`eigenrays` takes the traced fan and one receiver and finds them as roots: an
+eigenray stands wherever a ray's depth at the receiver range crosses the
+receiver depth, so a pair of adjacent fan rays straddling the receiver
+brackets one, and each bracket is closed by bisection **on fresh traces
+through the same profile**, never by interpolating between the traced rays —
+the two rays of a bracket can carry different bounce histories, and a blend
+of them is a path the water does not contain (the interpolation hazard of
+Jensen §3.7.5.1). Every arrival is a real ray, its travel time, angles and
+bounce counts read off its own trajectory, with the spreading $q$ of the next
+section riding the same march in its *real*, point-source form (Eq. 3.63), so
+the classical amplitude of Eq. (3.65) belongs to the very ray that hit:
+
+```python
+# The 100 m isovelocity channel unfolds into mirror images, so every arrival
+# is checkable by hand: the n-th one flies straight to an image of the
+# receiver, sqrt(r^2 + z_n^2) metres away.
+fan = underwater.ray_trace([0.0, 100.0], [1500.0, 1500.0], source_depth=36.0,
+                           launch_angles_deg=np.arange(-48.0, 48.5, 0.5),
+                           max_range=600.0, n_steps=201)
+arr = underwater.eigenrays(fan, receiver_range=500.0, receiver_depth=46.0)
+print(arr.travel_times.size)          # 11 arrivals inside the 48 degree fan
+
+# The direct path: 500 m out, 10 m down, no touches, 1/R spreading.
+print(round(float(arr.travel_times[0]) * 1e3, 2))       # 333.4 ms
+print(round(float(abs(arr.amplitudes[0])) * 500.1, 6))  # 1.0: that is 1/R
+
+# The first echo left the source upward and arrives from above, its sign
+# flipped once by the pressure-release surface.
+print(int(arr.surface_reflections[1]), int(arr.bottom_reflections[1]))  # 1 0
+print(round(float(arr.launch_angles[1]), 2))            # -9.31 degrees: up
+arr.plot()   # the impulse-response skeleton: per-path loss against delay
+```
+
+One list serves every frequency. The amplitudes are normalised to unit
+pressure at 1 m, in the same $e^{-i\omega t}$ convention as the rest of the
+module, and the search never asks for a frequency at all: the tone a receiver
+hears is $p(\omega) = \sum_j a_j e^{i\omega\tau_j}$, its loss
+$-20\lg|p(\omega)|$ on the same scale as the other three solvers, and a
+band's impulse response is that sum transformed. Each amplitude carries
+$(-1)$ per surface touch and the bottom's coefficient per bottom touch — the
+perfect reflectors' $\mp1$, or, with the same
+`seabed_density`/`seabed_sound_speed` pair the beams take, the Rayleigh
+$\mathcal{R}$ of each ray's own grazing angle, magnitude and phase — and the
+$(-i)^m$ of Eq. (3.79) for each caustic crossed, the discrete form of the
+$-\pi/2$ the beam solver's square-root branch spends continuously. Validated
+against the one environment whose arrival structure is entirely closed form,
+the ideal waveguide's image lattice: the count matches image for image, and
+times, angles and amplitudes agree to $10^{-13}$ s, $10^{-11}$ degrees and
+$10^{-13}$ relative; and against the $n^2$-linear profile's exact parabolic
+ray (Eq. 3.195), whose closed-form travel time, integrated by quadrature to
+machine precision, the upward-refracted eigenray reproduces to
+$2\times10^{-7}$ s, the residual being the sampled profile rather than the
+search.
+
+Three limits, all deliberate. The fan is the search space: an eigenray
+steeper than the traced aperture does not exist to it, and a pair of
+arrivals standing between the same two fan rays merges into no bracket at
+all, so the fan's density and half-angle are the completeness levers, and
+they stay where they are visible, in the `ray_trace` call. The multipath
+ladder of a hard-bottomed guide is unbounded, so `max_arrivals` (64 by
+default) keeps the earliest arrivals, the flat, least-bounced ones that
+carry the energy, and warns when it truncates. And the amplitude is
+classical on purpose: a receiver standing exactly on a caustic is answered
+with the infinity Eq. (3.65) really has there, because a list of discrete
+paths is ray theory and says so; the field that stays finite on that caustic
+is the next section's, built by widening these same rays into beams.
 
 ## 4. Gaussian beams: a field where rays give up
 
@@ -964,9 +1043,14 @@ Runge-Kutta ray-trajectory integration (Ch. 3, Eqs. 3.23-3.24), the Gaussian
 beam sum built on it (Ch. 3, §3.5, Eqs. 3.88-3.92) and the
 split-step Fourier standard PE (Ch. 6), with ISO 18405:2017 terminology
 throughout. `ray_trace` also returns the travel time along each ray,
-integrated as a third state of the same Runge-Kutta step. Each is validated
+integrated as a third state of the same Runge-Kutta step, and `eigenrays`
+searches a traced fan for the arrivals that join a source to one receiver,
+each refined by bisection on fresh traces and charged the classical ray
+amplitude of Eq. (3.65) with the boundary and caustic phases on record
+(Eqs. 3.79, 3.125-3.126). Each is validated
 against an exact closed form: the ideal pressure-release waveguide's modes and
-its image-source sum,
+its image-source sum (for the eigenrays, that lattice's complete arrival
+list, time, angle, count and amplitude per image),
 the circular-arc rays of a linear gradient together with the published travel
 time along them (Medwin & Clay 1998, Eq. (3.3.20)), and free-field spherical
 spreading, plus the mutual agreement of the modal and PE propagation loss.
@@ -979,9 +1063,10 @@ pressure-release or (for the modes and the beams) rigid. The beams can trade
 it for the lossy fluid seabed of the Rayleigh model, but there is no elastic
 bottom, no sediment attenuation and no real bathymetry,
 so range-dependent problems are out of scope. The ray solver returns paths and
-travel times, not amplitudes, and nothing searches for the eigenrays that join
-a given source and receiver: `gaussian_beams` is what supplies a level, and it
-does so by summing beams rather than by finding rays. Its geometric-beam
+travel times, not amplitudes; the per-path level belongs to `eigenrays`, whose
+arrival list is classical ray theory and honestly diverges for a receiver
+standing on a caustic, while `gaussian_beams` is what supplies a finite
+field, by summing beams rather than by finding rays. Its geometric-beam
 alternative (Ch. 3, §3.3.5.5) with the KMAH index and the Weinberg-Keenan
 width floor is not implemented. The PE is the standard small-angle (Tappert)
 form, not a wide-angle Padé variant. For the elastic seabed physics these fluid solvers
@@ -1012,7 +1097,8 @@ coupling](/phonometry/simulation/elastic-waves/).
 
 Pick by frequency and geometry (Jensen et al. 2011, Ch. 1): rays for high
 frequency and deep water (ray-path geometry, travel times and convergence
-zones at a cost independent of frequency, and no level at all), Gaussian beams
+zones at a cost independent of frequency, plus, through `eigenrays`, the
+per-receiver arrival list), Gaussian beams
 when that same high-frequency geometry has to yield a level (the PL($z$,$r$)
 field, finite at caustics and graded into shadow zones), normal modes for low
 frequency in shallow water (few propagating modes, $M \approx kD/\pi$, the

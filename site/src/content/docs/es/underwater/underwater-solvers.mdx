@@ -1,6 +1,6 @@
 ---
 title: "Métodos numéricos de propagación submarina"
-description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, el trazado de haces gaussianos para un campo que se mantiene finito en las cáusticas, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
+description: "Calcular el campo sonoro submarino cuando las formas cerradas no bastan: la expansión en modos normales de la guía de ondas estratificada, el trazado de rayos con el invariante de Snell y las zonas de convergencia, la búsqueda de eigenrayos que convierte un abanico trazado en la lista de llegadas de un receptor, el trazado de haces gaussianos para un campo que se mantiene finito en las cáusticas, y la ecuación parabólica split-step de Fourier, cada uno validado contra una forma cerrada exacta, con la guía de selección de modelo para elegir entre ellos."
 references:
   - type: book
     authors: ["Jensen, F. B.", "Kuperman, W. A.", "Porter, M. B.", "Schmidt, H."]
@@ -9,7 +9,7 @@ references:
     edition: "2.ª ed."
     publisher: "Springer"
     doi: "10.1007/978-1-4419-8678-8"
-    note: "La monografía de referencia implementada aquí: la derivación modal de la sección 2 (cap. 5, Ecs. 5.3-5.17), las ecuaciones de rayos de la sección 3 (cap. 3, Ecs. 3.23-3.24), los haces gaussianos de la sección 4 (cap. 3, §3.5, Ecs. 3.88-3.92), la ecuación parabólica split-step de Fourier de la sección 5 (cap. 6) y la guía de selección de modelo de la sección 6 (cap. 1)."
+    note: "La monografía de referencia implementada aquí: la derivación modal de la sección 2 (cap. 5, Ecs. 5.3-5.17), las ecuaciones de rayos de la sección 3 (cap. 3, Ecs. 3.23-3.24) y sus llegadas de eigenrayos (§3.3.5, Ecs. 3.65-3.68), los haces gaussianos de la sección 4 (cap. 3, §3.5, Ecs. 3.88-3.92), la ecuación parabólica split-step de Fourier de la sección 5 (cap. 6) y la guía de selección de modelo de la sección 6 (cap. 1)."
   - type: article
     authors: ["Munk, W. H."]
     year: 1974
@@ -58,7 +58,9 @@ Jensen, Kuperman, Porter y Schmidt, *Computational Ocean Acoustics*.
   arrastra el tiempo de propagación de cada rayo como un estado más de la
   misma integración. Validado contra los arcos de círculo de un gradiente
   lineal y contra la forma cerrada del tiempo de propagación a lo largo de
-  ellos.
+  ellos. `eigenrays` busca después en ese abanico trazado los caminos que
+  unen la fuente con un receptor y lista sus llegadas, validado contra la red
+  de imágenes de la guía de ondas ideal, donde cada llegada es forma cerrada.
 - **`gaussian_beams`** cuelga un haz gaussiano de cada uno de esos rayos y los
   suma en un campo de pérdida de propagación, que se mantiene finito en las
   cáusticas donde la amplitud clásica de un rayo es infinita y decae en las
@@ -386,10 +388,91 @@ en las mismas cuatro etapas Runge-Kutta que la trayectoria, y toma su velocidad
 del sonido de la interpolación que esas etapas ya hacen, describe el camino que
 de verdad se devuelve y no una segunda lectura de él, y coincide con la forma
 cerrada de un gradiente constante (Medwin y Clay 1998, Ec. (3.3.20)) hasta unos
-$10^{-14}$ s. Lo que aquí no llevan es una amplitud completa: la intensidad
-geométrica del tubo de rayos diverge en las cáusticas, así que `RayTraceResult`
-no informa de ningún nivel. La sección 4 es la que lo arregla, sobre los mismos
-rayos y con el mismo integrador.
+$10^{-14}$ s. `RayTraceResult` sigue sin informar de ningún nivel propio: la
+amplitud clásica por camino pertenece a los eigenrayos de justo debajo, que
+son los caminos que un receptor dado de verdad recoge, y un *campo* que se
+mantenga finito donde la amplitud clásica diverge es el de la sección 4,
+sobre los mismos rayos y con el mismo integrador.
+
+### Eigenrayos: la estructura de llegadas en un receptor
+
+El abanico dibuja todos los caminos que el perfil admite; a un receptor solo
+llegan unos pocos. Esos son los **eigenrayos**, «los rayos que pasan por ese
+punto» (Jensen §3.3.5.2), y su lista — un retardo, un ángulo de salida y otro
+de llegada, los contadores de toques en los contornos y una amplitud compleja
+por camino — es la estructura de llegadas que la ecuación del sonar consume
+como multitrayecto, el esqueleto de una respuesta al impulso del canal, y
+aquello contra lo que ecualiza el trabajo de comunicaciones. `eigenrays` toma
+el abanico trazado y un receptor y los encuentra como raíces: hay un eigenrayo
+allí donde la profundidad de un rayo a la distancia del receptor cruza la
+profundidad del receptor, así que un par de rayos adyacentes del abanico que
+lo encajonan acota uno, y cada acotación se cierra por bisección **sobre
+trazados nuevos a través del mismo perfil**, nunca interpolando entre los
+rayos trazados — los dos rayos de una acotación pueden llevar historias de
+rebotes distintas, y una mezcla de ambos es un camino que el agua no contiene
+(el riesgo de interpolación de Jensen §3.7.5.1). Cada llegada es un rayo
+real, con su tiempo de propagación, sus ángulos y sus contadores de rebote
+leídos de su propia trayectoria, y con la divergencia $q$ de la sección
+siguiente montada en la misma marcha en su forma *real* de fuente puntual
+(Ec. 3.63), de modo que la amplitud clásica de la Ec. (3.65) pertenece
+exactamente al rayo que acertó:
+
+```python
+# El canal isóvelo de 100 m se despliega en imágenes especulares, así que
+# cada llegada se comprueba a mano: la n-ésima vuela en línea recta hasta una
+# imagen del receptor, a sqrt(r^2 + z_n^2) metros.
+fan = underwater.ray_trace([0.0, 100.0], [1500.0, 1500.0], source_depth=36.0,
+                           launch_angles_deg=np.arange(-48.0, 48.5, 0.5),
+                           max_range=600.0, n_steps=201)
+arr = underwater.eigenrays(fan, receiver_range=500.0, receiver_depth=46.0)
+print(arr.travel_times.size)          # 11 llegadas dentro del abanico de 48 grados
+
+# El camino directo: 500 m en distancia, 10 m hacia abajo, sin toques, 1/R.
+print(round(float(arr.travel_times[0]) * 1e3, 2))       # 333.4 ms
+print(round(float(abs(arr.amplitudes[0])) * 500.1, 6))  # 1.0: eso es 1/R
+
+# El primer eco salió de la fuente hacia arriba y llega desde arriba, con el
+# signo invertido una vez por la superficie de presión nula.
+print(int(arr.surface_reflections[1]), int(arr.bottom_reflections[1]))  # 1 0
+print(round(float(arr.launch_angles[1]), 2))            # -9.31 grados: arriba
+arr.plot(language="es")   # el esqueleto de la respuesta al impulso
+```
+
+Una sola lista sirve para todas las frecuencias. Las amplitudes están
+normalizadas a presión unidad a 1 m, en el mismo convenio $e^{-i\omega t}$
+que el resto del módulo, y la búsqueda no pregunta nunca por una frecuencia:
+el tono que oye un receptor es $p(\omega) = \sum_j a_j e^{i\omega\tau_j}$, su
+pérdida $-20\lg|p(\omega)|$ en la misma escala que los otros tres métodos, y
+la respuesta al impulso de una banda es esa suma transformada. Cada amplitud
+lleva un $(-1)$ por toque en la superficie y el coeficiente del fondo por
+toque en el fondo — el $\mp1$ de los reflectores perfectos o, con el mismo
+par `seabed_density`/`seabed_sound_speed` que toman los haces, la
+$\mathcal{R}$ de Rayleigh del ángulo rasante propio de cada rayo, módulo y
+fase — y el $(-i)^m$ de la Ec. (3.79) por cada cáustica cruzada, la forma
+discreta del $-\pi/2$ que la rama de la raíz cuadrada del método de haces
+gasta de forma continua. Validado contra el único entorno cuya estructura de
+llegadas es forma cerrada entera, la red de imágenes de la guía de ondas
+ideal: el censo coincide imagen por imagen, y tiempos, ángulos y amplitudes
+concuerdan hasta $10^{-13}$ s, $10^{-11}$ grados y $10^{-13}$ relativo; y
+contra el rayo parabólico exacto del perfil $n^2$-lineal (Ec. 3.195), cuyo
+tiempo de propagación en forma cerrada, integrado por cuadratura hasta la
+precisión de máquina, el eigenrayo refractado hacia arriba reproduce hasta
+$2\times10^{-7}$ s, siendo el residuo el muestreo del perfil y no la
+búsqueda.
+
+Tres límites, todos deliberados. El abanico es el espacio de búsqueda: un
+eigenrayo más empinado que la apertura trazada no existe para él, y un par de
+llegadas que queden entre los mismos dos rayos del abanico se funde en
+ninguna acotación, así que la densidad y el semiángulo del abanico son las
+palancas de completitud, y quedan donde se ven, en la llamada a `ray_trace`.
+La escalera de multitrayecto de una guía de fondo duro no tiene fin, así que
+`max_arrivals` (64 por defecto) conserva las llegadas más tempranas, las
+llanas y con menos rebotes que llevan la energía, y avisa cuando trunca. Y la
+amplitud es clásica a propósito: a un receptor plantado exactamente sobre una
+cáustica se le responde con el infinito que la Ec. (3.65) de verdad tiene
+ahí, porque una lista de caminos discretos es teoría de rayos y lo dice; el
+campo que se mantiene finito sobre esa cáustica es el de la sección
+siguiente, construido ensanchando estos mismos rayos en haces.
 
 ## 4. Haces gaussianos: un campo donde los rayos se rinden
 
@@ -1012,9 +1095,14 @@ rayos (cap. 3, Ecs. 3.23-3.24), la suma de haces gaussianos construida sobre
 ella (cap. 3, §3.5, Ecs. 3.88-3.92) y la PE estándar split-step de Fourier (cap.
 6), con la terminología de la ISO 18405:2017 en toda la página. `ray_trace`
 devuelve además el tiempo de propagación de cada rayo, integrado como un
-tercer estado del mismo paso Runge-Kutta. Cada uno está validado contra una
+tercer estado del mismo paso Runge-Kutta, y `eigenrays` busca en un abanico
+trazado las llegadas que unen una fuente con un receptor, cada una refinada
+por bisección sobre trazados nuevos y cargada con la amplitud clásica de rayo
+de la Ec. (3.65) con las fases de contorno y de cáustica en el registro
+(Ecs. 3.79, 3.125-3.126). Cada uno está validado contra una
 forma cerrada exacta: los modos de la guía de ondas ideal de presión nula y su
-suma de fuentes imagen, los
+suma de fuentes imagen (para los eigenrayos, la lista completa de llegadas de
+esa red: tiempo, ángulo, contadores y amplitud por imagen), los
 rayos en arco de círculo de un gradiente lineal junto con el tiempo de
 propagación publicado a lo largo de ellos (Medwin y Clay 1998, Ec. (3.3.20)) y
 la divergencia esférica en campo libre, más la coincidencia mutua de la
@@ -1028,10 +1116,11 @@ defecto, de presión nula o (para los modos y los haces) rígido. Los haces
 pueden cambiarlo por el lecho fluido disipativo del modelo de Rayleigh, pero
 no hay fondo elástico, ni atenuación del sedimento, ni batimetría real,
 así que los problemas dependientes de la distancia quedan fuera de alcance. El
-trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes, y
-nada busca los eigenrayos que unen una fuente y un receptor dados:
-`gaussian_beams` es lo que da un nivel, y lo hace sumando haces en vez de
-buscando rayos. Su alternativa de haces geométricos (cap. 3, §3.3.5.5) con el
+trazado de rayos devuelve caminos y tiempos de propagación, no amplitudes; el
+nivel por camino pertenece a `eigenrays`, cuya lista de llegadas es teoría de
+rayos clásica y diverge honestamente para un receptor plantado sobre una
+cáustica, mientras que `gaussian_beams` es lo que da un campo finito, sumando
+haces en vez de buscando rayos. Su alternativa de haces geométricos (cap. 3, §3.3.5.5) con el
 índice KMAH y el suelo de anchura de Weinberg-Keenan no está implementada. La
 PE es la forma estándar de ángulos pequeños (Tappert), no una variante de gran
 angular de Padé. Para la física del lecho elástico que estos métodos fluidos
@@ -1065,7 +1154,8 @@ fluido-sólido](/phonometry/es/simulation/elastic-waves/).
 Elige por frecuencia y geometría (Jensen et al. 2011, cap. 1): rayos para
 alta frecuencia y océano profundo (geometría de los caminos de rayos, tiempos
 de propagación y zonas de convergencia a un coste independiente de la
-frecuencia, y ningún nivel), haces gaussianos cuando de esa misma geometría de
+frecuencia, más, a través de `eigenrays`, la lista de llegadas por receptor),
+haces gaussianos cuando de esa misma geometría de
 alta frecuencia haga falta un nivel (el campo PL($z$,$r$), finito en las
 cáusticas y graduado en las zonas de sombra), modos normales para baja
 frecuencia en aguas someras (pocos modos

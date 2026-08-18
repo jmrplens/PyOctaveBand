@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The eigenrays and the arrival structure. `eigenrays` takes a `ray_trace`
+  fan and one receiver and returns the paths that actually connect them, each
+  with its travel time, launch and arrival angles, surface and bottom touch
+  counts, KMAH caustic count and complex amplitude: the list the sonar
+  equation consumes as multipath, the skeleton of a channel impulse response,
+  drawn by `EigenrayResult.plot()` as per-path loss stems against delay. The
+  search brackets the launch angles whose depth at the receiver range crosses
+  the receiver depth and closes each bracket by bisection on fresh marches
+  through the same profile, never by interpolating the fan, so every arrival
+  is a real ray; a root that slips within the integrations' disagreement of a
+  fan rung is recovered by widening the bracket one rung each way, and
+  `max_arrivals` caps the unbounded multipath ladder at the earliest
+  arrivals, with a warning when it truncates. Amplitudes are the classical
+  ray amplitude of Jensen Eq. (3.65) over the 1 m reference, with `(-1)` per
+  surface touch, the bottom's coefficient (perfect or Rayleigh, magnitude and
+  phase, unconjugated in the module's `exp(-i omega t)` convention) per
+  bottom touch, and the `(-i)^m` of Eq. (3.79) per caustic, so one
+  frequency-independent list serves every tone as `sum a_j exp(i omega
+  tau_j)`. `RayTraceResult` now records the profile it was traced through.
+  Validated against the ideal waveguide's image lattice, where the entire
+  arrival structure is closed form, to 1.2e-13 s, 1.4e-11 degrees and 2.4e-13
+  relative amplitude with the census matching image for image, and against
+  the n^2-linear profile's exact parabolic ray, whose quadrature-integrated
+  closed-form travel time the upward-refracted eigenray reproduces to 2e-7 s.
+  New subsection in the underwater solvers guide, in English and Spanish.
 - Gaussian beam tracing joins the underwater solvers. `gaussian_beams` hangs a
   beam on every ray of a launch fan (Jensen Eq. 3.88) and sums them into a
   propagation-loss field on the same grid, the same reference and the same
