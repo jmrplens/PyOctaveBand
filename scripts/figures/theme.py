@@ -187,6 +187,9 @@ _RASTER_FIGURES = frozenset(
         # calibration_stability above: the noise-floor traces of the
         # correlation normalizations make the SVG several times the raster.
         "correlation_normalizations",
+        # Ten seconds of raw waveform at 48 kHz: half a million vertices,
+        # same trade as calibration_stability above.
+        "signal_provenance",
     }
 )
 

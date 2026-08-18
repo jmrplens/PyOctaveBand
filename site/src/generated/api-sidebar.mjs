@@ -45,6 +45,14 @@ export const apiSections = {
       'reference/api/metrology/data-qualification',
     ],
   },
+  'io': {
+    label: 'Audio files',
+    translations: { es: 'Archivos de audio' },
+    collapsed: true,
+    items: [
+      'reference/api/io/io',
+    ],
+  },
   'psychoacoustics': {
     label: 'Psychoacoustics',
     translations: { es: 'Psicoacústica' },

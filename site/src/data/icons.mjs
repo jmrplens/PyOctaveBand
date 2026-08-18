@@ -52,6 +52,15 @@ export const topicIcons = {
     <path d="M2.6 12.6h3.2l2.6-8.4 3.4 15.6 2.8-9.8 2 4.2h4.8" />
   `,
 
+  // A waveform on the sheet it is stored on: samples on a page, which is what
+  // the topic reads and writes. Bars rather than a trace, because the signals
+  // icon is already a trace and at 16 px two traces read as one topic.
+  io: `
+    <path d="M13.4 2.8H6.8a1.5 1.5 0 0 0-1.5 1.5v15.4a1.5 1.5 0 0 0 1.5 1.5h10.4a1.5 1.5 0 0 0 1.5-1.5V8.2z" />
+    <path d="M13.4 2.8v5.4h5.3" />
+    <path d="M8.5 15v2M11.1 12.8v6.4M13.7 14.2v3.6M16.3 15.5v1" />
+  `,
+
   // An ear: the outer helix with the canal curling into it. The canal is a curl
   // rather than a ring, because a ring inside a teardrop is a map pin.
   perception: `

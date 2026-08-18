@@ -1,0 +1,89 @@
+← [Documentation index](../README.md)
+
+# Audio files
+
+Every other area of this library starts from an array that is already in
+memory; this one is about the files the array comes from and returns to. Its
+premise is that an audio file made by a measurement chain is a *measurement
+record*: the samples are only meaningful next to the sample rate, the
+calibration that maps digital full scale to pascals, and the provenance
+that says where, when and through what the recording was made. The module
+`phonometry.io` reads and writes with exactly that in mind — and never
+resamples, never mixes channels down, never normalizes, and never touches a
+level, because each of those is a documented default somewhere in the
+ecosystem and each one quietly destroys the quantity a measurement exists
+to preserve.
+
+The practical shape follows from an equipment survey rather than from
+format completism. Sound level meters and field recorders emit linear WAV —
+24-bit PCM, `WAVE_FORMAT_EXTENSIBLE` for multichannel, BWF `bext` metadata,
+RF64 once an overnight recording passes 4 GiB — so the **base install**
+(NumPy and SciPy alone) reads all of it, and the compressed formats live
+behind the optional `[audio]` extra (python-soundfile, whose wheel bundles
+libsndfile under the LGPL-2.1). Lossy sources are read but flagged, loudly:
+a level computed from an ADPCM or MP3 approximation of the waveform is not
+defensible, and the warning plus the `lossy` stamp keep that fact attached
+to the data.
+
+What comes back from a file is a `Signal`: the samples with their rate,
+calibration, channel labels and `bext` provenance in one immutable object
+that behaves as the bare array everywhere (`np.asarray` hands any existing
+function the samples), draws itself with `.plot()`, and walks straight into
+the level functions — `leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
+`sound_exposure`, `lex_8h` — without
+repeating the rate or the calibration by hand. In the other direction,
+`write()` produces WAV/BWF (24-bit packed in-house) and FLAC, refuses to
+clip silently, extends the `CodingHistory` rather than replacing it, can
+measure the five EBU R 128 loudness values of `bext` version 2 with the
+library's own BS.1770 implementation, and puts the calibration in a small
+versioned JSON sidecar beside the audio — the one number no audio container
+has a field for, made to travel.
+
+## Pages in this section
+
+- [Reading and writing measurement audio](audio-files.md): the
+  whole workflow on one runnable page — reading a meter's WAV into a
+  calibrated `Signal`, deriving the calibration from the calibrator take,
+  the lossy warning and the listening-copy story behind it, streaming an
+  overnight recording through stateful filters, writing BWF with its
+  provenance, the sidecar round trip, and conversion that keeps the
+  measurement a measurement.
+
+## What this section does not cover
+
+**No playback, no editing, no effects.** This is a file layer for
+measurements, not an audio workstation: nothing here plays a sound, trims a
+region by ear, or applies gain. There is deliberately no lossy *writing*
+either — no measurement ends in an MP3, and a library whose job is
+preserving levels should not make one easy to produce.
+
+**AAC/M4A stays external.** Dictaphone and phone recordings in MP4
+containers are not decoded; the honest route is a one-line
+`ffmpeg -i note.m4a note.wav` and then `read()`, with the same lossy caveat
+either way. Likewise the DAQ formats that are not audio at all — TDMS
+(LabVIEW) and UFF (modal analysis) have their own Python readers, `npTDMS`
+and `pyuff`, and pretending they are audio files would serve neither.
+
+**Ambisonic files are tolerated, not interpreted.** A B-format `.amb` file
+or an ambisonic GUID reads fine and its channels come back labelled, but no
+FuMa-to-AmbiX conversion matrix is applied: channel 0 of a FuMa file
+carries W at −3 dB, and turning that into a pressure without saying so
+would be a silent level change — the exact class of default this module
+exists to refuse.
+
+## Before and after these pages
+
+Before: [Calibration and dBFS](../signals/metrology/calibration.md)
+explains where the calibration factor a `Signal` carries actually comes
+from, and [Getting started](../start/getting-started.md) runs a first
+file through the chain. After: everything — the point of the file layer is
+that [levels](../signals/levels/levels.md),
+[octave filtering](../signals/filters/filter-banks.md),
+[block processing](../signals/filters/block-processing.md) and the
+rest of the library receive a calibrated signal and never learn it came
+from a file.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the
+job and [All guides](../README.md) lists every page with a line
+on each.

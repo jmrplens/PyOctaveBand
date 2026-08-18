@@ -40,6 +40,14 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     # HVAC plenum and machine enclosures reuse the room constant
     # R = S*alpha/(1 - alpha) of the steady-state room field
     ("noise_control", "room"),
+    # the level functions detect io.Signal so a read measurement carries
+    # its own fs and calibration; io imports no toolbox code back at
+    # module level, so import stays acyclic
+    ("signals", "io"),
+    # write(bext="loudness") fills the five R128 fields from the
+    # library's own BS.1770 implementation (a lazy import inside the
+    # writer: reading a file never pays for it)
+    ("io", "broadcast"),
 }
 
 

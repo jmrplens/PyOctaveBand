@@ -7,15 +7,26 @@ sidebar:
 
 Integrated and statistical sound levels (Leq, LAeq, LN percentiles).
 
+Every function here accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) in place of
+the bare `(x, fs)` pair: the object read from a measurement file
+already knows its sample rate and, when calibrated, its
+digital-to-pascal factor, so asking the caller to repeat either is
+asking for a transcription error. All of them or none: a function that
+took the object but silently dropped its calibration -- one row away
+from functions that honour it -- would compute a wrong level that looks
+right, the exact failure the object exists to prevent. The bare-array
+signatures are unchanged -- a plain array with an explicit `fs` and
+`calibration_factor` computes exactly what it always did.
+
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
 ## laeq
 
 ```python
 laeq(
-    x: list[float] | np.ndarray,
-    fs: int,
-    calibration_factor: float = 1.0,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray
 ```
@@ -26,9 +37,9 @@ A-weighted equivalent continuous sound level (LAeq).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D [channels, samples]), raw pressure units. |
-| `fs` | Sample rate in Hz. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
+| `x` | Input signal (1D or 2D [channels, samples]) in raw pressure units, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 | `dbfs` | If True, return dBFS instead of dB SPL. |
 
 **Returns:** Scalar for 1D input, array of shape (channels,) for 2D input.
@@ -37,9 +48,9 @@ A-weighted equivalent continuous sound level (LAeq).
 
 ```python
 lc_peak(
-    x: list[float] | np.ndarray,
-    fs: int,
-    calibration_factor: float = 1.0,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    calibration_factor: float | None = None,
     dbfs: bool = False,
     oversample: int = 8,
 ) -> float | np.ndarray
@@ -64,9 +75,9 @@ maximum is taken, recovering the inter-sample peak to within about
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D [channels, samples]), raw pressure units. |
-| `fs` | Sample rate in Hz. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
+| `x` | Input signal (1D or 2D [channels, samples]) in raw pressure units, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 | `dbfs` | If True, return dBFS (0 dB = peak 1.0) instead of dB SPL. |
 | `oversample` | Integer oversampling factor applied before peak detection (default 8, the audit-validated value). Use 1 to disable oversampling and detect the peak on the original sample grid. |
 
@@ -76,8 +87,8 @@ maximum is taken, recovering the inter-sample peak to within about
 
 ```python
 leq(
-    x: list[float] | np.ndarray,
-    calibration_factor: float = 1.0,
+    x: Signal | list[float] | np.ndarray,
+    calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray
 ```
@@ -88,9 +99,9 @@ Equivalent continuous sound level (Leq) over the whole signal.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D [channels, samples]), raw pressure units. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
-| `dbfs` | If True, return dBFS (0 dB = RMS 1.0) instead of dB SPL. |
+| `x` | Input signal (1D or 2D [channels, samples]) in raw pressure units, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence: an explicit value always wins; `None` (the default) takes the factor a calibrated [`Signal`](/phonometry/reference/api/io/io/#signal) carries, and falls back to 1.0 (levels in digital units) for everything else. |
+| `dbfs` | If True, return dBFS (0 dB = RMS 1.0) instead of dB SPL; calibration does not apply. |
 
 **Returns:** Scalar for 1D input, array of shape (channels,) for 2D input.
 
@@ -98,10 +109,10 @@ Equivalent continuous sound level (Leq) over the whole signal.
 
 ```python
 lex_8h(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     duration_hours: float | None = None,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> float | np.ndarray
 ```
 
@@ -116,10 +127,10 @@ and LEX,8h of ISO 1999 (BS EN 61252:1995, 3.3 NOTES 5-6).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal in raw pressure units (1D or 2D). |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal in raw pressure units (1D or 2D), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `duration_hours` | Exposure period the input represents, in hours. Default: the recording duration itself. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 
 **Returns:** LEX,8h in dB (scalar or per-channel array).
 
@@ -127,12 +138,12 @@ and LEX,8h of ISO 1999 (BS EN 61252:1995, 3.3 NOTES 5-6).
 
 ```python
 ln_levels(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     n: Sequence[int] = (10, 50, 90),
     mode: str = 'fast',
     weighting: str | None = None,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> dict[int, float | np.ndarray]
 ```
@@ -146,12 +157,12 @@ distribution), L90 the level exceeded 90% of the time, etc.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D [channels, samples]), raw pressure units. |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal (1D or 2D [channels, samples]) in raw pressure units, or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `n` | Percentile exceedance values, e.g. (10, 50, 90). |
 | `mode` | Time weighting for the envelope: 'fast', 'slow' or 'impulse'. |
 | `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 | `dbfs` | If True, return dBFS instead of dB SPL. |
 
 **Returns:** Dict mapping each N to its level (scalar for 1D input, array (channels,) for 2D input).
@@ -160,10 +171,10 @@ distribution), L90 the level exceeded 90% of the time, etc.
 
 ```python
 sel(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     weighting: str | None = None,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray
 ```
@@ -180,10 +191,10 @@ reference responses, Equation 8, in the test suite).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal covering the whole event (1D or 2D). |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal covering the whole event (1D or 2D), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `weighting` | Optional frequency weighting, any curve accepted by [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter): 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'. None (the default) and 'Z' both leave the signal unweighted. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 | `dbfs` | If True, reference digital full scale instead of 20 uPa. |
 
 **Returns:** Scalar for 1D input, array of shape (channels,) for 2D input.
@@ -192,10 +203,10 @@ reference responses, Equation 8, in the test suite).
 
 ```python
 sound_exposure(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     duration_hours: float | None = None,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> float | np.ndarray
 ```
 
@@ -211,9 +222,9 @@ BS EN 61252:1995 (3.3 NOTE 4): 3.2 Pa²h \<-> LEX,8h of exactly 90 dB.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal in raw pressure units (1D or 2D). |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal in raw pressure units (1D or 2D), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) read from a measurement file. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `duration_hours` | Exposure period the input represents, in hours. Default: the recording duration itself. |
-| `calibration_factor` | Multiplier converting digital units to Pascals. |
+| `calibration_factor` | Multiplier converting digital units to Pascals. Precedence as in [`leq`](/phonometry/reference/api/signals/levels/#leq): explicit value, then a calibrated Signal's own factor, then 1.0. |
 
 **Returns:** Exposure in Pa²·h (scalar or per-channel array).

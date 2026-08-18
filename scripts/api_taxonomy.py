@@ -91,6 +91,15 @@ _SECTION_LIST: tuple[Section, ...] = (
         ),
     ),
     Section(
+        key="io",
+        label_en="Audio files",
+        label_es="Archivos de audio",
+        # The whole public surface of the subpackage lives in its
+        # ``__init__`` (the implementation modules are private), so the one
+        # documented module is the package itself.
+        modules=("phonometry.io",),
+    ),
+    Section(
         key="psychoacoustics",
         label_en="Psychoacoustics",
         label_es="Psicoacústica",
@@ -339,6 +348,9 @@ SECTIONS: dict[str, Section] = {s.key: s for s in _SECTION_LIST}
 #: docstring above.
 _SECTION_SUBPACKAGES: dict[str, tuple[str, ...]] = {
     "filters": ("", "filters"),
+    # ``phonometry.io`` is documented as the package itself (two dotted
+    # parts), which the parent derivation reports as the top level.
+    "io": ("",),
     "signals": ("signals",),
     "psychoacoustics": ("psychoacoustics",),
     "speech": ("speech",),
@@ -377,6 +389,26 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "TAPPING_HAMMER_MASS": "phonometry.building.prediction.resilient_layers",
     # Defined in phonometry._internal.warnings, exported at the top level.
     "PhonometryWarning": "phonometry",
+    # The io subpackage keeps its implementation modules private and
+    # re-exports everything from phonometry/io/__init__.py, so every one of
+    # its public names reports a private ``__module__`` and is documented
+    # with the package itself.
+    "AudioFileInfo": "phonometry.io",
+    "BroadcastMetadata": "phonometry.io",
+    "CalibrationSidecar": "phonometry.io",
+    "ClippingWarning": "phonometry.io",
+    "CuePoint": "phonometry.io",
+    "LossyCompressionWarning": "phonometry.io",
+    "Signal": "phonometry.io",
+    "SignalOrigin": "phonometry.io",
+    "convert": "phonometry.io",
+    "info": "phonometry.io",
+    "read": "phonometry.io",
+    "read_blocks": "phonometry.io",
+    "read_sidecar": "phonometry.io",
+    "sidecar_path": "phonometry.io",
+    "write": "phonometry.io",
+    "write_sidecar": "phonometry.io",
     # Defined in phonometry.emission._shared, where the three sound power
     # standards share it; documented with the free-field method that raises it
     # most often.

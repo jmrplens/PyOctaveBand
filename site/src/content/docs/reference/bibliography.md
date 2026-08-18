@@ -19,7 +19,7 @@ implements clause by clause is in its chip run, and collected for the whole
 library in the [conformance report](/phonometry/reference/conformance/), not
 here.
 
-This page collects those sources in one list, grouped by the same ten areas the
+This page collects those sources in one list, grouped by the same eleven areas the
 guides are grouped into, with General acoustics and Metrology as the two
 cross-cutting buckets at the ends. Each entry lists the guide pages that cite
 it. Each guide's own References section, generated from its frontmatter, stays
@@ -246,6 +246,46 @@ synchronous averaging, Golay for the complementary pairs.
   [System measurement: Golay, shaped sweeps, inversion](/phonometry/signals/spectra/system-measurement/)
   and
   [Cepstrum, echoes and the envelope spectrum](/phonometry/signals/spectra/cepstrum-echoes/).
+
+## Audio files
+
+Standards rather than books: the file layer implements published container
+and metadata specifications, and each entry pins the piece of the module
+that follows it. Lipshitz, Wannamaker and Vanderkooy is the one paper, and
+it settles a single default: what dither to offer, and when offering it
+would be a disservice.
+
+- European Broadcasting Union. (2011). *Specification of the Broadcast Wave
+  Format (BWF) — A format for audio data files in broadcasting, Version 2.0*
+  (EBU Tech 3285). [tech.ebu.ch/publications/tech3285](https://tech.ebu.ch/publications/tech3285).
+  The `bext` chunk read and written field by field at its published
+  offsets, including the version-2 loudness values.
+  Cited by [Reading and writing measurement audio](/phonometry/io/audio-files/).
+- International Telecommunication Union. (2025). *Long-form file format for
+  the international exchange of audio programme materials with metadata*
+  (Recommendation ITU-R BS.2088-2).
+  [itu.int/rec/R-REC-BS.2088](https://www.itu.int/rec/R-REC-BS.2088/en).
+  The RF64/BW64 64-bit container an overnight recording promotes to,
+  resolved through its `ds64` sizes.
+  Cited by [Reading and writing measurement audio](/phonometry/io/audio-files/).
+- Internet Engineering Task Force. (2024). *Free Lossless Audio Codec*
+  (RFC 9639). [datatracker.ietf.org/doc/rfc9639](https://datatracker.ietf.org/doc/rfc9639/).
+  The lossless codec behind the FLAC archive route, and the reason a
+  round trip can return bit-identical codes.
+  Cited by [Reading and writing measurement audio](/phonometry/io/audio-files/).
+- International Telecommunication Union. (2023). *Algorithms to measure
+  audio programme loudness and true-peak audio level* (Recommendation
+  ITU-R BS.1770-5). [itu.int/rec/R-REC-BS.1770](https://www.itu.int/rec/R-REC-BS.1770/en).
+  The loudness algorithm behind `bext="loudness"`, implemented in the
+  broadcast area and reused here at write time.
+  Cited by [Reading and writing measurement audio](/phonometry/io/audio-files/).
+- Lipshitz, S. P., Wannamaker, R. A., & Vanderkooy, J. (1992). Quantization
+  and dither: A theoretical survey. *Journal of the Audio Engineering
+  Society*, 40(5), 355-375.
+  [aes2.org e-library](https://aes2.org/publications/elibrary-page/?id=7047).
+  Why the optional dither is triangular-PDF at one LSB and offered only at
+  16 bits.
+  Cited by [Reading and writing measurement audio](/phonometry/io/audio-files/).
 
 ## Hearing and perception
 

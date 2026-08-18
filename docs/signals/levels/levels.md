@@ -99,9 +99,16 @@ everywhere else, energy.
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units (or Pa if calibrated) | non-empty | 2D is `[channels, samples]`; returns one level per channel |
-| `fs` | int | Hz | > 0 (`laeq` only) | `leq` needs no sample rate (pure RMS integral) |
-| `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
+| `fs` | int | Hz | > 0 (`laeq` only; from the `Signal` when `x` is one) | `leq` needs no sample rate (pure RMS integral) |
+| `calibration_factor` | float | Pa per digital unit | default `None`: a calibrated `Signal`'s own factor, else `1.0` | From `sensitivity()` |
 | `dbfs` | bool | — | default `False` | `True`: 0 dBFS = RMS 1.0; ignores calibration |
+
+Every function on this page (`leq`, `laeq`, `ln_levels`, `sel`,
+`lc_peak`, `sound_exposure`, `lex_8h`) also takes a `Signal` from
+`phonometry.io.read` in place of the bare `(x, fs)` pair: the object supplies
+its own sample rate and, when calibrated, its `calibration_factor`. An
+explicit `calibration_factor` argument overrides the object's; an explicit
+`fs` that disagrees with the object's raises instead of silently winning.
 
 ## Percentile levels (LN)
 
@@ -215,7 +222,7 @@ of [Environmental levels](../../environment/assessment/environmental-levels.md) 
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units | non-empty | 2D returns per-channel dicts |
-| `fs` | int | Hz | > 0 | Needed by the envelope detector |
+| `fs` | int | Hz | > 0; from the `Signal` when `x` is one | Needed by the envelope detector |
 | `n` | tuple of ints | % | default `(10, 50, 90)` | Any exceedance percentages, e.g. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | IEC 61672-1 ballistics of the envelope |
 | `weighting` | str or None | — | any `weighting_filter` curve: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (default) | Frequency weighting before the envelope (`None` and `'Z'` both leave it unweighted) |
@@ -329,10 +336,10 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False, oversample=8)` | `dbfs=True` references full-scale *peak* (1.0), not RMS; `oversample=1` reads the peak on the sample grid | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
+| `lc_peak(x, fs=None, calibration_factor=None, dbfs=False, oversample=8)` | `dbfs=True` references full-scale *peak* (1.0), not RMS; `oversample=1` reads the peak on the sample grid | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `sel(x, fs=None, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
+| `sound_exposure(x, fs=None, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs=None, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in

@@ -85,6 +85,11 @@ If you are an AI assistant setting this up for a user: install from PyPI (no sys
 - [Compliance and verification](https://jmrplens.github.io/phonometry/signals/metrology/compliance-verification/)
 - [Data qualification: stationarity, level crossings and peaks (Bendat & Piersol)](https://jmrplens.github.io/phonometry/signals/metrology/data-qualification/)
 
+## Audio files
+
+- [Overview](https://jmrplens.github.io/phonometry/io/)
+- [Reading and writing measurement audio](https://jmrplens.github.io/phonometry/io/audio-files/)
+
 ## Hearing and perception
 
 - [Overview](https://jmrplens.github.io/phonometry/perception/)
@@ -331,6 +336,7 @@ One file per area, each small enough to fetch whole. `llms-full.txt` is the comp
 - [Levels and weighting](https://jmrplens.github.io/phonometry/llms/llms-signals-levels.txt)
 - [Signals and spectra](https://jmrplens.github.io/phonometry/llms/llms-signals-spectra.txt)
 - [Calibration and uncertainty](https://jmrplens.github.io/phonometry/llms/llms-signals-metrology.txt)
+- [Audio files](https://jmrplens.github.io/phonometry/llms/llms-io.txt)
 - [Hearing and perception](https://jmrplens.github.io/phonometry/llms/llms-perception.txt)
 - [Psychoacoustics](https://jmrplens.github.io/phonometry/llms/llms-perception-psychoacoustics.txt)
 - [Speech](https://jmrplens.github.io/phonometry/llms/llms-perception-speech.txt)
@@ -432,6 +438,7 @@ The generated API reference, one page per module. Fetch these only when a specif
 - [hearing/noise-induced-hearing-loss](https://jmrplens.github.io/phonometry/reference/api/hearing/noise-induced-hearing-loss/)
 - [hearing/occupational-exposure](https://jmrplens.github.io/phonometry/reference/api/hearing/occupational-exposure/)
 - [hearing/threshold](https://jmrplens.github.io/phonometry/reference/api/hearing/threshold/)
+- [io/io](https://jmrplens.github.io/phonometry/reference/api/io/io/)
 - [materials/airflow-resistance](https://jmrplens.github.io/phonometry/reference/api/materials/airflow-resistance/)
 - [materials/biot](https://jmrplens.github.io/phonometry/reference/api/materials/biot/)
 - [materials/design](https://jmrplens.github.io/phonometry/reference/api/materials/design/)
@@ -22981,6 +22988,514 @@ here; these are the underlying closed forms.
 ---
 
 
+<!-- source: docs/io/audio-files.md | canonical: https://jmrplens.github.io/phonometry/io/audio-files/ -->
+Source: https://jmrplens.github.io/phonometry/io/audio-files/
+
+# Reading and writing measurement audio
+
+A measurement WAV is only interpretable together with three things the
+samples do not carry: the sample rate, the calibration that turns digital
+full scale into pascals, and the provenance that says where and when the
+recording was made. `phonometry.io` treats all of that as part of the file's
+meaning. `read()` returns a `Signal` — samples plus rate, calibration,
+channel labels and `bext` provenance in one immutable object — and every
+function on this page follows the same defaults: the native sample rate is
+kept, channels are never mixed down, and no sample is ever normalized,
+because each of those "conveniences" silently destroys the level or the
+timing a measurement depends on.
+
+The base install (NumPy and SciPy alone) reads the whole linear WAV family
+that measurement equipment writes: PCM at any depth including 24-bit,
+IEEE float, `WAVE_FORMAT_EXTENSIBLE` with its channel mask, BWF `bext`
+metadata, and RF64/BW64 recordings past 4 GiB. The `[audio]` extra adds
+FLAC, AIFF, Ogg Vorbis, Opus, MP3 and the compressed WAV codecs some meters
+use for listening copies. Nothing metrological requires the extra.
+
+## Reading a measurement
+
+`read()` takes a path and returns the `Signal`. The file here is written
+first so the page runs; in a real workflow it comes from the instrument.
+
+```python
+import numpy as np
+from phonometry import io
+
+fs = 48000
+# recording: a stand-in for the sound level meter's WAV, synthesized so
+#   the guide runs; in a real measurement this file comes from the meter.
+rng = np.random.default_rng(11)
+recording = 0.02 * rng.standard_normal(10 * fs)
+io.write("measurement.wav", recording, fs, subtype="PCM_24")
+
+sig = io.read("measurement.wav")
+print(sig.fs, sig.n_channels, f"{sig.duration:.1f} s")    # 48000 1 10.0 s
+print(sig.source.format_name, sig.source.bit_depth)       # PCM 24
+```
+
+The object stands in for the bare array anywhere: `np.asarray(sig)` yields
+the samples (1-D for one channel, `(channels, samples)` for several), so
+every `(x, fs, ...)` function of the library accepts it today. The level
+functions (`leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`, `sound_exposure`
+and `lex_8h`) go further and take the `Signal` itself — the object already knows its rate and its calibration, and
+asking you to repeat either is asking for a transcription error.
+
+Integer samples are scaled by exactly $2^{B-1}$ for a $B$-bit container: a
+power of two, so the conversion to float64 is exact in binary floating
+point, and the same convention as libsndfile and MATLAB. The eternal
+32767-versus-32768 debate is moot here for a better reason than taste: the
+calibrator tone is read through this same reader, so any fixed scaling
+constant divides out of every calibrated level, exactly.
+
+`info()` answers from the headers alone — no sample is decoded, so it is
+instant on a 12-hour RF64, and it still describes a compressed WAV that
+`read()` would need the extra for:
+
+```python
+meta = io.info("measurement.wav")
+print(meta.container, meta.format_name, meta.bit_depth)   # WAV PCM 24
+print(meta.frames, f"{meta.duration:.1f} s")              # 480000 10.0 s
+```
+
+## Calibrating from the calibrator take
+
+The [calibration guide](https://jmrplens.github.io/phonometry/signals/metrology/calibration/) derives
+the sensitivity factor from a recording of the calibrator tone; the only
+new rule here is that **both files go through the same reader**. Then the
+factor rides on the `Signal` and the level functions use it on their own:
+
+```python
+from phonometry import metrology, signals
+
+# calibrator.wav: the 94 dB calibrator take, synthesized so the guide runs
+#   (tone at -10 dBFS RMS); in a real session, record your calibrator.
+t = np.arange(5 * fs) / fs
+io.write("calibrator.wav",
+         np.sqrt(2) * 0.316 * np.sin(2 * np.pi * 1000 * t), fs,
+         subtype="PCM_24")
+
+cal_take = io.read("calibrator.wav")
+cal = metrology.sensitivity(np.asarray(cal_take), target_spl=94.0,
+                            fs=cal_take.fs)
+print(f"S = {cal:.3f} Pa per full-scale unit")            # 3.172
+
+sig = io.read("measurement.wav", calibration_factor=cal)
+print(f"Leq = {float(signals.leq(sig)):.1f} dB")          # 70.0
+```
+
+No `calibration_factor` argument, no `fs` argument at the level call: the
+`Signal` carries both. An explicit argument still wins over the carried one
+— the caller knows more than an object — and a bare array without `fs` is
+refused by name rather than guessed at.
+
+The figure below is this page in one image: the same API wrote a 24-bit BWF
+with its `bext` chunk and its calibration sidecar, read it back, and the
+resulting `Signal` drew its calibrated waveform next to the card of what
+travelled with the samples.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_provenance_dark.webp"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/signal_provenance.webp" alt="Ten seconds of a calibrated night measurement drawn in pascals next to a provenance card listing the file, container, sample rate, originator, origination date and time, sample-accurate time reference, coding history and the sidecar calibration" width="92%"></picture>
+
+*What `read()` returns besides samples. The waveform is in pascals because
+the sidecar's calibration was applied on read; the card is the `bext`
+provenance of EBU Tech 3285 — who recorded it, when, and at which sample
+since midnight — plus the container facts and the calibration source. None
+of it had to be typed back in.*
+
+<details>
+<summary>Show the code for this figure</summary>
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from phonometry import io
+
+fig_fs = 48000
+fig_rng = np.random.default_rng(2026)
+night = 0.0012 * fig_rng.standard_normal(10 * fig_fs)
+for start_s, length_s, amplitude in ((1.6, 2.2, 0.011), (4.9, 1.4, 0.020),
+                                     (7.8, 1.8, 0.008)):
+    piece = slice(int(start_s * fig_fs),
+                  int(start_s * fig_fs) + int(length_s * fig_fs))
+    envelope = np.hanning(int(length_s * fig_fs))
+    night[piece] += amplitude * envelope * fig_rng.standard_normal(envelope.size)
+
+bext = io.BroadcastMetadata(
+    description="Night monitoring, facade position P3",
+    originator="Hand-held class 1 analyzer",
+    originator_reference="ESPHN20260621023705000012",
+    origination_date="2026-06-21", origination_time="02:37:05",
+    time_reference=(2 * 3600 + 37 * 60 + 5) * fig_fs, version=2, umid=None,
+    loudness_value=None, loudness_range=None, max_true_peak_level=None,
+    max_momentary_loudness=None, max_short_term_loudness=None,
+    coding_history="A=PCM,F=48000,W=24,M=mono,T=SLM",
+)
+io.write("night_p3.wav", io.Signal(data=night, fs=fig_fs,
+                                   calibration_factor=20.0),
+         subtype="PCM_24", bext=bext, sidecar=True)
+
+night_sig = io.read("night_p3.wav")   # calibrated by the sidecar
+ax = night_sig.plot()                 # pascals, because it is calibrated
+print(night_sig.provenance.originator, night_sig.provenance.origination_time)
+plt.show()
+```
+
+</details>
+
+## The lossy warning, and the XL2 story behind it
+
+By default an NTi XL2 records WAV — compressed to 4-bit ADPCM. The manual is
+explicit about the intent: the compressed recording is a listening record,
+and linear WAV (with the Extended Acoustic Pack) is what is "required for
+post-processing on the PC". The distinction matters because a lossy decoder
+reconstructs an *approximation* of the waveform: a level computed from it is
+not defensible as a measurement, however plausible the number looks.
+
+So lossy sources are read, not refused — a listening copy is still worth
+opening — but never silently:
+
+```python
+import soundfile as sf
+
+# What a meter's default listening copy looks like: 4-bit IMA ADPCM in a
+# WAV container. Written here with soundfile to have one to read.
+sf.write("voice_note.wav", np.asarray(sig)[: 2 * fs], fs,
+         subtype="IMA_ADPCM")
+
+note = io.read("voice_note.wav")     # emits LossyCompressionWarning
+print(note.source.lossy)             # True: the fact outlives the warning
+```
+
+The `LossyCompressionWarning` fires for MP3, Ogg Vorbis, Opus and the
+compressed WAV codecs alike, and `source.lossy` stays stamped on the signal
+so the fact survives after the warning has scrolled away. Writing lossy
+formats is not in the API at all: there is no measurement reason to produce
+one, and a library whose job is preserving levels should not make it easy.
+
+Two adjacent cases the module deliberately does not cover: dictaphone
+AAC/M4A, where the honest route is a one-line external conversion
+(`ffmpeg -i note.m4a note.wav`, then `read("note.wav")` — with the same
+caveat, since AAC is lossy too); and DAQ formats that are not audio at all
+(TDMS from LabVIEW hardware, UFF from modal analysis), which have their own
+Python readers (`npTDMS`, `pyuff`).
+
+## Streaming an overnight recording
+
+A night of monitoring at 48 kHz/24-bit is gigabytes; as float64 it is
+~5.5 GiB per stereo hour, which no analysis needs in memory at once.
+`read_blocks()` yields bare float64 blocks, not `Signal` objects: the same
+sample values as `np.asarray(read(...))`, with the same scaling and channel
+convention (base-install seek-and-decode for linear WAV including RF64),
+but no calibration or provenance riding along. Apply the calibration factor
+where the level is computed, as the loop below does; the stateful filters of
+[block processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/) consume
+the stream unchanged:
+
+```python
+from phonometry import filters
+
+weighter = filters.WeightingFilter(fs, "A", stateful=True)
+total_energy = 0.0
+total_samples = 0
+for block in io.read_blocks("measurement.wav", block_size=1 << 16):
+    weighted = weighter.filter(block)
+    total_energy += float(np.sum(weighted ** 2))
+    total_samples += weighted.shape[-1]
+
+streamed = 10 * np.log10((cal ** 2 * total_energy / total_samples)
+                         / (2e-5) ** 2)
+whole = float(signals.leq(
+    filters.weighting_filter(np.asarray(sig), fs, curve="A",
+                             high_accuracy=False),
+    calibration_factor=cal))
+print(f"streamed {streamed:.4f} dB, whole file {whole:.4f} dB")
+# streamed 66.4200 dB, whole file 66.4200 dB
+```
+
+The two numbers are not close — they are identical, to the last bit,
+because a stateful filter carries its state across block boundaries and the
+stream contributes every sample exactly once. (The single-pass comparison
+says `high_accuracy=False` because that is the filter a stateful weighting
+runs; the [weighting guide](https://jmrplens.github.io/phonometry/signals/levels/weighting/) covers
+the distinction.) The same construction drives an `OctaveFilterBank` with
+`BlockProcessing(stateful=True)`, band by band.
+
+## Writing a BWF with its provenance
+
+`write()` produces WAV/BWF — PCM 16, 24 (packed in-house; SciPy cannot),
+32, float 32/64 — and promotes to RF64 automatically past 4 GiB. Three
+promises, each the opposite of a documented ecosystem default: it never
+normalizes, it never resamples, and clipping is never silent — samples past
+full scale on an integer subtype are saturated, counted and reported with a
+`ClippingWarning` naming the count and the peak overshoot in dBFS. Optional
+`dither="tpdf"` adds one-LSB triangular dither when quantising to
+`PCM_16` — the Lipshitz, Wannamaker and Vanderkooy prescription for
+16-bit listening copies — and is refused elsewhere, because dither only adds
+noise to data that faces numerical analysis rather than ears.
+
+Provenance is first-class. A `Signal`'s own `bext` is carried by default
+when it has one; a `BroadcastMetadata` you build is written field by field
+at its EBU Tech 3285 offsets; and `bext="loudness"` additionally measures
+the five version-2 loudness values — programme loudness, loudness range,
+maximum true peak, momentary and short-term maxima — with the library's own
+[ITU-R BS.1770 implementation](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/)
+on the samples being written. Every written chunk's `CodingHistory` is
+extended, never replaced, with the EBU R98-formatted line describing this
+coding step.
+
+```python
+out = io.Signal(data=np.asarray(sig), fs=fs, calibration_factor=cal)
+io.write("delivery.wav", out, subtype="PCM_24", bext="loudness",
+         sidecar=True)
+
+delivered = io.info("delivery.wav")
+print(delivered.bext.loudness_value)        # -30.85 (LUFS, measured)
+print(delivered.bext.max_true_peak_level)   # -20.08 (dBTP, measured)
+```
+
+## The sidecar: how the calibration travels
+
+No audio container has a field for a microphone calibration — `bext` has
+none, and its loudness values are programme loudness, not sensitivity. The
+industry answer is proprietary companions (a meter's report text, a
+manufacturer's project file); seismology's answer, a standardized sidecar
+beside the waveform, is the one worth copying. `write(sidecar=True)` (or
+`write_sidecar()` for an existing file) puts a small versioned JSON at
+`<audio>.phonometry.json` carrying the calibration factor, the calibrator
+tone's metadata and the channel labels, and `read()` applies it
+automatically — an explicit argument still wins, and a sidecar written by a
+newer schema or another tool is refused loudly rather than half-understood.
+
+```python
+again = io.read("delivery.wav")              # no argument this time
+print(f"{again.calibration_factor:.3f}")     # 3.172, from the sidecar
+print(f"Leq = {float(signals.leq(again)):.1f} dB")   # 70.0: the level survived the disk
+```
+
+That round trip is the point of the whole page: write a calibrated signal,
+read it back with no arguments, and the absolute level is intact.
+
+## Conversion that keeps the measurement a measurement
+
+`convert()` moves a file between lossless containers with everything
+intact: samples at full precision (a WAV-24 to FLAC to WAV-24 round trip
+returns bit-identical codes), the `bext` chunk carried — into FLAC it rides
+in an `APPLICATION` block the readers here understand — the sidecar copied
+byte for byte, and one line appended to the `CodingHistory` naming the
+coding step. Lossy targets are refused by policy. The conversion streams,
+so an hour of RF64 converts in constant memory:
+
+```python
+io.convert("delivery.wav", "delivery.flac")
+
+flac = io.read("delivery.flac")
+print(flac.provenance is not None)                            # True
+print(float(signals.leq(flac)) == float(signals.leq(again)))  # True: identical
+```
+
+The equality is `==` on floats and it holds: FLAC stores the same integer
+codes, the reader scales them by the same power of two, and the archived
+level is *identical*, not merely close.
+
+## What each install reads and writes
+
+| | Base install (NumPy + SciPy) | With `pip install phonometry[audio]` |
+| :--- | :--- | :--- |
+| Read | WAV/BWF: PCM at any depth, IEEE float 32/64, EXTENSIBLE (channel labels), `bext`, cue points, RF64/BW64 | + FLAC, AIFF, Ogg Vorbis, Opus, MP3, compressed WAV (ADPCM, A-law/µ-law) |
+| Write | WAV/BWF: PCM 16/24/32, float 32/64, RF64 automatic, `bext`, sidecar | + FLAC (PCM up to 24-bit, `bext` carried) |
+| Stream | `read_blocks` on linear WAV (RF64 included) | + `read_blocks` on every readable format |
+| `info()` | Every WAV-family file, compressed included | + the extra formats |
+
+The extra is [python-soundfile](https://python-soundfile.readthedocs.io/),
+whose wheel bundles **libsndfile under the LGPL-2.1** (dynamically linked,
+the same pattern as librosa and torchaudio); the base install stays
+BSD/MIT-only, which is why every metrological format lives there.
+
+## `read()` and `write()` parameters
+
+| Parameter | Type | Default | Notes |
+| :--- | :--- | :--- | :--- |
+| `read(path)` | str / Path | — | Dispatch is by leading magic bytes, not extension: a mislabelled file dispatches by what it is |
+| `read(..., calibration_factor=)` | float, optional | `None` | Digital-to-pascal multiplier; `None` takes an existing sidecar's factor, else the signal stays in full-scale units |
+| `write(path, x, fs)` | — | — | `x` is a `Signal` (then `fs` may be omitted, and a disagreeing explicit one raises) or an array in `(channels, samples)` order |
+| `write(..., subtype=)` | str, optional | float data `"FLOAT"`, integer data its own depth | `"PCM_16"`, `"PCM_24"`, `"PCM_32"`, `"FLOAT"`, `"DOUBLE"`; FLAC targets take PCM up to 24 |
+| `write(..., bext=)` | `BroadcastMetadata` / `"loudness"` | `None` | `None` still carries a `Signal`'s own provenance; `"loudness"` measures the five R 128 fields in-house (one extra pass, which is why it is opt-in) |
+| `write(..., dither=)` | `"tpdf"`, optional | `None` | Only with `subtype="PCM_16"`; refused elsewhere |
+| `write(..., sidecar=)` | bool | `False` | Requires a calibrated `Signal`: a sidecar without a calibration would be a promise with nothing behind it |
+
+## Quick answers
+
+### Why does my sound level meter's WAV read as tiny numbers instead of pascals?
+
+Because a WAV carries no calibration: the samples come back in digital
+full-scale units (±1.0), and only a calibrator take recorded through the
+same chain turns them into pascals. Read the calibrator file with `read()`,
+derive the factor with `sensitivity()`, and pass it as
+`calibration_factor=` — or write it into the sidecar once and let `read()`
+apply it from then on.
+
+### Can I compute Leq from the meter's compressed voice-note WAV?
+
+You can make the call, and the library will answer — after a
+`LossyCompressionWarning`, with `source.lossy` stamped on the signal. The
+number is not defensible: an ADPCM or MP3 decoder reconstructs an
+approximation of the waveform, and the error is program-dependent. Use the
+meter's linear recording mode for anything that produces a level.
+
+### Do I need the `[audio]` extra to read my recordings?
+
+Almost certainly not for measurements: the base install reads every linear
+WAV variant meters and field recorders write, including 24-bit, EXTENSIBLE
+multichannel and RF64 files past 4 GiB. The extra is for FLAC archives,
+AIFF/Ogg/Opus/MP3, and the compressed WAV listening copies — and it bundles
+libsndfile under the LGPL, which the base install deliberately avoids.
+
+## See also
+
+- [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/): where the sensitivity factor comes from, and the field discipline around it.
+- [Integrated and statistical levels](https://jmrplens.github.io/phonometry/signals/levels/levels/): the level functions that accept the `Signal` directly.
+- [Block processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/): the stateful machinery `read_blocks` feeds.
+- [Programme loudness](https://jmrplens.github.io/phonometry/devices/broadcast/program-loudness/): the BS.1770 implementation behind `bext="loudness"`.
+- [Build a sound level meter](https://jmrplens.github.io/phonometry/signals/sound-level-meter/): the whole chain this page's files enter and leave.
+- API reference: [`phonometry.io`](https://jmrplens.github.io/phonometry/reference/api/io/io/).
+
+## References
+
+- European Broadcasting Union. (2011). *Specification of the Broadcast Wave
+  Format (BWF) — A format for audio data files in broadcasting, Version 2.0*
+  (EBU Tech 3285). [EBU](https://tech.ebu.ch/publications/tech3285).
+  The `bext` chunk this page reads and writes field by field: originator,
+  the sample-accurate since-midnight time reference, CodingHistory, and the
+  five EBU R 128 loudness values of version 2.
+- International Telecommunication Union. (2025). *Long-form file format for
+  the international exchange of audio programme materials with metadata*
+  (Recommendation ITU-R BS.2088-2).
+  [ITU](https://www.itu.int/rec/R-REC-BS.2088/en).
+  The 64-bit RF64/BW64 container an overnight recording promotes to past
+  4 GiB, read here through its ds64 sizes; it superseded EBU Tech 3306.
+- Internet Engineering Task Force. (2024). *Free Lossless Audio Codec*
+  (RFC 9639). [IETF](https://datatracker.ietf.org/doc/rfc9639/).
+  The lossless codec this page archives to: bit-exact integer samples up to
+  32 bits, which is what lets a WAV-to-FLAC-to-WAV round trip return the
+  identical codes.
+- International Telecommunication Union. (2023). *Algorithms to measure
+  audio programme loudness and true-peak audio level* (Recommendation
+  ITU-R BS.1770-5). [ITU](https://www.itu.int/rec/R-REC-BS.1770/en).
+  The loudness algorithm behind `bext="loudness"`: the five version-2
+  fields are measured by the library's own implementation on the samples
+  being written.
+- Lipshitz, S. P., Wannamaker, R. A., & Vanderkooy, J. (1992). Quantization
+  and dither: A theoretical survey. *Journal of the Audio Engineering
+  Society, 40*(5), 355-375.
+  [AES](https://aes2.org/publications/elibrary-page/?id=7047).
+  Why the optional dither is triangular-PDF at one LSB, why it is offered
+  only when quantising to 16 bits, and why it stays opt-in for data that
+  faces numerical analysis.
+
+## Standards
+
+EBU Tech 3285 (2011), *Specification of the Broadcast Wave Format (BWF),
+Version 2.0* — the `bext` chunk read and written field by field at its
+published offsets, with the version-2 loudness fields filled by
+measurement; ITU-R BS.2088-2 (2025) — the RF64/BW64 64-bit container
+resolved through `ds64`; RFC 9639 (2024) — the FLAC archives `convert()`
+produces and reads back bit-exactly.
+
+---
+
+
+<!-- source: docs/io/index.md | canonical: https://jmrplens.github.io/phonometry/io/ -->
+Source: https://jmrplens.github.io/phonometry/io/
+
+# Audio files
+
+Every other area of this library starts from an array that is already in
+memory; this one is about the files the array comes from and returns to. Its
+premise is that an audio file made by a measurement chain is a *measurement
+record*: the samples are only meaningful next to the sample rate, the
+calibration that maps digital full scale to pascals, and the provenance
+that says where, when and through what the recording was made. The module
+`phonometry.io` reads and writes with exactly that in mind — and never
+resamples, never mixes channels down, never normalizes, and never touches a
+level, because each of those is a documented default somewhere in the
+ecosystem and each one quietly destroys the quantity a measurement exists
+to preserve.
+
+The practical shape follows from an equipment survey rather than from
+format completism. Sound level meters and field recorders emit linear WAV —
+24-bit PCM, `WAVE_FORMAT_EXTENSIBLE` for multichannel, BWF `bext` metadata,
+RF64 once an overnight recording passes 4 GiB — so the **base install**
+(NumPy and SciPy alone) reads all of it, and the compressed formats live
+behind the optional `[audio]` extra (python-soundfile, whose wheel bundles
+libsndfile under the LGPL-2.1). Lossy sources are read but flagged, loudly:
+a level computed from an ADPCM or MP3 approximation of the waveform is not
+defensible, and the warning plus the `lossy` stamp keep that fact attached
+to the data.
+
+What comes back from a file is a `Signal`: the samples with their rate,
+calibration, channel labels and `bext` provenance in one immutable object
+that behaves as the bare array everywhere (`np.asarray` hands any existing
+function the samples), draws itself with `.plot()`, and walks straight into
+the level functions — `leq`, `laeq`, `ln_levels`, `sel`, `lc_peak`,
+`sound_exposure`, `lex_8h` — without
+repeating the rate or the calibration by hand. In the other direction,
+`write()` produces WAV/BWF (24-bit packed in-house) and FLAC, refuses to
+clip silently, extends the `CodingHistory` rather than replacing it, can
+measure the five EBU R 128 loudness values of `bext` version 2 with the
+library's own BS.1770 implementation, and puts the calibration in a small
+versioned JSON sidecar beside the audio — the one number no audio container
+has a field for, made to travel.
+
+## Pages in this section
+
+- [Reading and writing measurement audio](https://jmrplens.github.io/phonometry/io/audio-files/): the
+  whole workflow on one runnable page — reading a meter's WAV into a
+  calibrated `Signal`, deriving the calibration from the calibrator take,
+  the lossy warning and the listening-copy story behind it, streaming an
+  overnight recording through stateful filters, writing BWF with its
+  provenance, the sidecar round trip, and conversion that keeps the
+  measurement a measurement.
+
+## What this section does not cover
+
+**No playback, no editing, no effects.** This is a file layer for
+measurements, not an audio workstation: nothing here plays a sound, trims a
+region by ear, or applies gain. There is deliberately no lossy *writing*
+either — no measurement ends in an MP3, and a library whose job is
+preserving levels should not make one easy to produce.
+
+**AAC/M4A stays external.** Dictaphone and phone recordings in MP4
+containers are not decoded; the honest route is a one-line
+`ffmpeg -i note.m4a note.wav` and then `read()`, with the same lossy caveat
+either way. Likewise the DAQ formats that are not audio at all — TDMS
+(LabVIEW) and UFF (modal analysis) have their own Python readers, `npTDMS`
+and `pyuff`, and pretending they are audio files would serve neither.
+
+**Ambisonic files are tolerated, not interpreted.** A B-format `.amb` file
+or an ambisonic GUID reads fine and its channels come back labelled, but no
+FuMa-to-AmbiX conversion matrix is applied: channel 0 of a FuMa file
+carries W at −3 dB, and turning that into a pressure without saying so
+would be a silent level change — the exact class of default this module
+exists to refuse.
+
+## Before and after these pages
+
+Before: [Calibration and dBFS](https://jmrplens.github.io/phonometry/signals/metrology/calibration/)
+explains where the calibration factor a `Signal` carries actually comes
+from, and [Getting started](https://jmrplens.github.io/phonometry/start/getting-started/) runs a first
+file through the chain. After: everything — the point of the file layer is
+that [levels](https://jmrplens.github.io/phonometry/signals/levels/levels/),
+[octave filtering](https://jmrplens.github.io/phonometry/signals/filters/filter-banks/),
+[block processing](https://jmrplens.github.io/phonometry/signals/filters/block-processing/) and the
+rest of the library receive a calibrated signal and never learn it came
+from a file.
+
+If you arrived here from a search and want the shape of the whole library,
+[What do you need to measure?](https://jmrplens.github.io/phonometry/start/tasks/) indexes it by the
+job and [All guides](https://jmrplens.github.io/phonometry/) lists every page with a line
+on each.
+
+---
+
+
 <!-- source: docs/materials/absorbers/absorption-measurement.md | canonical: https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/ -->
 Source: https://jmrplens.github.io/phonometry/materials/absorbers/absorption-measurement/
 
@@ -32339,7 +32854,7 @@ Source: https://jmrplens.github.io/phonometry/reference/api/
 
 # API Reference
 
-All core functionality lives in eighteen domain subpackages; every public name
+All core functionality lives in nineteen domain subpackages; every public name
 is also re-exported by the top-level `phonometry` package.
 
 > **Note.** This page is the curated quick table for the GitHub/PyPI audience:
@@ -32350,7 +32865,7 @@ is also re-exported by the top-level `phonometry` package.
 
 ## Namespaces
 
-The library is organized into eighteen domain subpackages, and importing the
+The library is organized into nineteen domain subpackages, and importing the
 domain namespace is the primary form used throughout the documentation:
 
 ```python
@@ -32364,6 +32879,7 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.filters` | Octave and fractional-octave filter banks, frequency weightings and time weighting, parametric EQ, IEC 61260-1 and IEC 61672-1 class verification |
 | `phonometry.signals` | Levels (Leq, LAeq, percentiles), Welch and multitaper spectra, coherence, time-frequency, correlation, envelope, cepstrum, phase, synchronous averaging, test signals |
 | `phonometry.metrology` | Calibration, GUM uncertainty and Monte Carlo, data qualification (stationarity, trends, peak statistics) |
+| `phonometry.io` | Measurement audio files: WAV/BWF/RF64 read and write with `bext` provenance (EBU Tech 3285), headers-only `info`, block streaming, lossless conversion, calibration sidecar; FLAC, AIFF, Ogg/Opus and MP3 via the `[audio]` extra |
 | `phonometry.psychoacoustics` | Two families: `loudness` (ISO 532-1 Zwicker, ISO 532-2 and ISO 532-3 Moore-Glasberg, ECMA-418-2, ISO 226 equal-loudness contours) and `quality` (sharpness, roughness, fluctuation strength, tonality, tone audibility, annoyance), plus the ERB scale both measure on |
 | `phonometry.speech` | Speech Transmission Index (IEC 60268-16), Speech Intelligibility Index (ANSI S3.5), STOI and ESTOI |
 | `phonometry.hearing` | Audiometric thresholds (ISO 7029/389-7), noise-induced hearing loss (ISO 1999), occupational exposure (ISO 9612) |
@@ -32415,12 +32931,12 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `WeightingFilter` | `class` | **Reusable weighting filter.**<br>• `fs`: Sample rate [Hz]<br>• `curve`: 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'<br>• `stateful`: Block processing (Default: False)<br>• `steady_ic`: Steady-state initial conditions (Default: False)<br>• `high_accuracy`: Defaults to True except stateful | `wf = WeightingFilter(fs, 'A')`<br>`y = wf.filter(x)` |
 | `time_weighting` | `function` | **Energy capture.**<br>• `x`: Raw signal array (squared internally; time is the last axis)<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', or 'impulse'<br>• `initial_state`: None, 'zero', 'first', scalar, or array (Default: None) | `env = time_weighting(x, fs, mode='fast')`<br><br>• `env`: energy envelope (Mean Square), same shape as `x` |
 | `TimeWeighting` | `class` | **Stateful time weighting.**<br>• `fs`: Sample rate [Hz]<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast') | `tw = TimeWeighting(fs, mode='fast')`<br>`env = tw.process(block)` per block<br>`tw.reset()` to start over |
-| `leq` | `function` | **Equivalent level (Leq).**<br>• `x`: Signal array (1D or 2D)<br>• `calibration_factor`: Sensitivity multiplier (Default: 1.0)<br>• `dbfs`: Output in dBFS (Default: False) | `level = leq(x, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
-| `laeq` | `function` | **A-weighted Leq (LAeq).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `calibration_factor` / `dbfs`: as `leq` | `level = laeq(x, fs, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
-| `ln_levels` | `function` | **Statistical levels (LN).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `n`: Exceedance percentiles (Default: (10, 50, 90))<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast')<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `stats = ln_levels(x, fs, n=(10, 50, 90), weighting='A')`<br><br>• `stats`: Dict `{10: L10, 50: L50, 90: L90}` |
-| `lc_peak` | `function` | **C-weighted peak (LCpeak).**<br>• `x`: Signal array (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `calibration_factor`: as `leq`<br>• `dbfs`: 0 dBFS = full-scale *peak* (amplitude 1.0), unlike the RMS reference of `leq`<br>• `oversample`: HF inter-sample peak recovery (Default: 8; 1 = on-grid, under-reads up to ~1.15 dB at 48 kHz) | `peak = lc_peak(x, fs)`<br><br>• IEC 61672-1 §5.13; verified against Table 5 |
-| `sel` | `function` | **Sound exposure level (SEL/LAE).**<br>• `x`: Whole-event signal (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `lae = sel(x, fs, weighting='A')`<br><br>• Event level normalized to 1 s |
-| `sound_exposure` | `function` | **A-weighted exposure E (IEC 61252).**<br>• `x`: Signal (1D or 2D)<br>• `fs`: Sample rate [Hz]<br>• `duration_hours`: exposure period represented (Default: recording length)<br>• `calibration_factor` | `E = sound_exposure(x, fs, duration_hours=8)`<br><br>• `E`: Pa²·h |
+| `leq` | `function` | **Equivalent level (Leq).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `calibration_factor`: Sensitivity multiplier (Default: None: a calibrated `Signal`'s factor, else 1.0; explicit wins)<br>• `dbfs`: Output in dBFS (Default: False) | `level = leq(x, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
+| `laeq` | `function` | **A-weighted Leq (LAeq).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `calibration_factor` / `dbfs`: as `leq` | `level = laeq(x, fs, calibration_factor=s)`<br><br>• `level`: Scalar (1D) or per-channel array (2D) |
+| `ln_levels` | `function` | **Statistical levels (LN).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `n`: Exceedance percentiles (Default: (10, 50, 90))<br>• `mode`: 'fast', 'slow', 'impulse' (Default: 'fast')<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `stats = ln_levels(x, fs, n=(10, 50, 90), weighting='A')`<br><br>• `stats`: Dict `{10: L10, 50: L50, 90: L90}` |
+| `lc_peak` | `function` | **C-weighted peak (LCpeak).**<br>• `x`: Signal array (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `calibration_factor`: as `leq`<br>• `dbfs`: 0 dBFS = full-scale *peak* (amplitude 1.0), unlike the RMS reference of `leq`<br>• `oversample`: HF inter-sample peak recovery (Default: 8; 1 = on-grid, under-reads up to ~1.15 dB at 48 kHz) | `peak = lc_peak(x, fs)`<br><br>• IEC 61672-1 §5.13; verified against Table 5 |
+| `sel` | `function` | **Sound exposure level (SEL/LAE).**<br>• `x`: Whole-event signal (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `weighting`: any `weighting_filter` curve, 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z', or None (Default: None)<br>• `calibration_factor` / `dbfs`: as `leq` | `lae = sel(x, fs, weighting='A')`<br><br>• Event level normalized to 1 s |
+| `sound_exposure` | `function` | **A-weighted exposure E (IEC 61252).**<br>• `x`: Signal (1D or 2D) or a `phonometry.io.Signal`<br>• `fs`: Sample rate [Hz] (from the `Signal` when `x` is one)<br>• `duration_hours`: exposure period represented (Default: recording length)<br>• `calibration_factor` | `E = sound_exposure(x, fs, duration_hours=8)`<br><br>• `E`: Pa²·h |
 | `lex_8h` | `function` | **Daily exposure LEX,8h / LEP,d.**<br>• Same params as `sound_exposure` | `lex = lex_8h(x, fs, duration_hours=4)`<br><br>• Normalized 8 h level [dB] |
 | `loudness_zwicker` | `function` | **Zwicker loudness (ISO 532-1:2017).**<br>• `x`: Calibrated signal in Pa (1D)<br>• `fs`: Sample rate [Hz]<br>• `field`: 'free' or 'diffuse' (Default: 'free')<br>• `stationary`: Clause 5 stationary method (Default: False)<br>• `time_skip`: seconds excluded from the stationary mean square (Annex B.1 uses 0.2 s; Default: 0.0)<br>• `calibration_factor`: Digital units to Pa (Default: 1.0) | `res = loudness_zwicker(x, fs)`<br><br>• `ZwickerLoudness`; time-varying runs add N5/N10 and the 500 Hz N(t) trace |
 | `loudness_zwicker_from_spectrum` | `function` | **Stationary loudness from band levels.**<br>• `levels`: 28 one-third-octave levels, 25 Hz-12.5 kHz [dB SPL]<br>• `field`: 'free' or 'diffuse' (Default: 'free') | `res = loudness_zwicker_from_spectrum(levels)`<br><br>• `res.loudness` [sone], `res.loudness_level` [phon] |
@@ -32549,6 +33065,20 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `EQSection` | `dataclass` | **One cookbook biquad specification.**<br>• `filter_type`: 'peaking', 'lowshelf', 'highshelf', 'lowpass', 'highpass', 'bandpass', 'bandpass_skirt', 'notch', 'allpass'<br>• `f0`: Centre/corner frequency [Hz]<br>• `gain_db`: Gain (peaking/shelves) [dB]<br>• One of `q` (Default: 1/√2), `bw` [octaves] or `slope` (shelves) | `EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0)` |
 | `EQResponseResult` | `dataclass` | **Parametric-EQ cascade response.**<br>• `frequencies` [Hz], `magnitude_db` [dB], `phase_rad` [rad]<br>• `section_magnitude_db`: per-section magnitudes [dB]<br>• `sos`: the cascade, `fs`, `sections`; `.plot()` magnitude + phase | `res = eq.response()`<br>`res.plot()` |
 | `sensitivity` | `function`| **SPL Calibration.**<br>• `ref_signal`: Calibration signal<br>• `target_spl`: Level of calibrator (Default: 94.0)<br>• `ref_pressure`: Reference pressure (Default: 20e-6)<br>• `narrowband`: coherent Goertzel tone estimate that rejects broadband hum/noise (needs `fs`; Default: False) | `s = sensitivity(ref_signal, target_spl=94.0)`<br><br>• `s`: Float (multiplier for pressure) |
+| `read` | `function` | **Read a measurement audio file into a `Signal`.**<br>• `path`: WAV/BWF/RF64 in the base install; FLAC, AIFF, Ogg/Opus, MP3 with `[audio]`<br>• `calibration_factor`: digital units → Pa (Default: None; an existing sidecar is applied automatically, an explicit value wins)<br>Native fs kept, no downmix, no normalization; int PCM scaled by 2^(bits−1); lossy sources raise `LossyCompressionWarning` | `sig = io.read("night.wav")`<br><br>• `sig`: `Signal` (float64, (channels, samples), with fs, calibration, `bext`, labels) |
+| `info` | `function` | **Describe a file from its headers alone.**<br>• `path`: any supported container<br>No sample is decoded, so a 12-hour RF64 answers instantly; compressed WAV that `read` refuses still describes itself | `meta = io.info("night.wav")`<br><br>• `meta`: `AudioFileInfo` |
+| `read_blocks` | `function` | **Stream a file block by block.**<br>• `path`, `block_size` [samples]<br>• `overlap`: samples shared between consecutive blocks (Default: 0)<br>Yields exactly what `read` returns, in slices: feeds `BlockProcessing(stateful=True)` unchanged | `for block in io.read_blocks(p, 65536): ...`<br><br>• each `block`: float64 array, `read` conventions |
+| `write` | `function` | **Write WAV/BWF (FLAC with `[audio]`) without touching the level.**<br>• `path`, `x` (array or `Signal`), `fs` (from the `Signal` when `x` is one)<br>• `subtype`: 'PCM_16'/'PCM_24'/'PCM_32'/'FLOAT'/'DOUBLE' (Default: FLOAT for float data, the matching depth for integer pass-through; FLAC: PCM up to 24)<br>• `bext`: None (Default) carries a `Signal`'s own provenance; `"loudness"` also measures the five EBU R 128 fields in-house; a `BroadcastMetadata` is written as given<br>• `dither`: 'tpdf' at PCM_16 only (Default: None)<br>• `rng`: `numpy.random.Generator` or int seed for the dither noise, for byte-reproducible writes (Default: None = fresh entropy)<br>• `sidecar`: write the calibration sidecar too (Default: False)<br>Never normalizes; clipping saturates, is counted and warns (`ClippingWarning`); RF64 automatic past 4 GiB | `io.write("out.wav", sig, subtype="PCM_24")` |
+| `convert` | `function` | **Convert between lossless containers with the measurement intact.**<br>• `src`, `dst`: WAV/BWF/RF64 ↔ FLAC (lossy targets refused)<br>Samples bit-exact at full precision, `bext` carried (into FLAC via the `riff` APPLICATION block), sidecar copied byte for byte, CodingHistory extended one line; streams, so an hour of RF64 converts flat | `io.convert("night.wav", "night.flac")` |
+| `Signal` | `dataclass` | **Samples plus the metadata they need.**<br>• `data`: (channels, samples) float64<br>• `fs` [Hz]<br>• `calibration_factor`: Pa per digital unit, or None until known<br>• `channel_labels`, `provenance` (`bext`), `source` (`SignalOrigin`)<br>`np.asarray(sig)` yields the bare array (1D mono), so every `(x, fs, ...)` function accepts it; `leq`/`laeq`/`ln_levels`/`sel`/`lc_peak`/`sound_exposure`/`lex_8h` read fs and calibration from it directly | `sig.duration`, `sig.n_channels`<br>`sig.plot()` draws the calibrated waveform |
+| `SignalOrigin` | `dataclass` | **Where a `Signal` came from.**<br>• `path`, `container`, `format_name`<br>• `bit_depth`: valid bits, None for lossy codecs<br>• `lossy`: the read-time warning, kept attached to the data | `sig.source.lossy` |
+| `AudioFileInfo` | `dataclass` | **Everything `info()` reads from the headers.**<br>• `container`, `format_name`, `fs`, `channels`, `frames`, `duration`, `bit_depth`, `lossy`<br>• `channel_mask` / `channel_labels` (EXTENSIBLE speaker positions)<br>• `bext`, `has_ixml`, `cue_points` | `io.info(p).duration` |
+| `BroadcastMetadata` | `dataclass` | **The `bext` chunk of EBU Tech 3285 v2, field by field.**<br>• `description`, `originator`, `originator_reference`, `origination_date`/`_time`<br>• `time_reference`: 64-bit samples since midnight<br>• `version`, `umid`<br>• v2 loudness: `loudness_value`, `loudness_range`, `max_true_peak_level`, `max_momentary_loudness`, `max_short_term_loudness` (0x7FFF sentinel → None)<br>• `coding_history` (EBU R98) | `io.info(p).bext.time_reference` |
+| `CuePoint` | `dataclass` | **One marker of a WAV `cue ` chunk.**<br>• `cue_id`, `position` [samples], plus the raw `chunk_id`/`chunk_start`/`block_start`/`sample_offset` fields of the spec | `io.info(p).cue_points` |
+| `CalibrationSidecar` | `dataclass` | **The versioned JSON sidecar that carries the calibration.**<br>• `calibration_factor`, `reference_spl`, `calibrator_frequency`, `calibrator_model`, `channel_labels`, `phonometry_version`<br>Lives at `<audio>.phonometry.json`; applied automatically by `read` | `io.read("m.wav").calibration_factor` |
+| `read_sidecar` / `write_sidecar` / `sidecar_path` | `function` | **Sidecar round-trip.**<br>• `read_sidecar(path)`: the sidecar next to an audio file, or None (foreign or newer schema refused loudly)<br>• `write_sidecar(path, calibration_factor, ...)`: write one, with the optional calibrator tone metadata<br>• `sidecar_path(path)`: where it lives | `io.write_sidecar("m.wav", cal, reference_spl=94.0)` |
+| `LossyCompressionWarning` | `warning` | **A lossy decoder produced these samples** (MP3/Ogg/Opus/ADPCM): levels are not metrologically defensible. Subclass of `PhonometryWarning` | raised by `io.read` / `io.read_blocks` / `io.convert` |
+| `ClippingWarning` | `warning` | **Samples clipped while quantizing on write:** count and peak overshoot in dBFS; the file is written with saturated codes rather than wrapped ones. Subclass of `PhonometryWarning` | raised by `io.write` |
 | `verify_filter_class` | `function` | **IEC 61260 class check.**<br>• `bank`: an `OctaveFilterBank`<br>• `num_points`: frequency grid points per band (Default: 32768)<br>• `edition`: `'2014'` (classes 1/2, default) or `'1995'` (IEC 61260:1995 / ANSI S1.11-2004, adds class 0) | `result = verify_filter_class(bank, edition="1995")`<br><br>• `result["overall_class"]`: 1/2 or None (`'2014'`); 0/1/2 or None (`'1995'`)<br>• `result["bands"]`: per-band class and `margin_class<c>_db` [dB] |
 | `filter_class_compliance` | `function` | **IEC 61260 class check as a report result.**<br>Same verification as `verify_filter_class`, returned as a `FilterComplianceResult` with `.plot()` and `.report()`.<br>• `bank`: an `OctaveFilterBank`<br>• `num_points`: frequency grid points per band (Default: 32768)<br>• `edition`: `'2014'` (default) or `'1995'` (adds class 0) | `result = filter_class_compliance(bank, edition="1995")`<br>`result.report("iec61260.pdf", metadata=ReportMetadata(required_class=0))` |
 | `FilterComplianceResult` | `dataclass` | **IEC 61260 filter class-compliance result.**<br>• `overall_class`: strictest class every band meets: 1/2 (`'2014'`), 0/1/2 (`'1995'`), or `None`<br>• `bands`: per-band verdict dictionaries<br>• `range_limited`: stop-band mask beyond the processing Nyquist not exercised<br>• `.available_classes()` / `.reference_class()`: the edition's classes and the fiche's reference class<br>• `.plot()`: measured relative attenuation over the class corridor<br>• `.report(path, *, metadata=None, required_class via metadata)`: one-page PDF fiche | `filter_class_compliance(bank).report("iec61260.pdf")` |
@@ -33619,7 +34149,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `TonalityWarning` | `warning class` | **Tonality advisory.**<br>Emitted for biased tonality estimates (e.g. coarse FFT resolution) | `warnings.simplefilter('error', TonalityWarning)` |
 | `STIWarning` | `warning class` | **STI/STIPA advisory.**<br>Emitted for suspect speech-intelligibility measurements or inputs | `warnings.simplefilter('error', STIWarning)` |
 | `__version__` | `str` | **Package version string.**<br>(no parameters) | `phonometry.__version__  # '3.3.0'` |
-| `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
+| `.plot()` | `method` | **One-line canonical figure on every result object (soft matplotlib dependency).**<br>Available on `ZwickerLoudness`, `MooreGlasbergLoudness`, `MooreGlasbergTimeVaryingLoudness`, `EcmaLoudness`, `EcmaTonality`, `EcmaRoughness`, `PsychoacousticAnnoyanceResult`, `FluctuationStrengthResult`, `ProgramLoudnessResult`, `KWeightingResponse`, `STIResult`, `SIIResult`, `SIIProcedure`, `StandardSpeechSpectrum`, `NCResult`, `RCResult`, `AgeThresholdResult`, `NiptsResult`, `HtlanResult`, `ImpulseProminenceResult`, `ImpulsiveSoundResult`, `MultipleShockResult`, `ImpulseResponseResult`, `DecayCurve`, `RoomAcousticsResult`, `ReverberationResult`, `ReverberationModelResult`, `DynamicStiffnessResult`, `MobilityResult`, `TransferStiffnessResult`, `VibrationSoundPowerResult`, `StructureBornePowerResult`, `InstalledSourceResult`, `WeightedRatingResult`, `ImpactRatingResult`, `FacadeInsulationResult`, `LabAirborneInsulationResult`, `LabImpactInsulationResult`, `SoundPowerResult`, `ReverberationSoundPowerResult`, `SoundPowerIntensityResult`, `PrecisionSoundPowerResult`, `PrecisionIntensityResult`, `IntensityResult`, `UncertaintyResult`, `AbsorptionRatingResult`, `ScatteringResult`, `DiffusionResult`, `DiffusionSpectrum`, `InsituAbsorptionResult`, `WeightingResponse`, `WeightedSpectrum`, `Signal` and `DailyVibrationExposure`.<br>• `ax`: existing Axes, or None to build a fresh figure (Default: None)<br>• returns the Matplotlib `Axes` (an array of Axes for multi-panel figures); never calls `plt.show()`<br>• needs matplotlib (`pip install phonometry[plot]`) | `res.plot()`<br>`decay_curve(ir, fs).plot()` |
 
 ## Notes
 
@@ -39743,9 +40273,16 @@ everywhere else, energy.
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units (or Pa if calibrated) | non-empty | 2D is `[channels, samples]`; returns one level per channel |
-| `fs` | int | Hz | > 0 (`laeq` only) | `leq` needs no sample rate (pure RMS integral) |
-| `calibration_factor` | float | Pa per digital unit | default `1.0` | From `sensitivity()` |
+| `fs` | int | Hz | > 0 (`laeq` only; from the `Signal` when `x` is one) | `leq` needs no sample rate (pure RMS integral) |
+| `calibration_factor` | float | Pa per digital unit | default `None`: a calibrated `Signal`'s own factor, else `1.0` | From `sensitivity()` |
 | `dbfs` | bool | — | default `False` | `True`: 0 dBFS = RMS 1.0; ignores calibration |
+
+Every function on this page (`leq`, `laeq`, `ln_levels`, `sel`,
+`lc_peak`, `sound_exposure`, `lex_8h`) also takes a `Signal` from
+`phonometry.io.read` in place of the bare `(x, fs)` pair: the object supplies
+its own sample rate and, when calibrated, its `calibration_factor`. An
+explicit `calibration_factor` argument overrides the object's; an explicit
+`fs` that disagrees with the object's raises instead of silently winning.
 
 ## Percentile levels (LN)
 
@@ -39859,7 +40396,7 @@ of [Environmental levels](https://jmrplens.github.io/phonometry/environment/asse
 | Parameter | Type / shape | Units | Range / default | Notes |
 | :--- | :--- | :--- | :--- | :--- |
 | `x` | 1D or 2D array | digital units | non-empty | 2D returns per-channel dicts |
-| `fs` | int | Hz | > 0 | Needed by the envelope detector |
+| `fs` | int | Hz | > 0; from the `Signal` when `x` is one | Needed by the envelope detector |
 | `n` | tuple of ints | % | default `(10, 50, 90)` | Any exceedance percentages, e.g. `(1, 5, 95)` |
 | `mode` | str | — | `'fast'` (default), `'slow'`, `'impulse'` | IEC 61672-1 ballistics of the envelope |
 | `weighting` | str or None | — | any `weighting_filter` curve: `'A'`, `'B'`, `'C'`, `'D'`, `'G'`, `'AU'`, `'Z'`, `None` (default) | Frequency weighting before the envelope (`None` and `'Z'` both leave it unweighted) |
@@ -39973,10 +40510,10 @@ is +3 dB.
 
 | Function | Key parameters | Returns | Standard anchor |
 | :--- | :--- | :--- | :--- |
-| `lc_peak(x, fs, calibration_factor=1.0, dbfs=False, oversample=8)` | `dbfs=True` references full-scale *peak* (1.0), not RMS; `oversample=1` reads the peak on the sample grid | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
-| `sel(x, fs, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
-| `sound_exposure(x, fs, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
-| `lex_8h(x, fs, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
+| `lc_peak(x, fs=None, calibration_factor=None, dbfs=False, oversample=8)` | `dbfs=True` references full-scale *peak* (1.0), not RMS; `oversample=1` reads the peak on the sample grid | $L_\mathrm{Cpeak}$ [dB] | IEC 61672-1 §5.13, Table 5 tone bursts |
+| `sel(x, fs=None, weighting=None, ...)` | `weighting='A'` gives $L_{\mathrm{A}E}$ | SEL [dB] | IEC 61672-1 Table 4 ($L_{\mathrm{A}E}$ column) |
+| `sound_exposure(x, fs=None, duration_hours=None, ...)` | `duration_hours` treats `x` as a sample of that period | $E$ [Pa²h] | IEC 61252 |
+| `lex_8h(x, fs=None, duration_hours=None, ...)` | same sampling semantics | $L_\mathrm{EX,8h}$ [dB] | IEC 61252 ($\equiv L_\mathrm{EP,d}$) |
 
 `lex_8h` rates *one* recording; assembling a full working day from task or
 job samples, with the normative ISO 9612 uncertainty budget, continues in
@@ -47415,15 +47952,22 @@ Optional extras:
 pip install phonometry[plot]    # matplotlib, for filter response plots and result .plot() methods
 pip install phonometry[perf]    # numba, faster 'impulse' time weighting
 pip install phonometry[report]  # reportlab + svglib, so result .report() methods render normative PDF fiches (their figure panel needs [plot] too)
+pip install phonometry[audio]   # python-soundfile, so phonometry.io also reads FLAC, AIFF, Ogg/Opus, MP3 and compressed WAV
 pip install phonometry[full]    # all of the above (recommended)
 ```
 
 I recommend `pip install phonometry[full]`: it brings matplotlib, numba,
-reportlab and svglib in one go, so every feature of the library is enabled. The
-base install computes every metric on NumPy and SciPy alone; the only things it
-leaves unavailable are the figures (`.plot()` and the filter response plots),
-the normative PDF fiches (`.report()`) and the compiled kernel that speeds up
-the `impulse` time weighting.
+reportlab, svglib and soundfile in one go, so every feature of the library is
+enabled. The base install computes every metric on NumPy and SciPy alone — and
+that includes reading every linear measurement WAV (24-bit, multichannel
+EXTENSIBLE, RF64) through `phonometry.io`; the only things it leaves
+unavailable are the figures (`.plot()` and the filter response plots), the
+normative PDF fiches (`.report()`), the compiled kernel that speeds up the
+`impulse` time weighting, and the compressed audio formats. One licensing note
+on `[audio]`: it installs python-soundfile, whose wheel bundles **libsndfile
+under the LGPL-2.1** (dynamically linked, the same pattern as librosa and
+torchaudio). The base install deliberately stays free of it, which is why the
+metrological formats need no extra.
 
 One caveat about `[full]`: numba is the only extra that caps NumPy, and it
 raises that cap only once it supports a new NumPy minor. So in the weeks after
@@ -47521,6 +48065,36 @@ plt.show()
 
 </details>
 
+## Read a sound level meter WAV
+
+With a real meter you have two WAVs — the calibrator take and the
+measurement — and `phonometry.io` reads both as measurements: native rate
+kept, integer PCM scaled exactly to full scale, channels first, nothing
+normalized. The `Signal` it returns carries the sample rate and, once you
+attach it, the calibration, so the level functions stop asking you to
+repeat either:
+
+```python
+import numpy as np
+from phonometry import io, metrology, signals
+
+# Both files come from the meter, in this order, through one untouched chain.
+cal_take = io.read("calibrator.wav")          # the 94 dB calibrator tone
+cal = metrology.sensitivity(np.asarray(cal_take), target_spl=94.0,
+                            fs=cal_take.fs)
+
+sig = io.read("measurement.wav", calibration_factor=cal)
+print(f"Leq = {float(signals.leq(sig)):.1f} dB")   # no fs, no factor to repeat
+```
+
+The base install reads everything a meter writes — 24-bit PCM, multichannel
+EXTENSIBLE, overnight RF64 — and warns if the file is a compressed listening
+copy rather than a linear recording. Write the factor into the sidecar once
+(`io.write_sidecar("measurement.wav", cal)`) and from then on
+`io.read("measurement.wav")` comes back calibrated with no arguments at all.
+[Reading and writing measurement audio](https://jmrplens.github.io/phonometry/io/audio-files/) is the full
+workflow: provenance, streaming, BWF writing and lossless conversion.
+
 ## Analyzing an audio file
 
 ```python
@@ -47536,12 +48110,14 @@ fs, signal = wavfile.read("measurement.wav")
 spl, freq = filters.octave_filter(signal, fs=fs, fraction=3)
 ```
 
-Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it is
-safe to pass `wavfile.read` output directly.
+Integer audio (e.g. int16 WAV data) is converted to float64 internally, so it
+is safe to pass `wavfile.read` output directly — but note it is *cast*, not
+rescaled to full scale, so keep calibrator and measurement in the same format;
+`io.read` in the previous section scales exactly and removes the concern.
 
 ## Where to go next
 
-The octave analysis above uses the `filters` core, one of eighteen domain
+The octave analysis above uses the `filters` core, one of nineteen domain
 namespaces; the documentation index walks through the rest, from
 psychoacoustics and room, building and vibration acoustics to environmental,
 aircraft and underwater noise, electroacoustics and FDTD wave simulation.

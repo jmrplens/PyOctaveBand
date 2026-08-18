@@ -179,7 +179,7 @@ export const en: HomeContent = {
 	},
 	coverage: {
 		title: 'What it covers',
-		lead: `Ten documentation areas over eighteen import namespaces: ${guides} guides and ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
+		lead: `Eleven documentation areas over nineteen import namespaces: ${guides} guides and ${apiPages} API reference pages. Each row links to the area overview; the designations are the standards actually implemented there, not a reading list.`,
 		headers: ['Area', 'Standards implemented'],
 		areas: [
 			{
@@ -187,6 +187,12 @@ export const en: HomeContent = {
 				href: '/phonometry/signals/',
 				summary: 'Filter banks, weighting, levels, spectra, calibration and uncertainty.',
 				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],
+			},
+			{
+				name: 'Audio files',
+				href: '/phonometry/io/',
+				summary: 'Measurement audio in and out: calibrated reading, provenance, streaming, BWF writing, lossless conversion.',
+				standards: ['EBU Tech 3285', 'ITU-R BS.2088'],
 			},
 			{
 				name: 'Hearing and perception',
@@ -328,7 +334,7 @@ export const es: HomeContent = {
 	},
 	coverage: {
 		title: 'Qué abarca',
-		lead: `Diez áreas, ${guides} guías y ${apiPages} páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.`,
+		lead: `Once áreas, ${guides} guías y ${apiPages} páginas de referencia de la API. Cada fila enlaza al índice del área; las designaciones son las normas realmente implementadas ahí, no una lista de lecturas.`,
 		headers: ['Área', 'Normas implementadas'],
 		areas: [
 			{
@@ -336,6 +342,12 @@ export const es: HomeContent = {
 				href: '/phonometry/es/signals/',
 				summary: 'Bancos de filtros, ponderaciones, niveles, espectros, calibración e incertidumbre.',
 				standards: ['IEC 61260-1', 'ANSI S1.11', 'IEC 61672-1', 'ISO 7196', 'IEC 61252', 'ISO 1996-1', 'IEC 60942', 'GUM'],
+			},
+			{
+				name: 'Archivos de audio',
+				href: '/phonometry/es/io/',
+				summary: 'Audio de medición de entrada y salida: lectura calibrada, procedencia, flujo por bloques, escritura BWF, conversión sin pérdidas.',
+				standards: ['EBU Tech 3285', 'ITU-R BS.2088'],
 			},
 			{
 				name: 'Audición y percepción',

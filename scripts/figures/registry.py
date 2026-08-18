@@ -264,6 +264,7 @@ from .fields import (
     animate_standing_wave_tube,
 )
 from .i18n import set_lang
+from .io import generate_signal_provenance
 from .materials import (
     generate_absorber_stack_geometry,
     generate_absorption_rating,
@@ -587,6 +588,9 @@ _FIGURE_FUNCS: tuple[Callable[[str], None], ...] = (
     generate_calibration_stability,
     generate_calibration_narrowband_bias,
     generate_dbfs_versus_spl,
+    # The audio-files guide: the calibrated waveform a measurement WAV comes
+    # back as, next to the bext provenance card that arrived with it.
+    generate_signal_provenance,
     generate_sel_concept,
     generate_ballistics_vs_duration,
     # Filter banks: the z-plane behind the multirate design, and the cascade

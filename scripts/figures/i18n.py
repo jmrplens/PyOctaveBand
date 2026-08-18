@@ -4610,6 +4610,26 @@ _ES_EXACT = {
     "height above the plate [m]": "altura sobre la placa [m]",
     "distance along the plate [m]": "distancia a lo largo de la placa [m]",
     "the whole plate is driven": "se excita la placa entera",
+    # The audio-files guide (signal_provenance): the provenance card next to
+    # the calibrated waveform. Values are deterministic (the generator writes
+    # and reads back a fixed file), so exact rows cover them; "Calibration"
+    # already has a row above.
+    "The samples, back in pascals": "Las muestras, de vuelta en pascales",
+    "What travelled with them": "Lo que viajó con ellas",
+    "File": "Archivo",
+    "Container": "Contenedor",
+    "Sample rate": "Frecuencia de muestreo",
+    "Recorded by": "Grabado por",
+    "Recorded on": "Grabado el",
+    "First sample (since midnight)": "Primera muestra (desde medianoche)",
+    "Coding history": "Historial de codificación",
+    "WAV, 24-bit PCM": "WAV, PCM de 24 bits",
+    "Hand-held class 1 analyzer": "Analizador de mano de clase 1",
+    "2026-06-21 at 02:37:05": "2026-06-21 a las 02:37:05",
+    "452 400 000 samples": "452 400 000 muestras",
+    "+ 1 line appended by write()": "+ 1 línea añadida por write()",
+    "20.0 Pa at full scale, from the sidecar":
+        "20,0 Pa a fondo de escala, del sidecar",
 }
 
 _ES_PATTERNS = [

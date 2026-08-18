@@ -51,7 +51,7 @@ export const topics = [
       // only helps a reader who already knows which subject owns their job;
       // this row is the same library indexed by the job instead.
       { slug: 'start/tasks', label: 'What do you need to measure?', translations: { es: '¿Qué necesitas medir?' } },
-      // The map of the ten topics. A sibling entry point rather than a parent:
+      // The map of the eleven topics. A sibling entry point rather than a parent:
       // the area overviews stay the breadcrumb ancestors of their own guides.
       { slug: 'start/guides', label: 'All guides', translations: { es: 'Todas las guías' } },
       'start/why-phonometry',
@@ -119,6 +119,16 @@ export const topics = [
         ],
       },
       apiGroup('filters', 'signals', 'metrology'),
+    ],
+  },
+  {
+    id: 'io',
+    label: { en: 'Audio files', es: 'Archivos de audio' },
+    link: '/io/',
+    items: [
+      { slug: 'io', label: 'Overview', translations: { es: 'Resumen' } },
+      'io/audio-files',
+      apiGroup('io'),
     ],
   },
   {

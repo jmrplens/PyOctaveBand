@@ -60,6 +60,12 @@ La referencia de la API se genera a partir de los docstrings del código (en ing
 | [`metrology.uncertainty`](/phonometry/reference/api/metrology/uncertainty/) | Measurement uncertainty by the GUM and its Monte Carlo supplement. |
 | [`metrology.data_qualification`](/phonometry/reference/api/metrology/data-qualification/) | Random-data qualification: stationarity tests and Rice crossing statistics. |
 
+## Audio files
+
+| Module | Summary |
+| :--- | :--- |
+| [`io`](/phonometry/reference/api/io/io/) | Measurement audio files: read, write, stream and convert without touching a level. |
+
 ## Psychoacoustics
 
 | Module | Summary |

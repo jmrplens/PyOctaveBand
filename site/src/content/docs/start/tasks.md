@@ -20,6 +20,7 @@ it.
 |---|---|
 | I have a WAV recording and I need A-weighted levels, $L_\mathrm{Aeq}$ and the percentile levels | [Build a sound level meter](/phonometry/signals/sound-level-meter/) — IEC 61672-1 and IEC 61260-1, the whole chain on one runnable page, from the calibrator tone to the class check of every stage |
 | My numbers are not in pascals and I do not know what they are | [Calibration and dBFS](/phonometry/signals/metrology/calibration/) — the calibrator tone, the sensitivity in pascals per digital unit, the pre/post drift rule and the digital dBFS alternative |
+| My file is the meter's own WAV: 24-bit, multichannel, or an overnight RF64, and I want it read and written without touching the level | [Reading and writing measurement audio](/phonometry/io/audio-files/) — the calibrated `Signal`, the `bext` provenance, streaming, BWF writing and the calibration sidecar |
 | I need a spectrum rather than a level | [Filter Banks](/phonometry/signals/filters/filter-banks/) for band levels (IEC 61260-1), [Spectral analysis](/phonometry/signals/spectra/spectral-analysis/) for a density estimate |
 
 ## Rooms and buildings
