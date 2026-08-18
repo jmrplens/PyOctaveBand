@@ -872,7 +872,10 @@ def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
     """
     counts = np.zeros(spreadings.shape[0], dtype=np.int_)
     for i, row in enumerate(spreadings):
-        signs = np.sign(row[row != 0.0])
+        # Exact nonzero mask, deliberately: only the launch sample is q = 0 by
+        # construction, and a tolerance would count the small real spreadings
+        # either side of a caustic as zeros and miss their sign change.
+        signs = np.sign(row[row.astype(bool)])
         counts[i] = int(np.count_nonzero(np.diff(signs)))
     return counts
 
@@ -1079,7 +1082,11 @@ def eigenrays(
             lo[bad], hi[bad] = wide_lo, wide_hi
             f_lo[bad] = wide.positions[:bad.size, -1] - z_rec
             f_hi[bad] = wide.positions[bad.size:, -1] - z_rec
-        exact_lo, exact_hi = f_lo == 0.0, f_hi == 0.0
+        # An endpoint whose marched depth lands on the receiver to the last
+        # bit *is* the eigenray; the zero test is exact (a nonzero mask,
+        # inverted) because any tolerance would promote near-misses to roots
+        # and close their brackets before the bisection has refined them.
+        exact_lo, exact_hi = ~f_lo.astype(bool), ~f_hi.astype(bool)
         keep = (np.sign(f_lo) * np.sign(f_hi) < 0.0) | exact_lo | exact_hi
         lo, hi, f_lo = lo[keep], hi[keep], f_lo[keep]
         exact_lo, exact_hi = exact_lo[keep], exact_hi[keep]
@@ -1095,7 +1102,11 @@ def eigenrays(
                 z_prof, c_prof, source_depth=zs, thetas=mid,
                 receiver_range=r_rec, n_steps=ns).positions[:, -1] - z_rec
             s_mid = np.sign(f_mid)
-            hit = (s_mid == 0.0) & open_
+            # A midpoint landing exactly on the receiver depth is a root the
+            # march itself certified; the exact test (sign code zero, taken as
+            # an inverted nonzero mask) keeps it, where a tolerance would
+            # declare roots the marcher never confirmed.
+            hit = ~s_mid.astype(bool) & open_
             same = (s_mid == s_lo) & open_ & ~hit
             lo = np.where(hit | same, mid, lo)
             hi = np.where(hit | (open_ & ~same), mid, hi)
@@ -1680,7 +1691,11 @@ def _fold_images(
     d_col = fold.depths[cols][:, None]
     m_col = fold.slopes[cols][:, None]
     r_col = fold.ranges[cols][:, None]
-    sloped = m_col != 0.0
+    # Exact nonzero mask: a level facet has slope exactly 0.0 by construction
+    # (the polyline's own differences, or the level clamp past its ends), and
+    # a tolerance would fold gently sloping facets as if they were flat --
+    # small slopes are what a finely sampled bathymetry is made of.
+    sloped = m_col.astype(bool)
     z_flat = 2.0 * wrap * d_col + side * zr[None, :]
     # Distance from the local apex to the column along the surface, guarded
     # where the facet is level (the apex is then at infinity and the flat
@@ -1730,7 +1745,10 @@ def _fold_margins(
     """
     d_col = fold.depths
     m_col = fold.slopes
-    sloped = m_col != 0.0
+    # The same exact nonzero mask as :func:`_fold_images`, for the same
+    # physics: level means slope exactly 0.0, and a tolerance would hand a
+    # gently sloping column the flat ladder's floor it is not entitled to.
+    sloped = m_col.astype(bool)
     span = d_col if side > 0.0 else 2.0 * d_col
     flat_margin = np.abs(2.0 * wrap * d_col) - span
     beta = np.arctan(np.abs(m_col))
