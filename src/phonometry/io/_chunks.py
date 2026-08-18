@@ -263,8 +263,9 @@ class BroadcastMetadata:
       absolute instant of the file's first sample at single-sample
       resolution, which is what ties an environmental recording to wall
       time. Divide by the sample rate for seconds since midnight.
-    * The five v2 loudness fields are stored on disk as
-      ``int16 = round(100 x value)`` (LUFS for the loudness values and
+    * The five v2 loudness fields are stored on disk as the int16 of
+      100 x value rounded with ties away from zero, the Tech 3285 2.4
+      rule (LUFS for the loudness values and
       maxima, LU for the range, dBTP for the true peak); they are returned
       already divided by 100. Tech 3285 fills an unset field with 0x7FFF,
       which is returned as ``None``, as are all five for ``version < 2``

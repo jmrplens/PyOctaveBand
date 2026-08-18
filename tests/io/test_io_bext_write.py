@@ -17,6 +17,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import reference_data as ref
 
 from phonometry import __version__
 from phonometry.broadcast import program_loudness
@@ -192,6 +193,26 @@ def test_loudness_encoding_pins_its_edges() -> None:
     assert _encode_loudness(327.67) == 0x7FFE        # clamps off the sentinel
     assert _encode_loudness(float("-inf")) == -32768  # digital silence
     assert _encode_loudness(-400.0) == -32768
+
+
+@pytest.mark.parametrize(
+    ("value", "carried_decimal", "carried_hex"), ref.TECH3285_LOUDNESS_EXAMPLES
+)
+def test_loudness_encoding_reproduces_the_tech3285_worked_examples(
+    value: float, carried_decimal: int, carried_hex: int
+) -> None:
+    """The six printed 2.4 example rows, down to the carried hexadecimal.
+
+    These pin the tie behaviour: Tech 3285 rounds half away from zero, so
+    -22.645 carries F727h and 12.765 carries 04FDh - and both of those
+    products land exactly on a representable .5 in float64, so a
+    round-half-to-even encoder really does miss the printed value by one
+    code. (The tables' guard test recomputes the same rows from the
+    printed formula in decimal arithmetic.)
+    """
+    encoded = _encode_loudness(value)
+    assert encoded == carried_decimal
+    assert encoded & 0xFFFF == carried_hex
 
 
 # ---------------------------------------------------------------------------
