@@ -64,6 +64,10 @@ from __future__ import annotations
 import struct
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import BinaryIO
 
 #: RIFF format tags (``wFormatTag`` in ``fmt``, from Microsoft ``mmreg.h``).
 WAVE_FORMAT_PCM = 0x0001
@@ -469,6 +473,105 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
     return tuple(points)
 
 
+def _parse_ds64(payload: bytes, path: str | Path) -> Ds64Chunk:
+    """Decode the three mandatory 64-bit sizes of a ``ds64`` chunk."""
+    if len(payload) < 24:
+        raise ValueError(
+            f"{path}: ds64 chunk is {len(payload)} bytes; the "
+            "riffSize, dataSize and sampleCount fields require 24"
+        )
+    riff_size, chunk_data_size, sample_count = struct.unpack_from(
+        "<QQQ", payload
+    )
+    return Ds64Chunk(
+        riff_size=riff_size,
+        data_size=chunk_data_size,
+        sample_count=sample_count,
+    )
+
+
+def _parse_fact(payload: bytes, path: str | Path) -> int:
+    """Decode the ``fact`` chunk's single uint32 frame count."""
+    if len(payload) < 4:
+        raise ValueError(
+            f"{path}: fact chunk is {len(payload)} bytes; its "
+            "uint32 frame count requires 4"
+        )
+    (fact_frames,) = struct.unpack_from("<I", payload)
+    return int(fact_frames)
+
+
+def _read_wave_header(fh: BinaryIO, path: str | Path) -> str:
+    """Check the 12-byte RIFF prelude and name the container it declares."""
+    header = fh.read(12)
+    if len(header) < 12 or header[8:12] != b"WAVE":
+        raise ValueError(f"{path}: not a WAVE file")
+    fourcc = header[:4]
+    containers = {b"RIFF": "WAV", b"RF64": "RF64", b"BW64": "BW64"}
+    if fourcc not in containers:
+        raise ValueError(
+            f"{path}: unknown container fourcc {fourcc!r} "
+            "(expected RIFF, RF64 or BW64)"
+        )
+    return containers[fourcc]
+
+
+def _read_chunk_payload(
+    fh: BinaryIO, chunk_id: bytes, size: int, path: str | Path
+) -> bytes:
+    """Read one chunk's payload whole, honouring RIFF word alignment."""
+    payload = fh.read(size)
+    if len(payload) < size:
+        raise ValueError(
+            f"{path}: chunk {chunk_id!r} claims {size} bytes but the "
+            f"file ends after {len(payload)}"
+        )
+    if size % 2:
+        fh.seek(1, 1)  # chunks are word-aligned; the pad byte is not counted
+    return payload
+
+
+def _true_data_size(
+    size: int, container: str, ds64: Ds64Chunk | None, path: str | Path
+) -> int:
+    """Resolve the ``data`` size, through ``ds64`` for the RF64 sentinel."""
+    if size != 0xFFFFFFFF or container == "WAV":
+        return size
+    if ds64 is None:
+        raise ValueError(
+            f"{path}: RF64 data chunk defers its size to a "
+            "ds64 chunk that never appeared"
+        )
+    return ds64.data_size
+
+
+@dataclass
+class _WalkedChunks:
+    """The non-``data`` chunks gathered so far, mutable while walking."""
+
+    fmt: FormatChunk | None = None
+    ds64: Ds64Chunk | None = None
+    bext: BroadcastMetadata | None = None
+    fact_frames: int | None = None
+    cue_points: tuple[CuePoint, ...] = ()
+    has_ixml: bool = False
+
+    def absorb(self, chunk_id: bytes, payload: bytes, path: str | Path) -> None:
+        """Decode one chunk into its slot; unknown kinds pass in silence."""
+        if chunk_id == b"fmt ":
+            self.fmt = _parse_fmt(payload)
+        elif chunk_id == b"ds64":
+            self.ds64 = _parse_ds64(payload, path)
+        elif chunk_id == b"bext":
+            self.bext = _parse_bext(payload)
+        elif chunk_id == b"fact":
+            self.fact_frames = _parse_fact(payload, path)
+        elif chunk_id == b"cue ":
+            self.cue_points = _parse_cue(payload)
+        elif chunk_id == b"iXML":
+            self.has_ixml = True
+
+
 def parse_wav_chunks(path: str | Path) -> WavChunks:
     """Walk a WAV/BWF/RF64/BW64 file's chunks without reading the samples.
 
@@ -487,28 +590,12 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
         mandatory chunk is missing or malformed, or an RF64 file lacks the
         ``ds64`` its data size lives in.
     """
-    fmt: FormatChunk | None = None
-    ds64: Ds64Chunk | None = None
-    bext: BroadcastMetadata | None = None
-    fact_frames: int | None = None
-    cue_points: tuple[CuePoint, ...] = ()
-    has_ixml = False
+    seen = _WalkedChunks()
     data_offset: int | None = None
     data_size: int | None = None
 
     with Path(path).open("rb") as fh:
-        header = fh.read(12)
-        if len(header) < 12 or header[8:12] != b"WAVE":
-            raise ValueError(f"{path}: not a WAVE file")
-        fourcc = header[:4]
-        containers = {b"RIFF": "WAV", b"RF64": "RF64", b"BW64": "BW64"}
-        if fourcc not in containers:
-            raise ValueError(
-                f"{path}: unknown container fourcc {fourcc!r} "
-                "(expected RIFF, RF64 or BW64)"
-            )
-        container = containers[fourcc]
-
+        container = _read_wave_header(fh, path)
         while True:
             chunk_header = fh.read(8)
             if len(chunk_header) < 8:
@@ -516,68 +603,28 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
             chunk_id = chunk_header[:4]
             (size,) = struct.unpack("<I", chunk_header[4:])
             if chunk_id == b"data":
-                if size == 0xFFFFFFFF and container != "WAV":
-                    if ds64 is None:
-                        raise ValueError(
-                            f"{path}: RF64 data chunk defers its size to a "
-                            "ds64 chunk that never appeared"
-                        )
-                    size = ds64.data_size
+                size = _true_data_size(size, container, seen.ds64, path)
                 data_offset = fh.tell()
                 data_size = size
                 # Seek, never read: the payload may be gigabytes.
                 fh.seek(size + size % 2, 1)
                 continue
-            payload = fh.read(size)
-            if len(payload) < size:
-                raise ValueError(
-                    f"{path}: chunk {chunk_id!r} claims {size} bytes but the "
-                    f"file ends after {len(payload)}"
-                )
-            if size % 2:
-                fh.seek(1, 1)  # chunks are word-aligned; the pad byte is not counted
-            if chunk_id == b"fmt ":
-                fmt = _parse_fmt(payload)
-            elif chunk_id == b"ds64":
-                if len(payload) < 24:
-                    raise ValueError(
-                        f"{path}: ds64 chunk is {len(payload)} bytes; the "
-                        "riffSize, dataSize and sampleCount fields require 24"
-                    )
-                riff_size, chunk_data_size, sample_count = struct.unpack_from(
-                    "<QQQ", payload
-                )
-                ds64 = Ds64Chunk(
-                    riff_size=riff_size,
-                    data_size=chunk_data_size,
-                    sample_count=sample_count,
-                )
-            elif chunk_id == b"bext":
-                bext = _parse_bext(payload)
-            elif chunk_id == b"fact":
-                if len(payload) < 4:
-                    raise ValueError(
-                        f"{path}: fact chunk is {len(payload)} bytes; its "
-                        "uint32 frame count requires 4"
-                    )
-                (fact_frames,) = struct.unpack_from("<I", payload)
-            elif chunk_id == b"cue ":
-                cue_points = _parse_cue(payload)
-            elif chunk_id == b"iXML":
-                has_ixml = True
+            seen.absorb(
+                chunk_id, _read_chunk_payload(fh, chunk_id, size, path), path
+            )
 
-    if fmt is None:
+    if seen.fmt is None:
         raise ValueError(f"{path}: no fmt chunk found")
     if data_offset is None or data_size is None:
         raise ValueError(f"{path}: no data chunk found")
     return WavChunks(
         container=container,
-        fmt=fmt,
+        fmt=seen.fmt,
         data_offset=data_offset,
         data_size=data_size,
-        ds64=ds64,
-        bext=bext,
-        fact_frames=fact_frames,
-        cue_points=cue_points,
-        has_ixml=has_ixml,
+        ds64=seen.ds64,
+        bext=seen.bext,
+        fact_frames=seen.fact_frames,
+        cue_points=seen.cue_points,
+        has_ixml=seen.has_ixml,
     )
