@@ -261,6 +261,89 @@ def test_info_describes_headers_without_the_samples(tmp_path: Path) -> None:
     assert described.cue_points[0].sample_offset == 7
 
 
+def _forged_full_bext() -> bytes:
+    """A v2 bext payload with every field set, at its Tech 3285 offset.
+
+    Assembled by hand, independently of the reader's struct, so the test
+    is a second transcription of the field table: description at 0,
+    originator at 256, reference at 288, date at 320, time at 330, the
+    64-bit TimeReference split into its two 32-bit halves at 338/342
+    (the value used here does not fit 32 bits, so joining the halves is
+    actually exercised), version at 346, and the five R128 loudness
+    int16s (value x100) from 412, one left at the 0x7FFF unset sentinel.
+    """
+    buf = bytearray(602)
+    buf[0:11] = b"Facade SW-2"
+    buf[256:263] = b"XL2 rig"
+    buf[288:298] = b"serial-042"
+    buf[320:330] = b"2026-08-17"
+    buf[330:338] = b"23:59:58"
+    tref = 5_000_000_000
+    struct.pack_into("<II", buf, 338, tref & 0xFFFFFFFF, tref >> 32)
+    struct.pack_into("<H", buf, 346, 2)
+    struct.pack_into("<h", buf, 412, -2310)  # loudness_value, -23.10 LUFS
+    struct.pack_into("<h", buf, 414, 520)  # loudness_range, 5.20 LU
+    struct.pack_into("<h", buf, 416, 0x7FFF)  # max_true_peak_level: unset
+    struct.pack_into("<h", buf, 418, -1990)  # max_momentary_loudness
+    struct.pack_into("<h", buf, 420, -2110)  # max_short_term_loudness
+    return bytes(buf)
+
+
+def test_info_answers_a_giant_rf64_from_its_headers_alone(
+    tmp_path: Path,
+) -> None:
+    """The description of an unreadable overnight RF64 costs only headers.
+
+    The forged file claims three billion stereo frames (12 GB of data,
+    about 17 hours) through a real ``ds64``, carries a fully populated v2
+    ``bext``, and then simply ends: not one sample byte exists. ``info``
+    must still describe everything -- if it touched the data even once it
+    would fail exactly as ``read`` does below -- which is the property
+    that lets a survey tool catalogue a disk of overnight recordings
+    without decoding a second of audio.
+    """
+    frames = 3_000_000_000
+    data_bytes = frames * 4  # 16-bit stereo: block_align = 4
+    riff_size = 12 + (8 + 28) + (8 + 40) + (8 + 602) + 8 + data_bytes
+    image = riff_wave(
+        chunk(b"ds64", struct.pack("<QQQI", riff_size, data_bytes, frames, 0)),
+        chunk(b"fmt ", fmt_payload(channels=2, bits=16)),
+        chunk(b"bext", _forged_full_bext()),
+        b"data" + struct.pack("<I", 0xFFFFFFFF),  # header only, no payload
+        fourcc=b"RF64",
+    )
+    path = _write(tmp_path, image, "overnight.wav")
+
+    described = info(path)
+    assert described.container == "RF64"
+    assert described.format_name == "PCM"
+    assert described.fs == FS
+    assert described.channels == 2
+    assert described.frames == frames
+    assert described.duration == pytest.approx(frames / FS)
+    assert described.bit_depth == 16
+    assert not described.lossy
+
+    bext = described.bext
+    assert bext is not None
+    assert bext.description == "Facade SW-2"
+    assert bext.originator == "XL2 rig"
+    assert bext.originator_reference == "serial-042"
+    assert bext.origination_date == "2026-08-17"
+    assert bext.origination_time == "23:59:58"
+    assert bext.time_reference == 5_000_000_000
+    assert bext.version == 2
+    assert bext.loudness_value == pytest.approx(-23.10)
+    assert bext.loudness_range == pytest.approx(5.20)
+    assert bext.max_true_peak_level is None  # the 0x7FFF sentinel
+    assert bext.max_momentary_loudness == pytest.approx(-19.90)
+    assert bext.max_short_term_loudness == pytest.approx(-21.10)
+
+    # The proof that no sample was touched: touching them is impossible.
+    with pytest.raises(ValueError):
+        read(path)
+
+
 # ---------------------------------------------------------------------------
 # Dispatch: magic bytes, missing extra, unknown files
 # ---------------------------------------------------------------------------
