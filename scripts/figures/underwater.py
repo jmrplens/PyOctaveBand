@@ -908,9 +908,11 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
     c_prof = c0 / np.sqrt(1.0 + 2.4 * z_prof / c0)
     freq, z_src, r_max = 600.0, 992.5, 2500.0
 
+    from phonometry import BeamFan
+
     beams = gaussian_beams(freq, z_prof, c_prof, source_depth=z_src,
                            max_range=r_max, range_step=12.5,
-                           max_angle_deg=45.0, n_depth_points=400)
+                           fan=BeamFan(max_angle_deg=45.0), n_depth_points=400)
     pl = np.asarray(beams.propagation_loss, dtype=float)
     ranges = np.asarray(beams.ranges, dtype=float)
     depths = np.asarray(beams.depths, dtype=float)

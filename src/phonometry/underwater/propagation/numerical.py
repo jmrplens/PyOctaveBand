@@ -103,11 +103,11 @@ def _clean_profile(
 
 
 def _clean_bathymetry(
-    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None,
-    bathymetry_depths_m: NDArray[np.float64] | list[float] | None,
+    bathymetry: tuple[NDArray[np.float64] | list[float],
+                      NDArray[np.float64] | list[float]] | None,
     z_prof: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
-    """One validated depth(r) polyline out of the pair of arrays, or ``None``.
+    """One validated depth(r) polyline out of the node pair, or ``None``.
 
     The polyline is clamped level beyond its last node (the same
     :func:`numpy.interp` convention the sound-speed profile lives by), so it
@@ -116,70 +116,87 @@ def _clean_bathymetry(
     dive below the profile's last node, because the profile *is* the medium
     and a bottom below it would put water where no sound speed was given.
     """
-    if bathymetry_ranges_m is None and bathymetry_depths_m is None:
+    if bathymetry is None:
         return None
-    if bathymetry_ranges_m is None or bathymetry_depths_m is None:
+    pair = tuple(bathymetry)
+    if len(pair) != 2 or pair[0] is None or pair[1] is None:
         raise ValueError(
-            "'bathymetry_ranges_m' and 'bathymetry_depths_m' describe one"
-            " bottom profile and must be passed together.")
-    br = np.asarray(bathymetry_ranges_m, dtype=np.float64).ravel()
-    bd = np.asarray(bathymetry_depths_m, dtype=np.float64).ravel()
+            "'bathymetry' must be a (ranges_m, depths_m) pair of arrays.")
+    br = np.asarray(pair[0], dtype=np.float64).ravel()
+    bd = np.asarray(pair[1], dtype=np.float64).ravel()
     if br.size < 2 or bd.shape != br.shape:
         raise ValueError(
-            "'bathymetry_ranges_m' and 'bathymetry_depths_m' must be 1-D"
+            "the two halves of 'bathymetry' must be 1-D"
             " arrays of equal length, at least two points.")
     if not (np.all(np.isfinite(br)) and np.all(np.isfinite(bd))):
         raise ValueError("the bathymetry must be finite.")
     if np.any(np.diff(br) <= 0.0):
-        raise ValueError("'bathymetry_ranges_m' must be strictly increasing.")
+        raise ValueError("the bathymetry ranges must be strictly increasing.")
     if abs(float(br[0])) > 1e-9:
-        raise ValueError("'bathymetry_ranges_m' must start at the source, r = 0.")
+        raise ValueError("the bathymetry must start at the source, r = 0.")
     if np.any(bd <= 0.0):
         raise ValueError(
-            "'bathymetry_depths_m' must be strictly positive: the wedge apex"
+            "the bathymetry depths must be strictly positive: the wedge apex"
             " itself, where the water ends, cannot carry a water column.")
     if float(bd.max()) > float(z_prof[-1]) + 1e-9:
         raise ValueError(
-            "'bathymetry_depths_m' must not run below the sound-speed"
+            "the bathymetry depths must not run below the sound-speed"
             " profile: the profile is the medium, so it must reach the"
             " deepest point of the bottom.")
     return br, bd
 
 
-def _resolve_boundary(
-    bottom: str, seabed_density: float | None, seabed_sound_speed: float | None,
-    density: float,
-) -> tuple[str, tuple[float, float, float] | None]:
-    """One bottom description out of the two ways a caller may give one.
+@dataclass(frozen=True)
+class FluidSeabed:
+    r"""A lossy fluid seabed, passed as the ``bottom`` of a solver.
 
-    ``bottom`` names a perfect reflector; the ``seabed_density`` /
-    ``seabed_sound_speed`` pair names the lossy fluid half-space of
-    :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`.
-    They describe the same boundary, so the pair must arrive whole and must not
-    arrive alongside ``bottom="rigid"``. Returns the validated bottom key and
-    the ``(water_density, sediment_density, sediment_speed)`` triple, or
-    ``None`` for a perfect reflector. Shared by :func:`gaussian_beams` and
-    :func:`eigenrays`, which charge the same coefficient to different carriers
-    (a beam's running product there, an arrival's amplitude here).
+    The fluid half-space of
+    :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+    under the water column: handing one to :func:`eigenrays` or
+    :func:`gaussian_beams` as ``bottom=`` replaces the perfect reflector with
+    the Rayleigh interface, and every bottom touch of a path is charged the
+    complex coefficient at the one grazing angle Snell's invariant fixes for
+    it. The water's own sound speed at the interface comes from the
+    sound-speed profile, so it is not repeated here.
+
+    :ivar density: Sediment density :math:`\rho_2`, in the same unit as
+        ``water_density`` (kg/m³ by convention; only the ratio enters).
+    :ivar sound_speed: Sediment sound speed :math:`c_2`, in m/s. A sediment
+        faster than the water at the bottom has a critical grazing angle,
+        below which the reflection is total in magnitude and lossy in phase
+        alone.
+    :ivar water_density: Water density :math:`\rho_1` above the seabed
+        (default 1000 kg/m³). It enters only through the impedance ratio,
+        the fields themselves being density-normalised already.
     """
+
+    density: float
+    sound_speed: float
+    water_density: float = 1000.0
+
+
+def _resolve_boundary(
+    bottom: str | FluidSeabed,
+) -> tuple[str, tuple[float, float, float] | None]:
+    """One bottom description, whichever of its two forms the caller wrote.
+
+    ``bottom`` either names a perfect reflector or is the
+    :class:`FluidSeabed` of a lossy fluid half-space. Returns the validated
+    bottom key and the ``(water_density, sediment_density, sediment_speed)``
+    triple, or ``None`` for a perfect reflector. Shared by
+    :func:`gaussian_beams` and :func:`eigenrays`, which charge the same
+    coefficient to different carriers (a beam's running product there, an
+    arrival's amplitude here).
+    """
+    if isinstance(bottom, FluidSeabed):
+        return "pressure-release", (
+            require_positive(bottom.water_density, "water_density"),
+            require_positive(bottom.density, "density"),
+            require_positive(bottom.sound_speed, "sound_speed"))
     key = bottom.strip().lower()
     if key not in _BOTTOM_TYPES:
         raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
-    seabed: tuple[float, float, float] | None = None
-    if seabed_density is not None or seabed_sound_speed is not None:
-        if seabed_density is None or seabed_sound_speed is None:
-            raise ValueError(
-                "'seabed_density' and 'seabed_sound_speed' describe one fluid"
-                " seabed and must be passed together.")
-        if key != "pressure-release":
-            raise ValueError(
-                "'bottom' and the seabed pair are two descriptions of the same"
-                " boundary; leave 'bottom' at its default when passing a fluid"
-                " seabed.")
-        seabed = (require_positive(density, "density"),
-                  require_positive(seabed_density, "seabed_density"),
-                  require_positive(seabed_sound_speed, "seabed_sound_speed"))
-    return key, seabed
+    return key, None
 
 
 def _seabed_grazing_deg(
@@ -576,8 +593,8 @@ def ray_trace(
     launch_angles_deg: NDArray[np.float64] | list[float],
     max_range: float = 10_000.0,
     n_steps: int = 2000,
-    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
-    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
+    bathymetry: tuple[NDArray[np.float64] | list[float],
+                      NDArray[np.float64] | list[float]] | None = None,
 ) -> RayTraceResult:
     r"""Trace acoustic rays through a range-independent sound-speed profile.
 
@@ -585,8 +602,8 @@ def ray_trace(
     fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
     surface (``z = 0``) and the bottom (``z = water_depth``).
 
-    **The bottom may slope.** Passing the ``bathymetry_ranges_m`` /
-    ``bathymetry_depths_m`` pair replaces the level bottom with a
+    **The bottom may slope.** Passing the ``bathymetry`` pair replaces the
+    level bottom with a
     piecewise-linear depth profile ``depth(r)``, the faceted boundary model of
     Jensen Fig. 3.20, and the first range dependence in this module; the
     sound-speed profile stays range independent (see the scope note below).
@@ -641,22 +658,20 @@ def ray_trace(
         (positive downward).
     :param max_range: Maximum horizontal range to trace, in metres.
     :param n_steps: Number of integration steps per ray.
-    :param bathymetry_ranges_m: Node ranges of a piecewise-linear bottom
-        profile, in metres, strictly increasing from ``r = 0``; level past the
-        last node. Default (``None``): the level bottom at the profile's last
-        depth. Passed together with ``bathymetry_depths_m``.
-    :param bathymetry_depths_m: Bottom depth at each node, in metres, strictly
-        positive and never below the sound-speed profile's last depth
-        (``None`` likewise).
+    :param bathymetry: A ``(ranges_m, depths_m)`` pair of arrays describing a
+        piecewise-linear bottom profile: node ranges in metres, strictly
+        increasing from ``r = 0`` and level past the last node, with the
+        bottom depth at each node in metres, strictly positive and never
+        below the sound-speed profile's last depth. Default (``None``): the
+        level bottom at the profile's last depth.
     :return: A :class:`RayTraceResult`.
     :raises ValueError: If the inputs are invalid.
     """
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
-    bathymetry = _clean_bathymetry(bathymetry_ranges_m, bathymetry_depths_m,
-                                   z_prof)
+    bathy = _clean_bathymetry(bathymetry, z_prof)
     water_depth = float(z_prof[-1])
-    depth_at_source = (water_depth if bathymetry is None
-                       else float(bathymetry[1][0]))
+    depth_at_source = (water_depth if bathy is None
+                       else float(bathy[1][0]))
     zs = float(source_depth)
     if not (0.0 <= zs <= depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
@@ -680,14 +695,14 @@ def ray_trace(
     # so a reflected ray keeps the order the rest of the path is integrated
     # with; see :mod:`phonometry._internal.rays`.
     upper: float | SlopingBoundary = (
-        water_depth if bathymetry is None else SlopingBoundary(*bathymetry))
+        water_depth if bathy is None else SlopingBoundary(*bathy))
     march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
                        zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
                        n_steps=ns, lower=0.0, upper=upper)
     ray_r = np.broadcast_to(ranges, march.positions.shape).copy()
 
     ray_z, ray_t, ray_s = march.positions, march.times, march.arc_lengths
-    if bathymetry is not None and march.stopped_columns is not None and np.any(
+    if bathy is not None and march.stopped_columns is not None and np.any(
             march.stopped_columns < ns):
         # A terminated ray's samples from the stopping bounce on are frozen at
         # a point that is not on those columns' own ranges; NaN says "the ray
@@ -713,8 +728,8 @@ def ray_trace(
         water_depth=water_depth,
         profile_depths=z_prof,
         profile_speeds=c_prof,
-        bathymetry_ranges=None if bathymetry is None else bathymetry[0],
-        bathymetry_depths=None if bathymetry is None else bathymetry[1],
+        bathymetry_ranges=None if bathy is None else bathy[0],
+        bathymetry_depths=None if bathy is None else bathy[1],
     )
 
 
@@ -1013,10 +1028,7 @@ def eigenrays(
     *,
     receiver_range: float,
     receiver_depth: float,
-    bottom: str = "pressure-release",
-    seabed_density: float | None = None,
-    seabed_sound_speed: float | None = None,
-    density: float = 1000.0,
+    bottom: str | FluidSeabed = "pressure-release",
     max_arrivals: int = 64,
     n_steps: int | None = None,
 ) -> EigenrayResult:
@@ -1068,8 +1080,8 @@ def eigenrays(
     * :math:`(-1)^{n_\mathrm{s}}` and :math:`\mathcal{R}^{n_b}` are
       Eqs. (3.125)-(3.126) applied at every boundary touch, collapsed to
       powers because Snell's invariant fixes one crossing angle per ray at a
-      flat boundary. With the ``seabed_density`` / ``seabed_sound_speed``
-      pair, :math:`\mathcal{R}` is the Rayleigh coefficient of
+      flat boundary. With a :class:`FluidSeabed` as the ``bottom``,
+      :math:`\mathcal{R}` is the Rayleigh coefficient of
       :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
       at that angle, **not conjugated**: that function returns the
       coefficient in the :math:`e^{-i\omega t}` convention these amplitudes
@@ -1112,20 +1124,13 @@ def eigenrays(
     :param receiver_range: Receiver range, in metres, within the traced range.
     :param receiver_depth: Receiver depth, in metres, strictly inside the
         water column.
-    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``: the
+    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``, the
         perfect reflector whose coefficient (:math:`-1` or :math:`+1`) each
-        bottom touch multiplies into the amplitude. The sea surface is always
-        pressure-release. Superseded by the fluid seabed when the pair below
-        is passed. The choice touches amplitudes only; the geometry, times
-        and angles of the eigenrays are specular either way.
-    :param seabed_density: Sediment density of a lossy fluid seabed (kg/m3 by
-        convention; only the ratio to ``density`` enters), passed together
-        with ``seabed_sound_speed`` and not alongside ``bottom="rigid"``.
-        Default (``None``): the perfect reflector named by ``bottom``.
-    :param seabed_sound_speed: Sediment sound speed of that seabed, in m/s
-        (``None`` likewise).
-    :param density: Water density above the seabed, in kg/m3. Ignored unless
-        the seabed pair is passed.
+        bottom touch multiplies into the amplitude; or a
+        :class:`FluidSeabed`, whose complex Rayleigh coefficient is charged
+        instead. The sea surface is always pressure-release. The choice
+        touches amplitudes only; the geometry, times and angles of the
+        eigenrays are specular either way.
     :param max_arrivals: Most arrivals to return (earliest kept, see above).
     :param n_steps: Range samples per refinement march, receiver column
         included. Default (``None``): the step of ``trace`` itself carried
@@ -1136,8 +1141,7 @@ def eigenrays(
         and not an error.
     :raises ValueError: If the inputs are invalid.
     """
-    key, seabed = _resolve_boundary(bottom, seabed_density, seabed_sound_speed,
-                                    density)
+    key, seabed = _resolve_boundary(bottom)
     if trace.bathymetry_ranges is not None:
         raise ValueError(
             "'trace' was made over a sloping bottom, which this search does"
@@ -1365,7 +1369,7 @@ class GaussianBeamResult:
         number.
     :ivar initial_beam_widths: The :math:`W_0` of Eq. (3.91) actually used by
         each beam of the fan, in metres, shape ``(n_beams,)``. An explicit
-        ``beam_width`` fills it with one value; the default is per launch
+        ``fan.beam_width`` fills it with one value; the default is per launch
         angle (see :func:`_default_beam_widths`), widest on the axis of the
         fan whenever a shallow channel's modal-resolution term is in play and
         flat across it otherwise.
@@ -2302,20 +2306,128 @@ def _beam_receiver_grid(
 
 
 class _Fan(NamedTuple):
-    """The launch fan, in the three forms the beam sum reads it in.
+    """The resolved launch fan, in the forms the beam sum reads it in.
 
-    They are one quantity written three ways and have to agree, which is why
-    they travel together: ``xi`` is the Snell invariant the marcher is handed,
-    and ``dtheta`` is the spacing the weight of Eq. (3.92) integrates over.
+    The first three are one quantity written three ways and have to agree,
+    which is why they travel together: ``xi`` is the Snell invariant the
+    marcher is handed, and ``dtheta`` is the spacing the weight of Eq. (3.92)
+    integrates over. ``width`` rides along because each beam's weight and
+    initial condition both spend it.
 
     :ivar launch: Launch angle of each beam from the horizontal, in radians.
     :ivar xi: ``cos(launch) / c(z_s)``, per beam, in s/m.
     :ivar dtheta: Spacing of the fan, in radians.
+    :ivar width: Initial half-width :math:`W_0` of each beam, in metres.
     """
 
     launch: NDArray[np.float64]
     xi: NDArray[np.float64]
     dtheta: float
+    width: NDArray[np.float64]
+
+
+@dataclass(frozen=True)
+class BeamFan:
+    r"""The launch fan :func:`gaussian_beams` hangs its beams on.
+
+    Aperture, density and initial width travel together because they are one
+    bargain: the overlap condition that sizes the default fan reads the
+    width, and the width's own default is per launch angle. Every field has
+    a default, so ``BeamFan()`` is the stock fan and one field is named to
+    move one lever.
+
+    :ivar max_angle_deg: Half-angle of the fan, in degrees from the
+        horizontal. Beams are spread symmetrically over
+        ``[-max_angle_deg, +max_angle_deg]``.
+    :ivar n_beams: Number of beams in the fan. Default (``None``): from the
+        overlap condition. Adjacent beams are :math:`s\,\delta\theta_0` apart
+        at arc length :math:`s` while each has spread to
+        :math:`W \to s\lambda/(\pi W_0)`, so the condition that they still
+        overlap, :math:`\delta\theta_0 \lesssim \lambda/(\pi W_0)`, is
+        range-independent; the default takes four times that margin. Too
+        coarse a fan shows as a periodic ripple in range at the beam spacing,
+        which is easy to mistake for physical interference.
+    :ivar beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
+        initial half-width, at the :math:`e^{-2}` folding distance in
+        intensity, applied to every beam of the fan when passed. Default
+        (``None``): one width per launch angle, the free-space optimum of
+        each beam's own flight; see :func:`_default_beam_widths`.
+    """
+
+    max_angle_deg: float = 80.0
+    n_beams: int | None = None
+    beam_width: float | None = None
+
+
+@dataclass(frozen=True)
+class VolumeAbsorption:
+    r"""Seawater volume absorption: a model and the water it is evaluated in.
+
+    The same models, spelled the same way, as
+    :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`;
+    :func:`gaussian_beams` evaluates the coefficient once, at the source
+    frequency and the source depth, and charges it along each beam's own arc
+    length (Jensen Eq. 3.116). Passing the bare model name to the solver is
+    the same as passing this class with its defaults.
+
+    :ivar model: ``"francois-garrison"``, ``"ainslie-mccolm"`` or ``"thorp"``.
+    :ivar temperature: Temperature ``T``, in degrees Celsius.
+    :ivar salinity: Salinity ``S``, in parts per thousand.
+    :ivar ph: Acidity (Thorp ignores it always).
+    """
+
+    model: str
+    temperature: float = 10.0
+    salinity: float = 35.0
+    ph: float = 8.0
+
+
+def _resolve_absorption(
+    absorption: str | VolumeAbsorption | None, frequency_hz: float, zs: float,
+) -> tuple[str | None, float]:
+    """The validated model key and its dB/km coefficient at the source."""
+    if absorption is None:
+        return None, 0.0
+    spec = (VolumeAbsorption(absorption) if isinstance(absorption, str)
+            else absorption)
+    key = spec.model.strip().lower()
+    if key not in _ABSORPTION_MODELS:
+        raise ValueError(
+            f"'absorption' must name one of {_ABSORPTION_MODELS} or be None,"
+            f" got {spec.model!r}.")
+    return key, float(seawater_absorption(
+        frequency_hz, temperature=spec.temperature, salinity=spec.salinity,
+        depth=zs, ph=spec.ph, model=key)[0])
+
+
+def _resolve_fan(
+    fan: BeamFan, wavelength: float, rmax: float, water_depth: float,
+    c0: float,
+) -> _Fan:
+    """The concrete fan a :class:`BeamFan` asks for, widths resolved."""
+    theta_max = float(fan.max_angle_deg)
+    if not (0.0 < theta_max < 90.0):
+        raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
+    # The width the fan's density is sized for has to exist before the fan
+    # does, and the overlap condition below must hold for every beam, so it
+    # is the *widest* width of the run: an explicit one applies everywhere,
+    # and both terms of the per-angle default are widest on the axis, so its
+    # maximum is its value at theta_0 = 0.
+    if fan.beam_width is not None:
+        w_fan = require_positive(fan.beam_width, "beam_width")
+    else:
+        w_fan = float(_default_beam_widths(
+            wavelength, rmax, water_depth, np.zeros(1))[0])
+    span = 2.0 * np.radians(theta_max)
+    n_fan = (int(np.ceil(span * 4.0 * np.pi * w_fan / wavelength)) + 1
+             if fan.n_beams is None else int(fan.n_beams))
+    if n_fan < 2:
+        raise ValueError("'n_beams' must be at least 2.")
+    launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
+    w0 = (np.full(n_fan, float(w_fan)) if fan.beam_width is not None
+          else _default_beam_widths(wavelength, rmax, water_depth, launch))
+    return _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]),
+                np.asarray(w0, dtype=np.float64))
 
 
 def gaussian_beams(
@@ -2328,20 +2440,12 @@ def gaussian_beams(
     ranges_m: NDArray[np.float64] | list[float] | None = None,
     receiver_depths_m: NDArray[np.float64] | list[float] | None = None,
     n_depth_points: int = 200,
-    max_angle_deg: float = 80.0,
-    n_beams: int | None = None,
-    beam_width: float | None = None,
+    fan: BeamFan | None = None,
     range_step: float = 25.0,
-    bottom: str = "pressure-release",
-    seabed_density: float | None = None,
-    seabed_sound_speed: float | None = None,
-    density: float = 1000.0,
-    absorption_model: str | None = None,
-    temperature: float = 10.0,
-    salinity: float = 35.0,
-    ph: float = 8.0,
-    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
-    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
+    bottom: str | FluidSeabed = "pressure-release",
+    absorption: str | VolumeAbsorption | None = None,
+    bathymetry: tuple[NDArray[np.float64] | list[float],
+                      NDArray[np.float64] | list[float]] | None = None,
 ) -> GaussianBeamResult:
     r"""Propagation-loss field from Gaussian beam tracing.
 
@@ -2350,7 +2454,8 @@ def gaussian_beams(
     :func:`ray_trace` draws, integrated by the same marcher through the same
     profile; what is added is the dynamic pair :math:`(q, p)` of Eq. (3.58),
     started from the complex conditions of Eq. (3.91) that make each ray the
-    axis of a beam of initial half-width ``beam_width`` and flat wavefront.
+    axis of a beam of initial half-width ``fan.beam_width`` and flat
+    wavefront.
 
     The point of the beams is that the answer stays finite. Ray theory's
     amplitude, Eq. (3.65), divides by the ray-tube spreading, which vanishes on
@@ -2397,7 +2502,8 @@ def gaussian_beams(
       free-space term grows as :math:`\sqrt{r_\mathrm{max}}`, a longer run
       pushes that boundary out rather than in. :func:`parabolic_equation` is
       the solver to reach for close to the source.
-    * **The fan is truncated** at ``max_angle_deg``, and a waveguide with two
+    * **The fan is truncated** at ``fan.max_angle_deg``, and a waveguide with
+      two
       perfectly reflecting boundaries is the worst case for that, because
       nothing but :math:`1/R` attenuates the steep multiple bounces. Measured on
       the ideal 1000 m guide at 300 Hz, source at 300 m and receiver at 600 m,
@@ -2406,7 +2512,7 @@ def gaussian_beams(
       and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
       to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
       at 80 degrees is the fan and not the method. A real seabed (the
-      ``seabed_density``/``seabed_sound_speed`` pair below) absorbs those
+      :class:`FluidSeabed` below) absorbs those
       bounces and the default is then ample; a perfect reflector needs the
       fan opened and ``range_step`` cut with it, since a step has to resolve
       :math:`\tan\theta_\mathrm{max}` depth units of climb per unit range. The
@@ -2428,13 +2534,14 @@ def gaussian_beams(
       where the modal criterion is out of the band's reach and the free-space
       optimum stands, comes out at +0.72 dB with a 1.37 dB worst bin, closer
       to the exact field than :func:`normal_modes` on the same cut. An
-      explicit ``beam_width`` is taken as given, whatever its size: the old
+      explicit ``fan.beam_width`` is taken as given, whatever its size: the
+      old
       quarter-depth warning went with the cap, since the measurements put the
       fault on the cap's side.
 
     **Seawater absorption is off by default** and the field is then optimistic
     beyond a few kilometres at sonar frequencies, exactly as ray theory without
-    a volume loss must be. Passing ``absorption_model`` multiplies each beam by
+    a volume loss must be. Passing ``absorption`` multiplies each beam by
     :math:`e^{-\alpha s}` with :math:`s` the **arc length along its central
     ray**, which is Sect. 3.6.2 done as printed: perturbing the eikonal with
     the complex sound speed a volume loss implies leaves the real rays standing
@@ -2461,7 +2568,7 @@ def gaussian_beams(
     **The seabed is a perfect reflector by default**, for the same reason, and
     real shallow-water propagation loss is dominated by what that default
     leaves out: the seabed absorbs part of every bottom bounce. Passing
-    ``seabed_density`` and ``seabed_sound_speed`` replaces the perfect
+    a :class:`FluidSeabed` as the ``bottom`` replaces the perfect
     reflector with the lossy fluid half-space of
     :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
     (the Rayleigh interface, ``density`` standing for the water above it and
@@ -2487,8 +2594,8 @@ def gaussian_beams(
     already breathes; sediment attenuation and elasticity are outside the
     fluid-fluid model here as they are outside ``seabed_reflection`` itself.
 
-    **The bottom may slope.** The ``bathymetry_ranges_m`` /
-    ``bathymetry_depths_m`` pair replaces the level bottom with the same
+    **The bottom may slope.** The ``bathymetry`` pair replaces the level
+    bottom with the same
     piecewise-linear ``depth(r)`` polyline :func:`ray_trace` takes, and it is
     the first range dependence in this module; the sound-speed profile stays
     range independent, deliberately -- see :func:`ray_trace`'s scope note for
@@ -2536,7 +2643,8 @@ def gaussian_beams(
     pays its way; the test module's docstring records the measurements and
     their stability under step, width and aperture.
 
-    What it costs is ``n_beams`` times the size of the receiver grid, and none
+    What it costs is ``fan.n_beams`` times the size of the receiver grid,
+    and none
     of the three factors depends on the frequency: the ray core does not have to
     resolve a wavelength on a grid, and the fan only widens as
     :math:`\lambda/W_0`, which the default width holds nearly fixed. On a
@@ -2560,76 +2668,49 @@ def gaussian_beams(
         column, on the interior grid :func:`parabolic_equation` uses, so the two
         fields land on the same depths.
     :param n_depth_points: Size of that default depth grid.
-    :param max_angle_deg: Half-angle of the launch fan, in degrees from the
-        horizontal. Beams are spread symmetrically over
-        ``[-max_angle_deg, +max_angle_deg]``.
-    :param n_beams: Number of beams in the fan. Default (``None``): from the
-        overlap condition. Adjacent beams are :math:`s\,\delta\theta_0` apart at
-        arc length :math:`s` while each has spread to
-        :math:`W \to s\lambda/(\pi W_0)`, so the condition that they still
-        overlap, :math:`\delta\theta_0 \lesssim \lambda/(\pi W_0)`, is
-        range-independent; the default takes four times that margin. Too coarse
-        a fan shows as a periodic ripple in range at the beam spacing, which is
-        easy to mistake for physical interference.
-    :param beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
-        initial half-width, at the :math:`e^{-2}` folding distance in
-        intensity, applied to every beam of the fan when passed. Default
-        (``None``): one width per launch angle, the free-space optimum of
-        each beam's own flight; see :func:`_default_beam_widths`.
+    :param fan: The launch fan, as a :class:`BeamFan`: its half-angle
+        ``max_angle_deg``, its density ``n_beams`` and its initial width
+        ``beam_width``, each with the default that class documents. Default
+        (``None``): the stock ``BeamFan()``, the fan every published
+        validation number of this module was measured with.
     :param range_step: Marching step in range, in metres, and the spacing of the
         default ``ranges_m``.
-    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
-        surface is always pressure-release. Superseded by the fluid seabed
-        when the pair below is passed.
-    :param seabed_density: Sediment density of a lossy fluid seabed, in the
-        same unit as ``density`` (kg/m3 by convention; only the ratio
-        enters). Default (``None``): the perfect reflector named by
-        ``bottom``, so every published validation number of this module is
-        what the solver returns. Passed together with
-        ``seabed_sound_speed``, and not alongside ``bottom="rigid"``.
-    :param seabed_sound_speed: Sediment sound speed of that seabed, in m/s
-        (``None`` likewise). A sediment faster than the water at the bottom
-        has a critical grazing angle, below which the reflection is total in
-        magnitude and lossy in phase alone.
-    :param density: Water density above the seabed, in kg/m3. Ignored unless
-        the seabed pair is passed; it enters only through the seabed's
-        impedance ratio, the field itself being density-normalised already.
-    :param absorption_model: Seawater volume absorption applied along each
-        beam's central ray: ``"francois-garrison"``, ``"ainslie-mccolm"`` or
-        ``"thorp"``, the same models, spelled the same way, as
-        :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`.
-        Default (``None``): no volume absorption, so the published validation
-        numbers of this module are what the solver returns.
-    :param temperature: Temperature ``T`` for the absorption model, in degrees
-        Celsius (ignored when ``absorption_model`` is ``None``).
-    :param salinity: Salinity ``S`` for the absorption model, in parts per
-        thousand (ignored when ``absorption_model`` is ``None``).
-    :param ph: Acidity for the absorption model (ignored when
-        ``absorption_model`` is ``None``; Thorp ignores it always).
-    :param bathymetry_ranges_m: Node ranges of a piecewise-linear bottom
-        profile, in metres, strictly increasing from ``r = 0``; level past
-        the last node. Default (``None``): the level bottom at the profile's
-        last depth, which is every validation number of this module. Passed
-        together with ``bathymetry_depths_m``, and not alongside the seabed
-        pair.
-    :param bathymetry_depths_m: Bottom depth at each node, in metres,
-        strictly positive and never below the sound-speed profile's last
-        depth (``None`` likewise).
+    :param bottom: ``"pressure-release"`` (default) or ``"rigid"``, perfect
+        reflectors; or a :class:`FluidSeabed`, the lossy fluid half-space
+        whose complex Rayleigh coefficient every bottom touch is charged.
+        The sea surface is always pressure-release, and the perfect default
+        is what every published validation number of this module returns.
+    :param absorption: Seawater volume absorption applied along each beam's
+        central ray: the bare model name (``"francois-garrison"``,
+        ``"ainslie-mccolm"`` or ``"thorp"``) for the standard water of
+        :class:`VolumeAbsorption`'s defaults, or a :class:`VolumeAbsorption`
+        naming its own temperature, salinity and pH. Default (``None``): no
+        volume absorption, so the published validation numbers of this
+        module are what the solver returns.
+    :param bathymetry: A ``(ranges_m, depths_m)`` pair of arrays describing
+        a piecewise-linear bottom profile, the same pair :func:`ray_trace`
+        takes: node ranges in metres, strictly increasing from ``r = 0``
+        and level past the last node, with the bottom depth at each node in
+        metres, strictly positive and never below the sound-speed profile's
+        last depth. Not alongside a :class:`FluidSeabed`. Default
+        (``None``): the level bottom at the profile's last depth, which is
+        every validation number of this module.
     :return: A :class:`GaussianBeamResult`.
     :raises ValueError: If the inputs are invalid.
     :warns PhonometryWarning: when the source sits on a kink of the profile
         (Sect. 3.7.4's spurious horizontal jet), and when one marching step
         carries the steepest beam of the fan across more than a quarter of
-        the water column, which is the pairing between ``max_angle_deg`` and
-        ``range_step`` that is easiest to get wrong.
+        the water column, which is the pairing between
+        ``fan.max_angle_deg`` and ``range_step`` that is easiest to get
+        wrong.
     """
     f = require_positive(frequency_hz, "frequency_hz")
+    fan = BeamFan() if fan is None else fan
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
-    bathymetry = _clean_bathymetry(bathymetry_ranges_m, bathymetry_depths_m,
-                                   z_prof)
+    bathy = _clean_bathymetry(bathymetry, z_prof)
     water_depth = float(z_prof[-1])
-    depth_at_source = (water_depth if bathymetry is None
-                       else float(bathymetry[1][0]))
+    depth_at_source = (water_depth if bathy is None
+                       else float(bathy[1][0]))
     zs = float(source_depth)
     if not (0.0 < zs < depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
@@ -2637,9 +2718,8 @@ def gaussian_beams(
     dr_step = require_positive(range_step, "range_step")
     if dr_step > rmax:
         raise ValueError("'range_step' must not exceed 'max_range'.")
-    key, seabed = _resolve_boundary(bottom, seabed_density, seabed_sound_speed,
-                                    density)
-    if seabed is not None and bathymetry is not None:
+    key, seabed = _resolve_boundary(bottom)
+    if seabed is not None and bathy is not None:
         raise ValueError(
             "a lossy fluid seabed and a sloping bottom cannot be combined:"
             " the one-coefficient-per-beam collapse (and the image ladder's"
@@ -2647,21 +2727,7 @@ def gaussian_beams(
             " angle per ray at a level bottom, and a slope rotates that"
             " invariant at every touch. Sloping runs take the perfect"
             " reflectors of 'bottom'.")
-    theta_max = float(max_angle_deg)
-    if not (0.0 < theta_max < 90.0):
-        raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
-
-    absorption_key: str | None = None
-    alpha = 0.0
-    if absorption_model is not None:
-        absorption_key = absorption_model.strip().lower()
-        if absorption_key not in _ABSORPTION_MODELS:
-            raise ValueError(
-                f"'absorption_model' must be one of {_ABSORPTION_MODELS} or"
-                f" None, got {absorption_model!r}.")
-        alpha = float(seawater_absorption(
-            f, temperature=temperature, salinity=salinity, depth=zs, ph=ph,
-            model=absorption_key)[0])
+    absorption_key, alpha = _resolve_absorption(absorption, f, zs)
     # dB/km to nepers/m: N dB is e^(N ln 10 / 20) in amplitude.
     attenuation = alpha * np.log(10.0) / (20.0 * _M_PER_KM)
 
@@ -2670,26 +2736,9 @@ def gaussian_beams(
     wavelength = c0 / f
     _check_source_on_kink(z_prof, c_prof, zs)
 
-    # The width the fan's density is sized for has to exist before the fan
-    # does, and the overlap condition below must hold for every beam, so it is
-    # the *widest* width of the run: an explicit one applies everywhere, and
-    # both terms of the per-angle default are widest on the axis, so its
-    # maximum is its value at theta_0 = 0.
-    if beam_width is not None:
-        w_fan = require_positive(beam_width, "beam_width")
-    else:
-        w_fan = float(_default_beam_widths(
-            wavelength, rmax, water_depth, np.zeros(1))[0])
-
-    span = 2.0 * np.radians(theta_max)
-    n_fan = (int(np.ceil(span * 4.0 * np.pi * w_fan / wavelength)) + 1
-             if n_beams is None else int(n_beams))
-    if n_fan < 2:
-        raise ValueError("'n_beams' must be at least 2.")
-    launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
-    fan = _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]))
-    w0 = (np.full(n_fan, float(w_fan)) if beam_width is not None
-          else _default_beam_widths(wavelength, rmax, water_depth, launch))
+    launch_fan = _resolve_fan(fan, wavelength, rmax, water_depth, c0)
+    launch, w0 = launch_fan.launch, launch_fan.width
+    n_fan = launch.size
 
     n_steps = int(np.ceil(rmax / dr_step)) + 1
     dr = rmax / (n_steps - 1)
@@ -2701,7 +2750,7 @@ def gaussian_beams(
         # One coefficient per beam is exact rather than sampled: see
         # :func:`_seabed_grazing_deg` for why Snell's invariant fixes a single
         # grazing angle per ray at a flat seabed.
-        grazing = _seabed_grazing_deg(fan.xi, c_bottom)
+        grazing = _seabed_grazing_deg(launch_fan.xi, c_bottom)
         # Conjugated, deliberately. The beam sum is assembled in the
         # exp(+i omega t) convention Eq. (3.88) is printed in and conjugated
         # once at the end (see the sign-convention note above the result
@@ -2716,9 +2765,9 @@ def gaussian_beams(
             grazing, rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2))
 
     upper: float | SlopingBoundary = (
-        water_depth if bathymetry is None else SlopingBoundary(*bathymetry))
+        water_depth if bathy is None else SlopingBoundary(*bathy))
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof), xi=fan.xi,
+        _ocean_ray_derivative(z_prof, c_prof), xi=launch_fan.xi,
         z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
         n_steps=n_steps, lower=0.0, upper=upper,
         dynamic=DynamicRays(np.asarray(0.5j * omega * w0**2, dtype=np.complex128),
@@ -2728,7 +2777,7 @@ def gaussian_beams(
     receivers = _beam_receiver_grid(receiver_depths_m, n_depth_points=n_depth_points,
                                     water_depth=water_depth)
 
-    climb = dr * np.tan(np.radians(theta_max))
+    climb = dr * np.tan(np.radians(float(fan.max_angle_deg)))
     if climb > _MAX_STEEP_CLIMB * water_depth:
         _warn_beams(
             f"one marching step carries the steepest beam of the fan {climb:.0f} m"
@@ -2739,15 +2788,15 @@ def gaussian_beams(
     # the bottom slopes: depth and slope both, since a fold plane wrong by the
     # facet's tilt displaces the images by wavelengths (see _beam_influence).
     fold: _FoldColumns | None = None
-    if bathymetry is not None:
-        br, bd = bathymetry
+    if bathy is not None:
+        br, bd = bathy
         facet = np.concatenate(([0.0], np.diff(bd) / np.diff(br), [0.0]))
         fold = _FoldColumns(
             ranges, np.asarray(np.interp(ranges, br, bd)),
             facet[np.searchsorted(br, ranges, side="right")])
     field, widths, curvatures = _assemble_beam_field(
-        march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
-        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
+        march, ranges=ranges, receivers=receivers, fan=launch_fan, dr=dr,
+        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0,
         water_depth=water_depth, bottom_reflection=bottom_factor,
         attenuation=attenuation, fold=fold)
 
@@ -2762,7 +2811,7 @@ def gaussian_beams(
 
     ray_depths = march.positions
     ray_widths, ray_curvatures = widths, curvatures
-    if (bathymetry is not None and march.stopped_columns is not None
+    if (bathy is not None and march.stopped_columns is not None
             and np.any(march.stopped_columns < n_steps)):
         # A terminated beam's history is frozen at its last bounce; the field
         # above already retired it there, and the per-ray records say so the
@@ -2791,8 +2840,8 @@ def gaussian_beams(
         seabed_sound_speed=None if seabed is None else seabed[2],
         source_depth=zs,
         water_depth=water_depth,
-        bathymetry_ranges=None if bathymetry is None else bathymetry[0],
-        bathymetry_depths=None if bathymetry is None else bathymetry[1],
+        bathymetry_ranges=None if bathy is None else bathy[0],
+        bathymetry_depths=None if bathy is None else bathy[1],
     )
 
 
@@ -2800,7 +2849,7 @@ def _assemble_beam_field(
     march: RayMarch, *, ranges: NDArray[np.float64],
     receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    omega: float, c0: float, w0: NDArray[np.float64],
+    omega: float, c0: float,
     water_depth: float,
     bottom_reflection: float | NDArray[np.complex128], attenuation: float,
     fold: _FoldColumns | None = None,
@@ -2839,7 +2888,7 @@ def _assemble_beam_field(
     # W = 2|q|/(omega W_0) is Eq. (3.89) with Im[p/q] replaced by the conserved
     # Wronskian; K is Eq. (3.90) with the sign of the conjugated field. W_0 is
     # per beam, so each row of the history divides by its own.
-    widths = 2.0 * np.abs(q) / (omega * w0[:, None])
+    widths = 2.0 * np.abs(q) / (omega * fan.width[:, None])
     curvatures = speed * np.real(p / q)
 
     at_bottom = np.cumsum(march.upper_reflections, axis=1)
@@ -2850,7 +2899,7 @@ def _assemble_beam_field(
     # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and
     # positive. The weight carries each beam's own q(0) through W_0, which is
     # what lets the fan mix initial widths without renormalising anything.
-    weight = (fan.dtheta * (omega * w0 / (2.0 * c0))
+    weight = (fan.dtheta * (omega * fan.width / (2.0 * c0))
               * np.sqrt(np.cos(fan.launch) / np.pi))
 
     column = np.clip(np.rint(ranges / dr).astype(np.intp), 0,
@@ -2875,7 +2924,8 @@ def _assemble_beam_field(
     )
     field = _beam_influence(
         samples, receivers, water_depth=water_depth,
-        bottom_reflection=bottom_reflection, omega=omega, beam_width=w0,
+        bottom_reflection=bottom_reflection, omega=omega,
+        beam_width=fan.width,
         attenuation=attenuation, fold=fold,
         march_extent=(march.positions.shape[1] - 1) * dr)
     return field, widths, curvatures

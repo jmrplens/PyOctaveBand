@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 - The bottom may slope: the first range dependence in the underwater module.
-  `ray_trace` and `gaussian_beams` accept a `bathymetry_ranges_m` /
-  `bathymetry_depths_m` pair describing a piecewise-linear depth profile
+  `ray_trace` and `gaussian_beams` accept a `bathymetry` pair of node
+  arrays, `(ranges_m, depths_m)`, describing a piecewise-linear depth profile
   (Jensen's faceted boundary, Fig. 3.20) in place of the level bottom, while
   the sound-speed profile stays range independent, deliberately: the sloping
   boundary has an exact published oracle (the ideal wedge's closed fan of
@@ -86,9 +86,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   guide with its own figure, the caustic and the shadow zone behind it, in
   English and Spanish.
 - The beams can carry the water's own absorption. `gaussian_beams` accepts
-  `absorption_model` (`"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`,
-  the same names, arguments and defaults as `seawater_absorption`, off by
-  default so every published validation number stays reproducible bit for bit)
+  `absorption` (the bare model name, `"francois-garrison"`,
+  `"ainslie-mccolm"` or `"thorp"`, or a `VolumeAbsorption` naming its own
+  temperature, salinity and pH; the same names, arguments and defaults as
+  `seawater_absorption`, off by default so every published validation number
+  stays reproducible bit for bit)
   and multiplies each beam by `exp(-alpha s)` with `s` the arc length along
   its central ray, which is Jensen Sect. 3.6.2 as printed (Eq. 3.116): the
   loss integral runs along the path flown, not along the range axis, and the
@@ -104,10 +106,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   published formulas independently of the closed-form module, to 2e-4 dB, with
   a steep-receiver case whose arc length exceeds its range by 1.24 dB of loss
   separating the two measures directly.
-- The beams can bounce off a lossy seabed. `gaussian_beams` accepts
-  `seabed_density` and `seabed_sound_speed` (the same fluid description
-  `seabed_reflection` takes, with `density` for the water above; the perfect
-  reflector stays the default, bit for bit) and charges every bottom touch of
+- The beams can bounce off a lossy seabed. `gaussian_beams` accepts a
+  `FluidSeabed` as its `bottom` (the same fluid description
+  `seabed_reflection` takes, with `water_density` for the water above; the
+  perfect reflector stays the default, bit for bit) and charges every bottom touch of
   each beam with the Rayleigh coefficient at that beam's grazing angle,
   magnitude and phase together, which is Jensen Sect. 3.6.3 as printed
   (Eqs. 3.125-3.126). The angle is the one Snell's invariant fixes at the
@@ -1408,6 +1410,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `gaussian_beams` groups its options by the physics they describe, trimming
+  the signature from twenty-two parameters back to thirteen. The launch
+  fan's half-angle, density and initial width travel together as one
+  `BeamFan` (`fan=BeamFan(max_angle_deg=45.0)` where `max_angle_deg=45.0`
+  used to stand alone); the lossy fluid seabed is a `FluidSeabed` passed
+  directly as `bottom`, carrying the water density with it, so a
+  half-described seabed or a seabed alongside `bottom="rigid"` is unwritable
+  rather than checked; the volume absorption is the bare model name or a
+  `VolumeAbsorption` carrying its temperature, salinity and pH; and the
+  bottom profile is one `bathymetry` pair of node arrays, in `ray_trace`
+  too. `eigenrays` takes the same `bottom` union in place of its
+  seabed-and-density triple. The three classes are frozen dataclasses,
+  exported from `phonometry`, `phonometry.underwater` and
+  `phonometry.underwater.propagation` alike, and every result field keeps
+  its name, so recorded outputs read exactly as before.
 - The underwater domain calls its propagation quantity by the name the standard
   gives it. ISO 18405:2017 defines *propagation loss* in 3.4.1.4 as the
   difference between the source level in a specified direction and the

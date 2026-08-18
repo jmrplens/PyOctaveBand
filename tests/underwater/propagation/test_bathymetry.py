@@ -70,6 +70,8 @@ import numpy as np
 import pytest
 
 from phonometry.underwater.propagation.numerical import (
+    BeamFan,
+    FluidSeabed,
     eigenrays,
     gaussian_beams,
     ray_trace,
@@ -142,8 +144,8 @@ def test_the_wedge_trace_is_the_exact_folded_geometry() -> None:
     trace = ray_trace(
         [0.0, depth0], [_C, _C], source_depth=zs,
         launch_angles_deg=[np.degrees(theta0)], max_range=rmax, n_steps=ns,
-        bathymetry_ranges_m=[0.0, 2.0 * rmax],
-        bathymetry_depths_m=[depth0, depth0 - 2.0 * rmax * np.tan(beta)])
+        bathymetry=([0.0, 2.0 * rmax],
+                    [depth0, depth0 - 2.0 * rmax * np.tan(beta)]))
     r_grid = np.linspace(0.0, rmax, ns)
     z, t, n_surf, n_bot = _fold_wedge_ray(
         r_grid, z0=zs, theta0=theta0, depth0=depth0, slope_angle=beta)
@@ -181,8 +183,7 @@ def test_slope_zero_reproduces_the_level_trace_bit_for_bit() -> None:
           "max_range": 6000.0, "n_steps": 1201}
     level = ray_trace(depths, speeds, **kw)
     poly = ray_trace(depths, speeds, **kw,
-                     bathymetry_ranges_m=[0.0, 6000.0],
-                     bathymetry_depths_m=[1000.0, 1000.0])
+                     bathymetry=([0.0, 6000.0], [1000.0, 1000.0]))
     assert np.array_equal(level.depths, poly.depths)
     assert np.array_equal(level.travel_times, poly.travel_times)
     assert np.array_equal(level.arc_lengths, poly.arc_lengths)
@@ -202,8 +203,7 @@ def test_a_ray_reflected_past_the_vertical_ends_in_nan() -> None:
     trace = ray_trace(
         [0.0, 200.0], [_C, _C], source_depth=100.0,
         launch_angles_deg=[60.0], max_range=1500.0, n_steps=601,
-        bathymetry_ranges_m=[0.0, 1080.0],
-        bathymetry_depths_m=[200.0, 200.0 - 1080.0 * np.tan(beta)])
+        bathymetry=([0.0, 1080.0], [200.0, 200.0 - 1080.0 * np.tan(beta)]))
     z = trace.depths[0]
     dead = np.isnan(z)
     assert dead.any(), "the ray must terminate for this test to bite"
@@ -235,7 +235,7 @@ def test_a_vertex_reflects_specularly_off_one_of_its_facets() -> None:
     trace = ray_trace(
         [0.0, d0], [_C, _C], source_depth=zs,
         launch_angles_deg=[np.degrees(theta0)], max_range=2000.0, n_steps=2001,
-        bathymetry_ranges_m=[0.0, r_v], bathymetry_depths_m=[d0, d_v])
+        bathymetry=([0.0, r_v], [d0, d_v]))
     r = trace.ranges[0]
     z = trace.depths[0]
     assert np.isfinite(z).all()
@@ -265,8 +265,7 @@ def test_a_ray_nearly_parallel_to_the_slope_survives_the_graze() -> None:
         [0.0, 900.0], [_C, _C], source_depth=395.0,
         launch_angles_deg=[np.degrees(theta0)], max_range=8000.0,
         n_steps=1601,
-        bathymetry_ranges_m=[0.0, 8000.0],
-        bathymetry_depths_m=[400.0, 400.0 + 8000.0 * np.tan(beta)])
+        bathymetry=([0.0, 8000.0], [400.0, 400.0 + 8000.0 * np.tan(beta)]))
     r = trace.ranges[0]
     z = trace.depths[0]
     assert np.isfinite(z).all()
@@ -378,10 +377,10 @@ def test_a_single_facet_bounce_matches_the_two_path_field() -> None:
     zz = np.array([2300.0, 2500.0, 2650.0, 2750.0])
     res = gaussian_beams(
         f, [0.0, depth0], [_C, _C], source_depth=zs, max_range=3000.0,
-        ranges_m=rr, receiver_depths_m=zz, max_angle_deg=25.0,
-        range_step=2.0, beam_width=150.0, bottom="rigid",
-        bathymetry_ranges_m=[0.0, 3000.0],
-        bathymetry_depths_m=[depth0, depth0 - 3000.0 * m])
+        ranges_m=rr, receiver_depths_m=zz,
+        fan=BeamFan(max_angle_deg=25.0, beam_width=150.0),
+        range_step=2.0, bottom="rigid",
+        bathymetry=([0.0, 3000.0], [depth0, depth0 - 3000.0 * m]))
     for i, z in enumerate(zz):
         assert abs(res.propagation_loss[i, 0] - exact(2500.0, z)) < 0.1
 
@@ -407,10 +406,10 @@ def test_the_ideal_wedge_matches_its_closed_image_fan() -> None:
     depths = np.array([20.0, 40.0, 60.0, 90.0, 120.0])
     res = gaussian_beams(
         f, [0.0, depth0], [_C, _C], source_depth=zs, max_range=3200.0,
-        ranges_m=ranges, receiver_depths_m=depths, max_angle_deg=80.0,
-        range_step=2.0, beam_width=100.0, bottom="rigid",
-        bathymetry_ranges_m=[0.0, 3200.0],
-        bathymetry_depths_m=[depth0, depth0 - 3200.0 * np.tan(beta)])
+        ranges_m=ranges, receiver_depths_m=depths,
+        fan=BeamFan(max_angle_deg=80.0, beam_width=100.0),
+        range_step=2.0, bottom="rigid",
+        bathymetry=([0.0, 3200.0], [depth0, depth0 - 3200.0 * np.tan(beta)]))
     errors = []
     for j, rr in enumerate(ranges):
         local = depth0 - rr * np.tan(beta)
@@ -450,14 +449,15 @@ def test_slope_zero_beams_reproduce_the_level_field_bit_for_bit() -> None:
     kw = {"source_depth": guide["source_depth"], "max_range": 2200.0,
           "ranges_m": r,
           "receiver_depths_m": np.array([guide["receiver_depth"]]),
-          "max_angle_deg": 88.0, "range_step": 2.0, "beam_width": 100.0}
+          "fan": BeamFan(max_angle_deg=88.0, beam_width=100.0),
+          "range_step": 2.0}
     level = gaussian_beams(guide["frequency"], [0.0, guide["water_depth"]],
                            [_C, _C], **kw)
     poly = gaussian_beams(guide["frequency"], [0.0, guide["water_depth"]],
                           [_C, _C], **kw,
-                          bathymetry_ranges_m=[0.0, 2200.0],
-                          bathymetry_depths_m=[guide["water_depth"],
-                                               guide["water_depth"]])
+                          bathymetry=([0.0, 2200.0],
+                                      [guide["water_depth"],
+                                       guide["water_depth"]]))
     assert np.array_equal(level.pressure, poly.pressure)
     assert np.abs(poly.propagation_loss[0] - exact).max() < 5e-4
     assert poly.bathymetry_ranges is not None
@@ -484,11 +484,11 @@ def test_slope_zero_impulse_matches_the_flat_impulse_through_a_gradient() -> Non
     kw = {"source_depth": 26.0, "max_range": 3000.0,
           "ranges_m": np.array([1000.0, 2000.0, 2900.0]),
           "receiver_depths_m": np.array([40.0, 100.0, 160.0]),
-          "max_angle_deg": 60.0, "range_step": 2.0, "beam_width": 80.0}
+          "fan": BeamFan(max_angle_deg=60.0, beam_width=80.0),
+          "range_step": 2.0}
     level = gaussian_beams(200.0, z, c, **kw)
     poly = gaussian_beams(200.0, z, c, **kw,
-                          bathymetry_ranges_m=[0.0, 3000.0],
-                          bathymetry_depths_m=[200.0, 200.0])
+                          bathymetry=([0.0, 3000.0], [200.0, 200.0]))
     assert level.ray_depths.shape == poly.ray_depths.shape
     rel = (np.abs(poly.pressure - level.pressure)
            / np.abs(level.pressure))
@@ -509,9 +509,9 @@ def test_terminated_beams_leave_a_finite_field() -> None:
         200.0, [0.0, 300.0], [_C, _C], source_depth=100.0, max_range=1800.0,
         receiver_depths_m=np.array([50.0, 100.0, 150.0]),
         ranges_m=np.array([500.0, 1000.0, 1500.0]),
-        max_angle_deg=80.0, range_step=2.0, beam_width=50.0, bottom="rigid",
-        bathymetry_ranges_m=[0.0, 1800.0],
-        bathymetry_depths_m=[300.0, 300.0 - 1800.0 * np.tan(beta)])
+        fan=BeamFan(max_angle_deg=80.0, beam_width=50.0), range_step=2.0,
+        bottom="rigid",
+        bathymetry=([0.0, 1800.0], [300.0, 300.0 - 1800.0 * np.tan(beta)]))
     assert np.isnan(res.ray_depths).any(), "beams must terminate here"
     assert not np.isnan(res.propagation_loss).any()
     assert not np.isnan(res.pressure).any()
@@ -538,9 +538,9 @@ def test_a_sloping_bottom_out_of_reach_leaves_the_field_alone() -> None:
     res = gaussian_beams(
         f, [0.0, depth0], [_C, _C], source_depth=zs, max_range=3000.0,
         ranges_m=np.array([2500.0]), receiver_depths_m=zz,
-        max_angle_deg=25.0, range_step=2.0, beam_width=150.0, bottom="rigid",
-        bathymetry_ranges_m=[0.0, 3000.0],
-        bathymetry_depths_m=[depth0, depth0 - 3000.0 * np.tan(beta)])
+        fan=BeamFan(max_angle_deg=25.0, beam_width=150.0), range_step=2.0,
+        bottom="rigid",
+        bathymetry=([0.0, 3000.0], [depth0, depth0 - 3000.0 * np.tan(beta)]))
     r1 = np.hypot(2500.0, zz - zs)
     r2 = np.hypot(2500.0, zz + zs)
     exact = -20.0 * np.log10(np.abs(
@@ -557,7 +557,7 @@ def test_eigenrays_declines_a_sloping_trace() -> None:
         [0.0, 200.0], [_C, _C], source_depth=60.0,
         launch_angles_deg=np.linspace(-30.0, 30.0, 21), max_range=2000.0,
         n_steps=401,
-        bathymetry_ranges_m=[0.0, 2000.0], bathymetry_depths_m=[200.0, 150.0])
+        bathymetry=([0.0, 2000.0], [200.0, 150.0]))
     with pytest.raises(ValueError, match="sloping bottom|Snell"):
         eigenrays(trace, receiver_range=1500.0, receiver_depth=80.0)
 
@@ -568,48 +568,41 @@ def test_the_seabed_pair_and_a_slope_are_rejected_together() -> None:
     with pytest.raises(ValueError, match="lossy fluid seabed"):
         gaussian_beams(
             150.0, [0.0, 200.0], [_C, _C], source_depth=60.0,
-            max_range=2000.0, seabed_density=1800.0, seabed_sound_speed=1700.0,
-            bathymetry_ranges_m=[0.0, 2000.0],
-            bathymetry_depths_m=[200.0, 150.0])
+            max_range=2000.0,
+            bottom=FluidSeabed(density=1800.0, sound_speed=1700.0),
+            bathymetry=([0.0, 2000.0], [200.0, 150.0]))
 
 
 def test_invalid_bathymetry_is_rejected() -> None:
     """Each way a polyline can be malformed has its own message."""
     good = {"source_depth": 60.0, "launch_angles_deg": [10.0],
             "max_range": 1000.0}
-    with pytest.raises(ValueError, match="passed together"):
+    with pytest.raises(ValueError, match="pair"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[0.0, 1000.0])
+                  bathymetry=([0.0, 1000.0],))  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="equal length"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[0.0, 1000.0],
-                  bathymetry_depths_m=[200.0])
+                  bathymetry=([0.0, 1000.0], [200.0]))
     with pytest.raises(ValueError, match="strictly increasing"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[0.0, 500.0, 500.0],
-                  bathymetry_depths_m=[200.0, 180.0, 160.0])
+                  bathymetry=([0.0, 500.0, 500.0], [200.0, 180.0, 160.0]))
     with pytest.raises(ValueError, match="start at the source"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[100.0, 1000.0],
-                  bathymetry_depths_m=[200.0, 150.0])
+                  bathymetry=([100.0, 1000.0], [200.0, 150.0]))
     with pytest.raises(ValueError, match="strictly positive"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[0.0, 1000.0],
-                  bathymetry_depths_m=[200.0, 0.0])
+                  bathymetry=([0.0, 1000.0], [200.0, 0.0]))
     with pytest.raises(ValueError, match="profile is the medium"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[0.0, 1000.0],
-                  bathymetry_depths_m=[200.0, 250.0])
+                  bathymetry=([0.0, 1000.0], [200.0, 250.0]))
     with pytest.raises(ValueError, match="must be finite"):
         ray_trace([0.0, 200.0], [_C, _C], **good,
-                  bathymetry_ranges_m=[0.0, np.nan],
-                  bathymetry_depths_m=[200.0, 150.0])
+                  bathymetry=([0.0, np.nan], [200.0, 150.0]))
     # A source below the local water column at r = 0 is outside the medium.
     with pytest.raises(ValueError, match="water column"):
         ray_trace([0.0, 200.0], [_C, _C], source_depth=180.0,
                   launch_angles_deg=[10.0], max_range=1000.0,
-                  bathymetry_ranges_m=[0.0, 1000.0],
-                  bathymetry_depths_m=[150.0, 100.0])
+                  bathymetry=([0.0, 1000.0], [150.0, 100.0]))
 
 
 def test_bathymetry_plots_draw_the_seabed() -> None:
@@ -618,7 +611,7 @@ def test_bathymetry_plots_draw_the_seabed() -> None:
         [0.0, 300.0], [_C, _C], source_depth=100.0,
         launch_angles_deg=[-20.0, 0.0, 20.0, 60.0], max_range=2500.0,
         n_steps=501,
-        bathymetry_ranges_m=[0.0, 2000.0], bathymetry_depths_m=[300.0, 100.0])
+        bathymetry=([0.0, 2000.0], [300.0, 100.0]))
     ax = trace.plot()
     assert ax is not None
     ax_es = trace.plot(language="es")
@@ -627,9 +620,9 @@ def test_bathymetry_plots_draw_the_seabed() -> None:
     beams = gaussian_beams(
         150.0, [0.0, 300.0], [_C, _C], source_depth=100.0, max_range=2500.0,
         ranges_m=np.array([500.0, 1500.0, 2400.0]),
-        receiver_depths_m=np.array([50.0, 150.0]), max_angle_deg=30.0,
-        range_step=5.0, beam_width=50.0,
-        bathymetry_ranges_m=[0.0, 2000.0], bathymetry_depths_m=[300.0, 100.0])
+        receiver_depths_m=np.array([50.0, 150.0]),
+        fan=BeamFan(max_angle_deg=30.0, beam_width=50.0), range_step=5.0,
+        bathymetry=([0.0, 2000.0], [300.0, 100.0]))
     assert beams.plot() is not None
     import matplotlib.pyplot as plt
 

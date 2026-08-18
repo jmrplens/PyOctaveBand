@@ -232,8 +232,8 @@ diverges is section 4's, on the same rays and through the same marcher.
 
 ### A sloping bottom: the first range dependence
 
-Passing `bathymetry_ranges_m` and `bathymetry_depths_m` replaces the level
-bottom with a **piecewise-linear depth profile** — the faceted boundary of
+Passing a `bathymetry` pair of node arrays, `(ranges_m, depths_m)`,
+replaces the level bottom with a **piecewise-linear depth profile** — the faceted boundary of
 Jensen Fig. 3.20 — while the sound-speed profile stays range independent. The
 marcher finds each crossing against the interpolated polyline and reflects
 the ray specularly about the local facet (Eq. 3.121), so a bounce off a slope
@@ -258,8 +258,7 @@ beta = np.radians(5.0)
 wedge = underwater.ray_trace(
     [0.0, 1000.0], [1500.0, 1500.0], source_depth=400.0,
     launch_angles_deg=[20.0], max_range=4000.0, n_steps=1601,
-    bathymetry_ranges_m=[0.0, 4000.0],
-    bathymetry_depths_m=[1000.0, 1000.0 - 4000.0 * np.tan(beta)])
+    bathymetry=([0.0, 4000.0], [1000.0, 1000.0 - 4000.0 * np.tan(beta)]))
 r, z = wedge.ranges[0], wedge.depths[0]
 events = wedge.bottom_reflections[0] + wedge.surface_reflections[0]
 incline = np.degrees(np.arctan(np.abs(np.diff(z)) / np.diff(r)))
@@ -344,8 +343,8 @@ hears is $p(\omega) = \sum_j a_j e^{i\omega\tau_j}$, its loss
 $-20\lg|p(\omega)|$ on the same scale as the other three solvers, and a
 band's impulse response is that sum transformed. Each amplitude carries
 $(-1)$ per surface touch and the bottom's coefficient per bottom touch — the
-perfect reflectors' $\mp1$, or, with the same
-`seabed_density`/`seabed_sound_speed` pair the beams take, the Rayleigh
+perfect reflectors' $\mp1$, or, with the same `FluidSeabed` the beams
+take, the Rayleigh
 $\mathcal{R}$ of each ray's own grazing angle, magnitude and phase — and the
 $(-i)^m$ of Eq. (3.79) for each caustic crossed, the discrete form of the
 $-\pi/2$ the beam solver's square-root branch spends continuously. Validated
@@ -428,7 +427,8 @@ c_beam = c0 / np.sqrt(1.0 + 2.4 * z_beam / c0)
 
 beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
                                   max_range=2500.0, range_step=25.0,
-                                  max_angle_deg=45.0, n_depth_points=80)
+                                  fan=underwater.BeamFan(max_angle_deg=45.0),
+                                  n_depth_points=80)
 print(beams.propagation_loss.shape)            # (80, 101)  depth x range
 print(beams.launch_angles.size)                # 439 beams over +-45 degrees
 print(round(float(beams.initial_beam_widths[0]), 1))  # 35.9 m: W0, Eq. (3.86)
@@ -468,7 +468,8 @@ c_caustic = c_ref / np.sqrt(1.0 + 2.4 * z_caustic / c_ref)
 
 caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
                                     source_depth=992.5, max_range=2500.0,
-                                    range_step=12.5, max_angle_deg=45.0,
+                                    range_step=12.5,
+                                    fan=underwater.BeamFan(max_angle_deg=45.0),
                                     n_depth_points=400)
 caustic.plot()   # same field; the figure below bands it and draws the rays
 plt.show()
@@ -534,8 +535,9 @@ mid-column value, and a rigid bottom doubles it.
 **The water's own absorption** is off by default, so every number above was
 measured without it and stays reproducible as printed; the price is that the
 level beyond a few kilometres at sonar frequencies is optimistic. Passing
-`absorption_model` (`"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`,
-the same names, arguments and defaults as
+`absorption` (`"francois-garrison"`, `"ainslie-mccolm"` or `"thorp"`, or a
+`VolumeAbsorption` naming its own water; the same names, arguments and
+defaults as
 [`seawater_absorption`](underwater-propagation.md)) multiplies each beam by
 $e^{-\alpha s}$ with $s$ the **arc length along its central ray**, which is
 Jensen §3.6.2 as printed: perturbing the eikonal with the complex sound speed
@@ -553,10 +555,11 @@ the source frequency and depth, is recorded on the result as
 **A lossy seabed** is the other loss the default leaves out, and in shallow
 water the dominant one: a perfect bottom hands every steep multiple back
 undiminished, when what the seabed keeps is most of what decides real
-shallow-water propagation loss. Passing `seabed_density` and
-`seabed_sound_speed` (the same fluid description
-[`seabed_reflection`](underwater-propagation.md) takes, with `density` for
-the water above it) replaces the perfect reflector with the Rayleigh
+shallow-water propagation loss. Passing a `FluidSeabed` as the `bottom`
+(the same fluid description
+[`seabed_reflection`](underwater-propagation.md) takes, with
+`water_density` for the water above it) replaces the perfect reflector with
+the Rayleigh
 coefficient at each beam's own grazing angle: every bottom touch multiplies
 the beam's complex amplitude by $\mathcal{R}$, magnitude and phase together
 (Jensen §3.6.3, Eqs. 3.125-3.126). The phase is not a refinement to skip:
@@ -573,9 +576,8 @@ $\mathcal{R}(\theta)^n$ at each image's own closed-form angle: 0.07 dB at
 worst across ranges whose dominant images sit above and below the critical
 angle, where stripping the phase from the oracle moves it by 5.7 dB.
 
-**The bottom may slope** here too: the same
-`bathymetry_ranges_m`/`bathymetry_depths_m` pair `ray_trace` takes (section
-3) puts every beam's central ray on the faceted boundary, and the dynamic
+**The bottom may slope** here too: the same `bathymetry` pair `ray_trace`
+takes (section 3) puts every beam's central ray on the faceted boundary, and the dynamic
 pair crosses each sloping bounce with the reflection impulse of
 Eqs. (3.122)-(3.123) evaluated on the local facet. Two of the flat guide's
 devices generalise with it, each with its cost stated. The receiver-image
@@ -633,15 +635,16 @@ the perfect reflectors of `bottom`.
   says nothing about a channel the low-frequency field actually refracts
   through. There, `normal_modes` remains the solver to trust, exact for the
   cost of a handful of modes.
-- **The fan is truncated** at `max_angle_deg`, and a waveguide with two
+- **The fan is truncated** at the fan's `max_angle_deg`, and a waveguide with
+  two
   perfectly reflecting boundaries is the worst case for that, because nothing
   but $1/R$ attenuates the steep multiple bounces. On the ideal 1000 m guide at
   300 Hz, against the image-source sum at 2, 5 and 10 km: 0.27, 4.06 and
   2.52 dB with the default 80 degrees, falling to 0.0002, 0.0003 and 0.0004 dB
   when the fan is opened to 88 degrees. Cutting the *oracle* to the same
   half-angle moves it by 0.25, 3.95 and 2.31 dB, so this is the fan and not the
-  method. A real, lossy seabed (the `seabed_density`/`seabed_sound_speed`
-  pair above) absorbs those bounces and the default is then ample. Opening the
+  method. A real, lossy seabed (the `FluidSeabed` above) absorbs those
+  bounces and the default is then ample. Opening the
   fan means
   cutting `range_step` with it, since one step has to resolve
   $\tan\theta_{\max}$ depth units of climb per unit range; the solver warns

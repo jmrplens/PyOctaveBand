@@ -16,11 +16,14 @@ from .closed_form import (
     spreading_loss,
 )
 from .numerical import (
+    BeamFan,
     EigenrayResult,
+    FluidSeabed,
     GaussianBeamResult,
     NormalModeResult,
     ParabolicEquationResult,
     RayTraceResult,
+    VolumeAbsorption,
     eigenrays,
     gaussian_beams,
     normal_modes,
@@ -59,8 +62,10 @@ from .weston_regimes import (
 __all__ = [
     "WESTON_REGIMES",
     "WESTON_SEABEDS",
+    "BeamFan",
     "BottomLossResult",
     "EigenrayResult",
+    "FluidSeabed",
     "GaussianBeamResult",
     "NormalModeResult",
     "ParabolicEquationResult",
@@ -68,6 +73,7 @@ __all__ = [
     "RayTraceResult",
     "SeabedReflection",
     "SoundSpeedProfile",
+    "VolumeAbsorption",
     "WestonPropagationResult",
     "WestonRegimeBoundaries",
     "WestonSeabed",

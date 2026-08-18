@@ -54,6 +54,7 @@ import pytest
 from phonometry import PhonometryWarning
 from phonometry.underwater.propagation.numerical import (
     EigenrayResult,
+    FluidSeabed,
     _caustic_crossings,
     eigenrays,
     ray_trace,
@@ -206,8 +207,9 @@ def test_a_lossy_seabed_charges_R_at_each_arrivals_own_angle_as_printed() -> Non
     rho1, rho2, c2 = 1000.0, 1800.0, 1700.0
     trace, soft = _guide_arrivals()
     lossy = eigenrays(trace, receiver_range=_GUIDE["r"],
-                      receiver_depth=_GUIDE["zr"], density=rho1,
-                      seabed_density=rho2, seabed_sound_speed=c2,
+                      receiver_depth=_GUIDE["zr"],
+                      bottom=FluidSeabed(density=rho2, sound_speed=c2,
+                                         water_density=rho1),
                       n_steps=_GUIDE_STEPS)
     assert np.array_equal(lossy.travel_times, soft.travel_times)
     exact = _image_arrivals(
@@ -418,13 +420,12 @@ def test_invalid_inputs_rejected() -> None:
                   max_arrivals=0)
     with pytest.raises(ValueError, match="n_steps"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, n_steps=1)
-    with pytest.raises(ValueError, match="seabed_density"):
+    with pytest.raises(ValueError, match="sound_speed"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
-                  seabed_density=1800.0)
+                  bottom=FluidSeabed(density=1800.0, sound_speed=-1700.0))
     with pytest.raises(ValueError, match="bottom"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
-                  bottom="rigid", seabed_density=1800.0,
-                  seabed_sound_speed=1700.0)
+                  bottom="sandy")
     lone = ray_trace([0.0, 100.0], [_C, _C], source_depth=36.0,
                      launch_angles_deg=[10.0], max_range=600.0, n_steps=101)
     with pytest.raises(ValueError, match="at least two rays"):

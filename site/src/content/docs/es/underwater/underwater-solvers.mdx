@@ -398,8 +398,8 @@ sobre los mismos rayos y con el mismo integrador.
 
 ### Un fondo en pendiente: la primera dependencia de la distancia
 
-Pasar `bathymetry_ranges_m` y `bathymetry_depths_m` sustituye el fondo
-horizontal por un **perfil de profundidad lineal a trozos** — la frontera
+Pasar un par `bathymetry` de nodos, `(ranges_m, depths_m)`, sustituye el
+fondo horizontal por un **perfil de profundidad lineal a trozos** — la frontera
 facetada de la Fig. 3.20 de Jensen — mientras el perfil de velocidad del
 sonido sigue siendo independiente de la distancia. El integrador localiza
 cada cruce contra la polilínea interpolada y refleja el rayo especularmente
@@ -427,8 +427,7 @@ beta = np.radians(5.0)
 wedge = underwater.ray_trace(
     [0.0, 1000.0], [1500.0, 1500.0], source_depth=400.0,
     launch_angles_deg=[20.0], max_range=4000.0, n_steps=1601,
-    bathymetry_ranges_m=[0.0, 4000.0],
-    bathymetry_depths_m=[1000.0, 1000.0 - 4000.0 * np.tan(beta)])
+    bathymetry=([0.0, 4000.0], [1000.0, 1000.0 - 4000.0 * np.tan(beta)]))
 r, z = wedge.ranges[0], wedge.depths[0]
 events = wedge.bottom_reflections[0] + wedge.surface_reflections[0]
 incline = np.degrees(np.arctan(np.abs(np.diff(z)) / np.diff(r)))
@@ -517,7 +516,7 @@ pérdida $-20\lg|p(\omega)|$ en la misma escala que los otros tres métodos, y
 la respuesta al impulso de una banda es esa suma transformada. Cada amplitud
 lleva un $(-1)$ por toque en la superficie y el coeficiente del fondo por
 toque en el fondo — el $\mp1$ de los reflectores perfectos o, con el mismo
-par `seabed_density`/`seabed_sound_speed` que toman los haces, la
+`FluidSeabed` que toman los haces, la
 $\mathcal{R}$ de Rayleigh del ángulo rasante propio de cada rayo, módulo y
 fase — y el $(-i)^m$ de la Ec. (3.79) por cada cáustica cruzada, la forma
 discreta del $-\pi/2$ que la rama de la raíz cuadrada del método de haces
@@ -605,7 +604,8 @@ c_beam = c_bottom_ref / np.sqrt(1.0 + 2.4 * z_beam / c_bottom_ref)
 
 beams = underwater.gaussian_beams(600.0, z_beam, c_beam, source_depth=992.5,
                                   max_range=2500.0, range_step=25.0,
-                                  max_angle_deg=45.0, n_depth_points=80)
+                                  fan=underwater.BeamFan(max_angle_deg=45.0),
+                                  n_depth_points=80)
 print(beams.propagation_loss.shape)            # (80, 101)  profundidad x distancia
 print(beams.launch_angles.size)                # 439 haces entre +-45 grados
 print(round(float(beams.initial_beam_widths[0]), 1))  # 35,9 m: W0, Ec. (3.86)
@@ -643,7 +643,8 @@ c_caustic = c_ref / np.sqrt(1.0 + 2.4 * z_caustic / c_ref)
 
 caustic = underwater.gaussian_beams(600.0, z_caustic, c_caustic,
                                     source_depth=992.5, max_range=2500.0,
-                                    range_step=12.5, max_angle_deg=45.0,
+                                    range_step=12.5,
+                                    fan=underwater.BeamFan(max_angle_deg=45.0),
                                     n_depth_points=400)
 caustic.plot(language="es")   # el mismo campo; la figura lo dibuja por bandas
 plt.show()
@@ -714,8 +715,9 @@ fondo rígido lo duplica.
 **La absorción de volumen del agua** está desactivada por defecto, así que todos
 los números de arriba se midieron sin ella y siguen siendo reproducibles tal
 cual están impresos; el precio es que el nivel más allá de unos kilómetros a
-frecuencias de sonar resulta optimista. Pasar `absorption_model`
-(`"francois-garrison"`, `"ainslie-mccolm"` o `"thorp"`, los mismos nombres,
+frecuencias de sonar resulta optimista. Pasar `absorption`
+(`"francois-garrison"`, `"ainslie-mccolm"` o `"thorp"`, o un
+`VolumeAbsorption` que nombra su propia agua; los mismos nombres,
 argumentos y valores por defecto que
 [`seawater_absorption`](/phonometry/es/underwater/underwater-propagation/#perdida-de-propagacion))
 multiplica cada haz por $e^{-\alpha s}$ con $s$ la **longitud de arco a lo
@@ -737,10 +739,10 @@ queda registrado en el resultado como `absorption_coefficient`.
 deja fuera, y en aguas someras la dominante: un fondo perfecto devuelve
 intactos todos los múltiples inclinados, cuando lo que el lecho se queda es
 lo que más pesa en la pérdida de propagación real en aguas someras. Pasar
-`seabed_density` y `seabed_sound_speed` (la misma descripción fluida que
-acepta
+un `FluidSeabed` como `bottom` (la misma descripción fluida que acepta
 [`seabed_reflection`](/phonometry/es/underwater/underwater-propagation/#pérdida-por-reflexión-en-el-fondo),
-con `density` para el agua de encima) sustituye el reflector perfecto por el
+con `water_density` para el agua de encima) sustituye el reflector perfecto
+por el
 coeficiente de Rayleigh al ángulo rasante propio de cada haz: cada toque en
 el fondo multiplica la amplitud compleja del haz por $\mathcal{R}$, módulo y
 fase a la vez (Jensen §3.6.3, Ecs. 3.125-3.126). La fase no es un refinamiento
@@ -758,8 +760,8 @@ cerrada de cada imagen: 0,07 dB en el peor caso en distancias cuyas imágenes
 dominantes caen por encima y por debajo del ángulo crítico, donde despojar a
 la $\mathcal{R}$ del oráculo de su fase lo mueve 5,7 dB.
 
-**El fondo también puede inclinarse aquí**: el mismo par
-`bathymetry_ranges_m`/`bathymetry_depths_m` que toma `ray_trace` (sección 3)
+**El fondo también puede inclinarse aquí**: el mismo par `bathymetry` que
+toma `ray_trace` (sección 3)
 pone el rayo central de cada haz sobre la frontera facetada, y el par
 dinámico cruza cada rebote en pendiente con el impulso de reflexión de las
 Ecs. (3.122)-(3.123) evaluado en la faceta local. Dos de los dispositivos de
@@ -825,7 +827,8 @@ de `bottom`.
   de un canal por el que el campo de baja frecuencia de verdad refracta. Ahí
   `normal_modes` sigue siendo el método en el que confiar, exacto al precio de
   un puñado de modos.
-- **El abanico está truncado** en `max_angle_deg`, y una guía de ondas con dos
+- **El abanico está truncado** en el `max_angle_deg` del abanico, y una guía
+  de ondas con dos
   contornos perfectamente reflectantes es el peor caso posible para eso, porque
   nada salvo $1/R$ atenúa los rebotes múltiples más inclinados. En la guía ideal
   de 1000 m a 300 Hz, frente a la suma de fuentes imagen a 2, 5 y 10 km: 0,27,
@@ -833,7 +836,7 @@ de `bottom`.
   0,0004 dB al abrir el abanico a 88 grados. Recortar el *oráculo* al mismo
   semiángulo lo mueve 0,25, 3,95 y 2,31 dB, así que esto es el abanico y no el
   método. Un fondo real y
-  disipativo (el par `seabed_density`/`seabed_sound_speed` de más arriba)
+  disipativo (el `FluidSeabed` de más arriba)
   absorbe esos rebotes y entonces el valor por defecto sobra. Abrir
   el abanico obliga a recortar `range_step` con él, porque un paso tiene que
   resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
@@ -1008,7 +1011,8 @@ y el valor por defecto toma cuatro veces ese margen. Un abanico demasiado basto
 no se lee como un nivel equivocado sino como un rizado periódico en distancia al
 paso de los haces, fácil de confundir con interferencia física. `beam_width` es
 el $W_0$ de la sección 4, cuyo valor por defecto es el óptimo solo donde el
-canal no lo recorta, así que en aguas someras pásalo explícitamente. Y abrir
+canal no lo recorta, así que en aguas someras pásalo explícitamente. Los tres
+viajan juntos como el `BeamFan` que toma el método. Y abrir
 `max_angle_deg` obliga a recortar `range_step` con él, porque un paso tiene que
 resolver $\tan\theta_{\max}$ unidades de profundidad de ascenso por unidad de
 distancia.
