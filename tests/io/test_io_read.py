@@ -219,6 +219,26 @@ def test_rf64_reads_through_the_ds64_sizes(tmp_path: Path) -> None:
     assert described.duration == pytest.approx(codes.size / FS)
 
 
+def test_bw64_reads_like_the_rf64_it_differs_from_in_fourcc_alone(
+    tmp_path: Path,
+) -> None:
+    """BW64 (ITU-R BS.2088) shares RF64's ds64 semantics; only the tag differs.
+
+    scipy's reader accepts RF64 but rejects the BW64 fourcc, so this path
+    decodes in-house; the samples must still come back identical to the
+    RF64 reading of the same payload.
+    """
+    codes = np.arange(-1000, 1000, dtype=np.int64)
+    path = _write(tmp_path, rf64_wav(codes, bits=16, fourcc=b"BW64"))
+    sig = read(path)
+    np.testing.assert_array_equal(np.asarray(sig), codes / 32768)
+    assert sig.source is not None
+    assert sig.source.container == "BW64"
+    described = info(path)
+    assert described.container == "BW64"
+    assert described.frames == codes.size
+
+
 def test_truncated_data_is_refused_at_every_depth(tmp_path: Path) -> None:
     """A data chunk that promises more frames than the file holds.
 

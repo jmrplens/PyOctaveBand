@@ -139,13 +139,15 @@ def rf64_wav(
     channels: int = 1,
     fs: int = 48000,
     sample_count: int | None = None,
+    fourcc: bytes = b"RF64",
 ) -> bytes:
     """A small forged RF64: real ``ds64`` sizes, sentinel 32-bit fields.
 
     The layout is exactly what a field recorder writes past 4 GiB (fourcc
     ``RF64``, ``ds64`` first, ``data`` size 0xFFFFFFFF) with only the byte
     counts scaled down, so the reader's RF64 path is exercised without
-    forging 4 GiB of payload.
+    forging 4 GiB of payload. ``fourcc=b"BW64"`` forges the ITU-R BS.2088
+    variant, which shares the ``ds64`` layout and differs in the tag alone.
     """
     payload = pcm_data(samples, bits)
     frames = len(payload) // (channels * ((bits + 7) // 8))
@@ -157,4 +159,4 @@ def rf64_wav(
     placeholder = struct.pack("<QQQI", 0, len(payload), count, 0)
     body_size = len(riff_wave(chunk(b"ds64", placeholder), fmt, data)) - 8
     ds64 = struct.pack("<QQQI", body_size, len(payload), count, 0)
-    return riff_wave(chunk(b"ds64", ds64), fmt, data, fourcc=b"RF64")
+    return riff_wave(chunk(b"ds64", ds64), fmt, data, fourcc=fourcc)

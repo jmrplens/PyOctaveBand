@@ -176,7 +176,10 @@ def read_wav(
     ``bext`` provenance and EXTENSIBLE channel labels land on the returned
     object instead of a warning about their loss. Samples are scaled per
     the module convention and transposed to the library's
-    ``(channels, samples)`` axis order.
+    ``(channels, samples)`` axis order. A ``BW64`` container (ITU-R
+    BS.2088) shares RF64's ``ds64`` semantics but not the fourcc scipy
+    recognises, so its payload is decoded in-house by the block reader's
+    linear decoder instead of through scipy.
 
     Before any sample is decoded, the ``data`` payload the header promises
     is checked against the bytes the file actually holds. The walker never
@@ -217,16 +220,31 @@ def read_wav(
             f"{payload_end - actual} bytes short; refusing to read a "
             "truncated recording as if it were complete"
         )
-    with warnings.catch_warnings():
-        # The walker already kept what scipy is about to skip; warning about
-        # the skip would tell the user their metadata was lost when it was not.
-        warnings.simplefilter("ignore", wavfile.WavFileWarning)
-        fs, raw = wavfile.read(str(path), mmap=fmt.bits_per_sample != 24)
-    # scipy returns (frames,) or (frames, channels); the transpose to the
-    # library's (channels, samples) is taken before the float conversion so
-    # the conversion itself materialises the C-contiguous layout the
-    # axis=-1 reductions want, costing one copy instead of two.
-    data = np.atleast_2d(_scale_to_float(raw.T))
+    if parsed.container == "BW64":
+        # scipy honours ds64 for the RF64 fourcc but rejects BW64 (ITU-R
+        # BS.2088), which differs from RF64 in that four-byte tag alone;
+        # the payload the walker already located decodes in-house through
+        # the block reader's linear decoder instead.
+        from ._blocks import _decode_linear_frames
+
+        with Path(path).open("rb") as fh:
+            fh.seek(parsed.data_offset)
+            raw_bytes = fh.read(parsed.frames * fmt.block_align)
+        data = np.atleast_2d(_decode_linear_frames(raw_bytes, fmt))
+        fs = fmt.fs
+    else:
+        with warnings.catch_warnings():
+            # The walker already kept what scipy is about to skip; warning
+            # about the skip would tell the user their metadata was lost
+            # when it was not.
+            warnings.simplefilter("ignore", wavfile.WavFileWarning)
+            fs, raw = wavfile.read(str(path), mmap=fmt.bits_per_sample != 24)
+        # scipy returns (frames,) or (frames, channels); the transpose to
+        # the library's (channels, samples) is taken before the float
+        # conversion so the conversion itself materialises the C-contiguous
+        # layout the axis=-1 reductions want, costing one copy instead of
+        # two.
+        data = np.atleast_2d(_scale_to_float(raw.T))
     return Signal(
         data=data,
         fs=int(fs),
