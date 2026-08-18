@@ -132,7 +132,12 @@ def _source_traits(
 def _default_subtype(kind: str, bits: int, *, flac: bool) -> str:
     """The subtype that preserves the source, or a demand to choose one."""
     if kind == "int":
-        depth = 16 if bits <= 16 else 24 if bits <= 24 else 32
+        if bits <= 16:
+            depth = 16
+        elif bits <= 24:
+            depth = 24
+        else:
+            depth = 32
         if flac and depth > 24:
             raise ValueError(
                 "FLAC holds integer PCM up to 24 bits (libsndfile); a "
@@ -182,6 +187,64 @@ def _quantised_blocks(
         _warn_clipped(dst, subtype, clipped_total, total_samples, peak_dbfs)
 
 
+def _check_conversion_paths(src: str | Path, dst: str | Path) -> None:
+    """Refuse lossy and unknown targets, and a self-overwriting pair."""
+    source, target = Path(src), Path(dst)
+    suffix = target.suffix.lower()
+    if suffix in _LOSSY_TARGET_SUFFIXES:
+        raise ValueError(
+            f"{dst}: writing lossy formats is outside this API by policy; "
+            "a metrology library does not export approximations of its "
+            "own data. Convert to WAV or FLAC instead."
+        )
+    if suffix not in _WAV_SUFFIXES and suffix != ".flac":
+        raise ValueError(
+            f"{dst}: unsupported target {target.suffix!r}; convert() "
+            "produces the WAV family (.wav, .wave, .bwf) and, with the "
+            "[audio] extra, FLAC."
+        )
+    if source.resolve() == target.resolve():
+        raise ValueError(f"{src}: source and destination are the same file")
+
+
+def _check_resolved_subtype(resolved: str, *, flac: bool) -> None:
+    """Refuse a subtype the chosen container cannot hold."""
+    if flac and resolved not in ("PCM_16", "PCM_24"):
+        raise ValueError(
+            f"FLAC holds integer PCM up to 24 bits; subtype {resolved!r} "
+            "is not available (choose PCM_16 or PCM_24)"
+        )
+    if not flac and resolved not in _SUBTYPE_SPEC:
+        raise ValueError(
+            f"unknown subtype {resolved!r}; the WAV writer offers "
+            f"{sorted(_SUBTYPE_SPEC)}"
+        )
+
+
+def _stream_to_flac(
+    target: Path,
+    blocks: Iterator[np.ndarray],
+    fs: int,
+    channels: int,
+    resolved: str,
+    bext_payload: bytes | None,
+) -> None:
+    """Stream quantised blocks into a FLAC file, then embed the bext."""
+    sf = _import_soundfile("FLAC")
+    with sf.SoundFile(
+        str(target), "w", samplerate=fs, channels=channels,
+        subtype=resolved, format="FLAC",
+    ) as out:
+        for codes in blocks:
+            narrowed = (
+                codes.astype(np.int16) if resolved == "PCM_16"
+                else np.left_shift(codes.astype(np.int32), 8)
+            )
+            out.write(np.ascontiguousarray(narrowed.T))
+    if bext_payload is not None:
+        embed_flac_bext(target, bext_payload)
+
+
 def convert(
     src: str | Path,
     dst: str | Path,
@@ -215,37 +278,14 @@ def convert(
         and it is not installed.
     """
     source, target = Path(src), Path(dst)
-    suffix = target.suffix.lower()
-    if suffix in _LOSSY_TARGET_SUFFIXES:
-        raise ValueError(
-            f"{dst}: writing lossy formats is outside this API by policy; "
-            "a metrology library does not export approximations of its "
-            "own data. Convert to WAV or FLAC instead."
-        )
-    if suffix not in _WAV_SUFFIXES and suffix != ".flac":
-        raise ValueError(
-            f"{dst}: unsupported target {target.suffix!r}; convert() "
-            "produces the WAV family (.wav, .wave, .bwf) and, with the "
-            "[audio] extra, FLAC."
-        )
-    if source.resolve() == target.resolve():
-        raise ValueError(f"{src}: source and destination are the same file")
+    _check_conversion_paths(src, dst)
 
-    flac = suffix == ".flac"
+    flac = target.suffix.lower() == ".flac"
     kind, bits, bext, fs, channels, frames = _source_traits(source)
     resolved = (
         _default_subtype(kind, bits, flac=flac) if subtype is None else subtype
     )
-    if flac and resolved not in ("PCM_16", "PCM_24"):
-        raise ValueError(
-            f"FLAC holds integer PCM up to 24 bits; subtype {resolved!r} "
-            "is not available (choose PCM_16 or PCM_24)"
-        )
-    if not flac and resolved not in _SUBTYPE_SPEC:
-        raise ValueError(
-            f"unknown subtype {resolved!r}; the WAV writer offers "
-            f"{sorted(_SUBTYPE_SPEC)}"
-        )
+    _check_resolved_subtype(resolved, flac=flac)
 
     # The conversion's own CodingHistory line, appended under the carried
     # trail. The resolver keys on a Signal's provenance, so the carried
@@ -262,19 +302,7 @@ def convert(
     blocks = _quantised_blocks(source, target, resolved, block_size,
                                frames * channels)
     if flac:
-        sf = _import_soundfile("FLAC")
-        with sf.SoundFile(
-            str(target), "w", samplerate=fs, channels=channels,
-            subtype=resolved, format="FLAC",
-        ) as out:
-            for codes in blocks:
-                narrowed = (
-                    codes.astype(np.int16) if resolved == "PCM_16"
-                    else np.left_shift(codes.astype(np.int32), 8)
-                )
-                out.write(np.ascontiguousarray(narrowed.T))
-        if bext_payload is not None:
-            embed_flac_bext(target, bext_payload)
+        _stream_to_flac(target, blocks, fs, channels, resolved, bext_payload)
     else:
         write_wav_stream(
             target, blocks, fs, channels, resolved, frames,
