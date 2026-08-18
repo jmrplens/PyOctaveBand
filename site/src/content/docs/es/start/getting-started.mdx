@@ -29,16 +29,22 @@ pip install phonometry
 pip install phonometry[plot]    # matplotlib, para gráficas de respuesta y métodos .plot() de resultados
 pip install phonometry[perf]    # numba, ponderación temporal 'impulse' más rápida
 pip install phonometry[report]  # reportlab + svglib, para que los métodos .report() generen fichas PDF normativas (su panel de gráfica necesita también [plot])
+pip install phonometry[audio]   # python-soundfile, para que phonometry.io lea también FLAC, AIFF, Ogg/Opus, MP3 y WAV comprimido
 pip install phonometry[full]    # todos los anteriores (recomendado)
 ```
 
 Recomiendo `pip install phonometry[full]`: instala de una vez matplotlib,
-numba, reportlab y svglib, con lo que quedan habilitadas todas las
+numba, reportlab, svglib y soundfile, con lo que quedan habilitadas todas las
 funcionalidades de la biblioteca. La instalación base calcula todas las
-métricas solo con NumPy y SciPy; lo único que no queda disponible son las
-figuras (`.plot()` y las gráficas de respuesta de los filtros), las fichas PDF
-normativas (`.report()`) y el núcleo compilado que acelera la ponderación
-temporal `impulse`.
+métricas solo con NumPy y SciPy — y eso incluye leer con `phonometry.io` todo
+WAV lineal de medición (24 bits, multicanal EXTENSIBLE, RF64); lo único que no
+queda disponible son las figuras (`.plot()` y las gráficas de respuesta de los
+filtros), las fichas PDF normativas (`.report()`), el núcleo compilado que
+acelera la ponderación temporal `impulse` y los formatos de audio comprimidos.
+Un apunte de licencias sobre `[audio]`: instala python-soundfile, cuyo wheel
+empaqueta **libsndfile bajo LGPL-2.1** (enlazada dinámicamente, el mismo
+patrón que librosa y torchaudio). La instalación base se mantiene libre de
+ella a propósito, y por eso los formatos metrológicos no necesitan extra.
 
 Un matiz sobre `[full]`: numba es el único extra que pone un tope a NumPy, y
 solo lo sube cuando pasa a admitir una versión menor nueva de NumPy. Por eso,
@@ -316,6 +322,38 @@ estadísticos](/phonometry/es/signals/levels/levels/) las tienen, y [Construye u
 sonómetro](/phonometry/es/signals/sound-level-meter/) recorre la cadena entera,
 del tono de calibrador a todas ellas, en una sola página.
 
+## Leer un WAV de sonómetro
+
+La señal sintética de arriba hacía de archivo. Con un sonómetro real tienes
+dos WAV — la toma del calibrador y la medición — y `phonometry.io` lee los
+dos como mediciones: frecuencia nativa conservada, PCM entero escalado
+exactamente al fondo de escala, canales primero, nada normalizado. El
+`Signal` que devuelve lleva la frecuencia de muestreo y, en cuanto se lo
+adjuntas, la calibración, así que las funciones de nivel dejan de pedirte
+que repitas cualquiera de las dos:
+
+```python
+import numpy as np
+from phonometry import io, metrology, signals
+
+# Los dos archivos vienen del sonómetro, en este orden, por una cadena sin tocar.
+cal_take = io.read("calibrator.wav")          # el tono del calibrador de 94 dB
+cal = metrology.sensitivity(np.asarray(cal_take), target_spl=94.0,
+                            fs=cal_take.fs)
+
+sig = io.read("measurement.wav", calibration_factor=cal)
+print(f"Leq = {float(signals.leq(sig)):.1f} dB")   # sin fs ni factor que repetir
+```
+
+La instalación base lee todo lo que escribe un sonómetro — PCM de 24 bits,
+multicanal EXTENSIBLE, RF64 nocturno — y avisa si el archivo es una copia
+comprimida de escucha en vez de una grabación lineal. Escribe el factor en el
+sidecar una vez (`io.write_sidecar("measurement.wav", cal)`) y desde entonces
+`io.read("measurement.wav")` vuelve calibrado sin argumento alguno.
+[Leer y escribir audio de medición](/phonometry/es/io/audio-files/) es el
+flujo completo: procedencia, bloques, escritura BWF y conversión sin
+pérdidas.
+
 ## Analizar un archivo de audio
 
 Una medición real son **dos** grabaciones, no una, y las condiciones en que se
@@ -372,6 +410,11 @@ spl, freq = filters.octave_filter(
 )
 ```
 
+Las dos trampas mecánicas de abajo pertenecen a esta ruta directa con scipy —
+`io.read`, en la sección anterior, elimina las dos, escalando las muestras
+enteras al fondo de escala y devolviendo los canales primero — pero conviene
+conocerlas siempre que un array desnudo entre en la biblioteca:
+
 **Reduce un archivo multicanal al canal con el que mediste, o traspónlo.** La
 guarda de arriba no es adorno: `wavfile.read` devuelve un array
 `(muestras, canales)` y el banco lee un array 2D como `(canales, muestras)`.
@@ -414,8 +457,8 @@ poco sobre las bandas de 12,5 o 16 Hz por muchos dígitos que devuelva.
 
 ## Siguientes pasos
 
-El análisis en octavas de arriba usa `phonometry.filters`, uno de los dieciocho
-espacios de nombres de importación. La documentación los agrupa en **diez
+El análisis en octavas de arriba usa `phonometry.filters`, uno de los diecinueve
+espacios de nombres de importación. La documentación los agrupa en **once
 áreas**, una por tema de la barra lateral, desde la psicoacústica y la acústica
 de salas, edificación y vibraciones hasta el ruido ambiental, aeronáutico y
 submarino, la electroacústica y la simulación de ondas FDTD. Cada objeto de
