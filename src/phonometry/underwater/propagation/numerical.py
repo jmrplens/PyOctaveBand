@@ -1759,6 +1759,236 @@ def _fold_margins(
     return margin, valid
 
 
+class _Influence(NamedTuple):
+    """What every rung of one influence sum shares.
+
+    The receiver grid, the constants of Eq. (3.88) and the sloped-column tail
+    budget travel together so the rung workers take a context rather than an
+    argument list. ``capped`` and ``tail_limit`` are the fold's tail budget
+    (see :func:`_beam_influence` on :data:`_TAIL_TRUST`): ``None`` and an
+    unused limit over a level bottom, where no tail needs a leash.
+    """
+
+    receiver_depths: NDArray[np.float64]
+    water_depth: float
+    omega: float
+    attenuation: float
+    fold: _FoldColumns | None
+    half_omega_width: NDArray[np.float64]
+    cutoff_sq: float
+    capped: NDArray[np.bool_] | None
+    tail_limit: float
+
+
+def _wrap_count(
+    s: _BeamSamples, water_depth: float, fold: _FoldColumns | None,
+) -> int:
+    """How many rungs each way of the ladder the widest reach demands."""
+    if fold is None:
+        return min(_MAX_BEAM_WRAPS,
+                   int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
+    # Level columns ask for the depth-stack count the reach implies; the
+    # sloped ones ask for the whole half fan, seam included, because the
+    # wrapped tails carry the up-and-back arrivals whatever the reach.
+    n_wrap = int(np.ceil(float(s.reach.max()) / (2.0 * fold.depths.min())))
+    sloped = np.abs(fold.slopes) > 0.0
+    if np.any(sloped):
+        beta_min = float(np.arctan(np.abs(fold.slopes[sloped])).min())
+        n_wrap = max(n_wrap, int(np.ceil(0.5 * np.pi / beta_min)) + 1)
+    return min(_MAX_BEAM_WRAPS, n_wrap)
+
+
+def _rung_plan(
+    s: _BeamSamples, fold: _FoldColumns | None, water_depth: float,
+    r_bottom: NDArray[Any], n_wrap: int,
+) -> list[tuple[int, float, NDArray[Any], NDArray[np.intp],
+                NDArray[np.intp] | None]]:
+    """The rungs some beam can populate: strength, rows and columns of each.
+
+    Each image sits at ``shift + side*z_r - z_j`` in depth, so with both
+    depths inside the column its offset is at least ``|shift| - D`` away
+    for the upright family and ``|shift| - 2D`` for the mirrored one,
+    whose two depths subtract rather than cancel. A beam that cannot reach
+    that far cannot contribute to the image at any receiver depth and is
+    dropped before a single array is built for it. On a slope the floor
+    and the rung's validity come from the local fan instead.
+    """
+    reach_max = float(s.reach.max())
+    plan: list[tuple[int, float, NDArray[Any], NDArray[np.intp],
+                     NDArray[np.intp] | None]] = []
+    for wrap, side, n_surface, n_bottom in _image_ladder(n_wrap):
+        cols = None
+        if fold is None:
+            shift = 2.0 * wrap * water_depth
+            span = water_depth if side > 0.0 else 2.0 * water_depth
+            rows = np.flatnonzero(s.reach >= abs(shift) - span)
+        else:
+            margin, valid = _fold_margins(fold, wrap, side)
+            usable = valid & (margin <= reach_max)
+            if not usable.all():
+                cols = np.flatnonzero(usable)
+                if cols.size == 0:
+                    continue
+            rows = np.flatnonzero(s.reach >= float(margin[usable].min()))
+        if rows.size == 0:
+            continue
+        strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
+        plan.append((wrap, side, strength, rows, cols))
+    return plan
+
+
+def _rung_samples(
+    s: _BeamSamples, rows: NDArray[np.intp], cols: NDArray[np.intp] | None,
+) -> _BeamSamples:
+    """The march history of ``rows``, at every column or at ``cols`` alone.
+
+    A rung only some columns can populate is priced on those columns alone;
+    ``np.ix_`` gathers the (row, column) cross product once. The subset is a
+    :class:`_BeamSamples` again, so the block worker reads whichever subset
+    it is handed with the same words.
+    """
+    if cols is None:
+        return _BeamSamples(
+            xi=s.xi[rows], column_range=s.column_range,
+            range_offset=s.range_offset, depth=s.depth[rows],
+            vertical=s.vertical[rows], speed=s.speed[rows],
+            spreading=s.spreading[rows], slope=s.slope[rows],
+            time=s.time[rows], path=s.path[rows], phase=s.phase[rows],
+            weight=s.weight[rows], reach=s.reach[rows])
+    sub = np.ix_(rows, cols)
+    return _BeamSamples(
+        xi=s.xi[sub], column_range=s.column_range[:, cols],
+        range_offset=s.range_offset[:, cols], depth=s.depth[sub],
+        vertical=s.vertical[sub], speed=s.speed[sub],
+        spreading=s.spreading[sub], slope=s.slope[sub],
+        time=s.time[sub], path=s.path[sub], phase=s.phase[sub],
+        weight=s.weight[sub], reach=s.reach[rows])
+
+
+def _image_offsets(
+    grid: _Influence, col_index: NDArray[np.intp], wrap: int, side: float,
+    zr: NDArray[np.float64], depth: NDArray[np.float64],
+    offset: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Depth and range offsets from each beam sample to one rung's images."""
+    if grid.fold is None:
+        shift = 2.0 * wrap * grid.water_depth
+        return (shift + side * zr[None, None, :]) - depth, offset
+    z_i, r_i = _fold_images(grid.fold, col_index, wrap, side, zr)
+    dz = z_i[None, :, :] - depth
+    # The image's own range enters through the offset to the sample column; a
+    # level column reduces to the receiver's.
+    d_r = offset + (r_i - grid.fold.ranges[col_index][:, None])[None, :, :]
+    return dz, d_r
+
+
+def _survivor_block(
+    r: _BeamSamples, grid: _Influence, strength: NDArray[Any], *,
+    admitted: NDArray[np.bool_], q_infl: NDArray[np.complex128],
+    r_infl: NDArray[np.float64], along: NDArray[np.float64],
+    normal: NDArray[np.float64], n_z: int,
+) -> NDArray[np.complex128] | None:
+    """Eq. (3.88) summed over one block's admitted cells, or ``None``."""
+    nc = r.depth.shape[1]
+    hits = np.flatnonzero(admitted.ravel())
+    if hits.size == 0:
+        return None
+    beam_at, within = np.divmod(hits, nc * n_z)
+    range_at, depth_at = np.divmod(within, n_z)
+    q_hit = q_infl.ravel()[hits]
+    spread_hit = r.spreading[beam_at, range_at]
+    along_hit = along.ravel()[hits]
+    # The travel-time phase, the tracked branch of 1/sqrt(q) and the
+    # transverse Gaussian all ride in one exponent rather than three,
+    # because a complex exponential over tens of millions of survivors
+    # is where the run time goes.
+    exponent = (
+        -0.5j * (r.phase[beam_at, range_at]
+                 + np.angle(q_hit * np.conj(spread_hit)))
+        - 1j * grid.omega * (r.time[beam_at, range_at] + along_hit
+                             + r.slope[beam_at, range_at] / (2.0 * q_hit)
+                             * normal.ravel()[hits] ** 2)
+    )
+    if grid.attenuation > 0.0:
+        # e^{-alpha s} of Eq. (3.116): the marched arc length continued
+        # to the foot of the perpendicular (along = s/c), floored at
+        # zero; see the docstring. Real, so it joins the exponent as
+        # pure decay whichever time convention the caller settles on.
+        exponent -= grid.attenuation * np.maximum(
+            r.path[beam_at, range_at]
+            + r.speed[beam_at, range_at] * along_hit, 0.0)
+    value = (
+        r.weight[beam_at, range_at] * strength[beam_at]
+        * np.sqrt(r.speed[beam_at, range_at] / r_infl.ravel()[hits])
+        / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
+    )
+    cells = n_z * nc
+    target = depth_at * nc + range_at
+    return (np.bincount(target, value.real, minlength=cells)
+            + 1j * np.bincount(target, value.imag, minlength=cells)
+            ).reshape(n_z, nc)
+
+
+def _sum_rung(
+    field: NDArray[np.complex128], s: _BeamSamples, grid: _Influence, *,
+    wrap: int, side: float, strength: NDArray[Any],
+    rows: NDArray[np.intp], cols: NDArray[np.intp] | None,
+) -> None:
+    """Add one rung's beams into ``field``, a block of depths at a time.
+
+    The block is sized so the temporaries stay bounded however large the
+    requested receiver grid is.
+    """
+    n_ranges = s.depth.shape[1]
+    nc = n_ranges if cols is None else cols.size
+    r = _rung_samples(s, rows, cols)
+    col_index = np.arange(n_ranges, dtype=np.intp) if cols is None else cols
+    xi = r.xi[:, :, None]
+    offset = r.range_offset[:, :, None]
+    column = r.column_range[:, :, None]
+    depth = r.depth[:, :, None]
+    vertical = r.vertical[:, :, None]
+    speed = r.speed[:, :, None]
+    speed_sq = speed**2
+    wavelength = 2.0 * np.pi * speed / grid.omega
+    spreading = r.spreading[:, :, None]
+    slope = r.slope[:, :, None]
+    half_width = grid.half_omega_width[rows][:, None, None]
+    sub_capped = (None if grid.capped is None
+                  else grid.capped if cols is None else grid.capped[cols])
+    step = max(1, _INFLUENCE_BLOCK // (rows.size * nc))
+    for lo in range(0, grid.receiver_depths.size, step):
+        zr = grid.receiver_depths[lo:lo + step]
+        dz, d_r = _image_offsets(grid, col_index, wrap, side, zr, depth,
+                                 offset)
+        along = xi * d_r + vertical * dz  # s / c
+        normal = speed * (xi * dz - vertical * d_r)
+        q_infl = spreading + speed_sq * slope * along
+        # Held off the axis by a wavelength; see the note above on why the
+        # cylindrical half of the Jacobian is the one factor nothing else
+        # protects.
+        r_infl = np.maximum(column + speed_sq * xi * along, wavelength)
+        # Admit a cell when n^2/W^2 < cutoff^2 with W = 2|q|/(omega W_0),
+        # written as a comparison of squares so that neither side needs a
+        # square root: this test runs over the whole block while everything
+        # after it runs over the survivors, which in a waveguide are around
+        # a third of the cells, so it must stay arithmetic.
+        admitted = ((normal * half_width) ** 2
+                    < grid.cutoff_sq * (q_infl.real**2 + q_infl.imag**2))
+        if sub_capped is not None and sub_capped.any():
+            admitted &= (~sub_capped[None, :, None]
+                         | (np.abs(speed * along) <= grid.tail_limit))
+        block = _survivor_block(r, grid, strength, admitted=admitted,
+                                q_infl=q_infl, r_infl=r_infl, along=along,
+                                normal=normal, n_z=zr.size)
+        if block is None:
+            continue
+        if cols is None:
+            field[lo:lo + zr.size] += block
+        else:
+            field[lo:lo + zr.size, cols] += block
+
+
 def _beam_influence(
     s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
     water_depth: float,
@@ -1917,167 +2147,25 @@ def _beam_influence(
     :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
         convention Eq. (3.88) is printed in; the caller conjugates it.
     """
-    n_ranges = s.depth.shape[1]
-    if fold is None:
-        n_wrap = int(np.ceil(float(s.reach.max()) / (2.0 * water_depth)))
-    else:
-        # Level columns ask for the depth-stack count the reach implies; the
-        # sloped ones ask for the whole half fan, seam included, because the
-        # wrapped tails carry the up-and-back arrivals whatever the reach.
-        n_wrap = int(np.ceil(float(s.reach.max()) / (2.0 * fold.depths.min())))
-        sloped = np.abs(fold.slopes) > 0.0
-        if np.any(sloped):
-            beta_min = float(np.arctan(np.abs(fold.slopes[sloped])).min())
-            n_wrap = max(n_wrap, int(np.ceil(0.5 * np.pi / beta_min)) + 1)
-    n_wrap = min(_MAX_BEAM_WRAPS, n_wrap)
     r_bottom = np.broadcast_to(np.asarray(bottom_reflection),
                                (s.depth.shape[0],))
-    reach_max = float(s.reach.max())
-    if fold is not None:
-        capped = np.abs(fold.slopes) > 0.0
-        tail_limit = _TAIL_TRUST * march_extent
-    plan = []
-    for wrap, side, n_surface, n_bottom in _image_ladder(n_wrap):
-        # This image sits at ``shift + side*z_r - z_j`` in depth, so with both
-        # depths inside the column its offset is at least ``|shift| - D`` away
-        # for the upright family and ``|shift| - 2D`` for the mirrored one,
-        # whose two depths subtract rather than cancel. A beam that cannot reach
-        # that far cannot contribute to the image at any receiver depth and is
-        # dropped before a single array is built for it. On a slope the floor
-        # and the rung's validity come from the local fan instead.
-        cols = None
-        if fold is None:
-            shift = 2.0 * wrap * water_depth
-            span = water_depth if side > 0.0 else 2.0 * water_depth
-            rows = np.flatnonzero(s.reach >= abs(shift) - span)
-        else:
-            margin, valid = _fold_margins(fold, wrap, side)
-            usable = valid & (margin <= reach_max)
-            if not usable.all():
-                cols = np.flatnonzero(usable)
-                if cols.size == 0:
-                    continue
-            rows = np.flatnonzero(s.reach >= float(margin[usable].min()))
-        if rows.size == 0:
-            continue
-        strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
-        plan.append((wrap, side, strength, rows, cols))
-
-    # One W_0 per beam (a scalar is every beam's): the admission test below
-    # reads W = 2|q|/(omega W_0) with each row's own width.
+    plan = _rung_plan(s, fold, water_depth, r_bottom,
+                      _wrap_count(s, water_depth, fold))
+    # One W_0 per beam (a scalar is every beam's): the admission test of
+    # :func:`_sum_rung` reads W = 2|q|/(omega W_0) with each row's own width.
     half_omega_width = 0.5 * omega * np.broadcast_to(
         np.asarray(beam_width, dtype=np.float64), (s.depth.shape[0],))
-    cutoff_sq = _BEAM_CUTOFF**2
-    field = np.zeros((receiver_depths.size, n_ranges), dtype=np.complex128)
-    all_cols = np.arange(n_ranges, dtype=np.intp)
+    grid = _Influence(
+        receiver_depths=receiver_depths, water_depth=water_depth, omega=omega,
+        attenuation=attenuation, fold=fold,
+        half_omega_width=half_omega_width, cutoff_sq=_BEAM_CUTOFF**2,
+        capped=None if fold is None else np.abs(fold.slopes) > 0.0,
+        tail_limit=_TAIL_TRUST * march_extent)
+    field = np.zeros((receiver_depths.size, s.depth.shape[1]),
+                     dtype=np.complex128)
     for wrap, side, strength, rows, cols in plan:
-        if cols is None:
-            nc = n_ranges
-            speed2d, slope2d = s.speed[rows], s.slope[rows]
-            spread2d, weight2d = s.spreading[rows], s.weight[rows]
-            phase2d, time2d = s.phase[rows], s.time[rows]
-            path2d = s.path[rows]
-            xi2d, depth2d, vert2d = s.xi[rows], s.depth[rows], s.vertical[rows]
-            offset2d, column2d = s.range_offset, s.column_range
-        else:
-            # A rung only some columns can populate is priced on those columns
-            # alone; ``np.ix_`` gathers the (row, column) cross product once.
-            nc = cols.size
-            sub = np.ix_(rows, cols)
-            speed2d, slope2d = s.speed[sub], s.slope[sub]
-            spread2d, weight2d = s.spreading[sub], s.weight[sub]
-            phase2d, time2d = s.phase[sub], s.time[sub]
-            path2d = s.path[sub]
-            xi2d, depth2d, vert2d = s.xi[sub], s.depth[sub], s.vertical[sub]
-            offset2d, column2d = s.range_offset[:, cols], s.column_range[:, cols]
-        xi = xi2d[:, :, None]
-        offset = offset2d[:, :, None]
-        column = column2d[:, :, None]
-        depth = depth2d[:, :, None]
-        vertical = vert2d[:, :, None]
-        speed = speed2d[:, :, None]
-        speed_sq = speed**2
-        wavelength = 2.0 * np.pi * speed / omega
-        spreading = spread2d[:, :, None]
-        slope = slope2d[:, :, None]
-        # A block of receiver depths at a time, sized so the temporaries stay
-        # bounded however large the requested grid is.
-        step = max(1, _INFLUENCE_BLOCK // (rows.size * nc))
-        for lo in range(0, receiver_depths.size, step):
-            zr = receiver_depths[lo:lo + step]
-            if fold is None:
-                shift = 2.0 * wrap * water_depth
-                dz = (shift + side * zr[None, None, :]) - depth
-                d_r = offset
-            else:
-                z_i, r_i = _fold_images(
-                    fold, all_cols if cols is None else cols, wrap, side, zr)
-                dz = z_i[None, :, :] - depth
-                # The image's own range enters through the offset to the
-                # sample column; a level column reduces to the receiver's.
-                d_r = offset + (r_i - fold.ranges[
-                    all_cols if cols is None else cols][:, None])[None, :, :]
-            along = xi * d_r + vertical * dz  # s / c
-            normal = speed * (xi * dz - vertical * d_r)
-            q_infl = spreading + speed_sq * slope * along
-            # Held off the axis by a wavelength; see the note above on why the
-            # cylindrical half of the Jacobian is the one factor nothing else
-            # protects.
-            r_infl = np.maximum(column + speed_sq * xi * along, wavelength)
-            # Admit a cell when n^2/W^2 < cutoff^2 with W = 2|q|/(omega W_0),
-            # written as a comparison of squares so that neither side needs a
-            # square root: this test runs over the whole block while everything
-            # after it runs over the survivors, which in a waveguide are around
-            # a third of the cells, so it must stay arithmetic.
-            admitted = ((normal * half_omega_width[rows][:, None, None]) ** 2
-                        < cutoff_sq * (q_infl.real**2 + q_infl.imag**2))
-            if fold is not None:
-                sub_capped = capped if cols is None else capped[cols]
-                if sub_capped.any():
-                    admitted &= (~sub_capped[None, :, None]
-                                 | (np.abs(speed * along) <= tail_limit))
-            hits = np.flatnonzero(admitted.ravel())
-            if hits.size == 0:
-                continue
-            beam_at, within = np.divmod(hits, nc * zr.size)
-            range_at, depth_at = np.divmod(within, zr.size)
-            q_hit = q_infl.ravel()[hits]
-            spread_hit = spread2d[beam_at, range_at]
-            along_hit = along.ravel()[hits]
-            # The travel-time phase, the tracked branch of 1/sqrt(q) and the
-            # transverse Gaussian all ride in one exponent rather than three,
-            # because a complex exponential over tens of millions of survivors
-            # is where the run time goes.
-            exponent = (
-                -0.5j * (phase2d[beam_at, range_at]
-                         + np.angle(q_hit * np.conj(spread_hit)))
-                - 1j * omega * (time2d[beam_at, range_at] + along_hit
-                                + slope2d[beam_at, range_at] / (2.0 * q_hit)
-                                * normal.ravel()[hits] ** 2)
-            )
-            if attenuation > 0.0:
-                # e^{-alpha s} of Eq. (3.116): the marched arc length continued
-                # to the foot of the perpendicular (along = s/c), floored at
-                # zero; see the docstring. Real, so it joins the exponent as
-                # pure decay whichever time convention the caller settles on.
-                exponent -= attenuation * np.maximum(
-                    path2d[beam_at, range_at]
-                    + speed2d[beam_at, range_at] * along_hit, 0.0)
-            value = (
-                weight2d[beam_at, range_at] * strength[beam_at]
-                * np.sqrt(speed2d[beam_at, range_at] / r_infl.ravel()[hits])
-                / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
-            )
-            cells = zr.size * nc
-            target = depth_at * nc + range_at
-            block = (
-                np.bincount(target, value.real, minlength=cells)
-                + 1j * np.bincount(target, value.imag, minlength=cells)
-            ).reshape(zr.size, nc)
-            if cols is None:
-                field[lo:lo + zr.size] += block
-            else:
-                field[lo:lo + zr.size, cols] += block
+        _sum_rung(field, s, grid, wrap=wrap, side=side, strength=strength,
+                  rows=rows, cols=cols)
     return field
 
 
