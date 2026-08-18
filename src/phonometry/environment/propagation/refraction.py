@@ -403,12 +403,13 @@ def atmospheric_ray_paths(
     # solvers charge volume absorption along it); this tracer integrates it at
     # the cost of a division per stage and does not expose it.
     def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /,
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
+        xi_arr: NDArray[np.float64], /,
     ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
                NDArray[np.float64]]:
         cc = _speed_at(z_arr)
-        return (zeta_arr / xi, -_grad_at(z_arr) / (cc**3 * xi),
-                1.0 / (xi * cc**2), 1.0 / (xi * cc))
+        return (zeta_arr / xi_arr, -_grad_at(z_arr) / (cc**3 * xi_arr),
+                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
 
     # The ground is the only boundary: the atmosphere is open above, so a ray
     # that climbs out of the profile simply keeps climbing. The march splits

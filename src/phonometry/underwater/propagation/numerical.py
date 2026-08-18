@@ -1,6 +1,7 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 """
-Numerical models of underwater sound propagation (range-independent ocean).
+Numerical models of underwater sound propagation (range-independent water,
+with an optionally sloping bottom for the ray-based solvers).
 
 Four complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
@@ -34,8 +35,10 @@ to its count of bottom touches (Jensen Eq. 2.138 with Eq. 3.126 at every
 touch), the circular-arc ray paths of a linear
 sound-speed gradient together with the closed-form travel time along them
 (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press 1998,
-Eq. (3.3.20)), free-field spherical spreading, and mutual agreement of the PE
-and normal-mode propagation loss for a range-independent waveguide.
+Eq. (3.3.20)), free-field spherical spreading, mutual agreement of the PE
+and normal-mode propagation loss for a range-independent waveguide, and, for
+the sloping bottom the two ray-based solvers accept, the ideal wedge's exact
+image fan (the folded geometry to eleven digits, the beam field in dB).
 
 The three field solvers report the same quantity on the same terms, so their
 propagation losses can be laid side by side: ``normal_modes`` on a range slice
@@ -54,7 +57,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 
-from ..._internal.rays import DynamicRays, march_rays
+from ..._internal.rays import DynamicRays, SlopingBoundary, march_rays
 from ..._internal.validation import require_positive
 from .closed_form import _ABSORPTION_MODELS, _M_PER_KM, seawater_absorption
 from .seabed_reflection import reflection_coefficient
@@ -97,6 +100,50 @@ def _clean_profile(
     if np.any(c <= 0.0):
         raise ValueError("'sound_speeds' must be strictly positive.")
     return z, c
+
+
+def _clean_bathymetry(
+    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None,
+    bathymetry_depths_m: NDArray[np.float64] | list[float] | None,
+    z_prof: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
+    """One validated depth(r) polyline out of the pair of arrays, or ``None``.
+
+    The polyline is clamped level beyond its last node (the same
+    :func:`numpy.interp` convention the sound-speed profile lives by), so it
+    need not reach ``max_range``; but it must start at ``r = 0`` so the water
+    column at the source is stated rather than extrapolated, and it may not
+    dive below the profile's last node, because the profile *is* the medium
+    and a bottom below it would put water where no sound speed was given.
+    """
+    if bathymetry_ranges_m is None and bathymetry_depths_m is None:
+        return None
+    if bathymetry_ranges_m is None or bathymetry_depths_m is None:
+        raise ValueError(
+            "'bathymetry_ranges_m' and 'bathymetry_depths_m' describe one"
+            " bottom profile and must be passed together.")
+    br = np.asarray(bathymetry_ranges_m, dtype=np.float64).ravel()
+    bd = np.asarray(bathymetry_depths_m, dtype=np.float64).ravel()
+    if br.size < 2 or bd.shape != br.shape:
+        raise ValueError(
+            "'bathymetry_ranges_m' and 'bathymetry_depths_m' must be 1-D"
+            " arrays of equal length, at least two points.")
+    if not (np.all(np.isfinite(br)) and np.all(np.isfinite(bd))):
+        raise ValueError("the bathymetry must be finite.")
+    if np.any(np.diff(br) <= 0.0):
+        raise ValueError("'bathymetry_ranges_m' must be strictly increasing.")
+    if abs(float(br[0])) > 1e-9:
+        raise ValueError("'bathymetry_ranges_m' must start at the source, r = 0.")
+    if np.any(bd <= 0.0):
+        raise ValueError(
+            "'bathymetry_depths_m' must be strictly positive: the wedge apex"
+            " itself, where the water ends, cannot carry a water column.")
+    if float(bd.max()) > float(z_prof[-1]) + 1e-9:
+        raise ValueError(
+            "'bathymetry_depths_m' must not run below the sound-speed"
+            " profile: the profile is the medium, so it must reach the"
+            " deepest point of the bottom.")
+    return br, bd
 
 
 def _resolve_boundary(
@@ -152,7 +199,6 @@ def _seabed_grazing_deg(
 
 def _ocean_ray_derivative(
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    xi: NDArray[np.float64],
 ) -> RayDerivative:
     r"""The ocean's ray equations in range, vectorised over rays.
 
@@ -160,7 +206,10 @@ def _ocean_ray_derivative(
     ``[0, max_range]`` in the same number of steps regardless of its launch
     angle. The state is :math:`(z, \zeta, t, s)` and
     :math:`\xi = \cos\theta_0/c(z_\mathrm{s})` is invariant for a
-    range-independent :math:`c(z)`, so from
+    range-independent :math:`c(z)` between boundary reflections, which is why
+    the marcher passes it in per call rather than letting this closure freeze
+    it: a level boundary never touches it, and a sloping one rotates it at
+    each bounce (see :mod:`phonometry._internal.rays`). From
     :math:`dz/ds`, :math:`d\zeta/ds`, :math:`dt/ds = 1/c` and
     :math:`dr/ds = c\,\xi`,
 
@@ -191,7 +240,8 @@ def _ocean_ray_derivative(
     seg_grad = np.diff(c_prof) / np.diff(z_prof)
 
     def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64], /
+        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
+        xi_arr: NDArray[np.float64], /
     ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
                NDArray[np.float64]]:
         cc = np.interp(z_arr, z_prof, c_prof)
@@ -199,8 +249,8 @@ def _ocean_ray_derivative(
                        np.searchsorted(z_prof, z_arr, side="right") - 1,
                        np.searchsorted(z_prof, z_arr, side="left") - 1)
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
-        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2),
-                1.0 / (xi * cc))
+        return (zeta_arr / xi_arr, -grad / (cc**3 * xi_arr),
+                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
 
     return deriv
 
@@ -475,6 +525,25 @@ class RayTraceResult:
         recording it makes the result self-contained: :func:`eigenrays` needs
         it to put fresh rays through the same water the fan flew.
     :ivar profile_speeds: Sound speed at each of those depths, in m/s.
+    :ivar bathymetry_ranges: Node ranges of the bottom profile the rays were
+        traced over, in metres, or ``None`` for the level bottom at
+        ``water_depth`` (the default). With a sloping bottom two of the flat
+        record's invariants fall, and the arrays here say so honestly rather
+        than quietly keep their old meaning. A ray reflected past the vertical
+        by the accumulating slope cannot be carried by a range march (see
+        :func:`ray_trace`); its ``depths``, ``travel_times`` and
+        ``arc_lengths`` are ``NaN`` from the sample of the terminating bounce
+        on, so a plot simply ends where the ray turned and nothing downstream
+        can mistake a frozen sample for a traced one (the reflection counts,
+        being integers, instead hold their last value). And the crossing angle
+        at the bottom is no longer one per ray: each slope bounce rotates
+        Snell's invariant, so the per-bounce record that sufficed for a flat
+        guide (counts alone) does not price a sloping one, which is why
+        :func:`eigenrays` declines such a trace.
+    :ivar bathymetry_depths: Bottom depth at each of those nodes, in metres
+        (``None`` likewise). Between nodes the bottom is the straight facet,
+        beyond the last node it continues level: exactly the boundary the
+        marcher reflected off.
     """
 
     launch_angles: NDArray[np.float64]
@@ -488,6 +557,8 @@ class RayTraceResult:
     water_depth: float
     profile_depths: NDArray[np.float64]
     profile_speeds: NDArray[np.float64]
+    bathymetry_ranges: NDArray[np.float64] | None = None
+    bathymetry_depths: NDArray[np.float64] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the ray paths (depth increasing downward)."""
@@ -505,12 +576,46 @@ def ray_trace(
     launch_angles_deg: NDArray[np.float64] | list[float],
     max_range: float = 10_000.0,
     n_steps: int = 2000,
+    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
+    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
 ) -> RayTraceResult:
     r"""Trace acoustic rays through a range-independent sound-speed profile.
 
     Integrates the ray-trajectory equations (Jensen Eqs. 3.23-3.24) with a
     fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
     surface (``z = 0``) and the bottom (``z = water_depth``).
+
+    **The bottom may slope.** Passing the ``bathymetry_ranges_m`` /
+    ``bathymetry_depths_m`` pair replaces the level bottom with a
+    piecewise-linear depth profile ``depth(r)``, the faceted boundary model of
+    Jensen Fig. 3.20, and the first range dependence in this module; the
+    sound-speed profile stays range independent (see the scope note below).
+    The marcher then finds each boundary crossing against the interpolated
+    polyline and reflects the ray specularly about the local facet
+    (Eq. 3.121), so a bounce off a slope of angle :math:`\beta` changes the
+    ray's inclination by :math:`2\beta`: upslope bounces steepen a ray, which
+    is the whole one-line physics of wedge propagation, and downslope bounces
+    flatten it. Snell's invariant :math:`\xi` is therefore no longer a
+    constant of each ray but a constant *between* its bottom bounces, and one
+    consequence is drawn honestly rather than papered over: a ray steepened
+    past the vertical runs backward in range, which a marcher whose
+    independent variable is range cannot carry (the same one-way surgery the
+    parabolic equation performs), so such a ray is terminated at that bounce
+    and its samples are ``NaN`` from there on -- see
+    :attr:`RayTraceResult.bathymetry_ranges`. The polyline continues level
+    past its last node exactly as :func:`numpy.interp` clamps the sound-speed
+    profile; a bathymetric feature narrower than one range step can hide
+    between two samples of the crossing search, so ``n_steps`` must resolve
+    the bathymetry as well as the rays.
+
+    **Scope, stated plainly.** Range dependence enters here through the
+    boundary alone: full :math:`c(r, z)` is *not* implemented, deliberately.
+    Every solver in this module ships with an exact published oracle, and the
+    sloping-bottom geometry has one (the ideal wedge unfolds into a closed
+    fan of images, which is what the tests hold it to), while a
+    range-dependent water column has none: there is no closed form to hold a
+    :math:`c(r, z)` marcher to, so it would ship on trust, and this module
+    does not ship on trust.
 
     The travel time is a third state of that same Runge-Kutta step rather than a
     quadrature run over the finished path: with the range-invariant Snell
@@ -536,13 +641,24 @@ def ray_trace(
         (positive downward).
     :param max_range: Maximum horizontal range to trace, in metres.
     :param n_steps: Number of integration steps per ray.
+    :param bathymetry_ranges_m: Node ranges of a piecewise-linear bottom
+        profile, in metres, strictly increasing from ``r = 0``; level past the
+        last node. Default (``None``): the level bottom at the profile's last
+        depth. Passed together with ``bathymetry_depths_m``.
+    :param bathymetry_depths_m: Bottom depth at each node, in metres, strictly
+        positive and never below the sound-speed profile's last depth
+        (``None`` likewise).
     :return: A :class:`RayTraceResult`.
     :raises ValueError: If the inputs are invalid.
     """
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    bathymetry = _clean_bathymetry(bathymetry_ranges_m, bathymetry_depths_m,
+                                   z_prof)
     water_depth = float(z_prof[-1])
+    depth_at_source = (water_depth if bathymetry is None
+                       else float(bathymetry[1][0]))
     zs = float(source_depth)
-    if not (0.0 <= zs <= water_depth):
+    if not (0.0 <= zs <= depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     if int(n_steps) < 2:
@@ -558,22 +674,35 @@ def ray_trace(
     c0 = float(np.interp(zs, z_prof, c_prof))
     th = np.radians(angles)
     xi = np.cos(th) / c0  # Snell invariant per ray (> 0 since |θ0| < 90°)
-    deriv = _ocean_ray_derivative(z_prof, c_prof, xi)
+    deriv = _ocean_ray_derivative(z_prof, c_prof)
 
     # The marcher splits every range step at the surface or bottom it crosses,
     # so a reflected ray keeps the order the rest of the path is integrated
     # with; see :mod:`phonometry._internal.rays`.
+    upper: float | SlopingBoundary = (
+        water_depth if bathymetry is None else SlopingBoundary(*bathymetry))
     march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
                        zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
-                       n_steps=ns, lower=0.0, upper=water_depth)
+                       n_steps=ns, lower=0.0, upper=upper)
     ray_r = np.broadcast_to(ranges, march.positions.shape).copy()
+
+    ray_z, ray_t, ray_s = march.positions, march.times, march.arc_lengths
+    if bathymetry is not None and march.stopped_columns is not None and np.any(
+            march.stopped_columns < ns):
+        # A terminated ray's samples from the stopping bounce on are frozen at
+        # a point that is not on those columns' own ranges; NaN says "the ray
+        # ended here" in every consumer at once, plots included.
+        gone = np.arange(ns)[None, :] >= march.stopped_columns[:, None]
+        ray_z = np.where(gone, np.nan, ray_z)
+        ray_t = np.where(gone, np.nan, ray_t)
+        ray_s = np.where(gone, np.nan, ray_s)
 
     return RayTraceResult(
         launch_angles=angles,
         ranges=ray_r,
-        depths=march.positions,
-        travel_times=march.times,
-        arc_lengths=march.arc_lengths,
+        depths=ray_z,
+        travel_times=ray_t,
+        arc_lengths=ray_s,
         # The marcher reports per-step bounce counts and says which boundary
         # each was at; accumulated along the ray they become the exponent any
         # per-boundary reflection coefficient enters the amplitude with.
@@ -584,6 +713,8 @@ def ray_trace(
         water_depth=water_depth,
         profile_depths=z_prof,
         profile_speeds=c_prof,
+        bathymetry_ranges=None if bathymetry is None else bathymetry[0],
+        bathymetry_depths=None if bathymetry is None else bathymetry[1],
     )
 
 
@@ -719,7 +850,7 @@ def _march_arrival_rays(
     """
     c0 = float(np.interp(source_depth, z_prof, c_prof))
     xi = np.cos(thetas) / c0
-    deriv = _ocean_ray_derivative(z_prof, c_prof, xi)
+    deriv = _ocean_ray_derivative(z_prof, c_prof)
     return march_rays(
         deriv, xi=xi, z0=np.full(thetas.size, source_depth),
         zeta0=np.sin(thetas) / c0,
@@ -876,6 +1007,14 @@ def eigenrays(
     """
     key, seabed = _resolve_boundary(bottom, seabed_density, seabed_sound_speed,
                                     density)
+    if trace.bathymetry_ranges is not None:
+        raise ValueError(
+            "'trace' was made over a sloping bottom, which this search does"
+            " not price: each slope bounce rotates Snell's invariant, so an"
+            " arrival's bottom touches no longer share one grazing angle and"
+            " the amplitude convention below (one coefficient per ray, raised"
+            " to the touch count) stops holding. Trace over a level bottom to"
+            " list eigenrays.")
     z_prof = np.asarray(trace.profile_depths, dtype=np.float64)
     c_prof = np.asarray(trace.profile_speeds, dtype=np.float64)
     water_depth = float(trace.water_depth)
@@ -1196,7 +1335,20 @@ class GaussianBeamResult:
         :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
         each beam's bottom reflections multiplied it by.
     :ivar source_depth: Source depth, in metres.
-    :ivar water_depth: Water-column depth, in metres.
+    :ivar water_depth: Water-column depth, in metres: the sound-speed
+        profile's last depth, which over a sloping bottom is the deepest
+        water the medium description reaches while the column itself is the
+        bathymetry below.
+    :ivar bathymetry_ranges: Node ranges of the bottom profile the run was
+        marched over, in metres, or ``None`` for the level bottom (the
+        default). When present, the per-beam histories (``ray_depths``,
+        ``beam_widths``, ``wavefront_curvatures``) are ``NaN`` from the
+        column at which a beam was terminated by a reflection past the
+        vertical, the same convention :class:`RayTraceResult` uses and for
+        the same reason: from there on the beam no longer exists in the
+        forward field, and its weight in the sum is zero.
+    :ivar bathymetry_depths: Bottom depth at each of those nodes, in metres
+        (``None`` likewise).
     """
 
     frequency: float
@@ -1216,6 +1368,8 @@ class GaussianBeamResult:
     seabed_sound_speed: float | None
     source_depth: float
     water_depth: float
+    bathymetry_ranges: NDArray[np.float64] | None = None
+    bathymetry_depths: NDArray[np.float64] | None = None
 
     def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
         """Plot the propagation-loss field (depth increasing downward)."""
@@ -1244,6 +1398,23 @@ _INFLUENCE_BLOCK = 1 << 20
 #: Fraction of the water column the steepest beam of the fan may climb in one
 #: marching step before the step is reported as too coarse to resolve it.
 _MAX_STEEP_CLIMB = 0.25
+#: How far from its sample a beam's analytic tail may still be evaluated at a
+#: *sloped* receiver column, in multiples of the marched range extent. The fan
+#: ladder has no admission floor on a slope (see :func:`_fold_margins`), so
+#: this budget is what stands between the influence sum and pricing wedge
+#: geometry the caller never described: a wrapped rung's image is the local
+#: facet's wedge continued clear around its apex, and where that apex stands
+#: tens of extents beyond the march (a locally tilted bottom in deep water),
+#: the arrivals those tails would reconstruct bounce on pure fiction --
+#: measured at up to 11 dB of pollution against a two-path oracle whose bottom
+#: no beam can even reach, against 0.001 dB with the budget in place. Two
+#: extents is the up-and-back allowance: the farthest genuine rung of the
+#: ideal-wedge oracle, a return leg that turns just past the far edge of the
+#: march, stands 1.9 extents out and is untouched (the oracle's numbers are
+#: identical with the budget at 2 or at 4), while one extent alone clips it
+#: and costs that field over 2 dB. Level columns are never capped, which is
+#: part of why a level polyline keeps the flat ladder bit for bit.
+_TAIL_TRUST = 2.0
 
 
 def _default_beam_widths(
@@ -1362,8 +1533,8 @@ def _default_beam_widths(
 
 
 def _image_ladder(
-    water_depth: float, n_wrap: int,
-) -> list[tuple[float, float, int, int]]:
+    n_wrap: int,
+) -> list[tuple[int, float, int, int]]:
     """The receiver's images in the folded column, as boundary-touch counts.
 
     The marcher folds a reflected ray back into the water column, which is the
@@ -1400,20 +1571,32 @@ def _image_ladder(
     bottom they coincide with equal signs, so the field doubles and its depth
     derivative cancels.
 
+    With a sloping bottom there is no single ``D`` to fold at, and the rungs
+    returned here are the dimensionless part of the ladder only, the wrap
+    count and the two exponents: :func:`_beam_influence` prices the level
+    columns as ``shift = 2 l D`` and the sloping ones as the dihedral fan of
+    :func:`_fold_images`, whose rung ``(l, side)`` is the rotation of the
+    receiver by ``2 l`` facet angles about the local apex. The counts carry
+    over unchanged because the fan's plane-crossing structure is the stack's:
+    the image at angle :math:`2l\\beta \\pm \\gamma` stands behind exactly
+    ``l`` bottom planes and ``l`` (or ``l - 1``) surface planes, the same
+    words the level ladder counts, which is also where the sign consistency
+    condition (an even number of facets in the half turn) comes from.
+
     :param n_wrap: How many wraps each way to carry. What it costs is bounded
         per beam rather than globally: :func:`gaussian_beams` admits each beam
         only to the wraps its own reach can populate.
-    :return: One ``(shift, side, n_surface, n_bottom)`` entry per image, with
-        ``side`` the sign multiplying ``z_r`` and the two counts the exponents
-        of the surface and bottom reflection coefficients.
+    :return: One ``(wrap, side, n_surface, n_bottom)`` entry per image, with
+        ``wrap`` the integer ``l`` of the fold ``2 l D``, ``side`` the sign
+        multiplying ``z_r`` and the two counts the exponents of the surface
+        and bottom reflection coefficients.
     """
     ladder = []
     for wrap in range(-n_wrap, n_wrap + 1):
-        shift = 2.0 * wrap * water_depth
-        ladder.append((shift, 1.0, abs(wrap), abs(wrap)))
+        ladder.append((wrap, 1.0, abs(wrap), abs(wrap)))
         mirrored = ((wrap - 1, wrap) if wrap >= 1
                     else (abs(wrap) + 1, abs(wrap)))
-        ladder.append((shift, -1.0, *mirrored))
+        ladder.append((wrap, -1.0, *mirrored))
     return ladder
 
 
@@ -1422,9 +1605,11 @@ class _BeamSamples(NamedTuple):
 
     All the ``(n_beams, n_ranges)`` fields are the march's own history indexed
     at the column nearest each requested range, so the influence sum is
-    arithmetic on aligned arrays rather than a search. ``xi`` is
-    ``(n_beams, 1)`` and the two range fields are ``(1, n_ranges)``, so they
-    broadcast against the rest.
+    arithmetic on aligned arrays rather than a search. The two range fields
+    are ``(1, n_ranges)``, so they broadcast against the rest. ``xi`` is the
+    marched horizontal slowness read per column like the other state, because
+    a sloping bottom rotates it at each bounce; over a level bottom every row
+    is its launch value repeated.
 
     :ivar weight: :math:`A(\\theta_0)` of Eq. (3.92) times the reflection
         coefficients the central ray has accumulated by that column.
@@ -1454,11 +1639,115 @@ class _BeamSamples(NamedTuple):
     reach: NDArray[np.float64]
 
 
+class _FoldColumns(NamedTuple):
+    """The local bottom each receiver column folds its images at.
+
+    One entry per receiver range: the receiver's own range, the bottom depth
+    there and the facet slope there (the facet ahead at a vertex, the level
+    clamp beyond the polyline's ends: the marcher's own conventions). A
+    column with slope zero folds like the level guide, bit for bit.
+    """
+
+    ranges: NDArray[np.float64]
+    depths: NDArray[np.float64]
+    slopes: NDArray[np.float64]
+
+
+def _fold_images(
+    fold: _FoldColumns, cols: NDArray[np.intp], wrap: int, side: float,
+    zr: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Receiver images of one ladder rung, per (column, receiver depth).
+
+    Where the column's facet is level this is the flat ladder's image,
+    ``z = 2 l D + side z_r`` at the receiver's own range, to the last bit.
+    Where it slopes, the surface plane and the extended facet plane meet at a
+    local apex, and the compositions of their two mirrors are the dihedral
+    fan about it: the rung ``(l, side)`` image sits at polar angle
+    :math:`2 l \\beta + \\mathrm{side}\\,\\gamma` on the receiver's own circle
+    of radius :math:`\\rho` about that apex, with :math:`\\beta` the facet
+    angle and :math:`(\\rho, \\gamma)` the receiver's polar coordinates. For
+    a single facet that is the exact unfolding (it is how the ideal wedge's
+    closed-form image fan is built), which is what lets the tail sum keep the
+    flat ladder's accuracy on a slope; a polyline of several facets makes it
+    local to each column's facet, the honest first order in facet changes.
+    Both slope signs map onto one canonical wedge by mirroring range about
+    the column, which preserves every distance the influence sum consumes.
+
+    :return: ``(z_i, r_i)`` arrays of shape ``(cols.size, zr.size)``: the
+        image positions in the water-column plane.
+    """
+    d_col = fold.depths[cols][:, None]
+    m_col = fold.slopes[cols][:, None]
+    r_col = fold.ranges[cols][:, None]
+    sloped = m_col != 0.0
+    z_flat = 2.0 * wrap * d_col + side * zr[None, :]
+    # Distance from the local apex to the column along the surface, guarded
+    # where the facet is level (the apex is then at infinity and the flat
+    # branch above is the one selected).
+    x_col = d_col / np.abs(np.where(sloped, m_col, 1.0))
+    beta = np.arctan(np.abs(m_col))
+    rho = np.hypot(x_col, zr[None, :])
+    gamma = np.arctan2(zr[None, :], x_col)
+    angle = 2.0 * wrap * beta + side * gamma
+    z_i = np.where(sloped, rho * np.sin(angle), z_flat)
+    r_i = np.where(sloped,
+                   r_col + np.sign(m_col) * (rho * np.cos(angle) - x_col),
+                   r_col)
+    return z_i, r_i
+
+
+def _fold_margins(
+    fold: _FoldColumns, wrap: int, side: float,
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    """Per-column admission floor and validity of one ladder rung.
+
+    The floor is a lower bound on the *transverse* distance from the rung's
+    images to the beams, compared against the beams' reach so a rung no beam
+    can populate is never built. Level columns use the flat ladder's exact
+    ``|2 l D| - span``, which is transverse because a level fold displaces
+    the image in depth alone. Sloping columns get **no** floor at all, and
+    the reason is worth a sentence: a fold of the fan displaces the image in
+    range as much as in depth, and an image kilometres away *along* a beam's
+    axis is at zero transverse distance -- it is exactly how a wrapped tail
+    represents an arrival that went up the slope, turned past the vertical
+    and came back, which the marched axis cannot do but the analytic tail
+    does. An earlier chord-distance floor here silently pruned those
+    return-leg images and measured whole decibels against the ideal wedge;
+    only the per-cell admission test can prune a fan rung. What keeps that
+    freedom honest is the tail budget of :data:`_TAIL_TRUST`, applied inside
+    the per-cell test itself: a wrapped tail may carry an up-and-back
+    arrival, but no farther out than the march could have carried the beam
+    there and back, so a rung whose images stand on wedge geometry beyond
+    anything the caller described is refused by every beam at once.
+
+    Validity is the fan closing on itself: a wedge of angle :math:`\\beta`
+    has :math:`2\\pi/\\beta` distinct images in the whole circle, so a rung
+    rotated past :math:`\\pi` re-enters from the other side and would count
+    an image twice; it is dropped, and at exactly :math:`\\pi` (the seam,
+    where the two directions land on the same image) only the positive wrap
+    keeps it. Level columns have no fan to close and every rung is valid.
+    """
+    d_col = fold.depths
+    m_col = fold.slopes
+    sloped = m_col != 0.0
+    span = d_col if side > 0.0 else 2.0 * d_col
+    flat_margin = np.abs(2.0 * wrap * d_col) - span
+    beta = np.arctan(np.abs(m_col))
+    margin = np.where(sloped, 0.0, flat_margin)
+    turned = 2.0 * abs(wrap) * beta
+    valid = ~sloped | (turned < np.pi - 1e-9) | (
+        (np.abs(turned - np.pi) <= 1e-9) & (wrap > 0))
+    return margin, valid
+
+
 def _beam_influence(
     s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
-    water_depth: float, bottom_reflection: float | NDArray[np.complex128],
+    water_depth: float,
+    bottom_reflection: float | NDArray[np.complex128],
     omega: float, beam_width: float | NDArray[np.float64],
-    attenuation: float,
+    attenuation: float, fold: _FoldColumns | None = None,
+    march_extent: float = np.inf,
 ) -> NDArray[np.complex128]:
     r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
 
@@ -1568,29 +1857,93 @@ def _beam_influence(
     isovelocity column that is exact, not paraxial: the unfolded beam is
     straight, so it crosses every bottom plane at its central ray's own angle.
 
+    THE FOLD MAY BE A LOCAL WEDGE FAN. With ``fold`` given (a sloping bottom),
+    each receiver column folds its images at its own facet: the flat vertical
+    stack of mirrors becomes the dihedral fan about the local apex that
+    :func:`_fold_images` builds, which for a single facet is the exact
+    unfolding. The straight continuation the influence sum evaluates *is* the
+    unfolded beam, so evaluating it at those rotated image points keeps on a
+    slope the very property that makes the flat ladder exact: each stationary
+    image contributes :math:`e^{ikR}/R` of its own unfolded distance. What
+    breaks it is a fold plane that is wrong by the facet's tilt: an earlier
+    version of this branch folded at the local *depth* but not the local
+    *slope*, and the tilt displaces a first-fold image by
+    :math:`2\beta\,(D - z_\mathrm{r})`, metres against a wavelength, which
+    measured 5 to 21 dB of fringe displacement on the ideal wedge where the
+    fan ladder measures a small fraction of a decibel. The fan is local in
+    reach as well as in tilt: at a sloped column a tail is evaluated no
+    farther from its sample than :data:`_TAIL_TRUST` marched extents,
+    because a rung whose image circles an apex standing tens of extents
+    beyond the march represents bounces on boundary the polyline never
+    described, and evaluating those tails anyway measured up to 11 dB of
+    pollution on a configuration whose bottom no beam can even reach; two
+    extents is the out-and-back allowance that keeps every genuine return
+    leg of the ideal wedge (its farthest stands 1.9 extents out) while
+    refusing the fiction. A rung whose images
+    stand beyond every beam's reach at some columns but not others is
+    evaluated on the columns that need it alone, which is what keeps the
+    thinning column of a wedge from pricing every rung everywhere: near an
+    apex the local depth gets small, the wrap count the reach demands grows
+    as its inverse, and without the column subset the ladder would build
+    full-width arrays for rungs one column asked for.
+
     :param attenuation: Volume absorption :math:`\alpha` in nepers per metre
         (0.0 propagates without absorption and skips the work).
+    :param fold: Per-column fold geometry of a sloping bottom, or ``None``
+        for the level guide at ``water_depth`` (the flat ladder, bit for
+        bit; a ``fold`` whose slopes are all zero is that same ladder by
+        construction).
+    :param march_extent: Range span the beams were marched over, in metres;
+        with ``fold`` given it sets the tail budget
+        :data:`_TAIL_TRUST` ``* march_extent`` at the sloped columns.
     :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
         convention Eq. (3.88) is printed in; the caller conjugates it.
     """
     n_ranges = s.depth.shape[1]
-    n_wrap = min(_MAX_BEAM_WRAPS,
-                 int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
+    if fold is None:
+        n_wrap = int(np.ceil(float(s.reach.max()) / (2.0 * water_depth)))
+    else:
+        # Level columns ask for the depth-stack count the reach implies; the
+        # sloped ones ask for the whole half fan, seam included, because the
+        # wrapped tails carry the up-and-back arrivals whatever the reach.
+        n_wrap = int(np.ceil(float(s.reach.max()) / (2.0 * fold.depths.min())))
+        sloped = np.abs(fold.slopes) > 0.0
+        if np.any(sloped):
+            beta_min = float(np.arctan(np.abs(fold.slopes[sloped])).min())
+            n_wrap = max(n_wrap, int(np.ceil(0.5 * np.pi / beta_min)) + 1)
+    n_wrap = min(_MAX_BEAM_WRAPS, n_wrap)
     r_bottom = np.broadcast_to(np.asarray(bottom_reflection),
                                (s.depth.shape[0],))
+    reach_max = float(s.reach.max())
+    if fold is not None:
+        capped = np.abs(fold.slopes) > 0.0
+        tail_limit = _TAIL_TRUST * march_extent
     plan = []
-    for shift, side, n_surface, n_bottom in _image_ladder(water_depth, n_wrap):
+    for wrap, side, n_surface, n_bottom in _image_ladder(n_wrap):
         # This image sits at ``shift + side*z_r - z_j`` in depth, so with both
         # depths inside the column its offset is at least ``|shift| - D`` away
         # for the upright family and ``|shift| - 2D`` for the mirrored one,
         # whose two depths subtract rather than cancel. A beam that cannot reach
         # that far cannot contribute to the image at any receiver depth and is
-        # dropped before a single array is built for it.
-        span = water_depth if side > 0.0 else 2.0 * water_depth
-        rows = np.flatnonzero(s.reach >= abs(shift) - span)
-        if rows.size:
-            strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
-            plan.append((shift, side, strength, rows))
+        # dropped before a single array is built for it. On a slope the floor
+        # and the rung's validity come from the local fan instead.
+        cols = None
+        if fold is None:
+            shift = 2.0 * wrap * water_depth
+            span = water_depth if side > 0.0 else 2.0 * water_depth
+            rows = np.flatnonzero(s.reach >= abs(shift) - span)
+        else:
+            margin, valid = _fold_margins(fold, wrap, side)
+            usable = valid & (margin <= reach_max)
+            if not usable.all():
+                cols = np.flatnonzero(usable)
+                if cols.size == 0:
+                    continue
+            rows = np.flatnonzero(s.reach >= float(margin[usable].min()))
+        if rows.size == 0:
+            continue
+        strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
+        plan.append((wrap, side, strength, rows, cols))
 
     # One W_0 per beam (a scalar is every beam's): the admission test below
     # reads W = 2|q|/(omega W_0) with each row's own width.
@@ -1598,16 +1951,32 @@ def _beam_influence(
         np.asarray(beam_width, dtype=np.float64), (s.depth.shape[0],))
     cutoff_sq = _BEAM_CUTOFF**2
     field = np.zeros((receiver_depths.size, n_ranges), dtype=np.complex128)
-    for shift, side, strength, rows in plan:
-        xi = s.xi[rows][:, :, None]
-        offset = s.range_offset[:, :, None]
-        column = s.column_range[:, :, None]
-        depth = s.depth[rows][:, :, None]
-        vertical = s.vertical[rows][:, :, None]
-        speed2d, slope2d = s.speed[rows], s.slope[rows]
-        spread2d, weight2d = s.spreading[rows], s.weight[rows]
-        phase2d, time2d = s.phase[rows], s.time[rows]
-        path2d = s.path[rows]
+    all_cols = np.arange(n_ranges, dtype=np.intp)
+    for wrap, side, strength, rows, cols in plan:
+        if cols is None:
+            nc = n_ranges
+            speed2d, slope2d = s.speed[rows], s.slope[rows]
+            spread2d, weight2d = s.spreading[rows], s.weight[rows]
+            phase2d, time2d = s.phase[rows], s.time[rows]
+            path2d = s.path[rows]
+            xi2d, depth2d, vert2d = s.xi[rows], s.depth[rows], s.vertical[rows]
+            offset2d, column2d = s.range_offset, s.column_range
+        else:
+            # A rung only some columns can populate is priced on those columns
+            # alone; ``np.ix_`` gathers the (row, column) cross product once.
+            nc = cols.size
+            sub = np.ix_(rows, cols)
+            speed2d, slope2d = s.speed[sub], s.slope[sub]
+            spread2d, weight2d = s.spreading[sub], s.weight[sub]
+            phase2d, time2d = s.phase[sub], s.time[sub]
+            path2d = s.path[sub]
+            xi2d, depth2d, vert2d = s.xi[sub], s.depth[sub], s.vertical[sub]
+            offset2d, column2d = s.range_offset[:, cols], s.column_range[:, cols]
+        xi = xi2d[:, :, None]
+        offset = offset2d[:, :, None]
+        column = column2d[:, :, None]
+        depth = depth2d[:, :, None]
+        vertical = vert2d[:, :, None]
         speed = speed2d[:, :, None]
         speed_sq = speed**2
         wavelength = 2.0 * np.pi * speed / omega
@@ -1615,12 +1984,23 @@ def _beam_influence(
         slope = slope2d[:, :, None]
         # A block of receiver depths at a time, sized so the temporaries stay
         # bounded however large the requested grid is.
-        step = max(1, _INFLUENCE_BLOCK // (rows.size * n_ranges))
+        step = max(1, _INFLUENCE_BLOCK // (rows.size * nc))
         for lo in range(0, receiver_depths.size, step):
             zr = receiver_depths[lo:lo + step]
-            dz = (shift + side * zr[None, None, :]) - depth
-            along = xi * offset + vertical * dz  # s / c
-            normal = speed * (xi * dz - vertical * offset)
+            if fold is None:
+                shift = 2.0 * wrap * water_depth
+                dz = (shift + side * zr[None, None, :]) - depth
+                d_r = offset
+            else:
+                z_i, r_i = _fold_images(
+                    fold, all_cols if cols is None else cols, wrap, side, zr)
+                dz = z_i[None, :, :] - depth
+                # The image's own range enters through the offset to the
+                # sample column; a level column reduces to the receiver's.
+                d_r = offset + (r_i - fold.ranges[
+                    all_cols if cols is None else cols][:, None])[None, :, :]
+            along = xi * d_r + vertical * dz  # s / c
+            normal = speed * (xi * dz - vertical * d_r)
             q_infl = spreading + speed_sq * slope * along
             # Held off the axis by a wavelength; see the note above on why the
             # cylindrical half of the Jacobian is the one factor nothing else
@@ -1631,12 +2011,17 @@ def _beam_influence(
             # square root: this test runs over the whole block while everything
             # after it runs over the survivors, which in a waveguide are around
             # a third of the cells, so it must stay arithmetic.
-            hits = np.flatnonzero(
-                ((normal * half_omega_width[rows][:, None, None]) ** 2
-                 < cutoff_sq * (q_infl.real**2 + q_infl.imag**2)).ravel())
+            admitted = ((normal * half_omega_width[rows][:, None, None]) ** 2
+                        < cutoff_sq * (q_infl.real**2 + q_infl.imag**2))
+            if fold is not None:
+                sub_capped = capped if cols is None else capped[cols]
+                if sub_capped.any():
+                    admitted &= (~sub_capped[None, :, None]
+                                 | (np.abs(speed * along) <= tail_limit))
+            hits = np.flatnonzero(admitted.ravel())
             if hits.size == 0:
                 continue
-            beam_at, within = np.divmod(hits, n_ranges * zr.size)
+            beam_at, within = np.divmod(hits, nc * zr.size)
             range_at, depth_at = np.divmod(within, zr.size)
             q_hit = q_infl.ravel()[hits]
             spread_hit = spread2d[beam_at, range_at]
@@ -1665,12 +2050,16 @@ def _beam_influence(
                 * np.sqrt(speed2d[beam_at, range_at] / r_infl.ravel()[hits])
                 / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
             )
-            cells = zr.size * n_ranges
-            target = depth_at * n_ranges + range_at
-            field[lo:lo + zr.size] += (
+            cells = zr.size * nc
+            target = depth_at * nc + range_at
+            block = (
                 np.bincount(target, value.real, minlength=cells)
                 + 1j * np.bincount(target, value.imag, minlength=cells)
-            ).reshape(zr.size, n_ranges)
+            ).reshape(zr.size, nc)
+            if cols is None:
+                field[lo:lo + zr.size] += block
+            else:
+                field[lo:lo + zr.size, cols] += block
     return field
 
 
@@ -1806,6 +2195,8 @@ def gaussian_beams(
     temperature: float = 10.0,
     salinity: float = 35.0,
     ph: float = 8.0,
+    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
+    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
 ) -> GaussianBeamResult:
     r"""Propagation-loss field from Gaussian beam tracing.
 
@@ -1951,6 +2342,54 @@ def gaussian_beams(
     already breathes; sediment attenuation and elasticity are outside the
     fluid-fluid model here as they are outside ``seabed_reflection`` itself.
 
+    **The bottom may slope.** The ``bathymetry_ranges_m`` /
+    ``bathymetry_depths_m`` pair replaces the level bottom with the same
+    piecewise-linear ``depth(r)`` polyline :func:`ray_trace` takes, and it is
+    the first range dependence in this module; the sound-speed profile stays
+    range independent, deliberately -- see :func:`ray_trace`'s scope note for
+    why full :math:`c(r, z)` is excluded (no exact oracle exists to hold it
+    to). Four things follow from the slope, each stated with its cost:
+
+    * Every beam's central ray reflects specularly off the local facet
+      (Eq. 3.121), so an upslope bounce steepens it by twice the slope, and
+      the dynamic pair takes the reflection impulse of Eqs. (3.122)-(3.123)
+      evaluated on that facet (curvature zero, since the facets are straight;
+      :mod:`phonometry._internal.rays` records the closed form and its
+      flat-bottom limit).
+    * A beam steepened past the vertical would run backward in range, which a
+      range-marching solver cannot carry: it is terminated at that bounce and
+      its weight is zero from there on, so the field keeps only what still
+      travels forward, exactly as the one-way parabolic equation keeps no
+      backscatter. Upslope propagation toward an apex therefore *loses* the
+      energy the wedge sends back down the slope; the ideal-wedge oracle in
+      the tests prices that truncation next to everything else.
+    * The receiver-image ladder folds each receiver column about its own
+      local facet: the vertical stack of mirrors becomes the dihedral fan
+      about the local apex, exact for a single facet and local to each
+      column's facet on a general polyline; at slope zero it is the level
+      ladder bit for bit, which a test pins. The fan is what lets the
+      *tails* keep representing paths the marched axes cannot: an arrival
+      that went up the slope, turned past the vertical and came back is a
+      wrapped rung of the fan, analytic rather than marched, and the solver
+      recovers most of it.
+    * The lossy fluid seabed cannot be combined with a slope, and the
+      rejection is of the wiring, not the physics: the one-coefficient-per-
+      beam collapse rests on Snell's invariant fixing a single grazing angle
+      per ray at the bottom, and a slope rotates that invariant at every
+      touch. A sloping run takes the perfect reflectors of ``bottom``.
+
+    Validated against the ideal wedge, which has an exact solution by images:
+    an isovelocity wedge under a pressure-release surface with a rigid sloping
+    bottom of angle :math:`\beta = \pi/n` (:math:`n` even) unfolds into a
+    closed fan of :math:`2\pi/\beta` image sources on a circle about the apex.
+    The tests build that fan from pure geometry and quantify the agreement in
+    dB, cross-sections in range and depth, upslope: a tenth of a decibel
+    where a single facet bounce carries the field, and within about two
+    decibels of the *complete* wedge field (mean two thirds of one) across a
+    thin 2.8-degree wedge whose every cell is dense multipath, most of it
+    arrivals near their own turning point, which is where a one-way marcher
+    pays its way; the tests print the decomposition.
+
     What it costs is ``n_beams`` times the size of the receiver grid, and none
     of the three factors depends on the frequency: the ray core does not have to
     resolve a wavelength on a grid, and the fan only widens as
@@ -2021,6 +2460,15 @@ def gaussian_beams(
         thousand (ignored when ``absorption_model`` is ``None``).
     :param ph: Acidity for the absorption model (ignored when
         ``absorption_model`` is ``None``; Thorp ignores it always).
+    :param bathymetry_ranges_m: Node ranges of a piecewise-linear bottom
+        profile, in metres, strictly increasing from ``r = 0``; level past
+        the last node. Default (``None``): the level bottom at the profile's
+        last depth, which is every validation number of this module. Passed
+        together with ``bathymetry_depths_m``, and not alongside the seabed
+        pair.
+    :param bathymetry_depths_m: Bottom depth at each node, in metres,
+        strictly positive and never below the sound-speed profile's last
+        depth (``None`` likewise).
     :return: A :class:`GaussianBeamResult`.
     :raises ValueError: If the inputs are invalid.
     :warns PhonometryWarning: when the source sits on a kink of the profile
@@ -2031,9 +2479,13 @@ def gaussian_beams(
     """
     f = require_positive(frequency_hz, "frequency_hz")
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
+    bathymetry = _clean_bathymetry(bathymetry_ranges_m, bathymetry_depths_m,
+                                   z_prof)
     water_depth = float(z_prof[-1])
+    depth_at_source = (water_depth if bathymetry is None
+                       else float(bathymetry[1][0]))
     zs = float(source_depth)
-    if not (0.0 < zs < water_depth):
+    if not (0.0 < zs < depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
     rmax = require_positive(max_range, "max_range")
     dr_step = require_positive(range_step, "range_step")
@@ -2041,6 +2493,14 @@ def gaussian_beams(
         raise ValueError("'range_step' must not exceed 'max_range'.")
     key, seabed = _resolve_boundary(bottom, seabed_density, seabed_sound_speed,
                                     density)
+    if seabed is not None and bathymetry is not None:
+        raise ValueError(
+            "a lossy fluid seabed and a sloping bottom cannot be combined:"
+            " the one-coefficient-per-beam collapse (and the image ladder's"
+            " powers of R) rests on Snell's invariant fixing a single grazing"
+            " angle per ray at a level bottom, and a slope rotates that"
+            " invariant at every touch. Sloping runs take the perfect"
+            " reflectors of 'bottom'.")
     theta_max = float(max_angle_deg)
     if not (0.0 < theta_max < 90.0):
         raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
@@ -2109,10 +2569,12 @@ def gaussian_beams(
         bottom_factor = np.conj(reflection_coefficient(
             grazing, rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2))
 
+    upper: float | SlopingBoundary = (
+        water_depth if bathymetry is None else SlopingBoundary(*bathymetry))
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof, fan.xi), xi=fan.xi,
+        _ocean_ray_derivative(z_prof, c_prof), xi=fan.xi,
         z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
-        n_steps=n_steps, lower=0.0, upper=water_depth,
+        n_steps=n_steps, lower=0.0, upper=upper,
         dynamic=DynamicRays(np.asarray(0.5j * omega * w0**2, dtype=np.complex128),
                             np.full(n_fan, 1.0 + 0.0j), z_prof, c_prof))
 
@@ -2127,11 +2589,21 @@ def gaussian_beams(
             f" across a {water_depth:.0f} m column, so its trajectory is not"
             " resolved; cut 'range_step' or narrow 'max_angle_deg'.")
 
+    # The image ladder folds each receiver column at its own local facet when
+    # the bottom slopes: depth and slope both, since a fold plane wrong by the
+    # facet's tilt displaces the images by wavelengths (see _beam_influence).
+    fold: _FoldColumns | None = None
+    if bathymetry is not None:
+        br, bd = bathymetry
+        facet = np.concatenate(([0.0], np.diff(bd) / np.diff(br), [0.0]))
+        fold = _FoldColumns(
+            ranges, np.asarray(np.interp(ranges, br, bd)),
+            facet[np.searchsorted(br, ranges, side="right")])
     field, widths, curvatures = _assemble_beam_field(
         march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
         z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
         water_depth=water_depth, bottom_reflection=bottom_factor,
-        attenuation=attenuation)
+        attenuation=attenuation, fold=fold)
 
     # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
     # here hands back a field in the exp(-i omega t) one the rest of the module
@@ -2142,6 +2614,18 @@ def gaussian_beams(
     with np.errstate(divide="ignore"):
         pl = -20.0 * np.log10(np.abs(pressure))
 
+    ray_depths = march.positions
+    ray_widths, ray_curvatures = widths, curvatures
+    if (bathymetry is not None and march.stopped_columns is not None
+            and np.any(march.stopped_columns < n_steps)):
+        # A terminated beam's history is frozen at its last bounce; the field
+        # above already retired it there, and the per-ray records say so the
+        # same way ray_trace does: NaN from the stop column on.
+        gone = np.arange(n_steps)[None, :] >= march.stopped_columns[:, None]
+        ray_depths = np.where(gone, np.nan, ray_depths)
+        ray_widths = np.where(gone, np.nan, ray_widths)
+        ray_curvatures = np.where(gone, np.nan, ray_curvatures)
+
     return GaussianBeamResult(
         frequency=f,
         ranges=ranges,
@@ -2151,9 +2635,9 @@ def gaussian_beams(
         launch_angles=np.degrees(launch),
         ray_ranges=np.broadcast_to(np.arange(n_steps) * dr,
                                    march.positions.shape).copy(),
-        ray_depths=march.positions,
-        beam_widths=widths,
-        wavefront_curvatures=curvatures,
+        ray_depths=ray_depths,
+        beam_widths=ray_widths,
+        wavefront_curvatures=ray_curvatures,
         initial_beam_widths=np.asarray(w0, dtype=np.float64),
         absorption_model=absorption_key,
         absorption_coefficient=alpha,
@@ -2161,6 +2645,8 @@ def gaussian_beams(
         seabed_sound_speed=None if seabed is None else seabed[2],
         source_depth=zs,
         water_depth=water_depth,
+        bathymetry_ranges=None if bathymetry is None else bathymetry[0],
+        bathymetry_depths=None if bathymetry is None else bathymetry[1],
     )
 
 
@@ -2168,8 +2654,10 @@ def _assemble_beam_field(
     march: RayMarch, *, ranges: NDArray[np.float64],
     receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    omega: float, c0: float, w0: NDArray[np.float64], water_depth: float,
+    omega: float, c0: float, w0: NDArray[np.float64],
+    water_depth: float,
     bottom_reflection: float | NDArray[np.complex128], attenuation: float,
+    fold: _FoldColumns | None = None,
 ) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
     r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
 
@@ -2186,8 +2674,18 @@ def _assemble_beam_field(
     ``q`` along the ray before anything is sampled off it, since the increment
     per range step is small while a principal-value square root taken sample by
     sample would jump by :math:`\pi` at the first caustic.
+
+    A beam the sloping bottom terminated (see :func:`ray_trace` on rays
+    reflected past the vertical) has its weight zeroed from the stop column
+    on: its history there is a state frozen at the terminating bounce, and a
+    frozen beam summed as if it kept flying would shine from a point the ray
+    never passed. What the one-way march drops with it is the energy the
+    wedge sends back down the slope, exactly as a one-way parabolic equation
+    drops backscatter.
     """
-    if march.spreadings is None or march.spreading_slopes is None:  # pragma: no cover
+    if (march.spreadings is None or march.spreading_slopes is None
+            or march.horizontals is None
+            or march.stopped_columns is None):  # pragma: no cover
         raise ValueError("the march must carry the dynamic ray states.")
     q = np.asarray(march.spreadings, dtype=np.complex128)
     p = np.asarray(march.spreading_slopes, dtype=np.complex128)
@@ -2211,9 +2709,10 @@ def _assemble_beam_field(
 
     column = np.clip(np.rint(ranges / dr).astype(np.intp), 0,
                      march.positions.shape[1] - 1)
-    cosine = speed[:, column] * fan.xi[:, None]
+    cosine = speed[:, column] * march.horizontals[:, column]
+    alive = column[None, :] < march.stopped_columns[:, None]
     samples = _BeamSamples(
-        xi=fan.xi[:, None],
+        xi=march.horizontals[:, column],
         column_range=np.asarray(column * dr, dtype=np.float64)[None, :],
         range_offset=(ranges - column * dr)[None, :],
         depth=march.positions[:, column],
@@ -2224,13 +2723,15 @@ def _assemble_beam_field(
         time=march.times[:, column],
         path=march.arc_lengths[:, column],
         phase=np.unwrap(np.angle(q), axis=1)[:, column],
-        weight=(weight[:, None] * reflected[:, column]).astype(np.complex128),
+        weight=np.where(alive, weight[:, None] * reflected[:, column],
+                        0.0).astype(np.complex128),
         reach=_BEAM_CUTOFF * widths[:, column].max(axis=1) / cosine.min(axis=1),
     )
     field = _beam_influence(
         samples, receivers, water_depth=water_depth,
         bottom_reflection=bottom_reflection, omega=omega, beam_width=w0,
-        attenuation=attenuation)
+        attenuation=attenuation, fold=fold,
+        march_extent=(march.positions.shape[1] - 1) * dr)
     return field, widths, curvatures
 
 

@@ -1148,7 +1148,7 @@ def test_the_conserved_wronskian_is_why_the_spreading_never_vanishes() -> None:
     c0 = float(np.interp(200.0, z_prof, c_prof))
     xi = np.cos(angles) / c0
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof, xi), xi=xi,
+        _ocean_ray_derivative(z_prof, c_prof), xi=xi,
         z0=np.full(angles.size, 200.0), zeta0=np.sin(angles) / c0,
         range_step=10.0, n_steps=1201, lower=0.0, upper=depth,
         dynamic=DynamicRays(np.full(angles.size, 0.5j * omega * w0**2),
@@ -1193,7 +1193,7 @@ def _geometric_spreading(
     c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
     xi = np.cos(th) / c0
     march = march_rays(
-        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS, xi), xi=xi,
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS), xi=xi,
         z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
         range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
         upper=_N2_DEPTH,
@@ -1211,7 +1211,7 @@ def _beam_spreading(
     c0 = float(np.interp(source_depth, _N2_DEPTHS, _N2_SPEEDS))
     xi = np.cos(th) / c0
     march = march_rays(
-        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS, xi), xi=xi,
+        _ocean_ray_derivative(_N2_DEPTHS, _N2_SPEEDS), xi=xi,
         z0=np.full(th.size, source_depth), zeta0=np.sin(th) / c0,
         range_step=max_range / (n_steps - 1), n_steps=n_steps, lower=0.0,
         upper=_N2_DEPTH,

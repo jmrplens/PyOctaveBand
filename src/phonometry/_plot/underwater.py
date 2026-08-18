@@ -117,6 +117,7 @@ _STRINGS: dict[str, str] = {
     "Range [km]": "Distancia [km]",
     "Normal-mode propagation loss": "Pérdida de propagación por modos normales",
     "Source": "Fuente",
+    "Seabed": "Fondo marino",
     "Ray trace": "Trazado de rayos",
     "Eigenray arrivals": "Llegadas de eigenrayos",
     "Travel time [s]": "Tiempo de propagación [s]",
@@ -539,6 +540,7 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     z = np.asarray(result.depths, dtype=np.float64)
     for i in range(r.shape[0]):
         ax.plot(r[i] / 1000.0, z[i], **{"color": _C_PRIMARY, "lw": 0.7, "alpha": 0.7, **kwargs})
+    _draw_bathymetry(ax, result, float(np.max(r)), language, labelled=True)
     ax.plot([0.0], [result.source_depth], "o", color=_C_REFERENCE, label=_t("Source", language))
     ax.set_xlabel(_t(_RANGE_KM_LABEL, language))
     ax.set_ylabel(_t(_DEPTH_LABEL, language))
@@ -549,6 +551,28 @@ def plot_ray_trace(result: RayTraceResult, ax: Axes | None = None, *, language: 
     ax.legend(loc=_LEGEND_LOWER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
+
+def _draw_bathymetry(
+    ax: Axes, result: Any, r_max: float, language: str, *, labelled: bool,
+) -> None:
+    """Draw the bottom polyline of a sloping-bathymetry result, if it has one.
+
+    The polyline continues level past its last node, exactly as the solvers
+    clamp it, so the drawn line is the boundary the rays actually reflected
+    off rather than a segment that stops mid-picture.
+    """
+    br = getattr(result, "bathymetry_ranges", None)
+    bd = getattr(result, "bathymetry_depths", None)
+    if br is None or bd is None:
+        return
+    br = np.asarray(br, dtype=np.float64)
+    bd = np.asarray(bd, dtype=np.float64)
+    if br[-1] < r_max:
+        br = np.append(br, r_max)
+        bd = np.append(bd, bd[-1])
+    label = _t("Seabed", language) if labelled else None
+    ax.plot(br / 1000.0, bd, color=_C_SECONDARY, lw=1.4, label=label)
+
 
 def plot_eigenrays(
     result: EigenrayResult, ax: Axes | None = None, *, language: str = "en",
@@ -713,10 +737,13 @@ def plot_gaussian_beams(
     :param kwargs: Forwarded to ``imshow``.
     :return: The axes.
     """
-    return _plot_loss_field(
+    ax = _plot_loss_field(
         ax, result.ranges, result.depths, result.propagation_loss,
         title="Gaussian beam propagation loss", language=language,
         kwargs=kwargs)
+    _draw_bathymetry(ax, result, float(np.max(result.ranges)), language,
+                     labelled=False)
+    return ax
 
 
 def _plottable(levels: Any) -> np.ndarray:

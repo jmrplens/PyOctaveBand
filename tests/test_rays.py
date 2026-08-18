@@ -110,7 +110,7 @@ def _march(
     xi = np.cos(th) / c0
 
     def deriv(
-        z_arr: np.ndarray, zeta_arr: np.ndarray, /,
+        z_arr: np.ndarray, zeta_arr: np.ndarray, xi_arr: np.ndarray, /,
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         cc = np.interp(z_arr, z_prof, c_prof)
         seg = np.where(zeta_arr >= 0.0,
@@ -119,8 +119,8 @@ def _march(
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
         if open_above:
             grad = np.where(z_arr > top, 0.0, grad)
-        return (zeta_arr / xi, -grad / (cc**3 * xi), 1.0 / (xi * cc**2),
-                1.0 / (xi * cc))
+        return (zeta_arr / xi_arr, -grad / (cc**3 * xi_arr),
+                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
 
     dyn = None
     if dynamic:
