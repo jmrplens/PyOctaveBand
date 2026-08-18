@@ -491,6 +491,81 @@ def write_wav(
     )
 
 
+def _check_target_suffix(path: str | Path, target: Path) -> None:
+    """Refuse any destination outside the WAV family and FLAC."""
+    suffix = target.suffix.lower()
+    if suffix not in _WAV_SUFFIXES and suffix != ".flac":
+        raise ValueError(
+            f"{path}: unsupported target {target.suffix!r}; the writer "
+            "produces the WAV family (.wav, .wave, .bwf) and, with the "
+            "[audio] extra, FLAC. Lossy formats are deliberately not "
+            "offered: a metrology library does not export approximations "
+            "of its own data."
+        )
+
+
+def _check_sidecar_request(
+    x: Signal | NDArray[np.generic] | list[float], sidecar: bool
+) -> None:
+    """Refuse a sidecar request without a calibrated Signal behind it."""
+    if sidecar and (not isinstance(x, Signal) or x.calibration_factor is None):
+        raise ValueError(
+            "sidecar=True needs a Signal with a calibration_factor: the "
+            "sidecar exists to carry a calibration, and inventing one "
+            "is the single thing this library must never do"
+        )
+
+
+def _refuse_passthrough_dither(dither: str | None) -> None:
+    """Integer input has nothing to dither; say so instead of ignoring."""
+    if dither is not None:
+        raise ValueError(
+            "dither applies to quantisation, and integer input is a "
+            "bit-exact pass-through: there is nothing to dither"
+        )
+
+
+def _write_pcm24(
+    path: str | Path,
+    data: np.ndarray,
+    rate: int,
+    resolved: str,
+    dither: str | None,
+    bext_payload: bytes | None,
+) -> None:
+    """Quantise to 24-bit codes and write through the in-house packer."""
+    codes, clipped, peak_dbfs = _quantise(data, 24, dither)
+    if clipped:
+        _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
+    write_wav(
+        path, codes, rate, resolved,
+        metadata_chunks=(
+            frame_riff_chunk(b"bext", bext_payload)
+            if bext_payload is not None else b""
+        ),
+    )
+
+
+def _write_through_scipy(
+    path: str | Path,
+    data: np.ndarray,
+    rate: int,
+    resolved: str,
+    dither: str | None,
+) -> None:
+    """Quantise (PCM) or narrow (float) and hand scipy finished samples."""
+    tag, sample_bytes = _SUBTYPE_SPEC[resolved]
+    if tag == 0x0001:
+        codes, clipped, peak_dbfs = _quantise(data, 8 * sample_bytes, dither)
+        if clipped:
+            _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
+        _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2
+                                              else "<i4"))
+    else:
+        _scipy_write(path, rate, data if resolved == "DOUBLE"
+                     else data.astype(np.float32))
+
+
 def write(
     path: str | Path,
     x: Signal | NDArray[np.generic] | list[float],
@@ -560,23 +635,10 @@ def write(
         calibrated :class:`Signal`.
     """
     target = Path(path)
-    suffix = target.suffix.lower()
-    if suffix not in _WAV_SUFFIXES and suffix != ".flac":
-        raise ValueError(
-            f"{path}: unsupported target {target.suffix!r}; the writer "
-            "produces the WAV family (.wav, .wave, .bwf) and, with the "
-            "[audio] extra, FLAC. Lossy formats are deliberately not "
-            "offered: a metrology library does not export approximations "
-            "of its own data."
-        )
-    if sidecar and (not isinstance(x, Signal) or x.calibration_factor is None):
-        raise ValueError(
-            "sidecar=True needs a Signal with a calibration_factor: the "
-            "sidecar exists to carry a calibration, and inventing one "
-            "is the single thing this library must never do"
-        )
+    _check_target_suffix(path, target)
+    _check_sidecar_request(x, sidecar)
     data, rate = _resolve_input(x, fs)
-    if suffix == ".flac":
+    if target.suffix.lower() == ".flac":
         _write_flac(path, x, data, rate, subtype, bext, dither)
         _write_signal_sidecar(path, x, sidecar)
         return
@@ -584,38 +646,14 @@ def write(
     _check_dither(dither, resolved)
     bext_payload = _resolve_bext(x, bext, data, rate, resolved)
     if data.dtype in _PASSTHROUGH_SUBTYPES:
-        if dither is not None:
-            raise ValueError(
-                "dither applies to quantisation, and integer input is a "
-                "bit-exact pass-through: there is nothing to dither"
-            )
+        _refuse_passthrough_dither(dither)
         _scipy_write(path, rate, data)
     elif resolved == "PCM_24":
-        codes, clipped, peak_dbfs = _quantise(data, 24, dither)
-        if clipped:
-            _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-        write_wav(
-            path, codes, rate, resolved,
-            metadata_chunks=(
-                frame_riff_chunk(b"bext", bext_payload)
-                if bext_payload is not None else b""
-            ),
-        )
+        _write_pcm24(path, data, rate, resolved, dither, bext_payload)
         _write_signal_sidecar(path, x, sidecar)
         return
     else:
-        tag, sample_bytes = _SUBTYPE_SPEC[resolved]
-        if tag == 0x0001:
-            codes, clipped, peak_dbfs = _quantise(
-                data, 8 * sample_bytes, dither
-            )
-            if clipped:
-                _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-            _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2
-                                                  else "<i4"))
-        else:
-            _scipy_write(path, rate, data if resolved == "DOUBLE"
-                         else data.astype(np.float32))
+        _write_through_scipy(path, data, rate, resolved, dither)
     if bext_payload is not None:
         append_riff_chunk(path, b"bext", bext_payload)
     _write_signal_sidecar(path, x, sidecar)
@@ -654,6 +692,49 @@ def _scipy_write(path: str | Path, fs: int, data: np.ndarray) -> None:
     frames_first = np.ascontiguousarray(data.T)
     wavfile.write(str(path), fs, frames_first[:, 0] if data.shape[0] == 1
                   else frames_first)
+
+
+def _flac_passthrough_codes(
+    data: np.ndarray, subtype: str | None, dither: str | None
+) -> np.ndarray:
+    """int16 codes pass through whole; a conflicting request is refused."""
+    if subtype not in (None, "PCM_16"):
+        raise ValueError(
+            "integer int16 input is a bit-exact pass-through of PCM_16; "
+            f"requesting subtype={subtype!r} would resample the codes"
+        )
+    _refuse_passthrough_dither(dither)
+    return data.astype(np.int16)
+
+
+def _flac_quantised_codes(
+    path: str | Path,
+    data: np.ndarray,
+    subtype: str | None,
+    dither: str | None,
+) -> tuple[str, np.ndarray]:
+    """Quantise float data to the integer codes a FLAC subtype stores."""
+    if data.dtype.kind != "f":
+        raise ValueError(
+            f"unsupported input dtype {data.dtype}: pass float data, "
+            "or int16 codes for bit-exact pass-through"
+        )
+    resolved = "PCM_24" if subtype is None else subtype
+    if resolved not in ("PCM_16", "PCM_24"):
+        raise ValueError(
+            f"FLAC holds integer PCM up to 24 bits; subtype "
+            f"{resolved!r} is not available (choose PCM_16 or PCM_24)"
+        )
+    _check_dither(dither, resolved)
+    bits = _SUBTYPE_BITS[resolved]
+    codes, clipped, peak_dbfs = _quantise(data, bits, dither)
+    if clipped:
+        _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
+    out = (
+        codes.astype(np.int16) if resolved == "PCM_16"
+        else np.left_shift(codes.astype(np.int32), 8)
+    )
+    return resolved, out
 
 
 def _write_flac(
@@ -695,39 +776,10 @@ def _write_flac(
             "explicitly."
         )
     if implied == "PCM_16":
-        if subtype not in (None, "PCM_16"):
-            raise ValueError(
-                "integer int16 input is a bit-exact pass-through of PCM_16; "
-                f"requesting subtype={subtype!r} would resample the codes"
-            )
-        if dither is not None:
-            raise ValueError(
-                "dither applies to quantisation, and integer input is a "
-                "bit-exact pass-through: there is nothing to dither"
-            )
         resolved = "PCM_16"
-        out = data.astype(np.int16)
+        out = _flac_passthrough_codes(data, subtype, dither)
     else:
-        if data.dtype.kind != "f":
-            raise ValueError(
-                f"unsupported input dtype {data.dtype}: pass float data, "
-                "or int16 codes for bit-exact pass-through"
-            )
-        resolved = "PCM_24" if subtype is None else subtype
-        if resolved not in ("PCM_16", "PCM_24"):
-            raise ValueError(
-                f"FLAC holds integer PCM up to 24 bits; subtype "
-                f"{resolved!r} is not available (choose PCM_16 or PCM_24)"
-            )
-        _check_dither(dither, resolved)
-        bits = _SUBTYPE_BITS[resolved]
-        codes, clipped, peak_dbfs = _quantise(data, bits, dither)
-        if clipped:
-            _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-        out = (
-            codes.astype(np.int16) if resolved == "PCM_16"
-            else np.left_shift(codes.astype(np.int32), 8)
-        )
+        resolved, out = _flac_quantised_codes(path, data, subtype, dither)
     bext_payload = _resolve_bext(x, bext, data, fs, resolved,
                                  algorithm="FLAC")
     frames_first = np.ascontiguousarray(out.T)
