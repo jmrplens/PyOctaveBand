@@ -15,7 +15,7 @@
 
 ## Numerical conformance report
 
-&#9989; **536/536 conformance checks pass** across 57 domains and 365 standards - filters class 1 - weightings within IEC 61672-1 class 1.
+&#9989; **550/550 conformance checks pass** across 58 domains and 367 standards - filters class 1 - weightings within IEC 61672-1 class 1.
 
 <sub>Each row pins a standard clause to its expected normative value and the value the library computes. Every section below is collapsible and stays collapsed while all of its rows pass; a section with any failing row opens automatically.</sub>
 
@@ -879,6 +879,28 @@ Only **Butterworth** (the library default) and **Chebyshev-II** are class-compli
 | EBU Tech 3341:2023 Table 1 case 19 | True-peak level of the fs/4 sine at 1.41 FFS, dBTP | 3 dBTP (+0.2/-0.4 dB) | 3 dBTP | 0.001 dBTP | &#9989; |
 | EBU Tech 3342:2023 Table 1 case 1 | Loudness range of the -20/-30 dBFS tone steps, LU | 10 LU (+/-1 LU) | 10 LU | 0 LU | &#9989; |
 | EBU Tech 3342:2023 Table 1 case 3 | Loudness range of the -40/-20 dBFS tone steps, LU | 20 LU (+/-1 LU) | 20 LU | 0 LU | &#9989; |
+
+</details>
+
+<details>
+<summary>&#9989; <b>Broadcast Wave metadata (EBU Tech 3285 / ITU-R BS.2088)</b>: 100% (14/14)</summary>
+
+| Standard | Quantity | Expected (norm) | Computed | &#916; | Status |
+|:---|:---|:---|:---|:---|:---:|
+| EBU Tech 3285:2011 (2.3) | bext fixed part: every field at its cumulative offset, 602 bytes | 15 fields byte-identical at offsets 0..422, fixed part 602 B | 15/15 byte-identical, 602 B + CodingHistory | - | &#9989; |
+| EBU Tech 3285:2011 (2.3) | bext round trip: written metadata returns identically through the reader | 13 fields identical, CodingHistory extended | 13/13 identical, history extended | - | &#9989; |
+| EBU Tech 3285:2011 (2.4) | Loudness int16 = 100 x value, ties away from zero: negative examples | -22.644 -> F728h (-2264), -22.645 -> F727h (-2265), -22.646 -> F727h (-2265) | F728h (-2264), F727h (-2265), F727h (-2265) | - | &#9989; |
+| EBU Tech 3285:2011 (2.4) | Loudness int16 = 100 x value, ties away from zero: positive examples | 12.764 -> 04FCh (1276), 12.765 -> 04FDh (1277), 12.766 -> 04FDh (1277) | 04FCh (1276), 04FDh (1277), 04FDh (1277) | - | &#9989; |
+| EBU Tech 3285:2011 (2.4) | Unused loudness parameters: 7FFFh on disk, None through the reader | 7FFFh x 5 on disk; None x 5 reread | 7FFFh, 7FFFh, 7FFFh, 7FFFh, 7FFFh; None x 5 | - | &#9989; |
+| EBU Tech 3285:2011 (2.4) | Out-of-range loudness clamps to 7FFEh/8000h, never the 7FFFh sentinel | 327.9 -> 7FFEh (not the sentinel); -inf -> 8000h | 7FFEh; 8000h | - | &#9989; |
+| EBU Tech 3285:2011 (2.3) | TimeReference: 64-bit first-sample count split low/high at 338/342 | low 370632704 @ 338, high 1 @ 342 (13:30:00 at 96 kHz = 4665600000 samples) | low 370632704, high 1 -> 4665600000 samples, reread equal | - | &#9989; |
+| EBU Tech 3285:2011 (2.3): CodingHistory row per EBU R 98 Appendix 1 | Appended row is A=PCM,F=48000,W=16,M=stereo,T=... + CR/LF (Example 1) | A=PCM,F=48000,W=16,M=stereo,T=(free text, no commas) + CR/LF | A=PCM,F=48000,W=16,M=stereo,T=(free text) + CR/LF | - | &#9989; |
+| EBU Tech 3285:2011 (2.3): CodingHistory row per EBU R 98 Appendix 1 | Prior coding row preserved verbatim, new row added beneath it | 2 rows: Example 2's A/D row intact above, the writer's beneath | 2 rows, prior row byte-identical | - | &#9989; |
+| EBU Tech 3285:2011 (1.1/2.3) | UMID exists from v1 (64 of the 254 reserved bytes): v0 refused, v1 at 348 | v0+UMID refused; v1: Version=0001h, UMID verbatim at 348 | v0 refused; v1: Version=0001h, UMID verbatim | - | &#9989; |
+| EBU Tech 3285:2011 (1.1/2.3) | Loudness exists from v2 (10 of the 190 reserved bytes): v1 refused/zeroed | v1+loudness refused; v1 writes 10 zero bytes, reads None; v2 carries | v1 refused; bytes zeroed, None reread, v2 carries | - | &#9989; |
+| ITU-R BS.2088-2 Annex 1 (4.1/4.2) | ds64 first after WAVE: bw64Size/dataSize u64 pairs at 0/8, table at 24 | ds64 first, >= 28 B: riffSize 24883200072, dataSize 24883200000, tableLength 0 | ds64 @ 12, 28 B: riffSize 24883200072, dataSize 24883200000, tableLength 0 | - | &#9989; |
+| ITU-R BS.2088-2 Annex 1 (3.2/2.4) | Promoted header: FFFFFFFFh sentinel in the outer and data size fields | outer size = data size = FFFFFFFFh, form type WAVE | outer FFFFFFFFh, data FFFFFFFFh, WAVE | - | &#9989; |
+| ITU-R BS.2088-2 Annex 1 (2.4/3.1) | Reader resolves the data size through ds64; BW64 and RF64 fourccs alike | RF64: 48 frames, BW64: 48 frames (via ds64 dataSize = 96 B) | RF64 read as RF64, 48 frames; BW64 read as BW64, 48 frames | - | &#9989; |
 
 </details>
 
