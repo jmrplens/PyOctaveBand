@@ -360,6 +360,53 @@ def test_ray_travel_time_survives_reflections() -> None:
         5000.0 / (1500.0 * np.cos(np.radians(60.0))), rel=1e-9)
 
 
+def test_ray_reflection_counts_match_the_folded_geometry() -> None:
+    r"""The cumulative bounce counts against the unfolded straight line, exactly.
+
+    In isovelocity water the unfolded ray is the straight line
+    :math:`u(r) = z_\mathrm{s} + r\tan\theta_0`, and folding it back into the
+    column touches the bottom wherever :math:`u` crosses an odd multiple of
+    the depth :math:`D` and the surface wherever it crosses a nonzero even
+    one, so both counts are floors of closed forms and the *whole history*
+    can be asserted rather than a final total. An upward launch is the mirror
+    :math:`z \mapsto D - z` of a downward one, which swaps the two boundaries
+    and nothing else, so the same two formulas serve it with the source
+    mirrored and the labels exchanged; that exchange is asserted too, because
+    the labels are the point. The counts are what make a boundary coefficient
+    usable downstream: every bottom touch of one ray arrives at one grazing
+    angle (Snell's invariant fixes the crossing angle per depth), so any
+    :math:`R(\theta)` enters a path's amplitude only as :math:`R^n` with the
+    :math:`n` recorded here, per boundary because the surface's coefficient
+    is not the seabed's.
+    """
+    zs, theta = 30.0, 35.0
+    depth = float(_ISO[0][-1])
+    res = ray_trace(*_ISO, source_depth=zs, launch_angles_deg=[theta, -theta],
+                    max_range=1000.0, n_steps=2001)
+    climb = res.ranges[0] * np.tan(np.radians(theta))
+    down_bottom = np.floor((zs + climb + depth) / (2.0 * depth)).astype(int)
+    down_surface = np.floor((zs + climb) / (2.0 * depth)).astype(int)
+    up_surface = np.floor((depth - zs + climb + depth) / (2.0 * depth)).astype(int)
+    up_bottom = np.floor((depth - zs + climb) / (2.0 * depth)).astype(int)
+
+    assert res.surface_reflections.shape == res.depths.shape
+    assert res.bottom_reflections.shape == res.depths.shape
+    np.testing.assert_array_equal(res.bottom_reflections[0], down_bottom)
+    np.testing.assert_array_equal(res.surface_reflections[0], down_surface)
+    np.testing.assert_array_equal(res.surface_reflections[1], up_surface)
+    np.testing.assert_array_equal(res.bottom_reflections[1], up_bottom)
+    # Zero at the source, only ever growing, and a total that means the ray
+    # really worked both walls: 4 + 3 down, 4 + 3 up with the labels swapped.
+    assert res.bottom_reflections[0, 0] == 0
+    assert res.surface_reflections[0, 0] == 0
+    assert res.bottom_reflections[0, -1] == 4
+    assert res.surface_reflections[0, -1] == 3
+    assert res.surface_reflections[1, -1] == 4
+    assert res.bottom_reflections[1, -1] == 3
+    assert np.all(np.diff(res.bottom_reflections, axis=1) >= 0)
+    assert np.all(np.diff(res.surface_reflections, axis=1) >= 0)
+
+
 def test_ray_travel_time_increases_monotonically_along_every_ray() -> None:
     # Time only ever runs forward, whichever way the ray is going: a Munk-like
     # profile with rays that turn, reflect and cross each other.

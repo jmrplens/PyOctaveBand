@@ -23,7 +23,10 @@ All four are implemented clean-room from Jensen, Kuperman, Porter & Schmidt,
 (Ch. 5, Eqs. 5.3-5.17), the ray equations (Ch. 3, Eqs. 3.23-3.24), the Gaussian
 beams of Sect. 3.5 (Eqs. 3.88-3.92) and the split-step Fourier PE (Ch. 6). They
 are validated against analytic oracles: the ideal (pressure-release) waveguide's
-exact modes and its image-source sum, the circular-arc ray paths of a linear
+exact modes and its image-source sum, that same image sum over a lossy fluid
+seabed with the Rayleigh coefficient of each image's own grazing angle raised
+to its count of bottom touches (Jensen Eq. 2.138 with Eq. 3.126 at every
+touch), the circular-arc ray paths of a linear
 sound-speed gradient together with the closed-form travel time along them
 (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press 1998,
 Eq. (3.3.20)), free-field spherical spreading, and mutual agreement of the PE
@@ -49,6 +52,7 @@ import numpy as np
 from ..._internal.rays import DynamicRays, march_rays
 from ..._internal.validation import require_positive
 from .closed_form import _ABSORPTION_MODELS, _M_PER_KM, seawater_absorption
+from .seabed_reflection import reflection_coefficient
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -388,6 +392,24 @@ class RayTraceResult:
         (Eq. 3.116), an integral over the path actually flown, so a caller
         hanging amplitudes on these rays multiplies by
         :math:`e^{-\\alpha s}` with the :math:`s` read off here.
+    :ivar surface_reflections: Per-ray cumulative count of sea-surface
+        reflections by each range sample, same shape (zero at the source).
+    :ivar bottom_reflections: The same count for the seabed. The two counts,
+        and not the reflection coefficients themselves, are the whole of the
+        per-bounce record an amplitude carrier needs from the geometry.
+        Jensen Sect. 3.6.3 treats a boundary interaction as multiplying the
+        ray amplitude by :math:`|\\mathcal{R}(\\theta)|` and adding
+        :math:`\\arg \\mathcal{R}(\\theta)` to its phase (Eqs. 3.125-3.126),
+        with :math:`\\theta` the local angle of incidence; and in a
+        range-independent medium that angle is the *same* at every touch of
+        the same flat boundary, because the direction a ray crosses a depth
+        with is fixed by Snell's invariant, :math:`\\cos\\theta = \\xi\\,c`,
+        not by how many times it has bounced. Any boundary coefficient
+        therefore enters a path's amplitude only as :math:`\\mathcal{R}^n`
+        with the :math:`n` read off here, which is how
+        :func:`gaussian_beams` charges its lossy seabed and how an eigenray
+        search can charge one later; ``ray_trace`` itself carries no
+        amplitude, so the counts are what it can meaningfully expose.
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
     """
@@ -397,6 +419,8 @@ class RayTraceResult:
     depths: NDArray[np.float64]
     travel_times: NDArray[np.float64]
     arc_lengths: NDArray[np.float64]
+    surface_reflections: NDArray[np.int_]
+    bottom_reflections: NDArray[np.int_]
     source_depth: float
     water_depth: float
 
@@ -436,6 +460,9 @@ def ray_trace(
     :func:`~phonometry.environment.propagation.refraction.atmospheric_ray_paths`
     (which reflects at the ground instead of at the sea surface). Reflections
     cost no time and no path, so both odometers stay continuous across them.
+    They are counted, though, per boundary: see :class:`RayTraceResult` on why
+    the two cumulative counts, with the crossing angle Snell's invariant fixes
+    per ray, are the entire per-bounce record a downstream amplitude needs.
 
     :param depths: Depth samples of the profile, in metres, from ``z = 0``.
     :param sound_speeds: Sound speed at each depth, in m/s.
@@ -482,6 +509,12 @@ def ray_trace(
         depths=march.positions,
         travel_times=march.times,
         arc_lengths=march.arc_lengths,
+        # The marcher reports per-step bounce counts and says which boundary
+        # each was at; accumulated along the ray they become the exponent any
+        # per-boundary reflection coefficient enters the amplitude with.
+        surface_reflections=np.cumsum(
+            march.reflections - march.upper_reflections, axis=1),
+        bottom_reflections=np.cumsum(march.upper_reflections, axis=1),
         source_depth=zs,
         water_depth=water_depth,
     )
@@ -539,7 +572,12 @@ def ray_trace(
 # summed field is conjugated once at the end, which puts the exposed complex
 # pressure in the same exp(-i omega t) convention as the other two solvers.
 # This is a textbook inconsistency, not a defect of a published standard, so it
-# is recorded here rather than in docs/ERRATA.md.
+# is recorded here rather than in docs/ERRATA.md. The final conjugation has one
+# further consequence that stays invisible until a complex coefficient enters
+# the sum: everything multiplied into the field before it must be the conjugate
+# of its exp(-i omega t) self. The reflection coefficients of the perfect
+# boundaries are -1 and +1 and hid this; the complex R of a lossy seabed is
+# conjugated on the way in (see :func:`gaussian_beams`).
 #
 # Substituting Eq. (3.91) into that corrected Eq. (3.92) makes sqrt(i) e^(-i
 # pi/4) = 1, and the weight comes out real and positive in closed form,
@@ -624,6 +662,13 @@ class GaussianBeamResult:
         as :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`
         evaluated it at the source frequency and depth. Recorded so a run's
         loss can be decomposed without re-deriving what was subtracted.
+    :ivar seabed_density: Sediment density of the fluid seabed the bottom
+        bounces were charged with, or ``None`` when the bottom was one of the
+        perfect reflectors (the default).
+    :ivar seabed_sound_speed: Sediment sound speed of that seabed, in m/s, or
+        ``None`` likewise. Together the pair names the Rayleigh interface of
+        :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+        each beam's bottom reflections multiplied it by.
     :ivar source_depth: Source depth, in metres.
     :ivar water_depth: Water-column depth, in metres.
     """
@@ -641,6 +686,8 @@ class GaussianBeamResult:
     initial_beam_width: float
     absorption_model: str | None
     absorption_coefficient: float
+    seabed_density: float | None
+    seabed_sound_speed: float | None
     source_depth: float
     water_depth: float
 
@@ -739,9 +786,9 @@ def _default_beam_width(
 
 
 def _image_ladder(
-    water_depth: float, bottom_reflection: float, n_wrap: int,
-) -> list[tuple[float, float, float]]:
-    """``(shift, side, strength)`` of the receiver's images in the folded column.
+    water_depth: float, n_wrap: int,
+) -> list[tuple[float, float, int, int]]:
+    """The receiver's images in the folded column, as boundary-touch counts.
 
     The marcher folds a reflected ray back into the water column, which is the
     right thing for the geometry and only half the story for a beam: what folds
@@ -762,25 +809,35 @@ def _image_ladder(
     integer ``l``, and the strength of each is the product of the reflection
     coefficients of the boundaries between it and the receiver: the surface
     planes stand at even multiples of ``D`` and the bottom planes at odd ones,
-    so counting them gives the exponents below. Both boundary conditions come
-    out of that sum identically rather than approximately, for either bottom:
-    at ``z_r = 0`` the two families coincide with opposite signs and cancel, and
-    at ``z_r = D`` with a rigid bottom they coincide with equal signs, so the
-    field doubles and its depth derivative cancels.
+    and *counting* them is all that happens here. The counts are returned
+    rather than the product, because the bottom's coefficient need not be a
+    number: a lossy seabed's :math:`\\mathcal{R}` depends on the grazing angle
+    and so differs beam by beam, while the count of planes between an image and
+    the receiver is geometry and differs only rung by rung.
+    :func:`_beam_influence` raises each beam's own coefficient to these
+    exponents, which for the unfolded beam is exact in an isovelocity column:
+    every bottom plane the straight unfolded beam crosses, it crosses at the
+    one angle its central ray makes with the horizontal. Both boundary
+    conditions come out of the resulting sum identically rather than
+    approximately, for either perfect bottom: at ``z_r = 0`` the two families
+    coincide with opposite signs and cancel, and at ``z_r = D`` with a rigid
+    bottom they coincide with equal signs, so the field doubles and its depth
+    derivative cancels.
 
     :param n_wrap: How many wraps each way to carry. What it costs is bounded
         per beam rather than globally: :func:`gaussian_beams` admits each beam
         only to the wraps its own reach can populate.
-    :return: One entry per image, with ``side`` the sign multiplying ``z_r``.
+    :return: One ``(shift, side, n_surface, n_bottom)`` entry per image, with
+        ``side`` the sign multiplying ``z_r`` and the two counts the exponents
+        of the surface and bottom reflection coefficients.
     """
-    surface = _SURFACE_REFLECTION
     ladder = []
     for wrap in range(-n_wrap, n_wrap + 1):
         shift = 2.0 * wrap * water_depth
-        ladder.append((shift, 1.0, (surface * bottom_reflection) ** abs(wrap)))
-        mirrored = (bottom_reflection**wrap * surface ** (wrap - 1) if wrap >= 1
-                    else surface ** (abs(wrap) + 1) * bottom_reflection ** abs(wrap))
-        ladder.append((shift, -1.0, mirrored))
+        ladder.append((shift, 1.0, abs(wrap), abs(wrap)))
+        mirrored = ((wrap - 1, wrap) if wrap >= 1
+                    else (abs(wrap) + 1, abs(wrap)))
+        ladder.append((shift, -1.0, *mirrored))
     return ladder
 
 
@@ -823,8 +880,8 @@ class _BeamSamples(NamedTuple):
 
 def _beam_influence(
     s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
-    water_depth: float, bottom_reflection: float, omega: float,
-    beam_width: float, attenuation: float,
+    water_depth: float, bottom_reflection: float | NDArray[np.complex128],
+    omega: float, beam_width: float, attenuation: float,
 ) -> NDArray[np.complex128]:
     r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
 
@@ -924,6 +981,16 @@ def _beam_influence(
     near field within a few beam widths is already not to be read, see
     :func:`gaussian_beams`).
 
+    THE LADDER'S STRENGTHS ARE PER BEAM, because the bottom's coefficient may
+    be. ``bottom_reflection`` is either the scalar of a perfect reflector or
+    one complex Rayleigh coefficient per beam, evaluated by the caller at the
+    grazing angle Snell's invariant fixes for that beam at the seabed; each
+    rung of :func:`_image_ladder` says how many surface and bottom planes
+    stand between the image and the receiver, and the strength is the
+    coefficients raised to those counts. For the unfolded beam in an
+    isovelocity column that is exact, not paraxial: the unfolded beam is
+    straight, so it crosses every bottom plane at its central ray's own angle.
+
     :param attenuation: Volume absorption :math:`\alpha` in nepers per metre
         (0.0 propagates without absorption and skips the work).
     :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
@@ -932,8 +999,10 @@ def _beam_influence(
     n_ranges = s.depth.shape[1]
     n_wrap = min(_MAX_BEAM_WRAPS,
                  int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
+    r_bottom = np.broadcast_to(np.asarray(bottom_reflection),
+                               (s.depth.shape[0],))
     plan = []
-    for shift, side, strength in _image_ladder(water_depth, bottom_reflection, n_wrap):
+    for shift, side, n_surface, n_bottom in _image_ladder(water_depth, n_wrap):
         # This image sits at ``shift + side*z_r - z_j`` in depth, so with both
         # depths inside the column its offset is at least ``|shift| - D`` away
         # for the upright family and ``|shift| - 2D`` for the mirrored one,
@@ -943,6 +1012,7 @@ def _beam_influence(
         span = water_depth if side > 0.0 else 2.0 * water_depth
         rows = np.flatnonzero(s.reach >= abs(shift) - span)
         if rows.size:
+            strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
             plan.append((shift, side, strength, rows))
 
     half_omega_width = 0.5 * omega * beam_width
@@ -1011,7 +1081,7 @@ def _beam_influence(
                     path2d[beam_at, range_at]
                     + speed2d[beam_at, range_at] * along_hit, 0.0)
             value = (
-                weight2d[beam_at, range_at] * strength
+                weight2d[beam_at, range_at] * strength[beam_at]
                 * np.sqrt(speed2d[beam_at, range_at] / r_infl.ravel()[hits])
                 / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
             )
@@ -1149,6 +1219,9 @@ def gaussian_beams(
     beam_width: float | None = None,
     range_step: float = 25.0,
     bottom: str = "pressure-release",
+    seabed_density: float | None = None,
+    seabed_sound_speed: float | None = None,
+    density: float = 1000.0,
     absorption_model: str | None = None,
     temperature: float = 10.0,
     salinity: float = 35.0,
@@ -1209,7 +1282,8 @@ def gaussian_beams(
       0.27, 4.06 and 2.52 dB out, a fan to 85 degrees 0.21, 1.32 and 1.91 dB,
       and a fan to 88 degrees 0.0002, 0.0003 and 0.0004 dB. Cutting the *oracle*
       to the same half-angle moves it by 0.25, 3.95 and 2.31 dB, so what is left
-      at 80 degrees is the fan and not the method. A real seabed absorbs those
+      at 80 degrees is the fan and not the method. A real seabed (the
+      ``seabed_density``/``seabed_sound_speed`` pair below) absorbs those
       bounces and the default is then ample; a perfect reflector needs the
       fan opened and ``range_step`` cut with it, since a step has to resolve
       :math:`\tan\theta_\mathrm{max}` depth units of climb per unit range. The
@@ -1260,6 +1334,35 @@ def gaussian_beams(
     throughout, all measured without absorption, remain reproducible as
     printed.
 
+    **The seabed is a perfect reflector by default**, for the same reason, and
+    real shallow-water propagation loss is dominated by what that default
+    leaves out: the seabed absorbs part of every bottom bounce. Passing
+    ``seabed_density`` and ``seabed_sound_speed`` replaces the perfect
+    reflector with the lossy fluid half-space of
+    :func:`~phonometry.underwater.propagation.seabed_reflection.reflection_coefficient`
+    (the Rayleigh interface, ``density`` standing for the water above it and
+    the profile's own bottom sound speed for its ``c1``). This is Sect. 3.6.3
+    done as printed: "most ray codes treat the bottom simply as a reflector",
+    and each boundary touch multiplies the ray amplitude by
+    :math:`|\mathcal{R}(\theta)|` and adds :math:`\arg \mathcal{R}(\theta)`
+    to its phase (Eqs. 3.125-3.126), while the dynamic pair :math:`(q, p)`
+    crosses the reflection exactly as before, the curvature term of
+    Eq. (3.122) vanishing at a flat bottom, so the beam keeps its width and
+    only its complex amplitude is docked. The phase is not a refinement to
+    skip: below the critical angle :math:`|\mathcal{R}| = 1`, *only* the
+    phase distinguishes the lossy seabed from a perfect one, and it moves the
+    interference fringes of every bottom-interacting path. The grazing angle
+    each beam is charged at is the one Snell's invariant fixes,
+    :math:`\cos\theta = \xi\,c(z)` along the whole ray, so at a flat seabed a
+    given beam arrives at one and the same angle at every touch whatever the
+    profile above did in between: its coefficient is evaluated once, exactly,
+    and raised to the marcher's count of bottom touches, in the running
+    product and in the receiver-image ladder alike. The book is candid that a
+    plane-wave coefficient applied to a field that is not a plane wave is an
+    approximation (p. 189), and it is the approximation the whole method
+    already breathes; sediment attenuation and elasticity are outside the
+    fluid-fluid model here as they are outside ``seabed_reflection`` itself.
+
     What it costs is ``n_beams`` times the size of the receiver grid, and none
     of the three factors depends on the frequency: the ray core does not have to
     resolve a wavelength on a grid, and the fan only widens as
@@ -1304,7 +1407,21 @@ def gaussian_beams(
     :param range_step: Marching step in range, in metres, and the spacing of the
         default ``ranges_m``.
     :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
-        surface is always pressure-release.
+        surface is always pressure-release. Superseded by the fluid seabed
+        when the pair below is passed.
+    :param seabed_density: Sediment density of a lossy fluid seabed, in the
+        same unit as ``density`` (kg/m3 by convention; only the ratio
+        enters). Default (``None``): the perfect reflector named by
+        ``bottom``, so every published validation number of this module is
+        what the solver returns. Passed together with
+        ``seabed_sound_speed``, and not alongside ``bottom="rigid"``.
+    :param seabed_sound_speed: Sediment sound speed of that seabed, in m/s
+        (``None`` likewise). A sediment faster than the water at the bottom
+        has a critical grazing angle, below which the reflection is total in
+        magnitude and lossy in phase alone.
+    :param density: Water density above the seabed, in kg/m3. Ignored unless
+        the seabed pair is passed; it enters only through the seabed's
+        impedance ratio, the field itself being density-normalised already.
     :param absorption_model: Seawater volume absorption applied along each
         beam's central ray: ``"francois-garrison"``, ``"ainslie-mccolm"`` or
         ``"thorp"``, the same models, spelled the same way, as
@@ -1343,6 +1460,21 @@ def gaussian_beams(
     if not (0.0 < theta_max < 90.0):
         raise ValueError("'max_angle_deg' must lie in (0, 90) degrees.")
 
+    seabed: tuple[float, float, float] | None = None
+    if seabed_density is not None or seabed_sound_speed is not None:
+        if seabed_density is None or seabed_sound_speed is None:
+            raise ValueError(
+                "'seabed_density' and 'seabed_sound_speed' describe one fluid"
+                " seabed and must be passed together.")
+        if key != "pressure-release":
+            raise ValueError(
+                "'bottom' and the seabed pair are two descriptions of the same"
+                " boundary; leave 'bottom' at its default when passing a fluid"
+                " seabed.")
+        seabed = (require_positive(density, "density"),
+                  require_positive(seabed_density, "seabed_density"),
+                  require_positive(seabed_sound_speed, "seabed_sound_speed"))
+
     absorption_key: str | None = None
     alpha = 0.0
     if absorption_model is not None:
@@ -1379,6 +1511,31 @@ def gaussian_beams(
 
     n_steps = int(np.ceil(rmax / dr_step)) + 1
     dr = rmax / (n_steps - 1)
+
+    bottom_factor: float | NDArray[np.complex128] = _BOTTOM_REFLECTION[key]
+    if seabed is not None:
+        rho1, rho2, c2 = seabed
+        c_bottom = float(c_prof[-1])
+        # The grazing angle a beam meets the seabed with is Snell's invariant
+        # read at the bottom sound speed, cos(phi) = xi c(D): the same at every
+        # touch of that beam, so one coefficient per beam is exact rather than
+        # sampled. A beam that turns above the seabed has xi c(D) > 1 (clipped
+        # to a grazing angle of zero); its bottom count stays zero, so the
+        # coefficient it never earned is never applied.
+        grazing = np.degrees(np.arccos(np.clip(fan.xi * c_bottom, 0.0, 1.0)))
+        # Conjugated, deliberately. The beam sum is assembled in the
+        # exp(+i omega t) convention Eq. (3.88) is printed in and conjugated
+        # once at the end (see the sign-convention note above the result
+        # class), so every complex factor fed into it must be the conjugate of
+        # its exp(-i omega t) self or the final conjugation turns its phase
+        # backwards. The perfect reflectors are real and never showed this;
+        # a below-critical R is where it bites, |R| = 1 and only the phase
+        # carrying the seabed, and applying it un-conjugated measured 15 dB
+        # wrong against the lossy image sum at 4 km where the conjugate
+        # measures 0.02 dB.
+        bottom_factor = np.conj(reflection_coefficient(
+            grazing, rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2))
+
     march = march_rays(
         _ocean_ray_derivative(z_prof, c_prof, fan.xi), xi=fan.xi,
         z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
@@ -1400,7 +1557,7 @@ def gaussian_beams(
     field, widths, curvatures = _assemble_beam_field(
         march, ranges=ranges, receivers=receivers, fan=fan, dr=dr,
         z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0, w0=w0,
-        water_depth=water_depth, bottom_reflection=_BOTTOM_REFLECTION[key],
+        water_depth=water_depth, bottom_reflection=bottom_factor,
         attenuation=attenuation)
 
     # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
@@ -1427,6 +1584,8 @@ def gaussian_beams(
         initial_beam_width=float(w0),
         absorption_model=absorption_key,
         absorption_coefficient=alpha,
+        seabed_density=None if seabed is None else seabed[1],
+        seabed_sound_speed=None if seabed is None else seabed[2],
         source_depth=zs,
         water_depth=water_depth,
     )
@@ -1437,7 +1596,7 @@ def _assemble_beam_field(
     receivers: NDArray[np.float64], fan: _Fan, dr: float,
     z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
     omega: float, c0: float, w0: float, water_depth: float,
-    bottom_reflection: float, attenuation: float,
+    bottom_reflection: float | NDArray[np.complex128], attenuation: float,
 ) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
     r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
 
@@ -1445,6 +1604,11 @@ def _assemble_beam_field(
     factor is the running product of the coefficients the central ray has met,
     which is why the marcher has to say *which* boundary each bounce was at: a
     pressure-release sea surface inverts the pressure and a seabed need not.
+    With a lossy seabed the bottom's coefficient is one complex
+    :math:`\mathcal{R}` per beam rather than a scalar, and the product is
+    Jensen Eq. (3.126) applied at every touch, magnitude and phase together;
+    it collapses to a power because the touches of one ray all share one
+    grazing angle (see :func:`gaussian_beams`).
     And the branch of :math:`\sqrt{q}` is fixed by unwrapping the argument of
     ``q`` along the ray before anything is sampled off it, since the increment
     per range step is small while a principal-value square root taken sample by
@@ -1462,7 +1626,9 @@ def _assemble_beam_field(
 
     at_bottom = np.cumsum(march.upper_reflections, axis=1)
     at_surface = np.cumsum(march.reflections - march.upper_reflections, axis=1)
-    reflected = (_SURFACE_REFLECTION**at_surface) * (bottom_reflection**at_bottom)
+    r_bottom = (bottom_reflection if isinstance(bottom_reflection, float)
+                else np.asarray(bottom_reflection)[:, None])
+    reflected = (_SURFACE_REFLECTION**at_surface) * (r_bottom**at_bottom)
     # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and positive.
     weight = (fan.dtheta * (omega * w0 / (2.0 * c0))
               * np.sqrt(np.cos(fan.launch) / np.pi))

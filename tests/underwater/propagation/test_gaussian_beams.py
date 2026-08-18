@@ -38,6 +38,22 @@ nothing with the solver.
   steep multiple bounces, so the same image sum truncated to the fan's own
   half-angle is used to separate the fan's truncation from the method's error.
 
+* **The same guide over a lossy seabed.** The image expansion survives an
+  absorbing bottom with one change (Jensen Eq. 2.138 for the geometry,
+  Eq. 3.126 for what a boundary touch does to amplitude and phase): each
+  image's term carries :math:`(-1)^{n_s}\,\mathcal{R}(\theta)^{n_b}` with the
+  counts read off the unfolding and :math:`\theta` the one grazing angle the
+  straight unfolded path makes with every bottom plane, closed form by
+  geometry. The :math:`\mathcal{R}` is ``reflection_coefficient`` called
+  directly on those angles, so the oracle shares nothing with the solver's
+  wiring, which never sees an image angle: it reads one angle per beam off
+  Snell's invariant. One geometry exercises both sides of the critical angle,
+  where the physics changes character: above it :math:`|\mathcal{R}| < 1` and
+  the seabed drains the steep multiples, below it :math:`|\mathcal{R}| = 1`
+  and *only* the phase of :math:`\mathcal{R}` carries the seabed, which is
+  what caught the field being assembled with that phase conjugated (15 dB
+  wrong at the range the fringes moved most).
+
 * **The same guide, expanded over modes instead of paths.** Jensen Eq. (5.13)
   is a second closed form of that same exact field, built from the boundary
   conditions rather than from a stack of ray paths, and normalised by Eq. (5.16)
@@ -443,6 +459,11 @@ def test_the_ideal_waveguide_matches_the_image_source_sum() -> None:
     the square root through a path that has bounced dozens of times, and the
     ladder of folded receiver images without which the answer is several
     decibels light.
+
+    The bound is the measured 0.00024 dB doubled, not a loose ceiling, and
+    deliberately so: the perfect reflector is now the inert limit of the lossy
+    seabed machinery, and this is the assertion that the wiring for it left
+    the default exactly where it always was.
     """
     r = np.array([2000.0])
     exact = _image_source_loss(r, **_GUIDE)
@@ -451,7 +472,7 @@ def test_the_ideal_waveguide_matches_the_image_source_sum() -> None:
         source_depth=_GUIDE["source_depth"], max_range=2200.0, ranges_m=r,
         receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
         max_angle_deg=88.0, range_step=2.0, beam_width=100.0)
-    assert np.abs(res.propagation_loss[0] - exact).max() < 0.02
+    assert np.abs(res.propagation_loss[0] - exact).max() < 5e-4
 
 
 def test_a_narrower_fan_costs_exactly_what_cutting_the_image_sum_costs() -> None:
@@ -499,6 +520,207 @@ def test_both_boundary_conditions_fall_out_of_the_folded_images(
     scale = np.abs(res.pressure[1, 0])
     assert np.abs(res.pressure[0, 0]) / scale < 1e-3
     assert np.abs(res.pressure[2, 0]) / scale == pytest.approx(at_bottom, abs=0.2)
+
+
+# --- A lossy seabed ---------------------------------------------------------
+#
+# The image lattice above survives an absorbing bottom with one change: each
+# image's term carries the coefficients of the boundary planes standing
+# between it and the receiver. Jensen Eq. (2.138) writes the lattice as four
+# families per period m, and reading the counts off Fig. 2.17's unfolding
+# gives, for the family offsets in depth,
+#
+#     2Dm - zs + z:      m surface touches,   m bottom touches   (direct at m=0)
+#     2D(m+1) - zs - z:  m,                   m+1                (bottom first)
+#     2Dm + zs + z:      m+1,                 m                  (surface first)
+#     2D(m+1) + zs - z:  m+1,                 m+1
+#
+# which reproduces the book's signs for the ideal guide, (-1)^(touches), and
+# its naming of the first four terms (direct, bottom, surface, bottom-surface).
+# Checked against the two-sided lattice `_image_source_loss` sums, the four
+# families with R = -1 agree to 6e-10 dB. A boundary touch multiplies the
+# amplitude by |R| and adds arg R to the phase (Eq. 3.126), and in isovelocity
+# water every image path is one straight line, so all n_b of its bottom
+# touches share the single grazing angle that line makes with the horizontal:
+# atan2(|offset|, r), closed form by geometry, and the term's coefficient is
+# exactly (-1)^(n_s) R(theta)^(n_b).
+
+_SEABED = {"rho1": 1000.0, "rho2": 1800.0, "c2": 1700.0}  # sand-like, phi_c = 28.07 deg
+
+
+def _lossy_image_loss(
+    ranges: np.ndarray, *, water_depth: float, frequency: float,
+    source_depth: float, receiver_depth: float, rho1: float, rho2: float,
+    c2: float, n_images: int = 400, magnitude_only: bool = False,
+) -> np.ndarray:
+    """The lossy guide's loss as the image sum described above.
+
+    ``magnitude_only`` replaces every R by |R|, which below the critical angle
+    is exactly the perfect reflector each such touch would be if the phase of
+    R meant nothing: the degraded oracle the phase assertion needs.
+
+    Convergence is far faster than the ideal lattice's: above the critical
+    angle |R| < 1 caps every steep family geometrically (0.342 at normal
+    incidence for this sand), so 400 periods is already indistinguishable
+    from 1600 at the printed precision.
+    """
+    from phonometry.underwater.propagation.seabed_reflection import (
+        reflection_coefficient,
+    )
+
+    k = 2.0 * np.pi * frequency / _C
+    r = np.asarray(ranges, dtype=np.float64)
+    field = np.zeros(r.size, dtype=np.complex128)
+    for m in range(n_images):
+        families = [
+            (2.0 * water_depth * m - source_depth + receiver_depth, m, m),
+            (2.0 * water_depth * (m + 1) - source_depth - receiver_depth, m, m + 1),
+            (2.0 * water_depth * m + source_depth + receiver_depth, m + 1, m),
+            (2.0 * water_depth * (m + 1) + source_depth - receiver_depth, m + 1, m + 1),
+        ]
+        for offset, n_surface, n_bottom in families:
+            distance = np.hypot(r, offset)
+            grazing = np.degrees(np.arctan2(abs(offset), r))
+            refl = reflection_coefficient(grazing, rho1=rho1, c1=_C,
+                                          rho2=rho2, c2=c2)
+            if magnitude_only:
+                refl = np.abs(refl)
+            field = field + ((-1.0) ** n_surface * refl**n_bottom
+                             * np.exp(1j * k * distance) / distance)
+    return np.asarray(-20.0 * np.log10(np.abs(field)))
+
+
+def test_a_lossy_seabed_is_the_image_sum_with_R_at_each_images_own_angle() -> None:
+    r"""Above and below the critical angle at once, phase included.
+
+    The three ranges are chosen for what their dominant images do. At 2 km
+    every bottom-touching image lies *above* the 28.07 degree critical angle
+    (the shallowest touches the bottom at 28.8 degrees), so the comparison
+    there pins the magnitude of R and nothing else; replacing R by |R| moves
+    the oracle by exactly zero at that range. At 4 km the two dominant
+    bottom-touching images have slid *below* critical (15.4 and 23.0 degrees),
+    where |R| = 1 and the seabed survives only in the phase of R, and
+    replacing R by |R| now moves the oracle by 5.7 dB: that gap is the
+    fringes moving, it is asserted as material below, and the solver has to
+    land on the true side of it. This is also the configuration that caught
+    the phase being spent backwards: the beam sum is assembled in the
+    conjugate time convention and conjugated once at the end, so an
+    un-conjugated R survives to the exposed field as conj(R), which measured
+    15.3 dB wrong at this 4 km point while leaving every real-R
+    configuration, which is all the other tests, untouched.
+
+    Measured agreement with the settings below: 0.073, 0.042 and 0.019 dB at
+    2, 3 and 4 km. The 2 km error is the largest for a reason worth recording:
+    its shallowest bottom image sits 0.74 degrees above the critical kink,
+    where R varies fastest, and a beam reconstructs each arrival from a cone
+    of launch angles about a wavelength/(pi W0) = 0.9 degrees wide, so the
+    kink is smeared across the very arrival it matters most to; widening the
+    beams to 150 m narrows the cone and halves that error (0.031 dB), which
+    is what says it is angular smear and not a wrong coefficient. The 0.15 dB
+    bound keeps a hand's margin over all three while sitting fifty times
+    under the 8 dB the ideal guide differs by and far under either failure
+    the test exists to catch.
+    """
+    from phonometry.underwater.propagation.seabed_reflection import (
+        critical_angle,
+        reflection_coefficient,
+    )
+
+    r = np.array([2000.0, 3000.0, 4000.0])
+    exact = _lossy_image_loss(r, **_GUIDE, **_SEABED)
+    res = gaussian_beams(
+        _GUIDE["frequency"], [0.0, _GUIDE["water_depth"]], [_C, _C],
+        source_depth=_GUIDE["source_depth"], max_range=4200.0, ranges_m=r,
+        receiver_depths_m=np.array([_GUIDE["receiver_depth"]]),
+        max_angle_deg=85.0, range_step=2.5, beam_width=100.0,
+        seabed_density=_SEABED["rho2"], seabed_sound_speed=_SEABED["c2"],
+        density=_SEABED["rho1"])
+    assert np.abs(res.propagation_loss[0] - exact).max() < 0.15
+    assert res.seabed_density == _SEABED["rho2"]
+    assert res.seabed_sound_speed == _SEABED["c2"]
+
+    # The geometry really does straddle the critical angle: the shallowest
+    # bottom-touching image at 2 km is above it with |R| < 1, and at 4 km the
+    # dominant one is below it with |R| = 1 and a phase that means something.
+    phi_c = critical_angle(_C, _SEABED["c2"])
+    depth, zs, zr = (_GUIDE["water_depth"], _GUIDE["source_depth"],
+                     _GUIDE["receiver_depth"])
+    shallowest_touch = np.degrees(np.arctan2(2.0 * depth - zs - zr, r))
+    assert shallowest_touch[0] > phi_c > shallowest_touch[-1]
+    r_above = reflection_coefficient(float(shallowest_touch[0]),
+                                     rho1=_SEABED["rho1"], c1=_C,
+                                     rho2=_SEABED["rho2"], c2=_SEABED["c2"])
+    r_below = reflection_coefficient(float(shallowest_touch[-1]),
+                                     rho1=_SEABED["rho1"], c1=_C,
+                                     rho2=_SEABED["rho2"], c2=_SEABED["c2"])
+    assert np.abs(r_above[0]) < 0.999
+    assert np.abs(r_below[0]) == pytest.approx(1.0, abs=1e-12)
+    assert abs(np.angle(r_below[0])) > 0.3
+
+    # The phase of R is load-bearing, not decorative: strip it from the oracle
+    # and the 4 km point moves by decibels, while the solver stays with the
+    # phase-true sum. |R| = 1 below critical means the stripped oracle is what
+    # a solver that dropped, or conjugated, the phase would be chasing.
+    stripped = _lossy_image_loss(r, **_GUIDE, **_SEABED, magnitude_only=True)
+    assert abs(stripped[-1] - exact[-1]) > 3.0
+    assert abs(res.propagation_loss[0, -1] - exact[-1]) < 0.1
+
+    # And the seabed is material full stop: the ideal guide is decibels away.
+    ideal = _image_source_loss(r, **_GUIDE)
+    assert np.abs(exact - ideal).max() > 2.0
+
+
+def test_the_seabed_arguments_are_inert_until_both_are_passed() -> None:
+    """The perfect reflector is the seabed machinery's off state, bit for bit.
+
+    Every published validation number of this module was measured over a
+    perfect bottom, so the default has to reproduce them exactly, not merely
+    closely; and ``density`` must be inert while no seabed is given, which
+    the absurd value below would betray at the first operation that read it.
+    """
+    r = np.array([2000.0])
+    kwargs = {"source_depth": _GUIDE["source_depth"], "max_range": 2200.0,
+              "ranges_m": r,
+              "receiver_depths_m": np.array([_GUIDE["receiver_depth"]]),
+              "max_angle_deg": 85.0, "range_step": 10.0, "beam_width": 100.0}
+    default = gaussian_beams(_GUIDE["frequency"],
+                             [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs)
+    explicit = gaussian_beams(_GUIDE["frequency"],
+                              [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs,
+                              seabed_density=None, seabed_sound_speed=None,
+                              density=7.0)
+    assert default.seabed_density is None
+    assert default.seabed_sound_speed is None
+    assert np.array_equal(default.pressure, explicit.pressure)
+    lossy = gaussian_beams(_GUIDE["frequency"],
+                           [0.0, _GUIDE["water_depth"]], [_C, _C], **kwargs,
+                           seabed_density=_SEABED["rho2"],
+                           seabed_sound_speed=_SEABED["c2"])
+    assert not np.array_equal(default.pressure, lossy.pressure)
+
+
+def test_a_half_described_seabed_is_rejected() -> None:
+    """Half a seabed is a silent perfect reflector, so it is an error instead."""
+    iso = ([0.0, 1000.0], [_C, _C])
+    with pytest.raises(ValueError, match="passed together"):
+        gaussian_beams(200.0, *iso, source_depth=500.0,
+                       seabed_density=1800.0)
+    with pytest.raises(ValueError, match="passed together"):
+        gaussian_beams(200.0, *iso, source_depth=500.0,
+                       seabed_sound_speed=1700.0)
+    # Two descriptions of one boundary cannot both hold.
+    with pytest.raises(ValueError, match="two descriptions"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom="rigid",
+                       seabed_density=1800.0, seabed_sound_speed=1700.0)
+    with pytest.raises(ValueError, match="seabed_density"):
+        gaussian_beams(200.0, *iso, source_depth=500.0,
+                       seabed_density=-1.0, seabed_sound_speed=1700.0)
+    with pytest.raises(ValueError, match="seabed_sound_speed"):
+        gaussian_beams(200.0, *iso, source_depth=500.0,
+                       seabed_density=1800.0, seabed_sound_speed=0.0)
+    with pytest.raises(ValueError, match="density"):
+        gaussian_beams(200.0, *iso, source_depth=500.0, density=0.0,
+                       seabed_density=1800.0, seabed_sound_speed=1700.0)
 
 
 # --- The same field, expanded the other way ---------------------------------
