@@ -114,9 +114,12 @@ tiempos de propagación y ningún nivel propio; `eigenrays` busca en su abanico
 los caminos que unen una fuente y un receptor dados y lista sus llegadas con
 amplitudes clásicas por camino, y el campo lo da `gaussian_beams`,
 que ensancha cada uno de esos rayos hasta convertirlo en un haz y así responde
-un número finito en una cáustica y uno graduado en una zona de sombra, a dos
+un número finito en una cáustica y uno graduado en una zona de sombra, a tres
 precios: no tiene campo cercano
-dentro de unas tres anchuras de haz de la fuente, y la variante de haces
+dentro de unas tres anchuras de haz de la fuente; hereda el régimen de alta
+frecuencia propio de la teoría de rayos, así que un canal refractante de solo
+unas pocas longitudes de onda de profundidad sigue perteneciendo a
+`normal_modes`; y la variante de haces
 geométricos con su índice KMAH y su suelo de anchura mínima no está
 implementada. La ecuación parabólica es la forma estándar de ángulos pequeños
 de Tappert y no una variante de gran angular de Padé. Para la física del lecho
