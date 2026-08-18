@@ -56,6 +56,15 @@ Every other section consumes it.
 - [Measurement uncertainty](signals/metrology/gum-uncertainty.md): the GUM law of propagation of uncertainty and the Monte Carlo method (ISO/IEC Guide 98-3:2008 and Supplement 1): combined and expanded uncertainty, Welch–Satterthwaite effective degrees of freedom, and probabilistically symmetric coverage intervals
 - [Data qualification](signals/metrology/data-qualification.md): the Bendat & Piersol stationarity tests (reverse arrangements with the Table A.6 acceptance regions, runs about the median with the exact Wald-Wolfowitz distribution) on segment mean squares, and the Rice statistics of level crossings, apparent frequency, peak rates and the irregularity factor that places the peak-height distribution between Rayleigh and Gaussian
 
+### [Audio files](io/index.md)
+
+Measurement audio in and out: every linear WAV a meter writes read into a
+calibrated `Signal` with its `bext` provenance, long recordings streamed
+block by block, BWF written with provenance and measured loudness, the
+calibration sidecar, and lossless conversion.
+
+- [Reading and writing measurement audio](io/audio-files.md): the whole workflow on one runnable page, from the meter's WAV to the calibrated level, the lossy warning, streaming, BWF writing, the sidecar and lossless conversion
+
 ### [Hearing and perception](perception/index.md)
 
 What a listener makes of the sound a level merely counts: loudness, sharpness,

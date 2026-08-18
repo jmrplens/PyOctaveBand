@@ -1,6 +1,6 @@
 ---
 title: "Guías"
-description: "Las 106 guías de phonometry, agrupadas en los diez temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
+description: "Las 107 guías de phonometry, agrupadas en los once temas que cubre la biblioteca: para qué sirve cada área, las normas que implementa y un resumen de una línea de cada guía que contiene."
 head:
   - tag: script
     attrs:
@@ -11,9 +11,9 @@ head:
         "@type": "ItemList",
         "@id": "https://jmrplens.github.io/phonometry/es/start/guides/#areas",
         "name": "Áreas de la documentación de phonometry",
-        "description": "Las diez áreas documentadas de las guías de phonometry, cada una con las normas que implementa.",
+        "description": "Las once áreas documentadas de las guías de phonometry, cada una con las normas que implementa.",
         "inLanguage": "es",
-        "numberOfItems": 10,
+        "numberOfItems": 11,
         "itemListOrder": "https://schema.org/ItemListUnordered",
         "itemListElement": [
           {
@@ -26,62 +26,69 @@ head:
           {
             "@type": "ListItem",
             "position": 2,
+            "name": "Archivos de audio",
+            "description": "Audio de medición de entrada y salida: lectura calibrada, procedencia, flujo por bloques, escritura BWF y conversión sin pérdidas.",
+            "url": "https://jmrplens.github.io/phonometry/es/io/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
             "name": "Audición y percepción",
             "description": "Sonoridad, calidad sonora, inteligibilidad del habla, audición y exposición.",
             "url": "https://jmrplens.github.io/phonometry/es/perception/"
           },
           {
             "@type": "ListItem",
-            "position": 3,
+            "position": 4,
             "name": "Salas y edificación",
             "description": "Parámetros de sala, ruido de fondo, aislamiento en campo y laboratorio, predicción.",
             "url": "https://jmrplens.github.io/phonometry/es/buildings/"
           },
           {
             "@type": "ListItem",
-            "position": 4,
+            "position": 5,
             "name": "Materiales y superficies",
             "description": "Absorción, resistencia al flujo de aire, tubo de impedancia, modelos porosos y de metamaterial, difusores, dispersión.",
             "url": "https://jmrplens.github.io/phonometry/es/materials/"
           },
           {
             "@type": "ListItem",
-            "position": 5,
+            "position": 6,
             "name": "Vibración y ruido estructural",
             "description": "Movilidad y FRF, aisladores, potencia radiada, uniones, vibración en humanos.",
             "url": "https://jmrplens.github.io/phonometry/es/vibration/"
           },
           {
             "@type": "ListItem",
-            "position": 6,
+            "position": 7,
             "name": "Medio ambiente y transporte",
             "description": "Propagación en exteriores, barreras, refracción, fuentes viarias, ferroviarias y de aerogenerador, y la valoración construida sobre ellas.",
             "url": "https://jmrplens.github.io/phonometry/es/environment/"
           },
           {
             "@type": "ListItem",
-            "position": 7,
+            "position": 8,
             "name": "Ruido de aeronaves",
             "description": "Niveles de certificación, contornos de aeropuerto y el método del hemisferio.",
             "url": "https://jmrplens.github.io/phonometry/es/aircraft/"
           },
           {
             "@type": "ListItem",
-            "position": 8,
+            "position": 9,
             "name": "Acústica submarina",
             "description": "Niveles re 1 microPa, ruido radiado por buques, hincado de pilotes, ruido ambiente, pérdidas por transmisión.",
             "url": "https://jmrplens.github.io/phonometry/es/underwater/"
           },
           {
             "@type": "ListItem",
-            "position": 9,
+            "position": 10,
             "name": "Fuentes y dispositivos",
             "description": "Potencia acústica, intensidad, declaraciones de emisión, electroacústica, sonoridad de programa.",
             "url": "https://jmrplens.github.io/phonometry/es/devices/"
           },
           {
             "@type": "ListItem",
-            "position": 10,
+            "position": 11,
             "name": "Simulación de ondas",
             "description": "Simulación FDTD 2D determinista, acústica y elástica P-SV, validada frente a oráculos analíticos y no frente a una norma.",
             "url": "https://jmrplens.github.io/phonometry/es/simulation/"
@@ -97,7 +104,7 @@ hay ninguna panorámica del campo: cada página es la documentación de trabajo 
 un módulo, escrita para que un resultado se pueda defender apartado por
 apartado en lugar de darlo por bueno.
 
-Esta página es el mapa. Ciento seis guías repartidas en diez temas, y cada
+Esta página es el mapa. Ciento siete guías repartidas en once temas, y cada
 área tiene su propio índice con el relato largo de cómo encajan sus piezas. Si
 llegas sin una pregunta concreta, lee primero la
 [introducción](/phonometry/es/start/getting-started/): recorre una señal por toda la
@@ -239,6 +246,21 @@ ISO 1996-1, IEC 60942 y la GUM.
 - [Cualificación de datos](/phonometry/es/signals/metrology/data-qualification/): los tests
   de estacionariedad por inversiones de orden y por rachas, y las estadísticas
   de Rice de cruces por nivel y de picos con el factor de irregularidad.
+
+## [Archivos de audio](/phonometry/es/io/)
+
+Audio de medición de entrada y salida. La capa de archivos de la cadena de
+señal: todo WAV lineal que escribe un sonómetro o un grabador de campo
+vuelve como un `Signal` calibrado con su procedencia `bext`, las
+grabaciones largas fluyen por bloques a través de los filtros con estado, y
+lo que sale de la biblioteca es un BWF con su procedencia y un sidecar que
+transporta la calibración. Implementa EBU Tech 3285 e ITU-R BS.2088; los archivos FLAC siguen la
+RFC 9639.
+
+- [Leer y escribir audio de medición](/phonometry/es/io/audio-files/): todo
+  el flujo en una página ejecutable, del WAV del sonómetro al nivel
+  calibrado, el aviso de pérdidas, el flujo por bloques, la escritura BWF,
+  el sidecar y la conversión sin pérdidas.
 
 ## [Audición y percepción](/phonometry/es/perception/)
 

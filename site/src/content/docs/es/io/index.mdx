@@ -1,0 +1,103 @@
+---
+title: "Archivos de audio"
+description: "La capa de archivos de la medición: leer en un Signal calibrado todo WAV lineal que escribe un sonómetro, inspección solo de cabeceras, flujo por bloques hacia filtros con estado, escritura BWF con procedencia bext y sonoridad medida, el sidecar de calibración y la conversión sin pérdidas; qué queda fuera, y por qué."
+---
+
+import Scope from '../../../../components/Scope.astro';
+import ScopeClaim from '../../../../components/ScopeClaim.astro';
+
+Todas las demás áreas de esta biblioteca parten de un array que ya está en
+memoria; esta trata de los archivos de los que ese array sale y a los que
+vuelve. Su premisa es que un archivo de audio producido por una cadena de
+medición es un *registro de medición*: las muestras solo significan algo
+junto a la frecuencia de muestreo, la calibración que convierte el fondo de
+escala digital en pascales, y la procedencia que dice dónde, cuándo y a
+través de qué se hizo la grabación. El módulo `phonometry.io` lee y escribe
+exactamente con eso en mente — y nunca remuestrea, nunca mezcla canales,
+nunca normaliza y nunca toca un nivel, porque cada una de esas cosas es un
+valor por defecto documentado en algún rincón del ecosistema y cada una
+destruye en silencio la magnitud que una medición existe para conservar.
+
+La forma práctica sale de un repaso al equipamiento, no de coleccionar
+formatos. Sonómetros y grabadores de campo emiten WAV lineal — PCM de
+24 bits, `WAVE_FORMAT_EXTENSIBLE` para el multicanal, metadatos BWF `bext`,
+RF64 cuando una grabación nocturna pasa de 4 GiB — así que la **instalación
+base** (NumPy y SciPy, nada más) lo lee todo, y los formatos comprimidos
+viven tras el extra opcional `[audio]` (python-soundfile, cuyo wheel
+empaqueta libsndfile bajo LGPL-2.1). Las fuentes con pérdidas se leen pero
+se señalan, a las claras: un nivel calculado sobre la aproximación ADPCM o
+MP3 de la forma de onda no es defendible, y el aviso más la marca `lossy`
+mantienen ese hecho pegado a los datos.
+
+Lo que vuelve de un archivo es un `Signal`: las muestras con su frecuencia,
+su calibración, sus etiquetas de canal y su procedencia `bext` en un único
+objeto inmutable que se comporta como el array desnudo en todas partes
+(`np.asarray` entrega las muestras a cualquier función existente), se
+dibuja solo con `.plot()`, y entra directo en las funciones de nivel —
+`leq`, `ln_levels`, `sel`, `lc_peak` — sin repetir a mano ni la frecuencia
+ni la calibración. En la otra dirección, `write()` produce WAV/BWF (el de
+24 bits empaquetado en casa) y FLAC, se niega a recortar en silencio,
+extiende el `CodingHistory` en vez de sustituirlo, puede medir los cinco
+valores de sonoridad EBU R 128 del `bext` versión 2 con la implementación
+propia de la BS.1770, y deja la calibración en un pequeño sidecar JSON
+versionado junto al audio — el número para el que ningún contenedor de
+audio tiene campo, hecho para viajar.
+
+## Páginas de esta sección
+
+- [Leer y escribir audio de medición](/phonometry/es/io/audio-files/): todo
+  el flujo en una página ejecutable — leer el WAV de un sonómetro en un
+  `Signal` calibrado, derivar la calibración de la toma del calibrador, el
+  aviso de pérdidas y la historia de las copias de escucha que hay detrás,
+  recorrer por bloques una grabación nocturna con filtros con estado,
+  escribir BWF con su procedencia, el viaje de ida y vuelta del sidecar, y
+  una conversión con la que la medición no deja de serlo.
+
+## Qué no cubre esta sección
+
+<Scope>
+<ScopeClaim status="not-covered">
+**Ni reproducción, ni edición, ni efectos.** Esto es una capa de archivos
+para mediciones, no una estación de trabajo de audio: nada de aquí
+reproduce un sonido, recorta una región a oído ni aplica ganancia. Tampoco
+hay escritura con pérdidas, a propósito: ninguna medición termina en un
+MP3, y una biblioteca cuyo trabajo es conservar niveles no debería ponerlo
+fácil.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**El AAC/M4A se queda fuera.** Las grabaciones de dictáfonos y teléfonos en
+contenedores MP4 no se descodifican; la vía honesta es una línea de
+`ffmpeg -i note.m4a note.wav` y después `read()`, con la misma advertencia
+de pérdidas en ambos casos. Igual con los formatos de adquisición que no
+son audio: TDMS (LabVIEW) y UFF (análisis modal) tienen sus propios
+lectores en Python, `npTDMS` y `pyuff`, y fingir que son archivos de audio
+no serviría a nadie.
+</ScopeClaim>
+
+<ScopeClaim status="not-covered">
+**Los archivos ambisónicos se toleran, no se interpretan.** Un `.amb` en
+B-format o un GUID ambisónico se lee sin problema y sus canales vuelven
+etiquetados, pero no se aplica ninguna matriz de conversión FuMa a AmbiX:
+el canal 0 de un archivo FuMa lleva W a −3 dB, y convertirlo en una presión
+sin decirlo sería un cambio de nivel silencioso — exactamente la clase de
+valor por defecto que este módulo existe para rechazar.
+</ScopeClaim>
+</Scope>
+
+## Antes y después de estas páginas
+
+Antes: [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/)
+explica de dónde sale de verdad el factor de calibración que lleva un
+`Signal`, y [Primeros pasos](/phonometry/es/start/getting-started/) pasa un
+primer archivo por la cadena. Después: todo — el sentido de la capa de
+archivos es que los [niveles](/phonometry/es/signals/levels/levels/), el
+[filtrado en octavas](/phonometry/es/signals/filters/filter-banks/), el
+[proceso por bloques](/phonometry/es/signals/filters/block-processing/) y el
+resto de la biblioteca reciban una señal calibrada sin enterarse nunca de
+que salió de un archivo.
+
+Si llegaste aquí desde una búsqueda y quieres la forma de toda la
+biblioteca, [¿Qué necesitas medir?](/phonometry/es/start/tasks/) la indexa
+por el trabajo y [Todas las guías](/phonometry/es/start/guides/) lista cada
+página con una línea sobre cada una.

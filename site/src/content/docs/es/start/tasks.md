@@ -21,6 +21,7 @@ calcula.
 |---|---|
 | Tengo una grabación WAV y necesito niveles ponderados A, $L_\mathrm{Aeq}$ y los niveles percentiles | [Construye un sonómetro](/phonometry/es/signals/sound-level-meter/) — IEC 61672-1 e IEC 61260-1, la cadena entera en una página ejecutable, del tono de calibrador a la comprobación de clase de cada etapa |
 | Mis números no están en pascales y no sé qué son | [Calibración y dBFS](/phonometry/es/signals/metrology/calibration/) — el tono de calibrador, la sensibilidad en pascales por unidad digital, la regla de deriva antes/después y la alternativa digital en dBFS |
+| Mi archivo es el WAV del propio sonómetro: 24 bits, multicanal, o un RF64 nocturno, y quiero leerlo y escribirlo sin tocar el nivel | [Leer y escribir audio de medición](/phonometry/es/io/audio-files/) — el `Signal` calibrado, la procedencia `bext`, el flujo por bloques, la escritura BWF y el sidecar de calibración |
 | Necesito un espectro en lugar de un nivel | [Bancos de filtros](/phonometry/es/signals/filters/filter-banks/) para niveles de banda (IEC 61260-1), [Análisis espectral](/phonometry/es/signals/spectra/spectral-analysis/) para una estimación de densidad |
 
 ## Salas y edificación
