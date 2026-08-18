@@ -180,25 +180,8 @@ def _optional_number(payload: dict[str, object], key: str, path: Path) -> float 
     return float(value)
 
 
-def read_sidecar(audio_path: str | Path) -> CalibrationSidecar | None:
-    """Read an audio file's calibration sidecar, if one exists.
-
-    Returns ``None`` when there is no sidecar -- the common case, never an
-    error. A file *at the sidecar's reserved name* that is not a valid
-    phonometry calibration record raises instead of being ignored: a
-    corrupted or foreign file squatting on ``*.phonometry.json`` beside a
-    measurement is a problem to surface, not to read past (silently
-    dropping it would silently drop the calibration).
-
-    :param audio_path: The audio file whose sidecar to look for.
-    :return: The parsed record, or ``None`` when no sidecar exists.
-    :raises ValueError: If the sidecar exists but is not valid JSON, does
-        not declare this schema, was written by a newer schema version, or
-        carries malformed fields.
-    """
-    source = sidecar_path(audio_path)
-    if not source.exists():
-        return None
+def _load_sidecar_payload(source: Path) -> dict[str, object]:
+    """Parse the sidecar's JSON and check its schema declaration."""
     try:
         payload = json.loads(source.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
@@ -219,11 +202,23 @@ def read_sidecar(audio_path: str | Path) -> CalibrationSidecar | None:
             f"version {SIDECAR_VERSION} this phonometry understands; "
             "upgrade phonometry to read it"
         )
+    return payload
+
+
+def _required_factor(payload: dict[str, object], source: Path) -> float:
+    """The mandatory calibration factor, validated as a number."""
     factor = payload.get("calibration_factor")
     if isinstance(factor, bool) or not isinstance(factor, int | float):
         raise ValueError(  # noqa: TRY004 - ValueError keeps the module validation errors uniform
             f"{source}: calibration_factor must be a number; got {factor!r}"
         )
+    return float(factor)
+
+
+def _calibrator_fields(
+    payload: dict[str, object], source: Path
+) -> tuple[dict[str, object], str | None]:
+    """The calibrator object (``{}`` for null) and its validated model."""
     calibrator = payload.get("calibrator")
     if calibrator is None:
         calibrator = {}
@@ -234,23 +229,57 @@ def read_sidecar(audio_path: str | Path) -> CalibrationSidecar | None:
     model = calibrator.get("model")
     if model is not None and not isinstance(model, str):
         raise ValueError(f"{source}: calibrator model must be a string or null")
+    return calibrator, model
+
+
+def _channel_labels(
+    payload: dict[str, object], source: Path
+) -> tuple[str, ...] | None:
+    """The channel labels as a tuple, or ``None`` when absent or null."""
     labels = payload.get("channel_labels")
-    if labels is not None and (
-        not isinstance(labels, list)
-        or not all(isinstance(label, str) for label in labels)
+    if labels is None:
+        return None
+    if not isinstance(labels, list) or not all(
+        isinstance(label, str) for label in labels
     ):
         raise ValueError(
             f"{source}: channel_labels must be an array of strings or null"
         )
+    return tuple(labels)
+
+
+def read_sidecar(audio_path: str | Path) -> CalibrationSidecar | None:
+    """Read an audio file's calibration sidecar, if one exists.
+
+    Returns ``None`` when there is no sidecar -- the common case, never an
+    error. A file *at the sidecar's reserved name* that is not a valid
+    phonometry calibration record raises instead of being ignored: a
+    corrupted or foreign file squatting on ``*.phonometry.json`` beside a
+    measurement is a problem to surface, not to read past (silently
+    dropping it would silently drop the calibration).
+
+    :param audio_path: The audio file whose sidecar to look for.
+    :return: The parsed record, or ``None`` when no sidecar exists.
+    :raises ValueError: If the sidecar exists but is not valid JSON, does
+        not declare this schema, was written by a newer schema version, or
+        carries malformed fields.
+    """
+    source = sidecar_path(audio_path)
+    if not source.exists():
+        return None
+    payload = _load_sidecar_payload(source)
+    factor = _required_factor(payload, source)
+    calibrator, model = _calibrator_fields(payload, source)
+    labels = _channel_labels(payload, source)
     try:
         return CalibrationSidecar(
-            calibration_factor=float(factor),
+            calibration_factor=factor,
             reference_spl=_optional_number(payload, "reference_spl", source),
             calibrator_frequency=_optional_number(
                 calibrator, "frequency", source
             ),
             calibrator_model=model,
-            channel_labels=None if labels is None else tuple(labels),
+            channel_labels=labels,
             phonometry_version=(
                 str(payload["phonometry_version"])
                 if payload.get("phonometry_version") is not None else None
