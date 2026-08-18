@@ -2388,7 +2388,8 @@ def gaussian_beams(
     decibels of the *complete* wedge field (mean two thirds of one) across a
     thin 2.8-degree wedge whose every cell is dense multipath, most of it
     arrivals near their own turning point, which is where a one-way marcher
-    pays its way; the tests print the decomposition.
+    pays its way; the test module's docstring records the measurements and
+    their stability under step, width and aperture.
 
     What it costs is ``n_beams`` times the size of the receiver grid, and none
     of the three factors depends on the frequency: the ray core does not have to
