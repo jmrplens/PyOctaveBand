@@ -565,11 +565,11 @@ def test_eigenrays_declines_a_sloping_trace() -> None:
 def test_the_seabed_pair_and_a_slope_are_rejected_together() -> None:
     """One grazing angle per beam is a level-bottom fact, and the solver
     refuses to pretend otherwise rather than quietly mis-charging bounces."""
+    seabed = FluidSeabed(density=1800.0, sound_speed=1700.0)
     with pytest.raises(ValueError, match="lossy fluid seabed"):
         gaussian_beams(
             150.0, [0.0, 200.0], [_C, _C], source_depth=60.0,
-            max_range=2000.0,
-            bottom=FluidSeabed(density=1800.0, sound_speed=1700.0),
+            max_range=2000.0, bottom=seabed,
             bathymetry=([0.0, 2000.0], [200.0, 150.0]))
 
 

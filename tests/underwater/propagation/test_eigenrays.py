@@ -420,9 +420,10 @@ def test_invalid_inputs_rejected() -> None:
                   max_arrivals=0)
     with pytest.raises(ValueError, match="n_steps"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, n_steps=1)
+    slow = FluidSeabed(density=1800.0, sound_speed=-1700.0)
     with pytest.raises(ValueError, match="sound_speed"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
-                  bottom=FluidSeabed(density=1800.0, sound_speed=-1700.0))
+                  bottom=slow)
     with pytest.raises(ValueError, match="bottom"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
                   bottom="sandy")

@@ -711,16 +711,15 @@ def test_a_malformed_seabed_is_rejected() -> None:
     """A ``FluidSeabed`` cannot half-arrive, so what is left to reject is a
     nonphysical one, each field with its own message."""
     iso = ([0.0, 1000.0], [_C, _C])
+    airy = FluidSeabed(density=-1.0, sound_speed=1700.0)
+    still = FluidSeabed(density=1800.0, sound_speed=0.0)
+    dry = FluidSeabed(density=1800.0, sound_speed=1700.0, water_density=0.0)
     with pytest.raises(ValueError, match="density"):
-        gaussian_beams(200.0, *iso, source_depth=500.0,
-                       bottom=FluidSeabed(density=-1.0, sound_speed=1700.0))
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom=airy)
     with pytest.raises(ValueError, match="sound_speed"):
-        gaussian_beams(200.0, *iso, source_depth=500.0,
-                       bottom=FluidSeabed(density=1800.0, sound_speed=0.0))
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom=still)
     with pytest.raises(ValueError, match="water_density"):
-        gaussian_beams(200.0, *iso, source_depth=500.0,
-                       bottom=FluidSeabed(density=1800.0, sound_speed=1700.0,
-                                          water_density=0.0))
+        gaussian_beams(200.0, *iso, source_depth=500.0, bottom=dry)
 
 
 # --- The same field, expanded the other way ---------------------------------
@@ -1492,10 +1491,11 @@ def test_the_answer_does_not_care_which_width_inside_the_band_is_used() -> None:
 def test_a_source_on_a_profile_kink_is_warned_about() -> None:
     z = np.array([0.0, 100.0, 300.0, 1000.0])
     c = np.array([1500.0, 1510.0, 1488.0, 1512.0])
+    r = np.array([1000.0])
+    fan = BeamFan(max_angle_deg=30.0, n_beams=9)
     with pytest.warns(PhonometryWarning, match="gradient discontinuity"):
         gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
-                       ranges_m=np.array([1000.0]), n_depth_points=2,
-                       fan=BeamFan(max_angle_deg=30.0, n_beams=9),
+                       ranges_m=r, n_depth_points=2, fan=fan,
                        range_step=100.0)
     # A metre off the node is a different problem, and silent.
     with warnings.catch_warnings():
@@ -1526,12 +1526,12 @@ def test_a_beam_wider_than_a_quarter_of_the_channel_passes_in_silence() -> None:
 
 
 def test_a_step_that_cannot_follow_the_steepest_beam_is_warned_about() -> None:
+    r = np.array([2000.0])
+    steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
     with pytest.warns(PhonometryWarning, match="steepest beam"):
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=2000.0, ranges_m=np.array([2000.0]),
-                       n_depth_points=2,
-                       fan=BeamFan(max_angle_deg=85.0, n_beams=9),
-                       range_step=100.0)
+                       max_range=2000.0, ranges_m=r, n_depth_points=2,
+                       fan=steep_fan, range_step=100.0)
 
 
 def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
@@ -1546,17 +1546,18 @@ def test_every_warning_is_reported_against_the_line_that_caused_it() -> None:
     """
     z = np.array([0.0, 100.0, 300.0, 1000.0])
     c = np.array([1500.0, 1510.0, 1488.0, 1512.0])
+    on_kink = np.array([1000.0])
+    flat_fan = BeamFan(max_angle_deg=30.0, n_beams=9)
+    far = np.array([2000.0])
+    steep_fan = BeamFan(max_angle_deg=85.0, n_beams=9)
     with pytest.warns(PhonometryWarning) as kink:
         gaussian_beams(200.0, z, c, source_depth=100.0, max_range=1000.0,
-                       ranges_m=np.array([1000.0]), n_depth_points=2,
-                       fan=BeamFan(max_angle_deg=30.0, n_beams=9),
+                       ranges_m=on_kink, n_depth_points=2, fan=flat_fan,
                        range_step=100.0)
     with pytest.warns(PhonometryWarning) as steep:
         gaussian_beams(200.0, [0.0, 400.0], [_C, _C], source_depth=200.0,
-                       max_range=2000.0, ranges_m=np.array([2000.0]),
-                       n_depth_points=2,
-                       fan=BeamFan(max_angle_deg=85.0, n_beams=9),
-                       range_step=100.0)
+                       max_range=2000.0, ranges_m=far, n_depth_points=2,
+                       fan=steep_fan, range_step=100.0)
     for caught in (kink, steep):
         assert caught[0].filename == __file__
 
@@ -1565,17 +1566,17 @@ def test_invalid_inputs_rejected() -> None:
     iso = ([0.0, 1000.0], [_C, _C])
     with pytest.raises(ValueError, match="source_depth"):
         gaussian_beams(200.0, *iso, source_depth=1200.0)
+    vertical = BeamFan(max_angle_deg=90.0)
     with pytest.raises(ValueError, match="max_angle_deg"):
-        gaussian_beams(200.0, *iso, source_depth=500.0,
-                       fan=BeamFan(max_angle_deg=90.0))
+        gaussian_beams(200.0, *iso, source_depth=500.0, fan=vertical)
     with pytest.raises(ValueError, match="bottom"):
         gaussian_beams(200.0, *iso, source_depth=500.0, bottom="sandy")
     with pytest.raises(ValueError, match="range_step"):
         gaussian_beams(200.0, *iso, source_depth=500.0, max_range=100.0,
                        range_step=200.0)
+    unpaired = BeamFan(n_beams=1)
     with pytest.raises(ValueError, match="n_beams"):
-        gaussian_beams(200.0, *iso, source_depth=500.0,
-                       fan=BeamFan(n_beams=1))
+        gaussian_beams(200.0, *iso, source_depth=500.0, fan=unpaired)
     with pytest.raises(ValueError, match="ranges_m"):
         gaussian_beams(200.0, *iso, source_depth=500.0, ranges_m=[-1.0])
     with pytest.raises(ValueError, match="receiver_depths_m"):
