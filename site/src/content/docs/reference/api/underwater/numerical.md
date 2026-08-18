@@ -1,11 +1,12 @@
 ---
 title: "underwater.propagation.numerical"
-description: "Numerical models of underwater sound propagation (range-independent ocean)."
+description: "Numerical models of underwater sound propagation (range-independent water, with an optionally sloping bottom for the ray-based solvers)."
 sidebar:
   label: "numerical"
 ---
 
-Numerical models of underwater sound propagation (range-independent ocean).
+Numerical models of underwater sound propagation (range-independent water,
+with an optionally sloping bottom for the ray-based solvers).
 
 Four complementary numerical solvers for the acoustic field in a
 horizontally-stratified ocean waveguide, complementing the closed-form
@@ -39,8 +40,10 @@ to its count of bottom touches (Jensen Eq. 2.138 with Eq. 3.126 at every
 touch), the circular-arc ray paths of a linear
 sound-speed gradient together with the closed-form travel time along them
 (Medwin & Clay, *Fundamentals of Acoustical Oceanography*, Academic Press 1998,
-Eq. (3.3.20)), free-field spherical spreading, and mutual agreement of the PE
-and normal-mode propagation loss for a range-independent waveguide.
+Eq. (3.3.20)), free-field spherical spreading, mutual agreement of the PE
+and normal-mode propagation loss for a range-independent waveguide, and, for
+the sloping bottom the two ray-based solvers accept, the ideal wedge's exact
+image fan (the folded geometry to eleven digits, the beam field in dB).
 
 The three field solvers report the same quantity on the same terms, so their
 propagation losses can be laid side by side: `normal_modes` on a range slice
@@ -267,6 +270,8 @@ gaussian_beams(
     temperature: float = 10.0,
     salinity: float = 35.0,
     ph: float = 8.0,
+    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
+    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
 ) -> GaussianBeamResult
 ```
 
@@ -414,6 +419,54 @@ approximation (p. 189), and it is the approximation the whole method
 already breathes; sediment attenuation and elasticity are outside the
 fluid-fluid model here as they are outside `seabed_reflection` itself.
 
+**The bottom may slope.** The `bathymetry_ranges_m` /
+`bathymetry_depths_m` pair replaces the level bottom with the same
+piecewise-linear `depth(r)` polyline [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace) takes, and it is
+the first range dependence in this module; the sound-speed profile stays
+range independent, deliberately -- see [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace)'s scope note for
+why full $c(r, z)$ is excluded (no exact oracle exists to hold it
+to). Four things follow from the slope, each stated with its cost:
+
+* Every beam's central ray reflects specularly off the local facet
+  (Eq. 3.121), so an upslope bounce steepens it by twice the slope, and
+  the dynamic pair takes the reflection impulse of Eqs. (3.122)-(3.123)
+  evaluated on that facet (curvature zero, since the facets are straight;
+  `phonometry._internal.rays` records the closed form and its
+  flat-bottom limit).
+* A beam steepened past the vertical would run backward in range, which a
+  range-marching solver cannot carry: it is terminated at that bounce and
+  its weight is zero from there on, so the field keeps only what still
+  travels forward, exactly as the one-way parabolic equation keeps no
+  backscatter. Upslope propagation toward an apex therefore *loses* the
+  energy the wedge sends back down the slope; the ideal-wedge oracle in
+  the tests prices that truncation next to everything else.
+* The receiver-image ladder folds each receiver column about its own
+  local facet: the vertical stack of mirrors becomes the dihedral fan
+  about the local apex, exact for a single facet and local to each
+  column's facet on a general polyline; at slope zero it is the level
+  ladder bit for bit, which a test pins. The fan is what lets the
+  *tails* keep representing paths the marched axes cannot: an arrival
+  that went up the slope, turned past the vertical and came back is a
+  wrapped rung of the fan, analytic rather than marched, and the solver
+  recovers most of it.
+* The lossy fluid seabed cannot be combined with a slope, and the
+  rejection is of the wiring, not the physics: the one-coefficient-per-
+  beam collapse rests on Snell's invariant fixing a single grazing angle
+  per ray at the bottom, and a slope rotates that invariant at every
+  touch. A sloping run takes the perfect reflectors of `bottom`.
+
+Validated against the ideal wedge, which has an exact solution by images:
+an isovelocity wedge under a pressure-release surface with a rigid sloping
+bottom of angle $\beta = \pi/n$ ($n$ even) unfolds into a
+closed fan of $2\pi/\beta$ image sources on a circle about the apex.
+The tests build that fan from pure geometry and quantify the agreement in
+dB, cross-sections in range and depth, upslope: a tenth of a decibel
+where a single facet bounce carries the field, and within about two
+decibels of the *complete* wedge field (mean two thirds of one) across a
+thin 2.8-degree wedge whose every cell is dense multipath, most of it
+arrivals near their own turning point, which is where a one-way marcher
+pays its way; the tests print the decomposition.
+
 What it costs is `n_beams` times the size of the receiver grid, and none
 of the three factors depends on the frequency: the ray core does not have to
 resolve a wavelength on a grid, and the fan only widens as
@@ -449,6 +502,8 @@ direct way to trade resolution for time.
 | `temperature` | Temperature `T` for the absorption model, in degrees Celsius (ignored when `absorption_model` is `None`). |
 | `salinity` | Salinity `S` for the absorption model, in parts per thousand (ignored when `absorption_model` is `None`). |
 | `ph` | Acidity for the absorption model (ignored when `absorption_model` is `None`; Thorp ignores it always). |
+| `bathymetry_ranges_m` | Node ranges of a piecewise-linear bottom profile, in metres, strictly increasing from `r = 0`; level past the last node. Default (`None`): the level bottom at the profile's last depth, which is every validation number of this module. Passed together with `bathymetry_depths_m`, and not alongside the seabed pair. |
+| `bathymetry_depths_m` | Bottom depth at each node, in metres, strictly positive and never below the sound-speed profile's last depth (`None` likewise). |
 
 **Returns:** A [`GaussianBeamResult`](/phonometry/reference/api/underwater/numerical/#gaussianbeamresult).
 
@@ -487,6 +542,8 @@ GaussianBeamResult(
     seabed_sound_speed: float | None,
     source_depth: float,
     water_depth: float,
+    bathymetry_ranges: NDArray[np.float64] | None = None,
+    bathymetry_depths: NDArray[np.float64] | None = None,
 )
 ```
 
@@ -516,7 +573,9 @@ can be subtracted.
 | `seabed_density` | Sediment density of the fluid seabed the bottom bounces were charged with, or `None` when the bottom was one of the perfect reflectors (the default). |
 | `seabed_sound_speed` | Sediment sound speed of that seabed, in m/s, or `None` likewise. Together the pair names the Rayleigh interface of [`reflection_coefficient`](/phonometry/reference/api/underwater/seabed-reflection/#reflection_coefficient) each beam's bottom reflections multiplied it by. |
 | `source_depth` | Source depth, in metres. |
-| `water_depth` | Water-column depth, in metres. |
+| `water_depth` | Water-column depth, in metres: the sound-speed profile's last depth, which over a sloping bottom is the deepest water the medium description reaches while the column itself is the bathymetry below. |
+| `bathymetry_ranges` | Node ranges of the bottom profile the run was marched over, in metres, or `None` for the level bottom (the default). When present, the per-beam histories (`ray_depths`, `beam_widths`, `wavefront_curvatures`) are `NaN` from the column at which a beam was terminated by a reflection past the vertical, the same convention [`RayTraceResult`](/phonometry/reference/api/underwater/numerical/#raytraceresult) uses and for the same reason: from there on the beam no longer exists in the forward field, and its weight in the sum is zero. |
+| `bathymetry_depths` | Bottom depth at each of those nodes, in metres (`None` likewise). |
 
 ### GaussianBeamResult.plot()
 
@@ -728,6 +787,8 @@ ray_trace(
     launch_angles_deg: NDArray[np.float64] | list[float],
     max_range: float = 10000.0,
     n_steps: int = 2000,
+    bathymetry_ranges_m: NDArray[np.float64] | list[float] | None = None,
+    bathymetry_depths_m: NDArray[np.float64] | list[float] | None = None,
 ) -> RayTraceResult
 ```
 
@@ -736,6 +797,38 @@ Trace acoustic rays through a range-independent sound-speed profile.
 Integrates the ray-trajectory equations (Jensen Eqs. 3.23-3.24) with a
 fixed-step fourth-order Runge-Kutta scheme, reflecting at the pressure-release
 surface (`z = 0`) and the bottom (`z = water_depth`).
+
+**The bottom may slope.** Passing the `bathymetry_ranges_m` /
+`bathymetry_depths_m` pair replaces the level bottom with a
+piecewise-linear depth profile `depth(r)`, the faceted boundary model of
+Jensen Fig. 3.20, and the first range dependence in this module; the
+sound-speed profile stays range independent (see the scope note below).
+The marcher then finds each boundary crossing against the interpolated
+polyline and reflects the ray specularly about the local facet
+(Eq. 3.121), so a bounce off a slope of angle $\beta$ changes the
+ray's inclination by $2\beta$: upslope bounces steepen a ray, which
+is the whole one-line physics of wedge propagation, and downslope bounces
+flatten it. Snell's invariant $\xi$ is therefore no longer a
+constant of each ray but a constant *between* its bottom bounces, and one
+consequence is drawn honestly rather than papered over: a ray steepened
+past the vertical runs backward in range, which a marcher whose
+independent variable is range cannot carry (the same one-way surgery the
+parabolic equation performs), so such a ray is terminated at that bounce
+and its samples are `NaN` from there on -- see
+[`RayTraceResult.bathymetry_ranges`](/phonometry/reference/api/underwater/numerical/#raytraceresult). The polyline continues level
+past its last node exactly as `numpy.interp` clamps the sound-speed
+profile; a bathymetric feature narrower than one range step can hide
+between two samples of the crossing search, so `n_steps` must resolve
+the bathymetry as well as the rays.
+
+**Scope, stated plainly.** Range dependence enters here through the
+boundary alone: full $c(r, z)$ is *not* implemented, deliberately.
+Every solver in this module ships with an exact published oracle, and the
+sloping-bottom geometry has one (the ideal wedge unfolds into a closed
+fan of images, which is what the tests hold it to), while a
+range-dependent water column has none: there is no closed form to hold a
+$c(r, z)$ marcher to, so it would ship on trust, and this module
+does not ship on trust.
 
 The travel time is a third state of that same Runge-Kutta step rather than a
 quadrature run over the finished path: with the range-invariant Snell
@@ -764,6 +857,8 @@ per ray, are the entire per-bounce record a downstream amplitude needs.
 | `launch_angles_deg` | Launch angles from the horizontal, in degrees (positive downward). |
 | `max_range` | Maximum horizontal range to trace, in metres. |
 | `n_steps` | Number of integration steps per ray. |
+| `bathymetry_ranges_m` | Node ranges of a piecewise-linear bottom profile, in metres, strictly increasing from `r = 0`; level past the last node. Default (`None`): the level bottom at the profile's last depth. Passed together with `bathymetry_depths_m`. |
+| `bathymetry_depths_m` | Bottom depth at each node, in metres, strictly positive and never below the sound-speed profile's last depth (`None` likewise). |
 
 **Returns:** A [`RayTraceResult`](/phonometry/reference/api/underwater/numerical/#raytraceresult).
 
@@ -788,6 +883,8 @@ RayTraceResult(
     water_depth: float,
     profile_depths: NDArray[np.float64],
     profile_speeds: NDArray[np.float64],
+    bathymetry_ranges: NDArray[np.float64] | None = None,
+    bathymetry_depths: NDArray[np.float64] | None = None,
 )
 ```
 
@@ -808,6 +905,8 @@ Ray-tracing solution through a sound-speed profile.
 | `water_depth` | Water-column depth, in metres. |
 | `profile_depths` | Depth samples of the sound-speed profile the rays were traced through, in metres, exactly as cleaned on the way in. The pair below *is* the medium (both solvers interpolate it piecewise linearly and nothing else about the water enters the geometry), so recording it makes the result self-contained: [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) needs it to put fresh rays through the same water the fan flew. |
 | `profile_speeds` | Sound speed at each of those depths, in m/s. |
+| `bathymetry_ranges` | Node ranges of the bottom profile the rays were traced over, in metres, or `None` for the level bottom at `water_depth` (the default). With a sloping bottom two of the flat record's invariants fall, and the arrays here say so honestly rather than quietly keep their old meaning. A ray reflected past the vertical by the accumulating slope cannot be carried by a range march (see [`ray_trace`](/phonometry/reference/api/underwater/numerical/#ray_trace)); its `depths`, `travel_times` and `arc_lengths` are `NaN` from the sample of the terminating bounce on, so a plot simply ends where the ray turned and nothing downstream can mistake a frozen sample for a traced one (the reflection counts, being integers, instead hold their last value). And the crossing angle at the bottom is no longer one per ray: each slope bounce rotates Snell's invariant, so the per-bounce record that sufficed for a flat guide (counts alone) does not price a sloping one, which is why [`eigenrays`](/phonometry/reference/api/underwater/numerical/#eigenrays) declines such a trace. |
+| `bathymetry_depths` | Bottom depth at each of those nodes, in metres (`None` likewise). Between nodes the bottom is the straight facet, beyond the last node it continues level: exactly the boundary the marcher reflected off. |
 
 ### RayTraceResult.plot()
 

@@ -1,6 +1,6 @@
 ---
 title: "Underwater propagation solvers"
-description: "Computing the underwater sound field when closed forms are not enough: the normal-mode expansion of the stratified waveguide, ray tracing with Snell's invariant and convergence zones, the eigenray search that turns a traced fan into a receiver's arrival list, Gaussian beam tracing for a field that stays finite at caustics, and the split-step Fourier parabolic equation, each validated against an exact closed form, with the model-selection guidance to choose between them."
+description: "Computing the underwater sound field when closed forms are not enough: the normal-mode expansion of the stratified waveguide, ray tracing with Snell's invariant and convergence zones, the eigenray search that turns a traced fan into a receiver's arrival list, a bottom free to slope as a piecewise-linear profile held to the ideal wedge's exact image fan, Gaussian beam tracing for a field that stays finite at caustics, and the split-step Fourier parabolic equation, each validated against an exact closed form, with the model-selection guidance to choose between them."
 references:
   - type: book
     authors: ["Jensen, F. B.", "Kuperman, W. A.", "Porter, M. B.", "Schmidt, H."]
@@ -39,10 +39,11 @@ knows nothing of the sound-speed profile, the seabed or the surface. When
 refraction and boundaries decide the answer, the field has to be
 **computed**: this guide covers the four numerical solvers of the
 `underwater` module, the physics each one discretises, and how to choose
-between them and the closed forms. All four assume a range-independent
-(horizontally stratified) ocean with a pressure-release surface, take the
-same $c(z)$ profile as input, and follow Jensen, Kuperman, Porter &
-Schmidt, *Computational Ocean Acoustics*.
+between them and the closed forms. All four take the same range-independent
+(horizontally stratified) $c(z)$ profile and a pressure-release surface, and
+follow Jensen, Kuperman, Porter & Schmidt, *Computational Ocean Acoustics*;
+the two ray-based solvers can also slope the bottom over a piecewise-linear
+depth profile (section 3), the one range dependence in the module.
 
 ## 1. The four solvers at a glance
 
@@ -380,6 +381,58 @@ to the eigenrays below, which are the paths a given receiver actually
 collects, and a *field* that stays finite where the classical amplitude
 diverges is section 4's, on the same rays and through the same marcher.
 
+### A sloping bottom: the first range dependence
+
+Passing `bathymetry_ranges_m` and `bathymetry_depths_m` replaces the level
+bottom with a **piecewise-linear depth profile** — the faceted boundary of
+Jensen Fig. 3.20 — while the sound-speed profile stays range independent. The
+marcher finds each crossing against the interpolated polyline and reflects
+the ray specularly about the local facet (Eq. 3.121), so a bounce off a slope
+of angle $\beta$ turns the ray by $2\beta$: upslope bounces steepen a ray,
+downslope bounces flatten it, and that is the whole one-line physics of wedge
+propagation. Snell's invariant is then a constant of each ray only *between*
+bottom bounces, and one consequence is faced rather than papered over: a ray
+steepened past the vertical would run backward in range, which a marcher
+whose independent variable is range cannot carry, so it is terminated at that
+bounce and its samples are `NaN` from there on — a plot simply ends where
+the ray turned. In an isovelocity wedge every ray is straight lines and
+mirrors, so every angle below is exact:
+
+```python
+import numpy as np
+from phonometry import underwater
+
+# An isovelocity wedge: the bottom shoals from 1000 m to 650 m over 4 km, a
+# 5 degree upslope. A surface bounce only flips the ray; a bottom bounce
+# steepens it by twice the slope.
+beta = np.radians(5.0)
+wedge = underwater.ray_trace(
+    [0.0, 1000.0], [1500.0, 1500.0], source_depth=400.0,
+    launch_angles_deg=[20.0], max_range=4000.0, n_steps=1601,
+    bathymetry_ranges_m=[0.0, 4000.0],
+    bathymetry_depths_m=[1000.0, 1000.0 - 4000.0 * np.tan(beta)])
+r, z = wedge.ranges[0], wedge.depths[0]
+events = wedge.bottom_reflections[0] + wedge.surface_reflections[0]
+incline = np.degrees(np.arctan(np.abs(np.diff(z)) / np.diff(r)))
+for leg in range(int(events[-1]) + 1):
+    seg = np.flatnonzero(events[:-1] == leg)[1:-1]
+    print(leg, round(float(np.median(incline[seg])), 1))
+# 0 20.0   as launched
+# 1 30.0   first bottom bounce: steepened by 2 beta
+# 2 30.0   the surface only flips the sign
+# 3 40.0   second bottom bounce: 2 beta again
+```
+
+The polyline starts at $r = 0$, so the water column at the source is stated
+rather than extrapolated, and it continues level past its last node, the same
+clamp the sound-speed profile lives by; a vertex reflects specularly off one
+of its two facets, and a bathymetric feature narrower than one range step can
+hide between two samples of the crossing search, so `n_steps` has to resolve
+the bathymetry as well as the rays. `eigenrays` declines a sloping trace, and
+says why: each slope bounce rotates Snell's invariant, so an arrival's bottom
+touches no longer share one grazing angle and the one-coefficient-per-path
+amplitude convention below stops holding.
+
 ### Eigenrays: the arrival structure at one receiver
 
 The fan draws every path the profile supports; a receiver is reached by only
@@ -654,6 +707,38 @@ $\mathcal{R}(\theta)^n$ at each image's own closed-form angle: 0.07 dB at
 worst across ranges whose dominant images sit above and below the critical
 angle, where stripping the phase from the oracle moves it by 5.7 dB.
 
+**The bottom may slope** here too: the same
+`bathymetry_ranges_m`/`bathymetry_depths_m` pair `ray_trace` takes (section
+3) puts every beam's central ray on the faceted boundary, and the dynamic
+pair crosses each sloping bounce with the reflection impulse of
+Eqs. (3.122)-(3.123) evaluated on the local facet. Two of the flat guide's
+devices generalise with it, each with its cost stated. The receiver-image
+ladder folds each receiver column about its own facet — depth *and* tilt,
+since a fold plane wrong by the facet's tilt displaces a first-fold image by
+metres against a wavelength — so the vertical stack of mirrors becomes the
+dihedral fan about the local apex, exact for a single facet; at slope zero it
+is the level ladder bit for bit, which a test pins. And the fan's wrapped
+rungs let the beams' analytic tails carry the arrivals no marched axis can: a
+path that went up the slope, steepened past the vertical and came back is a
+wrapped rung, analytic rather than marched. The beam itself, once steepened
+past the vertical, is terminated at that bounce with its weight zeroed —
+a range-marching sum keeps only what still travels forward, exactly as the
+one-way parabolic equation keeps no backscatter — and a tail is trusted no
+farther than two marched extents from its sample, because beyond that it
+would be pricing wedge geometry the polyline never described (measured: up
+to 11 dB of invented field on a tilted bottom no beam can even reach,
+0.001 dB with the budget in place). Validated against the **ideal wedge**,
+which has an exact solution by images — a fan of $2\pi/\beta$ signed image
+sources on a circle about the apex, built in the test from pure geometry and
+proved against both boundary conditions before it judges: a single facet
+bounce to 0.05 dB, and within 1.85 dB worst / 0.67 dB mean of the *complete*
+field across a thin 2.8° wedge whose every cell is dense multipath, most of
+it arrivals near their own turning point, numbers that move in the fourth
+decimal when the range step is halved. The lossy fluid seabed above cannot
+be combined with a slope — one grazing angle per beam is a level-bottom
+fact, and the solver refuses to pretend otherwise — so a sloping run takes
+the perfect reflectors of `bottom`.
+
 **Where it stops.** Four limits, in the order they bite.
 
 - **There is no near field**, and this is the biggest error of the four.
@@ -927,8 +1012,8 @@ and boundaries decide the answer, pick the solver by frequency and geometry
 
 | Solver | Natural regime | What it buys you |
 |---|---|---|
-| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, travel times, convergence zones; cost independent of frequency, and no amplitude |
-| `gaussian_beams` | High frequency, wherever a *level* is wanted from rays | The same geometry turned into PL($z$,$r$): finite at caustics, graded into shadow zones, and like the rays it is built on, its cost does not grow with frequency |
+| `ray_trace` | High frequency (water depth ≫ λ), deep water | Ray-path geometry, turning depths, travel times, convergence zones, over a level or sloping bottom; cost independent of frequency, and no amplitude |
+| `gaussian_beams` | High frequency, wherever a *level* is wanted from rays | The same geometry turned into PL($z$,$r$): finite at caustics, graded into shadow zones, sloping bottom included, and like the rays it is built on, its cost does not grow with frequency |
 | `normal_modes` | Low frequency, shallow water, range-independent | Finite-difference modal sum with few propagating modes ($M \approx kD/\pi$); the reference solution for its regime, validated against the ideal waveguide's exact modes |
 | `parabolic_equation` | Low frequency, long one-way paths | Full-field PL($z$,$r$) with refraction, marched in range over the range-independent $c(z)$ all four solvers assume |
 
@@ -1047,22 +1132,30 @@ integrated as a third state of the same Runge-Kutta step, and `eigenrays`
 searches a traced fan for the arrivals that join a source to one receiver,
 each refined by bisection on fresh traces and charged the classical ray
 amplitude of Eq. (3.65) with the boundary and caustic phases on record
-(Eqs. 3.79, 3.125-3.126). Each is validated
+(Eqs. 3.79, 3.125-3.126). `ray_trace` and `gaussian_beams` also accept a
+piecewise-linear bottom profile, the faceted boundary of Ch. 3 reflecting
+each ray about the local facet (Eq. 3.121) with the dynamic pair crossing
+the bounce by Eqs. (3.122)-(3.123). Each is validated
 against an exact closed form: the ideal pressure-release waveguide's modes and
 its image-source sum (for the eigenrays, that lattice's complete arrival
 list, time, angle, count and amplitude per image),
 the circular-arc rays of a linear gradient together with the published travel
-time along them (Medwin & Clay 1998, Eq. (3.3.20)), and free-field spherical
-spreading, plus the mutual agreement of the modal and PE propagation loss.
+time along them (Medwin & Clay 1998, Eq. (3.3.20)), free-field spherical
+spreading, and, for the sloping bottom, the ideal wedge's exact closed fan
+of images, plus the mutual agreement of the modal and PE propagation loss.
 </ScopeClaim>
 
 <ScopeClaim status="not-covered" label="Not covered">
 All four solvers assume a range-independent water column with a
 pressure-release surface, and the bottom is a perfect reflector by default,
 pressure-release or (for the modes and the beams) rigid. The beams can trade
-it for the lossy fluid seabed of the Rayleigh model, but there is no elastic
-bottom, no sediment attenuation and no real bathymetry,
-so range-dependent problems are out of scope. The ray solver returns paths and
+it for the lossy fluid seabed of the Rayleigh model (level bottoms only),
+and the two ray-based solvers can slope the bottom over a piecewise-linear
+depth profile, which is the only range dependence there is: a
+range-dependent water column $c(r,z)$ is excluded deliberately, because the
+sloping boundary has an exact oracle (the ideal wedge's closed image fan)
+and $c(r,z)$ has none. There is no elastic bottom and no sediment
+attenuation. The ray solver returns paths and
 travel times, not amplitudes; the per-path level belongs to `eigenrays`, whose
 arrival list is classical ray theory and honestly diverges for a receiver
 standing on a caustic, while `gaussian_beams` is what supplies a finite
@@ -1097,8 +1190,8 @@ coupling](/phonometry/simulation/elastic-waves/).
 
 Pick by frequency and geometry (Jensen et al. 2011, Ch. 1): rays for high
 frequency and deep water (ray-path geometry, travel times and convergence
-zones at a cost independent of frequency, plus, through `eigenrays`, the
-per-receiver arrival list), Gaussian beams
+zones at a cost independent of frequency, over a level or sloping bottom,
+plus, through `eigenrays`, the per-receiver arrival list), Gaussian beams
 when that same high-frequency geometry has to yield a level (the PL($z$,$r$)
 field, finite at caustics and graded into shadow zones), normal modes for low
 frequency in shallow water (few propagating modes, $M \approx kD/\pi$, the

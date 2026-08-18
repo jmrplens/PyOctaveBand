@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- The bottom may slope: the first range dependence in the underwater module.
+  `ray_trace` and `gaussian_beams` accept a `bathymetry_ranges_m` /
+  `bathymetry_depths_m` pair describing a piecewise-linear depth profile
+  (Jensen's faceted boundary, Fig. 3.20) in place of the level bottom, while
+  the sound-speed profile stays range independent, deliberately: the sloping
+  boundary has an exact published oracle (the ideal wedge's closed fan of
+  images) and a range-dependent `c(r, z)` has none. The marcher bisects each
+  crossing against the interpolated polyline, vertices included, and reflects
+  the ray about the local facet (Eq. 3.121), a rotation of the slowness pair
+  that steepens a ray by twice the slope per upslope bounce; the dynamic pair
+  crosses the bounce with the impulse of Eqs. (3.122)-(3.124) on a facet of
+  zero curvature. A ray steepened past the vertical cannot be carried by a
+  range march and is terminated at that bounce, `NaN` from that sample on,
+  and a terminated beam retires from the field with its weight zeroed, the
+  one-way trade the parabolic equation also makes. The beam solver folds each
+  receiver column's image ladder about its own local facet, the dihedral fan
+  that is exact for a single facet, with its analytic tails trusted no
+  farther than two marched extents so they cannot price wedge geometry the
+  polyline never described. Both results record the polyline and draw it
+  under `plot()`. Slope zero reproduces the level solvers bit for bit;
+  validated against the exact folded wedge trajectory (1e-5 m over 4 km and
+  twenty-plus reflections), the single-facet two-path field (0.05 dB), a
+  tilted bottom out of every beam's reach (0.001 dB against the free-water
+  sum) and the ideal wedge's closed image fan (1.85 dB worst, 0.67 dB mean,
+  across dense multipath cells of a 2.8-degree wedge). The lossy fluid
+  seabed and `eigenrays` decline sloping runs, each with its reason stated.
+  New subsections in the underwater solvers guide, in English and Spanish.
 - The eigenrays and the arrival structure. `eigenrays` takes a `ray_trace`
   fan and one receiver and returns the paths that actually connect them, each
   with its travel time, launch and arrival angles, surface and bottom touch
