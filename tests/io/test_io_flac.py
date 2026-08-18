@@ -12,6 +12,7 @@ RFC 9639 and the flac --keep-foreign-metadata convention.
 from __future__ import annotations
 
 import builtins
+import struct
 from dataclasses import replace
 from pathlib import Path
 
@@ -111,6 +112,60 @@ def test_bext_rides_the_application_block_field_for_field(
     described = info(path).bext
     assert described is not None
     assert described.originator == "SVAN 979"
+
+
+@needs_soundfile
+def test_application_block_bytes_match_the_reference_convention(
+    tmp_path: Path,
+) -> None:
+    """The written APPLICATION block, read back byte for byte.
+
+    Every other bext test here writes and reads through this same module,
+    so a regression in the block layout -- the application ID, the
+    verbatim fourcc + little-endian size framing, the block header --
+    would round-trip invisibly (flipping the app ID's case survives
+    exactly that way), and with it the module's central claim: that the
+    reference ``flac`` tool recognises the block. The constants below are
+    a second transcription, from RFC 9639 section 8 and the
+    ``flac --keep-foreign-metadata`` convention, independent of the
+    module's own -- the same pattern the bext offset oracle uses.
+    """
+    path = tmp_path / "bytes.flac"
+    write(path, np.full(16, 0.25), FS, bext=fresh_metadata())
+    blob = path.read_bytes()
+    assert blob[:4] == b"fLaC"
+
+    application = None
+    pos = 4
+    while True:
+        header = blob[pos:pos + 4]
+        # One byte: last-block flag in bit 7, type in bits 6-0; then a
+        # 24-bit big-endian length (RFC 9639 section 8.1).
+        block_type = header[0] & 0x7F
+        length = int.from_bytes(header[1:4], "big")
+        last = bool(header[0] & 0x80)
+        if block_type == 2:  # APPLICATION
+            assert application is None, "one APPLICATION block, not several"
+            assert last, "the inserted block must close the metadata chain"
+            application = blob[pos + 4:pos + 4 + length]
+        pos += 4 + length
+        if last:
+            break
+
+    assert application is not None
+    # flac --keep-foreign-metadata layout: the registered application ID
+    # 'riff' (lowercase on the wire), then the RIFF chunk verbatim --
+    # fourcc, uint32 little-endian size, payload, and a pad byte exactly
+    # when the payload is odd.
+    assert application[:4] == b"riff"
+    assert application[4:8] == b"bext"
+    (size,) = struct.unpack_from("<I", application, 8)
+    assert len(application) == 12 + size + size % 2
+    # The verbatim payload is a real Tech 3285 chunk: the 602-byte fixed
+    # part (version at offset 346, here 2) plus the CodingHistory tail.
+    assert size >= 602
+    (version,) = struct.unpack_from("<H", application, 12 + 346)
+    assert version == 2
 
 
 @needs_soundfile
