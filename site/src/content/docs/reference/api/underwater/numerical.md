@@ -101,7 +101,7 @@ The limits are worth knowing before the numbers are believed.
   makes. Eq. (3.92) weights the fan by matching it to a point source in the
   far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
   on the axis every ray leaves from, so close in the sum has nothing to
-  converge to. `_beam_influence` floors that range at a wavelength,
+  converge to. The cylindrical range is floored at one wavelength,
   which is what keeps the answer bounded rather than what makes it right.
   The scale it recovers on is the initial beam width, not a fixed distance.
   Worst error against $20\lg R$ over a +-500 m depth cut in an
@@ -171,7 +171,7 @@ direct way to trade resolution for time.
 | `n_depth_points` | Size of that default depth grid. |
 | `max_angle_deg` | Half-angle of the launch fan, in degrees from the horizontal. Beams are spread symmetrically over `[-max_angle_deg, +max_angle_deg]`. |
 | `n_beams` | Number of beams in the fan. Default (`None`): from the overlap condition. Adjacent beams are $s\,\delta\theta_0$ apart at arc length $s$ while each has spread to $W \to s\lambda/(\pi W_0)$, so the condition that they still overlap, $\delta\theta_0 \lesssim \lambda/(\pi W_0)$, is range-independent; the default takes four times that margin. Too coarse a fan shows as a periodic ripple in range at the beam spacing, which is easy to mistake for physical interference. |
-| `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity. Default (`None`): see `_default_beam_width`. |
+| `beam_width` | The $W_0$ of Eq. (3.91), in metres: the beam's initial half-width, at the $e^{-2}$ folding distance in intensity. Default (`None`): the free-space optimum $W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}$ of Sect. 3.5.1, held inside the book's recommended band of 10 to 50 wavelengths and clamped to a quarter of the water depth, and the clamp has the last word. |
 | `range_step` | Marching step in range, in metres, and the spacing of the default `ranges_m`. |
 | `bottom` | `"pressure-release"` (default) or `"rigid"`. The sea surface is always pressure-release. |
 
@@ -183,14 +183,11 @@ direct way to trade resolution for time.
 | :--- | :--- |
 | ValueError | If the inputs are invalid. |
 
-.. warning::
+**Warns**
 
-   A [`PhonometryWarning`](/phonometry/reference/api/filters/phonometry/#phonometrywarning) is emitted when the source sits
-   on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), when an
-   explicit `beam_width` exceeds a quarter of the water depth, and when
-   one marching step carries the steepest beam of the fan across more than a
-   quarter of the water column, which is the pairing between
-   `max_angle_deg` and `range_step` that is easiest to get wrong.
+| Warning | When |
+| :--- | :--- |
+| PhonometryWarning | when the source sits on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), when an explicit `beam_width` exceeds a quarter of the water depth, and when one marching step carries the steepest beam of the fan across more than a quarter of the water column, which is the pairing between `max_angle_deg` and `range_step` that is easiest to get wrong. |
 
 ## GaussianBeamResult
 

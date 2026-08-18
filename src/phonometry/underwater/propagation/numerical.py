@@ -1116,7 +1116,7 @@ def gaussian_beams(
       makes. Eq. (3.92) weights the fan by matching it to a point source in the
       far field, and Eq. (3.88) divides by a cylindrical range that goes to zero
       on the axis every ray leaves from, so close in the sum has nothing to
-      converge to. :func:`_beam_influence` floors that range at a wavelength,
+      converge to. The cylindrical range is floored at one wavelength,
       which is what keeps the answer bounded rather than what makes it right.
       The scale it recovers on is the initial beam width, not a fixed distance.
       Worst error against :math:`20\lg R` over a +-500 m depth cut in an
@@ -1198,22 +1198,22 @@ def gaussian_beams(
         easy to mistake for physical interference.
     :param beam_width: The :math:`W_0` of Eq. (3.91), in metres: the beam's
         initial half-width, at the :math:`e^{-2}` folding distance in intensity.
-        Default (``None``): see :func:`_default_beam_width`.
+        Default (``None``): the free-space optimum
+        :math:`W_0 = \sqrt{\lambda\,r_\mathrm{max}/\pi}` of Sect. 3.5.1, held
+        inside the book's recommended band of 10 to 50 wavelengths and clamped
+        to a quarter of the water depth, and the clamp has the last word.
     :param range_step: Marching step in range, in metres, and the spacing of the
         default ``ranges_m``.
     :param bottom: ``"pressure-release"`` (default) or ``"rigid"``. The sea
         surface is always pressure-release.
     :return: A :class:`GaussianBeamResult`.
     :raises ValueError: If the inputs are invalid.
-
-    .. warning::
-
-       A :class:`~phonometry.PhonometryWarning` is emitted when the source sits
-       on a kink of the profile (Sect. 3.7.4's spurious horizontal jet), when an
-       explicit ``beam_width`` exceeds a quarter of the water depth, and when
-       one marching step carries the steepest beam of the fan across more than a
-       quarter of the water column, which is the pairing between
-       ``max_angle_deg`` and ``range_step`` that is easiest to get wrong.
+    :warns PhonometryWarning: when the source sits on a kink of the profile
+        (Sect. 3.7.4's spurious horizontal jet), when an explicit
+        ``beam_width`` exceeds a quarter of the water depth, and when one
+        marching step carries the steepest beam of the fan across more than a
+        quarter of the water column, which is the pairing between
+        ``max_angle_deg`` and ``range_step`` that is easiest to get wrong.
     """
     f = require_positive(frequency_hz, "frequency_hz")
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
