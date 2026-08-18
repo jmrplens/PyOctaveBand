@@ -35,8 +35,11 @@ reader and writers under a contract none of those tools offer:
 * **Memory stays flat.** The samples stream through
   :func:`~phonometry.io.read_blocks` into the streaming WAV writer (the
   frame count is known from the headers, so the RF64-aware header is
-  exact up front) or into an open ``SoundFile``, one block at a time: an
-  hour of RF64 converts in block-sized memory.
+  exact up front; for a lossy source, whose decoder may deliver a few
+  frames more or fewer than the container declares, the writer
+  reconciles the header with the streamed count at close) or into an
+  open ``SoundFile``, one block at a time: an hour of RF64 converts in
+  block-sized memory.
 
 The default target ``subtype`` preserves what the source had: integer
 depths map to the smallest of PCM_16/24/32 that holds them, float
@@ -310,6 +313,10 @@ def convert(
                 frame_riff_chunk(b"bext", bext_payload)
                 if bext_payload is not None else b""
             ),
+            # A lossy container's declared frame count is a promise its
+            # decoder need not keep (decoder delay and padding), so the
+            # writer reconciles the header with what actually streamed.
+            frames_are_estimate=kind == "decoded",
         )
 
     source_sidecar = read_sidecar(source)

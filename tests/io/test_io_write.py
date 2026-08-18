@@ -21,7 +21,7 @@ from wav_forge import pcm_data
 
 from phonometry.io import ClippingWarning, Signal, info, read, write
 from phonometry.io._chunks import parse_wav_chunks
-from phonometry.io._write import build_wav_header
+from phonometry.io._write import build_wav_header, write_wav_stream
 
 FS = 48000
 
@@ -282,6 +282,38 @@ def test_float_header_carries_fact_and_cbsize() -> None:
     assert struct.unpack_from("<I", header, 16)[0] == 18  # fmt size with cbSize
     fact_at = header.index(b"fact")
     assert struct.unpack_from("<II", header, fact_at + 4) == (4, 7)
+
+
+@pytest.mark.parametrize("actual", [1000, 1300])
+def test_streamed_header_reconciles_with_an_estimated_frame_count(
+    tmp_path: Path, actual: int
+) -> None:
+    """With ``frames_are_estimate`` the header follows the streamed count.
+
+    A lossy source's decoder may deliver a different count than its
+    container declares (decoder delay and padding); the sizes on disk
+    must then describe the samples that landed, not the declaration --
+    in both directions, short and long of the promise of 1152.
+    """
+    path = tmp_path / "reconciled.wav"
+    write_wav_stream(
+        path, [np.zeros((1, actual))], FS, 1, "FLOAT", 1152,
+        frames_are_estimate=True,
+    )
+    assert info(path).frames == actual
+    assert read(path).n_samples == actual
+    # The outer RIFF size agrees with the bytes actually on disk.
+    (riff_size,) = struct.unpack_from("<I", path.read_bytes(), 4)
+    assert path.stat().st_size == 8 + riff_size
+
+
+def test_streamed_count_mismatch_without_an_estimate_still_raises(
+    tmp_path: Path,
+) -> None:
+    """The exact-count contract keeps refusing a short or long stream."""
+    path = tmp_path / "mismatch.wav"
+    with pytest.raises(ValueError, match="inconsistent"):
+        write_wav_stream(path, [np.zeros((1, 10))], FS, 1, "FLOAT", 12)
 
 
 def test_odd_pcm24_payload_gets_its_pad_byte(tmp_path: Path) -> None:

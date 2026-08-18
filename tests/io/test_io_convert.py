@@ -158,7 +158,13 @@ def test_lossy_source_converts_with_the_metrology_warning(
         result = convert(src, dst)
     # The decoder hands floats; the default keeps them as FLOAT.
     assert result.format_name == "IEEE float"
-    assert result.frames == info(src).frames
+    # A lossy container's declared count and its decoder's delivery may
+    # differ by decoder delay/padding, so the contract is internal
+    # consistency (the written header equals the streamed samples) plus
+    # agreement with the source within one MP3 granule train (1152
+    # frames), not exact equality with the source header.
+    assert result.frames == np.asarray(read(dst)).shape[-1]
+    assert abs(result.frames - info(src).frames) <= 1152
 
 
 def test_lossy_targets_are_refused_before_reading_anything(

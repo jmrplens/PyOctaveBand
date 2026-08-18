@@ -91,6 +91,7 @@ from ._signal import Signal
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from typing import BinaryIO
 
     from numpy.typing import NDArray
 
@@ -437,6 +438,41 @@ def _resolve_bext(
     return serialize_bext(meta)
 
 
+def _reconcile_streamed_header(
+    fh: BinaryIO,
+    path: str | Path,
+    *,
+    fs: int,
+    channels: int,
+    subtype: str,
+    written: int,
+    header_len: int,
+    metadata_chunks: bytes,
+) -> None:
+    """Rewrite the header in place for the frame count actually streamed.
+
+    Only for callers whose up-front count was an estimate: a lossy
+    source's decoder can deliver a few frames more or fewer than its
+    container declares (decoder delay and padding), and the sizes on
+    disk must describe the samples that landed, not the declaration.
+    The rebuilt header must occupy exactly the bytes of the original;
+    the layout only changes across the RF64 promotion boundary, where a
+    discrepancy this large is no codec quirk and refusing is honest.
+    """
+    patched = build_wav_header(
+        fs=fs, channels=channels, subtype=subtype, frames=written,
+        metadata_chunks=metadata_chunks,
+    )
+    if len(patched) != header_len:
+        raise ValueError(
+            f"{path}: the {written} frames actually streamed move the "
+            "header across the RF64 promotion boundary the estimated "
+            "count chose; the estimate was too wrong to reconcile"
+        )
+    fh.seek(0)
+    fh.write(patched)
+
+
 def write_wav_stream(
     path: str | Path,
     blocks: Iterable[np.ndarray],
@@ -446,6 +482,7 @@ def write_wav_stream(
     frames: int,
     *,
     metadata_chunks: bytes = b"",
+    frames_are_estimate: bool = False,
 ) -> None:
     """Stream ``(channels, n)`` blocks (codes or floats) into one WAV file.
 
@@ -457,9 +494,16 @@ def write_wav_stream(
     PCM subtypes and float samples for the float ones; no scaling happens
     here.
 
+    :param frames_are_estimate: The caller's ``frames`` is a container
+        declaration it cannot guarantee (a lossy source's decoder may
+        deliver a slightly different count than its header claims). When
+        the streamed count differs, the header is then rewritten in
+        place at close so the sizes on disk describe what was actually
+        written, instead of the mismatch being an error.
     :raises ValueError: If the blocks do not add up to exactly ``frames``
-        frames -- the header already promised that length, so a mismatch
-        is a corrupt file, not a rounding detail.
+        frames and ``frames`` was not an estimate -- the header already
+        promised that length, so a mismatch is a corrupt file, not a
+        rounding detail.
     """
     header = build_wav_header(
         fs=fs, channels=channels, subtype=subtype, frames=frames,
@@ -476,6 +520,13 @@ def write_wav_stream(
             odd ^= bool(len(payload) % 2)
         if odd:
             fh.write(b"\x00")  # RIFF word alignment; not counted in the size
+        if written != frames and frames_are_estimate:
+            _reconcile_streamed_header(
+                fh, path, fs=fs, channels=channels, subtype=subtype,
+                written=written, header_len=len(header),
+                metadata_chunks=metadata_chunks,
+            )
+            frames = written
     if written != frames:
         raise ValueError(
             f"{path}: the block stream carried {written} frames but the "
