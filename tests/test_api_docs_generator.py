@@ -472,7 +472,8 @@ def test_overloaded_function_publishes_every_call_form() -> None:
     # One form takes the pair, the other takes neither; no form takes one.
     with_pair = [f for f in forms if "area" in f]
     without = [f for f in forms if "area" not in f]
-    assert len(with_pair) == 1 and len(without) == 1
+    assert len(with_pair) == 1
+    assert len(without) == 1
     assert "volume" in with_pair[0]
     assert "volume" not in without[0]
     # The permissive union is exactly what must NOT be published.
