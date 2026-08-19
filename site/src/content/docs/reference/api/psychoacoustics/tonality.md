@@ -24,8 +24,8 @@ caller's responsibility.
 
 ```python
 prominence_ratio(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     tone_freq: float | None = None,
     resolution_hz: float = 1.0,
 ) -> ToneAssessment
@@ -45,8 +45,8 @@ the PDF is a typo).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D). |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal (1D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: the ratio compares the tone against the masking noise inside the same spectrum, so a factor common to both leaves it exactly where it was. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `tone_freq` | Approximate tone frequency in Hz (default: highest peak in the range of interest). |
 | `resolution_hz` | FFT bin spacing (default 1.0 Hz). |
 
@@ -60,8 +60,8 @@ Warns about biased tonality estimates (e.g. coarse FFT resolution).
 
 ```python
 tone_to_noise_ratio(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     tone_freq: float | None = None,
     resolution_hz: float = 1.0,
 ) -> ToneAssessment
@@ -80,8 +80,8 @@ the same critical band are combined per clause 11.6 (Formulae 14-16).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D). |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal (1D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: the ratio compares the tone against the masking noise inside the same spectrum, so a factor common to both leaves it exactly where it was. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `tone_freq` | Approximate tone frequency in Hz. Default (None) assesses the highest spectral peak in the 89.1 Hz - 11.2 kHz range of interest. For harmonic complexes, call once per component (clause 11.7). |
 | `resolution_hz` | FFT bin spacing (default 1.0 Hz; the tone band must stay within 15 % of the critical bandwidth, clause 11.2). |
 

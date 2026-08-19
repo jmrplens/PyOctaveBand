@@ -44,6 +44,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ...io._resolve import apply_calibration, resolve_fs
+from ...io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -913,8 +916,8 @@ def _signal_components(pressure: np.ndarray, fs: float) -> np.ndarray:
 
 
 def loudness_moore_glasberg(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: Signal | list[float] | np.ndarray,
+    fs: float | None = None,
     *,
     field: Literal["free", "diffuse", "eardrum"] = "free",
     presentation: Literal["binaural", "diotic", "monaural"] = "binaural",
@@ -931,15 +934,24 @@ def loudness_moore_glasberg(
     matching :func:`loudness_moore_glasberg_from_spectrum`.  The signal must be
     calibrated so that ``x`` is the instantaneous sound pressure in pascals.
 
-    :param x: Single-channel calibrated pressure signal in pascals.
-    :param fs: Sampling rate in Hz (positive).
+    :param x: Single-channel calibrated pressure signal in pascals. Accepts a
+        :class:`phonometry.io.Signal`, which is where "calibrated" comes
+        from without arithmetic: this model reads absolute levels, so an
+        uncalibrated record is taken as if one digital unit were one
+        pascal and the answer is wrong by however far that is from true.
+    :param fs: Sampling rate in Hz (positive). Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param field: ``"free"`` (default), ``"diffuse"`` or ``"eardrum"``.
     :param presentation: ``"binaural"`` (default; alias ``"diotic"``) or
         ``"monaural"``.
     :return: A :class:`MooreGlasbergLoudness`.
     """
     _validate_conditions(field, presentation)
-    pressure = require_1d_signal(_typesignal(x), name="'x'")
+    fs = resolve_fs(x, fs)
+    pressure = apply_calibration(
+        x, require_1d_signal(_typesignal(np.asarray(x)), name="'x'")
+    )
     if pressure.size == 0:
         raise ValueError("Input signal 'x' cannot be empty.")
     if not np.all(np.isfinite(pressure)):

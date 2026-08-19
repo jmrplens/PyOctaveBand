@@ -48,6 +48,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..._internal.validation import require_positive
+from ...io._resolve import SignalInput, resolve_calibration, resolve_fs
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -161,11 +164,11 @@ def psychoacoustic_annoyance(
 
 
 def psychoacoustic_annoyance_from_signal(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: SignalInput,
+    fs: int | None = None,
     *,
     field: Literal["free", "diffuse"] = "free",
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> PsychoacousticAnnoyanceResult:
     """Psychoacoustic annoyance from a calibrated pressure signal (convenience).
 
@@ -188,11 +191,18 @@ def psychoacoustic_annoyance_from_signal(
         variant (see :func:`~phonometry.psychoacoustics.quality.fluctuation_strength.fluctuation_strength`).
 
     :param x: Calibrated sound-pressure signal (1-D), in Pa after
-        ``calibration_factor``.
-    :param fs: Sample rate, in Hz.
+        ``calibration_factor``. Accepts a :class:`phonometry.io.Signal`,
+        which is where that calibration comes from without arithmetic:
+        all four sensations are level-dependent models, so an uncalibrated
+        record is read as if one digital unit were one pascal and every
+        one of them comes out wrong by however far that is from true.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises.
     :param field: ``'free'`` (default) or ``'diffuse'`` sound field for the
         loudness/sharpness/roughness front-ends (``F`` is always free-field).
-    :param calibration_factor: Digital-units-to-Pa factor applied to ``x``.
+    :param calibration_factor: Digital-units-to-Pa factor applied to
+        ``x``. An explicit value wins over the one a Signal carries.
     :return: A :class:`PsychoacousticAnnoyanceResult`.
     """
     from ..loudness.zwicker import loudness_zwicker
@@ -200,7 +210,14 @@ def psychoacoustic_annoyance_from_signal(
     from .roughness_ecma import roughness_ecma
     from .sharpness import sharpness_din_from_specific
 
-    signal = np.asarray(x, dtype=np.float64) * float(calibration_factor)
+    fs = resolve_fs(x, fs)
+    # The factor is applied here rather than passed down, so the check that
+    # loudness_zwicker would have run has to happen here too: without it a
+    # zero or negative factor silences the signal and reports PA = 0.
+    factor = require_positive(
+        resolve_calibration(x, calibration_factor), "calibration_factor"
+    )
+    signal = np.asarray(x, dtype=np.float64) * float(factor)
     loud = loudness_zwicker(signal, fs, field=field, stationary=False)
     # N5: the 5 % percentile loudness of the time-varying trace; fall back to
     # the total loudness for signals too short to yield a percentile.

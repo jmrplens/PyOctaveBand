@@ -55,8 +55,8 @@ Osses/Fastl & Zwicker model, not that method.
 
 ```python
 fluctuation_strength(
-    signal_in: NDArray[np.float64],
-    fs: float,
+    signal_in: Signal | NDArray[np.float64],
+    fs: float | None = None,
 ) -> FluctuationStrengthResult
 ```
 
@@ -108,7 +108,7 @@ the reference method itself overestimates it above 4 Hz.
 
 | Name | Description |
 | :--- | :--- |
-| `signal_in` | Calibrated sound-pressure signal (1-D), in Pa. |
+| `signal_in` | Calibrated sound-pressure signal (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where that calibration comes from without arithmetic: the model reads excitation levels, so an uncalibrated record is taken as if one digital unit were one pascal and `F` comes out wrong by however far that is from true. |
 | `fs` | Sample rate, in Hz (resampled to the model rate if needed). |
 
 **Returns:** A [`FluctuationStrengthResult`](/phonometry/reference/api/psychoacoustics/fluctuation-strength/#fluctuationstrengthresult).

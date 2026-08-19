@@ -63,6 +63,7 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     ("electroacoustics", "io"),
     ("room", "io"),
     ("speech", "io"),
+    ("psychoacoustics", "io"),
 }
 
 

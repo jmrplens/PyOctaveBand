@@ -19,6 +19,7 @@ from typing import Literal
 
 import numpy as np
 
+from ...io._signal import Signal
 from ..loudness.zwicker import ZwickerLoudness, loudness_zwicker
 
 _DZ = 0.1  # Bark step of the ISO 532-1 specific-loudness pattern
@@ -139,11 +140,11 @@ def sharpness_din_from_specific(
 
 
 def sharpness_din(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     field: Literal["free", "diffuse"] = "free",
     method: Literal["din", "aures", "bismarck"] = "din",
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> float:
     """
     Sharpness of a signal per DIN 45692:2009 (stationary analysis).
@@ -160,10 +161,17 @@ def sharpness_din(
     tolerance and is a known DIN 45692 implementation property.
 
     :param x: Input signal (1D), in Pa after ``calibration_factor``.
-    :param fs: Sample rate in Hz.
+        Accepts a :class:`phonometry.io.Signal`; the rate and the factor
+        are resolved by :func:`~phonometry.loudness_zwicker`, which this
+        is a weighted moment of, so both arrive here on exactly the terms
+        they have there.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises.
     :param field: ``'free'`` (default) or ``'diffuse'``.
     :param method: ``'din'`` (default), ``'aures'`` or ``'bismarck'``.
-    :param calibration_factor: Digital-units-to-Pa factor.
+    :param calibration_factor: Digital-units-to-Pa factor. An explicit
+        value wins over the one a Signal carries.
     :return: Sharpness in acum.
     """
     zw: ZwickerLoudness = loudness_zwicker(

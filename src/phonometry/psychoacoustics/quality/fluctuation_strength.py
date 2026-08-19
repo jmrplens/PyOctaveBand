@@ -52,6 +52,9 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ...io._resolve import apply_calibration, resolve_fs
+from ...io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -245,7 +248,7 @@ def _cross_covariance(x: NDArray[np.float64], y: NDArray[np.float64]) -> float:
     return float(num / np.sqrt(product))
 
 
-def _validate_signal(x: NDArray[np.float64]) -> NDArray[np.float64]:
+def _validate_signal(x: Signal | NDArray[np.float64]) -> NDArray[np.float64]:
     sig = np.asarray(x, dtype=np.float64)
     if sig.ndim != 1:
         raise ValueError("'signal' must be one-dimensional.")
@@ -441,8 +444,8 @@ def _c_fs() -> float:
 
 
 def fluctuation_strength(
-    signal_in: NDArray[np.float64],
-    fs: float,
+    signal_in: Signal | NDArray[np.float64],
+    fs: float | None = None,
 ) -> FluctuationStrengthResult:
     r"""Fluctuation strength of a calibrated signal (Osses 2016 model).
 
@@ -488,13 +491,19 @@ def fluctuation_strength(
         the reference method itself overestimates it above 4 Hz.
 
     :param signal_in: Calibrated sound-pressure signal (1-D), in Pa.
+        Accepts a :class:`phonometry.io.Signal`, which is where that
+        calibration comes from without arithmetic: the model reads
+        excitation levels, so an uncalibrated record is taken as if one
+        digital unit were one pascal and ``F`` comes out wrong by however
+        far that is from true.
     :param fs: Sample rate, in Hz (resampled to the model rate if needed).
     :return: A :class:`FluctuationStrengthResult`.
     :raises ValueError: If the signal is invalid or ``fs`` is not positive.
     """
     from scipy import signal as sp_signal
 
-    sig = _validate_signal(signal_in)
+    fs = resolve_fs(signal_in, fs, name="signal_in")
+    sig = apply_calibration(signal_in, _validate_signal(signal_in))
     fs_v = float(fs)
     if not np.isfinite(fs_v) or fs_v <= 0.0:
         raise ValueError("'fs' must be positive and finite.")

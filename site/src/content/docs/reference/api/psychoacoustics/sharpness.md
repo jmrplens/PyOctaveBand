@@ -23,11 +23,11 @@ at, 1.00 acum (~0.96 Aures / ~1.02 von Bismarck through this front-end).
 
 ```python
 sharpness_din(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     field: Literal['free', 'diffuse'] = 'free',
     method: Literal['din', 'aures', 'bismarck'] = 'din',
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> float
 ```
 
@@ -48,11 +48,11 @@ tolerance and is a known DIN 45692 implementation property.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D), in Pa after `calibration_factor`. |
-| `fs` | Sample rate in Hz. |
+| `x` | Input signal (1D), in Pa after `calibration_factor`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal); the rate and the factor are resolved by [`loudness_zwicker`](/phonometry/reference/api/psychoacoustics/zwicker/#loudness_zwicker), which this is a weighted moment of, so both arrive here on exactly the terms they have there. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. |
 | `field` | `'free'` (default) or `'diffuse'`. |
 | `method` | `'din'` (default), `'aures'` or `'bismarck'`. |
-| `calibration_factor` | Digital-units-to-Pa factor. |
+| `calibration_factor` | Digital-units-to-Pa factor. An explicit value wins over the one a Signal carries. |
 
 **Returns:** Sharpness in acum.
 

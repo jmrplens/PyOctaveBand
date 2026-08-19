@@ -147,8 +147,8 @@ specific-fluctuation-strength heatmap. Requires matplotlib
 
 ```python
 fluctuation_strength_ecma(
-    signal_in: np.ndarray,
-    fs: float,
+    signal_in: Signal | np.ndarray,
+    fs: float | None = None,
     field: Literal['free', 'diffuse'] = 'free',
 ) -> EcmaFluctuationStrength
 ```
@@ -159,8 +159,8 @@ Psychoacoustic fluctuation strength per ECMA-418-2:2025 (Clause 9).
 
 | Name | Description |
 | :--- | :--- |
-| `signal_in` | Calibrated sound pressure signal in pascals. |
-| `fs` | Sampling rate in Hz. Signals not at 48 kHz are resampled (Clause 5.1.1). |
+| `signal_in` | Calibrated sound pressure signal in pascals. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where "calibrated" comes from without arithmetic: this model reads absolute levels, so an uncalibrated record is taken as if one digital unit were one pascal and the answer is wrong by however far that is from true. |
+| `fs` | Sampling rate in Hz. Signals not at 48 kHz are resampled (Clause 5.1.1). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `field` | `"free"` (default) or `"diffuse"` sound field, selecting the outer/middle-ear filter of Clause 5.1.3. |
 
 **Returns:** An [`EcmaFluctuationStrength`](/phonometry/reference/api/psychoacoustics/fluctuation-strength-ecma/#ecmafluctuationstrength) with the single value F (Clause 9.1.14), the average specific fluctuation strength F'(z) (Clause 9.1.12) and the time-dependent fluctuation strength F(l50) (Formula 169).

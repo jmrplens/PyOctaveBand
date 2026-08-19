@@ -85,11 +85,11 @@ $S \le 1.75$ acum.
 
 ```python
 psychoacoustic_annoyance_from_signal(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: SignalInput,
+    fs: int | None = None,
     *,
     field: Literal['free', 'diffuse'] = 'free',
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
 ) -> PsychoacousticAnnoyanceResult
 ```
 
@@ -118,10 +118,10 @@ variant (see [`fluctuation_strength`](/phonometry/reference/api/psychoacoustics/
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Calibrated sound-pressure signal (1-D), in Pa after `calibration_factor`. |
-| `fs` | Sample rate, in Hz. |
+| `x` | Calibrated sound-pressure signal (1-D), in Pa after `calibration_factor`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where that calibration comes from without arithmetic: all four sensations are level-dependent models, so an uncalibrated record is read as if one digital unit were one pascal and every one of them comes out wrong by however far that is from true. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises. |
 | `field` | `'free'` (default) or `'diffuse'` sound field for the loudness/sharpness/roughness front-ends (`F` is always free-field). |
-| `calibration_factor` | Digital-units-to-Pa factor applied to `x`. |
+| `calibration_factor` | Digital-units-to-Pa factor applied to `x`. An explicit value wins over the one a Signal carries. |
 
 **Returns:** A [`PsychoacousticAnnoyanceResult`](/phonometry/reference/api/psychoacoustics/annoyance/#psychoacousticannoyanceresult).
 

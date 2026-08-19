@@ -26,6 +26,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ...io._resolve import resolve_calibration, resolve_fs
+from ...io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -746,11 +749,11 @@ def loudness_zwicker_from_spectrum(
 
 
 def loudness_zwicker(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     field: Literal["free", "diffuse"] = "free",
     stationary: bool = False,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
     time_skip: float = 0.0,
 ) -> ZwickerLoudness:
     r"""
@@ -786,12 +789,25 @@ def loudness_zwicker(
     with ``ref`` scaled to +-1 full scale as well.
 
     :param x: Single-channel time signal (see scaling convention above).
+        Accepts a :class:`phonometry.io.Signal`, which is where that
+        convention is met without arithmetic: a calibrated record already
+        carries the digital-to-pascal factor, and this model is defined on
+        pressure, so an uncalibrated record is read as if one digital unit
+        were one pascal and the loudness comes out wrong by however far
+        that is from true.
     :param fs: Sampling rate in Hz (positive integer; resampled to 48 kHz
-        with :func:`scipy.signal.resample_poly` when not 48000).
+        with :func:`scipy.signal.resample_poly` when not 48000). Required
+        for a bare array; a :class:`~phonometry.io.Signal` brings its own,
+        and an explicit value that disagrees with it raises instead of
+        silently winning.
     :param field: Sound field of the recording: 'free' or 'diffuse'.
     :param stationary: Use the stationary method (clause 5) instead of the
         time-varying method (clause 6).
     :param calibration_factor: Multiplier converting ``x`` to pascals.
+        An explicit value wins over the one a Signal carries, since the
+        caller may know of a re-calibration the file predates; otherwise
+        the object supplies it, and a bare array with neither is taken to
+        be in pascals already.
     :param time_skip: Leading time, in seconds, excluded from the stationary
         mean square (the reference implementation's TimeSkip). Annex B.1
         states the stationary calculation "shall start from 0,2 s" when
@@ -808,10 +824,12 @@ def loudness_zwicker(
         ``loudness_vs_time`` the loudness trace at 500 Hz.
     """
     diffuse = _validate_field(field)
+    fs = resolve_fs(x, fs)
     if fs <= 0:
         raise ValueError(f"'fs' must be a positive sampling rate, got {fs!r}.")
-    require_positive(calibration_factor, "calibration_factor")
-    pressure = _typesignal(x)
+    factor = resolve_calibration(x, calibration_factor)
+    require_positive(factor, "calibration_factor")
+    pressure = _typesignal(np.asarray(x))
     if pressure.ndim != 1:
         raise ValueError(
             "loudness_zwicker() accepts single-channel signals only, got "
@@ -821,7 +839,7 @@ def loudness_zwicker(
         raise ValueError("Input signal 'x' cannot be empty.")
     if not np.all(np.isfinite(pressure)):
         raise ValueError("Input signal 'x' must contain only finite values.")
-    pressure = pressure * calibration_factor
+    pressure = pressure * factor
 
     if int(fs) != fs:
         raise ValueError(f"'fs' must be an integer sampling rate, got {fs!r}.")

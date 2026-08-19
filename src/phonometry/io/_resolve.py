@@ -48,13 +48,18 @@ The rules, identical everywhere:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 
 from .._internal.utils import _typesignal
 from ._signal import Signal
 
-#: What a function that consumes a recording accepts for its signal argument.
-SignalInput = Signal | list[float] | np.ndarray
+#: What a function that consumes a recording accepts for its signal
+#: argument. ``Sequence[float]`` rather than ``list[float]`` so that a
+#: surface already typed for tuples does not have to narrow its signature
+#: to adopt the contract; ``str`` is a ``Sequence[str]`` and so stays out.
+SignalInput = Signal | Sequence[float] | np.ndarray
 
 # The rate type parameter below is value-restricted to ``(int, float)``
 # rather than bound to ``float`` so that a module typing its rate as ``int``
