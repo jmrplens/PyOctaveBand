@@ -1,0 +1,129 @@
+#  Copyright (c) 2026. Jose Manuel Requena Plens
+"""
+Narrowing a ``Signal`` without losing what makes it one.
+
+Indexing a Signal yields its samples, which is what makes the object a
+drop-in for the array it stands for. The cost is that ``sig[0]`` and
+``sig[:, a:b]`` hand back a bare array: the rate, the calibration, the
+channel labels and the provenance are gone, and the caller who wanted one
+channel of a multichannel take has to rebuild the object by hand and get the
+calibration right while doing it.
+
+:meth:`~phonometry.io.Signal.pick` and :meth:`~phonometry.io.Signal.crop`
+are the two narrowings that keep it. They are named for the record they
+operate on rather than for the array: MNE, which stores the same
+``(channels, samples)`` beside a rate, spells them the same way.
+
+The edges of ``crop`` follow the half-open convention of a Python slice, so
+cropping a record in two at the same instant partitions it: the assertion
+below is that the two halves add back up to the whole, with nothing counted
+twice and nothing dropped.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+import pytest
+
+from phonometry.io import Signal
+
+FS = 48000
+CAL = 3.0
+
+
+def _stereo() -> Signal:
+    t = np.arange(FS) / FS
+    left = 0.05 * np.sin(2.0 * np.pi * 1000.0 * t)
+    return Signal(
+        np.stack([left, 2.0 * left]),
+        FS,
+        calibration_factor=CAL,
+        channel_labels=("left", "right"),
+    )
+
+
+def test_pick_keeps_the_rate_the_calibration_and_the_label() -> None:
+    """What indexing drops is exactly what this exists to keep."""
+    one = _stereo().pick(0)
+    assert one.n_channels == 1
+    assert one.fs == FS
+    assert one.calibration_factor == CAL
+    assert one.channel_labels == ("left",)
+
+
+def test_pick_takes_the_channels_in_the_order_asked_for() -> None:
+    """A reordering is a legitimate pick, so the labels follow the samples."""
+    swapped = _stereo().pick([1, 0])
+    assert swapped.channel_labels == ("right", "left")
+    assert np.array_equal(np.asarray(swapped)[0], _stereo().data[1])
+
+
+def test_pick_refuses_a_channel_that_is_not_there() -> None:
+    stereo = _stereo()
+    with pytest.raises(IndexError, match="out of range"):
+        stereo.pick(2)
+
+
+def test_crop_cuts_at_the_seconds_asked_for() -> None:
+    cropped = _stereo().crop(0.25, 0.75)
+    assert cropped.n_samples == FS // 2
+    assert cropped.duration == pytest.approx(0.5)
+    assert cropped.fs == FS
+    assert cropped.calibration_factor == CAL
+
+
+def test_crop_is_half_open_so_two_halves_make_the_whole() -> None:
+    """The property that makes the convention worth stating.
+
+    Cropping ``[0, t)`` and ``[t, end)`` has to partition the record: no
+    sample in both halves, none in neither.
+    """
+    whole = _stereo()
+    first, second = whole.crop(tmax=0.4), whole.crop(tmin=0.4)
+    assert first.n_samples + second.n_samples == whole.n_samples
+    rejoined = np.concatenate([np.asarray(first), np.asarray(second)], axis=-1)
+    assert np.array_equal(rejoined, np.asarray(whole))
+
+
+def test_crop_defaults_to_the_records_own_edges() -> None:
+    whole = _stereo()
+    assert np.array_equal(np.asarray(whole.crop()), np.asarray(whole))
+
+
+def test_crop_refuses_an_empty_or_backwards_span() -> None:
+    whole = _stereo()
+    with pytest.raises(ValueError, match="greater than"):
+        whole.crop(0.5, 0.5)
+    with pytest.raises(ValueError, match="greater than"):
+        whole.crop(0.75, 0.25)
+    with pytest.raises(ValueError, match="must not be negative"):
+        whole.crop(-1.0, 0.5)
+
+
+def test_the_two_narrowings_compose() -> None:
+    """The point of both: a chain that stays a measurement."""
+    part = _stereo().pick(1).crop(0.1, 0.2)
+    assert part.n_channels == 1
+    assert part.channel_labels == ("right",)
+    assert part.n_samples == pytest.approx(FS * 0.1, abs=1)
+    assert part.calibration_factor == CAL
+
+
+def test_the_decibel_scale_needs_a_calibration_to_mean_anything() -> None:
+    """Without a factor the samples are full-scale units, not pressures."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    axes = _stereo().pick(0).plot(scale="db")
+    assert "dB" in axes.get_ylabel()
+    with pytest.raises(ValueError, match="needs a calibrated Signal"):
+        Signal(np.asarray(_stereo().pick(0)), FS).plot(scale="db")
+
+
+def test_an_unknown_scale_is_refused_by_name() -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    one = _stereo().pick(0)
+    with pytest.raises(ValueError, match="scale must be"):
+        one.plot(scale="log")

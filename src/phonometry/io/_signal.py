@@ -25,6 +25,7 @@ the library expects from a bare array.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -168,14 +169,94 @@ class Signal:
         """Length in seconds."""
         return self.n_samples / float(self.fs)
 
+    def pick(self, channels: int | Sequence[int]) -> Signal:
+        """The chosen channels, as a new Signal.
+
+        Indexing a Signal yields the samples, which is what makes it a
+        drop-in for the array it stands for; the cost is that ``sig[0]``
+        drops the rate, the calibration and the labels on the floor. This
+        keeps them, so a multichannel take can be narrowed to the channel
+        under test and stay a measurement.
+
+        :param channels: One channel index, or a sequence of them, in the
+            order they should appear in the result.
+        :return: A :class:`Signal` with those channels, in that order.
+        :raises IndexError: If a channel is out of range.
+        """
+        wanted = [channels] if isinstance(channels, (int, np.integer)) else list(channels)
+        picked = [int(c) for c in wanted]
+        for c in picked:
+            if not -self.data.shape[0] <= c < self.data.shape[0]:
+                raise IndexError(
+                    f"channel {c} out of range for a {self.data.shape[0]}-channel signal"
+                )
+        labels = (
+            tuple(self.channel_labels[c] for c in picked)
+            if self.channel_labels is not None
+            else None
+        )
+        return Signal(
+            data=self.data[picked],
+            fs=self.fs,
+            calibration_factor=self.calibration_factor,
+            channel_labels=labels,
+            provenance=self.provenance,
+            source=self.source,
+        )
+
+    def crop(self, tmin: float | None = None, tmax: float | None = None) -> Signal:
+        """The samples between *tmin* and *tmax* seconds, as a new Signal.
+
+        The edges are seconds from the start of the record, and follow the
+        half-open convention of a Python slice: the sample at *tmax* is not
+        included, so cropping ``[0, t)`` and ``[t, end)`` partitions the
+        record with nothing counted twice. ``None`` means the record's own
+        edge.
+
+        :param tmin: Start time, in seconds (default: the beginning).
+        :param tmax: End time, in seconds, exclusive (default: the end).
+        :return: A :class:`Signal` over that span, at the same rate.
+        :raises ValueError: If an edge is negative, not finite, or if
+            *tmax* is not after *tmin*.
+        """
+        start = 0.0 if tmin is None else float(tmin)
+        stop = self.duration if tmax is None else float(tmax)
+        if not np.isfinite(start) or not np.isfinite(stop):
+            raise ValueError("'tmin' and 'tmax' must be finite times in seconds")
+        if start < 0.0:
+            raise ValueError(f"'tmin' must not be negative; got {start}")
+        if stop <= start:
+            raise ValueError(f"'tmax' ({stop}) must be greater than 'tmin' ({start})")
+        first = round(start * self.fs)
+        last = min(round(stop * self.fs), self.data.shape[1])
+        if first >= last:
+            raise ValueError(
+                f"the span [{start}, {stop}) s holds no samples at {self.fs} Hz"
+            )
+        return Signal(
+            data=self.data[:, first:last],
+            fs=self.fs,
+            calibration_factor=self.calibration_factor,
+            channel_labels=self.channel_labels,
+            provenance=self.provenance,
+            source=self.source,
+        )
+
     def plot(
-        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+        self,
+        ax: Axes | None = None,
+        *,
+        language: str = "en",
+        scale: str = "linear",
+        **kwargs: Any,
     ) -> Axes:
         """Plot the waveform, calibrated to pascals when a calibration is set.
 
         Draws each channel's time-domain waveform; with a
         ``calibration_factor`` the amplitude axis is in pascals, otherwise
-        in digital full-scale units. Requires matplotlib
+        in digital full-scale units. ``scale="db"`` draws the level against
+        20 uPa instead, which is the trace a sound level meter shows, and
+        needs a calibrated record to mean anything. Requires matplotlib
         (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """
@@ -183,4 +264,4 @@ class Signal:
         from .._plot.io import plot_signal
 
         check_language(language)
-        return plot_signal(self, ax=ax, language=language, **kwargs)
+        return plot_signal(self, ax=ax, language=language, scale=scale, **kwargs)
