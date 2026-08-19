@@ -15,7 +15,6 @@ exported here, so ``from phonometry import materials`` reads as it did.
 
 from __future__ import annotations
 
-from .._compat import _namespace_dir, _namespace_shim
 from .._plot.geometry import (
     plot_absorber_stack,
     plot_dynamic_stiffness_rig,
@@ -405,9 +404,3 @@ __all__ = [
     "weighted_absorption_from_third_octave",
     "weighted_coefficient_uncertainty",
 ]
-
-#: No public name left this namespace in 4.0, but the modules did, so
-#: ``materials.porous_absorber`` has to keep resolving to its alias module
-#: until 5.0: the import registers it, the attribute read needs this.
-__getattr__ = _namespace_shim(__name__)
-__dir__ = _namespace_dir(__name__, __all__)

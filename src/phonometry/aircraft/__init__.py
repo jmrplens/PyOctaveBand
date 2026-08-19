@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from .._compat import _namespace_dir, _namespace_shim
 from .airport_noise import (
     AerodromeAtmosphere,
     FlightSegmentState,
@@ -126,9 +125,3 @@ __all__ = [
     "tone_correction",
     "verify_aircraft_noise_system",
 ]
-
-#: No public name left this namespace in 4.0, but the modules did, so
-#: ``aircraft.aircraft_noise`` has to keep resolving to its alias module until 5.0: the
-#: import registers it, the attribute read needs this.
-__getattr__ = _namespace_shim(__name__)
-__dir__ = _namespace_dir(__name__, __all__)

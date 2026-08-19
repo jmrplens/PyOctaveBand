@@ -13,7 +13,6 @@ families measure on it. Every public name is still exported here, so
 
 from __future__ import annotations
 
-from .._compat import _namespace_dir, _namespace_shim
 from .erb_scale import (
     CAM_C,
     ERB_C1,
@@ -143,9 +142,3 @@ __all__ = [
     "tone_to_noise_ratio",
     "two_tone_separation_frequency",
 ]
-
-#: No public name left this namespace in 4.0, but the modules did, so
-#: ``psychoacoustics.loudness_zwicker`` has to keep resolving to its alias
-#: module until 5.0: the import registers it, the attribute read needs this.
-__getattr__ = _namespace_shim(__name__)
-__dir__ = _namespace_dir(__name__, __all__)

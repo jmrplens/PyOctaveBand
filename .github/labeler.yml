@@ -121,7 +121,6 @@ ci:
   - changed-files:
       - any-glob-to-any-file:
           - src/phonometry/_internal/**
-          - src/phonometry/_compat.py
           - src/phonometry/_version.py
           - src/phonometry/_i18n.py
           - tests/*.py

@@ -1970,7 +1970,7 @@ def generate_field_indicators(output_dir: str) -> None:
 def generate_intensity_class(output_dir: str) -> None:
     """Measured delta_pI0 of a p-p chain over the IEC 61043 Table 2 masks."""
     print("Generating intensity_class.svg...")
-    from phonometry import metrology
+    from phonometry import emission
 
     # A complete instrument verified with the common 12 mm spacer, so the
     # printed 25 mm minima come down by 10 log10(12/25) = -3,2 dB (Table 2,
@@ -1982,16 +1982,16 @@ def generate_intensity_class(output_dir: str) -> None:
     # chain grows with frequency instead of staying put, so the index levels
     # off where the requirement does.
     spacing = 0.012
-    freqs, _, _ = metrology.residual_index_limits("instrument", spacing=spacing)
+    freqs, _, _ = emission.residual_index_limits("instrument", spacing=spacing)
     phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)   # degrees
-    measured = metrology.residual_index_from_phase_mismatch(
+    measured = emission.residual_index_from_phase_mismatch(
         phase_mismatch, freqs, spacing
     )
     # A vent resonance of the capsules costs 4 dB around 100 Hz, the one band
     # that drops out of class 1 and drags the whole verdict down to class 2.
     measured = measured - 4.0 * np.exp(-(((np.log(freqs / 100.0)) / 0.25) ** 2))
 
-    result = metrology.intensity_class_compliance(measured, freqs, spacing=spacing)
+    result = emission.intensity_class_compliance(measured, freqs, spacing=spacing)
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() shades the pass region of the achieved class and
     # rings the bands that cost the chain the next class up.
