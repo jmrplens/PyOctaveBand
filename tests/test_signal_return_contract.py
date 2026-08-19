@@ -139,3 +139,64 @@ def test_the_metadata_travels_with_the_samples(name, extra) -> None:
     out = _call(name, labelled, extra)
     assert out.fs == FS
     assert out.channel_labels == ("left", "right")
+
+
+# ---------------------------------------------------------------------------
+# The squared one, which cannot be a Signal
+# ---------------------------------------------------------------------------
+
+
+def test_a_mean_square_envelope_is_not_a_signal() -> None:
+    """The rule that decides what a Signal may hold, asserted where it bites.
+
+    ``time_weighting`` returns the running mean SQUARE. Measured, its output
+    scales as the square of a gain on the record, so it is in pascals
+    squared: handing it back as a Signal would label a Pa2 quantity as a
+    pressure record, which is the lie the calibration contract exists to
+    prevent. It gets a result object of its own instead.
+    """
+    from phonometry.filters import TimeWeightedEnvelope, time_weighting
+
+    plain = np.asarray(time_weighting(Signal(_RECORD, FS), mode="fast"))
+    doubled = np.asarray(time_weighting(Signal(2.0 * _RECORD, FS), mode="fast"))
+    finite = np.isfinite(plain) & (plain != 0)
+    assert np.allclose(doubled[finite] / plain[finite], 4.0)
+
+    out = time_weighting(Signal(_RECORD, FS), mode="fast")
+    assert isinstance(out, TimeWeightedEnvelope)
+    assert not isinstance(out, Signal)
+
+
+def test_the_envelope_stands_in_for_the_array_it_replaced() -> None:
+    """Every caller that only wanted the numbers must not notice the change."""
+    from phonometry.filters import time_weighting
+
+    out = time_weighting(Signal(_RECORD, FS), mode="fast")
+    bare = time_weighting(_RECORD, FS, mode="fast")
+    assert np.array_equal(np.asarray(out), bare)
+    assert out.shape == bare.shape
+    assert out.ndim == bare.ndim
+    assert out.size == bare.size
+    assert out.dtype == bare.dtype
+    assert len(out) == len(bare)
+    assert np.array_equal(out[..., -1], bare[..., -1])
+
+
+def test_the_envelope_knows_whether_its_level_means_anything() -> None:
+    """A level needs pascals; without them the trace is full-scale squared."""
+    from phonometry.filters import time_weighting
+
+    assert time_weighting(
+        Signal(_RECORD, FS, calibration_factor=CAL), mode="fast"
+    ).calibrated
+    assert not time_weighting(Signal(_RECORD, FS), mode="fast").calibrated
+
+
+def test_a_bare_array_still_gets_the_bare_envelope() -> None:
+    """The six places that divide the envelope in place keep working."""
+    from phonometry.filters import time_weighting
+
+    out = time_weighting(_RECORD, FS, mode="fast")
+    assert isinstance(out, np.ndarray)
+    out /= float(np.max(out))  # in place, which a frozen result cannot do
+    assert np.isclose(np.max(out), 1.0)

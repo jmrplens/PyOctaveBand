@@ -61,6 +61,7 @@ from phonometry.underwater import (
     strike_sel_spectrum,
 )
 from phonometry.vibration import (
+    apply_weighting,
     running_rms,
     spinal_response,
     vibration_dose_value,
@@ -237,6 +238,7 @@ def test_a_full_scale_reading_still_resolves_the_rate(func, kwargs) -> None:
 # ---------------------------------------------------------------------------
 
 NOT_PRESSURE = [
+    (apply_weighting, {"name": "Wk"}),
     (running_rms, {}),
     (vibration_dose_value, {}),
     (spinal_response, {}),

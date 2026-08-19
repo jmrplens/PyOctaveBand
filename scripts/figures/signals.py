@@ -1868,8 +1868,11 @@ def generate_streaming_level_seams(output_dir: str) -> None:
 
     aw = WeightingFilter(fs, "A", stateful=True)
     tw = TimeWeighting(fs, mode="fast")
-    stateful = np.concatenate([to_db(tw.process(aw.filter(
-        x[i * block:(i + 1) * block]))) for i in range(n_blocks)])
+    stateful = np.concatenate([
+        to_db(np.asarray(tw.process(aw.filter(
+            x[i * block:(i + 1) * block]))))
+        for i in range(n_blocks)
+    ])
 
     stateless = np.concatenate([to_db(time_weighting(weighting_filter(
         x[i * block:(i + 1) * block], fs, curve="A", high_accuracy=False), fs,
@@ -1902,8 +1905,11 @@ def generate_streaming_level_seams(output_dir: str) -> None:
     aw_s = WeightingFilter(fs, "A", stateful=True, steady_ic=True)
     tw_s = TimeWeighting(fs, mode="fast")
     shown = 8
-    steady = np.concatenate([to_db(tw_s.process(aw_s.filter(
-        x[i * block:(i + 1) * block]))) for i in range(shown)])
+    steady = np.concatenate([
+        to_db(np.asarray(tw_s.process(aw_s.filter(
+            x[i * block:(i + 1) * block]))))
+        for i in range(shown)
+    ])
     ax_b.axvspan(0.0, 0.625, color=COLOR_SECONDARY, alpha=0.20)
     ax_b.plot(t[:shown * block], continuous[:shown * block], color=COLOR_MUTED,
               linewidth=3.2, alpha=0.5, label="one continuous pass")

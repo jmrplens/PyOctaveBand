@@ -753,6 +753,7 @@ from .filters.frequencies import (
     normalized_frequencies,
 )
 from .filters.weighting import (
+    TimeWeightedEnvelope,
     TimeWeighting,
     WeightingFilter,
     linkwitz_riley,
@@ -2073,6 +2074,7 @@ __all__ = [
     "TaskContribution",
     "TerrainScreeningResult",
     "TimeDelayResult",
+    "TimeWeightedEnvelope",
     "TimeWeighting",
     "TonalAssessmentResult",
     "TonalCorrectionResult",
