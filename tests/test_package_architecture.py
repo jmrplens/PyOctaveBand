@@ -174,7 +174,7 @@ def test_cross_package_edges_are_whitelisted() -> None:
             "root", "_plot", "_report"
         ):
             # root modules are unrestricted during the migration; the facade
-            # (__init__, _compat) legitimately imports everything. _plot and
+            # (__init__) legitimately imports everything. _plot and
             # _report are rendering leaves that reference domain classes only
             # under TYPE_CHECKING (see the guarantee test below).
             continue

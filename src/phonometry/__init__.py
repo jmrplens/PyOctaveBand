@@ -2998,11 +2998,6 @@ __all__ = [
 ]
 
 
-# Deprecated module-path aliases for the 4.0 taxonomy: importing the package
-# installs sys.modules shims for every moved public module (see
-# phonometry/_compat.py; removed in 5.0).
-from . import _compat as _compat
-
 # The domain packages are part of the public surface: ``phonometry.building``
 # reads the same as ``from phonometry import building``. Importing the flat API
 # already binds every one of them; naming them here says so, and lets a type

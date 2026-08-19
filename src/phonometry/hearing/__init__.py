@@ -4,12 +4,11 @@
 Narrowed in 4.0 to hearing conservation: audiometric thresholds, noise-induced
 hearing loss and occupational exposure. Speech intelligibility (STI, SII, STOI)
 moved to :mod:`phonometry.speech`, which evaluates a transmission channel
-rather than an ear; reading those names from here still works until 5.0.
+rather than an ear.
 """
 
 from __future__ import annotations
 
-from .._compat import _namespace_dir, _namespace_shim
 from .noise_induced_hearing_loss import (
     HtlanResult,
     NiptsResult,
@@ -40,10 +39,6 @@ from .threshold import (
     reference_threshold,
 )
 
-#: Names that left this namespace in 4.0 keep resolving from here until 5.0.
-_MOVED_TO = ("phonometry.speech",)
-__getattr__ = _namespace_shim(__name__, _MOVED_TO)
-
 __all__ = [
     "AUDIOMETRIC_FREQUENCIES",
     "COVERAGE_FACTOR",
@@ -69,7 +64,3 @@ __all__ = [
     "table_c4_contribution",
     "task_based_exposure",
 ]
-
-#: ``__getattr__`` is invisible to ``dir()``; keep the moved names listed
-#: while they still resolve.
-__dir__ = _namespace_dir(__name__, __all__, _MOVED_TO)

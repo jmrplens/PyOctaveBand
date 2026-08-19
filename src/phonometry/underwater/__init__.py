@@ -12,7 +12,6 @@ here, so ``from phonometry import underwater`` reads as it did.
 
 from __future__ import annotations
 
-from .._compat import _namespace_dir, _namespace_shim
 from .acoustics import (
     UNDERWATER_REFERENCE_EXPOSURE,
     UNDERWATER_REFERENCE_PRESSURE,
@@ -204,9 +203,3 @@ __all__ = [
     "weston_regime_boundaries",
     "wind_noise_spectrum",
 ]
-
-#: No public name left this namespace in 4.0, but the modules did, so
-#: ``underwater.seabed_reflection`` has to keep resolving to its alias module
-#: until 5.0: the import registers it, the attribute read needs this.
-__getattr__ = _namespace_shim(__name__)
-__dir__ = _namespace_dir(__name__, __all__)

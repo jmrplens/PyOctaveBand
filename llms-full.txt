@@ -33013,26 +33013,12 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 | `phonometry.simulation` | 2D acoustic FDTD wave simulation (staggered grid, sources, probes, impedance boundaries, obstacles) |
 
 Every name in the table below is also re-exported at the top level, so
-`from phonometry import <name>` works for every row. The pre-4.0 module paths
-that the taxonomy moved are still importable and warn on use; they are removed
-in 5.0. Reading a moved name from the namespace it left warns and delegates as
-well. The pre-3.2 flat paths, written without a subpackage, were removed in
-4.0 as announced.
-
-| Deprecated path | Resolves to | Removed in |
-| :--- | :--- | :--- |
-| `phonometry.metrology.levels` | `phonometry.signals.levels` | 5.0 |
-| `phonometry.hearing.sti` | `phonometry.speech.sti` | 5.0 |
-| `phonometry.vibration.human_vibration` | `phonometry.vibration.human.exposure` | 5.0 |
-| `phonometry.building.spanish_building_code` | `phonometry.building.regulation.spain` | 5.0 |
-| `phonometry.materials.porous_absorber` | `phonometry.materials.absorbers.porous` | 5.0 |
-| `phonometry.environmental` | `phonometry.environment` | 5.0 |
-| `phonometry.psychoacoustics.loudness_zwicker` | `phonometry.psychoacoustics.loudness.zwicker` | 5.0 |
-| `phonometry.underwater.ocean_ambient_noise` | `phonometry.underwater.sources.ambient_noise` | 5.0 |
-| `phonometry.metrology.intensity_compliance` | `phonometry.emission.intensity_compliance` | 5.0 |
-| `phonometry.environment.assessment.impulse_prominence` | `phonometry.environment.assessment.impulsive_sound` | 5.0 |
-| `phonometry.room.room_ir` | `phonometry.room.impulse_response` | 5.0 |
-| `phonometry.aircraft.aircraft_noise` | `phonometry.aircraft.certification` | 5.0 |
+`from phonometry import <name>` works for every row. The module paths of every
+earlier layout were removed in 4.0 along with the shims that served them, so
+`phonometry.metrology.levels`, `phonometry.environmental` and the rest of the
+pre-4.0 spellings raise `ModuleNotFoundError`. The paths in force are the ones
+the [generated reference](https://jmrplens.github.io/phonometry/reference/api/)
+documents, one page per module.
 
 > **Reading the input column.** Every function that consumes a recording
 > accepts a `phonometry.io.Signal` wherever the table writes a signal

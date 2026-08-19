@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+
+- The compatibility layer that served the module paths of every earlier layout
+  is gone, and with it `phonometry.environmental`. The hundred and five paths
+  the 4.0 taxonomy moved now refuse in the three ways Python has, which are
+  worth naming separately because they are not interchangeable: `import
+  phonometry.metrology.levels` raises `ModuleNotFoundError`, `from
+  phonometry.hearing import sti` raises `ImportError` because the package
+  itself imports and only the name inside it is missing, and
+  `phonometry.metrology.levels` read as an attribute raises `AttributeError`.
+  The shims announced their own removal for 5.0;
+  they go now because 4.0 is the release that breaks, and carrying a table of
+  105 renamed paths through a whole major version protects nobody: every
+  documented path in 4.0 is the real one.
+
+  `_warn_renamed`, the helper behind the notices, goes with them: it had no
+  caller left. `PhonometryWarning` is what remains of that module, which is
+  what it was there for.
+
+  One import inside the library was resolving through the shims rather than
+  through the real module, and only the type checker knew: the intensity-class
+  figure read `residual_index_limits`, `residual_index_from_phase_mismatch`
+  and `intensity_class_compliance` off `metrology`, which stopped defining
+  them when the IEC 61043 check moved to `emission` in 4.0. It reads them from
+  `emission` now. Nothing else in the tree, the tests or the documentation was
+  on a moved path.
+
 ### Added
 
 - `Signal.pick` and `Signal.crop` narrow a recording to a set of channels or

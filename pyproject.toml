@@ -136,9 +136,9 @@ pythonpath = ["tests"]
 addopts = ["--dist=loadgroup"]
 filterwarnings = [
     "ignore:Low sampling rate:UserWarning",
-    # A deprecated phonometry name used anywhere in the suite is an error, not
-    # a line in a log nobody reads: the shims exist for users on the old paths,
-    # and the tests are not users. The one file that exercises the shims on
-    # purpose catches them with pytest.warns, which passes under this filter.
+    # 4.0 carries no deprecated names: the aliases the 3.x layout left behind
+    # were removed with the shims that served them. The rule stays as a guard,
+    # so the day a deprecation is introduced the suite fails instead of
+    # logging, and it costs nothing while nothing matches it.
     "error:.*is deprecated since phonometry.*:DeprecationWarning",
 ]

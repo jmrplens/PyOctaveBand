@@ -13,7 +13,6 @@ here, so ``from phonometry import building`` reads as it did.
 
 from __future__ import annotations
 
-from .._compat import _namespace_dir, _namespace_shim
 from .._plot.geometry import (
     plot_aperture_geometry,
     plot_double_wall_geometry,
@@ -545,9 +544,3 @@ __all__ = [
     "weighted_rating_extended",
     "window_size_correction",
 ]
-
-#: No public name left this namespace in 4.0, but the modules did, so
-#: ``building.insulation`` has to keep resolving to its alias module until
-#: 5.0: the import registers it, the attribute read needs this.
-__getattr__ = _namespace_shim(__name__)
-__dir__ = _namespace_dir(__name__, __all__)

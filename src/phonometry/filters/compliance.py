@@ -41,7 +41,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy import signal
 
-from .._compat import _namespace_dir, _namespace_shim
 from .core import OctaveFilterBank
 
 if TYPE_CHECKING:
@@ -536,16 +535,6 @@ def filter_class_compliance(
     )
 
 
-#: The IEC 61265 aircraft measurement-system check verifies a certification
-#: chain rather than an instrument of this module's kind, so it moved to
-#: :mod:`phonometry.aircraft.measurement_system` in 4.0. Reading it from here,
-#: and from every alias of this module, still works until 5.0.
-_MOVED_TO = ("phonometry.aircraft",)
-_MOVED_NAMES: dict[str, tuple[str, ...]] = {
-    "phonometry.aircraft": ("verify_aircraft_noise_system",),
-}
-_moved_getattr = _namespace_shim(__name__, _MOVED_TO, only=_MOVED_NAMES)
-
 #: The frequency-weighting transcriptions this module used to carry went to
 #: :mod:`phonometry.filters.weighting_compliance` with their subject. The
 #: clean-room oracles pin the tables by this path, so the reads still resolve
@@ -564,12 +553,9 @@ _WEIGHTING_TRANSCRIPTIONS = frozenset(
 
 
 def __getattr__(name: str) -> Any:
-    """Serve the names that left this module from where they live now."""
+    """Serve the transcriptions this module used to carry from their module."""
     if name in _WEIGHTING_TRANSCRIPTIONS:
         from . import weighting_compliance
 
         return getattr(weighting_compliance, name)
-    return _moved_getattr(name)
-
-
-__dir__ = _namespace_dir(__name__, __all__, _MOVED_TO, _MOVED_NAMES)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
