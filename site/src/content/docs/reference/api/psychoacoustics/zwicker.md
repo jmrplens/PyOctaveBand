@@ -28,11 +28,11 @@ A.9 of the standard digit for digit.
 
 ```python
 loudness_zwicker(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     field: Literal['free', 'diffuse'] = 'free',
     stationary: bool = False,
-    calibration_factor: float = 1.0,
+    calibration_factor: float | None = None,
     time_skip: float = 0.0,
 ) -> ZwickerLoudness
 ```
@@ -69,11 +69,11 @@ with `ref` scaled to +-1 full scale as well.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Single-channel time signal (see scaling convention above). |
-| `fs` | Sampling rate in Hz (positive integer; resampled to 48 kHz with `scipy.signal.resample_poly` when not 48000). |
+| `x` | Single-channel time signal (see scaling convention above). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where that convention is met without arithmetic: a calibrated record already carries the digital-to-pascal factor, and this model is defined on pressure, so an uncalibrated record is read as if one digital unit were one pascal and the loudness comes out wrong by however far that is from true. |
+| `fs` | Sampling rate in Hz (positive integer; resampled to 48 kHz with `scipy.signal.resample_poly` when not 48000). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `field` | Sound field of the recording: 'free' or 'diffuse'. |
 | `stationary` | Use the stationary method (clause 5) instead of the time-varying method (clause 6). |
-| `calibration_factor` | Multiplier converting `x` to pascals. |
+| `calibration_factor` | Multiplier converting `x` to pascals. An explicit value wins over the one a Signal carries, since the caller may know of a re-calibration the file predates; otherwise the object supplies it, and a bare array with neither is taken to be in pascals already. |
 | `time_skip` | Leading time, in seconds, excluded from the stationary mean square (the reference implementation's TimeSkip). Annex B.1 states the stationary calculation "shall start from 0,2 s" when validating against the official Annex B WAV files, excluding the filterbank transient; the default 0.0 preserves the whole-signal behaviour for synthetic steady signals. Validated always (negative, non-finite or whole-signal skips raise `ValueError`) but applied only by the stationary method -- clause 6 has no TimeSkip. |
 
 **Returns:** [`ZwickerLoudness`](/phonometry/reference/api/psychoacoustics/zwicker/#zwickerloudness).  Stationary: as in [`loudness_zwicker_from_spectrum`](/phonometry/reference/api/psychoacoustics/zwicker/#loudness_zwicker_from_spectrum).  Time-varying: `loudness` is the maximum loudness Nmax, `loudness_level` its phon mapping, `specific` the pattern at the loudness maximum, `n5`/`n10` the percentile values and `time` / `loudness_vs_time` the loudness trace at 500 Hz.

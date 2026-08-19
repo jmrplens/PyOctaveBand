@@ -81,8 +81,8 @@ Adds a tonality-vs-time panel. Requires matplotlib
 
 ```python
 tonality_ecma(
-    signal_in: np.ndarray,
-    fs: float,
+    signal_in: Signal | np.ndarray,
+    fs: float | None = None,
     field: Literal['free', 'diffuse'] = 'free',
     f_low: float | None = None,
     f_high: float | None = None,
@@ -95,8 +95,8 @@ Psychoacoustic tonality per ECMA-418-2:2025 (Sottek Hearing Model).
 
 | Name | Description |
 | :--- | :--- |
-| `signal_in` | Calibrated sound pressure signal in pascals. |
-| `fs` | Sampling rate in Hz. Signals not at 48 kHz are resampled (Clause 5.1.1). |
+| `signal_in` | Calibrated sound pressure signal in pascals. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where "calibrated" comes from without arithmetic: this model reads absolute levels, so an uncalibrated record is taken as if one digital unit were one pascal and the answer is wrong by however far that is from true. |
+| `fs` | Sampling rate in Hz. Signals not at 48 kHz are resampled (Clause 5.1.1). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `field` | `"free"` (default) or `"diffuse"` sound field, selecting the outer/middle-ear filter of Clause 5.1.3. |
 | `f_low` | Optional lower edge (Hz) of a user frequency band for the time-dependent tonality maximum search (Formulae 56-60). `None` uses the full range. |
 | `f_high` | Optional upper edge (Hz) of the user frequency band. |

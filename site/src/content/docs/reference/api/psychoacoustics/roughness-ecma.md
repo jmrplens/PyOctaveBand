@@ -100,8 +100,8 @@ heatmap. Requires matplotlib (`pip install phonometry[plot]`).
 
 ```python
 roughness_ecma(
-    signal_in: np.ndarray,
-    fs: float,
+    signal_in: Signal | np.ndarray,
+    fs: float | None = None,
     field: Literal['free', 'diffuse'] = 'free',
 ) -> EcmaRoughness
 ```
@@ -112,8 +112,8 @@ Psychoacoustic roughness per ECMA-418-2:2025 (Sottek Hearing Model).
 
 | Name | Description |
 | :--- | :--- |
-| `signal_in` | Calibrated sound pressure signal in pascals. |
-| `fs` | Sampling rate in Hz. Signals not at 48 kHz are resampled (Clause 5.1.1). |
+| `signal_in` | Calibrated sound pressure signal in pascals. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where "calibrated" comes from without arithmetic: this model reads absolute levels, so an uncalibrated record is taken as if one digital unit were one pascal and the answer is wrong by however far that is from true. |
+| `fs` | Sampling rate in Hz. Signals not at 48 kHz are resampled (Clause 5.1.1). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `field` | `"free"` (default) or `"diffuse"` sound field, selecting the outer/middle-ear filter of Clause 5.1.3. |
 
 **Returns:** An [`EcmaRoughness`](/phonometry/reference/api/psychoacoustics/roughness-ecma/#ecmaroughness) with the single value R (Clause 7.1.10), the average specific roughness R'(z) (Clause 7.1.8) and the time-dependent roughness R(l50) (Formula 111).

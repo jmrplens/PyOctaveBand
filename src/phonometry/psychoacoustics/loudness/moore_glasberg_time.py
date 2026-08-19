@@ -63,6 +63,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ...io._resolve import apply_calibration, resolve_fs
+from ...io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -599,10 +602,10 @@ def _run_ear(
 
 
 def _as_two_channels(
-    signal: Sequence[float] | np.ndarray, presentation: str
+    signal: Signal | Sequence[float] | np.ndarray, presentation: str
 ) -> tuple[np.ndarray, np.ndarray | None]:
     """Split the input into left and (optional) right calibrated pressure signals."""
-    array = np.asarray(signal, dtype=np.float64)
+    array = apply_calibration(signal, np.asarray(signal, dtype=np.float64))
     if array.ndim == 2:
         if array.shape[1] == 2 and array.shape[0] != 2:
             left, right = array[:, 0], array[:, 1]
@@ -638,8 +641,8 @@ def _percentiles(trace: np.ndarray, fractions: Sequence[float]) -> dict[float, f
 
 
 def loudness_moore_glasberg_time(
-    signal: Sequence[float] | np.ndarray,
-    fs: float,
+    signal: Signal | Sequence[float] | np.ndarray,
+    fs: float | None = None,
     *,
     field: Literal["free", "diffuse", "eardrum"] = "free",
     presentation: Literal["binaural", "diotic", "monaural"] = "binaural",
@@ -657,8 +660,14 @@ def loudness_moore_glasberg_time(
     :param signal: Calibrated pressure signal in pascals.  A 1-D array is
         treated as diotic (the same sound at both ears) for a binaural/diotic
         presentation, or as the single active ear for a monaural presentation;
-        a two-channel ``(n, 2)`` array gives the left and right ear signals.
-    :param fs: Sampling rate in Hz (positive).
+        a two-channel ``(n, 2)`` array gives the left and right ear signals. Accepts a
+        :class:`phonometry.io.Signal`, which is where "calibrated" comes
+        from without arithmetic: this model reads absolute levels, so an
+        uncalibrated record is taken as if one digital unit were one
+        pascal and the answer is wrong by however far that is from true.
+    :param fs: Sampling rate in Hz (positive). Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param field: Listening condition setting the outer-ear transfer:
         ``"free"`` (frontal free field, default), ``"diffuse"`` (diffuse field)
         or ``"eardrum"`` (levels already at the tympanic membrane).
@@ -671,6 +680,7 @@ def loudness_moore_glasberg_time(
     long-term loudness of 1.000 sone (40 phon) by definition of the sone.
     """
     _validate_conditions(field, presentation)
+    fs = resolve_fs(signal, fs, name="signal")
     if fs <= 0.0:
         raise ValueError(f"'fs' must be a positive sampling rate, got {fs!r}.")
     left, right = _as_two_channels(signal, presentation)

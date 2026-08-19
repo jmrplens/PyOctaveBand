@@ -36,6 +36,9 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 from scipy import signal
 
+from ...io._resolve import apply_calibration, resolve_fs
+from ...io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -194,17 +197,23 @@ def _assemble_tonality(
 
 
 def tonality_ecma(
-    signal_in: np.ndarray,
-    fs: float,
+    signal_in: Signal | np.ndarray,
+    fs: float | None = None,
     field: Literal["free", "diffuse"] = "free",
     f_low: float | None = None,
     f_high: float | None = None,
 ) -> EcmaTonality:
     """Psychoacoustic tonality per ECMA-418-2:2025 (Sottek Hearing Model).
 
-    :param signal_in: Calibrated sound pressure signal in pascals.
+    :param signal_in: Calibrated sound pressure signal in pascals. Accepts a
+        :class:`phonometry.io.Signal`, which is where "calibrated" comes
+        from without arithmetic: this model reads absolute levels, so an
+        uncalibrated record is taken as if one digital unit were one
+        pascal and the answer is wrong by however far that is from true.
     :param fs: Sampling rate in Hz. Signals not at 48 kHz are resampled
-        (Clause 5.1.1).
+        (Clause 5.1.1). Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param field: ``"free"`` (default) or ``"diffuse"`` sound field, selecting
         the outer/middle-ear filter of Clause 5.1.3.
     :param f_low: Optional lower edge (Hz) of a user frequency band for the
@@ -221,7 +230,8 @@ def tonality_ecma(
     """
     if field not in ("free", "diffuse"):
         raise ValueError("field must be 'free' or 'diffuse'")
-    x = require_1d_signal(_typesignal(signal_in))
+    fs = resolve_fs(signal_in, fs, name="signal_in")
+    x = apply_calibration(signal_in, require_1d_signal(_typesignal(np.asarray(signal_in))))
     if x.size == 0:
         raise ValueError("signal must not be empty")
     fs = float(fs)

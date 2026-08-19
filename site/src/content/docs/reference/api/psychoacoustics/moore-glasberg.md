@@ -45,8 +45,8 @@ the exact sinusoidal-component method.
 
 ```python
 loudness_moore_glasberg(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: Signal | list[float] | np.ndarray,
+    fs: float | None = None,
     *,
     field: Literal['free', 'diffuse', 'eardrum'] = 'free',
     presentation: Literal['binaural', 'diotic', 'monaural'] = 'binaural',
@@ -69,8 +69,8 @@ calibrated so that `x` is the instantaneous sound pressure in pascals.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Single-channel calibrated pressure signal in pascals. |
-| `fs` | Sampling rate in Hz (positive). |
+| `x` | Single-channel calibrated pressure signal in pascals. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), which is where "calibrated" comes from without arithmetic: this model reads absolute levels, so an uncalibrated record is taken as if one digital unit were one pascal and the answer is wrong by however far that is from true. |
+| `fs` | Sampling rate in Hz (positive). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `field` | `"free"` (default), `"diffuse"` or `"eardrum"`. |
 | `presentation` | `"binaural"` (default; alias `"diotic"`) or `"monaural"`. |
 

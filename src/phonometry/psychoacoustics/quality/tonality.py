@@ -24,6 +24,8 @@ import numpy as np
 
 from ..._internal.utils import _typesignal
 from ..._internal.warnings import PhonometryWarning
+from ...io._resolve import apply_calibration, resolve_fs
+from ...io._signal import Signal
 from ...signals.spectra import _welch_autospectrum
 
 if TYPE_CHECKING:
@@ -249,8 +251,8 @@ def _pr_criterion(ft: float) -> float:
 
 
 def tone_to_noise_ratio(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     tone_freq: float | None = None,
     resolution_hz: float = 1.0,
 ) -> ToneAssessment:
@@ -264,8 +266,14 @@ def tone_to_noise_ratio(
     (Formula 10); TNR = Lt - Ln (Formula 11). Proximate secondary tones in
     the same critical band are combined per clause 11.6 (Formulae 14-16).
 
-    :param x: Input signal (1D).
-    :param fs: Sample rate in Hz.
+    :param x: Input signal (1D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: the ratio compares the tone against the
+        masking noise inside the same spectrum, so a factor common to both
+        leaves it exactly where it was.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises instead of silently winning.
     :param tone_freq: Approximate tone frequency in Hz. Default (None)
         assesses the highest spectral peak in the 89.1 Hz - 11.2 kHz range
         of interest. For harmonic complexes, call once per component
@@ -274,7 +282,10 @@ def tone_to_noise_ratio(
         must stay within 15 % of the critical bandwidth, clause 11.2).
     :return: :class:`ToneAssessment` with ``ratio_db`` = TNR in dB.
     """
-    x_proc = np.atleast_1d(np.asarray(_typesignal(x), dtype=np.float64))
+    fs = resolve_fs(x, fs)
+    x_proc = apply_calibration(
+        x, np.atleast_1d(np.asarray(_typesignal(np.asarray(x)), dtype=np.float64))
+    )
     if x_proc.ndim != 1:
         raise ValueError("tone_to_noise_ratio expects a 1D signal.")
     if fs <= 0:
@@ -366,8 +377,8 @@ def _fitted_edge(
 
 
 def prominence_ratio(
-    x: list[float] | np.ndarray,
-    fs: int,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     tone_freq: float | None = None,
     resolution_hz: float = 1.0,
 ) -> ToneAssessment:
@@ -382,14 +393,23 @@ def prominence_ratio(
     clause 12.5 prose - the inline condition printed next to Formula 23 in
     the PDF is a typo).
 
-    :param x: Input signal (1D).
-    :param fs: Sample rate in Hz.
+    :param x: Input signal (1D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: the ratio compares the tone against the
+        masking noise inside the same spectrum, so a factor common to both
+        leaves it exactly where it was.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises instead of silently winning.
     :param tone_freq: Approximate tone frequency in Hz (default: highest
         peak in the range of interest).
     :param resolution_hz: FFT bin spacing (default 1.0 Hz).
     :return: :class:`ToneAssessment` with ``ratio_db`` = PR in dB.
     """
-    x_proc = np.atleast_1d(np.asarray(_typesignal(x), dtype=np.float64))
+    fs = resolve_fs(x, fs)
+    x_proc = apply_calibration(
+        x, np.atleast_1d(np.asarray(_typesignal(np.asarray(x)), dtype=np.float64))
+    )
     if x_proc.ndim != 1:
         raise ValueError("prominence_ratio expects a 1D signal.")
     if fs <= 0:
