@@ -32,6 +32,7 @@ CAL = 3.0
 
 
 def _stereo() -> Signal:
+    """A calibrated two-channel second, the right channel twice the left."""
     t = np.arange(FS) / FS
     left = 0.05 * np.sin(2.0 * np.pi * 1000.0 * t)
     return Signal(
@@ -59,12 +60,14 @@ def test_pick_takes_the_channels_in_the_order_asked_for() -> None:
 
 
 def test_pick_refuses_a_channel_that_is_not_there() -> None:
+    """An index past the last channel is a mistake, not an empty result."""
     stereo = _stereo()
     with pytest.raises(IndexError, match="out of range"):
         stereo.pick(2)
 
 
 def test_crop_cuts_at_the_seconds_asked_for() -> None:
+    """The span in seconds, and the rate and the factor that come with it."""
     cropped = _stereo().crop(0.25, 0.75)
     assert cropped.n_samples == FS // 2
     assert cropped.duration == pytest.approx(0.5)
@@ -86,11 +89,13 @@ def test_crop_is_half_open_so_two_halves_make_the_whole() -> None:
 
 
 def test_crop_defaults_to_the_records_own_edges() -> None:
+    """Both edges omitted means the whole record, sample for sample."""
     whole = _stereo()
     assert np.array_equal(np.asarray(whole.crop()), np.asarray(whole))
 
 
 def test_crop_refuses_an_empty_or_backwards_span() -> None:
+    """A zero-length span, a reversed one and a negative start all raise."""
     whole = _stereo()
     with pytest.raises(ValueError, match="greater than"):
         whole.crop(0.5, 0.5)
@@ -123,6 +128,7 @@ def test_the_decibel_scale_needs_a_calibration_to_mean_anything() -> None:
 
 
 def test_an_unknown_scale_is_refused_by_name() -> None:
+    """A misspelt scale names the two that exist rather than drawing one."""
     import matplotlib
 
     matplotlib.use("Agg")

@@ -47,6 +47,7 @@ CAL = 20.0
 
 
 def _record(seconds: float = 1.0, seed: int = 0) -> np.ndarray:
+    """A seeded 1 kHz tone with a little noise, so levels are reproducible."""
     rng = np.random.default_rng(seed)
     t = np.arange(int(FS * seconds)) / FS
     return 0.05 * np.sin(2.0 * np.pi * 1000.0 * t) + 0.01 * rng.standard_normal(t.size)
@@ -278,6 +279,7 @@ def test_the_envelope_plot_labels_each_channel() -> None:
 
 
 def test_the_envelope_plot_is_translated() -> None:
+    """Every fixed string this renderer draws has a Spanish counterpart."""
     import matplotlib
 
     matplotlib.use("Agg")
