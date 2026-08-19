@@ -79,9 +79,17 @@ airborne_insulation(
     l2: Sequence[float] | np.ndarray,
     t2: Sequence[float] | np.ndarray,
     *,
-    area: float | None = None,
-    volume: float | None = None,
-    t0: float = 0.5,
+    area: float,
+    volume: float,
+    t0: float = ...,
+) -> AirborneInsulationResult
+
+airborne_insulation(
+    l1: Sequence[float] | np.ndarray,
+    l2: Sequence[float] | np.ndarray,
+    t2: Sequence[float] | np.ndarray,
+    *,
+    t0: float = ...,
 ) -> AirborneInsulationResult
 ```
 

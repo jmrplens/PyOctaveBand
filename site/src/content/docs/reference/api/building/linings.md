@@ -141,8 +141,14 @@ lining_resonance_frequency(
     base_mass_per_area: float,
     lining_mass_per_area: float,
     *,
-    dynamic_stiffness: float | None = None,
-    cavity_depth: float | None = None,
+    dynamic_stiffness: float,
+) -> float
+
+lining_resonance_frequency(
+    base_mass_per_area: float,
+    lining_mass_per_area: float,
+    *,
+    cavity_depth: float,
 ) -> float
 ```
 

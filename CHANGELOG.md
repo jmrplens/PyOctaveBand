@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The generated API reference publishes every call form a function has,
+  instead of the single permissive signature that accepts all of them.
+  `inspect.signature` returns the implementation signature, which for an
+  overloaded function is not one of its call forms: it is the union that
+  admits every head plus the combinations the heads exist to refuse, so the
+  site was documenting a contract the library rejects. `octave_filter` shows
+  what that cost: its page carried one signature returning
+  `tuple[...] | tuple[...] | tuple[...] | tuple[...]` with nothing to say
+  which combination of `sigbands` and `nominal` produced which, and it now
+  carries its four forms with the return type each one gives. Nineteen pages
+  change, covering the functions in the tree that declare overloads. Functions
+  that declare none render exactly as before.
+
 ### Fixed
 
 - `floating_floor_improvement_spectrum` refuses one half of the

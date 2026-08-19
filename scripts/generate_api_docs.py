@@ -40,7 +40,7 @@ import sys
 from collections.abc import Mapping
 from pathlib import Path
 from types import ModuleType
-from typing import Any
+from typing import Any, get_overloads
 
 from api_taxonomy import (
     OBJECT_MODULE_OVERRIDES,
@@ -595,11 +595,38 @@ def format_signature(
     drop_first: bool = False,
     omit_return: bool = False,
 ) -> str:
-    """Render ``name(params) -> ret`` from ``inspect.signature``.
+    """Render the call forms of ``obj``, one per ``typing.overload`` head.
+
+    A function that declares overloads has more than one way to be called, and
+    the implementation signature is not one of them: it is the permissive union
+    that accepts every head plus the combinations none of them allow. Publishing
+    only that would document a contract the library refuses, so every head is
+    rendered, separated by a blank line, the way a stub file shows them.
 
     Stringized annotations (PEP 563, the repo style) are emitted verbatim.
     Multi-line when the one-line form would be hard to read.
     """
+    heads = get_overloads(obj)
+    if heads:
+        return "\n\n".join(
+            _format_one_signature(
+                name, head, drop_first=drop_first, omit_return=omit_return
+            )
+            for head in heads
+        )
+    return _format_one_signature(
+        name, obj, drop_first=drop_first, omit_return=omit_return
+    )
+
+
+def _format_one_signature(
+    name: str,
+    obj: Any,
+    *,
+    drop_first: bool = False,
+    omit_return: bool = False,
+) -> str:
+    """Render a single ``name(params) -> ret`` from ``inspect.signature``."""
     signature = inspect.signature(obj)
     parameters = list(signature.parameters.values())
     if drop_first and parameters and parameters[0].name in ("self", "cls"):
@@ -659,7 +686,11 @@ def _format_parameter(parameter: inspect.Parameter) -> str:
     if annotated:
         text = f"{text}: {_format_annotation(parameter.annotation)}"
     if parameter.default is not inspect.Parameter.empty:
-        if type(parameter.default).__module__ not in ("builtins", "types"):
+        if parameter.default is Ellipsis:
+            # The placeholder an overload head uses for "whatever the
+            # implementation defaults to"; `repr` would print `Ellipsis`.
+            default = "..."
+        elif type(parameter.default).__module__ not in ("builtins", "types"):
             # Third-party reprs (numpy arrays) are not pinned, so a repr here
             # would make the drift gate hostage to dependency upgrades; the
             # parameter description documents the effective default.

@@ -18,13 +18,25 @@ The calibration reference recording looks unreliable.
 ```python
 sensitivity(
     ref_signal: list[float] | np.ndarray,
-    target_spl: float = 94.0,
-    ref_pressure: float = 2e-05,
-    fs: int | None = None,
-    validate: bool = True,
-    max_fluctuation_db: float | None = None,
-    frequency: float = 1000.0,
-    narrowband: bool = False,
+    target_spl: float = ...,
+    ref_pressure: float = ...,
+    *,
+    fs: int,
+    validate: bool = ...,
+    max_fluctuation_db: float | None = ...,
+    frequency: float = ...,
+    narrowband: Literal[True],
+) -> float
+
+sensitivity(
+    ref_signal: list[float] | np.ndarray,
+    target_spl: float = ...,
+    ref_pressure: float = ...,
+    fs: int | None = ...,
+    validate: bool = ...,
+    max_fluctuation_db: float | None = ...,
+    frequency: float = ...,
+    narrowband: Literal[False] = ...,
 ) -> float
 ```
 

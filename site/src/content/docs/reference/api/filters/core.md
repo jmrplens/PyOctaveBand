@@ -78,14 +78,62 @@ octave_filter(
     order: int = 6,
     limits: list[float] | None = None,
     *,
-    sigbands: bool = False,
+    sigbands: Literal[False] = False,
     detrend: bool = True,
     mode: str = 'rms',
-    nominal: bool = False,
+    nominal: Literal[False] = False,
     design: FilterDesign = ...,
     calibration: LevelCalibration = ...,
     response_plot: ResponsePlot = ...,
-) -> tuple[np.ndarray, list[float]] | tuple[np.ndarray, list[str]] | tuple[np.ndarray, list[float], list[np.ndarray]] | tuple[np.ndarray, list[str], list[np.ndarray]]
+) -> tuple[np.ndarray, list[float]]
+
+octave_filter(
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    fraction: float = 1,
+    order: int = 6,
+    limits: list[float] | None = None,
+    *,
+    sigbands: Literal[True] = True,
+    detrend: bool = True,
+    mode: str = 'rms',
+    nominal: Literal[False] = False,
+    design: FilterDesign = ...,
+    calibration: LevelCalibration = ...,
+    response_plot: ResponsePlot = ...,
+) -> tuple[np.ndarray, list[float], list[np.ndarray]]
+
+octave_filter(
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    fraction: float = 1,
+    order: int = 6,
+    limits: list[float] | None = None,
+    *,
+    sigbands: Literal[False] = False,
+    detrend: bool = True,
+    mode: str = 'rms',
+    nominal: Literal[True] = ...,
+    design: FilterDesign = ...,
+    calibration: LevelCalibration = ...,
+    response_plot: ResponsePlot = ...,
+) -> tuple[np.ndarray, list[str]]
+
+octave_filter(
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    fraction: float = 1,
+    order: int = 6,
+    limits: list[float] | None = None,
+    *,
+    sigbands: Literal[True] = True,
+    detrend: bool = True,
+    mode: str = 'rms',
+    nominal: Literal[True] = ...,
+    design: FilterDesign = ...,
+    calibration: LevelCalibration = ...,
+    response_plot: ResponsePlot = ...,
+) -> tuple[np.ndarray, list[str], list[np.ndarray]]
 ```
 
 Filter a signal with octave or fractional octave filter bank.
@@ -154,13 +202,83 @@ Initialize the Octave Filter Bank.
 ```python
 OctaveFilterBank.filter(
     x: Signal | list[float] | np.ndarray,
-    sigbands: bool = False,
+    sigbands: Literal[False] = False,
     mode: str = 'rms',
     detrend: bool = True,
-    calculate_level: bool = True,
-    nominal: bool = False,
+    calculate_level: Literal[True] = True,
+    nominal: Literal[False] = False,
     zero_phase: bool = False,
-) -> tuple[np.ndarray | None, list[float] | list[str]] | tuple[np.ndarray | None, list[float] | list[str], list[np.ndarray]]
+) -> tuple[np.ndarray, list[float]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[True],
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[True] = True,
+    nominal: Literal[False] = False,
+    zero_phase: bool = False,
+) -> tuple[np.ndarray, list[float], list[np.ndarray]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[False] = False,
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[False] = False,
+    nominal: Literal[False] = False,
+    zero_phase: bool = False,
+) -> tuple[None, list[float]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[True],
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[False] = False,
+    nominal: Literal[False] = False,
+    zero_phase: bool = False,
+) -> tuple[None, list[float], list[np.ndarray]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[False] = False,
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[True] = True,
+    nominal: Literal[True] = ...,
+    zero_phase: bool = False,
+) -> tuple[np.ndarray, list[str]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[True],
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[True] = True,
+    nominal: Literal[True] = ...,
+    zero_phase: bool = False,
+) -> tuple[np.ndarray, list[str], list[np.ndarray]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[False] = False,
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[False] = False,
+    nominal: Literal[True] = ...,
+    zero_phase: bool = False,
+) -> tuple[None, list[str]]
+
+OctaveFilterBank.filter(
+    x: Signal | list[float] | np.ndarray,
+    sigbands: Literal[True],
+    mode: str = 'rms',
+    detrend: bool = True,
+    calculate_level: Literal[False] = False,
+    nominal: Literal[True] = ...,
+    zero_phase: bool = False,
+) -> tuple[None, list[str], list[np.ndarray]]
 ```
 
 Apply the pre-designed filter bank to a signal.

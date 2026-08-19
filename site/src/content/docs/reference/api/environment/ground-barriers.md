@@ -344,11 +344,22 @@ ground_effect(
     receiver_height: float,
     distance: float,
     *,
-    impedance: ArrayLike | PorousMediumResult | None = None,
-    flow_resistivity: float | None = None,
-    model: Literal['delany_bazley', 'miki'] = 'delany_bazley',
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    impedance: ArrayLike | PorousMediumResult,
+    model: Literal['delany_bazley', 'miki'] = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SphericalGroundResult
+
+ground_effect(
+    frequencies: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+    distance: float,
+    *,
+    flow_resistivity: float,
+    model: Literal['delany_bazley', 'miki'] = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
 ) -> SphericalGroundResult
 ```
 
