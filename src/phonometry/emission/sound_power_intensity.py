@@ -39,10 +39,10 @@ normative):
 ``FpI`` is the surface pressure-intensity indicator (equivalent to ISO 9614-1
 ``F3`` for uniform-area segments, Note 14); ``F+/-`` the negative-partial-power
 indicator (equivalent to ISO 9614-1 ``F3-F2``, Note 15). Because Part 2 weights
-by segment area ``Si`` while :func:`phonometry.field_indicators` (ISO 9614-1)
-assumes equal-area positions, the indicators are computed directly here; only
-the dynamic-capability index :math:`L_\mathrm{d} = \delta_{pI0} - K` is shared with
-:func:`phonometry.dynamic_capability_index`.
+by segment area ``Si`` while :func:`phonometry.emission.field_indicators` (ISO
+9614-1) assumes equal-area positions, the indicators are computed directly
+here; only the dynamic-capability index :math:`L_\mathrm{d} = \delta_{pI0} - K`
+is shared with :func:`phonometry.emission.dynamic_capability_index`.
 
 Qualification criteria per band (Annex B), where ``K`` is 10 (engineering) or
 7 (survey) per Table 1, criterion 2 is mandatory for grade 2 and optional for

@@ -28,7 +28,7 @@ Two excitation families are implemented:
   IR and discarded by keeping only the causal part (B.5). To *analyse*
   those discarded products instead (per-order harmonic responses and
   THD(f) from the same recording), see
-  [`phonometry.swept_sine_distortion`](/phonometry/reference/api/electroacoustics/swept-sine/#swept_sine_distortion).
+  [`phonometry.electroacoustics.swept_sine_distortion`](/phonometry/reference/api/electroacoustics/swept-sine/#swept_sine_distortion).
 
 * **Maximum-length sequence (Annex A)** -- an order-`N` binary sequence of
   length $2^N - 1$ generated with a linear-feedback shift register
@@ -60,7 +60,7 @@ complete the family:
   noise-floor-matched, loudspeaker-equalizing, ...). See
   [`shaped_sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#shaped_sweep_signal); the recording is deconvolved with the
   ordinary spectral method of [`impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response), or post-equalized
-  with [`phonometry.regularized_inverse_filter`](/phonometry/reference/api/signals/inversion/#regularized_inverse_filter).
+  with [`phonometry.signals.regularized_inverse_filter`](/phonometry/reference/api/signals/inversion/#regularized_inverse_filter).
 
 The recovered IR is broadband; ISO 18233 6.3.2 requires subsequent
 fractional-octave-band weighting (IEC 61260) before computing levels or
@@ -216,9 +216,11 @@ or `"mls"`).
 The object is a drop-in replacement for the raw array it used to be: it
 implements `__array__`, so `np.asarray(result)` yields the IR and
 the result can be passed straight to array consumers such as
-[`phonometry.room_parameters`](/phonometry/reference/api/rooms/acoustics/#room_parameters), [`phonometry.decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve) and
-[`phonometry.sti_from_impulse_response`](/phonometry/reference/api/speech/sti/#sti_from_impulse_response). Indexing, `len(result)`
-and the `size`/`ndim`/`shape`/`dtype` attributes forward to `ir`.
+[`phonometry.room.room_parameters`](/phonometry/reference/api/rooms/acoustics/#room_parameters),
+[`phonometry.room.decay_curve`](/phonometry/reference/api/rooms/acoustics/#decay_curve) and
+[`phonometry.speech.sti_from_impulse_response`](/phonometry/reference/api/speech/sti/#sti_from_impulse_response). Indexing,
+`len(result)` and the `size`/`ndim`/`shape`/`dtype` attributes
+forward to `ir`. 
 
 ### ImpulseResponseResult.dtype
 
@@ -381,10 +383,11 @@ plot_excitation(
 Plot an ISO 18233 excitation signal (sweep or MLS).
 
 A documented helper for the raw arrays returned by
-[`sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) and [`mls_signal`](/phonometry/reference/api/rooms/impulse-response/#mls_signal), which
-stay plain `numpy.ndarray` (they are meant for playback). For a
-swept sine the waveform and its spectrogram are drawn; for an MLS the first
-samples of the bipolar sequence and its (flat) magnitude spectrum.
+[`sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) and
+[`mls_signal`](/phonometry/reference/api/rooms/impulse-response/#mls_signal), which stay plain
+`numpy.ndarray` (they are meant for playback). For a swept sine the
+waveform and its spectrogram are drawn; for an MLS the first samples of the
+bipolar sequence and its (flat) magnitude spectrum.
 
 **Parameters**
 

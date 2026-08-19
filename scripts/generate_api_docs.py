@@ -2,7 +2,7 @@
 """
 Generate the Starlight API reference from the phonometry docstrings.
 
-Renders every name in ``phonometry.__all__`` as committed Markdown pages under
+Renders every public name as committed Markdown pages under
 ``site/src/content/docs/reference/api/`` (one page per public module, grouped
 by the sections in ``scripts/api_taxonomy.py``) plus the sidebar fragment
 ``site/src/generated/api-sidebar.mjs``. English only by decision; Spanish
@@ -47,9 +47,8 @@ from api_taxonomy import (
     SECTIONS,
     Section,
     module_section,
+    public_names,
 )
-
-import phonometry
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = ROOT / "site" / "src" / "content" / "docs" / "reference" / "api"
@@ -776,13 +775,12 @@ def _type_name(obj: object) -> str:
 def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:
     """Introspect phonometry into pages, the xref map and parse issues."""
     issues: list[str] = []
-    names: list[str] = list(phonometry.__all__)
-    if len(names) != len(set(names)):
-        raise ValueError("phonometry.__all__ contains duplicate names")
+    owners = public_names()
+    names: list[str] = sorted(owners)
 
     by_module: dict[str, list[str]] = {}
     for name in names:
-        module = attribute_module(name, getattr(phonometry, name))
+        module = attribute_module(name, getattr(owners[name], name))
         module_section(module)  # fails loudly for unmapped modules
         by_module.setdefault(module, []).append(name)
 
@@ -798,7 +796,7 @@ def build_model() -> tuple[list[ModuleDoc], dict[str, str], list[str]]:
     for section in SECTIONS.values():
         for module_name in section.modules:
             page = _build_page(
-                module_name, section, by_module[module_name], issues
+                module_name, section, by_module[module_name], issues, owners
             )
             pages.append(page)
             xref[module_name] = page.url
@@ -838,6 +836,7 @@ def _build_page(
     section: Section,
     names: list[str],
     issues: list[str],
+    owners: Mapping[str, ModuleType],
 ) -> ModuleDoc:
     top_level = module_name == "phonometry"
     module = importlib.import_module(module_name)
@@ -849,7 +848,7 @@ def _build_page(
     slugger = _Slugger()
     members: list[MemberDoc] = []
     for name in _sorted_names(names):
-        obj = getattr(phonometry, name)
+        obj = getattr(owners[name], name)
         anchor = slugger.slug(name)
         if inspect.isclass(obj):
             # Warning/exception classes inherit object.__init__; a signature

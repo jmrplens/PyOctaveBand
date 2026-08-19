@@ -214,7 +214,7 @@ def read(path: str | Path, *, calibration_factor: float | None = None) -> Signal
     :param path: The file to read.
     :param calibration_factor: Digital-to-pascal multiplier to attach to
         the returned signal when the calibration is known (typically from
-        :func:`phonometry.sensitivity` on a calibrator recording read
+        :func:`phonometry.metrology.sensitivity` on a calibrator recording read
         through this same function). ``None`` (the default) takes the
         sidecar's factor when a sidecar exists, and otherwise leaves the
         signal in digital full-scale units.

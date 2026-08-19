@@ -5,8 +5,11 @@ The hand-written table in ``docs/reference/api/index.md`` is the quick reference
 the GitHub/PyPI audience; the authoritative, generated reference lives on the
 site (``make api-docs``). Being curated, the table can silently miss a newly
 exported name. This gate closes that gap: it parses every backticked name in
-the first column of the file's tables and fails when a ``phonometry.__all__``
-name has no row.
+the first column of the file's tables and fails when a public name has no row.
+Public means what the library publishes since 4.0: the union of the domain
+packages' ``__all__`` plus the four names the top level holds itself. Reading
+``phonometry.__all__`` instead would see the twenty-three names the top level
+publishes and call the other thirteen hundred private.
 
 Extra rows are fine and expected: methods (``OctaveFilterBank.spectrogram``),
 namespace subpackages (``phonometry.metrology``) and convention entries
@@ -33,6 +36,8 @@ from __future__ import annotations
 import pathlib
 import re
 import sys
+
+from api_taxonomy import public_names
 
 #: A backticked name inside a table cell, e.g. ```leq``` or ```.plot()```.
 _BACKTICKED = re.compile(r"`([^`]+)`")
@@ -66,7 +71,7 @@ def missing_names(markdown: str, public: list[str]) -> list[str]:
     """Public names without a table row, in ``__all__`` order.
 
     :param markdown: The ``docs/reference/api/index.md`` source.
-    :param public: ``phonometry.__all__``.
+    :param public: Every public name (see :func:`api_taxonomy.public_names`).
     """
     documented = table_names(markdown)
     return [name for name in public if name not in documented]
@@ -96,16 +101,17 @@ def main() -> int:
     """Run the gate against the working tree. Returns the exit status."""
     import phonometry
 
+    public = sorted(public_names())
     path = (
         pathlib.Path(__file__).resolve().parent.parent
         / "docs" / "reference" / "api" / "index.md"
     )
     markdown = path.read_text(encoding="utf-8")
-    missing = missing_names(markdown, list(phonometry.__all__))
+    missing = missing_names(markdown, public)
     if missing:
         print(
             f"docs/reference/api/index.md is missing {len(missing)} public "
-            "name(s) from phonometry.__all__:"
+            "name(s):"
         )
         for name in missing:
             print(f"  - {name}")
@@ -122,8 +128,7 @@ def main() -> int:
         print("Update the __version__ row's example to the current version.")
         return 1
     print(
-        "docs/reference/api/index.md covers all "
-        f"{len(phonometry.__all__)} phonometry.__all__ names "
+        f"docs/reference/api/index.md covers all {len(public)} public names "
         f"and shows version {phonometry.__version__}."
     )
     return 0

@@ -24,17 +24,14 @@ with the reference acceleration $a_0 = 10^{-6}$ m/s², i.e.
 $L_a = 10 \log_{10}(\overline{a^2}/a_0^2)$.
 
 **Background correction (Formula (2)).** Each measured level `L'` is
-corrected
-against the background `Lb` per accelerometer position, by the margin
-$L' - L_\mathrm{b}$: unchanged for $\ge 15$ dB; energy subtraction
-$10 \log_{10}(10^{L'/10} - 10^{L_\mathrm{b}/10})$ for
-$6 \le \mathrm{margin} < 15$ dB; and the fixed
-$L' - 1.3$ dB limit for $< 6$ dB. Bands hitting the 1.3 dB limit
-are flagged
-as the *limit of measurement* (reported as $> \Delta L$). This differs
-from the ISO
-10140-4 correction ([`phonometry.background_correction`](/phonometry/reference/api/building/lab-insulation/#background_correction)) only at exactly
-$\mathrm{margin} = 6$ dB.
+corrected against the background `Lb` per accelerometer position, by the
+margin $L' - L_\mathrm{b}$: unchanged for $\ge 15$ dB; energy
+subtraction $10 \log_{10}(10^{L'/10} - 10^{L_\mathrm{b}/10})$ for
+$6 \le \mathrm{margin} < 15$ dB; and the fixed $L' - 1.3$ dB limit
+for $< 6$ dB. Bands hitting the 1.3 dB limit are flagged as the *limit of
+measurement* (reported as $> \Delta L$). This differs from the ISO
+10140-4 correction ([`phonometry.building.background_correction`](/phonometry/reference/api/building/lab-insulation/#background_correction)) only at
+exactly $\mathrm{margin} = 6$ dB.
 
 **Improvement (Formulae (3)/(4)).** The per-position difference is
 $\Delta L_{t,a} = L_{0,t,a} - L_{1,t,a}$ (0 = bare plate, 1 = specimen)
@@ -47,13 +44,13 @@ $\Delta L_\mathrm{oct} = -10 \log_{10}[(1/3) \sum 10^{-\Delta L_j/10}]$ dB from
 the three one-third-octave values in each octave.
 
 **Weighted improvement.** `ΔLw` is the ISO 717-2 weighted reduction of impact
-sound pressure level (Clause 6.5), computed with the heavyweight reference floor
-via [`phonometry.weighted_impact_improvement`](/phonometry/reference/api/building/ratings/#weighted_impact_improvement) on the 16 rating bands
-100 Hz to 3150 Hz; a wider clause 6.3 spectrum (18 bands 100-5000 Hz,
-optionally extended to 50 Hz) is rated on that sub-range. The statement of
-results (Clause 8 e)) also carries the spectrum adaptation term `CI,Δ`
-(ISO 717-2:2020 Formula (A.4)) via
-[`phonometry.impact_improvement_adaptation_term`](/phonometry/reference/api/building/ratings/#impact_improvement_adaptation_term).
+sound pressure level (Clause 6.5), computed with the heavyweight reference
+floor via [`phonometry.building.weighted_impact_improvement`](/phonometry/reference/api/building/ratings/#weighted_impact_improvement) on the 16
+rating bands 100 Hz to 3150 Hz; a wider clause 6.3 spectrum (18 bands 100-5000
+Hz, optionally extended to 50 Hz) is rated on that sub-range. The statement of
+results (Clause 8 e)) also carries the spectrum adaptation term `CI,Δ` (ISO
+717-2:2020 Formula (A.4)) via
+[`phonometry.building.impact_improvement_adaptation_term`](/phonometry/reference/api/building/ratings/#impact_improvement_adaptation_term). 
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

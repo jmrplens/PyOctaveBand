@@ -33,6 +33,8 @@ still exist (see ``scripts/generate_api_docs.py``).
 from __future__ import annotations
 
 import dataclasses
+import inspect
+from types import ModuleType
 
 
 @dataclasses.dataclass(frozen=True)
@@ -506,3 +508,43 @@ def _build_module_index() -> dict[str, Section]:
 
 
 _MODULE_TO_SECTION: dict[str, Section] = _build_module_index()
+
+
+def public_names() -> dict[str, ModuleType]:
+    """Every public name in the library, mapped to the package that owns it.
+
+    Since 4.0 the top level publishes the nineteen domain packages and the
+    four names that belong to no domain, and a function is reached through its
+    package. "The public API" is therefore the union of the domain ``__all__``
+    plus those four, which is what the coverage gate walks and what the
+    generator renders. Reading ``phonometry.__all__`` instead would now see
+    twenty-three names and call the other thirteen hundred private.
+
+    The value is the module to read the name off, which is the owning package
+    for a domain name and ``phonometry`` itself for the four at the top.
+    """
+    import phonometry
+
+    packages = [
+        getattr(phonometry, name) for name in phonometry.__all__
+        if inspect.ismodule(getattr(phonometry, name))
+    ]
+    owners: dict[str, ModuleType] = {}
+    for package in packages:
+        for member in getattr(package, "__all__", ()):
+            previous = owners.get(member)
+            if previous is not None:
+                raise ValueError(
+                    f"{member!r} is published by both {previous.__name__} and "
+                    f"{package.__name__}; one name, one owner"
+                )
+            owners[member] = package
+    # The names the top level holds itself, which is every one it publishes
+    # that no package does. `Signal` is not among them: it is published at the
+    # top level and by `phonometry.io`, which owns it, and the top-level
+    # re-export is a shortcut to the same object.
+    for name in phonometry.__all__:
+        attribute = getattr(phonometry, name)
+        if not inspect.ismodule(attribute) and name not in owners:
+            owners[name] = phonometry
+    return owners

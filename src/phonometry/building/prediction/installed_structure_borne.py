@@ -751,8 +751,8 @@ def tapping_machine_coupling_term(
     :param receiver_mobility: Real mobility ``Y_i`` of the supporting element,
         in m/(N.s) (> 0).
     :param hammer_mass: Source mass ``M``, in kilograms (Default:
-        :data:`~phonometry.TAPPING_HAMMER_MASS`, the 0,5 kg of clause D.1.3
-        and ISO 10140-5).
+        :data:`~phonometry.building.TAPPING_HAMMER_MASS`, the 0,5 kg of clause
+        D.1.3 and ISO 10140-5).
     :return: The coupling term ``D_C,i``, in dB.
     :raises ValueError: for a non-positive frequency, mobility or mass.
     """

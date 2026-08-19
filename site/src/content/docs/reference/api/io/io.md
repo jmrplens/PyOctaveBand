@@ -306,7 +306,7 @@ derived from the file's channel mask.
 | Name | Description |
 | :--- | :--- |
 | `path` | The file to read. |
-| `calibration_factor` | Digital-to-pascal multiplier to attach to the returned signal when the calibration is known (typically from [`phonometry.sensitivity`](/phonometry/reference/api/metrology/calibration/#sensitivity) on a calibrator recording read through this same function). `None` (the default) takes the sidecar's factor when a sidecar exists, and otherwise leaves the signal in digital full-scale units. |
+| `calibration_factor` | Digital-to-pascal multiplier to attach to the returned signal when the calibration is known (typically from [`phonometry.metrology.sensitivity`](/phonometry/reference/api/metrology/calibration/#sensitivity) on a calibrator recording read through this same function). `None` (the default) takes the sidecar's factor when a sidecar exists, and otherwise leaves the signal in digital full-scale units. |
 
 **Returns:** The signal with its metadata.
 

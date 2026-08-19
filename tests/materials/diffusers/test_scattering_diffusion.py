@@ -711,9 +711,9 @@ def test_public_names_in_module_all() -> None:
 
 
 def test_public_exports() -> None:
-    import phonometry
     import phonometry.materials.diffusers.reverberation_room_scattering as part1
     import phonometry.materials.diffusers.scattering_diffusion as part2
+    from phonometry import materials
 
     for name in (*part1.__all__, *part2.__all__):
-        assert hasattr(phonometry, name), name
+        assert hasattr(materials, name), name

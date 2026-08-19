@@ -27,7 +27,7 @@ phase.
 Sampling precautions (documented, and the reason for the ``oversample``
 padding): the estimate operates on a *uniformly sampled* one-sided response
 (DC to Nyquist inclusive, the layout of ``numpy.fft.rfft`` and of
-:func:`phonometry.impulse_response` spectra). The real cepstrum of the
+:func:`phonometry.room.impulse_response` spectra). The real cepstrum of the
 sampled log-magnitude is time-aliased when the grid is coarse relative to
 how sharp the response is, so the magnitude is resampled onto an
 ``oversample`` times denser grid by exact trigonometric (zero-padded

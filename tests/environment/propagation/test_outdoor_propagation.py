@@ -499,7 +499,7 @@ class TestInputValidation:
 
 
 def test_public_exports() -> None:
-    import phonometry
+    from phonometry import environment
 
     for name in (
         "Barrier", "OutdoorAttenuation", "outdoor_propagation_attenuation",
@@ -510,4 +510,4 @@ def test_public_exports() -> None:
         "PropagationGeometry", "GroundFactors", "AtmosphericConditions",
         "DirectivityCorrection",
     ):
-        assert hasattr(phonometry, name), name
+        assert hasattr(environment, name), name

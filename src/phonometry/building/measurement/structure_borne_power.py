@@ -162,7 +162,7 @@ def structure_borne_power_level(
         :func:`equivalent_blocked_force_level` (Formula 15) and
         :func:`characteristic_reception_plate_power` (Formula 17), then apply
         the EN 12354-5 Annex I mobility correction
-        (:func:`phonometry.installed_power_from_reception_plate`).
+        (:func:`phonometry.building.installed_power_from_reception_plate`).
 
     :param velocity_level: Spatial mean plate velocity level ``L_v`` (scalar or
         per band), in dB re ``v0``.
@@ -391,15 +391,13 @@ def characteristic_reception_plate_power(
 ) -> np.ndarray:
     r"""Characteristic reception-plate power level (EN 15657:2018, Formula 17).
 
-    :math:`L_{Wsn} = L_{F\mathrm{b,eq}} + 10 \log_{10}(|Y_{R,\infty,low}|/Y_0)` with the
-    characteristic
-    mobility of the standard 10 cm concrete reception plate
-    :math:`Y_{R,\infty,low} = 5 \cdot 10^{-6}` m/(N.s) (clause 7.2.4) and
-    :math:`Y_0 = 1` m/(N.s).
-    This is the plate-independent source power level ``L_Ws,n`` that
-    EN 12354-5 consumes (its Annex I mobility correction
-    :func:`phonometry.installed_power_from_reception_plate` then refers it to
-    the actual receiver).
+    :math:`L_{Wsn} = L_{F\mathrm{b,eq}} + 10 \log_{10}(|Y_{R,\infty,low}|/Y_0)`
+    with the characteristic mobility of the standard 10 cm concrete reception
+    plate :math:`Y_{R,\infty,low} = 5 \cdot 10^{-6}` m/(N.s) (clause 7.2.4) and
+    :math:`Y_0 = 1` m/(N.s). This is the plate-independent source power level
+    ``L_Ws,n`` that EN 12354-5 consumes (its Annex I mobility correction
+    :func:`phonometry.building.installed_power_from_reception_plate` then
+    refers it to the actual receiver).
 
     :param blocked_force_level: Equivalent blocked force level ``L_Fb,eq``
         (per band), in dB re 1e-6 N (see

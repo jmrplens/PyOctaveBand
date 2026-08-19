@@ -474,10 +474,12 @@ def expanded_uncertainty(
     .. note::
 
        Three domains define an expanded uncertainty over their own coverage
-       factors, so the package top level qualifies each of them: this one is
-       ``phonometry.environmental_expanded_uncertainty``, the building one is
-       :func:`~phonometry.insulation_expanded_uncertainty`. Inside
-       ``phonometry.environment`` the plain name is unambiguous and stays.
+       factors, and each is reached through its own package: this one is
+       ``environment.expanded_uncertainty``, the building one is
+       :func:`~phonometry.building.insulation_expanded_uncertainty`. Until 4.0
+       the flat top level had to rename this one to
+       ``environmental_expanded_uncertainty`` to tell them apart, which is the
+       clearest thing the flat namespace cost.
 
     :param standard_uncertainty: Combined standard uncertainty ``u``, in dB.
     :param confidence: Coverage probability (0.95 or 0.80).

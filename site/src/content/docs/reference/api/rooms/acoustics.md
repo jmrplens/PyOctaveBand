@@ -69,7 +69,7 @@ integrated impulse response, Clause 6).
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response) (ISO 18233). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: the curve is normalised to 0 dB at its start, so a factor on the record moves neither the levels nor the decay times read off them. |
+| `ir` | Measured impulse response (1D), e.g. from [`phonometry.room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/) (ISO 18233). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: the curve is normalised to 0 dB at its start, so a factor on the record moves neither the levels nor the decay times read off them. |
 | `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `band` | Optional band centre frequency in Hz. When given, the impulse response is first filtered with the matching IEC 61260 fractional-octave filter; when None the broadband response is integrated directly. |
 | `fraction` | Bandwidth fraction of the band filter (1 = octave, 3 = one-third octave). Only used when `band` is not None. |

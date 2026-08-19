@@ -17,11 +17,11 @@ P = \rho_0 c_0 S \langle v^2 \rangle \sigma
 $$
 
 so `sigma` is exactly the radiation factor `epsilon` that
-[`phonometry.sound_power_from_vibration`](/phonometry/reference/api/power/vibration-sound-power/#sound_power_from_vibration) (ISO/TS 7849) otherwise takes as a
-measured input: this module predicts it from the plate geometry and its
-coincidence (critical) frequency, closing the ISO 7849 chain without a power
-measurement, and it supplies the *resonant* transmission path of the single- and
-double-leaf sound-reduction-index predictions in
+[`phonometry.emission.sound_power_from_vibration`](/phonometry/reference/api/power/vibration-sound-power/#sound_power_from_vibration) (ISO/TS 7849) otherwise
+takes as a measured input: this module predicts it from the plate geometry and
+its coincidence (critical) frequency, closing the ISO 7849 chain without a
+power measurement, and it supplies the *resonant* transmission path of the
+single- and double-leaf sound-reduction-index predictions in
 [`phonometry.building.prediction.panel_transmission`](/phonometry/reference/api/building/panel-transmission/).
 
 **Coincidence (critical) frequency (Hopkins Eq. 2.201).** Below it the free

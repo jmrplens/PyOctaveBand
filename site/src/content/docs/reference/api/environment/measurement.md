@@ -128,10 +128,14 @@ above 500 Hz.
 | :--- | :--- |
 | ValueError | If `centre_frequency` is not positive/finite. |
 
-## environmental_expanded_uncertainty
+## EnvironmentalMeasurementWarning
+
+Warning for unreliable environmental-noise determinations.
+
+## expanded_uncertainty
 
 ```python
-environmental_expanded_uncertainty(
+expanded_uncertainty(
     standard_uncertainty: float,
     *,
     confidence: float = 0.95,
@@ -144,10 +148,12 @@ Coverage factor $k = 2$ for 95 % or $k = 1.3$ for 80 %.
 
 :::note
 Three domains define an expanded uncertainty over their own coverage
-factors, so the package top level qualifies each of them: this one is
-`phonometry.environmental_expanded_uncertainty`, the building one is
-[`insulation_expanded_uncertainty`](/phonometry/reference/api/building/uncertainty/#insulation_expanded_uncertainty). Inside
-`phonometry.environment` the plain name is unambiguous and stays.
+factors, and each is reached through its own package: this one is
+`environment.expanded_uncertainty`, the building one is
+[`insulation_expanded_uncertainty`](/phonometry/reference/api/building/uncertainty/#insulation_expanded_uncertainty). Until 4.0
+the flat top level had to rename this one to
+`environmental_expanded_uncertainty` to tell them apart, which is the
+clearest thing the flat namespace cost.
 :::
 
 **Parameters**
@@ -164,10 +170,6 @@ factors, so the package top level qualifies each of them: this one is
 | Exception | When |
 | :--- | :--- |
 | ValueError | If `u` is negative/non-finite or `confidence` is not one of the tabulated values. |
-
-## EnvironmentalMeasurementWarning
-
-Warning for unreliable environmental-noise determinations.
 
 ## gaussian_residual_level
 

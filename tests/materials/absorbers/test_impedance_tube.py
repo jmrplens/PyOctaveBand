@@ -710,7 +710,7 @@ def test_transfer_matrix_retains_measurement_context() -> None:
 
 
 def test_public_exports() -> None:
-    import phonometry
+    from phonometry import materials
 
     for name in (
         "ImpedanceTubeResult", "ImpedanceTubeWarning", "TransferMatrix",
@@ -727,4 +727,4 @@ def test_public_exports() -> None:
         "transfer_matrix_two_load", "transfer_matrix_one_load",
         "air_layer_transfer_matrix",
     ):
-        assert hasattr(phonometry, name), name
+        assert hasattr(materials, name), name

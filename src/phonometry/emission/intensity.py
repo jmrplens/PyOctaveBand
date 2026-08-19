@@ -390,7 +390,7 @@ def sound_intensity(
     :math:`(p_1 + p_2)/2` at the probe reference point. When ``fraction`` is
     given, both quantities are integrated into octave (1) or one-third
     octave (3) bands using the ANSI S1.11/IEC 61260-1 band edges of
-    :func:`phonometry.nominal_frequencies`; bands without any spectral
+    :func:`phonometry.filters.nominal_frequencies`; bands without any spectral
     bin are dropped. Broadband totals are always computed (over
     ``limits`` when provided, otherwise over all positive frequencies).
 
@@ -423,7 +423,7 @@ def sound_intensity(
     :param fraction: ``None`` (broadband only), 1 (octave bands) or
         3 (one-third octave bands).
     :param limits: [f_min, f_max] band limits in Hz (default
-        [12, 20000], as in :func:`phonometry.nominal_frequencies`).
+        [12, 20000], as in :func:`phonometry.filters.nominal_frequencies`).
     :param bias_correct: If True, apply the per-bin finite-difference
         correction :math:`(k \Delta r)/\sin(k \Delta r)` (IEC 61043:1993,
         7.3) to the

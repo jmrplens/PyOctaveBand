@@ -8,8 +8,8 @@ element sound reduction index ``R`` as a *measured* input, this module
 **predicts** ``R(f)`` from the physical properties of the construction: the mass
 per unit area, bending stiffness (through the coincidence frequency) and loss
 factor. The prediction feeds the same ISO 717-1 weighting
-(:func:`phonometry.weighted_rating`) as the measured quantities, closing the
-chain from panel physics to the single-number ``Rw``.
+(:func:`phonometry.building.weighted_rating`) as the measured quantities,
+closing the chain from panel physics to the single-number ``Rw``.
 
 **Mass law (Bies Eq. 7.40/7.42).** A non-stiff panel transmits by forced motion;
 the transmission coefficient of an infinite limp panel gives the normal- and
@@ -281,11 +281,12 @@ class SoundReductionResult:
     def rating(self, bands: str | None = None) -> WeightedRatingResult:
         """Single-number weighted rating ``Rw`` of the predicted ``R(f)``.
 
-        Delegates to :func:`phonometry.weighted_rating` (ISO 717-1); requires
-        the spectrum to be on the 16 one-third-octave bands (100 Hz to
+        Delegates to :func:`phonometry.building.weighted_rating` (ISO 717-1);
+        requires the spectrum to be on the 16 one-third-octave bands (100 Hz to
         3150 Hz) or the 5 octave bands (125 Hz to 2000 Hz).
 
-        :param bands: Band set forwarded to :func:`phonometry.weighted_rating`.
+        :param bands: Band set forwarded to
+            :func:`phonometry.building.weighted_rating`.
         :return: The :class:`~phonometry.building.measurement.insulation.WeightedRatingResult`.
         """
         from ..measurement.insulation import weighted_rating
@@ -1168,8 +1169,8 @@ def mass_spring_mass_resonance(
     masonry cavity wall, resilient mounts under a floating floor) acts as a
     spring **in parallel** with the cavity, adding :math:`N k / S` to ``s''``
     (Hopkins Eq. 4.89). Pass that term as *tie_stiffness_per_area*; the helper
-    :func:`phonometry.wall_tie_stiffness_per_area` builds it from a tie density
-    and Hopkins' Table A4.
+    :func:`phonometry.building.wall_tie_stiffness_per_area` builds it from a
+    tie density and Hopkins' Table A4.
 
     :param mass1: Surface density of leaf 1 ``m1``, in kg/m^2 (> 0).
     :param mass2: Surface density of leaf 2 ``m2``, in kg/m^2 (> 0).
@@ -1227,7 +1228,7 @@ def double_wall_transmission_loss(
     Ties or mounts bridging the cavity stiffen it (Hopkins Eq. 4.89), pushing
     ``f0`` up and extending the combined-mass branch; pass their stiffness per
     unit area as *tie_stiffness_per_area* (see
-    :func:`phonometry.wall_tie_stiffness_per_area`).
+    :func:`phonometry.building.wall_tie_stiffness_per_area`).
 
     :param frequency: Band centre frequencies ``f``, in hertz (array, > 0).
     :param mass1: Surface density of leaf 1 ``m1``, in kg/m^2 (> 0).

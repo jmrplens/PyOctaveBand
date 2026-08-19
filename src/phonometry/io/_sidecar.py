@@ -39,7 +39,7 @@ Key                     Meaning
                         forensics; never used to gate reading.
 ``calibration_factor``  The digital-to-pascal multiplier (0 dBFS = RMS
                         1.0 convention of ``signals.levels``), as derived
-                        by :func:`phonometry.sensitivity` from a
+                        by :func:`phonometry.metrology.sensitivity` from a
                         calibrator recording read through the same reader.
                         Required, finite and positive.
 ``reference_spl``       The calibrator's known SPL the factor was derived

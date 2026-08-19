@@ -459,7 +459,7 @@ def decay_curve(
     integrated impulse response, Clause 6).
 
     :param ir: Measured impulse response (1D), e.g. from
-        :func:`phonometry.impulse_response` (ISO 18233). Accepts a
+        :func:`phonometry.room.impulse_response` (ISO 18233). Accepts a
         :class:`phonometry.io.Signal`, whose calibration is applied to the
         samples and then cancels: the curve is normalised to 0 dB at its
         start, so a factor on the record moves neither the levels nor the

@@ -322,18 +322,17 @@ def test_sonar_configuration_names_files_that_exist() -> None:
     assert not missing, f"sonar-project.properties names missing files: {missing}"
 
 
-#: Public names that live on the package top level and nowhere else, because
-#: they belong to no single domain. Everything else the root publishes must be
-#: reachable from the domain that owns it: the root re-export is a shortcut,
-#: not a name's home. ``environmental_expanded_uncertainty`` is the exception
-#: that proves it, a rename that exists only so two domains can both spell
-#: their expanded uncertainty in one flat namespace.
+#: The names the top level holds itself, because they belong to no single
+#: domain. Everything else it publishes is a domain package, and every function
+#: and class lives in the package that owns it. ``Signal`` is the one name in
+#: both places: ``phonometry.io`` owns it and the top level re-exports it,
+#: because it is the type every package that takes measured audio accepts.
 ROOT_ONLY: frozenset[str] = frozenset(
     {
         "PhonometryWarning",
         "ReportMetadata",
+        "Signal",
         "__version__",
-        "environmental_expanded_uncertainty",
     }
 )
 
@@ -362,7 +361,9 @@ def test_every_public_name_is_reachable_from_its_domain() -> None:
         for name in getattr(getattr(phonometry, domain), "__all__", ()):
             published.setdefault(name, []).append(domain)
 
-    orphans = sorted(set(phonometry.__all__) - set(published) - ROOT_ONLY)
+    orphans = sorted(
+        set(phonometry.__all__) - set(published) - ROOT_ONLY - domains
+    )
     assert not orphans, (
         "public names the root publishes and no domain package does: "
         f"{orphans}. Export each from the package that owns it, or add it to "
