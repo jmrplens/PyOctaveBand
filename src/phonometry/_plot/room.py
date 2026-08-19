@@ -510,14 +510,17 @@ def plot_reverberation_models(
         ("Arau-Puchades", result.arau_puchades, _C_PRIMARY, "o", 2.4),
     )
     for label, curve, color, marker, lw in styles:
-        kwargs.setdefault("label", label)
+        # A copy per curve: `setdefault` mutates, so one before the loop would
+        # give every model the first one's name.
+        model_kwargs = dict(kwargs)
+        model_kwargs.setdefault("label", label)
         ax.plot(
             freq,
             np.asarray(curve, dtype=np.float64),
             color=color,
             marker=marker,
             lw=lw,
-            **kwargs,
+            **model_kwargs,
         )
     _freq_axis(ax, freq, language=language)
     ax.set_ylabel(_t(_REVERBERATION_TIME_LABEL, language))
@@ -975,9 +978,10 @@ def plot_room_modes(
         if not np.any(mask):
             continue
         row = rows[kind]
-        kwargs.setdefault("label", _t(kind, language))
+        kind_kwargs = dict(kwargs)
+        kind_kwargs.setdefault("label", _t(kind, language))
         ladder.vlines(freqs[mask], row - 0.35, row + 0.35, color=colors[kind],
-                      lw=1.2, **kwargs)
+                      lw=1.2, **kind_kwargs)
     ladder.set_ylim(0.4, 4.1)
     order = ("oblique", "tangential", "axial")
     ladder.set_yticks([rows[k] for k in order])
@@ -1045,11 +1049,12 @@ def plot_crowd_noise(
     levels = np.asarray(result.levels, dtype=np.float64)
     palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED)
     for row, (area, curve) in enumerate(zip(result.absorption_areas, levels)):
-        kwargs.setdefault("label", _t(_ABSORPTION_AREA_LABEL, language).format(
+        area_kwargs = dict(kwargs)
+        area_kwargs.setdefault("label", _t(_ABSORPTION_AREA_LABEL, language).format(
                 value=format_number(float(area), language, decimals=0)))
         ax.plot(
             n, curve, color=palette[row % len(palette)], lw=1.8,
-            **kwargs,
+            **area_kwargs,
         )
     ax.axhline(
         result.signal_level, color=_C_EDGE, ls="--", lw=1.3,
