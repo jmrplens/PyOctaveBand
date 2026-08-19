@@ -65,7 +65,7 @@ def _tone(seconds: float = 1.0, seed: int = 0) -> np.ndarray:
 def _modulated(seconds: float = 1.0) -> np.ndarray:
     """A 70 Hz amplitude modulation, where the roughness model reads a maximum.
 
-    A steady tone has no roughness at all, so it would report 0.000 vacil
+    A steady tone has no roughness at all, so it would report 0.000 asper
     whatever the calibration, and could not tell a model that reads the
     factor from one that ignores it.
     """
@@ -197,6 +197,39 @@ def test_an_explicit_factor_wins_over_the_objects(func, kwargs) -> None:
         **kwargs,
     )
     assert_same(explicit, func(2.0 * record, FS, **kwargs))
+
+
+def test_a_two_channel_signal_is_split_after_the_factor_is_applied() -> None:
+    """The one model here that takes two ears, so the split has to see pascals.
+
+    ``loudness_moore_glasberg_time`` divides the record into left and right
+    before running either ear. Applying the factor after that split, or not
+    at all, would report a binaural loudness for a sound at the wrong level.
+    """
+    left, right = _tone(seed=1), _tone(seed=2)
+    stereo = np.stack([left, right])
+    assert_same(
+        loudness_moore_glasberg_time(Signal(stereo, FS, calibration_factor=CAL)),
+        loudness_moore_glasberg_time(CAL * stereo, FS),
+    )
+    mono = loudness_moore_glasberg_time(Signal(left, FS, calibration_factor=CAL))
+    binaural = loudness_moore_glasberg_time(
+        Signal(np.stack([left, left]), FS, calibration_factor=CAL)
+    )
+    assert_same(mono, binaural)
+
+
+def test_a_non_positive_explicit_factor_is_refused() -> None:
+    """The convenience applies the factor itself, so it has to check it itself.
+
+    It scales the record and hands the result to ``loudness_zwicker`` with
+    no factor, so the check that function performs never sees the explicit
+    one. Measured before this refusal existed: a factor of 0.0 silenced the
+    signal and reported an annoyance of 0.0.
+    """
+    for bad in (0.0, -1.0):
+        with pytest.raises(ValueError, match="calibration_factor"):
+            psychoacoustic_annoyance_from_signal(_TONE, FS, calibration_factor=bad)
 
 
 def test_a_bare_array_with_no_factor_is_still_read_as_pascals() -> None:

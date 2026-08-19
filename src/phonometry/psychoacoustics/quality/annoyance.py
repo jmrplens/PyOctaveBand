@@ -48,8 +48,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
-from ...io._resolve import resolve_calibration, resolve_fs
-from ...io._signal import Signal
+from ..._internal.validation import require_positive
+from ...io._resolve import SignalInput, resolve_calibration, resolve_fs
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -164,7 +164,7 @@ def psychoacoustic_annoyance(
 
 
 def psychoacoustic_annoyance_from_signal(
-    x: Signal | list[float] | np.ndarray,
+    x: SignalInput,
     fs: int | None = None,
     *,
     field: Literal["free", "diffuse"] = "free",
@@ -211,7 +211,12 @@ def psychoacoustic_annoyance_from_signal(
     from .sharpness import sharpness_din_from_specific
 
     fs = resolve_fs(x, fs)
-    factor = resolve_calibration(x, calibration_factor)
+    # The factor is applied here rather than passed down, so the check that
+    # loudness_zwicker would have run has to happen here too: without it a
+    # zero or negative factor silences the signal and reports PA = 0.
+    factor = require_positive(
+        resolve_calibration(x, calibration_factor), "calibration_factor"
+    )
     signal = np.asarray(x, dtype=np.float64) * float(factor)
     loud = loudness_zwicker(signal, fs, field=field, stationary=False)
     # N5: the 5 % percentile loudness of the time-varying trace; fall back to
