@@ -74,7 +74,7 @@ from __future__ import annotations
 import warnings
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
@@ -406,6 +406,19 @@ def _positive_area(value: float, name: str) -> float:
     if not np.isfinite(v) or v <= 0.0:
         raise ValueError(f"'{name}' must be positive.")
     return v
+
+
+@overload
+def adaptation_term_kc(
+    freq: Sequence[float] | np.ndarray,
+    *,
+    boundary_area: float,
+    volume: float,
+) -> np.ndarray: ...
+
+
+@overload
+def adaptation_term_kc(freq: Sequence[float] | np.ndarray) -> np.ndarray: ...
 
 
 def adaptation_term_kc(

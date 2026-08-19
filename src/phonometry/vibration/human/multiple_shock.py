@@ -62,7 +62,7 @@ text and is out of scope.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
@@ -501,6 +501,34 @@ class MultipleShockResult:
         return render_iso2631_5_report(
             self, path, metadata=metadata, verbose=verbose, language=language
         )
+
+
+@overload
+def multiple_shock_assessment(
+    acceleration: ArrayLike,
+    fs: float,
+    *,
+    start_age: float,
+    years: int,
+    days_per_year: float,
+    exposure_time: float,
+    measurement_time: float,
+    sex: Literal["male", "female"] = ...,
+    mz: float | None = ...,
+) -> MultipleShockResult: ...
+
+
+@overload
+def multiple_shock_assessment(
+    acceleration: ArrayLike,
+    fs: float,
+    *,
+    start_age: float,
+    years: int,
+    days_per_year: float,
+    sex: Literal["male", "female"] = ...,
+    mz: float | None = ...,
+) -> MultipleShockResult: ...
 
 
 def multiple_shock_assessment(

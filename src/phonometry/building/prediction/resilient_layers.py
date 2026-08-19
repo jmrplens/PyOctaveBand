@@ -73,7 +73,7 @@ pieces have an oracle and which do not.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -910,6 +910,48 @@ class FloatingFloorImprovementResult:
         return plot_floating_floor_improvement(self, ax=ax, language=language, **kwargs)
 
 
+@overload
+def floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal["cremer_hammer"],
+    limiting_frequency: float,
+    mass_per_area: float,
+    dynamic_stiffness: float,
+) -> FloatingFloorImprovementResult: ...
+
+
+@overload
+def floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal["cremer_hammer"],
+    limiting_frequency: float,
+) -> FloatingFloorImprovementResult: ...
+
+
+@overload
+def floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal["en12354", "cremer"] = ...,
+    mass_per_area: float,
+    dynamic_stiffness: float,
+) -> FloatingFloorImprovementResult: ...
+
+
+@overload
+def floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal["en12354", "cremer"] = ...,
+) -> FloatingFloorImprovementResult: ...
+
+
 def floating_floor_improvement_spectrum(
     frequencies: ArrayLike,
     *,
@@ -979,6 +1021,12 @@ def floating_floor_improvement_spectrum(
             above, 10.0 * np.log10(1.0 + (f / f_limit) ** 2), 0.0
         )
     delta_lw: float | None = None
+    if (mass_per_area is None) != (dynamic_stiffness is None):
+        raise ValueError(
+            "'mass_per_area' and 'dynamic_stiffness' are the two halves of the "
+            "weighted improvement 'delta_lw'; give both or neither, since one "
+            "alone would return it as None without saying why"
+        )
     if mass_per_area is not None and dynamic_stiffness is not None:
         # The weighted fit follows the construction the law belongs to:
         # Formula (C.4) for the sand-cement screeds of the 30 lg law, and

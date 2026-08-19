@@ -13,7 +13,7 @@ leaf never imports domain code at module level.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -68,6 +68,30 @@ def _t(text: str, language: str = "en") -> str:
 # ---------------------------------------------------------------------------
 # Baffled piston with its directivity lobe.
 # ---------------------------------------------------------------------------
+@overload
+def plot_piston_geometry(
+    radius: float,
+    ax: Axes | None = ...,
+    *,
+    angles: ArrayLike,
+    directivity: ArrayLike,
+    lobe_label: str | None = ...,
+    language: str = ...,
+    **kwargs: Any,
+) -> Axes: ...
+
+
+@overload
+def plot_piston_geometry(
+    radius: float,
+    ax: Axes | None = ...,
+    *,
+    lobe_label: str | None = ...,
+    language: str = ...,
+    **kwargs: Any,
+) -> Axes: ...
+
+
 def plot_piston_geometry(
     radius: float,
     ax: Axes | None = None,

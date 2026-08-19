@@ -104,7 +104,7 @@ the shifted contour at 500 Hz (clause 5.5). See
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -376,6 +376,38 @@ class PlenumFlankingResult:
 
         check_language(language)
         return plot_plenum_flanking(self, ax=ax, language=language, **kwargs)
+
+
+@overload
+def plenum_flanking_reduction_index(
+    reduction_index_source: ArrayLike,
+    reduction_index_receiving: ArrayLike,
+    *,
+    ceiling_length: float,
+    plenum_height: float,
+    sidewalls: str = ...,
+    frequency: ArrayLike | None = ...,
+    attenuation_source: ArrayLike,
+    attenuation_receiving: ArrayLike,
+    source_length: float | None = ...,
+    split_source: float = ...,
+    split_receiving: float = ...,
+) -> PlenumFlankingResult: ...
+
+
+@overload
+def plenum_flanking_reduction_index(
+    reduction_index_source: ArrayLike,
+    reduction_index_receiving: ArrayLike,
+    *,
+    ceiling_length: float,
+    plenum_height: float,
+    sidewalls: str = ...,
+    frequency: ArrayLike | None = ...,
+    source_length: float | None = ...,
+    split_source: float = ...,
+    split_receiving: float = ...,
+) -> PlenumFlankingResult: ...
 
 
 def plenum_flanking_reduction_index(

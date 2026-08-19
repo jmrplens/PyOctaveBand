@@ -69,7 +69,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
@@ -643,6 +643,28 @@ def _validate_reverberation(t: np.ndarray, t0: float) -> None:
         raise ValueError("'t2' must contain positive, finite values.")
     if t0 <= 0.0:
         raise ValueError("'t0' must be positive.")
+
+
+@overload
+def airborne_insulation(
+    l1: Sequence[float] | np.ndarray,
+    l2: Sequence[float] | np.ndarray,
+    t2: Sequence[float] | np.ndarray,
+    *,
+    area: float,
+    volume: float,
+    t0: float = ...,
+) -> AirborneInsulationResult: ...
+
+
+@overload
+def airborne_insulation(
+    l1: Sequence[float] | np.ndarray,
+    l2: Sequence[float] | np.ndarray,
+    t2: Sequence[float] | np.ndarray,
+    *,
+    t0: float = ...,
+) -> AirborneInsulationResult: ...
 
 
 def airborne_insulation(

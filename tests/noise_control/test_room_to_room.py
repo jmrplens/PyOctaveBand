@@ -159,19 +159,19 @@ def test_nc_rating_of_the_received_spectrum() -> None:
 
 
 def test_source_description_is_exclusive() -> None:
-    """Exactly one of ``source.level`` / ``source.power_level`` is required."""
+    """Exactly one of ``source.level`` / ``source.power_level`` is required.
+
+    The refusal belongs to :class:`SourceRoom` itself, so it arrives when the
+    bundle is built rather than when it is used. The call with no source at
+    all still raises, because the empty default is built here and rejects
+    itself for the same reason.
+    """
     with pytest.raises(ValueError, match="exactly one"):
         room_to_room_transmission(_BANDS, 40.0, 20.0, _ABSORPTION)
-    both_descriptions = SourceRoom(level=90.0, power_level=100.0)
     with pytest.raises(ValueError, match="exactly one"):
-        room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION, source=both_descriptions
-        )
-    power_without_room_constant = SourceRoom(power_level=100.0)
+        SourceRoom(level=90.0, power_level=100.0)
     with pytest.raises(ValueError, match="room_constant"):
-        room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION, source=power_without_room_constant
-        )
+        SourceRoom(power_level=100.0)
 
 
 def test_validation() -> None:

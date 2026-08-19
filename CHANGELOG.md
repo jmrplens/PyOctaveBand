@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `floating_floor_improvement_spectrum` refuses one half of the
+  `mass_per_area` / `dynamic_stiffness` pair instead of returning
+  `delta_lw=None` without a word. The pair exists only to compute that
+  weighted improvement, so answering `None` to a caller who asked for it was
+  the one failure that mattered, and it was the only one of the twenty
+  parameter groups below that did not already raise.
+
 - `miso_coherence` refuses a list of input records whose `Signal` elements
   were recorded at different rates, instead of taking the rate of whichever
   one happened to be first. Nothing downstream caught it: two records at
@@ -20,6 +27,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   now enforces.
 
 ### Changed
+
+- Nineteen functions, seventeen of them public and two plotting helpers, state
+  in their signature the group of arguments they actually require, through
+  `typing.overload`, instead of presenting the members as independently
+  optional and enforcing the group from the body. A type checker now rejects
+  the invalid call before it runs, and the run-time check stays for callers who
+  do not type-check.
+
+  The groups come in three shapes, all of them previously invisible to the
+  signature.
+
+  - *Exactly one of the members.* `lining_resonance_frequency` (Formula D.1
+    against D.2), `ground_effect` (flow resistivity against impedance),
+    `gaussian_residual_level` (L90 against L95),
+    `predict_diffuser_polar_response` (depths against reflection) and the
+    plotting helper `plot_aperture_geometry` (width against radius).
+  - *All of them or none*, or one member requiring another.
+    `airborne_insulation`, `survey_airborne_insulation`, `adaptation_term_kc`,
+    `plenum_flanking_reduction_index`, `plateau_transmission_loss` (three
+    members over two routes), `floating_floor_improvement_spectrum`,
+    `sound_power_anechoic`, `impulse_response`, `stipa`,
+    `sti_from_impulse_response`, `multiple_shock_assessment`, `io.write` and
+    the plotting helper `plot_piston_geometry` (angles with directivity).
+  - *Required by the value of another argument*, expressed with `Literal`.
+    `sensitivity`, whose narrowband estimation needs the rate, and
+    `floating_floor_improvement_spectrum`, whose Cremer hammer model needs its
+    limiting frequency.
+
+  `sti_from_impulse_response` turned out to carry a second group besides its
+  own pair: `snr` and `ambient` are two ways of saying the same thing and the
+  run time already refused them together, which no signature said until now.
+
+  One group could not take an overload at all: `SourceRoom` holds its two
+  descriptions of the source room as fields, and no overload of
+  `room_to_room_transmission` can constrain the inside of its own argument.
+  The bundle now refuses itself in `__post_init__`, as `OperatingModeDeclaration`
+  already did, so building a source room with both descriptions, with neither,
+  or with a power level and no room constant raises at the line that built it
+  rather than at the call that used it.
+
+  Two further groups are stated in prose rather than in the signature, because
+  no signature can carry them: `db_hr_global_index` requires `frequencies` for
+  any input that is not exactly the eighteen DB-HR bands, a condition on the
+  length of an array at run time, and `floating_floor_resonance` requires
+  `thickness` and `porosity` for the enclosed-gas term, a condition on the
+  value of `airflow_resistivity` rather than on a literal. Both now say so
+  where the caller reads them.
 
 - `linkwitz_riley` and `parametric_eq` take their mandatory argument as
   keyword-only: `linkwitz_riley(x, fs=None, *, freq, order=4)` and

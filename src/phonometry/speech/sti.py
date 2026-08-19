@@ -20,7 +20,7 @@ from __future__ import annotations
 import warnings
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
@@ -367,6 +367,36 @@ def _sti_from_mtf(
     )
 
 
+@overload
+def sti_from_impulse_response(
+    ir: list[float] | np.ndarray,
+    fs: int,
+    snr: None,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult: ...
+
+
+@overload
+def sti_from_impulse_response(
+    ir: list[float] | np.ndarray,
+    fs: int,
+    snr: None = ...,
+    *,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult: ...
+
+
+@overload
+def sti_from_impulse_response(
+    ir: list[float] | np.ndarray,
+    fs: int,
+    snr: float | Sequence[float] | np.ndarray | None = ...,
+    level: Sequence[float] | np.ndarray | None = ...,
+) -> STIResult: ...
+
+
 def sti_from_impulse_response(
     ir: list[float] | np.ndarray,
     fs: int,
@@ -521,6 +551,36 @@ def _stipa_modulation_depths(env: np.ndarray, fs: int) -> np.ndarray:
             stacklevel=3,
         )
     return mdr
+
+
+@overload
+def stipa(
+    x: list[float] | np.ndarray,
+    fs: int,
+    reference: list[float] | np.ndarray | None,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult: ...
+
+
+@overload
+def stipa(
+    x: list[float] | np.ndarray,
+    fs: int,
+    reference: list[float] | np.ndarray | None = ...,
+    *,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult: ...
+
+
+@overload
+def stipa(
+    x: list[float] | np.ndarray,
+    fs: int,
+    reference: list[float] | np.ndarray | None = ...,
+    level: Sequence[float] | np.ndarray | None = ...,
+) -> STIResult: ...
 
 
 def stipa(

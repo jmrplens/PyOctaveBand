@@ -73,7 +73,7 @@ import struct
 import warnings
 from dataclasses import replace
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, overload
 
 import numpy as np
 from scipy.io import wavfile
@@ -626,6 +626,32 @@ def _write_through_scipy(
     else:
         _scipy_write(path, rate, data if resolved == "DOUBLE"
                      else data.astype(np.float32))
+
+
+@overload
+def write(
+    path: str | Path,
+    x: Signal | NDArray[np.generic] | list[float],
+    fs: int | None = ...,
+    *,
+    subtype: str | None = ...,
+    bext: BroadcastMetadata | str | None = ...,
+    dither: Literal["tpdf"],
+    rng: np.random.Generator | int | None = ...,
+    sidecar: bool = ...,
+) -> None: ...
+
+
+@overload
+def write(
+    path: str | Path,
+    x: Signal | NDArray[np.generic] | list[float],
+    fs: int | None = ...,
+    *,
+    subtype: str | None = ...,
+    bext: BroadcastMetadata | str | None = ...,
+    sidecar: bool = ...,
+) -> None: ...
 
 
 def write(

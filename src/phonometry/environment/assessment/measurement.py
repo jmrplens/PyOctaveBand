@@ -50,7 +50,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
@@ -378,6 +378,14 @@ def residual_sound_correction(
         margin=float(margin),
         reliable=reliable,
     )
+
+
+@overload
+def gaussian_residual_level(l50: float, *, l90: float) -> float: ...
+
+
+@overload
+def gaussian_residual_level(l50: float, *, l95: float) -> float: ...
 
 
 def gaussian_residual_level(

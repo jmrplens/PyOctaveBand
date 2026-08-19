@@ -14,7 +14,7 @@ leaf never imports domain code at module level.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 
@@ -61,6 +61,28 @@ def _t(text: str, language: str = "en") -> str:
 # ---------------------------------------------------------------------------
 # Wall aperture (slit or circular hole) cross-section.
 # ---------------------------------------------------------------------------
+@overload
+def plot_aperture_geometry(
+    depth: float,
+    ax: Axes | None = ...,
+    *,
+    width: float,
+    language: str = ...,
+    **kwargs: Any,
+) -> Axes: ...
+
+
+@overload
+def plot_aperture_geometry(
+    depth: float,
+    ax: Axes | None = ...,
+    *,
+    radius: float,
+    language: str = ...,
+    **kwargs: Any,
+) -> Axes: ...
+
+
 def plot_aperture_geometry(
     depth: float,
     ax: Axes | None = None,
@@ -133,16 +155,23 @@ def plot_aperture_result_geometry(
     **kwargs: Any,
 ) -> Axes:
     """Aperture section for a result that retained its geometry."""
-    if result.depth is None or (
-        result.width is None and result.radius is None
-    ):
-        raise ValueError(
-            "This result does not retain its geometry; call "
-            "plot_aperture_geometry(depth, ...) with the original arguments."
-        )
-    return plot_aperture_geometry(
-        result.depth, ax=ax, width=result.width, radius=result.radius,
-        language=language, **kwargs,
+    # One branch per shape, which is what the result carries: a 'slit' keeps
+    # its width and a 'circular' aperture its radius, never both. Passing both
+    # through and letting one be None would not match either call form.
+    if result.depth is not None:
+        if result.width is not None:
+            return plot_aperture_geometry(
+                result.depth, ax=ax, width=result.width,
+                language=language, **kwargs,
+            )
+        if result.radius is not None:
+            return plot_aperture_geometry(
+                result.depth, ax=ax, radius=result.radius,
+                language=language, **kwargs,
+            )
+    raise ValueError(
+        "This result does not retain its geometry; call "
+        "plot_aperture_geometry(depth, ...) with the original arguments."
     )
 
 

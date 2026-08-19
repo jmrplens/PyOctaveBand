@@ -372,9 +372,13 @@ def floating_floor_resonance(
     :param floor_mass_per_area: Supported-floor mass per unit area ``m'``, kg/m2.
     :param airflow_resistivity: Lateral airflow resistivity ``r``, in kPa.s/m2
         (default ``inf`` -> the high-resistivity case :math:`s' = s'_\mathrm{t}`).
-    :param thickness: Specimen thickness ``d`` under load, in metres (required
-        for the enclosed-gas term when :math:`r < 100` kPa.s/m2).
-    :param porosity: Specimen porosity ``epsilon`` (required with ``thickness``).
+    :param thickness: Specimen thickness ``d`` under load, in metres. Required
+        together with ``porosity`` for the enclosed-gas term, which applies
+        when :math:`r < 100` kPa.s/m2. That condition is on the *value* of
+        ``airflow_resistivity`` rather than on a literal, so a signature
+        cannot state it: it is checked here and raises.
+    :param porosity: Specimen porosity ``epsilon``, required with
+        ``thickness`` (see above).
     :param atmospheric_pressure: Atmospheric pressure ``p0``, in pascals.
     :return: The :class:`DynamicStiffnessResult`.
     """

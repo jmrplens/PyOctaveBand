@@ -605,6 +605,27 @@ def _validate_index(k: Sequence[float] | np.ndarray, n_bands: int) -> np.ndarray
     return kk
 
 
+@overload
+def survey_airborne_insulation(
+    l1: Sequence[float] | np.ndarray,
+    l2: Sequence[float] | np.ndarray,
+    reverberation_index: Sequence[float] | np.ndarray,
+    *,
+    volume: float,
+    area: float,
+) -> SurveyAirborneResult: ...
+
+
+@overload
+def survey_airborne_insulation(
+    l1: Sequence[float] | np.ndarray,
+    l2: Sequence[float] | np.ndarray,
+    reverberation_index: Sequence[float] | np.ndarray,
+    *,
+    volume: float = ...,
+) -> SurveyAirborneResult: ...
+
+
 def survey_airborne_insulation(
     l1: Sequence[float] | np.ndarray,
     l2: Sequence[float] | np.ndarray,
