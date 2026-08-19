@@ -163,9 +163,9 @@ impulse_response(
 ) -> ImpulseResponseResult
 
 impulse_response(
-    recorded: list[float] | np.ndarray,
-    reference: list[float] | np.ndarray,
-    fs: int,
+    recorded: Signal | list[float] | np.ndarray,
+    reference: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     method: str = ...,
     f_range: tuple[float, float] | None = ...,

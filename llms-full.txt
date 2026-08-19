@@ -12539,7 +12539,9 @@ from phonometry import electroacoustics
 
 thd_f = electroacoustics.thd(signal, fs, 1000.0, kind="F")          # relative to fundamental
 thd_r = electroacoustics.thd(signal, fs, 1000.0, kind="R")          # relative to total RMS
-d2 = electroacoustics.harmonic_distortion(signal, fs, 1000.0, 2)    # 2nd-order harmonic
+d2 = electroacoustics.harmonic_distortion(  # 2nd-order harmonic
+    signal, fs, fundamental=1000.0, order=2
+)
 ```
 
 `harmonic_analysis` bundles the fundamental, the harmonic amplitudes and the THD
@@ -12688,10 +12690,12 @@ each with its own per-order definition:
 ```python
 from phonometry import electroacoustics
 
-md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
+md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
 print(md.d2, md.d3, md.smpte)                                       # 14.12.7
 md.plot()   # carrier and modulation sidebands, d2/d3 annotated (needs matplotlib)
-dfd2 = electroacoustics.difference_frequency_distortion(signal, fs, 13e3, 14e3, order=2)
+dfd2 = electroacoustics.difference_frequency_distortion(
+    signal, fs, f1=13e3, f2=14e3, order=2
+)
 tdfd = electroacoustics.total_difference_frequency_distortion(signal, fs)         # 8/11.95 kHz
 dim = electroacoustics.dynamic_intermodulation_distortion(signal, fs)             # DIM (15k/3.15k)
 ```
@@ -12718,7 +12722,7 @@ t = np.arange(fs) / fs                        # 1 s -> tones land on FFT bins
 x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
 signal = x + 0.04 * x**2 + 0.012 * x**3       # weakly non-linear device output
 
-md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
+md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
 md.plot()
 plt.show()
 ```
@@ -13867,7 +13871,7 @@ from phonometry import swept_sine_distortion, synchronized_sweep_signal
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
 x = synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
 # ... record the device response into `y` (include the decay tail) ...
-res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 res.harmonic_responses    # complex H1..H3 on res.frequencies
 res.thd, res.thd_frequencies
@@ -13891,7 +13895,7 @@ a2, a3 = 0.12, 0.08
 x = synchronized_sweep_signal(fs, f1, f2, seconds)
 b, a = sp_signal.butter(2, 3000.0, fs=fs)             # 3 kHz post-filter
 y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 h1 = 1.0 + 3.0 * a3 / 4.0                              # Chebyshev gain
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -13972,7 +13976,7 @@ filter.
 from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
-res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
 res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
 
@@ -33559,16 +33563,16 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `stoi` | `function` | **Short-time objective intelligibility STOI / ESTOI (Taal et al. 2011; Jensen & Taal 2016).**<br>• `clean`: clean reference (1D)<br>• `degraded`: degraded/processed signal (1D, same length)<br>• `fs` [Hz] (resampled to 10 kHz internally)<br>• `extended`: use ESTOI (Default: False) | `d = stoi(clean, degraded, fs)`<br><br>• `STOIResult`; `d.value` in ~[0, 1] (1 if identical) |
 | `STOIResult` | `dataclass` | **STOI / ESTOI result.**<br>• `value`: the intelligibility index<br>• `extended`: True for ESTOI<br>• `segment_scores`: per-segment intermediate<br>• `band_scores`: per-band mean correlation (STOI; None for ESTOI)<br>• `band_frequencies` [Hz]<br>• `sample_rate` (10 kHz)<br>• `.plot()` | `res.value, res.band_scores` |
 | `thd` | `function` | **Total harmonic distortion (IEC 60268-3 14.12.2–3).**<br>• `signal` (1D), `fs` [Hz]<br>• `fundamental` [Hz] (Default: None → largest peak)<br>• `kind`: 'F' rel. fundamental or 'R' rel. total RMS (Default: 'F')<br>• `n_harmonics` (Default: 10)<br>• `window` (Default: 'hann') | `thd(sig, fs, 1000.0, kind="F")`<br><br>• ratio (0..) |
-| `harmonic_distortion` | `function` | **nth-order harmonic distortion dₙ (IEC 60268-3 14.12.5).**<br>• `signal`, `fs`, `fundamental` [Hz], `order` n (≥ 2) | `harmonic_distortion(sig, fs, 1000.0, 2)`<br><br>• ratio (aₙ rel. total RMS) |
+| `harmonic_distortion` | `function` | **nth-order harmonic distortion dₙ (IEC 60268-3 14.12.5).**<br>• `signal`, `fs`, `fundamental` [Hz], `order` n (≥ 2) | `harmonic_distortion(sig, fs, fundamental=1000.0, order=2)`<br><br>• ratio (aₙ rel. total RMS) |
 | `thd_plus_noise` | `function` | **THD+N ratio (AES17-2015 6.3.1).**<br>• `signal`, `fs`, `fundamental` (Default: None)<br>• `notch_q`: effective Q of the applied notch, 1.2–3 (Default: 2.0)<br>• `bandwidth`: AES17 chain upper edge [Hz] (Default: 20000; None = full Nyquist); 20 Hz high-pass included<br>• `as_db`: 20·lg(ratio) dB (Default: False)<br>• `window`: FFT window for auto-detection (Default: 'hann') | `thd_plus_noise(sig, fs, 1000.0)`<br><br>• ratio, or dB if `as_db` |
 | `sinad` | `function` | **Signal-to-noise-and-distortion ratio, dB (derived from AES17 THD+N).**<br>• `signal`, `fs`, `fundamental` (Default: None), `notch_q` (Default: 2.0), `bandwidth` (Default: 20000)<br>= −(THD+N in dB) | `sinad(sig, fs, 1000.0)`<br><br>• SINAD [dB] |
 | `dynamic_range` | `function` | **Dynamic range (AES17-2015 6.4.1), dB CCIR-RMS.**<br>• `signal`, `fs`, `fundamental` (Default: None → 997 Hz)<br>• `notch_q` (Default: 2.0), `bandwidth` (Default: 20000)<br>• `full_scale`: digital full-scale peak amplitude (Default: 1.0)<br>= full-scale sine / CCIR-RMS-weighted notched residual | `dynamic_range(out, fs, 997.0)`<br><br>• dB CCIR-RMS |
 | `idle_channel_noise` | `function` | **Idle channel noise level (AES17-2015 6.4.2), dBFS CCIR-RMS.**<br>• `signal` (idle output, 1D), `fs`<br>• `bandwidth` (Default: 20000)<br>• `full_scale` (Default: 1.0)<br>= CCIR-RMS-weighted RMS re full scale | `idle_channel_noise(idle, fs)`<br><br>• dBFS CCIR-RMS (−inf for digital zero) |
 | `weighted_thd` | `function` | **Weighted THD (IEC 60268-3 14.12.11).**<br>• `signal`, `fs`, `fundamental` (Default: None)<br>• `weighting`: '468' (ITU-R BS.468-4 / IEC 60268-1, the 14.12.11 network), 'A' or 'C' (Default: '468')<br>• `notch_q` (Default: 2.0)<br>• valid for fundamentals 31.5–400 Hz | `weighted_thd(sig, fs, 100.0)`<br><br>• ratio |
 | `itu_r_468_weighting` | `function` | **ITU-R BS.468-4 weighting response (Table 1).**<br>• `frequencies` [Hz] (≥ 0)<br>• log-frequency dB interpolation per the recommendation; DC → −inf | `itu_r_468_weighting([6300.0])  # +12.2`<br><br>• dB re 1 kHz |
-| `modulation_distortion` | `function` | **Modulation distortion d_m,2 / d_m,3 (IEC 60268-3 14.12.7).**<br>• `signal`, `fs`, `f_low` [Hz], `f_high` [Hz]<br>• arithmetic sideband sums over the f₂ amplitude (14.12.7.2 g–h) | `modulation_distortion(sig, fs, 60.0, 7000.0).d2`<br><br>• `ModulationDistortionResult` |
+| `modulation_distortion` | `function` | **Modulation distortion d_m,2 / d_m,3 (IEC 60268-3 14.12.7).**<br>• `signal`, `fs`, `f_low` [Hz], `f_high` [Hz]<br>• arithmetic sideband sums over the f₂ amplitude (14.12.7.2 g–h) | `modulation_distortion(sig, fs, f_low=60.0, f_high=7000.0).d2`<br><br>• `ModulationDistortionResult` |
 | `ModulationDistortionResult` | `dataclass` | **Modulation distortion result.**<br>• `d2` / `d3`: the IEC per-order values<br>• `smpte`: combined-RMS analyzer convention (not an IEC quantity) | `res.d2, res.d3, res.smpte` |
-| `difference_frequency_distortion` | `function` | **Difference-frequency distortion d_d,n (IEC 60268-3 14.12.8).**<br>• `signal`, `fs`, `f1` < `f2` [Hz]<br>• `order`: 2 or 3 (Default: 2)<br>• ref. U₂,ref = 2·U₂,f₂; 3rd order sums arithmetically | `difference_frequency_distortion(sig, fs, 13e3, 14e3, order=2)`<br><br>• ratio |
+| `difference_frequency_distortion` | `function` | **Difference-frequency distortion d_d,n (IEC 60268-3 14.12.8).**<br>• `signal`, `fs`, `f1` < `f2` [Hz]<br>• `order`: 2 or 3 (Default: 2)<br>• ref. U₂,ref = 2·U₂,f₂; 3rd order sums arithmetically | `difference_frequency_distortion(sig, fs, f1=13e3, f2=14e3, order=2)`<br><br>• ratio |
 | `total_difference_frequency_distortion` | `function` | **Total difference-frequency distortion (IEC 60268-3 14.12.10).**<br>• `signal`, `fs`<br>• `f1` (Default: 8000), `f2` (Default: 11950) [Hz]<br>= √(a²_{f₂−f₁} + a²_{2f₁−f₂}) / (a_{f₁} + a_{f₂}) | `total_difference_frequency_distortion(sig, fs)`<br><br>• ratio |
 | `dynamic_intermodulation_distortion` | `function` | **Dynamic intermodulation DIM (IEC 60268-3 14.12.9).**<br>• `signal`, `fs`<br>• `f_sine` [Hz] (Default: 15000)<br>• `f_square` [Hz] (Default: 3150) | `dynamic_intermodulation_distortion(sig, fs)`<br><br>• ratio (products rel. 15 kHz sine) |
 | `harmonic_analysis` | `function` | **Full harmonic analysis (THD, THD+N, SINAD).**<br>• `signal`, `fs`, `fundamental` (Default: None)<br>• `n_harmonics` (Default: 10), `notch_q` (Default: 2.0), `bandwidth` (Default: 20000)<br>• `window`: FFT window (Default: 'hann') | `res = harmonic_analysis(sig, fs, 1000.0)`<br><br>• `HarmonicDistortionResult` |
