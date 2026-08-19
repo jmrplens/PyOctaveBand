@@ -29,6 +29,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from ..io._resolve import SignalInput, apply_calibration, resolve_fs
+
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
@@ -52,7 +54,7 @@ def _positive(value: float, name: str) -> float:
 
 
 def _validate_pressure(
-    pressure: NDArray[np.float64] | list[float], *, min_samples: int = 1
+    pressure: SignalInput, *, min_samples: int = 1
 ) -> NDArray[np.float64]:
     sig = np.asarray(pressure, dtype=np.float64)
     if sig.ndim != 1:
@@ -62,11 +64,11 @@ def _validate_pressure(
         raise ValueError(f"'pressure' must contain at least {min_samples} {plural}.")
     if not np.all(np.isfinite(sig)):
         raise ValueError("'pressure' must be finite.")
-    return sig
+    return apply_calibration(pressure, sig)
 
 
 def sound_pressure_level(
-    pressure: NDArray[np.float64] | list[float],
+    pressure: SignalInput,
     *,
     reference: float = UNDERWATER_REFERENCE_PRESSURE,
 ) -> float:
@@ -75,7 +77,11 @@ def sound_pressure_level(
     :math:`\mathrm{SPL} = 10 \log_{10}(\langle p^2 \rangle / p_0^2)` dB, with ``p``
     in pascals and the underwater reference :math:`p_0 = 1` µPa by default.
 
-    :param pressure: Sound-pressure time series (1-D), in Pa.
+    :param pressure: Sound-pressure time series (1-D), in Pa. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: this quantity is a pressure, and the underwater reference
+        of 1 uPa changes what the decibel is counted from, not what the
+        samples have to be in.
     :param reference: Reference pressure :math:`p_0`, in Pa (default 1 µPa).
     :return: Sound pressure level, in dB re the reference.
     :raises ValueError: If the signal is invalid or has no energy.
@@ -89,8 +95,8 @@ def sound_pressure_level(
 
 
 def sound_exposure_level(
-    pressure: NDArray[np.float64] | list[float],
-    fs: float,
+    pressure: SignalInput,
+    fs: float | None = None,
     *,
     reference: float = UNDERWATER_REFERENCE_EXPOSURE,
 ) -> float:
@@ -100,13 +106,20 @@ def sound_exposure_level(
     exposure :math:`E = \int p^2 \, dt \approx (1/f_\mathrm{s}) \sum p^2` over the
     record.
 
-    :param pressure: Sound-pressure time series (1-D), in Pa.
-    :param fs: Sample rate, in Hz.
+    :param pressure: Sound-pressure time series (1-D), in Pa. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: this quantity is a pressure, and the underwater reference
+        of 1 uPa changes what the decibel is counted from, not what the
+        samples have to be in.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param reference: Reference exposure :math:`E_0`, in Pa²·s (default
         1 µPa²·s).
     :return: Sound exposure level, in dB re the reference.
     :raises ValueError: If the inputs are invalid or the signal has no energy.
     """
+    fs = resolve_fs(pressure, fs, name="pressure")
     sig = _validate_pressure(pressure)
     fs_v = _positive(fs, "fs")
     e0 = _positive(reference, "reference")
@@ -117,7 +130,7 @@ def sound_exposure_level(
 
 
 def peak_sound_pressure_level(
-    pressure: NDArray[np.float64] | list[float],
+    pressure: SignalInput,
     *,
     reference: float = UNDERWATER_REFERENCE_PRESSURE,
 ) -> float:
@@ -126,7 +139,11 @@ def peak_sound_pressure_level(
     :math:`L_{p,\mathrm{pk}} = 20 \log_{10}(\max \lvert p \rvert / p_0)` dB re
     1 µPa.
 
-    :param pressure: Sound-pressure time series (1-D), in Pa.
+    :param pressure: Sound-pressure time series (1-D), in Pa. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: this quantity is a pressure, and the underwater reference
+        of 1 uPa changes what the decibel is counted from, not what the
+        samples have to be in.
     :param reference: Reference pressure :math:`p_0`, in Pa (default 1 µPa).
     :return: Peak sound pressure level, in dB re the reference.
     :raises ValueError: If the signal is invalid or is all zero.

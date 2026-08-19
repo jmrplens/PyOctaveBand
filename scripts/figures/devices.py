@@ -64,7 +64,7 @@ def generate_intensity_demo(output_dir: str) -> None:
     # Plane progressive wave: microphone 2 sees the wave dr/c later.
     p1_plane = noise
     p2_plane = np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n)
-    plane = sound_intensity(p1_plane, p2_plane, fs, dr, fraction=3, limits=[100.0, 5000.0])
+    plane = sound_intensity(p1_plane, p2_plane, fs, spacing=dr, fraction=3, limits=[100.0, 5000.0])
 
     # Standing wave: equal counter-propagating waves, probe centred at x0.
     x0 = 0.30
@@ -72,7 +72,7 @@ def generate_intensity_demo(output_dir: str) -> None:
         return np.fft.irfft(spectrum * 2.0 * np.cos(k * pos), n)
     standing = sound_intensity(
         standing_pressure(x0 - dr / 2), standing_pressure(x0 + dr / 2),
-        fs, dr, fraction=3, limits=[100.0, 5000.0],
+        fs, spacing=dr, fraction=3, limits=[100.0, 5000.0],
     )
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
@@ -1706,7 +1706,7 @@ def generate_spacer_bandwidth(output_dir: str) -> None:
     colours = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY)
     for (dr, colour) in zip((0.006, 0.012, 0.050), colours, strict=True):
         p2 = np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n)
-        res = sound_intensity(noise, p2, fs, dr, fraction=3,
+        res = sound_intensity(noise, p2, fs, spacing=dr, fraction=3,
                               limits=[20.0, 12500.0])
         # bias_correction is the compensating factor (k dr)/sin(k dr); the bias
         # itself is its reciprocal in decibels. Drop the bands the library

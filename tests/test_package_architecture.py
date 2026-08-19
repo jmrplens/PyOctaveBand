@@ -64,6 +64,20 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     ("room", "io"),
     ("speech", "io"),
     ("psychoacoustics", "io"),
+    ("underwater", "io"),
+    ("emission", "io"),
+    ("environment", "io"),
+    ("materials", "io"),
+    ("building", "io"),
+    # the acceleration and force records go through the same contract as the
+    # pressure ones, except that they take the exemption: their quantity is
+    # not a pressure, so a factor the object carries is never applied
+    ("vibration", "io"),
+    # the EBU R 128 family reads its rate off the object too. This is the one
+    # place the edge goes both ways -- ("io", "broadcast") above -- and it is
+    # still not a cycle at import time, because io's side is deferred into the
+    # writer, so importing phonometry.io never pulls broadcast in
+    ("broadcast", "io"),
 }
 
 

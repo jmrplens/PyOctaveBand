@@ -69,6 +69,7 @@ import numpy as np
 from ..._internal.types import as_float_or_array
 from ..._internal.validation import require_1d_signal, require_choice, require_positive
 from ...hearing.threshold import SEXES as _SEXES
+from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -156,7 +157,9 @@ def seat_to_spine_transfer(frequencies: ArrayLike) -> np.ndarray:
     return np.asarray(response, dtype=np.complex128)
 
 
-def spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray:
+def spinal_response(
+    acceleration: SignalInput, fs: float | None = None
+) -> np.ndarray:
     r"""Vertical spinal response :math:`A_\mathrm{z}(t)` (clause 5.2, Formula 2).
 
     Applies the seat-to-spine transfer function to the measured conditioned
@@ -171,13 +174,21 @@ def spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray:
     high-pass) of :math:`a_\mathrm{z}(t)` before calling.
 
     :param acceleration: Measured, conditioned (zero-mean) vertical seat
-        acceleration :math:`a_\mathrm{z}(t)`, m/s2.
-    :param fs: Sampling frequency, in hertz.
+        acceleration :math:`a_\mathrm{z}(t)`, m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare
+        array; a :class:`~phonometry.io.Signal` brings its own, and an
+        explicit value that disagrees with it raises instead of silently
+        winning.
     :return: The spinal response acceleration :math:`A_\mathrm{z}(t)`, m/s2, same
         length.
     """
-    fs = require_positive(fs, "fs")
-    az = np.asarray(acceleration, dtype=np.float64)
+    fs = require_positive(resolve_fs(acceleration, fs, name="acceleration"), "fs")
+    # calibrate=False: a Signal may carry a digital-to-pascal factor, and
+    # this is an acceleration in m/s2. See phonometry.io._resolve.
+    az = np.asarray(resolve_samples(acceleration, calibrate=False), dtype=np.float64)
     if az.ndim != 1:
         raise ValueError("acceleration must be a 1-D time series.")
     if az.size == 0:
@@ -226,7 +237,9 @@ def dose_from_peaks(peaks: ArrayLike) -> float:
     return float(DOSE_AMPLITUDE_FACTOR * total ** (1.0 / DOSE_EXPONENT))
 
 
-def acceleration_dose(acceleration: ArrayLike, fs: float) -> float:
+def acceleration_dose(
+    acceleration: SignalInput, fs: float | None = None
+) -> float:
     r"""Acceleration dose :math:`D_\mathrm{z}` from a seat acceleration time history.
 
     Filters the acceleration through the seat-to-spine transfer function
@@ -235,8 +248,14 @@ def acceleration_dose(acceleration: ArrayLike, fs: float) -> float:
     :func:`spinal_response`.
 
     :param acceleration: Measured, conditioned (zero-mean) vertical seat
-        acceleration :math:`a_\mathrm{z}(t)`, m/s2.
-    :param fs: Sampling frequency, in hertz.
+        acceleration :math:`a_\mathrm{z}(t)`, m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare
+        array; a :class:`~phonometry.io.Signal` brings its own, and an
+        explicit value that disagrees with it raises instead of silently
+        winning.
     :return: The acceleration dose :math:`D_\mathrm{z}`, m/s2.
     """
     return dose_from_peaks(response_peaks(spinal_response(acceleration, fs)))
@@ -505,8 +524,8 @@ class MultipleShockResult:
 
 @overload
 def multiple_shock_assessment(
-    acceleration: ArrayLike,
-    fs: float,
+    acceleration: SignalInput,
+    fs: float | None = None,
     *,
     start_age: float,
     years: int,
@@ -520,8 +539,8 @@ def multiple_shock_assessment(
 
 @overload
 def multiple_shock_assessment(
-    acceleration: ArrayLike,
-    fs: float,
+    acceleration: SignalInput,
+    fs: float | None = None,
     *,
     start_age: float,
     years: int,
@@ -532,8 +551,8 @@ def multiple_shock_assessment(
 
 
 def multiple_shock_assessment(
-    acceleration: ArrayLike,
-    fs: float,
+    acceleration: SignalInput,
+    fs: float | None = None,
     *,
     start_age: float,
     years: int,
@@ -558,8 +577,14 @@ def multiple_shock_assessment(
     :func:`~phonometry.vibration.vibration_dose_value`).
 
     :param acceleration: Measured, conditioned (zero-mean) vertical seat
-        acceleration :math:`a_\mathrm{z}(t)`, m/s2.
-    :param fs: Sampling frequency, in hertz.
+        acceleration :math:`a_\mathrm{z}(t)`, m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare
+        array; a :class:`~phonometry.io.Signal` brings its own, and an
+        explicit value that disagrees with it raises instead of silently
+        winning.
     :param start_age: Age ``b`` at which the exposure started, in years.
     :param years: Number of exposure years ``n``.
     :param days_per_year: Number of exposure days per year ``N``.

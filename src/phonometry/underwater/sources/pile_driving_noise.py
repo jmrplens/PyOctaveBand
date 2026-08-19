@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ...io._resolve import SignalInput, resolve_fs
 from ..acoustics import (
     _positive,
     _validate_pressure,
@@ -46,14 +47,23 @@ _ENERGY_LOW = 0.05
 _ENERGY_HIGH = 0.95
 
 
-def single_strike_sel(pressure: NDArray[np.float64] | list[float], fs: float) -> float:
+def single_strike_sel(
+    pressure: SignalInput, fs: float | None = None
+) -> float:
     """Single-strike sound exposure level ``SEL_ss`` (ISO 18406 Formulae 3-4).
 
     The sound exposure level of one hammer-strike pulse, integrated over the
     pulse, in dB re 1 µPa²·s.
 
-    :param pressure: Sound-pressure time series of one strike (1-D), in Pa.
-    :param fs: Sample rate, in Hz.
+    :param pressure: Sound-pressure time series of one strike (1-D), in
+        Pa. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: this quantity is a pressure, and the underwater reference
+        of 1 uPa changes what the decibel is counted from, not what the
+        samples have to be in.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :return: Single-strike SEL, in dB re 1 µPa²·s.
     :raises ValueError: If the inputs are invalid.
     """
@@ -178,8 +188,8 @@ class StrikeSelSpectrum:
 
 
 def strike_sel_spectrum(
-    pressure: NDArray[np.float64] | list[float],
-    fs: float,
+    pressure: SignalInput,
+    fs: float | None = None,
     *,
     fraction: int = 3,
     limits: tuple[float, float] = (10.0, 20_000.0),
@@ -198,8 +208,15 @@ def strike_sel_spectrum(
     handed straight to
     :func:`~phonometry.underwater.bioacoustics.weighting.weighted_exposure`.
 
-    :param pressure: Sound-pressure time series of one strike (1-D), in Pa.
-    :param fs: Sample rate, in Hz.
+    :param pressure: Sound-pressure time series of one strike (1-D), in
+        Pa. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: this quantity is a pressure, and the underwater reference
+        of 1 uPa changes what the decibel is counted from, not what the
+        samples have to be in.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fraction: Bandwidth fraction: 1 (octave) or 3 (one-third octave).
     :param limits: Lower and upper band-centre limits, in Hz.
     :return: A :class:`StrikeSelSpectrum`.
@@ -207,6 +224,7 @@ def strike_sel_spectrum(
     """
     from ...filters.frequencies import nominal_frequencies
 
+    fs = resolve_fs(pressure, fs, name="pressure")
     sig = _validate_pressure(pressure, min_samples=2)
     fs_v = _positive(fs, "fs")
     if int(fraction) not in (1, 3):
@@ -251,18 +269,26 @@ def strike_sel_spectrum(
 
 
 def pile_strike_metrics(
-    pressure: NDArray[np.float64] | list[float], fs: float
+    pressure: SignalInput, fs: float | None = None
 ) -> PileStrikeResult:
     """Full per-strike pile-driving metrics (ISO 18406).
 
     Bundles the single-strike SEL, the peak sound pressure level, the SPL/Leq
     and the 90 %-energy pulse duration of one recorded hammer strike.
 
-    :param pressure: Sound-pressure time series of one strike (1-D), in Pa.
-    :param fs: Sample rate, in Hz.
+    :param pressure: Sound-pressure time series of one strike (1-D), in
+        Pa. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: this quantity is a pressure, and the underwater reference
+        of 1 uPa changes what the decibel is counted from, not what the
+        samples have to be in.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :return: A :class:`PileStrikeResult`.
     :raises ValueError: If the inputs are invalid.
     """
+    fs = resolve_fs(pressure, fs, name="pressure")
     sig = _validate_pressure(pressure, min_samples=2)
     fs_v = _positive(fs, "fs")
     return PileStrikeResult(

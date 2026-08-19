@@ -169,7 +169,7 @@ def test_apply_weighting_scales_sine_by_magnitude() -> None:
     f0 = 80.0
     t = np.arange(int(4 * fs)) / fs
     x = np.sqrt(2.0) * np.sin(2.0 * math.pi * f0 * t)  # unit-r.m.s. amplitude
-    y = hv.apply_weighting(x, fs, "Wk")
+    y = hv.apply_weighting(x, fs, name="Wk")
     factor = hv.weighting_factors("Wk", f0)[0]
     # Interior r.m.s. (drop edges) equals |H(f0)| * input r.m.s. (~1).
     interior = y[int(0.5 * fs):-int(0.5 * fs)]
@@ -179,9 +179,9 @@ def test_apply_weighting_scales_sine_by_magnitude() -> None:
 def test_apply_weighting_validates() -> None:
     two_dimensional = np.zeros((2, 2))
     with pytest.raises(ValueError, match="1-D"):
-        hv.apply_weighting(two_dimensional, 1000.0, "Wk")
+        hv.apply_weighting(two_dimensional, 1000.0, name="Wk")
     with pytest.raises(ValueError, match="positive"):
-        hv.apply_weighting([1.0, 2.0], 0.0, "Wk")
+        hv.apply_weighting([1.0, 2.0], 0.0, name="Wk")
 
 
 # ---------------------------------------------------------------------------
@@ -435,7 +435,7 @@ def test_all_nonpositive_frequencies_return_zero_response() -> None:
 
 def test_apply_weighting_rejects_empty_signal() -> None:
     with pytest.raises(ValueError, match="non-empty"):
-        hv.apply_weighting([], 1000.0, "Wk")
+        hv.apply_weighting([], 1000.0, name="Wk")
 
 
 def test_running_rms_rejects_empty_signal() -> None:

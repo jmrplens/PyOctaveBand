@@ -82,8 +82,8 @@ DEFAULT_CHANNEL_WEIGHTS = {1: (1.0,), 2: (1.0, 1.0), 5: (1.0, 1.0, 1.0, 1.41, 1.
 
 ```python
 integrated_loudness(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: SignalInput,
+    fs: float | None = None,
     weights: ArrayLike | None = None,
 ) -> float
 ```
@@ -102,8 +102,8 @@ normalises to -23.0 LUFS.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D mono or 2D `[channels, samples]`), full-scale units (1.0 = 0 dBFS). |
-| `fs` | Sample rate, Hz. |
+| `x` | Input signal (1D mono or 2D `[channels, samples]`), full-scale units (1.0 = 0 dBFS). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately **not** applied, because this quantity is counted from a full-scale sine rather than from 20 uPa. See [`k_weighting`](/phonometry/reference/api/broadcast/program-loudness/#k_weighting) for the reasoning. |
+| `fs` | Sample rate, Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `weights` | Per-channel weights `Gi`, or `None` for the Table 3 defaults by channel count (see [`DEFAULT_CHANNEL_WEIGHTS`](/phonometry/reference/api/broadcast/program-loudness/#default_channel_weights) and [`channel_weight`](/phonometry/reference/api/broadcast/program-loudness/#channel_weight)). |
 
 **Returns:** The programme loudness, LUFS (`-inf` when the signal is shorter than one gating block or entirely below the absolute gate).
@@ -111,7 +111,7 @@ normalises to -23.0 LUFS.
 ## k_weighting
 
 ```python
-k_weighting(x: list[float] | np.ndarray, fs: float) -> np.ndarray
+k_weighting(x: SignalInput, fs: float | None = None) -> np.ndarray
 ```
 
 Apply the two-stage K-weighting pre-filter (BS.1770-5 Annex 1).
@@ -124,8 +124,8 @@ low-frequency B-curve high-pass. Their concatenation is the K-weighting.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D `[channels, samples]`), linear units. |
-| `fs` | Sample rate, Hz. |
+| `x` | Input signal (1D or 2D `[channels, samples]`), linear units. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately **not** applied. This family is referenced to digital full scale, not to 20 uPa: LUFS, LU and dBTP are all counted from a full-scale sine, so scaling the samples to pascals would move every one of them by `20 lg(factor)` and still call them by their full-scale names. |
+| `fs` | Sample rate, Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 
 **Returns:** The K-weighted signal, same shape as the input.
 
@@ -290,8 +290,8 @@ distribution, following the Tech 3342 reference implementation.
 
 ```python
 program_loudness(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: SignalInput,
+    fs: float | None = None,
     weights: ArrayLike | None = None,
     *,
     momentary_step: float = 0.01,
@@ -318,8 +318,8 @@ finished programme:
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D mono or 2D `[channels, samples]`), full-scale units (1.0 = 0 dBFS). |
-| `fs` | Sample rate, Hz. |
+| `x` | Input signal (1D mono or 2D `[channels, samples]`), full-scale units (1.0 = 0 dBFS). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately **not** applied, because this quantity is counted from a full-scale sine rather than from 20 uPa. See [`k_weighting`](/phonometry/reference/api/broadcast/program-loudness/#k_weighting) for the reasoning. |
+| `fs` | Sample rate, Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `weights` | Per-channel weights `Gi`, or `None` for the Table 3 defaults by channel count (see [`DEFAULT_CHANNEL_WEIGHTS`](/phonometry/reference/api/broadcast/program-loudness/#default_channel_weights); for other layouts derive the weights with [`channel_weight`](/phonometry/reference/api/broadcast/program-loudness/#channel_weight)). |
 | `momentary_step` | Hop of the momentary series, s (default 10 ms, a 100 Hz update rate; EBU Tech 3341 requires at least 10 Hz). |
 | `short_term_step` | Hop of the short-term series, s (default 100 ms, the 10 Hz minimum rate that Tech 3342 requires for the LRA input). |
@@ -442,8 +442,8 @@ PASS/FAIL verdict row and a footer with the fixed disclaimer.
 
 ```python
 true_peak_level(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: SignalInput,
+    fs: float | None = None,
     oversample: int | None = None,
 ) -> float | np.ndarray
 ```
@@ -465,8 +465,8 @@ and inter-sample peaks above full scale give positive values.
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Input signal (1D or 2D `[channels, samples]`), full-scale units (1.0 = 0 dBFS). |
-| `fs` | Sample rate, Hz. |
+| `x` | Input signal (1D or 2D `[channels, samples]`), full-scale units (1.0 = 0 dBFS). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately **not** applied, because this quantity is counted from a full-scale sine rather than from 20 uPa. See [`k_weighting`](/phonometry/reference/api/broadcast/program-loudness/#k_weighting) for the reasoning. |
+| `fs` | Sample rate, Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `oversample` | Integer oversampling factor >= 1, or `None` (the default) for the smallest factor whose oversampled rate reaches 192 kHz (4 at 48 kHz, 2 at 96 kHz, 1 at 192 kHz and above, matching the Annex 2 guidance that higher input rates need proportionately less oversampling). |
 
 **Returns:** The true-peak level in dBTP: a float for 1D input, an array of shape `(channels,)` for 2D input.

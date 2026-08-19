@@ -8,9 +8,8 @@ object read from a measurement file already knows its sample rate and,
 when calibrated, its digital-to-pascal factor, so asking the caller to
 repeat either is asking for a transcription error. The helpers here are
 that contract, in one place, so that the surfaces adopting it cannot
-drift apart. ``signals.levels``, ``filters`` and ``signals`` are on it;
-the rest of the library still takes the bare pair, and moves over
-surface by surface.
+drift apart. Every function in the library that consumes a recording is
+on it.
 
 They live beside :class:`Signal` rather than in ``_internal`` because that
 tree is a leaf every package may import: a resolver there would have to

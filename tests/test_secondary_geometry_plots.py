@@ -120,7 +120,7 @@ def test_intensity_result_retains_spacing_and_draws() -> None:
     t = np.arange(fs // 4) / fs
     p1 = np.sin(2.0 * np.pi * 500.0 * t)
     p2 = np.sin(2.0 * np.pi * 500.0 * t - 0.05)
-    res = pm.sound_intensity(p1, p2, fs, 0.012)
+    res = pm.sound_intensity(p1, p2, fs, spacing=0.012)
     assert res.spacing == pytest.approx(0.012)
     assert res.plot_geometry() is not None
     assert pm.plot_pp_probe_geometry() is not None

@@ -455,8 +455,8 @@ spectrum by other means still conforms.
 
 ```python
 impact_force_exposure_level(
-    force: ArrayLike,
-    sample_rate: float,
+    force: SignalInput,
+    sample_rate: float | None = None,
     *,
     reference_force: float = 1.0,
     reference_time: float = 1.0,
@@ -488,8 +488,8 @@ supplied record with the trapezoidal rule, so pass one isolated impact.
 
 | Name | Description |
 | :--- | :--- |
-| `force` | Sampled instantaneous force `F(t)`, in newtons (1-D). |
-| `sample_rate` | Sampling rate of *force*, in hertz (> 0). |
+| `force` | Sampled instantaneous force `F(t)`, in newtons (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately not applied, because this record is a force in newtons and not a pressure. |
+| `sample_rate` | Sampling rate of *force*, in hertz (> 0). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `reference_force` | Reference force `F0`, in newtons (Default: 1 N). |
 | `reference_time` | Reference time interval `Tref`, in seconds (Default: 1 s). |
 

@@ -163,7 +163,7 @@ freqs = np.fft.rfftfreq(n, 1 / fs)
 # más tarde, aplicado como desfase y no como un número entero de muestras.
 plane = emission.sound_intensity(
     noise, np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n),
-    fs, dr, fraction=3, limits=[100.0, 5000.0],
+    fs, spacing=dr, fraction=3, limits=[100.0, 5000.0],
 )
 
 # Derecha: una onda estacionaria, dos ondas iguales contrapropagantes, con la
@@ -172,7 +172,8 @@ k, x0 = 2 * np.pi * freqs / c, 0.30
 def at(pos):
     return np.fft.irfft(spectrum * 2.0 * np.cos(k * pos), n)
 standing = emission.sound_intensity(at(x0 - dr / 2), at(x0 + dr / 2),
-                                    fs, dr, fraction=3, limits=[100.0, 5000.0])
+                                    fs, spacing=dr, fraction=3,
+                                    limits=[100.0, 5000.0])
 
 fig, (axl, axr) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
 plane.plot(ax=axl, language="es")
@@ -667,7 +668,7 @@ espectro, bins = np.fft.rfft(x), np.fft.rfftfreq(fs, 1 / fs)
 fig, (axs, axi) = plt.subplots(2, 1, sharex=True)
 for dr in (0.006, 0.012, 0.050):
     p2 = np.fft.irfft(espectro * np.exp(-2j * np.pi * bins * dr / c), fs)
-    res = emission.sound_intensity(x, p2, fs, dr, fraction=3,
+    res = emission.sound_intensity(x, p2, fs, spacing=dr, fraction=3,
                                    limits=[20.0, 12500.0])
     utiles = res.frequency < c / (4.0 * dr)      # descartar las bandas saturadas
     axs.semilogx(res.frequency[utiles],

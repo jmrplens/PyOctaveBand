@@ -62,6 +62,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..io._resolve import SignalInput, apply_calibration, resolve_pair_fs
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -357,9 +359,10 @@ def _validate_band_options(fraction: int | None, limits: list[float] | None) -> 
 
 
 def sound_intensity(
-    p1: list[float] | np.ndarray,
-    p2: list[float] | np.ndarray,
-    fs: int,
+    p1: SignalInput,
+    p2: SignalInput,
+    fs: int | None = None,
+    *,
     spacing: float,
     rho: float = 1.204,
     c: float = 343.0,
@@ -403,9 +406,17 @@ def sound_intensity(
     ``max_valid_frequency`` :math:`= 0.1 \, c / \Delta r`, and
     ``bias_correction`` provides the per-band compensation factor.
 
-    :param p1: Pressure signal of microphone 1, in pascals (1D).
-    :param p2: Pressure signal of microphone 2, in pascals (1D).
-    :param fs: Sample rate in Hz.
+    :param p1: Pressure signal of microphone 1, in pascals (1D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples, which is what puts them in pascals; the intensity goes as
+        the product of the two pressures, so a factor on both scales it by
+        the square of that factor.
+    :param p2: Pressure signal of microphone 2, in pascals (1D). Same
+        treatment as ``p1``.
+    :param fs: Sample rate in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply
+        it, and two Signals recorded at different rates are refused rather
+        than arbitrated.
     :param spacing: Microphone separation :math:`\Delta r`, in metres.
     :param rho: Air density, in kg/m^3. Default 1.204 (20 degC).
     :param c: Speed of sound, in m/s. Default 343.0.
@@ -430,8 +441,9 @@ def sound_intensity(
         reported either way.
     :return: :class:`IntensityResult`.
     """
-    x1 = _typesignal(p1)
-    x2 = _typesignal(p2)
+    fs = resolve_pair_fs(p1, p2, fs, names=("p1", "p2"))
+    x1 = apply_calibration(p1, _typesignal(np.asarray(p1)))
+    x2 = apply_calibration(p2, _typesignal(np.asarray(p2)))
     _validate_probe_signals(x1, x2)
     _validate_probe_medium(fs, spacing, rho, c)
     _validate_band_options(fraction, limits)

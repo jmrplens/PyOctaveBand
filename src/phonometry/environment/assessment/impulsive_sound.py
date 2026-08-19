@@ -67,6 +67,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from ..._internal.warnings import PhonometryWarning
+from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -477,8 +478,8 @@ class ImpulsiveSoundResult:
 
 
 def sound_pressure_level_history(
-    signal: ArrayLike,
-    fs: float,
+    signal: SignalInput,
+    fs: float | None = None,
     *,
     dt: float = DEFAULT_SAMPLE_INTERVAL,
     reference_pressure: float = REFERENCE_PRESSURE,
@@ -491,8 +492,14 @@ def sound_pressure_level_history(
     and sampled at intervals ``dt`` in the 10-25 ms range required by the
     standard.
 
-    :param signal: Calibrated sound pressure signal, in pascal.
-    :param fs: Sampling rate of ``signal``, in Hz.
+    :param signal: Calibrated sound pressure signal, in pascal. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: that factor is what puts them in pascal, and it is a
+        different knob from ``calibration_offset``, which shifts the
+        finished level in decibels for a record that never was.
+    :param fs: Sampling rate of ``signal``, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param dt: Target sampling interval of ``LpAF``, in seconds (10-25 ms).
     :param reference_pressure: Reference pressure, in pascal (default 20 uPa).
     :param calibration_offset: Level offset added to ``LpAF``, in dB, for
@@ -504,7 +511,8 @@ def sound_pressure_level_history(
     """
     from ...filters.weighting import time_weighting, weighting_filter
 
-    x = np.asarray(signal, dtype=np.float64).ravel()
+    fs = resolve_fs(signal, fs, name="signal")
+    x = np.asarray(resolve_samples(signal), dtype=np.float64).ravel()
     if not math.isfinite(fs) or fs <= 0.0:
         raise ValueError("fs must be positive.")
     lo, hi = SAMPLE_INTERVAL_RANGE
@@ -697,8 +705,8 @@ def _categorise(adjustment: float) -> str:
 
 
 def impulsive_sound_adjustment(
-    signal: ArrayLike,
-    fs: float,
+    signal: SignalInput,
+    fs: float | None = None,
     *,
     dt: float = DEFAULT_SAMPLE_INTERVAL,
     reference_pressure: float = REFERENCE_PRESSURE,
@@ -713,9 +721,15 @@ def impulsive_sound_adjustment(
     adjustment ``KI`` (Formula 3) of the most prominent qualifying impulse,
     together with the source category (Clause 7) and the adjusted ``LAeq``.
 
-    :param signal: Calibrated sound pressure signal of the candidate event, in
-        pascal.
-    :param fs: Sampling rate of ``signal``, in Hz.
+    :param signal: Calibrated sound pressure signal of the candidate event,
+        in pascal. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: that factor is what puts them in pascal, and it is a
+        different knob from ``calibration_offset``, which shifts the
+        finished level in decibels for a record that never was.
+    :param fs: Sampling rate of ``signal``, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param dt: Target ``LpAF`` sampling interval, in seconds (10-25 ms).
     :param reference_pressure: Reference pressure, in pascal (default 20 uPa).
     :param calibration_offset: Level offset, in dB, for signals not scaled to
@@ -729,7 +743,8 @@ def impulsive_sound_adjustment(
         prominence, adjustment, category and adjusted ``LAeq``.
     :raises ValueError: for invalid ``fs``, ``dt`` or an empty signal.
     """
-    x = np.asarray(signal, dtype=np.float64).ravel()
+    fs = resolve_fs(signal, fs, name="signal")
+    x = np.asarray(resolve_samples(signal), dtype=np.float64).ravel()
     times, levels = sound_pressure_level_history(
         x, fs, dt=dt, reference_pressure=reference_pressure, calibration_offset=calibration_offset
     )

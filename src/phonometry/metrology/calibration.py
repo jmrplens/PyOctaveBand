@@ -11,6 +11,7 @@ from typing import Literal, overload
 import numpy as np
 
 from .._internal.warnings import PhonometryWarning
+from ..io._resolve import SignalInput, resolve_optional_fs, resolve_samples
 
 
 class CalibrationWarning(PhonometryWarning):
@@ -37,7 +38,7 @@ def _class1_fluctuation_limit(frequency: float) -> float:
 
 @overload
 def sensitivity(
-    ref_signal: list[float] | np.ndarray,
+    ref_signal: SignalInput,
     target_spl: float = ...,
     ref_pressure: float = ...,
     *,
@@ -51,7 +52,7 @@ def sensitivity(
 
 @overload
 def sensitivity(
-    ref_signal: list[float] | np.ndarray,
+    ref_signal: SignalInput,
     target_spl: float = ...,
     ref_pressure: float = ...,
     fs: int | None = ...,
@@ -63,7 +64,7 @@ def sensitivity(
 
 
 def sensitivity(
-    ref_signal: list[float] | np.ndarray,
+    ref_signal: SignalInput,
     target_spl: float = 94.0,
     ref_pressure: float = 2e-5,
     fs: int | None = None,
@@ -94,11 +95,17 @@ def sensitivity(
        settled portion of the recording is available (>= 1 s after the 1 s
        integrator attack).
 
-    :param ref_signal: Recording of the calibration tone.
+    :param ref_signal: Recording of the calibration tone. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately **not** applied, because this function is
+        what produces such a factor and folding an existing one in would
+        calibrate the calibration.
     :param target_spl: The known SPL level of the calibrator (default 94 dB).
     :param ref_pressure: Reference pressure (default 20 microPascals).
     :param fs: Sample rate of the recording in Hz. Required for the
-        stability validation; without it the check is skipped.
+        stability validation; without it the check is skipped. A
+        :class:`~phonometry.io.Signal` supplies it, so a read take gets the
+        validation for free, and an explicit value that disagrees raises.
     :param validate: If True (default) and ``fs`` is given, warn when the
         recording's short-term level fluctuation exceeds the limit.
     :param max_fluctuation_db: Explicit fluctuation limit in dB. Default
@@ -117,7 +124,11 @@ def sensitivity(
         enable it for noisy coupler recordings.
     :return: Calibration factor (sensitivity multiplier).
     """
-    signal_arr = np.asarray(ref_signal, dtype=np.float64)
+    fs = resolve_optional_fs(ref_signal, fs)
+    # calibrate=False: this function *derives* the digital-to-pascal factor
+    # from a calibrator take, so scaling the samples by a factor the object
+    # already carries would fold the old calibration into the new one.
+    signal_arr = np.asarray(resolve_samples(ref_signal, calibrate=False), dtype=np.float64)
     if signal_arr.size == 0:
         raise ValueError("Reference signal is empty, cannot calibrate.")
     if not np.all(np.isfinite(signal_arr)):

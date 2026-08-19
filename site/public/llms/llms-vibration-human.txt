@@ -286,7 +286,7 @@ from phonometry import vibration
 
 fs = 1000.0
 raw = np.random.default_rng(0).standard_normal(int(60 * fs))   # 60 s record
-a_w = vibration.apply_weighting(raw, fs, "Wk")                        # weighted signal
+a_w = vibration.apply_weighting(raw, fs, name="Wk")                        # weighted signal
 
 print(round(vibration.vibration_dose_value(a_w, fs), 3))   # 0.744  VDV [m/s^1.75]
 print(round(vibration.mtvv(a_w, fs), 3))                   # 0.265  MTVV [m/s^2]

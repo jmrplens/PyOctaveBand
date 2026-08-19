@@ -359,9 +359,10 @@ intensity axis through both; default is the classic 12 mm spacer.
 
 ```python
 sound_intensity(
-    p1: list[float] | np.ndarray,
-    p2: list[float] | np.ndarray,
-    fs: int,
+    p1: SignalInput,
+    p2: SignalInput,
+    fs: int | None = None,
+    *,
     spacing: float,
     rho: float = 1.204,
     c: float = 343.0,
@@ -409,9 +410,9 @@ by the factor $\sin(k \Delta r)/(k \Delta r)$ (IEC 61043:1993,
 
 | Name | Description |
 | :--- | :--- |
-| `p1` | Pressure signal of microphone 1, in pascals (1D). |
-| `p2` | Pressure signal of microphone 2, in pascals (1D). |
-| `fs` | Sample rate in Hz. |
+| `p1` | Pressure signal of microphone 1, in pascals (1D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, which is what puts them in pascals; the intensity goes as the product of the two pressures, so a factor on both scales it by the square of that factor. |
+| `p2` | Pressure signal of microphone 2, in pascals (1D). Same treatment as `p1`. |
+| `fs` | Sample rate in Hz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `spacing` | Microphone separation $\Delta r$, in metres. |
 | `rho` | Air density, in kg/m^3. Default 1.204 (20 degC). |
 | `c` | Speed of sound, in m/s. Default 343.0. |

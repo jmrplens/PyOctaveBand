@@ -64,6 +64,7 @@ from scipy import signal as sig
 
 from ..._internal.types import Real
 from ..._internal.warnings import PhonometryWarning
+from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
@@ -335,7 +336,9 @@ def weighting_factors(name: str, frequencies: ArrayLike) -> Real:
     return frequency_weighting(name, frequencies).magnitude
 
 
-def apply_weighting(signal: ArrayLike, fs: float, name: str) -> Real:
+def apply_weighting(
+    signal: SignalInput, fs: float | None = None, *, name: str
+) -> Real:
     """Apply frequency weighting ``name`` to a time signal (ISO 8041-1).
 
     The exact analog response :func:`frequency_weighting` is applied in the
@@ -345,16 +348,20 @@ def apply_weighting(signal: ArrayLike, fs: float, name: str) -> Real:
     to a record long enough (or pre-tapered) that the boundary transient is
     negligible, as for any block frequency-domain filtering.
 
-    :param signal: Unweighted acceleration time history (1-D), in m/s2.
-    :param fs: Sampling frequency, in hertz (> 0).
+    :param signal: Unweighted acceleration time history (1-D), in m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz (> 0). Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param name: Weighting name (one of :data:`WEIGHTING_NAMES`).
     :return: The frequency-weighted acceleration signal, same length as input.
     :raises ValueError: if ``signal`` is not 1-D, ``fs`` is not positive, or
         ``name`` is unknown.
     """
-    x = np.asarray(signal, dtype=np.float64)
-    if x.ndim != 1 or x.size == 0:
-        raise ValueError("'signal' must be a non-empty 1-D array.")
+    fs = resolve_fs(signal, fs, name="signal")
+    x = _weighted_signal(signal)
     fs = _positive_fs(fs)
     n = x.size
     freqs = np.fft.rfftfreq(n, d=1.0 / fs).astype(np.float64)
@@ -451,8 +458,15 @@ def weighted_acceleration(
 # ---------------------------------------------------------------------------
 # Time-domain metrics (ISO 2631-1 clause 6; ISO 8041-1 clause 3.1.2).
 # ---------------------------------------------------------------------------
-def _weighted_signal(signal: ArrayLike) -> Real:
-    x = np.asarray(signal, dtype=np.float64)
+def _weighted_signal(signal: SignalInput) -> Real:
+    """The 1-D acceleration record, never scaled to pascals.
+
+    A :class:`~phonometry.io.Signal` may carry a digital-to-pascal factor,
+    and this quantity is an acceleration in m/s2: applying it would be a
+    unit conversion nobody asked for. This is the exemption the contract
+    describes for a quantity that is not a pressure.
+    """
+    x = np.asarray(resolve_samples(signal, calibrate=False), dtype=np.float64)
     if x.ndim != 1 or x.size == 0:
         raise ValueError("'signal' must be a non-empty 1-D array.")
     return x
@@ -467,16 +481,21 @@ def _positive_fs(fs: float) -> float:
 
 
 def running_rms(
-    signal: ArrayLike,
-    fs: float,
+    signal: SignalInput,
+    fs: float | None = None,
     *,
     integration_time: float = 1.0,
     method: str = "linear",
 ) -> Real:
     """Running r.m.s. of a weighted signal (ISO 2631-1 Eqs. (2)/(3)).
 
-    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
-    :param fs: Sampling frequency, in hertz.
+    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param integration_time: Averaging time ``tau``, in seconds (default 1 s,
         the "slow" constant of ISO 2631-1 6.3.1).
     :param method: ``"linear"`` (Eq. (2), a sliding rectangular average) or
@@ -485,6 +504,7 @@ def running_rms(
     :raises ValueError: for a bad signal, non-positive ``fs``/``tau`` or an
         unknown ``method``.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     x = _weighted_signal(signal)
     fs = _positive_fs(fs)
     tau = float(integration_time)
@@ -510,13 +530,23 @@ def running_rms(
     return np.sqrt(mean_power)
 
 
-def mtvv(signal: ArrayLike, fs: float, *, integration_time: float = 1.0) -> float:
+def mtvv(
+    signal: SignalInput,
+    fs: float | None = None,
+    *,
+    integration_time: float = 1.0,
+) -> float:
     """Maximum transient vibration value (ISO 2631-1 Eq. (4)).
 
     ``MTVV = max a_w(t0)``, the peak of the 1 s running r.m.s. value.
 
-    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
-    :param fs: Sampling frequency, in hertz.
+    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param integration_time: Running-r.m.s. averaging time, in seconds (1 s).
     :return: The MTVV, in m/s2.
     """
@@ -525,40 +555,56 @@ def mtvv(signal: ArrayLike, fs: float, *, integration_time: float = 1.0) -> floa
     )
 
 
-def vibration_dose_value(signal: ArrayLike, fs: float) -> float:
+def vibration_dose_value(
+    signal: SignalInput, fs: float | None = None
+) -> float:
     r"""Vibration dose value ``VDV`` (ISO 2631-1 Eq. (5)).
 
     :math:`\mathrm{VDV} = \left( \int a_\mathrm{w}(t)^4 \, dt \right)^{1/4}`, in
     m/s^1.75; more sensitive to peaks than the r.m.s. value.
 
-    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
-    :param fs: Sampling frequency, in hertz.
+    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :return: The VDV, in m/s^1.75.
     :raises ValueError: for a bad signal or non-positive ``fs``.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     x = _weighted_signal(signal)
     fs = _positive_fs(fs)
     return float(np.sum(x**4 / fs) ** 0.25)
 
 
-def motion_sickness_dose_value(signal: ArrayLike, fs: float) -> float:
+def motion_sickness_dose_value(
+    signal: SignalInput, fs: float | None = None
+) -> float:
     r"""Motion sickness dose value ``MSDV`` (ISO 2631-1 clause 9; 8041-1
     3.1.2.5).
 
     :math:`\mathrm{MSDV} = \left( \int a_\mathrm{w}(t)^2 \, dt \right)^{1/2}`, in
     m/s^1.5; the ``Wf``-weighted signal is the intended input.
 
-    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
-    :param fs: Sampling frequency, in hertz.
+    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately not applied, because this quantity is an
+        acceleration in m/s2 and not a pressure.
+    :param fs: Sampling frequency, in hertz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :return: The MSDV, in m/s^1.5.
     :raises ValueError: for a bad signal or non-positive ``fs``.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     x = _weighted_signal(signal)
     fs = _positive_fs(fs)
     return float(np.sum(x**2 / fs) ** 0.5)
 
 
-def crest_factor(signal: ArrayLike) -> float:
+def crest_factor(signal: SignalInput) -> float:
     """Crest factor of a weighted signal (ISO 2631-1 clause 6.2.1).
 
     The modulus of the ratio of the peak weighted acceleration to its r.m.s.
@@ -570,6 +616,10 @@ def crest_factor(signal: ArrayLike) -> float:
     inadequate.
 
     :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
+        Accepts a :class:`phonometry.io.Signal`, of which only the samples
+        are read: a peak-to-r.m.s. ratio needs no sample rate, and a
+        calibration factor the object carries is deliberately not applied,
+        because this quantity is an acceleration in m/s2 and not a pressure.
     :return: The crest factor (dimensionless); ``0`` for an all-zero signal.
     """
     x = _weighted_signal(signal)

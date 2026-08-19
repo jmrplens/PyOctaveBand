@@ -81,8 +81,8 @@ $\mathrm{SEL}_{\mathrm{ss}} + 10 \log_{10} N$.
 
 ```python
 pile_strike_metrics(
-    pressure: NDArray[np.float64] | list[float],
-    fs: float,
+    pressure: SignalInput,
+    fs: float | None = None,
 ) -> PileStrikeResult
 ```
 
@@ -95,8 +95,8 @@ and the 90 %-energy pulse duration of one recorded hammer strike.
 
 | Name | Description |
 | :--- | :--- |
-| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. |
-| `fs` | Sample rate, in Hz. |
+| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: this quantity is a pressure, and the underwater reference of 1 uPa changes what the decibel is counted from, not what the samples have to be in. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 
 **Returns:** A [`PileStrikeResult`](/phonometry/reference/api/underwater/pile-driving-noise/#pilestrikeresult).
 
@@ -148,10 +148,7 @@ Plot the strike waveform and its cumulative energy.
 ## single_strike_sel
 
 ```python
-single_strike_sel(
-    pressure: NDArray[np.float64] | list[float],
-    fs: float,
-) -> float
+single_strike_sel(pressure: SignalInput, fs: float | None = None) -> float
 ```
 
 Single-strike sound exposure level `SEL_ss` (ISO 18406 Formulae 3-4).
@@ -163,8 +160,8 @@ pulse, in dB re 1 µPa²·s.
 
 | Name | Description |
 | :--- | :--- |
-| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. |
-| `fs` | Sample rate, in Hz. |
+| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: this quantity is a pressure, and the underwater reference of 1 uPa changes what the decibel is counted from, not what the samples have to be in. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 
 **Returns:** Single-strike SEL, in dB re 1 µPa²·s.
 
@@ -178,8 +175,8 @@ pulse, in dB re 1 µPa²·s.
 
 ```python
 strike_sel_spectrum(
-    pressure: NDArray[np.float64] | list[float],
-    fs: float,
+    pressure: SignalInput,
+    fs: float | None = None,
     *,
     fraction: int = 3,
     limits: tuple[float, float] = (10.0, 20000.0),
@@ -204,8 +201,8 @@ handed straight to
 
 | Name | Description |
 | :--- | :--- |
-| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. |
-| `fs` | Sample rate, in Hz. |
+| `pressure` | Sound-pressure time series of one strike (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: this quantity is a pressure, and the underwater reference of 1 uPa changes what the decibel is counted from, not what the samples have to be in. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fraction` | Bandwidth fraction: 1 (octave) or 3 (one-third octave). |
 | `limits` | Lower and upper band-centre limits, in Hz. |
 
