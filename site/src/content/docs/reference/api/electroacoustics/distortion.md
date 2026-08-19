@@ -39,8 +39,8 @@ are built on the spectrum, notch and weighting helpers of this module.
 
 ```python
 harmonic_analysis(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     n_harmonics: int = 10,
@@ -59,8 +59,8 @@ conventions), THD+N and SINAD into a plottable result.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: the three distortion ratios and the SINAD are ratios and come out unchanged, but `harmonic_amplitudes` carries the unit and so lands in pascals when the record is calibrated. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency, or `None` to auto-detect. |
 | `n_harmonics` | Highest harmonic order (default 10). |
 | `notch_q` | Effective notch quality factor for THD+N (default 2.0). |
@@ -79,11 +79,11 @@ conventions), THD+N and SINAD into a plottable result.
 
 ```python
 harmonic_distortion(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     fundamental: float,
     order: int,
-    *,
     n_harmonics: int = 10,
     window: str = 'hann',
 ) -> float
@@ -98,8 +98,8 @@ amplitude relative to the total RMS.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency $f_1$, in Hz. |
 | `order` | Harmonic order `n` (>= 2). |
 | `n_harmonics` | Highest harmonic order used for the total RMS. |
@@ -194,8 +194,8 @@ additional gain of -5,63 dB (unity at 2 kHz, the "CCIR-RMS" filter).
 
 ```python
 sinad(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = 2.0,
@@ -218,8 +218,8 @@ measurement (same notch, same measurement bandwidth).
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency, or `None` to auto-detect. |
 | `notch_q` | Effective notch quality factor (AES17: 1.2..3; default 2.0). |
 | `bandwidth` | Upper band-edge frequency of the AES17 chain, in Hz (default 20 kHz); `None` measures the full Nyquist band. |
@@ -237,8 +237,8 @@ measurement (same notch, same measurement bandwidth).
 
 ```python
 thd(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     kind: Literal['F', 'R'] = 'F',
@@ -271,8 +271,8 @@ datasheets; the two agree to first order for small distortion.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). Coherent sampling (integer periods) or a low-leakage window gives the exact value. |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. Coherent sampling (integer periods) or a low-leakage window gives the exact value. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency $f_1$ in Hz, or `None` to take the largest spectral peak. |
 | `kind` | `'F'` (relative to the fundamental, the default) or `'R'` (relative to the total RMS, the 14.12.3.2 quantity). |
 | `n_harmonics` | Highest harmonic order summed (default 10). |
@@ -290,8 +290,8 @@ datasheets; the two agree to first order for small distortion.
 
 ```python
 thd_plus_noise(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = 2.0,
@@ -316,8 +316,8 @@ and out-of-band noise do not inflate the result.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency, or `None` to auto-detect. |
 | `notch_q` | Effective notch quality factor (AES17: 1.2..3; default 2.0). |
 | `bandwidth` | Upper band-edge frequency of the AES17 chain, in Hz (default 20 kHz, the 5.2.5 standard value; capped at Nyquist). `None` disables the chain and measures the full Nyquist band (20 Hz high-pass included only when the chain is active). |
@@ -336,8 +336,8 @@ and out-of-band noise do not inflate the result.
 
 ```python
 weighted_thd(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = 2.0,
@@ -365,8 +365,8 @@ between 31,5 Hz and 400 Hz.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency, or `None` to auto-detect. |
 | `notch_q` | Effective notch quality factor (default 2.0). |
 | `weighting` | Frequency weighting applied to the residual: `'468'` (ITU-R BS.468-4 / IEC 60268-1, the 14.12.11 default), `'A'` or `'C'`. |

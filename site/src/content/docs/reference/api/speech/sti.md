@@ -25,27 +25,11 @@ the male test-signal spectrum (A.6.1).
 
 ```python
 sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
-    snr: None,
-    level: Sequence[float] | np.ndarray,
-    ambient: Sequence[float] | np.ndarray,
-) -> STIResult
-
-sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
-    snr: None = ...,
-    *,
-    level: Sequence[float] | np.ndarray,
-    ambient: Sequence[float] | np.ndarray,
-) -> STIResult
-
-sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
-    snr: float | Sequence[float] | np.ndarray | None = ...,
-    level: Sequence[float] | np.ndarray | None = ...,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    snr: float | Sequence[float] | np.ndarray | None = None,
+    level: Sequence[float] | np.ndarray | None = None,
+    ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult
 ```
 
@@ -87,8 +71,8 @@ STI itself stays within ~0.001.
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Impulse response (1D). |
-| `fs` | Sample rate in Hz (>= 22,5 kHz so the 8 kHz band fits). |
+| `ir` | Impulse response (1D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: every modulation index is normalised by the total intensity of its own band, so a factor on the record moves neither the transfer values nor the STI. The absolute levels the noise corrections need arrive through `level` and `ambient`, in dB, not from the samples. |
+| `fs` | Sample rate in Hz (>= 22,5 kHz so the 8 kHz band fits). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `snr` | Optional signal-to-noise ratio in dB, scalar or one value per octave band. Degrades m by 1/(1 + 10^(-SNR/10)); combined with `level` it is interpreted as ambient levels `level - snr` so noise is not applied twice. Mutually exclusive with `ambient`. |
 | `level` | Optional speech octave-band levels in dB SPL (7 values) at the listener position; enables the auditory masking (Ed.5 Table A.2) and reception threshold (Ed.5 Table A.3) corrections. |
 | `ambient` | Optional ambient noise octave-band levels in dB SPL (7 values); requires `level`. |
@@ -99,27 +83,11 @@ STI itself stays within ~0.001.
 
 ```python
 stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None,
-    level: Sequence[float] | np.ndarray,
-    ambient: Sequence[float] | np.ndarray,
-) -> STIResult
-
-stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None = ...,
-    *,
-    level: Sequence[float] | np.ndarray,
-    ambient: Sequence[float] | np.ndarray,
-) -> STIResult
-
-stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None = ...,
-    level: Sequence[float] | np.ndarray | None = ...,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    reference: Signal | list[float] | np.ndarray | None = None,
+    level: Sequence[float] | np.ndarray | None = None,
+    ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult
 ```
 
@@ -149,9 +117,9 @@ biased low (an ideal loopback gives STI ~0.956 at 5 s vs ~0.998 at 18 s).
 
 | Name | Description |
 | :--- | :--- |
-| `x` | Recorded STIPA signal (1D), 15 s to 25 s recommended. |
-| `fs` | Sample rate in Hz (>= 22,5 kHz). |
-| `reference` | Optional reference recording of the undistorted test signal; its measured modulation depths replace the nominal 0,55 as normalization (useful for non-conformant sources). |
+| `x` | Recorded STIPA signal (1D), 15 s to 25 s recommended. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: every modulation index is normalised by the total intensity of its own band, so a factor on the record moves neither the transfer values nor the STI. The absolute levels the noise corrections need arrive through `level` and `ambient`, in dB, not from the samples. |
+| `fs` | Sample rate in Hz (>= 22,5 kHz). Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
+| `reference` | Optional reference recording of the undistorted test signal; its measured modulation depths replace the nominal 0,55 as normalization (useful for non-conformant sources). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal); only its samples are read, since what is taken from it is a modulation depth, already normalised. |
 | `level` | Optional speech octave-band levels in dB SPL (7 values) enabling auditory masking and reception threshold corrections. |
 | `ambient` | Optional ambient noise octave-band levels in dB SPL (7 values); requires `level`. |
 

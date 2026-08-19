@@ -64,12 +64,12 @@ matches [`phonometry.thd`](/phonometry/reference/api/electroacoustics/distortion
 
 ```python
 swept_sine_distortion(
-    recorded: NDArray[np.float64] | list[float],
-    fs: float,
+    recorded: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     f1: float,
     f2: float,
     seconds: float,
-    *,
     method: Literal['synchronized', 'farina'] = 'synchronized',
     n_harmonics: int = 5,
     ir_length: int | None = None,
@@ -100,8 +100,8 @@ capped at `f2` by the inverse filter).
 
 | Name | Description |
 | :--- | :--- |
-| `recorded` | Recorded system response (1-D). Include enough trailing room for the system to decay; at least the sweep length. |
-| `fs` | Sample rate, in Hz. |
+| `recorded` | Recorded system response (1-D). Include enough trailing room for the system to decay; at least the sweep length. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: `harmonic_responses` and `harmonic_irs` carry the unit and so come out in pascals per unit of excitation, while `thd` and `distortion_ratios` are ratios of harmonics drawn from the same record and do not move. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `f1` | Sweep start frequency, in Hz. |
 | `f2` | Sweep stop frequency, in Hz. Distortion products above Nyquist fold back in any real recording, so keep `n_harmonics*f2` in mind when choosing the sweep band. |
 | `seconds` | Sweep duration handed to the generator, in seconds (for the synchronized method the actual duration is the same quantized value the generator used). |

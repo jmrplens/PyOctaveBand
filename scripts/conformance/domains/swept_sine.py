@@ -34,7 +34,7 @@ def _swept_sine_polynomial() -> Any:
     fs, f1, f2, seconds = 48000, 20.0, 6000.0, 2.0
     x = ph.synchronized_sweep_signal(fs, f1, f2, seconds)
     y = x + _SS_A2 * x**2 + _SS_A3 * x**3
-    return ph.swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+    return ph.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 
 def _ss_response_at(res: Any, order: int, freq: float) -> complex:
@@ -89,7 +89,9 @@ def _chk_swept_sine_linear_floor() -> Outcome:
     # residue, and 4 s of sweep leaves 3x headroom under the 1e-3 bound.
     fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
     x = ph.synchronized_sweep_signal(fs, f1, f2, seconds)
-    res = ph.swept_sine_distortion(0.5 * x, fs, f1, f2, seconds, n_harmonics=3)
+    res = ph.swept_sine_distortion(
+        0.5 * x, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
+    )
     band = (res.thd_frequencies > 100.0) & (res.thd_frequencies < 2000.0)
     return numeric(0.0, float(np.max(res.thd[band])), 1e-3, places=5)
 

@@ -209,7 +209,7 @@ def test_distortion_from_swept_sine_result() -> None:
     sweep = ph.synchronized_sweep_signal(fs, 100.0, 5000.0, 1.0)
     a2, a3 = 0.05, 0.02
     y = sweep + a2 * sweep**2 + a3 * sweep**3
-    swept = ph.swept_sine_distortion(y, fs, 100.0, 5000.0, 1.0)
+    swept = ph.swept_sine_distortion(y, fs, f1=100.0, f2=5000.0, seconds=1.0)
     f, spl = _flat_response()
     result = loudspeaker_characteristics(
         f, spl, _R, sensitivity_band=(200.0, 4000.0), distortion=swept

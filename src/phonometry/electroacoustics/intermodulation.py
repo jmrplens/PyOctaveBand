@@ -33,6 +33,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .distortion import (
     _amplitude_spectrum,
     _positive,
@@ -139,11 +141,11 @@ class ModulationDistortionResult:
 
 
 def modulation_distortion(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     f_low: float,
     f_high: float,
-    *,
     window: str = "hann",
 ) -> ModulationDistortionResult:
     r"""Modulation distortion of the nth order (IEC 60268-3 14.12.7).
@@ -167,8 +169,14 @@ def modulation_distortion(
     root-sum-square that SMPTE-type analyzers report is returned alongside
     as ``smpte``.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: the distortion ratios are ratios and come out unchanged,
+        while ``carrier_amplitude`` and ``sideband_amplitudes`` carry the
+        unit and so land in pascals when the record is calibrated.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param f_low: Low modulating tone ``f1``, in Hz (e.g. 60 Hz).
     :param f_high: High carrier tone ``f2``, in Hz (e.g. 7 kHz).
     :param window: FFT window (default ``'hann'``).
@@ -176,6 +184,7 @@ def modulation_distortion(
         the ``smpte`` combined RMS.
     :raises ValueError: If the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     fl = _positive(f_low, "f_low")
@@ -218,11 +227,11 @@ def modulation_distortion(
 
 
 def difference_frequency_distortion(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     f1: float,
     f2: float,
-    *,
     order: int = 2,
     window: str = "hann",
 ) -> float:
@@ -244,8 +253,14 @@ def difference_frequency_distortion(
     that fall outside (0, Nyquist) or that cannot be separated from a primary
     tone or DC read zero.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of product amplitudes
+        drawn from the same record, so the factor divides out and the
+        answer is the same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param f1: Lower tone, in Hz.
     :param f2: Upper tone, in Hz.
     :param order: Product order (2 or 3).
@@ -253,6 +268,7 @@ def difference_frequency_distortion(
     :return: nth-order difference-frequency distortion, as a ratio.
     :raises ValueError: If ``order`` is not 2 or 3 or the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     fa = _positive(f1, "f1")
@@ -277,8 +293,8 @@ def difference_frequency_distortion(
 
 
 def total_difference_frequency_distortion(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     f1: float = 8000.0,
     f2: float = 11950.0,
     *,
@@ -303,14 +319,21 @@ def total_difference_frequency_distortion(
     (The out-of-band product at :math:`2 f_2 - f_1` is explicitly not
     part of it.)
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of product amplitudes
+        drawn from the same record, so the factor divides out and the
+        answer is the same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param f1: Lower tone, in Hz (default 8 kHz, per 14.12.10.2 b).
     :param f2: Upper tone, in Hz (default 11.95 kHz, per 14.12.10.2 b).
     :param window: FFT window (default ``'hann'``).
     :return: Total difference-frequency distortion, as a ratio.
     :raises ValueError: If the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     fa = _positive(f1, "f1")
@@ -359,8 +382,8 @@ def _dim_components(f_sine: float, f_square: float, nyquist: float) -> list[floa
 
 
 def dynamic_intermodulation_distortion(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     f_sine: float = 15000.0,
     f_square: float = 3150.0,
@@ -375,14 +398,21 @@ def dynamic_intermodulation_distortion(
     fall below ``f_sine`` (IEC 60268-3 Table 2), relative to the 15 kHz
     sine amplitude.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of product amplitudes
+        drawn from the same record, so the factor divides out and the
+        answer is the same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param f_sine: High sine frequency, in Hz (default 15 kHz).
     :param f_square: Square-wave fundamental, in Hz (default 3.15 kHz).
     :param window: FFT window (default ``'hann'``).
     :return: Dynamic intermodulation distortion, as a ratio.
     :raises ValueError: If the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     fsine = _positive(f_sine, "f_sine")

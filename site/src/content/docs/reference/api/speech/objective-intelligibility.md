@@ -48,9 +48,9 @@ dependency).
 
 ```python
 stoi(
-    clean: ArrayLike,
-    degraded: ArrayLike,
-    fs: int,
+    clean: Signal | list[float] | np.ndarray,
+    degraded: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     extended: bool = False,
 ) -> STOIResult
@@ -68,9 +68,9 @@ envelopes, and compared over 384 ms segments.
 
 | Name | Description |
 | :--- | :--- |
-| `clean` | The clean reference speech (1-D). |
+| `clean` | The clean reference speech (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal); STOI normalises every band of every segment before correlating them, so a calibration factor on either record cancels and the score does not move. The factor is applied anyway, so that the samples entering the computation are the same ones every other surface on this contract would see. |
 | `degraded` | The degraded/processed speech (1-D, same length as `clean`, same sample rate). |
-| `fs` | Sample rate of both signals, in hertz. |
+| `fs` | Sample rate of both signals, in hertz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `extended` | Use ESTOI (spectral correlation, robust to modulated maskers) instead of STOI. |
 
 **Returns:** A [`STOIResult`](/phonometry/reference/api/speech/objective-intelligibility/#stoiresult) with the index `.value` and its `.plot()`.

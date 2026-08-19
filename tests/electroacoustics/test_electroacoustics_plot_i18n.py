@@ -61,7 +61,7 @@ def test_swept_sine_distortion_es() -> None:
     f1, f2, seconds = 100.0, 8000.0, 1.0
     sweep = ph.synchronized_sweep_signal(FS, f1, f2, seconds)
     rec = sweep + 0.01 * sweep ** 2
-    res = ph.swept_sine_distortion(rec, FS, f1, f2, seconds, n_harmonics=3)
+    res = ph.swept_sine_distortion(rec, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
     # Two-panel figure: harmonic responses (title) + THD(f) (excitation axis).
     axes = res.plot(language="es")
     text = _labels(axes)

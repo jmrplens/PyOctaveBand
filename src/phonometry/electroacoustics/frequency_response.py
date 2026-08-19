@@ -31,6 +31,8 @@ import numpy as np
 
 # Shared Welch-core defaults and helpers (single source of truth for the
 # segment policy across the spectral estimators).
+from ..io._resolve import apply_calibration, resolve_pair_fs
+from ..io._signal import Signal
 from ..signals.spectra import (
     _DEFAULT_OVERLAP,
     _MIN_SAMPLES,
@@ -46,7 +48,8 @@ if TYPE_CHECKING:
 
 
 def _validate_pair(
-    x: NDArray[np.float64] | list[float], y: NDArray[np.float64] | list[float]
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     xa = np.asarray(x, dtype=np.float64)
     ya = np.asarray(y, dtype=np.float64)
@@ -60,7 +63,7 @@ def _validate_pair(
         )
     if not (np.all(np.isfinite(xa)) and np.all(np.isfinite(ya))):
         raise ValueError("'x' and 'y' must be finite.")
-    return xa, ya
+    return apply_calibration(x, xa), apply_calibration(y, ya)
 
 
 def _spectra(
@@ -120,9 +123,9 @@ class FrequencyResponseResult:
 
 
 def transfer_function(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     estimator: Literal["H1", "H2"] = "H1",
     nperseg: int | None = None,
@@ -136,9 +139,18 @@ def transfer_function(
     :math:`\gamma^2 = \lvert G_{xy} \rvert^2 / (G_{xx} G_{yy})` is
     returned alongside as a data-quality indicator.
 
-    :param x: Input (reference) signal, 1-D.
-    :param y: Output (response) signal, 1-D, same length as ``x``.
-    :param fs: Sample rate, in Hz.
+    :param x: Input (reference) signal, 1-D. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples. The whole result is a ratio of the two records, so a factor
+        the two share cancels and nothing moves; calibrating only one of them
+        rescales the response by that factor, which is the right answer for a
+        pair that is genuinely in two different units.
+    :param y: Output (response) signal, 1-D, same length as ``x``. Same
+        treatment as ``x``.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param estimator: ``'H1'`` (default) or ``'H2'``.
     :param nperseg: Welch segment length; ``None`` picks a length targeting
         about 4 Hz resolution (as in :mod:`~phonometry.emission.intensity`).
@@ -146,6 +158,7 @@ def transfer_function(
     :return: A :class:`FrequencyResponseResult`.
     :raises ValueError: If the inputs or parameters are invalid.
     """
+    fs = resolve_pair_fs(x, y, fs)
     xa, ya = _validate_pair(x, y)
     fs_v = _positive(fs, "fs")
     if estimator not in ("H1", "H2"):
@@ -192,9 +205,9 @@ def transfer_function(
 
 
 def coherence(
-    x: NDArray[np.float64] | list[float],
-    y: NDArray[np.float64] | list[float],
-    fs: float,
+    x: Signal | NDArray[np.float64] | list[float],
+    y: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     nperseg: int | None = None,
     overlap: float = _DEFAULT_OVERLAP,
@@ -208,14 +221,22 @@ def coherence(
     Averaging over several segments is required for a meaningful estimate
     (a single segment gives :math:`\gamma^2 \equiv 1`).
 
-    :param x: First signal, 1-D.
-    :param y: Second signal, 1-D, same length as ``x``.
-    :param fs: Sample rate, in Hz.
+    :param x: First signal, 1-D. Accepts a :class:`phonometry.io.Signal`,
+        whose calibration is applied to the samples. The coherence is a
+        normalised ratio, so it is unchanged whichever of the two is
+        calibrated and by how much.
+    :param y: Second signal, 1-D, same length as ``x``. Same treatment as
+        ``x``.
+    :param fs: Sample rate, in Hz. Required when both records are bare
+        arrays; either may be a :class:`~phonometry.io.Signal` and supply it,
+        and two Signals recorded at different rates are refused rather than
+        arbitrated.
     :param nperseg: Welch segment length; ``None`` picks a default.
     :param overlap: Segment overlap fraction (default 0.5).
     :return: ``(frequencies, gamma_squared)``.
     :raises ValueError: If the inputs or parameters are invalid.
     """
+    fs = resolve_pair_fs(x, y, fs)
     xa, ya = _validate_pair(x, y)
     fs_v = _positive(fs, "fs")
     if not 0.0 <= float(overlap) < 1.0:

@@ -34,6 +34,8 @@ from .._internal.utils import _typesignal
 from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
+from ..io._resolve import apply_calibration, resolve_fs
+from ..io._signal import Signal
 
 
 class STIWarning(PhonometryWarning):
@@ -369,8 +371,8 @@ def _sti_from_mtf(
 
 @overload
 def sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None,
     snr: None,
     level: Sequence[float] | np.ndarray,
     ambient: Sequence[float] | np.ndarray,
@@ -379,8 +381,8 @@ def sti_from_impulse_response(
 
 @overload
 def sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = ...,
     snr: None = ...,
     *,
     level: Sequence[float] | np.ndarray,
@@ -390,16 +392,16 @@ def sti_from_impulse_response(
 
 @overload
 def sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = ...,
     snr: float | Sequence[float] | np.ndarray | None = ...,
     level: Sequence[float] | np.ndarray | None = ...,
 ) -> STIResult: ...
 
 
 def sti_from_impulse_response(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     snr: float | Sequence[float] | np.ndarray | None = None,
     level: Sequence[float] | np.ndarray | None = None,
     ambient: Sequence[float] | np.ndarray | None = None,
@@ -438,8 +440,17 @@ def sti_from_impulse_response(
        high-modulation-frequency MTF cells by up to ~0.02-0.04 while the
        STI itself stays within ~0.001.
 
-    :param ir: Impulse response (1D).
+    :param ir: Impulse response (1D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: every modulation index is normalised by
+        the total intensity of its own band, so a factor on the record
+        moves neither the transfer values nor the STI. The absolute levels
+        the noise corrections need arrive through ``level`` and
+        ``ambient``, in dB, not from the samples.
     :param fs: Sample rate in Hz (>= 22,5 kHz so the 8 kHz band fits).
+        Required for a bare array; a :class:`~phonometry.io.Signal` brings
+        its own, and an explicit value that disagrees with it raises
+        instead of silently winning.
     :param snr: Optional signal-to-noise ratio in dB, scalar or one value
         per octave band. Degrades m by 1/(1 + 10^(-SNR/10)); combined
         with ``level`` it is interpreted as ambient levels
@@ -452,7 +463,8 @@ def sti_from_impulse_response(
         (7 values); requires ``level``.
     :return: :class:`STIResult` with ``mtf`` of shape (7, 14).
     """
-    ir_proc = _typesignal(ir)
+    fs = resolve_fs(ir, fs, name="ir")
+    ir_proc = apply_calibration(ir, _typesignal(np.asarray(ir)))
     if ir_proc.ndim != 1:
         raise ValueError("sti_from_impulse_response expects a 1D impulse response.")
     if fs <= 0:
@@ -555,9 +567,9 @@ def _stipa_modulation_depths(env: np.ndarray, fs: int) -> np.ndarray:
 
 @overload
 def stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None,
+    reference: Signal | list[float] | np.ndarray | None,
     level: Sequence[float] | np.ndarray,
     ambient: Sequence[float] | np.ndarray,
 ) -> STIResult: ...
@@ -565,9 +577,9 @@ def stipa(
 
 @overload
 def stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None = ...,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = ...,
+    reference: Signal | list[float] | np.ndarray | None = ...,
     *,
     level: Sequence[float] | np.ndarray,
     ambient: Sequence[float] | np.ndarray,
@@ -576,17 +588,17 @@ def stipa(
 
 @overload
 def stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None = ...,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = ...,
+    reference: Signal | list[float] | np.ndarray | None = ...,
     level: Sequence[float] | np.ndarray | None = ...,
 ) -> STIResult: ...
 
 
 def stipa(
-    x: list[float] | np.ndarray,
-    fs: int,
-    reference: list[float] | np.ndarray | None = None,
+    x: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
+    reference: Signal | list[float] | np.ndarray | None = None,
     level: Sequence[float] | np.ndarray | None = None,
     ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult:
@@ -613,18 +625,29 @@ def stipa(
     periods and the recovered modulation depths - and hence the STI - are
     biased low (an ideal loopback gives STI ~0.956 at 5 s vs ~0.998 at 18 s).
 
-    :param x: Recorded STIPA signal (1D), 15 s to 25 s recommended.
-    :param fs: Sample rate in Hz (>= 22,5 kHz).
+    :param x: Recorded STIPA signal (1D), 15 s to 25 s recommended. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: every modulation index is normalised by
+        the total intensity of its own band, so a factor on the record
+        moves neither the transfer values nor the STI. The absolute levels
+        the noise corrections need arrive through ``level`` and
+        ``ambient``, in dB, not from the samples.
+    :param fs: Sample rate in Hz (>= 22,5 kHz). Required for a bare array;
+        a :class:`~phonometry.io.Signal` brings its own, and an explicit
+        value that disagrees with it raises instead of silently winning.
     :param reference: Optional reference recording of the undistorted
         test signal; its measured modulation depths replace the nominal
-        0,55 as normalization (useful for non-conformant sources).
+        0,55 as normalization (useful for non-conformant sources). Accepts
+        a :class:`phonometry.io.Signal`; only its samples are read, since
+        what is taken from it is a modulation depth, already normalised.
     :param level: Optional speech octave-band levels in dB SPL (7 values)
         enabling auditory masking and reception threshold corrections.
     :param ambient: Optional ambient noise octave-band levels in dB SPL
         (7 values); requires ``level``.
     :return: :class:`STIResult` with ``mtf`` of shape (7, 2).
     """
-    x_proc = _typesignal(x)
+    fs = resolve_fs(x, fs, name="x")
+    x_proc = apply_calibration(x, _typesignal(np.asarray(x)))
     if x_proc.ndim != 1:
         raise ValueError("stipa expects a 1D signal.")
     if fs <= 0:
@@ -647,7 +670,7 @@ def stipa(
 
     mdr = _stipa_modulation_depths(_intensity_envelopes(x_proc, fs), fs)
     if reference is not None:
-        ref_proc = _typesignal(reference)
+        ref_proc = _typesignal(np.asarray(reference))
         if ref_proc.ndim != 1:
             raise ValueError("'reference' must be a 1D signal.")
         mdt = _stipa_modulation_depths(_intensity_envelopes(ref_proc, fs), fs)

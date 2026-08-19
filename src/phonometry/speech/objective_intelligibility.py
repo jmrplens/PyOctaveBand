@@ -44,7 +44,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
+
+from ..io._resolve import apply_calibration, resolve_pair_fs
+from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -237,7 +240,8 @@ def _resample_to_internal(sig: NDArray[np.float64], fs: int) -> NDArray[np.float
 
 
 def _validate_pair(
-    clean: ArrayLike, degraded: ArrayLike
+    clean: Signal | list[float] | np.ndarray,
+    degraded: Signal | list[float] | np.ndarray,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Validate and return the clean/degraded 1-D float arrays."""
     x = np.asarray(clean, dtype=np.float64)
@@ -253,7 +257,7 @@ def _validate_pair(
         raise ValueError("'clean' and 'degraded' must be non-empty.")
     if not (np.all(np.isfinite(x)) and np.all(np.isfinite(y))):
         raise ValueError("'clean' and 'degraded' must be finite.")
-    return x, y
+    return apply_calibration(clean, x), apply_calibration(degraded, y)
 
 
 def _segments(bands: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -284,9 +288,9 @@ def _row_col_normalize(seg: NDArray[np.float64]) -> NDArray[np.float64]:
 
 
 def stoi(
-    clean: ArrayLike,
-    degraded: ArrayLike,
-    fs: int,
+    clean: Signal | list[float] | np.ndarray,
+    degraded: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     extended: bool = False,
 ) -> STOIResult:
@@ -298,10 +302,18 @@ def stoi(
     resampled internally to 10 kHz, split into one-third-octave short-time
     envelopes, and compared over 384 ms segments.
 
-    :param clean: The clean reference speech (1-D).
+    :param clean: The clean reference speech (1-D). Accepts a
+        :class:`phonometry.io.Signal`; STOI normalises every band of every
+        segment before correlating them, so a calibration factor on either
+        record cancels and the score does not move. The factor is applied
+        anyway, so that the samples entering the computation are the same
+        ones every other surface on this contract would see.
     :param degraded: The degraded/processed speech (1-D, same length as
         ``clean``, same sample rate).
-    :param fs: Sample rate of both signals, in hertz.
+    :param fs: Sample rate of both signals, in hertz. Required when both
+        records are bare arrays; either may be a
+        :class:`~phonometry.io.Signal` and supply it, and two Signals
+        recorded at different rates are refused rather than arbitrated.
     :param extended: Use ESTOI (spectral correlation, robust to modulated
         maskers) instead of STOI.
     :return: A :class:`STOIResult` with the index ``.value`` and its
@@ -310,6 +322,7 @@ def stoi(
         ``fs`` is not positive, or fewer than 30 short-time frames survive the
         silent-frame removal (too little speech to score).
     """
+    fs = resolve_pair_fs(clean, degraded, fs, names=("clean", "degraded"))
     x, y = _validate_pair(clean, degraded)
     if int(fs) <= 0:
         raise ValueError("'fs' must be a positive sample rate.")

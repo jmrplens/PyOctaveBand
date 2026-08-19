@@ -32,8 +32,8 @@ but how much output there is when there should be none.
 
 ```python
 dynamic_range(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = 2.0,
@@ -63,8 +63,8 @@ known as the signal-to-noise ratio (6.4.1 note).
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured output of the device under test (1-D), scaled so that `full_scale` is the digital full-scale peak amplitude. |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured output of the device under test (1-D), scaled so that `full_scale` is the digital full-scale peak amplitude. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for the rate, but a calibration factor it carries is deliberately **not** applied: this quantity is referenced to digital full scale, not to 20 uPa, so scaling the samples to pascals would move the reading by `20 lg(factor)` under a full-scale name. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Test frequency, in Hz; `None` uses the 997 Hz of the standard. |
 | `notch_q` | Effective notch quality factor (AES17 5.2.8: 1.2..3; default 2.0). |
 | `bandwidth` | AES17 measurement bandwidth, in Hz (default 20 kHz; `None` measures the full Nyquist band). |
@@ -83,8 +83,8 @@ known as the signal-to-noise ratio (6.4.1 note).
 
 ```python
 idle_channel_noise(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     bandwidth: float | None = 20000.0,
     full_scale: float = 1.0,
@@ -106,8 +106,8 @@ $$
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured idle output of the device under test (1-D), scaled so that `full_scale` is the digital full-scale peak amplitude. |
-| `fs` | Sample rate, in Hz. |
+| `signal` | Captured idle output of the device under test (1-D), scaled so that `full_scale` is the digital full-scale peak amplitude. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for the rate, but a calibration factor it carries is deliberately **not** applied: this quantity is referenced to digital full scale, not to 20 uPa, so scaling the samples to pascals would move the reading by `20 lg(factor)` under a full-scale name. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `bandwidth` | AES17 measurement bandwidth, in Hz (default 20 kHz; `None` measures the full Nyquist band). |
 | `full_scale` | Digital full-scale peak amplitude (default 1.0). |
 

@@ -72,8 +72,8 @@ decay curves -- that step belongs to downstream room-acoustics modules.
 
 ```python
 golay_impulse_response(
-    recorded_a: list[float] | np.ndarray,
-    recorded_b: list[float] | np.ndarray,
+    recorded_a: Signal | list[float] | np.ndarray,
+    recorded_b: Signal | list[float] | np.ndarray,
     pair: tuple[np.ndarray, np.ndarray],
     *,
     length: int | None = None,
@@ -107,10 +107,10 @@ more exposed to time variance than a single sweep (Xiang, Sec. 2).
 | Name | Description |
 | :--- | :--- |
 | `recorded_a` | Recorded response to the periodic `a` code; its length must be a positive multiple of the code length `L`. |
-| `recorded_b` | Recorded response to the periodic `b` code; its length must be a positive multiple of `L` (the period counts of the two recordings may differ). |
+| `recorded_b` | Recorded response to the periodic `b` code; its length must be a positive multiple of `L` (the period counts of the two recordings may differ). Both recordings accept a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the recovered impulse response comes out in pascals per unit of excitation; two Signals recorded at different rates are refused rather than arbitrated. |
 | `pair` | The complementary pair `(a, b)` from [`golay_pair`](/phonometry/reference/api/rooms/impulse-response/#golay_pair). |
 | `length` | Number of IR samples to return. Defaults to `L`; longer requests are periodic extensions. |
-| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. |
+| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. Either record may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it instead, and an explicit value that disagrees with one raises. |
 
 **Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) (`method="golay"`). It behaves like the raw IR array for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot).
 
@@ -151,9 +151,9 @@ autocorrelation of an MLS.
 
 ```python
 impulse_response(
-    recorded: list[float] | np.ndarray,
-    reference: list[float] | np.ndarray,
-    fs: int,
+    recorded: Signal | list[float] | np.ndarray,
+    reference: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     method: Literal['farina'],
     f_range: tuple[float, float],
@@ -188,9 +188,9 @@ causal part (B.5).
 
 | Name | Description |
 | :--- | :--- |
-| `recorded` | Recorded system response to the sweep. |
-| `reference` | The emitted sweep (excitation signal). |
-| `fs` | Sampling frequency in Hz (kept for API symmetry; the deconvolution itself is sample-rate agnostic). |
+| `recorded` | Recorded system response to the sweep. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the recovered impulse response comes out in pascals per unit of excitation. |
+| `reference` | The emitted sweep (excitation signal). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for the rate; it is the excitation rather than a measurement, so a calibration factor on it is not applied. |
+| `fs` | Sampling frequency in Hz. Optional for the default spectral division, which is sample-rate agnostic and only stores the rate on the result so that a plot can label its time axis; **required** for `method="farina"`, which rebuilds the analytic inverse filter and so needs the rate to know what its band edges mean. Either record may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and an explicit value that disagrees raises. |
 | `method` | `"spectral"` for spectral division $H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})$ (Figure B.3, default) or `"farina"` for convolution with the analytic inverse filter (Figure B.2). The Farina method requires `f_range` and the **exact-length, unpadded** excitation sweep as `reference` (it rebuilds the inverse filter from `reference.size/fs` as the sweep duration); a reference zero-padded to the recording length - the correct input for the spectral method - is rejected with a `ValueError` because it would silently produce a wrong inverse filter. It also assumes the reference sweep was generated with the default `amplitude`/`fade` of [`sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal); a non-unit amplitude or custom fade yields a scaled IR, so use the spectral method in that case. |
 | `f_range` | `(f1, f2)` of the sweep, required for `method="farina"` to rebuild the inverse filter; ignored for the spectral method. |
 | `regularization` | Tikhonov term added to the denominator, expressed as a fraction of the peak spectral energy $\max(\lvert X \rvert^2)$ (spectral method only). Guards against amplifying noise where the sweep has little energy, e.g. outside its frequency range (B.5). Default 1e-6. |
@@ -304,8 +304,8 @@ the spectral-division convention (rather than a unit pulse peak).
 
 ```python
 mls_impulse_response(
-    recorded: list[float] | np.ndarray,
-    mls: list[float] | np.ndarray,
+    recorded: Signal | list[float] | np.ndarray,
+    mls: Signal | list[float] | np.ndarray,
     *,
     length: int | None = None,
     fs: int | None = None,
@@ -326,10 +326,10 @@ into the record (A.1).
 
 | Name | Description |
 | :--- | :--- |
-| `recorded` | Recorded response, length a multiple of `2**N - 1`. |
-| `mls` | The excitation sequence returned by [`mls_signal`](/phonometry/reference/api/rooms/impulse-response/#mls_signal). |
+| `recorded` | Recorded response, length a multiple of `2**N - 1`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, so the recovered impulse response comes out in pascals per unit of excitation. |
+| `mls` | The excitation sequence returned by [`mls_signal`](/phonometry/reference/api/rooms/impulse-response/#mls_signal). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for the rate; it is the excitation rather than a measurement, so a calibration factor on it is not applied. |
 | `length` | Number of IR samples to return. Defaults to the sequence length `2**N - 1`. |
-| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. |
+| `fs` | Optional sample rate in Hz, stored on the result so that [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot) can label a time axis in seconds (the recovery itself is sample-rate agnostic). Default `None`. Either record may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it instead, and an explicit value that disagrees with one raises. |
 
 **Returns:** An [`ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) wrapping the recovered impulse response. It behaves like the raw IR array for every downstream consumer and adds [`ImpulseResponseResult.plot`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresultplot).
 

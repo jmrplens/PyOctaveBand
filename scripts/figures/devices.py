@@ -306,7 +306,7 @@ def generate_swept_sine_thd(output_dir: str) -> None:
     x = synchronized_sweep_signal(fs, f1, f2, seconds)
     b, a = sp_signal.butter(2, 3000.0, fs=fs)
     y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-    res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+    res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
     sel = (res.thd_frequencies >= 30.0) & (res.thd_frequencies <= 2800.0)
     freqs = res.thd_frequencies[sel]
@@ -1307,7 +1307,7 @@ def generate_modulation_distortion(output_dir: str) -> None:
     x = 1.0 * np.sin(2.0 * np.pi * 60.0 * t) + 0.25 * np.sin(2.0 * np.pi * 7000.0 * t)
     y = x + 0.04 * x**2 + 0.012 * x**3
 
-    res = modulation_distortion(y, fs, 60.0, 7000.0)
+    res = modulation_distortion(y, fs, f_low=60.0, f_high=7000.0)
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() draws the carrier (0 dB reference) and the four
     # modulation sidebands at f2 +/- f1 and f2 +/- 2 f1, annotated with the
@@ -2943,7 +2943,8 @@ def generate_intermodulation_tests(output_dir: str) -> None:
     y_dim = through(x_dim)
 
     dfd2 = electroacoustics.difference_frequency_distortion(
-        y_dfd, fs, 13e3, 14e3, order=2)
+        y_dfd, fs, f1=13e3, f2=14e3, order=2
+    )
     tdfd = electroacoustics.total_difference_frequency_distortion(y_tdfd, fs)
     dim = electroacoustics.dynamic_intermodulation_distortion(y_dim, fs)
 
@@ -3179,7 +3180,7 @@ def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
     x = synchronized_sweep_signal(fs, f1, f2, seconds)
     b, a = scipy_signal.butter(2, 3000.0, fs=fs)
     y = scipy_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-    res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+    res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
     h1_ref = 1.0 + 3.0 * a3 / 4.0
     _fig, ax = plt.subplots(figsize=(10, 6))
@@ -3236,8 +3237,8 @@ def generate_swept_sine_methods(output_dir: str) -> None:
     # The synchronized generator quantises the duration slightly; the Farina
     # analysis of the same recording has to be told the length it really is.
     actual = len(x) / fs
-    sync = swept_sine_distortion(y, fs, f1, f2, actual, n_harmonics=3)
-    farina = swept_sine_distortion(y, fs, f1, f2, actual, n_harmonics=3,
+    sync = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=actual, n_harmonics=3)
+    farina = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=actual, n_harmonics=3,
                                    method="farina")
 
     _fig, (ax_mag, ax_ph) = plt.subplots(

@@ -24,7 +24,10 @@ The rules, identical everywhere:
   explicit one that disagrees is refused rather than arbitrated, because
   the rate is a fact of the recording and silently trusting either side
   mis-times every filter downstream. A bare array knows nothing about
-  time, so there the argument stays mandatory.
+  time, so there the argument stays mandatory -- except where the rate is
+  only a label for the result's time axis and the computation never reads
+  it, which is :func:`resolve_optional_fs` and stays callable without
+  one.
 - **Calibration.** A calibrated Signal presents its samples in pascals.
   One rule rather than a per-function taxonomy: it is what keeps every
   surface on this contract talking about the same signal, instead of one
@@ -61,6 +64,39 @@ SignalInput = Signal | list[float] | np.ndarray
 # mypy rejects as incompatible.
 
 
+def resolve_optional_fs[Rate: (int, float)](
+    x: SignalInput,
+    fs: Rate | None,
+    *,
+    rate: str = "fs",
+) -> Rate | None:
+    """Resolve a rate that the call can also do without.
+
+    The sibling of :func:`resolve_fs` for the surfaces where the rate is
+    only a label: a deconvolution is sample-rate agnostic, and the rate
+    it is handed goes onto the result so a plot can put seconds on its
+    time axis. A bare array without one is therefore legal, and stays
+    legal. What a Signal buys here is that the label arrives by itself
+    instead of being retyped, and the disagreement is still refused for
+    the same reason as everywhere else.
+
+    :param x: The signal argument, a Signal or a bare array.
+    :param fs: The explicitly passed rate, or ``None``.
+    :param rate: Name of the rate parameter, for the error message.
+    :return: The resolved sample rate, or ``None`` if there is none.
+    :raises ValueError: If a Signal is given an explicit rate that
+        disagrees with its own.
+    """
+    if isinstance(x, Signal):
+        if fs is not None and fs != x.fs:
+            raise ValueError(
+                f"{rate}={fs} conflicts with the Signal's own fs={x.fs}; "
+                "pass one or the other, not a disagreement"
+            )
+        return x.fs
+    return fs
+
+
 def resolve_fs[Rate: (int, float)](
     x: SignalInput,
     fs: Rate | None,
@@ -78,16 +114,10 @@ def resolve_fs[Rate: (int, float)](
     :raises ValueError: If a Signal is given an explicit rate that
         disagrees with its own, or a bare array is given none.
     """
-    if isinstance(x, Signal):
-        if fs is not None and fs != x.fs:
-            raise ValueError(
-                f"{rate}={fs} conflicts with the Signal's own fs={x.fs}; "
-                "pass one or the other, not a disagreement"
-            )
-        return x.fs
-    if fs is None:
+    resolved = resolve_optional_fs(x, fs, rate=rate)
+    if resolved is None:
         raise ValueError(f"{rate} is required when '{name}' is a bare array")
-    return fs
+    return resolved
 
 
 def refuse_foreign_rate(x: SignalInput, fs: float, what: str) -> None:
@@ -176,6 +206,26 @@ def apply_calibration(x: SignalInput, samples: np.ndarray) -> np.ndarray:
     return samples
 
 
+def _agreed_pair(
+    x: SignalInput, y: SignalInput, names: tuple[str, str]
+) -> SignalInput:
+    """The member of the pair that knows the rate, once they agree.
+
+    :param x: The first signal argument.
+    :param y: The second signal argument.
+    :param names: Names of the two signal parameters, for the message.
+    :return: *x* when it is a Signal, otherwise *y*.
+    :raises ValueError: If both are Signals recorded at different rates.
+    """
+    if isinstance(x, Signal) and isinstance(y, Signal) and x.fs != y.fs:
+        raise ValueError(
+            f"'{names[0]}' and '{names[1]}' are Signals recorded at "
+            f"different rates ({x.fs} Hz and {y.fs} Hz); resample one of "
+            "them before comparing them"
+        )
+    return x if isinstance(x, Signal) else y
+
+
 def resolve_pair_fs[Rate: (int, float)](
     x: SignalInput,
     y: SignalInput,
@@ -201,11 +251,29 @@ def resolve_pair_fs[Rate: (int, float)](
     :return: The resolved sample rate.
     :raises ValueError: On any disagreement, or when nothing knows the rate.
     """
-    if isinstance(x, Signal) and isinstance(y, Signal) and x.fs != y.fs:
-        raise ValueError(
-            f"'{names[0]}' and '{names[1]}' are Signals recorded at "
-            f"different rates ({x.fs} Hz and {y.fs} Hz); resample one of "
-            "them before comparing them"
-        )
-    known = x if isinstance(x, Signal) else y
+    known = _agreed_pair(x, y, names)
     return resolve_fs(known, fs, name=names[0], rate=rate)
+
+
+def resolve_optional_pair_fs[Rate: (int, float)](
+    x: SignalInput,
+    y: SignalInput,
+    fs: Rate | None,
+    *,
+    names: tuple[str, str] = ("x", "y"),
+    rate: str = "fs",
+) -> Rate | None:
+    """Resolve a rate from two signal arguments that can also do without.
+
+    :func:`resolve_optional_fs` for a pair: same refusals, and a pair of
+    bare arrays with no rate is still a legal call.
+
+    :param x: The first signal argument.
+    :param y: The second signal argument.
+    :param fs: The explicitly passed rate, or ``None``.
+    :param names: Names of the two signal parameters, for the messages.
+    :param rate: Name of the rate parameter, for the messages.
+    :return: The resolved sample rate, or ``None`` if nothing knows it.
+    :raises ValueError: On any disagreement.
+    """
+    return resolve_optional_fs(_agreed_pair(x, y, names), fs, rate=rate)
