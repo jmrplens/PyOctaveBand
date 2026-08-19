@@ -1631,10 +1631,10 @@ def generate_speech_intelligibility(output_dir: str) -> None:
     # (an office/ventilation-like spectrum): the band-audibility function A_i
     # is partial across the band, and the importance-weighted contribution
     # I_i*A_i (ANSI S3.5-1997 clause 6) sums to the index SII.
-    speech = standard_speech_spectrum("normal")
+    speech_spectrum = standard_speech_spectrum("normal")
     noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                       22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
-    result = speech_intelligibility_index(speech, noise)
+    result = speech_intelligibility_index(speech_spectrum, noise)
 
     freqs = result.frequencies
     positions = np.arange(freqs.size)
@@ -2589,12 +2589,12 @@ def generate_sii_hearing_loss(output_dir: str) -> None:
     # listener with a sloping high-frequency loss: the consonant-bearing bands
     # fall below the raised internal noise and the index drops from 0.46 to
     # 0.36.
-    speech = standard_speech_spectrum("normal")
+    speech_spectrum = standard_speech_spectrum("normal")
     noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                       22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
     threshold = np.array([5.0, 5.0, 5.0, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0,
                           22.0, 28.0, 35.0, 42.0, 48.0, 55.0, 60.0, 65.0, 70.0])
-    res = speech_intelligibility_index(speech, noise, threshold=threshold)
+    res = speech_intelligibility_index(speech_spectrum, noise, threshold=threshold)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     res.plot(ax=ax, language=_LANG)

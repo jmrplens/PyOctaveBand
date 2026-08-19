@@ -1643,9 +1643,9 @@ def animate_power_two_rooms(output_dir: str) -> None:
     ax_r.set_title(T("Reverberation room (ISO 3741)"), fontsize=10,
                    )
     # animated fill (the diffuse level building up) + a fixed outline
-    room = Rectangle((0.6, 0.4), 6.8, 5.6, facecolor=COLOR_PRIMARY,
+    room_patch = Rectangle((0.6, 0.4), 6.8, 5.6, facecolor=COLOR_PRIMARY,
                      edgecolor="none", alpha=0.0)
-    ax_r.add_patch(room)
+    ax_r.add_patch(room_patch)
     ax_r.add_patch(Rectangle((0.6, 0.4), 6.8, 5.6, facecolor="none",
                              edgecolor=COLOR_FG, lw=1.4))
     # a tilted diffuser panel hanging in the volume
@@ -1712,7 +1712,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
         note_a.set_alpha(min(tc / 2.0, 1.0) * 0.9)
         # diffuse field: rays bounce, the background level rises
         build = float(np.clip(tc / 4.0, 0.0, 1.0))
-        room.set_alpha(0.16 * (1.0 - np.exp(-3.0 * build)))
+        room_patch.set_alpha(0.16 * (1.0 - np.exp(-3.0 * build)))
         for ray in rays:
             ts = np.linspace(max(0.0, tc - 0.9), tc, 24)
             xs = [_fold(cr[0] + ray["v"][0] * s, 0.7, 7.3) for s in ts]
@@ -1723,7 +1723,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
         mic_dot.set_data([mic_path_c[0] + mic_path_r * np.cos(ang)],
                          [mic_path_c[1] + mic_path_r * np.sin(ang)])
         note_r.set_alpha(min(tc / 2.0, 1.0) * 0.9)
-        arts += [room, mic_dot, note_a, note_r]
+        arts += [room_patch, mic_dot, note_a, note_r]
         # microphone readings appear, then each formula computes L_W
         if tc >= t_meter:
             lp_a.set_text(T(f"mean $L_p$ = {lp_free:.1f} dB"))

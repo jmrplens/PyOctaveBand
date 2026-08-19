@@ -49,7 +49,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     # We want exactly the 1000Hz band
     limits = [800.0, 1200.0]
     
-    filters = [
+    designs = [
         ("butter", "Butterworth", COLOR_PRIMARY, "-"),
         ("cheby1", "Chebyshev I", COLOR_SECONDARY, "--"),
         ("cheby2", "Chebyshev II", COLOR_TERTIARY, ":"),
@@ -64,7 +64,7 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     axins = inset_axes(ax, width="35%", height="45%", loc="upper left", borderpad=3)
     axins.set_xscale("log") # Explicitly set log scale
     
-    for f_type, label, color, style in filters:
+    for f_type, label, color, style in designs:
         bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits,
                                 design=FilterDesign(filter_type=f_type))
         
@@ -775,7 +775,7 @@ def generate_group_delay_comparison(output_dir: str) -> None:
     fs = 48000
     limits = [800.0, 1200.0]
 
-    filters = [
+    designs = [
         ("butter", "Butterworth", COLOR_PRIMARY, "-"),
         ("cheby1", "Chebyshev I", COLOR_SECONDARY, "--"),
         ("cheby2", "Chebyshev II", COLOR_TERTIARY, ":"),
@@ -784,7 +784,7 @@ def generate_group_delay_comparison(output_dir: str) -> None:
     ]
 
     _, ax = plt.subplots()
-    for f_type, label, color, style in filters:
+    for f_type, label, color, style in designs:
         bank = OctaveFilterBank(fs, fraction=1, order=6, limits=limits,
                                 design=FilterDesign(filter_type=f_type))
         idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))

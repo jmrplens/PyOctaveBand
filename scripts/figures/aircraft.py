@@ -442,17 +442,17 @@ def generate_anp_npd(output_dir: str) -> None:
     # A real fleet entry rather than a schematic table: the 747-100 is one of
     # the aircraft whose ANP record carries a fixed-point profile, so the same
     # aircraft can illustrate the profile figure below.
-    aircraft = load_anp_database().aircraft("747100")
-    curves = aircraft.npd_curves("D", "SEL")
+    airframe = load_anp_database().aircraft("747100")
+    curves = airframe.npd_curves("D", "SEL")
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     curves.plot(ax=ax)
-    ax.set_title(f"ANP NPD Curves - {aircraft.description} (SEL, departure)",
+    ax.set_title(f"ANP NPD Curves - {airframe.description} (SEL, departure)",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.text(0.02, 0.06,
-            f"power parameter: {aircraft.power_parameter}\n"
+            f"power parameter: {airframe.power_parameter}\n"
             "markers: tabulated NPD nodes",
             transform=ax.transAxes, va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
@@ -466,12 +466,12 @@ def generate_anp_profile(output_dir: str) -> None:
     print("Generating anp_profile...")
     from phonometry import load_anp_database
 
-    aircraft = load_anp_database().aircraft("747100")
-    profile = aircraft.profile("D", stage_length=1)
+    airframe = load_anp_database().aircraft("747100")
+    profile = airframe.profile("D", stage_length=1)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     profile.plot(ax=ax)
-    ax.set_title(f"ANP Default Departure Profile - {aircraft.description}",
+    ax.set_title(f"ANP Default Departure Profile - {airframe.description}",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)

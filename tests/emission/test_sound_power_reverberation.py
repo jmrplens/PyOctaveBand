@@ -179,9 +179,9 @@ def test_synergy_room_parameters_feeds_direct_method() -> None:
     ir = rng.standard_normal(n) * decay
     ir[0] += 5.0  # a clear direct-sound peak
 
-    room = room_parameters(ir, fs, limits=(500.0, 1000.0), fraction=1)
-    t60_bands = room.t30  # decay time (s) extrapolated to 60 dB
-    freqs = np.asarray(room.frequency, dtype=float)
+    parameters = room_parameters(ir, fs, limits=(500.0, 1000.0), fraction=1)
+    t60_bands = parameters.t30  # decay time (s) extrapolated to 60 dB
+    freqs = np.asarray(parameters.frequency, dtype=float)
     assert np.all(np.isfinite(t60_bands))
 
     lp = np.full(freqs.shape, 80.0)
