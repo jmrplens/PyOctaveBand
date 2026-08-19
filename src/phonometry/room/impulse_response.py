@@ -66,7 +66,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 from scipy import signal
@@ -365,6 +365,34 @@ def _farina_deconvolve(
     # len(reference)-1. Roll it to index 0 so the layout matches the spectral
     # method (causal at 0, negative times in the tail).
     return np.roll(conv, -(ref.size - 1))
+
+
+@overload
+def impulse_response(
+    recorded: list[float] | np.ndarray,
+    reference: list[float] | np.ndarray,
+    fs: int,
+    *,
+    method: Literal["farina"],
+    f_range: tuple[float, float],
+    regularization: float = ...,
+    length: int | None = ...,
+    return_full: bool = ...,
+) -> ImpulseResponseResult: ...
+
+
+@overload
+def impulse_response(
+    recorded: list[float] | np.ndarray,
+    reference: list[float] | np.ndarray,
+    fs: int,
+    *,
+    method: str = ...,
+    f_range: tuple[float, float] | None = ...,
+    regularization: float = ...,
+    length: int | None = ...,
+    return_full: bool = ...,
+) -> ImpulseResponseResult: ...
 
 
 def impulse_response(

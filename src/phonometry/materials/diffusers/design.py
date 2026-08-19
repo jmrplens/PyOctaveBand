@@ -61,7 +61,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -360,6 +360,36 @@ def _prepare_geometry(
     if n_periods != periods or n_periods < 1:
         raise ValueError("'periods' must be an integer of at least 1.")
     return w, f, ang, psi, n_periods, c
+
+
+@overload
+def predict_diffuser_polar_response(
+    well_width: float,
+    frequency: float,
+    *,
+    depths: ArrayLike,
+    angles: ArrayLike = ...,
+    source_angle: float = ...,
+    periods: int = ...,
+    speed_of_sound: float = ...,
+    include_aperture: bool = ...,
+    include_obliquity: bool = ...,
+) -> DiffuserPolarResponse: ...
+
+
+@overload
+def predict_diffuser_polar_response(
+    well_width: float,
+    frequency: float,
+    *,
+    reflection: ArrayLike,
+    angles: ArrayLike = ...,
+    source_angle: float = ...,
+    periods: int = ...,
+    speed_of_sound: float = ...,
+    include_aperture: bool = ...,
+    include_obliquity: bool = ...,
+) -> DiffuserPolarResponse: ...
 
 
 def predict_diffuser_polar_response(

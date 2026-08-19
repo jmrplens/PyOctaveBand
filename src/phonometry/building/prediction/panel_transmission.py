@@ -88,7 +88,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -520,6 +520,48 @@ def _resolve_plateau_panel(
         require_positive(plateau_height, "plateau_height"),
         ratio,
     )
+
+
+@overload
+def plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    material: str,
+    thickness_mm: float,
+    plateau_height: float | None = ...,
+    frequency_ratio: float | None = ...,
+    field_correction: float = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SoundReductionResult: ...
+
+
+@overload
+def plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    material: str,
+    mass_per_area: float,
+    thickness_mm: float | None = ...,
+    plateau_height: float | None = ...,
+    frequency_ratio: float | None = ...,
+    field_correction: float = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SoundReductionResult: ...
+
+
+@overload
+def plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    mass_per_area: float,
+    plateau_height: float,
+    frequency_ratio: float,
+    field_correction: float = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SoundReductionResult: ...
 
 
 def plateau_transmission_loss(

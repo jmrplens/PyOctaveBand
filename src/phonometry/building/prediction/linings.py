@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
@@ -128,6 +128,24 @@ _THIRD_OCTAVE_FIRST_INDEX: int = 11
 
 #: Additional-layer system of ISO 12354-1:2017 Annex D.
 LiningSystem = Literal["mineral_wool", "foam", "studs"]
+
+
+@overload
+def lining_resonance_frequency(
+    base_mass_per_area: float,
+    lining_mass_per_area: float,
+    *,
+    dynamic_stiffness: float,
+) -> float: ...
+
+
+@overload
+def lining_resonance_frequency(
+    base_mass_per_area: float,
+    lining_mass_per_area: float,
+    *,
+    cavity_depth: float,
+) -> float: ...
 
 
 def lining_resonance_frequency(

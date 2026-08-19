@@ -125,6 +125,25 @@ class SourceRoom:
     directivity: float = 1.0
     model: str = "constant_power"
 
+    def __post_init__(self) -> None:
+        """Refuse a source room that does not describe one source.
+
+        The two ways of saying it are mutually exclusive, and the power-level
+        way needs the room constant that turns a power into a level. Checked
+        here rather than where the object is used, so the complaint arrives
+        at the line that built it.
+        """
+        if (self.level is None) == (self.power_level is None):
+            raise ValueError(
+                "give exactly one of 'level' (the source-room level L_p1) or "
+                "'power_level' (the source sound power level L_W)."
+            )
+        if self.power_level is not None and self.room_constant is None:
+            raise ValueError(
+                "'room_constant' is required with 'power_level'; build it "
+                "with phonometry.room.room_constant."
+            )
+
 
 @dataclass(frozen=True)
 class DesignCriterion:
@@ -419,19 +438,11 @@ def room_to_room_transmission(
         raise ValueError("'frequencies' must be a non-empty 1-D array.")
     n = f.size
 
-    if (source.level is None) == (source.power_level is None):
-        raise ValueError(
-            "give exactly one of 'source.level' (the source-room level L_p1) "
-            "or 'source.power_level' (the source sound power level L_W)."
-        )
     require_choice(source.model, "source.model", tuple(SOURCE_POWER_MODELS))
     lw: NDArray[np.float64] | None = None
-    if source.power_level is not None:
-        if source.room_constant is None:
-            raise ValueError(
-                "'source.room_constant' is required with 'source.power_level'; "
-                "build it with phonometry.room.room_constant."
-            )
+    # SourceRoom.__post_init__ has already refused every other combination,
+    # so these two branches are the only ones reachable.
+    if source.power_level is not None and source.room_constant is not None:
         lw = as_band_spectrum(source.power_level, n, "source.power_level")
         lp1 = np.asarray(
             steady_state_spl(
@@ -443,7 +454,7 @@ def room_to_room_transmission(
             ),
             dtype=np.float64,
         )
-    elif source.level is None:  # pragma: no cover - guarded above
+    elif source.level is None:  # pragma: no cover - __post_init__ guards this
         raise ValueError("'source.level' must be given.")
     else:
         lp1 = as_band_spectrum(source.level, n, "source.level")

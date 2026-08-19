@@ -325,7 +325,10 @@ def db_hr_global_index(
     :param spectrum: Normalised spectrum key: ``"pink"`` (default),
         ``"traffic"``, ``"railway"`` or ``"aircraft"``.
     :param frequencies: Band centre frequencies, in Hz, one per value.
-        ``None`` assumes exactly the eighteen DB-HR bands in order.
+        ``None`` assumes exactly the eighteen DB-HR bands in order, so it is
+        required for any other length. That condition is on the length of
+        ``band_values`` at run time, which a signature cannot state, so it is
+        checked here and raises rather than being caught by a type checker.
     :param name: Optional index name carried on the result (e.g. ``"R'A"``).
     :return: A :class:`DbHrGlobalIndexResult`.
     :raises ValueError: For an unknown spectrum, a wrong band count, or

@@ -330,7 +330,7 @@ one-third-octave bands 100 Hz to 5 kHz (Formulae (A.5) to (A.7)).
 | :--- | :--- |
 | `band_values` | The band insulation `X_i`, in dB. Either exactly the eighteen DB-HR bands, or a longer spectrum together with `frequencies`, from which the eighteen bands are selected. |
 | `spectrum` | Normalised spectrum key: `"pink"` (default), `"traffic"`, `"railway"` or `"aircraft"`. |
-| `frequencies` | Band centre frequencies, in Hz, one per value. `None` assumes exactly the eighteen DB-HR bands in order. |
+| `frequencies` | Band centre frequencies, in Hz, one per value. `None` assumes exactly the eighteen DB-HR bands in order, so it is required for any other length. That condition is on the length of `band_values` at run time, which a signature cannot state, so it is checked here and raises rather than being caught by a type checker. |
 | `name` | Optional index name carried on the result (e.g. `"R'A"`). |
 
 **Returns:** A [`DbHrGlobalIndexResult`](/phonometry/reference/api/building/spain/#dbhrglobalindexresult).

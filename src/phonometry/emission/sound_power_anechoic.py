@@ -42,7 +42,7 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
@@ -562,6 +562,39 @@ def _precision_uncertainty_bands(
         precision_uncertainty(sigma_bands, sigma_omc, coverage_factor),
         dtype=np.float64,
     )
+
+
+@overload
+def sound_power_anechoic(
+    levels_positions: np.ndarray,
+    surface: PrecisionSurface,
+    *,
+    radius: float,
+    background_levels: np.ndarray,
+    frequencies: np.ndarray,
+    areas: np.ndarray | None = ...,
+    temperature: float = ...,
+    static_pressure: float = ...,
+    air_absorption_coefficient: float | np.ndarray | None = ...,
+    sigma_omc: float = ...,
+    coverage_factor: float = ...,
+) -> PrecisionSoundPowerResult: ...
+
+
+@overload
+def sound_power_anechoic(
+    levels_positions: np.ndarray,
+    surface: PrecisionSurface,
+    *,
+    radius: float,
+    frequencies: np.ndarray | None = ...,
+    areas: np.ndarray | None = ...,
+    temperature: float = ...,
+    static_pressure: float = ...,
+    air_absorption_coefficient: float | np.ndarray | None = ...,
+    sigma_omc: float = ...,
+    coverage_factor: float = ...,
+) -> PrecisionSoundPowerResult: ...
 
 
 def sound_power_anechoic(

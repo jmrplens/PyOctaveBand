@@ -100,7 +100,7 @@ Fresnel number :math:`N = (2/\lambda)(A + B + e - d)` (Bies Eq. (5.157)).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -295,6 +295,34 @@ def spherical_reflection_coefficient(
     w = np.sqrt(0.5j * k * r2) * (cos_theta + 1.0 / z)
     f_w = 1.0 + 1j * np.sqrt(np.pi) * w * wofz(w)
     return np.asarray(rp + (1.0 - rp) * f_w, dtype=np.complex128)
+
+
+@overload
+def ground_effect(
+    frequencies: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+    distance: float,
+    *,
+    impedance: ArrayLike | PorousMediumResult,
+    model: Literal["delany_bazley", "miki"] = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SphericalGroundResult: ...
+
+
+@overload
+def ground_effect(
+    frequencies: ArrayLike,
+    source_height: float,
+    receiver_height: float,
+    distance: float,
+    *,
+    flow_resistivity: float,
+    model: Literal["delany_bazley", "miki"] = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SphericalGroundResult: ...
 
 
 def ground_effect(

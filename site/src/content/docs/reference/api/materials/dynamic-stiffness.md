@@ -254,8 +254,8 @@ frequency (Formula 2).
 | `total_mass_per_area` | Test total mass per unit area `m't`, kg/m2. |
 | `floor_mass_per_area` | Supported-floor mass per unit area `m'`, kg/m2. |
 | `airflow_resistivity` | Lateral airflow resistivity `r`, in kPa.s/m2 (default `inf` -> the high-resistivity case $s' = s'_\mathrm{t}$). |
-| `thickness` | Specimen thickness `d` under load, in metres (required for the enclosed-gas term when $r < 100$ kPa.s/m2). |
-| `porosity` | Specimen porosity `epsilon` (required with `thickness`). |
+| `thickness` | Specimen thickness `d` under load, in metres. Required together with `porosity` for the enclosed-gas term, which applies when $r < 100$ kPa.s/m2. That condition is on the *value* of `airflow_resistivity` rather than on a literal, so a signature cannot state it: it is checked here and raises. |
+| `porosity` | Specimen porosity `epsilon`, required with `thickness` (see above). |
 | `atmospheric_pressure` | Atmospheric pressure `p0`, in pascals. |
 
 **Returns:** The [`DynamicStiffnessResult`](/phonometry/reference/api/materials/dynamic-stiffness/#dynamicstiffnessresult).
