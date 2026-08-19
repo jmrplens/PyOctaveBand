@@ -317,3 +317,32 @@ def test_plot_unknown_language_raises() -> None:
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
     plt.close("all")
+
+
+def test_the_level_history_still_unpacks_as_the_pair_it_replaced() -> None:
+    """The migration this change had to survive.
+
+    Every caller of ``sound_pressure_level_history`` wrote
+    ``times, levels = ...``, so the result is iterable and yields those two
+    in that order, the same way DecayCurve replaced its own tuple return.
+    """
+    rng = np.random.default_rng(0)
+    signal = 0.01 * rng.standard_normal(FS * 2)
+    result = iso.sound_pressure_level_history(signal, FS, dt=0.02)
+
+    times, levels = result
+    assert np.array_equal(times, result.times)
+    assert np.array_equal(levels, result.levels)
+    assert result.dt == pytest.approx(0.02)
+
+
+def test_the_level_history_draws_its_own_trace() -> None:
+    """The thing a bare tuple could not do, and every other result here can."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    rng = np.random.default_rng(0)
+    signal = 0.01 * rng.standard_normal(FS * 2)
+    axes = iso.sound_pressure_level_history(signal, FS, dt=0.02).plot()
+    assert "dB" in axes.get_ylabel()
+    assert axes.get_xlabel().startswith("Time")

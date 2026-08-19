@@ -60,6 +60,7 @@ from __future__ import annotations
 
 import math
 import warnings
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -477,6 +478,46 @@ class ImpulsiveSoundResult:
 # ---------------------------------------------------------------------------
 
 
+@dataclass(frozen=True)
+class LevelHistory:
+    """A frequency- and time-weighted level trace, and the axis it lives on.
+
+    What :func:`sound_pressure_level_history` computes is ``LpAF``: the
+    A-weighted, F time-weighted sound pressure level sampled every ``dt``
+    seconds. It came back as a bare ``(times, levels)`` pair, which meant
+    the one thing every other result in this library offers, a plot that
+    knows what it is drawing, had to be written by hand each time.
+
+    For backward compatibility with that pair, the dataclass is iterable
+    and unpacks as ``times, levels = sound_pressure_level_history(...)``,
+    the same way :class:`~phonometry.room.DecayCurve` replaced its own
+    tuple return.
+
+    :ivar times: Time of each sample, in seconds from the start.
+    :ivar levels: The level at each of those times, in dB.
+    :ivar dt: Sampling interval of ``levels``, in seconds.
+    """
+
+    times: np.ndarray
+    levels: np.ndarray
+    dt: float
+
+    def __iter__(self) -> Iterator[np.ndarray]:
+        """Yield ``times`` then ``levels`` so the result unpacks like a tuple."""
+        yield self.times
+        yield self.levels
+
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
+        """Plot the level trace against time.
+
+        Requires matplotlib (``pip install phonometry[plot]``); returns the
+        :class:`~matplotlib.axes.Axes`.
+        """
+        return _plot_level_history(self, ax=ax, language=language, **kwargs)
+
+
 def sound_pressure_level_history(
     signal: SignalInput,
     fs: float | None = None,
@@ -484,7 +525,7 @@ def sound_pressure_level_history(
     dt: float = DEFAULT_SAMPLE_INTERVAL,
     reference_pressure: float = REFERENCE_PRESSURE,
     calibration_offset: float = 0.0,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> LevelHistory:
     r"""A frequency-weighted, F time-weighted level history ``LpAF`` (Clause 4).
 
     The signal is A-weighted (IEC 61672-1), F time-weighted
@@ -504,7 +545,8 @@ def sound_pressure_level_history(
     :param reference_pressure: Reference pressure, in pascal (default 20 uPa).
     :param calibration_offset: Level offset added to ``LpAF``, in dB, for
         signals recorded on a scale other than pascal.
-    :return: ``(times, levels)``, the sample times in seconds and ``LpAF`` in
+    :return: A :class:`LevelHistory`, which unpacks as ``(times, levels)``
+        for the callers that always did: the sample times in seconds and ``LpAF`` in
         dB. The realised interval is ``times[1] - times[0]`` and may differ
         slightly from ``dt`` because it is an integer number of samples.
     :raises ValueError: for a non-positive ``fs`` or ``dt`` outside 10-25 ms.
@@ -539,7 +581,7 @@ def sound_pressure_level_history(
     floor = np.finfo(np.float64).tiny
     levels = 10.0 * np.log10(np.maximum(sampled, floor) / reference_pressure**2) + calibration_offset
     times = idx / fs
-    return times, levels
+    return LevelHistory(times=times, levels=levels, dt=float(dt))
 
 
 def _equivalent_level(
@@ -817,6 +859,37 @@ _PLOT_LABELS: dict[str, dict[str, str]] = {
         "nosummary": "sin inicio válido: K_I = 0 dB (no impulsivo)",
     },
 }
+
+
+def _plot_level_history(
+    result: LevelHistory,
+    *,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The bare ``LpAF`` trace, without the onset marks of the full assessment.
+
+    The same axes as :func:`_plot_impulsive_sound` draws underneath its
+    prominence marks, so the two figures read the same way when a reader
+    puts them side by side.
+    """
+    from ..._i18n import check_language, localize_axes
+
+    lang = check_language(language)
+    labels = _PLOT_LABELS[lang]
+
+    import matplotlib.pyplot as plt
+
+    if ax is None:
+        _, ax = plt.subplots()
+    kwargs.setdefault("lw", 1.0)
+    ax.plot(result.times, result.levels, label=labels["level"], **kwargs)
+    ax.set_xlabel(labels["xlabel"])
+    ax.set_ylabel(labels["ylabel"])
+    ax.grid(True, alpha=0.3)
+    localize_axes(ax, lang)
+    return ax
 
 
 def _plot_impulsive_sound(
