@@ -195,18 +195,16 @@ def test_golay_reads_the_second_recording_too() -> None:
         ),
         golay_impulse_response(_GOLAY_A, CAL * _GOLAY_B, fs=FS, pair=_PAIR),
     )
+    second = Signal(_GOLAY_B, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
-        golay_impulse_response(
-            _GOLAY_A, Signal(_GOLAY_B, FS), fs=FS + 1, pair=_PAIR
-        )
+        golay_impulse_response(_GOLAY_A, second, fs=FS + 1, pair=_PAIR)
 
 
 def test_two_recordings_at_different_rates_are_refused() -> None:
     """Golay takes two recordings, and they have to be the same measurement."""
+    first, second = Signal(_GOLAY_A, FS), Signal(_GOLAY_B, FS // 2)
     with pytest.raises(ValueError, match="recorded at different rates"):
-        golay_impulse_response(
-            Signal(_GOLAY_A, FS), Signal(_GOLAY_B, FS // 2), pair=_PAIR
-        )
+        golay_impulse_response(first, second, pair=_PAIR)
 
 
 def test_the_farina_method_still_demands_the_rate() -> None:

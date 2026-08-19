@@ -108,8 +108,10 @@ def test_stoi_takes_the_rate_from_either_side() -> None:
 
 
 def test_stoi_refuses_two_signals_at_different_rates() -> None:
+    clean = Signal(_CLEAN, STOI_FS)
+    degraded = Signal(_DEGRADED, STOI_FS // 2)
     with pytest.raises(ValueError, match="recorded at different rates"):
-        stoi(Signal(_CLEAN, STOI_FS), Signal(_DEGRADED, STOI_FS // 2))
+        stoi(clean, degraded)
 
 
 def test_stoi_still_requires_fs_for_a_pair_of_bare_arrays() -> None:
@@ -156,9 +158,10 @@ def test_a_reference_at_another_rate_is_refused() -> None:
     rate was processed on the measurement's rate and returned STI 1.000, a
     perfect score for a mismatch, instead of saying anything was wrong.
     """
-    half = stipa_signal(FS // 2, seconds=18.0, seed=2)
+    measured = Signal(_STIPA, FS)
+    half = Signal(stipa_signal(FS // 2, seconds=18.0, seed=2), FS // 2)
     with pytest.raises(ValueError, match="recorded at different rates"):
-        stipa(Signal(_STIPA, FS), reference=Signal(half, FS // 2))
+        stipa(measured, reference=half)
 
 
 def test_the_reference_recording_is_read_and_then_cancels() -> None:
