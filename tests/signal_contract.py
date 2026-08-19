@@ -41,6 +41,9 @@ def assert_same(a: Any, b: Any, path: str = "") -> None:
             assert_same(ai, bi, f"{path}[{i}]")
         return
     if isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
-        assert np.array_equal(np.asarray(a), np.asarray(b)), path
+        # equal_nan: a NaN in the same place is the same result. Several
+        # of these carry one by design (an unqualified decay time, an empty
+        # band), and without this the helper would reject a match.
+        assert np.array_equal(np.asarray(a), np.asarray(b), equal_nan=True), path
         return
     assert a == b, path

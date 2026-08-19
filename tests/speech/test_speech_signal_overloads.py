@@ -149,13 +149,28 @@ def test_the_noise_corrections_still_take_their_levels_positionally() -> None:
     assert_same(positional, stipa(Signal(_STIPA, FS), level=_LEVEL, ambient=_AMBIENT))
 
 
-def test_the_reference_recording_is_read_but_not_calibrated() -> None:
-    """It contributes a modulation depth, which is already normalised."""
+def test_a_reference_at_another_rate_is_refused() -> None:
+    """The reference is a second take of the same signal, so it shares a rate.
+
+    Measured before the refusal existed: a reference recorded at half the
+    rate was processed on the measurement's rate and returned STI 1.000, a
+    perfect score for a mismatch, instead of saying anything was wrong.
+    """
+    half = stipa_signal(FS // 2, seconds=18.0, seed=2)
+    with pytest.raises(ValueError, match="recorded at different rates"):
+        stipa(Signal(_STIPA, FS), reference=Signal(half, FS // 2))
+
+
+def test_the_reference_recording_is_read_and_then_cancels() -> None:
+    """Its factor is applied like any other record's, and then divides out.
+
+    What is taken from the reference is a modulation depth, and those are
+    normalised by the total intensity of their own band, so the calibrated
+    call has to match both the pre-scaled one and the bare one.
+    """
     reference = stipa_signal(FS, seconds=18.0, seed=2)
-    assert_same(
-        stipa(
-            Signal(_STIPA, FS),
-            reference=Signal(reference, FS, calibration_factor=CAL),
-        ),
-        stipa(_STIPA, FS, reference),
+    calibrated = stipa(
+        Signal(_STIPA, FS), reference=Signal(reference, FS, calibration_factor=CAL)
     )
+    assert_same(calibrated, stipa(_STIPA, FS, CAL * reference))
+    assert calibrated.sti == pytest.approx(stipa(_STIPA, FS, reference).sti)

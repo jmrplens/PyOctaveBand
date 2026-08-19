@@ -34,7 +34,7 @@ from .._internal.utils import _typesignal
 from .._internal.warnings import PhonometryWarning
 from ..filters.core import OctaveFilterBank
 from ..filters.frequencies import nominal_frequencies
-from ..io._resolve import apply_calibration, resolve_fs
+from ..io._resolve import apply_calibration, resolve_fs, resolve_pair_fs
 from ..io._signal import Signal
 
 
@@ -638,15 +638,27 @@ def stipa(
     :param reference: Optional reference recording of the undistorted
         test signal; its measured modulation depths replace the nominal
         0,55 as normalization (useful for non-conformant sources). Accepts
-        a :class:`phonometry.io.Signal`; only its samples are read, since
-        what is taken from it is a modulation depth, already normalised.
+        a :class:`phonometry.io.Signal`. It is a second recording of the
+        same test signal, so it has to share the rate: two Signals that
+        disagree are refused rather than arbitrated, and measuring the
+        reference on a rate that is not its own would return a perfect STI
+        for a mismatch. Its calibration is applied like any other record's,
+        and then cancels, because what is taken from it is a modulation
+        depth and those are normalised.
     :param level: Optional speech octave-band levels in dB SPL (7 values)
         enabling auditory masking and reception threshold corrections.
     :param ambient: Optional ambient noise octave-band levels in dB SPL
         (7 values); requires ``level``.
     :return: :class:`STIResult` with ``mtf`` of shape (7, 2).
     """
-    fs = resolve_fs(x, fs, name="x")
+    # The reference is a second recording of the same test signal, so it has
+    # to have been made at the same rate: measuring its modulation depths on
+    # a rate that is not its own returns a perfect STI for a mismatch.
+    fs = (
+        resolve_fs(x, fs, name="x")
+        if reference is None
+        else resolve_pair_fs(x, reference, fs, names=("x", "reference"))
+    )
     x_proc = apply_calibration(x, _typesignal(np.asarray(x)))
     if x_proc.ndim != 1:
         raise ValueError("stipa expects a 1D signal.")
@@ -670,7 +682,7 @@ def stipa(
 
     mdr = _stipa_modulation_depths(_intensity_envelopes(x_proc, fs), fs)
     if reference is not None:
-        ref_proc = _typesignal(np.asarray(reference))
+        ref_proc = apply_calibration(reference, _typesignal(np.asarray(reference)))
         if ref_proc.ndim != 1:
             raise ValueError("'reference' must be a 1D signal.")
         mdt = _stipa_modulation_depths(_intensity_envelopes(ref_proc, fs), fs)

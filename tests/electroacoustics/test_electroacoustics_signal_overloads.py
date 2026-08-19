@@ -191,15 +191,32 @@ def test_a_pair_of_bare_arrays_still_requires_fs(func, kwargs) -> None:
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
 def test_a_calibrated_pair_is_analysed_in_pascals(func, kwargs) -> None:
+    """Two different factors, because a shared one cancels from both of these.
+
+    The transfer function is a ratio of the two records and the coherence is
+    normalised, so calibrating both by the same amount changes nothing and a
+    function that ignored the pair's calibration entirely would pass. Giving
+    the two records different factors is what tells them apart.
+    """
     x, y = _HARMONIC, _MODULATION
     assert_same(
         func(
             Signal(x, FS, calibration_factor=CAL),
-            Signal(y, FS, calibration_factor=CAL),
+            Signal(y, FS, calibration_factor=2.0 * CAL),
             **kwargs,
         ),
-        func(CAL * x, CAL * y, FS, **kwargs),
+        func(CAL * x, 2.0 * CAL * y, FS, **kwargs),
     )
+
+
+def test_the_transfer_function_moves_with_an_unequal_pair() -> None:
+    """And the direction is the documented one: H comes out as (c_y/c_x) H."""
+    x, y = _HARMONIC, _MODULATION
+    plain = transfer_function(x, y, FS)
+    scaled = transfer_function(x, 3.0 * y, FS)
+    assert np.allclose(scaled.response, 3.0 * plain.response)
+    from_objects = transfer_function(Signal(x, FS), Signal(y, FS, calibration_factor=3.0))
+    assert np.allclose(from_objects.response, scaled.response)
 
 
 # ---------------------------------------------------------------------------

@@ -179,6 +179,28 @@ def test_a_calibrated_recording_deconvolves_in_pascals(func, records, kwargs) ->
     )
 
 
+def test_golay_reads_the_second_recording_too() -> None:
+    """The parametrised cases above only ever wrap the first record.
+
+    Golay is the one here with two recordings, so a regression that looked
+    at ``recorded_a`` and ignored ``recorded_b`` would pass every case above.
+    """
+    assert_same(
+        golay_impulse_response(_GOLAY_A, Signal(_GOLAY_B, FS), pair=_PAIR),
+        golay_impulse_response(_GOLAY_A, _GOLAY_B, fs=FS, pair=_PAIR),
+    )
+    assert_same(
+        golay_impulse_response(
+            _GOLAY_A, Signal(_GOLAY_B, FS, calibration_factor=CAL), pair=_PAIR
+        ),
+        golay_impulse_response(_GOLAY_A, CAL * _GOLAY_B, fs=FS, pair=_PAIR),
+    )
+    with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
+        golay_impulse_response(
+            _GOLAY_A, Signal(_GOLAY_B, FS), fs=FS + 1, pair=_PAIR
+        )
+
+
 def test_two_recordings_at_different_rates_are_refused() -> None:
     """Golay takes two recordings, and they have to be the same measurement."""
     with pytest.raises(ValueError, match="recorded at different rates"):
