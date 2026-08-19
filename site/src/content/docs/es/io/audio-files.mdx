@@ -60,8 +60,9 @@ una medición.
 El tipo es `phonometry.io.Signal`. Se escribe `io.Signal` tras
 `from phonometry import io`, o `phonometry.Signal`, que es la misma clase: el
 nivel superior la publica porque siete paquetes la aceptan, y esas son las dos
-únicas formas. El módulo donde está definida es privado, y entrar por ahí da
-una clase igual a esta en todo salvo en que nada garantiza que siga estando.
+formas admitidas. El módulo donde está definida es privado, y entrar por ahí
+devuelve el mismo objeto, sin que nada garantice que siga siendo alcanzable
+así.
 
 La instalación base (NumPy y SciPy, nada más) lee toda la familia WAV lineal
 que escribe el equipamiento de medida: PCM a cualquier profundidad, incluido
