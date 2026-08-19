@@ -28,7 +28,7 @@ in order of weight:
   ``x * calibration_factor = (n / D) * D * p_ref / rms(n_cal)`` -- ``D``
   divides out exactly. The perennial 32767-vs-32768 debate is therefore moot
   here; even uncalibrated, the difference is
-  ``20*log10(32768/32767) = 0.00027 dB``, three orders of magnitude below the
+  ``20*log10(32768/32767) = 0.00027 dB``, some 380 times smaller than the
   0.1 dB indication resolution of an IEC 61672 sound level meter.
 * **A power of two is exact in binary floating point.** Dividing by
   :math:`2^{B-1}` only shifts the exponent, so every integer sample maps to
