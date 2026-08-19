@@ -35,6 +35,49 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
     return s.format(**fmt) if fmt else s
 
 
+def _db_waveform(y: np.ndarray, calibrated: bool) -> np.ndarray:
+    """Pointwise ``20 lg(|p| / 20 uPa)`` of a calibrated waveform.
+
+    :param y: Samples already scaled to pascals.
+    :param calibrated: Whether the Signal carried a calibration factor.
+    :return: The same shape, in decibels re 20 uPa.
+    :raises ValueError: If the samples are digital full-scale units, which
+        have no reference to count decibels from.
+    """
+    if not calibrated:
+        raise ValueError(
+            "scale='db' needs a calibrated Signal: without a "
+            "calibration_factor the samples are digital full-scale units "
+            "and there is no reference to count decibels from"
+        )
+    # Deferred, not tidiness: signals.levels imports io, so reaching for
+    # the reference pressure at module level here is an import cycle that
+    # takes down `import phonometry` outright.
+    from ..signals.levels import _REF_PRESSURE
+
+    with np.errstate(divide="ignore"):
+        return 20.0 * np.log10(np.abs(y) / _REF_PRESSURE)
+
+
+def _draw_channels(
+    axw: Axes, t: np.ndarray, y: np.ndarray, result: Signal,
+    language: str, kwargs: dict[str, Any],
+) -> None:
+    """Draw one line per channel, labelled and with a legend when there are several."""
+    if result.n_channels == 1:
+        kwargs.setdefault("color", _C_PRIMARY)
+        axw.plot(t, y[0], **kwargs)
+        return
+    for index, channel in enumerate(y):
+        label = (
+            result.channel_labels[index]
+            if result.channel_labels is not None
+            else _t("Channel {n}", language, n=index + 1)
+        )
+        axw.plot(t, channel, label=label, **kwargs)
+    axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+
+
 def plot_signal(
     result: Signal, ax: Axes | None = None, *,
     language: str = "en", scale: str = "linear", **kwargs: Any
@@ -60,53 +103,30 @@ def plot_signal(
         result plots.
     :param kwargs: Forwarded to every channel's ``plot`` call.
     :return: The axes drawn on.
+    :raises ValueError: If ``scale`` is neither ``"linear"`` nor ``"db"``, or
+        if ``"db"`` is asked of an uncalibrated Signal.
     """
     from .._i18n import localize_axes
+
+    if scale not in ("linear", "db"):
+        raise ValueError(f"scale must be 'linear' or 'db'; got {scale!r}")
 
     factor = result.calibration_factor
     calibrated = factor is not None
     y = result.data if factor is None else result.data * factor
-    t = np.arange(result.n_samples) / float(result.fs)
-
     if scale == "db":
-        if not calibrated:
-            raise ValueError(
-                "scale='db' needs a calibrated Signal: without a "
-                "calibration_factor the samples are digital full-scale units "
-                "and there is no reference to count decibels from"
-            )
-        # Deferred, not tidiness: signals.levels imports io, so reaching for
-        # the reference pressure at module level here is an import cycle that
-        # takes down `import phonometry` outright.
-        from ..signals.levels import _REF_PRESSURE
-
-        with np.errstate(divide="ignore"):
-            y = 20.0 * np.log10(np.abs(y) / _REF_PRESSURE)
-    elif scale != "linear":
-        raise ValueError(f"scale must be 'linear' or 'db'; got {scale!r}")
+        y = _db_waveform(y, calibrated)
+        ylabel = "Sound pressure [dB re 20 uPa]"
+    else:
+        ylabel = "Sound pressure [Pa]" if calibrated else "Amplitude [FS]"
+    t = np.arange(result.n_samples) / float(result.fs)
 
     new_figure = ax is None
     axw = _new_axes() if ax is None else ax
     kwargs.setdefault("lw", 0.9)
-    if result.n_channels == 1:
-        kwargs.setdefault("color", _C_PRIMARY)
-        axw.plot(t, y[0], **kwargs)
-    else:
-        for index, channel in enumerate(y):
-            label = (
-                result.channel_labels[index]
-                if result.channel_labels is not None
-                else _t("Channel {n}", language, n=index + 1)
-            )
-            axw.plot(t, channel, label=label, **kwargs)
-        axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+    _draw_channels(axw, t, y, result, language, kwargs)
     axw.set_xlabel(_t(_TIME_LABEL, language))
-    if scale == "db":
-        axw.set_ylabel(_t("Sound pressure [dB re 20 uPa]", language))
-    else:
-        axw.set_ylabel(_t(
-            "Sound pressure [Pa]" if calibrated else "Amplitude [FS]", language
-        ))
+    axw.set_ylabel(_t(ylabel, language))
     axw.grid(True, alpha=0.3)
     if new_figure:
         axw.set_title(_t(

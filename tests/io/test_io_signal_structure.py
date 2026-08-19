@@ -114,10 +114,12 @@ def test_the_decibel_scale_needs_a_calibration_to_mean_anything() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    axes = _stereo().pick(0).plot(scale="db")
+    one = _stereo().pick(0)
+    axes = one.plot(scale="db")
     assert "dB" in axes.get_ylabel()
+    bare = Signal(np.asarray(one), FS)
     with pytest.raises(ValueError, match="needs a calibrated Signal"):
-        Signal(np.asarray(_stereo().pick(0)), FS).plot(scale="db")
+        bare.plot(scale="db")
 
 
 def test_an_unknown_scale_is_refused_by_name() -> None:
@@ -169,3 +171,30 @@ def test_the_decibel_axis_is_translated() -> None:
     matplotlib.use("Agg")
     axes = _stereo().pick(0).plot(scale="db", language="es")
     assert axes.get_ylabel() == "Presión sonora [dB re 20 uPa]"
+
+
+def test_crop_refuses_a_time_that_is_not_a_finite_number() -> None:
+    """A NaN or an infinity is not an edge; it is a missing edge.
+
+    Left to arithmetic, ``nan * fs`` compares false against everything and
+    the span would silently become empty or the whole record. The refusal
+    names the parameters so the caller knows which one it handed in.
+    """
+    whole = _stereo()
+    with pytest.raises(ValueError, match="finite times in seconds"):
+        whole.crop(float("nan"), 0.5)
+    with pytest.raises(ValueError, match="finite times in seconds"):
+        whole.crop(0.0, float("inf"))
+
+
+def test_crop_refuses_a_span_too_narrow_to_hold_a_sample() -> None:
+    """A span can be well formed in seconds and still hold nothing.
+
+    At 10 Hz the samples sit 100 ms apart, so [0.11, 0.19) s falls between
+    two of them: ``tmax`` is greater than ``tmin``, and yet there is no
+    sample to return. Returning an empty Signal would push the surprise
+    downstream, so the refusal quotes the span and the rate.
+    """
+    sparse = Signal(np.arange(5.0)[None, :], 10)
+    with pytest.raises(ValueError, match="holds no samples at 10 Hz"):
+        sparse.crop(0.11, 0.19)

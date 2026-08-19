@@ -288,3 +288,66 @@ def test_the_envelope_plot_is_translated() -> None:
     ).plot(language="es")
     assert axes.get_ylabel().startswith("Nivel de presión sonora")
     assert axes.get_xlabel() == "Tiempo [s]"
+
+
+def test_the_band_waveforms_come_back_as_signals_only_when_the_bank_read_the_factor() -> None:
+    """Both sides of the gate on the filter bank's band output.
+
+    ``sigbands=True`` hands back one waveform per band, and each one is a
+    pressure record in its own right. It is a Signal only when the bank
+    filtered pascals: that is, when it took the object's calibration rather
+    than one of its own or a dBFS reading. A dBFS bank filtered digital
+    full-scale units, so returning those as a Signal would put a pascal
+    label on a number that is not one.
+
+    The factor on the returned band is 1.0 for the reason this whole file
+    exists: the samples are already in pascals, so a factor that is not 1
+    would be applied a second time downstream.
+    """
+    from phonometry.filters import LevelCalibration, octave_filter
+
+    record = Signal(_RECORD, FS, calibration_factor=CAL)
+    _spl, _freq, bands = octave_filter(record, sigbands=True, detrend=False)
+    assert all(isinstance(band, Signal) for band in bands)
+    assert {band.fs for band in bands} == {FS}
+    assert {band.calibration_factor for band in bands} == {1.0}
+
+    _spl, _freq, digital = octave_filter(
+        record, sigbands=True, detrend=False,
+        calibration=LevelCalibration(dbfs=True),
+    )
+    assert not any(isinstance(band, Signal) for band in digital)
+    assert all(isinstance(band, np.ndarray) for band in digital)
+
+
+def test_an_empty_block_keeps_the_carried_state_and_the_wrapper() -> None:
+    """The block integrator's empty-input path, on both input shapes.
+
+    A stream can hand a block-wise integrator an empty block, and that must
+    neither reset the state it carries nor change the type it returns: the
+    block after it has to continue exactly where the one before left off.
+    Checked against a run with no empty block in the middle, which is the
+    only thing that can tell a kept state from a forgotten one. The empty
+    envelope itself comes back wrapped for a Signal and bare for an array,
+    like every other call.
+    """
+    from phonometry.filters import TimeWeightedEnvelope, TimeWeighting
+
+    first, second = _RECORD[:2400], _RECORD[2400:4800]
+
+    straight = TimeWeighting(FS, mode="fast")
+    straight.process(Signal(first, FS))
+    continued = np.asarray(straight.process(Signal(second, FS)))
+
+    interrupted = TimeWeighting(FS, mode="fast")
+    interrupted.process(Signal(first, FS))
+    empty = interrupted.process(Signal(np.zeros((1, 0)), FS))
+    assert isinstance(empty, TimeWeightedEnvelope)
+    assert np.asarray(empty).shape[-1] == 0
+    assert np.array_equal(
+        np.asarray(interrupted.process(Signal(second, FS))), continued
+    )
+
+    bare = TimeWeighting(FS, mode="fast")
+    bare.process(first)
+    assert isinstance(bare.process(np.zeros(0)), np.ndarray)
