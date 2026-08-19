@@ -6,6 +6,7 @@ from __future__ import annotations
 from .._plot.geometry import (
     plot_open_plan_geometry,
 )
+from .._plot.room import plot_excitation
 from .acoustics import (
     DecayCurve,
     RoomAcousticsResult,
@@ -136,6 +137,7 @@ __all__ = [
     "noise_criterion",
     "object_fraction",
     "open_plan_metrics",
+    "plot_excitation",
     "plot_open_plan_geometry",
     "rc_curve",
     "reflection_density",
