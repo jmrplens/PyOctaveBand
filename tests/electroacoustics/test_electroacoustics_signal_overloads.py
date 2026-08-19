@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from signal_contract import assert_same
 
 from phonometry.electroacoustics import (
     coherence,
@@ -46,7 +47,6 @@ from phonometry.electroacoustics import (
     weighted_thd,
 )
 from phonometry.io import Signal
-from tests.signal_contract import assert_same
 
 FS = 48000
 CAL = 3.0

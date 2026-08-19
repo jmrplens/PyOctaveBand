@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from signal_contract import assert_same
 
 from phonometry.io import Signal
 from phonometry.speech import (
@@ -32,7 +33,6 @@ from phonometry.speech import (
     stipa_signal,
     stoi,
 )
-from tests.signal_contract import assert_same
 
 FS = 48000
 STOI_FS = 10000

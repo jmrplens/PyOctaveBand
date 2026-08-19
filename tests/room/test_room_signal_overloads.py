@@ -25,6 +25,7 @@ from dataclasses import fields
 
 import numpy as np
 import pytest
+from signal_contract import assert_same
 
 from phonometry.io import Signal
 from phonometry.room import (
@@ -36,7 +37,6 @@ from phonometry.room import (
     mls_signal,
     room_parameters,
 )
-from tests.signal_contract import assert_same
 
 FS = 8000
 CAL = 3.0

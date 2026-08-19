@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from signal_contract import assert_same
 
 from phonometry.io import Signal
 from phonometry.metrology import (
@@ -51,7 +52,6 @@ from phonometry.signals import (
     time_synchronous_average,
     zoom_fft,
 )
-from tests.signal_contract import assert_same
 
 FS = 8000
 CAL = 3.0
