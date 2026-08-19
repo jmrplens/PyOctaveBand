@@ -3,8 +3,19 @@ name: Python CI
 on:
   push:
     branches: [ "master", "main" ]
+  # No base-branch filter, deliberately. A pull request that targets another
+  # branch is the bottom half of a stack, and it is the half that still has to
+  # be reviewed and merged: with `branches` set to main it arrived with four
+  # checks instead of the thirty this workflow runs, and the gates only spoke
+  # once it was already at the front of the queue.
+  #
+  # This does not double any run. The `push` trigger above is limited to the
+  # two trunk branches, so a commit on a working branch fires `pull_request`
+  # alone and a commit on main fires `push` alone. The two jobs that care which
+  # one it was, `sonar` and `pr-comment`, key on `github.event_name` rather
+  # than on the base, so they behave for a stacked pull request exactly as they
+  # do for any other.
   pull_request:
-    branches: [ "master", "main" ]
   workflow_dispatch:
 
 permissions:
