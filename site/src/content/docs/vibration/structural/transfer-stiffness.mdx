@@ -460,13 +460,13 @@ $L_k(f)$ spectrum, so it needs both the report and plot extras
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, TransferStiffnessResult, transfer_stiffness_direct
+from phonometry import ReportMetadata, vibration
 
 freqs = np.array([20, 31.5, 50, 80, 125, 200, 315, 500, 800, 1250, 2000], dtype=float)
 k21 = 1e6 + 1j * (2 * np.pi * freqs) * 80.0     # Kelvin-Voigt element k + jwc
 u1 = 1e-6 + 0j
-k = transfer_stiffness_direct(k21 * u1, u1)     # direct method: k2,1 = F2,b/u1
-res = TransferStiffnessResult(frequencies=freqs, transfer_stiffness=k)
+k = vibration.transfer_stiffness_direct(k21 * u1, u1)     # direct method: k2,1 = F2,b/u1
+res = vibration.TransferStiffnessResult(frequencies=freqs, transfer_stiffness=k)
 res.report(
     "transfer_stiffness.pdf",
     metadata=ReportMetadata(

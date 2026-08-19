@@ -54,22 +54,17 @@ less into the top one, which is why the two sources are not interchangeable and
 why a floor can pass one and fail the other.
 
 ```python
-from phonometry import (
-    check_heavy_impact_source,
-    heavy_impact_source_limits,
-    heavy_impact_source_specification,
-    impact_force_exposure_level,
-)
+from phonometry import building
 
-spec = heavy_impact_source_specification("rubber_ball")
+spec = building.heavy_impact_source_specification("rubber_ball")
 print(spec.drop_height, spec.effective_mass)      # 1.0 m, 2.5 kg
 print(spec.contact_time, spec.contact_time_tolerance)   # 0.02 s +/- 0.002 s
 
-freqs, lower, upper = heavy_impact_source_limits("bang_machine")
+freqs, lower, upper = building.heavy_impact_source_limits("bang_machine")
 print(list(zip(freqs, lower, upper))[0])          # (31.5, 46.0, 48.0)
 
 # A calibration run: five measured octave-band LFE against the printed table.
-check = check_heavy_impact_source([39.4, 30.2, 23.6, 18.5, 12.9])
+check = building.check_heavy_impact_source([39.4, 30.2, 23.6, 18.5, 12.9])
 print(check.passed, list(check.within_tolerance))
 check.plot()   # measured LFE over the tolerance band (needs matplotlib)
 ```
@@ -84,7 +79,7 @@ any single band value and must not be compared with the table above.
 
 ```python
 import numpy as np
-from phonometry import OctaveFilterBank, impact_force_exposure_level
+from phonometry import building, filters
 
 fs = 48_000
 t = np.arange(0.0, 0.020, 1.0 / fs)          # the 20 ms contact time
@@ -92,12 +87,12 @@ force = 1500.0 * np.sin(np.pi * t / 0.020)   # a single-peak half-sine pulse
 
 # Broadband, i.e. the whole pulse energy: 10 lg(Fp^2 t / 2) = 43.5 dB.
 # Not a band value, and not comparable with the table above.
-print(round(impact_force_exposure_level(force, fs), 2))
+print(round(building.impact_force_exposure_level(force, fs), 2))
 
 # The five octave-band values the specification is actually written in.
-bank = OctaveFilterBank(fs, fraction=1, limits=[31.5, 500.0])
+bank = filters.OctaveFilterBank(fs, fraction=1, limits=[31.5, 500.0])
 _, freqs, bands = bank.filter(force, sigbands=True, calculate_level=False)
-lfe = [impact_force_exposure_level(b, fs) for b in bands]
+lfe = [building.impact_force_exposure_level(b, fs) for b in bands]
 print([round(v, 1) for v in lfe])   # [-1.4, 14.0, 22.1, 20.2, 17.1]
 
 # Those five go to the conformance check; this synthetic half-sine is not a
@@ -139,23 +134,19 @@ its value is $1/e$. When $T = T_0$ the bracket collapses to 1 and the whole
 correction reduces to the volume term, as it must.
 
 ```python
-from phonometry import (
-    fast_reverberation_correction,
-    heavy_impact_octave_levels,
-    standardized_maximum_impact_level,
-)
+from phonometry import building
 
 freqs = [63.0, 125.0, 250.0, 500.0]
 li_fmax = [65.3, 64.5, 58.0, 55.8]           # energy-averaged over ball positions
 t = [1.43, 3.70, 3.10, 2.38]                 # receiving-room reverberation time
 
-res = standardized_maximum_impact_level(li_fmax, 41.4, t, frequency=freqs)
+res = building.standardized_maximum_impact_level(li_fmax, 41.4, t, frequency=freqs)
 print(res.volume_term)                        # 10 lg(41.4/50) = -0.8 dB
-print(fast_reverberation_correction([0.5]))   # exactly 0 dB at T = T0
+print(building.fast_reverberation_correction([0.5]))   # exactly 0 dB at T = T0
 res.plot()   # measured and standardized spectra (needs matplotlib)
 
 # One-third-octave measurements combine into octaves with Formula (20):
-print(heavy_impact_octave_levels([60.0] * 6))   # +10 lg 3 dB per octave
+print(building.heavy_impact_octave_levels([60.0] * 6))   # +10 lg 3 dB per octave
 ```
 
 ## The single number is an A-weighted sum, not a shifted curve
@@ -179,10 +170,10 @@ The worked example of Table D.4 is reproduced exactly, including the
 deliberately unrounded intermediate the standard prints:
 
 ```python
-from phonometry import a_weighted_maximum_impact_level
+from phonometry import building
 
 # ISO 717-2:2020 Table D.4: a field measurement in octave bands.
-res = a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
+res = building.a_weighted_maximum_impact_level([65.3, 64.5, 58.0, 55.8])
 print(list(res.corrected))   # 39.1, 48.3, 49.3, 52.6 dB
 print(res.unrounded)         # 55.350667... dB
 print(res.rating)            # 55 dB

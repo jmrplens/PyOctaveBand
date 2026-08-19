@@ -56,9 +56,9 @@ has a single real Fourier component, so those bins carry half the degrees of
 freedom and a correspondingly wider interval.
 
 ```python
-from phonometry import power_spectral_density
+from phonometry import signals
 
-res = power_spectral_density(signal, fs)          # Hann, 50 % overlap, 95 % CI
+res = signals.power_spectral_density(signal, fs)          # Hann, 50 % overlap, 95 % CI
 print(res.n_averages, res.random_error)           # nd and 1/sqrt(nd)
 print(res.ci_lower[10], res.psd[10], res.ci_upper[10])
 res.plot()                                        # PSD in dB with the CI band
@@ -76,9 +76,9 @@ $$
 $$
 
 ```python
-from phonometry import resolution_bias_error
+from phonometry import signals
 
-eps_b = resolution_bias_error(res.resolution_bandwidth, 25.0)  # Br = 25 Hz peak
+eps_b = signals.resolution_bias_error(res.resolution_bandwidth, 25.0)  # Br = 25 Hz peak
 ```
 
 Narrow $B_\mathrm{e}$ (long segments) suppresses the bias but leaves fewer averages and
@@ -94,18 +94,14 @@ visible.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    fractional_octave_smoothing,
-    noise_signal,
-    power_spectral_density,
-)
+from phonometry import signals
 
 fs = 48000.0
-x = noise_signal(fs, 20.0, color="pink", seed=11)
-res = power_spectral_density(x, fs, nperseg=4096)
+x = signals.noise_signal(fs, 20.0, color="pink", seed=11)
+res = signals.power_spectral_density(x, fs, nperseg=4096)
 band = (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
 freqs = res.frequencies[band]
-smooth = fractional_octave_smoothing(res.frequencies, res.psd, 3.0)[band]
+smooth = signals.fractional_octave_smoothing(res.frequencies, res.psd, 3.0)[band]
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.fill_between(freqs, 10 * np.log10(res.ci_lower[band]),
@@ -146,9 +142,9 @@ delay path the phase is linear and that slope reads the propagation delay
 directly.
 
 ```python
-from phonometry import cross_spectral_density
+from phonometry import signals
 
-res = cross_spectral_density(x, y, fs)
+res = signals.cross_spectral_density(x, y, fs)
 print(res.magnitude_random_error[100], res.phase_std[100])  # bin 100 errors
 res.plot()   # magnitude, phase with ±sigma band, coherence
 ```
@@ -167,16 +163,16 @@ frequency.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import cross_spectral_density, noise_signal
+from phonometry import signals
 
 fs = 8000.0
 tau = 0.002                                   # 2 ms = 16 samples
 delay = int(tau * fs)
-x = noise_signal(fs, 8.0, seed=8)
-noise = noise_signal(fs, 8.0, rms=0.3, seed=9)
+x = signals.noise_signal(fs, 8.0, seed=8)
+noise = signals.noise_signal(fs, 8.0, rms=0.3, seed=9)
 y = 0.9 * np.concatenate([np.zeros(delay), x[:-delay]]) + noise
 
-res = cross_spectral_density(x, y, fs)
+res = signals.cross_spectral_density(x, y, fs)
 
 # One line — magnitude, phase with its ±sigma band and coherence:
 res.plot()
@@ -233,14 +229,14 @@ synthetic signal:
 
 ```python
 import numpy as np
-from phonometry import coherent_output_spectrum, noise_signal
+from phonometry import signals
 
 fs = 48000.0
-x = noise_signal(fs, 8.0, color="white", seed=1)
-noise = noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
+x = signals.noise_signal(fs, 8.0, color="white", seed=1)
+noise = signals.noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
 y = 0.8 * x + noise                      # SNR = 0.64/0.25 at every frequency
 
-res = coherent_output_spectrum(x, y, fs)
+res = signals.coherent_output_spectrum(x, y, fs)
 print(np.median(res.coherence))          # -> SNR/(1+SNR) = 0.719
 print(np.median(res.snr_db))             # -> 10·lg(2.56) = 4.1 dB
 res.plot()                               # Gyy, Gvv, Gnn and the SNR panel
@@ -259,14 +255,14 @@ frequency.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import coherent_output_spectrum, noise_signal
+from phonometry import signals
 
 fs = 48000.0
-x = noise_signal(fs, 8.0, color="white", seed=1)
-noise = noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
+x = signals.noise_signal(fs, 8.0, color="white", seed=1)
+noise = signals.noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
 y = 0.8 * x + noise                      # SNR = 0.64/0.25 per band
 
-res = coherent_output_spectrum(x, y, fs, nperseg=2048)
+res = signals.coherent_output_spectrum(x, y, fs, nperseg=2048)
 
 # One line — the three spectra and the SNR panel:
 res.plot()
@@ -310,12 +306,12 @@ squared first, dB levels converted and back), so band power is conserved
 rather than amplitude, and a flat spectrum passes through exactly unchanged.
 
 ```python
-from phonometry import fractional_octave_smoothing
+from phonometry import signals
 
-smooth_psd = fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
-smooth_mag = fractional_octave_smoothing(freqs, np.abs(response), 6.0,
-                                         domain="amplitude")  # an FRF |H|
-smooth_db = fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # dB curve
+smooth_psd = signals.fractional_octave_smoothing(res.frequencies, res.psd, 3.0)
+smooth_mag = signals.fractional_octave_smoothing(freqs, np.abs(response), 6.0,
+                                                 domain="amplitude")  # an FRF |H|
+smooth_db = signals.fractional_octave_smoothing(freqs, levels, 3.0, domain="db")  # dB curve
 ```
 
 A single spectral line with PSD ordinate $P$ (units²/Hz) in a bin of width
@@ -344,10 +340,10 @@ seed reproduces the same record bit for bit.
 | `violet` | +2 | +6.02 dB/octave |
 
 ```python
-from phonometry import noise_signal
+from phonometry import signals
 
-pink = noise_signal(48000, 10.0, color="pink", seed=7)     # deterministic
-white = noise_signal(48000, 10.0, color="white", rms=0.5, seed=7)
+pink = signals.noise_signal(48000, 10.0, color="pink", seed=7)     # deterministic
+white = signals.noise_signal(48000, 10.0, color="white", rms=0.5, seed=7)
 ```
 
 Measured over three decades (20 Hz – 20 kHz) with the estimator of section 1,
@@ -378,9 +374,9 @@ it:
   resolution.
 
 ```python
-from phonometry import window_metrics
+from phonometry import signals
 
-m = window_metrics("hann", 2048)
+m = signals.window_metrics("hann", 2048)
 print(m.enbw_bins)              # 1.5, exactly
 print(m.scalloping_loss_db)     # 1.42 dB
 print(m.highest_sidelobe_db)    # -31.5 dB
@@ -433,9 +429,9 @@ taper count is $K = 2NW - 1$, all tapers with near-unity concentration.
 Larger $NW$ admits more tapers (lower variance) at the cost of resolution.
 
 ```python
-from phonometry import multitaper_psd
+from phonometry import signals
 
-res = multitaper_psd(signal, fs)                 # NW = 4, K = 7, adaptive
+res = signals.multitaper_psd(signal, fs)                 # NW = 4, K = 7, adaptive
 print(res.degrees_of_freedom.mean())             # ~2K from one record
 print(res.eigenvalues)                           # taper concentrations
 res.plot()                                       # density with the CI band
@@ -479,12 +475,12 @@ precision, which is the anchor oracle of the test suite.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import multitaper_psd, noise_signal
+from phonometry import signals
 
 fs = 48000.0
-x = noise_signal(fs, 8192 / fs, color="pink", seed=11)   # 171 ms record
-single = multitaper_psd(x, fs, n_tapers=1, adaptive=False)
-res = multitaper_psd(x, fs)                              # NW = 4, K = 7
+x = signals.noise_signal(fs, 8192 / fs, color="pink", seed=11)   # 171 ms record
+single = signals.multitaper_psd(x, fs, n_tapers=1, adaptive=False)
+res = signals.multitaper_psd(x, fs)                              # NW = 4, K = 7
 band = (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
 freqs = res.frequencies[band]
 

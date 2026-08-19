@@ -202,11 +202,11 @@ plus matplotlib for the spectrum.
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, reception_plate_power
+from phonometry import ReportMetadata, building
 
 freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
 lv = np.array([88.0, 90, 86, 82, 78, 73])   # spatial mean plate velocity level [dB]
-res = reception_plate_power(
+res = building.reception_plate_power(
     lv, freqs, mass_per_area=25.0, area=1.2, reverberation_time=0.3,
 )
 res.report(

@@ -56,9 +56,9 @@ $y(t) = \alpha\,x(t-\tau_0) + n(t)$ the estimate peaks at $\tau = +\tau_0$
 
 ```python
 import numpy as np
-from phonometry import correlation
+from phonometry import signals
 
-res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+res = signals.correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
 peak = np.argmax(res.values)
 print(res.lags[peak], res.values[peak])   # delay and its coefficient
 res.plot()
@@ -78,23 +78,23 @@ there (bottom).*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import correlation, noise_signal
+from phonometry import signals
 
 fs = 8192.0
 delay = 102                                  # 12.45 ms
-x = noise_signal(fs, 2.0, seed=4)
-interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+x = signals.noise_signal(fs, 2.0, seed=4)
+interference = signals.noise_signal(fs, 2.0, rms=0.5, seed=5)
 y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
 
-res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+res = signals.correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
 
 # One line — the correlation estimate against the lag in seconds:
 res.plot()
 plt.show()
 
 # The three normalizations by hand, from the same records:
-biased = correlation(x, y, fs, normalization="biased")
-unbiased = correlation(x, y, fs, normalization="unbiased")
+biased = signals.correlation(x, y, fs, normalization="biased")
+unbiased = signals.correlation(x, y, fs, normalization="unbiased")
 
 fig, (ax_c, ax_n) = plt.subplots(2, 1)
 ax_c.plot(1e3 * res.lags, res.values, label="coefficient")
@@ -245,18 +245,18 @@ position: it is what says whether a reflection could be sitting under the peak.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import noise_signal, time_delay
+from phonometry import signals
 
 fs = 8192.0
 delay = 20  # samples
 b, a = sp_signal.butter(2, 800.0 / (fs / 2.0))   # colored common signal
-s = sp_signal.lfilter(b, a, noise_signal(fs, 4.0, color="white", seed=10))
-x = s + noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
-y = np.roll(s, delay) + noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
+s = sp_signal.lfilter(b, a, signals.noise_signal(fs, 4.0, color="white", seed=10))
+x = s + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
+y = np.roll(s, delay) + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
 
-direct = time_delay(x, y, fs, method="direct", max_delay=0.01)
-phat = time_delay(x, y, fs, method="gcc", weighting="phat",
-                  nperseg=2048, max_delay=0.01)
+direct = signals.time_delay(x, y, fs, method="direct", max_delay=0.01)
+phat = signals.time_delay(x, y, fs, method="gcc", weighting="phat",
+                          nperseg=2048, max_delay=0.01)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(1e3 * direct.lags,
@@ -291,10 +291,10 @@ $$
 $$
 
 ```python
-from phonometry import time_delay
+from phonometry import signals
 
-res = time_delay(x, y, fs, method="gcc", weighting="ml",
-                 nperseg=2048, upsample=16, signal_bandwidth=1000.0)
+res = signals.time_delay(x, y, fs, method="gcc", weighting="ml",
+                         nperseg=2048, upsample=16, signal_bandwidth=1000.0)
 print(res.delay, res.delay_samples)     # seconds and fractional samples
 print(res.delay_std, res.delay_interval)  # Eq. 8.129 sigma, +/-2 sigma
 res.plot()                              # correlation with the delay marked
@@ -316,12 +316,12 @@ stationary records, so the direct correlator is used rather than the
 Welch-averaged GCC):
 
 ```python
-from phonometry import align_impulse_responses, impulse_response_delay
+from phonometry import signals
 
-t_arrival = impulse_response_delay(ir, fs)              # seconds from t = 0
-dt = impulse_response_delay(ir_b, fs, reference=ir_a)   # pair delay
+t_arrival = signals.impulse_response_delay(ir, fs)              # seconds from t = 0
+dt = signals.impulse_response_delay(ir_b, fs, reference=ir_a)   # pair delay
 
-res = align_impulse_responses(ir_b, ir_a, fs)  # remove the estimated delay
+res = signals.align_impulse_responses(ir_b, ir_a, fs)  # remove the estimated delay
 res.plot()                                     # reference vs aligned overlay
 ```
 
@@ -338,17 +338,17 @@ back onto its reference: the band-limited shift removes the estimated
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import align_impulse_responses, fractional_delay
+from phonometry import signals
 
 fs = 48000.0
 t = np.arange(int(0.03 * fs)) / fs
 rng = np.random.default_rng(6)
 # Band-limited reference pulse: a 2 kHz Gaussian tone burst at 5 ms.
 ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
-ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+ir_b = signals.fractional_delay(ir_a, 7.37)[: ir_a.size]
 ir_b += 0.005 * rng.standard_normal(ir_a.size)
 
-res = align_impulse_responses(ir_b, ir_a, fs)
+res = signals.align_impulse_responses(ir_b, ir_a, fs)
 
 # One line — reference and aligned IR overlaid:
 res.plot()
@@ -415,13 +415,13 @@ recovered AM envelope and the Table 13.1 pair $\cos \to \sin$ at the
 1e-9 level, and the instantaneous frequency of a chirp tracks its sweep.
 
 ```python
-from phonometry import envelope
+from phonometry import signals
 
-res = envelope(x, fs)
+res = signals.envelope(x, fs)
 print(res.envelope, res.instantaneous_frequency)
 res.plot()               # signal + envelope, instantaneous frequency
 
-slow = envelope(x, fs, decimation_factor=32)   # anti-aliased, fs/32
+slow = signals.envelope(x, fs, decimation_factor=32)   # anti-aliased, fs/32
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope.svg" alt="Two panels for a decaying 250 hertz mode in light noise. Top: the oscillating signal with the smooth exponential Hilbert envelope tracing its decay above and below. Bottom: the instantaneous frequency staying on the dashed 250 hertz carrier line while the mode is strong and jittering increasingly as the signal decays into the noise floor" width="86%" />
@@ -437,7 +437,7 @@ noise floor (bottom, ×8 anti-aliased decimation).*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import envelope
+from phonometry import signals
 
 fs = 8192.0
 t = np.arange(int(0.4 * fs)) / fs
@@ -445,7 +445,7 @@ rng = np.random.default_rng(7)
 x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # a struck mode
 x += 0.001 * rng.standard_normal(t.size)
 
-res = envelope(x, fs, decimation_factor=8)
+res = signals.envelope(x, fs, decimation_factor=8)
 
 # One line — signal + envelope and the instantaneous frequency:
 res.plot()

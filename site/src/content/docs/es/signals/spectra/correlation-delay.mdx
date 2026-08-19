@@ -58,9 +58,9 @@ $\tau = +\tau_0$ (ecuación 5.21). Hay tres normalizaciones disponibles:
 
 ```python
 import numpy as np
-from phonometry import correlation
+from phonometry import signals
 
-res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+res = signals.correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
 peak = np.argmax(res.values)
 print(res.lags[peak], res.values[peak])   # retardo y su coeficiente
 res.plot()
@@ -80,23 +80,23 @@ insesgadez con una varianza que crece allí (abajo).*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import correlation, noise_signal
+from phonometry import signals
 
 fs = 8192.0
 delay = 102                                  # 12,45 ms
-x = noise_signal(fs, 2.0, seed=4)
-interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+x = signals.noise_signal(fs, 2.0, seed=4)
+interference = signals.noise_signal(fs, 2.0, rms=0.5, seed=5)
 y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
 
-res = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
+res = signals.correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
 
 # Una línea: la estimación de correlación frente al retardo en segundos:
 res.plot(language="es")
 plt.show()
 
 # Las tres normalizaciones a mano, con los mismos registros:
-biased = correlation(x, y, fs, normalization="biased")
-unbiased = correlation(x, y, fs, normalization="unbiased")
+biased = signals.correlation(x, y, fs, normalization="biased")
+unbiased = signals.correlation(x, y, fs, normalization="unbiased")
 
 fig, (ax_c, ax_n) = plt.subplots(2, 1)
 ax_c.plot(1e3 * res.lags, res.values, label="coeficiente")
@@ -257,18 +257,18 @@ bajo el pico.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import noise_signal, time_delay
+from phonometry import signals
 
 fs = 8192.0
 delay = 20  # muestras
 b, a = sp_signal.butter(2, 800.0 / (fs / 2.0))   # señal común coloreada
-s = sp_signal.lfilter(b, a, noise_signal(fs, 4.0, color="white", seed=10))
-x = s + noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
-y = np.roll(s, delay) + noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
+s = sp_signal.lfilter(b, a, signals.noise_signal(fs, 4.0, color="white", seed=10))
+x = s + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
+y = np.roll(s, delay) + signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
 
-direct = time_delay(x, y, fs, method="direct", max_delay=0.01)
-phat = time_delay(x, y, fs, method="gcc", weighting="phat",
-                  nperseg=2048, max_delay=0.01)
+direct = signals.time_delay(x, y, fs, method="direct", max_delay=0.01)
+phat = signals.time_delay(x, y, fs, method="gcc", weighting="phat",
+                          nperseg=2048, max_delay=0.01)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(1e3 * direct.lags,
@@ -306,10 +306,10 @@ $$
 $$
 
 ```python
-from phonometry import time_delay
+from phonometry import signals
 
-res = time_delay(x, y, fs, method="gcc", weighting="ml",
-                 nperseg=2048, upsample=16, signal_bandwidth=1000.0)
+res = signals.time_delay(x, y, fs, method="gcc", weighting="ml",
+                         nperseg=2048, upsample=16, signal_bandwidth=1000.0)
 print(res.delay, res.delay_samples)     # segundos y muestras fraccionarias
 print(res.delay_std, res.delay_interval)  # sigma de la ec. 8.129, +/-2 sigma
 res.plot()                              # correlación con el retardo marcado
@@ -333,12 +333,12 @@ registros estacionarios, así que se usa el correlador directo en lugar de
 la GCC promediada por Welch):
 
 ```python
-from phonometry import align_impulse_responses, impulse_response_delay
+from phonometry import signals
 
-t_arrival = impulse_response_delay(ir, fs)              # segundos desde t = 0
-dt = impulse_response_delay(ir_b, fs, reference=ir_a)   # retardo del par
+t_arrival = signals.impulse_response_delay(ir, fs)              # segundos desde t = 0
+dt = signals.impulse_response_delay(ir_b, fs, reference=ir_a)   # retardo del par
 
-res = align_impulse_responses(ir_b, ir_a, fs)  # elimina el retardo estimado
+res = signals.align_impulse_responses(ir_b, ir_a, fs)  # elimina el retardo estimado
 res.plot()                       # superposición referencia frente a alineada
 ```
 
@@ -356,17 +356,17 @@ la referencia.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import align_impulse_responses, fractional_delay
+from phonometry import signals
 
 fs = 48000.0
 t = np.arange(int(0.03 * fs)) / fs
 rng = np.random.default_rng(6)
 # Pulso de referencia de banda limitada: ráfaga tonal gaussiana de 2 kHz en 5 ms.
 ir_a = sp_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
-ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+ir_b = signals.fractional_delay(ir_a, 7.37)[: ir_a.size]
 ir_b += 0.005 * rng.standard_normal(ir_a.size)
 
-res = align_impulse_responses(ir_b, ir_a, fs)
+res = signals.align_impulse_responses(ir_b, ir_a, fs)
 
 # Una línea: referencia y RI alineada superpuestas:
 res.plot(language="es")
@@ -437,13 +437,13 @@ conformidad fija la envolvente AM recuperada y el par $\cos \to \sin$ de
 la Tabla 13.1 al nivel de 1e-9, y la frecuencia instantánea de un barrido sigue su rampa.
 
 ```python
-from phonometry import envelope
+from phonometry import signals
 
-res = envelope(x, fs)
+res = signals.envelope(x, fs)
 print(res.envelope, res.instantaneous_frequency)
 res.plot()               # señal + envolvente, frecuencia instantánea
 
-slow = envelope(x, fs, decimation_factor=32)   # con antialias, fs/32
+slow = signals.envelope(x, fs, decimation_factor=32)   # con antialias, fs/32
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/hilbert_envelope_es.svg" alt="Dos paneles para un modo de 250 hercios en decaimiento con ruido ligero. Arriba: la señal oscilante con la envolvente de Hilbert exponencial y suave trazando su decaimiento por arriba y por abajo. Abajo: la frecuencia instantánea manteniéndose sobre la línea discontinua de la portadora de 250 hercios mientras el modo es fuerte y con un temblor creciente a medida que la señal se hunde en el suelo de ruido" width="86%" />
@@ -459,7 +459,7 @@ la señal se hunde en el suelo de ruido (abajo, diezmado ×8 con antialias).*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import envelope
+from phonometry import signals
 
 fs = 8192.0
 t = np.arange(int(0.4 * fs)) / fs
@@ -467,7 +467,7 @@ rng = np.random.default_rng(7)
 x = np.exp(-t / 0.1) * np.sin(2 * np.pi * 250.0 * t)   # un modo golpeado
 x += 0.001 * rng.standard_normal(t.size)
 
-res = envelope(x, fs, decimation_factor=8)
+res = signals.envelope(x, fs, decimation_factor=8)
 
 # Una línea: señal + envolvente y la frecuencia instantánea:
 res.plot(language="es")

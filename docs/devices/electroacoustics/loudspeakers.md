@@ -72,10 +72,10 @@ $ka\sin\theta = 3.8317$.
 
 ```python
 import numpy as np
-from phonometry import radiating_piston
+from phonometry import electroacoustics
 
-res = radiating_piston(radius=0.1, frequencies=np.geomspace(20, 20000, 200),
-                       angles=np.linspace(0.0, np.pi / 2, 91))
+res = electroacoustics.radiating_piston(radius=0.1, frequencies=np.geomspace(20, 20000, 200),
+                                        angles=np.linspace(0.0, np.pi / 2, 91))
 print(round(res.radiation_mass, 4))               # 8 rho a^3 / 3, kg
 print(round(float(res.directivity_index[0]), 2))  # 3.01 dB half-space limit
 res.plot()                                         # R1 and X1 vs ka
@@ -96,9 +96,9 @@ reactance dies away.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import radiating_piston
+from phonometry import electroacoustics
 
-res = radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 400))
+res = electroacoustics.radiating_piston(radius=0.075, frequencies=np.geomspace(20, 20000, 400))
 res.plot()   # normalized R1 and X1 against ka
 plt.show()
 ```
@@ -121,9 +121,9 @@ classic polar beam pattern. Several $ka$ are shown as one family, so the main
 lobe narrowing and the side lobes appearing read at a glance:
 
 ```python
-from phonometry import piston_directivity_pattern
+from phonometry import electroacoustics
 
-pattern = piston_directivity_pattern([3.0, 8.0, 16.0])
+pattern = electroacoustics.piston_directivity_pattern([3.0, 8.0, 16.0])
 print(pattern.directivity_db.shape)  # (3, 361): one row per ka
 pattern.plot()                       # polar beam pattern in dB (needs matplotlib)
 ```
@@ -135,9 +135,9 @@ pattern.plot()                       # polar beam pattern in dB (needs matplotli
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import piston_directivity_pattern
+from phonometry import electroacoustics
 
-piston_directivity_pattern([3.0, 8.0, 16.0]).plot()
+electroacoustics.piston_directivity_pattern([3.0, 8.0, 16.0]).plot()
 plt.show()
 ```
 
@@ -161,10 +161,10 @@ first side lobes have appeared.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import radiating_piston
+from phonometry import electroacoustics
 
-res = radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
-                       angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
+res = electroacoustics.radiating_piston(0.1, np.array([500.0, 2000.0, 4000.0]),
+                                        angles=np.linspace(-np.pi / 2, np.pi / 2, 181))
 
 # One line: the piston in its baffle with the lobe of the highest frequency.
 res.plot_geometry()
@@ -192,25 +192,22 @@ computed from the response rather than merely repeated:
 
 ```python
 import numpy as np
-from phonometry import (
-    LoudspeakerDirectivity, ReportMetadata, loudspeaker_characteristics,
-    radiating_piston,
-)
+from phonometry import ReportMetadata, electroacoustics
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
 spl -= 10 * np.log10(1 + (50.0 / freqs) ** 6)       # low-frequency roll-off
 spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # high-frequency roll-off
 
-result = loudspeaker_characteristics(
+result = electroacoustics.loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
     impedance=(np.geomspace(20, 20000, 260),
                6.6 + 24 * np.exp(-(np.log2(np.geomspace(20, 20000, 260) / 52.0) ** 2) / 0.12)),
     distortion=(np.geomspace(50, 5000, 140),
                 0.3 + 2.6 * np.exp(-(np.log2(np.geomspace(50, 5000, 140) / 70.0) ** 2) / 0.45)),
-    directivity=LoudspeakerDirectivity(
-        piston=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                angles=np.radians(np.linspace(0, 90, 46))),
+    directivity=electroacoustics.LoudspeakerDirectivity(
+        piston=electroacoustics.radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                                 angles=np.radians(np.linspace(0, 90, 46))),
         frequency=2000.0,
     ),
 )
@@ -256,15 +253,15 @@ result.plot(quantity="directivity")  # polar response on the 25 dB circle
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import loudspeaker_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
 spl -= 10 * np.log10(1 + (50.0 / freqs) ** 6)       # low-frequency roll-off
 spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # high-frequency roll-off
 
-result = loudspeaker_characteristics(freqs, spl, rated_impedance=8.0,
-                                     sensitivity_band=(200.0, 4000.0))
+result = electroacoustics.loudspeaker_characteristics(freqs, spl, rated_impedance=8.0,
+                                                      sensitivity_band=(200.0, 4000.0))
 result.plot()   # quantity="response" (the default)
 plt.show()
 ```
@@ -279,13 +276,13 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import loudspeaker_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
 fz = np.geomspace(20, 20000, 260)
 
-result = loudspeaker_characteristics(
+result = electroacoustics.loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
     impedance=(fz, 6.6 + 24 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
 )
@@ -303,13 +300,13 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import loudspeaker_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
 thd_f = np.geomspace(50, 5000, 140)
 
-result = loudspeaker_characteristics(
+result = electroacoustics.loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
     distortion=(thd_f, 0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45)),
 )
@@ -327,18 +324,16 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    LoudspeakerDirectivity, loudspeaker_characteristics, radiating_piston,
-)
+from phonometry import electroacoustics
 
 freqs = np.geomspace(30, 24000, 320)
 spl = 87.0 - 10 * np.log10(1 + (50.0 / freqs) ** 6)
 
-result = loudspeaker_characteristics(
+result = electroacoustics.loudspeaker_characteristics(
     freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
-    directivity=LoudspeakerDirectivity(
-        piston=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                angles=np.radians(np.linspace(0, 90, 46))),
+    directivity=electroacoustics.LoudspeakerDirectivity(
+        piston=electroacoustics.radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
+                                                 angles=np.radians(np.linspace(0, 90, 46))),
         frequency=2000.0,
     ),
 )

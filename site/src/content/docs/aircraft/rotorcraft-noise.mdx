@@ -824,11 +824,11 @@ and only pay for a full elevation model if that section turns out to be
 screened.
 
 ```python
-from phonometry import diffraction_attenuation
+from phonometry import aircraft
 
 bands = [63.0, 250.0, 1000.0, 4000.0]
-diffraction_attenuation(bands, 0.0, edge_height=2.5)   # grazing incidence
-diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
+aircraft.diffraction_attenuation(bands, 0.0, edge_height=2.5)   # grazing incidence
+aircraft.diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss.svg" alt="Diffraction attenuation against path difference for four bands from 63 Hz to 4 kHz, over a 2.5 m edge: every curve is zero left of its own band-dependent threshold near the line of sight, the three bands with C_h = 1 cross about 4.8 dB at grazing incidence while 63 Hz crosses at 3.0 dB, and only the 4 kHz curve reaches the 25 dB cap within the plotted range" width="82%" />
@@ -848,11 +848,11 @@ with wavelength alone.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import diffraction_attenuation
+from phonometry import aircraft
 
 bands = np.array([63.0, 250.0, 1000.0, 4000.0])
 delta = np.linspace(-0.4, 1.5, 441)
-ld = np.array([diffraction_attenuation(bands, float(d), edge_height=2.5)
+ld = np.array([aircraft.diffraction_attenuation(bands, float(d), edge_height=2.5)
               for d in delta])
 
 fig, ax = plt.subplots(figsize=(9, 6))

@@ -84,7 +84,7 @@ returning a number. At least about **0.4 s of active speech** has to survive.
 
 ```python
 import numpy as np
-from phonometry import stoi
+from phonometry import speech
 
 fs = 10000
 rng = np.random.default_rng(11)
@@ -102,9 +102,9 @@ noise = rng.standard_normal(n)
 noise *= np.sqrt(np.mean(clean ** 2) / np.mean(noise ** 2))   # 0 dB SNR
 degraded = clean + noise
 
-d = stoi(clean, degraded, fs)               # STOI, resampled to 10 kHz inside
+d = speech.stoi(clean, degraded, fs)               # STOI, resampled to 10 kHz inside
 print(round(d.value, 3))                    # 0.708
-print(round(stoi(clean, clean, fs).value, 6))   # 1.0  (a signal against itself)
+print(round(speech.stoi(clean, clean, fs).value, 6))   # 1.0  (a signal against itself)
 ```
 
 Everything up to the 384 ms segments is shared; the two measures only part
@@ -197,7 +197,7 @@ gain, STOI is **invariant to the overall playback level** of the degraded
 signal, and higher SNR gives a monotonically higher score.
 
 ```python
-from phonometry import stoi
+from phonometry import speech
 
 # The speech-like `clean` of section 1, degraded at four signal-to-noise
 # ratios. Keep the reference speech-like: a flat Gaussian reference has no
@@ -205,7 +205,7 @@ from phonometry import stoi
 for snr_db in (-10, 0, 10, 20):
     g = 10.0 ** (-snr_db / 20.0)
     noisy = clean + g * rng.standard_normal(clean.size)
-    print(snr_db, round(stoi(clean, noisy, fs).value, 3))
+    print(snr_db, round(speech.stoi(clean, noisy, fs).value, 3))
 # -10 0.083 | 0 0.484 | 10 0.858 | 20 0.956
 ```
 
@@ -228,7 +228,7 @@ bites, which the single number cannot.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, lfilter
-from phonometry import stoi
+from phonometry import speech
 
 # Speech-like material: band-limited noise with a 3.5 Hz syllabic envelope,
 # in a flat masker at 0 dB SNR.
@@ -240,7 +240,7 @@ carrier = lfilter(b, a, rng.standard_normal(t.size))
 clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
 masker = rng.standard_normal(clean.size)
 gain = np.sqrt(np.mean(clean ** 2)) / np.sqrt(np.mean(masker ** 2))
-res = stoi(clean, clean + gain * masker, fs)
+res = speech.stoi(clean, clean + gain * masker, fs)
 print(round(res.value, 3))    # 0.727
 
 # One line: the per-band intermediate correlation behind the index.
@@ -295,11 +295,11 @@ ref = np.fft.irfft(spec, n) * np.where(env < 0.08, 0.0, env)
 
 masker = fig_rng.standard_normal(n)
 masker *= np.sqrt(np.mean(ref ** 2) / np.mean(masker ** 2))
-steady = stoi(ref, ref + masker, fs)
+steady = speech.stoi(ref, ref + masker, fs)
 
 hole = np.ones(n)
 hole[int(1.6 * fs):int(1.95 * fs)] = 0.0        # a 0.35 s dropout
-dropout = stoi(ref, ref * hole, fs)
+dropout = speech.stoi(ref, ref * hole, fs)
 
 print(round(steady.value, 3), round(dropout.value, 3))   # 0.772 0.874
 print(round(float(dropout.segment_scores.min()), 3))     # -0.078
@@ -337,7 +337,7 @@ average largely misses.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import stoi
+from phonometry import speech
 
 fs = 10000
 rng = np.random.default_rng(20)
@@ -356,8 +356,8 @@ snrs = np.arange(-15.0, 20.1, 5.0)
 
 def curve(masker, extended):
     p_m = np.sqrt(np.mean(masker ** 2))
-    return [stoi(clean, clean + (p_clean / (p_m * 10.0 ** (s / 20.0))) * masker,
-                 fs, extended=extended).value for s in snrs]
+    return [speech.stoi(clean, clean + (p_clean / (p_m * 10.0 ** (s / 20.0))) * masker,
+                        fs, extended=extended).value for s in snrs]
 
 fig, (a, b) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
 for ax, extended, title in ((a, False, "STOI"), (b, True, "ESTOI")):

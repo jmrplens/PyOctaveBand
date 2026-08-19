@@ -789,10 +789,10 @@ class; `intensity_class_compliance` does the same for the IEC 61043
 residual-index verdict:
 
 ```python
-from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+from phonometry import ReportMetadata, filters
 
-bank_11 = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-result = filter_class_compliance(bank_11)   # result.overall_class == 1
+bank_11 = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filters.filter_class_compliance(bank_11)   # result.overall_class == 1
 result.report(
     "iec61260.pdf",
     metadata=ReportMetadata(
@@ -924,12 +924,12 @@ suite pins. The book's Example 4.4 (twenty observations, $A = 86$, accepted
 between 64 and 125) runs verbatim:
 
 ```python
-from phonometry import trend_test
+from phonometry import metrology
 
 values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
           5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]
 
-res = trend_test(values)                  # B&P Example 4.4
+res = metrology.trend_test(values)                  # B&P Example 4.4
 print(res.statistic, res.bounds)          # 86, (64, 125)
 print(res.trend_free, round(res.p_value, 3))   # True, 0.586
 res.plot()
@@ -943,14 +943,14 @@ res.plot()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import trend_test
+from phonometry import metrology
 
 example = np.array([5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
                     5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0])
 drifting = example + np.linspace(0.0, 4.0, example.size)   # rising drift
 
-res_flat = trend_test(example)
-res_drift = trend_test(drifting)
+res_flat = metrology.trend_test(example)
+res_drift = metrology.trend_test(drifting)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 index = np.arange(1, example.size + 1)
@@ -987,17 +987,17 @@ while the same noise without the drift passes:
 
 ```python
 import numpy as np
-from phonometry import stationarity_test
+from phonometry import metrology
 
 fs = 8192.0
 n = 1 << 16
 noise = np.random.default_rng(42).standard_normal(n)
 
-res = stationarity_test(noise, fs)        # 20 segments, mean squares
+res = metrology.stationarity_test(noise, fs)        # 20 segments, mean squares
 print(res.stationary, res.count, res.bounds)   # True, 91, (64, 125)
 
 drifting = noise * np.linspace(1.0, 1.2, n)    # +20 % gain ramp
-res = stationarity_test(drifting, fs)
+res = metrology.stationarity_test(drifting, fs)
 print(res.stationary, res.count)          # False, 7  (upward trend -> low A)
 res.plot()
 ```
@@ -1010,15 +1010,15 @@ res.plot()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import stationarity_test
+from phonometry import metrology
 
 fs = 8192.0
 n = 1 << 16
 steady = np.random.default_rng(42).standard_normal(n)
 ramp = np.random.default_rng(42).standard_normal(n) * np.linspace(1.0, 1.2, n)
 
-res_steady = stationarity_test(steady, fs)
-res_ramp = stationarity_test(ramp, fs)
+res_steady = metrology.stationarity_test(steady, fs)
+res_ramp = metrology.stationarity_test(ramp, fs)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 index = np.arange(1, res_steady.n_segments + 1)
@@ -1060,15 +1060,15 @@ acceptance region at $\alpha = 0.05$ is the classical $(6, 15]$:
 
 ```python
 import numpy as np
-from phonometry import trend_test
+from phonometry import metrology
 
 rng = np.random.default_rng(3)
-res = trend_test(rng.standard_normal(40), method="runs")
+res = metrology.trend_test(rng.standard_normal(40), method="runs")
 print(res.statistic, res.bounds, res.trend_free)
 res.plot()   # the sequence about its median with the runs verdict
 
 alternating = np.tile([1.0, -1.0], 10)   # 20 runs: rejected the other way
-print(trend_test(alternating, method="runs").trend_free)   # False
+print(metrology.trend_test(alternating, method="runs").trend_free)   # False
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/runs_test.svg" alt="Two panels of sequences classified about their median, points above in blue and below in red. Left: forty Gaussian observations with twenty runs inside the acceptance region from fourteen to twenty-seven, verdict trend-free. Right: a strictly alternating twenty-value sequence also giving twenty runs, but against the acceptance region from six to fifteen for twenty values, verdict rejected for too-rapid alternation" width="92%"></picture>
@@ -1084,19 +1084,19 @@ too *many* runs is as non-random as too few.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import trend_test
+from phonometry import metrology
 
 rng = np.random.default_rng(3)
 sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
 
 # One line per sequence — the tested values with the verdict:
-trend_test(sequences[0], method="runs").plot()
+metrology.trend_test(sequences[0], method="runs").plot()
 plt.show()
 
 # Both verdicts side by side, classified about the median:
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
 for ax, seq in zip(axes, sequences):
-    res = trend_test(seq, method="runs")
+    res = metrology.trend_test(seq, method="runs")
     idx = np.arange(1, seq.size + 1)
     median = np.median(seq)
     above = seq > median
@@ -1144,13 +1144,13 @@ the Rice curve next to them, taking the moments from the record's own
 
 ```python
 import numpy as np
-from phonometry import level_crossing_rate
+from phonometry import metrology
 
 fs = 8192.0
 t = np.arange(1 << 16) / fs
 x = np.sin(2 * np.pi * 60.0 * t)          # a 60 Hz sine ...
 
-res = level_crossing_rate(x, fs)
+res = metrology.level_crossing_rate(x, fs)
 print(round(res.zero_crossing_rate, 1))   # ... has 120 zeros per second
 print(round(res.apparent_frequency, 1))   # 60.0
 res.plot()
@@ -1164,7 +1164,7 @@ res.plot()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import level_crossing_rate
+from phonometry import metrology
 
 fs = 20480.0
 n = 1 << 19
@@ -1174,7 +1174,7 @@ spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(freqs.size)
 spec[(freqs < 800.0) | (freqs > 1200.0)] = 0.0
 x = np.fft.irfft(spec, n)
 
-res = level_crossing_rate(x, fs, levels=np.linspace(-3.5, 3.5, 29) * np.std(x))
+res = metrology.level_crossing_rate(x, fs, levels=np.linspace(-3.5, 3.5, 29) * np.std(x))
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(res.levels, res.rice_rates, label="Rice (Eq. 5.196)")
@@ -1217,13 +1217,13 @@ available as `peak_exceedance()` / `peak_density()` on the result:
 
 ```python
 import numpy as np
-from phonometry import peak_statistics
+from phonometry import metrology
 
 fs = 8192.0
 t = np.arange(1 << 16) / fs
 x = np.sin(2 * np.pi * 60.0 * t)          # narrowband: r is essentially 1
 
-res = peak_statistics(x, fs)
+res = metrology.peak_statistics(x, fs)
 print(round(res.irregularity_factor, 3))       # 0.997
 print(res.peak_exceedance(4.0))                # exp(-8): about 1 in 3000
 res.plot()   # empirical exceedance against the Rice mixture (figure below)
@@ -1237,7 +1237,7 @@ res.plot()   # empirical exceedance against the Rice mixture (figure below)
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import peak_statistics
+from phonometry import metrology
 from phonometry.metrology.data_qualification import _rice_peak_exceedance
 
 fs = 20480.0
@@ -1248,7 +1248,7 @@ spec = rng.standard_normal(freqs.size) + 1j * rng.standard_normal(freqs.size)
 spec[freqs > 2000.0] = 0.0
 x = np.fft.irfft(spec, n)
 
-res = peak_statistics(x, fs)
+res = metrology.peak_statistics(x, fs)
 peaks = res.peak_values
 empirical = 1.0 - np.arange(1, peaks.size + 1) / peaks.size
 z = np.linspace(-2.5, 4.5, 400)

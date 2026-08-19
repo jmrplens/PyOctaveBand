@@ -78,10 +78,10 @@ exactly.
 
 ```python
 import numpy as np
-from phonometry import expansion_chamber
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
-res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
 print(round(res.transmission_loss.max(), 2))   # 6.55 dB peak (m = 4)
 res.plot()                                      # TL (and IL) vs frequency
 ```
@@ -102,18 +102,18 @@ circular diameters $d = 2\sqrt{S/\pi}$ of the 0.04 and 0.01 m² cross-sections.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import expansion_chamber, plot_silencer_geometry
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
-res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
 
 # One line: the dimensioned cross-section of the chamber just computed.
 res.plot_geometry()
 plt.show()
 
 # The same drawing without a result, from the free function:
-plot_silencer_geometry("expansion chamber", length=0.3,
-                       chamber_area=0.04, pipe_area=0.01)
+noise_control.plot_silencer_geometry("expansion chamber", length=0.3,
+                                     chamber_area=0.04, pipe_area=0.01)
 plt.show()
 ```
 
@@ -144,26 +144,24 @@ with `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` and
 
 ```python
 import numpy as np
-from phonometry import (
-    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
-)
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
 
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
 print(round(float(hr.resonances[0]), 1))       # tuning frequency, Hz
 hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
 
-qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
-                            speed_of_sound=343.24)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
+                                          speed_of_sound=343.24)
 print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
 
 # Each extension is a quarter-wave stub, so its own length picks the trough
 # it fills: L/4 = 0.1 m shorts the duct at c/4(L/4) = c/L, the chamber's
 # second trough, and L/2 = 0.2 m would take the first one at c/2L.
-et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
-                           inlet_extension=0.1)
+et = noise_control.extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                                         inlet_extension=0.1)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Transmission loss of a Helmholtz resonator and a closed quarter-wave tube on the same 10 cm2 duct: each side branch produces a sharp spike at its own tuning frequency, near 120 Hz for the Helmholtz volume and near 285 Hz for the 0.3 m tube, and is transparent elsewhere" width="88%"></picture>
@@ -178,12 +176,12 @@ firing frequency or a fan blade-passing tone rather than used broadband.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import helmholtz_resonator, quarter_wave_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 
 # One line for one device: TL vs frequency with the resonance marked.
 hr.plot()
@@ -236,11 +234,11 @@ its target.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import helmholtz_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
 
 # One line: the side branch drawn to scale, cavity as its equal-volume cube.
 hr.plot_geometry()
@@ -265,10 +263,10 @@ area only sets how strongly the stub loads the duct.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import quarter_wave_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 
 # One line: the closed 0.3 m tube on its duct, to scale.
 qw.plot_geometry()
@@ -311,7 +309,7 @@ all, because an impedance is not a shape.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import SilencerChain
+from phonometry import noise_control
 from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
 
 freqs = np.linspace(20.0, 500.0, 481)
@@ -319,7 +317,7 @@ s_duct = np.pi * 0.100**2               # nominal 200 mm duct
 s_shell = np.pi * 0.200**2              # nominal 400 mm shell
 
 chain = (
-    SilencerChain(freqs)
+    noise_control.SilencerChain(freqs)
     .duct(0.10, s_duct)
     .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
            label="Quarter-wave stub")
@@ -351,11 +349,11 @@ embedded figure, matplotlib (`pip install "phonometry[report,plot]"`), and
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, expansion_chamber
+from phonometry import ReportMetadata, noise_control
 
 # A 0.5 m chamber of area ratio m = 8, at the octave-band centres.
 freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-res = expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
 res.report(
     "silencer_fiche.pdf",
     metadata=ReportMetadata(

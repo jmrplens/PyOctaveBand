@@ -32,10 +32,10 @@ continuous 200 mm wall.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import junction_transmission
+from phonometry import vibration
 
 # A 140 mm concrete floor meeting a 200 mm wall at a T-junction.
-res = junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
+res = vibration.junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
 res.plot_geometry()
 plt.show()
 ```
@@ -49,10 +49,10 @@ plt.show()
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import junction_transmission
+from phonometry import vibration
 
 # X-junction between a 100 mm and a 200 mm concrete plate (cL = 3200 m/s).
-res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 res.plot()  # tau(theta) for the corner and straight paths, with averages
 plt.show()
 ```
@@ -84,9 +84,9 @@ cut-off angle $\theta_\text{co} = \arcsin\chi$; $\psi$ is the ratio of their
 bending-moment mobilities. For **identical plates** both are 1.
 
 ```python
-from phonometry import junction_wave_parameters
+from phonometry import vibration
 
-chi, psi = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+chi, psi = vibration.junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 #  -> (sqrt(0.5), 4.0)
 ```
 
@@ -128,14 +128,11 @@ plates 2 and 4 identical.
 
 ```python
 import numpy as np
-from phonometry import (
-    corner_transmission_coefficient,
-    straight_transmission_coefficient,
-)
+from phonometry import vibration
 
 theta = np.radians(np.linspace(0.0, 90.0, 91))
-tau12 = corner_transmission_coefficient(theta, chi, psi, "X")
-tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
+tau12 = vibration.corner_transmission_coefficient(theta, chi, psi, "X")
+tau13 = vibration.straight_transmission_coefficient(theta, chi, psi, "X")
 ```
 
 The clip below runs this experiment in the time domain with the library's 2D
@@ -170,10 +167,10 @@ first-principles oracle:
 * in-line junction: $\tau_{12}(0°) = 1$ (a continuous plate transmits fully).
 
 ```python
-from phonometry import angular_average_transmission_coefficient
+from phonometry import vibration
 
-angular_average_transmission_coefficient(1.0, 1.0, "X", section="corner")  # 1/12
-angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
+vibration.angular_average_transmission_coefficient(1.0, 1.0, "X", section="corner")  # 1/12
+vibration.angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
 ```
 
 The two directions obey the SEA consistency relationship (Eq. 5.7),
@@ -205,14 +202,13 @@ X-junction ($f_\mathrm{c} \approx 203\ \text{Hz}$),
 $K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7.3\ \text{dB}$.
 
 ```python
-from phonometry import (coupling_loss_factor, junction_transmission,
-                        wave_vibration_reduction_index)
+from phonometry import vibration
 
-eta = coupling_loss_factor(1.0 / 12.0, group_velocity=200.0,
-                           junction_length=4.0, frequency=500.0, plate_area=10.0)
-res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
-kij = wave_vibration_reduction_index(res.corner_average,
-                                     res.critical_frequency2)  # 7.33 dB
+eta = vibration.coupling_loss_factor(1.0 / 12.0, group_velocity=200.0,
+                                     junction_length=4.0, frequency=500.0, plate_area=10.0)
+res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+kij = vibration.wave_vibration_reduction_index(res.corner_average,
+                                               res.critical_frequency2)  # 7.33 dB
 kij = res.corner_reduction_index  # the same, precomputed on the result
 
 res.plot()   # tau(theta) for this junction's corner and straight paths (needs matplotlib)
@@ -239,7 +235,7 @@ perpendicular plates increasingly pin the junction line:
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import junction_transmission, wave_vibration_reduction_index
+from phonometry import vibration
 
 # Concrete plates (cL = 3200 m/s, rho = 2400 kg/m3): plate 1 fixed at
 # 100 mm, plate 2 swept from 50 mm to 400 mm.
@@ -248,7 +244,7 @@ ratios = np.linspace(0.5, 4.0, 36)
 kij_corner = []
 for ratio in ratios:
     h2 = h1 * float(ratio)
-    res = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    res = vibration.junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
     kij_corner.append(res.corner_reduction_index)
 
 fig, ax = plt.subplots()
@@ -271,10 +267,10 @@ the top: its corner path gives $K_{12} = 9.8\ \text{dB}$. Handing that to
 junction's three flanking paths and their effect on the apparent rating:
 
 ```python
-from phonometry import building, junction_transmission
+from phonometry import building, vibration
 
 # The 100 mm / 200 mm concrete X-junction of the opening figure:
-res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 k12 = res.corner_reduction_index                     # 9.8 dB (corner path)
 
 # Feed it to the EN 12354-1 simplified model as this junction's Kij:
@@ -353,15 +349,7 @@ model to be trustworthy.*
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    coupling_loss_factor,
-    cylindrical_shell_modal_density,
-    flat_plate_modal_density,
-    plate_bending_stiffness,
-    point_connection_coupling_loss_factor,
-    power_injection_clf,
-    right_angle_transmission_coefficient,
-)
+from phonometry import vibration
 from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
 rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminium
@@ -371,13 +359,13 @@ bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
 # Predicted: a 3 mm x 2.5 m x 1.2 m plate meeting a 5.5 mm x 2.0 m x 1.2 m
 # plate at right angles along the 1.2 m edge, welded and then bolted.
 h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
-tau = right_angle_transmission_coefficient(h1, h2, density1=rho, density2=rho,
-                                           wave_speed1=cl, wave_speed2=cl)
-cb = plate_bending_wave_speed(bands, plate_bending_stiffness(young, h1, nu),
+tau = vibration.right_angle_transmission_coefficient(h1, h2, density1=rho, density2=rho,
+                                                     wave_speed1=cl, wave_speed2=cl)
+cb = plate_bending_wave_speed(bands, vibration.plate_bending_stiffness(young, h1, nu),
                               rho * h1)
-welded = [float(coupling_loss_factor(tau, 2.0 * c, length, f, area1))
+welded = [float(vibration.coupling_loss_factor(tau, 2.0 * c, length, f, area1))
           for c, f in zip(cb, bands, strict=True)]
-bolted = point_connection_coupling_loss_factor(
+bolted = vibration.point_connection_coupling_loss_factor(
     bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
     surface_density2=rho * h2, wave_speed1=cl, wave_speed2=cl,
     plate_area1=area1)
@@ -387,11 +375,11 @@ bolted = point_connection_coupling_loss_factor(
 t_p, t_c, radius = 0.005, 0.003, 0.75
 area_c = 2.0 * math.pi * radius * 2.0
 area_p = 3.5 * 3.0 - math.pi * radius**2
-sea = power_injection_clf(
+sea = vibration.power_injection_clf(
     500.0, rho * t_p * area_p * 0.0272**2, rho * t_c * area_c * 0.0132**2,
     4.4e-3, 2.4e-3,
-    flat_plate_modal_density(area_p, t_p, cl),
-    float(cylindrical_shell_modal_density(500.0, area_c, t_c, radius, cl)[0]))
+    vibration.flat_plate_modal_density(area_p, t_p, cl),
+    float(vibration.cylindrical_shell_modal_density(500.0, area_c, t_c, radius, cl)[0]))
 
 print(f"{float(sea.coupling_loss_factor12[0]):.2e}")   # 4.26e-04
 print(f"{float(sea.coupling_loss_factor21[0]):.2e}")   # 3.91e-04

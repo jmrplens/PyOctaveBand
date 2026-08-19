@@ -47,12 +47,12 @@ diagnóstico: un descascarillado en la pista exterior.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import bearing_fault_frequencies, envelope_spectrum, noise_signal
+from phonometry import signals, vibration
 
 # El rodamiento: 15 rodillos sobre un diámetro primitivo de 34 mm, rodillos
 # de 6 mm, ángulo de contacto de 12,96 grados, eje a 2000 r/min.
-faults = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                   contact_angle_deg=12.96)
+faults = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                             contact_angle_deg=12.96)
 bpfo, shaft = faults["BPFO"], faults.shaft_rate    # 207,0 Hz, 33,33 Hz
 
 # Una pista exterior descascarillada: un impacto por periodo de BPFO, cada uno
@@ -68,11 +68,11 @@ tau = np.arange(int(0.004 * fs)) / fs
 ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
 x = np.convolve(impacts, ring)[: t.size] * 0.6
 x += 0.35 * np.sin(2.0 * np.pi * shaft * t)          # desequilibrio residual
-x += noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
+x += signals.noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
 
 # Se filtra en banda la resonancia que excitan los impactos, se detecta su
 # envolvente, se transforma, y el resultado dibuja sus propias líneas encima.
-spectrum = envelope_spectrum(x, fs, band=(2000.0, 4000.0))
+spectrum = signals.envelope_spectrum(x, fs, band=(2000.0, 4000.0))
 faults.within(1.0, 5.0 * bpfo).plot(spectrum=spectrum, language="es")
 plt.show()
 ```
@@ -190,9 +190,9 @@ que es la razón de que la adquisición de la sección 5 importe aquí, y no sol
 en principio.
 
 ```python
-from phonometry import bearing_fault_frequencies
+from phonometry import vibration
 
-res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96)
+res = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96)
 print(round(res["BPFO"], 1), round(res["BPFI"], 1))   # 207.0 293.0
 print(round(res["BPFO"] + res["BPFI"], 1))            # 500.0 = 15 x 33,33
 print(res.as_dict())
@@ -256,10 +256,10 @@ eje, mientras que un desgaste distribuido levanta grupos altos de bandas
 laterales y eleva los armónicos superiores del engrane.
 
 ```python
-from phonometry import gear_mesh_frequencies
+from phonometry import vibration
 
 # Un piñón de 28 dientes en un eje a 1500 r/min, con dos órdenes de bandas.
-res = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+res = vibration.gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
 print(round(res["GMF"], 1))            # 700.0
 print(round(res["GMF+1x"], 1))         # 725.0  (GMF + un orden de eje)
 print(res.harmonics("GMF", 3))         # [ 700. 1400. 2100.]
@@ -292,12 +292,12 @@ viste el armónico de ranura dominante con bandas laterales a $\pm$ la
 frecuencia de giro del eje y a $\pm$ la frecuencia de deslizamiento.
 
 ```python
-from phonometry import induction_motor_frequencies
+from phonometry import vibration
 
 # Sesenta barras de rotor, seis polos magnéticos, 3600 r/min, sin deslizamiento:
 # una máquina de seis polos a esa velocidad va con un variador a 180 Hz, no con
 # la red.
-res = induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
+res = vibration.induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
 print(round(res["fe"]))                         # 180  la alimentación que implica
 print(round(res["1x"]), round(res["2x"]),
       round(res["2fe"]), round(res["fsh"]))     # 60 120 360 3600
@@ -334,11 +334,11 @@ el recuento de palas sustituido por el número de eventos de bombeo por vuelta
 lo que se trata pasando $4 \times \text{r/min}$ con una sola «pala»:
 
 ```python
-from phonometry import blade_pass_frequencies
+from phonometry import vibration
 
 # Una soplante volumétrica rotativa a 1200 r/min: cuatro pulsaciones por
 # vuelta, así que la frecuencia de pulsación se pide como 4 x r/min con N = 1.
-res = blade_pass_frequencies(4 * 1200.0, 1, harmonics=3)
+res = vibration.blade_pass_frequencies(4 * 1200.0, 1, harmonics=3)
 print(round(res["BPF"], 1))        # 80.0 Hz, la frecuencia de pulsación
 print(round(res.shaft_rate, 1))    # 80.0 Hz - NO la del eje, que es 20
 ```
@@ -361,7 +361,7 @@ lóbulos alcanzado desde otro armónico es otro patrón, que gira a otra velocid
 
 ```python
 # Seis palas, cuatro álabes, 3500 r/min (blade_pass_frequencies importado arriba).
-res = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
+res = vibration.blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
 print(round(res.shaft_rate, 1))   # 58.3 Hz, el eje mismo
 print(round(res["BPF"]))          # 350
 print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35
@@ -399,7 +399,7 @@ import numpy as np
 # La biblioteca prevé las líneas; los espectros de debajo se sintetizan
 # exactamente a esas frecuencias, así que la figura y los valores impresos
 # concuerdan.
-gear = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+gear = vibration.gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
 freq = np.linspace(0.0, 2400.0, 4800)
 amp = np.full_like(freq, 0.004)
 for order, height in enumerate((1.0, 0.40, 0.16), start=1):
@@ -517,7 +517,7 @@ from scipy import signal as sp_signal
 # El registro x, su frecuencia de muestreo fs, su base de tiempos t y la BPFO
 # prevista son los que se construyeron para la figura que abre la página.
 band = (2000.0, 4000.0)
-spec = envelope_spectrum(x, fs, band=band)     # lleva .envelope y .times
+spec = signals.envelope_spectrum(x, fs, band=band)     # lleva .envelope y .times
 
 # El mismo filtro paso banda Butterworth de cuarto orden y fase nula que aplica la
 # llamada internamente, ejecutado aquí para poder dibujar el registro intermedio.
@@ -558,24 +558,19 @@ momento. El rodamiento soporta un piñón de 28 dientes, así que el soporte lle
 tres familias a la vez.
 
 ```python
-from phonometry import (
-    bearing_fault_frequencies,
-    combine_fault_lines,
-    envelope_spectrum,
-    gear_mesh_frequencies,
-)
+from phonometry import signals, vibration
 
 record, fs = x, 20000.0          # el registro del soporte y su muestreo
 shaft_rpm = 2000.0               # del tacómetro, no de la placa de características
 
 # Las líneas propias del rodamiento, la familia de engrane del piñón que soporta
 # y los armónicos del eje. Todos en unos ejes.
-bearing = bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
-                                    contact_angle_deg=12.96)
-gear = gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
-lines = combine_fault_lines(bearing, gear)
+bearing = vibration.bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
+                                              contact_angle_deg=12.96)
+gear = vibration.gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
+lines = vibration.combine_fault_lines(bearing, gear)
 
-spectrum = envelope_spectrum(record, fs, band=(2000.0, 4000.0))
+spectrum = signals.envelope_spectrum(record, fs, band=(2000.0, 4000.0))
 lines.within(1.0, 1600.0).plot(spectrum=spectrum, language="es")
 ```
 

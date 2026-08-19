@@ -359,16 +359,16 @@ magnitud unidad en todas las frecuencias (solo gira la fase).
 
 ```python
 import numpy as np
-from phonometry import EQSection, ParametricEQ
+from phonometry import filters
 
 fs = 48000
 rng = np.random.default_rng(1)
 x = rng.standard_normal(fs)                 # un segundo de ruido
 
-eq = ParametricEQ(fs, [
-    EQSection("lowshelf", 100.0, gain_db=4.0),
-    EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0),  # recorte de 1 octava
-    EQSection("highshelf", 8000.0, gain_db=3.0),
+eq = filters.ParametricEQ(fs, [
+    filters.EQSection("lowshelf", 100.0, gain_db=4.0),
+    filters.EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0),  # recorte de 1 octava
+    filters.EQSection("highshelf", 8000.0, gain_db=3.0),
 ])
 y = eq.filter(x)              # aplicar la cascada
 res = eq.response()           # resultado congelado con la cascada SOS
@@ -393,21 +393,21 @@ figura.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import EQSection, ParametricEQ
+from phonometry import filters
 
 fs = 48000
 familia = [
-    EQSection("peaking", 1000.0, gain_db=6.0, q=1.4),
-    EQSection("lowshelf", 125.0, gain_db=6.0),
-    EQSection("highshelf", 4000.0, gain_db=-6.0),
-    EQSection("lowpass", 10000.0),
-    EQSection("highpass", 50.0),
-    EQSection("bandpass", 500.0, q=2.0),
-    EQSection("notch", 2000.0, q=6.0),
+    filters.EQSection("peaking", 1000.0, gain_db=6.0, q=1.4),
+    filters.EQSection("lowshelf", 125.0, gain_db=6.0),
+    filters.EQSection("highshelf", 4000.0, gain_db=-6.0),
+    filters.EQSection("lowpass", 10000.0),
+    filters.EQSection("highpass", 50.0),
+    filters.EQSection("bandpass", 500.0, q=2.0),
+    filters.EQSection("notch", 2000.0, q=6.0),
 ]
 fig, ax = plt.subplots(figsize=(10, 6))
 for section in familia:
-    res = ParametricEQ(fs, [section]).response(f_min=20.0, f_max=20000.0)
+    res = filters.ParametricEQ(fs, [section]).response(f_min=20.0, f_max=20000.0)
     ax.semilogx(res.frequencies, res.magnitude_db,
                 label=f"{section.filter_type} @ {section.f0:g} Hz")
 ax.set(xlim=(20, 20000), ylim=(-27, 9),

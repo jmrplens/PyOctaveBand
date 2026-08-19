@@ -66,6 +66,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Every example in the documentation reaches a function through the package
+  that owns it: `from phonometry import building` and then
+  `building.single_panel_transmission_loss(...)`, in both languages in step.
+  Two thirds of the pages already led with that form; the remaining third
+  imported the function flat off the top level, and the two forms sat side by
+  side on the same page.
+
+  Reading the domain at each call site is the point. A page that computes a
+  panel's transmission loss from its bending stiffness now says out loud that
+  `plate_bending_stiffness` and `coincidence_frequency` come from `vibration`
+  while `single_panel_transmission_loss` comes from `building`, which the flat
+  form hid. It is also what the published guidance recommends, and it settles
+  a collision the pages were already paying for by hand: `envelope`,
+  `spectrogram`, `coherence`, `group_delay`, `minimum_phase` and `zoom_fft`
+  all exist in `scipy.signal` under the same spelling, which is why several
+  pages import the other side as `from scipy import signal as sp_signal`.
+
 - The transforms whose output is itself a pressure record return a `Signal`
   when they are given one, instead of a bare array. A chain of them used to
   lose the rate and the calibration at the first step and the caller rebuilt

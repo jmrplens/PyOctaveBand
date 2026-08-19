@@ -48,18 +48,16 @@ reflection at zero.
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+design = materials.critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
 
 f = np.array([300.0])
-res = slit_helmholtz_absorber(
+res = materials.slit_helmholtz_absorber(
     f, design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )
@@ -89,19 +87,17 @@ $\mathrm{Re}(Z)\cos\theta = Z_0$ and $\mathrm{Im}(Z) = 0$ hold.
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+design = materials.critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
 print(round(design.absorption, 4))          # ~1.0 (perfect absorption)
 
 f = np.linspace(150.0, 500.0, 700)
-res = slit_helmholtz_absorber(
+res = materials.slit_helmholtz_absorber(
     f, design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )
@@ -124,9 +120,9 @@ the cavity length to place the resonance.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator
+from phonometry import materials
 
-resonator = HelmholtzResonator(
+resonator = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
@@ -148,13 +144,13 @@ mechanism.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator, critical_coupling_design, materials
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(
+design = materials.critical_coupling_design(
     300.0, base, lattice_step=3.0e-2, period=5.0e-2,
 )
 
@@ -181,20 +177,18 @@ deep; detuning the slit height drops the peak below one.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
 a, d, f0 = 3.0e-2, 5.0e-2, 300.0
-base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
-design = critical_coupling_design(f0, base, lattice_step=a, period=d)
+base = materials.HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
+design = materials.critical_coupling_design(f0, base, lattice_step=a, period=d)
 h0 = design.slit_height
 
 f = np.linspace(150.0, 500.0, 700)
 fig, ax = plt.subplots()
 for factor, label in [(1.0, "critically coupled"),
                       (0.6, "narrow slit"), (1.7, "wide slit")]:
-    res = slit_helmholtz_absorber(
+    res = materials.slit_helmholtz_absorber(
         f, design.resonator, slit_height=factor * h0,
         lattice_step=a, period=d,
     )
@@ -225,16 +219,14 @@ everything about why the panel can be thin:
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
-res = slit_helmholtz_absorber(
+design = materials.critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+res = materials.slit_helmholtz_absorber(
     np.array([300.0]), design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )

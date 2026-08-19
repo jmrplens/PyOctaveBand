@@ -142,12 +142,7 @@ five-well sequence six times (`periods=6`, a 2.1 m panel):
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator,
-    MetadiffuserWell,
-    metadiffuser_polar_response,
-    metadiffuser_reflection,
-)
+from phonometry import materials
 
 # The published quadratic-residue metadiffuser: five slits with two
 # resonators each in a 35 cm x 2 cm panel (7 cm pitch), tuned to mimic a
@@ -164,12 +159,12 @@ rows = [  # slit h, neck l_n, cavity l_c, neck w_n, cavity w_c  [mm]
 ]
 wells = []
 for h, ln, lc, wn, wc in rows:
-    resonator = HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm)
+    resonator = materials.HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm)
     # two identical resonators per slit
-    wells.append(MetadiffuserWell(h * mm, (resonator, resonator)))
+    wells.append(materials.MetadiffuserWell(h * mm, (resonator, resonator)))
 
 f = np.arange(1800.0, 2601.0, 5.0)
-panel = metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
+panel = materials.metadiffuser_reflection(f, wells, depth=0.02, period=0.07)
 alpha1 = panel.well_absorption[0]
 print(round(float(alpha1.max()), 2), int(f[alpha1.argmax()]))  # 0.99 2305
 
@@ -183,8 +178,8 @@ print(round(float(panel.absorption.max()), 3), peak)
 # 0.253 2260
 
 # Far-field comparison: the five-well sequence repeated six times (2.1 m).
-polar = metadiffuser_polar_response(2000.0, wells, depth=0.02,
-                                    period=0.07, periods=6)
+polar = materials.metadiffuser_polar_response(2000.0, wells, depth=0.02,
+                                              period=0.07, periods=6)
 print(round(polar.coefficient, 2))                             # 0.32
 ```
 
@@ -256,12 +251,7 @@ only difference between them is how each well reaches its reflection phase.*
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator,
-    MetadiffuserWell,
-    materials,
-    metadiffuser_polar_response,
-)
+from phonometry import materials
 
 mm = 1e-3
 rows = [
@@ -272,17 +262,17 @@ rows = [
     (20.3, 18.0, 20.7, 3.2, 9.0),
 ]
 wells = [
-    MetadiffuserWell(
+    materials.MetadiffuserWell(
         h * mm,
-        2 * (HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
+        2 * (materials.HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm),),
     )
     for h, ln, lc, wn, wc in rows
 ]
 
 # The metadiffuser panel and the QRD it was tuned to at 2 kHz, both with
 # six repetitions of the period (2.1 m panels).
-meta = metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
-                                   periods=6)
+meta = materials.metadiffuser_polar_response(2000.0, wells, depth=0.02, period=0.07,
+                                             periods=6)
 sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
 depths = sequence * (343.0 / 500.0) / (2 * 5)
 qrd = materials.predict_diffuser_polar_response(
@@ -325,11 +315,11 @@ targets while keeping $|R_n|$ near one:
 
 ```python
 import numpy as np
-from phonometry import materials, metadiffuser_reflection
+from phonometry import materials
 
 # wells: the five published slits from the example above.
-panel = metadiffuser_reflection(np.array([2000.0]), wells,
-                                depth=0.02, period=0.07)
+panel = materials.metadiffuser_reflection(np.array([2000.0]), wells,
+                                          depth=0.02, period=0.07)
 phases = np.degrees(np.angle(panel.reflection[:, 0]))
 print(np.round(np.abs(panel.reflection[:, 0]), 2))  # [0.97 1.   1.   0.97 0.98]
 print(np.round(phases))                             # [ 75. -71. -71.  74.   2.]
@@ -360,7 +350,7 @@ import matplotlib.pyplot as plt
 
 # `wells` and `depths` come from the blocks above.
 sweep = np.linspace(1600.0, 2600.0, 201)
-swept = metadiffuser_reflection(sweep, wells, depth=0.02, period=0.07)
+swept = materials.metadiffuser_reflection(sweep, wells, depth=0.02, period=0.07)
 k_sweep = 2 * np.pi * sweep / 343.0
 target_phase = np.angle(np.exp(-2j * np.outer(depths, k_sweep)))
 error = np.degrees(np.angle(np.exp(1j * (np.angle(swept.reflection)
@@ -400,10 +390,10 @@ def panel_with(cavity_mm):
     trial = [(14.7, 13.0, cavity_mm, 6.2, 9.0)] + rows[1:]
     built = []
     for h, ln, lc, wn, wc in trial:
-        resonator = HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm)
-        built.append(MetadiffuserWell(h * mm, (resonator, resonator)))
-    return metadiffuser_reflection(np.array([2000.0]), built,
-                                   depth=0.02, period=0.07)
+        resonator = materials.HelmholtzResonator(ln * mm, wn * mm, lc * mm, wc * mm)
+        built.append(materials.MetadiffuserWell(h * mm, (resonator, resonator)))
+    return materials.metadiffuser_reflection(np.array([2000.0]), built,
+                                             depth=0.02, period=0.07)
 
 best = None
 for cavity_mm in np.linspace(4.0, 22.0, 60):

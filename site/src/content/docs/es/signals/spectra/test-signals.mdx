@@ -69,15 +69,15 @@ apartado A2.2 en el que cada ráfaga tonal ocupa un periodo de repetición
 completo:
 
 ```python
-from phonometry import tone_burst
+from phonometry import signals
 
 # Una ráfaga tonal de 5 ms de tono de 5 kHz (25 periodos completos), como en la
 # tabla AII.
-single = tone_burst(48000, 5000, 25)
+single = signals.tone_burst(48000, 5000, 25)
 print(single.burst_samples)         # 240 muestras = 5 ms a 48 kHz
 
 # Apartado A2.2: ráfagas tonales de 5 ms a 10 ráfagas por segundo.
-train = tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
+train = signals.tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
 print(train.period_samples, train.duty_cycle)   # 4800, 0.05
 train.plot(language="es")           # forma de onda con la envolvente
 ```
@@ -107,11 +107,11 @@ definido como el encendido.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import tone_burst
+from phonometry import signals
 
 fs = 48000.0
-single = tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
-train = tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
+single = signals.tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
+train = signals.tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
 
 fig, axes = plt.subplots(2, 1, figsize=(10, 6.4))
 t_ms = 1e3 * np.arange(single.signal.size) / single.fs
@@ -174,10 +174,10 @@ ventana de Kaiser, a partir de dos números que controla quien llama:
   misma cota de rizado de Kaiser $\delta = 10^{-A/20}$.
 
 ```python
-from phonometry import noise_signal, resample_signal
+from phonometry import signals
 
-x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, fs_new=48000)   # 120 dB de rechazo de alias
+x = signals.noise_signal(44100, 5.0, color="pink", seed=1)
+res = signals.resample_signal(x, 44100, fs_new=48000)   # 120 dB de rechazo de alias
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # FIR diseñado, 20947.5 Hz
 res.plot()   # el filtro antisolapamiento entregado frente a su especificación
@@ -198,10 +198,10 @@ misma cota de rizado.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import noise_signal, resample_signal
+from phonometry import signals
 
-x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, fs_new=48000)   # 120 dB de rechazo de alias
+x = signals.noise_signal(44100, 5.0, color="pink", seed=1)
+res = signals.resample_signal(x, 44100, fs_new=48000)   # 120 dB de rechazo de alias
 
 # res es el ResampledSignalResult calculado en el ejemplo de arriba.
 # Una línea: el filtro antisolapamiento entregado frente a su especificación:
@@ -285,10 +285,10 @@ Dos convenciones de frontera cubren los dos casos de uso:
 
 ```python
 import numpy as np
-from phonometry import fractional_delay
+from phonometry import signals
 
-y = fractional_delay(x, 0.37)                    # 0,37 muestras más tarde
-z = fractional_delay(x, -2.5, mode="circular")   # avance, con vuelta
+y = signals.fractional_delay(x, 0.37)                    # 0,37 muestras más tarde
+z = signals.fractional_delay(x, -2.5, mode="circular")   # avance, con vuelta
 ```
 
 Una sutileza que conviene conocer: un registro real de longitud par no

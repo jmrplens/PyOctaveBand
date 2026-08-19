@@ -409,11 +409,11 @@ los diez niveles sustituya a la integral de superficie.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import measurement_positions, plot_microphone_positions
+from phonometry import emission
 
 # Los 10 micrófonos del Anexo B de ISO 3744 sobre un hemisferio de 2 m.
-plot_microphone_positions(measurement_positions("hemisphere", radius=2.0),
-                          radius=2.0, language="es")
+emission.plot_microphone_positions(emission.measurement_positions("hemisphere", radius=2.0),
+                                   radius=2.0, language="es")
 plt.show()
 ```
 
@@ -583,10 +583,10 @@ investigación localizada posterior lleva áreas desiguales.*
 import matplotlib.pyplot as plt
 
 fig, (axi, axd) = plt.subplots(1, 2, subplot_kw={"projection": "3d"})
-plot_microphone_positions(
+emission.plot_microphone_positions(
     emission.precision_positions("hemisphere", radius=1.0, count=40),
     ax=axi, radius=1.0)
-plot_microphone_positions(
+emission.plot_microphone_positions(
     emission.precision_positions("sphere", radius=1.0, count=20),
     ax=axd, radius=1.0)
 plt.show()

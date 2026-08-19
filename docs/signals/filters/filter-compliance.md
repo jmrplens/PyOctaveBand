@@ -220,10 +220,10 @@ Spanish fiche (translated fixed strings and a comma decimal separator), e.g.
 `result.report("iec61260_es.pdf", language="es")`.
 
 ```python
-from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+from phonometry import ReportMetadata, filters
 
-bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-result = filter_class_compliance(bank)   # overall_class == 1
+bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filters.filter_class_compliance(bank)   # overall_class == 1
 result.plot()   # the worst-margin band on its class corridor
 
 result.report(
@@ -250,8 +250,8 @@ ANSI S1.11-2004 mask, which keeps the stricter **class 0** that the 2014 edition
 dropped; the default order-6 Butterworth bank can then be certified to class 0:
 
 ```python
-bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
-result = filter_class_compliance(bank, edition="1995")   # overall_class == 0
+bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
+result = filters.filter_class_compliance(bank, edition="1995")   # overall_class == 0
 result.plot()   # the class-0 corridor of the 1995 edition
 result.report(
     "iec61260_1995.pdf",

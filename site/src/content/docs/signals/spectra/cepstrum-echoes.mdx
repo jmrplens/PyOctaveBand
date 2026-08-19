@@ -80,13 +80,13 @@ computes the three standard variants over the quefrency axis:
 
 ```python
 import numpy as np
-from phonometry import cepstrum
+from phonometry import signals
 
 fs = 48000.0
 rng = np.random.default_rng(1)
 x = rng.standard_normal(4096)
 
-res = cepstrum(x, fs, kind="power")
+res = signals.cepstrum(x, fs, kind="power")
 print(res.quefrencies[:3], res.cepstrum.shape)   # quefrency axis, in s
 res.plot()
 ```
@@ -106,7 +106,7 @@ wavelet concentrates below 2 ms.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import cepstrum
+from phonometry import signals
 
 fs = 48000.0
 # A band-limited source wavelet plus one reflection at 8 ms (a = 0.5)
@@ -116,13 +116,13 @@ s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 x = s + 0.5 * np.roll(s, 384)
 
 # One line per variant — each CepstrumResult draws itself:
-cepstrum(x, fs, kind="power").plot()
+signals.cepstrum(x, fs, kind="power").plot()
 plt.show()
 
 # The three variants overlaid by hand on one quefrency axis:
 fig, ax = plt.subplots()
 for kind, style in (("power", "-"), ("real", "--"), ("complex", ":")):
-    res = cepstrum(x, fs, kind=kind)
+    res = signals.cepstrum(x, fs, kind=kind)
     q_ms = 1e3 * res.quefrencies
     mask = (q_ms > 0.5) & (q_ms <= 20.0)
     ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"{kind} cepstrum")
@@ -171,14 +171,14 @@ delay still lands on it, but the reported coefficient underestimates $|a|$
 
 ```python
 import numpy as np
-from phonometry import echo_detection
+from phonometry import signals
 
 fs = 48000.0
 rng = np.random.default_rng(2)
 s = rng.standard_normal(12000)               # broadband source
 x = s + 0.5 * np.roll(s, 384)                # echo: 8 ms, a = 0.5
 
-res = echo_detection(x, fs, min_quefrency=0.002)
+res = signals.echo_detection(x, fs, min_quefrency=0.002)
 print(res.delay, res.reflection_coefficient)  # 0.008 s, ~0.5
 res.plot()
 ```
@@ -200,7 +200,7 @@ source's own envelope, which is why the search starts above it.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import echo_detection, noise_signal
+from phonometry import signals
 
 fs = 48000.0
 n = 12000
@@ -209,9 +209,9 @@ impulse[0] = 1.0
 b, a = sp_signal.butter(2, [0.004, 0.9], btype="bandpass")
 direct = sp_signal.lfilter(b, a, impulse)              # broadband click
 ir = direct + 0.5 * np.roll(direct, int(0.008 * fs))   # echo at 8 ms
-ir += noise_signal(fs, n / fs, color="white", rms=1e-4, seed=13)
+ir += signals.noise_signal(fs, n / fs, color="white", rms=1e-4, seed=13)
 
-res = echo_detection(ir, fs, min_quefrency=0.002)
+res = signals.echo_detection(ir, fs, min_quefrency=0.002)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 half = res.nfft // 2 + 1
@@ -294,15 +294,15 @@ exactly complementary in dB, because the split is linear in the log domain:
 
 ```python
 import numpy as np
-from phonometry import lifter
+from phonometry import signals
 
 fs = 48000.0
 rng = np.random.default_rng(3)
 s = rng.standard_normal(12000)
 x = s + 0.5 * np.roll(s, 384)                # the same 8 ms echo
 
-low = lifter(x, fs, cutoff=0.004, mode="lowpass")    # envelope of ln|X|
-high = lifter(x, fs, cutoff=0.004, mode="highpass")  # the echo ripple
+low = signals.lifter(x, fs, cutoff=0.004, mode="lowpass")    # envelope of ln|X|
+high = signals.lifter(x, fs, cutoff=0.004, mode="highpass")  # the echo ripple
 print(np.allclose(low.liftered_db + high.liftered_db, low.spectrum_db))
 low.plot()
 ```
@@ -321,7 +321,7 @@ $20\log_{10}(1 \pm a) = +3.5$ and $-6.0$ dB.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import lifter
+from phonometry import signals
 
 fs = 48000.0
 # A band-limited wavelet carrying a pure 8 ms echo (a = 0.5), so the
@@ -331,8 +331,8 @@ s = np.zeros(4096)
 s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 x = s + 0.5 * np.roll(s, 384)
 
-low = lifter(x, fs, cutoff=0.004, mode="lowpass")
-high = lifter(x, fs, cutoff=0.004, mode="highpass")
+low = signals.lifter(x, fs, cutoff=0.004, mode="lowpass")
+high = signals.lifter(x, fs, cutoff=0.004, mode="highpass")
 
 # One line — the cepstrum with the cutoff and the two log spectra:
 low.plot()
@@ -374,14 +374,14 @@ removes and stores in `linear_phase_samples`:
 ```python
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import cepstrum
+from phonometry import signals
 
 fs = 48000.0
 x = np.zeros(2048)
 b, a = sp_signal.butter(2, 0.3)
 x[37:293] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 
-res = cepstrum(x, fs, kind="complex")
+res = signals.cepstrum(x, fs, kind="complex")
 print(res.linear_phase_samples)              # negative: a bulk delay removed
 print(np.max(np.abs(res.invert() - x)))      # ~1e-14
 res.plot()   # the complex cepstrum against quefrency (as in the figure above)
@@ -446,13 +446,13 @@ on an analysis bin the closed forms are:
 
 ```python
 import numpy as np
-from phonometry import envelope_spectrum
+from phonometry import signals
 
 fs = 8192.0
 t = np.arange(int(4 * fs)) / fs
 x = (1.0 + 0.4 * np.cos(2 * np.pi * 25.0 * t)) * np.cos(2 * np.pi * 1000.0 * t)
 
-res = envelope_spectrum(x, fs)
+res = signals.envelope_spectrum(x, fs)
 k = int(round(25.0 * res.nfft / fs))
 print(res.mean_level, res.amplitude[k])      # ~1.0 and ~0.4
 res.plot()
@@ -474,15 +474,15 @@ is why the chain finds bearing defects that the carrier's own spectrum hides.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import envelope_spectrum, noise_signal
+from phonometry import signals
 
 fs = 8192.0
 seconds = 4.0
 t = np.arange(int(seconds * fs)) / fs
 x = (1.0 + 0.4 * np.cos(2 * np.pi * 25.0 * t)) * np.cos(2 * np.pi * 1000.0 * t)
-x += noise_signal(fs, seconds, color="white", rms=0.03, seed=8)
+x += signals.noise_signal(fs, seconds, color="white", rms=0.03, seed=8)
 
-res = envelope_spectrum(x, fs)
+res = signals.envelope_spectrum(x, fs)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(res.frequencies, res.amplitude, lw=1.4, label="Envelope spectrum")
@@ -539,8 +539,8 @@ t_s = np.arange(int(4 * fs)) / fs
 ring = np.sin(2 * np.pi * 3000.0 * t_s) * np.exp(-(t_s % (1 / 120.0)) / 0.001)
 raw = ring + 3.0 * np.sin(2 * np.pi * 50.0 * t_s)
 
-wide = envelope_spectrum(raw, fs)
-narrow = envelope_spectrum(raw, fs, band=(2000.0, 4000.0))
+wide = signals.envelope_spectrum(raw, fs)
+narrow = signals.envelope_spectrum(raw, fs, band=(2000.0, 4000.0))
 k120 = int(round(120.0 * wide.nfft / fs))
 print(round(wide.amplitude[k120], 4),        # 0.0093 — buried
       round(narrow.amplitude[k120], 4))      # 0.1964 — 26 dB better

@@ -68,19 +68,17 @@ governs.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    JunctionType, RoadSurface, RoadTraffic, RoadVehicleCategory, road_source_power,
-)
+from phonometry import environment
 
 traffic = [
-    RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 45.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
 ]
-result = road_source_power(
-    traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
-    junction_distance=60.0, junction_type=JunctionType.CROSSING,
+result = environment.road_source_power(
+    traffic, surface=environment.RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+    junction_distance=60.0, junction_type=environment.JunctionType.CROSSING,
 )
 result.plot()
 plt.show()
@@ -147,20 +145,17 @@ from about 60 km/h, which is why a lorry is still an engine at urban speeds.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    CNOSSOS_A_WEIGHTING, road_propulsion_noise, road_rolling_noise,
-    road_vehicle_sound_power,
-)
+from phonometry import environment
 
-weights = np.asarray(CNOSSOS_A_WEIGHTING)
+weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
 
 speeds = np.linspace(20.0, 130.0, 221)
 fig, ax = plt.subplots()
 for category, name in [("1", "Light vehicles (1)"), ("3", "Heavy vehicles (3)")]:
-    rolling = [a_weighted(road_rolling_noise(category, v)) for v in speeds]
-    propulsion = [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
-    total = [a_weighted(road_vehicle_sound_power(category, v)) for v in speeds]
+    rolling = [a_weighted(environment.road_rolling_noise(category, v)) for v in speeds]
+    propulsion = [a_weighted(environment.road_propulsion_noise(category, v)) for v in speeds]
+    total = [a_weighted(environment.road_vehicle_sound_power(category, v)) for v in speeds]
     ax.plot(speeds, total, lw=2.4, label=f"{name} - total")
     ax.plot(speeds, rolling, ls="--", lw=1.2, label=f"{name} - rolling")
     ax.plot(speeds, propulsion, ls=":", lw=1.2, label=f"{name} - propulsion")
@@ -208,9 +203,9 @@ down onto it, but a rough texture only generates tyre noise, and tyre noise is
 already the rolling term.
 
 ```python
-from phonometry import RoadSurface, road_surface_coefficients
+from phonometry import environment
 
-row = road_surface_coefficients(RoadSurface.TWO_LAYER_ZOAB_FINE)
+row = environment.road_surface_coefficients(environment.RoadSurface.TWO_LAYER_ZOAB_FINE)
 row.speed_range          # (80.0, 130.0) km/h, the printed validity range
 row.alpha["1"]           # alpha per octave band for light vehicles
 row.beta["1"]            # -0.1, the speed coefficient
@@ -234,19 +229,16 @@ $dL$ simply carries $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, which is
 arithmetic and is offered as such.
 
 ```python
-from phonometry import (
-    PropagationGeometry, RoadTraffic, RoadVehicleCategory,
-    line_source_segment_power, predicted_receiver_level, road_source_power,
-)
+from phonometry import environment
 
-result = road_source_power([
-    RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 90.0),
-    RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
+result = environment.road_source_power([
+    environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1000.0, 90.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 120.0, 80.0),
 ])
-segment = line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
-levels = predicted_receiver_level(
+segment = environment.line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
+levels = environment.predicted_receiver_level(
     segment,
-    PropagationGeometry(100.0, result.source_height, 4.0),
+    environment.PropagationGeometry(100.0, result.source_height, 4.0),
     frequencies=result.frequencies,
 )
 ```
@@ -262,9 +254,9 @@ For the A-weighted total, use the octave-band weighting the Directive itself
 prints in 2.5.5 as amended, rather than recomputing it:
 
 ```python
-from phonometry import CNOSSOS_A_WEIGHTING
+from phonometry import environment
 
-CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+environment.CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
 result.a_weighted_line_power
 ```
 
@@ -278,13 +270,13 @@ and the 2021 one). Both coefficient objects can be replaced:
 ```python
 import dataclasses
 
-from phonometry import ROAD_COEFFICIENTS
+from phonometry import environment
 
 # One measured national row for light vehicles, the rest of Appendix F as published.
 national = dataclasses.replace(
-    ROAD_COEFFICIENTS,
+    environment.ROAD_COEFFICIENTS,
     rolling_a={
-        **ROAD_COEFFICIENTS.rolling_a,
+        **environment.ROAD_COEFFICIENTS.rolling_a,
         "1": (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5),
     },
 )

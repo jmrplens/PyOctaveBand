@@ -85,10 +85,10 @@ class; `intensity_class_compliance` does the same for the IEC 61043
 residual-index verdict:
 
 ```python
-from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+from phonometry import ReportMetadata, filters
 
-bank_11 = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-result = filter_class_compliance(bank_11)   # result.overall_class == 1
+bank_11 = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filters.filter_class_compliance(bank_11)   # result.overall_class == 1
 result.report(
     "iec61260.pdf",
     metadata=ReportMetadata(

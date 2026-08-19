@@ -41,9 +41,9 @@ Welch-module scaling with no detrending, three identities hold:
   the conformance checks).
 
 ```python
-from phonometry import spectrogram
+from phonometry import signals
 
-res = spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
+res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
 print(res.power.shape)             # (frequencies, times)
 print(res.time_resolution)         # T_B = nperseg/fs, in s
 print(res.resolution_bandwidth)    # Be of the tapered segment, in Hz
@@ -70,7 +70,7 @@ tool for the stationary background.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import noise_signal, spectrogram
+from phonometry import signals
 
 fs = 16000.0
 t = np.arange(int(4.0 * fs)) / fs
@@ -85,10 +85,10 @@ n_imp = int(0.06 * fs)                              # impact at t = 2.5 s
 x[int(2.5 * fs):int(2.5 * fs) + n_imp] += 0.4 * (
     rng.standard_normal(n_imp) * np.exp(-np.arange(n_imp) / (0.012 * fs))
 )
-x += noise_signal(fs, 4.0, color="pink",            # 45 dB SPL floor
-                  rms=p_ref * 10.0 ** (45.0 / 20.0), seed=10)
+x += signals.noise_signal(fs, 4.0, color="pink",            # 45 dB SPL floor
+                          rms=p_ref * 10.0 ** (45.0 / 20.0), seed=10)
 
-res = spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
+res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
 level = 10.0 * np.log10(res.power / p_ref**2)
 
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -128,9 +128,9 @@ the taper's coherent gain, so a sine of peak amplitude $A$ on an analysis
 frequency reads `amplitude` $= A$ and `power` $= A^2/2$ exactly:
 
 ```python
-from phonometry import zoom_fft
+from phonometry import signals
 
-res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0)     # grid at the record resolution
+res = signals.zoom_fft(x, fs, f_min=980.0, f_max=1016.0)     # grid at the record resolution
 print(res.bin_spacing)                   # fs/N by default
 print(res.resolution_bandwidth)          # Be of the tapered record
 peak = res.amplitude.argmax()
@@ -154,7 +154,7 @@ only a longer record separates closer tones.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import zoom_fft
+from phonometry import signals
 
 fs = 8192.0
 t = np.arange(8192) / fs                 # 1 s record: 1 Hz resolution
@@ -166,7 +166,7 @@ coarse = 2.0 * np.abs(np.fft.rfft(x[:1024] * w)) / np.sum(w)
 coarse_f = np.fft.rfftfreq(1024, 1.0 / fs)
 band = (coarse_f >= 950.0) & (coarse_f <= 1050.0)
 
-res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)   # 0.25 Hz grid
+res = signals.zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)   # 0.25 Hz grid
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(coarse_f[band], 20.0 * np.log10(coarse[band]), "o--",

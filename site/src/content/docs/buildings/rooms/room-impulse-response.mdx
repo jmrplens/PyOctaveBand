@@ -349,15 +349,14 @@ sequence, visible as the near-constant magnitude on the right.
 
 ```python
 from phonometry import room
-from phonometry import plot_excitation
 
 fs = 48000
 sweep = room.sweep_signal(fs, 50.0, 20000.0, 1.0)   # ESS excitation
 mls = room.mls_signal(12).astype(float)             # length 2**12 - 1
 
 # One-liner: waveform + spectrogram (sweep), sequence + flat spectrum (MLS)
-plot_excitation(sweep, fs, kind="sweep")
-plot_excitation(mls, fs, kind="mls")
+room.plot_excitation(sweep, fs, kind="sweep")
+room.plot_excitation(mls, fs, kind="mls")
 
 # By hand: the sweep spectrogram and the MLS magnitude spectrum
 import numpy as np

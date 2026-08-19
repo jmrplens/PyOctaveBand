@@ -362,15 +362,14 @@ casi constante de la derecha.
 
 ```python
 from phonometry import room
-from phonometry import plot_excitation
 
 fs = 48000
 sweep = room.sweep_signal(fs, 50.0, 20000.0, 1.0)   # excitación ESS
 mls = room.mls_signal(12).astype(float)             # longitud 2**12 - 1
 
 # Una línea: forma de onda + espectrograma (barrido), secuencia + espectro (MLS)
-plot_excitation(sweep, fs, kind="sweep")
-plot_excitation(mls, fs, kind="mls")
+room.plot_excitation(sweep, fs, kind="sweep")
+room.plot_excitation(mls, fs, kind="mls")
 
 # A mano: el espectrograma del barrido y el espectro de magnitud de la MLS
 import numpy as np
