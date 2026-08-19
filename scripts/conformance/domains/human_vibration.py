@@ -25,25 +25,27 @@ def _true_centre(n: int) -> float:
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table B.8", "Wk design-goal factor at 6,31 Hz")
 def _chk_iso8041_wk_annex_b() -> Outcome:
-    factor = float(ph.weighting_factors("Wk", _true_centre(8))[0])
+    factor = float(ph.vibration.weighting_factors("Wk", _true_centre(8))[0])
     return numeric(ref.ISO8041_1_WK_FACTOR_6P31HZ, factor, 1e-3, rel=True, places=4)
 
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table B.9", "Wm design-goal factor at 1,585 Hz")
 def _chk_iso8041_wm_annex_b() -> Outcome:
-    factor = float(ph.weighting_factors("Wm", _true_centre(2))[0])
+    factor = float(ph.vibration.weighting_factors("Wm", _true_centre(2))[0])
     return numeric(ref.ISO8041_1_WM_FACTOR_1P585HZ, factor, 1e-3, rel=True, places=4)
 
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table 1", "Wh factor at the 500 rad/s reference")
 def _chk_iso8041_wh_reference() -> Outcome:
-    factor = float(ph.weighting_factors("Wh", ref.ISO8041_1_WH_REF_FREQ_HZ)[0])
+    factor = float(
+        ph.vibration.weighting_factors("Wh", ref.ISO8041_1_WH_REF_FREQ_HZ)[0]
+    )
     return numeric(ref.ISO8041_1_WH_REF_FACTOR, factor, 1.5e-3, rel=True, places=4)
 
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table B.1", "Wb design-goal factor at 6,31 Hz")
 def _chk_iso8041_wb_annex_b() -> Outcome:
-    factor = float(ph.weighting_factors("Wb", _true_centre(8))[0])
+    factor = float(ph.vibration.weighting_factors("Wb", _true_centre(8))[0])
     return numeric(ref.ISO8041_1_WB_FACTOR_6P31HZ, factor, 1e-3, rel=True, places=4)
 
 
@@ -52,7 +54,11 @@ def _chk_iso8041_wb_annex_b() -> Outcome:
 )
 def _chk_iso8041_wb_annex_b_edges() -> Outcome:
     worst = max(
-        abs(float(ph.weighting_factors("Wb", _true_centre(n))[0]) / expected - 1.0)
+        abs(
+            float(ph.vibration.weighting_factors("Wb", _true_centre(n))[0])
+            / expected
+            - 1.0
+        )
         for n, expected in (
             (0, ref.ISO8041_1_WB_FACTOR_1HZ),
             (20, ref.ISO8041_1_WB_FACTOR_100HZ),
@@ -65,7 +71,9 @@ def _chk_iso8041_wb_annex_b_edges() -> Outcome:
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table 1", "Wc factor at the 100 rad/s reference")
 def _chk_iso8041_wc_reference() -> Outcome:
-    factor = float(ph.weighting_factors("Wc", ref.ISO8041_1_WBV_REF_FREQ_HZ)[0])
+    factor = float(
+        ph.vibration.weighting_factors("Wc", ref.ISO8041_1_WBV_REF_FREQ_HZ)[0]
+    )
     return numeric(ref.ISO8041_1_WC_REF_FACTOR, factor, 1e-3, rel=True, places=4)
 
 
@@ -77,7 +85,8 @@ def _chk_iso8041_wc_reference() -> Outcome:
 def _chk_iso8041_wd_reference_and_annex_b() -> Outcome:
     worst = max(
         abs(
-            float(ph.weighting_factors("Wd", freq)[0]) / expected - 1.0
+            float(ph.vibration.weighting_factors("Wd", freq)[0]) / expected
+            - 1.0
         )
         for freq, expected in (
             (ref.ISO8041_1_WBV_REF_FREQ_HZ, ref.ISO8041_1_WD_REF_FACTOR),
@@ -91,7 +100,7 @@ def _chk_iso8041_wd_reference_and_annex_b() -> Outcome:
 
 @register(_HUMAN_VIB, "ISO 8041-1:2017 Table B.4", "We design-goal factor at 8 Hz")
 def _chk_iso8041_we_annex_b() -> Outcome:
-    factor = float(ph.weighting_factors("We", _true_centre(9))[0])
+    factor = float(ph.vibration.weighting_factors("We", _true_centre(9))[0])
     return numeric(ref.ISO8041_1_WE_FACTOR_8HZ, factor, 1e-3, rel=True, places=4)
 
 
@@ -100,7 +109,11 @@ def _chk_iso8041_we_annex_b() -> Outcome:
 )
 def _chk_iso8041_wf_annex_b() -> Outcome:
     worst = max(
-        abs(float(ph.weighting_factors("Wf", _true_centre(n))[0]) / expected - 1.0)
+        abs(
+            float(ph.vibration.weighting_factors("Wf", _true_centre(n))[0])
+            / expected
+            - 1.0
+        )
         for n, expected in (
             (-8, ref.ISO8041_1_WF_FACTOR_0P1585HZ),
             (-10, ref.ISO8041_1_WF_FACTOR_0P1HZ),
@@ -116,7 +129,11 @@ def _chk_iso8041_wf_annex_b() -> Outcome:
 )
 def _chk_iso8041_wj_annex_b() -> Outcome:
     worst = max(
-        abs(float(ph.weighting_factors("Wj", _true_centre(n))[0]) / expected - 1.0)
+        abs(
+            float(ph.vibration.weighting_factors("Wj", _true_centre(n))[0])
+            / expected
+            - 1.0
+        )
         for n, expected in (
             (8, ref.ISO8041_1_WJ_FACTOR_6P31HZ),
             (9, ref.ISO8041_1_WJ_FACTOR_8HZ),
@@ -149,7 +166,10 @@ def _chk_iso8041_table5_envelope() -> Outcome:
             else:
                 region = 4
             upper, lower = ref.ISO8041_1_TABLE5_TOLERANCES[region]
-            ratio = float(ph.weighting_factors(name, freq)[0]) / printed - 1.0
+            ratio = (
+                float(ph.vibration.weighting_factors(name, freq)[0]) / printed
+                - 1.0
+            )
             if not -lower <= ratio <= upper:
                 violations += 1
     return numeric(
@@ -160,13 +180,13 @@ def _chk_iso8041_table5_envelope() -> Outcome:
 
 @register(_HUMAN_VIB, "ISO 5349-2:2001 Example E.2.1", "Single-tool daily exposure A(8)")
 def _chk_iso5349_e21() -> Outcome:
-    a8 = ph.daily_exposure(7.4, 2.5 * 3600.0)
+    a8 = ph.vibration.daily_exposure(7.4, 2.5 * 3600.0)
     return numeric(ref.ISO5349_2_E21_A8, a8, 0.05, unit="m/s^2", places=2)
 
 
 @register(_HUMAN_VIB, "ISO 5349-2:2001 Example E.3", "Forestry three-task A(8)")
 def _chk_iso5349_e3() -> Outcome:
-    a8 = ph.hav_daily_exposure(
+    a8 = ph.vibration.hav_daily_exposure(
         [4.6, 6.0, 3.6], [2 * 3600.0, 1 * 3600.0, 2 * 3600.0]
     )
     return numeric(ref.ISO5349_2_E3_A8, a8, 0.05, unit="m/s^2", places=2)
@@ -174,14 +194,14 @@ def _chk_iso5349_e3() -> Outcome:
 
 @register(_HUMAN_VIB, "ISO 5349-1:2001 Eq. (C.1)", "VWF 10 % lifetime Dy at A(8)=7")
 def _chk_iso5349_vwf() -> Outcome:
-    dy = ph.hav_vwf_lifetime_years(ref.ISO5349_1_VWF_A8)
+    dy = ph.vibration.hav_vwf_lifetime_years(ref.ISO5349_1_VWF_A8)
     return numeric(ref.ISO5349_1_VWF_DY_YEARS, dy, 0.1, unit="yr", places=2)
 
 
 @register(_HUMAN_VIB, "Directive 2002/44/EC Art. 3", "HAV/WBV action & limit values")
 def _chk_directive_2002_44() -> Outcome:
-    hav = ph.exposure_assessment(1.0, kind="hav")
-    wbv = ph.exposure_assessment(0.1, kind="wbv")
+    hav = ph.vibration.exposure_assessment(1.0, kind="hav")
+    wbv = ph.vibration.exposure_assessment(0.1, kind="wbv")
     ok = (
         hav.action_value == ref.DIRECTIVE_2002_44_HAV_EAV
         and hav.limit_value == ref.DIRECTIVE_2002_44_HAV_ELV

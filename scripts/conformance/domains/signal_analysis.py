@@ -36,7 +36,9 @@ def _spectra_fs() -> float:
 
 
 def _spectra_white(seed: int, rms: float = 1.0) -> np.ndarray:
-    return ph.noise_signal(_spectra_fs(), 4.0, color="white", rms=rms, seed=seed)
+    return ph.signals.noise_signal(
+        _spectra_fs(), 4.0, color="white", rms=rms, seed=seed
+    )
 
 
 @register(
@@ -46,7 +48,9 @@ def _spectra_white(seed: int, rms: float = 1.0) -> np.ndarray:
 )
 def _chk_psd_white_level() -> Outcome:
     fs = _spectra_fs()
-    res = ph.power_spectral_density(_spectra_white(1, rms=2.0), fs, nperseg=1024)
+    res = ph.signals.power_spectral_density(
+        _spectra_white(1, rms=2.0), fs, nperseg=1024
+    )
     band = (res.frequencies > 200.0) & (res.frequencies < 3800.0)
     expected = 4.0 / (fs / 2.0)
     return numeric(
@@ -64,7 +68,7 @@ def _chk_psd_random_error() -> Outcome:
     estimates = []
     nd = 0.0
     for seed in range(100):
-        res = ph.power_spectral_density(
+        res = ph.signals.power_spectral_density(
             _spectra_white(100 + seed), fs, nperseg=1024, overlap=0.0
         )
         estimates.append(res.psd[50:200])
@@ -84,7 +88,9 @@ def _chk_psd_ci_coverage() -> Outcome:
     true_psd = 1.0 / (fs / 2.0)
     hits, total = 0, 0
     for seed in range(150):
-        res = ph.power_spectral_density(_spectra_white(300 + seed), fs, nperseg=1024)
+        res = ph.signals.power_spectral_density(
+            _spectra_white(300 + seed), fs, nperseg=1024
+        )
         for b in (60, 120, 240):
             hits += int(res.ci_lower[b] <= true_psd <= res.ci_upper[b])
             total += 1
@@ -99,8 +105,10 @@ def _chk_psd_ci_coverage() -> Outcome:
 def _chk_coherent_output_snr() -> Outcome:
     fs = _spectra_fs()
     x = _spectra_white(11)
-    noise = ph.noise_signal(fs, 4.0, color="white", rms=0.5, seed=12)
-    res = ph.coherent_output_spectrum(x, 0.8 * x + noise, fs, nperseg=1024)
+    noise = ph.signals.noise_signal(fs, 4.0, color="white", rms=0.5, seed=12)
+    res = ph.signals.coherent_output_spectrum(
+        x, 0.8 * x + noise, fs, nperseg=1024
+    )
     snr = 0.64 / 0.25
     band = slice(50, 400)
     return numeric(
@@ -118,8 +126,8 @@ def _chk_coherent_output_snr() -> Outcome:
 )
 def _chk_pink_noise_slope() -> Outcome:
     fs = 48000.0
-    x = ph.noise_signal(fs, 40.0, color="pink", seed=3)
-    res = ph.power_spectral_density(x, fs, nperseg=8192)
+    x = ph.signals.noise_signal(fs, 40.0, color="pink", seed=3)
+    res = ph.signals.power_spectral_density(x, fs, nperseg=8192)
     band = (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
     slope = float(
         np.polyfit(
@@ -139,7 +147,7 @@ def _chk_tone_burst_rms() -> Outcome:
     # Over exactly 25 full periods (240 samples) the mean square of the
     # sine is exactly 1/2, so the gate RMS is A/sqrt(2) to machine
     # precision.
-    res = ph.tone_burst(48000.0, 5000.0, 25, amplitude=1.0)
+    res = ph.signals.tone_burst(48000.0, 5000.0, 25, amplitude=1.0)
     if res.burst_samples != 240:  # 5 ms at 48 kHz, from Table AII
         return numeric(240.0, float(res.burst_samples), 0.0, places=0)
     rms = float(np.sqrt(np.mean(res.signal[:240] ** 2)))
@@ -152,7 +160,7 @@ def _chk_tone_burst_rms() -> Outcome:
     "Hann window ENBW = n*sum(w^2)/sum(w)^2 = 3/2 exactly",
 )
 def _chk_hann_enbw() -> Outcome:
-    res = ph.window_metrics("hann", 1024)
+    res = ph.signals.window_metrics("hann", 1024)
     return numeric(1.5, float(res.enbw_bins), 1e-12, places=6)
 
 
@@ -166,7 +174,7 @@ def _chk_smoothing_line_level() -> Outcome:
     power = np.zeros_like(f)
     i0 = 999  # 1000 Hz
     power[i0] = 5.0
-    out = ph.fractional_octave_smoothing(f, power, 3.0)
+    out = ph.signals.fractional_octave_smoothing(f, power, 3.0)
     width = 1000.0 * (2.0 ** (1.0 / 6.0) - 2.0 ** (-1.0 / 6.0))
     return numeric(5.0 / width, float(out[i0]), 1e-9, rel=True, places=6)
 
@@ -192,7 +200,9 @@ def _chk_multitaper_dpss_eigenvalue() -> Outcome:
 )
 def _chk_multitaper_white_level() -> Outcome:
     fs = _spectra_fs()
-    res = ph.multitaper_psd(np.asarray(_spectra_white(41, rms=2.0))[:8192], fs)
+    res = ph.signals.multitaper_psd(
+        np.asarray(_spectra_white(41, rms=2.0))[:8192], fs
+    )
     expected = 4.0 / (fs / 2.0)
     return numeric(
         expected, float(np.mean(res.psd[1:-1])), 0.03, rel=True, places=6
@@ -208,7 +218,7 @@ def _chk_multitaper_tone_peak() -> Outcome:
     fs = _spectra_fs()
     t = np.arange(4096) / fs
     x = 3.0 * np.sin(2.0 * np.pi * 1024.0 * t)
-    res = ph.multitaper_psd(x, fs, scaling="spectrum", adaptive=False)
+    res = ph.signals.multitaper_psd(x, fs, scaling="spectrum", adaptive=False)
     return numeric(
         4.5, float(res.psd[int(np.argmax(res.psd))]), 1e-4, rel=True, places=6
     )
@@ -221,7 +231,7 @@ def _chk_multitaper_tone_peak() -> Outcome:
 )
 def _chk_multitaper_adaptive_dof() -> Outcome:
     fs = _spectra_fs()
-    res = ph.multitaper_psd(np.asarray(_spectra_white(42))[:4096], fs)
+    res = ph.signals.multitaper_psd(np.asarray(_spectra_white(42))[:4096], fs)
     return numeric(
         2.0 * res.n_tapers,
         float(np.mean(res.degrees_of_freedom[1:-1])),
@@ -289,8 +299,10 @@ def _chk_miso_multiple_snr() -> Outcome:
     fs = _spectra_fs()
     x1 = _spectra_white(201)
     x2 = _spectra_white(202)
-    noise = ph.noise_signal(fs, 4.0, color="white", rms=0.5, seed=203)
-    res = ph.miso_coherence([x1, x2], x1 + x2 + noise, fs, nperseg=1024)
+    noise = ph.signals.noise_signal(fs, 4.0, color="white", rms=0.5, seed=203)
+    res = ph.signals.miso_coherence(
+        [x1, x2], x1 + x2 + noise, fs, nperseg=1024
+    )
     band = (res.frequencies > 200.0) & (res.frequencies < 3800.0)
     snr = 2.0 / 0.25  # Gvv = 2*sigma^2, Gnn = 0.5^2, both flat
     return numeric(
@@ -310,8 +322,10 @@ def _chk_miso_independent_sum() -> Outcome:
     fs = _spectra_fs()
     x1 = _spectra_white(211)
     x2 = _spectra_white(212)
-    noise = ph.noise_signal(fs, 4.0, color="white", rms=0.4, seed=213)
-    res = ph.miso_coherence([x1, x2], x1 + 0.7 * x2 + noise, fs, nperseg=1024)
+    noise = ph.signals.noise_signal(fs, 4.0, color="white", rms=0.4, seed=213)
+    res = ph.signals.miso_coherence(
+        [x1, x2], x1 + 0.7 * x2 + noise, fs, nperseg=1024
+    )
     band = (res.frequencies > 200.0) & (res.frequencies < 3800.0)
     diff = (res.multiple_coherence
             - res.ordinary_coherence.sum(axis=0))[band]
@@ -328,8 +342,10 @@ def _chk_miso_output_decomposition() -> Outcome:
     fs = _spectra_fs()
     x1 = _spectra_white(221)
     x2 = 0.5 * x1 + _spectra_white(222)
-    noise = ph.noise_signal(fs, 4.0, color="white", rms=0.3, seed=223)
-    res = ph.miso_coherence([x1, x2], x1 + x2 + noise, fs, nperseg=1024)
+    noise = ph.signals.noise_signal(fs, 4.0, color="white", rms=0.3, seed=223)
+    res = ph.signals.miso_coherence(
+        [x1, x2], x1 + x2 + noise, fs, nperseg=1024
+    )
     reconstructed = res.coherent_output_spectra.sum(axis=0) + res.noise_psd
     resid = float(np.max(np.abs(reconstructed - res.output_psd)))
     return numeric(0.0, resid, 1e-12, places=12)
@@ -350,7 +366,7 @@ def _chk_spectrogram_tone_mean_square() -> Outcome:
     fs = _spectra_fs()
     t = np.arange(int(4 * fs)) / fs
     x = 2.0 * np.cos(2.0 * np.pi * 1024.0 * t)  # bin 128 of a 1024-segment
-    res = ph.spectrogram(x, fs, nperseg=1024, scaling="spectrum")
+    res = ph.signals.spectrogram(x, fs, nperseg=1024, scaling="spectrum")
     b = int(np.argmin(np.abs(res.frequencies - 1024.0)))
     worst = res.power[b][int(np.argmax(np.abs(res.power[b] - 2.0)))]
     return numeric(2.0, float(worst), 1e-9, rel=True, places=6)
@@ -365,7 +381,7 @@ def _chk_spectrogram_parseval_cola() -> Outcome:
     fs = _spectra_fs()
     x = np.zeros(8192)
     x[2048:4096] = np.asarray(_spectra_white(21))[:2048]
-    res = ph.spectrogram(x, fs, nperseg=256, overlap=0.75)
+    res = ph.signals.spectrogram(x, fs, nperseg=256, overlap=0.75)
     df = float(res.frequencies[1] - res.frequencies[0])
     stft_energy = (res.hop / fs) * float(np.sum(res.power)) * df
     return numeric(
@@ -387,7 +403,9 @@ def _chk_zoom_fft_demodulation_chain() -> Outcome:
     n = 4096
     t = np.arange(n) / fs
     x = 0.7 * np.cos(2.0 * np.pi * 1100.0 * t + 0.3)
-    res = ph.zoom_fft(x, fs, f_min=1000.0, f_max=1256.0, n_points=257, window="boxcar")
+    res = ph.signals.zoom_fft(
+        x, fs, f_min=1000.0, f_max=1256.0, n_points=257, window="boxcar"
+    )
     peak = int(np.argmax(res.amplitude))
     # Eqs. (11.128)-(11.130): demodulate by exp(-j*2*pi*1000*t), decimate
     # by d = fs/(2B) = 16 and read bin 50 ((1100-1000) Hz / 2 Hz) of the
@@ -415,7 +433,7 @@ def _corr_fractional_pair(
 ) -> tuple[np.ndarray, np.ndarray]:
     """White noise and its exact circular fractional delay by ``shift``."""
     fs = _corr_fs()
-    x = ph.noise_signal(fs, 4.0, color="white", seed=seed)
+    x = ph.signals.noise_signal(fs, 4.0, color="white", seed=seed)
     ramp = np.exp(-2j * np.pi * np.fft.rfftfreq(x.size) * shift)
     return x, np.fft.irfft(np.fft.rfft(x) * ramp, x.size)
 
@@ -427,8 +445,8 @@ def _corr_fractional_pair(
 )
 def _chk_tde_integer_delay() -> Outcome:
     fs = _corr_fs()
-    x = ph.noise_signal(fs, 4.0, color="white", seed=40)
-    res = ph.time_delay(x, np.roll(x, 16), fs, method="direct")
+    x = ph.signals.noise_signal(fs, 4.0, color="white", seed=40)
+    res = ph.signals.time_delay(x, np.roll(x, 16), fs, method="direct")
     return numeric(16.0, res.delay_samples, 1e-3, places=4)
 
 
@@ -439,7 +457,7 @@ def _chk_tde_integer_delay() -> Outcome:
 )
 def _chk_tde_gcc_phat_fractional() -> Outcome:
     x, y = _corr_fractional_pair(41, 12.25)
-    res = ph.time_delay(
+    res = ph.signals.time_delay(
         x, y, _corr_fs(), method="gcc", weighting="phat", nperseg=2048,
         upsample=16,
     )
@@ -453,7 +471,7 @@ def _chk_tde_gcc_phat_fractional() -> Outcome:
 )
 def _chk_tde_phase_slope_fractional() -> Outcome:
     x, y = _corr_fractional_pair(41, 12.25)
-    res = ph.time_delay(x, y, _corr_fs(), method="phase", nperseg=2048)
+    res = ph.signals.time_delay(x, y, _corr_fs(), method="phase", nperseg=2048)
     return numeric(12.25, res.delay_samples, 1e-3, places=4)
 
 
@@ -465,11 +483,11 @@ def _chk_tde_phase_slope_fractional() -> Outcome:
 def _chk_blwn_autocorrelation_sinc() -> Outcome:
     fs = _corr_fs()
     bandwidth = fs / 5.0
-    x = ph.noise_signal(fs, 4.0, color="white", seed=41)
+    x = ph.signals.noise_signal(fs, 4.0, color="white", seed=41)
     spectrum = np.fft.rfft(x)
     spectrum[np.fft.rfftfreq(x.size, 1.0 / fs) > bandwidth] = 0.0
     xb = np.fft.irfft(spectrum, x.size)
-    res = ph.correlation(xb, fs=fs, normalization="coefficient",
+    res = ph.signals.correlation(xb, fs=fs, normalization="coefficient",
                          max_lag=0.005)
     lag = int(np.argmin(np.abs(res.lags))) + 3
     arg = 2.0 * math.pi * bandwidth * res.lags[lag]
@@ -485,7 +503,7 @@ def _chk_blwn_autocorrelation_sinc() -> Outcome:
 )
 def _chk_correlation_random_error_example_8_5() -> Outcome:
     # rho_peak = S/sqrt((S+M)(S+N)) = 1/11 (Eq. 8.115); the book gives 0.35.
-    eps = ph.correlation_random_error(1.0 / 11.0, 100.0, 5.0)
+    eps = ph.signals.correlation_random_error(1.0 / 11.0, 100.0, 5.0)
     return numeric(0.35, eps, 1e-3, places=4)
 
 
@@ -498,7 +516,7 @@ def _chk_hilbert_cos_to_sin() -> Outcome:
     fs = _corr_fs()
     n = 16384
     t = np.arange(n) / fs
-    res = ph.envelope(np.cos(2.0 * np.pi * 500.0 * t), fs)
+    res = ph.signals.envelope(np.cos(2.0 * np.pi * 500.0 * t), fs)
     interior = slice(1024, n - 1024)
     reconstructed = res.envelope * np.sin(res.phase)
     err = float(np.max(np.abs(
@@ -517,7 +535,7 @@ def _chk_am_envelope_exact() -> Outcome:
     n = 16384
     t = np.arange(n) / fs
     exact = 1.0 + 0.5 * np.cos(2.0 * np.pi * 10.0 * t)
-    res = ph.envelope(exact * np.cos(2.0 * np.pi * 1000.0 * t), fs)
+    res = ph.signals.envelope(exact * np.cos(2.0 * np.pi * 1000.0 * t), fs)
     interior = slice(1024, n - 1024)
     err = float(np.max(np.abs(res.envelope[interior] - exact[interior])))
     return numeric(0.0, err, 1e-9, places=6)
@@ -543,7 +561,7 @@ def _cepstrum_echo_signal() -> np.ndarray:
     "Power-cepstrum height at the echo delay = reflection coefficient a",
 )
 def _chk_power_cepstrum_echo() -> Outcome:
-    res = ph.echo_detection(_cepstrum_echo_signal(), 8192.0)
+    res = ph.signals.echo_detection(_cepstrum_echo_signal(), 8192.0)
     if res.delay_samples != 313:
         return numeric(313.0, float(res.delay_samples), 0.5, places=0)
     return numeric(0.4, res.reflection_coefficient, 1e-10, places=6)
@@ -555,7 +573,7 @@ def _chk_power_cepstrum_echo() -> Outcome:
     "Second rahmonic of a reflection a = 0.4 equals -a^2/2",
 )
 def _chk_complex_cepstrum_rahmonic() -> Outcome:
-    res = ph.cepstrum(_cepstrum_echo_signal(), 8192.0, kind="complex")
+    res = ph.signals.cepstrum(_cepstrum_echo_signal(), 8192.0, kind="complex")
     return numeric(-0.08, float(res.cepstrum[2 * 313]), 1e-10, places=6)
 
 
@@ -571,7 +589,7 @@ def _chk_envelope_spectrum_am_line() -> Outcome:
     x = 2.0 * (1.0 + 0.35 * np.cos(2.0 * np.pi * 16.0 * t)) * np.cos(
         2.0 * np.pi * 1000.0 * t
     )
-    res = ph.envelope_spectrum(x, fs)
+    res = ph.signals.envelope_spectrum(x, fs)
     line = float(res.amplitude[round(16.0 * n / fs)])
     return numeric(0.7, line, 2e-3, places=4)
 
@@ -589,7 +607,11 @@ _TSA = "Time synchronous averaging (McFadden 1987)"
 )
 def _chk_tsa_comb_tooth() -> Outcome:
     period = 1.0 / 32.0
-    value = float(ph.comb_filter_response(np.array([16.0 / period]), period, 8)[0])
+    value = float(
+        ph.signals.comb_filter_response(np.array([16.0 / period]), period, 8)[
+            0
+        ]
+    )
     return numeric(1.0, value, 1e-10, places=8)
 
 
@@ -601,7 +623,9 @@ def _chk_tsa_comb_tooth() -> Outcome:
 def _chk_tsa_comb_midbin() -> Outcome:
     period = 1.0 / 32.0
     value = float(
-        ph.comb_filter_response(np.array([0.25 / period]), period, 2)[0]
+        ph.signals.comb_filter_response(np.array([0.25 / period]), period, 2)[
+            0
+        ]
     )
     return numeric(1.0 / math.sqrt(2.0), value, 1e-10, places=8)
 
@@ -614,8 +638,8 @@ def _chk_tsa_comb_midbin() -> Outcome:
 def _chk_tsa_node_selection() -> Outcome:
     period = 1.0 / 32.0
     freq = np.array([32.05 / period])
-    c20 = float(ph.comb_filter_response(freq, period, 20)[0])
-    c32 = float(ph.comb_filter_response(freq, period, 32)[0])
+    c20 = float(ph.signals.comb_filter_response(freq, period, 20)[0])
+    c32 = float(ph.signals.comb_filter_response(freq, period, 32)[0])
     if not c32 > 0.15:  # sanity: the power-of-two choice does not reject it
         return numeric(0.0, c32, 0.0, places=8)
     return numeric(0.0, c20, 1e-10, places=10)
@@ -634,7 +658,9 @@ def _chk_tsa_exact_recovery() -> Outcome:
     one = np.cos(2.0 * np.pi * phase) + 0.5 * np.cos(
         2.0 * np.pi * 3.0 * phase + 0.4
     )
-    res = ph.time_synchronous_average(np.tile(one, 24), fs, period=period)
+    res = ph.signals.time_synchronous_average(
+        np.tile(one, 24), fs, period=period
+    )
     err = float(np.max(np.abs(res.period_waveform - one)))
     return numeric(0.0, err, 1e-10, places=12)
 
@@ -653,7 +679,7 @@ def _chk_tsa_sqrt_n_law() -> Outcome:
     one = np.cos(2.0 * np.pi * phase)
     rng = np.random.default_rng(2024)
     noise = rng.standard_normal(n_avg * m)
-    res = ph.time_synchronous_average(
+    res = ph.signals.time_synchronous_average(
         np.tile(one, n_avg) + noise, fs, period=period, n_averages=n_avg
     )
     measured = float(np.std(res.period_waveform - one))
@@ -679,7 +705,7 @@ _BP_EXAMPLE_4_4 = [
     "Reverse arrangements of the 20-observation sequence",
 )
 def _chk_reverse_arrangements_example_4_4() -> Outcome:
-    res = ph.trend_test(_BP_EXAMPLE_4_4)
+    res = ph.metrology.trend_test(_BP_EXAMPLE_4_4)
     if not res.trend_free:  # the book accepts the hypothesis at 5 %
         return numeric(1.0, 0.0, 0.0, places=0)
     return numeric(86.0, float(res.statistic), 0.0, places=0)
@@ -691,7 +717,7 @@ def _chk_reverse_arrangements_example_4_4() -> Outcome:
     "Lower percentage point A(20; 0.975) at alpha = 0.05",
 )
 def _chk_table_a6_lower() -> Outcome:
-    res = ph.trend_test(_BP_EXAMPLE_4_4)
+    res = ph.metrology.trend_test(_BP_EXAMPLE_4_4)
     return numeric(64.0, float(res.bounds[0]), 0.0, places=0)
 
 
@@ -701,13 +727,13 @@ def _chk_table_a6_lower() -> Outcome:
     "Upper percentage point A(20; 0.025) at alpha = 0.05",
 )
 def _chk_table_a6_upper() -> Outcome:
-    res = ph.trend_test(_BP_EXAMPLE_4_4)
+    res = ph.metrology.trend_test(_BP_EXAMPLE_4_4)
     return numeric(125.0, float(res.bounds[1]), 0.0, places=0)
 
 
-def _runs_reference_result() -> ph.TrendTestResult:
+def _runs_reference_result() -> ph.metrology.TrendTestResult:
     rng = np.random.default_rng(20)
-    return ph.trend_test(rng.standard_normal(20), method="runs")
+    return ph.metrology.trend_test(rng.standard_normal(20), method="runs")
 
 
 @register(
@@ -753,7 +779,7 @@ def _bandlimited_gaussian_record(
 )
 def _chk_rice_zero_crossings_bandpass() -> Outcome:
     x = _bandlimited_gaussian_record(0, 20480.0, 1 << 19, 800.0, 1200.0)
-    res = ph.level_crossing_rate(x, 20480.0, levels=[0.0])
+    res = ph.metrology.level_crossing_rate(x, 20480.0, levels=[0.0])
     expected = 2.0 * float(np.sqrt(1000.0**2 + 400.0**2 / 12.0))
     return numeric(expected, res.zero_crossing_rate, 0.01, rel=True, places=0)
 
@@ -765,7 +791,7 @@ def _chk_rice_zero_crossings_bandpass() -> Outcome:
 )
 def _chk_rice_apparent_frequency_lowpass() -> Outcome:
     x = _bandlimited_gaussian_record(1, 20480.0, 1 << 19, 0.0, 2000.0)
-    res = ph.level_crossing_rate(x, 20480.0, levels=[0.0])
+    res = ph.metrology.level_crossing_rate(x, 20480.0, levels=[0.0])
     expected = 2000.0 / float(np.sqrt(3.0))
     return numeric(expected, res.apparent_frequency, 0.01, rel=True, places=0)
 
@@ -778,7 +804,7 @@ def _chk_rice_apparent_frequency_lowpass() -> Outcome:
 def _chk_rice_narrowband_peak_exceedance() -> Outcome:
     fs = 8192.0
     t = np.arange(1 << 16) / fs
-    res = ph.peak_statistics(np.sin(2.0 * np.pi * 60.0 * t), fs)
+    res = ph.metrology.peak_statistics(np.sin(2.0 * np.pi * 60.0 * t), fs)
     return numeric(
         float(np.exp(-8.0)),
         float(res.peak_exceedance(4.0)[0]),

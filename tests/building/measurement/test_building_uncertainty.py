@@ -261,7 +261,7 @@ def test_coverage_factors_table_is_public():
     import phonometry
     from phonometry.building.measurement.uncertainty import COVERAGE_FACTORS
 
-    assert phonometry.COVERAGE_FACTORS is COVERAGE_FACTORS
+    assert phonometry.building.COVERAGE_FACTORS is COVERAGE_FACTORS
     # Keyed by (confidence, one_sided); matches the functional lookup.
     assert COVERAGE_FACTORS[(0.95, False)] == pytest.approx(1.96)
     assert COVERAGE_FACTORS[(0.95, True)] == pytest.approx(1.65)

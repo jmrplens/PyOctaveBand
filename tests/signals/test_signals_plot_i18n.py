@@ -48,7 +48,7 @@ def _add4(a: float, b: float, c: float, d: float) -> float:
 
 
 def test_spectral_density_es_and_bad_language() -> None:
-    res = ph.power_spectral_density(_white(), FS, nperseg=1024)
+    res = ph.signals.power_spectral_density(_white(), FS, nperseg=1024)
     ax = res.plot(language="es")
     assert "Densidad espectral de Welch" in ax.get_title()
     assert ax.get_xlabel() == "Frecuencia [Hz]"
@@ -58,7 +58,7 @@ def test_spectral_density_es_and_bad_language() -> None:
 
 
 def test_multitaper_psd_es_and_bad_language() -> None:
-    res = ph.multitaper_psd(_white(), FS)
+    res = ph.signals.multitaper_psd(_white(), FS)
     ax = res.plot(language="es")
     assert "Densidad multitaper de Thomson" in ax.get_title()
     assert ax.get_xlabel() == "Frecuencia [Hz]"
@@ -71,7 +71,7 @@ def test_multitaper_psd_es_and_bad_language() -> None:
 def test_cross_spectral_density_es() -> None:
     x = _white()
     y = np.roll(x, 17) + 0.1 * _white()
-    axes = ph.cross_spectral_density(x, y, FS).plot(language="es")
+    axes = ph.signals.cross_spectral_density(x, y, FS).plot(language="es")
     assert "Densidad espectral cruzada (Bendat y Piersol)" in _titles(axes)
     assert "Fase [grados]" in _labels(axes)
     plt.close("all")
@@ -80,14 +80,14 @@ def test_cross_spectral_density_es() -> None:
 def test_coherent_output_spectrum_es() -> None:
     x = _white()
     y = np.roll(x, 17) + 0.1 * _white()
-    axes = ph.coherent_output_spectrum(x, y, FS).plot(language="es")
+    axes = ph.signals.coherent_output_spectrum(x, y, FS).plot(language="es")
     assert "Espectro de salida coherente" in _titles(axes)
     assert "SNR espectral [dB]" in _labels(axes)
     plt.close("all")
 
 
 def test_spectrogram_es() -> None:
-    res = ph.spectrogram(_white(8192), FS, nperseg=1024)
+    res = ph.signals.spectrogram(_white(8192), FS, nperseg=1024)
     ax = res.plot(language="es")
     assert "Espectrograma calibrado (Bendat y Piersol 12.6.4.2)" in ax.get_title()
     assert ax.get_xlabel() == "Tiempo [s]"
@@ -98,7 +98,7 @@ def test_spectrogram_es() -> None:
 
 
 def test_zoom_fft_es() -> None:
-    res = ph.zoom_fft(_white(8192), FS, f_min=1000.0, f_max=2000.0)
+    res = ph.signals.zoom_fft(_white(8192), FS, f_min=1000.0, f_max=2000.0)
     ax = res.plot(language="es")
     assert ax.get_title() == "FFT con zoom (Bendat y Piersol 11.5.4)"
     assert ax.get_ylabel() == "Espectro de potencia [dB]"
@@ -108,7 +108,7 @@ def test_zoom_fft_es() -> None:
 
 
 def test_correlation_es() -> None:
-    res = ph.correlation(_white(), fs=FS, max_lag=0.01)
+    res = ph.signals.correlation(_white(), fs=FS, max_lag=0.01)
     ax = res.plot(language="es")
     assert ax.get_title() == "Estimación de autocorrelación (Bendat y Piersol)"
     assert ax.get_xlabel() == "Retardo [s]"
@@ -119,12 +119,14 @@ def test_correlation_es() -> None:
 
 def test_correlation_normalization_label_es() -> None:
     """The normalization word is a table key reached through the result."""
-    res = ph.correlation(_white(), fs=FS, max_lag=0.01, normalization="biased")
+    res = ph.signals.correlation(
+        _white(), fs=FS, max_lag=0.01, normalization="biased"
+    )
     ax = res.plot(language="es")
     assert ax.get_ylabel() == "Correlación (sesgada)"
     plt.close("all")
     # The coefficient normalization has a label of its own, not a template.
-    res = ph.correlation(
+    res = ph.signals.correlation(
         _white(), fs=FS, max_lag=0.01, normalization="coefficient"
     )
     ax = res.plot(language="es")
@@ -135,7 +137,9 @@ def test_correlation_normalization_label_es() -> None:
 def test_time_delay_es() -> None:
     x = _white(8192)
     y = np.roll(x, 12)
-    res = ph.time_delay(x, y, FS, nperseg=2048, signal_bandwidth=FS / 2.0)
+    res = ph.signals.time_delay(
+        x, y, FS, nperseg=2048, signal_bandwidth=FS / 2.0
+    )
     ax = res.plot(language="es")
     assert ax.get_title().startswith("Estimación del retardo temporal")
     plt.close("all")
@@ -144,7 +148,7 @@ def test_time_delay_es() -> None:
 def test_aligned_impulse_response_es() -> None:
     ref = np.zeros(256)
     ref[100] = 1.0
-    res = ph.align_impulse_responses(np.roll(ref, 5), ref, FS)
+    res = ph.signals.align_impulse_responses(np.roll(ref, 5), ref, FS)
     ax = res.plot(language="es")
     assert "Alineación de la respuesta al impulso" in ax.get_title()
     assert "RI de referencia" in _labels(ax)
@@ -154,14 +158,14 @@ def test_aligned_impulse_response_es() -> None:
 
 
 def test_envelope_es() -> None:
-    axes = ph.envelope(_white(), FS).plot(language="es")
+    axes = ph.signals.envelope(_white(), FS).plot(language="es")
     assert "Envolvente de Hilbert (Bendat y Piersol Cap. 13)" in _titles(axes)
     assert "Frecuencia instantánea [Hz]" in _labels(axes)
     plt.close("all")
 
 
 def test_envelope_spectrum_es() -> None:
-    axes = ph.envelope_spectrum(_white(), FS).plot(language="es")
+    axes = ph.signals.envelope_spectrum(_white(), FS).plot(language="es")
     assert "Espectro de la envolvente (Bendat y Piersol 13.3)" in _titles(axes)
     assert "Amplitud de modulación" in _labels(axes)
     assert "Nivel medio" in _labels(axes)
@@ -169,7 +173,7 @@ def test_envelope_spectrum_es() -> None:
 
 
 def test_cepstrum_es() -> None:
-    res = ph.cepstrum(_white(), FS, kind="power")
+    res = ph.signals.cepstrum(_white(), FS, kind="power")
     ax = res.plot(language="es")
     assert "Cepstro de potencia" in _titles(ax)
     assert "Quefrencia [ms]" in _labels(ax)
@@ -181,7 +185,7 @@ def test_cepstrum_es() -> None:
 def test_echo_detection_es() -> None:
     x = np.zeros(4096)
     x[0], x[313] = 1.0, 0.4
-    ax = ph.echo_detection(x, FS).plot(language="es")
+    ax = ph.signals.echo_detection(x, FS).plot(language="es")
     assert "Detección de ecos en el cepstro de potencia" in _titles(ax)
     assert "Banda de búsqueda" in _labels(ax)
     assert any("Eco:" in s and "," in s for s in _labels(ax).split(" || "))
@@ -189,7 +193,9 @@ def test_echo_detection_es() -> None:
 
 
 def test_lifter_es() -> None:
-    axes = ph.lifter(_white(), FS, cutoff=0.002, mode="highpass").plot(language="es")
+    axes = ph.signals.lifter(_white(), FS, cutoff=0.002, mode="highpass").plot(
+        language="es"
+    )
     assert "Liftering a 2 ms (paso alto)" in _titles(axes)
     assert "Lifterado (paso alto)" in _labels(axes)
     plt.close("all")
@@ -197,14 +203,16 @@ def test_lifter_es() -> None:
 
 def test_phase_decomposition_es() -> None:
     resp = np.fft.rfft(np.exp(-np.arange(1024) / 50.0))
-    axes = ph.phase_decomposition(resp, fs=FS).plot(language="es")
+    axes = ph.signals.phase_decomposition(resp, fs=FS).plot(language="es")
     assert "Descomposición fase mínima / pasa-todo" in _titles(axes)
     assert "Fase medida" in _labels(axes)
     plt.close("all")
 
 
 def test_tone_burst_es_and_bad_language() -> None:
-    res = ph.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=10.0)
+    res = ph.signals.tone_burst(
+        FS, 5000.0, 25, repetitions=2, repetition_rate=10.0
+    )
     ax = res.plot(language="es")
     assert "Salva de tono (IEC 60268-1)" in ax.get_title()
     assert ax.get_xlabel() == "Tiempo [s]"
@@ -215,8 +223,8 @@ def test_tone_burst_es_and_bad_language() -> None:
 
 
 def test_resampled_signal_es_and_bad_language() -> None:
-    res = ph.resample_signal(
-        ph.noise_signal(FS, 0.2, seed=5), FS, fs_new=32000.0)
+    res = ph.signals.resample_signal(
+        ph.signals.noise_signal(FS, 0.2, seed=5), FS, fs_new=32000.0)
     ax = res.plot(language="es")
     assert "Remuestreo polifásico" in ax.get_title()
     assert ax.get_xlabel() == "Frecuencia [Hz]"
@@ -228,7 +236,7 @@ def test_resampled_signal_es_and_bad_language() -> None:
 
 
 def test_window_metrics_es_and_bad_language() -> None:
-    res = ph.window_metrics("hann", 1024)
+    res = ph.signals.window_metrics("hann", 1024)
     axes = res.plot(language="es")
     assert "Métricas de la ventana (Harris 1978)" in _titles(axes)
     assert "Pérdida de festoneado" in _labels(axes)
@@ -244,7 +252,7 @@ def test_inverse_filter_es() -> None:
     b, a = sg.butter(2, [100.0, 8000.0], btype="bandpass", fs=float(FS))
     imp = np.zeros(1024)
     imp[0] = 1.0
-    res = ph.regularized_inverse_filter(
+    res = ph.signals.regularized_inverse_filter(
         sg.lfilter(b, a, imp), float(FS), f_range=(200.0, 4000.0)
     )
     ax = res.plot(language="es")

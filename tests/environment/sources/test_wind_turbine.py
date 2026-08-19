@@ -142,12 +142,15 @@ def test_tonal_audibility_plot_smoke_and_export() -> None:
     import phonometry
 
     levels, freqs = _synthetic_tone()
-    res = phonometry.wind_turbine_tonality(levels, freqs)
+    res = phonometry.environment.wind_turbine_tonality(levels, freqs)
     assert res.plot() is not None
     # Caller-supplied plot kwargs must override the defaults, not collide with
     # them (no duplicate-keyword TypeError).
     assert res.plot(lw=2.0, label="spectrum") is not None
-    assert phonometry.apparent_sound_power_level is apparent_sound_power_level
+    assert (
+        phonometry.environment.apparent_sound_power_level
+        is apparent_sound_power_level
+    )
 
 
 def test_two_tone_band_anchors_to_highest_tone_line() -> None:

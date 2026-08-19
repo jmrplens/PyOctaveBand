@@ -87,7 +87,9 @@ def test_impact_rating_uses_opposite_sign_mask() -> None:
 
 
 def test_rating_without_curve_data_raises() -> None:
-    bare = ph.WeightedRatingResult(rating=52, c=-1, ctr=-3, unfavourable_sum=10.0)
+    bare = ph.building.WeightedRatingResult(
+        rating=52, c=-1, ctr=-3, unfavourable_sum=10.0
+    )
     with pytest.raises(ValueError, match="no band curve"):
         bare.plot()
 
@@ -167,7 +169,7 @@ def test_octave_impact_plot_keeps_curve_honest_and_annotates_offset() -> None:
     # rule of Clause 4.3.2. The drawn shifted-reference curve is genuinely
     # ref - shift (so it reads 59 at 500 Hz); the rating (54) is annotated
     # with the -5 dB note rather than the curve being distorted down.
-    res = ph.weighted_impact_rating(_ANNEX_C3_LN_OCTAVE)
+    res = ph.building.weighted_impact_rating(_ANNEX_C3_LN_OCTAVE)
     assert res.rating == 54
     idx500 = int(np.argmin(np.abs(res.band_centers - 500.0)))
     read_value = float(res.shifted_reference[idx500])
@@ -204,7 +206,7 @@ def test_third_octave_impact_plot_reads_rating_at_500() -> None:
 def test_facade_plot_accepts_label_kwarg() -> None:
     # Regression: kwargs used to be forwarded to all four curves, so a user
     # label= collided with the per-curve labels and raised TypeError.
-    res = ph.facade_insulation(
+    res = ph.building.facade_insulation(
         [70.0, 72.0, 74.0], [40.0, 41.0, 42.0], [0.5, 0.5, 0.5]
     )
     ax = res.plot(label="my measurement")

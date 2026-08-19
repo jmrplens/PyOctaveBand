@@ -67,7 +67,7 @@ def _chk_butter_class0_1995() -> Outcome:
         48000, fraction=1, order=6, limits=[100, 10000],
         design=filters.FilterDesign(filter_type="butter"),
     )
-    result = ph.verify_filter_class(bank, edition="1995")
+    result = ph.filters.verify_filter_class(bank, edition="1995")
     margin = min(b["margin_class0_db"] for b in result["bands"])
     ok = result["overall_class"] == 0
     return Outcome(

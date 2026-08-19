@@ -43,7 +43,7 @@ _PA_C0 = 343.0
 )
 def _chk_porous_db_real() -> Outcome:
     f = np.array([0.1 * _PA_SIGMA / _PA_RHO0])
-    res = ph.delany_bazley(
+    res = ph.materials.delany_bazley(
         f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0
     )
     return numeric(
@@ -59,7 +59,7 @@ def _chk_porous_db_real() -> Outcome:
 )
 def _chk_porous_db_imag() -> Outcome:
     f = np.array([0.1 * _PA_SIGMA / _PA_RHO0])
-    res = ph.delany_bazley(
+    res = ph.materials.delany_bazley(
         f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0
     )
     return numeric(
@@ -75,7 +75,9 @@ def _chk_porous_db_imag() -> Outcome:
 )
 def _chk_porous_miki() -> Outcome:
     f = np.array([0.1 * _PA_SIGMA])
-    res = ph.miki(f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0)
+    res = ph.materials.miki(
+        f, _PA_SIGMA, speed_of_sound=_PA_C0, air_density=_PA_RHO0
+    )
     return numeric(
         ref.POROUS_MIKI_K_EXPECTED.real,
         float(res.normalized_wavenumber[0].real), 1e-9,
@@ -89,7 +91,7 @@ def _chk_porous_miki() -> Outcome:
 )
 def _chk_porous_jca_dc() -> Outcome:
     f = np.array([1e-3])
-    res = ph.johnson_champoux_allard(
+    res = ph.materials.johnson_champoux_allard(
         f, _PA_SIGMA, porosity=0.95, tortuosity=1.3,
         viscous_length=6e-5, thermal_length=1.2e-4, air_density=_PA_RHO0,
     )
@@ -104,9 +106,9 @@ def _chk_porous_jca_dc() -> Outcome:
 )
 def _chk_porous_rigid_backed() -> Outcome:
     f = np.linspace(200.0, 4000.0, 200)
-    med = ph.delany_bazley(f, _PA_SIGMA, air_density=_PA_RHO0)
-    res = ph.layered_absorber(
-        f, [ph.PorousLayer(0.05, med)],
+    med = ph.materials.delany_bazley(f, _PA_SIGMA, air_density=_PA_RHO0)
+    res = ph.materials.layered_absorber(
+        f, [ph.materials.PorousLayer(0.05, med)],
         speed_of_sound=_PA_C0, air_density=_PA_RHO0,
     )
     zs_ref = -1j * med.characteristic_impedance / np.tan(med.wavenumber * 0.05)
@@ -122,8 +124,11 @@ def _chk_porous_rigid_backed() -> Outcome:
 def _chk_porous_air_cavity() -> Outcome:
     d = 0.1
     f = np.array([_PA_C0 / (4.0 * d)])
-    res = ph.layered_absorber(
-        f, [ph.AirLayer(d)], speed_of_sound=_PA_C0, air_density=_PA_RHO0
+    res = ph.materials.layered_absorber(
+        f,
+        [ph.materials.AirLayer(d)],
+        speed_of_sound=_PA_C0,
+        air_density=_PA_RHO0,
     )
     return numeric(0.0, float(res.absorption[0]), 1e-12, places=4)
 
@@ -135,7 +140,7 @@ def _chk_porous_air_cavity() -> Outcome:
 )
 def _chk_porous_statistical_max() -> Outcome:
     z = np.linspace(1.0, 3.0, 2001).astype(complex)
-    value = float(np.max(ph.statistical_absorption(z)))
+    value = float(np.max(ph.materials.statistical_absorption(z)))
     return numeric(ref.POROUS_STATISTICAL_ALPHA_MAX, value, 1e-3, places=3)
 
 
@@ -145,7 +150,7 @@ def _chk_porous_statistical_max() -> Outcome:
     "Membrane resonance 60/sqrt(m d), m = 5 kg/m2, d = 5 cm, Hz",
 )
 def _chk_porous_membrane_resonance() -> Outcome:
-    value = ph.membrane_resonance_frequency(
+    value = ph.materials.membrane_resonance_frequency(
         surface_density=5.0, cavity_depth=0.05,
         speed_of_sound=_PA_C0, air_density=_PA_RHO0,
     )
@@ -161,13 +166,13 @@ def _chk_porous_membrane_resonance() -> Outcome:
 def _chk_porous_mpp_peak() -> Outcome:
     eps = (math.pi / 4.0) * (ref.MAA_FIG5_DIAMETER / ref.MAA_FIG5_SEPARATION) ** 2
     f = np.linspace(100.0, 4000.0, 2000)
-    res = ph.layered_absorber(
+    res = ph.materials.layered_absorber(
         f,
         [
-            ph.MicroperforatedPlateLayer(
+            ph.materials.MicroperforatedPlateLayer(
                 ref.MAA_FIG5_THICKNESS, ref.MAA_FIG5_DIAMETER / 2.0, eps
             ),
-            ph.AirLayer(ref.MAA_FIG5_CAVITY),
+            ph.materials.AirLayer(ref.MAA_FIG5_CAVITY),
         ],
         speed_of_sound=_PA_C0, air_density=_PA_RHO0,
     )
@@ -190,11 +195,11 @@ def _chk_porous_maa_peak_closed_form() -> Outcome:
     t = ref.MAA_FIG5_THICKNESS
     eps = (math.pi / 4.0) * (d / ref.MAA_FIG5_SEPARATION) ** 2
     f = np.linspace(400.0, 1200.0, 4000)
-    res = ph.layered_absorber(
+    res = ph.materials.layered_absorber(
         f,
         [
-            ph.MicroperforatedPlateLayer(t, d / 2.0, eps),
-            ph.AirLayer(ref.MAA_FIG5_CAVITY),
+            ph.materials.MicroperforatedPlateLayer(t, d / 2.0, eps),
+            ph.materials.AirLayer(ref.MAA_FIG5_CAVITY),
         ],
         speed_of_sound=_PA_C0, air_density=_PA_RHO0,
     )
@@ -234,7 +239,9 @@ _AA_TABLE_11_2_RHO1 = 30.0
     "Zwikker-Kosten decoupling frequency Fd, Hz",
 )
 def _chk_limp_decoupling_frequency() -> Outcome:
-    fd = ph.decoupling_frequency(40.0e3, porosity=0.94, frame_density=130.0)
+    fd = ph.materials.decoupling_frequency(
+        40.0e3, porosity=0.94, frame_density=130.0
+    )
     return numeric(43.27, fd, 0.005, unit="Hz", places=3)
 
 
@@ -244,11 +251,11 @@ def _chk_limp_decoupling_frequency() -> Outcome:
     "Limp effective density at DC = apparent total density rho_t, kg/m3",
 )
 def _chk_limp_low_frequency_limit() -> Outcome:
-    rigid = ph.johnson_champoux_allard(
+    rigid = ph.materials.johnson_champoux_allard(
         np.array([1.0e-4]), _AA_TABLE_11_2_SIGMA,
         speed_of_sound=_PA_C0, air_density=_PA_RHO0, **_AA_TABLE_11_2,
     )
-    limp = ph.limp_frame(
+    limp = ph.materials.limp_frame(
         rigid, _AA_TABLE_11_2_RHO1, porosity=_AA_TABLE_11_2["porosity"]
     )
     expected = _AA_TABLE_11_2_RHO1 + _AA_TABLE_11_2["porosity"] * _PA_RHO0
@@ -263,11 +270,11 @@ def _chk_limp_low_frequency_limit() -> Outcome:
 )
 def _chk_limp_heavy_frame_limit() -> Outcome:
     f = np.array([50.0, 125.0, 500.0, 2000.0])
-    rigid = ph.johnson_champoux_allard(
+    rigid = ph.materials.johnson_champoux_allard(
         f, _AA_TABLE_11_2_SIGMA, speed_of_sound=_PA_C0,
         air_density=_PA_RHO0, **_AA_TABLE_11_2,
     )
-    limp = ph.limp_frame(
+    limp = ph.materials.limp_frame(
         rigid, 1.0e12, porosity=_AA_TABLE_11_2["porosity"]
     )
     deviation = float(np.max(np.abs(
@@ -284,9 +291,9 @@ def _chk_limp_heavy_frame_limit() -> Outcome:
 def _chk_limp_frame_criterion_limit() -> Outcome:
     # The book states "lower than 20 kPa" for |Kc/Kf| < 0.2 with Kf = P0.
     limit = 0.2 * 101325.0
-    ok = ph.limp_frame_applicable(limit) and not ph.limp_frame_applicable(
-        limit * (1.0 + 1e-9)
-    )
+    ok = ph.materials.limp_frame_applicable(
+        limit
+    ) and not ph.materials.limp_frame_applicable(limit * (1.0 + 1e-9))
     return numeric(20.0, limit / 1000.0 if ok else float("nan"),
                    0.3, unit="kPa", places=2)
 
@@ -310,13 +317,13 @@ _AA_TABLE_6_1_SHEAR = 220.0e4 * (1.0 + 0.1j)
 
 def _aa_glass_wool_medium(frequency: np.ndarray) -> Any:
     """The rigid-frame JCA equivalent fluid of the Table 6.1 glass wool."""
-    return ph.johnson_champoux_allard(
+    return ph.materials.johnson_champoux_allard(
         frequency, _AA_TABLE_6_1_SIGMA, **_AA_TABLE_6_1
     )
 
 
 def _aa_glass_wool_waves(frequency: np.ndarray) -> Any:
-    return ph.biot_waves(
+    return ph.materials.biot_waves(
         _aa_glass_wool_medium(frequency),
         porosity=_AA_TABLE_6_1["porosity"],
         tortuosity=_AA_TABLE_6_1["tortuosity"],
@@ -329,7 +336,7 @@ def _aa_glass_wool_layer(
     medium: Any, thickness: float, scale: float = 1.0
 ) -> Any:
     """The same material as a poroelastic layer, optionally frozen stiff."""
-    return ph.PoroelasticLayer(
+    return ph.materials.PoroelasticLayer(
         thickness,
         medium,
         _AA_TABLE_6_1["porosity"],
@@ -345,7 +352,7 @@ def _aa_glass_wool_layer(
     "Frame lambda/4 resonance of a 10 cm layer, Hz",
 )
 def _chk_biot_frame_resonance() -> Outcome:
-    value = ph.frame_quarter_wave_resonance(
+    value = ph.materials.frame_quarter_wave_resonance(
         0.10, shear_modulus=_AA_TABLE_6_1_SHEAR, poisson_ratio=0.0,
         frame_density=_AA_TABLE_6_1_RHO1,
     )
@@ -383,7 +390,9 @@ def _chk_biot_frame_borne_ratio() -> Outcome:
 )
 def _chk_biot_impedance_peak() -> Outcome:
     grid = np.arange(500.0, 1200.0, 0.25)
-    impedance = ph.biot_surface_impedance(_aa_glass_wool_waves(grid), 0.056)
+    impedance = ph.materials.biot_surface_impedance(
+        _aa_glass_wool_waves(grid), 0.056
+    )
     peak = float(grid[int(np.argmax(impedance.imag))])
     return numeric(860.0, peak, 0.02, rel=True, unit="Hz", places=1)
 
@@ -396,10 +405,12 @@ def _chk_biot_impedance_peak() -> Outcome:
 def _chk_biot_rigid_frame_limit() -> Outcome:
     frequency = np.geomspace(50.0, 5000.0, 40)
     medium = _aa_glass_wool_medium(frequency)
-    reference = ph.layered_absorber(
-        frequency, [ph.PorousLayer(0.05, medium)], angle=math.pi / 4.0
+    reference = ph.materials.layered_absorber(
+        frequency,
+        [ph.materials.PorousLayer(0.05, medium)],
+        angle=math.pi / 4.0,
     ).surface_impedance
-    frozen = ph.layered_absorber(
+    frozen = ph.materials.layered_absorber(
         frequency,
         [_aa_glass_wool_layer(medium, 0.05, 1e8)],
         angle=math.pi / 4.0,
@@ -416,8 +427,10 @@ def _chk_biot_rigid_frame_limit() -> Outcome:
 def _chk_biot_assembly_vs_closed_form() -> Outcome:
     frequency = np.geomspace(20.0, 5000.0, 80)
     medium = _aa_glass_wool_medium(frequency)
-    closed = ph.biot_surface_impedance(_aa_glass_wool_waves(frequency), 0.10)
-    assembled = ph.layered_absorber(
+    closed = ph.materials.biot_surface_impedance(
+        _aa_glass_wool_waves(frequency), 0.10
+    )
+    assembled = ph.materials.layered_absorber(
         frequency, [_aa_glass_wool_layer(medium, 0.10)]
     ).surface_impedance
     deviation = float(np.max(np.abs(assembled / closed - 1.0)))
@@ -436,15 +449,15 @@ _SLOW_SOUND = "Slow-sound perfect absorbers (Jimenez et al. Appl. Sci. 2017)"
     "Critical coupling: alpha at the design frequency (300 Hz, normal)",
 )
 def _chk_slow_sound_perfect_absorption() -> Outcome:
-    res = ph.HelmholtzResonator(
+    res = ph.materials.HelmholtzResonator(
         neck_length=1.0e-3, neck_side=3.0e-3,
         cavity_length=30.0e-3, cavity_side=27.0e-3,
     )
-    air = ph.AirProperties(density=_PA_RHO0, speed_of_sound=_PA_C0)
-    design = ph.critical_coupling_design(
+    air = ph.materials.AirProperties(density=_PA_RHO0, speed_of_sound=_PA_C0)
+    design = ph.materials.critical_coupling_design(
         300.0, res, lattice_step=3.0e-2, period=5.0e-2, air=air,
     )
-    out = ph.slit_helmholtz_absorber(
+    out = ph.materials.slit_helmholtz_absorber(
         np.array([300.0]), design.resonator, slit_height=design.slit_height,
         lattice_step=3.0e-2, period=5.0e-2, air=air,
     )
@@ -464,9 +477,9 @@ def _chk_slow_sound_slit_resistivity() -> Outcome:
     eta = 1.84e-5
     h = 1.2e-3
     f = np.array([1.0e-2])
-    rho_s, _ = ph.slit_effective_properties(
+    rho_s, _ = ph.materials.slit_effective_properties(
         f, slit_height=h,
-        air=ph.AirProperties(density=_PA_RHO0, viscosity=eta),
+        air=ph.materials.AirProperties(density=_PA_RHO0, viscosity=eta),
     )
     sigma = float((1j * 2.0 * math.pi * f * rho_s)[0].real)
     return numeric(12.0 * eta / h**2, sigma, 1e-3, rel=True,
@@ -482,9 +495,9 @@ def _chk_slow_sound_duct_resistivity() -> Outcome:
     eta = 1.84e-5
     side = 3.0e-3
     f = np.array([1.0e-2])
-    rho, _ = ph.rectangular_duct_properties(
+    rho, _ = ph.materials.rectangular_duct_properties(
         f, side=side,
-        air=ph.AirProperties(density=_PA_RHO0, viscosity=eta),
+        air=ph.materials.AirProperties(density=_PA_RHO0, viscosity=eta),
     )
     sigma = float((1j * 2.0 * math.pi * f * rho)[0].real)
     return numeric(28.454 * eta / side**2, sigma, 2e-3, rel=True,

@@ -28,8 +28,8 @@ _SLOPES = [
 
 def _measured_slope(color: str) -> float:
     """Welch-PSD regression slope in dB per octave over 20 Hz - 20 kHz."""
-    x = ph.noise_signal(FS, 40.0, color=color, seed=3)  # type: ignore[arg-type]
-    res = ph.power_spectral_density(x, FS, nperseg=8192)
+    x = ph.signals.noise_signal(FS, 40.0, color=color, seed=3)  # type: ignore[arg-type]
+    res = ph.signals.power_spectral_density(x, FS, nperseg=8192)
     band = (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
     slope = np.polyfit(
         np.log2(res.frequencies[band]), 10.0 * np.log10(res.psd[band]), 1
@@ -46,32 +46,32 @@ def test_spectral_slope_matches_exact_power_law(color: str, expected: float) -> 
 
 
 def test_same_seed_is_bit_reproducible() -> None:
-    a = ph.noise_signal(FS, 1.0, color="pink", seed=42)
-    b = ph.noise_signal(FS, 1.0, color="pink", seed=42)
+    a = ph.signals.noise_signal(FS, 1.0, color="pink", seed=42)
+    b = ph.signals.noise_signal(FS, 1.0, color="pink", seed=42)
     np.testing.assert_array_equal(a, b)
 
 
 def test_different_seeds_differ() -> None:
-    a = ph.noise_signal(FS, 1.0, color="pink", seed=1)
-    b = ph.noise_signal(FS, 1.0, color="pink", seed=2)
+    a = ph.signals.noise_signal(FS, 1.0, color="pink", seed=1)
+    b = ph.signals.noise_signal(FS, 1.0, color="pink", seed=2)
     assert not np.array_equal(a, b)
 
 
 def test_rms_is_exact_and_mean_zero() -> None:
     for color in ("white", "pink", "red", "blue", "violet"):
-        x = ph.noise_signal(FS, 2.0, color=color, rms=0.25, seed=5)  # type: ignore[arg-type]
+        x = ph.signals.noise_signal(FS, 2.0, color=color, rms=0.25, seed=5)  # type: ignore[arg-type]
         assert float(np.sqrt(np.mean(x * x))) == pytest.approx(0.25, rel=1e-12)
         assert float(np.mean(x)) == pytest.approx(0.0, abs=1e-12)
 
 
 def test_length_and_dtype() -> None:
-    x = ph.noise_signal(FS, 0.5, seed=1)
+    x = ph.signals.noise_signal(FS, 0.5, seed=1)
     assert x.shape == (24000,)
     assert x.dtype == np.float64
 
 
 def test_white_is_gaussian_like() -> None:
-    x = ph.noise_signal(FS, 10.0, color="white", seed=6)
+    x = ph.signals.noise_signal(FS, 10.0, color="white", seed=6)
     # Kurtosis of a Gaussian is 3; a crude but effective distribution check.
     kurt = float(np.mean(x**4) / np.mean(x**2) ** 2)
     assert kurt == pytest.approx(3.0, abs=0.1)
@@ -79,12 +79,12 @@ def test_white_is_gaussian_like() -> None:
 
 def test_rejects_invalid_arguments() -> None:
     with pytest.raises(ValueError, match="'fs'"):
-        ph.noise_signal(0.0, 1.0)
+        ph.signals.noise_signal(0.0, 1.0)
     with pytest.raises(ValueError, match="'seconds'"):
-        ph.noise_signal(FS, -1.0)
+        ph.signals.noise_signal(FS, -1.0)
     with pytest.raises(ValueError, match="16 samples"):
-        ph.noise_signal(FS, 1e-5)
+        ph.signals.noise_signal(FS, 1e-5)
     with pytest.raises(ValueError, match="'color'"):
-        ph.noise_signal(FS, 1.0, color="brown")  # type: ignore[arg-type]
+        ph.signals.noise_signal(FS, 1.0, color="brown")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="'rms'"):
-        ph.noise_signal(FS, 1.0, rms=0.0)
+        ph.signals.noise_signal(FS, 1.0, rms=0.0)

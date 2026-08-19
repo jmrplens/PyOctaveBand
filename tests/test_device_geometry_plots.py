@@ -35,13 +35,13 @@ def _close_figures():
 # ---------------------------------------------------------------------------
 def test_silencer_results_retain_geometry_and_draw() -> None:
     cases = (
-        pm.expansion_chamber(FREQ, 0.3, 0.03, 0.005),
-        pm.extended_tube_chamber(
+        pm.noise_control.expansion_chamber(FREQ, 0.3, 0.03, 0.005),
+        pm.noise_control.extended_tube_chamber(
             FREQ, 0.3, 0.03, 0.005, inlet_extension=0.075,
             outlet_extension=0.05,
         ),
-        pm.helmholtz_resonator(FREQ, 0.01, 0.001, 0.05, 0.002),
-        pm.quarter_wave_resonator(FREQ, 0.01, 0.4, 0.003),
+        pm.noise_control.helmholtz_resonator(FREQ, 0.01, 0.001, 0.05, 0.002),
+        pm.noise_control.quarter_wave_resonator(FREQ, 0.01, 0.4, 0.003),
     )
     for result in cases:
         assert result.geometry is not None
@@ -53,7 +53,7 @@ def test_silencer_results_retain_geometry_and_draw() -> None:
 
 
 def test_silencer_hand_built_refuses() -> None:
-    result = pm.expansion_chamber(FREQ, 0.3, 0.03, 0.005)
+    result = pm.noise_control.expansion_chamber(FREQ, 0.3, 0.03, 0.005)
     import dataclasses
 
     bare = dataclasses.replace(result, geometry=None)
@@ -66,12 +66,12 @@ def test_silencer_hand_built_refuses() -> None:
 CHAIN_FREQ = np.linspace(20.0, 500.0, 481)
 
 
-def _chain(branch_length: float = 0.686) -> pm.SilencerChain:
+def _chain(branch_length: float = 0.686) -> pm.noise_control.SilencerChain:
     """A duct-shunt-duct-chamber-duct chain with one quarter-wave branch."""
     from phonometry.noise_control.silencers import quarter_wave_impedance
 
     return (
-        pm.SilencerChain(CHAIN_FREQ)
+        pm.noise_control.SilencerChain(CHAIN_FREQ)
         .duct(0.15, 0.0314)
         .shunt(
             quarter_wave_impedance(CHAIN_FREQ, branch_length, 0.00785),
@@ -134,7 +134,7 @@ def test_silencer_chain_result_and_language() -> None:
 
 def test_silencer_chain_numbers_unlabelled_branches() -> None:
     ax = (
-        pm.SilencerChain(FREQ)
+        pm.noise_control.SilencerChain(FREQ)
         .shunt(1.0e4)
         .duct(0.4, 0.02)
         .shunt(1.0e4)
@@ -146,38 +146,40 @@ def test_silencer_chain_numbers_unlabelled_branches() -> None:
 
 
 def test_silencer_chain_without_a_duct_refuses_to_draw() -> None:
-    chain = pm.SilencerChain(FREQ).shunt(1.0e4)
+    chain = pm.noise_control.SilencerChain(FREQ).shunt(1.0e4)
     with pytest.raises(ValueError, match="no duct of positive length"):
         chain.plot_geometry()
     # A zero-length duct is the identity matrix: nothing acoustically, and
     # nothing to draw either.
-    flat = pm.SilencerChain(FREQ).duct(0.0, 0.02)
+    flat = pm.noise_control.SilencerChain(FREQ).duct(0.0, 0.02)
     with pytest.raises(ValueError, match="no duct of positive length"):
         flat.plot_geometry()
 
 
 def test_silencer_free_function_validation() -> None:
     with pytest.raises(ValueError, match="Unknown silencer kind"):
-        pm.plot_silencer_geometry("muffler")
+        pm.noise_control.plot_silencer_geometry("muffler")
     with pytest.raises(ValueError, match="chamber_area"):
-        pm.plot_silencer_geometry(
+        pm.noise_control.plot_silencer_geometry(
             "expansion chamber", length=0.3, chamber_area=0.004,
             pipe_area=0.005,
         )
     with pytest.raises(ValueError, match="must not exceed"):
-        pm.plot_silencer_geometry(
+        pm.noise_control.plot_silencer_geometry(
             "extended-tube chamber", length=0.1, chamber_area=0.03,
             pipe_area=0.005, inlet_extension=0.08, outlet_extension=0.08,
         )
     with pytest.raises(ValueError, match="needs"):
-        pm.plot_silencer_geometry("Helmholtz resonator", duct_area=0.01)
+        pm.noise_control.plot_silencer_geometry(
+            "Helmholtz resonator", duct_area=0.01
+        )
 
 
 # ---------------------------------------------------------------------------
 # Image-source plan.
 # ---------------------------------------------------------------------------
 def test_image_source_plan_draws_and_caps_order() -> None:
-    res = pm.image_source_rir(
+    res = pm.room.image_source_rir(
         (5.0, 4.0, 3.0), (1.5, 1.2, 1.5), (3.5, 2.8, 1.2), 0.3,
         fs=8000, max_order=4,
     )
@@ -193,11 +195,11 @@ def test_image_source_plan_draws_and_caps_order() -> None:
 # Barrier section.
 # ---------------------------------------------------------------------------
 def test_barrier_result_retains_geometry_and_draws() -> None:
-    res = pm.barrier_insertion_loss(FREQ, 1.5, 5.0, 3.0, 20.0, 1.5)
+    res = pm.environment.barrier_insertion_loss(FREQ, 1.5, 5.0, 3.0, 20.0, 1.5)
     assert res.barrier_height == pytest.approx(3.0)
     assert res.thickness is None
     assert res.plot_geometry() is not None
-    thick = pm.barrier_insertion_loss(
+    thick = pm.environment.barrier_insertion_loss(
         FREQ, 1.5, 5.0, 3.0, 20.0, 1.5, thickness=0.4
     )
     assert thick.thickness == pytest.approx(0.4)
@@ -206,7 +208,7 @@ def test_barrier_result_retains_geometry_and_draws() -> None:
 
 def test_barrier_free_function_validation() -> None:
     with pytest.raises(ValueError, match="receiver_distance"):
-        pm.plot_barrier_geometry(
+        pm.environment.plot_barrier_geometry(
             source_height=1.5, barrier_distance=5.0, barrier_height=3.0,
             receiver_distance=4.0, receiver_height=1.5,
         )
@@ -216,39 +218,41 @@ def test_barrier_free_function_validation() -> None:
 # Microphone positions (3-D).
 # ---------------------------------------------------------------------------
 def test_microphone_positions_hemisphere_and_sphere() -> None:
-    pos = pm.measurement_positions("hemisphere", radius=2.0)
-    ax = pm.plot_microphone_positions(pos, radius=2.0)
+    pos = pm.emission.measurement_positions("hemisphere", radius=2.0)
+    ax = pm.emission.plot_microphone_positions(pos, radius=2.0)
     assert ax.name == "3d"
-    sphere = pm.precision_positions("sphere", radius=1.0, count=20)
-    ax = pm.plot_microphone_positions(sphere)
+    sphere = pm.emission.precision_positions("sphere", radius=1.0, count=20)
+    ax = pm.emission.plot_microphone_positions(sphere)
     assert ax.name == "3d"
     bad = np.zeros((3, 2))
     with pytest.raises(ValueError, match="shape"):
-        pm.plot_microphone_positions(bad)
+        pm.emission.plot_microphone_positions(bad)
     with pytest.raises(ValueError, match="radius"):
-        pm.plot_microphone_positions(pos, radius=-1.0)
+        pm.emission.plot_microphone_positions(pos, radius=-1.0)
 
 
 # ---------------------------------------------------------------------------
 # Wall aperture.
 # ---------------------------------------------------------------------------
 def test_aperture_results_retain_geometry_and_draw() -> None:
-    slit = pm.slit_transmission_coefficient(FREQ, 0.003, 0.1)
+    slit = pm.building.slit_transmission_coefficient(FREQ, 0.003, 0.1)
     assert slit.width == pytest.approx(0.003)
     assert slit.depth == pytest.approx(0.1)
     assert slit.plot_geometry() is not None
-    hole = pm.circular_aperture_transmission_coefficient(FREQ, 0.005, 0.1)
+    hole = pm.building.circular_aperture_transmission_coefficient(
+        FREQ, 0.005, 0.1
+    )
     assert hole.radius == pytest.approx(0.005)
     assert hole.plot_geometry() is not None
 
 
 def test_aperture_validation() -> None:
     with pytest.raises(ValueError, match="exactly one"):
-        pm.plot_aperture_geometry(0.1)
+        pm.building.plot_aperture_geometry(0.1)
     with pytest.raises(ValueError, match="exactly one"):
-        pm.plot_aperture_geometry(0.1, width=0.003, radius=0.005)
+        pm.building.plot_aperture_geometry(0.1, width=0.003, radius=0.005)
     with pytest.raises(ValueError, match="depth"):
-        pm.plot_aperture_geometry(0.0, width=0.003)
+        pm.building.plot_aperture_geometry(0.0, width=0.003)
 
 
 # ---------------------------------------------------------------------------
@@ -256,30 +260,30 @@ def test_aperture_validation() -> None:
 # ---------------------------------------------------------------------------
 def test_piston_geometry_with_and_without_lobe() -> None:
     angles = np.linspace(-np.pi / 2, np.pi / 2, 91)
-    with_lobe = pm.radiating_piston(
+    with_lobe = pm.electroacoustics.radiating_piston(
         0.1, np.array([500.0, 4000.0]), angles=angles
     )
     ax = with_lobe.plot_geometry()
     assert ax.get_legend() is not None
-    without = pm.radiating_piston(0.1, np.array([500.0]))
+    without = pm.electroacoustics.radiating_piston(0.1, np.array([500.0]))
     ax = without.plot_geometry()
     assert ax.get_legend() is None
     with pytest.raises(ValueError, match="radius"):
-        pm.plot_piston_geometry(0.0)
+        pm.electroacoustics.plot_piston_geometry(0.0)
     with pytest.raises(ValueError, match="together"):
-        pm.plot_piston_geometry(0.1, angles=angles)
+        pm.electroacoustics.plot_piston_geometry(0.1, angles=angles)
 
 
 # ---------------------------------------------------------------------------
 # Plenum.
 # ---------------------------------------------------------------------------
 def test_plenum_geometry_draws_and_validates() -> None:
-    ax = pm.plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
+    ax = pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
     assert ax.get_aspect() == 1.0
     with pytest.raises(ValueError, match="positive"):
-        pm.plot_plenum_geometry(0.0, 1.2, 6.0)
+        pm.noise_control.plot_plenum_geometry(0.0, 1.2, 6.0)
     with pytest.raises(ValueError, match="angle"):
-        pm.plot_plenum_geometry(0.09, 1.2, 6.0, angle=2.0)
+        pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=2.0)
 
 
 # ---------------------------------------------------------------------------
@@ -314,16 +318,16 @@ def test_fdtd_domain_preview() -> None:
 
 def test_device_geometry_language_validation() -> None:
     with pytest.raises(ValueError, match="Unknown language"):
-        pm.plot_plenum_geometry(0.09, 1.2, 6.0, language="fr")
+        pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, language="fr")
     with pytest.raises(ValueError, match="Unknown language"):
-        pm.plot_barrier_geometry(
+        pm.environment.plot_barrier_geometry(
             source_height=1.5, barrier_distance=5.0, barrier_height=3.0,
             receiver_distance=20.0, receiver_height=1.5, language="pt",
         )
 
 
 def test_device_geometry_spanish_labels() -> None:
-    res = pm.barrier_insertion_loss(FREQ, 1.5, 5.0, 3.0, 20.0, 1.5)
+    res = pm.environment.barrier_insertion_loss(FREQ, 1.5, 5.0, 3.0, 20.0, 1.5)
     ax = res.plot_geometry(language="es")
     texts = " ".join(t.get_text() for t in ax.texts) + " " + " ".join(
         t.get_text() for t in ax.get_legend().get_texts()

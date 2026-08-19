@@ -51,7 +51,7 @@ def _airborne_prediction_example() -> tuple[object, ReportMetadata, str]:
         ("intwall", 33.0, 33.5, 15.7, 2.55),
     ]
     for label, rw, kff, kfd, lf in elements:
-        ff, df, fd = ph.flanking_element(
+        ff, df, fd = ph.building.flanking_element(
             label=label,
             r_flanking=rw,
             r_separating=57.0,
@@ -62,7 +62,9 @@ def _airborne_prediction_example() -> tuple[object, ReportMetadata, str]:
             coupling_length=lf,
         )
         paths += [ff, df, fd]
-    result = ph.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
+    result = ph.building.predicted_airborne_insulation(
+        r_direct=57.0, flanking_paths=paths
+    )
     metadata = ReportMetadata(
         specimen="Separating wall, Rs,w = 57 dB (EN 12354-1 Annex H.3)",
         client="Example client",
@@ -95,9 +97,9 @@ def _impact_prediction_example() -> tuple[object, ReportMetadata, str]:
     = 45 dB (Formula 21). The element set and its L'n,w are the standard's own
     worked example, run through the tested prediction code.
     """
-    ln_w_eq = ph.equivalent_impact_level(322.0)
-    k = ph.impact_flanking_correction(322.0, 145.0)
-    result = ph.predicted_impact_insulation(
+    ln_w_eq = ph.building.equivalent_impact_level(322.0)
+    k = ph.building.impact_flanking_correction(322.0, 145.0)
+    result = ph.building.predicted_impact_insulation(
         ln_w_eq=ln_w_eq, delta_l_w=33.0, k_correction=k
     )
     metadata = ReportMetadata(
@@ -187,7 +189,7 @@ def _structure_borne_power_example() -> tuple[object, ReportMetadata, str]:
     """
     freqs = np.array([125, 250, 500, 1000, 2000, 4000], dtype=float)
     lv = np.array([70.0, 72.0, 68.0, 64.0, 60.0, 55.0])
-    result = ph.reception_plate_power(
+    result = ph.building.reception_plate_power(
         lv, freqs, mass_per_area=230.0, area=7.0, reverberation_time=0.25
     )
     metadata = ReportMetadata(
@@ -241,7 +243,7 @@ def _installed_structure_borne_example() -> tuple[object, ReportMetadata, str]:
             "element_area": 12.8,
         },
     ]
-    result = ph.installed_source_prediction(
+    result = ph.building.installed_source_prediction(
         characteristic_power, coupling, paths, frequencies=bands
     )
     metadata = ReportMetadata(
@@ -270,8 +272,11 @@ def _detailed_building() -> tuple[dict[str, Any], np.ndarray, np.ndarray]:
     import iso12354_building as bld
 
     bands = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
-    situ = {key: ph.in_situ_element(el, bands) for key, el in bld.elements().items()}
-    delta = ph.floating_floor_improvement(
+    situ = {
+        key: ph.building.in_situ_element(el, bands)
+        for key, el in bld.elements().items()
+    }
+    delta = ph.building.floating_floor_improvement(
         bands, resonance_frequency=bld.floating_floor_resonance()
     )
     return situ, bands, delta
@@ -296,9 +301,9 @@ def _detailed_airborne_example() -> tuple[object, ReportMetadata, str]:
     import iso12354_building as bld
 
     situ, bands, delta = _detailed_building()
-    result = ph.detailed_airborne_prediction(
+    result = ph.building.detailed_airborne_prediction(
         bands,
-        direct_index=ph.direct_reduction_index(
+        direct_index=ph.building.direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta
         ),
         flanking_paths=bld.airborne_paths(situ, delta),
@@ -337,9 +342,9 @@ def _detailed_impact_example() -> tuple[object, ReportMetadata, str]:
     import iso12354_building as bld
 
     situ, bands, delta = _detailed_building()
-    result = ph.detailed_impact_prediction(
+    result = ph.building.detailed_impact_prediction(
         bands,
-        direct_level=ph.direct_impact_level(
+        direct_level=ph.building.direct_impact_level(
             situ["floor"].impact_level, delta_l=delta
         ),
         flanking_paths=bld.impact_paths(situ, delta),

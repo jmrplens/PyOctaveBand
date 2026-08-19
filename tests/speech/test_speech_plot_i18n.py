@@ -37,7 +37,7 @@ def _labels(ax: object) -> str:
 
 def test_standard_speech_spectrum_es_and_bad_language() -> None:
     """The four vocal efforts are table keys reached through the result."""
-    res = ph.standard_speech_spectra()
+    res = ph.speech.standard_speech_spectra()
     ax = res.plot(language="es")
     legend = [t.get_text() for t in ax.get_legend().get_texts()]
     assert legend == ["Normal", "Elevada", "Fuerte", "Grito"]
@@ -59,7 +59,7 @@ def test_standard_speech_spectrum_es_and_bad_language() -> None:
 )
 def test_sii_procedure_es(method: str, label: str) -> None:
     """All four band-importance labels: each is a key of its own."""
-    ax = ph.sii_procedure(method).plot(language="es")
+    ax = ph.speech.sii_procedure(method).plot(language="es")
     assert ax.get_title() == "ANSI S3.5-1997 función de importancia de banda"
     assert ax.get_ylabel() == "Importancia de banda $I_i$"
     assert [t.get_text() for t in ax.get_legend().get_texts()] == [label]
@@ -67,8 +67,8 @@ def test_sii_procedure_es(method: str, label: str) -> None:
 
 
 def test_sii_es() -> None:
-    res = ph.speech_intelligibility_index(
-        ph.standard_speech_spectrum("normal"), [30.0] * 18
+    res = ph.speech.speech_intelligibility_index(
+        ph.speech.standard_speech_spectrum("normal"), [30.0] * 18
     )
     ax = res.plot(language="es")
     text = _labels(ax)
@@ -83,7 +83,7 @@ def test_sti_es() -> None:
     impulse = np.zeros(FS // 2)
     impulse[0] = 1.0
     impulse[2048] = 0.4
-    res = ph.sti_from_impulse_response(impulse, FS)
+    res = ph.speech.sti_from_impulse_response(impulse, FS)
     ax = res.plot(language="es")
     text = _labels(ax)
     assert "Índice de transferencia de modulación MTI" in text
@@ -96,7 +96,7 @@ def test_sti_es() -> None:
 def test_stoi_es() -> None:
     clean = RNG.standard_normal(FS)
     degraded = clean + 0.2 * RNG.standard_normal(FS)
-    res = ph.stoi(clean, degraded, FS)
+    res = ph.speech.stoi(clean, degraded, FS)
     ax = res.plot(language="es")
     text = _labels(ax)
     assert "Correlación" in text
@@ -104,7 +104,7 @@ def test_stoi_es() -> None:
 
 def test_sti_with_a_non_octave_band_set_es() -> None:
     """A result whose MTI is not the seven octave bands gets a plain axis."""
-    res = ph.STIResult(
+    res = ph.speech.STIResult(
         sti=0.62,
         mti=np.linspace(0.4, 0.8, 5),
         mtf=np.zeros((5, 14)),

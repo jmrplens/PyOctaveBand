@@ -148,7 +148,7 @@ def _sound_absorption_example() -> tuple[object, ReportMetadata, str]:
             2.85,
         ]
     )
-    result = ph.measure_sound_absorption(
+    result = ph.materials.measure_sound_absorption(
         freqs,
         t_empty,
         t_specimen,

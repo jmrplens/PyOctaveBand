@@ -44,7 +44,7 @@ _ENBW_EXACT = [
 
 @pytest.mark.parametrize(("window", "expected"), _ENBW_EXACT)
 def test_enbw_matches_exact_closed_form(window: str, expected: float) -> None:
-    res = ph.window_metrics(window, N)
+    res = ph.signals.window_metrics(window, N)
     assert res.enbw_bins == pytest.approx(expected, rel=1e-12)
 
 
@@ -54,13 +54,13 @@ def test_enbw_matches_exact_closed_form(window: str, expected: float) -> None:
 )
 def test_coherent_gain_exact(window: str, expected: float) -> None:
     # DFT-even cosine sums over full periods leave only the a0 term.
-    res = ph.window_metrics(window, N)
+    res = ph.signals.window_metrics(window, N)
     assert res.coherent_gain == pytest.approx(expected, rel=1e-12)
 
 
 def test_rectangular_scalloping_exact_discrete_form() -> None:
     # |W(1/2)| / |W(0)| = 1 / (N·sin(π/2N)) exactly (Dirichlet kernel).
-    res = ph.window_metrics("boxcar", N)
+    res = ph.signals.window_metrics("boxcar", N)
     exact = 20.0 * np.log10(N * np.sin(np.pi / (2.0 * N)))
     assert res.scalloping_loss_db == pytest.approx(exact, rel=1e-9)
     # Large-N limit: 20·lg(π/2) = 3.9224 dB.
@@ -69,7 +69,7 @@ def test_rectangular_scalloping_exact_discrete_form() -> None:
 
 def test_hann_scalloping_matches_continuous_limit() -> None:
     # W(1/2)/W(0) -> (2/π)/(1 - 1/4) = 8/3π for the continuous Hann kernel.
-    res = ph.window_metrics("hann", N)
+    res = ph.signals.window_metrics("hann", N)
     assert res.scalloping_loss_db == pytest.approx(
         -20.0 * np.log10(8.0 / (3.0 * np.pi)), abs=1e-3
     )
@@ -86,7 +86,7 @@ def test_hann_scalloping_matches_continuous_limit() -> None:
 def test_highest_sidelobe_matches_classic_values(
     window: str, sidelobe_db: float, tol: float
 ) -> None:
-    res = ph.window_metrics(window, N)
+    res = ph.signals.window_metrics(window, N)
     assert res.highest_sidelobe_db == pytest.approx(sidelobe_db, abs=tol)
 
 
@@ -97,18 +97,18 @@ def test_highest_sidelobe_matches_classic_values(
 def test_mainlobe_3db_width_matches_harris_table(
     window: str, width: float
 ) -> None:
-    res = ph.window_metrics(window, N)
+    res = ph.signals.window_metrics(window, N)
     assert res.mainlobe_width_3db_bins == pytest.approx(width, abs=0.01)
 
 
 def test_worst_case_processing_loss() -> None:
     # WCPL = scalloping loss + 10·lg(ENBW): 3.92 dB rectangular (no ENBW
     # term), 3.18 dB Hann (Harris Table 1).
-    rect = ph.window_metrics("boxcar", N)
+    rect = ph.signals.window_metrics("boxcar", N)
     assert rect.worst_case_processing_loss_db == pytest.approx(
         rect.scalloping_loss_db
     )
-    hann = ph.window_metrics("hann", N)
+    hann = ph.signals.window_metrics("hann", N)
     assert hann.worst_case_processing_loss_db == pytest.approx(3.18, abs=0.01)
 
 
@@ -116,16 +116,16 @@ def test_enbw_hz_matches_welch_resolution_bandwidth() -> None:
     # The PSD estimator reports Bₑ = fs·Σw²/(Σw)² per segment; it must be
     # the same number window_metrics reports as ENBW·fs/n.
     fs, nperseg = 48000.0, 2048
-    x = ph.noise_signal(fs, 1.0, seed=6)
-    psd = ph.power_spectral_density(x, fs, nperseg=nperseg)
-    metrics = ph.window_metrics("hann", nperseg)
+    x = ph.signals.noise_signal(fs, 1.0, seed=6)
+    psd = ph.signals.power_spectral_density(x, fs, nperseg=nperseg)
+    metrics = ph.signals.window_metrics("hann", nperseg)
     assert psd.resolution_bandwidth == pytest.approx(
         metrics.enbw_hz(fs), rel=1e-12
     )
 
 
 def test_parametric_windows_are_accepted() -> None:
-    res = ph.window_metrics(("kaiser", 8.6), 512)
+    res = ph.signals.window_metrics(("kaiser", 8.6), 512)
     assert res.enbw_bins > 1.5
     assert res.highest_sidelobe_db < -60.0
     assert res.n == 512
@@ -133,20 +133,20 @@ def test_parametric_windows_are_accepted() -> None:
 
 
 def test_window_metrics_result_is_frozen() -> None:
-    res = ph.window_metrics("hann", N)
+    res = ph.signals.window_metrics("hann", N)
     with pytest.raises(dataclasses.FrozenInstanceError):
         res.enbw_bins = 2.0  # type: ignore[misc]
 
 
 def test_window_metrics_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="Unknown window"):
-        ph.window_metrics("not-a-window", N)
+        ph.signals.window_metrics("not-a-window", N)
     with pytest.raises(ValueError, match="at least 16"):
-        ph.window_metrics("hann", 8)
+        ph.signals.window_metrics("hann", 8)
 
 
 def test_window_metrics_plot_two_panels_and_single_axes() -> None:
-    res = ph.window_metrics("hann", N)
+    res = ph.signals.window_metrics("hann", N)
     axes = res.plot(linewidth=2)
     assert isinstance(axes, np.ndarray)
     assert axes.size == 2

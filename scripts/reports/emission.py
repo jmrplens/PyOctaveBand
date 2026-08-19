@@ -38,7 +38,7 @@ def _epnl_example() -> tuple[object, ReportMetadata, str]:
     gain = 24.0 * np.exp(-((idx - 12.0) ** 2) / (2 * 3.5**2)) - 3.0
     spectra = (46.0 + shape)[None, :] + gain[:, None]
     spectra[:, 17] += 10.0 * np.exp(-((idx - 12.0) ** 2) / (2 * 4.0**2))  # 2500 Hz tone
-    result = ph.effective_perceived_noise_level(spectra, dt)
+    result = ph.aircraft.effective_perceived_noise_level(spectra, dt)
     metadata = ReportMetadata(
         specimen="Example twin-turbofan transport (synthetic flyover)",
         manufacturer="Example Aircraft Company",
@@ -65,7 +65,7 @@ def _iso4871_declaration_example() -> tuple[object, ReportMetadata, str]:
     (clause 6.2): mode 1 passes (89 <= 90) and mode 2 fails (98 > 97),
     exercising the verdict both ways.
     """
-    mode1 = ph.OperatingModeDeclaration(
+    mode1 = ph.emission.OperatingModeDeclaration(
         mode="Operating mode 1",
         sound_power_level=88.0,
         sound_power_uncertainty=2.0,
@@ -73,7 +73,7 @@ def _iso4871_declaration_example() -> tuple[object, ReportMetadata, str]:
         emission_pressure_uncertainty=2.0,
         verification_level=89.0,
     )
-    mode2 = ph.OperatingModeDeclaration(
+    mode2 = ph.emission.OperatingModeDeclaration(
         mode="Operating mode 2",
         sound_power_level=95.0,
         sound_power_uncertainty=2.0,
@@ -81,7 +81,7 @@ def _iso4871_declaration_example() -> tuple[object, ReportMetadata, str]:
         emission_pressure_uncertainty=2.0,
         verification_level=98.0,
     )
-    result = ph.NoiseEmissionDeclaration(
+    result = ph.emission.NoiseEmissionDeclaration(
         modes=(mode1, mode2),
         machine="Type 990, Model 11-TC",
         operating_conditions="50 Hz, 230 V, rated load",

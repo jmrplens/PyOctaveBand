@@ -33,13 +33,13 @@ _NTA = "Impulsive-sound prominence (NT ACOU 112)"
 
 @register(_NTA, "NT ACOU 112:2002 Formula 1", "Predicted prominence, OR=1000 dB/s, LD=30 dB")
 def _chk_impulse_prominence() -> Outcome:
-    value = float(ph.predicted_prominence(1000.0, 30.0))
+    value = float(ph.environment.predicted_prominence(1000.0, 30.0))
     return numeric(ref.NTACOU112_PROMINENCE, value, 1e-4, places=4)
 
 
 @register(_NTA, "NT ACOU 112:2002 Formula 2", "Adjustment KI to LAeq at prominence P=10")
 def _chk_impulse_adjustment() -> Outcome:
-    value = float(ph.impulse_adjustment(10.0))
+    value = float(ph.environment.impulse_adjustment(10.0))
     return numeric(ref.NTACOU112_ADJUSTMENT_P10, value, 1e-9, unit="dB", places=3)
 
 
@@ -66,7 +66,9 @@ def _chk_iso1996_3_onset_rate() -> Outcome:
 
 @register(_ISO1996_3, "ISO/PAS 1996-3:2022 Formula 3", "Adjustment KI of the ramp onset")
 def _chk_iso1996_3_adjustment() -> Outcome:
-    value = float(ph.impulse_adjustment(_iso1996_3_ramp_onset().prominence))
+    value = float(
+        ph.environment.impulse_adjustment(_iso1996_3_ramp_onset().prominence)
+    )
     return numeric(ref.ISO1996_3_RAMP_ADJUSTMENT, value, 1e-6, unit="dB", places=4)
 
 
@@ -75,18 +77,28 @@ _RN = "Room noise (ANSI S12.2-2019)"
 
 @register(_RN, "ANSI S12.2-2019 Table 1", "NC-40 curve, tangency self-consistency")
 def _chk_rn_nc_self() -> Outcome:
-    rating = ph.noise_criterion(ph.nc_curve(40.0)).tangency_rating
+    rating = ph.room.noise_criterion(ph.room.nc_curve(40.0)).tangency_rating
     return numeric(ref.ANSIS12_2_NC40_SELF, rating, 1e-9, places=3)
 
 
 @register(_RN, "ANSI S12.2-2019 Table D.1", "RC-31 Mark II curve, 63 Hz level")
 def _chk_rn_rc_curve() -> Outcome:
-    return numeric(ref.ANSIS12_2_RC31_63HZ, float(ph.rc_curve(31.0)[2]), 1e-9, places=3)
+    return numeric(
+        ref.ANSIS12_2_RC31_63HZ,
+        float(ph.room.rc_curve(31.0)[2]),
+        1e-9,
+        places=3,
+    )
 
 
 @register(_RN, "ANSI S12.2-2019 clause D.4", "RC-35 curve, mid-frequency average LMF")
 def _chk_rn_rc_lmf() -> Outcome:
-    return numeric(ref.ANSIS12_2_RC35_LMF, ph.room_criterion(ph.rc_curve(35.0)).lmf, 1e-9, places=3)
+    return numeric(
+        ref.ANSIS12_2_RC35_LMF,
+        ph.room.room_criterion(ph.room.rc_curve(35.0)).lmf,
+        1e-9,
+        places=3,
+    )
 
 
 _HEAR = "Hearing threshold (ISO 7029 / ISO 389-7)"
@@ -94,19 +106,19 @@ _HEAR = "Hearing threshold (ISO 7029 / ISO 389-7)"
 
 @register(_HEAR, "ISO 7029:2017 Table 1", "Median threshold, male age 60 at 4 kHz")
 def _chk_hearing_median() -> Outcome:
-    value = float(ph.age_threshold(60, "male", 0.5).median[8])
+    value = float(ph.hearing.age_threshold(60, "male", 0.5).median[8])
     return numeric(ref.ISO7029_MEDIAN_MALE_60_4KHZ, value, 1e-3, unit="dB", places=3)
 
 
 @register(_HEAR, "ISO 7029:2017 Table 2", "Upper spread su, male age 60 at 1 kHz")
 def _chk_hearing_spread() -> Outcome:
-    value = float(ph.age_threshold(60, "male", 0.5).spread_upper[4])
+    value = float(ph.hearing.age_threshold(60, "male", 0.5).spread_upper[4])
     return numeric(ref.ISO7029_SU_MALE_60_1KHZ, value, 1e-3, unit="dB", places=3)
 
 
 @register(_HEAR, "ISO 389-7:2005 Table 1", "Free-field reference threshold at 1 kHz")
 def _chk_hearing_reference() -> Outcome:
-    value = float(ph.reference_threshold("free-field")[4])
+    value = float(ph.hearing.reference_threshold("free-field")[4])
     return numeric(ref.ISO389_7_REF_FREE_1KHZ, value, 1e-9, unit="dB", places=3)
 
 
@@ -115,8 +127,10 @@ _GUM = "Measurement uncertainty (GUM / Supplement 1)"
 
 @register(_GUM, "ISO/IEC Guide 98-3-1 clause 9.2", "Combined uncertainty, additive model")
 def _chk_gum_additive() -> Outcome:
-    quantities = [ph.Quantity(0.0, 1.0) for _ in range(4)]
-    result = ph.combine_uncertainty(lambda a, b, c, d: a + b + c + d, quantities)
+    quantities = [ph.metrology.Quantity(0.0, 1.0) for _ in range(4)]
+    result = ph.metrology.combine_uncertainty(
+        lambda a, b, c, d: a + b + c + d, quantities
+    )
     return numeric(ref.GUM_ADDITIVE_UC, result.combined_uncertainty, 1e-9, places=4)
 
 
@@ -129,17 +143,22 @@ def _chk_gum_coverage() -> Outcome:
 
 @register(_GUM, "ISO/IEC Guide 98-3 Annex G.4", "Welch-Satterthwaite effective dof")
 def _chk_gum_welch() -> Outcome:
-    quantities = [ph.Quantity(0.0, 1.0, dof=10) for _ in range(4)]
-    result = ph.combine_uncertainty(lambda a, b, c, d: a + b + c + d, quantities)
+    quantities = [ph.metrology.Quantity(0.0, 1.0, dof=10) for _ in range(4)]
+    result = ph.metrology.combine_uncertainty(
+        lambda a, b, c, d: a + b + c + d, quantities
+    )
     return numeric(ref.GUM_WELCH_VEFF, result.effective_dof, 1e-6, places=3)
 
 
 def _gum_h1_result() -> Any:
-    quantities = [ph.Quantity(v, unc, dof=dof) for v, unc, dof in ref.GUM_H1_INPUTS]
+    quantities = [
+        ph.metrology.Quantity(v, unc, dof=dof)
+        for v, unc, dof in ref.GUM_H1_INPUTS
+    ]
     with warnings.catch_warnings():
         # alphaS and theta are genuinely flat directions at the H.1 estimates.
         warnings.simplefilter("ignore")
-        return ph.combine_uncertainty(
+        return ph.metrology.combine_uncertainty(
             lambda ls, d, a_s, th, da, dth: ls + d - ls * (da * th + a_s * dth),
             quantities,
         )
@@ -169,8 +188,8 @@ def _chk_gum_h2_correlated() -> Outcome:
     means = obs.mean(axis=0)
     u_means = obs.std(axis=0, ddof=1) / math.sqrt(obs.shape[0])
     r = np.corrcoef(obs.T)
-    quantities = [ph.Quantity(m, s) for m, s in zip(means, u_means)]
-    result = ph.combine_uncertainty(
+    quantities = [ph.metrology.Quantity(m, s) for m, s in zip(means, u_means)]
+    result = ph.metrology.combine_uncertainty(
         lambda v, i, p: v / i * math.cos(p), quantities, correlation=r
     )
     return numeric(
@@ -185,8 +204,10 @@ def _chk_gum_h2_correlated() -> Outcome:
     "Seeded Monte Carlo, rectangular sum: 95 % interval endpoint",
 )
 def _chk_gum_s1_table3_monte_carlo() -> Outcome:
-    quantities = [ph.Quantity(0.0, 1.0, "rectangular") for _ in range(4)]
-    mc = ph.monte_carlo(
+    quantities = [
+        ph.metrology.Quantity(0.0, 1.0, "rectangular") for _ in range(4)
+    ]
+    mc = ph.metrology.monte_carlo(
         lambda a, b, c, d: a + b + c + d, quantities,
         trials=1_000_000, coverage=0.95, seed=1996,
     )
@@ -206,19 +227,19 @@ _NIHL = "Noise-induced hearing loss (ISO 1999)"
 
 @register(_NIHL, "ISO 1999:2013 Table D.2", "Median NIPTS, 4 kHz, 90 dB, 20 yr")
 def _chk_nihl_median() -> Outcome:
-    value = float(ph.nipts(90.0, 20.0, 0.5).value[4])
+    value = float(ph.hearing.nipts(90.0, 20.0, 0.5).value[4])
     return numeric(ref.ISO1999_N50_4K_90_20, value, 0.5, unit="dB", places=1)
 
 
 @register(_NIHL, "ISO 1999:2013 Table D.2", "Worst-10 % NIPTS, 4 kHz, 90 dB, 20 yr")
 def _chk_nihl_fractile() -> Outcome:
-    value = float(ph.nipts(90.0, 20.0, 0.9).value[4])
+    value = float(ph.hearing.nipts(90.0, 20.0, 0.9).value[4])
     return numeric(ref.ISO1999_N10_4K_90_20, value, 0.5, unit="dB", places=1)
 
 
 @register(_NIHL, "ISO 1999:2013 Table D.4", "Worst-10 % NIPTS, 3 kHz, 100 dB, 40 yr")
 def _chk_nihl_high() -> Outcome:
-    value = float(ph.nipts(100.0, 40.0, 0.9).value[3])
+    value = float(ph.hearing.nipts(100.0, 40.0, 0.9).value[3])
     return numeric(ref.ISO1999_N10_3K_100_40, value, 0.5, unit="dB", places=1)
 
 
@@ -230,7 +251,9 @@ def _chk_nihl_high() -> Outcome:
 def _chk_nihl_annex_c_nipts() -> Outcome:
     """The Table D.2 shifts the Annex C example takes as its noise input."""
     value = np.round(
-        ph.nipts(90.0, 30.0, 0.9, frequencies=[1000.0, 2000.0, 4000.0]).value
+        ph.hearing.nipts(
+            90.0, 30.0, 0.9, frequencies=[1000.0, 2000.0, 4000.0]
+        ).value
     )
     expected = np.asarray(ref.ISO1999_ANNEX_C_N, dtype=float)
     delta = float(np.max(np.abs(value - expected)))
@@ -252,7 +275,7 @@ def _chk_nihl_annex_c_compression() -> Outcome:
     h = ref.ISO1999_ANNEX_C_H[2]
     n = ref.ISO1999_ANNEX_C_N[2]
     # H' - H is what Formula (1) leaves of the noise component at that band.
-    value = float(ph.combine_age_and_noise(h, n)) - h
+    value = float(ph.hearing.combine_age_and_noise(h, n)) - h
     return numeric(
         ref.ISO1999_ANNEX_C_N_4K_COMPRESSED, value, 0.05, unit="dB", places=1
     )
@@ -276,7 +299,7 @@ def _chk_nihl_annex_c_htlan() -> Outcome:
     """
     h = np.asarray(ref.ISO1999_ANNEX_C_H, dtype=float)
     n = np.asarray(ref.ISO1999_ANNEX_C_N, dtype=float)
-    compressed = ph.combine_age_and_noise(h, n) - h
+    compressed = ph.hearing.combine_age_and_noise(h, n) - h
     noise = np.where(h + n > ref.ISO1999_ANNEX_C_COMPRESSION_FENCE, compressed, n)
     value = float(np.mean(h) + np.mean(noise))
     return numeric(ref.ISO1999_ANNEX_C_HTLAN, value, 0.05, unit="dB", places=1)
@@ -287,22 +310,35 @@ _MSV = "Multiple-shock whole-body vibration (ISO 2631-5)"
 
 @register(_MSV, "ISO 2631-5:2018 Formula 3", "Daily acceleration dose, 5 x 40 m/s2 peaks")
 def _chk_multiple_shock_dose() -> Outcome:
-    value = ph.dose_from_peaks([40.0] * 5)
+    value = ph.vibration.dose_from_peaks([40.0] * 5)
     return numeric(ref.ISO2631_5_DZD_MALE, value, 0.01, unit="m/s2", places=2)
 
 
 @register(_MSV, "ISO 2631-5:2018 Formula C.3", "Stress variable R, Annex C male example")
 def _chk_multiple_shock_risk() -> Outcome:
-    sd = ph.compression_dose(ph.dose_from_peaks([40.0] * 5))
-    value = ph.injury_risk(sd, start_age=20, years=20, days_per_year=120, sex="male")
+    sd = ph.vibration.compression_dose(
+        ph.vibration.dose_from_peaks([40.0] * 5)
+    )
+    value = ph.vibration.injury_risk(
+        sd, start_age=20, years=20, days_per_year=120, sex="male"
+    )
     return numeric(ref.ISO2631_5_R_MALE, value, 0.01, places=2)
 
 
 @register(_MSV, "ISO 2631-5:2018 Formula C.5", "Injury probability, Annex C male example")
 def _chk_multiple_shock_probability() -> Outcome:
-    sd = ph.compression_dose(ph.dose_from_peaks([40.0] * 5))
-    r = ph.injury_risk(sd, start_age=20, years=20, days_per_year=120, sex="male")
-    return numeric(ref.ISO2631_5_PI_MALE, float(ph.injury_probability(r)), 0.01, places=2)
+    sd = ph.vibration.compression_dose(
+        ph.vibration.dose_from_peaks([40.0] * 5)
+    )
+    r = ph.vibration.injury_risk(
+        sd, start_age=20, years=20, days_per_year=120, sex="male"
+    )
+    return numeric(
+        ref.ISO2631_5_PI_MALE,
+        float(ph.vibration.injury_probability(r)),
+        0.01,
+        places=2,
+    )
 
 
 @register(
@@ -311,7 +347,9 @@ def _chk_multiple_shock_probability() -> Outcome:
 def _chk_multiple_shock_female_sd() -> Outcome:
     from phonometry.vibration.human.multiple_shock import MZ_FEMALE
 
-    sd = ph.compression_dose(ph.dose_from_peaks([40.0] * 5), mz=MZ_FEMALE)
+    sd = ph.vibration.compression_dose(
+        ph.vibration.dose_from_peaks([40.0] * 5), mz=MZ_FEMALE
+    )
     return numeric(ref.ISO2631_5_SD_FEMALE, sd, 0.01, unit="MPa", places=2)
 
 
@@ -321,8 +359,12 @@ def _chk_multiple_shock_female_sd() -> Outcome:
 def _chk_multiple_shock_female_r() -> Outcome:
     from phonometry.vibration.human.multiple_shock import MZ_FEMALE
 
-    sd = ph.compression_dose(ph.dose_from_peaks([40.0] * 5), mz=MZ_FEMALE)
-    r = ph.injury_risk(sd, start_age=20, years=20, days_per_year=120, sex="female")
+    sd = ph.vibration.compression_dose(
+        ph.vibration.dose_from_peaks([40.0] * 5), mz=MZ_FEMALE
+    )
+    r = ph.vibration.injury_risk(
+        sd, start_age=20, years=20, days_per_year=120, sex="female"
+    )
     return numeric(ref.ISO2631_5_R_FEMALE, r, 0.01, places=2)
 
 
@@ -333,7 +375,7 @@ def _chk_multiple_shock_female_r() -> Outcome:
 )
 def _chk_multiple_shock_annex_d_filter() -> Outcome:
     freqs = np.array([0.5, 2.0, 5.0, 10.0, 20.0, 40.0, 60.0, 80.0])
-    formula = np.abs(ph.seat_to_spine_transfer(freqs))
+    formula = np.abs(ph.vibration.seat_to_spine_transfer(freqs))
     _, h = sg.freqz(
         ref.ISO2631_5_ANNEX_D_B,
         ref.ISO2631_5_ANNEX_D_A,
@@ -351,12 +393,18 @@ _ABS = "Sound absorption in enclosed spaces (EN 12354-6)"
 
 @register(_ABS, "EN 12354-6:2003 Formula 1", "Equivalent absorption area, Annex E bare room")
 def _chk_enclosed_space_area() -> Outcome:
-    value = float(ph.equivalent_absorption_area(ref.EN12354_6_ANNEX_E_BARE_SURFACES))
+    value = float(
+        ph.room.equivalent_absorption_area(ref.EN12354_6_ANNEX_E_BARE_SURFACES)
+    )
     return numeric(ref.EN12354_6_A_BARE, value, 0.01, unit="m2", places=2)
 
 
 @register(_ABS, "EN 12354-6:2003 Formula 5", "Reverberation time, Annex E bare room")
 def _chk_enclosed_space_rt() -> Outcome:
-    area = ph.equivalent_absorption_area(ref.EN12354_6_ANNEX_E_BARE_SURFACES)
-    value = float(ph.reverberation_time(area, ref.EN12354_6_ANNEX_E_VOLUME))
+    area = ph.room.equivalent_absorption_area(
+        ref.EN12354_6_ANNEX_E_BARE_SURFACES
+    )
+    value = float(
+        ph.room.reverberation_time(area, ref.EN12354_6_ANNEX_E_VOLUME)
+    )
     return numeric(ref.EN12354_6_T_BARE, value, 0.05, unit="s", places=1)

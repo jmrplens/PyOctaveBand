@@ -42,7 +42,9 @@ N = 1 << 19
 
 
 def _white(seed: int, rms: float = 1.0, n: int = N) -> np.ndarray:
-    return ph.noise_signal(FS, n / FS, color="white", rms=rms, seed=seed)
+    return ph.signals.noise_signal(
+        FS, n / FS, color="white", rms=rms, seed=seed
+    )
 
 
 def _fir(x: np.ndarray, taps: list[float]) -> np.ndarray:
@@ -110,7 +112,7 @@ def test_conditioned_matrix_is_hermitian_with_positive_diagonal() -> None:
     x1 = _white(1)
     x2 = 0.6 * x1 + _white(2)
     y = _fir(x1, [1.0, 0.4]) + _fir(x2, [0.3, -0.5]) + _white(3, rms=0.3)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     band = _band(res.frequencies)
     # Conditioned residual noise (a genuine autospectrum) stays non-negative.
     assert np.all(res.noise_psd[band] >= 0.0)
@@ -133,7 +135,7 @@ def test_multiple_coherence_equals_snr_over_one_plus_snr() -> None:
     x2 = _white(11)
     noise = _white(12, rms=0.5)
     y = x1 + x2 + noise
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=1024)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=1024)
     band = _band(res.frequencies)
     snr = 2.0 / 0.25
     assert float(np.median(res.multiple_coherence[band])) == pytest.approx(
@@ -145,7 +147,7 @@ def test_multiple_coherence_is_one_for_noiseless_system() -> None:
     x1 = _white(20)
     x2 = _white(21)
     y = _fir(x1, [1.0, 0.5]) + _fir(x2, [0.3, -0.2, 0.1])
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=1024)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=1024)
     band = _band(res.frequencies)
     # No output noise: multiple coherence is 1 within the estimator bias.
     assert float(np.median(res.multiple_coherence[band])) == pytest.approx(
@@ -162,7 +164,7 @@ def test_independent_inputs_partial_equals_ordinary() -> None:
     x1 = _white(30)
     x2 = _white(31)
     y = _fir(x1, [1.0, 0.5, -0.3]) + _fir(x2, [0.2, -0.6, 0.4]) + _white(32, rms=0.3)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     band = _band(res.frequencies)
     for i in (0, 1):
         diff = np.abs(res.partial_coherence[i][band]
@@ -176,7 +178,7 @@ def test_independent_inputs_multiple_equals_sum_of_ordinary() -> None:
     x1 = _white(40)
     x2 = _white(41)
     y = _fir(x1, [1.0, 0.5]) + _fir(x2, [0.2, -0.6, 0.4]) + _white(42, rms=0.3)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     band = _band(res.frequencies)
     diff = res.multiple_coherence[band] - res.ordinary_coherence[:, band].sum(axis=0)
     # Both sides carry the O(q/nd) coherence bias of Section 9.3 (here nd is a
@@ -207,7 +209,7 @@ def test_four_uncorrelated_inputs_general_q_identity() -> None:
         + _fir(x3, [-0.3, 0.5, 0.1])
         + _white(54, rms=0.6)
     )
-    res = ph.miso_coherence([x0, x1, x2, x3], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x0, x1, x2, x3], y, FS, nperseg=2048)
 
     # (a) general q >= 2 no longer raises, and (d) every array carries q = 4.
     assert res.n_inputs == 4
@@ -243,7 +245,7 @@ def test_correlated_input_ordinary_inflated_but_partial_near_zero() -> None:
     x1 = _white(50)
     x2 = 0.8 * x1 + _white(51)
     y = _fir(x1, [1.0, 0.5, -0.3]) + _white(52, rms=0.3)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     band = _band(res.frequencies)
     ordinary_x2 = float(np.median(res.ordinary_coherence[1][band]))
     partial_x2 = float(np.median(res.partial_coherence[1][band]))
@@ -259,7 +261,7 @@ def test_partial_coherence_recovers_true_conditioned_gain() -> None:
     x1 = _white(60)
     x2 = 0.7 * x1 + _white(61)
     y = _fir(x1, [1.0, -0.4, 0.2]) + _white(62, rms=0.2)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     band = _band(res.frequencies)
     share_x1 = res.coherent_output_spectra[0][band]
     share_x2 = res.coherent_output_spectra[1][band]
@@ -277,7 +279,7 @@ def test_output_power_decomposition_is_exact() -> None:
     x3 = _white(72)
     y = (_fir(x1, [1.0, 0.3]) + _fir(x2, [0.4, -0.5])
          + _fir(x3, [0.2, 0.1]) + _white(73, rms=0.3))
-    res = ph.miso_coherence([x1, x2, x3], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2, x3], y, FS, nperseg=2048)
     reconstructed = res.coherent_output_spectra.sum(axis=0) + res.noise_psd
     np.testing.assert_allclose(reconstructed, res.output_psd, rtol=1e-9)
 
@@ -286,7 +288,7 @@ def test_multiple_coherence_equals_sum_of_partials() -> None:
     x1 = _white(80)
     x2 = 0.5 * x1 + _white(81)
     y = _fir(x1, [1.0, 0.3]) + _fir(x2, [0.4, -0.5]) + _white(82, rms=0.3)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     np.testing.assert_allclose(
         res.multiple_coherence, res.partial_coherence.sum(axis=0), atol=1e-12
     )
@@ -324,7 +326,7 @@ def test_near_collinear_inputs_preserve_decomposition() -> None:
     x1 = _white(200)
     x2 = _fir(x1, [1.0, 0.2]) + _white(201, rms=1e-4)
     y = _fir(x1, [0.8, -0.3]) + _fir(x2, [0.1, 0.05]) + _white(202, rms=0.2)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     reconstructed = res.coherent_output_spectra.sum(axis=0) + res.noise_psd
     assert np.all(np.isfinite(res.coherent_output_spectra))
     assert np.all(np.isfinite(res.partial_coherence))
@@ -335,8 +337,12 @@ def test_ordinary_and_multiple_coherence_are_order_invariant() -> None:
     x1 = _white(90)
     x2 = 0.5 * x1 + _white(91)
     y = _fir(x1, [1.0, 0.3]) + _fir(x2, [0.4, -0.5]) + _white(92, rms=0.3)
-    forward = ph.miso_coherence([x1, x2], y, FS, nperseg=2048, order=(0, 1))
-    reverse = ph.miso_coherence([x1, x2], y, FS, nperseg=2048, order=(1, 0))
+    forward = ph.signals.miso_coherence(
+        [x1, x2], y, FS, nperseg=2048, order=(0, 1)
+    )
+    reverse = ph.signals.miso_coherence(
+        [x1, x2], y, FS, nperseg=2048, order=(1, 0)
+    )
     np.testing.assert_allclose(
         forward.ordinary_coherence, reverse.ordinary_coherence, atol=1e-12
     )
@@ -360,7 +366,7 @@ def test_dominant_input_tracks_the_band_with_more_power() -> None:
     hp = sp_signal.butter(4, 2000.0, btype="high", fs=FS, output="sos")
     y = (sp_signal.sosfilt(lp, x1) + sp_signal.sosfilt(hp, x2)
          + _white(102, rms=0.05))
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=2048)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=2048)
     dom = res.dominant_input()
     freqs = res.frequencies
     low = (freqs > 150.0) & (freqs < 400.0)
@@ -379,7 +385,7 @@ def test_multiple_coherence_random_error_matches_bendat_piersol() -> None:
     x2 = _white(111)
     noise = _white(112, rms=0.5)
     y = x1 + x2 + noise
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=1024)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=1024)
     band = _band(res.frequencies)
     gamma2 = float(np.median(res.multiple_coherence[band]))
     eff = res.n_averages - (res.n_inputs - 1)
@@ -399,7 +405,7 @@ def test_plot_returns_two_panels(language: str) -> None:
     x1 = _white(120, n=1 << 17)
     x2 = 0.5 * x1 + _white(121, n=1 << 17)
     y = _fir(x1, [1.0, 0.3]) + _fir(x2, [0.4, -0.5]) + _white(122, rms=0.3, n=1 << 17)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=1024)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=1024)
     axes = res.plot(language=language)
     assert np.asarray(axes).size == 2
     plt.close("all")
@@ -409,7 +415,7 @@ def test_plot_on_given_axis_draws_spectra_panel() -> None:
     x1 = _white(130, n=1 << 17)
     x2 = _white(131, n=1 << 17)
     y = x1 + x2 + _white(132, rms=0.3, n=1 << 17)
-    res = ph.miso_coherence([x1, x2], y, FS, nperseg=1024)
+    res = ph.signals.miso_coherence([x1, x2], y, FS, nperseg=1024)
     _fig, ax = plt.subplots()
     returned = res.plot(ax=ax)
     assert returned is ax
@@ -425,7 +431,7 @@ def test_rejects_single_input() -> None:
     x1 = _white(140, n=1 << 14)
     y = x1.copy()
     with pytest.raises(ValueError, match="at least two"):
-        ph.miso_coherence([x1], y, FS)
+        ph.signals.miso_coherence([x1], y, FS)
 
 
 def test_rejects_mismatched_length() -> None:
@@ -433,7 +439,7 @@ def test_rejects_mismatched_length() -> None:
     x2 = _white(171, n=1 << 13)
     y = _white(172, n=1 << 14)
     with pytest.raises(ValueError, match="same length"):
-        ph.miso_coherence([x1, x2], y, FS)
+        ph.signals.miso_coherence([x1, x2], y, FS)
 
 
 def test_rejects_bad_order() -> None:
@@ -441,7 +447,7 @@ def test_rejects_bad_order() -> None:
     x2 = _white(181, n=1 << 14)
     y = x1 + x2
     with pytest.raises(ValueError, match="permutation"):
-        ph.miso_coherence([x1, x2], y, FS, order=(0, 0))
+        ph.signals.miso_coherence([x1, x2], y, FS, order=(0, 0))
 
 
 def test_accepts_2d_input_array() -> None:
@@ -449,5 +455,5 @@ def test_accepts_2d_input_array() -> None:
     x2 = _white(191, n=1 << 16)
     y = x1 + x2 + _white(192, rms=0.3, n=1 << 16)
     stacked = np.vstack([x1, x2])
-    res = ph.miso_coherence(stacked, y, FS, nperseg=1024)
+    res = ph.signals.miso_coherence(stacked, y, FS, nperseg=1024)
     assert res.n_inputs == 2

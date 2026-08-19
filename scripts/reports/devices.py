@@ -22,8 +22,10 @@ def _filter_class_example() -> tuple[object, ReportMetadata, str]:
     4 kHz clears class 1 across every band, so the fiche boxes a Class 1
     COMPLIES result and passes the required-class-1 verdict.
     """
-    bank = ph.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-    result = ph.filter_class_compliance(bank)
+    bank = ph.filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=6, limits=[125, 4000]
+    )
+    result = ph.filters.filter_class_compliance(bank)
     metadata = ReportMetadata(
         specimen="1/1-octave filter bank",
         client="Example client",
@@ -47,8 +49,10 @@ def _filter_class_1995_example() -> tuple[object, ReportMetadata, str]:
     that mask, and the default (order 6) octave bank clears the stricter
     class 0, so the fiche boxes a Class 0 COMPLIES result.
     """
-    bank = ph.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
-    result = ph.filter_class_compliance(bank, edition="1995")
+    bank = ph.filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=6, limits=[250, 4000]
+    )
+    result = ph.filters.filter_class_compliance(bank, edition="1995")
     metadata = ReportMetadata(
         specimen="1/1-octave filter bank",
         client="Example client",
@@ -78,11 +82,17 @@ def _intensity_class_example() -> tuple[object, ReportMetadata, str]:
     required-class-1 verdict, showing both halves of the layout at once.
     """
     spacing = 0.012
-    freqs, _, _ = ph.residual_index_limits("instrument", spacing=spacing)
+    freqs, _, _ = ph.emission.residual_index_limits(
+        "instrument", spacing=spacing
+    )
     phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)  # degrees
-    measured = ph.residual_index_from_phase_mismatch(phase_mismatch, freqs, spacing)
+    measured = ph.emission.residual_index_from_phase_mismatch(
+        phase_mismatch, freqs, spacing
+    )
     measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
-    result = ph.intensity_class_compliance(measured, freqs, spacing=spacing)
+    result = ph.emission.intensity_class_compliance(
+        measured, freqs, spacing=spacing
+    )
     metadata = ReportMetadata(
         specimen="p-p sound intensity probe and analyser, 12 mm spacer",
         client="Example client",
@@ -127,11 +137,11 @@ def _loudspeaker_example() -> tuple[object, ReportMetadata, str]:
     thd_percent = 0.3 + 2.6 * np.exp(-((np.log2(thd_freqs / 70.0)) ** 2) / 0.45)
 
     angles = np.radians(np.linspace(0.0, 90.0, 46))
-    directivity = ph.radiating_piston(
+    directivity = ph.electroacoustics.radiating_piston(
         0.075, np.array([1000.0, 2000.0, 4000.0]), angles=angles
     )
 
-    result = ph.loudspeaker_characteristics(
+    result = ph.electroacoustics.loudspeaker_characteristics(
         freqs,
         spl,
         8.0,
@@ -139,10 +149,10 @@ def _loudspeaker_example() -> tuple[object, ReportMetadata, str]:
         tolerance_db=3.0,
         impedance=(imp_freqs, impedance),
         distortion=(thd_freqs, thd_percent),
-        directivity=ph.LoudspeakerDirectivity(
+        directivity=ph.electroacoustics.LoudspeakerDirectivity(
             piston=directivity, frequency=2000.0
         ),
-        ratings=ph.LoudspeakerRatings(
+        ratings=ph.electroacoustics.LoudspeakerRatings(
             frequency_range=(45.0, 22000.0),
             noise_power=80.0,
             sinusoidal_power=120.0,
@@ -202,24 +212,24 @@ def _microphone_example() -> tuple[object, ReportMetadata, str]:
         18.0 - 5.4 * np.log2(noise_freqs / 20.0) + 1.5 * np.sin(np.log2(noise_freqs))
     )
 
-    result = ph.microphone_characteristics(
+    result = ph.electroacoustics.microphone_characteristics(
         freqs,
         response,
         12.5,
         tolerance_db=3.0,
-        directivity=ph.MicrophoneDirectivity(
+        directivity=ph.electroacoustics.MicrophoneDirectivity(
             polar=(angles, cardioid_db),
             frequency=1000.0,
         ),
-        noise=ph.MicrophoneNoise(
+        noise=ph.electroacoustics.MicrophoneNoise(
             voltage=1.25e-6,
             spectrum=(noise_freqs, noise_levels),
         ),
-        overload=ph.MicrophoneOverload(
+        overload=ph.electroacoustics.MicrophoneOverload(
             distortion=(thd_spl, thd_percent),
             thd_percent=0.5,
         ),
-        electrical=ph.MicrophoneElectrical(
+        electrical=ph.electroacoustics.MicrophoneElectrical(
             rated_impedance=150.0,
             minimum_load_impedance=1000.0,
             powering="Phantom P48 (IEC 61938)",

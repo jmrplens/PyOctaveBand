@@ -45,7 +45,7 @@ def test_zwicker_stationary_returns_single_axes_with_specific_curve() -> None:
 
 def test_zwicker_time_varying_returns_two_panels() -> None:
     sig = RNG.standard_normal(FS) * 0.02  # 1 s of noise
-    res = ph.loudness_zwicker(sig, FS, stationary=False)
+    res = ph.psychoacoustics.loudness_zwicker(sig, FS, stationary=False)
     assert res.loudness_vs_time is not None
     axes = res.plot()
     assert isinstance(axes, np.ndarray)
@@ -59,7 +59,9 @@ def test_zwicker_time_varying_returns_two_panels() -> None:
 # Moore-Glasberg loudness (ISO 532-2)
 # --------------------------------------------------------------------------
 def test_moore_glasberg_returns_single_axes_with_specific_curve() -> None:
-    res = ph.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
+    res = ph.psychoacoustics.loudness_moore_glasberg_from_spectrum(
+        [(1000.0, 60.0)]
+    )
     ax = res.plot()
     assert not isinstance(ax, np.ndarray)
     np.testing.assert_allclose(ax.lines[0].get_ydata(), res.specific)

@@ -41,7 +41,7 @@ def _room_acoustics_example() -> tuple[object, ReportMetadata, str]:
     ir = np.zeros_like(time)
     for freq, decay in zip(bands, t60):
         ir += np.sin(2.0 * np.pi * freq * time) * np.exp(-0.5 * a60 * time / decay)
-    result = ph.room_parameters(ir, fs)
+    result = ph.room.room_parameters(ir, fs)
     metadata = ReportMetadata(
         specimen="Small auditorium, unoccupied, fully furnished",
         client="Example client",
@@ -82,7 +82,7 @@ def _reverberation_prediction_example() -> tuple[object, ReportMetadata, str]:
     treated = [0.10, 0.15, 0.30, 0.45, 0.55, 0.60]  # broadband absorber wall
     side = [0.08, 0.10, 0.12, 0.15, 0.18, 0.20]      # lightly absorptive walls
     floor_ceiling = [0.05, 0.08, 0.10, 0.12, 0.15, 0.18]
-    result = ph.reverberation_time_models(
+    result = ph.room.reverberation_time_models(
         (8.0, 5.0, 3.0), (treated, side, floor_ceiling), frequencies=freqs
     )
     metadata = ReportMetadata(
@@ -119,9 +119,9 @@ def _enclosed_space_absorption_example() -> tuple[object, ReportMetadata, str]:
         (45.0, [0.02, 0.02, 0.03, 0.04, 0.05, 0.05, 0.05]),   # painted-plaster walls
     ]
     object_volumes = [0.5, 0.8, 0.3]  # furniture and fittings, m3
-    objects = ph.hard_object_absorption(object_volumes)
-    psi = ph.object_fraction(object_volumes, 50.0)
-    result = ph.enclosed_space_reverberation(
+    objects = ph.room.hard_object_absorption(object_volumes)
+    psi = ph.room.object_fraction(object_volumes, 50.0)
+    result = ph.room.enclosed_space_reverberation(
         surfaces, 50.0, objects=objects, object_fraction=psi,
         air_condition="20C_50-70",
     )
@@ -153,10 +153,10 @@ def _noise_criteria_example() -> tuple[object, ReportMetadata, str]:
     falls to the tangency method, which returns NC-40 with the 250 Hz band
     governing.
     """
-    contour = ph.nc_curve(40.0)
+    contour = ph.room.nc_curve(40.0)
     levels = contour - 5.0
     levels[4] = contour[4]  # 250 Hz sits on the NC-40 curve and governs.
-    result = ph.noise_criterion(levels)
+    result = ph.room.noise_criterion(levels)
     metadata = ReportMetadata(
         specimen="Open-plan office, air handling at nominal flow",
         client="Example client",
@@ -186,9 +186,9 @@ def _room_criteria_example() -> tuple[object, ReportMetadata, str]:
     is RC-35; the raised low band exceeds the reference by more than 5 dB, so
     the spectral-quality tag is rumble (clause D.3), giving RC-35(R).
     """
-    levels = ph.rc_curve(35.0)
+    levels = ph.room.rc_curve(35.0)
     levels[4] += 8.0  # 250 Hz rumble.
-    result = ph.room_criterion(levels)
+    result = ph.room.room_criterion(levels)
     metadata = ReportMetadata(
         specimen="Conference room, variable-air-volume terminal",
         client="Example client",

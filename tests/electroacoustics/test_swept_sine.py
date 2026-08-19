@@ -40,9 +40,11 @@ def _polynomial_recording(sweep: np.ndarray) -> np.ndarray:
     return sweep + A2 * sweep**2 + A3 * sweep**3
 
 
-def _analyze(**kwargs: object) -> ph.SweptSineDistortionResult:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
-    return ph.swept_sine_distortion(
+def _analyze(
+    **kwargs: object,
+) -> ph.electroacoustics.SweptSineDistortionResult:
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    return ph.electroacoustics.swept_sine_distortion(
         _polynomial_recording(x), FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=3, **kwargs
     )
 
@@ -58,7 +60,7 @@ def _at(freqs: np.ndarray, values: np.ndarray, f: float) -> complex:
 
 def test_synchronized_sweep_rate_is_integer_periods_of_f1() -> None:
     """L·f1 must be an integer (the Eq. 49 rounding)."""
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     rate = round(F1 * SECONDS / np.log(F2 / F1)) / F1
     assert rate * F1 == round(rate * F1)
     assert x.size == int(np.ceil(rate * np.log(F2 / F1) * FS))
@@ -75,39 +77,51 @@ def test_synchronized_sweep_time_shift_equals_harmonic() -> None:
 
 
 def test_synchronized_sweep_starts_at_zero_phase() -> None:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     assert abs(x[0]) < 1e-9
 
 
 def test_synchronized_sweep_band_and_duration_validation() -> None:
     with pytest.raises(ValueError, match="f2"):
-        ph.synchronized_sweep_signal(FS, 100.0, 50.0, SECONDS)
+        ph.electroacoustics.synchronized_sweep_signal(FS, 100.0, 50.0, SECONDS)
     with pytest.raises(ValueError, match="Nyquist"):
-        ph.synchronized_sweep_signal(FS, 100.0, 30000.0, SECONDS)
+        ph.electroacoustics.synchronized_sweep_signal(
+            FS, 100.0, 30000.0, SECONDS
+        )
     with pytest.raises(ValueError, match="synchronize"):
-        ph.synchronized_sweep_signal(FS, 1.0, 1000.0, 0.5)
+        ph.electroacoustics.synchronized_sweep_signal(FS, 1.0, 1000.0, 0.5)
     with pytest.raises(ValueError, match="fade"):
-        ph.synchronized_sweep_signal(FS, F1, F2, SECONDS, fade=0.7)
+        ph.electroacoustics.synchronized_sweep_signal(
+            FS, F1, F2, SECONDS, fade=0.7
+        )
 
 
 def test_synchronized_sweep_rejects_bad_amplitude() -> None:
     for bad in (0.0, -1.0, float("inf")):
         with pytest.raises(ValueError, match="amplitude"):
-            ph.synchronized_sweep_signal(FS, F1, F2, SECONDS, amplitude=bad)
+            ph.electroacoustics.synchronized_sweep_signal(
+                FS, F1, F2, SECONDS, amplitude=bad
+            )
 
 
 def test_empty_thd_grid_raises_actionably() -> None:
     """f1 above fs/4: every order-2 product would exceed Nyquist."""
     f1, f2, seconds = 13000.0, 20000.0, 0.5
-    x = ph.synchronized_sweep_signal(FS, f1, f2, seconds)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, f1, f2, seconds)
     with pytest.raises(ValueError, match="order-2 product"):
-        ph.swept_sine_distortion(x, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=2)
+        ph.electroacoustics.swept_sine_distortion(
+            x, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=2
+        )
 
 
 def test_synchronized_sweep_amplitude_and_fade() -> None:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS, amplitude=0.25)
+    x = ph.electroacoustics.synchronized_sweep_signal(
+        FS, F1, F2, SECONDS, amplitude=0.25
+    )
     assert 0.24 < np.max(np.abs(x)) <= 0.25 + 1e-12
-    faded = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS, fade=0.05)
+    faded = ph.electroacoustics.synchronized_sweep_signal(
+        FS, F1, F2, SECONDS, fade=0.05
+    )
     assert abs(faded[-1]) < 1e-3  # the fade-out lands on the last samples
 
 
@@ -161,7 +175,9 @@ def test_sweep_thd_matches_classical_tone_analyzer() -> None:
     """Same nonlinearity, same orders: sweep separator vs phonometry.thd."""
     t = np.arange(FS) / FS
     tone = np.sin(2.0 * np.pi * 1000.0 * t)
-    classical = ph.thd(_polynomial_recording(tone), FS, 1000.0, n_harmonics=3)
+    classical = ph.electroacoustics.thd(
+        _polynomial_recording(tone), FS, 1000.0, n_harmonics=3
+    )
     res = _analyze()
     idx = int(np.argmin(np.abs(res.thd_frequencies - 1000.0)))
     assert classical == pytest.approx(THD_EXPECTED, rel=1e-6)
@@ -170,8 +186,10 @@ def test_sweep_thd_matches_classical_tone_analyzer() -> None:
 
 def test_linear_system_thd_is_noise_floor() -> None:
     """A purely linear path leaves only the deconvolution residue."""
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
-    res = ph.swept_sine_distortion(0.5 * x, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=3)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    res = ph.electroacoustics.swept_sine_distortion(
+        0.5 * x, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=3
+    )
     h1 = abs(_at(res.frequencies, res.harmonic_responses[0], 1000.0))
     assert h1 == pytest.approx(0.5, rel=1e-3)
     band = (res.thd_frequencies > 100.0) & (res.thd_frequencies < 2000.0)
@@ -180,11 +198,13 @@ def test_linear_system_thd_is_noise_floor() -> None:
 
 def test_hammerstein_composition_delay_and_gain() -> None:
     """A linear post-filter (gain+delay) scales every harmonic response."""
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     rec = np.concatenate(
         [np.zeros(100), 0.5 * _polynomial_recording(x), np.zeros(4096)]
     )
-    res = ph.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=3)
+    res = ph.electroacoustics.swept_sine_distortion(
+        rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=3
+    )
     h1 = abs(_at(res.frequencies, res.harmonic_responses[0], 1000.0))
     h3 = abs(_at(res.frequencies, res.harmonic_responses[2], 3000.0))
     assert h1 == pytest.approx(0.5 * H1_EXPECTED, rel=2e-3)
@@ -206,10 +226,11 @@ def test_delays_follow_l_ln_n() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _analyze_farina() -> ph.SweptSineDistortionResult:
-    x = ph.sweep_signal(FS, F1, F2, SECONDS)
+def _analyze_farina() -> ph.electroacoustics.SweptSineDistortionResult:
+    x = ph.room.sweep_signal(FS, F1, F2, SECONDS)
     rec = np.concatenate([_polynomial_recording(x), np.zeros(4096)])
-    return ph.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="farina", n_harmonics=3
+    return ph.electroacoustics.swept_sine_distortion(
+        rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="farina", n_harmonics=3
     )
 
 
@@ -257,8 +278,10 @@ def test_synchronized_band_extends_beyond_f2() -> None:
 
 def test_amplitude_referencing_recovers_unit_gain() -> None:
     amp = 0.25
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS, amplitude=amp)
-    res = ph.swept_sine_distortion(
+    x = ph.electroacoustics.synchronized_sweep_signal(
+        FS, F1, F2, SECONDS, amplitude=amp
+    )
+    res = ph.electroacoustics.swept_sine_distortion(
         x.copy(), FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2, amplitude=amp
     )
     h1 = abs(_at(res.frequencies, res.harmonic_responses[0], 1000.0))
@@ -266,35 +289,51 @@ def test_amplitude_referencing_recovers_unit_gain() -> None:
 
 
 def test_dc_offset_is_removed_by_default() -> None:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
-    res_clean = ph.swept_sine_distortion(x, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2)
-    res_dc = ph.swept_sine_distortion(x + 0.5, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    res_clean = ph.electroacoustics.swept_sine_distortion(
+        x, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2
+    )
+    res_dc = ph.electroacoustics.swept_sine_distortion(
+        x + 0.5, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2
+    )
     h_clean = abs(_at(res_clean.frequencies, res_clean.harmonic_responses[0], 1000.0))
     h_dc = abs(_at(res_dc.frequencies, res_dc.harmonic_responses[0], 1000.0))
     assert h_dc == pytest.approx(h_clean, rel=1e-6)
 
 
 def test_validation_errors() -> None:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     rec = _polynomial_recording(x)
     two_dimensional = rec.reshape(2, -1)
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.swept_sine_distortion(two_dimensional, FS, f1=F1, f2=F2, seconds=SECONDS)
+        ph.electroacoustics.swept_sine_distortion(
+            two_dimensional, FS, f1=F1, f2=F2, seconds=SECONDS
+        )
     not_finite = np.full(rec.size, np.nan)
     with pytest.raises(ValueError, match="finite"):
-        ph.swept_sine_distortion(not_finite, FS, f1=F1, f2=F2, seconds=SECONDS)
+        ph.electroacoustics.swept_sine_distortion(
+            not_finite, FS, f1=F1, f2=F2, seconds=SECONDS
+        )
     with pytest.raises(ValueError, match="method"):
-        ph.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="nope")  # type: ignore[arg-type]
+        ph.electroacoustics.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, method="nope")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="n_harmonics"):
-        ph.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=1)
+        ph.electroacoustics.swept_sine_distortion(
+            rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=1
+        )
     with pytest.raises(ValueError, match="whole sweep"):
-        ph.swept_sine_distortion(rec[: rec.size // 2], FS, f1=F1, f2=F2, seconds=SECONDS)
+        ph.electroacoustics.swept_sine_distortion(
+            rec[: rec.size // 2], FS, f1=F1, f2=F2, seconds=SECONDS
+        )
     with pytest.raises(ValueError, match="overlap"):
-        ph.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, ir_length=1 << 16)
+        ph.electroacoustics.swept_sine_distortion(
+            rec, FS, f1=F1, f2=F2, seconds=SECONDS, ir_length=1 << 16
+        )
     with pytest.raises(ValueError, match="Lengthen the sweep"):
         # So many orders that the two closest arrivals are < 16 samples
         # apart and no usable window exists.
-        ph.swept_sine_distortion(rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2500)
+        ph.electroacoustics.swept_sine_distortion(
+            rec, FS, f1=F1, f2=F2, seconds=SECONDS, n_harmonics=2500
+        )
 
 
 def test_farina_rejects_orders_beyond_the_sweep_ratio() -> None:
@@ -305,16 +344,24 @@ def test_farina_rejects_orders_beyond_the_sweep_ratio() -> None:
     causal linear response and read back a spurious copy of H1.
     """
     fs, f1, f2, seconds = 48000, 1000.0, 2000.0, 1.0
-    x = ph.sweep_signal(fs, f1, f2, seconds)
+    x = ph.room.sweep_signal(fs, f1, f2, seconds)
     rec = np.concatenate([x, np.zeros(4096)])
     with pytest.raises(ValueError, match="anticausal"):
-        ph.swept_sine_distortion(rec, fs, f1=f1, f2=f2, seconds=seconds, method="farina", n_harmonics=3,
+        ph.electroacoustics.swept_sine_distortion(
+            rec,
+            fs,
+            f1=f1,
+            f2=f2,
+            seconds=seconds,
+            method="farina",
+            n_harmonics=3,
             ir_length=1024,
         )
     # The synchronized path handles the same request: absent orders read
     # only the deconvolution floor, never a copy of the linear response.
-    xs = ph.synchronized_sweep_signal(fs, f1, f2, seconds)
-    res = ph.swept_sine_distortion(xs, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3, ir_length=1024
+    xs = ph.electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
+    res = ph.electroacoustics.swept_sine_distortion(
+        xs, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3, ir_length=1024
     )
     band = (res.frequencies > 1.2 * f1) & (res.frequencies < 1.8 * f2)
     assert float(np.max(np.abs(res.harmonic_responses[2][band]))) < 0.05
@@ -324,23 +371,32 @@ def test_farina_window_overrun_blames_the_window_not_the_ratio() -> None:
     """When the order fits but its window does not, the message says so."""
     fs, f1, seconds = 48000, 500.0, 1.0
     f2 = f1 * float(np.e)  # ratio e: the order-2 arrival itself fits
-    x = ph.sweep_signal(fs, f1, f2, seconds)
+    x = ph.room.sweep_signal(fs, f1, f2, seconds)
     rec = np.concatenate([x, np.zeros(65536)])
     with pytest.raises(ValueError, match="window around the order-2 arrival"):
-        ph.swept_sine_distortion(rec, fs, f1=f1, f2=f2, seconds=seconds, method="farina", n_harmonics=2,
+        ph.electroacoustics.swept_sine_distortion(
+            rec,
+            fs,
+            f1=f1,
+            f2=f2,
+            seconds=seconds,
+            method="farina",
+            n_harmonics=2,
             ir_length=32768,
         )
 
 
 def test_explicit_ir_length_below_minimum_has_its_own_message() -> None:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
     with pytest.raises(ValueError, match="'ir_length' must be at least"):
-        ph.swept_sine_distortion(x, FS, f1=F1, f2=F2, seconds=SECONDS, ir_length=8)
+        ph.electroacoustics.swept_sine_distortion(
+            x, FS, f1=F1, f2=F2, seconds=SECONDS, ir_length=8
+        )
 
 
 def test_ir_length_explicit_and_windows_centered() -> None:
-    x = ph.synchronized_sweep_signal(FS, F1, F2, SECONDS)
-    res = ph.swept_sine_distortion(
+    x = ph.electroacoustics.synchronized_sweep_signal(FS, F1, F2, SECONDS)
+    res = ph.electroacoustics.swept_sine_distortion(
         _polynomial_recording(x), FS, f1=F1, f2=F2, seconds=SECONDS,
         n_harmonics=3, ir_length=2048,
     )

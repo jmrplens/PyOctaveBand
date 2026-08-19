@@ -116,7 +116,7 @@ def _tone_audibility_example() -> tuple[object, ReportMetadata, str]:
         ],
         dtype=float,
     )
-    result = ph.analyze_spectrum(levels, frequencies, 2.7)
+    result = ph.psychoacoustics.analyze_spectrum(levels, frequencies, 2.7)
     metadata = ReportMetadata(
         specimen="Combustion engine, steady operation",
         client="Example client",
@@ -181,7 +181,7 @@ def _wind_turbine_tonality_example() -> tuple[object, ReportMetadata, str]:
     frequencies = np.arange(440.0, 560.0 + df, df)
     levels = np.full(frequencies.size, 30.0)
     levels[int(np.argmin(np.abs(frequencies - 500.0)))] = 60.0
-    result = ph.wind_turbine_tonality(levels, frequencies)
+    result = ph.environment.wind_turbine_tonality(levels, frequencies)
     metadata = ReportMetadata(
         specimen="Horizontal-axis wind turbine, gearbox tone",
         client="Example client",
@@ -206,7 +206,9 @@ class _WithSourceEmission:
     keeping the generator loop unchanged.
     """
 
-    def __init__(self, result: Any, emission: ph.SourceEmission) -> None:
+    def __init__(
+        self, result: Any, emission: ph.environment.SourceEmission
+    ) -> None:
         self._result = result
         self._emission = emission
 
@@ -231,12 +233,14 @@ def _outdoor_attenuation_example() -> tuple[object, ReportMetadata, str]:
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
     lw = np.array([95, 100, 103, 105, 104, 101, 95, 88], dtype=float)
-    barrier = ph.Barrier(source_to_edge=105.0, edge_to_receiver=105.0)
-    result = ph.outdoor_propagation_attenuation(
+    barrier = ph.environment.Barrier(
+        source_to_edge=105.0, edge_to_receiver=105.0
+    )
+    result = ph.environment.outdoor_propagation_attenuation(
         200.0, 4.0, 2.0, freqs, 1.0, 1.0, 1.0, barrier=barrier,
         temperature=10.0, relative_humidity=70.0,
     )
-    emission = ph.SourceEmission(sound_power_level=lw)
+    emission = ph.environment.SourceEmission(sound_power_level=lw)
     metadata = ReportMetadata(
         specimen="Industrial fan plant (point source)",
         client="Example client",
@@ -267,7 +271,9 @@ def _barrier_insertion_loss_example() -> tuple[object, ReportMetadata, str]:
     tests/environment/propagation/test_ground_barriers.py).
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
-    result = ph.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+    result = ph.environment.barrier_insertion_loss(
+        freqs, 1.0, 50.0, 4.0, 100.0, 1.5
+    )
     metadata = ReportMetadata(
         specimen="Roadside noise barrier, 4 m high",
         client="Example client",
@@ -300,17 +306,23 @@ def _rd1367_example() -> tuple[object, ReportMetadata, str]:
     The fiche renders in Spanish, the language of the regulation it applies.
     """
     day = [
-        ph.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
-        ph.NoisePhase(6.0, 50.0, kt=6.0, kf=3.0, label="Maquina ruidosa activa"),
-        ph.NoisePhase(4.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"),
+        ph.environment.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
+        ph.environment.NoisePhase(
+            6.0, 50.0, kt=6.0, kf=3.0, label="Maquina ruidosa activa"
+        ),
+        ph.environment.NoisePhase(
+            4.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"
+        ),
     ]
     evening = [
-        ph.NoisePhase(2.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"),
-        ph.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
+        ph.environment.NoisePhase(
+            2.0, 48.0, kt=3.0, kf=3.0, label="Resto de fuentes"
+        ),
+        ph.environment.NoisePhase(2.0, 0.0, label="Actividad cerrada"),
     ]
-    result = ph.assess_activity(
+    result = ph.environment.assess_activity(
         {"day": day, "evening": evening},
-        ph.activity_limits("a"),
+        ph.environment.activity_limits("a"),
         operating_days=303,
     )
     metadata = ReportMetadata(

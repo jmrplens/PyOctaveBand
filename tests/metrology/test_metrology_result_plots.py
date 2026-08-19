@@ -53,7 +53,7 @@ def test_monte_carlo_plot_histogram_and_interval() -> None:
 
 
 def test_monte_carlo_plot_without_samples_raises() -> None:
-    res = ph.monte_carlo(
+    res = ph.metrology.monte_carlo(
         lambda a, b, c: a + b + c, _MC_QUANTITIES, trials=200, seed=7
     )
     assert res.samples is None

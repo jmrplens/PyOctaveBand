@@ -28,9 +28,16 @@ def _chk_atm_ray_turning() -> Outcome:
     c0, gradient, angle = 343.0, 0.2, 10.0
     rc = c0 / (gradient * math.cos(math.radians(angle)))
     turn = rc * (1.0 - math.cos(math.radians(angle)))
-    prof = ph.linear_sound_speed_profile(gradient, ground_speed=c0, max_height=3000.0)
-    res = ph.atmospheric_ray_paths(prof, source_height=0.0, launch_angles_deg=[angle],
-                                   max_range=600.0, n_steps=8000)
+    prof = ph.environment.linear_sound_speed_profile(
+        gradient, ground_speed=c0, max_height=3000.0
+    )
+    res = ph.environment.atmospheric_ray_paths(
+        prof,
+        source_height=0.0,
+        launch_angles_deg=[angle],
+        max_range=600.0,
+        n_steps=8000,
+    )
     return numeric(turn, float(res.heights[0].max()), 0.1, unit="m", places=3)
 
 
@@ -41,14 +48,29 @@ def _chk_atm_ray_turning() -> Outcome:
 )
 def _chk_atm_pe_ground_effect() -> Outcome:
     freq, zs, zr, z = 250.0, 1.0, 1.0, 11.0 + 8.0j
-    flat = ph.linear_sound_speed_profile(1e-12, ground_speed=343.0, max_height=200.0)
-    pe = ph.atmospheric_parabolic_equation(freq, flat, source_height=zs,
-                                           impedance=z, max_range=520.0,
-                                           max_height=40.0)
+    flat = ph.environment.linear_sound_speed_profile(
+        1e-12, ground_speed=343.0, max_height=200.0
+    )
+    pe = ph.environment.atmospheric_parabolic_equation(
+        freq,
+        flat,
+        source_height=zs,
+        impedance=z,
+        max_range=520.0,
+        max_height=40.0,
+    )
     i = int(min(range(pe.ranges.size), key=lambda k: abs(pe.ranges[k] - 500.0)))
     got = float(pe.level_at_height(zr)[i])
-    oracle = float(ph.ground_effect([freq], zs, zr, float(pe.ranges[i]),
-                                    impedance=z, speed_of_sound=343.0).excess_attenuation[0])
+    oracle = float(
+        ph.environment.ground_effect(
+            [freq],
+            zs,
+            zr,
+            float(pe.ranges[i]),
+            impedance=z,
+            speed_of_sound=343.0,
+        ).excess_attenuation[0]
+    )
     return numeric(oracle, got, 0.5, unit="dB", places=3)
 
 
@@ -59,10 +81,17 @@ def _chk_atm_pe_ground_effect() -> Outcome:
 )
 def _chk_atm_pe_hard_ground() -> Outcome:
     freq, zs, zr = 500.0, 2.0, 2.0
-    flat = ph.linear_sound_speed_profile(1e-12, ground_speed=343.0, max_height=200.0)
-    pe = ph.atmospheric_parabolic_equation(freq, flat, source_height=zs,
-                                           impedance=1e6 + 0j, max_range=520.0,
-                                           max_height=150.0)
+    flat = ph.environment.linear_sound_speed_profile(
+        1e-12, ground_speed=343.0, max_height=200.0
+    )
+    pe = ph.environment.atmospheric_parabolic_equation(
+        freq,
+        flat,
+        source_height=zs,
+        impedance=1e6 + 0j,
+        max_range=520.0,
+        max_height=150.0,
+    )
     i = int(min(range(pe.ranges.size), key=lambda k: abs(pe.ranges[k] - 500.0)))
     r = float(pe.ranges[i])
     r1, r2 = math.hypot(r, zs - zr), math.hypot(r, zs + zr)
