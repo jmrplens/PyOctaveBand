@@ -88,7 +88,8 @@ def _render_probe_lines(
     from .._i18n import localize_axes
 
     for trace, label in zip(traces, labels, strict=True):
-        ax.plot(t_ms, trace, label=label, **kwargs)
+        kwargs.setdefault("label", label)
+        ax.plot(t_ms, trace, **kwargs)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)

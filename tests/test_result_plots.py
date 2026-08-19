@@ -203,6 +203,22 @@ def test_every_plot_forwards_kwargs_to_primary_artist(name, factory, kind) -> No
     )
     plt.close("all")
 
+    # And the same for `label`, which is where this went wrong for longest.
+    # `color` was passed by name next to `**kwargs` once and fixed; `label`
+    # was passed that way in fifty-five renderers, so a caller naming a curve
+    # got `TypeError: got multiple values for keyword argument 'label'`
+    # instead of a labelled curve.
+    out = res.plot(label="mine")
+    ax = out[0] if isinstance(out, np.ndarray) else out
+    # Through the legend, not through the artist: `ax.bar` puts the label on
+    # the container it returns rather than on each rectangle, so reading
+    # `ax.patches` would miss it on every bar renderer. The legend is what the
+    # caller is naming the curve for anyway.
+    assert "mine" in ax.get_legend_handles_labels()[1], (
+        f"{name}: label kwarg did not reach the legend"
+    )
+    plt.close("all")
+
 
 # --------------------------------------------------------------------------
 # Common contract: ax=None creates a figure; passing ax composes

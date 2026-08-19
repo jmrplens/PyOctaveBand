@@ -1026,8 +1026,9 @@ def plot_resampled_signal(
     kwargs.setdefault("color", _C_PRIMARY)
     if "lw" not in kwargs and "linewidth" not in kwargs:
         kwargs["lw"] = 1.2
+    kwargs.setdefault("label", _t("Anti-alias filter $|H(f)|$", language))
     ax.semilogx(freqs[view], mag_db[view],
-                label=_t("Anti-alias filter $|H(f)|$", language), **kwargs)
+                **kwargs)
     ax.axvline(result.passband_edge_hz, color=_C_TERTIARY, linestyle="--",
                lw=1.2, label=_t("Passband edge", language))
     ax.axvline(result.stopband_edge_hz, color=_C_SECONDARY, linestyle="--",
@@ -1360,9 +1361,10 @@ def plot_inverse_filter(
     color = kwargs.pop("color", _C_PRIMARY)
     f1, f2 = result.f_range
 
+    kwargs.setdefault("label", _t("Measured response $|H|$", language))
     ax.semilogx(
         freqs[pos], 20.0 * np.log10(np.maximum(h_mag[pos], tiny) / peak),
-        color=color, lw=1.2, label=_t("Measured response $|H|$", language),
+        color=color, lw=1.2,
         **kwargs,
     )
     ax.semilogx(
@@ -1409,10 +1411,10 @@ def plot_synchronous_average(
     def _waveform(axw: Axes) -> None:
         kwargs.setdefault("color", _C_PRIMARY)
         kwargs.setdefault("lw", 1.6)
+        kwargs.setdefault("label", _t("Averaged periodic waveform ($N$ = {n})", language,
+                     n=result.n_averages))
         axw.plot(
             1e3 * result.times, result.period_waveform,
-            label=_t("Averaged periodic waveform ($N$ = {n})", language,
-                     n=result.n_averages),
             **kwargs,
         )
         axw.set_xlabel(_t("Time [ms]", language))

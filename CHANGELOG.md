@@ -101,6 +101,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- A caller can name a curve. `label` is an ordinary matplotlib keyword and
+  arrives through `**kwargs` like `color` or `linewidth`, but fifty-five
+  renderers also passed one by name in the same call, so `result.plot(label=
+  "mine")` raised `TypeError: got multiple values for keyword argument
+  'label'` instead of drawing a labelled curve. Six of the thirty-two result
+  types the plotting contract covers failed outright; the rest were one
+  argument away from it.
+
+  They use `kwargs.setdefault("label", ...)` now, which is what the same
+  renderers already do for `color` and `marker`: the caller's label wins and
+  the generated one still appears when there is none. Two renderers draw one
+  bar per item, each with its own name, and take a copy of the keywords per
+  bar rather than one default before the loop, which would have put the first
+  item's label on all of them.
+
+  The plotting contract test now checks `label` alongside `color`, through the
+  legend rather than the artist: `ax.bar` puts the label on the container it
+  returns, not on each rectangle, so reading `ax.patches` would have missed it
+  on every bar renderer and let this back in.
+
 - `plot_excitation` is exported by `phonometry.room`, the package that owns it.
   It was the one of the twenty-four plotting helpers that no domain published:
   it is defined in the private `_plot.room`, the top level re-exported it, and

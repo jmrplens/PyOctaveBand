@@ -510,13 +510,13 @@ def plot_reverberation_models(
         ("Arau-Puchades", result.arau_puchades, _C_PRIMARY, "o", 2.4),
     )
     for label, curve, color, marker, lw in styles:
+        kwargs.setdefault("label", label)
         ax.plot(
             freq,
             np.asarray(curve, dtype=np.float64),
             color=color,
             marker=marker,
             lw=lw,
-            label=label,
             **kwargs,
         )
     _freq_axis(ax, freq, language=language)
@@ -748,8 +748,9 @@ def plot_image_source_reflectogram(
         cbar.set_label(_t("Reflection order", language))
     ax.vlines(ms[order0], -120.0, level[order0], color=_C_PRIMARY, lw=1.6,
               zorder=4)
+    kwargs.setdefault("label", _t("Direct sound", language))
     ax.plot(ms[order0], level[order0], "o", color=_C_PRIMARY, ms=7, zorder=5,
-            label=_t("Direct sound", language), **kwargs)
+            **kwargs)
 
     lx, ly, lz = result.dimensions
     # A bare ``:g`` never reaches the locale pass (``localize_axes`` reformats
@@ -805,8 +806,9 @@ def plot_steady_field(
             color=_C_TERTIARY, ls=":", lw=1.4, label=_t("Reverberant field", language))
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 2.4)
+    kwargs.setdefault("label", _t("Total", language))
     ax.plot(r, np.asarray(result.total, dtype=np.float64),
-            label=_t("Total", language), **kwargs)
+            **kwargs)
     ax.axvline(result.critical_distance, color=_C_REFERENCE, ls="-.", lw=1.2,
                label=rf"$r_\mathrm{{c}}$ = "
                      f"{format_number(result.critical_distance, language, decimals=2)} m")
@@ -973,8 +975,9 @@ def plot_room_modes(
         if not np.any(mask):
             continue
         row = rows[kind]
+        kwargs.setdefault("label", _t(kind, language))
         ladder.vlines(freqs[mask], row - 0.35, row + 0.35, color=colors[kind],
-                      lw=1.2, label=_t(kind, language), **kwargs)
+                      lw=1.2, **kwargs)
     ladder.set_ylim(0.4, 4.1)
     order = ("oblique", "tangential", "axial")
     ladder.set_yticks([rows[k] for k in order])
@@ -1042,10 +1045,10 @@ def plot_crowd_noise(
     levels = np.asarray(result.levels, dtype=np.float64)
     palette = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_QUATERNARY, _C_MUTED)
     for row, (area, curve) in enumerate(zip(result.absorption_areas, levels)):
+        kwargs.setdefault("label", _t(_ABSORPTION_AREA_LABEL, language).format(
+                value=format_number(float(area), language, decimals=0)))
         ax.plot(
             n, curve, color=palette[row % len(palette)], lw=1.8,
-            label=_t(_ABSORPTION_AREA_LABEL, language).format(
-                value=format_number(float(area), language, decimals=0)),
             **kwargs,
         )
     ax.axhline(

@@ -250,7 +250,8 @@ def plot_trend_test(
     kwargs.setdefault("lw", 1.2)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 4.5)
-    ax.plot(index, result.values, label=label, **kwargs)
+    kwargs.setdefault("label", label)
+    ax.plot(index, result.values, **kwargs)
     if result.method == "runs" and result.median is not None:
         # The runs test classifies each value against the median of the
         # *original* sequence (before values equal to it were discarded),
@@ -296,7 +297,8 @@ def plot_stationarity_test(
     kwargs.setdefault("lw", 1.2)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 4.5)
-    ax.plot(index, result.segment_values, label=label, **kwargs)
+    kwargs.setdefault("label", label)
+    ax.plot(index, result.segment_values, **kwargs)
     if result.method == "runs":
         _draw_sequence_median(
             ax, float(np.median(result.segment_values)), language
@@ -336,9 +338,10 @@ def plot_level_crossing_rate(
     )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("ms", 6.0)
+    kwargs.setdefault("label", _t("Measured rate", language))
     ax.plot(
         result.levels, result.rates, "o",
-        label=_t("Measured rate", language), **kwargs,
+        **kwargs,
     )
     ax.set_yscale("log")
     ax.set_xlabel(_t("Level $a$ [signal units]", language))
@@ -393,9 +396,10 @@ def plot_peak_statistics(
     )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 1.2)
+    kwargs.setdefault("label", _t("Empirical peak exceedance", language))
     ax.plot(
         peaks, exceedance, drawstyle="steps-post",
-        label=_t("Empirical peak exceedance", language), **kwargs,
+        **kwargs,
     )
     floor = max(1.0 / peaks.size, 1e-6)
     ax.set_yscale("log")
