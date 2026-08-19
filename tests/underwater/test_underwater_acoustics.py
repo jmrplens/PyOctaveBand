@@ -12,13 +12,7 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import (
-    in_air_to_underwater_spl,
-    peak_sound_pressure_level,
-    sound_exposure_level,
-    sound_pressure_level,
-    underwater_to_in_air_spl,
-)
+from phonometry import underwater
 
 FS = 48000
 
@@ -33,7 +27,9 @@ def test_spl_of_known_tone() -> None:
     amp = 2.0  # Pa
     x = _tone(500.0, 1.0, amp)
     expected = 20.0 * np.log10((amp / np.sqrt(2.0)) / 1e-6)
-    assert sound_pressure_level(x) == pytest.approx(expected, rel=1e-9)
+    assert underwater.sound_pressure_level(x) == pytest.approx(
+        expected, rel=1e-9
+    )
 
 
 def test_sel_of_known_tone() -> None:
@@ -42,21 +38,31 @@ def test_sel_of_known_tone() -> None:
     x = _tone(500.0, seconds, amp)
     spl = 20.0 * np.log10((amp / np.sqrt(2.0)) / 1e-6)
     expected = spl + 10.0 * np.log10(seconds)
-    assert sound_exposure_level(x, FS) == pytest.approx(expected, rel=1e-6)
+    assert underwater.sound_exposure_level(x, FS) == pytest.approx(
+        expected, rel=1e-6
+    )
 
 
 def test_peak_level_of_known_tone() -> None:
     amp = 3.0
     x = _tone(500.0, 0.5, amp)
     expected = 20.0 * np.log10(amp / 1e-6)
-    assert peak_sound_pressure_level(x) == pytest.approx(expected, rel=1e-6)
+    assert underwater.peak_sound_pressure_level(x) == pytest.approx(
+        expected, rel=1e-6
+    )
 
 
 def test_reference_conversion_round_trip() -> None:
     # 20 lg(20e-6/1e-6) = 26.0206 dB.
-    assert underwater_to_in_air_spl(120.0) == pytest.approx(120.0 - ref.UW_REFERENCE_OFFSET_DB)
-    assert in_air_to_underwater_spl(94.0) == pytest.approx(94.0 + ref.UW_REFERENCE_OFFSET_DB)
-    assert in_air_to_underwater_spl(underwater_to_in_air_spl(100.0)) == pytest.approx(100.0)
+    assert underwater.underwater_to_in_air_spl(120.0) == pytest.approx(
+        120.0 - ref.UW_REFERENCE_OFFSET_DB
+    )
+    assert underwater.in_air_to_underwater_spl(94.0) == pytest.approx(
+        94.0 + ref.UW_REFERENCE_OFFSET_DB
+    )
+    assert underwater.in_air_to_underwater_spl(
+        underwater.underwater_to_in_air_spl(100.0)
+    ) == pytest.approx(100.0)
 
 
 def test_rejects_invalid_signal() -> None:
@@ -65,10 +71,10 @@ def test_rejects_invalid_signal() -> None:
     valid_tone = _tone(500.0, 0.1, 1.0)
     silence = np.zeros(100)
     with pytest.raises(ValueError):
-        sound_pressure_level(two_dimensional)
+        underwater.sound_pressure_level(two_dimensional)
     with pytest.raises(ValueError):
-        sound_pressure_level(with_nan)
+        underwater.sound_pressure_level(with_nan)
     with pytest.raises(ValueError):
-        sound_exposure_level(valid_tone, 0.0)
+        underwater.sound_exposure_level(valid_tone, 0.0)
     with pytest.raises(ValueError):
-        sound_pressure_level(silence)  # no energy
+        underwater.sound_pressure_level(silence)  # no energy

@@ -22,15 +22,7 @@ import warnings
 import numpy as np
 import pytest
 
-from phonometry import (
-    PhonometryWarning,
-    ReportMetadata,
-    TransferStiffnessResult,
-    base_transmissibility,
-    indirect_transfer_stiffness_result,
-    transfer_stiffness_direct,
-    transfer_stiffness_level,
-)
+from phonometry import PhonometryWarning, ReportMetadata, vibration
 
 _PDF_MAGIC = b"%PDF"
 
@@ -59,13 +51,13 @@ def _extract_text(path: str) -> str:
     return " ".join(raw.split())
 
 
-def _direct_result() -> TransferStiffnessResult:
+def _direct_result() -> vibration.TransferStiffnessResult:
     """A Kelvin-Voigt element characterised by the direct method (ISO 10846-2)."""
     omega = 2.0 * np.pi * _FREQS
     k21 = _K + 1j * omega * _C
     u1 = 1.0e-6 + 0.0j
-    measured = transfer_stiffness_direct(k21 * u1, u1)
-    return TransferStiffnessResult(
+    measured = vibration.transfer_stiffness_direct(k21 * u1, u1)
+    return vibration.TransferStiffnessResult(
         frequencies=_FREQS, transfer_stiffness=measured, blocking_mass=None
     )
 
@@ -75,9 +67,11 @@ def test_low_frequency_plateau_oracle() -> None:
     res = _direct_result()
     assert float(res.magnitude[0]) == pytest.approx(_K, rel=1e-4)
     assert float(res.level[0]) == pytest.approx(
-        float(transfer_stiffness_level(_K)), abs=1e-3
+        float(vibration.transfer_stiffness_level(_K)), abs=1e-3
     )
-    assert float(transfer_stiffness_level(_K)) == pytest.approx(120.0, abs=1e-3)
+    assert float(vibration.transfer_stiffness_level(_K)) == pytest.approx(
+        120.0, abs=1e-3
+    )
 
 
 def test_report_renders_plateau_and_basis(tmp_path) -> None:
@@ -108,10 +102,10 @@ def test_indirect_method_labels_blocking_mass(tmp_path) -> None:
                      dtype=float)
     # A blocking mass well above the mass/spring resonance keeps |T| <= 0.1, so
     # the ISO 10846-3 validity advisory does not fire.
-    transmissibility = base_transmissibility(freqs, 50.0, _K, 40.0)
+    transmissibility = vibration.base_transmissibility(freqs, 50.0, _K, 40.0)
     with warnings.catch_warnings():
         warnings.simplefilter("error", PhonometryWarning)
-        res = indirect_transfer_stiffness_result(
+        res = vibration.indirect_transfer_stiffness_result(
             freqs, transmissibility, blocking_mass=50.0
         )
     out = tmp_path / "indirect.pdf"

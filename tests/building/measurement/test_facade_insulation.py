@@ -25,11 +25,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    FacadeInsulationResult,
-    facade_insulation,
-    weighted_rating,
-)
+from phonometry import building
 
 # ISO 717-1 Annex C Table C.1 measured curve; rated Rw = 30 (-2; -3).
 _ANNEX_C_R = [
@@ -53,8 +49,8 @@ def test_d2m_is_level_difference() -> None:
     """D2m = L1,2m - L2 per band (Clause 3.14)."""
     l1 = np.array([80.0, 78.0, 76.0])
     l2 = np.array([40.0, 41.0, 39.0])
-    res = facade_insulation(l1, l2, _flat(3, 0.5))
-    assert isinstance(res, FacadeInsulationResult)
+    res = building.facade_insulation(l1, l2, _flat(3, 0.5))
+    assert isinstance(res, building.FacadeInsulationResult)
     np.testing.assert_allclose(res.d_2m, l1 - l2)
 
 
@@ -62,7 +58,7 @@ def test_dnt_reduces_to_d_at_reference_time() -> None:
     """Dls,2m,nT = D2m when T = T0 = 0,5 s (Clause 3.15)."""
     l1 = _flat(3, 75.0)
     l2 = _flat(3, 35.0)
-    res = facade_insulation(l1, l2, _flat(3, 0.5))
+    res = building.facade_insulation(l1, l2, _flat(3, 0.5))
     np.testing.assert_allclose(res.d_2m_nt, res.d_2m)
 
 
@@ -71,7 +67,7 @@ def test_dnt_standardization_term() -> None:
     l1 = _flat(2, 70.0)
     l2 = _flat(2, 30.0)
     t = np.array([1.0, 0.25])
-    res = facade_insulation(l1, l2, t)
+    res = building.facade_insulation(l1, l2, t)
     expected = (l1 - l2) + 10.0 * np.log10(t / 0.5)
     np.testing.assert_allclose(res.d_2m_nt, expected)
 
@@ -79,7 +75,7 @@ def test_dnt_standardization_term() -> None:
 def test_d2m_n_reduces_to_d_when_absorption_equals_reference() -> None:
     """Dls,2m,n = D2m when A = 0,16 V/T = A0 = 10 m² (Clause 3.16, 3.17)."""
     # 0,16 * 62,5 / 1,0 = 10,0 = A0.
-    res = facade_insulation(
+    res = building.facade_insulation(
         _flat(3, 72.0), _flat(3, 32.0), _flat(3, 1.0), volume=62.5
     )
     assert res.d_2m_n is not None
@@ -87,7 +83,9 @@ def test_d2m_n_reduces_to_d_when_absorption_equals_reference() -> None:
 
 
 def test_d2m_n_none_without_volume() -> None:
-    res = facade_insulation(_flat(3, 72.0), _flat(3, 32.0), _flat(3, 0.5))
+    res = building.facade_insulation(
+        _flat(3, 72.0), _flat(3, 32.0), _flat(3, 0.5)
+    )
     assert res.d_2m_n is None
     assert res.r_prime is None
 
@@ -101,7 +99,7 @@ def test_r45_loudspeaker_correction() -> None:
     # A = 0,16 * 62,5 / 1,0 = 10; pick S = 10 so 10 lg(S/A) = 0.
     surf = _flat(n, 60.0)
     l2 = _flat(n, 20.0)
-    res = facade_insulation(
+    res = building.facade_insulation(
         _flat(n, 55.0), l2, _flat(n, 1.0),
         area=10.0, volume=62.5, surface_level=surf,
     )
@@ -114,7 +112,7 @@ def test_rtrs_road_traffic_correction() -> None:
     n = 3
     surf = _flat(n, 60.0)
     l2 = _flat(n, 20.0)
-    res = facade_insulation(
+    res = building.facade_insulation(
         _flat(n, 55.0), l2, _flat(n, 1.0),
         area=10.0, volume=62.5, surface_level=surf,
         method="road_traffic",
@@ -130,7 +128,7 @@ def test_r45_full_formula_with_absorption() -> None:
     t = np.array([0.8, 0.8])
     area, volume = 12.0, 50.0
     a = 0.16 * volume / t
-    res = facade_insulation(
+    res = building.facade_insulation(
         np.array([50.0, 50.0]), l2, t,
         area=area, volume=volume, surface_level=surf,
     )
@@ -141,7 +139,7 @@ def test_r45_full_formula_with_absorption() -> None:
 
 def test_r_prime_needs_surface_area_and_volume() -> None:
     # surface_level but no area/volume -> no R'.
-    res = facade_insulation(
+    res = building.facade_insulation(
         _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
         surface_level=_flat(3, 72.0),
     )
@@ -155,7 +153,7 @@ def test_positions_are_energy_averaged() -> None:
     """2-D (positions x bands) inputs are energy-averaged (Clause 9.5.1, Formula 7)."""
     l1 = np.array([[80.0, 70.0], [86.0, 70.0]])  # two positions, two bands
     l2 = np.array([[40.0, 30.0], [40.0, 30.0]])
-    res = facade_insulation(l1, l2, np.array([0.5, 0.5]))
+    res = building.facade_insulation(l1, l2, np.array([0.5, 0.5]))
     l1_avg = 10.0 * np.log10(np.mean(10.0 ** (l1 / 10.0), axis=0))
     np.testing.assert_allclose(res.d_2m, l1_avg - l2[0])
 
@@ -166,21 +164,21 @@ def test_positions_are_energy_averaged() -> None:
 def test_band_count_mismatch_raises() -> None:
     outdoor, indoor_two_bands, rt = _flat(3, 70.0), _flat(2, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError):
-        facade_insulation(outdoor, indoor_two_bands, rt)
+        building.facade_insulation(outdoor, indoor_two_bands, rt)
 
 
 def test_nonpositive_reverberation_raises() -> None:
     outdoor, indoor = _flat(3, 70.0), _flat(3, 30.0)
     rt_with_zero = np.array([0.5, 0.0, 0.5])
     with pytest.raises(ValueError):
-        facade_insulation(outdoor, indoor, rt_with_zero)
+        building.facade_insulation(outdoor, indoor, rt_with_zero)
 
 
 def test_nonpositive_area_volume_raises() -> None:
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     surface = _flat(3, 72.0)
     with pytest.raises(ValueError):
-        facade_insulation(
+        building.facade_insulation(
             outdoor, indoor, rt,
             area=-1.0, volume=50.0, surface_level=surface,
         )
@@ -192,12 +190,14 @@ def test_surface_and_area_without_volume_raises() -> None:
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     surface = _flat(3, 72.0)
     with pytest.raises(ValueError, match="volume"):
-        facade_insulation(outdoor, indoor, rt, area=10.0, surface_level=surface)
+        building.facade_insulation(
+            outdoor, indoor, rt, area=10.0, surface_level=surface
+        )
 
 
 def test_surface_area_and_volume_returns_r_prime() -> None:
     # The complete set of R' inputs still yields a value.
-    res = facade_insulation(
+    res = building.facade_insulation(
         _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
         area=10.0, volume=62.5, surface_level=_flat(3, 72.0),
     )
@@ -207,7 +207,7 @@ def test_surface_area_and_volume_returns_r_prime() -> None:
 def test_invalid_method_raises() -> None:
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError):
-        facade_insulation(outdoor, indoor, rt, method="airplane")
+        building.facade_insulation(outdoor, indoor, rt, method="airplane")
 
 
 def test_invalid_method_on_result_raises() -> None:
@@ -216,7 +216,7 @@ def test_invalid_method_on_result_raises() -> None:
     d_2m = np.array([30.0])
     d_2m_nt = np.array([31.0])
     with pytest.raises(ValueError, match="'method' must be"):
-        FacadeInsulationResult(
+        building.FacadeInsulationResult(
             d_2m=d_2m,
             d_2m_nt=d_2m_nt,
             d_2m_n=None,
@@ -229,7 +229,7 @@ def test_nonfinite_raises() -> None:
     outdoor_with_nan = np.array([70.0, np.nan, 70.0])
     indoor, rt = _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError):
-        facade_insulation(outdoor_with_nan, indoor, rt)
+        building.facade_insulation(outdoor_with_nan, indoor, rt)
 
 
 def test_frequencies_length_mismatch_raises() -> None:
@@ -237,7 +237,9 @@ def test_frequencies_length_mismatch_raises() -> None:
     # than deferring a confusing matplotlib shape error to plot().
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError, match="frequencies"):
-        facade_insulation(outdoor, indoor, rt, frequencies=[125.0, 250.0])
+        building.facade_insulation(
+            outdoor, indoor, rt, frequencies=[125.0, 250.0]
+        )
 
 
 # --------------------------------------------------------------------------
@@ -246,7 +248,9 @@ def test_frequencies_length_mismatch_raises() -> None:
 def test_extended_bands_supported() -> None:
     """50-5000 Hz (21 bands) may be supplied; all quantities per band."""
     n = 21
-    res = facade_insulation(_flat(n, 70.0), _flat(n, 30.0), _flat(n, 0.5))
+    res = building.facade_insulation(
+        _flat(n, 70.0), _flat(n, 30.0), _flat(n, 0.5)
+    )
     assert res.d_2m.shape == (n,)
     np.testing.assert_allclose(res.d_2m, _flat(n, 40.0))
 
@@ -260,13 +264,13 @@ def test_rating_path_reproduces_known_rw() -> None:
     # Build L1,s so that R'45° == _ANNEX_C_R with S = A (term 0), L2 = 0:
     # R' = L1,s - 0 - 1,5 => L1,s = R' + 1,5.
     surf = ref + 1.5
-    res = facade_insulation(
+    res = building.facade_insulation(
         _flat(16, 50.0), _flat(16, 0.0), _flat(16, 1.0),
         area=10.0, volume=62.5, surface_level=surf,
     )
     assert res.r_prime is not None
     np.testing.assert_allclose(res.r_prime, ref, atol=1e-9)
-    rating = weighted_rating(res.r_prime)
+    rating = building.weighted_rating(res.r_prime)
     assert rating.rating == 30
     assert rating.c == -2
     assert rating.ctr == -3
@@ -276,7 +280,9 @@ def test_rating_path_reproduces_known_rw() -> None:
 # Result dataclass + plotting
 # --------------------------------------------------------------------------
 def test_result_is_frozen() -> None:
-    res = facade_insulation(_flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5))
+    res = building.facade_insulation(
+        _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
+    )
     with pytest.raises(AttributeError):
         res.d_2m = np.zeros(3)  # type: ignore[misc]
 
@@ -286,7 +292,7 @@ def test_plot_returns_axes_with_dnt_curve() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    res = facade_insulation(
+    res = building.facade_insulation(
         np.asarray(_ANNEX_C_R) + 40.0, _flat(16, 40.0), _flat(16, 0.5),
         volume=62.5, frequencies=_CORE_FREQS,
     )
@@ -302,7 +308,9 @@ def test_plot_forwards_kwargs() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    res = facade_insulation(_flat(16, 70.0), _flat(16, 30.0), _flat(16, 0.5))
+    res = building.facade_insulation(
+        _flat(16, 70.0), _flat(16, 30.0), _flat(16, 0.5)
+    )
     ax = res.plot(linewidth=2)
     assert ax.lines[0].get_linewidth() == 2.0
     plt.close("all")

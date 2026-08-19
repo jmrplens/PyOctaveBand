@@ -10,11 +10,13 @@ import numpy as np
 import pytest
 from scipy import signal as sg
 
-from phonometry import FilterDesign, OctaveFilterBank, octave_filter
+from phonometry import filters
 from phonometry.filters.design import _design_sos_filter, _showfilter
 
 
-def _edge_gains_db(bank: OctaveFilterBank, band_idx: int) -> tuple[float, float]:
+def _edge_gains_db(
+    bank: filters.OctaveFilterBank, band_idx: int
+) -> tuple[float, float]:
     """Measured gain (dB) at the band's lower and upper edge frequencies."""
     fsd = bank.fs / bank.factor[band_idx]
     w, h = sg.sosfreqz(bank.sos[band_idx], worN=2**16, fs=fsd)
@@ -39,9 +41,9 @@ def test_cheby2_minus3db_at_band_edges(fraction: float) -> None:
     **Verification:**
     - Gain at every band's lower and upper edge is -3 dB (+/- 0.4 dB).
     """
-    bank = OctaveFilterBank(
+    bank = filters.OctaveFilterBank(
         fs=48000, fraction=fraction, order=6, limits=[100, 5000],
-        design=FilterDesign(filter_type="cheby2", attenuation=60.0),
+        design=filters.FilterDesign(filter_type="cheby2", attenuation=60.0),
     )
     for idx in range(bank.num_bands):
         g_lo, g_hi = _edge_gains_db(bank, idx)
@@ -62,10 +64,20 @@ def test_cheby2_broadband_levels_match_butter() -> None:
     """
     rng = np.random.default_rng(42)
     x = rng.standard_normal(48000 * 5)
-    spl_b, _ = octave_filter(x, 48000, fraction=3, limits=[100, 10000],
-                             design=FilterDesign(filter_type="butter"))
-    spl_c, _ = octave_filter(x, 48000, fraction=3, limits=[100, 10000],
-                             design=FilterDesign(filter_type="cheby2"))
+    spl_b, _ = filters.octave_filter(
+        x,
+        48000,
+        fraction=3,
+        limits=[100, 10000],
+        design=filters.FilterDesign(filter_type="butter"),
+    )
+    spl_c, _ = filters.octave_filter(
+        x,
+        48000,
+        fraction=3,
+        limits=[100, 10000],
+        design=filters.FilterDesign(filter_type="cheby2"),
+    )
     diff = np.asarray(spl_c) - np.asarray(spl_b)
     assert np.abs(diff).max() < 0.5, f"max deviation {np.abs(diff).max():.2f} dB"
 
@@ -82,9 +94,9 @@ def test_bessel_minus3db_at_band_edges(fraction: float) -> None:
     **Verification:**
     - Gain at every band's lower and upper edge is -3 dB (+/- 0.6 dB).
     """
-    bank = OctaveFilterBank(
+    bank = filters.OctaveFilterBank(
         fs=48000, fraction=fraction, order=6, limits=[100, 5000],
-        design=FilterDesign(filter_type="bessel"),
+        design=filters.FilterDesign(filter_type="bessel"),
     )
     for idx in range(bank.num_bands):
         g_lo, g_hi = _edge_gains_db(bank, idx)
@@ -157,9 +169,11 @@ def test_cheby2_low_attenuation_raises() -> None:
 
     with pytest.raises(ValueError, match="3.01"):
         _cheby2_transition_ratio(order=6, attenuation=3.0)
-    low_attenuation = FilterDesign(filter_type="cheby2", attenuation=2.0)
+    low_attenuation = filters.FilterDesign(
+        filter_type="cheby2", attenuation=2.0
+    )
     with pytest.raises(ValueError, match="3.01"):
-        OctaveFilterBank(fs=48000, fraction=3, design=low_attenuation)
+        filters.OctaveFilterBank(fs=48000, fraction=3, design=low_attenuation)
 
 
 def test_cheby2_stopband_edges_near_nyquist_stay_valid() -> None:
@@ -213,13 +227,12 @@ def test_cheby2_default_bank_meets_class1(fraction: float) -> None:
     (>= 70 dB for Omega >= G^4). The default was raised to 72 dB, which the
     audit demonstrated passes class 1 with the same +0.400 dB passband margin.
     """
-    from phonometry import verify_filter_class
 
-    bank = OctaveFilterBank(
+    bank = filters.OctaveFilterBank(
         fs=48000, fraction=fraction, order=6, limits=[100, 5000],
-        design=FilterDesign(filter_type="cheby2"),
+        design=filters.FilterDesign(filter_type="cheby2"),
     )
-    result = verify_filter_class(bank)
+    result = filters.verify_filter_class(bank)
     assert result["overall_class"] == 1, result
 
 
@@ -229,18 +242,30 @@ def test_functional_octavefilter_cheby2_default_meets_class1() -> None:
     the wrapper previously still defaulted to 60 dB)."""
     import inspect
 
-    from phonometry import verify_filter_class
-
-    default_att = inspect.signature(octave_filter).parameters["design"].default.attenuation
+    default_att = (
+        inspect.signature(filters.octave_filter)
+        .parameters["design"]
+        .default.attenuation
+    )
     assert default_att == 72.0
     # A bank built with the wrapper's own default passes class 1; and the
     # functional call itself runs without raising.
-    bank = OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[100, 5000],
-        design=FilterDesign(filter_type="cheby2", attenuation=default_att),
+    bank = filters.OctaveFilterBank(
+        fs=48000,
+        fraction=1,
+        order=6,
+        limits=[100, 5000],
+        design=filters.FilterDesign(
+            filter_type="cheby2", attenuation=default_att
+        ),
     )
-    assert verify_filter_class(bank)["overall_class"] == 1
+    assert filters.verify_filter_class(bank)["overall_class"] == 1
     x = np.random.default_rng(0).standard_normal(48000)
-    spl, _ = octave_filter(x, 48000, fraction=1, limits=[100, 5000],
-                           design=FilterDesign(filter_type="cheby2"))
+    spl, _ = filters.octave_filter(
+        x,
+        48000,
+        fraction=1,
+        limits=[100, 5000],
+        design=filters.FilterDesign(filter_type="cheby2"),
+    )
     assert np.all(np.isfinite(spl))

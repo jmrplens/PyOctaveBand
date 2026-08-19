@@ -26,13 +26,17 @@ _SLIT_ABS_DETUNE = 1.7                   # wide-slit factor of the alpha figure
 @lru_cache(maxsize=1)
 def _slit_absorber_design() -> Any:
     """The 300 Hz critical-coupling design of the slow-sound figures."""
-    from phonometry import HelmholtzResonator, critical_coupling_design
+    from phonometry import materials
 
-    base = HelmholtzResonator(neck_length=1.0e-3, neck_side=3.0e-3,
-                              cavity_length=30.0e-3, cavity_side=27.0e-3)
-    return critical_coupling_design(_SLIT_ABS_F0, base,
-                                    lattice_step=_SLIT_ABS_LATTICE,
-                                    period=_SLIT_ABS_PERIOD)
+    base = materials.HelmholtzResonator(
+        neck_length=1.0e-3,
+        neck_side=3.0e-3,
+        cavity_length=30.0e-3,
+        cavity_side=27.0e-3,
+    )
+    return materials.critical_coupling_design(_SLIT_ABS_F0, base,
+                                              lattice_step=_SLIT_ABS_LATTICE,
+                                              period=_SLIT_ABS_PERIOD)
 
 
 def _lossy_fluid_params(rho_c: complex,
@@ -89,7 +93,7 @@ def _slit_absorber_fields(
     """
     import fdtd2d
 
-    from phonometry import slit_helmholtz_absorber
+    from phonometry import materials
     from phonometry.materials import (
         rectangular_duct_properties,
         slit_effective_properties,
@@ -137,7 +141,7 @@ def _slit_absorber_fields(
     scale_cav = _SLIT_ABS_LATTICE / res.cavity_side
 
     alphas = (float(design.absorption),
-              float(slit_helmholtz_absorber(
+              float(materials.slit_helmholtz_absorber(
                   freq, res, slit_height=_SLIT_ABS_DETUNE * h0,
                   lattice_step=_SLIT_ABS_LATTICE,
                   period=_SLIT_ABS_PERIOD).absorption[0]))

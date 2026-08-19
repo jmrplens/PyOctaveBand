@@ -20,7 +20,7 @@ import importlib
 import numpy as np
 import pytest
 
-from phonometry import EcmaFluctuationStrength, fluctuation_strength_ecma
+from phonometry import psychoacoustics
 
 _fse = importlib.import_module("phonometry.psychoacoustics.quality.fluctuation_strength_ecma")
 
@@ -52,9 +52,11 @@ def _tone(fc: float, level_db: float, seconds: float = 2.5) -> np.ndarray:
 
 
 @pytest.fixture(scope="module")
-def ref_calibration() -> EcmaFluctuationStrength:
+def ref_calibration() -> psychoacoustics.EcmaFluctuationStrength:
     """The 1 kHz / 4 Hz / m=1 / overall 60 dB calibration signal (1 vacil_HMS)."""
-    return fluctuation_strength_ecma(_am_tone(1000.0, 4.0, 1.0, 60.0, 5.0), FS)
+    return psychoacoustics.fluctuation_strength_ecma(
+        _am_tone(1000.0, 4.0, 1.0, 60.0, 5.0), FS
+    )
 
 
 # --------------------------------------------------------------------------
@@ -64,7 +66,7 @@ def ref_calibration() -> EcmaFluctuationStrength:
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_calibration_1khz_4hz_is_one_vacil(
-    ref_calibration: EcmaFluctuationStrength,
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
 ) -> None:
     """The Clause 9 reference signal computes 1 vacil_HMS.
 
@@ -225,16 +227,16 @@ def test_window_rejects_a_quiet_block() -> None:
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_peaks_near_4hz_modulation(
-    ref_calibration: EcmaFluctuationStrength,
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
 ) -> None:
     # Fluctuation strength is maximal around 4 Hz modulation and falls off
     # toward slower and faster rates (Clause 9 intro). The 4 Hz reference is
     # the module calibration signal, so reuse its result.
     f4 = ref_calibration.fluctuation_strength
-    f1 = fluctuation_strength_ecma(
+    f1 = psychoacoustics.fluctuation_strength_ecma(
         _am_tone(1000.0, 1.0, 1.0, 60.0), FS
     ).fluctuation_strength
-    f16 = fluctuation_strength_ecma(
+    f16 = psychoacoustics.fluctuation_strength_ecma(
         _am_tone(1000.0, 16.0, 1.0, 60.0), FS
     ).fluctuation_strength
     assert f4 > f1
@@ -245,7 +247,7 @@ def test_roughness_domain_modulation_scores_near_zero() -> None:
     # 70 Hz modulation is the roughness reference; fluctuation strength
     # covers slow variations (typically below 20 Hz, Clause 9 intro) and
     # must be negligible there.
-    f70 = fluctuation_strength_ecma(
+    f70 = psychoacoustics.fluctuation_strength_ecma(
         _am_tone(1000.0, 70.0, 1.0, 60.0), FS
     ).fluctuation_strength
     assert f70 < 0.05
@@ -253,22 +255,22 @@ def test_roughness_domain_modulation_scores_near_zero() -> None:
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_grows_with_modulation_depth(
-    ref_calibration: EcmaFluctuationStrength,
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
 ) -> None:
     f_full = ref_calibration.fluctuation_strength
-    f_half = fluctuation_strength_ecma(
+    f_half = psychoacoustics.fluctuation_strength_ecma(
         _am_tone(1000.0, 4.0, 0.5, 60.0), FS
     ).fluctuation_strength
     assert f_full > f_half > 0.05
 
 
 def test_unmodulated_tone_is_near_zero() -> None:
-    result = fluctuation_strength_ecma(_tone(1000.0, 60.0), FS)
+    result = psychoacoustics.fluctuation_strength_ecma(_tone(1000.0, 60.0), FS)
     assert result.fluctuation_strength < 0.1
 
 
 def test_silence_is_zero() -> None:
-    result = fluctuation_strength_ecma(np.zeros(FS), FS)
+    result = psychoacoustics.fluctuation_strength_ecma(np.zeros(FS), FS)
     assert result.fluctuation_strength == pytest.approx(0.0, abs=1e-9)
     assert np.all(result.specific_fluctuation_strength == 0.0)
 
@@ -279,7 +281,9 @@ def test_silence_is_zero() -> None:
 
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
-def test_result_structure(ref_calibration: EcmaFluctuationStrength) -> None:
+def test_result_structure(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
+) -> None:
     res = ref_calibration
     assert res.specific_fluctuation_strength.shape == res.bark.shape == (53,)
     assert res.fluctuation_strength_vs_time.shape == res.time.shape
@@ -295,39 +299,43 @@ def test_result_structure(ref_calibration: EcmaFluctuationStrength) -> None:
 def test_invalid_field_raises() -> None:
     sig = _tone(1000.0, 60.0, 1.0)
     with pytest.raises(ValueError):
-        fluctuation_strength_ecma(sig, FS, field="bogus")
+        psychoacoustics.fluctuation_strength_ecma(sig, FS, field="bogus")
 
 
 def test_empty_signal_raises() -> None:
     empty = np.array([])
     with pytest.raises(ValueError):
-        fluctuation_strength_ecma(empty, FS)
+        psychoacoustics.fluctuation_strength_ecma(empty, FS)
 
 
 @pytest.mark.parametrize("bad_fs", [0.0, -48000.0, float("nan"), float("inf")])
 def test_invalid_fs_raises(bad_fs: float) -> None:
     sig = _tone(1000.0, 60.0, 1.0)
     with pytest.raises(ValueError):
-        fluctuation_strength_ecma(sig, bad_fs)
+        psychoacoustics.fluctuation_strength_ecma(sig, bad_fs)
 
 
 def test_non_finite_signal_raises() -> None:
     sig = _tone(1000.0, 60.0, 1.0)
     sig[100] = np.nan
     with pytest.raises(ValueError):
-        fluctuation_strength_ecma(sig, FS)
+        psychoacoustics.fluctuation_strength_ecma(sig, FS)
 
 
 def test_resample_length_clamps_to_one_sample() -> None:
     # 4 samples at 10 MHz resample to round(4 * 48000 / 1e7) = 0 samples
     # without the clamp; the clamped 1-sample signal must process cleanly.
-    res = fluctuation_strength_ecma(np.zeros(4), 1.0e7)
+    res = psychoacoustics.fluctuation_strength_ecma(np.zeros(4), 1.0e7)
     assert res.fluctuation_strength == 0.0
 
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
-def test_deterministic(ref_calibration: EcmaFluctuationStrength) -> None:
-    again = fluctuation_strength_ecma(_am_tone(1000.0, 4.0, 1.0, 60.0, 5.0), FS)
+def test_deterministic(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
+) -> None:
+    again = psychoacoustics.fluctuation_strength_ecma(
+        _am_tone(1000.0, 4.0, 1.0, 60.0, 5.0), FS
+    )
     assert again.fluctuation_strength == pytest.approx(
         ref_calibration.fluctuation_strength, abs=1e-9
     )
@@ -335,13 +343,17 @@ def test_deterministic(ref_calibration: EcmaFluctuationStrength) -> None:
 
 def test_free_and_diffuse_differ() -> None:
     sig = _am_tone(1000.0, 4.0, 1.0, 60.0)
-    free = fluctuation_strength_ecma(sig, FS, field="free")
-    diffuse = fluctuation_strength_ecma(sig, FS, field="diffuse")
+    free = psychoacoustics.fluctuation_strength_ecma(sig, FS, field="free")
+    diffuse = psychoacoustics.fluctuation_strength_ecma(
+        sig, FS, field="diffuse"
+    )
     assert free.fluctuation_strength != diffuse.fluctuation_strength
 
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
-def test_plot_smoke(ref_calibration: EcmaFluctuationStrength) -> None:
+def test_plot_smoke(
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
+) -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -353,7 +365,7 @@ def test_plot_smoke(ref_calibration: EcmaFluctuationStrength) -> None:
 
 @pytest.mark.xdist_group("ecma-fluctuation-ref")
 def test_plot_accepts_matplotlib_color_alias(
-    ref_calibration: EcmaFluctuationStrength,
+    ref_calibration: psychoacoustics.EcmaFluctuationStrength,
 ) -> None:
     # ``c=`` is matplotlib's alias for ``color=``; the renderer must not
     # inject the canonical name alongside it (that raises a TypeError).

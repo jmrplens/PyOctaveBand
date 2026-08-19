@@ -5,7 +5,7 @@ Multichannel processing validation tests.
 
 import numpy as np
 
-from phonometry import octave_filter
+from phonometry import filters
 
 
 def test_multichannel() -> None:
@@ -44,7 +44,7 @@ def test_multichannel() -> None:
 
     x = np.vstack((ch1, ch2))
 
-    spl, freq = octave_filter(x, fs, fraction=3)
+    spl, freq = filters.octave_filter(x, fs, fraction=3)
 
     assert spl.shape == (2, len(freq)), "Output SPL should maintain channel count"
 
@@ -59,6 +59,6 @@ def test_multichannel() -> None:
     assert std_tone > std_noise, "Tone should have higher spectral variance than noise"
 
     # Verify time-domain band splitting
-    _, _, xb = octave_filter(x, fs, fraction=3, sigbands=True)
+    _, _, xb = filters.octave_filter(x, fs, fraction=3, sigbands=True)
     assert xb is not None, "xb should not be None when sigbands=True"
     assert xb[0].shape == (2, len(t)), "Bands should maintain stereo shape and length"

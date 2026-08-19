@@ -24,11 +24,7 @@ pytest.importorskip("pypdf")
 
 import numpy as np
 
-from phonometry import (
-    ReportMetadata,
-    ReverberationModelResult,
-    reverberation_time_models,
-)
+from phonometry import ReportMetadata, room
 
 _PDF_MAGIC = b"%PDF"
 _MODELS = ("Sabine", "Eyring", "Millington-Sette", "Fitzroy", "Arau-Puchades")
@@ -40,8 +36,8 @@ _SIDE = [0.08, 0.10, 0.12, 0.15, 0.18, 0.20]
 _FLOOR = [0.05, 0.08, 0.10, 0.12, 0.15, 0.18]
 
 
-def _result() -> ReverberationModelResult:
-    return reverberation_time_models(
+def _result() -> room.ReverberationModelResult:
+    return room.reverberation_time_models(
         (8.0, 5.0, 3.0), (_TREATED, _SIDE, _FLOOR), frequencies=_FREQS
     )
 

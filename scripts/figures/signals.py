@@ -18,7 +18,7 @@ import matplotlib.ticker as mticker
 import numpy as np
 from scipy import signal as scipy_signal
 
-from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
+from phonometry import filters
 from phonometry._plot.common import format_frequency_axis, theme_fill
 
 from .i18n import _fmt_minus
@@ -65,8 +65,13 @@ def generate_filter_type_comparison(output_dir: str) -> None:
     axins.set_xscale("log") # Explicitly set log scale
     
     for f_type, label, color, style in designs:
-        bank = OctaveFilterBank(fs, fraction=fraction, order=order, limits=limits,
-                                design=FilterDesign(filter_type=f_type))
+        bank = filters.OctaveFilterBank(
+            fs,
+            fraction=fraction,
+            order=order,
+            limits=limits,
+            design=filters.FilterDesign(filter_type=f_type),
+        )
         
         # Find index of 1000Hz band
         idx = np.argmin(np.abs(np.array(bank.freq) - 1000))
@@ -125,8 +130,13 @@ def generate_filter_responses(output_dir: str) -> None:
         for fraction, order in configs:
             filename = f"filter_{f_type_name}_fraction_{fraction}_order_{order}.png"
             print(f"Generating {filename}...")
-            bank = OctaveFilterBank(fs=fs, fraction=fraction, order=order, limits=[12.0, 20000.0],
-                                    design=FilterDesign(filter_type=f_type))
+            bank = filters.OctaveFilterBank(
+                fs=fs,
+                fraction=fraction,
+                order=order,
+                limits=[12.0, 20000.0],
+                design=filters.FilterDesign(filter_type=f_type),
+            )
             
             from phonometry.filters.design import _showfilter
             # Draw first, then save through save_figure so the Spanish
@@ -151,7 +161,9 @@ def generate_signal_responses(output_dir: str) -> None:
         (3, "signal_response_fraction_3.png", "1/3 Octave Band Analysis"),
     ]:
         print(f"Generating {filename}...")
-        bank = OctaveFilterBank(fs=fs, fraction=frac, order=6, limits=[12.0, 20000.0])
+        bank = filters.OctaveFilterBank(
+            fs=fs, fraction=frac, order=6, limits=[12.0, 20000.0]
+        )
         spl, freq = bank.filter(y)
 
         _, ax = plt.subplots()
@@ -203,7 +215,9 @@ def generate_multichannel_response(output_dir: str) -> None:
     ch2 = scipy_signal.chirp(t, f0=50, t1=duration, f1=10000, method="logarithmic")
 
     x = np.vstack((ch1, ch2))
-    bank = OctaveFilterBank(fs=fs, fraction=3, order=6, limits=[20.0, 20000.0])
+    bank = filters.OctaveFilterBank(
+        fs=fs, fraction=3, order=6, limits=[20.0, 20000.0]
+    )
     spl, freq = bank.filter(x)
 
     _fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
@@ -272,10 +286,20 @@ def generate_decomposition_plot(output_dir: str) -> None:
 
     # Filter into 1/1 octave bands with two different architectures
     # We use Chebyshev II (flat passband, no ripple)
-    bank_butter = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
-                                   design=FilterDesign(filter_type="butter"))
-    bank_cheby2 = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[100.0, 2000.0],
-                                   design=FilterDesign(filter_type="cheby2"))
+    bank_butter = filters.OctaveFilterBank(
+        fs=fs,
+        fraction=1,
+        order=6,
+        limits=[100.0, 2000.0],
+        design=filters.FilterDesign(filter_type="butter"),
+    )
+    bank_cheby2 = filters.OctaveFilterBank(
+        fs=fs,
+        fraction=1,
+        order=6,
+        limits=[100.0, 2000.0],
+        design=filters.FilterDesign(filter_type="cheby2"),
+    )
     
     # Cast to 3-tuple to satisfy mypy unpacking
     _, freq, xb_butter = bank_butter.filter(y, sigbands=True)
@@ -454,7 +478,6 @@ def generate_g_weighting_response(output_dir: str) -> None:
     print("Generating g_weighting_response.png...")
     from scipy import signal as sp_signal
 
-    from phonometry import WeightingFilter
 
     fs = 48000
     # ISO 7196:1995 Table 2 - nominal one-third-octave frequency, response dB
@@ -464,7 +487,7 @@ def generate_g_weighting_response(output_dir: str) -> None:
         (31.5, -4.0), (63.0, -28.0), (125.0, -52.0), (250.0, -76.0),
     ]
     freqs = np.logspace(np.log10(0.1), np.log10(1000), 800)
-    sos = WeightingFilter(fs, "G").sos
+    sos = filters.WeightingFilter(fs, "G").sos
     _, h = sp_signal.sosfreqz(sos, worN=freqs, fs=fs)
     mag_db = 20 * np.log10(np.abs(h))
 
@@ -506,13 +529,12 @@ def generate_time_weighting_plot(output_dir: str) -> None:
     end_idx = int(fs * 1.5)
     x[start_idx:end_idx] = rng.standard_normal(end_idx - start_idx)
     
-    from phonometry import time_weighting
     
     # Square for energy
     x_sq = x**2
-    fast = time_weighting(x, fs, mode="fast")
-    slow = time_weighting(x, fs, mode="slow")
-    impulse = time_weighting(x, fs, mode="impulse")
+    fast = filters.time_weighting(x, fs, mode="fast")
+    slow = filters.time_weighting(x, fs, mode="slow")
+    impulse = filters.time_weighting(x, fs, mode="impulse")
     
     _, ax = plt.subplots()
     # Normalize for better visualization
@@ -546,13 +568,12 @@ def generate_crossover_plot(output_dir: str) -> None:
     print("Generating crossover_lr4.png...")
     fs = 48000
     
-    from phonometry import linkwitz_riley
     
     # Frequency analysis
     # Measure response using IR
     impulse = np.zeros(fs)
     impulse[0] = 1.0
-    lp_ir, hp_ir = linkwitz_riley(impulse, fs, freq=1000, order=4)
+    lp_ir, hp_ir = filters.linkwitz_riley(impulse, fs, freq=1000, order=4)
     
     w, h_lp = scipy_signal.freqz(lp_ir, worN=8192, fs=fs)
     _, h_hp = scipy_signal.freqz(hp_ir, worN=8192, fs=fs)
@@ -573,28 +594,29 @@ def generate_parametric_eq_family(output_dir: str) -> None:
     print("Generating parametric_eq_family.png...")
     fs = 48000
 
-    from phonometry import EQSection, ParametricEQ
 
     family = [
-        (EQSection("peaking", 1000.0, gain_db=6.0, q=1.4),
+        (filters.EQSection("peaking", 1000.0, gain_db=6.0, q=1.4),
          "Peaking +6 dB ($Q$ = 1.4)", COLOR_PRIMARY, "-"),
-        (EQSection("lowshelf", 125.0, gain_db=6.0),
+        (filters.EQSection("lowshelf", 125.0, gain_db=6.0),
          "Low shelf +6 dB", COLOR_TERTIARY, "-"),
-        (EQSection("highshelf", 4000.0, gain_db=-6.0),
+        (filters.EQSection("highshelf", 4000.0, gain_db=-6.0),
          "High shelf −6 dB", "#9467bd", "-"),
-        (EQSection("lowpass", 10000.0),
+        (filters.EQSection("lowpass", 10000.0),
          "Low-pass ($Q$ = 0.707)", COLOR_SECONDARY, "--"),
-        (EQSection("highpass", 50.0),
+        (filters.EQSection("highpass", 50.0),
          "High-pass ($Q$ = 0.707)", "#8c564b", "--"),
-        (EQSection("bandpass", 500.0, q=2.0),
+        (filters.EQSection("bandpass", 500.0, q=2.0),
          "Band-pass ($Q$ = 2)", "#ff7f0e", "-."),
-        (EQSection("notch", 2000.0, q=6.0),
+        (filters.EQSection("notch", 2000.0, q=6.0),
          "Notch ($Q$ = 6)", "#17becf", "-."),
     ]
 
     _, ax = plt.subplots(figsize=(10, 6))
     for section, label, color, style in family:
-        res = ParametricEQ(fs, section).response(f_min=20.0, f_max=20000.0)
+        res = filters.ParametricEQ(fs, section).response(
+            f_min=20.0, f_max=20000.0
+        )
         ax.semilogx(res.frequencies, res.magnitude_db,
                     label=label, color=color, linestyle=style)
 
@@ -626,7 +648,9 @@ def generate_spectrogram_example(output_dir: str) -> None:
     # integration still sets the time resolution, but the mesh is sampled four
     # times finer on each axis than the band spacing and hop it replaces, so
     # the sweep reads as a line instead of a staircase of cells.
-    bank = OctaveFilterBank(fs=fs, fraction=12, order=6, limits=[50.0, 12000.0])
+    bank = filters.OctaveFilterBank(
+        fs=fs, fraction=12, order=6, limits=[50.0, 12000.0]
+    )
     levels, freq, times = bank.spectrogram(x, window_time=0.125, overlap=0.875)
 
     _, ax = plt.subplots()
@@ -651,7 +675,7 @@ def generate_ln_levels_example(output_dir: str) -> None:
     duration = 30.0
     t = np.linspace(0, duration, int(fs * duration), endpoint=False)
 
-    from phonometry import ln_levels, time_weighting
+    from phonometry import signals
 
     # Fluctuating "traffic-like" noise: background + random events
     rng = np.random.default_rng(42)
@@ -663,9 +687,9 @@ def generate_ln_levels_example(output_dir: str) -> None:
         envelope = np.hanning(int(idx.sum()))
         x[idx] += envelope * rng.uniform(0.3, 1.0) * rng.standard_normal(int(idx.sum()))
 
-    envelope_ms = time_weighting(x, fs, mode="fast")
+    envelope_ms = filters.time_weighting(x, fs, mode="fast")
     level_t = 10 * np.log10(np.maximum(envelope_ms, 1e-12) / (2e-5) ** 2)
-    stats = ln_levels(x, fs, n=(10, 50, 90))
+    stats = signals.ln_levels(x, fs, n=(10, 50, 90))
 
     _, ax = plt.subplots()
     ax.plot(t, level_t, color=COLOR_PRIMARY, linewidth=0.8, label="Fast level $L_p(t)$")
@@ -695,7 +719,9 @@ def generate_zero_phase_comparison(output_dir: str) -> None:
     start, end = int(0.05 * fs), int(0.10 * fs)
     x[start:end] = np.sin(2 * np.pi * 250 * t[start:end]) * np.hanning(end - start)
 
-    bank = OctaveFilterBank(fs=fs, fraction=1, order=6, limits=[200.0, 300.0])
+    bank = filters.OctaveFilterBank(
+        fs=fs, fraction=1, order=6, limits=[200.0, 300.0]
+    )
     _, _, bands_fwd = bank.filter(x, sigbands=True, calculate_level=False)
     _, _, bands_zp = bank.filter(x, sigbands=True, calculate_level=False, zero_phase=True)
 
@@ -716,7 +742,6 @@ def generate_weighting_accuracy_hf(output_dir: str) -> None:
     print("Generating weighting_accuracy_hf.png...")
     fs = 48000
 
-    from phonometry import WeightingFilter
 
     freqs = np.logspace(np.log10(1000), np.log10(20000), 40)
 
@@ -728,7 +753,7 @@ def generate_weighting_accuracy_hf(output_dir: str) -> None:
         )
         return np.asarray(20 * np.log10(ra) + 2.0)
 
-    def measured_gains(wf: WeightingFilter) -> np.ndarray:
+    def measured_gains(wf: filters.WeightingFilter) -> np.ndarray:
         gains = []
         for f0 in freqs:
             tt = np.arange(int(fs * 0.2)) / fs
@@ -738,8 +763,10 @@ def generate_weighting_accuracy_hf(output_dir: str) -> None:
             gains.append(20 * np.log10(np.std(y[n0:]) / np.std(x[n0:])))
         return np.array(gains)
 
-    legacy = measured_gains(WeightingFilter(fs, "A", high_accuracy=False))
-    accurate = measured_gains(WeightingFilter(fs, "A"))
+    legacy = measured_gains(
+        filters.WeightingFilter(fs, "A", high_accuracy=False)
+    )
+    accurate = measured_gains(filters.WeightingFilter(fs, "A"))
     reference = analytic_a(freqs)
 
     _, (ax, ax_err) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
@@ -785,8 +812,13 @@ def generate_group_delay_comparison(output_dir: str) -> None:
 
     _, ax = plt.subplots()
     for f_type, label, color, style in designs:
-        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=limits,
-                                design=FilterDesign(filter_type=f_type))
+        bank = filters.OctaveFilterBank(
+            fs,
+            fraction=1,
+            order=6,
+            limits=limits,
+            design=filters.FilterDesign(filter_type=f_type),
+        )
         idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
         fsd = fs / bank.factor[idx]
         # Group delay of an SOS cascade = sum of the sections' group delays.
@@ -815,20 +847,25 @@ def generate_tone_burst_iec(output_dir: str) -> None:
     print("Generating tone_burst_iec.png...")
     fs = 48000
 
-    from phonometry import time_weighting
 
     cases = [(0.2, -1.0), (0.05, -4.8), (0.01, -11.1)]  # Table 4, class 1 rows
     fig, axes = plt.subplots(1, 3, figsize=(12, 4.5), sharey=True)
 
     t_all = np.arange(int(fs * 2.0)) / fs
     steady = np.sin(2 * np.pi * 4000 * t_all)
-    ref = time_weighting(steady, fs, mode="fast")[int(1.5 * fs):].mean()
+    ref = filters.time_weighting(steady, fs, mode="fast")[
+        int(1.5 * fs) :
+    ].mean()
 
     for ax, (duration, target) in zip(axes, cases):
         burst = np.zeros_like(t_all)
         start = int(0.5 * fs)
         burst[start:start + round(duration * fs)] = steady[start:start + round(duration * fs)]
-        env_db = 10 * np.log10(np.maximum(time_weighting(burst, fs, mode="fast") / ref, 1e-6))
+        env_db = 10 * np.log10(
+            np.maximum(
+                filters.time_weighting(burst, fs, mode="fast") / ref, 1e-6
+            )
+        )
 
         ax.plot(t_all, env_db, color=COLOR_PRIMARY, linewidth=1.3, label="FAST envelope")
         ax.axhline(target, color=COLOR_SECONDARY, linestyle="--", linewidth=1.2,
@@ -856,9 +893,13 @@ def generate_block_processing_continuity(output_dir: str) -> None:
     t = np.arange(len(x)) / fs
 
     def band_output(stateful: bool) -> np.ndarray:
-        bank = OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
-                                design=FilterDesign(resample=False),
-                                block_processing=BlockProcessing(stateful=stateful))
+        bank = filters.OctaveFilterBank(
+            fs,
+            fraction=1,
+            limits=[900, 1100],
+            design=filters.FilterDesign(resample=False),
+            block_processing=filters.BlockProcessing(stateful=stateful),
+        )
         if stateful:
             parts = [
                 bank.filter(x[i * block:(i + 1) * block], sigbands=True,
@@ -868,14 +909,21 @@ def generate_block_processing_continuity(output_dir: str) -> None:
         else:
             parts = []
             for i in range(n_blocks):
-                b2 = OctaveFilterBank(fs, fraction=1, limits=[900, 1100],
-                                      design=FilterDesign(resample=False))
+                b2 = filters.OctaveFilterBank(
+                    fs,
+                    fraction=1,
+                    limits=[900, 1100],
+                    design=filters.FilterDesign(resample=False),
+                )
                 parts.append(b2.filter(x[i * block:(i + 1) * block], sigbands=True,
                                        detrend=False, calculate_level=False)[2][0])
         return np.concatenate(parts)
 
-    continuous = OctaveFilterBank(
-        fs, fraction=1, limits=[900, 1100], design=FilterDesign(resample=False)
+    continuous = filters.OctaveFilterBank(
+        fs,
+        fraction=1,
+        limits=[900, 1100],
+        design=filters.FilterDesign(resample=False),
     ).filter(x, sigbands=True, detrend=False, calculate_level=False)[2][0]
     y_stateful = band_output(stateful=True)
     y_stateless = band_output(stateful=False)
@@ -923,8 +971,13 @@ def generate_class_mask_overlay(output_dir: str) -> None:
 
     from phonometry.filters.compliance import class_limits
 
-    bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                            design=FilterDesign(filter_type="butter"))
+    bank = filters.OctaveFilterBank(
+        fs,
+        fraction=1,
+        order=6,
+        limits=[800, 1200],
+        design=filters.FilterDesign(filter_type="butter"),
+    )
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fm = bank.freq[idx]
     fsd = fs / bank.factor[idx]
@@ -974,8 +1027,13 @@ def generate_filter_class0_mask(output_dir: str) -> None:
     fs = 48000
     from phonometry.filters.compliance import class_limits
 
-    bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                            design=FilterDesign(filter_type="butter"))
+    bank = filters.OctaveFilterBank(
+        fs,
+        fraction=1,
+        order=6,
+        limits=[800, 1200],
+        design=filters.FilterDesign(filter_type="butter"),
+    )
     idx = int(np.argmin(np.abs(np.array(bank.freq) - 1000)))
     fm = bank.freq[idx]
     fsd = fs / bank.factor[idx]
@@ -1023,14 +1081,9 @@ def generate_filter_class0_mask(output_dir: str) -> None:
 def generate_weighting_class_mask(output_dir: str) -> None:
     """A/C weighting deviation against the IEC 61672-1:2013 Table 3 mask."""
     print("Generating weighting_class_mask.png...")
-    from phonometry import (
-        WeightingFilter,
-        verify_weighting_class,
-        weighting_class_limits,
-    )
 
-    freqs, lower1, upper1 = weighting_class_limits(1)
-    _, lower2, upper2 = weighting_class_limits(2)
+    freqs, lower1, upper1 = filters.weighting_class_limits(1)
+    _, lower2, upper2 = filters.weighting_class_limits(2)
     floor, ceil = -7.0, 7.0  # plotting bounds; -inf limits clip to the floor
     lo1 = np.clip(lower1, floor, ceil)
     lo2 = np.clip(lower2, floor, ceil)
@@ -1048,7 +1101,9 @@ def generate_weighting_class_mask(output_dir: str) -> None:
             drawstyle="steps-mid")
 
     for curve, colour, marker in (("A", COLOR_PRIMARY, "o"), ("C", "#9467bd", "s")):
-        result = verify_weighting_class(WeightingFilter(48000, curve))
+        result = filters.verify_weighting_class(
+            filters.WeightingFilter(48000, curve)
+        )
         f = np.array([b["freq"] for b in result["bands"]])
         dev = np.array([b["deviation_db"] for b in result["bands"]])
         ax.plot(f, dev, color=colour, linewidth=1.6, marker=marker, markersize=4,
@@ -1071,7 +1126,7 @@ def generate_weighting_class_mask(output_dir: str) -> None:
 def generate_sel_concept(output_dir: str) -> None:
     """SEL: the whole event compressed into one second of equal energy."""
     print("Generating sel_concept.png...")
-    from phonometry import leq, sel, time_weighting
+    from phonometry import signals
 
     fs = 48000
     seconds = 8.0
@@ -1081,10 +1136,10 @@ def generate_sel_concept(output_dir: str) -> None:
     envelope = np.exp(-0.5 * ((tt - 4.0) / 1.1) ** 2)
     x = envelope * rng.standard_normal(tt.size) * 0.3
 
-    env = time_weighting(x, fs, mode="fast")
+    env = filters.time_weighting(x, fs, mode="fast")
     level = 10 * np.log10(np.maximum(env, 1e-12))
-    l_sel = float(sel(x, fs, dbfs=True))
-    l_eq = float(leq(x, fs, dbfs=True))
+    l_sel = float(signals.sel(x, fs, dbfs=True))
+    l_eq = float(signals.leq(x, fs, dbfs=True))
 
     _, ax = plt.subplots(figsize=(10, 6))
     ax.plot(tt, level, color=COLOR_PRIMARY, linewidth=1.2,
@@ -1134,11 +1189,10 @@ def generate_slm_level_track(output_dir: str) -> None:
     """The step-4 readouts drawn on the level history that produced them."""
     print("Generating slm_level_track.png...")
     from phonometry import signals as level_signals
-    from phonometry import time_weighting, weighting_filter
 
     fs, recording, cal = _slm_walkthrough_signals()
-    weighted = weighting_filter(cal * recording, fs, curve="A")
-    envelope = time_weighting(weighted, fs, mode="fast")
+    weighted = filters.weighting_filter(cal * recording, fs, curve="A")
+    envelope = filters.time_weighting(weighted, fs, mode="fast")
     laf_t = 10 * np.log10(np.maximum(envelope, 1e-12) / (2e-5) ** 2)
 
     la_eq = float(level_signals.laeq(recording, fs, calibration_factor=cal))
@@ -1180,13 +1234,16 @@ def generate_slm_level_track(output_dir: str) -> None:
 def generate_slm_third_octave(output_dir: str) -> None:
     """The step-5 spectrum, unweighted and A-weighted, on one axis."""
     print("Generating slm_third_octave.png...")
-    from phonometry import LevelCalibration, octave_filter, weighting_filter
 
     fs, recording, cal = _slm_walkthrough_signals()
-    spl_z, centres = octave_filter(recording, fs, fraction=3,
-                                   calibration=LevelCalibration(factor=cal))
-    weighted = weighting_filter(cal * recording, fs, curve="A")
-    spl_a, _ = octave_filter(weighted, fs, fraction=3)
+    spl_z, centres = filters.octave_filter(
+        recording,
+        fs,
+        fraction=3,
+        calibration=filters.LevelCalibration(factor=cal),
+    )
+    weighted = filters.weighting_filter(cal * recording, fs, curve="A")
+    spl_a, _ = filters.octave_filter(weighted, fs, fraction=3)
 
     total_z = 10 * np.log10(np.sum(10 ** (np.asarray(spl_z) / 10)))
     total_a = 10 * np.log10(np.sum(10 ** (np.asarray(spl_a) / 10)))
@@ -1297,11 +1354,13 @@ def _distribution_pair() -> tuple[int, np.ndarray, np.ndarray]:
 def generate_level_distribution(output_dir: str) -> None:
     """Same LAeq, opposite distributions: the percentiles read the shape."""
     print("Generating level_distribution.png...")
-    from phonometry import laeq, ln_levels, time_weighting, weighting_filter
+    from phonometry import signals
 
     fs, steady, peaky = _distribution_pair()
-    peaky = peaky * 10 ** ((float(laeq(steady, fs)) - float(laeq(peaky, fs))) / 20)
-    la_eq = float(laeq(steady, fs))
+    peaky = peaky * 10 ** (
+        (float(signals.laeq(steady, fs)) - float(signals.laeq(peaky, fs))) / 20
+    )
+    la_eq = float(signals.laeq(steady, fs))
 
     percentages = tuple(range(1, 100))
     fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(12, 4.8))
@@ -1311,7 +1370,9 @@ def generate_level_distribution(output_dir: str) -> None:
         ("quiet background, three events", peaky, COLOR_SECONDARY, "-"),
     ]
     for name, x, color, style in styles:
-        env = time_weighting(weighting_filter(x, fs, curve="A"), fs, mode="fast")
+        env = filters.time_weighting(
+            filters.weighting_filter(x, fs, curve="A"), fs, mode="fast"
+        )
         track = 10 * np.log10(np.maximum(env, 1e-12) / (2e-5) ** 2)
         t = np.arange(x.size) / fs
         # The Fast track is smooth on a 125 ms constant, so 80 samples per
@@ -1319,7 +1380,7 @@ def generate_level_distribution(output_dir: str) -> None:
         ax_left.plot(t[::100], track[::100], color=color, linestyle=style,
                      linewidth=0.7, label=name)
 
-        curve = ln_levels(x, fs, n=percentages, weighting="A")
+        curve = signals.ln_levels(x, fs, n=percentages, weighting="A")
         values = np.array([float(curve[p]) for p in percentages])
         ax_right.plot(percentages, values, color=color, linewidth=1.8,
                       label=name)
@@ -1363,7 +1424,7 @@ def generate_level_distribution(output_dir: str) -> None:
 def generate_peak_oversampling(output_dir: str) -> None:
     """What the on-grid maximum misses, and what oversample=8 recovers."""
     print("Generating peak_oversampling.png...")
-    from phonometry import lc_peak
+    from phonometry import signals
 
     fs = 48000
     f_tone = 8000.0
@@ -1404,9 +1465,13 @@ def generate_peak_oversampling(output_dir: str) -> None:
         for n_samples in per_cycle:
             tones = [np.sin(2 * np.pi * (fs / n_samples) * t_tone + p)
                      for p in phases]
-            worst.append(max(float(lc_peak(tone, fs, oversample=16))
-                             - float(lc_peak(tone, fs, oversample=factor))
-                             for tone in tones))
+            worst.append(
+                max(
+                    float(signals.lc_peak(tone, fs, oversample=16))
+                    - float(signals.lc_peak(tone, fs, oversample=factor))
+                    for tone in tones
+                )
+            )
         ax_right.semilogx(per_cycle, worst, marker="o", color=color,
                           linewidth=1.8, label=f"oversample={factor}")
     ax_right.axhline(0.1, color=COLOR_MUTED, linestyle=":", linewidth=1.2)
@@ -1431,16 +1496,20 @@ def generate_peak_oversampling(output_dir: str) -> None:
 def generate_dose_exchange(output_dir: str) -> None:
     """Iso-exposure contours: the equal-energy trade of level against time."""
     print("Generating dose_exchange.png...")
-    from phonometry import laeq, lex_8h
+    from phonometry import signals
 
     fs = 48000
     hours = np.geomspace(1.0 / 60.0, 8.0, 60)
     sample = 0.4946 * np.random.default_rng(1).standard_normal(2 * fs)
-    base = float(laeq(sample, fs))
+    base = float(signals.laeq(sample, fs))
     # lex_8h(sample, duration_hours=h) - LAeq(sample) is the 10 log10(h/8)
     # normalisation, so the contour is the target minus that offset.
-    offsets = np.array([float(lex_8h(sample, fs, duration_hours=h)) - base
-                        for h in hours])
+    offsets = np.array(
+        [
+            float(signals.lex_8h(sample, fs, duration_hours=h)) - base
+            for h in hours
+        ]
+    )
 
     _, ax = plt.subplots(figsize=(10, 5.4))
     styles = [(80.0, COLOR_TERTIARY, ":"), (85.0, COLOR_PRIMARY, "-"),
@@ -1475,7 +1544,6 @@ def generate_dose_exchange(output_dir: str) -> None:
 def generate_ballistics_vs_duration(output_dir: str) -> None:
     """How much of an event each detector keeps, against event duration."""
     print("Generating ballistics_vs_duration.png...")
-    from phonometry import time_weighting
 
     fs = 48000
     t = np.arange(int(3.0 * fs)) / fs
@@ -1486,8 +1554,10 @@ def generate_ballistics_vs_duration(output_dir: str) -> None:
     # of it after 2.5 s, which would bias the whole S curve by 0.4 dB.
     long_t = np.arange(int(12.0 * fs)) / fs
     long_tone = np.sin(2 * np.pi * 4000 * long_t)
-    steady = {m: float(np.mean(time_weighting(long_tone, fs, mode=m)[-fs:]))
-              for m in ("fast", "slow", "impulse")}
+    steady = {
+        m: float(np.mean(filters.time_weighting(long_tone, fs, mode=m)[-fs:]))
+        for m in ("fast", "slow", "impulse")
+    }
 
     _, ax = plt.subplots(figsize=(10, 5.4))
     modes = [("fast", 0.125, COLOR_PRIMARY, "-"),
@@ -1501,8 +1571,13 @@ def generate_ballistics_vs_duration(output_dir: str) -> None:
             burst = np.zeros_like(t)
             stop = start + int(t_b * fs)
             burst[start:stop] = tone[start:stop]
-            peaks.append(10 * np.log10(
-                float(np.max(time_weighting(burst, fs, mode=mode))) / reference))
+            peaks.append(
+                10
+                * np.log10(
+                    float(np.max(filters.time_weighting(burst, fs, mode=mode)))
+                    / reference
+                )
+            )
         measured[mode] = np.asarray(peaks)
         ax.semilogx(durations * 1e3, measured[mode], color=color, linestyle=style,
                     linewidth=1.9, label=f"{mode} (measured)")
@@ -1519,7 +1594,9 @@ def generate_ballistics_vs_duration(output_dir: str) -> None:
         burst = np.zeros_like(t)
         burst[start:start + int(0.1 * fs)] = tone[start:start + int(0.1 * fs)]
         at_100ms[mode] = 10 * np.log10(
-            float(np.max(time_weighting(burst, fs, mode=mode))) / reference)
+            float(np.max(filters.time_weighting(burst, fs, mode=mode)))
+            / reference
+        )
     gap = at_100ms["fast"] - at_100ms["slow"]
     ax.axvline(100.0, color=COLOR_MUTED, linewidth=1.0)
     ax.annotate(f"at 100 ms, F reads {gap:.1f} dB above S",
@@ -1551,13 +1628,13 @@ def generate_ballistics_vs_duration(output_dir: str) -> None:
 def generate_c_minus_a_spectrum(output_dir: str) -> None:
     """What a C - A difference of 23 dB looks like as a band spectrum."""
     print("Generating c_minus_a_spectrum.png...")
-    from phonometry import leq, noise_signal, octave_filter, weighting_filter
+    from phonometry import signals
 
     fs = 48000
     t = np.arange(10 * fs) / fs
     rng = np.random.default_rng(1)
     rumble = 0.2 * np.sin(2 * np.pi * 50 * t) + 0.01 * rng.standard_normal(t.size)
-    pink = noise_signal(fs, 10.0, color="pink", rms=0.02, seed=5)
+    pink = signals.noise_signal(fs, 10.0, color="pink", rms=0.02, seed=5)
 
     scenes = [("A 50 Hz rumble under a light hiss", rumble),
               ("Broadband pink noise", pink)]
@@ -1566,12 +1643,14 @@ def generate_c_minus_a_spectrum(output_dir: str) -> None:
               ("A", COLOR_SECONDARY, ":")]
     for ax, (title, x) in zip(axes, scenes):
         for curve, color, style in curves:
-            weighted = weighting_filter(x, fs, curve=curve)
-            band_levels, centres = octave_filter(weighted, fs, fraction=3)
+            weighted = filters.weighting_filter(x, fs, curve=curve)
+            band_levels, centres = filters.octave_filter(
+                weighted, fs, fraction=3
+            )
             ax.semilogx(centres, band_levels, color=color, linestyle=style,
                         linewidth=1.8, label=f"{curve}-weighted bands")
-        la = float(leq(weighting_filter(x, fs, curve="A")))
-        lc = float(leq(weighting_filter(x, fs, curve="C")))
+        la = float(signals.leq(filters.weighting_filter(x, fs, curve="A")))
+        lc = float(signals.leq(filters.weighting_filter(x, fs, curve="C")))
         ax.text(0.03, 0.05,
                 f"$L_{{\\mathrm{{Aeq}}}}$ {la:.1f} dB\n$L_{{\\mathrm{{Ceq}}}}$ {lc:.1f} dB\n"
                 f"C − A = {_fmt_minus(lc - la, '.1f')} dB",
@@ -1597,9 +1676,10 @@ def generate_pole_migration(output_dir: str) -> None:
     from scipy.signal import sos2zpk
 
     fs = 48000
-    bank = OctaveFilterBank(fs=fs, fraction=3)
-    full = OctaveFilterBank(fs=fs, fraction=3,
-                            design=FilterDesign(resample=False))
+    bank = filters.OctaveFilterBank(fs=fs, fraction=3)
+    full = filters.OctaveFilterBank(
+        fs=fs, fraction=3, design=filters.FilterDesign(resample=False)
+    )
     idx = int(np.argmin(np.abs(np.asarray(bank.freq) - 25.0)))
     f_m = float(bank.freq[idx])
     factor = int(bank.factor[idx])
@@ -1687,13 +1767,12 @@ def generate_pole_migration(output_dir: str) -> None:
 def generate_parametric_eq_cascade(output_dir: str) -> None:
     """The three sections of the guide's snippet and the cascade they sum to."""
     print("Generating parametric_eq_cascade.png...")
-    from phonometry import EQSection, ParametricEQ
 
     fs = 48000
-    eq = ParametricEQ(fs, [
-        EQSection("lowshelf", 100.0, gain_db=4.0),
-        EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0),
-        EQSection("highshelf", 8000.0, gain_db=3.0),
+    eq = filters.ParametricEQ(fs, [
+        filters.EQSection("lowshelf", 100.0, gain_db=4.0),
+        filters.EQSection("peaking", 1000.0, gain_db=-6.0, bw=1.0),
+        filters.EQSection("highshelf", 8000.0, gain_db=3.0),
     ])
     result = eq.response(f_min=20.0, f_max=20000.0)
     result.plot(show_sections=True)
@@ -1715,9 +1794,13 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
     names = ("butter", "cheby1", "cheby2", "ellip", "bessel")
     two_fm, four_fm, delays = [], [], []
     for ftype in names:
-        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                                design=FilterDesign(filter_type=ftype,
-                                                    resample=False))
+        bank = filters.OctaveFilterBank(
+            fs,
+            fraction=1,
+            order=6,
+            limits=[800, 1200],
+            design=filters.FilterDesign(filter_type=ftype, resample=False),
+        )
         idx = int(np.argmin(np.abs(np.asarray(bank.freq) - 1000.0)))
         f_m = float(bank.freq[idx])
         w, h = sosfreqz(bank.sos[idx], worN=1 << 17, fs=fs)
@@ -1770,7 +1853,6 @@ def generate_architecture_tradeoff(output_dir: str) -> None:
 def generate_class_mask_architectures(output_dir: str) -> None:
     """The four architecture verdicts of the table, drawn on their own mask."""
     print("Generating class_mask_architectures.png...")
-    from phonometry import filter_class_compliance
 
     fs = 48000
     cases = (("butter", "Butterworth: passes"),
@@ -1779,9 +1861,14 @@ def generate_class_mask_architectures(output_dir: str) -> None:
              ("bessel", "Bessel: roll-off too slow"))
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     for ax, (ftype, title) in zip(axes.ravel(), cases):
-        bank = OctaveFilterBank(fs, fraction=1, order=6, limits=[800, 1200],
-                                design=FilterDesign(filter_type=ftype))
-        result = filter_class_compliance(bank)
+        bank = filters.OctaveFilterBank(
+            fs,
+            fraction=1,
+            order=6,
+            limits=[800, 1200],
+            design=filters.FilterDesign(filter_type=ftype),
+        )
+        result = filters.filter_class_compliance(bank)
         result.plot(ax=ax)
         verdict = result.overall_class
         ax.set_title(f"{title}   (overall_class = {verdict})",
@@ -1796,7 +1883,7 @@ def generate_class_mask_architectures(output_dir: str) -> None:
 def generate_leakage_floor(output_dir: str) -> None:
     """What a 70 dB stopband looks like as a measured band spectrum."""
     print("Generating filter_leakage_floor.png...")
-    from phonometry import LevelCalibration, noise_signal, octave_filter
+    from phonometry import signals
 
     fs = 48000
     t = np.arange(int(8.0 * fs)) / fs
@@ -1804,19 +1891,19 @@ def generate_leakage_floor(output_dir: str) -> None:
     # so the real floor and the filter's own skirt are within reach of each
     # other and the crossing is the point of the figure.
     tone = np.sqrt(2) * (2e-5 * 10 ** (100 / 20)) * np.sin(2 * np.pi * 1000 * t)
-    floor = noise_signal(fs, 8.0, color="pink", rms=2.04e-3, seed=4)
+    floor = signals.noise_signal(fs, 8.0, color="pink", rms=2.04e-3, seed=4)
     x = tone + floor
 
-    calibration = LevelCalibration(factor=1.0)
+    calibration = filters.LevelCalibration(factor=1.0)
     _, ax = plt.subplots(figsize=(10, 5.4))
     for order, color, style in ((6, COLOR_PRIMARY, "-"),
                                 (10, COLOR_TERTIARY, "--")):
-        levels, centres = octave_filter(x, fs, fraction=3, order=order,
-                                        calibration=calibration)
+        levels, centres = filters.octave_filter(x, fs, fraction=3, order=order,
+                                                calibration=calibration)
         ax.semilogx(centres, levels, color=color, linestyle=style,
                     linewidth=1.8, label=f"measured band levels, order {order}")
-    truth, centres = octave_filter(floor, fs, fraction=3, order=6,
-                                   calibration=calibration)
+    truth, centres = filters.octave_filter(floor, fs, fraction=3, order=6,
+                                           calibration=calibration)
     ax.semilogx(centres, truth, color=COLOR_SECONDARY, linestyle=":",
                 linewidth=1.8, label="the noise actually present")
     ax.annotate("bands on the skirt are measuring\nthe filter, not the sound",
@@ -1842,12 +1929,6 @@ def generate_leakage_floor(output_dir: str) -> None:
 def generate_streaming_level_seams(output_dir: str) -> None:
     """The three streaming pitfalls, in the level domain the reader watches."""
     print("Generating streaming_level_seams.png...")
-    from phonometry import (
-        TimeWeighting,
-        WeightingFilter,
-        time_weighting,
-        weighting_filter,
-    )
 
     fs, block = 48000, 4800                     # 100 ms blocks
     rng = np.random.default_rng(17)
@@ -1862,21 +1943,35 @@ def generate_streaming_level_seams(output_dir: str) -> None:
     # The reference must use the *same* weighting design streaming can use:
     # the oversampled high_accuracy path is not block-compatible, so a
     # comparison against it would show a design difference, not a state one.
-    continuous = to_db(time_weighting(
-        weighting_filter(x, fs, curve="A", high_accuracy=False), fs,
+    continuous = to_db(filters.time_weighting(
+        filters.weighting_filter(x, fs, curve="A", high_accuracy=False), fs,
         mode="fast"))
 
-    aw = WeightingFilter(fs, "A", stateful=True)
-    tw = TimeWeighting(fs, mode="fast")
+    aw = filters.WeightingFilter(fs, "A", stateful=True)
+    tw = filters.TimeWeighting(fs, mode="fast")
     stateful = np.concatenate([
         to_db(np.asarray(tw.process(aw.filter(
             x[i * block:(i + 1) * block]))))
         for i in range(n_blocks)
     ])
 
-    stateless = np.concatenate([to_db(time_weighting(weighting_filter(
-        x[i * block:(i + 1) * block], fs, curve="A", high_accuracy=False), fs,
-        mode="fast")) for i in range(n_blocks)])
+    stateless = np.concatenate(
+        [
+            to_db(
+                filters.time_weighting(
+                    filters.weighting_filter(
+                        x[i * block : (i + 1) * block],
+                        fs,
+                        curve="A",
+                        high_accuracy=False,
+                    ),
+                    fs,
+                    mode="fast",
+                )
+            )
+            for i in range(n_blocks)
+        ]
+    )
 
     seam = max(abs(float(stateless[i * block] - continuous[i * block]))
                for i in range(1, n_blocks))
@@ -1902,8 +1997,8 @@ def generate_streaming_level_seams(output_dir: str) -> None:
     ax_a.grid(color=COLOR_GRID, linestyle="-")
     ax_a.legend(loc="lower right", fontsize=8)
 
-    aw_s = WeightingFilter(fs, "A", stateful=True, steady_ic=True)
-    tw_s = TimeWeighting(fs, mode="fast")
+    aw_s = filters.WeightingFilter(fs, "A", stateful=True, steady_ic=True)
+    tw_s = filters.TimeWeighting(fs, mode="fast")
     shown = 8
     steady = np.concatenate([
         to_db(np.asarray(tw_s.process(aw_s.filter(
@@ -1934,13 +2029,13 @@ def generate_streaming_level_seams(output_dir: str) -> None:
 def generate_survey_channel_average(output_dir: str) -> None:
     """Energy average against dB average over a five-position room survey."""
     print("Generating survey_channel_average.png...")
-    from phonometry import noise_signal, octave_filter
+    from phonometry import signals
 
     fs = 48000
     rng = np.random.default_rng(23)
     # Five positions in one room: the same source, a modal field below about
     # 300 Hz where the positions disagree, and a diffuse field above it.
-    base = noise_signal(fs, 6.0, color="pink", rms=0.05, seed=1)
+    base = signals.noise_signal(fs, 6.0, color="pink", rms=0.05, seed=1)
     survey = []
     for _ in range(5):
         modal = np.zeros_like(base)
@@ -1951,7 +2046,9 @@ def generate_survey_channel_average(output_dir: str) -> None:
         survey.append(base * rng.uniform(0.85, 1.15) + modal)
     x = np.stack(survey)
 
-    spl, centres = octave_filter(x, fs, fraction=3, limits=[25.0, 10000.0])
+    spl, centres = filters.octave_filter(
+        x, fs, fraction=3, limits=[25.0, 10000.0]
+    )
     spl = np.asarray(spl)
     energetic = 10 * np.log10(np.mean(10 ** (spl / 10), axis=0))
     arithmetic = np.mean(spl, axis=0)

@@ -25,11 +25,7 @@ pytest.importorskip("svglib")
 
 import reference_data as ref
 
-from phonometry import (
-    ReportMetadata,
-    intensity_class_compliance,
-    residual_index_limits,
-)
+from phonometry import ReportMetadata, emission
 
 _PDF_MAGIC = b"%PDF"
 
@@ -38,8 +34,12 @@ _BANDS = [row[0] for row in ref.IEC61043_TABLE2]
 
 def _class1_chain(offset: float = 1.5, spacing: float = 0.025):
     """A complete instrument that clears the class 1 minima by ``offset`` dB."""
-    freqs, class1, _ = residual_index_limits("instrument", spacing=spacing)
-    return intensity_class_compliance(class1 + offset, freqs, spacing=spacing)
+    freqs, class1, _ = emission.residual_index_limits(
+        "instrument", spacing=spacing
+    )
+    return emission.intensity_class_compliance(
+        class1 + offset, freqs, spacing=spacing
+    )
 
 
 def _metadata(**kwargs: object) -> ReportMetadata:
@@ -148,8 +148,8 @@ def test_required_class_verdict_both_ways(tmp_path) -> None:
         )
     )
     # 1 dB short of class 1 everywhere, so the chain lands on class 2.
-    freqs, class1, _ = residual_index_limits("instrument")
-    failing = intensity_class_compliance(class1 - 1.0, freqs)
+    freqs, class1, _ = emission.residual_index_limits("instrument")
+    failing = emission.intensity_class_compliance(class1 - 1.0, freqs)
     assert failing.overall_class == 2
     _assert_one_page(
         failing.report(
@@ -160,8 +160,10 @@ def test_required_class_verdict_both_ways(tmp_path) -> None:
 
 def test_non_compliant_chain_renders(tmp_path) -> None:
     """A chain meeting neither class boxes a non-conformity statement."""
-    freqs, _, class2 = residual_index_limits("probe")
-    result = intensity_class_compliance(class2 - 2.0, freqs, device="probe")
+    freqs, _, class2 = emission.residual_index_limits("probe")
+    result = emission.intensity_class_compliance(
+        class2 - 2.0, freqs, device="probe"
+    )
     assert result.overall_class is None
     _assert_one_page(
         result.report(str(tmp_path / "none.pdf"), metadata=_metadata())
@@ -171,8 +173,12 @@ def test_non_compliant_chain_renders(tmp_path) -> None:
 def test_range_limited_note_renders(tmp_path) -> None:
     """A partial band set adds the clause 6.1 qualifying note."""
     bands = _BANDS[6:14]
-    freqs, class1, _ = residual_index_limits("processor", frequencies=bands)
-    result = intensity_class_compliance(class1, freqs, device="processor")
+    freqs, class1, _ = emission.residual_index_limits(
+        "processor", frequencies=bands
+    )
+    result = emission.intensity_class_compliance(
+        class1, freqs, device="processor"
+    )
     assert result.range_limited is True
     _assert_one_page(
         result.report(str(tmp_path / "partial.pdf"), metadata=_metadata())
@@ -191,8 +197,12 @@ def test_range_limited_note_drops_the_class_wording_when_no_class_is_met(
     attests" has no referent.
     """
     octaves = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
-    freqs, _, class2 = residual_index_limits("processor", frequencies=octaves)
-    result = intensity_class_compliance(class2 - 2.0, freqs, device="processor")
+    freqs, _, class2 = emission.residual_index_limits(
+        "processor", frequencies=octaves
+    )
+    result = emission.intensity_class_compliance(
+        class2 - 2.0, freqs, device="processor"
+    )
     assert result.overall_class is None
     assert result.range_limited is True
 

@@ -11,7 +11,7 @@ import string
 import numpy as np
 import pytest
 
-from phonometry import laeq, leq
+from phonometry import signals
 
 FS = 48000
 
@@ -24,13 +24,13 @@ def _tone(f0: float, seconds: float = 1.0, amp: float = 1.0) -> np.ndarray:
 def test_leq_sine_matches_rms() -> None:
     """Leq of a 1 Pa amplitude sine = 20*log10((1/sqrt2)/20u) = 90.97 dB."""
     x = _tone(1000)
-    assert leq(x) == pytest.approx(90.97, abs=0.05)
+    assert signals.leq(x) == pytest.approx(90.97, abs=0.05)
 
 
 def test_leq_dbfs() -> None:
     """RMS of a full-scale sine is -3.01 dBFS."""
     x = _tone(1000)
-    assert leq(x, dbfs=True) == pytest.approx(-3.01, abs=0.05)
+    assert signals.leq(x, dbfs=True) == pytest.approx(-3.01, abs=0.05)
 
 
 def test_leq_dbfs_zero_reference_is_rms_one_not_a_full_scale_sine() -> None:
@@ -40,42 +40,49 @@ def test_leq_dbfs_zero_reference_is_rms_one_not_a_full_scale_sine() -> None:
     0 dBFS; here it reads -3.01, and it takes a sine of amplitude sqrt(2)
     (RMS 1.0) to reach 0. Anything else is a 3.01 dB systematic offset.
     """
-    assert leq(_tone(1000, amp=np.sqrt(2.0)), dbfs=True) == pytest.approx(0.0, abs=1e-6)
-    assert leq(_tone(1000), dbfs=True) == pytest.approx(-3.0103, abs=1e-3)
+    assert signals.leq(
+        _tone(1000, amp=np.sqrt(2.0)), dbfs=True
+    ) == pytest.approx(0.0, abs=1e-6)
+    assert signals.leq(_tone(1000), dbfs=True) == pytest.approx(
+        -3.0103, abs=1e-3
+    )
     # Any RMS-1.0 waveform hits 0 dBFS: the reference is RMS, not a shape.
-    assert leq(np.ones(FS), dbfs=True) == pytest.approx(0.0, abs=1e-9)
+    assert signals.leq(np.ones(FS), dbfs=True) == pytest.approx(0.0, abs=1e-9)
 
 
 def test_leq_multichannel_returns_per_channel() -> None:
     x = np.stack([_tone(1000), 0.5 * _tone(1000)])
-    out = leq(x)
+    out = signals.leq(x)
     assert out.shape == (2,)
     assert out[0] - out[1] == pytest.approx(6.02, abs=0.05)
 
 
 def test_leq_calibration_factor() -> None:
     x = _tone(1000)
-    assert leq(x, calibration_factor=10.0) == pytest.approx(90.97 + 20.0, abs=0.05)
+    assert signals.leq(x, calibration_factor=10.0) == pytest.approx(
+        90.97 + 20.0, abs=0.05
+    )
 
 
 def test_laeq_1khz_equals_leq() -> None:
     """A-weighting is 0 dB at 1 kHz, so LAeq == Leq there."""
     x = _tone(1000, seconds=2.0)
-    assert laeq(x, FS) == pytest.approx(leq(x), abs=0.3)
+    assert signals.laeq(x, FS) == pytest.approx(signals.leq(x), abs=0.3)
 
 
 def test_laeq_100hz_attenuated() -> None:
     """A-weighting at 100 Hz is about -19.1 dB."""
     x = _tone(100, seconds=2.0)
-    assert laeq(x, FS) - leq(x) == pytest.approx(-19.1, abs=0.5)
+    assert signals.laeq(x, FS) - signals.leq(x) == pytest.approx(
+        -19.1, abs=0.5
+    )
 
 
 def test_ln_levels_constant_signal_all_equal() -> None:
     """For a steady tone, L10 == L90 and L50 == Leq (within envelope ripple)."""
-    from phonometry import ln_levels
 
     x = _tone(1000, seconds=3.0)
-    out = ln_levels(x, FS, n=(10, 50, 90))
+    out = signals.ln_levels(x, FS, n=(10, 50, 90))
     assert set(out.keys()) == {10, 50, 90}
     # 5*tau attack skip settles the F integrator to 99.3%, so a steady tone's
     # L10-L90 spread collapses to ~0.01 dB (was ~0.15 dB at the old 2*tau).
@@ -85,36 +92,32 @@ def test_ln_levels_constant_signal_all_equal() -> None:
 
 def test_ln_levels_ordering() -> None:
     """L10 (exceeded 10% of time) >= L50 >= L90 for a fluctuating signal."""
-    from phonometry import ln_levels
 
     rng = np.random.default_rng(0)
     x = rng.standard_normal(FS * 3) * np.linspace(0.1, 1.0, FS * 3)
-    out = ln_levels(x, FS)
+    out = signals.ln_levels(x, FS)
     assert out[10] >= out[50] >= out[90]
 
 
 def test_ln_levels_weighting_a() -> None:
-    from phonometry import ln_levels
 
     x = _tone(100, seconds=3.0)
-    unweighted = ln_levels(x, FS, n=(50,))[50]
-    weighted = ln_levels(x, FS, n=(50,), weighting="A")[50]
+    unweighted = signals.ln_levels(x, FS, n=(50,))[50]
+    weighted = signals.ln_levels(x, FS, n=(50,), weighting="A")[50]
     assert weighted - unweighted == pytest.approx(-19.1, abs=0.5)
 
 
 def test_ln_levels_invalid_percentile_raises() -> None:
-    from phonometry import ln_levels
 
     tone = _tone(1000)
     with pytest.raises(ValueError, match="between 0 and 100"):
-        ln_levels(tone, FS, n=(0,))
+        signals.ln_levels(tone, FS, n=(0,))
 
 
 def test_ln_levels_multichannel() -> None:
-    from phonometry import ln_levels
 
     x = np.stack([_tone(1000, 2.0), 0.5 * _tone(1000, 2.0)])
-    out = ln_levels(x, FS, n=(50,))
+    out = signals.ln_levels(x, FS, n=(50,))
     assert out[50].shape == (2,)
     assert out[50][0] - out[50][1] == pytest.approx(6.02, abs=0.2)
 
@@ -122,29 +125,28 @@ def test_ln_levels_multichannel() -> None:
 def test_leq_dbfs_ignores_calibration_factor() -> None:
     """dBFS is relative to digital full scale (consistent with OctaveFilterBank)."""
     x = _tone(1000)
-    assert leq(x, calibration_factor=10.0, dbfs=True) == pytest.approx(
-        leq(x, dbfs=True), abs=1e-12
+    assert signals.leq(x, calibration_factor=10.0, dbfs=True) == pytest.approx(
+        signals.leq(x, dbfs=True), abs=1e-12
     )
 
 
 def test_leq_empty_signal_raises() -> None:
     empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        leq(empty)
+        signals.leq(empty)
 
 
 def test_leq_nonpositive_calibration_raises() -> None:
     tone = _tone(1000)
     with pytest.raises(ValueError, match="calibration_factor"):
-        leq(tone, calibration_factor=-1.0)
+        signals.leq(tone, calibration_factor=-1.0)
 
 
 def test_ln_levels_empty_signal_raises() -> None:
-    from phonometry import ln_levels
 
     empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        ln_levels(empty, FS)
+        signals.ln_levels(empty, FS)
 
 
 # ---------------------------------------------------------------------------
@@ -163,32 +165,33 @@ def _faded(x: np.ndarray, ramp: float = 0.05) -> np.ndarray:
 
 def test_lc_peak_steady_1khz() -> None:
     """C weighting is ~0 dB at 1 kHz: LCpeak of a steady sine = 20*log10(A/p0)."""
-    from phonometry import lc_peak
 
     x = _faded(_tone(1000, seconds=1.0, amp=1.0))
-    assert lc_peak(x, FS) == pytest.approx(20 * np.log10(1.0 / 2e-5), abs=0.15)
+    assert signals.lc_peak(x, FS) == pytest.approx(
+        20 * np.log10(1.0 / 2e-5), abs=0.15
+    )
 
 
 def test_lc_peak_exceeds_lc_by_crest_factor() -> None:
     """For a steady sine, LCpeak - LC = 20*log10(sqrt(2)) = 3.01 dB."""
-    from phonometry import lc_peak, leq
     from phonometry.filters.weighting import weighting_filter
 
     # 10 ms ramps: enough to avoid the onset click without biasing the RMS
     x = _faded(_tone(1000, seconds=1.0), ramp=0.01)
-    lc = leq(weighting_filter(x, FS, "C"))
-    assert lc_peak(x, FS) - lc == pytest.approx(3.01, abs=0.2)
+    lc = signals.leq(weighting_filter(x, FS, "C"))
+    assert signals.lc_peak(x, FS) - lc == pytest.approx(3.01, abs=0.2)
 
 
 def test_lc_peak_multichannel_and_dbfs() -> None:
-    from phonometry import lc_peak
 
     x = np.stack([_faded(_tone(1000)), 0.5 * _faded(_tone(1000))])
-    out = lc_peak(x, FS)
+    out = signals.lc_peak(x, FS)
     assert out.shape == (2,)
     assert out[0] - out[1] == pytest.approx(6.02, abs=0.1)
     # dBFS: peak 1.0 -> 0 dBFS, calibration must not apply
-    assert lc_peak(_faded(_tone(1000)), FS, calibration_factor=10.0, dbfs=True) == pytest.approx(0.0, abs=0.15)
+    assert signals.lc_peak(
+        _faded(_tone(1000)), FS, calibration_factor=10.0, dbfs=True
+    ) == pytest.approx(0.0, abs=0.15)
 
 
 @pytest.mark.parametrize(
@@ -206,13 +209,12 @@ def test_lc_peak_multichannel_and_dbfs() -> None:
 )
 def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) -> None:
     """One-cycle / half-cycle bursts must reproduce Table 5 within class 1."""
-    from phonometry import lc_peak, leq
     from phonometry.filters.weighting import weighting_filter
 
     fs = 96000
     t = np.arange(int(fs * 1.0)) / fs
     steady = np.sin(2 * np.pi * freq * t)
-    lc_steady = leq(weighting_filter(steady, fs, "C"))
+    lc_steady = signals.leq(weighting_filter(steady, fs, "C"))
 
     n = round(abs(cycles) * fs / freq)  # starts and stops on zero crossings
     sign = 1.0 if cycles > 0 else -1.0
@@ -221,7 +223,7 @@ def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) 
     tt = np.arange(n) / fs
     burst[start:start + n] = sign * np.sin(2 * np.pi * freq * tt)
 
-    diff = lc_peak(burst, fs) - lc_steady
+    diff = signals.lc_peak(burst, fs) - lc_steady
     assert diff == pytest.approx(ref, abs=tol), f"{cycles} cycles @ {freq:.0f} Hz: {diff:.2f} dB"
 
 
@@ -241,13 +243,12 @@ def test_lc_peak_iec_table5(cycles: float, freq: float, ref: float, tol: float) 
 )
 def test_lc_peak_iec_table5_48k(cycles: float, freq: float, ref: float, tol: float) -> None:
     """Table 5 reference differences must also hold at fs = 48 kHz."""
-    from phonometry import lc_peak, leq
     from phonometry.filters.weighting import weighting_filter
 
     fs = 48000
     t = np.arange(int(fs * 1.0)) / fs
     steady = np.sin(2 * np.pi * freq * t)
-    lc_steady = leq(weighting_filter(steady, fs, "C"))
+    lc_steady = signals.leq(weighting_filter(steady, fs, "C"))
 
     n = round(abs(cycles) * fs / freq)  # starts and stops on zero crossings
     sign = 1.0 if cycles > 0 else -1.0
@@ -256,7 +257,7 @@ def test_lc_peak_iec_table5_48k(cycles: float, freq: float, ref: float, tol: flo
     tt = np.arange(n) / fs
     burst[start:start + n] = sign * np.sin(2 * np.pi * freq * tt)
 
-    diff = lc_peak(burst, fs) - lc_steady
+    diff = signals.lc_peak(burst, fs) - lc_steady
     assert diff == pytest.approx(ref, abs=tol), f"{cycles} cycles @ {freq:.0f} Hz: {diff:.2f} dB"
 
 
@@ -283,21 +284,19 @@ def test_lc_peak_recovers_inter_sample_peak_8k_48k() -> None:
     (audit N2 I-1: up to -1.15 dB worst-case over phase, -0.69 dB at phase 0).
     Oversampled peak detection recovers the analytic sinusoid crest.
     """
-    from phonometry import lc_peak
 
     x = _faded(_tone(8000, seconds=1.0))
-    err = lc_peak(x, FS) - _lcpeak_analytic_steady(x, FS)
+    err = signals.lc_peak(x, FS) - _lcpeak_analytic_steady(x, FS)
     assert abs(err) < 0.5, f"LCpeak under-reads by {err:+.3f} dB (inter-sample loss)"
 
 
 def test_lc_peak_oversample_keyword_controls_recovery() -> None:
     """oversample=1 reproduces the legacy on-grid under-read; the default fixes it."""
-    from phonometry import lc_peak
 
     x = _faded(_tone(8000, seconds=1.0))
     ref = _lcpeak_analytic_steady(x, FS)
-    legacy_err = lc_peak(x, FS, oversample=1) - ref
-    fixed_err = lc_peak(x, FS) - ref
+    legacy_err = signals.lc_peak(x, FS, oversample=1) - ref
+    fixed_err = signals.lc_peak(x, FS) - ref
     assert legacy_err < -0.5          # legacy on-grid detection under-reads
     assert abs(fixed_err) < abs(legacy_err)   # default oversampling recovers it
 
@@ -309,24 +308,25 @@ def test_lc_peak_oversample_keyword_controls_recovery() -> None:
 
 def test_sel_steady_signal_normalizes_to_one_second() -> None:
     """SEL = Leq + 10*log10(T / 1 s) for a steady signal of duration T."""
-    from phonometry import leq, sel
 
     x = _tone(1000, seconds=4.0)
-    assert sel(x, FS) == pytest.approx(leq(x) + 10 * np.log10(4.0), abs=1e-6)
+    assert signals.sel(x, FS) == pytest.approx(
+        signals.leq(x) + 10 * np.log10(4.0), abs=1e-6
+    )
 
 
 def test_sel_one_second_equals_leq() -> None:
-    from phonometry import leq, sel
 
     x = _tone(1000, seconds=1.0)
-    assert sel(x, FS) == pytest.approx(leq(x), abs=1e-9)
+    assert signals.sel(x, FS) == pytest.approx(signals.leq(x), abs=1e-9)
 
 
 def test_sel_a_weighted() -> None:
-    from phonometry import laeq, sel
 
     x = _tone(1000, seconds=2.0)
-    assert sel(x, FS, weighting="A") == pytest.approx(laeq(x, FS) + 10 * np.log10(2.0), abs=0.05)
+    assert signals.sel(x, FS, weighting="A") == pytest.approx(
+        signals.laeq(x, FS) + 10 * np.log10(2.0), abs=0.05
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -343,61 +343,64 @@ def _tone_at_level(level_db: float, seconds: float = 2.0, f0: float = 1000.0) ->
 
 def test_sound_exposure_anchor_90db_8h_is_3p2_pa2h() -> None:
     """BS EN 61252:1995 Annex A / §3.3 NOTE 4: 3.2 Pa²h <-> exactly 90 dB."""
-    from phonometry import sound_exposure
 
     x = _tone_at_level(90.0)
-    assert sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(3.2, rel=0.01)
+    assert signals.sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(
+        3.2, rel=0.01
+    )
 
 
 def test_lex_8h_anchor_90db() -> None:
-    from phonometry import lex_8h
 
     x = _tone_at_level(90.0)
-    assert lex_8h(x, FS, duration_hours=8.0) == pytest.approx(90.0, abs=0.05)
+    assert signals.lex_8h(x, FS, duration_hours=8.0) == pytest.approx(
+        90.0, abs=0.05
+    )
 
 
 def test_lex_8h_half_workday_subtracts_3db() -> None:
     """LEX,8h = LAeq,T + 10*log10(T/8h): a 4 h exposure at 90 dB -> 86.99 dB."""
-    from phonometry import lex_8h
 
     x = _tone_at_level(90.0)
-    assert lex_8h(x, FS, duration_hours=4.0) == pytest.approx(90.0 + 10 * np.log10(4 / 8), abs=0.05)
+    assert signals.lex_8h(x, FS, duration_hours=4.0) == pytest.approx(
+        90.0 + 10 * np.log10(4 / 8), abs=0.05
+    )
 
 
 def test_sound_exposure_1_pa2h_is_nearly_85db() -> None:
     """§3.3 NOTE 4: 1 Pa²h corresponds to a LEX,8h of nearly 85 dB (84.95)."""
-    from phonometry import lex_8h, sound_exposure
 
     x = _tone_at_level(84.9485)
-    assert sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(1.0, rel=0.01)
-    assert lex_8h(x, FS, duration_hours=8.0) == pytest.approx(84.95, abs=0.05)
+    assert signals.sound_exposure(x, FS, duration_hours=8.0) == pytest.approx(
+        1.0, rel=0.01
+    )
+    assert signals.lex_8h(x, FS, duration_hours=8.0) == pytest.approx(
+        84.95, abs=0.05
+    )
 
 
 def test_sound_exposure_defaults_to_recording_duration() -> None:
     """Without duration_hours, x IS the whole event: E = integral over len(x)."""
-    from phonometry import sound_exposure
 
     x = _tone_at_level(90.0, seconds=2.0)
     expected = (2e-5 * 10 ** (90 / 20)) ** 2 * (2.0 / 3600.0)  # Pa² * hours
-    assert sound_exposure(x, FS) == pytest.approx(expected, rel=0.01)
+    assert signals.sound_exposure(x, FS) == pytest.approx(expected, rel=0.01)
 
 
 def test_sel_invalid_fs_raises() -> None:
-    from phonometry import sel
 
     tone = _tone(1000)
     with pytest.raises(ValueError, match="fs"):
-        sel(tone, 0)
+        signals.sel(tone, 0)
 
 
 def test_sound_exposure_rejects_nonpositive_duration() -> None:
-    from phonometry import lex_8h, sound_exposure
 
     tone = _tone_at_level(90.0)
     with pytest.raises(ValueError, match="duration_hours"):
-        sound_exposure(tone, FS, duration_hours=0)
+        signals.sound_exposure(tone, FS, duration_hours=0)
     with pytest.raises(ValueError, match="duration_hours"):
-        lex_8h(tone, FS, duration_hours=-1.0)
+        signals.lex_8h(tone, FS, duration_hours=-1.0)
 
 
 # ---------------------------------------------------------------------------
@@ -492,13 +495,13 @@ _QUOTED_CURVE = re.compile(r"`'([A-Za-z]+)'`")
 
 def _accepted_weighting_curves() -> set[str]:
     """Every curve `weighting_filter` really takes, found by asking it."""
-    from phonometry import weighting_filter
+    from phonometry import filters
 
     silence = np.zeros(256)
     accepted = set()
     for candidate in [*string.ascii_uppercase, "AU"]:
         try:
-            weighting_filter(silence, FS, curve=candidate)
+            filters.weighting_filter(silence, FS, curve=candidate)
         except ValueError:
             continue
         accepted.add(candidate)
@@ -535,21 +538,19 @@ def test_ln_levels_and_sel_accept_every_weighting_filter_curve(curve: str) -> No
     'A', 'C', 'G', 'Z'; the real accepted set is whatever `weighting_filter`
     takes. Only an unknown letter raises.
     """
-    from phonometry import ln_levels, sel
 
     x = _tone(1000, seconds=2.0)
-    assert np.isfinite(ln_levels(x, FS, n=(50,), weighting=curve)[50])
-    assert np.isfinite(sel(x, FS, weighting=curve))
+    assert np.isfinite(signals.ln_levels(x, FS, n=(50,), weighting=curve)[50])
+    assert np.isfinite(signals.sel(x, FS, weighting=curve))
 
 
 def test_ln_levels_and_sel_reject_an_unknown_weighting() -> None:
-    from phonometry import ln_levels, sel
 
     x = _tone(1000)
     with pytest.raises(ValueError, match="Weighting curve"):
-        ln_levels(x, FS, weighting="Q")
+        signals.ln_levels(x, FS, weighting="Q")
     with pytest.raises(ValueError, match="Weighting curve"):
-        sel(x, FS, weighting="Q")
+        signals.sel(x, FS, weighting="Q")
 
 
 # ---------------------------------------------------------------------------
@@ -564,7 +565,7 @@ def test_leq_takes_the_signals_own_calibration() -> None:
 
     x = _tone(1000)
     sig = Signal(x, FS, calibration_factor=2.0)
-    assert leq(sig) == leq(x, calibration_factor=2.0)
+    assert signals.leq(sig) == signals.leq(x, calibration_factor=2.0)
 
 
 def test_explicit_calibration_beats_the_signals() -> None:
@@ -573,14 +574,16 @@ def test_explicit_calibration_beats_the_signals() -> None:
 
     x = _tone(1000)
     sig = Signal(x, FS, calibration_factor=2.0)
-    assert leq(sig, calibration_factor=10.0) == leq(x, calibration_factor=10.0)
+    assert signals.leq(sig, calibration_factor=10.0) == signals.leq(
+        x, calibration_factor=10.0
+    )
 
 
 def test_uncalibrated_signal_levels_are_digital_unit_levels() -> None:
     from phonometry.io import Signal
 
     x = _tone(1000)
-    assert leq(Signal(x, FS)) == leq(x)
+    assert signals.leq(Signal(x, FS)) == signals.leq(x)
 
 
 def test_dbfs_ignores_the_signals_calibration() -> None:
@@ -588,42 +591,48 @@ def test_dbfs_ignores_the_signals_calibration() -> None:
     from phonometry.io import Signal
 
     x = _tone(1000)
-    assert leq(Signal(x, FS, calibration_factor=123.0), dbfs=True) == leq(
-        x, dbfs=True
-    )
+    assert signals.leq(
+        Signal(x, FS, calibration_factor=123.0), dbfs=True
+    ) == signals.leq(x, dbfs=True)
 
 
 def test_fs_functions_take_the_signals_rate_and_calibration() -> None:
-    from phonometry import lc_peak, ln_levels, sel
     from phonometry.io import Signal
 
     x = _tone(1000, seconds=2.0)
     sig = Signal(x, FS, calibration_factor=0.5)
-    assert lc_peak(sig) == lc_peak(x, FS, calibration_factor=0.5)
-    assert sel(sig, weighting="A") == sel(
+    assert signals.lc_peak(sig) == signals.lc_peak(
+        x, FS, calibration_factor=0.5
+    )
+    assert signals.sel(sig, weighting="A") == signals.sel(
         x, FS, weighting="A", calibration_factor=0.5
     )
-    assert ln_levels(sig, weighting="A") == ln_levels(
+    assert signals.ln_levels(sig, weighting="A") == signals.ln_levels(
         x, FS, weighting="A", calibration_factor=0.5
     )
 
 
 def test_a_conflicting_fs_is_refused_a_matching_one_is_not() -> None:
-    from phonometry import lc_peak
     from phonometry.io import Signal
 
     sig = Signal(_tone(1000), FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
-        lc_peak(sig, FS + 1)
+        signals.lc_peak(sig, FS + 1)
     # The same number twice is agreement, not a conflict.
-    assert lc_peak(sig, FS) == lc_peak(sig)
+    assert signals.lc_peak(sig, FS) == signals.lc_peak(sig)
 
 
 def test_a_bare_array_still_requires_fs() -> None:
-    from phonometry import laeq, lc_peak, lex_8h, ln_levels, sel, sound_exposure
 
     x = _tone(1000)
-    for func in (ln_levels, sel, lc_peak, laeq, sound_exposure, lex_8h):
+    for func in (
+        signals.ln_levels,
+        signals.sel,
+        signals.lc_peak,
+        signals.laeq,
+        signals.sound_exposure,
+        signals.lex_8h,
+    ):
         with pytest.raises(ValueError, match="fs is required"):
             func(x)
 
@@ -636,25 +645,27 @@ def test_exposure_functions_take_the_signals_rate_and_calibration() -> None:
     silently dropped (np.asarray sees only the samples) computed a level
     ~10 dB off that looked perfectly plausible. All of them or none.
     """
-    from phonometry import laeq, lex_8h, sound_exposure
     from phonometry.io import Signal
 
     x = _tone(1000, seconds=2.0)
     sig = Signal(x, FS, calibration_factor=3.5)
-    assert laeq(sig) == laeq(x, FS, calibration_factor=3.5)
-    assert sound_exposure(sig) == sound_exposure(x, FS, calibration_factor=3.5)
-    assert sound_exposure(sig, duration_hours=8.0) == sound_exposure(
+    assert signals.laeq(sig) == signals.laeq(x, FS, calibration_factor=3.5)
+    assert signals.sound_exposure(sig) == signals.sound_exposure(
+        x, FS, calibration_factor=3.5
+    )
+    assert signals.sound_exposure(
+        sig, duration_hours=8.0
+    ) == signals.sound_exposure(
         x, FS, duration_hours=8.0, calibration_factor=3.5
     )
-    assert lex_8h(sig) == lex_8h(x, FS, calibration_factor=3.5)
+    assert signals.lex_8h(sig) == signals.lex_8h(x, FS, calibration_factor=3.5)
 
 
 def test_exposure_functions_refuse_a_conflicting_fs() -> None:
-    from phonometry import laeq, lex_8h, sound_exposure
     from phonometry.io import Signal
 
     sig = Signal(_tone(1000), FS)
-    for func in (laeq, sound_exposure, lex_8h):
+    for func in (signals.laeq, signals.sound_exposure, signals.lex_8h):
         with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
             func(sig, FS + 1)
 
@@ -663,7 +674,10 @@ def test_multichannel_signal_returns_per_channel_levels() -> None:
     from phonometry.io import Signal
 
     x = np.stack([_tone(1000), 0.5 * _tone(1000)])
-    out = leq(Signal(x, FS, calibration_factor=2.0))
+    out = signals.leq(Signal(x, FS, calibration_factor=2.0))
     assert isinstance(out, np.ndarray)
     assert out.shape == (2,)
-    assert out.tolist() == np.asarray(leq(x, calibration_factor=2.0)).tolist()
+    assert (
+        out.tolist()
+        == np.asarray(signals.leq(x, calibration_factor=2.0)).tolist()
+    )

@@ -22,7 +22,7 @@ import os
 import numpy as np
 import pytest
 
-from phonometry import ReportMetadata, installed_source_prediction
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 _S0 = 10.0
@@ -71,7 +71,9 @@ def _paths():
 
 
 def _result():
-    return installed_source_prediction(_LWSC, _DC, _paths(), frequencies=_BANDS)
+    return building.installed_source_prediction(
+        _LWSC, _DC, _paths(), frequencies=_BANDS
+    )
 
 
 def _oracle_path(rij: np.ndarray) -> np.ndarray:
@@ -252,7 +254,9 @@ def test_scalar_source_level_fiche_renders(tmp_path) -> None:
     The table prints L_Ws,inst per band, so a scalar source level used to
     crash the fiche with an IndexError once the paths carried band axes.
     """
-    result = installed_source_prediction(80.0, 10.0, _paths(), frequencies=_BANDS)
+    result = building.installed_source_prediction(
+        80.0, 10.0, _paths(), frequencies=_BANDS
+    )
     assert result.installed_power_level.shape == _BANDS.shape
     out = tmp_path / "scalar.pdf"
     result.report(str(out), verbose=True)

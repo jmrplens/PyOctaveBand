@@ -40,37 +40,7 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import (
-    airborne_flanking_path,
-    bare_floor_impact_level,
-    bending_radiation_factor,
-    calculated_sound_reduction_index,
-    detailed_airborne_prediction,
-    detailed_impact_prediction,
-    direct_impact_level,
-    direct_reduction_index,
-    flanking_element,
-    flanking_impact_level_from_flanking_level,
-    flanking_impact_level_from_normalized_difference,
-    flanking_reduction_index_from_flanking_level,
-    flanking_reduction_index_from_normalized_difference,
-    floating_floor_improvement,
-    forced_radiation_factor,
-    in_situ_element,
-    in_situ_equivalent_absorption_length,
-    in_situ_impact_level,
-    in_situ_reduction_index,
-    in_situ_total_loss_factor,
-    in_situ_velocity_level_difference,
-    laboratory_total_loss_factor,
-    perimeter_absorption_coefficient,
-    predicted_airborne_insulation,
-    reciprocity_impact_level,
-    resonant_sound_reduction_index,
-    structural_reverberation_time,
-    weighted_impact_rating,
-    weighted_rating,
-)
+from phonometry import building
 
 BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
 # The building's own geometry and material data live in the shared fixture
@@ -85,13 +55,16 @@ TOL = 0.1
 @pytest.fixture(scope="module")
 def situ() -> dict:
     """Every element of the worked example evaluated in situ, per band."""
-    return {k: in_situ_element(e, BANDS) for k, e in iso12354_building.elements().items()}
+    return {
+        k: building.in_situ_element(e, BANDS)
+        for k, e in iso12354_building.elements().items()
+    }
 
 
 @pytest.fixture(scope="module")
 def delta_l() -> np.ndarray:
     """The floating floor's improvement, 30 lg(f/fo) above fo = 52,8 Hz."""
-    return floating_floor_improvement(
+    return building.floating_floor_improvement(
         BANDS, resonance_frequency=iso12354_building.floating_floor_resonance()
     )
 
@@ -155,8 +128,8 @@ def test_table_l2_forced_radiation_factor(situ: dict, label: str) -> None:
 def test_forced_radiation_factor_matches_table_b1_openings() -> None:
     """ISO 12354-1 Table B.1: 10 lg σf of the 2 m² and 10 m² test openings."""
     bands = BANDS[:-1]  # Table B.1 stops at 4 kHz
-    small = forced_radiation_factor(bands, length1=1.5, length2=1.25)
-    large = forced_radiation_factor(bands, length1=3.75, length2=2.65)
+    small = building.forced_radiation_factor(bands, length1=1.5, length2=1.25)
+    large = building.forced_radiation_factor(bands, length1=3.75, length2=2.65)
     printed_small = (-6.5, -4.8, -3.5, -2.6, -1.8, -1.1, -0.5, 0.0, 0.5, 0.9,
                      1.3, 1.7, 2.0, 2.3, 2.6, 2.9, 3.0, 3.0, 3.0, 3.0)
     printed_large = (-2.1, -1.4, -0.7, -0.2, 0.3, 0.8, 1.1, 1.5, 1.8, 2.2, 2.5,
@@ -192,7 +165,7 @@ def test_table_g3_in_situ_impact_level(situ: dict) -> None:
 def test_structural_reverberation_time_is_the_loss_factor_inverse(situ: dict) -> None:
     """``Ts = 2,2/(f ηtot)`` closes the Formula (C.1) pair exactly."""
     floor = situ["floor"]
-    assert structural_reverberation_time(
+    assert building.structural_reverberation_time(
         BANDS, floor.total_loss_factor
     ) == pytest.approx(floor.reverberation_time, rel=1e-12)
 
@@ -215,12 +188,12 @@ def test_table_l4_velocity_level_differences(situ: dict) -> None:
     """
     kij = iso12354_building.junction_indices()
     lengths = iso12354_building.COUPLING_LENGTH
-    d1 = in_situ_velocity_level_difference(
+    d1 = building.in_situ_velocity_level_difference(
         kij["floor-ext"], coupling_length=lengths["ext1"],
         absorption_length_i=situ["floor"].absorption_length,
         absorption_length_j=situ["ext1"].absorption_length,
     )
-    fourth = in_situ_velocity_level_difference(
+    fourth = building.in_situ_velocity_level_difference(
         kij["floor-int"], coupling_length=lengths["int2"],
         absorption_length_i=situ["floor"].absorption_length,
         absorption_length_j=situ["int2"].absorption_length,
@@ -231,7 +204,7 @@ def test_table_l4_velocity_level_differences(situ: dict) -> None:
 
 def test_velocity_level_difference_is_floored_at_zero() -> None:
     """Formula (10) states ``Dv,ij,situ ≥ 0 dB``."""
-    got = in_situ_velocity_level_difference(
+    got = building.in_situ_velocity_level_difference(
         -30.0, coupling_length=4.0, absorption_length_i=10.0,
         absorption_length_j=10.0,
     )
@@ -244,9 +217,9 @@ def test_velocity_level_difference_is_floored_at_zero() -> None:
 @pytest.fixture(scope="module")
 def airborne(situ: dict, delta_l: np.ndarray):
     """The Annex L airborne prediction, assembled from the fixture."""
-    return detailed_airborne_prediction(
+    return building.detailed_airborne_prediction(
         BANDS,
-        direct_index=direct_reduction_index(
+        direct_index=building.direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta_l
         ),
         flanking_paths=iso12354_building.airborne_paths(situ, delta_l),
@@ -289,9 +262,11 @@ def test_path_fractions_sum_to_one_and_name_a_dominant_path(airborne) -> None:
 @pytest.fixture(scope="module")
 def impact(situ: dict, delta_l: np.ndarray):
     """The Annex G impact prediction, assembled from the same fixture."""
-    return detailed_impact_prediction(
+    return building.detailed_impact_prediction(
         BANDS,
-        direct_level=direct_impact_level(situ["floor"].impact_level, delta_l=delta_l),
+        direct_level=building.direct_impact_level(
+            situ["floor"].impact_level, delta_l=delta_l
+        ),
         flanking_paths=iso12354_building.impact_paths(situ, delta_l),
     )
 
@@ -380,13 +355,13 @@ def test_simplified_model_agrees_with_the_detailed_model(airborne) -> None:
         lij = lengths[name]
         k_cross = kij["floor-ext"] if key == "ext" else kij["floor-int"]
         k_through = kij["ext-ext"] if key == "ext" else kij["int-int"]
-        paths.extend(flanking_element(
+        paths.extend(building.flanking_element(
             label=tag, r_flanking=rw[key], r_separating=rw["floor"],
             k_ff=k_through, k_fd=k_cross, k_df=k_cross,
             separating_area=SEPARATING_AREA, coupling_length=lij,
             delta_r_df=ref.ISO12354_ANNEX_L10_DELTA_RW,
         ))
-    simplified = predicted_airborne_insulation(
+    simplified = building.predicted_airborne_insulation(
         r_direct=rw["floor"],
         delta_r_direct=ref.ISO12354_ANNEX_L10_DELTA_RW,
         flanking_paths=paths,
@@ -414,7 +389,7 @@ def test_table_l12_resonant_correction_of_the_wall_leaf() -> None:
     The gypsum leaf's critical frequency falls between the 2 kHz and 2,5 kHz
     bands, above which the printed correction drops to zero.
     """
-    got = resonant_sound_reduction_index(
+    got = building.resonant_sound_reduction_index(
         ref.ISO12354_TABLE_L12_R_WALL, BANDS, critical_frequency=2200.0
     )
     assert got == pytest.approx(ref.ISO12354_TABLE_L12_R_STAR_WALL, abs=TOL)
@@ -422,14 +397,14 @@ def test_table_l12_resonant_correction_of_the_wall_leaf() -> None:
 
 def test_table_l11_lightweight_flanking_paths_and_total() -> None:
     """Table L.11, the Ff and Df paths (Formula 17) and the total ``R'``."""
-    ff = flanking_reduction_index_from_normalized_difference(
+    ff = building.flanking_reduction_index_from_normalized_difference(
         index_i=ref.ISO12354_TABLE_L12_R_STAR_WALL,
         index_j=ref.ISO12354_TABLE_L12_R_STAR_WALL,
         normalized_velocity_level_difference=ref.ISO12354_TABLE_L12_DV_FF,
         separating_area=ref.ISO12354_LIGHTWEIGHT_AREA,
         coupling_length=ref.ISO12354_LIGHTWEIGHT_COUPLING,
     )
-    df = flanking_reduction_index_from_normalized_difference(
+    df = building.flanking_reduction_index_from_normalized_difference(
         index_i=ref.ISO12354_TABLE_L13_R_STAR_BARE,
         index_j=ref.ISO12354_TABLE_L12_R_STAR_WALL,
         normalized_velocity_level_difference=ref.ISO12354_TABLE_L13_DV_DF,
@@ -442,7 +417,7 @@ def test_table_l11_lightweight_flanking_paths_and_total() -> None:
 
     from phonometry.building.prediction.detailed_model import BandPath
 
-    result = detailed_airborne_prediction(
+    result = building.detailed_airborne_prediction(
         BANDS,
         direct_index=ref.ISO12354_TABLE_L12_RD_FLOOR,
         flanking_paths=[BandPath("Ff", "Ff", ff), BandPath("Df", "Df", df)],
@@ -462,12 +437,12 @@ def test_table_l11_path_ratings() -> None:
                         ("RFf", ref.ISO12354_TABLE_L11_R_FF),
                         ("RDf", ref.ISO12354_TABLE_L11_R_DF)):
         spectrum = np.asarray(values, dtype=np.float64)[index]
-        assert weighted_rating(spectrum).rating == printed[key], key
+        assert building.weighted_rating(spectrum).rating == printed[key], key
 
 
 def test_table_l15_flanking_index_from_measured_level_difference() -> None:
     """Table L.15, ``R13`` from the measured ``Dn,f,13`` (Formula 16)."""
-    got = flanking_reduction_index_from_flanking_level(
+    got = building.flanking_reduction_index_from_flanking_level(
         ref.ISO12354_TABLE_L15_DNF,
         separating_area=ref.ISO12354_TABLE_L14_SEPARATING_AREA,
         coupling_length=ref.ISO12354_TABLE_L14_COUPLING,
@@ -487,11 +462,11 @@ def test_flanking_impact_level_from_a_measured_flanking_level() -> None:
     laboratory one.
     """
     ln_f = np.array([60.0, 58.0, 56.0])
-    assert flanking_impact_level_from_flanking_level(
+    assert building.flanking_impact_level_from_flanking_level(
         ln_f, area=20.0, laboratory_area=10.0,
         coupling_length=4.0, laboratory_coupling_length=4.5,
     ) == pytest.approx([56.4782, 54.4782, 52.4782], abs=5e-4)
-    assert flanking_impact_level_from_flanking_level(
+    assert building.flanking_impact_level_from_flanking_level(
         ln_f, area=10.0, laboratory_area=10.0,
         coupling_length=2.5, laboratory_coupling_length=2.5,
     ) == pytest.approx(ln_f)
@@ -507,7 +482,7 @@ def test_impact_prediction_without_a_direct_path_sums_the_flanking_paths() -> No
     from phonometry.building.prediction.detailed_model import BandPath
 
     values = np.full(BANDS.size, 50.0)
-    result = detailed_impact_prediction(
+    result = building.detailed_impact_prediction(
         BANDS,
         flanking_paths=[BandPath("Ff1", "Ff", values), BandPath("Ff2", "Ff", values)],
     )
@@ -515,7 +490,7 @@ def test_impact_prediction_without_a_direct_path_sums_the_flanking_paths() -> No
     assert result.l_prime_n == pytest.approx(50.0 + 10.0 * np.log10(2.0))
     assert result.fractions == pytest.approx(0.5)
     with pytest.raises(ValueError, match="direct_level"):
-        detailed_impact_prediction(BANDS)
+        building.detailed_impact_prediction(BANDS)
 
 
 def test_table_l16_predicted_flanking_index_matches_the_measurement() -> None:
@@ -525,7 +500,7 @@ def test_table_l16_predicted_flanking_index_matches_the_measurement() -> None:
     of the measured ``R13`` of Table L.15 in the weighted rating, which is the
     point of the standard's comparison.
     """
-    got = flanking_reduction_index_from_normalized_difference(
+    got = building.flanking_reduction_index_from_normalized_difference(
         index_i=ref.ISO12354_TABLE_L16_R_SITU,
         index_j=ref.ISO12354_TABLE_L16_R_SITU,
         normalized_velocity_level_difference=ref.ISO12354_TABLE_L16_DV,
@@ -537,12 +512,12 @@ def test_table_l16_predicted_flanking_index_matches_the_measurement() -> None:
 
 def test_table_g11_lightweight_impact_paths_and_total() -> None:
     """Tables G.11 to G.13, the lightweight impact chain (Part 2, (11)/(14))."""
-    direct = direct_impact_level(
+    direct = building.direct_impact_level(
         ref.ISO12354_TABLE_G12_LN_BARE,
         delta_l=ref.ISO12354_TABLE_G12_DELTA_LI,
         delta_l_ceiling=ref.ISO12354_TABLE_G12_DELTA_LDI,
     )
-    flanking = flanking_impact_level_from_normalized_difference(
+    flanking = building.flanking_impact_level_from_normalized_difference(
         floor_level=ref.ISO12354_TABLE_G12_LN_BARE,
         index_i=ref.ISO12354_TABLE_G13_R_BARE,
         index_j=ref.ISO12354_TABLE_G13_R_WALL,
@@ -556,7 +531,7 @@ def test_table_g11_lightweight_impact_paths_and_total() -> None:
 
     from phonometry.building.prediction.detailed_model import BandPath
 
-    result = detailed_impact_prediction(
+    result = building.detailed_impact_prediction(
         BANDS, direct_level=direct,
         flanking_paths=[BandPath("Df", "Df", flanking)],
     )
@@ -573,7 +548,7 @@ def test_table_g11_path_ratings() -> None:
     for key, values in (("LnDd", ref.ISO12354_TABLE_G11_LN_DD),
                         ("LnDf", ref.ISO12354_TABLE_G11_LN_DF)):
         spectrum = np.asarray(values, dtype=np.float64)[index]
-        rating = weighted_impact_rating(spectrum).rating
+        rating = building.weighted_impact_rating(spectrum).rating
         assert rating == ref.ISO12354_TABLE_G11_RATINGS[key], key
 
 
@@ -604,32 +579,39 @@ def test_table_b2_octave_impact_levels_of_monolithic_floors() -> None:
         rho, c_l, eta_int = ref.ISO12354_2_TABLE_B1[material]
         thickness = mass / rho
         fc = 340.0**2 / (1.8 * c_l * thickness)
-        sigma = bending_radiation_factor(
+        sigma = building.bending_radiation_factor(
             third, critical_frequency=fc, length1=3.75, length2=2.65
         )
-        eta = laboratory_total_loss_factor(
+        eta = building.laboratory_total_loss_factor(
             third, mass_per_area=mass, internal_loss_factor=eta_int
         )
-        ln = bare_floor_impact_level(
-            third, mass_per_area=mass,
-            structural_reverberation_time=structural_reverberation_time(third, eta),
+        ln = building.bare_floor_impact_level(
+            third,
+            mass_per_area=mass,
+            structural_reverberation_time=building.structural_reverberation_time(
+                third, eta
+            ),
             radiation_factor=sigma,
         )
         octave = 10.0 * np.log10(
             (10.0 ** (ln.reshape(-1, 3) / 10.0)).sum(axis=1)
         )
         assert octave[1:6] == pytest.approx(printed[1:6], abs=2.0), material
-        assert abs(
-            weighted_impact_rating(octave[1:6], "octave").rating - rating
-        ) <= 1
+        assert (
+            abs(
+                building.weighted_impact_rating(octave[1:6], "octave").rating
+                - rating
+            )
+            <= 1
+        )
 
 
 def test_reciprocity_relation_closes_on_itself() -> None:
     """Part 2 Formulae (B.3)/(B.4): ``R + Ln`` depends only on frequency."""
     r = np.linspace(30.0, 70.0, BANDS.size)
-    ln = reciprocity_impact_level(r, BANDS)
+    ln = building.reciprocity_impact_level(r, BANDS)
     assert r + ln == pytest.approx(38.0 + 30.0 * np.log10(BANDS))
-    ln_oct = reciprocity_impact_level(r, BANDS, bands="octave")
+    ln_oct = building.reciprocity_impact_level(r, BANDS, bands="octave")
     assert ln_oct - ln == pytest.approx(5.0)
 
 
@@ -638,11 +620,11 @@ def test_reciprocity_relation_closes_on_itself() -> None:
 # --------------------------------------------------------------------------
 def test_in_situ_transfer_is_symmetric_between_index_and_impact_level() -> None:
     """Formula (9) and Part 2 Formula (5) move ``R`` and ``Ln`` oppositely."""
-    ts_lab = laboratory_total_loss_factor(BANDS, mass_per_area=484.0)
+    ts_lab = building.laboratory_total_loss_factor(BANDS, mass_per_area=484.0)
     ts_situ = 2.2 / (BANDS * 0.02)
     lab = 2.2 / (BANDS * ts_lab)
-    r = in_situ_reduction_index(50.0, ts_situ, lab)
-    ln = in_situ_impact_level(60.0, ts_situ, lab)
+    r = building.in_situ_reduction_index(50.0, ts_situ, lab)
+    ln = building.in_situ_impact_level(60.0, ts_situ, lab)
     assert (r - 50.0) == pytest.approx(-(ln - 60.0))
 
 
@@ -660,16 +642,24 @@ def test_in_situ_transfer_direction_matches_the_printed_signs() -> None:
     lab = np.full(BANDS.size, 0.20)
     half, double = np.full(BANDS.size, 0.10), np.full(BANDS.size, 0.40)
     three = 10.0 * np.log10(2.0)
-    assert in_situ_reduction_index(50.0, half, lab) == pytest.approx(50.0 + three)
-    assert in_situ_impact_level(60.0, half, lab) == pytest.approx(60.0 - three)
-    assert in_situ_reduction_index(50.0, double, lab) == pytest.approx(50.0 - three)
-    assert in_situ_impact_level(60.0, double, lab) == pytest.approx(60.0 + three)
+    assert building.in_situ_reduction_index(50.0, half, lab) == pytest.approx(
+        50.0 + three
+    )
+    assert building.in_situ_impact_level(60.0, half, lab) == pytest.approx(
+        60.0 - three
+    )
+    assert building.in_situ_reduction_index(
+        50.0, double, lab
+    ) == pytest.approx(50.0 - three)
+    assert building.in_situ_impact_level(60.0, double, lab) == pytest.approx(
+        60.0 + three
+    )
 
 
 def test_in_situ_absorption_length_matches_formula_11(situ: dict) -> None:
     """Formula (11) evaluated directly matches the element's own column."""
     floor = situ["floor"]
-    assert in_situ_equivalent_absorption_length(
+    assert building.in_situ_equivalent_absorption_length(
         BANDS, area=20.0, situ_reverberation_time=floor.reverberation_time
     ) == pytest.approx(floor.absorption_length, rel=1e-12)
 
@@ -677,7 +667,7 @@ def test_in_situ_absorption_length_matches_formula_11(situ: dict) -> None:
 def test_in_situ_total_loss_factor_without_perimeter_is_internal_plus_radiation() -> None:
     """With no perimeter losses Formula (C.1) keeps only its first two terms."""
     sigma = np.ones(BANDS.size)
-    eta = in_situ_total_loss_factor(
+    eta = building.in_situ_total_loss_factor(
         BANDS, internal_loss_factor=0.01, mass_per_area=400.0, area=20.0,
         critical_frequency=100.0, radiation_factor=sigma, perimeter_absorption=0.0,
     )
@@ -690,17 +680,21 @@ def test_in_situ_total_loss_factor_without_perimeter_is_internal_plus_radiation(
 # --------------------------------------------------------------------------
 def test_resonant_only_raises_the_index_below_the_critical_frequency() -> None:
     """Annex B.1/B.3: dropping the forced term can only increase ``R``."""
-    sigma = bending_radiation_factor(
+    sigma = building.bending_radiation_factor(
         BANDS, critical_frequency=FC_INT, length1=4.0, length2=2.75
     )
-    sigma_f = forced_radiation_factor(BANDS, length1=4.0, length2=2.75)
+    sigma_f = building.forced_radiation_factor(
+        BANDS, length1=4.0, length2=2.75
+    )
     kwargs = {
         "mass_per_area": M_INT, "critical_frequency": FC_INT,
         "total_loss_factor": 0.03, "radiation_factor": sigma,
         "forced_radiation_factor": sigma_f,
     }
-    full = calculated_sound_reduction_index(BANDS, **kwargs)
-    resonant = calculated_sound_reduction_index(BANDS, resonant_only=True, **kwargs)
+    full = building.calculated_sound_reduction_index(BANDS, **kwargs)
+    resonant = building.calculated_sound_reduction_index(
+        BANDS, resonant_only=True, **kwargs
+    )
     # The band straddling fc uses the f ~ fc branch, which has no forced term.
     below = BANDS < FC_INT / 2.0 ** (1.0 / 6.0)
     assert np.all(resonant[below] > full[below])
@@ -711,9 +705,9 @@ def test_octave_bands_select_the_critical_band_and_rating_range(situ: dict) -> N
     """``bands="octave"`` widens the ``f ≈ fc`` window and rates 125-2000 Hz."""
     octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
     element = iso12354_building.elements()["floor"]
-    got = in_situ_element(element, octaves, bands="octave")
+    got = building.in_situ_element(element, octaves, bands="octave")
     assert got.sound_reduction_index.size == octaves.size
-    result = detailed_airborne_prediction(
+    result = building.detailed_airborne_prediction(
         octaves, direct_index=got.sound_reduction_index, bands="octave"
     )
     assert result.rating is not None
@@ -721,7 +715,7 @@ def test_octave_bands_select_the_critical_band_and_rating_range(situ: dict) -> N
 
 def test_rating_is_none_when_the_bands_do_not_cover_iso717() -> None:
     """A partial spectrum yields per-band results but no single number."""
-    result = detailed_airborne_prediction(
+    result = building.detailed_airborne_prediction(
         BANDS[:5], direct_index=np.full(5, 50.0)
     )
     assert result.rating is None
@@ -739,19 +733,19 @@ def test_rating_is_none_when_the_bands_do_not_cover_iso717() -> None:
 def test_radiation_factor_rejects_invalid_geometry(kwargs: dict) -> None:
     """Non-positive or non-finite geometry is refused."""
     with pytest.raises(ValueError):
-        bending_radiation_factor(BANDS, **kwargs)
+        building.bending_radiation_factor(BANDS, **kwargs)
 
 
 def test_perimeter_absorption_rejects_mismatched_lengths() -> None:
     """Formula (C.4) needs one ``Kij`` per connected element."""
     with pytest.raises(ValueError, match="same length"):
-        perimeter_absorption_coefficient([100.0, 200.0], [6.0])
+        building.perimeter_absorption_coefficient([100.0, 200.0], [6.0])
 
 
 def test_flanking_path_rejects_an_unknown_kind(situ: dict) -> None:
     """Only the three Annex-defined flanking paths exist."""
     with pytest.raises(ValueError, match="kind"):
-        airborne_flanking_path(
+        building.airborne_flanking_path(
             label="x", kind="Dd", element_i=situ["floor"], element_j=situ["ext1"],
             vibration_reduction_index=6.0, coupling_length=4.0,
             separating_area=20.0,
@@ -762,7 +756,7 @@ def test_band_count_mismatch_is_reported(situ: dict) -> None:
     """A path built on a different band set cannot be combined."""
     too_short = np.zeros(5)
     with pytest.raises(ValueError, match="one value per band"):
-        detailed_airborne_prediction(BANDS, direct_index=too_short)
+        building.detailed_airborne_prediction(BANDS, direct_index=too_short)
 
 
 # --------------------------------------------------------------------------

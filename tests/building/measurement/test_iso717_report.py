@@ -27,13 +27,7 @@ from reference_data import (
     ISO717_2_ANNEX_C1_LN as _IMPACT_LN,
 )
 
-from phonometry import (
-    ReportMetadata,
-    WeightedRatingResult,
-    single_panel_transmission_loss,
-    weighted_impact_rating,
-    weighted_rating,
-)
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 
@@ -58,7 +52,7 @@ def _assert_one_page(path: str) -> None:
 
 def test_airborne_report_writes_pdf(tmp_path) -> None:
     """An ISO 717-1 airborne rating renders a PDF fiche."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "airborne.pdf"
     returned = result.report(str(out))
     assert returned == str(out)
@@ -67,7 +61,7 @@ def test_airborne_report_writes_pdf(tmp_path) -> None:
 
 def test_impact_report_writes_pdf(tmp_path) -> None:
     """An ISO 717-2 impact rating renders a PDF fiche."""
-    result = weighted_impact_rating(_IMPACT_LN)
+    result = building.weighted_impact_rating(_IMPACT_LN)
     assert result.quantity == "impact"
     out = tmp_path / "impact.pdf"
     returned = result.report(str(out))
@@ -81,7 +75,7 @@ def test_panel_result_report_convenience(tmp_path) -> None:
         100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
         1000, 1250, 1600, 2000, 2500, 3150,
     ]
-    res = single_panel_transmission_loss(
+    res = building.single_panel_transmission_loss(
         freqs, 15.0, critical_frequency=2000.0, loss_factor=0.02
     )
     out = tmp_path / "panel.pdf"
@@ -91,7 +85,7 @@ def test_panel_result_report_convenience(tmp_path) -> None:
 
 def test_unknown_engine_rejected(tmp_path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
@@ -99,7 +93,9 @@ def test_unknown_engine_rejected(tmp_path) -> None:
 
 def test_missing_band_data_rejected(tmp_path) -> None:
     """A rating built without the per-band curves cannot be reported."""
-    bare = WeightedRatingResult(rating=52, c=-1, ctr=-4, unfavourable_sum=30.0)
+    bare = building.WeightedRatingResult(
+        rating=52, c=-1, ctr=-4, unfavourable_sum=30.0
+    )
     assert bare.band_centers is None
     out = str(tmp_path / "bare.pdf")
     with pytest.raises(ValueError, match="per-band data"):
@@ -113,7 +109,7 @@ def test_airborne_fiche_reproduces_iso717_1_annex_c1(tmp_path) -> None:
     fiche shows: Rw(C;Ctr) = 30(-2;-3) dB, unfavourable-deviation sum 31,8 dB, the
     reference curve shifted by -22 dB, and the per-band unfavourable deviations.
     """
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     assert (result.rating, result.c, result.ctr) == (30, -2, -3)
     assert result.unfavourable_sum == pytest.approx(31.8, abs=0.05)
     # Reference values shifted by -22 dB (Table C.1, column 3).
@@ -134,7 +130,7 @@ def test_impact_fiche_reproduces_iso717_2_annex_c1(tmp_path) -> None:
     Ln,w = 79 dB, CI = -11 dB, unfavourable-deviation sum 28,0 dB (see the note
     on the 2020 reprint's CI in reference_data).
     """
-    result = weighted_impact_rating(_IMPACT_LN)
+    result = building.weighted_impact_rating(_IMPACT_LN)
     assert result.rating == _IMPACT_EXPECTED["ln_w"]
     assert result.ci == _IMPACT_EXPECTED["ci"]
     assert result.unfavourable_sum == pytest.approx(
@@ -185,7 +181,7 @@ def test_metadata_rejects_out_of_range_humidity() -> None:
 
 def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
     """Metadata with XML specials (& < >) renders without crashing reportlab."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     md = ReportMetadata(
         client="Ac & Co <Ltd>",
         specimen="wall <A> & partition",
@@ -201,7 +197,7 @@ def test_report_escapes_xml_specials_in_metadata(tmp_path) -> None:
 
 def test_full_metadata_renders_one_page(tmp_path) -> None:
     """A full ReportMetadata renders a one-page accredited fiche."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "airborne_meta.pdf"
     result.report(str(out), metadata=_full_metadata())
     _assert_one_page(str(out))
@@ -209,7 +205,7 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
 
 def test_verbose_renders_annex_c_table(tmp_path) -> None:
     """``verbose=True`` renders the Annex C evaluation table one-pager."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "airborne_verbose.pdf"
     result.report(str(out), metadata=_full_metadata(), verbose=True)
     _assert_one_page(str(out))
@@ -217,7 +213,7 @@ def test_verbose_renders_annex_c_table(tmp_path) -> None:
 
 def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
     """A PASS and a FAIL requirement both render a one-page fiche."""
-    result = weighted_rating(_AIRBORNE_R)  # Rw = 30 dB
+    result = building.weighted_rating(_AIRBORNE_R)  # Rw = 30 dB
     passing = tmp_path / "pass.pdf"
     failing = tmp_path / "fail.pdf"
     result.report(str(passing), metadata=_full_metadata(requirement=25.0))
@@ -228,7 +224,7 @@ def test_requirement_pass_and_fail_both_render(tmp_path) -> None:
 
 def test_impact_requirement_verdict_renders(tmp_path) -> None:
     """An impact fiche with a requirement (lower is better) renders."""
-    result = weighted_impact_rating(_IMPACT_LN)
+    result = building.weighted_impact_rating(_IMPACT_LN)
     out = tmp_path / "impact_meta.pdf"
     result.report(
         str(out),
@@ -261,7 +257,7 @@ def test_airborne_fiche_pins_displayed_rating(tmp_path) -> None:
     adaptation terms carry a sign only when negative, as the standard's own
     examples write them (e.g. "41 (0; -5) dB" in clause 5.2).
     """
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "pins.pdf"
     result.report(str(out), verbose=True)
     text = _extract_text(str(out))
@@ -277,7 +273,7 @@ def test_octave_band_fiche_declares_octave_bands(tmp_path) -> None:
     or octave measurements; a 5-row octave fiche must not claim
     "One-third-octave".
     """
-    result = weighted_impact_rating([65.0, 68.0, 67.0, 63.0, 58.0])
+    result = building.weighted_impact_rating([65.0, 68.0, 67.0, 63.0, 58.0])
     assert result.band_centers is not None
     assert len(result.band_centers) == 5
     out = tmp_path / "octave.pdf"
@@ -294,7 +290,7 @@ def test_symbol_labels_field_quantity(tmp_path) -> None:
     reported as the laboratory ``Rw`` (ISO 717-1 Tables 1-2 distinguish the
     quantities).
     """
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "symbol.pdf"
     result.report(
         str(out), metadata=ReportMetadata(requirement=25.0), symbol="DnT,w"
@@ -307,7 +303,7 @@ def test_symbol_labels_field_quantity(tmp_path) -> None:
 
 def test_invalid_symbol_rejected(tmp_path) -> None:
     """A malformed quantity symbol raises ``ValueError``."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = str(tmp_path / "bad.pdf")
     with pytest.raises(ValueError, match="symbol"):
         result.report(out, symbol="not a symbol")
@@ -315,7 +311,7 @@ def test_invalid_symbol_rejected(tmp_path) -> None:
 
 def test_metadata_area_is_not_display_rounded(tmp_path) -> None:
     """A supplied area of 1.23 m^2 is reprinted verbatim, not reduced to 1.2."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     out = tmp_path / "area.pdf"
     result.report(str(out), metadata=ReportMetadata(area=1.23))
     text = _extract_text(str(out))
@@ -327,7 +323,9 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
-    result = weighted_rating(_AIRBORNE_R)  # Rw = 30 dB, passes a 25 dB minimum
+    result = building.weighted_rating(
+        _AIRBORNE_R
+    )  # Rw = 30 dB, passes a 25 dB minimum
     out = tmp_path / "airborne_es.pdf"
     result.report(str(out), metadata=_full_metadata(requirement=25.0), language="es")
     _assert_one_page(str(out))
@@ -339,6 +337,6 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 
 def test_unknown_language_rejected(tmp_path) -> None:
     """An unknown fiche language raises ``ValueError``."""
-    result = weighted_rating(_AIRBORNE_R)
+    result = building.weighted_rating(_AIRBORNE_R)
     with pytest.raises(ValueError, match="language"):
         result.report(str(tmp_path / "bad.pdf"), language="xx")

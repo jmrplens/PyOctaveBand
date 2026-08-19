@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from phonometry import verify_aircraft_noise_system
+from phonometry import aircraft
 from phonometry.aircraft.measurement_system import _iec61265_directional_limit
 
 
@@ -28,19 +28,19 @@ def test_directional_intermediate_angle_uses_greater() -> None:
 
 def test_directional_pass() -> None:
     meas = {4000.0: {30: 0.4, 60: 0.9, 90: 1.9, 120: 2.4, 150: 2.4}}
-    result = verify_aircraft_noise_system(directional=meas)
+    result = aircraft.verify_aircraft_noise_system(directional=meas)
     assert result["passed"] is True
     assert all(c["ok"] for c in result["checks"])
 
 
 def test_directional_fail() -> None:
     meas = {4000.0: {90: 2.5}}  # limit is 2.0 dB at 4 kHz / 90 deg
-    result = verify_aircraft_noise_system(directional=meas)
+    result = aircraft.verify_aircraft_noise_system(directional=meas)
     assert result["passed"] is False
 
 
 def test_scalar_checks() -> None:
-    result = verify_aircraft_noise_system(
+    result = aircraft.verify_aircraft_noise_system(
         frequency_response={1000.0: 1.2, 8000.0: 1.6},  # 1.6 > 1.5 -> fail
         linearity={"reference": 0.3, "other": 0.6},  # 0.6 > 0.5 -> fail
         resolution=0.1,
@@ -53,24 +53,29 @@ def test_scalar_checks() -> None:
 
 def test_out_of_range_frequency_raises() -> None:
     with pytest.raises(ValueError):
-        verify_aircraft_noise_system(directional={20.0: {90: 0.5}})
+        aircraft.verify_aircraft_noise_system(directional={20.0: {90: 0.5}})
 
 
 def test_out_of_range_angle_raises() -> None:
     with pytest.raises(ValueError):
-        verify_aircraft_noise_system(directional={4000.0: {0.0: 0.5}})
+        aircraft.verify_aircraft_noise_system(directional={4000.0: {0.0: 0.5}})
     with pytest.raises(ValueError):
-        verify_aircraft_noise_system(directional={4000.0: {160.0: 0.5}})
+        aircraft.verify_aircraft_noise_system(
+            directional={4000.0: {160.0: 0.5}}
+        )
 
 
 def test_linearity_rejects_unknown_key() -> None:
     with pytest.raises(ValueError):
-        verify_aircraft_noise_system(linearity={"refernce": 0.3})
+        aircraft.verify_aircraft_noise_system(linearity={"refernce": 0.3})
 
 
 def test_resolution_rejects_negative() -> None:
-    assert verify_aircraft_noise_system(resolution=-1.0)["passed"] is False
+    assert (
+        aircraft.verify_aircraft_noise_system(resolution=-1.0)["passed"]
+        is False
+    )
 
 
 def test_empty_call_not_passed() -> None:
-    assert verify_aircraft_noise_system()["passed"] is False
+    assert aircraft.verify_aircraft_noise_system()["passed"] is False

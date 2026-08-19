@@ -16,16 +16,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import (
-    VibrationSoundPowerResult,
-    extraneous_velocity_correction,
-    mean_velocity_level,
-    radiated_sound_power_level,
-    radiation_factor,
-    sound_power_from_vibration,
-    velocity_level,
-    velocity_level_from_acceleration,
-)
+from phonometry import emission
 
 V0 = 5.0e-8
 ZCN, ZC0, P0 = 411.0, 400.0, 1.0e-12
@@ -35,25 +26,29 @@ ZCN, ZC0, P0 = 411.0, 400.0, 1.0e-12
 # Velocity level (Eq. 3) and calibration (Eq. 8)
 # ---------------------------------------------------------------------------
 def test_velocity_level_reference() -> None:
-    assert velocity_level(V0) == pytest.approx(0.0)
-    assert velocity_level(5.0e-5) == pytest.approx(60.0)   # 20 lg(1000)
+    assert emission.velocity_level(V0) == pytest.approx(0.0)
+    assert emission.velocity_level(5.0e-5) == pytest.approx(
+        60.0
+    )  # 20 lg(1000)
 
 
 def test_calibration_example_from_standard() -> None:
     """ISO/TS 7849-1 worked EXAMPLE: 9,81 m/s^2 at 100 Hz -> 106,9 dB."""
-    lv = float(velocity_level_from_acceleration(9.81, 100.0))
+    lv = float(emission.velocity_level_from_acceleration(9.81, 100.0))
     assert lv == pytest.approx(106.9, abs=0.05)
 
 
 def test_calibration_matches_hand_formula() -> None:
     a, f = 4.0, 250.0
     expected = 20.0 * math.log10(a / (2.0 * math.pi * f * V0 * math.sqrt(2.0)))
-    assert velocity_level_from_acceleration(a, f) == pytest.approx(expected)
+    assert emission.velocity_level_from_acceleration(a, f) == pytest.approx(
+        expected
+    )
 
 
 def test_calibration_rejects_non_positive_frequency() -> None:
     with pytest.raises(ValueError, match="frequency"):
-        velocity_level_from_acceleration(9.81, 0.0)
+        emission.velocity_level_from_acceleration(9.81, 0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +57,7 @@ def test_calibration_rejects_non_positive_frequency() -> None:
 def test_mean_velocity_level_energetic() -> None:
     levels = np.array([60.0, 60.0, 66.0])
     expected = 10.0 * math.log10(np.mean(10.0 ** (0.1 * levels)))
-    assert mean_velocity_level(levels) == pytest.approx(expected)
+    assert emission.mean_velocity_level(levels) == pytest.approx(expected)
 
 
 def test_mean_velocity_level_area_weighted() -> None:
@@ -71,12 +66,14 @@ def test_mean_velocity_level_area_weighted() -> None:
     expected = 10.0 * math.log10(
         np.sum(areas * 10.0 ** (0.1 * levels)) / np.sum(areas)
     )
-    assert mean_velocity_level(levels, areas=areas) == pytest.approx(expected)
+    assert emission.mean_velocity_level(levels, areas=areas) == pytest.approx(
+        expected
+    )
 
 
 def test_mean_velocity_level_area_shape_mismatch() -> None:
     with pytest.raises(ValueError, match="areas"):
-        mean_velocity_level([60.0, 66.0], areas=[1.0])
+        emission.mean_velocity_level([60.0, 66.0], areas=[1.0])
 
 
 # ---------------------------------------------------------------------------
@@ -84,36 +81,42 @@ def test_mean_velocity_level_area_shape_mismatch() -> None:
 # ---------------------------------------------------------------------------
 def test_radiation_factor_definition() -> None:
     p, s, v2 = 3.0e-4, 2.0, (1.0e-3) ** 2
-    assert radiation_factor(p, s, v2) == pytest.approx(p / (ZCN * v2 * s))
+    assert emission.radiation_factor(p, s, v2) == pytest.approx(
+        p / (ZCN * v2 * s)
+    )
 
 
 def test_power_level_round_trip_through_radiation_factor() -> None:
     """eps from Eq. 8, fed into Eq. 15, recovers L_W = 10 lg(P/P0) exactly."""
     p, s, v2 = 3.0e-4, 2.0, (1.0e-3) ** 2
-    eps = float(radiation_factor(p, s, v2))
-    lv = float(velocity_level(math.sqrt(v2)))
-    lw = float(radiated_sound_power_level(lv, s, radiation_factor=eps))
+    eps = float(emission.radiation_factor(p, s, v2))
+    lv = float(emission.velocity_level(math.sqrt(v2)))
+    lw = float(
+        emission.radiated_sound_power_level(lv, s, radiation_factor=eps)
+    )
     assert lw == pytest.approx(10.0 * math.log10(p / P0))
 
 
 def test_power_level_impedance_constant() -> None:
     # eps = 1, S = S0 = 1 -> L_W = L_v + 10 lg(411/400)
     lv = 80.0
-    lw = float(radiated_sound_power_level(lv, 1.0))
+    lw = float(emission.radiated_sound_power_level(lv, 1.0))
     assert lw == pytest.approx(lv + 10.0 * math.log10(ZCN / ZC0))
 
 
 def test_upper_limit_is_largest() -> None:
     # Part 1 (eps = 1) is an upper limit for any eps < 1.
     lv, s = 75.0, 2.0
-    upper = float(radiated_sound_power_level(lv, s))
-    measured = float(radiated_sound_power_level(lv, s, radiation_factor=0.4))
+    upper = float(emission.radiated_sound_power_level(lv, s))
+    measured = float(
+        emission.radiated_sound_power_level(lv, s, radiation_factor=0.4)
+    )
     assert upper > measured
 
 
 def test_power_level_rejects_bad_area() -> None:
     with pytest.raises(ValueError, match="area"):
-        radiated_sound_power_level(80.0, 0.0)
+        emission.radiated_sound_power_level(80.0, 0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -122,12 +125,18 @@ def test_power_level_rejects_bad_area() -> None:
 def test_k1a_table_values() -> None:
     table = {3: 3.0, 4: 2.0, 5: 2.0, 6: 1.0, 7: 1.0, 8: 1.0, 9: 1.0, 10: 0.0}
     for dlv, k in table.items():
-        assert extraneous_velocity_correction(float(dlv)) == pytest.approx(k)
+        assert emission.extraneous_velocity_correction(
+            float(dlv)
+        ) == pytest.approx(k)
 
 
 def test_k1a_boundaries() -> None:
-    assert extraneous_velocity_correction(2.0) == 3.0    # dLv < 3 -> 3 dB
-    assert extraneous_velocity_correction(15.0) == 0.0   # dLv >= 10 -> 0
+    assert (
+        emission.extraneous_velocity_correction(2.0) == 3.0
+    )  # dLv < 3 -> 3 dB
+    assert (
+        emission.extraneous_velocity_correction(15.0) == 0.0
+    )  # dLv >= 10 -> 0
 
 
 # ---------------------------------------------------------------------------
@@ -137,13 +146,15 @@ def test_result_bundle_and_total() -> None:
     lv = np.array([70.0, 75.0, 72.0])
     eps = np.array([0.5, 0.8, 1.0])
     f = np.array([250.0, 500.0, 1000.0])
-    res = sound_power_from_vibration(lv, 1.5, radiation_factor=eps, frequencies=f)
-    assert isinstance(res, VibrationSoundPowerResult)
+    res = emission.sound_power_from_vibration(
+        lv, 1.5, radiation_factor=eps, frequencies=f
+    )
+    assert isinstance(res, emission.VibrationSoundPowerResult)
     assert res.area == 1.5
     # per-band level matches the standalone function
     assert np.allclose(
         res.sound_power_level,
-        radiated_sound_power_level(lv, 1.5, radiation_factor=eps),
+        emission.radiated_sound_power_level(lv, 1.5, radiation_factor=eps),
     )
     # total is the energetic sum of the bands
     expected_total = 10.0 * math.log10(np.sum(10.0 ** (0.1 * res.sound_power_level)))
@@ -152,18 +163,20 @@ def test_result_bundle_and_total() -> None:
 
 def test_result_frequencies_shape_mismatch() -> None:
     with pytest.raises(ValueError, match="frequencies"):
-        sound_power_from_vibration([70.0, 75.0, 72.0], 1.5, frequencies=[250.0, 500.0])
+        emission.sound_power_from_vibration(
+            [70.0, 75.0, 72.0], 1.5, frequencies=[250.0, 500.0]
+        )
 
 
 def test_result_scalar_frequency_is_coerced() -> None:
     # a single-band call with a scalar frequency plots without error
-    res = sound_power_from_vibration(80.0, 2.0, frequencies=1000.0)
+    res = emission.sound_power_from_vibration(80.0, 2.0, frequencies=1000.0)
     assert res.frequencies is not None
     assert res.frequencies.shape == (1,)
 
 
 def test_result_scalar_radiation_factor_broadcasts() -> None:
-    res = sound_power_from_vibration(np.array([70.0, 72.0]), 2.0)
+    res = emission.sound_power_from_vibration(np.array([70.0, 72.0]), 2.0)
     assert res.radiation_factor.shape == (2,)
     assert np.all(res.radiation_factor == 1.0)
 
@@ -173,7 +186,7 @@ def test_plot_returns_axes() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    res = sound_power_from_vibration(
+    res = emission.sound_power_from_vibration(
         np.array([70.0, 75.0, 72.0]), 1.5, frequencies=np.array([250.0, 500.0, 1000.0])
     )
     assert res.plot() is not None
@@ -190,5 +203,5 @@ def test_radiated_power_norton_diesel_engine_example() -> None:
     # normalized 411 N.s/m3 (0.04 dB) and rounds to 0.1 dB, so 0.15 dB
     # covers both.
     lv = 20.0 * math.log10(12.2e-3 / 5e-8)  # dB re 5e-8 m/s
-    lw = radiated_sound_power_level(lv, 7.2, radiation_factor=0.25)
+    lw = emission.radiated_sound_power_level(lv, 7.2, radiation_factor=0.25)
     assert float(lw) == pytest.approx(110.5, abs=0.15)

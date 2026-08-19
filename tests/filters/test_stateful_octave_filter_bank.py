@@ -4,7 +4,7 @@ import pytest
 
 @pytest.mark.parametrize("block_size", [8, 256, 1024])
 def test_block_processing_matches_full_signal(block_size: int):
-    from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
+    from phonometry import filters
     """
     Ensure that block-wise processing with preserved filter state
     produces the same result as filtering the full signal at once.
@@ -20,14 +20,18 @@ def test_block_processing_matches_full_signal(block_size: int):
     signal = rng.standard_normal(n_samples)
 
     # --- Full signal processing (reference) ---
-    full_filter = OctaveFilterBank(fs=fs, design=FilterDesign(resample=False))
+    full_filter = filters.OctaveFilterBank(
+        fs=fs, design=filters.FilterDesign(resample=False)
+    )
     _full_output_spl, _, full_output_signal = full_filter.filter(signal, sigbands=True, detrend=False)
 
     # --- Block-wise processing ---
-    block_filter = OctaveFilterBank(
+    block_filter = filters.OctaveFilterBank(
         fs=fs,
-        design=FilterDesign(resample=False),
-        block_processing=BlockProcessing(stateful=True, steady_ic=False),
+        design=filters.FilterDesign(resample=False),
+        block_processing=filters.BlockProcessing(
+            stateful=True, steady_ic=False
+        ),
     )
 
     outputs = []

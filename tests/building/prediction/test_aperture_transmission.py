@@ -15,13 +15,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import (
-    circular_aperture_transmission_coefficient,
-    composite_transmission_loss,
-    slit_resonance_frequencies,
-    slit_transmission_coefficient,
-    transmission_loss_from_coefficient,
-)
+from phonometry import building
 
 
 # ---------------------------------------------------------------------------
@@ -30,23 +24,25 @@ from phonometry import (
 def test_composite_open_area_caps_reduction() -> None:
     # A 1 % bare opening caps the composite R at 10 lg(100) = 20 dB, whatever
     # the wall's own R.
-    r = composite_transmission_loss([0.99, 0.01], [60.0, 0.0])
+    r = building.composite_transmission_loss([0.99, 0.01], [60.0, 0.0])
     assert float(r) == pytest.approx(10.0 * math.log10(1.0 / 0.01), abs=0.1)
 
 
 def test_composite_cap_independent_of_wall() -> None:
-    a = composite_transmission_loss([0.99, 0.01], [50.0, 0.0])
-    b = composite_transmission_loss([0.99, 0.01], [90.0, 0.0])
+    a = building.composite_transmission_loss([0.99, 0.01], [50.0, 0.0])
+    b = building.composite_transmission_loss([0.99, 0.01], [90.0, 0.0])
     assert float(a) == pytest.approx(float(b), abs=0.1)
 
 
 def test_composite_all_equal_returns_same() -> None:
-    r = composite_transmission_loss([1.0, 2.0, 3.0], [40.0, 40.0, 40.0])
+    r = building.composite_transmission_loss(
+        [1.0, 2.0, 3.0], [40.0, 40.0, 40.0]
+    )
     assert float(r) == pytest.approx(40.0)
 
 
 def test_composite_2d_per_band() -> None:
-    r = composite_transmission_loss(
+    r = building.composite_transmission_loss(
         [10.0, 0.1], np.array([[40.0, 50.0], [0.0, 0.0]])
     )
     assert r.shape == (2,)
@@ -62,12 +58,14 @@ def test_composite_matches_facade_energy_sum() -> None:
     r = np.array([55.0, 30.0])
     tau = 10.0 ** (-r / 10.0)
     expected = -10.0 * math.log10(np.sum(areas * tau) / np.sum(areas))
-    assert float(composite_transmission_loss(areas, r)) == pytest.approx(expected)
+    assert float(
+        building.composite_transmission_loss(areas, r)
+    ) == pytest.approx(expected)
 
 
 def test_composite_rejects_bad_shape() -> None:
     with pytest.raises(ValueError, match="length must match"):
-        composite_transmission_loss([1.0, 2.0], [40.0])
+        building.composite_transmission_loss([1.0, 2.0], [40.0])
 
 
 # ---------------------------------------------------------------------------
@@ -75,16 +73,16 @@ def test_composite_rejects_bad_shape() -> None:
 # ---------------------------------------------------------------------------
 def test_slit_transmission_peaks_at_first_resonance() -> None:
     w, d = 0.005, 0.1
-    fr = slit_resonance_frequencies(d, w, orders=1)
+    fr = building.slit_resonance_frequencies(d, w, orders=1)
     f = np.linspace(fr[0] - 300.0, fr[0] + 300.0, 601)
-    res = slit_transmission_coefficient(f, w, d, field="normal")
+    res = building.slit_transmission_coefficient(f, w, d, field="normal")
     peak = f[int(np.argmax(res.transmission_coefficient))]
     assert peak == pytest.approx(fr[0], abs=15.0)
 
 
 def test_slit_resonances_are_half_wavelength_spaced() -> None:
     # d + 2e = z lambda/2, so the orders are near-integer multiples.
-    fr = slit_resonance_frequencies(0.1, 0.005, orders=3)
+    fr = building.slit_resonance_frequencies(0.1, 0.005, orders=3)
     assert fr[1] / fr[0] == pytest.approx(2.0, rel=0.05)
     assert fr[2] / fr[0] == pytest.approx(3.0, rel=0.05)
 
@@ -93,7 +91,7 @@ def test_slit_resonance_rejects_wide_shallow_slit() -> None:
     # A very wide, shallow slit drives the effective depth d + 2e non-positive;
     # the resonance is undefined and must raise rather than return NaN.
     with pytest.raises(ValueError, match="too wide"):
-        slit_resonance_frequencies(0.001, 0.2, orders=1)
+        building.slit_resonance_frequencies(0.001, 0.2, orders=1)
 
 
 def test_slit_transmission_finite_through_cos_ke_zero() -> None:
@@ -104,19 +102,27 @@ def test_slit_transmission_finite_through_cos_ke_zero() -> None:
     f = np.linspace(50.0, 10000.0, 8000)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        tau = slit_transmission_coefficient(f, 0.01, 0.02).transmission_coefficient
+        tau = building.slit_transmission_coefficient(
+            f, 0.01, 0.02
+        ).transmission_coefficient
     assert np.all(np.isfinite(tau))
 
 
 def test_slit_reduction_index_from_coefficient() -> None:
-    res = slit_transmission_coefficient([500.0], 0.002, 0.1)
-    r = transmission_loss_from_coefficient(res.transmission_coefficient)
+    res = building.slit_transmission_coefficient([500.0], 0.002, 0.1)
+    r = building.transmission_loss_from_coefficient(
+        res.transmission_coefficient
+    )
     np.testing.assert_allclose(r, res.transmission_loss)
 
 
 def test_slit_edge_position_differs_from_mid() -> None:
-    mid = slit_transmission_coefficient([400.0], 0.003, 0.05, position="mid")
-    edge = slit_transmission_coefficient([400.0], 0.003, 0.05, position="edge")
+    mid = building.slit_transmission_coefficient(
+        [400.0], 0.003, 0.05, position="mid"
+    )
+    edge = building.slit_transmission_coefficient(
+        [400.0], 0.003, 0.05, position="edge"
+    )
     assert not np.isclose(
         mid.transmission_coefficient[0], edge.transmission_coefficient[0]
     )
@@ -127,12 +133,16 @@ def test_slit_edge_position_differs_from_mid() -> None:
 # ---------------------------------------------------------------------------
 def test_circular_aperture_large_hole_transmits_fully() -> None:
     # ka >> 1: tau -> 1 (R -> 0 dB).
-    res = circular_aperture_transmission_coefficient([50000.0], 0.02, 0.001)
+    res = building.circular_aperture_transmission_coefficient(
+        [50000.0], 0.02, 0.001
+    )
     assert res.transmission_coefficient[0] == pytest.approx(1.0, abs=0.02)
 
 
 def test_circular_aperture_thin_hole_reduction_positive_at_low_f() -> None:
-    res = circular_aperture_transmission_coefficient([100.0], 0.005, 0.002)
+    res = building.circular_aperture_transmission_coefficient(
+        [100.0], 0.005, 0.002
+    )
     assert float(res.transmission_loss[0]) > 0.0
 
 
@@ -141,8 +151,10 @@ def test_circular_aperture_thin_hole_reduction_positive_at_low_f() -> None:
 # ---------------------------------------------------------------------------
 def test_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="field"):
-        slit_transmission_coefficient([500.0], 0.002, 0.1, field="oblique")
+        building.slit_transmission_coefficient(
+            [500.0], 0.002, 0.1, field="oblique"
+        )
     with pytest.raises(ValueError, match="width"):
-        slit_transmission_coefficient([500.0], -0.002, 0.1)
+        building.slit_transmission_coefficient([500.0], -0.002, 0.1)
     with pytest.raises(ValueError, match="tau"):
-        transmission_loss_from_coefficient([-1.0])
+        building.transmission_loss_from_coefficient([-1.0])

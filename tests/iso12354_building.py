@@ -29,11 +29,7 @@ from __future__ import annotations
 
 import reference_data as ref
 
-from phonometry import (
-    HomogeneousElement,
-    junction_vibration_reduction,
-    perimeter_absorption_coefficient,
-)
+from phonometry import building
 
 #: Critical frequencies of the three constructions, in hertz.
 FC_FLOOR, FC_EXT, FC_INT = 76.8, 92.6, 128.4
@@ -67,25 +63,33 @@ def junction_indices() -> dict[str, float]:
     unrounded values are used, so they are re-derived from Annex E here.
     """
     return {
-        "floor-ext": junction_vibration_reduction(
+        "floor-ext": building.junction_vibration_reduction(
             "rigid_t", "corner", M_FLOOR / M_EXT
         ),
-        "ext-ext": junction_vibration_reduction(
+        "ext-ext": building.junction_vibration_reduction(
             "rigid_t", "through", M_FLOOR / M_EXT
         ),
-        "floor-floor": junction_vibration_reduction(
+        "floor-floor": building.junction_vibration_reduction(
             "rigid_cross", "through", M_INT / M_FLOOR
         ),
-        "int-int": junction_vibration_reduction(
+        "int-int": building.junction_vibration_reduction(
             "rigid_cross", "through", M_FLOOR / M_INT
         ),
-        "floor-int": junction_vibration_reduction(
+        "floor-int": building.junction_vibration_reduction(
             "rigid_cross", "corner", M_INT / M_FLOOR
         ),
-        "ext1-ext2": junction_vibration_reduction("corner", "corner", 1.0),
-        "int-ext": junction_vibration_reduction("rigid_t", "corner", M_INT / M_EXT),
-        "extT-ext": junction_vibration_reduction("rigid_t", "through", M_INT / M_EXT),
-        "int1-int2": junction_vibration_reduction("rigid_cross", "through", 1.0),
+        "ext1-ext2": building.junction_vibration_reduction(
+            "corner", "corner", 1.0
+        ),
+        "int-ext": building.junction_vibration_reduction(
+            "rigid_t", "corner", M_INT / M_EXT
+        ),
+        "extT-ext": building.junction_vibration_reduction(
+            "rigid_t", "through", M_INT / M_EXT
+        ),
+        "int1-int2": building.junction_vibration_reduction(
+            "rigid_cross", "through", 1.0
+        ),
     }
 
 
@@ -101,7 +105,7 @@ def perimeter_sums(kij: dict[str, float] | None = None) -> dict[str, float]:
     external wall (which it sees on both sides of the junction).
     """
     k = junction_indices() if kij is None else kij
-    alpha = perimeter_absorption_coefficient
+    alpha = building.perimeter_absorption_coefficient
     floor_at_ext = alpha([FC_EXT, FC_EXT], [k["floor-ext"]] * 2)
     floor_at_int = alpha(
         [FC_FLOOR, FC_INT, FC_INT],
@@ -125,13 +129,13 @@ def perimeter_sums(kij: dict[str, float] | None = None) -> dict[str, float]:
     }
 
 
-def elements() -> dict[str, HomogeneousElement]:
+def elements() -> dict[str, building.HomogeneousElement]:
     """The five elements of the Annex L / Annex G building."""
     sums = perimeter_sums()
-    built: dict[str, HomogeneousElement] = {}
+    built: dict[str, building.HomogeneousElement] = {}
     for label, values in ref.ISO12354_ANNEX_L_ELEMENTS.items():
         area, length1, length2, mass, fc, eta_int, rho, c_l, _lij = values
-        built[label] = HomogeneousElement(
+        built[label] = building.HomogeneousElement(
             label=label,
             area=area,
             length1=length1,
@@ -160,7 +164,6 @@ def airborne_paths(situ: dict, delta_r: object) -> list:
     :return: The twelve :class:`~phonometry.BandPath` objects, labelled as
         Table L.1 labels its columns (``D1``, ``1d``, ``11``, ...).
     """
-    from phonometry import airborne_flanking_path
 
     kij = junction_indices()
     paths = []
@@ -168,15 +171,15 @@ def airborne_paths(situ: dict, delta_r: object) -> list:
         wall = situ[name]
         lij = COUPLING_LENGTH[name]
         cross, through = junction_paths(name, kij)
-        paths.append(airborne_flanking_path(
+        paths.append(building.airborne_flanking_path(
             label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
             vibration_reduction_index=cross, coupling_length=lij,
             separating_area=SEPARATING_AREA, delta_r_i=delta_r))
-        paths.append(airborne_flanking_path(
+        paths.append(building.airborne_flanking_path(
             label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
             vibration_reduction_index=cross, coupling_length=lij,
             separating_area=SEPARATING_AREA))
-        paths.append(airborne_flanking_path(
+        paths.append(building.airborne_flanking_path(
             label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
             vibration_reduction_index=through, coupling_length=lij,
             separating_area=SEPARATING_AREA))
@@ -192,11 +195,10 @@ def impact_paths(situ: dict, delta_l: object) -> list:
     :return: The four :class:`~phonometry.BandPath` objects, labelled as
         Table G.1 labels its columns (``Df1`` to ``Df4``).
     """
-    from phonometry import impact_flanking_path
 
     kij = junction_indices()
     return [
-        impact_flanking_path(
+        building.impact_flanking_path(
             label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
             vibration_reduction_index=junction_paths(name, kij)[0],
             coupling_length=COUPLING_LENGTH[name], delta_l=delta_l,

@@ -356,11 +356,11 @@ def measure_weighting_response(
         dense 8192-point grid for plotting.
     :return: Tuple (frequencies, magnitude in dB).
     """
-    from phonometry import weighting_filter
+    from phonometry import filters
 
     impulse = np.zeros(fs)
     impulse[fs // 2] = 1.0
-    weighted = weighting_filter(impulse, fs, curve=curve)
+    weighted = filters.weighting_filter(impulse, fs, curve=curve)
 
     worn = 8192 if freqs is None else np.asarray(freqs, dtype=float)
     w, h = scipy_signal.freqz(weighted, [1], worN=worn, fs=fs)

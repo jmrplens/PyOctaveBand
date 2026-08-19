@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 
-from phonometry import leq
+from phonometry import signals
 from phonometry.io import Signal, SignalOrigin
 
 FS = 48000
@@ -71,9 +71,11 @@ def test_existing_levels_function_accepts_the_object() -> None:
     """
     x = _tone()
     sig = Signal(data=x, fs=FS, calibration_factor=2.0)
-    assert leq(sig) == leq(x, calibration_factor=2.0)
-    assert leq(sig, calibration_factor=5.0) == leq(x, calibration_factor=5.0)
-    assert leq(Signal(data=x, fs=FS)) == leq(x)
+    assert signals.leq(sig) == signals.leq(x, calibration_factor=2.0)
+    assert signals.leq(sig, calibration_factor=5.0) == signals.leq(
+        x, calibration_factor=5.0
+    )
+    assert signals.leq(Signal(data=x, fs=FS)) == signals.leq(x)
 
 
 def test_signal_properties() -> None:

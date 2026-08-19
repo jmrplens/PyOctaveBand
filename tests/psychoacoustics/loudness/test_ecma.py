@@ -12,7 +12,7 @@ remaining checks are internal consistency properties the standard implies
 import numpy as np
 import pytest
 
-from phonometry import EcmaLoudness, loudness_ecma
+from phonometry import psychoacoustics
 
 FS = 48000
 
@@ -25,9 +25,9 @@ def _tone(freq: float, level_db: float, seconds: float = 1.2) -> np.ndarray:
 
 
 @pytest.fixture(scope="module")
-def ref_1k_40() -> EcmaLoudness:
+def ref_1k_40() -> psychoacoustics.EcmaLoudness:
     """The calibration signal result, computed once for the module."""
-    return loudness_ecma(_tone(1000.0, 40.0), FS)
+    return psychoacoustics.loudness_ecma(_tone(1000.0, 40.0), FS)
 
 
 # --------------------------------------------------------------------------
@@ -36,7 +36,9 @@ def ref_1k_40() -> EcmaLoudness:
 
 
 @pytest.mark.xdist_group("ecma-loudness-ref")
-def test_calibration_1khz_40db_is_one_sone(ref_1k_40: EcmaLoudness) -> None:
+def test_calibration_1khz_40db_is_one_sone(
+    ref_1k_40: psychoacoustics.EcmaLoudness,
+) -> None:
     # c_N is defined so the 1 kHz / 40 dB tone gives 1 sone_HMS. With the
     # full Clause 6.2.3 band averaging this chain computes 0.9845 sone_HMS;
     # the -1.55 % residual (outside the +/-0.25 % c_N allowance) comes from
@@ -67,7 +69,9 @@ def test_monotonic_in_level() -> None:
     # three levels suffice (the 0.6 s / 40 dB anchor also holds 1 sone within
     # 3 % in the CI conformance check, which uses the same duration).
     values = [
-        loudness_ecma(_tone(1000.0, lvl, seconds=0.6), FS).loudness
+        psychoacoustics.loudness_ecma(
+            _tone(1000.0, lvl, seconds=0.6), FS
+        ).loudness
         for lvl in (20, 40, 80)
     ]
     assert values[0] < values[1] < values[2]
@@ -79,19 +83,23 @@ def test_monotonic_in_level() -> None:
 def test_silence_is_zero() -> None:
     # Pure-property check: zero in, zero out at any length past the
     # transient-discard window, so 0.6 s is enough.
-    result = loudness_ecma(np.zeros(int(FS * 0.6)), FS)
+    result = psychoacoustics.loudness_ecma(np.zeros(int(FS * 0.6)), FS)
     assert result.loudness == 0.0
     assert np.all(result.specific_loudness == 0.0)
 
 
 def test_subthreshold_tone_is_inaudible() -> None:
     # A 1 kHz tone at -10 dB SPL is well below the threshold in quiet.
-    result = loudness_ecma(_tone(1000.0, -10.0, seconds=0.6), FS)
+    result = psychoacoustics.loudness_ecma(
+        _tone(1000.0, -10.0, seconds=0.6), FS
+    )
     assert result.loudness < 0.01
 
 
 @pytest.mark.xdist_group("ecma-loudness-ref")
-def test_specific_loudness_peaks_near_tone(ref_1k_40: EcmaLoudness) -> None:
+def test_specific_loudness_peaks_near_tone(
+    ref_1k_40: psychoacoustics.EcmaLoudness,
+) -> None:
     peak_band = int(np.argmax(ref_1k_40.specific_loudness))
     assert ref_1k_40.centre_frequencies[peak_band] == pytest.approx(1000.0, rel=0.15)
 
@@ -105,8 +113,8 @@ def test_free_and_diffuse_fields_differ() -> None:
     # Property check (ear-filter difference), not a calibration: 0.6 s is
     # enough for a stable value in both fields.
     x = _tone(1000.0, 60.0, seconds=0.6)
-    free = loudness_ecma(x, FS, field="free").loudness
-    diffuse = loudness_ecma(x, FS, field="diffuse").loudness
+    free = psychoacoustics.loudness_ecma(x, FS, field="free").loudness
+    diffuse = psychoacoustics.loudness_ecma(x, FS, field="diffuse").loudness
     # Both plausible loudspeaker-range values, but the ear filter differs.
     assert free > 1.0
     assert diffuse > 1.0
@@ -118,7 +126,7 @@ def test_resampling_matches_native_rate() -> None:
     t = np.arange(int(fs_alt * 0.6)) / fs_alt
     amp = np.sqrt(2.0) * 2e-5 * 10 ** (40.0 / 20.0)
     x = amp * np.sin(2.0 * np.pi * 1000.0 * t)
-    resampled = loudness_ecma(x, fs_alt).loudness
+    resampled = psychoacoustics.loudness_ecma(x, fs_alt).loudness
     assert resampled == pytest.approx(1.0, abs=0.05)
 
 
@@ -128,7 +136,7 @@ def test_resampling_matches_native_rate() -> None:
 
 
 @pytest.mark.xdist_group("ecma-loudness-ref")
-def test_result_structure(ref_1k_40: EcmaLoudness) -> None:
+def test_result_structure(ref_1k_40: psychoacoustics.EcmaLoudness) -> None:
     assert ref_1k_40.specific_loudness.shape == (53,)
     assert ref_1k_40.bark.shape == (53,)
     assert ref_1k_40.bark[0] == pytest.approx(0.5)
@@ -144,23 +152,23 @@ def test_result_structure(ref_1k_40: EcmaLoudness) -> None:
 def test_invalid_field() -> None:
     tone = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError):
-        loudness_ecma(tone, FS, field="reverberant")
+        psychoacoustics.loudness_ecma(tone, FS, field="reverberant")
 
 
 def test_invalid_fs() -> None:
     tone = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError):
-        loudness_ecma(tone, 0.0)
+        psychoacoustics.loudness_ecma(tone, 0.0)
 
 
 def test_empty_signal() -> None:
     empty = np.array([])
     with pytest.raises(ValueError):
-        loudness_ecma(empty, FS)
+        psychoacoustics.loudness_ecma(empty, FS)
 
 
 @pytest.mark.xdist_group("ecma-loudness-ref")
-def test_plot_smoke(ref_1k_40: EcmaLoudness) -> None:
+def test_plot_smoke(ref_1k_40: psychoacoustics.EcmaLoudness) -> None:
     import matplotlib
 
     matplotlib.use("Agg")

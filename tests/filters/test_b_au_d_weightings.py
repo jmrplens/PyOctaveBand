@@ -34,7 +34,7 @@ from reference_data import (
 )
 from scipy import signal as sg
 
-from phonometry import WeightingFilter, verify_weighting_class
+from phonometry import filters
 from phonometry.filters.weighting_compliance import (
     _ANSI_S14_TABLE4_B,
     _ANSI_S14_TABLE5_12,
@@ -50,7 +50,9 @@ def _exact(freq: float) -> float:
     return float(10.0 ** (round(10.0 * math.log10(freq)) / 10.0))
 
 
-def _response_db(wf: WeightingFilter, freqs: "list[float] | np.ndarray") -> np.ndarray:
+def _response_db(
+    wf: filters.WeightingFilter, freqs: "list[float] | np.ndarray"
+) -> np.ndarray:
     """Relative response of the designed SOS in dB, normalized to 1 kHz."""
     fs_proc = wf.fs * wf._oversample
     worn = np.concatenate([np.asarray(freqs, dtype=float), [1000.0]])
@@ -93,7 +95,7 @@ def test_au_masks_match_reference_data() -> None:
 
 def test_b_pins_ansi_table4_values() -> None:
     """Pin the realized B response to Table IV at 31.5 Hz, 1 kHz and 8 kHz."""
-    wf = WeightingFilter(96000, "B")
+    wf = filters.WeightingFilter(96000, "B")
     resp = _response_db(wf, [_exact(31.5), 1000.0, _exact(8000.0)])
     assert resp[0] == pytest.approx(-17.1, abs=0.06)
     assert resp[1] == 0.0  # exact by 1 kHz normalization
@@ -102,7 +104,7 @@ def test_b_pins_ansi_table4_values() -> None:
 
 def test_b_realized_within_type0_at_every_table4_row() -> None:
     """The realized B filter meets the strictest Table V mask (Type 0)."""
-    wf = WeightingFilter(96000, "B")
+    wf = filters.WeightingFilter(96000, "B")
     freqs = [_exact(row[0]) for row in ANSIS14_TABLE4_B]
     resp = _response_db(wf, freqs)
     for (freq, goal), (_, up0, lo0, *_), got in zip(
@@ -137,7 +139,9 @@ def test_b_sits_between_a_and_c_at_low_frequency() -> None:
 
 def test_b_verifier_reaches_type1() -> None:
     """verify_weighting_class attests the ANSI Type 1 mask for B."""
-    result = verify_weighting_class(WeightingFilter(48000, "B"))
+    result = filters.verify_weighting_class(
+        filters.WeightingFilter(48000, "B")
+    )
     assert result["overall_class"] == 1
     assert result["range_limited"] is False
     assert all(b["margin_class1_db"] >= 0 for b in result["bands"])
@@ -173,7 +177,7 @@ def test_au_table2_poles_reproduce_table1_nominals() -> None:
 def test_au_pins_nominal_values() -> None:
     """Pin the realized AU response at 31.5 Hz, 1 kHz, 8 kHz and the
     subclause 2.2 explicit values at 25/31.5/40 kHz (nominal A + U)."""
-    wf = WeightingFilter(96000, "AU")
+    wf = filters.WeightingFilter(96000, "AU")
     freqs = [_exact(f) for f in (31.5, 1000.0, 8000.0, 25000.0, 31500.0, 40000.0)]
     resp = _response_db(wf, freqs)
     assert resp[0] == pytest.approx(-39.4, abs=0.06)
@@ -189,7 +193,7 @@ def test_au_pins_nominal_values() -> None:
 def test_au_realized_within_table1_tolerances() -> None:
     """The realized AU filter meets the Table 1 separate-unit mask at 96 kHz."""
     a_nom = {row[0]: row[1] for row in IEC61672_TABLE3}
-    wf = WeightingFilter(96000, "AU")
+    wf = filters.WeightingFilter(96000, "AU")
     rows = [r for r in IEC61012_TABLE1 if _exact(r[0]) < 48000.0 and r[0] != 1000]
     resp = _response_db(wf, [_exact(r[0]) for r in rows])
     for (freq, u_nom, up, lo), got in zip(rows, resp):
@@ -204,8 +208,8 @@ def test_au_matches_a_weighting_through_the_audio_band() -> None:
     288 kHz for the U roll-off, A targets 144 kHz), so their bilinear
     residuals differ by up to ~0.1 dB near the top of the compared band.
     """
-    au = WeightingFilter(48000, "AU")
-    a = WeightingFilter(48000, "A")
+    au = filters.WeightingFilter(48000, "AU")
+    a = filters.WeightingFilter(48000, "A")
     freqs = np.geomspace(20.0, 8000.0, 200)
     assert _response_db(au, freqs) == pytest.approx(
         _response_db(a, freqs), abs=0.12
@@ -214,10 +218,14 @@ def test_au_matches_a_weighting_through_the_audio_band() -> None:
 
 def test_au_verifier_flags_range_limited_at_48k() -> None:
     """At fs = 48 kHz the 25-40 kHz Table 1 rows cannot be demonstrated."""
-    result = verify_weighting_class(WeightingFilter(48000, "AU"))
+    result = filters.verify_weighting_class(
+        filters.WeightingFilter(48000, "AU")
+    )
     assert result["overall_class"] == 1
     assert result["range_limited"] is True
-    result_full = verify_weighting_class(WeightingFilter(96000, "AU"))
+    result_full = filters.verify_weighting_class(
+        filters.WeightingFilter(96000, "AU")
+    )
     assert result_full["overall_class"] == 1
     assert result_full["range_limited"] is False
     # Single tolerance set: both verdict slots carry the same margin.
@@ -260,7 +268,7 @@ def test_d_matches_librosa_closed_form() -> None:
     20 kHz; the realized digital filter adds only the documented bilinear
     residual near Nyquist, so the agreement bound tightens with frequency.
     """
-    wf = WeightingFilter(96000, "D")
+    wf = filters.WeightingFilter(96000, "D")
     freqs = np.geomspace(10.0, 20000.0, 400)
     ours = _response_db(wf, freqs)
     theirs = _librosa_d_weighting_db(freqs) - _librosa_d_weighting_db(
@@ -282,7 +290,7 @@ def test_d_pins_published_table_values() -> None:
     rational transfer function by 0.15/0.28 dB (see the module docstring of
     ``weighting``).
     """
-    wf = WeightingFilter(48000, "D")
+    wf = filters.WeightingFilter(48000, "D")
     freqs = [float(row[0]) for row in IEC537_NASA_TABLE_SLD1]
     resp = _response_db(wf, freqs)
     table = {row[0]: row[1] for row in IEC537_NASA_TABLE_SLD1}
@@ -297,7 +305,7 @@ def test_d_pins_published_table_values() -> None:
 
 def test_d_peak_sits_in_the_perceived_noisiness_region() -> None:
     """The D curve peaks near 3.15 kHz at about +11.5 dB (Table SLD-I)."""
-    wf = WeightingFilter(96000, "D")
+    wf = filters.WeightingFilter(96000, "D")
     freqs = np.geomspace(2000.0, 5000.0, 300)
     resp = _response_db(wf, freqs)
     peak = float(freqs[int(np.argmax(resp))])
@@ -308,9 +316,9 @@ def test_d_peak_sits_in_the_perceived_noisiness_region() -> None:
 def test_d_and_g_are_rejected_by_the_class_verifier() -> None:
     """No surviving tolerance tables: the class verifier refuses D (and G)."""
     for curve in ("D", "G"):
-        weighting = WeightingFilter(48000, curve)
+        weighting = filters.WeightingFilter(48000, curve)
         with pytest.raises(ValueError, match="'A', 'B', 'C', 'AU' or 'Z'"):
-            verify_weighting_class(weighting)
+            filters.verify_weighting_class(weighting)
 
 
 # ---------------------------------------------------------------------------
@@ -324,7 +332,7 @@ def test_new_curves_filter_time_domain_tone(curve: str) -> None:
     fs = 48000
     t = np.arange(fs) / fs
     x = np.sin(2 * np.pi * 1000.0 * t)
-    y = WeightingFilter(fs, curve).filter(x)
+    y = filters.WeightingFilter(fs, curve).filter(x)
     skip = fs // 5  # discard the onset transient
     gain_db = 20 * np.log10(np.std(y[skip:]) / np.std(x[skip:]))
     assert gain_db == pytest.approx(0.0, abs=0.05)
@@ -336,7 +344,9 @@ def test_new_curves_support_stateful_block_processing(curve: str) -> None:
     fs = 48000
     rng = np.random.default_rng(7)
     x = rng.standard_normal(fs // 2)
-    continuous = WeightingFilter(fs, curve, high_accuracy=False).filter(x)
-    wf = WeightingFilter(fs, curve, stateful=True)
+    continuous = filters.WeightingFilter(
+        fs, curve, high_accuracy=False
+    ).filter(x)
+    wf = filters.WeightingFilter(fs, curve, stateful=True)
     blocks = np.concatenate([wf.filter(part) for part in np.split(x, 4)])
     assert blocks == pytest.approx(continuous, abs=1e-12)

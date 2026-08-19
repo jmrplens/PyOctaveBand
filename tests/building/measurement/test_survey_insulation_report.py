@@ -20,12 +20,7 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    ReportMetadata,
-    survey_airborne_insulation,
-    survey_facade_insulation,
-    survey_impact_insulation,
-)
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 
@@ -58,24 +53,28 @@ def _extract_text(path: str) -> str:
     )
 
 
-def _airborne() -> survey_airborne_insulation:  # type: ignore[valid-type]
+def _airborne() -> building.survey_airborne_insulation:  # type: ignore[valid-type]
     """A survey airborne result whose DnT equals a known octave curve."""
     l1 = np.full(_OCTAVE, 80.0)
     d = np.array([33.0, 36.0, 40.0, 44.0, 48.0])
-    return survey_airborne_insulation(l1, l1 - d, _K0, volume=50.0, area=12.0)
+    return building.survey_airborne_insulation(
+        l1, l1 - d, _K0, volume=50.0, area=12.0
+    )
 
 
-def _impact() -> survey_impact_insulation:  # type: ignore[valid-type]
+def _impact() -> building.survey_impact_insulation:  # type: ignore[valid-type]
     """A survey impact result whose L'nT equals a known octave curve."""
     li = np.array([62.0, 64.0, 63.0, 60.0, 55.0])
-    return survey_impact_insulation(li, _K0, volume=50.0)
+    return building.survey_impact_insulation(li, _K0, volume=50.0)
 
 
-def _facade() -> survey_facade_insulation:  # type: ignore[valid-type]
+def _facade() -> building.survey_facade_insulation:  # type: ignore[valid-type]
     """A survey facade result whose D2m,nT equals a known octave curve."""
     l1_2m = np.full(_OCTAVE, 75.0)
     d2m = np.array([31.0, 34.0, 37.0, 40.0, 43.0])
-    return survey_facade_insulation(l1_2m, l1_2m - d2m, _K0, volume=40.0)
+    return building.survey_facade_insulation(
+        l1_2m, l1_2m - d2m, _K0, volume=40.0
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -118,7 +117,9 @@ def test_airborne_one_third_octave_caption(tmp_path) -> None:
     n = 16
     l1 = np.full(n, 80.0)
     d = np.linspace(33.0, 52.0, n)
-    result = survey_airborne_insulation(l1, l1 - d, np.zeros(n), volume=50.0, area=12.0)
+    result = building.survey_airborne_insulation(
+        l1, l1 - d, np.zeros(n), volume=50.0, area=12.0
+    )
     out = tmp_path / "dnt_third.pdf"
     result.report(str(out))
     _assert_one_page(str(out))
@@ -242,7 +243,7 @@ def test_unknown_airborne_quantity_rejected(tmp_path) -> None:
 
 def test_missing_r_prime_rating_rejected(tmp_path) -> None:
     """Requesting R' without area/volume (no R' rating) raises ``ValueError``."""
-    result = survey_airborne_insulation(
+    result = building.survey_airborne_insulation(
         np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0), _K0
     )
     out = str(tmp_path / "x.pdf")
@@ -252,11 +253,11 @@ def test_missing_r_prime_rating_rejected(tmp_path) -> None:
 
 def test_missing_rating_off_band_count_rejected(tmp_path) -> None:
     """A band count that yields no ISO 717 rating cannot be reported."""
-    airborne = survey_airborne_insulation(
+    airborne = building.survey_airborne_insulation(
         np.full(4, 80.0), np.full(4, 45.0), np.zeros(4)
     )
-    impact = survey_impact_insulation(np.full(4, 60.0), np.zeros(4))
-    facade = survey_facade_insulation(
+    impact = building.survey_impact_insulation(np.full(4, 60.0), np.zeros(4))
+    facade = building.survey_facade_insulation(
         np.full(4, 70.0), np.full(4, 40.0), np.zeros(4)
     )
     out = str(tmp_path / "x.pdf")

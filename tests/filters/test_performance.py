@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 import phonometry
-from phonometry import OctaveFilterBank, octave_filter
+from phonometry import filters
 from phonometry.filters import core
 
 
@@ -64,12 +64,12 @@ def test_filterbank_reuse_skips_redesign(design_counter: _DesignCounter) -> None
     #    caches bank designs, so clearing it isolates the redesign cost.
     for _ in range(num_iterations):
         core._cached_filter_bank.cache_clear()
-        spl_func, freq_func = octave_filter(x, fs)
+        spl_func, freq_func = filters.octave_filter(x, fs)
     assert design_counter.calls == num_iterations
 
     # 2. The class designs once at construction and never again.
     design_counter.calls = 0
-    bank = OctaveFilterBank(fs)
+    bank = filters.OctaveFilterBank(fs)
     assert design_counter.calls == 1
     for _ in range(num_iterations):
         spl_class, freq_class = bank.filter(x)
@@ -98,10 +98,10 @@ def test_octave_filter_cache_reuses_the_bank(design_counter: _DesignCounter) -> 
     x = rng.standard_normal(fs // 4)
 
     for _ in range(5):
-        octave_filter(x, fs)
+        filters.octave_filter(x, fs)
     assert design_counter.calls == 1
 
-    octave_filter(x[: fs // 8], 24000)
+    filters.octave_filter(x[: fs // 8], 24000)
     assert design_counter.calls == 2
 
 
@@ -126,11 +126,11 @@ def test_filterbank_reuse_is_not_slower() -> None:
     start_func = time.time()
     for _ in range(num_iterations):
         phonometry.filters.core._cached_filter_bank.cache_clear()
-        octave_filter(x, fs)
+        filters.octave_filter(x, fs)
     time_func = time.time() - start_func
 
     start_class_init = time.time()
-    bank = OctaveFilterBank(fs)
+    bank = filters.OctaveFilterBank(fs)
     time_class_init = time.time() - start_class_init
 
     start_class_filter = time.time()

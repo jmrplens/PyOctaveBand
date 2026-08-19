@@ -28,7 +28,7 @@ from .theme import (
 def generate_ship_source_level(output_dir: str) -> None:
     """Ship equivalent monopole source level and the ΔL surface correction."""
     print("Generating ship_source_level...")
-    from phonometry import monopole_source_level
+    from phonometry import underwater
 
     # One-third-octave centres 20 Hz-20 kHz and a plausible broadband ship RNL
     # that rolls off with frequency; draught 6 m -> source depth 4.2 m.
@@ -37,7 +37,7 @@ def generate_ship_source_level(output_dir: str) -> None:
                       4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000],
                      dtype=float)
     rnl = 175.0 - 12.0 * np.log10(freqs / 20.0)
-    res = monopole_source_level(rnl, freqs, draught=6.0)
+    res = underwater.monopole_source_level(rnl, freqs, draught=6.0)
 
     _fig, ax = plt.subplots(figsize=(10, 6.0))
     ax.semilogx(freqs, res.source_level, "o-", color=COLOR_PRIMARY, linewidth=2.0,
@@ -80,7 +80,7 @@ def generate_ship_source_level(output_dir: str) -> None:
 def generate_pile_driving(output_dir: str) -> None:
     """Pile-driving strike waveform, single-strike SEL and cumulative-SEL growth."""
     print("Generating pile_driving...")
-    from phonometry import cumulative_sel_identical, pile_strike_metrics
+    from phonometry import underwater
 
     fs = 48000
     dur = 0.3
@@ -88,12 +88,16 @@ def generate_pile_driving(output_dir: str) -> None:
     # An impulsive strike: a short rise then an exponentially decaying ring.
     envelope = np.where(t < 0.01, t / 0.01, np.exp(-(t - 0.01) / 0.04))
     pressure = 8000.0 * envelope * np.sin(2.0 * np.pi * 180.0 * t)
-    res = pile_strike_metrics(pressure, fs)
+    res = underwater.pile_strike_metrics(pressure, fs)
 
     # Cumulative SEL growth over a driving sequence of identical strikes.
     strikes = np.arange(1, 2001)
-    sel_cum = np.array([cumulative_sel_identical(res.single_strike_sel, int(n))
-                        for n in strikes])
+    sel_cum = np.array(
+        [
+            underwater.cumulative_sel_identical(res.single_strike_sel, int(n))
+            for n in strikes
+        ]
+    )
 
     _fig, (ax_w, ax_c) = plt.subplots(
         2, 1, figsize=(10, 7.2),
@@ -127,10 +131,10 @@ def generate_pile_driving(output_dir: str) -> None:
 def generate_underwater_propagation_loss(output_dir: str) -> None:
     """Underwater PL vs range: geometrical spreading + volume absorption."""
     print("Generating underwater_propagation_loss...")
-    from phonometry import propagation_loss
+    from phonometry import underwater
 
     ranges = np.linspace(10.0, 20_000.0, 400)
-    res = propagation_loss(
+    res = underwater.propagation_loss(
         ranges, 10_000.0, law="practical", transition_range=1000.0,
         temperature=10.0, salinity=35.0, depth=100.0, model="francois-garrison",
     )
@@ -162,13 +166,19 @@ def generate_underwater_propagation_loss(output_dir: str) -> None:
 def generate_weston_regimes(output_dir: str) -> None:
     """Weston's four shallow-water propagation regimes and their boundaries."""
     print("Generating weston_regimes...")
-    from phonometry import weston_propagation_loss
+    from phonometry import underwater
 
     # A 50 m shallow-water site over medium sand at 250 Hz, the frequency and
     # sediment pair Ainslie uses to illustrate the transition (Figure 9.7).
     ranges = np.logspace(1.0, 5.3, 500)
-    res = weston_propagation_loss(ranges, 250.0, 50.0, seabed="sand",
-                                  source_depth=10.0, receiver_depth=25.0)
+    res = underwater.weston_propagation_loss(
+        ranges,
+        250.0,
+        50.0,
+        seabed="sand",
+        source_depth=10.0,
+        receiver_depth=25.0,
+    )
     bounds = res.boundaries
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.set_xscale("log")
@@ -224,7 +234,7 @@ def generate_weston_regimes(output_dir: str) -> None:
 def generate_marine_mammal_weighting(output_dir: str) -> None:
     """NMFS 2024 auditory weighting functions for the five in-water groups."""
     print("Generating marine_mammal_weighting...")
-    from phonometry import auditory_weighting, exposure_criteria
+    from phonometry import underwater
 
     freqs = np.logspace(1.0, 5.4, 700)
     groups = (
@@ -236,8 +246,10 @@ def generate_marine_mammal_weighting(output_dir: str) -> None:
     )
     _fig, ax = plt.subplots(figsize=(10, 6))
     for group, label, color, style in groups:
-        res = auditory_weighting(freqs, group, guidance="nmfs-2024")
-        crit = exposure_criteria(group, guidance="nmfs-2024", impulsive=True)
+        res = underwater.auditory_weighting(freqs, group, guidance="nmfs-2024")
+        crit = underwater.exposure_criteria(
+            group, guidance="nmfs-2024", impulsive=True
+        )
         ax.semilogx(res.frequencies, res.weighting, color=color, linestyle=style,
                     linewidth=2.0,
                     label=f"{label} (AUD INJ {crit.injury_sel:.0f} dB)")
@@ -259,13 +271,13 @@ def generate_marine_mammal_weighting(output_dir: str) -> None:
 def generate_underwater_sound_speed(output_dir: str) -> None:
     """Sea-water sound-speed profile (UNESCO): mixed layer, thermocline, deep channel."""
     print("Generating underwater_sound_speed...")
-    from phonometry import sound_speed_profile
+    from phonometry import underwater
 
     depths = np.linspace(0.0, 3000.0, 121)
     # A warm mixed layer (18 °C to 80 m), a thermocline down to 4 °C at 1000 m,
     # then an isothermal deep layer; the pressure term then lifts c with depth.
     temps = 4.0 + 14.0 / (1.0 + (np.maximum(depths - 80.0, 0.0) / 250.0) ** 2)
-    prof = sound_speed_profile(depths, temps, 35.0, model="unesco")
+    prof = underwater.sound_speed_profile(depths, temps, 35.0, model="unesco")
     axis_depth = depths[int(np.argmin(prof.sound_speed))]
     _fig, ax = plt.subplots(figsize=(7, 8))
     ax.plot(prof.sound_speed, prof.depth, color=COLOR_PRIMARY, linewidth=2.0,
@@ -288,11 +300,12 @@ def generate_underwater_sound_speed(output_dir: str) -> None:
 def generate_sonar_equation(output_dir: str) -> None:
     """Passive sonar equation: signal excess vs propagation loss."""
     print("Generating sonar_equation...")
-    from phonometry import passive_sonar_equation
+    from phonometry import underwater
 
     pl = np.linspace(40.0, 120.0, 400)
-    res = passive_sonar_equation(140.0, pl, 60.0, directivity_index=15.0,
-                                 detection_threshold=8.0)
+    res = underwater.passive_sonar_equation(
+        140.0, pl, 60.0, directivity_index=15.0, detection_threshold=8.0
+    )
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(res.propagation_loss, res.signal_excess, color=COLOR_PRIMARY, linewidth=2.0,
             label="Signal excess")
@@ -319,10 +332,12 @@ def generate_sonar_equation(output_dir: str) -> None:
 def generate_seabed_reflection(output_dir: str) -> None:
     """Seabed reflection loss vs grazing angle, marking the critical angle."""
     print("Generating seabed_reflection...")
-    from phonometry import bottom_reflection_loss
+    from phonometry import underwater
 
     phi = np.linspace(0.0, 90.0, 361)
-    res = bottom_reflection_loss(phi, rho1=1000.0, c1=1500.0, rho2=1900.0, c2=1650.0)
+    res = underwater.bottom_reflection_loss(
+        phi, rho1=1000.0, c1=1500.0, rho2=1900.0, c2=1650.0
+    )
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(res.grazing_angle, res.reflection_loss, color=COLOR_PRIMARY, linewidth=2.0,
             label="Bottom loss (sand)")
@@ -347,10 +362,12 @@ def generate_seabed_reflection(output_dir: str) -> None:
 def generate_seabed_reflection_coefficient(output_dir: str) -> None:
     """Seabed reflection-coefficient magnitude |R| vs grazing angle."""
     print("Generating seabed_reflection_coefficient...")
-    from phonometry import seabed_reflection
+    from phonometry import underwater
 
     phi = np.linspace(0.0, 90.0, 361)
-    res = seabed_reflection(phi, rho1=1000.0, c1=1500.0, rho2=1900.0, c2=1650.0)
+    res = underwater.seabed_reflection(
+        phi, rho1=1000.0, c1=1500.0, rho2=1900.0, c2=1650.0
+    )
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(res.grazing_angle, res.magnitude, color=COLOR_PRIMARY, linewidth=2.0,
             label="Reflection coefficient magnitude $|R|$ (sand)")
@@ -414,7 +431,7 @@ def _plot_ambient_curve(res: object, wind_speed: float, color: str,
 def generate_ship_traffic_noise(output_dir: str) -> None:
     """JOMOPANS-ECHO ship source-level spectra for three vessel classes."""
     print("Generating ship_traffic_noise...")
-    from phonometry import ship_source_spectrum
+    from phonometry import underwater
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     cases = (
@@ -423,7 +440,9 @@ def generate_ship_traffic_noise(output_dir: str) -> None:
         ("tug", 3.7, 30.0, "#8c8c8c"),
     )
     for vessel_class, speed, length, color in cases:
-        s = ship_source_spectrum(speed, length, vessel_class=vessel_class)
+        s = underwater.ship_source_spectrum(
+            speed, length, vessel_class=vessel_class
+        )
         ax.plot(s.frequency, s.source_psd, color=color, linewidth=2.0,
                 label=f"{vessel_class} ({speed:.0f} kn, {length:.0f} m)")
     ax.set_xscale("log")
@@ -443,7 +462,7 @@ def generate_ship_traffic_noise(output_dir: str) -> None:
 def generate_numerical_propagation(output_dir: str) -> None:
     """Three numerical solvers: ray paths, the PE field and modes-vs-PE loss."""
     print("Generating numerical_propagation...")
-    from phonometry import normal_modes, parabolic_equation, ray_trace
+    from phonometry import underwater
 
     # A Munk deep-water sound-speed profile for the ray / PE panels.
     zprof = np.linspace(0.0, 5000.0, 60)
@@ -453,9 +472,9 @@ def generate_numerical_propagation(output_dir: str) -> None:
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 
     # (a) Ray trace through the Munk profile (vectorised over rays).
-    rt = ray_trace(zprof, cprof, source_depth=1000.0,
-                   launch_angles_deg=np.linspace(-12.0, 12.0, 13),
-                   max_range=100_000.0, n_steps=6000)
+    rt = underwater.ray_trace(zprof, cprof, source_depth=1000.0,
+                              launch_angles_deg=np.linspace(-12.0, 12.0, 13),
+                              max_range=100_000.0, n_steps=6000)
     for i in range(rt.ranges.shape[0]):
         axes[0].plot(rt.ranges[i] / 1000.0, rt.depths[i], color=COLOR_PRIMARY,
                      linewidth=0.6, alpha=0.7)
@@ -469,9 +488,15 @@ def generate_numerical_propagation(output_dir: str) -> None:
 
     # (b) Parabolic-equation propagation-loss field for the same environment;
     # imshow renders a single raster image (the figure is a raster WebP).
-    pe_field = parabolic_equation(50.0, zprof, cprof, source_depth=1000.0,
-                                  max_range=100_000.0, range_step=25.0,
-                                  n_depth_points=1024)
+    pe_field = underwater.parabolic_equation(
+        50.0,
+        zprof,
+        cprof,
+        source_depth=1000.0,
+        max_range=100_000.0,
+        range_step=25.0,
+        n_depth_points=1024,
+    )
     pl = pe_field.propagation_loss
     vmax = float(np.percentile(pl[np.isfinite(pl)], 95))
     pl = np.where(np.isfinite(pl), pl, vmax)  # clip the infinite zero-range column
@@ -485,10 +510,24 @@ def generate_numerical_propagation(output_dir: str) -> None:
 
     # (c) Propagation loss vs range: modes and PE agree for a shallow gradient.
     r = np.linspace(100.0, 20_000.0, 400)
-    nm = normal_modes(50.0, [0.0, 200.0], [1500.0, 1530.0], source_depth=30.0,
-                      receiver_depth=120.0, ranges_m=r, n_depth_points=800)
-    pe = parabolic_equation(50.0, [0.0, 200.0], [1500.0, 1530.0], source_depth=30.0,
-                            max_range=20_000.0, range_step=20.0, n_depth_points=512)
+    nm = underwater.normal_modes(
+        50.0,
+        [0.0, 200.0],
+        [1500.0, 1530.0],
+        source_depth=30.0,
+        receiver_depth=120.0,
+        ranges_m=r,
+        n_depth_points=800,
+    )
+    pe = underwater.parabolic_equation(
+        50.0,
+        [0.0, 200.0],
+        [1500.0, 1530.0],
+        source_depth=30.0,
+        max_range=20_000.0,
+        range_step=20.0,
+        n_depth_points=512,
+    )
     zi = int(np.argmin(np.abs(pe.depths - 120.0)))
     axes[2].plot(nm.ranges / 1000.0, nm.propagation_loss, color=COLOR_PRIMARY,
                  linewidth=1.0, label="Normal modes")
@@ -510,12 +549,16 @@ def generate_seawater_absorption(output_dir: str) -> None:
     """Volume absorption of the three models, and how far the two simpler ones
     depart from the Francois-Garrison reference."""
     print("Generating seawater_absorption...")
-    from phonometry import seawater_absorption
+    from phonometry import underwater
 
     freqs = np.logspace(1.0, 6.0, 500)
     kw = {"temperature": 10.0, "salinity": 35.0, "depth": 100.0}
-    alpha = {m: np.asarray(seawater_absorption(freqs, model=m, **kw), dtype=float)
-             for m in ("francois-garrison", "ainslie-mccolm", "thorp")}
+    alpha = {
+        m: np.asarray(
+            underwater.seawater_absorption(freqs, model=m, **kw), dtype=float
+        )
+        for m in ("francois-garrison", "ainslie-mccolm", "thorp")
+    }
 
     fig, (ax_a, ax_r) = plt.subplots(1, 2, figsize=(13.5, 5.4))
 
@@ -576,14 +619,21 @@ def generate_seawater_absorption(output_dir: str) -> None:
 def generate_sound_speed_models(output_dir: str) -> None:
     """The four sound-speed equations on one profile, and their spread."""
     print("Generating sound_speed_models...")
-    from phonometry import sea_water_sound_speed, sound_speed_profile
+    from phonometry import underwater
 
     depths = np.linspace(0.0, 5000.0, 251)
     temps = 4.0 + 14.0 / (1.0 + (np.maximum(depths - 80.0, 0.0) / 250.0) ** 2)
     models = ("unesco", "del_grosso", "mackenzie", "medwin")
     colors = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, "#8c8c8c")
-    profiles = {m: np.asarray(sound_speed_profile(depths, temps, 35.0, model=m)
-                              .sound_speed, dtype=float) for m in models}
+    profiles = {
+        m: np.asarray(
+            underwater.sound_speed_profile(
+                depths, temps, 35.0, model=m
+            ).sound_speed,
+            dtype=float,
+        )
+        for m in models
+    }
 
     fig, (ax_c, ax_d) = plt.subplots(1, 2, figsize=(13.0, 6.2))
     for m, color in zip(models, colors, strict=True):
@@ -614,7 +664,9 @@ def generate_sound_speed_models(output_dir: str) -> None:
     ax_d.set_axisbelow(True)
     ax_d.legend(loc="lower left", fontsize=9)
 
-    check = float(sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie"))
+    check = float(
+        underwater.sea_water_sound_speed(25.0, 35.0, 1000.0, model="mackenzie")
+    )
     ax_c.text(0.03, 0.05,
               f"Mackenzie check point: {check:.3f} m/s\n"
               "at 25 °C, 35 ppt, 1000 m (not on this profile)",
@@ -629,15 +681,11 @@ def generate_sound_speed_models(output_dir: str) -> None:
 def generate_detection_range(output_dir: str) -> None:
     """One crossing in closed form, several against a modal loss curve."""
     print("Generating detection_range...")
-    from phonometry import (
-        detection_range,
-        detection_range_from_curve,
-        normal_modes,
-    )
+    from phonometry import underwater
 
     fig, (ax_c, ax_m) = plt.subplots(1, 2, figsize=(13.5, 5.4))
 
-    res = detection_range(82.7, 50e3)
+    res = underwater.detection_range(82.7, 50e3)
     res.plot(ax=ax_c)
     ax_c.set_title("Closed Form: One Crossing (FOM = 82.7 dB, 50 kHz)",
                    pad=12)
@@ -645,9 +693,9 @@ def generate_detection_range(output_dir: str) -> None:
     # A shallow waveguide: the modal loss oscillates, so a figure of merit can
     # be crossed several times and "the" detection range needs a convention.
     ranges = np.linspace(200.0, 6000.0, 1200)
-    modes = normal_modes(30.0, [0.0, 100.0], [1500.0, 1500.0],
-                         source_depth=25.0, receiver_depth=60.0,
-                         ranges_m=ranges, n_depth_points=800)
+    modes = underwater.normal_modes(30.0, [0.0, 100.0], [1500.0, 1500.0],
+                                    source_depth=25.0, receiver_depth=60.0,
+                                    ranges_m=ranges, n_depth_points=800)
     pl = np.asarray(modes.propagation_loss, dtype=float)
     fom = 60.0
     ax_m.plot(ranges / 1000.0, pl, color=COLOR_PRIMARY, linewidth=1.2,
@@ -659,7 +707,9 @@ def generate_detection_range(output_dir: str) -> None:
         ax_m.plot([ranges[idx] / 1000.0], [pl[idx]], "o", color=COLOR_TERTIARY,
                   markersize=6, zorder=5,
                   label="Crossings" if i == 0 else None)
-    first = detection_range_from_curve(fom, ranges, pl, crossing="first")
+    first = underwater.detection_range_from_curve(
+        fom, ranges, pl, crossing="first"
+    )
     last = float(ranges[crossings[-1]])
     ax_m.annotate(f"first crossing: {first / 1000.0:.2f} km\n"
                   "(what detection_range_from_curve returns)",
@@ -688,13 +738,13 @@ def generate_detection_range(output_dir: str) -> None:
 def generate_normal_modes(output_dir: str) -> None:
     """Mode shapes, the mode count against frequency, and the modal loss."""
     print("Generating normal_modes...")
-    from phonometry import normal_modes
+    from phonometry import underwater
 
     depth_m, freq = 200.0, 50.0
     ranges = np.linspace(100.0, 20_000.0, 500)
-    res = normal_modes(freq, [0.0, depth_m], [1500.0, 1500.0],
-                       source_depth=50.0, receiver_depth=100.0,
-                       ranges_m=ranges, n_depth_points=800)
+    res = underwater.normal_modes(freq, [0.0, depth_m], [1500.0, 1500.0],
+                                  source_depth=50.0, receiver_depth=100.0,
+                                  ranges_m=ranges, n_depth_points=800)
 
     fig, axes = plt.subplots(1, 3, figsize=(16.0, 5.4))
 
@@ -725,10 +775,20 @@ def generate_normal_modes(output_dir: str) -> None:
 
     ax = axes[1]
     freqs = np.arange(10.0, 201.0, 1.0)
-    counts = np.array([normal_modes(f, [0.0, depth_m], [1500.0, 1500.0],
-                                    source_depth=50.0, receiver_depth=100.0,
-                                    n_depth_points=1200).wavenumbers.size
-                       for f in freqs], dtype=float)
+    counts = np.array(
+        [
+            underwater.normal_modes(
+                f,
+                [0.0, depth_m],
+                [1500.0, 1500.0],
+                source_depth=50.0,
+                receiver_depth=100.0,
+                n_depth_points=1200,
+            ).wavenumbers.size
+            for f in freqs
+        ],
+        dtype=float,
+    )
     ax.step(freqs, counts, where="post", color=COLOR_PRIMARY, linewidth=1.8,
             label="Propagating modes returned")
     ax.plot(freqs, 2.0 * freqs * depth_m / 1500.0, color=COLOR_SECONDARY,
@@ -752,7 +812,7 @@ def generate_normal_modes(output_dir: str) -> None:
 def generate_sonar_budget(output_dir: str) -> None:
     """The worked budget as a picture: every term moves the crossing."""
     print("Generating sonar_budget...")
-    from phonometry import detection_range, passive_sonar_equation, propagation_loss
+    from phonometry import underwater
 
     ranges = np.linspace(50.0, 30_000.0, 800)
     cases = (
@@ -762,19 +822,26 @@ def generate_sonar_budget(output_dir: str) -> None:
         ("20 kHz, practical $R_0$ = 1 km", 20e3, "practical", 1000.0,
          COLOR_SECONDARY, "--"),
     )
-    fom_full = float(passive_sonar_equation(
+    fom_full = float(underwater.passive_sonar_equation(
         source_level=140.0, propagation_loss=np.array([50.0]),
         noise_level=60.0, directivity_index=15.0,
         detection_threshold=8.0).figure_of_merit)
-    fom_trim = float(passive_sonar_equation(
+    fom_trim = float(underwater.passive_sonar_equation(
         source_level=140.0, propagation_loss=np.array([50.0]),
         noise_level=60.0, directivity_index=7.5,
         detection_threshold=8.0).figure_of_merit)
 
     _fig, ax = plt.subplots(figsize=(11.0, 6.4))
     for label, freq, law, r0, color, ls in cases:
-        loss = propagation_loss(ranges, freq, law=law, transition_range=r0,
-                                temperature=10.0, salinity=35.0, depth=100.0)
+        loss = underwater.propagation_loss(
+            ranges,
+            freq,
+            law=law,
+            transition_range=r0,
+            temperature=10.0,
+            salinity=35.0,
+            depth=100.0,
+        )
         ax.plot(ranges / 1000.0, loss.pl, ls, color=color, linewidth=1.9,
                 label=label)
     for fom, style, lab, dy in (
@@ -783,10 +850,20 @@ def generate_sonar_budget(output_dir: str) -> None:
         ax.axhline(fom, color=COLOR_FG, linewidth=1.4, linestyle=style,
                    alpha=0.8, label=lab)
         for k, (label, freq, law, r0, color, _ls) in enumerate(cases):
-            r50 = float(detection_range(fom, freq, law=law,
-                                        transition_range=r0, temperature=10.0,
-                                        salinity=35.0, depth=100.0)
-                        .detection_range) / 1000.0
+            r50 = (
+                float(
+                    underwater.detection_range(
+                        fom,
+                        freq,
+                        law=law,
+                        transition_range=r0,
+                        temperature=10.0,
+                        salinity=35.0,
+                        depth=100.0,
+                    ).detection_range
+                )
+                / 1000.0
+            )
             ax.plot([r50, r50], [fom, 124.0], color=color, linewidth=0.9,
                     linestyle=":", alpha=0.8)
             ax.plot([r50], [fom], "o", color=color, markersize=5, zorder=5)
@@ -821,7 +898,7 @@ def generate_sonar_budget(output_dir: str) -> None:
 def generate_ray_turning_point(output_dir: str) -> None:
     """Snell's turning condition as a picture: a fan of rays, each turning."""
     print("Generating ray_turning_point...")
-    from phonometry import ray_trace
+    from phonometry import underwater
 
     z_top, z_bot, c_top, grad = 0.0, 2000.0, 1490.0, 0.017
     depths = [z_top, z_bot]
@@ -845,9 +922,9 @@ def generate_ray_turning_point(output_dir: str) -> None:
     colors = (COLOR_PRIMARY, COLOR_TERTIARY, COLOR_SECONDARY, "#8c8c8c",
               "#7b5ea7")
     for angle, color in zip(angles, colors, strict=True):
-        rays = ray_trace(depths, speeds, source_depth=z_source,
-                         launch_angles_deg=[angle], max_range=32e3,
-                         n_steps=20000)
+        rays = underwater.ray_trace(depths, speeds, source_depth=z_source,
+                                    launch_angles_deg=[angle], max_range=32e3,
+                                    n_steps=20000)
         ax_r.plot(rays.ranges[0] / 1000.0, rays.depths[0], color=color,
                   linewidth=1.6, label=f"{angle:.0f}°")
         z_turn = (c_source / np.cos(np.radians(angle)) - c_top) / grad
@@ -894,7 +971,7 @@ def generate_ray_turning_point(output_dir: str) -> None:
 def generate_gaussian_beam_caustic(output_dir: str) -> None:
     """A finite level on the caustic and a graded one in the shadow behind it."""
     print("Generating gaussian_beam_caustic...")
-    from phonometry import gaussian_beams, ray_trace
+    from phonometry import underwater
 
     # Jensen's n^2-linear profile, Eq. (3.77): c(z) = c0/sqrt(1 + 2.4 z/c0), the
     # one profile whose modes are Airy functions in closed form, and the one the
@@ -908,11 +985,17 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
     c_prof = c0 / np.sqrt(1.0 + 2.4 * z_prof / c0)
     freq, z_src, r_max = 600.0, 992.5, 2500.0
 
-    from phonometry import BeamFan
 
-    beams = gaussian_beams(freq, z_prof, c_prof, source_depth=z_src,
-                           max_range=r_max, range_step=12.5,
-                           fan=BeamFan(max_angle_deg=45.0), n_depth_points=400)
+    beams = underwater.gaussian_beams(
+        freq,
+        z_prof,
+        c_prof,
+        source_depth=z_src,
+        max_range=r_max,
+        range_step=12.5,
+        fan=underwater.BeamFan(max_angle_deg=45.0),
+        n_depth_points=400,
+    )
     pl = np.asarray(beams.propagation_loss, dtype=float)
     ranges = np.asarray(beams.ranges, dtype=float)
     depths = np.asarray(beams.depths, dtype=float)
@@ -952,9 +1035,9 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
     # The rays the beams are hung on, from the same profile and the same source:
     # every second one of a 15-ray up-going fan, so the fold that makes the
     # caustic is visible as geometry over the level it produces.
-    rays = ray_trace(z_prof, c_prof, source_depth=z_src,
-                     launch_angles_deg=np.linspace(-45.0, -3.0, 15),
-                     max_range=r_max, n_steps=4000)
+    rays = underwater.ray_trace(z_prof, c_prof, source_depth=z_src,
+                                launch_angles_deg=np.linspace(-45.0, -3.0, 15),
+                                max_range=r_max, n_steps=4000)
     # Grey rather than COLOR_FG: these lines cross the whole ramp, and each end
     # of it takes a different ink (black vanishes in the shadow band, white in
     # the bright core). COLOR_MUTED is the one grey that reads on both.
@@ -1023,7 +1106,7 @@ def generate_gaussian_beam_caustic(output_dir: str) -> None:
 def generate_eigenray_arrivals(output_dir: str) -> None:
     """The arrival structure at one receiver: per-path loss against delay."""
     print("Generating eigenray_arrivals...")
-    from phonometry import eigenrays, ray_trace
+    from phonometry import underwater
 
     # The solvers guide's own worked case, kept identical so every number the
     # labels quote is checkable against the prose beside the figure: a 100 m
@@ -1031,10 +1114,15 @@ def generate_eigenray_arrivals(output_dir: str) -> None:
     # (the n-th flies straight to a mirror image of the receiver), a source at
     # 36 m and a receiver 500 m out at 46 m. The 0.5-degree fan brackets all
     # eleven arrivals inside its 48-degree half-angle.
-    fan = ray_trace([0.0, 100.0], [1500.0, 1500.0], source_depth=36.0,
-                    launch_angles_deg=np.arange(-48.0, 48.5, 0.5),
-                    max_range=600.0, n_steps=201)
-    arr = eigenrays(fan, receiver_range=500.0, receiver_depth=46.0)
+    fan = underwater.ray_trace(
+        [0.0, 100.0],
+        [1500.0, 1500.0],
+        source_depth=36.0,
+        launch_angles_deg=np.arange(-48.0, 48.5, 0.5),
+        max_range=600.0,
+        n_steps=201,
+    )
+    arr = underwater.eigenrays(fan, receiver_range=500.0, receiver_depth=46.0)
 
     t_ms = np.asarray(arr.travel_times, dtype=float) * 1e3
     loss = -20.0 * np.log10(np.abs(np.asarray(arr.amplitudes)))
@@ -1120,16 +1208,22 @@ def generate_eigenray_arrivals(output_dir: str) -> None:
 def generate_pe_paraxial_error(output_dir: str) -> None:
     """Where the small-angle PE disagrees with the modal reference, and why."""
     print("Generating pe_paraxial_error...")
-    from phonometry import normal_modes, parabolic_equation
+    from phonometry import underwater
 
     freq, depth_m, z_rx = 50.0, 100.0, 60.0
     ranges = np.linspace(50.0, 6000.0, 700)
-    modes = normal_modes(freq, [0.0, depth_m], [1500.0, 1500.0],
-                         source_depth=30.0, receiver_depth=z_rx,
-                         ranges_m=ranges, n_depth_points=800)
-    field = parabolic_equation(freq, [0.0, depth_m], [1500.0, 1500.0],
-                               source_depth=30.0, max_range=6000.0,
-                               range_step=5.0, n_depth_points=1024)
+    modes = underwater.normal_modes(freq, [0.0, depth_m], [1500.0, 1500.0],
+                                    source_depth=30.0, receiver_depth=z_rx,
+                                    ranges_m=ranges, n_depth_points=800)
+    field = underwater.parabolic_equation(
+        freq,
+        [0.0, depth_m],
+        [1500.0, 1500.0],
+        source_depth=30.0,
+        max_range=6000.0,
+        range_step=5.0,
+        n_depth_points=1024,
+    )
     iz = int(np.argmin(np.abs(field.depths - z_rx)))
     nm = np.asarray(modes.propagation_loss, dtype=float)
     pe = np.interp(ranges, field.ranges, field.propagation_loss[iz])
@@ -1201,15 +1295,15 @@ def generate_pe_paraxial_error(output_dir: str) -> None:
 def generate_marine_mammal_audiograms(output_dir: str) -> None:
     """The group hearing curves, and the orca curve with its branch trap."""
     print("Generating marine_mammal_audiograms...")
-    from phonometry import AUDIOGRAM_GROUPS, group_audiogram, orca_audiogram
+    from phonometry import underwater
 
     freqs = np.logspace(2.0, np.log10(200e3), 700)
     fig, (ax_g, ax_o) = plt.subplots(1, 2, figsize=(13.5, 5.6))
 
     palette = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, "#8c8c8c",
                "#7b5ea7", "#c07a2c", "#2c8c8c")
-    for group, color in zip(AUDIOGRAM_GROUPS, palette, strict=True):
-        res = group_audiogram(freqs, group)
+    for group, color in zip(underwater.AUDIOGRAM_GROUPS, palette, strict=True):
+        res = underwater.group_audiogram(freqs, group)
         style = "--" if res.in_air else "-"
         ax_g.semilogx(res.frequencies, res.threshold, style, color=color,
                       linewidth=1.8,
@@ -1231,7 +1325,7 @@ def generate_marine_mammal_audiograms(output_dir: str) -> None:
     format_frequency_axis(ax_g, 100.0, 200e3)
 
     orca_f = np.logspace(np.log10(500.0), np.log10(80e3), 600)
-    orca = orca_audiogram(orca_f)
+    orca = underwater.orca_audiogram(orca_f)
     ax_o.semilogx(orca.frequencies, orca.threshold, color=COLOR_PRIMARY,
                   linewidth=2.0, label="orca_audiogram (three branches)")
     for edge in (11.3e3, 46.2e3):
@@ -1240,7 +1334,7 @@ def generate_marine_mammal_audiograms(output_dir: str) -> None:
               color=COLOR_SECONDARY, markersize=7, zorder=5,
               label=f"minimum {orca.best_threshold:.1f} dB at "
                     f"{orca.best_frequency / 1000.0:.1f} kHz")
-    at_50k = float(orca_audiogram(50e3).threshold[0])
+    at_50k = float(underwater.orca_audiogram(50e3).threshold[0])
     ax_o.plot([50e3], [at_50k], "s", color=COLOR_TERTIARY, markersize=7,
               zorder=5, label=f"third branch at 50 kHz: {at_50k:.1f} dB")
     second_branch = 242.9 * 50.0 ** (-0.7578) + 0.5643 * 50.0**1.076
@@ -1280,16 +1374,12 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
     """The band spectrum the chain starts from, and the same campaign judged
     for a low-frequency cetacean and for a porpoise."""
     print("Generating marine_mammal_assessment...")
-    from phonometry import (
-        peak_sound_pressure_level,
-        strike_sel_spectrum,
-        weighted_exposure,
-    )
+    from phonometry import underwater
 
     fs = 48_000
     strike = _piling_strike(fs)
-    spectrum = strike_sel_spectrum(strike, fs, fraction=3)
-    peak = float(peak_sound_pressure_level(strike))
+    spectrum = underwater.strike_sel_spectrum(strike, fs, fraction=3)
+    peak = float(underwater.peak_sound_pressure_level(strike))
 
     fig, axes = plt.subplots(1, 3, figsize=(16.5, 5.4))
     spectrum.plot(ax=axes[0], language=_LANG)
@@ -1297,9 +1387,15 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
                       pad=12)
 
     for ax, group in zip(axes[1:], ("LF", "VHF"), strict=True):
-        res = weighted_exposure(spectrum.frequencies, spectrum.band_sel, group,
-                                guidance="nmfs-2024", impulsive=True,
-                                n_events=3000, peak_spl=peak)
+        res = underwater.weighted_exposure(
+            spectrum.frequencies,
+            spectrum.band_sel,
+            group,
+            guidance="nmfs-2024",
+            impulsive=True,
+            n_events=3000,
+            peak_spl=peak,
+        )
         res.plot(ax=ax, language=_LANG)
         ax.set_title(f"{group}: cumulative {res.cumulative_sel:.1f} dB, "
                      f"margin {_fmt_minus(res.sel_margin, '+.1f')} dB",
@@ -1313,7 +1409,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     """The exposure function regulators apply, what the 2024 revision changed,
     and the criteria of every in-water group side by side."""
     print("Generating marine_mammal_exposure_functions...")
-    from phonometry import auditory_weighting, exposure_criteria
+    from phonometry import underwater
 
     groups = ("LF", "HF", "VHF", "PW", "OW")
     palette = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, "#8c8c8c",
@@ -1328,14 +1424,14 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
 
     ax = axes[0]
     for group, color in zip(groups, palette, strict=True):
-        res = auditory_weighting(freqs, group, guidance="nmfs-2024")
+        res = underwater.auditory_weighting(freqs, group, guidance="nmfs-2024")
         exposure = np.asarray(res.exposure_function, dtype=float)
         ax.semilogx(res.frequencies, exposure, color=color, linewidth=1.8,
                     label=group)
         imin = int(np.argmin(exposure))
         ax.plot([res.frequencies[imin]], [exposure[imin]], "o", color=color,
                 markersize=5, zorder=5)
-    lf = auditory_weighting(freqs, "LF", guidance="nmfs-2024")
+    lf = underwater.auditory_weighting(freqs, "LF", guidance="nmfs-2024")
     p = lf.parameters
     ax.annotate("each minimum is that group's weighted TTS onset "
                 "$T_\\mathrm{w} = K + C$\nLF: below $f_1$ the filter falls at "
@@ -1358,7 +1454,7 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     ax = axes[1]
     for guidance, color, ls in (("nmfs-2024", COLOR_PRIMARY, "-"),
                                 ("nmfs-2018", COLOR_SECONDARY, "--")):
-        res = auditory_weighting(freqs, "LF", guidance=guidance)
+        res = underwater.auditory_weighting(freqs, "LF", guidance=guidance)
         ax.semilogx(res.frequencies, res.weighting, ls, color=color,
                     linewidth=1.9,
                     label=f"{guidance}  ($b$ = {res.parameters.b:g})")
@@ -1382,9 +1478,17 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
         ("AUD INJ peak (flat)", "injury_peak_spl", COLOR_SECONDARY, 1.5),
     )
     for label, attr, color, offset in series:
-        values = [float(getattr(exposure_criteria(g, guidance="nmfs-2024",
-                                                  impulsive=True), attr))
-                  for g in groups]
+        values = [
+            float(
+                getattr(
+                    underwater.exposure_criteria(
+                        g, guidance="nmfs-2024", impulsive=True
+                    ),
+                    attr,
+                )
+            )
+            for g in groups
+        ]
         ax.bar(idx + offset * width, values, width, color=color, label=label)
     ax.set_xticks(idx)
     ax.set_xticklabels(groups)
@@ -1403,10 +1507,12 @@ def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
 def generate_piling_campaign_accumulation(output_dir: str) -> None:
     """How many strikes a group can take before each criterion is crossed."""
     print("Generating piling_campaign_accumulation...")
-    from phonometry import strike_sel_spectrum, weighted_exposure
+    from phonometry import underwater
 
     fs = 48_000
-    spectrum = strike_sel_spectrum(_piling_strike(fs), fs, fraction=3)
+    spectrum = underwater.strike_sel_spectrum(
+        _piling_strike(fs), fs, fraction=3
+    )
     counts = np.unique(np.round(np.logspace(0.0, 4.0, 90)).astype(int))
     groups = ("LF", "HF", "VHF", "PW", "OW")
     palette = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, "#8c8c8c",
@@ -1414,15 +1520,29 @@ def generate_piling_campaign_accumulation(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(11.5, 6.4))
     for group, color in zip(groups, palette, strict=True):
-        curve = np.array([
-            weighted_exposure(spectrum.frequencies, spectrum.band_sel, group,
-                              guidance="nmfs-2024", impulsive=True,
-                              n_events=int(n)).cumulative_sel
-            for n in counts], dtype=float)
+        curve = np.array(
+            [
+                underwater.weighted_exposure(
+                    spectrum.frequencies,
+                    spectrum.band_sel,
+                    group,
+                    guidance="nmfs-2024",
+                    impulsive=True,
+                    n_events=int(n),
+                ).cumulative_sel
+                for n in counts
+            ],
+            dtype=float,
+        )
         ax.semilogx(counts, curve, color=color, linewidth=1.9, label=group)
-        crit = weighted_exposure(spectrum.frequencies, spectrum.band_sel, group,
-                                 guidance="nmfs-2024", impulsive=True,
-                                 n_events=1).criteria
+        crit = underwater.weighted_exposure(
+            spectrum.frequencies,
+            spectrum.band_sel,
+            group,
+            guidance="nmfs-2024",
+            impulsive=True,
+            n_events=1,
+        ).criteria
         levels = [(value, style) for value, style in
                   ((crit.tts_sel, ":"), (crit.injury_sel, "--"))
                   if value is not None]
@@ -1436,9 +1556,14 @@ def generate_piling_campaign_accumulation(output_dir: str) -> None:
                 ax.annotate(f"{n_cross:.0f}", xy=(n_cross, level),
                             xytext=(0, 6), textcoords="offset points",
                             fontsize=8.5, color=color, ha="center")
-    vhf = weighted_exposure(spectrum.frequencies, spectrum.band_sel, "VHF",
-                            guidance="nmfs-2024", impulsive=True,
-                            n_events=10_000)
+    vhf = underwater.weighted_exposure(
+        spectrum.frequencies,
+        spectrum.band_sel,
+        "VHF",
+        guidance="nmfs-2024",
+        impulsive=True,
+        n_events=10_000,
+    )
     headroom = float(vhf.criteria.tts_sel or 0.0) - float(vhf.cumulative_sel)
     ax.text(0.03, 0.90,
             "the same campaign, judged five ways: a 200 Hz hammer reaches only\n"

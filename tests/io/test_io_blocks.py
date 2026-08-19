@@ -16,7 +16,7 @@ import numpy as np
 import pytest
 from wav_forge import chunk, float_wav, fmt_payload, pcm_wav, rf64_wav, riff_wave
 
-from phonometry import filters, leq
+from phonometry import filters, signals
 from phonometry.io import LossyCompressionWarning, read, read_blocks, write
 
 try:
@@ -215,7 +215,7 @@ def test_streamed_leq_equals_the_whole_file_leq(
     write(path, x, FS, subtype="DOUBLE")  # bit-exact container: no
     # quantisation muddies the comparison; the only difference left
     # between the two paths is summation order (~1e-13 dB).
-    whole = leq(np.asarray(read(path)))
+    whole = signals.leq(np.asarray(read(path)))
     # 4800-frame blocks do not divide 144000 - overlap tilings evenly.
     assert _streamed_leq(path, 4800, overlap) == pytest.approx(
         whole, abs=1e-9
@@ -247,7 +247,7 @@ def test_streamed_stateful_laeq_equals_the_single_pass(
         frames += y.shape[-1]
     streamed = 10 * np.log10((total / frames) / (2e-5) ** 2)
 
-    offline = leq(
+    offline = signals.leq(
         filters.WeightingFilter(FS, "A", high_accuracy=False).filter(
             np.asarray(read(path))
         )
@@ -294,7 +294,7 @@ def test_streamed_band_leq_through_a_stateful_bank(tmp_path: Path) -> None:
         calculate_level=False,
     )[2][0]
     assert streamed == pytest.approx(
-        leq(offline_band), abs=1e-9
+        signals.leq(offline_band), abs=1e-9
     )
 
 
@@ -315,6 +315,6 @@ def test_streamed_leq_matches_across_backends(
     flac = tmp_path / "same.flac"
     sf.write(str(flac), (codes << 8).astype(np.int32), FS, subtype="PCM_24")
 
-    whole = leq(np.asarray(read(wav)))
+    whole = signals.leq(np.asarray(read(wav)))
     assert _streamed_leq(wav, 4800, overlap) == pytest.approx(whole, abs=1e-9)
     assert _streamed_leq(flac, 4800, overlap) == pytest.approx(whole, abs=1e-9)

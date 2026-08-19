@@ -6,7 +6,7 @@ Parametric tests using pytest best practices for signal processing verification.
 import numpy as np
 import pytest
 
-from phonometry import FilterDesign, OctaveFilterBank, octave_filter
+from phonometry import filters
 
 
 @pytest.mark.parametrize("fraction, expected_bands", [
@@ -34,7 +34,7 @@ def test_band_count_estimates(fraction: float, expected_bands: int) -> None:
     x = np.zeros(fs)
     limits = [12.0, 20000.0]
     
-    _, freq = octave_filter(x, fs, fraction=fraction, limits=limits)
+    _, freq = filters.octave_filter(x, fs, fraction=fraction, limits=limits)
     
     # We allow some flexibility as exact count depends on limits implementation details
     assert abs(len(freq) - expected_bands) <= 2, f"Expected approx {expected_bands} bands, got {len(freq)}"
@@ -62,7 +62,7 @@ def test_input_dtypes(dtype: np.dtype) -> None:
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs).astype(dtype)
     
-    spl, _ = octave_filter(x, fs)
+    spl, _ = filters.octave_filter(x, fs)
     assert not np.isnan(spl).any()
     assert spl.dtype == np.float64 # Internal processing is likely float64
 
@@ -94,7 +94,7 @@ def test_multichannel_shapes(channels: int) -> None:
     else:
         x = rng.standard_normal((channels, samples))
         
-    spl, freq = octave_filter(x, fs)
+    spl, freq = filters.octave_filter(x, fs)
     
     if channels == 1:
         assert spl.ndim == 1
@@ -128,9 +128,14 @@ def test_frequency_isolation(target_freq: float, filter_type: str) -> None:
     
     # Generate pure tone
     x = np.sin(2 * np.pi * target_freq * t)
-    
-    spl, freq = octave_filter(x, fs, fraction=1, limits=[20.0, 16000.0],
-                              design=FilterDesign(filter_type=filter_type))
+
+    spl, freq = filters.octave_filter(
+        x,
+        fs,
+        fraction=1,
+        limits=[20.0, 16000.0],
+        design=filters.FilterDesign(filter_type=filter_type),
+    )
     
     # Find the band closest to target_freq
     freq_arr = np.array(freq)
@@ -178,8 +183,13 @@ def test_impulse_response_decay(filter_type: str) -> None:
     x[0] = 1.0 # Impulse
     
     # Use sigbands=True to get time domain signals
-    _, _, signals = octave_filter(x, fs, fraction=1, sigbands=True,
-                                  design=FilterDesign(filter_type=filter_type))
+    _, _, signals = filters.octave_filter(
+        x,
+        fs,
+        fraction=1,
+        sigbands=True,
+        design=filters.FilterDesign(filter_type=filter_type),
+    )
     
     for band_sig in signals:
         # Check that the end of the signal is close to zero (decayed)
@@ -207,7 +217,7 @@ def test_filterbank_class_direct() -> None:
     """
     fs = 44100
     rng = np.random.default_rng(42)
-    bank = OctaveFilterBank(fs, fraction=3)
+    bank = filters.OctaveFilterBank(fs, fraction=3)
     x = rng.standard_normal(fs)
     
     spl, freq = bank.filter(x)
@@ -240,25 +250,23 @@ def test_impulse_kernel_python_fallback_matches_numba() -> None:
 
 def test_time_weighting_class_blocks_match_continuous() -> None:
     """Block-wise TimeWeighting must equal one-shot time_weighting."""
-    from phonometry import TimeWeighting, time_weighting
 
     fs = 48000
     rng = np.random.default_rng(5)
     x = rng.standard_normal(fs)
 
-    continuous = time_weighting(x, fs, mode="fast")
+    continuous = filters.time_weighting(x, fs, mode="fast")
 
-    tw = TimeWeighting(fs, mode="fast")
+    tw = filters.TimeWeighting(fs, mode="fast")
     blocks = [tw.process(b) for b in np.split(x, 8)]
     np.testing.assert_allclose(np.concatenate(blocks), continuous, rtol=1e-10)
 
 
 def test_time_weighting_class_reset() -> None:
-    from phonometry import TimeWeighting
 
     fs = 48000
     x = np.ones(1000)
-    tw = TimeWeighting(fs, mode="fast")
+    tw = filters.TimeWeighting(fs, mode="fast")
     first = tw.process(x)
     tw.reset()
     again = tw.process(x)
@@ -266,50 +274,46 @@ def test_time_weighting_class_reset() -> None:
 
 
 def test_time_weighting_class_multichannel_state() -> None:
-    from phonometry import TimeWeighting, time_weighting
 
     fs = 48000
     rng = np.random.default_rng(6)
     x = rng.standard_normal((2, fs))
-    continuous = time_weighting(x, fs, mode="slow")
-    tw = TimeWeighting(fs, mode="slow")
+    continuous = filters.time_weighting(x, fs, mode="slow")
+    tw = filters.TimeWeighting(fs, mode="slow")
     blocks = [tw.process(x[:, i * 12000:(i + 1) * 12000]) for i in range(4)]
     np.testing.assert_allclose(np.concatenate(blocks, axis=-1), continuous, rtol=1e-10)
 
 
 def test_time_weighting_class_invalid_params() -> None:
-    from phonometry import TimeWeighting
 
     with pytest.raises(ValueError, match="must be positive"):
-        TimeWeighting(0)
+        filters.TimeWeighting(0)
     with pytest.raises(ValueError, match="Invalid time weighting mode"):
-        TimeWeighting(48000, mode="banana")
+        filters.TimeWeighting(48000, mode="banana")
 
 
 def test_time_weighting_class_impulse_blocks_match_continuous() -> None:
     """Impulse mode uses a distinct asymmetric kernel: verify state carrying."""
-    from phonometry import TimeWeighting, time_weighting
 
     fs = 48000
     rng = np.random.default_rng(7)
     x = rng.standard_normal((2, fs))
 
-    continuous = time_weighting(x, fs, mode="impulse")
-    tw = TimeWeighting(fs, mode="impulse")
+    continuous = filters.time_weighting(x, fs, mode="impulse")
+    tw = filters.TimeWeighting(fs, mode="impulse")
     blocks = [tw.process(x[:, i * 12000:(i + 1) * 12000]) for i in range(4)]
     np.testing.assert_allclose(np.concatenate(blocks, axis=-1), continuous, rtol=1e-10)
 
 
 def test_time_weighting_class_empty_block_keeps_state() -> None:
-    from phonometry import TimeWeighting, time_weighting
 
     fs = 48000
     x = np.ones(1000)
-    tw = TimeWeighting(fs)
+    tw = filters.TimeWeighting(fs)
     first = tw.process(x)
     empty = tw.process(np.array([]))
     assert empty.shape == (0,)
     second = tw.process(x)
     # State must have survived the empty block: continuous reference
-    reference = time_weighting(np.concatenate([x, x]), fs)
+    reference = filters.time_weighting(np.concatenate([x, x]), fs)
     np.testing.assert_allclose(np.concatenate([first, second]), reference, rtol=1e-10)

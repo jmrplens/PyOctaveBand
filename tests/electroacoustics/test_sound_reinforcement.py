@@ -30,14 +30,7 @@ import math
 
 import pytest
 
-from phonometry import (
-    CARDIOID_RELATIVE_DIRECTIVITY,
-    DEFAULT_STABILITY_MARGIN,
-    FeedbackStabilityResult,
-    feedback_loop_gain,
-    feedback_stability,
-    open_microphone_correction,
-)
+from phonometry import electroacoustics
 
 #: Long, printed p. 697: "the desired open-loop system gain might be of the
 #: order of -6 dB", typical of an auditorium or church.
@@ -50,15 +43,17 @@ LEVEL_AT_LISTENER = 80.0
 def test_stability_margin_default_is_10_db() -> None:
     """Long p. 698: "This text uses a middle value of 10 dB for an equalised
     system" (12 dB unequalised, 6 dB carefully equalised)."""
-    assert DEFAULT_STABILITY_MARGIN == 10.0
+    assert electroacoustics.DEFAULT_STABILITY_MARGIN == 10.0
 
 
 def test_feedback_loop_gain_is_equation_18_18() -> None:
     """G_S = L_H-M - L_H-L + D_M(theta)."""
-    assert feedback_loop_gain(74.0, 80.0) == pytest.approx(-6.0)
-    assert feedback_loop_gain(74.0, 80.0, microphone_directivity=-2.0) == (
-        pytest.approx(-8.0)
+    assert electroacoustics.feedback_loop_gain(74.0, 80.0) == pytest.approx(
+        -6.0
     )
+    assert electroacoustics.feedback_loop_gain(
+        74.0, 80.0, microphone_directivity=-2.0
+    ) == (pytest.approx(-8.0))
 
 
 def test_oscillation_criterion_equation_18_16() -> None:
@@ -68,8 +63,8 @@ def test_oscillation_criterion_equation_18_16() -> None:
     margin at all, and the system is unstable for any positive margin.
     """
     l_hm = LEVEL_AT_LISTENER + LONG_OPEN_LOOP_GAIN
-    result = feedback_stability(
-        -feedback_loop_gain(l_hm, LEVEL_AT_LISTENER),
+    result = electroacoustics.feedback_stability(
+        -electroacoustics.feedback_loop_gain(l_hm, LEVEL_AT_LISTENER),
         l_hm,
         LEVEL_AT_LISTENER,
     )
@@ -77,8 +72,8 @@ def test_oscillation_criterion_equation_18_16() -> None:
     assert result.margin == pytest.approx(0.0)
     assert not result.is_stable
     # With a zero margin required, sitting exactly at oscillation is the edge.
-    edge = feedback_stability(
-        -feedback_loop_gain(l_hm, LEVEL_AT_LISTENER),
+    edge = electroacoustics.feedback_stability(
+        -electroacoustics.feedback_loop_gain(l_hm, LEVEL_AT_LISTENER),
         l_hm,
         LEVEL_AT_LISTENER,
         stability_margin=0.0,
@@ -92,7 +87,7 @@ def test_equation_18_21_omnidirectional_microphone_4_db_below() -> None:
     For an omnidirectional microphone (D_M = 0) the loudspeaker level at the
     microphone must be 4 dB below the average level in the audience.
     """
-    result = feedback_stability(
+    result = electroacoustics.feedback_stability(
         LONG_OPEN_LOOP_GAIN, LEVEL_AT_LISTENER - 4.0, LEVEL_AT_LISTENER
     )
     assert result.maximum_level_at_microphone == pytest.approx(
@@ -101,7 +96,7 @@ def test_equation_18_21_omnidirectional_microphone_4_db_below() -> None:
     assert result.is_stable
     assert result.headroom == pytest.approx(0.0)
     # One decibel more at the microphone and the criterion fails.
-    louder = feedback_stability(
+    louder = electroacoustics.feedback_stability(
         LONG_OPEN_LOOP_GAIN, LEVEL_AT_LISTENER - 3.0, LEVEL_AT_LISTENER
     )
     assert not louder.is_stable
@@ -110,11 +105,11 @@ def test_equation_18_21_omnidirectional_microphone_4_db_below() -> None:
 
 def test_equation_18_22_cardioid_microphone_2_db_below() -> None:
     """Equation (18.22): a cardioid (-2 dB relative) allows L_H-M <= L_H-L - 2."""
-    result = feedback_stability(
+    result = electroacoustics.feedback_stability(
         LONG_OPEN_LOOP_GAIN,
         LEVEL_AT_LISTENER - 2.0,
         LEVEL_AT_LISTENER,
-        microphone_directivity=CARDIOID_RELATIVE_DIRECTIVITY,
+        microphone_directivity=electroacoustics.CARDIOID_RELATIVE_DIRECTIVITY,
     )
     assert result.maximum_level_at_microphone == pytest.approx(
         LEVEL_AT_LISTENER - 2.0
@@ -125,8 +120,10 @@ def test_equation_18_22_cardioid_microphone_2_db_below() -> None:
 
 def test_cardioid_buys_exactly_its_directivity_index() -> None:
     """Long p. 698: a directional microphone buys gain equal to -D_M(theta)."""
-    omni = feedback_stability(LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER)
-    cardioid = feedback_stability(
+    omni = electroacoustics.feedback_stability(
+        LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER
+    )
+    cardioid = electroacoustics.feedback_stability(
         LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER,
         microphone_directivity=-3.0,
     )
@@ -135,16 +132,24 @@ def test_cardioid_buys_exactly_its_directivity_index() -> None:
 
 def test_equation_18_23_number_of_open_microphones() -> None:
     """dL_nom = 10 log10 N_m: doubling the open microphones costs 3 dB."""
-    assert open_microphone_correction(1) == 0.0
-    assert open_microphone_correction(2) == pytest.approx(3.0103, abs=1e-4)
-    assert open_microphone_correction(4) == pytest.approx(6.0206, abs=1e-4)
-    assert open_microphone_correction(10) == pytest.approx(10.0)
+    assert electroacoustics.open_microphone_correction(1) == 0.0
+    assert electroacoustics.open_microphone_correction(2) == pytest.approx(
+        3.0103, abs=1e-4
+    )
+    assert electroacoustics.open_microphone_correction(4) == pytest.approx(
+        6.0206, abs=1e-4
+    )
+    assert electroacoustics.open_microphone_correction(10) == pytest.approx(
+        10.0
+    )
 
 
 def test_open_microphones_eat_the_headroom() -> None:
     """Equation (18.24): dL_nom enters the criterion on the loop-gain side."""
-    one = feedback_stability(LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER)
-    four = feedback_stability(
+    one = electroacoustics.feedback_stability(
+        LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER
+    )
+    four = electroacoustics.feedback_stability(
         LONG_OPEN_LOOP_GAIN, 74.0, LEVEL_AT_LISTENER, open_microphones=4
     )
     assert four.nom_correction == pytest.approx(10.0 * math.log10(4.0))
@@ -156,8 +161,10 @@ def test_open_microphones_eat_the_headroom() -> None:
 
 def test_maximum_open_loop_gain_is_the_stability_edge() -> None:
     """Setting Z_S to its maximum lands the loop exactly on the margin line."""
-    probe = feedback_stability(0.0, 74.0, LEVEL_AT_LISTENER, open_microphones=3)
-    at_limit = feedback_stability(
+    probe = electroacoustics.feedback_stability(
+        0.0, 74.0, LEVEL_AT_LISTENER, open_microphones=3
+    )
+    at_limit = electroacoustics.feedback_stability(
         probe.maximum_open_loop_gain, 74.0, LEVEL_AT_LISTENER,
         open_microphones=3,
     )
@@ -167,7 +174,7 @@ def test_maximum_open_loop_gain_is_the_stability_edge() -> None:
 
 
 def test_loop_gain_is_the_sum_of_its_parts() -> None:
-    result = feedback_stability(
+    result = electroacoustics.feedback_stability(
         -4.0, 70.0, 78.0, microphone_directivity=-2.5, open_microphones=6
     )
     assert result.loop_gain == pytest.approx(
@@ -177,11 +184,11 @@ def test_loop_gain_is_the_sum_of_its_parts() -> None:
     assert result.headroom == pytest.approx(
         -result.stability_margin - result.loop_gain
     )
-    assert isinstance(result, FeedbackStabilityResult)
+    assert isinstance(result, electroacoustics.FeedbackStabilityResult)
 
 
 def test_result_is_frozen() -> None:
-    result = feedback_stability(-6.0, 74.0, 80.0)
+    result = electroacoustics.feedback_stability(-6.0, 74.0, 80.0)
     with pytest.raises(AttributeError):
         result.open_loop_gain = 0.0  # type: ignore[misc]
 
@@ -191,7 +198,9 @@ def test_plot_bars_echo_the_gain_structure() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    result = feedback_stability(-6.0, 74.0, 80.0, open_microphones=2)
+    result = electroacoustics.feedback_stability(
+        -6.0, 74.0, 80.0, open_microphones=2
+    )
     ax = result.plot()
     heights = [patch.get_height() for patch in ax.patches]
     assert heights == pytest.approx(
@@ -221,9 +230,8 @@ def test_geometry_drawing_annotates_every_path() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    from phonometry import plot_sound_reinforcement_geometry
 
-    ax = plot_sound_reinforcement_geometry(0.3, 4.0, 12.0)
+    ax = electroacoustics.plot_sound_reinforcement_geometry(0.3, 4.0, 12.0)
     texts = [t.get_text() for t in ax.texts]
     assert "0.3 m" in texts
     assert "4 m" in texts
@@ -238,23 +246,27 @@ def test_geometry_drawing_annotates_every_path() -> None:
     plt.close("all")
 
     with pytest.raises(ValueError, match="must be positive"):
-        plot_sound_reinforcement_geometry(0.0, 4.0, 12.0)
+        electroacoustics.plot_sound_reinforcement_geometry(0.0, 4.0, 12.0)
     with pytest.raises(ValueError, match="must be positive"):
-        plot_sound_reinforcement_geometry(0.3, math.inf, 12.0)
+        electroacoustics.plot_sound_reinforcement_geometry(0.3, math.inf, 12.0)
 
 
 @pytest.mark.parametrize("bad", [0, -1, 2.5])
 def test_open_microphone_validation(bad: float) -> None:
     with pytest.raises(ValueError, match="integer of at least 1"):
-        open_microphone_correction(bad)  # type: ignore[arg-type]
+        electroacoustics.open_microphone_correction(bad)  # type: ignore[arg-type]
 
 
 def test_validation_errors() -> None:
     with pytest.raises(ValueError, match="finite"):
-        feedback_stability(math.nan, 74.0, 80.0)
+        electroacoustics.feedback_stability(math.nan, 74.0, 80.0)
     with pytest.raises(ValueError, match="finite"):
-        feedback_stability(-6.0, math.inf, 80.0)
+        electroacoustics.feedback_stability(-6.0, math.inf, 80.0)
     with pytest.raises(ValueError, match="non-negative"):
-        feedback_stability(-6.0, 74.0, 80.0, stability_margin=-1.0)
+        electroacoustics.feedback_stability(
+            -6.0, 74.0, 80.0, stability_margin=-1.0
+        )
     with pytest.raises(ValueError, match="integer of at least 1"):
-        feedback_stability(-6.0, 74.0, 80.0, open_microphones=0)
+        electroacoustics.feedback_stability(
+            -6.0, 74.0, 80.0, open_microphones=0
+        )

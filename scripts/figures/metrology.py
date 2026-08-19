@@ -32,7 +32,7 @@ from .theme import (
 def generate_calibration_stability(output_dir: str) -> None:
     """Stable vs unstable calibration tone against the IEC 60942 limit."""
     print("Generating calibration_stability.png...")
-    from phonometry import time_weighting
+    from phonometry import filters
 
     fs = 48000
     seconds = 6.0
@@ -47,7 +47,7 @@ def generate_calibration_stability(output_dir: str) -> None:
         (stable, COLOR_PRIMARY, "Stable tone (good coupling)"),
         (unstable, COLOR_SECONDARY, "3% AM tone (loose coupling)"),
     ]:
-        env = time_weighting(x, fs, mode="fast")[skip:]
+        env = filters.time_weighting(x, fs, mode="fast")[skip:]
         level = 10 * np.log10(np.maximum(env, np.finfo(float).eps))
         rel = level - np.mean(level)
         ax.plot(tt[skip:], rel, color=color, linewidth=1.4, label=label)
@@ -72,7 +72,7 @@ def generate_calibration_narrowband_bias(output_dir: str) -> None:
     print("Generating calibration_narrowband_bias...")
     import warnings
 
-    from phonometry import sensitivity
+    from phonometry import metrology
 
     fs = 48000
     tt = np.arange(int(fs * 6.0)) / fs
@@ -90,9 +90,14 @@ def generate_calibration_narrowband_bias(output_dir: str) -> None:
         x = tone + raw * 10 ** (-snr / 20.0)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            err_rms.append(20 * np.log10(sensitivity(x, fs=fs) / s_true))
+            err_rms.append(
+                20 * np.log10(metrology.sensitivity(x, fs=fs) / s_true)
+            )
             err_nb.append(
-                20 * np.log10(sensitivity(x, fs=fs, narrowband=True) / s_true)
+                20
+                * np.log10(
+                    metrology.sensitivity(x, fs=fs, narrowband=True) / s_true
+                )
             )
     closed = -10 * np.log10(1.0 + 10 ** (-snr_db / 10.0))
     # Where the broadband estimator alone eats the whole class 1 acceptance
@@ -136,7 +141,7 @@ def generate_dbfs_versus_spl(output_dir: str) -> None:
     print("Generating dbfs_versus_spl...")
     import warnings
 
-    from phonometry import LevelCalibration, octave_filter, sensitivity, tone_burst
+    from phonometry import filters, metrology, signals
 
     fs = 48000
     tt = np.arange(fs) / fs
@@ -158,11 +163,21 @@ def generate_dbfs_versus_spl(output_dir: str) -> None:
     limits = [22.0, 11300.0]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        factor = sensitivity(cal, fs=fs)
-        spl, bands = octave_filter(record, fs, fraction=3, limits=limits,
-                                   calibration=LevelCalibration(factor=factor))
-        dbfs, _ = octave_filter(record, fs, fraction=3, limits=limits,
-                                calibration=LevelCalibration(dbfs=True))
+        factor = metrology.sensitivity(cal, fs=fs)
+        spl, bands = filters.octave_filter(
+            record,
+            fs,
+            fraction=3,
+            limits=limits,
+            calibration=filters.LevelCalibration(factor=factor),
+        )
+        dbfs, _ = filters.octave_filter(
+            record,
+            fs,
+            fraction=3,
+            limits=limits,
+            calibration=filters.LevelCalibration(dbfs=True),
+        )
     offset = 20 * np.log10(factor / 2e-5)
 
     _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(12.5, 5.4))
@@ -185,11 +200,14 @@ def generate_dbfs_versus_spl(output_dir: str) -> None:
 
     # --- Right: the band-filter onset overshoot the peak mode reads. ---
     drive = 0.5
-    burst = tone_burst(fs, 1000.0, 40, amplitude=drive, post_silence=0.03)
+    burst = signals.tone_burst(
+        fs, 1000.0, 40, amplitude=drive, post_silence=0.03
+    )
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        _levels, _bands, filtered = octave_filter(burst.signal, fs, fraction=1,
-                                                  sigbands=True)
+        _levels, _bands, filtered = filters.octave_filter(
+            burst.signal, fs, fraction=1, sigbands=True
+        )
     idx = int(np.argmin(np.abs(np.asarray(_bands, dtype=float) - 1000.0)))
     band = np.asarray(filtered[idx], dtype=float)
     overshoot = float(np.max(np.abs(band)))
@@ -218,7 +236,7 @@ def generate_dbfs_versus_spl(output_dir: str) -> None:
 def generate_trend_test(output_dir: str) -> None:
     """Reverse arrangement trend test: B&P Example 4.4 vs a rising drift."""
     print("Generating trend_test...")
-    from phonometry import trend_test
+    from phonometry import metrology
 
     # B&P Example 4.4: twenty observations, A = 86, accepted (no trend).
     example = np.array([
@@ -228,8 +246,8 @@ def generate_trend_test(output_dir: str) -> None:
     # The same fluctuations with a slow upward drift: fewer reverse
     # arrangements (A = 38, below the Table A.6 lower bound of 64), rejected.
     drifting = example + np.linspace(0.0, 4.0, example.size)
-    res_flat = trend_test(example)
-    res_drift = trend_test(drifting)
+    res_flat = metrology.trend_test(example)
+    res_drift = metrology.trend_test(drifting)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     index = np.arange(1, example.size + 1)
@@ -262,7 +280,7 @@ def generate_trend_test(output_dir: str) -> None:
 def generate_stationarity_test(output_dir: str) -> None:
     """Reverse arrangement stationarity test: steady noise vs a gain ramp."""
     print("Generating stationarity_test...")
-    from phonometry import stationarity_test
+    from phonometry import metrology
 
     fs = 8192.0
     n = 1 << 16
@@ -272,8 +290,8 @@ def generate_stationarity_test(output_dir: str) -> None:
     ramp = np.random.default_rng(42).standard_normal(n) * np.linspace(
         1.0, 1.2, n
     )
-    res_steady = stationarity_test(steady, fs)
-    res_ramp = stationarity_test(ramp, fs)
+    res_steady = metrology.stationarity_test(steady, fs)
+    res_ramp = metrology.stationarity_test(ramp, fs)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     index = np.arange(1, res_steady.n_segments + 1)
@@ -318,11 +336,13 @@ def _bandlimited_gaussian_figure_record(
 def generate_rice_level_crossings(output_dir: str) -> None:
     """Measured level-crossing rates against the Rice curve."""
     print("Generating rice_level_crossings...")
-    from phonometry import level_crossing_rate
+    from phonometry import metrology
 
     fs = 20480.0
     x = _bandlimited_gaussian_figure_record(0, fs, 1 << 19, 800.0, 1200.0)
-    res = level_crossing_rate(x, fs, levels=np.linspace(-3.5, 3.5, 29))
+    res = metrology.level_crossing_rate(
+        x, fs, levels=np.linspace(-3.5, 3.5, 29)
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     order = np.argsort(res.levels)
@@ -353,12 +373,12 @@ def generate_rice_level_crossings(output_dir: str) -> None:
 def generate_rice_peak_distribution(output_dir: str) -> None:
     """Peak-height exceedance between the Gaussian and Rayleigh limits."""
     print("Generating rice_peak_distribution...")
-    from phonometry import peak_statistics
+    from phonometry import metrology
     from phonometry.metrology.data_qualification import _rice_peak_exceedance
 
     fs = 20480.0
     x = _bandlimited_gaussian_figure_record(3, fs, 1 << 19, 0.0, 2000.0)
-    res = peak_statistics(x, fs)
+    res = metrology.peak_statistics(x, fs)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     peaks = res.peak_values
@@ -465,7 +485,7 @@ def generate_stationarity_glide_blind_spot(output_dir: str) -> None:
     print("Generating stationarity_glide_blind_spot...")
     from scipy import signal as scipy_signal
 
-    from phonometry import stationarity_test
+    from phonometry import metrology
 
     fs = 8192.0
     n = 1 << 16
@@ -478,8 +498,8 @@ def generate_stationarity_glide_blind_spot(output_dir: str) -> None:
                               output="sos")
     banded = scipy_signal.sosfiltfilt(sos, glide)
 
-    full = stationarity_test(glide, fs)
-    band = stationarity_test(banded, fs)
+    full = metrology.stationarity_test(glide, fs)
+    band = metrology.stationarity_test(banded, fs)
 
     _fig, axes = plt.subplots(3, 1, figsize=(10, 11))
 
@@ -540,7 +560,7 @@ def generate_rice_nongaussian_screen(output_dir: str) -> None:
     print("Generating rice_nongaussian_screen...")
     from scipy import signal as scipy_signal
 
-    from phonometry import level_crossing_rate, peak_statistics
+    from phonometry import metrology
 
     fs = 20480.0
     n = 1 << 19
@@ -560,7 +580,9 @@ def generate_rice_nongaussian_screen(output_dir: str) -> None:
         (impulsive, COLOR_TERTIARY, "^", 4,
          r"Gaussian + sparse $6\,\sigma$ spikes"),
     ):
-        res = level_crossing_rate(record, fs, levels=levels * np.std(record))
+        res = metrology.level_crossing_rate(
+            record, fs, levels=levels * np.std(record)
+        )
         ax_l.plot(res.levels / np.std(record), res.rice_rates, color=color,
                   linestyle="--", linewidth=1.2, alpha=0.8)
         ax_l.plot(res.levels / np.std(record), res.rates, marker, color=color,
@@ -607,8 +629,11 @@ def generate_rice_nongaussian_screen(output_dir: str) -> None:
     factors = []
     for cut in cutoffs:
         sos = scipy_signal.butter(8, cut / (fs2 / 2), btype="low", output="sos")
-        factors.append(peak_statistics(scipy_signal.sosfiltfilt(sos, wide),
-                                       fs2).irregularity_factor)
+        factors.append(
+            metrology.peak_statistics(
+                scipy_signal.sosfiltfilt(sos, wide), fs2
+            ).irregularity_factor
+        )
     ideal = float(np.sqrt(5) / 3)
     ax_r.plot(cutoffs / 1000.0, factors, "o-", color=COLOR_PRIMARY, linewidth=2)
     ax_r.axhline(ideal, color=COLOR_FG, linestyle="--", linewidth=1.2,
@@ -760,14 +785,14 @@ def generate_uncertainty_correlation(output_dir: str) -> None:
 def generate_runs_test(output_dir: str) -> None:
     """Runs test about the median: accepted noise vs rejected alternation."""
     print("Generating runs_test...")
-    from phonometry import trend_test
+    from phonometry import metrology
 
     rng = np.random.default_rng(3)
     sequences = [rng.standard_normal(40), np.tile([1.0, -1.0], 10)]
 
     _fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.4))
     for ax, seq in zip(axes, sequences):
-        res = trend_test(seq, method="runs")
+        res = metrology.trend_test(seq, method="runs")
         idx = np.arange(1, seq.size + 1)
         median = float(np.median(seq))
         above = seq > median

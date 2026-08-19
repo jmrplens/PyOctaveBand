@@ -36,17 +36,7 @@ import reference_data
 from numpy.typing import ArrayLike
 from scipy.integrate import quad
 
-from phonometry import (
-    SoundReductionResult,
-    coincidence_frequency,
-    corrugated_plate_mass_factor,
-    corrugated_plate_stiffness,
-    orthotropic_critical_frequencies,
-    orthotropic_plate_resonance,
-    orthotropic_transmission_loss,
-    plate_bending_stiffness,
-    single_panel_transmission_loss,
-)
+from phonometry import building, vibration
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -108,7 +98,7 @@ BIES_AIR_DENSITY = 414.0 / 343.0
 
 def _vigran_flat_stiffness() -> float:
     """``B'`` of Vigran's 1 mm flat steel plate."""
-    return plate_bending_stiffness(
+    return vibration.plate_bending_stiffness(
         VIGRAN_STEEL["youngs_modulus"], VIGRAN_THICKNESS,
         VIGRAN_STEEL["poisson_ratio"],
     )
@@ -116,10 +106,10 @@ def _vigran_flat_stiffness() -> float:
 
 def _vigran_corrugated() -> tuple[float, tuple[float, float, float]]:
     """``(m'', (Bx, Bz, Bxz))`` of Vigran's corrugated version."""
-    mass = VIGRAN_MASS * corrugated_plate_mass_factor(
+    mass = VIGRAN_MASS * building.corrugated_plate_mass_factor(
         VIGRAN_AMPLITUDE, VIGRAN_WAVELENGTH
     )
-    stiffness = corrugated_plate_stiffness(
+    stiffness = building.corrugated_plate_stiffness(
         VIGRAN_THICKNESS, VIGRAN_AMPLITUDE, VIGRAN_WAVELENGTH,
         youngs_modulus=VIGRAN_STEEL["youngs_modulus"],
         poisson_ratio=VIGRAN_STEEL["poisson_ratio"],
@@ -138,8 +128,12 @@ def test_flat_plate_eigenfrequencies_match_vigran_example() -> None:
         "bending_stiffness_x": b, "bending_stiffness_z": b,
         "bending_stiffness_xz": b,
     }
-    assert orthotropic_plate_resonance(1, 1, **kwargs) == pytest.approx(4.9, abs=0.05)
-    assert orthotropic_plate_resonance(2, 2, **kwargs) == pytest.approx(19.7, abs=0.05)
+    assert building.orthotropic_plate_resonance(
+        1, 1, **kwargs
+    ) == pytest.approx(4.9, abs=0.05)
+    assert building.orthotropic_plate_resonance(
+        2, 2, **kwargs
+    ) == pytest.approx(19.7, abs=0.05)
 
 
 def test_corrugated_plate_eigenfrequencies_match_vigran_example() -> None:
@@ -157,8 +151,12 @@ def test_corrugated_plate_eigenfrequencies_match_vigran_example() -> None:
         "bending_stiffness_x": b_x, "bending_stiffness_z": b_z,
         "bending_stiffness_xz": b_xz,
     }
-    assert orthotropic_plate_resonance(1, 1, **kwargs) == pytest.approx(25.5, abs=0.05)
-    assert orthotropic_plate_resonance(2, 2, **kwargs) == pytest.approx(102.0, abs=0.1)
+    assert building.orthotropic_plate_resonance(
+        1, 1, **kwargs
+    ) == pytest.approx(25.5, abs=0.05)
+    assert building.orthotropic_plate_resonance(
+        2, 2, **kwargs
+    ) == pytest.approx(102.0, abs=0.1)
 
 
 def test_corrugated_stiffness_is_stiff_along_and_soft_across() -> None:
@@ -176,7 +174,7 @@ def test_corrugated_stiffness_returns_to_the_flat_plate_when_flattened() -> None
     twisting term: Timoshenko's corrugated ``Bxz`` carries no ``Bx nu_z``
     contribution, unlike the general Eq. (3.114).
     """
-    b_x, b_z, b_xz = corrugated_plate_stiffness(
+    b_x, b_z, b_xz = building.corrugated_plate_stiffness(
         VIGRAN_THICKNESS, 1.0e-9, VIGRAN_WAVELENGTH,
         youngs_modulus=VIGRAN_STEEL["youngs_modulus"],
         poisson_ratio=VIGRAN_STEEL["poisson_ratio"],
@@ -197,10 +195,12 @@ def test_corrugation_mass_factor_is_the_developed_length() -> None:
     numeric = quad(
         lambda t: math.sqrt(1.0 + q**2 * math.cos(t) ** 2), 0.0, 2.0 * math.pi
     )[0] / (2.0 * math.pi)
-    assert corrugated_plate_mass_factor(
+    assert building.corrugated_plate_mass_factor(
         VIGRAN_AMPLITUDE, VIGRAN_WAVELENGTH
     ) == pytest.approx(numeric, rel=1e-10)
-    assert corrugated_plate_mass_factor(1e-12, 0.1) == pytest.approx(1.0, abs=1e-12)
+    assert building.corrugated_plate_mass_factor(1e-12, 0.1) == pytest.approx(
+        1.0, abs=1e-12
+    )
 
 
 def test_orthotropic_resonance_collapses_to_the_isotropic_formula() -> None:
@@ -213,7 +213,7 @@ def test_orthotropic_resonance_collapses_to_the_isotropic_formula() -> None:
     b, m2, a, c = 19.23, 7.8, 1.4, 0.9
     for i, n in ((1, 1), (2, 3), (4, 2)):
         expected = math.pi / 2.0 * math.sqrt(b / m2) * ((i / a) ** 2 + (n / c) ** 2)
-        assert orthotropic_plate_resonance(
+        assert building.orthotropic_plate_resonance(
             i, n, length_x=a, length_z=c, mass_per_area=m2,
             bending_stiffness_x=b, bending_stiffness_z=b, bending_stiffness_xz=b,
         ) == pytest.approx(expected, rel=1e-12)
@@ -234,22 +234,29 @@ def test_hopkins_table_a2_h_fc_products() -> None:
     rows = reference_data.HOPKINS_TABLE_A2_H_FC
     assert len(rows) == len(HOPKINS_TABLE_A2_NAMES)
     for name, (c_l, product) in zip(HOPKINS_TABLE_A2_NAMES, rows, strict=True):
-        b = plate_bending_stiffness(rho * c_l**2 * (1.0 - nu**2), h, nu)
-        fc = coincidence_frequency(rho * h, b)
+        b = vibration.plate_bending_stiffness(
+            rho * c_l**2 * (1.0 - nu**2), h, nu
+        )
+        fc = vibration.coincidence_frequency(rho * h, b)
         assert h * fc == pytest.approx(product, abs=0.06), name
 
 
 def test_orthotropic_critical_frequencies_bound_the_isotropic_one() -> None:
     """Vigran Eq. (6.107) with equal stiffnesses is the isotropic ``fc``."""
     b, m2 = 19.23, 7.8
-    fc = coincidence_frequency(m2, b)
-    assert orthotropic_critical_frequencies(m2, b, b) == pytest.approx((fc, fc))
+    fc = vibration.coincidence_frequency(m2, b)
+    assert building.orthotropic_critical_frequencies(
+        m2, b, b
+    ) == pytest.approx((fc, fc))
     # A hundredfold stiffer direction moves its coincidence frequency down by
     # a decade, and the pair comes back sorted whichever way it is given.
-    low, high = orthotropic_critical_frequencies(m2, 100.0 * b, b)
+    low, high = building.orthotropic_critical_frequencies(m2, 100.0 * b, b)
     assert low == pytest.approx(fc / 10.0)
     assert high == pytest.approx(fc)
-    assert orthotropic_critical_frequencies(m2, b, 100.0 * b) == (low, high)
+    assert building.orthotropic_critical_frequencies(m2, b, 100.0 * b) == (
+        low,
+        high,
+    )
 
 
 def test_corrugating_vigran_plate_moves_the_coincidence_range() -> None:
@@ -261,8 +268,10 @@ def test_corrugating_vigran_plate_moves_the_coincidence_range() -> None:
     mechanism Vigran Sect. 6.5.3 describes.
     """
     mass, (b_x, b_z, _b_xz) = _vigran_corrugated()
-    fc1, fc2 = orthotropic_critical_frequencies(mass, b_x, b_z)
-    flat_fc = coincidence_frequency(VIGRAN_MASS, _vigran_flat_stiffness())
+    fc1, fc2 = building.orthotropic_critical_frequencies(mass, b_x, b_z)
+    flat_fc = vibration.coincidence_frequency(
+        VIGRAN_MASS, _vigran_flat_stiffness()
+    )
     assert flat_fc == pytest.approx(11925.0, rel=1e-3)
     assert fc1 == pytest.approx(1164.6, rel=1e-3)
     assert fc2 == pytest.approx(13064.0, rel=1e-3)
@@ -280,9 +289,9 @@ def _fig627(
     area: float | None = None,
     limiting_angle: float = 78.0,
     air_density: float = 1.205,
-) -> SoundReductionResult:
+) -> building.SoundReductionResult:
     """The Figure 6.27 panel: 7,5 kg/m2 with the range 400 Hz to 4000 Hz."""
-    return orthotropic_transmission_loss(
+    return building.orthotropic_transmission_loss(
         freq, FIG627_MASS,
         critical_frequency_lower=FIG627_FC1, critical_frequency_upper=FIG627_FC2,
         method=method, loss_factor=loss_factor, area=area,
@@ -366,7 +375,7 @@ def test_heckl_construction_is_continuous_at_its_four_knots() -> None:
 
 def test_heckl_needs_a_wide_coincidence_range() -> None:
     with pytest.raises(ValueError, match="four times"):
-        orthotropic_transmission_loss(
+        building.orthotropic_transmission_loss(
             BANDS, FIG627_MASS, critical_frequency_lower=400.0,
             critical_frequency_upper=1000.0, method="heckl",
         )
@@ -383,7 +392,7 @@ def test_orthotropic_integral_reduces_to_the_exact_mass_law_integral() -> None:
     ``tau = ln((1 + q^2)/(1 + q^2 (1 - u))) / q^2`` with ``u = sin^2(theta_L)``.
     """
     m2, f, angle = FIG627_MASS, 50.0, 78.0
-    res = orthotropic_transmission_loss(
+    res = building.orthotropic_transmission_loss(
         [f], m2, critical_frequency_lower=4.0e5,
         critical_frequency_upper=4.0e6, limiting_angle=angle,
     )
@@ -413,7 +422,7 @@ def test_orthotropic_integral_reduces_to_the_isotropic_integral() -> None:
             return 1.0 / abs(1.0 + z_w * math.sqrt(1.0 - x) / (2.0 * z0)) ** 2
 
         expected = -10.0 * math.log10(quad(integrand, 0.0, u, limit=200)[0])
-        res = orthotropic_transmission_loss(
+        res = building.orthotropic_transmission_loss(
             [f], m2, critical_frequency_lower=fc,
             critical_frequency_upper=fc * (1.0 + 1e-12),
             loss_factor=eta, limiting_angle=angle,
@@ -452,15 +461,15 @@ def test_orthotropic_integral_flattens_below_the_flat_plate() -> None:
     """
     bands = np.array([125.0, 250.0, 500.0, 2000.0, 4000.0])
     mass, (b_x, b_z, _b_xz) = _vigran_corrugated()
-    fc1, fc2 = orthotropic_critical_frequencies(mass, b_x, b_z)
-    flat = single_panel_transmission_loss(
+    fc1, fc2 = building.orthotropic_critical_frequencies(mass, b_x, b_z)
+    flat = building.single_panel_transmission_loss(
         bands, VIGRAN_MASS,
-        critical_frequency=coincidence_frequency(
+        critical_frequency=vibration.coincidence_frequency(
             VIGRAN_MASS, _vigran_flat_stiffness()
         ),
         loss_factor=0.011,
     ).transmission_loss
-    corrugated = orthotropic_transmission_loss(
+    corrugated = building.orthotropic_transmission_loss(
         bands, mass, critical_frequency_lower=fc1,
         critical_frequency_upper=fc2, loss_factor=0.011,
     ).transmission_loss
@@ -506,7 +515,7 @@ def test_orthotropic_area_limits_the_incidence_angle() -> None:
 
 def test_orthotropic_result_carries_the_coincidence_range() -> None:
     res = _fig627(BANDS)
-    assert isinstance(res, SoundReductionResult)
+    assert isinstance(res, building.SoundReductionResult)
     assert res.model == "orthotropic-integral"
     assert res.critical_frequency == FIG627_FC1
     assert res.critical_frequency_upper == FIG627_FC2
@@ -548,7 +557,7 @@ def test_orthotropic_plot_shades_the_coincidence_range() -> None:
         plt.close("all")
 
     # The isotropic result keeps its single unsubscripted f_c and no shading.
-    flat = single_panel_transmission_loss(
+    flat = building.single_panel_transmission_loss(
         BANDS, FIG627_MASS, critical_frequency=FIG627_FC1
     )
     labels = _legend(flat.plot())
@@ -558,14 +567,14 @@ def test_orthotropic_plot_shades_the_coincidence_range() -> None:
 
 def test_orthotropic_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="must exceed"):
-        orthotropic_transmission_loss(
+        building.orthotropic_transmission_loss(
             BANDS, FIG627_MASS, critical_frequency_lower=4000.0,
             critical_frequency_upper=400.0,
         )
     with pytest.raises(ValueError):
         _fig627(BANDS, method="heckle")
     with pytest.raises(ValueError, match="must be positive"):
-        orthotropic_transmission_loss(
+        building.orthotropic_transmission_loss(
             BANDS, -1.0, critical_frequency_lower=FIG627_FC1,
             critical_frequency_upper=FIG627_FC2,
         )
@@ -594,16 +603,16 @@ def test_orthotropic_validates_every_argument_on_both_routes(method: str) -> Non
 
 def test_orthotropic_helpers_reject_bad_input() -> None:
     with pytest.raises(ValueError, match="must be positive"):
-        corrugated_plate_mass_factor(-0.01, 0.1)
+        building.corrugated_plate_mass_factor(-0.01, 0.1)
     with pytest.raises(ValueError, match="poisson_ratio"):
-        corrugated_plate_stiffness(
+        building.corrugated_plate_stiffness(
             1e-3, 0.01, 0.1, youngs_modulus=2.1e11, poisson_ratio=1.5
         )
     with pytest.raises(ValueError, match="must be integers"):
-        orthotropic_plate_resonance(
+        building.orthotropic_plate_resonance(
             0, 1, length_x=1.0, length_z=1.0, mass_per_area=7.8,
             bending_stiffness_x=1.0, bending_stiffness_z=1.0,
             bending_stiffness_xz=1.0,
         )
     with pytest.raises(ValueError, match="must be positive"):
-        orthotropic_critical_frequencies(7.8, 0.0, 1.0)
+        building.orthotropic_critical_frequencies(7.8, 0.0, 1.0)

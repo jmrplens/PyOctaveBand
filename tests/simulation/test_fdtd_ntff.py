@@ -55,7 +55,7 @@ import numpy as np
 import pytest
 from scipy.special import hankel2
 
-from phonometry import HelmholtzResonator, MetadiffuserWell
+from phonometry import materials
 from phonometry.materials import (
     metadiffuser_polar_response,
     metadiffuser_reflection,
@@ -403,11 +403,18 @@ def test_meshed_metadiffuser_far_field_matches_tmm_model(
     # weaker correlation, 0.64, and d = 0.71; both are asserted with
     # tolerances wide enough to cover those documented modelling gaps and
     # no more.
-    wells = [MetadiffuserWell(h * 1e-3,
-                              (HelmholtzResonator(l_n * 1e-3, w_n * 1e-3,
-                                                  l_c * 1e-3,
-                                                  w_c * 1e-3),) * 2)
-             for h, l_n, l_c, w_n, w_c in META_ROWS]
+    wells = [
+        materials.MetadiffuserWell(
+            h * 1e-3,
+            (
+                materials.HelmholtzResonator(
+                    l_n * 1e-3, w_n * 1e-3, l_c * 1e-3, w_c * 1e-3
+                ),
+            )
+            * 2,
+        )
+        for h, l_n, l_c, w_n, w_c in META_ROWS
+    ]
     module = metadiffuser_polar_response(F0, wells, depth=META_DEPTH,
                                          period=PITCH,
                                          angles=POLAR_ANGLES, periods=1)

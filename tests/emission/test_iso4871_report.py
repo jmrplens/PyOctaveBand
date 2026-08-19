@@ -22,31 +22,28 @@ import pickle
 import numpy as np
 import pytest
 
-from phonometry import (
-    NoiseEmissionDeclaration,
-    OperatingModeDeclaration,
-    ReportMetadata,
-    sound_power_pressure,
-)
+from phonometry import ReportMetadata, emission
 
 _PDF_MAGIC = b"%PDF"
 
 
-def _annex_b_modes() -> tuple[OperatingModeDeclaration, OperatingModeDeclaration]:
+def _annex_b_modes() -> tuple[
+    emission.OperatingModeDeclaration, emission.OperatingModeDeclaration
+]:
     """The ISO 4871:1996 Annex B.2 dual-number example (Type 990, Model 11-TC)."""
-    mode1 = OperatingModeDeclaration(
+    mode1 = emission.OperatingModeDeclaration(
         "Operating mode 1", 88.0, 2.0,
         emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
     )
-    mode2 = OperatingModeDeclaration(
+    mode2 = emission.OperatingModeDeclaration(
         "Operating mode 2", 95.0, 2.0,
         emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
     )
     return mode1, mode2
 
 
-def _annex_b_declaration(**kwargs) -> NoiseEmissionDeclaration:
-    return NoiseEmissionDeclaration(
+def _annex_b_declaration(**kwargs) -> emission.NoiseEmissionDeclaration:
+    return emission.NoiseEmissionDeclaration(
         _annex_b_modes(),
         machine="Type 990, Model 11-TC",
         operating_conditions="50 Hz, 230 V, rated load",
@@ -88,7 +85,7 @@ def test_declared_value_is_measured_plus_uncertainty() -> None:
 
 def test_declared_value_rounds_to_nearest_decibel() -> None:
     """A non-integer measurement + uncertainty is rounded to the nearest dB."""
-    mode = OperatingModeDeclaration("m", 87.6, 2.4)
+    mode = emission.OperatingModeDeclaration("m", 87.6, 2.4)
     # round(87.6 + 2.4) = round(90.0) = 90.
     assert mode.declared_sound_power_level == 90
 
@@ -100,7 +97,7 @@ def test_declared_value_rounds_the_sum_not_the_addends() -> None:
     addends first would give 91 + 2 = 93, one decibel low. The same rule
     applies to the declared emission sound pressure level.
     """
-    mode = OperatingModeDeclaration(
+    mode = emission.OperatingModeDeclaration(
         "m", 91.4, 2.4,
         emission_pressure_level=81.4, emission_pressure_uncertainty=2.4,
     )
@@ -110,16 +107,22 @@ def test_declared_value_rounds_the_sum_not_the_addends() -> None:
 
 def test_declared_value_ties_round_half_up() -> None:
     """A sum landing exactly on a half decibel rounds up (halves-up rule)."""
-    mode = OperatingModeDeclaration("m", 92.5, 2.0)
+    mode = emission.OperatingModeDeclaration("m", 92.5, 2.0)
     # round(94.5) = 95 with the halves-up rule.
     assert mode.declared_sound_power_level == 95
 
 
 def test_verification_passes_and_fails_at_the_clause_6_2_boundary() -> None:
     """Clause 6.2: verified iff L_1 <= L_WAd (boundary L_1 == L_WAd passes)."""
-    at_boundary = OperatingModeDeclaration("m", 88.0, 2.0, verification_level=90.0)
-    just_over = OperatingModeDeclaration("m", 88.0, 2.0, verification_level=91.0)
-    under = OperatingModeDeclaration("m", 88.0, 2.0, verification_level=87.0)
+    at_boundary = emission.OperatingModeDeclaration(
+        "m", 88.0, 2.0, verification_level=90.0
+    )
+    just_over = emission.OperatingModeDeclaration(
+        "m", 88.0, 2.0, verification_level=91.0
+    )
+    under = emission.OperatingModeDeclaration(
+        "m", 88.0, 2.0, verification_level=87.0
+    )
     assert at_boundary.verified is True
     assert just_over.verified is False
     assert under.verified is True
@@ -140,15 +143,19 @@ def test_dual_number_verification_uses_separately_rounded_values() -> None:
     the verification limit is 95 dB, while the single-number L_WAd is
     round(95,8) = 96 dB.
     """
-    verified = OperatingModeDeclaration("m", 93.4, 2.4, verification_level=95.0)
-    rejected = OperatingModeDeclaration("m", 93.4, 2.4, verification_level=95.5)
+    verified = emission.OperatingModeDeclaration(
+        "m", 93.4, 2.4, verification_level=95.0
+    )
+    rejected = emission.OperatingModeDeclaration(
+        "m", 93.4, 2.4, verification_level=95.5
+    )
     assert verified.dual_number_verification_limit == 95
     assert verified.declared_sound_power_level == 96
     assert verified.verified_dual is True
     assert rejected.verified_dual is False
     # The combined (single-number) form still verifies against L_WAd = 96.
     assert rejected.verified is True
-    at_single_boundary = OperatingModeDeclaration(
+    at_single_boundary = emission.OperatingModeDeclaration(
         "m", 93.4, 2.4, verification_level=96.0
     )
     assert at_single_boundary.verified is True
@@ -161,37 +168,41 @@ def test_dual_number_verification_uses_separately_rounded_values() -> None:
 def test_emission_pressure_pair_must_be_given_together() -> None:
     """A lone emission-pressure level (no uncertainty) is rejected."""
     with pytest.raises(ValueError, match="given together"):
-        OperatingModeDeclaration("m", 88.0, 2.0, emission_pressure_level=78.0)
+        emission.OperatingModeDeclaration(
+            "m", 88.0, 2.0, emission_pressure_level=78.0
+        )
 
 
 def test_negative_uncertainty_is_rejected() -> None:
     """The uncertainty K must be finite and non-negative."""
     with pytest.raises(ValueError, match="non-negative"):
-        OperatingModeDeclaration("m", 88.0, -1.0)
+        emission.OperatingModeDeclaration("m", 88.0, -1.0)
 
 
 def test_non_finite_level_is_rejected() -> None:
     """A non-finite sound power level is rejected."""
     with pytest.raises(ValueError, match="finite"):
-        OperatingModeDeclaration("m", math.nan, 2.0)
+        emission.OperatingModeDeclaration("m", math.nan, 2.0)
 
 
 def test_declaration_requires_at_least_one_mode() -> None:
     """A declaration with no operating mode is rejected."""
     with pytest.raises(ValueError, match="at least one operating mode"):
-        NoiseEmissionDeclaration(())
+        emission.NoiseEmissionDeclaration(())
 
 
 def test_unknown_form_is_rejected() -> None:
     """An unknown declaration form is rejected."""
     modes = _annex_b_modes()
     with pytest.raises(ValueError, match="dual-number"):
-        NoiseEmissionDeclaration(modes, form="triple")  # type: ignore[arg-type]
+        emission.NoiseEmissionDeclaration(modes, form="triple")  # type: ignore[arg-type]
 
 
 def test_basic_standards_string_is_wrapped() -> None:
     """A single basic-standard string is stored as a one-tuple."""
-    decl = NoiseEmissionDeclaration(_annex_b_modes(), basic_standards="ISO 3744")
+    decl = emission.NoiseEmissionDeclaration(
+        _annex_b_modes(), basic_standards="ISO 3744"
+    )
     assert decl.basic_standards == ("ISO 3744",)
 
 
@@ -210,7 +221,9 @@ def test_declare_from_sound_power_result() -> None:
     r = 1.0
     lw = 90.0
     lp = lw - 10.0 * math.log10(2.0 * math.pi * r**2)
-    result = sound_power_pressure(np.full((10, 1), lp), "hemisphere", radius=r)
+    result = emission.sound_power_pressure(
+        np.full((10, 1), lp), "hemisphere", radius=r
+    )
     decl = result.declare(uncertainty=2.0, machine="Pump X", basic_standards="ISO 3744")
     mode = decl.modes[0]
     assert mode.sound_power_level == pytest.approx(lw, abs=1e-6)
@@ -225,7 +238,9 @@ def test_declare_from_sound_power_result() -> None:
 def test_declare_requires_finite_lwa() -> None:
     """declare() needs a finite A-weighted sound power level."""
     # Several bands without frequencies leave LWA undefined (NaN).
-    result = sound_power_pressure(np.full((10, 3), 70.0), "hemisphere", radius=1.0)
+    result = emission.sound_power_pressure(
+        np.full((10, 3), 70.0), "hemisphere", radius=1.0
+    )
     assert not math.isfinite(result.sound_power_level_a)
     with pytest.raises(ValueError, match="finite A-weighted"):
         result.declare()
@@ -276,10 +291,12 @@ def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
     """A dual-number fiche verifies against L_WA + K_WA of the separately
     rounded declared values (93 + 2 = 95 for 93,4/2,4), not round(95,8) = 96."""
     pytest.importorskip("reportlab")
-    mode = OperatingModeDeclaration(
+    mode = emission.OperatingModeDeclaration(
         "Operating mode 1", 93.4, 2.4, verification_level=95.0
     )
-    decl = NoiseEmissionDeclaration((mode,), basic_standards="ISO 3744")
+    decl = emission.NoiseEmissionDeclaration(
+        (mode,), basic_standards="ISO 3744"
+    )
     out = tmp_path / "iso4871_dual_verify.pdf"
     decl.report(str(out))
     text = _extract_text(str(out))
@@ -288,7 +305,7 @@ def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
     assert "96 dB" not in text
     assert "PASS" in text
     # The same declaration in single-number form verifies against L_WAd = 96.
-    single = NoiseEmissionDeclaration(
+    single = emission.NoiseEmissionDeclaration(
         (mode,), basic_standards="ISO 3744", form="single-number"
     )
     out2 = tmp_path / "iso4871_single_verify.pdf"
@@ -301,9 +318,15 @@ def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
 def test_verification_verdict_renders_both_ways(tmp_path) -> None:
     """A passing and a failing verification both render in the verdict table."""
     pytest.importorskip("reportlab")
-    mode1 = OperatingModeDeclaration("Operating mode 1", 88.0, 2.0, verification_level=89.0)
-    mode2 = OperatingModeDeclaration("Operating mode 2", 95.0, 2.0, verification_level=98.0)
-    decl = NoiseEmissionDeclaration((mode1, mode2), basic_standards="ISO 3744")
+    mode1 = emission.OperatingModeDeclaration(
+        "Operating mode 1", 88.0, 2.0, verification_level=89.0
+    )
+    mode2 = emission.OperatingModeDeclaration(
+        "Operating mode 2", 95.0, 2.0, verification_level=98.0
+    )
+    decl = emission.NoiseEmissionDeclaration(
+        (mode1, mode2), basic_standards="ISO 3744"
+    )
     out = tmp_path / "iso4871_verify.pdf"
     decl.report(str(out), metadata=ReportMetadata(report_id="PHN-4871"))
     _assert_one_page(str(out))

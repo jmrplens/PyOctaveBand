@@ -21,18 +21,14 @@ pytest.importorskip("reportlab")
 
 import reference_data as ref
 
-from phonometry import (
-    ReportMetadata,
-    analyze_spectrum,
-    tonal_adjustment_from_mean_audibility,
-)
+from phonometry import ReportMetadata, environment, psychoacoustics
 
 _PDF_MAGIC = b"%PDF"
 
 
 def _result():
     """The ISO/PAS 20065 Annex E spectrum-1 detection (three tones + FG)."""
-    return analyze_spectrum(
+    return psychoacoustics.analyze_spectrum(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
     )
 
@@ -92,7 +88,7 @@ def test_report_states_audibility_adjustment_and_frequency(tmp_path) -> None:
     text = _extract_text(str(out)).replace("\n", " ")
 
     delta = result.decisive_audibility
-    k = tonal_adjustment_from_mean_audibility(delta)
+    k = environment.tonal_adjustment_from_mean_audibility(delta)
     assert k == 5  # 9 < ΔL_ta <= 12  (Annex E spectrum 1, FG group)
     assert "Tonal audibility" in text
     assert f"= {delta:.1f} dB" in text  # boxed ΔL_ta
@@ -184,17 +180,18 @@ def test_absent_tone_reports_zero_adjustment(tmp_path) -> None:
     A synthetic near-threshold tone keeps K low; the prominence note and boxed
     K stay consistent with the decisive audibility.
     """
-    from phonometry import assess_tones
 
     # One tone barely above the masking threshold: LT chosen so ΔL_ta is small.
-    result = assess_tones([500.0], [40.0], [30.0], 2.0)
+    result = psychoacoustics.assess_tones([500.0], [40.0], [30.0], 2.0)
     out = tmp_path / "weak.pdf"
     result.report(str(out))
     _assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     # The tone sits below the masking threshold, so no adjustment applies.
     assert result.decisive_audibility < 0.0
-    k = tonal_adjustment_from_mean_audibility(result.decisive_audibility)
+    k = environment.tonal_adjustment_from_mean_audibility(
+        result.decisive_audibility
+    )
     assert k == 0
     assert "K = 0 dB" in text
     assert "No prominent tone is present" in text

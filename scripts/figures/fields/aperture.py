@@ -58,7 +58,7 @@ def _aperture_fields(
     """
     import fdtd2d
 
-    from phonometry import slit_transmission_coefficient
+    from phonometry import building
 
     dx = _APERTURE_DX
     ny, nx = 800, 960                      # 5 m x 6 m
@@ -98,7 +98,7 @@ def _aperture_fields(
     with np.errstate(divide="ignore"):
         db = 20.0 * np.log10(rms / ref)
     db_all = np.clip(db, -40.0, 0.0).astype(np.float32)
-    res = slit_transmission_coefficient(
+    res = building.slit_transmission_coefficient(
         np.array([_APERTURE_F]), _APERTURE_WIDTHS[0], _APERTURE_DEPTH,
         field="normal")
     tau = float(res.transmission_coefficient[0])

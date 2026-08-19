@@ -53,22 +53,7 @@ import itertools
 import numpy as np
 import pytest
 
-from phonometry import (
-    AirLayer,
-    MembraneLayer,
-    PoroelasticLayer,
-    PorousLayer,
-    PorousMediumResult,
-    biot_surface_impedance,
-    biot_waves,
-    frame_bulk_modulus,
-    frame_elastic_coefficient,
-    frame_quarter_wave_resonance,
-    johnson_champoux_allard,
-    layered_absorber,
-    limp_frame,
-    poroelastic_transfer_matrix,
-)
+from phonometry import materials
 
 # The private [Gamma] of A&A Table 11.1: the field-versus-amplitude matrix the
 # transfer matrix is built from, checked directly against the equations it
@@ -106,9 +91,9 @@ TABLE_11_2_FRAME_DENSITY = 30.0
 TABLE_11_2_THICKNESS = 0.050
 
 
-def _glass_wool_medium(frequency: np.ndarray) -> PorousMediumResult:
+def _glass_wool_medium(frequency: np.ndarray) -> materials.PorousMediumResult:
     """Rigid-frame JCA equivalent fluid of the A&A Table 6.1 glass wool."""
-    return johnson_champoux_allard(
+    return materials.johnson_champoux_allard(
         frequency,
         TABLE_6_1_RESISTIVITY,
         porosity=TABLE_6_1_POROSITY,
@@ -119,7 +104,7 @@ def _glass_wool_medium(frequency: np.ndarray) -> PorousMediumResult:
 
 
 def _glass_wool_waves(frequency: np.ndarray):
-    return biot_waves(
+    return materials.biot_waves(
         _glass_wool_medium(frequency),
         porosity=TABLE_6_1_POROSITY,
         tortuosity=TABLE_6_1_TORTUOSITY,
@@ -131,8 +116,8 @@ def _glass_wool_waves(frequency: np.ndarray):
 
 def _glass_wool_layer(
     frequency: np.ndarray, thickness: float, *, scale: float = 1.0
-) -> PoroelasticLayer:
-    return PoroelasticLayer(
+) -> materials.PoroelasticLayer:
+    return materials.PoroelasticLayer(
         thickness,
         _glass_wool_medium(frequency),
         TABLE_6_1_POROSITY,
@@ -145,7 +130,7 @@ def _glass_wool_layer(
 
 def _closed_form_resonance(thickness: float) -> float:
     """Eq. (6.110) on the Table 6.1 glass wool."""
-    return frame_quarter_wave_resonance(
+    return materials.frame_quarter_wave_resonance(
         thickness,
         shear_modulus=TABLE_6_1_SHEAR_MODULUS,
         poisson_ratio=TABLE_6_1_POISSON_RATIO,
@@ -162,7 +147,9 @@ def _impedance_peak(thickness: float) -> float:
     """
     resonance = _closed_form_resonance(thickness)
     frequency = np.arange(0.6 * resonance, 1.5 * resonance, 0.25)
-    impedance = biot_surface_impedance(_glass_wool_waves(frequency), thickness)
+    impedance = materials.biot_surface_impedance(
+        _glass_wool_waves(frequency), thickness
+    )
     return float(frequency[int(np.argmax(impedance.imag))])
 
 
@@ -178,8 +165,8 @@ def test_frame_moduli_match_the_printed_closed_forms() -> None:
     """
     n_mod = 3.0e5 * (1.0 + 0.07j)
     for nu in (-0.2, 0.0, 0.3, 0.45):
-        k_b = frame_bulk_modulus(n_mod, nu)
-        k_c = frame_elastic_coefficient(n_mod, nu)
+        k_b = materials.frame_bulk_modulus(n_mod, nu)
+        k_c = materials.frame_elastic_coefficient(n_mod, nu)
         assert k_b == pytest.approx(
             2.0 * n_mod * (nu + 1.0) / (3.0 * (1.0 - 2.0 * nu)), rel=1e-14
         )
@@ -195,7 +182,7 @@ def test_frame_elastic_coefficient_of_the_table_6_1_glass_wool() -> None:
     A&A Table 6.1 prints ``N = 220 (1 + j 0,1)`` N/cm2 and ``nu = 0``, so
     ``Re(Kc) = 2 x 2,2e6 = 4,4e6`` Pa: pure arithmetic on the printed values.
     """
-    k_c = frame_elastic_coefficient(
+    k_c = materials.frame_elastic_coefficient(
         TABLE_6_1_SHEAR_MODULUS, TABLE_6_1_POISSON_RATIO
     )
     assert k_c.real == pytest.approx(4.4e6, rel=1e-14)
@@ -208,13 +195,13 @@ def test_frame_quarter_wave_resonance_allard_eq_6_110() -> None:
     layer resonates at **459,9 Hz** and a 5,6 cm layer at 821,3 Hz. The
     arithmetic is pure and the two are the closed-form anchors of this module.
     """
-    assert frame_quarter_wave_resonance(
+    assert materials.frame_quarter_wave_resonance(
         0.10,
         shear_modulus=TABLE_6_1_SHEAR_MODULUS,
         poisson_ratio=TABLE_6_1_POISSON_RATIO,
         frame_density=TABLE_6_1_FRAME_DENSITY,
     ) == pytest.approx(459.9, abs=0.05)
-    assert frame_quarter_wave_resonance(
+    assert materials.frame_quarter_wave_resonance(
         0.056,
         shear_modulus=TABLE_6_1_SHEAR_MODULUS,
         poisson_ratio=TABLE_6_1_POISSON_RATIO,
@@ -229,18 +216,18 @@ def test_frame_quarter_wave_resonance_scales_as_the_closed_form() -> None:
         "poisson_ratio": TABLE_6_1_POISSON_RATIO,
         "frame_density": TABLE_6_1_FRAME_DENSITY,
     }
-    base = frame_quarter_wave_resonance(0.10, **kwargs)
-    assert frame_quarter_wave_resonance(0.05, **kwargs) == pytest.approx(
-        2.0 * base
-    )
+    base = materials.frame_quarter_wave_resonance(0.10, **kwargs)
+    assert materials.frame_quarter_wave_resonance(
+        0.05, **kwargs
+    ) == pytest.approx(2.0 * base)
     quadrupled = dict(kwargs, shear_modulus=4.0 * TABLE_6_1_SHEAR_MODULUS)
-    assert frame_quarter_wave_resonance(0.10, **quadrupled) == pytest.approx(
-        2.0 * base
-    )
+    assert materials.frame_quarter_wave_resonance(
+        0.10, **quadrupled
+    ) == pytest.approx(2.0 * base)
     heavier = dict(kwargs, frame_density=4.0 * TABLE_6_1_FRAME_DENSITY)
-    assert frame_quarter_wave_resonance(0.10, **heavier) == pytest.approx(
-        0.5 * base
-    )
+    assert materials.frame_quarter_wave_resonance(
+        0.10, **heavier
+    ) == pytest.approx(0.5 * base)
 
 
 # ---------------------------------------------------------------------------
@@ -473,11 +460,15 @@ def test_rigid_frame_layer_shows_no_impedance_peak() -> None:
     """
     frequency = np.arange(300.0, 700.0, 1.0)
     medium = _glass_wool_medium(frequency)
-    flexible = layered_absorber(frequency, [_glass_wool_layer(frequency, 0.10)])
-    frozen = layered_absorber(
+    flexible = materials.layered_absorber(
+        frequency, [_glass_wool_layer(frequency, 0.10)]
+    )
+    frozen = materials.layered_absorber(
         frequency, [_glass_wool_layer(frequency, 0.10, scale=1e6)]
     )
-    rigid = layered_absorber(frequency, [PorousLayer(0.10, medium)])
+    rigid = materials.layered_absorber(
+        frequency, [materials.PorousLayer(0.10, medium)]
+    )
     assert np.max(np.diff(np.sign(np.diff(frozen.surface_impedance.imag)))) == 0
     assert np.any(np.diff(np.sign(np.diff(flexible.surface_impedance.imag))))
     assert np.allclose(
@@ -503,8 +494,8 @@ def test_global_assembly_reproduces_the_chapter_6_closed_form() -> None:
     frequency = np.geomspace(20.0, 5000.0, 120)
     waves = _glass_wool_waves(frequency)
     for thickness in (0.02, 0.056, 0.10, 0.25):
-        closed = biot_surface_impedance(waves, thickness)
-        assembled = layered_absorber(
+        closed = materials.biot_surface_impedance(waves, thickness)
+        assembled = materials.layered_absorber(
             frequency, [_glass_wool_layer(frequency, thickness)]
         ).surface_impedance
         assert np.max(np.abs(assembled / closed - 1.0)) < 1e-10
@@ -522,9 +513,15 @@ def test_transfer_matrix_composes() -> None:
     frequency = np.geomspace(100.0, 2000.0, 20)
     waves = _glass_wool_waves(frequency)
     k_t = 2.0 * np.pi * frequency / 343.0 * np.sin(0.4)
-    t_one = poroelastic_transfer_matrix(waves, 0.02, transverse_wavenumber=k_t)
-    t_two = poroelastic_transfer_matrix(waves, 0.03, transverse_wavenumber=k_t)
-    t_all = poroelastic_transfer_matrix(waves, 0.05, transverse_wavenumber=k_t)
+    t_one = materials.poroelastic_transfer_matrix(
+        waves, 0.02, transverse_wavenumber=k_t
+    )
+    t_two = materials.poroelastic_transfer_matrix(
+        waves, 0.03, transverse_wavenumber=k_t
+    )
+    t_all = materials.poroelastic_transfer_matrix(
+        waves, 0.05, transverse_wavenumber=k_t
+    )
     assert np.allclose(t_one @ t_two, t_all, rtol=1e-7, atol=1e-7)
 
 
@@ -615,8 +612,10 @@ def test_bonded_poroelastic_layers_split_without_changing_the_result() -> None:
     case) and the block chaining of the assembly.
     """
     frequency = np.geomspace(50.0, 3000.0, 40)
-    single = layered_absorber(frequency, [_glass_wool_layer(frequency, 0.10)])
-    split = layered_absorber(
+    single = materials.layered_absorber(
+        frequency, [_glass_wool_layer(frequency, 0.10)]
+    )
+    split = materials.layered_absorber(
         frequency,
         [_glass_wool_layer(frequency, 0.05), _glass_wool_layer(frequency, 0.05)],
     )
@@ -679,18 +678,21 @@ def test_two_bonded_materials_reduce_to_the_two_layer_equivalent_fluid() -> None
     frequency = np.geomspace(50.0, 5000.0, 40)
     glass_wool = _glass_wool_medium(frequency)
     fibrous = _soft_fibrous(frequency)
-    reference = layered_absorber(
+    reference = materials.layered_absorber(
         frequency,
-        [PorousLayer(0.04, glass_wool), PorousLayer(0.03, fibrous)],
+        [
+            materials.PorousLayer(0.04, glass_wool),
+            materials.PorousLayer(0.03, fibrous),
+        ],
     ).surface_impedance
 
     residuals = []
     for scale in (1e2, 1e4, 1e6, 1e8):
-        stack = layered_absorber(
+        stack = materials.layered_absorber(
             frequency,
             [
                 _glass_wool_layer(frequency, 0.04, scale=scale),
-                PoroelasticLayer(
+                materials.PoroelasticLayer(
                     0.03,
                     fibrous,
                     TABLE_11_2["porosity"],
@@ -721,8 +723,8 @@ def test_two_bonded_materials_reduce_to_the_two_layer_equivalent_fluid() -> None
 _DENSE_RESISTIVITY = 500.0e3
 
 
-def _dense_medium(frequency: np.ndarray) -> PorousMediumResult:
-    return johnson_champoux_allard(
+def _dense_medium(frequency: np.ndarray) -> materials.PorousMediumResult:
+    return materials.johnson_champoux_allard(
         frequency,
         _DENSE_RESISTIVITY,
         porosity=TABLE_6_1_POROSITY,
@@ -734,8 +736,8 @@ def _dense_medium(frequency: np.ndarray) -> PorousMediumResult:
 
 def _dense_poroelastic(
     frequency: np.ndarray, thickness: float
-) -> PoroelasticLayer:
-    return PoroelasticLayer(
+) -> materials.PoroelasticLayer:
+    return materials.PoroelasticLayer(
         thickness,
         _dense_medium(frequency),
         TABLE_6_1_POROSITY,
@@ -763,9 +765,12 @@ def test_attenuating_fluid_run_in_front_of_a_biot_layer_gives_the_half_space() -
     """
     frequency = np.geomspace(2000.0, 20000.0, 12)
     medium = _dense_medium(frequency)
-    result = layered_absorber(
+    result = materials.layered_absorber(
         frequency,
-        [PorousLayer(2.0, medium), _dense_poroelastic(frequency, 0.05)],
+        [
+            materials.PorousLayer(2.0, medium),
+            _dense_poroelastic(frequency, 0.05),
+        ],
     )
     assert np.all(np.isfinite(result.surface_impedance))
     assert np.allclose(
@@ -792,12 +797,12 @@ def test_attenuating_fluid_run_behind_a_biot_layer_acts_as_its_termination() -> 
     frequency = np.geomspace(2000.0, 20000.0, 12)
     medium = _dense_medium(frequency)
     layer = _dense_poroelastic(frequency, 0.05)
-    half_space = layered_absorber(
+    half_space = materials.layered_absorber(
         frequency, [layer], termination=np.asarray(medium.characteristic_impedance)
     ).surface_impedance
     for thickness in (0.5, 1.0, 2.0):
-        backed = layered_absorber(
-            frequency, [layer, PorousLayer(thickness, medium)]
+        backed = materials.layered_absorber(
+            frequency, [layer, materials.PorousLayer(thickness, medium)]
         )
         assert np.all(np.isfinite(backed.surface_impedance))
         assert np.all(backed.absorption >= 0.0)
@@ -820,8 +825,10 @@ def test_thick_poroelastic_layer_hides_whatever_is_behind_it() -> None:
     residuals = []
     for thickness in (0.3, 0.6, 1.2, 2.4):
         layer = _dense_poroelastic(frequency, thickness)
-        hard = layered_absorber(frequency, [layer]).surface_impedance
-        gap = layered_absorber(frequency, [layer, AirLayer(0.02)])
+        hard = materials.layered_absorber(frequency, [layer]).surface_impedance
+        gap = materials.layered_absorber(
+            frequency, [layer, materials.AirLayer(0.02)]
+        )
         assert np.all(np.isfinite(gap.surface_impedance))
         assert np.all(gap.absorption >= 0.0)
         assert np.all(gap.absorption <= 1.0)
@@ -843,7 +850,7 @@ def test_an_unresolvable_stack_is_refused_instead_of_exhausting_memory() -> None
     """
     frequency = np.geomspace(500.0, 5000.0, 10)
     medium = _glass_wool_medium(frequency)
-    floppy = PoroelasticLayer(
+    floppy = materials.PoroelasticLayer(
         0.05,
         medium,
         TABLE_6_1_POROSITY,
@@ -853,13 +860,13 @@ def test_an_unresolvable_stack_is_refused_instead_of_exhausting_memory() -> None
         TABLE_6_1_POISSON_RATIO,
     )
     deaf_run = [
-        PorousLayer(400.0, _dense_medium(frequency)),
+        materials.PorousLayer(400.0, _dense_medium(frequency)),
         _dense_poroelastic(frequency, 0.05),
     ]
     with pytest.raises(ValueError, match="nepers"):
-        layered_absorber(frequency, [floppy])
+        materials.layered_absorber(frequency, [floppy])
     with pytest.raises(ValueError, match="nepers"):
-        layered_absorber(frequency, deaf_run)
+        materials.layered_absorber(frequency, deaf_run)
 
 
 def test_splitting_a_block_is_exact(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -874,16 +881,20 @@ def test_splitting_a_block_is_exact(monkeypatch: pytest.MonkeyPatch) -> None:
     frequency = np.geomspace(500.0, 8000.0, 20)
     medium = _glass_wool_medium(frequency)
     layers = [
-        AirLayer(0.01),
-        PorousLayer(0.03, medium),
+        materials.AirLayer(0.01),
+        materials.PorousLayer(0.03, medium),
         _glass_wool_layer(frequency, 0.05),
-        AirLayer(0.02),
+        materials.AirLayer(0.02),
     ]
     monkeypatch.setattr(biot_module, "_BLOCK_NEPERS", 1.0e9)
-    unsplit = layered_absorber(frequency, layers, angle=0.4).surface_impedance
+    unsplit = materials.layered_absorber(
+        frequency, layers, angle=0.4
+    ).surface_impedance
     for budget in (5.0, 2.0, 1.0):
         monkeypatch.setattr(biot_module, "_BLOCK_NEPERS", budget)
-        split = layered_absorber(frequency, layers, angle=0.4).surface_impedance
+        split = materials.layered_absorber(
+            frequency, layers, angle=0.4
+        ).surface_impedance
         assert np.allclose(split, unsplit, rtol=1e-11, atol=0.0)
 
 
@@ -912,12 +923,12 @@ def test_rigid_frame_limit_converges_on_the_jca_equivalent_fluid(
     """
     frequency = np.geomspace(50.0, 5000.0, 60)
     medium = _glass_wool_medium(frequency)
-    reference = layered_absorber(
-        frequency, [PorousLayer(0.05, medium)], angle=angle
+    reference = materials.layered_absorber(
+        frequency, [materials.PorousLayer(0.05, medium)], angle=angle
     ).surface_impedance
     residuals = []
     for scale in (1e2, 1e4, 1e6, 1e8):
-        result = layered_absorber(
+        result = materials.layered_absorber(
             frequency,
             [_glass_wool_layer(frequency, 0.05, scale=scale)],
             angle=angle,
@@ -940,14 +951,14 @@ def test_rigid_frame_limit_degrades_when_the_limit_is_perturbed() -> None:
     the equivalent-fluid path this test would fail.
     """
     frequency = np.geomspace(50.0, 5000.0, 60)
-    reference = layered_absorber(
-        frequency, [PorousLayer(0.05, _glass_wool_medium(frequency))]
+    reference = materials.layered_absorber(
+        frequency, [materials.PorousLayer(0.05, _glass_wool_medium(frequency))]
     ).surface_impedance
     residuals = [
         float(
             np.max(
                 np.abs(
-                    layered_absorber(
+                    materials.layered_absorber(
                         frequency, [_glass_wool_layer(frequency, 0.05, scale=s)]
                     ).surface_impedance
                     / reference
@@ -972,11 +983,11 @@ def test_rigid_frame_limit_holds_through_a_multilayer_stack() -> None:
     """
     frequency = np.geomspace(50.0, 5000.0, 40)
     medium = _glass_wool_medium(frequency)
-    head: list = [MembraneLayer(0.2), AirLayer(0.02)]
-    reference = layered_absorber(
-        frequency, [*head, PorousLayer(0.05, medium)], angle=0.3
+    head: list = [materials.MembraneLayer(0.2), materials.AirLayer(0.02)]
+    reference = materials.layered_absorber(
+        frequency, [*head, materials.PorousLayer(0.05, medium)], angle=0.3
     )
-    frozen = layered_absorber(
+    frozen = materials.layered_absorber(
         frequency,
         [*head, _glass_wool_layer(frequency, 0.05, scale=1e8)],
         angle=0.3,
@@ -994,10 +1005,10 @@ def test_rigid_frame_limit_holds_for_a_non_rigid_termination() -> None:
     """
     frequency = np.geomspace(50.0, 5000.0, 40)
     medium = _glass_wool_medium(frequency)
-    reference = layered_absorber(
-        frequency, [PorousLayer(0.05, medium)], termination="free"
+    reference = materials.layered_absorber(
+        frequency, [materials.PorousLayer(0.05, medium)], termination="free"
     )
-    frozen = layered_absorber(
+    frozen = materials.layered_absorber(
         frequency,
         [_glass_wool_layer(frequency, 0.05, scale=1e8)],
         termination="free",
@@ -1011,8 +1022,8 @@ def test_rigid_frame_limit_holds_for_a_non_rigid_termination() -> None:
 # ---------------------------------------------------------------------------
 # The limp limit: convergence on the shipped limp-frame equivalent fluid
 # ---------------------------------------------------------------------------
-def _soft_fibrous(frequency: np.ndarray) -> PorousMediumResult:
-    return johnson_champoux_allard(
+def _soft_fibrous(frequency: np.ndarray) -> materials.PorousMediumResult:
+    return materials.johnson_champoux_allard(
         frequency, TABLE_11_2_RESISTIVITY, **TABLE_11_2
     )
 
@@ -1039,17 +1050,24 @@ def test_limp_limit_converges_on_the_limp_frame_equivalent_fluid() -> None:
     """
     frequency = np.geomspace(50.0, 4000.0, 50)
     medium = _soft_fibrous(frequency)
-    reference = layered_absorber(
+    reference = materials.layered_absorber(
         frequency,
-        [PorousLayer(TABLE_11_2_THICKNESS,
-                     limp_frame(medium, TABLE_11_2_FRAME_DENSITY,
-                                porosity=TABLE_11_2["porosity"]))],
+        [
+            materials.PorousLayer(
+                TABLE_11_2_THICKNESS,
+                materials.limp_frame(
+                    medium,
+                    TABLE_11_2_FRAME_DENSITY,
+                    porosity=TABLE_11_2["porosity"],
+                ),
+            )
+        ],
     ).surface_impedance
     residuals = []
     for shear in (1e5, 1e4, 1e3, 1e2, 1e1, 1e0, 1e-1):
-        result = layered_absorber(
+        result = materials.layered_absorber(
             frequency,
-            [PoroelasticLayer(
+            [materials.PoroelasticLayer(
                 TABLE_11_2_THICKNESS, medium, TABLE_11_2["porosity"],
                 TABLE_11_2["tortuosity"], TABLE_11_2_FRAME_DENSITY,
                 shear * (1.0 + 0.1j),
@@ -1073,7 +1091,7 @@ def test_limp_and_rigid_limits_of_the_same_layer_differ_at_low_frequency() -> No
     """
     frequency = np.array([50.0, 100.0, 200.0])
     medium = _soft_fibrous(frequency)
-    limp = limp_frame(
+    limp = materials.limp_frame(
         medium, TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
     deviation = np.abs(limp.effective_density / medium.effective_density - 1.0)
@@ -1087,7 +1105,7 @@ def test_absorption_is_physical_and_reflection_is_passive() -> None:
     """A passive layer cannot reflect more energy than it receives."""
     frequency = np.geomspace(50.0, 5000.0, 80)
     for angle in (0.0, np.pi / 4.0):
-        result = layered_absorber(
+        result = materials.layered_absorber(
             frequency, [_glass_wool_layer(frequency, 0.05)], angle=angle
         )
         assert np.all(result.absorption >= 0.0)
@@ -1100,7 +1118,7 @@ def test_layered_result_keeps_the_layers_and_flags_the_missing_chain_matrix() ->
     """A six-variable stack has no 2x2 chain matrix; the field says so."""
     frequency = np.geomspace(100.0, 1000.0, 5)
     layer = _glass_wool_layer(frequency, 0.05)
-    result = layered_absorber(frequency, [layer])
+    result = materials.layered_absorber(frequency, [layer])
     assert result.layers == (layer,)
     assert np.all(np.isnan(result.transfer_matrix.real))
 
@@ -1109,10 +1127,16 @@ def test_zero_thickness_poroelastic_layer_is_ignored() -> None:
     """A degenerate layer contributes nothing, as the fluid layers already do."""
     frequency = np.geomspace(100.0, 1000.0, 8)
     medium = _glass_wool_medium(frequency)
-    with_gap = layered_absorber(
-        frequency, [_glass_wool_layer(frequency, 0.0), PorousLayer(0.05, medium)]
+    with_gap = materials.layered_absorber(
+        frequency,
+        [
+            _glass_wool_layer(frequency, 0.0),
+            materials.PorousLayer(0.05, medium),
+        ],
     )
-    without = layered_absorber(frequency, [PorousLayer(0.05, medium)])
+    without = materials.layered_absorber(
+        frequency, [materials.PorousLayer(0.05, medium)]
+    )
     assert np.allclose(with_gap.surface_impedance, without.surface_impedance)
 
 
@@ -1145,41 +1169,43 @@ def test_biot_waves_rejects_bad_input() -> None:
         "shear_modulus": TABLE_6_1_SHEAR_MODULUS,
     }
     with pytest.raises(ValueError, match="must not exceed 1"):
-        biot_waves(medium, **{**kwargs, "porosity": 1.5})
+        materials.biot_waves(medium, **{**kwargs, "porosity": 1.5})
     with pytest.raises(ValueError, match="must be >= 1"):
-        biot_waves(medium, **{**kwargs, "tortuosity": 0.5})
+        materials.biot_waves(medium, **{**kwargs, "tortuosity": 0.5})
     with pytest.raises(ValueError, match="must be positive"):
-        biot_waves(medium, **{**kwargs, "frame_density": 0.0})
+        materials.biot_waves(medium, **{**kwargs, "frame_density": 0.0})
     with pytest.raises(ValueError, match="positive real part"):
-        biot_waves(medium, **{**kwargs, "shear_modulus": -1.0})
+        materials.biot_waves(medium, **{**kwargs, "shear_modulus": -1.0})
     with pytest.raises(ValueError, match="non-negative imaginary part"):
-        biot_waves(medium, **{**kwargs, "shear_modulus": 1.0 - 1.0j})
+        materials.biot_waves(medium, **{**kwargs, "shear_modulus": 1.0 - 1.0j})
     with pytest.raises(ValueError, match="must be finite"):
-        biot_waves(medium, **{**kwargs, "shear_modulus": complex("nan")})
+        materials.biot_waves(
+            medium, **{**kwargs, "shear_modulus": complex("nan")}
+        )
     with pytest.raises(ValueError, match="-1 < nu < 0,5"):
-        biot_waves(medium, **kwargs, poisson_ratio=0.5)
+        materials.biot_waves(medium, **kwargs, poisson_ratio=0.5)
 
 
 def test_layer_rejects_a_medium_on_another_grid() -> None:
     frequency = np.geomspace(100.0, 1000.0, 8)
     other = _glass_wool_medium(np.geomspace(100.0, 1000.0, 9))
-    layer = PoroelasticLayer(
+    layer = materials.PoroelasticLayer(
         0.05, other, TABLE_6_1_POROSITY, TABLE_6_1_TORTUOSITY,
         TABLE_6_1_FRAME_DENSITY, TABLE_6_1_SHEAR_MODULUS,
     )
     with pytest.raises(ValueError, match="different frequency"):
-        layered_absorber(frequency, [layer])
+        materials.layered_absorber(frequency, [layer])
 
 
 def test_surface_impedance_and_transfer_matrix_reject_bad_thickness() -> None:
     frequency = np.geomspace(100.0, 1000.0, 4)
     waves = _glass_wool_waves(frequency)
     with pytest.raises(ValueError, match="must be positive"):
-        biot_surface_impedance(waves, 0.0)
+        materials.biot_surface_impedance(waves, 0.0)
     with pytest.raises(ValueError, match="must be positive"):
-        poroelastic_transfer_matrix(waves, -0.01)
+        materials.poroelastic_transfer_matrix(waves, -0.01)
     with pytest.raises(ValueError, match="must be positive"):
-        frame_quarter_wave_resonance(
+        materials.frame_quarter_wave_resonance(
             0.0, shear_modulus=1.0, poisson_ratio=0.0, frame_density=30.0
         )
 

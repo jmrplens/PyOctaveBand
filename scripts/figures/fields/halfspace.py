@@ -91,7 +91,7 @@ def _halfspace_fields() -> tuple[Any, Any, Any, Any, Any, float]:
     histories, the frame times and the Rayleigh speed measured off the free
     run's probes.
     """
-    from phonometry import ElasticFDTD2D, ForceSource, GaussianPulse
+    from phonometry import simulation
 
     dx = _HS_DX
     dt = 0.6 * dx / (_HS_CP * float(np.sqrt(2.0)))
@@ -105,19 +105,24 @@ def _halfspace_fields() -> tuple[Any, Any, Any, Any, Any, float]:
     probe_cols = (src_ix + 150, src_ix + 300)
     rows = slice(0, _HS_HALF, 2)
     cols = slice(src_ix - _HS_HALF, src_ix + _HS_HALF, 2)
-    pulse = GaussianPulse(0, 0, width=_HS_SRC_W).value
+    pulse = simulation.GaussianPulse(0, 0, width=_HS_SRC_W).value
 
     stacks: list[Any] = []
     traces: list[Any] = []
     times = np.zeros(0)
     for free in (True, False):
-        sim = ElasticFDTD2D(_HS_CP, _HS_CS, dx, rho=_HS_RHO,
-                            shape=(_HS_NY, _HS_NX),
-                            sponge_width=_HS_SPONGE,
-                            sponge_sides=("left", "right", "bottom"),
-                            free_sides=("top",) if free else None)
-        sim.add_source(ForceSource(ix=src_ix, iy=0, direction="y",
-                                   amplitude=1e6, waveform=pulse))
+        sim = simulation.ElasticFDTD2D(
+            _HS_CP,
+            _HS_CS,
+            dx,
+            rho=_HS_RHO,
+            shape=(_HS_NY, _HS_NX),
+            sponge_width=_HS_SPONGE,
+            sponge_sides=("left", "right", "bottom"),
+            free_sides=("top",) if free else None,
+        )
+        sim.add_source(simulation.ForceSource(ix=src_ix, iy=0, direction="y",
+                                              amplitude=1e6, waveform=pulse))
         frames: list[Any] = []
         probe: list[Any] = []
         ts: list[float] = []

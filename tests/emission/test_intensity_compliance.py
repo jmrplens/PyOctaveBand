@@ -34,14 +34,7 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import (
-    instrument_class_from_components,
-    intensity_class_compliance,
-    phase_mismatch_from_residual_index,
-    residual_index_from_phase_mismatch,
-    residual_index_limits,
-    verify_intensity_class,
-)
+from phonometry import emission
 
 #: Table 2 column index of each device kind's (class 1, class 2) pair.
 _COLUMNS = {"probe": (1, 2), "processor": (3, 4), "instrument": (5, 6)}
@@ -64,7 +57,7 @@ def _table_column(device: str, cls: int) -> list[float]:
 def test_table2_transcription_digit_for_digit(device: str) -> None:
     """Every band of every Table 2 column group reproduces the standard."""
     col1, col2 = _COLUMNS[device]
-    freqs, class1, class2 = residual_index_limits(device)
+    freqs, class1, class2 = emission.residual_index_limits(device)
 
     assert list(freqs) == pytest.approx(_BANDS)
     for i, row in enumerate(ref.IEC61043_TABLE2):
@@ -75,7 +68,7 @@ def test_table2_transcription_digit_for_digit(device: str) -> None:
 def test_table2_class1_never_looser_than_class2() -> None:
     """Class 1 demands at least as much residual index as class 2 everywhere."""
     for device in _COLUMNS:
-        _, class1, class2 = residual_index_limits(device)
+        _, class1, class2 = emission.residual_index_limits(device)
         assert np.all(class1 >= class2)
 
 
@@ -113,7 +106,9 @@ def test_table2_instrument_column_is_the_probe_plus_processor_residual(
 def test_table2_accepts_exact_base_ten_band_centres() -> None:
     """The exact IEC 61260 centres behind the nominal labels select the same rows."""
     exact = [1000.0 * 10.0 ** (n / 10.0) for n in (-13, -10, 0, 8)]  # 50/100/1k/6.3k
-    freqs, class1, _ = residual_index_limits("instrument", frequencies=exact)
+    freqs, class1, _ = emission.residual_index_limits(
+        "instrument", frequencies=exact
+    )
     assert list(freqs) == [50.0, 100.0, 1000.0, 6300.0]
     assert list(class1) == pytest.approx([12.0, 15.0, 19.0, 19.0])
 
@@ -121,14 +116,14 @@ def test_table2_accepts_exact_base_ten_band_centres() -> None:
 def test_frequency_outside_table_is_rejected() -> None:
     """A frequency that is not a tabulated band raises, it is not snapped."""
     with pytest.raises(ValueError, match="Table 2 band"):
-        residual_index_limits("instrument", frequencies=[700.0])
+        emission.residual_index_limits("instrument", frequencies=[700.0])
     with pytest.raises(ValueError, match="Table 2 band"):
-        residual_index_limits("instrument", frequencies=[8000.0])
+        emission.residual_index_limits("instrument", frequencies=[8000.0])
 
 
 def test_unknown_device_is_rejected() -> None:
     with pytest.raises(ValueError, match="probe"):
-        residual_index_limits("analyser")
+        emission.residual_index_limits("analyser")
 
 
 # ---------------------------------------------------------------------------
@@ -150,8 +145,8 @@ def test_unknown_device_is_rejected() -> None:
 def test_note1_separation_rule(spacing_mm: float, offset_db: float) -> None:
     """Every tabulated figure shifts by exactly 10 lg(x/25) dB."""
     for device in _COLUMNS:
-        _, base1, base2 = residual_index_limits(device)
-        _, shifted1, shifted2 = residual_index_limits(
+        _, base1, base2 = emission.residual_index_limits(device)
+        _, shifted1, shifted2 = emission.residual_index_limits(
             device, spacing=spacing_mm / 1000.0
         )
         assert shifted1 == pytest.approx(base1 + offset_db)
@@ -160,14 +155,14 @@ def test_note1_separation_rule(spacing_mm: float, offset_db: float) -> None:
 
 def test_note1_rule_matches_the_table_values_at_50_mm() -> None:
     """A 50 mm spacer earns 3,0103 dB over every printed 25 mm figure."""
-    _, class1, _ = residual_index_limits("instrument", spacing=0.050)
+    _, class1, _ = emission.residual_index_limits("instrument", spacing=0.050)
     expected = [row[5] + 10.0 * math.log10(2.0) for row in ref.IEC61043_TABLE2]
     assert list(class1) == pytest.approx(expected)
 
 
 def test_non_positive_spacing_is_rejected() -> None:
     with pytest.raises(ValueError, match="spacing"):
-        residual_index_limits("probe", spacing=0.0)
+        emission.residual_index_limits("probe", spacing=0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -183,12 +178,14 @@ def test_instrument_class_from_components(
     probe: int, processor: int, expected: int
 ) -> None:
     """IEC 61043 clause 8: only 1 + 1 makes a class 1 instrument."""
-    assert instrument_class_from_components(probe, processor) == expected
+    assert (
+        emission.instrument_class_from_components(probe, processor) == expected
+    )
 
 
 def test_instrument_class_rejects_class_2x() -> None:
     with pytest.raises(ValueError, match="2X"):
-        instrument_class_from_components(1, 3)
+        emission.instrument_class_from_components(1, 3)
 
 
 # ---------------------------------------------------------------------------
@@ -199,7 +196,7 @@ def test_instrument_class_rejects_class_2x() -> None:
 def test_instrument_exactly_on_the_class1_limit_passes() -> None:
     """A band exactly on the minimum meets the class (the limit is inclusive)."""
     measured = _table_column("instrument", 1)
-    verdict = verify_intensity_class(measured, _BANDS)
+    verdict = emission.verify_intensity_class(measured, _BANDS)
     assert verdict["overall_class"] == 1
     assert verdict["range_limited"] is False
     assert all(band["margin_class1_db"] == pytest.approx(0.0)
@@ -210,7 +207,7 @@ def test_instrument_just_below_the_class1_limit_falls_to_class2() -> None:
     """One band 0,1 dB short of class 1 drops the whole verdict to class 2."""
     measured = _table_column("instrument", 1)
     measured[7] -= 0.1  # 250 Hz
-    verdict = verify_intensity_class(measured, _BANDS)
+    verdict = emission.verify_intensity_class(measured, _BANDS)
     assert verdict["overall_class"] == 2
     classes = [band["class"] for band in verdict["bands"]]
     assert classes[7] == 2
@@ -221,7 +218,7 @@ def test_instrument_below_both_limits_meets_no_class() -> None:
     """A band under the class 2 minimum leaves the chain unclassified."""
     measured = _table_column("instrument", 1)
     measured[0] = _table_column("instrument", 2)[0] - 0.5  # 50 Hz under class 2
-    verdict = verify_intensity_class(measured, _BANDS)
+    verdict = emission.verify_intensity_class(measured, _BANDS)
     assert verdict["overall_class"] is None
     assert verdict["bands"][0]["class"] is None
 
@@ -229,12 +226,15 @@ def test_instrument_below_both_limits_meets_no_class() -> None:
 def test_probe_and_processor_are_judged_against_their_own_columns() -> None:
     """The same measured spectrum classifies differently per device kind."""
     measured = _table_column("processor", 1)
-    assert verify_intensity_class(measured, _BANDS, device="processor")[
-        "overall_class"
-    ] == 1
+    assert (
+        emission.verify_intensity_class(measured, _BANDS, device="processor")[
+            "overall_class"
+        ]
+        == 1
+    )
     # The processor class 1 column is 6-7 dB above the probe class 1 column, so
     # the same spectrum clears the probe requirement with room to spare.
-    probe = verify_intensity_class(measured, _BANDS, device="probe")
+    probe = emission.verify_intensity_class(measured, _BANDS, device="probe")
     assert probe["overall_class"] == 1
     assert min(b["margin_class1_db"] for b in probe["bands"]) > 5.0
 
@@ -242,9 +242,11 @@ def test_probe_and_processor_are_judged_against_their_own_columns() -> None:
 def test_spacing_shifts_the_verdict() -> None:
     """A chain that fails at 25 mm can pass with a wider spacer, and back."""
     measured = [row[5] - 2.0 for row in ref.IEC61043_TABLE2]  # 2 dB short
-    assert verify_intensity_class(measured, _BANDS)["overall_class"] == 2
+    assert (
+        emission.verify_intensity_class(measured, _BANDS)["overall_class"] == 2
+    )
     # A 12,5 mm spacer relaxes every requirement by 10 lg(0,5) = -3,01 dB.
-    relaxed = verify_intensity_class(measured, _BANDS, spacing=0.0125)
+    relaxed = emission.verify_intensity_class(measured, _BANDS, spacing=0.0125)
     assert relaxed["overall_class"] == 1
     assert relaxed["spacing_offset_db"] == pytest.approx(-10.0 * math.log10(2.0))
 
@@ -254,13 +256,19 @@ _OCTAVES = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 
 def test_octave_band_subset_attests_a_full_range_class_2() -> None:
     """Clause 6.1 offers the 7 octave bands 63 Hz to 4 kHz to class 2."""
-    _, _, class2 = residual_index_limits("processor", frequencies=_OCTAVES)
-    verdict = verify_intensity_class(list(class2), _OCTAVES, device="processor")
+    _, _, class2 = emission.residual_index_limits(
+        "processor", frequencies=_OCTAVES
+    )
+    verdict = emission.verify_intensity_class(
+        list(class2), _OCTAVES, device="processor"
+    )
     assert verdict["overall_class"] == 2
     assert verdict["range_limited"] is False
     # The instrument built on that processor inherits the same alternative.
-    _, _, inst2 = residual_index_limits("instrument", frequencies=_OCTAVES)
-    instrument = verify_intensity_class(list(inst2), _OCTAVES)
+    _, _, inst2 = emission.residual_index_limits(
+        "instrument", frequencies=_OCTAVES
+    )
+    instrument = emission.verify_intensity_class(list(inst2), _OCTAVES)
     assert instrument["overall_class"] == 2
     assert instrument["range_limited"] is False
 
@@ -272,14 +280,20 @@ def test_octave_band_class_1_verdict_is_still_range_limited() -> None:
     minima at seven octave centres attests class 1 over those seven bands and
     not over the 45 Hz to 7,1 kHz one-third-octave range the class requires.
     """
-    _, class1, _ = residual_index_limits("processor", frequencies=_OCTAVES)
-    verdict = verify_intensity_class(list(class1), _OCTAVES, device="processor")
+    _, class1, _ = emission.residual_index_limits(
+        "processor", frequencies=_OCTAVES
+    )
+    verdict = emission.verify_intensity_class(
+        list(class1), _OCTAVES, device="processor"
+    )
     assert verdict["overall_class"] == 1
     assert verdict["range_limited"] is True
     # The same chain measured across all 22 one-third-octave bands does attest
     # the full class 1 range.
-    _, full1, _ = residual_index_limits("processor")
-    full = verify_intensity_class(list(full1), _BANDS, device="processor")
+    _, full1, _ = emission.residual_index_limits("processor")
+    full = emission.verify_intensity_class(
+        list(full1), _BANDS, device="processor"
+    )
     assert full["overall_class"] == 1
     assert full["range_limited"] is False
 
@@ -290,13 +304,17 @@ def test_octave_band_subset_is_range_limited_for_a_probe() -> None:
     The octave-band alternative of clause 6.1 is a *processor* option, so a
     probe verified at seven octave centres only attests those seven bands.
     """
-    _, _, class2 = residual_index_limits("probe", frequencies=_OCTAVES)
-    verdict = verify_intensity_class(list(class2), _OCTAVES, device="probe")
+    _, _, class2 = emission.residual_index_limits(
+        "probe", frequencies=_OCTAVES
+    )
+    verdict = emission.verify_intensity_class(
+        list(class2), _OCTAVES, device="probe"
+    )
     assert verdict["range_limited"] is True
     assert verdict["overall_class"] == 2
     # All 22 one-third-octave bands do attest the probe's full range.
-    _, full, _ = residual_index_limits("probe")
-    assert verify_intensity_class(list(full), _BANDS, device="probe")[
+    _, full, _ = emission.residual_index_limits("probe")
+    assert emission.verify_intensity_class(list(full), _BANDS, device="probe")[
         "range_limited"
     ] is False
 
@@ -304,18 +322,20 @@ def test_octave_band_subset_is_range_limited_for_a_probe() -> None:
 def test_partial_band_set_is_range_limited() -> None:
     """A verdict over a handful of bands attests only those bands."""
     bands = [500.0, 1000.0, 2000.0]
-    _, class1, _ = residual_index_limits("instrument", frequencies=bands)
-    verdict = verify_intensity_class(list(class1), bands)
+    _, class1, _ = emission.residual_index_limits(
+        "instrument", frequencies=bands
+    )
+    verdict = emission.verify_intensity_class(list(class1), bands)
     assert verdict["range_limited"] is True
 
 
 def test_mismatched_lengths_and_repeats_are_rejected() -> None:
     with pytest.raises(ValueError, match="same length"):
-        verify_intensity_class([20.0, 20.0], [1000.0])
+        emission.verify_intensity_class([20.0, 20.0], [1000.0])
     with pytest.raises(ValueError, match="repeats"):
-        verify_intensity_class([20.0, 20.0], [1000.0, 1000.0])
+        emission.verify_intensity_class([20.0, 20.0], [1000.0, 1000.0])
     with pytest.raises(ValueError, match="At least one"):
-        verify_intensity_class([], [])
+        emission.verify_intensity_class([], [])
 
 
 # ---------------------------------------------------------------------------
@@ -327,7 +347,7 @@ def test_result_carries_the_masks_and_the_binding_margin() -> None:
     """The result mirrors verify_intensity_class and exposes the margins."""
     measured = [value + 1.5 for value in _table_column("instrument", 1)]
     measured[4] -= 1.0  # 125 Hz becomes the binding band (+0,5 dB)
-    result = intensity_class_compliance(measured, _BANDS)
+    result = emission.intensity_class_compliance(measured, _BANDS)
 
     assert result.overall_class == 1
     assert result.binding_margin() == pytest.approx(0.5)
@@ -343,7 +363,7 @@ def test_result_carries_the_masks_and_the_binding_margin() -> None:
 def test_result_reference_class_and_failing_bands_when_non_compliant() -> None:
     """A chain meeting no class reports class 2 as reference and lists failures."""
     measured = [value - 1.0 for value in _table_column("instrument", 2)]
-    result = intensity_class_compliance(measured, _BANDS)
+    result = emission.intensity_class_compliance(measured, _BANDS)
 
     assert result.overall_class is None
     assert result.reference_class() == 2
@@ -352,8 +372,9 @@ def test_result_reference_class_and_failing_bands_when_non_compliant() -> None:
 
 
 def test_result_rejects_an_unknown_class() -> None:
-    result = intensity_class_compliance(_table_column("probe", 1), _BANDS,
-                                        device="probe")
+    result = emission.intensity_class_compliance(
+        _table_column("probe", 1), _BANDS, device="probe"
+    )
     with pytest.raises(ValueError, match="must be 1 or 2"):
         result.binding_margin(0)
     with pytest.raises(ValueError, match="must be 1 or 2"):
@@ -367,7 +388,7 @@ def test_result_rejects_an_unknown_class() -> None:
 
 def test_fahy_worked_check_026_degrees() -> None:
     """20 dB at 1 kHz over 25 mm is a mismatch of about 0,26 degrees."""
-    phi = phase_mismatch_from_residual_index(
+    phi = emission.phase_mismatch_from_residual_index(
         ref.IEC61043_PHASE_INDEX_DB,
         ref.IEC61043_PHASE_FREQUENCY_HZ,
         ref.IEC61043_PHASE_SPACING_M,
@@ -380,7 +401,7 @@ def test_20_db_is_one_hundredth_of_kd() -> None:
     freqs = np.array([50.0, 250.0, 1000.0, 6300.0])
     spacing = 0.012
     kd_deg = 360.0 * freqs * spacing / 343.0
-    phi = phase_mismatch_from_residual_index(20.0, freqs, spacing)
+    phi = emission.phase_mismatch_from_residual_index(20.0, freqs, spacing)
     assert phi == pytest.approx(kd_deg / 100.0)
 
 
@@ -388,41 +409,51 @@ def test_phase_conversion_round_trip() -> None:
     """The two conversions invert each other exactly over a wide range."""
     freqs = np.array([50.0, 125.0, 500.0, 2000.0, 6300.0])
     index = np.array([12.0, 16.0, 19.0, 19.0, 19.0])
-    phi = phase_mismatch_from_residual_index(index, freqs, 0.050)
-    back = residual_index_from_phase_mismatch(phi, freqs, 0.050)
+    phi = emission.phase_mismatch_from_residual_index(index, freqs, 0.050)
+    back = emission.residual_index_from_phase_mismatch(phi, freqs, 0.050)
     assert back == pytest.approx(index)
 
 
 def test_index_rises_10_db_per_decade_for_a_fixed_mismatch() -> None:
     """kd grows with f while a constant mismatch does not: +10 dB per decade."""
-    index_100 = float(residual_index_from_phase_mismatch(0.5, 100.0, 0.025))
-    index_1000 = float(residual_index_from_phase_mismatch(0.5, 1000.0, 0.025))
+    index_100 = float(
+        emission.residual_index_from_phase_mismatch(0.5, 100.0, 0.025)
+    )
+    index_1000 = float(
+        emission.residual_index_from_phase_mismatch(0.5, 1000.0, 0.025)
+    )
     assert index_1000 - index_100 == pytest.approx(10.0)
 
 
 def test_index_follows_note1_when_the_spacer_changes() -> None:
     """Doubling the spacer at a fixed mismatch adds exactly 10 lg 2 dB."""
-    narrow = float(residual_index_from_phase_mismatch(0.3, 500.0, 0.0125))
-    wide = float(residual_index_from_phase_mismatch(0.3, 500.0, 0.025))
+    narrow = float(
+        emission.residual_index_from_phase_mismatch(0.3, 500.0, 0.0125)
+    )
+    wide = float(
+        emission.residual_index_from_phase_mismatch(0.3, 500.0, 0.025)
+    )
     assert wide - narrow == pytest.approx(10.0 * math.log10(2.0))
 
 
 def test_phase_conversion_rejects_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="phase_mismatch"):
-        residual_index_from_phase_mismatch(0.0, 1000.0, 0.025)
+        emission.residual_index_from_phase_mismatch(0.0, 1000.0, 0.025)
     with pytest.raises(ValueError, match="spacing"):
-        phase_mismatch_from_residual_index(20.0, 1000.0, -0.01)
+        emission.phase_mismatch_from_residual_index(20.0, 1000.0, -0.01)
     with pytest.raises(ValueError, match="'c'"):
-        phase_mismatch_from_residual_index(20.0, 1000.0, 0.025, c=0.0)
+        emission.phase_mismatch_from_residual_index(20.0, 1000.0, 0.025, c=0.0)
     with pytest.raises(ValueError, match="frequency"):
-        phase_mismatch_from_residual_index(20.0, 0.0, 0.025)
+        emission.phase_mismatch_from_residual_index(20.0, 0.0, 0.025)
 
 
 def test_result_phase_mismatch_matches_the_standalone_conversion() -> None:
     """The result's convenience conversion is the public function, band by band."""
     measured = _table_column("instrument", 1)
-    result = intensity_class_compliance(measured, _BANDS, spacing=0.012)
-    expected = phase_mismatch_from_residual_index(
+    result = emission.intensity_class_compliance(
+        measured, _BANDS, spacing=0.012
+    )
+    expected = emission.phase_mismatch_from_residual_index(
         np.asarray(measured), np.asarray(_BANDS), 0.012
     )
     assert result.phase_mismatch() == pytest.approx(expected)

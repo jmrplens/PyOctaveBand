@@ -38,19 +38,21 @@ from .theme import (
 def generate_dynamic_stiffness(output_dir: str) -> None:
     """EN 29052-1 floating-floor natural frequency f0(s') for typical floors."""
     print("Generating dynamic_stiffness...")
-    from phonometry import natural_frequency
+    from phonometry import materials
 
     s_mn = np.logspace(np.log10(2.0), np.log10(100.0), 300)   # MN/m3
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     # Two typical floating-floor masses per unit area (light vs heavy screed).
     for m, color, label in ((40.0, COLOR_SECONDARY, r"$m^{\prime}$ = 40 kg/m²"),
                              (120.0, COLOR_PRIMARY, r"$m^{\prime}$ = 120 kg/m²")):
-        f0 = np.asarray(natural_frequency(s_mn * 1e6, m), dtype=float)
+        f0 = np.asarray(
+            materials.natural_frequency(s_mn * 1e6, m), dtype=float
+        )
         ax.plot(s_mn, f0, color=color, linewidth=2.2, label=label)
 
     # A worked design point: s' = 10 MN/m3 on the 120 kg/m2 floor.
     s0, m0 = 10.0, 120.0
-    f00 = float(natural_frequency(s0 * 1e6, m0))
+    f00 = float(materials.natural_frequency(s0 * 1e6, m0))
     ax.scatter([s0], [f00], color=COLOR_TERTIARY, s=90, zorder=6,
                label=f"design point ({s0:g} MN/m³, {f00:.0f} Hz)")
     ax.plot([s0, s0], [0, f00], color=COLOR_GRID, ls=":", lw=1.0, zorder=1)
@@ -85,7 +87,7 @@ def generate_dynamic_stiffness(output_dir: str) -> None:
 def generate_floating_floor_transmissibility(output_dir: str) -> None:
     """The rig's peak, and what the installed floor does either side of f0."""
     print("Generating floating_floor_transmissibility...")
-    from phonometry import floating_floor_improvement_spectrum, materials
+    from phonometry import building, materials
 
     # Left: the response the operator reads off the rig, and what over-driving
     # does to it. Right: the ISO 12354-2 improvement law the installed floor
@@ -136,7 +138,9 @@ def generate_floating_floor_transmissibility(output_dir: str) -> None:
         (f0_soft, COLOR_TERTIARY, "s",
          rf"$s^{{\prime}}$ = 5.0 MN/m³, $f_0$ = {f0_soft:.0f} Hz"),
     ):
-        law = floating_floor_improvement_spectrum(bands, resonance_frequency=f0)
+        law = building.floating_floor_improvement_spectrum(
+            bands, resonance_frequency=f0
+        )
         ax_r.semilogx(bands, np.asarray(law.improvement), color=color,
                       marker=marker, markersize=4, linewidth=1.9, zorder=3,
                       label=label)
@@ -238,7 +242,7 @@ def generate_enclosed_gas_stiffness(output_dir: str) -> None:
 def generate_absorption_uncertainty(output_dir: str) -> None:
     """ISO 12999-2 absorption-coefficient uncertainty: alpha_s with a +/-U ribbon."""
     print("Generating absorption_uncertainty...")
-    from phonometry import sound_absorption_coefficient_uncertainty
+    from phonometry import materials
 
     # The standard's worked Example (Table 4): a measured sound absorption
     # coefficient alpha_s per one-third-octave band and its reproducibility
@@ -249,7 +253,9 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
     alpha_s = np.array([0.33, 0.35, 0.39, 0.38, 0.37, 0.36, 0.36, 0.36, 0.43,
                         0.49, 0.58, 0.63, 0.68, 0.71, 0.73, 0.75, 0.77, 0.79,
                         0.81, 0.81])
-    res = sound_absorption_coefficient_uncertainty(alpha_s, freqs, confidence=0.95)
+    res = materials.sound_absorption_coefficient_uncertainty(
+        alpha_s, freqs, confidence=0.95
+    )
     u = res.expanded_uncertainty
 
     x = np.arange(len(freqs))
@@ -286,11 +292,11 @@ def generate_absorption_uncertainty(output_dir: str) -> None:
 def generate_absorption_rating(output_dir: str) -> None:
     """ISO 11654 alpha_w: practical curve, shifted reference, deviations (Annex A.2)."""
     print("Generating absorption_rating.png...")
-    from phonometry import weighted_absorption
+    from phonometry import materials
 
     # ISO 11654:1997 Annex A.2 worked example -> alpha_w = 0.60(M).
     alpha_p = [0.35, 1.00, 0.65, 0.60, 0.55]
-    result = weighted_absorption(alpha_p)
+    result = materials.weighted_absorption(alpha_p)
     freqs = np.asarray(result.band_centers, dtype=float)
     measured = np.asarray(result.measured, dtype=float)
     shifted = np.asarray(result.shifted_reference, dtype=float)
@@ -345,7 +351,7 @@ def generate_absorption_rating(output_dir: str) -> None:
 def generate_airflow_resistance(output_dir: str) -> None:
     """ISO 9053-1 static method: dp vs u, through-origin quadratic fit, R_s at 0.5 mm/s."""
     print("Generating airflow_resistance.png...")
-    from phonometry import static_airflow_resistance
+    from phonometry import materials
 
     # A porous specimen (area 100 mm dia, 50 mm thick) measured stepwise. The
     # pressure drop is slightly super-linear in velocity; the through-origin
@@ -354,7 +360,9 @@ def generate_airflow_resistance(output_dir: str) -> None:
     r_s_true, curvature = 1.6e4, 4.0e5  # Pa*s/m, Pa*s2/m2
     u = np.array([0.5, 1.0, 2.0, 4.0, 8.0, 12.0]) * 1e-3  # m/s
     dp = r_s_true * u + curvature * u**2
-    result = static_airflow_resistance(u, dp, area=area, thickness=0.05)
+    result = materials.static_airflow_resistance(
+        u, dp, area=area, thickness=0.05
+    )
 
     u_fit = np.linspace(0.0, 13e-3, 200)
     dp_fit = result.linear_coefficient * u_fit + result.quadratic_coefficient * u_fit**2
@@ -399,18 +407,18 @@ def generate_airflow_resistance(output_dir: str) -> None:
 def generate_impedance_tube(output_dir: str) -> None:
     """ISO 10534-1 standing-wave-ratio method: alpha and |r| vs level difference."""
     print("Generating impedance_tube.png...")
-    from phonometry import (
-        standing_wave_absorption,
-        standing_wave_ratio_from_level,
-        standing_wave_reflection_magnitude,
-    )
+    from phonometry import materials
 
     # Level difference between pressure maximum and minimum (Eq. 15): a large dL
     # means a strong reflection (little absorption); dL -> 0 is a perfect absorber.
     level_diff = np.linspace(0.5, 40.0, 300)
-    swr = np.array([standing_wave_ratio_from_level(dl) for dl in level_diff])
-    alpha = np.array([standing_wave_absorption(s) for s in swr])
-    r_mag = np.array([standing_wave_reflection_magnitude(s) for s in swr])
+    swr = np.array(
+        [materials.standing_wave_ratio_from_level(dl) for dl in level_diff]
+    )
+    alpha = np.array([materials.standing_wave_absorption(s) for s in swr])
+    r_mag = np.array(
+        [materials.standing_wave_reflection_magnitude(s) for s in swr]
+    )
 
     _, ax = plt.subplots(figsize=(10, 6.5))
     ax.plot(level_diff, alpha, color=COLOR_PRIMARY, linewidth=2.0, zorder=3,
@@ -456,51 +464,68 @@ def generate_porous_absorber_designs(output_dir: str) -> None:
     print("Generating porous_absorber_designs...")
     import warnings as _warnings
 
-    from phonometry import (
-        AirLayer,
-        MembraneLayer,
-        MicroperforatedPlateLayer,
-        PerforatedPlateLayer,
-        PorousAbsorberWarning,
-        PorousLayer,
-        helmholtz_resonance_frequency,
-        layered_absorber,
-        membrane_resonance_frequency,
-        miki,
-    )
+    from phonometry import materials
     from phonometry.materials.absorbers.layered import Layer
 
     f = np.logspace(np.log10(50.0), np.log10(5000.0), 500)
     with _warnings.catch_warnings():
         # The 50 Hz decade end sits below the published Miki fit range on
         # purpose (the figure shows the bass behaviour of the resonators).
-        _warnings.simplefilter("ignore", PorousAbsorberWarning)
-        med = miki(f, 20000.0)
-        med_light = miki(f, 10000.0)
+        _warnings.simplefilter("ignore", materials.PorousAbsorberWarning)
+        med = materials.miki(f, 20000.0)
+        med_light = materials.miki(f, 10000.0)
         cases: list[tuple[str, list[Layer], str, str]] = [
-            (r"Porous layer 50 mm ($\sigma$ = 20 kPa·s/m²)",
-             [PorousLayer(0.05, med)], COLOR_PRIMARY, "-"),
-            ("Microperforated panel + 48 mm cavity",
-             [MicroperforatedPlateLayer(0.5e-3, 0.15e-3, 0.008),
-              AirLayer(0.048)], COLOR_SECONDARY, "-"),
-            ("Perforated panel 6 mm + porous 25 mm + air",
-             [PerforatedPlateLayer(0.006, 0.0025, 0.05),
-              PorousLayer(0.025, med), AirLayer(0.019)], COLOR_TERTIARY, "-"),
-            ("Membrane 2 kg/m² + air + porous 38 mm",
-             [MembraneLayer(2.0), AirLayer(0.01),
-              PorousLayer(0.038, med_light)], "#9467bd", "-"),
+            (
+                r"Porous layer 50 mm ($\sigma$ = 20 kPa·s/m²)",
+                [materials.PorousLayer(0.05, med)],
+                COLOR_PRIMARY,
+                "-",
+            ),
+            (
+                "Microperforated panel + 48 mm cavity",
+                [
+                    materials.MicroperforatedPlateLayer(
+                        0.5e-3, 0.15e-3, 0.008
+                    ),
+                    materials.AirLayer(0.048),
+                ],
+                COLOR_SECONDARY,
+                "-",
+            ),
+            (
+                "Perforated panel 6 mm + porous 25 mm + air",
+                [
+                    materials.PerforatedPlateLayer(0.006, 0.0025, 0.05),
+                    materials.PorousLayer(0.025, med),
+                    materials.AirLayer(0.019),
+                ],
+                COLOR_TERTIARY,
+                "-",
+            ),
+            (
+                "Membrane 2 kg/m² + air + porous 38 mm",
+                [
+                    materials.MembraneLayer(2.0),
+                    materials.AirLayer(0.01),
+                    materials.PorousLayer(0.038, med_light),
+                ],
+                "#9467bd",
+                "-",
+            ),
         ]
         _fig, ax = plt.subplots(figsize=(10, 6.2))
         for label, layers, color, ls in cases:
-            res = layered_absorber(f, layers)
+            res = materials.layered_absorber(f, layers)
             ax.semilogx(f, res.absorption, ls, color=color, linewidth=2.2,
                         label=label)
     # Closed-form resonance anchors of the two classical designs.
-    f_helm = helmholtz_resonance_frequency(
+    f_helm = materials.helmholtz_resonance_frequency(
         cavity_depth=0.044, plate_thickness=0.006, hole_radius=0.0025,
         open_area=0.05,
     )
-    f_mem = membrane_resonance_frequency(surface_density=2.0, cavity_depth=0.048)
+    f_mem = materials.membrane_resonance_frequency(
+        surface_density=2.0, cavity_depth=0.048
+    )
     # Each guide label hangs from its own ceiling instead of standing on a
     # common floor: the Spanish label is a third longer than the English one,
     # so a shared baseline pushes the longer one up into whatever crosses its
@@ -556,24 +581,20 @@ def generate_limp_frame_effective_density(output_dir: str) -> None:
     coincide, which is the plot's own check on the correction.
     """
     print("Generating limp_frame_effective_density...")
-    from phonometry import (
-        decoupling_frequency,
-        johnson_champoux_allard,
-        limp_frame,
-    )
+    from phonometry import materials
 
     # Allard & Atalla Table 11.2 (printed p. 254): the soft fibrous material
     # behind their Figure 11.2.
     porosity, resistivity, frame_density = 0.98, 25.0e3, 30.0
     f = np.linspace(1.0, 2000.0, 800)
-    rigid = johnson_champoux_allard(
+    rigid = materials.johnson_champoux_allard(
         f, resistivity, porosity=porosity, tortuosity=1.02,
         viscous_length=90e-6, thermal_length=180e-6,
     )
-    limp = limp_frame(rigid, frame_density, porosity=porosity)
+    limp = materials.limp_frame(rigid, frame_density, porosity=porosity)
     rho0 = rigid.air_density
     total = frame_density + porosity * rho0
-    f_d = decoupling_frequency(
+    f_d = materials.decoupling_frequency(
         resistivity, porosity=porosity, frame_density=frame_density
     )
 
@@ -632,13 +653,7 @@ def generate_biot_frame_resonance(output_dir: str) -> None:
     marks where that resonance is expected.
     """
     print("Generating biot_frame_resonance...")
-    from phonometry import (
-        PoroelasticLayer,
-        PorousLayer,
-        frame_quarter_wave_resonance,
-        johnson_champoux_allard,
-        layered_absorber,
-    )
+    from phonometry import materials
 
     # Allard & Atalla Table 6.1 (printed p. 124): the glass wool "Domisol
     # Coffrage", with the characteristic lengths of their printed p. 123.
@@ -646,17 +661,19 @@ def generate_biot_frame_resonance(output_dir: str) -> None:
     frame_density, shear_modulus = 130.0, 2.2e6 * (1.0 + 0.1j)
     thickness = 0.10
     f = np.linspace(200.0, 1500.0, 1300)
-    medium = johnson_champoux_allard(
+    medium = materials.johnson_champoux_allard(
         f, resistivity, porosity=porosity, tortuosity=tortuosity,
         viscous_length=0.56e-4, thermal_length=1.1e-4,
     )
-    rigid = layered_absorber(f, [PorousLayer(thickness, medium)])
-    biot = layered_absorber(
-        f,
-        [PoroelasticLayer(thickness, medium, porosity, tortuosity,
-                          frame_density, shear_modulus)],
+    rigid = materials.layered_absorber(
+        f, [materials.PorousLayer(thickness, medium)]
     )
-    f_r = frame_quarter_wave_resonance(
+    biot = materials.layered_absorber(
+        f,
+        [materials.PoroelasticLayer(thickness, medium, porosity, tortuosity,
+                                    frame_density, shear_modulus)],
+    )
+    f_r = materials.frame_quarter_wave_resonance(
         thickness, shear_modulus=shear_modulus, poisson_ratio=0.0,
         frame_density=frame_density,
     )
@@ -716,20 +733,16 @@ def generate_slow_sound_absorber(output_dir: str) -> None:
     leakage balance in a deep-subwavelength (L = lambda/38) panel.
     """
     print("Generating slow_sound_absorber.svg...")
-    from phonometry import (
-        HelmholtzResonator,
-        critical_coupling_design,
-        slit_helmholtz_absorber,
-    )
+    from phonometry import materials
 
     lattice_step = 3.0e-2
     period = 5.0e-2
     f0 = 300.0
-    base = HelmholtzResonator(
+    base = materials.HelmholtzResonator(
         neck_length=1.0e-3, neck_side=3.0e-3,
         cavity_length=30.0e-3, cavity_side=27.0e-3,
     )
-    design = critical_coupling_design(
+    design = materials.critical_coupling_design(
         f0, base, lattice_step=lattice_step, period=period,
     )
     h0 = design.slit_height
@@ -741,7 +754,7 @@ def generate_slow_sound_absorber(output_dir: str) -> None:
     ]
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     for height, color, ls, label in cases:
-        res = slit_helmholtz_absorber(
+        res = materials.slit_helmholtz_absorber(
             f, design.resonator, slit_height=height,
             lattice_step=lattice_step, period=period,
         )
@@ -803,17 +816,13 @@ def generate_slit_absorber_geometry(output_dir: str) -> None:
     the deep-subwavelength panel actually looks like.
     """
     print("Generating slit_absorber_geometry...")
-    from phonometry import (
-        HelmholtzResonator,
-        critical_coupling_design,
-        materials,
-    )
+    from phonometry import materials
 
-    base = HelmholtzResonator(
+    base = materials.HelmholtzResonator(
         neck_length=1.0e-3, neck_side=3.0e-3,
         cavity_length=30.0e-3, cavity_side=27.0e-3,
     )
-    design = critical_coupling_design(
+    design = materials.critical_coupling_design(
         300.0, base, lattice_step=3.0e-2, period=5.0e-2,
     )
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -863,13 +872,17 @@ _METADIFFUSER_T1_ROWS = (
 
 def _qr_metadiffuser_wells() -> tuple[Any, float, float]:
     """The published 2 cm quadratic-residue metadiffuser (wells, L, d)."""
-    from phonometry import HelmholtzResonator, MetadiffuserWell
+    from phonometry import materials
 
     rows = _METADIFFUSER_T1_ROWS
     wells = [
-        MetadiffuserWell(
+        materials.MetadiffuserWell(
             h * 1e-3,
-            (HelmholtzResonator(ln * 1e-3, wn * 1e-3, lc * 1e-3, wc * 1e-3),)
+            (
+                materials.HelmholtzResonator(
+                    ln * 1e-3, wn * 1e-3, lc * 1e-3, wc * 1e-3
+                ),
+            )
             * 2,
         )
         for h, ln, lc, wn, wc in rows
@@ -887,19 +900,15 @@ def generate_metadiffuser_polar(output_dir: str) -> None:
     13.7 times thicker classical diffuser.
     """
     print("Generating metadiffuser_polar...")
-    from phonometry import (
-        metadiffuser_polar_response,
-        predict_diffuser_polar_response,
-        quadratic_residue_sequence,
-    )
+    from phonometry import materials
 
     wells, depth, period = _qr_metadiffuser_wells()
-    sequence = np.roll(quadratic_residue_sequence(5), -1)
+    sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
     qrd_depths = sequence * (343.0 / 500.0) / (2 * 5)
-    meta = metadiffuser_polar_response(
+    meta = materials.metadiffuser_polar_response(
         2000.0, wells, depth=depth, period=period, periods=6,
     )
-    qrd = predict_diffuser_polar_response(
+    qrd = materials.predict_diffuser_polar_response(
         period, 2000.0, depths=qrd_depths, periods=6,
         include_obliquity=False,
     )
@@ -953,7 +962,7 @@ def generate_metadiffuser_geometry(output_dir: str) -> None:
 def generate_metadiffuser_absorption(output_dir: str) -> None:
     """What a metadiffuser costs in absorption: per-well and face-averaged."""
     print("Generating metadiffuser_absorption...")
-    from phonometry import metadiffuser_reflection
+    from phonometry import materials
 
     # The published five-slit panel over the band its resonators live in. Two
     # of the five slits pass through critical coupling above the 2 kHz design
@@ -961,7 +970,9 @@ def generate_metadiffuser_absorption(output_dir: str) -> None:
     # tuned and a quarter-absorbing surface 300 Hz higher up.
     wells, depth, period = _qr_metadiffuser_wells()
     freqs = np.arange(1800.0, 2601.0, 5.0)
-    panel = metadiffuser_reflection(freqs, wells, depth=depth, period=period)
+    panel = materials.metadiffuser_reflection(
+        freqs, wells, depth=depth, period=period
+    )
     per_well = np.asarray(panel.well_absorption)
     face = np.asarray(panel.absorption)
     i_design = int(np.argmin(np.abs(freqs - 2000.0)))
@@ -996,7 +1007,7 @@ def generate_metadiffuser_absorption(output_dir: str) -> None:
 def generate_metadiffuser_phase_match(output_dir: str) -> None:
     """The whole trick, and its limit: matched phases, only at one frequency."""
     print("Generating metadiffuser_phase_match...")
-    from phonometry import metadiffuser_reflection, quadratic_residue_sequence
+    from phonometry import materials
 
     # Left: the five reflection phases at the 2 kHz design frequency against
     # the targets of the 27.4 cm deep N = 5 QRD, with |R_n| beside each point.
@@ -1004,18 +1015,20 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
     # well's linear phase and the resonator-loaded slit's dispersive one part
     # company either side of the crossing.
     wells, depth, period = _qr_metadiffuser_wells()
-    sequence = np.roll(quadratic_residue_sequence(5), -1)
+    sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
     qrd_depths = np.asarray(sequence) * (343.0 / 500.0) / (2 * 5)
     index = np.arange(1, 6)
 
-    at_design = metadiffuser_reflection(np.array([2000.0]), wells,
-                                        depth=depth, period=period)
+    at_design = materials.metadiffuser_reflection(np.array([2000.0]), wells,
+                                                  depth=depth, period=period)
     r_design = np.asarray(at_design.reflection)[:, 0]
     k_design = 2.0 * np.pi * 2000.0 / 343.0
     target_design = np.degrees(np.angle(np.exp(-2j * k_design * qrd_depths)))
 
     freqs = np.linspace(1600.0, 2600.0, 201)
-    swept = metadiffuser_reflection(freqs, wells, depth=depth, period=period)
+    swept = materials.metadiffuser_reflection(
+        freqs, wells, depth=depth, period=period
+    )
     phases = np.degrees(np.angle(np.asarray(swept.reflection)))
     k = 2.0 * np.pi * freqs / 343.0
     targets = np.degrees(np.angle(np.exp(-2j * np.outer(qrd_depths, k))))
@@ -1087,11 +1100,7 @@ def generate_metadiffuser_phase_match(output_dir: str) -> None:
 def generate_metadiffuser_spectrum(output_dir: str) -> None:
     """Band by band: where the 2 cm panel and the 27 cm grating agree."""
     print("Generating metadiffuser_spectrum...")
-    from phonometry import (
-        metadiffuser_diffusion_spectrum,
-        predicted_diffusion_spectrum,
-        quadratic_residue_sequence,
-    )
+    from phonometry import materials
 
     # Both panels are six periods of five 7 cm wells, a 2.1 m array, so the
     # comparison is of the wells alone. Below c / L = 980 Hz the period is
@@ -1099,14 +1108,15 @@ def generate_metadiffuser_spectrum(output_dir: str) -> None:
     # do better than the flat reference: the normalised coefficient of both
     # collapses there for a reason that has nothing to do with the wells.
     wells, depth, period = _qr_metadiffuser_wells()
-    sequence = np.roll(quadratic_residue_sequence(5), -1)
+    sequence = np.roll(materials.quadratic_residue_sequence(5), -1)
     qrd_depths = np.asarray(sequence) * (343.0 / 500.0) / (2 * 5)
     freqs = np.array([500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150,
                       4000, 5000], dtype=float)
-    meta = metadiffuser_diffusion_spectrum(freqs, wells, depth=depth,
-                                           period=period, periods=6)
-    qrd = predicted_diffusion_spectrum(period, freqs, depths=qrd_depths,
-                                       periods=6, include_obliquity=False)
+    meta = materials.metadiffuser_diffusion_spectrum(freqs, wells, depth=depth,
+                                                     period=period, periods=6)
+    qrd = materials.predicted_diffusion_spectrum(
+        period, freqs, depths=qrd_depths, periods=6, include_obliquity=False
+    )
     f_lobe = 343.0 / (5 * period)
 
     _fig, ax = plt.subplots(figsize=(10, 6.3))
@@ -1189,9 +1199,9 @@ def generate_helmholtz_resonator_geometry(output_dir: str) -> None:
     the resonator geometry the slit-panel figures build on.
     """
     print("Generating helmholtz_resonator_geometry...")
-    from phonometry import HelmholtzResonator
+    from phonometry import materials
 
-    resonator = HelmholtzResonator(
+    resonator = materials.HelmholtzResonator(
         neck_length=1.0e-3, neck_side=3.0e-3,
         cavity_length=30.0e-3, cavity_side=27.0e-3,
     )
@@ -1210,10 +1220,10 @@ def generate_insitu_setup_geometry(output_dir: str) -> None:
     surface. One concept: what the subtraction technique actually samples.
     """
     print("Generating insitu_setup_geometry...")
-    from phonometry import plot_insitu_geometry
+    from phonometry import materials
 
     _fig, ax = plt.subplots(figsize=(9.0, 6.0))
-    plot_insitu_geometry(ax=ax, language=_LANG)
+    materials.plot_insitu_geometry(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "insitu_setup_geometry.svg")
     plt.close()
@@ -1227,10 +1237,10 @@ def generate_dynamic_stiffness_rig_geometry(output_dir: str) -> None:
     little mass-spring oscillator behind s' and the floating-floor f0.
     """
     print("Generating dynamic_stiffness_rig_geometry...")
-    from phonometry import plot_dynamic_stiffness_rig
+    from phonometry import materials
 
     _fig, ax = plt.subplots(figsize=(9.0, 6.2))
-    plot_dynamic_stiffness_rig(ax=ax, language=_LANG)
+    materials.plot_dynamic_stiffness_rig(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "dynamic_stiffness_rig_geometry.svg")
     plt.close()
@@ -1244,10 +1254,10 @@ def generate_diffusion_goniometer_geometry(output_dir: str) -> None:
     of the diffusion coefficient are measured.
     """
     print("Generating diffusion_goniometer_geometry...")
-    from phonometry import plot_goniometer_geometry
+    from phonometry import materials
 
     _fig, ax = plt.subplots(figsize=(9.0, 6.6))
-    plot_goniometer_geometry(ax=ax, language=_LANG)
+    materials.plot_goniometer_geometry(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "diffusion_goniometer_geometry.svg")
     plt.close()
@@ -1256,7 +1266,7 @@ def generate_diffusion_goniometer_geometry(output_dir: str) -> None:
 def generate_scattering_coefficient(output_dir: str) -> None:
     """ISO 17497-1 Eq. (5): the alpha pair on top, the s(f) it produces below."""
     print("Generating scattering_coefficient.png...")
-    from phonometry import scattering_coefficient_spectrum
+    from phonometry import materials
 
     # A realistic reverberation-room measurement reduced to two absorption
     # spectra over the 13 one-third-octave bands 250-4000 Hz: the random-
@@ -1272,7 +1282,9 @@ def generate_scattering_coefficient(output_dir: str) -> None:
     )
     alpha_s = np.full_like(freqs, 0.10)
     alpha_spec = 0.11 + 0.75 * (np.log10(freqs / 250.0) / np.log10(4000.0 / 250.0))
-    result = scattering_coefficient_spectrum(freqs, alpha_spec, alpha_s)
+    result = materials.scattering_coefficient_spectrum(
+        freqs, alpha_spec, alpha_s
+    )
 
     fig, (ax_a, ax) = plt.subplots(
         2, 1, figsize=(10, 8.2), sharex=True,
@@ -1349,7 +1361,7 @@ def _goniometer_path_times(
 def generate_diffusion_measurement_chain(output_dir: str) -> None:
     """ISO 17497-2 Clause 7.4: h1, h2, their difference, h4 and the window."""
     print("Generating diffusion_measurement_chain...")
-    from phonometry import qrd_well_depths
+    from phonometry import materials
 
     # The page's own published geometry read on the standard rig: the N = 7
     # QRD, 6 periods, 3.6 m wide, source at 10 m on the reference normal and
@@ -1377,7 +1389,7 @@ def generate_diffusion_measurement_chain(output_dir: str) -> None:
     # spread between the shortest and the longest path and delayed further by
     # the round trip down each well of the quadratic-residue sequence, so the
     # whole return still lands inside [t_first, t_last].
-    depths = qrd_well_depths(7, 490.0, speed_of_sound=c)
+    depths = materials.qrd_well_depths(7, 490.0, speed_of_sound=c)
     seq = np.tile(depths, 6)
     t_well = 2.0 * float(depths.max()) / c
     delays = np.linspace(t_first, t_last - t_well, seq.size) + 2.0 * seq / c
@@ -1476,7 +1488,7 @@ def generate_diffusion_measurement_chain(output_dir: str) -> None:
 def generate_qrd_working_band(output_dir: str) -> None:
     """The band a Schroeder design actually works over: f0, N f0 and c/(2w)."""
     print("Generating qrd_working_band...")
-    from phonometry import predicted_diffusion_spectrum, qrd_well_depths
+    from phonometry import materials
 
     # The N = 7, f0 = 500 Hz, 10 cm well, five-period design of the guide,
     # evaluated on a fine linear grid instead of band centres so that the two
@@ -1486,14 +1498,23 @@ def generate_qrd_working_band(output_dir: str) -> None:
     # above f_max = c / (2 w) = 1715 Hz.
     c, n_seq, f0, width, periods = 343.0, 7, 500.0, 0.10, 5
     freqs = np.linspace(200.0, 6000.0, 601)
-    depths = qrd_well_depths(n_seq, f0, speed_of_sound=c)
-    qrd = predicted_diffusion_spectrum(width, freqs, depths=depths,
-                                       periods=periods, speed_of_sound=c,
-                                       normalize=False)
-    flat = predicted_diffusion_spectrum(width, freqs,
-                                        depths=np.zeros_like(depths),
-                                        periods=periods, speed_of_sound=c,
-                                        normalize=False)
+    depths = materials.qrd_well_depths(n_seq, f0, speed_of_sound=c)
+    qrd = materials.predicted_diffusion_spectrum(
+        width,
+        freqs,
+        depths=depths,
+        periods=periods,
+        speed_of_sound=c,
+        normalize=False,
+    )
+    flat = materials.predicted_diffusion_spectrum(
+        width,
+        freqs,
+        depths=np.zeros_like(depths),
+        periods=periods,
+        speed_of_sound=c,
+        normalize=False,
+    )
     f_max = c / (2.0 * width)
 
     _fig, ax = plt.subplots(figsize=(10, 6.3))
@@ -1536,11 +1557,7 @@ def generate_qrd_working_band(output_dir: str) -> None:
 def generate_diffuser_modulation(output_dir: str) -> None:
     """Periodicity concentrates, modulation spreads: same wells, same width."""
     print("Generating diffuser_modulation...")
-    from phonometry import (
-        predict_diffuser_polar_response,
-        predicted_diffusion_spectrum,
-        qrd_well_depths,
-    )
+    from phonometry import materials
 
     # Two arrangements of the same 42 wells over the same 4.2 m footprint:
     # six repeats of one N = 7 quadratic-residue period, and the same period
@@ -1548,7 +1565,7 @@ def generate_diffuser_modulation(output_dir: str) -> None:
     # modulation Cox & D'Antonio recommend. Nothing else differs, so every
     # difference below is periodicity.
     c, f0, width = 343.0, 500.0, 0.10
-    base = qrd_well_depths(7, f0, speed_of_sound=c)
+    base = materials.qrd_well_depths(7, f0, speed_of_sound=c)
     inverse = base.max() - base
     periodic = np.tile(base, 6)
     modulated = np.concatenate([base if k % 2 == 0 else inverse
@@ -1564,7 +1581,7 @@ def generate_diffuser_modulation(output_dir: str) -> None:
         (periodic, COLOR_PRIMARY, "-", "Periodic, 6 × $N$ = 7"),
         (modulated, COLOR_SECONDARY, "--", "Modulated, period + inverse"),
     ):
-        response = predict_diffuser_polar_response(
+        response = materials.predict_diffuser_polar_response(
             width, 1000.0, depths=depths, periods=1, angles=angles,
             speed_of_sound=c,
         )
@@ -1588,7 +1605,7 @@ def generate_diffuser_modulation(output_dir: str) -> None:
         (periodic, COLOR_PRIMARY, "o", "Periodic, 6 × $N$ = 7"),
         (modulated, COLOR_SECONDARY, "s", "Modulated, period + inverse"),
     ):
-        spectrum = predicted_diffusion_spectrum(
+        spectrum = materials.predicted_diffusion_spectrum(
             width, freqs, depths=depths, periods=1, angles=angles,
             speed_of_sound=c,
         )
@@ -1614,11 +1631,7 @@ def generate_diffuser_modulation(output_dir: str) -> None:
 def generate_diffusion_polar(output_dir: str) -> None:
     """ISO 17497-2: polar reflected response and its diffusion coefficient d."""
     print("Generating diffusion_polar.png...")
-    from phonometry import (
-        directional_diffusion,
-        predict_diffuser_polar_response,
-        qrd_well_depths,
-    )
+    from phonometry import materials
 
     # Reflected sound-pressure levels L_i(theta) on the standard 37-point
     # semicircle (-90 to 90 deg, 5 deg spacing) of a published diffuser
@@ -1630,11 +1643,15 @@ def generate_diffusion_polar(output_dir: str) -> None:
     # periods of a periodic QRD concentrate the reflected energy into grating
     # lobes, so the ISO 17497-2 Formula (5) coefficient d is modest.
     angles = np.arange(-90.0, 90.5, 5.0)
-    depths = qrd_well_depths(7, 490.0, speed_of_sound=343.0)  # deepest 0.2 m
-    predicted = predict_diffuser_polar_response(
+    depths = materials.qrd_well_depths(
+        7, 490.0, speed_of_sound=343.0
+    )  # deepest 0.2 m
+    predicted = materials.predict_diffuser_polar_response(
         3.6 / 42, 1000.0, depths=depths, periods=6, speed_of_sound=343.0,
     )
-    result = directional_diffusion(angles, np.round(predicted.levels, 3))
+    result = materials.directional_diffusion(
+        angles, np.round(predicted.levels, 3)
+    )
 
     _fig, ax = plt.subplots(figsize=(8.0, 7.5),
                            subplot_kw={"projection": "polar"})
@@ -1666,10 +1683,7 @@ def generate_diffusion_polar(output_dir: str) -> None:
 def generate_diffuser_prediction(output_dir: str) -> None:
     """Predicted diffusion d(f): an N = 7 QRD design versus a flat panel."""
     print("Generating diffuser_prediction.png...")
-    from phonometry import (
-        predicted_diffusion_spectrum,
-        qrd_well_depths,
-    )
+    from phonometry import materials
 
     # An N = 7 quadratic residue diffuser, design frequency 500 Hz, 10 cm wells,
     # five periods (Cox & D'Antonio far-field Fraunhofer model). The predicted
@@ -1678,9 +1692,11 @@ def generate_diffuser_prediction(output_dir: str) -> None:
     # its diffusion coefficient sits well above the near-specular flat panel.
     freqs = np.array([250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
                       2000, 2500, 3150, 4000, 5000], float)
-    depths = qrd_well_depths(7, 500.0)
-    qrd = predicted_diffusion_spectrum(0.10, freqs, depths=depths, periods=5)
-    flat = predicted_diffusion_spectrum(
+    depths = materials.qrd_well_depths(7, 500.0)
+    qrd = materials.predicted_diffusion_spectrum(
+        0.10, freqs, depths=depths, periods=5
+    )
+    flat = materials.predicted_diffusion_spectrum(
         0.10, freqs, depths=np.zeros_like(depths), periods=5, normalize=False
     )
 
@@ -1704,7 +1720,7 @@ def generate_diffuser_prediction(output_dir: str) -> None:
 def generate_insitu_absorption(output_dir: str) -> None:
     """ISO 13472-1: in-situ one-third-octave absorption spectrum alpha(f)."""
     print("Generating insitu_absorption.png...")
-    from phonometry import geometric_spreading_factor, insitu_absorption_spectrum
+    from phonometry import materials
 
     # A synthetic-but-realistic in-situ measurement. The incident impulse hi is
     # a unit spike; the road reflection is hr = Kr * r0 * roll(hi, shift) with
@@ -1714,7 +1730,7 @@ def generate_insitu_absorption(output_dir: str) -> None:
     # shift = round(2 dm / c * fs). The library forms the narrow-band
     # alpha = 1 - (1/Kr^2)|Hr/Hi|^2 and reduces it to one-third-octave bands.
     fs, n = 48000.0, 8192
-    kr = geometric_spreading_factor()  # (ds - dm)/(ds + dm) = 2/3
+    kr = materials.geometric_spreading_factor()  # (ds - dm)/(ds + dm) = 2/3
     hi = np.zeros(n)
     hi[0] = 1.0
     r0 = 0.85
@@ -1722,7 +1738,7 @@ def generate_insitu_absorption(output_dir: str) -> None:
     taps = taps / taps.sum()
     shift = round(2.0 * 0.25 / 340.0 * fs)  # reflected-path delay 2 dm / c
     hr = kr * r0 * np.roll(scipy_signal.lfilter(taps, 1.0, hi), shift)
-    result = insitu_absorption_spectrum(hi, hr, fs)
+    result = materials.insitu_absorption_spectrum(hi, hr, fs)
 
     freqs = result.frequencies
     positions = np.arange(freqs.size, dtype=float)
@@ -2686,18 +2702,23 @@ def generate_sheet_transfer_impedance(output_dir: str) -> None:
 
 def _slit_design(target: float = 300.0) -> Any:
     """The guide's 300 Hz critical-coupling design, solved once."""
-    from phonometry import HelmholtzResonator, critical_coupling_design
+    from phonometry import materials
 
-    base = HelmholtzResonator(neck_length=1.0e-3, neck_side=3.0e-3,
-                              cavity_length=30.0e-3, cavity_side=27.0e-3)
-    return critical_coupling_design(target, base, lattice_step=3.0e-2,
-                                    period=5.0e-2)
+    base = materials.HelmholtzResonator(
+        neck_length=1.0e-3,
+        neck_side=3.0e-3,
+        cavity_length=30.0e-3,
+        cavity_side=27.0e-3,
+    )
+    return materials.critical_coupling_design(
+        target, base, lattice_step=3.0e-2, period=5.0e-2
+    )
 
 
 def generate_critical_coupling_impedance(output_dir: str) -> None:
     """Critical coupling seen as an impedance: the sweep and the locus."""
     print("Generating critical_coupling_impedance...")
-    from phonometry import slit_helmholtz_absorber
+    from phonometry import materials
 
     design = _slit_design()
     h0 = design.slit_height
@@ -2707,7 +2728,7 @@ def generate_critical_coupling_impedance(output_dir: str) -> None:
     heights = np.linspace(0.5 * h0, 2.5 * h0, 70)
     one = np.array([300.0])
     z = np.array([
-        complex(slit_helmholtz_absorber(
+        complex(materials.slit_helmholtz_absorber(
             one, design.resonator, slit_height=float(h),
             lattice_step=3.0e-2, period=5.0e-2).normalized_impedance[0])
         for h in heights])
@@ -2747,7 +2768,7 @@ def generate_critical_coupling_impedance(output_dir: str) -> None:
         (1.0, COLOR_PRIMARY, "$h$  critically coupled"),
         (1.7, COLOR_TERTIARY, r"$1.7\,h$  under-damped"),
     ):
-        loc = slit_helmholtz_absorber(
+        loc = materials.slit_helmholtz_absorber(
             freq, design.resonator, slit_height=factor * h0,
             lattice_step=3.0e-2, period=5.0e-2).normalized_impedance
         ax_l.plot(loc.real, loc.imag, color=color, linewidth=2.0, label=label)
@@ -2776,12 +2797,12 @@ def generate_critical_coupling_impedance(output_dir: str) -> None:
 def generate_slow_sound_dispersion(output_dir: str) -> None:
     """The phase speed inside the loaded slit, and the depth it buys."""
     print("Generating slow_sound_dispersion...")
-    from phonometry import materials, slit_helmholtz_absorber
+    from phonometry import materials
 
     design = _slit_design()
     depth, c0 = 3.0e-2, 343.0
     freq = np.geomspace(50.0, 3000.0, 500)
-    res = slit_helmholtz_absorber(
+    res = materials.slit_helmholtz_absorber(
         freq, design.resonator, slit_height=design.slit_height,
         lattice_step=3.0e-2, period=5.0e-2)
     ratio = 2.0 * np.pi * freq / res.effective_wavenumber.real / c0
@@ -2837,7 +2858,7 @@ def generate_slow_sound_dispersion(output_dir: str) -> None:
 def generate_graded_slit_absorber(output_dir: str) -> None:
     """One cell against a four-resonator chain, graded and uniform."""
     print("Generating graded_slit_absorber...")
-    from phonometry import slit_helmholtz_absorber
+    from phonometry import materials
 
     freq = np.linspace(120.0, 700.0, 700)
     single = _slit_design(320.0)
@@ -2853,7 +2874,7 @@ def generate_graded_slit_absorber(output_dir: str) -> None:
     )
     step = float(freq[1] - freq[0])
     for i, (label, resonators, height, color, style) in enumerate(curves):
-        alpha = slit_helmholtz_absorber(
+        alpha = materials.slit_helmholtz_absorber(
             freq, resonators, slit_height=height,
             lattice_step=3.0e-2, period=5.0e-2).absorption
         ax.plot(freq, alpha, color=color, linewidth=2.2, linestyle=style,

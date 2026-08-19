@@ -16,7 +16,7 @@ from pathlib import Path
 
 import numpy as np
 
-from phonometry import leq, sensitivity
+from phonometry import metrology, signals
 from phonometry.io import Signal, read, write
 
 FS = 48000
@@ -55,14 +55,14 @@ def test_calibrated_signal_survives_write_sidecar_read_exactly(
     """The absolute level is intact after the full cycle, bit for bit."""
     x = _tone(0.05, 1000.0, 0.5)
     sig = Signal(data=x, fs=FS, calibration_factor=17.3)
-    level_before = leq(np.asarray(sig), calibration_factor=17.3)
+    level_before = signals.leq(np.asarray(sig), calibration_factor=17.3)
     path = tmp_path / "calibrated.wav"
     write(path, sig, subtype="DOUBLE", sidecar=True)
     reread = read(path)  # no argument: the sidecar carries the calibration
     assert reread.calibration_factor == 17.3
     assert reread.calibration_factor is not None
-    level_after = leq(np.asarray(reread),
-                      calibration_factor=reread.calibration_factor)
+    level_after = signals.leq(np.asarray(reread),
+                              calibration_factor=reread.calibration_factor)
     assert level_after == level_before
 
 
@@ -89,9 +89,9 @@ def test_calibration_cancellation_holds_on_disk(tmp_path: Path) -> None:
         meas_path = tmp_path / f"meas_{subtype}.wav"
         write(cal_path, calibrator, FS, subtype=subtype)
         write(meas_path, measurement, FS, subtype=subtype)
-        factor = sensitivity(np.asarray(read(cal_path)), 94.0, fs=FS)
-        levels.append(float(leq(np.asarray(read(meas_path)),
-                                calibration_factor=factor)))
+        factor = metrology.sensitivity(np.asarray(read(cal_path)), 94.0, fs=FS)
+        levels.append(float(signals.leq(np.asarray(read(meas_path)),
+                                        calibration_factor=factor)))
 
     assert abs(levels[0] - levels[1]) < 1e-3  # dB
 

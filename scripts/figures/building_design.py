@@ -124,7 +124,7 @@ def generate_prediction_flanking_demo(output_dir: str) -> None:
 def generate_floor_covering_improvement(output_dir: str) -> None:
     """ISO 16251-1 floor-covering impact-sound improvement spectrum ΔL with ΔLw."""
     print("Generating floor_covering_improvement...")
-    from phonometry import impact_improvement
+    from phonometry import building
 
     freqs = [100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
              630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0]
@@ -135,7 +135,7 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
     bare = np.full(16, 78.0)
     covering = bare - np.array([5, 8, 10, 14, 18, 23, 30, 31, 39, 49,
                                 53, 57, 60, 67, 68, 71], dtype=float)
-    res = impact_improvement(bare, covering, freqs)
+    res = building.impact_improvement(bare, covering, freqs)
     assert res.delta_lw is not None
 
     x = np.arange(len(freqs))
@@ -173,12 +173,7 @@ def generate_floor_covering_improvement(output_dir: str) -> None:
 def generate_masonry_wall_ties(output_dir: str) -> None:
     """Wall-tie coupling loss factor and the resonance shift it causes."""
     print("Generating masonry_wall_ties...")
-    from phonometry import (
-        double_wall_transmission_loss,
-        wall_tie_coupling_loss_factor,
-        wall_tie_stiffness,
-        wall_tie_stiffness_per_area,
-    )
+    from phonometry import building
 
     _fig, (ax_clf, ax_tl) = plt.subplots(1, 2, figsize=(13.0, 5.6))
 
@@ -190,14 +185,14 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     ties = ("butterfly", "double_triangle", "vertical_twist")
     colours = (COLOR_PRIMARY, COLOR_TERTIARY, COLOR_SECONDARY)
     for tie, colour in zip(ties, colours, strict=True):
-        clf = wall_tie_coupling_loss_factor(
+        clf = building.wall_tie_coupling_loss_factor(
             freq, 150.0, 170.0, stiffness1, stiffness2,
             ties_per_area=2.5, tie=tie,
         )
-        label = f"{tie.replace('_', ' ')} ({wall_tie_stiffness(tie)[1] / 1e6:g} MN/m)"
+        label = f"{tie.replace('_', ' ')} ({building.wall_tie_stiffness(tie)[1] / 1e6:g} MN/m)"
         ax_clf.loglog(freq, clf.coupling_loss_factor, color=colour, linewidth=2.4,
                       zorder=4, label=label)
-    rigid = wall_tie_coupling_loss_factor(
+    rigid = building.wall_tie_coupling_loss_factor(
         freq, 150.0, 170.0, stiffness1, stiffness2, ties_per_area=2.5
     )
     ax_clf.loglog(freq, rigid.rigid_coupling_loss_factor, "--", color=COLOR_MUTED,
@@ -222,9 +217,9 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
     # of s_75mm = 2e6 N/m, which lifts fmsm from 26 Hz to 50 Hz.
     bands = np.array([20.0, 25.0, 31.5, 40.0, 50.0, 63.0, 80.0, 100.0,
                       125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0])
-    per_area = wall_tie_stiffness_per_area(2.5, 2.0e6)
-    plain = double_wall_transmission_loss(bands, 140.0, 140.0, 0.075)
-    tied = double_wall_transmission_loss(
+    per_area = building.wall_tie_stiffness_per_area(2.5, 2.0e6)
+    plain = building.double_wall_transmission_loss(bands, 140.0, 140.0, 0.075)
+    tied = building.double_wall_transmission_loss(
         bands, 140.0, 140.0, 0.075, tie_stiffness_per_area=per_area
     )
     xb = np.arange(bands.size)
@@ -265,29 +260,31 @@ def generate_masonry_wall_ties(output_dir: str) -> None:
 def generate_floating_floor_prediction(output_dir: str) -> None:
     """Floating-floor improvement DeltaL(f) under the three prediction laws."""
     print("Generating floating_floor_prediction...")
-    from phonometry import (
-        floating_floor_improvement_spectrum,
-        floating_floor_resonance_frequency,
-        weighted_floating_floor_improvement,
-    )
+    from phonometry import building
 
     # The worked floating floor of ISO 12354-2:2017 Annex G: a 35 mm screed
     # (m' = 73,5 kg/m2) on a resilient layer of s' = 8 MN/m3.
     mass_per_area, stiffness = 73.5, 8.0e6
-    f0 = floating_floor_resonance_frequency(stiffness, mass_per_area)
-    delta_lw = weighted_floating_floor_improvement(mass_per_area, stiffness)
+    f0 = building.floating_floor_resonance_frequency(stiffness, mass_per_area)
+    delta_lw = building.weighted_floating_floor_improvement(
+        mass_per_area, stiffness
+    )
 
     bands = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0,
                       315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
                       1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0])
     freqs = np.logspace(np.log10(40.0), np.log10(5000.0), 400)
-    screed = floating_floor_improvement_spectrum(freqs, resonance_frequency=f0)
-    asphalt = floating_floor_improvement_spectrum(
+    screed = building.floating_floor_improvement_spectrum(
+        freqs, resonance_frequency=f0
+    )
+    asphalt = building.floating_floor_improvement_spectrum(
         freqs, resonance_frequency=f0, model="cremer")
-    lightweight = floating_floor_improvement_spectrum(
+    lightweight = building.floating_floor_improvement_spectrum(
         freqs, resonance_frequency=f0, model="cremer_hammer",
         limiting_frequency=521.0)
-    printed = floating_floor_improvement_spectrum(bands, resonance_frequency=f0)
+    printed = building.floating_floor_improvement_spectrum(
+        bands, resonance_frequency=f0
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.fill_betweenx([-5.0, 100.0], 40.0, f0, color=theme_fill(COLOR_FG, ax),
@@ -332,13 +329,7 @@ def generate_floating_floor_prediction(output_dir: str) -> None:
 def generate_soft_covering_prediction(output_dir: str) -> None:
     """Soft-covering DeltaL(f) from the tapping-machine contact stiffness."""
     print("Generating soft_covering_prediction...")
-    from phonometry import (
-        covering_contact_stiffness,
-        covering_improvement,
-        infinite_plate_impedance,
-        plate_bending_stiffness,
-        plate_contact_stiffness,
-    )
+    from phonometry import building, vibration
 
     # A 140 mm cast in-situ concrete slab (Hopkins Table A2: 2 200 kg/m3,
     # cL = 3 800 m/s, nu = 0,2) carrying the two soft coverings of Hopkins
@@ -346,9 +337,11 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
     # (a vinyl or carpet with a resilient backing).
     density, longitudinal, poisson, thickness = 2200.0, 3800.0, 0.2, 0.14
     modulus = density * longitudinal**2 * (1.0 - poisson**2)
-    plate_stiffness = plate_contact_stiffness(modulus, poisson_ratio=poisson)
-    impedance = infinite_plate_impedance(
-        plate_bending_stiffness(modulus, thickness, poisson),
+    plate_stiffness = building.plate_contact_stiffness(
+        modulus, poisson_ratio=poisson
+    )
+    impedance = vibration.infinite_plate_impedance(
+        vibration.plate_bending_stiffness(modulus, thickness, poisson),
         density * thickness)
 
     # covering_improvement returns the band value directly: the tapping
@@ -367,10 +360,14 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     labels = []
     for label, stiffness_per_volume, colour, style in series:
-        result = covering_improvement(
+        result = building.covering_improvement(
             bands,
-            covering_contact_stiffness(stiffness_per_volume * layer, layer),
-            plate_stiffness, impedance)
+            building.covering_contact_stiffness(
+                stiffness_per_volume * layer, layer
+            ),
+            plate_stiffness,
+            impedance,
+        )
         ax.plot(bands, result.improvement, style, color=colour, linewidth=2.2,
                 marker="o", markersize=5, label=label)
         ax.plot(bands, result.two_line, ":", color=colour, linewidth=1.5)
@@ -405,7 +402,7 @@ def generate_soft_covering_prediction(output_dir: str) -> None:
 def generate_structure_borne_power(output_dir: str) -> None:
     """EN 15657 structure-borne sound power injected into the reception plate."""
     print("Generating structure_borne_power...")
-    from phonometry import reception_plate_power
+    from phonometry import building
 
     bands = np.array([50.0, 100.0, 200.0, 400.0, 800.0, 1600.0, 3150.0])
     # A pump-like source on the two plates EN 15657 specifies. Low-mobility
@@ -419,10 +416,12 @@ def generate_structure_borne_power(output_dir: str) -> None:
     # 35,1 dB higher, of which 12,0 dB is extra injected power and the rest is
     # its far smaller eta*m*S dissipating it.
     lv_high = lv_low + 35.1
-    res_low = reception_plate_power(lv_low, bands, mass_per_area=230.0, area=7.0,
-                                    reverberation_time=0.25)
-    res_high = reception_plate_power(lv_high, bands, mass_per_area=7.9, area=2.0,
-                                     reverberation_time=0.5)
+    res_low = building.reception_plate_power(
+        lv_low, bands, mass_per_area=230.0, area=7.0, reverberation_time=0.25
+    )
+    res_high = building.reception_plate_power(
+        lv_high, bands, mass_per_area=7.9, area=2.0, reverberation_time=0.5
+    )
 
     x = np.arange(bands.size)
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -457,19 +456,17 @@ def generate_structure_borne_power(output_dir: str) -> None:
 def generate_installed_structure_borne(output_dir: str) -> None:
     """EN 12354-5 installed structure-borne sound: characteristic power to SPL."""
     print("Generating installed_structure_borne...")
-    from phonometry import (
-        coupling_term,
-        installed_source_prediction,
-        installed_structure_borne_power_level,
-    )
+    from phonometry import building
 
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
     lws_c = np.array([78.0, 82.0, 84.0, 81.0, 77.0, 72.0, 66.0])   # EN 15657 source
     # Frequency-dependent source / receiver point mobilities (illustrative).
     ys = (2.0e-4 + 1.0e-4j) * (bands / 250.0)
     yi = (3.0e-5 + 1.0e-5j) * np.ones_like(bands)
-    dc = np.array([float(coupling_term(a, b)) for a, b in zip(ys, yi)])
-    lws_inst = installed_structure_borne_power_level(lws_c, dc)
+    dc = np.array(
+        [float(building.coupling_term(a, b)) for a, b in zip(ys, yi)]
+    )
+    lws_inst = building.installed_structure_borne_power_level(lws_c, dc)
     # Dsa is negative and falls with frequency (Annex F.2, Formula F.3); the
     # standard's own Annex I columns run from about -14 dB at 63 Hz to -45 dB
     # at 2 kHz. It enters Formula (18a) with a minus sign.
@@ -481,7 +478,9 @@ def generate_installed_structure_borne(output_dir: str) -> None:
          "flanking_reduction_index": np.array([46., 49., 52., 55., 58., 61., 64.]),
          "element_area": 9.0},
     ]
-    res = installed_source_prediction(lws_c, dc, paths, frequencies=bands)
+    res = building.installed_source_prediction(
+        lws_c, dc, paths, frequencies=bands
+    )
 
     x = np.arange(bands.size)
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -531,10 +530,10 @@ def generate_aperture_slit_geometry(output_dir: str) -> None:
     tiny geometry behind a large leak.
     """
     print("Generating aperture_slit_geometry...")
-    from phonometry import plot_aperture_geometry
+    from phonometry import building
 
     _fig, ax = plt.subplots(figsize=(9.0, 6.2))
-    plot_aperture_geometry(0.1, ax=ax, width=0.002, language=_LANG)
+    building.plot_aperture_geometry(0.1, ax=ax, width=0.002, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "aperture_slit_geometry.svg")
     plt.close()
@@ -549,11 +548,11 @@ def generate_double_wall_geometry(output_dir: str) -> None:
     resonance dip.
     """
     print("Generating double_wall_geometry...")
-    from phonometry import mass_spring_mass_resonance, plot_double_wall_geometry
+    from phonometry import building
 
-    f0 = mass_spring_mass_resonance(8.8, 8.8, 0.1)
+    f0 = building.mass_spring_mass_resonance(8.8, 8.8, 0.1)
     _fig, ax = plt.subplots(figsize=(9.0, 6.0))
-    plot_double_wall_geometry(
+    building.plot_double_wall_geometry(
         8.8, 8.8, 0.1, ax=ax, resonance_frequency=f0, language=_LANG,
     )
     plt.tight_layout()
@@ -564,16 +563,7 @@ def generate_double_wall_geometry(output_dir: str) -> None:
 def generate_panel_insulation_concept(output_dir: str) -> None:
     """Theoretical panel sound insulation: the four PR-I predictions."""
     print("Generating panel_insulation_concept.png...")
-    from phonometry import (
-        coincidence_frequency,
-        composite_transmission_loss,
-        double_wall_transmission_loss,
-        mass_law_transmission_loss,
-        mass_spring_mass_resonance,
-        plate_bending_stiffness,
-        radiation_efficiency,
-        single_panel_transmission_loss,
-    )
+    from phonometry import building, vibration
 
     bands = np.array(
         [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
@@ -588,10 +578,10 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
                "(transmission loss $\\mathrm{TL}$) [dB]")
 
     # (a) Single panel: field-incidence mass law and the coincidence dip.
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = coincidence_frequency(15.0, bp)
-    ml = mass_law_transmission_loss(bands, 15.0, incidence="field")
-    sharp = single_panel_transmission_loss(
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = vibration.coincidence_frequency(15.0, bp)
+    ml = building.mass_law_transmission_loss(bands, 15.0, incidence="field")
+    sharp = building.single_panel_transmission_loss(
         bands, 15.0, critical_frequency=fc, loss_factor=0.024
     )
     ax = axes[0, 0]
@@ -610,9 +600,11 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     format_frequency_axis(ax, float(bands.min()), float(bands.max()))
 
     # (b) Double wall: mass-spring-mass resonance and cavity gain.
-    dw = double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
-    single = mass_law_transmission_loss(bands, 24.0, incidence="field")
-    f0 = mass_spring_mass_resonance(12.0, 12.0, 0.075)
+    dw = building.double_wall_transmission_loss(bands, 12.0, 12.0, 0.075)
+    single = building.mass_law_transmission_loss(
+        bands, 24.0, incidence="field"
+    )
+    f0 = building.mass_spring_mass_resonance(12.0, 12.0, 0.075)
     ax = axes[0, 1]
     ax.semilogx(bands, single, color=COLOR_TERTIARY, ls="--", lw=1.6,
                 label="single leaf (total mass)")
@@ -628,7 +620,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     format_frequency_axis(ax, float(bands.min()), float(bands.max()))
 
     # (c) Radiation efficiency of a bending plate.
-    sigma = radiation_efficiency(bands, 1.5, 1.25, fc)
+    sigma = vibration.radiation_efficiency(bands, 1.5, 1.25, fc)
     ax = axes[1, 0]
     ax.loglog(bands, sigma.radiation_efficiency, color=COLOR_PRIMARY, lw=2.0,
               marker="o", markersize=3, label=r"$\sigma(f)$")
@@ -648,7 +640,7 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
     open_area = 0.01
     n = bands.size
     composite = np.array([
-        float(composite_transmission_loss(
+        float(building.composite_transmission_loss(
             [1.0 - open_area, open_area], [wall[i], 0.0]))
         for i in range(n)
     ])
@@ -679,18 +671,14 @@ def generate_panel_insulation_concept(output_dir: str) -> None:
 def generate_impact_prediction_terms(output_dir: str) -> None:
     """EN 12354-2 Annex E.3 impact prediction as its Formula (21) terms."""
     print("Generating impact_prediction_terms...")
-    from phonometry import (
-        equivalent_impact_level,
-        impact_flanking_correction,
-        predicted_impact_insulation,
-    )
+    from phonometry import building
 
     # EN 12354-2 Annex E.3: a 0.14 m concrete floor (m' = 322 kg/m2) with a
     # floating floor (delta-Lw = 33 dB), mean flanking mass 145 kg/m2.
-    ln_eq = float(equivalent_impact_level(322.0))
-    k = float(impact_flanking_correction(322.0, 145.0))
-    imp = predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
-                                      k_correction=k)
+    ln_eq = float(building.equivalent_impact_level(322.0))
+    k = float(building.impact_flanking_correction(322.0, 145.0))
+    imp = building.predicted_impact_insulation(ln_w_eq=ln_eq, delta_l_w=33.0,
+                                               k_correction=k)
 
     labels = [r"$L_\mathrm{n,w,eq}$", r"$-\Delta L_\mathrm{w}$", "$+K$",
               r"$L^{\prime}_\mathrm{n,w}$"]
@@ -748,12 +736,7 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
         sys.path.insert(0, tests)
     import iso12354_building as bld
 
-    from phonometry import (
-        detailed_airborne_prediction,
-        direct_reduction_index,
-        floating_floor_improvement,
-        in_situ_element,
-    )
+    from phonometry import building
 
     # The heavy homogeneous building of ISO 12354-1:2017 Annex L: a 220 mm
     # concrete separating floor with a floating floor, two 365 mm AAC external
@@ -762,13 +745,16 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
     # conformance report reads too, so the figure cannot drift from the rows.
     bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
                       800, 1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
-    situ = {k: in_situ_element(e, bands) for k, e in bld.elements().items()}
-    delta = floating_floor_improvement(
+    situ = {
+        k: building.in_situ_element(e, bands)
+        for k, e in bld.elements().items()
+    }
+    delta = building.floating_floor_improvement(
         bands, resonance_frequency=bld.floating_floor_resonance()
     )
-    res = detailed_airborne_prediction(
+    res = building.detailed_airborne_prediction(
         bands,
-        direct_index=direct_reduction_index(
+        direct_index=building.direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta),
         flanking_paths=bld.airborne_paths(situ, delta),
     )
@@ -825,19 +811,16 @@ def generate_detailed_prediction_paths(output_dir: str) -> None:
 def generate_single_panel_rating(output_dir: str) -> None:
     """Sharp single-panel R(f) prediction rated per ISO 717-1 (6 mm glass)."""
     print("Generating single_panel_rating...")
-    from phonometry import (
-        coincidence_frequency,
-        plate_bending_stiffness,
-        single_panel_transmission_loss,
-    )
+    from phonometry import building, vibration
 
     # 6 mm float glass: E = 62 GPa, rho = 2500 kg/m3, nu = 0.24, eta = 0.024.
     bands = np.asarray(_THIRD_OCTAVE_16, dtype=float)
     mass = 2500.0 * 0.006
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = float(coincidence_frequency(mass, bp))
-    res = single_panel_transmission_loss(bands, mass, critical_frequency=fc,
-                                         loss_factor=0.024)
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = float(vibration.coincidence_frequency(mass, bp))
+    res = building.single_panel_transmission_loss(
+        bands, mass, critical_frequency=fc, loss_factor=0.024
+    )
     w = res.rating()
     assert w.shifted_reference is not None and w.measured is not None
 
@@ -880,10 +863,7 @@ def generate_single_panel_rating(output_dir: str) -> None:
 def generate_plateau_transmission_loss(output_dir: str) -> None:
     """Plateau-method TL estimate against the full physical model."""
     print("Generating plateau_transmission_loss...")
-    from phonometry import (
-        plateau_transmission_loss,
-        single_panel_transmission_loss,
-    )
+    from phonometry import building
 
     # 6 mm float glass, 2.47 kg/m2 per mm (Norton Table 3.1); its critical
     # frequency from the same book's problem 3.13 is 2033 Hz.
@@ -891,12 +871,12 @@ def generate_plateau_transmission_loss(output_dir: str) -> None:
     mass = 2.47 * thickness_mm
     nominal = [*_THIRD_OCTAVE_16, 4000, 5000, 6300, 8000, 10000]
     bands = np.asarray(nominal, dtype=float)
-    quick = plateau_transmission_loss(bands, material="glass",
-                                      thickness_mm=thickness_mm,
-                                      field_correction=5.5)
-    physical = single_panel_transmission_loss(bands, mass,
-                                              critical_frequency=f_c,
-                                              loss_factor=eta)
+    quick = building.plateau_transmission_loss(bands, material="glass",
+                                               thickness_mm=thickness_mm,
+                                               field_correction=5.5)
+    physical = building.single_panel_transmission_loss(bands, mass,
+                                                       critical_frequency=f_c,
+                                                       loss_factor=eta)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     x = _band_index_axis(ax, nominal)
@@ -950,39 +930,33 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
     extra mass the developed length adds.
     """
     print("Generating orthotropic_transmission_loss...")
-    from phonometry import (
-        coincidence_frequency,
-        corrugated_plate_mass_factor,
-        corrugated_plate_stiffness,
-        orthotropic_critical_frequencies,
-        orthotropic_transmission_loss,
-        plate_bending_stiffness,
-        single_panel_transmission_loss,
-    )
+    from phonometry import building, vibration
 
     # Vigran's worked example (printed p. 96): 1 mm steel, corrugation of total
     # height 20 mm (H = 10 mm) at a 100 mm pitch, E = 2,1e11 Pa, nu = 0,3.
     modulus, thickness, poisson, eta = 2.1e11, 1.0e-3, 0.3, 0.011
     amplitude, pitch, mass_flat = 0.010, 0.100, 7.8
-    flat_b = plate_bending_stiffness(modulus, thickness, poisson)
-    flat_fc = coincidence_frequency(mass_flat, flat_b)
-    b_x, b_z, _b_xz = corrugated_plate_stiffness(
+    flat_b = vibration.plate_bending_stiffness(modulus, thickness, poisson)
+    flat_fc = vibration.coincidence_frequency(mass_flat, flat_b)
+    b_x, b_z, _b_xz = building.corrugated_plate_stiffness(
         thickness, amplitude, pitch, youngs_modulus=modulus,
         poisson_ratio=poisson,
     )
-    mass_corr = mass_flat * corrugated_plate_mass_factor(amplitude, pitch)
-    fc1, fc2 = orthotropic_critical_frequencies(mass_corr, b_x, b_z)
+    mass_corr = mass_flat * building.corrugated_plate_mass_factor(
+        amplitude, pitch
+    )
+    fc1, fc2 = building.orthotropic_critical_frequencies(mass_corr, b_x, b_z)
 
     nominal = [*_THIRD_OCTAVE_16, 4000, 5000, 6300, 8000, 10000, 12500, 16000]
     bands = np.asarray(nominal, dtype=float)
-    flat = single_panel_transmission_loss(
+    flat = building.single_panel_transmission_loss(
         bands, mass_flat, critical_frequency=flat_fc, loss_factor=eta,
     )
-    corrugated = orthotropic_transmission_loss(
+    corrugated = building.orthotropic_transmission_loss(
         bands, mass_corr, critical_frequency_lower=fc1,
         critical_frequency_upper=fc2, loss_factor=eta,
     )
-    heckl = orthotropic_transmission_loss(
+    heckl = building.orthotropic_transmission_loss(
         bands, mass_corr, critical_frequency_lower=fc1,
         critical_frequency_upper=fc2, method="heckl",
     )
@@ -1037,11 +1011,7 @@ def generate_orthotropic_transmission_loss(output_dir: str) -> None:
 def generate_coupling_term_regimes(output_dir: str) -> None:
     """EN 12354-5 coupling term against the source-to-receiver mobility ratio."""
     print("Generating coupling_term_regimes...")
-    from phonometry import (
-        coupling_term,
-        coupling_term_force_source,
-        coupling_term_velocity_source,
-    )
+    from phonometry import building
 
     # The receiver mobility of the guide's pump example, held fixed while the
     # source mobility sweeps six decades around it along the same phase.
@@ -1049,10 +1019,15 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
     ratio = np.logspace(-3.0, 3.0, 400)
     y_s = abs(y_i) * ratio * (2 + 1j) / abs(2 + 1j)
 
-    exact = np.array([float(coupling_term(a, y_i)) for a in y_s])
-    force = np.array([float(coupling_term_force_source(a, y_i)) for a in y_s])
+    exact = np.array([float(building.coupling_term(a, y_i)) for a in y_s])
+    force = np.array(
+        [float(building.coupling_term_force_source(a, y_i)) for a in y_s]
+    )
     velocity = np.array(
-        [float(coupling_term_velocity_source(a, 1.0 / y_i)) for a in y_s]
+        [
+            float(building.coupling_term_velocity_source(a, 1.0 / y_i))
+            for a in y_s
+        ]
     )
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -1064,7 +1039,10 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
                 zorder=4, label="velocity-source limit (19d)")
     for style, y_k in (("-.", 1e-4), ((0, (5, 2, 1, 2)), 1e-3)):
         with_mount = np.array(
-            [float(coupling_term(a, y_i, transfer_mobility=y_k)) for a in y_s]
+            [
+                float(building.coupling_term(a, y_i, transfer_mobility=y_k))
+                for a in y_s
+            ]
         )
         ax.semilogx(ratio, with_mount, linestyle=style, color=COLOR_MUTED,
                     linewidth=1.8, zorder=3,
@@ -1080,7 +1058,7 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
                 arrowprops={"arrowstyle": "->", "lw": 1.0})
 
     pump = abs(y_i) * 7.0710678 * (2 + 1j) / abs(2 + 1j)
-    pump_dc = float(coupling_term(pump, y_i))
+    pump_dc = float(building.coupling_term(pump, y_i))
     ax.plot(7.0710678, pump_dc, "o", color=COLOR_FG, markersize=8, zorder=7)
     ax.annotate(f"pump on a concrete slab: {pump_dc:.1f} dB",
                 xy=(7.0710678, pump_dc), xytext=(30.0, pump_dc - 12.0),
@@ -1113,13 +1091,7 @@ def generate_coupling_term_regimes(output_dir: str) -> None:
 def generate_tapping_force_spectrum(output_dir: str) -> None:
     """The tapping machine's force spectrum on concrete and on chipboard."""
     print("Generating tapping_force_spectrum...")
-    from phonometry import (
-        hammer_limiting_frequency,
-        infinite_plate_impedance,
-        plate_bending_stiffness,
-        plate_contact_stiffness,
-        tapping_force_spectrum,
-    )
+    from phonometry import building, vibration
 
     freqs = np.logspace(np.log10(50.0), np.log10(20000.0), 500)
     surfaces = (
@@ -1132,11 +1104,11 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
     upper = lower = 0.0
     for label, rho, c_l, nu, h, colour in surfaces:
         modulus = rho * c_l**2 * (1 - nu**2)
-        impedance = infinite_plate_impedance(
-            plate_bending_stiffness(modulus, h, nu), rho * h
+        impedance = vibration.infinite_plate_impedance(
+            vibration.plate_bending_stiffness(modulus, h, nu), rho * h
         )
-        stiffness = plate_contact_stiffness(modulus, poisson_ratio=nu)
-        res = tapping_force_spectrum(freqs, stiffness, impedance)
+        stiffness = building.plate_contact_stiffness(modulus, poisson_ratio=nu)
+        res = building.tapping_force_spectrum(freqs, stiffness, impedance)
         upper, lower = res.upper_limit, res.lower_limit
         regime = "over-critical" if res.over_critical else "under-critical"
         ax.loglog(freqs, res.peak_force, "-", color=colour, linewidth=2.4,
@@ -1145,7 +1117,7 @@ def generate_tapping_force_spectrum(output_dir: str) -> None:
                          f"{res.cut_off_frequency:.0f} Hz)"))
         ax.axvline(res.cut_off_frequency, color=colour, linestyle=":",
                    linewidth=1.4, zorder=3)
-        f_limit = float(hammer_limiting_frequency(impedance))
+        f_limit = float(building.hammer_limiting_frequency(impedance))
         if freqs[0] < f_limit < freqs[-1]:
             ax.axvline(f_limit, color=colour, linestyle="-.", linewidth=1.2,
                        zorder=3)
@@ -1203,22 +1175,20 @@ def generate_detailed_impact_paths(output_dir: str) -> None:
         sys.path.insert(0, tests)
     import iso12354_building as bld
 
-    from phonometry import (
-        detailed_impact_prediction,
-        direct_impact_level,
-        floating_floor_improvement,
-        in_situ_element,
-    )
+    from phonometry import building
 
     bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
                       800, 1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
-    situ = {k: in_situ_element(e, bands) for k, e in bld.elements().items()}
+    situ = {
+        k: building.in_situ_element(e, bands)
+        for k, e in bld.elements().items()
+    }
     f_0 = bld.floating_floor_resonance()
-    delta = floating_floor_improvement(bands, resonance_frequency=f_0)
-    res = detailed_impact_prediction(
+    delta = building.floating_floor_improvement(bands, resonance_frequency=f_0)
+    res = building.detailed_impact_prediction(
         bands,
-        direct_level=direct_impact_level(situ["floor"].impact_level,
-                                         delta_l=delta),
+        direct_level=building.direct_impact_level(situ["floor"].impact_level,
+                                                  delta_l=delta),
         flanking_paths=bld.impact_paths(situ, delta),
     )
     assert res.rating is not None
@@ -1278,14 +1248,14 @@ def enumerate_paths(result: object) -> list[tuple[int, int]]:
 def generate_radiation_efficiency_panels(output_dir: str) -> None:
     """Plate radiation efficiency for two pane sizes, and the baffled plate."""
     print("Generating radiation_efficiency_panels...")
-    from phonometry import radiation_efficiency
+    from phonometry import vibration
 
     bands = np.array([50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630,
                       800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000],
                      dtype=float)
     f_c = 2107.0                       # the page's 6 mm float glass pane
-    big = radiation_efficiency(bands, 1.5, 1.25, f_c)
-    small = radiation_efficiency(bands, 0.5, 0.4, f_c)
+    big = vibration.radiation_efficiency(bands, 1.5, 1.25, f_c)
+    small = vibration.radiation_efficiency(bands, 0.5, 0.4, f_c)
 
     _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(13.0, 5.6))
     ax_l.loglog(bands, big.radiation_efficiency, "-o", color=COLOR_PRIMARY,
@@ -1337,20 +1307,20 @@ def generate_radiation_efficiency_panels(output_dir: str) -> None:
 def generate_structure_borne_conversion(output_dir: str) -> None:
     """EN 15657 to EN 12354-5: the two quantities one correction produces."""
     print("Generating structure_borne_conversion...")
-    from phonometry import (
-        characteristic_reception_plate_power,
-        equivalent_blocked_force_level,
-        installed_power_from_reception_plate,
-    )
+    from phonometry import building
 
     # The flushing cistern of EN 12354-5 Annex I.3 at its wall contact, whose
     # printed Table I.8 columns the library reproduces to a tenth of a decibel.
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
-    l_ws = np.array([61.7, 59.8, 47.2, 44.9, 38.8, 27.2])   # on the test plate
-    l_fb = equivalent_blocked_force_level(l_ws, 5.34e-6)    # Formula (15)
-    l_wsn = characteristic_reception_plate_power(l_fb)       # Formula (17)
-    installed = installed_power_from_reception_plate(l_wsn, 24.1e-6)
-    characteristic = installed_power_from_reception_plate(l_wsn, 1.0e-3)
+    l_ws = np.array([61.7, 59.8, 47.2, 44.9, 38.8, 27.2])  # on the test plate
+    l_fb = building.equivalent_blocked_force_level(
+        l_ws, 5.34e-6
+    )  # Formula (15)
+    l_wsn = building.characteristic_reception_plate_power(l_fb)  # Formula (17)
+    installed = building.installed_power_from_reception_plate(l_wsn, 24.1e-6)
+    characteristic = building.installed_power_from_reception_plate(
+        l_wsn, 1.0e-3
+    )
     d_c = 16.2                                               # Annex I.9
 
     x = np.arange(bands.size)

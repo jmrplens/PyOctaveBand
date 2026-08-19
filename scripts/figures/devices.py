@@ -43,7 +43,7 @@ _ASCII_MINUS_RE = re.compile(r"(?<![\w)\]])-(?=\d)")
 def generate_intensity_demo(output_dir: str) -> None:
     """p-p intensity: plane progressive wave vs reactive standing wave."""
     print("Generating intensity_demo.png...")
-    from phonometry import sound_intensity
+    from phonometry import emission
 
     fs = 48000
     dr, c = 0.012, 343.0
@@ -64,13 +64,15 @@ def generate_intensity_demo(output_dir: str) -> None:
     # Plane progressive wave: microphone 2 sees the wave dr/c later.
     p1_plane = noise
     p2_plane = np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n)
-    plane = sound_intensity(p1_plane, p2_plane, fs, spacing=dr, fraction=3, limits=[100.0, 5000.0])
+    plane = emission.sound_intensity(
+        p1_plane, p2_plane, fs, spacing=dr, fraction=3, limits=[100.0, 5000.0]
+    )
 
     # Standing wave: equal counter-propagating waves, probe centred at x0.
     x0 = 0.30
     def standing_pressure(pos: float) -> np.ndarray:
         return np.fft.irfft(spectrum * 2.0 * np.cos(k * pos), n)
-    standing = sound_intensity(
+    standing = emission.sound_intensity(
         standing_pressure(x0 - dr / 2), standing_pressure(x0 + dr / 2),
         fs, spacing=dr, fraction=3, limits=[100.0, 5000.0],
     )
@@ -114,10 +116,12 @@ def generate_sound_reinforcement_geometry(output_dir: str) -> None:
     one usable drawing scale.
     """
     print("Generating sound_reinforcement_geometry...")
-    from phonometry import plot_sound_reinforcement_geometry
+    from phonometry import electroacoustics
 
     _fig, ax = plt.subplots(figsize=(10, 4.6))
-    plot_sound_reinforcement_geometry(0.3, 4.0, 12.0, ax=ax, language=_LANG)
+    electroacoustics.plot_sound_reinforcement_geometry(
+        0.3, 4.0, 12.0, ax=ax, language=_LANG
+    )
     plt.tight_layout()
     save_figure(output_dir, "sound_reinforcement_geometry.svg")
     plt.close()
@@ -129,7 +133,7 @@ _FS_ELECTRO = 48000  # audio sample rate for the electroacoustic demos
 def generate_distortion(output_dir: str) -> None:
     """Annotated harmonic spectrum with the THD of a synthetic amplifier output."""
     print("Generating distortion...")
-    from phonometry import harmonic_analysis
+    from phonometry import electroacoustics
 
     fs = _FS_ELECTRO
     n = fs  # 1 s -> 1 Hz bins; every harmonic lands on a bin
@@ -144,7 +148,9 @@ def generate_distortion(output_dir: str) -> None:
     rng = np.random.default_rng(2026)
     sig = sig + rng.standard_normal(n) * 1.2e-2
 
-    res = harmonic_analysis(sig, fs, f0, n_harmonics=len(amps))
+    res = electroacoustics.harmonic_analysis(
+        sig, fs, f0, n_harmonics=len(amps)
+    )
 
     # Magnitude spectrum (coherent-gain normalised) in dB re the fundamental.
     window = np.hanning(n)
@@ -204,7 +210,7 @@ def generate_frequency_response(output_dir: str) -> None:
     print("Generating frequency_response...")
     from scipy import signal as sp_signal
 
-    from phonometry import transfer_function
+    from phonometry import electroacoustics
 
     fs = _FS_ELECTRO
     n = 400000
@@ -234,8 +240,8 @@ def generate_frequency_response(output_dir: str) -> None:
         2, 2, figsize=(11.4, 7.6), sharex=True,
         gridspec_kw={"height_ratios": [2.0, 1.0]})
     for col, (title, xx, yy) in enumerate(cases):
-        h1 = transfer_function(xx, yy, fs, estimator="H1")
-        h2 = transfer_function(xx, yy, fs, estimator="H2")
+        h1 = electroacoustics.transfer_function(xx, yy, fs, estimator="H1")
+        h2 = electroacoustics.transfer_function(xx, yy, fs, estimator="H2")
         _, h_true = sp_signal.freqz(b, a, worN=h1.frequencies, fs=fs)
         pos = h1.frequencies > 0.0
         freqs = h1.frequencies[pos]
@@ -295,7 +301,7 @@ def generate_swept_sine_thd(output_dir: str) -> None:
     print("Generating swept_sine_thd...")
     from scipy import signal as sp_signal
 
-    from phonometry import swept_sine_distortion, synchronized_sweep_signal
+    from phonometry import electroacoustics
 
     fs = 48000
     f1, f2, seconds = 20.0, 6000.0, 4.0
@@ -303,10 +309,12 @@ def generate_swept_sine_thd(output_dir: str) -> None:
     # Hammerstein chain: a memoryless cubic polynomial (exact Chebyshev
     # harmonic levels) followed by a 3 kHz low-pass, so each order rolls off
     # where its own product n*f crosses the filter corner.
-    x = synchronized_sweep_signal(fs, f1, f2, seconds)
+    x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
     b, a = sp_signal.butter(2, 3000.0, fs=fs)
     y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-    res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
+    res = electroacoustics.swept_sine_distortion(
+        y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
+    )
 
     sel = (res.thd_frequencies >= 30.0) & (res.thd_frequencies <= 2800.0)
     freqs = res.thd_frequencies[sel]
@@ -350,20 +358,18 @@ def generate_swept_sine_thd(output_dir: str) -> None:
 def generate_piston_directivity(output_dir: str) -> None:
     """Far-field beam pattern of a baffled circular piston at three ka values."""
     print("Generating piston_directivity...")
-    from phonometry import piston_directivity_pattern
+    from phonometry import electroacoustics
 
-    piston_directivity_pattern([3.0, 8.0, 16.0]).plot(language=_LANG)
+    electroacoustics.piston_directivity_pattern([3.0, 8.0, 16.0]).plot(
+        language=_LANG
+    )
     save_figure(output_dir, "piston_directivity.svg")
     plt.close()
 
 
 def _loudspeaker_datasheet_example() -> Any:
     """The IEC 60268-5 loudspeaker result shared by the section-7 .plot() figures."""
-    from phonometry import (
-        LoudspeakerDirectivity,
-        loudspeaker_characteristics,
-        radiating_piston,
-    )
+    from phonometry import electroacoustics
 
     freqs = np.geomspace(30, 24000, 320)
     spl = 87.0 + 1.2 * np.sin(2 * np.log2(freqs / 900.0))
@@ -371,13 +377,22 @@ def _loudspeaker_datasheet_example() -> Any:
     spl -= 10 * np.log10(1 + (freqs / 16000.0) ** 7)    # high-frequency roll-off
     fz = np.geomspace(20, 20000, 260)
     thd_f = np.geomspace(50, 5000, 140)
-    return loudspeaker_characteristics(
-        freqs, spl, rated_impedance=8.0, sensitivity_band=(200.0, 4000.0),
+    return electroacoustics.loudspeaker_characteristics(
+        freqs,
+        spl,
+        rated_impedance=8.0,
+        sensitivity_band=(200.0, 4000.0),
         impedance=(fz, 6.6 + 24 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
-        distortion=(thd_f, 0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45)),
-        directivity=LoudspeakerDirectivity(
-            piston=radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]),
-                                    angles=np.radians(np.linspace(0, 90, 46))),
+        distortion=(
+            thd_f,
+            0.3 + 2.6 * np.exp(-(np.log2(thd_f / 70.0) ** 2) / 0.45),
+        ),
+        directivity=electroacoustics.LoudspeakerDirectivity(
+            piston=electroacoustics.radiating_piston(
+                0.075,
+                np.array([1000.0, 2000.0, 4000.0]),
+                angles=np.radians(np.linspace(0, 90, 46)),
+            ),
             frequency=2000.0,
         ),
     )
@@ -385,13 +400,7 @@ def _loudspeaker_datasheet_example() -> Any:
 
 def _microphone_datasheet_example() -> Any:
     """The IEC 60268-4 microphone result shared by the section-8 .plot() figures."""
-    from phonometry import (
-        MicrophoneDirectivity,
-        MicrophoneElectrical,
-        MicrophoneNoise,
-        MicrophoneOverload,
-        microphone_characteristics,
-    )
+    from phonometry import electroacoustics
 
     freqs = np.geomspace(20, 20000, 400)
     response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # low-frequency roll-off
@@ -401,20 +410,27 @@ def _microphone_datasheet_example() -> Any:
     cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
     noise_f = np.geomspace(20, 20000, 31)
     spl_axis = np.linspace(100, 140, 81)
-    return microphone_characteristics(
-        freqs, response, 12.5, tolerance_db=3.0,          # 12.5 mV/Pa at 1 kHz
-        directivity=MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
-        noise=MicrophoneNoise(
+    return electroacoustics.microphone_characteristics(
+        freqs,
+        response,
+        12.5,
+        tolerance_db=3.0,  # 12.5 mV/Pa at 1 kHz
+        directivity=electroacoustics.MicrophoneDirectivity(
+            polar=(angles, cardioid), frequency=1000.0
+        ),
+        noise=electroacoustics.MicrophoneNoise(
             voltage=1.25e-6,
             spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
         ),
-        overload=MicrophoneOverload(
+        overload=electroacoustics.MicrophoneOverload(
             distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
             thd_percent=0.5,
         ),
-        electrical=MicrophoneElectrical(
-            rated_impedance=150.0, minimum_load_impedance=1000.0,
-            powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+        electrical=electroacoustics.MicrophoneElectrical(
+            rated_impedance=150.0,
+            minimum_load_impedance=1000.0,
+            powering="Phantom P48 (IEC 61938)",
+            supply_current_ma=3.1,
         ),
     )
 
@@ -488,7 +504,7 @@ def generate_program_loudness(output_dir: str) -> None:
     print("Generating program_loudness...")
     from scipy import signal as sp_signal
 
-    from phonometry import program_loudness
+    from phonometry import broadcast
 
     fs = 48000
     rng = np.random.default_rng(1770)
@@ -513,9 +529,9 @@ def generate_program_loudness(output_dir: str) -> None:
     x = np.concatenate(chunks)
     # Loudness-normalise the programme to the R 128 target of -23.0 LUFS,
     # exactly what a broadcast workflow does before delivery.
-    raw = program_loudness(np.vstack([x, x]), fs)
+    raw = broadcast.program_loudness(np.vstack([x, x]), fs)
     x *= 10.0 ** ((-23.0 - raw.integrated) / 20.0)
-    res = program_loudness(np.vstack([x, x]), fs)
+    res = broadcast.program_loudness(np.vstack([x, x]), fs)
 
     _fig, ax = plt.subplots(figsize=(11.5, 5.8))
     ax.axhspan(res.lra_low, res.lra_high, color=theme_fill(COLOR_TERTIARY, ax),
@@ -568,10 +584,10 @@ def generate_program_loudness(output_dir: str) -> None:
 def generate_k_weighting_response(output_dir: str) -> None:
     """K-weighting magnitude frequency response (ITU-R BS.1770-5 Annex 1)."""
     print("Generating k_weighting_response...")
-    from phonometry import k_weighting_response
+    from phonometry import broadcast
 
     _fig, ax = plt.subplots(figsize=(10, 6))
-    k_weighting_response().plot(ax=ax, language=_LANG)
+    broadcast.k_weighting_response().plot(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "k_weighting_response.svg")
     plt.close()
@@ -580,7 +596,7 @@ def generate_k_weighting_response(output_dir: str) -> None:
 def generate_vibration_sound_power(output_dir: str) -> None:
     """ISO/TS 7849 sound power from surface vibration: upper limit vs engineering."""
     print("Generating vibration_sound_power...")
-    from phonometry import radiated_sound_power_level
+    from phonometry import emission
 
     bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
     # A plausible surface velocity level spectrum and a measured radiation factor.
@@ -588,8 +604,10 @@ def generate_vibration_sound_power(output_dir: str) -> None:
     eps = np.array([0.20, 0.45, 0.75, 0.95, 1.00, 1.00])
     area = 1.6
 
-    lw_max = radiated_sound_power_level(lv, area)                    # Part 1, eps=1
-    lw_eng = radiated_sound_power_level(lv, area, radiation_factor=eps)  # Part 2
+    lw_max = emission.radiated_sound_power_level(lv, area)  # Part 1, eps=1
+    lw_eng = emission.radiated_sound_power_level(
+        lv, area, radiation_factor=eps
+    )  # Part 2
 
     x = np.arange(bands.size)
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -637,10 +655,10 @@ def generate_expansion_chamber_geometry(output_dir: str) -> None:
     expansion-chamber transmission-loss curve.
     """
     print("Generating expansion_chamber_geometry...")
-    from phonometry import plot_silencer_geometry
+    from phonometry import noise_control
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    plot_silencer_geometry(
+    noise_control.plot_silencer_geometry(
         "expansion chamber", ax=ax, length=0.3, chamber_area=0.04,
         pipe_area=0.01, language=_LANG,
     )
@@ -657,10 +675,10 @@ def generate_helmholtz_branch_geometry(output_dir: str) -> None:
     One concept: the branch geometry that shorts the duct at its tuning.
     """
     print("Generating helmholtz_branch_geometry...")
-    from phonometry import plot_silencer_geometry
+    from phonometry import noise_control
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    plot_silencer_geometry(
+    noise_control.plot_silencer_geometry(
         "Helmholtz resonator", ax=ax, duct_area=0.01, neck_area=1e-4,
         neck_length=0.02, cavity_volume=1e-3, language=_LANG,
     )
@@ -677,10 +695,10 @@ def generate_quarter_wave_geometry(output_dir: str) -> None:
     the right length.
     """
     print("Generating quarter_wave_geometry...")
-    from phonometry import plot_silencer_geometry
+    from phonometry import noise_control
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    plot_silencer_geometry(
+    noise_control.plot_silencer_geometry(
         "quarter-wave resonator", ax=ax, duct_area=0.01, length=0.3,
         branch_area=2e-3, language=_LANG,
     )
@@ -709,7 +727,7 @@ def generate_silencer_chain_geometry(output_dir: str) -> None:
     can honestly draw, which is its ducts to scale and its branches marked.
     """
     print("Generating silencer_chain_geometry...")
-    from phonometry import SilencerChain
+    from phonometry import noise_control
     from phonometry.noise_control.silencers import (
         helmholtz_impedance,
         quarter_wave_impedance,
@@ -720,7 +738,7 @@ def generate_silencer_chain_geometry(output_dir: str) -> None:
     s_shell = np.pi * 0.200**2               # nominal 400 mm shell
     s_stub = np.pi * 0.050**2                # nominal 100 mm branch
     chain = (
-        SilencerChain(freqs)
+        noise_control.SilencerChain(freqs)
         .duct(0.10, s_duct)
         .shunt(
             quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), s_stub),
@@ -749,12 +767,14 @@ def generate_microphone_positions_hemisphere(output_dir: str) -> None:
     sound-power microphones actually sit.
     """
     print("Generating microphone_positions_hemisphere...")
-    from phonometry import measurement_positions, plot_microphone_positions
+    from phonometry import emission
 
-    positions = measurement_positions("hemisphere", radius=2.0)
+    positions = emission.measurement_positions("hemisphere", radius=2.0)
     plt.figure(figsize=(9.0, 7.0))
     ax = plt.subplot(projection="3d")
-    plot_microphone_positions(positions, ax=ax, radius=2.0, language=_LANG)
+    emission.plot_microphone_positions(
+        positions, ax=ax, radius=2.0, language=_LANG
+    )
     plt.tight_layout()
     save_figure(output_dir, "microphone_positions_hemisphere.svg")
     plt.close()
@@ -769,9 +789,9 @@ def generate_piston_baffle_geometry(output_dir: str) -> None:
     describe.
     """
     print("Generating piston_baffle_geometry...")
-    from phonometry import radiating_piston
+    from phonometry import electroacoustics
 
-    result = radiating_piston(
+    result = electroacoustics.radiating_piston(
         0.1, np.array([500.0, 2000.0, 4000.0]),
         angles=np.linspace(-np.pi / 2.0, np.pi / 2.0, 181),
     )
@@ -791,10 +811,12 @@ def generate_plenum_geometry(output_dir: str) -> None:
     concept: what the plenum formula actually measures.
     """
     print("Generating plenum_geometry...")
-    from phonometry import plot_plenum_geometry
+    from phonometry import noise_control
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    plot_plenum_geometry(0.09, 1.2, 6.0, ax=ax, angle=0.35, language=_LANG)
+    noise_control.plot_plenum_geometry(
+        0.09, 1.2, 6.0, ax=ax, angle=0.35, language=_LANG
+    )
     plt.tight_layout()
     save_figure(output_dir, "plenum_geometry.svg")
     plt.close()
@@ -808,10 +830,10 @@ def generate_radiation_plate_geometry(output_dir: str) -> None:
     behind the radiation-efficiency plateau and coincidence peak.
     """
     print("Generating radiation_plate_geometry...")
-    from phonometry import plot_plate_geometry
+    from phonometry import vibration
 
     _fig, ax = plt.subplots(figsize=(9.0, 6.2))
-    plot_plate_geometry(1.5, 1.25, ax=ax, language=_LANG)
+    vibration.plot_plate_geometry(1.5, 1.25, ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "radiation_plate_geometry.svg")
     plt.close()
@@ -825,10 +847,10 @@ def generate_pp_probe_geometry(output_dir: str) -> None:
     difference the p-p method is built on.
     """
     print("Generating pp_probe_geometry...")
-    from phonometry import plot_pp_probe_geometry
+    from phonometry import emission
 
     _fig, ax = plt.subplots(figsize=(9.0, 5.4))
-    plot_pp_probe_geometry(ax=ax, language=_LANG)
+    emission.plot_pp_probe_geometry(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "pp_probe_geometry.svg")
     plt.close()
@@ -837,7 +859,7 @@ def generate_pp_probe_geometry(output_dir: str) -> None:
 def generate_sound_power_pressure_result(output_dir: str) -> None:
     """ISO 3744: enveloping-surface LW spectrum from hemisphere pressure levels."""
     print("Generating sound_power_pressure_result.png...")
-    from phonometry import RoomEnvironment, sound_power_pressure
+    from phonometry import emission
 
     # The sound-power guide's section-1 example: octave-band SPL at the 10
     # hemisphere positions of ISO 3744 (Annex B) around a machine on one
@@ -850,10 +872,10 @@ def generate_sound_power_pressure_result(output_dir: str) -> None:
     rng = np.random.default_rng(0)
     levels = base + rng.normal(0.0, 0.5, size=(10, 8))
     background = np.full((10, 8), 55.0)
-    result = sound_power_pressure(
+    result = emission.sound_power_pressure(
         levels, "hemisphere", radius=1.5, reflecting_planes=1,
         background_levels=background, frequencies=freqs,
-        room=RoomEnvironment(reverberation_time=0.6, volume=300.0),
+        room=emission.RoomEnvironment(reverberation_time=0.6, volume=300.0),
     )
 
     lw = result.sound_power_level
@@ -970,7 +992,7 @@ def generate_sound_power_intensity_result(output_dir: str) -> None:
 def generate_precision_anechoic_power(output_dir: str) -> None:
     """ISO 3745: precision LW spectrum from a hemisphere pressure measurement."""
     print("Generating precision_anechoic_power.png...")
-    from phonometry import sound_power_anechoic
+    from phonometry import emission
 
     # A mid-frequency-peaked machine measured over the 40-position hemisphere
     # array (ISO 3745 Annex E) in a hemi-anechoic room. levels_positions is the
@@ -982,8 +1004,8 @@ def generate_precision_anechoic_power(output_dir: str) -> None:
     base = 70.0 + 8.0 * np.exp(-(np.log2(freqs / 1000.0) ** 2) / 2.0)
     rng = np.random.default_rng(7)
     levels = base[None, :] + rng.normal(0.0, 1.0, (40, freqs.size))
-    result = sound_power_anechoic(levels, "hemisphere", radius=1.0,
-                                  frequencies=freqs)
+    result = emission.sound_power_anechoic(levels, "hemisphere", radius=1.0,
+                                           frequencies=freqs)
 
     lw = result.sound_power_level
     lwa = result.sound_power_level_a
@@ -1011,7 +1033,7 @@ def generate_intensity_scan_power(output_dir: str) -> None:
     print("Generating intensity_scan_power.png...")
     import warnings
 
-    from phonometry import sound_power_intensity_precision
+    from phonometry import emission
 
     # Four partial surfaces scanned over five one-third-octave bands. Each cell
     # of partial_intensity is the signed normal intensity In_i (W/m^2) already
@@ -1028,8 +1050,9 @@ def generate_intensity_scan_power(output_dir: str) -> None:
     partial_intensity[:, 0] = np.array([2.0e-6, -3.0e-6, -4.0e-6, -1.0e-6])
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        result = sound_power_intensity_precision(partial_intensity, areas,
-                                                 frequencies=freqs)
+        result = emission.sound_power_intensity_precision(
+            partial_intensity, areas, frequencies=freqs
+        )
 
     lw = result.sound_power_level
     neg = result.not_applicable_band
@@ -1067,7 +1090,7 @@ def generate_intensity_scan_power(output_dir: str) -> None:
 def generate_silencer_expansion_chamber(output_dir: str) -> None:
     """Expansion-chamber transmission loss for four area ratios (Bies 8.111)."""
     print("Generating silencer_expansion_chamber.svg...")
-    from phonometry import expansion_chamber
+    from phonometry import noise_control
 
     freqs = np.linspace(20.0, 2000.0, 2000)
     pipe_area, length = 0.01, 0.3
@@ -1076,7 +1099,9 @@ def generate_silencer_expansion_chamber(output_dir: str) -> None:
 
     _fig, ax = plt.subplots(figsize=(9.0, 5.2))
     for m, color in zip(ratios, colors):
-        res = expansion_chamber(freqs, length, m * pipe_area, pipe_area)
+        res = noise_control.expansion_chamber(
+            freqs, length, m * pipe_area, pipe_area
+        )
         peak = 10.0 * np.log10(1.0 + 0.25 * (m - 1.0 / m) ** 2)
         ax.plot(freqs, res.transmission_loss, color=color, lw=1.8,
                 label=f"$m$ = {int(m)}  →  {peak:.1f} dB")
@@ -1100,13 +1125,15 @@ def generate_silencer_insertion_loss(output_dir: str) -> None:
     print("Generating silencer_insertion_loss.svg...")
     import warnings as _warnings
 
-    from phonometry import expansion_chamber, radiating_piston
+    from phonometry import electroacoustics, noise_control
 
     pipe_area, rho, c = 0.01, 1.206, 343.0
     radius = float(np.sqrt(pipe_area / np.pi))
     z0 = rho * c / pipe_area                       # 41.4 kPa.s/m3
-    freqs = np.linspace(20.0, 880.0, 1600)         # up to the cut-on, 890.8 Hz
-    piston = radiating_piston(radius, freqs, speed_of_sound=c, density=rho)
+    freqs = np.linspace(20.0, 880.0, 1600)  # up to the cut-on, 890.8 Hz
+    piston = electroacoustics.radiating_piston(
+        radius, freqs, speed_of_sound=c, density=rho
+    )
     # Acoustic (not mechanical) radiation impedance of the open end:
     # Z_r = (rho c / S) (R_1 + j X_1), with the normalised R_1 / X_1 the
     # result carries as .resistance / .reactance.
@@ -1114,12 +1141,18 @@ def generate_silencer_insertion_loss(output_dir: str) -> None:
 
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        plain = expansion_chamber(freqs, 0.3, 0.04, pipe_area)
-        matched = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
-                                    source_impedance=z0, radiation_impedance=z_r)
-        stiff = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
-                                  source_impedance=20.0 * z0,
-                                  radiation_impedance=z_r)
+        plain = noise_control.expansion_chamber(freqs, 0.3, 0.04, pipe_area)
+        matched = noise_control.expansion_chamber(
+            freqs,
+            0.3,
+            0.04,
+            pipe_area,
+            source_impedance=z0,
+            radiation_impedance=z_r,
+        )
+        stiff = noise_control.expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                                                source_impedance=20.0 * z0,
+                                                radiation_impedance=z_r)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.axhline(0.0, color=COLOR_GRID, lw=1.0)
@@ -1161,7 +1194,7 @@ def generate_silencer_selection(output_dir: str) -> None:
     print("Generating silencer_selection.svg...")
     import warnings as _warnings
 
-    from phonometry import expansion_chamber, helmholtz_resonator
+    from phonometry import noise_control
     from phonometry.noise_control import hvac
 
     inch, foot = 0.0254, 0.3048
@@ -1170,9 +1203,14 @@ def generate_silencer_selection(output_dir: str) -> None:
 
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        chamber = expansion_chamber(freqs, 0.3, 0.04, 0.01)
-        branch = helmholtz_resonator(freqs, duct_area=0.01, neck_area=1e-4,
-                                     neck_length=0.0296, cavity_volume=1e-3)
+        chamber = noise_control.expansion_chamber(freqs, 0.3, 0.04, 0.01)
+        branch = noise_control.helmholtz_resonator(
+            freqs,
+            duct_area=0.01,
+            neck_area=1e-4,
+            neck_length=0.0296,
+            cavity_volume=1e-3,
+        )
     limit = float(chamber.plane_wave_limit or 8000.0)
     inside = freqs <= limit
 
@@ -1219,17 +1257,24 @@ def generate_silencer_extended_tube(output_dir: str) -> None:
     print("Generating silencer_extended_tube.svg...")
     import warnings as _warnings
 
-    from phonometry import expansion_chamber, extended_tube_chamber
+    from phonometry import noise_control
 
     freqs = np.linspace(20.0, 880.0, 2400)
     kwargs = {"length": 0.4, "chamber_area": 0.04, "pipe_area": 0.01}
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        plain = expansion_chamber(freqs, kwargs["length"], kwargs["chamber_area"],
-                                  kwargs["pipe_area"])
-        inlet = extended_tube_chamber(freqs, inlet_extension=0.1, **kwargs)
-        both = extended_tube_chamber(freqs, inlet_extension=0.1,
-                                     outlet_extension=0.2, **kwargs)
+        plain = noise_control.expansion_chamber(
+            freqs,
+            kwargs["length"],
+            kwargs["chamber_area"],
+            kwargs["pipe_area"],
+        )
+        inlet = noise_control.extended_tube_chamber(
+            freqs, inlet_extension=0.1, **kwargs
+        )
+        both = noise_control.extended_tube_chamber(
+            freqs, inlet_extension=0.1, outlet_extension=0.2, **kwargs
+        )
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.plot(freqs, plain.transmission_loss, color=COLOR_FG, lw=1.6, ls="--",
@@ -1278,12 +1323,12 @@ def generate_extended_tube_geometry(output_dir: str) -> None:
     print("Generating extended_tube_geometry.svg...")
     import warnings as _warnings
 
-    from phonometry import extended_tube_chamber
+    from phonometry import noise_control
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        result = extended_tube_chamber(
+        result = noise_control.extended_tube_chamber(
             np.linspace(20.0, 880.0, 800), length=0.4, chamber_area=0.04,
             pipe_area=0.01, inlet_extension=0.1, outlet_extension=0.2,
         )
@@ -1296,7 +1341,7 @@ def generate_extended_tube_geometry(output_dir: str) -> None:
 def generate_modulation_distortion(output_dir: str) -> None:
     """IEC 60268-3 14.12.7 modulation sidebands via ModulationDistortionResult.plot()."""
     print("Generating modulation_distortion.svg...")
-    from phonometry import modulation_distortion
+    from phonometry import electroacoustics
 
     # The standard two-tone test: a large low tone f1 = 60 Hz and a small high
     # tone f2 = 7 kHz (4:1), captured at the output of a weakly non-linear
@@ -1307,7 +1352,9 @@ def generate_modulation_distortion(output_dir: str) -> None:
     x = 1.0 * np.sin(2.0 * np.pi * 60.0 * t) + 0.25 * np.sin(2.0 * np.pi * 7000.0 * t)
     y = x + 0.04 * x**2 + 0.012 * x**3
 
-    res = modulation_distortion(y, fs, f_low=60.0, f_high=7000.0)
+    res = electroacoustics.modulation_distortion(
+        y, fs, f_low=60.0, f_high=7000.0
+    )
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() draws the carrier (0 dB reference) and the four
     # modulation sidebands at f2 +/- f1 and f2 +/- 2 f1, annotated with the
@@ -1322,11 +1369,13 @@ def generate_modulation_distortion(output_dir: str) -> None:
 def generate_piston_radiation_impedance(output_dir: str) -> None:
     """Baffled-piston R1/X1 against ka via RadiatingPistonResult.plot()."""
     print("Generating piston_radiation_impedance.svg...")
-    from phonometry import radiating_piston
+    from phonometry import electroacoustics
 
     # A 75 mm-radius piston (a typical mid-woofer cone) over the audio band:
     # ka runs from well below 0.1 (mass-controlled) past 10 (resistive).
-    res = radiating_piston(radius=0.075, frequencies=np.geomspace(20.0, 20000.0, 400))
+    res = electroacoustics.radiating_piston(
+        radius=0.075, frequencies=np.geomspace(20.0, 20000.0, 400)
+    )
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() draws the normalized radiation resistance R1 and
     # reactance X1 against ka (the classic Beranek & Mellow figure).
@@ -1408,7 +1457,7 @@ def generate_precision_positions_arrays(output_dir: str) -> None:
     are added only when the band level range demands it.
     """
     print("Generating precision_positions_arrays.svg...")
-    from phonometry import emission, plot_microphone_positions
+    from phonometry import emission
 
     hemi = emission.precision_positions("hemisphere", radius=1.0, count=40)
     sphere = emission.precision_positions("sphere", radius=1.0, count=20)
@@ -1420,7 +1469,7 @@ def generate_precision_positions_arrays(output_dir: str) -> None:
         1, 2, figsize=(13, 7.0), subplot_kw={"projection": "3d"})
     # Two colours through the scatter kwargs, so the escalation the standard
     # makes at position 20 reads straight off the array.
-    plot_microphone_positions(
+    emission.plot_microphone_positions(
         hemi, ax=axl, radius=1.0, language=_LANG,
         color=[COLOR_SECONDARY] * 20 + [COLOR_PRIMARY] * 20, s=36)
     # Forty numbered positions on one dome is the densest array the corpus
@@ -1457,7 +1506,9 @@ def generate_precision_positions_arrays(output_dir: str) -> None:
                label="positions 21-40: on escalation"),
     ], loc="upper left", fontsize=8)
 
-    plot_microphone_positions(sphere, ax=axr, radius=1.0, language=_LANG)
+    emission.plot_microphone_positions(
+        sphere, ax=axr, radius=1.0, language=_LANG
+    )
     # Nine labels to an axis ran the tick chain of the sphere's x axis into
     # itself ("−1.00" into "−0.75" into "−0.50"); the half-metre step reads
     # the same radius with room between the labels, and matches the ticks the
@@ -1691,7 +1742,7 @@ def generate_spacer_bandwidth(output_dir: str) -> None:
     the audio range.
     """
     print("Generating spacer_bandwidth.svg...")
-    from phonometry import sound_intensity
+    from phonometry import emission
 
     fs, c = 48000, 343.0
     n = fs  # one second of white noise: enough bands to read the bias off
@@ -1706,8 +1757,8 @@ def generate_spacer_bandwidth(output_dir: str) -> None:
     colours = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY)
     for (dr, colour) in zip((0.006, 0.012, 0.050), colours, strict=True):
         p2 = np.fft.irfft(spectrum * np.exp(-2j * np.pi * freqs * dr / c), n)
-        res = sound_intensity(noise, p2, fs, spacing=dr, fraction=3,
-                              limits=[20.0, 12500.0])
+        res = emission.sound_intensity(noise, p2, fs, spacing=dr, fraction=3,
+                                       limits=[20.0, 12500.0])
         # bias_correction is the compensating factor (k dr)/sin(k dr); the bias
         # itself is its reciprocal in decibels. Drop the bands the library
         # clamps at k dr = pi/2 so the curve stays the physics.
@@ -2004,13 +2055,19 @@ def generate_intensity_class(output_dir: str) -> None:
 def generate_silencer_side_branch(output_dir: str) -> None:
     """Helmholtz and quarter-wave side branches shorting the duct at tuning."""
     print("Generating silencer_side_branch.svg...")
-    from phonometry import helmholtz_resonator, quarter_wave_resonator
+    from phonometry import noise_control
 
     freqs = np.linspace(20.0, 600.0, 4000)
-    hr = helmholtz_resonator(freqs, duct_area=0.01, neck_area=1e-4,
-                             neck_length=0.02, cavity_volume=1e-3)
-    qw = quarter_wave_resonator(freqs, duct_area=0.01, length=0.3,
-                                branch_area=2e-3)
+    hr = noise_control.helmholtz_resonator(
+        freqs,
+        duct_area=0.01,
+        neck_area=1e-4,
+        neck_length=0.02,
+        cavity_volume=1e-3,
+    )
+    qw = noise_control.quarter_wave_resonator(
+        freqs, duct_area=0.01, length=0.3, branch_area=2e-3
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(freqs, hr.transmission_loss, color=COLOR_PRIMARY, lw=1.8,
@@ -2149,15 +2206,19 @@ def generate_duct_attenuation_elements(output_dir: str) -> None:
 def generate_duct_sheet_verification(output_dir: str) -> None:
     """Which rows of Long's Table 14.9 the printed equations reproduce."""
     print("Generating duct_sheet_verification.svg...")
-    from phonometry import fan_sound_power, nc_curve
+    from phonometry import noise_control, room
     from phonometry.noise_control import hvac
 
     inch, foot = 0.0254, 0.3048
     cfm, in_wg = 0.0004719474432, 249.0
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
 
-    fan = fan_sound_power(volume_flow=5000 * cfm, static_pressure=2 * in_wg,
-                          fan_type="forward_curved", relative_efficiency=80.0)
+    fan = noise_control.fan_sound_power(
+        volume_flow=5000 * cfm,
+        static_pressure=2 * in_wg,
+        fan_type="forward_curved",
+        relative_efficiency=80.0,
+    )
     flex = hvac.flexible_duct_insertion_loss(bands[:7], diameter=12 * inch,
                                              length=6 * foot)
     lined_small = hvac.lined_rectangular_duct_attenuation(
@@ -2167,7 +2228,9 @@ def generate_duct_sheet_verification(output_dir: str) -> None:
     diffuser = hvac.diffuser_sound_power(bands, (24 * inch) ** 2,
                                          volume_flow=312 * cfm,
                                          pressure_drop=0.05 * in_wg)
-    nc30 = np.asarray(nc_curve(30), dtype=float)[2:]   # OCTAVE_BANDS is 16 Hz up
+    nc30 = np.asarray(room.nc_curve(30), dtype=float)[
+        2:
+    ]  # OCTAVE_BANDS is 16 Hz up
 
     panels = (
         ("Fan, Eq. 13.1", [90, 86, 82, 79, 77, 75, 71, 61],
@@ -2217,7 +2280,7 @@ def generate_duct_sheet_verification(output_dir: str) -> None:
 def generate_duct_regenerated_noise(output_dir: str) -> None:
     """The two velocity laws of section 4, as slopes rather than as numbers."""
     print("Generating duct_regenerated_noise.svg...")
-    from phonometry import air_terminal_velocity_limit
+    from phonometry import noise_control
     from phonometry.noise_control import hvac
 
     inch, cfm, in_wg = 0.0254, 0.0004719474432, 249.0
@@ -2251,7 +2314,7 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
         ax.semilogx(bands, np.asarray(res.values), "o-", color=color, lw=1.8,
                     ms=4, label=f"{flow:.0f} cfm ({velocity:.1f} m/s)")
         ax.axvline(peak, color=color, lw=1.0, ls=":")
-    limit = air_terminal_velocity_limit(30, opening="supply")
+    limit = noise_control.air_terminal_velocity_limit(30, opening="supply")
     ax.annotate(f"peak band $f_\\mathrm{{P}} = 48.8\\,U_\\mathrm{{G}}$ moves "
                 f"up one octave per\n"
                 f"doubling of the face velocity; ASHRAE Table 9 caps\nthe "
@@ -2277,11 +2340,7 @@ def generate_duct_regenerated_noise(output_dir: str) -> None:
 def generate_fan_sound_power(output_dir: str) -> None:
     """The source row: the efficiency staircase and the blade-tone increment."""
     print("Generating fan_sound_power.svg...")
-    from phonometry import (
-        fan_casing_attenuation,
-        fan_efficiency_correction,
-        fan_sound_power,
-    )
+    from phonometry import noise_control
 
     cfm, in_wg = 0.0004719474432, 249.0
     volume_flow, static_pressure = 5000 * cfm, 2 * in_wg
@@ -2290,15 +2349,27 @@ def generate_fan_sound_power(output_dir: str) -> None:
     for efficiency, color, style in ((90.0, COLOR_TERTIARY, ":"),
                                      (80.0, COLOR_PRIMARY, "-"),
                                      (55.0, COLOR_SECONDARY, "--")):
-        fan = fan_sound_power(volume_flow, static_pressure,
-                              fan_type=fan_type,
-                              relative_efficiency=efficiency)
-        ax.semilogx(np.asarray(fan.frequencies), np.asarray(fan.values), style,
-                    color=color, lw=1.9, marker="o", ms=4,
-                    label=f"{efficiency:.0f} % of peak static efficiency "
-                          f"(+{fan_efficiency_correction(efficiency):.0f} dB)")
-    tone = fan_sound_power(volume_flow, static_pressure, fan_type=fan_type,
-                           relative_efficiency=80.0, blade_frequency=2000.0)
+        fan = noise_control.fan_sound_power(volume_flow, static_pressure,
+                                            fan_type=fan_type,
+                                            relative_efficiency=efficiency)
+        ax.semilogx(
+            np.asarray(fan.frequencies),
+            np.asarray(fan.values),
+            style,
+            color=color,
+            lw=1.9,
+            marker="o",
+            ms=4,
+            label=f"{efficiency:.0f} % of peak static efficiency "
+            f"(+{noise_control.fan_efficiency_correction(efficiency):.0f} dB)",
+        )
+    tone = noise_control.fan_sound_power(
+        volume_flow,
+        static_pressure,
+        fan_type=fan_type,
+        relative_efficiency=80.0,
+        blade_frequency=2000.0,
+    )
     # The same fan again, so the same colour: what changed is the blade tone,
     # not the fan. A shade back rather than an opacity back, which on the dark
     # page took the whole curve back to the page.
@@ -2306,7 +2377,7 @@ def generate_fan_sound_power(output_dir: str) -> None:
                 color=theme_line(COLOR_PRIMARY, ax, quiet=0.55), lw=1.0,
                 marker="^", ms=4,
                 label="the same fan with its blade tone at 2 kHz")
-    casing = fan_casing_attenuation()
+    casing = noise_control.fan_casing_attenuation()
     ax.semilogx(np.asarray(casing.frequencies), np.asarray(casing.values), "-.",
                 color=COLOR_FG, lw=1.6, marker="s", ms=4,
                 label="Casing attenuation (Table 13.8)")
@@ -2331,8 +2402,12 @@ def generate_fan_sound_power(output_dir: str) -> None:
 
     inset = ax.inset_axes((0.07, 0.22, 0.33, 0.26))
     grid = np.linspace(40.0, 100.0, 400)
-    inset.plot(grid, [fan_efficiency_correction(v) for v in grid],
-               color=COLOR_PRIMARY, lw=1.8)
+    inset.plot(
+        grid,
+        [noise_control.fan_efficiency_correction(v) for v in grid],
+        color=COLOR_PRIMARY,
+        lw=1.8,
+    )
     inset.set_xlabel("static efficiency [% of peak]", fontsize="x-small")
     inset.set_ylabel("$C_{\\mathrm{EFF}}$ [dB]", fontsize="x-small")
     inset.tick_params(labelsize="x-small")
@@ -2416,52 +2491,93 @@ def _long_duct_paths() -> tuple[Any, Any]:
     for the silencers and the terminal devices, so the figure shows what the
     published calculation delivers into the room rather than a re-derivation.
     """
-    from phonometry import DuctElement, duct_path
+    from phonometry import noise_control
 
     bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
     fan = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
     source = "Fan, centrifugal FC, 5000 cfm, 2 in w.g."
-    supply = duct_path(
-        bands, fan,
+    supply = noise_control.duct_path(
+        bands,
+        fan,
         [
-            DuctElement("Elbow, 36 x 24 in, unlined",
-                        [0, 1, 2, 3, 3, 3, 3, 3],
-                        [41, 39, 36, 29, 20, 6, 0, 0], code="2"),
-            DuctElement("Silencer, 3 ft, standard pressure drop",
-                        [7, 12, 16, 28, 35, 35, 28, 17],
-                        [49, 43, 44, 42, 42, 45, 35, 24], code="3"),
-            DuctElement("Duct, 36 x 24 in, 5 ft, 1 in lining",
-                        [2, 2, 3, 7, 15, 12, 11, 9], code="4"),
-            DuctElement("Split, 25 per cent", 6.0, code="5"),
-            DuctElement("Duct, 18 x 12 in, 6 ft, 1 in lining",
-                        [3, 3, 5, 11, 25, 22, 16, 13], code="6"),
-            DuctElement("Flexible duct, 12 in, 6 ft",
-                        [14, 14, 16, 15, 17, 22, 16, 13], code="7"),
-            DuctElement("Rectangular diffuser, 312 cfm", None,
-                        [33, 32, 29, 23, 15, 4, 0, 0], code="8"),
+            noise_control.DuctElement(
+                "Elbow, 36 x 24 in, unlined",
+                [0, 1, 2, 3, 3, 3, 3, 3],
+                [41, 39, 36, 29, 20, 6, 0, 0],
+                code="2",
+            ),
+            noise_control.DuctElement(
+                "Silencer, 3 ft, standard pressure drop",
+                [7, 12, 16, 28, 35, 35, 28, 17],
+                [49, 43, 44, 42, 42, 45, 35, 24],
+                code="3",
+            ),
+            noise_control.DuctElement(
+                "Duct, 36 x 24 in, 5 ft, 1 in lining",
+                [2, 2, 3, 7, 15, 12, 11, 9],
+                code="4",
+            ),
+            noise_control.DuctElement("Split, 25 per cent", 6.0, code="5"),
+            noise_control.DuctElement(
+                "Duct, 18 x 12 in, 6 ft, 1 in lining",
+                [3, 3, 5, 11, 25, 22, 16, 13],
+                code="6",
+            ),
+            noise_control.DuctElement(
+                "Flexible duct, 12 in, 6 ft",
+                [14, 14, 16, 15, 17, 22, 16, 13],
+                code="7",
+            ),
+            noise_control.DuctElement(
+                "Rectangular diffuser, 312 cfm",
+                None,
+                [33, 32, 29, 23, 15, 4, 0, 0],
+                code="8",
+            ),
         ],
         room_effect=[6, 6, 5, 5, 6, 7, 6, 6],
-        source_label=source, target=30.0, label="Supply",
+        source_label=source,
+        target=30.0,
+        label="Supply",
     )
-    ret = duct_path(
-        bands, fan,
+    ret = noise_control.duct_path(
+        bands,
+        fan,
         [
-            DuctElement("Elbow, 36 x 24 in, unlined",
-                        [0, 1, 2, 3, 3, 3, 3, 3],
-                        [43, 42, 39, 33, 24, 12, 0, 0], code="2"),
-            DuctElement("Silencer, 5 ft, low-frequency type",
-                        [16, 21, 35, 41, 41, 28, 21, 15],
-                        [51, 49, 53, 56, 56, 59, 60, 53], code="3"),
-            DuctElement("Elbow, 36 x 24 in, lined, 1 in",
-                        [1, 2, 3, 4, 5, 6, 8, 10],
-                        [39, 38, 34, 28, 18, 4, 0, 0], code="4"),
-            DuctElement("Plenum, 800 sq ft, 50 per cent lined",
-                        [12, 13, 19, 20, 20, 20, 21, 21], code="5"),
-            DuctElement("Rectangular grille, 24 x 24 in, 563 cfm", None,
-                        [30, 29, 26, 20, 12, 1, 0, 0], code="6"),
+            noise_control.DuctElement(
+                "Elbow, 36 x 24 in, unlined",
+                [0, 1, 2, 3, 3, 3, 3, 3],
+                [43, 42, 39, 33, 24, 12, 0, 0],
+                code="2",
+            ),
+            noise_control.DuctElement(
+                "Silencer, 5 ft, low-frequency type",
+                [16, 21, 35, 41, 41, 28, 21, 15],
+                [51, 49, 53, 56, 56, 59, 60, 53],
+                code="3",
+            ),
+            noise_control.DuctElement(
+                "Elbow, 36 x 24 in, lined, 1 in",
+                [1, 2, 3, 4, 5, 6, 8, 10],
+                [39, 38, 34, 28, 18, 4, 0, 0],
+                code="4",
+            ),
+            noise_control.DuctElement(
+                "Plenum, 800 sq ft, 50 per cent lined",
+                [12, 13, 19, 20, 20, 20, 21, 21],
+                code="5",
+            ),
+            noise_control.DuctElement(
+                "Rectangular grille, 24 x 24 in, 563 cfm",
+                None,
+                [30, 29, 26, 20, 12, 1, 0, 0],
+                code="6",
+            ),
         ],
         room_effect=[9, 8, 6, 8, 8, 8, 9, 10],
-        source_label=source, target=30.0, label="Return",
+        source_label=source,
+        target=30.0,
+        label="Return",
     )
     return supply, ret
 
@@ -2469,10 +2585,12 @@ def _long_duct_paths() -> tuple[Any, Any]:
 def generate_duct_path_cascade(output_dir: str) -> None:
     """Long Table 14.9 supply + return duct paths against NC 30."""
     print("Generating duct_path_cascade.svg...")
-    from phonometry import combine_duct_paths
+    from phonometry import noise_control
 
     supply, ret = _long_duct_paths()
-    total = combine_duct_paths([supply, ret], label="Supply + return")
+    total = noise_control.combine_duct_paths(
+        [supply, ret], label="Supply + return"
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() draws each contributing path, the received
@@ -2489,7 +2607,7 @@ def generate_duct_path_cascade(output_dir: str) -> None:
 def generate_enclosure_required_tl(output_dir: str) -> None:
     """Norton problem 4.16: the panel TL an enclosure needs, band by band."""
     print("Generating enclosure_required_tl.svg...")
-    from phonometry import enclosure_required_transmission_loss, mean_absorption
+    from phonometry import noise_control, room
 
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
     wool = [0.10, 0.20, 0.45, 0.65, 0.75, 0.80, 0.80, 0.80]
@@ -2499,10 +2617,12 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
     radiating = 2 * (2.5 * 2.5) + 2 * (3.5 * 2.5) + 2.5 * 3.5
     machine = 2 * (1.5 * 1.5) + 2 * (2.5 * 1.5) + 1.5 * 2.5
     bare_floor = 2.5 * 3.5 - 1.5 * 2.5
-    alpha = mean_absorption([(radiating, wool), (bare_floor + machine, concrete)])
+    alpha = room.mean_absorption(
+        [(radiating, wool), (bare_floor + machine, concrete)]
+    )
 
     def _required(model: str) -> Any:
-        return enclosure_required_transmission_loss(
+        return noise_control.enclosure_required_transmission_loss(
             lp1 - nc45, radiating, radiating + bare_floor + machine, alpha,
             frequencies=bands, model=model,
         )
@@ -2549,14 +2669,10 @@ def generate_enclosure_required_tl(output_dir: str) -> None:
 def generate_room_to_room_partitions(output_dir: str) -> None:
     """Norton problem 4.21: three partitions, one room, one gap curve."""
     print("Generating room_to_room_partitions.svg...")
-    from phonometry import (
-        SourceRoom,
-        equivalent_absorption_area,
-        room_to_room_transmission,
-    )
+    from phonometry import noise_control, room
 
     bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-    receiving = np.asarray(equivalent_absorption_area([
+    receiving = np.asarray(room.equivalent_absorption_area([
         (102.0, [0.04, 0.04, 0.09, 0.15, 0.17, 0.23]),   # walls
         (72.0, [0.02, 0.06, 0.14, 0.37, 0.60, 0.66]),    # floor
         (72.0, [0.30, 0.20, 0.15, 0.05, 0.05, 0.05]),    # ceiling
@@ -2575,9 +2691,9 @@ def generate_room_to_room_partitions(output_dir: str) -> None:
 
     ax = axes[0]
     for label, tl, color, style in partitions:
-        res = room_to_room_transmission(
+        res = noise_control.room_to_room_transmission(
             bands, tl, wall_area, receiving,
-            source=SourceRoom(level=90.0), label=label,
+            source=noise_control.SourceRoom(level=90.0), label=label,
         )
         gap = np.asarray(res.noise_reduction, dtype=float) - np.asarray(tl)
         ax.semilogx(bands, gap, style, color=color, lw=1.8, ms=7,
@@ -2629,14 +2745,7 @@ def _norton_plant_room_chain() -> Any:
     8 x 10 x 3 m plant room, the transmission loss of the separating wall and
     the carpeted floor of the 5 x 5 x 3 m operator room.
     """
-    from phonometry import (
-        DesignCriterion,
-        SourceRoom,
-        equivalent_absorption_area,
-        mean_absorption,
-        room_constant,
-        room_to_room_transmission,
-    )
+    from phonometry import noise_control, room
 
     bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
     ceiling = [0.07, 0.20, 0.40, 0.52, 0.60, 0.67]
@@ -2651,21 +2760,23 @@ def _norton_plant_room_chain() -> Any:
         (25.0, ceiling),
         (60.0, walls),
     ]
-    return room_to_room_transmission(
+    return noise_control.room_to_room_transmission(
         bands,
         [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],
         5.0 * 3.0,
-        equivalent_absorption_area(operator),
-        source=SourceRoom(
+        room.equivalent_absorption_area(operator),
+        source=noise_control.SourceRoom(
             power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-            room_constant=room_constant(268.0, mean_absorption(plant)),
+            room_constant=room.room_constant(
+                268.0, room.mean_absorption(plant)
+            ),
             # The blower sits on the floor along the middle of a wall (Q = 4)
             # and the problem asks for a conservative estimate, i.e. the
             # constant-volume sound power model of Norton Table 4.5.
             directivity=4.0,
             model="constant_volume",
         ),
-        criterion=DesignCriterion(target=45.0),
+        criterion=noise_control.DesignCriterion(target=45.0),
         label="Plant room to operator room",
     )
 
@@ -2692,13 +2803,13 @@ def generate_room_to_room_chain(output_dir: str) -> None:
 def generate_duct_mode_cut_on(output_dir: str) -> None:
     """Higher-order-mode cut-on ladder of a 254 mm steam line at 200 m/s."""
     print("Generating duct_mode_cut_on.svg...")
-    from phonometry import circular_duct_cut_on
+    from phonometry import noise_control
 
     # Norton & Karczub problem 7.1: a 254 mm circular duct carrying steam
     # (c = 405 m/s) at a mean flow velocity of 200 m/s, i.e. M = 0.494, where
     # the sqrt(1 - M^2) shift separates the two ladders visibly.
-    modes = circular_duct_cut_on(0.254, flow_velocity=200.0,
-                                 speed_of_sound=405.0, count=6)
+    modes = noise_control.circular_duct_cut_on(0.254, flow_velocity=200.0,
+                                               speed_of_sound=405.0, count=6)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() draws the still-air ladder, the with-flow
@@ -2714,14 +2825,14 @@ def generate_duct_mode_cut_on(output_dir: str) -> None:
 def generate_enclosure_insertion_loss(output_dir: str) -> None:
     """Machine-enclosure IL = R - C per band via EnclosureResult.plot()."""
     print("Generating enclosure_insertion_loss.svg...")
-    from phonometry import enclosure_insertion_loss
+    from phonometry import noise_control
 
     # A measured panel transmission loss combined with a modest interior
     # lining (mean absorption 0.3): the reverberant build-up inside the small
     # hard cavity spends part of the panel R.
     bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
     panel_r = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])
-    enc = enclosure_insertion_loss(
+    enc = noise_control.enclosure_insertion_loss(
         panel_r, external_area=6.0, internal_area=5.0,
         internal_absorption=0.3, frequencies=bands,
     )
@@ -2739,7 +2850,7 @@ def generate_phase_decomposition(output_dir: str) -> None:
     print("Generating phase_decomposition.svg...")
     from scipy import signal as sp_signal
 
-    from phonometry import phase_decomposition
+    from phonometry import signals
 
     # A strictly minimum-phase equalizer response (an RBJ +6 dB peaking biquad
     # at 1 kHz) measured through a 2.5 ms latency (a digital processing
@@ -2757,7 +2868,7 @@ def generate_phase_decomposition(output_dir: str) -> None:
     imp[delay] = 1.0
     ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
 
-    res = phase_decomposition(np.fft.rfft(ir), fs)
+    res = signals.phase_decomposition(np.fft.rfft(ir), fs)
     # The result's own .plot() draws three stacked panels: |H|, the measured /
     # minimum / excess phases and the total and excess group delays.
     res.plot()
@@ -2784,7 +2895,7 @@ def _r128_noise_programme(sections: list[tuple[float, float]], fs: int) -> np.nd
 def generate_loudness_gating(output_dir: str) -> None:
     """BS.1770 gating: a long quiet tail does not drag the integrated loudness."""
     print("Generating loudness_gating.svg...")
-    from phonometry import program_loudness
+    from phonometry import broadcast
 
     # 20 s of programme material on the -23 LUFS target followed by 40 s of
     # quiet room ambience ~29 LU lower: the -70 LUFS absolute gate keeps
@@ -2793,11 +2904,12 @@ def generate_loudness_gating(output_dir: str) -> None:
     # ungated mean sinks. The programme is loudness-normalised to -23.0 LUFS
     # first, exactly as a delivery workflow would.
     fs = 48000
-    from phonometry import integrated_loudness
 
     x = _r128_noise_programme([(-23.0, 20.0), (-52.0, 40.0)], fs)
-    x *= 10.0 ** ((-23.0 - integrated_loudness(np.vstack([x, x]), fs)) / 20.0)
-    res = program_loudness(np.vstack([x, x]), fs)
+    x *= 10.0 ** (
+        (-23.0 - broadcast.integrated_loudness(np.vstack([x, x]), fs)) / 20.0
+    )
+    res = broadcast.program_loudness(np.vstack([x, x]), fs)
 
     _fig, ax = plt.subplots(figsize=(10.5, 5.8))
     # The result's own .plot() draws the momentary and short-term traces, the
@@ -2820,7 +2932,7 @@ def generate_loudness_gating(output_dir: str) -> None:
 def generate_loudness_range(output_dir: str) -> None:
     """EBU Tech 3342 loudness range on its two-step reference case (LRA = 10 LU)."""
     print("Generating loudness_range.svg...")
-    from phonometry import program_loudness
+    from phonometry import broadcast
 
     # EBU Tech 3342 test case 1: 20 s at -20 dBFS then 20 s at -30 dBFS. The
     # short-term distribution has two plateaus 10 LU apart, and the P10-P95
@@ -2830,7 +2942,7 @@ def generate_loudness_range(output_dir: str) -> None:
     tone = np.sin(2.0 * np.pi * 1000.0 * t)
     x = np.concatenate([10.0 ** (-20.0 / 20.0) * tone,
                         10.0 ** (-30.0 / 20.0) * tone])
-    res = program_loudness(np.vstack([x, x]), fs)
+    res = broadcast.program_loudness(np.vstack([x, x]), fs)
 
     _fig, ax = plt.subplots(figsize=(10.5, 5.8))
     # The result's own .plot() shades the loudness range between its 10th and
@@ -3039,7 +3151,7 @@ def generate_feedback_stability(output_dir: str) -> None:
 def generate_microphone_patterns(output_dir: str) -> None:
     """The first-order family and the directivity index each member returns."""
     print("Generating microphone_patterns...")
-    from phonometry import MicrophoneDirectivity, microphone_characteristics
+    from phonometry import electroacoustics
 
     freqs = np.geomspace(20.0, 20000.0, 200)
     response = -10.0 * np.log10(1.0 + (30.0 / freqs) ** 4)
@@ -3065,10 +3177,15 @@ def generate_microphone_patterns(output_dir: str) -> None:
         polar_db = 20.0 * np.log10(
             np.maximum(np.abs((1.0 - b) + b * np.cos(np.radians(angles))),
                        10 ** (-30.0 / 20.0)))
-        res = microphone_characteristics(
-            freqs, response, 12.5, tolerance_db=3.0,
-            directivity=MicrophoneDirectivity(polar=(angles, polar_db),
-                                              frequency=1000.0))
+        res = electroacoustics.microphone_characteristics(
+            freqs,
+            response,
+            12.5,
+            tolerance_db=3.0,
+            directivity=electroacoustics.MicrophoneDirectivity(
+                polar=(angles, polar_db), frequency=1000.0
+            ),
+        )
         assert res.directivity_index_db is not None, "polar input gives a DI"
         di = float(res.directivity_index_db)
         mag = np.maximum(np.abs((1.0 - b) + b * np.cos(theta)),
@@ -3172,15 +3289,17 @@ def generate_microphone_noise_weightings(output_dir: str) -> None:
 def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
     """Each separated order is a full frequency response, not a number."""
     print("Generating swept_sine_harmonic_responses...")
-    from phonometry import swept_sine_distortion, synchronized_sweep_signal
+    from phonometry import electroacoustics
 
     fs = 48000
     f1, f2, seconds = 20.0, 6000.0, 4.0
     a2, a3 = 0.12, 0.08
-    x = synchronized_sweep_signal(fs, f1, f2, seconds)
+    x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
     b, a = scipy_signal.butter(2, 3000.0, fs=fs)
     y = scipy_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-    res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
+    res = electroacoustics.swept_sine_distortion(
+        y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
+    )
 
     h1_ref = 1.0 + 3.0 * a3 / 4.0
     _fig, ax = plt.subplots(figsize=(10, 6))
@@ -3223,12 +3342,12 @@ def generate_swept_sine_harmonic_responses(output_dir: str) -> None:
 def generate_swept_sine_methods(output_dir: str) -> None:
     """Synchronized against Farina on one recording: band and phase."""
     print("Generating swept_sine_methods...")
-    from phonometry import swept_sine_distortion, synchronized_sweep_signal
+    from phonometry import electroacoustics
 
     fs = 48000
     f1, f2, seconds = 20.0, 6000.0, 4.0
     a2, a3 = 0.12, 0.08
-    x = synchronized_sweep_signal(fs, f1, f2, seconds)
+    x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
     # The memoryless cubic, with no post-filter: the Chebyshev identities then
     # fix |H2| = a2/2 and arg H2 = -pi/2 at every frequency, so any departure
     # on the figure is the method and not the device.
@@ -3237,9 +3356,12 @@ def generate_swept_sine_methods(output_dir: str) -> None:
     # The synchronized generator quantises the duration slightly; the Farina
     # analysis of the same recording has to be told the length it really is.
     actual = len(x) / fs
-    sync = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=actual, n_harmonics=3)
-    farina = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=actual, n_harmonics=3,
-                                   method="farina")
+    sync = electroacoustics.swept_sine_distortion(
+        y, fs, f1=f1, f2=f2, seconds=actual, n_harmonics=3
+    )
+    farina = electroacoustics.swept_sine_distortion(
+        y, fs, f1=f1, f2=f2, seconds=actual, n_harmonics=3, method="farina"
+    )
 
     _fig, (ax_mag, ax_ph) = plt.subplots(
         2, 1, figsize=(10, 8.0), sharex=True,

@@ -27,10 +27,7 @@ within ~1.5 phon.  Annex C.1 is therefore the tone oracle used.
 import numpy as np
 import pytest
 
-from phonometry import (
-    MooreGlasbergTimeVaryingLoudness,
-    loudness_moore_glasberg_time,
-)
+from phonometry import psychoacoustics
 from phonometry.psychoacoustics.loudness.moore_glasberg_time import _ALPHA_AL, _ALPHA_RL
 
 FS = 32000.0  # the Annex B/C sampling rate; keeps reference tones on FFT bins
@@ -57,7 +54,7 @@ def mg_tone():
     recomputations without touching any oracle or tolerance. The returned
     ``MooreGlasbergTimeVaryingLoudness`` is never mutated by callers.
     """
-    cache: dict[tuple, MooreGlasbergTimeVaryingLoudness] = {}
+    cache: dict[tuple, psychoacoustics.MooreGlasbergTimeVaryingLoudness] = {}
 
     def get(
         frequency: float,
@@ -65,10 +62,10 @@ def mg_tone():
         *,
         field: str = "free",
         presentation: str = "binaural",
-    ) -> MooreGlasbergTimeVaryingLoudness:
+    ) -> psychoacoustics.MooreGlasbergTimeVaryingLoudness:
         key = (frequency, level_db, field, presentation)
         if key not in cache:
-            cache[key] = loudness_moore_glasberg_time(
+            cache[key] = psychoacoustics.loudness_moore_glasberg_time(
                 _tone(frequency, level_db), FS, field=field, presentation=presentation
             )
         return cache[key]
@@ -106,7 +103,7 @@ def test_anchor_holds_at_native_sample_rates(fs: float, expected_n_max: float) -
     """
     t = np.arange(round(0.5 * fs)) / fs
     x = np.sqrt(2.0) * 2e-5 * 10.0 ** (40.0 / 20.0) * np.sin(2.0 * np.pi * 1000.0 * t)
-    res = loudness_moore_glasberg_time(x, fs)
+    res = psychoacoustics.loudness_moore_glasberg_time(x, fs)
     assert res.n_max == pytest.approx(expected_n_max, abs=0.003)
 
 
@@ -213,7 +210,7 @@ def test_annex_c3_multi_tone(
     uncertainty.
     """
     x = np.sum([_tone(f, level_db) for f in freqs], axis=0)
-    res = loudness_moore_glasberg_time(x, FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(x, FS)
     assert res.n_max == pytest.approx(sone, rel=0.04)
     assert res.loudness_level_max == pytest.approx(phon, abs=0.5)
 
@@ -225,10 +222,11 @@ def test_annex_c3_multi_tone(
 
 def test_steady_matches_iso532_2_stationary() -> None:
     """A long steady tone converges to the ISO 532-2 stationary loudness."""
-    from phonometry import loudness_moore_glasberg_from_spectrum
 
-    stationary = loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
-    res = loudness_moore_glasberg_time(_tone(1000.0, 60.0), FS)
+    stationary = psychoacoustics.loudness_moore_glasberg_from_spectrum(
+        [(1000.0, 60.0)]
+    )
+    res = psychoacoustics.loudness_moore_glasberg_time(_tone(1000.0, 60.0), FS)
     # Both models share the excitation/specific-loudness machinery (different
     # calibration constants); agree well within the standard's uncertainty.
     assert res.n_max == pytest.approx(stationary.loudness, rel=0.05)
@@ -241,7 +239,9 @@ def test_steady_matches_iso532_2_stationary() -> None:
 
 def test_steady_tone_gives_flat_trace() -> None:
     """A steady tone gives an essentially flat long-term-loudness trace."""
-    res = loudness_moore_glasberg_time(_tone(1000.0, 50.0, duration=1.5), FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(
+        _tone(1000.0, 50.0, duration=1.5), FS
+    )
     steady = res.long_term_loudness[res.time > 0.8]
     assert steady.std() < 0.02
     assert res.long_term_loudness[-1] == pytest.approx(res.n_max, rel=1e-3)
@@ -249,7 +249,7 @@ def test_steady_tone_gives_flat_trace() -> None:
 
 def test_short_term_reacts_faster_than_long_term() -> None:
     """Short-term loudness rises faster and peaks higher than long-term."""
-    res = loudness_moore_glasberg_time(_tone(1000.0, 60.0), FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(_tone(1000.0, 60.0), FS)
     stl, ltl, time = (
         res.short_term_loudness,
         res.long_term_loudness,
@@ -269,7 +269,7 @@ def test_release_is_slower_than_attack() -> None:
     and the long-term averager is deliberately sluggish (clause 7.9).
     """
     burst = np.concatenate([_tone(1000.0, 60.0, duration=0.3), np.zeros(int(0.7 * FS))])
-    res = loudness_moore_glasberg_time(burst, FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(burst, FS)
     stl, ltl, time = (
         res.short_term_loudness,
         res.long_term_loudness,
@@ -288,7 +288,9 @@ def test_release_is_slower_than_attack() -> None:
 
 def test_silence_is_zero() -> None:
     """Silence yields a zero loudness trace and zero peak."""
-    res = loudness_moore_glasberg_time(np.zeros(int(0.3 * FS)), FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(
+        np.zeros(int(0.3 * FS)), FS
+    )
     assert res.n_max == 0.0
     assert np.all(res.short_term_loudness == 0.0)
     assert np.all(res.long_term_loudness == 0.0)
@@ -302,7 +304,9 @@ def test_louder_tone_is_louder() -> None:
     long-term averager has settled (attack ~100 ms).
     """
     values = [
-        loudness_moore_glasberg_time(_tone(1000.0, lvl, duration=0.7), FS).n_max
+        psychoacoustics.loudness_moore_glasberg_time(
+            _tone(1000.0, lvl, duration=0.7), FS
+        ).n_max
         for lvl in (30.0, 50.0, 70.0)
     ]
     assert values[0] < values[1] < values[2]
@@ -315,10 +319,10 @@ def test_louder_tone_is_louder() -> None:
 
 def test_result_fields_and_percentiles() -> None:
     """The result exposes consistent traces, percentiles and metadata."""
-    res = loudness_moore_glasberg_time(
+    res = psychoacoustics.loudness_moore_glasberg_time(
         _tone(1000.0, 60.0), FS, percentiles=(5.0, 50.0, 95.0)
     )
-    assert isinstance(res, MooreGlasbergTimeVaryingLoudness)
+    assert isinstance(res, psychoacoustics.MooreGlasbergTimeVaryingLoudness)
     n = res.time.size
     assert res.short_term_loudness.shape == (n,)
     assert res.long_term_loudness.shape == (n,)
@@ -339,8 +343,10 @@ def test_diotic_equals_binaural_and_exceeds_monaural() -> None:
     duration effect.
     """
     tone = _tone(1000.0, 60.0, duration=0.7)
-    binaural = loudness_moore_glasberg_time(tone, FS, presentation="binaural")
-    monaural = loudness_moore_glasberg_time(
+    binaural = psychoacoustics.loudness_moore_glasberg_time(
+        tone, FS, presentation="binaural"
+    )
+    monaural = psychoacoustics.loudness_moore_glasberg_time(
         tone, FS, field="eardrum", presentation="monaural"
     )
     assert binaural.n_max > monaural.n_max
@@ -353,8 +359,8 @@ def test_stereo_input_accepted() -> None:
     """
     tone = _tone(1000.0, 60.0, duration=0.7)
     stereo = np.column_stack([tone, tone])
-    res = loudness_moore_glasberg_time(stereo, FS)
-    mono = loudness_moore_glasberg_time(tone, FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(stereo, FS)
+    mono = psychoacoustics.loudness_moore_glasberg_time(tone, FS)
     # Identical channels == diotic presentation.
     assert res.n_max == pytest.approx(mono.n_max, rel=1e-6)
 
@@ -392,7 +398,9 @@ def test_dichotic_ltl_is_per_ear_then_summed() -> None:
         [np.zeros(int(0.15 * FS)), _tone(1000.0, 55.0, 0.2), np.zeros(int(0.15 * FS))]
     )
     n = min(left.size, right.size)
-    res = loudness_moore_glasberg_time(np.column_stack([left[:n], right[:n]]), FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(
+        np.column_stack([left[:n], right[:n]]), FS
+    )
     old = _sum_then_agc(res.short_term_loudness)
     # (a) The fix changes the dichotic result substantially.
     assert np.max(np.abs(res.long_term_loudness - old)) > 0.1
@@ -400,7 +408,9 @@ def test_dichotic_ltl_is_per_ear_then_summed() -> None:
     # (b) A diotic input is byte-identical to the old sum-then-AGC (regression);
     # the identity is algebraic, so 0.7 s is as strong as any length.
     tone = _tone(1000.0, 60.0, duration=0.7)
-    diotic = loudness_moore_glasberg_time(np.column_stack([tone, tone]), FS)
+    diotic = psychoacoustics.loudness_moore_glasberg_time(
+        np.column_stack([tone, tone]), FS
+    )
     assert np.array_equal(
         diotic.long_term_loudness, _sum_then_agc(diotic.short_term_loudness)
     )
@@ -417,7 +427,7 @@ def test_anchor_oracle_is_byte_identical() -> None:
     asserted elsewhere in this file). It only detects unintended numerical
     drift; update it deliberately when the chain legitimately changes.
     """
-    res = loudness_moore_glasberg_time(_tone(1000.0, 40.0), FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(_tone(1000.0, 40.0), FS)
     assert res.n_max == pytest.approx(1.0000044713237626, abs=1e-12)
     assert res.loudness_level_max == pytest.approx(40.00005907615314, abs=1e-9)
 
@@ -454,28 +464,32 @@ def test_invalid_inputs_raise() -> None:
     """Invalid field, presentation, sampling rate and signal raise ValueError."""
     tone = _tone(1000.0, 40.0, duration=0.1)
     with pytest.raises(ValueError, match="field must be one of"):
-        loudness_moore_glasberg_time(tone, FS, field="bogus")
+        psychoacoustics.loudness_moore_glasberg_time(tone, FS, field="bogus")
     with pytest.raises(ValueError, match="presentation must be one of"):
-        loudness_moore_glasberg_time(tone, FS, presentation="bogus")
+        psychoacoustics.loudness_moore_glasberg_time(
+            tone, FS, presentation="bogus"
+        )
     with pytest.raises(
         ValueError, match="'fs' must be a positive sampling rate"
     ):
-        loudness_moore_glasberg_time(tone, -1.0)
+        psychoacoustics.loudness_moore_glasberg_time(tone, -1.0)
     empty = np.array([])
     with pytest.raises(ValueError, match="Input signal cannot be empty"):
-        loudness_moore_glasberg_time(empty, FS)
+        psychoacoustics.loudness_moore_glasberg_time(empty, FS)
     with_nan = np.array([1.0, np.nan, 2.0])
     with pytest.raises(
         ValueError, match="Input signal must contain only finite values"
     ):
-        loudness_moore_glasberg_time(with_nan, FS)
+        psychoacoustics.loudness_moore_glasberg_time(with_nan, FS)
 
 
 def test_plot_smoke() -> None:
     """The lazy .plot() renders without error when matplotlib is present."""
     matplotlib = pytest.importorskip("matplotlib")
     matplotlib.use("Agg")
-    res = loudness_moore_glasberg_time(_tone(1000.0, 60.0, duration=0.4), FS)
+    res = psychoacoustics.loudness_moore_glasberg_time(
+        _tone(1000.0, 60.0, duration=0.4), FS
+    )
     ax = res.plot()
     assert ax.get_ylabel() == "Loudness [sone]"
 

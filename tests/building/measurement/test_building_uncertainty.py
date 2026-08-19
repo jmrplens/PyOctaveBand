@@ -459,14 +459,14 @@ def test_annex_b_correlated_rw_uncertainty() -> None:
     """Formula (B.6) with the 0,1 dB shift gives u(Rw) = 1,9 dB."""
     import reference_data as ref
 
-    from phonometry import weighted_rating_extended
+    from phonometry import building
 
     ri = np.asarray(ref.ISO12999_1_ANNEX_B_RI)
     ui = np.asarray(ref.ISO12999_1_ANNEX_B_UI)
-    up = weighted_rating_extended(
+    up = building.weighted_rating_extended(
         ri + ui, ref.ISO12999_1_ANNEX_B_FREQ, one_decimal=True
     ).rating
-    down = weighted_rating_extended(
+    down = building.weighted_rating_extended(
         ri - ui, ref.ISO12999_1_ANNEX_B_FREQ, one_decimal=True
     ).rating
     assert (up - down) / 2.0 == pytest.approx(ref.ISO12999_1_ANNEX_B_U_CORR_RW)

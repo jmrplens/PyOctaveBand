@@ -18,21 +18,7 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import (
-    HarmonicDistortionResult,
-    difference_frequency_distortion,
-    dynamic_intermodulation_distortion,
-    dynamic_range,
-    harmonic_analysis,
-    harmonic_distortion,
-    idle_channel_noise,
-    modulation_distortion,
-    sinad,
-    thd,
-    thd_plus_noise,
-    total_difference_frequency_distortion,
-    weighted_thd,
-)
+from phonometry import electroacoustics
 
 FS = 48000
 N = 48000  # 1 s -> 1 Hz bin resolution, every test tone lands on a bin.
@@ -55,30 +41,38 @@ def _harmonic_signal() -> np.ndarray:
 
 def test_thd_f_matches_closed_form() -> None:
     x = _harmonic_signal()
-    assert thd(x, FS, 1000.0, kind="F") == pytest.approx(ref.DISTORTION_THD_F, rel=1e-6)
+    assert electroacoustics.thd(x, FS, 1000.0, kind="F") == pytest.approx(
+        ref.DISTORTION_THD_F, rel=1e-6
+    )
 
 
 def test_thd_r_matches_closed_form() -> None:
     x = _harmonic_signal()
-    assert thd(x, FS, 1000.0, kind="R") == pytest.approx(ref.DISTORTION_THD_R, rel=1e-6)
+    assert electroacoustics.thd(x, FS, 1000.0, kind="R") == pytest.approx(
+        ref.DISTORTION_THD_R, rel=1e-6
+    )
 
 
 def test_thd_auto_detects_fundamental() -> None:
     x = _harmonic_signal()
-    assert thd(x, FS) == pytest.approx(ref.DISTORTION_THD_F, rel=1e-6)
+    assert electroacoustics.thd(x, FS) == pytest.approx(
+        ref.DISTORTION_THD_F, rel=1e-6
+    )
 
 
 def test_nth_order_harmonic_distortion() -> None:
     x = _harmonic_signal()
-    assert harmonic_distortion(x, FS, fundamental=1000.0, order=2) == pytest.approx(
-        ref.DISTORTION_D2, rel=1e-6
-    )
+    assert electroacoustics.harmonic_distortion(
+        x, FS, fundamental=1000.0, order=2
+    ) == pytest.approx(ref.DISTORTION_D2, rel=1e-6)
 
 
 def test_harmonic_distortion_rejects_order_below_two() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        harmonic_distortion(tone, FS, fundamental=1000.0, order=1)
+        electroacoustics.harmonic_distortion(
+            tone, FS, fundamental=1000.0, order=1
+        )
 
 
 def test_thd_plus_noise_recovers_noise_floor() -> None:
@@ -92,11 +86,13 @@ def test_thd_plus_noise_recovers_noise_floor() -> None:
     expected = 0.01 * np.sqrt(band_fraction) / np.sqrt(0.5)
     # The notch also removes a small noise band, so the measured value is a
     # little below the broadband ratio.
-    assert thd_plus_noise(x, FS, 1000.0) == pytest.approx(expected, rel=0.1)
+    assert electroacoustics.thd_plus_noise(x, FS, 1000.0) == pytest.approx(
+        expected, rel=0.1
+    )
     # bandwidth=None restores the full-Nyquist measurement.
-    full = thd_plus_noise(x, FS, 1000.0, bandwidth=None)
+    full = electroacoustics.thd_plus_noise(x, FS, 1000.0, bandwidth=None)
     assert full == pytest.approx(0.01 / np.sqrt(0.5), rel=0.1)
-    assert full > thd_plus_noise(x, FS, 1000.0)
+    assert full > electroacoustics.thd_plus_noise(x, FS, 1000.0)
 
 
 def test_thd_plus_noise_aes17_bandwidth_at_high_fs() -> None:
@@ -107,8 +103,8 @@ def test_thd_plus_noise_aes17_bandwidth_at_high_fs() -> None:
     t = np.arange(fs) / fs
     rng = np.random.default_rng(7)
     x = np.sin(2 * np.pi * 1000.0 * t) + rng.standard_normal(fs) * 0.01
-    banded = thd_plus_noise(x, fs, 1000.0)
-    full = thd_plus_noise(x, fs, 1000.0, bandwidth=None)
+    banded = electroacoustics.thd_plus_noise(x, fs, 1000.0)
+    full = electroacoustics.thd_plus_noise(x, fs, 1000.0, bandwidth=None)
     expected_banded = 0.01 * np.sqrt((20000.0 - 20.0) / (fs / 2.0)) / np.sqrt(0.5)
     assert banded == pytest.approx(expected_banded, rel=0.1)
     gain_db = 20.0 * np.log10(full / banded)
@@ -122,47 +118,47 @@ def test_thd_plus_noise_dc_offset_not_counted() -> None:
     # must not be counted as noise (it previously produced THD+N = 0.577
     # for a 0.5 offset on a unit tone).
     x = _tone(1000.0) + 0.5
-    assert thd_plus_noise(x, FS, 1000.0) < 1e-3
+    assert electroacoustics.thd_plus_noise(x, FS, 1000.0) < 1e-3
 
 
 def test_sinad_is_negative_thd_plus_noise_db() -> None:
     rng = np.random.default_rng(1)
     x = _tone(1000.0) + rng.standard_normal(N) * 0.01
-    thdn_db = thd_plus_noise(x, FS, 1000.0, as_db=True)
-    assert sinad(x, FS, 1000.0) == pytest.approx(-thdn_db)
+    thdn_db = electroacoustics.thd_plus_noise(x, FS, 1000.0, as_db=True)
+    assert electroacoustics.sinad(x, FS, 1000.0) == pytest.approx(-thdn_db)
 
 
 def test_thd_plus_noise_pure_tone_is_tiny() -> None:
     # A pure fundamental has no distortion or noise; THD+N ~ 0.
-    assert thd_plus_noise(_tone(1000.0), FS, 1000.0) < 1e-3
+    assert electroacoustics.thd_plus_noise(_tone(1000.0), FS, 1000.0) < 1e-3
 
 
 def test_thd_plus_noise_rejects_q_out_of_range() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        thd_plus_noise(tone, FS, 1000.0, notch_q=5.0)
+        electroacoustics.thd_plus_noise(tone, FS, 1000.0, notch_q=5.0)
 
 
 def test_weighted_thd_attenuates_low_harmonics() -> None:
     # A-weighting attenuates a 100 Hz fundamental's 200 Hz harmonic relative to
     # the unweighted residual, so weighted THD < the plain harmonic ratio.
     x = _tone(100.0) + _tone(200.0, 0.1)
-    plain = thd(x, FS, 100.0, kind="R")
-    weighted = weighted_thd(x, FS, 100.0, weighting="A")
+    plain = electroacoustics.thd(x, FS, 100.0, kind="R")
+    weighted = electroacoustics.weighted_thd(x, FS, 100.0, weighting="A")
     assert 0.0 < weighted < plain
 
 
 def test_weighted_thd_rejects_bad_notch_q() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        weighted_thd(tone, FS, 1000.0, notch_q=5.0)
+        electroacoustics.weighted_thd(tone, FS, 1000.0, notch_q=5.0)
 
 
 def test_thd_plus_noise_rejects_fundamental_above_nyquist() -> None:
     # A fundamental at/above fs/2 cannot be notched (iirnotch would fail).
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        thd_plus_noise(tone, FS, FS / 2.0)
+        electroacoustics.thd_plus_noise(tone, FS, FS / 2.0)
 
 
 def test_modulation_distortion_iec_per_order() -> None:
@@ -180,7 +176,7 @@ def test_modulation_distortion_iec_per_order() -> None:
         + _tone(fh + 2 * fl, 0.01)
         + _tone(fh - 2 * fl, 0.01)
     )
-    res = modulation_distortion(x, FS, f_low=fl, f_high=fh)
+    res = electroacoustics.modulation_distortion(x, FS, f_low=fl, f_high=fh)
     assert res.d2 == pytest.approx(0.16, rel=1e-6)
     assert res.d3 == pytest.approx(0.08, rel=1e-6)
     # The SMPTE-analyzer combined RMS convention is kept, explicitly labelled.
@@ -201,7 +197,7 @@ def test_modulation_distortion_carries_sideband_spectrum() -> None:
         + _tone(fh + 2 * fl, 0.01)
         + _tone(fh - 2 * fl, 0.01)
     )
-    res = modulation_distortion(x, FS, f_low=fl, f_high=fh)
+    res = electroacoustics.modulation_distortion(x, FS, f_low=fl, f_high=fh)
     assert res.f_low == fl
     assert res.f_high == fh
     assert res.carrier_amplitude == pytest.approx(ah, rel=1e-6)
@@ -217,7 +213,6 @@ def test_modulation_distortion_carries_sideband_spectrum() -> None:
 def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
     import matplotlib.pyplot as plt
 
-    from phonometry import ModulationDistortionResult
 
     fl, fh = 250.0, 8000.0
     x = (
@@ -228,7 +223,7 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
         + _tone(fh + 2 * fl, 0.01)
         + _tone(fh - 2 * fl, 0.01)
     )
-    res = modulation_distortion(x, FS, f_low=fl, f_high=fh)
+    res = electroacoustics.modulation_distortion(x, FS, f_low=fl, f_high=fh)
     ax = res.plot()
     # The carrier marker sits at (f_high, 0 dB); the four sidebands read
     # 20*lg(a_s / carrier) re the carrier.
@@ -252,7 +247,9 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
     with pytest.raises(ValueError):
         res.plot(language="xx")
     # A hand-built result without the spectral fields cannot be plotted.
-    bare = ModulationDistortionResult(d2=0.1, d3=0.05, smpte=0.08)
+    bare = electroacoustics.ModulationDistortionResult(
+        d2=0.1, d3=0.05, smpte=0.08
+    )
     with pytest.raises(ValueError, match="no sideband spectrum"):
         bare.plot()
     plt.close("all")
@@ -272,12 +269,12 @@ def test_difference_frequency_distortion_iec() -> None:
         + _tone(2 * f1 - f2, 0.02)
         + _tone(2 * f2 - f1, 0.02)
     )
-    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=2) == pytest.approx(
-        0.03, rel=1e-6
-    )
-    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=3) == pytest.approx(
-        0.04, rel=1e-6
-    )
+    assert electroacoustics.difference_frequency_distortion(
+        x, FS, f1=f1, f2=f2, order=2
+    ) == pytest.approx(0.03, rel=1e-6)
+    assert electroacoustics.difference_frequency_distortion(
+        x, FS, f1=f1, f2=f2, order=3
+    ) == pytest.approx(0.04, rel=1e-6)
 
 
 def test_total_difference_frequency_distortion_iec() -> None:
@@ -295,13 +292,13 @@ def test_total_difference_frequency_distortion_iec() -> None:
         + _tone(2 * f2 - f1, 0.05)  # out-of-band product: must NOT count
     )
     expected = 0.03605551275463989  # sqrt(0.0013), exact
-    assert total_difference_frequency_distortion(x, FS) == pytest.approx(
-        expected, rel=1e-6
-    )
+    assert electroacoustics.total_difference_frequency_distortion(
+        x, FS
+    ) == pytest.approx(expected, rel=1e-6)
     # Explicit tone arguments give the same value as the standard defaults.
-    assert total_difference_frequency_distortion(x, FS, f1, f2) == pytest.approx(
-        expected, rel=1e-6
-    )
+    assert electroacoustics.total_difference_frequency_distortion(
+        x, FS, f1, f2
+    ) == pytest.approx(expected, rel=1e-6)
 
 
 def test_difference_frequency_clean_octave_tones_read_zero() -> None:
@@ -311,8 +308,18 @@ def test_difference_frequency_clean_octave_tones_read_zero() -> None:
     for f1, f2 in ((1000.0, 2000.0), (1000.0, 3000.0)):
         x = _tone(f1, 0.5) + _tone(f2, 0.5)
         # Numerical floor only (window leakage of the FFT at ~1e-16).
-        assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=2) < 1e-12
-        assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=3) < 1e-12
+        assert (
+            electroacoustics.difference_frequency_distortion(
+                x, FS, f1=f1, f2=f2, order=2
+            )
+            < 1e-12
+        )
+        assert (
+            electroacoustics.difference_frequency_distortion(
+                x, FS, f1=f1, f2=f2, order=3
+            )
+            < 1e-12
+        )
 
 
 def test_difference_frequency_dc_offset_not_counted() -> None:
@@ -320,18 +327,34 @@ def test_difference_frequency_dc_offset_not_counted() -> None:
     # (the old window at negative/zero product frequencies included bin 0).
     f1, f2 = 1000.0, 2500.0
     x = _tone(f1, 0.5) + _tone(f2, 0.5) + 0.5
-    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=3) < 1e-12
-    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=2) < 1e-12
+    assert (
+        electroacoustics.difference_frequency_distortion(
+            x, FS, f1=f1, f2=f2, order=3
+        )
+        < 1e-12
+    )
+    assert (
+        electroacoustics.difference_frequency_distortion(
+            x, FS, f1=f1, f2=f2, order=2
+        )
+        < 1e-12
+    )
 
 
 def test_difference_frequency_rejects_bad_args() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        difference_frequency_distortion(tone, FS, f1=2000.0, f2=1000.0)
+        electroacoustics.difference_frequency_distortion(
+            tone, FS, f1=2000.0, f2=1000.0
+        )
     with pytest.raises(ValueError):
-        difference_frequency_distortion(tone, FS, f1=1000.0, f2=2000.0, order=4)
+        electroacoustics.difference_frequency_distortion(
+            tone, FS, f1=1000.0, f2=2000.0, order=4
+        )
     with pytest.raises(ValueError):
-        total_difference_frequency_distortion(tone, FS, 2000.0, 1000.0)
+        electroacoustics.total_difference_frequency_distortion(
+            tone, FS, 2000.0, 1000.0
+        )
 
 
 def test_dynamic_intermodulation_distortion() -> None:
@@ -356,14 +379,14 @@ def test_dynamic_intermodulation_distortion() -> None:
     for c, a in zip(comps, amps):
         x = x + _tone(c, a)
     expected = math.sqrt(sum(a**2 for a in amps))
-    assert dynamic_intermodulation_distortion(x, FS) == pytest.approx(
-        expected, rel=1e-6
-    )
+    assert electroacoustics.dynamic_intermodulation_distortion(
+        x, FS
+    ) == pytest.approx(expected, rel=1e-6)
 
 
 def test_harmonic_analysis_bundle_and_plot() -> None:
-    res = harmonic_analysis(_harmonic_signal(), FS, 1000.0)
-    assert isinstance(res, HarmonicDistortionResult)
+    res = electroacoustics.harmonic_analysis(_harmonic_signal(), FS, 1000.0)
+    assert isinstance(res, electroacoustics.HarmonicDistortionResult)
     assert res.fundamental == pytest.approx(1000.0)
     assert res.thd_f == pytest.approx(ref.DISTORTION_THD_F, rel=1e-6)
     assert res.thd_r == pytest.approx(ref.DISTORTION_THD_R, rel=1e-6)
@@ -373,7 +396,12 @@ def test_harmonic_analysis_bundle_and_plot() -> None:
 
 
 @pytest.mark.parametrize(
-    "func", [thd, thd_plus_noise, lambda s, fs: sinad(s, fs)]
+    "func",
+    [
+        electroacoustics.thd,
+        electroacoustics.thd_plus_noise,
+        lambda s, fs: electroacoustics.sinad(s, fs),
+    ],
 )
 def test_rejects_non_finite_signal(func) -> None:  # type: ignore[no-untyped-def]
     bad = np.array([np.nan] * 100)
@@ -384,15 +412,15 @@ def test_rejects_non_finite_signal(func) -> None:  # type: ignore[no-untyped-def
 def test_rejects_bad_fs_and_kind() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        thd(tone, 0.0)
+        electroacoustics.thd(tone, 0.0)
     with pytest.raises(ValueError):
-        thd(tone, FS, 1000.0, kind="X")  # type: ignore[arg-type]
+        electroacoustics.thd(tone, FS, 1000.0, kind="X")  # type: ignore[arg-type]
 
 
 def test_rejects_too_short_signal() -> None:
     too_short = np.array([0.0, 1.0, 0.0])
     with pytest.raises(ValueError):
-        thd(too_short, FS)
+        electroacoustics.thd(too_short, FS)
 
 
 # ---------------------------------------------------------------------------
@@ -425,34 +453,36 @@ def test_itu_r_468_weighting_table_values() -> None:
     # ITU-R BS.468-4 Table 1 nominal response, including the +12.2 dB peak
     # at 6.3 kHz; interpolation between mask points is linear in dB over
     # log-frequency per the recommendation's own tolerance rule.
-    from phonometry import itu_r_468_weighting
 
     pins = {
         31.5: -29.9, 200.0: -13.8, 1000.0: 0.0, 2000.0: 5.6, 5000.0: 11.7,
         6300.0: 12.2, 10000.0: 8.1, 20000.0: -22.2, 31500.0: -42.7,
     }
     for f, db in pins.items():
-        assert itu_r_468_weighting([f])[0] == pytest.approx(db, abs=1e-9)
+        assert electroacoustics.itu_r_468_weighting([f])[0] == pytest.approx(
+            db, abs=1e-9
+        )
     # The 6.3 kHz table point is the curve's maximum.
     grid = np.geomspace(20.0, 31500.0, 20000)
-    curve = itu_r_468_weighting(grid)
+    curve = electroacoustics.itu_r_468_weighting(grid)
     assert float(np.max(curve)) == pytest.approx(12.2, abs=1e-3)
     assert grid[int(np.argmax(curve))] == pytest.approx(6300.0, rel=1e-3)
     # DC blocks completely; negative/non-finite frequencies are rejected.
-    assert itu_r_468_weighting([0.0])[0] == -np.inf
+    assert electroacoustics.itu_r_468_weighting([0.0])[0] == -np.inf
     with pytest.raises(ValueError):
-        itu_r_468_weighting([-100.0])
+        electroacoustics.itu_r_468_weighting([-100.0])
 
 
 def test_itu_r_468_matches_aes17_ccir_rms_table() -> None:
     # AES17-2015 Table 1 prints the same curve shifted by -5.63 dB (the
     # CCIR-RMS filter, unity at 2 kHz); cross-check a few rows within the
     # 0.05 dB rounding of the AES17 print.
-    from phonometry import itu_r_468_weighting
 
     aes17 = {63.0: -29.5, 3150.0: 3.4, 8000.0: 5.8, 12500.0: -5.6}
     for f, db in aes17.items():
-        assert itu_r_468_weighting([f])[0] - 5.63 == pytest.approx(db, abs=0.05)
+        assert electroacoustics.itu_r_468_weighting([f])[
+            0
+        ] - 5.63 == pytest.approx(db, abs=0.05)
 
 
 def test_weighted_thd_468_emphasises_6khz_products() -> None:
@@ -460,12 +490,14 @@ def test_weighted_thd_468_emphasises_6khz_products() -> None:
     # distortion product near the +12.2 dB peak is emphasised accordingly,
     # where A-weighting leaves it nearly unchanged (~+0.1 dB).
     x = _tone(100.0) + _tone(6300.0, 0.01)
-    w468 = weighted_thd(x, FS, 100.0)  # default weighting="468"
+    w468 = electroacoustics.weighted_thd(
+        x, FS, 100.0
+    )  # default weighting="468"
     assert w468 == pytest.approx(0.01 * 10.0 ** (12.2 / 20.0), rel=0.02)
-    w_a = weighted_thd(x, FS, 100.0, weighting="A")
+    w_a = electroacoustics.weighted_thd(x, FS, 100.0, weighting="A")
     assert w468 / w_a == pytest.approx(10.0 ** (12.2 / 20.0), rel=0.05)
     with pytest.raises(ValueError):
-        weighted_thd(x, FS, 100.0, weighting="B")  # type: ignore[arg-type]
+        electroacoustics.weighted_thd(x, FS, 100.0, weighting="B")  # type: ignore[arg-type]
 
 
 def test_thd_clipped_sine_fourier_oracle() -> None:
@@ -473,8 +505,10 @@ def test_thd_clipped_sine_fourier_oracle() -> None:
     # odd-harmonic amplitudes and THD_F from an independent single-period
     # Fourier series of the sampled waveform (reference_data/).
     x = np.clip(_tone(1000.0), -0.7, 0.7)
-    assert thd(x, FS, 1000.0) == pytest.approx(ref.CLIPPED_SINE_THD_F, rel=1e-9)
-    res = harmonic_analysis(x, FS, 1000.0)
+    assert electroacoustics.thd(x, FS, 1000.0) == pytest.approx(
+        ref.CLIPPED_SINE_THD_F, rel=1e-9
+    )
+    res = electroacoustics.harmonic_analysis(x, FS, 1000.0)
     b = res.harmonic_amplitudes
     assert b[0] == pytest.approx(ref.CLIPPED_SINE_B1, rel=1e-9)
     assert b[2] == pytest.approx(ref.CLIPPED_SINE_B3, rel=1e-9)
@@ -491,7 +525,7 @@ def test_thd_raises_when_no_harmonic_below_nyquist() -> None:
     # Nyquist: the THD is undefined and must raise, not return 0.
     tone_hf = _tone(20000.0)
     with pytest.raises(ValueError, match="Nyquist"):
-        thd(tone_hf, FS, 20000.0)
+        electroacoustics.thd(tone_hf, FS, 20000.0)
 
 
 def test_dim_full_signal_regression() -> None:
@@ -519,7 +553,7 @@ def test_dim_full_signal_regression() -> None:
     spec = np.abs(np.fft.rfft(y192)) * 2.0 / y192.size
     products = [750, 2400, 3900, 5550, 7050, 8700, 10200, 11850, 13350]
     oracle = float(np.sqrt(sum(spec[p] ** 2 for p in products)) / spec[15000])
-    value = dynamic_intermodulation_distortion(y192, fs)
+    value = electroacoustics.dynamic_intermodulation_distortion(y192, fs)
     assert abs(value - oracle) < 1e-3
     assert oracle > 0.01  # the nonlinearity produces measurable DIM
 
@@ -538,27 +572,31 @@ def test_idle_channel_noise_1khz_offset_closed_form() -> None:
     # -5.63 dB offset, and the 468 curve is 0 dB at 1 kHz. A 1 kHz sine at
     # -20 dBFS therefore reads exactly -20 - 5.63 = -25.63 dBFS CCIR-RMS.
     sig = _dbfs_sine_amplitude(-20.0) * _tone(1000.0)
-    assert idle_channel_noise(sig, FS) == pytest.approx(-25.63, abs=1e-3)
+    assert electroacoustics.idle_channel_noise(sig, FS) == pytest.approx(
+        -25.63, abs=1e-3
+    )
 
 
 def test_idle_channel_noise_2khz_unity() -> None:
     # The CCIR-RMS filter is unity at 2 kHz (by construction), so a 2 kHz sine
     # reads its own dBFS to within the 0.03 dB the -5.63 print rounds off.
     sig = _dbfs_sine_amplitude(-30.0) * _tone(2000.0)
-    assert idle_channel_noise(sig, FS) == pytest.approx(-30.0, abs=0.05)
+    assert electroacoustics.idle_channel_noise(sig, FS) == pytest.approx(
+        -30.0, abs=0.05
+    )
 
 
 def test_idle_channel_noise_scales_with_level() -> None:
     # Doubling the idle level raises the reported dBFS by 20*log10(2) = 6.02 dB.
     base = _dbfs_sine_amplitude(-40.0) * _tone(3150.0)
-    lo = idle_channel_noise(base, FS)
-    hi = idle_channel_noise(2.0 * base, FS)
+    lo = electroacoustics.idle_channel_noise(base, FS)
+    hi = electroacoustics.idle_channel_noise(2.0 * base, FS)
     assert hi - lo == pytest.approx(20.0 * math.log10(2.0), abs=1e-6)
 
 
 def test_idle_channel_noise_digital_zero_is_minus_inf() -> None:
     # Digital zero (silence, 3.14) carries no energy: the level is -inf dBFS.
-    assert idle_channel_noise(np.zeros(N), FS) == -math.inf
+    assert electroacoustics.idle_channel_noise(np.zeros(N), FS) == -math.inf
 
 
 def test_dynamic_range_closed_form_residual_at_2khz() -> None:
@@ -570,7 +608,9 @@ def test_dynamic_range_closed_form_residual_at_2khz() -> None:
     sig = sig + _dbfs_sine_amplitude(-40.0) * _tone(2000.0)
     # The 997 Hz notch trims a little of the 2 kHz residual, lifting DR ~0.4 dB
     # above the ideal 40 dB.
-    assert dynamic_range(sig, FS, 997.0) == pytest.approx(40.0, abs=0.6)
+    assert electroacoustics.dynamic_range(sig, FS, 997.0) == pytest.approx(
+        40.0, abs=0.6
+    )
 
 
 def test_dynamic_range_residual_at_1khz_uses_ccir_offset() -> None:
@@ -580,7 +620,7 @@ def test_dynamic_range_residual_at_1khz_uses_ccir_offset() -> None:
     sig = sig + _dbfs_sine_amplitude(-40.0) * _tone(1000.0)
     # The 997 Hz notch also attenuates the nearby 1 kHz residual, lifting DR a
     # little; check it clears the unweighted 40 dB by at least the offset.
-    assert dynamic_range(sig, FS, 997.0) > 45.0
+    assert electroacoustics.dynamic_range(sig, FS, 997.0) > 45.0
 
 
 def test_dynamic_range_monotonic_with_noise() -> None:
@@ -589,8 +629,8 @@ def test_dynamic_range_monotonic_with_noise() -> None:
     tone = _dbfs_sine_amplitude(-60.0) * _tone(997.0)
     noise = rng.standard_normal(N)
     noise /= math.sqrt(float(np.mean(noise**2)))
-    dr_quiet = dynamic_range(tone + 1e-4 * noise, FS, 997.0)
-    dr_noisy = dynamic_range(tone + 1e-3 * noise, FS, 997.0)
+    dr_quiet = electroacoustics.dynamic_range(tone + 1e-4 * noise, FS, 997.0)
+    dr_noisy = electroacoustics.dynamic_range(tone + 1e-3 * noise, FS, 997.0)
     assert dr_quiet > dr_noisy
     # A 10x louder noise floor costs 20 dB of dynamic range.
     assert dr_quiet - dr_noisy == pytest.approx(20.0, abs=1.0)
@@ -600,16 +640,16 @@ def test_dynamic_range_full_scale_reference() -> None:
     # Halving the full-scale reference halves the numerator: DR drops 6.02 dB.
     sig = _dbfs_sine_amplitude(-60.0) * _tone(997.0)
     sig = sig + _dbfs_sine_amplitude(-40.0) * _tone(2000.0)
-    dr1 = dynamic_range(sig, FS, 997.0, full_scale=1.0)
-    dr2 = dynamic_range(sig, FS, 997.0, full_scale=0.5)
+    dr1 = electroacoustics.dynamic_range(sig, FS, 997.0, full_scale=1.0)
+    dr2 = electroacoustics.dynamic_range(sig, FS, 997.0, full_scale=0.5)
     assert dr1 - dr2 == pytest.approx(20.0 * math.log10(2.0), abs=1e-6)
 
 
 def test_dynamic_range_rejects_bad_notch_q_and_full_scale() -> None:
     sig = _dbfs_sine_amplitude(-60.0) * _tone(997.0) + 1e-3 * _tone(2000.0)
     with pytest.raises(ValueError):
-        dynamic_range(sig, FS, 997.0, notch_q=0.5)
+        electroacoustics.dynamic_range(sig, FS, 997.0, notch_q=0.5)
     with pytest.raises(ValueError):
-        dynamic_range(sig, FS, 997.0, full_scale=0.0)
+        electroacoustics.dynamic_range(sig, FS, 997.0, full_scale=0.0)
     with pytest.raises(ValueError):
-        idle_channel_noise(sig, FS, full_scale=-1.0)
+        electroacoustics.idle_channel_noise(sig, FS, full_scale=-1.0)

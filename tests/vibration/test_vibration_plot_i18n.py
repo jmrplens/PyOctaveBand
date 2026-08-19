@@ -6,11 +6,13 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import rigid_mass_calibration_check, sdof_mobility_result
+from phonometry import vibration
 
 
 def _result():
-    return sdof_mobility_result(np.linspace(1.0, 50.0, 200), 2.0, 8000.0, 5.0)
+    return vibration.sdof_mobility_result(
+        np.linspace(1.0, 50.0, 200), 2.0, 8000.0, 5.0
+    )
 
 
 def test_spanish_labels() -> None:
@@ -35,7 +37,9 @@ def test_rigid_mass_spanish_labels() -> None:
 
     matplotlib.use("Agg")
     f = np.array([20.0, 100.0, 500.0])
-    res = rigid_mass_calibration_check([0.100, 0.102, 0.097], f, mass=10.0)
+    res = vibration.rigid_mass_calibration_check(
+        [0.100, 0.102, 0.097], f, mass=10.0
+    )
 
     axes_en = res.plot(language="en")
     assert axes_en[0].get_title() == "ISO 7626-2 rigid-mass calibration check (PASS)"
@@ -103,10 +107,9 @@ def test_fault_frequency_overlay_labels() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    from phonometry import bearing_fault_frequencies
 
-    res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                    contact_angle_deg=12.96)
+    res = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                              contact_angle_deg=12.96)
 
     ax_en = res.plot()
     assert ax_en.get_xlabel() == "Frequency [Hz]"
@@ -131,15 +134,15 @@ def test_fault_frequency_overlay_on_a_measured_spectrum() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    from phonometry import bearing_fault_frequencies, envelope_spectrum
+    from phonometry import signals
 
-    res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                    contact_angle_deg=12.96)
+    res = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                              contact_angle_deg=12.96)
     fs = 8192.0
     t = np.arange(int(fs)) / fs
     signal = (1.0 + 0.5 * np.cos(2.0 * np.pi * res["BPFO"] * t)) * np.cos(
         2.0 * np.pi * 2000.0 * t)
-    spectrum = envelope_spectrum(signal, fs)
+    spectrum = signals.envelope_spectrum(signal, fs)
 
     ax = res.plot(spectrum=spectrum, max_frequency=600.0)
     assert ax.get_ylabel() == "Envelope amplitude"
@@ -163,11 +166,10 @@ def test_crowded_fault_labels_do_not_overlap() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    from phonometry import bearing_fault_frequencies
     from phonometry._plot.vibration import _LABEL_WIDTH_PT, _label_offsets
 
-    res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                    contact_angle_deg=12.96)
+    res = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                              contact_angle_deg=12.96)
     ax = res.plot(max_frequency=1200.0)
     assert len(ax.texts) == len(res.lines)
 
@@ -189,10 +191,11 @@ def test_power_injection_labels() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    from phonometry import power_injection_clf
 
     f = np.array([250.0, 500.0, 1000.0])
-    res = power_injection_clf(f, 0.087, 0.013, 4.4e-3, 2.4e-3, 0.557, 0.606)
+    res = vibration.power_injection_clf(
+        f, 0.087, 0.013, 4.4e-3, 2.4e-3, 0.557, 0.606
+    )
 
     ax_en = res.plot()
     assert ax_en.get_xlabel() == "Frequency [Hz]"

@@ -25,43 +25,43 @@ from typing import TYPE_CHECKING
 import reference_data as ref
 
 if TYPE_CHECKING:
-    from phonometry import RoadEmissionCoefficients, RoadSurfaceCoefficients
+    from phonometry import environment
 
 
 @functools.cache
-def coefficients_2015() -> RoadEmissionCoefficients:
+def coefficients_2015() -> environment.RoadEmissionCoefficients:
     """Table F-1 as published in (EU) 2015/996, the workbook's own database.
 
     The studded-tyre, junction and temperature terms are unchanged by the 2021
     amendment, so they come from the shipped database rather than from a second
     transcription of identical numbers.
     """
-    from phonometry import ROAD_COEFFICIENTS, RoadEmissionCoefficients
+    from phonometry import environment
 
     table = ref.cnossos_road_2015_coefficients()
-    return RoadEmissionCoefficients(
+    return environment.RoadEmissionCoefficients(
         rolling_a={k: v["AR"] for k, v in table.items()},
         rolling_b={k: v["BR"] for k, v in table.items()},
         propulsion_a={k: v["AP"] for k, v in table.items()},
         propulsion_b={k: v["BP"] for k, v in table.items()},
-        studded_a=ROAD_COEFFICIENTS.studded_a,
-        studded_b=ROAD_COEFFICIENTS.studded_b,
-        junction_c=ROAD_COEFFICIENTS.junction_c,
-        temperature_k=ROAD_COEFFICIENTS.temperature_k,
+        studded_a=environment.ROAD_COEFFICIENTS.studded_a,
+        studded_b=environment.ROAD_COEFFICIENTS.studded_b,
+        junction_c=environment.ROAD_COEFFICIENTS.junction_c,
+        temperature_k=environment.ROAD_COEFFICIENTS.temperature_k,
     )
 
 
 @functools.cache
-def surfaces_2015() -> dict[str, RoadSurfaceCoefficients]:
+def surfaces_2015() -> dict[str, environment.RoadSurfaceCoefficients]:
     """Table F-4 as published in (EU) 2015/996, keyed by the workbook's ID.
 
     ``speed_range`` is ``None`` because the 2015 table printed no validity
     range for these rows; the ranges arrived with the 2021 amendment.
     """
-    from phonometry import RoadSurfaceCoefficients
+    from phonometry import environment
 
     return {
-        surface: RoadSurfaceCoefficients(
+        surface: environment.RoadSurfaceCoefficients(
             name=name, alpha=alpha, beta=beta, speed_range=None
         )
         for surface, (name, alpha, beta) in ref.cnossos_road_2015_surfaces().items()

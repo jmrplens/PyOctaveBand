@@ -148,11 +148,12 @@ def _side_branch_fields() -> tuple[Any, ...]:
     """
     import fdtd2d
 
-    from phonometry import quarter_wave_resonator
+    from phonometry import noise_control
 
     f_grid = np.linspace(20.0, 600.0, 4000)
-    resonances = quarter_wave_resonator(f_grid, duct_area=0.01, length=0.3,
-                                        branch_area=2e-3).resonances
+    resonances = noise_control.quarter_wave_resonator(
+        f_grid, duct_area=0.01, length=0.3, branch_area=2e-3
+    ).resonances
     if resonances is None:  # never for a closed stub; narrows the type
         raise RuntimeError("quarter_wave_resonator returned no resonances")
     f0 = float(resonances[0])

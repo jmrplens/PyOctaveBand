@@ -45,16 +45,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    LIMP_FRAME_CRITERIA,
-    PorousLayer,
-    PorousMediumResult,
-    decoupling_frequency,
-    johnson_champoux_allard,
-    layered_absorber,
-    limp_frame,
-    limp_frame_applicable,
-)
+from phonometry import materials
 
 #: A&A Table 11.2 (printed p. 254): soft fibrous material, 50 mm thick.
 TABLE_11_2: dict[str, float] = {
@@ -68,8 +59,8 @@ TABLE_11_2_FRAME_DENSITY = 30.0
 TABLE_11_2_THICKNESS = 0.050
 
 
-def _rigid(frequency: np.ndarray) -> PorousMediumResult:
-    return johnson_champoux_allard(
+def _rigid(frequency: np.ndarray) -> materials.PorousMediumResult:
+    return materials.johnson_champoux_allard(
         frequency, TABLE_11_2_RESISTIVITY, **TABLE_11_2
     )
 
@@ -80,27 +71,31 @@ def test_decoupling_frequency_allard_table_6_1() -> None:
     On the fully specified glass wool of Table 6.1 (printed p. 124), pure
     arithmetic gives ``40 000 x 0,94^2 / (2 pi x 130) = 43,27`` Hz.
     """
-    assert decoupling_frequency(
+    assert materials.decoupling_frequency(
         40.0e3, porosity=0.94, frame_density=130.0
     ) == pytest.approx(43.27, abs=0.005)
 
 
 def test_decoupling_frequency_scaling() -> None:
     """The closed form is quadratic in porosity and inverse in frame density."""
-    base = decoupling_frequency(25.0e3, porosity=0.5, frame_density=30.0)
-    assert decoupling_frequency(
+    base = materials.decoupling_frequency(
+        25.0e3, porosity=0.5, frame_density=30.0
+    )
+    assert materials.decoupling_frequency(
         25.0e3, porosity=1.0, frame_density=30.0
     ) == pytest.approx(4.0 * base)
-    assert decoupling_frequency(
+    assert materials.decoupling_frequency(
         25.0e3, porosity=0.5, frame_density=60.0
     ) == pytest.approx(0.5 * base)
 
 
 def test_decoupling_frequency_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="must be positive"):
-        decoupling_frequency(-1.0, porosity=0.98, frame_density=30.0)
+        materials.decoupling_frequency(-1.0, porosity=0.98, frame_density=30.0)
     with pytest.raises(ValueError, match="must not exceed 1"):
-        decoupling_frequency(25.0e3, porosity=1.5, frame_density=30.0)
+        materials.decoupling_frequency(
+            25.0e3, porosity=1.5, frame_density=30.0
+        )
 
 
 def test_limp_effective_density_matches_the_printed_closed_form() -> None:
@@ -111,7 +106,7 @@ def test_limp_effective_density_matches_the_printed_closed_form() -> None:
     """
     f = np.array([50.0, 125.0, 500.0, 2000.0])
     rigid = _rigid(f)
-    limp = limp_frame(
+    limp = materials.limp_frame(
         rigid, TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
     rho0 = rigid.air_density
@@ -130,7 +125,7 @@ def test_limp_frame_low_frequency_limit_is_the_apparent_total_density() -> None:
     unconstrained sample.
     """
     rigid = _rigid(np.array([1.0e-4]))
-    limp = limp_frame(
+    limp = materials.limp_frame(
         rigid, TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
     rho0 = rigid.air_density
@@ -154,13 +149,17 @@ def test_limp_frame_recovers_the_rigid_frame_for_a_heavy_frame() -> None:
     rigid = _rigid(f)
     errors = []
     for rho1 in (1.0e9, 1.0e12):
-        limp = limp_frame(rigid, rho1, porosity=TABLE_11_2["porosity"])
+        limp = materials.limp_frame(
+            rigid, rho1, porosity=TABLE_11_2["porosity"]
+        )
         errors.append(
             float(np.max(np.abs(limp.effective_density / rigid.effective_density - 1.0)))
         )
     assert errors[1] < 1.0e-5
     assert errors[0] / errors[1] == pytest.approx(1000.0, rel=0.05)
-    heavy = limp_frame(rigid, 1.0e12, porosity=TABLE_11_2["porosity"])
+    heavy = materials.limp_frame(
+        rigid, 1.0e12, porosity=TABLE_11_2["porosity"]
+    )
     assert np.allclose(
         heavy.characteristic_impedance, rigid.characteristic_impedance, rtol=1e-5
     )
@@ -171,7 +170,7 @@ def test_limp_frame_keeps_the_bulk_modulus_and_the_equivalent_fluid_relations() 
     """Only the density changes: ``Zc = sqrt(K_e rho_limp)``, ``k = w sqrt(rho_limp/K_e)``."""
     f = np.array([100.0, 400.0, 1600.0])
     rigid = _rigid(f)
-    limp = limp_frame(
+    limp = materials.limp_frame(
         rigid, TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
     assert np.array_equal(limp.bulk_modulus, rigid.bulk_modulus)
@@ -193,7 +192,7 @@ def test_limp_frame_keeps_the_bulk_modulus_and_the_equivalent_fluid_relations() 
 def test_limp_frame_stays_passive() -> None:
     """A passive medium keeps ``Re(Zc) > 0`` and ``Im(k) < 0``."""
     f = np.logspace(0.0, 4.0, 60)
-    limp = limp_frame(
+    limp = materials.limp_frame(
         _rigid(f), TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
     assert np.all(np.real(limp.characteristic_impedance) > 0.0)
@@ -207,7 +206,7 @@ def test_limp_and_rigid_converge_well_above_the_decoupling_frequency() -> None:
     effective densities agree to a few per cent, and at ``Fd`` itself they do
     not agree at all.
     """
-    fd = decoupling_frequency(
+    fd = materials.decoupling_frequency(
         TABLE_11_2_RESISTIVITY,
         porosity=TABLE_11_2["porosity"],
         frame_density=TABLE_11_2_FRAME_DENSITY,
@@ -215,7 +214,7 @@ def test_limp_and_rigid_converge_well_above_the_decoupling_frequency() -> None:
     assert fd == pytest.approx(127.4, abs=0.1)
     f = np.array([fd, 10.0 * fd, 100.0 * fd])
     rigid = _rigid(f)
-    limp = limp_frame(
+    limp = materials.limp_frame(
         rigid, TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
     ratio = np.abs(limp.effective_density / rigid.effective_density - 1.0)
@@ -233,11 +232,15 @@ def test_limp_layer_drops_the_low_frequency_absorption_of_the_table_11_2_layer()
     """
     f = np.array([100.0, 2000.0, 5000.0])
     rigid = _rigid(f)
-    limp = limp_frame(
+    limp = materials.limp_frame(
         rigid, TABLE_11_2_FRAME_DENSITY, porosity=TABLE_11_2["porosity"]
     )
-    a_rigid = layered_absorber(f, [PorousLayer(TABLE_11_2_THICKNESS, rigid)])
-    a_limp = layered_absorber(f, [PorousLayer(TABLE_11_2_THICKNESS, limp)])
+    a_rigid = materials.layered_absorber(
+        f, [materials.PorousLayer(TABLE_11_2_THICKNESS, rigid)]
+    )
+    a_limp = materials.layered_absorber(
+        f, [materials.PorousLayer(TABLE_11_2_THICKNESS, limp)]
+    )
     assert float(a_limp.absorption[0]) < float(a_rigid.absorption[0]) - 0.02
     assert float(a_limp.absorption[1]) == pytest.approx(
         float(a_rigid.absorption[1]), abs=0.01
@@ -251,7 +254,7 @@ def test_limp_frame_plot_smoke() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    limp = limp_frame(
+    limp = materials.limp_frame(
         _rigid(np.array([100.0, 400.0, 1600.0])), TABLE_11_2_FRAME_DENSITY,
         porosity=TABLE_11_2["porosity"],
     )
@@ -264,9 +267,9 @@ def test_limp_frame_plot_smoke() -> None:
 def test_limp_frame_rejects_bad_input() -> None:
     rigid = _rigid(np.array([100.0]))
     with pytest.raises(ValueError, match="must be positive"):
-        limp_frame(rigid, -1.0)
+        materials.limp_frame(rigid, -1.0)
     with pytest.raises(ValueError, match="must not exceed 1"):
-        limp_frame(rigid, 30.0, porosity=1.2)
+        materials.limp_frame(rigid, 30.0, porosity=1.2)
 
 
 def test_limp_frame_criteria_match_the_printed_thresholds() -> None:
@@ -276,21 +279,23 @@ def test_limp_frame_criteria_match_the_printed_thresholds() -> None:
     ``P0 = 101 325`` Pa, the relaxed criterion admits up to 20,3 kPa, which is
     the book's rounded 20 kPa; Beranek's original admits 5,1 kPa.
     """
-    assert LIMP_FRAME_CRITERIA == {"beranek": 0.05, "doutres": 0.2}
-    assert limp_frame_applicable(20.0e3)
-    assert not limp_frame_applicable(20.5e3)
-    assert limp_frame_applicable(5.0e3, criterion="beranek")
-    assert not limp_frame_applicable(5.1e3, criterion="beranek")
+    assert materials.LIMP_FRAME_CRITERIA == {"beranek": 0.05, "doutres": 0.2}
+    assert materials.limp_frame_applicable(20.0e3)
+    assert not materials.limp_frame_applicable(20.5e3)
+    assert materials.limp_frame_applicable(5.0e3, criterion="beranek")
+    assert not materials.limp_frame_applicable(5.1e3, criterion="beranek")
     # Exactly at the boundary of each printed threshold.
-    for name, ratio in LIMP_FRAME_CRITERIA.items():
-        assert limp_frame_applicable(ratio * 101325.0, criterion=name)
-        assert not limp_frame_applicable(
+    for name, ratio in materials.LIMP_FRAME_CRITERIA.items():
+        assert materials.limp_frame_applicable(
+            ratio * 101325.0, criterion=name
+        )
+        assert not materials.limp_frame_applicable(
             ratio * 101325.0 * (1.0 + 1e-9), criterion=name
         )
 
 
 def test_limp_frame_applicable_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="non-negative"):
-        limp_frame_applicable(-1.0)
+        materials.limp_frame_applicable(-1.0)
     with pytest.raises(ValueError):
-        limp_frame_applicable(1.0e3, criterion="panneton")
+        materials.limp_frame_applicable(1.0e3, criterion="panneton")

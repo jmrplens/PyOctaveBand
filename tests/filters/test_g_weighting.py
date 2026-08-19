@@ -16,7 +16,7 @@ import pytest
 from reference_data import ISO7196_TABLE2 as TABLE2
 from scipy import signal as sp_signal
 
-from phonometry import WeightingFilter, weighting_filter
+from phonometry import filters
 
 FS = 48000
 
@@ -25,7 +25,7 @@ FS = 48000
 
 
 def _response_db(freqs: list[float], fs: int = FS) -> np.ndarray:
-    sos = WeightingFilter(fs, "G").sos
+    sos = filters.WeightingFilter(fs, "G").sos
     _, h = sp_signal.sosfreqz(sos, worN=np.asarray(freqs), fs=fs)
     return 20 * np.log10(np.abs(h))
 
@@ -60,14 +60,14 @@ def test_g_weighting_filter_function() -> None:
     """A 10 Hz tone passes unchanged; a 40 Hz tone drops ~12 dB."""
     t = np.arange(int(FS * 10.0)) / FS
     x10 = np.sin(2 * np.pi * 10.0 * t)
-    y10 = weighting_filter(x10, FS, "G")
+    y10 = filters.weighting_filter(x10, FS, "G")
     # Skip the (long, low-frequency) transient before comparing RMS.
     s = slice(5 * FS, None)
     gain10 = 20 * np.log10(np.std(y10[s]) / np.std(x10[s]))
     assert gain10 == pytest.approx(0.0, abs=0.2)
 
     x40 = np.sin(2 * np.pi * 40.0 * t)
-    y40 = weighting_filter(x40, FS, "G")
+    y40 = filters.weighting_filter(x40, FS, "G")
     gain40 = 20 * np.log10(np.std(y40[s]) / np.std(x40[s]))
     assert gain40 == pytest.approx(-12.0, abs=0.5)
 
@@ -75,13 +75,13 @@ def test_g_weighting_filter_function() -> None:
 def test_g_multichannel_and_stateful() -> None:
     t = np.arange(FS) / FS
     x = np.stack([np.sin(2 * np.pi * 10 * t), np.sin(2 * np.pi * 20 * t)])
-    y = weighting_filter(x, FS, "G")
+    y = filters.weighting_filter(x, FS, "G")
     assert y.shape == x.shape
 
-    wf = WeightingFilter(FS, "G", stateful=True)
+    wf = filters.WeightingFilter(FS, "G", stateful=True)
     blocks = [wf.filter(x[:, i : i + 4800]) for i in range(0, FS, 4800)]
     y_blocks = np.concatenate(blocks, axis=-1)
-    y_ref = WeightingFilter(FS, "G", high_accuracy=False).filter(x)
+    y_ref = filters.WeightingFilter(FS, "G", high_accuracy=False).filter(x)
     np.testing.assert_allclose(y_blocks, y_ref, atol=1e-12)
 
 
@@ -95,7 +95,7 @@ def test_g_stateful_holds_its_reference_at_low_fs() -> None:
     fs = 2000
     t = np.arange(fs * 8) / fs
     x = np.sin(2 * np.pi * 10.0 * t)
-    wf = WeightingFilter(fs, "G", stateful=True)
+    wf = filters.WeightingFilter(fs, "G", stateful=True)
     blocks = [wf.filter(x[i : i + 500]) for i in range(0, fs * 8, 500)]
     y = np.concatenate(blocks)
     s = slice(fs * 2, fs * 7)
@@ -103,13 +103,13 @@ def test_g_stateful_holds_its_reference_at_low_fs() -> None:
     assert gain == pytest.approx(0.0, abs=0.1)
 
     # And block processing still matches the one-shot plain design exactly.
-    y_ref = WeightingFilter(fs, "G", high_accuracy=False).filter(x)
+    y_ref = filters.WeightingFilter(fs, "G", high_accuracy=False).filter(x)
     np.testing.assert_allclose(y, y_ref, atol=1e-12)
 
 
 def test_invalid_curve_message_mentions_g() -> None:
     with pytest.raises(ValueError, match="G"):
-        WeightingFilter(FS, "Q")
+        filters.WeightingFilter(FS, "Q")
 
 
 def test_g_weighting_consistent_at_low_sample_rates() -> None:
@@ -120,7 +120,7 @@ def test_g_weighting_consistent_at_low_sample_rates() -> None:
     def gain_at(fs: int, freq: float) -> float:
         t = np.arange(int(fs * 8)) / fs
         x = np.sin(2 * np.pi * freq * t)
-        y = WeightingFilter(fs, "G").filter(x)
+        y = filters.WeightingFilter(fs, "G").filter(x)
         s = slice(int(fs * 2), int(fs * 7))
         return float(20 * np.log10(np.std(y[s]) / np.std(x[s])))
 

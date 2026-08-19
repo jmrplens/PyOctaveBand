@@ -18,7 +18,7 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, loudness_zwicker_from_spectrum
+from phonometry import ReportMetadata, psychoacoustics
 
 # A shaped 28-band one-third-octave spectrum (25 Hz..12.5 kHz), descending.
 _LEVELS = np.array(
@@ -31,7 +31,9 @@ _PDF_MAGIC = b"%PDF"
 
 
 def _result():
-    return loudness_zwicker_from_spectrum(_LEVELS, field="free")
+    return psychoacoustics.loudness_zwicker_from_spectrum(
+        _LEVELS, field="free"
+    )
 
 
 def _assert_pdf(path: str) -> None:
@@ -147,12 +149,11 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
     time-varying sounds and names the reported maximum "loudness (Nmax)";
     the fiche must not label it as the stationary total loudness N.
     """
-    from phonometry import loudness_zwicker
 
     fs = 48000
     t = np.arange(fs) / fs
     x = 0.2 * np.sin(2.0 * np.pi * 1000.0 * t) * (1.0 + 0.5 * np.sin(2.0 * np.pi * 3.0 * t))
-    result = loudness_zwicker(x, fs, field="diffuse")
+    result = psychoacoustics.loudness_zwicker(x, fs, field="diffuse")
     assert result.n5 is not None
     assert result.time is not None
     assert result.field == "diffuse"

@@ -45,10 +45,10 @@ def generate_metadiffuser_ntff_polar(output_dir: str) -> None:
     cross-check.
     """
     print("Generating metadiffuser_ntff_polar...")
-    from phonometry import metadiffuser_polar_response
+    from phonometry import materials
 
     wells, depth, period = _qr_metadiffuser_wells()
-    model = metadiffuser_polar_response(
+    model = materials.metadiffuser_polar_response(
         2000.0, wells, depth=depth, period=period, periods=1,
     )
     angles, levels = _meshed_metadiffuser_ntff_levels()
@@ -109,7 +109,7 @@ def generate_fdtd_domain_geometry(output_dir: str) -> None:
 def generate_fdtd_simulation(output_dir: str) -> None:
     """2D FDTD simulation: diffraction snapshot and the probe histories."""
     print("Generating fdtd_simulation.png...")
-    from phonometry import GaussianPulse, fdtd_simulation
+    from phonometry import simulation
 
     # A 3.0 x 2.0 m free field (absorbing edges) with a thin rigid barrier:
     # probe A sees the direct pulse plus the barrier reflection, probe B sits
@@ -117,9 +117,9 @@ def generate_fdtd_simulation(output_dir: str) -> None:
     dx = 0.01
     mask = np.zeros((200, 300), dtype=bool)
     mask[60:, 150:154] = True
-    res = fdtd_simulation(
+    res = simulation.fdtd_simulation(
         343.0, dx, 9.0e-3, shape=(200, 300),
-        sources=[GaussianPulse(ix=60, iy=100, width=3.0e-4)],
+        sources=[simulation.GaussianPulse(ix=60, iy=100, width=3.0e-4)],
         probes=[(100, 100), (240, 100)],
         obstacle_mask=mask,
         boundaries="absorbing", absorbing_layer_cells=30,
@@ -141,13 +141,7 @@ def generate_fdtd_simulation(output_dir: str) -> None:
 def generate_elastic_halfspace_waves(output_dir: str) -> None:
     """Elastic FDTD: P, S and Rayleigh waves in an aluminium half-space."""
     print("Generating elastic_halfspace_waves...")
-    from phonometry import (
-        ElasticBoundaries,
-        ElasticRecording,
-        ForceSource,
-        GaussianPulse,
-        elastic_fdtd_simulation,
-    )
+    from phonometry import simulation
 
     # A 0.6 x 0.3 m aluminium block with a free upper surface, struck by a
     # short vertical force at the middle of that surface (Lamb's problem):
@@ -159,12 +153,27 @@ def generate_elastic_halfspace_waves(output_dir: str) -> None:
     cfl = 0.6
     dt = cfl * dx / (c_p * np.sqrt(2.0))
     steps = round(duration / dt)
-    res = elastic_fdtd_simulation(
-        c_p, c_s, dx, duration, rho=rho, shape=(300, 600), cfl=cfl,
-        sources=[ForceSource(ix=300, iy=0, direction="y", amplitude=1e6,
-                             waveform=GaussianPulse(0, 0, width=width).value)],
-        boundaries=ElasticBoundaries({"top": "free"}),
-        recording=ElasticRecording(snapshot_every=steps, snapshot_field="vy"),
+    res = simulation.elastic_fdtd_simulation(
+        c_p,
+        c_s,
+        dx,
+        duration,
+        rho=rho,
+        shape=(300, 600),
+        cfl=cfl,
+        sources=[
+            simulation.ForceSource(
+                ix=300,
+                iy=0,
+                direction="y",
+                amplitude=1e6,
+                waveform=simulation.GaussianPulse(0, 0, width=width).value,
+            )
+        ],
+        boundaries=simulation.ElasticBoundaries({"top": "free"}),
+        recording=simulation.ElasticRecording(
+            snapshot_every=steps, snapshot_field="vy"
+        ),
     )
 
     _fig, ax = plt.subplots(figsize=(9.5, 5.4))
@@ -210,12 +219,7 @@ def _scholte_interface_result() -> Any:
     explosion 10 m above the interface, run until the Scholte train has
     crawled ~330 m along the contact.
     """
-    from phonometry import (
-        ElasticBoundaries,
-        ElasticRecording,
-        ExplosionSource,
-        elastic_fdtd_simulation,
-    )
+    from phonometry import simulation
 
     ny, nx, dx = 200, 500, 1.0
     c_p = np.full((ny, nx), 1500.0)
@@ -231,12 +235,23 @@ def _scholte_interface_result() -> Any:
         a = (np.pi * f0 * (t - t0)) ** 2
         return float((1.0 - 2.0 * a) * np.exp(-a))
 
-    return elastic_fdtd_simulation(
-        c_p, c_s, dx, duration, rho=rho,
-        sources=[ExplosionSource(ix=60, iy=89, waveform=ricker,
-                                 amplitude=1e3)],
-        boundaries=ElasticBoundaries("absorbing", absorbing_layer_cells=20),
-        recording=ElasticRecording(snapshot_every=steps, snapshot_field="vy"),
+    return simulation.elastic_fdtd_simulation(
+        c_p,
+        c_s,
+        dx,
+        duration,
+        rho=rho,
+        sources=[
+            simulation.ExplosionSource(
+                ix=60, iy=89, waveform=ricker, amplitude=1e3
+            )
+        ],
+        boundaries=simulation.ElasticBoundaries(
+            "absorbing", absorbing_layer_cells=20
+        ),
+        recording=simulation.ElasticRecording(
+            snapshot_every=steps, snapshot_field="vy"
+        ),
     )
 
 

@@ -13,15 +13,7 @@ Physics anchors:
 import numpy as np
 import pytest
 
-from phonometry import (
-    TEMPORAL_VARIABILITY_LIMIT,
-    FieldIndicators,
-    IntensityResult,
-    dynamic_capability_index,
-    field_indicators,
-    sound_intensity,
-    temporal_variability_indicator,
-)
+from phonometry import emission
 
 FS = 48000
 SPACING = 0.012  # 12 mm microphone separation
@@ -53,7 +45,7 @@ def _plane_wave_pair(
 def test_plane_progressive_wave_broadband() -> None:
     """I = p_rms^2/(rho*c) within 3 % in the valid band, F2 = 0,14 dB."""
     p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
-    res = sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C)
+    res = emission.sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C)
     p_center = (p1 + p2) / 2.0
     expected = float(np.mean(p_center**2)) / (RHO * C)
     # Measured residual is ~0.5 % (second-order finite-difference/Welch term);
@@ -79,8 +71,10 @@ def test_bias_correct_undoes_finite_difference_underread() -> None:
     delay = spacing / C
     p1 = np.sin(2 * np.pi * f0 * t)
     p2 = np.sin(2 * np.pi * f0 * (t - delay))
-    raw = sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C)
-    corr = sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True)
+    raw = emission.sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C)
+    corr = emission.sound_intensity(
+        p1, p2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True
+    )
     k_dr = 2.0 * np.pi * f0 * spacing / C
     expected_ratio = k_dr / np.sin(k_dr)
     assert corr.total_intensity / raw.total_intensity == pytest.approx(
@@ -89,8 +83,10 @@ def test_bias_correct_undoes_finite_difference_underread() -> None:
     # At 50 Hz the correction is negligible (< 0.1 %).
     lo1 = np.sin(2 * np.pi * 50.0 * t)
     lo2 = np.sin(2 * np.pi * 50.0 * (t - delay))
-    r = sound_intensity(lo1, lo2, FS, spacing=spacing, rho=RHO, c=C)
-    cc = sound_intensity(lo1, lo2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True)
+    r = emission.sound_intensity(lo1, lo2, FS, spacing=spacing, rho=RHO, c=C)
+    cc = emission.sound_intensity(
+        lo1, lo2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True
+    )
     assert cc.total_intensity == pytest.approx(r.total_intensity, rel=2e-3)
 
 
@@ -106,8 +102,10 @@ def test_bias_correct_near_null_does_not_explode() -> None:
     delay = spacing / C
     p1 = np.sin(2 * np.pi * f0 * t)
     p2 = np.sin(2 * np.pi * f0 * (t - delay))
-    raw = sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C)
-    corr = sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True)
+    raw = emission.sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C)
+    corr = emission.sound_intensity(
+        p1, p2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True
+    )
     k_dr = 2.0 * np.pi * f0 * spacing / C
     assert k_dr > np.pi / 2.0  # the tone is past the cutoff
     # The un-clamped correction factor at this bin is huge (documented blow-up).
@@ -131,15 +129,17 @@ def test_bias_correct_below_cutoff_matches_analytic() -> None:
     assert phi < np.pi / 2.0
     p1 = amp * np.cos(2.0 * np.pi * f0 * t)
     p2 = amp * np.cos(2.0 * np.pi * f0 * t - phi)
-    corr = sound_intensity(p1, p2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True)
+    corr = emission.sound_intensity(
+        p1, p2, FS, spacing=spacing, rho=RHO, c=C, bias_correct=True
+    )
     true_plane = amp**2 / (2.0 * RHO * C)
     assert corr.total_intensity == pytest.approx(true_plane, rel=0.02)
 
 
 def test_reversing_microphones_flips_the_sign() -> None:
     p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
-    fwd = sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C)
-    rev = sound_intensity(p2, p1, FS, spacing=SPACING, rho=RHO, c=C)
+    fwd = emission.sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C)
+    rev = emission.sound_intensity(p2, p1, FS, spacing=SPACING, rho=RHO, c=C)
     assert rev.total_direction == -1
     assert rev.total_intensity == pytest.approx(-fwd.total_intensity, rel=1e-6)
     assert rev.total_intensity_level == pytest.approx(fwd.total_intensity_level, abs=1e-6)
@@ -148,7 +148,9 @@ def test_reversing_microphones_flips_the_sign() -> None:
 def test_plane_wave_third_octave_bands() -> None:
     """Per-band F2 = 0 dB and positive direction inside the excited band."""
     p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
-    res = sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3)
+    res = emission.sound_intensity(
+        p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3
+    )
     assert res.frequency is not None
     assert res.intensity is not None
     assert res.direction is not None
@@ -172,7 +174,7 @@ def test_standing_wave_high_pressure_intensity_index() -> None:
     x1, x2 = 0.10, 0.10 + SPACING
     p1 = 2.0 * np.cos(k * x1) * np.cos(2.0 * np.pi * f0 * t)
     p2 = 2.0 * np.cos(k * x2) * np.cos(2.0 * np.pi * f0 * t)
-    res = sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C)
+    res = emission.sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C)
     p_center = (p1 + p2) / 2.0
     plane_equivalent = float(np.mean(p_center**2)) / (RHO * C)
     assert abs(res.total_intensity) < 1e-3 * plane_equivalent
@@ -189,7 +191,9 @@ def test_1khz_tone_exact_analytic_intensity() -> None:
     phi = 2.0 * np.pi * f0 * SPACING / C  # k*dr
     p1 = amp * np.cos(2.0 * np.pi * f0 * t)
     p2 = amp * np.cos(2.0 * np.pi * f0 * t - phi)
-    res = sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3)
+    res = emission.sound_intensity(
+        p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3
+    )
     true_plane = amp**2 / (2.0 * RHO * C)
     expected = true_plane * np.sin(phi) / phi
     assert res.total_intensity == pytest.approx(expected, rel=0.01)
@@ -211,7 +215,9 @@ def test_1khz_tone_exact_analytic_intensity() -> None:
 def test_band_integration_consistency() -> None:
     """Sum of band intensities and pressures matches the broadband totals."""
     p1, p2 = _plane_wave_pair(delay_s=SPACING / C, f_lo=100.0, f_hi=4000.0)
-    res = sound_intensity(p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3)
+    res = emission.sound_intensity(
+        p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=3
+    )
     assert res.intensity is not None
     assert res.pressure_level is not None
     assert float(np.sum(res.intensity)) == pytest.approx(res.total_intensity, rel=0.01)
@@ -221,10 +227,10 @@ def test_band_integration_consistency() -> None:
 
 def test_octave_fraction_and_limits() -> None:
     p1, p2 = _plane_wave_pair(delay_s=SPACING / C)
-    res = sound_intensity(
+    res = emission.sound_intensity(
         p1, p2, FS, spacing=SPACING, rho=RHO, c=C, fraction=1, limits=[63.0, 4000.0]
     )
-    assert isinstance(res, IntensityResult)
+    assert isinstance(res, emission.IntensityResult)
     assert res.frequency is not None
     assert res.frequency[0] >= 63.0 / np.sqrt(2.0)
     assert res.frequency[-1] <= 4000.0 * np.sqrt(2.0)
@@ -233,30 +239,36 @@ def test_octave_fraction_and_limits() -> None:
 def test_validation_errors() -> None:
     good = np.random.default_rng(0).standard_normal(FS)
     with pytest.raises(ValueError, match="same length"):
-        sound_intensity(good, good[:-1], FS, spacing=SPACING)
+        emission.sound_intensity(good, good[:-1], FS, spacing=SPACING)
     with pytest.raises(ValueError, match="spacing"):
-        sound_intensity(good, good, FS, spacing=0.0)
+        emission.sound_intensity(good, good, FS, spacing=0.0)
     with pytest.raises(ValueError, match="spacing"):
-        sound_intensity(good, good, FS, spacing=-0.01)
+        emission.sound_intensity(good, good, FS, spacing=-0.01)
     with pytest.raises(ValueError, match="fs"):
-        sound_intensity(good, good, 0, spacing=SPACING)
+        emission.sound_intensity(good, good, 0, spacing=SPACING)
     with pytest.raises(ValueError, match="fs"):
-        sound_intensity(good, good, -48000, spacing=SPACING)
+        emission.sound_intensity(good, good, -48000, spacing=SPACING)
     with pytest.raises(ValueError, match="rho"):
-        sound_intensity(good, good, FS, spacing=SPACING, rho=0.0)
+        emission.sound_intensity(good, good, FS, spacing=SPACING, rho=0.0)
     with pytest.raises(ValueError, match="'c'"):
-        sound_intensity(good, good, FS, spacing=SPACING, c=-1.0)
+        emission.sound_intensity(good, good, FS, spacing=SPACING, c=-1.0)
     with pytest.raises(ValueError, match="fraction"):
-        sound_intensity(good, good, FS, spacing=SPACING, fraction=2)
+        emission.sound_intensity(good, good, FS, spacing=SPACING, fraction=2)
     with pytest.raises(ValueError, match="limits"):
-        sound_intensity(good, good, FS, spacing=SPACING, limits=[100.0])
+        emission.sound_intensity(
+            good, good, FS, spacing=SPACING, limits=[100.0]
+        )
     with pytest.raises(ValueError, match="limits"):
-        sound_intensity(good, good, FS, spacing=SPACING, limits=[1000.0, 100.0])
+        emission.sound_intensity(
+            good, good, FS, spacing=SPACING, limits=[1000.0, 100.0]
+        )
     two_dimensional = np.zeros((2, 100))
     with pytest.raises(ValueError, match="1D"):
-        sound_intensity(two_dimensional, two_dimensional, FS, spacing=SPACING)
+        emission.sound_intensity(
+            two_dimensional, two_dimensional, FS, spacing=SPACING
+        )
     with pytest.raises(ValueError, match="too short"):
-        sound_intensity(good[:8], good[:8], FS, spacing=SPACING)
+        emission.sound_intensity(good[:8], good[:8], FS, spacing=SPACING)
 
 
 def test_field_indicators_uniform_field() -> None:
@@ -264,8 +276,8 @@ def test_field_indicators_uniform_field() -> None:
     surface gives F2 = 10*lg(rho*c/400) = 0,14 dB."""
     i_n = np.full(8, 1.0 / (RHO * C))  # plane-wave intensity for 1 Pa^2
     lp = np.full(8, 93.98)  # 1 Pa^2 mean-square pressure
-    ind = field_indicators(lp, i_n)
-    assert isinstance(ind, FieldIndicators)
+    ind = emission.field_indicators(lp, i_n)
+    assert isinstance(ind, emission.FieldIndicators)
     assert ind.f4 == pytest.approx(0.0, abs=1e-12)
     assert ind.f2 == pytest.approx(ind.f3, abs=1e-12)
     assert ind.f2 == pytest.approx(10 * np.log10(RHO * C / 400.0), abs=0.02)
@@ -275,7 +287,7 @@ def test_field_indicators_negative_partial_power() -> None:
     """A negative-intensity segment raises F3 above F2 (A.6 vs A.3)."""
     i_n = np.array([2.0e-3, 1.5e-3, 1.0e-3, -0.5e-3])
     lp = np.full(4, 90.0)
-    ind = field_indicators(lp, i_n)
+    ind = emission.field_indicators(lp, i_n)
     assert ind.f3 > ind.f2
     assert ind.f4 > 0.0
     # Hand-computed anchors: mean|In| = 1,25e-3, mean In = 1,0e-3.
@@ -286,15 +298,15 @@ def test_field_indicators_negative_partial_power() -> None:
 
 def test_field_indicators_validation() -> None:
     with pytest.raises(ValueError, match="same shape"):
-        field_indicators([90.0, 91.0], [1e-3])
+        emission.field_indicators([90.0, 91.0], [1e-3])
     with pytest.raises(ValueError, match="two measurement positions"):
-        field_indicators([90.0], [1e-3])
+        emission.field_indicators([90.0], [1e-3])
     with pytest.raises(ValueError, match="not positive"):
-        field_indicators([90.0, 90.0], [1e-3, -2e-3])
+        emission.field_indicators([90.0, 90.0], [1e-3, -2e-3])
     three_band_lp = np.full((4, 3), 90.0)
     three_band_in = np.full((4, 3), 1e-3)
     with pytest.raises(ValueError, match="one entry per band"):
-        field_indicators(three_band_lp, three_band_in, [125.0, 250.0])
+        emission.field_indicators(three_band_lp, three_band_in, [125.0, 250.0])
 
 
 def test_field_indicators_per_band_matches_per_column_scalars() -> None:
@@ -304,12 +316,12 @@ def test_field_indicators_per_band_matches_per_column_scalars() -> None:
     freqs = np.array([125.0, 250.0, 500.0, 1000.0])
     lp = 74.0 + rng.normal(0.0, 0.8, (8, 4))
     i_n = 1.0e-5 * (1.0 + rng.normal(0.0, 0.2, (8, 4)))
-    ind = field_indicators(lp, i_n, freqs)
+    ind = emission.field_indicators(lp, i_n, freqs)
     assert isinstance(ind.f2, np.ndarray)
     assert ind.f2.shape == (4,)
     np.testing.assert_allclose(ind.frequency, freqs)
     for b in range(4):
-        one = field_indicators(lp[:, b], i_n[:, b])
+        one = emission.field_indicators(lp[:, b], i_n[:, b])
         assert ind.f2[b] == pytest.approx(one.f2)
         assert ind.f3[b] == pytest.approx(one.f3)
         assert ind.f4[b] == pytest.approx(one.f4)
@@ -318,7 +330,7 @@ def test_field_indicators_per_band_matches_per_column_scalars() -> None:
     bad = i_n.copy()
     bad[:, 1] = -1.0e-5
     with pytest.raises(ValueError, match="not positive"):
-        field_indicators(lp, bad, freqs)
+        emission.field_indicators(lp, bad, freqs)
 
 
 def test_field_indicators_plot_draws_indicators_and_ld() -> None:
@@ -331,8 +343,8 @@ def test_field_indicators_plot_draws_indicators_and_ld() -> None:
     freqs = np.array([250.0, 500.0, 1000.0, 2000.0])
     lp = 76.0 + rng.normal(0.0, 0.5, (10, 4))
     i_n = 2.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
-    ind = field_indicators(lp, i_n, freqs)
-    ld = dynamic_capability_index(18.0)
+    ind = emission.field_indicators(lp, i_n, freqs)
+    ld = emission.dynamic_capability_index(18.0)
     ax = ind.plot(dynamic_capability=ld)
     # F2 curve, F3 curve and the Ld criterion line on the main axes.
     ydata = [np.asarray(line.get_ydata(), dtype=float) for line in ax.lines]
@@ -351,7 +363,7 @@ def test_field_indicators_plot_draws_indicators_and_ld() -> None:
     with pytest.raises(ValueError, match="Unknown language"):
         ind.plot(language="xx")
     # The scalar (single-band) result has nothing per band to draw.
-    single = field_indicators(lp[:, 0], i_n[:, 0])
+    single = emission.field_indicators(lp[:, 0], i_n[:, 0])
     with pytest.raises(ValueError, match="per-band"):
         single.plot()
     plt.close("all")
@@ -360,10 +372,12 @@ def test_field_indicators_plot_draws_indicators_and_ld() -> None:
 def test_dynamic_capability_index() -> None:
     """Ld = delta_pI0 - K (ISO 9614-1 equation (10)); adequate when
     Ld > F2 (criterion 1, equation (B.1))."""
-    assert dynamic_capability_index(18.0) == pytest.approx(8.0)
-    assert dynamic_capability_index(18.0, bias_error_factor=7.0) == pytest.approx(11.0)
+    assert emission.dynamic_capability_index(18.0) == pytest.approx(8.0)
+    assert emission.dynamic_capability_index(
+        18.0, bias_error_factor=7.0
+    ) == pytest.approx(11.0)
     with pytest.raises(ValueError, match="bias_error_factor"):
-        dynamic_capability_index(18.0, bias_error_factor=0.0)
+        emission.dynamic_capability_index(18.0, bias_error_factor=0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -381,14 +395,18 @@ def test_dynamic_capability_index() -> None:
 
 def test_f1_is_zero_for_a_perfectly_steady_field() -> None:
     """A constant short-time intensity has no temporal variability."""
-    assert temporal_variability_indicator(np.full(10, 3.4e-5)) == pytest.approx(0.0)
+    assert emission.temporal_variability_indicator(
+        np.full(10, 3.4e-5)
+    ) == pytest.approx(0.0)
 
 
 def test_f1_two_sample_closed_form() -> None:
     """For M = 2, equation (A.1) reduces to sqrt(2)*|b - a| / (a + b)."""
     a, b = 1.0e-5, 3.0e-5
     expected = np.sqrt(2.0) * abs(b - a) / (a + b)
-    assert temporal_variability_indicator([a, b]) == pytest.approx(expected)
+    assert emission.temporal_variability_indicator([a, b]) == pytest.approx(
+        expected
+    )
 
 
 def test_f1_is_the_coefficient_of_variation() -> None:
@@ -396,53 +414,57 @@ def test_f1_is_the_coefficient_of_variation() -> None:
     rng = np.random.default_rng(1993)
     samples = 5.0e-5 * (1.0 + rng.normal(0.0, 0.3, 10))
     expected = float(np.std(samples, ddof=1) / np.mean(samples))
-    assert temporal_variability_indicator(samples) == pytest.approx(expected)
+    assert emission.temporal_variability_indicator(samples) == pytest.approx(
+        expected
+    )
 
 
 def test_f1_is_scale_invariant() -> None:
     """F1 is dimensionless: a gain change on every sample leaves it unchanged."""
     samples = np.array([1.0e-5, 1.4e-5, 0.8e-5, 1.1e-5, 1.3e-5])
-    assert temporal_variability_indicator(samples * 1000.0) == pytest.approx(
-        temporal_variability_indicator(samples)
-    )
+    assert emission.temporal_variability_indicator(
+        samples * 1000.0
+    ) == pytest.approx(emission.temporal_variability_indicator(samples))
 
 
 def test_f1_and_f4_share_the_closed_form() -> None:
     """(A.1) over M samples and (A.8) over N positions are the same statistic."""
     values = np.array([2.0e-5, 1.6e-5, 2.4e-5, 1.9e-5, 2.2e-5, 2.1e-5])
-    surface = field_indicators(np.full(values.size, 80.0), values)
-    assert temporal_variability_indicator(values) == pytest.approx(surface.f4)
+    surface = emission.field_indicators(np.full(values.size, 80.0), values)
+    assert emission.temporal_variability_indicator(values) == pytest.approx(
+        surface.f4
+    )
 
 
 def test_f1_per_band_matches_the_per_column_scalars() -> None:
     """2D (samples, bands) input evaluates every band of Annex A.1 at once."""
     rng = np.random.default_rng(614)
     samples = 3.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
-    per_band = temporal_variability_indicator(samples)
+    per_band = emission.temporal_variability_indicator(samples)
     assert isinstance(per_band, np.ndarray)
     assert per_band.shape == (4,)
     for b in range(4):
         assert per_band[b] == pytest.approx(
-            temporal_variability_indicator(samples[:, b])
+            emission.temporal_variability_indicator(samples[:, b])
         )
 
 
 def test_f1_validation() -> None:
     with pytest.raises(ValueError, match="two short-time samples"):
-        temporal_variability_indicator([1.0e-5])
+        emission.temporal_variability_indicator([1.0e-5])
     three_dimensional = np.zeros((2, 2, 2))
     with pytest.raises(ValueError, match="1D .samples,. or 2D"):
-        temporal_variability_indicator(three_dimensional)
+        emission.temporal_variability_indicator(three_dimensional)
     with pytest.raises(ValueError, match="not positive"):
-        temporal_variability_indicator([1.0e-5, -3.0e-5])
+        emission.temporal_variability_indicator([1.0e-5, -3.0e-5])
     # A NaN or infinite sample would otherwise slip past the positivity test
     # and turn the indicator into a silent NaN.
     with_nan = [1.0e-5, float("nan"), 1.2e-5]
     with pytest.raises(ValueError, match="finite"):
-        temporal_variability_indicator(with_nan)
+        emission.temporal_variability_indicator(with_nan)
     with_inf = [1.0e-5, float("inf"), 1.2e-5]
     with pytest.raises(ValueError, match="finite"):
-        temporal_variability_indicator(with_inf)
+        emission.temporal_variability_indicator(with_inf)
 
 
 def test_non_positive_mean_cites_a23_only_for_the_surface_indicators() -> None:
@@ -456,11 +478,11 @@ def test_non_positive_mean_cites_a23_only_for_the_surface_indicators() -> None:
     condition, so the F1 message must not claim A.2.3 backing.
     """
     with pytest.raises(ValueError) as surface:
-        field_indicators([90.0, 90.0], [1e-3, -2e-3])
+        emission.field_indicators([90.0, 90.0], [1e-3, -2e-3])
     assert "A.2.3" in str(surface.value)
 
     with pytest.raises(ValueError) as temporal:
-        temporal_variability_indicator([1.0e-5, -3.0e-5])
+        emission.temporal_variability_indicator([1.0e-5, -3.0e-5])
     assert "A.2.3" not in str(temporal.value)
     assert "A.1" in str(temporal.value)
 
@@ -476,14 +498,14 @@ def test_f1_follows_the_shape_of_its_sibling_indicators() -> None:
     samples_1d = np.array([1.0e-5, 1.2e-5, 0.9e-5, 1.1e-5, 1.0e-5])
     samples_2d = samples_1d.reshape(-1, 1)
 
-    scalar = field_indicators(
+    scalar = emission.field_indicators(
         np.full(4, 80.0), np.full(4, 1.0e-5), temporal_intensity=samples_2d
     )
     assert np.ndim(scalar.f1) == 0
     assert np.ndim(scalar.f2) == 0
     assert scalar.field_is_stationary() is True
 
-    per_band = field_indicators(
+    per_band = emission.field_indicators(
         np.full((4, 1), 80.0),
         np.full((4, 1), 1.0e-5),
         [1000.0],
@@ -500,9 +522,11 @@ def test_field_indicators_carries_f1_when_given_the_samples() -> None:
     lp = np.full(6, 82.0)
     i_n = np.full(6, 1.5e-5)
     samples = np.array([1.4e-5, 1.6e-5, 1.5e-5, 1.7e-5, 1.3e-5, 1.5e-5])
-    ind = field_indicators(lp, i_n, temporal_intensity=samples)
-    assert ind.f1 == pytest.approx(temporal_variability_indicator(samples))
-    assert field_indicators(lp, i_n).f1 is None
+    ind = emission.field_indicators(lp, i_n, temporal_intensity=samples)
+    assert ind.f1 == pytest.approx(
+        emission.temporal_variability_indicator(samples)
+    )
+    assert emission.field_indicators(lp, i_n).f1 is None
 
 
 def test_field_indicators_f1_column_count_must_match_the_bands() -> None:
@@ -510,25 +534,31 @@ def test_field_indicators_f1_column_count_must_match_the_bands() -> None:
     i_n = np.full((5, 3), 1.5e-5)
     two_band_samples = np.full((10, 2), 1.5e-5)
     with pytest.raises(ValueError, match="one column per band"):
-        field_indicators(lp, i_n, temporal_intensity=two_band_samples)
+        emission.field_indicators(lp, i_n, temporal_intensity=two_band_samples)
 
 
 def test_field_is_stationary_against_the_table_b3_limit() -> None:
     """ISO 9614-1 Table B.3 calls for action when F1 exceeds 0,6."""
-    assert TEMPORAL_VARIABILITY_LIMIT == 0.6
+    assert emission.TEMPORAL_VARIABILITY_LIMIT == 0.6
     lp = np.full(4, 80.0)
     i_n = np.full(4, 1.0e-5)
-    steady = field_indicators(lp, i_n, temporal_intensity=np.full(10, 1.0e-5))
+    steady = emission.field_indicators(
+        lp, i_n, temporal_intensity=np.full(10, 1.0e-5)
+    )
     assert steady.field_is_stationary() is True
     # A pair chosen so equation (A.1) lands exactly on the 0,6 threshold, and
     # a wilder pair above it: sqrt(2)*(b - a)/(a + b) with a = 1, b = r.
     r = (np.sqrt(2.0) + 0.6) / (np.sqrt(2.0) - 0.6)
-    on_limit = field_indicators(lp, i_n, temporal_intensity=[1.0e-5, r * 1.0e-5])
+    on_limit = emission.field_indicators(
+        lp, i_n, temporal_intensity=[1.0e-5, r * 1.0e-5]
+    )
     assert float(np.asarray(on_limit.f1)) == pytest.approx(0.6)
     assert on_limit.field_is_stationary() is True  # the limit itself passes
-    varying = field_indicators(lp, i_n, temporal_intensity=[1.0e-5, 5.0e-5])
+    varying = emission.field_indicators(
+        lp, i_n, temporal_intensity=[1.0e-5, 5.0e-5]
+    )
     assert varying.field_is_stationary() is False
-    without_f1 = field_indicators(lp, i_n)
+    without_f1 = emission.field_indicators(lp, i_n)
     with pytest.raises(ValueError, match="no F1"):
         without_f1.field_is_stationary()
 
@@ -544,10 +574,12 @@ def test_field_indicators_plot_draws_f1_and_its_limit() -> None:
     lp = 76.0 + rng.normal(0.0, 0.5, (10, 4))
     i_n = 2.0e-5 * (1.0 + rng.normal(0.0, 0.25, (10, 4)))
     samples = 2.0e-5 * (1.0 + rng.normal(0.0, 0.15, (10, 4)))
-    ind = field_indicators(lp, i_n, freqs, temporal_intensity=samples)
+    ind = emission.field_indicators(lp, i_n, freqs, temporal_intensity=samples)
     ax = ind.plot()
     twin = next(a for a in ax.figure.axes if a is not ax)
     ydata = [np.asarray(line.get_ydata(), dtype=float) for line in twin.lines]
     assert any(np.allclose(y, np.asarray(ind.f1)) for y in ydata)
-    assert any(np.allclose(y, TEMPORAL_VARIABILITY_LIMIT) for y in ydata)
+    assert any(
+        np.allclose(y, emission.TEMPORAL_VARIABILITY_LIMIT) for y in ydata
+    )
     plt.close("all")

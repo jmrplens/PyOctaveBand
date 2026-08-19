@@ -13,7 +13,7 @@ time-dependent maximum) plus result-structure guards.
 import numpy as np
 import pytest
 
-from phonometry import EcmaTonality, tonality_ecma
+from phonometry import psychoacoustics
 
 FS = 48000
 
@@ -34,19 +34,19 @@ def _noise(level_db: float, seconds: float = 1.5) -> np.ndarray:
 
 
 @pytest.fixture(scope="module")
-def ref_1k_40() -> EcmaTonality:
+def ref_1k_40() -> psychoacoustics.EcmaTonality:
     """The calibration signal result, computed once for the module."""
-    return tonality_ecma(_tone(1000.0, 40.0), FS)
+    return psychoacoustics.tonality_ecma(_tone(1000.0, 40.0), FS)
 
 
 @pytest.fixture(scope="module")
-def broadband_noise() -> EcmaTonality:
+def broadband_noise() -> psychoacoustics.EcmaTonality:
     """A broadband-noise result, computed once for the module.
 
     0.8 s: a qualitative reference (noise stays far below a tone), so it only
     needs to clear the transient-discard window, not the calibration length.
     """
-    return tonality_ecma(_noise(60.0, seconds=0.8), FS)
+    return psychoacoustics.tonality_ecma(_noise(60.0, seconds=0.8), FS)
 
 
 # --------------------------------------------------------------------------
@@ -55,7 +55,9 @@ def broadband_noise() -> EcmaTonality:
 
 
 @pytest.mark.xdist_group("ecma-tonality-ref")
-def test_calibration_1khz_40db_is_one_tu(ref_1k_40: EcmaTonality) -> None:
+def test_calibration_1khz_40db_is_one_tu(
+    ref_1k_40: psychoacoustics.EcmaTonality,
+) -> None:
     # c_T is defined so the 1 kHz / 40 dB tone gives 1 tu_HMS; the standard
     # allows c_T to vary within 0.25 %, and implementation differences add a
     # little more, so a 3 % window is comfortably tight.
@@ -103,7 +105,8 @@ def test_decision_thresholds_are_the_standard_constants() -> None:
 
 @pytest.mark.xdist_group("ecma-tonality-ref")
 def test_pure_tone_far_exceeds_noise(
-    ref_1k_40: EcmaTonality, broadband_noise: EcmaTonality
+    ref_1k_40: psychoacoustics.EcmaTonality,
+    broadband_noise: psychoacoustics.EcmaTonality,
 ) -> None:
     # Broadband noise -> near 0 (the sigmoid + 0.02 tu gate suppress it),
     # a pure tone -> near the top of the scale.
@@ -113,7 +116,9 @@ def test_pure_tone_far_exceeds_noise(
 
 
 @pytest.mark.xdist_group("ecma-tonality-ref")
-def test_tonal_frequency_tracks_tone(ref_1k_40: EcmaTonality) -> None:
+def test_tonal_frequency_tracks_tone(
+    ref_1k_40: psychoacoustics.EcmaTonality,
+) -> None:
     peak_band = int(np.argmax(ref_1k_40.specific_tonality))
     # The peaking band centres on the tone and its estimated tonal frequency
     # matches (Formulae 39/55).
@@ -123,7 +128,9 @@ def test_tonal_frequency_tracks_tone(ref_1k_40: EcmaTonality) -> None:
 
 def test_tonal_frequency_tracks_a_second_tone() -> None:
     # Frequency tracking is spectral, not duration-driven: 0.7 s suffices.
-    result = tonality_ecma(_tone(2000.0, 50.0, seconds=0.7), FS)
+    result = psychoacoustics.tonality_ecma(
+        _tone(2000.0, 50.0, seconds=0.7), FS
+    )
     peak_band = int(np.argmax(result.specific_tonality))
     assert result.tonal_frequencies[peak_band] == pytest.approx(2000.0, rel=0.05)
 
@@ -137,23 +144,27 @@ def test_short_signal_averages_over_all_blocks() -> None:
     noise (the normal-length calibration anchor is unaffected: those signals
     have far more blocks than the 56-block transient window).
     """
-    short_tone = tonality_ecma(_tone(1000.0, 40.0, seconds=0.2), FS)
+    short_tone = psychoacoustics.tonality_ecma(
+        _tone(1000.0, 40.0, seconds=0.2), FS
+    )
     assert np.isfinite(short_tone.tonality)
     assert short_tone.tonality > 0.3
-    short_noise = tonality_ecma(_noise(60.0, seconds=0.2), FS)
+    short_noise = psychoacoustics.tonality_ecma(_noise(60.0, seconds=0.2), FS)
     assert short_tone.tonality > short_noise.tonality
 
 
 def test_silence_is_zero() -> None:
     # Pure-property check: zero in, zero out at any length past the
     # transient-discard window, so 0.6 s is enough.
-    result = tonality_ecma(np.zeros(int(FS * 0.6)), FS)
+    result = psychoacoustics.tonality_ecma(np.zeros(int(FS * 0.6)), FS)
     assert result.tonality == 0.0
     assert np.all(result.specific_tonality == 0.0)
 
 
 @pytest.mark.xdist_group("ecma-tonality-ref")
-def test_specific_tonality_peaks_near_tone(ref_1k_40: EcmaTonality) -> None:
+def test_specific_tonality_peaks_near_tone(
+    ref_1k_40: psychoacoustics.EcmaTonality,
+) -> None:
     peak_band = int(np.argmax(ref_1k_40.specific_tonality))
     assert ref_1k_40.centre_frequencies[peak_band] == pytest.approx(1000.0, rel=0.15)
 
@@ -162,7 +173,9 @@ def test_user_band_excluding_tone_lowers_tonality() -> None:
     # Restricting the time-dependent maximum search (Formulae 56-61) to bands
     # above the tone removes the tonal event, driving T towards 0. A 0.7 s
     # segment is enough: the property is spectral, not duration-driven.
-    restricted = tonality_ecma(_tone(1000.0, 40.0, seconds=0.7), FS, f_low=3000.0)
+    restricted = psychoacoustics.tonality_ecma(
+        _tone(1000.0, 40.0, seconds=0.7), FS, f_low=3000.0
+    )
     assert restricted.tonality < 0.2
 
 
@@ -177,7 +190,6 @@ def test_loudness_and_tonality_share_the_tonal_split(monkeypatch) -> None:
     """
     import sys
 
-    from phonometry import loudness_ecma
 
     L = sys.modules["phonometry.psychoacoustics.loudness.ecma"]
     T = sys.modules["phonometry.psychoacoustics.quality.tonality_ecma"]
@@ -194,8 +206,8 @@ def test_loudness_and_tonality_share_the_tonal_split(monkeypatch) -> None:
     monkeypatch.setattr(L, "_tonal_noise_split", spy)
     monkeypatch.setattr(T, "_tonal_noise_split", spy)
     sig = _tone(1000.0, 40.0, seconds=0.7)
-    loudness_ecma(sig, FS)
-    tonality_ecma(sig, FS)
+    psychoacoustics.loudness_ecma(sig, FS)
+    psychoacoustics.tonality_ecma(sig, FS)
     assert len(recorded) == 2
     assert np.array_equal(recorded[0], recorded[1])
 
@@ -204,11 +216,11 @@ def test_band_range_rejects_out_of_range_edges() -> None:
     # Formulae 56/57 preconditions: 16 Hz < f_L, f_H < 20 kHz, f_L < f_H.
     x = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError, match="16 Hz"):
-        tonality_ecma(x, FS, f_low=10.0)
+        psychoacoustics.tonality_ecma(x, FS, f_low=10.0)
     with pytest.raises(ValueError, match="20 kHz"):
-        tonality_ecma(x, FS, f_high=25000.0)
+        psychoacoustics.tonality_ecma(x, FS, f_high=25000.0)
     with pytest.raises(ValueError, match="below 'f_high'"):
-        tonality_ecma(x, FS, f_low=2000.0, f_high=500.0)
+        psychoacoustics.tonality_ecma(x, FS, f_low=2000.0, f_high=500.0)
 
 
 def test_band_range_uses_edge_midpoints() -> None:
@@ -242,8 +254,8 @@ def test_free_and_diffuse_fields_differ() -> None:
     # Property check (ear-filter difference), not a calibration: 0.7 s is
     # enough for a stable value in both fields.
     x = _tone(1000.0, 60.0, seconds=0.7)
-    free = tonality_ecma(x, FS, field="free").tonality
-    diffuse = tonality_ecma(x, FS, field="diffuse").tonality
+    free = psychoacoustics.tonality_ecma(x, FS, field="free").tonality
+    diffuse = psychoacoustics.tonality_ecma(x, FS, field="diffuse").tonality
     assert free > 0.5
     assert diffuse > 0.5
     assert free != diffuse
@@ -255,7 +267,7 @@ def test_free_and_diffuse_fields_differ() -> None:
 
 
 @pytest.mark.xdist_group("ecma-tonality-ref")
-def test_result_structure(ref_1k_40: EcmaTonality) -> None:
+def test_result_structure(ref_1k_40: psychoacoustics.EcmaTonality) -> None:
     assert ref_1k_40.specific_tonality.shape == (53,)
     assert ref_1k_40.tonal_frequencies.shape == (53,)
     assert ref_1k_40.bark.shape == (53,)
@@ -273,23 +285,23 @@ def test_result_structure(ref_1k_40: EcmaTonality) -> None:
 def test_invalid_field() -> None:
     tone = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError):
-        tonality_ecma(tone, FS, field="reverberant")
+        psychoacoustics.tonality_ecma(tone, FS, field="reverberant")
 
 
 def test_invalid_fs() -> None:
     tone = _tone(1000.0, 40.0, seconds=0.5)
     with pytest.raises(ValueError):
-        tonality_ecma(tone, 0.0)
+        psychoacoustics.tonality_ecma(tone, 0.0)
 
 
 def test_empty_signal() -> None:
     empty = np.array([])
     with pytest.raises(ValueError):
-        tonality_ecma(empty, FS)
+        psychoacoustics.tonality_ecma(empty, FS)
 
 
 @pytest.mark.xdist_group("ecma-tonality-ref")
-def test_plot_smoke(ref_1k_40: EcmaTonality) -> None:
+def test_plot_smoke(ref_1k_40: psychoacoustics.EcmaTonality) -> None:
     import matplotlib
 
     matplotlib.use("Agg")

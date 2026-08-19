@@ -7,7 +7,7 @@ Focuses on edge cases that might be problematic in DSP.
 import numpy as np
 import pytest
 
-from phonometry import LevelCalibration, octave_filter
+from phonometry import filters
 
 
 def test_nyquist_frequency_content() -> None:
@@ -22,7 +22,7 @@ def test_nyquist_frequency_content() -> None:
     x = np.cos(np.pi * fs * t) 
     
     # Request analysis up to Nyquist
-    spl, _ = octave_filter(x, fs, limits=[100, 23000])
+    spl, _ = filters.octave_filter(x, fs, limits=[100, 23000])
     assert not np.isnan(spl).any()
 
 
@@ -40,7 +40,7 @@ def test_aliasing_behavior() -> None:
     
     # Analyze. 250Hz is a standard band for 1/1 octave? 
     # Mid bands: ..., 125, 250, 500
-    spl, freq = octave_filter(x, fs, fraction=1, limits=[100, 400])
+    spl, freq = filters.octave_filter(x, fs, fraction=1, limits=[100, 400])
     
     # Find 250Hz band
     idx_250 = np.argmin(np.abs(np.array(freq) - aliased_freq))
@@ -57,7 +57,7 @@ def test_extreme_high_order_stability() -> None:
     x = np.random.default_rng(42).standard_normal(fs)
     
     for order in [50, 100]:
-        spl, _ = octave_filter(x, fs, order=order)
+        spl, _ = filters.octave_filter(x, fs, order=order)
         assert not np.isnan(spl).any()
         assert np.all(np.isfinite(spl))
 
@@ -73,14 +73,16 @@ def test_dc_offset_rejection() -> None:
     x = np.ones(fs) # Pure DC
     
     # 1. With detrend=True (default)
-    spl, _ = octave_filter(x, fs, limits=[100, 2000], detrend=True)
+    spl, _ = filters.octave_filter(x, fs, limits=[100, 2000], detrend=True)
     # SPL should be extremely low (near noise floor)
     assert np.all(spl < -100)
 
     # 2. With detrend=False
     # The step response at t=0 will still generate some transient energy,
     # but we verify it's at least not a crash.
-    spl_nodetrend, _ = octave_filter(x, fs, limits=[100, 2000], detrend=False)
+    spl_nodetrend, _ = filters.octave_filter(
+        x, fs, limits=[100, 2000], detrend=False
+    )
     assert not np.isnan(spl_nodetrend).any()
 
 
@@ -91,13 +93,13 @@ def test_extreme_sampling_rates() -> None:
     # Extremely low (e.g. 100Hz)
     fs_low = 100
     x_low = np.zeros(fs_low)
-    _, freq_low = octave_filter(x_low, fs_low, limits=[10, 40])
+    _, freq_low = filters.octave_filter(x_low, fs_low, limits=[10, 40])
     assert len(freq_low) > 0
     
     # Extremely high (e.g. 1MHz)
     fs_high = 1000000
     x_high = np.zeros(fs_high // 10)
-    _, freq_high = octave_filter(x_high, fs_high, limits=[1000, 20000])
+    _, freq_high = filters.octave_filter(x_high, fs_high, limits=[1000, 20000])
     assert len(freq_high) > 0
 
 
@@ -107,7 +109,9 @@ def test_huge_calibration_factor() -> None:
     """
     fs = 8000
     x = np.random.default_rng(42).standard_normal(fs)
-    spl, _ = octave_filter(x, fs, calibration=LevelCalibration(factor=1e10))
+    spl, _ = filters.octave_filter(
+        x, fs, calibration=filters.LevelCalibration(factor=1e10)
+    )
     assert np.all(spl > 100) # Should be massive but not Inf
 
 
@@ -123,7 +127,7 @@ def test_multichannel_mismatched_lengths() -> None:
     # This should probably raise an error or handle it via numpy's default behavior
     with pytest.raises((ValueError, TypeError)):
         # type ignore because list of lists of floats is technically not what we hint, but what user might pass
-        octave_filter(x, fs) # type: ignore
+        filters.octave_filter(x, fs) # type: ignore
 
 
 def test_sos_stability_at_low_freq_high_fs() -> None:
@@ -134,6 +138,6 @@ def test_sos_stability_at_low_freq_high_fs() -> None:
     fs = 192000
     x = np.random.default_rng(42).standard_normal(fs)
     # The bank should use a very high decimation factor
-    spl, freq = octave_filter(x, fs, limits=[15, 30])
+    spl, freq = filters.octave_filter(x, fs, limits=[15, 30])
     assert not np.isnan(spl).any()
     assert 16.0 in np.round(freq)

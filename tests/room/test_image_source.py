@@ -32,14 +32,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import (
-    ImageSourceResult,
-    audible_image_count,
-    decay_curve,
-    eyring_reverberation_time,
-    image_source_rir,
-    reflection_density,
-)
+from phonometry import room
 from phonometry.room.image_source import WALL_ORDER
 from phonometry.simulation import GaussianPulse, fdtd_simulation
 
@@ -55,7 +48,7 @@ def test_direct_sound_time_and_amplitude() -> None:
     dims = (8.0, 5.0, 3.0)
     src = (2.0, 2.5, 1.5)
     rcv = (6.0, 2.5, 1.5)
-    res = image_source_rir(dims, src, rcv, 0.2, fs=48000, max_order=2)
+    res = room.image_source_rir(dims, src, rcv, 0.2, fs=48000, max_order=2)
     d = math.dist(src, rcv)  # 4.0 m
     # Sorted by arrival time -> the first entry is the direct sound (order 0).
     assert res.orders[0] == 0
@@ -74,7 +67,7 @@ def test_first_reflection_amplitude_carries_one_reflection_factor() -> None:
     dims = (10.0, 8.0, 4.0)
     src = np.array([3.0, 4.0, 2.0])
     rcv = np.array([6.0, 4.0, 2.0])
-    res = image_source_rir(dims, src, rcv, alpha, fs=96000, max_order=1)
+    res = room.image_source_rir(dims, src, rcv, alpha, fs=96000, max_order=1)
     # The two first-order z-reflections (floor at z=0, ceiling at z=4) mirror
     # the source to z = -2 and z = +6, both at distance sqrt(3^2 + 4^2) = 5 m.
     r_reflect = math.hypot(3.0, 4.0)
@@ -91,8 +84,8 @@ def test_fully_absorbing_wall_annihilates_its_reflections() -> None:
     dims = (6.0, 5.0, 4.0)
     alpha = np.zeros(6)
     alpha[WALL_ORDER.index("z0")] = 1.0  # floor perfectly absorbing
-    res = image_source_rir(dims, (2.0, 2.0, 2.0), (4.0, 3.0, 2.0), alpha,
-                           fs=48000, max_order=6)
+    res = room.image_source_rir(dims, (2.0, 2.0, 2.0), (4.0, 3.0, 2.0), alpha,
+                                fs=48000, max_order=6)
     amp = np.atleast_1d(res.amplitudes)
     # No non-finite or negative amplitudes; the floor-touching images are 0.
     assert np.all(np.isfinite(amp))
@@ -108,25 +101,25 @@ def test_fully_absorbing_wall_annihilates_its_reflections() -> None:
 @pytest.mark.parametrize("i0", [0, 1, 2, 3, 5, 10])
 def test_audible_image_count_matches_kuttruff_9_23(i0: int) -> None:
     dims = (8.0, 5.0, 3.0)
-    res = image_source_rir(dims, (2.0, 2.5, 1.6), (5.5, 3.2, 1.4), 0.1,
-                           fs=8000, max_order=i0)
+    res = room.image_source_rir(dims, (2.0, 2.5, 1.6), (5.5, 3.2, 1.4), 0.1,
+                                fs=8000, max_order=i0)
     # The reflection table holds the audible images plus the direct source.
-    assert res.times.size == audible_image_count(i0) + 1
+    assert res.times.size == room.audible_image_count(i0) + 1
 
 
 def test_audible_image_count_formula() -> None:
     # (2/3)(2 i0^3 + 3 i0^2 + 4 i0); i0 = 10 -> 1560 (Kuttruff Eq. 9.23).
-    assert audible_image_count(10) == 1560
-    assert audible_image_count(0) == 0
-    assert audible_image_count(1) == 6
+    assert room.audible_image_count(10) == 1560
+    assert room.audible_image_count(0) == 0
+    assert room.audible_image_count(1) == 6
 
 
 def test_reflection_density_closed_form() -> None:
     V = 120.0
-    assert reflection_density(0.1, V) == pytest.approx(
+    assert room.reflection_density(0.1, V) == pytest.approx(
         4.0 * math.pi * C**3 * 0.1**2 / V
     )
-    assert reflection_density(0.0, V) == pytest.approx(0.0)
+    assert room.reflection_density(0.0, V) == pytest.approx(0.0)
 
 
 def test_reflection_density_matches_arrival_histogram() -> None:
@@ -135,8 +128,8 @@ def test_reflection_density_matches_arrival_histogram() -> None:
     # (before the finite max_order truncates the far/late images).
     dims = (5.0, 4.0, 3.0)
     V = float(np.prod(dims))
-    res = image_source_rir(dims, (2.0, 2.0, 1.5), (3.0, 2.5, 1.5), 0.1,
-                           fs=48000, max_order=50)
+    res = room.image_source_rir(dims, (2.0, 2.0, 1.5), (3.0, 2.5, 1.5), 0.1,
+                                fs=48000, max_order=50)
     t_probe = 0.05  # s, well inside the complete region (50 * 3 / c = 0.44 s)
     n_before = int(np.count_nonzero(res.times <= t_probe))
     predicted = 4.0 * math.pi * C**3 / (3.0 * V) * t_probe**3
@@ -148,7 +141,9 @@ def test_reflection_density_matches_arrival_histogram() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _energy_density_t60(res: ImageSourceResult, win: float = 0.008) -> float:
+def _energy_density_t60(
+    res: room.ImageSourceResult, win: float = 0.008
+) -> float:
     """Recover T60 from the initial slope of the reverberant energy density."""
     times = res.times
     amp = np.atleast_1d(res.amplitudes)
@@ -170,10 +165,12 @@ def test_cubic_room_recovers_eyring(length: float, alpha: float) -> None:
     dims = (length, length, length)
     volume = length**3
     surface = 6.0 * length**2
-    eyring = float(eyring_reverberation_time(volume, [(surface / 6.0, alpha)] * 6))
-    res = image_source_rir(dims, (1.3, 2.1, 1.7),
-                           (length - 1.4, length - 1.9, length - 1.1),
-                           alpha, fs=48000, max_order=70)
+    eyring = float(
+        room.eyring_reverberation_time(volume, [(surface / 6.0, alpha)] * 6)
+    )
+    res = room.image_source_rir(dims, (1.3, 2.1, 1.7),
+                                (length - 1.4, length - 1.9, length - 1.1),
+                                alpha, fs=48000, max_order=70)
     recovered = _energy_density_t60(res)
     # The specular decay of a cube reproduces the Eyring rate to ~10 %.
     assert recovered == pytest.approx(eyring, rel=0.12)
@@ -185,9 +182,11 @@ def test_elongated_room_decays_slower_than_eyring() -> None:
     dims = (12.0, 5.0, 3.0)
     volume = float(np.prod(dims))
     surface = 2.0 * (12 * 5 + 12 * 3 + 5 * 3)
-    eyring = float(eyring_reverberation_time(volume, [(surface / 6.0, 0.12)] * 6))
-    res = image_source_rir(dims, (2.0, 2.0, 1.5), (9.0, 3.0, 1.6), 0.12,
-                           fs=48000, max_order=60)
+    eyring = float(
+        room.eyring_reverberation_time(volume, [(surface / 6.0, 0.12)] * 6)
+    )
+    res = room.image_source_rir(dims, (2.0, 2.0, 1.5), (9.0, 3.0, 1.6), 0.12,
+                                fs=48000, max_order=60)
     assert _energy_density_t60(res) > eyring
 
 
@@ -199,8 +198,15 @@ def test_elongated_room_decays_slower_than_eyring() -> None:
 def test_per_band_result_shapes() -> None:
     freqs = [250.0, 500.0, 1000.0]
     alpha = np.array([[0.1] * 6, [0.2] * 6, [0.4] * 6]).T  # (6, 3)
-    res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
-                           alpha, fs=16000, max_order=6, frequencies=freqs)
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.2, 1.1, 1.3),
+        (3.5, 2.6, 1.7),
+        alpha,
+        fs=16000,
+        max_order=6,
+        frequencies=freqs,
+    )
     assert res.ir.ndim == 2
     assert res.ir.shape[0] == 3
     assert res.amplitudes.shape[0] == 3
@@ -212,16 +218,27 @@ def test_per_band_result_shapes() -> None:
 
 
 def test_per_band_uniform_vector() -> None:
-    res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
-                           np.array([0.1, 0.3]), fs=16000, max_order=5)
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.2, 1.1, 1.3),
+        (3.5, 2.6, 1.7),
+        np.array([0.1, 0.3]),
+        fs=16000,
+        max_order=5,
+    )
     assert res.ir.shape[0] == 2
 
 
 def test_length_six_is_per_wall_without_frequencies() -> None:
     # A bare length-6 vector is the six per-wall coefficients (broadband).
-    res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
-                           np.array([0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
-                           fs=16000, max_order=5)
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.2, 1.1, 1.3),
+        (3.5, 2.6, 1.7),
+        np.array([0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
+        fs=16000,
+        max_order=5,
+    )
     assert res.ir.ndim == 1
     assert res.frequencies is None
 
@@ -229,9 +246,15 @@ def test_length_six_is_per_wall_without_frequencies() -> None:
 def test_length_six_is_per_band_with_six_frequencies() -> None:
     # With six declared bands, a length-6 vector is a per-band curve.
     freqs = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
-    res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
-                           np.array([0.1, 0.15, 0.2, 0.3, 0.45, 0.6]),
-                           fs=16000, max_order=5, frequencies=freqs)
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.2, 1.1, 1.3),
+        (3.5, 2.6, 1.7),
+        np.array([0.1, 0.15, 0.2, 0.3, 0.45, 0.6]),
+        fs=16000,
+        max_order=5,
+        frequencies=freqs,
+    )
     assert res.ir.shape[0] == 6
     # More absorption at each higher band -> a strictly lower total energy.
     energies = np.sum(res.ir**2, axis=1)
@@ -241,10 +264,10 @@ def test_length_six_is_per_band_with_six_frequencies() -> None:
 def test_air_attenuation_reduces_late_energy() -> None:
     dims = (8.0, 6.0, 4.0)
     common = {"fs": 48000, "max_order": 30}
-    dry = image_source_rir(dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1,
-                           air_attenuation=0.0, **common)
-    humid = image_source_rir(dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1,
-                             air_attenuation=0.01, **common)
+    dry = room.image_source_rir(dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1,
+                                air_attenuation=0.0, **common)
+    humid = room.image_source_rir(dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1,
+                                  air_attenuation=0.01, **common)
     # Air absorption scales exp(-m r / 2); distant (late) images lose more.
     late = dry.times > 0.05
     assert np.all(
@@ -308,7 +331,7 @@ def test_fdtd_damping_decay_recovers_t60() -> None:
     )
     p = res.pressures[0]
     fs = round(1.0 / res.dt)
-    time, level = decay_curve(p, fs)
+    time, level = room.decay_curve(p, fs)
     mask = (level <= -5.0) & (level >= -35.0)
     slope = np.polyfit(time[mask], level[mask], 1)[0]
     t30 = -60.0 / slope
@@ -322,45 +345,77 @@ def test_fdtd_damping_decay_recovers_t60() -> None:
 
 def test_source_outside_room_rejected() -> None:
     with pytest.raises(ValueError, match="outside the room"):
-        image_source_rir((5.0, 4.0, 3.0), (6.0, 2.0, 1.5), (3.0, 2.0, 1.5),
-                         0.2, fs=16000, max_order=2)
+        room.image_source_rir(
+            (5.0, 4.0, 3.0),
+            (6.0, 2.0, 1.5),
+            (3.0, 2.0, 1.5),
+            0.2,
+            fs=16000,
+            max_order=2,
+        )
 
 
 def test_absorption_above_one_rejected() -> None:
     with pytest.raises(ValueError, match=r"\[0, 1\]"):
-        image_source_rir((5.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5),
-                         1.2, fs=16000, max_order=2)
+        room.image_source_rir(
+            (5.0, 4.0, 3.0),
+            (1.0, 2.0, 1.5),
+            (3.0, 2.0, 1.5),
+            1.2,
+            fs=16000,
+            max_order=2,
+        )
 
 
 def test_absorption_band_count_mismatch_rejected() -> None:
     alpha = np.full((6, 4), 0.2)  # 4 bands vs 3 frequencies
     with pytest.raises(ValueError, match="bands but the result has"):
-        image_source_rir((5.0, 4.0, 3.0), (1.0, 1.0, 1.0), (3.0, 2.0, 1.5),
-                         alpha, fs=16000, max_order=3,
-                         frequencies=[250.0, 500.0, 1000.0])
+        room.image_source_rir(
+            (5.0, 4.0, 3.0),
+            (1.0, 1.0, 1.0),
+            (3.0, 2.0, 1.5),
+            alpha,
+            fs=16000,
+            max_order=3,
+            frequencies=[250.0, 500.0, 1000.0],
+        )
 
 
 def test_coincident_source_receiver_rejected() -> None:
     with pytest.raises(ValueError, match="coincide"):
-        image_source_rir((5.0, 4.0, 3.0), (2.0, 2.0, 1.5), (2.0, 2.0, 1.5),
-                         0.2, fs=16000, max_order=2)
+        room.image_source_rir(
+            (5.0, 4.0, 3.0),
+            (2.0, 2.0, 1.5),
+            (2.0, 2.0, 1.5),
+            0.2,
+            fs=16000,
+            max_order=2,
+        )
 
 
 def test_bad_dimension_and_fs() -> None:
     with pytest.raises(ValueError):
-        image_source_rir((0.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5),
-                         0.2, fs=16000)
+        room.image_source_rir(
+            (0.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=16000
+        )
     with pytest.raises(ValueError):
-        image_source_rir((5.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5),
-                         0.2, fs=0)
+        room.image_source_rir(
+            (5.0, 4.0, 3.0), (1.0, 2.0, 1.5), (3.0, 2.0, 1.5), 0.2, fs=0
+        )
 
 
 def test_reflectogram_plot_smoke() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
-                           0.15, fs=16000, max_order=8)
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.2, 1.1, 1.3),
+        (3.5, 2.6, 1.7),
+        0.15,
+        fs=16000,
+        max_order=8,
+    )
     ax = res.plot()
     assert ax.get_xlabel() == "Arrival time [ms]"
 
@@ -371,7 +426,13 @@ def test_reflectogram_plot_direct_only() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    res = image_source_rir((5.0, 4.0, 3.0), (1.2, 1.1, 1.3), (3.5, 2.6, 1.7),
-                           0.15, fs=16000, max_order=0)
+    res = room.image_source_rir(
+        (5.0, 4.0, 3.0),
+        (1.2, 1.1, 1.3),
+        (3.5, 2.6, 1.7),
+        0.15,
+        fs=16000,
+        max_order=0,
+    )
     ax = res.plot()
     assert ax.get_xlabel() == "Arrival time [ms]"
