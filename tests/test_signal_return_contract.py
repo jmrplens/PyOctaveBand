@@ -351,3 +351,15 @@ def test_an_empty_block_keeps_the_carried_state_and_the_wrapper() -> None:
     bare = TimeWeighting(FS, mode="fast")
     bare.process(first)
     assert isinstance(bare.process(np.zeros(0)), np.ndarray)
+
+
+def test_the_envelope_plot_takes_a_caller_supplied_label() -> None:
+    """The same keyword collision as the waveform renderer, same resolution."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry.filters import time_weighting
+
+    stereo = Signal(np.stack([_RECORD, 2.0 * _RECORD]), FS, calibration_factor=CAL)
+    axes = time_weighting(stereo, mode="fast").plot(label="mine")
+    assert [line.get_label() for line in axes.get_lines()] == ["mine", "mine"]

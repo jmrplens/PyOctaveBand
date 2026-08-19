@@ -345,10 +345,15 @@ def plot_time_weighted_envelope(
         axw.plot(result.times, y[0], **kwargs)
     else:
         for index, channel in enumerate(y):
-            axw.plot(
-                result.times, channel,
-                label=_t("Channel {n}", language, n=index + 1), **kwargs,
+            # setdefault, not label=: `label` is an ordinary matplotlib
+            # keyword, so a caller who passes one through **kwargs would
+            # otherwise hit "got multiple values for keyword argument
+            # 'label'". Theirs wins.
+            per_channel = dict(kwargs)
+            per_channel.setdefault(
+                "label", _t("Channel {n}", language, n=index + 1)
             )
+            axw.plot(result.times, channel, **per_channel)
         axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     axw.set_xlabel(_t("Time [s]", language))
     axw.set_ylabel(_t(

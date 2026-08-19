@@ -198,3 +198,21 @@ def test_crop_refuses_a_span_too_narrow_to_hold_a_sample() -> None:
     sparse = Signal(np.arange(5.0)[None, :], 10)
     with pytest.raises(ValueError, match="holds no samples at 10 Hz"):
         sparse.crop(0.11, 0.19)
+
+
+def test_a_caller_supplied_label_reaches_the_lines_instead_of_crashing() -> None:
+    """``label`` is an ordinary matplotlib keyword, and it arrives by kwargs.
+
+    Measured before the fix: ``plot(label="mine")`` on a two-channel record
+    raised ``TypeError: got multiple values for keyword argument 'label'``,
+    because the renderer passed its generated label positionally alongside
+    the caller's. The caller's wins now, and the generated one is still
+    there when they say nothing.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    theirs = _stereo().plot(label="mine")
+    assert [line.get_label() for line in theirs.get_lines()] == ["mine", "mine"]
+    ours = _stereo().plot()
+    assert [line.get_label() for line in ours.get_lines()] == ["left", "right"]

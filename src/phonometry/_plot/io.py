@@ -69,12 +69,16 @@ def _draw_channels(
         axw.plot(t, y[0], **kwargs)
         return
     for index, channel in enumerate(y):
-        label = (
+        # setdefault, not label=: `label` is an ordinary matplotlib keyword,
+        # so a caller who passes one through **kwargs would otherwise hit
+        # "got multiple values for keyword argument 'label'". Theirs wins.
+        per_channel = dict(kwargs)
+        per_channel.setdefault("label", (
             result.channel_labels[index]
             if result.channel_labels is not None
             else _t("Channel {n}", language, n=index + 1)
-        )
-        axw.plot(t, channel, label=label, **kwargs)
+        ))
+        axw.plot(t, channel, **per_channel)
     axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
 
 
