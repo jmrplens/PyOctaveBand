@@ -99,6 +99,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `import phonometry` imports the top level and nothing else. The nineteen
+  domain packages and the four names it publishes arrive on first use, through
+  a module `__getattr__` (PEP 562), so the statement costs **4.4 ms and 56
+  entries in `sys.modules`** where it cost **954 ms and 1182**. Exactly one of
+  those fifty-six is the library itself, where 235 of the 1182 were; the rest
+  are the interpreter's and the standard library's.
+
+  Nothing changes for a caller. `phonometry.building` and
+  `from phonometry import building` work as they did, `dir(phonometry)` still
+  lists all twenty-three names before anything is touched, and the resolved
+  attribute is cached in the module namespace, so the import happens once.
+  The type checker sees the same package it always did: the imports are
+  written out under `if TYPE_CHECKING`, which is the half of the module a
+  checker reads and the interpreter never runs.
+
+  What this buys is a program that uses one domain not paying for the other
+  eighteen. A script that reads a WAV imported scipy, matplotlib and the
+  aircraft noise-power-distance tables before its first line ran, because the
+  top level had to bind every name it published.
+
 - Every example in the documentation reaches a function through the package
   that owns it: `from phonometry import building` and then
   `building.single_panel_transmission_loss(...)`, in both languages in step.
