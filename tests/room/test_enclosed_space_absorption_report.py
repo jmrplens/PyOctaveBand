@@ -23,13 +23,7 @@ pytest.importorskip("reportlab")
 pytest.importorskip("svglib")
 pytest.importorskip("pypdf")
 
-from phonometry import (
-    ReportMetadata,
-    ReverberationResult,
-    enclosed_space_reverberation,
-    hard_object_absorption,
-    object_fraction,
-)
+from phonometry import ReportMetadata, room
 
 _PDF_MAGIC = b"%PDF"
 _VOLUME = 50.0
@@ -41,10 +35,10 @@ _SURFACES = [
 _OBJECT_VOLUMES = [0.5, 0.8, 0.3]
 
 
-def _result() -> ReverberationResult:
-    objects = hard_object_absorption(_OBJECT_VOLUMES)
-    psi = object_fraction(_OBJECT_VOLUMES, _VOLUME)
-    return enclosed_space_reverberation(
+def _result() -> room.ReverberationResult:
+    objects = room.hard_object_absorption(_OBJECT_VOLUMES)
+    psi = room.object_fraction(_OBJECT_VOLUMES, _VOLUME)
+    return room.enclosed_space_reverberation(
         _SURFACES, _VOLUME, objects=objects, object_fraction=psi,
         air_condition="20C_50-70",
     )

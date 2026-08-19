@@ -20,11 +20,7 @@ import numpy as np
 import pytest
 from scipy import signal
 
-from phonometry import (
-    ImpulseResponseResult,
-    golay_impulse_response,
-    golay_pair,
-)
+from phonometry import room
 from phonometry.room.impulse_response import ImpulseResponseWarning
 
 
@@ -41,10 +37,10 @@ def _periodic_response(code: np.ndarray, b: np.ndarray, a: np.ndarray,
 # Pair generation and the complementary identity
 # --------------------------------------------------------------------------
 def test_golay_pair_first_orders_match_recursion() -> None:
-    a1, b1 = golay_pair(1)
+    a1, b1 = room.golay_pair(1)
     assert np.array_equal(a1, [1.0, 1.0])
     assert np.array_equal(b1, [1.0, -1.0])
-    a2, b2 = golay_pair(2)
+    a2, b2 = room.golay_pair(2)
     # Xiang's worked example: a2 = ++.+-, b2 = ++-+
     assert np.array_equal(a2, [1.0, 1.0, 1.0, -1.0])
     assert np.array_equal(b2, [1.0, 1.0, -1.0, 1.0])
@@ -53,7 +49,7 @@ def test_golay_pair_first_orders_match_recursion() -> None:
 @pytest.mark.parametrize("order", range(1, 15))
 def test_complementary_autocorrelation_identity(order: int) -> None:
     """sum of periodic autocorrelations == 2L*delta, machine exact."""
-    a, b = golay_pair(order)
+    a, b = room.golay_pair(order)
     length = 1 << order
     assert a.size == length
     assert b.size == length
@@ -66,7 +62,7 @@ def test_complementary_autocorrelation_identity(order: int) -> None:
 
 
 def test_golay_pair_is_bipolar() -> None:
-    a, b = golay_pair(10)
+    a, b = room.golay_pair(10)
     assert set(np.unique(a)) == {-1.0, 1.0}
     assert set(np.unique(b)) == {-1.0, 1.0}
 
@@ -74,20 +70,20 @@ def test_golay_pair_is_bipolar() -> None:
 @pytest.mark.parametrize("order", [0, -3, 23])
 def test_golay_pair_rejects_bad_order(order: int) -> None:
     with pytest.raises(ValueError, match="order"):
-        golay_pair(order)
+        room.golay_pair(order)
 
 
 # --------------------------------------------------------------------------
 # Impulse-response recovery (Xiang Eq. (4))
 # --------------------------------------------------------------------------
 def test_recovers_delay_and_gain_to_machine_precision() -> None:
-    pair = golay_pair(8)
+    pair = room.golay_pair(8)
     a, b = pair
     gain, delay = 0.75, 37
     rec_a = gain * np.roll(a, delay)
     rec_b = gain * np.roll(b, delay)
-    res = golay_impulse_response(rec_a, rec_b, pair)
-    assert isinstance(res, ImpulseResponseResult)
+    res = room.golay_impulse_response(rec_a, rec_b, pair)
+    assert isinstance(res, room.ImpulseResponseResult)
     assert res.method == "golay"
     expected = np.zeros(a.size)
     expected[delay] = gain
@@ -98,10 +94,10 @@ def test_recovers_biquad_to_machine_precision() -> None:
     # An RBJ-style peaking biquad (any short IIR works: the recovery is
     # circular, so the IR must decay within one code period).
     b, a = signal.iirpeak(0.12, Q=4.0)
-    pair = golay_pair(12)
+    pair = room.golay_pair(12)
     rec_a = _periodic_response(pair[0], b, a)
     rec_b = _periodic_response(pair[1], b, a)
-    res = golay_impulse_response(rec_a, rec_b, pair, fs=48000)
+    res = room.golay_impulse_response(rec_a, rec_b, pair, fs=48000)
     imp = np.zeros(pair[0].size)
     imp[0] = 1.0
     true_ir = signal.lfilter(b, a, imp)
@@ -110,7 +106,7 @@ def test_recovers_biquad_to_machine_precision() -> None:
 
 
 def test_multi_period_recordings_average_noise_down() -> None:
-    pair = golay_pair(10)
+    pair = room.golay_pair(10)
     length = pair[0].size
     rng = np.random.default_rng(7)
     delay = 11
@@ -119,8 +115,8 @@ def test_multi_period_recordings_average_noise_down() -> None:
     noise_b = 0.05 * rng.standard_normal(periods * length)
     rec_a = np.tile(np.roll(pair[0], delay), periods) + noise_a
     rec_b = np.tile(np.roll(pair[1], delay), periods) + noise_b
-    res = golay_impulse_response(rec_a, rec_b, pair)
-    single = golay_impulse_response(
+    res = room.golay_impulse_response(rec_a, rec_b, pair)
+    single = room.golay_impulse_response(
         rec_a[:length], rec_b[:length], pair
     )
     expected = np.zeros(length)
@@ -132,11 +128,11 @@ def test_multi_period_recordings_average_noise_down() -> None:
 
 
 def test_length_trims_and_extends_periodically() -> None:
-    pair = golay_pair(6)
+    pair = room.golay_pair(6)
     rec_a, rec_b = pair
-    short = golay_impulse_response(rec_a, rec_b, pair, length=10)
+    short = room.golay_impulse_response(rec_a, rec_b, pair, length=10)
     assert short.size == 10
-    long = golay_impulse_response(rec_a, rec_b, pair, length=100)
+    long = room.golay_impulse_response(rec_a, rec_b, pair, length=100)
     assert long.size == 100
     np.testing.assert_allclose(long.ir[64:74], short.ir[:10], atol=1e-15)
 
@@ -144,33 +140,33 @@ def test_length_trims_and_extends_periodically() -> None:
 def test_alias_warning_when_ir_longer_than_period() -> None:
     # A slowly decaying system relative to a short pair aliases circularly.
     b, a = signal.butter(2, 0.01)
-    pair = golay_pair(6)
+    pair = room.golay_pair(6)
     rec_a = _periodic_response(pair[0], b, a, periods=1)
     rec_b = _periodic_response(pair[1], b, a, periods=1)
     with pytest.warns(ImpulseResponseWarning, match="Golay"):
-        golay_impulse_response(rec_a, rec_b, pair)
+        room.golay_impulse_response(rec_a, rec_b, pair)
 
 
 def test_input_validation() -> None:
-    pair = golay_pair(4)
+    pair = room.golay_pair(4)
     valid = np.zeros(16)
     non_multiple = np.zeros(10)
     empty = np.zeros(0)
     truncated_pair = (pair[0], pair[1][:8])
     two_dim = np.zeros((2, 16))
     with pytest.raises(ValueError, match="multiple"):
-        golay_impulse_response(non_multiple, valid, pair)
+        room.golay_impulse_response(non_multiple, valid, pair)
     with pytest.raises(ValueError, match="multiple"):
-        golay_impulse_response(valid, empty, pair)
+        room.golay_impulse_response(valid, empty, pair)
     with pytest.raises(ValueError, match="equal-length"):
-        golay_impulse_response(valid, valid, truncated_pair)
+        room.golay_impulse_response(valid, valid, truncated_pair)
     with pytest.raises(ValueError, match="one-dimensional"):
-        golay_impulse_response(two_dim, valid, pair)
+        room.golay_impulse_response(two_dim, valid, pair)
 
 
 def test_result_behaves_like_array() -> None:
-    pair = golay_pair(5)
-    res = golay_impulse_response(pair[0], pair[1], pair)
+    pair = room.golay_pair(5)
+    res = room.golay_impulse_response(pair[0], pair[1], pair)
     assert len(res) == 32
     assert np.asarray(res).shape == (32,)
     assert res[0] == pytest.approx(1.0)

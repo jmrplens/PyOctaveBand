@@ -234,7 +234,7 @@ def test_bandsharing_window_scales_with_record_duration() -> None:
 def test_effective_epnl_exposes_bandsharing_field() -> None:
     rng = np.random.default_rng(7)
     spectra = 60.0 + 5.0 * rng.standard_normal((9, 24))
-    from phonometry import effective_perceived_noise_level
-    res = effective_perceived_noise_level(spectra, 0.5)
+    from phonometry import aircraft
+    res = aircraft.effective_perceived_noise_level(spectra, 0.5)
     assert res.bandsharing_adjustment >= 0.0
     assert res.pnltm == pytest.approx(float(np.max(res.pnlt)) + res.bandsharing_adjustment)

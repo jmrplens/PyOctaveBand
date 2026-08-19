@@ -20,7 +20,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from phonometry import sound_absorption_coefficient_uncertainty
+from phonometry import materials
 from phonometry.materials.absorbers.airflow_resistance import (
     static_airflow_resistance,
 )
@@ -124,7 +124,7 @@ def _static_airflow():
 def _uncertainty():
     freqs = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
     alpha = [0.15, 0.35, 0.55, 0.70, 0.80, 0.85]
-    return sound_absorption_coefficient_uncertainty(alpha, freqs)
+    return materials.sound_absorption_coefficient_uncertainty(alpha, freqs)
 
 
 def _porous_medium():

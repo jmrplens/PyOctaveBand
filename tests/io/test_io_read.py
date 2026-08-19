@@ -32,7 +32,7 @@ from wav_forge import (
     riff_wave,
 )
 
-from phonometry import leq
+from phonometry import signals
 from phonometry.io import LossyCompressionWarning, Signal, info, read
 
 try:
@@ -162,7 +162,7 @@ def test_calibration_cancels_the_scaling_convention(tmp_path: Path) -> None:
     # (1.00237 Pa; 1.0 Pa would be 93.98 dB).
     p_cal = 2e-5 * 10 ** (94.0 / 20.0)
     factor = p_cal / float(np.sqrt(np.mean(np.asarray(cal_sig) ** 2)))
-    measured = leq(meas_sig, calibration_factor=factor)
+    measured = signals.leq(meas_sig, calibration_factor=factor)
     expected = 94.0 + 20 * np.log10(meas_fs / cal_fs)
     assert measured == pytest.approx(expected, abs=0.01)
 

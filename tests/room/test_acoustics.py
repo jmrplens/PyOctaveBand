@@ -24,7 +24,7 @@ import warnings
 import numpy as np
 import pytest
 
-from phonometry import RoomAcousticsResult, decay_curve, room_parameters
+from phonometry import room
 
 FS = 48000
 #: 6*ln(10): decay-rate constant so that exp(-A*t/T) falls 60 dB in T seconds.
@@ -61,7 +61,7 @@ def test_decay_curve_is_linear_for_exponential() -> None:
     # L(t) = -60*t/T exactly for an exponential decay (5.3.3, Eq. 1).
     t60 = 1.0
     ir = exponential_ir(t60, 3.0)
-    t, level = decay_curve(ir, FS)
+    t, level = room.decay_curve(ir, FS)
     assert level[0] == pytest.approx(0.0, abs=1e-9)
     # Compare over the first 40 dB of decay.
     mask = level >= -40.0
@@ -71,13 +71,13 @@ def test_decay_curve_is_linear_for_exponential() -> None:
 def test_decay_curve_monotone_nonincreasing() -> None:
     rng = np.random.default_rng(7)
     ir = exponential_ir(0.7, 2.0) * rng.standard_normal(int(2.0 * FS))
-    _, level = decay_curve(ir, FS)
+    _, level = room.decay_curve(ir, FS)
     assert np.all(np.diff(level) <= 1e-12)
 
 
 def test_decay_curve_single_band() -> None:
     ir = multitone_ir(0.8, 2.5, [500.0])
-    t, level = decay_curve(ir, FS, band=500.0)
+    t, level = room.decay_curve(ir, FS, band=500.0)
     assert t.shape == level.shape
     assert level[0] == pytest.approx(0.0, abs=1e-9)
     assert np.all(np.isfinite(level))
@@ -91,7 +91,7 @@ def test_rt_exponential_broadband(t60: float) -> None:
     # T20 = T30 = EDT = T within +/-1 % (far below the Table A.1 JND of
     # rel. 5 % for EDT / reverberation).
     ir = exponential_ir(t60, 3.0 * t60)
-    res = room_parameters(ir, FS, limits=None)
+    res = room.room_parameters(ir, FS, limits=None)
     assert res.frequency is None
     assert res.edt[0] == pytest.approx(t60, rel=0.01)
     assert res.t20[0] == pytest.approx(t60, rel=0.01)
@@ -108,7 +108,7 @@ def test_rt_exponential_per_octave_band() -> None:
     t60 = 1.0
     centers = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
     ir = multitone_ir(t60, 3.0, centers)
-    res = room_parameters(ir, FS)
+    res = room.room_parameters(ir, FS)
     assert res.frequency is not None
     assert len(res.frequency) == 6
     np.testing.assert_allclose(res.t20, t60, rtol=0.01)
@@ -133,8 +133,10 @@ def test_zero_phase_reduces_short_decay_group_delay_bias() -> None:
     t = np.arange(n) / FS
     # Amplitude decays A60/2 (energy decays A60, i.e. 60 dB) over t60.
     ir = np.exp(-0.5 * A60 * t / t60) * np.sin(2 * np.pi * fc * t)
-    causal = room_parameters(ir, FS, limits=(112.0, 140.0), fraction=1)
-    zp = room_parameters(ir, FS, limits=(112.0, 140.0), fraction=1, zero_phase=True)
+    causal = room.room_parameters(ir, FS, limits=(112.0, 140.0), fraction=1)
+    zp = room.room_parameters(
+        ir, FS, limits=(112.0, 140.0), fraction=1, zero_phase=True
+    )
     for arr in (causal.t20, causal.t30, zp.t20, zp.t30):
         assert np.isfinite(arr[0])
     # Both over-estimate the short decay (positive group-delay bias); the
@@ -150,7 +152,7 @@ def test_zero_phase_reduces_short_decay_group_delay_bias() -> None:
 def test_clarity_closed_form(t60: float) -> None:
     # C80 = 10*lg(exp(13.8155*0.08/T) - 1) dB; tolerance << 1 dB JND.
     ir = exponential_ir(t60, 3.0 * t60)
-    res = room_parameters(ir, FS, limits=None)
+    res = room.room_parameters(ir, FS, limits=None)
     assert res.c80[0] == pytest.approx(c_te_closed_form(t60, 0.080), abs=0.05)
     assert res.c50[0] == pytest.approx(c_te_closed_form(t60, 0.050), abs=0.05)
 
@@ -158,7 +160,7 @@ def test_clarity_closed_form(t60: float) -> None:
 @pytest.mark.parametrize("t60", [0.5, 1.0, 2.0])
 def test_definition_and_centre_time_closed_form(t60: float) -> None:
     ir = exponential_ir(t60, 3.0 * t60)
-    res = room_parameters(ir, FS, limits=None)
+    res = room.room_parameters(ir, FS, limits=None)
     # D50 = 1 - exp(-13.8155*0.05/T); tolerance << 0.05 JND.
     d50_expected = 1.0 - np.exp(-A60 * 0.05 / t60)
     assert res.d50[0] == pytest.approx(d50_expected, abs=0.005)
@@ -169,7 +171,7 @@ def test_definition_and_centre_time_closed_form(t60: float) -> None:
 def test_c50_d50_exact_relation() -> None:
     # C50 = 10*lg(D50/(1 - D50)) must hold exactly (Eq. A.12).
     ir = exponential_ir(1.2, 3.5)
-    res = room_parameters(ir, FS, limits=None)
+    res = room.room_parameters(ir, FS, limits=None)
     d50 = float(res.d50[0])
     assert res.c50[0] == pytest.approx(10.0 * np.log10(d50 / (1.0 - d50)),
                                        abs=1e-9)
@@ -181,8 +183,8 @@ def test_energy_parameters_shift_invariant() -> None:
     t60 = 1.0
     ir = exponential_ir(t60, 3.0)
     shifted = np.concatenate([np.zeros(int(0.05 * FS)), ir])
-    res_a = room_parameters(ir, FS, limits=None)
-    res_b = room_parameters(shifted, FS, limits=None)
+    res_a = room.room_parameters(ir, FS, limits=None)
+    res_b = room.room_parameters(shifted, FS, limits=None)
     assert res_b.c80[0] == pytest.approx(float(res_a.c80[0]), abs=0.05)
     assert res_b.ts[0] == pytest.approx(float(res_a.ts[0]), abs=5e-4)
     assert res_b.t30[0] == pytest.approx(float(res_a.t30[0]), rel=0.01)
@@ -199,7 +201,7 @@ def test_double_slope_edt_below_t30() -> None:
     t = np.arange(int(4.0 * fs)) / fs
     p2 = np.exp(-A60 * t / 0.4) + 1e-2 * np.exp(-A60 * t / 2.0)
     ir = np.sqrt(p2)
-    res = room_parameters(ir, fs, limits=None)
+    res = room.room_parameters(ir, fs, limits=None)
     assert np.isfinite(res.edt[0])
     assert np.isfinite(res.t30[0])
     assert res.edt[0] < res.t20[0] < res.t30[0]
@@ -218,7 +220,7 @@ def test_noise_flips_validity_flags() -> None:
     rng = np.random.default_rng(11)
     ir = exponential_ir(1.0, 3.0)
     noisy = ir + 10.0 ** (-30.0 / 20.0) * rng.standard_normal(ir.size)
-    res = room_parameters(noisy, FS, limits=None)
+    res = room.room_parameters(noisy, FS, limits=None)
     assert bool(res.edt_valid[0])
     assert not bool(res.t20_valid[0])
     assert not bool(res.t30_valid[0])
@@ -243,14 +245,14 @@ def test_decay_validity_thresholds_account_for_tail_compensation() -> None:
 
     # dyn ~ 40 dB: above the OLD T20 threshold (35 dB, would flag valid),
     # below the NEW one (46 dB) -> must now be flagged INVALID.
-    res = room_parameters(noisy_exp(0.010, 0), FS, limits=None)
+    res = room.room_parameters(noisy_exp(0.010, 0), FS, limits=None)
     assert res.dynamic_range[0] == pytest.approx(40.0, abs=2.0)
     assert np.isfinite(res.t20[0])
     assert not bool(res.t20_valid[0])
 
     # dyn ~ 52 dB: T20 now valid (>= 46) with bias < JND; T30 still below its
     # NEW threshold (54 dB) though above the OLD one (45 dB) -> T30 invalid.
-    res = room_parameters(noisy_exp(0.0025, 0), FS, limits=None)
+    res = room.room_parameters(noisy_exp(0.0025, 0), FS, limits=None)
     assert res.dynamic_range[0] == pytest.approx(52.0, abs=2.0)
     assert bool(res.t20_valid[0])
     assert abs(res.t20[0] - 1.0) < 0.05
@@ -258,7 +260,7 @@ def test_decay_validity_thresholds_account_for_tail_compensation() -> None:
     assert not bool(res.t30_valid[0])
 
     # dyn ~ 56 dB: T30 now valid (>= 54) with bias < JND.
-    res = room_parameters(noisy_exp(0.0016, 0), FS, limits=None)
+    res = room.room_parameters(noisy_exp(0.0016, 0), FS, limits=None)
     assert res.dynamic_range[0] == pytest.approx(56.0, abs=2.0)
     assert bool(res.t30_valid[0])
     assert abs(res.t30[0] - 1.0) < 0.05
@@ -266,7 +268,7 @@ def test_decay_validity_thresholds_account_for_tail_compensation() -> None:
 
 def test_clean_ir_flags_all_valid() -> None:
     ir = exponential_ir(1.0, 3.0)
-    res = room_parameters(ir, FS, limits=None)
+    res = room.room_parameters(ir, FS, limits=None)
     assert bool(res.edt_valid[0] and res.t20_valid[0] and res.t30_valid[0])
     assert res.dynamic_range[0] > 45.0
 
@@ -275,7 +277,7 @@ def test_short_ir_yields_nan_and_invalid() -> None:
     # 0.3 s of a T = 2 s decay only covers ~9 dB: T30 (needs -35 dB) is
     # not evaluable.
     ir = exponential_ir(2.0, 0.3)
-    res = room_parameters(ir, FS, limits=None)
+    res = room.room_parameters(ir, FS, limits=None)
     assert np.isnan(res.t30[0])
     assert not bool(res.t30_valid[0])
 
@@ -286,17 +288,17 @@ def test_short_ir_yields_nan_and_invalid() -> None:
 def test_third_octave_bands_option() -> None:
     rng = np.random.default_rng(3)
     ir = exponential_ir(0.8, 2.0) * rng.standard_normal(int(2.0 * FS))
-    res = room_parameters(ir, FS, limits=(100.0, 5000.0), fraction=3)
+    res = room.room_parameters(ir, FS, limits=(100.0, 5000.0), fraction=3)
     assert res.frequency is not None
     assert len(res.frequency) == 18  # 100 Hz..5 kHz one-third octaves
     assert res.t20.shape == (18,)
-    assert isinstance(res, RoomAcousticsResult)
+    assert isinstance(res, room.RoomAcousticsResult)
 
 
 def test_default_bands_are_octaves_125_to_4k() -> None:
     rng = np.random.default_rng(5)
     ir = exponential_ir(0.8, 2.0) * rng.standard_normal(int(2.0 * FS))
-    res = room_parameters(ir, FS)
+    res = room.room_parameters(ir, FS)
     assert res.frequency is not None
     np.testing.assert_allclose(
         res.frequency,
@@ -310,13 +312,13 @@ def test_rejects_bad_input() -> None:
     silent = np.zeros(100)
     decaying = exponential_ir(1.0, 1.0)
     with pytest.raises(ValueError):
-        room_parameters(two_dimensional, FS)  # 2D
+        room.room_parameters(two_dimensional, FS)  # 2D
     with pytest.raises(ValueError):
-        room_parameters(silent, FS)  # silent
+        room.room_parameters(silent, FS)  # silent
     with pytest.raises(ValueError):
-        room_parameters(decaying, 0)  # bad fs
+        room.room_parameters(decaying, 0)  # bad fs
     with pytest.raises(ValueError):
-        decay_curve(silent, FS)  # silent
+        room.decay_curve(silent, FS)  # silent
 
 
 def test_constant_noise_no_decay_is_finite_and_invalid() -> None:
@@ -330,7 +332,7 @@ def test_constant_noise_no_decay_is_finite_and_invalid() -> None:
     ir = rng.standard_normal(FS)  # stationary noise, no decay envelope
     with warnings.catch_warnings():
         warnings.simplefilter("error", RuntimeWarning)
-        res = room_parameters(ir, FS, limits=None)
+        res = room.room_parameters(ir, FS, limits=None)
     # No decay is measurable -> the T-parameters are NaN and flagged invalid.
     assert not bool(res.edt_valid[0])
     assert not bool(res.t20_valid[0])
@@ -354,7 +356,7 @@ def test_band_plot_uses_nominal_frequency_labels() -> None:
     import matplotlib.pyplot as plt
 
     ir = multitone_ir(1.0, 3.0, [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-    res = room_parameters(ir, FS)
+    res = room.room_parameters(ir, FS)
     fig, ax = plt.subplots()
     try:
         res.plot(ax=ax)

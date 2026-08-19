@@ -20,15 +20,7 @@ import reference_data as ref
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    ReportMetadata,
-    detailed_airborne_prediction,
-    detailed_impact_prediction,
-    direct_impact_level,
-    direct_reduction_index,
-    floating_floor_improvement,
-    in_situ_element,
-)
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
@@ -36,8 +28,11 @@ _BANDS = np.asarray(ref.ISO12354_ANNEX_L_BANDS, dtype=np.float64)
 
 def _situ() -> tuple[dict, np.ndarray]:
     """The Annex L building in situ, plus the floating floor's improvement."""
-    situ = {k: in_situ_element(e, _BANDS) for k, e in bld.elements().items()}
-    delta = floating_floor_improvement(
+    situ = {
+        k: building.in_situ_element(e, _BANDS)
+        for k, e in bld.elements().items()
+    }
+    delta = building.floating_floor_improvement(
         _BANDS, resonance_frequency=bld.floating_floor_resonance()
     )
     return situ, delta
@@ -46,9 +41,9 @@ def _situ() -> tuple[dict, np.ndarray]:
 def _annex_l_airborne():
     """The Annex L detailed airborne prediction (R'w = 57 dB)."""
     situ, delta = _situ()
-    return detailed_airborne_prediction(
+    return building.detailed_airborne_prediction(
         _BANDS,
-        direct_index=direct_reduction_index(
+        direct_index=building.direct_reduction_index(
             situ["floor"].sound_reduction_index, delta_r_source=delta),
         flanking_paths=bld.airborne_paths(situ, delta),
     )
@@ -57,9 +52,11 @@ def _annex_l_airborne():
 def _annex_g_impact():
     """The Annex G detailed impact prediction (L'n,w = 41 dB)."""
     situ, delta = _situ()
-    return detailed_impact_prediction(
+    return building.detailed_impact_prediction(
         _BANDS,
-        direct_level=direct_impact_level(situ["floor"].impact_level, delta_l=delta),
+        direct_level=building.direct_impact_level(
+            situ["floor"].impact_level, delta_l=delta
+        ),
         flanking_paths=bld.impact_paths(situ, delta),
     )
 
@@ -145,7 +142,7 @@ def test_spanish_detailed_fiche_renders(tmp_path) -> None:
 
 def test_detailed_fiche_rejects_an_unrated_spectrum(tmp_path) -> None:
     """Without the ISO 717 band range there is no single number to box."""
-    partial = detailed_airborne_prediction(
+    partial = building.detailed_airborne_prediction(
         _BANDS[:5], direct_index=np.full(5, 55.0)
     )
     assert partial.rating is None

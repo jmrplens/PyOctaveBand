@@ -7,7 +7,7 @@ from typing import cast
 
 import numpy as np
 
-from phonometry import octave_filter
+from phonometry import filters
 
 
 def generate_pink_noise(samples: int) -> np.ndarray:
@@ -58,7 +58,9 @@ def test_pink_noise_flatness() -> None:
     samples = int(fs * duration)
     x = generate_pink_noise(samples)
 
-    spl, _freq = octave_filter(x, fs=fs, fraction=3, order=6, limits=[20, 20000])
+    spl, _freq = filters.octave_filter(
+        x, fs=fs, fraction=3, order=6, limits=[20, 20000]
+    )
 
     # Check flatness in central bands (ignoring edges)
     valid_spl = np.array(spl)[2:-2]

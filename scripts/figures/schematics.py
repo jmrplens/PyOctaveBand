@@ -354,7 +354,7 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
     and drains while the F/S/I meter needles follow their own ballistics."""
     from matplotlib.patches import FancyBboxPatch, Rectangle
 
-    from phonometry import time_weighting
+    from phonometry import filters
 
     T = _translate_str
     fs = 8000
@@ -371,9 +371,9 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
     # F, S and I for a steady tone (the asymmetric Impulse kernel otherwise
     # rides the carrier ripple toward its peaks and would sit ~2.6 dB high).
     i_ss = int(2.45 * fs)   # inside the burst, all detectors settled
-    fast = time_weighting(x, fs, mode="fast")
-    slow = time_weighting(x, fs, mode="slow")
-    imp = time_weighting(x, fs, mode="impulse")
+    fast = filters.time_weighting(x, fs, mode="fast")
+    slow = filters.time_weighting(x, fs, mode="slow")
+    imp = filters.time_weighting(x, fs, mode="impulse")
     fast /= fast[i_ss]
     slow /= 0.5             # Slow has not settled by 2.45 s; use the tone MS
     imp /= imp[i_ss]
@@ -536,7 +536,7 @@ def animate_onset_detection(output_dir: str) -> None:
     OR -> LD -> P -> KI decision chain lights up once the onset is found."""
     from matplotlib.patches import Ellipse
 
-    from phonometry import impulse_adjustment, predicted_prominence
+    from phonometry import environment
 
     T = _translate_str
     fs = 500
@@ -551,8 +551,8 @@ def animate_onset_detection(output_dir: str) -> None:
     grad = np.gradient(laf, t)
     onset_rate = (le - ls) / rise      # 200 dB/s
     level_diff = le - ls               # 30 dB
-    prom = float(predicted_prominence(onset_rate, level_diff))
-    ki = float(impulse_adjustment(prom))
+    prom = float(environment.predicted_prominence(onset_rate, level_diff))
+    ki = float(environment.impulse_adjustment(prom))
     is_onset = grad > 10.0             # clauses 4.5-4.7
 
     fig = _anim_figure()
@@ -820,7 +820,7 @@ def animate_schroeder(output_dir: str) -> None:
     while the decay curve and its T20/T30 fits emerge on a companion axis."""
     from matplotlib.patches import Patch
 
-    from phonometry import decay_curve, room_parameters
+    from phonometry import room
     from phonometry.room.acoustics import _T20_RANGE, _T30_RANGE, _onset_index
 
     T = _translate_str
@@ -829,8 +829,8 @@ def animate_schroeder(output_dir: str) -> None:
     t = np.arange(int(2.0 * fs)) / fs
     ir = (rng.standard_normal(t.size) * np.exp(-6.9077 * t / reverb_t)
           + rng.standard_normal(t.size) * 10.0 ** (-45.0 / 20.0))
-    time, level = decay_curve(ir, fs)
-    res = room_parameters(ir, fs, limits=None)
+    time, level = room.decay_curve(ir, fs)
+    res = room.room_parameters(ir, fs, limits=None)
     t20, t30 = float(res.t20[0]), float(res.t30[0])
     p2 = ir.astype(np.float64) ** 2
     p2 = p2[_onset_index(p2):]
@@ -1311,12 +1311,12 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
     from scipy.signal import fftconvolve, spectrogram
 
-    from phonometry import impulse_response, sweep_signal
+    from phonometry import room
 
     T = _translate_str
     fs = 8000
     sweep_len, f1, f2 = 2.5, 60.0, 3500.0
-    sweep = sweep_signal(fs, f1, f2, sweep_len)
+    sweep = room.sweep_signal(fs, f1, f2, sweep_len)
     # Synthetic room: direct sound, two discrete echoes far enough apart
     # (90/160 ms >> the 64 ms spectrogram window) that the recorded sweep
     # shows them as visibly separate delayed copies of the main ridge,
@@ -1334,8 +1334,8 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
     _freqs, times, sxx = spectrogram(recorded, fs, nperseg=512,
                                     noverlap=384)
     sxx_db = 10.0 * np.log10(np.maximum(sxx, sxx.max() * 1e-8) / sxx.max())
-    ir = impulse_response(recorded, sweep, fs, method="spectral",
-                          length=int(0.2 * fs))
+    ir = room.impulse_response(recorded, sweep, fs, method="spectral",
+                               length=int(0.2 * fs))
     t_ir = np.arange(ir.ir.size) / fs * 1e3
     ir_n = ir.ir / np.max(np.abs(ir.ir))
 
@@ -1471,7 +1471,7 @@ def animate_specific_loudness(output_dir: str) -> None:
     sound builds along the Bark axis as the band level steps up, and the
     area under the pattern integrates to the total loudness in sone."""
     T = _translate_str
-    from phonometry import loudness_zwicker_from_spectrum
+    from phonometry import psychoacoustics
 
     bands = [25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400,
              500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000,
@@ -1483,7 +1483,9 @@ def animate_specific_loudness(output_dir: str) -> None:
     for lv in levels:
         third = [-60.0] * 28
         third[i_1k] = float(lv)
-        res = loudness_zwicker_from_spectrum(third, field="free")
+        res = psychoacoustics.loudness_zwicker_from_spectrum(
+            third, field="free"
+        )
         patterns[int(lv)] = res.specific
         totals[int(lv)] = float(res.loudness)
     z = np.arange(1, 241) * 0.1
@@ -1643,9 +1645,9 @@ def animate_power_two_rooms(output_dir: str) -> None:
     ax_r.set_title(T("Reverberation room (ISO 3741)"), fontsize=10,
                    )
     # animated fill (the diffuse level building up) + a fixed outline
-    room = Rectangle((0.6, 0.4), 6.8, 5.6, facecolor=COLOR_PRIMARY,
+    room_patch = Rectangle((0.6, 0.4), 6.8, 5.6, facecolor=COLOR_PRIMARY,
                      edgecolor="none", alpha=0.0)
-    ax_r.add_patch(room)
+    ax_r.add_patch(room_patch)
     ax_r.add_patch(Rectangle((0.6, 0.4), 6.8, 5.6, facecolor="none",
                              edgecolor=COLOR_FG, lw=1.4))
     # a tilted diffuser panel hanging in the volume
@@ -1712,7 +1714,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
         note_a.set_alpha(min(tc / 2.0, 1.0) * 0.9)
         # diffuse field: rays bounce, the background level rises
         build = float(np.clip(tc / 4.0, 0.0, 1.0))
-        room.set_alpha(0.16 * (1.0 - np.exp(-3.0 * build)))
+        room_patch.set_alpha(0.16 * (1.0 - np.exp(-3.0 * build)))
         for ray in rays:
             ts = np.linspace(max(0.0, tc - 0.9), tc, 24)
             xs = [_fold(cr[0] + ray["v"][0] * s, 0.7, 7.3) for s in ts]
@@ -1723,7 +1725,7 @@ def animate_power_two_rooms(output_dir: str) -> None:
         mic_dot.set_data([mic_path_c[0] + mic_path_r * np.cos(ang)],
                          [mic_path_c[1] + mic_path_r * np.sin(ang)])
         note_r.set_alpha(min(tc / 2.0, 1.0) * 0.9)
-        arts += [room, mic_dot, note_a, note_r]
+        arts += [room_patch, mic_dot, note_a, note_r]
         # microphone readings appear, then each formula computes L_W
         if tc >= t_meter:
             lp_a.set_text(T(f"mean $L_p$ = {lp_free:.1f} dB"))
@@ -2098,14 +2100,14 @@ def _modulation_transfer_data() -> dict[str, Any]:
 
     @lru_cache(maxsize=1)
     def build() -> dict[str, Any]:
-        from phonometry import OctaveFilterBank, speech
+        from phonometry import filters, speech
 
         fs = 48000
         # One fixed noise carrier for every decay, so the sweep moves
         # smoothly instead of jittering on a fresh realisation per frame.
         rng = np.random.default_rng(60268)
         carrier = rng.standard_normal(int(2.5 * max(_MTF_T60S) * fs))
-        bank = OctaveFilterBank(fs=fs, fraction=1, order=6,
+        bank = filters.OctaveFilterBank(fs=fs, fraction=1, order=6,
                                limits=[125.0, 8000.0])
         step = fs // _MTF_ENV_HZ
         n_win = int(_MTF_WINDOW_S * _MTF_ENV_HZ)
@@ -3321,14 +3323,14 @@ def _block_vs_exponential_data() -> dict[str, Any]:
     procedure section defines it -- so the readings below are the
     standard's L_AFmax - L_A and are directly comparable with Table 4.
     """
-    from phonometry import time_weighting
+    from phonometry import filters
 
     fs = _BVE_FS
     n_span = round(_BVE_SPAN * fs)
     n_block = round(_BVE_BLOCK * fs)
     t_steady = np.arange(3 * fs) / fs
     steady = np.sin(2.0 * np.pi * _BVE_FREQ * t_steady)
-    ref = float(np.mean(time_weighting(steady, fs, mode="fast")
+    ref = float(np.mean(filters.time_weighting(steady, fs, mode="fast")
                         [int(2.5 * fs):]))
 
     t = np.arange(n_span) / fs
@@ -3342,7 +3344,7 @@ def _block_vs_exponential_data() -> dict[str, Any]:
             x = np.zeros(n_span)
             x[start:start + n_burst] = np.sin(
                 2.0 * np.pi * _BVE_FREQ * t[start:start + n_burst])
-            env = time_weighting(x, fs, mode="fast")
+            env = filters.time_weighting(x, fs, mode="fast")
             env_db.append(10.0 * np.log10(np.maximum(env, 1e-12) / ref))
             n_full = n_span // n_block
             per = (x[:n_full * n_block].reshape(n_full, n_block) ** 2).mean(

@@ -48,12 +48,12 @@ def _hms(unit: str) -> str:
 def generate_equal_loudness_contours(output_dir: str) -> None:
     """Plot the ISO 226:2023 normal equal-loudness-level contours."""
     print("Generating equal_loudness_contours.png...")
-    from phonometry import equal_loudness_contours
+    from phonometry import psychoacoustics
 
     _, ax = plt.subplots(figsize=(10, 7))
     # The result's own .plot() draws the contour family plus the hearing
     # threshold on a 1k/2k-labelled log frequency axis (ISO 226:2023 Formula 1).
-    equal_loudness_contours().plot(ax=ax)
+    psychoacoustics.equal_loudness_contours().plot(ax=ax)
     ax.set_ylim(-10, 130)
     ax.set_title("Normal Equal-Loudness-Level Contours (ISO 226:2023)",
                  pad=12)
@@ -64,7 +64,7 @@ def generate_equal_loudness_contours(output_dir: str) -> None:
 def generate_tonality_spectrum(output_dir: str) -> None:
     """Annotated spectrum for the tone-to-noise ratio method."""
     print("Generating tonality_spectrum.png...")
-    from phonometry import tone_to_noise_ratio
+    from phonometry import psychoacoustics
     from phonometry.psychoacoustics.quality.tonality import (
         _averaged_spectrum,
         _critical_band,
@@ -75,7 +75,7 @@ def generate_tonality_spectrum(output_dir: str) -> None:
     tt = np.arange(fs * 30) / fs
     x = (np.sqrt(2) * 0.1 * np.sin(2 * np.pi * 1000 * tt)
          + 0.05 * rng.standard_normal(tt.size))
-    result = tone_to_noise_ratio(x, fs)
+    result = psychoacoustics.tone_to_noise_ratio(x, fs)
     freqs, power, _ = _averaged_spectrum(x - np.mean(x), fs, 1.0)
     f1, f2, _ = _critical_band(result.frequency)
 
@@ -106,14 +106,14 @@ def generate_tonality_spectrum(output_dir: str) -> None:
 def generate_loudness_pattern(output_dir: str) -> None:
     """Specific loudness N'(z) of a narrowband vs a broadband sound."""
     print("Generating loudness_pattern.png...")
-    from phonometry import loudness_zwicker_from_spectrum
+    from phonometry import psychoacoustics
 
     # 28 one-third-octave band levels, 25 Hz .. 12.5 kHz (ISO 532-1
     # clause 5.3). Index 16 is the 1 kHz band.
     narrow_levels = np.full(28, -60.0)
     narrow_levels[16] = 60.0
-    narrow = loudness_zwicker_from_spectrum(narrow_levels)
-    flat = loudness_zwicker_from_spectrum(np.full(28, 60.0))
+    narrow = psychoacoustics.loudness_zwicker_from_spectrum(narrow_levels)
+    flat = psychoacoustics.loudness_zwicker_from_spectrum(np.full(28, 60.0))
 
     z = np.arange(1, 241) * 0.1  # 0.1-Bark steps up to 24 Bark
 
@@ -168,15 +168,15 @@ def _zwicker_burst_train(fs: int) -> np.ndarray:
 def generate_zwicker_time_varying(output_dir: str) -> None:
     """The clause 6 loudness trace and the percentiles read off it."""
     print("Generating zwicker_time_varying...")
-    from phonometry import loudness_zwicker
+    from phonometry import psychoacoustics
 
     fs = 48000
     x = _zwicker_burst_train(fs)
-    res = loudness_zwicker(x, fs)
+    res = psychoacoustics.loudness_zwicker(x, fs)
     trace = np.asarray(res.loudness_vs_time, dtype=float)
     times = np.asarray(res.time, dtype=float)
     n5, n10 = float(res.n5 or 0.0), float(res.n10 or 0.0)
-    stationary = loudness_zwicker(x, fs, stationary=True)
+    stationary = psychoacoustics.loudness_zwicker(x, fs, stationary=True)
 
     fig, (ax, ax2) = plt.subplots(
         1, 2, figsize=(11.5, 5.4), gridspec_kw={"width_ratios": [1.7, 1.0]})
@@ -334,13 +334,14 @@ def _critical_band_noise(f_low: float, f_high: float,
 
 def _level_for_four_sone(f_low: float, f_high: float) -> float:
     """Band level that puts the band at the clause 6 loudness of 4 sone."""
-    from phonometry import loudness_zwicker
+    from phonometry import psychoacoustics
 
     low, high = 30.0, 95.0
     for _ in range(14):
         mid = (low + high) / 2
-        loudness = loudness_zwicker(_critical_band_noise(f_low, f_high, mid),
-                                    48000, stationary=True).loudness
+        loudness = psychoacoustics.loudness_zwicker(
+            _critical_band_noise(f_low, f_high, mid), 48000, stationary=True
+        ).loudness
         low, high = (mid, high) if loudness < 4.0 else (low, mid)
     return (low + high) / 2
 
@@ -348,12 +349,12 @@ def _level_for_four_sone(f_low: float, f_high: float) -> float:
 @cache
 def _din45692_sweep() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Computed sharpness against the Table A.2 targets, at 4 sone each."""
-    from phonometry import sharpness_din
+    from phonometry import psychoacoustics
 
     centres, targets, computed = [], [], []
     for centre, f_low, f_high, target in _DIN45692_TABLE_A2:
         level = _level_for_four_sone(f_low, f_high)
-        computed.append(float(sharpness_din(
+        computed.append(float(psychoacoustics.sharpness_din(
             _critical_band_noise(f_low, f_high, level), 48000)))
         centres.append(centre)
         targets.append(target)
@@ -424,10 +425,11 @@ def _sottek_specific_panels(
 def generate_sottek_specific_roughness(output_dir: str) -> None:
     """R'(z) and R(l50) of the clause 7 reference sound."""
     print("Generating sottek_specific_roughness...")
-    from phonometry import roughness_ecma
+    from phonometry import psychoacoustics
 
-    result = roughness_ecma(_sottek_am_reference(70.0, 2.0), 48000,
-                            field="free")
+    result = psychoacoustics.roughness_ecma(
+        _sottek_am_reference(70.0, 2.0), 48000, field="free"
+    )
     _sottek_specific_panels(
         output_dir, "sottek_specific_roughness.svg",
         bark=np.asarray(result.bark),
@@ -441,10 +443,11 @@ def generate_sottek_specific_roughness(output_dir: str) -> None:
 def generate_sottek_specific_fluctuation(output_dir: str) -> None:
     """F'(z) and F(l50) of the clause 9 reference sound."""
     print("Generating sottek_specific_fluctuation...")
-    from phonometry import fluctuation_strength_ecma
+    from phonometry import psychoacoustics
 
-    result = fluctuation_strength_ecma(_sottek_am_reference(4.0, 8.0), 48000,
-                                       field="free")
+    result = psychoacoustics.fluctuation_strength_ecma(
+        _sottek_am_reference(4.0, 8.0), 48000, field="free"
+    )
     _sottek_specific_panels(
         output_dir, "sottek_specific_fluctuation.svg",
         bark=np.asarray(result.bark),
@@ -459,7 +462,7 @@ def generate_sottek_specific_fluctuation(output_dir: str) -> None:
 def generate_sharpness_pair_and_targets(output_dir: str) -> None:
     """Sharpness as a position on the Bark axis, and the Table A.2 check."""
     print("Generating sharpness_pair_and_targets...")
-    from phonometry import loudness_zwicker, sharpness_din
+    from phonometry import psychoacoustics
 
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.6))
 
@@ -470,8 +473,8 @@ def generate_sharpness_pair_and_targets(output_dir: str) -> None:
             ((4000.0, 3700.0, 4400.0), COLOR_SECONDARY)):
         level = _level_for_four_sone(f_low, f_high)
         band = _critical_band_noise(f_low, f_high, level)
-        result = loudness_zwicker(band, 48000, stationary=True)
-        acum = float(sharpness_din(band, 48000))
+        result = psychoacoustics.loudness_zwicker(band, 48000, stationary=True)
+        acum = float(psychoacoustics.sharpness_din(band, 48000))
         z = np.arange(1, result.specific.size + 1) * 0.1
         centroid = float(np.sum(result.specific * z) / np.sum(result.specific))
         ax.fill_between(z, result.specific, color=theme_fill(color, ax))
@@ -522,7 +525,7 @@ def generate_sharpness_pair_and_targets(output_dir: str) -> None:
 @cache
 def _tnr_pr_neighbour_sweep() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """TNR and PR of a 1 kHz tone as a tone grows in the next band up."""
-    from phonometry import prominence_ratio, tone_to_noise_ratio
+    from phonometry import psychoacoustics
 
     fs = 48000
     rng = np.random.default_rng(7)
@@ -538,15 +541,21 @@ def _tnr_pr_neighbour_sweep() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     for rel in relative:
         amplitude = np.sqrt(2) * 0.012 * 10 ** (rel / 20)
         x = primary + amplitude * np.sin(2 * np.pi * 1160.0 * t) + noise
-        tnr.append(tone_to_noise_ratio(x, fs, tone_freq=1000.0).ratio_db)
-        pr.append(prominence_ratio(x, fs, tone_freq=1000.0).ratio_db)
+        tnr.append(
+            psychoacoustics.tone_to_noise_ratio(
+                x, fs, tone_freq=1000.0
+            ).ratio_db
+        )
+        pr.append(
+            psychoacoustics.prominence_ratio(x, fs, tone_freq=1000.0).ratio_db
+        )
     return relative, np.array(tnr), np.array(pr)
 
 
 def generate_tnr_pr_comparison(output_dir: str) -> None:
     """The two criteria side by side, and a case where they disagree."""
     print("Generating tnr_pr_comparison...")
-    from phonometry import prominence_ratio, tone_to_noise_ratio
+    from phonometry import psychoacoustics
 
     # The 250 Hz fan tone of the assessment figure, put to both methods.
     fs = 48000
@@ -554,8 +563,8 @@ def generate_tnr_pr_comparison(output_dir: str) -> None:
     t = np.arange(10 * fs) / fs
     fan = (np.sqrt(2) * 0.011 * np.sin(2 * np.pi * 250.0 * t)
            + 0.03 * rng.standard_normal(t.size))
-    tnr_fan = tone_to_noise_ratio(fan, fs)
-    pr_fan = prominence_ratio(fan, fs, tone_freq=250.0)
+    tnr_fan = psychoacoustics.tone_to_noise_ratio(fan, fs)
+    pr_fan = psychoacoustics.prominence_ratio(fan, fs, tone_freq=250.0)
 
     freqs = np.logspace(np.log10(89.1), np.log10(11200.0), 400)
     tnr_criterion = np.where(freqs < 1000.0,
@@ -668,7 +677,7 @@ def generate_two_tone_separation(output_dir: str) -> None:
 def generate_sti_curve(output_dir: str) -> None:
     """STI vs reverberation time: pipeline points vs the analytic MTF."""
     print("Generating sti_vs_t60.png...")
-    from phonometry import sti_from_impulse_response
+    from phonometry import speech
 
     fs = 48000
     t60_points = [0.3, 0.5, 0.8, 1.2, 2.0, 3.0, 5.0]
@@ -693,7 +702,7 @@ def generate_sti_curve(output_dir: str) -> None:
     for t60 in t60_points:
         t = np.arange(int(2 * t60 * fs)) / fs
         ir = rng.standard_normal(t.size) * np.exp(-6.9077 * t / t60)
-        measured.append(sti_from_impulse_response(ir, fs).sti)
+        measured.append(speech.sti_from_impulse_response(ir, fs).sti)
 
     t_dense = np.logspace(np.log10(0.25), np.log10(6.0), 200)
     sti_dense = [analytic_sti(float(t)) for t in t_dense]
@@ -797,10 +806,10 @@ def generate_erb_bandwidth(output_dir: str) -> None:
     octave for scale, with the Cam axis that counts those widths.
     """
     print("Generating erb_bandwidth...")
-    from phonometry import cam_from_frequency, erb_bandwidth
+    from phonometry import psychoacoustics
 
     f = np.geomspace(50.0, 16000.0, 400)
-    erb = np.asarray(erb_bandwidth(f))
+    erb = np.asarray(psychoacoustics.erb_bandwidth(f))
     third_octave = f * (2.0 ** (1.0 / 6.0) - 2.0 ** (-1.0 / 6.0))
 
     _fig, ax = plt.subplots(figsize=(10, 6))
@@ -821,8 +830,8 @@ def generate_erb_bandwidth(output_dir: str) -> None:
     ax.yaxis.set_major_formatter(FixedFormatter([f"{v:g}" for v in y_ticks]))
     ax.legend(loc="upper left", fontsize=9)
 
-    cam_1k = float(np.asarray(cam_from_frequency(1000.0))[()])
-    erb_1k = float(np.asarray(erb_bandwidth(1000.0))[()])
+    cam_1k = float(np.asarray(psychoacoustics.cam_from_frequency(1000.0))[()])
+    erb_1k = float(np.asarray(psychoacoustics.erb_bandwidth(1000.0))[()])
     ax.plot([1000.0], [erb_1k], "o", color=COLOR_PRIMARY, markersize=8,
             markerfacecolor="white", markeredgewidth=1.6, zorder=6)
     ax.annotate(f"1 kHz = {cam_1k:.2f} Cam", xy=(1000.0, erb_1k),
@@ -832,13 +841,12 @@ def generate_erb_bandwidth(output_dir: str) -> None:
     # Top axis: the Cam scale, which counts ERB_N widths along frequency.
     from matplotlib.ticker import NullFormatter, NullLocator
 
-    from phonometry import frequency_from_cam
 
     ax2 = ax.twiny()
     ax2.set_xscale("log")
     ax2.set_xlim(ax.get_xlim())
     cam_ticks = np.array([5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0])
-    ax2.set_xticks(np.asarray(frequency_from_cam(cam_ticks)))
+    ax2.set_xticks(np.asarray(psychoacoustics.frequency_from_cam(cam_ticks)))
     ax2.set_xticklabels([f"{c:.0f}" for c in cam_ticks])
     ax2.xaxis.set_minor_locator(NullLocator())
     ax2.xaxis.set_minor_formatter(NullFormatter())
@@ -870,21 +878,23 @@ def _pure_tone(freq: float, spl_db: float, dur: float,
 @cache
 def _loudness_models_data() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Total loudness (sone) vs level for the three loudness models."""
-    from phonometry import (
-        loudness_ecma,
-        loudness_moore_glasberg_from_spectrum,
-        loudness_zwicker,
-    )
+    from phonometry import psychoacoustics
 
     levels = np.arange(20.0, 81.0, 10.0)  # 20..80 dB SPL
     zw, mg, ec = [], [], []
     for spl in levels:
         x = _pure_tone(1000.0, float(spl), 1.0)
-        zw.append(loudness_zwicker(x, _FS_PSY, stationary=True).loudness)
-        mg.append(
-            loudness_moore_glasberg_from_spectrum([(1000.0, float(spl))]).loudness
+        zw.append(
+            psychoacoustics.loudness_zwicker(
+                x, _FS_PSY, stationary=True
+            ).loudness
         )
-        ec.append(loudness_ecma(x, _FS_PSY).loudness)
+        mg.append(
+            psychoacoustics.loudness_moore_glasberg_from_spectrum(
+                [(1000.0, float(spl))]
+            ).loudness
+        )
+        ec.append(psychoacoustics.loudness_ecma(x, _FS_PSY).loudness)
     return levels, np.array(zw), np.array(mg), np.array(ec)
 
 
@@ -1175,12 +1185,17 @@ def _fluctuation_am_noise_sweep() -> tuple[np.ndarray, np.ndarray]:
 def generate_fluctuation_strength(output_dir: str) -> None:
     """The two models on one stimulus, and the signal model on its own."""
     print("Generating fluctuation_strength...")
-    from phonometry import fluctuation_strength_am_noise
+    from phonometry import psychoacoustics
 
     # Exact closed form (Fastl & Zwicker Eq. 10.2) for AM broadband noise at
     # 60 dB, 100 % modulation, swept over f_mod on a log axis.
     fmod = np.logspace(np.log10(0.5), np.log10(32.0), 240)
-    f_bbn = np.array([fluctuation_strength_am_noise(60.0, 1.0, fm) for fm in fmod])
+    f_bbn = np.array(
+        [
+            psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, fm)
+            for fm in fmod
+        ]
+    )
     bbn_peak = int(np.argmax(f_bbn))
 
     # The Osses 2016 signal model on the same AM broadband noise, and on the
@@ -1188,8 +1203,10 @@ def generate_fluctuation_strength(output_dir: str) -> None:
     fm_noise, f_noise = _fluctuation_am_noise_sweep()
     fm_tone, f_tone = _fluctuation_am_tone_sweep()
     tone_peak = int(np.argmax(f_tone))
-    overshoot = float(f_noise[int(np.argmin(np.abs(fm_noise - 4.0)))]
-                      / fluctuation_strength_am_noise(60.0, 1.0, 4.0))
+    overshoot = float(
+        f_noise[int(np.argmin(np.abs(fm_noise - 4.0)))]
+        / psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, 4.0)
+    )
 
     fig, (ax, ax2) = plt.subplots(
         1, 2, figsize=(12.0, 5.6), gridspec_kw={"width_ratios": [1.55, 1.0]})
@@ -1260,15 +1277,19 @@ def generate_fluctuation_strength(output_dir: str) -> None:
 def generate_annoyance_weightings(output_dir: str) -> None:
     """The two pieces of modelling judgement in the PA formula, drawn."""
     print("Generating annoyance_weightings...")
-    from phonometry import psychoacoustic_annoyance
+    from phonometry import psychoacoustics
 
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.4))
 
     # Left: the sharpness weighting against S, for three loudnesses.
     sharpness = np.linspace(1.0, 5.0, 200)
     for n5, style in ((10.0, "-"), (30.0, "--"), (60.0, ":")):
-        w_s = [psychoacoustic_annoyance(n5, float(s), 0.0, 0.0).w_s
-               for s in sharpness]
+        w_s = [
+            psychoacoustics.psychoacoustic_annoyance(
+                n5, float(s), 0.0, 0.0
+            ).w_s
+            for s in sharpness
+        ]
         ax.plot(sharpness, w_s, style, color=COLOR_PRIMARY, linewidth=2.0,
                 label=f"$N_5$ = {n5:g} sone")
     ax.axvline(1.75, color=COLOR_SECONDARY, linewidth=1.4, linestyle="--")
@@ -1291,10 +1312,18 @@ def generate_annoyance_weightings(output_dir: str) -> None:
 
     # Right: the same magnitude spent on roughness or on fluctuation strength.
     magnitude = np.linspace(0.0, 1.5, 120)
-    rough = [psychoacoustic_annoyance(30.0, 2.0, 0.0, float(v)).annoyance
-             for v in magnitude]
-    fluct = [psychoacoustic_annoyance(30.0, 2.0, float(v), 0.0).annoyance
-             for v in magnitude]
+    rough = [
+        psychoacoustics.psychoacoustic_annoyance(
+            30.0, 2.0, 0.0, float(v)
+        ).annoyance
+        for v in magnitude
+    ]
+    fluct = [
+        psychoacoustics.psychoacoustic_annoyance(
+            30.0, 2.0, float(v), 0.0
+        ).annoyance
+        for v in magnitude
+    ]
     ax2.plot(magnitude, rough, color=COLOR_SECONDARY, linewidth=2.2,
              label="all roughness: $R = v$, $F = 0$")
     ax2.plot(magnitude, fluct, "--", color=COLOR_PRIMARY, linewidth=2.2,
@@ -1393,7 +1422,7 @@ def generate_psychoacoustic_annoyance(output_dir: str) -> None:
 def generate_stoi_intelligibility(output_dir: str) -> None:
     """STOI vs ESTOI over SNR for stationary and modulated maskers."""
     print("Generating stoi_intelligibility...")
-    from phonometry import stoi
+    from phonometry import speech
 
     fs = 10000  # the STOI internal rate: no resampling, faster and exact
     rng = np.random.default_rng(20)
@@ -1420,7 +1449,11 @@ def generate_stoi_intelligibility(output_dir: str) -> None:
         out = []
         for snr in snrs:
             g = p_clean / (p_m * 10.0 ** (snr / 20.0))
-            out.append(stoi(clean, clean + g * masker, fs, extended=extended).value)
+            out.append(
+                speech.stoi(
+                    clean, clean + g * masker, fs, extended=extended
+                ).value
+            )
         return np.asarray(out)
 
     fig, (ax_stoi, ax_estoi) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
@@ -1509,7 +1542,7 @@ def generate_moore_glasberg_time_loudness(output_dir: str) -> None:
 def generate_tone_audibility(output_dir: str) -> None:
     """ISO/PAS 20065 tonal audibility: per-tone ΔL of the Annex E example."""
     print("Generating tone_audibility...")
-    from phonometry import assess_tones
+    from phonometry import psychoacoustics
 
     # Annex E combustion-engine example, spectrum 1 (Tables E.2/E.3),
     # line spacing Δf = 2.7 Hz. Each tuple is (fT, LS, LT).
@@ -1519,7 +1552,9 @@ def generate_tone_audibility(output_dir: str) -> None:
         (629.8, 59.71, 75.00), (643.3, 61.98, 79.75), (1582.7, 54.16, 71.07),
     ]
     freqs = [t[0] for t in tones]
-    res = assess_tones(freqs, [t[2] for t in tones], [t[1] for t in tones], 2.7)
+    res = psychoacoustics.assess_tones(
+        freqs, [t[2] for t in tones], [t[1] for t in tones], 2.7
+    )
 
     x = np.arange(len(freqs))
     decisive = int(np.argmax(res.audibilities))
@@ -1625,16 +1660,16 @@ def generate_exposure_uncertainty(output_dir: str) -> None:
 def generate_speech_intelligibility(output_dir: str) -> None:
     """ANSI S3.5-1997: band audibility and the SII in broadband noise."""
     print("Generating speech_intelligibility.png...")
-    from phonometry import speech_intelligibility_index, standard_speech_spectrum
+    from phonometry import speech
 
     # Standard normal-effort speech in a descending broadband masking noise
     # (an office/ventilation-like spectrum): the band-audibility function A_i
     # is partial across the band, and the importance-weighted contribution
     # I_i*A_i (ANSI S3.5-1997 clause 6) sums to the index SII.
-    speech = standard_speech_spectrum("normal")
+    speech_spectrum = speech.standard_speech_spectrum("normal")
     noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                       22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
-    result = speech_intelligibility_index(speech, noise)
+    result = speech.speech_intelligibility_index(speech_spectrum, noise)
 
     freqs = result.frequencies
     positions = np.arange(freqs.size)
@@ -1664,7 +1699,7 @@ def generate_speech_intelligibility(output_dir: str) -> None:
 def generate_sii_vocal_efforts(output_dir: str) -> None:
     """ANSI S3.5-1997 Table 3 standard speech spectra by vocal effort."""
     print("Generating sii_vocal_efforts.png...")
-    from phonometry import speech_intelligibility_index, standard_speech_spectrum
+    from phonometry import speech
     from phonometry.speech.sii import BAND_CENTERS, VOCAL_EFFORTS
 
     freqs = BAND_CENTERS
@@ -1676,7 +1711,7 @@ def generate_sii_vocal_efforts(output_dir: str) -> None:
 
     # --- Left: the four standard speech spectra. ---
     for effort in VOCAL_EFFORTS:
-        ax_s.plot(freqs, standard_speech_spectrum(effort), "o-",
+        ax_s.plot(freqs, speech.standard_speech_spectrum(effort), "o-",
                   color=colours[effort], label=effort.capitalize())
     ax_s.set_xscale("log")
     ax_s.set_xticks(list(freqs))
@@ -1693,7 +1728,10 @@ def generate_sii_vocal_efforts(output_dir: str) -> None:
     # --- Right: SII in a fixed broadband noise rises with vocal effort. ---
     noise = np.array([48.0, 47.0, 46.0, 44.0, 42.0, 40.0, 38.0, 36.0, 34.0,
                       32.0, 30.0, 28.0, 26.0, 24.0, 22.0, 20.0, 18.0, 16.0])
-    indices = [speech_intelligibility_index(e, noise).sii for e in VOCAL_EFFORTS]
+    indices = [
+        speech.speech_intelligibility_index(e, noise).sii
+        for e in VOCAL_EFFORTS
+    ]
     positions = np.arange(len(VOCAL_EFFORTS))
     bar_colours = [colours[e] for e in VOCAL_EFFORTS]
     ax_i.bar(positions, indices, width=0.6, color=bar_colours, zorder=2)
@@ -1717,13 +1755,13 @@ def generate_sii_vocal_efforts(output_dir: str) -> None:
 def generate_standard_speech_spectrum(output_dir: str) -> None:
     """ANSI S3.5-1997 Table 3 standard speech spectra via StandardSpeechSpectrum.plot()."""
     print("Generating standard_speech_spectrum...")
-    from phonometry import standard_speech_spectra
+    from phonometry import speech
 
     _, ax = plt.subplots(figsize=(10, 6))
     # The result's own .plot() draws one line per vocal effort on the categorical
     # one-third-octave band axis (160 Hz to 8000 Hz), each higher effort lifting
     # the whole speech spectrum (ANSI S3.5-1997 Table 3).
-    standard_speech_spectra().plot(ax=ax, language=_LANG)
+    speech.standard_speech_spectra().plot(ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "standard_speech_spectrum.svg")
     plt.close()
@@ -1732,15 +1770,15 @@ def generate_standard_speech_spectrum(output_dir: str) -> None:
 def generate_sii_band_procedures(output_dir: str) -> None:
     """The band-importance functions of the four ANSI S3.5-1997 procedures."""
     print("Generating sii_band_procedures...")
-    from phonometry import SII_METHODS, sii_procedure
+    from phonometry import speech
 
     _, ax = plt.subplots(figsize=(10, 6))
     # Each procedure's own .plot() steps Ii across its tabulated band limits on
     # a shared logarithmic frequency axis, so the 6-band octave function and
     # the 21-band critical-band function are directly comparable: the same
     # importance is spread over very different bandwidths (Tables 1 to 4).
-    for method in SII_METHODS:
-        sii_procedure(method).plot(ax=ax, language=_LANG, linewidth=1.8)
+    for method in speech.SII_METHODS:
+        speech.sii_procedure(method).plot(ax=ax, language=_LANG, linewidth=1.8)
     plt.tight_layout()
     save_figure(output_dir, "sii_band_procedures.svg")
     plt.close()
@@ -1749,7 +1787,7 @@ def generate_sii_band_procedures(output_dir: str) -> None:
 def generate_hearing_threshold(output_dir: str) -> None:
     """ISO 7029 age-related threshold and ISO 389-7 reference threshold."""
     print("Generating hearing_threshold.png...")
-    from phonometry import age_threshold, reference_threshold
+    from phonometry import hearing
     from phonometry.hearing.threshold import AUDIOMETRIC_FREQUENCIES
 
     freqs = AUDIOMETRIC_FREQUENCIES
@@ -1759,9 +1797,9 @@ def generate_hearing_threshold(output_dir: str) -> None:
     ages = [(20, "#9e9e9e"), (40, "#7f7f7f"), (60, COLOR_PRIMARY),
             (80, COLOR_SECONDARY)]
     for age, color in ages:
-        r = age_threshold(age, "male", 0.5)
+        r = hearing.age_threshold(age, "male", 0.5)
         ax_age.plot(freqs, r.median, "o-", color=color, label=f"{age} yr")
-    r70 = age_threshold(70, "male", 0.5)
+    r70 = hearing.age_threshold(70, "male", 0.5)
     z90 = 1.2816
     ax_age.fill_between(freqs, r70.median - z90 * r70.spread_lower,
                         r70.median + z90 * r70.spread_upper,
@@ -1781,9 +1819,9 @@ def generate_hearing_threshold(output_dir: str) -> None:
     ax_age.legend(loc="lower left")
 
     # --- Right: ISO 389-7 reference threshold, free vs diffuse field. ---
-    ax_ref.plot(freqs, reference_threshold("free-field"), "o-",
+    ax_ref.plot(freqs, hearing.reference_threshold("free-field"), "o-",
                 color=COLOR_PRIMARY, label="Free-field (frontal)")
-    ax_ref.plot(freqs, reference_threshold("diffuse-field"), "s--",
+    ax_ref.plot(freqs, hearing.reference_threshold("diffuse-field"), "s--",
                 color=COLOR_SECONDARY, label="Diffuse-field")
     ax_ref.set_xscale("log")
     ax_ref.set_xticks(list(freqs))
@@ -1812,12 +1850,12 @@ def generate_age_threshold_sex_and_spread(output_dir: str) -> None:
     3000 Hz upwards, because the oldest subjects ran off the audiometer scale.
     """
     print("Generating age_threshold_sex_and_spread.png...")
-    from phonometry import age_threshold
+    from phonometry import hearing
     from phonometry.hearing.threshold import AUDIOMETRIC_FREQUENCIES
 
     idx = int(np.argmin(np.abs(np.asarray(AUDIOMETRIC_FREQUENCIES) - 4000.0)))
     ages = np.arange(18.0, 81.0, 1.0)
-    res = {s: [age_threshold(float(a), s, 0.5) for a in ages]
+    res = {s: [hearing.age_threshold(float(a), s, 0.5) for a in ages]
            for s in ("male", "female")}
     med = {s: np.array([r.median[idx] for r in res[s]]) for s in res}
     s_u = np.array([r.spread_upper[idx] for r in res["male"]])
@@ -2106,7 +2144,7 @@ def generate_exposure_budget(output_dir: str) -> None:
 def generate_stoi_segment_scores(output_dir: str) -> None:
     """The time marginal of STOI, and what the front end throws away."""
     print("Generating stoi_segment_scores.png...")
-    from phonometry import stoi
+    from phonometry import speech
 
     fs = 10000
     rng = np.random.default_rng(11)
@@ -2124,12 +2162,12 @@ def generate_stoi_segment_scores(output_dir: str) -> None:
 
     noise = rng.standard_normal(n)
     noise *= np.sqrt(np.mean(clean**2) / np.mean(noise**2))
-    steady = stoi(clean, clean + noise, fs)
+    steady = speech.stoi(clean, clean + noise, fs)
 
     # The same pair with a 0.35 s dropout instead of steady noise.
     gate = np.ones(n)
     gate[int(1.6 * fs):int(1.95 * fs)] = 0.0
-    dropout = stoi(clean, clean * gate, fs)
+    dropout = speech.stoi(clean, clean * gate, fs)
 
     _fig, (ax_w, ax_s) = plt.subplots(
         2, 1, figsize=(11.0, 6.6), sharex=True,
@@ -2425,7 +2463,7 @@ def generate_sti_level_dependence(output_dir: str) -> None:
 def generate_noise_induced_hearing_loss(output_dir: str) -> None:
     """ISO 1999 noise-induced permanent threshold shift and HTLAN combination."""
     print("Generating noise_induced_hearing_loss.png...")
-    from phonometry import htlan, nipts
+    from phonometry import hearing
     from phonometry.hearing.noise_induced_hearing_loss import NIPTS_FREQUENCIES
 
     freqs = NIPTS_FREQUENCIES
@@ -2435,9 +2473,9 @@ def generate_noise_induced_hearing_loss(output_dir: str) -> None:
     durations = [(10, "#9e9e9e"), (20, "#7f7f7f"), (30, COLOR_PRIMARY),
                  (40, COLOR_SECONDARY)]
     for years, color in durations:
-        r = nipts(95.0, years, 0.5)
+        r = hearing.nipts(95.0, years, 0.5)
         ax_n.plot(freqs, r.median, "o-", color=color, label=f"{years} yr")
-    r40 = nipts(95.0, 40.0, 0.5)
+    r40 = hearing.nipts(95.0, 40.0, 0.5)
     z90 = 1.2816
     ax_n.fill_between(freqs, np.maximum(r40.median - z90 * r40.spread_lower, 0.0),
                       r40.median + z90 * r40.spread_upper,
@@ -2457,7 +2495,7 @@ def generate_noise_induced_hearing_loss(output_dir: str) -> None:
     ax_n.legend(loc="lower left")
 
     # --- Right: HTLAN = age + noise for a 60-year-old worker, 95 dB / 30 yr. ---
-    h = htlan(60, "male", 95.0, 30.0, 0.5)
+    h = hearing.htlan(60, "male", 95.0, 30.0, 0.5)
     ax_h.plot(freqs, h.htla, "o-", color=COLOR_PRIMARY,
               label="Age (HTLA, ISO 7029)")
     ax_h.plot(freqs, h.nipts, "^-", color="#ff7f0e", label="Noise (NIPTS)")
@@ -2583,18 +2621,20 @@ def generate_fluctuation_strength_specific(output_dir: str) -> None:
 def generate_sii_hearing_loss(output_dir: str) -> None:
     """ANSI S3.5-1997 band audibility with a sloping hearing loss."""
     print("Generating sii_hearing_loss...")
-    from phonometry import speech_intelligibility_index, standard_speech_spectrum
+    from phonometry import speech
 
     # The same speech and office noise as the reference SII figure, heard by a
     # listener with a sloping high-frequency loss: the consonant-bearing bands
     # fall below the raised internal noise and the index drops from 0.46 to
     # 0.36.
-    speech = standard_speech_spectrum("normal")
+    speech_spectrum = speech.standard_speech_spectrum("normal")
     noise = np.array([38.0, 37.0, 36.0, 34.0, 32.0, 30.0, 28.0, 26.0, 24.0,
                       22.0, 20.0, 18.0, 16.0, 14.0, 12.0, 10.0, 8.0, 6.0])
     threshold = np.array([5.0, 5.0, 5.0, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0,
                           22.0, 28.0, 35.0, 42.0, 48.0, 55.0, 60.0, 65.0, 70.0])
-    res = speech_intelligibility_index(speech, noise, threshold=threshold)
+    res = speech.speech_intelligibility_index(
+        speech_spectrum, noise, threshold=threshold
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     res.plot(ax=ax, language=_LANG)
@@ -2640,7 +2680,7 @@ def generate_stoi_band_scores(output_dir: str) -> None:
     print("Generating stoi_band_scores...")
     from scipy import signal as sp_signal
 
-    from phonometry import stoi
+    from phonometry import speech
 
     # Speech-like material (band-limited noise with a 3.5 Hz syllabic
     # envelope) in a flat masker at 0 dB SNR: the low bands lose most of the
@@ -2653,7 +2693,7 @@ def generate_stoi_band_scores(output_dir: str) -> None:
     clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
     masker = rng.standard_normal(clean.size)
     gain = np.sqrt(np.mean(clean**2)) / np.sqrt(np.mean(masker**2))
-    res = stoi(clean, clean + gain * masker, fs)
+    res = speech.stoi(clean, clean + gain * masker, fs)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     res.plot(ax=ax, language=_LANG)
@@ -2665,7 +2705,7 @@ def generate_stoi_band_scores(output_dir: str) -> None:
 def generate_sti_band_mti(output_dir: str) -> None:
     """IEC 60268-16 per-band modulation transfer index of a real room."""
     print("Generating sti_band_mti...")
-    from phonometry import sti_from_impulse_response
+    from phonometry import speech
 
     # A reverberant hall (T60 = 0.9 s) with a 15 dB speech-to-noise ratio:
     # the per-band MTI bars behind the single STI number and its rating.
@@ -2673,7 +2713,7 @@ def generate_sti_band_mti(output_dir: str) -> None:
     rng = np.random.default_rng(0)
     n = np.arange(fs)
     ir = rng.standard_normal(fs) * np.exp(-6.9078 * n / fs / 0.9)
-    res = sti_from_impulse_response(ir, fs, snr=15.0)
+    res = speech.sti_from_impulse_response(ir, fs, snr=15.0)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     res.plot(ax=ax, language=_LANG)

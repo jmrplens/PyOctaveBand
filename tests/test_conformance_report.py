@@ -145,14 +145,14 @@ def test_filter_binding_detail_matches_library_margin() -> None:
     """The report re-derives the binding measured value and limit with the
     public ``class_limits``; guard that its class-1 margin never diverges from
     the authoritative ``verify_filter_class`` (single source of truth)."""
-    from phonometry import FilterDesign, OctaveFilterBank
+    from phonometry import filters
     from phonometry.filters.compliance import verify_filter_class
 
     for arch in cr._FILTER_ARCHS:
         fc = cr._filter_class(arch, 3)
-        bank = OctaveFilterBank(
+        bank = filters.OctaveFilterBank(
             48000, fraction=3, order=6, limits=[100, 10000],
-            design=FilterDesign(filter_type=arch),
+            design=filters.FilterDesign(filter_type=arch),
         )
         bands = verify_filter_class(bank)["bands"]
         lib_min = min(b["margin_class1_db"] for b in bands)

@@ -65,7 +65,7 @@ import oracle_data
 import pytest
 from scipy.io import wavfile
 
-from phonometry import STIResult, sti_from_impulse_response, stipa
+from phonometry import speech
 from phonometry.speech.sti import _MOD_FREQS, _NUM_BANDS, _sti_from_mtf
 
 FS = 48000
@@ -141,12 +141,12 @@ def _available(cases: Mapping[Any, str]) -> list[Any]:
     return sorted(key for key, path in cases.items() if path in _MANIFEST)
 
 
-def _stipa_quiet(x: np.ndarray) -> STIResult:
+def _stipa_quiet(x: np.ndarray) -> speech.STIResult:
     """stipa() with the expected verification-bench warnings silenced
     (dead bands and junk m > 1,3 in the two-band C.4.2 signals)."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        return stipa(x, FS)
+        return speech.stipa(x, FS)
 
 
 # ---------------------------------------------------------------------------
@@ -164,7 +164,7 @@ _C32_FILES = {m: f"Annex C.3.2/STIPA-sinecarrier-M={m:g}.wav" for m in _C32_EXPE
 
 @pytest.mark.parametrize("m", _available(_C32_FILES))
 def test_c32_direct_method_modulation_depth(m: float) -> None:
-    res = stipa(_load(_C32_FILES[m]), FS)
+    res = speech.stipa(_load(_C32_FILES[m]), FS)
     # Published staircase (worst measured |dSTI| = 0,0031 -> tol 0,01).
     assert res.sti == pytest.approx(_C32_EXPECTED[m], abs=0.01)
     # MTF extraction: every band/modulation-frequency cell must read back
@@ -193,7 +193,7 @@ def _schroeder_m(rt60: float) -> np.ndarray:
 
 @pytest.mark.parametrize("rt60", _available(_C33_FILES))
 def test_c33_indirect_method_exponential_decay(rt60: float) -> None:
-    res = sti_from_impulse_response(_load(_C33_FILES[rt60]), FS)
+    res = speech.sti_from_impulse_response(_load(_C33_FILES[rt60]), FS)
     m_expected = _schroeder_m(rt60)
     # Per-band, per-modulation-frequency MTF against the closed form
     # (worst measured deviation 0,018 at RT60 = 0,125 s -> tol 0,03).
@@ -256,7 +256,7 @@ _A22_FILES = {
 
 @pytest.mark.parametrize("pair", _available(_A22_FILES))
 def test_a22_weighting_factor_pairs(pair: tuple[int, int]) -> None:
-    res = stipa(_load(_A22_FILES[pair]), FS)
+    res = speech.stipa(_load(_A22_FILES[pair]), FS)
     # Worst measured deviation vs the exact identity: 0,0002 (the visible
     # 0,004 vs the filename is its 2-decimal rounding) -> tol 0,005.
     assert res.sti == pytest.approx(_A22_EXPECTED[pair], abs=0.005)
@@ -289,7 +289,7 @@ _A312_FILES = {
 
 @pytest.mark.parametrize("ti", _available(_A312_FILES))
 def test_a312_filter_bank_phase(ti: float) -> None:
-    res = stipa(_load(_A312_FILES[ti]), FS)
+    res = speech.stipa(_load(_A312_FILES[ti]), FS)
     # Normative criterion: |STI bias| < 0,01 over TI = 0,1 .. 0,9; the
     # endpoints (clipped m) hold trivially and are asserted at the same
     # tolerance. Worst measured bias with the zero-phase bank: -0,0029.

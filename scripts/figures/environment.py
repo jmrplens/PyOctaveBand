@@ -31,7 +31,7 @@ from .theme import (
 def generate_lden_profile(output_dir: str) -> None:
     """A 24 h urban level profile with the Lden period weightings."""
     print("Generating lden_profile.png...")
-    from phonometry import lden
+    from phonometry import environment
 
     hours = np.arange(24)
     # Typical urban road profile (synthetic hourly LAeq, dB)
@@ -45,7 +45,7 @@ def generate_lden_profile(output_dir: str) -> None:
     ld = _period_leq(np.arange(7, 19))    # day 07-19
     le = _period_leq(np.arange(19, 23))   # evening 19-23
     ln_ = _period_leq(np.r_[np.arange(23, 24), np.arange(0, 7)])  # night 23-07
-    l_den = lden(ld, le, ln_)
+    l_den = environment.lden(ld, le, ln_)
 
     _, ax = plt.subplots(figsize=(10, 6))
     ax.axvspan(7, 19, color=theme_fill(COLOR_TERTIARY, ax))
@@ -78,7 +78,7 @@ def generate_lden_profile(output_dir: str) -> None:
 def generate_wind_turbine_tonality(output_dir: str) -> None:
     """IEC 61400-11 wind-turbine tonal audibility: narrowband spectrum + masking."""
     print("Generating wind_turbine_tonality...")
-    from phonometry import wind_turbine_tonality
+    from phonometry import environment
     from phonometry.environment.sources.wind_turbine import _critical_band_edges
 
     # A narrowband spectrum: a shaped broadband floor with a blade-passing-style
@@ -89,7 +89,9 @@ def generate_wind_turbine_tonality(output_dir: str) -> None:
     tone_bin = int(np.argmin(np.abs(freqs - 200.0)))
     levels = floor.copy()
     levels[tone_bin] += 22.0
-    res = wind_turbine_tonality(levels, freqs, tone_frequency=200.0)
+    res = environment.wind_turbine_tonality(
+        levels, freqs, tone_frequency=200.0
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     band_lo, band_hi = _critical_band_edges(res.tone_frequency)
@@ -122,7 +124,7 @@ def generate_wind_turbine_tonality(output_dir: str) -> None:
 def generate_air_absorption_alpha(output_dir: str) -> None:
     """ISO 9613-1 pure-tone atmospheric attenuation coefficient alpha(f)."""
     print("Generating air_absorption_alpha.png...")
-    from phonometry import air_attenuation
+    from phonometry import environment
 
     freqs = np.logspace(np.log10(50.0), np.log10(10000.0), 400)
     # Four representative (temperature, relative humidity) conditions spanning
@@ -136,7 +138,7 @@ def generate_air_absorption_alpha(output_dir: str) -> None:
     ]
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     for temp, rh, color in conditions:
-        alpha_km = air_attenuation(freqs, temp, rh) * 1000.0
+        alpha_km = environment.air_attenuation(freqs, temp, rh) * 1000.0
         ax.loglog(freqs, alpha_km, color=color, linewidth=2.0,
                   label=f"{temp:g} °C, {rh:g} % RH")
     ax.set_title(r"ISO 9613-1 Atmospheric Absorption $\alpha(f)$",
@@ -155,13 +157,15 @@ def generate_air_absorption_alpha(output_dir: str) -> None:
 def generate_atmospheric_attenuation(output_dir: str) -> None:
     """ISO 9613-1 atmospheric attenuation via the AtmosphericAttenuation.plot()."""
     print("Generating atmospheric_attenuation.png...")
-    from phonometry import atmospheric_attenuation
+    from phonometry import environment
 
     freqs = np.logspace(np.log10(50.0), np.log10(10000.0), 400)
     _, ax = plt.subplots(figsize=(10, 6.2))
     # The result's own .plot() draws alpha in dB/km on a 1k/2k-labelled log
     # frequency axis for the reference 20 degC / 50 % RH atmosphere (ISO 9613-1).
-    atmospheric_attenuation(freqs, temperature=20.0, relative_humidity=50.0).plot(ax=ax)
+    environment.atmospheric_attenuation(
+        freqs, temperature=20.0, relative_humidity=50.0
+    ).plot(ax=ax)
     plt.tight_layout()
     save_figure(output_dir, "atmospheric_attenuation.png")
     plt.close()
@@ -170,14 +174,14 @@ def generate_atmospheric_attenuation(output_dir: str) -> None:
 def generate_outdoor_attenuation_breakdown(output_dir: str) -> None:
     """ISO 9613-2 per-term octave-band attenuation breakdown, with a barrier."""
     print("Generating outdoor_attenuation_breakdown.png...")
-    from phonometry import Barrier, outdoor_propagation_attenuation
+    from phonometry import environment
 
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
     # A point source 200 m away over porous ground (G = 1), screened by a 4 m
     # barrier midway (source and receiver 1,5 m high; the diffraction geometry
     # gives dss = dsr ~ 100 m over the raised edge).
-    barrier = Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
-    att = outdoor_propagation_attenuation(
+    barrier = environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
+    att = environment.outdoor_propagation_attenuation(
         200.0, 1.5, 1.5, bands, ground_source=1.0, ground_middle=1.0,
         ground_receiver=1.0, barrier=barrier, temperature=15.0, relative_humidity=70.0,
     )
@@ -221,13 +225,7 @@ def generate_outdoor_attenuation_breakdown(output_dir: str) -> None:
 def generate_cnossos_road_emission(output_dir: str) -> None:
     """CNOSSOS-EU road source-line power of an urban arterial traffic mix."""
     print("Generating cnossos_road_emission.png...")
-    from phonometry import (
-        JunctionType,
-        RoadSurface,
-        RoadTraffic,
-        RoadVehicleCategory,
-        road_source_power,
-    )
+    from phonometry import environment
 
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
     # A two-lane urban arterial on a thin-layer surface: 1 200 light vehicles,
@@ -235,14 +233,26 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
     # motorcycles, 60 m before a signalised crossing, on a 3 % upgrade, at the
     # 12 degC yearly mean of a temperate city.
     traffic = [
-        RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
-        RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
-        RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
-        RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+        environment.RoadTraffic(
+            environment.RoadVehicleCategory.LIGHT, 1200.0, 50.0
+        ),
+        environment.RoadTraffic(
+            environment.RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0
+        ),
+        environment.RoadTraffic(
+            environment.RoadVehicleCategory.HEAVY, 45.0, 50.0
+        ),
+        environment.RoadTraffic(
+            environment.RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0
+        ),
     ]
-    result = road_source_power(
-        traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
-        junction_distance=60.0, junction_type=JunctionType.CROSSING,
+    result = environment.road_source_power(
+        traffic,
+        surface=environment.RoadSurface.THIN_LAYER_A,
+        temperature=12.0,
+        gradient=3.0,
+        junction_distance=60.0,
+        junction_type=environment.JunctionType.CROSSING,
     )
     x = np.arange(len(bands))
     _fig, ax = plt.subplots(figsize=(11, 6.4))
@@ -283,14 +293,9 @@ def generate_cnossos_road_emission(output_dir: str) -> None:
 def generate_cnossos_road_speed_law(output_dir: str) -> None:
     """Rolling and propulsion noise against speed, and where they cross over."""
     print("Generating cnossos_road_speed_law.png...")
-    from phonometry import (
-        CNOSSOS_A_WEIGHTING,
-        road_propulsion_noise,
-        road_rolling_noise,
-        road_vehicle_sound_power,
-    )
+    from phonometry import environment
 
-    weights = np.asarray(CNOSSOS_A_WEIGHTING)
+    weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 
     def a_weighted(bands: np.ndarray) -> float:
         return float(10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0))))
@@ -301,11 +306,24 @@ def generate_cnossos_road_speed_law(output_dir: str) -> None:
         ("1", COLOR_PRIMARY, "Light vehicles (1)"),
         ("3", COLOR_SECONDARY, "Heavy vehicles (3)"),
     ]:
-        rolling = np.array([a_weighted(road_rolling_noise(category, v)) for v in speeds])
-        propulsion = np.array(
-            [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
+        rolling = np.array(
+            [
+                a_weighted(environment.road_rolling_noise(category, v))
+                for v in speeds
+            ]
         )
-        total = np.array([a_weighted(road_vehicle_sound_power(category, v)) for v in speeds])
+        propulsion = np.array(
+            [
+                a_weighted(environment.road_propulsion_noise(category, v))
+                for v in speeds
+            ]
+        )
+        total = np.array(
+            [
+                a_weighted(environment.road_vehicle_sound_power(category, v))
+                for v in speeds
+            ]
+        )
         ax.plot(speeds, total, color=color, linewidth=2.4, zorder=5, label=f"{name} — total")
         ax.plot(speeds, rolling, color=color, linewidth=1.3, linestyle="--", zorder=4,
                 label=f"{name} — rolling")
@@ -341,7 +359,7 @@ def generate_ground_effect_spherical(output_dir: str) -> None:
     print("Generating ground_effect_spherical.png...")
     import warnings as _warnings
 
-    from phonometry import ground_effect
+    from phonometry import environment
 
     freqs = np.geomspace(50.0, 4000.0, 400)
     # Effective flow resistivities (kPa s/m2 -> Pa s/m2) after Attenborough Ch. 2
@@ -357,7 +375,9 @@ def generate_ground_effect_spherical(output_dir: str) -> None:
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
         for label, sigma, color in grounds:
-            res = ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
+            res = environment.ground_effect(
+                freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma
+            )
             ax.plot(freqs, res.excess_attenuation, color=color, linewidth=1.8,
                     label=label, zorder=3)
     ax.axhline(6.0, color=COLOR_FG, linestyle=":", linewidth=1.0, alpha=0.7,
@@ -384,24 +404,25 @@ def generate_atmospheric_refraction(output_dir: str) -> None:
     print("Generating atmospheric_refraction.png...")
     import warnings as _warnings
 
-    from phonometry import (
-        atmospheric_parabolic_equation,
-        atmospheric_ray_paths,
-        log_linear_sound_speed_profile,
-        shadow_zone_distance,
-    )
+    from phonometry import environment
 
     # Upward-refracting surface layer (b = -1 m/s) over grassland: rays curve
     # up and leave an acoustic shadow near the ground (Salomons Sec. 4.4/4.6).
     c0, b = 340.0, -1.0
-    prof = log_linear_sound_speed_profile(b, ground_speed=c0, max_height=60.0)
+    prof = environment.log_linear_sound_speed_profile(
+        b, ground_speed=c0, max_height=60.0
+    )
     zs = 2.0
     fig, axes = plt.subplots(2, 1, figsize=(11, 8.2), sharex=True)
 
     # (a) Ray fan from a near-ground source.
-    rays = atmospheric_ray_paths(prof, source_height=zs,
-                                 launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                                 max_range=600.0, n_steps=3000)
+    rays = environment.atmospheric_ray_paths(
+        prof,
+        source_height=zs,
+        launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+        max_range=600.0,
+        n_steps=3000,
+    )
     for i in range(rays.heights.shape[0]):
         axes[0].plot(rays.ranges[i], rays.heights[i], color=COLOR_PRIMARY,
                      lw=0.8, alpha=0.7, zorder=2)
@@ -409,7 +430,9 @@ def generate_atmospheric_refraction(output_dir: str) -> None:
                  label="Source")
     # The linear-gradient shadow distance (grazing ray at hr = zs) as a guide.
     grad = (prof.speed_at(10.0) - c0) / 10.0
-    x_sh = shadow_zone_distance(float(grad), zs, zs, ground_speed=c0)
+    x_sh = environment.shadow_zone_distance(
+        float(grad), zs, zs, ground_speed=c0
+    )
     axes[0].axvline(x_sh, color=COLOR_SECONDARY, ls="--", lw=1.2, zorder=3,
                     label="Shadow-zone boundary")
     axes[0].set_ylabel("Height [m]")
@@ -422,9 +445,14 @@ def generate_atmospheric_refraction(output_dir: str) -> None:
     # (b) GFPE relative-level field over the same atmosphere and ground.
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        pe = atmospheric_parabolic_equation(400.0, prof, source_height=zs,
-                                            flow_resistivity=200e3,
-                                            max_range=600.0, max_height=40.0)
+        pe = environment.atmospheric_parabolic_equation(
+            400.0,
+            prof,
+            source_height=zs,
+            flow_resistivity=200e3,
+            max_range=600.0,
+            max_height=40.0,
+        )
     dl = np.where(np.isfinite(pe.relative_level), pe.relative_level, np.nan)
     img = axes[1].imshow(
         dl, cmap="RdBu_r", vmin=-30.0, vmax=6.0, aspect="auto", origin="lower",
@@ -457,10 +485,10 @@ def generate_barrier_geometry(output_dir: str) -> None:
     methods share.
     """
     print("Generating barrier_geometry...")
-    from phonometry import plot_barrier_geometry
+    from phonometry import environment
 
     _fig, ax = plt.subplots(figsize=(10, 5.4))
-    plot_barrier_geometry(
+    environment.plot_barrier_geometry(
         ax=ax, source_height=1.0, barrier_distance=50.0,
         barrier_height=4.0, receiver_distance=100.0, receiver_height=1.5,
         language=_LANG,
@@ -473,11 +501,7 @@ def generate_barrier_geometry(output_dir: str) -> None:
 def generate_impulse_prominence(output_dir: str) -> None:
     """NT ACOU 112: predicted prominence and the LAeq adjustment."""
     print("Generating impulse_prominence.png...")
-    from phonometry import (
-        impulse_adjustment,
-        impulse_prominence,
-        predicted_prominence,
-    )
+    from phonometry import environment
     from phonometry.environment.assessment.impulsive_sound import (
         ADJUSTMENT_THRESHOLD,
     )
@@ -489,8 +513,12 @@ def generate_impulse_prominence(output_dir: str) -> None:
     # Distinct hues (not COLOR_GRID, which is near-invisible on a light ground).
     for ld, colour in ((5.0, COLOR_TERTIARY), (15.0, COLOR_PRIMARY),
                        (30.0, COLOR_SECONDARY)):
-        ax_p.plot(orate, predicted_prominence(orate, np.full_like(orate, ld)),
-                  color=colour, label=rf"$\mathrm{{LD}}$ = {ld:g} dB")
+        ax_p.plot(
+            orate,
+            environment.predicted_prominence(orate, np.full_like(orate, ld)),
+            color=colour,
+            label=rf"$\mathrm{{LD}}$ = {ld:g} dB",
+        )
     ax_p.set_xscale("log")
     ax_p.set_xlabel("Onset rate [dB/s]")
     ax_p.set_ylabel("Predicted prominence $P$")
@@ -501,14 +529,21 @@ def generate_impulse_prominence(output_dir: str) -> None:
     ax_p.legend(loc="upper left")
 
     # --- Right: the adjustment KI(P) with example impulses. ---
-    result = impulse_prominence([1200.0, 300.0, 60.0], [32.0, 18.0, 11.0])
+    result = environment.impulse_prominence(
+        [1200.0, 300.0, 60.0], [32.0, 18.0, 11.0]
+    )
     grid = np.linspace(0.0, 16.0, 200)
-    ax_k.plot(grid, impulse_adjustment(grid), color=COLOR_PRIMARY,
+    ax_k.plot(grid, environment.impulse_adjustment(grid), color=COLOR_PRIMARY,
               label=r"$K_{\mathrm{I}} = 1.8\,(P-5)$")
     ax_k.axvline(ADJUSTMENT_THRESHOLD, color="#7f7f7f", linestyle=":",
                  label=f"threshold $P = {ADJUSTMENT_THRESHOLD:g}$")
-    ax_k.scatter(result.per_impulse, impulse_adjustment(result.per_impulse),
-                 color="#aec7e8", zorder=3, label="Impulses")
+    ax_k.scatter(
+        result.per_impulse,
+        environment.impulse_adjustment(result.per_impulse),
+        color="#aec7e8",
+        zorder=3,
+        label="Impulses",
+    )
     ax_k.scatter([result.prominence], [result.adjustment], color=COLOR_SECONDARY,
                  marker="*", s=140, zorder=4,
                  label=rf"Governing  $K_{{\mathrm{{I}}}}$ = {result.adjustment:.1f} dB")
@@ -528,17 +563,20 @@ def generate_impulse_prominence(output_dir: str) -> None:
 def generate_tonal_audibility(output_dir: str) -> None:
     """ISO 1996-2: tonal adjustment Kt(ΔLta) with the Annex C.5 examples."""
     print("Generating tonal_audibility...")
-    from phonometry import assess_tonal_audibility, tonal_adjustment
+    from phonometry import environment
 
     # The four ISO 1996-2:2007 Annex C.5 worked examples: (Lpt, Lpn, fc).
     examples = [(46.7, 37.3, 4000.0), (54.1, 45.2, 430.0),
                 (53.6, 45.5, 755.0), (54.6, 45.5, 308.0)]
-    assessed = [assess_tonal_audibility(lpt, lpn, fc) for lpt, lpn, fc in examples]
+    assessed = [
+        environment.assess_tonal_audibility(lpt, lpn, fc)
+        for lpt, lpn, fc in examples
+    ]
     # A synthetic mid-range tone to exercise the sloped branch.
-    mid = assess_tonal_audibility(50.0, 44.0, 500.0)
+    mid = environment.assess_tonal_audibility(50.0, 44.0, 500.0)
 
     grid = np.linspace(0.0, 15.0, 300)
-    curve = np.array([tonal_adjustment(d) for d in grid])
+    curve = np.array([environment.tonal_adjustment(d) for d in grid])
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.plot(grid, curve, "-", color=COLOR_PRIMARY, linewidth=2.4, zorder=5,
@@ -608,10 +646,14 @@ def generate_impulsive_sound_onsets(output_dir: str) -> None:
 def generate_atmospheric_sound_speed_profiles(output_dir: str) -> None:
     """Log-linear effective sound-speed profiles: downward vs upward refraction."""
     print("Generating atmospheric_sound_speed_profiles...")
-    from phonometry import log_linear_sound_speed_profile
+    from phonometry import environment
 
-    down = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
-    up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
+    down = environment.log_linear_sound_speed_profile(
+        +1.0, ground_speed=340.0, max_height=60.0
+    )
+    up = environment.log_linear_sound_speed_profile(
+        -1.0, ground_speed=340.0, max_height=60.0
+    )
     _fig, ax = plt.subplots(figsize=(7.0, 7.5))
     ax.plot(down.sound_speeds, down.heights, color=COLOR_PRIMARY, linewidth=2.0,
             label="Downward refraction ($b$ = +1 m/s)", zorder=3)
@@ -634,14 +676,19 @@ def generate_atmospheric_sound_speed_profiles(output_dir: str) -> None:
 def generate_atmospheric_ray_fan(output_dir: str) -> None:
     """Downward-refraction ray fan: every ray returns to the ground and bounces."""
     print("Generating atmospheric_ray_fan...")
-    from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+    from phonometry import environment
 
-    profile = log_linear_sound_speed_profile(+1.0, ground_speed=340.0,
-                                             max_height=60.0)
+    profile = environment.log_linear_sound_speed_profile(
+        +1.0, ground_speed=340.0, max_height=60.0
+    )
     zs = 2.0
-    rays = atmospheric_ray_paths(profile, source_height=zs,
-                                 launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                                 max_range=600.0, n_steps=600)
+    rays = environment.atmospheric_ray_paths(
+        profile,
+        source_height=zs,
+        launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+        max_range=600.0,
+        n_steps=600,
+    )
     _fig, ax = plt.subplots(figsize=(11.0, 5.6))
     for i in range(rays.heights.shape[0]):
         ax.plot(rays.ranges[i], rays.heights[i], color=COLOR_PRIMARY, lw=0.8,
@@ -671,36 +718,56 @@ def generate_atmospheric_pe_range(output_dir: str) -> None:
     print("Generating atmospheric_pe_range...")
     import warnings as _warnings
 
-    from phonometry import (
-        atmospheric_parabolic_equation,
-        linear_sound_speed_profile,
-        log_linear_sound_speed_profile,
-        shadow_zone_distance,
-    )
+    from phonometry import environment
 
     c0, zs, zr = 340.0, 2.0, 2.0
     cases = [
-        (log_linear_sound_speed_profile(+1.0, ground_speed=c0, max_height=60.0),
-         COLOR_PRIMARY, "-", "Downward ($b$ = +1 m/s)"),
-        (linear_sound_speed_profile(0.0, ground_speed=c0, max_height=60.0),
-         COLOR_FG, "--", "Homogeneous ($b$ = 0)"),
-        (log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0),
-         COLOR_SECONDARY, "-", "Upward ($b$ = −1 m/s)"),
+        (
+            environment.log_linear_sound_speed_profile(
+                +1.0, ground_speed=c0, max_height=60.0
+            ),
+            COLOR_PRIMARY,
+            "-",
+            "Downward ($b$ = +1 m/s)",
+        ),
+        (
+            environment.linear_sound_speed_profile(
+                0.0, ground_speed=c0, max_height=60.0
+            ),
+            COLOR_FG,
+            "--",
+            "Homogeneous ($b$ = 0)",
+        ),
+        (
+            environment.log_linear_sound_speed_profile(
+                -1.0, ground_speed=c0, max_height=60.0
+            ),
+            COLOR_SECONDARY,
+            "-",
+            "Upward ($b$ = −1 m/s)",
+        ),
     ]
     _fig, ax = plt.subplots(figsize=(11.0, 6.2))
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
         for profile, color, ls, label in cases:
-            pe = atmospheric_parabolic_equation(400.0, profile, source_height=zs,
-                                                flow_resistivity=200e3,
-                                                max_range=600.0, max_height=40.0)
+            pe = environment.atmospheric_parabolic_equation(
+                400.0,
+                profile,
+                source_height=zs,
+                flow_resistivity=200e3,
+                max_range=600.0,
+                max_height=40.0,
+            )
             ax.plot(pe.ranges, pe.level_at_height(zr), color=color, ls=ls,
                     lw=1.6, label=label, zorder=3)
     # The closed-form shadow boundary of the equivalent linear upward gradient
     # (the 10 m mean gradient of the log profile), as in the page-top figure.
     up_prof = cases[2][0]
     grad = (up_prof.speed_at(10.0) - c0) / 10.0
-    x_sh = shadow_zone_distance(float(grad), zs, zr, ground_speed=c0)
+    x_sh = environment.shadow_zone_distance(
+        float(grad), zs, zr, ground_speed=c0
+    )
     ax.axvline(x_sh, color=COLOR_SECONDARY, ls=":", lw=1.2, zorder=2,
                label="Shadow-zone boundary")
     ax.axhline(0.0, color=COLOR_FG, lw=0.8, alpha=0.6)
@@ -723,20 +790,29 @@ def generate_barrier_insertion_loss_methods(output_dir: str) -> None:
     print("Generating barrier_insertion_loss_methods...")
     import warnings as _warnings
 
-    from phonometry import barrier_insertion_loss
+    from phonometry import environment
 
     # A 4 m barrier 50 m from a 1 m source, receiver 1.5 m high at 100 m
     # (the geometry of the ground-barriers guide snippets).
     freqs = np.geomspace(50.0, 5000.0, 240)
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                                       method="kurze_anderson")
-        il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                                       method="exact")
-        il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                                       method="exact",
-                                       ground_flow_resistivity=2e5)
+        il_ka = environment.barrier_insertion_loss(
+            freqs, 1.0, 50.0, 4.0, 100.0, 1.5, method="kurze_anderson"
+        )
+        il_ex = environment.barrier_insertion_loss(
+            freqs, 1.0, 50.0, 4.0, 100.0, 1.5, method="exact"
+        )
+        il_gr = environment.barrier_insertion_loss(
+            freqs,
+            1.0,
+            50.0,
+            4.0,
+            100.0,
+            1.5,
+            method="exact",
+            ground_flow_resistivity=2e5,
+        )
     _fig, ax = plt.subplots(figsize=(11.0, 6.4))
     ax.plot(freqs, il_ka.insertion_loss, color=COLOR_TERTIARY, lw=1.8,
             ls="--", label="Kurze-Anderson (thin screen)", zorder=3)
@@ -772,16 +848,21 @@ def generate_rd1367_activity_assessment(output_dir: str) -> None:
     met but the annual one is not.
     """
     print("Generating rd1367_activity_assessment.png...")
-    from phonometry import NoisePhase, activity_limits, assess_activity
+    from phonometry import environment
 
     day = [
-        NoisePhase(2.0, 0.0, label="closed"),
-        NoisePhase(6.0, 50.0, kt=6.0, kf=3.0),
-        NoisePhase(4.0, 48.0, kt=3.0, kf=3.0),
+        environment.NoisePhase(2.0, 0.0, label="closed"),
+        environment.NoisePhase(6.0, 50.0, kt=6.0, kf=3.0),
+        environment.NoisePhase(4.0, 48.0, kt=3.0, kf=3.0),
     ]
-    evening = [NoisePhase(2.0, 48.0, kt=3.0, kf=3.0), NoisePhase(2.0, 0.0)]
-    verdict = assess_activity(
-        {"day": day, "evening": evening}, activity_limits("a"), operating_days=303
+    evening = [
+        environment.NoisePhase(2.0, 48.0, kt=3.0, kf=3.0),
+        environment.NoisePhase(2.0, 0.0),
+    ]
+    verdict = environment.assess_activity(
+        {"day": day, "evening": evening},
+        environment.activity_limits("a"),
+        operating_days=303,
     )
 
     _, ax = plt.subplots(figsize=(10, 6))
@@ -801,37 +882,32 @@ def _cnossos_rail_scene() -> tuple[Any, Any]:
     rail pad with one joint per 100 m, which is the default Annex II prescribes
     for jointed track.
     """
-    from phonometry import (
-        BrakeType,
-        ContactFilter,
-        RailRoughnessClass,
-        RailwayTrack,
-        RollingStock,
-        TrackTransferClass,
-        TractionVehicle,
-        WheelDiameter,
-        aerodynamic_sound_power,
-        contact_filter,
-        impact_roughness_single,
-        rail_roughness,
-        track_transfer,
-        traction_sound_power,
-        wheel_roughness,
-        wheel_transfer,
-    )
+    from phonometry import environment
 
-    stock = RollingStock(
+    stock = environment.RollingStock(
         axles=4,
-        wheel_roughness=wheel_roughness(BrakeType.NON_TREAD),
-        contact_filter=contact_filter(ContactFilter.LOAD_50_DIAMETER_920),
-        wheel_transfer=wheel_transfer(WheelDiameter.MM_920),
-        traction=traction_sound_power(TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
-        aerodynamic=aerodynamic_sound_power(),
+        wheel_roughness=environment.wheel_roughness(
+            environment.BrakeType.NON_TREAD
+        ),
+        contact_filter=environment.contact_filter(
+            environment.ContactFilter.LOAD_50_DIAMETER_920
+        ),
+        wheel_transfer=environment.wheel_transfer(
+            environment.WheelDiameter.MM_920
+        ),
+        traction=environment.traction_sound_power(
+            environment.TractionVehicle.ELECTRIC_MULTIPLE_UNIT
+        ),
+        aerodynamic=environment.aerodynamic_sound_power(),
     )
-    track = RailwayTrack(
-        rail_roughness=rail_roughness(RailRoughnessClass.NORMAL),
-        track_transfer=track_transfer(TrackTransferClass.MONOBLOCK_MEDIUM),
-        impact_roughness=impact_roughness_single(),
+    track = environment.RailwayTrack(
+        rail_roughness=environment.rail_roughness(
+            environment.RailRoughnessClass.NORMAL
+        ),
+        track_transfer=environment.track_transfer(
+            environment.TrackTransferClass.MONOBLOCK_MEDIUM
+        ),
+        impact_roughness=environment.impact_roughness_single(),
     )
     return stock, track
 
@@ -839,14 +915,17 @@ def _cnossos_rail_scene() -> tuple[Any, Any]:
 def generate_cnossos_rail_emission(output_dir: str) -> None:
     """CNOSSOS-EU railway source-line power at the two equivalent heights."""
     print("Generating cnossos_rail_emission.png...")
-    from phonometry import RailwayVehicle, railway_source_power
+    from phonometry import environment
 
     stock, track = _cnossos_rail_scene()
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
     # 96 coaches per hour at 160 km/h: eight eight-car trains an hour on a
     # conventional main line, seen broadside and slightly from above.
-    result = railway_source_power(
-        RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
+    result = environment.railway_source_power(
+        environment.RailwayVehicle(stock, flow_rate=96.0, speed=160.0),
+        track,
+        phi=90.0,
+        psi=10.0,
     )
     x = np.arange(len(bands))
     _fig, ax = plt.subplots(figsize=(11, 6.4))
@@ -880,32 +959,24 @@ def generate_cnossos_rail_emission(output_dir: str) -> None:
 def generate_cnossos_rail_roughness_shift(output_dir: str) -> None:
     """The roughness spectrum sliding along the frequency axis with speed."""
     print("Generating cnossos_rail_roughness_shift.png...")
-    from phonometry import (
-        RAILWAY_THIRD_OCTAVE_BANDS,
-        BrakeType,
-        ContactFilter,
-        RailRoughnessClass,
-        contact_filter,
-        rail_roughness,
-        roughness_to_frequency,
-        total_effective_roughness,
-        wheel_roughness,
-    )
+    from phonometry import environment
 
-    freqs = np.asarray(RAILWAY_THIRD_OCTAVE_BANDS)
-    rail = rail_roughness(RailRoughnessClass.NORMAL)
-    wheel = wheel_roughness(BrakeType.NON_TREAD)
-    filt = contact_filter(ContactFilter.LOAD_50_DIAMETER_920)
+    freqs = np.asarray(environment.RAILWAY_THIRD_OCTAVE_BANDS)
+    rail = environment.rail_roughness(environment.RailRoughnessClass.NORMAL)
+    wheel = environment.wheel_roughness(environment.BrakeType.NON_TREAD)
+    filt = environment.contact_filter(
+        environment.ContactFilter.LOAD_50_DIAMETER_920
+    )
 
     _fig, ax = plt.subplots(figsize=(11, 6.4))
     for speed, color, marker in (
         (60.0, COLOR_PRIMARY, "o"), (160.0, COLOR_TERTIARY, "s"),
         (300.0, COLOR_SECONDARY, "D"),
     ):
-        total = total_effective_roughness(
-            roughness_to_frequency(rail[1], rail[0], speed),
-            roughness_to_frequency(wheel[1], wheel[0], speed),
-            roughness_to_frequency(filt[1], filt[0], speed),
+        total = environment.total_effective_roughness(
+            environment.roughness_to_frequency(rail[1], rail[0], speed),
+            environment.roughness_to_frequency(wheel[1], wheel[0], speed),
+            environment.roughness_to_frequency(filt[1], filt[0], speed),
         )
         ax.semilogx(freqs, total, color=color, marker=marker, linewidth=1.8,
                     markersize=5, markerfacecolor="white", markeredgewidth=1.2,
@@ -1042,7 +1113,7 @@ def generate_ground_reflection_coefficient(output_dir: str) -> None:
     print("Generating ground_reflection_coefficient.svg...")
     import warnings as _warnings
 
-    from phonometry import ground_effect
+    from phonometry import environment
 
     heights = np.geomspace(3.0, 0.02, 120)
     c0, freq, dist = 343.0, 500.0, 50.0
@@ -1051,8 +1122,8 @@ def generate_ground_reflection_coefficient(output_dir: str) -> None:
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
         for h in heights:
-            res = ground_effect([freq], float(h), float(h), dist,
-                                flow_resistivity=2e5, model="miki")
+            res = environment.ground_effect([freq], float(h), float(h), dist,
+                                            flow_resistivity=2e5, model="miki")
             rp = complex(res.plane_reflection_coefficient[0])
             q = complex(res.reflection_coefficient[0])
             ratio = float(res.r_direct) / float(res.r_reflected)
@@ -1107,7 +1178,7 @@ def generate_barrier_thickness_gain(output_dir: str) -> None:
     import math
     import warnings as _warnings
 
-    from phonometry import barrier_insertion_loss, environment
+    from phonometry import environment
 
     widths = np.linspace(0.0, 30.0, 46)
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.4))
@@ -1115,7 +1186,7 @@ def generate_barrier_thickness_gain(output_dir: str) -> None:
         _warnings.simplefilter("ignore")
         for freq, color in ((250.0, COLOR_PRIMARY), (500.0, COLOR_TERTIARY),
                             (1000.0, COLOR_SECONDARY)):
-            thin = float(barrier_insertion_loss(
+            thin = float(environment.barrier_insertion_loss(
                 [freq], 1.0, 50.0, 4.0, 100.0, 1.5,
                 method="exact").insertion_loss[0])
             gain = []
@@ -1123,7 +1194,7 @@ def generate_barrier_thickness_gain(output_dir: str) -> None:
                 if e <= 0.0:
                     gain.append(0.0)
                     continue
-                gain.append(float(barrier_insertion_loss(
+                gain.append(float(environment.barrier_insertion_loss(
                     [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact",
                     thickness=float(e)).insertion_loss[0]) - thin)
             left.plot(widths, gain, color=color, linewidth=2.0,
@@ -1175,29 +1246,53 @@ def generate_barrier_thickness_gain(output_dir: str) -> None:
 def generate_shadow_zone_map(output_dir: str) -> None:
     """Is my range long enough for refraction to matter?"""
     print("Generating shadow_zone_map.svg...")
-    from phonometry import shadow_zone_distance
+    from phonometry import environment
 
     gradients = np.geomspace(0.02, 0.4, 160)
     _fig, ax = plt.subplots(figsize=(11, 6.2))
     pairs = ((0.5, 1.5, COLOR_PRIMARY), (2.0, 2.0, COLOR_TERTIARY),
              (2.0, 10.0, COLOR_SECONDARY))
     for hs, hr, color in pairs:
-        ax.loglog(gradients,
-                  [shadow_zone_distance(-float(g), hs, hr, ground_speed=340.0)
-                   for g in gradients], color=color, linewidth=2.0,
-                  label=rf"$h_{{\mathrm{{s}}}}/h_{{\mathrm{{r}}}}$ = "
-                        rf"{hs:g} / {hr:g} m", zorder=4)
+        ax.loglog(
+            gradients,
+            [
+                environment.shadow_zone_distance(
+                    -float(g), hs, hr, ground_speed=340.0
+                )
+                for g in gradients
+            ],
+            color=color,
+            linewidth=2.0,
+            label=rf"$h_{{\mathrm{{s}}}}/h_{{\mathrm{{r}}}}$ = "
+            rf"{hs:g} / {hr:g} m",
+            zorder=4,
+        )
     ax.axvline(0.1, color=COLOR_MUTED, linestyle="--", linewidth=1.3, zorder=2)
-    ax.plot([0.1], [shadow_zone_distance(-0.1, 2.0, 2.0, ground_speed=340.0)],
-            "o", color=COLOR_FG, markersize=8, zorder=5)
+    ax.plot(
+        [0.1],
+        [environment.shadow_zone_distance(-0.1, 2.0, 2.0, ground_speed=340.0)],
+        "o",
+        color=COLOR_FG,
+        markersize=8,
+        zorder=5,
+    )
     ax.annotate("representative −0.1 s⁻¹: 233 m",
                 xy=(0.1, 233.2), xytext=(0.022, 90.0), fontsize=10,
                 color=COLOR_FG,
                 arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
     grad_log = 1.0 * np.log(101.0) / 10.0
-    ax.plot([grad_log],
-            [shadow_zone_distance(-grad_log, 2.0, 2.0, ground_speed=340.0)],
-            "s", color=COLOR_SECONDARY, markersize=8, zorder=5)
+    ax.plot(
+        [grad_log],
+        [
+            environment.shadow_zone_distance(
+                -grad_log, 2.0, 2.0, ground_speed=340.0
+            )
+        ],
+        "s",
+        color=COLOR_SECONDARY,
+        markersize=8,
+        zorder=5,
+    )
     ax.annotate("the page's $b$ = −1 m/s case: 109 m",
                 xy=(grad_log, 108.6), xytext=(0.12, 480.0), fontsize=10,
                 color=COLOR_FG,
@@ -1223,15 +1318,22 @@ def generate_refraction_homogeneous_check(output_dir: str) -> None:
     print("Generating refraction_homogeneous_check.svg...")
     import warnings as _warnings
 
-    from phonometry import atmospheric_parabolic_equation, linear_sound_speed_profile
+    from phonometry import environment
 
     c0, freq, zs = 343.0, 500.0, 2.0
-    flat = linear_sound_speed_profile(1e-12, ground_speed=c0, max_height=200.0)
+    flat = environment.linear_sound_speed_profile(
+        1e-12, ground_speed=c0, max_height=200.0
+    )
     with _warnings.catch_warnings():
         _warnings.simplefilter("ignore")
-        pe = atmospheric_parabolic_equation(freq, flat, source_height=zs,
-                                            impedance=1e6 + 0j, max_range=520.0,
-                                            max_height=150.0)
+        pe = environment.atmospheric_parabolic_equation(
+            freq,
+            flat,
+            source_height=zs,
+            impedance=1e6 + 0j,
+            max_range=520.0,
+            max_height=150.0,
+        )
     ranges = np.asarray(pe.ranges)
     solver = np.asarray(pe.level_at_height(zs))
     k = 2.0 * np.pi * freq / c0
@@ -1278,18 +1380,23 @@ def generate_refraction_homogeneous_check(output_dir: str) -> None:
 def generate_cnossos_road_corrections(output_dir: str) -> None:
     """Temperature, studded tyres and junctions, as changes in the line power."""
     print("Generating cnossos_road_corrections.svg...")
-    from phonometry import (
-        JunctionType,
-        RoadTraffic,
-        RoadVehicleCategory,
-        road_source_power,
-    )
+    from phonometry import environment
 
     def a_line(**kwargs: Any) -> float:
-        return float(road_source_power(**kwargs).a_weighted_line_power)
+        return float(
+            environment.road_source_power(**kwargs).a_weighted_line_power
+        )
 
-    light = [RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 50.0)]
-    heavy = [RoadTraffic(RoadVehicleCategory.HEAVY, 1000.0, 50.0)]
+    light = [
+        environment.RoadTraffic(
+            environment.RoadVehicleCategory.LIGHT, 1000.0, 50.0
+        )
+    ]
+    heavy = [
+        environment.RoadTraffic(
+            environment.RoadVehicleCategory.HEAVY, 1000.0, 50.0
+        )
+    ]
 
     _fig, (t_ax, s_ax, j_ax) = plt.subplots(1, 3, figsize=(14.5, 4.8))
     temps = np.linspace(-10.0, 40.0, 60)
@@ -1308,16 +1415,37 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
 
     speeds = np.linspace(20.0, 130.0, 56)
     for share, color in ((0.2, COLOR_PRIMARY), (0.5, COLOR_TERTIARY)):
-        s_ax.plot(speeds, [
-            a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0,
-                                        float(v), studded_fraction=share)],
-                   studded_months=4.0)
-            - a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0,
-                                          float(v))])
-            for v in speeds], color=color, linewidth=2.0,
+        s_ax.plot(
+            speeds,
+            [
+                a_line(
+                    traffic=[
+                        environment.RoadTraffic(
+                            environment.RoadVehicleCategory.LIGHT,
+                            1000.0,
+                            float(v),
+                            studded_fraction=share,
+                        )
+                    ],
+                    studded_months=4.0,
+                )
+                - a_line(
+                    traffic=[
+                        environment.RoadTraffic(
+                            environment.RoadVehicleCategory.LIGHT,
+                            1000.0,
+                            float(v),
+                        )
+                    ]
+                )
+                for v in speeds
+            ],
+            color=color,
+            linewidth=2.0,
             label=rf"$Q_{{\mathrm{{stud}}}}$ = {share:g}, "
-                  rf"$T_{{\mathrm{{s}}}}$ = 4 months",
-            zorder=4)
+            rf"$T_{{\mathrm{{s}}}}$ = 4 months",
+            zorder=4,
+        )
     for edge in (50.0, 90.0):
         s_ax.axvline(edge, color=COLOR_MUTED, linestyle=":", linewidth=1.3,
                      zorder=2)
@@ -1329,8 +1457,12 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
     xs = np.linspace(0.0, 120.0, 61)
     ref = a_line(traffic=light)
     for junction, name, color in (
-        (JunctionType.CROSSING, "Crossing with lights", COLOR_PRIMARY),
-        (JunctionType.ROUNDABOUT, "Roundabout", COLOR_SECONDARY),
+        (
+            environment.JunctionType.CROSSING,
+            "Crossing with lights",
+            COLOR_PRIMARY,
+        ),
+        (environment.JunctionType.ROUNDABOUT, "Roundabout", COLOR_SECONDARY),
     ):
         j_ax.plot(xs, [a_line(traffic=light, junction_distance=float(x),
                               junction_type=junction) - ref for x in xs],
@@ -1354,9 +1486,9 @@ def generate_cnossos_road_corrections(output_dir: str) -> None:
 def generate_cnossos_road_gradient(output_dir: str) -> None:
     """The asymmetric road-gradient correction to propulsion noise."""
     print("Generating cnossos_road_gradient.svg...")
-    from phonometry import CNOSSOS_A_WEIGHTING, road_propulsion_noise
+    from phonometry import environment
 
-    weights = np.asarray(CNOSSOS_A_WEIGHTING)
+    weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 
     def a_weighted(bands: Any) -> float:
         return float(10.0 * np.log10(
@@ -1367,12 +1499,26 @@ def generate_cnossos_road_gradient(output_dir: str) -> None:
     colors = {"1": COLOR_PRIMARY, "2": COLOR_TERTIARY, "3": COLOR_SECONDARY}
     for category, color in colors.items():
         for speed, style in ((50.0, "--"), (80.0, "-")):
-            flat = a_weighted(road_propulsion_noise(category, speed))
-            ax.plot(slopes,
-                    [a_weighted(road_propulsion_noise(category, speed,
-                                                      gradient=float(s))) - flat
-                     for s in slopes], style, color=color, linewidth=1.9,
-                    label=f"Category {category}, {speed:g} km/h", zorder=4)
+            flat = a_weighted(
+                environment.road_propulsion_noise(category, speed)
+            )
+            ax.plot(
+                slopes,
+                [
+                    a_weighted(
+                        environment.road_propulsion_noise(
+                            category, speed, gradient=float(s)
+                        )
+                    )
+                    - flat
+                    for s in slopes
+                ],
+                style,
+                color=color,
+                linewidth=1.9,
+                label=f"Category {category}, {speed:g} km/h",
+                zorder=4,
+            )
     for edge in (-12.0, 12.0):
         ax.axvline(edge, color=COLOR_MUTED, linestyle=":", linewidth=1.3,
                    zorder=2)
@@ -1392,20 +1538,24 @@ def generate_cnossos_road_gradient(output_dir: str) -> None:
 def generate_cnossos_road_surfaces(output_dir: str) -> None:
     """Table F-4: the octave-band surface coefficient of five pavements."""
     print("Generating cnossos_road_surfaces.svg...")
-    from phonometry import RoadSurface, road_surface_coefficients
+    from phonometry import environment
 
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
     rows = (
-        (RoadSurface.REFERENCE, COLOR_FG, ":"),
-        (RoadSurface.TWO_LAYER_ZOAB_FINE, COLOR_PRIMARY, "-"),
-        (RoadSurface.ONE_LAYER_ZOAB, COLOR_TERTIARY, "-"),
-        (RoadSurface.THIN_LAYER_A, "#9467bd", "-"),
-        (RoadSurface.SMA_NL8, "#e8a838", "-"),
-        (RoadSurface.HARD_ELEMENTS_NOT_HERRINGBONE, COLOR_SECONDARY, "-"),
+        (environment.RoadSurface.REFERENCE, COLOR_FG, ":"),
+        (environment.RoadSurface.TWO_LAYER_ZOAB_FINE, COLOR_PRIMARY, "-"),
+        (environment.RoadSurface.ONE_LAYER_ZOAB, COLOR_TERTIARY, "-"),
+        (environment.RoadSurface.THIN_LAYER_A, "#9467bd", "-"),
+        (environment.RoadSurface.SMA_NL8, "#e8a838", "-"),
+        (
+            environment.RoadSurface.HARD_ELEMENTS_NOT_HERRINGBONE,
+            COLOR_SECONDARY,
+            "-",
+        ),
     )
     _fig, ax = plt.subplots(figsize=(11, 6.4))
     for surface, color, style in rows:
-        row = road_surface_coefficients(surface)
+        row = environment.road_surface_coefficients(surface)
         span = ("all speeds" if row.speed_range is None
                 else "{:g}-{:g} km/h".format(*row.speed_range))
         ax.semilogx(bands, np.asarray(row.alpha["1"]), style, color=color,
@@ -1430,7 +1580,7 @@ def generate_cnossos_road_surfaces(output_dir: str) -> None:
 def generate_cnossos_rail_components(output_dir: str) -> None:
     """Which source line carries what, and when source B wakes up."""
     print("Generating cnossos_rail_components.svg...")
-    from phonometry import RailwayVehicle, railway_source_power
+    from phonometry import environment
 
     stock, track = _cnossos_rail_scene()
 
@@ -1438,8 +1588,8 @@ def generate_cnossos_rail_components(output_dir: str) -> None:
         return float(10.0 * np.log10(np.sum(10.0 ** (np.asarray(bands) / 10.0))))
 
     _fig, (left, right) = plt.subplots(1, 2, figsize=(13, 5.4))
-    result = railway_source_power(
-        RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track,
+    result = environment.railway_source_power(
+        environment.RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track,
         phi=90.0, psi=10.0)
     freqs = np.asarray(result.third_octave_frequencies)
     palette = {"rolling": COLOR_PRIMARY, "traction": COLOR_TERTIARY,
@@ -1464,11 +1614,26 @@ def generate_cnossos_rail_components(output_dir: str) -> None:
     speeds = np.linspace(60.0, 350.0, 40)
     for row, label, color in ((0, "Source A (0,5 m)", COLOR_PRIMARY),
                               (1, "Source B (4,0 m)", COLOR_SECONDARY)):
-        right.plot(speeds, [
-            total(railway_source_power(
-                RailwayVehicle(stock, flow_rate=96.0, speed=float(v)), track,
-                phi=90.0, psi=10.0).line_power[row]) for v in speeds],
-            color=color, linewidth=2.0, label=label, zorder=4)
+        right.plot(
+            speeds,
+            [
+                total(
+                    environment.railway_source_power(
+                        environment.RailwayVehicle(
+                            stock, flow_rate=96.0, speed=float(v)
+                        ),
+                        track,
+                        phi=90.0,
+                        psi=10.0,
+                    ).line_power[row]
+                )
+                for v in speeds
+            ],
+            color=color,
+            linewidth=2.0,
+            label=label,
+            zorder=4,
+        )
     right.axvline(200.0, color=COLOR_MUTED, linestyle=":", linewidth=1.4,
                   label="Aerodynamic threshold (2.3.13)", zorder=2)
     right.set_title("Each source line against speed", pad=10)
@@ -1485,17 +1650,25 @@ def generate_cnossos_rail_components(output_dir: str) -> None:
 def generate_cnossos_rail_directivity(output_dir: str) -> None:
     """Two editions of the vertical correction, and the horizontal dipole."""
     print("Generating cnossos_rail_directivity.svg...")
-    from phonometry import DirectivityEdition, vertical_directivity
+    from phonometry import environment
 
     psi = np.linspace(-89.0, 89.0, 179)
     fig, (left, right) = plt.subplots(
         1, 2, subplot_kw={"projection": "polar"}, figsize=(12.5, 5.8))
     bands = ((7, "250 Hz", COLOR_PRIMARY), (19, "4 kHz", COLOR_SECONDARY))
     for band, name, color in bands:
-        for edition, style in ((DirectivityEdition.CURRENT, "-"),
-                               (DirectivityEdition.ORIGINAL_2015, "--")):
-            values = [float(vertical_directivity(float(a), edition=edition)[band])
-                      for a in psi]
+        for edition, style in (
+            (environment.DirectivityEdition.CURRENT, "-"),
+            (environment.DirectivityEdition.ORIGINAL_2015, "--"),
+        ):
+            values = [
+                float(
+                    environment.vertical_directivity(
+                        float(a), edition=edition
+                    )[band]
+                )
+                for a in psi
+            ]
             left.plot(np.radians(psi), values, style, color=color, linewidth=1.9,
                       label=f"{name}, {edition.value}")
     left.set_title("Vertical correction of source A (2.3.16)",
@@ -1526,13 +1699,13 @@ def generate_cnossos_rail_directivity(output_dir: str) -> None:
 def generate_wind_turbine_apparent_power(output_dir: str) -> None:
     """LWA as a function of wind speed, with a voided and an asterisked bin."""
     print("Generating wind_turbine_apparent_power.svg...")
-    from phonometry import apparent_sound_power_level, slant_distance
+    from phonometry import environment
 
-    r1 = slant_distance(hub_height=80.0, rotor_diameter=100.0)
+    r1 = environment.slant_distance(hub_height=80.0, rotor_diameter=100.0)
     bins = np.arange(4.0, 12.5, 0.5)
     shape = np.array([-4.0, -1.5, 0.0, -1.0, -3.0])   # 250 Hz to 1 kHz
     lwa = np.array([
-        float(apparent_sound_power_level(
+        float(environment.apparent_sound_power_level(
             44.0 + 12.0 / (1.0 + np.exp(-(v - 7.0))) + shape, r1))
         for v in bins])
     voided, flagged = 0, 1        # the two lowest bins, by their margin
@@ -1571,7 +1744,7 @@ def generate_wind_turbine_apparent_power(output_dir: str) -> None:
 def generate_wind_turbine_audibility_criterion(output_dir: str) -> None:
     """The critical bandwidth and the audibility criterion against frequency."""
     print("Generating wind_turbine_audibility_criterion.svg...")
-    from phonometry import critical_bandwidth
+    from phonometry import environment
 
     fc = np.geomspace(20.0, 10000.0, 400)
     zwicker = 25.0 + 75.0 * (1.0 + 1.4 * (fc / 1000.0) ** 2) ** 0.69
@@ -1580,9 +1753,15 @@ def generate_wind_turbine_audibility_criterion(output_dir: str) -> None:
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 5.2))
     left.loglog(fc, zwicker, color=COLOR_PRIMARY, linewidth=2.0,
                 label="IEC 61400-11 critical band (Zwicker)", zorder=4)
-    left.loglog(fc, [critical_bandwidth(float(f)) for f in fc], "--",
-                color=COLOR_TERTIARY, linewidth=1.8,
-                label="ISO 1996-2 Table C.1", zorder=4)
+    left.loglog(
+        fc,
+        [environment.critical_bandwidth(float(f)) for f in fc],
+        "--",
+        color=COLOR_TERTIARY,
+        linewidth=1.8,
+        label="ISO 1996-2 Table C.1",
+        zorder=4,
+    )
     left.plot([20.0, 70.0], [100.0, 100.0], color=COLOR_SECONDARY, linewidth=5.0,
               solid_capstyle="butt", label="9.5.3: fixed 20-120 Hz band", zorder=5)
     left.set_title("Two critical bandwidths on one page",

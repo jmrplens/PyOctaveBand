@@ -19,7 +19,7 @@ import pathlib
 import numpy as np
 import pytest
 
-from phonometry import ZwickerLoudness, loudness_zwicker, loudness_zwicker_from_spectrum
+from phonometry import psychoacoustics
 
 FS = 48000
 # Single ISO 532-1 data root, honouring the ISO532_1_TESTDATA override so the
@@ -84,14 +84,16 @@ def _levels_from_file() -> np.ndarray:
 @requires_iso_data
 def test_annex_b2_stationary_from_levels() -> None:
     exp = EXPECTED["Test signal 1.txt"]
-    res = loudness_zwicker_from_spectrum(_levels_from_file(), field="free")
+    res = psychoacoustics.loudness_zwicker_from_spectrum(
+        _levels_from_file(), field="free"
+    )
     assert exp["Nmin"] <= res.loudness <= exp["Nmax"]
     assert res.loudness == pytest.approx(exp["N"], rel=0.001)
 
 
 @requires_iso_data
 def test_specific_loudness_shape_and_integral() -> None:
-    res = loudness_zwicker_from_spectrum(_levels_from_file())
+    res = psychoacoustics.loudness_zwicker_from_spectrum(_levels_from_file())
     assert res.specific.shape == (240,)
     # N equals the integral of N'(z) dz (dz = 0.1 Bark) up to the slope
     # method's fractional band-edge handling
@@ -112,7 +114,7 @@ def test_specific_loudness_shape_and_integral() -> None:
 def test_annex_b3_stationary_tones(case: str, freq: float, level: float) -> None:
     exp = EXPECTED[case]
     x = _tone(freq, level, seconds=2.0, pad_ms=0.0)
-    res = loudness_zwicker(x, FS, stationary=True)
+    res = psychoacoustics.loudness_zwicker(x, FS, stationary=True)
     assert exp["Nmin"] <= res.loudness <= exp["Nmax"], (
         f"{case}: N={res.loudness:.4f} outside [{exp['Nmin']}, {exp['Nmax']}]"
     )
@@ -140,7 +142,9 @@ def test_annex_b3_pink_noise_bounds() -> None:
     the stated overall level is checked against the workbook bounds only.
     """
     exp = EXPECTED["Test signal 5"]
-    res = loudness_zwicker(_pink_noise(5.0, 60.0), FS, stationary=True)
+    res = psychoacoustics.loudness_zwicker(
+        _pink_noise(5.0, 60.0), FS, stationary=True
+    )
     assert exp["Nmin"] <= res.loudness <= exp["Nmax"], (
         f"pink noise: N={res.loudness:.4f} outside [{exp['Nmin']}, {exp['Nmax']}]"
     )
@@ -155,9 +159,11 @@ def test_stationary_time_skip() -> None:
     skips raise."""
     lead = np.zeros(int(FS * 0.15))
     x = np.concatenate([lead, _tone(1000.0, 60.0, seconds=1.0, pad_ms=0.0)])
-    n_all = loudness_zwicker(x, FS, stationary=True).loudness
-    n_skip = loudness_zwicker(x, FS, stationary=True, time_skip=0.2).loudness
-    n_steady = loudness_zwicker(
+    n_all = psychoacoustics.loudness_zwicker(x, FS, stationary=True).loudness
+    n_skip = psychoacoustics.loudness_zwicker(
+        x, FS, stationary=True, time_skip=0.2
+    ).loudness
+    n_steady = psychoacoustics.loudness_zwicker(
         _tone(1000.0, 60.0, seconds=1.0, pad_ms=0.0), FS, stationary=True
     ).loudness
     assert n_skip > n_all  # leading silence no longer dilutes the mean square
@@ -165,15 +171,19 @@ def test_stationary_time_skip() -> None:
     # broadband onset click the skip removes.
     assert n_skip == pytest.approx(n_steady, rel=0.02)
     with pytest.raises(ValueError, match="time_skip"):
-        loudness_zwicker(x, FS, stationary=True, time_skip=-0.1)
+        psychoacoustics.loudness_zwicker(
+            x, FS, stationary=True, time_skip=-0.1
+        )
     with pytest.raises(ValueError, match="time_skip"):
-        loudness_zwicker(x, FS, stationary=True, time_skip=2.0)
+        psychoacoustics.loudness_zwicker(x, FS, stationary=True, time_skip=2.0)
 
 
 def test_1khz_60db_anchor() -> None:
     """Definitional anchor: a 1 kHz tone at 40 phon is 1 sone; 60 dB -> 4 sone
     (each 10 phon doubles loudness)."""
-    res = loudness_zwicker(_tone(1000.0, 60.0, seconds=2.0, pad_ms=0.0), FS, stationary=True)
+    res = psychoacoustics.loudness_zwicker(
+        _tone(1000.0, 60.0, seconds=2.0, pad_ms=0.0), FS, stationary=True
+    )
     # Measured +0.97 % vs the 4.0 sone definitional value (the +0.5-0.8 %
     # Zwicker stationary bias); 0.02 keeps ~2x headroom (was 0.05).
     assert res.loudness == pytest.approx(4.0, rel=0.02)
@@ -250,7 +260,9 @@ def test_annex_b4_level_ramp_tones(case: str, freq: float) -> None:
     pins are 0.6 % and 2 % with about 2x headroom.
     """
     exp = EXPECTED[case]
-    res = loudness_zwicker(_level_ramp_tone(freq), FS, stationary=False)
+    res = psychoacoustics.loudness_zwicker(
+        _level_ramp_tone(freq), FS, stationary=False
+    )
     assert res.loudness == pytest.approx(exp["Nmax"], rel=6e-3), (
         f"{case}: Nmax={res.loudness:.4f} vs workbook {exp['Nmax']}"
     )
@@ -286,7 +298,7 @@ def test_annex_b4_pink_noise_ramp() -> None:
     n_fade = int(0.005 * FS)
     act[-n_fade:] *= 0.5 * (1.0 + np.cos(np.pi * np.arange(n_fade) / n_fade))
     sig = np.concatenate([np.zeros(int(0.1 * FS)), act, np.zeros(int(0.5 * FS))])
-    res = loudness_zwicker(sig, FS, stationary=False)
+    res = psychoacoustics.loudness_zwicker(sig, FS, stationary=False)
     assert res.loudness == pytest.approx(exp["Nmax"], rel=0.10)
     assert res.n5 == pytest.approx(exp["N5"], rel=0.10)
 
@@ -309,7 +321,7 @@ def test_annex_b4_tone_pulses(case: str, num: int, level: float) -> None:
     not asserted.)"""
     exp = EXPECTED[case]
     x, fs = _read_wav_pa(DATA / f"iso532_1_test_signal_{num}.wav", level)
-    res = loudness_zwicker(x, fs, stationary=False)
+    res = psychoacoustics.loudness_zwicker(x, fs, stationary=False)
     assert res.n5 is not None
     assert res.loudness_vs_time is not None
     # Nmax reproduces the workbook header to < 0.01 %; 1e-3 locks that in
@@ -349,7 +361,7 @@ def test_n5_n10_use_full_rate_series(monkeypatch) -> None:
 
     monkeypatch.setattr(L, "_percentile", spy)
     x, fs = _read_wav_pa(DATA / "iso532_1_test_signal_10.wav", 70.0)
-    res = loudness_zwicker(x, fs, stationary=False)
+    res = psychoacoustics.loudness_zwicker(x, fs, stationary=False)
     assert res.n5 is not None
     assert res.loudness_vs_time is not None
 
@@ -366,7 +378,7 @@ def test_n5_n10_use_full_rate_series(monkeypatch) -> None:
 
 def test_time_varying_outputs() -> None:
     x = _tone(1000.0, 70.0, seconds=0.5)
-    res = loudness_zwicker(x, FS)
+    res = psychoacoustics.loudness_zwicker(x, FS)
     assert res.time is not None
     assert res.loudness_vs_time is not None
     assert res.time.shape == res.loudness_vs_time.shape
@@ -397,7 +409,9 @@ def test_annex_b5_technical_signals(num: int) -> None:
     exp = EXPECTED[f"Test signal {num}"]
     # Each B.5 signal is validated in the sound field its ISO results
     # workbook was computed in; signal 15 (vehicle interior) is diffuse.
-    res = loudness_zwicker(np.asarray(x, dtype=np.float64), int(fs), field=exp["field"])
+    res = psychoacoustics.loudness_zwicker(
+        np.asarray(x, dtype=np.float64), int(fs), field=exp["field"]
+    )
     # Nmax reproduces the ISO results workbook to < 0.01 % for all twelve
     # signals; 1e-3 locks that in. N5 is a percentile of the loudness-vs-time
     # trace, phase-sensitive on impulsive signals (e.g. the machine gun),
@@ -413,24 +427,26 @@ def test_annex_b5_technical_signals(num: int) -> None:
 def test_invalid_inputs() -> None:
     ten_bands = np.zeros(10)
     with pytest.raises(ValueError, match="28"):
-        loudness_zwicker_from_spectrum(ten_bands)
+        psychoacoustics.loudness_zwicker_from_spectrum(ten_bands)
     levels = np.full(28, 60.0)
     with pytest.raises(ValueError, match="field"):
-        loudness_zwicker_from_spectrum(levels, field="reverberant")
+        psychoacoustics.loudness_zwicker_from_spectrum(
+            levels, field="reverberant"
+        )
     x = np.ones(1000)
     with pytest.raises(ValueError, match="fs"):
-        loudness_zwicker(x, 0)
+        psychoacoustics.loudness_zwicker(x, 0)
 
 
 def test_non_finite_inputs_rejected() -> None:
     levels = np.full(28, 60.0)
     levels[5] = np.nan
     with pytest.raises(ValueError, match="finite"):
-        loudness_zwicker_from_spectrum(levels)
+        psychoacoustics.loudness_zwicker_from_spectrum(levels)
     x = np.ones(1000)
     x[3] = np.inf
     with pytest.raises(ValueError, match="finite"):
-        loudness_zwicker(x, FS)
+        psychoacoustics.loudness_zwicker(x, FS)
 
 
 def test_pathological_resampling_ratio_rejected() -> None:
@@ -438,14 +454,16 @@ def test_pathological_resampling_ratio_rejected() -> None:
     reject instead of hanging."""
     x = np.ones(1000)
     with pytest.raises(ValueError, match="resampl"):
-        loudness_zwicker(x, 44101)
+        psychoacoustics.loudness_zwicker(x, 44101)
 
 
 def test_diffuse_field_differs() -> None:
     levels = np.full(28, 70.0)
-    free = loudness_zwicker_from_spectrum(levels, field="free")
-    diffuse = loudness_zwicker_from_spectrum(levels, field="diffuse")
-    assert isinstance(free, ZwickerLoudness)
+    free = psychoacoustics.loudness_zwicker_from_spectrum(levels, field="free")
+    diffuse = psychoacoustics.loudness_zwicker_from_spectrum(
+        levels, field="diffuse"
+    )
+    assert isinstance(free, psychoacoustics.ZwickerLoudness)
     assert free.loudness != diffuse.loudness
 
 
@@ -454,8 +472,10 @@ def test_minimal_length_validation() -> None:
     of crashing on an empty percentile buffer."""
     too_short = np.ones(48)
     with pytest.raises(ValueError, match="too short"):
-        loudness_zwicker(too_short, FS)
-    res = loudness_zwicker(np.ones(96 * 4), FS)  # exactly a few output samples
+        psychoacoustics.loudness_zwicker(too_short, FS)
+    res = psychoacoustics.loudness_zwicker(
+        np.ones(96 * 4), FS
+    )  # exactly a few output samples
     assert res.loudness >= 0.0
 
 
@@ -464,5 +484,7 @@ def test_specific_pattern_matches_reported_max() -> None:
     reported Nmax. For a steady tone the temporal weighting converges, so
     the pattern integral must match Nmax there (for transients the
     instantaneous pattern legitimately exceeds the weighted maximum)."""
-    res = loudness_zwicker(_tone(1000.0, 70.0, seconds=2.0, pad_ms=0.0), FS)
+    res = psychoacoustics.loudness_zwicker(
+        _tone(1000.0, 70.0, seconds=2.0, pad_ms=0.0), FS
+    )
     assert float(np.sum(res.specific) * 0.1) == pytest.approx(res.loudness, rel=0.03)

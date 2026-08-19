@@ -154,11 +154,11 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
     frame times, the measured ``k_x / k_0`` of the air above each panel and
     the fitted e-folding height of the pressure envelope in each.
     """
-    from phonometry import ElasticFDTD2D, coincidence_frequency
+    from phonometry import simulation, vibration
 
     dx = _EL_DX
     bp, m2 = _elastic_plate_bp_m2()
-    fc = coincidence_frequency(m2, bp)
+    fc = vibration.coincidence_frequency(m2, bp)
     freqs = (0.5 * fc, 2.0 * fc)
     cp_plate = _EL_CP * _EC_CB_TUNE
     dt = 0.6 * dx / (cp_plate * float(np.sqrt(2.0)))
@@ -194,7 +194,9 @@ def _radiation_efficiency_fields() -> tuple[Any, Any, Any, Any, Any]:
         c_p[r0:r0 + _RE_PLATE_ROWS] = cp_plate
         c_s[r0:r0 + _RE_PLATE_ROWS] = _EL_CS * _EC_CB_TUNE
         rho[r0:r0 + _RE_PLATE_ROWS] = _EL_RHO
-        sim = ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_RE_SPONGE)
+        sim = simulation.ElasticFDTD2D(
+            c_p, c_s, dx, rho=rho, sponge_width=_RE_SPONGE
+        )
         omega = 2.0 * np.pi * f0
         k_b = _re_bending_wavenumber(f0)
         ramp_t = _RE_RAMP_CYCLES / f0
@@ -261,12 +263,12 @@ def animate_elastic_radiation_efficiency(output_dir: str) -> None:
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 
-    from phonometry import coincidence_frequency
+    from phonometry import vibration
 
     T = _translate_str
     p_lo, p_hi, plate_lo, plate_hi, times = _radiation_efficiency_fields()
     bp, m2 = _elastic_plate_bp_m2()
-    fc = coincidence_frequency(m2, bp)
+    fc = vibration.coincidence_frequency(m2, bp)
     freqs = (0.5 * fc, 2.0 * fc)
     # Closed forms from the plate's own constants: the bending wavelength of
     # each panel against the acoustic one, the trace-match angle above

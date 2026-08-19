@@ -19,16 +19,7 @@ import reference_data as ref
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    FacadeElement,
-    ReportMetadata,
-    equivalent_impact_level,
-    facade_sound_reduction,
-    flanking_element,
-    impact_flanking_correction,
-    predicted_airborne_insulation,
-    predicted_impact_insulation,
-)
+from phonometry import ReportMetadata, building
 from phonometry._i18n import fmt_minus
 from phonometry.building.prediction.facade import (
     FacadePredictionResult,
@@ -47,21 +38,23 @@ def _annex_h3_airborne() -> AirbornePredictionResult:
     r_direct = ref.EN12354_1_ANNEX_H3_R_DIRECT
     paths = []
     for label, rw, kff, kfd, lf in ref.EN12354_1_ANNEX_H3_ELEMENTS:
-        ff, df, fd = flanking_element(
+        ff, df, fd = building.flanking_element(
             label=label, r_flanking=rw, r_separating=r_direct,
             k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=ss, coupling_length=lf,
         )
         paths += [ff, df, fd]
-    return predicted_airborne_insulation(r_direct=r_direct, flanking_paths=paths)
+    return building.predicted_airborne_insulation(
+        r_direct=r_direct, flanking_paths=paths
+    )
 
 
 def _annex_e3_impact() -> ImpactPredictionResult:
     """The EN 12354-2 Annex E.3 impact prediction (L'n,w = 45 dB)."""
-    ln_w_eq = equivalent_impact_level(ref.EN12354_2_ANNEX_E3_MASS)
-    k = impact_flanking_correction(
+    ln_w_eq = building.equivalent_impact_level(ref.EN12354_2_ANNEX_E3_MASS)
+    k = building.impact_flanking_correction(
         ref.EN12354_2_ANNEX_E3_MASS, ref.EN12354_2_ANNEX_E3_FLANKING_MEAN_MASS
     )
-    return predicted_impact_insulation(
+    return building.predicted_impact_insulation(
         ln_w_eq=ln_w_eq, delta_l_w=ref.EN12354_2_ANNEX_E3_DELTA_LW, k_correction=k
     )
 
@@ -69,13 +62,15 @@ def _annex_e3_impact() -> ImpactPredictionResult:
 def _annex_f_facade() -> FacadePredictionResult:
     """The EN 12354-3 Annex F facade prediction (D2m,nT,w = 33 dB)."""
     elements = [
-        FacadeElement(name=name, area=area, r=r)
+        building.FacadeElement(name=name, area=area, r=r)
         for name, area, r in ref.EN12354_3_ANNEX_F_ELEMENTS
     ]
     elements.append(
-        FacadeElement(name="air inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE)
+        building.FacadeElement(
+            name="air inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE
+        )
     )
-    return facade_sound_reduction(
+    return building.facade_sound_reduction(
         elements,
         area=ref.EN12354_3_ANNEX_F_AREA,
         volume=ref.EN12354_3_ANNEX_F_VOLUME,
@@ -318,8 +313,8 @@ def test_facade_spanish_fiche_renders_translated(tmp_path) -> None:
 def test_facade_report_requires_single_number_ratings(tmp_path) -> None:
     """A facade result without the ISO 717-1 ratings cannot be reported."""
     # Three bands: not the 5 octave / 16 one-third-octave set, so no rating.
-    result = facade_sound_reduction(
-        [FacadeElement(name="wall", area=10.0, r=[40.0, 41.0, 42.0])],
+    result = building.facade_sound_reduction(
+        [building.FacadeElement(name="wall", area=10.0, r=[40.0, 41.0, 42.0])],
         area=10.0, volume=50.0,
     )
     out = str(tmp_path / "x.pdf")

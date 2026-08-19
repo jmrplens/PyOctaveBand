@@ -18,7 +18,7 @@ import numpy as np
 import reference_data as ref
 
 import phonometry as ph
-from phonometry import FilterDesign, OctaveFilterBank, WeightingFilter
+from phonometry import filters
 from phonometry.filters.weighting import _runtime_frequency_response
 
 from ..registry import Outcome, numeric, register
@@ -63,9 +63,9 @@ def _chk_butter_third() -> Outcome:
     "Class 0 (strictest) octave-band filter (butterworth, fs=48 kHz)",
 )
 def _chk_butter_class0_1995() -> Outcome:
-    bank = OctaveFilterBank(
+    bank = filters.OctaveFilterBank(
         48000, fraction=1, order=6, limits=[100, 10000],
-        design=FilterDesign(filter_type="butter"),
+        design=filters.FilterDesign(filter_type="butter"),
     )
     result = ph.verify_filter_class(bank, edition="1995")
     margin = min(b["margin_class0_db"] for b in result["bands"])
@@ -165,7 +165,7 @@ def _chk_d_weighting() -> Outcome:
     # round a different source curve; the realized filter adds bilinear
     # residuals below 0.1 dB, so the acceptance bound is 0.2 dB (0.45 dB at
     # the two outlier cells).
-    wf = WeightingFilter(48000, "D")
+    wf = filters.WeightingFilter(48000, "D")
     freqs = np.array([r[0] for r in ref.IEC537_NASA_TABLE_SLD1], dtype=float)
     table = np.array([r[1] for r in ref.IEC537_NASA_TABLE_SLD1], dtype=float)
     h = _runtime_frequency_response(wf, np.concatenate([freqs, [1000.0]]))

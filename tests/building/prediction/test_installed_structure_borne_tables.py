@@ -20,21 +20,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import (
-    MINIMUM_MULTI_JUNCTION_KIJ,
-    TABLE_D1_QUANTITIES,
-    TABLE_F1_FORCE_LEVEL,
-    TABLE_F1_OCTAVE_BANDS,
-    TAPPING_HAMMER_MASS,
-    coupling_term,
-    multi_junction_adjustment,
-    structure_to_airborne_adjustment,
-    tapping_machine_characteristic_power_level,
-    tapping_machine_coupling_term,
-    tapping_machine_force_level,
-    tapping_machine_force_level_estimate,
-    typical_element_mobility,
-)
+from phonometry import building
 from phonometry.vibration.structural.point_mobility import infinite_plate_mobility
 
 # ---------------------------------------------------------------------------
@@ -53,29 +39,29 @@ _TABLE_D1_COLUMN_TWO = {
 
 def test_table_d1_has_the_six_printed_rows() -> None:
     """Table D.1 prints six rows, in this order, with these quantities."""
-    assert list(TABLE_D1_QUANTITIES) == [
+    assert list(building.TABLE_D1_QUANTITIES) == [
         "mass", "bar_end", "beam", "plate", "pipe", "mass_spring",
     ]
-    assert TABLE_D1_QUANTITIES == _TABLE_D1_COLUMN_TWO
+    assert building.TABLE_D1_QUANTITIES == _TABLE_D1_COLUMN_TWO
 
 
 def test_table_d1_mass_row() -> None:
     """Row "Mass": |Y| = [2 pi f M]^-1."""
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "mass", frequency=125.0, mass=25.0
     ) == pytest.approx(5.092958178940651e-05)
 
 
 def test_table_d1_bar_end_row() -> None:
     """Row "Bar end": |Y| = [rho cL S]^-1, and no frequency in it."""
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "bar_end", density=7800.0, longitudinal_velocity=5100.0, area=0.002
     ) == pytest.approx(1.2569130216189039e-05)
 
 
 def test_table_d1_beam_row() -> None:
     """Row "Beam": |Y| = [7,6 rho t w sqrt(cL t f)]^-1 (radical included)."""
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "beam",
         frequency=250.0,
         density=600.0,
@@ -87,14 +73,14 @@ def test_table_d1_beam_row() -> None:
 
 def test_table_d1_plate_row() -> None:
     """Row "Plate": |Y| = [2,3 cL rho t^2]^-1, for a 140 mm concrete slab."""
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "plate", density=2300.0, longitudinal_velocity=3800.0, thickness=0.14
     ) == pytest.approx(2.5380762194441e-06)
 
 
 def test_table_d1_pipe_row() -> None:
     """Row "Pipe": |Y| = [63 rho t r sqrt(cL r f)]^-1 (radical included)."""
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "pipe",
         frequency=500.0,
         density=7800.0,
@@ -106,7 +92,7 @@ def test_table_d1_pipe_row() -> None:
 
 def test_table_d1_mass_spring_row() -> None:
     """Row "Mass-spring": the square root of the sum of two squares."""
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "mass_spring", frequency=50.0, mass=200.0, stiffness=1.0e6,
         loss_factor=0.1,
     ) == pytest.approx(0.00029676786941383365)
@@ -122,7 +108,7 @@ def test_mass_spring_row_bottoms_out_at_its_own_resonance() -> None:
     mass, stiffness, eta = 200.0, 1.0e6, 0.1
     f0 = math.sqrt(stiffness * (1.0 + eta**2) / mass) / (2.0 * math.pi)
     at_resonance = float(
-        typical_element_mobility(
+        building.typical_element_mobility(
             "mass_spring", frequency=f0, mass=mass, stiffness=stiffness,
             loss_factor=eta,
         )
@@ -130,7 +116,7 @@ def test_mass_spring_row_bottoms_out_at_its_own_resonance() -> None:
     assert at_resonance == pytest.approx(
         2.0 * math.pi * f0 * eta / (stiffness * (1.0 + eta**2))
     )
-    sweep = typical_element_mobility(
+    sweep = building.typical_element_mobility(
         "mass_spring",
         frequency=np.linspace(0.2 * f0, 5.0 * f0, 401),
         mass=mass, stiffness=stiffness, loss_factor=eta,
@@ -144,7 +130,7 @@ def test_mass_spring_row_is_the_series_sum_of_spring_and_mass() -> None:
     mass, stiffness, eta = 200.0, 1.0e6, 0.1
     omega = 2.0 * math.pi * bands
     series = 1j * omega / (stiffness * (1.0 + 1j * eta)) + 1.0 / (1j * omega * mass)
-    assert typical_element_mobility(
+    assert building.typical_element_mobility(
         "mass_spring", frequency=bands, mass=mass, stiffness=stiffness,
         loss_factor=eta,
     ) == pytest.approx(np.abs(series))
@@ -163,7 +149,7 @@ def test_plate_row_is_formula_f4_in_other_symbols() -> None:
     bending = rho * c_l**2 * t**3 / 12.0
     formula_f4 = infinite_plate_mobility(bending, rho * t)
     table_d1 = float(
-        typical_element_mobility(
+        building.typical_element_mobility(
             "plate", density=rho, longitudinal_velocity=c_l, thickness=t
         )
     )
@@ -173,12 +159,14 @@ def test_plate_row_is_formula_f4_in_other_symbols() -> None:
     )
 
 
-@pytest.mark.parametrize("structure", list(TABLE_D1_QUANTITIES))
+@pytest.mark.parametrize("structure", list(building.TABLE_D1_QUANTITIES))
 def test_table_d1_rejects_a_quantity_that_does_not_describe_the_row(
     structure: str,
 ) -> None:
     """Only the quantities of the row's own second column are accepted."""
-    supplied: dict[str, float] = dict.fromkeys(TABLE_D1_QUANTITIES[structure], 1.0)
+    supplied: dict[str, float] = dict.fromkeys(
+        building.TABLE_D1_QUANTITIES[structure], 1.0
+    )
     surplus = next(
         k for k in ("mass", "area", "stiffness", "radius", "width")
         if k not in supplied
@@ -187,18 +175,20 @@ def test_table_d1_rejects_a_quantity_that_does_not_describe_the_row(
     if structure in ("mass", "beam", "pipe", "mass_spring"):
         kwargs["frequency"] = 100.0
     with pytest.raises(ValueError, match="does not describe it"):
-        typical_element_mobility(structure, **kwargs)
+        building.typical_element_mobility(structure, **kwargs)
 
 
 def test_table_d1_names_the_missing_describing_quantity() -> None:
     with pytest.raises(ValueError, match="missing longitudinal_velocity"):
-        typical_element_mobility("plate", density=2300.0, thickness=0.14)
+        building.typical_element_mobility(
+            "plate", density=2300.0, thickness=0.14
+        )
 
 
 def test_frequency_independent_rows_reject_a_frequency() -> None:
     """Two of the six expressions carry no f; passing one is an error."""
     with pytest.raises(ValueError, match="frequency-independent"):
-        typical_element_mobility(
+        building.typical_element_mobility(
             "plate", frequency=125.0, density=2300.0,
             longitudinal_velocity=3800.0, thickness=0.14,
         )
@@ -206,17 +196,17 @@ def test_frequency_independent_rows_reject_a_frequency() -> None:
 
 def test_frequency_dependent_rows_require_a_frequency() -> None:
     with pytest.raises(ValueError, match="depends on frequency"):
-        typical_element_mobility("mass", mass=25.0)
+        building.typical_element_mobility("mass", mass=25.0)
 
 
 def test_unknown_row_is_rejected() -> None:
     with pytest.raises(ValueError, match="structure"):
-        typical_element_mobility("slab", density=1.0)
+        building.typical_element_mobility("slab", density=1.0)
 
 
 def test_table_d1_broadcasts_over_bands() -> None:
     bands = np.array([125.0, 250.0, 500.0])
-    y = typical_element_mobility("mass", frequency=bands, mass=25.0)
+    y = building.typical_element_mobility("mass", frequency=bands, mass=25.0)
     assert y.shape == (3,)
     # A mass mobility halves per octave.
     assert y[1] == pytest.approx(y[0] / 2.0)
@@ -232,38 +222,43 @@ def test_table_f1_cells_as_printed() -> None:
     The header prints the first centre as "31"; it is the nominal 31,5 Hz
     octave band.
     """
-    assert TABLE_F1_OCTAVE_BANDS == (
+    assert building.TABLE_F1_OCTAVE_BANDS == (
         31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0,
     )
-    assert TABLE_F1_FORCE_LEVEL == (
+    assert building.TABLE_F1_FORCE_LEVEL == (
         139.0, 142.0, 145.0, 148.0, 151.0, 154.0, 156.0, 156.0,
     )
-    assert tapping_machine_force_level().tolist() == list(
-        TABLE_F1_FORCE_LEVEL
+    assert building.tapping_machine_force_level().tolist() == list(
+        building.TABLE_F1_FORCE_LEVEL
     )
 
 
 def test_table_f1_closed_form_reproduces_the_table_up_to_1_khz() -> None:
     """"Up till about 1000 Hz this corresponds to LF = 10 lg 2,5f/10^-12"."""
-    bands = np.array(TABLE_F1_OCTAVE_BANDS[:6])
-    assert np.round(tapping_machine_force_level_estimate(bands)).tolist() == [
-        139.0, 142.0, 145.0, 148.0, 151.0, 154.0
-    ]
+    bands = np.array(building.TABLE_F1_OCTAVE_BANDS[:6])
+    assert np.round(
+        building.tapping_machine_force_level_estimate(bands)
+    ).tolist() == [139.0, 142.0, 145.0, 148.0, 151.0, 154.0]
 
 
 def test_table_f1_departs_from_the_closed_form_above_1_khz() -> None:
     """Above the stated limit the table flattens and the closed form does not."""
     high = np.array([2000.0, 4000.0])
-    closed = tapping_machine_force_level_estimate(high)
+    closed = building.tapping_machine_force_level_estimate(high)
     assert np.round(closed).tolist() == [157.0, 160.0]
-    assert tapping_machine_force_level()[-2:].tolist() == [156.0, 156.0]
+    assert building.tapping_machine_force_level()[-2:].tolist() == [
+        156.0,
+        156.0,
+    ]
 
 
 def test_third_octave_closed_form_is_the_octave_one_less_10_lg_3() -> None:
     """0,8 f against 2,5 f: the three one-third octaves of an octave band."""
     difference = float(
-        tapping_machine_force_level_estimate(1000.0)
-        - tapping_machine_force_level_estimate(1000.0, bandwidth="third")
+        building.tapping_machine_force_level_estimate(1000.0)
+        - building.tapping_machine_force_level_estimate(
+            1000.0, bandwidth="third"
+        )
     )
     assert difference == pytest.approx(10.0 * math.log10(2.5 / 0.8))
     assert difference == pytest.approx(10.0 * math.log10(3.0), abs=0.2)
@@ -283,11 +278,16 @@ def test_table_f1_is_referred_to_1e_6_newton_not_1_piconewton() -> None:
     cells would be 120 dB away from the machine that produces them; see
     docs/ERRATA.md.
     """
-    hammer, drop, rate, gravity = TAPPING_HAMMER_MASS, 0.04, 10.0, 9.81
+    hammer, drop, rate, gravity = (
+        building.TAPPING_HAMMER_MASS,
+        0.04,
+        10.0,
+        9.81,
+    )
     momentum = hammer * math.sqrt(2.0 * gravity * drop)
     harmonic = math.sqrt(2.0) * momentum * rate
     for centre, printed in zip(
-        TABLE_F1_OCTAVE_BANDS[:6], TABLE_F1_FORCE_LEVEL[:6],
+        building.TABLE_F1_OCTAVE_BANDS[:6], building.TABLE_F1_FORCE_LEVEL[:6],
         strict=True,
     ):
         harmonics = centre * (math.sqrt(2.0) - 1.0 / math.sqrt(2.0)) / rate
@@ -305,8 +305,11 @@ def test_formula_d9a_is_flat_at_about_115_db_per_third_octave() -> None:
     47) whose A-weighted total the key gives as 124 dB.
     """
     thirds = np.array([100.0, 200.0, 400.0, 800.0, 1600.0, 3150.0])
-    lw = tapping_machine_characteristic_power_level(
-        thirds, tapping_machine_force_level_estimate(thirds, bandwidth="third")
+    lw = building.tapping_machine_characteristic_power_level(
+        thirds,
+        building.tapping_machine_force_level_estimate(
+            thirds, bandwidth="third"
+        ),
     )
     assert np.ptp(lw) == pytest.approx(0.0, abs=1e-9)
     assert float(lw[0]) == pytest.approx(115.0, abs=1.0)
@@ -316,15 +319,19 @@ def test_formula_d9b_is_formula_19b_for_a_mass_like_source() -> None:
     """D.9b is Formula (19b) with Ys = 1/(j omega M): D_C agrees exactly."""
     bands = np.array([125.0, 250.0, 500.0, 1000.0])
     y_i = 2.5e-6                       # a heavy concrete floor
-    source = 1.0 / (1j * 2.0 * math.pi * bands * TAPPING_HAMMER_MASS)
-    assert tapping_machine_coupling_term(bands, y_i) == pytest.approx(
-        coupling_term(source, np.full(bands.shape, y_i, dtype=complex))
+    source = 1.0 / (1j * 2.0 * math.pi * bands * building.TAPPING_HAMMER_MASS)
+    assert building.tapping_machine_coupling_term(bands, y_i) == pytest.approx(
+        building.coupling_term(
+            source, np.full(bands.shape, y_i, dtype=complex)
+        )
     )
 
 
 def test_tapping_machine_coupling_term_takes_a_hammer_mass() -> None:
-    doubled = tapping_machine_coupling_term(500.0, 2.5e-6, hammer_mass=1.0)
-    default = tapping_machine_coupling_term(500.0, 2.5e-6)
+    doubled = building.tapping_machine_coupling_term(
+        500.0, 2.5e-6, hammer_mass=1.0
+    )
+    default = building.tapping_machine_coupling_term(500.0, 2.5e-6)
     assert float(doubled) < float(default)
 
 
@@ -340,7 +347,7 @@ def test_formula_f3_adjustment_term_hand_values() -> None:
     """
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
     sigma = np.minimum(1.0, np.sqrt(bands / 200.0))
-    dsa = structure_to_airborne_adjustment(
+    dsa = building.structure_to_airborne_adjustment(
         bands, 200.0, 92.0, radiation_factor=sigma
     )
     assert np.round(dsa, 1).tolist() == [-9.1, -13.6, -18.6, -24.6, -30.6, -36.6]
@@ -348,7 +355,9 @@ def test_formula_f3_adjustment_term_hand_values() -> None:
 
 def test_formula_f3_is_negative_and_falls_20_lg_f_above_fc() -> None:
     """Above fc the radiation factor saturates and only the f^-2 is left."""
-    dsa = structure_to_airborne_adjustment([500.0, 1000.0], 200.0, 92.0)
+    dsa = building.structure_to_airborne_adjustment(
+        [500.0, 1000.0], 200.0, 92.0
+    )
     assert float(dsa[0]) < 0.0
     assert float(dsa[0]) - float(dsa[1]) == pytest.approx(
         20.0 * math.log10(2.0)
@@ -356,8 +365,8 @@ def test_formula_f3_is_negative_and_falls_20_lg_f_above_fc() -> None:
 
 
 def test_formula_f3_falls_3_db_when_the_mass_doubles() -> None:
-    single = structure_to_airborne_adjustment(500.0, 200.0, 92.0)
-    double = structure_to_airborne_adjustment(500.0, 200.0, 184.0)
+    single = building.structure_to_airborne_adjustment(500.0, 200.0, 92.0)
+    double = building.structure_to_airborne_adjustment(500.0, 200.0, 184.0)
     assert float(single) - float(double) == pytest.approx(
         10.0 * math.log10(2.0)
     )
@@ -365,17 +374,17 @@ def test_formula_f3_falls_3_db_when_the_mass_doubles() -> None:
 
 def test_clause_f1_multi_junction_adjustment_values() -> None:
     """"dK = 4 dB for two junctions and dK = 6 dB for three junctions or more"."""
-    assert multi_junction_adjustment(1) == 0.0
-    assert multi_junction_adjustment(2) == 4.0
-    assert multi_junction_adjustment(3) == 6.0
-    assert multi_junction_adjustment(7) == 6.0
+    assert building.multi_junction_adjustment(1) == 0.0
+    assert building.multi_junction_adjustment(2) == 4.0
+    assert building.multi_junction_adjustment(3) == 6.0
+    assert building.multi_junction_adjustment(7) == 6.0
 
 
 def test_clause_f1_kij_floor() -> None:
     """"the resulting value for Kij should normally not become less than -5 dB"."""
-    assert MINIMUM_MULTI_JUNCTION_KIJ == -5.0
+    assert building.MINIMUM_MULTI_JUNCTION_KIJ == -5.0
 
 
 def test_multi_junction_adjustment_rejects_zero_junctions() -> None:
     with pytest.raises(ValueError, match="at least 1"):
-        multi_junction_adjustment(0)
+        building.multi_junction_adjustment(0)

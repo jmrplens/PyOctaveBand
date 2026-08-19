@@ -6,14 +6,14 @@ Tests for OctaveFilterBank.spectrogram() short-time band levels.
 import numpy as np
 import pytest
 
-from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
+from phonometry import filters
 
 FS = 48000
 
 
 def test_spectrogram_shapes_and_times() -> None:
     """Output shapes follow (bands, frames) and times are window centers."""
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
     x = np.random.default_rng(0).standard_normal(FS * 2)
     levels, freq, times = bank.spectrogram(x, window_time=0.25, overlap=0.5)
 
@@ -27,7 +27,7 @@ def test_spectrogram_shapes_and_times() -> None:
 
 def test_spectrogram_detects_level_step() -> None:
     """A tone whose amplitude doubles mid-signal shows a ~6 dB step in its band."""
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
     t = np.arange(FS * 2) / FS
     amp = np.where(t < 1.0, 0.5, 1.0)
     x = amp * np.sin(2 * np.pi * 1000 * t)
@@ -40,7 +40,7 @@ def test_spectrogram_detects_level_step() -> None:
 
 
 def test_spectrogram_multichannel() -> None:
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
     x = np.random.default_rng(1).standard_normal((3, FS))
     levels, _, times = bank.spectrogram(x, window_time=0.125, overlap=0.5)
     assert levels.ndim == 3
@@ -50,15 +50,18 @@ def test_spectrogram_multichannel() -> None:
 
 
 def test_spectrogram_rejects_stateful() -> None:
-    bank = OctaveFilterBank(fs=FS, design=FilterDesign(resample=False),
-                            block_processing=BlockProcessing(stateful=True))
+    bank = filters.OctaveFilterBank(
+        fs=FS,
+        design=filters.FilterDesign(resample=False),
+        block_processing=filters.BlockProcessing(stateful=True),
+    )
     silence = np.zeros(FS)
     with pytest.raises(ValueError, match="stateful"):
         bank.spectrogram(silence)
 
 
 def test_spectrogram_invalid_params_raise() -> None:
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 5000])
     # the signals are built outside the raises blocks, so each block holds
     # exactly the one call whose exception is under test
     one_second = np.zeros(FS)

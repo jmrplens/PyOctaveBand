@@ -18,7 +18,7 @@ https://github.com/jmrplens/phonometry/issues/38.
 import numpy as np
 import pytest
 
-from phonometry import time_weighting
+from phonometry import filters
 
 FS = 48000
 F0 = 4000
@@ -29,13 +29,13 @@ def _burst_response_db(duration: float, mode: str, total: float) -> float:
     t = np.arange(int(FS * total)) / FS
     x = np.sin(2 * np.pi * F0 * t)
 
-    steady = time_weighting(x, FS, mode=mode)
+    steady = filters.time_weighting(x, FS, mode=mode)
     ref = steady[int((total - 0.5) * FS):].mean()
 
     burst = np.zeros_like(t)
     start = int(1.0 * FS)
     burst[start:start + round(duration * FS)] = x[start:start + round(duration * FS)]
-    env = time_weighting(burst, FS, mode=mode)
+    env = filters.time_weighting(burst, FS, mode=mode)
     return float(10 * np.log10(env.max() / ref))
 
 
@@ -102,18 +102,18 @@ def test_delta_ref_equation7_consistency() -> None:
 
 def _burst_sel_response_db(duration: float) -> float:
     """LAE of a 4 kHz toneburst relative to the steady A-weighted level."""
-    from phonometry import leq, sel
+    from phonometry import signals
     from phonometry.filters.weighting import weighting_filter
 
     total = 3.0
     t = np.arange(int(FS * total)) / FS
     x = np.sin(2 * np.pi * F0 * t)
-    la_steady = leq(weighting_filter(x, FS, "A")[int(0.5 * FS):])
+    la_steady = signals.leq(weighting_filter(x, FS, "A")[int(0.5 * FS):])
 
     burst = np.zeros_like(t)
     start = int(1.0 * FS)
     burst[start:start + round(duration * FS)] = x[start:start + round(duration * FS)]
-    return float(sel(burst, FS, weighting="A")) - float(la_steady)
+    return float(signals.sel(burst, FS, weighting="A")) - float(la_steady)
 
 
 # BS EN 61672-1:2013 Table 4, column "LAE - LA" (Equation 8:

@@ -31,22 +31,24 @@ def generate_gcc_phat_delay(output_dir: str) -> None:
     print("Generating gcc_phat_delay...")
     from scipy import signal as sp_signal
 
-    from phonometry import noise_signal, time_delay
+    from phonometry import signals
 
     fs = 8192.0
     delay = 20  # samples -> 2.44 ms
     # Colored common signal: a Butterworth roll-off keeps some power in
     # every band (the Knapp & Carter condition for a usable PHAT phase).
     b, a = sp_signal.butter(2, 800.0 / (fs / 2.0))
-    s = sp_signal.lfilter(b, a, noise_signal(fs, 4.0, color="white", seed=10))
-    noise_x = noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
-    noise_y = noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
+    s = sp_signal.lfilter(
+        b, a, signals.noise_signal(fs, 4.0, color="white", seed=10)
+    )
+    noise_x = signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=11)
+    noise_y = signals.noise_signal(fs, 4.0, color="white", rms=0.02, seed=12)
     x = s + noise_x
     y = np.roll(s, delay) + noise_y
 
-    direct = time_delay(x, y, fs, method="direct", max_delay=0.01)
-    phat = time_delay(x, y, fs, method="gcc", weighting="phat",
-                      nperseg=2048, max_delay=0.01)
+    direct = signals.time_delay(x, y, fs, method="direct", max_delay=0.01)
+    phat = signals.time_delay(x, y, fs, method="gcc", weighting="phat",
+                              nperseg=2048, max_delay=0.01)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(1e3 * direct.lags,
@@ -80,7 +82,7 @@ def generate_cepstrum_echo(output_dir: str) -> None:
     print("Generating cepstrum_echo...")
     from scipy import signal as sp_signal
 
-    from phonometry import echo_detection, noise_signal
+    from phonometry import signals
 
     fs = 48000.0
     delay_s = 0.008  # one floor reflection 8 ms after the direct sound
@@ -93,9 +95,9 @@ def generate_cepstrum_echo(output_dir: str) -> None:
     b, bb = sp_signal.butter(2, [0.004, 0.9], btype="bandpass")
     direct = sp_signal.lfilter(b, bb, impulse)
     ir = direct + a * np.roll(direct, round(delay_s * fs))
-    ir += noise_signal(fs, n / fs, color="white", rms=1e-4, seed=13)
+    ir += signals.noise_signal(fs, n / fs, color="white", rms=1e-4, seed=13)
 
-    res = echo_detection(ir, fs, min_quefrency=0.002)
+    res = signals.echo_detection(ir, fs, min_quefrency=0.002)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     half = res.nfft // 2 + 1
@@ -131,7 +133,7 @@ def generate_cepstrum_echo(output_dir: str) -> None:
 def generate_envelope_spectrum(output_dir: str) -> None:
     """Envelope spectrum of an AM tone in noise: the line at fm."""
     print("Generating envelope_spectrum...")
-    from phonometry import envelope_spectrum, noise_signal
+    from phonometry import signals
 
     fs = 8192.0
     seconds = 4.0
@@ -140,9 +142,9 @@ def generate_envelope_spectrum(output_dir: str) -> None:
     x = a0 * (1.0 + m * np.cos(2.0 * np.pi * fm * t)) * np.cos(
         2.0 * np.pi * 1000.0 * t
     )
-    x += noise_signal(fs, seconds, color="white", rms=0.03, seed=8)
+    x += signals.noise_signal(fs, seconds, color="white", rms=0.03, seed=8)
 
-    res = envelope_spectrum(x, fs)
+    res = signals.envelope_spectrum(x, fs)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(res.frequencies, res.amplitude, color=COLOR_PRIMARY,
@@ -173,11 +175,7 @@ def generate_envelope_spectrum(output_dir: str) -> None:
 def generate_synchronous_average(output_dir: str) -> None:
     """TSA: a periodic waveform pulled from noise, and the comb filter."""
     print("Generating synchronous_average...")
-    from phonometry import (
-        comb_filter_response,
-        noise_signal,
-        time_synchronous_average,
-    )
+    from phonometry import signals
 
     fs = 8192.0
     period = 1.0 / 32.0  # one revolution: 256 samples at this rate
@@ -189,8 +187,12 @@ def generate_synchronous_average(output_dir: str) -> None:
         + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
         - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
     )
-    signal = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-    res = time_synchronous_average(signal, fs, period=period, n_averages=n_avg)
+    signal = periodic + signals.noise_signal(
+        fs, phase.size / fs, rms=0.9, seed=11
+    )
+    res = signals.time_synchronous_average(
+        signal, fs, period=period, n_averages=n_avg
+    )
     true_one = periodic[:m]
 
     _fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
@@ -220,8 +222,8 @@ def generate_synchronous_average(output_dir: str) -> None:
     # Panel (b): comb filter, node selection at 32.05 orders.
     orders = np.linspace(31.0, 33.0, 4000)
     freqs = orders / period
-    c20 = comb_filter_response(freqs, period, 20)
-    c32 = comb_filter_response(freqs, period, 32)
+    c20 = signals.comb_filter_response(freqs, period, 20)
+    c32 = signals.comb_filter_response(freqs, period, 32)
     ax1.plot(orders, c32, color=COLOR_TERTIARY, linewidth=1.2,
              label="$N$ = 32 (power of two)")
     ax1.plot(orders, c20, color=COLOR_PRIMARY, linewidth=1.4,
@@ -251,7 +253,7 @@ def generate_synchronous_average(output_dir: str) -> None:
 def generate_cepstrum_variants(output_dir: str) -> None:
     """Power, real and complex cepstra of one echo-carrying record."""
     print("Generating cepstrum_variants...")
-    from phonometry import cepstrum
+    from phonometry import signals
 
     fs = 48000.0
     # A band-limited source wavelet (its cepstrum concentrates below 1 ms)
@@ -271,7 +273,7 @@ def generate_cepstrum_variants(output_dir: str) -> None:
         ("complex", COLOR_SECONDARY, ":", "Complex cepstrum"),
     )
     for kind, colour, style, label in variants:
-        res = cepstrum(x, fs, kind=kind)
+        res = signals.cepstrum(x, fs, kind=kind)
         q_ms = 1e3 * res.quefrencies
         mask = (q_ms > 0.5) & (q_ms <= 20.0)
         ax.plot(q_ms[mask], res.cepstrum[mask], color=colour, linestyle=style,
@@ -310,7 +312,7 @@ def generate_cepstrum_variants(output_dir: str) -> None:
 def generate_lifter_split(output_dir: str) -> None:
     """Lowpass/highpass liftering of a log spectrum with an 8 ms echo."""
     print("Generating lifter_split...")
-    from phonometry import lifter
+    from phonometry import signals
 
     fs = 48000.0
     # The same wavelet-plus-echo record as the cepstrum-variants figure:
@@ -323,8 +325,8 @@ def generate_lifter_split(output_dir: str) -> None:
     )
     x = s + 0.5 * np.roll(s, 384)                # the same 8 ms echo
 
-    low = lifter(x, fs, cutoff=0.004, mode="lowpass")
-    high = lifter(x, fs, cutoff=0.004, mode="highpass")
+    low = signals.lifter(x, fs, cutoff=0.004, mode="lowpass")
+    high = signals.lifter(x, fs, cutoff=0.004, mode="highpass")
     band = (low.frequencies >= 500.0) & (low.frequencies <= 2000.0)
 
     _fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
@@ -363,17 +365,19 @@ def generate_lifter_split(output_dir: str) -> None:
 def generate_correlation_normalizations(output_dir: str) -> None:
     """The three correlation normalizations of a two-sensor delay model."""
     print("Generating correlation_normalizations...")
-    from phonometry import correlation, noise_signal
+    from phonometry import signals
 
     fs = 8192.0
     delay = 102                                   # 12.45 ms
-    x = noise_signal(fs, 2.0, seed=4)
-    interference = noise_signal(fs, 2.0, rms=0.5, seed=5)
+    x = signals.noise_signal(fs, 2.0, seed=4)
+    interference = signals.noise_signal(fs, 2.0, rms=0.5, seed=5)
     y = 0.8 * np.concatenate([np.zeros(delay), x[:-delay]]) + interference
 
-    coeff = correlation(x, y, fs, normalization="coefficient", max_lag=0.05)
-    biased = correlation(x, y, fs, normalization="biased")
-    unbiased = correlation(x, y, fs, normalization="unbiased")
+    coeff = signals.correlation(
+        x, y, fs, normalization="coefficient", max_lag=0.05
+    )
+    biased = signals.correlation(x, y, fs, normalization="biased")
+    unbiased = signals.correlation(x, y, fs, normalization="unbiased")
 
     _fig, (ax_c, ax_n) = plt.subplots(2, 1, figsize=(10, 7))
     ax_c.plot(1e3 * coeff.lags, coeff.values, color=COLOR_PRIMARY,
@@ -409,17 +413,17 @@ def generate_correlation_normalizations(output_dir: str) -> None:
 def generate_ir_alignment(output_dir: str) -> None:
     """Sub-sample alignment of an impulse response onto a reference."""
     print("Generating ir_alignment...")
-    from phonometry import align_impulse_responses, fractional_delay
+    from phonometry import signals
 
     fs = 48000.0
     t = np.arange(int(0.03 * fs)) / fs
     rng = np.random.default_rng(6)
     # Band-limited reference pulse: a 2 kHz Gaussian tone burst at 5 ms.
     ir_a = scipy_signal.gausspulse(t - 0.005, fc=2000.0, bw=0.5)
-    ir_b = fractional_delay(ir_a, 7.37)[: ir_a.size]
+    ir_b = signals.fractional_delay(ir_a, 7.37)[: ir_a.size]
     ir_b += 0.005 * rng.standard_normal(ir_a.size)
 
-    res = align_impulse_responses(ir_b, ir_a, fs)
+    res = signals.align_impulse_responses(ir_b, ir_a, fs)
     t_ms = 1e3 * t
 
     _fig, ax = plt.subplots(figsize=(10, 6))
@@ -449,7 +453,7 @@ def generate_ir_alignment(output_dir: str) -> None:
 def generate_hilbert_envelope(output_dir: str) -> None:
     """Hilbert envelope and instantaneous frequency of a decaying mode."""
     print("Generating hilbert_envelope...")
-    from phonometry import envelope
+    from phonometry import signals
 
     fs = 8192.0
     t = np.arange(int(0.4 * fs)) / fs
@@ -460,7 +464,7 @@ def generate_hilbert_envelope(output_dir: str) -> None:
 
     # The envelope of a narrowband signal is low-frequency: the anti-aliased
     # x8 decimation keeps the outputs compact without losing the decay.
-    res = envelope(x, fs, decimation_factor=8)
+    res = signals.envelope(x, fs, decimation_factor=8)
 
     _fig, (ax_e, ax_f) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
     ax_e.plot(t, res.signal, color=COLOR_PRIMARY, linewidth=0.6,
@@ -494,7 +498,7 @@ def generate_hilbert_envelope(output_dir: str) -> None:
 def generate_tsa_noise_reduction(output_dir: str) -> None:
     """TSA: measured error of the average against the ideal 1/sqrt(N)."""
     print("Generating tsa_noise_reduction...")
-    from phonometry import time_synchronous_average
+    from phonometry import signals
 
     fs = 8192.0
     samples = 256
@@ -510,8 +514,9 @@ def generate_tsa_noise_reduction(output_dir: str) -> None:
     counts = [1, 2, 4, 8, 16, 32, 64, 128]
     errors = []
     for n in counts:
-        res = time_synchronous_average(x[: n * samples], fs, period=period,
-                                       n_averages=n)
+        res = signals.time_synchronous_average(
+            x[: n * samples], fs, period=period, n_averages=n
+        )
         errors.append(float(np.sqrt(np.mean(
             (res.period_waveform - true) ** 2))))
 

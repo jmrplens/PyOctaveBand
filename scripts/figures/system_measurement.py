@@ -29,11 +29,15 @@ from .theme import (
 def generate_tone_burst_train(output_dir: str) -> None:
     """IEC 60268-1 tone bursts: one gated burst and the repetitive train."""
     print("Generating tone_burst_train...")
-    from phonometry import tone_burst
+    from phonometry import signals
 
     fs = 48000.0
-    single = tone_burst(fs, 5000.0, 25, pre_silence=0.001, post_silence=0.001)
-    train = tone_burst(fs, 5000.0, 25, repetitions=4, repetition_rate=10.0)
+    single = signals.tone_burst(
+        fs, 5000.0, 25, pre_silence=0.001, post_silence=0.001
+    )
+    train = signals.tone_burst(
+        fs, 5000.0, 25, repetitions=4, repetition_rate=10.0
+    )
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6.4))
     t_ms = 1e3 * np.arange(single.signal.size) / single.fs
@@ -73,7 +77,7 @@ def generate_regularized_inversion(output_dir: str) -> None:
     print("Generating regularized_inversion...")
     from scipy import signal as sp_signal
 
-    from phonometry import regularized_inverse_filter
+    from phonometry import signals
 
     fs = 48000.0
     b, bb = sp_signal.butter(2, [100.0, 8000.0], btype="bandpass", fs=fs)
@@ -81,7 +85,7 @@ def generate_regularized_inversion(output_dir: str) -> None:
     imp[0] = 1.0
     h = sp_signal.lfilter(b, bb, imp)
 
-    res = regularized_inverse_filter(h, fs, f_range=(200.0, 4000.0))
+    res = signals.regularized_inverse_filter(h, fs, f_range=(200.0, 4000.0))
 
     freqs = res.frequencies
     pos = freqs > 0.0
@@ -131,10 +135,10 @@ def generate_shaped_sweep(output_dir: str) -> None:
     print("Generating shaped_sweep...")
     from scipy import signal as sp_signal
 
-    from phonometry import shaped_sweep_signal
+    from phonometry import room
 
     fs = 48000
-    res = shaped_sweep_signal(fs, 50.0, 5000.0, 2.0, target="pink")
+    res = room.shaped_sweep_signal(fs, 50.0, 5000.0, 2.0, target="pink")
     x = np.asarray(res)
     t = np.arange(x.size) / fs
 
@@ -190,10 +194,12 @@ def generate_shaped_sweep(output_dir: str) -> None:
 def generate_resampling_antialias(output_dir: str) -> None:
     """Polyphase resampling: the delivered anti-alias filter vs its spec."""
     print("Generating resampling_antialias...")
-    from phonometry import noise_signal, resample_signal
+    from phonometry import signals
 
-    x = noise_signal(44100, 5.0, color="pink", seed=1)
-    res = resample_signal(x, 44100, fs_new=48000)      # 120 dB alias rejection
+    x = signals.noise_signal(44100, 5.0, color="pink", seed=1)
+    res = signals.resample_signal(
+        x, 44100, fs_new=48000
+    )  # 120 dB alias rejection
 
     fs_up = res.original_fs * res.up
     freqs, h = scipy_signal.freqz(res.filter_taps, worN=1 << 18, fs=fs_up)
@@ -232,16 +238,16 @@ def generate_resampling_antialias(output_dir: str) -> None:
 def generate_golay_ir(output_dir: str) -> None:
     """Golay-pair impulse response: exact complementary recovery."""
     print("Generating golay_ir...")
-    from phonometry import golay_impulse_response, golay_pair
+    from phonometry import room
 
     fs = 48000
-    pair = golay_pair(14)                        # two 16384-sample codes
+    pair = room.golay_pair(14)                        # two 16384-sample codes
     b, a = scipy_signal.butter(2, [200.0, 2000.0], btype="bandpass", fs=fs)
     length = pair[0].size
     rec_a = scipy_signal.lfilter(b, a, np.tile(pair[0], 3))[2 * length:]
     rec_b = scipy_signal.lfilter(b, a, np.tile(pair[1], 3))[2 * length:]
 
-    ir = np.asarray(golay_impulse_response(rec_a, rec_b, pair, fs=fs))
+    ir = np.asarray(room.golay_impulse_response(rec_a, rec_b, pair, fs=fs))
     impulse = np.zeros(length)
     impulse[0] = 1.0
     true_ir = scipy_signal.lfilter(b, a, impulse)

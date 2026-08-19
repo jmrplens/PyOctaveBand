@@ -32,14 +32,7 @@ import os
 import numpy as np
 import pytest
 
-from phonometry import (
-    MicrophoneDirectivity,
-    MicrophoneElectrical,
-    MicrophoneNoise,
-    MicrophoneOverload,
-    ReportMetadata,
-    microphone_characteristics,
-)
+from phonometry import ReportMetadata, electroacoustics
 
 _PDF_MAGIC = b"%PDF"
 _M_MV = 12.5
@@ -80,7 +73,9 @@ def _extract_text(path: str) -> str:
 def test_sensitivity_level_is_20lg_m_over_1v_pa() -> None:
     """12,5 mV/Pa gives 20 lg 0,0125 = -38,06 dB re 1 V/Pa (11.1)."""
     f, rel = _flat_response()
-    result = microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel, _M_MV, tolerance_db=_TOL
+    )
     assert result.sensitivity_level_db == pytest.approx(
         20.0 * math.log10(0.0125), abs=1e-12
     )
@@ -91,7 +86,9 @@ def test_sensitivity_level_is_20lg_m_over_1v_pa() -> None:
 def test_reference_sensitivity_gives_zero_level() -> None:
     """M = 1 V/Pa (1 000 mV/Pa) is the reference: L_M = 0 dB exactly (11.1)."""
     f, rel = _flat_response()
-    result = microphone_characteristics(f, rel, 1000.0, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel, 1000.0, tolerance_db=_TOL
+    )
     assert result.sensitivity_level_db == pytest.approx(0.0, abs=1e-12)
 
 
@@ -101,7 +98,9 @@ def test_reference_sensitivity_gives_zero_level() -> None:
 def test_effective_range_crosses_lower_limit_at_known_points() -> None:
     """The band edges are the frequencies where the response crosses -tol (12.2)."""
     f, rel = _flat_response()
-    result = microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel, _M_MV, tolerance_db=_TOL
+    )
     lo, hi = result.effective_range
     assert lo == pytest.approx(40.0, rel=1e-6)
     assert hi == pytest.approx(18000.0, rel=1e-6)
@@ -114,7 +113,9 @@ def test_effective_range_crosses_upper_limit() -> None:
     # A linear-in-log rise above 8 kHz crossing +3 dB at exactly 12 kHz.
     above = f > 8000.0
     rel[above] += _TOL * (np.log2(f[above] / 8000.0) / np.log2(12000.0 / 8000.0))
-    result = microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel, _M_MV, tolerance_db=_TOL
+    )
     lo, hi = result.effective_range
     assert lo == pytest.approx(40.0, rel=1e-6)
     assert hi == pytest.approx(12000.0, rel=1e-4)
@@ -123,7 +124,9 @@ def test_effective_range_crosses_upper_limit() -> None:
 def test_response_is_normalized_at_reference_frequency() -> None:
     """A constant offset is removed: the response is 0 dB at 1 kHz (12.1.1)."""
     f, rel = _flat_response()
-    result = microphone_characteristics(f, rel + 7.0, _M_MV, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel + 7.0, _M_MV, tolerance_db=_TOL
+    )
     idx = int(np.argmin(np.abs(f - 1000.0)))
     assert result.response_db[idx] == pytest.approx(0.0, abs=1e-9)
     assert result.effective_range[0] == pytest.approx(40.0, rel=1e-6)
@@ -137,9 +140,14 @@ def test_cardioid_directivity_index_is_10lg3() -> None:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 179.9, 1800)
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(polar=(angles, pattern), frequency=1000.0),
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        directivity=electroacoustics.MicrophoneDirectivity(
+            polar=(angles, pattern), frequency=1000.0
+        ),
     )
     assert result.directivity_index_db == pytest.approx(
         10.0 * math.log10(3.0), abs=5e-3
@@ -154,9 +162,14 @@ def test_omnidirectional_directivity_index_is_zero() -> None:
     """A uniform pattern returns D = 0 dB (13.2.2)."""
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 721)
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(polar=(angles, np.zeros_like(angles))),
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        directivity=electroacoustics.MicrophoneDirectivity(
+            polar=(angles, np.zeros_like(angles))
+        ),
     )
     # Trapezoidal quadrature of the 11.2.2 a) integral over 0,25 degree steps.
     assert result.directivity_index_db == pytest.approx(0.0, abs=1e-4)
@@ -166,9 +179,9 @@ def test_stated_directivity_index_is_kept() -> None:
     """A stated directivity index overrides the computed one (13.2.1)."""
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 721)
-    result = microphone_characteristics(
+    result = electroacoustics.microphone_characteristics(
         f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(
+        directivity=electroacoustics.MicrophoneDirectivity(
             polar=(angles, np.zeros_like(angles)), index_db=4.5
         ),
     )
@@ -179,9 +192,14 @@ def test_front_only_pattern_gives_no_directivity_index() -> None:
     """A pattern that stops at 90 degrees cannot feed the 11.2.2 a) integral."""
     f, rel = _flat_response()
     angles = np.linspace(0.0, 90.0, 91)
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(polar=(angles, np.zeros_like(angles))),
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        directivity=electroacoustics.MicrophoneDirectivity(
+            polar=(angles, np.zeros_like(angles))
+        ),
     )
     assert result.directivity_index_db is None
 
@@ -192,9 +210,14 @@ def test_full_circle_cardioid_gives_same_directivity_index() -> None:
     angles = np.arange(0.0, 360.0, 0.25)
     angles = angles[angles != 180.0]  # the exact null is -inf dB
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(polar=(angles, pattern)),
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        directivity=electroacoustics.MicrophoneDirectivity(
+            polar=(angles, pattern)
+        ),
     )
     assert result.directivity_index_db == pytest.approx(
         10.0 * math.log10(3.0), abs=5e-3
@@ -205,9 +228,14 @@ def test_front_quarter_beyond_270_gives_no_directivity_index() -> None:
     """Angles 270..360 fold onto 0..90, too short for the 11.2.2 a) integral."""
     f, rel = _flat_response()
     angles = np.linspace(270.0, 360.0, 91)
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(polar=(angles, np.zeros_like(angles))),
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        directivity=electroacoustics.MicrophoneDirectivity(
+            polar=(angles, np.zeros_like(angles))
+        ),
     )
     assert result.directivity_index_db is None
 
@@ -218,8 +246,12 @@ def test_front_quarter_beyond_270_gives_no_directivity_index() -> None:
 def test_equivalent_noise_level_from_noise_voltage() -> None:
     """2,5 uV over 12,5 mV/Pa is 200 uPa = 20,0 dB SPL exactly (17.2 d/e)."""
     f, rel = _flat_response()
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL, noise=MicrophoneNoise(voltage=2.5e-6)
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        noise=electroacoustics.MicrophoneNoise(voltage=2.5e-6),
     )
     assert result.equivalent_noise_level_db == pytest.approx(20.0, abs=1e-12)
     # SNR re 1 Pa: 20 lg(1 Pa / 20 uPa) - L_N = 93,98 - 20,0.
@@ -233,9 +265,14 @@ def test_overload_spl_read_from_distortion_curve() -> None:
     f, rel = _flat_response()
     spl = np.linspace(100.0, 140.0, 81)  # includes 130,0 dB exactly
     thd = 0.5 * 10.0 ** ((spl - 130.0) * 0.08)
-    result = microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        overload=MicrophoneOverload(distortion=(spl, thd), thd_percent=0.5),
+    result = electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        overload=electroacoustics.MicrophoneOverload(
+            distortion=(spl, thd), thd_percent=0.5
+        ),
     )
     assert result.max_spl_db == pytest.approx(130.0, abs=1e-9)
 
@@ -245,9 +282,9 @@ def test_stated_max_spl_is_kept() -> None:
     f, rel = _flat_response()
     spl = np.linspace(100.0, 140.0, 81)
     thd = 0.5 * 10.0 ** ((spl - 130.0) * 0.08)
-    result = microphone_characteristics(
+    result = electroacoustics.microphone_characteristics(
         f, rel, _M_MV, tolerance_db=_TOL,
-        overload=MicrophoneOverload(
+        overload=electroacoustics.MicrophoneOverload(
             distortion=(spl, thd), thd_percent=0.5, spl_db=132.0
         ),
     )
@@ -259,9 +296,9 @@ def test_distortion_below_limit_gives_no_max_spl() -> None:
     f, rel = _flat_response()
     spl = np.linspace(100.0, 120.0, 41)
     thd = np.full_like(spl, 0.05)
-    result = microphone_characteristics(
+    result = electroacoustics.microphone_characteristics(
         f, rel, _M_MV, tolerance_db=_TOL,
-        overload=MicrophoneOverload(distortion=(spl, thd)),
+        overload=electroacoustics.MicrophoneOverload(distortion=(spl, thd)),
     )
     assert result.max_spl_db is None
 
@@ -272,51 +309,67 @@ def test_distortion_below_limit_gives_no_max_spl() -> None:
 def test_sensitivity_must_be_positive() -> None:
     f, rel = _flat_response()
     with pytest.raises(ValueError, match="sensitivity_mv_per_pa"):
-        microphone_characteristics(f, rel, 0.0)
+        electroacoustics.microphone_characteristics(f, rel, 0.0)
 
 
 def test_mismatched_response_lengths_rejected() -> None:
     with pytest.raises(ValueError, match="equal length"):
-        microphone_characteristics([100.0, 200.0, 400.0], [0.0, 0.0], _M_MV)
+        electroacoustics.microphone_characteristics(
+            [100.0, 200.0, 400.0], [0.0, 0.0], _M_MV
+        )
 
 
 def test_reference_frequency_outside_band_rejected() -> None:
     f, rel = _flat_response()
     with pytest.raises(ValueError, match="reference_frequency"):
-        microphone_characteristics(f, rel, _M_MV, reference_frequency=30000.0)
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, reference_frequency=30000.0
+        )
 
 
 def test_noise_voltage_and_stated_level_conflict() -> None:
     f, rel = _flat_response()
-    conflicting_noise = MicrophoneNoise(voltage=1e-6, equivalent_level_db=14.0)
+    conflicting_noise = electroacoustics.MicrophoneNoise(
+        voltage=1e-6, equivalent_level_db=14.0
+    )
     with pytest.raises(ValueError, match="not both"):
-        microphone_characteristics(f, rel, _M_MV, noise=conflicting_noise)
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, noise=conflicting_noise
+        )
 
 
 def test_nonpositive_frequencies_rejected() -> None:
     with pytest.raises(ValueError, match="positive and finite"):
-        microphone_characteristics([0.0, 100.0, 1000.0], [0.0, 0.0, 0.0], _M_MV)
+        electroacoustics.microphone_characteristics(
+            [0.0, 100.0, 1000.0], [0.0, 0.0, 0.0], _M_MV
+        )
 
 
 def test_empty_distortion_rejected() -> None:
     f, rel = _flat_response()
-    empty_distortion = MicrophoneOverload(distortion=([], []))
+    empty_distortion = electroacoustics.MicrophoneOverload(distortion=([], []))
     with pytest.raises(ValueError, match="at least two"):
-        microphone_characteristics(f, rel, _M_MV, overload=empty_distortion)
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, overload=empty_distortion
+        )
 
 
 def test_empty_noise_spectrum_rejected() -> None:
     f, rel = _flat_response()
-    empty_spectrum = MicrophoneNoise(spectrum=([], []))
+    empty_spectrum = electroacoustics.MicrophoneNoise(spectrum=([], []))
     with pytest.raises(ValueError, match="at least two"):
-        microphone_characteristics(f, rel, _M_MV, noise=empty_spectrum)
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, noise=empty_spectrum
+        )
 
 
 def test_empty_polar_rejected() -> None:
     f, rel = _flat_response()
-    empty_polar = MicrophoneDirectivity(polar=([], []))
+    empty_polar = electroacoustics.MicrophoneDirectivity(polar=([], []))
     with pytest.raises(ValueError, match="at least two angle points"):
-        microphone_characteristics(f, rel, _M_MV, directivity=empty_polar)
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, directivity=empty_polar
+        )
 
 
 def test_nonfinite_stated_directivity_index_rejected_with_polar() -> None:
@@ -324,21 +377,25 @@ def test_nonfinite_stated_directivity_index_rejected_with_polar() -> None:
     f, rel = _flat_response()
     angles = np.linspace(0.0, 180.0, 181)
     omnidirectional = np.zeros_like(angles)
-    infinite_index_with_polar = MicrophoneDirectivity(
+    infinite_index_with_polar = electroacoustics.MicrophoneDirectivity(
         polar=(angles, omnidirectional), index_db=float("inf")
     )
     with pytest.raises(ValueError, match=r"directivity\.index_db"):
-        microphone_characteristics(
+        electroacoustics.microphone_characteristics(
             f, rel, _M_MV, directivity=infinite_index_with_polar
         )
-    nan_index = MicrophoneDirectivity(index_db=float("nan"))
+    nan_index = electroacoustics.MicrophoneDirectivity(index_db=float("nan"))
     with pytest.raises(ValueError, match=r"directivity\.index_db"):
-        microphone_characteristics(f, rel, _M_MV, directivity=nan_index)
+        electroacoustics.microphone_characteristics(
+            f, rel, _M_MV, directivity=nan_index
+        )
 
 
 def test_no_noise_input_gives_no_noise_rows() -> None:
     f, rel = _flat_response()
-    result = microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel, _M_MV, tolerance_db=_TOL
+    )
     assert result.equivalent_noise_level_db is None
     assert result.signal_to_noise_ratio_db is None
 
@@ -354,16 +411,25 @@ def _example_result():
     thd = 0.5 * 10.0 ** ((spl - 130.0) * 0.08)
     nf = np.geomspace(20.0, 20000.0, 31)
     nl = 18.0 - 5.4 * np.log2(nf / 20.0)
-    return microphone_characteristics(
-        f, rel, _M_MV, tolerance_db=_TOL,
-        directivity=MicrophoneDirectivity(
+    return electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        _M_MV,
+        tolerance_db=_TOL,
+        directivity=electroacoustics.MicrophoneDirectivity(
             polar=(angles, pattern), frequency=1000.0
         ),
-        noise=MicrophoneNoise(voltage=1.25e-6, spectrum=(nf, nl)),
-        overload=MicrophoneOverload(distortion=(spl, thd), thd_percent=0.5),
-        electrical=MicrophoneElectrical(
-            rated_impedance=150.0, minimum_load_impedance=1000.0,
-            powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
+        noise=electroacoustics.MicrophoneNoise(
+            voltage=1.25e-6, spectrum=(nf, nl)
+        ),
+        overload=electroacoustics.MicrophoneOverload(
+            distortion=(spl, thd), thd_percent=0.5
+        ),
+        electrical=electroacoustics.MicrophoneElectrical(
+            rated_impedance=150.0,
+            minimum_load_impedance=1000.0,
+            powering="Phantom P48 (IEC 61938)",
+            supply_current_ma=3.1,
         ),
     )
 
@@ -397,7 +463,9 @@ def test_report_without_optional_panels(tmp_path) -> None:
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
     f, rel = _flat_response()
-    result = microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
+    result = electroacoustics.microphone_characteristics(
+        f, rel, _M_MV, tolerance_db=_TOL
+    )
     out = tmp_path / "microphone_min.pdf"
     result.report(str(out))
     _assert_one_page(str(out))
@@ -455,7 +523,9 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
     with pytest.raises(ValueError, match="unknown quantity"):
         result.plot(quantity="bogus")
     f, rel = _flat_response()
-    bare = microphone_characteristics(f, rel, _M_MV, tolerance_db=_TOL)
+    bare = electroacoustics.microphone_characteristics(
+        f, rel, _M_MV, tolerance_db=_TOL
+    )
     with pytest.raises(ValueError, match="no directional pattern"):
         bare.plot(quantity="directivity")
 

@@ -22,7 +22,7 @@ import os
 import numpy as np
 import pytest
 
-from phonometry import ReportMetadata, reception_plate_power
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 
@@ -52,7 +52,7 @@ def _extract_text(path: str) -> str:
 
 
 def _result():
-    return reception_plate_power(
+    return building.reception_plate_power(
         _LV, _FREQS, mass_per_area=_MASS, area=_AREA, reverberation_time=_TS
     )
 
@@ -140,7 +140,7 @@ def test_third_octave_labels_and_caption(tmp_path) -> None:
     pytest.importorskip("matplotlib")
     freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800], dtype=float)
     lv = np.linspace(80.0, 92.0, freqs.size)
-    res = reception_plate_power(
+    res = building.reception_plate_power(
         lv, freqs, mass_per_area=_MASS, area=_AREA, loss_factor=0.01
     )
     out = tmp_path / "third.pdf"

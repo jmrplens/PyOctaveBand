@@ -6,14 +6,14 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import loudness_zwicker
+from phonometry import psychoacoustics
 
 
 def _result():
     fs = 48000
     t = np.arange(int(fs * 0.3)) / fs
     x = np.sqrt(2.0) * 0.02 * np.sin(2.0 * np.pi * 1000.0 * t)
-    return loudness_zwicker(x, fs, stationary=True)
+    return psychoacoustics.loudness_zwicker(x, fs, stationary=True)
 
 
 def test_spanish_labels_and_comma_decimals() -> None:

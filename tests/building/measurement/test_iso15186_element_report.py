@@ -23,10 +23,7 @@ import reference_data as ref
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    ReportMetadata,
-    intensity_element_normalized_difference,
-)
+from phonometry import ReportMetadata, building
 from phonometry.building.measurement.intensity_insulation import (
     IntensityElementNormalizedResult,
 )
@@ -51,7 +48,7 @@ def _element_result() -> IntensityElementNormalizedResult:
     """A result whose DI,n,e equals the ISO 717-1 Annex C curve (30 dB)."""
     lp1, sm, n = 85.0, 12.0, 1
     l_in = _levels_for_target_dine(ref.ISO717_1_ANNEX_C_R, lp1, sm, n)
-    return intensity_element_normalized_difference(
+    return building.intensity_element_normalized_difference(
         np.full(16, lp1), l_in, measurement_area=sm, n=n
     )
 
@@ -60,7 +57,7 @@ def _octave_result() -> IntensityElementNormalizedResult:
     """A five-octave-band element result with a valid ISO 717-1 rating."""
     dine = np.array([30.0, 40.0, 48.0, 52.0, 55.0])
     l_in = _levels_for_target_dine(dine, 85.0, 12.0, 1)
-    return intensity_element_normalized_difference(
+    return building.intensity_element_normalized_difference(
         np.full(5, 85.0), l_in, measurement_area=12.0, n=1
     )
 
@@ -193,7 +190,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 def test_missing_rating_rejected(tmp_path) -> None:
     """A result without the ISO 717 rating (non-core band count) is rejected."""
     l_in = _levels_for_target_dine(np.full(8, 40.0), 85.0, 12.0, 1)
-    result = intensity_element_normalized_difference(
+    result = building.intensity_element_normalized_difference(
         np.full(8, 85.0), l_in, measurement_area=12.0, n=1
     )
     assert result.rating is None
@@ -209,11 +206,10 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
     ISO 717-1 rates; a hand-crafted rating whose per-band arrays all match an
     8-band curve would otherwise satisfy the shared renderer's shape checks.
     """
-    from phonometry import WeightedRatingResult
 
     centers = np.array([100, 125, 160, 200, 250, 315, 400, 500], dtype=float)
     curve = np.linspace(20.0, 40.0, 8)
-    rating = WeightedRatingResult(
+    rating = building.WeightedRatingResult(
         rating=30, c=-2, ctr=-3, unfavourable_sum=0.0,
         band_centers=centers, measured=curve, shifted_reference=curve,
     )
@@ -225,9 +221,8 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
 
 def test_rating_without_per_band_data_rejected(tmp_path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
-    from phonometry import WeightedRatingResult
 
-    bare_rating = WeightedRatingResult(
+    bare_rating = building.WeightedRatingResult(
         rating=30, c=-2, ctr=-3, unfavourable_sum=0.0
     )
     result = IntensityElementNormalizedResult(

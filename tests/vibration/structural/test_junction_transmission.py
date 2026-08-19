@@ -43,19 +43,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import (
-    angular_average_transmission_coefficient,
-    corner_transmission_coefficient,
-    coupling_loss_factor,
-    inline_transmission_coefficient,
-    junction_transmission,
-    junction_wave_parameters,
-    plate_bending_stiffness,
-    point_connection_coupling_loss_factor,
-    right_angle_transmission_coefficient,
-    straight_transmission_coefficient,
-    wave_vibration_reduction_index,
-)
+from phonometry import vibration
 from phonometry.vibration import JunctionTransmissionResult
 from phonometry.vibration.structural.experimental_sea import flat_plate_modal_density
 from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
@@ -71,7 +59,9 @@ J1J2J3 = {"X": (1.0, 1.0, 1.0), "T1": (2.0, 0.5, 0.5), "T2": (2.0, 2.0, None),
 # ---------------------------------------------------------------------------
 def test_wave_parameters_closed_form() -> None:
     # h1 cL1 = 0.1*3200, h2 cL2 = 0.2*3200 -> chi = sqrt(0.5), psi = 2*(480/240).
-    chi, psi = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+    chi, psi = vibration.junction_wave_parameters(
+        0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0
+    )
     assert chi == pytest.approx(math.sqrt(0.1 * 3200.0 / (0.2 * 3200.0)))
     assert chi == pytest.approx(math.sqrt(0.5))
     assert psi == pytest.approx((0.2 * 3200.0 * 480.0) / (0.1 * 3200.0 * 240.0))
@@ -79,14 +69,18 @@ def test_wave_parameters_closed_form() -> None:
 
 
 def test_wave_parameters_identical_plates_are_unity() -> None:
-    chi, psi = junction_wave_parameters(0.15, 3100.0, 375.0, 0.15, 3100.0, 375.0)
+    chi, psi = vibration.junction_wave_parameters(
+        0.15, 3100.0, 375.0, 0.15, 3100.0, 375.0
+    )
     assert chi == pytest.approx(1.0)
     assert psi == pytest.approx(1.0)
 
 
 def test_chi_equals_sqrt_critical_frequency_ratio() -> None:
     # chi = sqrt(fc2 / fc1); fc ~ 1 / (cL h), so fc2/fc1 = (h1 cL1)/(h2 cL2).
-    chi, _ = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+    chi, _ = vibration.junction_wave_parameters(
+        0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0
+    )
     fc1 = 1.0 / (3200.0 * 0.1)
     fc2 = 1.0 / (3200.0 * 0.2)
     assert chi == pytest.approx(math.sqrt(fc2 / fc1))
@@ -99,7 +93,9 @@ def test_chi_equals_sqrt_critical_frequency_ratio() -> None:
 def test_identical_x_corner_is_cos_squared_over_eight(deg: float) -> None:
     theta = math.radians(deg)
     expected = math.cos(theta) ** 2 / 8.0
-    got = float(corner_transmission_coefficient(theta, 1.0, 1.0, "X"))
+    got = float(
+        vibration.corner_transmission_coefficient(theta, 1.0, 1.0, "X")
+    )
     assert got == pytest.approx(expected)
 
 
@@ -107,24 +103,36 @@ def test_identical_x_corner_is_cos_squared_over_eight(deg: float) -> None:
 def test_identical_x_straight_is_cos_squared_over_eight(deg: float) -> None:
     theta = math.radians(deg)
     expected = math.cos(theta) ** 2 / 8.0
-    got = float(straight_transmission_coefficient(theta, 1.0, 1.0, "X"))
+    got = float(
+        vibration.straight_transmission_coefficient(theta, 1.0, 1.0, "X")
+    )
     assert got == pytest.approx(expected)
 
 
 def test_identical_x_specific_angles() -> None:
     # cos**2/8 at 0, 45, 60 deg -> 1/8, 1/16, 1/32.
-    assert float(corner_transmission_coefficient(0.0, 1.0, 1.0, "X")) == pytest.approx(0.125)
     assert float(
-        corner_transmission_coefficient(math.radians(45.0), 1.0, 1.0, "X")
+        vibration.corner_transmission_coefficient(0.0, 1.0, 1.0, "X")
+    ) == pytest.approx(0.125)
+    assert float(
+        vibration.corner_transmission_coefficient(
+            math.radians(45.0), 1.0, 1.0, "X"
+        )
     ) == pytest.approx(1.0 / 16.0)
     assert float(
-        corner_transmission_coefficient(math.radians(60.0), 1.0, 1.0, "X")
+        vibration.corner_transmission_coefficient(
+            math.radians(60.0), 1.0, 1.0, "X"
+        )
     ) == pytest.approx(1.0 / 32.0)
 
 
 def test_identical_x_angular_average_is_one_twelfth() -> None:
-    corner = angular_average_transmission_coefficient(1.0, 1.0, "X", section="corner")
-    straight = angular_average_transmission_coefficient(1.0, 1.0, "X", section="straight")
+    corner = vibration.angular_average_transmission_coefficient(
+        1.0, 1.0, "X", section="corner"
+    )
+    straight = vibration.angular_average_transmission_coefficient(
+        1.0, 1.0, "X", section="straight"
+    )
     assert corner == pytest.approx(1.0 / 12.0)
     assert straight == pytest.approx(1.0 / 12.0)
 
@@ -135,12 +143,16 @@ def test_identical_x_angular_average_is_one_twelfth() -> None:
 @pytest.mark.parametrize("deg", [0.0, 30.0, 45.0, 60.0])
 def test_identical_l_corner_is_cos_squared_over_two(deg: float) -> None:
     theta = math.radians(deg)
-    got = float(corner_transmission_coefficient(theta, 1.0, 1.0, "L"))
+    got = float(
+        vibration.corner_transmission_coefficient(theta, 1.0, 1.0, "L")
+    )
     assert got == pytest.approx(math.cos(theta) ** 2 / 2.0)
 
 
 def test_identical_l_angular_average_is_one_third() -> None:
-    avg = angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")
+    avg = vibration.angular_average_transmission_coefficient(
+        1.0, 1.0, "L", section="corner"
+    )
     assert avg == pytest.approx(1.0 / 3.0)
 
 
@@ -152,7 +164,9 @@ def test_corner_normal_incidence_perfect_square(junction: str) -> None:
     chi, psi = 1.5, 0.8
     j1, j2, _ = J1J2J3[junction]
     expected = 0.5 * j1 * j2 * psi * chi / (j2 * psi + chi) ** 2
-    got = float(corner_transmission_coefficient(0.0, chi, psi, junction))
+    got = float(
+        vibration.corner_transmission_coefficient(0.0, chi, psi, junction)
+    )
     assert got == pytest.approx(expected)
 
 
@@ -162,7 +176,9 @@ def test_straight_normal_incidence_perfect_square(junction: str) -> None:
     _, _, j3 = J1J2J3[junction]
     assert j3 is not None
     expected = 0.5 * chi**2 / (j3 * psi + chi) ** 2
-    got = float(straight_transmission_coefficient(0.0, chi, psi, junction))
+    got = float(
+        vibration.straight_transmission_coefficient(0.0, chi, psi, junction)
+    )
     assert got == pytest.approx(expected)
 
 
@@ -170,13 +186,13 @@ def test_t_junctions_identical_normal_incidence_two_ninths() -> None:
     # tau12(0) = 0.5 J1 J2 / (J2 + 1)**2 with chi = psi = 1:
     #   T1: 0.5*2*0.5/(1.5)**2 = 2/9;  T2: 0.5*2*2/(3)**2 = 2/9.
     assert float(
-        corner_transmission_coefficient(0.0, 1.0, 1.0, "T1")
+        vibration.corner_transmission_coefficient(0.0, 1.0, 1.0, "T1")
     ) == pytest.approx(2.0 / 9.0)
     assert float(
-        corner_transmission_coefficient(0.0, 1.0, 1.0, "T2")
+        vibration.corner_transmission_coefficient(0.0, 1.0, 1.0, "T2")
     ) == pytest.approx(2.0 / 9.0)
     assert float(
-        straight_transmission_coefficient(0.0, 1.0, 1.0, "T1")
+        vibration.straight_transmission_coefficient(0.0, 1.0, 1.0, "T1")
     ) == pytest.approx(2.0 / 9.0)
 
 
@@ -184,7 +200,9 @@ def test_t_junctions_identical_normal_incidence_two_ninths() -> None:
 # In-line junction (Hopkins Eq. 5.14).
 # ---------------------------------------------------------------------------
 def test_inline_identical_plates_transmit_fully() -> None:
-    assert inline_transmission_coefficient(1.0, 1.0) == pytest.approx(1.0)
+    assert vibration.inline_transmission_coefficient(
+        1.0, 1.0
+    ) == pytest.approx(1.0)
 
 
 def test_inline_asymmetric_closed_form() -> None:
@@ -192,13 +210,15 @@ def test_inline_asymmetric_closed_form() -> None:
     ratio = 2.0 * (1.0 + chi) * (1.0 + psi) * math.sqrt(chi * psi) / (
         chi * (1.0 + psi) ** 2 + 2.0 * psi * (1.0 + chi**2)
     )
-    assert inline_transmission_coefficient(chi, psi) == pytest.approx(ratio**2)
+    assert vibration.inline_transmission_coefficient(
+        chi, psi
+    ) == pytest.approx(ratio**2)
 
 
 def test_inline_is_between_zero_and_one() -> None:
     for chi in (0.3, 0.7, 1.0, 2.0, 5.0):
         for psi in (0.2, 1.0, 3.0):
-            tau = inline_transmission_coefficient(chi, psi)
+            tau = vibration.inline_transmission_coefficient(chi, psi)
             assert 0.0 <= tau <= 1.0
 
 
@@ -207,25 +227,44 @@ def test_inline_is_between_zero_and_one() -> None:
 # ---------------------------------------------------------------------------
 def test_corner_cut_off_is_zero() -> None:
     # chi = 0.5, theta = 45 deg (sin 45 ~ 0.707 > 0.5) -> no transmitted wave.
-    assert float(
-        corner_transmission_coefficient(math.radians(45.0), 0.5, 1.0, "X")
-    ) == 0.0
+    assert (
+        float(
+            vibration.corner_transmission_coefficient(
+                math.radians(45.0), 0.5, 1.0, "X"
+            )
+        )
+        == 0.0
+    )
     # Just above the cut-off arcsin(0.5) = 30 deg the coefficient vanishes.
-    assert float(
-        corner_transmission_coefficient(math.radians(31.0), 0.5, 1.0, "X")
-    ) == 0.0
+    assert (
+        float(
+            vibration.corner_transmission_coefficient(
+                math.radians(31.0), 0.5, 1.0, "X"
+            )
+        )
+        == 0.0
+    )
     # Just below it there is a finite transmitted wave.
-    assert float(
-        corner_transmission_coefficient(math.radians(29.0), 0.5, 1.0, "X")
-    ) > 0.0
+    assert (
+        float(
+            vibration.corner_transmission_coefficient(
+                math.radians(29.0), 0.5, 1.0, "X"
+            )
+        )
+        > 0.0
+    )
 
 
 def test_straight_is_continuous_across_cut_off() -> None:
     # The two branches of Eq. 5.13 must join at chi = sin(theta).
     chi, psi = 0.8, 0.7
     tco = math.asin(chi)
-    below = float(straight_transmission_coefficient(tco - 1e-6, chi, psi, "X"))
-    above = float(straight_transmission_coefficient(tco + 1e-6, chi, psi, "X"))
+    below = float(
+        vibration.straight_transmission_coefficient(tco - 1e-6, chi, psi, "X")
+    )
+    above = float(
+        vibration.straight_transmission_coefficient(tco + 1e-6, chi, psi, "X")
+    )
     assert below == pytest.approx(above, abs=1e-4)
 
 
@@ -235,9 +274,11 @@ def test_straight_is_continuous_across_cut_off() -> None:
 @pytest.mark.parametrize("junction", ["X", "L"])
 def test_corner_reciprocity(junction: str) -> None:
     chi, psi = 1.5, 0.8
-    forward = angular_average_transmission_coefficient(chi, psi, junction, section="corner")
+    forward = vibration.angular_average_transmission_coefficient(
+        chi, psi, junction, section="corner"
+    )
     # Reverse direction: incident on plate 2 -> chi' = 1/chi, psi' = 1/psi.
-    reverse = angular_average_transmission_coefficient(
+    reverse = vibration.angular_average_transmission_coefficient(
         1.0 / chi, 1.0 / psi, junction, section="corner"
     )
     assert forward == pytest.approx(chi * reverse, rel=1e-6)
@@ -249,8 +290,10 @@ def test_corner_reciprocity(junction: str) -> None:
 # ---------------------------------------------------------------------------
 def test_identical_x_energy_bound() -> None:
     theta = np.radians(np.linspace(0.0, 89.0, 90))
-    corner = corner_transmission_coefficient(theta, 1.0, 1.0, "X")
-    straight = straight_transmission_coefficient(theta, 1.0, 1.0, "X")
+    corner = vibration.corner_transmission_coefficient(theta, 1.0, 1.0, "X")
+    straight = vibration.straight_transmission_coefficient(
+        theta, 1.0, 1.0, "X"
+    )
     total = 2.0 * corner + straight  # two corner plates + one straight plate
     assert np.all(total <= 1.0 + 1e-12)
 
@@ -261,13 +304,13 @@ def test_identical_x_energy_bound() -> None:
 def test_coupling_loss_factor_closed_form() -> None:
     cg, lij, f, area, tau = 200.0, 4.0, 500.0, 10.0, 1.0 / 12.0
     expected = cg * lij * tau / (2.0 * math.pi**2 * f * area)
-    got = float(coupling_loss_factor(tau, cg, lij, f, area))
+    got = float(vibration.coupling_loss_factor(tau, cg, lij, f, area))
     assert got == pytest.approx(expected)
 
 
 def test_coupling_loss_factor_broadcasts_over_frequency() -> None:
     freqs = np.array([250.0, 500.0, 1000.0])
-    eta = coupling_loss_factor(0.1, 300.0, 3.0, freqs, 8.0)
+    eta = vibration.coupling_loss_factor(0.1, 300.0, 3.0, freqs, 8.0)
     assert eta.shape == freqs.shape
     # eta ~ 1/f, so doubling the frequency halves the coupling loss factor.
     assert eta[1] == pytest.approx(eta[0] / 2.0)
@@ -286,32 +329,36 @@ def test_kij_closed_form() -> None:
     # K = 10 lg(1/tau) + 5 lg(fc_j / 1000), fc_j the receiving plate's fc.
     tau, fcj = 0.05, 200.0
     expected = 10.0 * math.log10(1.0 / tau) + 5.0 * math.log10(fcj / 1000.0)
-    assert float(wave_vibration_reduction_index(tau, fcj)) == pytest.approx(expected)
+    assert float(
+        vibration.wave_vibration_reduction_index(tau, fcj)
+    ) == pytest.approx(expected)
 
 
 def test_kij_at_reference_frequency_is_ten_lg_inverse_tau() -> None:
     # fc_j = f_ref = 1000 Hz makes the correction term vanish.
-    assert float(wave_vibration_reduction_index(1.0 / 12.0, 1000.0)) == pytest.approx(
-        10.0 * math.log10(12.0)
-    )
-    assert float(wave_vibration_reduction_index(1.0 / 3.0, 1000.0)) == pytest.approx(
-        10.0 * math.log10(3.0)
-    )
+    assert float(
+        vibration.wave_vibration_reduction_index(1.0 / 12.0, 1000.0)
+    ) == pytest.approx(10.0 * math.log10(12.0))
+    assert float(
+        vibration.wave_vibration_reduction_index(1.0 / 3.0, 1000.0)
+    ) == pytest.approx(10.0 * math.log10(3.0))
 
 
 def test_kij_identical_plates_uses_common_critical_frequency() -> None:
     # Identical plates: K = 10 lg(1/tau) + 5 lg(fc/1000) with the common fc.
     fc = _critical_frequency_oracle(0.1, 3200.0)
-    res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+    res = vibration.junction_transmission(
+        "X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0
+    )
     expected = 10.0 * math.log10(12.0) + 5.0 * math.log10(fc / 1000.0)
     assert res.corner_reduction_index == pytest.approx(expected)
 
 
 def test_kij_rejects_nonpositive_critical_frequency() -> None:
     with pytest.raises(ValueError):
-        wave_vibration_reduction_index(0.1, 0.0)
+        vibration.wave_vibration_reduction_index(0.1, 0.0)
     with pytest.raises(ValueError):
-        wave_vibration_reduction_index(0.1, -100.0)
+        vibration.wave_vibration_reduction_index(0.1, -100.0)
 
 
 def test_kij_l_junction_concrete_oracle_is_symmetric() -> None:
@@ -320,8 +367,12 @@ def test_kij_l_junction_concrete_oracle_is_symmetric() -> None:
     # K_12 = K_21 = 2.966 dB.
     plate_a = (0.100, 3800.0, 220.0)
     plate_b = (0.215, 3200.0, 430.0)
-    k_ab = junction_transmission("L", *plate_a, *plate_b).corner_reduction_index
-    k_ba = junction_transmission("L", *plate_b, *plate_a).corner_reduction_index
+    k_ab = vibration.junction_transmission(
+        "L", *plate_a, *plate_b
+    ).corner_reduction_index
+    k_ba = vibration.junction_transmission(
+        "L", *plate_b, *plate_a
+    ).corner_reduction_index
     assert k_ab == pytest.approx(k_ba, abs=1e-9)
     assert k_ab == pytest.approx(2.9664, abs=1e-3)
 
@@ -348,10 +399,10 @@ def test_kij_symmetry_over_random_plate_pairs(junction: str) -> None:
             float(rng.uniform(1500.0, 4000.0)),
             float(rng.uniform(100.0, 600.0)),
         )
-        k_ab = junction_transmission(
+        k_ab = vibration.junction_transmission(
             junction, *plate_a, *plate_b
         ).corner_reduction_index
-        k_ba = junction_transmission(
+        k_ba = vibration.junction_transmission(
             _REVERSE_JUNCTION[junction], *plate_b, *plate_a
         ).corner_reduction_index
         assert k_ab == pytest.approx(k_ba, abs=1e-9)
@@ -361,7 +412,9 @@ def test_kij_symmetry_over_random_plate_pairs(junction: str) -> None:
 # Result object and builder.
 # ---------------------------------------------------------------------------
 def test_result_identical_x() -> None:
-    res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+    res = vibration.junction_transmission(
+        "X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0
+    )
     assert isinstance(res, JunctionTransmissionResult)
     assert res.junction == "X"
     assert res.chi == pytest.approx(1.0)
@@ -378,20 +431,24 @@ def test_result_identical_x() -> None:
 
 
 def test_result_l_has_no_straight_section() -> None:
-    res = junction_transmission("L", 0.12, 2000.0, 200.0, 0.2, 3200.0, 500.0)
+    res = vibration.junction_transmission(
+        "L", 0.12, 2000.0, 200.0, 0.2, 3200.0, 500.0
+    )
     assert res.straight is None
     assert res.straight_average is None
     assert res.corner.shape == res.angles_deg.shape
 
 
 def test_result_is_frozen() -> None:
-    res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+    res = vibration.junction_transmission(
+        "X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0
+    )
     with pytest.raises(dataclasses.FrozenInstanceError):
         res.chi = 2.0  # type: ignore[misc]
 
 
 def test_result_accepts_custom_angles() -> None:
-    res = junction_transmission(
+    res = vibration.junction_transmission(
         "X", 0.1, 3200.0, 240.0, 0.15, 3000.0, 360.0, angles_deg=[0.0, 45.0, 90.0]
     )
     assert res.angles_deg.tolist() == [0.0, 45.0, 90.0]
@@ -402,7 +459,9 @@ def test_plot_returns_axes() -> None:
     import matplotlib
     matplotlib.use("Agg")
 
-    res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.15, 3000.0, 360.0)
+    res = vibration.junction_transmission(
+        "X", 0.1, 3200.0, 240.0, 0.15, 3000.0, 360.0
+    )
     ax = res.plot()
     assert ax.get_xlabel() == "Incidence angle [deg]"
     ax_es = res.plot(language="es")
@@ -414,28 +473,30 @@ def test_plot_returns_axes() -> None:
 # ---------------------------------------------------------------------------
 def test_unknown_junction_rejected() -> None:
     with pytest.raises(ValueError):
-        corner_transmission_coefficient(0.0, 1.0, 1.0, "Z")
+        vibration.corner_transmission_coefficient(0.0, 1.0, 1.0, "Z")
 
 
 def test_negative_parameters_rejected() -> None:
     with pytest.raises(ValueError):
-        corner_transmission_coefficient(0.0, -1.0, 1.0, "X")
+        vibration.corner_transmission_coefficient(0.0, -1.0, 1.0, "X")
     with pytest.raises(ValueError):
-        junction_wave_parameters(-0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+        vibration.junction_wave_parameters(
+            -0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0
+        )
 
 
 def test_out_of_range_angle_rejected() -> None:
     with pytest.raises(ValueError):
-        corner_transmission_coefficient(2.0, 1.0, 1.0, "X")  # > pi/2
+        vibration.corner_transmission_coefficient(2.0, 1.0, 1.0, "X")  # > pi/2
     with pytest.raises(ValueError):
-        corner_transmission_coefficient(-0.1, 1.0, 1.0, "X")
+        vibration.corner_transmission_coefficient(-0.1, 1.0, 1.0, "X")
 
 
 def test_straight_section_undefined_for_t2_and_l() -> None:
     with pytest.raises(ValueError):
-        straight_transmission_coefficient(0.0, 1.0, 1.0, "T2")
+        vibration.straight_transmission_coefficient(0.0, 1.0, 1.0, "T2")
     with pytest.raises(ValueError):
-        straight_transmission_coefficient(0.0, 1.0, 1.0, "L")
+        vibration.straight_transmission_coefficient(0.0, 1.0, 1.0, "L")
 
 
 # ---------------------------------------------------------------------------
@@ -471,7 +532,7 @@ _S1, _S2, _L, _NBOLTS = 2.5 * 1.2, 2.0 * 1.2, 1.2, 12
 
 
 def _norton_tau12(incidence: str = "random") -> float:
-    return right_angle_transmission_coefficient(
+    return vibration.right_angle_transmission_coefficient(
         _H1, _H2, density1=_AL_RHO, density2=_AL_RHO,
         wave_speed1=_AL_CL, wave_speed2=_AL_CL, incidence=incidence,
     )
@@ -488,7 +549,7 @@ def test_norton_right_angle_normal_incidence_closed_form() -> None:
 def test_norton_right_angle_normal_incidence_is_symmetric() -> None:
     # tau12(0) does not see which plate is which: swapping them inverts psi and
     # the (sqrt(psi) + 1/sqrt(psi)) sum is unchanged.
-    swapped = right_angle_transmission_coefficient(
+    swapped = vibration.right_angle_transmission_coefficient(
         _H2, _H1, density1=_AL_RHO, density2=_AL_RHO,
         wave_speed1=_AL_CL, wave_speed2=_AL_CL, incidence="normal",
     )
@@ -498,12 +559,12 @@ def test_norton_right_angle_normal_incidence_is_symmetric() -> None:
 def test_norton_right_angle_identical_plates() -> None:
     # Identical plates give psi = 1, hence tau12(0) = 2/4 = 0,5, and X = 1 so
     # the random-incidence factor is 2,754/4,24.
-    same = right_angle_transmission_coefficient(
+    same = vibration.right_angle_transmission_coefficient(
         0.004, 0.004, density1=_AL_RHO, density2=_AL_RHO,
         wave_speed1=_AL_CL, wave_speed2=_AL_CL, incidence="normal",
     )
     assert same == pytest.approx(0.5, rel=1e-12)
-    random = right_angle_transmission_coefficient(
+    random = vibration.right_angle_transmission_coefficient(
         0.004, 0.004, density1=_AL_RHO, density2=_AL_RHO,
         wave_speed1=_AL_CL, wave_speed2=_AL_CL,
     )
@@ -514,11 +575,11 @@ def test_norton_problem_613_welded_line_junction() -> None:
     # Eq. (6.52) via the library's coupling loss factor (Hopkins Eq. 2.154 is
     # the same expression with cg = 2 cB), against the printed eta_12 column.
     tau = _norton_tau12()
-    stiffness = plate_bending_stiffness(7.1e10, _H1, 0.33)
+    stiffness = vibration.plate_bending_stiffness(7.1e10, _H1, 0.33)
     c_b = plate_bending_wave_speed(_P613_BANDS, stiffness, _AL_RHO * _H1)
     eta = np.array(
         [
-            float(coupling_loss_factor(tau, 2.0 * c, _L, f, _S1))
+            float(vibration.coupling_loss_factor(tau, 2.0 * c, _L, f, _S1))
             for c, f in zip(c_b, _P613_BANDS, strict=True)
         ]
     )
@@ -536,7 +597,7 @@ def test_norton_line_junction_falls_as_inverse_root_frequency() -> None:
 
 def test_norton_problem_613_bolted_point_connections() -> None:
     # Eq. (6.56) with twelve bolts, against the printed bolted eta_12 column.
-    eta = point_connection_coupling_loss_factor(
+    eta = vibration.point_connection_coupling_loss_factor(
         _P613_BANDS, _NBOLTS, thickness1=_H1, thickness2=_H2,
         surface_density1=_AL_RHO * _H1, surface_density2=_AL_RHO * _H2,
         wave_speed1=_AL_CL, wave_speed2=_AL_CL, plate_area1=_S1,
@@ -559,8 +620,8 @@ def test_norton_point_junction_scales_with_the_bolt_count() -> None:
         "surface_density2": _AL_RHO * _H2, "wave_speed1": _AL_CL,
         "wave_speed2": _AL_CL, "plate_area1": _S1,
     }
-    one = point_connection_coupling_loss_factor(500.0, 1, **kwargs)  # type: ignore[arg-type]
-    twelve = point_connection_coupling_loss_factor(500.0, 12, **kwargs)  # type: ignore[arg-type]
+    one = vibration.point_connection_coupling_loss_factor(500.0, 1, **kwargs)  # type: ignore[arg-type]
+    twelve = vibration.point_connection_coupling_loss_factor(500.0, 12, **kwargs)  # type: ignore[arg-type]
     np.testing.assert_allclose(twelve, 12.0 * one, rtol=1e-12)
 
 
@@ -596,7 +657,7 @@ def test_right_angle_validation(kwargs: dict[str, object]) -> None:
     thickness1 = base.pop("thickness1")
     thickness2 = base.pop("thickness2")
     with pytest.raises(ValueError):
-        right_angle_transmission_coefficient(thickness1, thickness2, **base)  # type: ignore[arg-type]
+        vibration.right_angle_transmission_coefficient(thickness1, thickness2, **base)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize(
@@ -619,12 +680,12 @@ def test_point_connection_validation(kwargs: dict[str, object]) -> None:
     base.update(kwargs)
     n = base.pop("n_connections")
     with pytest.raises(ValueError):
-        point_connection_coupling_loss_factor(500.0, n, **base)  # type: ignore[arg-type]
+        vibration.point_connection_coupling_loss_factor(500.0, n, **base)  # type: ignore[arg-type]
 
 
 def test_point_connection_rejects_non_positive_frequency() -> None:
     with pytest.raises(ValueError, match="must be positive"):
-        point_connection_coupling_loss_factor(
+        vibration.point_connection_coupling_loss_factor(
             [500.0, 0.0], 12, thickness1=_H1, thickness2=_H2,
             surface_density1=_AL_RHO * _H1, surface_density2=_AL_RHO * _H2,
             wave_speed1=_AL_CL, wave_speed2=_AL_CL, plate_area1=_S1,

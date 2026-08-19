@@ -23,11 +23,7 @@ import reference_data as ref
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    ReportMetadata,
-    adaptation_term_kc,
-    intensity_sound_reduction,
-)
+from phonometry import ReportMetadata, building
 from phonometry.building.measurement.intensity_insulation import (
     IntensityReductionResult,
 )
@@ -52,8 +48,8 @@ def _intensity_result(*, with_kc: bool = False) -> IntensityReductionResult:
     sm = ref.ISO15186_1_REF_SM
     s = ref.ISO15186_1_REF_S
     l_in = _levels_for_target_ri(ref.ISO15186_1_REF_RI, lp1, sm, s)
-    kc = adaptation_term_kc(_RATING_FREQS) if with_kc else None
-    return intensity_sound_reduction(
+    kc = building.adaptation_term_kc(_RATING_FREQS) if with_kc else None
+    return building.intensity_sound_reduction(
         np.full(16, lp1), l_in, measurement_area=sm, area=s, kc=kc
     )
 
@@ -150,8 +146,8 @@ def _octave_result(*, with_kc: bool = False) -> IntensityReductionResult:
     ri = np.array([30.0, 40.0, 48.0, 52.0, 55.0])
     l_in = _levels_for_target_ri(ri, 85.0, 12.0, 10.0)
     octave_freqs = np.array([125, 250, 500, 1000, 2000], dtype=float)
-    kc = adaptation_term_kc(octave_freqs) if with_kc else None
-    return intensity_sound_reduction(
+    kc = building.adaptation_term_kc(octave_freqs) if with_kc else None
+    return building.intensity_sound_reduction(
         np.full(5, 85.0), l_in, measurement_area=12.0, area=10.0, kc=kc
     )
 
@@ -223,7 +219,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 def test_missing_rating_rejected(tmp_path) -> None:
     """A result without the ISO 717 rating (non-core band count) is rejected."""
     l_in = _levels_for_target_ri(np.full(8, 40.0), 85.0, 12.0, 10.0)
-    result = intensity_sound_reduction(
+    result = building.intensity_sound_reduction(
         np.full(8, 85.0), l_in, measurement_area=12.0, area=10.0
     )
     assert result.rating is None
@@ -249,11 +245,10 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
     ISO 717-1 rates; a hand-crafted rating whose per-band arrays all match an
     8-band curve would otherwise satisfy the shared renderer's shape checks.
     """
-    from phonometry import WeightedRatingResult
 
     centers = np.array([100, 125, 160, 200, 250, 315, 400, 500], dtype=float)
     curve = np.linspace(20.0, 40.0, 8)
-    rating = WeightedRatingResult(
+    rating = building.WeightedRatingResult(
         rating=30, c=-2, ctr=-3, unfavourable_sum=0.0,
         band_centers=centers, measured=curve, shifted_reference=curve,
     )
@@ -267,9 +262,10 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
 
 def test_rating_without_per_band_data_rejected(tmp_path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
-    from phonometry import WeightedRatingResult
 
-    bare_rating = WeightedRatingResult(rating=30, c=-2, ctr=-3, unfavourable_sum=0.0)
+    bare_rating = building.WeightedRatingResult(
+        rating=30, c=-2, ctr=-3, unfavourable_sum=0.0
+    )
     result = IntensityReductionResult(
         r_i=np.asarray(ref.ISO15186_1_REF_RI, dtype=np.float64),
         r_i_modified=None,

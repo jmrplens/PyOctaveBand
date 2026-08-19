@@ -17,11 +17,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    SoundPowerIntensityResult,
-    SoundPowerWarning,
-    sound_power_intensity,
-)
+from phonometry import emission
 
 _P0 = 1.0e-12
 
@@ -35,8 +31,8 @@ def test_uniform_enclosed_source_recovers_power_exactly() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])  # S = 2 m^2
     s_total = areas.sum()
     intensity = np.full((4, 1), w / s_total)  # (N_seg, 1 band)
-    res = sound_power_intensity(intensity, areas)
-    assert isinstance(res, SoundPowerIntensityResult)
+    res = emission.sound_power_intensity(intensity, areas)
+    assert isinstance(res, emission.SoundPowerIntensityResult)
     assert res.sound_power[0] == pytest.approx(w)
     assert res.sound_power_level[0] == pytest.approx(90.0)
     assert res.surface_area == pytest.approx(2.0)
@@ -50,7 +46,7 @@ def test_non_uniform_segmentation_recovers_power() -> None:
     # In,i chosen so partial powers are 1e-4, 1e-4, 1.5e-4, 1.5e-4 -> sum 5e-4.
     partial = np.array([1.0e-4, 1.0e-4, 1.5e-4, 1.5e-4])
     intensity = (partial / areas).reshape(4, 1)
-    res = sound_power_intensity(intensity, areas)
+    res = emission.sound_power_intensity(intensity, areas)
     assert res.sound_power[0] == pytest.approx(w)
     assert res.sound_power_level[0] == pytest.approx(10.0 * np.log10(w / _P0))
     np.testing.assert_allclose(res.partial_power[:, 0], partial)
@@ -61,7 +57,7 @@ def test_multiband_independent_recovery() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     # band 0: uniform 5e-4 -> P 1e-3 (90 dB); band 1: uniform 5e-5 -> P 1e-4 (80).
     intensity = np.column_stack([np.full(4, 5.0e-4), np.full(4, 5.0e-5)])
-    res = sound_power_intensity(intensity, areas)
+    res = emission.sound_power_intensity(intensity, areas)
     np.testing.assert_allclose(res.sound_power, [1.0e-3, 1.0e-4])
     np.testing.assert_allclose(res.sound_power_level, [90.0, 80.0])
 
@@ -74,8 +70,8 @@ def test_negative_partial_power_indicator_and_warning() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     # partial powers 2.5e-4 *[1,1,1,-2]: sum positive, strong negative flow.
     intensity = (np.array([1.0, 1.0, 1.0, -2.0]) * 5.0e-4).reshape(4, 1)
-    with pytest.warns(SoundPowerWarning):
-        res = sound_power_intensity(intensity, areas)
+    with pytest.warns(emission.SoundPowerWarning):
+        res = emission.sound_power_intensity(intensity, areas)
     pi = intensity[:, 0] * areas
     expected = 10.0 * np.log10(np.sum(np.abs(pi)) / abs(np.sum(pi)))
     assert res.negative_partial_power_index[0] == pytest.approx(expected)
@@ -93,7 +89,7 @@ def test_small_negative_partial_power_no_warning() -> None:
 
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        res = sound_power_intensity(intensity, areas)
+        res = emission.sound_power_intensity(intensity, areas)
     assert res.negative_partial_power_index[0] <= 3.0
 
 
@@ -109,19 +105,19 @@ def test_f_plus_minus_warning_suppressed_under_survey_grade() -> None:
     # warning source either).
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        res = sound_power_intensity(intensity, areas, grade="survey")
+        res = emission.sound_power_intensity(intensity, areas, grade="survey")
     assert res.negative_partial_power_index[0] > 3.0
     # Engineering grade: the same data still warns.
-    with pytest.warns(SoundPowerWarning):
-        sound_power_intensity(intensity, areas, grade="engineering")
+    with pytest.warns(emission.SoundPowerWarning):
+        emission.sound_power_intensity(intensity, areas, grade="engineering")
 
 
 def test_negative_total_power_band_not_determinable() -> None:
     """Sum Pi < 0: method not applicable to the band (clause 9.2), warn, NaN."""
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = (np.array([1.0, 1.0, 1.0, -4.0]) * 5.0e-4).reshape(4, 1)
-    with pytest.warns(SoundPowerWarning):
-        res = sound_power_intensity(intensity, areas)
+    with pytest.warns(emission.SoundPowerWarning):
+        res = emission.sound_power_intensity(intensity, areas)
     assert res.sound_power[0] < 0.0
     assert res.negative_band[0]
     assert np.isnan(res.sound_power_level[0])
@@ -135,7 +131,7 @@ def test_fpi_matches_definition() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.full((4, 1), 5.0e-4)  # P = 1e-3 -> LW = 90
     lp = np.full((4, 1), 95.0)
-    res = sound_power_intensity(intensity, areas, pressure_levels=lp)
+    res = emission.sound_power_intensity(intensity, areas, pressure_levels=lp)
     s_total = areas.sum()
     lp_surface = 10.0 * np.log10(np.sum(areas * 10.0 ** (0.1 * lp[:, 0])) / s_total)
     expected = lp_surface - 90.0 + 10.0 * np.log10(s_total)
@@ -145,7 +141,7 @@ def test_fpi_matches_definition() -> None:
 def test_fpi_none_without_pressure_levels() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.full((4, 1), 5.0e-4)
-    res = sound_power_intensity(intensity, areas)
+    res = emission.sound_power_intensity(intensity, areas)
     assert res.surface_pressure_intensity_index is None
 
 
@@ -163,7 +159,7 @@ def _base_case() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 def test_class_engineering_when_all_criteria_pass() -> None:
     areas, intensity, lp = _base_case()
     # FpI ≈ 8.0103; dpI0 = 20 -> Ld_eng = 10 > FpI, Ld_survey = 13 > FpI.
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         intensity,
         areas,
         normal_intensity_2=intensity,  # identical scans -> repeatability 0
@@ -178,7 +174,7 @@ def test_class_engineering_when_all_criteria_pass() -> None:
 def test_class_survey_when_c1_fails_for_engineering() -> None:
     areas, intensity, lp = _base_case()
     # dpI0 = 17 -> Ld_eng = 7 < 8.0103 (fail), Ld_survey = 10 > 8.0103 (pass).
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         intensity,
         areas,
         normal_intensity_2=intensity,
@@ -193,7 +189,7 @@ def test_class_survey_when_c1_fails_for_engineering() -> None:
 def test_class_none_when_c1_fails_for_both() -> None:
     areas, intensity, lp = _base_case()
     # dpI0 = 14 -> Ld_survey = 7 < 8.0103 (fail).
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         intensity,
         areas,
         normal_intensity_2=intensity,
@@ -213,8 +209,8 @@ def test_class_survey_when_c2_fails_only() -> None:
     pi = intensity[:, 0] * areas
     lw = 10.0 * np.log10(np.sum(pi) / _P0)
     lp = np.full((4, 1), lw)  # -> FpI ≈ 10*lg(S) ≈ 3.0103, small
-    with pytest.warns(SoundPowerWarning):
-        res = sound_power_intensity(
+    with pytest.warns(emission.SoundPowerWarning):
+        res = emission.sound_power_intensity(
             intensity,
             areas,
             normal_intensity_2=intensity,
@@ -236,7 +232,7 @@ def test_class_downgrade_by_repeatability() -> None:
     pi2 = _P0 * 10.0 ** (0.1 * (lwi1 - 3.0))
     scan2 = np.full((4, 1), pi2 / 0.5)
     lp = np.full((4, 1), 90.0)
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         scan1,
         areas,
         normal_intensity_2=scan2,
@@ -259,7 +255,7 @@ def test_sweep_reversal_fails_criterion_3() -> None:
     scan2 = scan1.copy()
     scan2[0, 0] = -5.0e-4  # equal magnitude, opposite sign on segment 0
     lp = np.full((4, 1), 90.0)
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         scan1,
         areas,
         normal_intensity_2=scan2,
@@ -274,7 +270,7 @@ def test_sweep_reversal_fails_criterion_3() -> None:
     assert res.achieved_grade[0] == "none"
     # Without the sign guard, the magnitude-only |ΔL| would have been 0 and the
     # band would have qualified; confirm an all-aligned pair does qualify.
-    ok = sound_power_intensity(
+    ok = emission.sound_power_intensity(
         scan1, areas, normal_intensity_2=scan1, pressure_levels=lp,
         pressure_residual_index=40.0, frequencies=np.array([1000.0]),
         band_type="octave",
@@ -289,7 +285,9 @@ def test_partial_sweep_reversal_only_affects_flipped_segment() -> None:
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
     scan2[2, 0] = -5.0e-4  # reverse only segment 2
-    res = sound_power_intensity(scan1, areas, normal_intensity_2=scan2)
+    res = emission.sound_power_intensity(
+        scan1, areas, normal_intensity_2=scan2
+    )
     rep = res.repeatability[:, 0]
     assert np.isinf(rep[2])
     assert np.allclose(rep[[0, 1, 3]], 0.0, atol=1e-9)
@@ -302,7 +300,9 @@ def test_exact_zero_partial_power_does_not_trigger_reversal() -> None:
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
     scan2[1, 0] = 0.0  # zero, not a sign flip
-    res = sound_power_intensity(scan1, areas, normal_intensity_2=scan2)
+    res = emission.sound_power_intensity(
+        scan1, areas, normal_intensity_2=scan2
+    )
     assert np.all(np.isfinite(res.repeatability[:, 0]))
 
 
@@ -314,7 +314,7 @@ def test_short_frequencies_raises_value_error_not_index_error() -> None:
     levels = np.full((4, 2), 90.0)
     short_frequencies = np.array([1000.0])  # one freq, two bands
     with pytest.raises(ValueError, match="frequencies"):
-        sound_power_intensity(
+        emission.sound_power_intensity(
             intensity,
             areas,
             normal_intensity_2=intensity,
@@ -329,7 +329,9 @@ def test_repeatability_uses_mean_of_two_scans_for_power() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     scan1 = np.full((4, 1), 6.0e-4)
     scan2 = np.full((4, 1), 4.0e-4)
-    res = sound_power_intensity(scan1, areas, normal_intensity_2=scan2)
+    res = emission.sound_power_intensity(
+        scan1, areas, normal_intensity_2=scan2
+    )
     # mean In = 5e-4 -> P = 1e-3.
     assert res.sound_power[0] == pytest.approx(1.0e-3)
 
@@ -338,7 +340,7 @@ def test_achieved_grade_none_without_inputs() -> None:
     """Without dpI0/two scans the achieved grade cannot be determined."""
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.full((4, 1), 5.0e-4)
-    res = sound_power_intensity(intensity, areas)
+    res = emission.sound_power_intensity(intensity, areas)
     assert res.achieved_grade is None
 
 
@@ -351,8 +353,8 @@ def test_a_weighted_total_excludes_non_determinable_band() -> None:
     intensity = np.column_stack(
         [np.full(4, 5.0e-4), np.array([1.0, 1.0, 1.0, -4.0]) * 5.0e-5]
     )
-    with pytest.warns(SoundPowerWarning):
-        res = sound_power_intensity(
+    with pytest.warns(emission.SoundPowerWarning):
+        res = emission.sound_power_intensity(
             intensity, areas, frequencies=np.array([1000.0, 2000.0]),
             band_type="octave",
         )
@@ -363,7 +365,7 @@ def test_a_weighted_total_excludes_non_determinable_band() -> None:
 def test_single_band_a_weighted_equals_lw() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.full((4, 1), 5.0e-4)
-    res = sound_power_intensity(intensity, areas)
+    res = emission.sound_power_intensity(intensity, areas)
     assert res.sound_power_level_a == pytest.approx(90.0)
 
 
@@ -383,7 +385,7 @@ def test_a_weighted_total_omits_band_failing_criterion_1() -> None:
     """
     areas = np.ones(4)
     intensity = np.column_stack([np.full(4, 1.0e-3), np.full(4, 5.0e-4)])
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         intensity,
         areas,
         pressure_levels=np.column_stack([np.full(4, 92.0), np.full(4, 95.0)]),
@@ -411,8 +413,8 @@ def test_a_weighted_total_omits_band_failing_criterion_2_engineering() -> None:
         [np.full(4, 1.0e-3), np.array([5.0e-3, -1.0e-3, 1.0e-3, -1.0e-3])]
     )
     lp = np.full((4, 2), 92.0)  # FpI ~ 2 dB in both bands: criterion 1 passes
-    with pytest.warns(SoundPowerWarning, match="criterion 2"):
-        res = sound_power_intensity(
+    with pytest.warns(emission.SoundPowerWarning, match="criterion 2"):
+        res = emission.sound_power_intensity(
             intensity,
             areas,
             pressure_levels=lp,
@@ -433,7 +435,7 @@ def test_survey_grade_does_not_omit_on_criterion_2() -> None:
         [np.full(4, 1.0e-3), np.array([5.0e-3, -1.0e-3, 1.0e-3, -1.0e-3])]
     )
     lp = np.full((4, 2), 92.0)
-    res = sound_power_intensity(
+    res = emission.sound_power_intensity(
         intensity,
         areas,
         pressure_levels=lp,
@@ -451,8 +453,8 @@ def test_a_weighting_screening_unavailable_warns_and_sums_all() -> None:
     determinable band is summed and a warning notes the missing screening."""
     areas = np.ones(4)
     intensity = np.column_stack([np.full(4, 1.0e-3), np.full(4, 5.0e-4)])
-    with pytest.warns(SoundPowerWarning, match="10.6 b"):
-        res = sound_power_intensity(
+    with pytest.warns(emission.SoundPowerWarning, match="10.6 b"):
+        res = emission.sound_power_intensity(
             intensity, areas, frequencies=np.array([500.0, 1000.0])
         )
     assert res.a_weighting_omitted_bands is None
@@ -466,7 +468,7 @@ def test_area_length_mismatch_raises() -> None:
     intensity = np.full((4, 1), 1e-4)
     three_areas = np.array([0.5, 0.5, 0.5])
     with pytest.raises(ValueError):
-        sound_power_intensity(intensity, three_areas)
+        emission.sound_power_intensity(intensity, three_areas)
 
 
 def test_pressure_levels_shape_mismatch_raises() -> None:
@@ -474,26 +476,28 @@ def test_pressure_levels_shape_mismatch_raises() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     two_band_levels = np.full((4, 2), 90.0)
     with pytest.raises(ValueError):
-        sound_power_intensity(intensity, areas, pressure_levels=two_band_levels)
+        emission.sound_power_intensity(
+            intensity, areas, pressure_levels=two_band_levels
+        )
 
 
 def test_non_positive_area_raises() -> None:
     intensity = np.full((4, 1), 1e-4)
     zero_area = np.array([0.5, 0.5, 0.5, 0.0])
     with pytest.raises(ValueError):
-        sound_power_intensity(intensity, zero_area)
+        emission.sound_power_intensity(intensity, zero_area)
 
 
 def test_fewer_than_four_segments_warns() -> None:
     """Clause 8.2 requires at least 4 segments."""
     intensity = np.full((3, 1), 5e-4)
     areas = np.array([0.5, 0.5, 0.5])
-    with pytest.warns(SoundPowerWarning):
-        sound_power_intensity(intensity, areas)
+    with pytest.warns(emission.SoundPowerWarning):
+        emission.sound_power_intensity(intensity, areas)
 
 
 def test_bad_grade_raises() -> None:
     intensity = np.full((4, 1), 1e-4)
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     with pytest.raises(ValueError):
-        sound_power_intensity(intensity, areas, grade="bogus")
+        emission.sound_power_intensity(intensity, areas, grade="bogus")

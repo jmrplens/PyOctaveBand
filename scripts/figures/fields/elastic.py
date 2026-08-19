@@ -90,7 +90,7 @@ def _plate_junction_fields() -> tuple[Any, Any, Any, Any, int]:
     speed c_g = 2 c_B(4 kHz) = 1251 m/s: t = 0.5 ms + 1.2 x 1.52 ms =
     2.32 ms -> 462 active frames.
     """
-    from phonometry import ElasticFDTD2D, ForceSource
+    from phonometry import simulation
 
     dx = _EL_DX
     bp, m2 = _elastic_plate_bp_m2()
@@ -126,13 +126,19 @@ def _plate_junction_fields() -> tuple[Any, Any, Any, Any, int]:
             c_p[r0:r_end, j0:j0 + 4] = _EL_CP
             c_s[r0:r_end, j0:j0 + 4] = _EL_CS
             rho[r0:r_end, j0:j0 + 4] = _EL_RHO
-        sim = ElasticFDTD2D(c_p, c_s, dx, rho=rho,
-                            sponge_width=_EJ_SPONGE)
+        sim = simulation.ElasticFDTD2D(c_p, c_s, dx, rho=rho,
+                                       sponge_width=_EJ_SPONGE)
         # Vertical force on the top surface (the vy face between the air
         # row r0 - 1 and the first plate row): Lamb-style A0 launcher.
-        sim.add_source(ForceSource(ix=round(_EJ_SRC_X / dx), iy=r0 - 1,
-                                   direction="y", amplitude=1e4,
-                                   waveform=burst))
+        sim.add_source(
+            simulation.ForceSource(
+                ix=round(_EJ_SRC_X / dx),
+                iy=r0 - 1,
+                direction="y",
+                amplitude=1e4,
+                waveform=burst,
+            )
+        )
         frames: list[Any] = []
         hl: list[Any] = []
         vl: list[Any] = []
@@ -161,14 +167,16 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     the guide computes for this corner."""
     from matplotlib.patches import Rectangle
 
-    from phonometry import junction_transmission
+    from phonometry import vibration
 
     T = _translate_str
     v_ctrl, v_junc, lines, times, n_active = _plate_junction_fields()
     hl_ctrl, hl_junc, vl_junc = lines
     bp, m2 = _elastic_plate_bp_m2()
     c_pl = float(np.sqrt(12.0 * bp / (m2 * _EL_H**2)))
-    res = junction_transmission("L", _EL_H, c_pl, m2, _EL_H, c_pl, m2)
+    res = vibration.junction_transmission(
+        "L", _EL_H, c_pl, m2, _EL_H, c_pl, m2
+    )
     tau0 = float(res.corner[0])
     kij = float(res.corner_reduction_index)
     x0, x1, y0, y1 = _EJ_VIEW
@@ -374,11 +382,11 @@ def _coincidence_fields() -> tuple[Any, Any, Any, list[float], int]:
     = 1), the frame times, the measured transmitted levels [dB re
     incident] and the active frame count.
     """
-    from phonometry import ElasticFDTD2D, coincidence_frequency
+    from phonometry import simulation, vibration
 
     dx = _EL_DX
     bp, m2 = _elastic_plate_bp_m2()
-    fc = coincidence_frequency(m2, bp)
+    fc = vibration.coincidence_frequency(m2, bp)
     freqs = (0.5 * fc, 2.0 * fc)
     theta = np.radians(_EC_THETA)
     r0 = round(_EC_PLATE_Y / dx)
@@ -416,7 +424,9 @@ def _coincidence_fields() -> tuple[Any, Any, Any, list[float], int]:
         c_p[r0:r0 + 4] = _EL_CP * _EC_CB_TUNE
         c_s[r0:r0 + 4] = _EL_CS * _EC_CB_TUNE
         rho[r0:r0 + 4] = _EL_RHO
-        sim = ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_EC_SPONGE)
+        sim = simulation.ElasticFDTD2D(
+            c_p, c_s, dx, rho=rho, sponge_width=_EC_SPONGE
+        )
         omega = 2.0 * np.pi * f0
         phase_x = omega * np.sin(theta) * x_src / _EL_C0
         frames: list[Any] = []
@@ -461,14 +471,14 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 
-    from phonometry import coincidence_frequency
+    from phonometry import vibration
 
     T = _translate_str
     outline = [patheffects.withStroke(linewidth=2.0,
                                       foreground=FIELD_STROKE)]
     p_lo, p_hi, times, trans_db, n_active = _coincidence_fields()
     bp, m2 = _elastic_plate_bp_m2()
-    fc = coincidence_frequency(m2, bp)
+    fc = vibration.coincidence_frequency(m2, bp)
     x0, x1, y0, y1 = _EC_VIEW
     # The air below the plate rides an annotated display gain measured off
     # the settled field of both runs at once (see the _EC_VLIM note); the

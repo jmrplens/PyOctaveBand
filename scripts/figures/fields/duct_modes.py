@@ -162,9 +162,9 @@ def animate_fdtd_duct_cut_on(output_dir: str) -> None:
     """
     p_lo, p_hi, col_lo, col_hi, times, sigmas = _duct_cut_on_fields()
     T = _translate_str
-    from phonometry import rectangular_duct_cut_on
+    from phonometry import noise_control
 
-    modes = rectangular_duct_cut_on(_DUCT_A, _DUCT_B, count=2)
+    modes = noise_control.rectangular_duct_cut_on(_DUCT_A, _DUCT_B, count=2)
     f_co = float(modes.cut_on[0])
     n_active = int(times.size)
     ny = round(_DUCT_A / _DUCT_DX)

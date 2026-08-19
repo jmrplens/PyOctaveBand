@@ -22,7 +22,7 @@ import os
 import numpy as np
 import pytest
 
-from phonometry import ReportMetadata, enclosure_insertion_loss
+from phonometry import ReportMetadata, noise_control
 
 _PDF_MAGIC = b"%PDF"
 
@@ -50,7 +50,9 @@ def _extract_text(path: str) -> str:
 
 
 def _result():
-    return enclosure_insertion_loss(_PANEL_R, _S_E, _S_I, _ALPHA, frequencies=_FREQS)
+    return noise_control.enclosure_insertion_loss(
+        _PANEL_R, _S_E, _S_I, _ALPHA, frequencies=_FREQS
+    )
 
 
 def _oracle_correction() -> np.ndarray:
@@ -136,7 +138,9 @@ def test_third_octave_labels_and_caption(tmp_path) -> None:
     pytest.importorskip("matplotlib")
     freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630], dtype=float)
     r = np.linspace(20.0, 40.0, freqs.size)
-    res = enclosure_insertion_loss(r, _S_E, _S_I, _ALPHA, frequencies=freqs)
+    res = noise_control.enclosure_insertion_loss(
+        r, _S_E, _S_I, _ALPHA, frequencies=freqs
+    )
     out = tmp_path / "third.pdf"
     res.report(str(out))
     _assert_one_page(str(out))

@@ -174,13 +174,13 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     from matplotlib import patheffects
     from matplotlib.patches import Polygon
 
-    from phonometry import directional_diffusion_coefficient
+    from phonometry import materials
 
     T = _translate_str
     outline = [patheffects.withStroke(linewidth=2.0,
                                       foreground=FIELD_STROKE)]
     tot_all, trail_db, times, theta, levels = _diffusion_fields()
-    d_coef = [directional_diffusion_coefficient(lv) for lv in levels]
+    d_coef = [materials.directional_diffusion_coefficient(lv) for lv in levels]
     x0, x1, y0, y1 = _QRD_SLAB
     vmax = float(np.quantile(np.abs(tot_all[:, 0]), 0.999))
 

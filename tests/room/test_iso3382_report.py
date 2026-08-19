@@ -29,11 +29,7 @@ pytest.importorskip("pypdf")
 
 import numpy as np
 
-from phonometry import (
-    ReportMetadata,
-    RoomAcousticsResult,
-    room_parameters,
-)
+from phonometry import ReportMetadata, room
 
 _PDF_MAGIC = b"%PDF"
 _FS = 48000
@@ -56,8 +52,8 @@ def _synthetic_ir(seconds: float = 5.0) -> np.ndarray:
     return ir
 
 
-def _result() -> RoomAcousticsResult:
-    return room_parameters(_synthetic_ir(), _FS)
+def _result() -> room.RoomAcousticsResult:
+    return room.room_parameters(_synthetic_ir(), _FS)
 
 
 def _assert_one_page(path: str) -> None:
@@ -206,14 +202,14 @@ def _synthetic_result(
     frequency: np.ndarray | None,
     t30: np.ndarray,
     edt: np.ndarray,
-) -> RoomAcousticsResult:
+) -> room.RoomAcousticsResult:
     """A hand-built result: T30/EDT as given, other parameters mirrored."""
     t30 = np.asarray(t30, dtype=np.float64)
     edt = np.asarray(edt, dtype=np.float64)
     n = t30.size
     finite_t30 = np.isfinite(t30)
     finite_edt = np.isfinite(edt)
-    return RoomAcousticsResult(
+    return room.RoomAcousticsResult(
         frequency=frequency,
         edt=edt,
         t20=t30.copy(),
@@ -240,7 +236,9 @@ def test_third_octave_report_renders(tmp_path) -> None:
     bands are averaged (not the two full octaves), so the boxed descriptor
     must say so instead of the octave "500-1000 Hz" label.
     """
-    res = room_parameters(_synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3)
+    res = room.room_parameters(
+        _synthetic_ir(), _FS, limits=(100.0, 5000.0), fraction=3
+    )
     out = tmp_path / "thirds.pdf"
     res.report(str(out), metadata=_full_metadata())
     _assert_one_page(str(out))
@@ -251,7 +249,7 @@ def test_third_octave_report_renders(tmp_path) -> None:
 
 def test_band_range_without_mid_octaves_names_the_band(tmp_path) -> None:
     """A range missing the mid bands boxes the first finite T30 band by name."""
-    res = room_parameters(_synthetic_ir(), _FS, limits=(2000.0, 4000.0))
+    res = room.room_parameters(_synthetic_ir(), _FS, limits=(2000.0, 4000.0))
     assert res.frequency is not None
     assert len(res.frequency) == 2
     out = tmp_path / "high_bands.pdf"
@@ -302,7 +300,9 @@ def test_single_band_is_not_labeled_broadband(tmp_path) -> None:
     Selecting a single octave band leaves one frequency entry (not ``None``),
     so the caption must read "Single-band parameters", never "Broadband".
     """
-    res = room_parameters(_synthetic_ir(), _FS, limits=(490.0, 510.0), fraction=1)
+    res = room.room_parameters(
+        _synthetic_ir(), _FS, limits=(490.0, 510.0), fraction=1
+    )
     assert res.frequency is not None
     assert len(res.frequency) == 1
     out = tmp_path / "single_band.pdf"
@@ -320,7 +320,9 @@ def test_octave_report_many_bands_renders(tmp_path) -> None:
     wide octave set (11 bands) is still labelled an octave-band set and grouped
     by octave, not by spurious one-third-octave triplets.
     """
-    res = room_parameters(_synthetic_ir(), _FS, limits=(16.0, 16000.0), fraction=1)
+    res = room.room_parameters(
+        _synthetic_ir(), _FS, limits=(16.0, 16000.0), fraction=1
+    )
     assert res.frequency is not None
     assert len(res.frequency) > 6
     out = tmp_path / "octave_wide.pdf"
@@ -331,7 +333,7 @@ def test_octave_report_many_bands_renders(tmp_path) -> None:
 
 def test_broadband_report_renders(tmp_path) -> None:
     """A broadband (single-band) analysis renders a one-page fiche."""
-    res = room_parameters(_synthetic_ir(), _FS, limits=None)
+    res = room.room_parameters(_synthetic_ir(), _FS, limits=None)
     assert res.frequency is None
     out = tmp_path / "broadband.pdf"
     res.report(str(out))
@@ -346,7 +348,7 @@ def test_broadband_makes_no_mid_frequency_claim(tmp_path) -> None:
     descriptor is the plain broadband T30 and the verdict is broadband-aware;
     neither the result box nor the verdict may claim "500-1000 Hz".
     """
-    res = room_parameters(_synthetic_ir(), _FS, limits=None)
+    res = room.room_parameters(_synthetic_ir(), _FS, limits=None)
     assert res.frequency is None
     out = tmp_path / "broadband_claim.pdf"
     res.report(str(out), metadata=_full_metadata(requirement=1.30))

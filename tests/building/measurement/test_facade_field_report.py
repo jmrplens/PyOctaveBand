@@ -19,11 +19,7 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    FacadeInsulationResult,
-    ReportMetadata,
-    facade_insulation,
-)
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 
@@ -59,18 +55,18 @@ def _extract_text(path: str) -> str:
     )
 
 
-def _facade_dnt() -> FacadeInsulationResult:
+def _facade_dnt() -> building.FacadeInsulationResult:
     """A facade result whose D2m,nT equals the ISO 717-1 Annex C curve."""
-    return facade_insulation(
+    return building.facade_insulation(
         _ANNEX_C_R + 40.0, np.full(16, 40.0), _T_AT_T0, volume=62.5
     )
 
 
-def _facade_r_prime() -> FacadeInsulationResult:
+def _facade_r_prime() -> building.FacadeInsulationResult:
     """A facade result whose R'45 equals the Annex C curve (S = A, -1,5 dB)."""
     # A = 0,16 x 62,5 / 1 = 10 = S, so 10 lg(S/A) = 0 and R'45 = L1,s - L2 - 1,5.
     surf = _ANNEX_C_R + 1.5
-    return facade_insulation(
+    return building.facade_insulation(
         np.full(16, 50.0), np.full(16, 0.0), np.full(16, 1.0),
         area=10.0, volume=62.5, surface_level=surf,
     )
@@ -115,7 +111,7 @@ def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path) -> None:
     """A road-traffic result is labelled R'tr,s (Clause 3.13), never R'45."""
     # A = 0,16 x 62,5 / 1 = 10 = S, so 10 lg(S/A) = 0 and R'tr,s = L1,s - L2 - 3.
     surf = _ANNEX_C_R + 3.0
-    result = facade_insulation(
+    result = building.facade_insulation(
         np.full(16, 50.0), np.full(16, 0.0), np.full(16, 1.0),
         area=10.0, volume=62.5, surface_level=surf, method="road_traffic",
     )
@@ -206,7 +202,7 @@ def test_unknown_quantity_rejected(tmp_path) -> None:
 
 def test_missing_quantity_rejected(tmp_path) -> None:
     """Requesting d_2m_n / r_prime without their inputs raises ``ValueError``."""
-    bare = facade_insulation(
+    bare = building.facade_insulation(
         _ANNEX_C_R + 40.0, np.full(16, 40.0), _T_AT_T0
     )
     out = str(tmp_path / "x.pdf")
@@ -218,7 +214,7 @@ def test_missing_quantity_rejected(tmp_path) -> None:
 
 def test_non_core_band_count_rejected(tmp_path) -> None:
     """The facade field fiche needs the 16 core one-third-octave bands."""
-    result = facade_insulation(
+    result = building.facade_insulation(
         np.full(21, 70.0), np.full(21, 30.0), np.full(21, 0.5)
     )
     out = str(tmp_path / "x.pdf")

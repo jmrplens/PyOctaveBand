@@ -14,7 +14,7 @@ depth, an unmodulated tone and silence give ~0) plus result-structure guards.
 import numpy as np
 import pytest
 
-from phonometry import EcmaRoughness, roughness_ecma
+from phonometry import psychoacoustics
 
 FS = 48000
 P0 = 2e-5
@@ -47,9 +47,11 @@ def _tone(fc: float, level_db: float, seconds: float = 2.0) -> np.ndarray:
 
 
 @pytest.fixture(scope="module")
-def ref_calibration() -> EcmaRoughness:
+def ref_calibration() -> psychoacoustics.EcmaRoughness:
     """The 1 kHz / 70 Hz / m=1 / overall 60 dB calibration signal (1 asper)."""
-    return roughness_ecma(_am_tone(1000.0, 70.0, 1.0, 60.0), FS)
+    return psychoacoustics.roughness_ecma(
+        _am_tone(1000.0, 70.0, 1.0, 60.0), FS
+    )
 
 
 # --------------------------------------------------------------------------
@@ -57,7 +59,9 @@ def ref_calibration() -> EcmaRoughness:
 # --------------------------------------------------------------------------
 
 
-def test_calibration_1khz_70hz_is_one_asper(ref_calibration: EcmaRoughness) -> None:
+def test_calibration_1khz_70hz_is_one_asper(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
     """The Clause 7 reference signal computes 1 asper.
 
     A 1 kHz carrier, 100 % amplitude-modulated at 70 Hz, with an overall
@@ -85,32 +89,42 @@ def test_calibration_constant_is_the_tabulated_c_r() -> None:
 
 
 def test_unmodulated_tone_is_near_zero() -> None:
-    result = roughness_ecma(_tone(1000.0, 60.0), FS)
+    result = psychoacoustics.roughness_ecma(_tone(1000.0, 60.0), FS)
     assert result.roughness < 0.1
 
 
 def test_silence_is_zero() -> None:
-    result = roughness_ecma(np.zeros(FS), FS)
+    result = psychoacoustics.roughness_ecma(np.zeros(FS), FS)
     assert result.roughness == pytest.approx(0.0, abs=1e-6)
     assert np.all(result.specific_roughness == 0.0)
 
 
-def test_peaks_near_70hz_modulation(ref_calibration: EcmaRoughness) -> None:
+def test_peaks_near_70hz_modulation(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
     # Roughness is maximal around 70 Hz modulation and falls off toward slow
     # (< 20 Hz) and fast (> 200 Hz) modulation (Clause 7 intro, Annex C). The
     # 70 Hz reference is the module calibration signal, so reuse its result
     # rather than recompute the same chain.
     r70 = ref_calibration.roughness
-    r10 = roughness_ecma(_am_tone(1000.0, 10.0, 1.0, 60.0), FS).roughness
-    r300 = roughness_ecma(_am_tone(1000.0, 300.0, 1.0, 60.0), FS).roughness
+    r10 = psychoacoustics.roughness_ecma(
+        _am_tone(1000.0, 10.0, 1.0, 60.0), FS
+    ).roughness
+    r300 = psychoacoustics.roughness_ecma(
+        _am_tone(1000.0, 300.0, 1.0, 60.0), FS
+    ).roughness
     assert r70 > r10
     assert r70 > r300
 
 
-def test_grows_with_modulation_depth(ref_calibration: EcmaRoughness) -> None:
+def test_grows_with_modulation_depth(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
     # The full-depth 70 Hz signal is the module calibration signal; reuse it.
     r_full = ref_calibration.roughness
-    r_half = roughness_ecma(_am_tone(1000.0, 70.0, 0.5, 60.0), FS).roughness
+    r_half = psychoacoustics.roughness_ecma(
+        _am_tone(1000.0, 70.0, 0.5, 60.0), FS
+    ).roughness
     assert r_full > r_half > 0.05
 
 
@@ -119,7 +133,9 @@ def test_grows_with_modulation_depth(ref_calibration: EcmaRoughness) -> None:
 # --------------------------------------------------------------------------
 
 
-def test_result_structure(ref_calibration: EcmaRoughness) -> None:
+def test_result_structure(
+    ref_calibration: psychoacoustics.EcmaRoughness,
+) -> None:
     res = ref_calibration
     assert res.specific_roughness.shape == res.bark.shape == (53,)
     assert res.roughness_vs_time.shape == res.time.shape
@@ -135,24 +151,28 @@ def test_result_structure(ref_calibration: EcmaRoughness) -> None:
 def test_invalid_field_raises() -> None:
     tone = _tone(1000.0, 60.0, 0.5)
     with pytest.raises(ValueError):
-        roughness_ecma(tone, FS, field="bogus")
+        psychoacoustics.roughness_ecma(tone, FS, field="bogus")
 
 
 def test_empty_signal_raises() -> None:
     empty = np.array([])
     with pytest.raises(ValueError):
-        roughness_ecma(empty, FS)
+        psychoacoustics.roughness_ecma(empty, FS)
 
 
-def test_deterministic(ref_calibration: EcmaRoughness) -> None:
-    again = roughness_ecma(_am_tone(1000.0, 70.0, 1.0, 60.0), FS)
+def test_deterministic(ref_calibration: psychoacoustics.EcmaRoughness) -> None:
+    again = psychoacoustics.roughness_ecma(
+        _am_tone(1000.0, 70.0, 1.0, 60.0), FS
+    )
     assert again.roughness == pytest.approx(ref_calibration.roughness, abs=1e-9)
 
 
 def test_free_and_diffuse_differ() -> None:
     sig = _am_tone(1000.0, 70.0, 1.0, 60.0)
-    free = roughness_ecma(sig, FS, field="free").roughness
-    diffuse = roughness_ecma(sig, FS, field="diffuse").roughness
+    free = psychoacoustics.roughness_ecma(sig, FS, field="free").roughness
+    diffuse = psychoacoustics.roughness_ecma(
+        sig, FS, field="diffuse"
+    ).roughness
     assert free != diffuse
 
 

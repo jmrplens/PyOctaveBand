@@ -21,19 +21,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    HEAVY_IMPACT_A_WEIGHTING,
-    HEAVY_IMPACT_OCTAVE_BANDS,
-    HEAVY_IMPACT_SOURCES,
-    a_weighted_maximum_impact_level,
-    check_heavy_impact_source,
-    fast_reverberation_correction,
-    heavy_impact_octave_levels,
-    heavy_impact_source_limits,
-    heavy_impact_source_specification,
-    impact_force_exposure_level,
-    standardized_maximum_impact_level,
-)
+from phonometry import building
 
 # ---------------------------------------------------------------------------
 # Printed oracles
@@ -91,17 +79,23 @@ GURTNER_STANDARDIZED = (
 
 def test_rubber_ball_force_exposure_table() -> None:
     """ISO 16283-2:2020 Table A.1 / JIS A 1418-2:2019 Table A.2, digit by digit."""
-    assert HEAVY_IMPACT_SOURCES["rubber_ball"] == RUBBER_BALL_LFE
+    assert building.HEAVY_IMPACT_SOURCES["rubber_ball"] == RUBBER_BALL_LFE
 
 
 def test_bang_machine_force_exposure_table() -> None:
     """JIS A 1418-2:2019 Table A.1 (impact force characteristic 1)."""
-    assert HEAVY_IMPACT_SOURCES["bang_machine"] == BANG_MACHINE_LFE
+    assert building.HEAVY_IMPACT_SOURCES["bang_machine"] == BANG_MACHINE_LFE
 
 
 def test_octave_bands_of_the_specification() -> None:
     """Both tables are printed over the five octaves 31,5 Hz to 500 Hz."""
-    assert HEAVY_IMPACT_OCTAVE_BANDS == (31.5, 63.0, 125.0, 250.0, 500.0)
+    assert building.HEAVY_IMPACT_OCTAVE_BANDS == (
+        31.5,
+        63.0,
+        125.0,
+        250.0,
+        500.0,
+    )
 
 
 @pytest.mark.parametrize(
@@ -112,8 +106,8 @@ def test_source_limits_bracket_the_printed_nominal(
     source: str, table: tuple[tuple[float, float], ...]
 ) -> None:
     """The tolerance band is the printed nominal +/- the printed tolerance."""
-    freqs, lower, upper = heavy_impact_source_limits(source)
-    np.testing.assert_allclose(freqs, HEAVY_IMPACT_OCTAVE_BANDS)
+    freqs, lower, upper = building.heavy_impact_source_limits(source)
+    np.testing.assert_allclose(freqs, building.HEAVY_IMPACT_OCTAVE_BANDS)
     np.testing.assert_allclose(lower, [v - t for v, t in table])
     np.testing.assert_allclose(upper, [v + t for v, t in table])
 
@@ -125,7 +119,7 @@ def test_rubber_ball_construction_example() -> None:
     (2,5 +/- 0,1) kg, coefficient of restitution 0,8 +/- 0,1, single-peak force
     pulse of 20 +/- 2 ms (JIS A.2 b) 2)).
     """
-    spec = heavy_impact_source_specification("rubber_ball")
+    spec = building.heavy_impact_source_specification("rubber_ball")
     assert spec.drop_height == pytest.approx(1.00)
     assert spec.drop_height_tolerance == pytest.approx(0.01)
     assert spec.effective_mass == pytest.approx(2.5)
@@ -137,7 +131,7 @@ def test_rubber_ball_construction_example() -> None:
 
 def test_bang_machine_construction_example() -> None:
     """JIS A 1418-2:2019 B.2: tyre dropped from 85 cm, effective mass 7,3 +/- 0,2 kg."""
-    spec = heavy_impact_source_specification("bang_machine")
+    spec = building.heavy_impact_source_specification("bang_machine")
     assert spec.drop_height == pytest.approx(0.85)
     assert spec.effective_mass == pytest.approx(7.3)
     assert spec.effective_mass_tolerance == pytest.approx(0.2)
@@ -145,7 +139,7 @@ def test_bang_machine_construction_example() -> None:
 
 def test_check_source_accepts_the_nominal_spectrum() -> None:
     """A source exactly on the printed nominal conforms in every band."""
-    check = check_heavy_impact_source([v for v, _ in RUBBER_BALL_LFE])
+    check = building.check_heavy_impact_source([v for v, _ in RUBBER_BALL_LFE])
     assert check.passed
     assert bool(np.all(check.within_tolerance))
     np.testing.assert_allclose(check.deviation, 0.0)
@@ -155,7 +149,7 @@ def test_check_source_rejects_a_band_outside_the_tolerance() -> None:
     """500 Hz has a +/- 2,0 dB tolerance, so 12,5 + 2,1 dB must fail there only."""
     measured = [v for v, _ in RUBBER_BALL_LFE]
     measured[-1] += 2.1
-    check = check_heavy_impact_source(measured)
+    check = building.check_heavy_impact_source(measured)
     assert not check.passed
     assert list(check.within_tolerance) == [True, True, True, True, False]
 
@@ -164,24 +158,24 @@ def test_check_source_accepts_the_tolerance_edge() -> None:
     """The printed tolerance is inclusive: 31,0 - 1,5 dB at 63 Hz still conforms."""
     measured = [v for v, _ in RUBBER_BALL_LFE]
     measured[1] -= 1.5
-    assert check_heavy_impact_source(measured).passed
+    assert building.check_heavy_impact_source(measured).passed
 
 
 def test_bang_machine_spectrum_fails_the_rubber_ball_check() -> None:
     """The two characteristics differ by far more than their tolerances."""
     bang = [v for v, _ in BANG_MACHINE_LFE]
-    assert check_heavy_impact_source(bang, "bang_machine").passed
-    assert not check_heavy_impact_source(bang, "rubber_ball").passed
+    assert building.check_heavy_impact_source(bang, "bang_machine").passed
+    assert not building.check_heavy_impact_source(bang, "rubber_ball").passed
 
 
 def test_check_source_rejects_a_wrong_band_count() -> None:
     with pytest.raises(ValueError, match="5 octave-band values"):
-        check_heavy_impact_source([39.0, 31.0, 23.0])
+        building.check_heavy_impact_source([39.0, 31.0, 23.0])
 
 
 def test_unknown_source_name_is_rejected() -> None:
     with pytest.raises(ValueError, match="source"):
-        heavy_impact_source_specification("tapping_machine")
+        building.heavy_impact_source_specification("tapping_machine")
 
 
 # ---------------------------------------------------------------------------
@@ -199,7 +193,9 @@ def test_force_exposure_level_of_a_rectangular_pulse() -> None:
     amplitude = 1500.0
     force = np.full(int(fs * duration) + 1, amplitude)
     expected = 10.0 * np.log10(amplitude**2 * duration)
-    assert impact_force_exposure_level(force, fs) == pytest.approx(expected, abs=1e-6)
+    assert building.impact_force_exposure_level(force, fs) == pytest.approx(
+        expected, abs=1e-6
+    )
 
 
 def test_force_exposure_level_of_a_half_sine_pulse() -> None:
@@ -214,22 +210,24 @@ def test_force_exposure_level_of_a_half_sine_pulse() -> None:
     t = np.arange(0.0, duration, 1.0 / fs)
     force = peak * np.sin(np.pi * t / duration)
     expected = 10.0 * np.log10(peak**2 * duration / 2.0)
-    assert impact_force_exposure_level(force, fs) == pytest.approx(expected, abs=1e-3)
+    assert building.impact_force_exposure_level(force, fs) == pytest.approx(
+        expected, abs=1e-3
+    )
 
 
 def test_force_exposure_level_scales_6_db_per_force_doubling() -> None:
     """LFE is a squared-force integral, so doubling F adds 20 lg 2 = 6,02 dB."""
     fs = 100_000.0
     force = np.full(2001, 100.0)
-    single = impact_force_exposure_level(force, fs)
-    double = impact_force_exposure_level(2.0 * force, fs)
+    single = building.impact_force_exposure_level(force, fs)
+    double = building.impact_force_exposure_level(2.0 * force, fs)
     assert double - single == pytest.approx(20.0 * np.log10(2.0), abs=1e-9)
 
 
 def test_force_exposure_level_rejects_a_silent_record() -> None:
     silent = np.zeros(100)
     with pytest.raises(ValueError, match="non-zero energy"):
-        impact_force_exposure_level(silent, 48_000.0)
+        building.impact_force_exposure_level(silent, 48_000.0)
 
 
 # ---------------------------------------------------------------------------
@@ -239,12 +237,14 @@ def test_force_exposure_level_rejects_a_silent_record() -> None:
 
 def test_reverberation_correction_vanishes_at_the_reference_time() -> None:
     """Formula (4) reduces to 10 lg(V/V0) when T = T0, since C = C0."""
-    assert fast_reverberation_correction([0.5])[0] == pytest.approx(0.0, abs=1e-12)
+    assert building.fast_reverberation_correction([0.5])[0] == pytest.approx(
+        0.0, abs=1e-12
+    )
 
 
 def test_standardization_at_the_reference_time_is_the_volume_term_only() -> None:
     """T = T0 = 0,5 s: L' = Li,Fmax + 10 lg(V/V0) with V0 = 50 m3."""
-    res = standardized_maximum_impact_level([70.0, 65.0], 100.0, 0.5)
+    res = building.standardized_maximum_impact_level([70.0, 65.0], 100.0, 0.5)
     np.testing.assert_allclose(res.reverberation_correction, 0.0, atol=1e-12)
     assert res.volume_term == pytest.approx(10.0 * np.log10(2.0))
     np.testing.assert_allclose(
@@ -254,7 +254,7 @@ def test_standardization_at_the_reference_time_is_the_volume_term_only() -> None
 
 def test_standardization_at_the_reference_volume_is_the_time_term_only() -> None:
     """V = V0 = 50 m3 leaves only the Fast reverberation correction."""
-    res = standardized_maximum_impact_level([70.0], 50.0, 2.0)
+    res = building.standardized_maximum_impact_level([70.0], 50.0, 2.0)
     assert res.volume_term == pytest.approx(0.0)
     np.testing.assert_allclose(
         res.standardized, 70.0 - res.reverberation_correction
@@ -263,7 +263,7 @@ def test_standardization_at_the_reference_volume_is_the_time_term_only() -> None
 
 def test_reverberation_correction_grows_with_reverberation_time() -> None:
     """A livelier room needs a larger correction: g(C) increases with C."""
-    correction = fast_reverberation_correction([0.5, 1.0, 2.0, 4.0])
+    correction = building.fast_reverberation_correction([0.5, 1.0, 2.0, 4.0])
     assert bool(np.all(np.diff(correction) > 0.0))
 
 
@@ -273,7 +273,7 @@ def test_reverberation_correction_is_smooth_across_the_c_equals_one_pole() -> No
     The correction there must sit between its neighbours, not blow up.
     """
     times = np.array([1.7274, 1.7275, 1.7276])
-    correction = fast_reverberation_correction(times)
+    correction = building.fast_reverberation_correction(times)
     assert np.all(np.isfinite(correction))
     assert correction[0] < correction[1] < correction[2]
     assert correction[1] == pytest.approx(
@@ -291,7 +291,7 @@ def test_reverberation_correction_is_accurate_inside_the_pole_guard() -> None:
     the pole rather than wandering.
     """
     times = 1.7275 * np.array([1.0 - 5e-7, 1.0 - 1e-7, 1.0, 1.0 + 1e-7, 1.0 + 5e-7])
-    correction = fast_reverberation_correction(times)
+    correction = building.fast_reverberation_correction(times)
     assert float(np.ptp(correction)) < 1e-6
     # The exact value at C = 1: g(1) = 1/e, so the correction is
     # 10 lg[(1/e) / g(C0)] with C0 = 0,5/1,7275.
@@ -307,7 +307,7 @@ def test_standardization_reproduces_a_published_25_band_example() -> None:
     decimal, and its 50 Hz entry is affected by the author rounding C to 0,24,
     so the bound is 0,1 dB.
     """
-    res = standardized_maximum_impact_level(
+    res = building.standardized_maximum_impact_level(
         GURTNER_MEASURED, GURTNER_VOLUME, GURTNER_REVERBERATION_TIME
     )
     np.testing.assert_allclose(
@@ -317,7 +317,9 @@ def test_standardization_reproduces_a_published_25_band_example() -> None:
 
 def test_standardization_rejects_a_mismatched_reverberation_time() -> None:
     with pytest.raises(ValueError, match="reverberation_time"):
-        standardized_maximum_impact_level([70.0, 65.0], 50.0, [1.0, 2.0, 3.0])
+        building.standardized_maximum_impact_level(
+            [70.0, 65.0], 50.0, [1.0, 2.0, 3.0]
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -327,7 +329,7 @@ def test_standardization_rejects_a_mismatched_reverberation_time() -> None:
 
 def test_octave_conversion_sums_three_equal_thirds_to_plus_4_77_db() -> None:
     """Formula (20) is an energy sum: three equal thirds give +10 lg 3 dB."""
-    octaves = heavy_impact_octave_levels([60.0] * 6)
+    octaves = building.heavy_impact_octave_levels([60.0] * 6)
     np.testing.assert_allclose(octaves, 60.0 + 10.0 * np.log10(3.0))
 
 
@@ -342,7 +344,7 @@ def test_octave_conversion_groups_consecutive_thirds() -> None:
     thirds = np.array(
         [76.5, 60.8, 51.6, 48.7, 43.6, 42.3, 40.5, 35.9, 29.6, 27.0, 21.5, 19.8]
     )
-    octaves = heavy_impact_octave_levels(thirds)
+    octaves = building.heavy_impact_octave_levels(thirds)
     assert octaves.size == 4
     expected = [
         10.0 * np.log10(np.sum(10.0 ** (thirds[3 * i:3 * i + 3] / 10.0)))
@@ -358,7 +360,7 @@ def test_octave_conversion_groups_consecutive_thirds() -> None:
 
 def test_octave_conversion_rejects_a_non_multiple_of_three() -> None:
     with pytest.raises(ValueError, match="multiple of 3"):
-        heavy_impact_octave_levels([60.0, 61.0, 62.0, 63.0])
+        building.heavy_impact_octave_levels([60.0, 61.0, 62.0, 63.0])
 
 
 # ---------------------------------------------------------------------------
@@ -368,7 +370,7 @@ def test_octave_conversion_rejects_a_non_multiple_of_three() -> None:
 
 def test_a_weighting_table_third_octave() -> None:
     """ISO 717-2:2020 Table D.3, one-third-octave row, 50 Hz to 630 Hz."""
-    table = HEAVY_IMPACT_A_WEIGHTING["third"]
+    table = building.HEAVY_IMPACT_A_WEIGHTING["third"]
     values = tuple(table[f] for f in sorted(table))
     assert values == ISO717_2_TABLE_D3_THIRD
     assert sorted(table) == [
@@ -379,7 +381,7 @@ def test_a_weighting_table_third_octave() -> None:
 
 def test_a_weighting_table_octave() -> None:
     """ISO 717-2:2020 Table D.3, octave row, 63 Hz to 500 Hz."""
-    table = HEAVY_IMPACT_A_WEIGHTING["octave"]
+    table = building.HEAVY_IMPACT_A_WEIGHTING["octave"]
     values = tuple(table[f] for f in sorted(table))
     assert values == ISO717_2_TABLE_D3_OCTAVE
     assert sorted(table) == [63.0, 125.0, 250.0, 500.0]
@@ -387,8 +389,8 @@ def test_a_weighting_table_octave() -> None:
 
 def test_octave_a_weighting_matches_the_third_octave_row() -> None:
     """The octave row of Table D.3 repeats the mid-band third-octave values."""
-    third = HEAVY_IMPACT_A_WEIGHTING["third"]
-    for band, value in HEAVY_IMPACT_A_WEIGHTING["octave"].items():
+    third = building.HEAVY_IMPACT_A_WEIGHTING["third"]
+    for band, value in building.HEAVY_IMPACT_A_WEIGHTING["octave"].items():
         assert third[band] == value
 
 
@@ -399,7 +401,7 @@ def test_iso717_2_table_d4_worked_example() -> None:
     at 63 / 125 / 250 / 500 Hz gives the corrected values 39,1 / 48,3 / 49,3 /
     52,6 dB and LiA,Fmax = 55,350 66... = 55 dB.
     """
-    res = a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
+    res = building.a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
     assert res.band == "octave"
     np.testing.assert_allclose(res.a_weighting, ISO717_2_TABLE_D3_OCTAVE)
     np.testing.assert_allclose(res.corrected, ISO717_2_TABLE_D4_CORRECTED, atol=5e-2)
@@ -416,7 +418,7 @@ def test_rating_rounds_halves_up() -> None:
     a = np.asarray(ISO717_2_TABLE_D3_OCTAVE)
     offset = 10.0 * np.log10(np.sum(10.0 ** (a / 10.0)))
     level = 55.5 - offset
-    res = a_weighted_maximum_impact_level([level] * 4)
+    res = building.a_weighted_maximum_impact_level([level] * 4)
     assert res.unrounded == pytest.approx(55.5, abs=1e-9)
     assert res.rating == 56
 
@@ -451,19 +453,23 @@ def test_rating_is_dominated_by_the_low_bands() -> None:
     Adding 1 dB at 500 Hz therefore moves the rating far more than 1 dB at
     63 Hz for the Table D.4 spectrum.
     """
-    base = a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS).unrounded
+    base = building.a_weighted_maximum_impact_level(
+        ISO717_2_TABLE_D4_LEVELS
+    ).unrounded
     low = list(ISO717_2_TABLE_D4_LEVELS)
     low[0] += 1.0
     high = list(ISO717_2_TABLE_D4_LEVELS)
     high[-1] += 1.0
-    delta_low = a_weighted_maximum_impact_level(low).unrounded - base
-    delta_high = a_weighted_maximum_impact_level(high).unrounded - base
+    delta_low = building.a_weighted_maximum_impact_level(low).unrounded - base
+    delta_high = (
+        building.a_weighted_maximum_impact_level(high).unrounded - base
+    )
     assert delta_high > delta_low
 
 
 def test_third_octave_rating_uses_twelve_bands() -> None:
     """A one-third-octave measurement is rated in one-third octaves (Clause D.3)."""
-    res = a_weighted_maximum_impact_level([60.0] * 12)
+    res = building.a_weighted_maximum_impact_level([60.0] * 12)
     assert res.band == "third"
     assert res.frequencies.size == 12
     expected = 10.0 * np.log10(
@@ -474,12 +480,12 @@ def test_third_octave_rating_uses_twelve_bands() -> None:
 
 def test_rating_rejects_an_unsupported_band_count() -> None:
     with pytest.raises(ValueError, match="12 one-third-octave values"):
-        a_weighted_maximum_impact_level([60.0] * 7)
+        building.a_weighted_maximum_impact_level([60.0] * 7)
 
 
 def test_rating_rejects_mismatched_frequencies() -> None:
     with pytest.raises(ValueError, match="rating bands"):
-        a_weighted_maximum_impact_level(
+        building.a_weighted_maximum_impact_level(
             ISO717_2_TABLE_D4_LEVELS, [125.0, 250.0, 500.0, 1000.0]
         )
 
@@ -491,11 +497,11 @@ def test_rating_and_standardization_compose() -> None:
     ISO 16283-2 Formula (4) output, so a pure volume gain of 10 lg(V/V0) must
     pass straight through to the single number.
     """
-    standardized = standardized_maximum_impact_level(
+    standardized = building.standardized_maximum_impact_level(
         ISO717_2_TABLE_D4_LEVELS, 100.0, 0.5
     )
-    rated = a_weighted_maximum_impact_level(standardized.standardized)
-    plain = a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
+    rated = building.a_weighted_maximum_impact_level(standardized.standardized)
+    plain = building.a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
     assert rated.unrounded - plain.unrounded == pytest.approx(
         10.0 * np.log10(2.0)
     )

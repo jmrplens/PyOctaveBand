@@ -20,7 +20,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import OpenPlanResult, open_plan_metrics
+from phonometry import room
 
 
 def test_d2s_minus_6db_per_doubling_exact() -> None:
@@ -28,8 +28,8 @@ def test_d2s_minus_6db_per_doubling_exact() -> None:
     r = np.array([2.0, 4.0, 8.0, 16.0])
     lp = 70.0 - 6.0 * np.log2(r)  # L0 = 70 dB, 6 dB / doubling
     sti = 0.6 - 0.02 * r
-    res = open_plan_metrics(r, lp, sti)
-    assert isinstance(res, OpenPlanResult)
+    res = room.open_plan_metrics(r, lp, sti)
+    assert isinstance(res, room.OpenPlanResult)
     assert res.d2s == pytest.approx(6.0, abs=1e-9)
     # Lp,A,S,4m read off the regression line at r = 4 m.
     assert res.lp_as_4m == pytest.approx(58.0, abs=1e-9)
@@ -40,7 +40,7 @@ def test_lp_as_4m_recovered_exactly() -> None:
     r = np.array([2.0, 4.0, 8.0, 16.0])
     lp = 65.0 - 4.0 * np.log2(r)
     sti = np.array([0.55, 0.45, 0.35, 0.25])
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     assert res.d2s == pytest.approx(4.0, abs=1e-9)
     assert res.lp_as_4m == pytest.approx(65.0 - 8.0, abs=1e-9)  # 57 dB
 
@@ -53,7 +53,7 @@ def test_d2s_ignores_positions_outside_2_to_16_m() -> None:
     lp[0] = 1000.0  # r = 1 m, out of range: must be ignored
     lp[-1] = -1000.0  # r = 20 m, out of range: must be ignored
     sti = np.linspace(0.6, 0.1, r.size)
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     assert res.d2s == pytest.approx(6.0, abs=1e-9)
     assert res.lp_as_4m == pytest.approx(58.0, abs=1e-9)
 
@@ -63,7 +63,7 @@ def test_rd_within_range_rp_extrapolated() -> None:
     r = np.array([2.0, 5.0, 10.0, 15.0])
     sti = 0.6 - 0.02 * r  # STI = 0.6 - 0.02 r
     lp = 70.0 - 6.0 * np.log2(r)
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     # 0.50 = 0.6 - 0.02 r -> r = 5 m (within range)
     assert res.rd == pytest.approx(5.0, abs=1e-9)
     # 0.20 = 0.6 - 0.02 r -> r = 20 m (extrapolated beyond 15 m)
@@ -75,7 +75,7 @@ def test_rd_nonpositive_returns_nan_rp_valid() -> None:
     r = np.array([2.0, 4.0, 6.0, 8.0])
     sti = 0.4 - 0.02 * r  # crosses 0.50 only at negative distance
     lp = 60.0 - 3.0 * np.log2(r)
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     assert math.isnan(res.rd)
     # 0.20 = 0.4 - 0.02 r -> r = 10 m
     assert res.rp == pytest.approx(10.0, abs=1e-9)
@@ -86,7 +86,7 @@ def test_sti_non_decreasing_returns_nan() -> None:
     r = np.array([2.0, 4.0, 8.0, 16.0])
     sti = np.array([0.3, 0.4, 0.5, 0.6])  # increases with distance
     lp = 70.0 - 6.0 * np.log2(r)
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     assert math.isnan(res.rd)
     assert math.isnan(res.rp)
 
@@ -97,7 +97,7 @@ def test_too_few_positions_raises() -> None:
     lp = 70.0 - 6.0 * np.log2(r)
     sti = np.array([0.6, 0.4, 0.2])
     with pytest.raises(ValueError, match="at least 4"):
-        open_plan_metrics(r, lp, sti)
+        room.open_plan_metrics(r, lp, sti)
 
 
 def test_mismatched_lengths_raise() -> None:
@@ -106,7 +106,7 @@ def test_mismatched_lengths_raise() -> None:
     lp = 70.0 - 6.0 * np.log2(r)
     sti = np.array([0.6, 0.4, 0.2])  # one short
     with pytest.raises(ValueError, match="same length"):
-        open_plan_metrics(r, lp, sti)
+        room.open_plan_metrics(r, lp, sti)
 
 
 def test_too_few_in_range_gives_nan_decay() -> None:
@@ -114,7 +114,7 @@ def test_too_few_in_range_gives_nan_decay() -> None:
     r = np.array([0.5, 1.0, 1.5, 18.0])  # all below 2 m or above 16 m: none in range
     lp = np.array([60.0, 58.0, 56.0, 40.0])
     sti = 0.6 - 0.02 * r
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     assert math.isnan(res.d2s)
     assert math.isnan(res.lp_as_4m)
     # STI regression uses all positions: 0.5 = 0.6 - 0.02 r -> r = 5
@@ -130,7 +130,7 @@ def test_exactly_one_in_range_gives_nan_decay() -> None:
     r = np.array([0.5, 1.0, 4.0, 18.0])  # only 4 m lies in [2, 16] m
     lp = np.array([60.0, 58.0, 50.0, 40.0])
     sti = 0.6 - 0.02 * r
-    res = open_plan_metrics(r, lp, sti)
+    res = room.open_plan_metrics(r, lp, sti)
     assert math.isnan(res.d2s)
     assert math.isnan(res.lp_as_4m)
     # STI regression uses all positions: 0.5 = 0.6 - 0.02 r -> r = 5 m.
@@ -143,7 +143,7 @@ def test_nan_in_positions_raises() -> None:
     lp = np.array([70.0, 64.0, 58.0, 46.0])
     sti = np.array([0.6, 0.5, 0.4, 0.3])
     with pytest.raises(ValueError, match="finite"):
-        open_plan_metrics(r, lp, sti)
+        room.open_plan_metrics(r, lp, sti)
 
 
 def test_nan_in_spl_raises() -> None:
@@ -152,7 +152,7 @@ def test_nan_in_spl_raises() -> None:
     lp = np.array([70.0, np.nan, 58.0, 46.0])
     sti = np.array([0.6, 0.5, 0.4, 0.3])
     with pytest.raises(ValueError, match="finite"):
-        open_plan_metrics(r, lp, sti)
+        room.open_plan_metrics(r, lp, sti)
 
 
 def test_inf_in_sti_raises() -> None:
@@ -161,4 +161,4 @@ def test_inf_in_sti_raises() -> None:
     lp = np.array([70.0, 64.0, 58.0, 46.0])
     sti = np.array([0.6, np.inf, 0.4, 0.3])
     with pytest.raises(ValueError, match="finite"):
-        open_plan_metrics(r, lp, sti)
+        room.open_plan_metrics(r, lp, sti)

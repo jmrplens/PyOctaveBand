@@ -18,16 +18,7 @@ import math
 import numpy as np
 import pytest
 
-from phonometry import (
-    SoundReductionResult,
-    coincidence_frequency,
-    double_wall_transmission_loss,
-    field_incidence_correction,
-    mass_law_transmission_loss,
-    mass_spring_mass_resonance,
-    plate_bending_stiffness,
-    single_panel_transmission_loss,
-)
+from phonometry import building, vibration
 from phonometry.materials import miki
 
 # ISO 717-1 one-third-octave band centres, 100 Hz to 3150 Hz.
@@ -41,22 +32,30 @@ BANDS = np.array(
 # Mass law (Bies Eq. 7.40 / 7.42).
 # ---------------------------------------------------------------------------
 def test_mass_law_six_db_per_octave() -> None:
-    lo = mass_law_transmission_loss(500.0, 20.0, incidence="normal")
-    hi = mass_law_transmission_loss(1000.0, 20.0, incidence="normal")
+    lo = building.mass_law_transmission_loss(500.0, 20.0, incidence="normal")
+    hi = building.mass_law_transmission_loss(1000.0, 20.0, incidence="normal")
     assert float(hi - lo) == pytest.approx(6.02, abs=0.01)
 
 
 def test_mass_law_six_db_per_mass_doubling() -> None:
-    light = mass_law_transmission_loss(500.0, 20.0, incidence="normal")
-    heavy = mass_law_transmission_loss(500.0, 40.0, incidence="normal")
+    light = building.mass_law_transmission_loss(
+        500.0, 20.0, incidence="normal"
+    )
+    heavy = building.mass_law_transmission_loss(
+        500.0, 40.0, incidence="normal"
+    )
     assert float(heavy - light) == pytest.approx(6.02, abs=0.01)
 
 
 def test_field_incidence_correction_values() -> None:
-    assert field_incidence_correction("third") == 5.5
-    assert field_incidence_correction("octave") == 4.0
-    normal = mass_law_transmission_loss(500.0, 20.0, incidence="normal")
-    field = mass_law_transmission_loss(500.0, 20.0, incidence="field", band="third")
+    assert building.field_incidence_correction("third") == 5.5
+    assert building.field_incidence_correction("octave") == 4.0
+    normal = building.mass_law_transmission_loss(
+        500.0, 20.0, incidence="normal"
+    )
+    field = building.mass_law_transmission_loss(
+        500.0, 20.0, incidence="field", band="third"
+    )
     assert float(normal - field) == pytest.approx(5.5)
 
 
@@ -65,9 +64,9 @@ def test_mass_law_hand_value() -> None:
     f, m = 500.0, 20.0
     ratio = math.pi * f * m / (1.205 * 343.0)
     expected = 10.0 * math.log10(1.0 + ratio**2)
-    assert mass_law_transmission_loss(f, m, incidence="normal") == pytest.approx(
-        expected
-    )
+    assert building.mass_law_transmission_loss(
+        f, m, incidence="normal"
+    ) == pytest.approx(expected)
 
 
 # ---------------------------------------------------------------------------
@@ -75,9 +74,9 @@ def test_mass_law_hand_value() -> None:
 # ---------------------------------------------------------------------------
 def test_single_panel_coincidence_dip_point_b() -> None:
     m, eta = 15.0, 0.024
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = coincidence_frequency(m, bp)
-    tl_fc = single_panel_transmission_loss(
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = vibration.coincidence_frequency(m, bp)
+    tl_fc = building.single_panel_transmission_loss(
         [fc], m, critical_frequency=fc, loss_factor=eta
     ).transmission_loss[0]
     point_b = 20.0 * math.log10(fc * m) + 10.0 * math.log10(eta) - 44.0
@@ -86,10 +85,11 @@ def test_single_panel_coincidence_dip_point_b() -> None:
 
 def test_single_panel_dip_at_coincidence() -> None:
     m = 15.0
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = coincidence_frequency(m, bp)
-    res = single_panel_transmission_loss(BANDS, m, critical_frequency=fc,
-                                         loss_factor=0.024)
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = vibration.coincidence_frequency(m, bp)
+    res = building.single_panel_transmission_loss(
+        BANDS, m, critical_frequency=fc, loss_factor=0.024
+    )
     # A local dip must sit near the coincidence frequency.
     dip_band = BANDS[int(np.argmin(np.abs(BANDS - fc)))]
     below = res.transmission_loss[BANDS == 1000.0][0]
@@ -100,38 +100,40 @@ def test_single_panel_dip_at_coincidence() -> None:
 def test_single_panel_glass_rating_realistic() -> None:
     # 6 mm float glass: catalogue Rw is about 31-32 dB.
     m = 15.0
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = coincidence_frequency(m, bp)
-    res = single_panel_transmission_loss(BANDS, m, critical_frequency=fc,
-                                         loss_factor=0.024)
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = vibration.coincidence_frequency(m, bp)
+    res = building.single_panel_transmission_loss(
+        BANDS, m, critical_frequency=fc, loss_factor=0.024
+    )
     assert 29 <= res.rating().rating <= 34
 
 
 def test_single_panel_matches_glass_measurement_masslaw_range() -> None:
     # Hopkins Fig. 4.8, 6 mm glass, below coincidence, within a few dB.
     m = 15.0
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = coincidence_frequency(m, bp)
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = vibration.coincidence_frequency(m, bp)
     freqs = np.array([250.0, 500.0, 1000.0])
     measured = np.array([25.0, 28.5, 33.0])
-    res = single_panel_transmission_loss(freqs, m, critical_frequency=fc,
-                                         loss_factor=0.024)
+    res = building.single_panel_transmission_loss(
+        freqs, m, critical_frequency=fc, loss_factor=0.024
+    )
     np.testing.assert_allclose(res.transmission_loss, measured, atol=4.0)
 
 
 def test_single_panel_from_bending_stiffness() -> None:
     m = 15.0
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    a = single_panel_transmission_loss(BANDS, m, bending_stiffness=bp)
-    b = single_panel_transmission_loss(
-        BANDS, m, critical_frequency=coincidence_frequency(m, bp)
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    a = building.single_panel_transmission_loss(BANDS, m, bending_stiffness=bp)
+    b = building.single_panel_transmission_loss(
+        BANDS, m, critical_frequency=vibration.coincidence_frequency(m, bp)
     )
     np.testing.assert_allclose(a.transmission_loss, b.transmission_loss)
 
 
 def test_single_panel_requires_fc_or_stiffness() -> None:
     with pytest.raises(ValueError, match="critical_frequency"):
-        single_panel_transmission_loss(BANDS, 15.0)
+        building.single_panel_transmission_loss(BANDS, 15.0)
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +141,7 @@ def test_single_panel_requires_fc_or_stiffness() -> None:
 # ---------------------------------------------------------------------------
 def test_mass_spring_mass_resonance_closed_form() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
-    f0 = mass_spring_mass_resonance(m1, m2, d)
+    f0 = building.mass_spring_mass_resonance(m1, m2, d)
     # Bies/Hopkins round the air-cavity constant to 60; the exact rho0 c0**2
     # form gives 59.9, so the design constant agrees to about 0.2 %.
     assert f0 == pytest.approx(60.0 * math.sqrt((m1 + m2) / (m1 * m2 * d)), rel=5e-3)
@@ -151,35 +153,45 @@ def test_mass_spring_mass_resonance_closed_form() -> None:
 
 def test_double_wall_below_f0_is_total_mass_law() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
-    f0 = mass_spring_mass_resonance(m1, m2, d)
+    f0 = building.mass_spring_mass_resonance(m1, m2, d)
     fb = 0.5 * f0
-    dw = double_wall_transmission_loss([fb], m1, m2, d).transmission_loss[0]
-    ml = mass_law_transmission_loss(fb, m1 + m2)
+    dw = building.double_wall_transmission_loss(
+        [fb], m1, m2, d
+    ).transmission_loss[0]
+    ml = building.mass_law_transmission_loss(fb, m1 + m2)
     assert float(dw) == pytest.approx(float(ml))
 
 
 def test_double_wall_continuous_at_limiting_frequency() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
     f_l = 343.0 / (2.0 * math.pi * d)
-    lo = double_wall_transmission_loss([f_l * 0.999], m1, m2, d).transmission_loss[0]
-    hi = double_wall_transmission_loss([f_l * 1.001], m1, m2, d).transmission_loss[0]
+    lo = building.double_wall_transmission_loss(
+        [f_l * 0.999], m1, m2, d
+    ).transmission_loss[0]
+    hi = building.double_wall_transmission_loss(
+        [f_l * 1.001], m1, m2, d
+    ).transmission_loss[0]
     # 20 lg(2 k d) = 6.02 dB at f_l, the +6 dB high branch: continuous to ~0.05 dB.
     assert abs(float(hi - lo)) < 0.1
 
 
 def test_double_wall_beats_single_leaf_above_resonance() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
-    dw = double_wall_transmission_loss([500.0], m1, m2, d).transmission_loss[0]
-    single = mass_law_transmission_loss(500.0, m1 + m2)
+    dw = building.double_wall_transmission_loss(
+        [500.0], m1, m2, d
+    ).transmission_loss[0]
+    single = building.mass_law_transmission_loss(500.0, m1 + m2)
     assert float(dw) > float(single) + 10.0
 
 
 def test_double_wall_porous_fill_lowers_resonance() -> None:
     m1, m2, d = 12.16, 12.16, 0.1
-    f0_air = mass_spring_mass_resonance(m1, m2, d)
+    f0_air = building.mass_spring_mass_resonance(m1, m2, d)
     # Flow resistivity chosen so f/sigma stays within the Miki fit range at f0.
     medium = miki([f0_air], 7000.0)
-    f0_fill = mass_spring_mass_resonance(m1, m2, d, cavity_medium=medium)
+    f0_fill = building.mass_spring_mass_resonance(
+        m1, m2, d, cavity_medium=medium
+    )
     assert f0_fill < f0_air
 
 
@@ -189,31 +201,34 @@ def test_double_wall_degenerate_f0_above_fl_is_partitioned() -> None:
     # (no silent overwrite), giving finite, monotone-ish values everywhere.
     m1 = m2 = 0.3          # kg/m2 (thin membranes)
     d = 0.3                # 300 mm gap
-    f0 = mass_spring_mass_resonance(m1, m2, d)
+    f0 = building.mass_spring_mass_resonance(m1, m2, d)
     f_l = 343.0 / (2.0 * math.pi * d)
     assert f0 > f_l        # the degenerate regime
-    res = double_wall_transmission_loss(BANDS, m1, m2, d)
+    res = building.double_wall_transmission_loss(BANDS, m1, m2, d)
     assert np.all(np.isfinite(res.transmission_loss))
     # Below f0 it is still the combined-mass law; above f0 it is the +6 branch.
     lo = float(res.transmission_loss[BANDS <= f0][0])
     assert lo == pytest.approx(
-        float(mass_law_transmission_loss(BANDS[BANDS <= f0][0], m1 + m2))
+        float(
+            building.mass_law_transmission_loss(BANDS[BANDS <= f0][0], m1 + m2)
+        )
     )
 
 
 def test_double_wall_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="gap"):
-        double_wall_transmission_loss(BANDS, 10.0, 10.0, -0.1)
+        building.double_wall_transmission_loss(BANDS, 10.0, 10.0, -0.1)
 
 
 def test_plot_language_spanish_and_validation() -> None:
     # The .plot() renderer accepts a language option: Spanish localises the
     # axis labels and title, and an unknown code is rejected up front.
     m = 15.0
-    bp = plate_bending_stiffness(6.2e10, 0.006, 0.24)
-    fc = coincidence_frequency(m, bp)
-    res = single_panel_transmission_loss(BANDS, m, critical_frequency=fc,
-                                         loss_factor=0.024)
+    bp = vibration.plate_bending_stiffness(6.2e10, 0.006, 0.24)
+    fc = vibration.coincidence_frequency(m, bp)
+    res = building.single_panel_transmission_loss(
+        BANDS, m, critical_frequency=fc, loss_factor=0.024
+    )
     ax = res.plot(language="es")
     assert "Frecuencia" in ax.get_xlabel()
     assert "reducción acústica" in ax.get_ylabel()
@@ -268,10 +283,9 @@ P314_BANDS = np.array(
 P314_TL = np.array([6.4, 12.2, 18.1, 24.1, 30.1, 36.1, 42.1, 48.1, 27.0, 38.6])
 
 
-def _brick_wall() -> SoundReductionResult:
-    from phonometry import plateau_transmission_loss
+def _brick_wall() -> building.SoundReductionResult:
 
-    return plateau_transmission_loss(
+    return building.plateau_transmission_loss(
         P311_BANDS, material="brick", thickness_mm=110.0,
         air_density=NORTON_AIR_DENSITY,
     )
@@ -297,9 +311,8 @@ def test_plateau_table_matches_norton_table_31() -> None:
     # the eight tabulated materials, transcribed from the printed table. The
     # whole mapping is compared, so neither a corrupted number nor an extra
     # material can slip through.
-    from phonometry import PLATEAU_MATERIALS
 
-    assert PLATEAU_MATERIALS == NORTON_TABLE_31
+    assert building.PLATEAU_MATERIALS == NORTON_TABLE_31
 
 
 @pytest.mark.parametrize(("material", "row"), sorted(NORTON_TABLE_31.items()))
@@ -307,9 +320,8 @@ def test_plateau_table_row_matches_the_printed_row(
     material: str, row: tuple[float, float, float]
 ) -> None:
     # One case per material, so a corrupted row names itself in the failure.
-    from phonometry import PLATEAU_MATERIALS
 
-    assert PLATEAU_MATERIALS[material] == row
+    assert building.PLATEAU_MATERIALS[material] == row
 
 
 def test_plateau_problem_311_mass_law_and_plateau_exactly() -> None:
@@ -340,7 +352,7 @@ def test_plateau_construction_points() -> None:
     assert res.plateau_start is not None
     assert res.plateau_end is not None
     assert res.plateau_end / res.plateau_start == pytest.approx(4.5, rel=1e-12)
-    mass_law = mass_law_transmission_loss(
+    mass_law = building.mass_law_transmission_loss(
         res.plateau_start, 231.0, incidence="field", field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
     )
@@ -350,13 +362,12 @@ def test_plateau_construction_points() -> None:
 def test_plateau_degenerates_to_the_mass_law_below_point_a() -> None:
     # Well below the plateau the estimate *is* the field-incidence mass law:
     # 6 dB per octave and 6 dB per doubling of surface mass.
-    from phonometry import plateau_transmission_loss
 
     low = np.array([20.0, 40.0])
-    res = plateau_transmission_loss(
+    res = building.plateau_transmission_loss(
         low, material="brick", thickness_mm=110.0, air_density=NORTON_AIR_DENSITY,
     )
-    reference = mass_law_transmission_loss(
+    reference = building.mass_law_transmission_loss(
         low, 231.0, incidence="field", field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
     )
@@ -368,10 +379,9 @@ def test_plateau_degenerates_to_the_mass_law_below_point_a() -> None:
 
 def test_plateau_explicit_panel_matches_the_table() -> None:
     # Giving the three plateau numbers by hand must equal the tabulated route.
-    from phonometry import plateau_transmission_loss
 
     by_table = _brick_wall()
-    by_hand = plateau_transmission_loss(
+    by_hand = building.plateau_transmission_loss(
         P311_BANDS, mass_per_area=2.10 * 110.0, plateau_height=37.0,
         frequency_ratio=4.5, air_density=NORTON_AIR_DENSITY,
     )
@@ -387,12 +397,11 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
     # The named route must read all three columns of its own row: the surface
     # density feeds the mass-law line (hence point A), the plateau height is
     # reported as such, and the B/A ratio places point B.
-    from phonometry import plateau_transmission_loss
 
     density_per_mm, height, ratio = row
     thickness_mm = 10.0
     bands = np.array([31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-    res = plateau_transmission_loss(
+    res = building.plateau_transmission_loss(
         bands, material=material, thickness_mm=thickness_mm,
         air_density=NORTON_AIR_DENSITY,
     )
@@ -400,7 +409,7 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
     assert res.plateau_end == pytest.approx(ratio * res.plateau_start, rel=1e-12)
     # Point A is where the field-incidence mass law of this row's surface
     # density reaches the plateau height, so the two must agree there.
-    at_a = mass_law_transmission_loss(
+    at_a = building.mass_law_transmission_loss(
         np.array([res.plateau_start]), density_per_mm * thickness_mm,
         incidence="field", field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
@@ -411,7 +420,7 @@ def test_plateau_construction_uses_every_column_of_the_named_row(
 def test_cremer_problem_314_printed_answers() -> None:
     # Field-incidence mass law below fc (Eq. 3.104) and Cremer's Eq. (3.110)
     # above it, against the printed "diffuse field" column of problem 3.14.
-    res = single_panel_transmission_loss(
+    res = building.single_panel_transmission_loss(
         P314_BANDS, 750.0 * 0.020, critical_frequency=97.7 / 0.020,
         loss_factor=1.5e-3, coincidence_model="cremer", field_correction=5.0,
         air_density=NORTON_AIR_DENSITY,
@@ -426,7 +435,7 @@ def test_cremer_is_floored_at_the_coincidence_frequency() -> None:
     # to incident sound waves", tau = 1, TL = 0 dB. A passive panel can never
     # do worse, so no band may report tau > 1.
     fc = 2000.0
-    res = single_panel_transmission_loss(
+    res = building.single_panel_transmission_loss(
         np.array([0.999 * fc, fc, 1.0005 * fc, 1.05 * fc]), 15.0,
         critical_frequency=fc, loss_factor=0.01, coincidence_model="cremer",
     )
@@ -442,7 +451,7 @@ def test_cremer_rises_ten_db_per_octave_far_above_coincidence() -> None:
     # to 3 dB/octave far above fc, hence the 10 dB/octave Norton quotes.
     fc = 500.0
     f = fc * np.array([64.0, 128.0])
-    res = single_panel_transmission_loss(
+    res = building.single_panel_transmission_loss(
         f, 15.0, critical_frequency=fc, loss_factor=0.01,
         coincidence_model="cremer",
     )
@@ -452,15 +461,14 @@ def test_cremer_rises_ten_db_per_octave_far_above_coincidence() -> None:
 def test_plateau_and_physical_model_agree_in_the_mass_law_region() -> None:
     # The whole point of the plateau shortcut: below coincidence it is the same
     # curve as the physical model, and it only replaces the coincidence dip.
-    from phonometry import plateau_transmission_loss
 
     thickness_mm, fc = 6.0, 2033.0  # 6 mm glass, Norton problem 3.13
     mass = 2.47 * thickness_mm
     low = np.array([125.0, 250.0])
-    quick = plateau_transmission_loss(
+    quick = building.plateau_transmission_loss(
         low, material="glass", thickness_mm=thickness_mm, field_correction=5.5,
     )
-    physical = single_panel_transmission_loss(
+    physical = building.single_panel_transmission_loss(
         low, mass, critical_frequency=fc, loss_factor=0.02,
     )
     np.testing.assert_allclose(
@@ -490,10 +498,9 @@ def test_plateau_plot_shades_the_coincidence_plateau() -> None:
     ],
 )
 def test_plateau_validation(kwargs: dict[str, object]) -> None:
-    from phonometry import plateau_transmission_loss
 
     with pytest.raises(ValueError):
-        plateau_transmission_loss(P311_BANDS, **kwargs)  # type: ignore[arg-type]
+        building.plateau_transmission_loss(P311_BANDS, **kwargs)  # type: ignore[arg-type]
 
 
 def test_plateau_rejects_a_height_that_underflows_point_a() -> None:
@@ -501,33 +508,33 @@ def test_plateau_rejects_a_height_that_underflows_point_a() -> None:
     # A plateau height so small that 10**((height + correction)/10) rounds to
     # exactly 1.0 leaves nothing to invert and would put point A at 0 Hz, i.e.
     # the whole spectrum on the plateau. The guard is what stops that.
-    from phonometry import plateau_transmission_loss
 
     with pytest.raises(ValueError, match="sits below the mass law"):
-        plateau_transmission_loss(
+        building.plateau_transmission_loss(
             P311_BANDS, mass_per_area=231.0, plateau_height=1e-300,
             frequency_ratio=4.5, field_correction=0.0,
         )
 
 
 def test_plateau_rejects_bad_frequency_axis() -> None:
-    from phonometry import plateau_transmission_loss
 
     with pytest.raises(ValueError, match="must be positive"):
-        plateau_transmission_loss(
+        building.plateau_transmission_loss(
             [100.0, -1.0], material="brick", thickness_mm=110.0
         )
     with pytest.raises(ValueError, match="non-empty"):
-        plateau_transmission_loss([], material="brick", thickness_mm=110.0)
+        building.plateau_transmission_loss(
+            [], material="brick", thickness_mm=110.0
+        )
 
 
 def test_negative_field_correction_rejected() -> None:
     with pytest.raises(ValueError, match="non-negative"):
-        mass_law_transmission_loss(500.0, 15.0, field_correction=-1.0)
+        building.mass_law_transmission_loss(500.0, 15.0, field_correction=-1.0)
 
 
 def test_unknown_coincidence_model_rejected() -> None:
     with pytest.raises(ValueError):
-        single_panel_transmission_loss(
+        building.single_panel_transmission_loss(
             BANDS, 15.0, critical_frequency=2000.0, coincidence_model="watters"
         )

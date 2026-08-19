@@ -115,7 +115,7 @@ def _mc_run(theta_deg: float) -> tuple[Any, Any]:
     nothing is measured off it: see :func:`_mode_conversion_fields` for why
     this scene shows the regimes but does not price them.
     """
-    from phonometry import ElasticFDTD2D
+    from phonometry import simulation
     from phonometry.simulation import STEEL, WATER
 
     dx = _MC_DX
@@ -127,7 +127,9 @@ def _mc_run(theta_deg: float) -> tuple[Any, Any]:
     c_p[iface:] = STEEL.c_p
     c_s[iface:] = STEEL.c_s
     rho[iface:] = STEEL.rho
-    sim = ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_MC_SPONGE)
+    sim = simulation.ElasticFDTD2D(
+        c_p, c_s, dx, rho=rho, sponge_width=_MC_SPONGE
+    )
     # Tapered aperture, centred so the beam axis meets the contact at the
     # middle of the frame whatever the incidence: a soft-edged beam instead
     # of a hard-clipped one keeps the edge diffraction out of the picture.

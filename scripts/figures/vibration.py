@@ -48,11 +48,13 @@ from .theme import (
 def generate_junction_transmission(output_dir: str) -> None:
     """Hopkins 5.2.1.3 bending-wave transmission at a rigid X-junction."""
     print("Generating junction_transmission...")
-    from phonometry import junction_transmission
+    from phonometry import vibration
 
     # X-junction between a 100 mm and a 200 mm concrete plate (cL = 3200 m/s,
     # rho = 2400 kg/m^3 -> rho_s = 240 and 480 kg/m^2).
-    res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+    res = vibration.junction_transmission(
+        "X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0
+    )
     assert res.straight is not None and res.straight_average is not None
     angles = res.angles_deg
 
@@ -110,19 +112,15 @@ def generate_junction_transmission(output_dir: str) -> None:
 def generate_mechanical_mobility(output_dir: str) -> None:
     """ISO 7626-1 receptance/mobility/accelerance of a SDOF resonator."""
     print("Generating mechanical_mobility...")
-    from phonometry import (
-        convert_frf,
-        resonance_frequency,
-        sdof_receptance,
-    )
+    from phonometry import vibration
 
     m, k, c = 2.0, 8000.0, 5.0
-    f0 = resonance_frequency(m, k)
+    f0 = vibration.resonance_frequency(m, k)
     freq = np.logspace(np.log10(f0 / 20.0), np.log10(f0 * 20.0), 600)
     w0 = 2.0 * np.pi * f0
-    h = sdof_receptance(freq, m, k, c)
-    y = convert_frf(h, freq, "receptance", "mobility")
-    a = convert_frf(h, freq, "receptance", "accelerance")
+    h = vibration.sdof_receptance(freq, m, k, c)
+    y = vibration.convert_frf(h, freq, "receptance", "mobility")
+    a = vibration.convert_frf(h, freq, "receptance", "accelerance")
     # Normalise each FRF to O(1) near resonance so all three share one axis.
     curves = [
         (np.abs(h) * k, COLOR_PRIMARY, r"Receptance $|H|$ ($\times k$)"),
@@ -163,11 +161,7 @@ def generate_mechanical_mobility(output_dir: str) -> None:
 def generate_transfer_stiffness(output_dir: str) -> None:
     """ISO 10846 dynamic transfer stiffness: true vs indirect-method recovery."""
     print("Generating transfer_stiffness...")
-    from phonometry import (
-        base_transmissibility,
-        transfer_stiffness_indirect,
-        transfer_stiffness_level,
-    )
+    from phonometry import vibration
 
     # Kelvin-Voigt isolator k + jwc, loaded by a blocking mass m2.
     k, c, m2 = 1.0e6, 120.0, 8.0
@@ -175,28 +169,41 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     freq = np.logspace(np.log10(f0 / 5.0), np.log10(f0 * 40.0), 600)
     w = 2.0 * np.pi * freq
 
-    k_true = k + 1j * w * c                                # exact transfer stiffness
-    t = base_transmissibility(freq, m2, k, c)              # mass-loaded transmissibility
-    k_indirect = transfer_stiffness_indirect(freq, t, m2)  # ISO 10846-3 Eq. (1)
+    k_true = k + 1j * w * c  # exact transfer stiffness
+    t = vibration.base_transmissibility(
+        freq, m2, k, c
+    )  # mass-loaded transmissibility
+    k_indirect = vibration.transfer_stiffness_indirect(
+        freq, t, m2
+    )  # ISO 10846-3 Eq. (1)
 
     # Where the standard's own criterion starts holding: |T| <= 0.1
     # (Inequality 2), not the 3 f0 rule of thumb.
     magnitude_t = np.abs(np.asarray(t, dtype=np.complex128))
     valid = np.flatnonzero(magnitude_t <= 0.1)
     f_valid = float(freq[valid[0]]) if valid.size else float(freq[-1])
-    level_error = (transfer_stiffness_level(k_indirect)
-                   - transfer_stiffness_level(k_true))
+    level_error = (vibration.transfer_stiffness_level(k_indirect)
+                   - vibration.transfer_stiffness_level(k_true))
     eta = np.imag(k_true) / np.real(k_true)          # Kelvin-Voigt: w c / k
 
     fig, (ax, mid, low) = plt.subplots(
         3, 1, figsize=(10, 10.2), sharex=True,
         gridspec_kw={"height_ratios": [1.5, 1.0, 0.85]})
-    ax.semilogx(freq, transfer_stiffness_level(k_true), color=COLOR_PRIMARY,
-                linewidth=2.2,
-                label=r"true $L_k$ of $k_{2,1}=k+\mathrm{j}\,\omega c$")
-    ax.semilogx(freq, transfer_stiffness_level(k_indirect), color=COLOR_SECONDARY,
-                linewidth=2.0, linestyle="--",
-                label=r"indirect method $-(2\pi f)^2 m_2 T$")
+    ax.semilogx(
+        freq,
+        vibration.transfer_stiffness_level(k_true),
+        color=COLOR_PRIMARY,
+        linewidth=2.2,
+        label=r"true $L_k$ of $k_{2,1}=k+\mathrm{j}\,\omega c$",
+    )
+    ax.semilogx(
+        freq,
+        vibration.transfer_stiffness_level(k_indirect),
+        color=COLOR_SECONDARY,
+        linewidth=2.0,
+        linestyle="--",
+        label=r"indirect method $-(2\pi f)^2 m_2 T$",
+    )
     ax.axvline(f0, color=COLOR_GRID, linestyle=":", linewidth=1.2,
                label="resonance $f_0$")
     for panel in (ax, mid, low):
@@ -262,7 +269,7 @@ def generate_transfer_stiffness(output_dir: str) -> None:
 def generate_rigid_mass_calibration(output_dir: str) -> None:
     """ISO 7626-2 (7.5.2) operational rigid-mass calibration check."""
     print("Generating rigid_mass_calibration...")
-    from phonometry import rigid_mass_calibration_check
+    from phonometry import vibration
 
     # A 10 kg calibration block: the accelerance must be a flat |A| = 1/m over
     # frequency. The measured chain has a mild ripple and drifts above the
@@ -274,7 +281,7 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
     ripple = 0.015 * np.sin(2.0 * np.pi * np.log10(freq))
     drift = 0.05 * (freq / 2500.0) ** 2
     measured = expected * (1.0 + ripple + drift)
-    res = rigid_mass_calibration_check(measured, freq, mass=m)
+    res = vibration.rigid_mass_calibration_check(measured, freq, mass=m)
     within = res.within_tolerance
     tol = res.tolerance
 
@@ -340,10 +347,10 @@ def generate_junction_plate_geometry(output_dir: str) -> None:
     transmission coefficients describe.
     """
     print("Generating junction_plate_geometry...")
-    from phonometry import plot_junction_geometry
+    from phonometry import building
 
     _fig, ax = plt.subplots(figsize=(9.0, 6.2))
-    plot_junction_geometry("T2", 0.14, 0.2, ax=ax, language=_LANG)
+    building.plot_junction_geometry("T2", 0.14, 0.2, ax=ax, language=_LANG)
     plt.tight_layout()
     save_figure(output_dir, "junction_plate_geometry.svg")
     plt.close()
@@ -352,14 +359,14 @@ def generate_junction_plate_geometry(output_dir: str) -> None:
 def generate_vibration_weighting(output_dir: str) -> None:
     """ISO 8041-1: the whole-body vertical weighting Wk over its band."""
     print("Generating vibration_weighting.png...")
-    from phonometry import frequency_weighting
+    from phonometry import vibration
 
     # A user evaluates the principal ISO 2631-1 weighting Wk on a fine
     # frequency grid across the whole-body band (0,4-100 Hz). The result is the
     # ISO 8041-1 cascade H(f): a gentle +0,5 dB peak near 6 Hz, a band-limiting
     # roll-off below 0,4 Hz and above ~16 Hz.
     freqs = np.geomspace(0.4, 100.0, 240)
-    result = frequency_weighting("Wk", freqs)
+    result = vibration.frequency_weighting("Wk", freqs)
 
     _fig, ax = plt.subplots(figsize=(10, 6.3))
     ax.semilogx(result.frequencies, result.magnitude_db, color=COLOR_PRIMARY,
@@ -387,7 +394,7 @@ def generate_vibration_weighting(output_dir: str) -> None:
 def generate_weighted_acceleration(output_dir: str) -> None:
     """ISO 2631-1: measured seat spectrum weighted to a_w (Eq. (9))."""
     print("Generating weighted_acceleration.png...")
-    from phonometry import weighted_acceleration
+    from phonometry import vibration
 
     # A measured vertical seat-pan acceleration spectrum (r.m.s. per one-third
     # octave, m/s^2) from a vehicle seat: energy concentrated in the 2-8 Hz
@@ -397,7 +404,7 @@ def generate_weighted_acceleration(output_dir: str) -> None:
     accel = np.array([0.18, 0.24, 0.33, 0.46, 0.52, 0.55, 0.48, 0.39, 0.31,
                       0.26, 0.21, 0.17, 0.13, 0.10, 0.078, 0.060, 0.045,
                       0.028, 0.020])
-    result = weighted_acceleration(accel, freqs, "Wk")
+    result = vibration.weighted_acceleration(accel, freqs, "Wk")
 
     positions = np.arange(freqs.size, dtype=float)
     width = 0.4
@@ -426,13 +433,13 @@ def generate_weighted_acceleration(output_dir: str) -> None:
 def generate_daily_vibration_exposure(output_dir: str) -> None:
     """ISO 5349 + Directive 2002/44/EC: A(8) vs the EAV/ELV thresholds."""
     print("Generating daily_vibration_exposure.png...")
-    from phonometry import daily_vibration_exposure
+    from phonometry import vibration
 
     # A forestry worker's day across three chain-saw tasks (the ISO 5349-2
     # Annex E.3 worked example): each task's a_hv and duration give a partial
     # exposure A_i(8); they combine to A(8) = 3,6 m/s^2, assessed against the
     # hand-arm action (2,5) and limit (5,0) values of Directive 2002/44/EC.
-    result = daily_vibration_exposure(
+    result = vibration.daily_vibration_exposure(
         [4.6, 6.0, 3.6],
         [2 * 3600.0, 1 * 3600.0, 2 * 3600.0],
         kind="hav",
@@ -470,13 +477,7 @@ def generate_daily_vibration_exposure(output_dir: str) -> None:
 def generate_multiple_shock(output_dir: str) -> None:
     """ISO 2631-5: seat-to-spine transmissibility and the injury probability."""
     print("Generating multiple_shock.png...")
-    from phonometry import (
-        compression_dose,
-        dose_from_peaks,
-        injury_probability,
-        injury_risk,
-        seat_to_spine_transfer,
-    )
+    from phonometry import vibration
     from phonometry.vibration.human.multiple_shock import (
         MZ_MALE,
         RISK_THRESHOLDS_MALE,
@@ -486,8 +487,12 @@ def generate_multiple_shock(output_dir: str) -> None:
 
     # --- Left: seat-to-spine transmissibility |H(f)| (Formula 1). ---
     freq = np.logspace(np.log10(0.5), np.log10(80.0), 400)
-    ax_h.plot(freq, np.abs(seat_to_spine_transfer(freq)), color=COLOR_PRIMARY,
-              label=r"$|H(f)|$")
+    ax_h.plot(
+        freq,
+        np.abs(vibration.seat_to_spine_transfer(freq)),
+        color=COLOR_PRIMARY,
+        label=r"$|H(f)|$",
+    )
     ax_h.axhline(1.0, color=COLOR_GRID, linestyle="--", alpha=0.7)
     ax_h.set_xscale("log")
     ax_h.set_xlabel("Frequency [Hz]")
@@ -505,17 +510,27 @@ def generate_multiple_shock(output_dir: str) -> None:
         ("female", COLOR_SECONDARY),
     )
     for sex, colour in sexes:
-        prob = 100.0 * injury_probability(grid, sex=sex)
+        prob = 100.0 * vibration.injury_probability(grid, sex=sex)
         ax_r.plot(grid, prob, color=colour, label=f"{sex}")
     # The worked example: five 40 m/s2 peaks, 82 kg male -> R = 1.22.
-    sd = compression_dose(dose_from_peaks([40.0] * 5), mz=MZ_MALE)
-    r_male = injury_risk(sd, start_age=20, years=20, days_per_year=120, sex="male")
+    sd = vibration.compression_dose(
+        vibration.dose_from_peaks([40.0] * 5), mz=MZ_MALE
+    )
+    r_male = vibration.injury_risk(
+        sd, start_age=20, years=20, days_per_year=120, sex="male"
+    )
     for level, r_val in zip((10, 50, 90), RISK_THRESHOLDS_MALE):
         ax_r.axhline(level, color="#7f7f7f", linestyle=":", lw=0.8)
         ax_r.plot([r_val, r_val], [0.0, level], color="#7f7f7f", linestyle=":", lw=0.8)
-    ax_r.scatter([r_male], [100.0 * injury_probability(r_male, sex="male")],
-                 color=COLOR_TERTIARY, marker="*", s=160, zorder=4,
-                 label=f"Example  $R$ = {r_male:.2f}")
+    ax_r.scatter(
+        [r_male],
+        [100.0 * vibration.injury_probability(r_male, sex="male")],
+        color=COLOR_TERTIARY,
+        marker="*",
+        s=160,
+        zorder=4,
+        label=f"Example  $R$ = {r_male:.2f}",
+    )
     ax_r.set_xlabel("Stress variable $R$")
     ax_r.set_ylabel("Probability of lumbar injury [%]")
     ax_r.set_title("Injury probability (Annex C)", pad=10)
@@ -870,7 +885,7 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
 def generate_junction_kij_thickness(output_dir: str) -> None:
     """Wave-approach Kij versus the plate thickness ratio (Hopkins Eq. 5.116)."""
     print("Generating junction_kij_thickness...")
-    from phonometry import junction_transmission, wave_vibration_reduction_index
+    from phonometry import vibration
 
     # Concrete plates (cL = 3200 m/s, rho = 2400 kg/m3): plate 1 fixed at
     # 100 mm, plate 2 swept from 50 mm to 400 mm.
@@ -882,14 +897,25 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     }
     for ratio in ratios:
         h2 = h1 * float(ratio)
-        res_x = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+        res_x = vibration.junction_transmission(
+            "X", h1, cl, rho * h1, h2, cl, rho * h2
+        )
         assert res_x.straight_average is not None
         curves["X corner"].append(res_x.corner_reduction_index)
-        curves["X straight"].append(float(wave_vibration_reduction_index(
-            res_x.straight_average, res_x.critical_frequency2)))
-        res_t = junction_transmission("T1", h1, cl, rho * h1, h2, cl, rho * h2)
+        curves["X straight"].append(
+            float(
+                vibration.wave_vibration_reduction_index(
+                    res_x.straight_average, res_x.critical_frequency2
+                )
+            )
+        )
+        res_t = vibration.junction_transmission(
+            "T1", h1, cl, rho * h1, h2, cl, rho * h2
+        )
         curves["T-junction (1) corner"].append(res_t.corner_reduction_index)
-        res_l = junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
+        res_l = vibration.junction_transmission(
+            "L", h1, cl, rho * h1, h2, cl, rho * h2
+        )
         curves["L corner"].append(res_l.corner_reduction_index)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
@@ -898,7 +924,9 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     for (label, values), (ls, color) in zip(curves.items(), styles):
         ax.plot(ratios, values, ls, color=color, linewidth=2.0, label=label)
     # The identical-plate X-junction: Kij = 10 log10 12 + 5 log10(fc2/1000).
-    res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
+    res_eq = vibration.junction_transmission(
+        "X", h1, cl, rho * h1, h1, cl, rho * h1
+    )
     ax.scatter([1.0], [res_eq.corner_reduction_index], color=COLOR_FG, s=70,
                zorder=6, label=r"identical plates ($\tau = 1/12$)")
 
@@ -928,12 +956,12 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
 def generate_bearing_fault_envelope(output_dir: str) -> None:
     """Predicted bearing fault lines over a measured envelope spectrum."""
     print("Generating bearing_fault_envelope...")
-    from phonometry import bearing_fault_frequencies, envelope_spectrum, noise_signal
+    from phonometry import signals, vibration
 
     # Norton problem 8.5 geometry: fifteen rollers, 34 mm pitch diameter,
     # 6 mm rollers, 12.96 deg contact angle, 2000 r/min.
-    faults = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                       contact_angle_deg=12.96)
+    faults = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                                 contact_angle_deg=12.96)
     bpfo, fs_shaft = faults["BPFO"], faults.shaft_rate
 
     # A spalled outer race: one impact per BPFO period ringing a 3 kHz housing
@@ -949,9 +977,9 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
     ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
     x = np.convolve(impacts, ring)[: t.size] * 0.6
     x += 0.35 * np.sin(2.0 * np.pi * fs_shaft * t)          # residual unbalance
-    x += noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
+    x += signals.noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
 
-    res = envelope_spectrum(x, fs, band=(2000.0, 4000.0))
+    res = signals.envelope_spectrum(x, fs, band=(2000.0, 4000.0))
     keep = res.frequencies <= 4.6 * bpfo
     freq, amp = res.frequencies[keep], res.amplitude[keep]
 
@@ -1002,15 +1030,7 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
 def generate_experimental_sea_clf(output_dir: str) -> None:
     """Measured and predicted coupling loss factors of a plate junction."""
     print("Generating experimental_sea_clf...")
-    from phonometry import (
-        coupling_loss_factor,
-        cylindrical_shell_modal_density,
-        flat_plate_modal_density,
-        plate_bending_stiffness,
-        point_connection_coupling_loss_factor,
-        power_injection_clf,
-        right_angle_transmission_coefficient,
-    )
+    from phonometry import vibration
     from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
     rho, nu, young = 2700.0, 0.33, 7.1e10
@@ -1020,13 +1040,20 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     # Two aluminium plates at right angles: 3 mm x 2.5 m x 1.2 m coupled to
     # 5.5 mm x 2.0 m x 1.2 m along the 1.2 m edge (Norton problem 6.13).
     h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
-    tau = right_angle_transmission_coefficient(
+    tau = vibration.right_angle_transmission_coefficient(
         h1, h2, density1=rho, density2=rho, wave_speed1=c_l, wave_speed2=c_l)
-    c_b = plate_bending_wave_speed(bands, plate_bending_stiffness(young, h1, nu),
-                                   rho * h1)
-    welded = np.array([float(coupling_loss_factor(tau, 2.0 * c, length, f, area1))
-                       for c, f in zip(c_b, bands, strict=True)])
-    bolted = point_connection_coupling_loss_factor(
+    c_b = plate_bending_wave_speed(
+        bands, vibration.plate_bending_stiffness(young, h1, nu), rho * h1
+    )
+    welded = np.array(
+        [
+            float(
+                vibration.coupling_loss_factor(tau, 2.0 * c, length, f, area1)
+            )
+            for c, f in zip(c_b, bands, strict=True)
+        ]
+    )
+    bolted = vibration.point_connection_coupling_loss_factor(
         bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
         surface_density2=rho * h2, wave_speed1=c_l, wave_speed2=c_l,
         plate_area1=area1)
@@ -1036,13 +1063,18 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     t_p, t_c, radius, cyl_len = 0.005, 0.003, 0.75, 2.0
     area_c = 2.0 * math.pi * radius * cyl_len
     area_p = 3.5 * 3.0 - math.pi * radius**2
-    sea = power_injection_clf(
+    sea = vibration.power_injection_clf(
         500.0,
         rho * t_p * area_p * 0.0272**2,
         rho * t_c * area_c * 0.0132**2,
-        4.4e-3, 2.4e-3,
-        flat_plate_modal_density(area_p, t_p, c_l),
-        float(cylindrical_shell_modal_density(500.0, area_c, t_c, radius, c_l)[0]),
+        4.4e-3,
+        2.4e-3,
+        vibration.flat_plate_modal_density(area_p, t_p, c_l),
+        float(
+            vibration.cylindrical_shell_modal_density(
+                500.0, area_c, t_c, radius, c_l
+            )[0]
+        ),
     )
 
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.6))
@@ -1100,11 +1132,11 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
 def generate_mobility_result_lines(output_dir: str) -> None:
     """ISO 7626 driving-point mobility with its stiffness and mass lines."""
     print("Generating mobility_result_lines...")
-    from phonometry import sdof_mobility_result
+    from phonometry import vibration
 
     m, k, c = 2.0, 8000.0, 5.0
     f = np.logspace(np.log10(0.5), np.log10(200.0), 400)
-    res = sdof_mobility_result(f, mass=m, stiffness=k, damping=c)
+    res = vibration.sdof_mobility_result(f, mass=m, stiffness=k, damping=c)
     w = 2.0 * np.pi * f
     f0 = float(res.frequencies[int(np.argmax(res.magnitude))])
 
@@ -1214,11 +1246,7 @@ def _relabel_spectrum(ax: Axes, title: str) -> None:
 def generate_machine_fault_families(output_dir: str) -> None:
     """The three fault families of Norton 8.4 as patterns, not as numbers."""
     print("Generating machine_fault_families...")
-    from phonometry import (
-        blade_pass_frequencies,
-        gear_mesh_frequencies,
-        induction_motor_frequencies,
-    )
+    from phonometry import vibration
 
     # Wide panels: the three gear clusters sit 100 Hz wide on a 2400 Hz axis
     # and the fan's four lines cut its axis into narrow columns, so the room
@@ -1226,7 +1254,9 @@ def generate_machine_fault_families(output_dir: str) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.8))
 
     # --- (a) and (b): the same gear pair with two different faults ----------
-    gear = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+    gear = vibration.gear_mesh_frequencies(
+        1500.0, 28, harmonics=3, sidebands=2
+    )
     shaft = gear.shaft_rate                                    # 25 Hz
     gmf = gear["GMF"]                                          # 700 Hz
     cases = (
@@ -1262,7 +1292,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
 
     # --- (c): the motor family, three decades of amplitude ------------------
     ax = axes[1][0]
-    motor = induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
+    motor = vibration.induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
     freq = np.linspace(0.0, 3900.0, 7800)
     spec = _LineSpectrum(freq, floor=2.0e-5)
     for name, height in (("1x", 1.0), ("2x", 0.30), ("2fe", 0.06)):
@@ -1285,7 +1315,7 @@ def generate_machine_fault_families(output_dir: str) -> None:
 
     # --- (d): the ducted fan, blade rate against its lobe patterns ----------
     ax = axes[1][1]
-    fan = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
+    fan = vibration.blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
     freq = np.linspace(0.0, 420.0, 3200)
     spec = _LineSpectrum(freq, floor=0.006)
     spec.add(fan.shaft_rate, 0.10, width=0.8)
@@ -1331,10 +1361,10 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
     print("Generating envelope_chain_steps...")
     from scipy import signal as sp_signal
 
-    from phonometry import bearing_fault_frequencies, envelope_spectrum, noise_signal
+    from phonometry import signals, vibration
 
-    faults = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                       contact_angle_deg=12.96)
+    faults = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                                 contact_angle_deg=12.96)
     bpfo, fs_shaft = faults["BPFO"], faults.shaft_rate
 
     # The record of the opening figure: impacts at BPFO ringing a 3 kHz
@@ -1350,10 +1380,10 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
     ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
     x = np.convolve(impacts, ring)[: t.size] * 0.6
     x += 0.35 * np.sin(2.0 * np.pi * fs_shaft * t)
-    x += noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
+    x += signals.noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
 
     band = (2000.0, 4000.0)
-    res = envelope_spectrum(x, fs, band=band)
+    res = signals.envelope_spectrum(x, fs, band=band)
     sos = sp_signal.butter(4, band, btype="bandpass", fs=fs, output="sos")
     narrow = np.asarray(sp_signal.sosfiltfilt(sos, x), dtype=np.float64)
 
@@ -1424,7 +1454,7 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
 def generate_infinite_mobilities(output_dir: str) -> None:
     """The point mobilities a real structure has, beside the SDOF reference."""
     print("Generating infinite_mobilities...")
-    from phonometry import sdof_mobility_result, vibration
+    from phonometry import vibration
 
     freq = np.logspace(np.log10(0.5), np.log10(2000.0), 600)
 
@@ -1435,7 +1465,9 @@ def generate_infinite_mobilities(output_dir: str) -> None:
     b_beam = 2.1e11 * 0.1 * 0.2**3 / 12.0
     beam = vibration.infinite_beam_point_mobility(freq, b_beam, 7800.0 * 0.02)
     rod = vibration.longitudinal_rod_mobility(7800.0, 5100.0, 2.0e-4)
-    sdof = sdof_mobility_result(freq, mass=2.0, stiffness=8000.0, damping=5.0)
+    sdof = vibration.sdof_mobility_result(
+        freq, mass=2.0, stiffness=8000.0, damping=5.0
+    )
 
     fig, (ax, low) = plt.subplots(
         2, 1, figsize=(10, 7.6), sharex=True,
@@ -1491,7 +1523,7 @@ def generate_infinite_mobilities(output_dir: str) -> None:
 def generate_mobility_random_error(output_dir: str) -> None:
     """ISO 7626-2 Annex A: how many averages the 5 % criterion costs."""
     print("Generating mobility_random_error...")
-    from phonometry import random_error_percent
+    from phonometry import vibration
 
     averages = np.unique(np.round(
         np.logspace(np.log10(2.0), np.log10(1000.0), 260)))
@@ -1500,8 +1532,13 @@ def generate_mobility_random_error(output_dir: str) -> None:
                COLOR_FG)
     for coherence, colour in zip((0.5, 0.7, 0.8, 0.9, 0.95), palette,
                                  strict=True):
-        error = np.array([float(random_error_percent(coherence, int(n)))
-                          for n in np.round(averages)], dtype=np.float64)
+        error = np.array(
+            [
+                float(vibration.random_error_percent(coherence, int(n)))
+                for n in np.round(averages)
+            ],
+            dtype=np.float64,
+        )
         ax.loglog(averages, error, color=colour, linewidth=2.0,
                   label=rf"$\gamma^2 = {coherence}$")
         needed = (1.0 - coherence) / (2.0 * coherence * 0.05**2)
@@ -1511,10 +1548,16 @@ def generate_mobility_random_error(output_dir: str) -> None:
                     color=colour)
     ax.axhline(5.0, color=COLOR_FG, linestyle="--", linewidth=1.4,
                label="the Annex A criterion, 5 %")
-    ax.scatter([75.0], [float(random_error_percent(0.8, 75))], marker="*",
-               s=190, color=COLOR_FG, zorder=7,
-               label=r"the standard's own example: $\gamma^2 = 0.8$, "
-                     "$n$ = 75 → 4.08 %")
+    ax.scatter(
+        [75.0],
+        [float(vibration.random_error_percent(0.8, 75))],
+        marker="*",
+        s=190,
+        color=COLOR_FG,
+        zorder=7,
+        label=r"the standard's own example: $\gamma^2 = 0.8$, "
+        "$n$ = 75 → 4.08 %",
+    )
 
     ax.set_xlabel("Number of averaged spectra $n$")
     ax.set_ylabel(r"Normalized random error $\varepsilon$ [%]")

@@ -23,7 +23,7 @@ import numpy as np
 import reference_data as ref
 from scipy import signal as sg
 
-from phonometry import FilterDesign, OctaveFilterBank, WeightingFilter
+from phonometry import filters
 from phonometry.filters.compliance import class_limits, verify_filter_class
 from phonometry.filters.weighting import _runtime_frequency_response
 
@@ -80,9 +80,9 @@ def _filter_class(arch: str, fraction: float) -> FilterClass:
     same designed SOS, so they cannot disagree with the library margin (a
     smoke-test guard asserts the re-derived margin equals the library's).
     """
-    bank = OctaveFilterBank(
+    bank = filters.OctaveFilterBank(
         48000, fraction=fraction, order=6, limits=[100, 10000],
-        design=FilterDesign(filter_type=arch),
+        design=filters.FilterDesign(filter_type=arch),
     )
     result = verify_filter_class(bank)
     bands = result["bands"]
@@ -137,7 +137,7 @@ def _weighting_deviation(curve: str, fs: int) -> WeightingDeviation:
     class-1 acceptance limits; for G it is the ISO 7196 Annex A.3 +/-1 dB
     instrumentation tolerance.
     """
-    wf = WeightingFilter(fs, curve)
+    wf = filters.WeightingFilter(fs, curve)
     if curve == "G":
         rows = [r for r in ref.ISO7196_TABLE2 if r[0] < fs / 2]
         # Table 2 lists nominal one-third-octave labels; evaluate at the

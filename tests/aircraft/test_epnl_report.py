@@ -21,7 +21,7 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import ReportMetadata, effective_perceived_noise_level
+from phonometry import ReportMetadata, aircraft
 
 _PDF_MAGIC = b"%PDF"
 
@@ -36,7 +36,7 @@ def _flyover():
     gain = 24.0 * np.exp(-((idx - 12.0) ** 2) / (2 * 3.5**2)) - 3.0
     spectra = (46.0 + shape)[None, :] + gain[:, None]
     spectra[:, 17] += 10.0 * np.exp(-((idx - 12.0) ** 2) / (2 * 4.0**2))
-    return effective_perceived_noise_level(spectra, dt)
+    return aircraft.effective_perceived_noise_level(spectra, dt)
 
 
 def _assert_one_page(path: str) -> None:

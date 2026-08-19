@@ -7,13 +7,7 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import (
-    adaptation_term_kc,
-    combine_subareas,
-    intensity_element_normalized_difference,
-    intensity_sound_reduction,
-    surface_pressure_intensity_indicator,
-)
+from phonometry import building
 
 
 def _levels_for_target_ri(ri, lp1, sm, s):
@@ -29,9 +23,13 @@ def _levels_for_target_ri(ri, lp1, sm, s):
 
 def test_ri_reproduces_formula_7_scalar() -> None:
     """RI = Lp1 - 6 - [LIn + 10 lg(Sm/S)] band by band."""
-    r = intensity_sound_reduction([80.0], [40.0], measurement_area=10.0, area=10.0)
+    r = building.intensity_sound_reduction(
+        [80.0], [40.0], measurement_area=10.0, area=10.0
+    )
     assert r.r_i[0] == pytest.approx(34.0)  # 80 - 6 - 40 - 0
-    r2 = intensity_sound_reduction([80.0], [40.0], measurement_area=20.0, area=10.0)
+    r2 = building.intensity_sound_reduction(
+        [80.0], [40.0], measurement_area=20.0, area=10.0
+    )
     assert r2.r_i[0] == pytest.approx(34.0 - 10.0 * np.log10(2.0))
 
 
@@ -43,7 +41,7 @@ def test_ri_reproduces_iso717_rw_through_intensity_path() -> None:
         ref.ISO15186_1_REF_SM,
         ref.ISO15186_1_REF_S,
     )
-    result = intensity_sound_reduction(
+    result = building.intensity_sound_reduction(
         [ref.ISO15186_1_REF_LP1] * 16,
         lin,
         measurement_area=ref.ISO15186_1_REF_SM,
@@ -58,10 +56,10 @@ def test_ri_energy_averages_positions() -> None:
     """A 2-D (positions, bands) input is energy-averaged before Formula (7)."""
     positions = np.array([[40.0, 42.0], [46.0, 44.0]])
     avg = 10.0 * np.log10(np.mean(10.0 ** (0.1 * positions), axis=0))
-    r_multi = intensity_sound_reduction(
+    r_multi = building.intensity_sound_reduction(
         [[80.0, 80.0], [80.0, 80.0]], positions, measurement_area=10.0, area=10.0
     )
-    r_avg = intensity_sound_reduction(
+    r_avg = building.intensity_sound_reduction(
         [80.0, 80.0], avg, measurement_area=10.0, area=10.0
     )
     np.testing.assert_allclose(r_multi.r_i, r_avg.r_i)
@@ -74,8 +72,8 @@ def test_ri_modified_adds_kc() -> None:
     )
     freq = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
                      1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
-    kc = adaptation_term_kc(freq)
-    result = intensity_sound_reduction(
+    kc = building.adaptation_term_kc(freq)
+    result = building.intensity_sound_reduction(
         [85.0] * 16, lin, measurement_area=12.0, area=10.0, kc=kc
     )
     assert result.r_i_modified is not None
@@ -87,7 +85,7 @@ def test_ri_modified_adds_kc() -> None:
 
 def test_ri_rating_none_off_band_count() -> None:
     """No automatic rating when the band count is neither 16 nor 5."""
-    r = intensity_sound_reduction(
+    r = building.intensity_sound_reduction(
         [80.0] * 18, [40.0] * 18, measurement_area=10.0, area=10.0
     )
     assert r.rating is None
@@ -102,14 +100,14 @@ def test_ri_rating_none_off_band_count() -> None:
 
 def test_kc_reproduces_printed_table_b1() -> None:
     """Kc reproduces all 21 printed Table B.1 rows at one decimal place."""
-    kc = adaptation_term_kc(ref.ISO15186_1_KC_BANDS)
+    kc = building.adaptation_term_kc(ref.ISO15186_1_KC_BANDS)
     np.testing.assert_allclose(kc, ref.ISO15186_1_KC_B1_PRINTED, atol=0.05)
 
 
 def test_kc_b1_reference_room_reduces_to_b2() -> None:
     """Formula (B.1) with the reference room equals (B.2) within 0,001 dB."""
-    b2 = adaptation_term_kc(ref.ISO15186_1_KC_BANDS)
-    b1 = adaptation_term_kc(
+    b2 = building.adaptation_term_kc(ref.ISO15186_1_KC_BANDS)
+    b1 = building.adaptation_term_kc(
         ref.ISO15186_1_KC_BANDS, boundary_area=117.0, volume=81.0
     )
     np.testing.assert_allclose(b1, b2, atol=1e-3)
@@ -117,15 +115,15 @@ def test_kc_b1_reference_room_reduces_to_b2() -> None:
 
 def test_kc_decreases_with_frequency() -> None:
     """Kc is strictly monotone decreasing (the 61,4/f term shrinks)."""
-    kc = adaptation_term_kc([100.0, 200.0, 400.0, 800.0, 1600.0])
+    kc = building.adaptation_term_kc([100.0, 200.0, 400.0, 800.0, 1600.0])
     assert np.all(np.diff(kc) < 0.0)
 
 
 def test_kc_requires_both_room_parameters() -> None:
     with pytest.raises(ValueError, match="both"):
-        adaptation_term_kc([500.0], boundary_area=117.0)
+        building.adaptation_term_kc([500.0], boundary_area=117.0)
     with pytest.raises(ValueError, match="both"):
-        adaptation_term_kc([500.0], volume=81.0)
+        building.adaptation_term_kc([500.0], volume=81.0)
 
 
 # ---------------------------------------------------------------------------
@@ -141,12 +139,12 @@ def test_element_normalized_difference_formula_8() -> None:
     docs/ERRATA.md); the per-unit value adds it, and n > 1 warns about the
     deviation from the print.
     """
-    d = intensity_element_normalized_difference(
+    d = building.intensity_element_normalized_difference(
         [80.0], [40.0], measurement_area=10.0, n=1
     )
     assert d.d_i_n_e[0] == pytest.approx(34.0)  # Sm = A0, N = 1
     with pytest.warns(UserWarning, match="Formula \\(8\\)"):
-        d2 = intensity_element_normalized_difference(
+        d2 = building.intensity_element_normalized_difference(
             [80.0], [40.0], measurement_area=10.0, n=2
         )
     assert d2.d_i_n_e[0] == pytest.approx(34.0 + 10.0 * np.log10(2.0))
@@ -156,7 +154,7 @@ def test_element_normalized_difference_formula_8() -> None:
 
 def test_element_normalized_rejects_bad_n() -> None:
     with pytest.raises(ValueError, match="positive integer"):
-        intensity_element_normalized_difference(
+        building.intensity_element_normalized_difference(
             [80.0], [40.0], measurement_area=10.0, n=0
         )
 
@@ -167,13 +165,15 @@ def test_element_normalized_rejects_bad_n() -> None:
 
 
 def test_fpi_is_lp_minus_lin() -> None:
-    fpi = surface_pressure_intensity_indicator([60.0, 58.0], [55.0, 54.0])
+    fpi = building.surface_pressure_intensity_indicator(
+        [60.0, 58.0], [55.0, 54.0]
+    )
     np.testing.assert_allclose(fpi, [5.0, 4.0])
 
 
 def test_fpi_shape_mismatch_raises() -> None:
     with pytest.raises(ValueError, match="share their shape"):
-        surface_pressure_intensity_indicator([60.0, 58.0], [55.0])
+        building.surface_pressure_intensity_indicator([60.0, 58.0], [55.0])
 
 
 # ---------------------------------------------------------------------------
@@ -183,14 +183,16 @@ def test_fpi_shape_mismatch_raises() -> None:
 
 def test_combine_subareas_energy_average() -> None:
     """Equal-level subareas average to the same level; Sm is the total."""
-    lin, sm = combine_subareas([[40.0, 42.0], [40.0, 42.0]], [5.0, 5.0])
+    lin, sm = building.combine_subareas(
+        [[40.0, 42.0], [40.0, 42.0]], [5.0, 5.0]
+    )
     np.testing.assert_allclose(lin, [40.0, 42.0])
     assert sm == pytest.approx(10.0)
 
 
 def test_combine_subareas_area_weighting() -> None:
     """The larger subarea dominates the energy average."""
-    lin, sm = combine_subareas([[50.0], [40.0]], [9.0, 1.0])
+    lin, sm = building.combine_subareas([[50.0], [40.0]], [9.0, 1.0])
     expected = 10.0 * np.log10((9.0 * 10 ** 5.0 + 1.0 * 10 ** 4.0) / 10.0)
     assert lin[0] == pytest.approx(expected)
     assert sm == pytest.approx(10.0)
@@ -198,33 +200,33 @@ def test_combine_subareas_area_weighting() -> None:
 
 def test_combine_subareas_validation() -> None:
     with pytest.raises(ValueError, match="two-dimensional"):
-        combine_subareas([40.0, 42.0], [5.0])
+        building.combine_subareas([40.0, 42.0], [5.0])
     with pytest.raises(ValueError, match="one area per subarea"):
-        combine_subareas([[40.0, 42.0], [40.0, 42.0]], [5.0])
+        building.combine_subareas([[40.0, 42.0], [40.0, 42.0]], [5.0])
     with pytest.raises(ValueError, match="non-zero"):
-        combine_subareas([[40.0], [42.0]], [5.0, 0.0])
+        building.combine_subareas([[40.0], [42.0]], [5.0, 0.0])
 
 
 def test_combine_subareas_negative_direction_rule() -> None:
     """Clause 6.4.6: a reverse-flow subarea enters Formula (11) with -Smi
     while Sm keeps the unsigned area sum (Formula (12))."""
     # Forward 9 m2 at 50 dB, reverse 1 m2 at 40 dB (~10 % reverse power).
-    lin, sm = combine_subareas([[50.0], [40.0]], [9.0, -1.0])
+    lin, sm = building.combine_subareas([[50.0], [40.0]], [9.0, -1.0])
     expected = 10.0 * np.log10((9.0 * 10**5.0 - 1.0 * 10**4.0) / 10.0)
     assert lin[0] == pytest.approx(expected)
     assert sm == pytest.approx(10.0)  # Sm = sum(|Smi|)
     # The unsigned sum would overestimate LIn by 10 lg(9,1/8,9) ~ 0,1 dB of
     # numerator energy for this case; check the exact signed/unsigned gap.
-    unsigned, _ = combine_subareas([[50.0], [40.0]], [9.0, 1.0])
+    unsigned, _ = building.combine_subareas([[50.0], [40.0]], [9.0, 1.0])
     assert unsigned[0] - lin[0] == pytest.approx(10.0 * np.log10(9.1 / 8.9))
 
 
 def test_combine_subareas_reverse_flow_dominating_raises() -> None:
     # Reverse energy equal to (or exceeding) the forward flow leaves no level.
     with pytest.raises(ValueError, match="not positive"):
-        combine_subareas([[50.0], [50.0]], [5.0, -5.0])
+        building.combine_subareas([[50.0], [50.0]], [5.0, -5.0])
     with pytest.raises(ValueError, match="not positive"):
-        combine_subareas([[50.0], [53.0]], [5.0, -5.0])
+        building.combine_subareas([[50.0], [53.0]], [5.0, -5.0])
 
 
 # ---------------------------------------------------------------------------
@@ -234,20 +236,24 @@ def test_combine_subareas_reverse_flow_dominating_raises() -> None:
 
 def test_reduction_rejects_nonpositive_areas() -> None:
     with pytest.raises(ValueError, match="measurement_area"):
-        intensity_sound_reduction([80.0], [40.0], measurement_area=0.0, area=10.0)
+        building.intensity_sound_reduction(
+            [80.0], [40.0], measurement_area=0.0, area=10.0
+        )
     with pytest.raises(ValueError, match="area"):
-        intensity_sound_reduction([80.0], [40.0], measurement_area=10.0, area=-1.0)
+        building.intensity_sound_reduction(
+            [80.0], [40.0], measurement_area=10.0, area=-1.0
+        )
 
 
 def test_reduction_band_count_mismatch_raises() -> None:
     with pytest.raises(ValueError, match="band count"):
-        intensity_sound_reduction(
+        building.intensity_sound_reduction(
             [80.0, 80.0], [40.0], measurement_area=10.0, area=10.0
         )
 
 
 def test_kc_band_count_mismatch_raises() -> None:
     with pytest.raises(ValueError, match="band count"):
-        intensity_sound_reduction(
+        building.intensity_sound_reduction(
             [80.0], [40.0], measurement_area=10.0, area=10.0, kc=[1.0, 2.0]
         )

@@ -13,13 +13,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    SpectrogramResult,
-    ZoomFFTResult,
-    power_spectral_density,
-    spectrogram,
-    zoom_fft,
-)
+from phonometry import signals
 
 REF_PRESSURE = 2e-5
 
@@ -48,7 +42,7 @@ class TestSpectrogramCalibration:
         fs = 48000.0
         rms = REF_PRESSURE * 10.0 ** (80.0 / 20.0)  # 80 dB SPL
         x = _tone(fs, 1.0, 1125.0, rms * np.sqrt(2.0))
-        res = spectrogram(x, fs, nperseg=4096, scaling="spectrum")
+        res = signals.spectrogram(x, fs, nperseg=4096, scaling="spectrum")
         bin_index = int(np.argmin(np.abs(res.frequencies - 1125.0)))
         assert res.frequencies[bin_index] == pytest.approx(1125.0)
         levels = 10.0 * np.log10(res.power[bin_index] / REF_PRESSURE**2)
@@ -57,7 +51,7 @@ class TestSpectrogramCalibration:
     def test_tone_peaks_at_its_frequency(self) -> None:
         fs = 8192.0
         x = _tone(fs, 2.0, 1000.0, 1.0)
-        res = spectrogram(x, fs, nperseg=1024)
+        res = signals.spectrogram(x, fs, nperseg=1024)
         ridge = res.frequencies[np.argmax(res.power, axis=0)]
         np.testing.assert_allclose(ridge, 1000.0)
 
@@ -67,8 +61,8 @@ class TestSpectrogramCalibration:
         fs = 8192.0
         x = rng.standard_normal(4 * 8192)
         for scaling in ("density", "spectrum"):
-            res = spectrogram(x, fs, nperseg=512, scaling=scaling)  # type: ignore[arg-type]
-            psd = power_spectral_density(x, fs, nperseg=512, scaling=scaling)  # type: ignore[arg-type]
+            res = signals.spectrogram(x, fs, nperseg=512, scaling=scaling)  # type: ignore[arg-type]
+            psd = signals.power_spectral_density(x, fs, nperseg=512, scaling=scaling)  # type: ignore[arg-type]
             np.testing.assert_allclose(res.frequencies, psd.frequencies)
             np.testing.assert_allclose(
                 np.mean(res.power, axis=1), psd.psd, rtol=1e-10
@@ -93,7 +87,7 @@ class TestSpectrogramCalibration:
         n = 8192
         x = np.zeros(n)
         x[2048:4096] = rng.standard_normal(2048)  # interior burst
-        res = spectrogram(x, fs, nperseg=nperseg, overlap=0.75)
+        res = signals.spectrogram(x, fs, nperseg=nperseg, overlap=0.75)
         df = res.frequencies[1] - res.frequencies[0]
         hop_seconds = res.hop / fs
         stft_energy = hop_seconds * float(np.sum(res.power)) * df
@@ -108,7 +102,7 @@ class TestSpectrogramCalibration:
         beta = (f1 - f0) / duration
         t = np.arange(int(fs * duration)) / fs
         x = np.cos(2.0 * np.pi * (f0 * t + 0.5 * beta * t**2))
-        res = spectrogram(x, fs, nperseg=512)
+        res = signals.spectrogram(x, fs, nperseg=512)
         ridge = res.frequencies[np.argmax(res.power, axis=0)]
         expected = f0 + beta * res.times
         df = fs / 512
@@ -116,8 +110,8 @@ class TestSpectrogramCalibration:
 
     def test_result_fields(self) -> None:
         fs = 1000.0
-        res = spectrogram(np.ones(1000), fs, nperseg=100, overlap=0.5)
-        assert isinstance(res, SpectrogramResult)
+        res = signals.spectrogram(np.ones(1000), fs, nperseg=100, overlap=0.5)
+        assert isinstance(res, signals.SpectrogramResult)
         assert res.power.shape == (51, res.n_segments)
         assert res.times.shape == (res.n_segments,)
         assert res.hop == 50
@@ -131,22 +125,22 @@ class TestSpectrogramValidation:
     def test_rejects_bad_overlap(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="overlap"):
-            spectrogram(x, 1000.0, overlap=1.0)
+            signals.spectrogram(x, 1000.0, overlap=1.0)
 
     def test_rejects_bad_scaling(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="scaling"):
-            spectrogram(x, 1000.0, scaling="amplitude")  # type: ignore[arg-type]
+            signals.spectrogram(x, 1000.0, scaling="amplitude")  # type: ignore[arg-type]
 
     def test_rejects_short_signal(self) -> None:
         x = np.ones(8)
         with pytest.raises(ValueError, match="too short"):
-            spectrogram(x, 1000.0)
+            signals.spectrogram(x, 1000.0)
 
     def test_rejects_bad_nperseg(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="nperseg"):
-            spectrogram(x, 1000.0, nperseg=2048)
+            signals.spectrogram(x, 1000.0, nperseg=2048)
 
 
 # ---------------------------------------------------------------------------
@@ -187,7 +181,9 @@ class TestZoomFFTExactness:
         amp = 0.7
         t = np.arange(n) / fs
         x = amp * np.cos(2.0 * np.pi * 1100.0 * t + 0.3)
-        res = zoom_fft(x, fs, f_min=1000.0, f_max=1256.0, n_points=257, window="boxcar")
+        res = signals.zoom_fft(
+            x, fs, f_min=1000.0, f_max=1256.0, n_points=257, window="boxcar"
+        )
 
         # Frequency recovered exactly on the zoom grid.
         peak = int(np.argmax(res.amplitude))
@@ -211,7 +207,9 @@ class TestZoomFFTExactness:
         x = rng.standard_normal(n)
         # Zoom grid at the record resolution fs/n = 2 Hz: every zoom
         # point sits on an rfft bin.
-        res = zoom_fft(x, fs, f_min=500.0, f_max=756.0, n_points=129, window="boxcar")
+        res = signals.zoom_fft(
+            x, fs, f_min=500.0, f_max=756.0, n_points=129, window="boxcar"
+        )
         bins = np.round(res.frequencies * n / fs).astype(int)
         full = np.fft.rfft(x)[bins] * 2.0 / n
         np.testing.assert_allclose(res.spectrum, full, rtol=1e-9, atol=1e-12)
@@ -228,7 +226,7 @@ class TestZoomFFTExactness:
         x = 0.8 * np.cos(2.0 * np.pi * 997.0 * t) + 0.5 * np.cos(
             2.0 * np.pi * 1000.0 * t
         )
-        res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=37)
+        res = signals.zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=37)
         i1 = int(np.argmin(np.abs(res.frequencies - 997.0)))
         i2 = int(np.argmin(np.abs(res.frequencies - 1000.0)))
         assert res.amplitude[i1] == pytest.approx(0.8, rel=1e-6)
@@ -239,20 +237,24 @@ class TestZoomFFTExactness:
 
     def test_default_grid_matches_the_record_resolution(self) -> None:
         fs = 1000.0
-        res = zoom_fft(np.ones(2000), fs, f_min=100.0, f_max=200.0)
+        res = signals.zoom_fft(np.ones(2000), fs, f_min=100.0, f_max=200.0)
         assert res.bin_spacing == pytest.approx(fs / 2000.0)
 
     def test_power_is_the_tone_mean_square(self) -> None:
         fs = 8192.0
         x = _tone(fs, 0.5, 1024.0, 2.0)
-        res = zoom_fft(x, fs, f_min=1000.0, f_max=1048.0, window="boxcar")
+        res = signals.zoom_fft(
+            x, fs, f_min=1000.0, f_max=1048.0, window="boxcar"
+        )
         peak = int(np.argmax(res.power))
         assert res.frequencies[peak] == 1024.0
         assert res.power[peak] == pytest.approx(2.0, rel=1e-12)  # A^2/2
 
     def test_result_fields(self) -> None:
-        res = zoom_fft(np.ones(1000), 1000.0, f_min=100.0, f_max=200.0, n_points=51)
-        assert isinstance(res, ZoomFFTResult)
+        res = signals.zoom_fft(
+            np.ones(1000), 1000.0, f_min=100.0, f_max=200.0, n_points=51
+        )
+        assert isinstance(res, signals.ZoomFFTResult)
         assert res.n_points == 51
         assert res.frequencies[0] == 100.0
         assert res.frequencies[-1] == 200.0
@@ -268,27 +270,27 @@ class TestZoomFFTValidation:
     def test_rejects_inverted_band(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="zoom band"):
-            zoom_fft(x, 1000.0, f_min=300.0, f_max=200.0)
+            signals.zoom_fft(x, 1000.0, f_min=300.0, f_max=200.0)
 
     def test_rejects_band_above_nyquist(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="zoom band"):
-            zoom_fft(x, 1000.0, f_min=100.0, f_max=600.0)
+            signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=600.0)
 
     def test_rejects_negative_f_min(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="zoom band"):
-            zoom_fft(x, 1000.0, f_min=-10.0, f_max=200.0)
+            signals.zoom_fft(x, 1000.0, f_min=-10.0, f_max=200.0)
 
     def test_rejects_single_point_grid(self) -> None:
         x = np.ones(1024)
         with pytest.raises(ValueError, match="n_points"):
-            zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0, n_points=1)
+            signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0, n_points=1)
 
     def test_rejects_short_signal(self) -> None:
         x = np.ones(8)
         with pytest.raises(ValueError, match="too short"):
-            zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0)
+            signals.zoom_fft(x, 1000.0, f_min=100.0, f_max=200.0)
 
 
 # ---------------------------------------------------------------------------
@@ -299,13 +301,13 @@ class TestZoomFFTValidation:
 class TestSingleComponentBins:
     def test_spectrogram_dc_reads_the_squared_offset(self) -> None:
         fs = 1000.0
-        res = spectrogram(
+        res = signals.spectrogram(
             np.full(1000, 3.0), fs, nperseg=100, scaling="spectrum"
         )
         np.testing.assert_allclose(res.power[0], 9.0, rtol=1e-12)
 
     def test_zoom_fft_dc_reads_the_offset(self) -> None:
-        res = zoom_fft(
+        res = signals.zoom_fft(
             np.full(1000, 3.0), 1000.0, f_min=0.0, f_max=100.0, window="boxcar"
         )
         assert res.amplitude[0] == pytest.approx(3.0, rel=1e-12)

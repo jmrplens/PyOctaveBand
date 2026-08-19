@@ -23,7 +23,7 @@ import pytest
 pytest.importorskip("reportlab")
 
 import phonometry as ph
-from phonometry import ReportMetadata, SourceEmission
+from phonometry import ReportMetadata, environment
 
 _PDF_MAGIC = b"%PDF"
 _BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
@@ -36,9 +36,9 @@ def _attenuation() -> ph.OutdoorAttenuation:
     )
 
 
-def _emission() -> SourceEmission:
+def _emission() -> environment.SourceEmission:
     """A flat 100 dB octave-band source power (matches a tested composition)."""
-    return SourceEmission(sound_power_level=np.full(8, 100.0))
+    return environment.SourceEmission(sound_power_level=np.full(8, 100.0))
 
 
 def _barrier(method: str = "exact") -> ph.BarrierInsertionLoss:
@@ -100,7 +100,7 @@ def test_attenuation_without_emission_boxes_total_range(tmp_path) -> None:
 def test_attenuation_emission_length_mismatch_raises(tmp_path) -> None:
     """A source power that does not match the band count is rejected."""
     result = _attenuation()
-    bad = SourceEmission(sound_power_level=np.full(4, 100.0))
+    bad = environment.SourceEmission(sound_power_level=np.full(4, 100.0))
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="one value per frequency"):
         result.report(out, source_emission=bad)

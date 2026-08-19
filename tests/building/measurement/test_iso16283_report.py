@@ -30,13 +30,7 @@ from reference_data import (
     ISO717_2_ANNEX_C1_LN as _IMPACT_LN,
 )
 
-from phonometry import (
-    AirborneInsulationResult,
-    ImpactInsulationResult,
-    ReportMetadata,
-    airborne_insulation,
-    impact_insulation,
-)
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 
@@ -46,11 +40,11 @@ _PDF_MAGIC = b"%PDF"
 _T_AT_T0 = np.full(16, 0.5)
 
 
-def _airborne_result(**kwargs) -> AirborneInsulationResult:
+def _airborne_result(**kwargs) -> building.AirborneInsulationResult:
     """A field airborne result whose ``DnT`` equals the ISO 717-1 Annex C curve."""
     l1 = np.full(16, 90.0)
     l2 = l1 - np.asarray(_AIRBORNE_R, dtype=np.float64)
-    return airborne_insulation(l1, l2, _T_AT_T0, **kwargs)
+    return building.airborne_insulation(l1, l2, _T_AT_T0, **kwargs)
 
 
 def _assert_one_page(path: str) -> None:
@@ -83,7 +77,7 @@ def test_dnt_reverberation_correction_hand_computed() -> None:
     """DnT = D + 10 lg(T/T0) (ISO 16283-1 Formula (2)) for T = 1,0 s."""
     l1 = np.full(16, 90.0)
     l2 = l1 - np.asarray(_AIRBORNE_R, dtype=np.float64)
-    result = airborne_insulation(l1, l2, np.full(16, 1.0))
+    result = building.airborne_insulation(l1, l2, np.full(16, 1.0))
     assert np.allclose(result.dnt, result.d + 10.0 * np.log10(2.0))
 
 
@@ -124,13 +118,13 @@ def test_r_prime_fiche_hand_computed(tmp_path) -> None:
 
 def test_impact_lnt_equals_li_at_reference_time() -> None:
     """With T = T0 the impact correction vanishes: L'nT = Li exactly."""
-    result = impact_insulation(_IMPACT_LN, _T_AT_T0)
+    result = building.impact_insulation(_IMPACT_LN, _T_AT_T0)
     assert np.allclose(result.l_n_t, _IMPACT_LN)
 
 
 def test_impact_fiche_rating_pinned_to_iso717_2_annex_c(tmp_path) -> None:
     """The L'nT fiche's rating is the published ISO 717-2 Annex C 79 (-11) dB."""
-    result = impact_insulation(_IMPACT_LN, _T_AT_T0, volume=31.25)
+    result = building.impact_insulation(_IMPACT_LN, _T_AT_T0, volume=31.25)
     out = tmp_path / "lnt.pdf"
     result.report(str(out))
     _assert_one_page(str(out))
@@ -149,7 +143,7 @@ def test_impact_l_n_fiche_hand_computed(tmp_path) -> None:
     V = 31,25 m3 and T = 0,5 s give A = 10 m2 = A0, so L'n = Li and the
     normalized fiche prints the same Annex C rating as the standardized one.
     """
-    result = impact_insulation(_IMPACT_LN, _T_AT_T0, volume=31.25)
+    result = building.impact_insulation(_IMPACT_LN, _T_AT_T0, volume=31.25)
     assert result.l_n is not None
     assert np.allclose(result.l_n, _IMPACT_LN)
     out = tmp_path / "ln.pdf"
@@ -192,7 +186,7 @@ def test_requirement_verdicts_pass_and_fail(tmp_path) -> None:
     airborne.report(str(failing), metadata=ReportMetadata(requirement=50.0))
     assert "FAIL" in _extract_text(str(failing))
 
-    impact = impact_insulation(_IMPACT_LN, _T_AT_T0)  # L'nT,w = 79 dB
+    impact = building.impact_insulation(_IMPACT_LN, _T_AT_T0)  # L'nT,w = 79 dB
     passing = tmp_path / "impact_pass.pdf"
     impact.report(str(passing), metadata=ReportMetadata(requirement=80.0))
     assert "PASS" in _extract_text(str(passing))
@@ -231,7 +225,7 @@ def test_unknown_quantity_rejected(tmp_path) -> None:
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="quantity"):
         airborne.report(out, quantity="dn")
-    impact = impact_insulation(_IMPACT_LN, _T_AT_T0)
+    impact = building.impact_insulation(_IMPACT_LN, _T_AT_T0)
     with pytest.raises(ValueError, match="quantity"):
         impact.report(out, quantity="dnt")
 
@@ -246,7 +240,7 @@ def test_missing_r_prime_rejected(tmp_path) -> None:
 
 def test_non_core_band_count_rejected(tmp_path) -> None:
     """The field fiche needs the 16 core one-third-octave bands."""
-    result = airborne_insulation(
+    result = building.airborne_insulation(
         np.full(5, 90.0), np.full(5, 50.0), np.full(5, 0.5)
     )
     out = str(tmp_path / "x.pdf")
@@ -257,7 +251,7 @@ def test_non_core_band_count_rejected(tmp_path) -> None:
 def test_verbose_needs_measurement_chain(tmp_path) -> None:
     """``verbose=True`` on a manually built result (no chain) is rejected."""
     curve = np.asarray(_AIRBORNE_R, dtype=np.float64)
-    bare = AirborneInsulationResult(d=curve, dnt=curve, r_prime=None)
+    bare = building.AirborneInsulationResult(d=curve, dnt=curve, r_prime=None)
     rejected = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="measurement chain"):
         bare.report(rejected, verbose=True)
@@ -270,7 +264,7 @@ def test_verbose_needs_measurement_chain(tmp_path) -> None:
 def test_manual_impact_result_renders_without_chain(tmp_path) -> None:
     """A backward-compatibly built impact result reports its L'nT fiche."""
     curve = np.asarray(_IMPACT_LN, dtype=np.float64)
-    bare = ImpactInsulationResult(l_n_t=curve, l_n=None)
+    bare = building.ImpactInsulationResult(l_n_t=curve, l_n=None)
     out = tmp_path / "bare_impact.pdf"
     bare.report(str(out))
     _assert_one_page(str(out))

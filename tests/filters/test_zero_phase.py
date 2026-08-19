@@ -6,14 +6,14 @@ Tests for zero-phase (sosfiltfilt) filtering in OctaveFilterBank.
 import numpy as np
 import pytest
 
-from phonometry import BlockProcessing, FilterDesign, OctaveFilterBank
+from phonometry import filters
 
 FS = 48000
 
 
 def test_zero_phase_no_group_delay() -> None:
     """A pulse filtered zero-phase keeps its energy centered at the pulse time."""
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
     x = np.zeros(FS)
     center = FS // 2
     x[center] = 1.0
@@ -30,7 +30,7 @@ def test_zero_phase_doubles_attenuation() -> None:
     Measured on the steady-state middle segment: the whole-signal RMS is
     dominated by the filter onset transient, which masks the difference.
     """
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
     t = np.arange(FS) / FS
     x = np.sin(2 * np.pi * 4000 * t)  # far out of band
 
@@ -43,8 +43,11 @@ def test_zero_phase_doubles_attenuation() -> None:
 
 
 def test_zero_phase_rejects_stateful() -> None:
-    bank = OctaveFilterBank(fs=FS, design=FilterDesign(resample=False),
-                            block_processing=BlockProcessing(stateful=True))
+    bank = filters.OctaveFilterBank(
+        fs=FS,
+        design=filters.FilterDesign(resample=False),
+        block_processing=filters.BlockProcessing(stateful=True),
+    )
     silence = np.zeros(FS)
     with pytest.raises(ValueError, match="zero_phase"):
         bank.filter(silence, zero_phase=True)
@@ -52,7 +55,7 @@ def test_zero_phase_rejects_stateful() -> None:
 
 def test_zero_phase_passband_level_matches() -> None:
     """In-band level must match forward filtering (0 dB passband both ways)."""
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
     t = np.arange(FS * 2) / FS
     x = np.sin(2 * np.pi * 1000 * t)
     spl_fwd, _ = bank.filter(x)
@@ -64,7 +67,7 @@ def test_zero_phase_broadband_band_narrowing() -> None:
     """Forward-backward filtering narrows the effective passband, lowering the
     measured broadband band level ~0.2-0.3 dB per band (a pure center tone,
     tested above, does not exercise this). Characterizes the documented bias."""
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[100, 8000])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 8000])
     x = np.random.default_rng(7).standard_normal(FS * 4)
     spl_fwd, _ = bank.filter(x)
     spl_zp, _ = bank.filter(x, zero_phase=True)
@@ -77,14 +80,14 @@ def test_zero_phase_broadband_band_narrowing() -> None:
 
 def test_zero_phase_short_signal_does_not_crash() -> None:
     """Heavily decimated bands can be shorter than sosfiltfilt's default padlen."""
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[100, 200])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 200])
     x = np.random.default_rng(3).standard_normal(4000)  # ~23 samples after decimation
     spl, _freq = bank.filter(x, zero_phase=True)
     assert np.all(np.isfinite(spl))
 
 
 def test_spectrogram_supports_zero_phase() -> None:
-    bank = OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
+    bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[800, 1200])
     x = np.random.default_rng(4).standard_normal(FS)
     levels_zp, _, _times = bank.spectrogram(x, window_time=0.125, zero_phase=True)
     levels_fwd, _, _ = bank.spectrogram(x, window_time=0.125, zero_phase=False)

@@ -56,7 +56,7 @@ def _expansion_chamber_fields(
     """
     import fdtd2d
 
-    from phonometry import expansion_chamber
+    from phonometry import noise_control
 
     dx = _CHAMBER_DX
     pipe_cells = round(_CHAMBER_BORE / dx)               # 20 cells
@@ -70,7 +70,7 @@ def _expansion_chamber_fields(
     air[:, c0:c1] = True
     rho_map = np.where(air, 1.2, 1.2e6)
     f_pass, f_peak = _expansion_chamber_freqs()
-    tls = expansion_chamber(
+    tls = noise_control.expansion_chamber(
         np.array([f_pass, f_peak]), _CHAMBER_L,
         _CHAMBER_M * _CHAMBER_PIPE_A, _CHAMBER_PIPE_A).transmission_loss
     # Clip duration per the deepest-reflector rule: d(source -> chamber

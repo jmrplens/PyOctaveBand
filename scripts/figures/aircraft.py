@@ -36,7 +36,7 @@ from .theme import (
 def generate_epnl(output_dir: str) -> None:
     """ICAO aircraft-flyover EPNL: PNL/PNLT time history with the 10 dB-down window."""
     print("Generating epnl...")
-    from phonometry import NOY_BANDS, effective_perceived_noise_level
+    from phonometry import aircraft
 
     k = 41
     dt = 0.5
@@ -44,11 +44,13 @@ def generate_epnl(output_dir: str) -> None:
     # Broadband flyover spectrum with a mid-frequency emphasis, modulated by a
     # Gaussian overall-level envelope; a fan tone in the 2500 Hz band adds a
     # tone correction near the closest-point-of-approach.
-    shape = 15.0 * np.exp(-((np.log10(NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5)
+    shape = 15.0 * np.exp(
+        -((np.log10(aircraft.NOY_BANDS) - np.log10(400.0)) ** 2) / 0.5
+    )
     gain = 30.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 5.0**2)) - 5.0
     spectra = (55.0 + shape)[None, :] + gain[:, None]
     spectra[:, 17] += 12.0 * np.exp(-((idx - 20.0) ** 2) / (2 * 6.0**2))
-    res = effective_perceived_noise_level(spectra, dt)
+    res = aircraft.effective_perceived_noise_level(spectra, dt)
     kf, kl = res.band_limits
 
     _fig, ax = plt.subplots(figsize=(10, 6))
@@ -81,12 +83,14 @@ def generate_epnl(output_dir: str) -> None:
 def generate_aircraft_atmospheric_absorption(output_dir: str) -> None:
     """SAE ARP 5534 band vs pure-tone mid-band atmospheric attenuation."""
     print("Generating aircraft_atmospheric_absorption...")
-    from phonometry import sae_band_attenuation
+    from phonometry import aircraft
 
     freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)  # 50 Hz - 10 kHz thirds
     _fig, ax = plt.subplots(figsize=(10, 6))
     for s, color in ((1000.0, COLOR_SECONDARY), (7620.0, COLOR_PRIMARY)):
-        res = sae_band_attenuation(freqs, s, temperature=25.0, relative_humidity=70.0)
+        res = aircraft.sae_band_attenuation(
+            freqs, s, temperature=25.0, relative_humidity=70.0
+        )
         ax.plot(res.frequency, res.band_attenuation, color=color, linewidth=2.0,
                 marker="o", markersize=3, label=f"SAE band ({s:.0f} m)")
         # The pure-tone mid-band curve belongs to the band curve above it, so
@@ -115,7 +119,7 @@ def generate_aircraft_atmospheric_absorption(output_dir: str) -> None:
 def generate_airport_noise(output_dir: str) -> None:
     """ECAC Doc 29 noise-power-distance interpolation for two power settings."""
     print("Generating airport_noise...")
-    from phonometry import npd_curve
+    from phonometry import aircraft
 
     # A schematic NPD table (SEL vs slant distance) for two thrust settings.
     powers = [12000.0, 20000.0]
@@ -126,7 +130,7 @@ def generate_airport_noise(output_dir: str) -> None:
     ]
     _fig, ax = plt.subplots(figsize=(10, 6))
     for p, color in ((20000.0, COLOR_PRIMARY), (12000.0, COLOR_SECONDARY)):
-        res = npd_curve(powers, distances, levels, p)
+        res = aircraft.npd_curve(powers, distances, levels, p)
         ax.plot(res.distance, res.level, color=color, linewidth=2.0,
                 label=f"$P$ = {p:.0f} N")
         ax.plot(res.table_distances, res.table_levels, "o", color=color, markersize=4)
@@ -148,7 +152,7 @@ def generate_airport_noise(output_dir: str) -> None:
 def generate_airport_contour(output_dir: str) -> None:
     """ECAC Doc 29 single-event SEL contour for a departure flight path."""
     print("Generating airport_contour...")
-    from phonometry import FlightSegmentState, noise_contour
+    from phonometry import aircraft
 
     powers = [8000.0, 12000.0]
     distances = [60.0, 120.0, 240.0, 480.0, 960.0, 1920.0, 3840.0, 7680.0]
@@ -163,9 +167,16 @@ def generate_airport_contour(output_dir: str) -> None:
     power = np.where(xs < 3000.0, 12000.0, 10000.0)
     path = np.column_stack([xs, np.zeros_like(xs), z, power, np.full_like(xs, vref)])
     ground_roll = xs[:-1] < 1500.0  # takeoff roll: segments still on the runway
-    res = noise_contour(path, powers, distances, sel, lmax,
-                        segments=FlightSegmentState(ground_roll=ground_roll),
-                        x=np.linspace(-2500.0, 20000.0, 56), y=np.linspace(-6000.0, 6000.0, 44))
+    res = aircraft.noise_contour(
+        path,
+        powers,
+        distances,
+        sel,
+        lmax,
+        segments=aircraft.FlightSegmentState(ground_roll=ground_roll),
+        x=np.linspace(-2500.0, 20000.0, 56),
+        y=np.linspace(-6000.0, 6000.0, 44),
+    )
     ax = res.plot()
     plt.gcf().set_size_inches(10, 5.5)
     ax.set_title("Aircraft Departure SEL Contour (ECAC Doc 29)", pad=12)
@@ -177,7 +188,7 @@ def generate_airport_contour(output_dir: str) -> None:
 def generate_airport_sor(output_dir: str) -> None:
     """ECAC Doc 29 start-of-roll directivity: the rearward jet/turboprop lobe."""
     print("Generating airport_sor...")
-    from phonometry import start_of_roll_directivity
+    from phonometry import aircraft
 
     dsor = 300.0  # < 762 m normalising distance: no distance de-emphasis
     # ΔSOR is defined only in the rearward arc (ψ from 90° abeam to 180° directly
@@ -185,8 +196,12 @@ def generate_airport_sor(output_dir: str) -> None:
     # measured clockwise from the nose; 90°/270° = abeam, 180° = directly behind.
     az = np.linspace(90.0, 270.0, 361)
     psi = np.where(az <= 180.0, az, 360.0 - az)
-    jet = np.array([start_of_roll_directivity(p, dsor, "jet") for p in psi])
-    prop = np.array([start_of_roll_directivity(p, dsor, "turboprop") for p in psi])
+    jet = np.array(
+        [aircraft.start_of_roll_directivity(p, dsor, "jet") for p in psi]
+    )
+    prop = np.array(
+        [aircraft.start_of_roll_directivity(p, dsor, "turboprop") for p in psi]
+    )
 
     # A polar Axes always reserves the full circle's square bounding box, which
     # wastes the upper half for a rearward half-disc. So the half-rose is drawn
@@ -242,12 +257,16 @@ def generate_airport_sor(output_dir: str) -> None:
 def generate_rotorcraft_ground_effect(output_dir: str) -> None:
     """ECAC Doc 32 ground-effect ΔLg vs frequency for soft vs hard ground."""
     print("Generating rotorcraft_ground_effect...")
-    from phonometry import ground_effect_adjustment
+    from phonometry import aircraft
 
     freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
-    hs, hr, dp = 150.0, 1.5, 500.0                         # overflight geometry
-    grass = ground_effect_adjustment(freqs, hs, hr, dp, flow_resistivity="D")
-    asphalt = ground_effect_adjustment(freqs, hs, hr, dp, flow_resistivity="G")
+    hs, hr, dp = 150.0, 1.5, 500.0  # overflight geometry
+    grass = aircraft.ground_effect_adjustment(
+        freqs, hs, hr, dp, flow_resistivity="D"
+    )
+    asphalt = aircraft.ground_effect_adjustment(
+        freqs, hs, hr, dp, flow_resistivity="G"
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.5)
@@ -278,11 +297,7 @@ def generate_rotorcraft_ground_effect(output_dir: str) -> None:
 def generate_rotorcraft_flyover_event(output_dir: str) -> None:
     """ECAC Doc 32 single-event LA(t) time history of a level flyover."""
     print("Generating rotorcraft_flyover_event...")
-    from phonometry import (
-        RotorcraftGround,
-        RotorcraftHemisphere,
-        rotorcraft_event_level,
-    )
+    from phonometry import aircraft
 
     # Synthetic helicopter-like hemisphere on the standard 31-band 10 deg grid:
     # low-frequency dominated spectrum with a mild forward-lobed directivity.
@@ -293,15 +308,15 @@ def generate_rotorcraft_flyover_event(output_dir: str) -> None:
     direct = -0.045 * np.abs(po - 80.0)                      # forward lobe
     levels = spectrum[None, None, :] + direct[None, :, None] \
         - 0.02 * np.abs(az)[:, None, None]
-    hemisphere = RotorcraftHemisphere(freqs, az, po, levels)
+    hemisphere = aircraft.RotorcraftHemisphere(freqs, az, po, levels)
 
     speed = 30.87                                            # 60 kt, in m/s
     t = np.arange(0.0, 130.01, 0.5)
     track = np.column_stack([np.zeros_like(t), speed * (t - 65.0),
                              np.full_like(t, 150.0)])
-    event = rotorcraft_event_level(
+    event = aircraft.rotorcraft_event_level(
         [hemisphere], [speed], [0.0], t, track, (120.0, 0.0),
-        ground=RotorcraftGround(flow_resistivity="D"))
+        ground=aircraft.RotorcraftGround(flow_resistivity="D"))
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     # The subscripts are descriptive (A weighting, A-weighted Slow maximum), so
@@ -340,15 +355,19 @@ def generate_rotorcraft_flyover_event(output_dir: str) -> None:
 def generate_rotorcraft_terrain_screening(output_dir: str) -> None:
     """ECAC Doc 32 / NORAH2 terrain screening: section geometry and adjustment."""
     print("Generating rotorcraft_terrain_screening...")
-    from phonometry import ground_effect_adjustment, terrain_screening_adjustment
+    from phonometry import aircraft
 
     freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)   # 50 Hz-10 kHz thirds
     d = np.array([0.0, 150.0, 260.0, 300.0, 340.0, 420.0, 600.0])
     z = np.array([0.0, 4.0, 48.0, 62.0, 40.0, 8.0, 2.0])
     src = (0.0, 90.0)                                       # helicopter
-    rcv = (600.0, 2.0 + 1.2)                                # microphone at 1.2 m
-    res = terrain_screening_adjustment(freqs, src, rcv, d, z, flow_resistivity="D")
-    flat = ground_effect_adjustment(freqs, src[1], 1.2, rcv[0], flow_resistivity="D")
+    rcv = (600.0, 2.0 + 1.2)  # microphone at 1.2 m
+    res = aircraft.terrain_screening_adjustment(
+        freqs, src, rcv, d, z, flow_resistivity="D"
+    )
+    flat = aircraft.ground_effect_adjustment(
+        freqs, src[1], 1.2, rcv[0], flow_resistivity="D"
+    )
 
     _fig, (ax, ax2) = plt.subplots(2, 1, figsize=(10, 8),
                                   gridspec_kw={"height_ratios": [1.1, 1.0]})
@@ -378,7 +397,7 @@ def generate_rotorcraft_terrain_screening(output_dir: str) -> None:
 def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
     """Pure diffraction attenuation ΔLd against path difference δ (Eq. 42-44)."""
     print("Generating rotorcraft_insertion_loss...")
-    from phonometry import diffraction_attenuation
+    from phonometry import aircraft
 
     # A single low ridge edge, shallow enough that Ch < 1 still bites on the
     # lowest band (Eq. 43: Ch = min(f h0/250, 1)) while the three higher
@@ -390,8 +409,12 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
     bands = np.array([63.0, 250.0, 1000.0, 4000.0])
     band_labels = ["63 Hz", "250 Hz", "1 kHz", "4 kHz"]
     delta = np.linspace(-0.4, 1.5, 441)
-    ld = np.array([diffraction_attenuation(bands, float(d), edge_height=h0)
-                   for d in delta])   # (len(delta), len(bands))
+    ld = np.array(
+        [
+            aircraft.diffraction_attenuation(bands, float(d), edge_height=h0)
+            for d in delta
+        ]
+    )   # (len(delta), len(bands))
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     ax.axvspan(float(delta.min()), 0.0, color=theme_fill(COLOR_MUTED, ax),
@@ -437,22 +460,22 @@ def generate_rotorcraft_insertion_loss(output_dir: str) -> None:
 def generate_anp_npd(output_dir: str) -> None:
     """NPD curves of a real ANP aircraft, one per tabulated thrust setting."""
     print("Generating anp_npd...")
-    from phonometry import load_anp_database
+    from phonometry import aircraft
 
     # A real fleet entry rather than a schematic table: the 747-100 is one of
     # the aircraft whose ANP record carries a fixed-point profile, so the same
     # aircraft can illustrate the profile figure below.
-    aircraft = load_anp_database().aircraft("747100")
-    curves = aircraft.npd_curves("D", "SEL")
+    airframe = aircraft.load_anp_database().aircraft("747100")
+    curves = airframe.npd_curves("D", "SEL")
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     curves.plot(ax=ax)
-    ax.set_title(f"ANP NPD Curves - {aircraft.description} (SEL, departure)",
+    ax.set_title(f"ANP NPD Curves - {airframe.description} (SEL, departure)",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
     ax.set_axisbelow(True)
     ax.text(0.02, 0.06,
-            f"power parameter: {aircraft.power_parameter}\n"
+            f"power parameter: {airframe.power_parameter}\n"
             "markers: tabulated NPD nodes",
             transform=ax.transAxes, va="bottom", fontsize=9,
             bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
@@ -464,14 +487,14 @@ def generate_anp_npd(output_dir: str) -> None:
 def generate_anp_profile(output_dir: str) -> None:
     """Default fixed-point departure trajectory of a real ANP aircraft."""
     print("Generating anp_profile...")
-    from phonometry import load_anp_database
+    from phonometry import aircraft
 
-    aircraft = load_anp_database().aircraft("747100")
-    profile = aircraft.profile("D", stage_length=1)
+    airframe = aircraft.load_anp_database().aircraft("747100")
+    profile = airframe.profile("D", stage_length=1)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
     profile.plot(ax=ax)
-    ax.set_title(f"ANP Default Departure Profile - {aircraft.description}",
+    ax.set_title(f"ANP Default Departure Profile - {airframe.description}",
                  pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
@@ -514,12 +537,19 @@ def _doc29_departure() -> "tuple[Any, Any, Any]":
 def generate_airport_segment_breakdown(output_dir: str) -> None:
     """ECAC Doc 29: which segments of a departure carry the SEL at one receiver."""
     print("Generating airport_segment_breakdown...")
-    from phonometry import FlightSegmentState, event_level
+    from phonometry import aircraft
 
     path, ground_roll, _xs = _doc29_departure()
     obs = [3000.0, 500.0, 1.2]
-    res = event_level(path, obs, _DOC29_POWERS, _DOC29_DISTANCES, _DOC29_SEL,
-                      _DOC29_LMAX, segments=FlightSegmentState(ground_roll=ground_roll))
+    res = aircraft.event_level(
+        path,
+        obs,
+        _DOC29_POWERS,
+        _DOC29_DISTANCES,
+        _DOC29_SEL,
+        _DOC29_LMAX,
+        segments=aircraft.FlightSegmentState(ground_roll=ground_roll),
+    )
     seg = np.asarray(res.segment_levels, dtype=np.float64)
     top = int(np.argmax(seg))
 
@@ -557,14 +587,7 @@ def generate_airport_segment_breakdown(output_dir: str) -> None:
 def generate_airport_segment_corrections(output_dir: str) -> None:
     """ECAC Doc 29: how large each per-segment correction is, and where it bites."""
     print("Generating airport_segment_corrections...")
-    from phonometry import (
-        duration_correction,
-        engine_installation_correction,
-        impedance_adjustment,
-        lateral_attenuation,
-        noise_fraction,
-        npd_level,
-    )
+    from phonometry import aircraft
 
     _fig, axes = plt.subplots(2, 2, figsize=(11, 8))
     (ax_i, ax_l), (ax_f, ax_v) = axes
@@ -574,7 +597,9 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     for mounting, color, label in (("wing", COLOR_PRIMARY, "Wing-mounted"),
                                    ("fuselage", COLOR_SECONDARY, "Fuselage-mounted"),
                                    ("propeller", COLOR_TERTIARY, "Propeller")):
-        di = np.array([engine_installation_correction(p, mounting) for p in phi])
+        di = np.array(
+            [aircraft.engine_installation_correction(p, mounting) for p in phi]
+        )
         ax_i.plot(phi, di, color=color, lw=2.0, label=label)
     ax_i.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.4)
     ax_i.set(xlabel=r"Depression angle $\varphi$ [°]",
@@ -587,7 +612,7 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     beta = np.linspace(0.0, 90.0, 361)
     for ell, color in ((100.0, COLOR_TERTIARY), (300.0, COLOR_SECONDARY),
                        (914.0, COLOR_PRIMARY)):
-        lam = np.array([lateral_attenuation(b, ell) for b in beta])
+        lam = np.array([aircraft.lateral_attenuation(b, ell) for b in beta])
         ax_l.plot(beta, lam, color=color, lw=2.0, label=rf"$\ell$ = {ell:.0f} m")
     ax_l.axvline(50.0, color=COLOR_FG, lw=1.0, ls="--", alpha=0.5)
     ax_l.text(51.0, 8.0, r"$\Lambda = 0$ above 50°", fontsize=8, color=COLOR_FG)
@@ -598,14 +623,43 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
     ax_l.legend(loc="upper right", fontsize=8)
 
     # (c) noise fraction: the share of the infinite path a finite segment gives.
-    d_lambda = (2.0 / np.pi) * _VREF_MS * 10.0 ** (
-        (float(npd_level(_DOC29_POWERS, _DOC29_DISTANCES, _DOC29_SEL, 12000.0, 526.0)[0])
-         - float(npd_level(_DOC29_POWERS, _DOC29_DISTANCES, _DOC29_LMAX, 12000.0, 526.0)[0]))
-        / 10.0)
+    d_lambda = (
+        (2.0 / np.pi)
+        * _VREF_MS
+        * 10.0
+        ** (
+            (
+                float(
+                    aircraft.npd_level(
+                        _DOC29_POWERS,
+                        _DOC29_DISTANCES,
+                        _DOC29_SEL,
+                        12000.0,
+                        526.0,
+                    )[0]
+                )
+                - float(
+                    aircraft.npd_level(
+                        _DOC29_POWERS,
+                        _DOC29_DISTANCES,
+                        _DOC29_LMAX,
+                        12000.0,
+                        526.0,
+                    )[0]
+                )
+            )
+            / 10.0
+        )
+    )
     for length, color, label in ((464.0, COLOR_PRIMARY, r"$\lambda$ = 464 m"),
                                  (2000.0, COLOR_SECONDARY, r"$\lambda$ = 2 000 m")):
         frac = np.linspace(-1.0, 2.0, 601)
-        df = np.array([noise_fraction(f * length, length, d_lambda) for f in frac])
+        df = np.array(
+            [
+                aircraft.noise_fraction(f * length, length, d_lambda)
+                for f in frac
+            ]
+        )
         ax_f.plot(frac, df, color=color, lw=2.0, label=label)
     ax_f.axvspan(0.0, 1.0, color=theme_fill(COLOR_PRIMARY, ax_f), zorder=0)
     ax_f.text(0.5, -13.0, "observer alongside", ha="center", fontsize=8,
@@ -617,7 +671,7 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
 
     # (d) duration correction, with the impedance adjustment for scale.
     v = np.linspace(50.0, 130.0, 401)
-    dv = np.array([duration_correction(_VREF_MS, s) for s in v])
+    dv = np.array([aircraft.duration_correction(_VREF_MS, s) for s in v])
     ax_v.plot(v, dv, color=COLOR_PRIMARY, lw=2.0)
     ax_v.axvline(_VREF_MS, color=COLOR_FG, lw=1.0, ls="--", alpha=0.5)
     ax_v.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.4)
@@ -629,14 +683,20 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
              ylabel=r"$\Delta V$ [dB]")
     ax_v.set_title("(d) Duration correction (Eq. 4-14)", fontsize=11,
                    )
-    ax_v.text(0.98, 0.96,
-              "impedance adjustment (Eq. 4-6/4-7), for scale:\n"
-              f"15 °C, 101.3 kPa: {_fmt_minus(impedance_adjustment(), '+.2f')} dB\n"
-              f"30 °C, 101.3 kPa: {_fmt_minus(impedance_adjustment(30.0), '+.2f')} dB\n"
-              f"15 °C, 95.0 kPa: "
-              f"{_fmt_minus(impedance_adjustment(15.0, 95.0), '+.2f')} dB",
-              transform=ax_v.transAxes, ha="right", va="top", fontsize=8,
-              bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6})
+    ax_v.text(
+        0.98,
+        0.96,
+        "impedance adjustment (Eq. 4-6/4-7), for scale:\n"
+        f"15 °C, 101.3 kPa: {_fmt_minus(aircraft.impedance_adjustment(), '+.2f')} dB\n"
+        f"30 °C, 101.3 kPa: {_fmt_minus(aircraft.impedance_adjustment(30.0), '+.2f')} dB\n"
+        f"15 °C, 95.0 kPa: "
+        f"{_fmt_minus(aircraft.impedance_adjustment(15.0, 95.0), '+.2f')} dB",
+        transform=ax_v.transAxes,
+        ha="right",
+        va="top",
+        fontsize=8,
+        bbox={"boxstyle": "round", "facecolor": COLOR_GRID, "alpha": 0.6},
+    )
 
     for ax in axes.ravel():
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
@@ -649,9 +709,9 @@ def generate_airport_segment_corrections(output_dir: str) -> None:
 def generate_anp_contour(output_dir: str) -> None:
     """The same Doc 29 contour, driven by a real ANP record instead of a table."""
     print("Generating anp_contour...")
-    from phonometry import load_anp_database
+    from phonometry import aircraft
 
-    record = load_anp_database().aircraft("747100")
+    record = aircraft.load_anp_database().aircraft("747100")
     profile = record.profile("D", stage_length=1)
     x = np.linspace(-2000.0, 12000.0, 40)
     y = np.linspace(-3000.0, 3000.0, 30)
@@ -700,7 +760,7 @@ def _synthetic_hemisphere(masked: bool = False) -> "Any":
     interaction. With ``masked`` the bins a ground array cannot reach are
     ``NaN``, as a measured hemisphere's are.
     """
-    from phonometry import RotorcraftHemisphere
+    from phonometry import aircraft
 
     freqs = 1000.0 * 10.0 ** (np.arange(-20, 11) / 10.0)   # 10 Hz - 10 kHz
     az = np.arange(-90.0, 91.0, 10.0)                      # 19 azimuths
@@ -718,7 +778,7 @@ def _synthetic_hemisphere(masked: bool = False) -> "Any":
         unseen = ((np.abs(az)[:, None] > 60.0)
                   | (po[None, :] < 40.0) | (po[None, :] > 140.0))
         levels = np.where(unseen[:, :, None], np.nan, levels)
-    return RotorcraftHemisphere(freqs, az, po, levels)
+    return aircraft.RotorcraftHemisphere(freqs, az, po, levels)
 
 
 def _level_flyover_track() -> "tuple[Any, Any, float]":
@@ -733,7 +793,7 @@ def _level_flyover_track() -> "tuple[Any, Any, float]":
 def generate_rotorcraft_hemisphere(output_dir: str) -> None:
     """ECAC Doc 32: the source hemisphere, in section and over the whole grid."""
     print("Generating rotorcraft_hemisphere...")
-    from phonometry import hemisphere_source_level
+    from phonometry import aircraft
 
     h = _synthetic_hemisphere(masked=True)
     freqs = np.asarray(h.frequencies)
@@ -765,8 +825,15 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
     spread_per_band = np.nanmax(lv, axis=(0, 1)) - np.nanmin(lv, axis=(0, 1))
     idx = int(np.nanargmax(spread_per_band))
     grid = lv[:, :, idx]
-    filled = np.array([[hemisphere_source_level(h, float(a), float(p))[idx]
-                        for p in po] for a in az])
+    filled = np.array(
+        [
+            [
+                aircraft.hemisphere_source_level(h, float(a), float(p))[idx]
+                for p in po
+            ]
+            for a in az
+        ]
+    )
     cs = ax2.contourf(po, az, filled, levels=12, cmap="viridis")
     # The measured patch as an outline rather than a hatch: everything
     # outside it is the gap-filling of Eq. 6/7, not data.
@@ -793,11 +860,7 @@ def generate_rotorcraft_hemisphere(output_dir: str) -> None:
 def generate_rotorcraft_hover_ring(output_dir: str) -> None:
     """NORAH2 guidance §A.3.5: the hover ring and the Table 3 derived sources."""
     print("Generating rotorcraft_hover_ring...")
-    from phonometry import (
-        hemisphere_source_level,
-        hover_derived_hemisphere,
-        hover_ring_hemisphere,
-    )
+    from phonometry import aircraft
 
     # A ground-ring measurement with the shape of a real campaign: one
     # 31-band spectrum per 30 deg bearing, reduced to the 70 m polar
@@ -809,7 +872,7 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
     directivity = (3.5 * np.cos(np.radians(bearings))
                    + 3.0 * np.exp(-((bearings - 120.0) ** 2) / (2.0 * 40.0**2)))
     ring = spectrum[None, :] + directivity[:, None]
-    hige = hover_ring_hemisphere(freqs, bearings, ring, distance=70.0)
+    hige = aircraft.hover_ring_hemisphere(freqs, bearings, ring, distance=70.0)
 
     k = int(np.argmin(np.abs(np.asarray(freqs) - 315.0)))
     _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.2))
@@ -832,19 +895,23 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
     conditions = (
         ("HIGE (from the ring)", hige, COLOR_PRIMARY, "-"),
         ("HOGE (+12 dB)",
-         hover_derived_hemisphere(hige, "out_of_ground_hover"),
+         aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover"),
          COLOR_SECONDARY, "--"),
         ("Full-rpm idle (−2.5 dB)",
-         hover_derived_hemisphere(hige, "full_rpm_idle"),
+         aircraft.hover_derived_hemisphere(hige, "full_rpm_idle"),
          COLOR_TERTIARY, "--"),
         ("Reduced-rpm idle (−12 dB)",
-         hover_derived_hemisphere(hige, "reduced_rpm_idle"),
+         aircraft.hover_derived_hemisphere(hige, "reduced_rpm_idle"),
          COLOR_QUATERNARY, "--"),
     )
     top = 0.0
     for label, hemisphere, color, style in conditions:
-        section = np.array([hemisphere_source_level(hemisphere, 0.0, t)[k]
-                            for t in theta])
+        section = np.array(
+            [
+                aircraft.hemisphere_source_level(hemisphere, 0.0, t)[k]
+                for t in theta
+            ]
+        )
         top = max(top, float(section.max()))
         ax2.plot(theta, section, color=color, ls=style, lw=1.8, label=label)
     ax2.set_ylim(top=top + 8.0)          # room for the legend above the curves
@@ -869,7 +936,7 @@ def generate_rotorcraft_hover_ring(output_dir: str) -> None:
 def generate_rotorcraft_contour(output_dir: str) -> None:
     """ECAC Doc 32 SEL footprint, over uniform grass and across a hard strip."""
     print("Generating rotorcraft_contour...")
-    from phonometry import RotorcraftGround, rotorcraft_noise_contour
+    from phonometry import aircraft
 
     h = _synthetic_hemisphere()
     t, track, speed = _level_flyover_track()
@@ -882,12 +949,21 @@ def generate_rotorcraft_contour(output_dir: str) -> None:
 
     _fig, axes = plt.subplots(1, 2, figsize=(11, 6.4))
     for ax, ground, title in (
-            (axes[0], RotorcraftGround(flow_resistivity="D"),
+            (axes[0], aircraft.RotorcraftGround(flow_resistivity="D"),
              "Uniform pasture (class D)"),
-            (axes[1], RotorcraftGround(flow_resistivity=sigma),
+            (axes[1], aircraft.RotorcraftGround(flow_resistivity=sigma),
              "A 600 m hard strip across it")):
-        res = rotorcraft_noise_contour([h], [speed], [0.0], t, track, x=x, y=y,
-                                       metric="exposure", ground=ground)
+        res = aircraft.rotorcraft_noise_contour(
+            [h],
+            [speed],
+            [0.0],
+            t,
+            track,
+            x=x,
+            y=y,
+            metric="exposure",
+            ground=ground,
+        )
         res.plot(ax=ax)
         # The contour plot works in kilometres; so must its overlays.
         ax.plot(track[:, 0] / 1000.0, track[:, 1] / 1000.0, color=COLOR_FG,
@@ -908,13 +984,13 @@ def generate_rotorcraft_contour(output_dir: str) -> None:
 def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
     """The mean ground plane, the equivalent heights, and what they change."""
     print("Generating rotorcraft_mean_ground_plane...")
-    from phonometry import ground_effect_adjustment, mean_ground_plane
+    from phonometry import aircraft
 
     # An undulating section that slopes gently up towards the receiver, with
     # the line of sight to a helicopter 150 m up never broken.
     d = np.linspace(0.0, 800.0, 33)
     z = 0.035 * d + 6.0 * np.sin(d / 90.0) + 2.5 * np.sin(d / 31.0)
-    plane = mean_ground_plane(d, z)
+    plane = aircraft.mean_ground_plane(d, z)
     src = (0.0, 60.0)                        # helicopter on final approach
     rcv = (800.0, float(z[-1]) + 1.2)        # microphone 1.2 m over the terrain
 
@@ -963,10 +1039,10 @@ def generate_rotorcraft_mean_ground_plane(output_dir: str) -> None:
     ax.set_axisbelow(True)
 
     freqs = 1000.0 * 10.0 ** (np.arange(-13, 11) / 10.0)
-    true = ground_effect_adjustment(freqs, hs_true, hr_true, rcv[0],
-                                    flow_resistivity="D")
-    equiv = ground_effect_adjustment(freqs, hs_eq, hr_eq, rcv[0],
-                                     flow_resistivity="D")
+    true = aircraft.ground_effect_adjustment(freqs, hs_true, hr_true, rcv[0],
+                                             flow_resistivity="D")
+    equiv = aircraft.ground_effect_adjustment(freqs, hs_eq, hr_eq, rcv[0],
+                                              flow_resistivity="D")
     ax2.axhline(0.0, color=COLOR_FG, lw=1.0, alpha=0.5)
     ax2.plot(freqs, true, color=COLOR_TERTIARY, lw=1.6, ls="--", marker="s",
              ms=3, label=f"true heights ({hs_true:.0f} m, {hr_true:.1f} m)")
@@ -989,7 +1065,7 @@ def generate_rotorcraft_flight_conditions(output_dir: str) -> None:
     print("Generating rotorcraft_flight_conditions...")
     from scipy.spatial import Delaunay
 
-    from phonometry import flight_condition_weights
+    from phonometry import aircraft
 
     # A Doc 32 §4.1 condition matrix for a light twin: descent at 3° steps and
     # four airspeeds, climb at Vy, and level flight at 0.9 VH with the three
@@ -1009,9 +1085,9 @@ def generate_rotorcraft_flight_conditions(output_dir: str) -> None:
     raw = np.column_stack([v, g])
     norm = np.column_stack([v / dv, scale * g / dg])
     raw_tri = Delaunay(raw).simplices
-    w_raw = flight_condition_weights(v, g, *inside, triangles=raw_tri)
-    w_norm = flight_condition_weights(v, g, *inside)
-    w_out = flight_condition_weights(v, g, *outside)
+    w_raw = aircraft.flight_condition_weights(v, g, *inside, triangles=raw_tri)
+    w_norm = aircraft.flight_condition_weights(v, g, *inside)
+    w_out = aircraft.flight_condition_weights(v, g, *outside)
 
     _fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 5.6))
     for axis, pts, tri, weights, qi, qo, title, xlabel, ylabel in (
@@ -1066,7 +1142,7 @@ def generate_rotorcraft_kinematics(output_dir: str) -> None:
     print("Generating rotorcraft_kinematics...")
     from scipy.interpolate import UnivariateSpline
 
-    from phonometry import flight_path_kinematics
+    from phonometry import aircraft
 
     # A 60 kt approach with a 600 m radius turn, sampled the way radar
     # delivers it (1 s, with position noise) and then spline-resampled to the
@@ -1093,7 +1169,7 @@ def generate_rotorcraft_kinematics(output_dir: str) -> None:
     for axis, times, pos, title in (
             (ax, t_radar, raw, "Raw radar track, 1 s cadence"),
             (ax2, t_fine, smooth, "Smoothing spline resampled to 0.5 s")):
-        kin = flight_path_kinematics(times, pos)
+        kin = aircraft.flight_path_kinematics(times, pos)
         kin.plot(ax=axis)
         axis.set_title(title, pad=10)
         axis.grid(color=COLOR_GRID, linestyle="--", alpha=0.6)

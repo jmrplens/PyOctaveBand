@@ -20,7 +20,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from phonometry import decay_curve, room_parameters
+from phonometry import room
 from phonometry._plot.room import plot_excitation
 from phonometry.room import enclosed_space_absorption as esa
 from phonometry.room import noise_criteria as rn
@@ -59,11 +59,11 @@ def _texts(ax_or_axes: object) -> str:
 def _room_acoustics():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        return room_parameters(_decaying_ir(), FS, limits=None)
+        return room.room_parameters(_decaying_ir(), FS, limits=None)
 
 
 def _decay_curve():
-    return decay_curve(_decaying_ir(), FS)
+    return room.decay_curve(_decaying_ir(), FS)
 
 
 def _nc():
@@ -100,9 +100,8 @@ def _impulse_response():
 
 
 def _shaped_sweep():
-    from phonometry import shaped_sweep_signal
 
-    return shaped_sweep_signal(FS, 100.0, 5000.0, 0.4, target="pink")
+    return room.shaped_sweep_signal(FS, 100.0, 5000.0, 0.4, target="pink")
 
 
 def _image_source():

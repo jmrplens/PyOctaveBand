@@ -33,7 +33,7 @@ from .theme import (
 def generate_schroeder_decay(output_dir: str) -> None:
     """Schroeder backward integration with T20/T30/EDT regressions (ISO 3382)."""
     print("Generating schroeder_decay.png...")
-    from phonometry import decay_curve, room_parameters
+    from phonometry import room
     from phonometry.room.acoustics import (
         _EDT_RANGE,
         _T20_RANGE,
@@ -52,8 +52,8 @@ def generate_schroeder_decay(output_dir: str) -> None:
     ir = ir + rng.standard_normal(t.size) * 10.0 ** (-45.0 / 20.0)
 
     # Library outputs: the annotated numbers are exactly these.
-    time, level = decay_curve(ir, fs)
-    res = room_parameters(ir, fs, limits=None)
+    time, level = room.decay_curve(ir, fs)
+    res = room.room_parameters(ir, fs, limits=None)
     edt, t20, t30 = float(res.edt[0]), float(res.t20[0]), float(res.t30[0])
 
     # Raw squared-IR level trace (onset-trimmed, normalized to its peak):
@@ -120,13 +120,13 @@ def generate_schroeder_decay(output_dir: str) -> None:
 def generate_excitation_signals(output_dir: str) -> None:
     """ISO 18233 excitations: ESS waveform + spectrogram and MLS + spectrum."""
     print("Generating excitation_signals.png...")
-    from phonometry import mls_signal, sweep_signal
+    from phonometry import room
 
     fs = 48000
     f1, f2, secs = 50.0, 20000.0, 1.0
-    sweep = sweep_signal(fs, f1, f2, secs)
+    sweep = room.sweep_signal(fs, f1, f2, secs)
     t = np.arange(sweep.size) / fs
-    mls = mls_signal(12)  # length 2**12 - 1 = 4095
+    mls = room.mls_signal(12)  # length 2**12 - 1 = 4095
 
     fig, axes = plt.subplots(2, 2, figsize=(12, 7.2))
     (ax_sw, ax_sp), (ax_ml, ax_ms) = axes
@@ -181,10 +181,10 @@ def generate_impulse_response(output_dir: str) -> None:
     print("Generating impulse_response.png...")
     from scipy.signal import fftconvolve
 
-    from phonometry import impulse_response, sweep_signal
+    from phonometry import room
 
     fs = 48000
-    sweep = sweep_signal(fs, 20.0, 20000.0, 1.5)
+    sweep = room.sweep_signal(fs, 20.0, 20000.0, 1.5)
 
     # A synthetic room: direct sound, two early reflections and an
     # exponentially decaying diffuse tail (T ~ 0.6 s) plus a low noise floor.
@@ -199,7 +199,7 @@ def generate_impulse_response(output_dir: str) -> None:
     system += rng.standard_normal(n) * 10.0 ** (-60.0 / 20.0)
 
     recorded = fftconvolve(sweep, system)
-    ir = impulse_response(recorded, sweep, fs, length=n)
+    ir = room.impulse_response(recorded, sweep, fs, length=n)
 
     h = np.asarray(ir, dtype=np.float64)
     time = np.arange(h.size) / fs
@@ -257,7 +257,7 @@ def generate_deconvolution_snr_gain(output_dir: str) -> None:
     print("Generating deconvolution_snr_gain...")
     from scipy.signal import fftconvolve
 
-    from phonometry import impulse_response, sweep_signal
+    from phonometry import room
 
     fs = 48000
     seconds = 2.0
@@ -288,11 +288,16 @@ def generate_deconvolution_snr_gain(output_dir: str) -> None:
     cases.append(("Pistol shot (no deconvolution)", COLOR_TERTIARY, recorded))
     # (b), (c) the same room through a 1 s and a 4 s sweep, deconvolved.
     for secs, color in ((1.0, COLOR_SECONDARY), (4.0, COLOR_PRIMARY)):
-        sweep = sweep_signal(fs, 20.0, 20000.0, secs)
+        sweep = room.sweep_signal(fs, 20.0, 20000.0, secs)
         played = fftconvolve(sweep, system)
         played = played + rng.standard_normal(played.size) * noise_rms
-        cases.append((f"{secs:g} s sweep, deconvolved",
-                      color, np.asarray(impulse_response(played, sweep, fs, length=n))))
+        cases.append(
+            (
+                f"{secs:g} s sweep, deconvolved",
+                color,
+                np.asarray(room.impulse_response(played, sweep, fs, length=n)),
+            )
+        )
 
     time = np.arange(n) / fs
     _fig, ax = plt.subplots(figsize=(10.5, 6.2))
@@ -332,11 +337,11 @@ def generate_sweep_distortion_separation(output_dir: str) -> None:
     print("Generating sweep_distortion_separation...")
     from scipy.signal import fftconvolve
 
-    from phonometry import impulse_response, sweep_signal
+    from phonometry import room
 
     fs = 48000
     f1, f2, seconds = 20.0, 20000.0, 3.0
-    sweep = sweep_signal(fs, f1, f2, seconds)
+    sweep = room.sweep_signal(fs, f1, f2, seconds)
     system = np.zeros(int(0.4 * fs))
     system[80], system[1400], system[3100] = 1.0, 0.5, 0.32
 
@@ -344,8 +349,10 @@ def generate_sweep_distortion_separation(output_dir: str) -> None:
     # A mild memoryless nonlinearity: the loudspeaker driven near its limit.
     played = (played + 0.08 * played ** 2 + 0.04 * played ** 3
               + 0.02 * played ** 4)
-    full = np.asarray(impulse_response(played, sweep, fs, return_full=True),
-                      dtype=np.float64)
+    full = np.asarray(
+        room.impulse_response(played, sweep, fs, return_full=True),
+        dtype=np.float64,
+    )
 
     # Wrap the sequence so t = 0 sits in the middle: what the default return
     # keeps is the causal half, and the harmonic packets are the negative half.
@@ -508,12 +515,7 @@ def generate_excitation_robustness(output_dir: str) -> None:
     print("Generating excitation_robustness...")
     from scipy.signal import fftconvolve
 
-    from phonometry import (
-        impulse_response,
-        mls_impulse_response,
-        mls_signal,
-        sweep_signal,
-    )
+    from phonometry import room
 
     fs = 48000
     seconds = 1.4
@@ -541,28 +543,29 @@ def generate_excitation_robustness(output_dir: str) -> None:
         level = 20.0 * np.log10(np.maximum(smooth, tiny) / smooth.max())
         return np.asarray(level, dtype=np.float64)
 
-    sweep = sweep_signal(fs, 20.0, 20000.0, seconds)
-    mls = mls_signal(16)                        # (2^16 - 1)/fs = 1.37 s period
+    sweep = room.sweep_signal(fs, 20.0, 20000.0, seconds)
+    mls = room.mls_signal(16)  # (2^16 - 1)/fs = 1.37 s period
     period = mls.size
     # The drifted MLS trips the library's own circular-aliasing warning. That
     # warning is the result this figure draws, not a defect in the run.
     import warnings
 
-    from phonometry import ImpulseResponseWarning
     traces = {}
     for name, ppm in (("stationary", 0.0), ("+0.3 K during the take", 500.0)):
         rng = np.random.default_rng(97)
         played = fftconvolve(sweep, system)
         played = drift(played, ppm) + rng.standard_normal(played.size) * noise_rms
         traces[("sweep", name)] = envelope(
-            np.asarray(impulse_response(played, sweep, fs, length=n)))
+            np.asarray(room.impulse_response(played, sweep, fs, length=n)))
         # Four periods played, the first discarded as warm-up: with the first
         # period kept the recovered floor sits 23 dB higher even with no drift.
         rec = fftconvolve(np.tile(mls, 4), system)[period: 4 * period]
         rec = drift(rec, ppm) + rng.standard_normal(rec.size) * noise_rms
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", ImpulseResponseWarning)
-            recovered = np.asarray(mls_impulse_response(rec, mls, length=n))
+            warnings.simplefilter("ignore", room.ImpulseResponseWarning)
+            recovered = np.asarray(
+                room.mls_impulse_response(rec, mls, length=n)
+            )
         traces[("MLS", name)] = envelope(recovered)
 
     time = np.arange(n) / fs
@@ -597,7 +600,7 @@ def generate_excitation_robustness(output_dir: str) -> None:
 def generate_open_plan_quality(output_dir: str) -> None:
     """Two ISO 3382-3 offices read against the Annex A ends of the scale."""
     print("Generating open_plan_quality...")
-    from phonometry import open_plan_metrics
+    from phonometry import room
 
     positions = np.array([2.0, 3.0, 4.0, 6.0, 8.0, 11.0, 16.0])
     cases = (
@@ -625,7 +628,7 @@ def generate_open_plan_quality(output_dir: str) -> None:
         slope = -d2s / np.log10(2.0)
         levels = (lp_4m - slope * np.log10(4.0)) + slope * np.log10(positions)
         sti = sti_0 - sti_slope * positions
-        res = open_plan_metrics(positions, levels, sti)
+        res = room.open_plan_metrics(positions, levels, sti)
         span = np.logspace(np.log10(1.8), np.log10(20.0), 200)
         ax_l.plot(span, (res.lp_as_4m - slope * np.log10(4.0))
                   + slope * np.log10(span), "--", color=color, linewidth=1.6)
@@ -762,13 +765,13 @@ def generate_absorption_per_table(output_dir: str) -> None:
 def generate_open_plan_decay(output_dir: str) -> None:
     """ISO 3382-3 spatial decay: speech SPL and STI vs source distance."""
     print("Generating open_plan_decay.png...")
-    from phonometry import open_plan_metrics
+    from phonometry import room
 
     # The worked example from the room-acoustics guide (matches its numbers).
     r = np.array([2.0, 4.0, 6.0, 8.0, 12.0, 16.0])   # distances (m)
     lp = 65.0 - 7.0 * np.log2(r)                      # A-weighted speech level (dB)
     sti = 0.70 - 0.03 * r                             # STI per position
-    m = open_plan_metrics(r, lp, sti)
+    m = room.open_plan_metrics(r, lp, sti)
 
     # Reconstruct the two regressions the metrics come from (2-16 m window).
     b_log = -m.d2s / np.log10(2.0)                    # slope vs log10(r/r0)
@@ -847,10 +850,10 @@ def generate_rectangular_room_modes(output_dir: str) -> None:
     regime.
     """
     print("Generating rectangular_room_modes...")
-    from phonometry import room_modes
+    from phonometry import room
 
     # Long, Architectural Acoustics 2nd ed., Table 8.1 (printed p. 325).
-    result = room_modes(
+    result = room.room_modes(
         (7.0, 5.0, 3.0), max_frequency=200.0, speed_of_sound=344.0,
         reverberation_time=0.8,
     )
@@ -868,12 +871,12 @@ def generate_restaurant_crowd_noise(output_dir: str) -> None:
     keeps it below the level at which cross-table conversation fails.
     """
     print("Generating restaurant_crowd_noise...")
-    from phonometry import crowd_noise
+    from phonometry import room
 
     # Long, Chapter 17 (printed pp. 665-666): a hard room of about 20 metric
     # sabins, the same room with a partly absorptive ceiling, and with the
     # full alpha 0.9 ceiling of his 13.7 x 13.7 m example (+170 sabins).
-    result = crowd_noise([20.0, 95.0, 190.0], distance=1.2)
+    result = room.crowd_noise([20.0, 95.0, 190.0], distance=1.2)
     ax = result.plot(language=_LANG)
     ax.set_xlim(1.0, 20.0)
     plt.gcf().set_size_inches(10, 6)
@@ -885,11 +888,11 @@ def generate_restaurant_crowd_noise(output_dir: str) -> None:
 def generate_image_source_reflectogram(output_dir: str) -> None:
     """Image-source reflectogram: the synthetic RIR as reflections by order."""
     print("Generating image_source_reflectogram...")
-    from phonometry import image_source_rir
+    from phonometry import room
 
     dims = (7.0, 5.0, 3.0)
-    res = image_source_rir(dims, (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
-                           0.12, fs=48000, max_order=10)
+    res = room.image_source_rir(dims, (2.0, 1.6, 1.5), (5.2, 3.4, 1.7),
+                                0.12, fs=48000, max_order=10)
     times = np.asarray(res.times) * 1e3  # ms
     amp = np.asarray(res.amplitudes)
     orders = np.asarray(res.orders)
@@ -940,7 +943,7 @@ def generate_image_source_reflectogram(output_dir: str) -> None:
 def generate_reverberation_models(output_dir: str) -> None:
     """Sabine/Eyring/Millington/Fitzroy/Arau reverberation time over octaves."""
     print("Generating reverberation_models...")
-    from phonometry import air_attenuation_m, reverberation_time_models
+    from phonometry import environment, room
 
     bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
     # A 10 x 7 x 3.5 m room (V = 245 m3, S = 259 m2) with a strongly anisotropic
@@ -951,8 +954,8 @@ def generate_reverberation_models(output_dir: str) -> None:
     alpha_x = [0.06, 0.07, 0.08, 0.09, 0.10, 0.10]   # hard end walls
     alpha_y = [0.12, 0.14, 0.16, 0.18, 0.20, 0.20]   # lightly treated side walls
     alpha_z = [0.30, 0.50, 0.65, 0.78, 0.82, 0.80]   # carpet + acoustic ceiling
-    m = air_attenuation_m(bands, 20.0, 50.0)
-    res = reverberation_time_models(
+    m = environment.air_attenuation_m(bands, 20.0, 50.0)
+    res = room.reverberation_time_models(
         (10.0, 7.0, 3.5), (alpha_x, alpha_y, alpha_z),
         air_attenuation=m, frequencies=bands,
     )
@@ -1004,9 +1007,9 @@ def generate_image_source_plan(output_dir: str) -> None:
     from.
     """
     print("Generating image_source_plan...")
-    from phonometry import image_source_rir
+    from phonometry import room
 
-    res = image_source_rir(
+    res = room.image_source_rir(
         (7.0, 5.0, 3.0), (2.0, 1.6, 1.5), (5.2, 3.4, 1.7), 0.3,
         fs=16000, max_order=3,
     )
@@ -1025,10 +1028,10 @@ def generate_open_plan_line_geometry(output_dir: str) -> None:
     line every ISO 3382-3 quantity comes from.
     """
     print("Generating open_plan_line_geometry...")
-    from phonometry import plot_open_plan_geometry
+    from phonometry import room
 
     _fig, ax = plt.subplots(figsize=(10, 4.6))
-    plot_open_plan_geometry(
+    room.plot_open_plan_geometry(
         [2.0, 4.0, 6.0, 8.0, 12.0, 16.0], ax=ax, rd=6.5, rp=13.0,
         language=_LANG,
     )
@@ -1040,7 +1043,7 @@ def generate_open_plan_line_geometry(output_dir: str) -> None:
 def generate_enclosed_space_absorption(output_dir: str) -> None:
     """EN 12354-6: absorption area and reverberation time of a room."""
     print("Generating enclosed_space_absorption.png...")
-    from phonometry import enclosed_space_reverberation
+    from phonometry import room
     from phonometry.room.enclosed_space_absorption import OCTAVE_BANDS
 
     # A 5 x 4 x 3 m office (60 m3): hard plaster walls and floor; the ceiling is
@@ -1049,9 +1052,9 @@ def generate_enclosed_space_absorption(output_dir: str) -> None:
     plaster = [0.02, 0.03, 0.03, 0.04, 0.05, 0.05, 0.05]
     tile = [0.15, 0.35, 0.65, 0.85, 0.90, 0.90, 0.85]
     walls_floor = [(54.0, plaster), (20.0, plaster)]  # walls + floor
-    bare = enclosed_space_reverberation(
+    bare = room.enclosed_space_reverberation(
         [*walls_floor, (20.0, plaster)], volume, air_condition="20C_50-70")
-    treated = enclosed_space_reverberation(
+    treated = room.enclosed_space_reverberation(
         [*walls_floor, (20.0, tile)], volume, air_condition="20C_50-70")
 
     _fig, (ax_a, ax_t) = plt.subplots(1, 2, figsize=(12.5, 5.4))
@@ -1085,15 +1088,15 @@ def generate_enclosed_space_absorption(output_dir: str) -> None:
 def generate_room_noise_criteria(output_dir: str) -> None:
     """ANSI S12.2-2019: NC tangency rating and RC Mark II classification."""
     print("Generating room_noise_criteria.png...")
-    from phonometry import noise_criterion, rc_curve, room_criterion
+    from phonometry import room
     from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 
     # A ventilation-dominated room spectrum: the low-frequency bands rise well
     # above the sloped RC reference (a rumble tag under RC Mark II) while the
     # mid bands set the NC tangency.
     spectrum = np.array([62.0, 62.0, 59.0, 57.0, 52.0, 42.0, 35.0, 29.0, 24.0, 19.0])
-    nc = noise_criterion(spectrum)
-    rc = room_criterion(spectrum)
+    nc = room.noise_criterion(spectrum)
+    rc = room.room_criterion(spectrum)
 
     _fig, (ax_nc, ax_rc) = plt.subplots(1, 2, figsize=(12.5, 5.6))
 
@@ -1126,7 +1129,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
     # -5 dB/octave keyed to the 1 kHz value, with the 55 dB low-frequency
     # floor flattening the 16/31.5 Hz end of RC-25 to RC-30.
     for index in range(25, 51, 5):
-        family = rc_curve(float(index))
+        family = room.rc_curve(float(index))
         ax_rc.plot(OCTAVE_BANDS, family, color=COLOR_GRID, lw=0.8, zorder=1)
         ax_rc.annotate(f"{index:d}", (OCTAVE_BANDS[-1], family[-1]),
                        fontsize=7, color="#999999", va="center")
@@ -1162,7 +1165,7 @@ def generate_room_noise_criteria(output_dir: str) -> None:
 def generate_nc_blind_spot(output_dir: str) -> None:
     """Two rooms with the same NC rating and opposite spectral character."""
     print("Generating nc_blind_spot...")
-    from phonometry import noise_criterion, room_criterion
+    from phonometry import room
     from phonometry.room.noise_criteria import NC_CURVES, NC_INDICES, OCTAVE_BANDS
 
     # Two ANSI/ASA S12.2 spectra built to touch the NC-40 curve at one band
@@ -1175,7 +1178,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
         ("Duct rumble", rumbly, COLOR_PRIMARY, "o-"),
         ("Diffuser hiss", hissy, COLOR_SECONDARY, "s-"),
     )
-    nc_left = noise_criterion(rumbly)
+    nc_left = room.noise_criterion(rumbly)
 
     _fig, (ax_nc, ax_rc) = plt.subplots(1, 2, figsize=(12.5, 5.6))
 
@@ -1185,7 +1188,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
         ax_nc.annotate(f"{idx:.0f}", (OCTAVE_BANDS[-1], row[-1]),
                        fontsize=7, color="#999999", va="center")
     for label, spectrum, color, style in cases:
-        nc = noise_criterion(spectrum)
+        nc = room.noise_criterion(spectrum)
         ax_nc.plot(OCTAVE_BANDS, spectrum, style, color=color, zorder=3,
                    label=f"{label} — tangent at {nc.governing_frequency:g} Hz")
         gov = spectrum[OCTAVE_BANDS == nc.governing_frequency][0]
@@ -1204,7 +1207,7 @@ def generate_nc_blind_spot(output_dir: str) -> None:
                        color=theme_fill(COLOR_TERTIARY, ax_rc))
     ax_rc.axhline(0.0, color=COLOR_GRID, lw=1.0, zorder=1)
     for label, spectrum, color, style in cases:
-        rc = room_criterion(spectrum)
+        rc = room.room_criterion(spectrum)
         ax_rc.plot(OCTAVE_BANDS, spectrum - rc.reference_curve, style,
                    color=color, zorder=3, label=f"{label} — {rc.label}")
     ax_rc.set_ylim(-17.0, 17.0)
@@ -1284,21 +1287,25 @@ def generate_reverberation_model_absorption(output_dir: str) -> None:
     why Sabine survives at low absorption and breaks at high.
     """
     print("Generating reverberation_model_absorption...")
-    from phonometry import (
-        eyring_reverberation_time,
-        millington_sette_reverberation_time,
-        sabine_reverberation_time,
-    )
+    from phonometry import room
 
     # The 8 x 5 x 3 m shoebox of the guide's section 1 (V = 120 m3, S = 158 m2).
     volume, area = 120.0, 158.0
     alpha = np.linspace(0.02, 0.99, 240)
-    sabine = np.array([float(sabine_reverberation_time(volume, [(area, a)]))
-                       for a in alpha])
-    eyring = np.array([float(eyring_reverberation_time(volume, [(area, a)]))
-                       for a in alpha])
+    sabine = np.array(
+        [
+            float(room.sabine_reverberation_time(volume, [(area, a)]))
+            for a in alpha
+        ]
+    )
+    eyring = np.array(
+        [
+            float(room.eyring_reverberation_time(volume, [(area, a)]))
+            for a in alpha
+        ]
+    )
     millington = np.array(
-        [float(millington_sette_reverberation_time(volume, [(area, a)]))
+        [float(room.millington_sette_reverberation_time(volume, [(area, a)]))
          for a in alpha])
 
     _fig, (top, bottom) = plt.subplots(
@@ -1368,7 +1375,7 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
     threshold and the volume threshold of clause 4.3 are one rule.
     """
     print("Generating enclosed_space_air_term...")
-    from phonometry import enclosed_space_reverberation
+    from phonometry import room
     from phonometry.room.enclosed_space_absorption import (
         AIR_ATTENUATION,
         OCTAVE_BANDS,
@@ -1380,10 +1387,10 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
 
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.6, 5.4))
 
-    still = enclosed_space_reverberation([(hall_area, soft)], hall_volume)
+    still = room.enclosed_space_reverberation([(hall_area, soft)], hall_volume)
     colours = series_colors(len(AIR_ATTENUATION))
     for colour, name in zip(colours, AIR_ATTENUATION):
-        humid = enclosed_space_reverberation(
+        humid = room.enclosed_space_reverberation(
             [(hall_area, soft)], hall_volume, air_condition=name)
         left.loglog(freq, humid.absorption_area - still.absorption_area,
                     color=colour, marker="o", markersize=4, linewidth=1.8,
@@ -1397,8 +1404,8 @@ def generate_enclosed_space_air_term(output_dir: str) -> None:
               (2000.0, 1000.0, COLOR_SECONDARY, "2000 m³ hall"))
     for volume, area, colour, label in styles:
         for condition, dash in ((None, "-"), ("20C_50-70", "--")):
-            res = enclosed_space_reverberation([(area, soft)], volume,
-                                               air_condition=condition)
+            res = room.enclosed_space_reverberation([(area, soft)], volume,
+                                                    air_condition=condition)
             suffix = " (no air)" if condition is None else " (20 °C, 50-70 %)"
             right.semilogx(freq, res.reverberation_time, dash, color=colour,
                            marker="o", markersize=4, linewidth=1.8,
@@ -1432,11 +1439,7 @@ def generate_enclosed_space_objects(output_dir: str) -> None:
     fraction contributes a separate, constant few per cent.
     """
     print("Generating enclosed_space_objects...")
-    from phonometry import (
-        enclosed_space_reverberation,
-        hard_object_absorption,
-        object_fraction,
-    )
+    from phonometry import room
     from phonometry.room.enclosed_space_absorption import OCTAVE_BANDS
 
     freq = np.asarray(OCTAVE_BANDS)
@@ -1447,18 +1450,18 @@ def generate_enclosed_space_objects(output_dir: str) -> None:
                 (10.90, [0.04] * n), (10.90, [0.04] * n),
                 (6.55, [0.04] * n), (6.55, [0.04] * n)]
     volumes = [0.15, 0.60, 0.05, 0.05, 0.65, 0.65]     # Annex E case 2
-    objects = hard_object_absorption(volumes)
-    psi = float(object_fraction(volumes, 29.75))
+    objects = room.hard_object_absorption(volumes)
+    psi = float(room.object_fraction(volumes, 29.75))
 
-    bare = enclosed_space_reverberation(surfaces, 29.75,
-                                        air_condition="20C_50-70")
-    absorbing = enclosed_space_reverberation(
+    bare = room.enclosed_space_reverberation(surfaces, 29.75,
+                                             air_condition="20C_50-70")
+    absorbing = room.enclosed_space_reverberation(
         surfaces, 29.75, objects=objects, air_condition="20C_50-70")
-    furnished = enclosed_space_reverberation(
+    furnished = room.enclosed_space_reverberation(
         surfaces, 29.75, objects=objects, object_fraction=psi,
         air_condition="20C_50-70")
 
-    dry = enclosed_space_reverberation(surfaces, 29.75)
+    dry = room.enclosed_space_reverberation(surfaces, 29.75)
     air = bare.absorption_area - dry.absorption_area
     surface_area = dry.absorption_area
     objects_area = absorbing.absorption_area - bare.absorption_area
@@ -1545,26 +1548,21 @@ def generate_image_source_order_convergence(output_dir: str) -> None:
     is a floor rather than a convergence criterion.
     """
     print("Generating image_source_order_convergence...")
-    from phonometry import (
-        audible_image_count,
-        eyring_reverberation_time,
-        image_source_rir,
-        room_parameters,
-    )
+    from phonometry import room
 
     # The guide's own room: 7 x 5 x 3 m, V = 105 m3, S = 142 m2, alpha = 0.12.
     orders = np.arange(8, 62, 2)
     t30_acc = []
     images = []
     for order in orders:
-        res = image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
-                               (5.2, 3.4, 1.7), 0.12, fs=48000,
-                               max_order=int(order))
-        params = room_parameters(res.ir, res.fs, limits=None)
+        res = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                                    (5.2, 3.4, 1.7), 0.12, fs=48000,
+                                    max_order=int(order))
+        params = room.room_parameters(res.ir, res.fs, limits=None)
         t30_acc.append(float(params.t30[0]))
-        images.append(float(audible_image_count(int(order))))
+        images.append(float(room.audible_image_count(int(order))))
     t30 = np.asarray(t30_acc)
-    eyring = float(eyring_reverberation_time(105.0, [(142.0, 0.12)]))
+    eyring = float(room.eyring_reverberation_time(105.0, [(142.0, 0.12)]))
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     ax.axhspan(0.9 * eyring, 1.1 * eyring, color=theme_fill(COLOR_TERTIARY, ax),
@@ -1615,7 +1613,7 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
     estimate it is validated against.
     """
     print("Generating image_source_anisotropy...")
-    from phonometry import eyring_reverberation_time, image_source_rir
+    from phonometry import room
 
     volume, alpha = 105.0, 0.12
     side = volume ** (1.0 / 3.0)
@@ -1631,10 +1629,12 @@ def generate_image_source_anisotropy(output_dir: str) -> None:
         lx = side * ratio ** (2.0 / 3.0)
         ly = side * ratio ** (-1.0 / 3.0)
         area = 2.0 * (2.0 * lx * ly + ly * ly)
-        eyring_acc.append(float(eyring_reverberation_time(volume, [(area, alpha)])))
+        eyring_acc.append(
+            float(room.eyring_reverberation_time(volume, [(area, alpha)]))
+        )
         runs = []
         for source, receiver in pairs:
-            res = image_source_rir(
+            res = room.image_source_rir(
                 (lx, ly, ly),
                 (lx * source[0], ly * source[1], ly * source[2]),
                 (lx * receiver[0], ly * receiver[1], ly * receiver[2]),
@@ -1688,21 +1688,21 @@ def generate_image_source_bands(output_dir: str) -> None:
     and how small the air loss is in a small room.
     """
     print("Generating image_source_bands...")
-    from phonometry import air_attenuation_m, decay_curve, image_source_rir
+    from phonometry import environment, room
 
     freqs = [250.0, 500.0, 1000.0, 2000.0, 4000.0]
     alpha = np.array([[0.10, 0.15, 0.25, 0.40, 0.50]] * 6)
-    m = air_attenuation_m(freqs, 20.0, 50.0)
+    m = environment.air_attenuation_m(freqs, 20.0, 50.0)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     colours = series_colors(len(freqs))
     for attenuation, dash, tag in ((0.0, "-", ""), (m, "--", " (with air)")):
-        banded = image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
-                                  (5.2, 3.4, 1.7), alpha, fs=48000,
-                                  max_order=60, frequencies=freqs,
-                                  air_attenuation=attenuation)
+        banded = room.image_source_rir((7.0, 5.0, 3.0), (2.0, 1.6, 1.5),
+                                       (5.2, 3.4, 1.7), alpha, fs=48000,
+                                       max_order=60, frequencies=freqs,
+                                       air_attenuation=attenuation)
         for row, freq, colour in zip(banded.ir, freqs, colours):
-            time, level = decay_curve(row, banded.fs)
+            time, level = room.decay_curve(row, banded.fs)
             label = f"{freq:g} Hz{tag}" if not tag else None
             ax.plot(time, level, dash, color=colour, linewidth=1.8,
                     label=label, zorder=5)
@@ -1738,7 +1738,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
     has, which is why a cube is the worst listening room.
     """
     print("Generating room_proportion_modes...")
-    from phonometry import room_modes
+    from phonometry import room
 
     volume = 105.0
     half = (volume / 2.0) ** (1.0 / 3.0)
@@ -1754,7 +1754,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
     _fig, axes = plt.subplots(4, 1, figsize=(10.5, 7.6), sharex=True,
                              gridspec_kw={"height_ratios": [1, 1, 1, 1.5]})
     for ax, (name, dims) in zip(axes[:3], shapes):
-        modes = room_modes(dims, max_frequency=200.0)
+        modes = room.room_modes(dims, max_frequency=200.0)
         freqs = np.asarray(modes.frequencies)
         kinds = np.asarray(modes.kinds)
         for kind, colour in family.items():
@@ -1775,7 +1775,7 @@ def generate_room_proportion_modes(output_dir: str) -> None:
 
     spacing = axes[3]
     for (name, dims), style in zip(shapes, ("-", "--", ":")):
-        modes = room_modes(dims, max_frequency=200.0)
+        modes = room.room_modes(dims, max_frequency=200.0)
         unique = np.unique(np.round(np.asarray(modes.frequencies), 1))
         spacing.step(unique[1:], np.diff(unique), style, where="post",
                      linewidth=1.8, label=name)
@@ -1805,16 +1805,20 @@ def generate_steady_state_directivity(output_dir: str) -> None:
     neither does the other's job.
     """
     print("Generating steady_state_directivity...")
-    from phonometry import steady_state_field
+    from phonometry import room
 
     grid = np.logspace(-1.0, 1.3, 240)
     _fig, (left, right) = plt.subplots(1, 2, figsize=(12.6, 5.6), sharey=True)
 
     colours = series_colors(4)
     for colour, q in zip(colours, (1.0, 2.0, 4.0, 8.0)):
-        field = steady_state_field(sound_power_level=90.0, surface_area=352.0,
-                                   mean_absorption=0.15, distances=grid,
-                                   directivity=q)
+        field = room.steady_state_field(
+            sound_power_level=90.0,
+            surface_area=352.0,
+            mean_absorption=0.15,
+            distances=grid,
+            directivity=q,
+        )
         left.semilogx(field.distances, field.total, color=colour, linewidth=2.0,
                       label=rf"$Q$ = {q:g}  ($r_{{\mathrm{{c}}}}$ = "
                             rf"{field.critical_distance:.2f} m)",
@@ -1827,9 +1831,13 @@ def generate_steady_state_directivity(output_dir: str) -> None:
 
     for colour, absorption in zip(colours[::2].tolist() + [colours[3]],
                                   (0.05, 0.15, 0.35)):
-        field = steady_state_field(sound_power_level=90.0, surface_area=352.0,
-                                   mean_absorption=absorption, distances=grid,
-                                   directivity=2.0)
+        field = room.steady_state_field(
+            sound_power_level=90.0,
+            surface_area=352.0,
+            mean_absorption=absorption,
+            distances=grid,
+            directivity=2.0,
+        )
         right.semilogx(
             field.distances, field.total, color=colour, linewidth=2.0,
             label=rf"$\bar\alpha$ = {absorption:g}  ($R$ = "
@@ -1865,7 +1873,7 @@ def generate_decay_signatures(output_dir: str) -> None:
     One concept: what a curvature above 10 % and a collapsed EDT look like.
     """
     print("Generating decay_signatures...")
-    from phonometry import decay_curve, room_parameters
+    from phonometry import room
 
     fs = 48000
     rng = np.random.default_rng(3382)
@@ -1891,8 +1899,8 @@ def generate_decay_signatures(output_dir: str) -> None:
 
     _fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.8), sharey=True)
     for ax, (name, signal, verdict) in zip(axes, cases):
-        res = room_parameters(signal, fs, limits=None)
-        time, level = decay_curve(signal, fs)
+        res = room.room_parameters(signal, fs, limits=None)
+        time, level = room.decay_curve(signal, fs)
         ax.plot(time, level, color=COLOR_PRIMARY, linewidth=1.8, zorder=5)
         for edge, colour in ((-5.0, COLOR_TERTIARY), (-25.0, COLOR_TERTIARY),
                              (-35.0, COLOR_SECONDARY)):
@@ -1925,7 +1933,7 @@ def generate_decay_range_bias(output_dir: str) -> None:
     One concept: why ISO 3382's 35/45 dB minima are tightened to 46/54 dB.
     """
     print("Generating decay_range_bias...")
-    from phonometry import room_parameters
+    from phonometry import room
 
     fs = 48000
     true_t = 1.0
@@ -1938,8 +1946,9 @@ def generate_decay_range_bias(output_dir: str) -> None:
 
     ranges_acc, bias20_acc, bias30_acc = [], [], []
     for inr in range(25, 81, 3):
-        res = room_parameters(clean + noise * peak * 10.0 ** (-inr / 20.0),
-                              fs, limits=None)
+        res = room.room_parameters(
+            clean + noise * peak * 10.0 ** (-inr / 20.0), fs, limits=None
+        )
         ranges_acc.append(float(res.dynamic_range[0]))
         bias20_acc.append(100.0 * (float(res.t20[0]) / true_t - 1.0))
         bias30_acc.append(100.0 * (float(res.t30[0]) / true_t - 1.0))

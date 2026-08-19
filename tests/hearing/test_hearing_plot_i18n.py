@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import pytest
 
-from phonometry import age_threshold, nipts
+from phonometry import hearing
 
 
 def _legend_labels(ax) -> list[str]:
@@ -20,7 +20,10 @@ def test_fractile_band_legend_follows_the_language() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    for result in (age_threshold(60.0, "male", fractile=0.9), nipts(95.0, 20.0, 0.9)):
+    for result in (
+        hearing.age_threshold(60.0, "male", fractile=0.9),
+        hearing.nipts(95.0, 20.0, 0.9),
+    ):
         assert "10-90 % fractile band" in _legend_labels(result.plot(language="en"))
         labels_es = _legend_labels(result.plot(language="es"))
         assert "Banda de fractiles 10-90 %" in labels_es
@@ -32,7 +35,7 @@ def test_spanish_labels() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    res = age_threshold(60.0, "male", fractile=0.9)
+    res = hearing.age_threshold(60.0, "male", fractile=0.9)
 
     ax_en = res.plot(language="en")
     assert ax_en.get_ylabel() == "Threshold deviation from age 18 [dB]"
@@ -47,7 +50,7 @@ def test_unknown_language_raises() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    result = age_threshold(60.0, "male")
+    result = hearing.age_threshold(60.0, "male")
     with pytest.raises(ValueError, match="Unknown language"):
         result.plot(language="xx")
 
@@ -57,9 +60,8 @@ def test_exposure_plot_needs_per_task_contributions() -> None:
     import matplotlib
 
     matplotlib.use("Agg")
-    from phonometry import full_day_exposure
 
-    result = full_day_exposure([85.0, 86.0, 84.0], 8.0)
+    result = hearing.full_day_exposure([85.0, 86.0, 84.0], 8.0)
     assert result.tasks == ()
     with pytest.raises(ValueError, match="per-task contributions"):
         result.plot()

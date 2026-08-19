@@ -36,12 +36,12 @@ _REFR_FPS = 80
 def _refraction_profiles() -> tuple[Any, ...]:
     """The guide's realistic logarithmic surface-layer profiles: downwind
     (+1 m/s) and upwind (-1 m/s) effective sound speed."""
-    from phonometry import log_linear_sound_speed_profile
+    from phonometry import environment
 
     return tuple(
-        log_linear_sound_speed_profile(sign * _REFR_B,
-                                       ground_speed=_REFR_C0,
-                                       max_height=140.0)
+        environment.log_linear_sound_speed_profile(sign * _REFR_B,
+                                                   ground_speed=_REFR_C0,
+                                                   max_height=140.0)
         for sign in (1.0, -1.0)
     )
 
@@ -71,7 +71,7 @@ def _refraction_fields(
     """
     import fdtd2d
 
-    from phonometry import atmospheric_ray_paths
+    from phonometry import environment
 
     dx = _REFR_DX
     ny, nx = 440, 1507                     # 132 m x 452 m
@@ -93,16 +93,24 @@ def _refraction_fields(
     # are the ones the committed clip already had.
     every = _REFR_EVERY
     rays = [
-        atmospheric_ray_paths(prof, source_height=_REFR_SRC[1],
-                              launch_angles_deg=angles, max_range=430.0,
-                              n_steps=900)
+        environment.atmospheric_ray_paths(
+            prof,
+            source_height=_REFR_SRC[1],
+            launch_angles_deg=angles,
+            max_range=430.0,
+            n_steps=900,
+        )
         for prof, angles in zip(
             profiles,
             # Downwind: a shallow fan (the log profile turns anything
             # under ~8 deg back down, so the duct is thin) plus one
             # escaping ray; upwind: the same fan bends up and away.
-            ((-2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0),
-             (-2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0)), strict=True)
+            (
+                (-2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0),
+                (-2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0),
+            ),
+            strict=True,
+        )
     ]
     p_all, r_all = [], []
     times = np.zeros(0)
@@ -161,7 +169,7 @@ def animate_fdtd_refraction(output_dir: str) -> None:
     spreading-compensated RMS map."""
     from matplotlib import patheffects
 
-    from phonometry import shadow_zone_distance
+    from phonometry import environment
 
     T = _translate_str
     outline = [patheffects.withStroke(linewidth=2.0,
@@ -181,8 +189,9 @@ def animate_fdtd_refraction(output_dir: str) -> None:
     # profile's linear-equivalent gradient over the first 10 m, then the
     # closed-form grazing-ray distance.
     grad = float(profiles[1].speed_at(10.0) - profiles[1].speed_at(0.0))
-    x_shadow = shadow_zone_distance(grad / 10.0, _REFR_SRC[1],
-                                    _REFR_SRC[1], ground_speed=_REFR_C0)
+    x_shadow = environment.shadow_zone_distance(
+        grad / 10.0, _REFR_SRC[1], _REFR_SRC[1], ground_speed=_REFR_C0
+    )
     extent = (0.0, 1507 * _REFR_DX, 0.0, 440 * _REFR_DX)
     src_x, src_h = _REFR_SRC
     recv_x = src_x + _REFR_RECV

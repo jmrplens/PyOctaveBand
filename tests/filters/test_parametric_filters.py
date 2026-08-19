@@ -6,15 +6,7 @@ Tests for parametric filters: Weighting (A, C), Time Weighting and Linkwitz-Rile
 import numpy as np
 import pytest
 
-from phonometry import (
-    LevelCalibration,
-    WeightingFilter,
-    linkwitz_riley,
-    octave_filter,
-    sensitivity,
-    time_weighting,
-    weighting_filter,
-)
+from phonometry import filters, metrology
 
 
 def test_calibration_logic() -> None:
@@ -40,11 +32,16 @@ def test_calibration_logic() -> None:
     ref_signal = rms_ref * np.sqrt(2) * np.sin(2 * np.pi * 1000 * t)
     
     # Calculate sensitivity
-    factor = sensitivity(ref_signal, target_spl=94.0)
+    factor = metrology.sensitivity(ref_signal, target_spl=94.0)
     
     # Analyze same signal with that factor
-    spl, _ = octave_filter(ref_signal, fs, fraction=1, limits=[800, 1200],
-                           calibration=LevelCalibration(factor=factor))
+    spl, _ = filters.octave_filter(
+        ref_signal,
+        fs,
+        fraction=1,
+        limits=[800, 1200],
+        calibration=filters.LevelCalibration(factor=factor),
+    )
     
     # It should be exactly 94 dB
     assert abs(spl[0] - 94.0) < 0.01
@@ -68,8 +65,13 @@ def test_dbfs_logic() -> None:
     t = np.linspace(0, 1, fs)
     x = np.sin(2 * np.pi * 1000 * t)
     
-    spl, _ = octave_filter(x, fs, fraction=1, limits=[800, 1200],
-                           calibration=LevelCalibration(dbfs=True))
+    spl, _ = filters.octave_filter(
+        x,
+        fs,
+        fraction=1,
+        limits=[800, 1200],
+        calibration=filters.LevelCalibration(dbfs=True),
+    )
     
     assert abs(spl[0] - (-3.01)) < 0.05
 
@@ -93,8 +95,8 @@ def test_peak_mode_logic() -> None:
     x = np.zeros(fs)
     x[100] = 0.5  # Large peak
     
-    spl_rms, _ = octave_filter(x, fs, mode="rms", fraction=1)
-    spl_peak, _ = octave_filter(x, fs, mode="peak", fraction=1)
+    spl_rms, _ = filters.octave_filter(x, fs, mode="rms", fraction=1)
+    spl_peak, _ = filters.octave_filter(x, fs, mode="peak", fraction=1)
     
     # Peak must be greater than RMS for an impulse
     assert np.all(spl_peak > spl_rms)
@@ -129,7 +131,7 @@ def test_a_weighting_response() -> None:
     for f, expected in zip(test_freqs, expected_gain, strict=True):
         # Generate tone
         x = np.sin(2 * np.pi * f * t)
-        y = weighting_filter(x, fs, curve="A")
+        y = filters.weighting_filter(x, fs, curve="A")
         
         # Calculate gain in dB (RMS)
         gain_db = 20 * np.log10(np.std(y) / np.std(x))
@@ -160,7 +162,7 @@ def test_c_weighting_response() -> None:
     
     for f, expected in zip(test_freqs, expected_gain, strict=True):
         x = np.sin(2 * np.pi * f * t)
-        y = weighting_filter(x, fs, curve="C")
+        y = filters.weighting_filter(x, fs, curve="C")
         
         gain_db = 20 * np.log10(np.std(y) / np.std(x))
         assert abs(gain_db - expected) < 1.0, f"C-weighting at {f}Hz failed. Got {gain_db:.1f}dB, expected {expected}dB"
@@ -172,7 +174,7 @@ def test_weighting_filter_c_output_shape() -> None:
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs)
 
-    y = weighting_filter(x, fs, curve="C")
+    y = filters.weighting_filter(x, fs, curve="C")
 
     assert y.shape == x.shape
 
@@ -183,18 +185,18 @@ def test_weighting_filter_class_direct_use() -> None:
     rng = np.random.default_rng(42)
     x = rng.standard_normal((2, fs))
 
-    wf = WeightingFilter(fs, curve="A")
+    wf = filters.WeightingFilter(fs, curve="A")
     y = wf.filter(x)
     assert y.shape == x.shape
 
-    wf_z = WeightingFilter(fs, curve="Z")
+    wf_z = filters.WeightingFilter(fs, curve="Z")
     y_z = wf_z.filter(x)
     np.testing.assert_allclose(y_z, x)
 
     with pytest.raises(ValueError):
-        WeightingFilter(0)
+        filters.WeightingFilter(0)
     with pytest.raises(ValueError):
-        WeightingFilter(fs, curve="invalid")
+        filters.WeightingFilter(fs, curve="invalid")
 
 
 def test_time_weighting_fast() -> None:
@@ -215,7 +217,7 @@ def test_time_weighting_fast() -> None:
     tau = 0.125
     x = np.ones(int(fs * 2)) # Step signal
     
-    y = time_weighting(x, fs, mode="fast")
+    y = filters.time_weighting(x, fs, mode="fast")
     
     # Check at index corresponding to tau
     idx_tau = int(fs * tau)
@@ -230,7 +232,7 @@ def test_time_weighting_initial_state_first() -> None:
     fs = 1000
     x = np.ones(fs)
 
-    y = time_weighting(x, fs, mode="fast", initial_state="first")
+    y = filters.time_weighting(x, fs, mode="fast", initial_state="first")
 
     np.testing.assert_allclose(y, np.ones_like(y), rtol=1e-12, atol=1e-12)
 
@@ -245,7 +247,7 @@ def test_time_weighting_initial_state_custom() -> None:
     x = np.array([2.0, 0.5, -1.0, 0.0])
     initial_state = 0.25
 
-    y = time_weighting(x, fs, mode="fast", initial_state=initial_state)
+    y = filters.time_weighting(x, fs, mode="fast", initial_state=initial_state)
 
     expected = np.zeros_like(x)
     current = initial_state
@@ -261,8 +263,8 @@ def test_time_weighting_initial_state_zero_matches_default() -> None:
     fs = 1000
     x = np.array([2.0, 0.5, -1.0, 0.0])
 
-    y_default = time_weighting(x, fs, mode="fast")
-    y_zero = time_weighting(x, fs, mode="fast", initial_state="zero")
+    y_default = filters.time_weighting(x, fs, mode="fast")
+    y_zero = filters.time_weighting(x, fs, mode="fast", initial_state="zero")
 
     np.testing.assert_allclose(y_zero, y_default, rtol=1e-12, atol=1e-12)
 
@@ -275,7 +277,7 @@ def test_time_weighting_initial_state_array_per_channel() -> None:
     x = np.vstack([np.ones(4), 2 * np.ones(4)])
     initial_state = np.array([0.25, 4.0])
 
-    y = time_weighting(x, fs, mode="fast", initial_state=initial_state)
+    y = filters.time_weighting(x, fs, mode="fast", initial_state=initial_state)
 
     expected = np.empty_like(x)
     current = initial_state.copy()
@@ -293,7 +295,7 @@ def test_time_weighting_initial_state_multichannel_first() -> None:
     fs = 1000
     x = np.vstack([np.ones(fs), 2 * np.ones(fs)])
 
-    y = time_weighting(x, fs, mode="fast", initial_state="first")
+    y = filters.time_weighting(x, fs, mode="fast", initial_state="first")
 
     expected = x**2
     np.testing.assert_allclose(y, expected, rtol=1e-12, atol=1e-12)
@@ -307,19 +309,21 @@ def test_time_weighting_initial_state_invalid() -> None:
     x = np.ones(fs)
 
     with pytest.raises(ValueError, match="initial_state"):
-        time_weighting(x, fs, mode="fast", initial_state="invalid")
+        filters.time_weighting(x, fs, mode="fast", initial_state="invalid")
 
     two_channels = np.ones((2, 10))
     mismatched_state = np.ones(3)
     with pytest.raises(ValueError, match="broadcastable"):
-        time_weighting(two_channels, fs, mode="fast", initial_state=mismatched_state)
+        filters.time_weighting(
+            two_channels, fs, mode="fast", initial_state=mismatched_state
+        )
 
 
 def test_time_weighting_initial_state_first_rejects_empty_input() -> None:
     """Verify initial_state='first' requires at least one sample."""
     empty = np.array([])
     with pytest.raises(ValueError, match="initial_state"):
-        time_weighting(empty, 1000, mode="fast", initial_state="first")
+        filters.time_weighting(empty, 1000, mode="fast", initial_state="first")
 
 
 @pytest.mark.parametrize("mode", ["fast", "slow", "impulse"])
@@ -327,7 +331,7 @@ def test_time_weighting_rejects_non_positive_sample_rate(mode: str) -> None:
     """Verify time weighting rejects non-positive sample rates before coefficient math."""
     x = np.ones(10)
     with pytest.raises(ValueError, match="Sample rate 'fs' must be positive"):
-        time_weighting(x, 0, mode=mode)
+        filters.time_weighting(x, 0, mode=mode)
 
 
 def test_time_weighting_impulse_multichannel() -> None:
@@ -336,7 +340,7 @@ def test_time_weighting_impulse_multichannel() -> None:
     x = np.zeros((2, fs))
     x[:, 0] = 1.0
 
-    y = time_weighting(x, fs, mode="impulse")
+    y = filters.time_weighting(x, fs, mode="impulse")
 
     assert y.shape == x.shape
     assert y[0, 100] < y[0, 0]
@@ -347,7 +351,7 @@ def test_time_weighting_impulse_initial_state_first_1d() -> None:
     fs = 1000
     x = np.ones(fs)
 
-    y = time_weighting(x, fs, mode="impulse", initial_state="first")
+    y = filters.time_weighting(x, fs, mode="impulse", initial_state="first")
 
     np.testing.assert_allclose(y, np.ones_like(y), rtol=1e-12, atol=1e-12)
 
@@ -373,7 +377,7 @@ def test_linkwitz_riley_sum() -> None:
     x = rng.standard_normal(fs)
     
     # Split at 1000 Hz
-    lp, hp = linkwitz_riley(x, fs, freq=1000, order=4)
+    lp, hp = filters.linkwitz_riley(x, fs, freq=1000, order=4)
     
     # Sum of bands
     y_sum = lp + hp
@@ -398,7 +402,7 @@ def test_weighting_z_bypass() -> None:
     """
     rng = np.random.default_rng(42)
     x = rng.standard_normal(1000)
-    y = weighting_filter(x, 48000, curve="Z")
+    y = filters.weighting_filter(x, 48000, curve="Z")
     assert np.all(x == y)
 
 def test_time_weighting_int16_no_overflow() -> None:
@@ -419,8 +423,8 @@ def test_time_weighting_int16_no_overflow() -> None:
     x_float = 0.9 * 32767 * np.sin(2 * np.pi * 1000 * t)
     x_int = x_float.astype(np.int16)
 
-    env_int = time_weighting(x_int, fs, mode="fast")
-    env_float = time_weighting(x_float, fs, mode="fast")
+    env_int = filters.time_weighting(x_int, fs, mode="fast")
+    env_float = filters.time_weighting(x_float, fs, mode="fast")
 
     assert (env_int >= 0).all(), "mean-square envelope can never be negative"
     np.testing.assert_allclose(env_int[-1], env_float[-1], rtol=1e-3)
@@ -441,8 +445,8 @@ def test_sensitivity_int16_matches_float() -> None:
     t = np.arange(fs) / fs
     x_float = 0.5 * 32767 * np.sin(2 * np.pi * 1000 * t)
 
-    s_int = sensitivity(x_float.astype(np.int16))
-    s_float = sensitivity(x_float)
+    s_int = metrology.sensitivity(x_float.astype(np.int16))
+    s_float = metrology.sensitivity(x_float)
     np.testing.assert_allclose(s_int, s_float, rtol=1e-3)
 
 
@@ -457,7 +461,9 @@ def _analytic_a_weight_db(f: float) -> float:
     return float(20 * np.log10(ra) + 2.0)
 
 
-def _measured_gain_db(wf: WeightingFilter, fs: int, f0: float) -> float:
+def _measured_gain_db(
+    wf: filters.WeightingFilter, fs: int, f0: float
+) -> float:
     """End-to-end RMS gain of the weighting filter at a single frequency."""
     t = np.arange(int(fs * 0.5)) / fs
     x = np.sin(2 * np.pi * f0 * t)
@@ -483,7 +489,7 @@ def test_a_weighting_class1_high_frequencies(fs: int) -> None:
     - Errors vs the analytic curve stay within class 1 tolerances
       (12.5 kHz: +2.0/-2.5 dB; 16 kHz: +2.5/-16 dB, tightened here).
     """
-    wf = WeightingFilter(fs, "A")  # high_accuracy defaults to True
+    wf = filters.WeightingFilter(fs, "A")  # high_accuracy defaults to True
     # Tightened to lock the 144 kHz oversample-target fit (audit N1 A6): with
     # the target raised from 96 to 144 kHz both 44.1k and 48k oversample enough
     # to keep the HF error within +/-0.7 dB of the analytic curve up to 16 kHz.
@@ -500,7 +506,7 @@ def test_a_weighting_48k_hf_accuracy_locked() -> None:
     144 kHz oversamples x3, halving those residuals to about -0.44 / -0.85 dB.
     """
     fs = 48000
-    wf = WeightingFilter(fs, "A")
+    wf = filters.WeightingFilter(fs, "A")
     for f0, bound in [(16000, 0.6), (20000, 1.0)]:
         err = _measured_gain_db(wf, fs, f0) - _analytic_a_weight_db(f0)
         assert abs(err) < bound, f"{f0} Hz: error {err:+.2f} dB at fs={fs}"
@@ -509,19 +515,19 @@ def test_a_weighting_48k_hf_accuracy_locked() -> None:
 def test_high_accuracy_incompatible_with_stateful() -> None:
     """high_accuracy resampling would break block continuity: must raise."""
     with pytest.raises(ValueError, match="high_accuracy"):
-        WeightingFilter(48000, "A", stateful=True, high_accuracy=True)
+        filters.WeightingFilter(48000, "A", stateful=True, high_accuracy=True)
 
 
 def test_stateful_defaults_to_legacy_mode() -> None:
     """Stateful filters keep the plain bilinear design (no oversampling)."""
-    wf = WeightingFilter(48000, "A", stateful=True)
+    wf = filters.WeightingFilter(48000, "A", stateful=True)
     assert wf._oversample == 1
 
 
 def test_high_accuracy_preserves_length_and_shape() -> None:
     """Oversample+decimate round trip must preserve the input shape."""
     x = np.random.default_rng(0).standard_normal((2, 12345))
-    y = WeightingFilter(48000, "A").filter(x)
+    y = filters.WeightingFilter(48000, "A").filter(x)
     assert y.shape == x.shape
 
 
@@ -541,7 +547,7 @@ def test_c_weighting_class1_high_frequencies(fs: int) -> None:
     Same oversampled design path as the A curve; dedicated regression so a
     C-specific change cannot silently degrade HF accuracy.
     """
-    wf = WeightingFilter(fs, "C")
+    wf = filters.WeightingFilter(fs, "C")
     # Tightened alongside the A curve for the 144 kHz oversample target (A6).
     for f0, tol_lo, tol_hi in [(8000, -0.7, 0.7), (12500, -0.7, 0.7), (16000, -0.7, 0.7)]:
         err = _measured_gain_db(wf, fs, f0) - _analytic_c_weight_db(f0)
@@ -550,7 +556,7 @@ def test_c_weighting_class1_high_frequencies(fs: int) -> None:
 
 def test_weighting_filter_empty_signal_high_accuracy() -> None:
     """Empty input must pass through (resample_poly rejects zero-length input)."""
-    wf = WeightingFilter(48000, "A")
+    wf = filters.WeightingFilter(48000, "A")
     y = wf.filter(np.array([]))
     assert y.shape == (0,)
 
@@ -569,7 +575,7 @@ def test_a_weighting_positive_gain_region() -> None:
     - 1250 Hz: +0.6 | 2000 Hz: +1.2 | 2500 Hz: +1.3 | 4000 Hz: +1.0 | 5000 Hz: +0.5
     """
     fs = 48000
-    wf = WeightingFilter(fs, "A")
+    wf = filters.WeightingFilter(fs, "A")
     for f0, expected in [(1250, 0.6), (2000, 1.2), (2500, 1.3), (4000, 1.0), (5000, 0.5)]:
         gain = _measured_gain_db(wf, fs, f0)
         assert gain > 0, f"A-weighting must be positive at {f0} Hz, got {gain:.2f} dB"

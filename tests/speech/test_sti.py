@@ -28,7 +28,7 @@ from reference_data import (
     IEC60268_16_ANNEX_M_STI,
 )
 
-from phonometry import STIResult, sti_from_impulse_response, stipa, stipa_signal
+from phonometry import speech
 from phonometry.speech.sti import (
     _ALPHA_MALE,
     _BETA_MALE,
@@ -143,7 +143,7 @@ def test_alpha_beta_artifact_truncated_to_one():
 def test_delta_impulse_response_is_perfect_transmission():
     ir = np.zeros(FS // 2)
     ir[100] = 1.0
-    result = sti_from_impulse_response(ir, FS)
+    result = speech.sti_from_impulse_response(ir, FS)
     # The residual error is the analysis filter bank's own MTF; the
     # standard allows < 0,01 STI systematic error (Ed.4 A.5.1.2).
     assert result.sti == pytest.approx(1.0, abs=0.01)
@@ -151,14 +151,14 @@ def test_delta_impulse_response_is_perfect_transmission():
     assert result.mtf.shape == (7, 14)
     assert result.mti.shape == (7,)
     assert result.band_levels is None
-    assert isinstance(result, STIResult)
+    assert isinstance(result, speech.STIResult)
 
 
 def test_exponential_decay_matches_analytic_schroeder_mtf():
     fs = 24000
     stis = []
     for t60 in (0.5, 1.0, 2.0, 4.0):
-        got = sti_from_impulse_response(_decay_ir(t60, fs), fs).sti
+        got = speech.sti_from_impulse_response(_decay_ir(t60, fs), fs).sti
         assert got == pytest.approx(_analytic_decay_sti(t60), abs=0.01)
         stis.append(got)
     # Monotonic: longer reverberation always degrades intelligibility.
@@ -168,32 +168,36 @@ def test_exponential_decay_matches_analytic_schroeder_mtf():
 def test_snr_degradation_on_impulse_response():
     fs = 24000
     ir = _decay_ir(1.0, fs)
-    plain = sti_from_impulse_response(ir, fs)
-    high_snr = sti_from_impulse_response(ir, fs, snr=30.0)
-    zero_snr = sti_from_impulse_response(ir, fs, snr=0.0)
+    plain = speech.sti_from_impulse_response(ir, fs)
+    high_snr = speech.sti_from_impulse_response(ir, fs, snr=30.0)
+    zero_snr = speech.sti_from_impulse_response(ir, fs, snr=0.0)
     # +30 dB SNR: m factor 1/(1+10^-3) = 0,999 -> no visible change.
     assert high_snr.sti == pytest.approx(plain.sti, abs=0.01)
     # 0 dB SNR: every m halved -> STI drops markedly.
     np.testing.assert_allclose(zero_snr.mtf, plain.mtf / 2.0, rtol=1e-12)
     assert zero_snr.sti < plain.sti - 0.1
     # Per-band SNR vector is accepted and equals the scalar case.
-    vec = sti_from_impulse_response(ir, fs, snr=np.zeros(7))
+    vec = speech.sti_from_impulse_response(ir, fs, snr=np.zeros(7))
     assert vec.sti == pytest.approx(zero_snr.sti, abs=1e-12)
 
 
 def test_level_corrections_reduce_sti():
     fs = 24000
     ir = _decay_ir(1.0, fs)
-    plain = sti_from_impulse_response(ir, fs)
+    plain = speech.sti_from_impulse_response(ir, fs)
     # Comfortable speech levels: masking/threshold effects are small.
-    comfortable = sti_from_impulse_response(ir, fs, level=[62, 62, 59, 53, 47, 41, 35])
+    comfortable = speech.sti_from_impulse_response(
+        ir, fs, level=[62, 62, 59, 53, 47, 41, 35]
+    )
     # Very quiet speech: the absolute reception threshold dominates.
-    quiet = sti_from_impulse_response(ir, fs, level=[20, 20, 17, 11, 5, -1, -7])
+    quiet = speech.sti_from_impulse_response(
+        ir, fs, level=[20, 20, 17, 11, 5, -1, -7]
+    )
     assert comfortable.sti <= plain.sti
     assert quiet.sti < comfortable.sti - 0.05
     assert comfortable.band_levels is not None
     # Ambient noise at the listener degrades further.
-    noisy = sti_from_impulse_response(
+    noisy = speech.sti_from_impulse_response(
         ir, fs, level=[62, 62, 59, 53, 47, 41, 35], ambient=[55] * 7
     )
     assert noisy.sti < comfortable.sti
@@ -231,12 +235,12 @@ def test_masking_amdb_is_vectorized_and_continuous():
 @pytest.fixture(scope="module")
 def stipa_18s_seed1234() -> np.ndarray:
     """The 18 s seed-1234 STIPA test signal, generated once for the module."""
-    return stipa_signal(FS, seconds=18.0, seed=1234)
+    return speech.stipa_signal(FS, seconds=18.0, seed=1234)
 
 
 def test_stipa_loopback_ideal_channel(stipa_18s_seed1234: np.ndarray):
     x = stipa_18s_seed1234
-    result = stipa(x, FS)
+    result = speech.stipa(x, FS)
     # Ideal loopback recovers STI 0.998 and min MTF 0.945 at 18 s; lock those
     # in (was >= 0.95 / > 0.9, several x looser than the achieved accuracy).
     assert result.sti >= 0.99
@@ -249,13 +253,13 @@ def test_stipa_short_recording_warns(stipa_18s_seed1234: np.ndarray):
     """A recording shorter than the recommended 15 s biases the recovered
     modulation depths (and STI) low; stipa should warn (IEC 60268-16 STIPA
     practice recommends 15 s to 25 s)."""
-    short = stipa_signal(FS, seconds=5.0, seed=1234)
+    short = speech.stipa_signal(FS, seconds=5.0, seed=1234)
     with pytest.warns(UserWarning, match="15"):
-        stipa(short, FS)
+        speech.stipa(short, FS)
     # No warning at the recommended length.
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        stipa(stipa_18s_seed1234, FS)
+        speech.stipa(stipa_18s_seed1234, FS)
 
 
 def test_stipa_with_noise_is_monotonic(stipa_18s_seed1234: np.ndarray):
@@ -265,15 +269,15 @@ def test_stipa_with_noise_is_monotonic(stipa_18s_seed1234: np.ndarray):
     stis = []
     for snr_db in (30.0, 10.0, 0.0):
         noise = rng.standard_normal(x.size) * rms * 10.0 ** (-snr_db / 20.0)
-        stis.append(stipa(x + noise, FS).sti)
+        stis.append(speech.stipa(x + noise, FS).sti)
     assert all(a > b for a, b in pairwise(stis))
     assert stis[-1] < 0.7  # 0 dB broadband SNR is clearly degraded
 
 
 def test_stipa_reference_normalization():
-    x = stipa_signal(FS, seconds=18.0, seed=99)
-    with_nominal = stipa(x, FS)
-    with_reference = stipa(0.25 * x, FS, reference=x)
+    x = speech.stipa_signal(FS, seconds=18.0, seed=99)
+    with_nominal = speech.stipa(x, FS)
+    with_reference = speech.stipa(0.25 * x, FS, reference=x)
     # Loop-back against the emitted signal itself: m = 1 in every band
     # (gain does not affect modulation depths).
     assert with_reference.sti == pytest.approx(1.0, abs=1e-6)
@@ -282,7 +286,7 @@ def test_stipa_reference_normalization():
 
 def test_stipa_signal_properties():
     seconds = 18.0
-    x = stipa_signal(FS, seconds=seconds, seed=0)
+    x = speech.stipa_signal(FS, seconds=seconds, seed=0)
     assert x.shape == (int(seconds * FS),)
     # Default normalization: RMS = 0,1 digital units.
     assert float(np.sqrt(np.mean(x**2))) == pytest.approx(0.1, rel=1e-9)
@@ -290,11 +294,13 @@ def test_stipa_signal_properties():
     crest_db = 20.0 * np.log10(np.max(np.abs(x)) / np.sqrt(np.mean(x**2)))
     assert 9.0 < crest_db < 16.0
     # Calibrated output: overall level in dB re 20 uPa.
-    x_cal = stipa_signal(FS, seconds=6.0, level_db=74.0, seed=0)
+    x_cal = speech.stipa_signal(FS, seconds=6.0, level_db=74.0, seed=0)
     level = 20.0 * np.log10(np.sqrt(np.mean(x_cal**2)) / 2e-5)
     assert level == pytest.approx(74.0, abs=1e-9)
     # Reproducible for a fixed seed.
-    np.testing.assert_array_equal(x, stipa_signal(FS, seconds=seconds, seed=0))
+    np.testing.assert_array_equal(
+        x, speech.stipa_signal(FS, seconds=seconds, seed=0)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -330,26 +336,28 @@ def test_invalid_inputs_raise():
     silent_ir = np.zeros(FS // 4)
 
     with pytest.raises(ValueError, match="1D"):
-        sti_from_impulse_response(two_dimensional_ir, FS)
+        speech.sti_from_impulse_response(two_dimensional_ir, FS)
     with pytest.raises(ValueError, match="positive"):
-        sti_from_impulse_response(ir, -1)
+        speech.sti_from_impulse_response(ir, -1)
     with pytest.raises(ValueError, match="8 kHz octave band"):
-        sti_from_impulse_response(ir, 16000)
+        speech.sti_from_impulse_response(ir, 16000)
     with pytest.raises(ValueError, match="silent"):
-        sti_from_impulse_response(silent_ir, FS)
+        speech.sti_from_impulse_response(silent_ir, FS)
     with pytest.raises(ValueError, match="7 octave-band values"):
-        sti_from_impulse_response(ir, FS, level=[60.0, 60.0, 60.0])
+        speech.sti_from_impulse_response(ir, FS, level=[60.0, 60.0, 60.0])
     with pytest.raises(ValueError, match="scalar or a vector"):
-        sti_from_impulse_response(ir, FS, snr=[10.0, 10.0])
+        speech.sti_from_impulse_response(ir, FS, snr=[10.0, 10.0])
     with pytest.raises(ValueError, match="requires the speech octave-band levels"):
-        sti_from_impulse_response(ir, FS, ambient=[40.0] * 7)
+        speech.sti_from_impulse_response(ir, FS, ambient=[40.0] * 7)
     with pytest.raises(ValueError, match="not both"):
-        sti_from_impulse_response(ir, FS, snr=10.0, level=[60.0] * 7, ambient=[40.0] * 7)
+        speech.sti_from_impulse_response(
+            ir, FS, snr=10.0, level=[60.0] * 7, ambient=[40.0] * 7
+        )
 
     two_dimensional_signal = np.zeros((2, FS))
     with pytest.raises(ValueError, match="1D"):
-        stipa(two_dimensional_signal, FS)
-    half_second_clip = stipa_signal(FS, seconds=18.0, seed=3)[: FS // 2]
+        speech.stipa(two_dimensional_signal, FS)
+    half_second_clip = speech.stipa_signal(FS, seconds=18.0, seed=3)[: FS // 2]
     # The 0.5 s clip also triggers the (correct) sub-15 s STIPA warning;
     # silence it so the test output stays clean while asserting the error.
     # simplefilter has to run inside catch_warnings, before the call, so the
@@ -357,7 +365,7 @@ def test_invalid_inputs_raise():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         with pytest.raises(ValueError, match="too short"):
-            stipa(half_second_clip, FS)
+            speech.stipa(half_second_clip, FS)
     with pytest.warns(STIWarning) as tone_warnings:  # noqa: PT031 - the warns block records the whole STIWarning family while running
         # A pure tone leaves other octave bands empty: those bands read
         # m = 0 (TI = 0) with a warning rather than a hard error, so the
@@ -368,7 +376,7 @@ def test_invalid_inputs_raise():
         # leaked warning is re-materialised on the pytest-xdist controller
         # by importing its module, which races the phonometry import).
         t = np.arange(4 * FS) / FS
-        res_tone = stipa(np.sin(2 * np.pi * 1000.0 * t), FS)
+        res_tone = speech.stipa(np.sin(2 * np.pi * 1000.0 * t), FS)
     assert any("No energy in octave band" in str(w.message) for w in tone_warnings)
     # The 1 kHz band carries the tone (unmodulated: m ~ 0); at least one
     # dead band integrates to non-positive envelope energy and is pinned
@@ -377,9 +385,9 @@ def test_invalid_inputs_raise():
     assert np.all(res_tone.mtf[3] < 0.01)
 
     with pytest.raises(ValueError, match="positive"):
-        stipa_signal(FS, seconds=0.0)
+        speech.stipa_signal(FS, seconds=0.0)
     with pytest.raises(ValueError, match="fs"):
-        stipa_signal(8000)
+        speech.stipa_signal(8000)
 
     wrong_shape_mtf = np.full((3, 14), 0.5)
     negative_mtf = _uniform_mtf(-0.1)
@@ -438,7 +446,7 @@ def test_stipa_direct_method_modulation_depth_staircase(i: int) -> None:
     published STI staircase for the Formula (C.1) signal within +/-0,05."""
     m = i / 10.0
     x = _c32_signal(m, FS, seconds=16.0)
-    res = stipa(x, FS)
+    res = speech.stipa(x, FS)
     assert res.sti == pytest.approx(_C32_STI_STAIRCASE[i], abs=0.05)
 
 

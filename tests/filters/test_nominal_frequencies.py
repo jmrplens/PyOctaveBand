@@ -6,7 +6,7 @@ Tests for IEC 61260-1 nominal frequency helpers and opt-in nominal label support
 import numpy as np
 import pytest
 
-from phonometry import OctaveFilterBank, normalized_frequencies, octave_filter
+from phonometry import filters
 from phonometry.filters.frequencies import (
     _format_nominal_freq,
     _iec_e3_round,
@@ -81,7 +81,7 @@ def test_getansifrequencies_fraction1_labels():
 # --- OctaveFilterBank.nominal_freq attribute ---
 
 def test_filterbank_nominal_freq_attribute():
-    fb = OctaveFilterBank(fs=48000, fraction=1)
+    fb = filters.OctaveFilterBank(fs=48000, fraction=1)
     assert hasattr(fb, "nominal_freq")
     assert isinstance(fb.nominal_freq, list)
     assert all(isinstance(label, str) for label in fb.nominal_freq)
@@ -92,7 +92,7 @@ def test_filterbank_nominal_freq_attribute():
 # --- filter(nominal=False) — default exact floats ---
 
 def test_filter_nominal_false_returns_floats():
-    fb = OctaveFilterBank(fs=48000, fraction=3)
+    fb = filters.OctaveFilterBank(fs=48000, fraction=3)
     x = np.zeros(4800)
     _, freq = fb.filter(x, nominal=False)
     assert all(isinstance(f, float) for f in freq)
@@ -101,7 +101,7 @@ def test_filter_nominal_false_returns_floats():
 # --- filter(nominal=True) — nominal string labels ---
 
 def test_filter_nominal_true_returns_strings():
-    fb = OctaveFilterBank(fs=48000, fraction=3)
+    fb = filters.OctaveFilterBank(fs=48000, fraction=3)
     x = np.zeros(4800)
     _, freq = fb.filter(x, nominal=True)
     assert all(isinstance(f, str) for f in freq)
@@ -109,7 +109,7 @@ def test_filter_nominal_true_returns_strings():
 
 
 def test_filter_nominal_true_with_sigbands():
-    fb = OctaveFilterBank(fs=48000, fraction=1)
+    fb = filters.OctaveFilterBank(fs=48000, fraction=1)
     x = np.zeros(4800)
     _, freq, xb = fb.filter(x, sigbands=True, nominal=True)
     assert all(isinstance(f, str) for f in freq)
@@ -120,23 +120,23 @@ def test_filter_nominal_true_with_sigbands():
 
 def test_octavefilter_nominal_true():
     x = np.zeros(4800)
-    _, freq = octave_filter(x, fs=48000, fraction=3, nominal=True)
+    _, freq = filters.octave_filter(x, fs=48000, fraction=3, nominal=True)
     assert all(isinstance(f, str) for f in freq)
     assert "1k" in freq
 
 
 def test_octavefilter_nominal_false_default():
     x = np.zeros(4800)
-    _, freq = octave_filter(x, fs=48000, fraction=3)
+    _, freq = filters.octave_filter(x, fs=48000, fraction=3)
     assert all(isinstance(f, float) for f in freq)
 
 
 def test_normalizedfreq_fraction1_and_invalid_fraction() -> None:
-    freq = normalized_frequencies(1)
+    freq = filters.normalized_frequencies(1)
     assert 1000 in freq
 
     with pytest.raises(ValueError):
-        normalized_frequencies(5)
+        filters.normalized_frequencies(5)
 
 
 def test_annex_e34_worked_rounding_examples() -> None:

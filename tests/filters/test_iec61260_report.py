@@ -20,19 +20,16 @@ import pytest
 
 pytest.importorskip("reportlab")
 
-from phonometry import (
-    OctaveFilterBank,
-    ReportMetadata,
-    filter_class_compliance,
-    verify_filter_class,
-)
+from phonometry import ReportMetadata, filters
 
 _PDF_MAGIC = b"%PDF"
 
 
-def _class1_bank() -> OctaveFilterBank:
+def _class1_bank() -> filters.OctaveFilterBank:
     """A default Butterworth octave bank that meets IEC 61260-1:2014 class 1."""
-    return OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+    return filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=6, limits=[125, 4000]
+    )
 
 
 def _assert_one_page(path: str) -> None:
@@ -46,9 +43,11 @@ def _assert_one_page(path: str) -> None:
 
 def test_filter_class_compliance_carries_bank_data() -> None:
     """The result packages the bank data and agrees with verify_filter_class."""
-    bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
-    result = filter_class_compliance(bank)
-    verdict = verify_filter_class(bank)
+    bank = filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=6, limits=[500, 2000]
+    )
+    result = filters.filter_class_compliance(bank)
+    verdict = filters.verify_filter_class(bank)
 
     assert result.overall_class == verdict["overall_class"]
     assert len(result.bands) == bank.num_bands
@@ -69,7 +68,7 @@ def test_filter_class_compliance_carries_bank_data() -> None:
 
 def test_class1_bank_reports_complies(tmp_path) -> None:
     """A class-1 bank renders a valid one-page COMPLIES fiche."""
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     assert result.overall_class == 1
     out = tmp_path / "iec.pdf"
     returned = result.report(str(out))
@@ -79,8 +78,10 @@ def test_class1_bank_reports_complies(tmp_path) -> None:
 
 def test_1995_edition_reports_class0(tmp_path) -> None:
     """The 1995 edition keeps class 0; a high-order bank renders a Class 0 fiche."""
-    bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
-    result = filter_class_compliance(bank, edition="1995")
+    bank = filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=6, limits=[250, 4000]
+    )
+    result = filters.filter_class_compliance(bank, edition="1995")
     assert result.edition == "1995"
     assert result.overall_class == 0
     assert 0 in result.available_classes()  # class 0 only exists in the 1995 mask
@@ -92,7 +93,7 @@ def test_1995_edition_reports_class0(tmp_path) -> None:
 
 def test_full_metadata_renders_one_page(tmp_path) -> None:
     """A populated ReportMetadata renders a one-page filter-compliance fiche."""
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     md = ReportMetadata(
         specimen="1/1-octave filter bank",
         client="Acoustic Test Client Ltd.",
@@ -112,7 +113,9 @@ def test_full_metadata_renders_one_page(tmp_path) -> None:
 
 def test_unknown_engine_rejected(tmp_path) -> None:
     """An unknown rendering engine raises ``ValueError``."""
-    result = filter_class_compliance(_class1_bank())  # hoisted out of raises (S5778)
+    result = filters.filter_class_compliance(
+        _class1_bank()
+    )  # hoisted out of raises (S5778)
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="engine"):
         result.report(out, engine="weasyprint")
@@ -120,14 +123,16 @@ def test_unknown_engine_rejected(tmp_path) -> None:
 
 def test_required_class_pass_and_fail_both_render(tmp_path) -> None:
     """A PASS (class 1 meets required 1) and a FAIL (meets no class) both render."""
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     assert result.overall_class == 1
     passing = tmp_path / "pass.pdf"
     result.report(str(passing), metadata=ReportMetadata(required_class=1))
     _assert_one_page(str(passing))
     # FAIL case: a low-order bank meets no class of the edition.
-    failing_result = filter_class_compliance(
-        OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
+    failing_result = filters.filter_class_compliance(
+        filters.OctaveFilterBank(
+            fs=48000, fraction=1, order=1, limits=[500, 2000]
+        )
     )
     assert failing_result.overall_class is None
     failing = tmp_path / "fail.pdf"
@@ -142,7 +147,7 @@ def test_required_class_missing_from_edition_rejected(tmp_path) -> None:
     against a 2014 verification would silently render a meaningless FAIL, so
     it is rejected with a pointer to the 1995 edition.
     """
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     out = str(tmp_path / "class0.pdf")
     meta = ReportMetadata(required_class=0)
     with pytest.raises(ValueError, match="edition"):
@@ -156,7 +161,7 @@ def test_fiche_labels_bands_with_nominal_frequencies(tmp_path) -> None:
     (2014 5.5 / 1995 4.2): the fiche must print 125 Hz and 4 kHz, never the
     exact base-ten 125.89.. / 3981.. Hz behind them.
     """
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     out = tmp_path / "nominal.pdf"
     result.report(str(out))
     text = _extract_text(str(out))
@@ -173,7 +178,7 @@ def test_range_limited_verdict_prints_qualifying_note(tmp_path) -> None:
     band's processing Nyquist, so the result carries ``range_limited`` and
     the fiche prints the qualification next to the stated class.
     """
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     assert result.range_limited is True
     for band in result.bands:
         assert band["checked_to_omega"] > 0.0
@@ -187,8 +192,10 @@ def test_range_limited_verdict_prints_qualifying_note(tmp_path) -> None:
 
 def test_non_compliant_bank_renders(tmp_path) -> None:
     """A low-order bank that meets no class renders its non-compliance fiche."""
-    bank = OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
-    result = filter_class_compliance(bank)
+    bank = filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=1, limits=[500, 2000]
+    )
+    result = filters.filter_class_compliance(bank)
     assert result.overall_class is None
     out = tmp_path / "noncompliant.pdf"
     result.report(str(out))
@@ -224,7 +231,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     """``language="es"`` renders a one-page Spanish fiche with comma decimals."""
     import re
 
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     out = tmp_path / "filter_es.pdf"
     result.report(str(out), metadata=ReportMetadata(required_class=1), language="es")
     _assert_one_page(str(out))
@@ -237,6 +244,6 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
 
 def test_unknown_language_rejected(tmp_path) -> None:
     """An unknown fiche language raises ``ValueError``."""
-    result = filter_class_compliance(_class1_bank())
+    result = filters.filter_class_compliance(_class1_bank())
     with pytest.raises(ValueError, match="language"):
         result.report(str(tmp_path / "bad.pdf"), language="xx")

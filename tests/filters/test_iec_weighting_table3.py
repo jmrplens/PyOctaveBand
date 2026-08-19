@@ -20,14 +20,16 @@ import numpy as np
 import pytest
 from reference_data import IEC61672_TABLE3 as TABLE3
 
-from phonometry import WeightingFilter
+from phonometry import filters
 
 # (nominal_freq_Hz, A_dB, C_dB, class1_upper_dB, class1_lower_dB)
 # BS EN 61672-1:2013 Table 3 is imported from reference_data (shared with the
 # CI conformance report). Z weighting is 0.0 dB at every frequency.
 
 
-def _measured_gain_db(wf: WeightingFilter, fs: int, f0: float) -> float:
+def _measured_gain_db(
+    wf: filters.WeightingFilter, fs: int, f0: float
+) -> float:
     """Steady-state RMS gain of the weighting filter at a single frequency."""
     # Longer windows at low frequencies keep the partial-cycle RMS error tiny.
     duration = max(0.5, 12 / f0)
@@ -61,7 +63,7 @@ _CLASS1_MISSES: dict[tuple[str, int], set[float]] = {
 @pytest.mark.parametrize("fs", [16000, 32000, 48000, 96000])
 @pytest.mark.parametrize("curve,column", [("A", 1), ("C", 2)])
 def test_weighting_within_class1_limits_table3(fs: int, curve: str, column: int) -> None:
-    wf = WeightingFilter(fs, curve)
+    wf = filters.WeightingFilter(fs, curve)
     missed: set[float] = set()
     detail = []
     for row in TABLE3:
@@ -83,6 +85,6 @@ def test_weighting_within_class1_limits_table3(fs: int, curve: str, column: int)
 
 def test_z_weighting_is_flat() -> None:
     """Z weighting is 0.0 dB at every Table 3 frequency (bypass)."""
-    wf = WeightingFilter(48000, "Z")
+    wf = filters.WeightingFilter(48000, "Z")
     x = np.random.default_rng(0).standard_normal(4800)
     np.testing.assert_array_equal(wf.filter(x), x)

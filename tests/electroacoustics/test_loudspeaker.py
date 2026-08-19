@@ -27,13 +27,7 @@ import os
 import numpy as np
 import pytest
 
-from phonometry import (
-    LoudspeakerDirectivity,
-    LoudspeakerRatings,
-    ReportMetadata,
-    loudspeaker_characteristics,
-    radiating_piston,
-)
+from phonometry import ReportMetadata, electroacoustics
 
 _PDF_MAGIC = b"%PDF"
 _R = 8.0
@@ -74,7 +68,9 @@ def _extract_text(path: str) -> str:
 def test_characteristic_sensitivity_is_band_mean_at_1w_1m() -> None:
     """A flat L0 driven at sqrt(R) volts at 1 m gives sensitivity level L0 (20.3)."""
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(f, spl, _R, sensitivity_band=(200.0, 4000.0))
+    result = electroacoustics.loudspeaker_characteristics(
+        f, spl, _R, sensitivity_band=(200.0, 4000.0)
+    )
     assert result.sensitivity_level_db == pytest.approx(_L0, abs=1e-9)
     # Default drive is sqrt(R): 1 W into R (the 2,83 V @ 8 ohm convention).
     assert result.input_voltage == pytest.approx(math.sqrt(_R))
@@ -83,7 +79,7 @@ def test_characteristic_sensitivity_is_band_mean_at_1w_1m() -> None:
 def test_sensitivity_drive_voltage_correction() -> None:
     """Doubling the drive voltage lowers the 1 W sensitivity by 20 lg 2 dB."""
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(
+    result = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, input_voltage=2.0 * math.sqrt(_R), sensitivity_band=(200.0, 4000.0)
     )
     assert result.sensitivity_level_db == pytest.approx(_L0 - 20.0 * math.log10(2.0), abs=1e-9)
@@ -92,7 +88,7 @@ def test_sensitivity_drive_voltage_correction() -> None:
 def test_sensitivity_distance_correction_cancels() -> None:
     """A 2 m distance with a doubled voltage cancels back to L0 (20.3.2)."""
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(
+    result = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, input_voltage=2.0 * math.sqrt(_R), distance=2.0,
         sensitivity_band=(200.0, 4000.0),
     )
@@ -102,7 +98,9 @@ def test_sensitivity_distance_correction_cancels() -> None:
 def test_characteristic_sensitivity_pressure() -> None:
     """The characteristic sensitivity in Pa is 20 uPa * 10 ** (L/20)."""
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(f, spl, _R, sensitivity_band=(200.0, 4000.0))
+    result = electroacoustics.loudspeaker_characteristics(
+        f, spl, _R, sensitivity_band=(200.0, 4000.0)
+    )
     assert result.characteristic_sensitivity_pa == pytest.approx(
         20e-6 * 10.0 ** (_L0 / 20.0), rel=1e-9
     )
@@ -114,7 +112,9 @@ def test_characteristic_sensitivity_pressure() -> None:
 def test_effective_range_crosses_threshold_at_known_points() -> None:
     """The band edges are the frequencies where the response crosses ref - 10 dB."""
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(f, spl, _R, sensitivity_band=(200.0, 4000.0))
+    result = electroacoustics.loudspeaker_characteristics(
+        f, spl, _R, sensitivity_band=(200.0, 4000.0)
+    )
     assert result.reference_level_db == pytest.approx(_L0, abs=1e-9)
     lo, hi = result.effective_range
     assert lo == pytest.approx(50.0, rel=1e-6)
@@ -126,7 +126,9 @@ def test_narrow_trough_is_neglected() -> None:
     f, spl = _flat_response()
     spl = spl.copy()
     spl[int(np.argmin(np.abs(f - 1000.0)))] = _L0 - 15.0
-    result = loudspeaker_characteristics(f, spl, _R, sensitivity_band=(200.0, 4000.0))
+    result = electroacoustics.loudspeaker_characteristics(
+        f, spl, _R, sensitivity_band=(200.0, 4000.0)
+    )
     lo, hi = result.effective_range
     assert lo == pytest.approx(50.0, rel=1e-6)
     assert hi == pytest.approx(18000.0, rel=1e-6)
@@ -137,7 +139,7 @@ def test_minimum_impedance_over_effective_range() -> None:
     f, spl = _flat_response()
     fz = np.geomspace(20.0, 20000.0, 200)
     z = 7.0 + 20.0 * np.exp(-((np.log2(fz / 40.0)) ** 2) / 0.1)  # peak below the range
-    result = loudspeaker_characteristics(
+    result = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, sensitivity_band=(200.0, 4000.0), impedance=(fz, z)
     )
     # Within [50, 18000] Hz the modulus floor is ~7 ohm (>= 80 % of 8 = 6.4).
@@ -160,9 +162,15 @@ def test_minimum_impedance_uses_rated_range_when_supplied() -> None:
     """16.1 scans the rated frequency range: a dip outside the effective range counts."""
     f, spl = _flat_response()
     fz, z = _dip_below_effective_range()
-    result = loudspeaker_characteristics(
-        f, spl, _R, sensitivity_band=(200.0, 4000.0), impedance=(fz, z),
-        ratings=LoudspeakerRatings(frequency_range=(30.0, 20000.0)),
+    result = electroacoustics.loudspeaker_characteristics(
+        f,
+        spl,
+        _R,
+        sensitivity_band=(200.0, 4000.0),
+        impedance=(fz, z),
+        ratings=electroacoustics.LoudspeakerRatings(
+            frequency_range=(30.0, 20000.0)
+        ),
     )
     lo_eff, _ = result.effective_range
     assert lo_eff > 40.0  # the dip sits outside the computed effective range
@@ -174,7 +182,7 @@ def test_minimum_impedance_without_rated_range_misses_out_of_band_dip() -> None:
     """The effective-range fallback ignores a dip below its lower edge (19.1 NOTE 2)."""
     f, spl = _flat_response()
     fz, z = _dip_below_effective_range()
-    result = loudspeaker_characteristics(
+    result = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, sensitivity_band=(200.0, 4000.0), impedance=(fz, z)
     )
     assert result.minimum_impedance == pytest.approx(7.0, abs=0.2)
@@ -187,18 +195,22 @@ def test_minimum_impedance_without_rated_range_misses_out_of_band_dip() -> None:
 def test_rated_impedance_must_be_positive() -> None:
     f, spl = _flat_response()
     with pytest.raises(ValueError, match="rated_impedance"):
-        loudspeaker_characteristics(f, spl, 0.0)
+        electroacoustics.loudspeaker_characteristics(f, spl, 0.0)
 
 
 def test_mismatched_response_lengths_rejected() -> None:
     with pytest.raises(ValueError, match="equal length"):
-        loudspeaker_characteristics([100.0, 200.0, 400.0], [90.0, 90.0], _R)
+        electroacoustics.loudspeaker_characteristics(
+            [100.0, 200.0, 400.0], [90.0, 90.0], _R
+        )
 
 
 def test_sensitivity_band_out_of_range_rejected() -> None:
     f, spl = _flat_response()
     with pytest.raises(ValueError, match="no on-axis response samples"):
-        loudspeaker_characteristics(f, spl, _R, sensitivity_band=(30000.0, 40000.0))
+        electroacoustics.loudspeaker_characteristics(
+            f, spl, _R, sensitivity_band=(30000.0, 40000.0)
+        )
 
 
 def test_distortion_from_swept_sine_result() -> None:
@@ -211,7 +223,7 @@ def test_distortion_from_swept_sine_result() -> None:
     y = sweep + a2 * sweep**2 + a3 * sweep**3
     swept = ph.swept_sine_distortion(y, fs, f1=100.0, f2=5000.0, seconds=1.0)
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(
+    result = electroacoustics.loudspeaker_characteristics(
         f, spl, _R, sensitivity_band=(200.0, 4000.0), distortion=swept
     )
     assert result.thd_percent is not None
@@ -224,17 +236,26 @@ def test_distortion_from_swept_sine_result() -> None:
 def _example_result():
     f, spl = _flat_response()
     angles = np.radians(np.linspace(0.0, 90.0, 40))
-    pist = radiating_piston(0.075, np.array([1000.0, 2000.0, 4000.0]), angles=angles)
+    pist = electroacoustics.radiating_piston(
+        0.075, np.array([1000.0, 2000.0, 4000.0]), angles=angles
+    )
     fz = np.geomspace(20.0, 20000.0, 200)
     z = 6.6 + 20.0 * np.exp(-((np.log2(fz / 55.0)) ** 2) / 0.12)
     ft = np.geomspace(50.0, 5000.0, 100)
     thd = 0.4 + 2.0 * np.exp(-((np.log2(ft / 70.0)) ** 2) / 0.4)
-    return loudspeaker_characteristics(
-        f, spl, _R, sensitivity_band=(200.0, 4000.0),
-        impedance=(fz, z), distortion=(ft, thd),
-        directivity=LoudspeakerDirectivity(piston=pist, frequency=2000.0),
-        ratings=LoudspeakerRatings(
-            frequency_range=(45.0, 20000.0), noise_power=80.0,
+    return electroacoustics.loudspeaker_characteristics(
+        f,
+        spl,
+        _R,
+        sensitivity_band=(200.0, 4000.0),
+        impedance=(fz, z),
+        distortion=(ft, thd),
+        directivity=electroacoustics.LoudspeakerDirectivity(
+            piston=pist, frequency=2000.0
+        ),
+        ratings=electroacoustics.LoudspeakerRatings(
+            frequency_range=(45.0, 20000.0),
+            noise_power=80.0,
             resonance_frequency=55.0,
         ),
     )
@@ -268,7 +289,9 @@ def test_report_without_optional_panels(tmp_path) -> None:
     pytest.importorskip("reportlab")
     pytest.importorskip("matplotlib")
     f, spl = _flat_response()
-    result = loudspeaker_characteristics(f, spl, _R, sensitivity_band=(200.0, 4000.0))
+    result = electroacoustics.loudspeaker_characteristics(
+        f, spl, _R, sensitivity_band=(200.0, 4000.0)
+    )
     out = tmp_path / "loudspeaker_min.pdf"
     result.report(str(out))
     _assert_one_page(str(out))
@@ -327,7 +350,9 @@ def test_plot_rejects_unknown_quantity_and_missing_data() -> None:
     with pytest.raises(ValueError, match="unknown quantity"):
         result.plot(quantity="bogus")
     f, spl = _flat_response()
-    bare = loudspeaker_characteristics(f, spl, _R, sensitivity_band=(200.0, 4000.0))
+    bare = electroacoustics.loudspeaker_characteristics(
+        f, spl, _R, sensitivity_band=(200.0, 4000.0)
+    )
     with pytest.raises(ValueError, match="no impedance"):
         bare.plot(quantity="impedance")
 

@@ -20,7 +20,7 @@ import itertools
 import numpy as np
 import pytest
 
-from phonometry import stoi
+from phonometry import speech
 from phonometry.speech import objective_intelligibility as oi
 
 FS = oi.SAMPLE_RATE  # 10 kHz: the internal rate, so the contrast skips resampling.
@@ -51,7 +51,9 @@ def _add_noise(clean: np.ndarray, snr_db: float, seed: int) -> np.ndarray:
 def test_identical_signals_score_one(extended: bool) -> None:
     # A degraded signal equal to the clean reference is a perfect correlation.
     x = _speech_like(1)
-    assert stoi(x, x, FS, extended=extended).value == pytest.approx(1.0, abs=1e-9)
+    assert speech.stoi(x, x, FS, extended=extended).value == pytest.approx(
+        1.0, abs=1e-9
+    )
 
 
 @pytest.mark.parametrize("extended", [False, True])
@@ -59,7 +61,7 @@ def test_uncorrelated_noise_scores_low(extended: bool) -> None:
     # An unrelated signal has no envelope correlation with the clean speech.
     x = _speech_like(1)
     y = _speech_like(999)  # independent, same statistics
-    value = stoi(x, y, FS, extended=extended).value
+    value = speech.stoi(x, y, FS, extended=extended).value
     assert value < 0.3
 
 
@@ -68,7 +70,9 @@ def test_monotonic_with_snr(extended: bool) -> None:
     # Higher SNR must not lower the index (monotonic relation with quality).
     x = _speech_like(2)
     values = [
-        stoi(x, _add_noise(x, snr, seed=10), FS, extended=extended).value
+        speech.stoi(
+            x, _add_noise(x, snr, seed=10), FS, extended=extended
+        ).value
         for snr in (-15.0, -5.0, 5.0, 15.0, 25.0)
     ]
     assert all(b >= a - 1e-9 for a, b in itertools.pairwise(values))
@@ -79,13 +83,15 @@ def test_scale_invariance() -> None:
     # A global gain on the degraded signal is normalised out (Taal Eq. 3).
     x = _speech_like(3)
     y = _add_noise(x, 5.0, seed=11)
-    assert stoi(x, y, FS).value == pytest.approx(stoi(x, 7.3 * y, FS).value, abs=1e-9)
+    assert speech.stoi(x, y, FS).value == pytest.approx(
+        speech.stoi(x, 7.3 * y, FS).value, abs=1e-9
+    )
 
 
 def test_result_fields_and_plot() -> None:
     x = _speech_like(4)
     y = _add_noise(x, 8.0, seed=12)
-    res = stoi(x, y, FS)
+    res = speech.stoi(x, y, FS)
     assert res.extended is False
     assert res.sample_rate == FS
     assert res.band_frequencies.shape == (15,)
@@ -93,7 +99,7 @@ def test_result_fields_and_plot() -> None:
     assert res.band_scores.shape == (15,)
     assert res.band_frequencies[0] == pytest.approx(150.0)
     res.plot()  # STOI: per-band bars
-    ext = stoi(x, y, FS, extended=True)
+    ext = speech.stoi(x, y, FS, extended=True)
     assert ext.band_scores is None
     assert ext.segment_scores.ndim == 1
     ext.plot()  # ESTOI: per-segment line
@@ -103,7 +109,7 @@ def test_resampling_path_runs() -> None:
     # A non-10-kHz input is resampled internally; identical inputs still score 1.
     t = np.arange(int(3.0 * 16000)) / 16000
     s = np.sin(2 * np.pi * 300 * t) * (1 + 0.5 * np.sin(2 * np.pi * 3 * t))
-    assert stoi(s, s, 16000).value == pytest.approx(1.0, abs=1e-9)
+    assert speech.stoi(s, s, 16000).value == pytest.approx(1.0, abs=1e-9)
 
 
 def test_input_validation() -> None:
@@ -115,22 +121,22 @@ def test_input_validation() -> None:
     empty = np.array([])
 
     with pytest.raises(ValueError, match="equal length"):
-        stoi(x, shorter, FS)
+        speech.stoi(x, shorter, FS)
     with pytest.raises(ValueError, match="1-D"):
-        stoi(two_d, two_d, FS)
+        speech.stoi(two_d, two_d, FS)
     with pytest.raises(ValueError, match="positive"):
-        stoi(x, x, 0)
+        speech.stoi(x, x, 0)
     with pytest.raises(ValueError, match="finite"):
-        stoi(x, with_nan, FS)
+        speech.stoi(x, with_nan, FS)
     with pytest.raises(ValueError, match="non-empty"):
-        stoi(empty, empty, FS)
+        speech.stoi(empty, empty, FS)
 
 
 def test_too_short_signal_raises() -> None:
     # Under ~0.4 s of active speech there are fewer than 30 frames to segment.
     short = _speech_like(7, seconds=0.2)
     with pytest.raises(ValueError, match="30"):
-        stoi(short, short, FS)
+        speech.stoi(short, short, FS)
 
 
 # --- External cross-check against pystoi (test-only, skipped if absent) ----
@@ -145,6 +151,6 @@ def test_matches_pystoi_reference(extended: bool, snr_db: float) -> None:
     # correlation core; the clean-room result matches the reference to machine
     # precision (the papers' tolerance vs the MATLAB original is 1e-3, so this
     # is two orders tighter and would catch any real regression).
-    mine = stoi(x, y, FS, extended=extended).value
+    mine = speech.stoi(x, y, FS, extended=extended).value
     theirs = float(pystoi.stoi(x, y, FS, extended=extended))
     assert mine == pytest.approx(theirs, abs=1e-6)

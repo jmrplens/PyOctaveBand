@@ -33,13 +33,7 @@ from reference_data import (
     ISO717_2_ANNEX_C1_LN as _IMPACT_LN,
 )
 
-from phonometry import (
-    LabAirborneInsulationResult,
-    LabImpactInsulationResult,
-    ReportMetadata,
-    lab_airborne_insulation,
-    lab_impact_insulation,
-)
+from phonometry import ReportMetadata, building
 
 _PDF_MAGIC = b"%PDF"
 
@@ -51,19 +45,19 @@ _T_UNITY = np.full(16, 0.5)
 _V_UNITY = 31.25
 
 
-def _airborne_result(**kwargs) -> LabAirborneInsulationResult:
+def _airborne_result(**kwargs) -> building.LabAirborneInsulationResult:
     """A lab airborne result whose R equals the ISO 717-1 Annex C curve."""
     l1 = np.full(16, 90.0)
     l2 = l1 - np.asarray(_AIRBORNE_R, dtype=np.float64)
     params = {"area": 10.0, "volume": _V_UNITY, **kwargs}
-    return lab_airborne_insulation(l1, l2, _T_UNITY, **params)
+    return building.lab_airborne_insulation(l1, l2, _T_UNITY, **params)
 
 
-def _impact_result(**kwargs) -> LabImpactInsulationResult:
+def _impact_result(**kwargs) -> building.LabImpactInsulationResult:
     """A lab impact result whose Ln equals the ISO 717-2 Annex C curve."""
     li = np.asarray(_IMPACT_LN, dtype=np.float64)
     params = {"volume": _V_UNITY, **kwargs}
-    return lab_impact_insulation(li, _T_UNITY, **params)
+    return building.lab_impact_insulation(li, _T_UNITY, **params)
 
 
 def _assert_one_page(path: str) -> None:
@@ -180,7 +174,7 @@ def test_octave_band_fiche_renders(tmp_path) -> None:
     """A five-octave-band laboratory result also yields a one-page fiche."""
     l1 = np.full(5, 90.0)
     r = np.array([30.0, 40.0, 48.0, 52.0, 55.0])
-    result = lab_airborne_insulation(
+    result = building.lab_airborne_insulation(
         l1, l1 - r, np.full(5, 0.5), area=10.0, volume=_V_UNITY
     )
     assert result.rating is not None
@@ -232,7 +226,7 @@ def test_unknown_language_rejected(tmp_path) -> None:
 def test_missing_rating_rejected(tmp_path) -> None:
     """A result without the ISO 717 rating (non-core band count) is rejected."""
     l1 = np.full(8, 90.0)
-    result = lab_airborne_insulation(
+    result = building.lab_airborne_insulation(
         l1, np.full(8, 50.0), np.full(8, 0.5), area=10.0, volume=_V_UNITY
     )
     assert result.rating is None
@@ -243,12 +237,13 @@ def test_missing_rating_rejected(tmp_path) -> None:
 
 def test_rating_without_per_band_data_rejected(tmp_path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
-    from phonometry import WeightedRatingResult
 
     # A backward-compatibly constructed rating (band_centers / measured /
     # shifted_reference default to None) would otherwise crash the table.
-    bare_rating = WeightedRatingResult(rating=30, c=-2, ctr=-3, unfavourable_sum=0.0)
-    result = LabAirborneInsulationResult(
+    bare_rating = building.WeightedRatingResult(
+        rating=30, c=-2, ctr=-3, unfavourable_sum=0.0
+    )
+    result = building.LabAirborneInsulationResult(
         r=np.asarray(_AIRBORNE_R, dtype=np.float64),
         absorption=np.full(16, 10.0),
         rating=bare_rating,
@@ -261,7 +256,7 @@ def test_rating_without_per_band_data_rejected(tmp_path) -> None:
 def test_manual_impact_result_renders(tmp_path) -> None:
     """A manually built lab impact result reports its Ln fiche."""
     result = _impact_result()
-    bare = LabImpactInsulationResult(
+    bare = building.LabImpactInsulationResult(
         l_n=result.l_n, absorption=result.absorption, rating=result.rating
     )
     out = tmp_path / "bare.pdf"

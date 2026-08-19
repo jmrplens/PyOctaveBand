@@ -25,14 +25,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    WALL_TIE_STIFFNESS,
-    double_wall_transmission_loss,
-    mass_spring_mass_resonance,
-    wall_tie_coupling_loss_factor,
-    wall_tie_stiffness,
-    wall_tie_stiffness_per_area,
-)
+from phonometry import building
 
 # ---------------------------------------------------------------------------
 # Printed oracles
@@ -70,9 +63,9 @@ HOPKINS_AIR_DENSITY = 1.42e5 / 343.0**2
 
 def test_wall_tie_table() -> None:
     """Hopkins (2007) Table A4, digit for digit, converted to SI base units."""
-    assert set(WALL_TIE_STIFFNESS) == set(HOPKINS_TABLE_A4)
+    assert set(building.WALL_TIE_STIFFNESS) == set(HOPKINS_TABLE_A4)
     for name, (cavity_mm, stiffness_mn) in HOPKINS_TABLE_A4.items():
-        cavity, stiffness = wall_tie_stiffness(name)
+        cavity, stiffness = building.wall_tie_stiffness(name)
         assert cavity == pytest.approx(cavity_mm / 1000.0)
         assert stiffness == pytest.approx(stiffness_mn * 1e6)
 
@@ -85,27 +78,29 @@ def test_wall_tie_stiffness_ordering() -> None:
     prints for a 50 mm spacing, and they order butterfly < double-triangle <
     vertical-twist by a factor of about 55 end to end.
     """
-    butterfly = wall_tie_stiffness("butterfly")[1]
-    triangle = wall_tie_stiffness("double_triangle")[1]
-    twist = wall_tie_stiffness("vertical_twist")[1]
+    butterfly = building.wall_tie_stiffness("butterfly")[1]
+    triangle = building.wall_tie_stiffness("double_triangle")[1]
+    twist = building.wall_tie_stiffness("vertical_twist")[1]
     assert butterfly < triangle < twist
     assert twist / butterfly == pytest.approx(94.0 / 1.7)
 
 
 def test_unknown_tie_is_rejected() -> None:
     with pytest.raises(ValueError, match="Unknown wall tie"):
-        wall_tie_stiffness("staple")
+        building.wall_tie_stiffness("staple")
 
 
 def test_stiffness_per_area_from_a_named_tie() -> None:
     """Eq. 4.89's N k / S term: 2,5 vertical-twist ties per m2 at 100 mm."""
-    per_area = wall_tie_stiffness_per_area(2.5, "vertical_twist_100mm")
+    per_area = building.wall_tie_stiffness_per_area(
+        2.5, "vertical_twist_100mm"
+    )
     assert per_area == pytest.approx(2.5 * 43.4e6)
 
 
 def test_stiffness_per_area_accepts_an_explicit_stiffness() -> None:
     """Hopkins Fig. 4.35 uses s_75mm = 2e6 N/m, which is not in Table A4."""
-    assert wall_tie_stiffness_per_area(
+    assert building.wall_tie_stiffness_per_area(
         FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS
     ) == pytest.approx(5.0e6)
 
@@ -122,7 +117,7 @@ def test_fig_4_35_untied_resonance() -> None:
     rho0 c0**2 / d = 1,42e5 / 0,075 = 1,893e6 N/m3 over the equivalent surface
     density 140 x 140 / 280 = 70 kg/m2.
     """
-    f0 = mass_spring_mass_resonance(
+    f0 = building.mass_spring_mass_resonance(
         FIG_4_35_SURFACE_DENSITY, FIG_4_35_SURFACE_DENSITY, FIG_4_35_CAVITY_DEPTH,
         air_density=HOPKINS_AIR_DENSITY,
     )
@@ -136,8 +131,10 @@ def test_fig_4_35_tied_resonance() -> None:
     The tie array adds N k / S = 5,0e6 N/m3 in parallel with the 1,893e6 N/m3
     air spring, so the resonance nearly doubles.
     """
-    ties = wall_tie_stiffness_per_area(FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS)
-    f0 = mass_spring_mass_resonance(
+    ties = building.wall_tie_stiffness_per_area(
+        FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS
+    )
+    f0 = building.mass_spring_mass_resonance(
         FIG_4_35_SURFACE_DENSITY, FIG_4_35_SURFACE_DENSITY, FIG_4_35_CAVITY_DEPTH,
         tie_stiffness_per_area=ties, air_density=HOPKINS_AIR_DENSITY,
     )
@@ -156,17 +153,29 @@ def test_fig_4_35_resonance_pair_with_the_library_default_air() -> None:
         "mass2": FIG_4_35_SURFACE_DENSITY,
         "gap": FIG_4_35_CAVITY_DEPTH,
     }
-    ties = wall_tie_stiffness_per_area(FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS)
-    assert round(mass_spring_mass_resonance(**kwargs)) == FIG_4_35_FMSM_UNTIED
-    assert round(
-        mass_spring_mass_resonance(**kwargs, tie_stiffness_per_area=ties)
-    ) == FIG_4_35_FMSM_TIED
+    ties = building.wall_tie_stiffness_per_area(
+        FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS
+    )
+    assert (
+        round(building.mass_spring_mass_resonance(**kwargs))
+        == FIG_4_35_FMSM_UNTIED
+    )
+    assert (
+        round(
+            building.mass_spring_mass_resonance(
+                **kwargs, tie_stiffness_per_area=ties
+            )
+        )
+        == FIG_4_35_FMSM_TIED
+    )
 
 
 def test_resonance_is_unchanged_by_a_zero_tie_term() -> None:
     """The default tie_stiffness_per_area = 0 reproduces the air-only value bit for bit."""
-    plain = mass_spring_mass_resonance(140.0, 170.0, 0.1)
-    tied = mass_spring_mass_resonance(140.0, 170.0, 0.1, tie_stiffness_per_area=0.0)
+    plain = building.mass_spring_mass_resonance(140.0, 170.0, 0.1)
+    tied = building.mass_spring_mass_resonance(
+        140.0, 170.0, 0.1, tie_stiffness_per_area=0.0
+    )
     assert tied == plain
 
 
@@ -176,14 +185,20 @@ def test_resonance_grows_as_the_square_root_of_the_tie_stiffness() -> None:
     Taking the air stiffness away by comparing two tie terms that dominate it.
     """
     kwargs = {"mass1": 140.0, "mass2": 140.0, "gap": 0.075}
-    low = mass_spring_mass_resonance(**kwargs, tie_stiffness_per_area=1e9)
-    high = mass_spring_mass_resonance(**kwargs, tie_stiffness_per_area=4e9)
+    low = building.mass_spring_mass_resonance(
+        **kwargs, tie_stiffness_per_area=1e9
+    )
+    high = building.mass_spring_mass_resonance(
+        **kwargs, tie_stiffness_per_area=4e9
+    )
     assert high / low == pytest.approx(2.0, rel=1e-3)
 
 
 def test_negative_tie_stiffness_is_rejected() -> None:
     with pytest.raises(ValueError, match="tie_stiffness_per_area"):
-        mass_spring_mass_resonance(140.0, 140.0, 0.075, tie_stiffness_per_area=-1.0)
+        building.mass_spring_mass_resonance(
+            140.0, 140.0, 0.075, tie_stiffness_per_area=-1.0
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -194,9 +209,11 @@ def test_negative_tie_stiffness_is_rejected() -> None:
 def test_ties_push_the_double_wall_resonance_up() -> None:
     """double_wall_transmission_loss carries the Eq. 4.89 resonance through."""
     freqs = np.array([50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0])
-    ties = wall_tie_stiffness_per_area(FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS)
-    plain = double_wall_transmission_loss(freqs, 140.0, 140.0, 0.075)
-    tied = double_wall_transmission_loss(
+    ties = building.wall_tie_stiffness_per_area(
+        FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS
+    )
+    plain = building.double_wall_transmission_loss(freqs, 140.0, 140.0, 0.075)
+    tied = building.double_wall_transmission_loss(
         freqs, 140.0, 140.0, 0.075, tie_stiffness_per_area=ties
     )
     assert plain.resonance_frequency is not None
@@ -212,9 +229,11 @@ def test_ties_extend_the_combined_mass_branch() -> None:
     cavity-boosted branch down onto the combined-mass law, costing insulation.
     """
     freqs = np.array([40.0])
-    ties = wall_tie_stiffness_per_area(FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS)
-    plain = double_wall_transmission_loss(freqs, 140.0, 140.0, 0.075)
-    tied = double_wall_transmission_loss(
+    ties = building.wall_tie_stiffness_per_area(
+        FIG_4_35_TIES_PER_AREA, FIG_4_35_TIE_STIFFNESS
+    )
+    plain = building.double_wall_transmission_loss(freqs, 140.0, 140.0, 0.075)
+    tied = building.double_wall_transmission_loss(
         freqs, 140.0, 140.0, 0.075, tie_stiffness_per_area=ties
     )
     assert float(tied.transmission_loss[0]) < float(plain.transmission_loss[0])
@@ -232,8 +251,10 @@ def test_double_wall_without_ties_is_bit_identical() -> None:
     for m1 in (8.0, 25.0, 140.0):
         for m2 in (8.0, 60.0, 170.0):
             for gap in (0.025, 0.075, 0.2):
-                plain = double_wall_transmission_loss(freqs, m1, m2, gap)
-                zero = double_wall_transmission_loss(
+                plain = building.double_wall_transmission_loss(
+                    freqs, m1, m2, gap
+                )
+                zero = building.double_wall_transmission_loss(
                     freqs, m1, m2, gap, tie_stiffness_per_area=0.0
                 )
                 assert np.array_equal(plain.transmission_loss, zero.transmission_loss)
@@ -251,7 +272,7 @@ def test_rigid_connection_matches_the_closed_form() -> None:
     The plate area cancels because N = n S and mi = rho_s1 S.
     """
     freqs = np.array([100.0, 500.0, 2000.0])
-    res = wall_tie_coupling_loss_factor(
+    res = building.wall_tie_coupling_loss_factor(
         freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5
     )
     expected = (
@@ -265,7 +286,7 @@ def test_rigid_connection_matches_the_closed_form() -> None:
 
 def test_plate_mobility_is_the_infinite_thin_plate_value() -> None:
     """Eq. 2.190: Z = 8 sqrt(B' m''), so Y = 1 / (8 sqrt(B' m''))."""
-    res = wall_tie_coupling_loss_factor(
+    res = building.wall_tie_coupling_loss_factor(
         [100.0], 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5
     )
     assert res.mobility1 == pytest.approx(1.0 / (8.0 * np.sqrt(1.0e5 * 150.0)))
@@ -275,7 +296,7 @@ def test_plate_mobility_is_the_infinite_thin_plate_value() -> None:
 def test_rigid_coupling_falls_as_one_over_frequency() -> None:
     """With Yc = 0 the only frequency dependence in Eq. 4.87 is the 1/omega."""
     freqs = np.array([100.0, 200.0, 400.0])
-    res = wall_tie_coupling_loss_factor(
+    res = building.wall_tie_coupling_loss_factor(
         freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5
     )
     ratios = res.coupling_loss_factor[:-1] / res.coupling_loss_factor[1:]
@@ -284,7 +305,7 @@ def test_rigid_coupling_falls_as_one_over_frequency() -> None:
 
 def test_a_stiff_tie_approaches_the_rigid_limit_at_low_frequency() -> None:
     """|Yc| = omega/k vanishes as k grows, recovering the Yc = 0 result."""
-    res = wall_tie_coupling_loss_factor(
+    res = building.wall_tie_coupling_loss_factor(
         [50.0], 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie=1e12
     )
     assert float(res.coupling_loss_factor[0]) == pytest.approx(
@@ -299,7 +320,7 @@ def test_a_resilient_tie_rolls_off_as_one_over_frequency_cubed() -> None:
     inside the building acoustics range for masonry leaves.
     """
     freqs = np.array([1000.0, 2000.0, 4000.0])
-    res = wall_tie_coupling_loss_factor(
+    res = building.wall_tie_coupling_loss_factor(
         freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie="butterfly"
     )
     ratios = res.coupling_loss_factor[:-1] / res.coupling_loss_factor[1:]
@@ -311,7 +332,7 @@ def test_softer_ties_couple_less_than_stiffer_ones() -> None:
     freqs = np.array([500.0])
     values = [
         float(
-            wall_tie_coupling_loss_factor(
+            building.wall_tie_coupling_loss_factor(
                 freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie=name
             ).coupling_loss_factor[0]
         )
@@ -323,8 +344,8 @@ def test_softer_ties_couple_less_than_stiffer_ones() -> None:
 def test_resilient_coupling_never_exceeds_the_rigid_ceiling() -> None:
     """Adding a finite spring in series can only reduce the power flow."""
     freqs = np.logspace(1.7, 3.7, 40)
-    for name in WALL_TIE_STIFFNESS:
-        res = wall_tie_coupling_loss_factor(
+    for name in building.WALL_TIE_STIFFNESS:
+        res = building.wall_tie_coupling_loss_factor(
             freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie=name
         )
         assert bool(
@@ -335,10 +356,10 @@ def test_resilient_coupling_never_exceeds_the_rigid_ceiling() -> None:
 def test_coupling_is_proportional_to_the_tie_density() -> None:
     """Eq. 4.87 is linear in N: doubling the ties doubles eta_ij."""
     freqs = np.array([250.0])
-    single = wall_tie_coupling_loss_factor(
+    single = building.wall_tie_coupling_loss_factor(
         freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie="butterfly"
     )
-    double = wall_tie_coupling_loss_factor(
+    double = building.wall_tie_coupling_loss_factor(
         freqs, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=5.0, tie="butterfly"
     )
     assert float(double.coupling_loss_factor[0]) == pytest.approx(
@@ -348,13 +369,13 @@ def test_coupling_is_proportional_to_the_tie_density() -> None:
 
 def test_coupling_rejects_a_non_positive_tie_density() -> None:
     with pytest.raises(ValueError, match="ties_per_area"):
-        wall_tie_coupling_loss_factor(
+        building.wall_tie_coupling_loss_factor(
             [100.0], 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=0.0
         )
 
 
 def test_coupling_rejects_an_unknown_tie() -> None:
     with pytest.raises(ValueError, match="Unknown wall tie"):
-        wall_tie_coupling_loss_factor(
+        building.wall_tie_coupling_loss_factor(
             [100.0], 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, tie="staple"
         )

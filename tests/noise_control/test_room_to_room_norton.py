@@ -31,15 +31,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from phonometry import (
-    DesignCriterion,
-    SourceRoom,
-    enclosure_required_transmission_loss,
-    equivalent_absorption_area,
-    mean_absorption,
-    room_constant,
-    room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 # ---------------------------------------------------------------------------
 # Problem 4.21 - noise reduction of three partitions (printed pp. 586-587).
@@ -80,7 +72,7 @@ def _receiving_absorption_421() -> np.ndarray:
     """Equivalent absorption area of the 8 x 9 x 3 m receiving room, m2."""
     walls = 2.0 * (8.0 * 3.0) + 2.0 * (9.0 * 3.0)
     return np.asarray(
-        equivalent_absorption_area(
+        room.equivalent_absorption_area(
             [
                 (walls, _R421_WALLS),
                 (8.0 * 9.0, _R421_FLOOR),
@@ -101,12 +93,12 @@ def test_problem_4_21_noise_reduction(
     wall of the receiving room. The printed answers carry one decimal, and the
     chain reproduces all eighteen values to 0.05 dB.
     """
-    result = room_to_room_transmission(
+    result = noise_control.room_to_room_transmission(
         _BANDS_6,
         tl,
         8.0 * 3.0,
         _receiving_absorption_421(),
-        source=SourceRoom(level=90.0),
+        source=noise_control.SourceRoom(level=90.0),
         label=name,
     )
     assert np.allclose(result.noise_reduction, printed, atol=0.05)
@@ -128,12 +120,12 @@ def test_problem_4_21_partition_transmission_term_is_negligible() -> None:
     than 0.1 dB, which is why the library leaves it off by default.
     """
     _, tl, printed = _R421_CASES[0]
-    with_term = room_to_room_transmission(
+    with_term = noise_control.room_to_room_transmission(
         _BANDS_6,
         tl,
         8.0 * 3.0,
         _receiving_absorption_421(),
-        source=SourceRoom(level=90.0),
+        source=noise_control.SourceRoom(level=90.0),
         include_partition_transmission=True,
     )
     assert np.allclose(with_term.noise_reduction, printed, atol=0.1)
@@ -169,19 +161,19 @@ def _problem_4_18(source_model: str = "constant_volume"):  # type: ignore[no-unt
         (2.0 * (8.0 * 3.0) + 2.0 * (10.0 * 3.0), _R418_WALLS),
     ]
     plant_area = sum(area for area, _ in plant)
-    r1 = room_constant(plant_area, mean_absorption(plant))
+    r1 = room.room_constant(plant_area, room.mean_absorption(plant))
     # Operator room 5 x 5 x 3 m, carpeted floor, plant-room ceiling and walls.
     operator = [
         (25.0, _R418_CARPET),
         (25.0, _R418_CEILING),
         (4.0 * (5.0 * 3.0), _R418_WALLS),
     ]
-    return room_to_room_transmission(
+    return noise_control.room_to_room_transmission(
         _BANDS_6,
         _R418_TL,
         5.0 * 3.0,
-        equivalent_absorption_area(operator),
-        source=SourceRoom(
+        room.equivalent_absorption_area(operator),
+        source=noise_control.SourceRoom(
             power_level=_R418_LW,
             room_constant=r1,
             # The blower stands on the floor along the middle of a wall, i.e.
@@ -192,7 +184,7 @@ def _problem_4_18(source_model: str = "constant_volume"):  # type: ignore[no-unt
             directivity=4.0,
             model=source_model,
         ),
-        criterion=DesignCriterion(family="NC", target=45.0),
+        criterion=noise_control.DesignCriterion(family="NC", target=45.0),
         label="Plant room to operator room",
     )
 
@@ -319,7 +311,7 @@ def _enclosure_4_16() -> tuple[float, float, np.ndarray]:
     machine = 2.0 * (1.5 * 1.5) + 2.0 * (2.5 * 1.5) + 1.5 * 2.5
     bare_floor = 2.5 * 3.5 - 1.5 * 2.5
     absorption = np.asarray(
-        mean_absorption(
+        room.mean_absorption(
             [(external_area, _R416_WOOL), (bare_floor + machine, _R416_CONCRETE)]
         ),
         dtype=np.float64,
@@ -334,7 +326,7 @@ def _problem_4_16(model: str = "norton"):  # type: ignore[no-untyped-def]
     the logarithm; that is the model the printed answer was computed with.
     """
     external_area, internal_area, absorption = _enclosure_4_16()
-    return enclosure_required_transmission_loss(
+    return noise_control.enclosure_required_transmission_loss(
         _R416_LP1 - _R416_LP2,
         external_area,
         internal_area,

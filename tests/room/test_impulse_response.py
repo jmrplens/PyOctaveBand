@@ -21,16 +21,7 @@ import numpy as np
 import pytest
 from scipy import signal
 
-from phonometry import (
-    ImpulseResponseResult,
-    impulse_response,
-    inverse_filter,
-    mls_impulse_response,
-    mls_signal,
-    plot_excitation,
-    room_parameters,
-    sweep_signal,
-)
+from phonometry import room
 from phonometry.room.impulse_response import _MLS_TAPS
 
 FS = 48000
@@ -53,7 +44,7 @@ def _band_response_db(b: np.ndarray, a: np.ndarray, ir: np.ndarray, fs: int,
 # Sweep generation
 # --------------------------------------------------------------------------
 def test_sweep_length_and_bounds() -> None:
-    x = sweep_signal(FS, 20.0, 20000.0, 1.0)
+    x = room.sweep_signal(FS, 20.0, 20000.0, 1.0)
     assert x.size == FS
     assert np.max(np.abs(x)) <= 1.0 + 1e-12
 
@@ -61,7 +52,7 @@ def test_sweep_length_and_bounds() -> None:
 def test_sweep_instantaneous_frequency_is_exponential() -> None:
     # Zero crossings of an exponential sweep should follow f(t)=f1*(f2/f1)^(t/T).
     fs, f1, f2, secs = 48000, 100.0, 10000.0, 2.0
-    x = sweep_signal(fs, f1, f2, secs, fade=0.0)
+    x = room.sweep_signal(fs, f1, f2, secs, fade=0.0)
     # Analytic phase; verify start/end instantaneous frequency via finite diff.
     # Use the analytic model directly: compare against the closed-form phase.
     t = np.arange(x.size) / fs
@@ -76,8 +67,8 @@ def test_sweep_instantaneous_frequency_is_exponential() -> None:
 # --------------------------------------------------------------------------
 def test_sweep_ideal_chain_is_delta() -> None:
     # Near-full-band sweep -> the recovered IR is a clean band-limited delta.
-    x = sweep_signal(FS, 5.0, 23800.0, 2.0, fade=0.005)
-    ir = impulse_response(x, x, FS, regularization=1e-8)
+    x = room.sweep_signal(FS, 5.0, 23800.0, 2.0, fade=0.005)
+    ir = room.impulse_response(x, x, FS, regularization=1e-8)
     assert int(np.argmax(np.abs(ir))) == 0
     peak = np.abs(ir[0])
     sidelobe = np.abs(ir[20:]).max()
@@ -86,8 +77,8 @@ def test_sweep_ideal_chain_is_delta() -> None:
 
 def test_farina_inverse_filter_compresses_sweep() -> None:
     f1, f2, secs = 50.0, 20000.0, 1.0
-    x = sweep_signal(FS, f1, f2, secs, fade=0.02)
-    inv = inverse_filter(FS, f1, f2, secs, fade=0.02)
+    x = room.sweep_signal(FS, f1, f2, secs, fade=0.02)
+    inv = room.inverse_filter(FS, f1, f2, secs, fade=0.02)
     y = signal.fftconvolve(x, inv)
     peak = np.abs(y).max()
     ipk = int(np.argmax(np.abs(y)))
@@ -103,9 +94,9 @@ def test_farina_inverse_filter_compresses_sweep() -> None:
 # --------------------------------------------------------------------------
 def test_sweep_recovers_iir_response_in_band() -> None:
     b, a = signal.butter(4, [200.0, 2000.0], btype="band", fs=FS)
-    x = sweep_signal(FS, 20.0, 20000.0, 2.0)
+    x = room.sweep_signal(FS, 20.0, 20000.0, 2.0)
     y = signal.lfilter(b, a, x)
-    ir = impulse_response(y, x, FS, length=16384)
+    ir = room.impulse_response(y, x, FS, length=16384)
     est_db, true_db = _band_response_db(b, a, ir, FS, 300.0, 1500.0)
     assert np.max(np.abs(est_db - true_db)) < 0.1
 
@@ -113,9 +104,11 @@ def test_sweep_recovers_iir_response_in_band() -> None:
 def test_farina_method_recovers_iir_response_in_band() -> None:
     b, a = signal.butter(4, [200.0, 2000.0], btype="band", fs=FS)
     f1, f2, secs = 20.0, 20000.0, 2.0
-    x = sweep_signal(FS, f1, f2, secs)
+    x = room.sweep_signal(FS, f1, f2, secs)
     y = signal.lfilter(b, a, x)
-    ir = impulse_response(y, x, FS, method="farina", f_range=(f1, f2), length=16384)
+    ir = room.impulse_response(
+        y, x, FS, method="farina", f_range=(f1, f2), length=16384
+    )
     est_db, true_db = _band_response_db(b, a, ir, FS, 300.0, 1500.0)
     # Farina inverse-filter whitening is approximate; use a looser band bound.
     assert np.max(np.abs(est_db - true_db)) < 0.5
@@ -127,15 +120,19 @@ def test_farina_rejects_zero_padded_reference() -> None:
     Farina; it must raise instead. The unpadded sweep is unaffected."""
     b, a = signal.butter(4, [200.0, 2000.0], btype="band", fs=FS)
     f1, f2, secs = 20.0, 20000.0, 2.0
-    x = sweep_signal(FS, f1, f2, secs)
+    x = room.sweep_signal(FS, f1, f2, secs)
     y = signal.lfilter(b, a, x)
     # Pad the reference to the recording length, as one would for spectral.
     n = y.size + x.size - 1
     x_padded = np.concatenate([x, np.zeros(n - x.size)])
     with pytest.raises(ValueError, match="zero-pad|unpadded|spectral"):
-        impulse_response(y, x_padded, FS, method="farina", f_range=(f1, f2))
+        room.impulse_response(
+            y, x_padded, FS, method="farina", f_range=(f1, f2)
+        )
     # The unpadded sweep still works unchanged.
-    ir = impulse_response(y, x, FS, method="farina", f_range=(f1, f2), length=16384)
+    ir = room.impulse_response(
+        y, x, FS, method="farina", f_range=(f1, f2), length=16384
+    )
     assert np.isfinite(ir).all()
 
 
@@ -144,10 +141,10 @@ def test_farina_rejects_zero_padded_reference() -> None:
 # --------------------------------------------------------------------------
 def test_harmonic_products_appear_at_negative_time() -> None:
     f1, f2, secs = 50.0, 12000.0, 3.0
-    x = sweep_signal(FS, f1, f2, secs)
+    x = room.sweep_signal(FS, f1, f2, secs)
     # Memoryless quadratic non-linearity -> strong 2nd-harmonic product.
     y = x + 0.3 * x**2
-    full = impulse_response(y, x, FS, return_full=True)
+    full = room.impulse_response(y, x, FS, return_full=True)
     n = full.size
 
     # The 2nd harmonic of an ESS arrives ahead of the linear IR by
@@ -164,7 +161,7 @@ def test_harmonic_products_appear_at_negative_time() -> None:
     assert harmonic_peak > 15.0 * floor
 
     # The default (trimmed) IR is causal, so it excludes the harmonic product.
-    causal = impulse_response(y, x, FS)
+    causal = room.impulse_response(y, x, FS)
     assert int(np.argmax(np.abs(causal))) == 0
     assert causal.size == x.size
 
@@ -177,9 +174,9 @@ def test_sweep_snr_improves_3db_per_doubling() -> None:
     f1, f2, noise_amp = 20.0, 20000.0, 2e-3
 
     def snr_for(seconds: float) -> float:
-        x = sweep_signal(FS, f1, f2, seconds)
+        x = room.sweep_signal(FS, f1, f2, seconds)
         noise = rng.standard_normal(x.size) * noise_amp
-        ir = impulse_response(x + noise, x, FS, length=x.size)
+        ir = room.impulse_response(x + noise, x, FS, length=x.size)
         peak = np.abs(ir).max()
         lo, hi = ir.size // 4, 3 * ir.size // 4
         floor = np.sqrt(np.mean(ir[lo:hi] ** 2))
@@ -197,7 +194,7 @@ def test_sweep_snr_improves_3db_per_doubling() -> None:
 # --------------------------------------------------------------------------
 def test_mls_length_and_levels() -> None:
     for order in (4, 8, 12, 15):
-        a = mls_signal(order)
+        a = room.mls_signal(order)
         assert a.size == 2**order - 1
         assert set(np.unique(a)).issubset({-1.0, 1.0})
         # bipolar sum of a maximum-length sequence is exactly -1
@@ -214,7 +211,7 @@ def test_all_mls_orders_are_primitive() -> None:
     # Every tap set must yield a true maximum-length sequence: circular
     # autocorrelation == length at lag 0 and -1 elsewhere (ISO 18233 A.1).
     for order in _MLS_TAPS:
-        a = mls_signal(order)
+        a = room.mls_signal(order)
         length = a.size
         autocorr = np.fft.irfft(np.abs(np.fft.rfft(a)) ** 2, length)
         assert autocorr[0] == pytest.approx(length, rel=1e-9)
@@ -223,7 +220,7 @@ def test_all_mls_orders_are_primitive() -> None:
 
 def test_mls_autocorrelation_is_delta() -> None:
     order = 12
-    a = mls_signal(order)
+    a = room.mls_signal(order)
     length = a.size
     spec = np.fft.rfft(a)
     autocorr = np.fft.irfft(np.abs(spec) ** 2, length)
@@ -236,8 +233,8 @@ def test_mls_autocorrelation_is_delta() -> None:
 
 def test_mls_ideal_chain_is_delta() -> None:
     order = 12
-    a = mls_signal(order)
-    ir = mls_impulse_response(a, a)
+    a = room.mls_signal(order)
+    ir = room.mls_impulse_response(a, a)
     assert int(np.argmax(np.abs(ir))) == 0
     assert ir[0] == pytest.approx(1.0, abs=1e-3)
     assert np.max(np.abs(ir[1:])) < 2e-3
@@ -245,14 +242,14 @@ def test_mls_ideal_chain_is_delta() -> None:
 
 def test_mls_recovers_iir_response_in_band() -> None:
     order = 14
-    a = mls_signal(order)
+    a = room.mls_signal(order)
     length = a.size
     b, coef_a = signal.butter(4, [200.0, 2000.0], btype="band", fs=FS)
     # Periodic excitation -> steady-state period == circular convolution.
     x = np.tile(a, 3)
     y = signal.lfilter(b, coef_a, x)
     y_period = y[-length:]
-    ir = mls_impulse_response(y_period, a)
+    ir = room.mls_impulse_response(y_period, a)
     freqs = np.fft.rfftfreq(length, d=1.0 / FS)
     h_est = np.fft.rfft(ir)
     _, h_true = signal.freqz(b, coef_a, worN=freqs, fs=FS)
@@ -266,7 +263,7 @@ def test_mls_short_period_aliasing_warns() -> None:
     """An IR longer than one MLS period folds back circularly (A.1); the
     recovered IR keeps undecayed energy at the period end, which is warned."""
     order = 12  # L = 4095 samples (~85 ms at 48 kHz)
-    a = mls_signal(order)
+    a = room.mls_signal(order)
     length = a.size
     t = np.arange(int(0.3 * FS)) / FS  # 0.3 s IR >> one period
     h = np.exp(-6.9078 * t / 0.3) * np.random.default_rng(0).standard_normal(t.size)
@@ -276,24 +273,24 @@ def test_mls_short_period_aliasing_warns() -> None:
         hh[i % length] += h[i]  # circular wrap into one period
     y = np.real(np.fft.ifft(np.fft.fft(a) * np.fft.fft(hh)))
     with pytest.warns(UserWarning, match="aliases"):
-        mls_impulse_response(y, a)
+        room.mls_impulse_response(y, a)
 
 
 def test_mls_well_fitting_ir_does_not_warn() -> None:
     """A system IR that decays within one period must not warn."""
     order = 14  # L = 16383 samples (~340 ms)
-    a = mls_signal(order)
+    a = room.mls_signal(order)
     length = a.size
     b, coef_a = signal.butter(4, [200.0, 2000.0], btype="band", fs=FS)
     y = signal.lfilter(b, coef_a, np.tile(a, 3))[-length:]
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        mls_impulse_response(y, a)
+        room.mls_impulse_response(y, a)
 
 
 def test_mls_snr_improves_with_averaging() -> None:
     order = 14
-    a = mls_signal(order)
+    a = room.mls_signal(order)
     length = a.size
     rng = np.random.default_rng(7)
     noise_amp = 0.5
@@ -304,7 +301,7 @@ def test_mls_snr_improves_with_averaging() -> None:
         for _ in range(n_avg):
             acc += a + rng.standard_normal(length) * noise_amp
         recorded = acc / n_avg
-        ir = mls_impulse_response(recorded, a)
+        ir = room.mls_impulse_response(recorded, a)
         peak = np.abs(ir).max()
         floor = np.sqrt(np.mean(ir[length // 4:length // 2] ** 2))
         return 20.0 * np.log10(peak / floor)
@@ -319,7 +316,7 @@ def test_mls_multi_period_recording_averages_internally() -> None:
     """A >1-period recording exercises the internal reshape/mean averaging
     branch and recovers a known filter, beating a single noisy period."""
     order = 14
-    a = mls_signal(order)
+    a = room.mls_signal(order)
     length = a.size
     b = np.array([0.6, 0.25, 0.1, 0.05])  # known short FIR filter
     reps = 4
@@ -331,8 +328,12 @@ def test_mls_multi_period_recording_averages_internally() -> None:
     noisy = y + rng.standard_normal(y.size) * 0.3
     assert noisy.size == reps * length  # multi-period recording
 
-    ir_multi = mls_impulse_response(noisy, a)  # internal averaging over reps
-    ir_single = mls_impulse_response(noisy[:length], a)  # one noisy period
+    ir_multi = room.mls_impulse_response(
+        noisy, a
+    )  # internal averaging over reps
+    ir_single = room.mls_impulse_response(
+        noisy[:length], a
+    )  # one noisy period
 
     err_multi = float(np.max(np.abs(ir_multi[: b.size] - b)))
     err_single = float(np.max(np.abs(ir_single[: b.size] - b)))
@@ -342,28 +343,28 @@ def test_mls_multi_period_recording_averages_internally() -> None:
 
 def test_invalid_arguments() -> None:
     with pytest.raises(ValueError, match="f2 must be greater than f1"):
-        sweep_signal(FS, 100.0, 100.0, 1.0)  # f1 == f2
+        room.sweep_signal(FS, 100.0, 100.0, 1.0)  # f1 == f2
     with pytest.raises(ValueError, match="f2 must be greater than f1"):
-        sweep_signal(FS, 100.0, 50.0, 1.0)  # f1 > f2
+        room.sweep_signal(FS, 100.0, 50.0, 1.0)  # f1 > f2
     with pytest.raises(
         ValueError, match="must not exceed the Nyquist frequency"
     ):
-        sweep_signal(FS, 20.0, 30000.0, 1.0)  # f2 > Nyquist
+        room.sweep_signal(FS, 20.0, 30000.0, 1.0)  # f2 > Nyquist
     with pytest.raises(ValueError, match="order must be one of"):
-        mls_signal(1)  # order too small
+        room.mls_signal(1)  # order too small
     with pytest.raises(ValueError, match="order must be one of"):
-        mls_signal(99)  # unsupported order
+        room.mls_signal(99)  # unsupported order
     ten = np.zeros(10)
     with pytest.raises(ValueError, match="unknown method"):
-        impulse_response(ten, ten, FS, method="bogus")
+        room.impulse_response(ten, ten, FS, method="bogus")
     with pytest.raises(ValueError, match="requires f_range"):
-        impulse_response(ten, ten, FS, method="farina")  # no f_range
-    seq = mls_signal(4)
+        room.impulse_response(ten, ten, FS, method="farina")  # no f_range
+    seq = room.mls_signal(4)
     with pytest.raises(
         ValueError,
         match="recorded length must be a positive multiple of the MLS length",
     ):
-        mls_impulse_response(ten, seq)  # not a multiple of L
+        room.mls_impulse_response(ten, seq)  # not a multiple of L
 
 
 def test_inverse_filter_empty_band_raises() -> None:
@@ -372,14 +373,14 @@ def test_inverse_filter_empty_band_raises() -> None:
     with pytest.raises(
         ValueError, match="no frequency bin falls within the sweep band"
     ):
-        inverse_filter(FS, 1000.0, 1000.5, 0.001)
+        room.inverse_filter(FS, 1000.0, 1000.5, 0.001)
     # The error must propagate through the Farina deconvolution path too.
     # The reference must be non-zero, or the zero-padding guard fires first.
     silence, tone = np.zeros(48), np.ones(48)
     with pytest.raises(
         ValueError, match="no frequency bin falls within the sweep band"
     ):
-        impulse_response(
+        room.impulse_response(
             silence, tone, FS, method="farina", f_range=(1000.0, 1000.5),
         )
 
@@ -391,49 +392,49 @@ def test_impulse_response_rejects_bad_shapes() -> None:
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be one-dimensional"
     ):
-        impulse_response(two_dimensional, good, FS)  # 2-D recorded
+        room.impulse_response(two_dimensional, good, FS)  # 2-D recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be one-dimensional"
     ):
-        impulse_response(good, two_dimensional, FS)  # 2-D reference
+        room.impulse_response(good, two_dimensional, FS)  # 2-D reference
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be non-empty"
     ):
-        impulse_response(empty, good, FS)  # empty recorded
+        room.impulse_response(empty, good, FS)  # empty recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'reference' must be non-empty"
     ):
-        impulse_response(good, empty, FS)  # empty reference
+        room.impulse_response(good, empty, FS)  # empty reference
 
 
 def test_mls_impulse_response_rejects_bad_shapes() -> None:
-    seq = mls_signal(4)
+    seq = room.mls_signal(4)
     good = np.tile(seq, 2)
     two_dimensional = np.zeros((2, seq.size))
     empty = np.zeros(0)
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be one-dimensional"
     ):
-        mls_impulse_response(two_dimensional, seq)  # 2-D recorded
+        room.mls_impulse_response(two_dimensional, seq)  # 2-D recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be one-dimensional"
     ):
-        mls_impulse_response(good, two_dimensional)  # 2-D mls
+        room.mls_impulse_response(good, two_dimensional)  # 2-D mls
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be non-empty"
     ):
-        mls_impulse_response(empty, seq)  # empty recorded
+        room.mls_impulse_response(empty, seq)  # empty recorded
     with pytest.raises(
         ValueError, match="'recorded' and 'mls' must be non-empty"
     ):
-        mls_impulse_response(good, empty)  # empty mls
+        room.mls_impulse_response(good, empty)  # empty mls
 
 
 # --------------------------------------------------------------------------
 # Result object: backward compatibility (drop-in for the raw IR array)
 # --------------------------------------------------------------------------
 def _synthetic_recording() -> tuple[np.ndarray, np.ndarray]:
-    sweep = sweep_signal(FS, 20.0, 20000.0, 1.0)
+    sweep = room.sweep_signal(FS, 20.0, 20000.0, 1.0)
     system = np.zeros(FS)
     system[100] = 1.0
     system[2000] = 0.4
@@ -442,8 +443,8 @@ def _synthetic_recording() -> tuple[np.ndarray, np.ndarray]:
 
 def test_impulse_response_returns_result_object() -> None:
     rec, sweep = _synthetic_recording()
-    ir = impulse_response(rec, sweep, FS)
-    assert isinstance(ir, ImpulseResponseResult)
+    ir = room.impulse_response(rec, sweep, FS)
+    assert isinstance(ir, room.ImpulseResponseResult)
     assert ir.fs == FS
     assert ir.method == "spectral"
     # Array protocol: np.asarray yields the raw IR and equals the .ir field.
@@ -461,7 +462,7 @@ def test_impulse_response_returns_result_object() -> None:
 def test_impulse_response_asarray_matches_untrimmed_math() -> None:
     """np.asarray(result) must equal the array the old API returned."""
     rec, sweep = _synthetic_recording()
-    ir = impulse_response(rec, sweep, FS, length=4096)
+    ir = room.impulse_response(rec, sweep, FS, length=4096)
     n = rec.size + sweep.size - 1
     spec_x = np.fft.rfft(sweep, n=n)
     spec_y = np.fft.rfft(rec, n=n)
@@ -474,21 +475,21 @@ def test_impulse_response_asarray_matches_untrimmed_math() -> None:
 def test_room_parameters_accepts_result_object() -> None:
     """room_parameters(result, fs) must work exactly like room_parameters(arr, fs)."""
     rec, sweep = _synthetic_recording()
-    ir = impulse_response(rec, sweep, FS)
-    from_result = room_parameters(ir, FS, limits=None)
-    from_array = room_parameters(np.asarray(ir), FS, limits=None)
+    ir = room.impulse_response(rec, sweep, FS)
+    from_result = room.room_parameters(ir, FS, limits=None)
+    from_array = room.room_parameters(np.asarray(ir), FS, limits=None)
     assert np.allclose(from_result.edt, from_array.edt, equal_nan=True)
     assert np.allclose(from_result.t30, from_array.t30, equal_nan=True)
 
 
 def test_mls_result_metadata() -> None:
-    a = mls_signal(14)
-    ir = mls_impulse_response(np.tile(a, 2)[: a.size], a, fs=FS)
-    assert isinstance(ir, ImpulseResponseResult)
+    a = room.mls_signal(14)
+    ir = room.mls_impulse_response(np.tile(a, 2)[: a.size], a, fs=FS)
+    assert isinstance(ir, room.ImpulseResponseResult)
     assert ir.method == "mls"
     assert ir.fs == FS
     # fs is optional; omitting it leaves the axis unitful-agnostic (None).
-    assert mls_impulse_response(a, a).fs is None
+    assert room.mls_impulse_response(a, a).fs is None
 
 
 # --------------------------------------------------------------------------
@@ -500,7 +501,7 @@ def test_impulse_response_plot_returns_axes() -> None:
     from matplotlib.axes import Axes
 
     rec, sweep = _synthetic_recording()
-    ir = impulse_response(rec, sweep, FS)
+    ir = room.impulse_response(rec, sweep, FS)
     axes = ir.plot()
     assert isinstance(axes, np.ndarray)
     assert axes.size == 2
@@ -517,13 +518,13 @@ def test_plot_excitation_returns_axes() -> None:
     matplotlib.use("Agg")
     from matplotlib.axes import Axes
 
-    sweep = sweep_signal(FS, 20.0, 20000.0, 0.5)
-    axes = plot_excitation(sweep, FS, kind="sweep")
+    sweep = room.sweep_signal(FS, 20.0, 20000.0, 0.5)
+    axes = room.plot_excitation(sweep, FS, kind="sweep")
     assert isinstance(axes, np.ndarray)
     assert axes.size == 2
 
-    mls = mls_signal(12).astype(float)
-    axes_m = plot_excitation(mls, FS, kind="mls")
+    mls = room.mls_signal(12).astype(float)
+    axes_m = room.plot_excitation(mls, FS, kind="mls")
     assert isinstance(axes_m, np.ndarray)
     assert axes_m.size == 2
     assert all(isinstance(a, Axes) for a in axes_m)
@@ -536,15 +537,17 @@ def test_plot_excitation_short_and_empty_guards() -> None:
     import matplotlib.pyplot as plt
 
     # A short sweep must not crash the spectrogram (nperseg capped by length).
-    short = sweep_signal(FS, 100.0, 4000.0, 0.02)
-    axes = plot_excitation(short, FS, kind="sweep")
+    short = room.sweep_signal(FS, 100.0, 4000.0, 0.02)
+    axes = room.plot_excitation(short, FS, kind="sweep")
     assert axes.size == 2
     plt.close("all")
 
     # Empty inputs raise a clear error rather than a cryptic reduction failure.
     empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
-        plot_excitation(empty, FS, kind="mls")
-    empty_result = ImpulseResponseResult(ir=empty, fs=FS, method="spectral")
+        room.plot_excitation(empty, FS, kind="mls")
+    empty_result = room.ImpulseResponseResult(
+        ir=empty, fs=FS, method="spectral"
+    )
     with pytest.raises(ValueError, match="empty"):
         empty_result.plot()
