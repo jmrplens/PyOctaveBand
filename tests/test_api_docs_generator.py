@@ -2,7 +2,7 @@
 """Tests for the generated API reference (taxonomy + generator).
 
 Covers the contract the site relies on: every public module is mapped to
-exactly one section, every ``phonometry.__all__`` name lands on exactly one
+exactly one section, every public name lands on exactly one
 generated page, docstrings parse, roles rewrite to intra-site links, pages
 carry valid frontmatter and two runs are byte-identical (the CI drift gate
 depends on determinism).
@@ -33,8 +33,8 @@ import generate_api_docs as gad
 
 def test_every_public_name_maps_to_a_taxonomy_section() -> None:
     """Each __all__ name resolves to a module that has a section."""
-    for name in phonometry.__all__:
-        module = gad.attribute_module(name, getattr(phonometry, name))
+    for name, owner in api_taxonomy.public_names().items():
+        module = gad.attribute_module(name, getattr(owner, name))
         section = api_taxonomy.module_section(module)
         assert section.key in api_taxonomy.SECTIONS
 
@@ -119,7 +119,7 @@ def test_rest_roles_to_links_known_and_unknown() -> None:
 
 def test_rest_roles_to_links_tilde_shortens_display() -> None:
     xref = {"leq": "/x/#leq"}
-    out = gad.rest_roles_to_links(":func:`~phonometry.leq`", xref)
+    out = gad.rest_roles_to_links(":func:`~phonometry.signals.leq`", xref)
     assert out == "[`leq`](/x/#leq)"
 
 
@@ -289,7 +289,7 @@ def test_every_public_name_on_exactly_one_page(
     for page in pages:
         for member in page.members:
             counts[member.name] = counts.get(member.name, 0) + 1
-    assert set(counts) == set(phonometry.__all__)
+    assert set(counts) == set(api_taxonomy.public_names())
     duplicated = [name for name, count in counts.items() if count > 1]
     assert not duplicated
 
@@ -403,7 +403,7 @@ def test_quick_table_covers_public_api() -> None:
         / "docs" / "reference" / "api" / "index.md"
     )
     markdown = path.read_text(encoding="utf-8")
-    assert car.missing_names(markdown, list(phonometry.__all__)) == []
+    assert car.missing_names(markdown, sorted(api_taxonomy.public_names())) == []
 
 
 _VERSION_ROW = """\

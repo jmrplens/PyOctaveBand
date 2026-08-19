@@ -78,12 +78,12 @@ ASTM E1414, uses :math:`A_0 = 12` m2, so an ASTM value runs about
 :math:`10 \log_{10}(12/10) = 0.79` dB higher than the ISO one.
 
 **Single number.** ISO rates :math:`D_\mathrm{n,c}` with the ISO 717-1 curve
-(:func:`phonometry.weighted_rating`, giving ``Dn,c,w``); ASTM E1414 rates it
-through ASTM E413 as the **ceiling attenuation class** (CAC). E413 rounds the
-data to the nearest integer (clause 5.2), shifts its reference contour upward in
-1 dB steps while the sum of the deficiencies stays at or below 32 dB and no
-single deficiency exceeds 8 dB (clauses 5.3 and 5.4), and reads the rating off
-the shifted contour at 500 Hz (clause 5.5). See
+(:func:`phonometry.building.weighted_rating`, giving ``Dn,c,w``); ASTM E1414
+rates it through ASTM E413 as the **ceiling attenuation class** (CAC). E413
+rounds the data to the nearest integer (clause 5.2), shifts its reference
+contour upward in 1 dB steps while the sum of the deficiencies stays at or
+below 32 dB and no single deficiency exceeds 8 dB (clauses 5.3 and 5.4), and
+reads the rating off the shifted contour at 500 Hz (clause 5.5). See
 :func:`ceiling_attenuation_class`.
 
 .. note::

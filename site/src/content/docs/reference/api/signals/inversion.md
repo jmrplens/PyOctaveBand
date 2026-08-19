@@ -175,13 +175,12 @@ a mixed-phase response into a causal filter (Kirkeby & Nelson,
 Sec. 2.4).
 
 Both regularization levels are *relative* to the peak of
-$\lvert H \rvert^2$
-(like the scalar `regularization` of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response),
-which this generalises): in-band the equalized magnitude deviates from
-unity by at most `regularization_inside * max|H|**2 / min|H|**2` --
-the analytic residue
-$\epsilon/(\lvert H \rvert^2 + \epsilon)$ -- and the achieved
-figure is reported as [`InverseFilterResult.flatness_db`](/phonometry/reference/api/signals/inversion/#inversefilterresult).
+$\lvert H \rvert^2$ (like the scalar `regularization` of
+[`phonometry.room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/), which this generalises): in-band
+the equalized magnitude deviates from unity by at most
+`regularization_inside * max|H|**2 / min|H|**2` -- the analytic residue
+$\epsilon/(\lvert H \rvert^2 + \epsilon)$ -- and the achieved figure
+is reported as [`InverseFilterResult.flatness_db`](/phonometry/reference/api/signals/inversion/#inversefilterresult).
 
 Use the result's [`InverseFilterResult.apply`](/phonometry/reference/api/signals/inversion/#inversefilterresultapply) to equalize
 recordings (or the excitation, for pre-emphasis) and read
@@ -191,7 +190,7 @@ recordings (or the excitation, for pre-emphasis) and read
 
 | Name | Description |
 | :--- | :--- |
-| `response` | Measured impulse response (1-D array), or an [`phonometry.ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) from the sweep/MLS/Golay front ends (its sample rate is used when `fs` is omitted). Also accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though an inverse filter undoes the response it is built from, so it comes out in 1/Pa, with the regularization floor in Pa². |
+| `response` | Measured impulse response (1-D array), or an [`phonometry.room.ImpulseResponseResult`](/phonometry/reference/api/rooms/impulse-response/#impulseresponseresult) from the sweep/MLS/Golay front ends (its sample rate is used when `fs` is omitted). Also accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples, though an inverse filter undoes the response it is built from, so it comes out in 1/Pa, with the regularization floor in Pa². |
 | `fs` | Sample rate in Hz. Optional when `response` carries one. |
 | `f_range` | `(f1, f2)` band, in Hz, over which the response is equalized to unity. Choose it inside the band actually excited and radiated; inverting unexcited regions only amplifies noise. |
 | `regularization_inside` | In-band regularization, as a fraction of the peak spectral power $\max \lvert H \rvert^2$. Default 1e-6. |

@@ -9,8 +9,8 @@ Wall ties in masonry cavity walls: the structural bridge across the cavity
 (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1).
 
 A masonry cavity wall is a double leaf, and the textbook double-leaf prediction
-([`phonometry.double_wall_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#double_wall_transmission_loss)) treats the cavity as pure
-air. Real cavity walls are stitched together by **wall ties** every few
+([`phonometry.building.double_wall_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#double_wall_transmission_loss)) treats the cavity
+as pure air. Real cavity walls are stitched together by **wall ties** every few
 courses. Those ties do two things the air-only model cannot see: they add a
 mechanical spring in parallel with the air spring, which pushes the
 mass-spring-mass resonance up, and they open a structure-borne path from one
@@ -37,8 +37,8 @@ Below `fmsm` the two leaves move as one plate of the combined mass. Stiff ties
 are therefore doubly bad: they raise the resonance into the rating range *and*
 bridge the cavity. Use [`wall_tie_stiffness_per_area`](/phonometry/reference/api/building/masonry-cavity-wall/#wall_tie_stiffness_per_area) and pass the result
 as `tie_stiffness_per_area` to
-[`phonometry.mass_spring_mass_resonance`](/phonometry/reference/api/building/panel-transmission/#mass_spring_mass_resonance) or
-[`phonometry.double_wall_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#double_wall_transmission_loss).
+[`phonometry.building.mass_spring_mass_resonance`](/phonometry/reference/api/building/panel-transmission/#mass_spring_mass_resonance) or
+[`phonometry.building.double_wall_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#double_wall_transmission_loss).
 
 **The structure-borne path (Eqs. 4.84 to 4.88).** Each tie is a point
 connection between two plates. With the driving-point mobilities `Yi`,
@@ -168,8 +168,8 @@ Eq. 4.89).
 
 The term that acts in parallel with the cavity air stiffness `s_a` in the
 mass-spring-mass resonance. Feed it to
-[`phonometry.mass_spring_mass_resonance`](/phonometry/reference/api/building/panel-transmission/#mass_spring_mass_resonance) or
-[`phonometry.double_wall_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#double_wall_transmission_loss) as
+[`phonometry.building.mass_spring_mass_resonance`](/phonometry/reference/api/building/panel-transmission/#mass_spring_mass_resonance) or
+[`phonometry.building.double_wall_transmission_loss`](/phonometry/reference/api/building/panel-transmission/#double_wall_transmission_loss) as
 `tie_stiffness_per_area`.
 
 **Parameters**

@@ -300,7 +300,7 @@ def test_effective_kappa_invalid_inputs_raise(kwargs: dict[str, float]) -> None:
 
 
 def test_public_exports() -> None:
-    import phonometry
+    from phonometry import materials
 
     for name in (
         "AirflowResistanceWarning", "StaticAirflowResult", "airflow_resistance",
@@ -309,4 +309,4 @@ def test_public_exports() -> None:
         "alternating_airflow_resistance", "effective_kappa",
         "thermal_boundary_layer_thickness",
     ):
-        assert hasattr(phonometry, name), name
+        assert hasattr(materials, name), name

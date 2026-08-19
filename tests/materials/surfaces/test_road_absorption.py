@@ -509,7 +509,7 @@ def test_spot_guards() -> None:
 
 
 def test_public_exports() -> None:
-    import phonometry
+    from phonometry import materials
 
     for name in (
         "adrienne_window", "geometric_spreading_factor",
@@ -521,4 +521,4 @@ def test_public_exports() -> None:
         "spot_microphone_spacing_bounds", "check_spot_frequency_range",
         "spot_internal_loss_correction", "RoadAbsorptionWarning",
     ):
-        assert hasattr(phonometry, name), name
+        assert hasattr(materials, name), name

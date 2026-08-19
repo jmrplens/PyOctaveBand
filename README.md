@@ -95,9 +95,10 @@ print(f"SPL [dB]: {spl}")
 
 ## ✨ What's inside
 
-The library is organized into domain namespaces; nearly every public name is
-also re-exported at the top level, so `from phonometry import octave_filter`
-keeps working:
+The library is organized into domain namespaces, and a function is reached
+through the one that owns it. Reading the domain at the call site is the point:
+two packages can hold a `transmission_loss` without either being renamed, and
+the line says which one it means.
 
 ```python
 from phonometry import building, underwater

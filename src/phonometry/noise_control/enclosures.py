@@ -305,12 +305,12 @@ def enclosure_insertion_loss(
         array to per-band ``R`` (then ``frequencies`` is required); or a panel
         prediction result carrying ``transmission_loss`` and ``frequencies``,
         such as the :class:`~phonometry.building.SoundReductionResult` of
-        :func:`phonometry.single_panel_transmission_loss` /
-        :func:`phonometry.double_wall_transmission_loss` or the
+        :func:`phonometry.building.single_panel_transmission_loss` /
+        :func:`phonometry.building.double_wall_transmission_loss` or the
         :class:`~phonometry.building.ApertureTransmissionResult` of
-        :func:`phonometry.composite_transmission_loss` (its ``frequencies`` are
-        then used unless *frequencies* is given). This function does not
-        predict ``R`` itself.
+        :func:`phonometry.building.composite_transmission_loss` (its
+        ``frequencies`` are then used unless *frequencies* is given). This
+        function does not predict ``R`` itself.
     :param external_area: External enclosure surface area ``S_E``, m2.
     :param internal_area: Internal surface area ``S_i`` (including the machine),
         m2.

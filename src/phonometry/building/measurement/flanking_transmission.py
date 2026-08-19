@@ -9,7 +9,7 @@ reduction index** ``Kij`` of each junction; ISO 10848 is the standard that
 *measures* that ``Kij`` (and the overall flanking descriptors ``Dn,f`` /
 ``Ln,f``) in a qualified test facility. The measured ``Kij`` is a
 situation-invariant junction descriptor that feeds straight into the
-:func:`phonometry.flanking_path` model.
+:func:`phonometry.building.flanking_path` model.
 
 **Vibration reduction index (Part 1, Clause 3.9).** From the *direction
 averaged* velocity level difference
@@ -41,15 +41,13 @@ factor is :math:`\eta = 2.2 / (f \, T_\mathrm{s})` (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-:math:`D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` (Formula (4)); with a tapping
-machine on the
-source-room floor the normalized flanking impact level is
-:math:`L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)` (Formula (5)), both with the reference
-absorption
-area :math:`A_0 = 10` m². Their single-number ratings ``Dn,f,w (C; Ctr)`` and
-``Ln,f,w (CI)`` follow ISO 717-1/-2 through the verified
-:func:`phonometry.weighted_rating` / :func:`phonometry.weighted_impact_rating`
-engines, reused unchanged.
+:math:`D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)` (Formula (4)); with a
+tapping machine on the source-room floor the normalized flanking impact level
+is :math:`L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)` (Formula (5)), both with
+the reference absorption area :math:`A_0 = 10` m². Their single-number ratings
+``Dn,f,w (C; Ctr)`` and ``Ln,f,w (CI)`` follow ISO 717-1/-2 through the
+verified :func:`phonometry.building.weighted_rating` /
+:func:`phonometry.building.weighted_impact_rating` engines, reused unchanged.
 
 **Validity of Kij.** ``Kij`` rests on a statistical-energy-analysis
 simplification (weak coupling, diffuse vibration fields). This module exposes
@@ -805,8 +803,9 @@ def normalized_flanking_level_difference(
     :param absorption_area: Receiving-room equivalent absorption area ``A`` per
         band, in m².
     :param reference_area: ``A0``, in m² (default 10 m²).
-    :param bands: Band spacing passed to :func:`phonometry.weighted_rating`;
-        auto-detected when ``None``.
+    :param bands: Band spacing passed to
+        :func:`phonometry.building.weighted_rating`; auto-detected when
+        ``None``.
     :return: A :class:`FlankingLevelDifferenceResult`; the single-number
         rating is formed only for 16 (one-third-octave) or 5 (octave) bands.
     :raises ValueError: On incompatible band counts or non-positive areas.
@@ -841,7 +840,8 @@ def normalized_flanking_impact_level(
         band, in m².
     :param reference_area: ``A0``, in m² (default 10 m²).
     :param bands: Band spacing passed to
-        :func:`phonometry.weighted_impact_rating`; auto-detected when ``None``.
+        :func:`phonometry.building.weighted_impact_rating`; auto-detected when
+        ``None``.
     :return: A :class:`FlankingImpactLevelResult`; the single-number rating is
         formed only for 16 (one-third-octave) or 5 (octave) bands.
     :raises ValueError: On incompatible band counts or non-positive areas.
@@ -878,13 +878,12 @@ def critical_frequency(
 ) -> float:
     r"""Thin-plate critical frequency ``fc`` (Part 1, Formula (20)).
 
-    :math:`f_\mathrm{c} = c_0^2 / (1.8 \, c_\mathrm{L} \, h)` for a homogeneous isotropic
-    element. The
-    constant 1.8 already carries the :math:`2\pi/\sqrt{12}` factor of the
-    thin-plate
-    dispersion relation, so for a plate whose bending stiffness and mass are
-    mutually consistent this equals :func:`phonometry.coincidence_frequency`
-    (Hopkins Eq. 2.201) to within the rounding of the constant.
+    :math:`f_\mathrm{c} = c_0^2 / (1.8 \, c_\mathrm{L} \, h)` for a homogeneous
+    isotropic element. The constant 1.8 already carries the
+    :math:`2\pi/\sqrt{12}` factor of the thin-plate dispersion relation, so for
+    a plate whose bending stiffness and mass are mutually consistent this
+    equals :func:`phonometry.vibration.coincidence_frequency` (Hopkins Eq.
+    2.201) to within the rounding of the constant.
 
     .. note::
         The printed ISO 10848-1:2006 Formula (20) carries a spurious extra

@@ -46,12 +46,11 @@ Two laboratory methods determine :math:`k_{2,1}`:
 
 The dynamic transfer stiffness is a member of the frequency-response-function
 family (ISO 10846-1, Annex A / Table A.2):
-:math:`k = j\omega Z = -\omega^2 m_{\mathrm{eff}}`,
-so it converts to mechanical impedance and effective mass through
-:func:`phonometry.convert_frf` (``"dynamic_stiffness"`` <-> ``"impedance"`` <->
-``"apparent_mass"``). This module feeds the structure-borne source and building
-prediction standards (ISO 9611, EN 15657, EN 12354-5).
-"""
+:math:`k = j\omega Z = -\omega^2 m_{\mathrm{eff}}`, so it converts to
+mechanical impedance and effective mass through
+:func:`phonometry.vibration.convert_frf` (``"dynamic_stiffness"`` <->
+``"impedance"`` <-> ``"apparent_mass"``). This module feeds the structure-borne
+source and building prediction standards (ISO 9611, EN 15657, EN 12354-5). """
 
 from __future__ import annotations
 
@@ -334,7 +333,7 @@ class TransferStiffnessResult:
 
         ``target`` is ``"impedance"`` (:math:`Z = k/(j\omega)`) or
         ``"apparent_mass"`` (:math:`m_{\mathrm{eff}} = -k/\omega^2`); see
-        :func:`phonometry.convert_frf`.
+        :func:`phonometry.vibration.convert_frf`.
         """
         return convert_frf(
             self.transfer_stiffness, self.frequencies, "dynamic_stiffness", target

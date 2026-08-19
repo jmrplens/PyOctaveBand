@@ -56,8 +56,9 @@ sums its ``LW`` with the envelope segments only at the final energetic stage.
 The exterior level follows from the simplified Annex E attenuation ``Atot`` of
 a finite radiating side and :math:`L_p = L_W - A_\mathrm{tot}`.
 
-Single-number ratings reuse EN ISO 717-1 via :func:`phonometry.weighted_rating`
-(exact for :math:`R'_\mathrm{w} + C_\mathrm{tr}`, a good approximation for ``R'w``, Part 3
+Single-number ratings reuse EN ISO 717-1 via
+:func:`phonometry.building.weighted_rating` (exact for
+:math:`R'_\mathrm{w} + C_\mathrm{tr}`, a good approximation for ``R'w``, Part 3
 NOTE 7).
 
 Clause/formula citations refer to EN 12354-3:2000 or EN 12354-4:2000.

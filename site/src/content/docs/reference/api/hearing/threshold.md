@@ -82,7 +82,7 @@ AgeThresholdResult(
 
 Age-related hearing threshold distribution (ISO 7029:2017).
 
-All arrays are in dB and aligned with `AUDIOMETRIC_FREQUENCIES`.
+All arrays are in dB and aligned with [`AUDIOMETRIC_FREQUENCIES`](/phonometry/reference/api/hearing/threshold/#audiometric_frequencies).
 
 **Attributes**
 
@@ -113,6 +113,18 @@ Plot the median threshold with the fractile band over frequency.
 Requires matplotlib (`pip install phonometry[plot]`); returns the
 `Axes`.
 
+## AUDIOMETRIC_FREQUENCIES
+
+*Constant* (`numpy.ndarray, shape (11,)`).
+
+## FIELDS
+
+*Constant* (`tuple`).
+
+```python
+FIELDS = ('free-field', 'diffuse-field')
+```
+
 ## reference_threshold
 
 ```python
@@ -142,3 +154,11 @@ frequencies.
 | Exception | When |
 | :--- | :--- |
 | ValueError | for an unknown field or frequency. |
+
+## SEXES
+
+*Constant* (`tuple`).
+
+```python
+SEXES = ('male', 'female')
+```

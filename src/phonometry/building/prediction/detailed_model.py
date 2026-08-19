@@ -756,8 +756,8 @@ def in_situ_equivalent_absorption_length(
     replaces it by the element area, :math:`a_\mathrm{situ} = S/l_o` (Formula 13).
 
     This is the ISO 10848 Formula (12) quantity
-    (:func:`phonometry.equivalent_absorption_length`) evaluated with the
-    ISO 12354 value :math:`c_\mathrm{o} = 340` m/s.
+    (:func:`phonometry.building.equivalent_absorption_length`) evaluated with
+    the ISO 12354 value :math:`c_\mathrm{o} = 340` m/s.
 
     :param frequencies: Band centre frequencies ``f``, in Hz.
     :param area: Element area ``S``, in m².

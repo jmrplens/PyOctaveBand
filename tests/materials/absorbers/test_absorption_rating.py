@@ -334,7 +334,7 @@ def test_plot_smoke() -> None:
 
 
 def test_public_exports() -> None:
-    import phonometry
+    from phonometry import materials
 
     for name in (
         "AbsorptionRatingResult", "OCTAVE_BANDS", "REFERENCE_CURVE",
@@ -342,4 +342,4 @@ def test_public_exports() -> None:
         "practical_absorption_coefficient", "weighted_absorption",
         "weighted_absorption_from_third_octave",
     ):
-        assert hasattr(phonometry, name), name
+        assert hasattr(materials, name), name

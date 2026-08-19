@@ -68,15 +68,17 @@ _REMOVED_CONSTANTS = [
     ("phonometry.hearing.occupational_exposure", "ExposureWarning"),
 ]
 
+#: ``(package, function, keyword)``: the keyword has to be absent from the
+#: signature the package publishes today.
 _REMOVED_KEYWORDS = [
-    ("adrienne_window", "sample_rate"),
-    ("insitu_reflection_factor", "sample_rate"),
-    ("insitu_absorption_spectrum", "sample_rate"),
-    ("atmospheric_absorption", "humidity"),
-    ("outdoor_propagation_attenuation", "humidity"),
-    ("predicted_receiver_level", "humidity"),
-    ("environmental_correction", "room_volume"),
-    ("sound_power_pressure", "room_volume"),
+    ("materials", "adrienne_window", "sample_rate"),
+    ("materials", "insitu_reflection_factor", "sample_rate"),
+    ("materials", "insitu_absorption_spectrum", "sample_rate"),
+    ("environment", "atmospheric_absorption", "humidity"),
+    ("environment", "outdoor_propagation_attenuation", "humidity"),
+    ("environment", "predicted_receiver_level", "humidity"),
+    ("emission", "environmental_correction", "room_volume"),
+    ("emission", "sound_power_pressure", "room_volume"),
 ]
 
 
@@ -87,20 +89,27 @@ def test_removed_3_1_alias_is_gone(module: str, name: str) -> None:
         getattr(home, name)
 
 
-@pytest.mark.parametrize(("func", "keyword"), _REMOVED_KEYWORDS)
-def test_removed_3_1_keyword_is_gone(func: str, keyword: str) -> None:
-    assert keyword not in inspect.signature(getattr(ph, func)).parameters
+@pytest.mark.parametrize(("package", "func", "keyword"), _REMOVED_KEYWORDS)
+def test_removed_3_1_keyword_is_gone(package: str, func: str, keyword: str) -> None:
+    home = getattr(ph, package)
+    assert keyword not in inspect.signature(getattr(home, func)).parameters
 
 
 def test_the_canonical_names_the_3_1_aliases_pointed_at_are_all_here() -> None:
     """The removal took the aliases, not the functions they delegated to."""
-    for name in (
-        "octave_filter", "nominal_frequencies", "normalized_frequencies",
-        "sensitivity", "insulation_coverage_factor",
-        "insulation_expanded_uncertainty", "OCTAVE_BANDS", "THIRD_OCTAVE_BANDS",
-        "BASE_PLATE_BANDS", "OccupationalExposureWarning",
+    for package, name in (
+        ("filters", "octave_filter"),
+        ("filters", "nominal_frequencies"),
+        ("filters", "normalized_frequencies"),
+        ("metrology", "sensitivity"),
+        ("building", "insulation_coverage_factor"),
+        ("building", "insulation_expanded_uncertainty"),
+        ("materials", "OCTAVE_BANDS"),
+        ("materials", "THIRD_OCTAVE_BANDS"),
+        ("materials", "BASE_PLATE_BANDS"),
+        ("hearing", "OccupationalExposureWarning"),
     ):
-        assert hasattr(ph, name), name
+        assert hasattr(getattr(ph, package), name), f"{package}.{name}"
 
 
 def test_the_plot_renderers_moved_out_of_the_deprecated_module() -> None:
@@ -131,8 +140,9 @@ def test_removed_flat_module_path_raises(path: str) -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module(path)
     assert path not in sys.modules
-    # The names themselves never moved: the flat API is what they were for.
-    assert hasattr(ph, "leq")
+    # The names these modules held never moved; the package that owns each of
+    # them publishes it, which is what the flat paths were a shortcut to.
+    assert callable(ph.signals.leq)
 
 
 # --------------------------------------------------------------------------- #

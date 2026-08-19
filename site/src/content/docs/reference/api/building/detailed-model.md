@@ -1134,8 +1134,8 @@ rings shorter at high frequency. For a Type B element the standard
 replaces it by the element area, $a_\mathrm{situ} = S/l_o$ (Formula 13).
 
 This is the ISO 10848 Formula (12) quantity
-([`phonometry.equivalent_absorption_length`](/phonometry/reference/api/building/flanking-transmission/#equivalent_absorption_length)) evaluated with the
-ISO 12354 value $c_\mathrm{o} = 340$ m/s.
+([`phonometry.building.equivalent_absorption_length`](/phonometry/reference/api/building/flanking-transmission/#equivalent_absorption_length)) evaluated with
+the ISO 12354 value $c_\mathrm{o} = 340$ m/s.
 
 **Parameters**
 

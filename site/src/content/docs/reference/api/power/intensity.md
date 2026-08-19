@@ -390,7 +390,7 @@ The mean-square pressure is taken from the mean signal
 $(p_1 + p_2)/2$ at the probe reference point. When `fraction` is
 given, both quantities are integrated into octave (1) or one-third
 octave (3) bands using the ANSI S1.11/IEC 61260-1 band edges of
-[`phonometry.nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies); bands without any spectral
+[`phonometry.filters.nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies); bands without any spectral
 bin are dropped. Broadband totals are always computed (over
 `limits` when provided, otherwise over all positive frequencies).
 
@@ -417,7 +417,7 @@ by the factor $\sin(k \Delta r)/(k \Delta r)$ (IEC 61043:1993,
 | `rho` | Air density, in kg/m^3. Default 1.204 (20 degC). |
 | `c` | Speed of sound, in m/s. Default 343.0. |
 | `fraction` | `None` (broadband only), 1 (octave bands) or 3 (one-third octave bands). |
-| `limits` | [f_min, f_max] band limits in Hz (default [12, 20000], as in [`phonometry.nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies)). |
+| `limits` | [f_min, f_max] band limits in Hz (default [12, 20000], as in [`phonometry.filters.nominal_frequencies`](/phonometry/reference/api/filters/frequencies/#nominal_frequencies)). |
 | `bias_correct` | If True, apply the per-bin finite-difference correction $(k \Delta r)/\sin(k \Delta r)$ (IEC 61043:1993, 7.3) to the intensity spectral density before summing the band and broadband totals, so the totals no longer under-read as the frequency approaches `max_valid_frequency`. The reciprocal diverges as $k \Delta r \to \pi$ (the first spatial-aliasing null at $c/(2 \Delta r)$, inside the default band range for close spacings), so it is applied only over the probe's usable range (up to $k \Delta r = \pi/2$) and held constant beyond, keeping the totals bounded instead of letting a few near-null bins dominate them. Default False keeps the exact legacy totals; the per-band `bias_correction` factor (same clamped definition) is reported either way. |
 
 **Returns:** [`IntensityResult`](/phonometry/reference/api/power/intensity/#intensityresult).

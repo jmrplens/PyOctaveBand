@@ -14,7 +14,7 @@ reduction index** `Kij` of each junction; ISO 10848 is the standard that
 *measures* that `Kij` (and the overall flanking descriptors `Dn,f` /
 `Ln,f`) in a qualified test facility. The measured `Kij` is a
 situation-invariant junction descriptor that feeds straight into the
-[`phonometry.flanking_path`](/phonometry/reference/api/building/simplified-model/#flanking_path) model.
+[`phonometry.building.flanking_path`](/phonometry/reference/api/building/simplified-model/#flanking_path) model.
 
 **Vibration reduction index (Part 1, Clause 3.9).** From the *direction
 averaged* velocity level difference
@@ -45,15 +45,13 @@ factor is $\eta = 2.2 / (f \, T_\mathrm{s})$ (Clause 7.3.1).
 
 **Overall flanking descriptors (Part 1, Clauses 3.2/3.3).** With airborne
 excitation the normalized flanking level difference is
-$D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ (Formula (4)); with a tapping
-machine on the
-source-room floor the normalized flanking impact level is
-$L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)$ (Formula (5)), both with the reference
-absorption
-area $A_0 = 10$ m². Their single-number ratings `Dn,f,w (C; Ctr)` and
-`Ln,f,w (CI)` follow ISO 717-1/-2 through the verified
-[`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) / [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating)
-engines, reused unchanged.
+$D_\mathrm{n,f} = L_1 - L_2 - 10 \log_{10}(A/A_0)$ (Formula (4)); with a
+tapping machine on the source-room floor the normalized flanking impact level
+is $L_\mathrm{n,f} = L_2 + 10 \log_{10}(A/A_0)$ (Formula (5)), both with
+the reference absorption area $A_0 = 10$ m². Their single-number ratings
+`Dn,f,w (C; Ctr)` and `Ln,f,w (CI)` follow ISO 717-1/-2 through the
+verified [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) /
+[`phonometry.building.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating) engines, reused unchanged.
 
 **Validity of Kij.** `Kij` rests on a statistical-energy-analysis
 simplification (weak coupling, diffuse vibration fields). This module exposes
@@ -127,13 +125,12 @@ critical_frequency(
 
 Thin-plate critical frequency `fc` (Part 1, Formula (20)).
 
-$f_\mathrm{c} = c_0^2 / (1.8 \, c_\mathrm{L} \, h)$ for a homogeneous isotropic
-element. The
-constant 1.8 already carries the $2\pi/\sqrt{12}$ factor of the
-thin-plate
-dispersion relation, so for a plate whose bending stiffness and mass are
-mutually consistent this equals [`phonometry.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency)
-(Hopkins Eq. 2.201) to within the rounding of the constant.
+$f_\mathrm{c} = c_0^2 / (1.8 \, c_\mathrm{L} \, h)$ for a homogeneous
+isotropic element. The constant 1.8 already carries the
+$2\pi/\sqrt{12}$ factor of the thin-plate dispersion relation, so for
+a plate whose bending stiffness and mass are mutually consistent this
+equals [`phonometry.vibration.coincidence_frequency`](/phonometry/reference/api/vibration/radiation-efficiency/#coincidence_frequency) (Hopkins Eq.
+2.201) to within the rounding of the constant.
 
 :::note
 The printed ISO 10848-1:2006 Formula (20) carries a spurious extra
@@ -471,7 +468,7 @@ tapping machine on the source-room floor.
 | `receive_level` | Receiving-room average impact SPL `L2` per band, in dB. |
 | `absorption_area` | Receiving-room equivalent absorption area `A` per band, in m². |
 | `reference_area` | `A0`, in m² (default 10 m²). |
-| `bands` | Band spacing passed to [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating); auto-detected when `None`. |
+| `bands` | Band spacing passed to [`phonometry.building.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating); auto-detected when `None`. |
 
 **Returns:** A [`FlankingImpactLevelResult`](/phonometry/reference/api/building/flanking-transmission/#flankingimpactlevelresult); the single-number rating is formed only for 16 (one-third-octave) or 5 (octave) bands.
 
@@ -507,7 +504,7 @@ area $A_0 = 10$ m².
 | `receive_level` | Receiving-room average SPL `L2` per band, in dB. |
 | `absorption_area` | Receiving-room equivalent absorption area `A` per band, in m². |
 | `reference_area` | `A0`, in m² (default 10 m²). |
-| `bands` | Band spacing passed to [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating); auto-detected when `None`. |
+| `bands` | Band spacing passed to [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating); auto-detected when `None`. |
 
 **Returns:** A [`FlankingLevelDifferenceResult`](/phonometry/reference/api/building/flanking-transmission/#flankingleveldifferenceresult); the single-number rating is formed only for 16 (one-third-octave) or 5 (octave) bands.
 

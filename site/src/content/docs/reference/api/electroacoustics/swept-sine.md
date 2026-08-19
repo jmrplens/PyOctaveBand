@@ -40,9 +40,9 @@ Two excitation/deconvolution pairs are implemented:
   `method="synchronized"` (the default).
 
 * **Exponential sweep with the Farina inverse filter** -- the classical
-  ESS of [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) deconvolved by the time-reversed,
+  ESS of [`phonometry.room.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) deconvolved by the time-reversed,
   amplitude-compensated sweep (Farina 2000; ISO 18233:2006 Figure B.2,
-  the machinery of [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response)). The harmonic
+  the machinery of [`phonometry.room.impulse_response`](/phonometry/reference/api/rooms/impulse-response/)). The harmonic
   *magnitudes* are correct, but the sweep is not synchronized: its `-1`
   phase term breaks the time-shift/harmonic equivalence, so the phases of
   `H_n` for $n \ge 2$ depend on the excitation and are not
@@ -53,10 +53,10 @@ The memoryless polynomial oracle anchors both paths: driving
 $y = x + a_2 x^2 + a_3 x^3$ with a unit sweep must return, by the
 Chebyshev identities, $\lvert H_1 \rvert = 1 + 3 a_3/4$,
 $\lvert H_2 \rvert = a_2/2$ (phase $-\pi/2$) and
-$\lvert H_3 \rvert = a_3/4$ (phase $\pi$), and a THD(f)
-equal to the closed form
-$\sqrt{(a_2/2)^2 + (a_3/4)^2} / (1 + 3 a_3/4)$ -- which also
-matches [`phonometry.thd`](/phonometry/reference/api/electroacoustics/distortion/#thd) measured tone by tone on the same system.
+$\lvert H_3 \rvert = a_3/4$ (phase $\pi$), and a THD(f) equal to
+the closed form $\sqrt{(a_2/2)^2 + (a_3/4)^2} / (1 + 3 a_3/4)$ -- which
+also matches [`phonometry.electroacoustics.thd`](/phonometry/reference/api/electroacoustics/distortion/#thd) measured tone by tone on
+the same system. 
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -92,7 +92,7 @@ The excitation must be the matching generator with the *same*
 parameters: [`synchronized_sweep_signal`](/phonometry/reference/api/electroacoustics/swept-sine/#synchronized_sweep_signal) for
 `method="synchronized"` (the default; harmonic phases are meaningful,
 and the closed-form deconvolution extends each `H_n` to
-$[n f_1, n f_2]$), or [`phonometry.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) for
+$[n f_1, n f_2]$), or [`phonometry.room.sweep_signal`](/phonometry/reference/api/rooms/impulse-response/#sweep_signal) for
 `method="farina"` (magnitudes only; the band of every `H_n` is
 capped at `f2` by the inverse filter).
 

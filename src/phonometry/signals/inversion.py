@@ -277,20 +277,19 @@ def regularized_inverse_filter(
     Sec. 2.4).
 
     Both regularization levels are *relative* to the peak of
-    :math:`\lvert H \rvert^2`
-    (like the scalar ``regularization`` of :func:`phonometry.impulse_response`,
-    which this generalises): in-band the equalized magnitude deviates from
-    unity by at most ``regularization_inside * max|H|**2 / min|H|**2`` --
-    the analytic residue
-    :math:`\epsilon/(\lvert H \rvert^2 + \epsilon)` -- and the achieved
-    figure is reported as :attr:`InverseFilterResult.flatness_db`.
+    :math:`\lvert H \rvert^2` (like the scalar ``regularization`` of
+    :func:`phonometry.room.impulse_response`, which this generalises): in-band
+    the equalized magnitude deviates from unity by at most
+    ``regularization_inside * max|H|**2 / min|H|**2`` -- the analytic residue
+    :math:`\epsilon/(\lvert H \rvert^2 + \epsilon)` -- and the achieved figure
+    is reported as :attr:`InverseFilterResult.flatness_db`.
 
     Use the result's :meth:`InverseFilterResult.apply` to equalize
     recordings (or the excitation, for pre-emphasis) and read
     :attr:`InverseFilterResult.spectrum` to apply it spectrally.
 
     :param response: Measured impulse response (1-D array), or an
-        :class:`phonometry.ImpulseResponseResult` from the sweep/MLS/Golay
+        :class:`phonometry.room.ImpulseResponseResult` from the sweep/MLS/Golay
         front ends (its sample rate is used when ``fs`` is omitted). Also
         accepts a :class:`phonometry.io.Signal`, whose calibration is applied
         to the samples, though an inverse filter undoes the response it is

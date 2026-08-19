@@ -22,7 +22,7 @@ opening area `S` and the Sabine equivalent absorption area
 $A = 0.16\,V/T$ (ISO 10140-4:2010, Clause 4.6.3, Formula (5)). The
 single-number weighted rating `Rw` and the adaptation terms `C` / `Ctr`
 follow ISO 717-1 (Clause 5.3) through the verified
-[`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine, reused unchanged.
+[`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine, reused unchanged.
 
 **Impact sound pressure level (ISO 10140-3:2010).** With the standard
 tapping machine exciting the floor under test this module forms, from the
@@ -32,7 +32,7 @@ normalized impact sound pressure level $L_\mathrm{n} = L_\mathrm{i} + 10 \log_{1
 Formula (1)) with $A = 0.16\,V/T$ and the reference absorption area
 $A_0 = 10$ m². The single-number weighted rating `Ln,w` and the term
 `CI` follow ISO 717-2 (Clause 5.3) through
-[`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating), reused unchanged.
+[`phonometry.building.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating), reused unchanged.
 
 **Background-noise correction (ISO 10140-4:2010, Clause 4.3, Formula (4)).**
 The receiving-room levels must be corrected for background noise before the
@@ -87,11 +87,12 @@ using the margin `Lsb - Lb`:
   nonsensical (or `NaN`) corrected level.
 
 This is the sound-insulation counterpart of
-[`phonometry.background_noise_correction`](/phonometry/reference/api/power/sound-power/#background_noise_correction) (ISO 3744:2010): both apply
-the same energy subtraction
-$10 \log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$, but that
-routine returns the correction *offset* `K1` (to subtract from `Lsb`),
-whereas this one returns the already-corrected levels `L` directly.
+[`phonometry.emission.background_noise_correction`](/phonometry/reference/api/power/sound-power/#background_noise_correction) (ISO 3744:2010):
+both apply the same energy subtraction
+$10 \log_{10}(10^{L_\mathrm{sb}/10} - 10^{L_\mathrm{b}/10})$, but
+that routine returns the correction *offset* `K1` (to subtract from
+`Lsb`), whereas this one returns the already-corrected levels `L`
+directly.
 
 **Parameters**
 
@@ -130,7 +131,7 @@ opening area `S` and the Sabine equivalent absorption area
 $A = 0.16\,V/T$ (ISO 10140-4:2010, Formula (5)). When exactly 16
 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
 supplied, the single-number weighted rating `Rw` with `C` / `Ctr`
-is also formed via [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1).
+is also formed via [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1).
 
 `l1` and `l2` may be one value per band (already energy-averaged) or a
 two-dimensional `(positions, bands)` array, in which case the positions
@@ -177,7 +178,7 @@ Formula (5)) and the reference absorption area $A_0 = 10$ m².
 When exactly
 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
 supplied, the single-number weighted rating `Ln,w` with `CI` is also
-formed via [`phonometry.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating) (ISO 717-2).
+formed via [`phonometry.building.weighted_impact_rating`](/phonometry/reference/api/building/ratings/#weighted_impact_rating) (ISO 717-2).
 
 `li` may be one value per band (already energy-averaged) or a
 two-dimensional `(positions, bands)` array, in which case the positions

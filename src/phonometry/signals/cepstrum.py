@@ -23,7 +23,7 @@ at the quefrency of its period. Three variants are standard:
 * the **real cepstrum**, the inverse transform of
   :math:`\ln \lvert X \rvert` -- exactly half
   the power cepstrum, and the quantity whose causal folding yields the
-  minimum-phase reconstruction of :func:`phonometry.minimum_phase`
+  minimum-phase reconstruction of :func:`phonometry.signals.minimum_phase`
   (Bendat & Piersol, *Random Data*, 4th ed., Sec. 13.1.4; Tohyama in
   Havelock Ch. 75 manipulates minimum-phase and all-pass components the
   same way);
@@ -61,7 +61,7 @@ to it). The discrete cepstrum is the inverse *DFT* of the log of a
 *sampled* spectrum, so it is time-aliased when the log spectrum has
 features sharper than the grid resolves; zero-padding ``nfft`` is the
 remedy, exactly like the ``oversample`` padding of
-:func:`phonometry.minimum_phase`, whose cepstral folding core
+:func:`phonometry.signals.minimum_phase`, whose cepstral folding core
 (:func:`_fold_causal`) this module shares.
 """
 
@@ -108,7 +108,7 @@ def _fold_causal(cepstrum: NDArray[np.float64]) -> NDArray[np.float64]:
     (Bendat & Piersol Sec. 13.1.4; the causal-part manipulation of Tohyama
     in Havelock Ch. 75): the result is the complex cepstrum of the unique
     minimum-phase signal whose log magnitude produced ``cepstrum``. Shared
-    verbatim with :func:`phonometry.minimum_phase`, whose output is
+    verbatim with :func:`phonometry.signals.minimum_phase`, whose output is
     bit-identical to the pre-refactor implementation.
 
     :param cepstrum: Real cepstrum over a full even-length quefrency axis.
@@ -262,7 +262,7 @@ def cepstrum(
       delay itself.
     * ``"real"``: inverse DFT of ``ln|X|`` -- exactly half the power
       cepstrum. Folding it causally is the minimum-phase reconstruction
-      (see :func:`phonometry.minimum_phase`, which shares this module's
+      (see :func:`phonometry.signals.minimum_phase`, which shares this module's
       folding core).
     * ``"complex"``: inverse DFT of ``ln|X| + j arg X`` with the phase
       unwrapped and its linear component removed (Neelamani Eq. (14) in

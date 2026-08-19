@@ -7,11 +7,12 @@ The **point mobility** ``Y`` of a structure is the complex ratio of the
 velocity response at a driving point to the point force that produces it, and
 its reciprocal is the **point impedance** :math:`Z = 1/Y` (the same
 motion-per-force / force-per-motion pair as ISO 7626-1 mechanical mobility, so
-these theoretical values slot straight into :class:`~phonometry.MobilityResult`
-and :func:`~phonometry.convert_frf`). For an *infinite* structure the driving
-point never sees a reflected wave, so the mobility is the free-field value that
-sets the vibrational power a source injects (Cremer 5.5): with a point force of
-amplitude ``F`` the time-averaged injected power, in watts, is
+these theoretical values slot straight into
+:class:`~phonometry.vibration.MobilityResult` and
+:func:`~phonometry.vibration.convert_frf`). For an *infinite* structure the
+driving point never sees a reflected wave, so the mobility is the free-field
+value that sets the vibrational power a source injects (Cremer 5.5): with a
+point force of amplitude ``F`` the time-averaged injected power, in watts, is
 (Cremer Eq. 5.23):
 
 .. math::

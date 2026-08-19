@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Removed
 
+- The top-level `phonometry` package publishes twenty-three names: the
+  nineteen domain packages, and `Signal`, `ReportMetadata`, `PhonometryWarning`
+  and `__version__`. The thirteen hundred functions, classes and constants it
+  used to re-export are reached through the package that owns them, so
+  `from phonometry import leq` and `phonometry.leq` raise where
+  `from phonometry import signals` and `signals.leq` work. Nothing was removed
+  from the library: every name is where it always was, and the shortcut is
+  what went.
+
+  The four that stay are the ones that belong to no domain. `Signal` is the
+  calibrated recording seven packages accept and `phonometry.io` owns;
+  `ReportMetadata` stamps the accredited fiches of every domain;
+  `PhonometryWarning` is the base of the twenty-seven warning classes across
+  thirteen packages, so one `warnings.filterwarnings` rule still reaches them
+  all. Measured rather than assumed: of the three hundred and sixty-seven
+  public classes, six are imported across a boundary between two public
+  packages, and only `Signal` by more than two.
+
+  What the flat namespace cost is easiest to see in the one name it forced a
+  rename on. Three domains define an expanded uncertainty over their own
+  coverage factors, and one flat namespace holds one spelling, so the
+  environmental one was published as `environmental_expanded_uncertainty`, a
+  name that existed for no reason but the collision. It is
+  `environment.expanded_uncertainty` now. Three more paid the same toll by
+  being left out: `hearing` publishes `AUDIOMETRIC_FREQUENCIES`, `FIELDS` and
+  `SEXES`, which the top level declined because `FIELDS` and `SEXES` cannot be
+  sustained in one flat namespace. All four are ordinary names again.
+
+  To migrate, read the package off the function's page in the generated
+  reference, or off the curated table in `docs/reference/api/index.md`, whose
+  usage column now shows the namespace to call through. Every name belongs to
+  exactly one package, so there is nothing to choose.
+
 - The compatibility layer that served the module paths of every earlier layout
   is gone, and with it `phonometry.environmental`. The hundred and five paths
   the 4.0 taxonomy moved now refuse in the three ways Python has, which are

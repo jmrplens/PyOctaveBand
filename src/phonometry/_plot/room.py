@@ -613,10 +613,11 @@ def plot_excitation(
     """Plot an ISO 18233 excitation signal (sweep or MLS).
 
     A documented helper for the raw arrays returned by
-    :func:`~phonometry.sweep_signal` and :func:`~phonometry.mls_signal`, which
-    stay plain :class:`numpy.ndarray` (they are meant for playback). For a
-    swept sine the waveform and its spectrogram are drawn; for an MLS the first
-    samples of the bipolar sequence and its (flat) magnitude spectrum.
+    :func:`~phonometry.room.sweep_signal` and
+    :func:`~phonometry.room.mls_signal`, which stay plain
+    :class:`numpy.ndarray` (they are meant for playback). For a swept sine the
+    waveform and its spectrogram are drawn; for an MLS the first samples of the
+    bipolar sequence and its (flat) magnitude spectrum.
 
     :param signal: The excitation samples (1D array-like).
     :param fs: Sample rate in Hz (for the time and frequency axes).

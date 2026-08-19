@@ -161,9 +161,9 @@ def sharpness_din(
     tolerance and is a known DIN 45692 implementation property.
 
     :param x: Input signal (1D), in Pa after ``calibration_factor``.
-        Accepts a :class:`phonometry.io.Signal`; the rate and the factor
-        are resolved by :func:`~phonometry.loudness_zwicker`, which this
-        is a weighted moment of, so both arrive here on exactly the terms
+        Accepts a :class:`phonometry.io.Signal`; the rate and the factor are
+        resolved by :func:`~phonometry.psychoacoustics.loudness_zwicker`, which
+        this is a weighted moment of, so both arrive here on exactly the terms
         they have there.
     :param fs: Sample rate in Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit

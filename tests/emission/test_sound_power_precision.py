@@ -718,7 +718,7 @@ def test_intensity_result_plot_returns_axes() -> None:
 
 
 def test_public_exports() -> None:
-    import phonometry
+    from phonometry import emission
 
     for name in (
         "sound_power_anechoic", "PrecisionSoundPowerResult", "precision_positions",
@@ -728,4 +728,4 @@ def test_public_exports() -> None:
         "precision_field_indicators", "PrecisionFieldIndicators",
         "precision_qualification", "PrecisionCriteria",
     ):
-        assert hasattr(phonometry, name), name
+        assert hasattr(emission, name), name

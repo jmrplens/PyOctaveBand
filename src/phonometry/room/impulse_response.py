@@ -23,7 +23,7 @@ Two excitation families are implemented:
   IR and discarded by keeping only the causal part (B.5). To *analyse*
   those discarded products instead (per-order harmonic responses and
   THD(f) from the same recording), see
-  :func:`phonometry.swept_sine_distortion`.
+  :func:`phonometry.electroacoustics.swept_sine_distortion`.
 
 * **Maximum-length sequence (Annex A)** -- an order-``N`` binary sequence of
   length :math:`2^N - 1` generated with a linear-feedback shift register
@@ -55,7 +55,7 @@ complete the family:
   noise-floor-matched, loudspeaker-equalizing, ...). See
   :func:`shaped_sweep_signal`; the recording is deconvolved with the
   ordinary spectral method of :func:`impulse_response`, or post-equalized
-  with :func:`phonometry.regularized_inverse_filter`.
+  with :func:`phonometry.signals.regularized_inverse_filter`.
 
 The recovered IR is broadband; ISO 18233 6.3.2 requires subsequent
 fractional-octave-band weighting (IEC 61260) before computing levels or
@@ -139,10 +139,11 @@ class ImpulseResponseResult:
     The object is a drop-in replacement for the raw array it used to be: it
     implements :meth:`__array__`, so ``np.asarray(result)`` yields the IR and
     the result can be passed straight to array consumers such as
-    :func:`phonometry.room_parameters`, :func:`phonometry.decay_curve` and
-    :func:`phonometry.sti_from_impulse_response`. Indexing, ``len(result)``
-    and the ``size``/``ndim``/``shape``/``dtype`` attributes forward to ``ir``.
-    """
+    :func:`phonometry.room.room_parameters`,
+    :func:`phonometry.room.decay_curve` and
+    :func:`phonometry.speech.sti_from_impulse_response`. Indexing,
+    ``len(result)`` and the ``size``/``ndim``/``shape``/``dtype`` attributes
+    forward to ``ir``. """
 
     ir: np.ndarray
     fs: int | None

@@ -50,11 +50,11 @@ Two laboratory methods determine $k_{2,1}$:
 
 The dynamic transfer stiffness is a member of the frequency-response-function
 family (ISO 10846-1, Annex A / Table A.2):
-$k = j\omega Z = -\omega^2 m_{\mathrm{eff}}$,
-so it converts to mechanical impedance and effective mass through
-[`phonometry.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf) (`"dynamic_stiffness"` \<-> `"impedance"` \<->
-`"apparent_mass"`). This module feeds the structure-borne source and building
-prediction standards (ISO 9611, EN 15657, EN 12354-5).
+$k = j\omega Z = -\omega^2 m_{\mathrm{eff}}$, so it converts to
+mechanical impedance and effective mass through
+[`phonometry.vibration.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf) (`"dynamic_stiffness"` \<->
+`"impedance"` \<-> `"apparent_mass"`). This module feeds the structure-borne
+source and building prediction standards (ISO 9611, EN 15657, EN 12354-5). 
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -446,7 +446,7 @@ Convert $k_{2,1}$ to an FRF (ISO 10846-1 Annex A / Table A.2).
 
 `target` is `"impedance"` ($Z = k/(j\omega)$) or
 `"apparent_mass"` ($m_{\mathrm{eff}} = -k/\omega^2$); see
-[`phonometry.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf).
+[`phonometry.vibration.convert_frf`](/phonometry/reference/api/vibration/mechanical-mobility/#convert_frf).
 
 ## TRANSMISSIBILITY_LIMIT
 

@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 import reference_data as ref
 
-from phonometry import environment, environmental_expanded_uncertainty
+from phonometry import environment
 from phonometry.environment.assessment.measurement import (
     EnvironmentalMeasurementWarning,
 )
@@ -206,10 +206,10 @@ def test_expanded_uncertainty_g2() -> None:
     u = environment.combined_standard_uncertainty(
         ref.ISO1996_2_G2_CONTRIBUTIONS
     )
-    assert environmental_expanded_uncertainty(u) == pytest.approx(
+    assert environment.expanded_uncertainty(u) == pytest.approx(
         ref.ISO1996_2_G2_EXPANDED, abs=0.01
     )
-    assert environmental_expanded_uncertainty(u, confidence=0.80) == pytest.approx(1.3 * u)
+    assert environment.expanded_uncertainty(u, confidence=0.80) == pytest.approx(1.3 * u)
 
 
 def test_combined_uncertainty_accepts_pairs() -> None:
@@ -222,7 +222,7 @@ def test_combined_uncertainty_accepts_pairs() -> None:
 
 def test_expanded_uncertainty_bad_confidence() -> None:
     with pytest.raises(ValueError, match="confidence"):
-        environmental_expanded_uncertainty(1.0, confidence=0.90)
+        environment.expanded_uncertainty(1.0, confidence=0.90)
 
 
 def test_residual_correction_uncertainty_f9() -> None:

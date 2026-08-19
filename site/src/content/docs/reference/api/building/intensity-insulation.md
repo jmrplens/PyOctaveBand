@@ -69,8 +69,9 @@ adequate.
 one-third-octave range 100 Hz to 5000 Hz (18 bands), optionally extended down
 to 50 Hz. The single-number weighted rating uses the ISO 717-1 core range, so
 the automatic rating (`RI,w`, `RI,M,w`, `DI,n,e,w`) is formed via the
-verified [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine only when exactly 16
-one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are supplied.
+verified [`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) engine only when exactly
+16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
+supplied. 
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 
@@ -186,11 +187,10 @@ $$
 from the average source-room sound pressure level `Lp1`, the average
 normal sound intensity level `LIn` over the measurement surface of area
 `Sm` (`measurement_area`), the reference absorption area
-$A_0 = 10$ m² and the number `N` of element units installed
-within the surface.
-The weighted rating `DI,n,e,w` is computed via
-[`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when exactly 16 or 5 values
-are supplied.
+$A_0 = 10$ m² and the number `N` of element units installed within
+the surface. The weighted rating `DI,n,e,w` is computed via
+[`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when exactly 16 or
+5 values are supplied.
 
 :::note
 The printed Formula (8) *subtracts* its $10 \log_{10} N$ term. That
@@ -244,15 +244,15 @@ $$
 
 from the average source-room sound pressure level `Lp1` and the average
 normal sound intensity level `LIn` over the measurement surface of area
-`Sm` (`measurement_area`), for a specimen of area `S` (`area`).
-The same formula gives the apparent index `R'I` in the field
-(ISO 15186-2). When an adaptation term `kc` is supplied (see
+`Sm` (`measurement_area`), for a specimen of area `S` (`area`). The
+same formula gives the apparent index `R'I` in the field (ISO 15186-2).
+When an adaptation term `kc` is supplied (see
 [`adaptation_term_kc`](/phonometry/reference/api/building/intensity-insulation/#adaptation_term_kc)), the modified index
-$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$
-(Formula (9)) is also formed. Weighted ratings `RI,w` (and `RI,M,w`)
-are computed via [`phonometry.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when
-exactly 16 one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz)
-values are supplied.
+$R_\mathrm{I,M} = R_\mathrm{I} + K_\mathrm{c}$ (Formula (9)) is also
+formed. Weighted ratings `RI,w` (and `RI,M,w`) are computed via
+[`phonometry.building.weighted_rating`](/phonometry/reference/api/building/ratings/#weighted_rating) (ISO 717-1) when exactly 16
+one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are
+supplied.
 
 `lp1` and `l_in` may be one value per band (already averaged) or a
 two-dimensional `(positions, bands)` array, in which case the positions

@@ -844,10 +844,10 @@ def weighted_floating_floor_improvement(
     r"""Weighted improvement ``ΔLw`` of a floating floor (Formulae C.4/C.5).
 
     The single number that feeds the simplified prediction
-    (:func:`phonometry.predicted_impact_insulation`), read directly from the
-    floating floor's mass per unit area and the resilient layer's dynamic
-    stiffness. ISO 12354-2:2017 gives it as the two nomograms of Figures C.1
-    and C.2 and prints the fits:
+    (:func:`phonometry.building.predicted_impact_insulation`), read directly
+    from the floating floor's mass per unit area and the resilient layer's
+    dynamic stiffness. ISO 12354-2:2017 gives it as the two nomograms of
+    Figures C.1 and C.2 and prints the fits:
 
     * ``floor="screed"`` (sand-cement or calcium-sulfate screeds, Formula C.4):
       :math:`\Delta L_\mathrm{w} = 13 \log_{10}(m') - 14.2 \log_{10}(s') + 20.8`;
