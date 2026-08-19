@@ -377,17 +377,21 @@ def test_insitu_absorption_spectrum_rejects_nonpositive_fs() -> None:
 
 
 def test_the_functions_that_took_a_deprecated_fs_alias_still_require_fs() -> None:
-    """``fs`` is keyword-optional in the signature and required in fact.
+    """``fs`` is optional in the signature and required in fact.
 
-    It reads as optional because it once shared the slot with the
-    ``sample_rate`` alias that 4.0 removed. Leaving it out has to say so.
+    It reads as optional for two different reasons now. On
+    :func:`adrienne_window` it is the leftover of the ``sample_rate`` alias
+    that 4.0 removed, so leaving it out is a plain ``TypeError``. On
+    :func:`insitu_absorption_spectrum` it is the Signal contract: a pair of
+    :class:`~phonometry.io.Signal` records would supply the rate, and a
+    pair of bare arrays is refused by name instead.
     """
     hi = _incident_ir()
     hr = 0.4 * np.roll(hi, 96)
     with pytest.raises(TypeError, match="missing 1 required positional argument"):
         adrienne_window(flat_duration=0.005)  # type: ignore[call-arg]
-    with pytest.raises(TypeError, match="missing 1 required positional argument"):
-        insitu_absorption_spectrum(hi, hr)  # type: ignore[call-arg]
+    with pytest.raises(ValueError, match="fs is required"):
+        insitu_absorption_spectrum(hi, hr)
 
 
 def test_insitu_absorption_spectrum_plot_returns_axes() -> None:

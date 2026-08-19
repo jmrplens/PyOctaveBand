@@ -23125,8 +23125,7 @@ io.write("calibrator.wav",
          subtype="PCM_24")
 
 cal_take = io.read("calibrator.wav")
-cal = metrology.sensitivity(np.asarray(cal_take), target_spl=94.0,
-                            fs=cal_take.fs)
+cal = metrology.sensitivity(cal_take, target_spl=94.0)
 print(f"S = {cal:.3f} Pa per full-scale unit")            # 3.172
 
 sig = io.read("measurement.wav", calibration_factor=cal)
@@ -23143,6 +23142,28 @@ object's raises instead of overriding it, and only a value that agrees is
 accepted. A bare array is refused by name rather than guessed at by the
 functions that need a rate at all, which `leq` does not: it integrates the
 whole record, so it never had an `fs` argument to omit.
+
+Both rules hold for every function in the library that consumes a
+recording, with four exemptions to the calibration half. Each is a case
+where pascals would be the wrong thing to hand the function, and each says
+so in its own docstring:
+
+- **Referenced to digital full scale.** The EBU R 128 family
+  (`program_loudness` and its parts), `dynamic_range` and
+  `idle_channel_noise` count from a full-scale sine rather than from
+  20 µPa. Scaling their samples would move every reading by
+  `20 lg(factor)` and still call it LUFS or dBFS.
+- **Not a pressure.** A whole-body vibration record is an acceleration in
+  m/s² and a heavy-impact record is a force in newtons, so a
+  digital-to-pascal factor is not a unit conversion either of them wants.
+- **Produces the factor.** `metrology.sensitivity` is what a factor comes
+  *from*, as in the snippet above; applying one first would calibrate the
+  calibration.
+- **A `dbfs=True` path**, for the same reason as the first.
+
+Everything else takes it, including the underwater metrics: their
+reference of 1 µPa changes where the decibel is counted from, not what
+unit the samples have to be in.
 
 ### The same chain on a real meter's file
 
@@ -34202,7 +34223,7 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `RoadAbsorptionWarning` | `warning class` | **ISO 13472 advisory.**<br>Emitted for frequencies outside the valid in-situ road-absorption ranges; results there are advisory | `warnings.simplefilter('error', RoadAbsorptionWarning)` |
 | `frequency_weighting` | `function` | **Vibration frequency weighting H(f) (ISO 8041-1:2017 Formula 5).**<br>• `name`: one of `WEIGHTING_NAMES`<br>• `frequencies` [Hz] (> 0) | `wr = frequency_weighting('Wk', [1.0, 8.0, 63.0])`<br><br>• `WeightingResponse`; \|H\| = [0.482, 1.036, 0.186] |
 | `weighting_factors` | `function` | **Weighting factors \|H(f)\| (the Wi of ISO 2631-1 Eq. 9).**<br>• `name`, `frequencies` [Hz] | `weighting_factors('Wh', [16.0])`<br><br>• Magnitude per frequency |
-| `apply_weighting` | `function` | **Apply a weighting to a time signal (frequency domain, exact response).**<br>• `signal`: acceleration (1D) [m/s²]<br>• `fs` [Hz]<br>• `name`: one of `WEIGHTING_NAMES` | `aw_t = apply_weighting(a, fs, 'Wk')`<br><br>• Weighted signal, same length (circular FFT filtering) |
+| `apply_weighting` | `function` | **Apply a weighting to a time signal (frequency domain, exact response).**<br>• `signal`: acceleration (1D) [m/s²]<br>• `fs` [Hz]<br>• `name`: one of `WEIGHTING_NAMES` | `aw_t = apply_weighting(a, fs, name="Wk")`<br><br>• Weighted signal, same length (circular FFT filtering) |
 | `WeightingResponse` | `dataclass` | **Weighting response.**<br>• `name`<br>• `frequencies` [Hz]<br>• `response`: complex H<br>• `magnitude`, `magnitude_db` [dB]<br>• `.plot()` | `wr.magnitude, wr.magnitude_db` |
 | `WEIGHTING_NAMES` | `tuple` | **ISO 8041-1 weighting names.**<br>('Wb', 'Wc', 'Wd', 'We', 'Wf', 'Wh', 'Wj', 'Wk', 'Wm') | `'Wk' in WEIGHTING_NAMES  # True` |
 | `weighted_acceleration` | `function` | **Weighted r.m.s. from a band spectrum (ISO 2631-1 Eq. 9 / ISO 5349-1 Eq. A.1).**<br>• `band_accelerations`: ai per band [m/s²]<br>• `frequencies`: band centres [Hz]<br>• `weighting`: name | `ws = weighted_acceleration([0.1, 0.3, 0.2], [4.0, 8.0, 16.0], 'Wk')`<br><br>• `WeightedSpectrum`; aw = 0.36 m/s² |
@@ -51020,7 +51041,7 @@ from phonometry import vibration
 
 fs = 1000.0
 raw = np.random.default_rng(0).standard_normal(int(60 * fs))   # 60 s record
-a_w = vibration.apply_weighting(raw, fs, "Wk")                        # weighted signal
+a_w = vibration.apply_weighting(raw, fs, name="Wk")                        # weighted signal
 
 print(round(vibration.vibration_dose_value(a_w, fs), 3))   # 0.744  VDV [m/s^1.75]
 print(round(vibration.mtvv(a_w, fs), 3))                   # 0.265  MTVV [m/s^2]

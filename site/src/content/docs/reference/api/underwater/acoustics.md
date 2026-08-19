@@ -53,7 +53,7 @@ only; see [`underwater_to_in_air_spl`](/phonometry/reference/api/underwater/acou
 
 ```python
 peak_sound_pressure_level(
-    pressure: NDArray[np.float64] | list[float],
+    pressure: SignalInput,
     *,
     reference: float = 1e-06,
 ) -> float
@@ -68,7 +68,7 @@ $L_{p,\mathrm{pk}} = 20 \log_{10}(\max \lvert p \rvert / p_0)$ dB re
 
 | Name | Description |
 | :--- | :--- |
-| `pressure` | Sound-pressure time series (1-D), in Pa. |
+| `pressure` | Sound-pressure time series (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: this quantity is a pressure, and the underwater reference of 1 uPa changes what the decibel is counted from, not what the samples have to be in. |
 | `reference` | Reference pressure $p_0$, in Pa (default 1 µPa). |
 
 **Returns:** Peak sound pressure level, in dB re the reference.
@@ -83,8 +83,8 @@ $L_{p,\mathrm{pk}} = 20 \log_{10}(\max \lvert p \rvert / p_0)$ dB re
 
 ```python
 sound_exposure_level(
-    pressure: NDArray[np.float64] | list[float],
-    fs: float,
+    pressure: SignalInput,
+    fs: float | None = None,
     *,
     reference: float = 1e-12,
 ) -> float
@@ -100,8 +100,8 @@ record.
 
 | Name | Description |
 | :--- | :--- |
-| `pressure` | Sound-pressure time series (1-D), in Pa. |
-| `fs` | Sample rate, in Hz. |
+| `pressure` | Sound-pressure time series (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: this quantity is a pressure, and the underwater reference of 1 uPa changes what the decibel is counted from, not what the samples have to be in. |
+| `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `reference` | Reference exposure $E_0$, in Pa²·s (default 1 µPa²·s). |
 
 **Returns:** Sound exposure level, in dB re the reference.
@@ -116,7 +116,7 @@ record.
 
 ```python
 sound_pressure_level(
-    pressure: NDArray[np.float64] | list[float],
+    pressure: SignalInput,
     *,
     reference: float = 1e-06,
 ) -> float
@@ -131,7 +131,7 @@ in pascals and the underwater reference $p_0 = 1$ µPa by default.
 
 | Name | Description |
 | :--- | :--- |
-| `pressure` | Sound-pressure time series (1-D), in Pa. |
+| `pressure` | Sound-pressure time series (1-D), in Pa. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: this quantity is a pressure, and the underwater reference of 1 uPa changes what the decibel is counted from, not what the samples have to be in. |
 | `reference` | Reference pressure $p_0$, in Pa (default 1 µPa). |
 
 **Returns:** Sound pressure level, in dB re the reference.

@@ -178,8 +178,7 @@ io.write("calibrator.wav",
          subtype="PCM_24")
 
 cal_take = io.read("calibrator.wav")
-cal = metrology.sensitivity(np.asarray(cal_take), target_spl=94.0,
-                            fs=cal_take.fs)
+cal = metrology.sensitivity(cal_take, target_spl=94.0)
 print(f"S = {cal:.3f} Pa por unidad de fondo de escala")  # 3.172
 
 sig = io.read("measurement.wav", calibration_factor=cal)
@@ -196,6 +195,29 @@ lleva el objeto lanza en vez de imponerse, y solo se acepta el que coincide.
 Un array desnudo se rechaza nombrando el argumento en vez de
 adivinarlo en las funciones que necesitan frecuencia, que no es el caso de
 `leq`: integra el registro entero, así que nunca tuvo un `fs` que omitir.
+
+Las dos reglas valen para toda función de la biblioteca que consuma un
+registro, con cuatro exenciones en la mitad de la calibración. Cada una es
+un caso en el que los pascales serían lo equivocado que entregarle a la
+función, y cada una lo dice en su propio docstring:
+
+- **Referenciado al fondo de escala digital.** La familia EBU R 128
+  (`program_loudness` y sus partes), `dynamic_range` e
+  `idle_channel_noise` cuentan desde una sinusoide a fondo de escala y no
+  desde 20 µPa. Escalar sus muestras movería cada lectura
+  `20 lg(factor)` y la seguiría llamando LUFS o dBFS.
+- **No es una presión.** Un registro de vibración de cuerpo completo es una
+  aceleración en m/s² y uno de impacto pesado es una fuerza en newtons, así
+  que un factor de unidades digitales a pascales no es una conversión que
+  ninguno de los dos pida.
+- **Produce el factor.** `metrology.sensitivity` es de donde sale un factor,
+  como en el fragmento de arriba; aplicar uno antes sería calibrar la
+  calibración.
+- **Una ruta con `dbfs=True`**, por la misma razón que la primera.
+
+Todo lo demás lo toma, incluidas las métricas submarinas: su referencia de
+1 µPa cambia desde dónde se cuenta el decibelio, no en qué unidad tienen que
+estar las muestras.
 
 ### La misma cadena sobre el archivo de un sonómetro real
 

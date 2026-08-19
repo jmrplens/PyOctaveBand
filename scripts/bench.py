@@ -196,7 +196,7 @@ def run_vibration_weighting() -> np.ndarray:
     from phonometry.vibration.human.exposure import apply_weighting
 
     sig, fs = vibration_signal()
-    out = np.asarray(apply_weighting(sig, fs, "Wd"), dtype=np.float64)
+    out = np.asarray(apply_weighting(sig, fs, name="Wd"), dtype=np.float64)
     rms = float(np.sqrt(np.mean(out**2)))
     return np.concatenate([[rms], out[::2000]])
 

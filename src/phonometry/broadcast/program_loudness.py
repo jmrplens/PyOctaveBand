@@ -48,6 +48,8 @@ import numpy as np
 from numpy.typing import ArrayLike
 from scipy import signal
 
+from ..io._resolve import SignalInput, resolve_fs, resolve_samples
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
@@ -196,18 +198,28 @@ def k_weighting_coefficients(
     )
 
 
-def k_weighting(x: list[float] | np.ndarray, fs: float) -> np.ndarray:
+def k_weighting(x: SignalInput, fs: float | None = None) -> np.ndarray:
     """Apply the two-stage K-weighting pre-filter (BS.1770-5 Annex 1).
 
     Stage 1 models the acoustic effect of the head as a rigid sphere (a
     high-frequency shelf of about +4 dB); stage 2 is the RLB revised
     low-frequency B-curve high-pass. Their concatenation is the K-weighting.
 
-    :param x: Input signal (1D or 2D ``[channels, samples]``), linear units.
-    :param fs: Sample rate, Hz.
+    :param x: Input signal (1D or 2D ``[channels, samples]``), linear
+        units. Accepts a
+        :class:`phonometry.io.Signal` for its rate; a calibration factor it
+        carries is deliberately **not** applied. This family is referenced
+        to digital full scale, not to 20 uPa: LUFS, LU and dBTP are all
+        counted from a full-scale sine, so scaling the samples to pascals
+        would move every one of them by ``20 lg(factor)`` and still call
+        them by their full-scale names.
+    :param fs: Sample rate, Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :return: The K-weighted signal, same shape as the input.
     """
-    x_proc = _typesignal(x)
+    fs = resolve_fs(x, fs)
+    x_proc = _typesignal(resolve_samples(x, calibrate=False))
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
     (b1, a1), (b2, a2) = k_weighting_coefficients(fs)
@@ -499,7 +511,7 @@ def loudness_range(short_term_loudness: ArrayLike) -> float:
 
 
 def true_peak_level(
-    x: list[float] | np.ndarray, fs: float, oversample: int | None = None
+    x: SignalInput, fs: float | None = None, oversample: int | None = None
 ) -> float | np.ndarray:
     """True-peak level in dBTP (BS.1770-5 Annex 2).
 
@@ -516,7 +528,9 @@ def true_peak_level(
 
     :param x: Input signal (1D or 2D ``[channels, samples]``), full-scale
         units (1.0 = 0 dBFS).
-    :param fs: Sample rate, Hz.
+    :param fs: Sample rate, Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param oversample: Integer oversampling factor >= 1, or ``None`` (the
         default) for the smallest factor whose oversampled rate reaches
         192 kHz (4 at 48 kHz, 2 at 96 kHz, 1 at 192 kHz and above, matching
@@ -525,7 +539,7 @@ def true_peak_level(
     :return: The true-peak level in dBTP: a float for 1D input, an array of
         shape ``(channels,)`` for 2D input.
     """
-    fs = require_positive(float(fs), "fs")
+    fs = require_positive(float(resolve_fs(x, fs)), "fs")
     if oversample is None:
         oversample = max(1, ceil(_TRUE_PEAK_RATE / fs))
     if (
@@ -534,7 +548,7 @@ def true_peak_level(
         or oversample < 1
     ):
         raise ValueError("oversample must be an integer >= 1.")
-    x_proc = _typesignal(x)
+    x_proc = _typesignal(resolve_samples(x, calibrate=False))
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
     peak = inter_sample_peak(x_proc, int(oversample))
@@ -549,8 +563,8 @@ def true_peak_level(
 
 
 def integrated_loudness(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: SignalInput,
+    fs: float | None = None,
     weights: ArrayLike | None = None,
 ) -> float:
     """Programme (integrated) loudness in LUFS (BS.1770-5 Annex 1).
@@ -565,13 +579,16 @@ def integrated_loudness(
 
     :param x: Input signal (1D mono or 2D ``[channels, samples]``),
         full-scale units (1.0 = 0 dBFS).
-    :param fs: Sample rate, Hz.
+    :param fs: Sample rate, Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param weights: Per-channel weights ``Gi``, or ``None`` for the Table 3
         defaults by channel count (see
         :data:`DEFAULT_CHANNEL_WEIGHTS` and :func:`channel_weight`).
     :return: The programme loudness, LUFS (``-inf`` when the signal is
         shorter than one gating block or entirely below the absolute gate).
     """
+    fs = resolve_fs(x, fs)
     x_proc, w = _prepare_signal(x, weights)
     csum = _power_cumsum(k_weighting(x_proc, fs))
     n_block, step = _block_geometry(fs)
@@ -580,7 +597,7 @@ def integrated_loudness(
 
 
 def _prepare_signal(
-    x: list[float] | np.ndarray, weights: ArrayLike | None
+    x: SignalInput, weights: ArrayLike | None
 ) -> tuple[np.ndarray, np.ndarray]:
     """Coerce to 2D float64, reject empty/non-finite input, resolve weights.
 
@@ -588,7 +605,7 @@ def _prepare_signal(
     block, empty the gate and silently read as digital silence (-inf), so
     non-finite input is rejected up front.
     """
-    x_proc = np.atleast_2d(_typesignal(x))
+    x_proc = np.atleast_2d(_typesignal(resolve_samples(x, calibrate=False)))
     if x_proc.shape[-1] == 0:
         raise ValueError(_EMPTY_SIGNAL)
     if not np.all(np.isfinite(x_proc)):
@@ -736,8 +753,8 @@ def _lra_edges(short_term: np.ndarray) -> tuple[float, float]:
 
 
 def program_loudness(
-    x: list[float] | np.ndarray,
-    fs: float,
+    x: SignalInput,
+    fs: float | None = None,
     weights: ArrayLike | None = None,
     *,
     momentary_step: float = 0.01,
@@ -760,7 +777,9 @@ def program_loudness(
 
     :param x: Input signal (1D mono or 2D ``[channels, samples]``),
         full-scale units (1.0 = 0 dBFS).
-    :param fs: Sample rate, Hz.
+    :param fs: Sample rate, Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param weights: Per-channel weights ``Gi``, or ``None`` for the Table 3
         defaults by channel count (see :data:`DEFAULT_CHANNEL_WEIGHTS`; for
         other layouts derive the weights with :func:`channel_weight`).
@@ -772,6 +791,7 @@ def program_loudness(
         smallest factor reaching 192 kHz (4 at 48 kHz).
     :return: The frozen :class:`ProgramLoudnessResult`.
     """
+    fs = resolve_fs(x, fs)
     x_proc, w = _prepare_signal(x, weights)
     fs = require_positive(float(fs), "fs")
     momentary_step = require_positive(float(momentary_step), "momentary_step")

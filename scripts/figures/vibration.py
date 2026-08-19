@@ -640,7 +640,7 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     fs, duration = 200.0, 20.0
     time = np.arange(int(duration * fs)) / fs
     raw = _shock_ride_record(fs, duration)
-    weighted = np.asarray(vibration.apply_weighting(raw, fs, "Wk"))
+    weighted = np.asarray(vibration.apply_weighting(raw, fs, name="Wk"))
     a_w = float(np.sqrt(np.mean(weighted ** 2)))
     running = np.asarray(vibration.running_rms(weighted, fs,
                                                integration_time=1.0))

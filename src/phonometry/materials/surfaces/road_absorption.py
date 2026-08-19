@@ -71,6 +71,12 @@ from numpy.typing import ArrayLike, NDArray
 
 from ..._internal.types import Real
 from ..._internal.warnings import PhonometryWarning
+from ...io._resolve import (
+    SignalInput,
+    apply_calibration,
+    resolve_optional_pair_fs,
+    resolve_pair_fs,
+)
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from matplotlib.axes import Axes
@@ -323,8 +329,8 @@ def adrienne_window(
 # Reflection factor and absorption (ISO 13472-1 Clause 4.1 / Annex C)
 # --------------------------------------------------------------------------- #
 def _transfer_functions(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     n: int | None,
 ) -> tuple[Complex, Complex, int]:
     """Real FFTs of the (windowed) incident and reflected impulse responses.
@@ -333,8 +339,12 @@ def _transfer_functions(
     used, so callers needing ``rfftfreq`` do not have to reconstruct it from the
     bin count (which is ambiguous for odd lengths).
     """
-    hi_t = np.atleast_1d(np.asarray(incident_ir, dtype=np.float64))
-    hr_t = np.atleast_1d(np.asarray(reflected_ir, dtype=np.float64))
+    hi_t = apply_calibration(
+        incident_ir, np.atleast_1d(np.asarray(incident_ir, dtype=np.float64))
+    )
+    hr_t = apply_calibration(
+        reflected_ir, np.atleast_1d(np.asarray(reflected_ir, dtype=np.float64))
+    )
     if hi_t.size == 0 or hr_t.size == 0:
         raise ValueError("Impulse responses must be non-empty.")
     length = n if n is not None else max(hi_t.size, hr_t.size)
@@ -350,8 +360,8 @@ def _transfer_functions(
 
 
 def insitu_reflection_factor(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     *,
     source_height: float = DEFAULT_SOURCE_HEIGHT,
     mic_height: float = DEFAULT_MIC_HEIGHT,
@@ -374,14 +384,20 @@ def insitu_reflection_factor(
     Annex C; the frequency-dependent form of Annex G).
 
     :param incident_ir: Windowed incident (direct-path) impulse response
-        ``hi(t)``, real, one sample per ``1 / fs``.
+        ``hi(t)``, real, one sample per ``1 / fs``. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples and then cancels: what is read
+        off the pair is the ratio of their transfer functions, so a factor
+        the two share divides out.
     :param reflected_ir: Windowed reflected-path impulse response ``hr(t)``,
         real, same sampling as ``incident_ir``.
     :param source_height: Source-to-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-plane distance ``dm``, in metres.
     :param incidence_angle: Incidence angle ``theta``, in radians (0 = normal).
     :param fs: Sampling frequency, in hertz; required with ``delay`` for phase
-        restoration.
+        restoration, and otherwise unused. Either record may be a
+        :class:`~phonometry.io.Signal` and supply it; an explicit value that
+        disagrees with one raises, and two Signals recorded at different
+        rates are refused rather than arbitrated.
     :param delay: Reflected-path delay ``dtau`` to undo, in seconds; ``None``
         returns the raw spectral ratio.
     :param n: FFT length; defaults to the longer of the two impulse responses.
@@ -391,6 +407,9 @@ def insitu_reflection_factor(
     """
     kr = geometric_spreading_factor_angle(
         incidence_angle, source_height, mic_height
+    )
+    fs = resolve_optional_pair_fs(
+        incident_ir, reflected_ir, fs, names=("incident_ir", "reflected_ir")
     )
     hi, hr, length = _transfer_functions(incident_ir, reflected_ir, n)
     r = (hr / hi) / kr
@@ -423,8 +442,8 @@ def insitu_absorption_from_reflection(reflection: ArrayLike) -> Real:
 
 
 def power_reflection_coefficient(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     *,
     source_height: float = DEFAULT_SOURCE_HEIGHT,
     mic_height: float = DEFAULT_MIC_HEIGHT,
@@ -457,8 +476,8 @@ def power_reflection_coefficient(
 
 
 def insitu_absorption_coefficient(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     *,
     source_height: float = DEFAULT_SOURCE_HEIGHT,
     mic_height: float = DEFAULT_MIC_HEIGHT,
@@ -630,9 +649,9 @@ class InsituAbsorptionResult:
 
 
 def insitu_absorption_spectrum(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
-    fs: float,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
+    fs: float | None = None,
     *,
     source_height: float = DEFAULT_SOURCE_HEIGHT,
     mic_height: float = DEFAULT_MIC_HEIGHT,
@@ -650,9 +669,16 @@ def insitu_absorption_spectrum(
     one-third-octave bands with :func:`one_third_octave_absorption` and wrapped
     in a plottable :class:`InsituAbsorptionResult`.
 
-    :param incident_ir: Windowed incident (direct-path) impulse response ``hi``.
+    :param incident_ir: Windowed incident (direct-path) impulse response
+        ``hi``. Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples and then cancels: what is read
+        off the pair is the ratio of their transfer functions, so a factor
+        the two share divides out.
     :param reflected_ir: Windowed reflected-path impulse response ``hr``.
-    :param fs: Sampling frequency, in hertz.
+    :param fs: Sampling frequency, in hertz. Required when both records are
+        bare arrays; either may be a :class:`~phonometry.io.Signal` and
+        supply it, and two Signals recorded at different rates are refused
+        rather than arbitrated.
     :param source_height: Source-to-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-plane distance ``dm``, in metres.
     :param incidence_angle: Incidence angle ``theta``, in radians (0 = normal).
@@ -664,10 +690,17 @@ def insitu_absorption_spectrum(
     :raises ValueError: On empty inputs, invalid geometry, or a
         non-positive ``fs``.
     """
+    fs = resolve_pair_fs(
+        incident_ir, reflected_ir, fs, names=("incident_ir", "reflected_ir")
+    )
     if fs <= 0.0:
         raise ValueError(_FS_POSITIVE)
-    hi_t = np.atleast_1d(np.asarray(incident_ir, dtype=np.float64))
-    hr_t = np.atleast_1d(np.asarray(reflected_ir, dtype=np.float64))
+    hi_t = apply_calibration(
+        incident_ir, np.atleast_1d(np.asarray(incident_ir, dtype=np.float64))
+    )
+    hr_t = apply_calibration(
+        reflected_ir, np.atleast_1d(np.asarray(reflected_ir, dtype=np.float64))
+    )
     # Fix the FFT length explicitly so ``rfftfreq`` matches the transform used
     # inside ``insitu_absorption_coefficient`` for both even and odd inputs.
     length = n if n is not None else max(hi_t.size, hr_t.size)

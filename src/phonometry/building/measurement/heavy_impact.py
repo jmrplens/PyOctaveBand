@@ -110,6 +110,7 @@ from ..._internal.validation import (
     require_finite_array,
     require_positive,
 )
+from ...io._resolve import SignalInput, resolve_fs, resolve_samples
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -312,8 +313,8 @@ def heavy_impact_source_limits(
 
 
 def impact_force_exposure_level(
-    force: ArrayLike,
-    sample_rate: float,
+    force: SignalInput,
+    sample_rate: float | None = None,
     *,
     reference_force: float = _FORCE_REFERENCE,
     reference_time: float = _TIME_REFERENCE,
@@ -340,14 +341,25 @@ def impact_force_exposure_level(
        :func:`check_heavy_impact_source`.
 
     :param force: Sampled instantaneous force ``F(t)``, in newtons (1-D).
-    :param sample_rate: Sampling rate of *force*, in hertz (> 0).
+        Accepts a :class:`phonometry.io.Signal` for its rate; a calibration
+        factor it carries is deliberately not applied, because this record
+        is a force in newtons and not a pressure.
+    :param sample_rate: Sampling rate of *force*, in hertz (> 0). Required
+        for a bare array; a :class:`~phonometry.io.Signal` brings its own,
+        and an explicit value that disagrees with it raises instead of
+        silently winning.
     :param reference_force: Reference force ``F0``, in newtons (Default: 1 N).
     :param reference_time: Reference time interval ``Tref``, in seconds
         (Default: 1 s).
     :return: The impact force exposure level ``LFE``, in dB re 1 N.
     :raises ValueError: for a malformed record or a non-positive parameter.
     """
-    f = require_finite_array(force, "force")
+    sample_rate = resolve_fs(
+        force, sample_rate, name="force", rate="sample_rate"
+    )
+    # calibrate=False: a Signal may carry a digital-to-pascal factor and
+    # this record is a force in newtons. See phonometry.io._resolve.
+    f = require_finite_array(resolve_samples(force, calibrate=False), "force")
     if f.size < 2:
         raise ValueError("'force' must be a 1-D record of at least two samples.")
     fs = require_positive(sample_rate, "sample_rate")

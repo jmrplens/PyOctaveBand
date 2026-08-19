@@ -263,8 +263,8 @@ cosine is unity and `Kr,theta` collapses to `Kr` (Clause 4.1).
 
 ```python
 insitu_absorption_coefficient(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     *,
     source_height: float = 1.25,
     mic_height: float = 0.25,
@@ -320,9 +320,9 @@ $1 / K_\mathrm{r}$ factor
 
 ```python
 insitu_absorption_spectrum(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
-    fs: float,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
+    fs: float | None = None,
     *,
     source_height: float = 1.25,
     mic_height: float = 0.25,
@@ -346,9 +346,9 @@ in a plottable [`InsituAbsorptionResult`](/phonometry/reference/api/materials/ro
 
 | Name | Description |
 | :--- | :--- |
-| `incident_ir` | Windowed incident (direct-path) impulse response `hi`. |
+| `incident_ir` | Windowed incident (direct-path) impulse response `hi`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: what is read off the pair is the ratio of their transfer functions, so a factor the two share divides out. |
 | `reflected_ir` | Windowed reflected-path impulse response `hr`. |
-| `fs` | Sampling frequency, in hertz. |
+| `fs` | Sampling frequency, in hertz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `source_height` | Source-to-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-plane distance `dm`, in metres. |
 | `incidence_angle` | Incidence angle `theta`, in radians (0 = normal). |
@@ -369,8 +369,8 @@ in a plottable [`InsituAbsorptionResult`](/phonometry/reference/api/materials/ro
 
 ```python
 insitu_reflection_factor(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     *,
     source_height: float = 1.25,
     mic_height: float = 0.25,
@@ -398,12 +398,12 @@ Annex C; the frequency-dependent form of Annex G).
 
 | Name | Description |
 | :--- | :--- |
-| `incident_ir` | Windowed incident (direct-path) impulse response `hi(t)`, real, one sample per `1 / fs`. |
+| `incident_ir` | Windowed incident (direct-path) impulse response `hi(t)`, real, one sample per `1 / fs`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: what is read off the pair is the ratio of their transfer functions, so a factor the two share divides out. |
 | `reflected_ir` | Windowed reflected-path impulse response `hr(t)`, real, same sampling as `incident_ir`. |
 | `source_height` | Source-to-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-plane distance `dm`, in metres. |
 | `incidence_angle` | Incidence angle `theta`, in radians (0 = normal). |
-| `fs` | Sampling frequency, in hertz; required with `delay` for phase restoration. |
+| `fs` | Sampling frequency, in hertz; required with `delay` for phase restoration, and otherwise unused. Either record may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it; an explicit value that disagrees with one raises, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `delay` | Reflected-path delay `dtau` to undo, in seconds; `None` returns the raw spectral ratio. |
 | `n` | FFT length; defaults to the longer of the two impulse responses. |
 
@@ -642,8 +642,8 @@ with the sampled radius of the standard 5 ms window.
 
 ```python
 power_reflection_coefficient(
-    incident_ir: ArrayLike,
-    reflected_ir: ArrayLike,
+    incident_ir: SignalInput,
+    reflected_ir: SignalInput,
     *,
     source_height: float = 1.25,
     mic_height: float = 0.25,

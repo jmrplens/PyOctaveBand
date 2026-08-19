@@ -70,7 +70,10 @@ text and is out of scope.
 ## acceleration_dose
 
 ```python
-acceleration_dose(acceleration: ArrayLike, fs: float) -> float
+acceleration_dose(
+    acceleration: SignalInput,
+    fs: float | None = None,
+) -> float
 ```
 
 Acceleration dose $D_\mathrm{z}$ from a seat acceleration time history.
@@ -84,8 +87,8 @@ Formula 3. The input must be conditioned (DC-removed); see
 
 | Name | Description |
 | :--- | :--- |
-| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. |
-| `fs` | Sampling frequency, in hertz. |
+| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately not applied, because this quantity is an acceleration in m/s2 and not a pressure. |
+| `fs` | Sampling frequency, in hertz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 
 **Returns:** The acceleration dose $D_\mathrm{z}$, m/s2.
 
@@ -230,8 +233,8 @@ weighted by the reducing ultimate strength of the ageing spine.
 
 ```python
 multiple_shock_assessment(
-    acceleration: ArrayLike,
-    fs: float,
+    acceleration: SignalInput,
+    fs: float | None = None,
     *,
     start_age: float,
     years: int,
@@ -243,8 +246,8 @@ multiple_shock_assessment(
 ) -> MultipleShockResult
 
 multiple_shock_assessment(
-    acceleration: ArrayLike,
-    fs: float,
+    acceleration: SignalInput,
+    fs: float | None = None,
     *,
     start_age: float,
     years: int,
@@ -272,8 +275,8 @@ horizontal whole-body exposure use the ISO 2631-1 metrics in this domain
 
 | Name | Description |
 | :--- | :--- |
-| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. |
-| `fs` | Sampling frequency, in hertz. |
+| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately not applied, because this quantity is an acceleration in m/s2 and not a pressure. |
+| `fs` | Sampling frequency, in hertz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `start_age` | Age `b` at which the exposure started, in years. |
 | `years` | Number of exposure years `n`. |
 | `days_per_year` | Number of exposure days per year `N`. |
@@ -438,7 +441,10 @@ the vertical spinal response; the transmissibility is unity at 0 Hz.
 ## spinal_response
 
 ```python
-spinal_response(acceleration: ArrayLike, fs: float) -> np.ndarray
+spinal_response(
+    acceleration: SignalInput,
+    fs: float | None = None,
+) -> np.ndarray
 ```
 
 Vertical spinal response $A_\mathrm{z}(t)$ (clause 5.2, Formula 2).
@@ -458,8 +464,8 @@ high-pass) of $a_\mathrm{z}(t)$ before calling.
 
 | Name | Description |
 | :--- | :--- |
-| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. |
-| `fs` | Sampling frequency, in hertz. |
+| `acceleration` | Measured, conditioned (zero-mean) vertical seat acceleration $a_\mathrm{z}(t)$, m/s2. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately not applied, because this quantity is an acceleration in m/s2 and not a pressure. |
+| `fs` | Sampling frequency, in hertz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 
 **Returns:** The spinal response acceleration $A_\mathrm{z}(t)$, m/s2, same length.
 

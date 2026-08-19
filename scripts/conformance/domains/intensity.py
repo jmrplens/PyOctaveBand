@@ -48,7 +48,7 @@ def _plane_wave_pair(
 def _chk_plane_wave_intensity() -> Outcome:
     rho, c, spacing = 1.204, 343.0, 0.012
     p1, p2 = _plane_wave_pair(spacing / c)
-    res = ph.sound_intensity(p1, p2, _FS, spacing, rho=rho, c=c)
+    res = ph.sound_intensity(p1, p2, _FS, spacing=spacing, rho=rho, c=c)
     expected = float(np.mean(((p1 + p2) / 2.0) ** 2)) / (rho * c)
     return numeric(
         expected, float(res.total_intensity), 0.015, unit="W/m^2", rel=True, places=5

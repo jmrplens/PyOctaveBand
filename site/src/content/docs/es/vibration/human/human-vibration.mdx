@@ -508,7 +508,7 @@ from phonometry import vibration
 fs = 1000.0
 duration = 60.0
 raw = np.random.default_rng(0).standard_normal(int(duration * fs))   # registro de 60 s
-a_w = vibration.apply_weighting(raw, fs, "Wk")                       # señal ponderada
+a_w = vibration.apply_weighting(raw, fs, name="Wk")                       # señal ponderada
 rms = float(np.sqrt(np.mean(np.asarray(a_w) ** 2)))
 
 vdv = vibration.vibration_dose_value(a_w, fs)
@@ -539,7 +539,7 @@ for start, amplitude in ((2.6, 9.0), (6.1, 14.0), (9.4, 6.0), (13.8, 18.0), (17.
     seat[hit] += amplitude * np.exp(-28.0 * (time[hit] - start)) * np.sin(
         2 * np.pi * 8.0 * (time[hit] - start))
 
-a_ws = np.asarray(vibration.apply_weighting(seat, fs_shock, "Wk"))
+a_ws = np.asarray(vibration.apply_weighting(seat, fs_shock, name="Wk"))
 rms_s = float(np.sqrt(np.mean(a_ws**2)))
 mtvv_s = vibration.mtvv(a_ws, fs_shock)
 vdv_s = vibration.vibration_dose_value(a_ws, fs_shock)
@@ -608,7 +608,7 @@ hombres, y la prevalencia baja con la edad.
 fs_ms = 20.0
 t_ms = np.arange(int(240 * fs_ms)) / fs_ms
 heave = 0.45 * np.sin(2 * np.pi * 0.2 * t_ms)
-a_wf = np.asarray(vibration.apply_weighting(heave, fs_ms, "Wf"))
+a_wf = np.asarray(vibration.apply_weighting(heave, fs_ms, name="Wf"))
 
 msdv = vibration.motion_sickness_dose_value(a_wf, fs_ms)
 print(round(msdv, 1), round(msdv / 3.0, 1))    # 4.9 m/s^1.5 -> 1.6 % en 240 s
