@@ -39,8 +39,12 @@ on:
       - ".zenodo.json"
       - ".github/workflows/docs.yml"
   pull_request:
-    branches: ["main"]
-    # Deliberately the same set as the push trigger above, spelled out because
+    # No base-branch filter: a pull request stacked on another branch has to
+    # build the site too, and it is the one most likely to break it. See the
+    # note in python-app.yml; the `push` trigger above stays on main, so
+    # nothing runs twice.
+    #
+    # The paths below are deliberately the same set as the push trigger, spelled out because
     # GitHub Actions does not resolve YAML anchors. Keep the two lists in step:
     # a path that deploys on push but is not validated here would be exactly the
     # blind spot this trigger exists to close.
