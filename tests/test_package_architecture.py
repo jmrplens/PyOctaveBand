@@ -320,3 +320,77 @@ def test_sonar_configuration_names_files_that_exist() -> None:
     ]
     missing = [path for path in keyed + excluded if not (root / path).exists()]
     assert not missing, f"sonar-project.properties names missing files: {missing}"
+
+
+#: Public names that live on the package top level and nowhere else, because
+#: they belong to no single domain. Everything else the root publishes must be
+#: reachable from the domain that owns it: the root re-export is a shortcut,
+#: not a name's home. ``environmental_expanded_uncertainty`` is the exception
+#: that proves it, a rename that exists only so two domains can both spell
+#: their expanded uncertainty in one flat namespace.
+ROOT_ONLY: frozenset[str] = frozenset(
+    {
+        "PhonometryWarning",
+        "ReportMetadata",
+        "__version__",
+        "environmental_expanded_uncertainty",
+    }
+)
+
+
+def test_every_public_name_is_reachable_from_its_domain() -> None:
+    """A name published only by the root is a name with no documented home.
+
+    ``plot_excitation`` was one: it lives in the private ``_plot.room``, the
+    root re-exported it, and ``phonometry.room`` did not, so the twenty-third
+    of the twenty-four geometry plots was reachable through the flat shortcut
+    and through no module path at all. A reader following the domain, which is
+    how the documentation teaches the library, could not find it.
+    """
+    import inspect
+
+    import phonometry
+
+    domains = {
+        name
+        for name in dir(phonometry)
+        if not name.startswith("_")
+        and inspect.ismodule(getattr(phonometry, name))
+    }
+    published: dict[str, list[str]] = {}
+    for domain in sorted(domains):
+        for name in getattr(getattr(phonometry, domain), "__all__", ()):
+            published.setdefault(name, []).append(domain)
+
+    orphans = sorted(set(phonometry.__all__) - set(published) - ROOT_ONLY)
+    assert not orphans, (
+        "public names the root publishes and no domain package does: "
+        f"{orphans}. Export each from the package that owns it, or add it to "
+        "ROOT_ONLY if it genuinely belongs to no domain."
+    )
+
+
+def test_no_public_name_is_published_by_two_domains() -> None:
+    """One name, one owner: what makes the flat root a shortcut and not a map.
+
+    Two domains exporting the same spelling is what forces a rename at the
+    root (see ``environmental_expanded_uncertainty``), and it is what would
+    make ``from phonometry import <domain>`` ambiguous about which module a
+    call reaches.
+    """
+    import inspect
+
+    import phonometry
+
+    published: dict[str, list[str]] = {}
+    for domain in sorted(
+        name
+        for name in dir(phonometry)
+        if not name.startswith("_")
+        and inspect.ismodule(getattr(phonometry, name))
+    ):
+        for name in getattr(getattr(phonometry, domain), "__all__", ()):
+            published.setdefault(name, []).append(domain)
+
+    shared = {name: owners for name, owners in published.items() if len(owners) > 1}
+    assert not shared, f"names published by more than one domain: {shared}"
