@@ -46,8 +46,11 @@ contour = aircraft.noise_contour(path, powers, distances, sel, lmax, x=gx, y=gy)
 
 Every name in the table below is also re-exported at the top level, so
 `from phonometry import <name>` works for every row. The module paths of every
-earlier layout were removed in 4.0, along with the shims that served them: a
-path that is not documented here raises `ModuleNotFoundError`.
+earlier layout were removed in 4.0 along with the shims that served them, so
+`phonometry.metrology.levels`, `phonometry.environmental` and the rest of the
+pre-4.0 spellings raise `ModuleNotFoundError`. The paths in force are the ones
+the [generated reference](https://jmrplens.github.io/phonometry/reference/api/)
+documents, one page per module.
 
 > **Reading the input column.** Every function that consumes a recording
 > accepts a `phonometry.io.Signal` wherever the table writes a signal

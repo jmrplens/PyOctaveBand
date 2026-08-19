@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Removed
 
 - The compatibility layer that served the module paths of every earlier layout
-  is gone, and with it `phonometry.environmental`. `import
-  phonometry.metrology.levels`, `from phonometry.hearing import sti` and the
-  hundred other paths the 4.0 taxonomy moved raise `ModuleNotFoundError`
-  instead of resolving with a notice, and reading a name from the namespace it
-  left raises `AttributeError`. The shims announced their own removal for 5.0;
+  is gone, and with it `phonometry.environmental`. The hundred and five paths
+  the 4.0 taxonomy moved now refuse in the three ways Python has, which are
+  worth naming separately because they are not interchangeable: `import
+  phonometry.metrology.levels` raises `ModuleNotFoundError`, `from
+  phonometry.hearing import sti` raises `ImportError` because the package
+  itself imports and only the name inside it is missing, and
+  `phonometry.metrology.levels` read as an attribute raises `AttributeError`.
+  The shims announced their own removal for 5.0;
   they go now because 4.0 is the release that breaks, and carrying a table of
   105 renamed paths through a whole major version protects nobody: every
   documented path in 4.0 is the real one.
