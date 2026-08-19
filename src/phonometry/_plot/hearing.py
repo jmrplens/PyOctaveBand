@@ -90,7 +90,8 @@ def plot_age_threshold(
 
     _fractile_band(ax, freqs, median, sl, su, color=_C_PRIMARY, language=language)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(freqs, median, "o-", label=_t("Median", language), **kwargs)
+    kwargs.setdefault("label", _t("Median", language))
+    ax.plot(freqs, median, "o-", **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
         ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--",
                 color=_C_REFERENCE, label=_t(_FRACTILE_LABEL, language).format(
@@ -133,7 +134,8 @@ def plot_nipts(
         language=language,
     )
     kwargs.setdefault("color", _C_SECONDARY)
-    ax.plot(freqs, median, "o-", label=_t("Median $N_{50}$", language), **kwargs)
+    kwargs.setdefault("label", _t("Median $N_{50}$", language))
+    ax.plot(freqs, median, "o-", **kwargs)
     if abs(result.fractile - 0.5) > 1e-9:
         ax.plot(freqs, np.asarray(result.value, dtype=np.float64), "s--",
                 color=_C_REFERENCE, label=_t(_FRACTILE_LABEL, language).format(
@@ -176,8 +178,9 @@ def plot_htlan(
     ax.plot(freqs, np.asarray(result.nipts, dtype=np.float64), "^-",
             color=_C_SECONDARY, label=_t("Noise (NIPTS)", language))
     kwargs.setdefault("color", _C_REFERENCE)
+    kwargs.setdefault("label", _t("Age + noise (HTLAN)", language))
     ax.plot(freqs, np.asarray(result.threshold, dtype=np.float64), "s--",
-            label=_t("Age + noise (HTLAN)", language), **kwargs)
+            **kwargs)
     _freq_axis(ax, freqs, language=language)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Hearing threshold level [dB]", language))

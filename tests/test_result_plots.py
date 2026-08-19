@@ -203,6 +203,22 @@ def test_every_plot_forwards_kwargs_to_primary_artist(name, factory, kind) -> No
     )
     plt.close("all")
 
+    # And the same for `label`, which is where this went wrong for longest.
+    # `color` was passed by name next to `**kwargs` once and fixed; `label`
+    # was passed that way in fifty-five renderers, so a caller naming a curve
+    # got `TypeError: got multiple values for keyword argument 'label'`
+    # instead of a labelled curve.
+    out = res.plot(label="mine")
+    ax = out[0] if isinstance(out, np.ndarray) else out
+    # Through the legend, not through the artist: `ax.bar` puts the label on
+    # the container it returns rather than on each rectangle, so reading
+    # `ax.patches` would miss it on every bar renderer. The legend is what the
+    # caller is naming the curve for anyway.
+    assert "mine" in ax.get_legend_handles_labels()[1], (
+        f"{name}: label kwarg did not reach the legend"
+    )
+    plt.close("all")
+
 
 # --------------------------------------------------------------------------
 # Common contract: ax=None creates a figure; passing ax composes
@@ -235,3 +251,45 @@ def test_single_axes_plots_accept_external_ax() -> None:
         out = res.plot(ax=ax)
         assert out is ax
         plt.close(fig)
+
+
+def test_no_renderer_defaults_a_label_on_the_shared_kwargs_inside_a_loop() -> None:
+    """One `setdefault` in a loop names every curve after the first one.
+
+    `dict.setdefault` mutates, so a renderer that draws several named curves
+    has to take a copy per curve. Doing it once on `kwargs` sets the first
+    label and then finds it already there on every later pass, which is not a
+    crash and not a test failure anywhere else: the figure simply comes out
+    with one legend entry repeated, and the only thing that noticed was a
+    committed report preview drifting by 693 pixels.
+
+    This is a structural check because the behavioural one cannot be written
+    once: what "several named curves" means differs per renderer, while the
+    shape that produces the bug is the same everywhere.
+    """
+    import ast
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parent.parent / "src" / "phonometry" / "_plot"
+    offenders: list[str] = []
+    for path in sorted(root.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.For | ast.While | ast.AsyncFor):
+                continue
+            for child in ast.walk(node):
+                if (
+                    isinstance(child, ast.Call)
+                    and isinstance(child.func, ast.Attribute)
+                    and child.func.attr == "setdefault"
+                    and isinstance(child.func.value, ast.Name)
+                    and child.func.value.id == "kwargs"
+                    and child.args
+                    and isinstance(child.args[0], ast.Constant)
+                    and child.args[0].value == "label"
+                ):
+                    offenders.append(f"{path.name}:{child.lineno}")
+    assert not offenders, (
+        "a label default on the shared kwargs inside a loop names every curve "
+        f"after the first one: {offenders}. Take a copy per iteration."
+    )

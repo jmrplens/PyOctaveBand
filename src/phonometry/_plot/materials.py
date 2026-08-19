@@ -318,7 +318,8 @@ def plot_scattering_report(
     )
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(positions, s, ms=4, zorder=3, label=r"$s$", **kwargs)
+    kwargs.setdefault("label", r"$s$")
+    ax.plot(positions, s, ms=4, zorder=3, **kwargs)
     ax.set_ylabel(_t("Coefficient", language))
     top = max(1.05, float(np.nanmax(s)) * 1.05) if s.size else 1.05
     ax.set_ylim(0.0, top)
@@ -366,7 +367,8 @@ def plot_diffusion_report(
         )
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(positions, d, ms=4, zorder=3, label=r"$d$", **kwargs)
+    kwargs.setdefault("label", r"$d$")
+    ax.plot(positions, d, ms=4, zorder=3, **kwargs)
     ax.set_ylabel(_t("Coefficient", language))
     ax.set_ylim(0.0, 1.05)
     ax.set_title(
@@ -472,10 +474,10 @@ def plot_dynamic_stiffness(
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("zorder", 5)
     kwargs.setdefault("s", 80)
-    ax.scatter([s_mn], [result.natural_frequency],
-               label=(rf"$s^{{\prime}}$ = {format_number(s_mn, language, decimals=2)} MN/m³,  "
+    kwargs.setdefault("label", rf"$s^{{\prime}}$ = {format_number(s_mn, language, decimals=2)} MN/m³,  "
                       f"$f_0$ = "
-                      f"{format_number(result.natural_frequency, language, decimals=1)} Hz"),
+                      f"{format_number(result.natural_frequency, language, decimals=1)} Hz")
+    ax.scatter([s_mn], [result.natural_frequency],
                **kwargs)
     ax.set_xscale("log")
     ax.set_xlabel(_t(r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]", language))
@@ -668,12 +670,12 @@ def _absorption_reflection_axes(
     reflection-factor magnitude as a muted dashed companion, then adds the
     legend. Used by the layered-absorber and slit-resonator predictions.
     """
+    kwargs.setdefault("label", _t(r"Absorption $\alpha(\theta)$", language))
     ax = _absorption_spectrum_axes(
         ax,
         freqs,
         alpha,
         title=title,
-        label=_t(r"Absorption $\alpha(\theta)$", language),
         language=language,
         **kwargs,
     )
@@ -880,12 +882,12 @@ def plot_diffuse_field_absorption(
                  f"{format_number(float(limit_deg), language, decimals=0)}°)")
     else:
         title = f"Random-incidence absorption (Paris integral to {limit_deg:.0f}°)"
+    kwargs.setdefault("label", _t(r"Absorption $\alpha_{\mathrm{dif}}$", language))
     ax = _absorption_spectrum_axes(
         ax,
         np.asarray(result.frequency, dtype=np.float64),
         np.asarray(result.absorption, dtype=np.float64),
         title=title,
-        label=_t(r"Absorption $\alpha_{\mathrm{dif}}$", language),
         language=language,
         **kwargs,
     )
@@ -1013,12 +1015,12 @@ def plot_metadiffuser_absorption(
     :return: The axes.
     """
     freqs = np.asarray(result.frequency, dtype=np.float64)
+    kwargs.setdefault("label", _t("Panel average", language))
     ax = _absorption_spectrum_axes(
         ax,
         freqs,
         np.asarray(result.absorption, dtype=np.float64),
         title=_t("Metadiffuser per-well absorption", language),
-        label=_t("Panel average", language),
         language=language,
         **kwargs,
     )

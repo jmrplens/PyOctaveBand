@@ -621,8 +621,9 @@ def plot_eigenrays(
         if np.any(direct):
             ax.vlines(t[direct], base, loss[direct], color=_C_PRIMARY, lw=1.4,
                       zorder=4)
+            kwargs.setdefault("label", _t("Refracted or direct", language))
             ax.plot(t[direct], loss[direct], "o", color=_C_PRIMARY, ms=6,
-                    zorder=5, label=_t("Refracted or direct", language),
+                    zorder=5,
                     **kwargs)
         ax.set_ylim(base, float(loss.min()) - 3.0)
         ax.legend(loc=_LEGEND_LOWER_RIGHT, fontsize="small")

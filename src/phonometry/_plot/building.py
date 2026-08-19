@@ -278,7 +278,8 @@ def plot_sound_reduction(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("markersize", 3)
-    ax.semilogx(freq, r, label=_t("predicted $R$", language), **kwargs)
+    kwargs.setdefault("label", _t("predicted $R$", language))
+    ax.semilogx(freq, r, **kwargs)
     if result.critical_frequency is not None:
         symbol = "$f_{c1}$" if result.critical_frequency_upper is not None else "$f_\\mathrm{c}$"
         ax.axvline(
@@ -341,7 +342,8 @@ def plot_aperture_transmission(
     freq = np.asarray(result.frequencies, dtype=np.float64)
     r = np.asarray(result.transmission_loss, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.semilogx(freq, r, label=f"{result.kind} {_t('aperture $R$', language)}", **kwargs)
+    kwargs.setdefault("label", f"{result.kind} {_t('aperture $R$', language)}")
+    ax.semilogx(freq, r, **kwargs)
     ax.axhline(0.0, color=_C_MUTED, ls=":", lw=0.9)
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
@@ -854,7 +856,8 @@ def plot_installed_structure_borne(
                 label=_t("paths", language) if k == 0 else None)
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 2.2)
-    ax.plot(x, total, label=_t(r"total $L_\mathrm{n,s}$", language), **kwargs)
+    kwargs.setdefault("label", _t(r"total $L_\mathrm{n,s}$", language))
+    ax.plot(x, total, **kwargs)
     ax.set_ylabel(_t(r"Normalised SPL $L_\mathrm{n,s}$ [dB]", language))
     ax.set_title(_t("EN 12354-5 installed structure-borne sound", language))
     ax.legend(loc="best", fontsize="small")
@@ -994,14 +997,20 @@ def _plot_path_shares(
     bottom = np.zeros(positions.size, dtype=np.float64)
     for colour, k in zip(palette, named):
         share = 100.0 * fractions[k]
+        # A copy per bar, not one `setdefault` before the loop: this renderer
+        # draws one bar per transmission path and each carries its own name,
+        # so a single default would put the first path's label on all of them.
+        path_kwargs = dict(kwargs)
+        path_kwargs.setdefault("label", labels[k])
         ax.bar(positions, share, bottom=bottom, width=0.85, color=colour,
-               edgecolor="none", zorder=0, label=labels[k], **kwargs)
+               edgecolor="none", zorder=0, **path_kwargs)
         bottom = bottom + share
     if pooled:
         share = 100.0 * fractions[pooled].sum(axis=0)
+        pooled_kwargs = dict(kwargs)
+        pooled_kwargs.setdefault("label", _t("other paths", language))
         ax.bar(positions, share, bottom=bottom, width=0.85, color=_C_MUTED,
-               edgecolor="none", zorder=0, label=_t("other paths", language),
-               **kwargs)
+               edgecolor="none", zorder=0, **pooled_kwargs)
     ax.set_ylabel(_t(_SHARE_LABEL, language))
     ax.set_ylim(0.0, 100.0)
     ax.set_title(title)
@@ -1096,7 +1105,8 @@ def plot_in_situ_element(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("ms", 4)
-    ax.plot(freqs, result.sound_reduction_index, label=r"$R_\mathrm{situ}$", **kwargs)
+    kwargs.setdefault("label", r"$R_\mathrm{situ}$")
+    ax.plot(freqs, result.sound_reduction_index, **kwargs)
     ax.plot(freqs, result.impact_level, color=_C_SECONDARY, marker="s", ms=4,
             label=r"$L_\mathrm{n,situ}$")
     ax.set_xscale("log")
@@ -1411,7 +1421,8 @@ def _plot_shaded_band_pair(
             label=_t(reference_label, language))
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
-    ax.plot(positions, curve, "-", label=_t(curve_label, language), **kwargs)
+    kwargs.setdefault("label", _t(curve_label, language))
+    ax.plot(positions, curve, "-", **kwargs)
     ax.fill_between(
         positions, reference, curve,
         color=theme_fill(_C_SECONDARY, ax), lw=0, zorder=0,
@@ -1451,7 +1462,8 @@ def plot_heavy_impact_source(
             label=_t("nominal $L_{FE}$", language))
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
-    ax.plot(positions, result.measured, "-", label=_t("measured $L_{FE}$", language),
+    kwargs.setdefault("label", _t("measured $L_{FE}$", language))
+    ax.plot(positions, result.measured, "-",
             **kwargs)
     failing = ~result.within_tolerance
     if bool(np.any(failing)):
@@ -1523,8 +1535,9 @@ def plot_a_weighted_maximum_impact(
     ax = ax if ax is not None else _new_axes()
     positions = _band_axis(ax, result.frequencies, language=language)
     kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("A-weighted contribution", language))
     ax.bar(positions, result.corrected, width=0.7, zorder=2,
-           label=_t("A-weighted contribution", language), **kwargs)
+           **kwargs)
     ax.plot(positions, result.levels, "s--", color=_C_REFERENCE, lw=1.2, zorder=3,
             label=_t(r"$X_\mathrm{i,Fmax}$ (unweighted)", language))
     ax.axhline(result.rating, color=_C_SECONDARY, ls="-", lw=1.6, zorder=4,
@@ -1633,8 +1646,9 @@ def plot_wall_tie_coupling(
     ax.loglog(freq, result.rigid_coupling_loss_factor, "--", color=_C_REFERENCE,
               lw=1.2, label=_t("rigid connection ($Y_\\mathrm{c}$ = 0)", language))
     kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("resilient tie array", language))
     ax.loglog(freq, result.coupling_loss_factor,
-              label=_t("resilient tie array", language), **kwargs)
+              **kwargs)
     ax.fill_between(
         freq, result.coupling_loss_factor, result.rigid_coupling_loss_factor,
         color=theme_fill(_C_TERTIARY, ax), lw=0, zorder=0,
@@ -1679,7 +1693,8 @@ def _plot_improvement_spectrum(
     kwargs.setdefault("color", colour)
     kwargs.setdefault("ls", style)
     # The caller may name the curve; do not hand matplotlib two labels.
-    ax.plot(freqs, values, label=kwargs.pop("label", _t(label, language)), **kwargs)
+    kwargs.setdefault("label", kwargs.pop("label", _t(label, language)))
+    ax.plot(freqs, values, **kwargs)
     for values, label, colour, style in rest:
         ax.plot(freqs, values, color=colour, ls=style, label=_t(label, language))
     if marker_frequency is not None:
@@ -1716,8 +1731,8 @@ def plot_tapping_force(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", kwargs.pop("label", _t("force spectrum $|F_n|$", language)))
     ax.plot(freqs, result.peak_force,
-            label=kwargs.pop("label", _t("force spectrum $|F_n|$", language)),
             **kwargs)
     ax.axhline(result.upper_limit, color=_C_REFERENCE, ls="--", lw=1.2,
                label=r"$|F_n|_\mathrm{upper}$")
@@ -1841,7 +1856,8 @@ def plot_lining_improvement(
     ]
     curves = np.asarray(ratings, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(sweep, curves[:, 0], label=kwargs.pop("label", r"$\Delta R_\mathrm{w}$"), **kwargs)
+    kwargs.setdefault("label", kwargs.pop("label", r"$\Delta R_\mathrm{w}$"))
+    ax.plot(sweep, curves[:, 0], **kwargs)
     ax.plot(sweep, curves[:, 1], color=_C_SECONDARY, ls="--", label=r"$\Delta R_\mathrm{A}$")
     ax.plot(sweep, curves[:, 2], color=_C_TERTIARY, ls="-.", label=r"$\Delta R_\mathrm{A,tr}$")
     ax.plot([result.resonance_frequency], [result.delta_rw], marker="o", ms=8,

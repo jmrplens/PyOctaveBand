@@ -283,8 +283,9 @@ def plot_sound_reinforcement_geometry(
     kwargs.setdefault("color", _C_SECONDARY)
     kwargs.setdefault("linewidth", 1.4)
     kwargs.setdefault("linestyle", "--")
+    kwargs.setdefault("label", _t("Feedback path", language))
     ax.plot([h_xy[0], m_xy[0]], [h_xy[1], 0.62], zorder=4,
-            label=_t("Feedback path", language), **kwargs)
+            **kwargs)
 
     for (x0, y0), (x1, y1), value, dy in (
         (t_xy, (m_xy[0], 0.5), d_tm, 0.16),

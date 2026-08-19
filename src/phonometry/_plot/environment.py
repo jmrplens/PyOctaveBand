@@ -261,7 +261,8 @@ def plot_impulse_prominence(
 
     kwargs.setdefault("color", _C_PRIMARY_LIGHT)
     kwargs.setdefault("zorder", 3)
-    ax.scatter(per, impulse_adjustment(per), label=_t("Impulses", language), **kwargs)
+    kwargs.setdefault("label", _t("Impulses", language))
+    ax.scatter(per, impulse_adjustment(per), **kwargs)
     ax.scatter([result.prominence], [result.adjustment], color=_C_REFERENCE,
                zorder=4, s=90, marker="*",
                label=f"{_t('Governing', language)}  $P$ = {format_number(result.prominence, language, decimals=2)},  "
@@ -303,9 +304,10 @@ def plot_tonal_adjustment(
     kwargs.setdefault("zorder", 4)
     kwargs.setdefault("s", 90)
     kwargs.setdefault("marker", "*")
+    kwargs.setdefault("label", rf"$\Delta L_\mathrm{{ta}}$ = {format_number(result.audibility, language)} dB,  "
+                     rf"$K_\mathrm{{t}}$ = {format_number(result.adjustment, language)} dB")
     ax.scatter([result.audibility], [result.adjustment],
-               label=rf"$\Delta L_\mathrm{{ta}}$ = {format_number(result.audibility, language)} dB,  "
-                     rf"$K_\mathrm{{t}}$ = {format_number(result.adjustment, language)} dB", **kwargs)
+               **kwargs)
     ax.set_xlabel(_t("Tonal audibility $\\Delta L_\\mathrm{ta}$ [dB]", language))
     ax.set_ylabel(_t("Tonal adjustment $K_\\mathrm{t}$ [dB]", language))
     ax.set_title(_t("ISO 1996-2 tonal adjustment", language))

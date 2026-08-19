@@ -219,7 +219,8 @@ def plot_zwicker_loudness_time(
     time = np.asarray(result.time, dtype=np.float64)
     lvt = np.asarray(result.loudness_vs_time, dtype=np.float64)
     kwargs.setdefault("color", _C_TERTIARY)
-    ax_time.plot(time, lvt, label="$N(t)$", **kwargs)
+    kwargs.setdefault("label", "$N(t)$")
+    ax_time.plot(time, lvt, **kwargs)
     if result.n5 is not None:
         ax_time.axhline(
             result.n5, color=_C_REFERENCE, ls="--", lw=1,
@@ -362,7 +363,8 @@ def plot_moore_glasberg_time_loudness(
             label=_t("Short-term loudness", language))
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 1.8)
-    ax.plot(time, ltl, label=_t("Long-term loudness", language), **kwargs)
+    kwargs.setdefault("label", _t("Long-term loudness", language))
+    ax.plot(time, ltl, **kwargs)
     ax.axhline(result.n_max, color=_C_REFERENCE, ls="--", lw=1.0, alpha=0.7)
     ax.set_xlabel(_t(_AXIS_TIME, language))
     ax.set_ylabel(_t("Loudness [sone]", language))
@@ -723,8 +725,9 @@ def plot_tone_assessment(
     kwargs.setdefault("linestyle", "none")
     kwargs.setdefault("markersize", 9)
     kwargs.setdefault("color", _C_PRIMARY)
+    kwargs.setdefault("label", _t("assessed tone", language))
     ax.plot([ft], [ratio], markeredgecolor=_C_EDGE, zorder=4,
-            label=_t("assessed tone", language), **kwargs)
+            **kwargs)
     ax.annotate(
         _t("margin {m} dB", language).format(
             m=format_number(ratio - criterion, language, decimals=1),
@@ -859,9 +862,10 @@ def plot_tone_audibility_levels(
         )
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("linestyle", "none")
+    kwargs.setdefault("label", _t(r"tone level $L_{p\mathrm{t}}$", language))
     ax.plot(
         freqs, lt, color=_C_PRIMARY, markeredgecolor=_C_EDGE, zorder=4,
-        label=_t(r"tone level $L_{p\mathrm{t}}$", language), **kwargs,
+        **kwargs,
     )
     ax.plot(
         [freqs[decisive]], [lt[decisive]], marker="o", linestyle="none",

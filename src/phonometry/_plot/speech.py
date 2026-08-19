@@ -197,8 +197,9 @@ def plot_sii(
     # keep the zero bars rather than dividing 0/0 into NaN.
     peak = float(contribution.max()) if contribution.size else 0.0
     scaled = contribution / peak if peak > 0.0 else contribution
+    kwargs.setdefault("label", _t(r"Importance-weighted $I_i\,A_i$ (scaled)", language))
     ax.bar(positions, scaled, width=0.5,
-           label=_t(r"Importance-weighted $I_i\,A_i$ (scaled)", language), **kwargs)
+           **kwargs)
     ax.set_ylabel(_t("Band audibility", language))
     ax.set_ylim(0.0, 1.0)
     ax.set_title(_t(_SII_TITLE, language).format(

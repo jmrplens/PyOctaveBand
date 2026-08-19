@@ -202,11 +202,11 @@ def plot_weighted_spectrum(
         positions - width / 2, raw, width, color=_C_MUTED,
         label=_t("Unweighted $a_i$", language),
     )
+    kwargs.setdefault("label", _t("Weighted $W_i a_i$ ({name})", language).format(name=result.weighting_name))
     ax.bar(
         positions + width / 2,
         weighted,
         width,
-        label=_t("Weighted $W_i a_i$ ({name})", language).format(name=result.weighting_name),
         **kwargs,
     )
     ax.set_ylabel(_t("r.m.s. acceleration [m/s²]", language))
@@ -259,14 +259,21 @@ def plot_daily_exposure(
     width = kwargs.pop("width", 0.7)
     edgecolor = kwargs.pop("edgecolor", _C_EDGE)
     for i in range(n_ops):
+        # A copy per bar, not one `setdefault` before the loop: each task bar
+        # carries its own name and the total carries another, so a single
+        # default would put the first task's label on every one of them.
+        task_kwargs = dict(kwargs)
+        task_kwargs.setdefault("label", str(result.labels[i]))
         ax.bar(
             positions[i], partials[i], width=width,
             color=_OP_COLORS[i % len(_OP_COLORS)], edgecolor=edgecolor,
-            linewidth=0.6, zorder=3, label=str(result.labels[i]), **kwargs,
+            linewidth=0.6, zorder=3, **task_kwargs,
         )
+    total_kwargs = dict(kwargs)
+    total_kwargs.setdefault("label", "$A(8)$")
     ax.bar(
         positions[-1], values[-1], width=width, color=_A8_COLOR,
-        edgecolor=edgecolor, linewidth=0.6, zorder=3, label="$A(8)$", **kwargs,
+        edgecolor=edgecolor, linewidth=0.6, zorder=3, **total_kwargs,
     )
     # The legend carries the bar identity, so the crowded category ticks go.
     ax.set_xticks([])
@@ -316,7 +323,8 @@ def plot_mobility(
     kwargs.setdefault("color", _C_PRIMARY)
     label = (_t("driving-point mobility", language) if result.driving_point
              else _t("transfer mobility", language))
-    ax.loglog(freq, mag, label=label, **kwargs)
+    kwargs.setdefault("label", label)
+    ax.loglog(freq, mag, **kwargs)
     # Mark the mobility peak (a resonance for a driving-point FRF).
     peak = int(np.argmax(mag))
     ax.plot(freq[peak], mag[peak], "o", color=_C_REFERENCE, zorder=5,
@@ -410,7 +418,8 @@ def plot_rigid_mass_calibration(
                      color=_C_REFERENCE, alpha=0.15, label=band_label)
     axm.loglog(freq, expected, ls="--", color=_C_REFERENCE, lw=1.4,
                label=exp_label)
-    axm.loglog(freq, measured, "o-", lw=1.4, label=within_label, **kwargs)
+    kwargs.setdefault("label", within_label)
+    axm.loglog(freq, measured, "o-", lw=1.4, **kwargs)
     if not np.all(within):
         axm.plot(freq[~within], measured[~within], "o", color=_C_SECONDARY,
                  zorder=4, label=outside_label)
@@ -450,7 +459,8 @@ def plot_transfer_stiffness(
     freq = np.asarray(result.frequencies, dtype=np.float64)
     level = np.asarray(result.level, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.semilogx(freq, level, label=r"$L_k = 20\,\log_{10}(|k_{2,1}|/k_0)$", **kwargs)
+    kwargs.setdefault("label", r"$L_k = 20\,\log_{10}(|k_{2,1}|/k_0)$")
+    ax.semilogx(freq, level, **kwargs)
     format_frequency_axis(ax, float(freq.min()), float(freq.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Transfer stiffness level $L_k$ [dB re 1 N/m]", language))
@@ -482,7 +492,8 @@ def plot_radiation_efficiency(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("markersize", 3)
-    ax.loglog(freq, sigma, label=r"$\sigma(f)$", **kwargs)
+    kwargs.setdefault("label", r"$\sigma(f)$")
+    ax.loglog(freq, sigma, **kwargs)
     ax.axhline(1.0, color=_C_MUTED, ls=":", lw=0.9, label=r"$\sigma = 1$")
     ax.axvline(
         result.critical_frequency,
@@ -530,10 +541,10 @@ def plot_multiple_shock(
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("zorder", 4)
     kwargs.setdefault("s", 90)
-    ax.scatter([result.risk], [100.0 * result.probability],
-               label=_t(_RISK_LABEL, language).format(
+    kwargs.setdefault("label", _t(_RISK_LABEL, language).format(
                    r=format_number(result.risk, language, decimals=2),
-                   p=format_number(100.0 * result.probability, language, decimals=0)),
+                   p=format_number(100.0 * result.probability, language, decimals=0)))
+    ax.scatter([result.risk], [100.0 * result.probability],
                **kwargs)
     ax.set_xlabel(_t("Stress variable $R$", language))
     ax.set_ylabel(_t("Probability of lumbar injury [%]", language))
@@ -580,8 +591,9 @@ def _draw_measured_spectrum(
     keep = frequencies <= f_max
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("lw", 1.0)
+    kwargs.setdefault("label", _t("envelope spectrum", language))
     ax.plot(frequencies[keep], amplitude[keep],
-            label=_t("envelope spectrum", language), **kwargs)
+            **kwargs)
     ax.set_ylabel(_t("Envelope amplitude", language))
     return float(np.max(amplitude[keep])) if np.any(keep) else 1.0
 
@@ -818,7 +830,8 @@ def plot_power_injection(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("markersize", 4)
-    ax.loglog(freq, result.coupling_loss_factor12, label=r"$\eta_{12}$",
+    kwargs.setdefault("label", r"$\eta_{12}$")
+    ax.loglog(freq, result.coupling_loss_factor12,
               **kwargs)
     ax.loglog(freq, result.coupling_loss_factor21, color=_C_SECONDARY,
               marker="s", markersize=4, label=r"$\eta_{21}$")
@@ -864,7 +877,8 @@ def plot_junction_transmission(
     corner = np.asarray(result.corner, dtype=np.float64)
 
     kwargs.setdefault("color", _C_PRIMARY)
-    ax.plot(angles, corner, label=_t(r"corner $\tau_{12}(\theta)$", language), **kwargs)
+    kwargs.setdefault("label", _t(r"corner $\tau_{12}(\theta)$", language))
+    ax.plot(angles, corner, **kwargs)
     ax.axhline(
         result.corner_average, color=_C_PRIMARY, ls="--", lw=1.0,
         label=_t(r"corner average $\bar\tau_{12}$ = {value}", language).replace(
