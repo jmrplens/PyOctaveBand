@@ -403,23 +403,20 @@ $\rho_\mathrm{t}/\rho_0 = 25,9$.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    PorousLayer, decoupling_frequency, johnson_champoux_allard,
-    layered_absorber, limp_frame, limp_frame_applicable,
-)
+from phonometry import materials
 
 # Allard & Atalla, tabla 11.2: capa fibrosa blanda, 50 mm.
 f = np.linspace(1.0, 2000.0, 800)
-rigid = johnson_champoux_allard(
+rigid = materials.johnson_champoux_allard(
     f, 25e3, porosity=0.98, tortuosity=1.02,
     viscous_length=90e-6, thermal_length=180e-6,
 )
-limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+limp = materials.limp_frame(rigid, frame_density=30.0, porosity=0.98)
 
-print(round(decoupling_frequency(25e3, porosity=0.98, frame_density=30.0), 1))
+print(round(materials.decoupling_frequency(25e3, porosity=0.98, frame_density=30.0), 1))
 # 127.4
 print(round(float(limp.effective_density[0].real), 1))     # 31.2 = rho_t
-print(limp_frame_applicable(20e3), limp_frame_applicable(25e3))  # True False
+print(materials.limp_frame_applicable(20e3), materials.limp_frame_applicable(25e3))  # True False
 
 limp.plot(language="es")   # Zc y k normalizados del medio corregido
 plt.show()
@@ -453,18 +450,16 @@ octava y algo mayor a ambos lados de 500 Hz:
 
 ```python
 import numpy as np
-from phonometry import (
-    PorousLayer, johnson_champoux_allard, layered_absorber, limp_frame,
-)
+from phonometry import materials
 
 bands = np.array([100, 125, 160, 200, 250, 315, 400, 500, 1000], dtype=float)
-rigid = johnson_champoux_allard(
+rigid = materials.johnson_champoux_allard(
     bands, 25e3, porosity=0.98, tortuosity=1.02,
     viscous_length=90e-6, thermal_length=180e-6,
 )
-limp = limp_frame(rigid, frame_density=30.0, porosity=0.98)
+limp = materials.limp_frame(rigid, frame_density=30.0, porosity=0.98)
 for medium in (rigid, limp):
-    print(layered_absorber(bands, [PorousLayer(0.05, medium)]).absorption.round(2))
+    print(materials.layered_absorber(bands, [materials.PorousLayer(0.05, medium)]).absorption.round(2))
 # [0.07 0.11 0.17 0.24 0.32 0.43 0.54 0.64 0.88]   esqueleto rígido
 # [0.04 0.08 0.15 0.24 0.36 0.48 0.61 0.71 0.91]   esqueleto flexible
 ```
@@ -591,31 +586,28 @@ fig. 6.10.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    PoroelasticLayer, PorousLayer, biot_waves, frame_elastic_coefficient,
-    frame_quarter_wave_resonance, johnson_champoux_allard, layered_absorber,
-)
+from phonometry import materials
 
 # Allard & Atalla, tabla 6.1: lana de vidrio "Domisol Coffrage", 100 mm, pegada.
 f = np.linspace(200.0, 1500.0, 1301)
 shear = 2.2e6 * (1 + 0.1j)          # 220 N/cm2, factor de pérdidas 0,1
-med = johnson_champoux_allard(
+med = materials.johnson_champoux_allard(
     f, 40e3, porosity=0.94, tortuosity=1.06,
     viscous_length=0.56e-4, thermal_length=1.1e-4,
 )
 
-print(frame_elastic_coefficient(shear, 0.0))       # (4400000+440000j)
-print(round(frame_quarter_wave_resonance(
+print(materials.frame_elastic_coefficient(shear, 0.0))       # (4400000+440000j)
+print(round(materials.frame_quarter_wave_resonance(
     0.10, shear_modulus=shear, poisson_ratio=0.0, frame_density=130.0), 1))
 # 459.9
 
-waves = biot_waves(med, porosity=0.94, tortuosity=1.06,
-                   frame_density=130.0, shear_modulus=shear)
+waves = materials.biot_waves(med, porosity=0.94, tortuosity=1.06,
+                             frame_density=130.0, shear_modulus=shear)
 print(round(float(abs(waves.airborne_velocity_ratio[800])), 1))     # 42.4
 print(np.round(waves.frame_borne_velocity_ratio[-1], 3))  # (0.811+0.473j)
 
-biot = layered_absorber(f, [PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)])
-rigid = layered_absorber(f, [PorousLayer(0.10, med)])
+biot = materials.layered_absorber(f, [materials.PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)])
+rigid = materials.layered_absorber(f, [materials.PorousLayer(0.10, med)])
 
 fig, ax = plt.subplots()
 for res, style in ((rigid, "--"), (biot, "-")):
@@ -652,19 +644,17 @@ de 500 Hz:
 
 ```python
 import numpy as np
-from phonometry import (
-    PoroelasticLayer, PorousLayer, johnson_champoux_allard, layered_absorber,
-)
+from phonometry import materials
 
 bands = np.array([250, 315, 400, 500, 630, 800, 1000], dtype=float)
-med = johnson_champoux_allard(
+med = materials.johnson_champoux_allard(
     bands, 40e3, porosity=0.94, tortuosity=1.06,
     viscous_length=0.56e-4, thermal_length=1.1e-4,
 )
 shear = 2.2e6 * (1 + 0.1j)
-for layer in (PorousLayer(0.10, med),
-              PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)):
-    print(layered_absorber(bands, [layer]).absorption.round(2))
+for layer in (materials.PorousLayer(0.10, med),
+              materials.PoroelasticLayer(0.10, med, 0.94, 1.06, 130.0, shear)):
+    print(materials.layered_absorber(bands, [layer]).absorption.round(2))
 # [0.55 0.58 0.62 0.65 0.69 0.74 0.78]   esqueleto rígido
 # [0.53 0.56 0.61 0.77 0.71 0.74 0.78]   Biot poroelástico
 ```

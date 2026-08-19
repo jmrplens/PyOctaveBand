@@ -45,35 +45,30 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 
-from phonometry import (
-    atmospheric_parabolic_equation,
-    atmospheric_ray_paths,
-    log_linear_sound_speed_profile,
-    shadow_zone_distance,
-)
+from phonometry import environment
 
 c0 = 340.0
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0)
+profile = environment.log_linear_sound_speed_profile(-1.0, ground_speed=c0, max_height=60.0)
 zs = 2.0
 fig, axes = plt.subplots(2, 1, figsize=(11, 8.2), sharex=True)
 
-rays = atmospheric_ray_paths(profile, source_height=zs,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0, n_steps=3000)
+rays = environment.atmospheric_ray_paths(profile, source_height=zs,
+                                         launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                                         max_range=600.0, n_steps=3000)
 for i in range(rays.heights.shape[0]):
     axes[0].plot(rays.ranges[i], rays.heights[i], color="#1f77b4", lw=0.8, alpha=0.7)
 axes[0].plot([0.0], [zs], "o", color="#d62728", label="Source")
 grad = (profile.speed_at(10.0) - c0) / 10.0
-x_sh = shadow_zone_distance(float(grad), zs, zs, ground_speed=c0)
+x_sh = environment.shadow_zone_distance(float(grad), zs, zs, ground_speed=c0)
 axes[0].axvline(x_sh, color="#d62728", ls="--", label="Shadow-zone boundary")
 axes[0].set(ylabel="Height [m]", ylim=(0, 40), title="Sound rays (upward refraction)")
 axes[0].legend()
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    pe = atmospheric_parabolic_equation(400.0, profile, source_height=zs,
-                                        flow_resistivity=200e3,
-                                        max_range=600.0, max_height=40.0)
+    pe = environment.atmospheric_parabolic_equation(400.0, profile, source_height=zs,
+                                                    flow_resistivity=200e3,
+                                                    max_range=600.0, max_height=40.0)
 img = axes[1].imshow(pe.relative_level, cmap="RdBu_r", vmin=-30, vmax=6,
                      aspect="auto", origin="lower", interpolation="bilinear",
                      extent=(pe.ranges[0], pe.ranges[-1], pe.heights[0], pe.heights[-1]))
@@ -110,9 +105,9 @@ the receiver (favourable propagation); a negative gradient bends them **up** and
 opens an acoustic **shadow** near the ground.
 
 ```python
-from phonometry import log_linear_sound_speed_profile
+from phonometry import environment
 
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
+profile = environment.log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
 profile.speed_at(10.0)   # effective sound speed 10 m above the ground
 profile.plot()           # c_eff(z) with height on the vertical axis
 ```
@@ -124,11 +119,11 @@ profile.plot()           # c_eff(z) with height on the vertical axis
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import log_linear_sound_speed_profile
+from phonometry import environment
 
 # The two canonical surface layers of Salomons Eq. 4.5 over grassland.
-down = log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
-up = log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
+down = environment.log_linear_sound_speed_profile(+1.0, ground_speed=340.0, max_height=60.0)
+up = environment.log_linear_sound_speed_profile(-1.0, ground_speed=340.0, max_height=60.0)
 ax = down.plot(color="#1f77b4")
 up.plot(ax=ax, color="#d62728")
 plt.show()
@@ -146,12 +141,12 @@ travel times and the number of ground reflections.
 
 ```python
 import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+from phonometry import environment
 
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
-rays = atmospheric_ray_paths(profile, source_height=2.0,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0)
+profile = environment.log_linear_sound_speed_profile(-1.0, ground_speed=340.0)
+rays = environment.atmospheric_ray_paths(profile, source_height=2.0,
+                                         launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                                         max_range=600.0)
 rays.plot()   # curved ray fan with the acoustic shadow near the ground
 ```
 
@@ -168,13 +163,13 @@ the surface instead of losing it upward.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import atmospheric_ray_paths, log_linear_sound_speed_profile
+from phonometry import environment
 
 # Downward refraction: the favourable-propagation mirror of the shadow case.
-profile = log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
-rays = atmospheric_ray_paths(profile, source_height=2.0,
-                             launch_angles_deg=np.linspace(-8.0, 8.0, 17),
-                             max_range=600.0, n_steps=600)
+profile = environment.log_linear_sound_speed_profile(+1.0, ground_speed=340.0)
+rays = environment.atmospheric_ray_paths(profile, source_height=2.0,
+                                         launch_angles_deg=np.linspace(-8.0, 8.0, 17),
+                                         max_range=600.0, n_steps=600)
 rays.plot()   # shallow rays return to the ground and bounce on down-range
 plt.show()
 ```
@@ -235,12 +230,12 @@ $\Delta L(z, r) = 20\log_{10}(|p| R_1)$ (dB re free field, Salomons Eq. 3.6) ove
 the whole range-height plane.
 
 ```python
-from phonometry import atmospheric_parabolic_equation, log_linear_sound_speed_profile
+from phonometry import environment
 
-profile = log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
-pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
-                                    flow_resistivity=200e3,  # grassland
-                                    max_range=600.0, max_height=40.0)
+profile = environment.log_linear_sound_speed_profile(-1.0, ground_speed=340.0)  # upward
+pe = environment.atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
+                                                flow_resistivity=200e3,  # grassland
+                                                max_range=600.0, max_height=40.0)
 pe.level_at_height(2.0)   # relative level vs range at 2 m
 pe.plot()                 # the range-height relative-level field
 ```
@@ -259,31 +254,26 @@ import warnings
 
 import matplotlib.pyplot as plt
 
-from phonometry import (
-    atmospheric_parabolic_equation,
-    linear_sound_speed_profile,
-    log_linear_sound_speed_profile,
-    shadow_zone_distance,
-)
+from phonometry import environment
 
 cases = [
-    (log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Downward (b = +1 m/s)"),
-    (linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogeneous (b = 0)"),
-    (log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Upward (b = -1 m/s)"),
+    (environment.log_linear_sound_speed_profile(+1.0, ground_speed=340.0), "Downward (b = +1 m/s)"),
+    (environment.linear_sound_speed_profile(0.0, ground_speed=340.0), "Homogeneous (b = 0)"),
+    (environment.log_linear_sound_speed_profile(-1.0, ground_speed=340.0), "Upward (b = -1 m/s)"),
 ]
 fig, ax = plt.subplots(figsize=(11, 6.2))
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     for profile, label in cases:
-        pe = atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
-                                            flow_resistivity=200e3,
-                                            max_range=600.0, max_height=40.0)
+        pe = environment.atmospheric_parabolic_equation(400.0, profile, source_height=2.0,
+                                                        flow_resistivity=200e3,
+                                                        max_range=600.0, max_height=40.0)
         ax.plot(pe.ranges, pe.level_at_height(2.0), label=label)
 # The closed-form boundary of the equivalent linear upward gradient (its
 # 10 m mean), the dotted line of the figure.
 up = cases[2][0]
 grad = float(up.speed_at(10.0) - 340.0) / 10.0
-ax.axvline(shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
+ax.axvline(environment.shadow_zone_distance(grad, 2.0, 2.0, ground_speed=340.0),
            color="k", ls=":", label="Shadow-zone boundary")
 ax.set(xlabel="Range [m]", ylabel="Level re free field [dB]", ylim=(-40, 10))
 ax.legend()

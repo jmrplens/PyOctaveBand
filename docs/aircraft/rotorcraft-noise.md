@@ -410,11 +410,11 @@ the CNOSSOS-EU scheme the guidance adopts). The ground effect is not
 evaluated separately in that regime.
 
 ```python
-from phonometry import diffraction_attenuation
+from phonometry import aircraft
 
 bands = [63.0, 250.0, 1000.0, 4000.0]
-diffraction_attenuation(bands, 0.0, edge_height=2.5)   # grazing incidence
-diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
+aircraft.diffraction_attenuation(bands, 0.0, edge_height=2.5)   # grazing incidence
+aircraft.diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
 ```
 
 <picture>
@@ -428,11 +428,11 @@ diffraction_attenuation(bands, 1.0, edge_height=2.5)   # 1 m into the shadow
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import diffraction_attenuation
+from phonometry import aircraft
 
 bands = np.array([63.0, 250.0, 1000.0, 4000.0])
 delta = np.linspace(-0.4, 1.5, 441)
-ld = np.array([diffraction_attenuation(bands, float(d), edge_height=2.5)
+ld = np.array([aircraft.diffraction_attenuation(bands, float(d), edge_height=2.5)
               for d in delta])
 
 fig, ax = plt.subplots(figsize=(9, 6))

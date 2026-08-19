@@ -86,10 +86,10 @@ se encuentra con el muro continuo de 200 mm.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import junction_transmission
+from phonometry import vibration
 
 # Un forjado de hormigón de 140 mm contra un muro de 200 mm en unión en T.
-res = junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
+res = vibration.junction_transmission("T2", 0.14, 3500.0, 320.0, 0.2, 3500.0, 460.0)
 res.plot_geometry(language="es")
 plt.show()
 ```
@@ -110,10 +110,10 @@ onda, y no $\psi$, quien fija la forma de la curva.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import junction_transmission
+from phonometry import vibration
 
 # Unión en X entre una placa de hormigón de 100 mm y otra de 200 mm (cL = 3200 m/s).
-res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 res.plot(language="es")  # tau(theta) de los caminos de esquina y recto, con medias
 plt.show()
 ```
@@ -146,9 +146,9 @@ la razón de sus movilidades de momento flector. Para **placas idénticas**
 ambos valen 1.
 
 ```python
-from phonometry import junction_wave_parameters
+from phonometry import vibration
 
-chi, psi = junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+chi, psi = vibration.junction_wave_parameters(0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 #  -> (sqrt(0.5), 4.0)
 ```
 
@@ -223,14 +223,11 @@ que un cambio de sección sea mal sitio donde buscar aislamiento.
 
 ```python
 import numpy as np
-from phonometry import (
-    corner_transmission_coefficient,
-    straight_transmission_coefficient,
-)
+from phonometry import vibration
 
 theta = np.radians(np.linspace(0.0, 90.0, 91))
-tau12 = corner_transmission_coefficient(theta, chi, psi, "X")
-tau13 = straight_transmission_coefficient(theta, chi, psi, "X")
+tau12 = vibration.corner_transmission_coefficient(theta, chi, psi, "X")
+tau13 = vibration.straight_transmission_coefficient(theta, chi, psi, "X")
 ```
 
 El clip de abajo ejecuta este experimento en el dominio del tiempo con el
@@ -268,10 +265,10 @@ que sirven de oráculo desde primeros principios de la biblioteca:
   `inline_transmission_coefficient` de la sección 2).
 
 ```python
-from phonometry import angular_average_transmission_coefficient
+from phonometry import vibration
 
-angular_average_transmission_coefficient(1.0, 1.0, "X", section="corner")  # 1/12
-angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
+vibration.angular_average_transmission_coefficient(1.0, 1.0, "X", section="corner")  # 1/12
+vibration.angular_average_transmission_coefficient(1.0, 1.0, "L", section="corner")  # 1/3
 ```
 
 Las dos direcciones cumplen la relación de consistencia SEA (Ec. 5.7),
@@ -293,14 +290,13 @@ al descriptor de unión. Para la unión en X idéntica de hormigón de 100 mm
 $K_{ij} = 10\log_{10} 12 + 5\log_{10}(203/1000) \approx 7{,}3\ \text{dB}$.
 
 ```python
-from phonometry import (coupling_loss_factor, junction_transmission,
-                        wave_vibration_reduction_index)
+from phonometry import vibration
 
-eta = coupling_loss_factor(1.0 / 12.0, group_velocity=200.0,
-                           junction_length=4.0, frequency=500.0, plate_area=10.0)
-res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
-kij = wave_vibration_reduction_index(res.corner_average,
-                                     res.critical_frequency2)  # 7.33 dB
+eta = vibration.coupling_loss_factor(1.0 / 12.0, group_velocity=200.0,
+                                     junction_length=4.0, frequency=500.0, plate_area=10.0)
+res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.1, 3200.0, 240.0)
+kij = vibration.wave_vibration_reduction_index(res.corner_average,
+                                               res.critical_frequency2)  # 7.33 dB
 kij = res.corner_reduction_index  # lo mismo, precalculado en el resultado
 
 res.plot()   # tau(theta) de los caminos de esquina y recto de esta unión (requiere matplotlib)
@@ -327,7 +323,7 @@ porque las placas perpendiculares fijan cada vez más la línea de unión:
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import junction_transmission, wave_vibration_reduction_index
+from phonometry import vibration
 
 # Placas de hormigón (cL = 3200 m/s, rho = 2400 kg/m3): placa 1 fija en
 # 100 mm, placa 2 en barrido de 50 mm a 400 mm.
@@ -337,22 +333,22 @@ curves = {"X esquina": [], "X recta": [], "unión en T (1) esquina": [],
           "L esquina": []}
 for ratio in ratios:
     h2 = h1 * float(ratio)
-    res_x = junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
+    res_x = vibration.junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
     curves["X esquina"].append(res_x.corner_reduction_index)
     # En el resultado solo viene precalculado el índice de esquina; el camino
     # recto es la media angular tau13 convertida de la misma forma.
-    curves["X recta"].append(float(wave_vibration_reduction_index(
+    curves["X recta"].append(float(vibration.wave_vibration_reduction_index(
         res_x.straight_average, res_x.critical_frequency2)))
-    res_t = junction_transmission("T1", h1, cl, rho * h1, h2, cl, rho * h2)
+    res_t = vibration.junction_transmission("T1", h1, cl, rho * h1, h2, cl, rho * h2)
     curves["unión en T (1) esquina"].append(res_t.corner_reduction_index)
-    res_l = junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
+    res_l = vibration.junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
     curves["L esquina"].append(res_l.corner_reduction_index)
 
 fig, ax = plt.subplots()
 for label, values in curves.items():
     ax.plot(ratios, values, "--" if label == "X recta" else "-", label=label)
 # La unión en X de placas idénticas: Kij = 10 lg 12 + 5 lg(fc2/1000).
-res_eq = junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
+res_eq = vibration.junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
 ax.scatter([1.0], [res_eq.corner_reduction_index], zorder=6,
            label="placas idénticas (tau = 1/12)")
 ax.set_xlabel("Relación de espesores h2/h1")
@@ -375,10 +371,10 @@ Entregarlo a
 tres trayectorias por flancos de la unión y su efecto sobre el índice aparente:
 
 ```python
-from phonometry import building, junction_transmission
+from phonometry import building, vibration
 
 # La unión en X de hormigón de 100 mm / 200 mm de la figura de tau(theta):
-res = junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
+res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
 k12 = res.corner_reduction_index                     # 9.8 dB (camino de esquina)
 
 # Llévalo al modelo simplificado de EN 12354-1 como Kij de esta unión:
@@ -513,15 +509,7 @@ que es la condición para que un modelo SEA de dos subsistemas sea fiable.*
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    coupling_loss_factor,
-    cylindrical_shell_modal_density,
-    flat_plate_modal_density,
-    plate_bending_stiffness,
-    point_connection_coupling_loss_factor,
-    power_injection_clf,
-    right_angle_transmission_coefficient,
-)
+from phonometry import vibration
 from phonometry.vibration.structural.point_mobility import plate_bending_wave_speed
 
 rho, nu, young = 2700.0, 0.33, 7.1e10                 # aluminio
@@ -532,13 +520,13 @@ bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0])
 # 5,5 mm x 2,0 m x 1,2 m en ángulo recto por el borde de 1,2 m, soldada y
 # después atornillada.
 h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
-tau = right_angle_transmission_coefficient(h1, h2, density1=rho, density2=rho,
-                                           wave_speed1=cl, wave_speed2=cl)
-cb = plate_bending_wave_speed(bands, plate_bending_stiffness(young, h1, nu),
+tau = vibration.right_angle_transmission_coefficient(h1, h2, density1=rho, density2=rho,
+                                                     wave_speed1=cl, wave_speed2=cl)
+cb = plate_bending_wave_speed(bands, vibration.plate_bending_stiffness(young, h1, nu),
                               rho * h1)
-welded = [float(coupling_loss_factor(tau, 2.0 * c, length, f, area1))
+welded = [float(vibration.coupling_loss_factor(tau, 2.0 * c, length, f, area1))
           for c, f in zip(cb, bands, strict=True)]
-bolted = point_connection_coupling_loss_factor(
+bolted = vibration.point_connection_coupling_loss_factor(
     bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
     surface_density2=rho * h2, wave_speed1=cl, wave_speed2=cl,
     plate_area1=area1)
@@ -548,11 +536,11 @@ bolted = point_connection_coupling_loss_factor(
 t_p, t_c, radius = 0.005, 0.003, 0.75
 area_c = 2.0 * math.pi * radius * 2.0
 area_p = 3.5 * 3.0 - math.pi * radius**2
-sea = power_injection_clf(
+sea = vibration.power_injection_clf(
     500.0, rho * t_p * area_p * 0.0272**2, rho * t_c * area_c * 0.0132**2,
     4.4e-3, 2.4e-3,
-    flat_plate_modal_density(area_p, t_p, cl),
-    float(cylindrical_shell_modal_density(500.0, area_c, t_c, radius, cl)[0]))
+    vibration.flat_plate_modal_density(area_p, t_p, cl),
+    float(vibration.cylindrical_shell_modal_density(500.0, area_c, t_c, radius, cl)[0]))
 
 print(f"{float(sea.coupling_loss_factor12[0]):.2e}")   # 4.26e-04
 print(f"{float(sea.coupling_loss_factor21[0]):.2e}")   # 3.91e-04

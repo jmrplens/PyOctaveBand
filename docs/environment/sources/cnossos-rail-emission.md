@@ -78,29 +78,23 @@ starts to matter.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    BrakeType, ContactFilter, RailRoughnessClass, RailwayTrack, RailwayVehicle,
-    RollingStock, TrackTransferClass, TractionVehicle, WheelDiameter,
-    aerodynamic_sound_power, contact_filter, impact_roughness_single,
-    rail_roughness, railway_source_power, track_transfer, traction_sound_power,
-    wheel_roughness, wheel_transfer,
-)
+from phonometry import environment
 
-stock = RollingStock(
+stock = environment.RollingStock(
     axles=4,
-    wheel_roughness=wheel_roughness(BrakeType.NON_TREAD),
-    contact_filter=contact_filter(ContactFilter.LOAD_50_DIAMETER_920),
-    wheel_transfer=wheel_transfer(WheelDiameter.MM_920),
-    traction=traction_sound_power(TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
-    aerodynamic=aerodynamic_sound_power(),
+    wheel_roughness=environment.wheel_roughness(environment.BrakeType.NON_TREAD),
+    contact_filter=environment.contact_filter(environment.ContactFilter.LOAD_50_DIAMETER_920),
+    wheel_transfer=environment.wheel_transfer(environment.WheelDiameter.MM_920),
+    traction=environment.traction_sound_power(environment.TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
+    aerodynamic=environment.aerodynamic_sound_power(),
 )
-track = RailwayTrack(
-    rail_roughness=rail_roughness(RailRoughnessClass.NORMAL),
-    track_transfer=track_transfer(TrackTransferClass.MONOBLOCK_MEDIUM),
-    impact_roughness=impact_roughness_single(),
+track = environment.RailwayTrack(
+    rail_roughness=environment.rail_roughness(environment.RailRoughnessClass.NORMAL),
+    track_transfer=environment.track_transfer(environment.TrackTransferClass.MONOBLOCK_MEDIUM),
+    impact_roughness=environment.impact_roughness_single(),
 )
-result = railway_source_power(
-    RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
+result = environment.railway_source_power(
+    environment.RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
 )
 result.plot()
 plt.show()
@@ -162,24 +156,20 @@ rough ones.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    RAILWAY_THIRD_OCTAVE_BANDS, BrakeType, ContactFilter, RailRoughnessClass,
-    contact_filter, rail_roughness, roughness_to_frequency,
-    total_effective_roughness, wheel_roughness,
-)
+from phonometry import environment
 
-rail = rail_roughness(RailRoughnessClass.NORMAL)
-wheel = wheel_roughness(BrakeType.NON_TREAD)
-filt = contact_filter(ContactFilter.LOAD_50_DIAMETER_920)
+rail = environment.rail_roughness(environment.RailRoughnessClass.NORMAL)
+wheel = environment.wheel_roughness(environment.BrakeType.NON_TREAD)
+filt = environment.contact_filter(environment.ContactFilter.LOAD_50_DIAMETER_920)
 
 fig, ax = plt.subplots()
 for speed in (60.0, 160.0, 300.0):
-    total = total_effective_roughness(
-        roughness_to_frequency(rail[1], rail[0], speed),
-        roughness_to_frequency(wheel[1], wheel[0], speed),
-        roughness_to_frequency(filt[1], filt[0], speed),
+    total = environment.total_effective_roughness(
+        environment.roughness_to_frequency(rail[1], rail[0], speed),
+        environment.roughness_to_frequency(wheel[1], wheel[0], speed),
+        environment.roughness_to_frequency(filt[1], filt[0], speed),
     )
-    ax.semilogx(RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
+    ax.semilogx(environment.RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
 ax.legend()
 plt.show()
 ```
@@ -201,10 +191,10 @@ worked example. Two readings are shipped, and the default is the one that
 reproduces the Commission's own reference source module:
 
 ```python
-from phonometry import RoughnessInterpolation
+from phonometry import environment
 
-RoughnessInterpolation.PROPORTIONAL   # levels interpolated linearly in lambda
-RoughnessInterpolation.ENERGY         # energies interpolated linearly in lambda
+environment.RoughnessInterpolation.PROPORTIONAL   # levels interpolated linearly in lambda
+environment.RoughnessInterpolation.ENERGY         # energies interpolated linearly in lambda
 ```
 
 They differ by up to about 1 dB on a steep part of a spectrum. This is the
@@ -248,12 +238,12 @@ the 2015 one:
 | Tram | curve or switch turnout with $R \le 200\ \text{m}$ | 5 dB |
 
 ```python
-from phonometry import curve_squeal_excess
+from phonometry import environment
 
-curve_squeal_excess(280.0)                       # 8.0 dB
-curve_squeal_excess(450.0)                       # 5.0 dB
-curve_squeal_excess(280.0, tram=True)            # 0.0 dB, trams need R <= 200 m
-curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, the curve is too short
+environment.curve_squeal_excess(280.0)                       # 8.0 dB
+environment.curve_squeal_excess(450.0)                       # 5.0 dB
+environment.curve_squeal_excess(280.0, tram=True)            # 0.0 dB, trams need R <= 200 m
+environment.curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, the curve is too short
 ```
 
 The 2015 text read "8 dB for R < 300 m and 5 dB for 300 m < R < 500 m", which
@@ -310,10 +300,10 @@ available, because comparing with a study computed before 2021 needs the old
 one:
 
 ```python
-from phonometry import DirectivityEdition, vertical_directivity
+from phonometry import environment
 
-vertical_directivity(-30.0)                                        # zeros
-vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positive
+environment.vertical_directivity(-30.0)                                        # zeros
+environment.vertical_directivity(-30.0, edition=environment.DirectivityEdition.ORIGINAL_2015)  # positive
 ```
 
 At source B, only the aerodynamic source is directional, $10\log_{10}(\cos^2\psi)$
@@ -345,11 +335,11 @@ bridge term is added to it. It sits at source A and is omni-directional, which
 the amendment states explicitly.
 
 ```python
-from phonometry import BridgeType, RailwayTrack, bridge_transfer
+from phonometry import environment
 
-RailwayTrack(
+environment.RailwayTrack(
     rail_roughness=..., track_transfer=...,
-    bridge_transfer=bridge_transfer(BridgeType.PLUS_10_DBA),
+    bridge_transfer=environment.bridge_transfer(environment.BridgeType.PLUS_10_DBA),
 )
 ```
 

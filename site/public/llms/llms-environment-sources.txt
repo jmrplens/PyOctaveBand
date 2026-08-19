@@ -173,19 +173,17 @@ governs.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    JunctionType, RoadSurface, RoadTraffic, RoadVehicleCategory, road_source_power,
-)
+from phonometry import environment
 
 traffic = [
-    RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 45.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
 ]
-result = road_source_power(
-    traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
-    junction_distance=60.0, junction_type=JunctionType.CROSSING,
+result = environment.road_source_power(
+    traffic, surface=environment.RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+    junction_distance=60.0, junction_type=environment.JunctionType.CROSSING,
 )
 result.plot()
 plt.show()
@@ -252,20 +250,17 @@ from about 60 km/h, which is why a lorry is still an engine at urban speeds.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    CNOSSOS_A_WEIGHTING, road_propulsion_noise, road_rolling_noise,
-    road_vehicle_sound_power,
-)
+from phonometry import environment
 
-weights = np.asarray(CNOSSOS_A_WEIGHTING)
+weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
 
 speeds = np.linspace(20.0, 130.0, 221)
 fig, ax = plt.subplots()
 for category, name in [("1", "Light vehicles (1)"), ("3", "Heavy vehicles (3)")]:
-    rolling = [a_weighted(road_rolling_noise(category, v)) for v in speeds]
-    propulsion = [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
-    total = [a_weighted(road_vehicle_sound_power(category, v)) for v in speeds]
+    rolling = [a_weighted(environment.road_rolling_noise(category, v)) for v in speeds]
+    propulsion = [a_weighted(environment.road_propulsion_noise(category, v)) for v in speeds]
+    total = [a_weighted(environment.road_vehicle_sound_power(category, v)) for v in speeds]
     ax.plot(speeds, total, lw=2.4, label=f"{name} - total")
     ax.plot(speeds, rolling, ls="--", lw=1.2, label=f"{name} - rolling")
     ax.plot(speeds, propulsion, ls=":", lw=1.2, label=f"{name} - propulsion")
@@ -313,9 +308,9 @@ down onto it, but a rough texture only generates tyre noise, and tyre noise is
 already the rolling term.
 
 ```python
-from phonometry import RoadSurface, road_surface_coefficients
+from phonometry import environment
 
-row = road_surface_coefficients(RoadSurface.TWO_LAYER_ZOAB_FINE)
+row = environment.road_surface_coefficients(environment.RoadSurface.TWO_LAYER_ZOAB_FINE)
 row.speed_range          # (80.0, 130.0) km/h, the printed validity range
 row.alpha["1"]           # alpha per octave band for light vehicles
 row.beta["1"]            # -0.1, the speed coefficient
@@ -339,19 +334,16 @@ $dL$ simply carries $L'_{W,\mathrm{eq,line},i} + 10\log_{10}(dL)$, which is
 arithmetic and is offered as such.
 
 ```python
-from phonometry import (
-    PropagationGeometry, RoadTraffic, RoadVehicleCategory,
-    line_source_segment_power, predicted_receiver_level, road_source_power,
-)
+from phonometry import environment
 
-result = road_source_power([
-    RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 90.0),
-    RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
+result = environment.road_source_power([
+    environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1000.0, 90.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 120.0, 80.0),
 ])
-segment = line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
-levels = predicted_receiver_level(
+segment = environment.line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
+levels = environment.predicted_receiver_level(
     segment,
-    PropagationGeometry(100.0, result.source_height, 4.0),
+    environment.PropagationGeometry(100.0, result.source_height, 4.0),
     frequencies=result.frequencies,
 )
 ```
@@ -367,9 +359,9 @@ For the A-weighted total, use the octave-band weighting the Directive itself
 prints in 2.5.5 as amended, rather than recomputing it:
 
 ```python
-from phonometry import CNOSSOS_A_WEIGHTING
+from phonometry import environment
 
-CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+environment.CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
 result.a_weighted_line_power
 ```
 
@@ -383,13 +375,13 @@ and the 2021 one). Both coefficient objects can be replaced:
 ```python
 import dataclasses
 
-from phonometry import ROAD_COEFFICIENTS
+from phonometry import environment
 
 # One measured national row for light vehicles, the rest of Appendix F as published.
 national = dataclasses.replace(
-    ROAD_COEFFICIENTS,
+    environment.ROAD_COEFFICIENTS,
     rolling_a={
-        **ROAD_COEFFICIENTS.rolling_a,
+        **environment.ROAD_COEFFICIENTS.rolling_a,
         "1": (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5),
     },
 )
@@ -552,29 +544,23 @@ starts to matter.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    BrakeType, ContactFilter, RailRoughnessClass, RailwayTrack, RailwayVehicle,
-    RollingStock, TrackTransferClass, TractionVehicle, WheelDiameter,
-    aerodynamic_sound_power, contact_filter, impact_roughness_single,
-    rail_roughness, railway_source_power, track_transfer, traction_sound_power,
-    wheel_roughness, wheel_transfer,
-)
+from phonometry import environment
 
-stock = RollingStock(
+stock = environment.RollingStock(
     axles=4,
-    wheel_roughness=wheel_roughness(BrakeType.NON_TREAD),
-    contact_filter=contact_filter(ContactFilter.LOAD_50_DIAMETER_920),
-    wheel_transfer=wheel_transfer(WheelDiameter.MM_920),
-    traction=traction_sound_power(TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
-    aerodynamic=aerodynamic_sound_power(),
+    wheel_roughness=environment.wheel_roughness(environment.BrakeType.NON_TREAD),
+    contact_filter=environment.contact_filter(environment.ContactFilter.LOAD_50_DIAMETER_920),
+    wheel_transfer=environment.wheel_transfer(environment.WheelDiameter.MM_920),
+    traction=environment.traction_sound_power(environment.TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
+    aerodynamic=environment.aerodynamic_sound_power(),
 )
-track = RailwayTrack(
-    rail_roughness=rail_roughness(RailRoughnessClass.NORMAL),
-    track_transfer=track_transfer(TrackTransferClass.MONOBLOCK_MEDIUM),
-    impact_roughness=impact_roughness_single(),
+track = environment.RailwayTrack(
+    rail_roughness=environment.rail_roughness(environment.RailRoughnessClass.NORMAL),
+    track_transfer=environment.track_transfer(environment.TrackTransferClass.MONOBLOCK_MEDIUM),
+    impact_roughness=environment.impact_roughness_single(),
 )
-result = railway_source_power(
-    RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
+result = environment.railway_source_power(
+    environment.RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
 )
 result.plot()
 plt.show()
@@ -636,24 +622,20 @@ rough ones.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    RAILWAY_THIRD_OCTAVE_BANDS, BrakeType, ContactFilter, RailRoughnessClass,
-    contact_filter, rail_roughness, roughness_to_frequency,
-    total_effective_roughness, wheel_roughness,
-)
+from phonometry import environment
 
-rail = rail_roughness(RailRoughnessClass.NORMAL)
-wheel = wheel_roughness(BrakeType.NON_TREAD)
-filt = contact_filter(ContactFilter.LOAD_50_DIAMETER_920)
+rail = environment.rail_roughness(environment.RailRoughnessClass.NORMAL)
+wheel = environment.wheel_roughness(environment.BrakeType.NON_TREAD)
+filt = environment.contact_filter(environment.ContactFilter.LOAD_50_DIAMETER_920)
 
 fig, ax = plt.subplots()
 for speed in (60.0, 160.0, 300.0):
-    total = total_effective_roughness(
-        roughness_to_frequency(rail[1], rail[0], speed),
-        roughness_to_frequency(wheel[1], wheel[0], speed),
-        roughness_to_frequency(filt[1], filt[0], speed),
+    total = environment.total_effective_roughness(
+        environment.roughness_to_frequency(rail[1], rail[0], speed),
+        environment.roughness_to_frequency(wheel[1], wheel[0], speed),
+        environment.roughness_to_frequency(filt[1], filt[0], speed),
     )
-    ax.semilogx(RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
+    ax.semilogx(environment.RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
 ax.legend()
 plt.show()
 ```
@@ -675,10 +657,10 @@ worked example. Two readings are shipped, and the default is the one that
 reproduces the Commission's own reference source module:
 
 ```python
-from phonometry import RoughnessInterpolation
+from phonometry import environment
 
-RoughnessInterpolation.PROPORTIONAL   # levels interpolated linearly in lambda
-RoughnessInterpolation.ENERGY         # energies interpolated linearly in lambda
+environment.RoughnessInterpolation.PROPORTIONAL   # levels interpolated linearly in lambda
+environment.RoughnessInterpolation.ENERGY         # energies interpolated linearly in lambda
 ```
 
 They differ by up to about 1 dB on a steep part of a spectrum. This is the
@@ -722,12 +704,12 @@ the 2015 one:
 | Tram | curve or switch turnout with $R \le 200\ \text{m}$ | 5 dB |
 
 ```python
-from phonometry import curve_squeal_excess
+from phonometry import environment
 
-curve_squeal_excess(280.0)                       # 8.0 dB
-curve_squeal_excess(450.0)                       # 5.0 dB
-curve_squeal_excess(280.0, tram=True)            # 0.0 dB, trams need R <= 200 m
-curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, the curve is too short
+environment.curve_squeal_excess(280.0)                       # 8.0 dB
+environment.curve_squeal_excess(450.0)                       # 5.0 dB
+environment.curve_squeal_excess(280.0, tram=True)            # 0.0 dB, trams need R <= 200 m
+environment.curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, the curve is too short
 ```
 
 The 2015 text read "8 dB for R < 300 m and 5 dB for 300 m < R < 500 m", which
@@ -784,10 +766,10 @@ available, because comparing with a study computed before 2021 needs the old
 one:
 
 ```python
-from phonometry import DirectivityEdition, vertical_directivity
+from phonometry import environment
 
-vertical_directivity(-30.0)                                        # zeros
-vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positive
+environment.vertical_directivity(-30.0)                                        # zeros
+environment.vertical_directivity(-30.0, edition=environment.DirectivityEdition.ORIGINAL_2015)  # positive
 ```
 
 At source B, only the aerodynamic source is directional, $10\log_{10}(\cos^2\psi)$
@@ -819,11 +801,11 @@ bridge term is added to it. It sits at source A and is omni-directional, which
 the amendment states explicitly.
 
 ```python
-from phonometry import BridgeType, RailwayTrack, bridge_transfer
+from phonometry import environment
 
-RailwayTrack(
+environment.RailwayTrack(
     rail_roughness=..., track_transfer=...,
-    bridge_transfer=bridge_transfer(BridgeType.PLUS_10_DBA),
+    bridge_transfer=environment.bridge_transfer(environment.BridgeType.PLUS_10_DBA),
 )
 ```
 

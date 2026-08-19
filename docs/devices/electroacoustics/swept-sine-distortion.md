@@ -52,12 +52,12 @@ their fixed advances.
 
 ```python
 import numpy as np
-from phonometry import swept_sine_distortion, synchronized_sweep_signal
+from phonometry import electroacoustics
 
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
-x = synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
+x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
 # ... record the device response into `y` (include the decay tail) ...
-res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
+res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 res.harmonic_responses    # complex H1..H3 on res.frequencies
 res.thd, res.thd_frequencies
@@ -74,14 +74,14 @@ res.plot()                # |Hn| magnitudes + THD(f)
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import swept_sine_distortion, synchronized_sweep_signal
+from phonometry import electroacoustics
 
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
 a2, a3 = 0.12, 0.08
-x = synchronized_sweep_signal(fs, f1, f2, seconds)
+x = electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
 b, a = sp_signal.butter(2, 3000.0, fs=fs)             # 3 kHz post-filter
 y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
+res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 h1 = 1.0 + 3.0 * a3 / 4.0                              # Chebyshev gain
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -159,10 +159,10 @@ be ignored; the band of every $H_n$ is also capped at $f_2$ by the inverse
 filter.
 
 ```python
-from phonometry import sweep_signal, swept_sine_distortion
+from phonometry import electroacoustics, room
 
-x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
-res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
+x = room.sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
+res = electroacoustics.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
 res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
 
@@ -191,16 +191,14 @@ all-pass parts:
 
 ```python
 import numpy as np
-from phonometry import (
-    excess_phase, group_delay, minimum_phase, phase_decomposition,
-)
+from phonometry import signals
 
 H = np.fft.rfft(ir)                    # one-sided response, DC..Nyquist
-h_min = minimum_phase(np.abs(H))       # phase from the magnitude alone
-tau_g = group_delay(H, fs)             # -(1/2pi) dphi/df, seconds
-phi_x = excess_phase(H)                # unwrap(arg H) - phi_min
+h_min = signals.minimum_phase(np.abs(H))       # phase from the magnitude alone
+tau_g = signals.group_delay(H, fs)             # -(1/2pi) dphi/df, seconds
+phi_x = signals.excess_phase(H)                # unwrap(arg H) - phi_min
 
-res = phase_decomposition(H, fs)       # everything on one axis
+res = signals.phase_decomposition(H, fs)       # everything on one axis
 res.excess_group_delay                 # the all-pass part, in seconds
 res.plot()                             # magnitude, phases, group delays
 ```
@@ -219,7 +217,7 @@ excess group delay reads the latency directly as a flat 2.5 ms line.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import phase_decomposition
+from phonometry import signals
 
 fs = 48000.0
 delay = int(0.0025 * fs)                      # a 2.5 ms processing latency
@@ -232,7 +230,7 @@ imp = np.zeros(16384)
 imp[delay] = 1.0
 ir = sp_signal.lfilter(b / a[0], a / a[0], imp)
 
-res = phase_decomposition(np.fft.rfft(ir), fs)
+res = signals.phase_decomposition(np.fft.rfft(ir), fs)
 res.plot()   # |H|, the three phases and the group delays
 plt.show()
 ```

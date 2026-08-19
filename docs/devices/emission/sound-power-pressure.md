@@ -223,11 +223,11 @@ surface integral.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import measurement_positions, plot_microphone_positions
+from phonometry import emission
 
 # The 10 ISO 3744 Annex B microphones on a 2 m hemisphere.
-plot_microphone_positions(measurement_positions("hemisphere", radius=2.0),
-                          radius=2.0)
+emission.plot_microphone_positions(emission.measurement_positions("hemisphere", radius=2.0),
+                                   radius=2.0)
 plt.show()
 ```
 

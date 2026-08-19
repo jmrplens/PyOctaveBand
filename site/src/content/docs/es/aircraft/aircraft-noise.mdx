@@ -327,10 +327,10 @@ calculado y no es un certificado oficial de ruido de un Estado; no reproduce
 ningún TCDSN.
 
 ```python
-from phonometry import effective_perceived_noise_level, ReportMetadata
+from phonometry import ReportMetadata, aircraft
 
 # spectra: un array (K, 24) de niveles de tercio de octava muestreado cada dt s
-res = effective_perceived_noise_level(spectra, dt=0.5)
+res = aircraft.effective_perceived_noise_level(spectra, dt=0.5)
 res.report(
     "ficha_epnl.pdf",
     metadata=ReportMetadata(

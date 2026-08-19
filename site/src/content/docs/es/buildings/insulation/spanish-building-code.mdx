@@ -175,7 +175,7 @@ $D_{2\mathrm{m,nT,Atr}}$ que el DB HR exige de verdad no llega a distinguir entr
 dos lecturas.
 
 ```python
-from phonometry import building, weighted_rating_extended
+from phonometry import building
 
 d2m_nt = [28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
           38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5, 39.4, 41.5]
@@ -183,7 +183,7 @@ d2m_nt = [28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
 direct = building.d2m_nt_atr(d2m_nt)
 direct.intermediate, direct.reported   # 32,8 dBA -> 33 dBA
 
-iso = weighted_rating_extended(d2m_nt, building.DB_HR_FREQUENCIES)
+iso = building.weighted_rating_extended(d2m_nt, building.DB_HR_FREQUENCIES)
 iso.rating, iso.ctr_100_5000           # 38 dB, -5 dB -> 33 dBA, la misma cifra
 iso.c, iso.c_100_5000                  # -2 y -1: el rango básico frente al ampliado
 ```

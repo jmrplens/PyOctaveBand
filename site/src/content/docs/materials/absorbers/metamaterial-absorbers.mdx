@@ -123,18 +123,16 @@ lengths.
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+design = materials.critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
 
 f = np.array([300.0])
-res = slit_helmholtz_absorber(
+res = materials.slit_helmholtz_absorber(
     f, design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )
@@ -161,7 +159,7 @@ says which side you are on; the absorption curve alone does not.*
 ```python
 # The impedance at 300 Hz as a function of slit height, in one line each.
 for factor in (0.6, 1.0, 1.7):
-    z_h = slit_helmholtz_absorber(
+    z_h = materials.slit_helmholtz_absorber(
         np.array([300.0]), design.resonator, slit_height=factor * design.slit_height,
         lattice_step=3.0e-2, period=5.0e-2,
     ).normalized_impedance[0]
@@ -225,22 +223,20 @@ $\alpha \approx 1$ at the design frequency.
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(
+design = materials.critical_coupling_design(
     300.0, base, lattice_step=3.0e-2, period=5.0e-2,
 )
 print(round(design.absorption, 4))          # ~1.0 (perfect absorption)
 print(round(design.slit_height * 1e3, 3))    # solved slit height, mm
 
 f = np.linspace(150.0, 500.0, 700)
-res = slit_helmholtz_absorber(
+res = materials.slit_helmholtz_absorber(
     f, design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )
@@ -263,9 +259,9 @@ the cavity length to place the resonance.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator
+from phonometry import materials
 
-resonator = HelmholtzResonator(
+resonator = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
@@ -287,13 +283,13 @@ mechanism.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import HelmholtzResonator, critical_coupling_design, materials
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(
+design = materials.critical_coupling_design(
     300.0, base, lattice_step=3.0e-2, period=5.0e-2,
 )
 
@@ -321,20 +317,18 @@ under-damps it, both dropping the peak below one.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
 a, d, f0 = 3.0e-2, 5.0e-2, 300.0
-base = HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
-design = critical_coupling_design(f0, base, lattice_step=a, period=d)
+base = materials.HelmholtzResonator(1.0e-3, 3.0e-3, 30.0e-3, 27.0e-3)
+design = materials.critical_coupling_design(f0, base, lattice_step=a, period=d)
 h0 = design.slit_height
 
 f = np.linspace(150.0, 500.0, 700)
 fig, ax = plt.subplots()
 for factor, label in [(1.0, "critically coupled"),
                       (0.6, "narrow slit"), (1.7, "wide slit")]:
-    res = slit_helmholtz_absorber(
+    res = materials.slit_helmholtz_absorber(
         f, design.resonator, slit_height=factor * h0,
         lattice_step=a, period=d,
     )
@@ -375,7 +369,7 @@ algebra suggests:
 # The same 300 Hz design, evaluated off normal. Both the solver and the
 # evaluator take `angle` in radians.
 for degrees in (0.0, 15.0, 30.0, 45.0, 60.0):
-    off = slit_helmholtz_absorber(
+    off = materials.slit_helmholtz_absorber(
         np.array([300.0]), design.resonator, slit_height=design.slit_height,
         lattice_step=3.0e-2, period=5.0e-2, angle=np.radians(degrees),
     )
@@ -402,16 +396,14 @@ everything about why the panel can be thin:
 
 ```python
 import numpy as np
-from phonometry import (
-    HelmholtzResonator, critical_coupling_design, slit_helmholtz_absorber,
-)
+from phonometry import materials
 
-base = HelmholtzResonator(
+base = materials.HelmholtzResonator(
     neck_length=1.0e-3, neck_side=3.0e-3,
     cavity_length=30.0e-3, cavity_side=27.0e-3,
 )
-design = critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
-res = slit_helmholtz_absorber(
+design = materials.critical_coupling_design(300.0, base, lattice_step=3.0e-2, period=5.0e-2)
+res = materials.slit_helmholtz_absorber(
     np.array([300.0]), design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )
@@ -454,7 +446,7 @@ metadiffuser panel of the
 
 ```python
 f_sweep = np.geomspace(50.0, 3000.0, 400)
-swept = slit_helmholtz_absorber(
+swept = materials.slit_helmholtz_absorber(
     f_sweep, design.resonator, slit_height=design.slit_height,
     lattice_step=3.0e-2, period=5.0e-2,
 )
@@ -554,11 +546,11 @@ compromise no longer critically coupled to any one stage.*
 ```python
 # `slit_helmholtz_absorber` takes a list: that is the chain along the slit.
 f_chain = np.linspace(120.0, 700.0, 700)
-graded = [critical_coupling_design(target, base, lattice_step=3.0e-2,
-                                   period=5.0e-2).resonator
+graded = [materials.critical_coupling_design(target, base, lattice_step=3.0e-2,
+                                             period=5.0e-2).resonator
           for target in (250.0, 320.0, 410.0, 520.0)]
-chain = slit_helmholtz_absorber(f_chain, graded, slit_height=1.20e-3,
-                                lattice_step=3.0e-2, period=5.0e-2)
+chain = materials.slit_helmholtz_absorber(f_chain, graded, slit_height=1.20e-3,
+                                          lattice_step=3.0e-2, period=5.0e-2)
 step = float(f_chain[1] - f_chain[0])
 print(round(float(chain.absorption.max()), 3),
       round(float(np.sum(chain.absorption >= 0.8)) * step))     # 0.999 51

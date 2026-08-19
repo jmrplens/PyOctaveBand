@@ -661,9 +661,9 @@ embeds, matplotlib (`pip install "phonometry[report,plot]"`); only
 decimal separator).
 
 ```python
-from phonometry import reverberation_time_models, ReportMetadata
+from phonometry import ReportMetadata, room
 
-result = reverberation_time_models(
+result = room.reverberation_time_models(
     (8.0, 5.0, 3.0),                       # a shoebox room, one treated wall pair
     ([0.10, 0.15, 0.30, 0.45, 0.55, 0.60], # treated wall pair, per octave band
      [0.08, 0.10, 0.12, 0.15, 0.18, 0.20], # side walls

@@ -65,14 +65,12 @@ speaking into the same 8 m x 9 m x 3 m receiving room through the same
 
 ```python
 import numpy as np
-from phonometry import (
-    SourceRoom, equivalent_absorption_area, room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 
 # Receiving room 8 x 9 x 3 m: walls 102 m2, floor and ceiling 72 m2 each.
-receiving = equivalent_absorption_area([
+receiving = room.equivalent_absorption_area([
     (102.0, [0.04, 0.04, 0.09, 0.15, 0.17, 0.23]),   # walls
     (72.0,  [0.02, 0.06, 0.14, 0.37, 0.60, 0.66]),   # floor
     (72.0,  [0.30, 0.20, 0.15, 0.05, 0.05, 0.05]),   # ceiling
@@ -86,9 +84,9 @@ partitions = {
     "Double brick, 50 mm cavity":      [37, 41, 48, 60, 61, 61],
 }
 for name, tl in partitions.items():
-    res = room_to_room_transmission(
+    res = noise_control.room_to_room_transmission(
         bands, tl, 8.0 * 3.0, receiving,
-        source=SourceRoom(level=90.0), label=name,
+        source=noise_control.SourceRoom(level=90.0), label=name,
     )
     print(f"{name:32s} {np.round(res.noise_reduction, 1)}")
 # Two 13 mm wallboards, 64 mm gap  [18.5 26.8 38.  47.8 47.3 43.9]
@@ -132,10 +130,7 @@ $10\log_{10} 4 = 6.02\ \text{dB}$, and without it the printed answers come out
 6 dB low.
 
 ```python
-from phonometry import (
-    DesignCriterion, SourceRoom, equivalent_absorption_area, mean_absorption,
-    room_constant, room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 ceiling = [0.07, 0.20, 0.40, 0.52, 0.60, 0.67]      # absorbent ceiling
@@ -149,18 +144,18 @@ plant = [(80.0, [0.01, 0.01, 0.015, 0.02, 0.02, 0.02]),
 operator = [(25.0, [0.08, 0.24, 0.57, 0.69, 0.71, 0.73]),
             (25.0, ceiling), (60.0, walls)]
 
-chain = room_to_room_transmission(
+chain = noise_control.room_to_room_transmission(
     bands,
     [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],       # TL of the separating wall
     5.0 * 3.0,                                  # the wall is 5 m x 3 m
-    equivalent_absorption_area(operator),
-    source=SourceRoom(
+    room.equivalent_absorption_area(operator),
+    source=noise_control.SourceRoom(
         power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-        room_constant=room_constant(268.0, mean_absorption(plant)),
+        room_constant=room.room_constant(268.0, room.mean_absorption(plant)),
         directivity=4.0,                        # floor-wall intersection
         model="constant_volume",                # the conservative bound
     ),
-    criterion=DesignCriterion(target=45.0),
+    criterion=noise_control.DesignCriterion(target=45.0),
     label="Plant room to operator room",
 )
 
@@ -276,7 +271,7 @@ $\text{TL} = \text{IL} + 10\log_{10}(S_\mathrm{E} / R_\mathrm{i})$, which is
 
 ```python
 import numpy as np
-from phonometry import enclosure_required_transmission_loss, mean_absorption
+from phonometry import noise_control, room
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 wool = [0.10, 0.20, 0.45, 0.65, 0.75, 0.80, 0.80, 0.80]   # 50 mm blanket
@@ -293,11 +288,11 @@ radiating = 2 * (2.5 * 2.5) + 2 * (3.5 * 2.5) + 2.5 * 3.5
 machine = 2 * (1.5 * 1.5) + 2 * (2.5 * 1.5) + 1.5 * 2.5
 bare_floor = 2.5 * 3.5 - 1.5 * 2.5
 
-required = enclosure_required_transmission_loss(
+required = noise_control.enclosure_required_transmission_loss(
     lp1 - nc45,
     radiating,
     radiating + bare_floor + machine,
-    mean_absorption([(radiating, wool), (bare_floor + machine, concrete)]),
+    room.mean_absorption([(radiating, wool), (bare_floor + machine, concrete)]),
     frequencies=bands,
     model="norton",
 )
@@ -358,11 +353,11 @@ transmission loss rather than get lost:
 
 ```python
 # The chain of section 3 again, with 3 dB allowed for flanking and leaks.
-honest = room_to_room_transmission(
+honest = noise_control.room_to_room_transmission(
     bands, [39.0, 42.0, 50.0, 58.0, 63.0, 67.0], 15.0,
-    equivalent_absorption_area(operator),
-    source=SourceRoom(level=chain.source_level),
-    criterion=DesignCriterion(target=45.0, flanking_penalty=3.0),
+    room.equivalent_absorption_area(operator),
+    source=noise_control.SourceRoom(level=chain.source_level),
+    criterion=noise_control.DesignCriterion(target=45.0, flanking_penalty=3.0),
 )
 print(np.round(honest.received_level, 1))
 # [75.4 63.4 44.4 44.  36.9 33.7]      every band 3 dB worse

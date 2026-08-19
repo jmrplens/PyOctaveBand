@@ -536,18 +536,13 @@ level supplied through the metadata `requirement` then adds a PASS/FAIL verdict
 
 ```python
 import numpy as np
-from phonometry import (
-    Barrier,
-    ReportMetadata,
-    SourceEmission,
-    outdoor_propagation_attenuation,
-)
+from phonometry import ReportMetadata, environment
 
 freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
 lw = np.array([95, 100, 103, 105, 104, 101, 95, 88], dtype=float)
-result = outdoor_propagation_attenuation(
+result = environment.outdoor_propagation_attenuation(
     200.0, 4.0, 2.0, freqs, 1.0, 1.0, 1.0,
-    barrier=Barrier(source_to_edge=105.0, edge_to_receiver=105.0),
+    barrier=environment.Barrier(source_to_edge=105.0, edge_to_receiver=105.0),
     temperature=10.0, relative_humidity=70.0,
 )
 result.report(
@@ -557,7 +552,7 @@ result.report(
         test_room="Nearest dwelling facade",
         requirement=50.0,  # maximum acceptable A-weighted downwind level
     ),
-    source_emission=SourceEmission(sound_power_level=lw),
+    source_emission=environment.SourceEmission(sound_power_level=lw),
 )
 ```
 
@@ -578,10 +573,10 @@ adds a PASS/FAIL verdict (a higher insertion loss is better).
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, barrier_insertion_loss
+from phonometry import ReportMetadata, environment
 
 freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
-result = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+result = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
 result.report(
     "barrier_insertion_loss.pdf",
     metadata=ReportMetadata(

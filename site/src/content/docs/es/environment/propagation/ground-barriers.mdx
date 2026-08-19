@@ -104,7 +104,7 @@ $$
 
 ```python
 import numpy as np
-from phonometry import ground_effect
+from phonometry import environment
 
 bands = np.array([63., 125., 250., 500., 1000., 2000., 4000., 8000.])
 
@@ -112,7 +112,7 @@ bands = np.array([63., 125., 250., 500., 1000., 2000., 4000., 8000.])
 # receptor a 1.5 m de altura, separados 50 m. La impedancia procede del modelo
 # poroso de Delany-Bazley de phonometry.materials (suelo semiinfinito).
 # Orden de los argumentos: frecuencias, source_height, receiver_height, distancia.
-res = ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
+res = environment.ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
 print(res.excess_attenuation)     # la caída del suelo (dB re campo libre)
 print(res.reflection_coefficient) # Q complejo por banda
 res.plot()                        # atenuación en exceso frente a frecuencia
@@ -145,7 +145,7 @@ resistividad en Pa·s/m², no una presión.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import ground_effect
+from phonometry import environment
 
 freqs = np.geomspace(50.0, 4000.0, 400)
 grounds = [
@@ -156,7 +156,7 @@ grounds = [
 ]
 fig, ax = plt.subplots(figsize=(11, 6.4))
 for label, sigma, color in grounds:
-    res = ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
+    res = environment.ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
     ax.plot(freqs, res.excess_attenuation, color=color, label=label)
 ax.axhline(6.0, color="k", ls=":", label="Límite de suelo rígido (+6 dB)")
 ax.axhline(0.0, color="k", lw=0.8)
@@ -203,7 +203,7 @@ c0, f, d = 343.0, 500.0, 50.0
 k = 2 * np.pi * f / c0
 q_mod, rp_mod, dl_q, dl_p = [], [], [], []
 for h in alturas:
-    res = ground_effect([f], h, h, d, flow_resistivity=2e5, model="miki")
+    res = environment.ground_effect([f], h, h, d, flow_resistivity=2e5, model="miki")
     rp = res.plane_reflection_coefficient[0]
     q = res.reflection_coefficient[0]
     fase = np.exp(1j * k * (float(res.r_reflected) - float(res.r_direct)))
@@ -312,13 +312,13 @@ difieren en solo 0,15 m.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier_es.svg" alt="Sección de la geometría de barrera: una fuente altavoz a 1 m del suelo, una pantalla delgada de 4 m a 50 m y un receptor micrófono a 1,5 m de altura a 100 m, el camino directo bloqueado de 100,00 m dibujado a trazos a través de la pantalla y el camino difractado doblado sobre el borde en dos segmentos A = 50,09 m y B = 50,06 m, con una diferencia de caminos de 0,15 m que da un número de Fresnel de 0,44 y una pérdida por inserción de Kurze-Anderson de 10,0 dB a 500 Hz, que sube a 15,5 dB a 2 kHz" width="92%" />
 
 ```python
-from phonometry import barrier_insertion_loss, kurze_anderson_attenuation
+from phonometry import environment
 
-kurze_anderson_attenuation(0.0)     # 5.0 dB en el límite de sombra
+environment.kurze_anderson_attenuation(0.0)     # 5.0 dB en el límite de sombra
 
 # Una barrera de 4 m a 50 m de una fuente a 1 m, receptor a 1.5 m y 100 m.
-il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
-                            method="kurze_anderson")
+il = environment.barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                        method="kurze_anderson")
 il.plot()                           # pérdida por inserción frente a frecuencia
 ```
 
@@ -359,9 +359,9 @@ import numpy as np
 anchos = np.linspace(0.0, 30.0, 40)
 fig, ax = plt.subplots()
 for freq in (250.0, 500.0, 1000.0):
-    delgada = float(barrier_insertion_loss(
+    delgada = float(environment.barrier_insertion_loss(
         [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact").insertion_loss[0])
-    ganancia = [0.0 if e == 0.0 else float(barrier_insertion_loss(
+    ganancia = [0.0 if e == 0.0 else float(environment.barrier_insertion_loss(
         [freq], 1.0, 50.0, 4.0, 100.0, 1.5, method="exact",
         thickness=e).insertion_loss[0]) - delgada for e in anchos]
     ax.plot(anchos, ganancia, label=f"{freq:g} Hz")
@@ -387,8 +387,8 @@ coherente y recíproco pero no una solución completa por elementos de contorno.
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_barrier_four_paths_es.svg" alt="Sección a escala del modelo coherente de barrera de cuatro caminos: una fuente a 1 m del suelo con su imagen especular 1 m por debajo, una pantalla de 4 m a 50 m, y un receptor a 1,5 m de altura a 100 m con su propia imagen especular bajo el suelo. Se dibujan cuatro rutas difractadas con cuatro trazos distinguibles desde la fuente o su imagen sobre el borde superior hasta el receptor o su imagen, cada una etiquetada con el número de rebotes en el suelo y con el coeficiente de reflexión esférica Q marcado en cada rebote; un panel lateral enumera las cuatro longitudes de camino y las diferencias de camino que fijan la interferencia, y un recuadro repite la geometría de dos bordes de una barrera gruesa con su ancho superior e" width="92%" />
 
 ```python
-il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
-                            method="exact", ground_flow_resistivity=2e5)
+il = environment.barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                        method="exact", ground_flow_resistivity=2e5)
 il.ground        # True: se aplicó el modelo coherente de cuatro caminos
 il.plot()
 ```
@@ -417,16 +417,16 @@ diseño.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import barrier_insertion_loss
+from phonometry import environment
 
 # La barrera de 4 m de los fragmentos anteriores, en una malla fina de frecuencia.
 freqs = np.geomspace(50.0, 5000.0, 240)
-il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                               method="kurze_anderson")
-il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                               method="exact")
-il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                               method="exact", ground_flow_resistivity=2e5)
+il_ka = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                           method="kurze_anderson")
+il_ex = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                           method="exact")
+il_gr = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                           method="exact", ground_flow_resistivity=2e5)
 fig, ax = plt.subplots(figsize=(11, 6.4))
 ax.semilogx(freqs, il_ka.insertion_loss, "--", label="Kurze-Anderson (pantalla delgada)")
 ax.semilogx(freqs, il_ex.insertion_loss, label="Semiplano rígido exacto")
@@ -459,10 +459,10 @@ del que dependen los métodos de pantalla delgada de arriba.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import barrier_insertion_loss
+from phonometry import environment
 
 freqs = np.geomspace(50.0, 5000.0, 240)
-il = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+il = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
 
 # Una línea: la sección a escala, con la diferencia de caminos anotada.
 il.plot_geometry(language="es")

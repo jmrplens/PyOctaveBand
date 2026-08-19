@@ -21,19 +21,19 @@ correlated inputs and one output.
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import miso_coherence, noise_signal
+from phonometry import signals
 
 fs = 8192.0
 # Input 1 drives a low-frequency path; input 2 = 0.7*x1 + independent noise
 # drives a high-frequency path, so input 2 is correlated with input 1.
-x1 = noise_signal(fs, 32.0, color="white", seed=1)
-x2 = 0.7 * x1 + noise_signal(fs, 32.0, color="white", seed=2)
+x1 = signals.noise_signal(fs, 32.0, color="white", seed=1)
+x2 = 0.7 * x1 + signals.noise_signal(fs, 32.0, color="white", seed=2)
 low = signal.butter(4, 400.0, fs=fs, output="sos")
 high = signal.butter(4, 1500.0, btype="high", fs=fs, output="sos")
-noise = noise_signal(fs, 32.0, color="white", rms=0.05, seed=3)
+noise = signals.noise_signal(fs, 32.0, color="white", rms=0.05, seed=3)
 y = signal.sosfilt(low, x1) + signal.sosfilt(high, x2) + noise
 
-res = miso_coherence([x1, x2], y, fs, nperseg=2048)
+res = signals.miso_coherence([x1, x2], y, fs, nperseg=2048)
 f = res.frequencies
 band = (f >= 20.0) & (f <= 4000.0)
 
@@ -102,7 +102,7 @@ to the multiple coherence (Eq. 7.116) and reduce exactly to the ordinary
 coherences when the inputs are mutually uncorrelated (Eq. 7.117).
 
 ```python
-res = miso_coherence([x1, x2], y, fs)
+res = signals.miso_coherence([x1, x2], y, fs)
 res.ordinary_coherence   # shape (q, F): each input on its own
 res.multiple_coherence   # shape (F,):  all inputs jointly
 res.partial_coherence    # shape (q, F): conditioned on the preceding inputs
@@ -165,7 +165,7 @@ Bendat & Piersol (Section 7.2.4) recommend ordering the inputs by descending
 ordinary coherence with the output. Pass `order` to choose:
 
 ```python
-res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
+res = signals.miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): the order actually applied
 res.plot()           # the two panels, recomputed in the applied order
 ```

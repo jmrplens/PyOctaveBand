@@ -654,8 +654,7 @@ milimétricas que el TMM modela analíticamente, se desplazan unos grados.*
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import (HelmholtzResonator, MetadiffuserWell,
-                        metadiffuser_polar_response, simulation)
+from phonometry import materials, simulation
 
 c0, dx, f0, pitch = 343.0, 0.0005, 2000.0, 0.07
 rows = [(14.7, 13.0, 16.4, 6.2, 9.0), (30.9, 9.1, 4.3, 3.5, 9.0),
@@ -703,12 +702,12 @@ pattern = simulation.far_field_from_contour(
     origin=((lat + face / 2.0) * dx, r_face * dx))
 levels = 20 * np.log10(np.abs(pattern) / np.abs(pattern).max())
 
-wells = [MetadiffuserWell(h * 1e-3,
-                          (HelmholtzResonator(ln * 1e-3, wn * 1e-3,
-                                              lc * 1e-3, wc * 1e-3),) * 2)
+wells = [materials.MetadiffuserWell(h * 1e-3,
+                                    (materials.HelmholtzResonator(ln * 1e-3, wn * 1e-3,
+                                                        lc * 1e-3, wc * 1e-3),) * 2)
          for h, ln, lc, wn, wc in rows]
-model = metadiffuser_polar_response(f0, wells, depth=0.02, period=pitch,
-                                    angles=angles, periods=1)
+model = materials.metadiffuser_polar_response(f0, wells, depth=0.02, period=pitch,
+                                              angles=angles, periods=1)
 ax = model.plot(color="#1f77b4", marker="", linestyle="--",
                 label="Modelo TMM + Fraunhofer", language="es")
 ax.plot(np.radians(angles), levels, color="#d62728", lw=2.2,

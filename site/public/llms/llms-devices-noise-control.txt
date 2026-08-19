@@ -141,20 +141,20 @@ level leaving it. `DuctElement` carries exactly the two spectra an element
 owns, and `duct_path` walks them:
 
 ```python
-from phonometry import DuctElement, duct_path
+from phonometry import noise_control
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 fan = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
 
-path = duct_path(
+path = noise_control.duct_path(
     bands, fan,
     [
-        DuctElement("Elbow, 36 x 24 in, unlined",
-                    attenuation=[0, 1, 2, 3, 3, 3, 3, 3],
-                    self_noise=[41, 39, 36, 29, 20, 6, 0, 0], code="2"),
-        DuctElement("Silencer, 3 ft, standard pressure drop",
-                    attenuation=[7, 12, 16, 28, 35, 35, 28, 17],
-                    self_noise=[49, 43, 44, 42, 42, 45, 35, 24], code="3"),
+        noise_control.DuctElement("Elbow, 36 x 24 in, unlined",
+                                  attenuation=[0, 1, 2, 3, 3, 3, 3, 3],
+                                  self_noise=[41, 39, 36, 29, 20, 6, 0, 0], code="2"),
+        noise_control.DuctElement("Silencer, 3 ft, standard pressure drop",
+                                  attenuation=[7, 12, 16, 28, 35, 35, 28, 17],
+                                  self_noise=[49, 43, 44, 42, 42, 45, 35, 24], code="3"),
     ],
     source_label="Fan, centrifugal FC, 5000 cfm, 2 in w.g.",
 )
@@ -207,21 +207,18 @@ logarithmic terms take the same values as the foot-pound form in cfm and
 inches of water gauge.
 
 ```python
-from phonometry import (
-    blade_passing_frequency, fan_casing_attenuation,
-    fan_efficiency_correction, fan_sound_power,
-)
+from phonometry import noise_control
 
 CFM, IN_WG = 0.0004719474432, 249.0
 
-fan = fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
-                      fan_type="forward_curved", relative_efficiency=80.0)
+fan = noise_control.fan_sound_power(volume_flow=5000 * CFM, static_pressure=2 * IN_WG,
+                                    fan_type="forward_curved", relative_efficiency=80.0)
 print([round(float(v)) for v in fan.values])
 # [99, 99, 89, 84, 82, 77, 72, 67]
 
-print(fan_efficiency_correction(80.0))          # 6.0 dB off the peak
-print(blade_passing_frequency(1200.0, 24))      # 480.0 Hz, in the 500 Hz band
-print(fan_casing_attenuation().values)          # what the housing holds back
+print(noise_control.fan_efficiency_correction(80.0))          # 6.0 dB off the peak
+print(noise_control.blade_passing_frequency(1200.0, 24))      # 480.0 Hz, in the 500 Hz band
+print(noise_control.fan_casing_attenuation().values)          # what the housing holds back
 # [ 0.  0.  5. 10. 15. 20. 22. 25.]
 fan.plot()                                      # the band spectrum, one line
 ```
@@ -266,17 +263,15 @@ for 25 mm to 52 mm linings and clipped at 40 dB per run because flanking
 takes over beyond that.
 
 ```python
-from phonometry import (
-    lined_rectangular_duct_attenuation, unlined_rectangular_duct_attenuation,
-)
+from phonometry import noise_control
 import numpy as np
 
 IN, FT = 0.0254, 0.3048
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 
-bare = unlined_rectangular_duct_attenuation(bands, 36 * IN, 24 * IN, 5 * FT)
-lined = lined_rectangular_duct_attenuation(bands, 36 * IN, 24 * IN, 5 * FT,
-                                           1 * IN, include_unlined=True)
+bare = noise_control.unlined_rectangular_duct_attenuation(bands, 36 * IN, 24 * IN, 5 * FT)
+lined = noise_control.lined_rectangular_duct_attenuation(bands, 36 * IN, 24 * IN, 5 * FT,
+                                                         1 * IN, include_unlined=True)
 print(np.round(bare.values, 1))    # [1.1 0.7 0.5 0.2 0.2 0.2 0.2 0.2]
 print(np.round(lined.values, 1))   # [ 1.3  1.3  2.5  6.7 12.8 10.6  9.7  9. ]
 ```
@@ -304,12 +299,12 @@ branch area does not match the feeder, and a 25 per cent branch therefore
 costs 6 dB.
 
 ```python
-from phonometry import elbow_insertion_loss, split_loss
+from phonometry import noise_control
 
 IN = 0.0254
 area = 36 * IN * 24 * IN
-print(round(split_loss(area, [0.25 * area, 0.75 * area], branch=0), 1))  # 6.0
-print(elbow_insertion_loss(
+print(round(noise_control.split_loss(area, [0.25 * area, 0.75 * area], branch=0), 1))  # 6.0
+print(noise_control.elbow_insertion_loss(
     [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
     24 * IN, bend_type="round").values)          # [0. 1. 2. 3. 3. 3. 3. 3.]
 ```
@@ -332,15 +327,15 @@ the impedance transition, and a manufacturer's diffuser rating already
 contains whatever is left of it.
 
 ```python
-from phonometry import end_reflection_loss, equivalent_diameter
+from phonometry import noise_control
 import numpy as np
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0]
-print(np.round(end_reflection_loss(bands, 0.30, method="bies").values, 1))
+print(np.round(noise_control.end_reflection_loss(bands, 0.30, method="bies").values, 1))
 # [12.  7.  3.  1.  0.  0.]
-print(np.round(end_reflection_loss(bands, 0.30, method="long").values, 1))
+print(np.round(noise_control.end_reflection_loss(bands, 0.30, method="long").values, 1))
 # [12.7  7.7  3.7  1.3  0.4  0.1]
-print(round(equivalent_diameter(0.36 * 0.24), 3))    # 0.332 m
+print(round(noise_control.equivalent_diameter(0.36 * 0.24), 3))    # 0.332 m
 ```
 
 **Silencers and plenums.** A parallel-splitter attenuator reduces, in Bies
@@ -351,17 +346,17 @@ chamber (Bies Eq. (8.275)), whose reverberant term uses the plenum
 [room constant](https://jmrplens.github.io/phonometry/buildings/rooms/room-image-sources/).
 
 ```python
-from phonometry import plenum_attenuation, splitter_silencer_insertion_loss
+from phonometry import noise_control
 import numpy as np
 
 IN, FT = 0.0254, 0.3048
-sil = splitter_silencer_insertion_loss(
+sil = noise_control.splitter_silencer_insertion_loss(
     None, height=24 * IN, length=5 * FT,
     airway_widths=[0.10] * 5, splitter_thickness=0.10,
 )
 print(np.round(sil.values, 1))
 # [ 5.8  8.6 14.1 28.2 34.5 33.5 18.4 12.1]
-print(round(plenum_attenuation(0.36, 2.4, 74.0, 0.5), 1))   # 16.1 dB
+print(round(noise_control.plenum_attenuation(0.36, 2.4, 74.0, 0.5), 1))   # 16.1 dB
 ```
 
 Read that estimate for what it is. The 5 ft unit Long's return path
@@ -389,14 +384,14 @@ is the whole message: the fifth-and-a-half power of the airway velocity
 means that *doubling the face velocity of a silencer adds about 17 dB*.
 
 ```python
-from phonometry import silencer_self_noise
+from phonometry import noise_control
 import numpy as np
 
 IN = 0.0254
-slow = silencer_self_noise(None, airway_velocity=10.0, passages=5,
-                           height=24 * IN)
-fast = silencer_self_noise(None, airway_velocity=20.0, passages=5,
-                           height=24 * IN)
+slow = noise_control.silencer_self_noise(None, airway_velocity=10.0, passages=5,
+                                         height=24 * IN)
+fast = noise_control.silencer_self_noise(None, airway_velocity=20.0, passages=5,
+                                         height=24 * IN)
 print(np.round(slow.values, 1))
 # [40.8 40.8 38.8 36.8 31.8 26.8 21.8 16.8]
 print(round(float(fast.values[0] - slow.values[0]), 1))     # 16.6 dB
@@ -421,15 +416,15 @@ function $C_D = -11.82 - 0.15 A - 1.13 A^2$ ($-5.82$ for a round device)
 about the peak band $f_\mathrm{P} = 48.8\,U_\mathrm{G}$.
 
 ```python
-from phonometry import diffuser_sound_power
+from phonometry import noise_control
 import numpy as np
 
 IN, CFM, IN_WG = 0.0254, 0.0004719474432, 249.0
 
 # The supply diffuser of Long's worked sheet: 24 x 24 in, 312 cfm, 0.05 in pd.
-print(np.round(diffuser_sound_power(None, (24 * IN) ** 2,
-                                    volume_flow=312 * CFM,
-                                    pressure_drop=0.05 * IN_WG).values, 1))
+print(np.round(noise_control.diffuser_sound_power(None, (24 * IN) ** 2,
+                                                  volume_flow=312 * CFM,
+                                                  pressure_drop=0.05 * IN_WG).values, 1))
 # [ 33.4  32.4  29.1  23.6  15.9   5.9  -6.4 -21. ]
 # Long Table 14.9 prints 33/32/29/23/15/4/0/0 for that row.
 ```
@@ -444,12 +439,12 @@ penalty for throttling a balancing damper, which is where a great many
 finished installations fail.
 
 ```python
-from phonometry import air_terminal_damper_correction, air_terminal_velocity_limit
+from phonometry import noise_control
 
-print(air_terminal_velocity_limit(30, opening="supply"))   # 2.2 m/s
-print(air_terminal_velocity_limit(30, opening="return"))   # 2.5 m/s
-print(air_terminal_damper_correction(3.0, location="diffuser_neck"))  # 15.0 dB
-print(air_terminal_damper_correction(3.0, location="supply_duct"))    #  2.0 dB
+print(noise_control.air_terminal_velocity_limit(30, opening="supply"))   # 2.2 m/s
+print(noise_control.air_terminal_velocity_limit(30, opening="return"))   # 2.5 m/s
+print(noise_control.air_terminal_damper_correction(3.0, location="diffuser_neck"))  # 15.0 dB
+print(noise_control.air_terminal_damper_correction(3.0, location="supply_duct"))    #  2.0 dB
 ```
 
 Fifteen decibels in the neck against two decibels 1.5 m back in the duct,
@@ -467,12 +462,12 @@ every other loss, with $Q = 2$ by default for a diffuser flush in a
 ceiling.
 
 ```python
-from phonometry import room_constant, room_effect
+from phonometry import noise_control, room
 
 # The 20 x 20 x 8 ft room of Long's worked sheet, drywall and carpet.
 area = 2 * 6.10 * 6.10 + 4 * 6.10 * 2.44        # 134.0 m2
-r_const = room_constant(area, 0.15)             # 23.6 m2
-print(round(float(room_effect(1.83, r_const, directivity=2.0)), 1))   # 6.6 dB
+r_const = room.room_constant(area, 0.15)             # 23.6 m2
+print(round(float(noise_control.room_effect(1.83, r_const, directivity=2.0)), 1))   # 6.6 dB
 ```
 
 Long's sheet prints 5 to 7 dB for that room across the bands, so a single
@@ -499,54 +494,54 @@ silencers and the terminal devices, which is what a real sheet uses.
 
 ```python
 import numpy as np
-from phonometry import DuctElement, combine_duct_paths, duct_path
+from phonometry import noise_control
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 fan = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
 source = "Fan, centrifugal FC, 5000 cfm, 2 in w.g."
 
-supply = duct_path(
+supply = noise_control.duct_path(
     bands, fan,
     [
-        DuctElement("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
-                    [41, 39, 36, 29, 20, 6, 0, 0], code="2"),
-        DuctElement("Silencer, 3 ft, standard pressure drop",
-                    [7, 12, 16, 28, 35, 35, 28, 17],
-                    [49, 43, 44, 42, 42, 45, 35, 24], code="3"),
-        DuctElement("Duct, 36 x 24 in, 5 ft, 1 in lining",
-                    [2, 2, 3, 7, 15, 12, 11, 9], code="4"),
-        DuctElement("Split, 25 per cent", 6.0, code="5"),
-        DuctElement("Duct, 18 x 12 in, 6 ft, 1 in lining",
-                    [3, 3, 5, 11, 25, 22, 16, 13], code="6"),
-        DuctElement("Flexible duct, 12 in, 6 ft",
-                    [14, 14, 16, 15, 17, 22, 16, 13], code="7"),
-        DuctElement("Rectangular diffuser, 312 cfm", None,
-                    [33, 32, 29, 23, 15, 4, 0, 0], code="8"),
+        noise_control.DuctElement("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
+                                  [41, 39, 36, 29, 20, 6, 0, 0], code="2"),
+        noise_control.DuctElement("Silencer, 3 ft, standard pressure drop",
+                                  [7, 12, 16, 28, 35, 35, 28, 17],
+                                  [49, 43, 44, 42, 42, 45, 35, 24], code="3"),
+        noise_control.DuctElement("Duct, 36 x 24 in, 5 ft, 1 in lining",
+                                  [2, 2, 3, 7, 15, 12, 11, 9], code="4"),
+        noise_control.DuctElement("Split, 25 per cent", 6.0, code="5"),
+        noise_control.DuctElement("Duct, 18 x 12 in, 6 ft, 1 in lining",
+                                  [3, 3, 5, 11, 25, 22, 16, 13], code="6"),
+        noise_control.DuctElement("Flexible duct, 12 in, 6 ft",
+                                  [14, 14, 16, 15, 17, 22, 16, 13], code="7"),
+        noise_control.DuctElement("Rectangular diffuser, 312 cfm", None,
+                                  [33, 32, 29, 23, 15, 4, 0, 0], code="8"),
     ],
     room_effect=[6, 6, 5, 5, 6, 7, 6, 6],
     source_label=source, target=30.0, label="Supply",
 )
 
-ret = duct_path(
+ret = noise_control.duct_path(
     bands, fan,
     [
-        DuctElement("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
-                    [43, 42, 39, 33, 24, 12, 0, 0], code="2"),
-        DuctElement("Silencer, 5 ft, low-frequency type",
-                    [16, 21, 35, 41, 41, 28, 21, 15],
-                    [51, 49, 53, 56, 56, 59, 60, 53], code="3"),
-        DuctElement("Elbow, 36 x 24 in, lined, 1 in", [1, 2, 3, 4, 5, 6, 8, 10],
-                    [39, 38, 34, 28, 18, 4, 0, 0], code="4"),
-        DuctElement("Plenum, 800 sq ft, 50 per cent lined",
-                    [12, 13, 19, 20, 20, 20, 21, 21], code="5"),
-        DuctElement("Rectangular grille, 24 x 24 in, 563 cfm", None,
-                    [30, 29, 26, 20, 12, 1, 0, 0], code="6"),
+        noise_control.DuctElement("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
+                                  [43, 42, 39, 33, 24, 12, 0, 0], code="2"),
+        noise_control.DuctElement("Silencer, 5 ft, low-frequency type",
+                                  [16, 21, 35, 41, 41, 28, 21, 15],
+                                  [51, 49, 53, 56, 56, 59, 60, 53], code="3"),
+        noise_control.DuctElement("Elbow, 36 x 24 in, lined, 1 in", [1, 2, 3, 4, 5, 6, 8, 10],
+                                  [39, 38, 34, 28, 18, 4, 0, 0], code="4"),
+        noise_control.DuctElement("Plenum, 800 sq ft, 50 per cent lined",
+                                  [12, 13, 19, 20, 20, 20, 21, 21], code="5"),
+        noise_control.DuctElement("Rectangular grille, 24 x 24 in, 563 cfm", None,
+                                  [30, 29, 26, 20, 12, 1, 0, 0], code="6"),
     ],
     room_effect=[9, 8, 6, 8, 8, 8, 9, 10],
     source_label=source, target=30.0, label="Return",
 )
 
-total = combine_duct_paths([supply, ret], label="Supply + return")
+total = noise_control.combine_duct_paths([supply, ret], label="Supply + return")
 print(np.round(supply.received_level, 0))    # Long: 52 42 30 18  9 -2 -2 -1
 print(np.round(ret.received_level, 0))       # Long: 52 41 27 25 23 25 22 12
 print(np.round(total.received_level, 0))     # Long: 55 45 32 26 23 25 22 12
@@ -577,7 +572,7 @@ nothing at all: the return already sets the answer everywhere except at
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import combine_duct_paths
+from phonometry import noise_control
 
 # `supply` and `ret` are the two DuctPathResult objects built above.
 
@@ -586,7 +581,7 @@ supply.plot()
 plt.show()
 
 # The concept figure: both paths, their energy sum and the criterion.
-total = combine_duct_paths([supply, ret], label="Supply + return")
+total = noise_control.combine_duct_paths([supply, ret], label="Supply + return")
 total.plot()
 plt.gca().set_ylim(-6.0, 62.0)
 plt.show()
@@ -685,18 +680,18 @@ $k_x = -M\kappa_{pq}/\sqrt{1 - M^2}$.
 
 ```python
 import numpy as np
-from phonometry import plane_wave_limit, rectangular_duct_cut_on
+from phonometry import noise_control
 
 # Norton problem 7.2: a 0.65 x 0.4 m air-conditioning duct at 15 m/s.
-modes = rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6)
+modes = noise_control.rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6)
 print(modes.modes[:3])                          # ((1, 0), (0, 1), (1, 1))
 print(np.round(modes.cut_on[:3], 1))            # [263.6 428.3 502.9] Hz
 print(np.round(modes.cut_on_no_flow[:3], 1))    # [263.8 428.8 503.4] Hz
 print(round(modes.plane_wave_limit, 1))         # 263.6 Hz
 
 IN = 0.0254
-print(round(plane_wave_limit(width=36 * IN, height=24 * IN), 1))   # 187.6 Hz
-print(round(plane_wave_limit(diameter=12 * IN), 1))                # 659.5 Hz
+print(round(noise_control.plane_wave_limit(width=36 * IN, height=24 * IN), 1))   # 187.6 Hz
+print(round(noise_control.plane_wave_limit(diameter=12 * IN), 1))                # 659.5 Hz
 ```
 
 Those ventilation numbers are blunt: in that duct plane waves are the whole
@@ -736,11 +731,11 @@ rung.
 
 ```python
 import numpy as np
-from phonometry import circular_duct_cut_on
+from phonometry import noise_control
 
 # Norton problem 7.1: a 254 mm circular duct carrying steam at 200 m/s.
-steam = circular_duct_cut_on(0.254, flow_velocity=200.0,
-                             speed_of_sound=405.0, count=6)
+steam = noise_control.circular_duct_cut_on(0.254, flow_velocity=200.0,
+                                           speed_of_sound=405.0, count=6)
 print(steam.modes)
 # ((1, 0), (2, 0), (0, 1), (3, 0), (4, 0), (1, 1))
 print(np.round(steam.cut_on_no_flow, 1))
@@ -766,16 +761,16 @@ at the frequency at which it appears.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import circular_duct_cut_on, rectangular_duct_cut_on
+from phonometry import noise_control
 
 # One line for one duct: the cut-on ladder with the plane-wave band shaded.
-steam = circular_duct_cut_on(0.254, flow_velocity=200.0,
-                             speed_of_sound=405.0, count=6)
+steam = noise_control.circular_duct_cut_on(0.254, flow_velocity=200.0,
+                                           speed_of_sound=405.0, count=6)
 steam.plot()
 plt.show()
 
 # The ventilation duct of problem 7.2, where the flow shift is negligible.
-rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6).plot()
+noise_control.rectangular_duct_cut_on(0.65, 0.40, flow_velocity=15.0, count=6).plot()
 plt.show()
 ```
 
@@ -790,17 +785,17 @@ they describe the plane-wave mode alone, which a measurement will not.
 
 ```python
 import warnings
-from phonometry import DuctElement, PlaneWaveWarning, duct_path
+from phonometry import noise_control
 
 IN = 0.0254
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
-    duct_path(bands, [90.0] * 8, [DuctElement("Straight run", 3.0)],
-              section={"width": 36 * IN, "height": 24 * IN},
-              flow_velocity=6.0, label="Supply")
-print(caught[0].category is PlaneWaveWarning)
+    noise_control.duct_path(bands, [90.0] * 8, [noise_control.DuctElement("Straight run", 3.0)],
+                            section={"width": 36 * IN, "height": 24 * IN},
+                            flow_velocity=6.0, label="Supply")
+print(caught[0].category is noise_control.PlaneWaveWarning)
 print(str(caught[0].message))
 # Supply: 6 of 8 frequencies are above the first duct cut-on frequency
 # (188 Hz), where higher-order modes propagate and the plane-wave result
@@ -966,14 +961,12 @@ speaking into the same 8 m x 9 m x 3 m receiving room through the same
 
 ```python
 import numpy as np
-from phonometry import (
-    SourceRoom, equivalent_absorption_area, room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 
 # Receiving room 8 x 9 x 3 m: walls 102 m2, floor and ceiling 72 m2 each.
-receiving = equivalent_absorption_area([
+receiving = room.equivalent_absorption_area([
     (102.0, [0.04, 0.04, 0.09, 0.15, 0.17, 0.23]),   # walls
     (72.0,  [0.02, 0.06, 0.14, 0.37, 0.60, 0.66]),   # floor
     (72.0,  [0.30, 0.20, 0.15, 0.05, 0.05, 0.05]),   # ceiling
@@ -987,9 +980,9 @@ partitions = {
     "Double brick, 50 mm cavity":      [37, 41, 48, 60, 61, 61],
 }
 for name, tl in partitions.items():
-    res = room_to_room_transmission(
+    res = noise_control.room_to_room_transmission(
         bands, tl, 8.0 * 3.0, receiving,
-        source=SourceRoom(level=90.0), label=name,
+        source=noise_control.SourceRoom(level=90.0), label=name,
     )
     print(f"{name:32s} {np.round(res.noise_reduction, 1)}")
 # Two 13 mm wallboards, 64 mm gap  [18.5 26.8 38.  47.8 47.3 43.9]
@@ -1033,10 +1026,7 @@ $10\log_{10} 4 = 6.02\ \text{dB}$, and without it the printed answers come out
 6 dB low.
 
 ```python
-from phonometry import (
-    DesignCriterion, SourceRoom, equivalent_absorption_area, mean_absorption,
-    room_constant, room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 ceiling = [0.07, 0.20, 0.40, 0.52, 0.60, 0.67]      # absorbent ceiling
@@ -1050,18 +1040,18 @@ plant = [(80.0, [0.01, 0.01, 0.015, 0.02, 0.02, 0.02]),
 operator = [(25.0, [0.08, 0.24, 0.57, 0.69, 0.71, 0.73]),
             (25.0, ceiling), (60.0, walls)]
 
-chain = room_to_room_transmission(
+chain = noise_control.room_to_room_transmission(
     bands,
     [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],       # TL of the separating wall
     5.0 * 3.0,                                  # the wall is 5 m x 3 m
-    equivalent_absorption_area(operator),
-    source=SourceRoom(
+    room.equivalent_absorption_area(operator),
+    source=noise_control.SourceRoom(
         power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-        room_constant=room_constant(268.0, mean_absorption(plant)),
+        room_constant=room.room_constant(268.0, room.mean_absorption(plant)),
         directivity=4.0,                        # floor-wall intersection
         model="constant_volume",                # the conservative bound
     ),
-    criterion=DesignCriterion(target=45.0),
+    criterion=noise_control.DesignCriterion(target=45.0),
     label="Plant room to operator room",
 )
 
@@ -1177,7 +1167,7 @@ $\text{TL} = \text{IL} + 10\log_{10}(S_\mathrm{E} / R_\mathrm{i})$, which is
 
 ```python
 import numpy as np
-from phonometry import enclosure_required_transmission_loss, mean_absorption
+from phonometry import noise_control, room
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 wool = [0.10, 0.20, 0.45, 0.65, 0.75, 0.80, 0.80, 0.80]   # 50 mm blanket
@@ -1194,11 +1184,11 @@ radiating = 2 * (2.5 * 2.5) + 2 * (3.5 * 2.5) + 2.5 * 3.5
 machine = 2 * (1.5 * 1.5) + 2 * (2.5 * 1.5) + 1.5 * 2.5
 bare_floor = 2.5 * 3.5 - 1.5 * 2.5
 
-required = enclosure_required_transmission_loss(
+required = noise_control.enclosure_required_transmission_loss(
     lp1 - nc45,
     radiating,
     radiating + bare_floor + machine,
-    mean_absorption([(radiating, wool), (bare_floor + machine, concrete)]),
+    room.mean_absorption([(radiating, wool), (bare_floor + machine, concrete)]),
     frequencies=bands,
     model="norton",
 )
@@ -1259,11 +1249,11 @@ transmission loss rather than get lost:
 
 ```python
 # The chain of section 3 again, with 3 dB allowed for flanking and leaks.
-honest = room_to_room_transmission(
+honest = noise_control.room_to_room_transmission(
     bands, [39.0, 42.0, 50.0, 58.0, 63.0, 67.0], 15.0,
-    equivalent_absorption_area(operator),
-    source=SourceRoom(level=chain.source_level),
-    criterion=DesignCriterion(target=45.0, flanking_penalty=3.0),
+    room.equivalent_absorption_area(operator),
+    source=noise_control.SourceRoom(level=chain.source_level),
+    criterion=noise_control.DesignCriterion(target=45.0, flanking_penalty=3.0),
 )
 print(np.round(honest.received_level, 1))
 # [75.4 63.4 44.4 44.  36.9 33.7]      every band 3 dB worse
@@ -1431,10 +1421,10 @@ exactly.
 
 ```python
 import numpy as np
-from phonometry import expansion_chamber
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
-res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
 print(round(res.transmission_loss.max(), 2))   # 6.55 dB peak (m = 4)
 res.plot()                                      # TL (and IL) vs frequency
 ```
@@ -1455,18 +1445,18 @@ circular diameters $d = 2\sqrt{S/\pi}$ of the 0.04 and 0.01 m² cross-sections.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import expansion_chamber, plot_silencer_geometry
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
-res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
 
 # One line: the dimensioned cross-section of the chamber just computed.
 res.plot_geometry()
 plt.show()
 
 # The same drawing without a result, from the free function:
-plot_silencer_geometry("expansion chamber", length=0.3,
-                       chamber_area=0.04, pipe_area=0.01)
+noise_control.plot_silencer_geometry("expansion chamber", length=0.3,
+                                     chamber_area=0.04, pipe_area=0.01)
 plt.show()
 ```
 
@@ -1497,26 +1487,24 @@ with `duct_matrix`, `shunt_matrix`, `cascade`, `transmission_loss` and
 
 ```python
 import numpy as np
-from phonometry import (
-    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
-)
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
 
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
 print(round(float(hr.resonances[0]), 1))       # tuning frequency, Hz
 hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
 
-qw = quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
-                            speed_of_sound=343.24)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=1.516, branch_area=2e-3,
+                                          speed_of_sound=343.24)
 print(round(float(qw.resonances[0]), 1))        # 56.6 Hz (Bies Example 8.1)
 
 # Each extension is a quarter-wave stub, so its own length picks the trough
 # it fills: L/4 = 0.1 m shorts the duct at c/4(L/4) = c/L, the chamber's
 # second trough, and L/2 = 0.2 m would take the first one at c/2L.
-et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
-                           inlet_extension=0.1)
+et = noise_control.extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                                         inlet_extension=0.1)
 ```
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/silencer_side_branch.svg" alt="Transmission loss of a Helmholtz resonator and a closed quarter-wave tube on the same 10 cm2 duct: each side branch produces a sharp spike at its own tuning frequency, near 120 Hz for the Helmholtz volume and near 285 Hz for the 0.3 m tube, and is transparent elsewhere" width="88%"></picture>
@@ -1531,12 +1519,12 @@ firing frequency or a fan blade-passing tone rather than used broadband.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import helmholtz_resonator, quarter_wave_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 
 # One line for one device: TL vs frequency with the resonance marked.
 hr.plot()
@@ -1589,11 +1577,11 @@ its target.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import helmholtz_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
 
 # One line: the side branch drawn to scale, cavity as its equal-volume cube.
 hr.plot_geometry()
@@ -1618,10 +1606,10 @@ area only sets how strongly the stub loads the duct.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import quarter_wave_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 
 # One line: the closed 0.3 m tube on its duct, to scale.
 qw.plot_geometry()
@@ -1664,7 +1652,7 @@ all, because an impedance is not a shape.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import SilencerChain
+from phonometry import noise_control
 from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
 
 freqs = np.linspace(20.0, 500.0, 481)
@@ -1672,7 +1660,7 @@ s_duct = np.pi * 0.100**2               # nominal 200 mm duct
 s_shell = np.pi * 0.200**2              # nominal 400 mm shell
 
 chain = (
-    SilencerChain(freqs)
+    noise_control.SilencerChain(freqs)
     .duct(0.10, s_duct)
     .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
            label="Quarter-wave stub")
@@ -1704,11 +1692,11 @@ embedded figure, matplotlib (`pip install "phonometry[report,plot]"`), and
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, expansion_chamber
+from phonometry import ReportMetadata, noise_control
 
 # A 0.5 m chamber of area ratio m = 8, at the octave-band centres.
 freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-res = expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
 res.report(
     "silencer_fiche.pdf",
     metadata=ReportMetadata(
@@ -1971,10 +1959,10 @@ numbers has the same predicted attenuation.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import plot_plenum_geometry
+from phonometry import noise_control
 
 # The r, S_out and S_w that Wells' formula actually uses, drawn exactly.
-plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
+noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
 plt.show()
 ```
 
@@ -2049,12 +2037,12 @@ interior absorption.
 
 ```python
 import numpy as np
-from phonometry import enclosure_insertion_loss
+from phonometry import noise_control
 
 bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
-enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
-                               internal_absorption=0.3, frequencies=bands)
+enc = noise_control.enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                                             internal_absorption=0.3, frequencies=bands)
 print(np.round(enc.insertion_loss, 1))          # net IL = R - C per band
 enc.plot()
 ```
@@ -2072,13 +2060,13 @@ together with the panels, not as an afterthought.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import enclosure_insertion_loss
+from phonometry import noise_control
 
 bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
 
-enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
-                               internal_absorption=0.3, frequencies=bands)
+enc = noise_control.enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                                             internal_absorption=0.3, frequencies=bands)
 
 # One line — panel R, interior correction C and the net IL = R - C:
 enc.plot()
@@ -2123,14 +2111,14 @@ insertion loss.
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, enclosure_insertion_loss
+from phonometry import ReportMetadata, noise_control
 
 octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 sheet_steel_R = np.array([18.0, 22.0, 28.0, 33.0, 38.0, 42.0, 45.0])
 
-case = enclosure_insertion_loss(sheet_steel_R, external_area=24.0,
-                                internal_area=30.0, internal_absorption=0.30,
-                                frequencies=octaves)
+case = noise_control.enclosure_insertion_loss(sheet_steel_R, external_area=24.0,
+                                              internal_area=30.0, internal_absorption=0.30,
+                                              frequencies=octaves)
 case.report(
     "enclosure.pdf",
     metadata=ReportMetadata(

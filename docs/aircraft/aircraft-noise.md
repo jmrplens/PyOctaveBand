@@ -136,10 +136,10 @@ EPNL result and is not an official State noise certificate; it does not
 reproduce any TCDSN.
 
 ```python
-from phonometry import effective_perceived_noise_level, ReportMetadata
+from phonometry import ReportMetadata, aircraft
 
 # spectra: a (K, 24) array of one-third-octave band levels sampled every dt s
-res = effective_perceived_noise_level(spectra, dt=0.5)
+res = aircraft.effective_perceived_noise_level(spectra, dt=0.5)
 res.report(
     "epnl_fiche.pdf",
     metadata=ReportMetadata(

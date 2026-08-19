@@ -68,9 +68,9 @@ Welch sin eliminación de tendencia, se cumplen tres identidades:
   más la identidad COLA, una de las comprobaciones de conformidad).
 
 ```python
-from phonometry import spectrogram
+from phonometry import signals
 
-res = spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
+res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
 print(res.power.shape)             # (frecuencias, tiempos)
 print(res.time_resolution)         # T_B = nperseg/fs, en s
 print(res.resolution_bandwidth)    # Be del segmento con ventana, en Hz
@@ -171,7 +171,7 @@ tiempo, la herramienta correcta es el espectrograma de bandas de
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import noise_signal, spectrogram
+from phonometry import signals
 
 fs = 16000.0
 t = np.arange(int(4.0 * fs)) / fs
@@ -186,10 +186,10 @@ n_imp = int(0.06 * fs)                              # impacto en t = 2,5 s
 x[int(2.5 * fs):int(2.5 * fs) + n_imp] += 0.4 * (
     rng.standard_normal(n_imp) * np.exp(-np.arange(n_imp) / (0.012 * fs))
 )
-x += noise_signal(fs, 4.0, color="pink",            # fondo a 45 dB SPL
-                  rms=p_ref * 10.0 ** (45.0 / 20.0), seed=10)
+x += signals.noise_signal(fs, 4.0, color="pink",            # fondo a 45 dB SPL
+                          rms=p_ref * 10.0 ** (45.0 / 20.0), seed=10)
 
-res = spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
+res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
 level = 10.0 * np.log10(res.power / p_ref**2)
 
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -233,9 +233,9 @@ ventana, así que una sinusoide de amplitud de pico $A$ sobre una frecuencia de
 análisis lee `amplitude` $= A$ y `power` $= A^2/2$ exactamente:
 
 ```python
-from phonometry import zoom_fft
+from phonometry import signals
 
-res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0)     # malla a la resolución del registro
+res = signals.zoom_fft(x, fs, f_min=980.0, f_max=1016.0)     # malla a la resolución del registro
 print(res.bin_spacing)                   # fs/N por defecto
 print(res.resolution_bandwidth)          # Be del registro con ventana
 peak = res.amplitude.argmax()
@@ -303,7 +303,7 @@ distinción que hace el apartado entre densidad de muestreo y resolución.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import zoom_fft
+from phonometry import signals
 
 fs = 8192.0
 t = np.arange(8192) / fs                 # registro de 1 s: resolución de 1 Hz
@@ -315,7 +315,7 @@ coarse = 2.0 * np.abs(np.fft.rfft(x[:1024] * w)) / np.sum(w)
 coarse_f = np.fft.rfftfreq(1024, 1.0 / fs)
 band = (coarse_f >= 950.0) & (coarse_f <= 1050.0)
 
-res = zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)   # malla de 0,25 Hz
+res = signals.zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)   # malla de 0,25 Hz
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(coarse_f[band], 20.0 * np.log10(coarse[band]), "o--",

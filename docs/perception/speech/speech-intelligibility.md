@@ -342,18 +342,18 @@ and so sums to 0.9996.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import SII_METHODS, sii_procedure
+from phonometry import speech
 
 # One line: each procedure's own .plot() steps its Ii over its band limits.
 fig, ax = plt.subplots(figsize=(10, 6))
-for method in SII_METHODS:
-    sii_procedure(method).plot(ax=ax, linewidth=1.8)
+for method in speech.SII_METHODS:
+    speech.sii_procedure(method).plot(ax=ax, linewidth=1.8)
 plt.show()
 
 # By hand, mirroring what SIIProcedure.plot() draws:
 fig, ax = plt.subplots()
-for method in SII_METHODS:
-    proc = sii_procedure(method)
+for method in speech.SII_METHODS:
+    proc = speech.sii_procedure(method)
     ii = proc.band_importance
     ax.plot(proc.band_edges, np.append(ii, ii[-1]), drawstyle="steps-post",
             label=method)

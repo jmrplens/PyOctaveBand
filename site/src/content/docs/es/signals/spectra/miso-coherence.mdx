@@ -45,20 +45,20 @@ la fuente equivocada.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import miso_coherence, noise_signal
+from phonometry import signals
 
 fs = 8192.0
 # La entrada 1 excita un camino de baja frecuencia; la entrada 2 =
 # 0.7*x1 + ruido independiente excita un camino de alta frecuencia, de modo
 # que la entrada 2 está correlacionada con la entrada 1.
-x1 = noise_signal(fs, 32.0, color="white", seed=1)
-x2 = 0.7 * x1 + noise_signal(fs, 32.0, color="white", seed=2)
+x1 = signals.noise_signal(fs, 32.0, color="white", seed=1)
+x2 = 0.7 * x1 + signals.noise_signal(fs, 32.0, color="white", seed=2)
 low = signal.butter(4, 400.0, fs=fs, output="sos")
 high = signal.butter(4, 1500.0, btype="high", fs=fs, output="sos")
-noise = noise_signal(fs, 32.0, color="white", rms=0.05, seed=3)
+noise = signals.noise_signal(fs, 32.0, color="white", rms=0.05, seed=3)
 y = signal.sosfilt(low, x1) + signal.sosfilt(high, x2) + noise
 
-res = miso_coherence([x1, x2], y, fs, nperseg=2048)
+res = signals.miso_coherence([x1, x2], y, fs, nperseg=2048)
 f = res.frequencies
 band = (f >= 20.0) & (f <= 4000.0)
 
@@ -154,7 +154,7 @@ exactamente a las coherencias ordinarias cuando las entradas son mutuamente
 no correlacionadas (Ec. 7.117).
 
 ```python
-res = miso_coherence([x1, x2], y, fs)
+res = signals.miso_coherence([x1, x2], y, fs)
 res.ordinary_coherence   # forma (q, F): cada entrada por sí sola
 res.multiple_coherence   # forma (F,):  todas las entradas conjuntamente
 res.partial_coherence    # forma (q, F): condicionada a las entradas previas
@@ -261,8 +261,8 @@ ventilador de la sala contigua, que no es coherente con ninguna de las dos.
 Pasa `order` para saltarte el orden por defecto:
 
 ```python
-x3 = noise_signal(fs, 32.0, color="white", seed=4)   # la tercera fuente, débil
-res = miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
+x3 = signals.noise_signal(fs, 32.0, color="white", seed=4)   # la tercera fuente, débil
+res = signals.miso_coherence([x1, x2, x3], y, fs, order=(2, 0, 1))
 res.order            # (2, 0, 1): el orden aplicado
 res.plot(language="es")   # los dos paneles, recalculados en el orden aplicado
 ```

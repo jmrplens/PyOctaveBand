@@ -119,19 +119,17 @@ governs.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    JunctionType, RoadSurface, RoadTraffic, RoadVehicleCategory, road_source_power,
-)
+from phonometry import environment
 
 traffic = [
-    RoadTraffic(RoadVehicleCategory.LIGHT, 1200.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.HEAVY, 45.0, 50.0),
-    RoadTraffic(RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1200.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.MEDIUM_HEAVY, 90.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 45.0, 50.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.MOTORCYCLES, 60.0, 50.0),
 ]
-result = road_source_power(
-    traffic, surface=RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
-    junction_distance=60.0, junction_type=JunctionType.CROSSING,
+result = environment.road_source_power(
+    traffic, surface=environment.RoadSurface.THIN_LAYER_A, temperature=12.0, gradient=3.0,
+    junction_distance=60.0, junction_type=environment.JunctionType.CROSSING,
 )
 print(result.total_line_power.round(1))
 # [89.1 82.7 81.3 80.2 80.4 76.2 71.7 66. ]  dB re 1 pW per metre of line
@@ -243,10 +241,10 @@ import numpy as np
 # `road_source_power`, `RoadTraffic`, `RoadVehicleCategory` and `JunctionType`
 # are imported by the figure snippet above.
 def a_line(**kwargs):
-    return float(road_source_power(**kwargs).a_weighted_line_power)
+    return float(environment.road_source_power(**kwargs).a_weighted_line_power)
 
-light = [RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 50.0)]
-heavy = [RoadTraffic(RoadVehicleCategory.HEAVY, 1000.0, 50.0)]
+light = [environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1000.0, 50.0)]
+heavy = [environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 1000.0, 50.0)]
 temps = np.linspace(-10.0, 40.0, 60)
 fig, (t_ax, s_ax, j_ax) = plt.subplots(1, 3, figsize=(13, 4.2))
 for flow, name in [(light, "Light (1)"), (heavy, "Heavy (3)")]:
@@ -259,18 +257,18 @@ t_ax.legend()
 speeds = np.linspace(20.0, 130.0, 60)
 for share in (0.2, 0.5):
     s_ax.plot(speeds, [
-        a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, v,
-                                    studded_fraction=share)],
+        a_line(traffic=[environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1000.0, v,
+                                                studded_fraction=share)],
                studded_months=4.0)
-        - a_line(traffic=[RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, v)])
+        - a_line(traffic=[environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1000.0, v)])
         for v in speeds], label=f"Qstud,ratio = {share:g}, Ts = 4 months")
 s_ax.set(xlabel="Speed v [km/h]", ylabel="Change in line power [dB(A)]")
 s_ax.legend(fontsize="small")
 
 xs = np.linspace(0.0, 120.0, 60)
 ref = a_line(traffic=light)
-for junction, name in [(JunctionType.CROSSING, "Crossing with lights"),
-                       (JunctionType.ROUNDABOUT, "Roundabout")]:
+for junction, name in [(environment.JunctionType.CROSSING, "Crossing with lights"),
+                       (environment.JunctionType.ROUNDABOUT, "Roundabout")]:
     j_ax.plot(xs, [a_line(traffic=light, junction_distance=float(x),
                           junction_type=junction) - ref for x in xs], label=name)
 j_ax.set(xlabel="Distance to the junction |x| [m]",
@@ -310,20 +308,17 @@ from about 60 km/h, which is why a lorry is still an engine at urban speeds.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    CNOSSOS_A_WEIGHTING, road_propulsion_noise, road_rolling_noise,
-    road_vehicle_sound_power,
-)
+from phonometry import environment
 
-weights = np.asarray(CNOSSOS_A_WEIGHTING)
+weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
 
 speeds = np.linspace(20.0, 130.0, 221)
 fig, ax = plt.subplots()
 for category, name in [("1", "Light vehicles (1)"), ("3", "Heavy vehicles (3)")]:
-    rolling = [a_weighted(road_rolling_noise(category, v)) for v in speeds]
-    propulsion = [a_weighted(road_propulsion_noise(category, v)) for v in speeds]
-    total = [a_weighted(road_vehicle_sound_power(category, v)) for v in speeds]
+    rolling = [a_weighted(environment.road_rolling_noise(category, v)) for v in speeds]
+    propulsion = [a_weighted(environment.road_propulsion_noise(category, v)) for v in speeds]
+    total = [a_weighted(environment.road_vehicle_sound_power(category, v)) for v in speeds]
     ax.plot(speeds, total, lw=2.4, label=f"{name} - total")
     ax.plot(speeds, rolling, ls="--", lw=1.2, label=f"{name} - rolling")
     ax.plot(speeds, propulsion, ls=":", lw=1.2, label=f"{name} - propulsion")
@@ -370,16 +365,16 @@ import numpy as np
 
 # `road_propulsion_noise` and `CNOSSOS_A_WEIGHTING` are imported by the
 # speed-law figure snippet above.
-weights = np.asarray(CNOSSOS_A_WEIGHTING)
+weights = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 a_weighted = lambda bands: 10.0 * np.log10(np.sum(10.0 ** ((bands + weights) / 10.0)))
 
 slopes = np.linspace(-14.0, 14.0, 141)
 fig, ax = plt.subplots()
 for category in ("1", "2", "3"):
     for speed, style in [(50.0, "--"), (80.0, "-")]:
-        flat = a_weighted(road_propulsion_noise(category, speed))
+        flat = a_weighted(environment.road_propulsion_noise(category, speed))
         ax.plot(slopes,
-                [a_weighted(road_propulsion_noise(category, speed, gradient=s)) - flat
+                [a_weighted(environment.road_propulsion_noise(category, speed, gradient=s)) - flat
                  for s in slopes], style, label=f"Category {category}, {speed:g} km/h")
 ax.set_xlabel("Road gradient s [%]")
 ax.set_ylabel("Propulsion-noise correction [dB(A)]")
@@ -427,9 +422,9 @@ down onto it, but a rough texture only generates tyre noise, and tyre noise is
 already the rolling term.
 
 ```python
-from phonometry import RoadSurface, road_surface_coefficients
+from phonometry import environment
 
-row = road_surface_coefficients(RoadSurface.TWO_LAYER_ZOAB_FINE)
+row = environment.road_surface_coefficients(environment.RoadSurface.TWO_LAYER_ZOAB_FINE)
 row.speed_range          # (80.0, 130.0) km/h, the printed validity range
 row.alpha["1"]           # alpha per octave band for light vehicles
 row.beta["1"]            # -0.1, the speed coefficient
@@ -455,10 +450,10 @@ import numpy as np
 # `RoadSurface` and `road_surface_coefficients` are imported just above.
 bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
 fig, ax = plt.subplots()
-for surface in (RoadSurface.REFERENCE, RoadSurface.TWO_LAYER_ZOAB_FINE,
-                RoadSurface.ONE_LAYER_ZOAB, RoadSurface.THIN_LAYER_A,
-                RoadSurface.SMA_NL8, RoadSurface.HARD_ELEMENTS_NOT_HERRINGBONE):
-    row = road_surface_coefficients(surface)
+for surface in (environment.RoadSurface.REFERENCE, environment.RoadSurface.TWO_LAYER_ZOAB_FINE,
+                environment.RoadSurface.ONE_LAYER_ZOAB, environment.RoadSurface.THIN_LAYER_A,
+                environment.RoadSurface.SMA_NL8, environment.RoadSurface.HARD_ELEMENTS_NOT_HERRINGBONE):
+    row = environment.road_surface_coefficients(surface)
     # The reference row carries no speed range: it is valid by definition.
     span = ("all speeds" if row.speed_range is None
             else "{:g}-{:g} km/h".format(*row.speed_range))
@@ -491,30 +486,27 @@ arithmetic and is offered as such.
 
 ```python
 import numpy as np
-from phonometry import (
-    PropagationGeometry, RoadTraffic, RoadVehicleCategory,
-    line_source_segment_power, predicted_receiver_level, road_source_power,
-)
+from phonometry import environment
 
-result = road_source_power([
-    RoadTraffic(RoadVehicleCategory.LIGHT, 1000.0, 90.0),
-    RoadTraffic(RoadVehicleCategory.HEAVY, 120.0, 80.0),
+result = environment.road_source_power([
+    environment.RoadTraffic(environment.RoadVehicleCategory.LIGHT, 1000.0, 90.0),
+    environment.RoadTraffic(environment.RoadVehicleCategory.HEAVY, 120.0, 80.0),
 ])
-segment = line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
+segment = environment.line_source_segment_power(result.total_line_power, 20.0)  # a 20 m segment
 
 # One segment, the one directly opposite a receiver 100 m from the road.
-levels = predicted_receiver_level(
+levels = environment.predicted_receiver_level(
     segment,
-    PropagationGeometry(100.0, result.source_height, 4.0),
+    environment.PropagationGeometry(100.0, result.source_height, 4.0),
     frequencies=result.frequencies,
 )
 
 # The road is the energy sum of its segments: 1 km either way, in 20 m steps.
 energy = np.zeros_like(levels)
 for x in np.arange(-990.0, 1000.0, 20.0):        # segment centres along the road
-    energy += 10 ** (predicted_receiver_level(
+    energy += 10 ** (environment.predicted_receiver_level(
         segment,
-        PropagationGeometry(float(np.hypot(100.0, x)), result.source_height, 4.0),
+        environment.PropagationGeometry(float(np.hypot(100.0, x)), result.source_height, 4.0),
         frequencies=result.frequencies,
     ) / 10)
 road = 10 * np.log10(energy)
@@ -544,13 +536,13 @@ For the A-weighted total, use the octave-band weighting the Directive itself
 prints in 2.5.5 as amended, rather than recomputing it:
 
 ```python
-from phonometry import CNOSSOS_A_WEIGHTING
+from phonometry import environment
 
-CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
+environment.CNOSSOS_A_WEIGHTING   # (-26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1)
 result.a_weighted_line_power
 
 # The two receiver spectra of the segmentation above, A-weighted:
-weight = np.asarray(CNOSSOS_A_WEIGHTING)
+weight = np.asarray(environment.CNOSSOS_A_WEIGHTING)
 print(round(float(10 * np.log10(np.sum(10 ** ((levels + weight) / 10)))), 1))
 # 52.9 dB(A) - one 20 m segment, not the road
 print(round(float(10 * np.log10(np.sum(10 ** ((road + weight) / 10)))), 1))
@@ -567,13 +559,13 @@ and the 2021 one). Both coefficient objects can be replaced:
 ```python
 import dataclasses
 
-from phonometry import ROAD_COEFFICIENTS
+from phonometry import environment
 
 # One measured national row for light vehicles, the rest of Appendix F as published.
 national = dataclasses.replace(
-    ROAD_COEFFICIENTS,
+    environment.ROAD_COEFFICIENTS,
     rolling_a={
-        **ROAD_COEFFICIENTS.rolling_a,
+        **environment.ROAD_COEFFICIENTS.rolling_a,
         "1": (83.4, 89.0, 88.1, 93.6, 100.4, 96.9, 87.0, 76.5),
     },
 )

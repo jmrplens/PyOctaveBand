@@ -537,10 +537,7 @@ matplotlib (`pip install "phonometry[report,plot]"`); solo se admite
 decimal de coma).
 
 ```python
-from phonometry import (
-    enclosed_space_reverberation, hard_object_absorption, object_fraction,
-    ReportMetadata,
-)
+from phonometry import ReportMetadata, room
 
 surfaces = [                                   # por banda de octava, 125 Hz - 8 kHz
     (20.0, [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.55]),  # suelo enmoquetado
@@ -548,10 +545,10 @@ surfaces = [                                   # por banda de octava, 125 Hz - 8
     (45.0, [0.02, 0.02, 0.03, 0.04, 0.05, 0.05, 0.05]),  # paredes de yeso pintado
 ]
 volumes = [0.5, 0.8, 0.3]                      # mobiliario, m^3
-result = enclosed_space_reverberation(
+result = room.enclosed_space_reverberation(
     surfaces, 50.0,
-    objects=hard_object_absorption(volumes),
-    object_fraction=object_fraction(volumes, 50.0),
+    objects=room.hard_object_absorption(volumes),
+    object_fraction=room.object_fraction(volumes, 50.0),
     air_condition="20C_50-70",
 )
 result.report(

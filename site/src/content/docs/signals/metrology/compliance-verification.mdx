@@ -210,10 +210,10 @@ band drawn on its class corridor) and `.report()`, the one-page accredited
 fiche with an optional PASS/FAIL row against a required class:
 
 ```python
-from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+from phonometry import ReportMetadata, filters
 
-bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-result = filter_class_compliance(bank)   # result.overall_class == 1
+bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filters.filter_class_compliance(bank)   # result.overall_class == 1
 result.report(
     "iec61260.pdf",
     metadata=ReportMetadata(

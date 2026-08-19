@@ -850,11 +850,11 @@ La regla práctica es ejecutar primero una sección con
 elevaciones completo solo si esa sección resulta estar apantallada.
 
 ```python
-from phonometry import diffraction_attenuation
+from phonometry import aircraft
 
 bandas = [63.0, 250.0, 1000.0, 4000.0]
-diffraction_attenuation(bandas, 0.0, edge_height=2.5)   # incidencia rasante
-diffraction_attenuation(bandas, 1.0, edge_height=2.5)   # 1 m dentro de la sombra
+aircraft.diffraction_attenuation(bandas, 0.0, edge_height=2.5)   # incidencia rasante
+aircraft.diffraction_attenuation(bandas, 1.0, edge_height=2.5)   # 1 m dentro de la sombra
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/rotorcraft_insertion_loss_es.svg" alt="Atenuación por difracción frente a la diferencia de camino para cuatro bandas de 63 Hz a 4 kHz, sobre una arista de 2,5 m: cada curva vale cero a la izquierda de su propio umbral dependiente de la banda cerca de la línea de visión, las tres bandas con C_h = 1 cruzan unos 4,8 dB en incidencia rasante mientras que la de 63 Hz cruza en 3,0 dB, y solo la curva de 4 kHz alcanza el tope de 25 dB dentro del rango representado" width="82%" />
@@ -874,11 +874,11 @@ de $C_h$, no solo de la longitud de onda.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import diffraction_attenuation
+from phonometry import aircraft
 
 bandas = np.array([63.0, 250.0, 1000.0, 4000.0])
 delta = np.linspace(-0.4, 1.5, 441)
-ld = np.array([diffraction_attenuation(bandas, float(d), edge_height=2.5)
+ld = np.array([aircraft.diffraction_attenuation(bandas, float(d), edge_height=2.5)
               for d in delta])
 
 fig, ax = plt.subplots(figsize=(9, 6))

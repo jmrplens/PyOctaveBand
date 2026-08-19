@@ -227,10 +227,10 @@ ficha acreditada de una página con una fila opcional de CUMPLE/NO CUMPLE
 frente a una clase exigida:
 
 ```python
-from phonometry import OctaveFilterBank, ReportMetadata, filter_class_compliance
+from phonometry import ReportMetadata, filters
 
-bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-result = filter_class_compliance(bank)   # result.overall_class == 1
+bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filters.filter_class_compliance(bank)   # result.overall_class == 1
 result.report(
     "iec61260_es.pdf",
     metadata=ReportMetadata(

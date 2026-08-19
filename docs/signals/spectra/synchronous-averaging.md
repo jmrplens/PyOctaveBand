@@ -21,11 +21,7 @@ Signal Processing 1(1), 1987, 83-95).
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    comb_filter_response,
-    noise_signal,
-    time_synchronous_average,
-)
+from phonometry import signals
 
 fs = 8192.0
 period = 1.0 / 32.0        # one revolution: 256 samples at this rate
@@ -36,8 +32,8 @@ periodic = (
     + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
     - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
 )
-recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-res = time_synchronous_average(recording, fs, period=period, n_averages=n_avg)
+recording = periodic + signals.noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
+res = signals.time_synchronous_average(recording, fs, period=period, n_averages=n_avg)
 
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
 t_ms = 1e3 * res.times
@@ -49,9 +45,9 @@ ax0.set_xlabel("Time [ms]"); ax0.set_ylabel("Amplitude"); ax0.legend()
 
 orders = np.linspace(31.0, 33.0, 4000)
 freqs = orders / period
-ax1.plot(orders, comb_filter_response(freqs, period, 32), color="#2ca02c",
+ax1.plot(orders, signals.comb_filter_response(freqs, period, 32), color="#2ca02c",
          label="N = 32 (power of two)")
-ax1.plot(orders, comb_filter_response(freqs, period, 20), color="#1f77b4",
+ax1.plot(orders, signals.comb_filter_response(freqs, period, 20), color="#1f77b4",
          label="N = 20 (node on 32.05)")
 ax1.axvline(32.05, color="#d62728", ls=":", label="Interfering tone")
 ax1.set_xlabel("Frequency [orders]"); ax1.set_ylabel("Comb filter magnitude")
@@ -98,12 +94,12 @@ every $j$ that is not a multiple of $N$, where the response is exactly zero.
 
 ```python
 import numpy as np
-from phonometry import comb_filter_response
+from phonometry import signals
 
 period = 1.0 / 32.0
-comb_filter_response(np.array([16.0 / period]), period, 8)   # 1.0 at a tooth
-comb_filter_response(np.array([0.25 / period]), period, 2)   # 1/sqrt(2)
-comb_filter_response(np.array([0.5 / period]), period, 2)    # 0.0 at a node
+signals.comb_filter_response(np.array([16.0 / period]), period, 8)   # 1.0 at a tooth
+signals.comb_filter_response(np.array([0.25 / period]), period, 2)   # 1/sqrt(2)
+signals.comb_filter_response(np.array([0.5 / period]), period, 2)    # 0.0 at a node
 ```
 
 `SynchronousAverageResult` carries the response over the first few harmonics
@@ -120,7 +116,7 @@ That is a power reduction of $10\log_{10} N$ dB, reported as
 `amplitude_snr_gain`:
 
 ```python
-res = time_synchronous_average(recording, fs, period=period, n_averages=100)
+res = signals.time_synchronous_average(recording, fs, period=period, n_averages=100)
 res.noise_reduction_db      # 20.0 dB = 10*log10(100)
 res.amplitude_snr_gain      # 10.0   = sqrt(100)
 res.plot()                  # averaged waveform + the comb it applied
@@ -139,7 +135,7 @@ the ideal $\sigma/\sqrt{N}$ line as the number of averaged periods grows from
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import time_synchronous_average
+from phonometry import signals
 
 fs = 8192.0
 samples = 256
@@ -154,8 +150,8 @@ recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
 counts = [1, 2, 4, 8, 16, 32, 64, 128]
 errors = []
 for n in counts:
-    res = time_synchronous_average(recording[:n * samples], fs, period=period,
-                                   n_averages=n)
+    res = signals.time_synchronous_average(recording[:n * samples], fs, period=period,
+                                           n_averages=n)
     errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
 
 # One line — the averaged waveform and the comb filter it applied:
@@ -205,8 +201,8 @@ average confirms it:
 phase = np.arange(41 * 256) / 256
 recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
 
-leak_20 = time_synchronous_average(recording, fs, period=period, n_averages=20)
-leak_32 = time_synchronous_average(recording, fs, period=period, n_averages=32)
+leak_20 = signals.time_synchronous_average(recording, fs, period=period, n_averages=20)
+leak_32 = signals.time_synchronous_average(recording, fs, period=period, n_averages=32)
 # leak_20.period_waveform matches the clean 8th-order tone; leak_32 does not
 ```
 
@@ -229,7 +225,7 @@ fs = 8192.0
 period = 1.0 / 31.7                       # fs * period is not an integer
 t = np.arange(int(40 * period * fs)) / fs
 recording = np.cos(2.0 * np.pi * t / period)  # one cycle per revolution
-res = time_synchronous_average(recording, fs, period=period)
+res = signals.time_synchronous_average(recording, fs, period=period)
 res.interpolated                          # True: fractional-delay alignment
 res.samples_per_period                    # integer samples of one period
 ```

@@ -27,12 +27,12 @@ BSF. That is the diagnosis: a spall on the outer race.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import bearing_fault_frequencies, envelope_spectrum, noise_signal
+from phonometry import signals, vibration
 
 # The bearing: 15 rollers on a 34 mm pitch diameter, 6 mm rollers,
 # 12.96 degrees contact angle, shaft at 2000 r/min.
-faults = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                   contact_angle_deg=12.96)
+faults = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
+                                             contact_angle_deg=12.96)
 bpfo, shaft = faults["BPFO"], faults.shaft_rate    # 207.0 Hz, 33.33 Hz
 
 # A spalled outer race: one impact per BPFO period, each ringing a 3 kHz
@@ -47,11 +47,11 @@ tau = np.arange(int(0.004 * fs)) / fs
 ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
 x = np.convolve(impacts, ring)[: t.size] * 0.6
 x += 0.35 * np.sin(2.0 * np.pi * shaft * t)          # residual unbalance
-x += noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
+x += signals.noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
 
 # Band-pass the resonance the impacts ring, envelope it, transform it,
 # and let the result draw its own lines on top.
-spectrum = envelope_spectrum(x, fs, band=(2000.0, 4000.0))
+spectrum = signals.envelope_spectrum(x, fs, band=(2000.0, 4000.0))
 faults.within(1.0, 5.0 * bpfo).plot(spectrum=spectrum)
 plt.show()
 ```
@@ -82,9 +82,9 @@ errors instantly: $\text{BPFO} + \text{BPFI} = Z f_\mathrm{s}$ always, and
 $\text{BPFO} = Z \times \text{FTF}$ whenever the outer race is stationary.
 
 ```python
-from phonometry import bearing_fault_frequencies
+from phonometry import vibration
 
-res = bearing_fault_frequencies(2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96)
+res = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96)
 print(round(res["BPFO"], 1), round(res["BPFI"], 1))   # 207.0 293.0
 print(round(res["BPFO"] + res["BPFI"], 1))            # 500.0 = 15 x 33.33
 print(res.as_dict())
@@ -110,10 +110,10 @@ flat sidebands spaced by the shaft rate, while distributed wear raises tall
 sideband groups and lifts the higher mesh harmonics.
 
 ```python
-from phonometry import gear_mesh_frequencies
+from phonometry import vibration
 
 # A 28-tooth pinion on a 1500 r/min shaft, with two sideband orders.
-res = gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+res = vibration.gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
 print(round(res["GMF"], 1))            # 700.0
 print(round(res["GMF+1x"], 1))         # 725.0  (GMF + one shaft order)
 print(res.harmonics("GMF", 3))         # [ 700. 1400. 2100.]
@@ -139,10 +139,10 @@ $n = 1, 2, \ldots$. Dynamic eccentricity dresses the dominant slot harmonic
 with sidebands at $\pm$ the shaft rate and $\pm$ the slip frequency.
 
 ```python
-from phonometry import induction_motor_frequencies
+from phonometry import vibration
 
 # Sixty rotor bars, six magnetic poles, 3600 r/min, no slip.
-res = induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
+res = vibration.induction_motor_frequencies(3600.0, 6, 60, slip=0.0)
 print(round(res["1x"]), round(res["2x"]),
       round(res["2fe"]), round(res["fsh"]))     # 60 120 360 3600
 ```
@@ -175,10 +175,10 @@ count reached from a different harmonic is a different pattern turning at a
 different speed.
 
 ```python
-from phonometry import blade_pass_frequencies
+from phonometry import vibration
 
 # Six blades, four vanes, 3500 r/min.
-res = blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
+res = vibration.blade_pass_frequencies(3500.0, 6, harmonics=1, n_vanes=4)
 print(round(res["BPF"]))          # 350
 print(round(res["lobe n=1 m=2"]), round(res["lobe n=1 m=10"]))    # 175 35
 ```
@@ -211,24 +211,19 @@ harmonic or sideband family onto a single quefrency spike, which is the fastest
 way to tell *which* periodicity dominates when several are superimposed.
 
 ```python
-from phonometry import (
-    bearing_fault_frequencies,
-    combine_fault_lines,
-    envelope_spectrum,
-    gear_mesh_frequencies,
-)
+from phonometry import signals, vibration
 
 record, fs = x, 20000.0          # the housing record and its sample rate
 shaft_rpm = 2000.0               # from the tacho, not from the nameplate
 
 # The bearing's own lines, the mesh family of the pinion it supports, and the
 # shaft harmonics. Put them all on one axes.
-bearing = bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
-                                    contact_angle_deg=12.96)
-gear = gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
-lines = combine_fault_lines(bearing, gear)
+bearing = vibration.bearing_fault_frequencies(shaft_rpm, 15, 6.0, 34.0,
+                                              contact_angle_deg=12.96)
+gear = vibration.gear_mesh_frequencies(shaft_rpm, 28, harmonics=2, sidebands=1)
+lines = vibration.combine_fault_lines(bearing, gear)
 
-spectrum = envelope_spectrum(record, fs, band=(2000.0, 4000.0))
+spectrum = signals.envelope_spectrum(record, fs, band=(2000.0, 4000.0))
 lines.within(1.0, 1600.0).plot(spectrum=spectrum)
 ```
 

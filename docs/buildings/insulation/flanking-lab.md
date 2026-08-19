@@ -205,29 +205,26 @@ $R_\mathrm{cl,p} = R_\mathrm{cl} + 10\log_{10}(H_\mathrm{S}/L_\mathrm{S})$ (Eq. 
 ceiling path be added to the direct path as transmission factors.
 
 ```python
-from phonometry import (
-    partition_referenced_reduction_index,
-    plenum_flanking_reduction_index,
-)
+from phonometry import building
 
 freqs = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 ceiling = [17.0, 21.0, 25.0, 29.0, 32.0, 30.0, 38.0]   # 9.5 mm plasterboard
 
 # Vigran's example geometry: LS = LR = 4.75 m, plenum 0.43 m, reflecting walls.
-res = plenum_flanking_reduction_index(
+res = building.plenum_flanking_reduction_index(
     ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, frequency=freqs
 )
 print(round(res.geometry_term, 1))    # 10.4 dB charged against RS + RR
 res.plot()                            # Rcl against the two ceilings
 
 # A lined plenum attenuates the sideways path (Eq. (9.18) instead of (9.20)):
-damped = plenum_flanking_reduction_index(
+damped = building.plenum_flanking_reduction_index(
     ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43,
     attenuation_source=[0.5] * 7, attenuation_receiving=[0.5] * 7,
 )
 
 # Referred to the partition instead of the ceiling (Eq. (9.13)):
-print(partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
+print(building.partition_referenced_reduction_index(res.reduction_index, 2.7, 4.75))
 ```
 
 **The measured quantity.** A ceiling is not rated by $R_\mathrm{cl}$ but by the
@@ -250,25 +247,21 @@ deficiency exceeds 8 dB (clauses 5.3 and 5.4), and reads the rating off the
 shifted contour at 500 Hz (clause 5.5).
 
 ```python
-from phonometry import (
-    ceiling_attenuation_class,
-    normalized_ceiling_attenuation,
-    weighted_rating,
-)
+from phonometry import building
 
 # ASTM E1414 normalizes to A0 = 12 m2, ISO 140-9 to A0 = 10 m2.
-dnc = normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
+dnc = building.normalized_ceiling_attenuation(l1, l2, absorption, reference_area=12.0)
 
 # A 28 mm perforated plaster acoustic tile, measured to ASTM E1414 (CAC 34).
 dnc = [14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
        41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9]
-res = ceiling_attenuation_class(dnc)
+res = building.ceiling_attenuation_class(dnc)
 print(res.rating, res.deficiency_sum, res.max_deficiency)   # 34, 27.0, 7.0
 res.plot()                                                  # Dn,c vs the contour
 
 # The ISO single number of the same spectrum, shifted to A0 = 10 m2:
 iso = [v - 0.79 for v in dnc]
-print(weighted_rating(iso).rating)                          # Dn,c,w
+print(building.weighted_rating(iso).rating)                          # Dn,c,w
 ```
 
 ## ISO 10848 flanking-transmission reports (`.report()`)

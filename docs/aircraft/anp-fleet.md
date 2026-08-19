@@ -20,9 +20,9 @@ table yourself.
 Point it at a directory to read any other ANP CSV export instead.
 
 ```python
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-db = load_anp_database()
+db = aircraft.load_anp_database()
 print(len(db.aircraft_ids))          # 155 aircraft types
 ac = db.aircraft("747100")
 print(ac.description)                # Boeing 747-100 / JT9DBD
@@ -53,9 +53,9 @@ tabulated nodes the Doc 29 interpolation is logarithmic in distance and linear
 in power.
 
 ```python
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-curves = load_anp_database().aircraft("A320-232").npd_curves("D", "SEL")
+curves = aircraft.load_anp_database().aircraft("A320-232").npd_curves("D", "SEL")
 print(curves.powers)                       # [10000. 14000. 19000. 23000.] lb
 print(curves.level(19000.0, [304.8, 1000.0, 3000.0]))
 ```
@@ -77,9 +77,9 @@ the level, while distance sets the shape.
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-ac = load_anp_database().aircraft("747100")
+ac = aircraft.load_anp_database().aircraft("747100")
 curves = ac.npd_curves("D", "SEL")
 
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -116,9 +116,9 @@ only for arrivals. Asking for one that does not exist raises a `KeyError` naming
 the stage lengths that do, which is how to discover them:
 
 ```python
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-db = load_anp_database()
+db = aircraft.load_anp_database()
 for identifier, operation, stage in (("A320-232", "D", 1), ("747100", "D", 9)):
     try:
         db.profile(identifier, operation, stage)
@@ -133,9 +133,9 @@ substitute trajectory. NPD curves, on the other hand, are tabulated for every
 aircraft in the database.
 
 ```python
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-profile = load_anp_database().aircraft("747100").profile("D", stage_length=1)
+profile = aircraft.load_anp_database().aircraft("747100").profile("D", stage_length=1)
 print(profile.profile_id, profile.stage_length, profile.path.shape)
 profile.plot()
 ```
@@ -153,9 +153,9 @@ after them fixes the slant distance at every receiver, so it decides the contour
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-ac = load_anp_database().aircraft("747100")
+ac = aircraft.load_anp_database().aircraft("747100")
 profile = ac.profile("D", stage_length=1)
 
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -178,9 +178,9 @@ over a ground grid, each wiring the NPD curves and the default profile into the
 functions the airport-noise page builds by hand.
 
 ```python
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-ac = load_anp_database().aircraft("747100")
+ac = aircraft.load_anp_database().aircraft("747100")
 flyover = ac.event_level([3000.0, 500.0, 0.0], "D")
 print(round(float(flyover.level), 1))     # 100.4 dB
 ```
@@ -200,9 +200,9 @@ weather correction.
 
 ```python
 import numpy as np
-from phonometry import load_anp_database
+from phonometry import aircraft
 
-contour = load_anp_database().aircraft("747100").noise_contour(
+contour = aircraft.load_anp_database().aircraft("747100").noise_contour(
     "D",
     x=np.linspace(-2000.0, 12000.0, 40),
     y=np.linspace(-3000.0, 3000.0, 30),

@@ -52,7 +52,7 @@ Section II):
 
 ```python
 import numpy as np
-from phonometry import stoi
+from phonometry import speech
 
 fs = 16000
 rng = np.random.default_rng(0)
@@ -61,9 +61,9 @@ clean = rng.standard_normal(3 * fs)          # stand-in for a speech waveform
 noise = rng.standard_normal(3 * fs)
 degraded = clean + 0.56 * noise
 
-d = stoi(clean, degraded, fs)
+d = speech.stoi(clean, degraded, fs)
 print(round(d.value, 3))              # a scalar in roughly [0, 1]
-print(stoi(clean, clean, fs).value)   # 1.0  (a signal against itself)
+print(speech.stoi(clean, clean, fs).value)   # 1.0  (a signal against itself)
 ```
 
 Everything up to the 384 ms segments is shared; the two measures only part
@@ -84,7 +84,7 @@ is the average of those intermediate correlations over all bands and segments
 
 ```python
 import numpy as np
-from phonometry import stoi
+from phonometry import speech
 
 fs = 10000
 rng = np.random.default_rng(1)
@@ -92,7 +92,7 @@ clean = rng.standard_normal(3 * fs)
 # Higher SNR gives a higher STOI: the relation is monotonic.
 for snr_db in (-10, 0, 10, 20):
     g = 10.0 ** (-snr_db / 20.0)
-    print(snr_db, round(stoi(clean, clean + g * rng.standard_normal(clean.size), fs).value, 3))
+    print(snr_db, round(speech.stoi(clean, clean + g * rng.standard_normal(clean.size), fs).value, 3))
 ```
 
 The `STOIResult` carries the per-band mean correlation (`band_scores`) and the
@@ -110,7 +110,7 @@ bites, which the single number cannot.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, lfilter
-from phonometry import stoi
+from phonometry import speech
 
 # Speech-like material: band-limited noise with a 3.5 Hz syllabic envelope,
 # in a flat masker at 0 dB SNR.
@@ -122,7 +122,7 @@ carrier = lfilter(b, a, rng.standard_normal(t.size))
 clean = carrier * (0.15 + 0.85 * np.abs(np.sin(2 * np.pi * 3.5 * t)) ** 2)
 masker = rng.standard_normal(clean.size)
 gain = np.sqrt(np.mean(clean ** 2)) / np.sqrt(np.mean(masker ** 2))
-res = stoi(clean, clean + gain * masker, fs)
+res = speech.stoi(clean, clean + gain * masker, fs)
 print(round(res.value, 3))    # 0.727
 
 # One line: the per-band intermediate correlation behind the index.
@@ -162,9 +162,9 @@ audible, is credited for the speech glimpsed there, which STOI's per-band
 average largely misses.
 
 ```python
-from phonometry import stoi
+from phonometry import speech
 
-estoi = stoi(clean, degraded, fs, extended=True)
+estoi = speech.stoi(clean, degraded, fs, extended=True)
 print(round(estoi.value, 3))
 ```
 
@@ -176,7 +176,7 @@ print(round(estoi.value, 3))
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from phonometry import stoi
+from phonometry import speech
 
 fs = 10000
 rng = np.random.default_rng(20)
@@ -198,7 +198,7 @@ def curve(masker, extended):
     out = []
     for snr in snrs:
         g = p_clean / (p_m * 10.0 ** (snr / 20.0))
-        out.append(stoi(clean, clean + g * masker, fs, extended=extended).value)
+        out.append(speech.stoi(clean, clean + g * masker, fs, extended=extended).value)
     return out
 
 fig, (a, b) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)

@@ -106,10 +106,10 @@ numbers has the same predicted attenuation.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import plot_plenum_geometry
+from phonometry import noise_control
 
 # The r, S_out and S_w that Wells' formula actually uses, drawn exactly.
-plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
+noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, angle=0.35)
 plt.show()
 ```
 
@@ -184,12 +184,12 @@ interior absorption.
 
 ```python
 import numpy as np
-from phonometry import enclosure_insertion_loss
+from phonometry import noise_control
 
 bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
-enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
-                               internal_absorption=0.3, frequencies=bands)
+enc = noise_control.enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                                             internal_absorption=0.3, frequencies=bands)
 print(np.round(enc.insertion_loss, 1))          # net IL = R - C per band
 enc.plot()
 ```
@@ -207,13 +207,13 @@ together with the panels, not as an afterthought.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import enclosure_insertion_loss
+from phonometry import noise_control
 
 bands = np.array([125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 panel_R = np.array([18.0, 24.0, 30.0, 36.0, 42.0, 46.0])   # measured, dB
 
-enc = enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
-                               internal_absorption=0.3, frequencies=bands)
+enc = noise_control.enclosure_insertion_loss(panel_R, external_area=6.0, internal_area=5.0,
+                                             internal_absorption=0.3, frequencies=bands)
 
 # One line — panel R, interior correction C and the net IL = R - C:
 enc.plot()
@@ -258,14 +258,14 @@ insertion loss.
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, enclosure_insertion_loss
+from phonometry import ReportMetadata, noise_control
 
 octaves = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
 sheet_steel_R = np.array([18.0, 22.0, 28.0, 33.0, 38.0, 42.0, 45.0])
 
-case = enclosure_insertion_loss(sheet_steel_R, external_area=24.0,
-                                internal_area=30.0, internal_absorption=0.30,
-                                frequencies=octaves)
+case = noise_control.enclosure_insertion_loss(sheet_steel_R, external_area=24.0,
+                                              internal_area=30.0, internal_absorption=0.30,
+                                              frequencies=octaves)
 case.report(
     "enclosure.pdf",
     metadata=ReportMetadata(

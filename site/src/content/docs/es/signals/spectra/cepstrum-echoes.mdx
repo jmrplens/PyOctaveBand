@@ -85,13 +85,13 @@ se separan - en el dominio cepstral (Havelock cap. 27, Ecs. (22)-(23)).
 
 ```python
 import numpy as np
-from phonometry import cepstrum
+from phonometry import signals
 
 fs = 48000.0
 rng = np.random.default_rng(1)
 x = rng.standard_normal(4096)
 
-res = cepstrum(x, fs, kind="power")
+res = signals.cepstrum(x, fs, kind="power")
 print(res.quefrencies[:3], res.cepstrum.shape)   # eje de quefrencia, en s
 res.plot(language="es")
 ```
@@ -111,7 +111,7 @@ potencia, y la ondícula fuente se concentra por debajo de 2 ms.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import cepstrum
+from phonometry import signals
 
 fs = 48000.0
 # Una ondícula fuente de banda limitada más una reflexión en 8 ms (a = 0,5)
@@ -121,13 +121,13 @@ s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 x = s + 0.5 * np.roll(s, 384)
 
 # Una línea por variante: cada CepstrumResult se dibuja solo:
-cepstrum(x, fs, kind="power").plot(language="es")
+signals.cepstrum(x, fs, kind="power").plot(language="es")
 plt.show()
 
 # Las tres variantes superpuestas a mano en un mismo eje de quefrencia:
 fig, ax = plt.subplots()
 for kind, style in (("power", "-"), ("real", "--"), ("complex", ":")):
-    res = cepstrum(x, fs, kind=kind)
+    res = signals.cepstrum(x, fs, kind=kind)
     q_ms = 1e3 * res.quefrencies
     mask = (q_ms > 0.5) & (q_ms <= 20.0)
     ax.plot(q_ms[mask], res.cepstrum[mask], style, label=f"cepstrum {kind}")
@@ -181,14 +181,14 @@ muestras).
 
 ```python
 import numpy as np
-from phonometry import echo_detection
+from phonometry import signals
 
 fs = 48000.0
 rng = np.random.default_rng(2)
 s = rng.standard_normal(12000)               # fuente de banda ancha
 x = s + 0.5 * np.roll(s, 384)                # eco: 8 ms, a = 0.5
 
-res = echo_detection(x, fs, min_quefrency=0.002)
+res = signals.echo_detection(x, fs, min_quefrency=0.002)
 print(res.delay, res.reflection_coefficient)  # 0.008 s, ~0.5
 res.plot(language="es")
 ```
@@ -211,7 +211,7 @@ búsqueda empieza por encima de ella.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import echo_detection, noise_signal
+from phonometry import signals
 
 fs = 48000.0
 n = 12000
@@ -220,9 +220,9 @@ impulse[0] = 1.0
 b, a = sp_signal.butter(2, [0.004, 0.9], btype="bandpass")
 direct = sp_signal.lfilter(b, a, impulse)              # clic de banda ancha
 ir = direct + 0.5 * np.roll(direct, int(0.008 * fs))   # eco a 8 ms
-ir += noise_signal(fs, n / fs, color="white", rms=1e-4, seed=13)
+ir += signals.noise_signal(fs, n / fs, color="white", rms=1e-4, seed=13)
 
-res = echo_detection(ir, fs, min_quefrency=0.002)
+res = signals.echo_detection(ir, fs, min_quefrency=0.002)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 half = res.nfft // 2 + 1
@@ -309,15 +309,15 @@ lineal en el dominio logarítmico:
 
 ```python
 import numpy as np
-from phonometry import lifter
+from phonometry import signals
 
 fs = 48000.0
 rng = np.random.default_rng(3)
 s = rng.standard_normal(12000)
 x = s + 0.5 * np.roll(s, 384)                # el mismo eco de 8 ms
 
-low = lifter(x, fs, cutoff=0.004, mode="lowpass")    # envolvente de ln|X|
-high = lifter(x, fs, cutoff=0.004, mode="highpass")  # el rizado del eco
+low = signals.lifter(x, fs, cutoff=0.004, mode="lowpass")    # envolvente de ln|X|
+high = signals.lifter(x, fs, cutoff=0.004, mode="highpass")  # el rizado del eco
 print(np.allclose(low.liftered_db + high.liftered_db, low.spectrum_db))
 low.plot(language="es")
 ```
@@ -336,7 +336,7 @@ $20\log_{10}(1 \pm a) = +3{,}5$ y $-6{,}0$ dB.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import lifter
+from phonometry import signals
 
 fs = 48000.0
 # Una ondícula de banda limitada con un eco puro de 8 ms (a = 0,5), de modo
@@ -346,8 +346,8 @@ s = np.zeros(4096)
 s[37:37 + 256] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 x = s + 0.5 * np.roll(s, 384)
 
-low = lifter(x, fs, cutoff=0.004, mode="lowpass")
-high = lifter(x, fs, cutoff=0.004, mode="highpass")
+low = signals.lifter(x, fs, cutoff=0.004, mode="lowpass")
+high = signals.lifter(x, fs, cutoff=0.004, mode="highpass")
 
 # Una línea: el cepstrum con el corte y los dos espectros logarítmicos:
 low.plot(language="es")
@@ -390,14 +390,14 @@ que la transformada directa elimina y guarda en `linear_phase_samples`:
 ```python
 import numpy as np
 from scipy import signal as sp_signal
-from phonometry import cepstrum
+from phonometry import signals
 
 fs = 48000.0
 x = np.zeros(2048)
 b, a = sp_signal.butter(2, 0.3)
 x[37:293] = sp_signal.lfilter(b, a, np.r_[1.0, np.zeros(255)])
 
-res = cepstrum(x, fs, kind="complex")
+res = signals.cepstrum(x, fs, kind="complex")
 print(res.linear_phase_samples)              # negativo: retardo eliminado
 print(np.max(np.abs(res.invert() - x)))      # ~1e-14
 res.plot(language="es")   # el cepstrum complejo frente a la quefrencia
@@ -466,13 +466,13 @@ en un bin de análisis las formas cerradas son:
 
 ```python
 import numpy as np
-from phonometry import envelope_spectrum
+from phonometry import signals
 
 fs = 8192.0
 t = np.arange(int(4 * fs)) / fs
 x = (1.0 + 0.4 * np.cos(2 * np.pi * 25.0 * t)) * np.cos(2 * np.pi * 1000.0 * t)
 
-res = envelope_spectrum(x, fs)
+res = signals.envelope_spectrum(x, fs)
 k = int(round(25.0 * res.nfft / fs))
 print(res.mean_level, res.amplitude[k])      # ~1.0 y ~0.4
 res.plot(language="es")
@@ -495,15 +495,15 @@ que el espectro de la propia portadora esconde.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import envelope_spectrum, noise_signal
+from phonometry import signals
 
 fs = 8192.0
 seconds = 4.0
 t = np.arange(int(seconds * fs)) / fs
 x = (1.0 + 0.4 * np.cos(2 * np.pi * 25.0 * t)) * np.cos(2 * np.pi * 1000.0 * t)
-x += noise_signal(fs, seconds, color="white", rms=0.03, seed=8)
+x += signals.noise_signal(fs, seconds, color="white", rms=0.03, seed=8)
 
-res = envelope_spectrum(x, fs)
+res = signals.envelope_spectrum(x, fs)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(res.frequencies, res.amplitude, lw=1.4,
@@ -567,8 +567,8 @@ t_s = np.arange(int(4 * fs)) / fs
 ring = np.sin(2 * np.pi * 3000.0 * t_s) * np.exp(-(t_s % (1 / 120.0)) / 0.001)
 raw = ring + 3.0 * np.sin(2 * np.pi * 50.0 * t_s)
 
-wide = envelope_spectrum(raw, fs)
-narrow = envelope_spectrum(raw, fs, band=(2000.0, 4000.0))
+wide = signals.envelope_spectrum(raw, fs)
+narrow = signals.envelope_spectrum(raw, fs, band=(2000.0, 4000.0))
 k120 = int(round(120.0 * wide.nfft / fs))
 print(round(wide.amplitude[k120], 4),        # 0,0093: enterrada
       round(narrow.amplitude[k120], 4))      # 0,1964: 26 dB mejor

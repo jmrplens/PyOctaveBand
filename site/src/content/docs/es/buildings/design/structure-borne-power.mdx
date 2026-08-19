@@ -481,11 +481,11 @@ alimentar la EN 12354-5.
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, reception_plate_power
+from phonometry import ReportMetadata, building
 
 freqs = np.array([125, 250, 500, 1000, 2000, 4000], float)
 lv = np.array([70.0, 72, 68, 64, 60, 55])   # nivel de velocidad medio de la placa [dB]
-res = reception_plate_power(               # la placa de baja movilidad del ap. 7.2.2
+res = building.reception_plate_power(               # la placa de baja movilidad del ap. 7.2.2
     lv, freqs, mass_per_area=230.0, area=7.0, reverberation_time=0.25,
 )
 

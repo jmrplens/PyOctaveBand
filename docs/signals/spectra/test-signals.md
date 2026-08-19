@@ -27,14 +27,14 @@ single burst or as the repetitive train of Clause A2.2 in which each burst
 occupies one full repetition period:
 
 ```python
-from phonometry import tone_burst
+from phonometry import signals
 
 # One 5 ms burst of 5 kHz tone (25 full periods), as in Table AII.
-single = tone_burst(48000, 5000, 25)
+single = signals.tone_burst(48000, 5000, 25)
 print(single.burst_samples)         # 240 samples = 5 ms at 48 kHz
 
 # Clause A2.2: 5 ms bursts at 10 bursts per second.
-train = tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
+train = signals.tone_burst(48000, 5000, 25, repetitions=4, repetition_rate=10)
 print(train.period_samples, train.duty_cycle)   # 4800, 0.05
 train.plot()                        # waveform with the gating envelope
 ```
@@ -54,11 +54,11 @@ the generator is verified.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import tone_burst
+from phonometry import signals
 
 fs = 48000.0
-single = tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
-train = tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
+single = signals.tone_burst(fs, 5000, 25, pre_silence=0.001, post_silence=0.001)
+train = signals.tone_burst(fs, 5000, 25, repetitions=4, repetition_rate=10)
 
 fig, axes = plt.subplots(2, 1, figsize=(10, 6.4))
 t_ms = 1e3 * np.arange(single.signal.size) / single.fs
@@ -105,10 +105,10 @@ numbers the caller controls:
   bound $\delta = 10^{-A/20}$.
 
 ```python
-from phonometry import noise_signal, resample_signal
+from phonometry import signals
 
-x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, fs_new=48000)   # 120 dB alias rejection
+x = signals.noise_signal(44100, 5.0, color="pink", seed=1)
+res = signals.resample_signal(x, 44100, fs_new=48000)   # 120 dB alias rejection
 print(res.up, res.down)                  # 160, 147
 print(res.n_taps, res.passband_edge_hz)  # designed FIR, 20947.5 Hz
 res.plot()   # the delivered anti-alias filter against its design spec
@@ -128,10 +128,10 @@ it, flat within the same ripple bound.*
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from phonometry import noise_signal, resample_signal
+from phonometry import signals
 
-x = noise_signal(44100, 5.0, color="pink", seed=1)
-res = resample_signal(x, 44100, fs_new=48000)   # 120 dB alias rejection
+x = signals.noise_signal(44100, 5.0, color="pink", seed=1)
+res = signals.resample_signal(x, 44100, fs_new=48000)   # 120 dB alias rejection
 
 # res is the ResampledSignalResult computed in the example above.
 # One line — the delivered anti-alias filter against its design spec:
@@ -194,10 +194,10 @@ boundary conventions cover the two use cases:
 
 ```python
 import numpy as np
-from phonometry import fractional_delay
+from phonometry import signals
 
-y = fractional_delay(x, 0.37)                    # 0.37 samples later
-z = fractional_delay(x, -2.5, mode="circular")   # advance, wrapped
+y = signals.fractional_delay(x, 0.37)                    # 0.37 samples later
+z = signals.fractional_delay(x, -2.5, mode="circular")   # advance, wrapped
 ```
 
 One subtlety worth knowing: a real record of even length cannot carry a

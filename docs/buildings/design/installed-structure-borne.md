@@ -221,7 +221,7 @@ optional `phonometry[report]` extra (reportlab), plus matplotlib for the plot.
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, installed_source_prediction
+from phonometry import ReportMetadata, building
 
 bands = np.array([63, 125, 250, 500, 1000, 2000], float)
 lwc = np.array([84.4, 82.5, 69.9, 67.6, 61.6, 49.9])   # characteristic power [dB]
@@ -234,7 +234,7 @@ paths = [
      "flanking_reduction_index": np.array([37.0, 41.2, 35.9, 37.7, 49, 57.8]),
      "element_area": 12.8},
 ]
-res = installed_source_prediction(lwc, 16.2, paths, frequencies=bands)
+res = building.installed_source_prediction(lwc, 16.2, paths, frequencies=bands)
 res.report(
     "installed_structure_borne.pdf",
     metadata=ReportMetadata(

@@ -45,11 +45,7 @@ treinta y dos, y solo por dónde cae el nodo.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import (
-    comb_filter_response,
-    noise_signal,
-    time_synchronous_average,
-)
+from phonometry import signals
 
 fs = 8192.0
 period = 1.0 / 32.0        # una revolución: 256 muestras a esta frecuencia
@@ -60,8 +56,8 @@ periodic = (
     + 0.5 * np.cos(2.0 * np.pi * 3.0 * phase + 0.4)
     - 0.3 * np.cos(2.0 * np.pi * 6.0 * phase)
 )
-recording = periodic + noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
-res = time_synchronous_average(recording, fs, period=period, n_averages=n_avg)
+recording = periodic + signals.noise_signal(fs, phase.size / fs, rms=0.9, seed=11)
+res = signals.time_synchronous_average(recording, fs, period=period, n_averages=n_avg)
 
 fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(11, 4.6))
 t_ms = 1e3 * res.times
@@ -73,9 +69,9 @@ ax0.set_xlabel("Tiempo [ms]"); ax0.set_ylabel("Amplitud"); ax0.legend()
 
 orders = np.linspace(31.0, 33.0, 4000)
 freqs = orders / period
-ax1.plot(orders, comb_filter_response(freqs, period, 32), color="#2ca02c",
+ax1.plot(orders, signals.comb_filter_response(freqs, period, 32), color="#2ca02c",
          label="N = 32 (potencia de dos)")
-ax1.plot(orders, comb_filter_response(freqs, period, 20), color="#1f77b4",
+ax1.plot(orders, signals.comb_filter_response(freqs, period, 20), color="#1f77b4",
          label="N = 20 (nodo en 32,05)")
 ax1.axvline(32.05, color="#d62728", ls=":", label="Tono interferente")
 ax1.set_xlabel("Frecuencia [órdenes]"); ax1.set_ylabel("Magnitud del filtro peine")
@@ -123,12 +119,12 @@ directamente:
 
 ```python
 import numpy as np
-from phonometry import comb_filter_response
+from phonometry import signals
 
 period = 1.0 / 32.0
-comb_filter_response(np.array([16.0 / period]), period, 8)   # 1.0 en un diente
-comb_filter_response(np.array([0.25 / period]), period, 2)   # 1/sqrt(2)
-comb_filter_response(np.array([0.5 / period]), period, 2)    # 0.0 en un nodo
+signals.comb_filter_response(np.array([16.0 / period]), period, 8)   # 1.0 en un diente
+signals.comb_filter_response(np.array([0.25 / period]), period, 2)   # 1/sqrt(2)
+signals.comb_filter_response(np.array([0.5 / period]), period, 2)    # 0.0 en un nodo
 ```
 
 `SynchronousAverageResult` lleva la respuesta sobre los primeros armónicos en
@@ -145,7 +141,7 @@ es una reducción de potencia de $10\log_{10} N$ dB, declarada como
 `amplitude_snr_gain`:
 
 ```python
-res = time_synchronous_average(recording, fs, period=period, n_averages=100)
+res = signals.time_synchronous_average(recording, fs, period=period, n_averages=100)
 res.noise_reduction_db      # 20.0 dB = 10*log10(100)
 res.amplitude_snr_gain      # 10.0   = sqrt(100)
 res.plot(language="es")     # forma de onda promediada + el peine aplicado
@@ -164,7 +160,7 @@ número de periodos promediados crece de 1 a 128.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import time_synchronous_average
+from phonometry import signals
 
 fs = 8192.0
 samples = 256
@@ -179,8 +175,8 @@ recording = np.tile(true, 128) + rng.standard_normal(128 * samples)
 counts = [1, 2, 4, 8, 16, 32, 64, 128]
 errors = []
 for n in counts:
-    res = time_synchronous_average(recording[:n * samples], fs, period=period,
-                                   n_averages=n)
+    res = signals.time_synchronous_average(recording[:n * samples], fs, period=period,
+                                           n_averages=n)
     errors.append(np.sqrt(np.mean((res.period_waveform - true) ** 2)))
 
 # Una línea: la forma de onda promediada y el peine que aplicó:
@@ -230,8 +226,8 @@ promedio de extremo a extremo lo confirma:
 phase = np.arange(41 * 256) / 256
 recording = np.cos(2 * np.pi * 8.0 * phase) + 0.7 * np.cos(2 * np.pi * 32.05 * phase)
 
-leak_20 = time_synchronous_average(recording, fs, period=period, n_averages=20)
-leak_32 = time_synchronous_average(recording, fs, period=period, n_averages=32)
+leak_20 = signals.time_synchronous_average(recording, fs, period=period, n_averages=20)
+leak_32 = signals.time_synchronous_average(recording, fs, period=period, n_averages=32)
 # leak_20.period_waveform coincide con el 8.º orden limpio; leak_32 no
 ```
 
@@ -323,7 +319,7 @@ fs = 8192.0
 period = 1.0 / 31.7                       # fs * period no es entero
 t = np.arange(int(40 * period * fs)) / fs
 recording = np.cos(2.0 * np.pi * t / period)  # un ciclo por revolución
-res = time_synchronous_average(recording, fs, period=period)
+res = signals.time_synchronous_average(recording, fs, period=period)
 res.interpolated                          # True: alineación por retardo fraccionario
 res.samples_per_period                    # muestras enteras de un periodo
 ```

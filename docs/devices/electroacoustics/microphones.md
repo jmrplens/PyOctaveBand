@@ -114,10 +114,7 @@ standard's own definitions rather than merely repeated:
 
 ```python
 import numpy as np
-from phonometry import (
-    MicrophoneDirectivity, MicrophoneElectrical, MicrophoneNoise,
-    MicrophoneOverload, ReportMetadata, microphone_characteristics,
-)
+from phonometry import ReportMetadata, electroacoustics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # low-frequency roll-off
@@ -128,19 +125,19 @@ angles = np.linspace(0, 179, 359)
 cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
 noise_f = np.geomspace(20, 20000, 31)
 
-result = microphone_characteristics(
+result = electroacoustics.microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,          # 12.5 mV/Pa at 1 kHz
-    directivity=MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
-    noise=MicrophoneNoise(                             # A-weighted, V
+    directivity=electroacoustics.MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
+    noise=electroacoustics.MicrophoneNoise(                             # A-weighted, V
         voltage=1.25e-6,
         spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
     ),
-    overload=MicrophoneOverload(
+    overload=electroacoustics.MicrophoneOverload(
         distortion=(np.linspace(100, 140, 81),
                     0.5 * 10 ** ((np.linspace(100, 140, 81) - 130.0) * 0.08)),
         thd_percent=0.5,
     ),
-    electrical=MicrophoneElectrical(
+    electrical=electroacoustics.MicrophoneElectrical(
         rated_impedance=150.0, minimum_load_impedance=1000.0,
         powering="Phantom P48 (IEC 61938)", supply_current_ma=3.1,
     ),
@@ -189,14 +186,14 @@ result.plot(quantity="distortion")   # THD vs sound pressure level
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import microphone_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)      # low-frequency roll-off
 response -= 10 * np.log10(1 + (freqs / 19000.0) ** 8)   # high-frequency roll-off
 response += 2.0 * np.exp(-(np.log2(freqs / 9000.0) ** 2) / 0.3)  # presence region
 
-result = microphone_characteristics(freqs, response, 12.5, tolerance_db=3.0)
+result = electroacoustics.microphone_characteristics(freqs, response, 12.5, tolerance_db=3.0)
 result.plot()   # quantity="response" (the default)
 plt.show()
 ```
@@ -211,16 +208,16 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import MicrophoneDirectivity, microphone_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
 angles = np.linspace(0, 179, 359)
 cardioid = 20 * np.log10((1 + np.cos(np.radians(angles))) / 2)
 
-result = microphone_characteristics(
+result = electroacoustics.microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,
-    directivity=MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
+    directivity=electroacoustics.MicrophoneDirectivity(polar=(angles, cardioid), frequency=1000.0),
 )
 result.plot(quantity="directivity")
 plt.show()
@@ -236,15 +233,15 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import MicrophoneNoise, microphone_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
 noise_f = np.geomspace(20, 20000, 31)
 
-result = microphone_characteristics(
+result = electroacoustics.microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,
-    noise=MicrophoneNoise(
+    noise=electroacoustics.MicrophoneNoise(
         voltage=1.25e-6,
         spectrum=(noise_f, 6.0 + 12.0 * np.log10(1000.0 / noise_f)),
     ),
@@ -263,15 +260,15 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import MicrophoneOverload, microphone_characteristics
+from phonometry import electroacoustics
 
 freqs = np.geomspace(20, 20000, 400)
 response = -10 * np.log10(1 + (30.0 / freqs) ** 4)
 spl_axis = np.linspace(100, 140, 81)
 
-result = microphone_characteristics(
+result = electroacoustics.microphone_characteristics(
     freqs, response, 12.5, tolerance_db=3.0,
-    overload=MicrophoneOverload(
+    overload=electroacoustics.MicrophoneOverload(
         distortion=(spl_axis, 0.5 * 10 ** ((spl_axis - 130.0) * 0.08)),
         thd_percent=0.5,
     ),

@@ -111,10 +111,10 @@ and transparent. The four-pole product reproduces this exactly.
 
 ```python
 import numpy as np
-from phonometry import expansion_chamber
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
-res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
 print(round(res.transmission_loss.max(), 2))   # 6.55 dB peak (m = 4)
 # The troughs at f = n c / 2L are exactly 0 dB (no dissipation).
 print(round(float(res.transmission_loss[np.argmin(res.transmission_loss)]), 6))
@@ -141,7 +141,7 @@ is lengthened to move the notch and widened to deepen the peak.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import expansion_chamber
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
 
@@ -149,14 +149,14 @@ freqs = np.linspace(20.0, 2000.0, 2000)
 # two acoustic impedances are given (Pa.s/m3 -- see the next subsection for
 # where they come from). With both set to rho c / S = 4.14e4 for this 0.01 m2
 # pipe the two curves coincide, which is what "anechoic ports" means.
-expansion_chamber(freqs, 0.3, 0.04, 0.01,
-                  source_impedance=4.14e4, radiation_impedance=4.14e4).plot()
+noise_control.expansion_chamber(freqs, 0.3, 0.04, 0.01,
+                                source_impedance=4.14e4, radiation_impedance=4.14e4).plot()
 plt.show()
 
 # By hand: the family of area ratios of the concept figure.
 fig, ax = plt.subplots()
 for m in (2.0, 4.0, 8.0, 16.0):
-    res = expansion_chamber(freqs, 0.3, m * 0.01, 0.01)
+    res = noise_control.expansion_chamber(freqs, 0.3, m * 0.01, 0.01)
     ax.plot(freqs, res.transmission_loss, label=f"m = {int(m)}")
 ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Transmission loss [dB]")
 ax.legend()
@@ -181,18 +181,18 @@ circular diameters $d = 2\sqrt{S/\pi}$ of the 0.04 and 0.01 m² cross-sections.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import expansion_chamber, plot_silencer_geometry
+from phonometry import noise_control
 
 freqs = np.linspace(20.0, 2000.0, 2000)
-res = expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.3, chamber_area=0.04, pipe_area=0.01)
 
 # One line: the dimensioned cross-section of the chamber just computed.
 res.plot_geometry()
 plt.show()
 
 # The same drawing without a result, from the free function:
-plot_silencer_geometry("expansion chamber", length=0.3,
-                       chamber_area=0.04, pipe_area=0.01)
+noise_control.plot_silencer_geometry("expansion chamber", length=0.3,
+                                     chamber_area=0.04, pipe_area=0.01)
 plt.show()
 ```
 
@@ -262,17 +262,17 @@ z_r = z0 * ((1.0 - 2.0 * special.j1(x) / x)
 
 # One line: the result draws the insertion loss beside the transmission loss
 # whenever both impedances are given.
-expansion_chamber(freqs, 0.3, 0.04, pipe_area,
-                  source_impedance=z0, radiation_impedance=z_r).plot()
+noise_control.expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                                source_impedance=z0, radiation_impedance=z_r).plot()
 plt.show()
 
 # By hand: the two source impedances of the figure against the same outlet.
 fig, ax = plt.subplots()
-ax.plot(freqs, expansion_chamber(freqs, 0.3, 0.04, pipe_area).transmission_loss,
+ax.plot(freqs, noise_control.expansion_chamber(freqs, 0.3, 0.04, pipe_area).transmission_loss,
         label="Transmission loss")
 for factor, label in ((20.0, "stiff source"), (1.0, "matched source")):
-    res = expansion_chamber(freqs, 0.3, 0.04, pipe_area,
-                            source_impedance=factor * z0, radiation_impedance=z_r)
+    res = noise_control.expansion_chamber(freqs, 0.3, 0.04, pipe_area,
+                                          source_impedance=factor * z0, radiation_impedance=z_r)
     ax.plot(freqs, res.insertion_loss, label=f"Insertion loss, {label}")
 ax.set_xlabel("Frequency [Hz]"); ax.set_ylabel("Attenuation [dB]")
 ax.legend()
@@ -328,37 +328,35 @@ trim it against a measurement.
 
 ```python
 import numpy as np
-from phonometry import (
-    helmholtz_resonator, quarter_wave_resonator, extended_tube_chamber,
-)
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
 
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
 print(round(float(hr.resonances[0]), 1))       # 122.1 Hz, for le = 20 mm
 hr.plot()   # TL spike at the tuning frequency (needs matplotlib)
 
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 print(round(float(qw.resonances[0]), 1))       # 285.8 Hz = c / 4 le
 
 # Bies Example 8.1, the published anchor: a 1.516 m stub at c = 343.24 m/s.
-print(round(float(quarter_wave_resonator(
+print(round(float(noise_control.quarter_wave_resonator(
     f, duct_area=0.01, length=1.516, branch_area=2e-3,
     speed_of_sound=343.24).resonances[0]), 1))  # 56.6 Hz
 
 # The same stub in hot exhaust gas: c(500 degC) = 343*sqrt(773/293) = 557 m/s
 # (see the caution below), which moves the notch by a factor 1.62.
 f_hot = np.linspace(20.0, 900.0, 6000)
-qw_hot = quarter_wave_resonator(f_hot, duct_area=0.01, length=0.3,
-                                branch_area=2e-3, speed_of_sound=557.0)
+qw_hot = noise_control.quarter_wave_resonator(f_hot, duct_area=0.01, length=0.3,
+                                              branch_area=2e-3, speed_of_sound=557.0)
 print(round(float(qw_hot.resonances[0]), 1))   # 464.2 Hz, not 285.8
 
 # Each extension is a quarter-wave stub, so its own length picks the trough
 # it fills: L/4 = 0.1 m shorts the duct at c/4(L/4) = c/L, the chamber's
 # second trough, and L/2 = 0.2 m would take the first one at c/2L.
-et = extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
-                           inlet_extension=0.1)
+et = noise_control.extended_tube_chamber(f, length=0.4, chamber_area=0.04, pipe_area=0.01,
+                                         inlet_extension=0.1)
 print(round(float(et.transmission_loss[np.argmin(abs(f - 428.75))]), 1))
 # 0.6 dB at c/2L: the L/4 stub is tuned an octave above it
 ```
@@ -390,10 +388,10 @@ general.*
 import matplotlib.pyplot as plt
 
 # `f`, and extended_tube_chamber / expansion_chamber, as in section 1.
-plain = expansion_chamber(f, 0.4, 0.04, 0.01)
-inlet = extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1)
-both = extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
-                             outlet_extension=0.2)
+plain = noise_control.expansion_chamber(f, 0.4, 0.04, 0.01)
+inlet = noise_control.extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1)
+both = noise_control.extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
+                                           outlet_extension=0.2)
 
 # One line for one device:
 inlet.plot()
@@ -427,8 +425,8 @@ are the annular spaces the extensions create.*
 import matplotlib.pyplot as plt
 
 # One line: the dimensioned cross-section of the device just computed.
-extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
-                      outlet_extension=0.2).plot_geometry()
+noise_control.extended_tube_chamber(f, 0.4, 0.04, 0.01, inlet_extension=0.1,
+                                    outlet_extension=0.2).plot_geometry()
 plt.show()
 ```
 
@@ -460,12 +458,12 @@ damped design is usually the safer one.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import helmholtz_resonator, quarter_wave_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 
 # One line for one device: TL vs frequency with the resonance marked.
 hr.plot()
@@ -529,11 +527,11 @@ its target.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import helmholtz_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-hr = helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
-                         neck_length=0.02, cavity_volume=1e-3)
+hr = noise_control.helmholtz_resonator(f, duct_area=0.01, neck_area=1e-4,
+                                       neck_length=0.02, cavity_volume=1e-3)
 
 # One line: the side branch drawn to scale, cavity as its equal-volume cube.
 hr.plot_geometry()
@@ -576,10 +574,10 @@ cold extremes and accepted with margin rather than designed at one value.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import quarter_wave_resonator
+from phonometry import noise_control
 
 f = np.linspace(20.0, 600.0, 4000)
-qw = quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
+qw = noise_control.quarter_wave_resonator(f, duct_area=0.01, length=0.3, branch_area=2e-3)
 
 # One line: the closed 0.3 m tube on its duct, to scale.
 qw.plot_geometry()
@@ -636,11 +634,11 @@ figure, matplotlib (`pip install "phonometry[report,plot]"`); pass
 
 ```python
 import numpy as np
-from phonometry import ReportMetadata, expansion_chamber
+from phonometry import ReportMetadata, noise_control
 
 # A 0.5 m chamber of area ratio m = 8, at the octave-band centres.
 freqs = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0])
-res = expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
+res = noise_control.expansion_chamber(freqs, length=0.5, chamber_area=0.08, pipe_area=0.01)
 res.report(
     "silencer_fiche.pdf",
     metadata=ReportMetadata(
@@ -700,7 +698,7 @@ all, because an impedance is not a shape.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import SilencerChain
+from phonometry import noise_control
 from phonometry.noise_control import helmholtz_impedance, quarter_wave_impedance
 
 freqs = np.linspace(20.0, 500.0, 481)
@@ -709,7 +707,7 @@ s_shell = np.pi * 0.200**2              # nominal 400 mm shell
 
 # The elements in order, inlet to outlet; each call keeps what it was given.
 chain = (
-    SilencerChain(freqs)
+    noise_control.SilencerChain(freqs)
     .duct(0.10, s_duct)
     .shunt(quarter_wave_impedance(freqs, 343.0 / (4.0 * 125.0), np.pi * 0.050**2),
            label="Quarter-wave stub")
@@ -787,7 +785,7 @@ blue curves stop at 891 Hz because that is where their model does.*
 import matplotlib.pyplot as plt
 
 # The reactive side, drawn only as far as its own validity ceiling.
-chamber = expansion_chamber(f, 0.3, 0.04, 0.01)
+chamber = noise_control.expansion_chamber(f, 0.3, 0.04, 0.01)
 inside = f <= chamber.plane_wave_limit
 
 fig, ax = plt.subplots()

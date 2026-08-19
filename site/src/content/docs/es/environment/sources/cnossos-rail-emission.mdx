@@ -172,29 +172,23 @@ la fuente B empieza a importar.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    BrakeType, ContactFilter, RailRoughnessClass, RailwayTrack, RailwayVehicle,
-    RollingStock, TrackTransferClass, TractionVehicle, WheelDiameter,
-    aerodynamic_sound_power, contact_filter, impact_roughness_single,
-    rail_roughness, railway_source_power, track_transfer, traction_sound_power,
-    wheel_roughness, wheel_transfer,
-)
+from phonometry import environment
 
-stock = RollingStock(
+stock = environment.RollingStock(
     axles=4,
-    wheel_roughness=wheel_roughness(BrakeType.NON_TREAD),
-    contact_filter=contact_filter(ContactFilter.LOAD_50_DIAMETER_920),
-    wheel_transfer=wheel_transfer(WheelDiameter.MM_920),
-    traction=traction_sound_power(TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
-    aerodynamic=aerodynamic_sound_power(),
+    wheel_roughness=environment.wheel_roughness(environment.BrakeType.NON_TREAD),
+    contact_filter=environment.contact_filter(environment.ContactFilter.LOAD_50_DIAMETER_920),
+    wheel_transfer=environment.wheel_transfer(environment.WheelDiameter.MM_920),
+    traction=environment.traction_sound_power(environment.TractionVehicle.ELECTRIC_MULTIPLE_UNIT),
+    aerodynamic=environment.aerodynamic_sound_power(),
 )
-track = RailwayTrack(
-    rail_roughness=rail_roughness(RailRoughnessClass.NORMAL),
-    track_transfer=track_transfer(TrackTransferClass.MONOBLOCK_MEDIUM),
-    impact_roughness=impact_roughness_single(),
+track = environment.RailwayTrack(
+    rail_roughness=environment.rail_roughness(environment.RailRoughnessClass.NORMAL),
+    track_transfer=environment.track_transfer(environment.TrackTransferClass.MONOBLOCK_MEDIUM),
+    impact_roughness=environment.impact_roughness_single(),
 )
-result = railway_source_power(
-    RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
+result = environment.railway_source_power(
+    environment.RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0,
 )
 result.plot(language="es")
 plt.show()
@@ -228,8 +222,8 @@ def total(bands):
     return 10.0 * np.log10(np.sum(10.0 ** (np.asarray(bands) / 10.0)))
 
 fig, (izq, der) = plt.subplots(1, 2, figsize=(12, 4.6))
-result = railway_source_power(
-    RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0)
+result = environment.railway_source_power(
+    environment.RailwayVehicle(stock, flow_rate=96.0, speed=160.0), track, phi=90.0, psi=10.0)
 for name, spectrum in result.components.items():
     for row, height in ((0, "0,5 m"), (1, "4,0 m")):
         values = np.asarray(spectrum)[row]
@@ -242,8 +236,8 @@ izq.legend(fontsize="small")
 velocidades = np.linspace(60.0, 350.0, 30)
 for row, label in [(0, "Fuente A (0,5 m)"), (1, "Fuente B (4,0 m)")]:
     der.plot(velocidades, [
-        total(railway_source_power(
-            RailwayVehicle(stock, flow_rate=96.0, speed=float(v)),
+        total(environment.railway_source_power(
+            environment.RailwayVehicle(stock, flow_rate=96.0, speed=float(v)),
             track, phi=90.0, psi=10.0).line_power[row]) for v in velocidades],
         label=label)
 der.axvline(200.0, ls=":", label="Umbral aerodinámico")
@@ -317,24 +311,20 @@ rugosas.*
 
 ```python
 import matplotlib.pyplot as plt
-from phonometry import (
-    RAILWAY_THIRD_OCTAVE_BANDS, BrakeType, ContactFilter, RailRoughnessClass,
-    contact_filter, rail_roughness, roughness_to_frequency,
-    total_effective_roughness, wheel_roughness,
-)
+from phonometry import environment
 
-rail = rail_roughness(RailRoughnessClass.NORMAL)
-wheel = wheel_roughness(BrakeType.NON_TREAD)
-filt = contact_filter(ContactFilter.LOAD_50_DIAMETER_920)
+rail = environment.rail_roughness(environment.RailRoughnessClass.NORMAL)
+wheel = environment.wheel_roughness(environment.BrakeType.NON_TREAD)
+filt = environment.contact_filter(environment.ContactFilter.LOAD_50_DIAMETER_920)
 
 fig, ax = plt.subplots()
 for speed in (60.0, 160.0, 300.0):
-    total = total_effective_roughness(
-        roughness_to_frequency(rail[1], rail[0], speed),
-        roughness_to_frequency(wheel[1], wheel[0], speed),
-        roughness_to_frequency(filt[1], filt[0], speed),
+    total = environment.total_effective_roughness(
+        environment.roughness_to_frequency(rail[1], rail[0], speed),
+        environment.roughness_to_frequency(wheel[1], wheel[0], speed),
+        environment.roughness_to_frequency(filt[1], filt[0], speed),
     )
-    ax.semilogx(RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
+    ax.semilogx(environment.RAILWAY_THIRD_OCTAVE_BANDS, total, label=f"v = {speed:g} km/h")
 ax.legend()
 plt.show()
 ```
@@ -357,10 +347,10 @@ y la que va por defecto es la que reproduce el propio módulo de fuente de
 referencia de la Comisión:
 
 ```python
-from phonometry import RoughnessInterpolation
+from phonometry import environment
 
-RoughnessInterpolation.PROPORTIONAL   # niveles interpolados linealmente en lambda
-RoughnessInterpolation.ENERGY         # energías interpoladas linealmente en lambda
+environment.RoughnessInterpolation.PROPORTIONAL   # niveles interpolados linealmente en lambda
+environment.RoughnessInterpolation.ENERGY         # energías interpoladas linealmente en lambda
 ```
 
 Difieren hasta cerca de 1 dB en un tramo de pendiente pronunciada del espectro.
@@ -406,12 +396,12 @@ de 2021, no la de 2015:
 | Tranvía | curva o aguja con $R \le 200\ \text{m}$ | 5 dB |
 
 ```python
-from phonometry import curve_squeal_excess
+from phonometry import environment
 
-curve_squeal_excess(280.0)                       # 8.0 dB
-curve_squeal_excess(450.0)                       # 5.0 dB
-curve_squeal_excess(280.0, tram=True)            # 0.0 dB, los tranvías piden R <= 200 m
-curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, la curva es demasiado corta
+environment.curve_squeal_excess(280.0)                       # 8.0 dB
+environment.curve_squeal_excess(450.0)                       # 5.0 dB
+environment.curve_squeal_excess(280.0, tram=True)            # 0.0 dB, los tranvías piden R <= 200 m
+environment.curve_squeal_excess(280.0, track_length=20.0)    # 0.0 dB, la curva es demasiado corta
 ```
 
 El texto de 2015 decía «8 dB para R < 300 m y 5 dB para 300 m < R < 500 m», lo
@@ -474,10 +464,10 @@ Ambas están disponibles, porque comparar con un estudio calculado antes de 2021
 requiere la antigua:
 
 ```python
-from phonometry import DirectivityEdition, vertical_directivity
+from phonometry import environment
 
-vertical_directivity(-30.0)                                        # ceros
-vertical_directivity(-30.0, edition=DirectivityEdition.ORIGINAL_2015)  # positivo
+environment.vertical_directivity(-30.0)                                        # ceros
+environment.vertical_directivity(-30.0, edition=environment.DirectivityEdition.ORIGINAL_2015)  # positivo
 ```
 
 <ThemeImage src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/cnossos_rail_directivity_es.svg" alt="Dos diagramas polares de la directividad ferroviaria de CNOSSOS-EU. Izquierda, la corrección vertical de la fuente A a 250 Hz y 4 kHz para las dos ediciones: la forma de 2021 es idénticamente nula en todo el semiespacio por debajo del horizonte y por encima de unos 41,4 grados se vuelve negativa, mientras que la de 2015 es simétrica respecto al horizonte y positiva a ambos lados, coincidiendo las dos solo en la cuña de 0 a 41,4 grados. Derecha, el dipolo horizontal en el plano de la vía: 0 dB en la perpendicular a la vía y menos 20 dB a lo largo de ella, con el cero longitudinal marcado" width="92%" />
@@ -507,9 +497,9 @@ bands = {7: "250 Hz", 19: "4 kHz"}       # índices en los 24 tercios de octava
 fig, (izq, der) = plt.subplots(1, 2, subplot_kw={"projection": "polar"},
                                figsize=(12, 5.0))
 for band, name in bands.items():
-    for edition, style in [(DirectivityEdition.CURRENT, "-"),
-                           (DirectivityEdition.ORIGINAL_2015, "--")]:
-        values = [float(vertical_directivity(float(a), edition=edition)[band])
+    for edition, style in [(environment.DirectivityEdition.CURRENT, "-"),
+                           (environment.DirectivityEdition.ORIGINAL_2015, "--")]:
+        values = [float(environment.vertical_directivity(float(a), edition=edition)[band])
                   for a in psi]
         izq.plot(np.radians(psi), values, style,
                  label=f"{name}, {edition.value}")
@@ -561,11 +551,11 @@ interpolación, así que elegir entre las dos es un juicio sobre el tablero, hec
 antes del cálculo y registrado con él.
 
 ```python
-from phonometry import BridgeType, RailwayTrack, bridge_transfer
+from phonometry import environment
 
-RailwayTrack(
+environment.RailwayTrack(
     rail_roughness=..., track_transfer=...,
-    bridge_transfer=bridge_transfer(BridgeType.PLUS_10_DBA),   # Tabla G-7, col. 1
+    bridge_transfer=environment.bridge_transfer(environment.BridgeType.PLUS_10_DBA),   # Tabla G-7, col. 1
 )
 ```
 

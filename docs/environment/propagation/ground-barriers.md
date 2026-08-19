@@ -55,14 +55,14 @@ $$
 
 ```python
 import numpy as np
-from phonometry import ground_effect
+from phonometry import environment
 
 bands = np.array([63., 125., 250., 500., 1000., 2000., 4000., 8000.])
 
 # Grassland (effective flow resistivity sigma = 200 kPa.s/m^2), source 1 m and
 # receiver 1.5 m high, 50 m apart. The impedance comes from the Delany-Bazley
 # porous model of phonometry.materials (a semi-infinite ground).
-res = ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
+res = environment.ground_effect(bands, 1.0, 1.5, 50.0, flow_resistivity=2e5)
 print(res.excess_attenuation)     # the ground dip (dB re free field)
 print(res.reflection_coefficient) # complex Q per band
 res.plot()                        # excess attenuation vs frequency
@@ -88,7 +88,7 @@ it enters the Weyl-Van der Pol formulas.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import ground_effect
+from phonometry import environment
 
 freqs = np.geomspace(50.0, 4000.0, 400)
 grounds = [
@@ -99,7 +99,7 @@ grounds = [
 ]
 fig, ax = plt.subplots(figsize=(11, 6.4))
 for label, sigma, color in grounds:
-    res = ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
+    res = environment.ground_effect(freqs, 1.0, 1.5, 50.0, flow_resistivity=sigma)
     ax.plot(freqs, res.excess_attenuation, color=color, label=label)
 ax.axhline(6.0, color="k", ls=":", label="Hard-ground limit (+6 dB)")
 ax.axhline(0.0, color="k", lw=0.8)
@@ -165,13 +165,13 @@ the 4 m screen of the snippets, they differ by just 0.15 m.
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier_dark.svg"><img src="https://raw.githubusercontent.com/jmrplens/phonometry/main/.github/images/diagram_ground_barrier.svg" alt="Section of the barrier geometry: a loudspeaker source 1 m above the ground, a thin 4 m screen at 50 m and a microphone receiver 1.5 m high at 100 m, the blocked direct path of 100.00 m drawn dashed through the screen and the diffracted path bent over the edge in two segments A = 50.09 m and B = 50.06 m, with the resulting path difference of 0.15 m giving a Fresnel number of 0.44 and a Kurze-Anderson insertion loss of 10.0 dB at 500 Hz, rising to 15.5 dB at 2 kHz" width="92%"></picture>
 
 ```python
-from phonometry import barrier_insertion_loss, kurze_anderson_attenuation
+from phonometry import environment
 
-kurze_anderson_attenuation(0.0)     # 5.0 dB at the shadow boundary
+environment.kurze_anderson_attenuation(0.0)     # 5.0 dB at the shadow boundary
 
 # A 4 m barrier 50 m from a 1 m source, receiver 1.5 m high at 100 m.
-il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
-                            method="kurze_anderson")
+il = environment.barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                        method="kurze_anderson")
 il.plot()                           # insertion loss vs frequency
 ```
 
@@ -200,8 +200,8 @@ coefficient per image path; the model is coherent and reciprocal but not a full
 boundary-element solution.
 
 ```python
-il = barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
-                            method="exact", ground_flow_resistivity=2e5)
+il = environment.barrier_insertion_loss(bands, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                        method="exact", ground_flow_resistivity=2e5)
 il.ground        # True: the four-path coherent ground model was applied
 il.plot()
 ```
@@ -221,16 +221,16 @@ interfere destructively.
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import barrier_insertion_loss
+from phonometry import environment
 
 # The 4 m barrier of the snippets above, on a fine frequency grid.
 freqs = np.geomspace(50.0, 5000.0, 240)
-il_ka = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                               method="kurze_anderson")
-il_ex = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                               method="exact")
-il_gr = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
-                               method="exact", ground_flow_resistivity=2e5)
+il_ka = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                           method="kurze_anderson")
+il_ex = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                           method="exact")
+il_gr = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5,
+                                           method="exact", ground_flow_resistivity=2e5)
 fig, ax = plt.subplots(figsize=(11, 6.4))
 ax.semilogx(freqs, il_ka.insertion_loss, "--", label="Kurze-Anderson (thin screen)")
 ax.semilogx(freqs, il_ex.insertion_loss, label="Exact rigid half-plane")
@@ -262,10 +262,10 @@ thin-screen methods above key on.*
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from phonometry import barrier_insertion_loss
+from phonometry import environment
 
 freqs = np.geomspace(50.0, 5000.0, 240)
-il = barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
+il = environment.barrier_insertion_loss(freqs, 1.0, 50.0, 4.0, 100.0, 1.5)
 
 # One line: the section to scale, with the path-length difference annotated.
 il.plot_geometry()

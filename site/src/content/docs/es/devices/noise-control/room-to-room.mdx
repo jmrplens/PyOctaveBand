@@ -138,14 +138,12 @@ cámara de 50 mm, los tres hablando al mismo recinto receptor de
 
 ```python
 import numpy as np
-from phonometry import (
-    SourceRoom, equivalent_absorption_area, room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 
 # Recinto receptor 8 x 9 x 3 m: paredes 102 m2, suelo y techo 72 m2 cada uno.
-receiving = equivalent_absorption_area([
+receiving = room.equivalent_absorption_area([
     (102.0, [0.04, 0.04, 0.09, 0.15, 0.17, 0.23]),   # paredes
     (72.0,  [0.02, 0.06, 0.14, 0.37, 0.60, 0.66]),   # suelo
     (72.0,  [0.30, 0.20, 0.15, 0.05, 0.05, 0.05]),   # techo
@@ -159,9 +157,9 @@ partitions = {
     "Doble hoja de ladrillo, cámara de 50 mm":      [37, 41, 48, 60, 61, 61],
 }
 for name, tl in partitions.items():
-    res = room_to_room_transmission(
+    res = noise_control.room_to_room_transmission(
         bands, tl, 8.0 * 3.0, receiving,
-        source=SourceRoom(level=90.0), label=name,
+        source=noise_control.SourceRoom(level=90.0), label=name,
     )
     print(f"{name:44s} {np.round(res.noise_reduction, 1)}")
 # Dos placas de yeso de 13 mm, cámara de 64 mm  [18.5 26.8 38.  47.8 47.3 43.9]
@@ -199,17 +197,17 @@ import matplotlib.pyplot as plt
 
 # Una línea por muro: el RoomToRoomResult dibuja los dos espectros, la curva
 # de criterio y la reducción de ruido frente a la pérdida por transmisión.
-room_to_room_transmission(
+noise_control.room_to_room_transmission(
     bands, partitions["Ladrillo enfoscado de 125 mm"], 8.0 * 3.0, receiving,
-    source=SourceRoom(level=90.0),
+    source=noise_control.SourceRoom(level=90.0),
 ).plot(language="es")
 plt.show()
 
 # A mano: la separación que muestra cada muro, y el recinto que hay detrás.
 fig, (top, bottom) = plt.subplots(2, 1, sharex=True)
 for name, tl in partitions.items():
-    res = room_to_room_transmission(bands, tl, 8.0 * 3.0, receiving,
-                                    source=SourceRoom(level=90.0))
+    res = noise_control.room_to_room_transmission(bands, tl, 8.0 * 3.0, receiving,
+                                                  source=noise_control.SourceRoom(level=90.0))
     top.semilogx(bands, res.noise_reduction - np.asarray(tl, float),
                  "o-", label=name)
 top.axhline(0.0)
@@ -248,10 +246,7 @@ $10\log_{10} 4 = 6{,}02\ \text{dB}$, y sin él las respuestas impresas salen 6 d
 por debajo.
 
 ```python
-from phonometry import (
-    DesignCriterion, SourceRoom, equivalent_absorption_area, mean_absorption,
-    room_constant, room_to_room_transmission,
-)
+from phonometry import noise_control, room
 
 bands = [125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0]
 ceiling = [0.07, 0.20, 0.40, 0.52, 0.60, 0.67]      # techo absorbente
@@ -265,18 +260,18 @@ plant = [(80.0, [0.01, 0.01, 0.015, 0.02, 0.02, 0.02]),
 operator = [(25.0, [0.08, 0.24, 0.57, 0.69, 0.71, 0.73]),
             (25.0, ceiling), (60.0, walls)]
 
-chain = room_to_room_transmission(
+chain = noise_control.room_to_room_transmission(
     bands,
     [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],       # TL del muro separador
     5.0 * 3.0,                                  # el muro mide 5 m x 3 m
-    equivalent_absorption_area(operator),
-    source=SourceRoom(
+    room.equivalent_absorption_area(operator),
+    source=noise_control.SourceRoom(
         power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-        room_constant=room_constant(268.0, mean_absorption(plant)),
+        room_constant=room.room_constant(268.0, room.mean_absorption(plant)),
         directivity=4.0,                        # intersección suelo-pared
         model="constant_volume",                # la cota conservadora
     ),
-    criterion=DesignCriterion(target=45.0),
+    criterion=noise_control.DesignCriterion(target=45.0),
     label="Plant room to operator room",
 )
 
@@ -410,7 +405,7 @@ los paneles, $\text{TL} = \text{IL} + 10\log_{10}(S_\mathrm{E} / R_\mathrm{i})$,
 
 ```python
 import numpy as np
-from phonometry import enclosure_required_transmission_loss, mean_absorption
+from phonometry import noise_control, room
 
 bands = [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 wool = [0.10, 0.20, 0.45, 0.65, 0.75, 0.80, 0.80, 0.80]   # manta de 50 mm
@@ -427,11 +422,11 @@ radiating = 2 * (2.5 * 2.5) + 2 * (3.5 * 2.5) + 2.5 * 3.5
 machine = 2 * (1.5 * 1.5) + 2 * (2.5 * 1.5) + 1.5 * 2.5
 bare_floor = 2.5 * 3.5 - 1.5 * 2.5
 
-required = enclosure_required_transmission_loss(
+required = noise_control.enclosure_required_transmission_loss(
     lp1 - nc45,
     radiating,
     radiating + bare_floor + machine,
-    mean_absorption([(radiating, wool), (bare_floor + machine, concrete)]),
+    room.mean_absorption([(radiating, wool), (bare_floor + machine, concrete)]),
     frequencies=bands,
     model="norton",
 )
@@ -556,11 +551,11 @@ necesaria en lugar de perderse:
 
 ```python
 # Otra vez la cadena del apartado 3, con 3 dB de provisión por flancos y fugas.
-honest = room_to_room_transmission(
+honest = noise_control.room_to_room_transmission(
     bands, [39.0, 42.0, 50.0, 58.0, 63.0, 67.0], 15.0,
-    equivalent_absorption_area(operator),
-    source=SourceRoom(level=chain.source_level),
-    criterion=DesignCriterion(target=45.0, flanking_penalty=3.0),
+    room.equivalent_absorption_area(operator),
+    source=noise_control.SourceRoom(level=chain.source_level),
+    criterion=noise_control.DesignCriterion(target=45.0, flanking_penalty=3.0),
 )
 print(np.round(honest.received_level, 1))
 # [75.4 63.4 44.4 44.  36.9 33.7]      cada banda 3 dB peor

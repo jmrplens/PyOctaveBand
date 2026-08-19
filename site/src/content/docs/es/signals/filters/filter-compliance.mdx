@@ -397,14 +397,10 @@ traducidas y coma como separador decimal), p. ej.
 `result.report("iec61260_es.pdf", language="es")`.
 
 ```python
-from phonometry import (
-    OctaveFilterBank,
-    ReportMetadata,
-    filter_class_compliance,
-)
+from phonometry import ReportMetadata, filters
 
-bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
-result = filter_class_compliance(bank)   # overall_class == 1
+bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
+result = filters.filter_class_compliance(bank)   # overall_class == 1
 result.plot(language="es")   # la banda de peor margen sobre su corredor de clase
 
 result.report(
@@ -432,8 +428,8 @@ ANSI S1.11-2004, que conserva la **clase 0** más estricta que la edición de 20
 eliminó, de modo que un banco de orden 6 puede certificarse a clase 0:
 
 ```python
-bank = OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
-result = filter_class_compliance(bank, edition="1995")   # overall_class == 0
+bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
+result = filters.filter_class_compliance(bank, edition="1995")   # overall_class == 0
 result.plot(language="es")   # el corredor de clase 0 de la edición de 1995
 result.report("iec61260_1995.pdf",
               metadata=ReportMetadata(measurement_standard="IEC 61260:1995",
