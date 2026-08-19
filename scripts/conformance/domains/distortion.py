@@ -117,7 +117,9 @@ def _chk_loudspeaker_effective_range() -> Outcome:
     "2nd-order harmonic distortion d2 (rel. total)",
 )
 def _chk_harmonic_d2() -> Outcome:
-    value = ph.harmonic_distortion(_electro_harmonic_signal(), _electro_fs(), 1000.0, 2)
+    value = ph.harmonic_distortion(
+        _electro_harmonic_signal(), _electro_fs(), fundamental=1000.0, order=2
+    )
     return numeric(ref.DISTORTION_D2, value, 1e-4, places=6)
 
 
@@ -225,7 +227,7 @@ def _electro_smpte_signal() -> tuple[np.ndarray, float, float]:
 def _chk_modulation_d2() -> Outcome:
     x, fl, fh = _electro_smpte_signal()
     # Sidebands 0.02 + 0.02 over the 0.25 carrier: d_m,2 = 0.16 exactly.
-    value = ph.modulation_distortion(x, _electro_fs(), fl, fh).d2
+    value = ph.modulation_distortion(x, _electro_fs(), f_low=fl, f_high=fh).d2
     return numeric(0.16, value, 1e-4, places=6)
 
 
@@ -237,7 +239,7 @@ def _chk_modulation_d2() -> Outcome:
 def _chk_modulation_d3() -> Outcome:
     x, fl, fh = _electro_smpte_signal()
     # Sidebands 0.01 + 0.01 over the 0.25 carrier: d_m,3 = 0.08 exactly.
-    value = ph.modulation_distortion(x, _electro_fs(), fl, fh).d3
+    value = ph.modulation_distortion(x, _electro_fs(), f_low=fl, f_high=fh).d3
     return numeric(0.08, value, 1e-4, places=6)
 
 
@@ -263,7 +265,9 @@ def _electro_dfd_signal() -> tuple[np.ndarray, float, float]:
 def _chk_dfd_d2() -> Outcome:
     x, f1, f2 = _electro_dfd_signal()
     # Product 0.03 over the tone-amplitude sum 1.0: d_d,2 = 0.03 exactly.
-    value = ph.difference_frequency_distortion(x, _electro_fs(), f1, f2, order=2)
+    value = ph.difference_frequency_distortion(
+        x, _electro_fs(), f1=f1, f2=f2, order=2
+    )
     return numeric(0.03, value, 1e-4, places=6)
 
 
@@ -275,7 +279,9 @@ def _chk_dfd_d2() -> Outcome:
 def _chk_dfd_d3() -> Outcome:
     x, f1, f2 = _electro_dfd_signal()
     # Products 0.02 + 0.02 over the tone-amplitude sum 1.0: d_d,3 = 0.04.
-    value = ph.difference_frequency_distortion(x, _electro_fs(), f1, f2, order=3)
+    value = ph.difference_frequency_distortion(
+        x, _electro_fs(), f1=f1, f2=f2, order=3
+    )
     return numeric(0.04, value, 1e-4, places=6)
 
 

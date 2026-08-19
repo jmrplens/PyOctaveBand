@@ -47,8 +47,8 @@ from a straight line.
 
 ```python
 decay_curve(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     band: float | None = None,
     fraction: int = 1,
     zero_phase: bool = False,
@@ -69,8 +69,8 @@ integrated impulse response, Clause 6).
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response) (ISO 18233). |
-| `fs` | Sample rate in Hz. |
+| `ir` | Measured impulse response (1D), e.g. from [`phonometry.impulse_response`](/phonometry/reference/api/rooms/impulse-response/#impulse_response) (ISO 18233). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: the curve is normalised to 0 dB at its start, so a factor on the record moves neither the levels nor the decay times read off them. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `band` | Optional band centre frequency in Hz. When given, the impulse response is first filtered with the matching IEC 61260 fractional-octave filter; when None the broadband response is integrated directly. |
 | `fraction` | Bandwidth fraction of the band filter (1 = octave, 3 = one-third octave). Only used when `band` is not None. |
 | `zero_phase` | If True, filter the band with forward-backward (zero-phase) filtering, removing the octave filter's group delay before the backward integration. ISO 3382-2:2008 Clause 7.3 NOTE permits time-reversed filtering (it relaxes the B\*T > 16 rule to B\*T > 4); it roughly halves the low-frequency short-decay bias at 125 Hz. Only used when `band` is not None. Default False (causal). |
@@ -115,8 +115,8 @@ EDT/T20/T30 fit lines.
 
 ```python
 room_parameters(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     limits: tuple[float, float] | None = (125.0, 4000.0),
     fraction: int = 1,
     zero_phase: bool = False,
@@ -149,8 +149,8 @@ Table A.1).
 
 | Name | Description |
 | :--- | :--- |
-| `ir` | Measured impulse response (1D). |
-| `fs` | Sample rate in Hz. |
+| `ir` | Measured impulse response (1D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: every parameter here is a decay time, a ratio of energies or a centre time, and none of them moves with a factor on the record. |
+| `fs` | Sample rate in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `limits` | `(f_min, f_max)` band-centre limits in Hz; default octave bands 125 Hz to 4 kHz (ISO 3382-1:2009, 5.1). Use `(100.0, 5000.0)` with `fraction=3` for the one-third-octave engineering/precision range. `None` analyses the broadband response as a single band (`frequency` is then `None`). |
 | `fraction` | Bandwidth fraction (1 = octave, 3 = one-third octave). Default 1. |
 | `zero_phase` | If True, use forward-backward (zero-phase) octave filtering, removing the filter group delay before the backward integration. ISO 3382-2:2008 Clause 7.3 NOTE permits time-reversed filtering (relaxing B\*T > 16 to B\*T > 4); it roughly halves the 125 Hz short-decay T30 bias (about +4.9 % -> +2.4 % at T = 0.2 s). The benefit is small next to the ~10 % measurement variance but is free and standards-sanctioned. Default False (causal filtering). |

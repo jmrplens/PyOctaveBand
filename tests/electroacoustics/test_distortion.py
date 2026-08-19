@@ -70,7 +70,7 @@ def test_thd_auto_detects_fundamental() -> None:
 
 def test_nth_order_harmonic_distortion() -> None:
     x = _harmonic_signal()
-    assert harmonic_distortion(x, FS, 1000.0, 2) == pytest.approx(
+    assert harmonic_distortion(x, FS, fundamental=1000.0, order=2) == pytest.approx(
         ref.DISTORTION_D2, rel=1e-6
     )
 
@@ -78,7 +78,7 @@ def test_nth_order_harmonic_distortion() -> None:
 def test_harmonic_distortion_rejects_order_below_two() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        harmonic_distortion(tone, FS, 1000.0, 1)
+        harmonic_distortion(tone, FS, fundamental=1000.0, order=1)
 
 
 def test_thd_plus_noise_recovers_noise_floor() -> None:
@@ -180,7 +180,7 @@ def test_modulation_distortion_iec_per_order() -> None:
         + _tone(fh + 2 * fl, 0.01)
         + _tone(fh - 2 * fl, 0.01)
     )
-    res = modulation_distortion(x, FS, fl, fh)
+    res = modulation_distortion(x, FS, f_low=fl, f_high=fh)
     assert res.d2 == pytest.approx(0.16, rel=1e-6)
     assert res.d3 == pytest.approx(0.08, rel=1e-6)
     # The SMPTE-analyzer combined RMS convention is kept, explicitly labelled.
@@ -201,7 +201,7 @@ def test_modulation_distortion_carries_sideband_spectrum() -> None:
         + _tone(fh + 2 * fl, 0.01)
         + _tone(fh - 2 * fl, 0.01)
     )
-    res = modulation_distortion(x, FS, fl, fh)
+    res = modulation_distortion(x, FS, f_low=fl, f_high=fh)
     assert res.f_low == fl
     assert res.f_high == fh
     assert res.carrier_amplitude == pytest.approx(ah, rel=1e-6)
@@ -228,7 +228,7 @@ def test_modulation_distortion_plot_marks_carrier_and_sidebands() -> None:
         + _tone(fh + 2 * fl, 0.01)
         + _tone(fh - 2 * fl, 0.01)
     )
-    res = modulation_distortion(x, FS, fl, fh)
+    res = modulation_distortion(x, FS, f_low=fl, f_high=fh)
     ax = res.plot()
     # The carrier marker sits at (f_high, 0 dB); the four sidebands read
     # 20*lg(a_s / carrier) re the carrier.
@@ -272,10 +272,10 @@ def test_difference_frequency_distortion_iec() -> None:
         + _tone(2 * f1 - f2, 0.02)
         + _tone(2 * f2 - f1, 0.02)
     )
-    assert difference_frequency_distortion(x, FS, f1, f2, order=2) == pytest.approx(
+    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=2) == pytest.approx(
         0.03, rel=1e-6
     )
-    assert difference_frequency_distortion(x, FS, f1, f2, order=3) == pytest.approx(
+    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=3) == pytest.approx(
         0.04, rel=1e-6
     )
 
@@ -311,8 +311,8 @@ def test_difference_frequency_clean_octave_tones_read_zero() -> None:
     for f1, f2 in ((1000.0, 2000.0), (1000.0, 3000.0)):
         x = _tone(f1, 0.5) + _tone(f2, 0.5)
         # Numerical floor only (window leakage of the FFT at ~1e-16).
-        assert difference_frequency_distortion(x, FS, f1, f2, order=2) < 1e-12
-        assert difference_frequency_distortion(x, FS, f1, f2, order=3) < 1e-12
+        assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=2) < 1e-12
+        assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=3) < 1e-12
 
 
 def test_difference_frequency_dc_offset_not_counted() -> None:
@@ -320,16 +320,16 @@ def test_difference_frequency_dc_offset_not_counted() -> None:
     # (the old window at negative/zero product frequencies included bin 0).
     f1, f2 = 1000.0, 2500.0
     x = _tone(f1, 0.5) + _tone(f2, 0.5) + 0.5
-    assert difference_frequency_distortion(x, FS, f1, f2, order=3) < 1e-12
-    assert difference_frequency_distortion(x, FS, f1, f2, order=2) < 1e-12
+    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=3) < 1e-12
+    assert difference_frequency_distortion(x, FS, f1=f1, f2=f2, order=2) < 1e-12
 
 
 def test_difference_frequency_rejects_bad_args() -> None:
     tone = _tone(1000.0)
     with pytest.raises(ValueError):
-        difference_frequency_distortion(tone, FS, 2000.0, 1000.0)
+        difference_frequency_distortion(tone, FS, f1=2000.0, f2=1000.0)
     with pytest.raises(ValueError):
-        difference_frequency_distortion(tone, FS, 1000.0, 2000.0, order=4)
+        difference_frequency_distortion(tone, FS, f1=1000.0, f2=2000.0, order=4)
     with pytest.raises(ValueError):
         total_difference_frequency_distortion(tone, FS, 2000.0, 1000.0)
 

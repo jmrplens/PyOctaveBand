@@ -47,6 +47,8 @@ import numpy as np
 
 from .._internal.utils import _typesignal
 from ..filters.core import OctaveFilterBank
+from ..io._resolve import apply_calibration, resolve_fs
+from ..io._signal import Signal
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -390,15 +392,15 @@ def _band_parameters(x: np.ndarray, fs: int) -> tuple[float, ...]:
     return edt, t20, t30, c50, c80, d50, ts, dyn
 
 
-def _validate_ir(ir: list[float] | np.ndarray, fs: int) -> np.ndarray:
-    x = _typesignal(ir)
+def _validate_ir(ir: Signal | list[float] | np.ndarray, fs: int) -> np.ndarray:
+    x = _typesignal(np.asarray(ir))
     if x.ndim != 1:
         raise ValueError("The impulse response must be one-dimensional.")
     if fs <= 0:
         raise ValueError("Sample rate 'fs' must be positive.")
     if not np.any(x):
         raise ValueError("Impulse response 'ir' is silent.")
-    return x
+    return apply_calibration(ir, x)
 
 
 @dataclass(frozen=True)
@@ -439,8 +441,8 @@ class DecayCurve:
 
 
 def decay_curve(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     band: float | None = None,
     fraction: int = 1,
     zero_phase: bool = False,
@@ -457,8 +459,14 @@ def decay_curve(
     integrated impulse response, Clause 6).
 
     :param ir: Measured impulse response (1D), e.g. from
-        :func:`phonometry.impulse_response` (ISO 18233).
-    :param fs: Sample rate in Hz.
+        :func:`phonometry.impulse_response` (ISO 18233). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: the curve is normalised to 0 dB at its
+        start, so a factor on the record moves neither the levels nor the
+        decay times read off them.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param band: Optional band centre frequency in Hz. When given, the
         impulse response is first filtered with the matching IEC 61260
         fractional-octave filter; when None the broadband response is
@@ -476,6 +484,7 @@ def decay_curve(
         truncation point. It unpacks as ``time, level = decay_curve(...)``
         for backward compatibility and exposes :meth:`DecayCurve.plot`.
     """
+    fs = resolve_fs(ir, fs, name="ir")
     x = _validate_ir(ir, fs)
     if band is not None:
         if band <= 0.0:
@@ -502,8 +511,8 @@ def decay_curve(
 
 
 def room_parameters(
-    ir: list[float] | np.ndarray,
-    fs: int,
+    ir: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     limits: tuple[float, float] | None = _DEFAULT_BANDS,
     fraction: int = 1,
     zero_phase: bool = False,
@@ -531,8 +540,14 @@ def room_parameters(
     flagged-valid decay time within the 5 % JND (ISO 3382-1:2009,
     Table A.1).
 
-    :param ir: Measured impulse response (1D).
-    :param fs: Sample rate in Hz.
+    :param ir: Measured impulse response (1D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: every parameter here is a decay time, a
+        ratio of energies or a centre time, and none of them moves with a
+        factor on the record.
+    :param fs: Sample rate in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param limits: ``(f_min, f_max)`` band-centre limits in Hz; default
         octave bands 125 Hz to 4 kHz (ISO 3382-1:2009, 5.1). Use
         ``(100.0, 5000.0)`` with ``fraction=3`` for the one-third-octave
@@ -549,6 +564,7 @@ def room_parameters(
         free and standards-sanctioned. Default False (causal filtering).
     :return: :class:`RoomAcousticsResult` with one entry per band.
     """
+    fs = resolve_fs(ir, fs, name="ir")
     x = _validate_ir(ir, fs)
     frequency: np.ndarray | None
     if limits is None:

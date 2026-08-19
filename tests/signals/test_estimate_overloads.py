@@ -22,10 +22,9 @@ be satisfied by accident.
 
 from __future__ import annotations
 
-from dataclasses import fields, is_dataclass
-
 import numpy as np
 import pytest
+from signal_contract import assert_same
 
 from phonometry.io import Signal
 from phonometry.metrology import (
@@ -68,29 +67,6 @@ def _tone(frequency: float = 500.0, n: int = 4096) -> np.ndarray:
     return np.sin(2 * np.pi * frequency * np.arange(n) / FS)
 
 
-def _same(a: object, b: object, path: str = "") -> None:
-    """Assert two results are identical, walking result objects field by field."""
-    if is_dataclass(a) and not isinstance(a, type):
-        assert type(a) is type(b), path
-        for f in fields(a):
-            _same(getattr(a, f.name), getattr(b, f.name), f"{path}.{f.name}")
-        return
-    if isinstance(a, dict):
-        assert a.keys() == b.keys(), path  # type: ignore[union-attr]
-        for k in a:
-            _same(a[k], b[k], f"{path}[{k!r}]")  # type: ignore[index]
-        return
-    if isinstance(a, (list, tuple)):
-        assert len(a) == len(b), path  # type: ignore[arg-type]
-        for i, (ai, bi) in enumerate(zip(a, b, strict=True)):
-            _same(ai, bi, f"{path}[{i}]")
-        return
-    if isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
-        assert np.array_equal(np.asarray(a), np.asarray(b)), path
-        return
-    assert a == b, path
-
-
 # The solo consumers: one record, one rate.
 SOLO = [
     (power_spectral_density, {}),
@@ -128,7 +104,7 @@ PAIR_IDS = [f.__name__ for f, _ in PAIRS]
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
 def test_an_uncalibrated_signal_computes_the_bare_array_result(func, kwargs) -> None:
     x = _record()
-    _same(func(Signal(x, FS), **kwargs), func(x, FS, **kwargs))
+    assert_same(func(Signal(x, FS), **kwargs), func(x, FS, **kwargs))
 
 
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
@@ -167,7 +143,7 @@ def test_a_multichannel_signal_is_refused_by_name(func, kwargs) -> None:
 @pytest.mark.parametrize(("func", "kwargs"), SOLO, ids=SOLO_IDS)
 def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
     x = _record()
-    _same(func(Signal(x, FS, calibration_factor=CAL), **kwargs), func(CAL * x, FS, **kwargs))
+    assert_same(func(Signal(x, FS, calibration_factor=CAL), **kwargs), func(CAL * x, FS, **kwargs))
 
 
 # ---------------------------------------------------------------------------
@@ -179,9 +155,9 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, kwargs) -> None:
 def test_a_pair_takes_the_rate_from_either_side(func, kwargs) -> None:
     x, y = _record(0), _record(1)
     reference = func(x, y, FS, **kwargs)
-    _same(func(Signal(x, FS), y, **kwargs), reference)
-    _same(func(x, Signal(y, FS), **kwargs), reference)
-    _same(func(Signal(x, FS), Signal(y, FS), **kwargs), reference)
+    assert_same(func(Signal(x, FS), y, **kwargs), reference)
+    assert_same(func(x, Signal(y, FS), **kwargs), reference)
+    assert_same(func(Signal(x, FS), Signal(y, FS), **kwargs), reference)
 
 
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
@@ -203,7 +179,7 @@ def test_a_pair_of_bare_arrays_still_requires_fs(func, kwargs) -> None:
 @pytest.mark.parametrize(("func", "kwargs"), PAIRS, ids=PAIR_IDS)
 def test_a_calibrated_pair_is_analysed_in_pascals(func, kwargs) -> None:
     x, y = _record(0), _record(1)
-    _same(
+    assert_same(
         func(
             Signal(x, FS, calibration_factor=CAL),
             Signal(y, FS, calibration_factor=CAL),
@@ -226,8 +202,8 @@ def test_correlation_keeps_its_rate_optional_for_bare_arrays() -> None:
     not turn that call into an error.
     """
     x, y = _record(0), _record(1)
-    _same(correlation(x, y), correlation(x, y, 1.0))
-    _same(correlation(Signal(x, FS), y), correlation(x, y, FS))
+    assert_same(correlation(x, y), correlation(x, y, 1.0))
+    assert_same(correlation(Signal(x, FS), y), correlation(x, y, FS))
     at_fs, at_half = Signal(x, FS), Signal(y, FS // 2)
     with pytest.raises(ValueError, match="recorded at different rates"):
         correlation(at_fs, at_half)
@@ -246,7 +222,7 @@ def test_miso_takes_a_multichannel_signal_as_the_input_records() -> None:
     """Here the channels *are* the q input records, so 2-D is the natural form."""
     a, b, out = _record(0), _record(1), _record(2)
     block = Signal(np.stack([a, b]), FS, calibration_factor=CAL)
-    _same(
+    assert_same(
         miso_coherence(block, Signal(out, FS, calibration_factor=CAL)),
         miso_coherence([CAL * a, CAL * b], CAL * out, FS),
     )
@@ -282,7 +258,7 @@ def test_miso_refuses_two_inputs_recorded_at_different_rates() -> None:
 def test_miso_takes_agreeing_input_signals() -> None:
     """The refusal above must not cost the ordinary case."""
     a, b, out = _record(0), _record(1), _record(2)
-    _same(
+    assert_same(
         miso_coherence([Signal(a, FS), Signal(b, FS)], Signal(out, FS)),
         miso_coherence([a, b], out, FS),
     )
@@ -303,4 +279,4 @@ def test_the_arguments_behind_fs_are_keyword_only_and_required() -> None:
 def test_the_positional_call_is_unchanged() -> None:
     """``zoom_fft(x, fs, f_min=f_min, f_max=f_max)`` still reads as it always did."""
     x = _tone()
-    _same(zoom_fft(x, FS, f_min=100.0, f_max=1000.0), zoom_fft(x, fs=FS, f_min=100.0, f_max=1000.0))
+    assert_same(zoom_fft(x, FS, f_min=100.0, f_max=1000.0), zoom_fft(x, fs=FS, f_min=100.0, f_max=1000.0))

@@ -57,7 +57,7 @@ from phonometry import swept_sine_distortion, synchronized_sweep_signal
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
 x = synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
 # ... record the device response into `y` (include the decay tail) ...
-res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 res.harmonic_responses    # complex H1..H3 on res.frequencies
 res.thd, res.thd_frequencies
@@ -81,7 +81,7 @@ a2, a3 = 0.12, 0.08
 x = synchronized_sweep_signal(fs, f1, f2, seconds)
 b, a = sp_signal.butter(2, 3000.0, fs=fs)             # 3 kHz post-filter
 y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 h1 = 1.0 + 3.0 * a3 / 4.0                              # Chebyshev gain
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -162,7 +162,7 @@ filter.
 from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
-res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
 res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
 

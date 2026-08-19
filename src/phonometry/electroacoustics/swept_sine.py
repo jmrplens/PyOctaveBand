@@ -61,6 +61,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import apply_calibration, resolve_fs
+from ..io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import NDArray
@@ -418,7 +421,7 @@ def _default_ir_length(min_spacing: int) -> int:
 
 
 def _validated_recording(
-    recorded: NDArray[np.float64] | list[float],
+    recorded: Signal | NDArray[np.float64] | list[float],
 ) -> NDArray[np.float64]:
     rec = np.asarray(recorded, dtype=np.float64)
     if rec.ndim != 1:
@@ -526,12 +529,12 @@ def _check_farina_span(
 
 
 def swept_sine_distortion(
-    recorded: NDArray[np.float64] | list[float],
-    fs: float,
+    recorded: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     f1: float,
     f2: float,
     seconds: float,
-    *,
     method: Literal["synchronized", "farina"] = "synchronized",
     n_harmonics: int = 5,
     ir_length: int | None = None,
@@ -559,7 +562,14 @@ def swept_sine_distortion(
 
     :param recorded: Recorded system response (1-D). Include enough
         trailing room for the system to decay; at least the sweep length.
-    :param fs: Sample rate, in Hz.
+        Accepts a :class:`phonometry.io.Signal`, whose calibration is
+        applied to the samples: ``harmonic_responses`` and ``harmonic_irs``
+        carry the unit and so come out in pascals per unit of excitation,
+        while ``thd`` and ``distortion_ratios`` are ratios of harmonics
+        drawn from the same record and do not move.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param f1: Sweep start frequency, in Hz.
     :param f2: Sweep stop frequency, in Hz. Distortion products above
         Nyquist fold back in any real recording, so keep
@@ -596,7 +606,8 @@ def swept_sine_distortion(
         excitation frequency has a measurable order-2 product (``f1``
         above ``fs/4``, where every order-2 product would exceed Nyquist).
     """
-    rec = _validated_recording(recorded)
+    fs = resolve_fs(recorded, fs, name="recorded")
+    rec = apply_calibration(recorded, _validated_recording(recorded))
     fs_v = _positive(fs, "fs")
     f1_v = _positive(f1, "f1")
     f2_v = _positive(f2, "f2")

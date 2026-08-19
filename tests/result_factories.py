@@ -297,7 +297,7 @@ def _modulation() -> ph.ModulationDistortionResult:
     x = (np.sin(2 * np.pi * 250.0 * t) + 0.25 * np.sin(2 * np.pi * 8000.0 * t)
          + 0.02 * np.sin(2 * np.pi * 8250.0 * t)
          + 0.02 * np.sin(2 * np.pi * 7750.0 * t))
-    return ph.modulation_distortion(x, FS, 250.0, 8000.0)
+    return ph.modulation_distortion(x, FS, f_low=250.0, f_high=8000.0)
 
 
 def _field_indicators() -> ph.FieldIndicators:

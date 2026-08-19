@@ -160,7 +160,9 @@ from phonometry import electroacoustics
 
 thd_f = electroacoustics.thd(signal, fs, 1000.0, kind="F")          # relative to fundamental
 thd_r = electroacoustics.thd(signal, fs, 1000.0, kind="R")          # relative to total RMS
-d2 = electroacoustics.harmonic_distortion(signal, fs, 1000.0, 2)    # 2nd-order harmonic
+d2 = electroacoustics.harmonic_distortion(  # 2nd-order harmonic
+    signal, fs, fundamental=1000.0, order=2
+)
 ```
 
 `harmonic_analysis` bundles the fundamental, the harmonic amplitudes and the THD
@@ -309,10 +311,12 @@ each with its own per-order definition:
 ```python
 from phonometry import electroacoustics
 
-md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
+md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
 print(md.d2, md.d3, md.smpte)                                       # 14.12.7
 md.plot()   # carrier and modulation sidebands, d2/d3 annotated (needs matplotlib)
-dfd2 = electroacoustics.difference_frequency_distortion(signal, fs, 13e3, 14e3, order=2)
+dfd2 = electroacoustics.difference_frequency_distortion(
+    signal, fs, f1=13e3, f2=14e3, order=2
+)
 tdfd = electroacoustics.total_difference_frequency_distortion(signal, fs)         # 8/11.95 kHz
 dim = electroacoustics.dynamic_intermodulation_distortion(signal, fs)             # DIM (15k/3.15k)
 ```
@@ -339,7 +343,7 @@ t = np.arange(fs) / fs                        # 1 s -> tones land on FFT bins
 x = np.sin(2 * np.pi * 60.0 * t) + 0.25 * np.sin(2 * np.pi * 7000.0 * t)
 signal = x + 0.04 * x**2 + 0.012 * x**3       # weakly non-linear device output
 
-md = electroacoustics.modulation_distortion(signal, fs, 60.0, 7000.0)
+md = electroacoustics.modulation_distortion(signal, fs, f_low=60.0, f_high=7000.0)
 md.plot()
 plt.show()
 ```
@@ -1384,7 +1388,7 @@ from phonometry import swept_sine_distortion, synchronized_sweep_signal
 fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
 x = synchronized_sweep_signal(fs, f1, f2, seconds)   # play this...
 # ... record the device response into `y` (include the decay tail) ...
-res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 res.harmonic_responses    # complex H1..H3 on res.frequencies
 res.thd, res.thd_frequencies
@@ -1408,7 +1412,7 @@ a2, a3 = 0.12, 0.08
 x = synchronized_sweep_signal(fs, f1, f2, seconds)
 b, a = sp_signal.butter(2, 3000.0, fs=fs)             # 3 kHz post-filter
 y = sp_signal.lfilter(b, a, x + a2 * x**2 + a3 * x**3)
-res = swept_sine_distortion(y, fs, f1, f2, seconds, n_harmonics=3)
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
 
 h1 = 1.0 + 3.0 * a3 / 4.0                              # Chebyshev gain
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -1489,7 +1493,7 @@ filter.
 from phonometry import sweep_signal, swept_sine_distortion
 
 x = sweep_signal(fs, f1, f2, seconds)          # the ISO 18233 ESS
-res = swept_sine_distortion(y, fs, f1, f2, seconds, method="farina")
+res = swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, method="farina")
 res.plot()   # same |Hn| + THD(f) panels as the synchronized method (needs matplotlib)
 ```
 

@@ -73,6 +73,11 @@ from scipy import signal
 
 from .._internal.utils import _typesignal
 from .._internal.warnings import PhonometryWarning
+from ..io._resolve import (
+    apply_calibration,
+    resolve_optional_pair_fs,
+)
+from ..io._signal import Signal
 
 
 class ImpulseResponseWarning(PhonometryWarning):
@@ -369,9 +374,9 @@ def _farina_deconvolve(
 
 @overload
 def impulse_response(
-    recorded: list[float] | np.ndarray,
-    reference: list[float] | np.ndarray,
-    fs: int,
+    recorded: Signal | list[float] | np.ndarray,
+    reference: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     method: Literal["farina"],
     f_range: tuple[float, float],
@@ -383,9 +388,9 @@ def impulse_response(
 
 @overload
 def impulse_response(
-    recorded: list[float] | np.ndarray,
-    reference: list[float] | np.ndarray,
-    fs: int,
+    recorded: Signal | list[float] | np.ndarray,
+    reference: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     method: str = ...,
     f_range: tuple[float, float] | None = ...,
@@ -396,9 +401,9 @@ def impulse_response(
 
 
 def impulse_response(
-    recorded: list[float] | np.ndarray,
-    reference: list[float] | np.ndarray,
-    fs: int,
+    recorded: Signal | list[float] | np.ndarray,
+    reference: Signal | list[float] | np.ndarray,
+    fs: int | None = None,
     *,
     method: str = "spectral",
     f_range: tuple[float, float] | None = None,
@@ -416,10 +421,22 @@ def impulse_response(
     arrival times (the wrapped tail) and are discarded by returning only the
     causal part (B.5).
 
-    :param recorded: Recorded system response to the sweep.
-    :param reference: The emitted sweep (excitation signal).
-    :param fs: Sampling frequency in Hz (kept for API symmetry; the
-        deconvolution itself is sample-rate agnostic).
+    :param recorded: Recorded system response to the sweep. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples, so the recovered impulse response comes out in pascals per
+        unit of excitation.
+    :param reference: The emitted sweep (excitation signal). Accepts a
+        :class:`phonometry.io.Signal` for the rate; it is the excitation
+        rather than a measurement, so a calibration factor on it is not
+        applied.
+    :param fs: Sampling frequency in Hz. Optional for the default spectral
+        division, which is sample-rate agnostic and only stores the rate on
+        the result so that a plot can label its time axis; **required** for
+        ``method="farina"``, which rebuilds the analytic inverse filter and
+        so needs the rate to know what its band edges mean. Either record
+        may be a :class:`~phonometry.io.Signal` and supply it, an explicit
+        value that disagrees with one raises, and two Signals recorded at
+        different rates are refused rather than arbitrated.
     :param method: ``"spectral"`` for spectral division
         :math:`H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})`
         (Figure B.3, default) or ``"farina"``
@@ -450,8 +467,11 @@ def impulse_response(
         indexing, ``.size``) for every downstream consumer and adds
         :meth:`ImpulseResponseResult.plot`.
     """
-    rec = _typesignal(recorded)
-    ref = _typesignal(reference)
+    fs = resolve_optional_pair_fs(
+        recorded, reference, fs, names=("recorded", "reference")
+    )
+    rec = apply_calibration(recorded, _typesignal(np.asarray(recorded)))
+    ref = _typesignal(np.asarray(reference))
     if rec.ndim != 1 or ref.ndim != 1:
         raise ValueError("'recorded' and 'reference' must be one-dimensional.")
     if rec.size == 0 or ref.size == 0:
@@ -467,6 +487,12 @@ def impulse_response(
         h_spec = spec_y * np.conj(spec_x) / (power + reg)
         full = np.fft.irfft(h_spec, n=n)
     elif method == "farina":
+        if fs is None:
+            raise ValueError(
+                "method='farina' requires fs: unlike the spectral division, "
+                "it rebuilds the analytic inverse filter, which is defined "
+                "in hertz. Pass fs, or hand a Signal that carries it"
+            )
         full = _farina_deconvolve(rec, ref, fs, f_range)
     else:
         raise ValueError(f"unknown method {method!r}")
@@ -511,8 +537,8 @@ def mls_signal(order: int) -> np.ndarray:
 
 
 def mls_impulse_response(
-    recorded: list[float] | np.ndarray,
-    mls: list[float] | np.ndarray,
+    recorded: Signal | list[float] | np.ndarray,
+    mls: Signal | list[float] | np.ndarray,
     *,
     length: int | None = None,
     fs: int | None = None,
@@ -529,12 +555,22 @@ def mls_impulse_response(
     into the record (A.1).
 
     :param recorded: Recorded response, length a multiple of ``2**N - 1``.
+        Accepts a :class:`phonometry.io.Signal`, whose
+        calibration is applied to the samples, so the recovered impulse
+        response comes out in pascals per unit of excitation.
     :param mls: The excitation sequence returned by :func:`mls_signal`.
+        Accepts a :class:`phonometry.io.Signal` for the rate; it is the
+        excitation rather than a measurement, so a calibration factor on it
+        is not applied.
     :param length: Number of IR samples to return. Defaults to the sequence
         length ``2**N - 1``.
     :param fs: Optional sample rate in Hz, stored on the result so that
         :meth:`ImpulseResponseResult.plot` can label a time axis in seconds
         (the recovery itself is sample-rate agnostic). Default ``None``.
+        Either record may be a :class:`~phonometry.io.Signal` and supply it
+        instead; an explicit value that disagrees with one raises, and two
+        Signals recorded at different rates are refused rather than
+        arbitrated.
     :return: An :class:`ImpulseResponseResult` wrapping the recovered impulse
         response. It behaves like the raw IR array for every downstream
         consumer and adds :meth:`ImpulseResponseResult.plot`.
@@ -548,8 +584,9 @@ def mls_impulse_response(
         warning as a prompt to check the noise floor and MLS order rather than
         a definitive aliasing diagnosis.
     """
-    rec = _typesignal(recorded)
-    seq = _typesignal(mls)
+    fs = resolve_optional_pair_fs(recorded, mls, fs, names=("recorded", "mls"))
+    rec = apply_calibration(recorded, _typesignal(np.asarray(recorded)))
+    seq = _typesignal(np.asarray(mls))
     if rec.ndim != 1 or seq.ndim != 1:
         raise ValueError("'recorded' and 'mls' must be one-dimensional.")
     if rec.size == 0 or seq.size == 0:
@@ -657,8 +694,8 @@ def golay_pair(order: int) -> tuple[np.ndarray, np.ndarray]:
 
 
 def golay_impulse_response(
-    recorded_a: list[float] | np.ndarray,
-    recorded_b: list[float] | np.ndarray,
+    recorded_a: Signal | list[float] | np.ndarray,
+    recorded_b: Signal | list[float] | np.ndarray,
     pair: tuple[np.ndarray, np.ndarray],
     *,
     length: int | None = None,
@@ -691,13 +728,21 @@ def golay_impulse_response(
         length must be a positive multiple of the code length ``L``.
     :param recorded_b: Recorded response to the periodic ``b`` code; its
         length must be a positive multiple of ``L`` (the period counts of
-        the two recordings may differ).
+        the two recordings may differ). Both recordings accept a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples, so the recovered impulse response comes out in pascals per
+        unit of excitation; two Signals recorded at different rates are
+        refused rather than arbitrated.
     :param pair: The complementary pair ``(a, b)`` from :func:`golay_pair`.
     :param length: Number of IR samples to return. Defaults to ``L``;
         longer requests are periodic extensions.
     :param fs: Optional sample rate in Hz, stored on the result so that
         :meth:`ImpulseResponseResult.plot` can label a time axis in seconds
         (the recovery itself is sample-rate agnostic). Default ``None``.
+        Either record may be a :class:`~phonometry.io.Signal` and supply it
+        instead; an explicit value that disagrees with one raises, and two
+        Signals recorded at different rates are refused rather than
+        arbitrated.
     :return: An :class:`ImpulseResponseResult` (``method="golay"``). It
         behaves like the raw IR array for every downstream consumer and
         adds :meth:`ImpulseResponseResult.plot`.
@@ -709,6 +754,9 @@ def golay_impulse_response(
         of the period (see the note in :func:`mls_impulse_response` about
         the heuristic's noise-floor false positives).
     """
+    fs = resolve_optional_pair_fs(
+        recorded_a, recorded_b, fs, names=("recorded_a", "recorded_b")
+    )
     code_a, code_b = (_typesignal(c) for c in pair)
     if code_a.ndim != 1 or code_b.ndim != 1:
         raise ValueError("both Golay codes must be one-dimensional.")
@@ -723,7 +771,7 @@ def golay_impulse_response(
         ("recorded_a", recorded_a, code_a),
         ("recorded_b", recorded_b, code_b),
     ):
-        rec = _typesignal(rec_in)
+        rec = apply_calibration(rec_in, _typesignal(np.asarray(rec_in)))
         if rec.ndim != 1:
             raise ValueError(f"'{name}' must be one-dimensional.")
         if rec.size == 0 or rec.size % period != 0:

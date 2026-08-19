@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from ..io._resolve import resolve_fs
+from ..io._signal import Signal
 from .distortion import (
     _AES17_BANDWIDTH_HZ,
     _AES17_HIGHPASS_HZ,
@@ -98,8 +100,8 @@ def _full_scale_rms(full_scale: float) -> float:
 
 
 def dynamic_range(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = _DEFAULT_NOTCH_Q,
@@ -127,7 +129,14 @@ def dynamic_range(
 
     :param signal: Captured output of the device under test (1-D), scaled so
         that ``full_scale`` is the digital full-scale peak amplitude.
-    :param fs: Sample rate, in Hz.
+        Accepts a :class:`phonometry.io.Signal` for the rate, but a
+        calibration factor it carries is deliberately **not** applied: this
+        quantity is referenced to digital full scale, not to 20 uPa, so
+        scaling the samples to pascals would move the reading by
+        ``20 lg(factor)`` under a full-scale name.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Test frequency, in Hz; ``None`` uses the 997 Hz of the
         standard.
     :param notch_q: Effective notch quality factor (AES17 5.2.8: 1.2..3;
@@ -140,7 +149,8 @@ def dynamic_range(
     :raises ValueError: If the inputs are invalid or ``notch_q`` is out of
         range.
     """
-    sig = _validate_signal(signal)
+    fs = resolve_fs(signal, fs, name="signal")
+    sig = _validate_signal(signal, calibrate=False)
     fs_v = _positive(fs, "fs")
     _validate_notch_q(notch_q)
     reference = _full_scale_rms(full_scale)
@@ -158,8 +168,8 @@ def dynamic_range(
 
 
 def idle_channel_noise(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     *,
     bandwidth: float | None = _AES17_BANDWIDTH_HZ,
     full_scale: float = 1.0,
@@ -179,7 +189,14 @@ def idle_channel_noise(
 
     :param signal: Captured idle output of the device under test (1-D), scaled
         so that ``full_scale`` is the digital full-scale peak amplitude.
-    :param fs: Sample rate, in Hz.
+        Accepts a :class:`phonometry.io.Signal` for the rate, but a
+        calibration factor it carries is deliberately **not** applied: this
+        quantity is referenced to digital full scale, not to 20 uPa, so
+        scaling the samples to pascals would move the reading by
+        ``20 lg(factor)`` under a full-scale name.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param bandwidth: AES17 measurement bandwidth, in Hz (default 20 kHz;
         ``None`` measures the full Nyquist band).
     :param full_scale: Digital full-scale peak amplitude (default 1.0).
@@ -187,7 +204,8 @@ def idle_channel_noise(
         number for any real device).
     :raises ValueError: If the inputs are invalid.
     """
-    sig = _validate_signal(signal)
+    fs = resolve_fs(signal, fs, name="signal")
+    sig = _validate_signal(signal, calibrate=False)
     fs_v = _positive(fs, "fs")
     reference = _full_scale_rms(full_scale)
     weighted = _ccir_rms_weighted_rms(sig, fs_v, bandwidth)

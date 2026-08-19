@@ -36,6 +36,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from ..io._resolve import apply_calibration, resolve_fs
+from ..io._signal import Signal
+
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from numpy.typing import ArrayLike, NDArray
@@ -92,7 +95,16 @@ def _validate_notch_q(notch_q: float) -> float:
 _MIN_SIGNAL_SAMPLES = 64
 
 
-def _validate_signal(signal: NDArray[np.float64] | list[float]) -> NDArray[np.float64]:
+def _validate_signal(
+    signal: Signal | NDArray[np.float64] | list[float],
+    *,
+    calibrate: bool = True,
+) -> NDArray[np.float64]:
+    """Validate the record and, unless exempted, present it in pascals.
+
+    ``calibrate=False`` is for the quantities referenced to digital full
+    scale rather than to 20 uPa: see :mod:`phonometry.io._resolve`.
+    """
     sig = np.asarray(signal, dtype=np.float64)
     if sig.ndim != 1:
         raise ValueError("'signal' must be one-dimensional.")
@@ -103,7 +115,7 @@ def _validate_signal(signal: NDArray[np.float64] | list[float]) -> NDArray[np.fl
         )
     if not np.all(np.isfinite(sig)):
         raise ValueError("'signal' must be finite.")
-    return sig
+    return apply_calibration(signal, sig) if calibrate else sig
 
 
 def _amplitude_spectrum(
@@ -169,8 +181,8 @@ def _harmonic_amplitudes(
 # Harmonic distortion (IEC 60268-3 14.12.2-3 / 14.12.5, AES17 6.3)
 # --------------------------------------------------------------------------- #
 def thd(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     kind: Literal["F", "R"] = "F",
@@ -196,9 +208,15 @@ def thd(
     the fundamental-referenced convention widespread in audio practice and
     datasheets; the two agree to first order for small distortion.
 
-    :param signal: Captured signal (1-D). Coherent sampling (integer periods) or
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of amplitudes drawn from
+        the same record, so the factor divides out and the answer is the
+        same calibrated or not. Coherent sampling (integer periods) or
         a low-leakage window gives the exact value.
-    :param fs: Sample rate, in Hz.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency :math:`f_1` in Hz, or ``None``
         to take the largest spectral peak.
     :param kind: ``'F'`` (relative to the fundamental, the default) or ``'R'``
@@ -209,6 +227,7 @@ def thd(
     :raises ValueError: If the signal/parameters are invalid, ``kind`` is
         unknown, or no harmonic of the fundamental lies below Nyquist.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     if kind not in ("F", "R"):
@@ -229,11 +248,11 @@ def thd(
 
 
 def harmonic_distortion(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
+    *,
     fundamental: float,
     order: int,
-    *,
     n_harmonics: int = _DEFAULT_N_HARMONICS,
     window: str = "hann",
 ) -> float:
@@ -242,8 +261,14 @@ def harmonic_distortion(
     :math:`d_n = a_n / \sqrt{\sum_{k \ge 1} a_k^2}` -- the nth harmonic
     amplitude relative to the total RMS.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of amplitudes drawn from
+        the same record, so the factor divides out and the answer is the
+        same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency :math:`f_1`, in Hz.
     :param order: Harmonic order ``n`` (>= 2).
     :param n_harmonics: Highest harmonic order used for the total RMS.
@@ -251,6 +276,7 @@ def harmonic_distortion(
     :return: nth-order harmonic distortion, as a ratio.
     :raises ValueError: If ``order`` < 2 or the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     f0 = _positive(fundamental, "fundamental")
@@ -347,8 +373,8 @@ def _aes17_rms_pair(
 
 
 def thd_plus_noise(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = _DEFAULT_NOTCH_Q,
@@ -367,8 +393,14 @@ def thd_plus_noise(
     standard low-pass at ``bandwidth`` (5.2.5 / 6.3.1) -- so DC offsets
     and out-of-band noise do not inflate the result.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of amplitudes drawn from
+        the same record, so the factor divides out and the answer is the
+        same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency, or ``None`` to auto-detect.
     :param notch_q: Effective notch quality factor (AES17: 1.2..3; default 2.0).
     :param bandwidth: Upper band-edge frequency of the AES17 chain, in Hz
@@ -381,6 +413,7 @@ def thd_plus_noise(
     :return: THD+N as a ratio (default) or in dB.
     :raises ValueError: If the inputs are invalid or ``notch_q`` out of range.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     _validate_notch_q(notch_q)
@@ -402,8 +435,8 @@ def thd_plus_noise(
 
 
 def sinad(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = _DEFAULT_NOTCH_Q,
@@ -421,8 +454,14 @@ def sinad(
     define SINAD; this value is derived from the AES17 6.3.1 THD+N
     measurement (same notch, same measurement bandwidth).
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: SINAD is the decibel form of a ratio of
+        amplitudes drawn from the same record rather than a level, so the
+        factor divides out and the answer is the same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency, or ``None`` to auto-detect.
     :param notch_q: Effective notch quality factor (AES17: 1.2..3; default 2.0).
     :param bandwidth: Upper band-edge frequency of the AES17 chain, in Hz
@@ -509,8 +548,8 @@ def _weighted_rms_468(x: NDArray[np.float64], fs: float) -> float:
 
 
 def weighted_thd(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     notch_q: float = _DEFAULT_NOTCH_Q,
@@ -532,8 +571,14 @@ def weighted_thd(
     the weighted measurement is valid only for fundamental frequencies
     between 31,5 Hz and 400 Hz.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: this is a ratio of amplitudes drawn from
+        the same record, so the factor divides out and the answer is the
+        same calibrated or not.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency, or ``None`` to auto-detect.
     :param notch_q: Effective notch quality factor (default 2.0).
     :param weighting: Frequency weighting applied to the residual:
@@ -543,6 +588,7 @@ def weighted_thd(
     :return: Weighted THD, as a ratio.
     :raises ValueError: If the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     if weighting not in ("468", "A", "C"):
@@ -608,8 +654,8 @@ class HarmonicDistortionResult:
 
 
 def harmonic_analysis(
-    signal: NDArray[np.float64] | list[float],
-    fs: float,
+    signal: Signal | NDArray[np.float64] | list[float],
+    fs: float | None = None,
     fundamental: float | None = None,
     *,
     n_harmonics: int = _DEFAULT_N_HARMONICS,
@@ -622,8 +668,15 @@ def harmonic_analysis(
     Bundles the fundamental, the harmonic amplitudes and the THD (both
     conventions), THD+N and SINAD into a plottable result.
 
-    :param signal: Captured signal (1-D).
-    :param fs: Sample rate, in Hz.
+    :param signal: Captured signal (1-D). Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples: the three distortion ratios come out unchanged, and so does
+        ``sinad_db``, which is the decibel form of one such ratio rather
+        than a level. Only ``harmonic_amplitudes`` carries the unit, and so
+        lands in pascals when the record is calibrated.
+    :param fs: Sample rate, in Hz. Required for a bare array; a
+        :class:`~phonometry.io.Signal` brings its own, and an explicit value
+        that disagrees with it raises instead of silently winning.
     :param fundamental: Fundamental frequency, or ``None`` to auto-detect.
     :param n_harmonics: Highest harmonic order (default 10).
     :param notch_q: Effective notch quality factor for THD+N (default 2.0).
@@ -633,6 +686,7 @@ def harmonic_analysis(
     :return: A :class:`HarmonicDistortionResult`.
     :raises ValueError: If the inputs are invalid.
     """
+    fs = resolve_fs(signal, fs, name="signal")
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     f0, amps = _harmonic_amplitudes(sig, fs_v, fundamental, n_harmonics, window)

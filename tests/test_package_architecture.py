@@ -56,6 +56,13 @@ ALLOWED_EDGES: set[tuple[str, str]] = {
     # data qualification runs on the record as read, so it takes the object
     # the reader returns for the same reason
     ("metrology", "io"),
+    # the electroacoustic, room and speech measurements read their record
+    # from a file too, so they take the object the reader returns and
+    # resolve its rate and calibration through the same contract. Same
+    # direction as the edges above, so the graph stays acyclic
+    ("electroacoustics", "io"),
+    ("room", "io"),
+    ("speech", "io"),
 }
 
 
