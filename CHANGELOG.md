@@ -101,6 +101,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `plot_excitation` is exported by `phonometry.room`, the package that owns it.
+  It was the one of the twenty-four plotting helpers that no domain published:
+  it is defined in the private `_plot.room`, the top level re-exported it, and
+  `phonometry.room` did not, so it was reachable through the flat shortcut and
+  through no module path at all. A reader following the domain, which is how
+  the documentation teaches the library, could not find it.
+
+  Two architecture rules now hold the invariant it broke. One fails when the
+  top level publishes a name no domain package does, naming the orphan. The
+  other fails when two domains publish the same spelling, which is what forces
+  a rename at the top level and what would make a call through a domain
+  ambiguous about the module it reaches. The second was impossible to satisfy
+  until the `environmental` alias went: the same module answered to two names,
+  so 170 names had two owners.
+
 - `floating_floor_improvement_spectrum` refuses one half of the
   `mass_per_area` / `dynamic_stiffness` pair instead of returning
   `delta_lw=None` without a word. The pair exists only to compute that
