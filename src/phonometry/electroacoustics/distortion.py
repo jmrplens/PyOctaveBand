@@ -456,9 +456,9 @@ def sinad(
 
     :param signal: Captured signal (1-D). Accepts a
         :class:`phonometry.io.Signal`, whose calibration is applied to the
-        samples and then cancels: this is a ratio of amplitudes drawn from
-        the same record, so the factor divides out and the answer is the
-        same calibrated or not.
+        samples and then cancels: SINAD is the decibel form of a ratio of
+        amplitudes drawn from the same record rather than a level, so the
+        factor divides out and the answer is the same calibrated or not.
     :param fs: Sample rate, in Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.
@@ -670,9 +670,10 @@ def harmonic_analysis(
 
     :param signal: Captured signal (1-D). Accepts a
         :class:`phonometry.io.Signal`, whose calibration is applied to the
-        samples: the three distortion ratios and the SINAD are ratios and
-        come out unchanged, but ``harmonic_amplitudes`` carries the unit and
-        so lands in pascals when the record is calibrated.
+        samples: the three distortion ratios come out unchanged, and so does
+        ``sinad_db``, which is the decibel form of one such ratio rather
+        than a level. Only ``harmonic_amplitudes`` carries the unit, and so
+        lands in pascals when the record is calibrated.
     :param fs: Sample rate, in Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.

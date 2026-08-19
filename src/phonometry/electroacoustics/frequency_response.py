@@ -141,10 +141,12 @@ def transfer_function(
 
     :param x: Input (reference) signal, 1-D. Accepts a
         :class:`phonometry.io.Signal`, whose calibration is applied to the
-        samples. The whole result is a ratio of the two records, so a factor
-        the two share cancels and nothing moves; calibrating only one of them
-        rescales the response by that factor, which is the right answer for a
-        pair that is genuinely in two different units.
+        samples. The response is a ratio of the two records, so with factors
+        ``c_x`` on ``x`` and ``c_y`` on ``y`` it comes out as
+        ``(c_y / c_x) H``: a factor the two share cancels, calibrating only
+        ``y`` multiplies the response by ``c_y`` and calibrating only ``x``
+        divides it by ``c_x``. That is the right answer for a pair that is
+        genuinely in two different units.
     :param y: Output (response) signal, 1-D, same length as ``x``. Same
         treatment as ``x``.
     :param fs: Sample rate, in Hz. Required when both records are bare

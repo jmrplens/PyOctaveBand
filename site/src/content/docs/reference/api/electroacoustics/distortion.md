@@ -59,7 +59,7 @@ conventions), THD+N and SINAD into a plottable result.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: the three distortion ratios and the SINAD are ratios and come out unchanged, but `harmonic_amplitudes` carries the unit and so lands in pascals when the record is calibrated. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples: the three distortion ratios come out unchanged, and so does `sinad_db`, which is the decibel form of one such ratio rather than a level. Only `harmonic_amplitudes` carries the unit, and so lands in pascals when the record is calibrated. |
 | `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency, or `None` to auto-detect. |
 | `n_harmonics` | Highest harmonic order (default 10). |
@@ -218,7 +218,7 @@ measurement (same notch, same measurement bandwidth).
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: this is a ratio of amplitudes drawn from the same record, so the factor divides out and the answer is the same calibrated or not. |
+| `signal` | Captured signal (1-D). Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: SINAD is the decibel form of a ratio of amplitudes drawn from the same record rather than a level, so the factor divides out and the answer is the same calibrated or not. |
 | `fs` | Sample rate, in Hz. Required for a bare array; a [`Signal`](/phonometry/reference/api/io/io/#signal) brings its own, and an explicit value that disagrees with it raises instead of silently winning. |
 | `fundamental` | Fundamental frequency, or `None` to auto-detect. |
 | `notch_q` | Effective notch quality factor (AES17: 1.2..3; default 2.0). |

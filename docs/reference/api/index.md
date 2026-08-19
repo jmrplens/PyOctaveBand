@@ -66,6 +66,16 @@ well. The pre-3.2 flat paths, written without a subpackage, were removed in
 | `phonometry.room.room_ir` | `phonometry.room.impulse_response` | 5.0 |
 | `phonometry.aircraft.aircraft_noise` | `phonometry.aircraft.certification` | 5.0 |
 
+> **Reading the input column.** Every function that consumes a recording
+> accepts a `phonometry.io.Signal` wherever the table writes a signal
+> argument, and then `fs` is optional: the object carries it, and an
+> explicit value that disagrees with it raises rather than overriding it. A
+> bare array still requires `fs` by name. A calibrated `Signal` is analysed
+> in pascals, with four documented exemptions (the EBU R 128 family, the
+> `dbfs=True` paths, quantities that are not pressures, and
+> `metrology.sensitivity`, which is what produces a calibration factor).
+> Each function's own page states which of these applies to it.
+
 | Name | Type | Description (Inputs) | Usage Snippet (Outputs) |
 | :--- | :--- | :--- | :--- |
 | `octave_filter` | `function` | **High-level analysis.**<br>• `x`: Signal array<br>• `fs`: Sample rate [Hz]<br>• `fraction`: 1, 3, etc. (Default: 1)<br>• `order`: Filter order (Default: 6)<br>• `limits`: [f_min, f_max] (Default: [12, 20000])<br>• `sigbands`: Return time signals (Default: False)<br>• `detrend`: Remove DC offset (Default: True)<br>• `mode`: 'rms' or 'peak' (Default: 'rms')<br>• `nominal`: IEC 61260-1 nominal labels (Default: False)<br>• `design`: `FilterDesign` (family, ripple, attenuation, decimation)<br>• `calibration`: `LevelCalibration` (factor, dBFS)<br>• `response_plot`: `ResponsePlot` (show, file) | `spl, freq = octave_filter(x, fs, ...)`<br>• `spl`: levels [dB]<br>• `freq`: frequencies [Hz]<br><br>**With `sigbands=True`:**<br>`spl, freq, xb = octave_filter(x, fs, sigbands=True)`<br>• `xb`: List of filtered signals (one per band)<br><br>**Calibrated usage:**<br>`spl, f = octave_filter(x, fs, calibration=LevelCalibration(factor=0.05))` |

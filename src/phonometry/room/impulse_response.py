@@ -434,8 +434,9 @@ def impulse_response(
         the result so that a plot can label its time axis; **required** for
         ``method="farina"``, which rebuilds the analytic inverse filter and
         so needs the rate to know what its band edges mean. Either record
-        may be a :class:`~phonometry.io.Signal` and supply it, and an
-        explicit value that disagrees raises.
+        may be a :class:`~phonometry.io.Signal` and supply it, an explicit
+        value that disagrees with one raises, and two Signals recorded at
+        different rates are refused rather than arbitrated.
     :param method: ``"spectral"`` for spectral division
         :math:`H = Y \overline{X} / (\lvert X \rvert^2 + \text{reg})`
         (Figure B.3, default) or ``"farina"``
@@ -567,7 +568,9 @@ def mls_impulse_response(
         :meth:`ImpulseResponseResult.plot` can label a time axis in seconds
         (the recovery itself is sample-rate agnostic). Default ``None``.
         Either record may be a :class:`~phonometry.io.Signal` and supply it
-        instead, and an explicit value that disagrees with one raises.
+        instead; an explicit value that disagrees with one raises, and two
+        Signals recorded at different rates are refused rather than
+        arbitrated.
     :return: An :class:`ImpulseResponseResult` wrapping the recovered impulse
         response. It behaves like the raw IR array for every downstream
         consumer and adds :meth:`ImpulseResponseResult.plot`.
@@ -737,7 +740,9 @@ def golay_impulse_response(
         :meth:`ImpulseResponseResult.plot` can label a time axis in seconds
         (the recovery itself is sample-rate agnostic). Default ``None``.
         Either record may be a :class:`~phonometry.io.Signal` and supply it
-        instead, and an explicit value that disagrees with one raises.
+        instead; an explicit value that disagrees with one raises, and two
+        Signals recorded at different rates are refused rather than
+        arbitrated.
     :return: An :class:`ImpulseResponseResult` (``method="golay"``). It
         behaves like the raw IR array for every downstream consumer and
         adds :meth:`ImpulseResponseResult.plot`.
