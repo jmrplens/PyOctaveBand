@@ -56,6 +56,13 @@ kept, channels are never mixed down, and no sample is ever normalized,
 because each of those "conveniences" silently destroys the level or the
 timing a measurement depends on.
 
+The type is `phonometry.io.Signal`. Write it `io.Signal` after
+`from phonometry import io`, or `phonometry.Signal`, which is the same class:
+the top level publishes it because seven packages accept one, and those are
+the only two spellings. The module it is defined in is private, and reaching
+into it gets a class that is equal to this one in every way except that
+nothing promises it will still be there.
+
 The base install (NumPy and SciPy alone) reads the whole linear WAV family
 that measurement equipment writes: PCM at any depth including 24-bit,
 IEEE float, `WAVE_FORMAT_EXTENSIBLE` with its channel mask, BWF `bext`

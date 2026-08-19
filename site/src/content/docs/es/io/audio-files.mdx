@@ -57,6 +57,12 @@ mezclan nunca, y ninguna muestra se normaliza jamás, porque cada una de esas
 «comodidades» destruye en silencio el nivel o los tiempos de los que depende
 una medición.
 
+El tipo es `phonometry.io.Signal`. Se escribe `io.Signal` tras
+`from phonometry import io`, o `phonometry.Signal`, que es la misma clase: el
+nivel superior la publica porque siete paquetes la aceptan, y esas son las dos
+únicas formas. El módulo donde está definida es privado, y entrar por ahí da
+una clase igual a esta en todo salvo en que nada garantiza que siga estando.
+
 La instalación base (NumPy y SciPy, nada más) lee toda la familia WAV lineal
 que escribe el equipamiento de medida: PCM a cualquier profundidad, incluido
 el de 24 bits, IEEE float, `WAVE_FORMAT_EXTENSIBLE` con su máscara de

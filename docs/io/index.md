@@ -25,7 +25,8 @@ a level computed from an ADPCM or MP3 approximation of the waveform is not
 defensible, and the warning plus the `lossy` stamp keep that fact attached
 to the data.
 
-What comes back from a file is a `Signal`: the samples with their rate,
+What comes back from a file is a `Signal` (`io.Signal`, or
+`phonometry.Signal`; the module it is defined in is private): the samples with their rate,
 calibration, channel labels and `bext` provenance in one immutable object
 that behaves as the bare array everywhere (`np.asarray` hands any existing
 function the samples), draws itself with `.plot()`, and walks straight into

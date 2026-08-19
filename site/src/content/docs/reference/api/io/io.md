@@ -410,6 +410,12 @@ Signal(
 
 A sampled acoustic signal with its rate, calibration and provenance.
 
+Written `io.Signal` after `from phonometry import io`, or
+`phonometry.Signal`: the top level publishes this one class because
+seven packages accept one, and those are the two spellings. The module
+holding this definition is private, and a name read out of it is the same
+object with nothing promising it will stay reachable that way.
+
 Returned by [`phonometry.io.read`](/phonometry/reference/api/io/io/#read); can also be constructed directly
 around an array. The object is a drop-in replacement for the bare array:
 it implements `__array__`, so `np.asarray(signal)` yields the
@@ -562,12 +568,12 @@ SignalOrigin(
 
 Where a [`Signal`](/phonometry/reference/api/io/io/#signal) came from, as read from the file itself.
 
-The name is deliberately not `SignalSource`: phonometry already exports
-a [`SignalSource`](/phonometry/reference/api/simulation/fdtd/#signalsource) (an FDTD excitation
-driven by an arbitrary sample sequence), and two public classes sharing a
-name across subpackages would collide the moment both are imported flat
-from `phonometry`. This one is a passive record -- an origin, not a
-source of sound.
+The name is deliberately not `SignalSource`, which
+[`SignalSource`](/phonometry/reference/api/simulation/fdtd/#signalsource) already is (an FDTD
+excitation driven by an arbitrary sample sequence). The two could share a
+spelling now that each is reached through its own package, and the reason
+for the distinction is the better one anyway: this is a passive record --
+an origin, not a source of sound.
 
 `bit_depth` is the *valid* bits per sample (an EXTENSIBLE container
 holding 20 valid bits in 24 reports 20), or `None` where the notion
