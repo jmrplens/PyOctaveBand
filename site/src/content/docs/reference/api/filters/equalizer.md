@@ -144,8 +144,15 @@ One biquad of the RBJ Audio EQ Cookbook.
 
 ```python
 parametric_eq(
-    x: Signal | list[float] | np.ndarray,
-    fs: float | None = None,
+    x: Signal,
+    fs: float | None = ...,
+    *,
+    sections: EQSection | Sequence[EQSection],
+) -> Signal
+
+parametric_eq(
+    x: list[float] | np.ndarray,
+    fs: float,
     *,
     sections: EQSection | Sequence[EQSection],
 ) -> np.ndarray

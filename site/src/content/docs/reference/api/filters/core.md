@@ -101,7 +101,7 @@ octave_filter(
     design: FilterDesign = ...,
     calibration: LevelCalibration = ...,
     response_plot: ResponsePlot = ...,
-) -> tuple[np.ndarray, list[float], list[np.ndarray]]
+) -> tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]]
 
 octave_filter(
     x: Signal | list[float] | np.ndarray,
@@ -133,7 +133,7 @@ octave_filter(
     design: FilterDesign = ...,
     calibration: LevelCalibration = ...,
     response_plot: ResponsePlot = ...,
-) -> tuple[np.ndarray, list[str], list[np.ndarray]]
+) -> tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]
 ```
 
 Filter a signal with octave or fractional octave filter bank.
@@ -218,7 +218,7 @@ OctaveFilterBank.filter(
     calculate_level: Literal[True] = True,
     nominal: Literal[False] = False,
     zero_phase: bool = False,
-) -> tuple[np.ndarray, list[float], list[np.ndarray]]
+) -> tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]]
 
 OctaveFilterBank.filter(
     x: Signal | list[float] | np.ndarray,
@@ -238,7 +238,7 @@ OctaveFilterBank.filter(
     calculate_level: Literal[False] = False,
     nominal: Literal[False] = False,
     zero_phase: bool = False,
-) -> tuple[None, list[float], list[np.ndarray]]
+) -> tuple[None, list[float], list[Signal] | list[np.ndarray]]
 
 OctaveFilterBank.filter(
     x: Signal | list[float] | np.ndarray,
@@ -258,7 +258,7 @@ OctaveFilterBank.filter(
     calculate_level: Literal[True] = True,
     nominal: Literal[True] = ...,
     zero_phase: bool = False,
-) -> tuple[np.ndarray, list[str], list[np.ndarray]]
+) -> tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]
 
 OctaveFilterBank.filter(
     x: Signal | list[float] | np.ndarray,
@@ -278,7 +278,7 @@ OctaveFilterBank.filter(
     calculate_level: Literal[False] = False,
     nominal: Literal[True] = ...,
     zero_phase: bool = False,
-) -> tuple[None, list[str], list[np.ndarray]]
+) -> tuple[None, list[str], list[Signal] | list[np.ndarray]]
 ```
 
 Apply the pre-designed filter bank to a signal.

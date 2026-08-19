@@ -54,12 +54,12 @@ from __future__ import annotations
 import math
 import warnings
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import numpy as np
 
 from .._internal.warnings import PhonometryWarning
-from ..io._resolve import apply_calibration, resolve_fs
+from ..io._resolve import apply_calibration, like_input, resolve_fs
 from ..io._signal import Signal
 from .spectra import _positive
 
@@ -624,12 +624,27 @@ def _fractional_advance(
     return np.asarray(shifted[:n], dtype=np.float64)
 
 
+@overload
+def fractional_delay(
+    x: Signal, delay: float, *, mode: Literal["linear", "circular"] = ...
+) -> Signal: ...
+
+
+@overload
+def fractional_delay(
+    x: NDArray[np.float64] | list[float],
+    delay: float,
+    *,
+    mode: Literal["linear", "circular"] = ...,
+) -> NDArray[np.float64]: ...
+
+
 def fractional_delay(
     x: Signal | NDArray[np.float64] | list[float],
     delay: float,
     *,
     mode: Literal["linear", "circular"] = "linear",
-) -> NDArray[np.float64]:
+) -> Signal | NDArray[np.float64]:
     r"""Delay a record by an arbitrary (sub-sample) number of samples.
 
     Band-limited delay via a frequency-domain phase ramp
@@ -680,10 +695,10 @@ def fractional_delay(
     if mode == "linear":
         # A delay is a negative advance; float negation is exact, so the
         # phase ramp is bit-identical to the alignment kernel's.
-        return _fractional_advance(xa, -delay_v)
+        return like_input(x, _fractional_advance(xa, -delay_v))
     n = xa.size
     freqs = np.fft.rfftfreq(n)
     delayed = np.fft.irfft(
         np.fft.rfft(xa) * np.exp(-2j * np.pi * freqs * delay_v), n=n
     )
-    return np.asarray(delayed, dtype=np.float64)
+    return like_input(x, np.asarray(delayed, dtype=np.float64))

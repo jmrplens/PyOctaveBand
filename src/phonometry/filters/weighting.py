@@ -47,13 +47,14 @@ from __future__ import annotations
 
 import math
 from functools import lru_cache
-from typing import cast
+from typing import cast, overload
 
 import numpy as np
 from scipy import signal
 
 from .._internal.utils import _sos_initial_state, _sos_state_mismatch
 from ..io._resolve import (
+    like_input,
     refuse_foreign_rate,
     resolve_fs,
     resolve_samples,
@@ -440,12 +441,30 @@ def _cached_weighting_filter(
     return WeightingFilter(fs, curve, high_accuracy=high_accuracy)
 
 
+@overload
+def weighting_filter(
+    x: Signal,
+    fs: int | None = ...,
+    curve: str = ...,
+    high_accuracy: bool = ...,
+) -> Signal: ...
+
+
+@overload
+def weighting_filter(
+    x: list[float] | np.ndarray,
+    fs: int,
+    curve: str = ...,
+    high_accuracy: bool = ...,
+) -> np.ndarray: ...
+
+
 def weighting_filter(
     x: Signal | list[float] | np.ndarray,
     fs: int | None = None,
     curve: str = "A",
     high_accuracy: bool = True,
-) -> np.ndarray:
+) -> Signal | np.ndarray:
     """
     Apply a frequency weighting to a signal.
 
@@ -465,7 +484,7 @@ def weighting_filter(
     """
     fs = resolve_fs(x, fs)
     wf = _cached_weighting_filter(fs, curve, high_accuracy)
-    return wf.filter(resolve_samples(x))
+    return like_input(x, wf.filter(resolve_samples(x)))
 
 
 def _prepare_time_weighting_initial_state(
@@ -636,13 +655,25 @@ class TimeWeighting:
         self._state = None
 
 
+@overload
+def linkwitz_riley(
+    x: Signal, fs: int | None = ..., *, freq: float, order: int = ...
+) -> tuple[Signal, Signal]: ...
+
+
+@overload
+def linkwitz_riley(
+    x: list[float] | np.ndarray, fs: int, *, freq: float, order: int = ...
+) -> tuple[np.ndarray, np.ndarray]: ...
+
+
 def linkwitz_riley(
     x: Signal | list[float] | np.ndarray,
     fs: int | None = None,
     *,
     freq: float,
     order: int = 4,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[Signal, Signal] | tuple[np.ndarray, np.ndarray]:
     """
     Linkwitz-Riley crossover filter (Butterworth squared).
     Splits signal into low and high bands with flat sum response.
@@ -678,4 +709,9 @@ def linkwitz_riley(
     hp = signal.sosfilt(sos_hp, x_proc)
     hp = signal.sosfilt(sos_hp, hp)
     
+    # The two branches are one measurement split in two, so they are wrapped
+    # together: a caller that got a Signal for the low band and an array for
+    # the high one would have to test which it holds before using either.
+    if isinstance(x, Signal):
+        return like_input(x, lp), like_input(x, hp)
     return lp, hp

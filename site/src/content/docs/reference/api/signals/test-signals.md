@@ -59,10 +59,17 @@ with their accuracy stated instead of implied.
 
 ```python
 fractional_delay(
-    x: Signal | NDArray[np.float64] | list[float],
+    x: Signal,
     delay: float,
     *,
-    mode: Literal['linear', 'circular'] = 'linear',
+    mode: Literal['linear', 'circular'] = ...,
+) -> Signal
+
+fractional_delay(
+    x: NDArray[np.float64] | list[float],
+    delay: float,
+    *,
+    mode: Literal['linear', 'circular'] = ...,
 ) -> NDArray[np.float64]
 ```
 

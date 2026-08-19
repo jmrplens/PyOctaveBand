@@ -51,11 +51,19 @@ frequency from 50 Hz to 10 kHz except 1600 Hz (0.15 dB) and 2500 Hz
 
 ```python
 linkwitz_riley(
-    x: Signal | list[float] | np.ndarray,
-    fs: int | None = None,
+    x: Signal,
+    fs: int | None = ...,
     *,
     freq: float,
-    order: int = 4,
+    order: int = ...,
+) -> tuple[Signal, Signal]
+
+linkwitz_riley(
+    x: list[float] | np.ndarray,
+    fs: int,
+    *,
+    freq: float,
+    order: int = ...,
 ) -> tuple[np.ndarray, np.ndarray]
 ```
 
@@ -149,10 +157,17 @@ Forget the carried state (the next block starts from rest).
 
 ```python
 weighting_filter(
-    x: Signal | list[float] | np.ndarray,
-    fs: int | None = None,
-    curve: str = 'A',
-    high_accuracy: bool = True,
+    x: Signal,
+    fs: int | None = ...,
+    curve: str = ...,
+    high_accuracy: bool = ...,
+) -> Signal
+
+weighting_filter(
+    x: list[float] | np.ndarray,
+    fs: int,
+    curve: str = ...,
+    high_accuracy: bool = ...,
 ) -> np.ndarray
 ```
 
