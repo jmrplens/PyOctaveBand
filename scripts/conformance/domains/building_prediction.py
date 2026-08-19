@@ -23,12 +23,12 @@ import phonometry as ph
 from ..registry import Outcome, numeric, register
 
 
-def _annex_h3_paths() -> list[ph.FlankingPath]:
+def _annex_h3_paths() -> list[ph.building.FlankingPath]:
     """The EN 12354-1 Annex H.3 flanking paths from the shared input table."""
     ss = ref.EN12354_1_ANNEX_H3_SEPARATING_AREA
-    paths: list[ph.FlankingPath] = []
+    paths: list[ph.building.FlankingPath] = []
     for label, rw, kff, kfd, lf in ref.EN12354_1_ANNEX_H3_ELEMENTS:
-        ff, df, fd = ph.flanking_element(
+        ff, df, fd = ph.building.flanking_element(
             label=label, r_flanking=rw, r_separating=ref.EN12354_1_ANNEX_H3_R_DIRECT,
             k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=ss, coupling_length=lf,
         )
@@ -42,7 +42,7 @@ def _annex_h3_paths() -> list[ph.FlankingPath]:
     "Airborne prediction R'w (direct + 12 flanking paths)",
 )
 def _chk_en12354_1_airborne() -> Outcome:
-    res = ph.predicted_airborne_insulation(
+    res = ph.building.predicted_airborne_insulation(
         r_direct=ref.EN12354_1_ANNEX_H3_R_DIRECT, flanking_paths=_annex_h3_paths()
     )
     expected = ref.EN12354_1_ANNEX_H3_RPRIME_W
@@ -62,7 +62,7 @@ def _chk_en12354_1_airborne() -> Outcome:
     "All 12 printed flanking-path values Rij,w",
 )
 def _chk_en12354_1_h3_paths() -> Outcome:
-    res = ph.predicted_airborne_insulation(
+    res = ph.building.predicted_airborne_insulation(
         r_direct=ref.EN12354_1_ANNEX_H3_R_DIRECT, flanking_paths=_annex_h3_paths()
     )
     by_label = {p.label: p.r_w for p in res.paths}
@@ -82,8 +82,8 @@ def _chk_en12354_1_h3_paths() -> Outcome:
 def _chk_en12354_1_dnt_closure() -> Outcome:
     v = ref.EN12354_1_ANNEX_H3_VOLUME
     ss = ref.EN12354_1_ANNEX_H3_SEPARATING_AREA
-    first = float(ph.standardized_level_difference(52.2, v, ss))
-    second = float(ph.standardized_level_difference(52.7, v, ss))
+    first = float(ph.building.standardized_level_difference(52.2, v, ss))
+    second = float(ph.building.standardized_level_difference(52.7, v, ss))
     ok = (
         round(first) == ref.EN12354_1_ANNEX_H3_DNT_W
         and round(second) == ref.EN12354_1_ANNEX_H3_DNT_W_SECOND
@@ -105,11 +105,11 @@ def _chk_en12354_1_dnt_closure() -> Outcome:
     "Impact prediction L'n,w = Ln,w,eq - dLw + K",
 )
 def _chk_en12354_2_impact() -> Outcome:
-    ln_eq = ph.equivalent_impact_level(ref.EN12354_2_ANNEX_E3_MASS)
-    k = ph.impact_flanking_correction(
+    ln_eq = ph.building.equivalent_impact_level(ref.EN12354_2_ANNEX_E3_MASS)
+    k = ph.building.impact_flanking_correction(
         ref.EN12354_2_ANNEX_E3_MASS, ref.EN12354_2_ANNEX_E3_FLANKING_MEAN_MASS
     )
-    res = ph.predicted_impact_insulation(
+    res = ph.building.predicted_impact_insulation(
         ln_w_eq=round(ln_eq), delta_l_w=ref.EN12354_2_ANNEX_E3_DELTA_LW,
         k_correction=k,
     )
@@ -129,7 +129,7 @@ def _chk_en12354_2_impact() -> Outcome:
 def _chk_en12354_2_standardized() -> Outcome:
     # Exact Formula (3): 45 - 10 lg(0,032 x 50) = 42,96 dB. The E.3 chain's own
     # "10 lg(V/30)" rounding gives 42,8 dB; both round to 43 dB.
-    lnt = float(ph.standardized_impact_level(45.0, 50.0))
+    lnt = float(ph.building.standardized_impact_level(45.0, 50.0))
     ok = round(lnt) == 43 and abs(lnt - 42.96) <= 0.01
     return Outcome(
         expected="L'nT,w 43 dB (exact 42,96; E.3 prints 42,8)",
@@ -139,14 +139,18 @@ def _chk_en12354_2_standardized() -> Outcome:
     )
 
 
-def _en12354_3_annex_f() -> ph.FacadePredictionResult:
+def _en12354_3_annex_f() -> ph.building.FacadePredictionResult:
     """The EN 12354-3 Annex F facade prediction from the shared input table."""
     elements = [
-        ph.FacadeElement(name=name, area=area, r=r)
+        ph.building.FacadeElement(name=name, area=area, r=r)
         for name, area, r in ref.EN12354_3_ANNEX_F_ELEMENTS
     ]
-    elements.append(ph.FacadeElement(name="inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE))
-    return ph.facade_sound_reduction(
+    elements.append(
+        ph.building.FacadeElement(
+            name="inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE
+        )
+    )
+    return ph.building.facade_sound_reduction(
         elements,
         area=ref.EN12354_3_ANNEX_F_AREA,
         volume=ref.EN12354_3_ANNEX_F_VOLUME,
@@ -188,14 +192,14 @@ def _chk_en12354_3_facade() -> Outcome:
     "Radiated LW of a wall+door segment (side 1, low bands)",
 )
 def _chk_en12354_4_radiated() -> Outcome:
-    res = ph.radiated_sound_power(
+    res = ph.building.radiated_sound_power(
         [
-            ph.FacadeElement(
+            ph.building.FacadeElement(
                 name="wall",
                 area=ref.EN12354_4_ANNEX_G_SEGMENT_AREA - ref.EN12354_4_ANNEX_G_DOOR_AREA,
                 r=ref.EN12354_4_ANNEX_G_CONCRETE_R,
             ),
-            ph.FacadeElement(
+            ph.building.FacadeElement(
                 name="door", area=ref.EN12354_4_ANNEX_G_DOOR_AREA,
                 r=ref.EN12354_4_ANNEX_G_DOOR_R,
             ),
@@ -240,8 +244,8 @@ def _chk_en12354_4_propagation() -> Outcome:
     worst = 0.0
     computed_lp = []
     for w, h, d, a_tot, lwa, lp_expected in cells:
-        att = float(ph.outdoor_attenuation(w, h, d))
-        lp = float(ph.outdoor_level(lwa, att))
+        att = float(ph.building.outdoor_attenuation(w, h, d))
+        lp = float(ph.building.outdoor_level(lwa, att))
         worst = max(worst, abs(att - a_tot), abs(lp - lp_expected))
         computed_lp.append(lp)
     return Outcome(
@@ -258,7 +262,7 @@ def _chk_en12354_4_propagation() -> Outcome:
     "Airborne band uncertainty, situation A @ 1 kHz",
 )
 def _chk_iso12999_table2_band() -> Outcome:
-    res = ph.band_uncertainty("airborne", "A")
+    res = ph.building.band_uncertainty("airborne", "A")
     idx = list(res.frequencies).index(1000)
     computed = float(res.uncertainties[idx])
     return numeric(
@@ -272,7 +276,7 @@ def _chk_iso12999_table2_band() -> Outcome:
     "One-decimal single numbers Rw / Rw+C50-5000 / Rw+Ctr,50-5000",
 )
 def _chk_iso12999_annex_b_values() -> Outcome:
-    res = ph.weighted_rating_extended(
+    res = ph.building.weighted_rating_extended(
         ref.ISO12999_1_ANNEX_B_RI, ref.ISO12999_1_ANNEX_B_FREQ,
         one_decimal=True,
     )
@@ -309,16 +313,16 @@ def _chk_iso12999_annex_b_uncertainties() -> Outcome:
 
     ri = np.asarray(ref.ISO12999_1_ANNEX_B_RI, dtype=float)
     ui = np.asarray(ref.ISO12999_1_ANNEX_B_UI, dtype=float)
-    u_c = float(ph.single_number_uncertainty_uncorrelated(
+    u_c = float(ph.building.single_number_uncertainty_uncorrelated(
         ui, np.asarray(_SPECTRUM1_50_5000, dtype=float) - ri
     ))
-    u_ctr = float(ph.single_number_uncertainty_uncorrelated(
+    u_ctr = float(ph.building.single_number_uncertainty_uncorrelated(
         ui, np.asarray(_SPECTRUM2_50_5000, dtype=float) - ri
     ))
-    up = ph.weighted_rating_extended(
+    up = ph.building.weighted_rating_extended(
         ri + ui, ref.ISO12999_1_ANNEX_B_FREQ, one_decimal=True
     ).rating
-    down = ph.weighted_rating_extended(
+    down = ph.building.weighted_rating_extended(
         ri - ui, ref.ISO12999_1_ANNEX_B_FREQ, one_decimal=True
     ).rating
     u_rw = (float(up) - float(down)) / 2.0
@@ -347,7 +351,9 @@ def _chk_iso12999_annex_b_uncertainties() -> Outcome:
 def _chk_iso12999_expanded() -> Outcome:
     u = ref.ISO12999_1_RW_A_STANDARD_UNCERTAINTY
     expected = ref.ISO12999_1_COVERAGE_K_95 * u
-    computed = float(ph.insulation_expanded_uncertainty(u, coverage=0.95))
+    computed = float(
+        ph.building.insulation_expanded_uncertainty(u, coverage=0.95)
+    )
     return numeric(expected, computed, 1e-9, unit="dB", places=6)
 
 
@@ -357,7 +363,7 @@ def _chk_iso12999_expanded() -> Outcome:
     "Absorption coefficient +/-U (k=2), reproducibility, 20 x 1/3-oct bands",
 )
 def _chk_iso12999_2_table4() -> Outcome:
-    res = ph.sound_absorption_coefficient_uncertainty(
+    res = ph.materials.sound_absorption_coefficient_uncertainty(
         ref.ISO12999_2_TABLE4_ALPHA_S, ref.ISO12999_2_TABLE4_FREQ, confidence=0.95
     )
     got = res.reported_expanded_uncertainty
@@ -377,7 +383,7 @@ def _chk_iso12999_2_table4() -> Outcome:
     "Practical coefficient +/-U (k=2), reproducibility, 5 octave bands",
 )
 def _chk_iso12999_2_table5() -> Outcome:
-    res = ph.practical_coefficient_uncertainty(
+    res = ph.materials.practical_coefficient_uncertainty(
         ref.ISO12999_2_TABLE5_ALPHA_P, ref.ISO12999_2_TABLE5_FREQ
     )
     got = res.reported_expanded_uncertainty
@@ -398,12 +404,12 @@ def _chk_iso12999_2_table5() -> Outcome:
 )
 def _chk_iso12999_2_single_numbers() -> Outcome:
     u_aw = float(
-        ph.weighted_coefficient_uncertainty(
+        ph.materials.weighted_coefficient_uncertainty(
             ref.ISO12999_2_ALPHA_W_EXAMPLE
         ).reported_expanded_uncertainty[0]
     )
     u_dl = float(
-        ph.single_number_rating_uncertainty(
+        ph.materials.single_number_rating_uncertainty(
             ref.ISO12999_2_DLALPHA_EXAMPLE
         ).reported_expanded_uncertainty[0]
     )

@@ -42,7 +42,7 @@ def _ebu_stereo_steps(segments: tuple[tuple[float, float], ...]) -> np.ndarray:
 )
 def _chk_bs1770_anchor() -> Outcome:
     x = np.vstack([_ebu_tone(0.0, 10.0, freq=997.0), np.zeros(10 * _EBU_FS)])
-    computed = ph.integrated_loudness(x, _EBU_FS)
+    computed = ph.broadcast.integrated_loudness(x, _EBU_FS)
     return numeric(ref.BS1770_ANCHOR_997_LKFS, computed, 0.01, unit="LKFS", places=2)
 
 
@@ -53,7 +53,9 @@ def _chk_bs1770_anchor() -> Outcome:
 )
 def _chk_tech3341_case1() -> Outcome:
     _, segments, expected = ref.EBU_TECH3341_INTEGRATED_CASES[0]
-    computed = ph.integrated_loudness(_ebu_stereo_steps(segments), _EBU_FS)
+    computed = ph.broadcast.integrated_loudness(
+        _ebu_stereo_steps(segments), _EBU_FS
+    )
     return numeric(expected, computed, ref.EBU_TECH3341_TOL_LU, unit="LUFS", places=2)
 
 
@@ -64,7 +66,9 @@ def _chk_tech3341_case1() -> Outcome:
 )
 def _chk_tech3341_case5() -> Outcome:
     _, segments, expected = ref.EBU_TECH3341_INTEGRATED_CASES[4]
-    computed = ph.integrated_loudness(_ebu_stereo_steps(segments), _EBU_FS)
+    computed = ph.broadcast.integrated_loudness(
+        _ebu_stereo_steps(segments), _EBU_FS
+    )
     return numeric(expected, computed, ref.EBU_TECH3341_TOL_LU, unit="LUFS", places=2)
 
 
@@ -75,7 +79,7 @@ def _chk_tech3341_case5() -> Outcome:
 )
 def _chk_tech3341_case6() -> Outcome:
     x = np.vstack([_ebu_tone(lvl, 20.0) for lvl in ref.EBU_TECH3341_CASE6_LEVELS])
-    computed = ph.integrated_loudness(x, _EBU_FS)
+    computed = ph.broadcast.integrated_loudness(x, _EBU_FS)
     return numeric(
         ref.EBU_TECH3341_CASE6_EXPECTED,
         computed,
@@ -97,7 +101,7 @@ def _ebu_true_peak_case(index: int) -> tuple[float, float]:
     n = int(0.01 * _EBU_FS)
     x[:n] *= np.linspace(0.0, 1.0, n)
     x[-n:] *= np.linspace(1.0, 0.0, n)
-    return expected, float(ph.true_peak_level(x, _EBU_FS))
+    return expected, float(ph.broadcast.true_peak_level(x, _EBU_FS))
 
 
 def _true_peak_outcome(expected: float, computed: float) -> Outcome:
@@ -141,7 +145,7 @@ def _chk_tech3341_case19() -> Outcome:
 def _chk_tech3342_case1() -> Outcome:
     _, levels, expected = ref.EBU_TECH3342_LRA_CASES[0]
     x = _ebu_stereo_steps(tuple((lvl, 20.0) for lvl in levels))
-    res = ph.program_loudness(x, _EBU_FS)
+    res = ph.broadcast.program_loudness(x, _EBU_FS)
     return numeric(
         expected, res.loudness_range, ref.EBU_TECH3342_TOL_LU, unit="LU", places=2
     )
@@ -155,7 +159,7 @@ def _chk_tech3342_case1() -> Outcome:
 def _chk_tech3342_case3() -> Outcome:
     _, levels, expected = ref.EBU_TECH3342_LRA_CASES[2]
     x = _ebu_stereo_steps(tuple((lvl, 20.0) for lvl in levels))
-    res = ph.program_loudness(x, _EBU_FS)
+    res = ph.broadcast.program_loudness(x, _EBU_FS)
     return numeric(
         expected, res.loudness_range, ref.EBU_TECH3342_TOL_LU, unit="LU", places=2
     )

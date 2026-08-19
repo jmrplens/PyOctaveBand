@@ -142,7 +142,7 @@ def _chk_stipa_staircase(m: float) -> Outcome:
     # audio path (octave bank, envelopes, correlation, TI chain). The
     # certified stipa.info WAV bench (same construction) measures a worst
     # deviation of 0,0031 STI; tolerance +/-0,01.
-    computed = float(ph.stipa(_stipa_sine_signal(m), _FS).sti)
+    computed = float(ph.speech.stipa(_stipa_sine_signal(m), _FS).sti)
     return numeric(_STI_STAIRCASE[m], computed, 0.01, places=4)
 
 
@@ -199,7 +199,7 @@ def _chk_sti_indirect_expdecay() -> Outcome:
         1.0 + (2.0 * np.pi * mod_freqs * rt60 / (6.0 * np.log(10.0))) ** 2
     )
     expected = float(_sti_from_mtf(np.tile(m_formula, (_NUM_STI_BANDS, 1))).sti)
-    computed = float(ph.sti_from_impulse_response(x, _FS).sti)
+    computed = float(ph.speech.sti_from_impulse_response(x, _FS).sti)
     return numeric(expected, computed, 0.005, places=4)
 
 
@@ -225,7 +225,7 @@ def _chk_sti_filter_slope() -> Outcome:
     with warnings.catch_warnings():
         # Bands other than 125 Hz are legitimately (near-)empty here.
         warnings.simplefilter("ignore", UserWarning)
-        m_observed = float(np.min(ph.stipa(x, _FS).mtf[0]))
+        m_observed = float(np.min(ph.speech.stipa(x, _FS).mtf[0]))
     return Outcome(
         expected="m >= 0.5 (C.4.2 pass criterion)",
         computed=_fmt(m_observed, places=4),
@@ -245,7 +245,7 @@ def _chk_sti_weighting_pair_audio() -> Outcome:
     # modulated (m = 1) -> STI = alpha_3 + alpha_4 - beta_3 = 0,398.
     # Certified WAV bench worst deviation vs the identity: 0,0002 STI.
     x = _stipa_sine_signal(1.0, bands=(2, 3), flat_levels=True)
-    computed = float(ph.stipa(x, _FS).sti)
+    computed = float(ph.speech.stipa(x, _FS).sti)
     return numeric(0.398, computed, 0.005, places=4)
 
 
@@ -261,7 +261,7 @@ def _chk_sti_edge_carriers() -> Outcome:
     # normative criterion is |STI bias| < 0,01 over TI = 0,1 .. 0,9; the
     # zero-phase bank measures -0,0029 worst on the certified WAVs.
     x = _stipa_sine_signal(0.94065, edge_carriers=True, flat_levels=True)
-    computed = float(ph.stipa(x, _FS).sti)
+    computed = float(ph.speech.stipa(x, _FS).sti)
     return numeric(0.9, computed, 0.01, places=4)
 
 
@@ -277,7 +277,7 @@ _SYSMEAS = "System measurement (Golay / Kirkeby / Mueller-Massarani)"
     "Golay pair: sum of periodic autocorrelations = 2L*delta (L = 4096)",
 )
 def _chk_golay_complementary() -> Outcome:
-    a, b = ph.golay_pair(12)
+    a, b = ph.room.golay_pair(12)
     length = a.size
     acorr = np.fft.irfft(
         np.abs(np.fft.rfft(a)) ** 2 + np.abs(np.fft.rfft(b)) ** 2, length
@@ -296,9 +296,9 @@ def _chk_golay_complementary() -> Outcome:
     "Golay chain recovers a delay+gain system IR (noiseless, exact)",
 )
 def _chk_golay_recovery() -> Outcome:
-    pair = ph.golay_pair(10)
+    pair = ph.room.golay_pair(10)
     gain, delay = 0.75, 37
-    res = ph.golay_impulse_response(
+    res = ph.room.golay_impulse_response(
         gain * np.roll(pair[0], delay), gain * np.roll(pair[1], delay), pair
     )
     expected = np.zeros(pair[0].size)
@@ -312,7 +312,7 @@ def _sysmeas_inverse() -> Any:
     b, a = sg.butter(2, [100.0, 8000.0], btype="bandpass", fs=float(_FS))
     imp = np.zeros(1024)
     imp[0] = 1.0
-    return ph.regularized_inverse_filter(
+    return ph.signals.regularized_inverse_filter(
         sg.lfilter(b, a, imp), float(_FS), f_range=(200.0, 4000.0)
     )
 
@@ -356,7 +356,7 @@ def _chk_kirkeby_out_of_band() -> Outcome:
     "Shaped sweep's Welch spectrum follows the pink target, in-band",
 )
 def _chk_shaped_sweep_pink() -> Outcome:
-    res = ph.shaped_sweep_signal(_FS, 50.0, 5000.0, 2.0, target="pink")
+    res = ph.room.shaped_sweep_signal(_FS, 50.0, 5000.0, 2.0, target="pink")
     nperseg = 8192
     freqs, psd = sg.welch(
         np.asarray(res), fs=float(_FS), nperseg=nperseg,

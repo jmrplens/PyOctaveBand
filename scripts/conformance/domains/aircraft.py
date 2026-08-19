@@ -35,7 +35,7 @@ _AIRCRAFT = "Aircraft noise (ICAO Annex 16 / IEC 61265)"
 )
 def _chk_ecac_noise_fraction() -> Outcome:
     # A half-infinite segment (Sp at the start) receives half the energy: −3.01 dB.
-    got = float(ph.noise_fraction(0.0, 10_000.0, 100.0))
+    got = float(ph.aircraft.noise_fraction(0.0, 10_000.0, 100.0))
     return numeric(-10.0 * math.log10(2.0), got, 1e-3, unit="dB", places=4)
 
 
@@ -57,13 +57,15 @@ def _chk_ecac_event_level() -> Outcome:
     xs = _np.linspace(-40000.0, 40000.0, 801)
     path = _np.column_stack([xs, _np.zeros_like(xs), _np.full_like(xs, 300.0),
                              _np.full_like(xs, 10000.0), _np.full_like(xs, vref)])
-    got = ph.event_level(path, [0.0, 300.0, 0.0], npd_p, npd_d, sel, lmax, metric="exposure").level
+    got = ph.aircraft.event_level(
+        path, [0.0, 300.0, 0.0], npd_p, npd_d, sel, lmax, metric="exposure"
+    ).level
     dp = math.hypot(300.0, 300.0)
     beta = math.degrees(math.acos(300.0 / dp))
-    expected = (float(ph.npd_level(npd_p, npd_d, sel, 10000.0, dp)[0])
-                + ph.impedance_adjustment()
-                + ph.engine_installation_correction(beta, "wing")
-                - ph.lateral_attenuation(beta, 300.0))
+    expected = (float(ph.aircraft.npd_level(npd_p, npd_d, sel, 10000.0, dp)[0])
+                + ph.aircraft.impedance_adjustment()
+                + ph.aircraft.engine_installation_correction(beta, "wing")
+                - ph.aircraft.lateral_attenuation(beta, 300.0))
     return numeric(expected, float(got), 1e-2, unit="dB", places=3)
 
 
@@ -75,7 +77,13 @@ def _chk_ecac_event_level() -> Outcome:
 def _chk_ecac_impedance() -> Outcome:
     # ECAC Doc 29 Vol 2 §4.2.1 states the standard-atmosphere adjustment is
     # +0.074 dB (ρc = 416.86, reference impedance 409.81 N·s/m³).
-    return numeric(0.074, float(ph.impedance_adjustment()), 5e-4, unit="dB", places=4)
+    return numeric(
+        0.074,
+        float(ph.aircraft.impedance_adjustment()),
+        5e-4,
+        unit="dB",
+        places=4,
+    )
 
 
 @register(
@@ -90,7 +98,7 @@ def _chk_ecac_workbook_segment() -> Outcome:
     # and Λ = 6.3769 dB. Here we anchor the Λ(β, ℓ) formula to those reference
     # values (the β/φ geometry itself is validated in tests/test_airport_noise).
     beta_ref, lateral_m = 4.2225708673, 81363.2829 * 0.3048
-    got = float(ph.lateral_attenuation(beta_ref, lateral_m))
+    got = float(ph.aircraft.lateral_attenuation(beta_ref, lateral_m))
     return numeric(6.3768594165, got, 1e-2, unit="dB", places=4)
 
 
@@ -102,7 +110,9 @@ def _chk_ecac_workbook_segment() -> Outcome:
 def _chk_ecac_start_of_roll() -> Outcome:
     # ECAC Doc 29 5th ed. Vol 3 Part 1 workbook, case JETFDC: at ψ = 112.8895°,
     # dSOR = 217.09 m the turbofan directivity (Eq. 4-24a) is +0.3196 dB.
-    got = float(ph.start_of_roll_directivity(112.889545, 217.0934, "jet"))
+    got = float(
+        ph.aircraft.start_of_roll_directivity(112.889545, 217.0934, "jet")
+    )
     return numeric(0.31961, got, 1e-2, unit="dB", places=4)
 
 
@@ -114,7 +124,11 @@ def _chk_ecac_start_of_roll() -> Outcome:
 def _chk_ecac_start_of_roll_prop() -> Outcome:
     # Same workbook, case PROPDC: at ψ = 128.1824°, dSOR = 254.44 m the turboprop
     # directivity (Eq. 4-24b) is +1.0943 dB.
-    got = float(ph.start_of_roll_directivity(128.182381, 254.4361, "turboprop"))
+    got = float(
+        ph.aircraft.start_of_roll_directivity(
+            128.182381, 254.4361, "turboprop"
+        )
+    )
     return numeric(1.09434, got, 1e-2, unit="dB", places=4)
 
 
@@ -165,7 +179,9 @@ def _chk_anp_round_trip() -> Outcome:
     # (power, distance) node the loader/interpolation must recover the
     # published value exactly. Boeing 747-100 (JT9DBD), departure SEL,
     # 28000 lb corrected net thrust, 2000 ft slant distance = 98.8 dB.
-    curves = ph.load_anp_database().npd_curves("747100", "departure", "SEL")
+    curves = ph.aircraft.load_anp_database().npd_curves(
+        "747100", "departure", "SEL"
+    )
     got = float(curves.level(28000.0, 2000.0 * 0.3048)[0])
     return numeric(98.8, got, 1e-9, unit="dB", places=4)
 
@@ -179,7 +195,9 @@ def _chk_ecac_npd() -> Outcome:
     # Log-midpoint distance -> arithmetic mean of the bracketing node levels.
     p, d = [1000.0, 2000.0], [200.0, 400.0, 800.0, 1600.0]
     lv = [[100.0, 94.0, 88.0, 82.0], [110.0, 104.0, 98.0, 92.0]]
-    got = float(ph.npd_level(p, d, lv, 1000.0, math.sqrt(200.0 * 400.0))[0])
+    got = float(
+        ph.aircraft.npd_level(p, d, lv, 1000.0, math.sqrt(200.0 * 400.0))[0]
+    )
     return numeric(97.0, got, 1e-9, unit="dB", places=4)
 
 
@@ -193,7 +211,9 @@ _ROTORCRAFT = "Rotorcraft noise (ECAC Doc 32 / NORAH2)"
 )
 def _chk_doc32_atmospheric() -> Outcome:
     # NORAH2 guidance Table 4: 6.3 dB/km at 1 kHz (ICAO reference conditions).
-    got = -float(ph.atmospheric_adjustment([1000.0], 1000.0 + 60.0)[0])
+    got = -float(
+        ph.aircraft.atmospheric_adjustment([1000.0], 1000.0 + 60.0)[0]
+    )
     return numeric(6.3, got, 0.2, unit="dB", places=3)
 
 
@@ -203,8 +223,13 @@ def _chk_doc32_atmospheric() -> Outcome:
     "ΔLs at ten times the 60 m hemisphere reference distance (Eq. 24), dB",
 )
 def _chk_doc32_spreading() -> Outcome:
-    return numeric(-20.0, float(ph.spherical_spreading_adjustment(600.0)), 1e-9,
-                   unit="dB", places=3)
+    return numeric(
+        -20.0,
+        float(ph.aircraft.spherical_spreading_adjustment(600.0)),
+        1e-9,
+        unit="dB",
+        places=3,
+    )
 
 
 @register(
@@ -216,7 +241,11 @@ def _chk_doc32_ground() -> Outcome:
     # Over a near-rigid surface (Zs -> inf), coherent reflection at a small path
     # difference reinforces the direct ray towards the +6.02 dB pressure-doubling
     # limit. A low frequency and near-grazing geometry approaches it.
-    got = float(ph.ground_effect_adjustment([20.0], 50.0, 1.2, 400.0, flow_resistivity="H")[0])
+    got = float(
+        ph.aircraft.ground_effect_adjustment(
+            [20.0], 50.0, 1.2, 400.0, flow_resistivity="H"
+        )[0]
+    )
     return numeric(6.0, got, 1.0, unit="dB", places=2)
 
 
@@ -247,9 +276,9 @@ def _chk_doc32_chain() -> Outcome:
                                  * np.sqrt((x**2 + f2**2) * (x**2 + f3**2))
                                  * (x**2 + f4**2))
 
-    level = (spec + float(ph.spherical_spreading_adjustment(223.66))
-             + ph.atmospheric_adjustment(bands, 223.66)
-             + ph.ground_effect_adjustment(bands, 5.0, 0.2, 223.607,
+    level = (spec + float(ph.aircraft.spherical_spreading_adjustment(223.66))
+             + ph.aircraft.atmospheric_adjustment(bands, 223.66)
+             + ph.aircraft.ground_effect_adjustment(bands, 5.0, 0.2, 223.607,
                                            flow_resistivity=1.0e6)
              + 20.0 * np.log10(_ra(bands) / _ra(np.array(1000.0))))
     got = float(10.0 * np.log10(np.sum(10.0 ** (level / 10.0))))
@@ -261,7 +290,7 @@ def _uniform_hemisphere(level: float, bands: list[float] | None = None) -> Any:
     freqs = np.asarray(bands if bands is not None else [50.0], dtype=np.float64)
     az = np.arange(-90.0, 91.0, 10.0)
     po = np.arange(0.0, 181.0, 10.0)
-    return ph.RotorcraftHemisphere(
+    return ph.aircraft.RotorcraftHemisphere(
         freqs, az, po, np.full((az.size, po.size, freqs.size), level))
 
 
@@ -276,8 +305,10 @@ def _chk_doc32_hover_ring() -> Outcome:
     # bin at theta = 150 reads the ring at +150 deg. Ring level = 60 +
     # bearing/10 dB -> 75 dB by hand.
     brg = np.arange(-180.0, 151.0, 30.0)
-    h = ph.hover_ring_hemisphere([500.0], brg, (60.0 + brg / 10.0)[:, None])
-    got = float(ph.hemisphere_source_level(h, 90.0, 150.0)[0])
+    h = ph.aircraft.hover_ring_hemisphere(
+        [500.0], brg, (60.0 + brg / 10.0)[:, None]
+    )
+    got = float(ph.aircraft.hemisphere_source_level(h, 90.0, 150.0)[0])
     return numeric(75.0, got, 1e-9, unit="dB", places=3)
 
 
@@ -290,11 +321,11 @@ def _chk_doc32_hover_offset() -> Outcome:
     # Table 3, Approach 3: LA_HOGE(theta) = LA_HIGE(theta) + 12 dB from the
     # in-ground-hover disk. A uniform 80 dB ring derives to 92 dB everywhere;
     # the bin under the aircraft is compared.
-    hige = ph.hover_ring_hemisphere(
+    hige = ph.aircraft.hover_ring_hemisphere(
         [500.0], np.arange(-180.0, 151.0, 30.0), np.full((12, 1), 80.0))
-    hoge = ph.hover_derived_hemisphere(hige, "out_of_ground_hover")
-    got = float(ph.hemisphere_source_level(hoge, 0.0, 90.0)[0]
-                - ph.hemisphere_source_level(hige, 0.0, 90.0)[0])
+    hoge = ph.aircraft.hover_derived_hemisphere(hige, "out_of_ground_hover")
+    got = float(ph.aircraft.hemisphere_source_level(hoge, 0.0, 90.0)[0]
+                - ph.aircraft.hemisphere_source_level(hige, 0.0, 90.0)[0])
     return numeric(12.0, got, 1e-9, unit="dB", places=3)
 
 
@@ -311,7 +342,7 @@ def _chk_doc32_flight_condition() -> Outcome:
     # 100 / 90 / 95 dB blend to 10*lg(sum w*10^(L/10)) = 97.0367 dB by hand.
     hems = [_uniform_hemisphere(100.0), _uniform_hemisphere(90.0),
             _uniform_hemisphere(95.0)]
-    got = float(ph.interpolated_source_level(
+    got = float(ph.aircraft.interpolated_source_level(
         hems, [50.0, 70.0, 60.0], [0.0, 0.0, 10.0], 60.0, 2.5, 0.0, 90.0)[0])
     return numeric(97.0367, got, 1e-3, unit="dB", places=4)
 
@@ -329,7 +360,7 @@ def _chk_doc32_kinematics() -> Outcome:
     heading = np.radians(30.0)
     pos = np.column_stack([vg * np.sin(heading) * t, vg * np.cos(heading) * t,
                            100.0 + vg * np.tan(gamma) * t])
-    kin = ph.flight_path_kinematics(t, pos)
+    kin = ph.aircraft.flight_path_kinematics(t, pos)
     return numeric(40.152786, float(kin.airspeed[10]), 1e-4, unit="m/s", places=5)
 
 
@@ -345,9 +376,17 @@ def _chk_doc32_retarded_time() -> Outcome:
     t = np.arange(0.0, 20.5, 0.5)
     pos = np.column_stack([np.zeros_like(t), 50.0 * (t - 10.0),
                            np.full_like(t, 101.2)])
-    res = ph.rotorcraft_event_level(
-        [_uniform_hemisphere(100.0)], [50.0], [0.0], t, pos, (0.0, 0.0),
-        ground=ph.RotorcraftGround(receiver_height=1.2, flow_resistivity="H"))
+    res = ph.aircraft.rotorcraft_event_level(
+        [_uniform_hemisphere(100.0)],
+        [50.0],
+        [0.0],
+        t,
+        pos,
+        (0.0, 0.0),
+        ground=ph.aircraft.RotorcraftGround(
+            receiver_height=1.2, flow_resistivity="H"
+        ),
+    )
     k = int(np.argmin(res.distance))
     return numeric(0.288934, float(res.times[k] - res.emission_times[k]), 1e-5,
                    unit="s", places=6)
@@ -367,9 +406,17 @@ def _chk_doc32_event_sel() -> Outcome:
     t = np.arange(0.0, 240.1, 0.5)
     pos = np.column_stack([np.zeros_like(t), 50.0 * (t - 120.0),
                            np.full_like(t, 100.1)])
-    res = ph.rotorcraft_event_level(
-        [_uniform_hemisphere(100.0, [31.5])], [50.0], [0.0], t, pos, (0.0, 0.0),
-        ground=ph.RotorcraftGround(receiver_height=0.1, flow_resistivity="H"))
+    res = ph.aircraft.rotorcraft_event_level(
+        [_uniform_hemisphere(100.0, [31.5])],
+        [50.0],
+        [0.0],
+        t,
+        pos,
+        (0.0, 0.0),
+        ground=ph.aircraft.RotorcraftGround(
+            receiver_height=0.1, flow_resistivity="H"
+        ),
+    )
     return numeric(7.982, res.sel - res.la_max, 0.1, unit="dB", places=3)
 
 
@@ -381,7 +428,7 @@ def _chk_doc32_event_sel() -> Outcome:
 def _chk_doc32_mean_plane() -> Outcome:
     # Roof (0,0)-(100,20)-(200,0): by symmetry the continuous least-squares
     # line is horizontal at the mean height, area/span = 2000/200 = 10 m.
-    res = ph.mean_ground_plane([0.0, 100.0, 200.0], [0.0, 20.0, 0.0])
+    res = ph.aircraft.mean_ground_plane([0.0, 100.0, 200.0], [0.0, 20.0, 0.0])
     return numeric(10.0, res.intercept, 1e-6, unit="m", places=4)
 
 
@@ -392,7 +439,7 @@ def _chk_doc32_mean_plane() -> Outcome:
 )
 def _chk_doc32_mean_sigma() -> Outcome:
     # Equal lengths: sigma_bar = 10^((log 1e4 + log 1e6)/2) = 1e5 by hand.
-    got = ph.mean_flow_resistivity([120.0, 120.0], [1.0e4, 1.0e6])
+    got = ph.aircraft.mean_flow_resistivity([120.0, 120.0], [1.0e4, 1.0e6])
     return numeric(1.0e5, got, 1e-3, unit="Pa·s/m²", places=1)
 
 
@@ -402,7 +449,9 @@ def _chk_doc32_mean_sigma() -> Outcome:
     "Pure diffraction with the edge on the line of sight, 10·lg 3, dB",
 )
 def _chk_doc32_diffraction_grazing() -> Outcome:
-    got = float(ph.diffraction_attenuation([1000.0], 0.0, edge_height=10.0)[0])
+    got = float(
+        ph.aircraft.diffraction_attenuation([1000.0], 0.0, edge_height=10.0)[0]
+    )
     return numeric(4.7712, got, 1e-4, unit="dB", places=4)
 
 
@@ -415,7 +464,7 @@ def _chk_doc32_screening_delta() -> Outcome:
     # Source (0, 20), receiver (400, 1.2), single edge at (200, 40):
     # delta = SO + OR - SR = sqrt(200^2+20^2) + sqrt(200^2+38.8^2)
     #         - sqrt(400^2+18.8^2) = 4.28480 m by hand.
-    res = ph.terrain_screening_adjustment(
+    res = ph.aircraft.terrain_screening_adjustment(
         [500.0], (0.0, 20.0), (400.0, 1.2),
         [0.0, 190.0, 200.0, 210.0, 400.0], [0.0, 0.0, 40.0, 0.0, 0.0])
     expected = (np.hypot(200.0, 20.0) + np.hypot(200.0, 38.8)
@@ -430,8 +479,14 @@ def _chk_doc32_screening_delta() -> Outcome:
 )
 def _chk_arp5534_coefficient() -> Outcome:
     # ARP 5534 §3.1: the pure-tone coefficient is the ISO 9613-1 one.
-    expected = float(ph.air_attenuation(1000.0, 25.0, 70.0, 101.325, exact_midband=True))
-    res = ph.sae_band_attenuation([1000.0], 1000.0, temperature=25.0, relative_humidity=70.0)
+    expected = float(
+        ph.environment.air_attenuation(
+            1000.0, 25.0, 70.0, 101.325, exact_midband=True
+        )
+    )
+    res = ph.aircraft.sae_band_attenuation(
+        [1000.0], 1000.0, temperature=25.0, relative_humidity=70.0
+    )
     return numeric(expected, float(res.coefficient[0]), 1e-9, unit="dB/m", places=6)
 
 # ICAO Doc 9501 ETM Vol. I (2018) Table 3-7 turbofan spectrum (bands 1-2 blank).
@@ -461,7 +516,9 @@ _ETM_DTR_44 = [
 def _chk_ac_noy() -> Outcome:
     spl = np.full(24, -999.0)
     spl[13] = 40.0  # 1000 Hz, SPL(b) -> n = 1
-    return numeric(1.0, float(ph.perceived_noisiness(spl)[13]), 1e-6, places=4)
+    return numeric(
+        1.0, float(ph.aircraft.perceived_noisiness(spl)[13]), 1e-6, places=4
+    )
 
 
 @register(
@@ -470,7 +527,9 @@ def _chk_ac_noy() -> Outcome:
     "Tone correction of the turbofan example, dB",
 )
 def _chk_ac_tone() -> Outcome:
-    return numeric(2.0, ph.tone_correction(_ETM_SPL_37), 1e-6, places=4)
+    return numeric(
+        2.0, ph.aircraft.tone_correction(_ETM_SPL_37), 1e-6, places=4
+    )
 
 
 @register(
@@ -479,7 +538,9 @@ def _chk_ac_tone() -> Outcome:
     "Integrated-method reference EPNL, EPNdB",
 )
 def _chk_ac_epnl() -> Outcome:
-    epnl, _, _, _ = ph.epnl_from_pnlt(np.array(_ETM_PNLTR_44), np.array(_ETM_DTR_44))
+    epnl, _, _, _ = ph.aircraft.epnl_from_pnlt(
+        np.array(_ETM_PNLTR_44), np.array(_ETM_DTR_44)
+    )
     return numeric(92.61892, epnl, 1e-2, unit="EPNdB", places=3)
 
 

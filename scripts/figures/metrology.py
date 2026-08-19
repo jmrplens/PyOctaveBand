@@ -423,15 +423,17 @@ def generate_uncertainty(output_dir: str) -> None:
     # A-weighted level: reading plus calibration, instrument and positional
     # corrections (all zero-mean); the model is their sum.
     quantities = [
-        ph.Quantity(74.0, 0.0, name="Reading"),
-        ph.rectangular(0.0, 0.20, name="Calibration"),
-        ph.rectangular(0.0, 0.30, name="Instrument"),
-        ph.Quantity(0.0, 0.35, dof=9, name="Position (Type A)"),
+        ph.metrology.Quantity(74.0, 0.0, name="Reading"),
+        ph.metrology.rectangular(0.0, 0.20, name="Calibration"),
+        ph.metrology.rectangular(0.0, 0.30, name="Instrument"),
+        ph.metrology.Quantity(0.0, 0.35, dof=9, name="Position (Type A)"),
     ]
     model = lambda a, b, c, d: a + b + c + d
 
-    result = ph.combine_uncertainty(model, quantities)
-    mc = ph.monte_carlo(model, quantities, trials=1_000_000, coverage=0.95, seed=1)
+    result = ph.metrology.combine_uncertainty(model, quantities)
+    mc = ph.metrology.monte_carlo(
+        model, quantities, trials=1_000_000, coverage=0.95, seed=1
+    )
     k, big = result.expanded(0.95)
 
     _fig, (ax_b, ax_m) = plt.subplots(1, 2, figsize=(12.5, 5.4))
@@ -664,19 +666,22 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
 
     # A. One dominant rectangular input: the output is nearly rectangular and
     # the Gaussian interval overcovers it.
-    q_a = [ph.rectangular(0.0, 1.0, name="Dominant rectangular"),
-           ph.Quantity(0.0, 0.1, name="Small Gaussian")]
+    q_a = [ph.metrology.rectangular(0.0, 1.0, name="Dominant rectangular"),
+           ph.metrology.Quantity(0.0, 0.1, name="Small Gaussian")]
     panels.append(("A dominant rectangular input", lambda a, b: a + b, q_a,
                    "Correction [dB]", None))
 
     # B. Non-linear model: the energy sum of two levels with wide inputs.
-    q_b = [ph.Quantity(70.0, 3.0, name="L1"), ph.Quantity(70.0, 3.0, name="L2")]
+    q_b = [
+        ph.metrology.Quantity(70.0, 3.0, name="L1"),
+        ph.metrology.Quantity(70.0, 3.0, name="L2"),
+    ]
     panels.append(("A non-linear model (energy sum)",
                    lambda l1, l2: 10 * np.log10(10 ** (l1 / 10) + 10 ** (l2 / 10)),
                    q_b, "Combined level [dB]", None))
 
     # C. An output against a physical bound.
-    q_c = [ph.Quantity(0.95, 0.06, name="alpha")]
+    q_c = [ph.metrology.Quantity(0.95, 0.06, name="alpha")]
     # The clamp piles a finite probability mass exactly on the bound, so the
     # histogram spike there is cut off to keep the rest of the shape readable.
     panels.append(("An output against a physical bound",
@@ -685,9 +690,15 @@ def generate_uncertainty_gum_vs_mc(output_dir: str) -> None:
 
     _fig, axes = plt.subplots(3, 1, figsize=(10, 11))
     for ax, (title, model, quantities, xlabel, ymax) in zip(axes, panels):
-        gum = ph.combine_uncertainty(model, quantities)
-        mc = ph.monte_carlo(model, quantities, trials=400_000, coverage=0.95,
-                            seed=1, keep_samples=True)
+        gum = ph.metrology.combine_uncertainty(model, quantities)
+        mc = ph.metrology.monte_carlo(
+            model,
+            quantities,
+            trials=400_000,
+            coverage=0.95,
+            seed=1,
+            keep_samples=True,
+        )
         _k, big = gum.expanded(0.95)
         # Asked for with `keep_samples=True` above. The type is optional
         # because callers that only want the interval do not pay for them.
@@ -733,16 +744,19 @@ def generate_uncertainty_correlation(output_dir: str) -> None:
     import phonometry as ph
 
     u_i = 0.3
-    pair = [ph.Quantity(0.0, u_i, name="Term 1"),
-            ph.Quantity(0.0, u_i, name="Term 2")]
+    pair = [ph.metrology.Quantity(0.0, u_i, name="Term 1"),
+            ph.metrology.Quantity(0.0, u_i, name="Term 2")]
     rho = np.linspace(-1.0, 1.0, 81)
     same, opposite = [], []
     for r in rho:
         corr = [[1.0, float(r)], [float(r), 1.0]]
-        same.append(ph.combine_uncertainty(lambda a, b: a + b, pair,
+        same.append(ph.metrology.combine_uncertainty(lambda a, b: a + b, pair,
                                            correlation=corr).combined_uncertainty)
-        opposite.append(ph.combine_uncertainty(lambda a, b: a - b, pair,
-                                               correlation=corr).combined_uncertainty)
+        opposite.append(
+            ph.metrology.combine_uncertainty(
+                lambda a, b: a - b, pair, correlation=corr
+            ).combined_uncertainty
+        )
     quad = float(np.hypot(u_i, u_i))
 
     _fig, (ax_l, ax_r) = plt.subplots(1, 2, figsize=(12.5, 5.4))

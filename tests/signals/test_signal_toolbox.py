@@ -51,14 +51,14 @@ _TABLE_AII_BURSTS = [
 @pytest.mark.parametrize(("ms", "cycles"), _TABLE_AII_BURSTS)
 def test_table_aii_burst_sample_counts(ms: int, cycles: int) -> None:
     # 5 kHz tone: 5 periods per ms, 48 samples per ms at 48 kHz.
-    res = ph.tone_burst(FS, 5000.0, cycles)
+    res = ph.signals.tone_burst(FS, 5000.0, cycles)
     assert res.burst_samples == 48 * ms
     assert res.burst_seconds == pytest.approx(ms / 1000.0)
     assert res.signal.size == res.burst_samples
 
 
 def test_burst_starts_at_zero_crossing_positive_going() -> None:
-    res = ph.tone_burst(FS, 5000.0, 25)
+    res = ph.signals.tone_burst(FS, 5000.0, 25)
     assert res.signal[0] == 0.0
     assert res.signal[1] > 0.0
 
@@ -67,7 +67,7 @@ def test_integral_periods_energy_closed_form() -> None:
     # Sum of sin² over an integral number of full periods sampled at an
     # integer number of samples per group of periods is exactly N/2.
     amplitude = 0.8
-    res = ph.tone_burst(FS, 5000.0, 25, amplitude=amplitude)
+    res = ph.signals.tone_burst(FS, 5000.0, 25, amplitude=amplitude)
     n = res.burst_samples
     energy = float(np.sum(res.signal**2))
     assert energy == pytest.approx(amplitude**2 * n / 2.0, rel=1e-12)
@@ -76,7 +76,7 @@ def test_integral_periods_energy_closed_form() -> None:
 
 
 def test_envelope_is_rectangular_gate() -> None:
-    res = ph.tone_burst(
+    res = ph.signals.tone_burst(
         FS, 5000.0, 25, amplitude=2.0, pre_silence=0.01, post_silence=0.02
     )
     n_pre, n_on = round(0.01 * FS), res.burst_samples
@@ -93,7 +93,9 @@ def test_envelope_is_rectangular_gate() -> None:
 def test_repetitive_burst_train_clause_a22() -> None:
     # Clause A2.2: 5 ms bursts of 5 kHz tone; 10 bursts per second gives a
     # 4800-sample period at 48 kHz and a 5 % duty cycle.
-    res = ph.tone_burst(FS, 5000.0, 25, repetitions=3, repetition_rate=10.0)
+    res = ph.signals.tone_burst(
+        FS, 5000.0, 25, repetitions=3, repetition_rate=10.0
+    )
     assert res.burst_samples == 240
     assert res.period_samples == 4800
     assert res.duty_cycle == pytest.approx(0.05)
@@ -109,7 +111,9 @@ def test_repetitive_burst_train_clause_a22() -> None:
 
 @pytest.mark.parametrize("rate", [2.0, 10.0, 100.0])
 def test_table_aiii_repetition_rates_fit(rate: float) -> None:
-    res = ph.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=rate)
+    res = ph.signals.tone_burst(
+        FS, 5000.0, 25, repetitions=2, repetition_rate=rate
+    )
     assert res.period_samples == round(FS / rate)
 
 
@@ -121,7 +125,7 @@ def test_tone_burst_incommensurate_frequency_warns() -> None:
     residual step at the gate edge.
     """
     with pytest.warns(ph.PhonometryWarning, match="incommensurate") as record:
-        res = ph.tone_burst(FS, 997.0, 10)
+        res = ph.signals.tone_burst(FS, 997.0, 10)
     assert res.burst_samples == 481
     # The warning quantifies the exact span and the residual step at the
     # gate edge, sin(2*pi*997*481/48000) ~ -0.058 (a commensurate burst
@@ -142,7 +146,7 @@ def test_tone_burst_invalid_config_raises_before_warning() -> None:
     with _warnings.catch_warnings():
         _warnings.simplefilter("error", ph.PhonometryWarning)
         with pytest.raises(ValueError, match="repetition_rate"):
-            ph.tone_burst(FS, 997.0, 10, repetitions=2)
+            ph.signals.tone_burst(FS, 997.0, 10, repetitions=2)
 
 
 def test_tone_burst_commensurate_frequency_does_not_warn() -> None:
@@ -150,39 +154,41 @@ def test_tone_burst_commensurate_frequency_does_not_warn() -> None:
 
     with _warnings.catch_warnings():
         _warnings.simplefilter("error", ph.PhonometryWarning)
-        res = ph.tone_burst(FS, 5000.0, 25)  # 240 samples exactly
+        res = ph.signals.tone_burst(FS, 5000.0, 25)  # 240 samples exactly
     assert res.burst_samples == 240
 
 
 def test_tone_burst_result_is_frozen() -> None:
-    res = ph.tone_burst(FS, 5000.0, 25)
+    res = ph.signals.tone_burst(FS, 5000.0, 25)
     with pytest.raises(dataclasses.FrozenInstanceError):
         res.cycles = 3  # type: ignore[misc]
 
 
 def test_tone_burst_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="positive integer"):
-        ph.tone_burst(FS, 5000.0, 0)
+        ph.signals.tone_burst(FS, 5000.0, 0)
     with pytest.raises(ValueError, match="Nyquist"):
-        ph.tone_burst(FS, 24000.0, 10)
+        ph.signals.tone_burst(FS, 24000.0, 10)
     with pytest.raises(ValueError, match="repetition_rate"):
-        ph.tone_burst(FS, 5000.0, 25, repetitions=2)
+        ph.signals.tone_burst(FS, 5000.0, 25, repetitions=2)
     with pytest.raises(ValueError, match="does not fit"):
-        ph.tone_burst(FS, 5000.0, 25, repetition_rate=300.0)
+        ph.signals.tone_burst(FS, 5000.0, 25, repetition_rate=300.0)
     with pytest.raises(ValueError, match="non-negative"):
-        ph.tone_burst(FS, 5000.0, 25, pre_silence=-1.0)
+        ph.signals.tone_burst(FS, 5000.0, 25, pre_silence=-1.0)
     with pytest.raises(ValueError, match="positive, finite"):
-        ph.tone_burst(FS, 5000.0, 25, amplitude=0.0)
+        ph.signals.tone_burst(FS, 5000.0, 25, amplitude=0.0)
 
 
 def test_tone_burst_plot_waveform_and_envelope() -> None:
-    res = ph.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=10.0)
+    res = ph.signals.tone_burst(
+        FS, 5000.0, 25, repetitions=2, repetition_rate=10.0
+    )
     ax = res.plot(linewidth=2)
     assert any(line.get_linewidth() == 2.0 for line in ax.lines)
     assert "IEC 60268-1" in ax.get_title()
     assert "10/s" in ax.get_title()
     plt.close("all")
-    ax = ph.tone_burst(FS, 5000.0, 25).plot(color="red")
+    ax = ph.signals.tone_burst(FS, 5000.0, 25).plot(color="red")
     red = plt.matplotlib.colors.to_rgba("red")
     assert any(
         plt.matplotlib.colors.to_rgba(line.get_color()) == red
@@ -211,8 +217,8 @@ def test_designed_filter_meets_its_own_spec(
     # passband flat within δ and stopband below -A dB with δ = 10^(-A/20).
     from scipy import signal as sp_signal
 
-    x = ph.noise_signal(fs, 0.2, seed=5)
-    res = ph.resample_signal(
+    x = ph.signals.noise_signal(fs, 0.2, seed=5)
+    res = ph.signals.resample_signal(
         x, fs, fs_new=fs_new, stopband_attenuation_db=atten, transition_width=tw
     )
     fs_up = res.original_fs * res.up
@@ -233,7 +239,9 @@ def test_resampled_tone_matches_analytic_tone() -> None:
     fs, fs_new, atten = 48000.0, 32000.0, 120.0
     t = np.arange(int(fs * 0.5)) / fs
     tone = np.sin(2.0 * np.pi * 1000.0 * t)
-    res = ph.resample_signal(tone, fs, fs_new=fs_new, stopband_attenuation_db=atten)
+    res = ph.signals.resample_signal(
+        tone, fs, fs_new=fs_new, stopband_attenuation_db=atten
+    )
     t_new = np.arange(res.signal.size) / fs_new
     exact = np.sin(2.0 * np.pi * 1000.0 * t_new)
     edge = res.n_taps // res.up + 1
@@ -242,8 +250,8 @@ def test_resampled_tone_matches_analytic_tone() -> None:
 
 
 def test_rational_ratio_and_output_length() -> None:
-    x = ph.noise_signal(44100.0, 0.1, seed=2)
-    res = ph.resample_signal(x, 44100.0, fs_new=48000.0)
+    x = ph.signals.noise_signal(44100.0, 0.1, seed=2)
+    res = ph.signals.resample_signal(x, 44100.0, fs_new=48000.0)
     assert (res.up, res.down) == (160, 147)
     assert res.signal.size == int(np.ceil(x.size * 160 / 147))
     assert res.fs == 48000.0
@@ -251,34 +259,38 @@ def test_rational_ratio_and_output_length() -> None:
 
 
 def test_identity_ratio_returns_copy_without_filtering() -> None:
-    x = ph.noise_signal(FS, 0.05, seed=3)
-    res = ph.resample_signal(x, FS, fs_new=FS)
+    x = ph.signals.noise_signal(FS, 0.05, seed=3)
+    res = ph.signals.resample_signal(x, FS, fs_new=FS)
     np.testing.assert_array_equal(res.signal, x)
     assert (res.up, res.down) == (1, 1)
     assert res.n_taps == 1
 
 
 def test_irrational_ratio_raises() -> None:
-    x = ph.noise_signal(FS, 0.05, seed=4)
+    x = ph.signals.noise_signal(FS, 0.05, seed=4)
     fs_irrational = FS * np.sqrt(2.0)
     with pytest.raises(ValueError, match="rational"):
-        ph.resample_signal(x, FS, fs_new=fs_irrational)
+        ph.signals.resample_signal(x, FS, fs_new=fs_irrational)
 
 
 def test_resample_invalid_parameters() -> None:
-    x = ph.noise_signal(FS, 0.05, seed=4)
+    x = ph.signals.noise_signal(FS, 0.05, seed=4)
     two_dimensional = np.zeros((4, 4))
     with pytest.raises(ValueError, match="at least 30"):
-        ph.resample_signal(x, FS, fs_new=32000.0, stopband_attenuation_db=10.0)
+        ph.signals.resample_signal(
+            x, FS, fs_new=32000.0, stopband_attenuation_db=10.0
+        )
     with pytest.raises(ValueError, match="transition_width"):
-        ph.resample_signal(x, FS, fs_new=32000.0, transition_width=0.9)
+        ph.signals.resample_signal(x, FS, fs_new=32000.0, transition_width=0.9)
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.resample_signal(two_dimensional, FS, fs_new=32000.0)
+        ph.signals.resample_signal(two_dimensional, FS, fs_new=32000.0)
 
 
 def test_resample_plot_filter_and_edges() -> None:
-    x = ph.noise_signal(FS, 0.2, seed=5)
-    res = ph.resample_signal(x, FS, fs_new=32000.0, stopband_attenuation_db=100.0)
+    x = ph.signals.noise_signal(FS, 0.2, seed=5)
+    res = ph.signals.resample_signal(
+        x, FS, fs_new=32000.0, stopband_attenuation_db=100.0
+    )
     ax = res.plot(linewidth=2)
     # The magnitude trace echoes the requested kwargs.
     assert any(line.get_linewidth() == 2.0 for line in ax.lines)
@@ -306,7 +318,7 @@ def test_circular_delay_of_bin_centered_tone_is_machine_exact() -> None:
     f = k * FS / n
     m = np.arange(n)
     x = np.cos(2.0 * np.pi * f * m / FS + 0.4)
-    y = ph.fractional_delay(x, delay, mode="circular")
+    y = ph.signals.fractional_delay(x, delay, mode="circular")
     exact = np.cos(2.0 * np.pi * f * (m - delay) / FS + 0.4)
     np.testing.assert_allclose(y, exact, atol=1e-11)
 
@@ -321,7 +333,7 @@ def test_phase_slope_is_exactly_minus_2pi_f_d_over_fs() -> None:
     x = np.zeros(n)
     for k in bins:
         x += np.cos(2.0 * np.pi * k * m / n + 0.1 * k)
-    y = ph.fractional_delay(x, delay, mode="circular")
+    y = ph.signals.fractional_delay(x, delay, mode="circular")
     spectrum_x = np.fft.rfft(x)
     spectrum_y = np.fft.rfft(y)
     measured = np.angle(spectrum_y[bins] / spectrum_x[bins])
@@ -332,15 +344,15 @@ def test_phase_slope_is_exactly_minus_2pi_f_d_over_fs() -> None:
 
 
 def test_linear_integer_delay_is_exact_sample_shift() -> None:
-    x = ph.noise_signal(FS, 0.1, seed=7)
-    y = ph.fractional_delay(x, 5.0)
+    x = ph.signals.noise_signal(FS, 0.1, seed=7)
+    y = ph.signals.fractional_delay(x, 5.0)
     expected = np.concatenate([np.zeros(5), x[:-5]])
     np.testing.assert_allclose(y, expected, atol=1e-13)
 
 
 def test_negative_delay_advances() -> None:
-    x = ph.noise_signal(FS, 0.1, seed=8)
-    y = ph.fractional_delay(x, -3.0)
+    x = ph.signals.noise_signal(FS, 0.1, seed=8)
+    y = ph.signals.fractional_delay(x, -3.0)
     expected = np.concatenate([x[3:], np.zeros(3)])
     np.testing.assert_allclose(y, expected, atol=1e-13)
 
@@ -350,32 +362,34 @@ def test_linear_mode_is_bit_identical_to_alignment_kernel() -> None:
     # public function must reproduce it bit for bit (advance = -delay).
     from phonometry.signals.correlation import _fractional_advance
 
-    x = ph.noise_signal(FS, 0.1, seed=9)
+    x = ph.signals.noise_signal(FS, 0.1, seed=9)
     shift = 4.6180339887
     np.testing.assert_array_equal(
-        ph.fractional_delay(x, -shift), _fractional_advance(x, shift)
+        ph.signals.fractional_delay(x, -shift), _fractional_advance(x, shift)
     )
 
 
 def test_circular_roundtrip_recovers_record() -> None:
     # Odd length: the rfft has no Nyquist bin, so the circular ramp is
     # exactly invertible for any record.
-    x = ph.noise_signal(FS, 0.05, seed=10)[:2399]
-    y = ph.fractional_delay(
-        ph.fractional_delay(x, 2.5, mode="circular"), -2.5, mode="circular"
+    x = ph.signals.noise_signal(FS, 0.05, seed=10)[:2399]
+    y = ph.signals.fractional_delay(
+        ph.signals.fractional_delay(x, 2.5, mode="circular"),
+        -2.5,
+        mode="circular",
     )
     np.testing.assert_allclose(y, x, atol=1e-12)
 
 
 def test_fractional_delay_invalid_inputs() -> None:
-    x = ph.noise_signal(FS, 0.05, seed=11)
+    x = ph.signals.noise_signal(FS, 0.05, seed=11)
     full_length = float(x.size)
     two_dimensional = np.zeros((2, 8))
     with pytest.raises(ValueError, match="mode"):
-        ph.fractional_delay(x, 1.0, mode="wrap")  # type: ignore[arg-type]
+        ph.signals.fractional_delay(x, 1.0, mode="wrap")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="magnitude"):
-        ph.fractional_delay(x, full_length)
+        ph.signals.fractional_delay(x, full_length)
     with pytest.raises(ValueError, match="finite"):
-        ph.fractional_delay(x, np.nan)
+        ph.signals.fractional_delay(x, np.nan)
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.fractional_delay(two_dimensional, 1.0)
+        ph.signals.fractional_delay(two_dimensional, 1.0)

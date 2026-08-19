@@ -45,7 +45,7 @@ def _am(fc: float, fm: float, m: float) -> tuple[np.ndarray, np.ndarray]:
 
 
 def test_pure_tone_has_unit_envelope_and_carrier_frequency() -> None:
-    res = ph.envelope(_tone(1000.0, amp=2.5), FS)
+    res = ph.signals.envelope(_tone(1000.0, amp=2.5), FS)
     np.testing.assert_allclose(res.envelope[INTERIOR], 2.5, atol=1e-9)
     np.testing.assert_allclose(
         res.instantaneous_frequency[INTERIOR], 1000.0, atol=1e-6
@@ -55,7 +55,7 @@ def test_pure_tone_has_unit_envelope_and_carrier_frequency() -> None:
 def test_hilbert_transform_of_cos_is_sin() -> None:
     """Table 13.1: x̃(t) = A(t)·sin(θ(t)) recovers sin(2πf0t) from cos."""
     f0 = 500.0
-    res = ph.envelope(_tone(f0), FS)
+    res = ph.signals.envelope(_tone(f0), FS)
     t = np.arange(N) / FS
     reconstructed = res.envelope * np.sin(res.phase)
     np.testing.assert_allclose(
@@ -68,14 +68,14 @@ def test_hilbert_transform_of_cos_is_sin() -> None:
 def test_am_envelope_is_recovered_exactly() -> None:
     """Eq. 13.27: the envelope of u(t)·cos(2πf0t) is u(t) exactly."""
     x, exact = _am(1000.0, 10.0, 0.5)
-    res = ph.envelope(x, FS)
+    res = ph.signals.envelope(x, FS)
     np.testing.assert_allclose(res.envelope[INTERIOR], exact[INTERIOR],
                                atol=1e-9)
 
 
 def test_instantaneous_phase_of_tone_advances_linearly() -> None:
     f0 = 250.0
-    res = ph.envelope(_tone(f0), FS)
+    res = ph.signals.envelope(_tone(f0), FS)
     slope = float(np.polyfit(res.times[INTERIOR],
                              res.phase[INTERIOR], 1)[0])
     assert slope / (2.0 * np.pi) == pytest.approx(f0, rel=1e-6)
@@ -87,7 +87,7 @@ def test_chirp_instantaneous_frequency_tracks_the_sweep() -> None:
     t = np.arange(N) / FS
     f0, f1 = 200.0, 2000.0
     x = chirp(t, f0=f0, t1=t[-1], f1=f1, method="linear")
-    res = ph.envelope(x, FS)
+    res = ph.signals.envelope(x, FS)
     expected = f0 + (f1 - f0) * t / t[-1]
     np.testing.assert_allclose(
         res.instantaneous_frequency[INTERIOR], expected[INTERIOR], rtol=0.01
@@ -104,7 +104,7 @@ def test_plain_subsampling_matches_the_ecma_internal_convention() -> None:
     from scipy.signal import hilbert
 
     x, _ = _am(1000.0, 10.0, 0.5)
-    res = ph.envelope(x, FS, decimation_factor=32, antialias=False)
+    res = ph.signals.envelope(x, FS, decimation_factor=32, antialias=False)
     np.testing.assert_array_equal(res.envelope, np.abs(hilbert(x))[::32])
     assert res.fs == pytest.approx(FS / 32.0)
     assert res.decimation_factor == 32
@@ -113,7 +113,7 @@ def test_plain_subsampling_matches_the_ecma_internal_convention() -> None:
 
 def test_antialiased_decimation_tracks_the_smooth_envelope() -> None:
     x, exact = _am(1000.0, 10.0, 0.5)
-    res = ph.envelope(x, FS, decimation_factor=16)
+    res = ph.signals.envelope(x, FS, decimation_factor=16)
     exact_dec = exact[::16]
     inner = slice(64, res.envelope.size - 64)
     np.testing.assert_allclose(res.envelope[inner], exact_dec[inner],
@@ -123,12 +123,12 @@ def test_antialiased_decimation_tracks_the_smooth_envelope() -> None:
 
 def test_decimated_outputs_share_one_time_axis() -> None:
     x, _ = _am(2000.0, 20.0, 0.3)
-    res = ph.envelope(x, FS, decimation_factor=8)
+    res = ph.signals.envelope(x, FS, decimation_factor=8)
     assert res.envelope.size == res.phase.size
     assert res.envelope.size == res.instantaneous_frequency.size
     assert res.envelope.size == res.times.size
     # Phase/instantaneous frequency are subsampled from the full rate.
-    full = ph.envelope(x, FS)
+    full = ph.signals.envelope(x, FS)
     np.testing.assert_array_equal(res.phase, full.phase[::8])
     np.testing.assert_array_equal(
         res.instantaneous_frequency, full.instantaneous_frequency[::8]
@@ -137,7 +137,7 @@ def test_decimated_outputs_share_one_time_axis() -> None:
 
 def test_no_decimation_keeps_the_full_rate() -> None:
     x, _ = _am(1000.0, 10.0, 0.5)
-    res = ph.envelope(x, FS)
+    res = ph.signals.envelope(x, FS)
     assert res.fs == FS
     assert res.envelope.size == x.size
     assert res.decimation_factor == 1
@@ -155,28 +155,28 @@ def test_envelope_rejects_invalid_inputs() -> None:
     two_dimensional = np.stack([x, x])
     non_finite = np.full(4096, np.nan)
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.envelope(two_dimensional, FS)
+        ph.signals.envelope(two_dimensional, FS)
     with pytest.raises(ValueError, match="'fs'"):
-        ph.envelope(x, 0.0)
+        ph.signals.envelope(x, 0.0)
     with pytest.raises(ValueError, match="decimation_factor"):
-        ph.envelope(x, FS, decimation_factor=0)
+        ph.signals.envelope(x, FS, decimation_factor=0)
     with pytest.raises(ValueError, match="decimation_factor"):
-        ph.envelope(x, FS, decimation_factor=x.size)
+        ph.signals.envelope(x, FS, decimation_factor=x.size)
     with pytest.raises(ValueError, match="finite"):
-        ph.envelope(non_finite, FS)
+        ph.signals.envelope(non_finite, FS)
 
 
 def test_short_record_antialiased_decimation_is_supported() -> None:
     """scipy's FIR decimator runs through resample_poly, so even the
     32-sample minimum record decimates without a length cushion."""
     x = np.sin(0.3 * np.arange(32))
-    res = ph.envelope(x, FS, decimation_factor=8)
+    res = ph.signals.envelope(x, FS, decimation_factor=8)
     assert res.envelope.size == 4
     assert res.fs == pytest.approx(FS / 8.0)
 
 
 def test_result_is_frozen() -> None:
-    res = ph.envelope(_tone(1000.0), FS)
+    res = ph.signals.envelope(_tone(1000.0), FS)
     with pytest.raises(AttributeError):
         res.envelope = res.envelope * 2.0  # type: ignore[misc]
 
@@ -188,7 +188,7 @@ def test_result_is_frozen() -> None:
 
 def test_envelope_plot_two_panels_and_external_ax() -> None:
     x, _ = _am(1000.0, 10.0, 0.5)
-    res = ph.envelope(x, FS)
+    res = ph.signals.envelope(x, FS)
     axes = res.plot()
     assert len(axes) == 2
     assert len(axes[0].lines) == 2  # signal + envelope
@@ -199,7 +199,7 @@ def test_envelope_plot_two_panels_and_external_ax() -> None:
 
 def test_envelope_plot_with_decimated_result() -> None:
     x, _ = _am(1000.0, 10.0, 0.5)
-    res = ph.envelope(x, FS, decimation_factor=32)
+    res = ph.signals.envelope(x, FS, decimation_factor=32)
     axes = res.plot()
     assert len(axes) == 2
     plt.close("all")
@@ -241,7 +241,7 @@ def _bin(freq: float, nfft: int = ES_N) -> int:
 
 
 def test_envelope_spectrum_magnitude_line_and_mean() -> None:
-    res = ph.envelope_spectrum(_am_signal(), FS)
+    res = ph.signals.envelope_spectrum(_am_signal(), FS)
     assert res.kind == "magnitude"
     assert res.mean_level == pytest.approx(ES_A0, abs=1e-3)
     assert res.amplitude[_bin(ES_FM)] == pytest.approx(ES_A0 * ES_M, rel=1e-3)
@@ -249,7 +249,7 @@ def test_envelope_spectrum_magnitude_line_and_mean() -> None:
 
 
 def test_envelope_spectrum_squared_lines_and_mean() -> None:
-    res = ph.envelope_spectrum(_am_signal(), FS, kind="squared")
+    res = ph.signals.envelope_spectrum(_am_signal(), FS, kind="squared")
     assert res.mean_level == pytest.approx(
         ES_A0**2 * (1.0 + ES_M**2 / 2.0), abs=1e-2
     )
@@ -262,10 +262,10 @@ def test_envelope_spectrum_squared_lines_and_mean() -> None:
 
 
 def test_envelope_spectrum_dc_removal() -> None:
-    res = ph.envelope_spectrum(_am_signal(), FS)
+    res = ph.signals.envelope_spectrum(_am_signal(), FS)
     assert res.remove_dc
     assert res.amplitude[0] == pytest.approx(0.0, abs=1e-6)
-    kept = ph.envelope_spectrum(_am_signal(), FS, remove_dc=False)
+    kept = ph.signals.envelope_spectrum(_am_signal(), FS, remove_dc=False)
     # Without the DC remover the zero-frequency bin carries the mean level
     # (not doubled), up to the taper's slight leakage.
     assert kept.amplitude[0] == pytest.approx(kept.mean_level, rel=5e-3)
@@ -276,14 +276,14 @@ def test_envelope_spectrum_dc_removal() -> None:
 
 
 def test_envelope_spectrum_pure_tone_has_no_lines() -> None:
-    res = ph.envelope_spectrum(_tone(1000.0, amp=1.5), FS)
+    res = ph.signals.envelope_spectrum(_tone(1000.0, amp=1.5), FS)
     assert res.mean_level == pytest.approx(1.5, abs=1e-3)
     # No modulation: nothing anywhere above the Hilbert edge-effect floor.
     assert float(np.max(res.amplitude[1:])) < 1e-2
 
 
 def test_envelope_spectrum_zero_padding() -> None:
-    res = ph.envelope_spectrum(_am_signal(), FS, nfft=2 * ES_N)
+    res = ph.signals.envelope_spectrum(_am_signal(), FS, nfft=2 * ES_N)
     assert res.nfft == 2 * ES_N
     assert res.frequencies.size == ES_N + 1
     assert res.amplitude[_bin(ES_FM, 2 * ES_N)] == pytest.approx(
@@ -305,7 +305,7 @@ def test_envelope_spectrum_off_bin_line_shows_hann_scalloping() -> None:
         ES_A0 * (1.0 + ES_M * np.cos(2.0 * np.pi * fm * t))
         * np.cos(2.0 * np.pi * 1000.0 * t)
     )
-    res = ph.envelope_spectrum(x, FS)
+    res = ph.signals.envelope_spectrum(x, FS)
     peak = float(np.max(res.amplitude[1:]))
     # Hann scalloping at the bin midpoint: |W(1/2)| / |W(0)| ~ 0.8488.
     assert peak == pytest.approx(0.8488 * ES_A0 * ES_M, rel=0.02)
@@ -323,8 +323,8 @@ def test_envelope_spectrum_bandpass_prefilter_isolates_the_carrier() -> None:
     t = np.arange(ES_N) / FS
     x = _am_signal() + 3.0 * np.cos(2.0 * np.pi * 3000.0 * t)
 
-    raw = ph.envelope_spectrum(x, FS)
-    filtered = ph.envelope_spectrum(x, FS, band=(700.0, 1300.0))
+    raw = ph.signals.envelope_spectrum(x, FS)
+    filtered = ph.signals.envelope_spectrum(x, FS, band=(700.0, 1300.0))
 
     assert filtered.band == (700.0, 1300.0)
     assert raw.band is None
@@ -341,28 +341,28 @@ def test_envelope_spectrum_band_validation() -> None:
     x = _am_signal()
     for band in ((0.0, 100.0), (200.0, 100.0), (100.0, FS / 2.0)):
         with pytest.raises(ValueError, match="band"):
-            ph.envelope_spectrum(x, FS, band=band)
+            ph.signals.envelope_spectrum(x, FS, band=band)
     # Malformed shapes: not exactly two numeric edges.
     for bad in ((700.0,), (700.0, 900.0, 1300.0), (700.0, None)):
         with pytest.raises(ValueError, match="pair"):
-            ph.envelope_spectrum(x, FS, band=bad)  # type: ignore[arg-type]
+            ph.signals.envelope_spectrum(x, FS, band=bad)  # type: ignore[arg-type]
     # A record shorter than the zero-phase padding fails informatively.
     with pytest.raises(ValueError, match="too short"):
-        ph.envelope_spectrum(x[:20], FS, band=(700.0, 1300.0))
+        ph.signals.envelope_spectrum(x[:20], FS, band=(700.0, 1300.0))
 
 
 def test_envelope_spectrum_validates_inputs() -> None:
     x = _am_signal()
     with pytest.raises(ValueError, match="kind"):
-        ph.envelope_spectrum(x, FS, kind="log")
+        ph.signals.envelope_spectrum(x, FS, kind="log")
     with pytest.raises(ValueError, match="nfft"):
-        ph.envelope_spectrum(x, FS, nfft=100)
+        ph.signals.envelope_spectrum(x, FS, nfft=100)
     with pytest.raises(ValueError, match="fs"):
-        ph.envelope_spectrum(x, -1.0)
+        ph.signals.envelope_spectrum(x, -1.0)
 
 
 def test_envelope_spectrum_plot_two_panels_and_external_ax() -> None:
-    res = ph.envelope_spectrum(_am_signal(), FS)
+    res = ph.signals.envelope_spectrum(_am_signal(), FS)
     axes = res.plot()
     assert len(axes) == 2
     assert len(axes[0].lines) >= 1  # envelope (+ mean-level rule)

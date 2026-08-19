@@ -32,7 +32,9 @@ _NOISE_CONTROL = "Industrial noise control"
 def _chk_expansion_chamber_peak() -> Outcome:
     c, length, s_duct = 343.0, 0.3, 0.01
     f = np.array([c / (4.0 * length)])  # kL = pi/2
-    res = ph.expansion_chamber(f, length, 4.0 * s_duct, s_duct, speed_of_sound=c)
+    res = ph.noise_control.expansion_chamber(
+        f, length, 4.0 * s_duct, s_duct, speed_of_sound=c
+    )
     expected = 10.0 * math.log10(1.0 + 0.25 * (4.0 - 0.25) ** 2)
     return numeric(expected, float(res.transmission_loss[0]), 1e-6, unit="dB")
 
@@ -45,7 +47,9 @@ def _chk_expansion_chamber_peak() -> Outcome:
 def _chk_expansion_chamber_trough() -> Outcome:
     c, length, s_duct = 343.0, 0.3, 0.01
     f = np.array([c / (2.0 * length)])  # kL = pi
-    res = ph.expansion_chamber(f, length, 4.0 * s_duct, s_duct, speed_of_sound=c)
+    res = ph.noise_control.expansion_chamber(
+        f, length, 4.0 * s_duct, s_duct, speed_of_sound=c
+    )
     return numeric(0.0, float(res.transmission_loss[0]), 1e-9, unit="dB")
 
 
@@ -56,7 +60,9 @@ def _chk_expansion_chamber_trough() -> Outcome:
 )
 def _chk_quarter_wave_tuning() -> Outcome:
     area = math.pi * 0.05**2 / 4.0
-    res = ph.quarter_wave_resonator([100.0], area, 1.516, area, speed_of_sound=343.24)
+    res = ph.noise_control.quarter_wave_resonator(
+        [100.0], area, 1.516, area, speed_of_sound=343.24
+    )
     assert res.resonances is not None
     return numeric(56.6, float(res.resonances[0]), 0.1, unit="Hz", places=2)
 
@@ -68,7 +74,9 @@ def _chk_quarter_wave_tuning() -> Outcome:
 )
 def _chk_helmholtz_resonance() -> Outcome:
     c = 343.0
-    res = ph.helmholtz_resonator([100.0], 0.01, 1e-4, 0.02, 1e-3, speed_of_sound=c)
+    res = ph.noise_control.helmholtz_resonator(
+        [100.0], 0.01, 1e-4, 0.02, 1e-3, speed_of_sound=c
+    )
     assert res.resonances is not None
     expected = c / (2.0 * math.pi) * math.sqrt(1e-4 / (0.02 * 1e-3))
     return numeric(expected, float(res.resonances[0]), 1e-6, unit="Hz", places=3)
@@ -114,7 +122,7 @@ def _chk_insertion_loss_equals_tl() -> Outcome:
     "Plenum TL = -10 lg[S_out(cos0/pi r^2 + (1-a)/(Sw a))] (S_out=.1,r=1,Sw=20,a=.2)",
 )
 def _chk_plenum_wells() -> Outcome:
-    tl = float(ph.plenum_attenuation(0.1, 1.0, 20.0, 0.2))
+    tl = float(ph.noise_control.plenum_attenuation(0.1, 1.0, 20.0, 0.2))
     direct = 1.0 / (math.pi * 1.0**2)
     reverb = (1.0 - 0.2) / (20.0 * 0.2)
     expected = -10.0 * math.log10(0.1 * (direct + reverb))
@@ -127,7 +135,9 @@ def _chk_plenum_wells() -> Outcome:
     "Duct end reflection D = 200 mm at 125 Hz = 10 dB (table node)",
 )
 def _chk_end_reflection_table() -> Outcome:
-    res = ph.end_reflection_loss([125.0], 0.200, termination="flush")
+    res = ph.noise_control.end_reflection_loss(
+        [125.0], 0.200, termination="flush"
+    )
     return numeric(10.0, float(res.values[0]), 1e-6, unit="dB")
 
 
@@ -137,7 +147,7 @@ def _chk_end_reflection_table() -> Outcome:
     "Forward-curved fan at Q_REF, P_REF, peak efficiency -> K_F + C_BFI at 500 Hz",
 )
 def _chk_fan_sound_power_reference_point() -> Outcome:
-    res = ph.fan_sound_power(
+    res = ph.noise_control.fan_sound_power(
         0.472e-3, 249.0, fan_type="forward_curved", relative_efficiency=100.0
     )
     # Table 13.5 forward-curved 500 Hz entry (36 dB) plus the Table 13.7
@@ -151,7 +161,7 @@ def _chk_fan_sound_power_reference_point() -> Outcome:
     "18 x 12 in duct, 6 ft, 1 in lining at 1 kHz -> 1.77 (10/3)^0.695 6 dB",
 )
 def _chk_lined_rectangular_duct() -> Outcome:
-    res = ph.lined_rectangular_duct_attenuation(
+    res = ph.noise_control.lined_rectangular_duct_attenuation(
         None, 18.0 * 0.0254, 12.0 * 0.0254, 6.0 * 0.3048, 0.0254
     )
     expected = 1.7700 * (10.0 / 3.0) ** 0.695 * 6.0
@@ -164,7 +174,9 @@ def _chk_lined_rectangular_duct() -> Outcome:
     "8 in diameter, 9 ft long -> 6/8/16/25/28/28/18 dB (table node)",
 )
 def _chk_flexible_duct_table() -> Outcome:
-    res = ph.flexible_duct_insertion_loss(None, 8.0 * 0.0254, 9.0 * 0.3048)
+    res = ph.noise_control.flexible_duct_insertion_loss(
+        None, 8.0 * 0.0254, 9.0 * 0.3048
+    )
     printed = np.array([6, 8, 16, 25, 28, 28, 18], dtype=float)
     worst = float(np.max(np.abs(res.values - printed)))
     return numeric(0.0, worst, 1e-9, unit="dB",
@@ -177,7 +189,7 @@ def _chk_flexible_duct_table() -> Outcome:
     "25 per cent split with area-matched branches -> -10 lg 0.25 = 6.02 dB",
 )
 def _chk_split_loss() -> Outcome:
-    loss = ph.split_loss(0.6, [0.15, 0.15, 0.15, 0.15], branch=0)
+    loss = ph.noise_control.split_loss(0.6, [0.15, 0.15, 0.15, 0.15], branch=0)
     return numeric(-10.0 * math.log10(0.25), loss, 1e-9, unit="dB")
 
 
@@ -221,7 +233,7 @@ def _chk_duct_path_table_14_9() -> Outcome:
     "row of Table 14.9",
 )
 def _chk_diffuser_sound_power() -> Outcome:
-    res = ph.diffuser_sound_power(
+    res = ph.noise_control.diffuser_sound_power(
         None, (24.0 * 0.0254) ** 2, 312.0 * 0.0004719474432, 0.05 * 249.0
     )
     printed = np.array([33.0, 32.0, 29.0, 23.0, 15.0])
@@ -236,7 +248,9 @@ def _chk_diffuser_sound_power() -> Outcome:
     "Max neck velocity of a supply outlet for design RC(30) -> 2.2 m/s",
 )
 def _chk_air_terminal_velocity() -> Outcome:
-    return numeric(2.2, ph.air_terminal_velocity_limit(30), 1e-9, unit="m/s")
+    return numeric(
+        2.2, ph.noise_control.air_terminal_velocity_limit(30), 1e-9, unit="m/s"
+    )
 
 
 @register(
@@ -245,7 +259,7 @@ def _chk_air_terminal_velocity() -> Outcome:
     "254 mm duct, steam, 200 m/s: (1,0) cut-on 812 Hz and k_x = -8.23 1/m",
 )
 def _chk_duct_cut_on_with_flow() -> Outcome:
-    res = ph.circular_duct_cut_on(
+    res = ph.noise_control.circular_duct_cut_on(
         0.254, flow_velocity=200.0, speed_of_sound=405.0, count=1
     )
     worst = max(
@@ -262,7 +276,9 @@ def _chk_duct_cut_on_with_flow() -> Outcome:
     "0.65 x 0.4 m duct, 15 m/s: first three cut-on 264 / 428 / 503 Hz",
 )
 def _chk_rectangular_duct_cut_on() -> Outcome:
-    res = ph.rectangular_duct_cut_on(0.65, 0.4, flow_velocity=15.0, count=3)
+    res = ph.noise_control.rectangular_duct_cut_on(
+        0.65, 0.4, flow_velocity=15.0, count=3
+    )
     printed = np.array([264.0, 428.0, 503.0])
     worst = float(np.max(np.abs(np.round(res.cut_on) - printed)))
     return numeric(0.0, worst, 1e-9, unit="Hz",
@@ -275,7 +291,7 @@ def _chk_rectangular_duct_cut_on() -> Outcome:
     "Enclosure correction C -> 10 lg 0.3 = -5.23 dB as alpha_i -> 1",
 )
 def _chk_enclosure_floor() -> Outcome:
-    res = ph.enclosure_insertion_loss([40.0], 6.0, 5.0, 0.999999)
+    res = ph.noise_control.enclosure_insertion_loss([40.0], 6.0, 5.0, 0.999999)
     return numeric(10.0 * math.log10(0.3), float(res.correction[0]), 1e-3,
                    unit="dB")
 
@@ -299,12 +315,12 @@ _N421_SURFACES = (
     "Double brick wall into an 8 x 9 x 3 m room -> NR 37.5/40.8/49.0/62.8/65.3/65.9 dB",
 )
 def _chk_room_to_room_noise_reduction() -> Outcome:
-    res = ph.room_to_room_transmission(
+    res = ph.noise_control.room_to_room_transmission(
         _N421_BANDS,
         [37.0, 41.0, 48.0, 60.0, 61.0, 61.0],
         8.0 * 3.0,
-        ph.equivalent_absorption_area(_N421_SURFACES),
-        source=ph.SourceRoom(level=90.0),
+        ph.room.equivalent_absorption_area(_N421_SURFACES),
+        source=ph.noise_control.SourceRoom(level=90.0),
     )
     printed = np.array([37.5, 40.8, 49.0, 62.8, 65.3, 65.9])
     worst = float(np.max(np.abs(np.asarray(res.noise_reduction) - printed)))
@@ -331,14 +347,16 @@ def _chk_room_to_room_chain() -> Outcome:
         (25.0, ceiling),
         (60.0, walls),
     )
-    res = ph.room_to_room_transmission(
+    res = ph.noise_control.room_to_room_transmission(
         _N421_BANDS,
         [39.0, 42.0, 50.0, 58.0, 63.0, 67.0],
         15.0,
-        ph.equivalent_absorption_area(operator),
-        source=ph.SourceRoom(
+        ph.room.equivalent_absorption_area(operator),
+        source=ph.noise_control.SourceRoom(
             power_level=[105.0, 103.0, 98.0, 108.0, 107.0, 109.0],
-            room_constant=ph.room_constant(268.0, ph.mean_absorption(plant)),
+            room_constant=ph.room.room_constant(
+                268.0, ph.room.mean_absorption(plant)
+            ),
             directivity=4.0,
             model="constant_volume",
         ),
@@ -363,11 +381,11 @@ def _chk_enclosure_required_transmission_loss() -> Outcome:
     concrete = np.array([0.01, 0.01, 0.01, 0.02, 0.02, 0.02, 0.03, 0.03])
     lp1 = np.array([72.0, 79.0, 81.0, 84.0, 83.0, 81.0, 80.0, 75.0])
     lp2 = np.array([67.0, 60.0, 54.0, 49.0, 46.0, 44.0, 43.0, 41.0])
-    res = ph.enclosure_required_transmission_loss(
+    res = ph.noise_control.enclosure_required_transmission_loss(
         lp1 - lp2,
         external,
         external + bare_floor + machine,
-        ph.mean_absorption(
+        ph.room.mean_absorption(
             ((external, wool), (bare_floor + machine, concrete))
         ),
         frequencies=[63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0],
@@ -385,9 +403,9 @@ def _chk_enclosure_required_transmission_loss() -> Outcome:
     "Source in the intersection of two flat surfaces (Q = 4) -> +10 lg 4 = 6.02 dB",
 )
 def _chk_constant_volume_source_model() -> Outcome:
-    base = float(ph.steady_state_spl(100.0, None, 40.0, directivity=4.0))
+    base = float(ph.room.steady_state_spl(100.0, None, 40.0, directivity=4.0))
     raised = float(
-        ph.steady_state_spl(
+        ph.room.steady_state_spl(
             100.0, None, 40.0, directivity=4.0, source_model="constant_volume"
         )
     )

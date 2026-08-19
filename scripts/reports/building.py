@@ -41,7 +41,7 @@ _RATING_FREQS = np.array(
 
 def _airborne_example() -> tuple[object, ReportMetadata, str]:
     """Airborne fiche: a predicted single-panel sound reduction index."""
-    result = ph.single_panel_transmission_loss(
+    result = ph.building.single_panel_transmission_loss(
         _RATING_FREQS, 15.0, critical_frequency=2000.0, loss_factor=0.02
     )
     metadata = ReportMetadata(
@@ -75,7 +75,7 @@ def _impact_example() -> tuple[object, ReportMetadata, str]:
         [45, 47, 48, 49, 51, 52, 53, 54, 55, 56, 57, 58, 55, 52, 49, 46],
         dtype=float,
     )
-    result = ph.weighted_impact_rating(ln)
+    result = ph.building.weighted_impact_rating(ln)
     metadata = ReportMetadata(
         specimen="150 mm concrete slab with a floating floor",
         client="Example client",
@@ -163,7 +163,9 @@ def _field_airborne_example() -> tuple[object, ReportMetadata, str]:
             0.42,
         ]
     )
-    result = ph.airborne_insulation(l1, l1 - d, t2, area=12.5, volume=30.4)
+    result = ph.building.airborne_insulation(
+        l1, l1 - d, t2, area=12.5, volume=30.4
+    )
     metadata = ReportMetadata(
         specimen="Separating wall, 240 mm brick with independent lining",
         client="Example client",
@@ -224,7 +226,7 @@ def _field_impact_example() -> tuple[object, ReportMetadata, str]:
             0.42,
         ]
     )
-    result = ph.impact_insulation(li, t2, volume=30.4)
+    result = ph.building.impact_insulation(li, t2, volume=30.4)
     metadata = ReportMetadata(
         specimen="Timber-joist floor with a floating chipboard deck",
         client="Example client",
@@ -271,7 +273,7 @@ def _lab_airborne_example() -> tuple[object, ReportMetadata, str]:
         ]
     )
     l1 = np.full(16, 90.0)
-    result = ph.lab_airborne_insulation(
+    result = ph.building.lab_airborne_insulation(
         l1, l1 - r, np.full(16, 0.8), area=10.0, volume=50.0
     )
     metadata = ReportMetadata(
@@ -326,7 +328,9 @@ def _lab_impact_example() -> tuple[object, ReportMetadata, str]:
             71.2,
         ]
     )
-    result = ph.lab_impact_insulation(li, np.full(16, 0.8), volume=50.0)
+    result = ph.building.lab_impact_insulation(
+        li, np.full(16, 0.8), volume=50.0
+    )
     # The impact fiche's plot legend carries an extra "500 Hz read" entry that
     # wraps to a second row, making the embedded figure taller than the
     # airborne one; the header is kept to the essential accredited fields so

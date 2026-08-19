@@ -50,7 +50,9 @@ def _add4(a: float, b: float, c: float, d: float) -> float:
 def test_filter_class_es() -> None:
     from phonometry.filters.compliance import filter_class_compliance
 
-    bank = ph.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
+    bank = ph.filters.OctaveFilterBank(
+        fs=48000, fraction=1, order=6, limits=[500, 2000]
+    )
     res = filter_class_compliance(bank)
     ax = res.plot(language="es")
     assert "Máscara clase" in ax.get_title()
@@ -61,9 +63,9 @@ def test_filter_class_es() -> None:
 
 
 def test_parametric_eq_es_and_bad_language() -> None:
-    eq = ph.ParametricEQ(FS, [
-        ph.EQSection("lowshelf", 100.0, gain_db=4.0),
-        ph.EQSection("peaking", 1000.0, gain_db=-6.0, q=1.5),
+    eq = ph.filters.ParametricEQ(FS, [
+        ph.filters.EQSection("lowshelf", 100.0, gain_db=4.0),
+        ph.filters.EQSection("peaking", 1000.0, gain_db=-6.0, q=1.5),
     ])
     res = eq.response(n_points=64)
     axes = res.plot(language="es")

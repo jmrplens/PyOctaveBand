@@ -54,7 +54,7 @@ def test_reverse_arrangement_count_bp_worked_example() -> None:
 
 
 def test_example_4_4_accepted_at_5_percent() -> None:
-    res = ph.trend_test(EXAMPLE_4_4)
+    res = ph.metrology.trend_test(EXAMPLE_4_4)
     assert res.statistic == 86
     assert res.bounds == (64, 125)
     assert res.trend_free
@@ -75,12 +75,12 @@ def test_table_a6_alpha_05_percentage_points(
 
 def test_monotonic_sequences_are_rejected() -> None:
     increasing = np.arange(20.0)
-    res = ph.trend_test(increasing)
+    res = ph.metrology.trend_test(increasing)
     assert res.statistic == 0  # no pair with x_i > x_j
     assert not res.trend_free
     assert res.p_value < 1e-9
     decreasing = increasing[::-1]
-    res = ph.trend_test(decreasing)
+    res = ph.metrology.trend_test(decreasing)
     assert res.statistic == 190  # all N(N-1)/2 pairs reversed
     assert not res.trend_free
 
@@ -96,7 +96,7 @@ def test_mahonian_distribution_is_normalized_and_symmetric() -> None:
 def test_large_n_p_value_uses_normal_approximation() -> None:
     rng = np.random.default_rng(11)
     values = rng.standard_normal(150)  # beyond the exact-distribution limit
-    res = ph.trend_test(values)
+    res = ph.metrology.trend_test(values)
     assert 0.0 < res.p_value <= 1.0
     assert res.trend_free
 
@@ -123,11 +123,11 @@ def test_runs_moments_and_pmf_normalization() -> None:
 
 def test_runs_test_rejects_alternation_and_trend() -> None:
     alternating = np.tile([1.0, -1.0], 10)  # r = 20: far too many runs
-    res = ph.trend_test(alternating, method="runs")
+    res = ph.metrology.trend_test(alternating, method="runs")
     assert res.statistic == 20
     assert not res.trend_free
     trending = np.arange(20.0)  # r = 2: one run below, one above the median
-    res = ph.trend_test(trending, method="runs")
+    res = ph.metrology.trend_test(trending, method="runs")
     assert res.statistic == 2
     assert not res.trend_free
     assert res.p_value < 1e-4
@@ -135,7 +135,7 @@ def test_runs_test_rejects_alternation_and_trend() -> None:
 
 def test_runs_test_accepts_random_sequence() -> None:
     rng = np.random.default_rng(3)
-    res = ph.trend_test(rng.standard_normal(40), method="runs")
+    res = ph.metrology.trend_test(rng.standard_normal(40), method="runs")
     assert res.trend_free
     assert res.bounds[0] < res.statistic <= res.bounds[1]
 
@@ -144,28 +144,28 @@ def test_runs_test_discards_median_ties() -> None:
     rng = np.random.default_rng(4)
     values = rng.standard_normal(21)
     values[5] = np.median(values)  # odd length: one exact tie
-    res = ph.trend_test(values, method="runs")
+    res = ph.metrology.trend_test(values, method="runs")
     assert res.n == 20
 
 
 def test_trend_test_validation() -> None:
     short = [1.0] * 9
     with pytest.raises(ValueError, match="at least 10"):
-        ph.trend_test(short)
+        ph.metrology.trend_test(short)
     two_dim = np.ones((5, 4))
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.trend_test(two_dim)
+        ph.metrology.trend_test(two_dim)
     with_nan = np.r_[np.arange(19.0), np.nan]
     with pytest.raises(ValueError, match="finite"):
-        ph.trend_test(with_nan)
+        ph.metrology.trend_test(with_nan)
     good = list(range(12))
     with pytest.raises(ValueError, match="method"):
-        ph.trend_test(good, method="chi2")
+        ph.metrology.trend_test(good, method="chi2")
     with pytest.raises(ValueError, match="alpha"):
-        ph.trend_test(good, alpha=1.5)
+        ph.metrology.trend_test(good, alpha=1.5)
     constant = np.ones(12)
     with pytest.raises(ValueError, match="distinct from the median"):
-        ph.trend_test(constant, method="runs")
+        ph.metrology.trend_test(constant, method="runs")
 
 
 # ---------------------------------------------------------------------------
@@ -178,7 +178,7 @@ FS = 8192.0
 def test_stationary_noise_is_accepted() -> None:
     rng = np.random.default_rng(42)
     x = rng.standard_normal(1 << 16)
-    res = ph.stationarity_test(x, FS)
+    res = ph.metrology.stationarity_test(x, FS)
     assert res.stationary
     assert res.n_segments == 20
     assert res.statistic == "mean_square"
@@ -194,23 +194,29 @@ def test_gain_ramp_is_rejected_like_example_10_3() -> None:
     rng = np.random.default_rng(42)
     n = 1 << 16
     x = rng.standard_normal(n) * np.linspace(1.0, 1.2, n)
-    res = ph.stationarity_test(x, FS)
+    res = ph.metrology.stationarity_test(x, FS)
     assert not res.stationary
     assert res.count < res.bounds[0]  # upward trend depresses A
-    runs = ph.stationarity_test(x, FS, method="runs")
+    runs = ph.metrology.stationarity_test(x, FS, method="runs")
     assert not runs.stationary
 
 
 def test_segment_statistics_are_consistent() -> None:
     rng = np.random.default_rng(5)
     x = rng.standard_normal(4000)
-    ms = ph.stationarity_test(x, FS, n_segments=10, statistic="mean_square")
-    rms = ph.stationarity_test(x, FS, n_segments=10, statistic="rms")
+    ms = ph.metrology.stationarity_test(
+        x, FS, n_segments=10, statistic="mean_square"
+    )
+    rms = ph.metrology.stationarity_test(x, FS, n_segments=10, statistic="rms")
     np.testing.assert_allclose(
         rms.segment_values, np.sqrt(ms.segment_values), rtol=1e-12
     )
-    mean = ph.stationarity_test(x, FS, n_segments=10, statistic="mean")
-    var = ph.stationarity_test(x, FS, n_segments=10, statistic="variance")
+    mean = ph.metrology.stationarity_test(
+        x, FS, n_segments=10, statistic="mean"
+    )
+    var = ph.metrology.stationarity_test(
+        x, FS, n_segments=10, statistic="variance"
+    )
     np.testing.assert_allclose(
         var.segment_values,
         ms.segment_values - mean.segment_values**2,
@@ -221,7 +227,7 @@ def test_segment_statistics_are_consistent() -> None:
 def test_stationarity_trailing_samples_are_discarded() -> None:
     rng = np.random.default_rng(6)
     x = rng.standard_normal(1013)  # 1013 = 10 * 101 + 3
-    res = ph.stationarity_test(x, FS, n_segments=10)
+    res = ph.metrology.stationarity_test(x, FS, n_segments=10)
     assert res.segment_duration == pytest.approx(101 / FS)
 
 
@@ -229,13 +235,13 @@ def test_stationarity_validation() -> None:
     rng = np.random.default_rng(7)
     x = rng.standard_normal(2048)
     with pytest.raises(ValueError, match="statistic"):
-        ph.stationarity_test(x, FS, statistic="kurtosis")
+        ph.metrology.stationarity_test(x, FS, statistic="kurtosis")
     with pytest.raises(ValueError, match="n_segments"):
-        ph.stationarity_test(x, FS, n_segments=5)
+        ph.metrology.stationarity_test(x, FS, n_segments=5)
     with pytest.raises(ValueError, match="n_segments"):
-        ph.stationarity_test(x, FS, n_segments=4096)
+        ph.metrology.stationarity_test(x, FS, n_segments=4096)
     with pytest.raises(ValueError, match="fs"):
-        ph.stationarity_test(x, 0.0)
+        ph.metrology.stationarity_test(x, 0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -268,7 +274,7 @@ def test_zero_crossing_rate_matches_rice_for_bandpass_noise() -> None:
     fs, n = 20480.0, 1 << 19
     fc, half_band = 1000.0, 200.0
     x = _bandlimited_gaussian(0, fs, n, fc - half_band, fc + half_band)
-    res = ph.level_crossing_rate(x, fs)
+    res = ph.metrology.level_crossing_rate(x, fs)
     n0 = 2.0 * np.sqrt(fc**2 + (2 * half_band) ** 2 / 12.0)
     assert res.zero_crossing_rate == pytest.approx(n0, rel=1e-2)
     assert res.zero_crossing_rate_rice == pytest.approx(n0, rel=1e-2)
@@ -276,7 +282,7 @@ def test_zero_crossing_rate_matches_rice_for_bandpass_noise() -> None:
     # Level dependence, Eq. (5.196): at a = 1 sigma the rate drops by
     # exp(-1/2). The 1-sigma crossing count is about as large as the
     # zero-crossing count, so the same statistical margin applies.
-    res_1s = ph.level_crossing_rate(x, fs, levels=[res.sigma])
+    res_1s = ph.metrology.level_crossing_rate(x, fs, levels=[res.sigma])
     assert res_1s.rates[0] == pytest.approx(n0 * np.exp(-0.5), rel=2e-2)
     assert res_1s.rice_rates[0] == pytest.approx(n0 * np.exp(-0.5), rel=2e-2)
 
@@ -287,7 +293,7 @@ def test_zero_crossing_rate_of_lowpass_noise_example_5_12() -> None:
     fs, n = 20480.0, 1 << 19
     band = 2000.0
     x = _bandlimited_gaussian(1, fs, n, 0.0, band)
-    res = ph.level_crossing_rate(x, fs)
+    res = ph.metrology.level_crossing_rate(x, fs)
     assert res.zero_crossing_rate == pytest.approx(
         2.0 * band / np.sqrt(3.0), rel=1e-2
     )
@@ -298,7 +304,7 @@ def test_sine_crosses_zero_at_twice_its_frequency() -> None:
     fs = 8192.0
     t = np.arange(1 << 16) / fs
     x = np.sin(2.0 * np.pi * 60.0 * t)
-    res = ph.level_crossing_rate(x, fs)
+    res = ph.metrology.level_crossing_rate(x, fs)
     assert res.zero_crossing_rate == pytest.approx(120.0, rel=1e-3)
     assert res.apparent_frequency == pytest.approx(60.0, rel=1e-3)
 
@@ -306,19 +312,19 @@ def test_sine_crosses_zero_at_twice_its_frequency() -> None:
 def test_level_crossing_default_levels_and_validation() -> None:
     rng = np.random.default_rng(8)
     x = rng.standard_normal(4096)
-    res = ph.level_crossing_rate(x, FS)
+    res = ph.metrology.level_crossing_rate(x, FS)
     assert res.levels.size == 13
     assert res.levels[0] == pytest.approx(-3.0 * res.sigma)
     assert res.levels[-1] == pytest.approx(3.0 * res.sigma)
     constant = np.ones(4096)
     with pytest.raises(ValueError, match="constant"):
-        ph.level_crossing_rate(constant, FS)
+        ph.metrology.level_crossing_rate(constant, FS)
     empty_levels: list[float] = []
     with pytest.raises(ValueError, match="levels"):
-        ph.level_crossing_rate(x, FS, levels=empty_levels)
+        ph.metrology.level_crossing_rate(x, FS, levels=empty_levels)
     nan_levels = [0.0, np.nan]
     with pytest.raises(ValueError, match="finite"):
-        ph.level_crossing_rate(x, FS, levels=nan_levels)
+        ph.metrology.level_crossing_rate(x, FS, levels=nan_levels)
 
 
 # ---------------------------------------------------------------------------
@@ -329,7 +335,7 @@ def test_level_crossing_default_levels_and_validation() -> None:
 def test_narrowband_peaks_are_rayleigh_example_5_14() -> None:
     fs, n = 20480.0, 1 << 19
     x = _bandlimited_gaussian(2, fs, n, 950.0, 1050.0)
-    res = ph.peak_statistics(x, fs)
+    res = ph.metrology.peak_statistics(x, fs)
     assert res.irregularity_factor > 0.99
     # Example 5.14: Prob[peak > 4 sigma] = exp(-8) = 0.00033.
     assert res.peak_exceedance(4.0)[0] == pytest.approx(np.exp(-8.0), rel=1e-2)
@@ -345,7 +351,7 @@ def test_wideband_irregularity_factor_of_lowpass_noise() -> None:
     fs, n = 20480.0, 1 << 19
     band = 2000.0
     x = _bandlimited_gaussian(3, fs, n, 0.0, band)
-    res = ph.peak_statistics(x, fs)
+    res = ph.metrology.peak_statistics(x, fs)
     assert res.peak_rate_rice == pytest.approx(
         band * np.sqrt(3.0 / 5.0), rel=1e-2
     )
@@ -381,14 +387,14 @@ def test_peak_exceedance_limits_and_density_consistency() -> None:
 def test_peak_statistics_validation_and_fields() -> None:
     rng = np.random.default_rng(9)
     x = rng.standard_normal(1 << 14)
-    res = ph.peak_statistics(x, FS)
+    res = ph.metrology.peak_statistics(x, FS)
     assert 0.0 < res.irregularity_factor <= 1.0
     assert res.peak_values.size > 0
     assert np.all(np.diff(res.peak_values) >= 0.0)  # sorted
     assert res.duration == pytest.approx((x.size - 1) / FS)
     constant = np.zeros(4096)
     with pytest.raises(ValueError, match="constant"):
-        ph.peak_statistics(constant, FS)
+        ph.metrology.peak_statistics(constant, FS)
 
 
 # ---------------------------------------------------------------------------
@@ -397,7 +403,7 @@ def test_peak_statistics_validation_and_fields() -> None:
 
 
 def test_trend_test_plot_renders_and_returns_axes() -> None:
-    res = ph.trend_test(EXAMPLE_4_4)
+    res = ph.metrology.trend_test(EXAMPLE_4_4)
     ax = res.plot()
     assert "Trend test" in ax.get_title()
     assert ax.get_xlabel() == "Sample index"
@@ -406,7 +412,7 @@ def test_trend_test_plot_renders_and_returns_axes() -> None:
     assert "no trend" in legend
     plt.close("all")
     rng = np.random.default_rng(3)
-    runs = ph.trend_test(rng.standard_normal(40), method="runs")
+    runs = ph.metrology.trend_test(rng.standard_normal(40), method="runs")
     ax = runs.plot()
     legend_texts = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any("Runs $r$ =" in t for t in legend_texts)
@@ -424,7 +430,7 @@ def test_runs_plot_draws_original_classification_median() -> None:
     # median recomputed on the filtered TrendTestResult.values.
     values = np.array([0.0] * 5 + [10.0] * 21 + [100.0] * 15)
     np.random.default_rng(0).shuffle(values)
-    res = ph.trend_test(values, method="runs")
+    res = ph.metrology.trend_test(values, method="runs")
     assert res.median == 10.0
     assert float(np.median(res.values)) == 100.0  # filtered median differs
     ax = res.plot()
@@ -440,29 +446,29 @@ def test_plots_render_and_return_axes() -> None:
     rng = np.random.default_rng(10)
     n = 1 << 14
     x = rng.standard_normal(n) * np.linspace(1.0, 1.3, n)
-    st = ph.stationarity_test(x, FS)
+    st = ph.metrology.stationarity_test(x, FS)
     ax = st.plot()
     assert "Stationarity test" in ax.get_title()
     assert "Reverse arrangements" in ax.get_legend().get_texts()[0].get_text()
     plt.close("all")
-    runs = ph.stationarity_test(x, FS, method="runs")
+    runs = ph.metrology.stationarity_test(x, FS, method="runs")
     ax = runs.plot()
     legend_texts = [t.get_text() for t in ax.get_legend().get_texts()]
     assert any("Runs $r$ =" in t for t in legend_texts)
     assert any("Sequence median" in t for t in legend_texts)
     plt.close("all")
     noise = rng.standard_normal(n)
-    ax = ph.level_crossing_rate(noise, FS).plot()
+    ax = ph.metrology.level_crossing_rate(noise, FS).plot()
     assert "Level-crossing rate" in ax.get_title()
     assert ax.get_yscale() == "log"
     plt.close("all")
-    ax = ph.peak_statistics(noise, FS).plot()
+    ax = ph.metrology.peak_statistics(noise, FS).plot()
     assert "Peak-height distribution" in ax.get_title()
     plt.close("all")
 
 
 def test_peak_plot_without_maxima_raises() -> None:
-    ramp_result = ph.peak_statistics(
+    ramp_result = ph.metrology.peak_statistics(
         np.linspace(0.0, 1.0, 4096) ** 2, FS
     )
     assert ramp_result.peak_values.size == 0

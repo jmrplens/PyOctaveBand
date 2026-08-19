@@ -35,7 +35,7 @@ def _enclosure_example() -> tuple[object, ReportMetadata, str]:
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
     panel_r = np.array([18, 22, 28, 33, 38, 42, 45], dtype=float)
-    result = ph.enclosure_insertion_loss(
+    result = ph.noise_control.enclosure_insertion_loss(
         panel_r, 24.0, 30.0, 0.30, frequencies=freqs
     )
     metadata = ReportMetadata(

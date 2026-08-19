@@ -48,7 +48,9 @@ def _plane_wave_pair(
 def _chk_plane_wave_intensity() -> Outcome:
     rho, c, spacing = 1.204, 343.0, 0.012
     p1, p2 = _plane_wave_pair(spacing / c)
-    res = ph.sound_intensity(p1, p2, _FS, spacing=spacing, rho=rho, c=c)
+    res = ph.emission.sound_intensity(
+        p1, p2, _FS, spacing=spacing, rho=rho, c=c
+    )
     expected = float(np.mean(((p1 + p2) / 2.0) ** 2)) / (rho * c)
     return numeric(
         expected, float(res.total_intensity), 0.015, unit="W/m^2", rel=True, places=5
@@ -63,7 +65,9 @@ def _chk_plane_wave_intensity() -> Outcome:
 def _chk_monopole_lw() -> Outcome:
     lw_true, r = 95.0, 4.0
     lp = lw_true - 10.0 * math.log10(2.0 * math.pi * r**2)
-    res = ph.sound_power_pressure(np.full((10, 1), lp), "hemisphere", radius=r)
+    res = ph.emission.sound_power_pressure(
+        np.full((10, 1), lp), "hemisphere", radius=r
+    )
     return numeric(lw_true, float(res.sound_power_level[0]), 1e-9, unit="dB", places=6)
 
 
@@ -76,7 +80,7 @@ def _chk_intensity_scan_lw() -> Outcome:
     w = 1.0e-3  # 90 dB re 1 pW
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.full((4, 1), w / areas.sum())
-    res = ph.sound_power_intensity(intensity, areas)
+    res = ph.emission.sound_power_intensity(intensity, areas)
     return numeric(90.0, float(res.sound_power_level[0]), 1e-6, unit="dB", places=6)
 
 
@@ -90,7 +94,7 @@ def _chk_iec61043_table2() -> Outcome:
     columns = {"probe": (1, 2), "processor": (3, 4), "instrument": (5, 6)}
     worst = 0.0
     for device, (col1, col2) in columns.items():
-        _, class1, class2 = ph.residual_index_limits(device)
+        _, class1, class2 = ph.emission.residual_index_limits(device)
         for i, row in enumerate(ref.IEC61043_TABLE2):
             worst = max(
                 worst,
@@ -120,8 +124,8 @@ def _chk_iec61043_spacing_rule() -> Outcome:
     expected = 10.0 * math.log10(2.0)
     offsets: list[float] = []
     for device in ("probe", "processor", "instrument"):
-        base = ph.residual_index_limits(device)
-        wide = ph.residual_index_limits(device, spacing=0.050)
+        base = ph.emission.residual_index_limits(device)
+        wide = ph.emission.residual_index_limits(device, spacing=0.050)
         for cls in (1, 2):
             offsets.extend(
                 (np.asarray(wide[cls]) - np.asarray(base[cls])).tolist()
@@ -138,7 +142,7 @@ def _chk_iec61043_spacing_rule() -> Outcome:
     "delta_pI0 = 20 dB is a phase mismatch of 0.26 deg (1 kHz, 25 mm)",
 )
 def _chk_iec61043_phase_mismatch() -> Outcome:
-    phi = ph.phase_mismatch_from_residual_index(
+    phi = ph.emission.phase_mismatch_from_residual_index(
         ref.IEC61043_PHASE_INDEX_DB,
         ref.IEC61043_PHASE_FREQUENCY_HZ,
         ref.IEC61043_PHASE_SPACING_M,
@@ -162,7 +166,10 @@ def _chk_iso9614_1_f1() -> Outcome:
         math.sqrt(float(np.sum((samples - mean) ** 2)) / (samples.size - 1)) / mean
     )
     return numeric(
-        expected, float(ph.temporal_variability_indicator(samples)), 1e-12, places=6
+        expected,
+        float(ph.emission.temporal_variability_indicator(samples)),
+        1e-12,
+        places=6,
     )
 
 
@@ -172,7 +179,7 @@ def _chk_iso9614_1_f1() -> Outcome:
     "Declared L_WAd = L_WA + K_WA (Annex B, L_WA=88, K_WA=2)",
 )
 def _chk_iso4871_declared_value() -> Outcome:
-    mode = ph.OperatingModeDeclaration("Operating mode 1", 88.0, 2.0)
+    mode = ph.emission.OperatingModeDeclaration("Operating mode 1", 88.0, 2.0)
     return numeric(90.0, float(mode.declared_sound_power_level), 0.0, unit="dB", places=1)
 
 
@@ -182,8 +189,12 @@ def _chk_iso4871_declared_value() -> Outcome:
     "Single-machine verification boundary L_1 <= L_WAd",
 )
 def _chk_iso4871_verification() -> Outcome:
-    at_boundary = ph.OperatingModeDeclaration("m", 88.0, 2.0, verification_level=90.0)
-    just_over = ph.OperatingModeDeclaration("m", 88.0, 2.0, verification_level=91.0)
+    at_boundary = ph.emission.OperatingModeDeclaration(
+        "m", 88.0, 2.0, verification_level=90.0
+    )
+    just_over = ph.emission.OperatingModeDeclaration(
+        "m", 88.0, 2.0, verification_level=91.0
+    )
     ok = at_boundary.verified is True and just_over.verified is False
     return Outcome(
         expected="L_1=90 verified, L_1=91 rejected (L_WAd=90)",
@@ -229,7 +240,7 @@ def _chk_reverberation_lw() -> Outcome:
     theta, ps = 23.0, 101.325
     lw_target = np.array([80.0, 85.0, 90.0, 82.0, 75.0])
     lp = lw_target - _reverb_bracket(t60, volume, surface, freqs, theta, ps)
-    res = ph.sound_power_reverberation(
+    res = ph.emission.sound_power_reverberation(
         lp, t60, volume, surface, freqs, temperature=theta, static_pressure=ps
     )
     worst = float(np.max(np.abs(np.asarray(res.sound_power_level) - lw_target)))

@@ -37,7 +37,7 @@ def _tone() -> np.ndarray:
 
 
 def test_harmonic_distortion_es() -> None:
-    res = ph.harmonic_analysis(_tone(), FS, 1000.0)
+    res = ph.electroacoustics.harmonic_analysis(_tone(), FS, 1000.0)
     ax = res.plot(language="es")
     assert ax.get_ylabel() == "Nivel respecto al fundamental [dB]"
     assert ax.get_xlabel().startswith("Orden del armónico")
@@ -49,7 +49,7 @@ def test_harmonic_distortion_es() -> None:
 def test_frequency_response_es() -> None:
     x = RNG.standard_normal(2 ** 15)
     y = np.convolve(x, np.array([0.5, 0.3, 0.1]), mode="same")
-    axes = ph.transfer_function(x, y, FS).plot(language="es")
+    axes = ph.electroacoustics.transfer_function(x, y, FS).plot(language="es")
     text = _labels(axes)
     assert "Respuesta en frecuencia" in text
     assert "coherencia" in text
@@ -59,9 +59,11 @@ def test_frequency_response_es() -> None:
 
 def test_swept_sine_distortion_es() -> None:
     f1, f2, seconds = 100.0, 8000.0, 1.0
-    sweep = ph.synchronized_sweep_signal(FS, f1, f2, seconds)
+    sweep = ph.electroacoustics.synchronized_sweep_signal(FS, f1, f2, seconds)
     rec = sweep + 0.01 * sweep ** 2
-    res = ph.swept_sine_distortion(rec, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
+    res = ph.electroacoustics.swept_sine_distortion(
+        rec, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
+    )
     # Two-panel figure: harmonic responses (title) + THD(f) (excitation axis).
     axes = res.plot(language="es")
     text = _labels(axes)
@@ -78,13 +80,13 @@ def test_swept_sine_distortion_es() -> None:
 
 
 def test_feedback_stability_es() -> None:
-    res = ph.feedback_stability(-6.0, 74.0, 80.0)
+    res = ph.electroacoustics.feedback_stability(-6.0, 74.0, 80.0)
     ax = res.plot(language="es")
     assert "Ganancia antes de la realimentación" in ax.get_title()
     assert "Ganancia [dB]" in ax.get_ylabel()
     assert "Oscilación (0 dB)" in _labels(ax)
     plt.close("all")
-    unstable = ph.feedback_stability(0.0, 80.0, 80.0)
+    unstable = ph.electroacoustics.feedback_stability(0.0, 80.0, 80.0)
     assert "inestable" in unstable.plot(language="es").get_title()
     plt.close("all")
     with pytest.raises(ValueError):
@@ -92,16 +94,22 @@ def test_feedback_stability_es() -> None:
 
 
 def test_sound_reinforcement_geometry_es() -> None:
-    ax = ph.plot_sound_reinforcement_geometry(0.3, 4.0, 12.0, language="es")
+    ax = ph.electroacoustics.plot_sound_reinforcement_geometry(
+        0.3, 4.0, 12.0, language="es"
+    )
     assert "Lazo de realimentación" in ax.get_title()
     assert "Camino de realimentación" in _labels(ax)
     plt.close("all")
     with pytest.raises(ValueError):
-        ph.plot_sound_reinforcement_geometry(0.3, 4.0, 12.0, language="xx")
+        ph.electroacoustics.plot_sound_reinforcement_geometry(
+            0.3, 4.0, 12.0, language="xx"
+        )
 
 
 def test_piston_impedance_es() -> None:
-    res = ph.radiating_piston(0.05, np.geomspace(50.0, 5000.0, 60))
+    res = ph.electroacoustics.radiating_piston(
+        0.05, np.geomspace(50.0, 5000.0, 60)
+    )
     ax = res.plot(language="es")
     assert "pistón circular con pantalla" in ax.get_title()
     assert "Impedancia de radiación normalizada" in ax.get_ylabel()
@@ -111,7 +119,7 @@ def test_piston_impedance_es() -> None:
 
 
 def test_piston_directivity_es() -> None:
-    res = ph.piston_directivity_pattern([3.0, 8.0, 16.0])
+    res = ph.electroacoustics.piston_directivity_pattern([3.0, 8.0, 16.0])
     ax = res.plot(language="es")
     assert ax.name == "polar"
     assert ax.get_title() == "Directividad de un pistón circular con pantalla"
@@ -124,12 +132,12 @@ def _loudspeaker() -> ph.electroacoustics.LoudspeakerCharacteristics:
     f = np.geomspace(30.0, 24000.0, 200)
     spl = 87.0 - 10 * np.log10(1 + (50.0 / f) ** 6) - 10 * np.log10(1 + (f / 16000.0) ** 7)
     fz = np.geomspace(20.0, 20000.0, 120)
-    return ph.loudspeaker_characteristics(
+    return ph.electroacoustics.loudspeaker_characteristics(
         f, spl, 8.0, sensitivity_band=(200.0, 4000.0),
         impedance=(fz, 6.6 + 20 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
         distortion=(np.geomspace(50.0, 5000.0, 90),
                     0.4 + 2.0 * np.ones(90)),
-        directivity=ph.LoudspeakerDirectivity(
+        directivity=ph.electroacoustics.LoudspeakerDirectivity(
             polar=(np.linspace(0.0, 90.0, 46), -np.linspace(0.0, 12.0, 46)),
             frequency=2000.0,
         ),
@@ -141,16 +149,16 @@ def _microphone() -> ph.electroacoustics.MicrophoneCharacteristics:
     resp = -10 * np.log10(1 + (30.0 / f) ** 4) - 10 * np.log10(1 + (f / 19000.0) ** 8)
     ang = np.linspace(0.0, 179.0, 180)
     spl = np.linspace(100.0, 140.0, 41)
-    return ph.microphone_characteristics(
+    return ph.electroacoustics.microphone_characteristics(
         f, resp, 12.5, tolerance_db=3.0,
-        noise=ph.MicrophoneNoise(
+        noise=ph.electroacoustics.MicrophoneNoise(
             voltage=1.25e-6,
             spectrum=(np.geomspace(20.0, 20000.0, 31), np.full(31, 10.0)),
         ),
-        overload=ph.MicrophoneOverload(
+        overload=ph.electroacoustics.MicrophoneOverload(
             distortion=(spl, 0.5 * 10 ** ((spl - 130.0) * 0.08)), thd_percent=0.5
         ),
-        directivity=ph.MicrophoneDirectivity(
+        directivity=ph.electroacoustics.MicrophoneDirectivity(
             polar=(ang, 20 * np.log10((1 + np.cos(np.radians(ang))) / 2)),
             frequency=1000.0,
         ),

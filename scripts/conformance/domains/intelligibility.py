@@ -34,7 +34,7 @@ def _chk_sii_band_importance_sum() -> Outcome:
 
 @register(_SII, "ASA WG S3-79 SII.C (clause 5.4)", "Equivalent masking spectrum level at 200 Hz")
 def _chk_sii_masking() -> Outcome:
-    result = ph.speech_intelligibility_index("normal")
+    result = ph.speech.speech_intelligibility_index("normal")
     return numeric(ref.ANSIS3_5_MASKING_Z_200HZ, float(result.masking[1]), 1e-3, places=3)
 
 
@@ -86,7 +86,7 @@ def _chk_sii_annex_c2_masking() -> Outcome:
 
 @register(_SII, "ASA WG S3-79 SII.C (clause 6)", "SII, standard speech in quiet, normal hearing")
 def _chk_sii_standard_quiet() -> Outcome:
-    result = ph.speech_intelligibility_index("normal")
+    result = ph.speech.speech_intelligibility_index("normal")
     return numeric(ref.ANSIS3_5_STANDARD_QUIET, result.sii, 1e-6, places=8)
 
 
@@ -206,19 +206,23 @@ def _chk_sii_annex_c1_level_distortion() -> Outcome:
 
 @register(_SII, "ANSI S3.5-1997 Table 1", "Critical-band importance normalisation")
 def _chk_sii_critical_importance_sum() -> Outcome:
-    total = float(ph.sii_procedure("critical-band").band_importance.sum())
+    total = float(
+        ph.speech.sii_procedure("critical-band").band_importance.sum()
+    )
     return numeric(ref.ANSIS3_5_CRITICAL_IMPORTANCE_SUM, total, 1e-9, places=6)
 
 
 @register(_SII, "ANSI S3.5-1997 Table 2", "Equally-contributing importance, 17 x 0.0588")
 def _chk_sii_equal_importance_sum() -> Outcome:
-    total = float(ph.sii_procedure("equally-contributing").band_importance.sum())
+    total = float(
+        ph.speech.sii_procedure("equally-contributing").band_importance.sum()
+    )
     return numeric(ref.ANSIS3_5_EQUAL_IMPORTANCE_SUM, total, 1e-9, places=6)
 
 
 @register(_SII, "ANSI S3.5-1997 Table 4", "Octave-band importance normalisation")
 def _chk_sii_octave_importance_sum() -> Outcome:
-    total = float(ph.sii_procedure("octave").band_importance.sum())
+    total = float(ph.speech.sii_procedure("octave").band_importance.sum())
     return numeric(ref.ANSIS3_5_OCTAVE_IMPORTANCE_SUM, total, 1e-9, places=6)
 
 
@@ -227,8 +231,8 @@ def _chk_sii_octave_matches_table3() -> Outcome:
     # Both are spectrum (per-hertz) levels, so Table 4 repeats Table 3's Ui and
     # Xi at all six shared centre frequencies. Reported as the largest
     # disagreement over the twelve cells.
-    octave = ph.sii_procedure("octave")
-    third = ph.sii_procedure("one-third-octave")
+    octave = ph.speech.sii_procedure("octave")
+    third = ph.speech.sii_procedure("one-third-octave")
     worst = 0.0
     for fc, speech, noise in ref.ANSIS3_5_OCTAVE_TABLE4_SHARED:
         k = int(np.flatnonzero(np.isclose(octave.frequencies, fc))[0])
@@ -247,7 +251,7 @@ def _chk_sii_octave_matches_table3() -> Outcome:
 def _chk_sii_critical_table1() -> Outcome:
     # Every cell of Table 1 as shipped: centre, both limits, Ii, Ui and Xi.
     # Reported as the largest absolute disagreement over the 126 cells.
-    proc = ph.sii_procedure("critical-band")
+    proc = ph.speech.sii_procedure("critical-band")
     worst = 0.0
     for i, (fc, lo, hi, imp, speech, noise) in enumerate(
         ref.ANSIS3_5_CRITICAL_TABLE1
@@ -271,7 +275,7 @@ def _chk_sii_flat_cases() -> Outcome:
     # Reported as the largest deviation from the committee code over the twelve.
     worst = 0.0
     for method, _regime, speech, noise, committee in ref.ANSIS3_5_WG_FLAT_CASES:
-        n = ph.sii_procedure(method).frequencies.size
+        n = ph.speech.sii_procedure(method).frequencies.size
         result = ph.speech.sii.speech_intelligibility_index(
             np.full(n, speech), np.full(n, noise), method=method
         )
@@ -313,8 +317,14 @@ def _stoi_speech_like(seed: int) -> np.ndarray:
 )
 def _chk_stoi_identity() -> Outcome:
     x = _stoi_speech_like(1)
-    return numeric(1.0, ph.stoi(x, x, ph.speech.objective_intelligibility.SAMPLE_RATE).value,
-                   1e-6, places=6)
+    return numeric(
+        1.0,
+        ph.speech.stoi(
+            x, x, ph.speech.objective_intelligibility.SAMPLE_RATE
+        ).value,
+        1e-6,
+        places=6,
+    )
 
 
 @register(
@@ -325,7 +335,9 @@ def _chk_stoi_identity() -> Outcome:
 def _chk_estoi_identity() -> Outcome:
     x = _stoi_speech_like(1)
     fs = ph.speech.objective_intelligibility.SAMPLE_RATE
-    return numeric(1.0, ph.stoi(x, x, fs, extended=True).value, 1e-6, places=6)
+    return numeric(
+        1.0, ph.speech.stoi(x, x, fs, extended=True).value, 1e-6, places=6
+    )
 
 
 @register(
@@ -339,8 +351,12 @@ def _chk_stoi_monotonic() -> Outcome:
     rng = np.random.default_rng(10)
     noise = rng.standard_normal(x.size)
     scale = np.sqrt(np.mean(x**2)) / np.sqrt(np.mean(noise**2))
-    lo = ph.stoi(x, x + scale * 10.0 ** (15.0 / 20.0) * noise, fs).value  # -15 dB
-    hi = ph.stoi(x, x + scale * 10.0 ** (-25.0 / 20.0) * noise, fs).value  # +25 dB
+    lo = ph.speech.stoi(
+        x, x + scale * 10.0 ** (15.0 / 20.0) * noise, fs
+    ).value  # -15 dB
+    hi = ph.speech.stoi(
+        x, x + scale * 10.0 ** (-25.0 / 20.0) * noise, fs
+    ).value  # +25 dB
     return Outcome(
         expected="STOI(+25 dB) - STOI(-15 dB) > 0.2",
         computed=f"{hi - lo:.3f} ({lo:.3f} -> {hi:.3f})",

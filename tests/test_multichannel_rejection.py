@@ -19,10 +19,10 @@ _STEREO = np.zeros((2, 4800))
 @pytest.mark.parametrize(
     "analyze",
     [
-        ph.loudness_ecma,
-        ph.tonality_ecma,
-        ph.roughness_ecma,
-        ph.loudness_moore_glasberg,
+        ph.psychoacoustics.loudness_ecma,
+        ph.psychoacoustics.tonality_ecma,
+        ph.psychoacoustics.roughness_ecma,
+        ph.psychoacoustics.loudness_moore_glasberg,
     ],
     ids=["loudness_ecma", "tonality_ecma", "roughness_ecma", "moore_glasberg"],
 )

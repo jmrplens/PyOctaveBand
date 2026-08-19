@@ -32,9 +32,11 @@ _SS_A2, _SS_A3 = 0.1, 0.2
 
 def _swept_sine_polynomial() -> Any:
     fs, f1, f2, seconds = 48000, 20.0, 6000.0, 2.0
-    x = ph.synchronized_sweep_signal(fs, f1, f2, seconds)
+    x = ph.electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
     y = x + _SS_A2 * x**2 + _SS_A3 * x**3
-    return ph.swept_sine_distortion(y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3)
+    return ph.electroacoustics.swept_sine_distortion(
+        y, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
+    )
 
 
 def _ss_response_at(res: Any, order: int, freq: float) -> complex:
@@ -88,8 +90,8 @@ def _chk_swept_sine_linear_floor() -> Outcome:
     # A longer sweep than the polynomial checks: the floor is deconvolution
     # residue, and 4 s of sweep leaves 3x headroom under the 1e-3 bound.
     fs, f1, f2, seconds = 48000, 20.0, 6000.0, 4.0
-    x = ph.synchronized_sweep_signal(fs, f1, f2, seconds)
-    res = ph.swept_sine_distortion(
+    x = ph.electroacoustics.synchronized_sweep_signal(fs, f1, f2, seconds)
+    res = ph.electroacoustics.swept_sine_distortion(
         0.5 * x, fs, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
     )
     band = (res.thd_frequencies > 100.0) & (res.thd_frequencies < 2000.0)
@@ -107,7 +109,7 @@ def _chk_minimum_phase_biquad() -> Outcome:
     b = np.array([1.0 + alpha * gain, -2.0 * math.cos(w0), 1.0 - alpha * gain])
     a = np.array([1.0 + alpha / gain, -2.0 * math.cos(w0), 1.0 - alpha / gain])
     _, resp = sg.freqz(b, a, worN=np.linspace(0.0, math.pi, 4097))
-    rec = ph.minimum_phase(resp)
+    rec = ph.signals.minimum_phase(resp)
     err = float(np.max(np.abs(np.angle(rec) - np.angle(resp))))
     return numeric(0.0, err, 1e-9, unit="rad", places=6)
 
@@ -121,7 +123,7 @@ def _chk_group_delay_allpass() -> Outcome:
     a_coef = 0.5
     grid = np.linspace(0.0, math.pi, 4097)
     _, resp = sg.freqz([a_coef, 1.0], [1.0, a_coef], worN=grid)
-    tau = ph.group_delay(resp, 1.0)  # fs = 1 -> samples
+    tau = ph.signals.group_delay(resp, 1.0)  # fs = 1 -> samples
     idx = int(np.argmin(np.abs(grid - math.pi / 2.0)))
     expected = (1.0 - a_coef**2) / (1.0 + a_coef**2)
     return numeric(expected, float(tau[idx]), 1e-5, places=5)
@@ -140,5 +142,5 @@ def _chk_excess_group_delay() -> Outcome:
     grid = np.linspace(0.0, math.pi, 4097)
     _, resp = sg.freqz(b, a, worN=grid)
     delayed = resp * np.exp(-1j * grid * 7.25)
-    res = ph.phase_decomposition(delayed, 1.0)  # fs = 1 -> samples
+    res = ph.signals.phase_decomposition(delayed, 1.0)  # fs = 1 -> samples
     return numeric(7.25, float(res.excess_group_delay[2048]), 1e-6, places=5)

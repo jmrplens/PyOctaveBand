@@ -119,8 +119,15 @@ def run_airport_contour() -> np.ndarray:
     import phonometry as ph
 
     a = airport_inputs()
-    res = ph.noise_contour(a["path"], a["powers"], a["distances"], a["sel"],
-                           a["lmax"], x=a["grid_x"], y=a["grid_y"])
+    res = ph.aircraft.noise_contour(
+        a["path"],
+        a["powers"],
+        a["distances"],
+        a["sel"],
+        a["lmax"],
+        x=a["grid_x"],
+        y=a["grid_y"],
+    )
     return np.asarray(res.level)
 
 
@@ -128,8 +135,14 @@ def run_event_level() -> np.ndarray:
     import phonometry as ph
 
     a = airport_inputs()
-    res = ph.event_level(a["path"], a["observer"], a["powers"], a["distances"],
-                         a["sel"], a["lmax"])
+    res = ph.aircraft.event_level(
+        a["path"],
+        a["observer"],
+        a["powers"],
+        a["distances"],
+        a["sel"],
+        a["lmax"],
+    )
     return np.concatenate([[res.level], np.asarray(res.segment_levels)])
 
 
@@ -138,16 +151,21 @@ def run_npd_batch() -> np.ndarray:
 
     a = airport_inputs()
     q = np.array([75.0, 150.0, 300.0, 600.0, 1200.0, 2400.0, 5000.0])
-    return np.asarray(ph.npd_level(a["powers"], a["distances"], a["sel"], 10000.0, q))
+    return np.asarray(
+        ph.aircraft.npd_level(
+            a["powers"], a["distances"], a["sel"], 10000.0, q
+        )
+    )
 
 
 def run_hemisphere_queries() -> np.ndarray:
     import phonometry as ph
 
     h = hemisphere_inputs()
-    hemi = ph.RotorcraftHemisphere(h["frequencies"], h["azimuth"], h["polar"],
-                                   h["levels"])
-    out = [ph.hemisphere_source_level(hemi, phi, theta)
+    hemi = ph.aircraft.RotorcraftHemisphere(
+        h["frequencies"], h["azimuth"], h["polar"], h["levels"]
+    )
+    out = [ph.aircraft.hemisphere_source_level(hemi, phi, theta)
            for phi, theta in h["queries"]]
     return np.concatenate(out)
 
@@ -156,11 +174,15 @@ def run_parabolic_equation() -> np.ndarray:
     import phonometry as ph
 
     p = pe_inputs()
-    res = ph.parabolic_equation(p["frequency_hz"], p["depths"], p["sound_speeds"],
-                                source_depth=p["source_depth"],
-                                max_range=p["max_range"],
-                                range_step=p["range_step"],
-                                n_depth_points=p["n_depth_points"])
+    res = ph.underwater.parabolic_equation(
+        p["frequency_hz"],
+        p["depths"],
+        p["sound_speeds"],
+        source_depth=p["source_depth"],
+        max_range=p["max_range"],
+        range_step=p["range_step"],
+        n_depth_points=p["n_depth_points"],
+    )
     pl = np.asarray(res.propagation_loss)
     return pl[::16, 1::10].ravel()  # skip the r = 0 column (PL is inf there)
 
@@ -169,7 +191,7 @@ def run_ecma_loudness() -> np.ndarray:
     import phonometry as ph
 
     sig, fs = ecma_signal()
-    res = ph.loudness_ecma(sig, fs)
+    res = ph.psychoacoustics.loudness_ecma(sig, fs)
     return np.concatenate([[float(res.loudness)],
                            np.asarray(res.specific_loudness).ravel()])
 
@@ -178,7 +200,7 @@ def run_ecma_roughness() -> np.ndarray:
     import phonometry as ph
 
     sig, fs = ecma_signal()
-    res = ph.roughness_ecma(sig, fs)
+    res = ph.psychoacoustics.roughness_ecma(sig, fs)
     return np.concatenate([[float(res.roughness)],
                            np.asarray(res.specific_roughness).ravel()])
 
@@ -187,7 +209,7 @@ def run_ecma_tonality() -> np.ndarray:
     import phonometry as ph
 
     sig, fs = ecma_signal()
-    res = ph.tonality_ecma(sig, fs)
+    res = ph.psychoacoustics.tonality_ecma(sig, fs)
     return np.concatenate([[float(res.tonality)],
                            np.asarray(res.specific_tonality).ravel()])
 

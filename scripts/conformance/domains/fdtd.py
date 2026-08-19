@@ -32,9 +32,9 @@ _FDTD = "2D FDTD wave simulation (Attenborough & Van Renterghem 2021, Ch. 4)"
 def _chk_fdtd_box_mode() -> Outcome:
     lx, ly, dx, c = 1.0, 0.7, 0.02, 343.0
     nx, ny = round(lx / dx), round(ly / dx)
-    res = ph.fdtd_simulation(
+    res = ph.simulation.fdtd_simulation(
         c, dx, 0.35, shape=(ny, nx),
-        sources=[ph.GaussianPulse(ix=7, iy=5, width=2.0e-4)],
+        sources=[ph.simulation.GaussianPulse(ix=7, iy=5, width=2.0e-4)],
         probes=[(nx - 4, ny - 3)])
     expected = 0.5 * c * math.hypot(1.0 / lx, 1.0 / ly)
     pressure = res.pressures[0]
@@ -53,9 +53,9 @@ def _chk_fdtd_box_mode() -> Outcome:
 )
 def _chk_fdtd_pulse_delay() -> Outcome:
     c, dx = 343.0, 0.01
-    res = ph.fdtd_simulation(
+    res = ph.simulation.fdtd_simulation(
         c, dx, 6.5e-3, shape=(200, 300),
-        sources=[ph.GaussianPulse(ix=40, iy=100, width=1.5e-4)],
+        sources=[ph.simulation.GaussianPulse(ix=40, iy=100, width=1.5e-4)],
         probes=[(100, 100), (160, 100)],
         boundaries="absorbing", absorbing_layer_cells=30)
     t1 = res.times[int(np.argmax(res.pressures[0]))]
@@ -84,8 +84,10 @@ def _ntff_monopole() -> tuple[Any, complex, float]:
 
     c, dx, f = 343.0, 0.005, 2000.0
     k = 2.0 * np.pi * f / c
-    sim = ph.FDTD2D(c, dx, shape=(300, 300), sponge_width=40)
-    sim.add_source(ph.CWSource(ix=150, iy=150, frequency=f, ramp_cycles=4.0))
+    sim = ph.simulation.FDTD2D(c, dx, shape=(300, 300), sponge_width=40)
+    sim.add_source(
+        ph.simulation.CWSource(ix=150, iy=150, frequency=f, ramp_cycles=4.0)
+    )
     probe = sim.add_contour_probe(90, 210, 90, 210, frequencies=[f])
     sim.run(round(4.5e-3 / sim.dt))
     probe.reset()
@@ -97,7 +99,7 @@ def _ntff_monopole() -> tuple[Any, complex, float]:
             -2j * np.pi * f * sim.n * sim.dt)
     amplitude = (2.0 * acc / probe.samples) / hankel2(
         0, k * (probe_col - 150) * dx)
-    pattern = ph.far_field_from_contour(
+    pattern = ph.simulation.far_field_from_contour(
         probe.phasors(f), np.arange(0.0, 360.0, 5.0),
         origin=(150.5 * dx, 150.5 * dx))
     expected = abs(amplitude) * math.sqrt(2.0 / (math.pi * k))

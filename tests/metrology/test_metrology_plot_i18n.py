@@ -72,7 +72,7 @@ def test_monte_carlo_es() -> None:
 def test_trend_test_es_and_bad_language() -> None:
     values = [5.2, 6.2, 3.7, 6.4, 3.9, 4.0, 3.9, 5.3, 4.0, 4.6,
               5.9, 6.5, 4.3, 5.7, 3.1, 5.6, 5.2, 3.9, 6.2, 5.0]
-    res = ph.trend_test(values)
+    res = ph.metrology.trend_test(values)
     ax = res.plot(language="es")
     assert "Test de tendencia" in ax.get_title()
     assert ax.get_xlabel() == "Índice de muestra"
@@ -80,7 +80,7 @@ def test_trend_test_es_and_bad_language() -> None:
     assert "Inversiones de orden" in _labels(ax)
     assert "sin tendencia" in _labels(ax)
     plt.close("all")
-    runs = ph.trend_test(RNG.standard_normal(40), method="runs")
+    runs = ph.metrology.trend_test(RNG.standard_normal(40), method="runs")
     ax = runs.plot(language="es")
     assert "Rachas $r$ =" in _labels(ax)
     assert "Mediana de la secuencia" in _labels(ax)
@@ -92,13 +92,13 @@ def test_trend_test_es_and_bad_language() -> None:
 def test_stationarity_test_es_and_bad_language() -> None:
     n = 1 << 14
     x = _white(n) * np.linspace(1.0, 1.3, n)
-    res = ph.stationarity_test(x, FS)
+    res = ph.metrology.stationarity_test(x, FS)
     ax = res.plot(language="es")
     assert "Test de estacionariedad" in ax.get_title()
     assert ax.get_xlabel() == "Índice de segmento"
     assert "Inversiones de orden" in _labels(ax)
     plt.close("all")
-    runs = ph.stationarity_test(x, FS, method="runs")
+    runs = ph.metrology.stationarity_test(x, FS, method="runs")
     ax = runs.plot(language="es")
     assert "Rachas $r$ =" in _labels(ax)
     assert "Mediana de la secuencia" in _labels(ax)
@@ -108,7 +108,7 @@ def test_stationarity_test_es_and_bad_language() -> None:
 
 
 def test_level_crossing_rate_es_and_bad_language() -> None:
-    res = ph.level_crossing_rate(_white(1 << 14), FS)
+    res = ph.metrology.level_crossing_rate(_white(1 << 14), FS)
     ax = res.plot(language="es")
     assert "Tasa de cruces por nivel" in ax.get_title()
     assert ax.get_ylabel() == "Cruces por segundo [1/s]"
@@ -119,7 +119,7 @@ def test_level_crossing_rate_es_and_bad_language() -> None:
 
 
 def test_peak_statistics_es_and_bad_language() -> None:
-    res = ph.peak_statistics(_white(1 << 14), FS)
+    res = ph.metrology.peak_statistics(_white(1 << 14), FS)
     ax = res.plot(language="es")
     assert "Distribución de alturas de pico" in ax.get_title()
     assert "Límite de Rayleigh" in _labels(ax)

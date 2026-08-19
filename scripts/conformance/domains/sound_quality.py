@@ -79,15 +79,17 @@ _TONE_AUD = "Tonal audibility (ISO/PAS 20065)"
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formulae (12)-(14)", "Audibility at 137.3 Hz, Annex E spectrum 1")
 def _chk_iso20065_audibility() -> Outcome:
     fT, ls, lt, expected = ref.ISO20065_ANNEX_E_TONES[1]  # 137.3 Hz tone
-    value = ph.tone_audibility(lt, ls, fT, ref.ISO20065_LINE_SPACING)
+    value = ph.psychoacoustics.tone_audibility(
+        lt, ls, fT, ref.ISO20065_LINE_SPACING
+    )
     # 0.05 dB absorbs the standard's 2-decimal table rounding of LS/LT/LG/av.
     return numeric(expected, value, 0.05, unit="dB", places=2)
 
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formula (13)", "Masking index av at 137.3 / 592.2 Hz")
 def _chk_iso20065_masking_index() -> Outcome:
-    av137 = ph.masking_index(137.3)
-    av592 = ph.masking_index(592.2)
+    av137 = ph.psychoacoustics.masking_index(137.3)
+    av592 = ph.psychoacoustics.masking_index(592.2)
     ok = (
         abs(av137 - ref.ISO20065_AV_137) <= 0.005
         and abs(av592 - ref.ISO20065_AV_592) <= 0.005
@@ -104,14 +106,16 @@ def _chk_iso20065_masking_index() -> Outcome:
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formula (20)", "Mean audibility of the five spectra, Annex E")
 def _chk_iso20065_mean_audibility() -> Outcome:
-    value = ph.mean_audibility(ref.ISO20065_DECISIVE_AUDIBILITIES)
+    value = ph.psychoacoustics.mean_audibility(
+        ref.ISO20065_DECISIVE_AUDIBILITIES
+    )
     # 0.05 dB absorbs the 2-decimal rounding of the tabulated decisive values.
     return numeric(ref.ISO20065_MEAN_AUDIBILITY, value, 0.05, unit="dB", places=2)
 
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formula (6)", "Mean narrow-band level LS from spectrum, Table E.1")
 def _chk_iso20065_mean_narrowband_level() -> Outcome:
-    value = ph.mean_narrowband_level(
+    value = ph.psychoacoustics.mean_narrowband_level(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, 137.3
     )
     # Iterative Formula (6) with Hanning correction; 0.02 dB absorbs rounding.
@@ -120,7 +124,7 @@ def _chk_iso20065_mean_narrowband_level() -> Outcome:
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Clause 6", "Extended uncertainty U of the 137.3 Hz tone, Table E.2")
 def _chk_iso20065_uncertainty() -> Outcome:
-    res = ph.analyze_spectrum(
+    res = ph.psychoacoustics.analyze_spectrum(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
     )
     assert res.extended_uncertainties is not None
@@ -132,7 +136,9 @@ def _chk_iso20065_uncertainty() -> Outcome:
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formulae (28)-(29)", "Extended uncertainty of the mean audibility, Annex E Step 4")
 def _chk_iso20065_mean_uncertainty() -> Outcome:
     u_j = [row[6] for row in ref.ISO20065_E4_DECISIVE_ROWS]
-    value = ph.mean_audibility_uncertainty(ref.ISO20065_DECISIVE_AUDIBILITIES, u_j)
+    value = ph.psychoacoustics.mean_audibility_uncertainty(
+        ref.ISO20065_DECISIVE_AUDIBILITIES, u_j
+    )
     return numeric(
         ref.ISO20065_E4_MEAN_UNCERTAINTY, value, 0.01, unit="dB", places=2
     )
@@ -140,10 +146,10 @@ def _chk_iso20065_mean_uncertainty() -> Outcome:
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formula (8)", "Tone level LT from spectrum, Table E.1")
 def _chk_iso20065_tone_level() -> Outcome:
-    ls = ph.mean_narrowband_level(
+    ls = ph.psychoacoustics.mean_narrowband_level(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, 137.3
     )
-    value = ph.tone_level(
+    value = ph.psychoacoustics.tone_level(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, 137.3, ls
     )
     return numeric(ref.ISO20065_E1_LT, value, 0.02, unit="dB", places=2)
@@ -151,7 +157,7 @@ def _chk_iso20065_tone_level() -> Outcome:
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Clause 5.3.8", "Tone detection over the spectrum, Table E.1")
 def _chk_iso20065_peak_detection() -> Outcome:
-    result = ph.analyze_spectrum(
+    result = ph.psychoacoustics.analyze_spectrum(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
     )
     assert result.group_sizes is not None
@@ -173,7 +179,7 @@ def _chk_iso20065_peak_detection() -> Outcome:
     "Same-band FG combination inside analyze_spectrum, Table E.2 row 2 FG",
 )
 def _chk_iso20065_step3_fg() -> Outcome:
-    result = ph.analyze_spectrum(
+    result = ph.psychoacoustics.analyze_spectrum(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
     )
     assert result.group_sizes is not None
@@ -184,7 +190,7 @@ def _chk_iso20065_step3_fg() -> Outcome:
 
 @register(_TONE_AUD, "ISO/PAS 20065:2016 Formula (17)", "Multi-tone FG combination, Table E.1")
 def _chk_iso20065_fg_combination() -> Outcome:
-    value = ph.combined_tone_level(
+    value = ph.psychoacoustics.combined_tone_level(
         ref.ISO20065_E1_LEVELS,
         ref.ISO20065_E1_FREQUENCIES,
         ref.ISO20065_E1_TONE_FREQUENCIES,
@@ -199,11 +205,13 @@ def _chk_iso20065_fg_combination() -> Outcome:
     "Two-tone separation fD (DIN 45681 Annex J), 137.3 / 212 Hz",
 )
 def _chk_iso20065_two_tone_separation() -> Outcome:
-    fd_137 = ph.two_tone_separation_frequency(137.3)
-    fd_212 = ph.two_tone_separation_frequency(212.0)
+    fd_137 = ph.psychoacoustics.two_tone_separation_frequency(137.3)
+    fd_212 = ph.psychoacoustics.two_tone_separation_frequency(212.0)
     # Annex E consistency: the 118.4/137.3 Hz pair is combined, not separated
     # (|Δf| = 18.9 Hz < fD ≈ 24 Hz at the more prominent tone).
-    annex_e_combined = not ph.resolve_tones_separately(118.4, 137.3, 4.0, 5.0)
+    annex_e_combined = not ph.psychoacoustics.resolve_tones_separately(
+        118.4, 137.3, 4.0, 5.0
+    )
     ok = (
         round(fd_137, 2) == ref.ISO20065_FD_137
         and round(fd_212, 2) == ref.ISO20065_FD_212
@@ -236,7 +244,7 @@ _PA_FS = "Psychoacoustic annoyance & fluctuation strength (Fastl & Zwicker)"
 )
 def _chk_psychoacoustic_annoyance() -> Outcome:
     n5, s, f, r = ref.PA_WORKED_INPUT
-    value = ph.psychoacoustic_annoyance(n5, s, f, r).annoyance
+    value = ph.psychoacoustics.psychoacoustic_annoyance(n5, s, f, r).annoyance
     return numeric(ref.PA_WORKED_VALUE, value, 1e-3, places=4)
 
 
@@ -246,7 +254,7 @@ def _chk_psychoacoustic_annoyance() -> Outcome:
     "Fluctuation strength of AM broadband noise (60 dB, m=1, 4 Hz)",
 )
 def _chk_fluctuation_strength_am_noise() -> Outcome:
-    value = ph.fluctuation_strength_am_noise(60.0, 1.0, 4.0)
+    value = ph.psychoacoustics.fluctuation_strength_am_noise(60.0, 1.0, 4.0)
     return numeric(ref.FS_BBN_60_1_4, value, 1e-3, unit="vacil", places=4)
 
 
@@ -262,7 +270,9 @@ def _chk_fluctuation_strength_calibration() -> Outcome:
     t = np.arange(int(fs * 2.0)) / fs
     tone = (1.0 + np.sin(2.0 * np.pi * 4.0 * t)) * np.sin(2.0 * np.pi * 1000.0 * t)
     tone = tone / np.sqrt(np.mean(tone**2)) * 2e-5 * 10.0 ** (60.0 / 20.0)
-    value = ph.fluctuation_strength(tone, fs).fluctuation_strength
+    value = ph.psychoacoustics.fluctuation_strength(
+        tone, fs
+    ).fluctuation_strength
     return numeric(
         ref.FS_CALIBRATION_VACIL, value, 0.05, unit="vacil", places=3
     )

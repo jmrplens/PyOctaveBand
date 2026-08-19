@@ -49,7 +49,7 @@ def test_exposure_plot_task_bars_and_lex_line() -> None:
 
 def test_exposure_plot_without_tasks_raises() -> None:
     levels = np.full(5, 80.0)
-    res = ph.job_based_exposure(levels, 6.0)
+    res = ph.hearing.job_based_exposure(levels, 6.0)
     assert not res.tasks
     with pytest.raises(ValueError, match="per-task"):
         res.plot()

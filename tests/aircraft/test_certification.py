@@ -191,7 +191,10 @@ def test_epnl_result_plot_smoke() -> None:
 def test_epnl_exposed_at_package_top_level() -> None:
     import phonometry
 
-    assert phonometry.effective_perceived_noise_level is effective_perceived_noise_level
+    assert (
+        phonometry.aircraft.effective_perceived_noise_level
+        is effective_perceived_noise_level
+    )
 
 
 def test_bandsharing_adjustment_applied() -> None:

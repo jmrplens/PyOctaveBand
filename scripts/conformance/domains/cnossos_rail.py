@@ -42,7 +42,7 @@ def _cnossos_rail_case(case: dict[str, str]) -> Any:
     lam = [float(w) for w in ref.CNOSSOS_RAIL_2015_WAVELENGTHS]
     idling = case["condition"] == "idling"
     traction = "traction_idling" if idling else "traction_constant"
-    stock = ph.RollingStock(
+    stock = ph.environment.RollingStock(
         axles=int(vehicle["axles"]),
         wheel_roughness=(lam, wavelength[("wheel_roughness", vehicle["wheel_roughness"])]),
         contact_filter=(lam, wavelength[("contact_filter", vehicle["contact_filter"])]),
@@ -56,7 +56,7 @@ def _cnossos_rail_case(case: dict[str, str]) -> Any:
                      frequency[("aerodynamic", vehicle["aerodynamic"], "B")]),
         aerodynamic_alpha=float(case["aero_alpha"]),
     )
-    track = ph.RailwayTrack(
+    track = ph.environment.RailwayTrack(
         rail_roughness=(lam, wavelength[("rail_roughness", case["rail_roughness"])]),
         track_transfer=frequency[("track_transfer", case["track_transfer"], "")],
         impact_roughness=(
@@ -66,17 +66,17 @@ def _cnossos_rail_case(case: dict[str, str]) -> Any:
         joint_density=float(case["joint_density_per_m"]),
         squeal_excess=float(case["squeal_excess_db"]) + float(case["bridge_constant_db"]),
     )
-    return ph.railway_source_power(
-        ph.RailwayVehicle(
+    return ph.environment.railway_source_power(
+        ph.environment.RailwayVehicle(
             stock=stock, flow_rate=float(case["flow_veh_per_h"]),
             speed=float(case["speed_kmh"]),
-            condition=(ph.RunningCondition.IDLING if idling
-                       else ph.RunningCondition.CONSTANT),
+            condition=(ph.environment.RunningCondition.IDLING if idling
+                       else ph.environment.RunningCondition.CONSTANT),
             idling_time=float(case["idling_time_h"]),
         ),
         track, psi=float(case["psi_deg"]), phi=float(case["phi_deg"]),
         reference_time=12.0, minimum_speed=0.0,
-        directivity_edition=ph.DirectivityEdition.ORIGINAL_2015,
+        directivity_edition=ph.environment.DirectivityEdition.ORIGINAL_2015,
     )
 
 
@@ -108,10 +108,10 @@ def _chk_cnossos_rail_roughness_tables() -> Outcome:
     for brake, expected in (("c", ref.CNOSSOS_RAIL_G1A_CAST_IRON),
                             ("k", ref.CNOSSOS_RAIL_G1A_COMPOSITE),
                             ("n", ref.CNOSSOS_RAIL_G1A_NON_TREAD)):
-        _, levels = ph.wheel_roughness(brake)
+        _, levels = ph.environment.wheel_roughness(brake)
         bad += sum(1 for a, b in zip(levels, expected) if a != b)
     for cls, expected in (("E", ref.CNOSSOS_RAIL_G1B_E), ("M", ref.CNOSSOS_RAIL_G1B_M)):
-        _, levels = ph.rail_roughness(cls)
+        _, levels = ph.environment.rail_roughness(cls)
         bad += sum(1 for a, b in zip(levels, expected) if a != b)
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="166 coefficients identical")
@@ -125,7 +125,7 @@ def _chk_cnossos_rail_roughness_tables() -> Outcome:
 def _chk_cnossos_rail_table_g2() -> Outcome:
     bad = 0
     for key, expected in ref.CNOSSOS_RAIL_G2.items():
-        _, levels = ph.contact_filter(key)
+        _, levels = ph.environment.contact_filter(key)
         bad += sum(1 for a, b in zip(levels, expected) if a != b)
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="175 coefficients identical")
@@ -139,11 +139,24 @@ def _chk_cnossos_rail_table_g2() -> Outcome:
 def _chk_cnossos_rail_table_g3() -> Outcome:
     bad = 0
     for key, expected in ref.CNOSSOS_RAIL_G3A.items():
-        bad += sum(1 for a, b in zip(ph.track_transfer(key), expected) if a != b)
+        bad += sum(
+            1
+            for a, b in zip(ph.environment.track_transfer(key), expected)
+            if a != b
+        )
     for diameter, expected in ref.CNOSSOS_RAIL_G3B.items():
-        bad += sum(1 for a, b in zip(ph.wheel_transfer(diameter), expected) if a != b)
-    bad += sum(1 for a, b in zip(ph.superstructure_transfer(), ref.CNOSSOS_RAIL_G3C)
-               if a != b)
+        bad += sum(
+            1
+            for a, b in zip(ph.environment.wheel_transfer(diameter), expected)
+            if a != b
+        )
+    bad += sum(
+        1
+        for a, b in zip(
+            ph.environment.superstructure_transfer(), ref.CNOSSOS_RAIL_G3C
+        )
+        if a != b
+    )
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="312 coefficients identical")
 
@@ -155,17 +168,21 @@ def _chk_cnossos_rail_table_g3() -> Outcome:
 )
 def _chk_cnossos_rail_source_tables() -> Outcome:
     bad = 0
-    _, impact = ph.impact_roughness_single()
+    _, impact = ph.environment.impact_roughness_single()
     bad += sum(1 for a, b in zip(impact, ref.CNOSSOS_RAIL_G4) if a != b)
     for key, (low, high) in ref.CNOSSOS_RAIL_G5.items():
-        got_low, got_high = ph.traction_sound_power(key)
+        got_low, got_high = ph.environment.traction_sound_power(key)
         bad += sum(1 for a, b in zip(got_low, low) if a != b)
         bad += sum(1 for a, b in zip(got_high, high) if a != b)
-    got_low, got_high = ph.aerodynamic_sound_power()
+    got_low, got_high = ph.environment.aerodynamic_sound_power()
     bad += sum(1 for a, b in zip(got_low, ref.CNOSSOS_RAIL_G6_A) if a != b)
     bad += sum(1 for a, b in zip(got_high, ref.CNOSSOS_RAIL_G6_B) if a != b)
     for key, expected in ref.CNOSSOS_RAIL_G7.items():
-        bad += sum(1 for a, b in zip(ph.bridge_transfer(key), expected) if a != b)
+        bad += sum(
+            1
+            for a, b in zip(ph.environment.bridge_transfer(key), expected)
+            if a != b
+        )
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="371 coefficients identical")
 
@@ -176,7 +193,7 @@ def _chk_cnossos_rail_source_tables() -> Outcome:
     "Horizontal dipole directivity along the track: 10 lg(0,01) at phi = 0",
 )
 def _chk_cnossos_rail_horizontal_directivity() -> Outcome:
-    got = float(ph.horizontal_directivity(0.0)[0])
+    got = float(ph.environment.horizontal_directivity(0.0)[0])
     return numeric(10.0 * math.log10(0.01), got, 1e-12, unit="dB")
 
 
@@ -186,7 +203,7 @@ def _chk_cnossos_rail_horizontal_directivity() -> Outcome:
     "Aerodynamic speed law at v0 = 300 km/h reduces to Table G-6 verbatim",
 )
 def _chk_cnossos_rail_aerodynamic_law() -> Outcome:
-    low, high = ph.aerodynamic_sound_power(600.0)
+    low, high = ph.environment.aerodynamic_sound_power(600.0)
     step = ref.CNOSSOS_RAIL_G6_ALPHA * math.log10(2.0)
     worst = max(
         max(abs(float(a) - b - step) for a, b in zip(low, ref.CNOSSOS_RAIL_G6_A)),
@@ -202,9 +219,9 @@ def _chk_cnossos_rail_aerodynamic_law() -> Outcome:
     "Impact roughness at the tabulated joint density n_l = 0,01 per m",
 )
 def _chk_cnossos_rail_joint_density() -> Outcome:
-    _, single = ph.impact_roughness_single()
+    _, single = ph.environment.impact_roughness_single()
     frequency_grid = np.asarray(single[:24])
-    got = ph.impact_roughness(frequency_grid, 0.01)
+    got = ph.environment.impact_roughness(frequency_grid, 0.01)
     worst = float(np.max(np.abs(got - frequency_grid)))
     return numeric(0.0, worst, 1e-12, unit="dB", places=6,
                    expected_label="Table G-4 verbatim")

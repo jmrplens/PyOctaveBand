@@ -90,21 +90,21 @@ def test_room_acoustics_single_axes_composition() -> None:
 # --------------------------------------------------------------------------
 def test_decay_curve_is_dataclass_and_unpacks_like_tuple() -> None:
     ir = _exp_ir()
-    dc = ph.decay_curve(ir, FS)
-    assert isinstance(dc, ph.DecayCurve)
-    time, level = ph.decay_curve(ir, FS)  # backward-compatible unpacking
+    dc = ph.room.decay_curve(ir, FS)
+    assert isinstance(dc, ph.room.DecayCurve)
+    time, level = ph.room.decay_curve(ir, FS)  # backward-compatible unpacking
     np.testing.assert_array_equal(time, dc.time)
     np.testing.assert_array_equal(level, dc.level)
     assert dc.band is None
 
 
 def test_decay_curve_records_band() -> None:
-    dc = ph.decay_curve(_exp_ir(), FS, band=500.0)
+    dc = ph.room.decay_curve(_exp_ir(), FS, band=500.0)
     assert dc.band == 500.0
 
 
 def test_decay_curve_plot_has_curve_and_fit_overlays() -> None:
-    dc = ph.decay_curve(_exp_ir(seconds=1.0, t60=0.6), FS)
+    dc = ph.room.decay_curve(_exp_ir(seconds=1.0, t60=0.6), FS)
     ax = dc.plot()
     np.testing.assert_allclose(ax.lines[0].get_ydata(), dc.level)
     labels = [ln.get_label() for ln in ax.lines]
@@ -114,7 +114,7 @@ def test_decay_curve_plot_has_curve_and_fit_overlays() -> None:
 
 
 def test_decay_curve_plot_without_fits() -> None:
-    dc = ph.decay_curve(_exp_ir(), FS)
+    dc = ph.room.decay_curve(_exp_ir(), FS)
     ax = dc.plot(fits=False)
     labels = [str(ln.get_label()) for ln in ax.lines]
     assert not any("fit" in lbl for lbl in labels)
@@ -147,7 +147,7 @@ def test_open_plan_plot_line_and_markers() -> None:
 
 
 def test_open_plan_plot_without_regression_raises() -> None:
-    bare = ph.OpenPlanResult(
+    bare = ph.room.OpenPlanResult(
         d2s=float("nan"), lp_as_4m=float("nan"), rd=float("nan"), rp=float("nan")
     )
     with pytest.raises(ValueError, match="regression"):

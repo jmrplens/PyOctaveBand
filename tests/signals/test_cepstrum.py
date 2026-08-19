@@ -69,7 +69,7 @@ def _impulse_echo(n: int = N, d: int = DELAY, a: float = ALPHA) -> np.ndarray:
 
 
 def test_power_cepstrum_echo_rahmonics_are_exact() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS, kind="power")
+    res = ph.signals.cepstrum(_impulse_echo(), FS, kind="power")
     assert res.kind == "power"
     for n in (1, 2, 3, 4):
         expected = (-1.0) ** (n + 1) * ALPHA**n / n
@@ -83,14 +83,14 @@ def test_power_cepstrum_echo_rahmonics_are_exact() -> None:
 
 def test_real_cepstrum_is_half_the_power_cepstrum() -> None:
     x = _impulse_echo()
-    real = ph.cepstrum(x, FS, kind="real")
+    real = ph.signals.cepstrum(x, FS, kind="real")
     assert real.cepstrum[DELAY] == pytest.approx(ALPHA / 2.0, abs=1e-12)
     # ...and mirrored onto the negative quefrencies (ln|X| is even).
     assert real.cepstrum[N - DELAY] == pytest.approx(ALPHA / 2.0, abs=1e-12)
 
 
 def test_complex_cepstrum_echo_rahmonics_are_exact() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS, kind="complex")
+    res = ph.signals.cepstrum(_impulse_echo(), FS, kind="complex")
     # delta + a*delta_d with a < 1 is minimum phase: no linear phase removed.
     assert res.linear_phase_samples == 0
     for n in (1, 2, 3):
@@ -103,9 +103,9 @@ def test_complex_cepstrum_echo_rahmonics_are_exact() -> None:
 
 def test_echo_on_broadband_noise_source() -> None:
     """The spike survives a non-trivial source: x = s + a*s(t-t0), circular."""
-    s = ph.noise_signal(FS, N / FS, color="white", seed=20260721)
+    s = ph.signals.noise_signal(FS, N / FS, color="white", seed=20260721)
     x = s + ALPHA * np.roll(s, DELAY)
-    res = ph.cepstrum(x, FS, kind="power")
+    res = ph.signals.cepstrum(x, FS, kind="power")
     # ln X = ln S + ln(1 + a e^{-j theta}) exactly (circular shift), so the
     # echo spike still reads the reflection coefficient; the noise source
     # spreads a small random floor over all quefrencies.
@@ -113,7 +113,7 @@ def test_echo_on_broadband_noise_source() -> None:
 
 
 def test_quefrency_axis_and_shapes() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS)
+    res = ph.signals.cepstrum(_impulse_echo(), FS)
     assert res.quefrencies.size == res.cepstrum.size == res.nfft == N
     assert res.quefrencies[0] == 0.0
     assert res.quefrencies[1] == pytest.approx(1.0 / FS)
@@ -121,7 +121,9 @@ def test_quefrency_axis_and_shapes() -> None:
 
 
 def test_odd_record_pads_to_even_nfft() -> None:
-    res = ph.cepstrum(np.random.default_rng(7).standard_normal(4095), FS)
+    res = ph.signals.cepstrum(
+        np.random.default_rng(7).standard_normal(4095), FS
+    )
     assert res.nfft == 4096
 
 
@@ -142,13 +144,13 @@ def _mixed_phase_delayed() -> np.ndarray:
 
 def test_complex_cepstrum_round_trip_is_exact() -> None:
     x = _mixed_phase_delayed()
-    res = ph.cepstrum(x, FS, kind="complex")
+    res = ph.signals.cepstrum(x, FS, kind="complex")
     assert res.linear_phase_samples != 0  # the delay was detected and removed
     np.testing.assert_allclose(res.invert(), x, atol=1e-12)
 
 
 def test_only_the_complex_cepstrum_inverts() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS, kind="power")
+    res = ph.signals.cepstrum(_impulse_echo(), FS, kind="power")
     with pytest.raises(ValueError, match="invertible"):
         res.invert()
 
@@ -159,16 +161,16 @@ def test_only_the_complex_cepstrum_inverts() -> None:
 
 
 def test_echo_detection_reads_delay_and_reflection_exactly() -> None:
-    res = ph.echo_detection(_impulse_echo(), FS)
+    res = ph.signals.echo_detection(_impulse_echo(), FS)
     assert res.delay_samples == DELAY
     assert res.delay == pytest.approx(DELAY / FS)
     assert res.reflection_coefficient == pytest.approx(ALPHA, abs=1e-12)
 
 
 def test_echo_detection_on_noise_source() -> None:
-    s = ph.noise_signal(FS, N / FS, color="white", seed=42)
+    s = ph.signals.noise_signal(FS, N / FS, color="white", seed=42)
     x = s + 0.25 * np.roll(s, 200)
-    res = ph.echo_detection(x, FS, min_quefrency=0.005)
+    res = ph.signals.echo_detection(x, FS, min_quefrency=0.005)
     assert res.delay_samples == 200
     assert res.reflection_coefficient == pytest.approx(0.25, abs=0.02)
 
@@ -181,16 +183,16 @@ def test_echo_detection_negative_reflection_exact() -> None:
     ``d``. Peak-picking on ``|cepstrum|`` must find the true delay and
     report the signed coefficient.
     """
-    res = ph.echo_detection(_impulse_echo(a=-ALPHA), FS)
+    res = ph.signals.echo_detection(_impulse_echo(a=-ALPHA), FS)
     assert res.delay_samples == DELAY
     assert res.delay == pytest.approx(DELAY / FS)
     assert res.reflection_coefficient == pytest.approx(-ALPHA, abs=1e-12)
 
 
 def test_echo_detection_negative_reflection_on_noise_source() -> None:
-    s = ph.noise_signal(FS, N / FS, color="white", seed=42)
+    s = ph.signals.noise_signal(FS, N / FS, color="white", seed=42)
     x = s - 0.25 * np.roll(s, 200)
-    res = ph.echo_detection(x, FS, min_quefrency=0.005)
+    res = ph.signals.echo_detection(x, FS, min_quefrency=0.005)
     assert res.delay_samples == 200
     assert res.reflection_coefficient == pytest.approx(-0.25, abs=0.02)
 
@@ -210,7 +212,7 @@ def test_echo_detection_off_sample_delay_is_interpolated() -> None:
     ramp = np.exp(-2j * np.pi * np.fft.rfftfreq(N) * true_delay)
     x = s + ALPHA * np.fft.irfft(np.fft.rfft(s) * ramp, N)
 
-    res = ph.echo_detection(x, FS)
+    res = ph.signals.echo_detection(x, FS)
     assert res.delay_samples in (DELAY, DELAY + 1)
     assert res.delay * FS == pytest.approx(true_delay, abs=0.15)
     # Bin splitting: the peak-sample coefficient reads low but keeps sign.
@@ -220,7 +222,7 @@ def test_echo_detection_off_sample_delay_is_interpolated() -> None:
 def test_echo_detection_search_band_is_respected() -> None:
     # Restrict the band away from the true echo: the peak reported must
     # come from inside the band.
-    res = ph.echo_detection(
+    res = ph.signals.echo_detection(
         _impulse_echo(), FS, min_quefrency=400.0 / FS,
         max_quefrency=1000.0 / FS,
     )
@@ -231,9 +233,9 @@ def test_echo_detection_search_band_is_respected() -> None:
 def test_echo_detection_rejects_bad_band() -> None:
     x = _impulse_echo()
     with pytest.raises(ValueError, match="search band"):
-        ph.echo_detection(x, FS, min_quefrency=0.1, max_quefrency=0.05)
+        ph.signals.echo_detection(x, FS, min_quefrency=0.1, max_quefrency=0.05)
     with pytest.raises(ValueError, match="search band"):
-        ph.echo_detection(x, FS, max_quefrency=1.0)
+        ph.signals.echo_detection(x, FS, max_quefrency=1.0)
 
 
 # ---------------------------------------------------------------------------
@@ -243,13 +245,17 @@ def test_echo_detection_rejects_bad_band() -> None:
 
 def test_lowpass_lifter_removes_the_echo_ripple() -> None:
     """Below the echo quefrency there is only the flat 0 dB source."""
-    res = ph.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS, mode="lowpass")
+    res = ph.signals.lifter(
+        _impulse_echo(), FS, cutoff=(DELAY - 50) / FS, mode="lowpass"
+    )
     assert float(np.max(np.abs(res.liftered_db))) < 1e-4
 
 
 def test_highpass_lifter_keeps_the_ripple_extrema() -> None:
     """ln|1 + a e^{-j theta}| swings between ln(1+a) and ln(1-a)."""
-    res = ph.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS, mode="highpass")
+    res = ph.signals.lifter(
+        _impulse_echo(), FS, cutoff=(DELAY - 50) / FS, mode="highpass"
+    )
     assert float(np.max(res.liftered_db)) == pytest.approx(
         20.0 * np.log10(1.0 + ALPHA), abs=1e-4
     )
@@ -259,9 +265,9 @@ def test_highpass_lifter_keeps_the_ripple_extrema() -> None:
 
 
 def test_lifter_modes_are_exactly_complementary() -> None:
-    x = ph.noise_signal(FS, 0.5, color="pink", seed=3)
-    low = ph.lifter(x, FS, cutoff=0.002, mode="lowpass")
-    high = ph.lifter(x, FS, cutoff=0.002, mode="highpass")
+    x = ph.signals.noise_signal(FS, 0.5, color="pink", seed=3)
+    low = ph.signals.lifter(x, FS, cutoff=0.002, mode="lowpass")
+    high = ph.signals.lifter(x, FS, cutoff=0.002, mode="highpass")
     np.testing.assert_allclose(
         low.liftered_db + high.liftered_db, low.spectrum_db, atol=1e-9
     )
@@ -270,11 +276,11 @@ def test_lifter_modes_are_exactly_complementary() -> None:
 def test_lifter_validates_inputs() -> None:
     x = _impulse_echo()
     with pytest.raises(ValueError, match="mode"):
-        ph.lifter(x, FS, cutoff=0.01, mode="bandpass")
+        ph.signals.lifter(x, FS, cutoff=0.01, mode="bandpass")
     with pytest.raises(ValueError, match="cutoff"):
-        ph.lifter(x, FS, cutoff=10.0)  # beyond nfft/2
+        ph.signals.lifter(x, FS, cutoff=10.0)  # beyond nfft/2
     with pytest.raises(ValueError, match="cutoff"):
-        ph.lifter(x, FS, cutoff=1e-9)  # below one sample
+        ph.signals.lifter(x, FS, cutoff=1e-9)  # below one sample
 
 
 # ---------------------------------------------------------------------------
@@ -285,23 +291,23 @@ def test_lifter_validates_inputs() -> None:
 def test_cepstrum_validates_inputs() -> None:
     x = _impulse_echo()
     with pytest.raises(ValueError, match="kind"):
-        ph.cepstrum(x, FS, kind="cheese")
+        ph.signals.cepstrum(x, FS, kind="cheese")
     with pytest.raises(ValueError, match="nfft"):
-        ph.cepstrum(x, FS, nfft=N - 2)
+        ph.signals.cepstrum(x, FS, nfft=N - 2)
     with pytest.raises(ValueError, match="even"):
-        ph.cepstrum(x, FS, nfft=N + 1)
+        ph.signals.cepstrum(x, FS, nfft=N + 1)
     with pytest.raises(ValueError, match="fs"):
-        ph.cepstrum(x, 0.0)
+        ph.signals.cepstrum(x, 0.0)
     silence = np.zeros(N)
     with pytest.raises(ValueError, match="identically zero"):
-        ph.cepstrum(silence, FS)
+        ph.signals.cepstrum(silence, FS)
 
 
 def test_results_are_frozen() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS)
+    res = ph.signals.cepstrum(_impulse_echo(), FS)
     with pytest.raises(AttributeError):
         res.kind = "real"  # type: ignore[misc]
-    echo = ph.echo_detection(_impulse_echo(), FS)
+    echo = ph.signals.echo_detection(_impulse_echo(), FS)
     with pytest.raises(AttributeError):
         echo.delay = 0.0  # type: ignore[misc]
 
@@ -369,7 +375,7 @@ def test_minimum_phase_refactor_is_bit_exact(oversample: int) -> None:
     """The shared-core refactor changes no output bit on any fixed input."""
     for response in _fixed_responses():
         old = _old_minimum_phase(response, oversample=oversample)
-        new = ph.minimum_phase(response, oversample=oversample)
+        new = ph.signals.minimum_phase(response, oversample=oversample)
         assert old.dtype == new.dtype
         assert old.shape == new.shape
         assert np.array_equal(
@@ -380,7 +386,7 @@ def test_minimum_phase_refactor_is_bit_exact(oversample: int) -> None:
 def test_phase_decomposition_uses_the_shared_core_bit_exactly() -> None:
     response = _fixed_responses()[0]
     old = _old_minimum_phase(response)
-    res = ph.phase_decomposition(response, FS)
+    res = ph.signals.phase_decomposition(response, FS)
     assert np.array_equal(
         old.view(np.float64), res.minimum_phase_response.view(np.float64)
     )
@@ -392,7 +398,7 @@ def test_phase_decomposition_uses_the_shared_core_bit_exactly() -> None:
 
 
 def test_cepstrum_plot_single_axes_and_external_ax() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS)
+    res = ph.signals.cepstrum(_impulse_echo(), FS)
     ax = res.plot()
     assert ax.get_title() != ""
     assert len(ax.lines) == 1
@@ -404,7 +410,7 @@ def test_cepstrum_plot_single_axes_and_external_ax() -> None:
 
 
 def test_echo_detection_plot_marks_the_peak() -> None:
-    res = ph.echo_detection(_impulse_echo(), FS)
+    res = ph.signals.echo_detection(_impulse_echo(), FS)
     ax = res.plot()
     marker = ax.lines[-1]
     assert marker.get_xdata()[0] == pytest.approx(1e3 * res.delay)
@@ -413,7 +419,7 @@ def test_echo_detection_plot_marks_the_peak() -> None:
 
 
 def test_lifter_plot_two_panels_and_external_ax() -> None:
-    res = ph.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS)
+    res = ph.signals.lifter(_impulse_echo(), FS, cutoff=(DELAY - 50) / FS)
     axes = res.plot()
     assert len(axes) == 2
     _fig, ext = plt.subplots()
@@ -422,7 +428,7 @@ def test_lifter_plot_two_panels_and_external_ax() -> None:
 
 
 def test_plot_rejects_unknown_language() -> None:
-    res = ph.cepstrum(_impulse_echo(), FS)
+    res = ph.signals.cepstrum(_impulse_echo(), FS)
     with pytest.raises(ValueError, match="language"):
         res.plot(language="xx")
     plt.close("all")

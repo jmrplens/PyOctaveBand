@@ -64,7 +64,7 @@ def test_section_labels_are_bilingual() -> None:
 
 
 def test_parse_docstring_on_real_docstring() -> None:
-    doc = inspect.getdoc(phonometry.leq)
+    doc = inspect.getdoc(phonometry.signals.leq)
     assert doc is not None
     parsed = gad.parse_docstring(doc)
     assert not parsed.issues
@@ -79,7 +79,7 @@ def test_parse_docstring_on_real_docstring() -> None:
 
 
 def test_parse_docstring_ivar_and_raises() -> None:
-    doc = inspect.getdoc(phonometry.UncertaintyResult)
+    doc = inspect.getdoc(phonometry.metrology.UncertaintyResult)
     assert doc is not None
     parsed = gad.parse_docstring(doc)
     assert not parsed.issues

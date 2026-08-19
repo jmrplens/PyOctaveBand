@@ -29,9 +29,9 @@ _PDF_MAGIC = b"%PDF"
 _BANDS = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
 
 
-def _attenuation() -> ph.OutdoorAttenuation:
+def _attenuation() -> ph.environment.OutdoorAttenuation:
     """A porous-ground attenuation over 200 m (a tested clause-7 geometry)."""
-    return ph.outdoor_propagation_attenuation(
+    return ph.environment.outdoor_propagation_attenuation(
         200.0, 2.0, 2.0, _BANDS, 1.0, 1.0, 1.0
     )
 
@@ -41,9 +41,9 @@ def _emission() -> environment.SourceEmission:
     return environment.SourceEmission(sound_power_level=np.full(8, 100.0))
 
 
-def _barrier(method: str = "exact") -> ph.BarrierInsertionLoss:
+def _barrier(method: str = "exact") -> ph.environment.BarrierInsertionLoss:
     """A 4 m thin screen, source 1 m at 50 m, receiver 1.5 m at 100 m."""
-    return ph.barrier_insertion_loss(
+    return ph.environment.barrier_insertion_loss(
         _BANDS, 1.0, 50.0, 4.0, 100.0, 1.5, method=method
     )
 

@@ -55,20 +55,24 @@ def _chk_cnossos_road_workbook() -> Outcome:
     worst = 0.0
     for case in ref.cnossos_road_workbook_cases():
         traffic = [
-            ph.RoadTraffic(
-                ph.RoadVehicleCategory(c), float(case[f"q_{c}"]), float(case[f"v_{c}"]),
+            ph.environment.RoadTraffic(
+                ph.environment.RoadVehicleCategory(c),
+                float(case[f"q_{c}"]),
+                float(case[f"v_{c}"]),
                 studded_fraction=0.5 if c == "1" else 0.0,
             )
             for c in ("1", "2", "3", "4a", "4b")
         ]
-        result = ph.road_source_power(
+        result = ph.environment.road_source_power(
             traffic,
             surface=surfaces[case["surface"]],
             temperature=float(case["temperature_c"]),
             gradient=float(case["gradient_pct"]),
             studded_months=float(case["studded_months"]),
             junction_distance=float(case["junction_distance_m"]),
-            junction_type=ph.JunctionType(int(case["junction_type"])),
+            junction_type=ph.environment.JunctionType(
+                int(case["junction_type"])
+            ),
             coefficients=coefficients,
         )
         for got, band in zip(result.total_line_power, ref.CNOSSOS_ROAD_BANDS):
@@ -86,10 +90,22 @@ def _chk_cnossos_road_table_f1() -> Outcome:
     bad = 0
     for category, expected in ref.CNOSSOS_ROAD_TABLE_F1.items():
         pairs = (
-            (ph.ROAD_COEFFICIENTS.rolling_a[category], expected["AR"]),
-            (ph.ROAD_COEFFICIENTS.rolling_b[category], expected["BR"]),
-            (ph.ROAD_COEFFICIENTS.propulsion_a[category], expected["AP"]),
-            (ph.ROAD_COEFFICIENTS.propulsion_b[category], expected["BP"]),
+            (
+                ph.environment.ROAD_COEFFICIENTS.rolling_a[category],
+                expected["AR"],
+            ),
+            (
+                ph.environment.ROAD_COEFFICIENTS.rolling_b[category],
+                expected["BR"],
+            ),
+            (
+                ph.environment.ROAD_COEFFICIENTS.propulsion_a[category],
+                expected["AP"],
+            ),
+            (
+                ph.environment.ROAD_COEFFICIENTS.propulsion_b[category],
+                expected["BP"],
+            ),
         )
         bad += sum(1 for got, want in pairs for a, b in zip(got, want) if a != b)
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
@@ -103,8 +119,8 @@ def _chk_cnossos_road_table_f1() -> Outcome:
 )
 def _chk_cnossos_road_table_f4() -> Outcome:
     bad = 0
-    for surface in ph.RoadSurface:
-        row = ph.road_surface_coefficients(surface)
+    for surface in ph.environment.RoadSurface:
+        row = ph.environment.road_surface_coefficients(surface)
         expected = ref.CNOSSOS_ROAD_TABLE_F4[surface.value]
         for category in ("1", "2", "3", "4a", "4b"):
             key = category if category in expected else "4a/4b"
@@ -123,14 +139,23 @@ def _chk_cnossos_road_tables_f2_f3() -> Outcome:
     bad = sum(
         1
         for got, want in (
-            (ph.ROAD_COEFFICIENTS.studded_a, ref.CNOSSOS_ROAD_TABLE_F2["ai"]),
-            (ph.ROAD_COEFFICIENTS.studded_b, ref.CNOSSOS_ROAD_TABLE_F2["bi"]),
+            (
+                ph.environment.ROAD_COEFFICIENTS.studded_a,
+                ref.CNOSSOS_ROAD_TABLE_F2["ai"],
+            ),
+            (
+                ph.environment.ROAD_COEFFICIENTS.studded_b,
+                ref.CNOSSOS_ROAD_TABLE_F2["bi"],
+            ),
         )
         for a, b in zip(got, want)
         if a != b
     )
     for category, expected in ref.CNOSSOS_ROAD_TABLE_F3.items():
-        bad += int(ph.ROAD_COEFFICIENTS.junction_c[category] != (expected[1], expected[2]))
+        bad += int(
+            ph.environment.ROAD_COEFFICIENTS.junction_c[category]
+            != (expected[1], expected[2])
+        )
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="36 coefficients identical")
 
@@ -146,11 +171,14 @@ def _chk_cnossos_road_reference_conditions() -> Outcome:
     """
     worst = 0.0
     for category in ("1", "2", "3", "4a", "4b"):
-        rolling = ph.road_rolling_noise(category, 70.0)
-        propulsion = ph.road_propulsion_noise(category, 70.0)
+        rolling = ph.environment.road_rolling_noise(category, 70.0)
+        propulsion = ph.environment.road_propulsion_noise(category, 70.0)
         for got, want in (
-            (rolling, ph.ROAD_COEFFICIENTS.rolling_a[category]),
-            (propulsion, ph.ROAD_COEFFICIENTS.propulsion_a[category]),
+            (rolling, ph.environment.ROAD_COEFFICIENTS.rolling_a[category]),
+            (
+                propulsion,
+                ph.environment.ROAD_COEFFICIENTS.propulsion_a[category],
+            ),
         ):
             worst = max(worst, max(abs(float(a) - b) for a, b in zip(got, want)))
     return numeric(0.0, worst, 0.0, unit="dB", places=6,
@@ -164,7 +192,11 @@ def _chk_cnossos_road_reference_conditions() -> Outcome:
 )
 def _chk_cnossos_a_weighting() -> Outcome:
     bad = sum(
-        1 for a, b in zip(ph.CNOSSOS_A_WEIGHTING, ref.CNOSSOS_A_WEIGHTING_TABLE) if a != b
+        1
+        for a, b in zip(
+            ph.environment.CNOSSOS_A_WEIGHTING, ref.CNOSSOS_A_WEIGHTING_TABLE
+        )
+        if a != b
     )
     return numeric(0.0, float(bad), 0.0, unit="mismatches", places=0,
                    expected_label="8 values identical")
@@ -196,7 +228,13 @@ def _chk_wt_critical_bandwidth() -> Outcome:
 def _chk_wt_apparent_power() -> Outcome:
     r1 = 150.0
     expected = 100.0 - 6.0 + 10.0 * math.log10(4.0 * math.pi * r1**2)
-    return numeric(expected, ph.apparent_sound_power_level([100.0], r1), 1e-4, unit="dB", places=4)
+    return numeric(
+        expected,
+        ph.environment.apparent_sound_power_level([100.0], r1),
+        1e-4,
+        unit="dB",
+        places=4,
+    )
 
 
 @register(
@@ -209,5 +247,5 @@ def _chk_wt_tonal_audibility() -> Outcome:
     freqs = np.arange(440.0, 560.0 + df, df)
     levels = np.full(freqs.size, 30.0)
     levels[int(np.argmin(np.abs(freqs - 500.0)))] = 60.0
-    res = ph.wind_turbine_tonality(levels, freqs)
+    res = ph.environment.wind_turbine_tonality(levels, freqs)
     return numeric(16.38, res.tonal_audibility, 6e-2, unit="dB", places=2)

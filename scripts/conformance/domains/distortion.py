@@ -55,7 +55,9 @@ def _electro_harmonic_signal() -> np.ndarray:
     "THD (rel. total RMS, the R convention the clause defines)",
 )
 def _chk_thd_r() -> Outcome:
-    value = ph.thd(_electro_harmonic_signal(), _electro_fs(), 1000.0, kind="R")
+    value = ph.electroacoustics.thd(
+        _electro_harmonic_signal(), _electro_fs(), 1000.0, kind="R"
+    )
     return numeric(ref.DISTORTION_THD_R, value, 1e-4, places=6)
 
 
@@ -65,7 +67,9 @@ def _chk_thd_r() -> Outcome:
     "THD (rel. fundamental, the widespread datasheet convention)",
 )
 def _chk_thd_f() -> Outcome:
-    value = ph.thd(_electro_harmonic_signal(), _electro_fs(), 1000.0, kind="F")
+    value = ph.electroacoustics.thd(
+        _electro_harmonic_signal(), _electro_fs(), 1000.0, kind="F"
+    )
     return numeric(ref.DISTORTION_THD_F, value, 1e-4, places=6)
 
 
@@ -87,7 +91,9 @@ def _loudspeaker_flat_response() -> tuple[np.ndarray, np.ndarray]:
 )
 def _chk_loudspeaker_sensitivity() -> Outcome:
     f, spl = _loudspeaker_flat_response()
-    result = ph.loudspeaker_characteristics(f, spl, 8.0, sensitivity_band=(200.0, 4000.0))
+    result = ph.electroacoustics.loudspeaker_characteristics(
+        f, spl, 8.0, sensitivity_band=(200.0, 4000.0)
+    )
     # A flat 90 dB response driven at sqrt(8) V (1 W) at 1 m has a
     # characteristic sensitivity level of 90 dB exactly (the corrections vanish).
     return numeric(90.0, result.sensitivity_level_db, 1e-6, unit="dB", places=6)
@@ -100,7 +106,9 @@ def _chk_loudspeaker_sensitivity() -> Outcome:
 )
 def _chk_loudspeaker_effective_range() -> Outcome:
     f, spl = _loudspeaker_flat_response()
-    result = ph.loudspeaker_characteristics(f, spl, 8.0, sensitivity_band=(200.0, 4000.0))
+    result = ph.electroacoustics.loudspeaker_characteristics(
+        f, spl, 8.0, sensitivity_band=(200.0, 4000.0)
+    )
     lo, hi = result.effective_range
     ok = abs(lo - 50.0) <= 5e-3 and abs(hi - 18000.0) <= 2.0
     return Outcome(
@@ -117,7 +125,7 @@ def _chk_loudspeaker_effective_range() -> Outcome:
     "2nd-order harmonic distortion d2 (rel. total)",
 )
 def _chk_harmonic_d2() -> Outcome:
-    value = ph.harmonic_distortion(
+    value = ph.electroacoustics.harmonic_distortion(
         _electro_harmonic_signal(), _electro_fs(), fundamental=1000.0, order=2
     )
     return numeric(ref.DISTORTION_D2, value, 1e-4, places=6)
@@ -141,7 +149,9 @@ def _microphone_flat_response() -> tuple[np.ndarray, np.ndarray]:
 )
 def _chk_microphone_sensitivity_level() -> Outcome:
     f, rel = _microphone_flat_response()
-    result = ph.microphone_characteristics(f, rel, 12.5, tolerance_db=3.0)
+    result = ph.electroacoustics.microphone_characteristics(
+        f, rel, 12.5, tolerance_db=3.0
+    )
     # Hand-computed: 20 lg 0.0125 = -38.061800 dB re 1 V/Pa.
     return numeric(-38.061800, result.sensitivity_level_db, 1e-5, unit="dB", places=6)
 
@@ -153,7 +163,9 @@ def _chk_microphone_sensitivity_level() -> Outcome:
 )
 def _chk_microphone_effective_range() -> Outcome:
     f, rel = _microphone_flat_response()
-    result = ph.microphone_characteristics(f, rel, 12.5, tolerance_db=3.0)
+    result = ph.electroacoustics.microphone_characteristics(
+        f, rel, 12.5, tolerance_db=3.0
+    )
     lo, hi = result.effective_range
     ok = abs(lo - 40.0) <= 5e-3 and abs(hi - 18000.0) <= 2.0
     return Outcome(
@@ -173,9 +185,14 @@ def _chk_microphone_cardioid_di() -> Outcome:
     f, rel = _microphone_flat_response()
     angles = np.linspace(0.0, 179.9, 1800)
     pattern = 20.0 * np.log10((1.0 + np.cos(np.radians(angles))) / 2.0)
-    result = ph.microphone_characteristics(
-        f, rel, 12.5, tolerance_db=3.0,
-        directivity=ph.MicrophoneDirectivity(polar=(angles, pattern)),
+    result = ph.electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        12.5,
+        tolerance_db=3.0,
+        directivity=ph.electroacoustics.MicrophoneDirectivity(
+            polar=(angles, pattern)
+        ),
     )
     di = result.directivity_index_db
     if di is None:
@@ -193,8 +210,12 @@ def _chk_microphone_cardioid_di() -> Outcome:
 )
 def _chk_microphone_equivalent_noise() -> Outcome:
     f, rel = _microphone_flat_response()
-    result = ph.microphone_characteristics(
-        f, rel, 12.5, tolerance_db=3.0, noise=ph.MicrophoneNoise(voltage=2.5e-6)
+    result = ph.electroacoustics.microphone_characteristics(
+        f,
+        rel,
+        12.5,
+        tolerance_db=3.0,
+        noise=ph.electroacoustics.MicrophoneNoise(voltage=2.5e-6),
     )
     noise = result.equivalent_noise_level_db
     if noise is None:
@@ -227,7 +248,9 @@ def _electro_smpte_signal() -> tuple[np.ndarray, float, float]:
 def _chk_modulation_d2() -> Outcome:
     x, fl, fh = _electro_smpte_signal()
     # Sidebands 0.02 + 0.02 over the 0.25 carrier: d_m,2 = 0.16 exactly.
-    value = ph.modulation_distortion(x, _electro_fs(), f_low=fl, f_high=fh).d2
+    value = ph.electroacoustics.modulation_distortion(
+        x, _electro_fs(), f_low=fl, f_high=fh
+    ).d2
     return numeric(0.16, value, 1e-4, places=6)
 
 
@@ -239,7 +262,9 @@ def _chk_modulation_d2() -> Outcome:
 def _chk_modulation_d3() -> Outcome:
     x, fl, fh = _electro_smpte_signal()
     # Sidebands 0.01 + 0.01 over the 0.25 carrier: d_m,3 = 0.08 exactly.
-    value = ph.modulation_distortion(x, _electro_fs(), f_low=fl, f_high=fh).d3
+    value = ph.electroacoustics.modulation_distortion(
+        x, _electro_fs(), f_low=fl, f_high=fh
+    ).d3
     return numeric(0.08, value, 1e-4, places=6)
 
 
@@ -265,7 +290,7 @@ def _electro_dfd_signal() -> tuple[np.ndarray, float, float]:
 def _chk_dfd_d2() -> Outcome:
     x, f1, f2 = _electro_dfd_signal()
     # Product 0.03 over the tone-amplitude sum 1.0: d_d,2 = 0.03 exactly.
-    value = ph.difference_frequency_distortion(
+    value = ph.electroacoustics.difference_frequency_distortion(
         x, _electro_fs(), f1=f1, f2=f2, order=2
     )
     return numeric(0.03, value, 1e-4, places=6)
@@ -279,7 +304,7 @@ def _chk_dfd_d2() -> Outcome:
 def _chk_dfd_d3() -> Outcome:
     x, f1, f2 = _electro_dfd_signal()
     # Products 0.02 + 0.02 over the tone-amplitude sum 1.0: d_d,3 = 0.04.
-    value = ph.difference_frequency_distortion(
+    value = ph.electroacoustics.difference_frequency_distortion(
         x, _electro_fs(), f1=f1, f2=f2, order=3
     )
     return numeric(0.04, value, 1e-4, places=6)
@@ -302,7 +327,7 @@ def _chk_tdfd() -> Outcome:
     )
     # Only the in-band products at f0 -/+ delta (3950/4050 Hz) enter:
     # d_TDFD = sqrt(0.02^2 + 0.03^2) / (0.5 + 0.5) = sqrt(0.0013).
-    value = ph.total_difference_frequency_distortion(x, fs)
+    value = ph.electroacoustics.total_difference_frequency_distortion(x, fs)
     return numeric(0.03605551275463989, value, 1e-4, places=8)
 
 
@@ -312,7 +337,7 @@ def _chk_tdfd() -> Outcome:
     "Weighting network response at the 6.3 kHz peak (14.12.11 network)",
 )
 def _chk_itu_468_peak() -> Outcome:
-    value = float(ph.itu_r_468_weighting([6300.0])[0])
+    value = float(ph.electroacoustics.itu_r_468_weighting([6300.0])[0])
     return numeric(12.2, value, 1e-9, unit="dB", places=2)
 
 
@@ -334,7 +359,12 @@ def _chk_dim() -> Outcome:
     for c, a in zip(comps, amps):
         x = x + _electro_tone(t, c, a)
     expected = math.sqrt(sum(a**2 for a in amps))
-    return numeric(expected, ph.dynamic_intermodulation_distortion(x, fs), 1e-4, places=6)
+    return numeric(
+        expected,
+        ph.electroacoustics.dynamic_intermodulation_distortion(x, fs),
+        1e-4,
+        places=6,
+    )
 
 
 @register(
@@ -348,7 +378,7 @@ def _chk_h1_gain() -> Outcome:
     x = rng.standard_normal(200000)
     b, a = sg.butter(1, 2000.0 / (fs / 2.0), btype="low")
     y = sg.lfilter(b, a, x)
-    res = ph.transfer_function(x, y, fs, estimator="H1")
+    res = ph.electroacoustics.transfer_function(x, y, fs, estimator="H1")
     _, h = sg.freqz(b, a, worN=res.frequencies, fs=fs)
     idx = int(np.argmin(np.abs(res.frequencies - 1000.0)))
     return numeric(
@@ -367,7 +397,7 @@ def _chk_coherence_unity() -> Outcome:
     x = rng.standard_normal(200000)
     b, a = sg.butter(1, 2000.0 / (fs / 2.0), btype="low")
     y = sg.lfilter(b, a, x)
-    f, g = ph.coherence(x, y, fs)
+    f, g = ph.electroacoustics.coherence(x, y, fs)
     band = (f > 100.0) & (f < 5000.0)
     return numeric(1.0, float(np.mean(g[band])), 1e-3, places=6)
 
@@ -383,7 +413,13 @@ def _chk_aes17_idle_noise() -> Outcome:
     # 468 is 0 dB at 1 kHz, so CCIR-RMS reads -5.63 dB there: a -20 dBFS tone
     # measures -25.63 dBFS CCIR-RMS in closed form.
     sig = _electro_tone(t, 1000.0, 10.0 ** (-20.0 / 20.0))
-    return numeric(-25.63, ph.idle_channel_noise(sig, fs), 1e-2, unit="dB", places=2)
+    return numeric(
+        -25.63,
+        ph.electroacoustics.idle_channel_noise(sig, fs),
+        1e-2,
+        unit="dB",
+        places=2,
+    )
 
 
 @register(
@@ -400,4 +436,10 @@ def _chk_aes17_dynamic_range() -> Outcome:
     # (a small notch lift aside).
     sig = _electro_tone(t, 997.0, 10.0 ** (-60.0 / 20.0))
     sig = sig + _electro_tone(t, 2000.0, 10.0 ** (-40.0 / 20.0))
-    return numeric(40.0, ph.dynamic_range(sig, fs, 997.0), 0.6, unit="dB", places=2)
+    return numeric(
+        40.0,
+        ph.electroacoustics.dynamic_range(sig, fs, 997.0),
+        0.6,
+        unit="dB",
+        places=2,
+    )

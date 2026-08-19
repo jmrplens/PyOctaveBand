@@ -47,7 +47,7 @@ def _iso532_levels() -> np.ndarray:
     "ERB_N number of 1000 Hz = 15.59 Cam",
 )
 def _chk_cam_of_1_khz() -> Outcome:
-    cam = float(np.asarray(ph.cam_from_frequency(1000.0))[()])
+    cam = float(np.asarray(ph.psychoacoustics.cam_from_frequency(1000.0))[()])
     return numeric(15.59, cam, 0.005, unit="Cam", places=4)
 
 
@@ -58,7 +58,7 @@ def _chk_cam_of_1_khz() -> Outcome:
 )
 def _chk_erb_bandwidth_1_khz() -> Outcome:
     published = 24.7 * (4.37 * 1.0 + 1.0)
-    erb = float(np.asarray(ph.erb_bandwidth(1000.0))[()])
+    erb = float(np.asarray(ph.psychoacoustics.erb_bandwidth(1000.0))[()])
     return numeric(published, erb, 3e-3, unit="Hz", rel=True, places=3)
 
 
@@ -69,7 +69,9 @@ def _chk_erb_bandwidth_1_khz() -> Outcome:
 )
 def _chk_iso532_stationary() -> Outcome:
     expected_n, nmin, nmax = _iso532_stationary_expected()
-    res = ph.loudness_zwicker_from_spectrum(_iso532_levels(), field="free")
+    res = ph.psychoacoustics.loudness_zwicker_from_spectrum(
+        _iso532_levels(), field="free"
+    )
     computed = float(res.loudness)
     out = numeric(expected_n, computed, 0.001, unit="sone", rel=True, places=4)
     within_band = nmin <= computed <= nmax
@@ -119,7 +121,7 @@ def _iso532_b5_signal(
 )
 def _chk_iso532_b5_free() -> Outcome:
     signal, fs, nmax, field = _iso532_b5_signal(14)
-    res = ph.loudness_zwicker(signal, fs, field=field)
+    res = ph.psychoacoustics.loudness_zwicker(signal, fs, field=field)
     return numeric(nmax, float(res.loudness), 0.001, unit="sone", rel=True, places=4)
 
 
@@ -130,7 +132,7 @@ def _chk_iso532_b5_free() -> Outcome:
 )
 def _chk_iso532_b5_diffuse() -> Outcome:
     signal, fs, nmax, field = _iso532_b5_signal(15)
-    res = ph.loudness_zwicker(signal, fs, field=field)
+    res = ph.psychoacoustics.loudness_zwicker(signal, fs, field=field)
     return numeric(nmax, float(res.loudness), 0.001, unit="sone", rel=True, places=4)
 
 
@@ -142,7 +144,7 @@ def _chk_iso532_b5_diffuse() -> Outcome:
 def _chk_sharpness_reference() -> Outcome:
     # Definitional: the clause 5.2 constant k is derived so this very signal
     # reads 1.00 acum. The independent Table A.2 oracle is checked below.
-    computed = float(ph.sharpness_din(reference_sound(), _FS))
+    computed = float(ph.psychoacoustics.sharpness_din(reference_sound(), _FS))
     return numeric(1.0, computed, 1e-9, unit="acum", places=6)
 
 
@@ -171,9 +173,13 @@ def _chk_sharpness_table_a2() -> Outcome:
     lo, hi = 30.0, 90.0
     for _ in range(13):  # set the clause 6 loudness of 4 sone
         mid = (lo + hi) / 2
-        n = ph.loudness_zwicker(narrowband(mid), _FS, stationary=True).loudness
+        n = ph.psychoacoustics.loudness_zwicker(
+            narrowband(mid), _FS, stationary=True
+        ).loudness
         lo, hi = (mid, hi) if n < 4.0 else (lo, mid)
-    computed = float(ph.sharpness_din(narrowband((lo + hi) / 2), _FS))
+    computed = float(
+        ph.psychoacoustics.sharpness_din(narrowband((lo + hi) / 2), _FS)
+    )
     return numeric(1.78, computed, 0.05 * 1.78, unit="acum", places=3)
 
 
@@ -186,7 +192,7 @@ def _chk_iso226_contour() -> Outcome:
     # Anchored off 1 kHz (where SPL == phon is a trivial identity) at a
     # tabulated point that exercises the Table 1 contour formula.
     phon, freq, spl_ref = ref.ISO226_2023_TABLE_B1_ANCHOR
-    freqs, spl = ph.equal_loudness_contour(phon)
+    freqs, spl = ph.psychoacoustics.equal_loudness_contour(phon)
     computed = float(spl[np.asarray(freqs) == freq][0])
     return numeric(spl_ref, computed, 0.05, unit="dB SPL", places=3)
 
@@ -225,7 +231,11 @@ def _chk_ecma_loudness() -> Outcome:
     # With the full Clause 6.2.3 band averaging the chain computes 0.9845
     # sone_HMS for the calibration tone; the residual's origin is documented
     # in the loudness_ecma module docstring (c_N stays the verbatim value).
-    computed = float(ph.loudness_ecma(_spl_tone(1000.0, 40.0, 0.6), _FS).loudness)
+    computed = float(
+        ph.psychoacoustics.loudness_ecma(
+            _spl_tone(1000.0, 40.0, 0.6), _FS
+        ).loudness
+    )
     return numeric(
         ref.ECMA418_2_LOUDNESS_1KHZ_40DB_SONE,
         computed,
@@ -241,7 +251,11 @@ def _chk_ecma_loudness() -> Outcome:
     "HMS tonality of a 1 kHz / 40 dB tone (c_T=2.8758615)",
 )
 def _chk_ecma_tonality() -> Outcome:
-    computed = float(ph.tonality_ecma(_spl_tone(1000.0, 40.0, 0.7), _FS).tonality)
+    computed = float(
+        ph.psychoacoustics.tonality_ecma(
+            _spl_tone(1000.0, 40.0, 0.7), _FS
+        ).tonality
+    )
     return numeric(
         ref.ECMA418_2_TONALITY_1KHZ_40DB_TU,
         computed,
@@ -260,7 +274,7 @@ def _chk_ecma_roughness() -> Outcome:
     # Clause 7 calibration: the reference signal at an overall sound pressure
     # level of 60 dB SPL is 1 asper (computed: 0.9999 with the tabulated c_R).
     sig = _am_tone(1000.0, 70.0, 1.0, 60.0, 2.0)
-    computed = float(ph.roughness_ecma(sig, _FS).roughness)
+    computed = float(ph.psychoacoustics.roughness_ecma(sig, _FS).roughness)
     return numeric(
         ref.ECMA418_2_ROUGHNESS_1KHZ_70HZ_60DB_ASPER,
         computed,
@@ -277,7 +291,9 @@ def _chk_ecma_roughness() -> Outcome:
 )
 def _chk_mg_loudness() -> Outcome:
     computed = float(
-        ph.loudness_moore_glasberg_from_spectrum([(1000.0, 40.0)]).loudness
+        ph.psychoacoustics.loudness_moore_glasberg_from_spectrum(
+            [(1000.0, 40.0)]
+        ).loudness
     )
     return numeric(
         ref.ISO532_2_ANCHOR_1KHZ_40DB_SONE, computed, 0.01, unit="sone", places=4
@@ -293,7 +309,9 @@ def _chk_mg_time_loudness() -> Outcome:
     fs = 32000.0
     t = np.arange(round(0.8 * fs)) / fs
     x = math.sqrt(2.0) * 2e-5 * 10.0 ** (40.0 / 20.0) * np.sin(2.0 * np.pi * 1000.0 * t)
-    computed = float(ph.loudness_moore_glasberg_time(x, fs).n_max)
+    computed = float(
+        ph.psychoacoustics.loudness_moore_glasberg_time(x, fs).n_max
+    )
     return numeric(
         ref.ISO532_3_ANCHOR_1KHZ_40DB_SONE, computed, 0.02, unit="sone", places=4
     )
@@ -309,7 +327,11 @@ def _chk_ecma_fluctuation_strength() -> Outcome:
     # level of 60 dB SPL is 1 vacil_HMS (computed: 0.9931 for this 5 s signal
     # with the tabulated c_F; 0.9958 converged for longer signals).
     sig = _am_tone(1000.0, 4.0, 1.0, 60.0, 5.0)
-    computed = float(ph.fluctuation_strength_ecma(sig, _FS).fluctuation_strength)
+    computed = float(
+        ph.psychoacoustics.fluctuation_strength_ecma(
+            sig, _FS
+        ).fluctuation_strength
+    )
     return numeric(
         ref.ECMA418_2_FLUCTUATION_1KHZ_4HZ_60DB_VACIL,
         computed,

@@ -36,7 +36,9 @@ N = 32768
 
 
 def _white(seed: int, rms: float = 1.0, n: int = N) -> np.ndarray:
-    return ph.noise_signal(FS, n / FS, color="white", rms=rms, seed=seed)
+    return ph.signals.noise_signal(
+        FS, n / FS, color="white", rms=rms, seed=seed
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +101,9 @@ def test_dpss_eigenvalues_match_pw_section_7_1_pattern() -> None:
 
 
 def test_multitaper_result_eigenvalues_are_the_dpss_ratios() -> None:
-    res = ph.multitaper_psd(_white(30, n=1024), FS, time_half_bandwidth=4.0)
+    res = ph.signals.multitaper_psd(
+        _white(30, n=1024), FS, time_half_bandwidth=4.0
+    )
     assert res.n_tapers == 7
     # P&W print lambda_6 as 0.94: match to half a unit in the last place.
     assert np.allclose(res.eigenvalues, _PW_NW4_N1024[:7], atol=5e-3)
@@ -113,7 +117,7 @@ def test_multitaper_white_noise_density_level() -> None:
     standard error of the mean is below 0.6 %; 3 % is a 5-sigma bound.
     """
     x = _white(31, rms=2.0, n=8192)
-    res = ph.multitaper_psd(x, FS)
+    res = ph.signals.multitaper_psd(x, FS)
     expected = 4.0 / (FS / 2.0)
     assert float(np.mean(res.psd[1:-1])) == pytest.approx(expected, rel=0.03)
 
@@ -121,8 +125,8 @@ def test_multitaper_white_noise_density_level() -> None:
 def test_multitaper_matches_welch_on_the_same_record() -> None:
     """Both estimators are calibrated: same broadband level, either scaling."""
     x = _white(32, n=8192)
-    mt = ph.multitaper_psd(x, FS)
-    welch = ph.power_spectral_density(x, FS, nperseg=1024)
+    mt = ph.signals.multitaper_psd(x, FS)
+    welch = ph.signals.power_spectral_density(x, FS, nperseg=1024)
     assert float(np.mean(mt.psd[1:-1])) == pytest.approx(
         float(np.mean(welch.psd[1:-1])), rel=0.05
     )
@@ -136,7 +140,7 @@ def test_multitaper_density_integrates_to_signal_power_parseval() -> None:
     fraction of a percent on any single record.
     """
     x = _white(33, n=4096)
-    res = ph.multitaper_psd(x, FS, adaptive=False)
+    res = ph.signals.multitaper_psd(x, FS, adaptive=False)
     df = float(res.frequencies[1] - res.frequencies[0])
     assert float(np.sum(res.psd) * df) == pytest.approx(
         float(np.mean(x**2)), rel=5e-3
@@ -149,7 +153,7 @@ def test_multitaper_tone_band_power_recovers_amplitude() -> None:
     t = np.arange(n) / FS
     amp = 3.0
     x = amp * np.sin(2.0 * np.pi * 1024.0 * t)  # exact bin (1024 = 512*df)
-    res = ph.multitaper_psd(x, FS, n_tapers=5, adaptive=False)
+    res = ph.signals.multitaper_psd(x, FS, n_tapers=5, adaptive=False)
     df = float(res.frequencies[1] - res.frequencies[0])
     half_w = res.resolution_bandwidth / 2.0
     band = np.abs(res.frequencies - 1024.0) <= 1.5 * half_w
@@ -167,7 +171,9 @@ def test_multitaper_spectrum_scaling_reads_tone_peak(adaptive: bool) -> None:
     t = np.arange(n) / FS
     amp = 3.0
     x = amp * np.sin(2.0 * np.pi * 1024.0 * t)
-    res = ph.multitaper_psd(x, FS, scaling="spectrum", adaptive=adaptive)
+    res = ph.signals.multitaper_psd(
+        x, FS, scaling="spectrum", adaptive=adaptive
+    )
     peak = int(np.argmax(res.psd))
     assert res.frequencies[peak] == pytest.approx(1024.0)
     assert float(res.psd[peak]) == pytest.approx(amp**2 / 2.0, rel=1e-4)
@@ -185,8 +191,16 @@ def test_multitaper_variance_is_one_kth_of_single_taper() -> None:
     est_mt, est_one = [], []
     for seed in range(120):
         x = _white(600 + seed, n=2048)
-        est_mt.append(ph.multitaper_psd(x, FS, n_tapers=k, adaptive=False).psd[50:900])
-        est_one.append(ph.multitaper_psd(x, FS, n_tapers=1, adaptive=False).psd[50:900])
+        est_mt.append(
+            ph.signals.multitaper_psd(x, FS, n_tapers=k, adaptive=False).psd[
+                50:900
+            ]
+        )
+        est_one.append(
+            ph.signals.multitaper_psd(x, FS, n_tapers=1, adaptive=False).psd[
+                50:900
+            ]
+        )
     rel_var_mt = float(np.mean(
         (np.std(est_mt, axis=0) / np.mean(est_mt, axis=0)) ** 2
     ))
@@ -204,7 +218,7 @@ def test_multitaper_adaptive_weights_uniform_for_white_noise() -> None:
     the departure of the concentrations from unity plus the estimation
     jitter, both far below 0.01 for K = 5, NW = 4.
     """
-    res = ph.multitaper_psd(_white(34, n=4096), FS, n_tapers=5)
+    res = ph.signals.multitaper_psd(_white(34, n=4096), FS, n_tapers=5)
     mean_weights = np.mean(res.weights[:, 1:-1], axis=1)
     assert np.max(np.abs(mean_weights - 0.2)) < 0.01
     lam_flat = res.eigenvalues / float(np.sum(res.eigenvalues))
@@ -213,7 +227,7 @@ def test_multitaper_adaptive_weights_uniform_for_white_noise() -> None:
 
 def test_multitaper_dof_is_2k_for_white_noise() -> None:
     """nu(f) ~ 2K where the adaptive weights are uniform (P&W Eq. 370b)."""
-    res = ph.multitaper_psd(_white(35, n=4096), FS)
+    res = ph.signals.multitaper_psd(_white(35, n=4096), FS)
     interior = res.degrees_of_freedom[1:-1]
     assert float(np.mean(interior)) == pytest.approx(2.0 * res.n_tapers, rel=0.02)
     assert np.all(interior <= 2.0 * res.n_tapers + 1e-9)
@@ -227,7 +241,7 @@ def test_multitaper_chi2_interval_covers_true_density() -> None:
     true_psd = 1.0 / (FS / 2.0)
     hits, total = 0, 0
     for seed in range(150):
-        res = ph.multitaper_psd(_white(800 + seed, n=2048), FS)
+        res = ph.signals.multitaper_psd(_white(800 + seed, n=2048), FS)
         for b in (100, 400, 800):
             hits += int(res.ci_lower[b] <= true_psd <= res.ci_upper[b])
             total += 1
@@ -243,15 +257,17 @@ def test_multitaper_adaptive_dof_drops_where_leakage_would_bias() -> None:
     """
     n = 4096
     t = np.arange(n) / FS
-    rng_x = ph.noise_signal(FS, n / FS, color="white", rms=1e-3, seed=99)
+    rng_x = ph.signals.noise_signal(
+        FS, n / FS, color="white", rms=1e-3, seed=99
+    )
     x = 50.0 * np.sin(2.0 * np.pi * 200.0 * t) + rng_x
-    res = ph.multitaper_psd(x, FS)
+    res = ph.signals.multitaper_psd(x, FS)
     faint = (res.frequencies > 2000.0) & (res.frequencies < 3800.0)
     assert float(np.mean(res.degrees_of_freedom[faint])) < 1.9 * res.n_tapers
 
 
 def test_multitaper_defaults_and_result_fields() -> None:
-    res = ph.multitaper_psd(_white(36, n=1024), FS)
+    res = ph.signals.multitaper_psd(_white(36, n=1024), FS)
     assert res.n_tapers == 7  # 2*NW - 1 for the default NW = 4
     assert res.time_half_bandwidth == 4.0
     assert res.resolution_bandwidth == pytest.approx(2.0 * 4.0 * FS / 1024.0)
@@ -271,28 +287,28 @@ def test_multitaper_rejects_invalid_inputs() -> None:
     x = _white(37, n=1024)
     two_dimensional = np.zeros((4, 256))
     with pytest.raises(ValueError, match="one-dimensional"):
-        ph.multitaper_psd(two_dimensional, FS)
+        ph.signals.multitaper_psd(two_dimensional, FS)
     with pytest.raises(ValueError, match="too short"):
-        ph.multitaper_psd(x[:16], FS)
+        ph.signals.multitaper_psd(x[:16], FS)
     with pytest.raises(ValueError, match="positive, finite"):
-        ph.multitaper_psd(x, -1.0)
+        ph.signals.multitaper_psd(x, -1.0)
     with pytest.raises(ValueError, match="time_half_bandwidth"):
-        ph.multitaper_psd(x, FS, time_half_bandwidth=0.5)
+        ph.signals.multitaper_psd(x, FS, time_half_bandwidth=0.5)
     with pytest.raises(ValueError, match="Shannon number"):
-        ph.multitaper_psd(x, FS, n_tapers=9)
+        ph.signals.multitaper_psd(x, FS, n_tapers=9)
     with pytest.raises(ValueError, match="Shannon number"):
-        ph.multitaper_psd(x, FS, n_tapers=0)
+        ph.signals.multitaper_psd(x, FS, n_tapers=0)
     silence = np.zeros(1024)
     with pytest.raises(ValueError, match="identically zero"):
-        ph.multitaper_psd(silence, FS)
+        ph.signals.multitaper_psd(silence, FS)
     with pytest.raises(ValueError, match="scaling"):
-        ph.multitaper_psd(x, FS, scaling="bogus")  # type: ignore[arg-type]
+        ph.signals.multitaper_psd(x, FS, scaling="bogus")  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="confidence"):
-        ph.multitaper_psd(x, FS, confidence=1.5)
+        ph.signals.multitaper_psd(x, FS, confidence=1.5)
 
 
 def test_multitaper_plot_line_and_confidence_band() -> None:
-    res = ph.multitaper_psd(_white(38, n=1024), FS)
+    res = ph.signals.multitaper_psd(_white(38, n=1024), FS)
     ax = res.plot()
     assert ax.lines, "expected the density line"
     labels = [str(c.get_label()) for c in ax.collections]

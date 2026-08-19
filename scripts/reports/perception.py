@@ -52,7 +52,9 @@ def _loudness_example() -> tuple[object, ReportMetadata, str]:
         ],
         dtype=float,
     )
-    result = ph.loudness_zwicker_from_spectrum(levels, field="free")
+    result = ph.psychoacoustics.loudness_zwicker_from_spectrum(
+        levels, field="free"
+    )
     metadata = ReportMetadata(
         specimen="Household appliance, steady operating noise",
         client="Example client",

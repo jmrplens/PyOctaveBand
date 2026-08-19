@@ -53,7 +53,7 @@ def _line_by_label(ax, needle: str):
 @pytest.mark.parametrize("language", ["en", "es"])
 def test_source_check_plot_draws_the_measured_spectrum(language: str) -> None:
     measured = [39.0, 31.0, 23.0, 17.0, 12.5]
-    res = ph.check_heavy_impact_source(measured)
+    res = ph.building.check_heavy_impact_source(measured)
     ax = res.plot(language=language)
     line = _line_by_label(ax, "L_{FE}")
     np.testing.assert_allclose(line.get_ydata(), measured)
@@ -65,7 +65,7 @@ def test_source_check_plot_draws_the_measured_spectrum(language: str) -> None:
 def test_source_check_plot_marks_the_failing_band() -> None:
     """A band outside its tolerance gets its own marker series."""
     measured = [39.0, 31.0, 23.0, 17.0, 20.0]
-    res = ph.check_heavy_impact_source(measured)
+    res = ph.building.check_heavy_impact_source(measured)
     assert not res.passed
     ax = res.plot()
     marked = [ln for ln in ax.lines if ln.get_marker() == "X"]
@@ -74,21 +74,22 @@ def test_source_check_plot_marks_the_failing_band() -> None:
 
 
 def test_source_check_plot_has_no_failure_marker_when_conforming() -> None:
-    res = ph.check_heavy_impact_source([39.0, 31.0, 23.0, 17.0, 12.5])
+    res = ph.building.check_heavy_impact_source([39.0, 31.0, 23.0, 17.0, 12.5])
     ax = res.plot()
     assert not [ln for ln in ax.lines if ln.get_marker() == "X"]
 
 
 def test_source_check_plot_shades_the_printed_tolerance_band() -> None:
-    res = ph.check_heavy_impact_source(
-        [v for v, _ in ph.HEAVY_IMPACT_SOURCES["bang_machine"]], "bang_machine"
+    res = ph.building.check_heavy_impact_source(
+        [v for v, _ in ph.building.HEAVY_IMPACT_SOURCES["bang_machine"]],
+        "bang_machine",
     )
     ax = res.plot()
     assert ax.collections, "the tolerance band was not drawn"
 
 
 def test_source_check_plot_forwards_kwargs() -> None:
-    res = ph.check_heavy_impact_source([39.0, 31.0, 23.0, 17.0, 12.5])
+    res = ph.building.check_heavy_impact_source([39.0, 31.0, 23.0, 17.0, 12.5])
     ax = res.plot(linewidth=3.0)
     assert _line_by_label(ax, "measured").get_linewidth() == 3.0
 
@@ -100,7 +101,7 @@ def test_source_check_plot_forwards_kwargs() -> None:
 
 @pytest.mark.parametrize("language", ["en", "es"])
 def test_standardization_plot_draws_both_spectra(language: str) -> None:
-    res = ph.standardized_maximum_impact_level(
+    res = ph.building.standardized_maximum_impact_level(
         _TABLE_D4, 41.4, [1.43, 3.7, 3.1, 2.38],
         frequency=[63.0, 125.0, 250.0, 500.0],
     )
@@ -113,13 +114,13 @@ def test_standardization_plot_draws_both_spectra(language: str) -> None:
 
 
 def test_standardization_plot_without_frequencies_uses_band_indices() -> None:
-    res = ph.standardized_maximum_impact_level(_TABLE_D4, 41.4, 2.0)
+    res = ph.building.standardized_maximum_impact_level(_TABLE_D4, 41.4, 2.0)
     ax = res.plot()
     assert [t.get_text() for t in ax.get_xticklabels()] == ["1", "2", "3", "4"]
 
 
 def test_standardization_plot_forwards_kwargs() -> None:
-    res = ph.standardized_maximum_impact_level(_TABLE_D4, 41.4, 2.0)
+    res = ph.building.standardized_maximum_impact_level(_TABLE_D4, 41.4, 2.0)
     ax = res.plot(linewidth=2.5)
     assert any(ln.get_linewidth() == 2.5 for ln in ax.lines)
 
@@ -131,7 +132,7 @@ def test_standardization_plot_forwards_kwargs() -> None:
 
 @pytest.mark.parametrize("language", ["en", "es"])
 def test_rating_plot_bars_carry_the_corrected_values(language: str) -> None:
-    res = ph.a_weighted_maximum_impact_level(_TABLE_D4)
+    res = ph.building.a_weighted_maximum_impact_level(_TABLE_D4)
     ax = res.plot(language=language)
     heights = [p.get_height() for p in ax.patches]
     np.testing.assert_allclose(heights, res.corrected, atol=1e-9)
@@ -142,13 +143,13 @@ def test_rating_plot_bars_carry_the_corrected_values(language: str) -> None:
 
 
 def test_rating_plot_third_octave_has_twelve_bars() -> None:
-    res = ph.a_weighted_maximum_impact_level([60.0] * 12)
+    res = ph.building.a_weighted_maximum_impact_level([60.0] * 12)
     ax = res.plot()
     assert len(ax.patches) == 12
 
 
 def test_rating_plot_forwards_kwargs_to_the_bars() -> None:
-    res = ph.a_weighted_maximum_impact_level(_TABLE_D4)
+    res = ph.building.a_weighted_maximum_impact_level(_TABLE_D4)
     ax = res.plot(color="red")
     red = plt.matplotlib.colors.to_rgba("red")
     assert any(tuple(p.get_facecolor()) == red for p in ax.patches)
@@ -161,7 +162,7 @@ def test_rating_plot_forwards_kwargs_to_the_bars() -> None:
 
 @pytest.mark.parametrize("language", ["en", "es"])
 def test_ceiling_attenuation_plot_draws_data_and_contour(language: str) -> None:
-    res = ph.ceiling_attenuation_class(_ALA_DNC)
+    res = ph.building.ceiling_attenuation_class(_ALA_DNC)
     ax = res.plot(language=language)
     values = [ln.get_ydata() for ln in ax.lines]
     assert any(np.allclose(v, res.measured) for v in values)
@@ -170,13 +171,13 @@ def test_ceiling_attenuation_plot_draws_data_and_contour(language: str) -> None:
 
 
 def test_ceiling_attenuation_plot_shades_the_deficiencies() -> None:
-    res = ph.ceiling_attenuation_class(_ALA_DNC)
+    res = ph.building.ceiling_attenuation_class(_ALA_DNC)
     ax = res.plot()
     assert ax.collections, "the deficiencies were not shaded"
 
 
 def test_ceiling_attenuation_plot_forwards_kwargs() -> None:
-    res = ph.ceiling_attenuation_class(_ALA_DNC)
+    res = ph.building.ceiling_attenuation_class(_ALA_DNC)
     ax = res.plot(linewidth=2.0)
     assert any(ln.get_linewidth() == 2.0 for ln in ax.lines)
 
@@ -188,7 +189,7 @@ def test_ceiling_attenuation_plot_forwards_kwargs() -> None:
 
 def _plenum(**kwargs):
     ceiling = [17.0, 21.0, 25.0, 29.0, 32.0]
-    return ph.plenum_flanking_reduction_index(
+    return ph.building.plenum_flanking_reduction_index(
         ceiling, ceiling, ceiling_length=4.75, plenum_height=0.43, **kwargs
     )
 
@@ -238,7 +239,7 @@ def test_plenum_plot_forwards_kwargs() -> None:
 
 def _coupling(**kwargs):
     freq = np.logspace(np.log10(50.0), np.log10(4000.0), 24)
-    return ph.wall_tie_coupling_loss_factor(
+    return ph.building.wall_tie_coupling_loss_factor(
         freq, 150.0, 170.0, 1.0e5, 1.2e5, ties_per_area=2.5, **kwargs
     )
 
@@ -280,10 +281,14 @@ def test_wall_tie_plot_forwards_kwargs() -> None:
 @pytest.mark.parametrize(
     "factory",
     [
-        lambda: ph.check_heavy_impact_source([39.0, 31.0, 23.0, 17.0, 12.5]),
-        lambda: ph.standardized_maximum_impact_level(_TABLE_D4, 41.4, 2.0),
-        lambda: ph.a_weighted_maximum_impact_level(_TABLE_D4),
-        lambda: ph.ceiling_attenuation_class(_ALA_DNC),
+        lambda: ph.building.check_heavy_impact_source(
+            [39.0, 31.0, 23.0, 17.0, 12.5]
+        ),
+        lambda: ph.building.standardized_maximum_impact_level(
+            _TABLE_D4, 41.4, 2.0
+        ),
+        lambda: ph.building.a_weighted_maximum_impact_level(_TABLE_D4),
+        lambda: ph.building.ceiling_attenuation_class(_ALA_DNC),
         _plenum,
         lambda: _coupling(tie="butterfly"),
     ],

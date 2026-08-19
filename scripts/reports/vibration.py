@@ -191,8 +191,8 @@ def _transfer_stiffness_example() -> tuple[object, ReportMetadata, str]:
     omega = 2.0 * np.pi * freqs
     k21 = stiffness + 1j * omega * damping
     u1 = 1.0e-6 + 0.0j
-    measured = ph.transfer_stiffness_direct(k21 * u1, u1)
-    result = ph.TransferStiffnessResult(
+    measured = ph.vibration.transfer_stiffness_direct(k21 * u1, u1)
+    result = ph.vibration.TransferStiffnessResult(
         frequencies=freqs, transfer_stiffness=measured, blocking_mass=None
     )
     metadata = ReportMetadata(
