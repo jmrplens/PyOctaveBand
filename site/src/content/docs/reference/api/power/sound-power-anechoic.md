@@ -311,14 +311,28 @@ sound_power_anechoic(
     surface: PrecisionSurface,
     *,
     radius: float,
-    background_levels: np.ndarray | None = None,
-    frequencies: np.ndarray | None = None,
-    areas: np.ndarray | None = None,
-    temperature: float = 23.0,
-    static_pressure: float = 101.325,
-    air_absorption_coefficient: float | np.ndarray | None = None,
-    sigma_omc: float = 0.0,
-    coverage_factor: float = 2.0,
+    background_levels: np.ndarray,
+    frequencies: np.ndarray,
+    areas: np.ndarray | None = ...,
+    temperature: float = ...,
+    static_pressure: float = ...,
+    air_absorption_coefficient: float | np.ndarray | None = ...,
+    sigma_omc: float = ...,
+    coverage_factor: float = ...,
+) -> PrecisionSoundPowerResult
+
+sound_power_anechoic(
+    levels_positions: np.ndarray,
+    surface: PrecisionSurface,
+    *,
+    radius: float,
+    frequencies: np.ndarray | None = ...,
+    areas: np.ndarray | None = ...,
+    temperature: float = ...,
+    static_pressure: float = ...,
+    air_absorption_coefficient: float | np.ndarray | None = ...,
+    sigma_omc: float = ...,
+    coverage_factor: float = ...,
 ) -> PrecisionSoundPowerResult
 ```
 

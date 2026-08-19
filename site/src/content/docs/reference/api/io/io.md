@@ -519,13 +519,23 @@ has scrolled away.
 write(
     path: str | Path,
     x: Signal | NDArray[np.generic] | list[float],
-    fs: int | None = None,
+    fs: int | None = ...,
     *,
-    subtype: str | None = None,
-    bext: BroadcastMetadata | str | None = None,
-    dither: str | None = None,
-    rng: np.random.Generator | int | None = None,
-    sidecar: bool = False,
+    subtype: str | None = ...,
+    bext: BroadcastMetadata | str | None = ...,
+    dither: Literal['tpdf'],
+    rng: np.random.Generator | int | None = ...,
+    sidecar: bool = ...,
+) -> None
+
+write(
+    path: str | Path,
+    x: Signal | NDArray[np.generic] | list[float],
+    fs: int | None = ...,
+    *,
+    subtype: str | None = ...,
+    bext: BroadcastMetadata | str | None = ...,
+    sidecar: bool = ...,
 ) -> None
 ```
 

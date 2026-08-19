@@ -80,9 +80,11 @@ one-third-octave (100-3150 Hz) or 5 octave (125-2000 Hz) values are supplied.
 adaptation_term_kc(
     freq: Sequence[float] | np.ndarray,
     *,
-    boundary_area: float | None = None,
-    volume: float | None = None,
+    boundary_area: float,
+    volume: float,
 ) -> np.ndarray
+
+adaptation_term_kc(freq: Sequence[float] | np.ndarray) -> np.ndarray
 ```
 
 Adaptation term `Kc` per ISO 15186-1:2000, Annex B.

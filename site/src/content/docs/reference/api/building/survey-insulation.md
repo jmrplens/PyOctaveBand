@@ -79,8 +79,15 @@ estimate_reverberation_index(
     volume: float,
     room: str,
     *,
-    weighted: bool = False,
-) -> np.ndarray | float
+    weighted: Literal[False] = False,
+) -> np.ndarray
+
+estimate_reverberation_index(
+    volume: float,
+    room: str,
+    *,
+    weighted: Literal[True],
+) -> float
 ```
 
 Estimate the reverberation index from room type and volume (Clause 6.5).
@@ -148,8 +155,16 @@ survey_airborne_insulation(
     l2: Sequence[float] | np.ndarray,
     reverberation_index: Sequence[float] | np.ndarray,
     *,
-    volume: float | None = None,
-    area: float | None = None,
+    volume: float,
+    area: float,
+) -> SurveyAirborneResult
+
+survey_airborne_insulation(
+    l1: Sequence[float] | np.ndarray,
+    l2: Sequence[float] | np.ndarray,
+    reverberation_index: Sequence[float] | np.ndarray,
+    *,
+    volume: float = ...,
 ) -> SurveyAirborneResult
 ```
 

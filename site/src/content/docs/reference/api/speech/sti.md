@@ -27,9 +27,25 @@ the male test-signal spectrum (A.6.1).
 sti_from_impulse_response(
     ir: list[float] | np.ndarray,
     fs: int,
-    snr: float | Sequence[float] | np.ndarray | None = None,
-    level: Sequence[float] | np.ndarray | None = None,
-    ambient: Sequence[float] | np.ndarray | None = None,
+    snr: None,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult
+
+sti_from_impulse_response(
+    ir: list[float] | np.ndarray,
+    fs: int,
+    snr: None = ...,
+    *,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult
+
+sti_from_impulse_response(
+    ir: list[float] | np.ndarray,
+    fs: int,
+    snr: float | Sequence[float] | np.ndarray | None = ...,
+    level: Sequence[float] | np.ndarray | None = ...,
 ) -> STIResult
 ```
 
@@ -85,9 +101,25 @@ STI itself stays within ~0.001.
 stipa(
     x: list[float] | np.ndarray,
     fs: int,
-    reference: list[float] | np.ndarray | None = None,
-    level: Sequence[float] | np.ndarray | None = None,
-    ambient: Sequence[float] | np.ndarray | None = None,
+    reference: list[float] | np.ndarray | None,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult
+
+stipa(
+    x: list[float] | np.ndarray,
+    fs: int,
+    reference: list[float] | np.ndarray | None = ...,
+    *,
+    level: Sequence[float] | np.ndarray,
+    ambient: Sequence[float] | np.ndarray,
+) -> STIResult
+
+stipa(
+    x: list[float] | np.ndarray,
+    fs: int,
+    reference: list[float] | np.ndarray | None = ...,
+    level: Sequence[float] | np.ndarray | None = ...,
 ) -> STIResult
 ```
 

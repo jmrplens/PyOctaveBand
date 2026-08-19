@@ -155,11 +155,23 @@ impulse_response(
     reference: list[float] | np.ndarray,
     fs: int,
     *,
-    method: str = 'spectral',
-    f_range: tuple[float, float] | None = None,
-    regularization: float = 1e-06,
-    length: int | None = None,
-    return_full: bool = False,
+    method: Literal['farina'],
+    f_range: tuple[float, float],
+    regularization: float = ...,
+    length: int | None = ...,
+    return_full: bool = ...,
+) -> ImpulseResponseResult
+
+impulse_response(
+    recorded: list[float] | np.ndarray,
+    reference: list[float] | np.ndarray,
+    fs: int,
+    *,
+    method: str = ...,
+    f_range: tuple[float, float] | None = ...,
+    regularization: float = ...,
+    length: int | None = ...,
+    return_full: bool = ...,
 ) -> ImpulseResponseResult
 ```
 

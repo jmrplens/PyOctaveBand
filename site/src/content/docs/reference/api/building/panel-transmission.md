@@ -565,14 +565,37 @@ PLATEAU_MATERIALS = {'aluminium': (2.66, 29.0, 11.0), 'brick': (2.1, 37.0, 4.5),
 plateau_transmission_loss(
     frequency: ArrayLike,
     *,
-    material: str | None = None,
-    thickness_mm: float | None = None,
-    mass_per_area: float | None = None,
-    plateau_height: float | None = None,
-    frequency_ratio: float | None = None,
-    field_correction: float = 5.0,
-    speed_of_sound: float = 343.0,
-    air_density: float = 1.205,
+    material: str,
+    thickness_mm: float,
+    plateau_height: float | None = ...,
+    frequency_ratio: float | None = ...,
+    field_correction: float = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SoundReductionResult
+
+plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    material: str,
+    mass_per_area: float,
+    thickness_mm: float | None = ...,
+    plateau_height: float | None = ...,
+    frequency_ratio: float | None = ...,
+    field_correction: float = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
+) -> SoundReductionResult
+
+plateau_transmission_loss(
+    frequency: ArrayLike,
+    *,
+    mass_per_area: float,
+    plateau_height: float,
+    frequency_ratio: float,
+    field_correction: float = ...,
+    speed_of_sound: float = ...,
+    air_density: float = ...,
 ) -> SoundReductionResult
 ```
 

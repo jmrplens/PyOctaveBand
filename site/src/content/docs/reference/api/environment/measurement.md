@@ -172,12 +172,9 @@ Warning for unreliable environmental-noise determinations.
 ## gaussian_residual_level
 
 ```python
-gaussian_residual_level(
-    l50: float,
-    *,
-    l90: float | None = None,
-    l95: float | None = None,
-) -> float
+gaussian_residual_level(l50: float, *, l90: float) -> float
+
+gaussian_residual_level(l50: float, *, l95: float) -> float
 ```
 
 Estimate the residual equivalent level from percentiles (Annex I).

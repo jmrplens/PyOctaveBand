@@ -179,14 +179,26 @@ predict_diffuser_polar_response(
     well_width: float,
     frequency: float,
     *,
-    depths: ArrayLike | None = None,
-    reflection: ArrayLike | None = None,
-    angles: ArrayLike = (-90, -85, -80, -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90),
-    source_angle: float = 0.0,
-    periods: int = 1,
-    speed_of_sound: float = 343.0,
-    include_aperture: bool = True,
-    include_obliquity: bool = True,
+    depths: ArrayLike,
+    angles: ArrayLike = ...,
+    source_angle: float = ...,
+    periods: int = ...,
+    speed_of_sound: float = ...,
+    include_aperture: bool = ...,
+    include_obliquity: bool = ...,
+) -> DiffuserPolarResponse
+
+predict_diffuser_polar_response(
+    well_width: float,
+    frequency: float,
+    *,
+    reflection: ArrayLike,
+    angles: ArrayLike = ...,
+    source_angle: float = ...,
+    periods: int = ...,
+    speed_of_sound: float = ...,
+    include_aperture: bool = ...,
+    include_obliquity: bool = ...,
 ) -> DiffuserPolarResponse
 ```
 

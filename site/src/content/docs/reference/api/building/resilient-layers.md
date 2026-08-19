@@ -303,10 +303,34 @@ floating_floor_improvement_spectrum(
     frequencies: ArrayLike,
     *,
     resonance_frequency: float,
-    model: FloatingFloorModel = 'en12354',
-    limiting_frequency: float | None = None,
-    mass_per_area: float | None = None,
-    dynamic_stiffness: float | None = None,
+    model: Literal['cremer_hammer'],
+    limiting_frequency: float,
+    mass_per_area: float,
+    dynamic_stiffness: float,
+) -> FloatingFloorImprovementResult
+
+floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal['cremer_hammer'],
+    limiting_frequency: float,
+) -> FloatingFloorImprovementResult
+
+floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal['en12354', 'cremer'] = ...,
+    mass_per_area: float,
+    dynamic_stiffness: float,
+) -> FloatingFloorImprovementResult
+
+floating_floor_improvement_spectrum(
+    frequencies: ArrayLike,
+    *,
+    resonance_frequency: float,
+    model: Literal['en12354', 'cremer'] = ...,
 ) -> FloatingFloorImprovementResult
 ```
 

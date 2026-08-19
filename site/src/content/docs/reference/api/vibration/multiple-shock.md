@@ -236,10 +236,21 @@ multiple_shock_assessment(
     start_age: float,
     years: int,
     days_per_year: float,
-    exposure_time: float | None = None,
-    measurement_time: float | None = None,
-    sex: Literal['male', 'female'] = 'male',
-    mz: float | None = None,
+    exposure_time: float,
+    measurement_time: float,
+    sex: Literal['male', 'female'] = ...,
+    mz: float | None = ...,
+) -> MultipleShockResult
+
+multiple_shock_assessment(
+    acceleration: ArrayLike,
+    fs: float,
+    *,
+    start_age: float,
+    years: int,
+    days_per_year: float,
+    sex: Literal['male', 'female'] = ...,
+    mz: float | None = ...,
 ) -> MultipleShockResult
 ```
 

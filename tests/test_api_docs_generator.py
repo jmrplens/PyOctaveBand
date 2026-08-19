@@ -450,3 +450,48 @@ def test_quick_table_version_literal_is_current() -> None:
     assert car.version_problems(markdown, phonometry.__version__) == []
     # And it says it exactly once, so no second copy can drift unseen.
     assert car._VERSION_LITERAL.findall(markdown) == [phonometry.__version__]
+
+
+# ---------------------------------------------------------------------------
+# Overloaded call forms
+# ---------------------------------------------------------------------------
+
+
+def test_overloaded_function_publishes_every_call_form() -> None:
+    """A function with overloads has more than one way to be called.
+
+    The implementation signature is not one of them: it is the permissive
+    union that accepts every head plus the combinations the heads refuse, so
+    publishing only that would document a contract the library rejects.
+    """
+    from phonometry.building.measurement.insulation import airborne_insulation
+
+    rendered = gad.format_signature("airborne_insulation", airborne_insulation)
+    forms = rendered.split("\n\n")
+    assert len(forms) == 2, rendered
+    # One form takes the pair, the other takes neither; no form takes one.
+    with_pair = [f for f in forms if "area" in f]
+    without = [f for f in forms if "area" not in f]
+    assert len(with_pair) == 1
+    assert len(without) == 1
+    assert "volume" in with_pair[0]
+    assert "volume" not in without[0]
+    # The permissive union is exactly what must NOT be published.
+    assert "area: float | None = None" not in rendered
+
+
+def test_overload_placeholder_default_reads_as_ellipsis() -> None:
+    """``= ...`` is the head's placeholder; ``repr`` would print ``Ellipsis``."""
+    from phonometry.emission.sound_power_anechoic import sound_power_anechoic
+
+    rendered = gad.format_signature("sound_power_anechoic", sound_power_anechoic)
+    assert "= ..." in rendered
+    assert "Ellipsis" not in rendered
+
+
+def test_plain_function_still_renders_one_form() -> None:
+    """Nothing changes for the functions that declare no overloads."""
+    from phonometry.signals.levels import leq
+
+    rendered = gad.format_signature("leq", leq)
+    assert "\n\n" not in rendered

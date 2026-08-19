@@ -270,13 +270,26 @@ plenum_flanking_reduction_index(
     *,
     ceiling_length: float,
     plenum_height: float,
-    sidewalls: str = 'reflecting',
-    frequency: ArrayLike | None = None,
-    attenuation_source: ArrayLike | None = None,
-    attenuation_receiving: ArrayLike | None = None,
-    source_length: float | None = None,
-    split_source: float = 0.5,
-    split_receiving: float = 0.5,
+    sidewalls: str = ...,
+    frequency: ArrayLike | None = ...,
+    attenuation_source: ArrayLike,
+    attenuation_receiving: ArrayLike,
+    source_length: float | None = ...,
+    split_source: float = ...,
+    split_receiving: float = ...,
+) -> PlenumFlankingResult
+
+plenum_flanking_reduction_index(
+    reduction_index_source: ArrayLike,
+    reduction_index_receiving: ArrayLike,
+    *,
+    ceiling_length: float,
+    plenum_height: float,
+    sidewalls: str = ...,
+    frequency: ArrayLike | None = ...,
+    source_length: float | None = ...,
+    split_source: float = ...,
+    split_receiving: float = ...,
 ) -> PlenumFlankingResult
 ```
 
