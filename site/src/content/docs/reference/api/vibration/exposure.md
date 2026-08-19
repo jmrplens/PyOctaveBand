@@ -137,7 +137,7 @@ inadequate.
 
 | Name | Description |
 | :--- | :--- |
-| `signal` | Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal) for its rate; a calibration factor it carries is deliberately not applied, because this quantity is an acceleration in m/s2 and not a pressure. |
+| `signal` | Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), of which only the samples are read: a peak-to-r.m.s. ratio needs no sample rate, and a calibration factor the object carries is deliberately not applied, because this quantity is an acceleration in m/s2 and not a pressure. |
 
 **Returns:** The crest factor (dimensionless); `0` for an all-zero signal.
 

@@ -285,8 +285,8 @@ is treated as absorbed, so `alpha` may be slightly overestimated
 
 | Name | Description |
 | :--- | :--- |
-| `incident_ir` | Windowed incident impulse response `hi(t)`, real. |
-| `reflected_ir` | Windowed reflected impulse response `hr(t)`, real. |
+| `incident_ir` | Windowed incident impulse response `hi(t)`, real. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: what is read off the pair is the ratio of their transfer functions, so a factor the two share divides out. |
+| `reflected_ir` | Windowed reflected impulse response `hr(t)`, real. Same treatment as `incident_ir`; two Signals recorded at different rates are refused rather than arbitrated. |
 | `source_height` | Source-to-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-plane distance `dm`, in metres. |
 | `incidence_angle` | Incidence angle `theta`, in radians (0 = normal). |
@@ -347,7 +347,7 @@ in a plottable [`InsituAbsorptionResult`](/phonometry/reference/api/materials/ro
 | Name | Description |
 | :--- | :--- |
 | `incident_ir` | Windowed incident (direct-path) impulse response `hi`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: what is read off the pair is the ratio of their transfer functions, so a factor the two share divides out. |
-| `reflected_ir` | Windowed reflected-path impulse response `hr`. |
+| `reflected_ir` | Windowed reflected-path impulse response `hr`. Same treatment as `incident_ir`: its calibration is applied too, which is what makes the shared factor cancel rather than skew the ratio. |
 | `fs` | Sampling frequency, in hertz. Required when both records are bare arrays; either may be a [`Signal`](/phonometry/reference/api/io/io/#signal) and supply it, and two Signals recorded at different rates are refused rather than arbitrated. |
 | `source_height` | Source-to-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-plane distance `dm`, in metres. |
@@ -399,7 +399,7 @@ Annex C; the frequency-dependent form of Annex G).
 | Name | Description |
 | :--- | :--- |
 | `incident_ir` | Windowed incident (direct-path) impulse response `hi(t)`, real, one sample per `1 / fs`. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: what is read off the pair is the ratio of their transfer functions, so a factor the two share divides out. |
-| `reflected_ir` | Windowed reflected-path impulse response `hr(t)`, real, same sampling as `incident_ir`. |
+| `reflected_ir` | Windowed reflected-path impulse response `hr(t)`, real, same sampling as `incident_ir`. Same treatment as `incident_ir`: its calibration is applied too, which is what makes the shared factor cancel rather than skew the ratio. |
 | `source_height` | Source-to-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-plane distance `dm`, in metres. |
 | `incidence_angle` | Incidence angle `theta`, in radians (0 = normal). |
@@ -665,8 +665,8 @@ independent of any reflected-path time offset.
 
 | Name | Description |
 | :--- | :--- |
-| `incident_ir` | Windowed incident impulse response `hi(t)`, real. |
-| `reflected_ir` | Windowed reflected impulse response `hr(t)`, real. |
+| `incident_ir` | Windowed incident impulse response `hi(t)`, real. Accepts a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal), whose calibration is applied to the samples and then cancels: what is read off the pair is the ratio of their transfer functions, so a factor the two share divides out. |
+| `reflected_ir` | Windowed reflected impulse response `hr(t)`, real. Same treatment as `incident_ir`; two Signals recorded at different rates are refused rather than arbitrated. |
 | `source_height` | Source-to-plane distance `ds`, in metres. |
 | `mic_height` | Microphone-to-plane distance `dm`, in metres. |
 | `incidence_angle` | Incidence angle `theta`, in radians. |

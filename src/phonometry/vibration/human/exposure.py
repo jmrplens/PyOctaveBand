@@ -615,10 +615,11 @@ def crest_factor(signal: SignalInput) -> float:
     the threshold above which ISO 2631-1 6.2.2 deems the basic method
     inadequate.
 
-    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2. Accepts a
-        :class:`phonometry.io.Signal` for its rate; a calibration factor it
-        carries is deliberately not applied, because this quantity is an
-        acceleration in m/s2 and not a pressure.
+    :param signal: Frequency-weighted acceleration signal (1-D), in m/s2.
+        Accepts a :class:`phonometry.io.Signal`, of which only the samples
+        are read: a peak-to-r.m.s. ratio needs no sample rate, and a
+        calibration factor the object carries is deliberately not applied,
+        because this quantity is an acceleration in m/s2 and not a pressure.
     :return: The crest factor (dimensionless); ``0`` for an all-zero signal.
     """
     x = _weighted_signal(signal)

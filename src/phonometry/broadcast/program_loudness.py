@@ -527,7 +527,10 @@ def true_peak_level(
     and inter-sample peaks above full scale give positive values.
 
     :param x: Input signal (1D or 2D ``[channels, samples]``), full-scale
-        units (1.0 = 0 dBFS).
+        units (1.0 = 0 dBFS). Accepts a :class:`phonometry.io.Signal` for
+        its rate; a calibration factor it carries is deliberately **not**
+        applied, because this quantity is counted from a full-scale sine
+        rather than from 20 uPa. See :func:`k_weighting` for the reasoning.
     :param fs: Sample rate, Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.
@@ -578,7 +581,10 @@ def integrated_loudness(
     normalises to -23.0 LUFS.
 
     :param x: Input signal (1D mono or 2D ``[channels, samples]``),
-        full-scale units (1.0 = 0 dBFS).
+        full-scale units (1.0 = 0 dBFS). Accepts a :class:`phonometry.io.Signal` for
+        its rate; a calibration factor it carries is deliberately **not**
+        applied, because this quantity is counted from a full-scale sine
+        rather than from 20 uPa. See :func:`k_weighting` for the reasoning.
     :param fs: Sample rate, Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.
@@ -776,7 +782,10 @@ def program_loudness(
       permits at most -1 dBTP during production).
 
     :param x: Input signal (1D mono or 2D ``[channels, samples]``),
-        full-scale units (1.0 = 0 dBFS).
+        full-scale units (1.0 = 0 dBFS). Accepts a :class:`phonometry.io.Signal` for
+        its rate; a calibration factor it carries is deliberately **not**
+        applied, because this quantity is counted from a full-scale sine
+        rather than from 20 uPa. See :func:`k_weighting` for the reasoning.
     :param fs: Sample rate, Hz. Required for a bare array; a
         :class:`~phonometry.io.Signal` brings its own, and an explicit value
         that disagrees with it raises instead of silently winning.

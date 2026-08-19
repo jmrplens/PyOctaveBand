@@ -384,12 +384,15 @@ def insitu_reflection_factor(
     Annex C; the frequency-dependent form of Annex G).
 
     :param incident_ir: Windowed incident (direct-path) impulse response
-        ``hi(t)``, real, one sample per ``1 / fs``. Accepts a :class:`phonometry.io.Signal`, whose
-        calibration is applied to the samples and then cancels: what is read
+        ``hi(t)``, real, one sample per ``1 / fs``. Accepts a
+        :class:`phonometry.io.Signal`, whose calibration is applied to the
+        samples and then cancels: what is read
         off the pair is the ratio of their transfer functions, so a factor
         the two share divides out.
     :param reflected_ir: Windowed reflected-path impulse response ``hr(t)``,
-        real, same sampling as ``incident_ir``.
+        real, same sampling as ``incident_ir``. Same treatment as
+        ``incident_ir``: its calibration is applied too, which is what makes
+        the shared factor cancel rather than skew the ratio.
     :param source_height: Source-to-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-plane distance ``dm``, in metres.
     :param incidence_angle: Incidence angle ``theta``, in radians (0 = normal).
@@ -460,7 +463,13 @@ def power_reflection_coefficient(
     independent of any reflected-path time offset.
 
     :param incident_ir: Windowed incident impulse response ``hi(t)``, real.
-    :param reflected_ir: Windowed reflected impulse response ``hr(t)``, real.
+        Accepts a :class:`phonometry.io.Signal`, whose calibration is
+        applied to the samples and then cancels: what is read off the pair
+        is the ratio of their transfer functions, so a factor the two share
+        divides out.
+    :param reflected_ir: Windowed reflected impulse response ``hr(t)``,
+        real. Same treatment as ``incident_ir``; two Signals recorded at
+        different rates are refused rather than arbitrated.
     :param source_height: Source-to-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-plane distance ``dm``, in metres.
     :param incidence_angle: Incidence angle ``theta``, in radians.
@@ -494,7 +503,13 @@ def insitu_absorption_coefficient(
     (Clause 4.1).
 
     :param incident_ir: Windowed incident impulse response ``hi(t)``, real.
-    :param reflected_ir: Windowed reflected impulse response ``hr(t)``, real.
+        Accepts a :class:`phonometry.io.Signal`, whose calibration is
+        applied to the samples and then cancels: what is read off the pair
+        is the ratio of their transfer functions, so a factor the two share
+        divides out.
+    :param reflected_ir: Windowed reflected impulse response ``hr(t)``,
+        real. Same treatment as ``incident_ir``; two Signals recorded at
+        different rates are refused rather than arbitrated.
     :param source_height: Source-to-plane distance ``ds``, in metres.
     :param mic_height: Microphone-to-plane distance ``dm``, in metres.
     :param incidence_angle: Incidence angle ``theta``, in radians (0 = normal).
@@ -675,6 +690,9 @@ def insitu_absorption_spectrum(
         off the pair is the ratio of their transfer functions, so a factor
         the two share divides out.
     :param reflected_ir: Windowed reflected-path impulse response ``hr``.
+        Same treatment as ``incident_ir``: its calibration is applied too,
+        which is what makes the shared factor cancel rather than skew the
+        ratio.
     :param fs: Sampling frequency, in hertz. Required when both records are
         bare arrays; either may be a :class:`~phonometry.io.Signal` and
         supply it, and two Signals recorded at different rates are refused

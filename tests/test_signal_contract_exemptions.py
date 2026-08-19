@@ -288,13 +288,13 @@ def test_the_calibrator_take_gets_its_validation_from_the_object() -> None:
     same short take passed as a bare array reaches no check at all.
     """
     short = _record(seconds=0.5)
+    take = Signal(short, FS)
     with pytest.warns(UserWarning, match="too short to validate"):
-        from_object = sensitivity(Signal(short, FS))
+        from_object = sensitivity(take)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         unvalidated = sensitivity(short)
     assert from_object == pytest.approx(unvalidated)
-    take = Signal(short, FS)
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
         sensitivity(take, fs=FS + 1)
 
