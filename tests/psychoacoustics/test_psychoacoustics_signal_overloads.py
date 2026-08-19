@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from signal_contract import assert_same
 
 from phonometry.io import Signal
 from phonometry.psychoacoustics import (
@@ -49,7 +50,6 @@ from phonometry.psychoacoustics import (
     tonality_ecma,
     tone_to_noise_ratio,
 )
-from tests.signal_contract import assert_same
 
 FS = 48000
 CAL = 4.0
