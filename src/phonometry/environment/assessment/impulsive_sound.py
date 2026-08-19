@@ -581,7 +581,11 @@ def sound_pressure_level_history(
     floor = np.finfo(np.float64).tiny
     levels = 10.0 * np.log10(np.maximum(sampled, floor) / reference_pressure**2) + calibration_offset
     times = idx / fs
-    return LevelHistory(times=times, levels=levels, dt=float(dt))
+    # The realised interval, not the target: the step is quantised to whole
+    # samples, so storing the request would put a dt in the result that its
+    # own times disagree with.
+    realised = float(times[1] - times[0]) if times.size > 1 else float(dt)
+    return LevelHistory(times=times, levels=levels, dt=realised)
 
 
 def _equivalent_level(

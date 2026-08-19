@@ -200,3 +200,91 @@ def test_a_bare_array_still_gets_the_bare_envelope() -> None:
     assert isinstance(out, np.ndarray)
     out /= float(np.max(out))  # in place, which a frozen result cannot do
     assert np.isclose(np.max(out), 1.0)
+
+
+def test_the_object_forms_of_the_filters_wrap_too() -> None:
+    """The class API and the function must not disagree about a recording.
+
+    ``WeightingFilter.filter`` and ``ParametricEQ.filter`` are what the
+    functions delegate to, so a Signal handed to either has to come back the
+    same way. Before this they dropped the rate on the class path only.
+    """
+    from phonometry.filters import ParametricEQ, WeightingFilter
+
+    sig = Signal(_RECORD, FS, calibration_factor=CAL)
+    weighted = WeightingFilter(FS, "A").filter(sig)
+    assert isinstance(weighted, Signal)
+    assert weighted.calibration_factor == 1.0
+    assert np.array_equal(np.asarray(weighted), np.asarray(weighting_filter(sig, curve="A")))
+
+    equalized = ParametricEQ(FS, _sections()).filter(sig)
+    assert isinstance(equalized, Signal)
+    assert equalized.calibration_factor == 1.0
+
+    assert isinstance(WeightingFilter(FS, "A").filter(_RECORD), np.ndarray)
+
+
+def test_the_envelope_reaches_ndarray_methods_through_asarray() -> None:
+    """The boundary of what the result stands in for, stated and pinned.
+
+    It forwards the array protocol and the geometry attributes, which is the
+    same boundary :class:`~phonometry.room.ImpulseResponseResult` draws, so
+    ``.mean()`` and the rest of the ndarray methods are reached through
+    :func:`numpy.asarray` rather than off the object.
+    """
+    from phonometry.filters import time_weighting
+
+    out = time_weighting(Signal(_RECORD, FS), mode="fast")
+    assert not hasattr(out, "mean")
+    assert np.asarray(out).mean() == pytest.approx(
+        time_weighting(_RECORD, FS, mode="fast").mean()
+    )
+
+
+def test_the_envelope_plot_says_which_quantity_it_drew() -> None:
+    """Both branches of the renderer, and neither claims to be an L_pAF.
+
+    Time weighting alone is not A-weighting: the level is ``L_pAF`` only
+    when the record was A-weighted first, and an uncalibrated record has no
+    reference to count decibels from at all.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry.filters import time_weighting
+
+    calibrated = time_weighting(
+        Signal(_RECORD, FS, calibration_factor=CAL), mode="fast"
+    ).plot()
+    assert calibrated.get_ylabel() == "Sound pressure level [dB re 20 uPa]"
+    assert "Fast" in calibrated.get_title()
+
+    plain = time_weighting(Signal(_RECORD, FS), mode="slow").plot()
+    assert "FS" in plain.get_ylabel()
+    assert "dB" not in plain.get_ylabel()
+
+
+def test_the_envelope_plot_labels_each_channel() -> None:
+    """The multichannel branch, which the single-channel cases never reach."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry.filters import time_weighting
+
+    stereo = Signal(np.stack([_RECORD, 2.0 * _RECORD]), FS, calibration_factor=CAL)
+    axes = time_weighting(stereo, mode="fast").plot()
+    assert len(axes.get_lines()) == 2
+    assert axes.get_legend() is not None
+
+
+def test_the_envelope_plot_is_translated() -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    from phonometry.filters import time_weighting
+
+    axes = time_weighting(
+        Signal(_RECORD, FS, calibration_factor=CAL), mode="fast"
+    ).plot(language="es")
+    assert axes.get_ylabel().startswith("Nivel de presión sonora")
+    assert axes.get_xlabel() == "Tiempo [s]"

@@ -25,6 +25,7 @@ the library expects from a bare array.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -227,8 +228,13 @@ class Signal:
             raise ValueError(f"'tmin' must not be negative; got {start}")
         if stop <= start:
             raise ValueError(f"'tmax' ({stop}) must be greater than 'tmin' ({start})")
-        first = round(start * self.fs)
-        last = min(round(stop * self.fs), self.data.shape[1])
+        # Ceiling, not rounding: the span is half-open, so a sample belongs
+        # to it when tmin <= i/fs < tmax, which is i >= tmin*fs. Rounding
+        # would pull in the sample just before tmin whenever the edge falls
+        # in the first half of a sample period. The rounding to nanoseconds
+        # is for the products that land on 2.9999999999999996 rather than 3.
+        first = math.ceil(round(start * self.fs, 9))
+        last = min(math.ceil(round(stop * self.fs, 9)), self.data.shape[1])
         if first >= last:
             raise ValueError(
                 f"the span [{start}, {stop}) s holds no samples at {self.fs} Hz"
@@ -254,9 +260,13 @@ class Signal:
 
         Draws each channel's time-domain waveform; with a
         ``calibration_factor`` the amplitude axis is in pascals, otherwise
-        in digital full-scale units. ``scale="db"`` draws the level against
-        20 uPa instead, which is the trace a sound level meter shows, and
-        needs a calibrated record to mean anything. Requires matplotlib
+        in digital full-scale units. ``scale="db"`` draws the magnitude of
+        each sample as ``20 lg(|p| / 20 uPa)`` instead, which needs a
+        calibrated record to mean anything. That is a waveform in decibels
+        and not a sound pressure level: an ``L_p`` is defined on a mean
+        square over a stated time weighting, and
+        :func:`~phonometry.filters.time_weighting` is what produces one.
+        Requires matplotlib
         (``pip install phonometry[plot]``); returns the
         :class:`~matplotlib.axes.Axes`.
         """

@@ -325,7 +325,9 @@ class WeightingFilter:
         """Check whether ``zi`` must be (re)allocated for *x_proc*."""
         return _sos_state_mismatch(self.zi, x_proc)
 
-    def filter(self, x: Signal | list[float] | np.ndarray) -> np.ndarray:
+    def filter(
+        self, x: Signal | list[float] | np.ndarray
+    ) -> Signal | np.ndarray:
         """
         Apply the weighting filter to a signal.
 
@@ -335,13 +337,16 @@ class WeightingFilter:
             weighted by the wrong response; a calibrated one is weighted in
             pascals, exactly as :func:`weighting_filter` does, so the two
             entry points cannot disagree about the same recording.
-        :return: Weighted signal.
+        :return: The weighted record. A bare array in gives a bare array
+            back; a :class:`~phonometry.io.Signal` gives a Signal, on the
+            same terms as :func:`weighting_filter`, so the object and the
+            function cannot disagree about the same recording.
         :raises ValueError: If a Signal's rate is not this filter's.
         """
         refuse_foreign_rate(x, self.fs, "weighting filter")
         x_proc = resolve_samples(x)
         if self.curve == "Z":
-            return x_proc
+            return like_input(x, x_proc)
 
         if self.stateful:
             if self._needs_zi_reinit(x_proc):
@@ -349,14 +354,14 @@ class WeightingFilter:
             y, self.zi = signal.sosfilt(self.sos, x_proc, axis=-1, zi=self.zi)
         elif self._oversample > 1:
             if x_proc.shape[-1] == 0:
-                return x_proc  # resample_poly rejects empty input
+                return like_input(x, x_proc)  # resample_poly rejects empty input
             up = signal.resample_poly(x_proc, self._oversample, 1, axis=-1)
             y_up = signal.sosfilt(self.sos, up, axis=-1)
             y = signal.resample_poly(y_up, 1, self._oversample, axis=-1)
         else:
             y = signal.sosfilt(self.sos, x_proc, axis=-1)
 
-        return cast(np.ndarray, y)
+        return like_input(x, cast(np.ndarray, y))
 
 
 def _resample_poly_fir(rate: int) -> np.ndarray:
@@ -538,10 +543,12 @@ class TimeWeightedEnvelope:
     ) -> Axes:
         """Plot the level trace this envelope stands for.
 
-        Draws ``10 lg(mean square / p0^2)`` against time, which is the
-        ``L_pAF``-style trace a sound level meter shows when the record was
-        A-weighted first. Needs a calibrated record to mean dB SPL, and says
-        so rather than drawing a number counted from nothing.
+        Draws ``10 lg(mean square / p0^2)`` against time. That is a
+        time-weighted sound pressure level, and it is ``L_pAF`` only when
+        the record was A-weighted before it got here: this function applies
+        the time weighting and nothing else. Needs a calibrated record to
+        mean dB SPL, and says so rather than drawing a number counted from
+        nothing.
         """
         from .._i18n import check_language
         from .._plot.filters import plot_time_weighted_envelope
@@ -590,11 +597,15 @@ def weighting_filter(
         infrasound), 'AU' (IEC 61012) or 'Z' (bypass).
     :param high_accuracy: Use internal oversampling for IEC 61672-1 class 1
         accuracy at high frequencies (default True).
-    :return: Weighted signal.
+    :return: The weighted record. A bare array in gives a bare array back; a
+        :class:`~phonometry.io.Signal` gives a Signal, whose samples are
+        already in pascals and whose factor therefore reads 1.0.
     """
     fs = resolve_fs(x, fs)
     wf = _cached_weighting_filter(fs, curve, high_accuracy)
-    return like_input(x, wf.filter(resolve_samples(x)))
+    # The object form wraps for itself now, so hand it the caller's input
+    # rather than the resolved samples: doing both would wrap twice.
+    return wf.filter(x)
 
 
 def _prepare_time_weighting_initial_state(

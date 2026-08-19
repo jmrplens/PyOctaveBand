@@ -173,10 +173,12 @@ TimeWeightedEnvelope.plot(
 
 Plot the level trace this envelope stands for.
 
-Draws `10 lg(mean square / p0^2)` against time, which is the
-`L_pAF`-style trace a sound level meter shows when the record was
-A-weighted first. Needs a calibrated record to mean dB SPL, and says
-so rather than drawing a number counted from nothing.
+Draws `10 lg(mean square / p0^2)` against time. That is a
+time-weighted sound pressure level, and it is `L_pAF` only when
+the record was A-weighted before it got here: this function applies
+the time weighting and nothing else. Needs a calibrated record to
+mean dB SPL, and says so rather than drawing a number counted from
+nothing.
 
 ### TimeWeightedEnvelope.shape
 
@@ -283,7 +285,7 @@ Apply a frequency weighting to a signal.
 | `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012) or 'Z' (bypass). |
 | `high_accuracy` | Use internal oversampling for IEC 61672-1 class 1 accuracy at high frequencies (default True). |
 
-**Returns:** Weighted signal.
+**Returns:** The weighted record. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a Signal, whose samples are already in pascals and whose factor therefore reads 1.0.
 
 ## WeightingFilter
 
@@ -315,7 +317,9 @@ Initialize the weighting filter.
 ### WeightingFilter.filter()
 
 ```python
-WeightingFilter.filter(x: Signal | list[float] | np.ndarray) -> np.ndarray
+WeightingFilter.filter(
+    x: Signal | list[float] | np.ndarray,
+) -> Signal | np.ndarray
 ```
 
 Apply the weighting filter to a signal.
@@ -326,7 +330,7 @@ Apply the weighting filter to a signal.
 | :--- | :--- |
 | `x` | Input signal (1D or 2D [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal recorded at another rate than this filter was designed for is refused rather than weighted by the wrong response; a calibrated one is weighted in pascals, exactly as [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter) does, so the two entry points cannot disagree about the same recording. |
 
-**Returns:** Weighted signal.
+**Returns:** The weighted record. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a Signal, on the same terms as [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter), so the object and the function cannot disagree about the same recording.
 
 **Raises**
 

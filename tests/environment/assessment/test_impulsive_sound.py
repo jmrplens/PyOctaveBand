@@ -346,3 +346,20 @@ def test_the_level_history_draws_its_own_trace() -> None:
     axes = iso.sound_pressure_level_history(signal, FS, dt=0.02).plot()
     assert "dB" in axes.get_ylabel()
     assert axes.get_xlabel().startswith("Time")
+
+
+def test_the_history_reports_the_interval_it_actually_used() -> None:
+    """``dt`` has to be the spacing of ``times``, not the interval requested.
+
+    The step is quantised to whole samples, so a target that is not an
+    integer number of them cannot be honoured exactly. Measured before this
+    was fixed: at 44,1 kHz with ``dt=0.021`` the result reported 0.021 while
+    its own times were 0.020997732 apart.
+    """
+    rng = np.random.default_rng(0)
+    odd_fs = 44_100
+    result = iso.sound_pressure_level_history(
+        0.01 * rng.standard_normal(odd_fs), odd_fs, dt=0.021
+    )
+    assert result.dt == pytest.approx(float(result.times[1] - result.times[0]))
+    assert result.dt != pytest.approx(0.021, abs=1e-9)

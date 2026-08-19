@@ -528,9 +528,13 @@ Plot the waveform, calibrated to pascals when a calibration is set.
 
 Draws each channel's time-domain waveform; with a
 `calibration_factor` the amplitude axis is in pascals, otherwise
-in digital full-scale units. `scale="db"` draws the level against
-20 uPa instead, which is the trace a sound level meter shows, and
-needs a calibrated record to mean anything. Requires matplotlib
+in digital full-scale units. `scale="db"` draws the magnitude of
+each sample as `20 lg(|p| / 20 uPa)` instead, which needs a
+calibrated record to mean anything. That is a waveform in decibels
+and not a sound pressure level: an `L_p` is defined on a mean
+square over a stated time weighting, and
+[`time_weighting`](/phonometry/reference/api/filters/weighting/#time_weighting) is what produces one.
+Requires matplotlib
 (`pip install phonometry[plot]`); returns the
 `Axes`.
 

@@ -21,6 +21,7 @@ _TIME_LABEL = "Time [s]"
 _STRINGS: dict[str, str] = {
     _TIME_LABEL: "Tiempo [s]",
     "Sound pressure [Pa]": "Presión sonora [Pa]",
+    "Sound pressure [dB re 20 uPa]": "Presión sonora [dB re 20 uPa]",
     "Amplitude [FS]": "Amplitud [FS]",
     "Calibrated waveform": "Forma de onda calibrada",
     "Waveform": "Forma de onda",
@@ -51,8 +52,12 @@ def plot_signal(
     :param ax: Existing axes to draw on, or ``None`` for a fresh figure.
     :param language: Label language, ``"en"`` (default) or ``"es"``.
     :param scale: ``"linear"`` (default) draws the waveform; ``"db"`` draws
-        its level against 20 uPa, which is the trace a sound level meter
-        shows and needs a calibrated Signal to mean anything.
+        the magnitude of each sample as ``20 lg(|p| / 20 uPa)``, which needs
+        a calibrated Signal to mean anything. That is a waveform in
+        decibels and NOT a sound pressure level: an ``L_p`` is defined on a
+        mean square over a stated time weighting, which is what
+        :func:`~phonometry.filters.time_weighting` produces and what its
+        result plots.
     :param kwargs: Forwarded to every channel's ``plot`` call.
     :return: The axes drawn on.
     """
@@ -97,7 +102,7 @@ def plot_signal(
         axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     axw.set_xlabel(_t(_TIME_LABEL, language))
     if scale == "db":
-        axw.set_ylabel(_t("Sound pressure level [dB re 20 uPa]", language))
+        axw.set_ylabel(_t("Sound pressure [dB re 20 uPa]", language))
     else:
         axw.set_ylabel(_t(
             "Sound pressure [Pa]" if calibrated else "Amplitude [FS]", language

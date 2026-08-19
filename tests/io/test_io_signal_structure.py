@@ -127,3 +127,45 @@ def test_an_unknown_scale_is_refused_by_name() -> None:
     one = _stereo().pick(0)
     with pytest.raises(ValueError, match="scale must be"):
         one.plot(scale="log")
+
+
+def test_crop_excludes_the_sample_before_the_start() -> None:
+    """The half-open convention, at the edge where rounding got it wrong.
+
+    Measured before the fix: at 10 Hz, ``crop(0.01, 0.15)`` returned the
+    sample at t = 0.0, which is before ``tmin``, because the edge was
+    rounded to the nearest sample instead of taken as a lower bound.
+    """
+    ramp = Signal(np.arange(20, dtype=float), 10)
+    assert np.array_equal(np.asarray(ramp.crop(0.01, 0.15)), [1.0])
+    assert np.array_equal(np.asarray(ramp.crop(0.0, 0.5)), [0.0, 1.0, 2.0, 3.0, 4.0])
+
+
+def test_crop_keeps_an_edge_that_lands_exactly_on_a_sample() -> None:
+    """The other half of the convention: tmin is included, tmax is not."""
+    ramp = Signal(np.arange(10, dtype=float), 10)
+    assert np.array_equal(np.asarray(ramp.crop(0.2, 0.5)), [2.0, 3.0, 4.0])
+
+
+def test_the_decibel_waveform_is_not_called_a_level() -> None:
+    """It is 20 lg|p| per sample, which is a waveform in dB and not an L_p.
+
+    An L_p is defined on a mean square over a stated time weighting. The
+    axis says sound pressure in decibels, and the level trace lives on
+    :class:`~phonometry.filters.TimeWeightedEnvelope` instead.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    axes = _stereo().pick(0).plot(scale="db")
+    assert axes.get_ylabel() == "Sound pressure [dB re 20 uPa]"
+    assert "level" not in axes.get_ylabel().lower()
+
+
+def test_the_decibel_axis_is_translated() -> None:
+    """Every fixed string this package draws has a Spanish counterpart."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    axes = _stereo().pick(0).plot(scale="db", language="es")
+    assert axes.get_ylabel() == "Presión sonora [dB re 20 uPa]"
