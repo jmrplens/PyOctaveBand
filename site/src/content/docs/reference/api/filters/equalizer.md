@@ -144,8 +144,15 @@ One biquad of the RBJ Audio EQ Cookbook.
 
 ```python
 parametric_eq(
-    x: Signal | list[float] | np.ndarray,
-    fs: float | None = None,
+    x: Signal,
+    fs: float | None = ...,
+    *,
+    sections: EQSection | Sequence[EQSection],
+) -> Signal
+
+parametric_eq(
+    x: list[float] | np.ndarray,
+    fs: float,
     *,
     sections: EQSection | Sequence[EQSection],
 ) -> np.ndarray
@@ -195,7 +202,9 @@ series as a numerically robust SOS cascade, following the house style of
 ### ParametricEQ.filter()
 
 ```python
-ParametricEQ.filter(x: Signal | list[float] | np.ndarray) -> np.ndarray
+ParametricEQ.filter(
+    x: Signal | list[float] | np.ndarray,
+) -> Signal | np.ndarray
 ```
 
 Apply the EQ cascade to a signal.
@@ -206,7 +215,7 @@ Apply the EQ cascade to a signal.
 | :--- | :--- |
 | `x` | Input signal (1D or 2D `[channels, samples]`), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal whose rate disagrees with the one this cascade was designed for is refused; a calibrated one is equalized in pascals. |
 
-**Returns:** Equalized signal.
+**Returns:** The equalized record. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a Signal, on the same terms as [`parametric_eq`](/phonometry/reference/api/filters/equalizer/#parametric_eq).
 
 **Raises**
 

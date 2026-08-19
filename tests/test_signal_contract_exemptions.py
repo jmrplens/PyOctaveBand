@@ -61,6 +61,7 @@ from phonometry.underwater import (
     strike_sel_spectrum,
 )
 from phonometry.vibration import (
+    apply_weighting,
     running_rms,
     spinal_response,
     vibration_dose_value,
@@ -96,6 +97,7 @@ IN_PASCALS_IDS = [f.__name__ for f, _, _ in IN_PASCALS]
 
 @pytest.mark.parametrize(("func", "record", "kwargs"), IN_PASCALS, ids=IN_PASCALS_IDS)
 def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> None:
+    """A calibrated Signal reads the same as the samples already in pascals."""
     assert_same(
         func(Signal(record, FS, calibration_factor=CAL), **kwargs),
         func(CAL * record, FS, **kwargs),
@@ -106,6 +108,7 @@ def test_a_calibrated_signal_is_analysed_in_pascals(func, record, kwargs) -> Non
 def test_an_uncalibrated_signal_computes_the_bare_array_result(
     func, record, kwargs
 ) -> None:
+    """With no factor to apply, the object and the bare array agree."""
     assert_same(func(Signal(record, FS), **kwargs), func(record, FS, **kwargs))
 
 
@@ -224,6 +227,7 @@ def test_a_full_scale_reading_never_sees_the_calibration(func, kwargs) -> None:
 
 @pytest.mark.parametrize(("func", "kwargs"), FULL_SCALE, ids=FULL_SCALE_IDS)
 def test_a_full_scale_reading_still_resolves_the_rate(func, kwargs) -> None:
+    """Exempt from the calibration, not from the rate: it still takes one."""
     sig = Signal(_RECORD, FS)
     assert_same(func(sig, **kwargs), func(_RECORD, FS, **kwargs))
     with pytest.raises(ValueError, match="conflicts with the Signal's own fs"):
@@ -237,6 +241,7 @@ def test_a_full_scale_reading_still_resolves_the_rate(func, kwargs) -> None:
 # ---------------------------------------------------------------------------
 
 NOT_PRESSURE = [
+    (apply_weighting, {"name": "Wk"}),
     (running_rms, {}),
     (vibration_dose_value, {}),
     (spinal_response, {}),
@@ -257,6 +262,7 @@ def test_a_non_pressure_record_never_sees_the_calibration(func, kwargs) -> None:
 
 @pytest.mark.parametrize(("func", "kwargs"), NOT_PRESSURE, ids=NOT_PRESSURE_IDS)
 def test_a_non_pressure_record_still_resolves_the_rate(func, kwargs) -> None:
+    """An acceleration is not a pressure, and it still needs a sample rate."""
     sig = Signal(_RECORD, FS)
     assert_same(func(sig, **kwargs), func(_RECORD, FS, **kwargs))
     with pytest.raises(ValueError, match="conflicts with the Signal's own"):
@@ -300,4 +306,5 @@ def test_the_calibrator_take_gets_its_validation_from_the_object() -> None:
 
 
 def test_a_calibrator_take_without_a_rate_is_still_a_legal_call() -> None:
+    """The function that derives the factor cannot be asked to apply one."""
     assert sensitivity(_SHORT) > 0.0

@@ -15,7 +15,12 @@ from scipy import signal
 
 from .._internal.utils import _downsamplingfactor, _resample_to_length
 from .._internal.warnings import PhonometryWarning
-from ..io._resolve import refuse_foreign_rate, resolve_fs, resolve_samples
+from ..io._resolve import (
+    like_input,
+    refuse_foreign_rate,
+    resolve_fs,
+    resolve_samples,
+)
 from ..io._signal import Signal
 from .design import _cheby2_headroom, _design_sos_filter
 from .frequencies import _genfreqs
@@ -271,7 +276,7 @@ class OctaveFilterBank:
         calculate_level: Literal[True] = True,
         nominal: Literal[False] = False,
         zero_phase: bool = False,
-    ) -> tuple[np.ndarray, list[float], list[np.ndarray]]: ...
+    ) -> tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]]: ...
 
     @overload
     def filter(
@@ -295,7 +300,7 @@ class OctaveFilterBank:
         calculate_level: Literal[False] = False,
         nominal: Literal[False] = False,
         zero_phase: bool = False,
-    ) -> tuple[None, list[float], list[np.ndarray]]: ...
+    ) -> tuple[None, list[float], list[Signal] | list[np.ndarray]]: ...
 
     @overload
     def filter(
@@ -319,7 +324,7 @@ class OctaveFilterBank:
         calculate_level: Literal[True] = True,
         nominal: Literal[True] = ...,
         zero_phase: bool = False,
-    ) -> tuple[np.ndarray, list[str], list[np.ndarray]]: ...
+    ) -> tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]: ...
 
     @overload
     def filter(
@@ -343,7 +348,7 @@ class OctaveFilterBank:
         calculate_level: Literal[False] = False,
         nominal: Literal[True] = ...,
         zero_phase: bool = False,
-    ) -> tuple[None, list[str], list[np.ndarray]]: ...
+    ) -> tuple[None, list[str], list[Signal] | list[np.ndarray]]: ...
 
     def filter(
         self,
@@ -354,7 +359,14 @@ class OctaveFilterBank:
         calculate_level: bool = True,
         nominal: bool = False,
         zero_phase: bool = False,
-    ) -> tuple[np.ndarray | None, list[float] | list[str]] | tuple[np.ndarray | None, list[float] | list[str], list[np.ndarray]]:
+    ) -> (
+        tuple[np.ndarray | None, list[float] | list[str]]
+        | tuple[
+            np.ndarray | None,
+            list[float] | list[str],
+            list[Signal] | list[np.ndarray],
+        ]
+    ):
         """
         Apply the pre-designed filter bank to a signal.
 
@@ -407,6 +419,16 @@ class OctaveFilterBank:
         freq_out: list[float] | list[str] = list(self.nominal_freq) if nominal else list(self.freq)
 
         if sigbands and xb is not None:
+            # The band waveforms are pressure records and come back as
+            # Signals, but only when this bank read the object's calibration
+            # in the first place. A dBFS bank, or one carrying a calibration
+            # of its own, filtered digital units: handing those back as a
+            # Signal would label them pascals. See _default_calibration.
+            if isinstance(x, Signal) and self._default_calibration:
+                bands: list[Signal] = [
+                    like_input(x, band, fs=self.fs) for band in xb
+                ]
+                return spl, freq_out, bands
             return spl, freq_out, xb
         return spl, freq_out
 
@@ -674,7 +696,7 @@ def octave_filter(
     design: FilterDesign = _DEFAULT_DESIGN,
     calibration: LevelCalibration = _DEFAULT_CALIBRATION,
     response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
-) -> tuple[np.ndarray, list[float], list[np.ndarray]]: ...
+) -> tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]]: ...
 
 
 @overload
@@ -710,7 +732,7 @@ def octave_filter(
     design: FilterDesign = _DEFAULT_DESIGN,
     calibration: LevelCalibration = _DEFAULT_CALIBRATION,
     response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
-) -> tuple[np.ndarray, list[str], list[np.ndarray]]: ...
+) -> tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]: ...
 
 
 def octave_filter(
@@ -727,7 +749,7 @@ def octave_filter(
     design: FilterDesign = _DEFAULT_DESIGN,
     calibration: LevelCalibration = _DEFAULT_CALIBRATION,
     response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
-) -> tuple[np.ndarray, list[float]] | tuple[np.ndarray, list[str]] | tuple[np.ndarray, list[float], list[np.ndarray]] | tuple[np.ndarray, list[str], list[np.ndarray]]:
+) -> tuple[np.ndarray, list[float]] | tuple[np.ndarray, list[str]] | tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]] | tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]:
     """
     Filter a signal with octave or fractional octave filter bank.
 

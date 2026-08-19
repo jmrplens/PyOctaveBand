@@ -48,6 +48,7 @@ The rules, identical everywhere:
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import overload
 
 import numpy as np
 
@@ -208,6 +209,56 @@ def apply_calibration(x: SignalInput, samples: np.ndarray) -> np.ndarray:
     if isinstance(x, Signal) and x.calibration_factor is not None:
         return samples * x.calibration_factor
     return samples
+
+
+@overload
+def like_input(x: Signal, samples: np.ndarray, fs: int | None = ...) -> Signal: ...
+
+
+@overload
+def like_input(
+    x: Sequence[float] | np.ndarray, samples: np.ndarray, fs: int | None = ...
+) -> np.ndarray: ...
+
+
+def like_input(
+    x: SignalInput, samples: np.ndarray, fs: int | None = None
+) -> Signal | np.ndarray:
+    """Hand the samples back as a Signal when they arrived as one.
+
+    The return side of the contract, and the mirror of
+    :func:`resolve_samples`. A transform whose output is itself a record of
+    pressure gives back a :class:`~phonometry.io.Signal` when it was given
+    one, so a chain of them keeps the rate and the calibration instead of
+    dropping them at the first step; a bare array in still gives a bare
+    array out, so nothing that passes arrays today changes.
+
+    The factor is the whole risk. A calibrated Signal presents its samples
+    in pascals, so *samples* has ALREADY been scaled: carrying the input's
+    factor forward would have every function downstream scale it a second
+    time, which is a silent offset of ``20 lg(factor)`` through the 49
+    sites that apply one, and it survives to disk because
+    :func:`phonometry.io.write` stamps the factor into the sidecar. The
+    returned object therefore says ``1.0``, meaning calibrated with the
+    conversion already done, and ``None`` when the input had no calibration
+    to begin with, because the object never invents one.
+
+    :param x: The signal argument as the caller received it.
+    :param samples: The samples the transform computed from it.
+    :param fs: The rate of *samples* when the transform changed it; by
+        default the input's own rate.
+    :return: A Signal when *x* was one, otherwise *samples* unchanged.
+    """
+    if not isinstance(x, Signal):
+        return samples
+    return Signal(
+        data=samples,
+        fs=x.fs if fs is None else fs,
+        calibration_factor=1.0 if x.calibration_factor is not None else None,
+        channel_labels=x.channel_labels,
+        provenance=x.provenance,
+        source=x.source,
+    )
 
 
 def _agreed_pair(

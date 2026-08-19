@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
     from ..filters.compliance import FilterComplianceResult
     from ..filters.equalizer import EQResponseResult
+    from ..filters.weighting import TimeWeightedEnvelope
 
 from .common import (
     _C_MUTED,
@@ -62,6 +63,14 @@ _STRINGS: dict[str, str] = {
     "bandpass_skirt": "paso banda (faldón)",
     "notch": "muesca",
     "allpass": "paso todo",
+    "Channel {n}": "Canal {n}",
+    "Time [s]": "Tiempo [s]",
+    "Sound pressure level [dB re 20 uPa]": "Nivel de presión sonora [dB re 20 uPa]",
+    "Mean square [FS²]": "Media cuadrática [FS²]",
+    "{mode} time-weighted level": "Nivel con ponderación temporal {mode}",
+    "fast": "rápida",
+    "slow": "lenta",
+    "impulse": "impulsiva",
 }
 
 
@@ -291,3 +300,72 @@ def plot_parametric_eq(
         format_frequency_axis(axf, fmin, fmax, language=language)
         localize_axes(axf, language)
     return axes
+
+
+def plot_time_weighted_envelope(
+    result: TimeWeightedEnvelope,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
+    """The level trace of a :class:`~phonometry.filters.TimeWeightedEnvelope`.
+
+    Draws ``10 lg(mean square / p0^2)`` against time, which is the trace a
+    sound level meter shows: A-weight the record first and this is
+    ``L_pAF``. An uncalibrated record has no reference to count decibels
+    from, so its mean square is drawn as it is and the axis says so rather
+    than implying a sound pressure level.
+
+    :param result: A :class:`~phonometry.filters.TimeWeightedEnvelope`.
+    :param ax: Existing axes to draw on, or ``None`` for a fresh figure.
+    :param language: Label language, ``"en"`` (default) or ``"es"``.
+    :param kwargs: Forwarded to every channel's ``plot`` call.
+    :return: The axes drawn on.
+    """
+    from .._i18n import localize_axes
+
+    # Deferred, not tidiness: signals.levels imports io, which imports this
+    # tree, so reaching for the reference pressure at module level is an
+    # import cycle that the package whitelist test cannot see.
+    from ..signals.levels import _REF_PRESSURE
+
+    envelope = np.atleast_2d(np.asarray(result.mean_square, dtype=np.float64))
+    if result.calibrated:
+        with np.errstate(divide="ignore"):
+            y = 10.0 * np.log10(envelope / _REF_PRESSURE**2)
+    else:
+        y = envelope
+
+    new_figure = ax is None
+    axw = _new_axes() if ax is None else ax
+    kwargs.setdefault("lw", 0.9)
+    if envelope.shape[0] == 1:
+        kwargs.setdefault("color", _C_PRIMARY)
+        axw.plot(result.times, y[0], **kwargs)
+    else:
+        for index, channel in enumerate(y):
+            # setdefault, not label=: `label` is an ordinary matplotlib
+            # keyword, so a caller who passes one through **kwargs would
+            # otherwise hit "got multiple values for keyword argument
+            # 'label'". Theirs wins.
+            per_channel = dict(kwargs)
+            per_channel.setdefault(
+                "label", _t("Channel {n}", language, n=index + 1)
+            )
+            axw.plot(result.times, channel, **per_channel)
+        axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+    axw.set_xlabel(_t("Time [s]", language))
+    axw.set_ylabel(_t(
+        "Sound pressure level [dB re 20 uPa]" if result.calibrated
+        else "Mean square [FS\u00b2]",
+        language,
+    ))
+    axw.grid(True, alpha=0.3)
+    if new_figure:
+        axw.set_title(_t(
+            "{mode} time-weighted level", language,
+            mode=_t(result.mode, language).capitalize(),
+        ))
+    localize_axes(axw, language)
+    return axw

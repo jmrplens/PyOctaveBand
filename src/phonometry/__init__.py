@@ -545,6 +545,7 @@ from .environment.assessment.impulsive_sound import (
     ImpulseProminenceWarning,
     ImpulsiveSoundResult,
     ImpulsiveSoundWarning,
+    LevelHistory,
     detect_onsets,
     impulse_adjustment,
     impulse_prominence,
@@ -753,6 +754,7 @@ from .filters.frequencies import (
     normalized_frequencies,
 )
 from .filters.weighting import (
+    TimeWeightedEnvelope,
     TimeWeighting,
     WeightingFilter,
     linkwitz_riley,
@@ -1917,6 +1919,7 @@ __all__ = [
     "LayeredAbsorberResult",
     "LevelCalibration",
     "LevelCrossingResult",
+    "LevelHistory",
     "LifterResult",
     "LiningImprovementResult",
     "LossyCompressionWarning",
@@ -2073,6 +2076,7 @@ __all__ = [
     "TaskContribution",
     "TerrainScreeningResult",
     "TimeDelayResult",
+    "TimeWeightedEnvelope",
     "TimeWeighting",
     "TonalAssessmentResult",
     "TonalCorrectionResult",

@@ -51,11 +51,19 @@ frequency from 50 Hz to 10 kHz except 1600 Hz (0.15 dB) and 2500 Hz
 
 ```python
 linkwitz_riley(
-    x: Signal | list[float] | np.ndarray,
-    fs: int | None = None,
+    x: Signal,
+    fs: int | None = ...,
     *,
     freq: float,
-    order: int = 4,
+    order: int = ...,
+) -> tuple[Signal, Signal]
+
+linkwitz_riley(
+    x: list[float] | np.ndarray,
+    fs: int,
+    *,
+    freq: float,
+    order: int = ...,
 ) -> tuple[np.ndarray, np.ndarray]
 ```
 
@@ -77,10 +85,17 @@ Splits signal into low and high bands with flat sum response.
 
 ```python
 time_weighting(
-    x: Signal | list[float] | np.ndarray,
-    fs: int | None = None,
-    mode: str = 'fast',
-    initial_state: str | float | np.ndarray | None = None,
+    x: Signal,
+    fs: int | None = ...,
+    mode: str = ...,
+    initial_state: str | float | np.ndarray | None = ...,
+) -> TimeWeightedEnvelope
+
+time_weighting(
+    x: list[float] | np.ndarray,
+    fs: int,
+    mode: str = ...,
+    initial_state: str | float | np.ndarray | None = ...,
 ) -> np.ndarray
 ```
 
@@ -95,7 +110,93 @@ Apply time weighting to a signal (Exponential averaging).
 | `mode` | 'fast' (125ms), 'slow' (1000ms), 'impulse' (35ms rise, 1500ms fall). |
 | `initial_state` | Previous mean-square output state `y[-1]`. Use None/'zero' for zero initialization (default), 'first' to initialize from the first input energy, or a scalar/array broadcastable to the input shape without the time axis. |
 
-**Returns:** Time-weighted squared signal (sound pressure level envelope).
+**Returns:** The time-weighted mean square. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a [`TimeWeightedEnvelope`](/phonometry/reference/api/filters/weighting/#timeweightedenvelope), which stands in for that array everywhere it was used and adds the rate and a level plot. It is not a Signal, because a mean square is not a pressure record.
+
+## TimeWeightedEnvelope
+
+```python
+TimeWeightedEnvelope(
+    mean_square: np.ndarray,
+    fs: int,
+    mode: str,
+    calibrated: bool,
+)
+```
+
+The exponentially averaged mean square of a record, and its rate.
+
+What [`time_weighting`](/phonometry/reference/api/filters/weighting/#time_weighting) computes is not a waveform: it is the
+running mean SQUARE, in pascals squared when the record was calibrated,
+which is why it cannot come back as a
+[`Signal`](/phonometry/reference/api/io/io/#signal). That class means a record of pressure,
+and labelling a squared quantity as one would be the kind of quiet lie
+the calibration contract exists to prevent.
+
+What it needs instead is the rate, so the envelope can be read against a
+time axis, and a plot that knows the trace is a level. That is this
+object. It stands in for the bare array it replaced everywhere the array
+was used: `numpy.asarray`, `len()`, indexing and the
+`shape`/`ndim`/`size`/`dtype` attributes all forward to the
+envelope, so a caller that only wanted the numbers never notices.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `mean_square` | The weighted mean square, `(channels, samples)` or 1-D for one channel, in Pa2 when the record was calibrated. |
+| `fs` | Sample rate, in Hz. |
+| `mode` | The weighting used: `"fast"`, `"slow"` or `"impulse"`. |
+| `calibrated` | Whether the samples that produced it were in pascals, which is what decides whether a level read off it means dB SPL. |
+
+### TimeWeightedEnvelope.dtype
+
+*property*
+
+Data type of the envelope.
+
+### TimeWeightedEnvelope.ndim
+
+*property*
+
+Number of dimensions of the envelope.
+
+### TimeWeightedEnvelope.plot()
+
+```python
+TimeWeightedEnvelope.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the level trace this envelope stands for.
+
+Draws `10 lg(mean square / p0^2)` against time. That is a
+time-weighted sound pressure level, and it is `L_pAF` only when
+the record was A-weighted before it got here: this function applies
+the time weighting and nothing else. Needs a calibrated record to
+mean dB SPL, and says so rather than drawing a number counted from
+nothing.
+
+### TimeWeightedEnvelope.shape
+
+*property*
+
+Shape of the envelope.
+
+### TimeWeightedEnvelope.size
+
+*property*
+
+Number of values in the envelope.
+
+### TimeWeightedEnvelope.times
+
+*property*
+
+Sample times, in seconds from the start of the record.
 
 ## TimeWeighting
 
@@ -118,10 +219,20 @@ across blocks, so concatenated block outputs equal a single continuous call.
 ### TimeWeighting.process()
 
 ```python
-TimeWeighting.process(x: Signal | list[float] | np.ndarray) -> np.ndarray
+TimeWeighting.process(
+    x: Signal | list[float] | np.ndarray,
+) -> TimeWeightedEnvelope | np.ndarray
 ```
 
 Apply time weighting to a block, continuing from the previous block.
+
+The block form of [`time_weighting`](/phonometry/reference/api/filters/weighting/#time_weighting), and it returns the same
+thing on the same terms: a mean square, in pascals squared when the
+record was calibrated, wrapped in a
+[`TimeWeightedEnvelope`](/phonometry/reference/api/filters/weighting/#timeweightedenvelope) when the block arrived as a
+[`Signal`](/phonometry/reference/api/io/io/#signal) and left as a bare array otherwise.
+The envelope stands in for that array, so a loop that concatenates
+the blocks keeps working either way.
 
 **Parameters**
 
@@ -149,10 +260,17 @@ Forget the carried state (the next block starts from rest).
 
 ```python
 weighting_filter(
-    x: Signal | list[float] | np.ndarray,
-    fs: int | None = None,
-    curve: str = 'A',
-    high_accuracy: bool = True,
+    x: Signal,
+    fs: int | None = ...,
+    curve: str = ...,
+    high_accuracy: bool = ...,
+) -> Signal
+
+weighting_filter(
+    x: list[float] | np.ndarray,
+    fs: int,
+    curve: str = ...,
+    high_accuracy: bool = ...,
 ) -> np.ndarray
 ```
 
@@ -167,7 +285,7 @@ Apply a frequency weighting to a signal.
 | `curve` | 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983, historical), 'D' (withdrawn IEC 537 aircraft-noise weighting), 'G' (ISO 7196 infrasound), 'AU' (IEC 61012) or 'Z' (bypass). |
 | `high_accuracy` | Use internal oversampling for IEC 61672-1 class 1 accuracy at high frequencies (default True). |
 
-**Returns:** Weighted signal.
+**Returns:** The weighted record. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a Signal, whose samples are already in pascals and whose factor therefore reads 1.0.
 
 ## WeightingFilter
 
@@ -199,7 +317,9 @@ Initialize the weighting filter.
 ### WeightingFilter.filter()
 
 ```python
-WeightingFilter.filter(x: Signal | list[float] | np.ndarray) -> np.ndarray
+WeightingFilter.filter(
+    x: Signal | list[float] | np.ndarray,
+) -> Signal | np.ndarray
 ```
 
 Apply the weighting filter to a signal.
@@ -210,7 +330,7 @@ Apply the weighting filter to a signal.
 | :--- | :--- |
 | `x` | Input signal (1D or 2D [channels, samples]), or a [`phonometry.io.Signal`](/phonometry/reference/api/io/io/#signal). A Signal recorded at another rate than this filter was designed for is refused rather than weighted by the wrong response; a calibrated one is weighted in pascals, exactly as [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter) does, so the two entry points cannot disagree about the same recording. |
 
-**Returns:** Weighted signal.
+**Returns:** The weighted record. A bare array in gives a bare array back; a [`Signal`](/phonometry/reference/api/io/io/#signal) gives a Signal, on the same terms as [`weighting_filter`](/phonometry/reference/api/filters/weighting/#weighting_filter), so the object and the function cannot disagree about the same recording.
 
 **Raises**
 

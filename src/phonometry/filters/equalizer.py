@@ -60,13 +60,18 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 import numpy as np
 from scipy import signal
 
 from .._internal.utils import _sos_initial_state, _sos_state_mismatch
-from ..io._resolve import refuse_foreign_rate, resolve_fs, resolve_samples
+from ..io._resolve import (
+    like_input,
+    refuse_foreign_rate,
+    resolve_fs,
+    resolve_samples,
+)
 from ..io._signal import Signal
 
 if TYPE_CHECKING:
@@ -486,25 +491,31 @@ class ParametricEQ:
             self.zi = np.array([])
             self._steady_ic = steady_ic
 
-    def filter(self, x: Signal | list[float] | np.ndarray) -> np.ndarray:
+    def filter(
+        self, x: Signal | list[float] | np.ndarray
+    ) -> Signal | np.ndarray:
         """Apply the EQ cascade to a signal.
 
         :param x: Input signal (1D or 2D ``[channels, samples]``), or a
             :class:`phonometry.io.Signal`. A Signal whose rate disagrees
             with the one this cascade was designed for is refused; a
             calibrated one is equalized in pascals.
-        :return: Equalized signal.
+        :return: The equalized record. A bare array in gives a bare array
+            back; a :class:`~phonometry.io.Signal` gives a Signal, on the
+            same terms as :func:`parametric_eq`.
         :raises ValueError: If a Signal's rate is not the cascade's.
         """
         refuse_foreign_rate(x, self.fs, "EQ cascade")
         x_proc = resolve_samples(x)
         if not self.stateful:
-            return cast(np.ndarray, signal.sosfilt(self.sos, x_proc, axis=-1))
+            return like_input(
+                x, cast(np.ndarray, signal.sosfilt(self.sos, x_proc, axis=-1))
+            )
 
         if _sos_state_mismatch(self.zi, x_proc):
             self.zi = _sos_initial_state(self.sos, x_proc, self._steady_ic)
         y, self.zi = signal.sosfilt(self.sos, x_proc, axis=-1, zi=self.zi)
-        return cast(np.ndarray, y)
+        return like_input(x, cast(np.ndarray, y))
 
     def response(
         self,
@@ -553,12 +564,30 @@ class ParametricEQ:
         )
 
 
+@overload
+def parametric_eq(
+    x: Signal,
+    fs: float | None = ...,
+    *,
+    sections: EQSection | Sequence[EQSection],
+) -> Signal: ...
+
+
+@overload
+def parametric_eq(
+    x: list[float] | np.ndarray,
+    fs: float,
+    *,
+    sections: EQSection | Sequence[EQSection],
+) -> np.ndarray: ...
+
+
 def parametric_eq(
     x: Signal | list[float] | np.ndarray,
     fs: float | None = None,
     *,
     sections: EQSection | Sequence[EQSection],
-) -> np.ndarray:
+) -> Signal | np.ndarray:
     """Apply a parametric-EQ cascade to a signal (RBJ Audio EQ Cookbook).
 
     Convenience wrapper around :class:`ParametricEQ` for one-shot use.
@@ -577,4 +606,6 @@ def parametric_eq(
     :return: Equalized signal.
     """
     fs = resolve_fs(x, fs)
+    # The object form wraps for itself now: wrapping again here would
+    # rebuild a Signal around a Signal.
     return ParametricEQ(fs, sections).filter(x)

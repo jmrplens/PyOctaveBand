@@ -7,7 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `Signal.pick` and `Signal.crop` narrow a recording to a set of channels or
+  to a span of seconds and keep it a recording. Indexing a `Signal` yields its
+  samples, which is what makes it a drop-in for the array it replaced, and the
+  cost is that `sig[0]` drops the rate, the calibration factor and the channel
+  labels. These two keep all three. `crop` is half-open like a Python slice,
+  so cutting a record in two at the same instant partitions it with nothing
+  counted twice.
+
+- `Signal.plot(scale="db")` draws the magnitude of each sample as
+  `20 lg(|p| / 20 uPa)`. That is a waveform in decibels and not a sound
+  pressure level: an `L_p` is defined on a mean square over a stated time
+  weighting, which is what `time_weighting` produces and what
+  `TimeWeightedEnvelope.plot` draws. It needs a calibrated record and refuses
+  an uncalibrated one by name rather than counting decibels from nothing.
+
+- `TimeWeightedEnvelope`, returned by `time_weighting` and
+  `TimeWeighting.process` for a `Signal` input, carries the running mean
+  square with the rate, the weighting mode and whether the samples were in
+  pascals. A mean square is in pascals squared, so it could not be a `Signal`
+  without labelling a Pa^2 quantity a pressure record. It stands in for the
+  array it replaced through the array protocol and the geometry attributes,
+  and it plots the level trace.
+
+- `LevelHistory`, returned by `sound_pressure_level_history`, carries the
+  times, the levels and the interval it actually walked, and plots itself. It
+  is iterable, so the callers that wrote `times, levels = ...` keep working,
+  the way `DecayCurve` replaced its own tuple return.
+
 ### Changed
+
+- The transforms whose output is itself a pressure record return a `Signal`
+  when they are given one, instead of a bare array. A chain of them used to
+  lose the rate and the calibration at the first step and the caller rebuilt
+  the object by hand. Four transforms that scale like a pressure record are
+  deliberately excluded because they are not one: the K-weighting of the
+  loudness family is referenced to digital full scale, and the three
+  whole-body vibration weightings are accelerations. The octave bank's band
+  waveforms come back as `Signal` objects only when the bank read the object's
+  calibration in the first place; a dBFS bank, or one carrying a factor of its
+  own, filtered digital full-scale units. A bare array in still gives a bare
+  array out, everywhere.
+
+  The returned object carries `calibration_factor=1.0` when the input carried
+  one, meaning calibrated with the conversion already done. Carrying the
+  input's own factor forward would make every function downstream scale the
+  samples a second time: measured before the rule was in place, the
+  A-weighted level of a record calibrated at 20.0 came back 26.02 dB low, and
+  it survived a trip to disk because `write(sidecar=True)` stamps the factor
+  into the sidecar.
 
 - The generated API reference publishes every call form a function has,
   instead of the single permissive signature that accepts all of them.

@@ -388,6 +388,49 @@ Requires matplotlib (`pip install phonometry[plot]`); returns the
 
 No qualifying onset (gradient > 10 dB/s) was found in the interval.
 
+## LevelHistory
+
+```python
+LevelHistory(times: np.ndarray, levels: np.ndarray, dt: float)
+```
+
+A frequency- and time-weighted level trace, and the axis it lives on.
+
+What [`sound_pressure_level_history`](/phonometry/reference/api/environment/impulsive-sound/#sound_pressure_level_history) computes is `LpAF`: the
+A-weighted, F time-weighted sound pressure level sampled every `dt`
+seconds. It came back as a bare `(times, levels)` pair, which meant
+the one thing every other result in this library offers, a plot that
+knows what it is drawing, had to be written by hand each time.
+
+For backward compatibility with that pair, the dataclass is iterable
+and unpacks as `times, levels = sound_pressure_level_history(...)`,
+the same way [`DecayCurve`](/phonometry/reference/api/rooms/acoustics/#decaycurve) replaced its own
+tuple return.
+
+**Attributes**
+
+| Name | Description |
+| :--- | :--- |
+| `times` | Time of each sample, in seconds from the start. |
+| `levels` | The level at each of those times, in dB. |
+| `dt` | Sampling interval of `levels`, in seconds. |
+
+### LevelHistory.plot()
+
+```python
+LevelHistory.plot(
+    ax: Axes | None = None,
+    *,
+    language: str = 'en',
+    **kwargs: Any,
+) -> Axes
+```
+
+Plot the level trace against time.
+
+Requires matplotlib (`pip install phonometry[plot]`); returns the
+`Axes`.
+
 ## predicted_prominence
 
 ```python
@@ -469,7 +512,7 @@ sound_pressure_level_history(
     dt: float = 0.02,
     reference_pressure: float = 2e-05,
     calibration_offset: float = 0.0,
-) -> tuple[np.ndarray, np.ndarray]
+) -> LevelHistory
 ```
 
 A frequency-weighted, F time-weighted level history `LpAF` (Clause 4).
@@ -489,7 +532,7 @@ standard.
 | `reference_pressure` | Reference pressure, in pascal (default 20 uPa). |
 | `calibration_offset` | Level offset added to `LpAF`, in dB, for signals recorded on a scale other than pascal. |
 
-**Returns:** `(times, levels)`, the sample times in seconds and `LpAF` in dB. The realised interval is `times[1] - times[0]` and may differ slightly from `dt` because it is an integer number of samples.
+**Returns:** A [`LevelHistory`](/phonometry/reference/api/environment/impulsive-sound/#levelhistory), which unpacks as `(times, levels)` for the callers that always did: the sample times in seconds and `LpAF` in dB. The realised interval is `times[1] - times[0]` and may differ slightly from `dt` because it is an integer number of samples.
 
 **Raises**
 

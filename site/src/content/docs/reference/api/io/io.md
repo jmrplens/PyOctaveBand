@@ -429,6 +429,35 @@ an EXTENSIBLE channel mask); `provenance` carries the `bext`
 broadcast metadata when the file had it; `source` records the file,
 container, codec, bit depth and lossy flag of the origin.
 
+### Signal.crop()
+
+```python
+Signal.crop(tmin: float | None = None, tmax: float | None = None) -> Signal
+```
+
+The samples between *tmin* and *tmax* seconds, as a new Signal.
+
+The edges are seconds from the start of the record, and follow the
+half-open convention of a Python slice: the sample at *tmax* is not
+included, so cropping `[0, t)` and `[t, end)` partitions the
+record with nothing counted twice. `None` means the record's own
+edge.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `tmin` | Start time, in seconds (default: the beginning). |
+| `tmax` | End time, in seconds, exclusive (default: the end). |
+
+**Returns:** A [`Signal`](/phonometry/reference/api/io/io/#signal) over that span, at the same rate.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| ValueError | If an edge is negative, not finite, or if *tmax* is not after *tmin*. |
+
 ### Signal.dtype
 
 *property*
@@ -455,6 +484,34 @@ Samples per channel (frames).
 
 *property*
 
+### Signal.pick()
+
+```python
+Signal.pick(channels: int | Sequence[int]) -> Signal
+```
+
+The chosen channels, as a new Signal.
+
+Indexing a Signal yields the samples, which is what makes it a
+drop-in for the array it stands for; the cost is that `sig[0]`
+drops the rate, the calibration and the labels on the floor. This
+keeps them, so a multichannel take can be narrowed to the channel
+under test and stay a measurement.
+
+**Parameters**
+
+| Name | Description |
+| :--- | :--- |
+| `channels` | One channel index, or a sequence of them, in the order they should appear in the result. |
+
+**Returns:** A [`Signal`](/phonometry/reference/api/io/io/#signal) with those channels, in that order.
+
+**Raises**
+
+| Exception | When |
+| :--- | :--- |
+| IndexError | If a channel is out of range. |
+
 ### Signal.plot()
 
 ```python
@@ -462,6 +519,7 @@ Signal.plot(
     ax: Axes | None = None,
     *,
     language: str = 'en',
+    scale: str = 'linear',
     **kwargs: Any,
 ) -> Axes
 ```
@@ -470,7 +528,13 @@ Plot the waveform, calibrated to pascals when a calibration is set.
 
 Draws each channel's time-domain waveform; with a
 `calibration_factor` the amplitude axis is in pascals, otherwise
-in digital full-scale units. Requires matplotlib
+in digital full-scale units. `scale="db"` draws the magnitude of
+each sample as `20 lg(|p| / 20 uPa)` instead, which needs a
+calibrated record to mean anything. That is a waveform in decibels
+and not a sound pressure level: an `L_p` is defined on a mean
+square over a stated time weighting, and
+[`time_weighting`](/phonometry/reference/api/filters/weighting/#time_weighting) is what produces one.
+Requires matplotlib
 (`pip install phonometry[plot]`); returns the
 `Axes`.
 

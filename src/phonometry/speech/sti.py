@@ -510,7 +510,9 @@ def _intensity_envelopes(x: np.ndarray, fs: int) -> np.ndarray:
     sos = signal.butter(4, _ENVELOPE_LPF_HZ, btype="lowpass", fs=fs, output="sos")
     env = np.empty((_NUM_BANDS, x.shape[-1]))
     for k, band in enumerate(bands):
-        env[k] = signal.sosfiltfilt(sos, band**2)
+        # np.asarray, not a cast: a bank on the default calibration hands
+        # back Signals, and a Signal has no arithmetic of its own.
+        env[k] = signal.sosfiltfilt(sos, np.asarray(band) ** 2)
     return env
 
 

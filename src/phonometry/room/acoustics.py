@@ -501,7 +501,9 @@ def decay_curve(
             zero_phase=zero_phase,
         )
         idx = int(np.argmin(np.abs(np.asarray(freqs, dtype=np.float64) - band)))
-        x = signals[idx]
+        # np.asarray, not a cast: a bank on the default calibration hands
+        # back Signals, and the squaring below is array arithmetic.
+        x = np.asarray(signals[idx])
     p2 = x.astype(np.float64) ** 2
     if not np.any(p2 > 0.0):
         raise ValueError("The selected band has no energy.")
@@ -576,10 +578,13 @@ def room_parameters(
         bank = OctaveFilterBank(
             fs=fs, fraction=fraction, order=6, limits=[limits[0], limits[1]]
         )
-        _, freqs, band_signals = bank.filter(
+        _, freqs, bands = bank.filter(
             x, sigbands=True, detrend=False, calculate_level=False,
             zero_phase=zero_phase,
         )
+        # np.asarray, not a cast: a bank on the default calibration hands
+        # back Signals, and what follows is array arithmetic.
+        band_signals = [np.asarray(band) for band in bands]
         frequency = np.asarray(freqs, dtype=np.float64)
 
     values = np.array([_band_parameters(sig, fs) for sig in band_signals])

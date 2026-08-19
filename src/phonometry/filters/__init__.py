@@ -25,6 +25,7 @@ from .frequencies import (
     normalized_frequencies,
 )
 from .weighting import (
+    TimeWeightedEnvelope,
     TimeWeighting,
     WeightingFilter,
     linkwitz_riley,
@@ -44,6 +45,7 @@ __all__ = [
     "OctaveFilterBank",
     "ParametricEQ",
     "ResponsePlot",
+    "TimeWeightedEnvelope",
     "TimeWeighting",
     "WeightingFilter",
     "class_limits",
