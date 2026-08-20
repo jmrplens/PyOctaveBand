@@ -99,6 +99,10 @@ DEFAULT_SPEED_OF_SOUND = 343.0
 #: reach it: their stricter below-1 wall-pair-mean check fires first.
 _MAX_ABSORPTION = 2.0
 
+#: Number of orthogonal axes -- equivalently wall pairs -- of the rectangular
+#: room the axial models describe: the three room lengths ``(Lx, Ly, Lz)``.
+_N_ROOM_AXES = 3
+
 
 Surface = tuple[float, ArrayLike]
 
@@ -402,7 +406,7 @@ def _axial_geometry(
     :math:`S_x = 2 L_y L_z`, :math:`S_y = 2 L_x L_z`,
     :math:`S_z = 2 L_x L_y`.
     """
-    if len(dimensions) != 3:
+    if len(dimensions) != _N_ROOM_AXES:
         msg = "'dimensions' must be the three room lengths (Lx, Ly, Lz)."
         raise ValueError(msg)
     lx, ly, lz = (require_positive(float(d), "dimension") for d in dimensions)
@@ -426,7 +430,7 @@ def _axial_eyring_times(
     ``alpha_bar_i`` of the wall pair perpendicular to that axis (Arau-Puchades'
     construction), plus the shared air term ``4 m V``.
     """
-    if len(absorptions) != 3:
+    if len(absorptions) != _N_ROOM_AXES:
         msg = (
             "'absorptions' must give the mean absorption of the three wall pairs "
             "(perpendicular to x, y and z)."
@@ -671,7 +675,7 @@ def reverberation_time_models(
     :return: The :class:`ReverberationModelResult`.
     """
     volume, total_area, pair_areas = _axial_geometry(dimensions)
-    if len(absorptions) != 3:
+    if len(absorptions) != _N_ROOM_AXES:
         msg = "'absorptions' must give the mean absorption of the three wall pairs."
         raise ValueError(msg)
     # Two equal-area opposing walls per axis share the axis mean absorption.

@@ -54,6 +54,13 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+# Bit depths that pick the linear decoder's branch, per the scaling
+# convention of :mod:`phonometry.io._wav`.
+_SINGLE_PRECISION_BITS = 32  # IEEE float stored as "<f4"; the other width is "<f8"
+_UNSIGNED_PCM_BITS = 8  # the one unsigned PCM depth, re-centred on 128
+_THREE_BYTE_PCM_BITS = 24  # packed byte triplets; the depth no numpy dtype can map
+_TWO_BYTE_PCM_BITS = 16  # signed PCM through "<i2"; the other mappable depth is "<i4"
+
 
 def _decode_linear_frames(raw: bytes, fmt: FormatChunk) -> NDArray[np.float64]:
     """Decode interleaved linear PCM/float bytes to ``(channels, frames)``.
@@ -66,11 +73,13 @@ def _decode_linear_frames(raw: bytes, fmt: FormatChunk) -> NDArray[np.float64]:
     """
     bits = fmt.bits_per_sample
     if fmt.resolved_tag == WAVE_FORMAT_IEEE_FLOAT:
-        data = np.frombuffer(raw, dtype="<f4" if bits == 32 else "<f8")
+        data = np.frombuffer(
+            raw, dtype="<f4" if bits == _SINGLE_PRECISION_BITS else "<f8"
+        )
         scaled = data.astype(np.float64)
-    elif bits == 8:
+    elif bits == _UNSIGNED_PCM_BITS:
         scaled = (np.frombuffer(raw, dtype=np.uint8).astype(np.float64) - 128.0) / 128.0
-    elif bits == 24:
+    elif bits == _THREE_BYTE_PCM_BITS:
         triplets = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 3)
         values = (
             triplets[:, 0].astype(np.int32)
@@ -79,7 +88,7 @@ def _decode_linear_frames(raw: bytes, fmt: FormatChunk) -> NDArray[np.float64]:
         )
         scaled = ((values ^ 0x800000) - 0x800000) / float(2**23)
     else:
-        data = np.frombuffer(raw, dtype="<i2" if bits == 16 else "<i4")
+        data = np.frombuffer(raw, dtype="<i2" if bits == _TWO_BYTE_PCM_BITS else "<i4")
         scaled = data.astype(np.float64) / float(2 ** (bits - 1))
     frames = scaled.reshape(-1, fmt.channels)
     return np.ascontiguousarray(frames.T)

@@ -82,6 +82,11 @@ _T0 = 273.15
 #: attenuation coefficient ``m`` (1/m) of ISO 17497-1 Eq. (3).
 _DB_PER_NEPER = 10.0 * math.log10(math.e)
 
+#: Minimum number ``N`` of spatially-averaged reverberation-time measurements
+#: for the standard error of the mean of ISO 17497-1 Eq. (A.1); the
+#: ``N (N - 1)`` denominator vanishes for a single measurement.
+_MIN_MEASUREMENTS = 2
+
 #: One-third-octave centre frequencies of ISO 17497-1 Table 1, in Hz
 #: (equivalent full-scale ``f / N``), 100 Hz to 5000 Hz.
 BASE_PLATE_BANDS: tuple[int, ...] = (
@@ -608,7 +613,7 @@ def reverberation_time_uncertainty(times: ArrayLike) -> Real:
         msg = "'times' must be a 1-D sequence of measurements."
         raise ValueError(msg)
     n = arr.size
-    if n < 2:
+    if n < _MIN_MEASUREMENTS:
         msg = "'times' needs at least two measurements (N >= 2)."
         raise ValueError(msg)
     mean = arr.mean()

@@ -191,6 +191,15 @@ _CASCADE_STYLES: tuple[str, ...] = ("-", "--", ":")
 #: full description belongs in the table, not in a corner of the chart.
 _LEGEND_CHARS = 30
 
+#: The largest number of cascade series (duct-path elements plus the source)
+#: that still get individual legend entries; past it the per-element labels are
+#: suppressed so the legend does not drown the chart.
+_LEGEND_MAX_SERIES = 10
+
+#: The largest series count whose legend still fits in a single column; above
+#: it the cascade legend wraps to two columns.
+_LEGEND_SINGLE_COLUMN_MAX = 4
+
 
 def _cascade_series(result: DuctPathResult) -> list[tuple[str, np.ndarray]]:
     """The labelled spectra of a duct path, from the source to the receiver."""
@@ -240,7 +249,7 @@ def plot_duct_path(
             color=colour,
             lw=1.1,
             alpha=0.85,
-            label=label if len(series) <= 10 else None,
+            label=label if len(series) <= _LEGEND_MAX_SERIES else None,
         )
     curve = result.criterion_curve
     if curve is not None and result.target is not None:
@@ -267,7 +276,7 @@ def plot_duct_path(
     ax.legend(
         loc="upper right",
         fontsize="xx-small",
-        ncol=2 if len(series) > 4 else 1,
+        ncol=2 if len(series) > _LEGEND_SINGLE_COLUMN_MAX else 1,
         framealpha=0.85,
     )
     localize_axes(ax, language)

@@ -45,7 +45,7 @@ def _warn_coarse_resolution(dfc: float, df: float, ft: float) -> None:
     bandwidth). At 250 Hz a 4 Hz bin already costs ~0.3 dB of TNR.
     """
     bins = 0.075 * dfc / df
-    if bins < 3.0:
+    if bins < _MIN_TONE_HALF_WIDTH_BINS:
         warnings.warn(
             f"Frequency resolution {df:.3g} Hz is coarse for the tone at "
             f"{ft:.0f} Hz: the tone band spans only {bins:.1f} bins (< 3), "
@@ -68,6 +68,40 @@ _F_MAX = 11200.0
 #: silence or DC input yields formally finite TNR/PR values that carry no
 #: meaning, so a warning is raised (about -100 dB SPL over a critical band).
 _NOISE_FLOOR_POWER = 4e-20
+
+# Minimum FFT bins across the tone-band half-width (0.075*dfc, the 15 %
+# critical-bandwidth window of clause 11.2) for an unbiased tone/noise
+# split; below it a TonalityWarning is raised (the "~3 bins" adequacy rule).
+_MIN_TONE_HALF_WIDTH_BINS = 3.0
+
+# Clause 10 crossover tone frequency: at or below it the critical-band edges
+# are arithmetic (Formulae (4)-(5)), above it geometric (Formulae (7)-(8)).
+_ARITHMETIC_EDGES_MAX_HZ = 500.0
+
+# Implementation floor on samples per FFT segment for the Hann-windowed,
+# RMS-averaged spectrum (clauses 11.1 / 12.1).
+_MIN_FFT_SEGMENT_SAMPLES = 16
+
+# At and above this frequency the prominence limit is constant: 8 dB for TNR
+# (clause 11.5 Formulae (12)-(13)) and 9 dB for PR (clause 12.6 Formulae
+# (25)-(26)); below it both limits rise with log10(1000/ft).
+_CRITERION_PLATEAU_HZ = 1000.0
+
+# Minimum critical-band bins outside the tone band for the clause 11.6
+# secondary-tone search to be attempted (an implementation guard so a
+# candidate local peak can have neighbours).
+_MIN_SECONDARY_SEARCH_BINS = 3
+
+# Clause 11.6 applicability bound of the Formula (14) proximity spacing: at
+# and above 1 kHz the spacing always exceeds half the critical band, so a
+# secondary tone in the band is unconditionally proximate.
+_ALWAYS_PROXIMATE_MIN_HZ = 1000.0
+
+# Clause 12.5: at or below this tone frequency the lower contiguous critical
+# band is truncated at 20 Hz and rescaled to a 100 Hz bandwidth by Formula
+# (24) instead of Formula (23); also the first row boundary of the Table 2
+# fit in _LOWER_EDGE_COEFFS, where the fitted lower edge equals 20 Hz.
+_TRUNCATED_LOWER_BAND_MAX_HZ = 171.4
 
 
 def _warn_degenerate(ft: float, band_power: float, df: float) -> None:
@@ -152,7 +186,7 @@ def _critical_band(f0: float) -> tuple[float, float, float]:
     (geometric) above.
     """
     dfc = 25.0 + 75.0 * (1.0 + 1.4 * (f0 / 1000.0) ** 2) ** 0.69
-    if f0 <= 500.0:
+    if f0 <= _ARITHMETIC_EDGES_MAX_HZ:
         f1 = f0 - dfc / 2.0
         f2 = f0 + dfc / 2.0
     else:
@@ -178,10 +212,11 @@ def _averaged_spectrum(
     Returns (frequencies, bin powers in Pa^2-like units, bin spacing).
     """
     nperseg = round(fs / resolution_hz)
-    if nperseg < 16:
+    if nperseg < _MIN_FFT_SEGMENT_SAMPLES:
         msg = (
             f"resolution_hz={resolution_hz!r} is too coarse for fs={fs}: it "
-            "leaves fewer than 16 samples per FFT segment."
+            f"leaves fewer than {_MIN_FFT_SEGMENT_SAMPLES} samples per FFT "
+            "segment."
         )
         raise ValueError(msg)
     if x.shape[-1] < nperseg:
@@ -250,14 +285,14 @@ def _band_power(
 
 def _tnr_criterion(ft: float) -> float:
     """Clause 11.5 Formulae (12)-(13): TNR prominence limit in dB."""
-    if ft < 1000.0:
+    if ft < _CRITERION_PLATEAU_HZ:
         return float(8.0 + 8.33 * np.log10(1000.0 / ft))
     return 8.0
 
 
 def _pr_criterion(ft: float) -> float:
     """Clause 12.6 Formulae (25)-(26): PR prominence limit in dB."""
-    if ft < 1000.0:
+    if ft < _CRITERION_PLATEAU_HZ:
         return float(9.0 + 10.0 * np.log10(1000.0 / ft))
     return 9.0
 
@@ -327,7 +362,7 @@ def tone_to_noise_ratio(
     in_band = (freqs > f1) & (freqs <= f2)
     band_idx = np.flatnonzero(in_band)
     outside_tone = band_idx[(band_idx < lo) | (band_idx > hi)]
-    if outside_tone.size >= 3:
+    if outside_tone.size >= _MIN_SECONDARY_SEARCH_BINS:
         rel = power[outside_tone]
         sec_local = outside_tone[np.argmax(rel)]
         # A secondary "tone" must be a local spectral peak, not noise floor:
@@ -335,7 +370,9 @@ def tone_to_noise_ratio(
         neigh = power[max(0, sec_local - 3)] + power[min(power.size - 1, sec_local + 3)]
         if power[sec_local] > 2.0 * neigh:
             fsec = float(freqs[sec_local])
-            proximate = ft >= 1000.0 or abs(fsec - ft) < _proximity_spacing(ft)
+            proximate = ft >= _ALWAYS_PROXIMATE_MIN_HZ or abs(
+                fsec - ft
+            ) < _proximity_spacing(ft)
             s_lo, s_hi = _tone_band(power, int(sec_local), half_width_bins)
             n_sec = s_hi - s_lo + 1
             p_sec = (
@@ -445,7 +482,7 @@ def prominence_ratio(
     # Lower band (12.3): truncated at 20 Hz below 171.4 Hz.
     f1_l = (
         max(_fitted_edge(ft, _LOWER_EDGE_COEFFS), 20.0)
-        if ft <= 171.4
+        if ft <= _TRUNCATED_LOWER_BAND_MAX_HZ
         else _fitted_edge(ft, _LOWER_EDGE_COEFFS)
     )
     # Upper band (12.4).
@@ -459,7 +496,7 @@ def prominence_ratio(
     p_l = max(p_l, np.finfo(float).tiny)
     p_u = max(p_u, np.finfo(float).tiny)
 
-    if ft <= 171.4:
+    if ft <= _TRUNCATED_LOWER_BAND_MAX_HZ:
         # Formula (24): rescale the truncated lower band to 100 Hz.
         df_l = n_l * df
         pr = 10 * np.log10(p_m) - 10 * np.log10((100.0 / df_l * p_l + p_u) * 0.5)

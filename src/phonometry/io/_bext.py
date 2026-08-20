@@ -70,7 +70,12 @@ import math
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from ._chunks import _BEXT_FIXED, _LOUDNESS_UNSET, BroadcastMetadata
+from ._chunks import (
+    _BEXT_FIXED,
+    _BEXT_LOUDNESS_MIN_VERSION,
+    _LOUDNESS_UNSET,
+    BroadcastMetadata,
+)
 
 if TYPE_CHECKING:
     import numpy as np
@@ -84,6 +89,9 @@ _STRING_FIELDS: tuple[tuple[str, str, int], ...] = (
     ("origination_date", "OriginationDate", 10),
     ("origination_time", "OriginationTime", 8),
 )
+
+#: Byte size of the fixed UMID (SMPTE ST 330) field -- the "64s" of _BEXT_FIXED.
+_UMID_BYTES = 64
 
 
 def _encode_loudness(value: float | None) -> int:
@@ -150,14 +158,16 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
         meta.max_momentary_loudness,
         meta.max_short_term_loudness,
     )
-    if meta.version < 2 and any(value is not None for value in loudness):
+    if meta.version < _BEXT_LOUDNESS_MIN_VERSION and any(
+        value is not None for value in loudness
+    ):
         msg = (
             f"bext version {meta.version} has no loudness fields "
             "(version >= 2); raise the version instead of losing them"
         )
         raise ValueError(msg)
     umid = meta.umid or b""
-    if len(umid) > 64:
+    if len(umid) > _UMID_BYTES:
         msg = f"bext UMID is {len(umid)} bytes; the field holds 64"
         raise ValueError(msg)
     history = meta.coding_history.encode("latin-1")
@@ -170,7 +180,7 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
             umid,
             *(
                 (_encode_loudness(value) for value in loudness)
-                if meta.version >= 2
+                if meta.version >= _BEXT_LOUDNESS_MIN_VERSION
                 else (0, 0, 0, 0, 0)
             ),
             b"",  # the 180 reserved bytes: zeros in every version

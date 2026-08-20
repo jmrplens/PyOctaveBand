@@ -212,7 +212,7 @@ def plot_open_plan_geometry(
     """
     _check_language(language)
     pos = np.sort(np.asarray(positions, dtype=np.float64).ravel())
-    if pos.size < 2 or np.any(pos <= 0.0):
+    if pos.size < 2 or np.any(pos <= 0.0):  # noqa: PLR2004
         msg = "'positions' needs at least two positive distances."
         raise ValueError(msg)
     if ax is None:

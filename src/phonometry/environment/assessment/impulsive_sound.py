@@ -405,6 +405,11 @@ _CATEGORY_NOT_IMPULSIVE = "not impulsive"
 _CATEGORY_REGULAR_IMPULSIVE = "regular impulsive"
 _CATEGORY_HIGHLY_IMPULSIVE = "highly impulsive"
 
+#: Fewest level samples that determine a slope: two points are the minimum for
+#: the least-squares onset-rate fit (Clause 3.5) and for the gradient of the
+#: level history (Clause 4).
+_MIN_SLOPE_SAMPLES: int = 2
+
 _OnsetRateMethod = Literal["least_squares", "upper_half"]
 
 
@@ -693,10 +698,10 @@ def _onset_rate(
         # levels from Le - (Le - Ls)/2 to Le.
         threshold = lev[-1] - (lev[-1] - lev[0]) / 2.0
         mask = lev >= threshold
-        if np.count_nonzero(mask) >= 2:
+        if np.count_nonzero(mask) >= _MIN_SLOPE_SAMPLES:
             t = t[mask]
             lev = lev[mask]
-    if t.size < 2:
+    if t.size < _MIN_SLOPE_SAMPLES:
         return float((levels[-1] - levels[0]) / (times[-1] - times[0]))
     slope = np.polyfit(t - t[0], lev, 1)[0]
     return float(slope)
@@ -730,7 +735,7 @@ def detect_onsets(
     if not math.isfinite(dt) or dt <= 0.0:
         msg = "dt must be positive."
         raise ValueError(msg)
-    if lev.size < 2:
+    if lev.size < _MIN_SLOPE_SAMPLES:
         msg = "at least two level samples are required."
         raise ValueError(msg)
     times = np.arange(lev.size) * dt

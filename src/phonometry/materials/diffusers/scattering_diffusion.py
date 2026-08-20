@@ -60,6 +60,11 @@ __all__ = [
 #: and each of the four +/-30 deg, +/-60 deg sources is weighted 3.
 TWO_DIMENSIONAL_SOURCE_WEIGHTS: tuple[int, ...] = (1, 3, 3, 3, 3)
 
+# Minimum number n of receivers in a polar response (ISO 17497-2,
+# Formulas (5)/(6)): Formula (5)'s (n - 1) denominator vanishes for a
+# single receiver, so the diffusion coefficient is undefined below two.
+_MIN_RECEIVERS = 2
+
 
 @dataclass(frozen=True)
 class DiffusionResult:
@@ -351,7 +356,7 @@ def directional_diffusion_coefficient(
         msg = "'levels' must be a 1-D sequence of receiver SPLs."
         raise ValueError(msg)
     n = lvl.size
-    if n < 2:
+    if n < _MIN_RECEIVERS:
         msg = "'levels' needs at least two receivers (n >= 2)."
         raise ValueError(msg)
     p = np.power(10.0, lvl / 10.0)

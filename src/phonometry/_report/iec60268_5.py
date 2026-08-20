@@ -63,6 +63,11 @@ _DB_PER_DECADE = 25.0
 
 _OHM = "&#937;"  # reportlab entity for the ohm sign
 
+#: The largest number of labelled frequency ticks that stays legible on the
+#: compressed multi-panel row of the PDF fiche without thinning; above it
+#: :func:`_thin_freq_ticklabels` blanks alternate labels.
+_MAX_UNTHINNED_TICKLABELS = 6
+
 
 def _basis(metadata: ReportMetadata | None, language: str = "en") -> str:
     """The standard-basis line: IEC 60268-5 with the IEC 60263 graph convention."""
@@ -317,7 +322,7 @@ def _thin_freq_ticklabels(ax: Any, keep_every: int = 2) -> None:
 
     formatter = ax.xaxis.get_major_formatter()
     labels = list(getattr(formatter, "seq", []))
-    if len(labels) <= 6:
+    if len(labels) <= _MAX_UNTHINNED_TICKLABELS:
         return
     ax.xaxis.set_major_formatter(
         FixedFormatter(

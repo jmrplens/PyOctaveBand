@@ -27,6 +27,11 @@ from .common import (
     theme_line,
 )
 
+#: Cap on how many per-section light magnitude lines of the parametric-EQ
+#: cascade get their own legend entry; sections past the eighth still draw
+#: but unlabeled, keeping the legend from swallowing the axes.
+_MAX_LABELED_SECTIONS = 8
+
 #: Spanish translations of the fixed strings rendered by the filters
 #: ``.plot()`` renderers, keyed by their verbatim English text. ``_t``
 #: returns the English key unchanged for any language other than ``"es"``,
@@ -287,7 +292,7 @@ def plot_parametric_eq(
                     color=_C_MUTED,
                     lw=0.9,
                     alpha=0.7,
-                    label=label if idx < 8 else None,
+                    label=label if idx < _MAX_LABELED_SECTIONS else None,
                 )
         kwargs.setdefault("lw", 1.8)
         kwargs.setdefault("label", _t("Cascade", language))

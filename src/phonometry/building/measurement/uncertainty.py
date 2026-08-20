@@ -390,6 +390,11 @@ _COVERAGE_ONE_SIDED: dict[float, float] = {
     0.9995: 3.29,
 }
 
+#: Tolerance for float-matching a confidence fraction against the tabulated
+#: Table 8 levels (Clause 8): absorbs decimal-representation noise in
+#: fractions like 0.95 while staying far below the gap between adjacent levels.
+_CONFIDENCE_MATCH_TOL = 1e-9
+
 
 # --------------------------------------------------------------------------- #
 # Result containers.
@@ -595,7 +600,7 @@ def insulation_coverage_factor(
     """
     table = _COVERAGE_ONE_SIDED if one_sided else _COVERAGE_TWO_SIDED
     for level, k in table.items():
-        if abs(level - confidence) < 1e-9:
+        if abs(level - confidence) < _CONFIDENCE_MATCH_TOL:
             return k
     kind = "one-sided" if one_sided else "two-sided"
     valid = ", ".join(f"{level:g}" for level in table)

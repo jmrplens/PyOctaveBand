@@ -125,13 +125,6 @@ def _metadata_pairs(
     ]
 
 
-def _band_label(frequency: float) -> str:
-    """The nominal Table 2 band label of a centre frequency (``6.3k``)."""
-    if frequency >= 1000.0:
-        return f"{frequency / 1000.0:g}k"
-    return f"{frequency:g}"
-
-
 def _class_cell(band_class: int | None) -> str:
     """The achieved-class cell of a band row (the class number, or an en dash)."""
     if band_class is None:
@@ -154,6 +147,8 @@ def _band_rows(
     classification. The margin is taken against the achieved class, the one the
     boxed result states.
     """
+    from ..filters.frequencies import _format_nominal_freq
+
     header_style = band_table_header_style()
     cls = result.reference_class()
     key = f"limit_class{cls}_db"
@@ -170,7 +165,7 @@ def _band_rows(
         margin = float(band["residual_index_db"]) - float(band[key])
         rows.append(
             [
-                decimal_comma(_band_label(float(band["freq"])), language),
+                decimal_comma(_format_nominal_freq(float(band["freq"])), language),
                 format_number(float(band["limit_class1_db"]), language, decimals=1),
                 format_number(float(band["limit_class2_db"]), language, decimals=1),
                 format_number(float(band["residual_index_db"]), language, decimals=1),

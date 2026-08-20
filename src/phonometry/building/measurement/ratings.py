@@ -120,6 +120,12 @@ _FREQ_THIRD_OCTAVE: tuple[float, ...] = (
 #: Octave band centre frequencies, 125 Hz to 2000 Hz (5 bands).
 _FREQ_OCTAVE: tuple[float, ...] = (125.0, 250.0, 500.0, 1000.0, 2000.0)
 
+#: Number of bands in each ISO 717 band set, used to infer the band set
+#: from the input length: 16 one-third-octave bands (100 Hz to 3150 Hz)
+#: and 5 octave bands (125 Hz to 2000 Hz).
+_N_THIRD_OCTAVE_BANDS = 16
+_N_OCTAVE_BANDS = 5
+
 #: Index of the 500 Hz band in each band set (the rating is read there).
 _INDEX_500_THIRD = 7
 _INDEX_500_OCTAVE = 2
@@ -134,6 +140,13 @@ _MAX_UNFAVOURABLE_OCTAVE = 10.0
 #: Tolerance absorbing floating-point noise when comparing the
 #: unfavourable-deviation sum (a true multiple of 0,1 dB) to the bound.
 _SHIFT_TOLERANCE = 1e-6
+
+#: Tolerance for checking that ``scale * step`` reconstructs exactly 1,
+#: i.e. that the reference-curve shift step divides 1 dB exactly (1.0 or
+#: 0.1 dB per ISO 717 / ISO 12999-1:2020 Annex B.2), absorbing the
+#: representation error of step values like 0.1. Distinct from
+#: _SHIFT_TOLERANCE, which guards the deviation-sum comparison.
+_STEP_DIVISOR_TOLERANCE = 1e-12
 
 # --- ISO 717-2 Table 3 impact reference values ---------------------------
 
@@ -600,8 +613,8 @@ def _resolve_band_set(
     :return: ``(reference, max_unfavourable, index_500, spectrum1,
         spectrum2)``.
     """
-    if bands == "third-octave" or (bands is None and n == 16):
-        if n != 16:
+    if bands == "third-octave" or (bands is None and n == _N_THIRD_OCTAVE_BANDS):
+        if n != _N_THIRD_OCTAVE_BANDS:
             msg = f"One-third-octave rating needs 16 bands (100-3150 Hz), got {n}."
             raise ValueError(msg)
         return (
@@ -611,8 +624,8 @@ def _resolve_band_set(
             _SPECTRUM1_THIRD,
             _SPECTRUM2_THIRD,
         )
-    if bands == "octave" or (bands is None and n == 5):
-        if n != 5:
+    if bands == "octave" or (bands is None and n == _N_OCTAVE_BANDS):
+        if n != _N_OCTAVE_BANDS:
             msg = f"Octave rating needs 5 bands (125-2000 Hz), got {n}."
             raise ValueError(msg)
         return (
@@ -658,7 +671,7 @@ def _best_shift(
     0,1 dB steps exact.
     """
     scale = round(1.0 / step)
-    if scale < 1 or abs(scale * step - 1.0) > 1e-12:
+    if scale < 1 or abs(scale * step - 1.0) > _STEP_DIVISOR_TOLERANCE:
         msg = "'step' must divide 1 dB exactly (e.g. 1.0 or 0.1)."
         raise ValueError(msg)
     # Start below any feasible shift, then climb while the bound holds.
@@ -724,7 +737,7 @@ def weighted_rating(
     rating = int(reference[index_500]) + round(shift)
     c = _adaptation_term(measured, spectrum1, rating)
     ctr = _adaptation_term(measured, spectrum2, rating)
-    centers = _FREQ_THIRD_OCTAVE if data.size == 16 else _FREQ_OCTAVE
+    centers = _FREQ_THIRD_OCTAVE if data.size == _N_THIRD_OCTAVE_BANDS else _FREQ_OCTAVE
     return WeightedRatingResult(
         rating=rating,
         c=c,
@@ -744,8 +757,8 @@ def _resolve_impact_band_set(
     :return: ``(reference, max_unfavourable, index_500, octave_offset,
         ci_band_count)``.
     """
-    if bands == "third-octave" or (bands is None and n == 16):
-        if n != 16:
+    if bands == "third-octave" or (bands is None and n == _N_THIRD_OCTAVE_BANDS):
+        if n != _N_THIRD_OCTAVE_BANDS:
             msg = (
                 f"One-third-octave impact rating needs 16 bands (100-3150 Hz), got {n}."
             )
@@ -757,8 +770,8 @@ def _resolve_impact_band_set(
             0,
             _CI_THIRD_OCTAVE_BANDS,
         )
-    if bands == "octave" or (bands is None and n == 5):
-        if n != 5:
+    if bands == "octave" or (bands is None and n == _N_OCTAVE_BANDS):
+        if n != _N_OCTAVE_BANDS:
             msg = f"Octave impact rating needs 5 bands (125-2000 Hz), got {n}."
             raise ValueError(msg)
         return (
@@ -845,7 +858,7 @@ def weighted_impact_rating(
     shift, unfavourable = _best_shift(-measured, -ref, limit)
     rating = int(reference[index_500]) - round(shift) + octave_offset
     ci = _impact_ci(measured, rating, ci_bands)
-    centers = _FREQ_THIRD_OCTAVE if data.size == 16 else _FREQ_OCTAVE
+    centers = _FREQ_THIRD_OCTAVE if data.size == _N_THIRD_OCTAVE_BANDS else _FREQ_OCTAVE
     return ImpactRatingResult(
         rating=rating,
         ci=ci,

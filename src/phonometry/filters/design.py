@@ -8,6 +8,12 @@ from __future__ import annotations
 import numpy as np
 from scipy import signal
 
+from .frequencies import _format_nominal_freq
+
+# Fewest standard-frequency ticks that must land inside the plotted range
+# before _showfilter falls back to plain powers-of-10 decade ticks.
+_MIN_STANDARD_TICKS = 3
+
 
 def _cheby2_transition_ratio(order: int, attenuation: float) -> float:
     """Ratio between stopband-edge and -3 dB frequencies for a Chebyshev II prototype."""
@@ -241,18 +247,13 @@ def _showfilter(
     xticks = [f for f in all_ticks if f_min <= f <= f_max]
 
     # If too few ticks, use simpler logic
-    if len(xticks) < 3:
+    if len(xticks) < _MIN_STANDARD_TICKS:
         # Fallback to powers of 10
         p_min = int(np.floor(np.log10(f_min)))
         p_max = int(np.ceil(np.log10(f_max)))
         xticks = [10**p for p in range(p_min, p_max + 1)]
 
-    xticklabels = []
-    for f in xticks:
-        if f >= 1000:
-            xticklabels.append(f"{f / 1000:g}k")
-        else:
-            xticklabels.append(f"{f:g}")
+    xticklabels = [_format_nominal_freq(f) for f in xticks]
 
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticklabels)

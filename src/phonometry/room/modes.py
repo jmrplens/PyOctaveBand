@@ -88,11 +88,15 @@ MODE_KINDS: tuple[str, str, str] = ("axial", "tangential", "oblique")
 #: :func:`room_modal_density`.
 MAX_ENUMERATED_LATTICE = 20_000_000
 
+# One room dimension (lx, ly, lz) and one mode order (nx, ny, nz) per
+# coordinate axis of the rectangular box.
+_N_ROOM_AXES = 3
+
 
 def _require_dimensions(dimensions: ArrayLike) -> NDArray[np.float64]:
     """Validate the three room dimensions and return them as an array."""
     dims = np.asarray(dimensions, dtype=np.float64).ravel()
-    if dims.size != 3:
+    if dims.size != _N_ROOM_AXES:
         msg = "'dimensions' must hold the three room dimensions (lx, ly, lz) in m."
         raise ValueError(msg)
     if not np.all(np.isfinite(dims)) or np.any(dims <= 0.0):
@@ -141,7 +145,7 @@ def room_mode_frequency(
         single = True
     else:
         single = False
-    if n.ndim != 2 or n.shape[1] != 3:
+    if n.ndim != 2 or n.shape[1] != _N_ROOM_AXES:  # noqa: PLR2004
         msg = "'orders' must be a triple (nx, ny, nz) or an (N, 3) array."
         raise ValueError(msg)
     if np.any(n < 0.0) or np.any(n != np.floor(n)):

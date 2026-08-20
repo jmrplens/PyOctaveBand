@@ -63,23 +63,34 @@ _FT_M = 0.3048
 _KT_MS = 0.514444
 #: Altitude below which a profile point counts as on the ground, in metres.
 _GROUND_ALTITUDE_M = 1.0
+#: Minimum number of ``L_<ft>ft`` slant-distance columns an NPD table must
+#: provide: the NPD level lookup (Doc 29 Eq. 4-3/4-4) interpolates over the
+#: distance grid, which needs at least two tabulated distances.
+_MIN_NPD_DISTANCES = 2
 #: Lateral-directivity identifier -> Doc 29 engine mounting.
 _MOUNTING = {"wing": "wing", "fuselage": "fuselage", "prop": "propeller"}
+#: ANP operation code for departure (on-ground segments are a ground roll).
+_DEPARTURE = "D"
+#: ANP operation code for arrival (on-ground segments are a landing roll).
+_ARRIVAL = "A"
 #: Operation aliases -> ANP operation code (``"A"`` arrival, ``"D"`` departure).
 _OPERATION = {
-    "a": "A",
-    "arrival": "A",
-    "arrivals": "A",
-    "approach": "A",
-    "landing": "A",
-    "d": "D",
-    "departure": "D",
-    "departures": "D",
-    "takeoff": "D",
-    "take-off": "D",
+    "a": _ARRIVAL,
+    "arrival": _ARRIVAL,
+    "arrivals": _ARRIVAL,
+    "approach": _ARRIVAL,
+    "landing": _ARRIVAL,
+    "d": _DEPARTURE,
+    "departure": _DEPARTURE,
+    "departures": _DEPARTURE,
+    "takeoff": _DEPARTURE,
+    "take-off": _DEPARTURE,
 }
 #: Supported NPD noise metrics for the Doc 29 chain.
 _METRICS = ("SEL", "LAmax")
+#: The ANP database's identifier for an aircraft's default fixed-point profile,
+#: selected when the caller passes ``profile_id=None``.
+_DEFAULT_PROFILE_ID = "DEFAULT"
 
 
 def _operation_code(operation: str) -> str:
@@ -127,7 +138,7 @@ def _distances_m(header: Iterable[str]) -> NDArray[np.float64]:
         c = col.strip()
         if c.startswith("L_") and c.endswith("ft"):
             dist_ft.append(float(c[2:-2]))
-    if len(dist_ft) < 2:
+    if len(dist_ft) < _MIN_NPD_DISTANCES:
         msg = "NPD table has fewer than two 'L_<ft>ft' distance columns."
         raise ValueError(msg)
     distances = np.asarray(dist_ft, dtype=np.float64) * _FT_M
@@ -461,15 +472,15 @@ class AnpDatabase:
                     f"{stage_length} (available profiles: {ids})."
                 )
                 raise KeyError(msg)
-        elif "DEFAULT" in ids:
-            pid = "DEFAULT"
+        elif _DEFAULT_PROFILE_ID in ids:
+            pid = _DEFAULT_PROFILE_ID
         elif len(ids) == 1:
             pid = ids[0]
         else:
             msg = (
                 f"aircraft {aircraft_id!r}, operation {op!r}, stage length "
                 f"{stage_length} has several fixed-point profiles and none is "
-                f"'DEFAULT': {ids}. Pass profile_id= to choose one."
+                f"{_DEFAULT_PROFILE_ID!r}: {ids}. Pass profile_id= to choose one."
             )
             raise ValueError(msg)
         path = self._profiles[(aircraft_id, op, pid, stage)]
@@ -478,8 +489,8 @@ class AnpDatabase:
         # airborne point is above 150 m, so a 1 m threshold separates them.
         on_ground = np.abs(path[:, 2]) <= _GROUND_ALTITUDE_M
         seg_zero = on_ground[:-1] & on_ground[1:]
-        ground_roll = seg_zero & (op == "D")
-        landing_roll = seg_zero & (op == "A")
+        ground_roll = seg_zero & (op == _DEPARTURE)
+        landing_roll = seg_zero & (op == _ARRIVAL)
         return AnpProfile(
             aircraft_id=aircraft_id,
             operation=op,

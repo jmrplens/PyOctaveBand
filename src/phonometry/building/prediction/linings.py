@@ -58,6 +58,11 @@ _CAVITY_STIFFNESS: float = 0.111e6
 #: ``ΔRw = 74,4 − 20 lg(fo) − Rw/2``, floored at 0 dB by NOTE 1.
 _TABLE_D1_LOW = (74.4, 20.0, 2.0)
 
+#: Highest nominal one-third-octave centre served by the ``_TABLE_D1_LOW``
+#: branch of Table D.1, in Hz; above it the fixed ``_TABLE_D1_HIGH`` rows
+#: apply.
+_TABLE_D1_LOW_MAX = 160.0
+
 #: ISO 12354-1:2017 Table D.1, the fixed rows above 160 Hz, as
 #: ``(upper bound of fo in Hz, ΔRw in dB)`` evaluated in order. The 1 600 Hz
 #: row is printed twice with different values; see ``docs/ERRATA.md``.
@@ -302,7 +307,7 @@ def weighted_lining_improvement(
             stacklevel=2,
         )
     nominal = _round_to_third_octave(f0)
-    if nominal <= 160.0:
+    if nominal <= _TABLE_D1_LOW_MAX:
         a, b, c = _TABLE_D1_LOW
         return float(max(0.0, a - b * np.log10(nominal) - rw / c))
     for upper, value in _TABLE_D1_HIGH:
@@ -442,7 +447,7 @@ def lining_improvement(
             )
             raise ValueError(msg)
         area = require_positive(glued_area, "glued_area")
-        if area > 100.0:
+        if area > 100.0:  # noqa: PLR2004
             msg = "'glued_area' is a percentage and cannot exceed 100."
             raise ValueError(msg)
         slope, offset = _ANNEX_D_GLUE

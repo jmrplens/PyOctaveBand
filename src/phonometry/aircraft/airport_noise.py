@@ -50,6 +50,17 @@ _INSTALLATION = {
     "wing": (0.0039, 0.062, 0.8786),
     "fuselage": (0.1225, 0.329, 1.0),
 }
+#: Lateral displacement ℓ beyond which the ground-effect distance factor Γ(ℓ)
+#: saturates at 1 (Eq. 4-18/4-19).
+_ELL_SAT_M = 914.0
+#: Elevation angle β above which the air-to-ground attenuation Λ(β) is zero
+#: (Eq. 4-18/4-19).
+_BETA_CUTOFF_DEG = 50.0
+#: Absolute zero in °C, the lower validity bound of the aerodrome air temperature.
+_ABS_ZERO_C = -273.15
+#: Azimuth ψ from which the rearward start-of-roll directivity ΔSOR applies
+#: (90° ≤ ψ ≤ 180°, §4.5.7); ahead of the aircraft it is zero.
+_SOR_PSI_MIN_DEG = 90.0
 
 
 def lateral_attenuation(elevation_deg: float, lateral_m: float) -> float:
@@ -66,10 +77,10 @@ def lateral_attenuation(elevation_deg: float, lateral_m: float) -> float:
     if not np.isfinite(ell) or ell < 0.0 or not np.isfinite(beta):
         msg = "'lateral_m' must be non-negative and inputs finite."
         raise ValueError(msg)
-    gamma = 1.089 * (1.0 - np.exp(-0.00274 * ell)) if ell <= 914.0 else 1.0
+    gamma = 1.089 * (1.0 - np.exp(-0.00274 * ell)) if ell <= _ELL_SAT_M else 1.0
     if beta < 0.0:
         lam = 10.857
-    elif beta <= 50.0:
+    elif beta <= _BETA_CUTOFF_DEG:
         lam = 1.137 - 0.0229 * beta + 9.72 * np.exp(-0.142 * beta)
     else:
         lam = 0.0
@@ -184,7 +195,7 @@ def impedance_adjustment(
     if not (np.isfinite(t) and np.isfinite(p) and p > 0.0):
         msg = "'pressure' must be positive and inputs finite."
         raise ValueError(msg)
-    if t <= -273.15:
+    if t <= _ABS_ZERO_C:
         msg = "'temperature' must be above absolute zero (−273.15 °C)."
         raise ValueError(msg)
     delta = p / _P0_KPA
@@ -258,7 +269,7 @@ def start_of_roll_directivity(
     if key not in ("jet", "turbofan", "turboprop", "prop", "propeller"):
         msg = f"'engine' must be 'jet' or 'turboprop', got {engine!r}."
         raise ValueError(msg)
-    if psi < 90.0:  # ahead of / abeam the aircraft: no rearward directivity
+    if psi < _SOR_PSI_MIN_DEG:  # ahead of / abeam the aircraft: no rearward directivity
         return 0.0
     psi = min(psi, 180.0)
     if key in ("jet", "turbofan"):
@@ -294,7 +305,7 @@ def _clean_table(
     p = np.asarray(powers, dtype=np.float64).ravel()
     d = np.asarray(distances, dtype=np.float64).ravel()
     lv = np.asarray(levels, dtype=np.float64)
-    if p.size < 2 or d.size < 2:
+    if p.size < 2 or d.size < 2:  # noqa: PLR2004
         msg = "'powers' and 'distances' must each have at least two values."
         raise ValueError(msg)
     if lv.shape != (p.size, d.size):
@@ -615,7 +626,7 @@ def _validate_path(
 ) -> NDArray[np.float64]:
     """Coerce and validate a flight path to a finite ``(N, 5)`` array."""
     pts = np.asarray(path, dtype=np.float64)
-    if pts.ndim != 2 or pts.shape[1] != 5 or pts.shape[0] < 2:
+    if pts.ndim != 2 or pts.shape[1] != 5 or pts.shape[0] < 2:  # noqa: PLR2004
         msg = "'path' must have shape (N, 5) with N >= 2 (x,y,z,power,speed)."
         raise ValueError(msg)
     if not np.all(np.isfinite(pts)):
@@ -963,12 +974,14 @@ def _grid_lateral_attenuation(
     ell_att: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """``Λ(β, ℓ)`` (Eq. 4-18/4-19), the array form of :func:`lateral_attenuation`."""
-    gamma = np.where(ell_att <= 914.0, 1.089 * (1.0 - np.exp(-0.00274 * ell_att)), 1.0)
+    gamma = np.where(
+        ell_att <= _ELL_SAT_M, 1.089 * (1.0 - np.exp(-0.00274 * ell_att)), 1.0
+    )
     lam = np.where(
         beta_att < 0.0,
         10.857,
         np.where(
-            beta_att <= 50.0,
+            beta_att <= _BETA_CUTOFF_DEG,
             1.137 - 0.0229 * beta_att + 9.72 * np.exp(-0.142 * beta_att),
             0.0,
         ),
@@ -1024,7 +1037,9 @@ def _grid_sor(
         )
     dsor = np.maximum(ds, 1e-9)
     d0 = np.where(dsor > _DSOR0_M, d0 * (_DSOR0_M / dsor), d0)
-    return np.asarray(np.where(roll_behind & (psi >= 90.0), d0, 0.0), dtype=np.float64)
+    return np.asarray(
+        np.where(roll_behind & (psi >= _SOR_PSI_MIN_DEG), d0, 0.0), dtype=np.float64
+    )
 
 
 def _grid_noise_fraction(
@@ -1326,7 +1341,7 @@ def noise_contour(
     """
     gx = np.asarray(x, dtype=np.float64).ravel()
     gy = np.asarray(y, dtype=np.float64).ravel()
-    if gx.size < 2 or gy.size < 2:
+    if gx.size < 2 or gy.size < 2:  # noqa: PLR2004
         msg = "'x' and 'y' must each have at least two grid points."
         raise ValueError(msg)
     # Validate and clean the shared inputs once, not per grid point.

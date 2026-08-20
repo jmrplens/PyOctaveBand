@@ -72,6 +72,25 @@ _A0 = 1.0  #: Reference absorption area, in square metres (ISO 3741, Eq. 20).
 _PS0 = 101.325  #: Reference static pressure, in kPa (ISO 3741 clause 4).
 _THETA0 = 314.0  #: Reference temperature for C1, in K (ISO 3741 clause 9.1.4).
 _THETA1 = 296.0  #: Reference temperature for C2, in K (ISO 3741 clause 9.1.4).
+#: Temperature floor in degC: sqrt(273 + theta) of the speed-of-sound formula
+#: c = 20.05*sqrt(273 + theta) is zero or complex at or below it (ISO 3741, 9.1.4).
+_ROUNDED_ABS_ZERO_C = -273.0
+#: K1 qualification edges: bands at or below the low edge or at or above the
+#: high edge carry the relaxed 6 dB lower criterion (ISO 3741:2010, 9.1.2).
+_K1_EDGE_LOW_HZ = 200.0
+_K1_EDGE_HIGH_HZ = 6300.0
+#: Background margin at or above which the background is negligible and K1 = 0
+#: (ISO 3741:2010, 9.1.2).
+_K1_UPPER_DB = 15.0
+#: The T60 > V/S room-absorptivity criterion covers bands below 6,3 kHz
+#: (ISO 3741:2010, 5.3, Eq. 7); distinct from the K1 edge above.
+_ABSORPTION_CRITERION_MAX_HZ = 6300.0
+#: Minimum microphone positions in an unqualified room (ISO 3741:2010, 8.3, 8.4.1).
+_MIN_MIC_POSITIONS = 6
+#: The inter-position sample deviation sM (ddof=1) needs at least two positions.
+_MIN_POSITIONS_FOR_SM = 2
+#: Maximum admissible inter-position deviation sM (ISO 3741:2010, 8.4.2.2, Eq. 10).
+_SM_CRITERION_DB = 1.5
 
 
 @dataclass(frozen=True)
@@ -189,7 +208,7 @@ def _validate_meteorology(temperature: float, static_pressure: float) -> None:
     static pressure makes :math:`\log_{10}(p_\mathrm{s}/p_{\mathrm{s}0})` undefined; both are rejected
     with a clean ``ValueError``.
     """
-    if not np.isfinite(temperature) or temperature <= -273.0:
+    if not np.isfinite(temperature) or temperature <= _ROUNDED_ABS_ZERO_C:
         msg = "'temperature' must be finite and greater than -273 degC."
         raise ValueError(msg)
     if not np.isfinite(static_pressure) or static_pressure <= 0.0:
@@ -228,7 +247,7 @@ def _mean_level(levels: np.ndarray) -> np.ndarray:
     arr = np.asarray(levels, dtype=np.float64)
     if arr.ndim == 1:
         return arr
-    if arr.ndim == 2:
+    if arr.ndim == 2:  # noqa: PLR2004
         return energy_mean(arr, axis=0)
     msg = "'levels' must be a 1D spectrum or a 2D (positions, bands) array."
     raise ValueError(msg)
@@ -246,10 +265,14 @@ def _k1_eq14(delta: np.ndarray, frequencies: np.ndarray) -> tuple[np.ndarray, bo
     ``(NB,)`` or per position and band ``(NM, NB)``; the second returned value
     flags whether any element fell below the lower criterion.
     """
-    low = np.where((frequencies <= 200.0) | (frequencies >= 6300.0), 6.0, 10.0)
+    low = np.where(
+        (frequencies <= _K1_EDGE_LOW_HZ) | (frequencies >= _K1_EDGE_HIGH_HZ),
+        6.0,
+        10.0,
+    )
     clamped = np.maximum(delta, low)
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * clamped))
-    k1 = np.where(delta >= 15.0, 0.0, k1)
+    k1 = np.where(delta >= _K1_UPPER_DB, 0.0, k1)
     return np.asarray(k1, dtype=np.float64), bool(np.any(delta < low))
 
 
@@ -277,7 +300,7 @@ def _background_corrected_mean(
     """
     arr = np.asarray(levels, dtype=np.float64)
     raw_mean = _mean_level(levels)
-    if arr.ndim == 2:
+    if arr.ndim == 2:  # noqa: PLR2004
         bg = np.asarray(background_levels, dtype=np.float64)
         if bg.ndim == 1:
             bg = np.broadcast_to(bg, arr.shape)
@@ -351,7 +374,7 @@ def _room_qualification_warnings(
             stacklevel=3,
         )
     floor = volume / surface_area
-    below_6k3 = frequencies < 6300.0
+    below_6k3 = frequencies < _ABSORPTION_CRITERION_MAX_HZ
     if np.any(below_6k3 & (t60 <= floor)):
         warnings.warn(
             f"Reverberation time falls to or below the V/S floor ({floor:g} s) "
@@ -373,20 +396,20 @@ def _position_sampling_warnings(levels: np.ndarray, stacklevel: int) -> None:
     spectrum carries no per-position information and is skipped.
     """
     arr = np.asarray(levels, dtype=np.float64)
-    if arr.ndim != 2:
+    if arr.ndim != 2:  # noqa: PLR2004
         return
     n_positions = arr.shape[0]
-    if n_positions < 6:
+    if n_positions < _MIN_MIC_POSITIONS:
         warnings.warn(
             f"Only {n_positions} microphone position(s) were supplied; an "
-            "unqualified reverberation room requires at least 6 "
+            f"unqualified reverberation room requires at least {_MIN_MIC_POSITIONS} "
             "(ISO 3741:2010, 8.3, 8.4.1).",
             SoundPowerWarning,
             stacklevel=stacklevel,
         )
-    if n_positions >= 2:
+    if n_positions >= _MIN_POSITIONS_FOR_SM:
         s_m = np.std(arr, axis=0, ddof=1)
-        if np.any(s_m > 1.5):
+        if np.any(s_m > _SM_CRITERION_DB):
             warnings.warn(
                 "Inter-position standard deviation exceeds the ISO 3741 sM "
                 "criterion (1,5 dB) in one or more bands; the source may radiate "

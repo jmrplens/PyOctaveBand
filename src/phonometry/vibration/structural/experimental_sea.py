@@ -104,6 +104,15 @@ __all__ = [
 #: used by the above-ring-frequency cylinder modal density (Norton Eq. 6.29).
 _BANDWIDTH_FACTOR: dict[str, float] = {"third": 1.122, "octave": 1.414}
 
+#: Largest ``x = f/f_r`` at which the sqrt-regime cylinder modal density
+#: (Norton Eq. 6.27) still applies; Eq. 6.28 takes over above it.
+_SQRT_REGIME_MAX_RING_RATIO = 0.48
+
+#: Largest ``x = f/f_r`` at which the linear-regime cylinder modal density
+#: (Norton Eq. 6.28) still applies; the bandwidth-averaged Eq. 6.29 takes
+#: over above it.
+_LINEAR_REGIME_MAX_RING_RATIO = 0.83
+
 
 # ---------------------------------------------------------------------------
 # Modal densities (Norton 6.4.1)
@@ -247,9 +256,9 @@ def cylindrical_shell_modal_density(
     base = s / (math.pi * c_l * t)
     low = 5.0 * base * np.sqrt(x)
     mid = 7.2 * base * x
-    # Eq. (6.29): the arccos arguments leave [-1, 1] just above the 0,83
-    # threshold for narrow bands, so clip them; the branch is only selected
-    # where the expression is meaningful anyway.
+    # Eq. (6.29): the arccos arguments leave [-1, 1] just above the
+    # _LINEAR_REGIME_MAX_RING_RATIO threshold for narrow bands, so clip them;
+    # the branch is only selected where the expression is meaningful anyway.
     arg_1 = np.clip(1.745 / (factor**2 * np.maximum(x, 1e-12) ** 2), -1.0, 1.0)
     arg_2 = np.clip(1.745 * factor**2 / np.maximum(x, 1e-12) ** 2, -1.0, 1.0)
     shape = 0.596 / (factor - 1.0 / factor)
@@ -258,7 +267,11 @@ def cylindrical_shell_modal_density(
         * base
         * (2.0 + shape * (factor * np.arccos(arg_1) - np.arccos(arg_2) / factor))
     )
-    n = np.where(x <= 0.48, low, np.where(x <= 0.83, mid, high))
+    n = np.where(
+        x <= _SQRT_REGIME_MAX_RING_RATIO,
+        low,
+        np.where(x <= _LINEAR_REGIME_MAX_RING_RATIO, mid, high),
+    )
     return np.asarray(n, dtype=np.float64)
 
 

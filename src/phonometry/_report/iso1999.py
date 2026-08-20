@@ -66,6 +66,15 @@ if TYPE_CHECKING:
 #: schemes use as a single hearing-damage index.
 _HANDICAP_SET: tuple[float, float, float] = (2000.0, 3000.0, 4000.0)
 
+#: Tolerance in hertz within which a result frequency counts as one of the
+#: :data:`_HANDICAP_SET` audiometric frequencies; absorbs float
+#: representation noise around the exact values.
+_FREQ_MATCH_TOL_HZ = 1e-6
+
+#: Float-equality tolerance within which the requested population fractile
+#: counts as exactly the median 0.5.
+_MEDIAN_FRACTILE_EPS = 1e-9
+
 #: The compression-term denominator of the HTLAN Formula (1).
 _HTLAN_DENOM = 120.0
 
@@ -98,7 +107,7 @@ def _handicap_indices(frequencies: np.ndarray) -> list[int]:
     return [
         i
         for i, f in enumerate(frequencies)
-        if any(abs(float(f) - h) < 1e-6 for h in _HANDICAP_SET)
+        if any(abs(float(f) - h) < _FREQ_MATCH_TOL_HZ for h in _HANDICAP_SET)
     ]
 
 
@@ -114,7 +123,7 @@ def _representative(
     """
     vals = np.asarray(values, dtype=np.float64)
     idx = _handicap_indices(frequencies)
-    if len(idx) == 3:
+    if len(idx) == len(_HANDICAP_SET):
         return True, float(vals[idx].mean()), 0.0
     peak = int(np.argmax(vals))
     return False, float(vals[peak]), float(frequencies[peak])
@@ -141,7 +150,7 @@ def _fractile_phrase(fractile: float, language: str = "en") -> str:
     fractile 0.9 prints ``Q = 10 %``.
     """
     q = decimal_comma(f"{_iso_q_percent(fractile):g}", language)
-    if abs(fractile - 0.5) < 1e-9:
+    if abs(fractile - 0.5) < _MEDIAN_FRACTILE_EPS:
         return t("Population fractile Q = {q} % (median)", language).format(q=q)
     return t(
         "Population fractile Q = {q} % (fraction with worse hearing)", language

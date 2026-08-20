@@ -82,6 +82,16 @@ _MIN_IR_LENGTH = 16
 #: 170 ms at 48 kHz; plenty for the anechoic tail of driver measurements).
 _DEFAULT_MAX_IR_LENGTH = 8192
 
+#: Exclusive upper bound on the half-Hann ``fade`` fraction: fade-in and
+#: fade-out each consume ``fade`` of the sweep duration, so at 0.5 the two
+#: fades would cover the whole signal with no unfaded portion left.
+_MAX_FADE_FRACTION = 0.5
+
+#: Minimum highest harmonic order that makes a distortion separation
+#: meaningful: order 1 is only the linear response H1, so the separation
+#: must reach at least the 2nd harmonic.
+_MIN_HARMONIC_ORDER = 2
+
 
 def _positive(value: float, name: str) -> float:
     scalar = float(value)
@@ -165,7 +175,7 @@ def synchronized_sweep_signal(
     _validate_sweep_band(fs_v, f1_v, float(f2))
     seconds_v = _positive(seconds, "seconds")
     amplitude_v = _positive(amplitude, "amplitude")
-    if not 0.0 <= fade < 0.5:
+    if not 0.0 <= fade < _MAX_FADE_FRACTION:
         msg = "fade must be in [0, 0.5)"
         raise ValueError(msg)
     rate = _sweep_rate(f1_v, float(f2), seconds_v)
@@ -626,7 +636,7 @@ def swept_sine_distortion(
         msg = "'method' must be 'synchronized' or 'farina'."
         raise ValueError(msg)
     n_orders = int(n_harmonics)
-    if n_orders < 2:
+    if n_orders < _MIN_HARMONIC_ORDER:
         msg = "'n_harmonics' must be at least 2."
         raise ValueError(msg)
 

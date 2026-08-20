@@ -122,6 +122,11 @@ _SABINE = 0.16
 #: Minimum-area factor of Clause 3.6: where V/7,5 > S, use V/7,5 for S.
 _MIN_AREA_FACTOR = 7.5
 
+#: Prescribed count of measurement positions for the service-equipment method
+#: (one near a corner, two in the reverberant field, Clause 6.3.3); also the
+#: 1/3 of the Clause 3.16 energy average.
+_SERVICE_EQUIPMENT_POSITIONS = 3
+
 #: Upper volume limits of the four Table 4 ranges (Clause 6.5); the table is
 #: valid for rooms up to 150 m³.
 _TABLE3_VOLUME_LIMITS = (15.0, 35.0, 60.0, 150.0)
@@ -820,7 +825,7 @@ def survey_service_equipment_level(
         are inconsistent, or if ``volume`` is not positive.
     """
     m = _finite_bands(measurements, "measurements")
-    if m.ndim not in (1, 2) or m.shape[0] != 3:
+    if m.ndim not in (1, 2) or m.shape[0] != _SERVICE_EQUIPMENT_POSITIONS:
         msg = (
             "'measurements' must give exactly three measurement positions "
             "(three scalars, or a (3, bands) array)."

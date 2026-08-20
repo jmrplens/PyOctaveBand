@@ -103,6 +103,10 @@ __all__ = [
 #: interpolation is applied and an integer-period record is exact.
 _ALIGN_TOL = 1e-9
 
+#: Validation floor for a period at the sample rate: the fewest samples a
+#: period may span for the block average to represent a waveform at all.
+_MIN_SAMPLES_PER_PERIOD = 2
+
 
 def comb_filter_response(
     frequencies: NDArray[np.float64] | list[float],
@@ -224,10 +228,10 @@ def _samples_per_period(fs: float, period: float) -> tuple[float, int]:
     """Exact and integer samples per period, with an integer-fit check."""
     samples = fs * period
     rounded = round(samples)
-    if rounded < 2:
+    if rounded < _MIN_SAMPLES_PER_PERIOD:
         msg = (
             "'period' is too short for the sample rate: it must span at "
-            "least 2 samples."
+            f"least {_MIN_SAMPLES_PER_PERIOD} samples."
         )
         raise ValueError(msg)
     return samples, rounded

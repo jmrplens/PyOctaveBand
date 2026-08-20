@@ -85,6 +85,11 @@ if TYPE_CHECKING:
 #: Localised names of the three evaluation periods.
 _PERIOD_LABELS = {"day": "Day", "evening": "Evening", "night": "Night"}
 
+# Noise-phase-table row count up to which the assessment figure keeps its
+# full height; above it the figure is the elastic element, shrinking per
+# extra row so the fiche stays on one page.
+_FULL_HEIGHT_MAX_ROWS = 5
+
 
 def _fmt(value: float, language: str, decimals: int = 1) -> str:
     """A quantity rounded to ``decimals`` decimals, localised separator."""
@@ -422,7 +427,11 @@ def render_activity_report(
     # split into several phases each). The figure is the elastic element, so
     # its height shrinks as the table grows.
     rows = sum(len(period.phases) for period in result.periods)
-    figure_height = 2.7 if rows <= 5 else max(1.7, 2.7 - 0.22 * (rows - 5))
+    figure_height = (
+        2.7
+        if rows <= _FULL_HEIGHT_MAX_ROWS
+        else max(1.7, 2.7 - 0.22 * (rows - _FULL_HEIGHT_MAX_ROWS))
+    )
     flow.append(
         render_figure_drawing(
             _assessment_plot,

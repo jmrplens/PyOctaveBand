@@ -373,7 +373,7 @@ def verify_intensity_class(
     # own and clause 12.4 tests it in one-third octaves, so the alternative is
     # not open to it at all.
     full_range = covered.issuperset(_THIRD_OCTAVE_BANDS) or (
-        device != "probe" and overall == 2 and covered.issuperset(_OCTAVE_BANDS)
+        device != "probe" and overall == 2 and covered.issuperset(_OCTAVE_BANDS)  # noqa: PLR2004
     )
     range_limited = not full_range
 

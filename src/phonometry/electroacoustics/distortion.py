@@ -45,8 +45,15 @@ if TYPE_CHECKING:
 
 #: Default number of harmonics summed for the THD (IEC 60268-3).
 _DEFAULT_N_HARMONICS = 10
+#: Lowest harmonic order (the fundamental is order 1, not a harmonic): the
+#: IEC 60268-3 THD sum runs over n >= 2, and 14.12.5 defines d_n for n >= 2.
+_MIN_HARMONIC_ORDER = 2
 #: Default standard-notch quality factor for THD+N (AES17 5.2.8: 1.2 <= Q <= 3).
 _DEFAULT_NOTCH_Q = 2.0
+#: AES17-2015 5.2.8 window for the effective quality factor of the standard
+#: notch filter used for THD+N.
+_AES17_NOTCH_Q_MIN = 1.2
+_AES17_NOTCH_Q_MAX = 3.0
 #: AES17 5.2.8 defines Q on the *applied* (combined) response. ``filtfilt``
 #: applies the notch twice, so the single-pass design must be sharper for the
 #: squared magnitude to have the requested -3 dB width. For the biquad notch
@@ -85,7 +92,7 @@ def _positive(value: float, name: str) -> float:
 def _validate_notch_q(notch_q: float) -> float:
     """Validate the effective notch quality factor (AES17 5.2.8: 1.2 <= Q <= 3)."""
     q = float(notch_q)
-    if not 1.2 <= q <= 3.0:
+    if not _AES17_NOTCH_Q_MIN <= q <= _AES17_NOTCH_Q_MAX:
         msg = "'notch_q' must be within the AES17 range [1.2, 3]."
         raise ValueError(msg)
     return q
@@ -247,7 +254,7 @@ def thd(
     if amps.size == 0 or amps[0] <= 0.0:
         msg = "No fundamental component found in the signal."
         raise ValueError(msg)
-    if amps.size < 2:
+    if amps.size < _MIN_HARMONIC_ORDER:
         msg = (
             "No harmonic of the fundamental lies below the Nyquist frequency; "
             "the THD is undefined (raise fs or lower the fundamental)."
@@ -293,7 +300,7 @@ def harmonic_distortion(
     sig = _validate_signal(signal)
     fs_v = _positive(fs, "fs")
     f0 = _positive(fundamental, "fundamental")
-    if order < 2:
+    if order < _MIN_HARMONIC_ORDER:
         msg = "'order' must be at least 2."
         raise ValueError(msg)
     n = max(n_harmonics, order)

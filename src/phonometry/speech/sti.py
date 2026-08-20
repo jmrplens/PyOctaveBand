@@ -68,6 +68,20 @@ _BETA_MALE = np.array([0.085, 0.078, 0.065, 0.011, 0.047, 0.095])
 # (Ed.5 Table A.3; identical to Ed.4 Table A.2).
 _ART_DB = np.array([46.0, 27.0, 12.0, 6.5, 7.5, 8.0, 12.0])
 
+# Segment breakpoints, in dB of total level L of the next lower octave
+# band, of the four-segment auditory masking function amdB (Ed.5 Table
+# A.2 = Ed.4 Table A.1): the steep 1.8 dB/dB middle segment runs from
+# 63 dB to 67 dB (0.5 dB/dB on either side), and amdB saturates at its
+# constant -10 dB from 100 dB up. All three are levels; 100.0 here is
+# unrelated to _ENVELOPE_LPF_HZ = 100.0 below, which is a frequency.
+_AMDB_STEEP_SEGMENT_START_DB = 63.0
+_AMDB_STEEP_SEGMENT_END_DB = 67.0
+_AMDB_SATURATION_DB = 100.0
+
+# Modulation-transfer validity ceiling: a value above 1.3 means the
+# measurement is likely invalid (IEC 60268-16 A.5.3 NOTE 1, Ed.4 = Ed.5).
+_MTF_INVALID_ABOVE = 1.3
+
 # STIPA modulation frequency pairs per octave band (Table B.1, unchanged
 # between Ed.4 and Ed.5) and the source modulation index per component.
 _STIPA_F1 = np.array([1.60, 1.00, 0.63, 2.00, 1.25, 0.80, 2.50])
@@ -204,7 +218,11 @@ def _masking_amdb(level: np.ndarray | float) -> np.ndarray:
     lvl = np.asarray(level, dtype=np.float64)
     return np.asarray(
         np.select(
-            [lvl < 63.0, lvl < 67.0, lvl < 100.0],
+            [
+                lvl < _AMDB_STEEP_SEGMENT_START_DB,
+                lvl < _AMDB_STEEP_SEGMENT_END_DB,
+                lvl < _AMDB_SATURATION_DB,
+            ],
             [0.5 * lvl - 65.0, 1.8 * lvl - 146.9, 0.5 * lvl - 59.8],
             default=-10.0,
         )
@@ -243,7 +261,7 @@ def _truncated_mtf(mtf: np.ndarray) -> np.ndarray:
     invalid, and every value is truncated to 1,0 before the chain runs.
     """
     m = np.array(mtf, dtype=np.float64)
-    if m.ndim != 2 or m.shape[0] != _NUM_BANDS:
+    if m.ndim != 2 or m.shape[0] != _NUM_BANDS:  # noqa: PLR2004
         msg = (
             f"'mtf' must have shape ({_NUM_BANDS}, n_modulation_frequencies), "
             f"got {m.shape}."
@@ -252,7 +270,7 @@ def _truncated_mtf(mtf: np.ndarray) -> np.ndarray:
     if np.any(m < 0.0) or not np.all(np.isfinite(m)):
         msg = "Modulation transfer values must be finite and >= 0."
         raise ValueError(msg)
-    if np.any(m > 1.3):
+    if np.any(m > _MTF_INVALID_ABOVE):
         warnings.warn(
             "Modulation transfer values above 1.3 detected: the measurement "
             "is likely invalid (IEC 60268-16 A.5.3). Values truncated to 1.0.",

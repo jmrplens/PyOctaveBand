@@ -113,6 +113,10 @@ _ANNEX_A_SPECIFIC_HEAT_CP = 938.7  # C_P (J/(kg*K))
 _STATIC_REFERENCE_VELOCITY = 0.5e-3
 #: Upper linear-velocity limit of the static method, ISO 9053-1:2018 clause 7.5 (m/s).
 _STATIC_MAX_VELOCITY = 15.0e-3
+#: Minimum stepwise (velocity, pressure-drop) measurement steps of the static method,
+#: ISO 9053-1:2018 clause 7.5: the through-origin fit dp = a*u + b*u**2 has two free
+#: coefficients, so two steps are the least that determine it.
+_MIN_MEASUREMENT_STEPS = 2
 #: Recommended specimen flow-velocity range, ISO 9053-2:2020 clause 6.2 (m/s).
 _ALT_VELOCITY_RANGE = (0.5e-3, 4.0e-3)
 #: Piston frequency range, ISO 9053-2:2020 clause 6.2 (Hz).
@@ -379,7 +383,7 @@ def static_airflow_resistance(
     if u.shape != dp.shape:
         msg = "'velocities' and 'pressure_drops' must have equal length."
         raise ValueError(msg)
-    if u.size < 2:
+    if u.size < _MIN_MEASUREMENT_STEPS:
         msg = "At least two measurement steps are required."
         raise ValueError(msg)
     if bool(np.any(u <= 0.0)):

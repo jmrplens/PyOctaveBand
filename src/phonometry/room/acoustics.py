@@ -97,6 +97,19 @@ _TRUST_MARGIN_DB = 10.0
 #: fitting the sloping line of ISO 3382-1:2009, 5.3.3, Equation (3).
 _SMOOTH_SECONDS = 0.010
 
+#: Minimum number of decay-level samples for the degree-1 least-squares
+#: line fits (a line fit needs at least two points): the sloping line of
+#: ISO 3382-1:2009, 5.3.3, Equation (3) in :func:`_truncation` and the
+#: evaluation-range fit of ISO 3382-2:2008, Equations (C.1)-(C.6) in
+#: :func:`_fit_decay_time`.
+_MIN_LINE_FIT_POINTS = 2
+
+#: Threshold on the fitted decay slope in dB/s: a slope at or shallower
+#: than this (implying a T60 of ~6e8 s, physically meaningless) is treated
+#: as no decay, protecting the decay constant alpha from underflowing and
+#: the tail terms p2_t1/alpha and 1/alpha**2 from overflowing to inf.
+_NO_DECAY_SLOPE_DB_PER_S = -1e-7
+
 #: Evaluation ranges in dB below the steady-state level:
 #: EDT 0 -> -10 (ISO 3382-1, A.2.2); T20 -5 -> -25 and T30 -5 -> -35
 #: (ISO 3382-2:2008, Clause 6).
@@ -281,7 +294,7 @@ def _truncation(
     level = 10.0 * np.log10(np.maximum(smoothed, tiny))
     noise_db = 10.0 * np.log10(noise_power)
     mask = (level <= level.max() - 5.0) & (level >= noise_db + _TRUST_MARGIN_DB)
-    if int(mask.sum()) < 2:
+    if int(mask.sum()) < _MIN_LINE_FIT_POINTS:
         return no_truncation
     slope, intercept = np.polyfit(t_smooth[mask], level[mask], 1)
     # A non-negative slope means no decay; a barely-negative slope (e.g.
@@ -290,7 +303,7 @@ def _truncation(
     # 1/alpha**2 overflow to inf. A slope of -1e-7 dB/s implies a T60 of
     # ~6e8 s, which is physically meaningless, so treat anything shallower
     # as no decay.
-    if slope >= -1e-7:
+    if slope >= _NO_DECAY_SLOPE_DB_PER_S:
         return no_truncation
     t1 = (noise_db - intercept) / slope
     i1 = min(max(round(t1 * fs), 2), n)
@@ -346,7 +359,7 @@ def _fit_decay_time(
     if lower < trust_floor_db:
         return float("nan")
     mask = (level <= upper) & (level >= lower)
-    if int(mask.sum()) < 2 or float(level.min()) > lower:
+    if int(mask.sum()) < _MIN_LINE_FIT_POINTS or float(level.min()) > lower:
         return float("nan")
     slope = float(np.polyfit(time[mask], level[mask], 1)[0])
     if slope >= 0.0:
@@ -582,7 +595,7 @@ def room_parameters(
         frequency = None
         band_signals: list[np.ndarray] = [x]
     else:
-        if len(limits) != 2:
+        if len(limits) != 2:  # noqa: PLR2004
             msg = "'limits' must be a (f_min, f_max) pair or None."
             raise ValueError(msg)
         bank = OctaveFilterBank(

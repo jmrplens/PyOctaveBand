@@ -73,6 +73,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 Complex = NDArray[np.complex128]
 
 __all__ = [
+    "BASIC_METHOD_MAX_CREST_FACTOR",
     "HAV_EAV_A8",
     "HAV_ELV_A8",
     "REFERENCE_ACCELERATION",
@@ -137,6 +138,10 @@ WBV_EAV_VDV = 9.1
 #: Whole-body VDV exposure limit value ``21 m/s^1,75`` (Directive
 #: 2002/44/EC, Article 3(2)(b), alternative dose metric).
 WBV_ELV_VDV = 21.0
+
+#: Largest crest factor for which the basic (r.m.s.) evaluation method is
+#: adequate (ISO 2631-1:1997, 6.2.2); :func:`crest_factor` warns above it.
+BASIC_METHOD_MAX_CREST_FACTOR = 9.0
 
 _Q_BUTTERWORTH = 1.0 / math.sqrt(2.0)
 
@@ -740,7 +745,7 @@ def crest_factor(signal: SignalInput) -> float:
     if rms <= 0.0:
         return 0.0
     cf = float(np.max(np.abs(x)) / rms)
-    if cf > 9.0:
+    if cf > BASIC_METHOD_MAX_CREST_FACTOR:
         warnings.warn(
             f"Crest factor {cf:.1f} exceeds 9; the basic r.m.s. method may be "
             "inadequate (ISO 2631-1, 6.2.2) - consider the VDV or running "

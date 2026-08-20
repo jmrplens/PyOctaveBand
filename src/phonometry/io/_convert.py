@@ -57,7 +57,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ._backends import _import_soundfile, _sniff, info
+from ._backends import _FLAC_NAME, _import_soundfile, _sniff, info
 from ._blocks import read_blocks
 from ._chunks import (
     WAVE_FORMAT_IEEE_FLOAT,
@@ -102,6 +102,10 @@ _SF_SUBTYPE_TRAITS: dict[str, tuple[str, int]] = {
     "DOUBLE": ("float", 64),
 }
 
+#: libsndfile's FLAC integer ceiling: FLAC holds integer PCM up to 24 bits,
+#: above which an integer source cannot pass through a FLAC target whole.
+_FLAC_MAX_PCM_BITS = 24
+
 
 def _source_traits(
     path: str | Path,
@@ -128,7 +132,7 @@ def _source_traits(
     sf = _import_soundfile(format_name)
     file_info = sf.info(str(path))
     kind, bits = _SF_SUBTYPE_TRAITS.get(str(file_info.subtype), ("decoded", 0))
-    bext = read_flac_bext(path) if format_name == "FLAC" else None
+    bext = read_flac_bext(path) if format_name == _FLAC_NAME else None
     return (
         kind,
         bits,
@@ -142,13 +146,13 @@ def _source_traits(
 def _default_subtype(kind: str, bits: int, *, flac: bool) -> str:
     """The subtype that preserves the source, or a demand to choose one."""
     if kind == "int":
-        if bits <= 16:
+        if bits <= _SUBTYPE_BITS["PCM_16"]:
             depth = 16
-        elif bits <= 24:
+        elif bits <= _SUBTYPE_BITS["PCM_24"]:
             depth = 24
         else:
             depth = 32
-        if flac and depth > 24:
+        if flac and depth > _FLAC_MAX_PCM_BITS:
             msg = (
                 "FLAC holds integer PCM up to 24 bits (libsndfile); a "
                 f"{bits}-bit integer source cannot pass through whole. "
@@ -165,7 +169,7 @@ def _default_subtype(kind: str, bits: int, *, flac: bool) -> str:
         )
         raise ValueError(msg)
     if kind == "float":
-        return "FLOAT" if bits == 32 else "DOUBLE"
+        return "FLOAT" if bits == _SUBTYPE_BITS["FLOAT"] else "DOUBLE"
     return "FLOAT"
 
 

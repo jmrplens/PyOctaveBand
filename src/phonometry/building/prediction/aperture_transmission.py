@@ -375,7 +375,7 @@ def composite_transmission_loss(
         tau = 10.0 ** (-r / 10.0)
         total_1d = float(np.sum(s * tau) / np.sum(s))
         return np.asarray(-10.0 * np.log10(total_1d), dtype=np.float64)
-    if r.ndim == 2:
+    if r.ndim == 2:  # noqa: PLR2004
         if r.shape[0] != s.shape[0]:
             msg = "'reduction_indices' first axis must match 'areas'."
             raise ValueError(msg)

@@ -85,7 +85,7 @@ from ._bext import (
     serialize_bext,
     with_measured_loudness,
 )
-from ._chunks import BroadcastMetadata
+from ._chunks import _RF64_SIZE_SENTINEL, BroadcastMetadata
 from ._signal import Signal
 
 if TYPE_CHECKING:
@@ -111,6 +111,12 @@ _SUBTYPE_SPEC: dict[str, tuple[int, int]] = {
     "DOUBLE": (0x0003, 8),
 }
 
+#: Bytes per sample of PCM_16, read from ``_SUBTYPE_SPEC`` so the value keeps
+#: living in one place: the per-sample width that separates the two
+#: scipy-served integer depths (PCM_16 vs PCM_32) and selects the ``<i2``
+#: dtype.
+_PCM16_SAMPLE_BYTES = _SUBTYPE_SPEC["PCM_16"][1]
+
 #: File suffixes the base writer owns (the WAV family; dispatch on write is
 #: by declared target, unlike the read side's magic bytes -- a file being
 #: created has no bytes to sniff).
@@ -119,6 +125,11 @@ _WAV_SUFFIXES = frozenset({".wav", ".wave", ".bwf"})
 #: numpy integer dtypes accepted for bit-exact pass-through, and the
 #: subtype their codes are.
 _PASSTHROUGH_SUBTYPES = {np.dtype(np.int16): "PCM_16", np.dtype(np.int32): "PCM_32"}
+
+#: Fourcc of the classic 32-bit WAV container: this file's declared size is
+#: the uint32 at offset 4, unlike RF64/BW64 whose real size is the uint64
+#: inside ``ds64`` at offset 20.
+_RIFF_FOURCC = b"RIFF"
 
 
 def _resolve_input(
@@ -151,7 +162,7 @@ def _resolve_input(
     if data.dtype not in _PASSTHROUGH_SUBTYPES:
         data = np.asarray(data, dtype=np.float64)
     data = np.atleast_2d(data)
-    if data.ndim != 2:
+    if data.ndim != 2:  # noqa: PLR2004
         msg = f"x must be 1-D or (channels, samples); got {data.ndim}-D"
         raise ValueError(msg)
     return data, int(fs)
@@ -296,7 +307,7 @@ def build_wav_header(
     # RIFF payload: the WAVE form type, every chunk, the data payload and
     # its pad byte; the outer 8-byte (fourcc + size) header is not counted.
     riff_payload = 4 + len(body) + 8 + data_size + data_size % 2
-    if riff_payload <= 0xFFFFFFFF:
+    if riff_payload <= _RF64_SIZE_SENTINEL:
         return (
             b"RIFF"
             + struct.pack("<I", riff_payload)
@@ -308,12 +319,12 @@ def build_wav_header(
     ds64 = b"ds64" + struct.pack("<IQQQI", 28, riff_payload + 36, data_size, frames, 0)
     return (
         b"RF64"
-        + struct.pack("<I", 0xFFFFFFFF)
+        + struct.pack("<I", _RF64_SIZE_SENTINEL)
         + b"WAVE"
         + ds64
         + body
         + b"data"
-        + struct.pack("<I", 0xFFFFFFFF)
+        + struct.pack("<I", _RF64_SIZE_SENTINEL)
     )
 
 
@@ -368,8 +379,8 @@ def append_riff_chunk(path: str | Path, chunk_id: bytes, payload: bytes) -> None
             fh.write(b"\x00")
         fh.write(frame_riff_chunk(chunk_id, payload))
         riff_size = fh.tell() - 8
-        if fourcc == b"RIFF":
-            if riff_size > 0xFFFFFFFF:
+        if fourcc == _RIFF_FOURCC:
+            if riff_size > _RF64_SIZE_SENTINEL:
                 msg = (
                     f"{path}: appending {len(payload)} bytes overflows the "
                     "32-bit RIFF size; the file needed to be RF64"
@@ -662,7 +673,11 @@ def _write_through_scipy(
         codes, clipped, peak_dbfs = _quantise(data, 8 * sample_bytes, dither, rng)
         if clipped:
             _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-        _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2 else "<i4"))
+        _scipy_write(
+            path,
+            rate,
+            codes.astype("<i2" if sample_bytes == _PCM16_SAMPLE_BYTES else "<i4"),
+        )
     else:
         _scipy_write(
             path, rate, data if resolved == "DOUBLE" else data.astype(np.float32)

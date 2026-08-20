@@ -10,6 +10,18 @@ import numpy as np
 
 from .._internal.warnings import PhonometryWarning
 
+# IEC 61260-1 Annex E.3: a most-significant digit of 1-4 keeps three
+# significant figures, one of 5-9 keeps two.
+_ANNEX_E3_MSD_THRESHOLD = 5.0
+
+# Adjacent mid-band centre ratio separating the two IEC 61260 band structures:
+# octave spacing (2) above it, one-third-octave spacing (2**(1/3) ~ 1.26) below.
+_OCTAVE_SPACING_MIN_RATIO = 1.5
+
+# One kilohertz in hertz: the boundary at which a nominal-frequency label
+# switches to the abbreviated "k" form, and the Hz-to-kHz divisor.
+_HZ_PER_KHZ = 1000
+
 
 def nominal_frequencies(
     fraction: float,
@@ -133,7 +145,11 @@ def _iec_e3_round(f: float) -> float:
         return f
     exponent = int(np.floor(np.log10(f)))
     msd = f / (10.0**exponent)
-    step = 10.0 ** (exponent - 2) if msd < 5.0 else 10.0 ** (exponent - 1)
+    step = (
+        10.0 ** (exponent - 2)
+        if msd < _ANNEX_E3_MSD_THRESHOLD
+        else 10.0 ** (exponent - 1)
+    )
     return round(f / step) * step
 
 
@@ -168,15 +184,15 @@ def _infer_band_fraction(frequency: np.ndarray) -> int:
     report fiche so they classify a band set identically.
     """
     freq = np.asarray(frequency, dtype=np.float64)
-    if freq.size < 2:
+    if freq.size < 2:  # noqa: PLR2004
         return 1
-    return 1 if float(freq[1] / freq[0]) > 1.5 else 3
+    return 1 if float(freq[1] / freq[0]) > _OCTAVE_SPACING_MIN_RATIO else 3
 
 
 def _format_nominal_freq(f: float) -> str:
     """Format a nominal frequency as a human-readable label string."""
-    if f >= 1000:
-        return f"{f / 1000:g}k"
+    if f >= _HZ_PER_KHZ:
+        return f"{f / _HZ_PER_KHZ:g}k"
     return f"{f:g}"
 
 

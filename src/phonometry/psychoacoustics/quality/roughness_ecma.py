@@ -89,6 +89,10 @@ _K_ONE = _SB_TILDE // 2 + 1  # 257 one-sided modulation-rate bins
 _R_S50 = 50.0  # interpolated rate r_s50 (Clause 7.1.7)
 _DZ = 0.5  # critical-band overlap dz (Clause 7.1.9)
 _TRANSIENT = 16  # discard l50 in [0, 15] (Clause 7.1.8)
+_REFERENCE_FREQUENCY = 1000.0  # 1 kHz reference of the Clause 7.1.5 weightings
+_MAX_PEAKS = 10  # keep only the 10 most prominent spectral peaks (Clause 7.1.5.1)
+_HARMONIC_TOL = 0.04  # 4 % harmonic-deviation gate (Formula 90)
+_MIN_INTERP_BLOCKS = 2  # fewest block-time knots pchip can interpolate (7.1.7)
 
 # Calibration constant c_R (Formula 104, tabulated; adjustable +/- 0.25 %).
 _C_R = 0.0180685
@@ -152,8 +156,8 @@ def _f_max() -> np.ndarray:
 def _r_max() -> np.ndarray:
     """Scaling factor r_max(z) (Formula 84, Table 11)."""
     lg = np.abs(np.log2(_F_CENTRE / 1000.0))
-    r1 = np.where(_F_CENTRE < 1000.0, 0.3560, 0.8024)
-    r2 = np.where(_F_CENTRE < 1000.0, 0.8049, 0.9333)
+    r1 = np.where(_F_CENTRE < _REFERENCE_FREQUENCY, 0.3560, 0.8024)
+    r2 = np.where(_F_CENTRE < _REFERENCE_FREQUENCY, 0.8049, 0.9333)
     return np.asarray(1.0 / (1.0 + r1 * lg**r2), dtype=np.float64)
 
 
@@ -358,8 +362,8 @@ def _pick_peaks(spec: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         return np.empty(0), np.empty(0)
     kloc = peaks + 2  # absolute modulation-rate index
     proms = np.asarray(props["prominences"], dtype=np.float64)
-    if kloc.size > 10:  # keep the 10 highest-prominence peaks
-        top = np.argsort(proms)[::-1][:10]
+    if kloc.size > _MAX_PEAKS:  # keep the 10 highest-prominence peaks
+        top = np.argsort(proms)[::-1][:_MAX_PEAKS]
         kloc = np.sort(kloc[top])
     amps = spec[kloc]
     keep = amps > 0.05 * np.max(amps)  # Formula 72
@@ -406,7 +410,7 @@ def _harmonic_members(f_p: np.ndarray, i0: int) -> list[int]:
         err = abs(f_p[i] / (r * f_p[i0]) - 1.0)  # Formula 89
         if r not in cand or err < cand[r][1]:
             cand[r] = (i, err)
-    return [i for i, err in cand.values() if err < 0.04]  # Formula 90
+    return [i for i, err in cand.values() if err < _HARMONIC_TOL]  # Formula 90
 
 
 def _fundamental_set(f_p: np.ndarray, a_tilde: np.ndarray) -> tuple[list[int], int]:
@@ -491,7 +495,7 @@ def _time_dependent(
     t_end = float(block_times[-1])
     n50 = int(np.floor(t_end * _R_S50)) + 1
     grid = np.arange(n50) / _R_S50
-    if block_times.size >= 2:
+    if block_times.size >= _MIN_INTERP_BLOCKS:
         # Piecewise cubic Hermite (Clause 7.1.7), all 53 bands in one
         # interpolator; pchip treats every column independently, so the
         # result is bit-identical to a per-band loop.

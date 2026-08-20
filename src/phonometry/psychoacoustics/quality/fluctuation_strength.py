@@ -131,6 +131,11 @@ _P_M = 1.7  # modulation-depth exponent p_m (Osses 2016 §3.1)
 _P_K = 1.7  # cross-covariance exponent p_k (Osses 2016 §3.1)
 _COMPRESSION_THRESHOLD = 0.7  # m* compression knee (Osses 2016 §2.1.3)
 _COMPRESSION_RATIO = 3.0  # 3:1 compression above the knee
+_G_TAPER_START_BARK = 15.0  # g(z) taper start, Bark (Osses 2016 §3.1)
+# Shortest analysis frame, in samples. Every frame is full length, so a frame
+# below this is only reachable when the whole signal is shorter; it is
+# degenerate for the FFT-based excitation front-end and is skipped.
+_MIN_FRAME_SAMPLES = 16
 # Envelope band-pass H(fmod). The paper's 3.1-12 Hz cascade was fitted to its
 # own 4096-tap FIR front-end and is too narrow for this FFT-based excitation
 # front-end -- it collapses the 1-2 Hz and 16-32 Hz tails of the modulation
@@ -149,6 +154,11 @@ _LP_ORDER = 3  # H(fmod) low-pass order (steep upper roll-off)
 #: reference stimulus through this implementation's own front-end and cached (see
 #: :func:`_c_fs`), replacing the paper's front-end-specific literal 0.2490.
 _C_FS: float | None = None
+#: Expected range (half-open, min <= C_FS < max) of the sanity guard on the
+#: derived C_FS, bracketing the paper's front-end literal 0.2490 and this
+#: implementation's ~0.28.
+_C_FS_EXPECTED_MIN = 0.15
+_C_FS_EXPECTED_MAX = 0.50
 
 
 def _hz_to_bark(f: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -188,8 +198,8 @@ def _g_weight(z: NDArray[np.float64]) -> NDArray[np.float64]:
     linear taper down to 0.5 at 23.5 Bark.
     """
     g = np.ones_like(z)
-    high = z > 15.0
-    g[high] = 1.0 - 0.5 * (z[high] - 15.0) / (23.5 - 15.0)
+    high = z > _G_TAPER_START_BARK
+    g[high] = 1.0 - 0.5 * (z[high] - _G_TAPER_START_BARK) / (23.5 - _G_TAPER_START_BARK)
     return np.clip(g, 0.5, 1.0)
 
 
@@ -410,7 +420,7 @@ def _analyze(
 
     for start in starts:
         frame = sig[start : start + frame_len]
-        if frame.size < 16:
+        if frame.size < _MIN_FRAME_SAMPLES:
             continue
         band_env = _band_envelopes(frame, z_axis, band_center_hz)
         m_star, h_bp = _modulation_depth(band_env, env_sos)
@@ -452,7 +462,9 @@ def _c_fs() -> float:
     if _C_FS is None:
         raw = float(np.median(_analyze(_reference_signal())[0]))
         c = 1.0 / raw if raw > 0.0 else 0.0
-        if not 0.15 <= c < 0.50:  # pragma: no cover - sanity guard
+        if (
+            not _C_FS_EXPECTED_MIN <= c < _C_FS_EXPECTED_MAX
+        ):  # pragma: no cover - sanity guard
             msg = f"C_FS={c} outside the expected range"
             raise RuntimeError(msg)
         _C_FS = c

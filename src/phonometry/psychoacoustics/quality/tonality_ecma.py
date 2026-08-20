@@ -61,6 +61,10 @@ _Q_B = 0.003
 # Tonality calibration factor c_T (Formula 51); 1 kHz/40 dB -> 1 tu_HMS.
 _C_T = 2.8758615
 
+# Preconditions on the user band range [f_L, f_H] (Clause 6.2.10).
+_F_LOW_MIN_HZ = 16.0  # Formula 56 precondition: f_L > 16 Hz
+_F_HIGH_MAX_HZ = 20000.0  # Formula 57 precondition: f_H < 20 kHz
+
 #: Prominence criterion (Clause 6.3): a signal has a prominent tonality when
 #: the single value T (Formula 63) exceeds this value, in tu_HMS.
 PROMINENT_TONALITY_TU_HMS = 0.4
@@ -131,10 +135,10 @@ def _band_range(f_low: float | None, f_high: float | None) -> tuple[int, int]:
     Enforces the Formulae 56/57 preconditions: 16 Hz < f_L, f_H < 20 kHz and
     f_L < f_H.
     """
-    if f_low is not None and f_low <= 16.0:
+    if f_low is not None and f_low <= _F_LOW_MIN_HZ:
         msg = "'f_low' must exceed 16 Hz (Formula 56)."
         raise ValueError(msg)
-    if f_high is not None and f_high >= 20000.0:
+    if f_high is not None and f_high >= _F_HIGH_MAX_HZ:
         msg = "'f_high' must be below 20 kHz (Formula 57)."
         raise ValueError(msg)
     if f_low is not None and f_high is not None and f_low >= f_high:

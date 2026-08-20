@@ -104,6 +104,18 @@ __all__ = [
 #: Shared validation message for open porosities.
 _POROSITY_MESSAGE = "'porosity' must not exceed 1."
 
+#: Upper bound of the Poisson ratio of an isotropic elastic frame:
+#: nu -> 0.5 is the incompressible-solid limit, where the frame bulk modulus
+#: Kb = 2N(nu + 1)/(3(1 - 2 nu)) (Allard & Atalla 2e Eq. (6.29), computed in
+#: ``frame_bulk_modulus`` below) diverges; -1 < nu < 0.5 is the isotropic
+#: stability range.
+_POISSON_INCOMPRESSIBLE_LIMIT = 0.5
+
+#: Discriminator of a two-variable fluid block in the global assembly (the
+#: six-variable alternative is ``"poroelastic"``): the kind decides which
+#: coupling matrices of A&A Sect. 11.4 join two adjacent blocks.
+_FLUID = "fluid"
+
 
 def _require_shear_modulus(value: complex, name: str) -> complex:
     r"""Validate a complex shear modulus :math:`N = N'(1 + j \eta)`."""
@@ -126,7 +138,7 @@ def _require_shear_modulus(value: complex, name: str) -> complex:
 def _require_poisson_ratio(value: float) -> float:
     """Validate a Poisson coefficient of an isotropic frame."""
     nu = float(value)
-    if not -1.0 < nu < 0.5:
+    if not -1.0 < nu < _POISSON_INCOMPRESSIBLE_LIMIT:
         msg = "'poisson_ratio' must satisfy -1 < nu < 0,5."
         raise ValueError(msg)
     return nu
@@ -748,7 +760,7 @@ class _Block:
 def _fluid_block(transfer_matrix: Complex) -> _Block:
     """A two-variable block from its ``(nf, 2, 2)`` chain matrix."""
     identity = np.broadcast_to(np.eye(2, dtype=np.complex128), transfer_matrix.shape)
-    return _Block("fluid", transfer_matrix, np.asarray(identity), 1.0)
+    return _Block(_FLUID, transfer_matrix, np.asarray(identity), 1.0)
 
 
 def _poroelastic_block(
@@ -841,10 +853,10 @@ def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
     :math:`[J_{pf}]` (Eq. (11.73)), with the two
     matrices interchanged for a fluid-porous boundary.
     """
-    left_kind = "fluid" if left is None else left.kind
+    left_kind = _FLUID if left is None else left.kind
     left_porosity = 1.0 if left is None else left.porosity
     if left_kind == right.kind:
-        if left_kind == "fluid":
+        if left_kind == _FLUID:
             return (
                 np.eye(2, dtype=np.complex128),
                 -np.eye(2, dtype=np.complex128),
@@ -861,7 +873,7 @@ def _interface(left: _Block | None, right: _Block) -> tuple[Complex, Complex]:
 
 def _wall_matrix(block: _Block) -> Complex:
     r""":math:`[Y]` of A&A Eq. (11.81): zero velocity against a hard wall."""
-    if block.kind == "fluid":
+    if block.kind == _FLUID:
         return np.array([[0.0, 1.0]], dtype=np.complex128)
     return np.eye(6, dtype=np.complex128)[:3]
 
@@ -899,7 +911,7 @@ def _stack_surface_impedance(
     # A semi-infinite fluid behind a poroelastic layer needs its own two
     # variables (A&A Eq. (11.85)); behind a fluid layer the impedance closes
     # the system directly.
-    trailing_fluid = termination is not None and last.kind != "fluid"
+    trailing_fluid = termination is not None and last.kind != _FLUID
     sizes = [2, *(block.unknowns for block in blocks)]
     if trailing_fluid:
         sizes.append(2)

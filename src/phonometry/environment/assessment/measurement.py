@@ -72,10 +72,23 @@ _KT_HIGH = 10.0
 #: Maximum tonal adjustment ``Kt`` (dB).
 _KT_MAX = 6.0
 
+#: Upper mean-audibility limits (dB) of the coarse 3-dB-step alternative
+#: to Table J.1: ΔL ≤ 2 → Kt = 0, ΔL ≤ 9 → Kt = 3, above → Kt = 6.
+_COARSE_KT_LOW = 2.0
+_COARSE_KT_HIGH = 9.0
+
 #: Critical-band centre-frequency split (Table C.1): 100 Hz up to 500 Hz.
 _CRITICAL_BAND_SPLIT = 500.0
 _CRITICAL_BAND_LOW_WIDTH = 100.0
 _CRITICAL_BAND_HIGH_FRACTION = 0.20
+
+#: Survey method (Annex K): fewest one-third-octave bands with an interior
+#: band to test (a band needs both neighbours), and the highest band-centre
+#: frequencies (Hz) of the low (25–125 Hz, 15 dB threshold) and mid
+#: (160–400 Hz, 8 dB threshold) ranges.
+_MIN_SURVEY_BANDS = 3
+_SURVEY_LOW_RANGE_TOP = 125.0
+_SURVEY_MID_RANGE_TOP = 400.0
 
 #: Coverage factors k (Clause 4): 95 % (k = 2) and 80 % (k = 1.3).
 _COVERAGE_FACTORS = {0.95: 2.0, 0.80: 1.3}
@@ -84,6 +97,16 @@ _COVERAGE_FACTORS = {0.95: 2.0, 0.80: 1.3}
 _GAUSS_CONSTANT = 0.115
 _GAUSS_DIVISOR_L90 = 1.28
 _GAUSS_DIVISOR_L95 = 1.65
+
+#: Margin L' − Lres (dB) that must be exceeded for the Formula (16)
+#: correction; within it, Clause 10.4 allows no correction and only the
+#: uncorrected L' is reportable, as an upper bound. A rule independent of
+#: the 3 dB Formula (20) Note 2 spread limit (_LEVEL_SPREAD_WARNING_DB).
+_MIN_CORRECTION_MARGIN_DB = 3.0
+
+#: Fewest repeated measured levels from which the Formula (17) sample
+#: standard deviation, with its (N − 1) denominator, exists.
+_MIN_REPEATED_LEVELS = 2
 
 
 class EnvironmentalMeasurementWarning(PhonometryWarning):
@@ -248,9 +271,9 @@ def tonal_adjustment_from_mean_audibility(
     """
     delta = _finite(mean_audibility, "mean_audibility")
     if coarse:
-        if delta <= 2.0:
+        if delta <= _COARSE_KT_LOW:
             return 0
-        if delta <= 9.0:
+        if delta <= _COARSE_KT_HIGH:
             return 3
         return 6
     for upper, adjustment in _TABLE_J1:
@@ -292,7 +315,7 @@ def tonal_seeking_survey(
     if lev.size != freq.size:
         msg = "'levels' and 'frequencies' must share their length."
         raise ValueError(msg)
-    if lev.size < 3:
+    if lev.size < _MIN_SURVEY_BANDS:
         msg = "Need at least three bands to test the neighbours."
         raise ValueError(msg)
     if not (np.all(np.isfinite(lev)) and np.all(np.isfinite(freq))):
@@ -308,9 +331,9 @@ def tonal_seeking_survey(
 
 def _survey_threshold(frequency: float) -> float:
     """The survey level-difference threshold for a band centre (Annex K)."""
-    if frequency <= 125.0:
+    if frequency <= _SURVEY_LOW_RANGE_TOP:
         return 15.0
-    if frequency <= 400.0:
+    if frequency <= _SURVEY_MID_RANGE_TOP:
         return 8.0
     return 5.0
 
@@ -371,7 +394,7 @@ def residual_sound_correction(
         msg = "'residual_level' must be below 'measured_level' to correct."
         raise ValueError(msg)
     corrected = 10.0 * np.log10(10.0 ** (lp / 10.0) - 10.0 ** (lres / 10.0))
-    reliable = margin > 3.0
+    reliable = margin > _MIN_CORRECTION_MARGIN_DB
     if not reliable:
         warnings.warn(
             "Residual is within 3 dB of the measured level; no correction is "
@@ -605,7 +628,7 @@ def uncertainty_from_repeated_measurements(
     import warnings
 
     lev = np.asarray(levels, dtype=np.float64)
-    if lev.ndim != 1 or lev.size < 2:
+    if lev.ndim != 1 or lev.size < _MIN_REPEATED_LEVELS:
         msg = "'levels' must be a 1-D array of at least two values."
         raise ValueError(msg)
     if not np.all(np.isfinite(lev)):

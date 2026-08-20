@@ -82,6 +82,12 @@ _FLOW_RESISTIVITY = {
     "G": 20.0e6,  # hard surfaces (asphalt, concrete)
     "H": 200.0e6,  # very hard and dense (dense asphalt, water)
 }
+#: Minimum vertex count of a terrain section: two vertices form the single
+#: straight segment the continuous least-squares mean-plane fit (Eq. 36-40) needs.
+_MIN_SECTION_VERTICES = 2
+#: Edge span ``e`` at or below which the multiple-diffraction factor C'' is 1,
+#: in metres (guidance Eq. 44).
+_SINGLE_DIFFRACTION_MAX_SPAN = 0.3
 
 
 # --------------------------------------------------------------------------- #
@@ -188,12 +194,13 @@ def _absorption_coefficient(
     import warnings
 
     from ..environment.propagation.air_absorption import (
+        _FREQ_RANGE,
         AtmosphericAbsorptionWarning,
         air_attenuation,
     )
 
     with warnings.catch_warnings():
-        if frequencies.max() <= 10000.0:
+        if frequencies.max() <= _FREQ_RANGE[1]:
             warnings.filterwarnings(
                 "ignore",
                 message="One or more frequencies are outside",
@@ -420,7 +427,7 @@ def _validated_section(
     """The validated ``(d, z)`` arrays of a terrain section."""
     d = np.atleast_1d(np.asarray(distances, dtype=np.float64))
     z = np.atleast_1d(np.asarray(heights, dtype=np.float64))
-    if d.ndim != 1 or d.shape != z.shape or d.size < 2:
+    if d.ndim != 1 or d.shape != z.shape or d.size < _MIN_SECTION_VERTICES:
         msg = "'distances' and 'heights' must be 1-D of equal size >= 2."
         raise ValueError(msg)
     if not (np.all(np.isfinite(d)) and np.all(np.isfinite(z))):
@@ -530,7 +537,7 @@ def diffraction_attenuation(
     e = require_non_negative(edge_span, "edge_span")
     lam = _C / f
     c2 = np.ones_like(f)
-    if e > 0.3:
+    if e > _SINGLE_DIFFRACTION_MAX_SPAN:
         c2 = (1.0 + (5.0 * lam / e) ** 2) / (1.0 / 3.0 + (5.0 * lam / e) ** 2)
     arg = 3.0 + 40.0 / lam * c2 * path_difference
     ch = np.minimum(f * h0 / 250.0, 1.0)
@@ -707,7 +714,7 @@ def _upper_hull(points: NDArray[np.float64]) -> NDArray[np.float64]:
     """The upper convex hull of ``(d, z)`` points sorted by ``d``."""
     hull: list[np.ndarray] = []
     for pt in points:
-        while len(hull) >= 2:
+        while len(hull) >= 2:  # noqa: PLR2004
             u, v = hull[-2], hull[-1]
             if (v[0] - u[0]) * (pt[1] - u[1]) - (v[1] - u[1]) * (pt[0] - u[0]) >= 0.0:
                 hull.pop()
@@ -765,7 +772,7 @@ def _screening_core(
     sigma_seg: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], bool, float, NDArray[np.float64]]:
     """The combined ground-and-screening adjustment of a section (Eq. 45-47)."""
-    interior = slice(1, -1) if d.size > 2 else slice(0, 0)
+    interior = slice(1, -1) if d.size > _MIN_SECTION_VERTICES else slice(0, 0)
     los = src[1] + (rcv[1] - src[1]) * (d - src[0]) / (rcv[0] - src[0])
     above = np.zeros(d.size, dtype=bool)
     above[interior] = z[interior] > los[interior]

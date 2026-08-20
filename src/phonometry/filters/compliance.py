@@ -55,6 +55,9 @@ __all__ = [
 
 _G = 10 ** (3 / 10)
 
+# Fewest per-band frequency-grid points the class verification accepts.
+_MIN_GRID_POINTS = 16
+
 # BS EN 61260-1:2014 Table 1, high side (Omega >= 1), as exponents x of the
 # octave-band normalized frequency G**x with (min, max) limits per class.
 # The low side mirrors these at 1/Omega (Formula 10). The band-edge rows
@@ -313,7 +316,7 @@ def verify_filter_class(
         frequency the band's verification could reach (its processing Nyquist
         over ``f_m``).
     """
-    if num_points < 16:
+    if num_points < _MIN_GRID_POINTS:
         msg = "'num_points' must be at least 16."
         raise ValueError(msg)
     spec = _FILTER_EDITIONS.get(edition)

@@ -125,14 +125,18 @@ def _resolve_walls(
         raise ValueError(msg)
     if alpha.ndim == 0:
         walls = np.full((6, 1), float(alpha), dtype=np.float64)
-    elif alpha.ndim == 1 and alpha.shape[0] == 6 and n_freq != 6:
+    elif (
+        alpha.ndim == 1
+        and alpha.shape[0] == len(WALL_ORDER)
+        and n_freq != len(WALL_ORDER)
+    ):
         # Length 6 with no matching frequencies -> the six per-wall values.
         walls = alpha[:, np.newaxis]
     elif alpha.ndim == 1:
         # A per-band curve, uniform across walls (this branch also handles a
         # length-6 curve when frequencies declares six bands).
         walls = np.broadcast_to(alpha, (6, alpha.shape[0])).copy()
-    elif alpha.ndim == 2 and alpha.shape[0] == 6:
+    elif alpha.ndim == 2 and alpha.shape[0] == len(WALL_ORDER):  # noqa: PLR2004
         walls = alpha
     else:
         msg = (

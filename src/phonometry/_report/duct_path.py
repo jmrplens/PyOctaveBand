@@ -74,11 +74,20 @@ _LEVEL_KINDS = (
 #: The longest element description printed in full before it is elided.
 _LABEL_CHARS = 46
 
+#: The irreducible row count of the elided path table: the source row at the
+#: head plus the three foot rows (room effect, received, criterion) that
+#: :func:`_elide` always keeps -- 1 + the length of its ``tail_kinds``, so a
+#: new tail kind moves this value. At this count the one-page fit loop stops
+#: because nothing more can be trimmed.
+_MIN_SHEET_ROWS = 4
+
 
 def _band_header(frequencies: np.ndarray, language: str) -> list[str]:
     """Column headings: the row-code and element columns, then the band centres."""
+    from ..filters.frequencies import _format_nominal_freq
+
     return [t("Ref.", language), t("Element", language)] + [
-        f"{f:g}" if f < 1000 else f"{f / 1000:g}k" for f in frequencies
+        _format_nominal_freq(f) for f in frequencies
     ]
 
 
@@ -494,7 +503,7 @@ def _fit_to_one_page(
     the table; the complete sheet always stays available through
     :meth:`~phonometry.noise_control.duct_path.DuctPathResult.table`.
     """
-    while len(rows) > 4:
+    while len(rows) > _MIN_SHEET_ROWS:
         used = _flow_height(flow)
         if used <= _FRAME_HEIGHT:
             return

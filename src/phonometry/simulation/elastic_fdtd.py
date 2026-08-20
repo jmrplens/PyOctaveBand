@@ -101,6 +101,11 @@ _DIRECTIONS = ("x", "y")
 #: Fields a probe or a snapshot can record.
 _FIELD_NAMES = ("p", "vx", "vy")
 
+#: Smallest grid extent per axis (in cells) the staggered scheme supports:
+#: an axis shorter than this has no interior faces or corners, so the velocity
+#: field staggered across it and the shear stress txy would be empty arrays.
+_MIN_GRID_CELLS = 2
+
 
 @dataclass(frozen=True)
 class ExplosionSource:
@@ -251,7 +256,7 @@ def _as_material(name: str, value: object) -> Material:
     """Coerce a :class:`Material` or a ``(c_p, c_s, rho)`` triple."""
     if isinstance(value, Material):
         return value
-    if isinstance(value, Sequence) and not isinstance(value, str) and len(value) == 3:
+    if isinstance(value, Sequence) and not isinstance(value, str) and len(value) == 3:  # noqa: PLR2004
         c_p, c_s, rho = (float(np.real(v)) for v in value)
         return Material(c_p=c_p, c_s=c_s, rho=rho)
     msg = f"{name} must be a Material or a (c_p, c_s, rho) triple"
@@ -342,7 +347,7 @@ def _resolve_speed_map(
         out = np.full(shape, float(np.real(value)), dtype=np.float64)
     else:
         out = np.asarray(value, dtype=np.float64)
-    if out.ndim != 2:
+    if out.ndim != 2:  # noqa: PLR2004
         msg = f"{name} must be a 2D (ny, nx) map"
         raise ValueError(msg)
     return out
@@ -445,7 +450,7 @@ class ElasticFDTD2D:
         cp_map = _resolve_speed_map("c_p", c_p, shape)
         _positive_map("c_p", cp_map)
         ny, nx = cp_map.shape
-        if ny < 2 or nx < 2:
+        if ny < _MIN_GRID_CELLS or nx < _MIN_GRID_CELLS:
             msg = "the grid must be at least 2 x 2 cells"
             raise ValueError(msg)
         cs_map = _resolve_speed_map("c_s", c_s, (ny, nx))
@@ -580,7 +585,7 @@ class ElasticFDTD2D:
         """
         ny = _integer("shape[0]", shape[0])
         nx = _integer("shape[1]", shape[1])
-        if ny < 2 or nx < 2:
+        if ny < _MIN_GRID_CELLS or nx < _MIN_GRID_CELLS:
             msg = "the grid must be at least 2 x 2 cells"
             raise ValueError(msg)
         bg = _as_material("background", background)

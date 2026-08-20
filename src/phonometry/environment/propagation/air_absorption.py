@@ -89,6 +89,10 @@ _T01 = 273.16
 _KELVIN = 273.15
 #: Np -> dB factor (20*lg e) ``20 lg e`` printed as 8,686 in Eq. (5).
 _EIGHT_686 = 8.686
+#: Full-scale relative humidity (saturation), in percent: hard upper validity
+#: bound of the input (raises on violation), unlike the advisory tabulated
+#: ``_HUMIDITY_RANGE`` checked alongside it.
+_MAX_RELATIVE_HUMIDITY_PERCENT = 100.0
 
 #: Tabulated ranges of ISO 9613-1:1993 (Scope / clause 1), used for advisories.
 _FREQ_RANGE = (50.0, 10_000.0)
@@ -140,7 +144,7 @@ def _validate(
     if temperature <= -_KELVIN:
         msg = "'temperature' must be above absolute zero (-273,15 degC)."
         raise ValueError(msg)
-    if not 0.0 <= relative_humidity <= 100.0:
+    if not 0.0 <= relative_humidity <= _MAX_RELATIVE_HUMIDITY_PERCENT:
         msg = "'relative_humidity' must be within [0, 100] %."
         raise ValueError(msg)
     if pressure <= 0.0:

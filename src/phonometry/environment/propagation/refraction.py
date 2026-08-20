@@ -67,6 +67,16 @@ if TYPE_CHECKING:
 _C_SOUND = 343.0
 #: Default air density ``rho``, in kg/m3 (matches the environmental domain).
 _AIR_DENSITY = 1.205
+#: Fewest samples of a piecewise-linear profile: two nodes define its segment.
+_MIN_POLYLINE_NODES = 2
+#: Slack, in metres, within which the first profile height counts as the ground
+#: z = 0 (float round-off in user-built grids, not a physical height).
+_ORIGIN_SLACK_M = 1e-9
+#: The vertical, in degrees from the horizontal: exclusive launch-angle bound
+#: (at 90 the ray is vertical and the Snell invariant cos(theta0)/c degenerates).
+_VERTICAL_DEG = 90.0
+#: Fewest range steps per marched ray: the launch sample plus one step.
+_MIN_RAY_STEPS = 2
 
 
 # ===========================================================================
@@ -181,7 +191,7 @@ def log_linear_sound_speed_profile(
     if not np.isfinite(b):
         msg = "'b' must be finite."
         raise ValueError(msg)
-    if int(n_points) < 2:
+    if int(n_points) < _MIN_POLYLINE_NODES:
         msg = "'n_points' must be at least 2."
         raise ValueError(msg)
     # Logarithmic height grid from the ground to max_height (z = 0 included).
@@ -213,7 +223,7 @@ def _clean_profile(
     """Validate and return the height/speed arrays of a profile."""
     z = np.asarray(profile.heights, dtype=np.float64)
     c = np.asarray(profile.sound_speeds, dtype=np.float64)
-    if z.ndim != 1 or z.size < 2:
+    if z.ndim != 1 or z.size < _MIN_POLYLINE_NODES:
         msg = "the profile must have at least two height samples."
         raise ValueError(msg)
     if c.shape != z.shape:
@@ -222,7 +232,7 @@ def _clean_profile(
     if not (np.all(np.isfinite(z)) and np.all(np.isfinite(c))):
         msg = "the profile heights and speeds must be finite."
         raise ValueError(msg)
-    if abs(float(z[0])) > 1e-9:
+    if abs(float(z[0])) > _ORIGIN_SLACK_M:
         msg = "the profile must start at the ground z = 0."
         raise ValueError(msg)
     if np.any(np.diff(z) <= 0.0):
@@ -263,7 +273,7 @@ def ray_curvature_radius(
     if not (np.isfinite(gradient) and abs(gradient) > 0.0):
         msg = "'gradient' must be finite and non-zero (a curved ray)."
         raise ValueError(msg)
-    if abs(launch_angle_deg) >= 90.0:
+    if abs(launch_angle_deg) >= _VERTICAL_DEG:
         msg = "'launch_angle_deg' must be within (-90, 90) degrees."
         raise ValueError(msg)
     return float(c0 / (abs(gradient) * np.cos(np.radians(launch_angle_deg))))
@@ -395,14 +405,14 @@ def atmospheric_ray_paths(
         msg = "'source_height' must be non-negative."
         raise ValueError(msg)
     rmax = require_positive(max_range, "max_range")
-    if int(n_steps) < 2:
+    if int(n_steps) < _MIN_RAY_STEPS:
         msg = "'n_steps' must be at least 2."
         raise ValueError(msg)
     angles = np.asarray(launch_angles_deg, dtype=np.float64).ravel()
     if angles.size == 0 or not np.all(np.isfinite(angles)):
         msg = "'launch_angles_deg' must be finite and non-empty."
         raise ValueError(msg)
-    if np.any(np.abs(angles) >= 90.0):
+    if np.any(np.abs(angles) >= _VERTICAL_DEG):
         msg = "'launch_angles_deg' must be within (-90, 90) degrees."
         raise ValueError(msg)
 

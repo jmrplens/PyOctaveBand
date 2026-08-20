@@ -11,6 +11,16 @@ import numpy as np
 from .._internal.warnings import PhonometryWarning
 from ..io._resolve import SignalInput, resolve_optional_fs, resolve_samples
 
+# IEC 60942:2017 Table 2 (p. 16) row edges in Hz for the class 1 short-term
+# level fluctuation limits; outside the specified span the strictest limit
+# is the fallback (see _class1_fluctuation_limit).
+_TABLE2_SPAN_LOW_HZ = 31.5  # bottom of the specified 31.5 Hz to 16 kHz span
+_TABLE2_LOW_ROW_TOP_HZ = 63.0  # top of the 0.20 dB row, floor of the 0.10 dB row
+_TABLE2_STRICT_ROW_MIN_HZ = 160.0  # at and above, the strictest 0.07 dB applies
+# Minimum sample count for the Hann-windowed coherent (Goertzel) tone
+# estimate; a shorter take falls back to broadband RMS.
+_MIN_COHERENT_SAMPLES = 4
+
 
 class CalibrationWarning(PhonometryWarning):
     """The calibration reference recording looks unreliable."""
@@ -27,9 +37,9 @@ def _class1_fluctuation_limit(frequency: float) -> float:
     0.10 dB; 160 Hz and above -> 0.07 dB. Frequencies outside the specified
     31.5 Hz to 16 kHz span fall back to the strictest limit (0.07 dB).
     """
-    if 31.5 <= frequency <= 63.0:
+    if _TABLE2_SPAN_LOW_HZ <= frequency <= _TABLE2_LOW_ROW_TOP_HZ:
         return 0.20
-    if 63.0 < frequency < 160.0:
+    if _TABLE2_LOW_ROW_TOP_HZ < frequency < _TABLE2_STRICT_ROW_MIN_HZ:
         return 0.10
     return 0.07
 
@@ -215,7 +225,7 @@ def _narrowband_tone_rms(signal_arr: np.ndarray, fs: int, frequency: float) -> f
         per_channel = [_narrowband_tone_rms(row, fs, frequency) for row in x]
         return float(np.sqrt(np.mean(np.square(per_channel))))
     n = x.size
-    if n < 4:
+    if n < _MIN_COHERENT_SAMPLES:
         # Too short for a coherent estimate; fall back to broadband RMS.
         return float(np.sqrt(np.mean(x**2)))
     window = np.hanning(n)

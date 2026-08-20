@@ -98,6 +98,14 @@ _C_DEFAULT = 343.0
 #: -90 deg to +90 deg in 5 deg steps (Clause 6.3, Figure 4), in degrees.
 DEFAULT_POLAR_ANGLES: tuple[int, ...] = tuple(range(-90, 91, 5))
 
+#: Fewest wells a per-period sequence must describe: a single well cannot
+#: form the phase-grating variation the Fraunhofer model sums over.
+_MIN_WELLS = 2
+
+#: Fewest receiver angles of a polar response reducible to the ISO 17497-2
+#: directional diffusion coefficient.
+_MIN_RECEIVERS = 2
+
 
 # ---------------------------------------------------------------------------
 # Validation helpers.
@@ -117,7 +125,7 @@ def _prime_generator(prime: int) -> int:
     if n != prime:
         msg = "'prime' must be an integer."
         raise ValueError(msg)
-    if n < 3 or n % 2 == 0:
+    if n < 3 or n % 2 == 0:  # noqa: PLR2004
         msg = "'prime' must be an odd prime >= 3."
         raise ValueError(msg)
     for factor in range(3, math.isqrt(n) + 1, 2):
@@ -324,7 +332,7 @@ def _resolve_reflection(
         raise ValueError(msg)
     if reflection is not None:
         r = np.atleast_1d(np.asarray(reflection, dtype=np.complex128))
-        if r.ndim != 1 or r.size < 2:
+        if r.ndim != 1 or r.size < _MIN_WELLS:
             msg = "'reflection' must be a 1-D sequence of at least two wells."
             raise ValueError(msg)
         if not np.all(np.isfinite(r)):
@@ -332,7 +340,7 @@ def _resolve_reflection(
             raise ValueError(msg)
         return r
     d = np.atleast_1d(np.asarray(depths, dtype=np.float64))
-    if d.ndim != 1 or d.size < 2:
+    if d.ndim != 1 or d.size < _MIN_WELLS:
         msg = "'depths' must be a 1-D sequence of at least two wells."
         raise ValueError(msg)
     if not np.all(np.isfinite(d)) or np.any(d < 0.0):
@@ -355,7 +363,7 @@ def _prepare_geometry(
     f = _positive_scalar(frequency, "frequency")
     c = _positive_scalar(speed_of_sound, "speed_of_sound")
     ang = np.atleast_1d(np.asarray(angles, dtype=np.float64))
-    if ang.ndim != 1 or ang.size < 2:
+    if ang.ndim != 1 or ang.size < _MIN_RECEIVERS:
         msg = "'angles' must be a 1-D sequence of at least two angles."
         raise ValueError(msg)
     if not np.all(np.isfinite(ang)):

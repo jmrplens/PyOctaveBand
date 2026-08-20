@@ -632,7 +632,7 @@ def _step3_groups(
     for band_tone in tones:
         f1, f2 = critical_band_corners(band_tone[0])
         members = {i for i, t in enumerate(tones) if f1 <= t[0] <= f2}
-        if len(members) < 2:
+        if len(members) < 2:  # noqa: PLR2004
             continue
         for c in [c for c in clusters if c & members]:
             members |= c
@@ -641,7 +641,7 @@ def _step3_groups(
     groups: list[tuple[int, ...]] = []
     for cluster in clusters:
         members_t = tuple(sorted(cluster))
-        if len(members_t) == 2:
+        if len(members_t) == 2:  # noqa: PLR2004
             (ta, tb) = (tones[members_t[0]], tones[members_t[1]])
             if resolve_tones_separately(ta[0], tb[0], ta[4], tb[4]):
                 continue  # rated separately, no FG entry

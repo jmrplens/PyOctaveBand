@@ -42,6 +42,13 @@ _SOURCE_DEPTH_FRACTION = 0.7
 _REFERENCE_DISTANCE = 1.0
 #: ISO 17208-1 standard depression angles (degrees) for the three hydrophones.
 _STANDARD_ANGLES = (15.0, 30.0, 45.0)
+#: Vertical depression angle (degrees); hydrophone angles must stay below it
+#: because the depth ``d = d_CPA * tan(angle)`` diverges at vertical.
+_VERTICAL_DEG = 90.0
+#: Upper edge (Hz) of the 5 dB low-frequency uncertainty bands (ISO 17208-2 §5).
+_UNCERTAINTY_LOW_BAND_MAX_HZ = 100.0
+#: Upper edge (Hz) of the 3 dB mid-frequency uncertainty bands (ISO 17208-2 §5).
+_UNCERTAINTY_MID_BAND_MAX_HZ = 16000.0
 
 
 def radiated_noise_level(rms_pressure: float, distance: float) -> float:
@@ -87,7 +94,7 @@ def hydrophone_depths(
         ang.size == 0
         or not np.all(np.isfinite(ang))
         or np.any(ang <= 0.0)
-        or np.any(ang >= 90.0)
+        or np.any(ang >= _VERTICAL_DEG)
     ):
         msg = "'angles' must be finite and lie in the open interval (0, 90) degrees."
         raise ValueError(msg)
@@ -112,9 +119,9 @@ def source_level_uncertainty(frequency: float) -> float:
     :raises ValueError: If the frequency is not positive.
     """
     f = _positive(frequency, "frequency")
-    if f <= 100.0:
+    if f <= _UNCERTAINTY_LOW_BAND_MAX_HZ:
         return 5.0
-    if f <= 16000.0:
+    if f <= _UNCERTAINTY_MID_BAND_MAX_HZ:
         return 3.0
     return 4.0
 

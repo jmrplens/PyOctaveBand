@@ -129,6 +129,12 @@ DEFAULT_FREQUENCIES: tuple[float, ...] = (
     4000.0,
     8000.0,
 )
+#: Tolerance on |x|, x = sqrt(2*pi*N), below which x/tanh(x) is replaced by its
+#: x -> 0 limit of 1+0j (guards the 0/0 indeterminate form at N = 0).
+_X_OVER_TANH_EPS = 1e-9
+#: Illuminated-zone limit of Maekawa's curve: the Fresnel number below which
+#: barrier diffraction is taken as negligible (0 dB).
+_MAEKAWA_ILLUMINATED_LIMIT = -0.2
 
 Complex = NDArray[np.complex128]
 Real = NDArray[np.float64]
@@ -491,13 +497,13 @@ def kurze_anderson_attenuation(fresnel_number: ArrayLike) -> Real:
     # intermediate argument is clipped at -0.2 to keep it clear of the tangent
     # poles of the imaginary-argument branch (this cannot change the result,
     # which is forced to 0 there below) instead of oscillating through them.
-    n_clipped = np.maximum(n, -0.2)
+    n_clipped = np.maximum(n, _MAEKAWA_ILLUMINATED_LIMIT)
     x = np.sqrt(2.0 * np.pi * n_clipped.astype(np.complex128))
     # x / tanh(x) is real for both real and imaginary x; take the real part.
     with np.errstate(divide="ignore", invalid="ignore"):
-        ratio = np.where(np.abs(x) < 1e-9, 1.0 + 0.0j, x / np.tanh(x))
+        ratio = np.where(np.abs(x) < _X_OVER_TANH_EPS, 1.0 + 0.0j, x / np.tanh(x))
     delta = 5.0 + 20.0 * np.log10(np.abs(ratio))
-    delta = np.where(n <= -0.2, 0.0, delta)
+    delta = np.where(n <= _MAEKAWA_ILLUMINATED_LIMIT, 0.0, delta)
     return np.asarray(np.maximum(delta, 0.0), dtype=np.float64)
 
 

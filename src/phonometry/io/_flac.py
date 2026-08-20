@@ -34,7 +34,15 @@ import shutil
 import struct
 from pathlib import Path
 
-from ._chunks import BroadcastMetadata, _parse_bext
+from ._chunks import _BEXT_CHUNK, BroadcastMetadata, _parse_bext
+
+#: The FLAC stream marker (RFC 9639 section 8): the four bytes every
+#: FLAC file must open with, in the mixed case the spec mandates.
+_FLAC_MAGIC = b"fLaC"
+
+#: Byte size of a FLAC metadata block header -- the last-block-flag and
+#: block-type byte plus a 24-bit big-endian length (RFC 9639 section 8).
+_METADATA_BLOCK_HEADER_BYTES = 4
 
 #: FLAC metadata block types (RFC 9639 section 8.1).
 _APPLICATION = 2
@@ -42,6 +50,12 @@ _APPLICATION = 2
 #: The registered application ID the FLAC reference tools use for foreign
 #: RIFF chunks (flac --keep-foreign-metadata).
 _RIFF_APP_ID = b"riff"
+
+#: Preamble bytes inside an APPLICATION payload before the foreign
+#: chunk's data begins: the 4-byte ``riff`` application ID plus the
+#: verbatim RIFF chunk header (4-byte fourcc + 4-byte 32-bit
+#: little-endian size).
+_FOREIGN_CHUNK_HEADER_BYTES = 12
 
 
 def read_flac_bext(path: str | Path) -> BroadcastMetadata | None:
@@ -53,12 +67,12 @@ def read_flac_bext(path: str | Path) -> BroadcastMetadata | None:
     foreign metadata is some other chunk.
     """
     with Path(path).open("rb") as fh:
-        if fh.read(4) != b"fLaC":
+        if fh.read(4) != _FLAC_MAGIC:
             msg = f"{path}: not a FLAC file"
             raise ValueError(msg)
         while True:
             header = fh.read(4)
-            if len(header) < 4:
+            if len(header) < _METADATA_BLOCK_HEADER_BYTES:
                 return None
             block_type = header[0] & 0x7F
             length = int.from_bytes(header[1:4], "big")
@@ -66,11 +80,16 @@ def read_flac_bext(path: str | Path) -> BroadcastMetadata | None:
                 payload = fh.read(length)
                 if (
                     payload[:4] == _RIFF_APP_ID
-                    and payload[4:8] == b"bext"
-                    and len(payload) >= 12
+                    and payload[4:8] == _BEXT_CHUNK
+                    and len(payload) >= _FOREIGN_CHUNK_HEADER_BYTES
                 ):
                     (size,) = struct.unpack_from("<I", payload, 8)
-                    return _parse_bext(payload[12 : 12 + size])
+                    return _parse_bext(
+                        payload[
+                            _FOREIGN_CHUNK_HEADER_BYTES : _FOREIGN_CHUNK_HEADER_BYTES
+                            + size
+                        ]
+                    )
             else:
                 fh.seek(length, 1)
             if header[0] & 0x80:  # that was the last metadata block
@@ -95,7 +114,7 @@ def embed_flac_bext(path: str | Path, bext_payload: bytes) -> None:
     """
     chunk = (
         _RIFF_APP_ID
-        + b"bext"
+        + _BEXT_CHUNK
         + struct.pack("<I", len(bext_payload))
         + bext_payload
         + (b"\x00" if len(bext_payload) % 2 else b"")
@@ -110,13 +129,13 @@ def embed_flac_bext(path: str | Path, bext_payload: bytes) -> None:
     staging = source.with_name(source.name + ".phonometry-tmp")
     with source.open("rb") as src, staging.open("wb") as dst:
         magic = src.read(4)
-        if magic != b"fLaC":
+        if magic != _FLAC_MAGIC:
             msg = f"{path}: not a FLAC file"
             raise ValueError(msg)
         dst.write(magic)
         while True:
             header = src.read(4)
-            if len(header) < 4:
+            if len(header) < _METADATA_BLOCK_HEADER_BYTES:
                 msg = f"{path}: truncated FLAC metadata chain"
                 raise ValueError(msg)
             body = src.read(int.from_bytes(header[1:4], "big"))

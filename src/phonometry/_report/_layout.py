@@ -71,6 +71,11 @@ _SCRIPT_RISE = "25%"
 #: attributes, so only the attribute-less tags need rewriting.
 _SCRIPT_TAG_RE = re.compile(r"<(sub|sup|super)>")
 
+#: Row count of the octave-band variant of the sound-insulation band table
+#: (one row per octave, the five octave centres 125-2000 Hz); a table this
+#: size carries no one-third-octave triplets to rule.
+_OCTAVE_TABLE_ROWS = 5
+
 
 def fiche_paragraph(text: str, style: Any, **kwargs: Any) -> Any:
     """Build a reportlab ``Paragraph`` whose sub/superscripts cannot collide.
@@ -393,7 +398,7 @@ def band_table(
         ("BOX", (0, 0), (-1, -1), 0.5, accent),
     ]
     # Octave-band tables (5 rows, one per octave) have no triplets to group.
-    if n_data != 5:
+    if n_data != _OCTAVE_TABLE_ROWS:
         for triplet_end in range(3, n_data, 3):
             style_cmds.append(
                 ("LINEBELOW", (0, triplet_end), (-1, triplet_end), 0.4, thin)

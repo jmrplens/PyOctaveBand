@@ -54,6 +54,11 @@ _DIFFUSION_TITLE = "Directional diffusion coefficient (ISO 17497-2)"
 _HARD_BACKED_ALPHA_LABEL = r"Hard-backed absorption $\alpha$"
 _SIGMA_UNFAV_LABEL = r"$\Sigma$ unfav. = "
 
+#: Half-span of the single-plane receiver semicircle about the surface
+#: normal that the ISO 17497-2 diffusion polar covers (Clause 6.3,
+#: Figure 4); negated for the lower edge of the span.
+_POLAR_SEMICIRCLE_DEG = 90.0
+
 #: Spanish translations of the fixed strings rendered by the materials
 #: ``.plot()`` renderers, keyed by their verbatim English text.  ``_t`` returns
 #: the English key unchanged for any language other than ``"es"``, so the
@@ -427,8 +432,8 @@ def plot_diffusion_polar_report(
     polar_ax.set_theta_direction(-1)
     if (
         angles_deg.size
-        and float(np.nanmin(angles_deg)) >= -90.0
-        and float(np.nanmax(angles_deg)) <= 90.0
+        and float(np.nanmin(angles_deg)) >= -_POLAR_SEMICIRCLE_DEG
+        and float(np.nanmax(angles_deg)) <= _POLAR_SEMICIRCLE_DEG
     ):
         polar_ax.set_thetamin(-90)
         polar_ax.set_thetamax(90)
@@ -1021,8 +1026,8 @@ def plot_diffuser_polar_response(
     polar_ax.set_theta_direction(-1)
     if (
         angles_deg.size
-        and float(np.nanmin(angles_deg)) >= -90.0
-        and float(np.nanmax(angles_deg)) <= 90.0
+        and float(np.nanmin(angles_deg)) >= -_POLAR_SEMICIRCLE_DEG
+        and float(np.nanmax(angles_deg)) <= _POLAR_SEMICIRCLE_DEG
     ):
         polar_ax.set_thetamin(-90)
         polar_ax.set_thetamax(90)

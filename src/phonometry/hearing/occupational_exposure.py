@@ -73,6 +73,31 @@ _U3_DEFAULT: float = 1.0
 #: 10/ln(10), which converts a natural-log derivative to dB (the 4.34 of Eq C.5).
 _C5_FACTOR: float = 10.0 / np.log(10.0)  # = 4.3429...
 
+#: Fewest observations for a sample spread to exist (the ddof=1 standard
+#: deviations of Eq C.6/C.7/C.12 and the max-minus-min range); below it the
+#: dispersion is taken as 0 and Table C.4 rejects the sample count.
+_MIN_SAMPLES_FOR_SPREAD: int = 2
+
+#: 3 dB spread-rule threshold (Clauses 9.3 and 11.3): samples spanning this
+#: much or more trigger the advisory recommending further measurements.
+_SPREAD_ADVISORY_THRESHOLD: float = 3.0
+
+#: Clause 11.3 minimum of three whole-day measurements; the spread rule
+#: fires only when exactly this many are supplied.
+_MIN_FULL_DAY_SAMPLES: int = 3
+
+#: Largest group size n_G in the first band of Table 1 (flat 5 h minimum
+#: cumulative measurement duration).
+_TABLE1_SMALL_GROUP_MAX: int = 5
+
+#: Upper group-size edge of Table 1's second band (6 to 15 workers,
+#: +0.5 h per additional worker).
+_TABLE1_MEDIUM_GROUP_MAX: int = 15
+
+#: Largest group size Table 1 tabulates (16 to 40 workers, +0.25 h per
+#: worker); above it the standard advises splitting the group (17 h fallback).
+_TABLE1_LARGE_GROUP_MAX: int = 40
+
 InstrumentClass = Literal["class1", "class2", "personal_exposimeter"]
 
 #: Instrument standard uncertainty u2 by class (Table C.5), dB.
@@ -168,7 +193,7 @@ def table_c4_contribution(n_samples: int, u1: float) -> float:
     :param u1: Standard uncertainty of the samples, dB (>= 0).
     :return: The contribution :math:`c_1 u_1` in dB.
     """
-    if n_samples < 2:
+    if n_samples < _MIN_SAMPLES_FOR_SPREAD:
         msg = "Table C.4 needs at least 2 samples."
         raise ValueError(msg)
     if u1 < 0:
@@ -203,11 +228,11 @@ def minimum_cumulative_duration_hours(n_workers: int) -> float:
     if n_workers < 1:
         msg = "'n_workers' must be a positive integer."
         raise ValueError(msg)
-    if n_workers <= 5:
+    if n_workers <= _TABLE1_SMALL_GROUP_MAX:
         return 5.0
-    if n_workers <= 15:
+    if n_workers <= _TABLE1_MEDIUM_GROUP_MAX:
         return 5.0 + (n_workers - 5) * 0.5
-    if n_workers <= 40:
+    if n_workers <= _TABLE1_LARGE_GROUP_MAX:
         return 10.0 + (n_workers - 15) * 0.25
     return 17.0
 
@@ -221,7 +246,7 @@ def _sampling_std(levels: Sequence[float]) -> float:
     Used for the job/full-day sampling uncertainty ``u1`` (denominator ``N-1``).
     """
     arr = np.asarray(levels, dtype=float)
-    if arr.size < 2:
+    if arr.size < _MIN_SAMPLES_FOR_SPREAD:
         return 0.0
     return float(np.std(arr, ddof=1))
 
@@ -234,7 +259,7 @@ def _task_sampling_uncertainty(levels: Sequence[float]) -> float:
     smaller than the Eq C.12 sample standard deviation used for the job method.
     """
     arr = np.asarray(levels, dtype=float)
-    if arr.size < 2:
+    if arr.size < _MIN_SAMPLES_FOR_SPREAD:
         return 0.0
     return float(np.std(arr, ddof=1) / sqrt(arr.size))
 
@@ -452,7 +477,7 @@ def _duration_uncertainty(task: Task) -> float:
     """
     if task.duration_samples is not None:
         j = np.asarray(task.duration_samples, dtype=float)
-        if j.size < 2:
+        if j.size < _MIN_SAMPLES_FOR_SPREAD:
             return 0.0
         # Eq C.7 divides by J(J-1), like Eq C.6: standard error of the mean.
         return float(np.std(j, ddof=1) / sqrt(j.size))
@@ -476,8 +501,10 @@ def _task_contribution(
     """One task's Eq C.3 terms (Eq C.4 to C.7) and its Clause 9.3 spread advisory."""
     samples = np.asarray(task.samples, dtype=float)
     n = int(samples.size)
-    sample_range = float(samples.max() - samples.min()) if n >= 2 else 0.0
-    spread = n >= 2 and sample_range >= 3.0
+    sample_range = (
+        float(samples.max() - samples.min()) if n >= _MIN_SAMPLES_FOR_SPREAD else 0.0
+    )
+    spread = n >= _MIN_SAMPLES_FOR_SPREAD and sample_range >= _SPREAD_ADVISORY_THRESHOLD
 
     u1a = _task_sampling_uncertainty(task.samples)
     # c1a (Eq C.4): (T_m/T0) * 10^(0.1 (Lp - LEX,8h)); L* ~ Lp since Q2,Q3 ~ 0.
@@ -589,7 +616,7 @@ def _sampled_exposure(
     """Shared engine for job-based and full-day strategies (Eq 11-13, Eq C.9)."""
     arr = np.asarray(samples, dtype=float)
     n = int(arr.size)
-    if n < 2:
+    if n < _MIN_SAMPLES_FOR_SPREAD:
         msg = "At least two samples are required."
         raise ValueError(msg)
     if effective_duration_hours <= 0:
@@ -715,7 +742,10 @@ def full_day_exposure(
     :return: An :class:`ExposureResult`.
     """
     arr = np.asarray(samples, dtype=float)
-    spread = arr.size == 3 and float(arr.max() - arr.min()) >= 3.0
+    spread = (
+        arr.size == _MIN_FULL_DAY_SAMPLES
+        and float(arr.max() - arr.min()) >= _SPREAD_ADVISORY_THRESHOLD
+    )
     if spread and warn:
         warnings.warn(
             f"Only three full-day measurements spanning {float(arr.max() - arr.min()):.1f} dB "

@@ -94,6 +94,12 @@ OCTAVE_BANDS: NDArray[np.float64] = np.array(
     [63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0]
 )
 
+# Half an octave, in log2 (octave) units: the half-spacing of adjacent
+# octave-band centres, used as the "same band" criterion so the blade frequency
+# increment C_BFI (Long Table 13.7) lands in exactly the one band of
+# OCTAVE_BANDS that matches the target band.
+_HALF_OCTAVE = 0.5
+
 # Imperial-to-SI conversions. The Reynolds regressions and the ASHRAE fan
 # equation are unit-sensitive empirical fits stated in foot-pound units, so the
 # SI arguments of this module are converted before the published constants are
@@ -102,6 +108,11 @@ _M_PER_FT = 0.3048
 _M_PER_IN = 0.0254
 _M3S_PER_CFM = 0.0004719474432  # 1 ft3/min in m3/s
 _PA_PER_IN_WG = 249.0  # Long Eq. 13.1 reference pressure P_REF
+
+# The perimeter-to-area ratio P/S, in ft^-1, at which the Reynolds (1990)
+# low-frequency (63-250 Hz) regression for unlined rectangular ducts switches
+# between its two fitted branches (Long Eqs. 14.9-14.11).
+_REYNOLDS_PS_SPLIT_PER_FT = 3.0
 
 # ---------------------------------------------------------------------------
 # Bies Table 8.14 -- duct end reflection loss (dB), ASHRAE.
@@ -798,7 +809,7 @@ def fan_efficiency_correction(relative_efficiency: float) -> float:
     :raises ValueError: If the efficiency is not in ``(0, 100]``.
     """
     eta = require_positive(relative_efficiency, "relative_efficiency")
-    if eta > 100.0:
+    if eta > 100.0:  # noqa: PLR2004
         msg = "'relative_efficiency' must not exceed 100 per cent."
         raise ValueError(msg)
     for lower, correction in _EFFICIENCY_CORRECTION:
@@ -877,7 +888,9 @@ def fan_sound_power(
         f_bp = require_positive(blade_frequency, "blade_frequency")
         nearest = int(np.argmin(np.abs(np.log2(f_bp / OCTAVE_BANDS))))
         band = float(OCTAVE_BANDS[nearest])
-    increment = np.where(np.abs(np.log2(OCTAVE_BANDS / band)) < 0.5, c_bfi, 0.0)
+    increment = np.where(
+        np.abs(np.log2(OCTAVE_BANDS / band)) < _HALF_OCTAVE, c_bfi, 0.0
+    )
 
     lw = _FAN_LEVEL_CORRECTION[kind][idx] + duty + c_eff + increment[idx]
     return HvacSpectrumResult(
@@ -958,7 +971,7 @@ def unlined_rectangular_duct_attenuation(
     ell = require_positive(length, "length") / _M_PER_FT
     low = (
         17.0 * ps**0.25 * f**-0.85 * ell
-        if ps >= 3.0
+        if ps >= _REYNOLDS_PS_SPLIT_PER_FT
         else 1.64 * ps**0.73 * f**-0.58 * ell
     )
     if wrapped:

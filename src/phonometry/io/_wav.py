@@ -66,6 +66,10 @@ if TYPE_CHECKING:
 
     from ._chunks import BroadcastMetadata, CuePoint
 
+# The one linear PCM bit depth scipy cannot memory-map: no numpy dtype can
+# map its 3-byte stride, so read_wav takes scipy's non-mmap path for it.
+_THREE_BYTE_PCM_BITS = 24
+
 
 @dataclass(frozen=True)
 class AudioFileInfo:
@@ -239,7 +243,9 @@ def read_wav(
             # about the skip would tell the user their metadata was lost
             # when it was not.
             warnings.simplefilter("ignore", wavfile.WavFileWarning)
-            fs, raw = wavfile.read(str(path), mmap=fmt.bits_per_sample != 24)
+            fs, raw = wavfile.read(
+                str(path), mmap=fmt.bits_per_sample != _THREE_BYTE_PCM_BITS
+            )
         # scipy returns (frames,) or (frames, channels); the transpose to
         # the library's (channels, samples) is taken before the float
         # conversion so the conversion itself materialises the C-contiguous

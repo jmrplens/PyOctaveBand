@@ -97,6 +97,18 @@ _MLS_ALIAS_TAIL_DB = -35.0
 #: reference was zero-padded (see the Farina guard in ``impulse_response``).
 _FARINA_MAX_TRAILING_ZEROS = 8
 
+#: Exclusive upper bound on the half-Hann ``fade`` fraction applied at each
+#: end of a generated sweep (transient suppression, ISO 18233:2006 B.3.3;
+#: end-pinning, Mueller & Massarani 2001, Sec. 4.2): at 0.5 the two fades
+#: together would cover the whole signal and leave no un-faded sweep.
+_MAX_FADE_FRACTION = 0.5
+
+#: Minimum retained sample count for the frequency-domain shaped-sweep
+#: synthesis -- the smallest signal its doubled FFT block (n_fft = next
+#: power of two of 2*n_keep, Mueller & Massarani 2001, Sec. 4.2) is
+#: prepared to synthesize.
+_MIN_SHAPED_SWEEP_SAMPLES = 16
+
 # Primitive-polynomial feedback taps (1-indexed register positions, highest
 # tap == order) yielding maximum-length sequences. Values from the standard
 # LFSR tables (Xilinx XAPP052, "Efficient Shift Registers, LFSR Counters,
@@ -243,12 +255,12 @@ def sweep_signal(
     if f2 > fs / 2.0:
         msg = "f2 must not exceed the Nyquist frequency fs/2"
         raise ValueError(msg)
-    if not 0.0 <= fade < 0.5:
+    if not 0.0 <= fade < _MAX_FADE_FRACTION:
         msg = "fade must be in [0, 0.5)"
         raise ValueError(msg)
 
     n = round(seconds * fs)
-    if n < 2:
+    if n < 2:  # noqa: PLR2004
         msg = "seconds*fs must yield at least 2 samples"
         raise ValueError(msg)
 
@@ -768,7 +780,7 @@ def golay_impulse_response(
         msg = "both Golay codes must be one-dimensional."
         raise ValueError(msg)
     period = code_a.size
-    if period < 2 or code_b.size != period:
+    if period < 2 or code_b.size != period:  # noqa: PLR2004
         msg = (
             "'pair' must hold two equal-length codes of at least 2 samples "
             "(use golay_pair())."
@@ -903,7 +915,7 @@ def _shaped_target_db(
         raise ValueError(msg)
     t_freq = np.asarray(target[0], dtype=np.float64)
     t_db = np.asarray(target[1], dtype=np.float64)
-    if t_freq.ndim != 1 or t_freq.size < 2 or t_db.shape != t_freq.shape:
+    if t_freq.ndim != 1 or t_freq.size < 2 or t_db.shape != t_freq.shape:  # noqa: PLR2004
         msg = (
             "an array target must be a (frequencies_hz, magnitude_db) pair "
             "of equal-length 1-D arrays with at least 2 points"
@@ -1040,7 +1052,7 @@ def shaped_sweep_signal(
     if amplitude <= 0.0:
         msg = "amplitude must be positive"
         raise ValueError(msg)
-    if not 0.0 <= fade < 0.5:
+    if not 0.0 <= fade < _MAX_FADE_FRACTION:
         msg = "fade must be in [0, 0.5)"
         raise ValueError(msg)
     lead = 0.05 * seconds if start_delay is None else float(start_delay)
@@ -1053,7 +1065,7 @@ def shaped_sweep_signal(
     # (Mueller & Massarani 2001, Sec. 4.2).
     total = seconds + 2.0 * lead
     n_keep = round(total * fs_v)
-    if n_keep < 16:
+    if n_keep < _MIN_SHAPED_SWEEP_SAMPLES:
         msg = "seconds*fs must yield at least 16 samples"
         raise ValueError(msg)
     n_fft = int(2 ** np.ceil(np.log2(2 * n_keep)))
@@ -1097,7 +1109,7 @@ def shaped_sweep_signal(
     # that would make the statistic blow up; fall back to the whole
     # retained sweep in that degenerate case.
     core = sweep[round(lead * fs_v) : round((lead + seconds) * fs_v)]
-    if core.size < 2:
+    if core.size < 2:  # noqa: PLR2004
         core = sweep
     rms = float(np.sqrt(np.mean(core**2)))
     crest_db = 20.0 * np.log10(float(np.max(np.abs(core))) / rms)

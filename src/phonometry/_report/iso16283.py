@@ -66,6 +66,11 @@ if TYPE_CHECKING:
     )
     from .metadata import ReportMetadata
 
+#: Decimal places of the ``T [s]`` reverberation-time column in the verbose
+#: measurement chain (the chain tuple's third field); the width rule narrows
+#: two-decimal columns to the compact 10 mm width.
+_T_DECIMALS = 2
+
 #: The field engineering-method statement the airborne (ISO 16283-1) and facade
 #: (ISO 16283-3) reports print verbatim.
 _FIELD_STATEMENT = (
@@ -216,7 +221,7 @@ def render_iso16283_report(
         # Compact widths for the chain; the reported quantity (last column)
         # carries the longest header, so give it room to render on one line.
         col_widths = [10 * mm] + [
-            (10 if decimals == 2 else 12) * mm for _, _, decimals in columns
+            (10 if decimals == _T_DECIMALS else 12) * mm for _, _, decimals in columns
         ]
         col_widths[-1] = 15 * mm
         caption = t("Per-band measurement chain", language)

@@ -65,7 +65,7 @@ def _is_stipa(result: STIResult) -> bool:
     frequencies of A.2.2.
     """
     mtf = np.asarray(result.mtf)
-    return mtf.ndim == 2 and mtf.shape[1] == 2
+    return mtf.ndim == 2 and mtf.shape[1] == 2  # noqa: PLR2004
 
 
 def _method_phrase(result: STIResult, language: str = "en") -> str:

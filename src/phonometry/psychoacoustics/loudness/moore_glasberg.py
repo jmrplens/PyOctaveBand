@@ -248,6 +248,7 @@ _ERB_C1 = ERB_C1
 _ERB_C2 = ERB_C2
 _CAM_C = CAM_C  # Formula (6): i = 21.366 * log10(C2 * fc + 1)
 _ROEX_D = 0.35  # constant D of Formula (5)
+_ROEX_G_MAX = 4.0  # Formula (4): drop upper-side components g > 4 (clause 7.4)
 _I_MIN, _I_MAX, _I_STEP = 1.8, 38.9, 0.1  # ERB-number grid (clause 7.4)
 
 
@@ -382,6 +383,8 @@ _T4_A = np.array(
 )
 
 _C_SONE = 0.0617  # calibration constant C of Formula (7) [sone/Cam]
+_E_HIGH_LEVEL = 1e10  # E/E0 bound of the high-level Formula (9) (clause 7.5)
+_HF_MIN_FC_HZ = 500.0  # _HF parameters apply for fc >= this (clauses 7.5.2/7.5.4)
 _ALPHA_HF = 0.2  # exponent alpha for fc >= 500 Hz (clause 7.5.4)
 _A_HF = 4.13  # parameter A for fc >= 500 Hz = 2 * E_THRQ/E0 (clause 7.5.4)
 _E_THRQ_HF = 2.065  # E_THRQ/E0 for fc >= 500 Hz (clause 7.5.2)
@@ -509,6 +512,7 @@ _THIRD_OCTAVE_FREQ = np.array(
 )
 _N_THIRD_OCTAVE = _THIRD_OCTAVE_FREQ.size
 _THIRD_OCTAVE_RATIO = 2.0 ** (1.0 / 6.0)  # band edge factor (half a third-octave)
+_FINE_SPACING_MAX_CENTRE_HZ = 125.0  # 1 Hz spacing at/below, 10 Hz above (clause 5.5)
 
 
 @dataclass(frozen=True)
@@ -623,7 +627,7 @@ def _excitation_pattern(freqs: np.ndarray, levels_cochlea: np.ndarray) -> np.nda
         p = np.where(upper, p_ref, p_lower)
         weight = (1.0 + p * g) * np.exp(-p * g)
         # Integration ranges of Formula (4): drop upper-side components g > 4.
-        weight = np.where(upper & (g > 4.0), 0.0, weight)
+        weight = np.where(upper & (g > _ROEX_G_MAX), 0.0, weight)
         excitation[k] = float(np.dot(powers, weight))
     return excitation
 
@@ -636,7 +640,7 @@ def _specific_loudness(excitation: np.ndarray) -> np.ndarray:
     Tables 2-4; below the reference threshold the near-threshold expression of
     Formula (8) is used and above E/E0 = 1e10 the high-level Formula (9).
     """
-    high = _FC_GRID >= 500.0
+    high = _FC_GRID >= _HF_MIN_FC_HZ
     g_lin = np.ones(_FC_GRID.size)
     alpha = np.full(_FC_GRID.size, _ALPHA_HF)
     a_par = np.full(_FC_GRID.size, _A_HF)
@@ -661,7 +665,7 @@ def _specific_loudness(excitation: np.ndarray) -> np.ndarray:
     factor = np.power(2.0 * e / (e + e_thr[active]), 1.5)
     values = np.where(below, _C_SONE * factor * core, values)
     # High level (Formula 9): E/E0 > 1e10.
-    very_high = e > 1e10
+    very_high = e > _E_HIGH_LEVEL
     values = np.where(very_high, _C_SONE * np.power(e / 1.0707, 0.2), values)
     n_spec[active] = values
     return n_spec
@@ -770,7 +774,7 @@ def _as_components(
     array = np.asarray(components, dtype=np.float64)
     if array.size == 0:
         return np.empty(0, dtype=np.float64), np.empty(0, dtype=np.float64)
-    if array.ndim != 2 or array.shape[1] != 2:
+    if array.ndim != 2 or array.shape[1] != 2:  # noqa: PLR2004
         msg = (
             "components must be a sequence of (frequency_Hz, level_dB) pairs, "
             f"got array of shape {array.shape}."
@@ -838,7 +842,7 @@ def _third_octave_components(
     for centre, level in zip(_THIRD_OCTAVE_FREQ, band_levels):
         width = centre * (_THIRD_OCTAVE_RATIO - 1.0 / _THIRD_OCTAVE_RATIO)
         spectrum_level = float(level) - 10.0 * math.log10(width)
-        spacing = 1.0 if centre <= 125.0 else 10.0
+        spacing = 1.0 if centre <= _FINE_SPACING_MAX_CENTRE_HZ else 10.0
         component_level = spectrum_level + 10.0 * math.log10(spacing)
         f_lo = centre / _THIRD_OCTAVE_RATIO
         f_hi = centre * _THIRD_OCTAVE_RATIO

@@ -110,6 +110,14 @@ _EXACT_LIMIT = 100
 #: Fewest observations a trend test accepts (Table A.6 starts at N = 10).
 _MIN_OBSERVATIONS = 10
 
+#: Threshold on the squared Rice bandwidth parameter
+#: :math:`\epsilon^2 = 1 - r^2` below which (:math:`\epsilon \le` ~1e-15,
+#: ``r`` equal to 1 to machine precision) the standardized peak-height
+#: distribution of B&P Eqs. (5.217)/(5.223) is treated as exactly Rayleigh
+#: (the narrow-bandwidth limit, Eqs. (5.206)/(5.222)), avoiding division
+#: by :math:`\epsilon`.
+_EPS_SQ_RAYLEIGH_LIMIT = 1e-30
+
 
 # ---------------------------------------------------------------------------
 # Reverse arrangement test (B&P Sec. 4.5.2, Table A.6)
@@ -826,7 +834,7 @@ def _rice_peak_exceedance(
     r = irregularity
     eps_sq = max(0.0, 1.0 - r * r)
     tail = np.exp(-(z**2) / 2.0)
-    if eps_sq < 1e-30:  # narrow bandwidth limit: exactly Rayleigh
+    if eps_sq < _EPS_SQ_RAYLEIGH_LIMIT:  # narrow bandwidth limit: exactly Rayleigh
         return np.asarray(np.where(z > 0.0, tail, 1.0), dtype=np.float64)
     eps = float(np.sqrt(eps_sq))
     q_first = special.ndtr(-z / eps)
@@ -848,7 +856,7 @@ def _rice_peak_density(
     r = irregularity
     eps_sq = max(0.0, 1.0 - r * r)
     tail = np.exp(-(z**2) / 2.0)
-    if eps_sq < 1e-30:  # narrow bandwidth limit: exactly Rayleigh
+    if eps_sq < _EPS_SQ_RAYLEIGH_LIMIT:  # narrow bandwidth limit: exactly Rayleigh
         return np.asarray(np.where(z > 0.0, z * tail, 0.0), dtype=np.float64)
     eps = float(np.sqrt(eps_sq))
     gaussian = eps / np.sqrt(2.0 * np.pi) * np.exp(-(z**2) / (2.0 * eps_sq))

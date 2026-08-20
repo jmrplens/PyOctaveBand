@@ -64,6 +64,12 @@ if TYPE_CHECKING:
     )
     from .metadata import ReportMetadata
 
+#: Band-centre count that identifies an ISO 717 rating computed from octave
+#: bands (5 centres versus 16 one-third-octave centres); it selects the caption
+#: ISO 717-1:2020 Clause 5.3 / ISO 717-2:2020 Clause 4.4 require, stating which
+#: band set produced the rating.
+_N_OCTAVE_BANDS = 5
+
 #: Threshold below which an unfavourable deviation is shown as an em dash.
 _DEVIATION_EPS = 0.05
 
@@ -511,7 +517,9 @@ def render_iso717_report(
     # whether the rating came from one-third-octave or octave bands; the
     # caption declares the actual set.
     caption_key = (
-        "Octave-band {vh} [dB]" if centers.size == 5 else "One-third-octave {vh} [dB]"
+        "Octave-band {vh} [dB]"
+        if centers.size == _N_OCTAVE_BANDS
+        else "One-third-octave {vh} [dB]"
     )
     left_cell = [
         fiche_paragraph(

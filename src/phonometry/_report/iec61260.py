@@ -51,6 +51,10 @@ if TYPE_CHECKING:
     from ..filters.compliance import FilterComplianceResult
     from .metadata import ReportMetadata
 
+# Scale at which the nominal mid-band label switches from the "125 Hz" form to
+# the "1 kHz" form (IEC 61260-1:2014 5.5; IEC 61260:1995 4.2).
+_HZ_PER_KHZ = 1000.0
+
 
 def _binding_margin(result: FilterComplianceResult, cls: int) -> float:
     """Smallest per-band margin to class ``cls`` (the binding margin)."""
@@ -114,8 +118,8 @@ def _band_label(exact_freq: float, fraction: int) -> str:
     from ..filters.frequencies import _nominal_freq_for_band
 
     nominal = _nominal_freq_for_band(exact_freq, float(fraction))
-    if nominal >= 1000.0:
-        return f"{nominal / 1000.0:g} kHz"
+    if nominal >= _HZ_PER_KHZ:
+        return f"{nominal / _HZ_PER_KHZ:g} kHz"
     return f"{nominal:g} Hz"
 
 

@@ -157,6 +157,57 @@ _BEXT_FIXED = struct.Struct("<256s32s32s10s8sIIH64shhhhh180s")
 #: rather than reporting an absurd 327.67 LUFS.
 _LOUDNESS_UNSET = 0x7FFF
 
+#: The ``bext`` version (EBU Tech 3285 v2, 2011) from which the five
+#: loudness fields carry values; below it those bytes are still reserved
+#: space and the reader returns the fields as ``None``.
+_BEXT_LOUDNESS_MIN_VERSION = 2
+
+#: Chunk IDs (fourccs) of the wire vocabulary the walker speaks. ``fmt``
+#: and ``cue`` carry the pad space RIFF requires to make 4 bytes (a
+#: re-typed ``b"fmt"`` would silently never match) and ``iXML``'s mixed
+#: case is likewise the spec's own.
+_FMT_CHUNK = b"fmt "  # wFormatTag/channels/rate/bits (1991 RIFF spec)
+_DS64_CHUNK = b"ds64"  # RF64/BW64 64-bit sizes (EBU Tech 3306)
+_BEXT_CHUNK = b"bext"  # EBU Tech 3285 broadcast extension
+_FACT_CHUNK = b"fact"  # uint32 frame count, mandatory for compressed formats
+_CUE_CHUNK = b"cue "  # event markers a recorder writes (1991 RIFF spec)
+_DATA_CHUNK = b"data"  # sample payload: located, deliberately never read
+_IXML_CHUNK = b"iXML"  # production metadata, recorded only as a presence flag
+
+#: RIFF form-type fourcc at bytes 8-12 of the prelude: declares that this
+#: RIFF/RF64/BW64 container holds a WAVE form (1991 Multimedia Programming
+#: Interface spec).
+_WAVE_FORM_TYPE = b"WAVE"
+
+#: Byte size of the RIFF prelude: 4-byte container fourcc, uint32 outer
+#: size, 4-byte ``WAVE`` form type.
+_RIFF_PRELUDE_BYTES = 12
+
+#: Byte size of one RIFF chunk header, the ``(fourcc, uint32 size)`` pair.
+_CHUNK_HEADER_BYTES = 8
+
+#: Byte width of one little-endian ``uint32`` field, e.g. the cue chunk's
+#: leading record count or the ``fact`` chunk's frame count.
+_UINT32_BYTES = 4
+
+#: Byte size of the six mandatory ``fmt`` fields (``<HHIIHH``), the
+#: minimum legal ``fmt`` chunk payload (1991 RIFF spec).
+_FMT_BASE_BYTES = 16
+
+#: Minimum ``fmt`` payload for WAVE_FORMAT_EXTENSIBLE: the 16-byte base
+#: plus the 2-byte ``cbSize`` plus the 22-byte extension (valid bits,
+#: channel mask, 16-byte SubFormat GUID).
+_FMT_EXTENSIBLE_BYTES = 40
+
+#: Byte size of the three mandatory 64-bit fields of a ``ds64`` chunk
+#: (``riffSize, dataSize, sampleCount`` as ``<QQQ``, EBU Tech 3306);
+#: distinct from the 24-byte cue-point record, which must not share it.
+_DS64_FIXED_BYTES = 24
+
+#: The RF64 size sentinel of EBU Tech 3306: a 32-bit chunk-size field set
+#: to 0xFFFFFFFF defers the true 64-bit size to the ``ds64`` chunk.
+_RF64_SIZE_SENTINEL = 0xFFFFFFFF
+
 
 @dataclass(frozen=True)
 class FormatChunk:
@@ -419,7 +470,7 @@ def _parse_bext(payload: bytes) -> BroadcastMetadata:
     coding_history = (
         payload[_BEXT_FIXED.size :].split(b"\x00", 1)[0].decode("latin-1").rstrip()
     )
-    v2 = version >= 2
+    v2 = version >= _BEXT_LOUDNESS_MIN_VERSION
     return BroadcastMetadata(
         description=_ascii_field(description),
         originator=_ascii_field(originator),
@@ -440,7 +491,7 @@ def _parse_bext(payload: bytes) -> BroadcastMetadata:
 
 def _parse_fmt(payload: bytes) -> FormatChunk:
     """Decode ``fmt``, including the EXTENSIBLE extension when present."""
-    if len(payload) < 16:
+    if len(payload) < _FMT_BASE_BYTES:
         msg = f"fmt chunk is {len(payload)} bytes; at least 16 required"
         raise ValueError(msg)
     tag, channels, fs, byte_rate, block_align, bits = struct.unpack_from(
@@ -450,7 +501,7 @@ def _parse_fmt(payload: bytes) -> FormatChunk:
     channel_mask: int | None = None
     subformat: bytes | None = None
     if tag == WAVE_FORMAT_EXTENSIBLE:
-        if len(payload) < 40:
+        if len(payload) < _FMT_EXTENSIBLE_BYTES:
             msg = (
                 f"WAVE_FORMAT_EXTENSIBLE fmt chunk is {len(payload)} bytes; "
                 "the 22-byte extension requires 40"
@@ -458,7 +509,7 @@ def _parse_fmt(payload: bytes) -> FormatChunk:
             raise ValueError(msg)
         # cbSize (uint16 at offset 16) precedes the extension proper.
         valid_bits, channel_mask = struct.unpack_from("<HI", payload, 18)
-        subformat = payload[24:40]
+        subformat = payload[24:_FMT_EXTENSIBLE_BYTES]
     return FormatChunk(
         format_tag=tag,
         channels=channels,
@@ -482,11 +533,11 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
     :exc:`struct.error` (which a caller filtering on ``ValueError``, the
     type every other malformed-chunk path here raises, would not catch).
     """
-    if len(payload) < 4:
+    if len(payload) < _UINT32_BYTES:
         msg = f"cue chunk is {len(payload)} bytes; its uint32 record count requires 4"
         raise ValueError(msg)
     (count,) = struct.unpack_from("<I", payload)
-    needed = 4 + 24 * count
+    needed = _UINT32_BYTES + 24 * count
     if len(payload) < needed:
         msg = (
             f"cue chunk declares {count} points but is {len(payload)} "
@@ -496,7 +547,7 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
     points = []
     for i in range(count):
         cue_id, position, chunk_id, chunk_start, block_start, sample_offset = (
-            struct.unpack_from("<II4sIII", payload, 4 + 24 * i)
+            struct.unpack_from("<II4sIII", payload, _UINT32_BYTES + 24 * i)
         )
         points.append(
             CuePoint(
@@ -513,7 +564,7 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
 
 def _parse_ds64(payload: bytes, path: str | Path) -> Ds64Chunk:
     """Decode the three mandatory 64-bit sizes of a ``ds64`` chunk."""
-    if len(payload) < 24:
+    if len(payload) < _DS64_FIXED_BYTES:
         msg = (
             f"{path}: ds64 chunk is {len(payload)} bytes; the "
             "riffSize, dataSize and sampleCount fields require 24"
@@ -529,7 +580,7 @@ def _parse_ds64(payload: bytes, path: str | Path) -> Ds64Chunk:
 
 def _parse_fact(payload: bytes, path: str | Path) -> int:
     """Decode the ``fact`` chunk's single uint32 frame count."""
-    if len(payload) < 4:
+    if len(payload) < _UINT32_BYTES:
         msg = (
             f"{path}: fact chunk is {len(payload)} bytes; its "
             "uint32 frame count requires 4"
@@ -541,8 +592,8 @@ def _parse_fact(payload: bytes, path: str | Path) -> int:
 
 def _read_wave_header(fh: BinaryIO, path: str | Path) -> str:
     """Check the 12-byte RIFF prelude and name the container it declares."""
-    header = fh.read(12)
-    if len(header) < 12 or header[8:12] != b"WAVE":
+    header = fh.read(_RIFF_PRELUDE_BYTES)
+    if len(header) < _RIFF_PRELUDE_BYTES or header[8:12] != _WAVE_FORM_TYPE:
         msg = f"{path}: not a WAVE file"
         raise ValueError(msg)
     fourcc = header[:4]
@@ -599,7 +650,7 @@ def _true_data_size(
     size: int, container: str, ds64: Ds64Chunk | None, path: str | Path
 ) -> int:
     """Resolve the ``data`` size, through ``ds64`` for the RF64 sentinel."""
-    if size != 0xFFFFFFFF or container == "WAV":
+    if size != _RF64_SIZE_SENTINEL or container == "WAV":
         return size
     if ds64 is None:
         msg = (
@@ -614,7 +665,9 @@ def _true_data_size(
 #: skipped by seeking, never read: a ``JUNK`` (or any unknown) chunk can
 #: legitimately be huge, and loading it would break the walker's promise
 #: that header inspection costs kilobytes whatever the file size.
-_DECODED_CHUNKS = frozenset({b"fmt ", b"ds64", b"bext", b"fact", b"cue "})
+_DECODED_CHUNKS = frozenset(
+    {_FMT_CHUNK, _DS64_CHUNK, _BEXT_CHUNK, _FACT_CHUNK, _CUE_CHUNK}
+)
 
 
 @dataclass
@@ -630,15 +683,15 @@ class _WalkedChunks:
 
     def absorb(self, chunk_id: bytes, payload: bytes, path: str | Path) -> None:
         """Decode one chunk of :data:`_DECODED_CHUNKS` into its slot."""
-        if chunk_id == b"fmt ":
+        if chunk_id == _FMT_CHUNK:
             self.fmt = _parse_fmt(payload)
-        elif chunk_id == b"ds64":
+        elif chunk_id == _DS64_CHUNK:
             self.ds64 = _parse_ds64(payload, path)
-        elif chunk_id == b"bext":
+        elif chunk_id == _BEXT_CHUNK:
             self.bext = _parse_bext(payload)
-        elif chunk_id == b"fact":
+        elif chunk_id == _FACT_CHUNK:
             self.fact_frames = _parse_fact(payload, path)
-        elif chunk_id == b"cue ":
+        elif chunk_id == _CUE_CHUNK:
             self.cue_points = _parse_cue(payload)
 
 
@@ -675,12 +728,12 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
         file_size = os.fstat(fh.fileno()).st_size
         container = _read_wave_header(fh, path)
         while True:
-            chunk_header = fh.read(8)
-            if len(chunk_header) < 8:
+            chunk_header = fh.read(_CHUNK_HEADER_BYTES)
+            if len(chunk_header) < _CHUNK_HEADER_BYTES:
                 break
             chunk_id = chunk_header[:4]
             (size,) = struct.unpack("<I", chunk_header[4:])
-            if chunk_id == b"data":
+            if chunk_id == _DATA_CHUNK:
                 size = _true_data_size(size, container, seen.ds64, path)
                 data_offset = fh.tell()
                 data_size = size
@@ -699,7 +752,7 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
                     path,
                 )
                 continue
-            if chunk_id == b"iXML":
+            if chunk_id == _IXML_CHUNK:
                 seen.has_ixml = True
             # Skipped, not read: unknown chunks (and iXML, kept only as a
             # presence flag) can be arbitrarily large.

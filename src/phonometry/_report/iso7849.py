@@ -63,11 +63,16 @@ if TYPE_CHECKING:
     from ..emission.vibration_sound_power import VibrationSoundPowerResult
     from .metadata import ReportMetadata
 
+# Absolute tolerance under which every per-band radiation factor is taken to
+# equal the survey method's fixed epsilon = 1 (ISO/TS 7849-1), deciding whether
+# the basis line names Part 1 (survey) or Part 2 (engineering).
+_UNITY_TOLERANCE = 1e-9
+
 
 def _is_survey(result: Any) -> bool:
     """Return ``True`` for the survey method (every band uses ``epsilon = 1``)."""
     eps = np.asarray(result.radiation_factor, dtype=np.float64)
-    return bool(np.all(np.abs(eps - 1.0) < 1e-9))
+    return bool(np.all(np.abs(eps - 1.0) < _UNITY_TOLERANCE))
 
 
 def _basis(result: Any, language: str = "en") -> str:

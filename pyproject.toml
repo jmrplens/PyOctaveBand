@@ -133,8 +133,8 @@ extend-exclude = ["*.md"]
 # The default set (E4, E7, E9, F) plus the families this tree already satisfies
 # or very nearly does, so the gate stays honest instead of drowning in noise.
 # Deliberately absent, with the count each would raise today:
-#   PL   (5753) mostly magic-value comparisons, and the magic values here are
-#               transcribed normative constants: that is the content.
+#   PL   (5265) minus PLR2004, which is selected below. The rest is mostly
+#               complexity counts and design opinions this tree does not share.
 #   RUF  (1705) ambiguous-unicode in prose that legitimately carries the
 #               degree sign, the multiplication sign and ISO symbols.
 #   TID  (2218) bans the relative imports this package uses by design.
@@ -153,6 +153,10 @@ select = [
     "ICN",                  # the conventional alias for a well-known package
     "N812",                 # an alias must not disguise a function as a class
     "INP", "T20",           # both already clean in `src`, and kept that way
+    "PLR2004",              # a number in a comparison carries a name or a
+                            # reasoned noqa; every site was censused one by
+                            # one before this went on (str/bytes stay exempt:
+                            # that vocabulary is its own name)
     "EM",                   # the message lives in a variable, so a traceback
                             # shows `raise ClauseError(msg)` and the text once,
                             # not a two-line message split across the frame
@@ -217,13 +221,16 @@ ignore = [
 # A print is what a command line tool is for, and neither the scripts nor the
 # tests are packages anyone imports by name. Both rules are here to hold `src`,
 # where they already find nothing.
-"scripts/**" = ["E402", "T201", "INP001"]
+# Scripts lay out figures with bare halves and angles, and the tests compare
+# against printed oracle values; a name for every such number would be noise.
+# The census that named the `src` sites covered neither, deliberately.
+"scripts/**" = ["E402", "T201", "INP001", "PLR2004"]
 # A test may open its docstring with the clause it checks, quoted verbatim:
 # `""" "Up till about 1000 Hz..." `. The space after the triple quote is what
 # keeps that from being four quotation marks in a row; D210 wants it gone and
 # has no way to fix it. The quotation stays, so the rule stands down in tests
 # and holds `src`, where it finds nothing.
-"tests/**" = ["E402", "T201", "INP001", "D210"]
+"tests/**" = ["E402", "T201", "INP001", "D210", "PLR2004"]
 ".github/**" = ["T201", "INP001"]
 # The PyOctaveBand transition shim exists to re-export the whole package under
 # the old name; the star import is the point of the file.
