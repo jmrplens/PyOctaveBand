@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2).
+r"""CNOSSOS-EU road traffic source emission (Directive 2002/49/EC Annex II, 2.2).
 
 The common noise assessment methods of the European Union describe a road as an
 incoherent **source line** of point sources 0.05 m above the pavement. Each

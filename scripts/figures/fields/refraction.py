@@ -35,7 +35,8 @@ _REFR_FPS = 80
 
 def _refraction_profiles() -> tuple[Any, ...]:
     """The guide's realistic logarithmic surface-layer profiles: downwind
-    (+1 m/s) and upwind (-1 m/s) effective sound speed."""
+    (+1 m/s) and upwind (-1 m/s) effective sound speed.
+    """
     from phonometry import environment
 
     return tuple(
@@ -168,7 +169,8 @@ def animate_fdtd_refraction(output_dir: str) -> None:
     they lift off the surface and an acoustic shadow opens at the ground.
     The library's ray fans, traced through the same c(z) profiles,
     overlay the fields; the closing seconds crossfade to the
-    spreading-compensated RMS map."""
+    spreading-compensated RMS map.
+    """
     from matplotlib import patheffects
 
     from phonometry import environment

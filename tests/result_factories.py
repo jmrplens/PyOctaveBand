@@ -261,7 +261,8 @@ def _band_uncertainty() -> ph.building.BandUncertainty:
 
 def _intensity_wide() -> ph.emission.IntensityResult:
     """IntensityResult with band centres spanning two decades (100 Hz-10 kHz)
-    so the log-axis bar-width scaling can be checked at the extremes."""
+    so the log-axis bar-width scaling can be checked at the extremes.
+    """
     freqs = np.array([100.0, 1000.0, 10000.0])
     n = freqs.size
     return ph.emission.IntensityResult(
@@ -441,7 +442,8 @@ def _field_indicators() -> ph.emission.FieldIndicators:
 
 def _room_with_one_invalid_band() -> ph.room.RoomAcousticsResult:
     """A RoomAcousticsResult whose middle band is flagged invalid on every
-    decay-time series (built directly so the test is deterministic)."""
+    decay-time series (built directly so the test is deterministic).
+    """
     freq = np.array([250.0, 500.0, 1000.0])
     ones = np.ones(3)
     valid = np.array([True, False, True])  # 500 Hz band invalid

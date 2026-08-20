@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 9614-2 sound-power-by-intensity ``.report()`` fiche.
+"""Tests for the ISO 9614-2 sound-power-by-intensity ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle derived from the
 standard, independent of the library's own combination path. A machine is

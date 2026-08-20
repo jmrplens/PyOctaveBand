@@ -379,7 +379,8 @@ def test_every_committed_catalogue_row_is_exercised_unmasked() -> None:
 def test_workbook_exercises_every_physical_source() -> None:
     """Rolling, impact, squeal, traction, aerodynamic and the bridge term all
     have to be switched on somewhere in the committed extract, or the end-to-end
-    agreement would be measuring less than it appears to."""
+    agreement would be measuring less than it appears to.
+    """
     cases = ref.cnossos_rail_workbook_cases()
     assert any(c["condition"] == "constant" for c in cases)  # rolling
     assert any(float(c["joint_density_per_m"]) > 0.0 for c in cases)  # impact
@@ -692,7 +693,8 @@ def test_idling_excludes_rolling_and_uses_the_idling_flow_term() -> None:
 
 def test_minimum_speed_floor_and_impact_exclusion() -> None:
     """2.3.2: a 50 km/h floor on the roughness, 30 km/h for a tram, and no
-    impact noise below it."""
+    impact noise below it.
+    """
     plain = _reference_track(impact_roughness=None)
     slow = railway_source_power(
         RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=20.0), plain

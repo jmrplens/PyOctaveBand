@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 17497-1/-2 scattering and diffusion reports (``.report()``).
+"""Tests for the ISO 17497-1/-2 scattering and diffusion reports (``.report()``).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for each fiche (scattering ``s(f)``, the

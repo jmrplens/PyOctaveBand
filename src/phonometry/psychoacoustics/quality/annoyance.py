@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Psychoacoustic annoyance (PA) after Fastl & Zwicker.
+r"""Psychoacoustic annoyance (PA) after Fastl & Zwicker.
 
 Psychoacoustic annoyance combines four hearing sensations -- loudness,
 sharpness, fluctuation strength and roughness -- into a single figure that

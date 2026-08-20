@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Environmental noise descriptors (ISO 1996-1:2016).
+"""Environmental noise descriptors (ISO 1996-1:2016).
 
 Lden (3.6.4): 10*lg{(1/24)*[t_day*10^(0,1*Lday) + t_evening*10^(0,1*(Levening+5))
 + t_night*10^(0,1*(Lnight+10))]} with default periods 12/4/8 h.
@@ -17,7 +16,8 @@ from phonometry import environment
 
 def test_lden_constant_level_analytic() -> None:
     """Constant level L in all periods: Lden = L + 10*lg[(12 + 4*10^0.5 +
-    8*10)/24] for the default 12/4/8 h split."""
+    8*10)/24] for the default 12/4/8 h split.
+    """
     expected_offset = 10 * np.log10((12 + 4 * 10**0.5 + 8 * 10) / 24)
     assert environment.lden(60.0, 60.0, 60.0) == pytest.approx(
         60.0 + expected_offset, abs=1e-9

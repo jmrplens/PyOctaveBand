@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-The return side of the ``Signal`` contract: what a transform hands back.
+"""The return side of the ``Signal`` contract: what a transform hands back.
 
 Until now the contract ran one way. A :class:`~phonometry.io.Signal` went
 into a transform and a bare array came out, so a chain of them lost the rate

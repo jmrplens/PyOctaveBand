@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for OctaveFilterBank.spectrogram() short-time band levels.
-"""
+"""Tests for OctaveFilterBank.spectrogram() short-time band levels."""
 
 import numpy as np
 import pytest

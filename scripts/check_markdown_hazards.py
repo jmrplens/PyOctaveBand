@@ -1,5 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""Gate for markdown that does not render the way it reads.
+r"""Gate for markdown that does not render the way it reads.
 
 The guides are hard-wrapped, so a sentence long enough to wrap can put a
 ``-``, a ``>`` or a digit-and-dot at the start of a line. CommonMark does not
@@ -15,7 +15,7 @@ a source that looks right and renders wrong.
    marker never closes: the marker ends the paragraph first. The maths is then
    published as literal text, and in MDX the subscript braces become a
    JavaScript expression, so the page does not render at all. This is what
-   ``$L_{n,ij,w} = ... - \\Delta R_{j,w}`` followed by ``- K_{ij} ...`` did:
+   ``$L_{n,ij,w} = ... - \Delta R_{j,w}`` followed by ``- K_{ij} ...`` did:
    the site build failed with ``ReferenceError: n is not defined``, ``n`` being
    the first subscript. A list marker is only reported when it interrupts an
    open ``$``, because a list that legitimately follows its introducing line
@@ -40,7 +40,7 @@ a source that looks right and renders wrong.
 
 4. **An opening ``$$`` with the formula on the same line.** Display maths is a
    fence, and like a code fence everything after the opening delimiter is read
-   as *meta*, not as content. So ``$$\\tau = ...`` opens a block that only ends
+   as *meta*, not as content. So ``$$\tau = ...`` opens a block that only ends
    at the next line that is exactly ``$$``, and a trailing ``$$`` at the end of
    the second line does not close it. The block then swallows the document
    until the next display block, which becomes its terminator: two hundred
@@ -100,7 +100,7 @@ _MATH_META = re.compile(r"^\$\$\s*\S")
 
 
 def _unescaped_dollars(line: str) -> int:
-    """Inline ``$`` delimiters on a line, ignoring ``\\$`` and ``$$``."""
+    r"""Inline ``$`` delimiters on a line, ignoring ``\$`` and ``$$``."""
     return len(re.findall(r"(?<!\\)\$", re.sub(r"\$\$", "", line)))
 
 

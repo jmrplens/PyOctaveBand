@@ -123,7 +123,8 @@ def _tolerance_region(freq: float, name: str) -> int:
 
 def test_table_5_tolerance_envelope() -> None:
     """|H| stays inside the Table 5 envelope of the printed design goal
-    at every Annex B one-third-octave band, for all nine weightings."""
+    at every Annex B one-third-octave band, for all nine weightings.
+    """
     for name, rows in ISO8041_1_ANNEX_B_FACTORS.items():
         for n, printed in rows:
             freq = _fc(n)

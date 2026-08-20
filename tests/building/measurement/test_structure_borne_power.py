@@ -168,7 +168,6 @@ def test_plot_returns_axes() -> None:
 
 def test_blocked_force_level_formula_15() -> None:
     """L_Fb,eq = L_Ws,low - 10 lg(Re{Y}/Y0), dB re 1e-6 N."""
-
     lfb = building.equivalent_blocked_force_level(61.7, 5.34e-6)
     assert float(lfb) == pytest.approx(61.7 - 10.0 * math.log10(5.34e-6))
     # A complex plate mobility uses its real part (Formula 16).
@@ -180,7 +179,6 @@ def test_blocked_force_level_formula_15() -> None:
 
 def test_characteristic_reception_plate_power_formula_17() -> None:
     """L_Wsn = L_Fb,eq + 10 lg(Y_R,inf,low/Y0), Y_R,inf,low = 5e-6 m/(N.s)."""
-
     lfb = building.equivalent_blocked_force_level(61.7, 5.34e-6)
     lwsn = building.characteristic_reception_plate_power(lfb)
     assert float(lwsn) == pytest.approx(61.7 + 10.0 * math.log10(5.0e-6 / 5.34e-6))
@@ -216,7 +214,6 @@ def test_free_velocity_level_formula_18_real_mobility() -> None:
     the injected power is P = v_f**2 / Y, so v_f**2 = P*Y and
     L_vf = 10 lg(P*Y/(1e-9)**2) with P in watts.
     """
-
     p_watt = 1e-12 * 10.0 ** (70.0 / 10.0)
     y = 1.0e-2
     expected = 10.0 * math.log10(p_watt * y / 1e-9**2)
@@ -233,7 +230,6 @@ def test_formulas_15_18_19_are_mutually_consistent() -> None:
     Synthesize a source of known free velocity and blocked force measured on
     ideal low- and high-mobility plates, then recover the source mobility.
     """
-
     y_source = 2.5e-4  # true |Y_S|, m/(N s)
     v_free = 3.2e-6  # true free velocity, m/s
     f_blocked = v_free / y_source
@@ -254,7 +250,6 @@ def test_source_mobility_formula_19_round_trip() -> None:
     has |Y_S| = v_f/F_b; expressing both as levels re 1e-9 m/s and 1e-6 N
     must return exactly that ratio.
     """
-
     v_f, f_b = 1.0e-4, 2.0e-2  # m/s, N -> |Y_S| = 5e-3 m/(N.s)
     lvf = 20.0 * math.log10(v_f / 1.0e-9)
     lfb = 20.0 * math.log10(f_b / 1.0e-6)

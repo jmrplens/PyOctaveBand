@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611).
+r"""Structure-borne sound power of building equipment (EN 15657:2018; ISO 9611).
 
 Building service equipment (pumps, fans, boilers, sanitary appliances) injects
 **structure-borne sound power** into the building structure it is fixed to.
@@ -218,7 +217,8 @@ class StructureBornePowerResult:
     @property
     def total_level(self) -> float:
         r"""Band-summed power level :math:`10 \log_{10}(\sum 10^{0.1 L_{W\mathrm{s}}})`,
-        in dB."""
+        in dB.
+        """
         lw = np.asarray(self.power_level, dtype=np.float64)
         return float(10.0 * np.log10(np.sum(10.0 ** (0.1 * lw))))
 

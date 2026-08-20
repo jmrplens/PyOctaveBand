@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9).
+r"""Psychoacoustic fluctuation strength per ECMA-418-2:2025 (4th ed., Clause 9).
 
 Clean-room implementation of the fluctuation-strength signal chain of
 ECMA-418-2:2025 (Clause 9, Sottek Hearing Model). The shared auditory

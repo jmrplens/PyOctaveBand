@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Ocean ambient-noise spectrum levels (Wenz framework).
+r"""Ocean ambient-noise spectrum levels (Wenz framework).
 
 Deep-water ambient-noise **spectrum levels** (dB re 1 µPa²/Hz) from the two
 physically grounded components of the Wenz curves:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Parse every ``$...$`` label the generators draw, and name what matplotlib refuses.
+r"""Parse every ``$...$`` label the generators draw, and name what matplotlib refuses.
 
 A label mathtext cannot parse does not degrade into a worse label: generation
 raises and the figure is never written. In a run of four hundred figures that
@@ -8,8 +8,8 @@ reports the figure as *stale* -- a description that sends the reader looking for
 a data change rather than a typo three characters wide.
 
 The reason this is worth its own check, rather than trusting the render: a
-construct can be legal alone and illegal in combination. ``^{\\prime}`` is a
-perfectly good prime, and ``^{\\prime}^{\\prime}`` is a double superscript
+construct can be legal alone and illegal in combination. ``^{\prime}`` is a
+perfectly good prime, and ``^{\prime}^{\prime}`` is a double superscript
 matplotlib rejects outright -- which is exactly what a mechanical substitution
 of ``′`` produces from a double prime, and exactly what it did produce in three
 labels of this tree.
@@ -58,9 +58,9 @@ _REGEX_SHAPE = re.compile(r"\(\.\+\)|\(\\d|\(\.\*\)|\\\d")
 
 
 def maths_runs(text: str) -> list[str]:
-    """Every ``$...$`` region of *text*, dollars included.
+    r"""Every ``$...$`` region of *text*, dollars included.
 
-    A dollar escaped as ``\\$`` opens nothing: that is how a pattern spells a
+    A dollar escaped as ``\$`` opens nothing: that is how a pattern spells a
     literal dollar it means to match.
     """
     runs: list[str] = []

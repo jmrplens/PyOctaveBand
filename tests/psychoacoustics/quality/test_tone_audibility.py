@@ -651,7 +651,8 @@ def test_assess_tones_rejects_non_positive_frequency() -> None:
 # ---------------------------------------------------------------------------
 def test_table_e2_lg_and_av_columns() -> None:
     """Every Table E.2 LG (Formula (12)) and av (Formula (13)) value chains
-    from the printed LS and fT to <= 0.03 dB (2-decimal print rounding)."""
+    from the printed LS and fT to <= 0.03 dB (2-decimal print rounding).
+    """
     for (ft, ls, _lt, _dl), lg_p, av_p in zip(
         ref.ISO20065_ANNEX_E_TONES, ref.ISO20065_E2_LG, ref.ISO20065_E2_AV
     ):
@@ -664,7 +665,8 @@ def test_table_e2_lg_and_av_columns() -> None:
 def test_table_e2_band_limits_are_line_snapped() -> None:
     """The printed Table E.2 f1/f2 are the first/last FFT lines inside the
     analytic Formula (4)/(5) band: each printed limit lies within one line
-    spacing inside the analytic corner."""
+    spacing inside the analytic corner.
+    """
     df = ref.ISO20065_LINE_SPACING
     for (ft, _ls, _lt, _dl), (f1_p, f2_p) in zip(
         ref.ISO20065_ANNEX_E_TONES, ref.ISO20065_E2_BAND_LIMITS
@@ -678,7 +680,8 @@ def test_table_e2_uncertainty_of_the_137hz_tone() -> None:
     """analyze_spectrum reports the Clause 6 extended uncertainty; on the
     E.1 spectrum the decisive 137.3 Hz tone reproduces the printed
     U = 2.79 dB. The flanking tones' critical bands extend beyond the
-    truncated E.1 table, so their U reproduces within 0.1 dB only."""
+    truncated E.1 table, so their U reproduces within 0.1 dB only.
+    """
     res = psychoacoustics.analyze_spectrum(
         ref.ISO20065_E1_LEVELS, ref.ISO20065_E1_FREQUENCIES, ref.ISO20065_LINE_SPACING
     )
@@ -696,7 +699,8 @@ def test_table_e2_uncertainty_of_the_137hz_tone() -> None:
 def test_table_e2_fg_uncertainty() -> None:
     """The '2 FG' row of Table E.2: with the N summated tone levels as the K
     summands (the Clause 6 reading for combined tones) and the decisive
-    tone's noise lines, U reproduces the printed 3.21 dB."""
+    tone's noise lines, U reproduces the printed 3.21 dB.
+    """
     from phonometry.psychoacoustics.quality.tone_audibility import (
         _mean_narrowband_level_lines,
     )
@@ -733,7 +737,8 @@ def test_uncertainty_constants_and_validation() -> None:
 # ---------------------------------------------------------------------------
 def test_table_e4_decisive_chain() -> None:
     """Each Table E.4 decisive row chains LS/LT -> LG, av, dL to the printed
-    values (<= 0.03 dB residual from the 2-decimal intermediates)."""
+    values (<= 0.03 dB residual from the 2-decimal intermediates).
+    """
     for ft, dl_p, ls, lt, lg_p, av_p, _u in ref.ISO20065_E4_DECISIVE_ROWS:
         assert psychoacoustics.critical_band_level(
             ls, ft, ref.ISO20065_LINE_SPACING
@@ -747,7 +752,8 @@ def test_table_e4_decisive_chain() -> None:
 def test_table_e4_mean_audibility_uncertainty() -> None:
     """Annex E Step 4: the extended uncertainty of the mean audibility over
     the five spectra (Formulae (28)/(29)) reproduces the printed 1.38 dB and
-    respects the printed 1.4 dB check margin for fewer than 12 spectra."""
+    respects the printed 1.4 dB check margin for fewer than 12 spectra.
+    """
     u_j = [row[6] for row in ref.ISO20065_E4_DECISIVE_ROWS]
     u_mean = psychoacoustics.mean_audibility_uncertainty(
         ref.ISO20065_DECISIVE_AUDIBILITIES, u_j
@@ -764,7 +770,8 @@ def test_table_e3_decisive_audibilities_and_mean() -> None:
     and FG audibilities (Clause 5.3.8 Step 4) and matches the printed bold
     values; their Formula (20) energy mean is the printed 6.96 dB. (The
     narrow-band lines of spectra 2-5 are not printed, so E.3 cannot be
-    chained from levels; this locks the printed record's consistency.)"""
+    chained from levels; this locks the printed record's consistency.)
+    """
     decisives = []
     for j in sorted(ref.ISO20065_E3_TONES):
         candidates = [dl for _f, dl in ref.ISO20065_E3_TONES[j]]
@@ -786,7 +793,8 @@ def test_table_e3_decisive_audibilities_and_mean() -> None:
 def test_din_anhang_i_decisive_tone_from_spectrum() -> None:
     """Tabelle I.9 -> I.10 row k = 2 (j = 24): the from-levels chain
     reproduces the printed LS = 41.71, LT = 68.10, LG = 57.68, av = -2.10
-    and decisive dL = 12.52 dB (2-decimal print rounding)."""
+    and decisive dL = 12.52 dB (2-decimal print rounding).
+    """
     ft, dl_p, ls_p, lt_p, lg_p, av_p, _u = ref.DIN45681_I10_DECISIVE
     df = ref.DIN45681_LINE_SPACING
     ls = psychoacoustics.mean_narrowband_level(
@@ -809,7 +817,8 @@ def test_din_anhang_i_decisive_tone_from_spectrum() -> None:
 def test_din_anhang_i_decisive_tone_uncertainty() -> None:
     """Tabelle I.10 row k = 2: the Clause 6 / Anhang G extended uncertainty of
     the decisive tone reproduces the printed u = 3.18 dB from the K = 4 tone
-    lines and the M noise lines of the final Formula (6) iteration."""
+    lines and the M noise lines of the final Formula (6) iteration.
+    """
     from phonometry.psychoacoustics.quality.tone_audibility import (
         _mean_narrowband_level_lines,
     )
@@ -827,7 +836,8 @@ def test_din_anhang_i_decisive_tone_uncertainty() -> None:
 
 def test_din_anhang_i_analyze_spectrum_end_to_end() -> None:
     """analyze_spectrum on the Tabelle I.9 lines finds exactly the decisive
-    298.8 Hz tone with the printed audibility and uncertainty."""
+    298.8 Hz tone with the printed audibility and uncertainty.
+    """
     res = psychoacoustics.analyze_spectrum(
         ref.DIN45681_I9_LEVELS,
         ref.DIN45681_I9_FREQUENCIES,
@@ -849,7 +859,8 @@ def test_din_anhang_i_two_tone_rule_matches_5fg_row() -> None:
     1000 Hz) are printed combined ("5 FG"): the Formula (18)/(19) decision
     must NOT separate them -- the only printed outcome of the two-tone rule.
     The FG chain then reproduces the printed dL = 3.22 dB from the printed
-    combined LT = 55.95 dB at the more audible member (732.1 Hz)."""
+    combined LT = 55.95 dB at the more audible member (732.1 Hz).
+    """
     ft4, dl4, _ls4, _lt4 = ref.DIN45681_I10_K4
     ft5, dl5, ls5, _lt5 = ref.DIN45681_I10_K5
     assert psychoacoustics.resolve_tones_separately(ft4, ft5, dl4, dl5) is False
@@ -867,7 +878,8 @@ def test_din_anhang_i_two_tone_rule_matches_5fg_row() -> None:
 
 def test_din_anhang_i11_rows_j45_j48_chain() -> None:
     """Tabelle I.11 rows j = 45 / j = 48: the Formulae (12)-(14) chain from
-    the printed LS/LT reproduces the printed LG, av and dL columns."""
+    the printed LS/LT reproduces the printed LG, av and dL columns.
+    """
     df = ref.DIN45681_LINE_SPACING
     for ft, dl_p, ls_p, lt_p, lg_p, av_p, _u in (
         ref.DIN45681_I11_J45,
@@ -887,7 +899,8 @@ def test_din_tabelle_i6_6fg_plain_sum_reproduces_printed_audibility() -> None:
     plain Formula (17) energy sum of the three tone levels (82.87 dB) through
     the chain at 592.2 Hz. (The row's printed LT cell, 81.11 dB, follows the
     Anmerkung-2 shared-line dedupe instead and contradicts the printed dL;
-    only the dL chain is pinned, see reference_data.)"""
+    only the dL chain is pinned, see reference_data.)
+    """
     ft, dl_p, ls_p, _av_p = ref.DIN45681_I6_6FG
     lt = psychoacoustics.energy_sum_level(
         ref.DIN45681_I6_6FG_TONE_LEVELS, effective_bandwidth_factor=1.0
@@ -900,7 +913,8 @@ def test_din_tabelle_i6_6fg_plain_sum_reproduces_printed_audibility() -> None:
 
 def test_din_anhang_i3_mean_audibility_maps_to_kt_4() -> None:
     """Anhang I.3 Steps 3/5: the printed mean audibility 6.38 dB maps to
-    KT = 4 dB (DIN Abschnitt 6 Tabelle 1 == ISO 1996-2:2017 Table J.1)."""
+    KT = 4 dB (DIN Abschnitt 6 Tabelle 1 == ISO 1996-2:2017 Table J.1).
+    """
     from phonometry import environment
 
     assert (
@@ -914,7 +928,8 @@ def test_din_anhang_i3_mean_audibility_maps_to_kt_4() -> None:
 def test_din_tabelle_a1_critical_bandwidths() -> None:
     """Tabelle A.1: Formula (2) reproduces every printed (integer-rounded)
     critical bandwidth from 100 Hz to 13.5 kHz, except the 250 Hz print
-    quirk recorded in reference_data (printed 105 vs Formula (2) 104.47)."""
+    quirk recorded in reference_data (printed 105 vs Formula (2) 104.47).
+    """
     for ft, dfc_printed in ref.DIN45681_A1_BANDWIDTHS:
         computed = psychoacoustics.critical_bandwidth_engineering(ft)
         if ft == 250.0:

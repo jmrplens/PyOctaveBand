@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Guards for the measurement methods used by generate_graphs.py.
+"""Guards for the measurement methods used by generate_graphs.py.
 
 The published weighting-curves figure once showed A/C ~2.4 dB low (never
 crossing 0 dB) because the impulse sat at sample 0 and the high-accuracy
@@ -68,8 +67,7 @@ def test_graph_c_curve_matches_analytic() -> None:
 
 
 def test_graph_a_curve_shows_positive_bump() -> None:
-    """
-    The exact failure mode that shipped: an A curve that never crosses 0 dB.
+    """The exact failure mode that shipped: an A curve that never crosses 0 dB.
 
     The A-weighting is positive between ~1.1 and ~6.2 kHz with a maximum of
     +1.27 dB at ~2.5 kHz (IEC 61672-1 Table 2). The plotted curve must show it.
@@ -94,8 +92,7 @@ def test_graph_curves_anchor_at_1khz() -> None:
 
 
 def test_graph_b_curve_matches_published_table() -> None:
-    """
-    The B trace of the special-curves figure, against its published table.
+    """The B trace of the special-curves figure, against its published table.
 
     Oracle: ANSI S1.4-1983 Table IV design goals (B column) with the Table V
     Type 0 tolerance, evaluated at the exact base-10 frequency behind each
@@ -114,8 +111,7 @@ def test_graph_b_curve_matches_published_table() -> None:
 
 
 def test_graph_d_curve_matches_published_table() -> None:
-    """
-    The D trace of the special-curves figure, including the annotated hump.
+    """The D trace of the special-curves figure, including the annotated hump.
 
     Oracle: the IEC 537:1976 one-third-octave table republished in NASA
     CR-3406 Table SLD-I, whose maximum is the +11.5 dB at 3.15 kHz the
@@ -132,8 +128,7 @@ def test_graph_d_curve_matches_published_table() -> None:
 
 
 def test_graph_au_trace_is_a_plus_the_u_lowpass() -> None:
-    """
-    AU must sit on the A reference through the audible range, then cut.
+    """AU must sit on the A reference through the audible range, then cut.
 
     Oracle: IEC 61012:1990 Table 1, the nominal relative response of the U
     weighting as a separate unit with its per-row tolerance. AU is A

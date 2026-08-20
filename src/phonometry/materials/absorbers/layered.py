@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Declarative layer stacks and the transfer-matrix absorber solver.
+r"""Declarative layer stacks and the transfer-matrix absorber solver.
 
 An absorber is declared as a list of layers ordered from the sound-incidence
 side towards the termination and solved at one angle, in the same

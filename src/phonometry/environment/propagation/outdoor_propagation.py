@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Outdoor sound propagation: ISO 9613-2:1996 general method of calculation.
+r"""Outdoor sound propagation: ISO 9613-2:1996 general method of calculation.
 
 This part of ISO 9613 predicts octave-band attenuation of sound propagating
 outdoors from a point source to a receiver under conditions favourable to
@@ -127,6 +126,7 @@ class Barrier:
     line_of_sight_clear: bool = False
 
     def __post_init__(self) -> None:
+        """Reject negative ``dss``/``dsr``/``a`` and a non-positive spacing ``e``."""
         if self.source_to_edge < 0.0 or self.edge_to_receiver < 0.0:
             raise ValueError("Barrier edge distances must be non-negative.")
         if self.parallel_distance < 0.0:

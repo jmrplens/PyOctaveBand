@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2).
+r"""In-situ sound absorption of road surfaces (ISO 13472-1 / ISO 13472-2).
 
 Two complementary standardised in-situ methods are supported here. They target
 opposite ends of the absorption scale and are **not** interchangeable:

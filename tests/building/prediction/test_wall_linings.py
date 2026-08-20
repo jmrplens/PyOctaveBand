@@ -245,7 +245,8 @@ def test_table_d1_63_to_80_boundary() -> None:
 def test_table_d1_1600_hz_overlap_takes_the_conservative_value() -> None:
     """ISO 12354-1:2017 Table D.1 prints 1 600 Hz in two rows with different
     values, "630 to 1 600 -> -10" and "1 600 <= f0 <= 5 000 -> -5"; see
-    docs/ERRATA.md. The library takes the more conservative -10 dB."""
+    docs/ERRATA.md. The library takes the more conservative -10 dB.
+    """
     assert building.weighted_lining_improvement(1600.0, 45.0) == -10.0
     assert building.weighted_lining_improvement(2000.0, 45.0) == -5.0
 
@@ -366,7 +367,8 @@ def test_anchor_and_glued_area_corrections_d5_and_d6() -> None:
 
 def test_stud_system_formula_d7() -> None:
     """ISO 12354-1:2017 Formula (D.7), printed p. 41: ``-20 lg(fo) + 48``,
-    ``-22 lg(fo) + 51``, ``-24 lg(fo) + 54``, each ">= -4"."""
+    ``-22 lg(fo) + 51``, ``-24 lg(fo) + 54``, each ">= -4".
+    """
     studs = building.lining_improvement(100.0, system="studs")
     assert studs.ratings == pytest.approx((48.0 - 40.0, 51.0 - 44.0, 54.0 - 48.0))
     assert building.lining_improvement(5000.0, system="studs").delta_rw == -4.0

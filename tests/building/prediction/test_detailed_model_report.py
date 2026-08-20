@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 12354-1/-2:2017 detailed prediction fiches (``.report()``).
+"""Tests for the ISO 12354-1/-2:2017 detailed prediction fiches (``.report()``).
 
 Both fiches are pinned to the per-band worked example the two parts share
 (ISO 12354-1 Annex L / ISO 12354-2 Annex G, the heavy homogeneous building

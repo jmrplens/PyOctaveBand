@@ -117,7 +117,8 @@ def animate_fdtd_aperture_slit(output_dir: str) -> None:
     the library gives the narrow slit's transmission coefficient. The
     shadow side of each instantaneous panel rides its own annotated
     display gain so the slit's re-radiation is visible next to the
-    standing wave facing the wall; the RMS row keeps one shared scale."""
+    standing wave facing the wall; the RMS row keeps one shared scale.
+    """
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 

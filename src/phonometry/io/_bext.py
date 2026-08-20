@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Writing the ``bext`` broadcast extension chunk (EBU Tech 3285 v2, 2011).
+r"""Writing the ``bext`` broadcast extension chunk (EBU Tech 3285 v2, 2011).
 
 No maintained Python package writes ``bext`` (wavinfo only reads it;
 python-soundfile does not expose libsndfile's ``SFC_SET_BROADCAST_INFO``),

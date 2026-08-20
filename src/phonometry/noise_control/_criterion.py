@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Shared plumbing of the composed noise-control workflows.
+"""Shared plumbing of the composed noise-control workflows.
 
 :mod:`phonometry.noise_control.duct_path` and
 :mod:`phonometry.noise_control.room_to_room` are the two calculations in the

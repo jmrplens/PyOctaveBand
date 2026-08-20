@@ -75,7 +75,8 @@ def _disp_group_speed(cells: Any, courant: float) -> Any:
 def _disp_phase_speed(cells: Any, courant: float) -> Any:
     """Exact discrete phase speed / c on the grid axis, in cells per
     wavelength: ``arcsin(S sin theta) / (S theta)``. This is the error the
-    guide's ``(1 - S^2)(k dx)^2 / 24`` approximates."""
+    guide's ``(1 - S^2)(k dx)^2 / 24`` approximates.
+    """
     theta = np.pi / np.asarray(cells, dtype=float)
     arg = np.clip(courant * np.sin(theta), -1.0, 1.0)
     return np.arcsin(arg) / theta / courant
@@ -192,7 +193,8 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
     the gap in metres against the closed form. The coarse tube reaches the
     finish line milliseconds late; the fine one arrives on time. The side
     panel carries the speed-error law the three measurements are read
-    against, phase and group."""
+    against, phase and group.
+    """
     T = _translate_str
     tubes, times, courant = _dispersion_fields()
     colors = (COLOR_SECONDARY, COLOR_PRIMARY, COLOR_TERTIARY)

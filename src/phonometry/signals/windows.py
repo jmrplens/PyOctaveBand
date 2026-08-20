@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Figures of merit of a spectral-analysis taper (Harris 1978).
+r"""Figures of merit of a spectral-analysis taper (Harris 1978).
 
 The window is the one choice every Fourier estimator forces and the one
 the estimators of :mod:`phonometry.signals.spectra` leave open in their

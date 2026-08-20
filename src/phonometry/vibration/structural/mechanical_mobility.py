@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011).
+r"""Mechanical mobility and the frequency-response-function family (ISO 7626-1:2011).
 
 Mechanical **mobility** is the complex ratio of a velocity response to the
 excitation force that produces it, :math:`Y_{ij} = v_i / F_j` (ISO 7626-1,

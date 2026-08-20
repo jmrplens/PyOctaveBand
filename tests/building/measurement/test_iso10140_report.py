@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 10140 laboratory test report (``.report()`` -> PDF).
+"""Tests for the ISO 10140 laboratory test report (``.report()`` -> PDF).
 
 The fiche's numbers are verified against the standards' own definitions
 using hand-computable syntheses. For the airborne fiche, choosing the free
@@ -237,7 +236,6 @@ def test_missing_rating_rejected(tmp_path) -> None:
 
 def test_rating_without_per_band_data_rejected(tmp_path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
-
     # A backward-compatibly constructed rating (band_centers / measured /
     # shifted_reference default to None) would otherwise crash the table.
     bare_rating = building.WeightedRatingResult(
@@ -266,7 +264,8 @@ def test_manual_impact_result_renders(tmp_path) -> None:
 
 def test_report_rejects_band_count_mismatch(tmp_path) -> None:
     """A rating whose per-band arrays are shorter than the curve raises a clear
-    ValueError (not an uncaught IndexError)."""
+    ValueError (not an uncaught IndexError).
+    """
     import dataclasses
 
     res = _airborne_result()

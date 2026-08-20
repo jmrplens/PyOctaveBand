@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016).
+r"""Objective audibility of tones in noise -- engineering method (ISO/PAS 20065:2016).
 
 ISO/PAS 20065 is the detailed engineering method that ISO 1996-2:2017 defers to
 for the audibility of prominent tones; the simplified 2007/2009 Annex C method
@@ -1079,7 +1078,8 @@ class ToneAudibilityResult:
     @property
     def audible(self) -> NDArray[np.bool_]:
         r"""Boolean mask of tones that are present, i.e. :math:`\Delta L > 0`
-        (Step 2)."""
+        (Step 2).
+        """
         return self.audibilities > 0.0
 
     @property

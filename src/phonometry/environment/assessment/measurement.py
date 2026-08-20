@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Determination of environmental-noise sound pressure levels (ISO 1996-2:2017).
+r"""Determination of environmental-noise sound pressure levels (ISO 1996-2:2017).
 
 The measurement companion of the ISO 1996-1 descriptors in
 :mod:`phonometry.environment`. ISO 1996-2 covers *how* the levels that feed

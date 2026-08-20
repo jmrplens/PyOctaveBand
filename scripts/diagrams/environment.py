@@ -252,7 +252,8 @@ def _d_impulse_prominence(s: SVG, th: Theme) -> None:
 def _d_wind_turbine(s: SVG, th: Theme) -> None:
     """IEC 61400-11 apparent-sound-power geometry: downwind ground-board
     microphone at R0 = H + D/2, slant distance R1 to the rotor centre and
-    the Figure 3 plan-view position pattern."""
+    the Figure 3 plan-view position pattern.
+    """
     import math
 
     gy = 470.0
@@ -408,7 +409,8 @@ def _d_ground_reflection(s: SVG, th: Theme) -> None:
     """Two-path ground interference: source, receiver, direct ray, the
     specular reflection unfolded through the image source, and the path
     difference that sets the interference phase (ISO 9613-2 ground effect,
-    Chien-Soroka geometry)."""
+    Chien-Soroka geometry).
+    """
     gy = 372.0
     sx, sy = 170.0, 232.0  # source (hs = 140 px)
     rx, ry = 700.0, 282.0  # receiver capsule tip (hr = 90 px)
@@ -506,7 +508,8 @@ def _d_atmospheric_refraction(s: SVG, th: Theme) -> None:
     Renterghem 2021, Ch. 11): wind profile arrows, an effective-sound-speed
     inset, downward-curved rays with a ground bounce on the downwind side
     and upward-curved rays opening an acoustic shadow on the upwind side.
-    Horizontal scale about 1 px per metre; heights exaggerated."""
+    Horizontal scale about 1 px per metre; heights exaggerated.
+    """
     gy = 452.0
     sx, sy = 450.0, gy - 56.0  # source, hs = 2 m (schematic)
     mlx, mrx = 90.0, 795.0  # receivers, 350 m to each side
@@ -633,7 +636,8 @@ def _d_ground_barrier(s: SVG, th: Theme) -> None:
     """The guide's barrier geometry: a 1 m source, a 4 m thin screen at
     50 m and a 1.5 m receiver at 100 m. The diffracted segments A and B,
     the blocked direct path d and the barrier_insertion_loss values
-    (N = 0.44 and 10.0 dB at 500 Hz, 15.5 dB at 2 kHz)."""
+    (N = 0.44 and 10.0 dB at 500 Hz, 15.5 dB at 2 kHz).
+    """
     gy = 340.0  # ground; 7 px/m horizontal, 60 px/m vertical
     sx, sy = 110.0, gy - 60.0  # source, hs = 1 m
     ex, ey = 460.0, gy - 240.0  # barrier top edge, 4 m

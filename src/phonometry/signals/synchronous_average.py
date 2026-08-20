@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Time synchronous averaging (TSA) of a periodic waveform in noise.
+r"""Time synchronous averaging (TSA) of a periodic waveform in noise.
 
 Time domain averaging extracts a repetitive signal of known period ``T``
 from additive noise by ensemble-averaging successive length-``T`` blocks,

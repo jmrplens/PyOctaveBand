@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Point mobilities and impedances of infinite structures (Cremer, Heckl &
+r"""Point mobilities and impedances of infinite structures (Cremer, Heckl &
 Petersson 2005, Chapter 5, Table 5.1).
 
 The **point mobility** ``Y`` of a structure is the complex ratio of the

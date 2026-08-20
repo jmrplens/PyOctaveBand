@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound transmission through slits, holes and apertures (Hopkins 2007, Sound
+r"""Sound transmission through slits, holes and apertures (Hopkins 2007, Sound
 Insulation, Section 4.3.10; Gomperts 1964; Wilson & Soroka 1965).
 
 Air paths are the real limit on the sound insulation of an otherwise heavy
@@ -126,7 +125,8 @@ class ApertureTransmissionResult:
     @property
     def transmission_loss(self) -> np.ndarray:
         r"""Aperture sound reduction index :math:`R = -10 \log_{10}(\tau)` per
-        band, dB."""
+        band, dB.
+        """
         return transmission_loss_from_coefficient(self.transmission_coefficient)
 
     def plot(
@@ -162,7 +162,8 @@ class ApertureTransmissionResult:
 
 def _slit_end_correction(k_big: np.ndarray) -> np.ndarray:
     r"""End correction :math:`e = (1/\pi)(\ln(8/K) - \gamma)` (Hopkins
-    Eq. 4.100)."""
+    Eq. 4.100).
+    """
     return np.asarray((np.log(8.0 / k_big) - _EULER_GAMMA) / np.pi, dtype=np.float64)
 
 

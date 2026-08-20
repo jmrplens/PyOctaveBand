@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the regularized spectral inversion (Kirkeby & Nelson 1999,
+"""Tests for the regularized spectral inversion (Kirkeby & Nelson 1999,
 Mueller & Massarani 2001).
 
 Validation strategy (closed-form, not self-consistency):

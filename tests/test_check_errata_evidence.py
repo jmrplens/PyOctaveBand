@@ -129,7 +129,8 @@ def test_an_incomplete_citation_does_not_satisfy_the_check(
 ) -> None:
     """All three parts are required: the page index resolves in any copy of the
     edition, the printed folio is what a reader holding the paper looks for,
-    and without the designation neither resolves in any library."""
+    and without the designation neither resolves in any library.
+    """
     incomplete = _WITH_PAGE.replace(
         "Verified on PDF page 8 (printed p. 6) of Some standard:2020.", without
     )

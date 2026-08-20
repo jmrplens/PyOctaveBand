@@ -75,7 +75,8 @@ def _d_aircraft_certification(s: SVG, th: Theme) -> None:
     """The three ICAO Annex 16 Vol. I Chapter 3 reference points around the
     runway: lateral (450 m line), flyover (6.5 km from start of roll) and
     approach (2 000 m from the threshold, 120 m under the 3-degree path).
-    Plan and side views share the same x mapping (0.062 px per metre)."""
+    Plan and side views share the same x mapping (0.062 px per metre).
+    """
     yc = 185.0  # plan-view runway centre line
     x_sor = 330.0  # start of roll / threshold
     x_fly = x_sor + 6500.0 * 0.062  # flyover point, 6.5 km
@@ -208,7 +209,8 @@ def _d_aircraft_certification(s: SVG, th: Theme) -> None:
 def _d_rotorcraft_certification(s: SVG, th: Theme) -> None:
     """Chapter 8 overflight: level flight at 150 m over the central
     microphone with two sideline microphones 150 m to each side (plan
-    inset). Side view to scale at about 0.47 px per metre vertically."""
+    inset). Side view to scale at about 0.47 px per metre vertically.
+    """
     gy = 470.0
     hx, hy = 300.0, 150.0  # helicopter on the flight path
 
@@ -352,7 +354,8 @@ def _d_doc29_segment_geometry(s: SVG, th: Theme) -> None:
     to scale at 0.30 px per metre in the plane containing the segment and the
     observer), the plane normal to the flight path where the elevation, bank
     and depression angles live (Fig. 4-3), and the start-of-roll azimuth in
-    plan (Fig. 4-8)."""
+    plan (Fig. 4-8).
+    """
     sc = 0.30  # px per metre, panels (a)/(b)
 
     # --- (a) observer alongside the segment (Fig. 4-2b) --------------------
@@ -548,7 +551,8 @@ def _d_aircraft_noise_station(s: SVG, th: Theme) -> None:
     10 m meteorological mast and the independent tracking sensor; below it,
     the microphone itself at a larger scale and the plan that explains why
     its capsule points across the track. The Appendix 2 test window and the
-    sample-size rule are in the footer."""
+    sample-size rule are in the footer.
+    """
     gy = 320.0  # site ground line
     mx = 300.0  # microphone station
 
@@ -742,7 +746,8 @@ def _d_rotorcraft_hemisphere(s: SVG, th: Theme) -> None:
     nose in the vertical centre plane, and the azimuth φ measured about the
     nose axis from straight down. The third panel places the 60 m sphere on a
     track, so the source level and the three propagation adjustments read as
-    one chain."""
+    one chain.
+    """
     r = 112.0
 
     # --- (a) the polar angle, in the vertical centre plane (φ = 0) ---------

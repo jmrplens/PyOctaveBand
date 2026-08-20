@@ -1880,7 +1880,8 @@ def cnossos_rail_workbook_cases() -> list[dict[str, str]]:
 
 def cnossos_rail_2015_wavelength_tables() -> dict[tuple[str, str], tuple[float, ...]]:
     """The 2015 catalogue spectra given against wavelength, keyed by
-    ``(table, id)``: wheel and rail roughness, contact filter, impact."""
+    ``(table, id)``: wheel and rail roughness, contact filter, impact.
+    """
     return {
         (row["table"], row["id"]): tuple(
             float(row[w]) for w in CNOSSOS_RAIL_2015_WAVELENGTHS
@@ -1893,7 +1894,8 @@ def cnossos_rail_2015_frequency_tables() -> dict[
     tuple[str, str, str], tuple[float, ...]
 ]:
     """The 2015 catalogue spectra given against frequency, keyed by
-    ``(table, id, source)``: transfer functions, traction, aerodynamic."""
+    ``(table, id, source)``: transfer functions, traction, aerodynamic.
+    """
     return {
         (row["table"], row["id"], row["source"]): tuple(
             float(row[b]) for b in CNOSSOS_RAIL_BANDS
@@ -2152,7 +2154,8 @@ def cnossos_road_workbook_cases() -> list[dict[str, str]]:
 def cnossos_road_2015_coefficients() -> dict[str, dict[str, tuple[float, ...]]]:
     """Table F-1 as published in (EU) 2015/996, keyed by category then ``AR``,
     ``BR``, ``AP``, ``BP``. This is the superseded database the workbook was
-    computed with, not the one the library ships."""
+    computed with, not the one the library ships.
+    """
     table: dict[str, dict[str, tuple[float, ...]]] = {}
     for row in _cnossos_road_rows("road_coefficients_2015.csv"):
         table.setdefault(row["category"], {})[row["coefficient"]] = tuple(
@@ -2165,7 +2168,8 @@ def cnossos_road_2015_surfaces() -> dict[
     str, tuple[str, dict[str, tuple[float, ...]], dict[str, float]]
 ]:
     """Table F-4 as published in (EU) 2015/996, keyed by the ``NLxx`` surface
-    identifier the workbook uses: ``(description, alpha, beta)``."""
+    identifier the workbook uses: ``(description, alpha, beta)``.
+    """
     names: dict[str, str] = {}
     alpha: dict[str, dict[str, tuple[float, ...]]] = {}
     beta: dict[str, dict[str, float]] = {}

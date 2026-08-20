@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Thomson multitaper spectral estimation (Percival & Walden 1993, Ch. 7).
+r"""Thomson multitaper spectral estimation (Percival & Walden 1993, Ch. 7).
 
 Thomson's multitaper estimator (Thomson 1982), as developed in Percival &
 Walden, *Spectral Analysis for Physical Applications* (1993, Chapter 7),

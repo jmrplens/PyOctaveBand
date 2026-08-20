@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Room acoustic parameters from impulse responses per ISO 3382-1:2009
+"""Room acoustic parameters from impulse responses per ISO 3382-1:2009
 (performance spaces) and ISO 3382-2:2008 (ordinary rooms).
 
 The measured impulse response (acquired e.g. with the swept-sine or MLS
@@ -452,8 +451,7 @@ def decay_curve(
     fraction: int = 1,
     zero_phase: bool = False,
 ) -> DecayCurve:
-    """
-    Schroeder decay curve of an impulse response.
+    """Schroeder decay curve of an impulse response.
 
     Backward integration of the squared impulse response
     (ISO 3382-1:2009, 5.3.3, Equation (1)), with noise truncation at the
@@ -527,8 +525,7 @@ def room_parameters(
     fraction: int = 1,
     zero_phase: bool = False,
 ) -> RoomAcousticsResult:
-    """
-    Room acoustic parameters per ISO 3382-1:2009 / ISO 3382-2:2008.
+    """Room acoustic parameters per ISO 3382-1:2009 / ISO 3382-2:2008.
 
     The impulse response (e.g. acquired with the ISO 18233 swept-sine or
     MLS methods of :mod:`phonometry.room.impulse_response`) is filtered into

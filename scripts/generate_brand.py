@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Deterministic generator for the phonometry brand assets: the mark itself and
+"""Deterministic generator for the phonometry brand assets: the mark itself and
 every icon derived from it.
 
 The mark is a wavefront leaving a point source and crossing a measurement grid.

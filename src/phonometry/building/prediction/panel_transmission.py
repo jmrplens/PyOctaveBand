@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Predicted airborne sound reduction index of panels (Bies, Hansen & Howard
+r"""Predicted airborne sound reduction index of panels (Bies, Hansen & Howard
 2017, Engineering Noise Control 5e, Section 7.2; Sharp 1973).
 
 Where EN 12354-1 (:mod:`phonometry.building.prediction.simplified_model`) takes the

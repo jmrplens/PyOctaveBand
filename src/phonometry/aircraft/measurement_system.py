@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Aircraft-noise measurement-system tolerances (IEC 61265:1995).
+"""Aircraft-noise measurement-system tolerances (IEC 61265:1995).
 
 The certification levels of :mod:`phonometry.aircraft.certification` are only
 worth what the chain that measured them is, and IEC 61265 is the standard that

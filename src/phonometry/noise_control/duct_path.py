@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-End-to-end duct-borne noise calculation: fan to room, element by element.
+r"""End-to-end duct-borne noise calculation: fan to room, element by element.
 
 The classic consulting workflow of HVAC acoustics is a bookkeeping exercise.
 Start from the sound power the fan puts into the duct, walk down the path, and

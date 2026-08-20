@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 717 Annex C rating report (``.report()`` -> PDF).
+"""Tests for the ISO 717 Annex C rating report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural
 facts: a non-empty file that starts with the ``%PDF`` magic bytes is written

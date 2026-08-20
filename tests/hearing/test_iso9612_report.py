@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 9612:2009 occupational noise-exposure ``.report()`` fiche.
+"""Tests for the ISO 9612:2009 occupational noise-exposure ``.report()`` fiche.
 
 The rendered values are checked against a hand-derivable oracle independent of
 the library: two 4 h tasks at 85 dB and 75 dB give

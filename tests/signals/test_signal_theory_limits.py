@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Stress tests and signal processing theory verification.
+"""Stress tests and signal processing theory verification.
 Focuses on edge cases that might be problematic in DSP.
 """
 
@@ -11,8 +10,7 @@ from phonometry import filters
 
 
 def test_nyquist_frequency_content() -> None:
-    """
-    Theory: A signal exactly at fs/2 (Nyquist) is ambiguous in digital systems.
+    """Theory: A signal exactly at fs/2 (Nyquist) is ambiguous in digital systems.
     Verification: Pass a Nyquist-frequency signal through the filter bank.
     Expectation: The library should not crash, and energy should be handled gracefully (attenuated).
     """
@@ -27,8 +25,7 @@ def test_nyquist_frequency_content() -> None:
 
 
 def test_aliasing_behavior() -> None:
-    """
-    Theory: Frequencies above fs/2 appear as aliased lower frequencies.
+    """Theory: Frequencies above fs/2 appear as aliased lower frequencies.
     Verification: Pass a signal at fs * 0.75 (above Nyquist).
     Expectation: The filter bank should treat the aliased frequency (fs * 0.25) correctly.
     """
@@ -48,8 +45,7 @@ def test_aliasing_behavior() -> None:
 
 
 def test_extreme_high_order_stability() -> None:
-    """
-    Theory: Very high order IIR filters can become numerically unstable even with SOS.
+    """Theory: Very high order IIR filters can become numerically unstable even with SOS.
     Verification: Request order 50 and 100 (extreme).
     Expectation: SOS should maintain stability (no NaNs), but we check output sanity.
     """
@@ -63,8 +59,7 @@ def test_extreme_high_order_stability() -> None:
 
 
 def test_dc_offset_rejection() -> None:
-    """
-    Theory: Band-pass filters should reject DC (0 Hz).
+    """Theory: Band-pass filters should reject DC (0 Hz).
     Verification: Pass a constant signal (x = 1.0) with detrend=True.
     Expectation: The signal should be centered around 0 before filtering,
     leading to extremely low energy levels.
@@ -85,9 +80,7 @@ def test_dc_offset_rejection() -> None:
 
 
 def test_extreme_sampling_rates() -> None:
-    """
-    Verification: Test extremely low and extremely high sampling rates.
-    """
+    """Verification: Test extremely low and extremely high sampling rates."""
     # Extremely low (e.g. 100Hz)
     fs_low = 100
     x_low = np.zeros(fs_low)
@@ -102,9 +95,7 @@ def test_extreme_sampling_rates() -> None:
 
 
 def test_huge_calibration_factor() -> None:
-    """
-    Verification: Sensitivity factor of 1e10 (extreme scaling).
-    """
+    """Verification: Sensitivity factor of 1e10 (extreme scaling)."""
     fs = 8000
     x = np.random.default_rng(42).standard_normal(fs)
     spl, _ = filters.octave_filter(
@@ -114,8 +105,7 @@ def test_huge_calibration_factor() -> None:
 
 
 def test_multichannel_mismatched_lengths() -> None:
-    """
-    Verification: Pass a 2D array where channels have different sizes (not possible in numpy,
+    """Verification: Pass a 2D array where channels have different sizes (not possible in numpy,
     but we check if it handles non-standard list of lists if we support it).
     Actually, _typesignal ensures it's an array.
     """
@@ -129,8 +119,7 @@ def test_multichannel_mismatched_lengths() -> None:
 
 
 def test_sos_stability_at_low_freq_high_fs() -> None:
-    """
-    Theory: Filtering at 16Hz with fs=192kHz is extremely difficult.
+    """Theory: Filtering at 16Hz with fs=192kHz is extremely difficult.
     Verification: Check stability for this case.
     """
     fs = 192000

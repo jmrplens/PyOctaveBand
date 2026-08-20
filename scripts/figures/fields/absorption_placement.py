@@ -121,7 +121,8 @@ def _ap_linings() -> tuple[float, float, float, float]:
 
 def _ap_fit_t60(t: Any, level: Any, lo: float, hi: float) -> float:
     """T60 extrapolated from a straight fit of the decay between two levels,
-    the T20/T30 practice of the measurement guides."""
+    the T20/T30 practice of the measurement guides.
+    """
     m = (level <= lo) & (level >= hi) & (t > 0.015)
     slope = float(np.polyfit(t[m], level[m], 1)[0])
     return -60.0 / slope
@@ -240,7 +241,8 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
     cannot tell the rooms apart: the spread room decays inside the band,
     the concentrated room's decay bends and its tail leaves it, and the
     per-frame RMS panel shows the surviving field running nearly parallel
-    to the absorbing pair, in horizontal stripes."""
+    to the absorbing pair, in horizontal stripes.
+    """
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 

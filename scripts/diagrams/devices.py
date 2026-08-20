@@ -815,7 +815,8 @@ def _d_box_array(s: SVG, th: Theme) -> None:
 def _d_radiation_factor(s: SVG, th: Theme) -> None:
     """The second, paired measurement Part 2 needs: an ISO 9614 intensity scan
     over a surface offset from the casing, taken on the same machine in the
-    same operating mode as the velocity survey that runs on the casing."""
+    same operating mode as the velocity survey that runs on the casing.
+    """
     gy = 400.0
     s.ground(gy, 60.0, 560.0)
 
@@ -1150,7 +1151,8 @@ def _d_loudspeaker_freefield(s: SVG, th: Theme) -> None:
 def _d_vibration_sound_power(s: SVG, th: Theme) -> None:
     """ISO/TS 7849 surface-velocity method: the machine's radiating surface
     divided into N equal cells, one accelerometer per cell centre, and the
-    survey sound power from the mean velocity level over the area S."""
+    survey sound power from the mean velocity level over the area S.
+    """
     gy = 470.0
     s.ground(gy, 50.0, 560.0)
 
@@ -1264,7 +1266,8 @@ def _d_swept_sine(s: SVG, th: Theme) -> None:
     """Farina's exponential-sweep method: sweep through the weakly nonlinear
     DUT, deconvolve with the inverse filter, and the order-n distortion
     products compress into impulse responses L*ln(n) ahead of the linear
-    one (L = 0.701 s for 20 Hz to 6 kHz in 4 s; 260 px per second)."""
+    one (L = 0.701 s for 20 Hz to 6 kHz in 4 s; 260 px per second).
+    """
 
     def box(x0: float, x1: float, y0: float, l1: str, l2: str, color: str) -> None:
         s.rect(x0, y0, x1 - x0, 76.0, th.panel, color, rx=10, sw=2)
@@ -1357,7 +1360,8 @@ def _d_swept_sine(s: SVG, th: Theme) -> None:
 def _d_program_loudness(s: SVG, th: Theme) -> None:
     """K-weighting, 400 ms blocks and the two gates into the integrated
     loudness of the guide's example (I = -23.1 LUFS, relative threshold
-    -39.0 LUFS), with the LRA and true-peak branches beside the chain."""
+    -39.0 LUFS), with the LRA and true-peak branches beside the chain.
+    """
     cx, bw = 450.0, 560.0
     x0 = cx - bw / 2
 
@@ -1462,7 +1466,8 @@ def _d_noise_control(s: SVG, th: Theme) -> None:
     machine enclosure (IL = R - C = 25 dB at 500 Hz), a duct run with the
     m = 4 expansion chamber (TL peak 6.5 dB at 286 Hz), a lined elbow
     (6 dB at 1 kHz), the open-end reflection (18 dB at 63 Hz) and an
-    operator cabin rated by the same IL = R - C (31 dB at 1 kHz)."""
+    operator cabin rated by the same IL = R - C (31 dB at 1 kHz).
+    """
     gy = 440.0
     s.ground(gy, 40.0, 860.0)
     for zx in (340.0, 660.0):

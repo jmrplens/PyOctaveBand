@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Frequency-response and coherence estimators (Bendat & Piersol).
+r"""Frequency-response and coherence estimators (Bendat & Piersol).
 
 Two-channel (input/output) system identification from measured signals, using
 the Welch-averaged cross- and auto-spectral densities. Following Bendat &

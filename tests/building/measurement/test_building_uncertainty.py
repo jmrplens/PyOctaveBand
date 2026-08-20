@@ -579,7 +579,8 @@ def test_the_bare_names_are_gone():
 
 def test_annex_b_uncorrelated_single_number_uncertainties() -> None:
     """Formula (B.2) on the Table B.1 spectrum gives u(Rw+C50-5000) = 0,6 dB
-    and u(Rw+Ctr,50-5000) = 0,8 dB."""
+    and u(Rw+Ctr,50-5000) = 0,8 dB.
+    """
     import reference_data as ref
 
     from phonometry.building.measurement.insulation import (
@@ -620,7 +621,8 @@ def test_annex_b_correlated_rw_uncertainty() -> None:
 
 def test_annex_b_correlated_adaptation_sum_uncertainties() -> None:
     """Formulae (B.3)-(B.5): u(Rw+C50-5000) = 2,1 dB and
-    u(Rw+Ctr,50-5000) = 2,6 dB (unrounded 2,05 / 2,63)."""
+    u(Rw+Ctr,50-5000) = 2,6 dB (unrounded 2,05 / 2,63).
+    """
     import reference_data as ref
 
     from phonometry.building.measurement.insulation import (

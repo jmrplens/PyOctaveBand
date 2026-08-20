@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Sound power from pressure over an enveloping surface: ISO 3744:2010
+"""Sound power from pressure over an enveloping surface: ISO 3744:2010
 (engineering) and ISO 3746:2010 (survey).
 
 Physics anchors:
@@ -82,7 +81,8 @@ def test_k1_zero_above_15db() -> None:
 def test_k1_applies_equation_16_at_exactly_15db() -> None:
     """dL == 15 dB stays inside '6 dB <= dLp <= 15 dB' (ISO 3744:2010, 8.2.3),
     so Eq. (16) applies: K1 = -10*lg(1-10^-1,5) = 0,1395... dB; K1 = 0 only
-    for dLp strictly above 15 dB."""
+    for dLp strictly above 15 dB.
+    """
     k1 = emission.background_noise_correction(np.array([75.0]), np.array([60.0]))
     assert k1[0] == pytest.approx(-10.0 * np.log10(1.0 - 10.0**-1.5), abs=1e-9)
     assert k1[0] == pytest.approx(0.13955, abs=1e-4)
@@ -90,7 +90,8 @@ def test_k1_applies_equation_16_at_exactly_15db() -> None:
 
 def test_k1_survey_applies_equation_at_exactly_10db() -> None:
     """Survey: dL == 10 dB stays inside '3 dB <= dLp <= 10 dB' (ISO 3746:2010,
-    8.3.3), so the correction applies: K1 = -10*lg(1-10^-1) = 0,4576 dB."""
+    8.3.3), so the correction applies: K1 = -10*lg(1-10^-1) = 0,4576 dB.
+    """
     k1 = emission.background_noise_correction(
         np.array([70.0]), np.array([60.0]), grade="survey"
     )
@@ -271,7 +272,8 @@ def test_directivity_index_uniform_field_is_zero() -> None:
 def test_directivity_index_uniform_field_with_background_is_zero() -> None:
     """With background correction and a uniform field (large dL so K1 ~ 0),
     the apparent DI stays ~0 at every position; it must NOT be inflated by the
-    surface-area term 10*lg(S/S0) (~22 dB at r = 5 m). ISO 3744 Eq. 7 / Eq. 16."""
+    surface-area term 10*lg(S/S0) (~22 dB at r = 5 m). ISO 3744 Eq. 7 / Eq. 16.
+    """
     src = np.full((10, 1), 80.0)
     bg = np.full((10, 1), 40.0)  # dL = 40 dB -> K1 ~ 4e-4 dB
     res = emission.sound_power_pressure(
@@ -284,7 +286,8 @@ def test_directivity_index_background_corrects_each_position() -> None:
     """Per Eq. 7 both the per-position level and the surface mean are
     background-corrected by the same broadband K1, which cancels in the
     difference: DI_i = (Lp_i - K1) - (mean - K1) = Lp_i - mean. The DI must
-    NOT carry a residual +K1 offset (ISO 3744 Eq. 7, notes sec. 9)."""
+    NOT carry a residual +K1 offset (ISO 3744 Eq. 7, notes sec. 9).
+    """
     src = np.array(
         [[82.0], [78.0], [80.0], [79.0], [81.0], [80.0], [83.0], [77.0], [80.0], [80.0]]
     )
@@ -305,7 +308,8 @@ def test_directivity_index_background_corrects_each_position() -> None:
 def test_directivity_index_per_band_localises_a_hot_band() -> None:
     """ISO 3744 clause 8.6: DI is per band, shape (NM, NB). A position that is
     hotter only in one band must show a positive DI in that band and ~0 in the
-    others; the other positions stay ~0 outside that band."""
+    others; the other positions stay ~0 outside that band.
+    """
     n_pos, n_bands = 10, 4
     levels = np.full((n_pos, n_bands), 70.0)
     levels[3, 2] += 12.0  # position 3 hot only in band 2
@@ -322,7 +326,8 @@ def test_directivity_index_per_band_localises_a_hot_band() -> None:
 
 def test_directivity_index_per_band_equals_level_minus_energy_mean() -> None:
     """DIi*(k) reduces to the raw per-band level minus the per-band energy mean
-    (the uniform per-band K1 cancels; ISO 3744 Eq. 7)."""
+    (the uniform per-band K1 cancels; ISO 3744 Eq. 7).
+    """
     rng = np.random.default_rng(0)
     levels = 70.0 + rng.uniform(-3.0, 3.0, size=(10, 3))
     res = emission.sound_power_pressure(levels, "hemisphere", radius=2.0)
@@ -332,7 +337,8 @@ def test_directivity_index_per_band_equals_level_minus_energy_mean() -> None:
 
 def test_background_levels_single_spectrum_broadcasts() -> None:
     """A single background spectrum (NB,) or (1, NB) is broadcast to every
-    position and gives the same K1 as the equivalent full (NM, NB) array."""
+    position and gives the same K1 as the equivalent full (NM, NB) array.
+    """
     levels = np.tile(np.array([90.0, 92.0, 95.0]), (10, 1))
     bg_spectrum = np.array([70.0, 71.0, 72.0])
     res_1d = emission.sound_power_pressure(
@@ -372,7 +378,8 @@ def test_k2_per_band_from_absorption_area() -> None:
 
 def test_k2_per_band_eq_a7_from_mean_absorption() -> None:
     """Eq. A.7: A = alpha*Sv per band -> K2 per band, and matches the scalar
-    branch band by band."""
+    branch band by band.
+    """
     alpha = np.array([0.1, 0.2, 0.4])
     sv = 500.0
     k2 = emission.environmental_correction(
@@ -405,7 +412,8 @@ def test_k2_scalar_still_returns_float() -> None:
 
 def test_per_band_k2_flows_into_sound_power() -> None:
     """A per-band K2 (from per-band reverberation time) is applied band by band
-    in the full determination."""
+    in the full determination.
+    """
     levels = np.tile(np.array([90.0, 92.0, 95.0]), (10, 1))
     t = np.array([1.0, 2.0, 4.0])
     volume = 2000.0  # large enough that per-band K2 stays under the 4 dB limit
@@ -424,7 +432,8 @@ def test_per_band_k2_flows_into_sound_power() -> None:
 
 def test_sound_power_level_a_multiband_without_frequencies_is_nan() -> None:
     """Multi-band input without 'frequencies' cannot be A-weighted, so the
-    A-weighted field is NaN (A-weighting needs the band centre frequencies)."""
+    A-weighted field is NaN (A-weighting needs the band centre frequencies).
+    """
     levels = np.tile(np.array([90.0, 92.0, 95.0]), (10, 1))
     res = emission.sound_power_pressure(levels, "hemisphere", radius=2.0)
     assert np.isnan(res.sound_power_level_a)

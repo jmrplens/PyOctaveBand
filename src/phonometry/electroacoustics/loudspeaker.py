@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Rated loudspeaker characteristics (IEC 60268-5).
+r"""Rated loudspeaker characteristics (IEC 60268-5).
 
 A loudspeaker measurement/rating report gathers the *rated characteristics*
 IEC 60268-5:2003+A1:2007 defines around a measured on-axis response: the

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Shared typing aliases and array/scalar coercion helpers (private).
+"""Shared typing aliases and array/scalar coercion helpers (private).
 
 Seeded by the library audit: several modules re-declared the same
 ``Real`` alias and hand-copied the "0-d array becomes a float" return

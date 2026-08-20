@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the spherical-wave ground effect and advanced barrier diffraction.
+"""Tests for the spherical-wave ground effect and advanced barrier diffraction.
 
 Clean-room anchors:
 - Attenborough & Van Renterghem, *Predicting Outdoor Sound* 2e (2021):

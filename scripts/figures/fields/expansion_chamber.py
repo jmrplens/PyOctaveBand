@@ -34,7 +34,8 @@ _CHAMBER_DX = 0.0025
 
 def _expansion_chamber_freqs() -> tuple[float, float]:
     """The two CW carriers: full transmission at ``kL = pi`` and the TL
-    peak at ``kL = pi/2`` of the 0.30 m chamber (Bies Eq. (8.111))."""
+    peak at ``kL = pi/2`` of the 0.30 m chamber (Bies Eq. (8.111)).
+    """
     return 343.0 / (2.0 * _CHAMBER_L), 343.0 / (4.0 * _CHAMBER_L)
 
 
@@ -127,7 +128,8 @@ def animate_fdtd_expansion_chamber(output_dir: str) -> None:
     (the pi round trip across the chamber returns both echoes to the
     inlet in phase) and the wave is sent back up the inlet, leaving the
     outlet at less than half amplitude (the 6.5 dB four-pole TL peak).
-    No absorption anywhere: a purely reactive silencer."""
+    No absorption anywhere: a purely reactive silencer.
+    """
     T = _translate_str
     (p_pass, e_pass), (p_stop, e_stop), times, tls = _expansion_chamber_fields()
     f_pass, f_peak = _expansion_chamber_freqs()
@@ -276,7 +278,8 @@ def _anim_chamber_hardware(
 ) -> None:
     """Draw the silencer as hardware: inlet/outlet pipe walls, the chamber
     shell with its end plates, the drive loudspeaker and the anechoic
-    termination, all to scale (metres)."""
+    termination, all to scale (metres).
+    """
     from matplotlib.patches import Rectangle
 
     wall = 0.012

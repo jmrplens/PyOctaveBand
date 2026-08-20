@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Estimation of noise-induced hearing loss (ISO 1999:2013).
+r"""Estimation of noise-induced hearing loss (ISO 1999:2013).
 
 Implements the noise-induced permanent threshold shift (NIPTS) of a
 noise-exposed population and its combination with the age-related threshold

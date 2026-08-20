@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the EN 12354-5 installed structure-borne prediction ``.report()``.
+"""Tests for the EN 12354-5 installed structure-borne prediction ``.report()``.
 
 The fiche is a prediction, not a measurement, and the sheet says so. The
 rendered values are checked against a clean-room oracle derived from the

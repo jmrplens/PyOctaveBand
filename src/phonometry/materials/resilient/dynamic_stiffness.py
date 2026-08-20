@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992).
+r"""Dynamic stiffness of resilient materials under floating floors (EN 29052-1:1992).
 
 A floating floor is a heavy floating slab resting on a resilient layer; the
 combination is a mass-spring system whose natural frequency governs the impact

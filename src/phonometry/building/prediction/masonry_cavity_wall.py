@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Wall ties in masonry cavity walls: the structural bridge across the cavity
+r"""Wall ties in masonry cavity walls: the structural bridge across the cavity
 (Hopkins 2007, Sections 3.11.3.2 and 4.3.5.4.1).
 
 A masonry cavity wall is a double leaf, and the textbook double-leaf prediction

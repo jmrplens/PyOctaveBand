@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-ECMA-418-2:2025 (Sottek Hearing Model) roughness conformance tests.
+"""ECMA-418-2:2025 (Sottek Hearing Model) roughness conformance tests.
 
 The primary oracle is the standard's own calibration (Clause 7, intro and
 7.1.7): a 1 kHz carrier, 100 % amplitude-modulated (m = 1) at 70 Hz and a

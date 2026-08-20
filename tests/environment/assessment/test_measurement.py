@@ -237,7 +237,8 @@ def test_repeated_measurements() -> None:
 def test_repeated_measurements_spread_levels() -> None:
     """Spread levels: the primary Formulae (17)+(19) route stays sane
     (3.944 dB for [50, 60, 70]) while the Note 2 approximation inflates to
-    12.183 dB and triggers the spread warning."""
+    12.183 dB and triggers the spread warning.
+    """
     with pytest.warns(EnvironmentalMeasurementWarning, match="Formula \\(20\\)"):
         res = environment.uncertainty_from_repeated_measurements([50.0, 60.0, 70.0])
     assert res.standard_uncertainty == pytest.approx(3.944, abs=2e-3)

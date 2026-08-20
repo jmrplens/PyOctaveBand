@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Short-Time Objective Intelligibility (STOI and ESTOI).
+"""Short-Time Objective Intelligibility (STOI and ESTOI).
 
 Implements the two correlation-based objective intelligibility measures that
 predict the intelligibility of time-frequency weighted noisy speech, where the

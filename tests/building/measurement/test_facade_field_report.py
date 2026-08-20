@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 16283-3 field facade report (``.report()`` -> PDF).
+"""Tests for the ISO 16283-3 field facade report (``.report()`` -> PDF).
 
 The fiche's numbers are verified against the standard's own definitions using
 hand-computable syntheses: with ``T = T0 = 0,5 s`` the standardization term

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 10052 survey-method field reports (``.report()`` -> PDF).
+"""Tests for the ISO 10052 survey-method field reports (``.report()`` -> PDF).
 
 ISO 10052 carries no worked numeric example, so the fiches are exercised with
 closed-form syntheses like the sibling report tests: with the reverberation

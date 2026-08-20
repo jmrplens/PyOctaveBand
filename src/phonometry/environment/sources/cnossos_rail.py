@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3).
+r"""CNOSSOS-EU railway source emission (Directive 2002/49/EC Annex II, 2.3).
 
 The common noise assessment methods of the European Union describe a railway
 track as **two** incoherent source lines at the centre of the track, at

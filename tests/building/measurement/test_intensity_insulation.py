@@ -222,7 +222,8 @@ def test_combine_subareas_validation() -> None:
 
 def test_combine_subareas_negative_direction_rule() -> None:
     """Clause 6.4.6: a reverse-flow subarea enters Formula (11) with -Smi
-    while Sm keeps the unsigned area sum (Formula (12))."""
+    while Sm keeps the unsigned area sum (Formula (12)).
+    """
     # Forward 9 m2 at 50 dB, reverse 1 m2 at 40 dB (~10 % reverse power).
     lin, sm = building.combine_subareas([[50.0], [40.0]], [9.0, -1.0])
     expected = 10.0 * np.log10((9.0 * 10**5.0 - 1.0 * 10**4.0) / 10.0)

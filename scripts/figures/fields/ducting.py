@@ -128,7 +128,8 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     toward the sound-speed minimum and stay trapped; launched near the
     surface the energy crosses the channel and leaks away to depth. The
     closing seconds crossfade to the time-integrated energy map, so the
-    verdict frame shows the whole path history."""
+    verdict frame shows the whole path history.
+    """
     from matplotlib import patheffects
 
     T = _translate_str

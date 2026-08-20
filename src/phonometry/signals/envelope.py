@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Envelope and instantaneous phase via the Hilbert transform.
+r"""Envelope and instantaneous phase via the Hilbert transform.
 
 Signal-envelope analysis following Bendat & Piersol, *Random Data:
 Analysis and Measurement Procedures* (4th ed., 2010), Chapter 13. The

@@ -906,7 +906,8 @@ def _d_equal_loudness_weighting(s: SVG, th: Theme) -> None:
 def _d_slm_chain(s: SVG, th: Theme) -> None:
     """IEC 61672-1 sound level meter: the acoustic front end on the left
     (windscreen, microphone, coupled class 1 calibrator) feeding the
-    four-stage level chain on the right."""
+    four-stage level chain on the right.
+    """
     gy = 508.0
     s.ground(gy, 40.0, 330.0)
 
@@ -967,7 +968,8 @@ def _d_slm_chain(s: SVG, th: Theme) -> None:
 def _d_system_measurement(s: SVG, th: Theme) -> None:
     """Classic dual-channel frequency-response measurement: generator into
     amplifier and loudspeaker, microphone back in, the electrical reference
-    on channel 1, and Welch cross-spectra feeding H1 and coherence."""
+    on channel 1, and Welch cross-spectra feeding H1 and coherence.
+    """
 
     def box(
         x0: float, x1: float, y0: float, h: float, l1: str, l2: str, color: str
@@ -1080,7 +1082,8 @@ def _d_system_measurement(s: SVG, th: Theme) -> None:
 def _d_test_signals(s: SVG, th: Theme) -> None:
     """Labelled miniature of each stimulus: white and pink noise with their
     PSD slopes, an MLS chip stream, linear versus exponential sweeps on a
-    time-frequency sketch and an IEC 60268-1 tone burst."""
+    time-frequency sketch and an IEC 60268-1 tone burst.
+    """
     import math
 
     def tile(x: float, y: float, w: float, title: str) -> None:
@@ -1209,7 +1212,8 @@ def _d_test_signals(s: SVG, th: Theme) -> None:
 def _d_spectral_analysis(s: SVG, th: Theme) -> None:
     """The Welch estimator as a chain, with the numbers of the guide's own
     example (fs = 48 kHz, 20 s of pink noise, nperseg = 4096): 467 raw
-    segments, 442 effective averages, eps_r = 4.8 %."""
+    segments, 442 effective averages, eps_r = 4.8 %.
+    """
     cx, bw = 450.0, 680.0
     x0 = cx - bw / 2
 
@@ -1289,7 +1293,8 @@ def _d_spectral_analysis(s: SVG, th: Theme) -> None:
 def _d_miso_coherence(s: SVG, th: Theme) -> None:
     """Two correlated inputs through their paths into one output, then the
     Welch cross-spectral matrix, the conditioning and the per-source split,
-    with the guide's measured numbers (ordinary 0.32 vs partial 0.00)."""
+    with the guide's measured numbers (ordinary 0.32 vs partial 0.00).
+    """
 
     def box(
         x0: float,
@@ -1403,7 +1408,8 @@ def _d_miso_coherence(s: SVG, th: Theme) -> None:
 def _d_time_frequency(s: SVG, th: Theme) -> None:
     """The same record tiled by a short and a long STFT window at
     fs = 16 kHz: nperseg = 256 (16 ms x 62.5 Hz cells) against 1024
-    (64 ms x 15.6 Hz), with a tone and a click smeared to cell size."""
+    (64 ms x 15.6 Hz), with a tone and a click smeared to cell size.
+    """
     panels = (
         (
             100.0,
@@ -1481,7 +1487,8 @@ def _d_time_frequency(s: SVG, th: Theme) -> None:
 def _d_cepstrum_echoes(s: SVG, th: Theme) -> None:
     """Signal with an 8 ms echo, rippled spectrum, log, inverse FFT, and the
     quefrency axis with the rahmonic spikes and the lifter split, using the
-    guide's exact numbers (a = 0.5, 1/t0 = 125 Hz, +3.5/−6.0 dB)."""
+    guide's exact numbers (a = 0.5, 1/t0 = 125 Hz, +3.5/−6.0 dB).
+    """
 
     def box(x0: float, x1: float, l1: str, l2: str, l3: str, color: str) -> None:
         s.rect(x0, 64, x1 - x0, 86, th.panel, color, rx=10, sw=2)
@@ -1680,7 +1687,8 @@ def _d_echo_geometry(s: SVG, th: Theme) -> None:
 def _d_synchronous_averaging(s: SVG, th: Theme) -> None:
     """Trigger train, sliced recording, coherent average and residual, with
     the guide's numbers: T = 1/32 s at 8192 Hz, N = 40 averages, 16 dB of
-    noise reduction, and McFadden's 32.05-order node example."""
+    noise reduction, and McFadden's 32.05-order node example.
+    """
     import math
 
     s.text(
@@ -1991,7 +1999,8 @@ def _d_tsa_setup(s: SVG, th: Theme) -> None:
 def _d_correlation_delay(s: SVG, th: Theme) -> None:
     """Two microphones, the extra path c*tau, and the correlogram where the
     direct correlator smears while GCC-PHAT spikes at the guide's delay of
-    20 samples at 8192 Hz (2.44 ms, 0.84 m at 343 m/s)."""
+    20 samples at 8192 Hz (2.44 ms, 0.84 m at 343 m/s).
+    """
     gy = 300.0
     s.ground(gy, 60, 840)
 
@@ -2078,7 +2087,8 @@ def _d_correlation_delay(s: SVG, th: Theme) -> None:
 def _d_data_qualification(s: SVG, th: Theme) -> None:
     """Record to segment mean squares to the reverse arrangement count and
     the Table A.6 verdict, with the guide's numbers: N = 20 segments,
-    acceptance (64, 125), A = 91 accepted and A = 7 rejected."""
+    acceptance (64, 125), A = 91 accepted and A = 7 rejected.
+    """
     cx = 450.0
     x0, bw = 170.0, 560.0
 
@@ -2159,7 +2169,8 @@ def _d_slm_pipeline(s: SVG, th: Theme) -> None:
     """The guide's own pipeline: the two recordings that go in, the single
     sensitivity factor that makes them physical, and the three readout
     branches (display statistics, integrated levels, band spectrum) that a
-    class 1 meter reports, closed by the class verifiers."""
+    class 1 meter reports, closed by the class verifiers.
+    """
     # --- The two recordings the meter needs, from the same input chain -----
     for x0, l1, l2 in (
         (40.0, "Calibrator tone", "94 dB at 1 kHz  (IEC 60942)"),
@@ -2274,7 +2285,8 @@ def _d_calibration_dataflow(s: SVG, th: Theme) -> None:
     """The data flow of the calibration guide: the calibrator recording
     yields one factor, the measurement recording carries the samples, and
     every level function takes the factor as ``calibration_factor``. The
-    dBFS reference frame is the branch taken when no factor exists."""
+    dBFS reference frame is the branch taken when no factor exists.
+    """
     # --- The two recordings, which must come from the same untouched chain --
     for x0, l1, l2 in (
         (40.0, "Calibrator recording", "1 kHz tone through the chain"),
@@ -2359,7 +2371,8 @@ def _d_bank_dataflow(s: SVG, th: Theme) -> None:
     """The two numerical-stability strategies of the filter bank as one
     path: every band is a biquad cascade, and a low band takes the decimated
     branch first. Both branches end in the band level; ``sigbands=True``
-    also brings the band signal back to the input rate."""
+    also brings the band signal back to the input rate.
+    """
     # --- Input and the per-band decision ------------------------------------
     s.rect(290, 54, 320, 64, th.panel, th.fg, rx=12, sw=2)
     s.text(450, 84, "Input signal  $x(t)$", 18, th.fg, bold=True)

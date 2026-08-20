@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-The PyOctaveBand transition stub that lives under ``stub/``.
+"""The PyOctaveBand transition stub that lives under ``stub/``.
 
 Almost nothing in the tree looks at it. It is not installed by the test
 environment, it is not imported by the library, `mypy` was pointed at ``src``

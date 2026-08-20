@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound power level of a noise source from sound pressure measurements over an
+r"""Sound power level of a noise source from sound pressure measurements over an
 enveloping measurement surface: ISO 3744:2010 (engineering, accuracy grade 2)
 and ISO 3746:2010 (survey, accuracy grade 3).
 
@@ -226,7 +225,8 @@ class SoundPowerResult:
     evaluated per band per clause 8.4). ``uncertainty`` is the expanded
     uncertainty
     :math:`U = 2\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}` (95 %, ISO 3744
-    clause 9.5)."""
+    clause 9.5).
+    """
 
     frequencies: np.ndarray | None
     sound_power_level: np.ndarray

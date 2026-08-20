@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Synthetic room impulse response by the image-source method (rectangular room).
+r"""Synthetic room impulse response by the image-source method (rectangular room).
 
 A rigid-walled (or absorbing) rectangular room -- a *shoebox* -- reflects a
 point source in its six walls. Each reflection is equivalent to the free-field

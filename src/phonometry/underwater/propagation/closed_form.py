@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Underwater sound propagation: propagation loss (closed-form).
+r"""Underwater sound propagation: propagation loss (closed-form).
 
 Propagation loss ``PL``, :math:`N_\mathrm{PL}` (dB) is the difference between
 the source level in a given direction and the mean-square sound pressure level

@@ -519,7 +519,8 @@ def _d_iso2631_5_setup(s: SVG, th: Theme) -> None:
 def _d_fault_kinematics(s: SVG, th: Theme) -> None:
     """Where the fault frequencies come from: the bearing in end section and
     in axial half-section (where the contact angle lives), the gear pair and
-    the ducted fan's rotating lobe pattern."""
+    the ducted fan's rotating lobe pattern.
+    """
     import math
 
     # ===== Panel 1: rolling-contact bearing, end section ====================
@@ -699,7 +700,8 @@ def _d_fault_kinematics(s: SVG, th: Theme) -> None:
 
 def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
     """Condition-monitoring measurement on a motor-gearbox train: where the
-    accelerometers go, how they are mounted, and what the analyser records."""
+    accelerometers go, how they are mounted, and what the analyser records.
+    """
     gy = 262.0  # top of the baseplate
     shaft_y = 222.0
 
@@ -839,7 +841,8 @@ def _d_machine_diagnostics(s: SVG, th: Theme) -> None:
 
 def _d_mobility_rig(s: SVG, th: Theme) -> None:
     """ISO 7626 rig: free-free beam, exciter + impedance head at the driving
-    point, accelerometer at a transfer point, impact-hammer variant."""
+    point, accelerometer at a transfer point, impact-hammer variant.
+    """
     cy_top, beam_top, beam_h = 116.0, 286.0, 26.0
     beam_bot = beam_top + beam_h
     # Ceiling with soft suspension.
@@ -974,7 +977,8 @@ def _d_mobility_rig(s: SVG, th: Theme) -> None:
 
 def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
     """ISO 10846: isolator between the driven input mass and a blocked output
-    (direct, force transducer) or a blocking mass (indirect)."""
+    (direct, force transducer) or a blocking mass (indirect).
+    """
     for cx, head in (
         (250.0, "Direct method (Part 2)"),
         (650.0, "Indirect method (Part 3)"),
@@ -1160,7 +1164,8 @@ def _d_transfer_stiffness_rig(s: SVG, th: Theme) -> None:
 def _d_junction_rig(s: SVG, th: Theme) -> None:
     """ISO 10848 junction rig: an L- and a T-junction of concrete plates,
     structure-borne excitation on element i, accelerometers on i and j and
-    the junction length l_ij along the corner line."""
+    the junction length l_ij along the corner line.
+    """
     gy = 430.0
     dp = 170.0
     dxo, dyo = dp * 0.72, dp * 0.55
@@ -1252,7 +1257,8 @@ def _d_junction_rig(s: SVG, th: Theme) -> None:
 def _d_power_injection_rig(s: SVG, th: Theme) -> None:
     """The experimental-SEA rig: two plates joined along an edge, a shaker
     through an impedance head on one of them, accelerometers distributed over
-    both, and the drive moved for the second run of the two-drive scheme."""
+    both, and the drive moved for the second run of the two-drive scheme.
+    """
     gy = 380.0
     dp = 116.0
     dxo, dyo = dp * 0.72, dp * 0.55

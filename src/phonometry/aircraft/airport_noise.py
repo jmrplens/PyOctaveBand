@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29).
+"""Noise-Power-Distance (NPD) event-level interpolation (ECAC Doc 29).
 
 The ECAC Doc 29 airport-noise method describes an aircraft's noise emission with
 **Noise-Power-Distance (NPD)** tables: the event noise level (``LAmax`` or the

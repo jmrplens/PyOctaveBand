@@ -373,7 +373,8 @@ def test_tech3341_true_peak_tones(
 @pytest.mark.parametrize("offset", range(4), ids=[f"case{20 + o}" for o in range(4)])
 def test_tech3341_true_peak_intersample_offsets(offset: int) -> None:
     """Cases 20-23: one fs/4 period inside an fs/6 tone, decimated with a
-    0-3 sample offset at the 4 fs synthesis rate; all read 0.0 dBTP."""
+    0-3 sample offset at the 4 fs synthesis rate; all read 0.0 dBTP.
+    """
     fs4 = 4 * FS
     n = round(1.0 * fs4)
     frequency = np.full(n, FS / 6.0)
@@ -393,7 +394,8 @@ def test_tech3341_true_peak_intersample_offsets(offset: int) -> None:
 
 def test_true_peak_under_read_bound() -> None:
     """The worst-phase under-read obeys 20 lg cos(pi fnorm / n) (Annex 2
-    Attachment 1) at fnorm = 0.25 with the default 4x oversampling."""
+    Attachment 1) at fnorm = 0.25 with the default 4x oversampling.
+    """
     t = np.arange(FS) / FS
     worst = 0.0
     for phase in np.linspace(0.0, np.pi / 2.0, 9):
@@ -450,7 +452,8 @@ def test_tech3342_repetition_invariance() -> None:
 
 def test_loudness_range_reference_percentile_indexing() -> None:
     """loudness_range follows the Tech 3342 reference implementation on a
-    hand-computable short-term vector (no gating active)."""
+    hand-computable short-term vector (no gating active).
+    """
     stl = np.linspace(-40.0, -20.0, 21)  # 1 LU steps; mean power ~ -24.2
     # Relative threshold ~ -44.2 gates nothing; indices round(20*p/100):
     # low = stl[2] = -38, high = stl[19] = -21.

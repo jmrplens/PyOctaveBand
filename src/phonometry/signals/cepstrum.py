@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Cepstral analysis: real/power/complex cepstrum, liftering and echo detection.
+r"""Cepstral analysis: real/power/complex cepstrum, liftering and echo detection.
 
 The **cepstrum** is the inverse Fourier transform of the logarithm of a
 spectrum. Because the log turns the convolution :math:`x = h * u` into the
@@ -246,8 +245,7 @@ def cepstrum(
     kind: str = "power",
     nfft: int | None = None,
 ) -> CepstrumResult:
-    """
-    Cepstrum of a record: power, real or complex.
+    """Cepstrum of a record: power, real or complex.
 
     * ``"power"``: inverse DFT of ``ln|X|^2`` (Milner Fig. 21 in Havelock
       Ch. 27). Even, phase-blind; an echo of reflection coefficient ``a``
@@ -355,8 +353,7 @@ def lifter(
     mode: str = "lowpass",
     nfft: int | None = None,
 ) -> LifterResult:
-    """
-    Lifter a record's log spectrum: keep quefrencies below or above a cutoff.
+    """Lifter a record's log spectrum: keep quefrencies below or above a cutoff.
 
     Liftering is filtering in the quefrency domain (Milner Sec. 4.3 in
     Havelock Ch. 27): the real cepstrum is windowed and transformed back
@@ -501,8 +498,7 @@ def echo_detection(
     max_quefrency: float | None = None,
     nfft: int | None = None,
 ) -> EchoDetectionResult:
-    r"""
-    Detect an echo as the largest power-cepstrum peak in a quefrency band.
+    r"""Detect an echo as the largest power-cepstrum peak in a quefrency band.
 
     A reflection :math:`x(t) = s(t) + a s(t - t_0)` leaves a spike of
     height ``a`` -- positive or negative with the sign of the reflection --

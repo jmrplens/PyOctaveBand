@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-IEC 61043:1993 sound-intensity instrument class verification.
+r"""IEC 61043:1993 sound-intensity instrument class verification.
 
 A two-microphone (p-p) intensity chain is graded by its **pressure-residual
 intensity index** ``delta_pI0``: feed both measurement channels the same pink
@@ -168,7 +167,8 @@ def _match_band(frequency: float) -> float:
 
 def _spacing_offset(spacing: float) -> float:
     r"""Table 2 Note 1 separation term :math:`10 \log_{10}(x/25)` in dB, ``x`` in
-    mm."""
+    mm.
+    """
     if not np.isfinite(spacing) or spacing <= 0.0:
         raise ValueError("'spacing' must be a positive, finite distance in metres.")
     return float(10.0 * np.log10(spacing / REFERENCE_SPACING))
@@ -191,8 +191,7 @@ def residual_index_limits(
     spacing: float = REFERENCE_SPACING,
     frequencies: list[float] | np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    r"""
-    IEC 61043:1993 Table 2 minimum pressure-residual intensity index.
+    r"""IEC 61043:1993 Table 2 minimum pressure-residual intensity index.
 
     Returns the class 1 and class 2 minima the standard requires of a device
     kind, already rescaled to the microphone separation in use with the Note 1
@@ -229,8 +228,7 @@ def residual_index_limits(
 
 
 def instrument_class_from_components(probe_class: int, processor_class: int) -> int:
-    """
-    Class of an instrument assembled from a separate probe and processor.
+    """Class of an instrument assembled from a separate probe and processor.
 
     IEC 61043:1993 clause 8: when a probe and a processor are supplied
     separately, a class 1 instrument consists of a class 1 processor and a
@@ -290,8 +288,7 @@ def verify_intensity_class(
     device: str = "instrument",
     spacing: float = REFERENCE_SPACING,
 ) -> dict[str, Any]:
-    r"""
-    Verify a measured ``delta_pI0`` spectrum against IEC 61043:1993 Table 2.
+    r"""Verify a measured ``delta_pI0`` spectrum against IEC 61043:1993 Table 2.
 
     Each band's measured pressure-residual intensity index is compared with the
     class 1 and class 2 minima of Table 2 for the device kind, rescaled to the
@@ -577,7 +574,8 @@ def _plane_wave_phase_deg(
     frequency: np.ndarray, spacing: float, c: float
 ) -> np.ndarray:
     r"""Plane-wave phase difference :math:`k d` across the spacer, in
-    degrees."""
+    degrees.
+    """
     if not np.isfinite(spacing) or spacing <= 0.0:
         raise ValueError("'spacing' must be a positive, finite distance in metres.")
     if not np.isfinite(c) or c <= 0.0:
@@ -594,8 +592,7 @@ def phase_mismatch_from_residual_index(
     spacing: float,
     c: float = 343.0,
 ) -> np.ndarray:
-    r"""
-    Channel phase mismatch equivalent to a pressure-residual intensity index.
+    r"""Channel phase mismatch equivalent to a pressure-residual intensity index.
 
     In an axially propagating plane progressive wave the true phase difference
     between the two sensing points is :math:`k d = 2\pi f d / c`, and a
@@ -634,8 +631,7 @@ def residual_index_from_phase_mismatch(
     spacing: float,
     c: float = 343.0,
 ) -> np.ndarray:
-    r"""
-    Pressure-residual intensity index of a given channel phase mismatch.
+    r"""Pressure-residual intensity index of a given channel phase mismatch.
 
     The inverse of :func:`phase_mismatch_from_residual_index`:
 

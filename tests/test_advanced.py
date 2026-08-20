@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Advanced tests for input validation, edge cases, and robustness.
-"""
+"""Advanced tests for input validation, edge cases, and robustness."""
 
 import numpy as np
 import pytest
@@ -10,8 +8,7 @@ from phonometry import filters
 
 
 def test_fraction_validation() -> None:
-    """
-    Test the filter's behavior with standard and non-standard fractional bandwidths.
+    """Test the filter's behavior with standard and non-standard fractional bandwidths.
 
     **Purpose:**
     Verify that the `octave_filter` function can handle both standard (1/1, 1/3 octave)
@@ -49,8 +46,7 @@ def test_fraction_validation() -> None:
 
 
 def test_invalid_inputs() -> None:
-    """
-    Test input validation logic for invalid parameters.
+    """Test input validation logic for invalid parameters.
 
     **Purpose:**
     Ensure that the function robustly rejects invalid input configurations that could lead
@@ -104,8 +100,7 @@ def test_invalid_inputs() -> None:
 
 
 def test_short_signal() -> None:
-    """
-    Test processing of a signal shorter than the downsampling factor.
+    """Test processing of a signal shorter than the downsampling factor.
 
     **Purpose:**
     The library uses multirate processing (downsampling) to stabilize low-frequency filters.
@@ -134,8 +129,7 @@ def test_short_signal() -> None:
 
 
 def test_nan_handling() -> None:
-    """
-    Test the behavior when the input signal contains NaN values.
+    """Test the behavior when the input signal contains NaN values.
 
     **Purpose:**
     Determine if NaNs in the input propagate to the output.
@@ -159,8 +153,7 @@ def test_nan_handling() -> None:
 
 
 def test_silence() -> None:
-    """
-    Test the filter's output for a completely silent input signal.
+    """Test the filter's output for a completely silent input signal.
 
     **Purpose:**
     Verify that a zero-input signal results in an appropriately low SPL (decibel) reading.
@@ -182,8 +175,7 @@ def test_silence() -> None:
 
 
 def test_nyquist_limit() -> None:
-    """
-    Test handling of requested frequency bands that exceed the Nyquist limit.
+    """Test handling of requested frequency bands that exceed the Nyquist limit.
 
     **Purpose:**
     The Nyquist theorem states valid frequencies are < fs/2. Requesting bands above this
@@ -211,8 +203,7 @@ def test_nyquist_limit() -> None:
 
 
 def test_high_order_stability() -> None:
-    """
-    Test the numerical stability of high-order filters.
+    """Test the numerical stability of high-order filters.
 
     **Purpose:**
     High-order IIR filters (e.g., order > 10) are prone to numerical instability if implemented

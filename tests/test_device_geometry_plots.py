@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Geometry drawings of measurement and control devices (``_plot/geometry/``).
+"""Geometry drawings of measurement and control devices (``_plot/geometry/``).
 
 Covers the device renderers added after the materials batch: reactive
 silencers, the image-source room plan, the barrier section, microphone

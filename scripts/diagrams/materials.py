@@ -853,7 +853,8 @@ def _dsr_arrangement(
 
 def _d_dynamic_stiffness_rig(s: SVG, th: Theme) -> None:
     """EN 29052-1 rig: the three excitation arrangements of Figures 1 to 3,
-    the specimen preparation of Clauses 5 and 6, and the Formula 4 reading."""
+    the specimen preparation of Clauses 5 and 6, and the Formula 4 reading.
+    """
     s.text(
         450,
         56,
@@ -1016,7 +1017,8 @@ def _d_porous_layer(s: SVG, th: Theme) -> None:
     normal-incidence plane wave, with a magnified microstructure detail and
     the JCA parameter set of the guide's material (sigma = 20 kPa.s/m2,
     phi = 0.98, alpha_inf = 1, Lambda = Lambda' = 87 um); the layered
-    absorber solves alpha = 0.91 at 1 kHz."""
+    absorber solves alpha = 0.91 at 1 kHz.
+    """
     import math
 
     lay_l, lay_r = 560.0, 700.0  # 140 px for 50 mm

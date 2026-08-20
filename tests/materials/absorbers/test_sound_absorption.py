@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for BS EN ISO 354:2003 sound absorption in a reverberation room.
+"""Tests for BS EN ISO 354:2003 sound absorption in a reverberation room.
 
 Normative anchors (ISO 354:2003):
 - Eq. (5)/(7): A = 55,3*V/(c*T) - 4*V*m  (empty room A1 / with specimen A2).
@@ -171,7 +170,8 @@ def test_temperature2_defaults_to_temperature1() -> None:
 
 def test_speed_of_sound2_defaults_to_speed_of_sound1() -> None:
     """Overriding only c1 must apply the same speed to the second measurement
-    (c2 defaults to c1), mirroring the temperature2 -> temperature1 default."""
+    (c2 defaults to c1), mirroring the temperature2 -> temperature1 default.
+    """
     v, s = 200.0, 10.0
     c = 340.0
     only_c1 = materials.absorption_coefficient(5.0, 3.0, v, s, speed_of_sound1=c)

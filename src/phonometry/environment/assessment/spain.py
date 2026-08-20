@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007).
+r"""Spanish noise regulation: the corrected level LKeq (Real Decreto 1367/2007).
 
 Real Decreto 1367/2007 develops Ley 37/2003 del Ruido on acoustic zoning,
 quality objectives and emitter limit values. Its assessment chain is built on

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Single-number weighted ratings of sound insulation and their spectrum
+r"""Single-number weighted ratings of sound insulation and their spectrum
 adaptation terms (ISO 717-1 airborne, ISO 717-2 impact).
 
 ISO 717 rates a curve, not a room. Whatever produced the band values (a field
@@ -684,8 +683,7 @@ def weighted_rating(
     values_by_band: Sequence[float] | np.ndarray,
     bands: str | None = None,
 ) -> WeightedRatingResult:
-    """
-    Single-number weighted rating and C / Ctr per ISO 717-1.
+    """Single-number weighted rating and C / Ctr per ISO 717-1.
 
     Applies the reference-curve method of Clause 4.4: the Table 3
     reference curve is shifted in 1 dB steps towards the measured curve
@@ -792,8 +790,7 @@ def weighted_impact_rating(
     values_by_band: Sequence[float] | np.ndarray,
     bands: str | None = None,
 ) -> ImpactRatingResult:
-    r"""
-    Single-number weighted impact rating and CI per ISO 717-2.
+    r"""Single-number weighted impact rating and CI per ISO 717-2.
 
     Applies the reference-curve method of Clause 4.3: the Table 3 impact
     reference curve is shifted in 1 dB steps towards the measured curve

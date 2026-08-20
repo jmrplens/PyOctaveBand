@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Test signals and sample-rate utilities.
+r"""Test signals and sample-rate utilities.
 
 The signal toolbox of the metrology domain: deterministic test signals and
 the two sample-rate operations every measurement chain eventually needs,

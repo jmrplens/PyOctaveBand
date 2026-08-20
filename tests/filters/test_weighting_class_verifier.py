@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the IEC 61672-1:2013 frequency-weighting class verifier
+"""Tests for the IEC 61672-1:2013 frequency-weighting class verifier
 (``verify_weighting_class`` / ``weighting_class_limits``).
 
 The design-goal responses and class 1 limits in the verifier's Table 3
@@ -157,7 +156,8 @@ def test_frequencies_above_nyquist_are_dropped() -> None:
 def test_low_fs_verdict_is_flagged_range_limited() -> None:
     """Dropping Table 3 rows that carry finite lower limits (class 1 has them
     up to 16 kHz) must flag the verdict as range-limited: a 16 kHz-sampled
-    system cannot demonstrate full class-1 conformance over 10 Hz-20 kHz."""
+    system cannot demonstrate full class-1 conformance over 10 Hz-20 kHz.
+    """
     result = filters.verify_weighting_class(filters.WeightingFilter(16000, "A"))
     assert result["range_limited"] is True
     result_full = filters.verify_weighting_class(filters.WeightingFilter(48000, "A"))
@@ -169,7 +169,8 @@ def test_deviation_evaluated_at_exact_base10_frequency() -> None:
     nominal label (Table 3 NOTE; IEC 61672-3 subclause 13.3), not at the
     label itself: the reported deviation at "16 kHz" follows a tone at
     15 848.9 Hz and not one at 16 000 Hz, which the A curve puts about
-    0.1 dB lower."""
+    0.1 dB lower.
+    """
     wf = filters.WeightingFilter(96000, "A")
     band = next(
         b for b in filters.verify_weighting_class(wf)["bands"] if b["freq"] == 16000.0
@@ -208,7 +209,8 @@ def test_verdict_measures_the_resampled_path(fs: int, label: float) -> None:
 def test_notch_between_nominals_fails_the_sweep() -> None:
     """Adversarial 5.5.7 case: an iirnotch at 900 Hz (between the 800 and
     1000 Hz nominals) leaves every nominal-frequency verdict at class 1 but
-    must fail the between-nominals sweep, so no class can be assigned."""
+    must fail the between-nominals sweep, so no class can be assigned.
+    """
     import numpy as np
     from scipy import signal as sg
 

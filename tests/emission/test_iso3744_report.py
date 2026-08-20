@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 3744 / ISO 3745 sound-power determination ``.report()`` fiche.
+"""Tests for the ISO 3744 / ISO 3745 sound-power determination ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle derived from the
 standard, independent of the library's own combination path. For a uniform

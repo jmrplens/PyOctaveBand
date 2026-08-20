@@ -216,7 +216,8 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
     (the junction end correction), and the clip reports the effective
     length c/(4 f_sim) -- the guide's build-long-and-trim procedure done
     on screen. No model TL is annotated anywhere: the lossless notch is
-    infinite at f0, while the charge bandwidth f/Q is percent-wide."""
+    infinite at f0, while the charge bandwidth f/Q is percent-wide.
+    """
     from matplotlib.patches import Rectangle
 
     T = _translate_str

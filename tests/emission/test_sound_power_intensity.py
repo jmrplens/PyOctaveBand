@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Sound power by sound-intensity scanning: ISO 9614-2:1996.
+"""Sound power by sound-intensity scanning: ISO 9614-2:1996.
 
 Physics / standard anchors:
 - Partial power Pi = <In,i>*Si (Eq. 5/12); total P = sum Pi (Eq. 6);
@@ -96,7 +95,8 @@ def test_small_negative_partial_power_no_warning() -> None:
 def test_f_plus_minus_warning_suppressed_under_survey_grade() -> None:
     """Criterion 2 is optional for the survey grade (B.1.2): F+/- > 3 dB must
     not emit the 'engineering grade not achieved' warning when grade='survey',
-    while the engineering grade still warns for the same data."""
+    while the engineering grade still warns for the same data.
+    """
     import warnings
 
     areas = np.array([0.5, 0.5, 0.5, 0.5])
@@ -249,7 +249,8 @@ def test_sweep_reversal_fails_criterion_3() -> None:
     """An equal-magnitude opposite-sign segment between the two sweeps has
     |ΔL| ~ 0 from the magnitudes alone, yet is grossly non-repeatable. With the
     band still determinable (positive total power) and criteria 1/2 satisfied,
-    the reversed segment must force criterion 3 (and thus the grade) to fail."""
+    the reversed segment must force criterion 3 (and thus the grade) to fail.
+    """
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
@@ -284,7 +285,8 @@ def test_sweep_reversal_fails_criterion_3() -> None:
 
 def test_partial_sweep_reversal_only_affects_flipped_segment() -> None:
     """Only the segment whose flow reverses gets +inf repeatability; the aligned
-    segments keep their finite |ΔL|."""
+    segments keep their finite |ΔL|.
+    """
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
@@ -297,7 +299,8 @@ def test_partial_sweep_reversal_only_affects_flipped_segment() -> None:
 
 def test_exact_zero_partial_power_does_not_trigger_reversal() -> None:
     """An exact-zero partial power carries no direction and must not be treated
-    as a reversal (no spurious +inf repeatability)."""
+    as a reversal (no spurious +inf repeatability).
+    """
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
@@ -308,7 +311,8 @@ def test_exact_zero_partial_power_does_not_trigger_reversal() -> None:
 
 def test_short_frequencies_raises_value_error_not_index_error() -> None:
     """A 'frequencies' array shorter than the band count raises the public
-    ValueError up front, not an IndexError during classification."""
+    ValueError up front, not an IndexError during classification.
+    """
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     intensity = np.column_stack([np.full(4, 5.0e-4), np.full(4, 5.0e-4)])
     levels = np.full((4, 2), 90.0)
@@ -429,7 +433,8 @@ def test_a_weighted_total_omits_band_failing_criterion_2_engineering() -> None:
 def test_survey_grade_does_not_omit_on_criterion_2() -> None:
     """Criterion 2 is optional for grade 3 (Note 16), so a survey
     determination keeps a band with F+/- > 3 dB in LWA:
-    10*lg(10^9,28206 + 10^9,60206) = 97,7192 dB."""
+    10*lg(10^9,28206 + 10^9,60206) = 97,7192 dB.
+    """
     areas = np.ones(4)
     intensity = np.column_stack(
         [np.full(4, 1.0e-3), np.array([5.0e-3, -1.0e-3, 1.0e-3, -1.0e-3])]
@@ -450,7 +455,8 @@ def test_survey_grade_does_not_omit_on_criterion_2() -> None:
 
 def test_a_weighting_screening_unavailable_warns_and_sums_all() -> None:
     """Without FpI/Ld the clause 10.6 b screening cannot run: every
-    determinable band is summed and a warning notes the missing screening."""
+    determinable band is summed and a warning notes the missing screening.
+    """
     areas = np.ones(4)
     intensity = np.column_stack([np.full(4, 1.0e-3), np.full(4, 5.0e-4)])
     with pytest.warns(emission.SoundPowerWarning, match="10.6 b"):

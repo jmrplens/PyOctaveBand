@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the reactive-silencer transmission-loss ``.report()`` fiche.
+"""Tests for the reactive-silencer transmission-loss ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle derived from the
 simple-expansion-chamber closed form (Bies, Hansen & Howard, Engineering Noise

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the IEC 61260-1 filter-class-compliance report (``.report()`` -> PDF).
+"""Tests for the IEC 61260-1 filter-class-compliance report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:
 ``filter_class_compliance`` carries the bank data and agrees with

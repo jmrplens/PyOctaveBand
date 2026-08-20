@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Scattering (ISO 17497-1) and diffusion (ISO 17497-2) coefficient tests.
+"""Scattering (ISO 17497-1) and diffusion (ISO 17497-2) coefficient tests.
 
 Neither part of ISO 17497 has a numeric worked example, so the tests anchor
 on algebraic and physical identities, on a committed model-generated arc for

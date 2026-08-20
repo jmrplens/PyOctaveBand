@@ -102,11 +102,11 @@ def test_legitimate_decimals_still_take_the_comma(text: str, expected: str) -> N
 
 
 def test_every_replacement_template_of_the_pattern_table_compiles() -> None:
-    """One bad escape in one template silences the whole Spanish edition.
+    r"""One bad escape in one template silences the whole Spanish edition.
 
     ``lookup`` walks the pattern list until something matches, and
     ``re.sub`` compiles the *replacement* as it goes, so a template with a
-    stray ``\\l`` (a mathtext ``\\lambda`` written with one backslash instead
+    stray ``\l`` (a mathtext ``\lambda`` written with one backslash instead
     of two) raises for every string that reaches that row -- which is every
     string the exact table and the earlier patterns do not answer. The
     Spanish pass of a whole render run then dies on a label that has nothing

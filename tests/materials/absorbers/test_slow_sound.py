@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.).
+"""Slow-sound slit + Helmholtz-resonator perfect absorbers (Jimenez et al.).
 
 Oracle strategy (clean-room from the documented transfer-matrix formulas of
 Jimenez, Groby, Pagneux and Romero-Garcia, Appl. Sci. 2017, 7, 618, and the

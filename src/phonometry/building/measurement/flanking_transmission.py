@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010).
+r"""Laboratory measurement of flanking sound transmission (ISO 10848:2006/2010).
 
 This is the **measurement** counterpart of the flanking-transmission
 *prediction* in :mod:`phonometry.building.prediction.simplified_model`. EN 12354-1 predicts the

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Underwater-acoustics reference levels (ISO 18405:2017).
+r"""Underwater-acoustics reference levels (ISO 18405:2017).
 
 Underwater sound levels use a reference pressure of **1 µPa** (not the 20 µPa of
 airborne acoustics) and a reference sound exposure of **1 µPa²·s**. This module

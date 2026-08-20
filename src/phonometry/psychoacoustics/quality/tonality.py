@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition).
+"""Prominent discrete tone assessment per ECMA-418-1:2024 (3rd edition).
 
 Implements the tone-to-noise ratio (TNR, clause 11) and prominence ratio
 (PR, clause 12) methods on Hann-windowed, RMS-averaged FFT spectra
@@ -43,7 +42,8 @@ def _warn_coarse_resolution(dfc: float, df: float, ft: float) -> None:
     The tone band is 15 % of the critical bandwidth ``dfc`` (half-width
     ``0.075*dfc``). Below ~3 bins across the half-width the tone/noise split
     is biased (ECMA-418-1 keeps the tone band within 15 % of the critical
-    bandwidth). At 250 Hz a 4 Hz bin already costs ~0.3 dB of TNR."""
+    bandwidth). At 250 Hz a 4 Hz bin already costs ~0.3 dB of TNR.
+    """
     bins = 0.075 * dfc / df
     if bins < 3.0:
         warnings.warn(
@@ -209,7 +209,8 @@ def _find_peak(freqs: np.ndarray, power: np.ndarray, tone_freq: float | None) ->
 def _tone_band(power: np.ndarray, peak: int, half_width_bins: int) -> tuple[int, int]:
     """Clause 11.2: tone-band edges at the minimal points on both sides of
     the peak within 15 % of the critical band; if the minimum falls on the
-    window edge, the nearest local minimum beyond it is used."""
+    window edge, the nearest local minimum beyond it is used.
+    """
 
     def _edge(direction: int) -> int:
         last = power.size - 1
@@ -262,8 +263,7 @@ def tone_to_noise_ratio(
     tone_freq: float | None = None,
     resolution_hz: float = 1.0,
 ) -> ToneAssessment:
-    """
-    Tone-to-noise ratio of a discrete tone (ECMA-418-1:2024, clause 11).
+    """Tone-to-noise ratio of a discrete tone (ECMA-418-1:2024, clause 11).
 
     The spectrum is Hann-windowed and RMS-averaged (clause 11.1). The tone
     level ``Lt`` is the tone-band level above the line connecting the band
@@ -387,8 +387,7 @@ def prominence_ratio(
     tone_freq: float | None = None,
     resolution_hz: float = 1.0,
 ) -> ToneAssessment:
-    """
-    Prominence ratio of a discrete tone (ECMA-418-1:2024, clause 12).
+    """Prominence ratio of a discrete tone (ECMA-418-1:2024, clause 12).
 
     Compares the level of the critical band centred on the tone (``LM``)
     with the mean of the two contiguous critical bands (``LL``, ``LU``,

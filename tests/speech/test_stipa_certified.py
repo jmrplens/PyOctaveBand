@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-End-to-end STIPA verification against the IEC 60268-16:2020 (rev 5)
+"""End-to-end STIPA verification against the IEC 60268-16:2020 (rev 5)
 certified test bench signals from stipa.info (Embedded Acoustics BV).
 
 The bench is 49 mono 48 kHz WAV files, 133 MB of PCM that does not compress
@@ -89,7 +88,8 @@ _FULL_BENCH_PRESENT = _BENCH.is_full_set
 
 def _decode(relative: str) -> np.ndarray:
     """Reconstruct an extracted signal: ``order`` cumulative sums of the
-    stored difference, checked against the SHA-256 of the original samples."""
+    stored difference, checked against the SHA-256 of the original samples.
+    """
     entry = _MANIFEST[relative]
     with zipfile.ZipFile(_EXTRACT) as archive:
         blob = archive.read(entry["member"])
@@ -143,7 +143,8 @@ def _available(cases: Mapping[Any, str]) -> list[Any]:
 
 def _stipa_quiet(x: np.ndarray) -> speech.STIResult:
     """stipa() with the expected verification-bench warnings silenced
-    (dead bands and junk m > 1,3 in the two-band C.4.2 signals)."""
+    (dead bands and junk m > 1,3 in the two-band C.4.2 signals).
+    """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         return speech.stipa(x, FS)
@@ -195,7 +196,8 @@ _C33_FILES = {
 
 def _schroeder_m(rt60: float) -> np.ndarray:
     """Closed-form MTF of an exponential intensity decay of 60 dB in RT60:
-    I(t) ~ e^(-a t), a = 6 ln(10)/RT60, m(F) = 1/sqrt(1 + (2 pi F/a)^2)."""
+    I(t) ~ e^(-a t), a = 6 ln(10)/RT60, m(F) = 1/sqrt(1 + (2 pi F/a)^2).
+    """
     a = 6.0 * np.log(10.0) / rt60
     return np.asarray(1.0 / np.sqrt(1.0 + (2.0 * np.pi * _MOD_FREQS / a) ** 2))
 
@@ -323,7 +325,8 @@ _COMMITTED = (
 
 def test_committed_extract_inventory() -> None:
     """The committed extract must hold exactly the 27 declared signals and
-    every one of them must decode to the digest of the original samples."""
+    every one of them must decode to the digest of the original samples.
+    """
     assert set(_MANIFEST) == set(_COMMITTED), (
         "the extract no longer matches the documented selection "
         "(see tests/data/stipa/README.md)"

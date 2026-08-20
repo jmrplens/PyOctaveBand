@@ -1,7 +1,6 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
 
-"""
-Tests ensuring the package treats matplotlib as the optional dependency it is.
+"""Tests ensuring the package treats matplotlib as the optional dependency it is.
 
 Three promises are kept here. Importing phonometry must not force a specific
 (e.g. non-interactive) backend, so the package can be used during interactive

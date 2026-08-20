@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Phase utilities: minimum phase, group delay and excess phase.
+r"""Phase utilities: minimum phase, group delay and excess phase.
 
 For a causal, stable, minimum-phase system the log-magnitude and the phase
 of the frequency response form a Hilbert-transform pair (Bendat & Piersol,
@@ -128,8 +127,7 @@ def minimum_phase(
     *,
     oversample: int = 8,
 ) -> NDArray[np.complex128]:
-    r"""
-    Minimum-phase response with the magnitude of ``response``.
+    r"""Minimum-phase response with the magnitude of ``response``.
 
     Computes the phase that the Hilbert relation between log-magnitude and
     phase assigns to :math:`\lvert H(f) \rvert` (Bendat & Piersol
@@ -176,8 +174,7 @@ def group_delay(
     response: NDArray[np.complex128] | list[float],
     fs: float,
 ) -> NDArray[np.float64]:
-    r"""
-    Group delay :math:`\tau_\mathrm{g}(f) = -(1/2\pi) \, d\phi/df` of a response.
+    r"""Group delay :math:`\tau_\mathrm{g}(f) = -(1/2\pi) \, d\phi/df` of a response.
 
     The phase is unwrapped and differentiated with second-order central
     differences (one-sided at the grid ends). The estimate is exact for a
@@ -207,8 +204,7 @@ def excess_phase(
     *,
     oversample: int = 8,
 ) -> NDArray[np.float64]:
-    r"""
-    Excess phase: measured phase minus the minimum phase of
+    r"""Excess phase: measured phase minus the minimum phase of
     :math:`\lvert H \rvert`.
 
     :math:`\phi_{\mathrm{excess}} = \operatorname{unwrap}(\arg H) -
@@ -289,8 +285,7 @@ def phase_decomposition(
     *,
     oversample: int = 8,
 ) -> PhaseDecompositionResult:
-    """
-    Decompose a response into its minimum-phase and all-pass parts.
+    """Decompose a response into its minimum-phase and all-pass parts.
 
     Bundles :func:`minimum_phase`, :func:`excess_phase` and
     :func:`group_delay` on one frequency axis: the minimum phase carries

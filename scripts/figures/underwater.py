@@ -791,7 +791,8 @@ def generate_numerical_propagation(output_dir: str) -> None:
 
 def generate_seawater_absorption(output_dir: str) -> None:
     """Volume absorption of the three models, and how far the two simpler ones
-    depart from the Francois-Garrison reference."""
+    depart from the Francois-Garrison reference.
+    """
     print("Generating seawater_absorption...")
     from phonometry import underwater
 
@@ -1951,7 +1952,8 @@ def _piling_strike(fs: int = 48_000) -> "np.ndarray":
 
 def generate_marine_mammal_assessment(output_dir: str) -> None:
     """The band spectrum the chain starts from, and the same campaign judged
-    for a low-frequency cetacean and for a porpoise."""
+    for a low-frequency cetacean and for a porpoise.
+    """
     print("Generating marine_mammal_assessment...")
     from phonometry import underwater
 
@@ -1987,7 +1989,8 @@ def generate_marine_mammal_assessment(output_dir: str) -> None:
 
 def generate_marine_mammal_exposure_functions(output_dir: str) -> None:
     """The exposure function regulators apply, what the 2024 revision changed,
-    and the criteria of every in-water group side by side."""
+    and the criteria of every in-water group side by side.
+    """
     print("Generating marine_mammal_exposure_functions...")
     from phonometry import underwater
 

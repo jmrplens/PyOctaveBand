@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 15186-1 element-normalized intensity report (``.report()``).
+"""Tests for the ISO 15186-1 element-normalized intensity report (``.report()``).
 
 The element-normalized level difference ``DI,n,e`` (Clause 3.9, Formula (8)) is
 a level difference rated by the same ISO 717-1 machinery as the pressure ``R``,
@@ -204,7 +203,6 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
     ISO 717-1 rates; a hand-crafted rating whose per-band arrays all match an
     8-band curve would otherwise satisfy the shared renderer's shape checks.
     """
-
     centers = np.array([100, 125, 160, 200, 250, 315, 400, 500], dtype=float)
     curve = np.linspace(20.0, 40.0, 8)
     rating = building.WeightedRatingResult(
@@ -224,7 +222,6 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
 
 def test_rating_without_per_band_data_rejected(tmp_path) -> None:
     """A manually built rating lacking the per-band arrays is rejected."""
-
     bare_rating = building.WeightedRatingResult(
         rating=30, c=-2, ctr=-3, unfavourable_sum=0.0
     )

@@ -234,7 +234,8 @@ def test_gcc_phat_sharpens_the_peak_of_a_colored_signal() -> None:
     """The plain correlator smears the delta by the signal autocorrelation
     (Knapp & Carter Eq. 9); PHAT prewhitens and restores a sharp peak.
     The coloring keeps some power everywhere (a Butterworth roll-off, not
-    a brick wall) - K&C's condition for the PHAT phase to stay defined."""
+    a brick wall) - K&C's condition for the PHAT phase to stay defined.
+    """
     from scipy import signal as sp_signal
 
     delay = 20
@@ -256,7 +257,8 @@ def test_ml_weighting_suppresses_empty_bands_where_phat_jitters() -> None:
     """K&C: PHAT weights 1/|Gxy| regardless of coherence, so bands without
     signal contribute unit-magnitude random phase; the ML (HT) weighting
     scales them by γ²/(1-γ²) and stays accurate on a band-limited signal
-    observed through noisy sensors."""
+    observed through noisy sensors.
+    """
     s = _bandlimited(11, 0.4 * FS)
     noise_a = ph.signals.noise_signal(FS, N / FS, color="white", rms=0.1, seed=311)
     noise_b = ph.signals.noise_signal(FS, N / FS, color="white", rms=0.1, seed=312)
@@ -279,7 +281,8 @@ def test_ml_weighting_suppresses_empty_bands_where_phat_jitters() -> None:
 
 def test_fractional_delay_direct_parabolic_accuracy() -> None:
     """Parabolic interpolation on a 0.4·fs band-limited pair: |err| < 0.1
-    sample (the parabola only approximates the sinc-shaped peak)."""
+    sample (the parabola only approximates the sinc-shaped peak).
+    """
     x = _bandlimited(12, 0.4 * FS)
     y = _fractional_delay(x, 12.25)
     res = ph.signals.time_delay(x, y, FS, method="direct")
@@ -288,7 +291,8 @@ def test_fractional_delay_direct_parabolic_accuracy() -> None:
 
 def test_fractional_delay_direct_upsampled_accuracy() -> None:
     """Band-limited local upsampling ×16 fixes the parabola bias:
-    |err| < 2e-3 samples on the same pair."""
+    |err| < 2e-3 samples on the same pair.
+    """
     x = _bandlimited(12, 0.4 * FS)
     y = _fractional_delay(x, 12.25)
     res = ph.signals.time_delay(x, y, FS, method="direct", upsample=16)
@@ -297,7 +301,8 @@ def test_fractional_delay_direct_upsampled_accuracy() -> None:
 
 def test_phase_slope_handles_polarity_inversion() -> None:
     """A polarity-inverted path (α < 0) has θ(0) = π; referencing the
-    phase to DC keeps the Eq. 5.101b slope unbiased."""
+    phase to DC keeps the Eq. 5.101b slope unbiased.
+    """
     x = _white(22)
     y = -np.roll(x, 5)
     res = ph.signals.time_delay(x, y, FS, method="phase", nperseg=2048)
@@ -306,7 +311,8 @@ def test_phase_slope_handles_polarity_inversion() -> None:
 
 def test_ml_weighting_requires_averaged_coherence() -> None:
     """K&C Eq. 45b exists only for |γ|² < 1: a single-segment coherence
-    is identically one, so the estimator refuses to run."""
+    is identically one, so the estimator refuses to run.
+    """
     x = _white(23, n=2048)
     y = np.roll(x, 5)
     with pytest.raises(ValueError, match="averaged coherence"):
@@ -325,7 +331,8 @@ def test_time_delay_rejects_constant_records() -> None:
 
 def test_fractional_delay_phase_slope_accuracy() -> None:
     """The Eq. 5.101b phase-slope estimate is exact to <1e-3 samples for a
-    clean fractional delay (the phase of a pure delay is exactly linear)."""
+    clean fractional delay (the phase of a pure delay is exactly linear).
+    """
     x = _bandlimited(13, 0.4 * FS)
     y = _fractional_delay(x, 12.25)
     res = ph.signals.time_delay(x, y, FS, method="phase", nperseg=2048)
@@ -382,7 +389,8 @@ def test_delay_scatter_is_consistent_with_the_eq_8_129_prediction() -> None:
     models the peak of the continuous correlation function, so it is an
     order-of-magnitude tool; the observed scatter sits below the
     prediction (the ±2σ interval of Eq. 8.130 is conservative) and within
-    a factor of a few of it."""
+    a factor of a few of it.
+    """
     bandwidth = 1000.0
     delays = []
     predicted = 0.0
@@ -415,7 +423,8 @@ def test_no_bandwidth_means_no_error_fields() -> None:
 def test_single_ir_subsample_delay_accuracy() -> None:
     """Documented accuracy on a smooth band-limited pulse: a few
     hundredths of a sample with the parabola alone, ~1e-3 samples at the
-    default upsample=8, below 1e-5 at x32."""
+    default upsample=8, below 1e-5 at x32.
+    """
     ir = _bandlimited_pulse(4096, 700.35, 0.15)
     got = ph.signals.impulse_response_delay(ir, FS) * FS
     assert got == pytest.approx(700.35, abs=1e-3)
@@ -445,7 +454,8 @@ def test_ir_pair_delay_and_alignment() -> None:
 
 def test_single_ir_delay_near_the_record_start() -> None:
     """A peak close to the boundary keeps a full-size (clamped) upsampling
-    window instead of a shrunken one."""
+    window instead of a shrunken one.
+    """
     ir = _bandlimited_pulse(4096, 5.25, 0.15)
     got = ph.signals.impulse_response_delay(ir, FS) * FS
     assert got == pytest.approx(5.25, abs=5e-3)
@@ -453,7 +463,8 @@ def test_single_ir_delay_near_the_record_start() -> None:
 
 def test_peak_coefficient_guard_for_out_of_record_delays() -> None:
     """The phase-slope delay is not bounded by a search window; a delay
-    beyond the record length must yield a zero coefficient, not a crash."""
+    beyond the record length must yield a zero coefficient, not a crash.
+    """
     from phonometry.signals.correlation import _delay_error
 
     x = _white(25, n=4096)

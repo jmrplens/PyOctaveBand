@@ -1,8 +1,6 @@
 #  Copyright (c) 2020. Jose Manuel Requena Plens
 
-"""
-Basic test and usage example for phonometry.
-"""
+"""Basic test and usage example for phonometry."""
 
 import numpy as np
 
@@ -15,8 +13,7 @@ def test_package_version_is_public() -> None:
 
 
 def test_octave_filter_basic() -> None:
-    """
-    Basic sanity check for the octave filter.
+    """Basic sanity check for the octave filter.
 
     **Purpose:**
     Ensure the function runs without errors for a simple, standard use case and returns
@@ -51,8 +48,7 @@ def test_octave_filter_basic() -> None:
 
 
 def test_octave_filter_sigbands() -> None:
-    """
-    Test the retrieval of time-domain filtered signals (`sigbands=True`).
+    """Test the retrieval of time-domain filtered signals (`sigbands=True`).
 
     **Purpose:**
     Verify that the user can retrieve the actual time-domain waveform for each frequency band,

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Predicted source-level spectrum of shipping traffic (semi-empirical models).
+"""Predicted source-level spectrum of shipping traffic (semi-empirical models).
 
 When no measured spectrum is available, the underwater radiated-noise source
 level of a ship can be *estimated* from readily available traffic parameters

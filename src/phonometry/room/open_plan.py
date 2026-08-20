@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Open-plan-office spatial metrics per ISO 3382-3:2012.
+r"""Open-plan-office spatial metrics per ISO 3382-3:2012.
 
 From a line of measurement positions across workstations (ISO 3382-3:2012,
 5.2.2) this module derives the single-number quantities of Clause 4:
@@ -225,8 +224,7 @@ def open_plan_metrics(
     spl_a_speech: list[float] | np.ndarray,
     sti_values: list[float] | np.ndarray,
 ) -> OpenPlanResult:
-    r"""
-    Open-plan-office single-number quantities per ISO 3382-3:2012.
+    r"""Open-plan-office single-number quantities per ISO 3382-3:2012.
 
     Computes the spatial decay rate ``D2,S`` and the nominal A-weighted
     speech level at 4 m ``Lp,A,S,4m`` (Clause 6.2, Equation (5)) from a

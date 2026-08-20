@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980;
+r"""Suspended-ceiling plenum flanking path (Vigran 9.2.3 after Mechel 1980;
 ISO 140-9 / ISO 10848-2; ASTM E1414 / ASTM E413).
 
 Two offices separated by a partition that stops at the suspended ceiling share

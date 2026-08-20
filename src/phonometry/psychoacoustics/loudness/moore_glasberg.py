@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Stationary loudness per ISO 532-2:2017 (Moore-Glasberg method).
+"""Stationary loudness per ISO 532-2:2017 (Moore-Glasberg method).
 
 Clean-room implementation of the spectral loudness model of ISO 532-2:2017,
 the third calculation method of the ISO 532 series (distinct from the Zwicker

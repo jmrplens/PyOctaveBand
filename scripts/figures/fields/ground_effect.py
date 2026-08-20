@@ -151,7 +151,8 @@ def animate_fdtd_ground_effect(output_dir: str) -> None:
     and ground-reflected wavefronts interfere and the lobe pattern forms;
     the ghosted image source below the ground explains the geometry, and the
     level sampled on an 8 m arc converges to the two-path model with its
-    predicted nulls."""
+    predicted nulls.
+    """
     from matplotlib import patheffects
 
     T = _translate_str

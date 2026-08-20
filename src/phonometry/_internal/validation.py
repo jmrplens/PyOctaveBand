@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Shared input-validation helpers (private).
+"""Shared input-validation helpers (private).
 
 Seeded by the library audit: modules used to hand-roll the same checks with
 diverging NaN semantics and error-message styles. New code should validate

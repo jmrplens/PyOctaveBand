@@ -144,7 +144,8 @@ def test_scattering_insitu_precision_reference_data_matches_oracles() -> None:
 def test_filter_binding_detail_matches_library_margin() -> None:
     """The report re-derives the binding measured value and limit with the
     public ``class_limits``; guard that its class-1 margin never diverges from
-    the authoritative ``verify_filter_class`` (single source of truth)."""
+    the authoritative ``verify_filter_class`` (single source of truth).
+    """
     from phonometry import filters
     from phonometry.filters.compliance import verify_filter_class
 

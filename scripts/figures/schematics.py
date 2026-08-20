@@ -172,7 +172,8 @@ def _draw_speaker(
     ax: Any, x: float, y: float, *, size: float = 1.0, direction: int = 1
 ) -> None:
     """A loudspeaker symbol: cabinet plus cone, radiating toward
-    ``direction`` (+1 = +x, -1 = -x). ``(x, y)`` is the cone mouth centre."""
+    ``direction`` (+1 = +x, -1 = -x). ``(x, y)`` is the cone mouth centre.
+    """
     from matplotlib.patches import Polygon, Rectangle
 
     d = float(direction)
@@ -472,7 +473,8 @@ def _draw_resistor(ax: Any, x0: float, x1: float, y: float) -> None:
 
 def animate_time_weighting_ballistics(output_dir: str) -> None:
     """A tone burst through the IEC 61672-1 RC detector: the capacitor fills
-    and drains while the F/S/I meter needles follow their own ballistics."""
+    and drains while the F/S/I meter needles follow their own ballistics.
+    """
     from matplotlib.patches import FancyBboxPatch, Rectangle
 
     from phonometry import filters
@@ -752,7 +754,8 @@ def animate_time_weighting_ballistics(output_dir: str) -> None:
 
 def animate_onset_detection(output_dir: str) -> None:
     """The NT ACOU 112 detector scanning L_AF with a magnifier; the
-    OR -> LD -> P -> KI decision chain lights up once the onset is found."""
+    OR -> LD -> P -> KI decision chain lights up once the onset is found.
+    """
     from matplotlib.patches import Ellipse
 
     from phonometry import environment
@@ -933,7 +936,8 @@ def animate_onset_detection(output_dir: str) -> None:
 
 def animate_instantaneous_intensity(output_dir: str) -> None:
     """A p-p probe with p/u phasors: the instantaneous intensity arrow flips
-    while its running average settles to net flow (active) or zero (reactive)."""
+    while its running average settles to net flow (active) or zero (reactive).
+    """
     from matplotlib.patches import Circle
 
     T = _translate_str
@@ -1203,7 +1207,8 @@ def animate_instantaneous_intensity(output_dir: str) -> None:
 
 def animate_schroeder(output_dir: str) -> None:
     """Backward integration of p²(t): the tail energy fills up on one axis
-    while the decay curve and its T20/T30 fits emerge on a companion axis."""
+    while the decay curve and its T20/T30 fits emerge on a companion axis.
+    """
     from matplotlib.patches import Patch
 
     from phonometry import room
@@ -1410,7 +1415,8 @@ def animate_schroeder(output_dir: str) -> None:
 def animate_flanking_paths(output_dir: str) -> None:
     """EN 12354-1 junction schematic: energy pulses leave the source room
     over the Dd, Ff, Fd and Df paths, shrinking at the junction, and each
-    path label lights up as its pulse re-radiates into the receiving room."""
+    path label lights up as its pulse re-radiates into the receiving room.
+    """
     from matplotlib.patches import Circle, Rectangle
 
     T = _translate_str
@@ -1651,7 +1657,8 @@ def animate_intensity_scan_power(output_dir: str) -> None:
     """ISO 9614-2 sound power: a p-p probe traces the serpentine scan over
     the top face of the measurement box while the normal-intensity arrows
     appear behind it, and the partial powers of the five faces accumulate
-    into the L_W meter."""
+    into the L_W meter.
+    """
     from matplotlib.patches import Circle, Polygon
 
     T = _translate_str
@@ -1950,7 +1957,8 @@ def animate_intensity_scan_power(output_dir: str) -> None:
 def animate_sweep_deconvolution(output_dir: str) -> None:
     """ISO 18233 swept-sine measurement: the exponential sweep crosses a
     drawn room while its spectrogram builds, then the inverse filter
-    collapses the whole record into the impulse response."""
+    collapses the whole record into the impulse response.
+    """
     from matplotlib.colors import Normalize
     from matplotlib.patches import Rectangle
     from scipy.signal import fftconvolve, spectrogram
@@ -2184,7 +2192,8 @@ def animate_sweep_deconvolution(output_dir: str) -> None:
 def animate_specific_loudness(output_dir: str) -> None:
     """ISO 532-1 specific loudness: the N'(z) pattern of a 1 kHz narrowband
     sound builds along the Bark axis as the band level steps up, and the
-    area under the pattern integrates to the total loudness in sone."""
+    area under the pattern integrates to the total loudness in sone.
+    """
     T = _translate_str
     from phonometry import psychoacoustics
 
@@ -2358,7 +2367,8 @@ def animate_specific_loudness(output_dir: str) -> None:
 def animate_power_two_rooms(output_dir: str) -> None:
     """The same source in an anechoic room (ISO 3745 free field) and in a
     reverberation room (ISO 3741 diffuse build-up): both microphone
-    pressures differ, both routes converge to the same sound power L_W."""
+    pressures differ, both routes converge to the same sound power L_W.
+    """
     from matplotlib.patches import Circle, Polygon, Rectangle
 
     T = _translate_str
@@ -2664,7 +2674,8 @@ def animate_comb_filtering(output_dir: str) -> None:
     """Direct sound plus one floor reflection at a microphone: as the mic
     height changes, the delayed copy shifts and the comb filter in the
     frequency response moves with it, which is why measurement position matters
-    near reflecting surfaces."""
+    near reflecting surfaces.
+    """
     T = _translate_str
     c0 = 343.0
     xs_, hs = 0.6, 1.5  # source position (x, height)
@@ -2887,7 +2898,8 @@ def animate_dynamic_stiffness_sweep(output_dir: str) -> None:
     """EN 29052-1 resonance sweep: the load plate on its resilient specimen
     driven through fr, with the amplitude peaking and the response flipping
     from in phase with the force to a quarter cycle behind it and on to
-    antiphase, which is what the measurement actually reads."""
+    antiphase, which is what the measurement actually reads.
+    """
     from matplotlib.patches import Rectangle
 
     T = _translate_str
@@ -3244,7 +3256,8 @@ def animate_modulation_transfer(output_dir: str) -> None:
     """The IEC 60268-16 modulation transfer function drawn where it lives:
     on a speech-rate intensity envelope. Reverberation shrinks the envelope
     about its mean; steady noise lifts a floor under it. Both shrink m, the
-    m(F) curve and the band MTIs follow, and the STI falls with them."""
+    m(F) curve and the band MTIs follow, and the STI falls with them.
+    """
     T = _translate_str
 
     data = _modulation_transfer_data()
@@ -3497,7 +3510,8 @@ def animate_loudness_gating(output_dir: str) -> None:
     """The BS.1770-5 double gate deciding, block by block: the relative
     threshold is recomputed from the survivors of the first pass, so it
     slides as the programme plays and retroactively drops blocks that were
-    passing. Then the deeper -20 LU gate of the loudness range."""
+    passing. Then the deeper -20 LU gate of the loudness range.
+    """
     T = _translate_str
 
     data = _loudness_gating_data()
@@ -3818,7 +3832,8 @@ def animate_epnl_flyover(output_dir: str) -> None:
     """EPNL built in the order the standard builds it: a spectrum every
     half second, a background fitted under its fan tone, PNLT rising over
     PNL by that correction, and only at the end -- once the peak is known --
-    the 10 dB-down window, the duration correction and the EPNL."""
+    the 10 dB-down window, the duration correction and the EPNL.
+    """
     from matplotlib.patches import Polygon
 
     T = _translate_str
@@ -4143,7 +4158,8 @@ def animate_image_source_buildup(output_dir: str) -> None:
     """A circle expanding from the receiver at c t sweeps the mirror-room
     lattice; every image it reaches writes its arrival into the
     reflectogram, and the running count follows the (4 pi / 3)(c t)^3 / V
-    law whose derivative is the reflection density of the guide."""
+    law whose derivative is the reflection density of the guide.
+    """
     from matplotlib.patches import Circle, Rectangle
 
     from .theme import series_colors
@@ -4461,7 +4477,8 @@ def animate_iso717_shift(output_dir: str) -> None:
     unfavourable deviations is as large as it can be without passing 32.0 dB
     -- the iterative fit behind every single number on the ratings page,
     run once for the airborne engine and once for the impact engine, where
-    the same rule holds with the deviation's sign reversed."""
+    the same rule holds with the deviation's sign reversed.
+    """
     from matplotlib.patches import Patch
 
     T = _translate_str
@@ -4831,7 +4848,8 @@ def _block_vs_exponential_data() -> dict[str, Any]:
 @lru_cache(maxsize=1)
 def _bve_cached() -> dict[str, Any]:
     """One data build per process: 128 Fast-envelope runs are paid once,
-    not once per language x theme variant."""
+    not once per language x theme variant.
+    """
     return _block_vs_exponential_data()
 
 
@@ -4840,7 +4858,8 @@ def animate_block_vs_exponential(output_dir: str) -> None:
     exponential Fast detector answers the same number at every alignment
     because the burst duration is in its differential equation; the block
     integrator's answer swings by nearly 3 dB, because the alignment is all
-    it has. The case study's central claim, measured."""
+    it has. The case study's central claim, measured.
+    """
     T = _translate_str
 
     d = _bve_cached()
@@ -5092,7 +5111,8 @@ def animate_feedback_howl(output_dir: str) -> None:
     3.3 dB above the direct sound; four open microphones cost 6 dB and the
     same loop takes far longer to settle 8.7 dB up; 4 dB more system gain
     puts the loop gain at unity and the copies stop shrinking, which is the
-    howl. Gain before feedback is a convergence condition, not a level."""
+    howl. Gain before feedback is a convergence condition, not a level.
+    """
     from matplotlib.patches import Circle
 
     T = _translate_str

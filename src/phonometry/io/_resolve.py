@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Resolving an ``(x, fs)`` argument pair that may arrive as a ``Signal``.
+"""Resolving an ``(x, fs)`` argument pair that may arrive as a ``Signal``.
 
 A function that consumes a recording should take a
 :class:`phonometry.io.Signal` in place of the bare ``(x, fs)`` pair: the

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Narrowing a ``Signal`` without losing what makes it one.
+"""Narrowing a ``Signal`` without losing what makes it one.
 
 Indexing a Signal yields its samples, which is what makes the object a
 drop-in for the array it stands for. The cost is that ``sig[0]`` and

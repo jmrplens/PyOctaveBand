@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Generate the Starlight API reference from the phonometry docstrings.
+"""Generate the Starlight API reference from the phonometry docstrings.
 
 Renders every public name as committed Markdown pages under
 ``site/src/content/docs/reference/api/`` (one page per public module, grouped
@@ -427,11 +426,11 @@ def render_inline(text: str, xref: dict[str, str], stats: RoleStats) -> str:
 
 
 def _math_bars_to_commands(match: re.Match[str]) -> str:
-    """Spell the vertical bars of a math span as TeX commands.
+    r"""Spell the vertical bars of a math span as TeX commands.
 
-    GFM decodes the ``\\|`` cell escape for prose and code spans but not
-    inside math, where KaTeX would then read it as ``\\|`` and typeset a
-    double bar. ``\\vert``/``\\Vert`` are the same glyphs written without
+    GFM decodes the ``\|`` cell escape for prose and code spans but not
+    inside math, where KaTeX would then read it as ``\|`` and typeset a
+    double bar. ``\vert``/``\Vert`` are the same glyphs written without
     the character the table syntax claims, so they survive the escape.
     """
     span = match.group(0).replace("\\|", "\\Vert ")
@@ -439,12 +438,12 @@ def _math_bars_to_commands(match: re.Match[str]) -> str:
 
 
 def render_cell(text: str, xref: dict[str, str], stats: RoleStats) -> str:
-    """Inline reST -> Markdown for a table cell (single line, pipes escaped).
+    r"""Inline reST -> Markdown for a table cell (single line, pipes escaped).
 
     The ``|`` escape is GFM table syntax: it is decoded back to a literal
     pipe only inside a table row, so it must never be applied to prose
     outside a table (a code span there would show the backslash literally).
-    Math is exempt: its bars become ``\\vert``/``\\Vert`` first, so the
+    Math is exempt: its bars become ``\vert``/``\Vert`` first, so the
     escaping below cannot reach into a formula.
     """
     rendered = render_inline(text, xref, stats)

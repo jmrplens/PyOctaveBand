@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5).
+"""Speech Transmission Index (STI) per IEC 60268-16:2020 (Edition 5).
 
 Implements the full-STI indirect method from impulse responses (Schroeder
 modulation transfer function), the direct STIPA method on recorded signals
@@ -413,8 +412,7 @@ def sti_from_impulse_response(
     level: Sequence[float] | np.ndarray | None = None,
     ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult:
-    r"""
-    Full STI from a room/system impulse response (indirect method).
+    r"""Full STI from a room/system impulse response (indirect method).
 
     The impulse response is filtered into the seven octave bands 125 Hz -
     8 kHz (IEC 61260-1 filters) and the modulation transfer function is
@@ -611,8 +609,7 @@ def stipa(
     level: Sequence[float] | np.ndarray | None = None,
     ambient: Sequence[float] | np.ndarray | None = None,
 ) -> STIResult:
-    """
-    STIPA on a recorded test signal (direct method, Annex B).
+    """STIPA on a recorded test signal (direct method, Annex B).
 
     The recording is filtered into the seven octave bands, squared and
     low-passed (~100 Hz) into intensity envelopes, and the modulation
@@ -719,8 +716,7 @@ def stipa_signal(
     level_db: float | None = None,
     seed: int | None = None,
 ) -> np.ndarray:
-    """
-    Generate an IEC 60268-16:2020 conformant STIPA test signal.
+    """Generate an IEC 60268-16:2020 conformant STIPA test signal.
 
     Pink-noise carriers are band-limited to half-octave bands centred on
     the seven octave-band frequencies (clause A.4), set to the Ed.5 male

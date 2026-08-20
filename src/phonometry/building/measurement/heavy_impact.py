@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Heavy and soft impact sources: rubber ball and bang machine
+r"""Heavy and soft impact sources: rubber ball and bang machine
 (ISO 16283-2:2020 Annex A, ISO 10140-5:2010 Annex F, JIS A 1418-2:2019,
 ISO 717-2:2020 Annex D).
 

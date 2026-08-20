@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Psychoacoustic loudness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
+"""Psychoacoustic loudness per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the loudness signal chain of ECMA-418-2:2025:
 

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-End-to-end validation of the rotorcraft event chain against the NORAH2
+"""End-to-end validation of the rotorcraft event chain against the NORAH2
 reference implementation (EASA.2020.FC.06 prototype, V2.0.74 public release).
 
 The prototype's ARP verification cases carry, per single-event operation, the

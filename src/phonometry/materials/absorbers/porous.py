@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Porous-material models and resonant sheet impedances.
+r"""Porous-material models and resonant sheet impedances.
 
 Two complementary building blocks, all in the :math:`e^{+j \omega t}`
 time convention with the forward wave carried by :math:`e^{-j k x}` (so a
@@ -251,7 +250,8 @@ class PorousMediumResult:
     @property
     def normalized_wavenumber(self) -> Complex:
         r"""Wavenumber normalised by the free-air wavenumber
-        :math:`k_0 = \omega / c`."""
+        :math:`k_0 = \omega / c`.
+        """
         k0 = 2.0 * np.pi * self.frequency / self.speed_of_sound
         return np.asarray(self.wavenumber / k0, dtype=np.complex128)
 

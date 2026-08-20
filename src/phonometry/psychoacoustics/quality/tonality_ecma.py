@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
+r"""Psychoacoustic tonality per ECMA-418-2:2025 (4th ed., Sottek Hearing Model).
 
 Clean-room implementation of the tonality signal chain of ECMA-418-2:2025
 (Clause 6.2). The shared auditory front-end (Clause 5) and the ACF-based

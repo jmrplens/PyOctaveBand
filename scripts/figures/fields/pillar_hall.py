@@ -174,7 +174,8 @@ def _pillar_fields(n_frames: int = _PILLAR_FRAMES) -> tuple[Any, Any]:
 def animate_fdtd_pillar_hall(output_dir: str) -> None:
     """README banner: an 800 Hz plane wavefront sweeps through a hall of
     rigid columns (2D FDTD at 2.5 mm): every pillar diffracts the front and
-    the scattered wavelets interfere until they fill the whole hall."""
+    the scattered wavelets interfere until they fill the whole hall.
+    """
     from matplotlib.patches import Circle
 
     T = _translate_str

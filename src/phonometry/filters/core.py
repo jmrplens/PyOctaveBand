@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Core processing logic and FilterBank class for phonometry.
-"""
+"""Core processing logic and FilterBank class for phonometry."""
 
 from __future__ import annotations
 
@@ -153,8 +151,7 @@ def _validate_bank_design(
 
 
 class OctaveFilterBank:
-    """
-    A class-based representation of an Octave Filter Bank.
+    """A class-based representation of an Octave Filter Bank.
     Allows for pre-calculating and reusing filter coefficients.
     """
 
@@ -170,8 +167,7 @@ class OctaveFilterBank:
         block_processing: BlockProcessing = _DEFAULT_BLOCK_PROCESSING,
         response_plot: ResponsePlot = _DEFAULT_RESPONSE_PLOT,
     ) -> None:
-        """
-        Initialize the Octave Filter Bank.
+        """Initialize the Octave Filter Bank.
 
         :param fs: Sample rate in Hz.
         :param fraction: Bandwidth fraction (e.g., 1 for octave, 3 for 1/3 octave).
@@ -260,6 +256,7 @@ class OctaveFilterBank:
         self._steady_ic = steady_ic
 
     def __repr__(self) -> str:
+        """Design summary: fs, fraction, order, limits, filter family and band count."""
         return (
             f"OctaveFilterBank(fs={self.fs}, fraction={self.fraction}, order={self.order}, "
             f"limits={self.limits}, filter_type='{self.filter_type}', "
@@ -379,8 +376,7 @@ class OctaveFilterBank:
             list[Signal] | list[np.ndarray],
         ]
     ):
-        """
-        Apply the pre-designed filter bank to a signal.
+        """Apply the pre-designed filter bank to a signal.
 
         :param x: Input signal (1D array or 2D array [channels, samples]), or
             a :class:`phonometry.io.Signal`. A Signal recorded at another rate
@@ -495,8 +491,7 @@ class OctaveFilterBank:
         detrend: bool = True,
         zero_phase: bool = False,
     ) -> tuple[np.ndarray, list[float], np.ndarray]:
-        """
-        Short-time fractional-octave analysis: level per band over time.
+        """Short-time fractional-octave analysis: level per band over time.
 
         :param x: Input signal (1D array or 2D array [channels, samples]), or
             a :class:`phonometry.io.Signal`. It follows the same rate and
@@ -577,8 +572,7 @@ class OctaveFilterBank:
         calculate_level: bool = True,
         zero_phase: bool = False,
     ) -> tuple[np.ndarray | None, list[np.ndarray] | None]:
-        """
-        Process signal through each frequency band.
+        """Process signal through each frequency band.
 
         :param x_proc: Standardized 2D input signal [channels, samples].
         :param num_channels: Number of channels.
@@ -785,8 +779,7 @@ def octave_filter(
     | tuple[np.ndarray, list[float], list[Signal] | list[np.ndarray]]
     | tuple[np.ndarray, list[str], list[Signal] | list[np.ndarray]]
 ):
-    """
-    Filter a signal with octave or fractional octave filter bank.
+    """Filter a signal with octave or fractional octave filter bank.
 
     This method uses a filter bank with Second-Order Sections (SOS) coefficients.
     To obtain the correct coefficients, automatic subsampling is applied to the

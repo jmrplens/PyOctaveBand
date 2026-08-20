@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Virtual impedance-tube experiments: FDTD end to end through the standards.
+"""Virtual impedance-tube experiments: FDTD end to end through the standards.
 
 A narrow rigid-walled FDTD domain is a plane-wave tube. A one-way packet is
 launched at a sample modelled as an equivalent fluid (density, speed and a

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for ISO 18233:2006 impulse-response acquisition.
+"""Tests for ISO 18233:2006 impulse-response acquisition.
 
 Validation strategy (closed-form, not self-consistency):
 - Ideal chain (recorded == excitation) -> band-limited delta at t=0.
@@ -118,7 +117,8 @@ def test_farina_method_recovers_iir_response_in_band() -> None:
 def test_farina_rejects_zero_padded_reference() -> None:
     """A reference zero-padded to the recording length (the correct input
     for method='spectral') silently rebuilds a wrong inverse filter for
-    Farina; it must raise instead. The unpadded sweep is unaffected."""
+    Farina; it must raise instead. The unpadded sweep is unaffected.
+    """
     b, a = signal.butter(4, [200.0, 2000.0], btype="band", fs=FS)
     f1, f2, secs = 20.0, 20000.0, 2.0
     x = room.sweep_signal(FS, f1, f2, secs)
@@ -260,7 +260,8 @@ def test_mls_recovers_iir_response_in_band() -> None:
 
 def test_mls_short_period_aliasing_warns() -> None:
     """An IR longer than one MLS period folds back circularly (A.1); the
-    recovered IR keeps undecayed energy at the period end, which is warned."""
+    recovered IR keeps undecayed energy at the period end, which is warned.
+    """
     order = 12  # L = 4095 samples (~85 ms at 48 kHz)
     a = room.mls_signal(order)
     length = a.size
@@ -313,7 +314,8 @@ def test_mls_snr_improves_with_averaging() -> None:
 
 def test_mls_multi_period_recording_averages_internally() -> None:
     """A >1-period recording exercises the internal reshape/mean averaging
-    branch and recovers a known filter, beating a single noisy period."""
+    branch and recovers a known filter, beating a single noisy period.
+    """
     order = 14
     a = room.mls_signal(order)
     length = a.size

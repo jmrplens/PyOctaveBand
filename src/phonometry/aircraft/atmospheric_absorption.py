@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534).
+"""One-third-octave-band atmospheric absorption for aircraft noise (SAE ARP 5534).
 
 Aircraft noise certification (14 CFR Part 36, ICAO Annex 16 Vol. I) works with
 one-third-octave-band spectra, and correcting a measured flyover to reference

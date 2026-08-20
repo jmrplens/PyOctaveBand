@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Sound power level of a noise source in an anechoic or hemi-anechoic room, from
+r"""Sound power level of a noise source in an anechoic or hemi-anechoic room, from
 sound pressure measurements over an enveloping surface: ISO 3745:2012
 (precision, accuracy grade 1).
 
@@ -262,7 +261,8 @@ class PrecisionSoundPowerResult:
     :math:`U = k\sqrt{\sigma_{\mathrm{R}0}^2 + \sigma_\mathrm{omc}^2}`
     (Eq. 24/25) and ``uncertainty_bands`` the
     per-band value (``NaN`` without ``frequencies``).
-    ``sound_power_level_a`` is the A-weighted total ``LWA`` (Eq. C.1)."""
+    ``sound_power_level_a`` is the A-weighted total ``LWA`` (Eq. C.1).
+    """
 
     frequencies: np.ndarray | None
     sound_power_level: np.ndarray
@@ -595,7 +595,8 @@ def _precision_surface_level(
     corrected: np.ndarray, areas: np.ndarray | None
 ) -> np.ndarray:
     """Surface time-averaged level Lp_bar: equal-area Eq. 12 or area-weighted
-    Eq. 13 when partial areas ``Si`` are supplied."""
+    Eq. 13 when partial areas ``Si`` are supplied.
+    """
     if areas is None:
         return np.asarray(energy_mean(corrected, axis=0), dtype=np.float64)
     n_positions = corrected.shape[0]

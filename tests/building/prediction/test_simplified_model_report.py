@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the EN/ISO 12354-1/-2 predicted-insulation reports (``.report()``).
+"""Tests for the EN/ISO 12354-1/-2 predicted-insulation reports (``.report()``).
 
 The prediction fiches are pinned to the standards' own worked examples, run
 through the tested prediction code: EN 12354-1 Annex H.3 (airborne, a

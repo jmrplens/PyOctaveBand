@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Numerical models of underwater sound propagation (range-independent water,
+"""Numerical models of underwater sound propagation (range-independent water,
 with an optionally sloping bottom for the ray-based solvers).
 
 Four complementary numerical solvers for the acoustic field in a
@@ -208,12 +207,12 @@ def _seabed_grazing_deg(
     xi: NDArray[np.float64],
     c_bottom: float,
 ) -> NDArray[np.float64]:
-    """The grazing angle Snell's invariant fixes at the seabed, in degrees.
+    r"""The grazing angle Snell's invariant fixes at the seabed, in degrees.
 
-    :math:`\\cos\\varphi = \\xi\\,c(D)`: the same at every touch of one ray,
+    :math:`\cos\varphi = \xi\,c(D)`: the same at every touch of one ray,
     because the direction a ray crosses a depth with is set by the invariant
     and not by how many times it has bounced. A ray that turns above the
-    seabed has :math:`\\xi\\,c(D) > 1` (clipped to a grazing angle of zero);
+    seabed has :math:`\xi\,c(D) > 1` (clipped to a grazing angle of zero);
     its bottom count stays zero, so the coefficient it never earned is never
     applied.
     """
@@ -536,7 +535,7 @@ def normal_modes(
 
 @dataclass(frozen=True)
 class RayTraceResult:
-    """Ray-tracing solution through a sound-speed profile.
+    r"""Ray-tracing solution through a sound-speed profile.
 
     :ivar launch_angles: Launch angles from the horizontal, in degrees.
     :ivar ranges: Per-ray horizontal ranges, in metres, shape
@@ -549,25 +548,25 @@ class RayTraceResult:
         column it stands in, exceeds it by the obliquity of the path, and a
         reflection leaves it continuous. This, and not the range, is the
         measure seawater absorption acts along: Jensen Sect. 3.6.2 carries a
-        volume loss :math:`\\alpha` into the ray solution by perturbing the
-        eikonal and lands on :math:`e^{-\\int_0^s \\alpha(s')\\,ds'}`
+        volume loss :math:`\alpha` into the ray solution by perturbing the
+        eikonal and lands on :math:`e^{-\int_0^s \alpha(s')\,ds'}`
         (Eq. 3.116), an integral over the path actually flown, so a caller
         hanging amplitudes on these rays multiplies by
-        :math:`e^{-\\alpha s}` with the :math:`s` read off here.
+        :math:`e^{-\alpha s}` with the :math:`s` read off here.
     :ivar surface_reflections: Per-ray cumulative count of sea-surface
         reflections by each range sample, same shape (zero at the source).
     :ivar bottom_reflections: The same count for the seabed. The two counts,
         and not the reflection coefficients themselves, are the whole of the
         per-bounce record an amplitude carrier needs from the geometry.
         Jensen Sect. 3.6.3 treats a boundary interaction as multiplying the
-        ray amplitude by :math:`|\\mathcal{R}(\\theta)|` and adding
-        :math:`\\arg \\mathcal{R}(\\theta)` to its phase (Eqs. 3.125-3.126),
-        with :math:`\\theta` the local angle of incidence; and in a
+        ray amplitude by :math:`|\mathcal{R}(\theta)|` and adding
+        :math:`\arg \mathcal{R}(\theta)` to its phase (Eqs. 3.125-3.126),
+        with :math:`\theta` the local angle of incidence; and in a
         range-independent medium that angle is the *same* at every touch of
         the same flat boundary, because the direction a ray crosses a depth
-        with is fixed by Snell's invariant, :math:`\\cos\\theta = \\xi\\,c`,
+        with is fixed by Snell's invariant, :math:`\cos\theta = \xi\,c`,
         not by how many times it has bounced. Any boundary coefficient
-        therefore enters a path's amplitude only as :math:`\\mathcal{R}^n`
+        therefore enters a path's amplitude only as :math:`\mathcal{R}^n`
         with the :math:`n` read off here, which is how
         :func:`gaussian_beams` charges its lossy seabed and how
         :func:`eigenrays` charges each arrival; ``ray_trace`` itself carries
@@ -911,7 +910,7 @@ def _march_arrival_rays(
     receiver_range: float,
     n_steps: int,
 ) -> RayMarch:
-    """March candidate eigenrays so the last sample lands on the receiver.
+    r"""March candidate eigenrays so the last sample lands on the receiver.
 
     Geometry and amplitude in one call, which the marcher's own doctrine
     requires (see :mod:`phonometry._internal.rays`): asking for the dynamic
@@ -920,7 +919,7 @@ def _march_arrival_rays(
     off one while the root was found on the other would answer for a slightly
     different path. Every march of the search therefore carries the pair, with
     the *real* point-source initial conditions of Jensen Eq. (3.63),
-    :math:`q(0) = 0`, :math:`p(0) = 1/c(0)`, under which :math:`r\\,q = J`
+    :math:`q(0) = 0`, :math:`p(0) = 1/c(0)`, under which :math:`r\,q = J`
     (Eq. 3.64) and the classical amplitude of Eq. (3.65) is a read-off. The
     receiver range is the last sample of the march by construction, so nothing
     is interpolated at the point everything is asserted at.
@@ -944,10 +943,10 @@ def _march_arrival_rays(
 
 
 def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
-    """The KMAH index per ray: sign changes of the real spreading history.
+    r"""The KMAH index per ray: sign changes of the real spreading history.
 
     With the initial conditions of Eq. (3.63) the pair is real, so
-    :math:`q \\propto J` (Eq. 3.64) and every caustic is a sign change of
+    :math:`q \propto J` (Eq. 3.64) and every caustic is a sign change of
     ``q`` along the row: "the number of times J(s) vanishes in [0, s]"
     (Eq. 3.79). The launch sample is q = 0 by those initial conditions and is
     not a caustic, which is why zeros are dropped before the signs are
@@ -1437,7 +1436,7 @@ def eigenrays(
 
 @dataclass(frozen=True)
 class GaussianBeamResult:
-    """Gaussian beam solution of a range-independent waveguide.
+    r"""Gaussian beam solution of a range-independent waveguide.
 
     The propagation-loss field is on the same footing as
     :class:`ParabolicEquationResult`'s: same shape, same reference, so the two
@@ -1458,7 +1457,7 @@ class GaussianBeamResult:
         none in 80200 cells.
 
         The source column is **not** one of the infinities, and is not to be
-        read. :func:`parabolic_equation` divides by :math:`\\sqrt{r}` and so
+        read. :func:`parabolic_equation` divides by :math:`\sqrt{r}` and so
         genuinely diverges at ``r = 0``; the beam sum does not, and hands back a
         finite number there instead, 13.6 dB in the case above. It means
         nothing, and neither does anything else within about three initial beam
@@ -1466,7 +1465,7 @@ class GaussianBeamResult:
         no near field. The plausible size of these numbers is the point worth
         knowing about them.
     :ivar pressure: The complex field the loss was taken from, same shape, in
-        the module's own :math:`e^{-i\\omega t}` convention (the conjugate of
+        the module's own :math:`e^{-i\omega t}` convention (the conjugate of
         the one Jensen Eq. (3.88) is printed in) and normalised to unit
         pressure at 1 m, so ``propagation_loss = -20 lg|pressure|``.
     :ivar launch_angles: Launch angle of each beam's central ray, from the
@@ -1492,7 +1491,7 @@ class GaussianBeamResult:
     :ivar absorption_model: The seawater absorption model applied along the
         beams, or ``None`` when the run propagated without volume absorption
         (the default).
-    :ivar absorption_coefficient: The absorption coefficient :math:`\\alpha`
+    :ivar absorption_coefficient: The absorption coefficient :math:`\alpha`
         actually applied, in dB/km (0.0 when ``absorption_model`` is ``None``),
         as :func:`~phonometry.underwater.propagation.closed_form.seawater_absorption`
         evaluated it at the source frequency and depth. Recorded so a run's
@@ -1711,13 +1710,13 @@ def _default_beam_widths(
 def _image_ladder(
     n_wrap: int,
 ) -> list[tuple[int, float, int, int]]:
-    """The receiver's images in the folded column, as boundary-touch counts.
+    r"""The receiver's images in the folded column, as boundary-touch counts.
 
     The marcher folds a reflected ray back into the water column, which is the
     right thing for the geometry and only half the story for a beam: what folds
     is the *central ray*, while the beam's transverse profile keeps its full
     unfolded extent. A beam of half-width :math:`W` crossing the column at
-    :math:`\\theta` to the horizontal spans :math:`W/\\cos\\theta` in depth at
+    :math:`\theta` to the horizontal spans :math:`W/\cos\theta` in depth at
     fixed range, so any beam steep enough, or wide enough, straddles a boundary
     and its folded copies overlap. Summing only the copy nearest the receiver
     throws the rest away, and it does so silently and in one direction: measured
@@ -1734,7 +1733,7 @@ def _image_ladder(
     planes stand at even multiples of ``D`` and the bottom planes at odd ones,
     and *counting* them is all that happens here. The counts are returned
     rather than the product, because the bottom's coefficient need not be a
-    number: a lossy seabed's :math:`\\mathcal{R}` depends on the grazing angle
+    number: a lossy seabed's :math:`\mathcal{R}` depends on the grazing angle
     and so differs beam by beam, while the count of planes between an image and
     the receiver is geometry and differs only rung by rung.
     :func:`_beam_influence` raises each beam's own coefficient to these
@@ -1754,7 +1753,7 @@ def _image_ladder(
     :func:`_fold_images`, whose rung ``(l, side)`` is the rotation of the
     receiver by ``2 l`` facet angles about the local apex. The counts carry
     over unchanged because the fan's plane-crossing structure is the stack's:
-    the image at angle :math:`2l\\beta \\pm \\gamma` stands behind exactly
+    the image at angle :math:`2l\beta \pm \gamma` stands behind exactly
     ``l`` bottom planes and ``l`` (or ``l - 1``) surface planes, the same
     words the level ladder counts, which is also where the sign consistency
     condition (an even number of facets in the half turn) comes from.
@@ -1776,7 +1775,7 @@ def _image_ladder(
 
 
 class _BeamSamples(NamedTuple):
-    """Each beam read at the marching column that brackets a receiver range.
+    r"""Each beam read at the marching column that brackets a receiver range.
 
     All the ``(n_beams, n_ranges)`` fields are the march's own history indexed
     at the column nearest each requested range, so the influence sum is
@@ -1786,7 +1785,7 @@ class _BeamSamples(NamedTuple):
     a sloping bottom rotates it at each bounce; over a level bottom every row
     is its launch value repeated.
 
-    :ivar weight: :math:`A(\\theta_0)` of Eq. (3.92) times the reflection
+    :ivar weight: :math:`A(\theta_0)` of Eq. (3.92) times the reflection
         coefficients the central ray has accumulated by that column.
     :ivar phase: The argument of ``spreading``, unwrapped along the ray, which
         is the branch the square root of Eq. (3.88) is taken on.
@@ -1835,16 +1834,16 @@ def _fold_images(
     side: float,
     zr: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Receiver images of one ladder rung, per (column, receiver depth).
+    r"""Receiver images of one ladder rung, per (column, receiver depth).
 
     Where the column's facet is level this is the flat ladder's image,
     ``z = 2 l D + side z_r`` at the receiver's own range, to the last bit.
     Where it slopes, the surface plane and the extended facet plane meet at a
     local apex, and the compositions of their two mirrors are the dihedral
     fan about it: the rung ``(l, side)`` image sits at polar angle
-    :math:`2 l \\beta + \\mathrm{side}\\,\\gamma` on the receiver's own circle
-    of radius :math:`\\rho` about that apex, with :math:`\\beta` the facet
-    angle and :math:`(\\rho, \\gamma)` the receiver's polar coordinates. For
+    :math:`2 l \beta + \mathrm{side}\,\gamma` on the receiver's own circle
+    of radius :math:`\rho` about that apex, with :math:`\beta` the facet
+    angle and :math:`(\rho, \gamma)` the receiver's polar coordinates. For
     a single facet that is the exact unfolding (it is how the ideal wedge's
     closed-form image fan is built), which is what lets the tail sum keep the
     flat ladder's accuracy on a slope; a polyline of several facets makes it
@@ -1884,7 +1883,7 @@ def _fold_margins(
     wrap: int,
     side: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
-    """Per-column admission floor and validity of one ladder rung.
+    r"""Per-column admission floor and validity of one ladder rung.
 
     The floor is a lower bound on the *transverse* distance from the rung's
     images to the beams, compared against the beams' reach so a rung no beam
@@ -1905,10 +1904,10 @@ def _fold_margins(
     there and back, so a rung whose images stand on wedge geometry beyond
     anything the caller described is refused by every beam at once.
 
-    Validity is the fan closing on itself: a wedge of angle :math:`\\beta`
-    has :math:`2\\pi/\\beta` distinct images in the whole circle, so a rung
-    rotated past :math:`\\pi` re-enters from the other side and would count
-    an image twice; it is dropped, and at exactly :math:`\\pi` (the seam,
+    Validity is the fan closing on itself: a wedge of angle :math:`\beta`
+    has :math:`2\pi/\beta` distinct images in the whole circle, so a rung
+    rotated past :math:`\pi` re-enters from the other side and would count
+    an image twice; it is dropped, and at exactly :math:`\pi` (the seam,
     where the two directions land on the same image) only the positive wrap
     keeps it. Level columns have no fan to close and every rung is valid.
     """

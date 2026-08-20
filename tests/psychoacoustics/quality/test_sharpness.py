@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Sharpness (DIN 45692:2009-08) conformance tests.
+"""Sharpness (DIN 45692:2009-08) conformance tests.
 
 Clause 6: the standard test signal is critical-band-wide narrowband noise
 at 1 kHz (920-1080 Hz) with 60 dB overall level -> S = 1.00 acum, and every
@@ -113,7 +112,8 @@ def test_k_in_normative_range() -> None:
 @pytest.mark.parametrize(("fc", "f_lo", "f_hi", "target"), A2_CASES)
 def test_table_a2_targets(fc: float, f_lo: float, f_hi: float, target: float) -> None:
     """Table A.2 target sharpness for critical-band-wide noises at 4 sone,
-    within the clause 6 tolerance (5 % or 0.05 acum)."""
+    within the clause 6 tolerance (5 % or 0.05 acum).
+    """
     level = _level_for_4_sone(f_lo, f_hi)
     s = sharpness_din(_narrowband(f_lo, f_hi, level), FS)
     tol = max(0.05, 0.05 * target)
@@ -123,7 +123,8 @@ def test_table_a2_targets(fc: float, f_lo: float, f_hi: float, target: float) ->
 @pytest.mark.parametrize(("f_lo", "target"), A3_CASES)
 def test_table_a3_targets(f_lo: float, target: float) -> None:
     """Table A.3 target sharpness for broadband noises (fu .. 10 kHz) at
-    4 sone, within the clause 6 tolerance (5 % or 0.05 acum)."""
+    4 sone, within the clause 6 tolerance (5 % or 0.05 acum).
+    """
     level = _level_for_4_sone(f_lo, 10000.0)
     s = sharpness_din(_narrowband(f_lo, 10000.0, level), FS)
     tol = max(0.05, 0.05 * target)
@@ -143,7 +144,8 @@ def test_annex_b_variants() -> None:
     DIN 45692 Formulas (B.1)/(B.2). The clause 6 reference sound then lands
     NEAR (not exactly at) 1 acum -- a non-circular check of the published
     formulas, unlike the normative method whose k is derived from this very
-    signal. Measured: ~0.96 acum (Aures), ~1.02 acum (von Bismarck)."""
+    signal. Measured: ~0.96 acum (Aures), ~1.02 acum (von Bismarck).
+    """
     spec = loudness_zwicker(reference_sound(), FS, stationary=True).specific
     for method in ("aures", "bismarck"):
         s = sharpness_din_from_specific(spec, method=method)
@@ -160,7 +162,8 @@ def test_annex_b_variants() -> None:
 def test_annex_b_literal_factor() -> None:
     """Formulas (B.1)/(B.2) print S = 0,11 * moment; the implementation must
     use the literal 0.11, not a self-derived per-variant constant (which
-    would shift every Aures result ~4 % against other implementations)."""
+    would shift every Aures result ~4 % against other implementations).
+    """
     from phonometry.psychoacoustics.quality.sharpness import _K_ANNEX_B
 
     assert _K_ANNEX_B == 0.11

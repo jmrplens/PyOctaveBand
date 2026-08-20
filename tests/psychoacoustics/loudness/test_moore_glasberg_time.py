@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher) time-varying loudness tests.
+"""ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher) time-varying loudness tests.
 
 The algorithmic reference for steady tones is Annex C.1 of the standard, which
 tabulates the maximum long-term loudness (sone) and loudness level (phon) of
@@ -232,7 +231,6 @@ def test_annex_c3_multi_tone(
 
 def test_steady_matches_iso532_2_stationary() -> None:
     """A long steady tone converges to the ISO 532-2 stationary loudness."""
-
     stationary = psychoacoustics.loudness_moore_glasberg_from_spectrum([(1000.0, 60.0)])
     res = psychoacoustics.loudness_moore_glasberg_time(_tone(1000.0, 60.0), FS)
     # Both models share the excitation/specific-loudness machinery (different

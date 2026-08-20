@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-The room measurements take a ``Signal`` in place of ``(ir, fs)``.
+"""The room measurements take a ``Signal`` in place of ``(ir, fs)``.
 
 Same contract as the rest of the library, held by
 ``phonometry.io._resolve``. What is particular here is that the room

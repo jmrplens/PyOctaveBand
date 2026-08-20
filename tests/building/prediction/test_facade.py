@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the EN 12354-3/-4:2000 façade prediction module
+"""Tests for the EN 12354-3/-4:2000 façade prediction module
 (:mod:`phonometry.building.prediction.facade`).
 
 The primary oracles are the two worked examples of the standard: Annex F of
@@ -195,7 +194,8 @@ def test_annex_g_rprime_cap() -> None:
 
 def test_rprime_cap_off_by_default() -> None:
     """The 40 dB cap is an Annex G example footnote, not Formula (2)/(3):
-    by default R' is the bare energy sum, uncapped."""
+    by default R' is the bare energy sum, uncapped.
+    """
     res = building.radiated_sound_power(
         [building.FacadeElement(name="wall", area=100.0, r=[60.0])],
         lp_in=90.0,

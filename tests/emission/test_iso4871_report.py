@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 4871:1996 noise-emission declaration and its ``.report()``
+"""Tests for the ISO 4871:1996 noise-emission declaration and its ``.report()``
 fiche (declaration model + PDF rendering).
 
 The declaration model is checked against ISO 4871's own definitions and Annex B
@@ -279,7 +278,8 @@ def test_single_number_report_renders_one_page(tmp_path) -> None:
 def test_dual_number_report_follows_annex_b2_layout(tmp_path) -> None:
     """The dual-number table states only L and K (Annex B.2): no derived
     L_WAd row, whose mix of separately rounded addends and a once-rounded sum
-    is not part of the dual layout."""
+    is not part of the dual layout.
+    """
     pytest.importorskip("reportlab")
     decl = _annex_b_declaration()
     out = tmp_path / "iso4871_dual_layout.pdf"
@@ -292,7 +292,8 @@ def test_dual_number_report_follows_annex_b2_layout(tmp_path) -> None:
 
 def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
     """A dual-number fiche verifies against L_WA + K_WA of the separately
-    rounded declared values (93 + 2 = 95 for 93,4/2,4), not round(95,8) = 96."""
+    rounded declared values (93 + 2 = 95 for 93,4/2,4), not round(95,8) = 96.
+    """
     pytest.importorskip("reportlab")
     mode = emission.OperatingModeDeclaration(
         "Operating mode 1", 93.4, 2.4, verification_level=95.0

@@ -234,13 +234,13 @@ def test_a_ray_reflected_past_the_vertical_ends_in_nan() -> None:
 
 
 def test_a_vertex_reflects_specularly_off_one_of_its_facets() -> None:
-    """A ray aimed exactly at a polyline vertex still reflects cleanly.
+    r"""A ray aimed exactly at a polyline vertex still reflects cleanly.
 
     A vertex has no tangent of its own and the faceted model needs none: the
     reflection uses the facet holding the located crossing, whichever side
     the bisection's last halving landed on. What is guaranteed, and asserted,
     is that the bounce is specular off one of the two adjoining facets (here
-    :math:`-\\theta_0` off the level one or :math:`-(\\theta_0 + 2\\beta)`
+    :math:`-\theta_0` off the level one or :math:`-(\theta_0 + 2\beta)`
     off the sloping one), counted once, with the march finite throughout;
     a wrong tangent, a double bounce or a corrupted crossing would all show.
     """
@@ -270,13 +270,13 @@ def test_a_vertex_reflects_specularly_off_one_of_its_facets() -> None:
 
 
 def test_a_ray_nearly_parallel_to_the_slope_survives_the_graze() -> None:
-    """A grazing contact with the slope neither spins nor corrupts the march.
+    r"""A grazing contact with the slope neither spins nor corrupts the march.
 
     The ray is launched within a tenth of a degree of the downslope facet's
     own angle, meets it near-tangentially where the Newton polish has no
     slope difference to divide by, and must come out specular all the same:
     finite, forward, exactly one bottom touch, and leaving at
-    :math:`2\\beta - \\theta_0`, a tenth of a degree on the *other* side of
+    :math:`2\beta - \theta_0`, a tenth of a degree on the *other* side of
     the facet, so it separates from the deepening bottom as slowly as it
     closed in on it.
     """
@@ -650,7 +650,8 @@ def test_eigenrays_declines_a_sloping_trace() -> None:
 
 def test_the_seabed_pair_and_a_slope_are_rejected_together() -> None:
     """One grazing angle per beam is a level-bottom fact, and the solver
-    refuses to pretend otherwise rather than quietly mis-charging bounces."""
+    refuses to pretend otherwise rather than quietly mis-charging bounces.
+    """
     seabed = FluidSeabed(density=1800.0, sound_speed=1700.0)
     with pytest.raises(ValueError, match="lossy fluid seabed"):
         gaussian_beams(

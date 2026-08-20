@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Room-noise rating curves per ANSI/ASA S12.2-2019.
+"""Room-noise rating curves per ANSI/ASA S12.2-2019.
 
 Implements the two spectrum-in rating methods of ANSI/ASA S12.2-2019, *Criteria
 for Evaluating Room Noise*:

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Weighting filters (A, B, C, D, G, AU, Z), time weighting utilities and
+r"""Weighting filters (A, B, C, D, G, AU, Z), time weighting utilities and
 the Linkwitz-Riley crossover.
 
 A/C/Z per IEC 61672-1:2013; G (infrasound) per ISO 7196:1995.
@@ -77,8 +76,7 @@ except ImportError:  # pragma: no cover - depends on install extras
 
 
 class WeightingFilter:
-    """
-    Class-based frequency weighting filter (A, B, C, D, G, AU, Z).
+    """Class-based frequency weighting filter (A, B, C, D, G, AU, Z).
     Allows pre-calculating and reusing filter coefficients.
     """
 
@@ -90,8 +88,7 @@ class WeightingFilter:
         steady_ic: bool = False,
         high_accuracy: bool | None = None,
     ) -> None:
-        """
-        Initialize the weighting filter.
+        """Initialize the weighting filter.
 
         :param fs: Sample rate in Hz.
         :param curve: 'A', 'C' (IEC 61672-1), 'B' (ANSI S1.4-1983,
@@ -339,8 +336,7 @@ class WeightingFilter:
         return _sos_state_mismatch(self.zi, x_proc)
 
     def filter(self, x: Signal | list[float] | np.ndarray) -> Signal | np.ndarray:
-        """
-        Apply the weighting filter to a signal.
+        """Apply the weighting filter to a signal.
 
         :param x: Input signal (1D or 2D [channels, samples]), or a
             :class:`phonometry.io.Signal`. A Signal recorded at another rate
@@ -397,7 +393,7 @@ def _resample_poly_fir(rate: int) -> np.ndarray:
 def _runtime_frequency_response(
     wf: WeightingFilter, frequencies: np.ndarray
 ) -> np.ndarray:
-    """Complex steady-state response of the *whole* filter path.
+    r"""Complex steady-state response of the *whole* filter path.
 
     A non-stateful ``WeightingFilter`` with ``high_accuracy`` does not apply
     its second-order sections to the input directly: it interpolates by
@@ -410,8 +406,8 @@ def _runtime_frequency_response(
 
     .. math::
 
-       G(f) = \\sum_{k=0}^{L-1} H_\\mathrm{FIR}^2(f - k f_s)\\,
-              H_\\mathrm{SOS}(f - k f_s),
+       G(f) = \sum_{k=0}^{L-1} H_\mathrm{FIR}^2(f - k f_s)\,
+              H_\mathrm{SOS}(f - k f_s),
 
     evaluated at the ``L * fs`` design rate (the transfer functions are
     periodic there, so images beyond the design Nyquist frequency need no
@@ -519,9 +515,11 @@ class TimeWeightedEnvelope:
         return np.asarray(self.mean_square, dtype=dtype)
 
     def __len__(self) -> int:
+        """Length of the leading axis: channels when 2-D, samples for one channel."""
         return int(self.mean_square.shape[0])
 
     def __getitem__(self, key: Any) -> Any:
+        """Index the mean square; the result is bare values, not another envelope."""
         return self.mean_square[key]
 
     @property
@@ -592,8 +590,7 @@ def weighting_filter(
     curve: str = "A",
     high_accuracy: bool = True,
 ) -> Signal | np.ndarray:
-    """
-    Apply a frequency weighting to a signal.
+    """Apply a frequency weighting to a signal.
 
     :param x: Input signal, or a :class:`phonometry.io.Signal` read from a
         measurement file. A calibrated Signal is weighted in pascals, so the
@@ -705,8 +702,7 @@ def time_weighting(
     mode: str = "fast",
     initial_state: str | float | np.ndarray | None = None,
 ) -> TimeWeightedEnvelope | np.ndarray:
-    """
-    Apply time weighting to a signal (Exponential averaging).
+    """Apply time weighting to a signal (Exponential averaging).
 
     :param x: Input signal (raw pressure/voltage), or a
         :class:`phonometry.io.Signal` read from a measurement file. The
@@ -767,16 +763,14 @@ def time_weighting(
 
 
 class TimeWeighting:
-    """
-    Stateful time weighting for block processing.
+    """Stateful time weighting for block processing.
 
     Wraps :func:`time_weighting` carrying the exponential integrator state
     across blocks, so concatenated block outputs equal a single continuous call.
     """
 
     def __init__(self, fs: int, mode: str = "fast") -> None:
-        """
-        :param fs: Sample rate in Hz.
+        """:param fs: Sample rate in Hz.
         :param mode: 'fast' (125 ms), 'slow' (1000 ms) or 'impulse' (35 ms / 1.5 s).
         """
         if fs <= 0:
@@ -843,8 +837,7 @@ def linkwitz_riley(
     freq: float,
     order: int = 4,
 ) -> tuple[Signal, Signal] | tuple[np.ndarray, np.ndarray]:
-    """
-    Linkwitz-Riley crossover filter (Butterworth squared).
+    """Linkwitz-Riley crossover filter (Butterworth squared).
     Splits signal into low and high bands with flat sum response.
 
     :param x: Input signal, or a :class:`phonometry.io.Signal` read from a

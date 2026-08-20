@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Precision-grade sound power: ISO 3745:2012 (anechoic / hemi-anechoic) and
+"""Precision-grade sound power: ISO 3745:2012 (anechoic / hemi-anechoic) and
 ISO 9614-3:2002 (sound-intensity scanning, precision).
 
 Physics / standard anchors:
@@ -284,7 +283,8 @@ def test_area_weighted_equals_equal_area_for_equal_areas() -> None:
 
 def test_anechoic_a_weighted_uncertainty_is_half_db_base() -> None:
     """The A-weighted sigma_R0 is 0,5 dB in both rooms; U = 2*0,5 = 1,0 dB
-    with no operating uncertainty (Eq. 24/25)."""
+    with no operating uncertainty (Eq. 24/25).
+    """
     res = sound_power_anechoic(np.full((40, 1), 70.0), "sphere", radius=1.0)
     assert res.uncertainty == pytest.approx(1.0, abs=1e-9)
 
@@ -342,7 +342,8 @@ def test_anechoic_bands_above_10khz_survive_without_lwa() -> None:
     """ISO 3745 covers one-third octaves up to 20 kHz (sigma_R0 Tables 2/3),
     but the ISO 3744 Annex E A-weighting table stops at 10 kHz: a 12,5 kHz
     band must not abort the determination -- the per-band LW and uncertainty
-    stay defined and only the A-weighted total is NaN."""
+    stay defined and only the A-weighted total is NaN.
+    """
     freqs = np.array([10000.0, 12500.0])
     res = sound_power_anechoic(
         np.full((40, freqs.size), 70.0), "sphere", radius=1.0, frequencies=freqs
@@ -525,7 +526,8 @@ def test_criterion_4_fails_on_highly_nonuniform_field() -> None:
 
 def test_criterion_2_dynamic_capability() -> None:
     """delta_pI0 = 14 dB, K = 10 -> Ld = 4; criterion 2 passes iff
-    F_pIn(signed) <= 4 dB."""
+    F_pIn(signed) <= 4 dB.
+    """
     # Build a field with a small, controllable F_pIn(signed).
     i_n = np.full((4, 1), 2.0e-6)
     # Choose Lp so that F_pIn(signed) = Lp_bar - 10*lg(In/I0) is ~2 dB (< 4).
@@ -606,7 +608,8 @@ def test_qualified_combines_criteria_1_to_4() -> None:
 
 def test_criterion_5_qualifies_band_despite_failed_criterion_4() -> None:
     """C.1.6.2: if criterion 5 holds, the band is qualified as a final result
-    even if FS(2) >= 2 (criterion 4 fails)."""
+    even if FS(2) >= 2 (criterion 4 fails).
+    """
     # A strongly non-uniform positive field: FS > 2 (criterion 4 fails).
     i_n = np.array([[1.0e-8], [1.0e-8], [1.0e-8], [1.0e-8], [1.0e-8], [1.0e-4]])
     li = 10.0 * np.log10(np.mean(i_n) / _P0)

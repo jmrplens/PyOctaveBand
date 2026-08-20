@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Bending-wave transmission coefficients for rigid plate junctions
+r"""Bending-wave transmission coefficients for rigid plate junctions
 (Hopkins 2007, *Sound Insulation*, Section 5.2.1.3; Cremer et al. 1973;
 Craik 1981, 1996).
 

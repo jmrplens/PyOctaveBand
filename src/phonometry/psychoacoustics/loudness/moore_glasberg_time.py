@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher).
+r"""Time-varying loudness per ISO 532-3:2023 (Moore-Glasberg-Schlittenlacher).
 
 Clean-room implementation of the time-varying loudness model of ISO 532-3:2023,
 the extension of the stationary Moore-Glasberg method of ISO 532-2:2017 to

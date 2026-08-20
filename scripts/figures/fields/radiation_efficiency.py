@@ -77,7 +77,8 @@ _RE_VLIM = 1.6
 
 def _re_geometry() -> tuple[float, float, float, float]:
     """View extent ``(x0, x1, h0, h1)`` [m], x from the left of the view and
-    h measured from the plate's upper face, positive upwards."""
+    h measured from the plate's upper face, positive upwards.
+    """
     dx = _EL_DX
     x1 = (_RE_VIEW_COLS[1] - _RE_VIEW_COLS[0]) * dx
     h1 = (_RE_R0 - _RE_VIEW_ROWS[0]) * dx

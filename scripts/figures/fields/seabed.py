@@ -70,7 +70,8 @@ _SB_T0 = 3.0 * _SB_TAU
 
 def _sb_geometry() -> tuple[int, int, int, int, int]:
     """Visible columns and rows, the seabed row inside the visible block,
-    and the source cell in absolute grid indices."""
+    and the source cell in absolute grid indices.
+    """
     n_vis = round(_SB_RANGE / _SB_DX)
     rows_water = round(_SB_WATER / _SB_DX)
     n_rows = rows_water + round(_SB_SED / _SB_DX)
@@ -96,14 +97,14 @@ def _sb_front_angle(times: Any) -> Any:
 
 @lru_cache(maxsize=1)
 def _seabed_fields() -> tuple[Any, ...]:
-    """Two runs of one water-over-sediment scene, sand and mud, cached.
+    r"""Two runs of one water-over-sediment scene, sand and mud, cached.
 
     Identical but for ``c2`` and ``rho2``. Sponges on all four sides, so
     the only interface in the model is the seabed and nothing returns from
     the edges. The source is a one-cycle 100 Hz Gaussian-modulated burst.
 
     The measurement is the **net energy flux through the seabed**,
-    ``\\int p v_z dt`` accumulated per column on the interface face: it is
+    ``\int p v_z dt`` accumulated per column on the interface face: it is
     exactly what enters the bottom, it needs no ray tracing, and an
     evanescent skin contributes nothing to it, which is what makes the sand
     run go to zero past the critical ray instead of merely dim.
@@ -244,7 +245,8 @@ def animate_fdtd_critical_angle(output_dir: str) -> None:
     which has no critical angle, sound enters the bottom at every angle
     right out to the edge of the frame. A lower axis fills in the measured
     energy flux through the seabed behind the contact point and lands on
-    the closed form."""
+    the closed form.
+    """
     from matplotlib.patches import Rectangle
 
     from phonometry import underwater

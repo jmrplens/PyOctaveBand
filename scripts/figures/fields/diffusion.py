@@ -167,7 +167,8 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     collimated specular beam back, the diffuser's phase-step wells spray
     the same energy into a wide fan; the scattered field (total minus
     incident) and the arc diffusion coefficients make the contrast
-    quantitative."""
+    quantitative.
+    """
     from matplotlib import patheffects
     from matplotlib.patches import Polygon
 

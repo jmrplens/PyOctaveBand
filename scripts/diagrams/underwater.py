@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 def _d_hydrophone_deployment(s: SVG, th: Theme) -> None:
     """ISO 17208-1 deep-water geometry: ship transiting past a buoy-suspended
     vertical array of three hydrophones at 15/30/45 degree depression angles,
-    lateral CPA distance of at least 100 m, plus the plan-view data window."""
+    lateral CPA distance of at least 100 m, plus the plan-view data window.
+    """
     import math
 
     surf = 150.0
@@ -165,7 +166,8 @@ def _d_hydrophone_deployment(s: SVG, th: Theme) -> None:
 def _d_sofar_channel(s: SVG, th: Theme) -> None:
     """The deep sound channel: measured North Atlantic values (sound speed
     1524 m/s at the surface, minimum near 1492 m/s at the 1200 m axis,
-    1527 m/s at 4800 m) and rays oscillating about the channel axis."""
+    1527 m/s at 4800 m) and rays oscillating about the channel axis.
+    """
     import math
 
     surf, bot = 100.0, 520.0
@@ -267,7 +269,8 @@ def _d_sofar_channel(s: SVG, th: Theme) -> None:
 def _d_pile_driving_deployment(s: SVG, th: Theme) -> None:
     """ISO 18406 piling survey: the monopile and hammer, the 750 m measurement
     position, the allowed hydrophone depth band in the lower half of a 30 m
-    water column, and the additional positions at three times the water depth."""
+    water column, and the additional positions at three times the water depth.
+    """
     import math
 
     surf, bed = 170.0, 440.0  # 30 m of water over 270 px
@@ -475,7 +478,8 @@ def _d_pile_driving_deployment(s: SVG, th: Theme) -> None:
 def _d_sonar_equation(s: SVG, th: Theme) -> None:
     """The two sonar geometries the equations encode: a passive one-way path
     against ambient noise, and an active monostatic two-way path against a
-    target strength and reverberation, with the reference conventions."""
+    target strength and reverberation, with the reference conventions.
+    """
 
     def _noise_field(x1: float, x2: float, y1: float, y2: float) -> None:
         """Isotropic ambient field, drawn as a sparse stipple."""
@@ -637,7 +641,8 @@ def _d_sonar_equation(s: SVG, th: Theme) -> None:
 def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
     """Range-depth section with the coordinate frame, the two boundary
     conditions, the c(z) profile, the source and receiver depths, one turning
-    ray, and what each of the four solvers computes in that same frame."""
+    ray, and what each of the four solvers computes in that same frame.
+    """
     import math
 
     surf, bot = 120.0, 400.0
@@ -768,7 +773,8 @@ def _d_underwater_waveguide(s: SVG, th: Theme) -> None:
 def _d_marine_mammal_exposure(s: SVG, th: Theme) -> None:
     """Where the spectrum is measured against where the criterion applies: the
     hydrophone at the ISO 18406 range, the animal further out, the three steps
-    between them, and the two isopleths of the dual metric."""
+    between them, and the two isopleths of the dual metric.
+    """
     surf, bed = 150.0, 366.0
     px_, hx_, ax_ = 92.0, 250.0, 430.0
 

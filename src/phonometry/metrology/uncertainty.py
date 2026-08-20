@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Measurement uncertainty by the GUM and its Monte Carlo supplement.
+r"""Measurement uncertainty by the GUM and its Monte Carlo supplement.
 
 Implements the two propagation methods of the *Guide to the Expression of
 Uncertainty in Measurement*:
@@ -76,6 +75,7 @@ class Quantity:
     name: str = ""
 
     def __post_init__(self) -> None:
+        """Reject a negative uncertainty, an unrecognised PDF or non-positive dof."""
         if self.uncertainty < 0.0:
             raise ValueError("uncertainty must be non-negative.")
         if self.distribution not in DISTRIBUTIONS:

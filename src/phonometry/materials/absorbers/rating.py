@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Single-number rating of sound absorption (ISO 11654:1997).
+r"""Single-number rating of sound absorption (ISO 11654:1997).
 
 From one-third-octave sound absorption coefficients ``alpha_s`` measured in
 a reverberation room (ISO 354) this module forms the practical sound
@@ -143,7 +142,8 @@ def _round_half_up(value: float) -> int:
 
 def _practical_round(mean: float) -> float:
     r"""Round an octave mean per Clause 4.1: to the second decimal, then in
-    steps of 0.05, capped at 1.00 (the NOTE gives :math:`0.92 \to 0.90`)."""
+    steps of 0.05, capped at 1.00 (the NOTE gives :math:`0.92 \to 0.90`).
+    """
     hundredths = _round_half_up(mean * 100.0)  # second decimal
     fives = _round_half_up(hundredths / 5.0) * 5  # nearest 0,05
     fives = max(0, min(100, fives))  # maximise to 1,00 (Clause 4.1)
@@ -152,7 +152,8 @@ def _practical_round(mean: float) -> float:
 
 def _to_units(alpha: float) -> int:
     """Snap an absorption coefficient to the 0,05 grid as an integer
-    twentieth in ``[0, 20]`` (``1.00`` -> 20), for float-safe comparison."""
+    twentieth in ``[0, 20]`` (``1.00`` -> 20), for float-safe comparison.
+    """
     return max(0, min(20, _round_half_up(alpha * 20.0)))
 
 
@@ -243,7 +244,8 @@ class AbsorptionRatingResult:
     @property
     def rating_label(self) -> str:
         """The rating as reported in Clause 5.3, e.g. ``"0.60(M)"`` or
-        ``"0.60"`` when no shape indicator applies."""
+        ``"0.60"`` when no shape indicator applies.
+        """
         if self.shape_indicator:
             return f"{self.alpha_w:.2f}({self.shape_indicator})"
         return f"{self.alpha_w:.2f}"
@@ -347,7 +349,8 @@ def practical_absorption_coefficient(
 def _shape_indicator(measured_units: list[int], reference_units: list[int]) -> str:
     """Shape indicators of Clause 4.3: a band exceeding the shifted
     reference by 0,25 or more contributes L (250 Hz), M (500/1000 Hz) or
-    H (2000/4000 Hz)."""
+    H (2000/4000 Hz).
+    """
     excess = [
         m - r >= _SHAPE_THRESHOLD_UNITS for m, r in zip(measured_units, reference_units)
     ]

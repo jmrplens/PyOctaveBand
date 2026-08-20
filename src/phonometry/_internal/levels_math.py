@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Shared decibel-energy arithmetic helpers (private).
+"""Shared decibel-energy arithmetic helpers (private).
 
 Seeded by the library audit: many modules restated the same
 ``10 lg(sum/mean 10^(L/10))`` energy combinations inline. New code

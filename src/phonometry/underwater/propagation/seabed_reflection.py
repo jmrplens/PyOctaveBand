@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Plane-wave reflection at the seabed (fluid-fluid Rayleigh model).
+r"""Plane-wave reflection at the seabed (fluid-fluid Rayleigh model).
 
 A plane wave in the water column (density :math:`\rho_1`, sound speed
 ``c1``) striking a fluid sediment half-space (:math:`\rho_2`, ``c2``)

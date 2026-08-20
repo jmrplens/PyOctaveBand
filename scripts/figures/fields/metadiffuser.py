@@ -357,7 +357,8 @@ def animate_fdtd_metadiffuser(output_dir: str) -> None:
     """The 27 cm deep Schroeder QRD vs the 2 cm metadiffuser that mimics
     it, next to a flat control slab (2D FDTD at 0.25 mm, real slits, necks
     and cavities meshed): the same 2 kHz wavefront leaves the same kind of
-    scattered fan, from a panel 13.7 times thinner."""
+    scattered fan, from a panel 13.7 times thinner.
+    """
     from matplotlib import patheffects
     from matplotlib.patches import Polygon, Rectangle
 

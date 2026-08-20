@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Integrated and statistical sound levels (Leq, LAeq, LN percentiles).
+"""Integrated and statistical sound levels (Leq, LAeq, LN percentiles).
 
 Every function here accepts a :class:`phonometry.io.Signal` in place of
 the bare ``(x, fs)`` pair: the object read from a measurement file
@@ -68,8 +67,7 @@ def leq(
     calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray:
-    """
-    Equivalent continuous sound level (Leq) over the whole signal.
+    """Equivalent continuous sound level (Leq) over the whole signal.
 
     :param x: Input signal (1D or 2D [channels, samples]) in raw pressure
         units, or a :class:`phonometry.io.Signal` read from a measurement
@@ -97,8 +95,7 @@ def laeq(
     calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray:
-    """
-    A-weighted equivalent continuous sound level (LAeq).
+    """A-weighted equivalent continuous sound level (LAeq).
 
     :param x: Input signal (1D or 2D [channels, samples]) in raw pressure
         units, or a :class:`phonometry.io.Signal` read from a measurement
@@ -127,8 +124,7 @@ def ln_levels(
     calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> dict[int, float | np.ndarray]:
-    """
-    Statistical percentile levels (LN) from the time-weighted level envelope.
+    """Statistical percentile levels (LN) from the time-weighted level envelope.
 
     L10 is the level exceeded 10% of the time (90th percentile of the level
     distribution), L90 the level exceeded 90% of the time, etc.
@@ -187,8 +183,7 @@ def lc_peak(
     dbfs: bool = False,
     oversample: int = 8,
 ) -> float | np.ndarray:
-    """
-    C-weighted peak sound level, LCpeak (IEC 61672-1:2013, subclause 5.13).
+    """C-weighted peak sound level, LCpeak (IEC 61672-1:2013, subclause 5.13).
 
     The absolute maximum of the C-weighted signal, expressed in dB. This is
     the quantity used by occupational-noise regulations (e.g. 135/137/140
@@ -237,8 +232,7 @@ def sel(
     calibration_factor: float | None = None,
     dbfs: bool = False,
 ) -> float | np.ndarray:
-    r"""
-    Sound exposure level (SEL / LAE): the event level normalized to 1 second.
+    r"""Sound exposure level (SEL / LAE): the event level normalized to 1 second.
 
     :math:`\text{SEL} = L_{\mathrm{eq},T} + 10 \log_{10}(T / 1\,\text{s})`, the
     standard single-event metric
@@ -281,8 +275,7 @@ def sound_exposure(
     duration_hours: float | None = None,
     calibration_factor: float | None = None,
 ) -> float | np.ndarray:
-    """
-    A-weighted sound exposure E in pascal-squared hours (IEC 61252, 3.1).
+    """A-weighted sound exposure E in pascal-squared hours (IEC 61252, 3.1).
 
     The time integral of the squared A-weighted sound pressure. By default
     the input is the whole event (E integrates over ``len(x)/fs``); pass
@@ -323,8 +316,7 @@ def lex_8h(
     duration_hours: float | None = None,
     calibration_factor: float | None = None,
 ) -> float | np.ndarray:
-    """
-    Normalized 8-h average sound level, LEX,8h (IEC 61252, 3.3).
+    """Normalized 8-h average sound level, LEX,8h (IEC 61252, 3.3).
 
     The daily personal noise exposure level: the steady level that, sustained
     over a nominal 8 h working day, carries the same A-weighted sound

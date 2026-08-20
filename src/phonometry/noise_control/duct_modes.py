@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Higher-order acoustic modes in ducts, with the mean-flow cut-on shift.
+r"""Higher-order acoustic modes in ducts, with the mean-flow cut-on shift.
 
 Every plane-wave duct method has the same expiry date: the frequency at which
 the first higher-order mode cuts on. Below it a duct carries only plane waves,

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-The sonar equation (passive and active), in decibels.
+r"""The sonar equation (passive and active), in decibels.
 
 Combines the sonar performance terms -- source level ``SL``, propagation loss
 ``PL``, noise level ``NL``, directivity index ``DI``, detection threshold ``DT``,

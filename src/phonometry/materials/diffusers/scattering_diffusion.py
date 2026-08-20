@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Directional and random-incidence diffusion coefficients in a free field.
+r"""Directional and random-incidence diffusion coefficients in a free field.
 
 **ISO 17497-2:2012.** From the set of reflected sound-pressure levels ``L_i``
 on a semicircle or hemisphere the autocorrelation diffusion coefficient

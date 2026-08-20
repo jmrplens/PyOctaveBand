@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the tonal audibility assessment report (``.report()`` -> PDF).
+"""Tests for the tonal audibility assessment report (``.report()`` -> PDF).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for a detected-tone result, unknown engines
@@ -180,7 +179,6 @@ def test_absent_tone_reports_zero_adjustment(tmp_path) -> None:
     A synthetic near-threshold tone keeps K low; the prominence note and boxed
     K stay consistent with the decisive audibility.
     """
-
     # One tone barely above the masking threshold: LT chosen so ΔL_ta is small.
     result = psychoacoustics.assess_tones([500.0], [40.0], [30.0], 2.0)
     out = tmp_path / "weak.pdf"

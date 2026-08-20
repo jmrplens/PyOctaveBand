@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the HVAC duct-noise-spectrum ``.report()`` fiche.
+"""Tests for the HVAC duct-noise-spectrum ``.report()`` fiche.
 
 The rendered values are checked against a clean-room oracle independent of the
 library's own path. For a regenerated-noise spectrum the band sound power level

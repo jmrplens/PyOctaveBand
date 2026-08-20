@@ -52,7 +52,6 @@ _ISO1996_3 = "Impulsive-sound prominence (ISO/PAS 1996-3)"
 
 def _iso1996_3_ramp_onset() -> Any:
     """Detected onset of a 30 dB LpAF ramp over 0.30 s (dt = 20 ms)."""
-
     from phonometry.environment.assessment.impulsive_sound import detect_onsets
 
     dt = 0.02

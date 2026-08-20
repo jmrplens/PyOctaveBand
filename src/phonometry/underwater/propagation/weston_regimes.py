@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Weston's shallow-water propagation regimes (flux theory).
+r"""Weston's shallow-water propagation regimes (flux theory).
 
 A source in a shallow-water waveguide loses energy in four successive range
 regimes, each with its own power law. The boundaries between them follow from

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Plane-wave machinery of the 2-D FDTD solver.
+"""Plane-wave machinery of the 2-D FDTD solver.
 
 Anchors on exact plane-wave physics: the one-way initial packet must stay
 plane, travel at the phase speed toward its direction and leave (almost) no

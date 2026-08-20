@@ -165,7 +165,8 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     identical perpendicular plate it splits into a reflected and a
     transmitted bending wave plus a fast in-plane precursor, and the
     verdict pill quotes the closed-form junction_transmission coefficient
-    the guide computes for this corner."""
+    the guide computes for this corner.
+    """
     from matplotlib.patches import Rectangle
 
     from phonometry import vibration
@@ -565,7 +566,8 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     quote the oblique mass law (Bies Eq. 7.41) each panel is judged
     against. Both panels draw the air below the plate with the same
     annotated display gain, so the transmitted field is legible next to an
-    incident wave some 45 dB louder."""
+    incident wave some 45 dB louder.
+    """
     from matplotlib import patheffects
     from matplotlib.patches import Rectangle
 

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 3382-1/-2 room acoustic parameters report (``.report()``).
+"""Tests for the ISO 3382-1/-2 room acoustic parameters report (``.report()``).
 
 The report is a rendering feature, so these tests assert only structural
 facts: a valid single-page PDF is written for a room-acoustics result, the

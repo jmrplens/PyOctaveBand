@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Random-data qualification: stationarity tests and Rice crossing statistics.
+r"""Random-data qualification: stationarity tests and Rice crossing statistics.
 
 Before a record is averaged into a PSD, condensed into a Leq or fed to a GUM
 budget, Bendat & Piersol (*Random Data*, 4th ed., Sec. 10.3) require it to be
@@ -450,8 +449,7 @@ def trend_test(
     method: str = "reverse_arrangements",
     alpha: float = 0.05,
 ) -> TrendTestResult:
-    r"""
-    Nonparametric trend test on a sequence of observations or estimates.
+    r"""Nonparametric trend test on a sequence of observations or estimates.
 
     Tests the hypothesis that the sequence holds independent observations
     of one random variable -- no underlying trend -- without assuming any
@@ -566,8 +564,7 @@ def stationarity_test(
     method: str = "reverse_arrangements",
     alpha: float = 0.05,
 ) -> StationarityTestResult:
-    r"""
-    Test a record for stationarity via trends in segment statistics.
+    r"""Test a record for stationarity via trends in segment statistics.
 
     The B&P Sec. 10.3.1.1 procedure: (1) divide the record into
     ``n_segments`` equal intervals, assumed long enough for the values to
@@ -734,8 +731,7 @@ def level_crossing_rate(
     levels: NDArray[np.float64] | list[float] | None = None,
     nperseg: int | None = None,
 ) -> LevelCrossingResult:
-    r"""
-    Level-crossing rates of a record and their Rice expectations.
+    r"""Level-crossing rates of a record and their Rice expectations.
 
     Counts the crossings of each level ``a`` (both slopes, B&P Sec. 5.5.1)
     and compares them with the closed forms for Gaussian data: the
@@ -936,8 +932,7 @@ def peak_statistics(
     *,
     nperseg: int | None = None,
 ) -> PeakStatisticsResult:
-    r"""
-    Peak rate, irregularity factor and peak-height distribution of a record.
+    r"""Peak rate, irregularity factor and peak-height distribution of a record.
 
     Detects the record's local maxima and compares their rate and height
     distribution with the Rice closed forms for Gaussian data (B&P

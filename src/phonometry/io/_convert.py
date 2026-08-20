@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Converting a measurement file without losing what makes it a measurement.
+r"""Converting a measurement file without losing what makes it a measurement.
 
 Generic converters treat audio as audio: they resample when convenient,
 normalise when helpful, and drop every chunk they do not recognise --

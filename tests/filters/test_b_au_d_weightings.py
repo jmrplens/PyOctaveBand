@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Clean-room oracles for the B, AU and D frequency weightings.
+"""Clean-room oracles for the B, AU and D frequency weightings.
 
 B is pinned to ANSI S1.4-1983: the Table IV design goals (B column), the
 Table V tolerance masks and the Appendix C analytic form. AU is pinned to
@@ -176,7 +175,8 @@ def test_au_table2_poles_reproduce_table1_nominals() -> None:
 
 def test_au_pins_nominal_values() -> None:
     """Pin the realized AU response at 31.5 Hz, 1 kHz, 8 kHz and the
-    subclause 2.2 explicit values at 25/31.5/40 kHz (nominal A + U)."""
+    subclause 2.2 explicit values at 25/31.5/40 kHz (nominal A + U).
+    """
     wf = filters.WeightingFilter(96000, "AU")
     freqs = [_exact(f) for f in (31.5, 1000.0, 8000.0, 25000.0, 31500.0, 40000.0)]
     resp = _response_db(wf, freqs)

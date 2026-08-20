@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-The last packages on the ``Signal`` contract, and the four exemptions.
+"""The last packages on the ``Signal`` contract, and the four exemptions.
 
 Everything in ``phonometry`` that consumes a recording now takes the object
 the reader returns in place of the ``(x, fs)`` pair. This file covers the

@@ -840,7 +840,8 @@ def _d_tone_audibility_acquisition(s: SVG, th: Theme) -> None:
 
 def _d_dosimeter(s: SVG, th: Theme) -> None:
     """ISO 9612 occupational exposure: worn-dosimeter microphone position
-    (Clause 12.3) and the three measurement strategies (Clauses 9-11)."""
+    (Clause 12.3) and the three measurement strategies (Clauses 9-11).
+    """
     # --- Left: worker with a shoulder-mounted personal exposimeter ---------
     s.text(195, 84, "Worn instrument (Clause 12.3)", 18, th.fg, bold=True)
     gy = 560.0
@@ -960,7 +961,8 @@ def _d_sound_quality(s: SVG, th: Theme) -> None:
     """One calibrated signal into the two auditory front ends and the four
     sound-quality metrics of the guide, each with its reference sound and
     the value the library returns for it (1.00 acum, 1.000 tu_HMS,
-    0.9999 asper, 0.9957 vacil_HMS)."""
+    0.9999 asper, 0.9957 vacil_HMS).
+    """
     # Input signal
     s.rect(230, 52, 440, 56, th.panel, th.fg, rx=10, sw=2)
     s.text(450, 76, "Calibrated signal $x(t)$ in pascals", 14, th.fg, bold=True)
@@ -1074,7 +1076,8 @@ def _d_sound_quality(s: SVG, th: Theme) -> None:
 def _d_tone_audibility(s: SVG, th: Theme) -> None:
     """The engineering-method chain on the Annex E combustion-engine
     spectrum: critical band, LS/LT, masking threshold and the 5.01 dB
-    decisive audibility, closing on the Kt = 4 dB tonal adjustment."""
+    decisive audibility, closing on the Kt = 4 dB tonal adjustment.
+    """
     cx, bw = 450.0, 620.0
     x0 = cx - bw / 2
 
@@ -1148,7 +1151,8 @@ def _d_tone_audibility(s: SVG, th: Theme) -> None:
 def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
     """The four sensations of the guide's worked example (N5 = 30 sone,
     S = 2.0 acum, F = 0.5 vacil, R = 0.3 asper) through the two weightings
-    (wS = 0.1001, wFR = 0.2125) into PA = 37.05."""
+    (wS = 0.1001, wFR = 0.2125) into PA = 37.05.
+    """
     inputs = (
         (
             42.0,
@@ -1224,7 +1228,8 @@ def _d_psychoacoustic_annoyance(s: SVG, th: Theme) -> None:
 def _d_objective_intelligibility(s: SVG, th: Theme) -> None:
     """The shared STOI/ESTOI front end, the split into the two intermediate
     correlations, and the guide's measured example: STOI = 0.727 for
-    speech-like material in a flat masker at 0 dB SNR."""
+    speech-like material in a flat masker at 0 dB SNR.
+    """
     cx, bw = 450.0, 600.0
     x0 = cx - bw / 2
 

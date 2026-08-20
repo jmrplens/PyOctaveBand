@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Fluctuation strength after Fastl & Zwicker / Osses et al.
+r"""Fluctuation strength after Fastl & Zwicker / Osses et al.
 
 Fluctuation strength ``F`` (unit: vacil) rates the slow loudness fluctuations of
 a sound. It has a band-pass dependence on modulation frequency peaking near
@@ -183,7 +182,8 @@ def _terhardt_a0_db(f: NDArray[np.float64]) -> NDArray[np.float64]:
 
 def _g_weight(z: NDArray[np.float64]) -> NDArray[np.float64]:
     """Frequency weighting g(z) (Osses 2016 §3.1): 1 up to 15 Bark, then a
-    linear taper down to 0.5 at 23.5 Bark."""
+    linear taper down to 0.5 at 23.5 Bark.
+    """
     g = np.ones_like(z)
     high = z > 15.0
     g[high] = 1.0 - 0.5 * (z[high] - 15.0) / (23.5 - 15.0)
@@ -356,7 +356,8 @@ def _modulation_depth(
 def _neighbour_covariance(h_bp: NDArray[np.float64]) -> NDArray[np.float64]:
     r"""Cross covariance :math:`\lvert k_{i-2} \cdot k_{i+2} \rvert` with the
     bands two indices away (Osses 2016 Eq. 9), with :math:`k = 1` at the
-    filter-bank edges."""
+    filter-bank edges.
+    """
     k = np.ones(_N_FILTERS)
     for i in range(_N_FILTERS):
         lo = i - 2

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Occupational noise exposure: measurement strategies and uncertainty (ISO 9612:2009).
+r"""Occupational noise exposure: measurement strategies and uncertainty (ISO 9612:2009).
 
 ISO 9612:2009 is the engineering method (accuracy grade 2) for determining a
 worker's daily noise exposure level ``LEX,8h`` from measurements of the
@@ -156,8 +155,7 @@ _C4_ADVISORY_THRESHOLD: float = 3.5
 
 
 def table_c4_contribution(n_samples: int, u1: float) -> float:
-    r"""
-    Uncertainty contribution :math:`c_1 u_1` (dB) from Table C.4
+    r"""Uncertainty contribution :math:`c_1 u_1` (dB) from Table C.4
     (job/full-day sampling).
 
     Bilinear interpolation on the sample count ``N`` and the sampling standard
@@ -193,8 +191,7 @@ def table_c4_contribution(n_samples: int, u1: float) -> float:
 
 
 def minimum_cumulative_duration_hours(n_workers: int) -> float:
-    """
-    Minimum cumulative measurement duration (h) for a homogeneous exposure group (Table 1).
+    """Minimum cumulative measurement duration (h) for a homogeneous exposure group (Table 1).
 
     :param n_workers: Number of workers ``n_G`` in the homogeneous exposure group.
     :return: The minimum cumulative measurement duration in hours. For
@@ -244,8 +241,7 @@ def _task_sampling_uncertainty(levels: Sequence[float]) -> float:
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class Task:
-    """
-    One task of a task-based measurement (ISO 9612:2009 Clause 9).
+    """One task of a task-based measurement (ISO 9612:2009 Clause 9).
 
     :param samples: Measured ``Lp,A,eqT,mi`` levels for the task, dB. At least
         three are recommended (Clause 9.3); a single conservative value is
@@ -269,6 +265,7 @@ class Task:
     instrument: InstrumentClass | None = None
 
     def __post_init__(self) -> None:
+        """Reject an empty ``samples`` tuple and a non-positive ``duration_hours``."""
         if len(self.samples) == 0:
             raise ValueError("A Task needs at least one Lp,A,eqT sample.")
         if self.duration_hours <= 0.0:
@@ -296,7 +293,8 @@ class TaskContribution:
     @property
     def variance_contribution(self) -> float:
         r"""This task's contribution to :math:`u^2(L_\mathrm{EX,8h})` (a term of
-        Eq C.3), dB²."""
+        Eq C.3), dB².
+        """
         return (
             self.c1a**2 * (self.u1a**2 + self.u2**2 + self.u3**2)
             + (self.c1b * self.u1b) ** 2
@@ -305,8 +303,7 @@ class TaskContribution:
 
 @dataclass(frozen=True)
 class ExposureResult:
-    r"""
-    Daily noise exposure level and its expanded uncertainty (ISO 9612:2009).
+    r"""Daily noise exposure level and its expanded uncertainty (ISO 9612:2009).
 
     :ivar lex_8h: A-weighted daily noise exposure level ``LEX,8h``, dB.
     :ivar combined_standard_uncertainty: Combined standard uncertainty ``u``
@@ -522,8 +519,7 @@ def task_based_exposure(
     include_duration_uncertainty: bool = True,
     warn: bool = True,
 ) -> ExposureResult:
-    """
-    Daily noise exposure level from task-based measurements (ISO 9612:2009 Clause 9).
+    """Daily noise exposure level from task-based measurements (ISO 9612:2009 Clause 9).
 
     Each task level is the energy average of its samples (Eq 7); the daily level
     is the energy sum of the task contributions (Eq 9/10). The uncertainty budget
@@ -639,8 +635,7 @@ def job_based_exposure(
     sample_duration_hours: float | None = None,
     warn: bool = True,
 ) -> ExposureResult:
-    r"""
-    Daily noise exposure level from job-based measurements (ISO 9612:2009 Clause 10).
+    r"""Daily noise exposure level from job-based measurements (ISO 9612:2009 Clause 10).
 
     The effective-day level is the energy average of ``N >= 5`` random job samples
     (Eq 11); the daily level follows Eq 12. The sampling uncertainty ``u1`` is the
@@ -694,8 +689,7 @@ def full_day_exposure(
     u3: float = _U3_DEFAULT,
     warn: bool = True,
 ) -> ExposureResult:
-    """
-    Daily noise exposure level from full-day measurements (ISO 9612:2009 Clause 11).
+    """Daily noise exposure level from full-day measurements (ISO 9612:2009 Clause 11).
 
     Three (or more) whole-day ``Lp,A,eqT`` measurements are energy-averaged (Eq 11)
     and the daily level follows Eq 13. If only three measurements are supplied and

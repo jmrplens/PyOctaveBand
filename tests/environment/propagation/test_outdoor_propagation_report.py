@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 9613-2 outdoor-propagation prediction reports (``.report()``).
+"""Tests for the ISO 9613-2 outdoor-propagation prediction reports (``.report()``).
 
 Two prediction fiches share the ISO 9613-2 family renderer: the octave-band
 attenuation breakdown (:class:`OutdoorAttenuation`), which boxes the A-weighted

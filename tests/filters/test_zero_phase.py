@@ -1,7 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for zero-phase (sosfiltfilt) filtering in OctaveFilterBank.
-"""
+"""Tests for zero-phase (sosfiltfilt) filtering in OctaveFilterBank."""
 
 import numpy as np
 import pytest
@@ -70,7 +68,8 @@ def test_zero_phase_passband_level_matches() -> None:
 def test_zero_phase_broadband_band_narrowing() -> None:
     """Forward-backward filtering narrows the effective passband, lowering the
     measured broadband band level ~0.2-0.3 dB per band (a pure center tone,
-    tested above, does not exercise this). Characterizes the documented bias."""
+    tested above, does not exercise this). Characterizes the documented bias.
+    """
     bank = filters.OctaveFilterBank(fs=FS, fraction=1, limits=[100, 8000])
     x = np.random.default_rng(7).standard_normal(FS * 4)
     spl_fwd, _ = bank.filter(x)

@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Measurement uncertainty in building acoustics (ISO 12999-1:2020).
+r"""Measurement uncertainty in building acoustics (ISO 12999-1:2020).
 
 This module supplies the **measurement uncertainty** of the sound-insulation
 quantities produced by the field/lab/prediction modules

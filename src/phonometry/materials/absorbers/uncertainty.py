@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Measurement uncertainty for sound absorption (ISO 12999-2:2020).
+r"""Measurement uncertainty for sound absorption (ISO 12999-2:2020).
 
 Companion of the sound-insulation uncertainty of :mod:`phonometry.building.measurement.uncertainty`
 (ISO 12999-1). This part gives the standard uncertainty ``u`` of the quantities
@@ -203,7 +202,8 @@ class AbsorptionUncertaintyResult:
     @property
     def reported_expanded_uncertainty(self) -> np.ndarray:
         """``U`` rounded for reporting (Clause 8): two decimals for absorption
-        coefficients, one decimal for the equivalent area and ``DLα,NRD``."""
+        coefficients, one decimal for the equivalent area and ``DLα,NRD``.
+        """
         decimals = 2 if self.quantity in _COEFFICIENT_QUANTITIES else 1
         return _round_report(self.expanded_uncertainty, decimals)
 
@@ -258,7 +258,8 @@ def _band_uncertainty(
     band_kind: str,
 ) -> AbsorptionUncertaintyResult:
     r"""Shared engine for the coefficient formulae
-    :math:`\sigma_\mathrm{R} = m \alpha + n` (values == α)."""
+    :math:`\sigma_\mathrm{R} = m \alpha + n` (values == α).
+    """
     if values.shape != frequencies.shape:
         raise ValueError(
             f"'{quantity}' values and frequencies must have the same shape; "

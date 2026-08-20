@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Noise measurements of audio equipment (AES17-2015 6.4).
+"""Noise measurements of audio equipment (AES17-2015 6.4).
 
 The two levels that say how quiet a device is, both measured through the
 AES17 measurement chain -- the standard notch (5.2.8) where a test tone has

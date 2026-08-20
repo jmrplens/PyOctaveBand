@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Reverberation-time prediction from room geometry and absorption.
+r"""Reverberation-time prediction from room geometry and absorption.
 
 Predicts the reverberation time ``T`` of an enclosed space from its volume,
 boundary areas and the sound-absorption coefficients of its surfaces, through
@@ -242,7 +241,8 @@ def _reverberation_time(
     volume: float, absorption: NDArray[np.float64], speed_of_sound: float
 ) -> np.ndarray | float:
     r""":math:`T = 24 \ln 10 / c_0 \cdot V / \text{absorption}`, with a
-    positive-absorption guard."""
+    positive-absorption guard.
+    """
     if np.any(absorption <= 0.0):
         raise ValueError(
             "the total absorption is non-positive; a perfectly reflecting room "

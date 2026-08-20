@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-The psychoacoustic models take a ``Signal`` in place of ``(x, fs)``.
+"""The psychoacoustic models take a ``Signal`` in place of ``(x, fs)``.
 
 Same contract as the rest of the library, held by
 ``phonometry.io._resolve``. This is the surface where it matters most, and

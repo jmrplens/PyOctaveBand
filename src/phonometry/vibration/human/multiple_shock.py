@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Whole-body vibration containing multiple shocks (ISO 2631-5:2018).
+r"""Whole-body vibration containing multiple shocks (ISO 2631-5:2018).
 
 Implements the normative Clause 5 spinal-response model and the Annex C
 assessment of adverse health effects for the vertical (``z``) axis.
@@ -319,7 +318,8 @@ def compression_dose(daily_dose_value: float, *, mz: float = MZ_MALE) -> float:
 
 def static_stress(mz: float = MZ_MALE) -> float:
     r"""Static compressive stress :math:`S_\text{stat} = m_\mathrm{z} \cdot 9.81`
-    (Annex C), MPa."""
+    (Annex C), MPa.
+    """
     return mz * GRAVITY
 
 

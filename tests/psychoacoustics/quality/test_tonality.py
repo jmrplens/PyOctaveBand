@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Prominent discrete tones: TNR and PR per ECMA-418-1:2024.
+"""Prominent discrete tones: TNR and PR per ECMA-418-1:2024.
 
 Anchors transcribed from the official PDF:
 - Clause 10 Formula (2) EXAMPLE: dfc = 162,2 Hz at 1 kHz; 117,3 Hz at 500 Hz.
@@ -45,7 +44,8 @@ def _tone_in_noise(
 
 def test_critical_band_examples() -> None:
     """Clause 10 and 12.2 worked examples from the standard text (shared
-    oracles in tests/reference_data/, also used by the CI report)."""
+    oracles in tests/reference_data/, also used by the CI report).
+    """
     _, _, dfc_1k = _critical_band(1000.0)
     assert dfc_1k == pytest.approx(ECMA418_1_DFC_1KHZ, abs=0.05)
     _, _, dfc_500 = _critical_band(500.0)
@@ -63,7 +63,8 @@ def test_proximity_spacing_examples() -> None:
 
 def test_tnr_of_synthetic_tone_matches_analytic() -> None:
     """White noise with PSD N0 masks a tone with power Pt:
-    TNR = 10*lg(Pt / (N0 * dfc))."""
+    TNR = 10*lg(Pt / (N0 * dfc)).
+    """
     tone_rms, noise_rms = 0.1, 0.05
     x = _tone_in_noise(1000.0, tone_rms, noise_rms)
     n0 = noise_rms**2 / (FS / 2)  # white-noise PSD
@@ -131,7 +132,8 @@ def test_pr_criteria_and_noise_only() -> None:
 
 def test_pr_low_frequency_truncated_band() -> None:
     """ft <= 171.4 Hz uses the 20 Hz-truncated lower band rescaled to
-    100 Hz (Formula 24) - the result must still be finite and sensible."""
+    100 Hz (Formula 24) - the result must still be finite and sensible.
+    """
     x = _tone_in_noise(120.0, 0.3, 0.02)
     result = psychoacoustics.prominence_ratio(x, FS, tone_freq=120.0)
     assert result.frequency == pytest.approx(120.0, abs=1.0)
@@ -143,7 +145,8 @@ def test_pr_low_frequency_truncated_band() -> None:
 
 def test_tnr_proximate_tones_combine() -> None:
     """Clause 11.6: two tones 30 Hz apart at 1 kHz (always proximate at
-    1 kHz+) are assessed as one tone with their combined level."""
+    1 kHz+) are assessed as one tone with their combined level.
+    """
     rng = np.random.default_rng(99)
     # 16 s (was 30 s): the 0.1 dB tolerance needs more spectral averaging than
     # the 8 s default (measured error: 0.18 dB at 8 s, 0.025 dB at 16 s).
@@ -189,7 +192,8 @@ def test_too_coarse_resolution_raises() -> None:
 
 def test_coarse_resolution_warns_at_low_frequency() -> None:
     """At 250 Hz (dfc ~ 115 Hz) a 4 Hz bin gives < 3 bins across the tone
-    half-width, biasing the ratio; the function warns (it does not raise)."""
+    half-width, biasing the ratio; the function warns (it does not raise).
+    """
     x = _tone_in_noise(250.0, 0.2, 0.02)
     with pytest.warns(UserWarning, match="bins"):
         psychoacoustics.tone_to_noise_ratio(x, FS, tone_freq=250.0, resolution_hz=4.0)
@@ -200,7 +204,8 @@ def test_coarse_resolution_warns_at_low_frequency() -> None:
 def test_range_edge_warns() -> None:
     """A tone at exactly 89.1 Hz snaps to the 89.0 Hz bin at 1 Hz resolution
     and lands just below the range of interest, flipping the prominence
-    verdict despite a huge ratio; the function warns about the edge."""
+    verdict despite a huge ratio; the function warns about the edge.
+    """
     x = _tone_in_noise(89.1, 0.2, 0.002)
     with pytest.warns(UserWarning, match="range-of-interest edge"):
         res = psychoacoustics.tone_to_noise_ratio(x, FS, tone_freq=89.1)
@@ -209,7 +214,8 @@ def test_range_edge_warns() -> None:
 
 def test_numeric_noise_power_warns() -> None:
     """Silence and DC produce formally finite TNR/PR values with no meaning;
-    the function warns that the band power is at numeric-noise level."""
+    the function warns that the band power is at numeric-noise level.
+    """
     silence = np.zeros(FS * 2)
     with pytest.warns(UserWarning, match="numeric-noise"):
         psychoacoustics.tone_to_noise_ratio(silence, FS, tone_freq=1000.0)

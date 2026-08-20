@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2).
+r"""Ship radiated noise and equivalent monopole source level (ISO 17208-1/-2).
 
 A surface ship measured in deep water is characterised by its **radiated noise
 level** and then by an **equivalent monopole source level** referred to a point

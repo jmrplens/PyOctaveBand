@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the IEC 61260 filter class verifier (2014 classes 1/2 and the
+"""Tests for the IEC 61260 filter class verifier (2014 classes 1/2 and the
 1995 / ANSI S1.11-2004 edition that adds class 0).
 """
 
@@ -109,7 +108,8 @@ def test_coarse_grid_breakpoints_evaluated_exactly() -> None:
     """The Table 1 breakpoints are evaluated with sosfreqz at their exact
     frequencies, not interpolated off the grid: even the permitted 16-point
     floor reproduces the dense-grid verdict and binding margin (interpolation
-    used to yield garbage margins around -190 dB there)."""
+    used to yield garbage margins around -190 dB there).
+    """
     bank = filters.OctaveFilterBank(
         fs=48000,
         fraction=3,
@@ -247,7 +247,8 @@ def test_1995_rejects_out_of_range_class_and_bad_edition() -> None:
 def test_map_breakpoint_reproduces_table_f1() -> None:
     """IEC 61260-1:2014 Table F.1: the Formula (9) mapping reproduces every
     printed one-third-octave (b = 3) breakpoint and reciprocal to the five
-    printed decimals."""
+    printed decimals.
+    """
     from reference_data import IEC61260_TABLE_F1
 
     from phonometry.filters.compliance import _map_breakpoint

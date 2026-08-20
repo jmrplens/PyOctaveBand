@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-r"""
-Harmonic-distortion separation with exponential sweeps (Farina / Novak).
+r"""Harmonic-distortion separation with exponential sweeps (Farina / Novak).
 
 A single exponential sine sweep characterises the linear response and
 every harmonic distortion order of a weakly nonlinear system at once:
@@ -51,7 +50,8 @@ Chebyshev identities, :math:`\lvert H_1 \rvert = 1 + 3 a_3/4`,
 :math:`\lvert H_3 \rvert = a_3/4` (phase :math:`\pi`), and a THD(f) equal to
 the closed form :math:`\sqrt{(a_2/2)^2 + (a_3/4)^2} / (1 + 3 a_3/4)` -- which
 also matches :func:`phonometry.electroacoustics.thd` measured tone by tone on
-the same system."""
+the same system.
+"""
 
 from __future__ import annotations
 
@@ -125,8 +125,7 @@ def synchronized_sweep_signal(
     amplitude: float = 1.0,
     fade: float = 0.0,
 ) -> NDArray[np.float64]:
-    r"""
-    Generate a synchronized exponential sweep (Novak et al. 2015, Eq. 47).
+    r"""Generate a synchronized exponential sweep (Novak et al. 2015, Eq. 47).
 
     :math:`x(t) = A \sin[2\pi f_1 L \exp(t/L)]` with the rate
     :math:`L = \operatorname{round}(f_1 \tilde{T} / \ln(f_2/f_1)) / f_1`
@@ -541,8 +540,7 @@ def swept_sine_distortion(
     fade: float | None = None,
     remove_dc: bool = True,
 ) -> SweptSineDistortionResult:
-    r"""
-    Separate the harmonic responses of a swept-sine measurement.
+    r"""Separate the harmonic responses of a swept-sine measurement.
 
     Deconvolves the recorded response of a (weakly, memorylessly) nonlinear
     system to an exponential sweep and windows the impulse response of each

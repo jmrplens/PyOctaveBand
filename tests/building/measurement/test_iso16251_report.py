@@ -1,6 +1,5 @@
 #  Copyright (c) 2026. Jose Manuel Requena Plens
-"""
-Tests for the ISO 16251-1 floor-covering impact-improvement report (``.report()``).
+"""Tests for the ISO 16251-1 floor-covering impact-improvement report (``.report()``).
 
 The report is a rendering feature, so these tests assert only structural facts:
 a valid single-page PDF is written for an impact-improvement measurement, the
