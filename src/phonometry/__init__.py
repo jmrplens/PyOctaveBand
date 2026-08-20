@@ -25,29 +25,46 @@ of every diagnostic the library raises, so one
 
 from __future__ import annotations
 
-from . import aircraft as aircraft
-from . import broadcast as broadcast
-from . import building as building
-from . import electroacoustics as electroacoustics
-from . import emission as emission
-from . import environment as environment
-from . import filters as filters
-from . import hearing as hearing
-from . import io as io
-from . import materials as materials
-from . import metrology as metrology
-from . import noise_control as noise_control
-from . import psychoacoustics as psychoacoustics
-from . import room as room
-from . import signals as signals
-from . import simulation as simulation
-from . import speech as speech
-from . import underwater as underwater
-from . import vibration as vibration
-from ._internal.warnings import PhonometryWarning
-from ._report import ReportMetadata
-from ._version import __version__
-from .io import Signal
+from importlib import import_module
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover - for the type checker, never at run time
+    from . import aircraft as aircraft
+    from . import broadcast as broadcast
+    from . import building as building
+    from . import electroacoustics as electroacoustics
+    from . import emission as emission
+    from . import environment as environment
+    from . import filters as filters
+    from . import hearing as hearing
+    from . import io as io
+    from . import materials as materials
+    from . import metrology as metrology
+    from . import noise_control as noise_control
+    from . import psychoacoustics as psychoacoustics
+    from . import room as room
+    from . import signals as signals
+    from . import simulation as simulation
+    from . import speech as speech
+    from . import underwater as underwater
+    from . import vibration as vibration
+    from ._internal.warnings import PhonometryWarning as PhonometryWarning
+    from ._report import ReportMetadata as ReportMetadata
+    from ._version import __version__ as __version__
+    from .io import Signal as Signal
+
+#: The nineteen domain packages, imported on first use.
+_PACKAGES = ['aircraft', 'broadcast', 'building', 'electroacoustics', 'emission', 'environment', 'filters', 'hearing', 'io', 'materials', 'metrology', 'noise_control', 'psychoacoustics', 'room', 'signals', 'simulation', 'speech', 'underwater', 'vibration']
+
+#: The four names that belong to no domain, and the private module each is
+#: defined in. ``Signal`` is ``phonometry.io``'s, and reached from here too
+#: because seven packages accept one.
+_NAMES = {
+    "PhonometryWarning": "._internal.warnings",
+    "ReportMetadata": "._report",
+    "Signal": ".io",
+    "__version__": "._version",
+}
 
 __all__ = [
     "PhonometryWarning",
@@ -74,3 +91,26 @@ __all__ = [
     "underwater",
     "vibration",
 ]
+
+
+def __getattr__(name: str) -> object:
+    """Import a domain package, or one of the four names, on first use.
+
+    PEP 562. Importing every package eagerly cost a second and pulled in
+    twelve hundred modules for a caller who wanted one of them; the whole
+    library is still one attribute away, and the attribute is cached in the
+    module namespace so the import happens once.
+    """
+    if name in _PACKAGES:
+        value: object = import_module(f".{name}", __name__)
+    elif name in _NAMES:
+        value = getattr(import_module(_NAMES[name], __name__), name)
+    else:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    globals()[name] = value
+    return value
+
+
+def __dir__() -> list[str]:
+    """What the package publishes, whether or not it has been touched yet."""
+    return sorted(__all__)
