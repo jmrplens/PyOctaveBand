@@ -47,8 +47,7 @@ if TYPE_CHECKING:
 _STRINGS: dict[str, str] = {
     "Wall aperture cross-section": "Sección de la abertura en el muro",
     "Wall": "Muro",
-    "Composite facade elevation (areas to scale)":
-        "Alzado de fachada compuesta (áreas a escala)",
+    "Composite facade elevation (areas to scale)": "Alzado de fachada compuesta (áreas a escala)",
     "Double wall cross-section": "Sección de la doble hoja",
 }
 
@@ -125,25 +124,44 @@ def plot_aperture_geometry(
     for y0 in (0.5 * opening, -0.5 * opening - wall_h):
         _material_rect(ax, 0.0, y0, depth, wall_h, "rigid", **kwargs)
     ax.text(
-        0.5 * depth, 0.5 * opening + wall_h * 1.03, _t("Wall", language),
-        fontsize=8, ha="center", va="bottom",
+        0.5 * depth,
+        0.5 * opening + wall_h * 1.03,
+        _t("Wall", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
     )
     reach = max(2.5 * opening, 0.45 * depth)
     _incidence_arrow(ax, -2.1 * reach, 0.0, 1.2 * reach, language)
     for k in (0.45, 0.72, 1.0):
-        ax.add_patch(Arc(
-            (depth, 0.0), 2.0 * k * reach, 2.0 * k * reach,
-            theta1=-80.0, theta2=80.0, color=_C_PRIMARY, linewidth=1.0,
-        ))
+        ax.add_patch(
+            Arc(
+                (depth, 0.0),
+                2.0 * k * reach,
+                2.0 * k * reach,
+                theta1=-80.0,
+                theta2=80.0,
+                color=_C_PRIMARY,
+                linewidth=1.0,
+            )
+        )
     off = max(opening, 0.12 * depth)
-    _dim(ax, (0.0, -0.5 * opening), (0.0, 0.5 * opening),
-         _mm(opening, language), offset=1.5 * off, tight=True)
-    _dim(ax, (0.0, 0.5 * opening + 0.55 * wall_h),
-         (depth, 0.5 * opening + 0.55 * wall_h),
-         _mm(depth, language), tight=depth < 3.0 * opening)
-    _finish_geometry_axes(
-        ax, _t("Wall aperture cross-section", language)
+    _dim(
+        ax,
+        (0.0, -0.5 * opening),
+        (0.0, 0.5 * opening),
+        _mm(opening, language),
+        offset=1.5 * off,
+        tight=True,
     )
+    _dim(
+        ax,
+        (0.0, 0.5 * opening + 0.55 * wall_h),
+        (depth, 0.5 * opening + 0.55 * wall_h),
+        _mm(depth, language),
+        tight=depth < 3.0 * opening,
+    )
+    _finish_geometry_axes(ax, _t("Wall aperture cross-section", language))
     return ax
 
 
@@ -161,13 +179,19 @@ def plot_aperture_result_geometry(
     if result.depth is not None:
         if result.width is not None:
             return plot_aperture_geometry(
-                result.depth, ax=ax, width=result.width,
-                language=language, **kwargs,
+                result.depth,
+                ax=ax,
+                width=result.width,
+                language=language,
+                **kwargs,
             )
         if result.radius is not None:
             return plot_aperture_geometry(
-                result.depth, ax=ax, radius=result.radius,
-                language=language, **kwargs,
+                result.depth,
+                ax=ax,
+                radius=result.radius,
+                language=language,
+                **kwargs,
             )
     raise ValueError(
         "This result does not retain its geometry; call "
@@ -206,7 +230,7 @@ def plot_facade_elements(
     for element in tiles:
         area = getattr(element, "area", None)
         if area is None:
-            areas.append(0.1)          # nominal tile for dn_e-rated elements
+            areas.append(0.1)  # nominal tile for dn_e-rated elements
         elif float(area) <= 0.0:
             raise ValueError("Element areas must be positive.")
         else:
@@ -222,22 +246,34 @@ def plot_facade_elements(
     for index, (element, area) in enumerate(zip(tiles, areas)):
         width = area / height
         _material_rect(
-            ax, x, 0.0, width, height, fills[index % len(fills)],
+            ax,
+            x,
+            0.0,
+            width,
+            height,
+            fills[index % len(fills)],
             **(dict(kwargs) if index == 0 else {}),
         )
         label = getattr(element, "name", "") or f"#{index + 1}"
         ax.text(
-            x + 0.5 * width, 0.5 * height, label, fontsize=8, ha="center",
-            va="center", rotation=90 if width < 0.35 * height else 0,
+            x + 0.5 * width,
+            0.5 * height,
+            label,
+            fontsize=8,
+            ha="center",
+            va="center",
+            rotation=90 if width < 0.35 * height else 0,
         )
         ax.text(
-            x + 0.5 * width, -0.04 * height,
+            x + 0.5 * width,
+            -0.04 * height,
             format_number(area, language, decimals=1, trim=True) + " m$^2$",
-            fontsize=8, ha="center", va="top",
+            fontsize=8,
+            ha="center",
+            va="top",
         )
         x += width
-    _dim(ax, (0.0, 1.06 * height), (x, 1.06 * height),
-         _metres(x, language))
+    _dim(ax, (0.0, 1.06 * height), (x, 1.06 * height), _metres(x, language))
     _dim(ax, (-0.03 * x, 0.0), (-0.03 * x, height), _metres(height, language))
     _finish_geometry_axes(
         ax, _t("Composite facade elevation (areas to scale)", language)
@@ -258,9 +294,7 @@ def plot_facade_result_geometry(
             "This result does not retain its elements; call "
             "plot_facade_elements(elements) with the original sequence."
         )
-    return plot_facade_elements(
-        result.elements, ax=ax, language=language, **kwargs
-    )
+    return plot_facade_elements(result.elements, ax=ax, language=language, **kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -310,27 +344,30 @@ def plot_double_wall_geometry(
     _material_rect(ax, t1 + gap, 0.0, t2, height, "plate")
     for x, mass, thickness in ((0.0, mass1, t1), (t1 + gap, mass2, t2)):
         ax.text(
-            x + 0.5 * thickness, 0.72 * height,
-            format_number(mass, language, decimals=1, trim=True)
-            + " kg/m2",
-            fontsize=8, ha="center", va="center", rotation=90,
+            x + 0.5 * thickness,
+            0.72 * height,
+            format_number(mass, language, decimals=1, trim=True) + " kg/m2",
+            fontsize=8,
+            ha="center",
+            va="center",
+            rotation=90,
         )
-    _dim(ax, (t1, 0.0), (t1 + gap, 0.0), _mm(gap, language),
-         offset=-0.06 * height)
-    _dim(ax, (0.0, 0.0), (t1, 0.0), _mm(t1, language),
-         offset=-0.16 * height, tight=True)
-    _incidence_arrow(
-        ax, -0.5 * height * 0.5, 0.5 * height, 0.2 * height, language
+    _dim(ax, (t1, 0.0), (t1 + gap, 0.0), _mm(gap, language), offset=-0.06 * height)
+    _dim(
+        ax, (0.0, 0.0), (t1, 0.0), _mm(t1, language), offset=-0.16 * height, tight=True
     )
+    _incidence_arrow(ax, -0.5 * height * 0.5, 0.5 * height, 0.2 * height, language)
     if resonance_frequency is not None:
         ax.text(
-            t1 + 0.5 * gap, 0.5 * height,
+            t1 + 0.5 * gap,
+            0.5 * height,
             "f$_0$ = "
-            + format_number(
-                resonance_frequency, language, decimals=0, trim=True
-            )
+            + format_number(resonance_frequency, language, decimals=0, trim=True)
             + " Hz",
-            fontsize=8, ha="center", va="center", rotation=90,
+            fontsize=8,
+            ha="center",
+            va="center",
+            rotation=90,
         )
     _finish_geometry_axes(ax, _t("Double wall cross-section", language))
     return ax
@@ -350,7 +387,11 @@ def plot_double_wall_result_geometry(
             "plot_double_wall_geometry(mass1, mass2, gap)."
         )
     return plot_double_wall_geometry(
-        result.mass1, result.mass2, result.gap, ax=ax,
-        resonance_frequency=result.resonance_frequency, language=language,
+        result.mass1,
+        result.mass2,
+        result.gap,
+        ax=ax,
+        resonance_frequency=result.resonance_frequency,
+        language=language,
         **kwargs,
     )

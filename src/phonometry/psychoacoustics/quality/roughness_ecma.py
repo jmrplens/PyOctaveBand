@@ -102,11 +102,40 @@ _A_THRESHOLD = 0.074376  # low-rate amplitude gate (Clause 7.1.5.4)
 # guard row equal to 0 that simplifies the branch of Formula 81).
 _E_THETA = np.array(
     [
-        0.0000, 0.0457, 0.0907, 0.1346, 0.1765, 0.2157, 0.2515, 0.2828,
-        0.3084, 0.3269, 0.3364, 0.3348, 0.3188, 0.2844, 0.2259, 0.1351,
-        0.0000, -0.1351, -0.2259, -0.2844, -0.3188, -0.3348, -0.3364,
-        -0.3269, -0.3084, -0.2828, -0.2515, -0.2157, -0.1765, -0.1346,
-        -0.0907, -0.0457, 0.0000, 0.0000,
+        0.0000,
+        0.0457,
+        0.0907,
+        0.1346,
+        0.1765,
+        0.2157,
+        0.2515,
+        0.2828,
+        0.3084,
+        0.3269,
+        0.3364,
+        0.3348,
+        0.3188,
+        0.2844,
+        0.2259,
+        0.1351,
+        0.0000,
+        -0.1351,
+        -0.2259,
+        -0.2844,
+        -0.3188,
+        -0.3348,
+        -0.3364,
+        -0.3269,
+        -0.3084,
+        -0.2828,
+        -0.2515,
+        -0.2157,
+        -0.1765,
+        -0.1346,
+        -0.0907,
+        -0.0457,
+        0.0000,
+        0.0000,
     ]
 )
 
@@ -148,9 +177,9 @@ _Q2_HI = _q2_hi()
 _Q2_LO = _q2_lo()
 
 # Scaled von-Hann window w_Hann(n~) (Clause 7.1.3, footnote 29).
-_HANN = (
-    0.5 - 0.5 * np.cos(2.0 * np.pi * np.arange(_SB_TILDE) / _SB_TILDE)
-) / np.sqrt(0.375)
+_HANN = (0.5 - 0.5 * np.cos(2.0 * np.pi * np.arange(_SB_TILDE) / _SB_TILDE)) / np.sqrt(
+    0.375
+)
 
 
 @dataclass(frozen=True)
@@ -178,7 +207,9 @@ class EcmaRoughness:
     specific_roughness_vs_time: np.ndarray
     field: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | np.ndarray:
         """Plot the roughness result (see :mod:`phonometry._plot.psychoacoustics`).
 
         Draws the time-dependent roughness R(l50) and a specific-roughness
@@ -187,7 +218,9 @@ class EcmaRoughness:
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_ecma_roughness
 
-        return plot_ecma_roughness(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ecma_roughness(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 # --------------------------------------------------------------------------
@@ -234,7 +267,7 @@ def _front_end(
         # clip block window to the available signal for the flush last block
         seg = p_band[np.minimum(idx, p_band.size - 1)]
         analytic = signal.hilbert(seg, axis=1)  # Formula 65
-        envelopes[:, :, band] = np.abs(analytic)[:, :: _DOWN]  # downsample x32
+        envelopes[:, :, band] = np.abs(analytic)[:, ::_DOWN]  # downsample x32
         rect = np.where(seg > 0.0, seg, 0.0)  # Formula 21
         rms = np.sqrt((2.0 / _SB) * np.sum(rect**2, axis=1))  # Formula 22
         basis[:, band] = _specific_basis_loudness(rms, band)  # Formulae 23-25
@@ -248,9 +281,7 @@ def _front_end(
 # --------------------------------------------------------------------------
 
 
-def _noise_reduced_spectra(
-    envelopes: np.ndarray, basis: np.ndarray
-) -> np.ndarray:
+def _noise_reduced_spectra(envelopes: np.ndarray, basis: np.ndarray) -> np.ndarray:
     """Noise-reduced scaled envelope power spectra Phi_hat (Formulae 66-71).
 
     Returns the one-sided spectra of shape ``(L, 257, Z)``.
@@ -378,9 +409,7 @@ def _harmonic_members(f_p: np.ndarray, i0: int) -> list[int]:
     return [i for i, err in cand.values() if err < 0.04]  # Formula 90
 
 
-def _fundamental_set(
-    f_p: np.ndarray, a_tilde: np.ndarray
-) -> tuple[list[int], int]:
+def _fundamental_set(f_p: np.ndarray, a_tilde: np.ndarray) -> tuple[list[int], int]:
     """Harmonic-complex index set I_max and its argmax i_max (Formulae 88-91)."""
     n = f_p.size
     best_energy = -1.0
@@ -497,9 +526,7 @@ def _aggregate(
     kept = r_time[_TRANSIENT:] if r_time.shape[0] > _TRANSIENT else r_time
     r_spec = np.mean(kept, axis=0) if kept.shape[0] else np.zeros(_CBF)  # 7.1.8
     r_vs_time = _DZ * np.sum(r_time, axis=1)  # Formula 111
-    kept_time = (
-        r_vs_time[_TRANSIENT:] if r_vs_time.size > _TRANSIENT else r_vs_time
-    )
+    kept_time = r_vs_time[_TRANSIENT:] if r_vs_time.size > _TRANSIENT else r_vs_time
     r_single = float(np.percentile(kept_time, 90)) if kept_time.size else 0.0  # 7.1.10
     return r_single, np.asarray(r_spec, dtype=np.float64), r_vs_time
 
@@ -533,7 +560,9 @@ def roughness_ecma(
     if field not in ("free", "diffuse"):
         raise ValueError("field must be 'free' or 'diffuse'")
     fs = resolve_fs(signal_in, fs, name="signal_in")
-    x = apply_calibration(signal_in, require_1d_signal(_typesignal(np.asarray(signal_in))))
+    x = apply_calibration(
+        signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
+    )
     if x.size == 0:
         raise ValueError("signal must not be empty")
     fs = float(fs)

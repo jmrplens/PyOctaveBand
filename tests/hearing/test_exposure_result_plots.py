@@ -34,11 +34,10 @@ def test_exposure_plot_task_bars_and_lex_line() -> None:
     res = _exposure()
     ax = res.plot()
     heights = [p.get_height() for p in ax.patches]
-    np.testing.assert_allclose(
-        heights, [t.lex_8h_contribution for t in res.tasks]
-    )
+    np.testing.assert_allclose(heights, [t.lex_8h_contribution for t in res.tasks])
     hlines = [
-        np.asarray(ln.get_ydata())[0] for ln in ax.lines
+        np.asarray(ln.get_ydata())[0]
+        for ln in ax.lines
         if np.asarray(ln.get_ydata()).size == 2
         and np.asarray(ln.get_ydata())[0] == np.asarray(ln.get_ydata())[1]
     ]

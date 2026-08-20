@@ -104,15 +104,15 @@ def main() -> int:
     public = sorted(public_names())
     path = (
         pathlib.Path(__file__).resolve().parent.parent
-        / "docs" / "reference" / "api" / "index.md"
+        / "docs"
+        / "reference"
+        / "api"
+        / "index.md"
     )
     markdown = path.read_text(encoding="utf-8")
     missing = missing_names(markdown, public)
     if missing:
-        print(
-            f"docs/reference/api/index.md is missing {len(missing)} public "
-            "name(s):"
-        )
+        print(f"docs/reference/api/index.md is missing {len(missing)} public name(s):")
         for name in missing:
             print(f"  - {name}")
         print("Add a table row for each name (see the file's existing style).")

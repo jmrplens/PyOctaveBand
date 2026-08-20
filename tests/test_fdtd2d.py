@@ -27,8 +27,7 @@ import fdtd2d
 
 def _pulse_box(sponge_width: int) -> fdtd2d.FDTD2D:
     """A homogeneous box with a centred Gaussian pulse (odd grid)."""
-    sim = fdtd2d.FDTD2D(343.0, 0.05, shape=(81, 101),
-                        sponge_width=sponge_width)
+    sim = fdtd2d.FDTD2D(343.0, 0.05, shape=(81, 101), sponge_width=sponge_width)
     sim.add_source(fdtd2d.GaussianPulse(ix=50, iy=40, width=6 * sim.dt))
     return sim
 
@@ -45,9 +44,9 @@ def test_rigid_box_conserves_energy() -> None:
 
 def test_sponge_absorbs_energy() -> None:
     sim = _pulse_box(sponge_width=20)
-    sim.run(60)    # pulse radiated, front just reaching the layer
+    sim.run(60)  # pulse radiated, front just reaching the layer
     e_ref = sim.energy()
-    sim.run(740)   # wavefront crosses the absorbing layer
+    sim.run(740)  # wavefront crosses the absorbing layer
     assert sim.energy() < 1e-2 * e_ref
 
 
@@ -60,9 +59,7 @@ def test_centered_pulse_stays_symmetric() -> None:
 
 
 def test_two_runs_are_bit_identical() -> None:
-    frames = [
-        _pulse_box(sponge_width=10).run(300, record_every=50) for _ in range(2)
-    ]
+    frames = [_pulse_box(sponge_width=10).run(300, record_every=50) for _ in range(2)]
     assert frames[0].shape == (7, 81, 101)
     assert np.array_equal(frames[0], frames[1])
 
@@ -80,10 +77,9 @@ def test_heterogeneous_speed_refracts_faster() -> None:
     # slow left half does in the same time.
     ny, nx = 81, 161
     c = np.full((ny, nx), 200.0)
-    c[:, nx // 2:] = 400.0
+    c[:, nx // 2 :] = 400.0
     sim = fdtd2d.FDTD2D(c, 0.05)
-    sim.add_source(fdtd2d.GaussianPulse(ix=nx // 2, iy=ny // 2,
-                                        width=6 * sim.dt))
+    sim.add_source(fdtd2d.GaussianPulse(ix=nx // 2, iy=ny // 2, width=6 * sim.dt))
     sim.run(150)
     row = np.abs(sim.p[ny // 2])
     threshold = 1e-3 * row.max()
@@ -125,10 +121,10 @@ def test_source_outside_the_grid_is_rejected() -> None:
     ],
 )
 def test_constructor_rejects_invalid_arguments(
-    kwargs: dict[str, object], match: str,
+    kwargs: dict[str, object],
+    match: str,
 ) -> None:
-    full: dict[str, object] = {"c": 343.0, "dx": 0.05, "shape": (10, 10),
-                               **kwargs}
+    full: dict[str, object] = {"c": 343.0, "dx": 0.05, "shape": (10, 10), **kwargs}
     c = full.pop("c")
     dx = full.pop("dx")
     with pytest.raises(ValueError, match=match):
@@ -137,10 +133,11 @@ def test_constructor_rejects_invalid_arguments(
 
 def test_sponge_sides_accepts_a_bare_string() -> None:
     # A single side name must mean that side, not its individual characters.
-    sim = fdtd2d.FDTD2D(343.0, 0.05, shape=(20, 20), sponge_width=5,
-                        sponge_sides="left")
-    assert float(sim._decay_p[10, 0]) < 1.0     # left edge absorbs
-    assert float(sim._decay_p[10, -1]) == 1.0   # right edge stays rigid
+    sim = fdtd2d.FDTD2D(
+        343.0, 0.05, shape=(20, 20), sponge_width=5, sponge_sides="left"
+    )
+    assert float(sim._decay_p[10, 0]) < 1.0  # left edge absorbs
+    assert float(sim._decay_p[10, -1]) == 1.0  # right edge stays rigid
 
 
 @pytest.mark.parametrize(
@@ -153,7 +150,8 @@ def test_sponge_sides_accepts_a_bare_string() -> None:
     ],
 )
 def test_gaussian_pulse_rejects_invalid_parameters(
-    kwargs: dict[str, float], match: str,
+    kwargs: dict[str, float],
+    match: str,
 ) -> None:
     with pytest.raises(ValueError, match=match):
         fdtd2d.GaussianPulse(ix=0, iy=0, **kwargs)
@@ -169,7 +167,8 @@ def test_gaussian_pulse_rejects_invalid_parameters(
     ],
 )
 def test_cw_source_rejects_invalid_parameters(
-    kwargs: dict[str, float], match: str,
+    kwargs: dict[str, float],
+    match: str,
 ) -> None:
     with pytest.raises(ValueError, match=match):
         fdtd2d.CWSource(ix=0, iy=0, **kwargs)
@@ -184,7 +183,8 @@ def test_cw_source_rejects_invalid_parameters(
     ],
 )
 def test_run_rejects_invalid_recording_controls(
-    kwargs: dict[str, int], match: str,
+    kwargs: dict[str, int],
+    match: str,
 ) -> None:
     sim = fdtd2d.FDTD2D(343.0, 0.05, shape=(10, 10))
     with pytest.raises(ValueError, match=match):

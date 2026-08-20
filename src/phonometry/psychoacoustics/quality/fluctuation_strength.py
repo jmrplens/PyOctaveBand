@@ -113,9 +113,7 @@ def fluctuation_strength_am_noise(
         * (_BBN_M_SLOPE * m - _BBN_M_OFFSET)
         * (_BBN_L_SLOPE * lvl - _BBN_L_OFFSET)
     )
-    denominator = (
-        (fmod / _BBN_FMOD_LP) ** 2 + (_BBN_FMOD_HP / fmod) + _BBN_DENOM_OFFSET
-    )
+    denominator = (fmod / _BBN_FMOD_LP) ** 2 + (_BBN_FMOD_HP / fmod) + _BBN_DENOM_OFFSET
     return float(max(0.0, numerator / denominator))
 
 
@@ -209,12 +207,16 @@ class FluctuationStrengthResult:
     bark_axis: NDArray[np.float64]
     time_dependent: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the specific fluctuation strength against critical-band rate."""
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_fluctuation_strength
 
-        return plot_fluctuation_strength(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_fluctuation_strength(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _bandpass_envelope_filter(fs: float) -> Any:
@@ -343,7 +345,10 @@ def _modulation_depth(
         m_star = np.where(h0 > 0.0, rms_bp / h0, 0.0)
     # 3:1 compression above the knee.
     over = m_star > _COMPRESSION_THRESHOLD
-    m_star[over] = _COMPRESSION_THRESHOLD + (m_star[over] - _COMPRESSION_THRESHOLD) / _COMPRESSION_RATIO
+    m_star[over] = (
+        _COMPRESSION_THRESHOLD
+        + (m_star[over] - _COMPRESSION_THRESHOLD) / _COMPRESSION_RATIO
+    )
     return m_star, h_bp
 
 
@@ -361,7 +366,9 @@ def _neighbour_covariance(h_bp: NDArray[np.float64]) -> NDArray[np.float64]:
     return k
 
 
-def _analyze(sig: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+def _analyze(
+    sig: NDArray[np.float64],
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     r"""Un-calibrated Osses 2016 sum (:math:`C_\mathrm{FS} = 1`) of a model-rate
     signal.
 

@@ -120,9 +120,7 @@ def noise_signal(
         raise ValueError("'seconds' must be a positive, finite number.")
     n = round(fs_v * seconds_v)
     if n < 16:
-        raise ValueError(
-            f"'fs'*'seconds' must give at least 16 samples, got {n}."
-        )
+        raise ValueError(f"'fs'*'seconds' must give at least 16 samples, got {n}.")
     if color not in _COLOR_EXPONENTS:
         raise ValueError(
             "'color' must be one of 'white', 'pink', 'red', 'blue', 'violet'."
@@ -257,8 +255,7 @@ def _tone_burst_scalars(
     repetitions_v = int(repetitions)
     if repetitions_v != repetitions or repetitions_v < 1:
         raise ValueError("'repetitions' must be a positive integer.")
-    for name, value in (("pre_silence", pre_silence),
-                        ("post_silence", post_silence)):
+    for name, value in (("pre_silence", pre_silence), ("post_silence", post_silence)):
         if not np.isfinite(float(value)) or float(value) < 0.0:
             raise ValueError(f"'{name}' must be a non-negative, finite number.")
     return fs_v, f_v, cycles_v, amplitude_v, repetitions_v
@@ -276,9 +273,7 @@ def _tone_burst_period(
     """
     if repetition_rate is None:
         if repetitions_v > 1:
-            raise ValueError(
-                "'repetition_rate' is required when 'repetitions' > 1."
-            )
+            raise ValueError("'repetition_rate' is required when 'repetitions' > 1.")
         return None, None, None
     rate_v = _positive(repetition_rate, "repetition_rate")
     period = round(fs_v / rate_v)
@@ -339,7 +334,12 @@ def tone_burst(
     :raises ValueError: If the inputs or parameters are invalid.
     """
     fs_v, f_v, cycles_v, amplitude_v, repetitions_v = _tone_burst_scalars(
-        fs, frequency, cycles, amplitude, repetitions, pre_silence,
+        fs,
+        frequency,
+        cycles,
+        amplitude,
+        repetitions,
+        pre_silence,
         post_silence,
     )
 
@@ -386,8 +386,8 @@ def tone_burst(
     envelope = np.zeros(n_total, dtype=np.float64)
     for k in range(repetitions_v):
         start = n_pre + k * block
-        signal[start:start + n_on] = burst
-        envelope[start:start + n_on] = amplitude_v
+        signal[start : start + n_on] = burst
+        envelope[start : start + n_on] = amplitude_v
 
     return ToneBurstResult(
         signal=signal,
@@ -568,9 +568,7 @@ def resample_signal(
     f_nyq = min(fs_v, fs_new_v) / 2.0
     f_stop = f_nyq
     f_pass = (1.0 - tw) * f_nyq
-    n_taps, beta = sp_signal.kaiserord(
-        atten + 1.0, (f_stop - f_pass) / (fs_up / 2.0)
-    )
+    n_taps, beta = sp_signal.kaiserord(atten + 1.0, (f_stop - f_pass) / (fs_up / 2.0))
     n_taps += (n_taps + 1) % 2  # Odd length: type I linear phase.
     taps = np.asarray(
         sp_signal.firwin(
@@ -600,9 +598,7 @@ def resample_signal(
 # ---------------------------------------------------------------------------
 
 
-def _fractional_advance(
-    x: NDArray[np.float64], shift: float
-) -> NDArray[np.float64]:
+def _fractional_advance(x: NDArray[np.float64], shift: float) -> NDArray[np.float64]:
     r"""Advance ``x`` by ``shift`` samples (band-limited, non-circular).
 
     Frequency-domain phase ramp
@@ -618,9 +614,7 @@ def _fractional_advance(
     nfft = int(sp_fft.next_fast_len(n + pad))
     spectrum = np.fft.rfft(x, n=nfft)
     freqs = np.fft.rfftfreq(nfft)
-    shifted = np.fft.irfft(
-        spectrum * np.exp(2j * np.pi * freqs * shift), n=nfft
-    )
+    shifted = np.fft.irfft(spectrum * np.exp(2j * np.pi * freqs * shift), n=nfft)
     return np.asarray(shifted[:n], dtype=np.float64)
 
 
@@ -698,7 +692,5 @@ def fractional_delay(
         return like_input(x, _fractional_advance(xa, -delay_v))
     n = xa.size
     freqs = np.fft.rfftfreq(n)
-    delayed = np.fft.irfft(
-        np.fft.rfft(xa) * np.exp(-2j * np.pi * freqs * delay_v), n=n
-    )
+    delayed = np.fft.irfft(np.fft.rfft(xa) * np.exp(-2j * np.pi * freqs * delay_v), n=n)
     return like_input(x, np.asarray(delayed, dtype=np.float64))

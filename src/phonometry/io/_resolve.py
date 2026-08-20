@@ -261,9 +261,7 @@ def like_input(
     )
 
 
-def _agreed_pair(
-    x: SignalInput, y: SignalInput, names: tuple[str, str]
-) -> SignalInput:
+def _agreed_pair(x: SignalInput, y: SignalInput, names: tuple[str, str]) -> SignalInput:
     """The member of the pair that knows the rate, once they agree.
 
     :param x: The first signal argument.

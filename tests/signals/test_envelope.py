@@ -47,9 +47,7 @@ def _am(fc: float, fm: float, m: float) -> tuple[np.ndarray, np.ndarray]:
 def test_pure_tone_has_unit_envelope_and_carrier_frequency() -> None:
     res = ph.signals.envelope(_tone(1000.0, amp=2.5), FS)
     np.testing.assert_allclose(res.envelope[INTERIOR], 2.5, atol=1e-9)
-    np.testing.assert_allclose(
-        res.instantaneous_frequency[INTERIOR], 1000.0, atol=1e-6
-    )
+    np.testing.assert_allclose(res.instantaneous_frequency[INTERIOR], 1000.0, atol=1e-6)
 
 
 def test_hilbert_transform_of_cos_is_sin() -> None:
@@ -69,15 +67,13 @@ def test_am_envelope_is_recovered_exactly() -> None:
     """Eq. 13.27: the envelope of u(t)·cos(2πf0t) is u(t) exactly."""
     x, exact = _am(1000.0, 10.0, 0.5)
     res = ph.signals.envelope(x, FS)
-    np.testing.assert_allclose(res.envelope[INTERIOR], exact[INTERIOR],
-                               atol=1e-9)
+    np.testing.assert_allclose(res.envelope[INTERIOR], exact[INTERIOR], atol=1e-9)
 
 
 def test_instantaneous_phase_of_tone_advances_linearly() -> None:
     f0 = 250.0
     res = ph.signals.envelope(_tone(f0), FS)
-    slope = float(np.polyfit(res.times[INTERIOR],
-                             res.phase[INTERIOR], 1)[0])
+    slope = float(np.polyfit(res.times[INTERIOR], res.phase[INTERIOR], 1)[0])
     assert slope / (2.0 * np.pi) == pytest.approx(f0, rel=1e-6)
 
 
@@ -116,8 +112,7 @@ def test_antialiased_decimation_tracks_the_smooth_envelope() -> None:
     res = ph.signals.envelope(x, FS, decimation_factor=16)
     exact_dec = exact[::16]
     inner = slice(64, res.envelope.size - 64)
-    np.testing.assert_allclose(res.envelope[inner], exact_dec[inner],
-                               atol=1e-3)
+    np.testing.assert_allclose(res.envelope[inner], exact_dec[inner], atol=1e-3)
     assert res.times[1] - res.times[0] == pytest.approx(16.0 / FS)
 
 
@@ -230,7 +225,8 @@ ES_N = N
 def _am_signal() -> np.ndarray:
     t = np.arange(ES_N) / FS
     return np.asarray(
-        ES_A0 * (1.0 + ES_M * np.cos(2.0 * np.pi * ES_FM * t))
+        ES_A0
+        * (1.0 + ES_M * np.cos(2.0 * np.pi * ES_FM * t))
         * np.cos(2.0 * np.pi * 1000.0 * t),
         dtype=np.float64,
     )
@@ -250,12 +246,8 @@ def test_envelope_spectrum_magnitude_line_and_mean() -> None:
 
 def test_envelope_spectrum_squared_lines_and_mean() -> None:
     res = ph.signals.envelope_spectrum(_am_signal(), FS, kind="squared")
-    assert res.mean_level == pytest.approx(
-        ES_A0**2 * (1.0 + ES_M**2 / 2.0), abs=1e-2
-    )
-    assert res.amplitude[_bin(ES_FM)] == pytest.approx(
-        2.0 * ES_A0**2 * ES_M, rel=1e-3
-    )
+    assert res.mean_level == pytest.approx(ES_A0**2 * (1.0 + ES_M**2 / 2.0), abs=1e-2)
+    assert res.amplitude[_bin(ES_FM)] == pytest.approx(2.0 * ES_A0**2 * ES_M, rel=1e-3)
     assert res.amplitude[_bin(2.0 * ES_FM)] == pytest.approx(
         ES_A0**2 * ES_M**2 / 2.0, rel=1e-2
     )
@@ -270,9 +262,7 @@ def test_envelope_spectrum_dc_removal() -> None:
     # (not doubled), up to the taper's slight leakage.
     assert kept.amplitude[0] == pytest.approx(kept.mean_level, rel=5e-3)
     # ...and the modulation line is unaffected either way.
-    assert kept.amplitude[_bin(ES_FM)] == pytest.approx(
-        ES_A0 * ES_M, rel=1e-3
-    )
+    assert kept.amplitude[_bin(ES_FM)] == pytest.approx(ES_A0 * ES_M, rel=1e-3)
 
 
 def test_envelope_spectrum_pure_tone_has_no_lines() -> None:
@@ -286,9 +276,7 @@ def test_envelope_spectrum_zero_padding() -> None:
     res = ph.signals.envelope_spectrum(_am_signal(), FS, nfft=2 * ES_N)
     assert res.nfft == 2 * ES_N
     assert res.frequencies.size == ES_N + 1
-    assert res.amplitude[_bin(ES_FM, 2 * ES_N)] == pytest.approx(
-        ES_A0 * ES_M, rel=1e-2
-    )
+    assert res.amplitude[_bin(ES_FM, 2 * ES_N)] == pytest.approx(ES_A0 * ES_M, rel=1e-2)
 
 
 def test_envelope_spectrum_off_bin_line_shows_hann_scalloping() -> None:
@@ -302,7 +290,8 @@ def test_envelope_spectrum_off_bin_line_shows_hann_scalloping() -> None:
     fm = (round(ES_FM / df) + 0.5) * df  # exactly midway between bins
     t = np.arange(ES_N) / FS
     x = (
-        ES_A0 * (1.0 + ES_M * np.cos(2.0 * np.pi * fm * t))
+        ES_A0
+        * (1.0 + ES_M * np.cos(2.0 * np.pi * fm * t))
         * np.cos(2.0 * np.pi * 1000.0 * t)
     )
     res = ph.signals.envelope_spectrum(x, FS)
@@ -328,9 +317,7 @@ def test_envelope_spectrum_bandpass_prefilter_isolates_the_carrier() -> None:
 
     assert filtered.band == (700.0, 1300.0)
     assert raw.band is None
-    assert filtered.amplitude[_bin(ES_FM)] == pytest.approx(
-        ES_A0 * ES_M, rel=1e-2
-    )
+    assert filtered.amplitude[_bin(ES_FM)] == pytest.approx(ES_A0 * ES_M, rel=1e-2)
     assert filtered.mean_level == pytest.approx(ES_A0, rel=1e-2)
     # Without the pre-filter the beat envelope swamps the modulation line.
     beat_error = abs(raw.amplitude[_bin(ES_FM)] - ES_A0 * ES_M)

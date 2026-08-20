@@ -76,7 +76,13 @@ def _fdtd_sponge_bands(
     for side in sim.sponge_sides:
         x0, y0, width, height = rects[side]
         handles["sponge"] = _material_rect(
-            ax, x0, y0, width, height, "cavity", edgecolor="none",
+            ax,
+            x0,
+            y0,
+            width,
+            height,
+            "cavity",
+            edgecolor="none",
         )
 
 
@@ -98,8 +104,10 @@ def _fdtd_edges(
         else:
             colour, key = _C_EDGE, "rigid"
         (line,) = ax.plot(
-            [seg[0][0], seg[1][0]], [seg[0][1], seg[1][1]],
-            color=colour, linewidth=2.6,
+            [seg[0][0], seg[1][0]],
+            [seg[0][1], seg[1][1]],
+            color=colour,
+            linewidth=2.6,
         )
         handles[key] = line
 
@@ -148,20 +156,30 @@ def plot_fdtd_domain(
         kwargs.setdefault("cmap", "gray")
         kwargs.setdefault("vmin", 0.0)
         kwargs.setdefault("vmax", 2.0)
-        ax.imshow(overlay, extent=extent, origin="upper",
-                  interpolation="nearest", **kwargs)
+        ax.imshow(
+            overlay, extent=extent, origin="upper", interpolation="nearest", **kwargs
+        )
     _fdtd_sponge_bands(ax, sim, lx, ly, handles)
     _fdtd_edges(ax, sim, lx, ly, handles)
     for src in getattr(sim, "_sources", ()):  # star per source
         (marker,) = ax.plot(
-            [(src.ix + 0.5) * sim.dx], [(src.iy + 0.5) * sim.dx],
-            marker="*", markersize=11, color=_C_REFERENCE, linestyle="none",
+            [(src.ix + 0.5) * sim.dx],
+            [(src.iy + 0.5) * sim.dx],
+            marker="*",
+            markersize=11,
+            color=_C_REFERENCE,
+            linestyle="none",
         )
         handles["source"] = marker
     if pts is not None:
         (dots,) = ax.plot(
-            pts[:, 0], pts[:, 1], marker="o", markersize=5, color=_C_MUTED,
-            markeredgecolor="black", linestyle="none",
+            pts[:, 0],
+            pts[:, 1],
+            marker="o",
+            markersize=5,
+            color=_C_MUTED,
+            markeredgecolor="black",
+            linestyle="none",
         )
         handles["probe"] = dots
     ax.set_xlim(0.0, lx)
@@ -171,14 +189,18 @@ def plot_fdtd_domain(
     ax.set_ylabel(_t(_AXIS_Y, language))
     ax.set_title(_t("FDTD domain", language))
     label_keys = {
-        "sponge": "Sponge layer", "impedance": "Impedance edge",
-        "rigid": "Rigid edge", "source": "Source", "probe": "Probe",
+        "sponge": "Sponge layer",
+        "impedance": "Impedance edge",
+        "rigid": "Rigid edge",
+        "source": "Source",
+        "probe": "Probe",
     }
     if handles:
         ax.legend(
             handles.values(),
             [_t(label_keys[k], language) for k in handles],
-            loc=_LEGEND_LOC, fontsize=8,
+            loc=_LEGEND_LOC,
+            fontsize=8,
         )
     localize_axes(ax, language)
     return ax

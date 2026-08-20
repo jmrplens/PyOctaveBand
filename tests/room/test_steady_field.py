@@ -27,7 +27,9 @@ def test_room_constant_closed_form() -> None:
 
 def test_room_constant_per_band() -> None:
     r = room.room_constant(150.0, np.array([0.1, 0.2, 0.4]))
-    assert np.allclose(r, 150.0 * np.array([0.1, 0.2, 0.4]) / (1.0 - np.array([0.1, 0.2, 0.4])))
+    assert np.allclose(
+        r, 150.0 * np.array([0.1, 0.2, 0.4]) / (1.0 - np.array([0.1, 0.2, 0.4]))
+    )
 
 
 def test_room_constant_domain() -> None:
@@ -51,9 +53,7 @@ def test_critical_distance_is_field_crossover() -> None:
 
 def test_critical_distance_directivity_scaling() -> None:
     # rc scales as sqrt(Q): a corner source (Q = 8) reaches sqrt(8) further.
-    assert float(
-        room.critical_distance(30.0, directivity=8.0)
-    ) == pytest.approx(
+    assert float(room.critical_distance(30.0, directivity=8.0)) == pytest.approx(
         math.sqrt(8.0) * float(room.critical_distance(30.0, directivity=1.0))
     )
 
@@ -73,7 +73,9 @@ def test_steady_state_spl_direct_and_reverberant_limits() -> None:
     # Very near -> direct dominates: Lp -> Lw + 10 log10(1 / (4 pi r^2)).
     r = 0.02
     near = float(room.steady_state_spl(Lw, r, R))
-    assert near == pytest.approx(Lw + 10.0 * math.log10(1.0 / (4.0 * math.pi * r**2)), abs=0.2)
+    assert near == pytest.approx(
+        Lw + 10.0 * math.log10(1.0 / (4.0 * math.pi * r**2)), abs=0.2
+    )
 
 
 def test_steady_state_spl_reverberant_only() -> None:
@@ -88,9 +90,9 @@ def test_steady_state_spl_reverberant_only() -> None:
     assert float(room.steady_state_spl(Lw, 1.0, R)) > reverberant
     # The directivity factor alone does not move it: the reverberant field is
     # position-independent for a constant-power source.
-    assert float(
-        room.steady_state_spl(Lw, None, R, directivity=8.0)
-    ) == pytest.approx(reverberant)
+    assert float(room.steady_state_spl(Lw, None, R, directivity=8.0)) == pytest.approx(
+        reverberant
+    )
 
 
 @pytest.mark.parametrize(
@@ -106,9 +108,7 @@ def test_steady_state_spl_source_power_models(model: str, exponent: float) -> No
     """
     Lw, R, q = 100.0, 40.0, 8.0
     base = Lw + 10.0 * math.log10(4.0 / R)
-    level = float(
-        room.steady_state_spl(Lw, None, R, directivity=q, source_model=model)
-    )
+    level = float(room.steady_state_spl(Lw, None, R, directivity=q, source_model=model))
     assert level - base == pytest.approx(exponent * 10.0 * math.log10(q))
     assert round(level - base) == pytest.approx(round(exponent * 9.03))
 
@@ -160,9 +160,7 @@ def test_steady_field_validation() -> None:
     with pytest.raises(ValueError):
         room.steady_state_spl(90.0, 1.0, -25.0)
     with pytest.raises(ValueError, match="source_model"):
-        room.steady_state_spl(
-            90.0, 1.0, 25.0, source_model="constant_intensity"
-        )
+        room.steady_state_spl(90.0, 1.0, 25.0, source_model="constant_intensity")
     with pytest.raises(ValueError):
         room.schroeder_frequency(-1.0, 200.0)
     empty = np.array([])

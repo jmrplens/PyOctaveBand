@@ -29,7 +29,9 @@ def test_expansion_chamber_matches_closed_form() -> None:
     for m in (2.0, 4.0, 8.0, 16.0):
         s_duct, length = 0.01, 0.3
         res = sl.expansion_chamber(f, length, m * s_duct, s_duct)
-        cf = 10.0 * np.log10(1.0 + 0.25 * (m - 1.0 / m) ** 2 * np.sin(_k(f) * length) ** 2)
+        cf = 10.0 * np.log10(
+            1.0 + 0.25 * (m - 1.0 / m) ** 2 * np.sin(_k(f) * length) ** 2
+        )
         assert np.allclose(res.transmission_loss, cf, atol=1e-9)
 
 
@@ -134,9 +136,7 @@ def test_transmission_loss_reciprocity_unequal_ports() -> None:
     # negative.
     f = np.linspace(50.0, 1500.0, 300)
     chamber = sl.duct_matrix(f, 0.3, 0.04)
-    cascaded = sl.cascade(
-        sl.duct_matrix(f, 0.2, 0.03), sl.duct_matrix(f, 0.15, 0.05)
-    )
+    cascaded = sl.cascade(sl.duct_matrix(f, 0.2, 0.03), sl.duct_matrix(f, 0.15, 0.05))
     for t in (chamber, cascaded):
         t_rev = t.copy()
         t_rev[:, 0, 0], t_rev[:, 1, 1] = t[:, 1, 1].copy(), t[:, 0, 0].copy()
@@ -180,17 +180,15 @@ def test_extended_tube_fills_the_trough_its_length_tunes() -> None:
     first, second = c / (2.0 * length), c / length
     f = np.array([first, second])
     plain = sl.expansion_chamber(f, length, 0.04, 0.01)
-    half = sl.extended_tube_chamber(
-        f, length, 0.04, 0.01, inlet_extension=length / 2.0
-    )
+    half = sl.extended_tube_chamber(f, length, 0.04, 0.01, inlet_extension=length / 2.0)
     quarter = sl.extended_tube_chamber(
         f, length, 0.04, 0.01, inlet_extension=length / 4.0
     )
     assert plain.transmission_loss == pytest.approx([0.0, 0.0], abs=1e-9)
-    assert half.transmission_loss[0] > 100.0     # tuned to the first trough
-    assert half.transmission_loss[1] < 0.1       # transparent at the second
+    assert half.transmission_loss[0] > 100.0  # tuned to the first trough
+    assert half.transmission_loss[1] < 0.1  # transparent at the second
     assert quarter.transmission_loss[1] > 100.0  # tuned to the second trough
-    assert quarter.transmission_loss[0] < 1.0    # nearly nothing at the first
+    assert quarter.transmission_loss[0] < 1.0  # nearly nothing at the first
 
 
 def test_extended_tube_straight_section_excludes_the_extensions() -> None:
@@ -203,7 +201,12 @@ def test_extended_tube_straight_section_excludes_the_extensions() -> None:
     f = np.linspace(50.0, 900.0, 400)
     s_exp, s_duct = 0.04, 0.01
     result = sl.extended_tube_chamber(
-        f, length, s_exp, s_duct, inlet_extension=la, outlet_extension=lb,
+        f,
+        length,
+        s_exp,
+        s_duct,
+        inlet_extension=la,
+        outlet_extension=lb,
         speed_of_sound=c,
     )
 
@@ -211,21 +214,23 @@ def test_extended_tube_straight_section_excludes_the_extensions() -> None:
         annulus = s_exp - s_duct
         return sl.transmission_loss(
             sl.cascade(
-                sl.shunt_matrix(sl.quarter_wave_impedance(
-                    f, la, annulus, speed_of_sound=c)),
+                sl.shunt_matrix(
+                    sl.quarter_wave_impedance(f, la, annulus, speed_of_sound=c)
+                ),
                 sl.duct_matrix(f, straight, s_exp, speed_of_sound=c),
-                sl.shunt_matrix(sl.quarter_wave_impedance(
-                    f, lb, annulus, speed_of_sound=c)),
+                sl.shunt_matrix(
+                    sl.quarter_wave_impedance(f, lb, annulus, speed_of_sound=c)
+                ),
             ),
-            inlet_area=s_duct, outlet_area=s_duct, speed_of_sound=c,
+            inlet_area=s_duct,
+            outlet_area=s_duct,
+            speed_of_sound=c,
         )
 
     assert result.transmission_loss == pytest.approx(
         by_hand(length - la - lb), abs=1e-9
     )
-    assert not np.allclose(
-        result.transmission_loss, by_hand(length), atol=1.0
-    )
+    assert not np.allclose(result.transmission_loss, by_hand(length), atol=1.0)
 
 
 def test_extended_tube_extensions_may_meet_but_not_overlap() -> None:
@@ -243,7 +248,8 @@ def test_extended_tube_extensions_may_meet_but_not_overlap() -> None:
             sl.shunt_matrix(sl.quarter_wave_impedance(f, 0.3, 0.03)),
             sl.shunt_matrix(sl.quarter_wave_impedance(f, 0.2, 0.03)),
         ),
-        inlet_area=0.01, outlet_area=0.01,
+        inlet_area=0.01,
+        outlet_area=0.01,
     )
     assert meeting.transmission_loss == pytest.approx(by_hand, abs=1e-9)
     with pytest.raises(ValueError, match="negative length"):
@@ -294,9 +300,7 @@ def test_chain_matches_the_hand_built_cascade() -> None:
     # compound matrix must equal the cascade of the bare matrices exactly.
     f = np.linspace(20.0, 400.0, 200)
     zb = sl.quarter_wave_impedance(f, 0.686, 7.85e-3)
-    chain = (
-        sl.SilencerChain(f).duct(0.15, 0.0314).shunt(zb).duct(0.60, 0.1257)
-    )
+    chain = sl.SilencerChain(f).duct(0.15, 0.0314).shunt(zb).duct(0.60, 0.1257)
     expected = sl.cascade(
         sl.duct_matrix(f, 0.15, 0.0314),
         sl.shunt_matrix(zb),
@@ -306,9 +310,7 @@ def test_chain_matches_the_hand_built_cascade() -> None:
     res = chain.result(inlet_area=0.0314, outlet_area=0.0314)
     assert np.array_equal(
         res.transmission_loss,
-        sl.transmission_loss(
-            expected, inlet_area=0.0314, outlet_area=0.0314
-        ),
+        sl.transmission_loss(expected, inlet_area=0.0314, outlet_area=0.0314),
     )
     # The widest section of the chain sets the plane-wave ceiling, exactly as
     # the widest declared area of a named device does.

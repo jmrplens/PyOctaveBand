@@ -75,19 +75,31 @@ _WAV_FOURCC = (b"RIFF", b"RF64", b"BW64")
 #: 'G721_32', ...); everything PCM/FLOAT/DOUBLE (including inside FLAC,
 #: which is lossless compression of PCM) is not matched.
 _LOSSY_SUBTYPE_MARKS = (
-    "VORBIS", "OPUS", "MPEG", "ADPCM", "ULAW", "ALAW", "GSM", "G721",
-    "G723", "DWVW", "VOX",
+    "VORBIS",
+    "OPUS",
+    "MPEG",
+    "ADPCM",
+    "ULAW",
+    "ALAW",
+    "GSM",
+    "G721",
+    "G723",
+    "DWVW",
+    "VOX",
 )
 
 #: soundfile subtype -> valid bits per sample, where the notion applies.
 _SUBTYPE_BITS = {
-    "PCM_S8": 8, "PCM_U8": 8, "PCM_16": 16, "PCM_24": 24, "PCM_32": 32,
-    "FLOAT": 32, "DOUBLE": 64,
+    "PCM_S8": 8,
+    "PCM_U8": 8,
+    "PCM_16": 16,
+    "PCM_24": 24,
+    "PCM_32": 32,
+    "FLOAT": 32,
+    "DOUBLE": 64,
 }
 
-_AUDIO_EXTRA_HINT = (
-    "Install the [audio] extra with: pip install phonometry[audio]"
-)
+_AUDIO_EXTRA_HINT = "Install the [audio] extra with: pip install phonometry[audio]"
 
 
 def _sniff(path: str | Path) -> str | None:

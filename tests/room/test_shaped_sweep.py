@@ -34,13 +34,9 @@ def _welch_deviation_db(res: room.ShapedSweepResult, target_db_fn) -> float:
     nperseg = 8192
     # 75 % overlap: at 50 % the squared Hann windows do not sum to a
     # constant and the sweep maps that power ripple onto the spectrum.
-    freqs, psd = signal.welch(
-        x, fs=res.fs, nperseg=nperseg, noverlap=3 * nperseg // 4
-    )
+    freqs, psd = signal.welch(x, fs=res.fs, nperseg=nperseg, noverlap=3 * nperseg // 4)
     third = 2.0 ** (1.0 / 3.0)
-    band = (freqs >= res.f_range[0] * third) & (
-        freqs <= res.f_range[1] / third
-    )
+    band = (freqs >= res.f_range[0] * third) & (freqs <= res.f_range[1] / third)
     measured_db = 10.0 * np.log10(psd[band])
     target_db = target_db_fn(freqs[band])
     diff = measured_db - target_db
@@ -83,10 +79,9 @@ def test_truncated_sweep_keeps_the_exact_synthesis_magnitude() -> None:
     step = 2.0 ** (1.0 / 24.0)
     centres = 130.0 * 2.0 ** (np.arange(19) / 3.0)
     centres = centres[centres <= 10000.0 / third]
-    smoothed = np.array([
-        float(np.mean(dev[(fb >= fc / step) & (fb <= fc * step)]))
-        for fc in centres
-    ])
+    smoothed = np.array(
+        [float(np.mean(dev[(fb >= fc / step) & (fb <= fc * step)])) for fc in centres]
+    )
     assert float(np.max(np.abs(smoothed))) < 0.05
 
 
@@ -94,9 +89,7 @@ def test_arbitrary_target_is_followed() -> None:
     # A tilted target with a mid-band emphasis step (in dB).
     t_freq = np.array([50.0, 200.0, 500.0, 2000.0, 8000.0])
     t_db = np.array([10.0, 10.0, 0.0, 0.0, -6.0])
-    res = room.shaped_sweep_signal(
-        FS, 50.0, 8000.0, 2.0, target=(t_freq, t_db)
-    )
+    res = room.shaped_sweep_signal(FS, 50.0, 8000.0, 2.0, target=(t_freq, t_db))
 
     def target(f: np.ndarray) -> np.ndarray:
         return np.interp(np.log10(f), np.log10(t_freq), t_db)
@@ -111,7 +104,7 @@ def test_arbitrary_target_is_followed() -> None:
 def test_group_delay_grows_with_cumulative_target_power() -> None:
     res = room.shaped_sweep_signal(FS, 50.0, 5000.0, 2.0, target="pink")
     tau = res.group_delay
-    power = res.magnitude ** 2
+    power = res.magnitude**2
     lead = tau[0]
     expected = lead + 2.0 * np.cumsum(power) / float(np.sum(power))
     np.testing.assert_allclose(tau, expected, atol=1e-12)
@@ -163,9 +156,7 @@ def test_shaped_sweep_deconvolves_a_known_system() -> None:
     h_est = np.fft.rfft(np.asarray(ir))
     _, h_true = signal.freqz(b, a, worN=freqs, fs=FS)
     band = (freqs >= 100.0) & (freqs <= 4500.0)
-    err_db = 20.0 * np.log10(
-        np.abs(h_est[band]) / np.abs(h_true[band])
-    )
+    err_db = 20.0 * np.log10(np.abs(h_est[band]) / np.abs(h_true[band]))
     assert float(np.max(np.abs(err_db))) < 0.01
 
 

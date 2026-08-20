@@ -79,10 +79,7 @@ def raster_problem(old: bytes, new: bytes, tol: RasterTolerance) -> str | None:
     diff = np.abs(a - b)
     sig_pixels = int(np.count_nonzero(diff.max(axis=-1) > tol.level))
     if sig_pixels > tol.max_sig_pixels:
-        return (
-            f"{sig_pixels} pixels changed by >{tol.level:g} "
-            f"(> {tol.max_sig_pixels})"
-        )
+        return f"{sig_pixels} pixels changed by >{tol.level:g} (> {tol.max_sig_pixels})"
     rms = float(np.sqrt(np.mean(diff**2)))
     if rms > tol.rms:
         return f"RMS {rms:.3f} > {tol.rms}"

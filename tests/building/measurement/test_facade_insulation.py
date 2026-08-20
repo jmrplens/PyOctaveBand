@@ -29,12 +29,40 @@ from phonometry import building
 
 # ISO 717-1 Annex C Table C.1 measured curve; rated Rw = 30 (-2; -3).
 _ANNEX_C_R = [
-    20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-    28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5,
+    20.4,
+    16.3,
+    17.7,
+    22.6,
+    22.4,
+    22.7,
+    24.8,
+    26.6,
+    28.0,
+    30.5,
+    31.8,
+    32.5,
+    33.4,
+    33.0,
+    31.0,
+    25.5,
 ]
 _CORE_FREQS = [
-    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
-    630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
 ]
 
 
@@ -83,9 +111,7 @@ def test_d2m_n_reduces_to_d_when_absorption_equals_reference() -> None:
 
 
 def test_d2m_n_none_without_volume() -> None:
-    res = building.facade_insulation(
-        _flat(3, 72.0), _flat(3, 32.0), _flat(3, 0.5)
-    )
+    res = building.facade_insulation(_flat(3, 72.0), _flat(3, 32.0), _flat(3, 0.5))
     assert res.d_2m_n is None
     assert res.r_prime is None
 
@@ -100,8 +126,12 @@ def test_r45_loudspeaker_correction() -> None:
     surf = _flat(n, 60.0)
     l2 = _flat(n, 20.0)
     res = building.facade_insulation(
-        _flat(n, 55.0), l2, _flat(n, 1.0),
-        area=10.0, volume=62.5, surface_level=surf,
+        _flat(n, 55.0),
+        l2,
+        _flat(n, 1.0),
+        area=10.0,
+        volume=62.5,
+        surface_level=surf,
     )
     assert res.r_prime is not None
     np.testing.assert_allclose(res.r_prime, surf - l2 - 1.5)
@@ -113,8 +143,12 @@ def test_rtrs_road_traffic_correction() -> None:
     surf = _flat(n, 60.0)
     l2 = _flat(n, 20.0)
     res = building.facade_insulation(
-        _flat(n, 55.0), l2, _flat(n, 1.0),
-        area=10.0, volume=62.5, surface_level=surf,
+        _flat(n, 55.0),
+        l2,
+        _flat(n, 1.0),
+        area=10.0,
+        volume=62.5,
+        surface_level=surf,
         method="road_traffic",
     )
     assert res.r_prime is not None
@@ -129,8 +163,12 @@ def test_r45_full_formula_with_absorption() -> None:
     area, volume = 12.0, 50.0
     a = 0.16 * volume / t
     res = building.facade_insulation(
-        np.array([50.0, 50.0]), l2, t,
-        area=area, volume=volume, surface_level=surf,
+        np.array([50.0, 50.0]),
+        l2,
+        t,
+        area=area,
+        volume=volume,
+        surface_level=surf,
     )
     expected = surf - l2 + 10.0 * np.log10(area / a) - 1.5
     assert res.r_prime is not None
@@ -140,7 +178,9 @@ def test_r45_full_formula_with_absorption() -> None:
 def test_r_prime_needs_surface_area_and_volume() -> None:
     # surface_level but no area/volume -> no R'.
     res = building.facade_insulation(
-        _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
+        _flat(3, 70.0),
+        _flat(3, 30.0),
+        _flat(3, 0.5),
         surface_level=_flat(3, 72.0),
     )
     assert res.r_prime is None
@@ -179,8 +219,12 @@ def test_nonpositive_area_volume_raises() -> None:
     surface = _flat(3, 72.0)
     with pytest.raises(ValueError):
         building.facade_insulation(
-            outdoor, indoor, rt,
-            area=-1.0, volume=50.0, surface_level=surface,
+            outdoor,
+            indoor,
+            rt,
+            area=-1.0,
+            volume=50.0,
+            surface_level=surface,
         )
 
 
@@ -198,8 +242,12 @@ def test_surface_and_area_without_volume_raises() -> None:
 def test_surface_area_and_volume_returns_r_prime() -> None:
     # The complete set of R' inputs still yields a value.
     res = building.facade_insulation(
-        _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5),
-        area=10.0, volume=62.5, surface_level=_flat(3, 72.0),
+        _flat(3, 70.0),
+        _flat(3, 30.0),
+        _flat(3, 0.5),
+        area=10.0,
+        volume=62.5,
+        surface_level=_flat(3, 72.0),
     )
     assert res.r_prime is not None
 
@@ -237,9 +285,7 @@ def test_frequencies_length_mismatch_raises() -> None:
     # than deferring a confusing matplotlib shape error to plot().
     outdoor, indoor, rt = _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
     with pytest.raises(ValueError, match="frequencies"):
-        building.facade_insulation(
-            outdoor, indoor, rt, frequencies=[125.0, 250.0]
-        )
+        building.facade_insulation(outdoor, indoor, rt, frequencies=[125.0, 250.0])
 
 
 # --------------------------------------------------------------------------
@@ -248,9 +294,7 @@ def test_frequencies_length_mismatch_raises() -> None:
 def test_extended_bands_supported() -> None:
     """50-5000 Hz (21 bands) may be supplied; all quantities per band."""
     n = 21
-    res = building.facade_insulation(
-        _flat(n, 70.0), _flat(n, 30.0), _flat(n, 0.5)
-    )
+    res = building.facade_insulation(_flat(n, 70.0), _flat(n, 30.0), _flat(n, 0.5))
     assert res.d_2m.shape == (n,)
     np.testing.assert_allclose(res.d_2m, _flat(n, 40.0))
 
@@ -265,8 +309,12 @@ def test_rating_path_reproduces_known_rw() -> None:
     # R' = L1,s - 0 - 1,5 => L1,s = R' + 1,5.
     surf = ref + 1.5
     res = building.facade_insulation(
-        _flat(16, 50.0), _flat(16, 0.0), _flat(16, 1.0),
-        area=10.0, volume=62.5, surface_level=surf,
+        _flat(16, 50.0),
+        _flat(16, 0.0),
+        _flat(16, 1.0),
+        area=10.0,
+        volume=62.5,
+        surface_level=surf,
     )
     assert res.r_prime is not None
     np.testing.assert_allclose(res.r_prime, ref, atol=1e-9)
@@ -280,21 +328,23 @@ def test_rating_path_reproduces_known_rw() -> None:
 # Result dataclass + plotting
 # --------------------------------------------------------------------------
 def test_result_is_frozen() -> None:
-    res = building.facade_insulation(
-        _flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5)
-    )
+    res = building.facade_insulation(_flat(3, 70.0), _flat(3, 30.0), _flat(3, 0.5))
     with pytest.raises(AttributeError):
         res.d_2m = np.zeros(3)  # type: ignore[misc]
 
 
 def test_plot_returns_axes_with_dnt_curve() -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     res = building.facade_insulation(
-        np.asarray(_ANNEX_C_R) + 40.0, _flat(16, 40.0), _flat(16, 0.5),
-        volume=62.5, frequencies=_CORE_FREQS,
+        np.asarray(_ANNEX_C_R) + 40.0,
+        _flat(16, 40.0),
+        _flat(16, 0.5),
+        volume=62.5,
+        frequencies=_CORE_FREQS,
     )
     ax = res.plot()
     assert not isinstance(ax, np.ndarray)
@@ -305,12 +355,11 @@ def test_plot_returns_axes_with_dnt_curve() -> None:
 
 def test_plot_forwards_kwargs() -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    res = building.facade_insulation(
-        _flat(16, 70.0), _flat(16, 30.0), _flat(16, 0.5)
-    )
+    res = building.facade_insulation(_flat(16, 70.0), _flat(16, 30.0), _flat(16, 0.5))
     ax = res.plot(linewidth=2)
     assert ax.lines[0].get_linewidth() == 2.0
     plt.close("all")

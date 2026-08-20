@@ -94,9 +94,7 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -119,8 +117,12 @@ def _band_table(result: SIIResult, verbose: bool, language: str = "en") -> Any:
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
     head_style = ParagraphStyle(
-        "sii_thead", parent=getSampleStyleSheet()["Normal"], fontSize=7.0,
-        textColor=colors.white, alignment=1, leading=8.2,
+        "sii_thead",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.0,
+        textColor=colors.white,
+        alignment=1,
+        leading=8.2,
     )
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
@@ -269,8 +271,10 @@ def render_sii_report(
 
     left_cell = [
         Paragraph(
-            t(_TABLE_CAPTIONS.get(result.method, _TABLE_CAPTIONS[_DEFAULT_METHOD]),
-              language),
+            t(
+                _TABLE_CAPTIONS.get(result.method, _TABLE_CAPTIONS[_DEFAULT_METHOD]),
+                language,
+            ),
             caption_style,
         ),
         _band_table(result, verbose, language),
@@ -286,8 +290,10 @@ def render_sii_report(
     )
     flow.append(
         two_panel_body(
-            left_cell, plot_drawing,
-            left_width_mm=left_width_mm, plot_width_mm=plot_width_mm,
+            left_cell,
+            plot_drawing,
+            left_width_mm=left_width_mm,
+            plot_width_mm=plot_width_mm,
         )
     )
     flow.append(Spacer(1, 8))

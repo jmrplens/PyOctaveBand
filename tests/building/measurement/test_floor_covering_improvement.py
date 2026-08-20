@@ -11,8 +11,24 @@ from phonometry import building
 
 #: The clause 6.3 measurement range: 18 one-third-octave bands 100-5000 Hz.
 _CLAUSE_63_FREQS = [
-    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
-    800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
 ]
 
 
@@ -40,9 +56,7 @@ def test_foret2011_carpet_rates_to_29() -> None:
     """The measured carpet spectrum rates to the paper's ΔLw = 29 dB."""
     bare = np.full(len(ref.FORET2011_CARPET_FREQ), 100.0)
     delta_l = np.asarray(ref.FORET2011_CARPET_ISO16251_DELTA_L)
-    res = building.impact_improvement(
-        bare, bare - delta_l, ref.FORET2011_CARPET_FREQ
-    )
+    res = building.impact_improvement(bare, bare - delta_l, ref.FORET2011_CARPET_FREQ)
     assert res.delta_lw == ref.FORET2011_CARPET_ISO16251_DELTA_LW
 
 
@@ -97,9 +111,7 @@ def test_weighted_improvement_rejects_non_finite() -> None:
 def test_acceleration_level_formula_1() -> None:
     # 20 lg(1e-3 / 1e-6) = 20 * 3 = 60 dB.
     np.testing.assert_allclose(building.acceleration_level(1e-3), [60.0])
-    np.testing.assert_allclose(
-        building.acceleration_level([1e-6, 1e-5]), [0.0, 20.0]
-    )
+    np.testing.assert_allclose(building.acceleration_level([1e-6, 1e-5]), [0.0, 20.0])
 
 
 def test_acceleration_level_rejects_nonpositive() -> None:
@@ -117,7 +129,7 @@ def test_background_correction_three_branches() -> None:
     lp = np.array([80.0, 80.0, 65.0])
     lb = np.array([50.0, 70.0, 62.0])
     corrected, limited = building.background_corrected_level(lp, lb)
-    expected_mid = 10.0 * np.log10(10.0 ** 8 - 10.0 ** 7)  # ~79.54
+    expected_mid = 10.0 * np.log10(10.0**8 - 10.0**7)  # ~79.54
     np.testing.assert_allclose(corrected, [80.0, expected_mid, 65.0 - 1.3])
     np.testing.assert_array_equal(limited, [False, False, True])
 
@@ -125,7 +137,7 @@ def test_background_correction_three_branches() -> None:
 def test_background_correction_boundary_at_6_subtracts() -> None:
     # ISO 16251-1 (unlike ISO 10140-4) energy-subtracts at exactly margin = 6 dB.
     corrected, limited = building.background_corrected_level([56.0], [50.0])
-    np.testing.assert_allclose(corrected, [10.0 * np.log10(10.0 ** 5.6 - 10.0 ** 5.0)])
+    np.testing.assert_allclose(corrected, [10.0 * np.log10(10.0**5.6 - 10.0**5.0)])
     assert not bool(limited[0])
 
 
@@ -148,19 +160,14 @@ def test_impact_improvement_difference_and_rating() -> None:
         res.improvement, [0, 0, 1, 2, 4, 7, 11, 15, 18, 21, 23, 25, 27, 28, 29, 30]
     )
     # ΔLw computed automatically for the 16 rating bands.
-    assert res.delta_lw == building.weighted_impact_improvement(
-        res.improvement
-    )
+    assert res.delta_lw == building.weighted_impact_improvement(res.improvement)
     assert not bool(np.any(res.limited))
 
 
 def test_annex_c2_improvement_oracle() -> None:
     """ISO 717-2 Annex C Table C.2: ΔLw = 15 dB and CI,Δ = -9 dB."""
     dl = np.asarray(ref.ISO717_2_ANNEX_C2_DELTA_L)
-    assert (
-        building.weighted_impact_improvement(dl)
-        == ref.ISO717_2_ANNEX_C2_DELTA_LW
-    )
+    assert building.weighted_impact_improvement(dl) == ref.ISO717_2_ANNEX_C2_DELTA_LW
     assert (
         building.impact_improvement_adaptation_term(dl)
         == ref.ISO717_2_ANNEX_C2_CI_DELTA
@@ -188,14 +195,46 @@ def test_baruch_2018_published_spectrum_crosscheck() -> None:
     worked examples, so the published figures corroborate it to within 1 dB.
     """
     freqs = np.asarray(ref.ISO717_2_REFERENCE_FLOOR_FREQ, dtype=float)  # 100-3150 Hz
-    baruch_full = np.array([
-        0.25, 0.39, 0.64, 0.98, 1.48, 2.25, 3.38, 4.84,
-        6.79, 9.28, 12.02, 15.09, 18.79, 22.32, 25.99, 29.89,
-    ])
-    baruch_simplified = np.array([
-        0.25, 0.39, 0.64, 0.97, 1.48, 2.24, 3.38, 4.82,
-        6.76, 9.25, 11.97, 15.02, 18.69, 22.19, 25.82, 29.67,
-    ])
+    baruch_full = np.array(
+        [
+            0.25,
+            0.39,
+            0.64,
+            0.98,
+            1.48,
+            2.25,
+            3.38,
+            4.84,
+            6.79,
+            9.28,
+            12.02,
+            15.09,
+            18.79,
+            22.32,
+            25.99,
+            29.89,
+        ]
+    )
+    baruch_simplified = np.array(
+        [
+            0.25,
+            0.39,
+            0.64,
+            0.97,
+            1.48,
+            2.24,
+            3.38,
+            4.82,
+            6.76,
+            9.25,
+            11.97,
+            15.02,
+            18.69,
+            22.19,
+            25.82,
+            29.67,
+        ]
+    )
     dlw_full = building.weighted_impact_improvement(baruch_full)
     dlw_simplified = building.weighted_impact_improvement(baruch_simplified)
     assert dlw_simplified == 15  # matches the paper exactly
@@ -206,9 +245,7 @@ def test_baruch_2018_published_spectrum_crosscheck() -> None:
     bare = np.full(16, 75.0)
     res_full = building.impact_improvement(bare, bare - baruch_full, freqs)
     assert res_full.delta_lw == dlw_full
-    res_simplified = building.impact_improvement(
-        bare, bare - baruch_simplified, freqs
-    )
+    res_simplified = building.impact_improvement(bare, bare - baruch_simplified, freqs)
     assert res_simplified.delta_lw == dlw_simplified
 
 
@@ -289,7 +326,7 @@ def test_background_correction_precedes_averaging() -> None:
     freqs = [500.0]
     l0 = np.array([[80.0], [80.0]])
     l1 = np.array([[62.0], [80.0]])  # pos 1 close to background, pos 2 not
-    bg = np.array([60.0])            # margins: L1 pos1 = 2 dB (<6 -> limit)
+    bg = np.array([60.0])  # margins: L1 pos1 = 2 dB (<6 -> limit)
     res = building.impact_improvement(l0, l1, freqs, background=bg)
     assert bool(res.limited[0])  # a position hit the 1.3 dB limit
     # Averaging-then-correcting would miss that per-position limit flag.
@@ -301,7 +338,10 @@ def test_impact_improvement_background_shape_validation() -> None:
     mismatched_background = np.full((3, 2), 50.0)  # 3 rows against 2 positions
     with pytest.raises(ValueError, match="'background' must be"):
         building.impact_improvement(
-            bare, covered, [500.0, 1000.0], background=mismatched_background,
+            bare,
+            covered,
+            [500.0, 1000.0],
+            background=mismatched_background,
         )
 
 

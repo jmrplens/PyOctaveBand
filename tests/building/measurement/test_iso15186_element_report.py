@@ -84,9 +84,7 @@ def _extract_text(path: str) -> str:
 def test_dine_equals_annex_c_curve() -> None:
     """The synthesised levels reproduce the ISO 717-1 Annex C curve exactly."""
     result = _element_result()
-    np.testing.assert_allclose(
-        result.d_i_n_e, ref.ISO717_1_ANNEX_C_R, atol=1e-9
-    )
+    np.testing.assert_allclose(result.d_i_n_e, ref.ISO717_1_ANNEX_C_R, atol=1e-9)
 
 
 def test_fiche_rating_pinned_to_iso717_1_annex_c(tmp_path) -> None:
@@ -210,8 +208,13 @@ def test_non_iso_band_count_rejected(tmp_path) -> None:
     centers = np.array([100, 125, 160, 200, 250, 315, 400, 500], dtype=float)
     curve = np.linspace(20.0, 40.0, 8)
     rating = building.WeightedRatingResult(
-        rating=30, c=-2, ctr=-3, unfavourable_sum=0.0,
-        band_centers=centers, measured=curve, shifted_reference=curve,
+        rating=30,
+        c=-2,
+        ctr=-3,
+        unfavourable_sum=0.0,
+        band_centers=centers,
+        measured=curve,
+        shifted_reference=curve,
     )
     result = IntensityElementNormalizedResult(d_i_n_e=curve, rating=rating)
     out = str(tmp_path / "x.pdf")

@@ -72,8 +72,7 @@ _STRINGS: dict[str, str] = {
     "Segment index": "Índice de segmento",
     "Segment {metric} [dB]": "{metric} por segmento [dB]",
     "Single-event segment contributions (ECAC Doc 29)": "Contribuciones por segmento de un evento único (ECAC Doc 29)",
-    "Polar angle $\\theta$ [°]  (0° forward → 180° rearward)":
-        "Ángulo polar $\\theta$ [°]  (0° adelante → 180° atrás)",
+    "Polar angle $\\theta$ [°]  (0° forward → 180° rearward)": "Ángulo polar $\\theta$ [°]  (0° adelante → 180° atrás)",
     "Source level at {distance} m [dB]": "Nivel de fuente a {distance} m [dB]",
     "Rotorcraft noise hemisphere directivity (ECAC Doc 32)": "Directividad del hemisferio de ruido de rotorcraft (ECAC Doc 32)",
     "Aircraft noise contour (ECAC Doc 29)": "Curvas de ruido de aeronaves (ECAC Doc 29)",
@@ -114,8 +113,9 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
     return s.format(**fmt) if fmt else s
 
 
-def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en",
-              **kwargs: Any) -> Axes:
+def plot_epnl(
+    result: EPNLResult, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+) -> Axes:
     """PNL and PNLT time histories with PNLTM and the 10 dB-down window.
 
     The perceived noise level and its tone-corrected counterpart are drawn
@@ -137,13 +137,28 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     # pale fill colour directly rather than a low alpha: the PDF vector backend
     # (svglib) does not preserve alpha, so a translucent fill would render solid
     # and hide the PNL/PNLT traces. A light face keeps both curves readable.
-    ax.axvspan(t[kf], t[kl], facecolor="#d7eccb", edgecolor="none", zorder=0,
-               label=_t(_TEN_DB_DOWN_LABEL, language))
+    ax.axvspan(
+        t[kf],
+        t[kl],
+        facecolor="#d7eccb",
+        edgecolor="none",
+        zorder=0,
+        label=_t(_TEN_DB_DOWN_LABEL, language),
+    )
     ax.plot(t, np.asarray(result.pnl), color=_C_MUTED, lw=1.0, ls="--", label="PNL")
-    ax.plot(t, np.asarray(result.pnlt), **{"color": _C_PRIMARY, "lw": 1.4, "label": "PNLT", **kwargs})
+    ax.plot(
+        t,
+        np.asarray(result.pnlt),
+        **{"color": _C_PRIMARY, "lw": 1.4, "label": "PNLT", **kwargs},
+    )
     km = int(np.argmax(np.asarray(result.pnlt)))
-    ax.plot([t[km]], [result.pnltm], "o", color=_C_REFERENCE,
-            label=f"PNLTM = {format_number(result.pnltm, language)} PNdB")
+    ax.plot(
+        [t[km]],
+        [result.pnltm],
+        "o",
+        color=_C_REFERENCE,
+        label=f"PNLTM = {format_number(result.pnltm, language)} PNdB",
+    )
     ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Level [PNdB]", language))
     ax.set_title(
@@ -155,9 +170,13 @@ def plot_epnl(result: EPNLResult, ax: Axes | None = None, *, language: str = "en
     localize_axes(ax, language)
     return ax
 
+
 def plot_aircraft_band_attenuation(
-    result: AircraftBandAttenuation, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: AircraftBandAttenuation,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """One-third-octave-band and pure-tone mid-band attenuation versus frequency.
 
@@ -173,10 +192,26 @@ def plot_aircraft_band_attenuation(
     ax = ax if ax is not None else _new_axes()
     f = np.asarray(result.frequency, dtype=np.float64)
     label = f"{_t('SAE band', language)} ({format_number(result.path_length, language, decimals=0)} m)"
-    ax.plot(f, np.asarray(result.band_attenuation),
-            **{"color": _C_PRIMARY, "lw": 1.6, "marker": "o", "ms": 3, "label": label, **kwargs})
-    ax.plot(f, np.asarray(result.midband_attenuation), color=_C_SECONDARY, lw=1.0, ls="--",
-            label=_t("Pure-tone mid-band (ISO 9613-1)", language))
+    ax.plot(
+        f,
+        np.asarray(result.band_attenuation),
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.6,
+            "marker": "o",
+            "ms": 3,
+            "label": label,
+            **kwargs,
+        },
+    )
+    ax.plot(
+        f,
+        np.asarray(result.midband_attenuation),
+        color=_C_SECONDARY,
+        lw=1.0,
+        ls="--",
+        label=_t("Pure-tone mid-band (ISO 9613-1)", language),
+    )
     ax.set_xscale("log")
     ax.set_xlabel(_t("Frequency [Hz]", language))
     ax.set_ylabel(_t("Attenuation [dB]", language))
@@ -187,8 +222,14 @@ def plot_aircraft_band_attenuation(
     localize_axes(ax, language)
     return ax
 
-def plot_npd_level(result: NpdLevelResult, ax: Axes | None = None, *, language: str = "en",
-                   **kwargs: Any) -> Axes:
+
+def plot_npd_level(
+    result: NpdLevelResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """NPD event level versus slant distance (log axis), with the tabulated nodes.
 
     :param result: An :class:`~phonometry.aircraft.airport_noise.NpdLevelResult`.
@@ -216,8 +257,14 @@ def plot_npd_level(result: NpdLevelResult, ax: Axes | None = None, *, language: 
     localize_axes(ax, language)
     return ax
 
-def plot_flyover(result: FlyoverResult, ax: Axes | None = None, *, language: str = "en",
-                 **kwargs: Any) -> Axes:
+
+def plot_flyover(
+    result: FlyoverResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Per-segment contributions to a single-event level (ECAC Doc 29).
 
     Bars show each flight-path segment's event level; the dashed line marks the
@@ -240,8 +287,13 @@ def plot_flyover(result: FlyoverResult, ax: Axes | None = None, *, language: str
     metric = "SEL" if result.metric == "exposure" else r"$L_\mathrm{Amax}$"
     ax.bar(idx, seg, **{"color": _C_PRIMARY, "alpha": 0.85, **kwargs})
     if np.isfinite(result.level):
-        ax.axhline(result.level, color=_C_REFERENCE, ls="--", lw=1.2,
-                   label=f"Total {metric} = {format_number(result.level, language)} dB")
+        ax.axhline(
+            result.level,
+            color=_C_REFERENCE,
+            ls="--",
+            lw=1.2,
+            label=f"Total {metric} = {format_number(result.level, language)} dB",
+        )
     ax.set_xlabel(_t("Segment index", language))
     ax.set_ylabel(_t("Segment {metric} [dB]", language, metric=metric))
     ax.set_title(_t("Single-event segment contributions (ECAC Doc 29)", language))
@@ -251,9 +303,15 @@ def plot_flyover(result: FlyoverResult, ax: Axes | None = None, *, language: str
     localize_axes(ax, language)
     return ax
 
+
 def plot_rotorcraft_hemisphere(
-    result: RotorcraftHemisphere, ax: Axes | None = None, *, band: float | None = None,
-    language: str = "en", **kwargs: Any) -> Axes:
+    result: RotorcraftHemisphere,
+    ax: Axes | None = None,
+    *,
+    band: float | None = None,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Fore-aft directivity section of a rotorcraft noise hemisphere (ECAC Doc 32).
 
     Plots the source level versus polar angle θ (0° forward → 180° rearward) in the
@@ -273,23 +331,45 @@ def plot_rotorcraft_hemisphere(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     theta = np.linspace(float(result.polar[0]), float(result.polar[-1]), 181)
     grid = np.array([hemisphere_source_level(result, 0.0, t) for t in theta])
-    idx = int(np.argmin(np.abs(freqs - band))) if band is not None else int(
-        np.nanargmax(np.nansum(10.0 ** (grid / 10.0), axis=0)))
-    ax.plot(theta, grid[:, idx], **{"color": _C_PRIMARY, "lw": 1.8,
+    idx = (
+        int(np.argmin(np.abs(freqs - band)))
+        if band is not None
+        else int(np.nanargmax(np.nansum(10.0 ** (grid / 10.0), axis=0)))
+    )
+    ax.plot(
+        theta,
+        grid[:, idx],
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.8,
             "label": f"{format_number(freqs[idx], language, decimals=0)} Hz ($\\varphi$ = 0°)",
-            **kwargs})
-    ax.set_xlabel(_t("Polar angle $\\theta$ [°]  (0° forward → 180° rearward)", language))
-    ax.set_ylabel(_t("Source level at {distance} m [dB]", language,
-                     distance=format_number(result.distance, language,
-                                            decimals=1, trim=True)))
+            **kwargs,
+        },
+    )
+    ax.set_xlabel(
+        _t("Polar angle $\\theta$ [°]  (0° forward → 180° rearward)", language)
+    )
+    ax.set_ylabel(
+        _t(
+            "Source level at {distance} m [dB]",
+            language,
+            distance=format_number(result.distance, language, decimals=1, trim=True),
+        )
+    )
     ax.set_title(_t("Rotorcraft noise hemisphere directivity (ECAC Doc 32)", language))
     ax.grid(True, alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
     return ax
 
-def plot_noise_contour(result: NoiseContourResult, ax: Axes | None = None, *,
-                       language: str = "en", **kwargs: Any) -> Axes:
+
+def plot_noise_contour(
+    result: NoiseContourResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Filled single-event noise contours over the ground plane (ECAC Doc 29).
 
     :param result: A :class:`~phonometry.aircraft.airport_noise.NoiseContourResult`.
@@ -309,7 +389,12 @@ def plot_noise_contour(result: NoiseContourResult, ax: Axes | None = None, *,
     levels = np.arange(top - 30.0, top + 0.1, 5.0)
     # Mask non-finite cells (e.g. degenerate paths) so they render blank.
     masked = np.ma.masked_invalid(lvl)
-    cf = ax.contourf(x, y, masked, **{"levels": levels, "cmap": "viridis", "extend": "both", **kwargs})
+    cf = ax.contourf(
+        x,
+        y,
+        masked,
+        **{"levels": levels, "cmap": "viridis", "extend": "both", **kwargs},
+    )
     ax.contour(x, y, masked, levels=levels, colors="k", linewidths=0.4, alpha=0.5)
     metric = "SEL" if result.metric == "exposure" else r"$L_\mathrm{Amax}$"
     ax.figure.colorbar(cf, ax=ax, label=f"{metric} [dB]")
@@ -322,8 +407,12 @@ def plot_noise_contour(result: NoiseContourResult, ax: Axes | None = None, *,
 
 
 def plot_flight_path_kinematics(
-    result: FlightPathKinematics, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: FlightPathKinematics,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Speed and angle profiles of a rotorcraft track (ECAC Doc 32).
 
     The ground speed and airspeed share the left axis; the path and bank
@@ -340,22 +429,53 @@ def plot_flight_path_kinematics(
 
     ax = ax if ax is not None else _new_axes()
     t = np.asarray(result.times, dtype=np.float64)
-    ax.plot(t, result.airspeed, **{"color": _C_PRIMARY, "lw": 1.8,
-            "label": _t("Airspeed $V_\\mathrm{A}$", language), **kwargs})
-    ax.plot(t, result.ground_speed, **{"color": _C_SECONDARY, "lw": 1.4,
-            "ls": "--", "label": _t("Ground speed $V_\\mathrm{g}$", language),
-            **kwargs})
+    ax.plot(
+        t,
+        result.airspeed,
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.8,
+            "label": _t("Airspeed $V_\\mathrm{A}$", language),
+            **kwargs,
+        },
+    )
+    ax.plot(
+        t,
+        result.ground_speed,
+        **{
+            "color": _C_SECONDARY,
+            "lw": 1.4,
+            "ls": "--",
+            "label": _t("Ground speed $V_\\mathrm{g}$", language),
+            **kwargs,
+        },
+    )
     ax.set_xlabel(_t(_TIME_LABEL, language))
     ax.set_ylabel(_t("Speed [m/s]", language))
     ax2 = ax.twinx()
-    ax2.plot(t, result.path_angle, color=_C_TERTIARY, lw=1.4,
-             label=_t("Path angle $\\gamma$", language))
-    ax2.plot(t, result.bank_angle, color=_C_MUTED, lw=1.4, ls=":",
-             label=_t("Bank angle $\\Phi$", language))
+    ax2.plot(
+        t,
+        result.path_angle,
+        color=_C_TERTIARY,
+        lw=1.4,
+        label=_t("Path angle $\\gamma$", language),
+    )
+    ax2.plot(
+        t,
+        result.bank_angle,
+        color=_C_MUTED,
+        lw=1.4,
+        ls=":",
+        label=_t("Bank angle $\\Phi$", language),
+    )
     ax2.set_ylabel(_t("Angle [°]", language))
     lines = [*ax.get_lines(), *ax2.get_lines()]
-    ax.legend(lines, [str(ln.get_label()) for ln in lines],
-              loc=_LEGEND_UPPER_RIGHT, fontsize="small")
+    ax.legend(
+        lines,
+        [str(ln.get_label()) for ln in lines],
+        loc=_LEGEND_UPPER_RIGHT,
+        fontsize="small",
+    )
     ax.set_title(_t("Rotorcraft flight-path kinematics (ECAC Doc 32)", language))
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
@@ -363,8 +483,12 @@ def plot_flight_path_kinematics(
 
 
 def plot_rotorcraft_event(
-    result: RotorcraftEventResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: RotorcraftEventResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """A-weighted level time history of a rotorcraft event (ECAC Doc 32).
 
     Draws ``L_A(t)`` at recorded time, marks ``LASmax``, shades the 10 dB-down
@@ -388,13 +512,24 @@ def plot_rotorcraft_event(
     label += ")"
     ax.plot(t, la, **{"color": _C_PRIMARY, "lw": 1.6, "label": label, **kwargs})
     k = int(np.argmax(la))
-    ax.plot(t[k], la[k], "o", color=_C_SECONDARY, ms=5,
-            label=rf"$L_\mathrm{{ASmax}}$ = {format_number(result.la_max, language)} dB(A)")
+    ax.plot(
+        t[k],
+        la[k],
+        "o",
+        color=_C_SECONDARY,
+        ms=5,
+        label=rf"$L_\mathrm{{ASmax}}$ = {format_number(result.la_max, language)} dB(A)",
+    )
     window = la >= result.la_max - 10.0
     if np.any(window):
         idx = np.nonzero(window)[0]
-        ax.axvspan(t[idx[0]], t[idx[-1]], color=_C_PRIMARY, alpha=0.08,
-                   label=_t(_TEN_DB_DOWN_LABEL, language))
+        ax.axvspan(
+            t[idx[0]],
+            t[idx[-1]],
+            color=_C_PRIMARY,
+            alpha=0.08,
+            label=_t(_TEN_DB_DOWN_LABEL, language),
+        )
     ax.set_xlabel(_t("Recorded time [s]", language))
     ax.set_ylabel(_t("A-weighted level [dB(A)]", language))
     ax.set_title(_t("Rotorcraft flyover time history (ECAC Doc 32)", language))
@@ -405,8 +540,12 @@ def plot_rotorcraft_event(
 
 
 def plot_rotorcraft_noise_contour(
-    result: RotorcraftNoiseContourResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: RotorcraftNoiseContourResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Filled rotorcraft single-event noise contours over the ground plane.
 
     :param result: A
@@ -426,8 +565,12 @@ def plot_rotorcraft_noise_contour(
     top = float(np.ceil(np.max(finite) / 5.0) * 5.0) if finite.size else 100.0
     levels = np.arange(top - 30.0, top + 0.1, 5.0)
     masked = np.ma.masked_invalid(lvl)
-    cf = ax.contourf(x, y, masked,
-                     **{"levels": levels, "cmap": "viridis", "extend": "both", **kwargs})
+    cf = ax.contourf(
+        x,
+        y,
+        masked,
+        **{"levels": levels, "cmap": "viridis", "extend": "both", **kwargs},
+    )
     ax.contour(x, y, masked, levels=levels, colors="k", linewidths=0.4, alpha=0.5)
     metric = "SEL" if result.metric == "exposure" else r"$L_\mathrm{ASmax}$"
     ax.figure.colorbar(cf, ax=ax, label=f"{metric} [dB(A)]")
@@ -440,8 +583,12 @@ def plot_rotorcraft_noise_contour(
 
 
 def plot_mean_ground_plane(
-    result: MeanGroundPlaneResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: MeanGroundPlaneResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Terrain section with its fitted mean ground plane (ECAC Doc 32 guidance).
 
     :param result: A
@@ -456,12 +603,27 @@ def plot_mean_ground_plane(
     ax = ax if ax is not None else _new_axes()
     d = np.asarray(result.distances, dtype=np.float64)
     z = np.asarray(result.heights, dtype=np.float64)
-    ax.plot(d, z, **{"color": _C_PRIMARY, "lw": 1.8, "label": _t(_TERRAIN_PROFILE_LABEL, language),
-            **kwargs})
-    ax.fill_between(d, z, z.min() - 0.05 * np.ptp(z) - 0.5, color=_C_PRIMARY,
-                    alpha=0.08)
-    ax.plot(d, result.height(d), color=_C_SECONDARY, lw=1.6, ls="--",
-            label=f"{_t('Mean ground plane', language)} ($a$ = {format_number(result.slope, language, decimals=3)})")
+    ax.plot(
+        d,
+        z,
+        **{
+            "color": _C_PRIMARY,
+            "lw": 1.8,
+            "label": _t(_TERRAIN_PROFILE_LABEL, language),
+            **kwargs,
+        },
+    )
+    ax.fill_between(
+        d, z, z.min() - 0.05 * np.ptp(z) - 0.5, color=_C_PRIMARY, alpha=0.08
+    )
+    ax.plot(
+        d,
+        result.height(d),
+        color=_C_SECONDARY,
+        lw=1.6,
+        ls="--",
+        label=f"{_t('Mean ground plane', language)} ($a$ = {format_number(result.slope, language, decimals=3)})",
+    )
     ax.set_xlabel(_t(_SECTION_DISTANCE_LABEL, language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(_t("Mean ground plane (NORAH2 guidance Eq. 36-40)", language))
@@ -472,8 +634,12 @@ def plot_mean_ground_plane(
 
 
 def plot_terrain_screening(
-    result: TerrainScreeningResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: TerrainScreeningResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
+) -> Axes:
     """Terrain screening section: profile, line of sight and diffracted path.
 
     :param result: A
@@ -489,25 +655,51 @@ def plot_terrain_screening(
     d = np.asarray(result.distances, dtype=np.float64)
     z = np.asarray(result.heights, dtype=np.float64)
     src, rcv = result.source, result.receiver
-    ax.plot(d, z, **{"color": _C_MUTED, "lw": 1.8, "label": _t(_TERRAIN_PROFILE_LABEL, language),
-            **kwargs})
+    ax.plot(
+        d,
+        z,
+        **{
+            "color": _C_MUTED,
+            "lw": 1.8,
+            "label": _t(_TERRAIN_PROFILE_LABEL, language),
+            **kwargs,
+        },
+    )
     floor = min(z.min(), src[1], rcv[1]) - 0.05 * max(np.ptp(z), 1.0) - 0.5
     ax.fill_between(d, z, floor, color=theme_fill(_C_MUTED, ax), zorder=0)
-    ax.plot([src[0], rcv[0]], [src[1], rcv[1]], color=_C_REFERENCE, lw=1.2,
-            ls=":", label=_t("Line of sight", language))
+    ax.plot(
+        [src[0], rcv[0]],
+        [src[1], rcv[1]],
+        color=_C_REFERENCE,
+        lw=1.2,
+        ls=":",
+        label=_t("Line of sight", language),
+    )
     if result.screened and result.diffraction_points.size:
-        pts = np.vstack([[src[0], src[1]], result.diffraction_points,
-                         [rcv[0], rcv[1]]])
-        ax.plot(pts[:, 0], pts[:, 1], color=_C_PRIMARY, lw=1.8,
-                label=f"{_t('Diffracted path', language)} ($\\delta$ = {format_number(result.path_difference, language, decimals=2)} m)")
-        ax.plot(result.diffraction_points[:, 0], result.diffraction_points[:, 1],
-                "v", color=_C_SECONDARY, ms=6, label=_t("Diffraction edges", language))
+        pts = np.vstack([[src[0], src[1]], result.diffraction_points, [rcv[0], rcv[1]]])
+        ax.plot(
+            pts[:, 0],
+            pts[:, 1],
+            color=_C_PRIMARY,
+            lw=1.8,
+            label=f"{_t('Diffracted path', language)} ($\\delta$ = {format_number(result.path_difference, language, decimals=2)} m)",
+        )
+        ax.plot(
+            result.diffraction_points[:, 0],
+            result.diffraction_points[:, 1],
+            "v",
+            color=_C_SECONDARY,
+            ms=6,
+            label=_t("Diffraction edges", language),
+        )
     ax.plot(*src, "o", color=_C_PRIMARY, ms=7)
-    ax.annotate("$S$", src, textcoords="offset points", xytext=(0, 8),
-                ha="center", fontsize=10)
+    ax.annotate(
+        "$S$", src, textcoords="offset points", xytext=(0, 8), ha="center", fontsize=10
+    )
     ax.plot(*rcv, "s", color=_C_SECONDARY, ms=6)
-    ax.annotate("$R$", rcv, textcoords="offset points", xytext=(0, 8),
-                ha="center", fontsize=10)
+    ax.annotate(
+        "$R$", rcv, textcoords="offset points", xytext=(0, 8), ha="center", fontsize=10
+    )
     ax.set_xlabel(_t(_SECTION_DISTANCE_LABEL, language))
     ax.set_ylabel(_t(_HEIGHT_LABEL, language))
     ax.set_title(_t("Terrain screening (ECAC Doc 32 / NORAH2 guidance)", language))
@@ -518,8 +710,8 @@ def plot_terrain_screening(
 
 
 def plot_anp_npd(
-    result: AnpNpdCurves, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: AnpNpdCurves, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+) -> Axes:
     """NPD curve at each tabulated power against slant distance.
 
     :param result: An :class:`~phonometry.aircraft.anp_fleet.AnpNpdCurves`.
@@ -535,14 +727,19 @@ def plot_anp_npd(
     for i, power in enumerate(result.powers):
         curve = npd_curve(result.powers, result.distances, result.levels, float(power))
         reading = decimal_comma(fmt_minus(float(power), "g"), language)
-        ax.plot(curve.distance, curve.level, **{"lw": 1.5, "label": f"$P$ = {reading}",
-                **kwargs})
+        ax.plot(
+            curve.distance,
+            curve.level,
+            **{"lw": 1.5, "label": f"$P$ = {reading}", **kwargs},
+        )
         ax.plot(result.distances, result.levels[i], "o", ms=3, color=_C_MUTED)
     ax.set_xscale("log")
     ax.set_xlabel(_t(_SLANT_DISTANCE_LABEL, language))
     ax.set_ylabel(_t(_EVENT_LEVEL_LABEL, language))
-    ax.set_title(f"{_t('ANP NPD curves', language)} - {result.aircraft_id} "
-                 f"({result.metric}, {result.operation})")
+    ax.set_title(
+        f"{_t('ANP NPD curves', language)} - {result.aircraft_id} "
+        f"({result.metric}, {result.operation})"
+    )
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
     localize_axes(ax, language)
@@ -550,8 +747,8 @@ def plot_anp_npd(
 
 
 def plot_anp_profile(
-    result: AnpProfile, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any) -> Axes:
+    result: AnpProfile, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+) -> Axes:
     """Trajectory altitude against along-track distance, runway points marked.
 
     :param result: An :class:`~phonometry.aircraft.anp_fleet.AnpProfile`.
@@ -565,8 +762,9 @@ def plot_anp_profile(
     ax = ax if ax is not None else _new_axes()
     x_km = result.path[:, 0] / 1000.0
     z_m = result.path[:, 2]
-    ax.plot(x_km, z_m, **{"marker": "o", "ms": 3, "lw": 1.5, "color": _C_PRIMARY,
-            **kwargs})
+    ax.plot(
+        x_km, z_m, **{"marker": "o", "ms": 3, "lw": 1.5, "color": _C_PRIMARY, **kwargs}
+    )
     # Highlight the runway points: both endpoints of every roll segment, so the
     # final point of a roll span is not dropped (the masks are per-segment).
     seg = result.ground_roll | result.landing_roll
@@ -574,13 +772,21 @@ def plot_anp_profile(
     roll[:-1] |= seg
     roll[1:] |= seg
     if roll.any():
-        ax.plot(x_km[roll], z_m[roll], "s", ms=6, color=_C_REFERENCE,
-                label=_t("ground roll", language))
+        ax.plot(
+            x_km[roll],
+            z_m[roll],
+            "s",
+            ms=6,
+            color=_C_REFERENCE,
+            label=_t("ground roll", language),
+        )
         ax.legend(loc="upper left", fontsize="small")
     ax.set_xlabel(_t("Along-track distance [km]", language))
     ax.set_ylabel(_t("Altitude AFE [m]", language))
-    ax.set_title(f"{_t('ANP default profile', language)} - {result.aircraft_id} "
-                 f"({result.operation})")
+    ax.set_title(
+        f"{_t('ANP default profile', language)} - {result.aircraft_id} "
+        f"({result.operation})"
+    )
     ax.grid(True, alpha=0.3)
     localize_axes(ax, language)
     return ax

@@ -30,7 +30,22 @@ from phonometry import building
 
 # ISO 717-2 Table 3 reference values.
 _REF_IMPACT_THIRD = [
-    62, 62, 62, 62, 62, 62, 61, 60, 59, 58, 57, 54, 51, 48, 45, 42,
+    62,
+    62,
+    62,
+    62,
+    62,
+    62,
+    61,
+    60,
+    59,
+    58,
+    57,
+    54,
+    51,
+    48,
+    45,
+    42,
 ]
 _REF_IMPACT_OCTAVE = [67, 67, 65, 62, 49]
 _INDEX_500_THIRD = 7
@@ -74,9 +89,7 @@ def _brute_force_impact_rating(
     return rating, dev
 
 
-def _brute_force_ci(
-    measured: list[float], rating: int, n_bands: int
-) -> int:
+def _brute_force_ci(measured: list[float], rating: int, n_bands: int) -> int:
     """Independent CI (ISO 717-2 A.2.1): energetic sum 100-2500 - 15 - Ln,w."""
     meas = _round_half_up_tenths(np.asarray(measured, dtype=np.float64))
     subset = meas[:n_bands]
@@ -87,6 +100,7 @@ def _brute_force_ci(
 # --------------------------------------------------------------------------
 # ISO 717-2 weighted impact rating and CI
 # --------------------------------------------------------------------------
+
 
 def test_annex_c1_worked_example_third_octave() -> None:
     """ISO 717-2 Annex C Table C.1: Ln,w = 79, CI = -11, sum 28,0."""
@@ -204,6 +218,7 @@ def test_engine_matches_brute_force_octave() -> None:
 # ISO 16283-2 field quantities
 # --------------------------------------------------------------------------
 
+
 def test_lnt_equals_li_when_t_is_half_second() -> None:
     """Formula (1): T = T0 = 0,5 s => L'nT = Li exactly."""
     li = np.array([60.0, 62.0, 55.0])
@@ -247,7 +262,7 @@ def test_impact_energy_averages_positions() -> None:
     """2-D li (positions x bands) is energy-averaged (Formula (10))."""
     li = np.array([[60.0, 50.0], [50.0, 60.0]])  # two positions, two bands
     res = building.impact_insulation(li, np.array([0.5, 0.5]))
-    avg = 10.0 * np.log10((10 ** 6 + 10 ** 5) / 2.0)
+    avg = 10.0 * np.log10((10**6 + 10**5) / 2.0)
     np.testing.assert_allclose(res.l_n_t, [avg, avg])
 
 
@@ -263,9 +278,7 @@ def test_impact_rejects_length_mismatch() -> None:
 def test_impact_rejects_bad_reverberation_time() -> None:
     li = np.array([60.0])
     zero_t2 = np.array([0.0])
-    with pytest.raises(
-        ValueError, match="'t2' must contain positive, finite values"
-    ):
+    with pytest.raises(ValueError, match="'t2' must contain positive, finite values"):
         building.impact_insulation(li, zero_t2)
 
 

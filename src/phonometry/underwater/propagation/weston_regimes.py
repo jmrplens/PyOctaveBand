@@ -161,7 +161,9 @@ def loss_parameter(attenuation_db_per_wavelength: float) -> float:
     """
     beta = float(attenuation_db_per_wavelength)
     if not np.isfinite(beta) or beta < 0.0:
-        raise ValueError("'attenuation_db_per_wavelength' must be non-negative and finite.")
+        raise ValueError(
+            "'attenuation_db_per_wavelength' must be non-negative and finite."
+        )
     return float(beta / (40.0 * np.pi * np.log10(np.e)))
 
 
@@ -204,9 +206,13 @@ def reflection_loss_gradient(
             " to use the refracting branch of Equation (9.53)."
         )
     if frequency_hz is None:
-        raise ValueError("'frequency_hz' is required for a refracting seabed (Equation 9.53).")
+        raise ValueError(
+            "'frequency_hz' is required for a refracting seabed (Equation 9.53)."
+        )
     f = require_positive(frequency_hz, "frequency_hz")
-    return float(2.0 * (2.0 * np.pi * f) * bed.loss_parameter / bed.sound_speed_gradient)
+    return float(
+        2.0 * (2.0 * np.pi * f) * bed.loss_parameter / bed.sound_speed_gradient
+    )
 
 
 def effective_depth(
@@ -274,9 +280,7 @@ def waveguide_cutoff_frequency(
             "'waveguide_cutoff_frequency' needs a seabed with a critical angle"
             f" (c_sed > c_w); {bed.name!r} has none."
         )
-    return float(
-        (np.pi - bed.density_ratio) / (2.0 * np.pi * np.sin(psi_c)) * c / h
-    )
+    return float((np.pi - bed.density_ratio) / (2.0 * np.pi * np.sin(psi_c)) * c / h)
 
 
 @dataclass(frozen=True)
@@ -408,7 +412,9 @@ def _angle_and_gradient(
     else:
         eta = float(gradient)
         if not np.isfinite(eta) or eta < 0.0:
-            raise ValueError("'reflection_loss_gradient_value' must be non-negative and finite.")
+            raise ValueError(
+                "'reflection_loss_gradient_value' must be non-negative and finite."
+            )
     return float(psi_c), float(eta)
 
 
@@ -455,12 +461,16 @@ class WestonPropagationResult:
     receiver_depth: float
     seabed: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the composite loss with each regime's law and the boundaries."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_weston_regimes
 
-        return plot_weston_regimes(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_weston_regimes(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _to_db(factor: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -468,8 +478,9 @@ def _to_db(factor: NDArray[np.float64]) -> NDArray[np.float64]:
     to ``nan``.
     """
     with np.errstate(divide="ignore"):
-        return np.asarray(-10.0 * np.log10(np.where(factor > 0.0, factor, np.nan)),
-                          dtype=np.float64)
+        return np.asarray(
+            -10.0 * np.log10(np.where(factor > 0.0, factor, np.nan)), dtype=np.float64
+        )
 
 
 def weston_propagation_loss(
@@ -524,7 +535,11 @@ def weston_propagation_loss(
 
     bed = _seabed(seabed)
     bounds = weston_regime_boundaries(
-        f, h, seabed=bed, sound_speed=c, critical_angle=critical_angle,
+        f,
+        h,
+        seabed=bed,
+        sound_speed=c,
+        critical_angle=critical_angle,
         reflection_loss_gradient_value=reflection_loss_gradient_value,
     )
     psi_c = bounds.critical_angle
@@ -532,18 +547,21 @@ def weston_propagation_loss(
     h_eff = bounds.effective_depth
     lam = c / f
 
-    f_ss = 1.0 / r**2                                            # Eq. (9.43)/(9.44)
-    f_cs = 2.0 * psi_c / (r * h)                                 # Eq. (9.42)
+    f_ss = 1.0 / r**2  # Eq. (9.43)/(9.44)
+    f_cs = 2.0 * psi_c / (r * h)  # Eq. (9.42)
     if eta > 0.0:
-        theta_eff = np.sqrt(np.pi * h / (4.0 * eta * r))         # Eq. (9.47)
+        theta_eff = np.sqrt(np.pi * h / (4.0 * eta * r))  # Eq. (9.47)
         f_mp = (2.0 * theta_eff / (r * h)) * erf(
-            np.sqrt(np.pi) * psi_c / (2.0 * theta_eff))          # Eq. (9.46)
-        f_ms = np.sqrt(np.pi / (eta * h)) * r ** (-1.5)          # Eq. (9.49)
+            np.sqrt(np.pi) * psi_c / (2.0 * theta_eff)
+        )  # Eq. (9.46)
+        f_ms = np.sqrt(np.pi / (eta * h)) * r ** (-1.5)  # Eq. (9.49)
     else:
         f_mp = f_cs
         f_ms = np.zeros_like(r)
-    f_sm = (                                                     # Eq. (9.54)
-        4.0 * lam / (h_eff**2 * r)
+    f_sm = (  # Eq. (9.54)
+        4.0
+        * lam
+        / (h_eff**2 * r)
         * np.sin(np.pi * z0 / h_eff) ** 2
         * np.sin(np.pi * zr / h_eff) ** 2
         * np.exp(-eta * lam**2 * r / (4.0 * h_eff**3))

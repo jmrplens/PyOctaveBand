@@ -71,8 +71,9 @@ def _chk_piston_resistance_limit() -> Outcome:
 )
 def _chk_piston_radiation_mass() -> Outcome:
     res = ph.electroacoustics.radiating_piston(0.1, [100.0], density=1.206)
-    return numeric(8.0 * 1.206 * 0.1**3 / 3.0, res.radiation_mass, 1e-9,
-                   unit="kg", places=8)
+    return numeric(
+        8.0 * 1.206 * 0.1**3 / 3.0, res.radiation_mass, 1e-9, unit="kg", places=8
+    )
 
 
 @register(
@@ -82,11 +83,7 @@ def _chk_piston_radiation_mass() -> Outcome:
 )
 def _chk_piston_directivity_null() -> Outcome:
     # ka sin(theta) = 3.8317 at ka = 3.8317, theta = pi/2.
-    d = float(
-        ph.electroacoustics.piston_directivity(
-            3.8317059702075125, math.pi / 2.0
-        )
-    )
+    d = float(ph.electroacoustics.piston_directivity(3.8317059702075125, math.pi / 2.0))
     return numeric(0.0, d, 1e-6, places=8)
 
 
@@ -97,8 +94,9 @@ def _chk_piston_directivity_null() -> Outcome:
 )
 def _chk_piston_directivity_index() -> Outcome:
     res = ph.electroacoustics.radiating_piston(0.01, [1.0])
-    return numeric(10.0 * math.log10(2.0), float(res.directivity_index[0]),
-                   1e-3, unit="dB")
+    return numeric(
+        10.0 * math.log10(2.0), float(res.directivity_index[0]), 1e-3, unit="dB"
+    )
 
 
 @register(
@@ -108,8 +106,9 @@ def _chk_piston_directivity_index() -> Outcome:
 )
 def _chk_feedback_omnidirectional() -> Outcome:
     res = ph.electroacoustics.feedback_stability(-6.0, 76.0, 80.0)
-    return numeric(80.0 - 4.0, res.maximum_level_at_microphone, 1e-9,
-                   unit="dB", places=6)
+    return numeric(
+        80.0 - 4.0, res.maximum_level_at_microphone, 1e-9, unit="dB", places=6
+    )
 
 
 @register(
@@ -121,8 +120,9 @@ def _chk_feedback_cardioid() -> Outcome:
     res = ph.electroacoustics.feedback_stability(
         -6.0, 78.0, 80.0, microphone_directivity=-2.0
     )
-    return numeric(80.0 - 2.0, res.maximum_level_at_microphone, 1e-9,
-                   unit="dB", places=6)
+    return numeric(
+        80.0 - 2.0, res.maximum_level_at_microphone, 1e-9, unit="dB", places=6
+    )
 
 
 @register(

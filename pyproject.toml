@@ -114,6 +114,79 @@ phonometry = ["py.typed", "aircraft/data/anp/*.csv", "aircraft/data/anp/*.md"]
 [tool.setuptools.dynamic]
 version = {file = "VERSION"}
 
+# Ruff is this project's formatter and linter. Before this section it had no
+# configuration at all: `ruff check .` ran with the default rule set (E4, E7,
+# E9, F) and nothing formatted the tree, so 673 of the 812 Python files had
+# drifted from any single style.
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+# Markdown is excluded on purpose. Ruff formats fenced Python inside `.md` but
+# does not recognise `.mdx` at all, and every snippet in `docs/` is mirrored by
+# hand into `site/src/content/docs/` in English and Spanish. Formatting one
+# side would silently drift the three copies apart, and the aligned trailing
+# comments those snippets use to show expected output are a teaching device,
+# not an accident.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+# The default set (E4, E7, E9, F) plus the families this tree already satisfies
+# or very nearly does, so the gate stays honest instead of drowning in noise.
+# Deliberately absent, with the count each would raise today:
+#   PL   (5753) mostly magic-value comparisons, and the magic values here are
+#               transcribed normative constants: that is the content.
+#   RUF  (1705) ambiguous-unicode in prose that legitimately carries the
+#               degree sign, the multiplication sign and ISO symbols.
+#   TID  (2218) bans the relative imports this package uses by design.
+#   N     (184) would rename `Rw`, `LAeq`, `alpha_w` and every other symbol
+#               that a standard spells that way.
+#   T20   (600) prints, which is what the scripts in `scripts/` are for.
+#   COM  (5992) trailing commas, which the formatter already decides.
+select = [
+    "E4", "E7", "E9", "F",  # ruff's default set
+    "W",                    # whitespace, which the formatter also settles
+    "I",                    # import order; this tree already satisfied it
+    "UP", "B", "SIM", "C4", "RET", "A",
+    "PIE", "DTZ", "G",      # zero findings today: these only guard the future
+    "FURB",                 # long-hand forms of builtins
+]
+ignore = ["B905"]  # selected by "B"; see the note below
+# Selected next, in their own review, because each is a change to code rather
+# than to its shape and the diff has to be readable to be checked:
+#   TC    (313) moves imports that only a type checker needs under
+#               `if TYPE_CHECKING`. Measured here, it costs more than it is
+#               worth in this pass: it reorders imports, which makes `I` fire
+#               where it was at zero, and the clip freshness fingerprint hashes
+#               the AST of the drawing closure, imports included. Both together
+#               moved the recorded fingerprint of most of the 42 committed
+#               clips, for drawings that are provably identical. The top-level
+#               import is already lazy, so the runtime gain is small.
+#   PT    (295) pytest idiom. 241 of them are `pytest.raises` without `match=`,
+#               and the habit here is already the other way: 1755 of the 2065
+#               `pytest.raises` in the suite do pass `match=`. These are the
+#               stragglers, not a style.
+#   PTH   (158) pathlib over os.path.
+#   PERF   (34) manual loops that build a list.
+#   B905  (162) `zip()` without `strict=`. 47 are in `src/`, where a silent
+#               truncation drops a band or a curve without saying so. Ruff's
+#               own fix writes `strict=False`, which only makes the truncation
+#               explicit; the value is in deciding, per site, where the lengths
+#               are equal by construction and `strict=True` is the truth.
+
+[tool.ruff.lint.per-file-ignores]
+# `matplotlib.use("Agg")` has to run between `import matplotlib` and the first
+# `import matplotlib.pyplot`, and the scripts put the repository on `sys.path`
+# before importing from it. Both are imports that cannot be at the top of the
+# file. `src/` raises no E402 at all, which is where it would matter.
+"tests/**" = ["E402"]
+"scripts/**" = ["E402"]
+# The PyOctaveBand transition shim exists to re-export the whole package under
+# the old name; the star import is the point of the file.
+"stub/src/pyoctaveband/__init__.py" = ["F403"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["phonometry"]
+
 [tool.mypy]
 python_version = "3.13"
 strict = true

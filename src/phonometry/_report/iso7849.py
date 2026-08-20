@@ -167,9 +167,7 @@ def _statement(result: Any, language: str = "en") -> tuple[str, list[str]]:
 
 def _relation_strip(language: str = "en") -> str:
     """The sound-power-relation line for the basis strip (Eq. 12/15)."""
-    imp = format_number(
-        10.0 * math.log10(411.0 / 400.0), language, decimals=2
-    )
+    imp = format_number(10.0 * math.log10(411.0 / 400.0), language, decimals=2)
     return t(
         "L<sub>W</sub> = L<sub>v</sub> + 10 lg(S/S<sub>0</sub>) + 10 lg(&#949;) "
         "+ 10 lg(Z<sub>c,n</sub>/Z<sub>c,0</sub>), S<sub>0</sub> = 1 m"
@@ -241,7 +239,8 @@ def render_vibration_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Sound power determination", language),
             basis=_basis(result, language),
@@ -249,9 +248,9 @@ def render_vibration_power_report(
             statement=statement,
             extended=extended,
             basis_strips=[
-            _relation_strip(language),
-            _factor_strip(result, language),
-        ],
+                _relation_strip(language),
+                _factor_strip(result, language),
+            ],
         ),
         value_table=_value_table(result, verbose, language),
         metadata=metadata,

@@ -232,9 +232,7 @@ def test_spanish_report_renders_translated_fiche(tmp_path) -> None:
     import re
 
     out = tmp_path / "openplan_es.pdf"
-    _result().report(
-        str(out), metadata=_full_metadata(requirement=7.0), language="es"
-    )
+    _result().report(str(out), metadata=_full_metadata(requirement=7.0), language="es")
     _assert_one_page(str(out))
     text = _extract_text(str(out))
     assert "Acústica de oficinas diáfanas" in text

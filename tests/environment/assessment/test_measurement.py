@@ -21,7 +21,9 @@ from phonometry.environment.assessment.measurement import (
 # ---------------------------------------------------------------------------
 # Tonal audibility -- Annex C.5 oracles
 # ---------------------------------------------------------------------------
-@pytest.mark.parametrize(("lpt", "lpn", "fc", "delta_expected", "kt"), ref.ISO1996_2_TONAL_EXAMPLES)
+@pytest.mark.parametrize(
+    ("lpt", "lpn", "fc", "delta_expected", "kt"), ref.ISO1996_2_TONAL_EXAMPLES
+)
 def test_tonal_audibility_annex_c5(
     lpt: float, lpn: float, fc: float, delta_expected: float, kt: float
 ) -> None:
@@ -67,15 +69,9 @@ def test_assess_tonal_audibility_bundles() -> None:
 def test_critical_bandwidth_table_c1() -> None:
     assert environment.critical_bandwidth(200.0) == 100.0
     assert environment.critical_bandwidth(500.0) == 100.0
-    assert (
-        environment.critical_bandwidth(430.0) == 100.0
-    )  # example 2 band width
-    assert (
-        environment.critical_bandwidth(4000.0) == 800.0
-    )  # example 1 band width
-    assert environment.critical_bandwidth(755.0) == pytest.approx(
-        151.0
-    )  # example 4
+    assert environment.critical_bandwidth(430.0) == 100.0  # example 2 band width
+    assert environment.critical_bandwidth(4000.0) == 800.0  # example 1 band width
+    assert environment.critical_bandwidth(755.0) == pytest.approx(151.0)  # example 4
 
 
 # ---------------------------------------------------------------------------
@@ -88,18 +84,9 @@ def test_table_j1_mapping() -> None:
 
 
 def test_table_j1_coarse() -> None:
-    assert (
-        environment.tonal_adjustment_from_mean_audibility(2.0, coarse=True)
-        == 0
-    )
-    assert (
-        environment.tonal_adjustment_from_mean_audibility(5.0, coarse=True)
-        == 3
-    )
-    assert (
-        environment.tonal_adjustment_from_mean_audibility(10.0, coarse=True)
-        == 6
-    )
+    assert environment.tonal_adjustment_from_mean_audibility(2.0, coarse=True) == 0
+    assert environment.tonal_adjustment_from_mean_audibility(5.0, coarse=True) == 3
+    assert environment.tonal_adjustment_from_mean_audibility(10.0, coarse=True) == 6
 
 
 # ---------------------------------------------------------------------------
@@ -112,15 +99,15 @@ def test_survey_thresholds() -> None:
     # 630 Hz band +6 over neighbours (>5 high-freq threshold) -> flagged
     levels = [40.0, 40.0, 60.0, 40.0, 40.0, 50.0, 56.0, 50.0]
     flags = environment.tonal_seeking_survey(levels, freqs)
-    assert flags[2]        # 125 Hz
-    assert flags[6]        # 630 Hz
-    assert not flags[0]                     # end bands never flagged
+    assert flags[2]  # 125 Hz
+    assert flags[6]  # 630 Hz
+    assert not flags[0]  # end bands never flagged
     assert not flags[-1]
 
 
 def test_survey_below_threshold_not_flagged() -> None:
     freqs = [160.0, 200.0, 250.0]
-    levels = [40.0, 45.0, 40.0]   # +5 < 8 dB mid-freq threshold
+    levels = [40.0, 45.0, 40.0]  # +5 < 8 dB mid-freq threshold
     assert not environment.tonal_seeking_survey(levels, freqs)[1]
 
 
@@ -142,9 +129,7 @@ def test_residual_correction_formula16() -> None:
 
 def test_residual_correction_unreliable_warns() -> None:
     with pytest.warns(EnvironmentalMeasurementWarning, match="upper bound"):
-        res = environment.residual_sound_correction(
-            50.0, 48.0
-        )  # margin 2 dB <= 3
+        res = environment.residual_sound_correction(50.0, 48.0)  # margin 2 dB <= 3
     assert not res.reliable
     # 10.4: with a margin <= 3 dB no correction is allowed; the reportable
     # value is the UNCORRECTED measured level, as an upper bound (the
@@ -166,12 +151,12 @@ def test_residual_not_below_raises() -> None:
 def test_gaussian_residual_i1_i2() -> None:
     # Independent hand values: (I.1) 50 + 0.115*(10/1.28)^2 = 57.019;
     # (I.2) 50 + 0.115*(12/1.65)^2 = 56.0826.
-    assert environment.gaussian_residual_level(
-        50.0, l90=40.0
-    ) == pytest.approx(57.019, abs=1e-3)
-    assert environment.gaussian_residual_level(
-        50.0, l95=38.0
-    ) == pytest.approx(56.0826, abs=1e-3)
+    assert environment.gaussian_residual_level(50.0, l90=40.0) == pytest.approx(
+        57.019, abs=1e-3
+    )
+    assert environment.gaussian_residual_level(50.0, l95=38.0) == pytest.approx(
+        56.0826, abs=1e-3
+    )
 
 
 def test_gaussian_residual_needs_one_percentile() -> None:
@@ -195,21 +180,19 @@ def test_gaussian_residual_rejects_inverted_percentiles() -> None:
 # ---------------------------------------------------------------------------
 def test_combined_uncertainty_g2() -> None:
     """Annex G.2 component products combine to u = 2.18 dB."""
-    u = environment.combined_standard_uncertainty(
-        ref.ISO1996_2_G2_CONTRIBUTIONS
-    )
+    u = environment.combined_standard_uncertainty(ref.ISO1996_2_G2_CONTRIBUTIONS)
     assert u == pytest.approx(ref.ISO1996_2_G2_COMBINED, abs=0.01)
 
 
 def test_expanded_uncertainty_g2() -> None:
     """k = 2 (95 %) expansion of the G.2 uncertainty -> 4.36 dB."""
-    u = environment.combined_standard_uncertainty(
-        ref.ISO1996_2_G2_CONTRIBUTIONS
-    )
+    u = environment.combined_standard_uncertainty(ref.ISO1996_2_G2_CONTRIBUTIONS)
     assert environment.expanded_uncertainty(u) == pytest.approx(
         ref.ISO1996_2_G2_EXPANDED, abs=0.01
     )
-    assert environment.expanded_uncertainty(u, confidence=0.80) == pytest.approx(1.3 * u)
+    assert environment.expanded_uncertainty(u, confidence=0.80) == pytest.approx(
+        1.3 * u
+    )
 
 
 def test_combined_uncertainty_accepts_pairs() -> None:
@@ -256,9 +239,7 @@ def test_repeated_measurements_spread_levels() -> None:
     (3.944 dB for [50, 60, 70]) while the Note 2 approximation inflates to
     12.183 dB and triggers the spread warning."""
     with pytest.warns(EnvironmentalMeasurementWarning, match="Formula \\(20\\)"):
-        res = environment.uncertainty_from_repeated_measurements(
-            [50.0, 60.0, 70.0]
-        )
+        res = environment.uncertainty_from_repeated_measurements([50.0, 60.0, 70.0])
     assert res.standard_uncertainty == pytest.approx(3.944, abs=2e-3)
     assert res.approximate_uncertainty == pytest.approx(12.183, abs=2e-3)
 

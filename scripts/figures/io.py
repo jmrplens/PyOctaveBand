@@ -46,9 +46,7 @@ def _night_measurement(fs: int) -> np.ndarray:
         start = int(start_s * fs)
         length = int(length_s * fs)
         envelope = np.hanning(length)
-        x[start:start + length] += (
-            amplitude * envelope * rng.standard_normal(length)
-        )
+        x[start : start + length] += amplitude * envelope * rng.standard_normal(length)
     return x
 
 
@@ -80,9 +78,10 @@ def generate_signal_provenance(output_dir: str) -> None:
         path = os.path.join(tmp, "night_p3.wav")
         io.write(
             path,
-            io.Signal(data=_night_measurement(fs), fs=fs,
-                      calibration_factor=20.0),
-            subtype="PCM_24", bext=bext, sidecar=True,
+            io.Signal(data=_night_measurement(fs), fs=fs, calibration_factor=20.0),
+            subtype="PCM_24",
+            bext=bext,
+            sidecar=True,
         )
         sig = io.read(path)
 
@@ -96,11 +95,18 @@ def generate_signal_provenance(output_dir: str) -> None:
     card = fig.add_subplot(grid[0, 1])
     card.set_axis_off()
     card.set_title("What travelled with them", pad=12)
-    card.add_patch(Rectangle(
-        (0.0, 0.0), 1.0, 1.0, transform=card.transAxes,
-        facecolor=COLOR_PANEL, edgecolor=COLOR_GRID, linewidth=1.0,
-        zorder=0,
-    ))
+    card.add_patch(
+        Rectangle(
+            (0.0, 0.0),
+            1.0,
+            1.0,
+            transform=card.transAxes,
+            facecolor=COLOR_PANEL,
+            edgecolor=COLOR_GRID,
+            linewidth=1.0,
+            zorder=0,
+        )
+    )
 
     origin = sig.source
     provenance = sig.provenance
@@ -108,17 +114,11 @@ def generate_signal_provenance(output_dir: str) -> None:
     history_lines = provenance.coding_history.splitlines()
     appended = len(history_lines) - 1
     container = f"{origin.container}, {origin.bit_depth}-bit {origin.format_name}"
-    recorded_on = (
-        f"{provenance.origination_date} at {provenance.origination_time}"
-    )
+    recorded_on = f"{provenance.origination_date} at {provenance.origination_time}"
     # Thousands grouped with spaces, so the Spanish edition needs no comma
     # surgery on a number that is not a decimal.
-    first_sample = (
-        f"{provenance.time_reference:,} samples"
-    ).replace(",", " ")
-    calibration = (
-        f"{sig.calibration_factor:.1f} Pa at full scale, from the sidecar"
-    )
+    first_sample = (f"{provenance.time_reference:,} samples").replace(",", " ")
+    calibration = f"{sig.calibration_factor:.1f} Pa at full scale, from the sidecar"
     rows: tuple[tuple[str, str], ...] = (
         ("File", os.path.basename(origin.path)),
         ("Container", container),
@@ -133,11 +133,25 @@ def generate_signal_provenance(output_dir: str) -> None:
     y = 0.915
     for label, value in rows:
         if label:
-            card.text(0.06, y, label, transform=card.transAxes,
-                      fontsize=8.2, color=COLOR_MUTED, va="top")
+            card.text(
+                0.06,
+                y,
+                label,
+                transform=card.transAxes,
+                fontsize=8.2,
+                color=COLOR_MUTED,
+                va="top",
+            )
             y -= 0.048
-        card.text(0.06, y, value, transform=card.transAxes,
-                  fontsize=9.2, color=COLOR_FG, va="top")
+        card.text(
+            0.06,
+            y,
+            value,
+            transform=card.transAxes,
+            fontsize=9.2,
+            color=COLOR_FG,
+            va="top",
+        )
         y -= 0.056
     save_figure(output_dir, "signal_provenance.png")
     plt.close()

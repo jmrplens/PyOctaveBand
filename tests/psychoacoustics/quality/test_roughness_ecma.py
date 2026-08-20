@@ -33,12 +33,8 @@ def _am_tone(
     signal, i.e. the overall RMS level of the modulated waveform.
     """
     t = np.arange(int(FS * seconds)) / FS
-    x = (1.0 + depth * np.cos(2.0 * np.pi * fmod * t)) * np.sin(
-        2.0 * np.pi * fc * t
-    )
-    return np.asarray(
-        x * (P0 * 10.0 ** (level_db / 20.0)) / np.sqrt(np.mean(x**2))
-    )
+    x = (1.0 + depth * np.cos(2.0 * np.pi * fmod * t)) * np.sin(2.0 * np.pi * fc * t)
+    return np.asarray(x * (P0 * 10.0 ** (level_db / 20.0)) / np.sqrt(np.mean(x**2)))
 
 
 def _tone(fc: float, level_db: float, seconds: float = 2.0) -> np.ndarray:
@@ -49,9 +45,7 @@ def _tone(fc: float, level_db: float, seconds: float = 2.0) -> np.ndarray:
 @pytest.fixture(scope="module")
 def ref_calibration() -> psychoacoustics.EcmaRoughness:
     """The 1 kHz / 70 Hz / m=1 / overall 60 dB calibration signal (1 asper)."""
-    return psychoacoustics.roughness_ecma(
-        _am_tone(1000.0, 70.0, 1.0, 60.0), FS
-    )
+    return psychoacoustics.roughness_ecma(_am_tone(1000.0, 70.0, 1.0, 60.0), FS)
 
 
 # --------------------------------------------------------------------------
@@ -161,18 +155,14 @@ def test_empty_signal_raises() -> None:
 
 
 def test_deterministic(ref_calibration: psychoacoustics.EcmaRoughness) -> None:
-    again = psychoacoustics.roughness_ecma(
-        _am_tone(1000.0, 70.0, 1.0, 60.0), FS
-    )
+    again = psychoacoustics.roughness_ecma(_am_tone(1000.0, 70.0, 1.0, 60.0), FS)
     assert again.roughness == pytest.approx(ref_calibration.roughness, abs=1e-9)
 
 
 def test_free_and_diffuse_differ() -> None:
     sig = _am_tone(1000.0, 70.0, 1.0, 60.0)
     free = psychoacoustics.roughness_ecma(sig, FS, field="free").roughness
-    diffuse = psychoacoustics.roughness_ecma(
-        sig, FS, field="diffuse"
-    ).roughness
+    diffuse = psychoacoustics.roughness_ecma(sig, FS, field="diffuse").roughness
     assert free != diffuse
 
 
@@ -189,9 +179,6 @@ def test_time_dependent_pchip_batch_matches_per_band_bitwise() -> None:
     grid = np.arange(int(np.floor(block_times[-1] * _R_S50)) + 1) / _R_S50
     batched = PchipInterpolator(block_times, a_lz, axis=0)(grid)
     per_band = np.column_stack(
-        [
-            PchipInterpolator(block_times, a_lz[:, band])(grid)
-            for band in range(_CBF)
-        ]
+        [PchipInterpolator(block_times, a_lz[:, band])(grid) for band in range(_CBF)]
     )
     assert np.array_equal(batched, per_band)

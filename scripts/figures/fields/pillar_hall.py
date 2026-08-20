@@ -37,14 +37,17 @@ def _poster_ss_for(webm: str) -> float | None:
     name = os.path.basename(webm)
     if _PILLAR_STEM in name:
         import fdtd2d
+
         dt = fdtd2d.FDTD2D(343.0, _PILLAR_DX, shape=(3, 8)).dt
         dt_frame = _PILLAR_EVERY * dt
         return float((6.0e-3 / dt_frame - _PILLAR_WARM) / _PILLAR_FPS)
     if "anim_fdtd_transmission_tube" in name:
         from .tubes import _TTUBE_FPS, _TTUBE_VERDICT
+
         return float(_TTUBE_VERDICT / _TTUBE_FPS)
     if "anim_elastic_halfspace_waves" in name:
         from .halfspace import _HS_CP, _HS_DX, _HS_FPS
+
         dt = 0.6 * _HS_DX / (_HS_CP * float(np.sqrt(2.0)))
         return float((95.0e-6 / (5.0 * dt)) / _HS_FPS)
     return None
@@ -57,13 +60,13 @@ def _poster_ss_for(webm: str) -> float | None:
 # interference of the scattered wavelets. Banner canvas: 8.0 x 2.0 in at
 # 300 dpi = 2400 x 600 px; the visible window is exactly 4 m x 1 m so the
 # field is shown at true physical aspect.
-_PILLAR_DX = 0.0025                   # [m]
-_PILLAR_LX, _PILLAR_LY = 4.4, 1.0     # domain [m]; 0.2 m sponge ends hidden
-_PILLAR_NX = round(_PILLAR_LX / _PILLAR_DX)   # 1760
-_PILLAR_NY = round(_PILLAR_LY / _PILLAR_DX)   # 400
-_PILLAR_F0 = 800.0                    # carrier [Hz], lambda = 42.9 cm
-_PILLAR_VIEW = (0.2, 4.2)             # visible x window [m] (4:1 exact)
-_PILLAR_FIGSIZE = (8.0, 2.0)          # in at _ANIM_DPI -> 2400 x 600 px
+_PILLAR_DX = 0.0025  # [m]
+_PILLAR_LX, _PILLAR_LY = 4.4, 1.0  # domain [m]; 0.2 m sponge ends hidden
+_PILLAR_NX = round(_PILLAR_LX / _PILLAR_DX)  # 1760
+_PILLAR_NY = round(_PILLAR_LY / _PILLAR_DX)  # 400
+_PILLAR_F0 = 800.0  # carrier [Hz], lambda = 42.9 cm
+_PILLAR_VIEW = (0.2, 4.2)  # visible x window [m] (4:1 exact)
+_PILLAR_FIGSIZE = (8.0, 2.0)  # in at _ANIM_DPI -> 2400 x 600 px
 # Mesh rule: the smallest geometric dimension is the 6.6 cm column-wall
 # aperture (6.6 / 4 = 1.65 cm) against lambda / 8 = 5.36 cm at 800 Hz, so
 # the bound is 1.65 cm; dx = 2.5 mm sits 6.6x finer (>= 44 cells per
@@ -80,7 +83,7 @@ _PILLAR_FIGSIZE = (8.0, 2.0)          # in at _ANIM_DPI -> 2400 x 600 px
 _PILLAR_EVERY = 8
 _PILLAR_FRAMES = 900
 _PILLAR_FPS = 40
-_PILLAR_WARM = 40                     # frames of free travel trimmed
+_PILLAR_WARM = 40  # frames of free travel trimmed
 _PILLAR_STEM = "anim_fdtd_pillar_hall"
 
 
@@ -145,9 +148,14 @@ def _pillar_fields(n_frames: int = _PILLAR_FRAMES) -> tuple[Any, Any]:
     import fdtd2d
 
     sim = fdtd2d.FDTD2D(
-        343.0, _PILLAR_DX, shape=(_PILLAR_NY, _PILLAR_NX),
-        sponge_width=80, sponge_sides=("left", "right"),
-        damping=25.0, obstacle_mask=_pillar_mask())
+        343.0,
+        _PILLAR_DX,
+        shape=(_PILLAR_NY, _PILLAR_NX),
+        sponge_width=80,
+        sponge_sides=("left", "right"),
+        damping=25.0,
+        obstacle_mask=_pillar_mask(),
+    )
 
     lam0 = 343.0 / _PILLAR_F0
     sim.add_plane_wave("right", center=0.30, width=0.08, wavelength=lam0)
@@ -180,31 +188,59 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     vmax = 0.55 * float(np.max(np.abs(frames)))
     fig = plt.figure(figsize=_PILLAR_FIGSIZE, dpi=_ANIM_DPI)
     ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
-    im = ax.imshow(frames[0], origin="lower",
-                   extent=(0.0, _PILLAR_LX, 0.0, _PILLAR_LY), cmap=cmap,
-                   vmin=-vmax, vmax=vmax, interpolation="bilinear")
+    im = ax.imshow(
+        frames[0],
+        origin="lower",
+        extent=(0.0, _PILLAR_LX, 0.0, _PILLAR_LY),
+        cmap=cmap,
+        vmin=-vmax,
+        vmax=vmax,
+        interpolation="bilinear",
+    )
     for cx, cy, r in _pillar_layout():
-        ax.add_patch(Circle((cx, cy), r, facecolor=COLOR_GRID,
-                            edgecolor=COLOR_FG, lw=0.8))
+        ax.add_patch(
+            Circle((cx, cy), r, facecolor=COLOR_GRID, edgecolor=COLOR_FG, lw=0.8)
+        )
     ax.set_xlim(*_PILLAR_VIEW)
     ax.set_ylim(0.0, _PILLAR_LY)
     ax.set_aspect("auto")
     ax.grid(False)
     ax.axis("off")
-    caption_bbox = {"facecolor": "black" if dark else "white",
-                    "alpha": 0.55, "edgecolor": "none", "pad": 1.5}
+    caption_bbox = {
+        "facecolor": "black" if dark else "white",
+        "alpha": 0.55,
+        "edgecolor": "none",
+        "pad": 1.5,
+    }
     # The hall has no margin -- the axes are the whole canvas -- so the two
     # captions go where the colonnade is not: the seeded layout leaves the
     # strip below y = 0.13 clear on the right half (the caption, right
     # aligned, is the wider of the two and the Spanish one wider still) and
     # the whole left quarter clear (the clock). Read the other way round,
     # the caption's translucent band bit into the bottom row of columns.
-    ax.text(0.988, 0.020, T("2D FDTD wavefront in a hall of columns"),
-            transform=ax.transAxes, ha="right", va="bottom", fontsize=9,
-            color=COLOR_FG, bbox=caption_bbox)
-    t_txt = ax.text(0.012, 0.020, "", transform=ax.transAxes, ha="left",
-                    va="bottom", family="monospace", fontsize=9,
-                    color=COLOR_FG, bbox=caption_bbox)
+    ax.text(
+        0.988,
+        0.020,
+        T("2D FDTD wavefront in a hall of columns"),
+        transform=ax.transAxes,
+        ha="right",
+        va="bottom",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox=caption_bbox,
+    )
+    t_txt = ax.text(
+        0.012,
+        0.020,
+        "",
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        family="monospace",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox=caption_bbox,
+    )
 
     def update(k: int) -> tuple[Any, ...]:
         kf = min(k, n_active - 1)
@@ -216,6 +252,13 @@ def animate_fdtd_pillar_hall(output_dir: str) -> None:
     # README GIF decimates the 40 fps WebM 5x (gif_fps = 8) at the shared
     # 640 px width, landing at 6.2 MB (light) and 6.6 MB (dark), under
     # the ~8 MB GitHub autoplay budget.
-    _render_clip(fig, update, output_dir, _PILLAR_STEM,
-                 frames=n_active + _ANIM_HOLD, fps=_PILLAR_FPS, gif_fps=8,
-                 poster_ss=_poster_ss_for(_PILLAR_STEM + ".webm"))
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        _PILLAR_STEM,
+        frames=n_active + _ANIM_HOLD,
+        fps=_PILLAR_FPS,
+        gif_fps=8,
+        poster_ss=_poster_ss_for(_PILLAR_STEM + ".webm"),
+    )

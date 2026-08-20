@@ -148,9 +148,7 @@ def test_a_deconvolution_keeps_its_rate_optional(func, records, kwargs) -> None:
 @pytest.mark.parametrize(
     ("func", "records", "kwargs"), DECONVOLUTIONS, ids=DECONVOLUTION_IDS
 )
-def test_a_deconvolution_takes_the_label_from_the_signal(
-    func, records, kwargs
-) -> None:
+def test_a_deconvolution_takes_the_label_from_the_signal(func, records, kwargs) -> None:
     first, second = records
     assert_same(
         func(Signal(first, FS), second, **kwargs),

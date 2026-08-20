@@ -27,6 +27,7 @@ def _tone(amp: float = 1.0, f0: float = 1000.0, seconds: float = 0.5) -> np.ndar
 # Array protocol: the object must stand for the array it wraps
 # ---------------------------------------------------------------------------
 
+
 def test_mono_signal_is_a_1d_array() -> None:
     x = _tone()
     sig = Signal(data=x, fs=FS)
@@ -95,8 +96,11 @@ def test_metadata_fields_default_to_none() -> None:
 
 def test_source_metadata_travels_with_the_signal() -> None:
     source = SignalOrigin(
-        path="m.wav", container="WAV", format_name="PCM",
-        bit_depth=24, lossy=False,
+        path="m.wav",
+        container="WAV",
+        format_name="PCM",
+        bit_depth=24,
+        lossy=False,
     )
     sig = Signal(data=_tone(), fs=FS, source=source)
     assert sig.source is not None
@@ -107,6 +111,7 @@ def test_source_metadata_travels_with_the_signal() -> None:
 # ---------------------------------------------------------------------------
 # Validation
 # ---------------------------------------------------------------------------
+
 
 def test_invalid_construction_is_rejected() -> None:
     tone = _tone()
@@ -128,19 +133,20 @@ def test_non_finite_or_non_positive_fs_is_rejected(bad: float) -> None:
         Signal(data=tone, fs=bad)  # type: ignore[arg-type]
 
 
-@pytest.mark.parametrize(
-    "bad", [float("nan"), float("inf"), float("-inf"), 0.0, -0.5]
-)
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf"), 0.0, -0.5])
 def test_non_finite_or_non_positive_calibration_is_rejected(bad: float) -> None:
     """A NaN calibration would flow into levels as a computed-looking wrong number."""
     tone = _tone()
-    with pytest.raises(ValueError, match="calibration_factor must be a positive finite"):
+    with pytest.raises(
+        ValueError, match="calibration_factor must be a positive finite"
+    ):
         Signal(data=tone, fs=FS, calibration_factor=bad)
 
 
 # ---------------------------------------------------------------------------
 # plot
 # ---------------------------------------------------------------------------
+
 
 def test_plot_calibrated_axis_is_pascals() -> None:
     sig = Signal(data=_tone(), fs=FS, calibration_factor=0.5)
@@ -162,7 +168,8 @@ def test_plot_uncalibrated_axis_is_full_scale() -> None:
 
 def test_plot_multichannel_legend_uses_channel_labels() -> None:
     sig = Signal(
-        data=np.stack([_tone(), _tone(0.5)]), fs=FS,
+        data=np.stack([_tone(), _tone(0.5)]),
+        fs=FS,
         channel_labels=("FL", "FR"),
     )
     ax = sig.plot()

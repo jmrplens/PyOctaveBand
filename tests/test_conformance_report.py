@@ -131,13 +131,13 @@ def test_scattering_insitu_precision_reference_data_matches_oracles() -> None:
     import reference_data as ref
 
     assert ref.ISO17497_1_SPEED_OF_SOUND_20C == 343.2  # Eq. (2) at 20 C
-    assert ref.ISO17497_1_CHAIN_SCATTERING == pytest.approx(0.09306, abs=1e-5)
-    assert ref.ISO17497_2_AREA_FACTOR_ZENITH == pytest.approx(1.5710, abs=1e-4)
-    assert ref.ISO13472_1_KR == pytest.approx(2.0 / 3.0)  # Clause 4.2
-    assert ref.ISO13472_1_MSA_RADIUS == pytest.approx(1.34, abs=5e-3)  # Annex A
-    assert ref.ISO13472_2_SPOT_FU == pytest.approx(1989.4, abs=0.1)  # 0.58c/d
-    assert ref.ISO3745_U_EXPANDED == pytest.approx(4.123, abs=1e-3)  # Cl. 10.5
-    assert ref.ISO3745_C1_REFERENCE == pytest.approx(-0.1282, abs=1e-4)  # Eq. 16
+    assert pytest.approx(0.09306, abs=1e-5) == ref.ISO17497_1_CHAIN_SCATTERING
+    assert pytest.approx(1.5710, abs=1e-4) == ref.ISO17497_2_AREA_FACTOR_ZENITH
+    assert pytest.approx(2.0 / 3.0) == ref.ISO13472_1_KR  # Clause 4.2
+    assert pytest.approx(1.34, abs=5e-3) == ref.ISO13472_1_MSA_RADIUS  # Annex A
+    assert pytest.approx(1989.4, abs=0.1) == ref.ISO13472_2_SPOT_FU  # 0.58c/d
+    assert pytest.approx(4.123, abs=1e-3) == ref.ISO3745_U_EXPANDED  # Cl. 10.5
+    assert pytest.approx(-0.1282, abs=1e-4) == ref.ISO3745_C1_REFERENCE  # Eq. 16
     assert ref.ISO9614_3_UNIFORM_LW == 80.0  # 10 lg(1e-4/1e-12)
 
 
@@ -151,7 +151,10 @@ def test_filter_binding_detail_matches_library_margin() -> None:
     for arch in cr._FILTER_ARCHS:
         fc = cr._filter_class(arch, 3)
         bank = filters.OctaveFilterBank(
-            48000, fraction=3, order=6, limits=[100, 10000],
+            48000,
+            fraction=3,
+            order=6,
+            limits=[100, 10000],
             design=filters.FilterDesign(filter_type=arch),
         )
         bands = verify_filter_class(bank)["bands"]
@@ -193,7 +196,9 @@ def test_human_vibration_reference_data_matches_oracles() -> None:
     assert ref.DIRECTIVE_2002_44_WBV_ELV == 1.15
 
 
-@pytest.mark.parametrize("check", cr.CHECKS, ids=lambda c: f"{c.standard} :: {c.quantity}")
+@pytest.mark.parametrize(
+    "check", cr.CHECKS, ids=lambda c: f"{c.standard} :: {c.quantity}"
+)
 def test_every_check_passes(check: cr.Check) -> None:
     outcome = check.run()
     assert outcome.passed, (

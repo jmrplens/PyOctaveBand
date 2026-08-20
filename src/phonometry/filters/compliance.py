@@ -67,22 +67,22 @@ _G = 10 ** (3 / 10)
 # Pass-band max limits (min is constant -0.4 dB class 1 / -0.6 dB class 2):
 _PASSBAND_MAX: list[tuple[float, float, float]] = [
     # (exponent, class 1 max, class 2 max)
-    (0.0, 0.4, 0.6),      # band centre (Omega of 1)
+    (0.0, 0.4, 0.6),  # band centre (Omega of 1)
     (1 / 8, 0.5, 0.7),
     (1 / 4, 0.7, 0.9),
     (3 / 8, 1.4, 1.7),
-    (1 / 2, 5.3, 5.8),    # G**(1/2) - epsilon
+    (1 / 2, 5.3, 5.8),  # G**(1/2) - epsilon
 ]
 _PASSBAND_MIN = {1: -0.4, 2: -0.6}
 
 # Stop-band min limits (max is +inf):
 _STOPBAND_MIN: list[tuple[float, float, float]] = [
     # (exponent, class 1 min, class 2 min)
-    (1 / 2, 1.2, 0.8),    # G**(1/2) + epsilon
+    (1 / 2, 1.2, 0.8),  # G**(1/2) + epsilon
     (1.0, 16.6, 15.6),
     (2.0, 40.5, 39.5),
     (3.0, 60.0, 54.0),
-    (4.0, 70.0, 60.0),    # and >= G**4: constant
+    (4.0, 70.0, 60.0),  # and >= G**4: constant
 ]
 
 # EN 61260:1995 / IEC 61260:1995 Table 1 == ANSI S1.11-2004 Table 1 (verified
@@ -93,7 +93,7 @@ _STOPBAND_MIN: list[tuple[float, float, float]] = [
 # reused unchanged for both editions.
 _PASSBAND_MAX_1995: list[tuple[float, float, float, float]] = [
     # (exponent, class 0 max, class 1 max, class 2 max)
-    (0.0, 0.15, 0.3, 0.5),   # band centre (Omega of 1)
+    (0.0, 0.15, 0.3, 0.5),  # band centre (Omega of 1)
     (1 / 8, 0.2, 0.4, 0.6),
     (1 / 4, 0.4, 0.6, 0.8),
     (3 / 8, 1.1, 1.3, 1.6),
@@ -141,8 +141,8 @@ def _map_breakpoint(exponent: float, fraction: float) -> float:
        1 + \frac{G^{1/(2b)} - 1}{G^{1/2} - 1}
        \left( \Omega_\mathrm{h}(1/1) - 1 \right)
     """
-    omega_octave = _G ** exponent
-    scale = (_G ** (1 / (2 * fraction)) - 1) / (_G ** 0.5 - 1)
+    omega_octave = _G**exponent
+    scale = (_G ** (1 / (2 * fraction)) - 1) / (_G**0.5 - 1)
     return float(1 + scale * (omega_octave - 1))
 
 
@@ -247,7 +247,9 @@ def _verify_band(
     # Cut at the processing Nyquist, not omega.max(): the sosfreqz grid
     # stops short of Nyquist and must not exclude checkable breakpoints.
     omega_nyq = fsd / 2.0 / fm
-    extra = breakpoint_omegas[(breakpoint_omegas > 0) & (breakpoint_omegas <= omega_nyq)]
+    extra = breakpoint_omegas[
+        (breakpoint_omegas > 0) & (breakpoint_omegas <= omega_nyq)
+    ]
     if extra.size:
         _, h_extra = signal.sosfreqz(bank.sos[idx], worN=extra * fm, fs=fsd)
         att_extra = -20.0 * np.log10(np.abs(h_extra) + np.finfo(float).eps)
@@ -260,7 +262,9 @@ def _verify_band(
         low_margin = float(np.min(delta_a - minimum))
         finite = np.isfinite(maximum)
         high_margin = (
-            float(np.min(maximum[finite] - delta_a[finite])) if np.any(finite) else np.inf
+            float(np.min(maximum[finite] - delta_a[finite]))
+            if np.any(finite)
+            else np.inf
         )
         margins[cls] = min(low_margin, high_margin)
 
@@ -278,7 +282,7 @@ def _verify_band(
 
 
 def verify_filter_class(
-    bank: OctaveFilterBank, num_points: int = 2 ** 15, *, edition: str = "2014"
+    bank: OctaveFilterBank, num_points: int = 2**15, *, edition: str = "2014"
 ) -> dict[str, Any]:
     """
     Verify a filter bank against the IEC 61260 class limits.
@@ -323,7 +327,9 @@ def verify_filter_class(
 
     # Table 1 breakpoints (both sides) that must always be evaluated.
     rows = list(spec["passband_max"]) + list(spec["stopband_min"])
-    breakpoint_omegas = np.array([_map_breakpoint(row[0], bank.fraction) for row in rows])
+    breakpoint_omegas = np.array(
+        [_map_breakpoint(row[0], bank.fraction) for row in rows]
+    )
     breakpoint_omegas = np.concatenate([1.0 / breakpoint_omegas, breakpoint_omegas])
 
     # The outermost stop-band breakpoint (G**4 mapped to the bandwidth
@@ -414,7 +420,7 @@ class FilterComplianceResult:
             return []
         prefix, suffix = "margin_class", "_db"
         return sorted(
-            int(key[len(prefix):-len(suffix)])
+            int(key[len(prefix) : -len(suffix)])
             for key in self.bands[0]
             if key.startswith(prefix) and key.endswith(suffix)
         )
@@ -438,8 +444,9 @@ class FilterComplianceResult:
             )
         return max(classes)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the worst-margin band against its class-limit corridor.
 
         Draws the measured relative attenuation of the binding band over the
@@ -504,7 +511,7 @@ class FilterComplianceResult:
 
 
 def filter_class_compliance(
-    bank: OctaveFilterBank, *, num_points: int = 2 ** 15, edition: str = "2014"
+    bank: OctaveFilterBank, *, num_points: int = 2**15, edition: str = "2014"
 ) -> FilterComplianceResult:
     """Verify a filter bank and package the verdict as a reportable result.
 

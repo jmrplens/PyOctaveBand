@@ -71,8 +71,12 @@ def test_zero_path_length_gives_zero() -> None:
 
 
 def test_attenuation_increases_with_frequency_and_distance() -> None:
-    near = sae_band_attenuation([2000.0], 500.0, temperature=25.0, relative_humidity=70.0)
-    far = sae_band_attenuation([2000.0], 5000.0, temperature=25.0, relative_humidity=70.0)
+    near = sae_band_attenuation(
+        [2000.0], 500.0, temperature=25.0, relative_humidity=70.0
+    )
+    far = sae_band_attenuation(
+        [2000.0], 5000.0, temperature=25.0, relative_humidity=70.0
+    )
     assert far.band_attenuation[0] > near.band_attenuation[0]
     spec = sae_band_attenuation([500.0, 8000.0], 2000.0)
     assert spec.band_attenuation[1] > spec.band_attenuation[0]
@@ -85,11 +89,14 @@ def test_large_attenuation_no_nan_or_warning() -> None:
 
     with warnings.catch_warnings():
         warnings.simplefilter("error", RuntimeWarning)
-        res = sae_band_attenuation([8000.0, 10000.0], 50_000.0,
-                                   temperature=25.0, relative_humidity=70.0)
+        res = sae_band_attenuation(
+            [8000.0, 10000.0], 50_000.0, temperature=25.0, relative_humidity=70.0
+        )
     assert np.all(np.isfinite(res.band_attenuation))
     # Above 150 dB the linear branch applies: δ_B = 9.2 + 0.765·δ_t.
-    assert np.all(res.band_attenuation == pytest.approx(9.2 + 0.765 * res.midband_attenuation))
+    assert np.all(
+        res.band_attenuation == pytest.approx(9.2 + 0.765 * res.midband_attenuation)
+    )
 
 
 def test_invalid_inputs_rejected() -> None:
@@ -100,5 +107,7 @@ def test_invalid_inputs_rejected() -> None:
 
 
 def test_plot_smoke() -> None:
-    res = sae_band_attenuation(np.array([50.0, 100.0, 500.0, 1000.0, 5000.0, 10000.0]), 3000.0)
+    res = sae_band_attenuation(
+        np.array([50.0, 100.0, 500.0, 1000.0, 5000.0, 10000.0]), 3000.0
+    )
     assert res.plot() is not None

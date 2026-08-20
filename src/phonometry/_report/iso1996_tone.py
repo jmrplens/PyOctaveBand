@@ -133,8 +133,7 @@ def _present_markup(present: bool, language: str = "en") -> str:
     """
     if present:
         return (
-            f"<font color='{_VERDICT_OK_HEX}'>&#9679; "
-            f"{t('Present', language)}</font>"
+            f"<font color='{_VERDICT_OK_HEX}'>&#9679; {t('Present', language)}</font>"
         )
     return f"<font color='{_MUTED_HEX}'>&#8211;</font>"
 
@@ -205,9 +204,7 @@ def _key_quantity_table(
             Paragraph(_present_markup(present, language), value_style),
         ]
         if show_u and uncertainties is not None:
-            row.insert(
-                6, Paragraph(_fmt(uncertainties[i], language), value_style)
-            )
+            row.insert(6, Paragraph(_fmt(uncertainties[i], language), value_style))
         data.append(row)
 
     table = stacked_table(data, [w * mm for w in widths])
@@ -217,14 +214,28 @@ def _key_quantity_table(
     dec_row = order.tolist().index(decisive) + 1
     table.setStyle(
         [
-            ("LINEBELOW", (0, dec_row), (-1, dec_row), 0.5, colors.HexColor(_ACCENT_HEX)),
-            ("LINEABOVE", (0, dec_row), (-1, dec_row), 0.5, colors.HexColor(_ACCENT_HEX)),
+            (
+                "LINEBELOW",
+                (0, dec_row),
+                (-1, dec_row),
+                0.5,
+                colors.HexColor(_ACCENT_HEX),
+            ),
+            (
+                "LINEABOVE",
+                (0, dec_row),
+                (-1, dec_row),
+                0.5,
+                colors.HexColor(_ACCENT_HEX),
+            ),
         ]
     )
     return table
 
 
-def _statement(result: ToneAudibilityResult, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: ToneAudibilityResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed decisive audibility ``ΔL_ta`` and tonal adjustment ``K``.
 
     The decisive audibility is the largest over the detected tones (Clause
@@ -355,7 +366,10 @@ def render_tone_audibility_report(
 
     flow.append(
         render_figure_drawing(
-            _levels_plot, 174 * mm, y_top=None, figsize=(9.2, 3.1),
+            _levels_plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, 3.1),
             language=language,
         )
     )

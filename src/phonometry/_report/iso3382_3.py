@@ -111,9 +111,7 @@ def _metadata_pairs(
     return escaped_pairs(specs)
 
 
-def _metric_rows(
-    result: OpenPlanResult, language: str = "en"
-) -> list[tuple[str, str]]:
+def _metric_rows(result: OpenPlanResult, language: str = "en") -> list[tuple[str, str]]:
     """The four single-number quantities shown in the left-hand metrics table.
 
     ``D2,S`` (dB per distance doubling), ``Lp,A,S,4m`` (dB), ``rD`` (m) and
@@ -140,9 +138,7 @@ def _metric_rows(
     ]
 
 
-def _statement(
-    result: OpenPlanResult, language: str = "en"
-) -> tuple[str, list[str]]:
+def _statement(result: OpenPlanResult, language: str = "en") -> tuple[str, list[str]]:
     """The boxed spatial-decay-rate statement and its remaining quantities.
 
     ``D2,S`` is boxed as the headline descriptor of the standard's title
@@ -257,13 +253,9 @@ def render_iso3382_3_report(
             flow.append(grid_table(header_pairs))
     flow.append(Spacer(1, 8))
 
+    flow.append(Paragraph(t("Single-number quantities", language), caption_style))
     flow.append(
-        Paragraph(t("Single-number quantities", language), caption_style)
-    )
-    flow.append(
-        metrics_table(
-            _metric_rows(result, language), col_widths=[62 * mm, 26 * mm]
-        )
+        metrics_table(_metric_rows(result, language), col_widths=[62 * mm, 26 * mm])
     )
     flow.append(Spacer(1, 8))
 
@@ -274,7 +266,10 @@ def render_iso3382_3_report(
     # em-dashed quantities on its own.
     if math.isfinite(result.d2s) and math.isfinite(result.lp_as_4m):
         plot_drawing = render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=(9.2, 4.4),
+            result.plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, 4.4),
             language=language,
         )
         flow.append(plot_drawing)

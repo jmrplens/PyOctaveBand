@@ -82,7 +82,7 @@ def _entries(markdown: str) -> list[cee.Entry]:
 
 
 def test_the_withdrawn_entry_trips_both_tells() -> None:
-    """"1,73 times too small" and "2,4 dB offset" are sqrt(3) twice over."""
+    """ "1,73 times too small" and "2,4 dB offset" are sqrt(3) twice over."""
     entries = _entries(_WITHDRAWN)
     assert len(entries) == 1
     assert not entries[0].cites_page
@@ -193,7 +193,7 @@ def test_every_wording_of_the_procedure_is_rejected(procedure: str) -> None:
 
 
 def test_the_ordinary_verb_is_not_the_procedure() -> None:
-    """"Renders" is a word an entry may need for what a misprint does.
+    """ "Renders" is a word an entry may need for what a misprint does.
 
     The check exists to keep an account of the reading out of the registry, not
     to ban an English verb: an entry that says a dropped exponent renders a
@@ -289,7 +289,7 @@ def test_a_claim_typeset_as_maths_is_still_a_claim(claim: str) -> None:
 
 
 def test_a_formula_term_is_not_a_ratio_claim() -> None:
-    """"The prefactor 4 N h" is a term of an equation, not a factor of four."""
+    """ "The prefactor 4 N h" is a term of an equation, not a factor of four."""
     markdown = """
 ## Probe
 

@@ -69,6 +69,7 @@ def _analytic_decay_sti(t60: float) -> float:
 # Final formula: weighting/redundancy factors (Ed.5 A.2.2 verification test)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize(
     "bands, expected",
     [
@@ -140,6 +141,7 @@ def test_alpha_beta_artifact_truncated_to_one():
 # Indirect method: impulse responses
 # ---------------------------------------------------------------------------
 
+
 def test_delta_impulse_response_is_perfect_transmission():
     ir = np.zeros(FS // 2)
     ir[100] = 1.0
@@ -190,9 +192,7 @@ def test_level_corrections_reduce_sti():
         ir, fs, level=[62, 62, 59, 53, 47, 41, 35]
     )
     # Very quiet speech: the absolute reception threshold dominates.
-    quiet = speech.sti_from_impulse_response(
-        ir, fs, level=[20, 20, 17, 11, 5, -1, -7]
-    )
+    quiet = speech.sti_from_impulse_response(ir, fs, level=[20, 20, 17, 11, 5, -1, -7])
     assert comfortable.sti <= plain.sti
     assert quiet.sti < comfortable.sti - 0.05
     assert comfortable.band_levels is not None
@@ -206,6 +206,7 @@ def test_level_corrections_reduce_sti():
 # ---------------------------------------------------------------------------
 # Auditory masking function (Ed.5 Table A.2)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.parametrize(
     "level, expected",
@@ -231,6 +232,7 @@ def test_masking_amdb_is_vectorized_and_continuous():
 # ---------------------------------------------------------------------------
 # STIPA: direct method and test-signal generator
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def stipa_18s_seed1234() -> np.ndarray:
@@ -298,14 +300,13 @@ def test_stipa_signal_properties():
     level = 20.0 * np.log10(np.sqrt(np.mean(x_cal**2)) / 2e-5)
     assert level == pytest.approx(74.0, abs=1e-9)
     # Reproducible for a fixed seed.
-    np.testing.assert_array_equal(
-        x, speech.stipa_signal(FS, seconds=seconds, seed=0)
-    )
+    np.testing.assert_array_equal(x, speech.stipa_signal(FS, seconds=seconds, seed=0))
 
 
 # ---------------------------------------------------------------------------
 # Annex F qualification rating
 # ---------------------------------------------------------------------------
+
 
 def test_rating_letters_from_band_edges():
     assert _rating(0.74) == "A"
@@ -326,6 +327,7 @@ def test_rating_letters_from_band_edges():
 # ---------------------------------------------------------------------------
 # Input validation
 # ---------------------------------------------------------------------------
+
 
 def test_invalid_inputs_raise():
     ir = np.zeros(FS // 4)
@@ -409,8 +411,7 @@ def test_mtf_above_1_3_warns_and_truncates():
 
 # Expected STI for the Ed.5 Formula (C.1) test signal at modulation scale
 # m = 0,0, 0,1, ... 1,0 (Ed.5 Table C.2 staircase), tolerance +/-0,05.
-_C32_STI_STAIRCASE = [0.0, 0.18, 0.30, 0.38, 0.44, 0.50, 0.56, 0.62,
-                      0.70, 0.82, 1.0]
+_C32_STI_STAIRCASE = [0.0, 0.18, 0.30, 0.38, 0.44, 0.50, 0.56, 0.62, 0.70, 0.82, 1.0]
 
 
 def _c32_signal(m: float, fs: int, seconds: float) -> np.ndarray:

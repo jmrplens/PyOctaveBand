@@ -41,7 +41,9 @@ UNDERWATER_REFERENCE_EXPOSURE = 1e-12
 #: In-air reference sound pressure (Pa), i.e. 20 µPa.
 _IN_AIR_REFERENCE_PRESSURE = 20e-6
 #: Level offset between the 20 µPa and 1 µPa references, ``20·lg(20)`` dB.
-_REFERENCE_OFFSET_DB = 20.0 * np.log10(_IN_AIR_REFERENCE_PRESSURE / UNDERWATER_REFERENCE_PRESSURE)
+_REFERENCE_OFFSET_DB = 20.0 * np.log10(
+    _IN_AIR_REFERENCE_PRESSURE / UNDERWATER_REFERENCE_PRESSURE
+)
 #: Rejection message for an all-zero record: no level is defined.
 _NO_ENERGY_MSG = "'pressure' has no energy."
 

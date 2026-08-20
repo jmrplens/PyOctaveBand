@@ -36,9 +36,7 @@ N = 32768
 
 
 def _white(seed: int, rms: float = 1.0, n: int = N) -> np.ndarray:
-    return ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=rms, seed=seed
-    )
+    return ph.signals.noise_signal(FS, n / FS, color="white", rms=rms, seed=seed)
 
 
 # ---------------------------------------------------------------------------
@@ -101,9 +99,7 @@ def test_dpss_eigenvalues_match_pw_section_7_1_pattern() -> None:
 
 
 def test_multitaper_result_eigenvalues_are_the_dpss_ratios() -> None:
-    res = ph.signals.multitaper_psd(
-        _white(30, n=1024), FS, time_half_bandwidth=4.0
-    )
+    res = ph.signals.multitaper_psd(_white(30, n=1024), FS, time_half_bandwidth=4.0)
     assert res.n_tapers == 7
     # P&W print lambda_6 as 0.94: match to half a unit in the last place.
     assert np.allclose(res.eigenvalues, _PW_NW4_N1024[:7], atol=5e-3)
@@ -142,9 +138,7 @@ def test_multitaper_density_integrates_to_signal_power_parseval() -> None:
     x = _white(33, n=4096)
     res = ph.signals.multitaper_psd(x, FS, adaptive=False)
     df = float(res.frequencies[1] - res.frequencies[0])
-    assert float(np.sum(res.psd) * df) == pytest.approx(
-        float(np.mean(x**2)), rel=5e-3
-    )
+    assert float(np.sum(res.psd) * df) == pytest.approx(float(np.mean(x**2)), rel=5e-3)
 
 
 def test_multitaper_tone_band_power_recovers_amplitude() -> None:
@@ -159,9 +153,7 @@ def test_multitaper_tone_band_power_recovers_amplitude() -> None:
     band = np.abs(res.frequencies - 1024.0) <= 1.5 * half_w
     # The captured fraction is bounded below by the mean concentration
     # lambda_k > 0.999 of the K = 5 tapers.
-    assert float(np.sum(res.psd[band]) * df) == pytest.approx(
-        amp**2 / 2.0, rel=5e-3
-    )
+    assert float(np.sum(res.psd[band]) * df) == pytest.approx(amp**2 / 2.0, rel=5e-3)
 
 
 @pytest.mark.parametrize("adaptive", [False, True])
@@ -171,9 +163,7 @@ def test_multitaper_spectrum_scaling_reads_tone_peak(adaptive: bool) -> None:
     t = np.arange(n) / FS
     amp = 3.0
     x = amp * np.sin(2.0 * np.pi * 1024.0 * t)
-    res = ph.signals.multitaper_psd(
-        x, FS, scaling="spectrum", adaptive=adaptive
-    )
+    res = ph.signals.multitaper_psd(x, FS, scaling="spectrum", adaptive=adaptive)
     peak = int(np.argmax(res.psd))
     assert res.frequencies[peak] == pytest.approx(1024.0)
     assert float(res.psd[peak]) == pytest.approx(amp**2 / 2.0, rel=1e-4)
@@ -192,21 +182,15 @@ def test_multitaper_variance_is_one_kth_of_single_taper() -> None:
     for seed in range(120):
         x = _white(600 + seed, n=2048)
         est_mt.append(
-            ph.signals.multitaper_psd(x, FS, n_tapers=k, adaptive=False).psd[
-                50:900
-            ]
+            ph.signals.multitaper_psd(x, FS, n_tapers=k, adaptive=False).psd[50:900]
         )
         est_one.append(
-            ph.signals.multitaper_psd(x, FS, n_tapers=1, adaptive=False).psd[
-                50:900
-            ]
+            ph.signals.multitaper_psd(x, FS, n_tapers=1, adaptive=False).psd[50:900]
         )
-    rel_var_mt = float(np.mean(
-        (np.std(est_mt, axis=0) / np.mean(est_mt, axis=0)) ** 2
-    ))
-    rel_var_one = float(np.mean(
-        (np.std(est_one, axis=0) / np.mean(est_one, axis=0)) ** 2
-    ))
+    rel_var_mt = float(np.mean((np.std(est_mt, axis=0) / np.mean(est_mt, axis=0)) ** 2))
+    rel_var_one = float(
+        np.mean((np.std(est_one, axis=0) / np.mean(est_one, axis=0)) ** 2)
+    )
     assert rel_var_one == pytest.approx(1.0, rel=0.25)
     assert rel_var_mt / rel_var_one == pytest.approx(1.0 / k, rel=0.25)
 
@@ -257,9 +241,7 @@ def test_multitaper_adaptive_dof_drops_where_leakage_would_bias() -> None:
     """
     n = 4096
     t = np.arange(n) / FS
-    rng_x = ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=1e-3, seed=99
-    )
+    rng_x = ph.signals.noise_signal(FS, n / FS, color="white", rms=1e-3, seed=99)
     x = 50.0 * np.sin(2.0 * np.pi * 200.0 * t) + rng_x
     res = ph.signals.multitaper_psd(x, FS)
     faint = (res.frequencies > 2000.0) & (res.frequencies < 3800.0)
@@ -276,9 +258,7 @@ def test_multitaper_defaults_and_result_fields() -> None:
     assert res.weights.shape == (7, res.frequencies.size)
     assert np.allclose(np.sum(res.weights, axis=0), 1.0)
     assert res.random_error.shape == res.degrees_of_freedom.shape
-    assert np.allclose(
-        res.random_error, np.sqrt(2.0 / res.degrees_of_freedom)
-    )
+    assert np.allclose(res.random_error, np.sqrt(2.0 / res.degrees_of_freedom))
     with pytest.raises(AttributeError):
         res.psd = res.psd * 2.0  # type: ignore[misc]
 

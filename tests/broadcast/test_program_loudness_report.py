@@ -178,8 +178,9 @@ def test_live_tolerance_applies_item_h_1_lu(tmp_path) -> None:
     assert qc_passed is False
     assert live_passed is True
     out = tmp_path / "live.pdf"
-    result.report(str(out), metadata=ReportMetadata(requirement=-23.0),
-                  tolerance="live")
+    result.report(
+        str(out), metadata=ReportMetadata(requirement=-23.0), tolerance="live"
+    )
     _assert_one_page(str(out))
     text = _extract_text(str(out)).replace("\n", " ")
     assert "±1.0 LU" in text

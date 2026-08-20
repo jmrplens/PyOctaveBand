@@ -83,9 +83,7 @@ def _deg(value_rad: float, language: str = "en") -> str:
     return format_number(np.degrees(value_rad), language, decimals=0)
 
 
-def _metric_rows(
-    result: MobilityResult, language: str = "en"
-) -> list[tuple[str, str]]:
+def _metric_rows(result: MobilityResult, language: str = "en") -> list[tuple[str, str]]:
     """The characteristic points shown in the left-hand table.
 
     The FRF type, the measured frequency range, the peak (resonance for a
@@ -97,12 +95,18 @@ def _metric_rows(
     phase = float(np.asarray(result.phase, dtype=np.float64)[index])
     return [
         (t("FRF type", language), _kind(result, language)),
-        (t("Frequency range f [Hz]", language),
-         frequency_range(np.asarray(result.frequencies, dtype=np.float64), language)),
-        (t("Peak frequency f [Hz]", language),
-         format_number(peak_freq, language, decimals=1)),
-        (t("Peak mobility |Y| [{unit}]", language).format(unit=_MOBILITY_UNIT),
-         _sig(peak_mag, language)),
+        (
+            t("Frequency range f [Hz]", language),
+            frequency_range(np.asarray(result.frequencies, dtype=np.float64), language),
+        ),
+        (
+            t("Peak frequency f [Hz]", language),
+            format_number(peak_freq, language, decimals=1),
+        ),
+        (
+            t("Peak mobility |Y| [{unit}]", language).format(unit=_MOBILITY_UNIT),
+            _sig(peak_mag, language),
+        ),
         (t("Phase at peak [&#176;]", language), _deg(phase, language)),
     ]
 
@@ -110,18 +114,14 @@ def _metric_rows(
 def _statement(result: MobilityResult, language: str = "en") -> str:
     """The boxed representative value: the peak mobility and its frequency."""
     _, peak_mag, peak_freq = _peak(result)
-    return t(
-        "Peak mobility |Y| = <b>{value} {unit}</b> at {freq} Hz", language
-    ).format(
+    return t("Peak mobility |Y| = <b>{value} {unit}</b> at {freq} Hz", language).format(
         value=_sig(peak_mag, language),
         unit=_MOBILITY_UNIT,
         freq=format_number(peak_freq, language, decimals=1),
     )
 
 
-def _extended_terms(
-    result: MobilityResult, language: str = "en"
-) -> list[str]:
+def _extended_terms(result: MobilityResult, language: str = "en") -> list[str]:
     """The FRF type, the frequency range and the peak phase shown beside the box."""
     index, _, _ = _peak(result)
     phase = float(np.asarray(result.phase, dtype=np.float64)[index])
@@ -132,9 +132,7 @@ def _extended_terms(
                 np.asarray(result.frequencies, dtype=np.float64), language
             )
         ),
-        t("Phase at peak: {value}&#176;", language).format(
-            value=_deg(phase, language)
-        ),
+        t("Phase at peak: {value}&#176;", language).format(value=_deg(phase, language)),
     ]
 
 

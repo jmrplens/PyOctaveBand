@@ -69,9 +69,7 @@ def test_monotonic_in_level() -> None:
     # three levels suffice (the 0.6 s / 40 dB anchor also holds 1 sone within
     # 3 % in the CI conformance check, which uses the same duration).
     values = [
-        psychoacoustics.loudness_ecma(
-            _tone(1000.0, lvl, seconds=0.6), FS
-        ).loudness
+        psychoacoustics.loudness_ecma(_tone(1000.0, lvl, seconds=0.6), FS).loudness
         for lvl in (20, 40, 80)
     ]
     assert values[0] < values[1] < values[2]
@@ -90,9 +88,7 @@ def test_silence_is_zero() -> None:
 
 def test_subthreshold_tone_is_inaudible() -> None:
     # A 1 kHz tone at -10 dB SPL is well below the threshold in quiet.
-    result = psychoacoustics.loudness_ecma(
-        _tone(1000.0, -10.0, seconds=0.6), FS
-    )
+    result = psychoacoustics.loudness_ecma(_tone(1000.0, -10.0, seconds=0.6), FS)
     assert result.loudness < 0.01
 
 

@@ -49,8 +49,19 @@ DOCS = ROOT / "docs"
 def _ignored_paths() -> frozenset[str]:
     """Everything under docs/ that git ignores, as repo-relative paths."""
     result = subprocess.run(
-        ["git", "ls-files", "--others", "--ignored", "--exclude-standard", "--", "docs"],
-        capture_output=True, text=True, cwd=ROOT, check=False,
+        [
+            "git",
+            "ls-files",
+            "--others",
+            "--ignored",
+            "--exclude-standard",
+            "--",
+            "docs",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        check=False,
     )
     return frozenset(result.stdout.split())
 
@@ -123,9 +134,7 @@ def _check_areas_cover_the_tree() -> None:
     if missing or ghosts:
         parts = []
         if missing:
-            parts.append(
-                "topic folder(s) with no AREAS entry: " + ", ".join(missing)
-            )
+            parts.append("topic folder(s) with no AREAS entry: " + ", ".join(missing))
         if ghosts:
             parts.append("AREAS entr(ies) with no topic folder: " + ", ".join(ghosts))
         raise SystemExit("generate_llms.py: " + "; ".join(parts))
@@ -176,9 +185,7 @@ def _routes() -> list[tuple[str, str]]:
         route = route.removesuffix("/index")
         published = any(
             (CONTENT / f"{route}{ext}").exists() for ext in (".md", ".mdx")
-        ) or any(
-            (CONTENT / route / f"index{ext}").exists() for ext in (".md", ".mdx")
-        )
+        ) or any((CONTENT / route / f"index{ext}").exists() for ext in (".md", ".mdx"))
         if not published:
             unmapped.append(route)
             continue
@@ -224,9 +231,7 @@ def _overview(folder: pathlib.Path) -> pathlib.Path:
     return folder / "index.md"
 
 
-def _linked_guides(
-    overview: pathlib.Path, guides: set[str], folder: str
-) -> list[str]:
+def _linked_guides(overview: pathlib.Path, guides: set[str], folder: str) -> list[str]:
     """Guide routes an overview links, in order, restricted to its own folder.
 
     The prose gives the reading order, which is the point of reading it, but an
@@ -435,7 +440,8 @@ def _shard_label(slug: str) -> str:
     if slug in labels:
         return labels[slug]
     split_labels = {
-        split_slug: label for _folder, (split_slug, label, _leaves) in MANUAL_SPLITS.items()
+        split_slug: label
+        for _folder, (split_slug, label, _leaves) in MANUAL_SPLITS.items()
     }
     if slug in split_labels:
         return split_labels[slug]
@@ -798,7 +804,9 @@ def build_shards() -> dict[str, str]:
     if theory:
         shards["theory"] = emit("Theory and reference", theory)
 
-    manual_split_slugs = {slug for _folder, (slug, _label, _leaves) in MANUAL_SPLITS.items()}
+    manual_split_slugs = {
+        slug for _folder, (slug, _label, _leaves) in MANUAL_SPLITS.items()
+    }
     for slug, routes in members.items():
         overview = _shard_folders().get(slug, slug)
         # A carved-out shard (see MANUAL_SPLITS) has no overview page of its

@@ -65,7 +65,9 @@ def test_npd_round_trip_is_exact() -> None:
     for row in _npd_oracle():
         if row["NPD_ID"] not in npd_ids or row["Noise Metric"] not in ("SEL", "LAmax"):
             continue
-        curves = _DB.npd_curves(npd_ids[row["NPD_ID"]], row["Op Mode"], row["Noise Metric"])
+        curves = _DB.npd_curves(
+            npd_ids[row["NPD_ID"]], row["Op Mode"], row["Noise Metric"]
+        )
         power = float(row["Power Setting"])
         for col in dist_cols:
             d_m = float(col[2:-2]) * _FT_M
@@ -81,7 +83,9 @@ def test_npd_log_midpoint_interpolation() -> None:
     curves = _DB.npd_curves("747100", "departure", "SEL")
     d0, d1 = curves.distances[0], curves.distances[1]
     mid = float(curves.level(curves.powers[0], np.sqrt(d0 * d1))[0])
-    assert mid == pytest.approx(0.5 * (curves.levels[0, 0] + curves.levels[0, 1]), abs=1e-9)
+    assert mid == pytest.approx(
+        0.5 * (curves.levels[0, 0] + curves.levels[0, 1]), abs=1e-9
+    )
 
 
 def test_modern_aircraft_has_npd_but_no_fixed_point_profile() -> None:
@@ -117,9 +121,12 @@ def test_event_level_finite(aircraft_id: str, operation: str) -> None:
     assert np.isfinite(fr.level)
     # The aircraft-object accessor matches the database method.
     assert _DB.aircraft(aircraft_id).event_level(
-        [500.0, 600.0, 0.0], operation, metric="maximum").level == pytest.approx(
-        _DB.event_level(aircraft_id, [500.0, 600.0, 0.0], operation,
-                        metric="maximum").level)
+        [500.0, 600.0, 0.0], operation, metric="maximum"
+    ).level == pytest.approx(
+        _DB.event_level(
+            aircraft_id, [500.0, 600.0, 0.0], operation, metric="maximum"
+        ).level
+    )
 
 
 def test_noise_contour_smoke() -> None:
@@ -140,8 +147,7 @@ def test_external_directory_load(tmp_path: object) -> None:
 
     root = pathlib.Path(str(tmp_path))
     src = files("phonometry.aircraft.data.anp")
-    for name in ("Aircraft.csv", "NPD_data.csv",
-                 "Default_fixed_point_profiles.csv"):
+    for name in ("Aircraft.csv", "NPD_data.csv", "Default_fixed_point_profiles.csv"):
         (root / f"ANP2.3_{name}").write_text(src.joinpath(name).read_text())
     db = load_anp_database(root)
     assert db.npd_curves("727200", "arrival", "SEL").levels.shape[1] == 10
@@ -194,7 +200,8 @@ def test_pick_ambiguous_table_raises(tmp_path: object) -> None:
     (root / "ANP2.3_Aircraft.csv").write_text(text)  # second "aircraft" match
     (root / "NPD_data.csv").write_text(src.joinpath("NPD_data.csv").read_text())
     (root / "Default_fixed_point_profiles.csv").write_text(
-        src.joinpath("Default_fixed_point_profiles.csv").read_text())
+        src.joinpath("Default_fixed_point_profiles.csv").read_text()
+    )
     with pytest.raises(ValueError, match="ambiguous"):
         load_anp_database(root)
 
@@ -206,8 +213,7 @@ def test_utf8_bom_export_is_tolerated(tmp_path: object) -> None:
     root = pathlib.Path(str(tmp_path))
     src = files("phonometry.aircraft.data.anp")
     for name in ("Aircraft.csv", "NPD_data.csv", "Default_fixed_point_profiles.csv"):
-        (root / name).write_text("﻿" + src.joinpath(name).read_text(),
-                                 encoding="utf-8")
+        (root / name).write_text("﻿" + src.joinpath(name).read_text(), encoding="utf-8")
     db = load_anp_database(root)
     assert "747100" in db.aircraft_ids  # first column not mangled by the BOM
 
@@ -215,16 +221,25 @@ def test_utf8_bom_export_is_tolerated(tmp_path: object) -> None:
 def test_mismatched_sel_lamax_powers_raise() -> None:
     """A malformed database with SEL/LAmax power mismatch is rejected."""
     distances = np.array([60.0, 120.0, 240.0])
-    sel = (np.array([8000.0, 12000.0]),
-           np.array([[95.0, 90.0, 85.0], [99.0, 94.0, 89.0]]))
-    lmax = (np.array([8000.0, 14000.0]),  # different top power on purpose
-            np.array([[90.0, 85.0, 80.0], [96.0, 91.0, 86.0]]))
-    aircraft = {"X": {"ACFT_ID": "X", "NPD_ID": "NX", "Power Parameter": "CNT",
-                      "Lateral Directivity Identifier": "Wing",
-                      "Number Of Engines": "2"}}
+    sel = (
+        np.array([8000.0, 12000.0]),
+        np.array([[95.0, 90.0, 85.0], [99.0, 94.0, 89.0]]),
+    )
+    lmax = (
+        np.array([8000.0, 14000.0]),  # different top power on purpose
+        np.array([[90.0, 85.0, 80.0], [96.0, 91.0, 86.0]]),
+    )
+    aircraft = {
+        "X": {
+            "ACFT_ID": "X",
+            "NPD_ID": "NX",
+            "Power Parameter": "CNT",
+            "Lateral Directivity Identifier": "Wing",
+            "Number Of Engines": "2",
+        }
+    }
     npd = {("NX", "SEL", "D"): sel, ("NX", "LAmax", "D"): lmax}
-    path = np.array([[0.0, 0.0, 0.0, 8000.0, 20.0],
-                     [1000.0, 0.0, 300.0, 8000.0, 80.0]])
+    path = np.array([[0.0, 0.0, 0.0, 8000.0, 20.0], [1000.0, 0.0, 300.0, 8000.0, 80.0]])
     profiles = {("X", "D", "DEFAULT", 1): path}
     db = AnpDatabase(aircraft=aircraft, npd=npd, distances=distances, profiles=profiles)
     with pytest.raises(ValueError, match="power settings differ"):
@@ -255,14 +270,19 @@ def test_aircraft_object_type() -> None:
 # (weight variants) must not have their points interleaved into one path.
 # ---------------------------------------------------------------------------
 
-_PROFILE_HEADER = ("ACFT_ID;Op Type;Profile_ID;Stage Length;Point Number;"
-                   "Distance (ft);Altitude AFE (ft);TAS (kt);Power Setting")
+_PROFILE_HEADER = (
+    "ACFT_ID;Op Type;Profile_ID;Stage Length;Point Number;"
+    "Distance (ft);Altitude AFE (ft);TAS (kt);Power Setting"
+)
 
 
 def _profiles_oracle() -> list[dict[str, str]]:
     """Independent parse of the bundled fixed-point profiles CSV."""
-    text = files("phonometry.aircraft.data.anp").joinpath(
-        "Default_fixed_point_profiles.csv").read_text()
+    text = (
+        files("phonometry.aircraft.data.anp")
+        .joinpath("Default_fixed_point_profiles.csv")
+        .read_text()
+    )
     return list(csv.DictReader(text.splitlines(), delimiter=";"))
 
 
@@ -275,7 +295,8 @@ def _synthetic_db(tmp_path: object, profile_rows: list[str]) -> AnpDatabase:
     for name in ("Aircraft.csv", "NPD_data.csv"):
         (root / name).write_text(src.joinpath(name).read_text())
     (root / "Default_fixed_point_profiles.csv").write_text(
-        "\n".join([_PROFILE_HEADER, *profile_rows]) + "\n")
+        "\n".join([_PROFILE_HEADER, *profile_rows]) + "\n"
+    )
     return load_anp_database(root)
 
 
@@ -300,8 +321,12 @@ def test_profile_point_counts_match_csv_rows() -> None:
     """Every bundled profile loads exactly its own CSV rows, nothing merged."""
     counts: dict[tuple[str, str, str, int], int] = {}
     for row in _profiles_oracle():
-        key = (row["ACFT_ID"], row["Op Type"], row["Profile_ID"],
-               int(float(row["Stage Length"])))
+        key = (
+            row["ACFT_ID"],
+            row["Op Type"],
+            row["Profile_ID"],
+            int(float(row["Stage Length"])),
+        )
         counts[key] = counts.get(key, 0) + 1
     assert len(counts) > 50  # 77 bundled (aircraft, op, profile, stage) keys
     for (acft, op, pid, stage), n in counts.items():
@@ -312,13 +337,16 @@ def test_profile_point_counts_match_csv_rows() -> None:
 
 def test_synthetic_two_profile_export_selects_default(tmp_path: object) -> None:
     """With several profiles per key, DEFAULT wins unless profile_id says else."""
-    db = _synthetic_db(tmp_path, [
-        "747100;D;HEAVY;1;1;0.0;0.0;30.0;40000.0",
-        "747100;D;HEAVY;1;2;5000.0;500.0;150.0;40000.0",
-        "747100;D;DEFAULT;1;1;0.0;0.0;35.0;45000.0",
-        "747100;D;DEFAULT;1;2;6000.0;800.0;160.0;45000.0",
-        "747100;D;DEFAULT;1;3;12000.0;2000.0;180.0;42000.0",
-    ])
+    db = _synthetic_db(
+        tmp_path,
+        [
+            "747100;D;HEAVY;1;1;0.0;0.0;30.0;40000.0",
+            "747100;D;HEAVY;1;2;5000.0;500.0;150.0;40000.0",
+            "747100;D;DEFAULT;1;1;0.0;0.0;35.0;45000.0",
+            "747100;D;DEFAULT;1;2;6000.0;800.0;160.0;45000.0",
+            "747100;D;DEFAULT;1;3;12000.0;2000.0;180.0;42000.0",
+        ],
+    )
     prof = db.profile("747100", "departure", 1)
     assert prof.profile_id == "DEFAULT"
     assert prof.path.shape[0] == 3
@@ -328,24 +356,31 @@ def test_synthetic_two_profile_export_selects_default(tmp_path: object) -> None:
 
 
 def test_single_non_default_profile_is_selected(tmp_path: object) -> None:
-    db = _synthetic_db(tmp_path, [
-        "747100;D;ONLY;1;1;0.0;0.0;30.0;40000.0",
-        "747100;D;ONLY;1;2;5000.0;500.0;150.0;40000.0",
-    ])
+    db = _synthetic_db(
+        tmp_path,
+        [
+            "747100;D;ONLY;1;1;0.0;0.0;30.0;40000.0",
+            "747100;D;ONLY;1;2;5000.0;500.0;150.0;40000.0",
+        ],
+    )
     assert db.profile("747100", "departure", 1).profile_id == "ONLY"
 
 
 def test_ambiguous_profiles_without_default_raise(tmp_path: object) -> None:
-    db = _synthetic_db(tmp_path, [
-        "747100;D;LIGHT;1;1;0.0;0.0;30.0;40000.0",
-        "747100;D;LIGHT;1;2;5000.0;500.0;150.0;40000.0",
-        "747100;D;HEAVY;1;1;0.0;0.0;30.0;42000.0",
-        "747100;D;HEAVY;1;2;5000.0;400.0;150.0;42000.0",
-    ])
+    db = _synthetic_db(
+        tmp_path,
+        [
+            "747100;D;LIGHT;1;1;0.0;0.0;30.0;40000.0",
+            "747100;D;LIGHT;1;2;5000.0;500.0;150.0;40000.0",
+            "747100;D;HEAVY;1;1;0.0;0.0;30.0;42000.0",
+            "747100;D;HEAVY;1;2;5000.0;400.0;150.0;42000.0",
+        ],
+    )
     with pytest.raises(ValueError, match=r"'HEAVY', 'LIGHT'"):
         db.profile("747100", "departure", 1)
-    assert db.profile("747100", "departure", 1,
-                      profile_id="LIGHT").profile_id == "LIGHT"
+    assert (
+        db.profile("747100", "departure", 1, profile_id="LIGHT").profile_id == "LIGHT"
+    )
     with pytest.raises(KeyError, match="available profiles"):
         db.profile("747100", "departure", 1, profile_id="NOPE")
 
@@ -353,7 +388,10 @@ def test_ambiguous_profiles_without_default_raise(tmp_path: object) -> None:
 def test_duplicate_point_numbers_raise(tmp_path: object) -> None:
     """A malformed table with duplicate point numbers errors instead of merging."""
     with pytest.raises(ValueError, match="point numbers"):
-        _synthetic_db(tmp_path, [
-            "747100;D;DEFAULT;1;1;0.0;0.0;30.0;40000.0",
-            "747100;D;DEFAULT;1;1;5000.0;500.0;150.0;40000.0",
-        ])
+        _synthetic_db(
+            tmp_path,
+            [
+                "747100;D;DEFAULT;1;1;0.0;0.0;30.0;40000.0",
+                "747100;D;DEFAULT;1;1;5000.0;500.0;150.0;40000.0",
+            ],
+        )

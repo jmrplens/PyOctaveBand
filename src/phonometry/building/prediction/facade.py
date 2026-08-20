@@ -120,7 +120,9 @@ class FacadeElement:
     insertion_loss: float | Sequence[float] | np.ndarray | None = None
 
     def _kind(self) -> str:
-        given = [k for k in ("r", "dn_e", "insertion_loss") if getattr(self, k) is not None]
+        given = [
+            k for k in ("r", "dn_e", "insertion_loss") if getattr(self, k) is not None
+        ]
         if len(given) != 1:
             raise ValueError(
                 f"Element '{self.name}': give exactly one of r / dn_e / insertion_loss."
@@ -196,7 +198,9 @@ class FacadePredictionResult:
     frequencies: np.ndarray | None = None
     elements: tuple[FacadeElement, ...] | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-element partial indices and the façade ``R'`` / ``D2m,nT``."""
         from ..._i18n import check_language
         from ..._plot.building import plot_facade_prediction
@@ -272,8 +276,7 @@ class FacadePredictionResult:
         check_language(language)
         if engine != "reportlab":
             raise ValueError(
-                f"Unknown report engine {engine!r}; only 'reportlab' is "
-                "supported."
+                f"Unknown report engine {engine!r}; only 'reportlab' is supported."
             )
         from ..._report.iso12354 import render_iso12354_facade_report
 
@@ -301,7 +304,9 @@ class RadiatedPowerResult:
     l_w_dba: float | None = None
     frequencies: np.ndarray | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the radiated sound power level ``LW`` per band."""
         from ..._i18n import check_language
         from ..._plot.building import plot_radiated_power
@@ -313,14 +318,20 @@ class RadiatedPowerResult:
 # A-weighting at octave-band centres 63 Hz .. 8 kHz (IEC 61672-1), for the
 # A-weighted single-number outputs of the worked examples.
 _A_WEIGHT_OCTAVE = {
-    63: -26.2, 125: -16.1, 250: -8.6, 500: -3.2,
-    1000: 0.0, 2000: 1.2, 4000: 1.0, 8000: -1.1,
+    63: -26.2,
+    125: -16.1,
+    250: -8.6,
+    500: -3.2,
+    1000: 0.0,
+    2000: 1.2,
+    4000: 1.0,
+    8000: -1.1,
 }
 
 
-def _apparent_reduction(elements: Sequence[FacadeElement], total_area: float) -> tuple[
-    np.ndarray, dict[str, np.ndarray]
-]:
+def _apparent_reduction(
+    elements: Sequence[FacadeElement], total_area: float
+) -> tuple[np.ndarray, dict[str, np.ndarray]]:
     r""":math:`R' = -10 \log_{10}(\sum \tau)` (F. 10 / Part 4 F. 3), plus ``Rp``."""
     if not elements:
         raise ValueError("At least one façade element is required.")
@@ -404,7 +415,9 @@ def facade_sound_reduction(
         r_tr_s_w=None if r_tr is None else r_tr[0],
         d_2m_nt_w=None if d_num is None else d_num[0],
         c_tr=None if r_tr is None else r_tr[1],
-        frequencies=None if frequencies is None else np.asarray(frequencies, dtype=np.float64),
+        frequencies=None
+        if frequencies is None
+        else np.asarray(frequencies, dtype=np.float64),
         elements=tuple(elements),
     )
 
@@ -465,7 +478,9 @@ def radiated_sound_power(
         if a_weights is not None:
             l_w_dba = float(10.0 * np.log10(np.sum(10.0 ** ((l_w + a_weights) / 10.0))))
     freqs = None if octave_bands is None else np.asarray(octave_bands, dtype=np.float64)
-    return RadiatedPowerResult(l_w=l_w, r_prime=r_prime, l_w_dba=l_w_dba, frequencies=freqs)
+    return RadiatedPowerResult(
+        l_w=l_w, r_prime=r_prime, l_w_dba=l_w_dba, frequencies=freqs
+    )
 
 
 def outdoor_attenuation(width: float, height: float, distance: float) -> float:

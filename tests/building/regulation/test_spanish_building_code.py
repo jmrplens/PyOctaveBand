@@ -37,14 +37,46 @@ from phonometry.building.regulation import spain as hr
 #: Manual Ejemplo 7.2, printed page 394: the apparent sound reduction index
 #: R' of a real field test, 100 Hz to 5 kHz.
 _R_PRIME = (
-    36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1, 47.1,
-    52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8, 64.7, 65.3,
+    36.2,
+    41.5,
+    36.9,
+    40.4,
+    44.7,
+    42.4,
+    45.7,
+    46.1,
+    47.1,
+    52.3,
+    54.3,
+    57.5,
+    57.8,
+    57.3,
+    59.0,
+    62.8,
+    64.7,
+    65.3,
 )
 #: Manual Ejercicio 7.1, printed page 395: the standardized facade level
 #: difference D2m,nT, 100 Hz to 5 kHz.
 _D2M_NT = (
-    28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2, 34.7,
-    38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5, 39.4, 41.5,
+    28.5,
+    28.5,
+    18.9,
+    23.7,
+    30.7,
+    31.3,
+    37.8,
+    35.2,
+    34.7,
+    38.5,
+    37.7,
+    43.1,
+    42.3,
+    44.2,
+    41.9,
+    37.5,
+    39.4,
+    41.5,
 )
 
 
@@ -61,16 +93,64 @@ def test_band_set_is_the_eighteen_bands_of_annex_a() -> None:
 def test_normalised_spectra_match_annex_a_tables() -> None:
     """DB-HR Annex A Tables A.2 to A.5, transcribed value by value."""
     assert hr.DB_HR_NORMALISED_SPECTRA["pink"] == (
-        -30.1, -27.1, -24.4, -21.9, -19.6, -17.6, -15.8, -14.2, -12.9,
-        -11.8, -11.0, -10.4, -10.0, -9.8, -9.7, -9.8, -10.0, -10.5,
+        -30.1,
+        -27.1,
+        -24.4,
+        -21.9,
+        -19.6,
+        -17.6,
+        -15.8,
+        -14.2,
+        -12.9,
+        -11.8,
+        -11.0,
+        -10.4,
+        -10.0,
+        -9.8,
+        -9.7,
+        -9.8,
+        -10.0,
+        -10.5,
     )
     assert hr.DB_HR_NORMALISED_SPECTRA["traffic"] == (
-        -20.0, -20.0, -18.0, -16.0, -15.0, -14.0, -13.0, -12.0, -11.0,
-        -9.0, -8.0, -9.0, -10.0, -11.0, -13.0, -15.0, -16.0, -18.0,
+        -20.0,
+        -20.0,
+        -18.0,
+        -16.0,
+        -15.0,
+        -14.0,
+        -13.0,
+        -12.0,
+        -11.0,
+        -9.0,
+        -8.0,
+        -9.0,
+        -10.0,
+        -11.0,
+        -13.0,
+        -15.0,
+        -16.0,
+        -18.0,
     )
     assert hr.DB_HR_NORMALISED_SPECTRA["aircraft"] == (
-        -23.8, -20.2, -15.4, -13.1, -12.6, -10.4, -9.8, -9.5, -8.7,
-        -9.5, -10.5, -11.0, -12.5, -14.9, -15.9, -18.6, -23.3, -29.9,
+        -23.8,
+        -20.2,
+        -15.4,
+        -13.1,
+        -12.6,
+        -10.4,
+        -9.8,
+        -9.5,
+        -8.7,
+        -9.5,
+        -10.5,
+        -11.0,
+        -12.5,
+        -14.9,
+        -15.9,
+        -18.6,
+        -23.3,
+        -29.9,
     )
     for spectrum in hr.DB_HR_NORMALISED_SPECTRA.values():
         assert len(spectrum) == 18
@@ -79,8 +159,7 @@ def test_normalised_spectra_match_annex_a_tables() -> None:
 def test_railway_spectrum_equals_the_road_traffic_spectrum() -> None:
     """Table A.4 (LAef,i) is numerically identical to Table A.3 (LAtr,i)."""
     assert (
-        hr.DB_HR_NORMALISED_SPECTRA["railway"]
-        == hr.DB_HR_NORMALISED_SPECTRA["traffic"]
+        hr.DB_HR_NORMALISED_SPECTRA["railway"] == hr.DB_HR_NORMALISED_SPECTRA["traffic"]
     )
 
 
@@ -111,9 +190,7 @@ def test_global_index_is_minus_the_energy_sum_of_the_band_contributions() -> Non
     """Formula (A.5): I_x = -10 lg sum_i 10^((L_x,i - X_i)/10), recomputed by hand."""
     index = hr.ra(_R_PRIME)
     pink = np.asarray(hr.DB_HR_NORMALISED_SPECTRA["pink"])
-    expected = -10.0 * np.log10(
-        np.sum(10.0 ** ((pink - np.asarray(_R_PRIME)) / 10.0))
-    )
+    expected = -10.0 * np.log10(np.sum(10.0 ** ((pink - np.asarray(_R_PRIME)) / 10.0)))
     assert index.value == pytest.approx(float(expected), abs=1e-12)
     assert index.band_contributions == pytest.approx(pink - np.asarray(_R_PRIME))
 
@@ -282,10 +359,17 @@ def test_rounding_is_half_up_not_bankers() -> None:
 @pytest.mark.parametrize(
     ("area", "expected"),
     [
-        (1.8, 0), (2.0, 0), (2.7, 0),
-        (2.8, -1), (3.0, -1), (3.6, -1),
-        (3.7, -2), (4.0, -2), (4.6, -2),
-        (4.7, -3), (8.0, -3),
+        (1.8, 0),
+        (2.0, 0),
+        (2.7, 0),
+        (2.8, -1),
+        (3.0, -1),
+        (3.6, -1),
+        (3.7, -2),
+        (4.0, -2),
+        (4.6, -2),
+        (4.7, -3),
+        (8.0, -3),
     ],
 )
 def test_window_size_correction_table(area: float, expected: int) -> None:
@@ -307,9 +391,22 @@ def test_window_size_correction_reproduces_ejemplo_7_4() -> None:
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize(
     ("ld", "expected"),
-    [(55.0, 30), (60.0, 30), (60.1, 32), (62.0, 32), (65.0, 32),
-     (65.1, 37), (68.0, 37), (70.0, 37), (70.1, 42), (72.0, 42), (75.0, 42),
-     (75.1, 47), (76.0, 47), (80.0, 47)],
+    [
+        (55.0, 30),
+        (60.0, 30),
+        (60.1, 32),
+        (62.0, 32),
+        (65.0, 32),
+        (65.1, 37),
+        (68.0, 37),
+        (70.0, 37),
+        (70.1, 42),
+        (72.0, 42),
+        (75.0, 42),
+        (75.1, 47),
+        (76.0, 47),
+        (80.0, 47),
+    ],
 )
 def test_facade_requirement_bedrooms_series(ld: float, expected: int) -> None:
     """DB-HR Table 2.1, residential/hospital bedrooms column, every Ld band.
@@ -382,9 +479,10 @@ def test_facade_requirement_quiet_facade_reduction() -> None:
         72.0, "residential", "bedrooms", quiet_facade=True
     )
     assert sheltered.limit == 32.0
-    assert sheltered.limit == hr.db_hr_facade_requirement(
-        62.0, "residential", "bedrooms"
-    ).limit
+    assert (
+        sheltered.limit
+        == hr.db_hr_facade_requirement(62.0, "residential", "bedrooms").limit
+    )
 
 
 def test_facade_requirement_use_and_room_aliases() -> None:
@@ -583,9 +681,7 @@ def test_global_index_validation() -> None:
     with pytest.raises(ValueError, match="one value per band"):
         hr.db_hr_global_index(_R_PRIME, frequencies=[100.0, 125.0])
     with pytest.raises(ValueError, match="positive"):
-        hr.db_hr_global_index(
-            _R_PRIME, frequencies=[0.0, *hr.DB_HR_FREQUENCIES[1:]]
-        )
+        hr.db_hr_global_index(_R_PRIME, frequencies=[0.0, *hr.DB_HR_FREQUENCIES[1:]])
 
 
 def test_global_index_rejects_a_spectrum_missing_a_db_hr_band() -> None:
@@ -600,7 +696,9 @@ def test_requirement_lookup_validation() -> None:
     with pytest.raises(ValueError, match="Unknown"):
         hr.db_hr_facade_requirement(62.0, "industrial", "bedrooms")
     with pytest.raises(ValueError, match="dominant_noise"):
-        hr.db_hr_facade_requirement(62.0, "residential", "bedrooms", dominant_noise="sea")
+        hr.db_hr_facade_requirement(
+            62.0, "residential", "bedrooms", dominant_noise="sea"
+        )
     with pytest.raises(ValueError, match="finite"):
         hr.db_hr_facade_requirement(math.nan, "residential", "bedrooms")
     with pytest.raises(ValueError, match="Unknown"):

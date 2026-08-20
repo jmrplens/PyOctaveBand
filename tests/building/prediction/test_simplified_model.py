@@ -188,16 +188,12 @@ def test_kij_corner_and_thickness_change_e9() -> None:
     with pytest.raises(ValueError, match="single path"):
         building.junction_vibration_reduction("corner", "through", 10.0)
     with pytest.raises(ValueError, match="single in-line path"):
-        building.junction_vibration_reduction(
-            "thickness_change", "corner", 3.0
-        )
+        building.junction_vibration_reduction("thickness_change", "corner", 3.0)
 
 
 def test_kij_double_leaf_path_rejected_for_rigid_junctions() -> None:
     with pytest.raises(ValueError, match="no 'double_leaf'"):
-        building.junction_vibration_reduction(
-            "rigid_cross", "double_leaf", 2.0
-        )
+        building.junction_vibration_reduction("rigid_cross", "double_leaf", 2.0)
 
 
 def test_kij_invalid_inputs() -> None:
@@ -217,9 +213,9 @@ def test_kij_min_formula_29() -> None:
     # Kij,min = 10 lg[ lf * l0 * (1/Si + 1/Sj) ], l0 = 1 m. Hand check.
     lf, si, sj = 4.5, 11.5, 19.6
     expected = 10.0 * math.log10(4.5 * (1.0 / 11.5 + 1.0 / 19.6))
-    assert building.junction_min_vibration_reduction(
-        lf, si, sj
-    ) == pytest.approx(expected)
+    assert building.junction_min_vibration_reduction(lf, si, sj) == pytest.approx(
+        expected
+    )
     with pytest.raises(
         ValueError,
         match="'coupling_length', 's_i' and 's_j' must be positive",
@@ -249,16 +245,26 @@ def test_combine_linings() -> None:
 def test_flanking_path_reproduces_annex_h_floor_ff() -> None:
     # Floor Ff: (49+49)/2 + 12.4 + 10 lg(11.5/4.5) = 65.5 dB.
     path = building.flanking_path(
-        label="floor-Ff", kind="Ff", r_source=49.0, r_receive=49.0,
-        k_ij=12.4, separating_area=11.5, coupling_length=4.5,
+        label="floor-Ff",
+        kind="Ff",
+        r_source=49.0,
+        r_receive=49.0,
+        k_ij=12.4,
+        separating_area=11.5,
+        coupling_length=4.5,
     )
     assert path.r_ij_w == pytest.approx(65.5, abs=0.05)
 
 
 def test_flanking_element_triplet() -> None:
     ff, df, fd = building.flanking_element(
-        label="floor", r_flanking=49.0, r_separating=57.0,
-        k_ff=12.4, k_fd=8.9, k_df=8.9, separating_area=11.5,
+        label="floor",
+        r_flanking=49.0,
+        r_separating=57.0,
+        k_ff=12.4,
+        k_fd=8.9,
+        k_df=8.9,
+        separating_area=11.5,
         coupling_length=4.5,
     )
     assert ff.r_ij_w == pytest.approx(65.5, abs=0.05)
@@ -274,9 +280,15 @@ def test_flanking_element_applies_kij_min_from_geometry() -> None:
     # give KFf,min = 10 lg(4*(2/1.5)) = 7.27 dB, above a raw 5 dB Kij.
     lf, sf, ss = 4.0, 1.5, 11.5
     ff, df, fd = building.flanking_element(
-        label="light", r_flanking=30.0, r_separating=57.0,
-        k_ff=5.0, k_fd=5.0, k_df=5.0, separating_area=ss,
-        coupling_length=lf, flanking_area=sf,
+        label="light",
+        r_flanking=30.0,
+        r_separating=57.0,
+        k_ff=5.0,
+        k_fd=5.0,
+        k_df=5.0,
+        separating_area=ss,
+        coupling_length=lf,
+        flanking_area=sf,
     )
     min_ff = building.junction_min_vibration_reduction(lf, sf, sf)
     min_cross = building.junction_min_vibration_reduction(lf, sf, ss)
@@ -288,8 +300,14 @@ def test_flanking_element_applies_kij_min_from_geometry() -> None:
     assert fd.r_ij_w == pytest.approx(base_cross + max(min_cross, 5.0))
     # Without the flanking area the raw Kij is used unchanged (documented).
     ff_raw, _, _ = building.flanking_element(
-        label="light", r_flanking=30.0, r_separating=57.0,
-        k_ff=5.0, k_fd=5.0, k_df=5.0, separating_area=ss, coupling_length=lf,
+        label="light",
+        r_flanking=30.0,
+        r_separating=57.0,
+        k_ff=5.0,
+        k_fd=5.0,
+        k_df=5.0,
+        separating_area=ss,
+        coupling_length=lf,
     )
     assert ff_raw.r_ij_w == pytest.approx(base_ff + 5.0)
 
@@ -298,9 +316,15 @@ def test_flanking_element_kij_min_is_noop_for_annex_h_geometry() -> None:
     # The Annex H.3 floor junction floors are far below the tabulated Kij
     # (Kij,min ~ -2 dB there), so passing the areas leaves the oracle intact.
     ff, df, fd = building.flanking_element(
-        label="floor", r_flanking=49.0, r_separating=57.0,
-        k_ff=12.4, k_fd=8.9, k_df=8.9, separating_area=11.5,
-        coupling_length=4.5, flanking_area=13.5,
+        label="floor",
+        r_flanking=49.0,
+        r_separating=57.0,
+        k_ff=12.4,
+        k_fd=8.9,
+        k_df=8.9,
+        separating_area=11.5,
+        coupling_length=4.5,
+        flanking_area=13.5,
     )
     assert ff.r_ij_w == pytest.approx(65.5, abs=0.05)
     assert fd.r_ij_w == pytest.approx(66.0, abs=0.05)
@@ -308,20 +332,28 @@ def test_flanking_element_kij_min_is_noop_for_annex_h_geometry() -> None:
 
 
 def test_flanking_path_invalid() -> None:
-    with pytest.raises(
-        ValueError, match="'kind' must be 'Ff', 'Df' or 'Fd'"
-    ):
+    with pytest.raises(ValueError, match="'kind' must be 'Ff', 'Df' or 'Fd'"):
         building.flanking_path(
-            label="x", kind="XX", r_source=40.0, r_receive=40.0,  # type: ignore[arg-type]
-            k_ij=5.0, separating_area=11.5, coupling_length=4.5,
+            label="x",
+            kind="XX",
+            r_source=40.0,
+            r_receive=40.0,  # type: ignore[arg-type]
+            k_ij=5.0,
+            separating_area=11.5,
+            coupling_length=4.5,
         )
     with pytest.raises(
         ValueError,
         match="'separating_area' and 'coupling_length' must be positive",
     ):
         building.flanking_path(
-            label="x", kind="Ff", r_source=40.0, r_receive=40.0,
-            k_ij=5.0, separating_area=-1.0, coupling_length=4.5,
+            label="x",
+            kind="Ff",
+            r_source=40.0,
+            r_receive=40.0,
+            k_ij=5.0,
+            separating_area=-1.0,
+            coupling_length=4.5,
         )
 
 
@@ -329,8 +361,12 @@ def test_flanking_path_kij_min_clamps() -> None:
     # Clause 4.4.2 floor: k_ij below kij_min is raised, so Rij,w rises with it;
     # a k_ij already above the floor (and kij_min=None) is left untouched.
     kwargs = {
-        "label": "floor-Ff", "kind": "Ff", "r_source": 49.0, "r_receive": 49.0,
-        "separating_area": 11.5, "coupling_length": 4.5,
+        "label": "floor-Ff",
+        "kind": "Ff",
+        "r_source": 49.0,
+        "r_receive": 49.0,
+        "separating_area": 11.5,
+        "coupling_length": 4.5,
     }
     unclamped = building.flanking_path(k_ij=2.0, **kwargs)  # type: ignore[arg-type]
     clamped = building.flanking_path(k_ij=2.0, kij_min=12.4, **kwargs)  # type: ignore[arg-type]
@@ -358,8 +394,13 @@ def _annex_h_paths() -> list:
     ]
     for label, rw, kff, kfd, lf in elements:
         ff, df, fd = building.flanking_element(
-            label=label, r_flanking=rw, r_separating=57.0,
-            k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=ss,
+            label=label,
+            r_flanking=rw,
+            r_separating=57.0,
+            k_ff=kff,
+            k_fd=kfd,
+            k_df=kfd,
+            separating_area=ss,
             coupling_length=lf,
         )
         paths += [ff, df, fd]
@@ -381,9 +422,12 @@ def test_airborne_annex_h_example() -> None:
 
 def test_airborne_annex_h_all_twelve_path_values() -> None:
     """Every printed H.3 path Rij,w reproduces to the table's 0,1 dB."""
-    by_label = {p.label: p.r_w for p in building.predicted_airborne_insulation(
-        r_direct=57.0, flanking_paths=_annex_h_paths()
-    ).paths}
+    by_label = {
+        p.label: p.r_w
+        for p in building.predicted_airborne_insulation(
+            r_direct=57.0, flanking_paths=_annex_h_paths()
+        ).paths
+    }
     for element, (r_ff, r_cross) in ref.EN12354_1_ANNEX_H3_PATH_RW.items():
         assert by_label[f"{element}-Ff"] == pytest.approx(r_ff, abs=0.05)
         assert by_label[f"{element}-Fd"] == pytest.approx(r_cross, abs=0.05)
@@ -423,15 +467,20 @@ def test_airborne_second_example_floating_floor() -> None:
     ]
     for label, rw, kff, kfd, lf, dr_ff, dr_other in elements:
         ff, df, fd = building.flanking_element(
-            label=label, r_flanking=rw, r_separating=57.0,
-            k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=ss,
-            coupling_length=lf, delta_r_ff=dr_ff, delta_r_fd=dr_other,
+            label=label,
+            r_flanking=rw,
+            r_separating=57.0,
+            k_ff=kff,
+            k_fd=kfd,
+            k_df=kfd,
+            separating_area=ss,
+            coupling_length=lf,
+            delta_r_ff=dr_ff,
+            delta_r_fd=dr_other,
             delta_r_df=dr_other,
         )
         paths += [ff, df, fd]
-    result = building.predicted_airborne_insulation(
-        r_direct=57.0, flanking_paths=paths
-    )
+    result = building.predicted_airborne_insulation(r_direct=57.0, flanking_paths=paths)
     # Standard result: R'w = 52.7 -> 53 dB.
     assert result.r_prime_w == pytest.approx(52.7, abs=0.1)
     assert round(result.r_prime_w) == 53
@@ -445,9 +494,7 @@ def test_airborne_no_flanking_equals_direct() -> None:
 
 
 def test_airborne_direct_lining() -> None:
-    result = building.predicted_airborne_insulation(
-        r_direct=52.0, delta_r_direct=5.0
-    )
+    result = building.predicted_airborne_insulation(r_direct=52.0, delta_r_direct=5.0)
     assert result.r_direct_w == pytest.approx(57.0)
     assert result.r_prime_w == pytest.approx(57.0)
 
@@ -458,8 +505,13 @@ def test_airborne_adding_flanking_strictly_lowers() -> None:
         r_direct=57.0,
         flanking_paths=[
             building.flanking_path(
-                label="f", kind="Ff", r_source=49.0, r_receive=49.0,
-                k_ij=12.4, separating_area=11.5, coupling_length=4.5,
+                label="f",
+                kind="Ff",
+                r_source=49.0,
+                r_receive=49.0,
+                k_ij=12.4,
+                separating_area=11.5,
+                coupling_length=4.5,
             )
         ],
     ).r_prime_w
@@ -467,12 +519,22 @@ def test_airborne_adding_flanking_strictly_lowers() -> None:
         r_direct=57.0,
         flanking_paths=[
             building.flanking_path(
-                label="f", kind="Ff", r_source=49.0, r_receive=49.0,
-                k_ij=12.4, separating_area=11.5, coupling_length=4.5,
+                label="f",
+                kind="Ff",
+                r_source=49.0,
+                r_receive=49.0,
+                k_ij=12.4,
+                separating_area=11.5,
+                coupling_length=4.5,
             ),
             building.flanking_path(
-                label="g", kind="Df", r_source=57.0, r_receive=49.0,
-                k_ij=8.9, separating_area=11.5, coupling_length=4.5,
+                label="g",
+                kind="Df",
+                r_source=57.0,
+                r_receive=49.0,
+                k_ij=8.9,
+                separating_area=11.5,
+                coupling_length=4.5,
             ),
         ],
     ).r_prime_w
@@ -484,15 +546,18 @@ def test_airborne_energy_composition_two_equal_paths() -> None:
     # Two identical paths each at R: R' = R - 10 lg 2 = R - 3.0103.
     r = 50.0
     p = building.flanking_path(
-        label="p", kind="Ff", r_source=r, r_receive=r, k_ij=0.0,
-        separating_area=1.0, coupling_length=1.0,
+        label="p",
+        kind="Ff",
+        r_source=r,
+        r_receive=r,
+        k_ij=0.0,
+        separating_area=1.0,
+        coupling_length=1.0,
     )
     # Ff at r_source=r_receive=r, k=0, coupling term 10 lg(1/1)=0 -> r_ij = r.
     assert p.r_ij_w == pytest.approx(r)
     # Direct at r, plus one identical flanking path -> two equal paths.
-    result = building.predicted_airborne_insulation(
-        r_direct=r, flanking_paths=[p]
-    )
+    result = building.predicted_airborne_insulation(r_direct=r, flanking_paths=[p])
     assert result.r_prime_w == pytest.approx(r - 10.0 * math.log10(2.0))
     assert result.paths[0].fraction == pytest.approx(0.5)
 
@@ -500,8 +565,13 @@ def test_airborne_energy_composition_two_equal_paths() -> None:
 def test_airborne_dominant_path_is_weakest() -> None:
     # A single very weak flanking path (low R) dominates the energy.
     weak = building.flanking_path(
-        label="weak", kind="Ff", r_source=30.0, r_receive=30.0, k_ij=0.0,
-        separating_area=1.0, coupling_length=1.0,
+        label="weak",
+        kind="Ff",
+        r_source=30.0,
+        r_receive=30.0,
+        k_ij=0.0,
+        separating_area=1.0,
+        coupling_length=1.0,
     )
     result = building.predicted_airborne_insulation(
         r_direct=60.0, flanking_paths=[weak]
@@ -516,9 +586,7 @@ def test_airborne_dominant_path_is_weakest() -> None:
 
 def test_equivalent_impact_level_annex_e3() -> None:
     # Concrete floor m' = 322 kg/m² -> Ln,w,eq = 164 - 35 lg(322) = 76.2 dB.
-    assert building.equivalent_impact_level(322.0) == pytest.approx(
-        76.2, abs=0.1
-    )
+    assert building.equivalent_impact_level(322.0) == pytest.approx(76.2, abs=0.1)
     with pytest.raises(ValueError, match="'mass_per_area' must be positive"):
         building.equivalent_impact_level(0.0)
 
@@ -568,9 +636,7 @@ def test_standardized_impact_level_annex_e3() -> None:
     # = 42.96 dB. Annex E.3's own "10 lg(V/30)" rounding gives 42.78; both
     # round to 43 dB.
     exact = 45.0 - 10.0 * math.log10(0.032 * 50.0)
-    assert building.standardized_impact_level(45.0, 50.0) == pytest.approx(
-        exact
-    )
+    assert building.standardized_impact_level(45.0, 50.0) == pytest.approx(exact)
     assert building.standardized_impact_level(45.0, 50.0) == pytest.approx(
         42.96, abs=0.01
     )
@@ -597,9 +663,7 @@ def test_standardized_level_difference_annex_h3_closure() -> None:
     assert dnt == pytest.approx(53.63, abs=0.01)
     assert round(dnt) == 54
     # Second H.3 example (floating floor): 52.7 + 1.6 = 54.3 -> 54 dB.
-    assert (
-        round(building.standardized_level_difference(52.7, 50.0, 11.5)) == 54
-    )
+    assert round(building.standardized_level_difference(52.7, 50.0, 11.5)) == 54
     with pytest.raises(ValueError, match="'volume' must be positive"):
         building.standardized_level_difference(52.2, 0.0, 11.5)
     with pytest.raises(ValueError, match="'separating_area' must be positive"):
@@ -620,19 +684,13 @@ def test_equivalent_impact_level_warns_outside_envelope() -> None:
 
 def test_impact_covering_improves_level() -> None:
     # A better covering (larger ΔLw) lowers L'n,w.
-    a = building.predicted_impact_insulation(
-        ln_w_eq=76.0, delta_l_w=20.0
-    ).l_prime_n_w
-    b = building.predicted_impact_insulation(
-        ln_w_eq=76.0, delta_l_w=30.0
-    ).l_prime_n_w
+    a = building.predicted_impact_insulation(ln_w_eq=76.0, delta_l_w=20.0).l_prime_n_w
+    b = building.predicted_impact_insulation(ln_w_eq=76.0, delta_l_w=30.0).l_prime_n_w
     assert b < a
 
 
 def test_impact_non_finite_rejected() -> None:
-    with pytest.raises(
-        ValueError, match="'ln_w_eq' must be a finite number"
-    ):
+    with pytest.raises(ValueError, match="'ln_w_eq' must be a finite number"):
         building.predicted_impact_insulation(ln_w_eq=float("nan"))
 
 
@@ -678,9 +736,7 @@ def test_kij_rigid_t_equal_masses_alba() -> None:
         (1250.0, 15.70),
     ],
 )
-def test_kij_flexible_t_alba_frequency_law(
-    frequency: float, expected: float
-) -> None:
+def test_kij_flexible_t_alba_frequency_law(frequency: float, expected: float) -> None:
     assert building.junction_vibration_reduction(
         "flexible_t", "corner", 1.0, frequency=frequency, f1=125.0
     ) == pytest.approx(expected, abs=0.005)
@@ -692,31 +748,94 @@ def test_kij_flexible_t_alba_frequency_law(
 # walls in Southern-European buildings. CB = concrete beam-brick wall,
 # BB = ribbed slab with brick blocks-brick wall.
 _SCHIAVI_TABLE3_FREQS = (
-    100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
-    800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
 )
 _SCHIAVI_TABLE3_CB = (
-    18.0, 17.5, 17.0, 16.5, 16.0, 15.5, 15.0, 14.5, 14.0,
-    14.0, 14.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0,
+    18.0,
+    17.5,
+    17.0,
+    16.5,
+    16.0,
+    15.5,
+    15.0,
+    14.5,
+    14.0,
+    14.0,
+    14.0,
+    14.0,
+    15.0,
+    16.0,
+    17.0,
+    18.0,
+    19.0,
+    20.0,
 )
 _SCHIAVI_TABLE3_BB = (
-    17.0, 16.5, 16.0, 15.5, 15.0, 14.5, 14.0, 13.5, 13.0,
-    12.5, 12.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 14.5,
+    17.0,
+    16.5,
+    16.0,
+    15.5,
+    15.0,
+    14.5,
+    14.0,
+    13.5,
+    13.0,
+    12.5,
+    12.0,
+    11.5,
+    12.0,
+    12.5,
+    13.0,
+    13.5,
+    14.0,
+    14.5,
 )
 # Table 3 "Single number (average)" row.
 _SCHIAVI_SINGLE_CB = 16.0
 _SCHIAVI_SINGLE_BB = 14.0
 # Table 1, mwall/mfloor of the 13 BB junctions (junction numbers 3, 5, 7, 11,
 # 13, 14, 15, 16, 17, 18, 19, 21, 29); all are cross junctions.
-_SCHIAVI_BB_RATIOS = (
-    0.4, 0.4, 0.2, 0.3, 0.3, 0.3, 0.4, 0.3, 0.3, 0.2, 0.3, 0.4, 0.2
-)
+_SCHIAVI_BB_RATIOS = (0.4, 0.4, 0.2, 0.3, 0.3, 0.3, 0.4, 0.3, 0.3, 0.2, 0.3, 0.4, 0.2)
 # Table 2, "essential" mass ratios mEwall/mEfloor of the 19 CB junctions
 # (junction numbers 1, 2, 4, 6, 8, 9, 10, 12, 20, 22, 23, 24, 25, 26, 27,
 # 28, 30, 31, 32).
 _SCHIAVI_CB_RATIOS = (
-    0.1, 0.1, 0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1,
-    0.2, 0.1, 0.1, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2,
+    0.1,
+    0.1,
+    0.1,
+    0.2,
+    0.1,
+    0.2,
+    0.2,
+    0.2,
+    0.2,
+    0.1,
+    0.2,
+    0.1,
+    0.1,
+    0.1,
+    0.2,
+    0.2,
+    0.1,
+    0.1,
+    0.2,
 )
 
 

@@ -373,7 +373,9 @@ class MooreGlasbergTimeVaryingLoudness:
     field: str
     presentation: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the short-term and long-term loudness against time.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -382,7 +384,9 @@ class MooreGlasbergTimeVaryingLoudness:
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_moore_glasberg_time_loudness
 
-        return plot_moore_glasberg_time_loudness(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_moore_glasberg_time_loudness(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 # ---------------------------------------------------------------------------

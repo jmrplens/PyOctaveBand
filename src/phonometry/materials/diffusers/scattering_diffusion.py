@@ -75,7 +75,9 @@ class DiffusionResult:
     levels: Real
     coefficient: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the polar response with the diffusion coefficient annotated.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -166,7 +168,9 @@ class DiffusionSpectrum:
     diffusion: Real
     normalized: Real | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the diffusion coefficient ``d`` versus frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -260,16 +264,13 @@ def diffusion_spectrum(
     d = np.atleast_1d(np.asarray(diffusion, dtype=np.float64))
     if freq.ndim != 1 or freq.size == 0 or freq.shape != d.shape:
         raise ValueError(
-            "'frequencies' and 'diffusion' must be non-empty, 1-D and "
-            "equal-length."
+            "'frequencies' and 'diffusion' must be non-empty, 1-D and equal-length."
         )
     d_n: Real | None = None
     if normalized is not None:
         d_n = np.atleast_1d(np.asarray(normalized, dtype=np.float64))
         if d_n.shape != freq.shape:
-            raise ValueError(
-                "'normalized' must match 'frequencies' in length."
-            )
+            raise ValueError("'normalized' must match 'frequencies' in length.")
     return DiffusionSpectrum(
         frequencies=freq,
         diffusion=d,
@@ -403,9 +404,7 @@ def normalized_diffusion_coefficient(
     d_ref = np.asarray(d_theta_reference, dtype=np.float64)
     denom = 1.0 - d_ref
     if np.any(np.isclose(denom, 0.0)):
-        raise ValueError(
-            "'d_theta_reference' must not equal 1 (division by zero)."
-        )
+        raise ValueError("'d_theta_reference' must not equal 1 (division by zero).")
     return np.asarray((d - d_ref) / denom, dtype=np.float64)
 
 
@@ -455,13 +454,9 @@ def area_factors(
     """
     theta_deg = np.asarray(elevations, dtype=np.float64)
     if theta_deg.ndim != 1 or theta_deg.size == 0:
-        raise ValueError(
-            "'elevations' must be a non-empty 1-D sequence of angles."
-        )
+        raise ValueError("'elevations' must be a non-empty 1-D sequence of angles.")
     d_theta = _positive_scalar(delta_theta, "delta_theta")
-    d_phi = d_theta if delta_phi is None else _positive_scalar(
-        delta_phi, "delta_phi"
-    )
+    d_phi = d_theta if delta_phi is None else _positive_scalar(delta_phi, "delta_phi")
     theta = np.radians(theta_deg)
     d_theta_rad = math.radians(d_theta)
     d_phi_rad = math.radians(d_phi)
@@ -471,13 +466,9 @@ def area_factors(
     general = ~at_zenith & ~at_pole
 
     areas = np.empty_like(theta_deg)
-    areas[at_zenith] = (
-        4.0 * np.pi / d_phi_rad * np.sin(d_theta_rad / 4.0) ** 2
-    )
+    areas[at_zenith] = 4.0 * np.pi / d_phi_rad * np.sin(d_theta_rad / 4.0) ** 2
     areas[at_pole] = np.sin(d_theta_rad / 2.0)
-    areas[general] = (
-        2.0 * np.sin(theta[general]) * np.sin(d_theta_rad / 2.0)
-    )
+    areas[general] = 2.0 * np.sin(theta[general]) * np.sin(d_theta_rad / 2.0)
     a_min = np.min(areas)
     if a_min <= 0.0:
         raise ValueError("Area factors must be positive; check the angles.")
@@ -508,9 +499,7 @@ def random_incidence_diffusion(
     """
     d = np.asarray(directional_coefficients, dtype=np.float64)
     if d.ndim != 1:
-        raise ValueError(
-            "'directional_coefficients' must be a 1-D sequence."
-        )
+        raise ValueError("'directional_coefficients' must be a 1-D sequence.")
     if d.size == 0:
         raise ValueError("'directional_coefficients' must not be empty.")
     if weights is None:

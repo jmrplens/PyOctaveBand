@@ -130,9 +130,7 @@ def _resolve_miso_fs(
             )
         carrier = signals[0] if signals else np.asarray(output)
     if isinstance(carrier, Signal) or isinstance(output, Signal):
-        return float(
-            resolve_pair_fs(carrier, output, fs, names=("inputs", "output"))
-        )
+        return float(resolve_pair_fs(carrier, output, fs, names=("inputs", "output")))
     return float(resolve_fs(np.asarray(output), fs, name="output"))
 
 
@@ -168,9 +166,7 @@ def _validate_inputs(
     ya = _validate_signal(output, "output")
     for i, x in enumerate(xs):
         if x.size != ya.size:
-            raise ValueError(
-                f"'inputs[{i}]' and 'output' must have the same length."
-            )
+            raise ValueError(f"'inputs[{i}]' and 'output' must have the same length.")
     return xs, ya
 
 
@@ -223,9 +219,7 @@ def _augmented_matrix(
 # ---------------------------------------------------------------------------
 
 
-def _ordinary_coherences(
-    mat: NDArray[np.complex128], q: int
-) -> NDArray[np.float64]:
+def _ordinary_coherences(mat: NDArray[np.complex128], q: int) -> NDArray[np.float64]:
     """Ordinary coherence of each input with the output (Eq. 7.109)."""
     gyy = mat[:, q, q].real
     coh = np.zeros((q, mat.shape[0]), dtype=np.float64)
@@ -273,19 +267,17 @@ def _schur_eliminate(
     if not np.any(safe):
         return
     piv = mat[:, r, r].real
-    col = mat[:, r + 1:, r]          # Gir·(r-1)!  (i > r)
-    row = mat[:, r, r + 1:]          # Grj·(r-1)!  (j > r)
+    col = mat[:, r + 1 :, r]  # Gir·(r-1)!  (i > r)
+    row = mat[:, r, r + 1 :]  # Grj·(r-1)!  (j > r)
     update = col[:, :, None] * row[:, None, :]
     pv = np.where(safe, piv, 1.0)[:, None, None]
     mask = safe[:, None, None]
-    mat[:, r + 1:, r + 1:] -= np.where(mask, update / pv, 0.0)
+    mat[:, r + 1 :, r + 1 :] -= np.where(mask, update / pv, 0.0)
 
 
 def _condition(
     mat: NDArray[np.complex128], order: tuple[int, ...]
-) -> tuple[
-    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
-]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     r"""Ordered conditioning of the augmented matrix (Bendat & Piersol 7.3).
 
     Pivots on the inputs in ``order``, output last. Returns, indexed by the
@@ -310,8 +302,8 @@ def _condition(
     partial = np.zeros((q, n_freq), dtype=np.float64)
     coherent = np.zeros((q, n_freq), dtype=np.float64)
     for pos in range(q):
-        gpp = work[:, pos, pos].real          # Gii·(i-1)!
-        gpy = work[:, pos, q]                 # Giy·(i-1)!
+        gpp = work[:, pos, pos].real  # Gii·(i-1)!
+        gpy = work[:, pos, q]  # Giy·(i-1)!
         safe = _pivot_safe(gpp)
         num = np.abs(gpy) ** 2
         contrib = np.divide(
@@ -319,9 +311,7 @@ def _condition(
         )  # |Liy|²·Gii·(i-1)! = Gvᵢ (Eq. 7.86)
         orig = order[pos]
         coherent[orig] = contrib
-        partial[orig] = np.divide(
-            contrib, gyy, out=np.zeros_like(gyy), where=gyy > 0.0
-        )
+        partial[orig] = np.divide(contrib, gyy, out=np.zeros_like(gyy), where=gyy > 0.0)
         _schur_eliminate(work, pos, safe)
     noise = work[:, q, q].real
     clipped = np.asarray(np.clip(partial, 0.0, 1.0), dtype=np.float64)
@@ -575,12 +565,8 @@ def miso_coherence(
         coherent_output_spectra=coherent,
         output_psd=gyy,
         noise_psd=noise,
-        multiple_coherence_random_error=_multiple_coherence_error(
-            multiple, q, nd
-        ),
-        coherent_output_random_error=_coherent_output_errors(
-            partial, perm, nd
-        ),
+        multiple_coherence_random_error=_multiple_coherence_error(multiple, q, nd),
+        coherent_output_random_error=_coherent_output_errors(partial, perm, nd),
         n_segments=k,
         n_averages=nd,
         resolution_bandwidth=benbw,

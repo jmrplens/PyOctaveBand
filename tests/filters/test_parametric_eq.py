@@ -40,7 +40,12 @@ import phonometry as ph
 FS = 48000.0
 
 _GAINLESS_TYPES = (
-    "lowpass", "highpass", "bandpass", "bandpass_skirt", "notch", "allpass",
+    "lowpass",
+    "highpass",
+    "bandpass",
+    "bandpass_skirt",
+    "notch",
+    "allpass",
 )
 _ALL_TYPES = ("peaking", "lowshelf", "highshelf") + _GAINLESS_TYPES
 
@@ -90,14 +95,16 @@ def test_peaking_hand_computed_coefficients() -> None:
     eq = ph.filters.ParametricEQ(
         FS, ph.filters.EQSection("peaking", 1000.0, gain_db=6.0, q=0.707)
     )
-    expected = np.array([
-        1.0610510792184844,
-        -1.8612559024730444,
-        0.81626552706657641,
-        1.0,
-        -1.8612559024730444,
-        0.87731660628506083,
-    ])
+    expected = np.array(
+        [
+            1.0610510792184844,
+            -1.8612559024730444,
+            0.81626552706657641,
+            1.0,
+            -1.8612559024730444,
+            0.87731660628506083,
+        ]
+    )
     assert eq.sos.shape == (1, 6)
     np.testing.assert_allclose(eq.sos[0], expected, rtol=0.0, atol=1e-15)
 
@@ -109,9 +116,7 @@ def test_peaking_hand_computed_coefficients() -> None:
 
 @pytest.mark.parametrize("gain_db", [-12.0, -6.0, 3.0, 6.0, 12.0])
 @pytest.mark.parametrize("f0", [100.0, 1000.0, 8000.0])
-def test_peaking_gain_exact_at_f0_and_unity_at_ends(
-    f0: float, gain_db: float
-) -> None:
+def test_peaking_gain_exact_at_f0_and_unity_at_ends(f0: float, gain_db: float) -> None:
     """Peaking: exactly G dB at f0, exactly 0 dB at DC and Nyquist.
 
     At w0 the numerator and denominator reduce to 2j*alpha*A*sin(w0) and
@@ -172,12 +177,8 @@ def test_lowpass_highpass_gain_q_at_f0(q: float) -> None:
     corner; the cookbook's bilinear design prewarps so the digital response
     keeps that value exactly at f0.
     """
-    lp = ph.filters.ParametricEQ(
-        FS, ph.filters.EQSection("lowpass", 1000.0, q=q)
-    )
-    hp = ph.filters.ParametricEQ(
-        FS, ph.filters.EQSection("highpass", 1000.0, q=q)
-    )
+    lp = ph.filters.ParametricEQ(FS, ph.filters.EQSection("lowpass", 1000.0, q=q))
+    hp = ph.filters.ParametricEQ(FS, ph.filters.EQSection("highpass", 1000.0, q=q))
     q_db = 20 * np.log10(q)
     (lp_f0,) = _gain_db_at(lp.sos, [1000.0])
     (hp_f0,) = _gain_db_at(hp.sos, [1000.0])
@@ -209,18 +210,14 @@ def test_bandpass_notch_allpass_anchors() -> None:
     )
     assert skirt_f0 == pytest.approx(20 * np.log10(3.0), abs=1e-10)
 
-    notch = ph.filters.ParametricEQ(
-        FS, ph.filters.EQSection("notch", 1000.0, q=5.0)
-    )
+    notch = ph.filters.ParametricEQ(FS, ph.filters.EQSection("notch", 1000.0, q=5.0))
     (notch_f0,) = _gain_db_at(notch.sos, [1000.0])
     assert notch_f0 < -250.0
     notch_dc, notch_nyq = _gain_db_at(notch.sos, [0.0, FS / 2])
     assert notch_dc == pytest.approx(0.0, abs=1e-10)
     assert notch_nyq == pytest.approx(0.0, abs=1e-10)
 
-    ap = ph.filters.ParametricEQ(
-        FS, ph.filters.EQSection("allpass", 1000.0, q=0.9)
-    )
+    ap = ph.filters.ParametricEQ(FS, ph.filters.EQSection("allpass", 1000.0, q=0.9))
     freqs = np.linspace(1.0, FS / 2, 512)
     _, h = signal.sosfreqz(ap.sos, worN=freqs, fs=FS)
     np.testing.assert_allclose(np.abs(h), 1.0, rtol=0.0, atol=1e-12)
@@ -307,9 +304,7 @@ def test_slope_parameterization_reduces_to_q_relation() -> None:
     for filter_type in ("lowshelf", "highshelf"):
         from_s = ph.filters.ParametricEQ(
             FS,
-            ph.filters.EQSection(
-                filter_type, f0, gain_db=gain_db, slope=slope
-            ),
+            ph.filters.EQSection(filter_type, f0, gain_db=gain_db, slope=slope),
         )
         from_q = ph.filters.ParametricEQ(
             FS, ph.filters.EQSection(filter_type, f0, gain_db=gain_db, q=q)
@@ -372,9 +367,7 @@ def test_butterworth_alignment_matches_scipy_butter() -> None:
         sos_ref = signal.butter(2, f0, btype=btype, output="sos", fs=FS)
         _, h_eq = signal.sosfreqz(eq.sos, worN=freqs, fs=FS)
         _, h_ref = signal.sosfreqz(sos_ref, worN=freqs, fs=FS)
-        np.testing.assert_allclose(
-            np.abs(h_eq), np.abs(h_ref), rtol=1e-7, atol=1e-9
-        )
+        np.testing.assert_allclose(np.abs(h_eq), np.abs(h_ref), rtol=1e-7, atol=1e-9)
 
 
 # ---------------------------------------------------------------------------
@@ -425,9 +418,7 @@ def test_stateful_block_processing_equals_one_shot() -> None:
     one_shot = ph.filters.ParametricEQ(FS, _three_sections()).filter(x)
     eq = ph.filters.ParametricEQ(FS, _three_sections(), stateful=True)
     blocks = [eq.filter(x[i : i + 1024]) for i in range(0, len(x), 1024)]
-    np.testing.assert_allclose(
-        np.concatenate(blocks), one_shot, rtol=0.0, atol=1e-12
-    )
+    np.testing.assert_allclose(np.concatenate(blocks), one_shot, rtol=0.0, atol=1e-12)
 
 
 def test_multichannel_filtering() -> None:
@@ -438,9 +429,7 @@ def test_multichannel_filtering() -> None:
     y = eq.filter(x)
     assert y.shape == x.shape
     for ch in range(3):
-        np.testing.assert_allclose(
-            y[ch], eq.filter(x[ch]), rtol=0.0, atol=0.0
-        )
+        np.testing.assert_allclose(y[ch], eq.filter(x[ch]), rtol=0.0, atol=0.0)
     eq_st = ph.filters.ParametricEQ(FS, _three_sections(), stateful=True)
     y_blocks = np.concatenate(
         [eq_st.filter(x[:, :1024]), eq_st.filter(x[:, 1024:])], axis=-1

@@ -59,7 +59,9 @@ def _finite(value: float, name: str) -> float:
     return scalar
 
 
-def _finite_array(values: NDArray[np.float64] | list[float] | float, name: str) -> NDArray[np.float64]:
+def _finite_array(
+    values: NDArray[np.float64] | list[float] | float, name: str
+) -> NDArray[np.float64]:
     arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if arr.size == 0 or not np.all(np.isfinite(arr)):
         raise ValueError(f"'{name}' must be finite and non-empty.")
@@ -101,12 +103,16 @@ class SonarEquationResult:
     target_strength: float | None
     reverberation_limited: bool
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot signal excess versus propagation loss with the detection limit."""
         from .._i18n import check_language
         from .._plot.underwater import plot_sonar_equation
 
-        return plot_sonar_equation(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_sonar_equation(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def passive_sonar_equation(
@@ -240,12 +246,16 @@ class DetectionRangeResult:
     law: str
     model: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the propagation loss against the figure of merit."""
         from .._i18n import check_language
         from .._plot.underwater import plot_detection_range
 
-        return plot_detection_range(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_detection_range(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def detection_range(
@@ -298,8 +308,12 @@ def detection_range(
     if int(n_points) < 2:
         raise ValueError("'n_points' must be at least 2.")
     options = {
-        "law": law, "temperature": temperature, "salinity": salinity,
-        "depth": depth, "ph": ph, "model": model,
+        "law": law,
+        "temperature": temperature,
+        "salinity": salinity,
+        "depth": depth,
+        "ph": ph,
+        "model": model,
         "transition_range": transition_range,
     }
 
@@ -361,7 +375,9 @@ def detection_range_from_curve(
     if r.shape != pl.shape:
         raise ValueError("'propagation_loss' must have the same length as 'range_m'.")
     if r.size < 2 or np.any(np.diff(r) <= 0.0):
-        raise ValueError("'range_m' must be strictly increasing with at least two samples.")
+        raise ValueError(
+            "'range_m' must be strictly increasing with at least two samples."
+        )
     key = crossing.strip().lower()
     if key not in ("first", "last"):
         raise ValueError(f"'crossing' must be 'first' or 'last', got {crossing!r}.")

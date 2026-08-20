@@ -63,9 +63,7 @@ MINUS = "−"
         (3.2e-07, ".1e", "3.2e-07"),
     ],
 )
-def test_only_the_sign_becomes_a_minus(
-    value: float, spec: str, expected: str
-) -> None:
+def test_only_the_sign_becomes_a_minus(value: float, spec: str, expected: str) -> None:
     assert _fmt_minus(value, spec) == expected
 
 
@@ -73,9 +71,7 @@ def test_only_the_sign_becomes_a_minus(
     ("value", "spec"),
     [(-4.82, ".1e"), (-3.2e-07, ".1e"), (-1.0e-12, ".2e")],
 )
-def test_a_number_keeps_every_hyphen_but_the_first(
-    value: float, spec: str
-) -> None:
+def test_a_number_keeps_every_hyphen_but_the_first(value: float, spec: str) -> None:
     written = _fmt_minus(value, spec)
     assert written.startswith(MINUS)
     # One ASCII hyphen left where ``format`` wrote two: the exponent's.

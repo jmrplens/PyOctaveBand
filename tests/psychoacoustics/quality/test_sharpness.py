@@ -52,11 +52,26 @@ A2_CASES = [
 # Table A.3 Sollwerte: broadband noise with a fixed 10 kHz upper edge and a
 # variable lower edge fu, all at 4 sone. All 20 rows.
 A3_CASES = [
-    (250.0, 2.70), (350.0, 2.74), (450.0, 2.78), (570.0, 2.85),
-    (700.0, 2.91), (840.0, 2.96), (1000.0, 3.05), (1170.0, 3.12),
-    (1370.0, 3.20), (1600.0, 3.30), (1850.0, 3.42), (2150.0, 3.53),
-    (2500.0, 3.69), (2900.0, 3.89), (3400.0, 4.12), (4000.0, 4.49),
-    (4800.0, 5.04), (5800.0, 5.69), (7000.0, 6.47), (8500.0, 7.46),
+    (250.0, 2.70),
+    (350.0, 2.74),
+    (450.0, 2.78),
+    (570.0, 2.85),
+    (700.0, 2.91),
+    (840.0, 2.96),
+    (1000.0, 3.05),
+    (1170.0, 3.12),
+    (1370.0, 3.20),
+    (1600.0, 3.30),
+    (1850.0, 3.42),
+    (2150.0, 3.53),
+    (2500.0, 3.69),
+    (2900.0, 3.89),
+    (3400.0, 4.12),
+    (4000.0, 4.49),
+    (4800.0, 5.04),
+    (5800.0, 5.69),
+    (7000.0, 6.47),
+    (8500.0, 7.46),
 ]
 
 
@@ -112,7 +127,9 @@ def test_table_a3_targets(f_lo: float, target: float) -> None:
     level = _level_for_4_sone(f_lo, 10000.0)
     s = sharpness_din(_narrowband(f_lo, 10000.0, level), FS)
     tol = max(0.05, 0.05 * target)
-    assert abs(s - target) <= tol, f"fu={f_lo} Hz: S={s:.3f} vs {target} (tol {tol:.3f})"
+    assert abs(s - target) <= tol, (
+        f"fu={f_lo} Hz: S={s:.3f} vs {target} (tol {tol:.3f})"
+    )
 
 
 def test_higher_frequency_is_sharper() -> None:

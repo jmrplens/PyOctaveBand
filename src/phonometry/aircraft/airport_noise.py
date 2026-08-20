@@ -76,7 +76,9 @@ def lateral_attenuation(elevation_deg: float, lateral_m: float) -> float:
     return float(gamma * lam)
 
 
-def engine_installation_correction(depression_deg: float, mounting: str = "wing") -> float:
+def engine_installation_correction(
+    depression_deg: float, mounting: str = "wing"
+) -> float:
     """Engine-installation lateral-directivity correction ``ΔI(φ)`` (Eq. 4-15/4-16).
 
     :param depression_deg: Depression angle ``φ`` (from the wing plane), in degrees.
@@ -91,7 +93,9 @@ def engine_installation_correction(depression_deg: float, mounting: str = "wing"
     if key in ("propeller", "prop"):
         return 0.0
     if key not in _INSTALLATION:
-        raise ValueError(f"'mounting' must be 'wing', 'fuselage' or 'propeller', got {mounting!r}.")
+        raise ValueError(
+            f"'mounting' must be 'wing', 'fuselage' or 'propeller', got {mounting!r}."
+        )
     a, b, c = _INSTALLATION[key]
     phi_eff = np.radians(max(phi, 0.0))  # for φ<0, ΔI(φ)=ΔI(0)
     num = (a * np.cos(phi_eff) ** 2 + np.sin(phi_eff) ** 2) ** b
@@ -138,7 +142,9 @@ def noise_fraction(q: float, segment_length: float, scaled_distance: float) -> f
     # infinite path (α1→−∞, α2→+∞) then gives F=1, i.e. ΔF=0.
     a1 = -float(q) / dl
     a2 = (lam - float(q)) / dl
-    frac = (a2 / (1.0 + a2**2) + np.arctan(a2) - a1 / (1.0 + a1**2) - np.arctan(a1)) / np.pi
+    frac = (
+        a2 / (1.0 + a2**2) + np.arctan(a2) - a1 / (1.0 + a1**2) - np.arctan(a1)
+    ) / np.pi
     if frac <= 0.0:
         return -150.0
     return float(max(10.0 * np.log10(frac), -150.0))
@@ -153,7 +159,9 @@ _P0_KPA = 101.325
 _T0_C = 15.0
 
 
-def impedance_adjustment(temperature: float = _T0_C, pressure: float = _P0_KPA) -> float:
+def impedance_adjustment(
+    temperature: float = _T0_C, pressure: float = _P0_KPA
+) -> float:
     r"""Acoustic-impedance adjustment of the standard NPD data (Eq. 4-6/4-7).
 
     The ANP NPD levels are normalised to a reference specific acoustic impedance
@@ -213,7 +221,8 @@ _DSOR0_M = 762.0
 
 
 def start_of_roll_directivity(
-    azimuth_deg: float, distance_m: float, engine: str = "jet") -> float:
+    azimuth_deg: float, distance_m: float, engine: str = "jet"
+) -> float:
     r"""Start-of-roll (ground-roll) directivity correction ``ΔSOR`` (Eq. 4-22/4-25).
 
     Behind a takeoff ground-roll segment, jet-exhaust noise radiates a lobed
@@ -248,13 +257,24 @@ def start_of_roll_directivity(
     psi = min(psi, 180.0)
     if key in ("jet", "turbofan"):
         r = np.pi * psi / 180.0
-        d0 = (2329.44 - 8.0573 * psi + 11.51 * np.exp(r)
-              - 3.4601 * psi / np.log(r) - 17403338.3 * np.log(r) / psi**2)
+        d0 = (
+            2329.44
+            - 8.0573 * psi
+            + 11.51 * np.exp(r)
+            - 3.4601 * psi / np.log(r)
+            - 17403338.3 * np.log(r) / psi**2
+        )
     else:
-        d0 = (-34643.898 + 30722161.987 / psi - 11491573930.510 / psi**2
-              + 2349285669062.0 / psi**3 - 283584441904272.0 / psi**4
-              + 20227150391251300.0 / psi**5 - 790084471305203000.0 / psi**6
-              + 13050687178273800000.0 / psi**7)
+        d0 = (
+            -34643.898
+            + 30722161.987 / psi
+            - 11491573930.510 / psi**2
+            + 2349285669062.0 / psi**3
+            - 283584441904272.0 / psi**4
+            + 20227150391251300.0 / psi**5
+            - 790084471305203000.0 / psi**6
+            + 13050687178273800000.0 / psi**7
+        )
     if dsor > _DSOR0_M:
         d0 *= _DSOR0_M / dsor
     return float(d0)
@@ -272,7 +292,9 @@ def _clean_table(
         raise ValueError("'powers' and 'distances' must each have at least two values.")
     if lv.shape != (p.size, d.size):
         raise ValueError("'levels' must have shape (len(powers), len(distances)).")
-    if not (np.all(np.isfinite(p)) and np.all(np.isfinite(d)) and np.all(np.isfinite(lv))):
+    if not (
+        np.all(np.isfinite(p)) and np.all(np.isfinite(d)) and np.all(np.isfinite(lv))
+    ):
         raise ValueError("'powers', 'distances' and 'levels' must be finite.")
     if np.any(d <= 0.0):
         raise ValueError("'distances' must be strictly positive (slant range in m).")
@@ -283,8 +305,9 @@ def _clean_table(
     return p, d, lv
 
 
-def _interp_distance(logd_tab: NDArray[np.float64], row: NDArray[np.float64],
-                     logd: NDArray[np.float64]) -> NDArray[np.float64]:
+def _interp_distance(
+    logd_tab: NDArray[np.float64], row: NDArray[np.float64], logd: NDArray[np.float64]
+) -> NDArray[np.float64]:
     """Log-linear interpolation/extrapolation of one NPD row over distance (Eq. 4-4)."""
     idx = np.clip(np.searchsorted(logd_tab, logd) - 1, 0, logd_tab.size - 2)
     x0 = logd_tab[idx]
@@ -311,7 +334,9 @@ class NpdLevelResult:
     table_distances: NDArray[np.float64]
     table_levels: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the interpolated level versus slant distance (log axis)."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_npd_level
@@ -406,7 +431,9 @@ _NPD_FLOOR_M = 30.0
 
 
 def _ground_track_offset(
-    seg: NDArray[np.float64], s1: NDArray[np.float64], obs: NDArray[np.float64],
+    seg: NDArray[np.float64],
+    s1: NDArray[np.float64],
+    obs: NDArray[np.float64],
 ) -> float:
     """Horizontal perpendicular distance to the ground track (projected to z = 0)."""
     seg_g = seg.copy()
@@ -421,9 +448,16 @@ def _ground_track_offset(
 
 
 def _segment_angles(
-    u: NDArray[np.float64], s1: NDArray[np.float64], obs: NDArray[np.float64],
-    q: float, length: float, dp: float, lateral: float,
-    z_foot: float, z_near: float, bank_deg: float,
+    u: NDArray[np.float64],
+    s1: NDArray[np.float64],
+    obs: NDArray[np.float64],
+    q: float,
+    length: float,
+    dp: float,
+    lateral: float,
+    z_foot: float,
+    z_near: float,
+    bank_deg: float,
 ) -> tuple[float, float]:
     r"""Elevation ``beta`` and depression ``phi`` for one segment, in degrees.
 
@@ -449,7 +483,11 @@ def _segment_angles(
     if lateral <= 0.0:  # directly overhead: elevation/depression are ±90°
         beta = 90.0 if z_near >= 0.0 else -90.0
         return beta, (90.0 if z_foot >= 0.0 else -90.0) + side * float(bank_deg)
-    eq_angle = float(np.degrees(np.arccos(np.clip(lateral / dp, 0.0, 1.0)))) if dp > 0.0 else 90.0
+    eq_angle = (
+        float(np.degrees(np.arccos(np.clip(lateral / dp, 0.0, 1.0))))
+        if dp > 0.0
+        else 90.0
+    )
     eq_angle = eq_angle if z_foot >= 0.0 else -eq_angle
     if 0.0 <= q <= length:
         beta = eq_angle
@@ -460,7 +498,9 @@ def _segment_angles(
 
 
 def _segment_geometry(
-    s1: NDArray[np.float64], s2: NDArray[np.float64], obs: NDArray[np.float64],
+    s1: NDArray[np.float64],
+    s2: NDArray[np.float64],
+    obs: NDArray[np.float64],
     bank_deg: float = 0.0,
 ) -> tuple[float, float, float, float, float, float, float]:
     """Return ``(length, q, dp, ds, beta_deg, phi_deg, lateral_m)`` for a segment.
@@ -492,8 +532,9 @@ def _segment_geometry(
     lateral = _ground_track_offset(seg, s1, obs)
     z_foot = float(foot[2] - obs[2])
     z_near = float(near_z - obs[2])
-    beta, phi = _segment_angles(u, s1, obs, q, length, dp, lateral,
-                                z_foot, z_near, bank_deg)
+    beta, phi = _segment_angles(
+        u, s1, obs, q, length, dp, lateral, z_foot, z_near, bank_deg
+    )
     return length, q, dp, ds, beta, phi, lateral
 
 
@@ -545,7 +586,9 @@ class FlyoverResult:
     segment_levels: NDArray[np.float64]
     observer: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-segment contributions to the event level."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_flyover
@@ -553,11 +596,15 @@ class FlyoverResult:
         return plot_flyover(self, ax=ax, language=check_language(language), **kwargs)
 
 
-def _validate_path(path: NDArray[np.float64] | list[list[float]]) -> NDArray[np.float64]:
+def _validate_path(
+    path: NDArray[np.float64] | list[list[float]],
+) -> NDArray[np.float64]:
     """Coerce and validate a flight path to a finite ``(N, 5)`` array."""
     pts = np.asarray(path, dtype=np.float64)
     if pts.ndim != 2 or pts.shape[1] != 5 or pts.shape[0] < 2:
-        raise ValueError("'path' must have shape (N, 5) with N >= 2 (x,y,z,power,speed).")
+        raise ValueError(
+            "'path' must have shape (N, 5) with N >= 2 (x,y,z,power,speed)."
+        )
     if not np.all(np.isfinite(pts)):
         raise ValueError("'path' must contain only finite values.")
     if np.any(pts[:, 3] < 0.0):
@@ -568,19 +615,23 @@ def _validate_path(path: NDArray[np.float64] | list[list[float]]) -> NDArray[np.
 
 
 def _validate_ground_roll(
-    ground_roll: NDArray[np.bool_] | list[bool] | None, n_points: int,
+    ground_roll: NDArray[np.bool_] | list[bool] | None,
+    n_points: int,
 ) -> NDArray[np.bool_] | None:
     """Coerce and validate the ground-roll segment mask (length ``N-1``)."""
     if ground_roll is None:
         return None
     gr = np.asarray(ground_roll, dtype=bool).ravel()
     if gr.shape != (n_points - 1,):
-        raise ValueError(f"'ground_roll' must have length {n_points - 1} (one per segment).")
+        raise ValueError(
+            f"'ground_roll' must have length {n_points - 1} (one per segment)."
+        )
     return gr
 
 
 def _validate_bank(
-    bank: NDArray[np.float64] | list[float] | None, n_points: int,
+    bank: NDArray[np.float64] | list[float] | None,
+    n_points: int,
 ) -> NDArray[np.float64] | None:
     """Coerce an optional per-segment bank-angle array (length ``N-1``)."""
     if bank is None:
@@ -592,9 +643,17 @@ def _validate_bank(
 
 
 def _attenuation_geometry(
-    s1: NDArray[np.float64], s2: NDArray[np.float64], obs: NDArray[np.float64],
-    q: float, length: float, beta: float, phi: float, lateral: float,
-    key: str, roll_behind: bool, roll_ahead: bool,
+    s1: NDArray[np.float64],
+    s2: NDArray[np.float64],
+    obs: NDArray[np.float64],
+    q: float,
+    length: float,
+    beta: float,
+    phi: float,
+    lateral: float,
+    key: str,
+    roll_behind: bool,
+    roll_ahead: bool,
 ) -> tuple[float, float, float]:
     r"""Lateral-attenuation and installation angles for one segment (§4.5.5).
 
@@ -620,19 +679,25 @@ def _attenuation_geometry(
 
 
 def _segment_noise_fraction(
-    q: float, length: float, d_lambda: float,
-    roll_behind: bool, roll_ahead: bool,
+    q: float,
+    length: float,
+    d_lambda: float,
+    roll_behind: bool,
+    roll_ahead: bool,
 ) -> float:
     """Finite-segment fraction: general Eq. 4-20 or the reduced roll forms."""
     if roll_behind:
-        return noise_fraction(0.0, length, d_lambda)      # Eq. 4-21a
+        return noise_fraction(0.0, length, d_lambda)  # Eq. 4-21a
     if roll_ahead:
-        return noise_fraction(length, length, d_lambda)   # Eq. 4-21b
-    return noise_fraction(q, length, d_lambda)            # Eq. 4-20
+        return noise_fraction(length, length, d_lambda)  # Eq. 4-21b
+    return noise_fraction(q, length, d_lambda)  # Eq. 4-20
 
 
 def _start_of_roll_correction(
-    q: float, ds: float, engine: str, roll_behind: bool,
+    q: float,
+    ds: float,
+    engine: str,
+    roll_behind: bool,
 ) -> float:
     """Start-of-roll directivity, zero away from the takeoff roll (Eq. 4-22/4-25)."""
     if not roll_behind:
@@ -656,8 +721,7 @@ def _segment_speed(v1: float, v2: float, frac: float, on_roll: bool) -> float:
     else:
         v_seg = float(np.sqrt(max(v1**2 + frac * (v2**2 - v1**2), 0.0)))
     if v_seg <= 0.0:
-        raise ValueError(
-            "segment with zero mean speed (stationary segment in 'path').")
+        raise ValueError("segment with zero mean speed (stationary segment in 'path').")
     return v_seg
 
 
@@ -671,10 +735,16 @@ def _combine_segment_levels(seg_arr: NDArray[np.float64], key: str) -> float:
 
 
 def _event_level_core(
-    pts: NDArray[np.float64], obs: NDArray[np.float64],
-    p: NDArray[np.float64], d: NDArray[np.float64],
-    le: NDArray[np.float64], lm: NDArray[np.float64],
-    vref: float, imp: float, mounting: str, key: str,
+    pts: NDArray[np.float64],
+    obs: NDArray[np.float64],
+    p: NDArray[np.float64],
+    d: NDArray[np.float64],
+    le: NDArray[np.float64],
+    lm: NDArray[np.float64],
+    vref: float,
+    imp: float,
+    mounting: str,
+    key: str,
     ground_roll: NDArray[np.bool_] | None = None,
     landing_roll: NDArray[np.bool_] | None = None,
     bank: NDArray[np.float64] | None = None,
@@ -702,15 +772,18 @@ def _event_level_core(
         p1, p2 = pts[i, 3], pts[i + 1, 3]
         v1, v2 = pts[i, 4], pts[i + 1, 4]
         eps = float(bank_deg[i])
-        length, q, dp, ds, beta, phi, lateral = _segment_geometry(s1, s2, obs, bank_deg=eps)
+        length, q, dp, ds, beta, phi, lateral = _segment_geometry(
+            s1, s2, obs, bank_deg=eps
+        )
         if length <= 0.0:
             continue
         is_takeoff = ground_roll is not None and bool(ground_roll[i])
         is_landing = landing_roll is not None and bool(landing_roll[i])
-        roll_behind = is_takeoff and q < 0.0     # behind the start of roll
-        roll_ahead = is_landing and q > length   # ahead of the landing rollout
+        roll_behind = is_takeoff and q < 0.0  # behind the start of roll
+        roll_ahead = is_landing and q > length  # ahead of the landing rollout
         beta_att, ell_att, phi_att = _attenuation_geometry(
-            s1, s2, obs, q, length, beta, phi, lateral, key, roll_behind, roll_ahead)
+            s1, s2, obs, q, length, beta, phi, lateral, key, roll_behind, roll_ahead
+        )
         frac = np.clip(q / length, 0.0, 1.0)
         p_seg = np.sqrt(max(p1**2 + frac * (p2**2 - p1**2), 0.0))
         lam_att = lateral_attenuation(beta_att, ell_att)
@@ -734,8 +807,10 @@ def _event_level_core(
 
 
 def _npd_level_grid(
-    p: NDArray[np.float64], lv: NDArray[np.float64],
-    logd_tab: NDArray[np.float64], pq: NDArray[np.float64],
+    p: NDArray[np.float64],
+    lv: NDArray[np.float64],
+    logd_tab: NDArray[np.float64],
+    pq: NDArray[np.float64],
     dq: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Vectorised NPD lookup ``L(P, d)`` for per-observer power and distance.
@@ -755,9 +830,21 @@ def _npd_level_grid(
 
 
 def _grid_segment_frame(
-    s1: NDArray[np.float64], s2: NDArray[np.float64],
-    u: NDArray[np.float64], length: float, obs: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.bool_], NDArray[np.bool_], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    s1: NDArray[np.float64],
+    s2: NDArray[np.float64],
+    u: NDArray[np.float64],
+    length: float,
+    obs: NDArray[np.float64],
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.bool_],
+    NDArray[np.bool_],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+]:
     """Per-observer geometry of one segment, the array form of :func:`_segment_geometry`.
 
     Returns ``(q, dp, ds, behind, ahead, lateral, z_foot, z_near)`` with one
@@ -767,8 +854,11 @@ def _grid_segment_frame(
     foot = s1 + q[:, None] * u
     dp_ = np.linalg.norm(obs - foot, axis=1)
     behind, ahead = q < 0.0, q > length
-    ds = np.where(behind, np.linalg.norm(obs - s1, axis=1),
-                  np.where(ahead, np.linalg.norm(obs - s2, axis=1), dp_))
+    ds = np.where(
+        behind,
+        np.linalg.norm(obs - s1, axis=1),
+        np.where(ahead, np.linalg.norm(obs - s2, axis=1), dp_),
+    )
     # _ground_track_offset over all observers.
     seg_g = (s2 - s1).copy()
     seg_g[2] = 0.0
@@ -786,34 +876,43 @@ def _grid_segment_frame(
 
 
 def _grid_angles(
-    u: NDArray[np.float64], s1: NDArray[np.float64], obs: NDArray[np.float64],
-    dp_: NDArray[np.float64], lateral: NDArray[np.float64],
-    z_foot: NDArray[np.float64], z_near: NDArray[np.float64],
-    behind: NDArray[np.bool_], ahead: NDArray[np.bool_], eps: float,
+    u: NDArray[np.float64],
+    s1: NDArray[np.float64],
+    obs: NDArray[np.float64],
+    dp_: NDArray[np.float64],
+    lateral: NDArray[np.float64],
+    z_foot: NDArray[np.float64],
+    z_near: NDArray[np.float64],
+    behind: NDArray[np.bool_],
+    ahead: NDArray[np.bool_],
+    eps: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """``beta``/``phi`` per observer (§4.5.2/4.5.5), array form of :func:`_segment_angles`."""
     with np.errstate(divide="ignore", invalid="ignore"):
         ratio = np.where(dp_ > 0.0, lateral / np.where(dp_ > 0.0, dp_, 1.0), 0.0)
-        eq_angle = np.where(dp_ > 0.0,
-                            np.degrees(np.arccos(np.clip(ratio, 0.0, 1.0))), 90.0)
+        eq_angle = np.where(
+            dp_ > 0.0, np.degrees(np.arccos(np.clip(ratio, 0.0, 1.0))), 90.0
+        )
     eq_angle = np.where(z_foot >= 0.0, eq_angle, -eq_angle)
-    beta = np.where(behind | ahead,
-                    np.degrees(np.arctan2(z_near, lateral)), eq_angle)
+    beta = np.where(behind | ahead, np.degrees(np.arctan2(z_near, lateral)), eq_angle)
     # Observer side: +1 to starboard, −1 to port, 0 on the ground track
     # (§4.5.2: φ = β + ε to starboard, φ = β − ε to port).
     side = -np.sign(u[0] * (obs[:, 1] - s1[1]) - u[1] * (obs[:, 0] - s1[0]))
     phi = eq_angle + side * eps
     overhead = lateral <= 0.0
     beta = np.where(overhead, np.where(z_near >= 0.0, 90.0, -90.0), beta)
-    phi = np.where(overhead,
-                   np.where(z_foot >= 0.0, 90.0, -90.0) + side * eps, phi)
+    phi = np.where(overhead, np.where(z_foot >= 0.0, 90.0, -90.0) + side * eps, phi)
     return beta, phi
 
 
 def _grid_attenuation_geometry(
-    s1: NDArray[np.float64], s2: NDArray[np.float64], obs: NDArray[np.float64],
-    beta: NDArray[np.float64], phi: NDArray[np.float64],
-    lateral: NDArray[np.float64], ahead: NDArray[np.bool_],
+    s1: NDArray[np.float64],
+    s2: NDArray[np.float64],
+    obs: NDArray[np.float64],
+    beta: NDArray[np.float64],
+    phi: NDArray[np.float64],
+    lateral: NDArray[np.float64],
+    ahead: NDArray[np.bool_],
     use_end: NDArray[np.bool_],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """Nearest-end ``beta``/``l``/``phi`` (§4.5.5), array form of :func:`_attenuation_geometry`."""
@@ -822,31 +921,47 @@ def _grid_attenuation_geometry(
     z_end = end[:, 2] - obs[:, 2]
     degenerate = d_end <= 0.0
     with np.errstate(divide="ignore", invalid="ignore"):
-        beta_end = np.degrees(np.arcsin(np.clip(
-            np.where(degenerate, 0.0, z_end / np.where(degenerate, 1.0, d_end)),
-            -1.0, 1.0)))
+        beta_end = np.degrees(
+            np.arcsin(
+                np.clip(
+                    np.where(degenerate, 0.0, z_end / np.where(degenerate, 1.0, d_end)),
+                    -1.0,
+                    1.0,
+                )
+            )
+        )
     beta_end = np.where(degenerate, 90.0, beta_end)
-    oc = np.where(degenerate, 0.0,
-                  np.hypot(obs[:, 0] - end[:, 0], obs[:, 1] - end[:, 1]))
-    return (np.where(use_end, beta_end, beta), np.where(use_end, oc, lateral),
-            np.where(use_end, beta_end, phi))
+    oc = np.where(
+        degenerate, 0.0, np.hypot(obs[:, 0] - end[:, 0], obs[:, 1] - end[:, 1])
+    )
+    return (
+        np.where(use_end, beta_end, beta),
+        np.where(use_end, oc, lateral),
+        np.where(use_end, beta_end, phi),
+    )
 
 
 def _grid_lateral_attenuation(
-    beta_att: NDArray[np.float64], ell_att: NDArray[np.float64],
+    beta_att: NDArray[np.float64],
+    ell_att: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """``Λ(β, ℓ)`` (Eq. 4-18/4-19), the array form of :func:`lateral_attenuation`."""
-    gamma = np.where(ell_att <= 914.0,
-                     1.089 * (1.0 - np.exp(-0.00274 * ell_att)), 1.0)
-    lam = np.where(beta_att < 0.0, 10.857,
-                   np.where(beta_att <= 50.0,
-                            1.137 - 0.0229 * beta_att
-                            + 9.72 * np.exp(-0.142 * beta_att), 0.0))
+    gamma = np.where(ell_att <= 914.0, 1.089 * (1.0 - np.exp(-0.00274 * ell_att)), 1.0)
+    lam = np.where(
+        beta_att < 0.0,
+        10.857,
+        np.where(
+            beta_att <= 50.0,
+            1.137 - 0.0229 * beta_att + 9.72 * np.exp(-0.142 * beta_att),
+            0.0,
+        ),
+    )
     return np.asarray(gamma * lam, dtype=np.float64)
 
 
 def _grid_installation(
-    phi_att: NDArray[np.float64], mount_key: str,
+    phi_att: NDArray[np.float64],
+    mount_key: str,
 ) -> NDArray[np.float64] | float:
     """``ΔI(φ)`` (Eq. 4-15/4-16), the array form of :func:`engine_installation_correction`."""
     if mount_key in ("propeller", "prop"):
@@ -859,43 +974,65 @@ def _grid_installation(
 
 
 def _grid_sor(
-    q: NDArray[np.float64], ds: NDArray[np.float64],
-    roll_behind: NDArray[np.bool_], engine_jet: bool,
+    q: NDArray[np.float64],
+    ds: NDArray[np.float64],
+    roll_behind: NDArray[np.bool_],
+    engine_jet: bool,
 ) -> NDArray[np.float64]:
     """``ΔSOR`` (Eq. 4-22..4-25), the array form of :func:`start_of_roll_directivity`."""
     with np.errstate(divide="ignore", invalid="ignore"):
-        psi = np.degrees(np.arccos(np.clip(
-            q / np.where(ds > 0.0, ds, 1e-9), -1.0, 1.0)))
+        psi = np.degrees(
+            np.arccos(np.clip(q / np.where(ds > 0.0, ds, 1e-9), -1.0, 1.0))
+        )
     psi_c = np.clip(psi, 90.0, 180.0)
     if engine_jet:
         r = np.pi * psi_c / 180.0
-        d0 = (2329.44 - 8.0573 * psi_c + 11.51 * np.exp(r)
-              - 3.4601 * psi_c / np.log(r) - 17403338.3 * np.log(r) / psi_c**2)
+        d0 = (
+            2329.44
+            - 8.0573 * psi_c
+            + 11.51 * np.exp(r)
+            - 3.4601 * psi_c / np.log(r)
+            - 17403338.3 * np.log(r) / psi_c**2
+        )
     else:
-        d0 = (-34643.898 + 30722161.987 / psi_c - 11491573930.510 / psi_c**2
-              + 2349285669062.0 / psi_c**3 - 283584441904272.0 / psi_c**4
-              + 20227150391251300.0 / psi_c**5 - 790084471305203000.0 / psi_c**6
-              + 13050687178273800000.0 / psi_c**7)
+        d0 = (
+            -34643.898
+            + 30722161.987 / psi_c
+            - 11491573930.510 / psi_c**2
+            + 2349285669062.0 / psi_c**3
+            - 283584441904272.0 / psi_c**4
+            + 20227150391251300.0 / psi_c**5
+            - 790084471305203000.0 / psi_c**6
+            + 13050687178273800000.0 / psi_c**7
+        )
     dsor = np.maximum(ds, 1e-9)
     d0 = np.where(dsor > _DSOR0_M, d0 * (_DSOR0_M / dsor), d0)
     return np.asarray(np.where(roll_behind & (psi >= 90.0), d0, 0.0), dtype=np.float64)
 
 
 def _grid_noise_fraction(
-    q: NDArray[np.float64], length: float, d_lambda: NDArray[np.float64],
-    roll_behind: NDArray[np.bool_], roll_ahead: NDArray[np.bool_],
+    q: NDArray[np.float64],
+    length: float,
+    d_lambda: NDArray[np.float64],
+    roll_behind: NDArray[np.bool_],
+    roll_ahead: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     """``ΔF`` (Eq. 4-20/4-21a/4-21b), the array form of :func:`_segment_noise_fraction`."""
     qf = np.where(roll_behind, 0.0, np.where(roll_ahead, length, q))
     a1 = -qf / d_lambda
     a2 = (length - qf) / d_lambda
-    frac = (a2 / (1.0 + a2**2) + np.arctan(a2)
-            - a1 / (1.0 + a1**2) - np.arctan(a1)) / np.pi
+    frac = (
+        a2 / (1.0 + a2**2) + np.arctan(a2) - a1 / (1.0 + a1**2) - np.arctan(a1)
+    ) / np.pi
     with np.errstate(divide="ignore", invalid="ignore"):
-        return np.asarray(np.where(
-            frac <= 0.0, -150.0,
-            np.maximum(10.0 * np.log10(np.where(frac > 0.0, frac, 1.0)), -150.0)),
-            dtype=np.float64)
+        return np.asarray(
+            np.where(
+                frac <= 0.0,
+                -150.0,
+                np.maximum(10.0 * np.log10(np.where(frac > 0.0, frac, 1.0)), -150.0),
+            ),
+            dtype=np.float64,
+        )
 
 
 class _GridContext(NamedTuple):
@@ -914,8 +1051,11 @@ class _GridContext(NamedTuple):
 
 
 def _grid_segment_level(
-    ctx: _GridContext, seg_pts: NDArray[np.float64], eps: float,
-    is_takeoff: bool, is_landing: bool,
+    ctx: _GridContext,
+    seg_pts: NDArray[np.float64],
+    eps: float,
+    is_takeoff: bool,
+    is_landing: bool,
 ) -> NDArray[np.float64]:
     """Per-observer event level of one non-degenerate segment (Eq. 4-8/4-9).
 
@@ -929,16 +1069,19 @@ def _grid_segment_level(
     u = seg / length
     obs = ctx.obs
     q, dp_, ds, behind, ahead, lateral, z_foot, z_near = _grid_segment_frame(
-        s1, s2, u, length, obs)
-    beta, phi = _grid_angles(u, s1, obs, dp_, lateral, z_foot, z_near,
-                             behind, ahead, eps)
+        s1, s2, u, length, obs
+    )
+    beta, phi = _grid_angles(
+        u, s1, obs, dp_, lateral, z_foot, z_near, behind, ahead, eps
+    )
     roll_behind = behind & is_takeoff
     roll_ahead = ahead & is_landing
     use_end = roll_behind | roll_ahead
     if ctx.maximum:
         use_end = use_end | behind | ahead
     beta_att, ell_att, phi_att = _grid_attenuation_geometry(
-        s1, s2, obs, beta, phi, lateral, ahead, use_end)
+        s1, s2, obs, beta, phi, lateral, ahead, use_end
+    )
     lam_att = _grid_lateral_attenuation(beta_att, ell_att)
     di = _grid_installation(phi_att, ctx.mount_key)
     frac = np.clip(q / length, 0.0, 1.0)
@@ -946,8 +1089,9 @@ def _grid_segment_level(
     p_seg = np.sqrt(np.maximum(p1**2 + frac * (p2**2 - p1**2), 0.0))
     sor = _grid_sor(q, ds, roll_behind, ctx.engine_jet) if is_takeoff else 0.0
     if ctx.maximum:
-        base = _npd_level_grid(ctx.p, ctx.lm, ctx.logd_tab, p_seg,
-                               np.maximum(ds, _NPD_FLOOR_M))
+        base = _npd_level_grid(
+            ctx.p, ctx.lm, ctx.logd_tab, p_seg, np.maximum(ds, _NPD_FLOOR_M)
+        )
         return np.asarray(base + ctx.imp + di - lam_att + sor, dtype=np.float64)
     dist = np.maximum(np.where(use_end, ds, dp_), _NPD_FLOOR_M)
     le_d = _npd_level_grid(ctx.p, ctx.le, ctx.logd_tab, p_seg, dist)
@@ -959,20 +1103,24 @@ def _grid_segment_level(
     else:
         v_seg = np.sqrt(np.maximum(v1**2 + frac * (v2**2 - v1**2), 0.0))
     if np.any(v_seg <= 0.0):
-        raise ValueError(
-            "segment with zero mean speed (stationary segment in 'path').")
+        raise ValueError("segment with zero mean speed (stationary segment in 'path').")
     dv = 10.0 * np.log10(ctx.vref / v_seg)
     d_lambda = _D0_M * 10.0 ** ((le_d - lm_d) / 10.0)
     df = _grid_noise_fraction(q, length, d_lambda, roll_behind, roll_ahead)
-    return np.asarray(le_d + ctx.imp + dv + di - lam_att + df + sor,
-                      dtype=np.float64)
+    return np.asarray(le_d + ctx.imp + dv + di - lam_att + df + sor, dtype=np.float64)
 
 
 def _grid_event_levels(
-    pts: NDArray[np.float64], obs: NDArray[np.float64],
-    p: NDArray[np.float64], d: NDArray[np.float64],
-    le: NDArray[np.float64], lm: NDArray[np.float64],
-    vref: float, imp: float, mounting: str, key: str,
+    pts: NDArray[np.float64],
+    obs: NDArray[np.float64],
+    p: NDArray[np.float64],
+    d: NDArray[np.float64],
+    le: NDArray[np.float64],
+    lm: NDArray[np.float64],
+    vref: float,
+    imp: float,
+    mounting: str,
+    key: str,
     ground_roll: NDArray[np.bool_] | None = None,
     landing_roll: NDArray[np.bool_] | None = None,
     bank: NDArray[np.float64] | None = None,
@@ -987,11 +1135,21 @@ def _grid_event_levels(
     scalar-equivalence test guard that.
     """
     mount_key = mounting.strip().lower()
-    engine_installation_correction(0.0, mounting)   # validate 'mounting' once
+    engine_installation_correction(0.0, mounting)  # validate 'mounting' once
     if not (np.isfinite(vref) and vref > 0.0):
         raise ValueError("'reference_speed' must be positive.")
-    ctx = _GridContext(obs, p, le, lm, np.log10(d), vref, imp, mount_key,
-                       mount_key not in ("propeller", "prop"), key == "maximum")
+    ctx = _GridContext(
+        obs,
+        p,
+        le,
+        lm,
+        np.log10(d),
+        vref,
+        imp,
+        mount_key,
+        mount_key not in ("propeller", "prop"),
+        key == "maximum",
+    )
     n_obs = obs.shape[0]
     total = np.full(n_obs, -np.inf)
     energy = np.zeros(n_obs)
@@ -1002,9 +1160,12 @@ def _grid_event_levels(
         any_segment = True
         eps = float(bank[i]) if bank is not None else 0.0
         seg_level = _grid_segment_level(
-            ctx, pts[i:i + 2], eps,
+            ctx,
+            pts[i : i + 2],
+            eps,
             ground_roll is not None and bool(ground_roll[i]),
-            landing_roll is not None and bool(landing_roll[i]))
+            landing_roll is not None and bool(landing_roll[i]),
+        )
         if ctx.maximum:
             total = np.maximum(total, seg_level)
         else:
@@ -1074,7 +1235,8 @@ def event_level(
     _, _, lm = _clean_table(powers, distances, maximum_levels)
     imp = impedance_adjustment(atmosphere.temperature, atmosphere.pressure)
     total, seg_arr = _event_level_core(
-        pts, obs, p, d, le, lm, float(reference_speed), imp, mounting, key, gr, lr, bk)
+        pts, obs, p, d, le, lm, float(reference_speed), imp, mounting, key, gr, lr, bk
+    )
     return FlyoverResult(level=total, metric=key, segment_levels=seg_arr, observer=obs)
 
 
@@ -1093,12 +1255,16 @@ class NoiseContourResult:
     level: NDArray[np.float64]
     metric: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot filled noise contours over the ground plane."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_noise_contour
 
-        return plot_noise_contour(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_noise_contour(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def noise_contour(
@@ -1161,6 +1327,8 @@ def noise_contour(
     obs[:, 0] = xx.ravel()
     obs[:, 1] = yy.ravel()
     levels = _grid_event_levels(
-        pts, obs, p, d, le, lm, vref, imp, mounting, key, gr, lr, bk)
+        pts, obs, p, d, le, lm, vref, imp, mounting, key, gr, lr, bk
+    )
     return NoiseContourResult(
-        x=gx, y=gy, level=levels.reshape(gy.size, gx.size), metric=key)
+        x=gx, y=gy, level=levels.reshape(gy.size, gx.size), metric=key
+    )

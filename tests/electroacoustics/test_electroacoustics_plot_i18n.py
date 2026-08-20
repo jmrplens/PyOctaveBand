@@ -31,9 +31,11 @@ def _labels(obj: object) -> str:
 
 def _tone() -> np.ndarray:
     t = np.arange(FS) / FS
-    return (np.sin(2 * np.pi * 1000.0 * t)
-            + 0.03 * np.sin(2 * np.pi * 2000.0 * t)
-            + 0.01 * np.sin(2 * np.pi * 3000.0 * t))
+    return (
+        np.sin(2 * np.pi * 1000.0 * t)
+        + 0.03 * np.sin(2 * np.pi * 2000.0 * t)
+        + 0.01 * np.sin(2 * np.pi * 3000.0 * t)
+    )
 
 
 def test_harmonic_distortion_es() -> None:
@@ -47,7 +49,7 @@ def test_harmonic_distortion_es() -> None:
 
 
 def test_frequency_response_es() -> None:
-    x = RNG.standard_normal(2 ** 15)
+    x = RNG.standard_normal(2**15)
     y = np.convolve(x, np.array([0.5, 0.3, 0.1]), mode="same")
     axes = ph.electroacoustics.transfer_function(x, y, FS).plot(language="es")
     text = _labels(axes)
@@ -60,7 +62,7 @@ def test_frequency_response_es() -> None:
 def test_swept_sine_distortion_es() -> None:
     f1, f2, seconds = 100.0, 8000.0, 1.0
     sweep = ph.electroacoustics.synchronized_sweep_signal(FS, f1, f2, seconds)
-    rec = sweep + 0.01 * sweep ** 2
+    rec = sweep + 0.01 * sweep**2
     res = ph.electroacoustics.swept_sine_distortion(
         rec, FS, f1=f1, f2=f2, seconds=seconds, n_harmonics=3
     )
@@ -107,9 +109,7 @@ def test_sound_reinforcement_geometry_es() -> None:
 
 
 def test_piston_impedance_es() -> None:
-    res = ph.electroacoustics.radiating_piston(
-        0.05, np.geomspace(50.0, 5000.0, 60)
-    )
+    res = ph.electroacoustics.radiating_piston(0.05, np.geomspace(50.0, 5000.0, 60))
     ax = res.plot(language="es")
     assert "pistón circular con pantalla" in ax.get_title()
     assert "Impedancia de radiación normalizada" in ax.get_ylabel()
@@ -130,13 +130,19 @@ def test_piston_directivity_es() -> None:
 
 def _loudspeaker() -> ph.electroacoustics.LoudspeakerCharacteristics:
     f = np.geomspace(30.0, 24000.0, 200)
-    spl = 87.0 - 10 * np.log10(1 + (50.0 / f) ** 6) - 10 * np.log10(1 + (f / 16000.0) ** 7)
+    spl = (
+        87.0
+        - 10 * np.log10(1 + (50.0 / f) ** 6)
+        - 10 * np.log10(1 + (f / 16000.0) ** 7)
+    )
     fz = np.geomspace(20.0, 20000.0, 120)
     return ph.electroacoustics.loudspeaker_characteristics(
-        f, spl, 8.0, sensitivity_band=(200.0, 4000.0),
+        f,
+        spl,
+        8.0,
+        sensitivity_band=(200.0, 4000.0),
         impedance=(fz, 6.6 + 20 * np.exp(-(np.log2(fz / 52.0) ** 2) / 0.12)),
-        distortion=(np.geomspace(50.0, 5000.0, 90),
-                    0.4 + 2.0 * np.ones(90)),
+        distortion=(np.geomspace(50.0, 5000.0, 90), 0.4 + 2.0 * np.ones(90)),
         directivity=ph.electroacoustics.LoudspeakerDirectivity(
             polar=(np.linspace(0.0, 90.0, 46), -np.linspace(0.0, 12.0, 46)),
             frequency=2000.0,
@@ -150,7 +156,10 @@ def _microphone() -> ph.electroacoustics.MicrophoneCharacteristics:
     ang = np.linspace(0.0, 179.0, 180)
     spl = np.linspace(100.0, 140.0, 41)
     return ph.electroacoustics.microphone_characteristics(
-        f, resp, 12.5, tolerance_db=3.0,
+        f,
+        resp,
+        12.5,
+        tolerance_db=3.0,
         noise=ph.electroacoustics.MicrophoneNoise(
             voltage=1.25e-6,
             spectrum=(np.geomspace(20.0, 20000.0, 31), np.full(31, 10.0)),

@@ -42,13 +42,20 @@ def test_cheby2_minus3db_at_band_edges(fraction: float) -> None:
     - Gain at every band's lower and upper edge is -3 dB (+/- 0.4 dB).
     """
     bank = filters.OctaveFilterBank(
-        fs=48000, fraction=fraction, order=6, limits=[100, 5000],
+        fs=48000,
+        fraction=fraction,
+        order=6,
+        limits=[100, 5000],
         design=filters.FilterDesign(filter_type="cheby2", attenuation=60.0),
     )
     for idx in range(bank.num_bands):
         g_lo, g_hi = _edge_gains_db(bank, idx)
-        assert g_lo == pytest.approx(-3.01, abs=0.4), f"band {idx} lower edge: {g_lo:.2f} dB"
-        assert g_hi == pytest.approx(-3.01, abs=0.4), f"band {idx} upper edge: {g_hi:.2f} dB"
+        assert g_lo == pytest.approx(-3.01, abs=0.4), (
+            f"band {idx} lower edge: {g_lo:.2f} dB"
+        )
+        assert g_hi == pytest.approx(-3.01, abs=0.4), (
+            f"band {idx} upper edge: {g_hi:.2f} dB"
+        )
 
 
 def test_cheby2_broadband_levels_match_butter() -> None:
@@ -95,13 +102,20 @@ def test_bessel_minus3db_at_band_edges(fraction: float) -> None:
     - Gain at every band's lower and upper edge is -3 dB (+/- 0.6 dB).
     """
     bank = filters.OctaveFilterBank(
-        fs=48000, fraction=fraction, order=6, limits=[100, 5000],
+        fs=48000,
+        fraction=fraction,
+        order=6,
+        limits=[100, 5000],
         design=filters.FilterDesign(filter_type="bessel"),
     )
     for idx in range(bank.num_bands):
         g_lo, g_hi = _edge_gains_db(bank, idx)
-        assert g_lo == pytest.approx(-3.01, abs=0.6), f"band {idx} lower edge: {g_lo:.2f} dB"
-        assert g_hi == pytest.approx(-3.01, abs=0.6), f"band {idx} upper edge: {g_hi:.2f} dB"
+        assert g_lo == pytest.approx(-3.01, abs=0.6), (
+            f"band {idx} lower edge: {g_lo:.2f} dB"
+        )
+        assert g_hi == pytest.approx(-3.01, abs=0.6), (
+            f"band {idx} upper edge: {g_hi:.2f} dB"
+        )
 
 
 def test_showfilter_saves_shows_and_noops(tmp_path) -> None:
@@ -114,7 +128,9 @@ def test_showfilter_saves_shows_and_noops(tmp_path) -> None:
     factor = np.array([1])
     plot_path = tmp_path / "test_plot_coverage.png"
 
-    _showfilter(sos, freq, freq_u, freq_d, fs, factor, show=False, plot_file=str(plot_path))
+    _showfilter(
+        sos, freq, freq_u, freq_d, fs, factor, show=False, plot_file=str(plot_path)
+    )
     assert plot_path.exists()
 
     with patch.object(plt, "show") as mock_show:
@@ -163,15 +179,14 @@ def test_design_sos_with_internal_plot(tmp_path) -> None:
 
     assert plot_path.exists()
 
+
 def test_cheby2_low_attenuation_raises() -> None:
     """attenuation <= 3.01 dB has no -3 dB point: must raise, not produce NaN."""
     from phonometry.filters.design import _cheby2_transition_ratio
 
     with pytest.raises(ValueError, match="3.01"):
         _cheby2_transition_ratio(order=6, attenuation=3.0)
-    low_attenuation = filters.FilterDesign(
-        filter_type="cheby2", attenuation=2.0
-    )
+    low_attenuation = filters.FilterDesign(filter_type="cheby2", attenuation=2.0)
     with pytest.raises(ValueError, match="3.01"):
         filters.OctaveFilterBank(fs=48000, fraction=3, design=low_attenuation)
 
@@ -229,7 +244,10 @@ def test_cheby2_default_bank_meets_class1(fraction: float) -> None:
     """
 
     bank = filters.OctaveFilterBank(
-        fs=48000, fraction=fraction, order=6, limits=[100, 5000],
+        fs=48000,
+        fraction=fraction,
+        order=6,
+        limits=[100, 5000],
         design=filters.FilterDesign(filter_type="cheby2"),
     )
     result = filters.verify_filter_class(bank)
@@ -255,9 +273,7 @@ def test_functional_octavefilter_cheby2_default_meets_class1() -> None:
         fraction=1,
         order=6,
         limits=[100, 5000],
-        design=filters.FilterDesign(
-            filter_type="cheby2", attenuation=default_att
-        ),
+        design=filters.FilterDesign(filter_type="cheby2", attenuation=default_att),
     )
     assert filters.verify_filter_class(bank)["overall_class"] == 1
     x = np.random.default_rng(0).standard_normal(48000)

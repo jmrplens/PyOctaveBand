@@ -35,16 +35,10 @@ def test_monte_carlo_plot_histogram_and_interval() -> None:
     assert res.samples is not None
     assert res.samples.size == res.trials
     ax = res.plot()
-    bars = [
-        p for p in ax.patches
-        if "coverage interval" not in str(p.get_label())
-    ]
+    bars = [p for p in ax.patches if "coverage interval" not in str(p.get_label())]
     assert bars, "expected histogram bars"
     # the coverage-interval axvspan matches the result's interval.
-    spans = [
-        p for p in ax.patches
-        if "coverage interval" in str(p.get_label())
-    ]
+    spans = [p for p in ax.patches if "coverage interval" in str(p.get_label())]
     assert spans, "expected the coverage-interval axvspan"
     low, high = res.interval
     assert spans[0].get_x() == pytest.approx(low)

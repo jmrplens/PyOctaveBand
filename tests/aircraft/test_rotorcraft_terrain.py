@@ -49,9 +49,7 @@ def test_mean_ground_plane_roofline_closed_form() -> None:
     assert r.intercept == pytest.approx(10.0, abs=1e-9)
     # Non-uniform vertex spacing must not bias the continuous fit: adding a
     # collinear vertex changes nothing.
-    r2 = aircraft.mean_ground_plane(
-        [0.0, 50.0, 100.0, 200.0], [0.0, 10.0, 20.0, 0.0]
-    )
+    r2 = aircraft.mean_ground_plane([0.0, 50.0, 100.0, 200.0], [0.0, 10.0, 20.0, 0.0])
     assert r2.slope == pytest.approx(0.0, abs=1e-12)
     assert r2.intercept == pytest.approx(10.0, abs=1e-9)
 
@@ -77,12 +75,10 @@ def test_mean_ground_plane_validation_and_plot() -> None:
 
 def test_mean_flow_resistivity_log_average() -> None:
     # Equal lengths of 1e4 and 1e6 average to the geometric mean 1e5 (Eq. 41).
-    assert aircraft.mean_flow_resistivity(
-        [1.0, 1.0], [1.0e4, 1.0e6]
-    ) == pytest.approx(1.0e5)
-    assert aircraft.mean_flow_resistivity([7.0], [2.0e5]) == pytest.approx(
-        2.0e5
+    assert aircraft.mean_flow_resistivity([1.0, 1.0], [1.0e4, 1.0e6]) == pytest.approx(
+        1.0e5
     )
+    assert aircraft.mean_flow_resistivity([7.0], [2.0e5]) == pytest.approx(2.0e5)
     # Length weighting: 3:1 towards 1e6.
     got = aircraft.mean_flow_resistivity([1.0, 3.0], [1.0e4, 1.0e6])
     assert got == pytest.approx(10.0 ** (0.25 * 4.0 + 0.75 * 6.0))
@@ -113,12 +109,14 @@ def test_diffraction_negative_path_difference_branch() -> None:
     # Slightly below the line of sight there is still some attenuation; at
     # (40/lambda) delta = -2 the argument reaches 1 and the attenuation is 0.
     lam = 346.1 / 1000.0
-    small = aircraft.diffraction_attenuation(
-        [1000.0], -lam / 40.0, edge_height=10.0
-    )[0]
+    small = aircraft.diffraction_attenuation([1000.0], -lam / 40.0, edge_height=10.0)[0]
     assert 0.0 < small < 10.0 * np.log10(3.0)
-    assert aircraft.diffraction_attenuation([1000.0], -3.0 * lam / 40.0,
-                                            edge_height=10.0)[0] == 0.0
+    assert (
+        aircraft.diffraction_attenuation([1000.0], -3.0 * lam / 40.0, edge_height=10.0)[
+            0
+        ]
+        == 0.0
+    )
 
 
 def test_diffraction_multiple_edges_and_cap() -> None:
@@ -145,10 +143,9 @@ def test_diffraction_multiple_edges_and_cap() -> None:
 def test_screening_flat_section_matches_ground_effect() -> None:
     f = np.array([63.0, 250.0, 1000.0])
     res = aircraft.terrain_screening_adjustment(
-        f, (0.0, 50.0), (500.0, 1.2), [0.0, 500.0], [0.0, 0.0], flow_resistivity="D")
-    ref = aircraft.ground_effect_adjustment(
-        f, 50.0, 1.2, 500.0, flow_resistivity="D"
+        f, (0.0, 50.0), (500.0, 1.2), [0.0, 500.0], [0.0, 0.0], flow_resistivity="D"
     )
+    ref = aircraft.ground_effect_adjustment(f, 50.0, 1.2, 500.0, flow_resistivity="D")
     assert not res.screened
     assert np.isnan(res.path_difference)
     assert np.allclose(res.adjustment, ref, atol=1e-12)
@@ -164,9 +161,7 @@ def test_screening_inclined_plane_uses_equivalent_geometry() -> None:
     z = slope * d
     src = (0.0, 60.0)
     rcv = (400.0, slope * 400.0 + 1.2)
-    res = aircraft.terrain_screening_adjustment(
-        f, src, rcv, d, z, flow_resistivity="E"
-    )
+    res = aircraft.terrain_screening_adjustment(f, src, rcv, d, z, flow_resistivity="E")
     scale = np.hypot(1.0, slope)
     hs = 60.0 / scale
     hr = 1.2 / scale
@@ -186,9 +181,7 @@ def test_screening_blocked_hill_hand_checked_delta() -> None:
     src, rcv = (0.0, 20.0), (400.0, 1.2)
     d = np.array([0.0, 190.0, 200.0, 210.0, 400.0])
     z = np.array([0.0, 0.0, 40.0, 0.0, 0.0])
-    res = aircraft.terrain_screening_adjustment(
-        f, src, rcv, d, z, flow_resistivity="G"
-    )
+    res = aircraft.terrain_screening_adjustment(f, src, rcv, d, z, flow_resistivity="G")
     assert res.screened
     so = np.hypot(200.0, 40.0 - 20.0)
     orr = np.hypot(200.0, 40.0 - 1.2)
@@ -198,7 +191,8 @@ def test_screening_blocked_hill_hand_checked_delta() -> None:
     assert tuple(res.diffraction_points[0]) == (200.0, 40.0)
     # Screening must lose level relative to the unblocked flat site at high f.
     flat = aircraft.terrain_screening_adjustment(
-        f, src, rcv, [0.0, 400.0], [0.0, 0.0], flow_resistivity="G")
+        f, src, rcv, [0.0, 400.0], [0.0, 0.0], flow_resistivity="G"
+    )
     assert res.adjustment[-1] < flat.adjustment[-1] - 5.0
 
 
@@ -207,8 +201,13 @@ def test_screening_terrain_below_sight_never_diffracts() -> None:
     # topography rule): the bump changes the mean plane, not the regime.
     f = np.array([500.0])
     res = aircraft.terrain_screening_adjustment(
-        f, (0.0, 50.0), (400.0, 1.2), [0.0, 200.0, 400.0], [0.0, 10.0, 0.0],
-        flow_resistivity="D")
+        f,
+        (0.0, 50.0),
+        (400.0, 1.2),
+        [0.0, 200.0, 400.0],
+        [0.0, 10.0, 0.0],
+        flow_resistivity="D",
+    )
     assert not res.screened
 
 
@@ -217,22 +216,34 @@ def test_screening_per_segment_resistivity_uses_log_mean() -> None:
     # run at the Eq. 41 log-mean 1e5.
     f = np.array([125.0, 1000.0])
     mixed = aircraft.terrain_screening_adjustment(
-        f, (0.0, 30.0), (300.0, 1.2), [0.0, 150.0, 300.0], [0.0, 0.0, 0.0],
-        flow_resistivity=[1.0e4, 1.0e6])
+        f,
+        (0.0, 30.0),
+        (300.0, 1.2),
+        [0.0, 150.0, 300.0],
+        [0.0, 0.0, 0.0],
+        flow_resistivity=[1.0e4, 1.0e6],
+    )
     scalar = aircraft.terrain_screening_adjustment(
-        f, (0.0, 30.0), (300.0, 1.2), [0.0, 150.0, 300.0], [0.0, 0.0, 0.0],
-        flow_resistivity=1.0e5)
+        f,
+        (0.0, 30.0),
+        (300.0, 1.2),
+        [0.0, 150.0, 300.0],
+        [0.0, 0.0, 0.0],
+        flow_resistivity=1.0e5,
+    )
     assert np.allclose(mixed.adjustment, scalar.adjustment, atol=1e-12)
 
 
 def test_screening_validation_and_plot() -> None:
     f = [500.0]
     with pytest.raises(ValueError, match="cover"):
-        aircraft.terrain_screening_adjustment(f, (-10.0, 5.0), (100.0, 1.2),
-                                              [0.0, 100.0], [0.0, 0.0])
+        aircraft.terrain_screening_adjustment(
+            f, (-10.0, 5.0), (100.0, 1.2), [0.0, 100.0], [0.0, 0.0]
+        )
     with pytest.raises(ValueError, match="smaller section distance"):
-        aircraft.terrain_screening_adjustment(f, (100.0, 5.0), (0.0, 1.2),
-                                              [0.0, 100.0], [0.0, 0.0])
+        aircraft.terrain_screening_adjustment(
+            f, (100.0, 5.0), (0.0, 1.2), [0.0, 100.0], [0.0, 0.0]
+        )
     with pytest.raises(ValueError, match="one value per"):
         aircraft.terrain_screening_adjustment(
             f,
@@ -243,11 +254,16 @@ def test_screening_validation_and_plot() -> None:
             flow_resistivity=[1e5],
         )
     blocked = aircraft.terrain_screening_adjustment(
-        [250.0, 1000.0], (0.0, 20.0), (400.0, 1.2),
-        [0.0, 190.0, 200.0, 210.0, 400.0], [0.0, 0.0, 40.0, 0.0, 0.0])
+        [250.0, 1000.0],
+        (0.0, 20.0),
+        (400.0, 1.2),
+        [0.0, 190.0, 200.0, 210.0, 400.0],
+        [0.0, 0.0, 40.0, 0.0, 0.0],
+    )
     assert blocked.plot() is not None
     clear = aircraft.terrain_screening_adjustment(
-        [250.0], (0.0, 20.0), (400.0, 1.2), [0.0, 400.0], [0.0, 0.0])
+        [250.0], (0.0, 20.0), (400.0, 1.2), [0.0, 400.0], [0.0, 0.0]
+    )
     assert clear.plot() is not None
 
 
@@ -264,8 +280,7 @@ def _terrain_case(tz: np.ndarray) -> tuple:
         freqs, az, po, np.full((az.size, po.size, freqs.size), 95.0)
     )
     t = np.arange(0.0, 40.5, 0.5)
-    pos = np.column_stack([np.zeros_like(t), 50.0 * t - 1000.0,
-                           np.full_like(t, 60.0)])
+    pos = np.column_stack([np.zeros_like(t), 50.0 * t - 1000.0, np.full_like(t, 60.0)])
     tx = np.linspace(-2000.0, 2000.0, 41)
     ty = np.linspace(-2000.0, 2000.0, 41)
     return [h], [50.0], [0.0], t, pos, (tx, ty, tz)
@@ -283,9 +298,16 @@ def test_event_flat_terrain_matches_flat_ground() -> None:
         ground=aircraft.RotorcraftGround(flow_resistivity="D"),
     )
     flat = aircraft.rotorcraft_event_level(
-        hems, spd, ang, t, pos, (300.0, 0.0),
-        ground=aircraft.RotorcraftGround(flow_resistivity="D", terrain=dem,
-                                         terrain_resolution=50.0))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        (300.0, 0.0),
+        ground=aircraft.RotorcraftGround(
+            flow_resistivity="D", terrain=dem, terrain_resolution=50.0
+        ),
+    )
     assert np.allclose(flat.a_levels, base.a_levels, atol=1e-9)
     assert flat.sel == pytest.approx(base.sel, abs=1e-9)
 
@@ -309,9 +331,16 @@ def test_event_blocking_ridge_attenuates() -> None:
         ),
     )
     ridge = aircraft.rotorcraft_event_level(
-        hems, spd, ang, t, pos, (300.0, 0.0),
-        ground=aircraft.RotorcraftGround(flow_resistivity="D", terrain=dem,
-                                         terrain_resolution=25.0))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        (300.0, 0.0),
+        ground=aircraft.RotorcraftGround(
+            flow_resistivity="D", terrain=dem, terrain_resolution=25.0
+        ),
+    )
     assert ridge.sel < flat.sel - 2.0
     assert ridge.la_max < flat.la_max
 
@@ -327,9 +356,7 @@ def test_event_terrain_sets_receiver_elevation() -> None:
         t,
         pos,
         (300.0, 0.0),
-        ground=aircraft.RotorcraftGround(
-            terrain=dem, terrain_resolution=100.0
-        ),
+        ground=aircraft.RotorcraftGround(terrain=dem, terrain_resolution=100.0),
     )
     k = int(np.argmin(res.distance))
     # CPA slant: track (x=0, z=60) to mic (x=300, z=30+1.2).
@@ -338,9 +365,7 @@ def test_event_terrain_sets_receiver_elevation() -> None:
 
 def test_event_and_contour_array_argument_validation() -> None:
     hems, spd, ang, t, pos, dem = _terrain_case(np.zeros((41, 41)))
-    vector_sigma_ground = aircraft.RotorcraftGround(
-        flow_resistivity=np.full(4, 2.0e5)
-    )
+    vector_sigma_ground = aircraft.RotorcraftGround(flow_resistivity=np.full(4, 2.0e5))
     mismatched_sigma_ground = aircraft.RotorcraftGround(
         flow_resistivity=np.full(3, 2.0e5)
     )
@@ -358,29 +383,54 @@ def test_event_and_contour_array_argument_validation() -> None:
         terrain=dem, ground_elevation=np.zeros(4)
     )
     with pytest.raises(ValueError, match="scalar"):
-        aircraft.rotorcraft_event_level(hems, spd, ang, t, pos, (0.0, 0.0),
-                                        ground=vector_sigma_ground)
+        aircraft.rotorcraft_event_level(
+            hems, spd, ang, t, pos, (0.0, 0.0), ground=vector_sigma_ground
+        )
     with pytest.raises(ValueError, match="one value per grid"):
-        aircraft.rotorcraft_noise_contour(hems, spd, ang, t, pos,
-                                          x=[0.0, 100.0], y=[0.0, 100.0],
-                                          ground=mismatched_sigma_ground)
+        aircraft.rotorcraft_noise_contour(
+            hems,
+            spd,
+            ang,
+            t,
+            pos,
+            x=[0.0, 100.0],
+            y=[0.0, 100.0],
+            ground=mismatched_sigma_ground,
+        )
     with pytest.raises(ValueError, match="one value per grid"):
-        aircraft.rotorcraft_noise_contour(hems, spd, ang, t, pos,
-                                          x=[0.0, 100.0], y=[0.0, 100.0],
-                                          ground=mismatched_elevation_ground)
+        aircraft.rotorcraft_noise_contour(
+            hems,
+            spd,
+            ang,
+            t,
+            pos,
+            x=[0.0, 100.0],
+            y=[0.0, 100.0],
+            ground=mismatched_elevation_ground,
+        )
     with pytest.raises(ValueError, match="elevation model"):
-        aircraft.rotorcraft_event_level(hems, spd, ang, t, pos, (0.0, 0.0),
-                                        ground=incomplete_dem_ground)
+        aircraft.rotorcraft_event_level(
+            hems, spd, ang, t, pos, (0.0, 0.0), ground=incomplete_dem_ground
+        )
     with pytest.raises(ValueError, match="strictly increasing"):
-        aircraft.rotorcraft_event_level(hems, spd, ang, t, pos, (0.0, 0.0),
-                                        ground=reversed_dem_ground)
+        aircraft.rotorcraft_event_level(
+            hems, spd, ang, t, pos, (0.0, 0.0), ground=reversed_dem_ground
+        )
     with pytest.raises(ValueError, match="per-path maps"):
-        aircraft.rotorcraft_event_level(hems, spd, ang, t, pos, (0.0, 0.0),
-                                        ground=short_sigma_map_ground)
+        aircraft.rotorcraft_event_level(
+            hems, spd, ang, t, pos, (0.0, 0.0), ground=short_sigma_map_ground
+        )
     with pytest.raises(ValueError, match="left scalar"):
-        aircraft.rotorcraft_noise_contour(hems, spd, ang, t, pos,
-                                          x=[0.0, 100.0], y=[0.0, 100.0],
-                                          ground=elevation_with_dem_ground)
+        aircraft.rotorcraft_noise_contour(
+            hems,
+            spd,
+            ang,
+            t,
+            pos,
+            x=[0.0, 100.0],
+            y=[0.0, 100.0],
+            ground=elevation_with_dem_ground,
+        )
 
 
 def test_event_numpy_scalar_flow_resistivity_is_scalar() -> None:
@@ -388,12 +438,24 @@ def test_event_numpy_scalar_flow_resistivity_is_scalar() -> None:
     # resistivity, not a per-receiver map, also when a terrain model is given.
     hems, spd, ang, t, pos, dem = _terrain_case(np.zeros((41, 41)))
     base = aircraft.rotorcraft_event_level(
-        hems, spd, ang, t, pos, (300.0, 0.0),
-        ground=aircraft.RotorcraftGround(flow_resistivity=2.0e5))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        (300.0, 0.0),
+        ground=aircraft.RotorcraftGround(flow_resistivity=2.0e5),
+    )
     for sigma in (np.float32(2.0e5), np.int64(200_000), np.array(2.0e5)):
         res = aircraft.rotorcraft_event_level(
-            hems, spd, ang, t, pos, (300.0, 0.0),
-            ground=aircraft.RotorcraftGround(flow_resistivity=sigma))
+            hems,
+            spd,
+            ang,
+            t,
+            pos,
+            (300.0, 0.0),
+            ground=aircraft.RotorcraftGround(flow_resistivity=sigma),
+        )
         assert np.allclose(res.a_levels, base.a_levels, atol=1e-9)
     with_dem = aircraft.rotorcraft_event_level(
         hems,
@@ -415,18 +477,21 @@ def test_terrain_must_cover_track_and_receivers() -> None:
     # Points beyond the elevation model would otherwise use fabricated edge
     # elevations; both the track and the receivers must be covered.
     hems, spd, ang, t, pos, dem = _terrain_case(np.zeros((41, 41)))
-    small = (np.linspace(-500.0, 500.0, 11), np.linspace(-500.0, 500.0, 11),
-             np.zeros((11, 11)))   # track spans y = -1000..1025: not covered
+    small = (
+        np.linspace(-500.0, 500.0, 11),
+        np.linspace(-500.0, 500.0, 11),
+        np.zeros((11, 11)),
+    )  # track spans y = -1000..1025: not covered
     undersized_dem_ground = aircraft.RotorcraftGround(terrain=small)
-    track_only_dem_ground = aircraft.RotorcraftGround(
-        terrain=dem
-    )  # ends at x = 2000
+    track_only_dem_ground = aircraft.RotorcraftGround(terrain=dem)  # ends at x = 2000
     with pytest.raises(ValueError, match="cover the whole track"):
-        aircraft.rotorcraft_event_level(hems, spd, ang, t, pos, (0.0, 0.0),
-                                        ground=undersized_dem_ground)
+        aircraft.rotorcraft_event_level(
+            hems, spd, ang, t, pos, (0.0, 0.0), ground=undersized_dem_ground
+        )
     with pytest.raises(ValueError, match="cover the whole receiver"):
-        aircraft.rotorcraft_event_level(hems, spd, ang, t, pos, (2500.0, 0.0),
-                                        ground=track_only_dem_ground)
+        aircraft.rotorcraft_event_level(
+            hems, spd, ang, t, pos, (2500.0, 0.0), ground=track_only_dem_ground
+        )
     with pytest.raises(ValueError, match="cover the whole receiver grid"):
         aircraft.rotorcraft_noise_contour(
             hems,
@@ -446,14 +511,35 @@ def test_contour_mixed_sigma_matches_stitched_scalar_runs() -> None:
     y = np.array([-100.0, 100.0])
     sig = np.array([[2.0e5, 8.0e5, 2.0e5], [8.0e5, 2.0e5, 8.0e5]])
     mixed = aircraft.rotorcraft_noise_contour(
-        hems, spd, ang, t, pos, x=x, y=y,
-        ground=aircraft.RotorcraftGround(flow_resistivity=sig))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=x,
+        y=y,
+        ground=aircraft.RotorcraftGround(flow_resistivity=sig),
+    )
     lo = aircraft.rotorcraft_noise_contour(
-        hems, spd, ang, t, pos, x=x, y=y,
-        ground=aircraft.RotorcraftGround(flow_resistivity=2.0e5))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=x,
+        y=y,
+        ground=aircraft.RotorcraftGround(flow_resistivity=2.0e5),
+    )
     hi = aircraft.rotorcraft_noise_contour(
-        hems, spd, ang, t, pos, x=x, y=y,
-        ground=aircraft.RotorcraftGround(flow_resistivity=8.0e5))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=x,
+        y=y,
+        ground=aircraft.RotorcraftGround(flow_resistivity=8.0e5),
+    )
     assert np.array_equal(mixed.level, np.where(sig == 2.0e5, lo.level, hi.level))
 
 
@@ -463,14 +549,35 @@ def test_contour_mixed_elevation_matches_stitched_scalar_runs() -> None:
     y = np.array([-100.0, 100.0])
     ge = np.array([[0.0, 5.0, 0.0], [5.0, 0.0, 5.0]])
     mixed = aircraft.rotorcraft_noise_contour(
-        hems, spd, ang, t, pos, x=x, y=y,
-        ground=aircraft.RotorcraftGround(ground_elevation=ge))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=x,
+        y=y,
+        ground=aircraft.RotorcraftGround(ground_elevation=ge),
+    )
     lo = aircraft.rotorcraft_noise_contour(
-        hems, spd, ang, t, pos, x=x, y=y,
-        ground=aircraft.RotorcraftGround(ground_elevation=0.0))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=x,
+        y=y,
+        ground=aircraft.RotorcraftGround(ground_elevation=0.0),
+    )
     hi = aircraft.rotorcraft_noise_contour(
-        hems, spd, ang, t, pos, x=x, y=y,
-        ground=aircraft.RotorcraftGround(ground_elevation=5.0))
+        hems,
+        spd,
+        ang,
+        t,
+        pos,
+        x=x,
+        y=y,
+        ground=aircraft.RotorcraftGround(ground_elevation=5.0),
+    )
     assert np.array_equal(mixed.level, np.where(ge == 0.0, lo.level, hi.level))
 
 
@@ -485,9 +592,7 @@ def test_contour_with_terrain_smoke() -> None:
         pos,
         x=[-100.0, 100.0],
         y=[-100.0, 100.0],
-        ground=aircraft.RotorcraftGround(
-            terrain=dem, terrain_resolution=200.0
-        ),
+        ground=aircraft.RotorcraftGround(terrain=dem, terrain_resolution=200.0),
     )
     base = aircraft.rotorcraft_noise_contour(
         hems, spd, ang, t, pos, x=[-100.0, 100.0], y=[-100.0, 100.0]

@@ -310,7 +310,9 @@ class SoundReductionResult:
         """
         return self.rating().report(path, **kwargs)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the predicted sound reduction index ``R(f)``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -336,7 +338,9 @@ class SoundReductionResult:
         from ..._plot.geometry import plot_double_wall_result_geometry
 
         check_language(language)
-        return plot_double_wall_result_geometry(self, ax=ax, language=language, **kwargs)
+        return plot_double_wall_result_geometry(
+            self, ax=ax, language=language, **kwargs
+        )
 
 
 def single_panel_transmission_loss(
@@ -404,8 +408,7 @@ def single_panel_transmission_loss(
     :raises ValueError: for a non-positive input, an unknown coincidence model,
         or if neither *critical_frequency* nor *bending_stiffness* is given.
     """
-    model = require_choice(coincidence_model, "coincidence_model",
-                          ("sharp", "cremer"))
+    model = require_choice(coincidence_model, "coincidence_model", ("sharp", "cremer"))
     m2 = require_positive(mass_per_area, "mass_per_area")
     eta = require_positive(loss_factor, "loss_factor")
     c0 = require_positive(speed_of_sound, "speed_of_sound")
@@ -423,8 +426,11 @@ def single_panel_transmission_loss(
 
     def _tl_normal(freq: np.ndarray) -> np.ndarray:
         return mass_law_transmission_loss(
-            freq, m2, incidence="normal",
-            speed_of_sound=c0, air_density=rho0,
+            freq,
+            m2,
+            incidence="normal",
+            speed_of_sound=c0,
+            air_density=rho0,
         )
 
     correction = _resolve_field_correction(band, field_correction)
@@ -642,8 +648,12 @@ def plateau_transmission_loss(
     f_b = ratio * f_a
 
     tl = mass_law_transmission_loss(
-        f, m2, incidence="field", field_correction=correction,
-        speed_of_sound=c0, air_density=rho0,
+        f,
+        m2,
+        incidence="field",
+        field_correction=correction,
+        speed_of_sound=c0,
+        air_density=rho0,
     )
     on_plateau = (f >= f_a) & (f <= f_b)
     above = f > f_b
@@ -754,8 +764,12 @@ def corrugated_plate_stiffness(
     shape = (math.pi * amplitude / wavelength) ** 2
     flat = e * h**3 / 12.0
     b_x = flat / ((1.0 - nu**2) * (1.0 + shape))
-    b_z = 0.5 * e * amplitude**2 * h * (
-        1.0 - 0.81 / (1.0 + 2.5 * (amplitude / wavelength) ** 2)
+    b_z = (
+        0.5
+        * e
+        * amplitude**2
+        * h
+        * (1.0 - 0.81 / (1.0 + 2.5 * (amplitude / wavelength) ** 2))
     )
     b_xz = flat / (1.0 + nu) * (1.0 + shape)
     return float(b_x), float(b_z), float(b_xz)
@@ -813,9 +827,7 @@ def orthotropic_plate_resonance(
     b_z = require_positive(bending_stiffness_z, "bending_stiffness_z")
     b_xz = require_positive(bending_stiffness_xz, "bending_stiffness_xz")
     total = (
-        i**4 * b_x / a**4
-        + n**4 * b_z / b**4
-        + 2.0 * i**2 * n**2 * b_xz / (a**2 * b**2)
+        i**4 * b_x / a**4 + n**4 * b_z / b**4 + 2.0 * i**2 * n**2 * b_xz / (a**2 * b**2)
     )
     return float(math.pi / (2.0 * math.sqrt(m2)) * math.sqrt(total))
 
@@ -916,9 +928,7 @@ def _orthotropic_tau(
 
         resonance = 1.0 / math.sqrt(ratio) if ratio > 0.0 else math.inf
         if 0.0 < resonance < upper:
-            return float(
-                quad(integrand, 0.0, upper, points=(resonance,), limit=200)[0]
-            )
+            return float(quad(integrand, 0.0, upper, points=(resonance,), limit=200)[0])
         return float(quad(integrand, 0.0, upper, limit=200)[0])
 
     return float(2.0 / math.pi * quad(azimuth, 0.0, 0.5 * math.pi, limit=200)[0])
@@ -945,10 +955,16 @@ def _heckl_transmission_loss(
     z0 = air_density * speed_of_sound
 
     def mass_law(freq: np.ndarray) -> np.ndarray:
-        return mass_law_transmission_loss(
-            freq, m2, incidence="normal",
-            speed_of_sound=speed_of_sound, air_density=air_density,
-        ) - correction
+        return (
+            mass_law_transmission_loss(
+                freq,
+                m2,
+                incidence="normal",
+                speed_of_sound=speed_of_sound,
+                air_density=air_density,
+            )
+            - correction
+        )
 
     def coincidence(freq: np.ndarray) -> np.ndarray:
         """Bies Eq. (7.59): the flattened plateau of the coincidence range."""
@@ -1115,8 +1131,12 @@ def orthotropic_transmission_loss(
                 "ordered; use method='integral' for a narrow coincidence range."
             )
         tl = _heckl_transmission_loss(
-            f, m2, fc1, fc2,
-            speed_of_sound=c0, air_density=rho0,
+            f,
+            m2,
+            fc1,
+            fc2,
+            speed_of_sound=c0,
+            air_density=rho0,
             correction=field_incidence_correction(band),
         )
         return SoundReductionResult(
@@ -1130,7 +1150,12 @@ def orthotropic_transmission_loss(
     tau = np.array(
         [
             _orthotropic_tau(
-                float(freq), m2, fc1, fc2, eta, z0,
+                float(freq),
+                m2,
+                fc1,
+                fc2,
+                eta,
+                z0,
                 _limiting_sin_squared(area, limiting_angle, c0 / float(freq)),
             )
             for freq in f
@@ -1255,16 +1280,24 @@ def double_wall_transmission_loss(
     f = _band_axis(frequency)
 
     f0 = mass_spring_mass_resonance(
-        m1, m2, d, cavity_medium=cavity_medium,
+        m1,
+        m2,
+        d,
+        cavity_medium=cavity_medium,
         tie_stiffness_per_area=tie_stiffness_per_area,
-        speed_of_sound=c0, air_density=rho0,
+        speed_of_sound=c0,
+        air_density=rho0,
     )
     f_l = c0 / (2.0 * np.pi * d)
 
     def _ml(freq: np.ndarray, mass: float) -> np.ndarray:
         return mass_law_transmission_loss(
-            freq, mass, incidence="field", band=band,
-            speed_of_sound=c0, air_density=rho0,
+            freq,
+            mass,
+            incidence="field",
+            band=band,
+            speed_of_sound=c0,
+            air_density=rho0,
         )
 
     tl = np.empty_like(f)

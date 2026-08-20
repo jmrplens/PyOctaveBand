@@ -43,6 +43,7 @@ if TYPE_CHECKING:
 class WindTurbineNoiseWarning(PhonometryWarning):
     """The tonality inputs leave the standard's stated domain of validity."""
 
+
 #: Reference area ``S0`` for the apparent sound power level (m²).
 _REFERENCE_AREA = 1.0
 #: The apparent-sound-power ground-board pressure-doubling term (dB).
@@ -211,12 +212,16 @@ class WindTurbineTonalityResult:
     frequencies: NDArray[np.float64]
     levels: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the narrowband spectrum with the critical band and masking level."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_wind_turbine_tonality
 
-        return plot_wind_turbine_tonality(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_wind_turbine_tonality(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,
@@ -282,7 +287,9 @@ def _validate_narrowband(
     lv = np.asarray(levels, dtype=np.float64)
     fr = np.asarray(frequencies, dtype=np.float64)
     if lv.ndim != 1 or lv.shape != fr.shape or lv.size < 3:
-        raise ValueError("'levels' and 'frequencies' must be 1-D and the same length (>= 3).")
+        raise ValueError(
+            "'levels' and 'frequencies' must be 1-D and the same length (>= 3)."
+        )
     if not (np.all(np.isfinite(lv)) and np.all(np.isfinite(fr))):
         raise ValueError("'levels' and 'frequencies' must be finite.")
     diffs = np.diff(fr)
@@ -290,12 +297,15 @@ def _validate_narrowband(
         raise ValueError("'frequencies' must be strictly increasing.")
     df = float(np.median(diffs))
     if np.any(np.abs(diffs - df) > 1e-3 * df):
-        raise ValueError("'frequencies' must be uniformly spaced (a narrowband spectrum).")
+        raise ValueError(
+            "'frequencies' must be uniformly spaced (a narrowband spectrum)."
+        )
     return lv, fr, df
 
 
 def _candidate_peak(
-    lv: NDArray[np.float64], fr: NDArray[np.float64],
+    lv: NDArray[np.float64],
+    fr: NDArray[np.float64],
     tone_frequency: float | None,
 ) -> int:
     """Index of the candidate line: the spectrum maximum, or the validated
@@ -312,7 +322,9 @@ def _candidate_peak(
 
 
 def _screen_possible_tone(
-    lv: NDArray[np.float64], in_band: NDArray[np.bool_], peak: int,
+    lv: NDArray[np.float64],
+    in_band: NDArray[np.bool_],
+    peak: int,
 ) -> bool:
     """9.5.2 possible-tone screen: local maximum more than 6 dB above the
     critical-band energy average that excludes the maximum line and its two

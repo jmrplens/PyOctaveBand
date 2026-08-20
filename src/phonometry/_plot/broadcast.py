@@ -45,8 +45,7 @@ _STRINGS: dict[str, str] = {
     "K-weighting (combined)": "Ponderación K (combinada)",
     "Stage 1: spherical-head shelf": "Etapa 1: realce de cabeza esférica",
     "Stage 2: RLB high-pass": "Etapa 2: paso alto RLB",
-    "K-weighting frequency response (ITU-R BS.1770)":
-        "Respuesta en frecuencia de la ponderación K (UIT-R BS.1770)",
+    "K-weighting frequency response (ITU-R BS.1770)": "Respuesta en frecuencia de la ponderación K (UIT-R BS.1770)",
 }
 
 
@@ -56,8 +55,11 @@ def _t(text: str, language: str = "en") -> str:
 
 
 def plot_program_loudness(
-    result: ProgramLoudnessResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: ProgramLoudnessResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """EBU Mode loudness over time (ITU-R BS.1770-5 / EBU R 128).
 
@@ -133,8 +135,11 @@ def plot_program_loudness(
 
 
 def plot_k_weighting_response(
-    result: KWeightingResponse, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: KWeightingResponse,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """K-weighting magnitude frequency response (ITU-R BS.1770-5 Annex 1).
 
@@ -153,13 +158,19 @@ def plot_k_weighting_response(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequencies, dtype=np.float64)
     ax.plot(
-        freqs, np.asarray(result.shelf_db, dtype=np.float64),
-        color=_C_MUTED, linewidth=1.0, linestyle="--",
+        freqs,
+        np.asarray(result.shelf_db, dtype=np.float64),
+        color=_C_MUTED,
+        linewidth=1.0,
+        linestyle="--",
         label=_t("Stage 1: spherical-head shelf", language),
     )
     ax.plot(
-        freqs, np.asarray(result.highpass_db, dtype=np.float64),
-        color=_C_SECONDARY, linewidth=1.0, linestyle=":",
+        freqs,
+        np.asarray(result.highpass_db, dtype=np.float64),
+        color=_C_SECONDARY,
+        linewidth=1.0,
+        linestyle=":",
         label=_t("Stage 2: RLB high-pass", language),
     )
     kwargs.setdefault("color", _C_PRIMARY)
@@ -170,8 +181,9 @@ def plot_k_weighting_response(
     # against, so it sits behind the curves -- held back by colour rather than
     # by opacity, which on a dark page holds a line back all the way to
     # invisible.
-    ax.axhline(4.0, color=theme_line(_C_REFERENCE, ax, quiet=0.6),
-               linestyle="-", linewidth=0.8)
+    ax.axhline(
+        4.0, color=theme_line(_C_REFERENCE, ax, quiet=0.6), linestyle="-", linewidth=0.8
+    )
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.set_xlabel(_t("Frequency [Hz]", language))
     ax.set_ylabel(_t("Magnitude [dB]", language))

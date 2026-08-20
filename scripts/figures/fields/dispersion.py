@@ -26,16 +26,16 @@ from ..theme import (
 )
 
 _DISP_C = 343.0
-_DISP_F0 = 500.0                          # tone-burst carrier
-_DISP_LAMBDA = _DISP_C / _DISP_F0         # 0.686 m
+_DISP_F0 = 500.0  # tone-burst carrier
+_DISP_LAMBDA = _DISP_C / _DISP_F0  # 0.686 m
 #: Cells per carrier wavelength of the three tubes: the guide's rule, one
 #: grid coarser and one finer, so the second-order law is three points.
 _DISP_CELLS = (5, 10, 20)
-_DISP_X0 = 1.1                            # launch centre [m]
-_DISP_W = 0.50                            # Gaussian 1/e half-width [m]
-_DISP_FINISH = 6.6                        # finish line the delays are read at
-_DISP_LSHOW = 10.0                        # visible tube [m]
-_DISP_LOSSY = 3.0 * _DISP_LAMBDA          # graded absorbing tail beyond it
+_DISP_X0 = 1.1  # launch centre [m]
+_DISP_W = 0.50  # Gaussian 1/e half-width [m]
+_DISP_FINISH = 6.6  # finish line the delays are read at
+_DISP_LSHOW = 10.0  # visible tube [m]
+_DISP_LOSSY = 3.0 * _DISP_LAMBDA  # graded absorbing tail beyond it
 #: Peak decay rate of the quadratic loss ramp closing the tube: about 60 dB
 #: one way over the ramp, graded so nothing measurable comes back.
 _DISP_SIGMA = 3450.0
@@ -92,10 +92,10 @@ def _disp_packet_group_speed(profile: Any, dx: float, courant: float) -> float:
     """
     energy = np.abs(np.fft.rfft(profile)) ** 2
     spatial = np.fft.rfftfreq(profile.size, dx)
-    cells = np.divide(1.0, spatial * dx, out=np.full(spatial.shape, np.inf),
-                      where=spatial > 0.0)
-    return float(np.average(_disp_group_speed(cells, courant),
-                            weights=energy))
+    cells = np.divide(
+        1.0, spatial * dx, out=np.full(spatial.shape, np.inf), where=spatial > 0.0
+    )
+    return float(np.average(_disp_group_speed(cells, courant), weights=energy))
 
 
 @lru_cache(maxsize=1)
@@ -117,9 +117,11 @@ def _dispersion_fields() -> tuple[Any, ...]:
     """
     import fdtd2d
 
-    t_end = 1.2 * (_DISP_FINISH - _DISP_X0) / (
-        float(_disp_group_speed(_DISP_CELLS[0], 0.6 / np.sqrt(2.0)))
-        * _DISP_C)
+    t_end = (
+        1.2
+        * (_DISP_FINISH - _DISP_X0)
+        / (float(_disp_group_speed(_DISP_CELLS[0], 0.6 / np.sqrt(2.0))) * _DISP_C)
+    )
     times = np.arange(0.0, t_end, _DISP_CAPTURE)
     tubes: list[dict[str, Any]] = []
     courant = 0.0
@@ -130,15 +132,17 @@ def _dispersion_fields() -> tuple[Any, ...]:
         x = (np.arange(n_x) + 0.5) * dx
         ramp = np.clip((x - n_vis * dx) / _DISP_LOSSY, 0.0, 1.0) ** 2
         sim = fdtd2d.FDTD2D(
-            _DISP_C, dx, shape=(3, n_x),
+            _DISP_C,
+            dx,
+            shape=(3, n_x),
             damping=np.tile(_DISP_SIGMA * ramp, (3, 1)),
-            edge_impedance={"left": 1.2 * _DISP_C,
-                            "right": 1.2 * _DISP_C})
-        sim.add_plane_wave("right", center=_DISP_X0, width=_DISP_W,
-                           wavelength=_DISP_LAMBDA)
+            edge_impedance={"left": 1.2 * _DISP_C, "right": 1.2 * _DISP_C},
+        )
+        sim.add_plane_wave(
+            "right", center=_DISP_X0, width=_DISP_W, wavelength=_DISP_LAMBDA
+        )
         courant = _DISP_C * sim.dt / dx
-        v_pred = _disp_packet_group_speed(sim.p[1, :n_vis].copy(), dx,
-                                          courant)
+        v_pred = _disp_packet_group_speed(sim.p[1, :n_vis].copy(), dx, courant)
         raw_t: list[float] = []
         raw_p: list[Any] = []
         while sim.time <= times[-1] + sim.dt:
@@ -163,12 +167,19 @@ def _dispersion_fields() -> tuple[Any, ...]:
         centroid = (energy * x_vis).sum(axis=1) / energy.sum(axis=1)
         t_cross = float(np.interp(_DISP_FINISH, centroid, times))
         distance = _DISP_FINISH - _DISP_X0
-        tubes.append({
-            "cells": cells, "dx": dx, "x": x_vis, "p": frames,
-            "centroid": centroid, "t_cross": t_cross,
-            "t_pred": distance / (v_pred * _DISP_C),
-            "v_meas": distance / t_cross / _DISP_C, "v_pred": v_pred,
-        })
+        tubes.append(
+            {
+                "cells": cells,
+                "dx": dx,
+                "x": x_vis,
+                "p": frames,
+                "centroid": centroid,
+                "t_cross": t_cross,
+                "t_pred": distance / (v_pred * _DISP_C),
+                "v_meas": distance / t_cross / _DISP_C,
+                "v_pred": v_pred,
+            }
+        )
     return tuple(tubes), times, courant
 
 
@@ -187,18 +198,17 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
     colors = (COLOR_SECONDARY, COLOR_PRIMARY, COLOR_TERTIARY)
 
     fig = _anim_figure()
-    fig.suptitle(T("Numerical dispersion: one pulse, three grids (2D FDTD)"),
-                 )
-    gs = fig.add_gridspec(3, 2, width_ratios=(3.55, 1.0), hspace=0.12,
-                          wspace=0.05)
+    fig.suptitle(
+        T("Numerical dispersion: one pulse, three grids (2D FDTD)"),
+    )
+    gs = fig.add_gridspec(3, 2, width_ratios=(3.55, 1.0), hspace=0.12, wspace=0.05)
     axes = [fig.add_subplot(gs[i, 0]) for i in range(3)]
     ax_law = fig.add_subplot(gs[:, 1])
 
     lines: list[Any] = []
     exacts: list[Any] = []
     pills: list[Any] = []
-    for i, (ax, tube, color) in enumerate(
-            zip(axes, tubes, colors, strict=True)):
+    for i, (ax, tube, color) in enumerate(zip(axes, tubes, colors, strict=True)):
         ax.grid(False)
         ax.set_xlim(0.0, _DISP_LSHOW)
         # Headroom above the trace, not around it: the packet never leaves
@@ -213,46 +223,99 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
         ax.axhline(0.0, color=COLOR_GRID, lw=0.8, zorder=1)
         ax.axvline(_DISP_FINISH, color=COLOR_MUTED, lw=1.0, ls=":", zorder=2)
         if i == 0:
-            ax.text(_DISP_FINISH, 1.03,
-                    T(f"finish line, {_DISP_FINISH:.1f} m"), ha="center",
-                    va="bottom", fontsize=7.5, color=COLOR_MUTED,
-                    transform=ax.get_xaxis_transform())
-        exacts.append(ax.fill_between(tube["x"], 0.0, 0.0,
-                                      color=COLOR_MUTED, alpha=0.38,
-                                      lw=0.0, zorder=2))
-        lines.append(ax.plot(tube["x"], np.zeros_like(tube["x"]),
-                             color=color, lw=1.4, marker="o",
-                             ms=(3.2, 2.0, 1.1)[i], zorder=4)[0])
-        ax.text(0.006, 0.985,
-                T(rf"{tube['cells']} cells per wavelength · "
-                  rf"$\Delta x$ = {tube['dx'] * 1000:.1f} mm"),
-                transform=ax.transAxes, ha="left", va="top", fontsize=9.0,
-                fontweight="bold", color=color)
+            ax.text(
+                _DISP_FINISH,
+                1.03,
+                T(f"finish line, {_DISP_FINISH:.1f} m"),
+                ha="center",
+                va="bottom",
+                fontsize=7.5,
+                color=COLOR_MUTED,
+                transform=ax.get_xaxis_transform(),
+            )
+        exacts.append(
+            ax.fill_between(
+                tube["x"], 0.0, 0.0, color=COLOR_MUTED, alpha=0.38, lw=0.0, zorder=2
+            )
+        )
+        lines.append(
+            ax.plot(
+                tube["x"],
+                np.zeros_like(tube["x"]),
+                color=color,
+                lw=1.4,
+                marker="o",
+                ms=(3.2, 2.0, 1.1)[i],
+                zorder=4,
+            )[0]
+        )
+        ax.text(
+            0.006,
+            0.985,
+            T(
+                rf"{tube['cells']} cells per wavelength · "
+                rf"$\Delta x$ = {tube['dx'] * 1000:.1f} mm"
+            ),
+            transform=ax.transAxes,
+            ha="left",
+            va="top",
+            fontsize=9.0,
+            fontweight="bold",
+            color=color,
+        )
         # The readout sits at the foot of its panel: the trace occupies the
         # middle band, and the Spanish text runs long enough that a
         # top-right pill collides with the panel label.
-        pills.append(ax.text(
-            0.994, 0.985, "", transform=ax.transAxes, ha="right",
-            va="top", fontsize=8.5, color="white", zorder=7,
-            linespacing=1.35,
-            bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                  "alpha": 0.55, "edgecolor": "none"}))
+        pills.append(
+            ax.text(
+                0.994,
+                0.985,
+                "",
+                transform=ax.transAxes,
+                ha="right",
+                va="top",
+                fontsize=8.5,
+                color="white",
+                zorder=7,
+                linespacing=1.35,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.55,
+                    "edgecolor": "none",
+                },
+            )
+        )
         ax.tick_params(labelsize=7.5, labelbottom=i == 2)
     axes[2].set_xlabel(T("Position along the tube [m]"), fontsize=9)
 
     grid = np.geomspace(3.0, 40.0, 240)
-    ax_law.plot(grid, 100.0 * (1.0 - _disp_group_speed(grid, courant)),
-                color=COLOR_FG, lw=1.7, label=T("group (a pulse)"))
-    ax_law.plot(grid, 100.0 * (1.0 - _disp_phase_speed(grid, courant)),
-                color=COLOR_FG, lw=1.2, ls="--", label=T("phase (the rule)"))
+    ax_law.plot(
+        grid,
+        100.0 * (1.0 - _disp_group_speed(grid, courant)),
+        color=COLOR_FG,
+        lw=1.7,
+        label=T("group (a pulse)"),
+    )
+    ax_law.plot(
+        grid,
+        100.0 * (1.0 - _disp_phase_speed(grid, courant)),
+        color=COLOR_FG,
+        lw=1.2,
+        ls="--",
+        label=T("phase (the rule)"),
+    )
     for tube, color in zip(tubes, colors, strict=True):
-        ax_law.plot([tube["cells"]],
-                    [100.0 * (1.0 - _disp_group_speed(tube["cells"],
-                                                      courant))],
-                    marker="o", ms=6.0, color=color, zorder=5)
+        ax_law.plot(
+            [tube["cells"]],
+            [100.0 * (1.0 - _disp_group_speed(tube["cells"], courant))],
+            marker="o",
+            ms=6.0,
+            color=color,
+            zorder=5,
+        )
     ax_law.axvline(10.0, color=COLOR_MUTED, lw=0.9, ls=":")
-    ax_law.set(xscale="log", yscale="log", xlim=(3.0, 40.0),
-               ylim=(0.1, 60.0))
+    ax_law.set(xscale="log", yscale="log", xlim=(3.0, 40.0), ylim=(0.1, 60.0))
     ax_law.set_xlabel(T("Cells per wavelength"), fontsize=8)
     ax_law.set_ylabel(T("Speed error [%]"), fontsize=8)
     # Explicit ticks on both log axes: the default locators put minor
@@ -267,14 +330,30 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
     ax_law.legend(fontsize=6.5, loc="lower left", framealpha=0.85)
     ax_law.set_title(T("The closed form"), fontsize=8.5)
 
-    t_txt = fig.text(0.012, 0.935, "", ha="left", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
-    fig.text(0.5, 0.011,
-             T(f"Air at {_DISP_C:.0f} m/s, a {_DISP_F0:.0f} Hz burst, "
-               f"per-axis Courant number $S$ = {courant:.3f}; grey is the "
-               f"exact continuous wave, dots are the grid cells"),
-             ha="center", va="bottom", fontsize=8, color=COLOR_FG,
-             alpha=0.85)
+    t_txt = fig.text(
+        0.012,
+        0.935,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
+    fig.text(
+        0.5,
+        0.011,
+        T(
+            f"Air at {_DISP_C:.0f} m/s, a {_DISP_F0:.0f} Hz burst, "
+            f"per-axis Courant number $S$ = {courant:.3f}; grey is the "
+            f"exact continuous wave, dots are the grid cells"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=8,
+        color=COLOR_FG,
+        alpha=0.85,
+    )
     fig.get_layout_engine().set(rect=(0.0, 0.045, 1.0, 0.94))
 
     def update(k: int) -> tuple[Any, ...]:
@@ -286,26 +365,40 @@ def animate_fdtd_dispersion(output_dir: str) -> None:
             x = tube["x"]
             shift = x - (_DISP_X0 + _DISP_C * t)
             exact = np.exp(-((shift / _DISP_W) ** 2)) * np.sin(
-                2.0 * np.pi * shift / _DISP_LAMBDA)
+                2.0 * np.pi * shift / _DISP_LAMBDA
+            )
             exacts[i].remove()
-            exacts[i] = ax.fill_between(x, 0.0, exact, color=COLOR_MUTED,
-                                        alpha=0.38, lw=0.0, zorder=2)
+            exacts[i] = ax.fill_between(
+                x, 0.0, exact, color=COLOR_MUTED, alpha=0.38, lw=0.0, zorder=2
+            )
             if t >= tube["t_cross"]:
-                late = (tube["t_cross"] - (_DISP_FINISH - _DISP_X0)
-                        / _DISP_C) * 1e3
+                late = (tube["t_cross"] - (_DISP_FINISH - _DISP_X0) / _DISP_C) * 1e3
                 pills[i].set_text(
-                    T(f"crossed at {tube['t_cross'] * 1e3:.1f} ms, "
-                      f"+{late:.1f} ms") + "\n"
-                    + T(f"{100 * (1 - tube['v_meas']):.1f} % slow "
-                        f"(theory {100 * (1 - tube['v_pred']):.1f} %)"))
+                    T(f"crossed at {tube['t_cross'] * 1e3:.1f} ms, +{late:.1f} ms")
+                    + "\n"
+                    + T(
+                        f"{100 * (1 - tube['v_meas']):.1f} % slow "
+                        f"(theory {100 * (1 - tube['v_pred']):.1f} %)"
+                    )
+                )
             elif t >= _DISP_REVEAL:
                 lag = _DISP_X0 + _DISP_C * t - tube["centroid"][j]
-                pills[i].set_text(T(
-                    f"{lag:.2f} m behind (theory "
-                    f"{(1 - tube['v_pred']) * _DISP_C * t:.2f} m)"))
+                pills[i].set_text(
+                    T(
+                        f"{lag:.2f} m behind (theory "
+                        f"{(1 - tube['v_pred']) * _DISP_C * t:.2f} m)"
+                    )
+                )
             artists += [lines[i], exacts[i], pills[i]]
         t_txt.set_text(T(f"$t$ = {t * 1e3:5.2f} ms"))
         return tuple(artists)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_dispersion",
-                 frames=times.size + _DISP_HOLD, fps=_DISP_FPS, gif_fps=10)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_dispersion",
+        frames=times.size + _DISP_HOLD,
+        fps=_DISP_FPS,
+        gif_fps=10,
+    )

@@ -258,8 +258,8 @@ def _critical_frequency(thickness: float, wave_speed: float) -> float:
     :math:`B' = m'' c_\mathrm{L}^2 h^2 / 12`, with the speed of sound in air fixed at
     :math:`c_0 = 343` m/s.
     """
-    return math.sqrt(12.0) * _SPEED_OF_SOUND**2 / (
-        2.0 * math.pi * thickness * wave_speed
+    return (
+        math.sqrt(12.0) * _SPEED_OF_SOUND**2 / (2.0 * math.pi * thickness * wave_speed)
     )
 
 
@@ -384,8 +384,12 @@ def inline_transmission_coefficient(chi: float, psi: float) -> float:
     """
     c = require_positive(chi, "chi")
     p = require_positive(psi, "psi")
-    ratio = 2.0 * (1.0 + c) * (1.0 + p) * math.sqrt(c * p) / (
-        c * (1.0 + p) ** 2 + 2.0 * p * (1.0 + c * c)
+    ratio = (
+        2.0
+        * (1.0 + c)
+        * (1.0 + p)
+        * math.sqrt(c * p)
+        / (c * (1.0 + p) ** 2 + 2.0 * p * (1.0 + c * c))
     )
     return float(ratio * ratio)
 
@@ -409,9 +413,11 @@ def angular_average_transmission_coefficient(
     """
     section = require_choice(str(section).lower(), "section", ("corner", "straight"))
     if section == "corner":
+
         def coeff(t: float) -> float:
             return float(corner_transmission_coefficient(t, chi, psi, junction))
     else:
+
         def coeff(t: float) -> float:
             return float(straight_transmission_coefficient(t, chi, psi, junction))
 
@@ -595,8 +601,14 @@ def point_connection_coupling_loss_factor(
     a_2 = (rs_2 * h_2 * c_2) ** 2
     omega = 2.0 * math.pi * freq
     eta = (
-        4.0 * n * h_1 * c_1 / (math.sqrt(3.0) * omega * area)
-        * a_1 * a_2 / (a_1 + a_2) ** 2
+        4.0
+        * n
+        * h_1
+        * c_1
+        / (math.sqrt(3.0) * omega * area)
+        * a_1
+        * a_2
+        / (a_1 + a_2) ** 2
     )
     return np.asarray(eta, dtype=np.float64)
 
@@ -681,7 +693,9 @@ class JunctionTransmissionResult:
         )
         return float(kij)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``tau(theta)`` versus incidence angle for this junction.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -750,8 +764,12 @@ def junction_transmission(
     """
     name = require_choice(str(junction).upper(), "junction", tuple(_JUNCTIONS))
     chi, psi = junction_wave_parameters(
-        thickness1, wave_speed1, surface_density1,
-        thickness2, wave_speed2, surface_density2,
+        thickness1,
+        wave_speed1,
+        surface_density1,
+        thickness2,
+        wave_speed2,
+        surface_density2,
     )
     if angles_deg is None:
         grid = np.linspace(0.0, 90.0, 91)
@@ -761,7 +779,9 @@ def junction_transmission(
             raise ValueError("'angles_deg' must be a non-empty 1-D array.")
     theta = np.radians(grid)
     corner = corner_transmission_coefficient(theta, chi, psi, name)
-    corner_avg = angular_average_transmission_coefficient(chi, psi, name, section="corner")
+    corner_avg = angular_average_transmission_coefficient(
+        chi, psi, name, section="corner"
+    )
 
     _, _, j3 = _JUNCTIONS[name]
     straight: np.ndarray | None

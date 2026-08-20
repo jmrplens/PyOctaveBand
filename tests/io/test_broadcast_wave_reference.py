@@ -52,8 +52,11 @@ def test_struct_tail_matches_the_reserved_byte_accounting() -> None:
     loudness_words = [
         fields[name][1]
         for name in (
-            "LoudnessValue", "LoudnessRange", "MaxTruePeakLevel",
-            "MaxMomentaryLoudness", "MaxShortTermLoudness",
+            "LoudnessValue",
+            "LoudnessRange",
+            "MaxTruePeakLevel",
+            "MaxMomentaryLoudness",
+            "MaxShortTermLoudness",
         )
     ]
     assert sum(loudness_words) == ref.TECH3285_LOUDNESS_BYTES

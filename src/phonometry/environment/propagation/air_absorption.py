@@ -124,9 +124,7 @@ def _molar_water_vapour(
     :math:`h = h_\mathrm{r} \, (p_\mathrm{sat}/p_\mathrm{r})/(p_\mathrm{a}/p_\mathrm{r})` (Annex B psychrometric
     conversion).
     """
-    psat_over_pr = 10.0 ** (
-        -6.8346 * (_T01 / temperature_k) ** 1.261 + 4.6151
-    )
+    psat_over_pr = 10.0 ** (-6.8346 * (_T01 / temperature_k) ** 1.261 + 4.6151)
     return float(relative_humidity * psat_over_pr / (pressure / _PR))
 
 

@@ -78,9 +78,7 @@ def junction_indices() -> dict[str, float]:
         "floor-int": building.junction_vibration_reduction(
             "rigid_cross", "corner", M_INT / M_FLOOR
         ),
-        "ext1-ext2": building.junction_vibration_reduction(
-            "corner", "corner", 1.0
-        ),
+        "ext1-ext2": building.junction_vibration_reduction("corner", "corner", 1.0),
         "int-ext": building.junction_vibration_reduction(
             "rigid_t", "corner", M_INT / M_EXT
         ),
@@ -171,18 +169,40 @@ def airborne_paths(situ: dict, delta_r: object) -> list:
         wall = situ[name]
         lij = COUPLING_LENGTH[name]
         cross, through = junction_paths(name, kij)
-        paths.append(building.airborne_flanking_path(
-            label=f"D{tag}", kind="Df", element_i=situ["floor"], element_j=wall,
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=SEPARATING_AREA, delta_r_i=delta_r))
-        paths.append(building.airborne_flanking_path(
-            label=f"{tag}d", kind="Fd", element_i=wall, element_j=situ["floor"],
-            vibration_reduction_index=cross, coupling_length=lij,
-            separating_area=SEPARATING_AREA))
-        paths.append(building.airborne_flanking_path(
-            label=f"{tag}{tag}", kind="Ff", element_i=wall, element_j=wall,
-            vibration_reduction_index=through, coupling_length=lij,
-            separating_area=SEPARATING_AREA))
+        paths.append(
+            building.airborne_flanking_path(
+                label=f"D{tag}",
+                kind="Df",
+                element_i=situ["floor"],
+                element_j=wall,
+                vibration_reduction_index=cross,
+                coupling_length=lij,
+                separating_area=SEPARATING_AREA,
+                delta_r_i=delta_r,
+            )
+        )
+        paths.append(
+            building.airborne_flanking_path(
+                label=f"{tag}d",
+                kind="Fd",
+                element_i=wall,
+                element_j=situ["floor"],
+                vibration_reduction_index=cross,
+                coupling_length=lij,
+                separating_area=SEPARATING_AREA,
+            )
+        )
+        paths.append(
+            building.airborne_flanking_path(
+                label=f"{tag}{tag}",
+                kind="Ff",
+                element_i=wall,
+                element_j=wall,
+                vibration_reduction_index=through,
+                coupling_length=lij,
+                separating_area=SEPARATING_AREA,
+            )
+        )
     return paths
 
 
@@ -199,9 +219,12 @@ def impact_paths(situ: dict, delta_l: object) -> list:
     kij = junction_indices()
     return [
         building.impact_flanking_path(
-            label=f"Df{tag}", floor=situ["floor"], element_j=situ[name],
+            label=f"Df{tag}",
+            floor=situ["floor"],
+            element_j=situ[name],
             vibration_reduction_index=junction_paths(name, kij)[0],
-            coupling_length=COUPLING_LENGTH[name], delta_l=delta_l,
+            coupling_length=COUPLING_LENGTH[name],
+            delta_l=delta_l,
         )
         for tag, name in enumerate_flanking()
     ]
@@ -224,7 +247,8 @@ def junction_paths(label: str, kij: dict[str, float]) -> tuple[float, float]:
 
 def floating_floor_resonance() -> float:
     """The floating floor's resonance ``fo = 160 √(s'/m')``, in hertz."""
-    return 160.0 * (
-        ref.ISO12354_ANNEX_L_FLOATING_STIFFNESS
-        / ref.ISO12354_ANNEX_L_FLOATING_MASS
-    ) ** 0.5
+    return (
+        160.0
+        * (ref.ISO12354_ANNEX_L_FLOATING_STIFFNESS / ref.ISO12354_ANNEX_L_FLOATING_MASS)
+        ** 0.5
+    )

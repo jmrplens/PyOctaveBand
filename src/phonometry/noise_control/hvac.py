@@ -168,9 +168,7 @@ _END_REFLECTION_FREE: NDArray[np.float64] = np.array(
 # 7.5 < f w < 15 unlisted. Bies Table 8.11 covers that band with 3 dB, which is
 # what the round column below carries.
 # ---------------------------------------------------------------------------
-_ELBOW_WL_UPPER: NDArray[np.float64] = np.array(
-    [0.14, 0.28, 0.55, 1.11, 2.22, np.inf]
-)
+_ELBOW_WL_UPPER: NDArray[np.float64] = np.array([0.14, 0.28, 0.55, 1.11, 2.22, np.inf])
 _ELBOW_TABLE: dict[str, NDArray[np.float64]] = {
     # square, no vanes, unlined
     "square": np.array([0, 1, 5, 8, 4, 3], dtype=float),
@@ -292,26 +290,66 @@ _FLEX_BANDS: NDArray[np.float64] = np.array(
 )
 _FLEX_INSERTION_LOSS: NDArray[np.float64] = np.array(
     [
-        [[2, 3, 3, 8, 9, 11, 7], [3, 6, 6, 16, 19, 21, 14],
-         [5, 8, 9, 23, 28, 32, 20], [6, 11, 12, 31, 37, 42, 27]],
-        [[2, 3, 4, 8, 10, 10, 7], [4, 6, 7, 16, 19, 21, 13],
-         [5, 9, 11, 24, 29, 31, 20], [7, 12, 14, 32, 38, 41, 26]],
-        [[2, 3, 4, 8, 10, 10, 7], [4, 6, 9, 17, 19, 20, 13],
-         [6, 9, 13, 25, 29, 30, 20], [8, 12, 17, 33, 38, 40, 26]],
-        [[2, 3, 5, 8, 9, 10, 6], [4, 6, 10, 17, 19, 19, 13],
-         [6, 9, 14, 25, 28, 29, 19], [8, 12, 19, 33, 37, 38, 25]],
-        [[2, 3, 5, 8, 9, 9, 6], [4, 6, 11, 17, 19, 19, 12],
-         [6, 8, 16, 25, 28, 28, 18], [8, 11, 21, 33, 37, 36, 22]],
-        [[2, 3, 6, 8, 9, 9, 6], [4, 6, 11, 17, 19, 18, 11],
-         [6, 8, 17, 25, 28, 27, 17], [8, 11, 22, 33, 37, 36, 22]],
-        [[2, 3, 6, 8, 9, 9, 5], [4, 5, 11, 16, 18, 17, 11],
-         [6, 8, 17, 24, 27, 26, 16], [8, 10, 22, 32, 36, 34, 21]],
-        [[2, 2, 5, 8, 9, 8, 5], [3, 5, 10, 15, 17, 16, 9],
-         [5, 7, 15, 23, 26, 23, 14], [7, 9, 20, 30, 34, 31, 18]],
-        [[1, 2, 4, 7, 8, 7, 4], [3, 4, 8, 14, 16, 14, 7],
-         [4, 5, 12, 20, 23, 20, 11], [5, 7, 16, 27, 31, 27, 14]],
-        [[1, 1, 2, 6, 7, 6, 2], [1, 2, 5, 12, 14, 12, 5],
-         [2, 3, 7, 17, 21, 17, 7], [2, 4, 9, 23, 28, 23, 9]],
+        [
+            [2, 3, 3, 8, 9, 11, 7],
+            [3, 6, 6, 16, 19, 21, 14],
+            [5, 8, 9, 23, 28, 32, 20],
+            [6, 11, 12, 31, 37, 42, 27],
+        ],
+        [
+            [2, 3, 4, 8, 10, 10, 7],
+            [4, 6, 7, 16, 19, 21, 13],
+            [5, 9, 11, 24, 29, 31, 20],
+            [7, 12, 14, 32, 38, 41, 26],
+        ],
+        [
+            [2, 3, 4, 8, 10, 10, 7],
+            [4, 6, 9, 17, 19, 20, 13],
+            [6, 9, 13, 25, 29, 30, 20],
+            [8, 12, 17, 33, 38, 40, 26],
+        ],
+        [
+            [2, 3, 5, 8, 9, 10, 6],
+            [4, 6, 10, 17, 19, 19, 13],
+            [6, 9, 14, 25, 28, 29, 19],
+            [8, 12, 19, 33, 37, 38, 25],
+        ],
+        [
+            [2, 3, 5, 8, 9, 9, 6],
+            [4, 6, 11, 17, 19, 19, 12],
+            [6, 8, 16, 25, 28, 28, 18],
+            [8, 11, 21, 33, 37, 36, 22],
+        ],
+        [
+            [2, 3, 6, 8, 9, 9, 6],
+            [4, 6, 11, 17, 19, 18, 11],
+            [6, 8, 17, 25, 28, 27, 17],
+            [8, 11, 22, 33, 37, 36, 22],
+        ],
+        [
+            [2, 3, 6, 8, 9, 9, 5],
+            [4, 5, 11, 16, 18, 17, 11],
+            [6, 8, 17, 24, 27, 26, 16],
+            [8, 10, 22, 32, 36, 34, 21],
+        ],
+        [
+            [2, 2, 5, 8, 9, 8, 5],
+            [3, 5, 10, 15, 17, 16, 9],
+            [5, 7, 15, 23, 26, 23, 14],
+            [7, 9, 20, 30, 34, 31, 18],
+        ],
+        [
+            [1, 2, 4, 7, 8, 7, 4],
+            [3, 4, 8, 14, 16, 14, 7],
+            [4, 5, 12, 20, 23, 20, 11],
+            [5, 7, 16, 27, 31, 27, 14],
+        ],
+        [
+            [1, 1, 2, 6, 7, 6, 2],
+            [1, 2, 5, 12, 14, 12, 5],
+            [2, 3, 7, 17, 21, 17, 7],
+            [2, 4, 9, 23, 28, 23, 9],
+        ],
     ],
     dtype=float,
 )
@@ -337,9 +375,7 @@ _TERMINAL_VELOCITY_LIMIT: dict[str, dict[int, float]] = {
 # be added to the diffuser sound rating to allow for throttling of a volume
 # damper, keyed by the damper pressure ratio and by where the damper sits.
 # ---------------------------------------------------------------------------
-_DAMPER_PRESSURE_RATIOS: NDArray[np.float64] = np.array(
-    [1.5, 2.0, 2.5, 3.0, 4.0, 6.0]
-)
+_DAMPER_PRESSURE_RATIOS: NDArray[np.float64] = np.array([1.5, 2.0, 2.5, 3.0, 4.0, 6.0])
 _DAMPER_CORRECTION: dict[str, NDArray[np.float64]] = {
     "diffuser_neck": np.array([5, 9, 12, 15, 18, 24], dtype=float),
     "plenum_inlet": np.array([2, 3, 4, 5, 6, 9], dtype=float),
@@ -400,7 +436,9 @@ class HvacSpectrumResult:
     quantity: str
     label: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the quantity against a continuous log-frequency axis.
 
         Requires matplotlib (``pip install phonometry[plot]``).
@@ -504,7 +542,9 @@ def end_reflection_loss(
     """
     if require_choice(method, "method", ("bies", "long")) == "long":
         return end_reflection_loss_closed_form(
-            frequencies, diameter, termination=termination,
+            frequencies,
+            diameter,
+            termination=termination,
             speed_of_sound=speed_of_sound,
         )
     f = _frequencies(frequencies)
@@ -525,7 +565,9 @@ def end_reflection_loss(
     )
     values = np.interp(np.log(f), log_f_band, per_band)
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=f"End reflection ({termination}, D = {diameter * 1000:.0f} mm)",
     )
 
@@ -574,7 +616,9 @@ def elbow_insertion_loss(
     idx = np.clip(idx, 0, col.size - 1)
     values = col[idx]
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=f"Elbow ({key.replace('_', ', ')}, W = {w * 1000:.0f} mm)",
     )
 
@@ -656,7 +700,9 @@ def flow_noise_straight_duct(
         - 26.0 * np.log10(1.14 + 0.02 * f / u)
     )
     return HvacSpectrumResult(
-        frequencies=f, values=lw, quantity="sound_power_level",
+        frequencies=f,
+        values=lw,
+        quantity="sound_power_level",
         label=f"Straight-duct flow noise (U = {u:.1f} m/s)",
     )
 
@@ -704,7 +750,9 @@ def flow_noise_bend(
     ns = f * h / u
     lw = lws - 10.0 * np.log10(1.0 + 0.165 * ns**2) + 30.0 * np.log10(u) - 103.0
     return HvacSpectrumResult(
-        frequencies=f, values=lw, quantity="sound_power_level",
+        frequencies=f,
+        values=lw,
+        quantity="sound_power_level",
         label=f"Mitred-bend flow noise (U = {u:.1f} m/s)",
     )
 
@@ -826,7 +874,9 @@ def fan_sound_power(
 
     lw = _FAN_LEVEL_CORRECTION[kind][idx] + duty + c_eff + increment[idx]
     return HvacSpectrumResult(
-        frequencies=f, values=lw, quantity="sound_power_level",
+        frequencies=f,
+        values=lw,
+        quantity="sound_power_level",
         label=f"Fan ({kind.replace('_', ' ')}, {q * 3600:.0f} m3/h, {p:.0f} Pa)",
     )
 
@@ -851,8 +901,10 @@ def fan_casing_attenuation(
     """
     f, idx = _octave_slots(frequencies)
     return HvacSpectrumResult(
-        frequencies=f, values=_FAN_CASING_ATTENUATION[idx].copy(),
-        quantity="attenuation", label="Fan casing",
+        frequencies=f,
+        values=_FAN_CASING_ATTENUATION[idx].copy(),
+        quantity="attenuation",
+        label="Fan casing",
     )
 
 
@@ -907,7 +959,9 @@ def unlined_rectangular_duct_attenuation(
     high = np.full_like(f, 0.02 * ps**0.8 * ell)
     values = np.where(f <= 250.0 * 1.05, low, high)
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=(
             f"Unlined rectangular duct ({width * 1000:.0f} x {height * 1000:.0f} mm, "
             f"{length:.2f} m)"
@@ -935,7 +989,8 @@ def unlined_circular_duct_attenuation(
     f, idx = _octave_slots(frequencies)
     ell = require_positive(length, "length") / _M_PER_FT
     return HvacSpectrumResult(
-        frequencies=f, values=_UNLINED_CIRCULAR_DB_PER_FT[idx] * ell,
+        frequencies=f,
+        values=_UNLINED_CIRCULAR_DB_PER_FT[idx] * ell,
         quantity="attenuation",
         label=f"Unlined circular duct ({length:.2f} m)",
     )
@@ -981,11 +1036,13 @@ def lined_rectangular_duct_attenuation(
         _LINED_RECT_B[idx] * ps ** _LINED_RECT_C[idx] * t_in ** _LINED_RECT_D[idx] * ell
     )
     if include_unlined:
-        values = values + unlined_rectangular_duct_attenuation(
-            f, width, height, length
-        ).values
+        values = (
+            values
+            + unlined_rectangular_duct_attenuation(f, width, height, length).values
+        )
     return HvacSpectrumResult(
-        frequencies=f, values=np.minimum(values, _LINED_DUCT_LIMIT),
+        frequencies=f,
+        values=np.minimum(values, _LINED_DUCT_LIMIT),
         quantity="attenuation",
         label=(
             f"Lined rectangular duct ({width * 1000:.0f} x {height * 1000:.0f} mm, "
@@ -1027,7 +1084,9 @@ def lined_circular_duct_attenuation(
     rate = a + b * t_in + c * t_in**2 + d * d_in + e * d_in**2 + g * d_in**3
     values = np.clip(rate * ell, 0.0, _LINED_DUCT_LIMIT)
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=(
             f"Lined circular duct (D = {diameter * 1000:.0f} mm, {length:.2f} m, "
             f"{lining_thickness * 1000:.0f} mm lining)"
@@ -1076,7 +1135,9 @@ def flexible_duct_insertion_loss(
         [np.interp(np.log(d_in), log_d, per_diameter[:, j]) for j in range(idx.size)]
     )
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=f"Flexible duct (D = {diameter * 1000:.0f} mm, {length:.2f} m)",
     )
 
@@ -1161,7 +1222,9 @@ def end_reflection_loss_closed_form(
     factor = 0.8 if kind == "flush" else 1.0
     values = 10.0 * np.log10(1.0 + (factor * c / (np.pi * f * d)) ** 1.88)
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=f"End reflection ({kind}, D = {d * 1000:.0f} mm)",
     )
 
@@ -1241,12 +1304,12 @@ def splitter_silencer_insertion_loss(
             for width in widths
         ]
     )
-    values = -10.0 * np.log10(
-        np.mean(10.0 ** (-per_airway / 10.0), axis=0)
-    )
+    values = -10.0 * np.log10(np.mean(10.0 ** (-per_airway / 10.0), axis=0))
     f, _ = _octave_slots(frequencies)
     return HvacSpectrumResult(
-        frequencies=f, values=values, quantity="attenuation",
+        frequencies=f,
+        values=values,
+        quantity="attenuation",
         label=(
             f"Splitter silencer ({widths.size} airways, {length:.2f} m, "
             f"{thickness * 1000:.0f} mm splitters)"
@@ -1305,7 +1368,8 @@ def silencer_self_noise(
         - 45.0
     )
     return HvacSpectrumResult(
-        frequencies=f, values=overall - _SILENCER_SELF_NOISE_CORRECTION[idx],
+        frequencies=f,
+        values=overall - _SILENCER_SELF_NOISE_CORRECTION[idx],
         quantity="sound_power_level",
         label=f"Silencer self-noise (V = {v:.1f} m/s, N = {passages})",
     )
@@ -1473,9 +1537,7 @@ def air_terminal_damper_correction(
     """
     ratio = require_positive(pressure_ratio, "pressure_ratio")
     key = require_choice(location, "location", tuple(_DAMPER_CORRECTION))
-    return float(
-        np.interp(ratio, _DAMPER_PRESSURE_RATIOS, _DAMPER_CORRECTION[key])
-    )
+    return float(np.interp(ratio, _DAMPER_PRESSURE_RATIOS, _DAMPER_CORRECTION[key]))
 
 
 # ---------------------------------------------------------------------------

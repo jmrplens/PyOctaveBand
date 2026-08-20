@@ -343,9 +343,7 @@ def absorption_from_reflection(reflection: ArrayLike) -> Real:
     return np.asarray(1.0 - np.abs(r) ** 2, dtype=np.float64)
 
 
-def mic_calibration_factor(
-    h12_config1: ArrayLike, h12_config2: ArrayLike
-) -> Complex:
+def mic_calibration_factor(h12_config1: ArrayLike, h12_config2: ArrayLike) -> Complex:
     r"""Microphone-mismatch calibration factor ``Hc`` (ISO 10534-2, Eq. (10)).
 
     :math:`H_\mathrm{c} = \sqrt{H_{12}^{I} / H_{12}^{II}}` from a transfer function measured on an
@@ -490,7 +488,9 @@ class ImpedanceTubeResult:
     diameter: float | None = None
     shape: str | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the absorption spectrum ``alpha(f)`` with ``|r|`` overlaid.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

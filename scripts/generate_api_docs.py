@@ -75,9 +75,7 @@ _FIELD_NAMES = (
     "vartype",
     "warns",
 )
-_FIELD_RE = re.compile(
-    r"^:(" + "|".join(_FIELD_NAMES) + r")(\s+[^:]*)?:\s?(.*)$"
-)
+_FIELD_RE = re.compile(r"^:(" + "|".join(_FIELD_NAMES) + r")(\s+[^:]*)?:\s?(.*)$")
 #: Any line that looks like a reST field (to detect unsupported field names).
 _FIELD_LIKE_RE = re.compile(r"^:(\w+)(\s+[^:`]*)?:(\s|$)")
 #: A supported field starting mid-line inside another field's description
@@ -280,9 +278,7 @@ def _consume_indented(lines: list[str], start: int, indent: int) -> int:
 
 
 def _dedent_block(lines: list[str]) -> list[str]:
-    indents = [
-        len(line) - len(line.lstrip()) for line in lines if line.strip()
-    ]
+    indents = [len(line) - len(line.lstrip()) for line in lines if line.strip()]
     if not indents:
         return [line.strip() for line in lines]
     cut = min(indents)
@@ -450,9 +446,7 @@ def render_cell(text: str, xref: dict[str, str], stats: RoleStats) -> str:
     escaping below cannot reach into a formula.
     """
     rendered = render_inline(text, xref, stats)
-    return _INLINE_MATH_RE.sub(_math_bars_to_commands, rendered).replace(
-        "|", "\\|"
-    )
+    return _INLINE_MATH_RE.sub(_math_bars_to_commands, rendered).replace("|", "\\|")
 
 
 # --------------------------------------------------------------------------
@@ -640,10 +634,7 @@ def _format_one_signature(
         elif saw_positional_only:
             parts.append("/")
             saw_positional_only = False
-        if (
-            parameter.kind is inspect.Parameter.KEYWORD_ONLY
-            and not star_emitted
-        ):
+        if parameter.kind is inspect.Parameter.KEYWORD_ONLY and not star_emitted:
             parts.append("*")
             star_emitted = True
         if parameter.kind is inspect.Parameter.VAR_POSITIONAL:
@@ -653,9 +644,7 @@ def _format_one_signature(
         parts.append("/")
 
     returns = ""
-    if not omit_return and signature.return_annotation is not (
-        inspect.Signature.empty
-    ):
+    if not omit_return and signature.return_annotation is not (inspect.Signature.empty):
         returns = f" -> {_format_annotation(signature.return_annotation)}"
     one_line = f"{name}({', '.join(parts)}){returns}"
     if len(one_line) <= _MAX_SIGNATURE_LINE or not parts:
@@ -704,9 +693,7 @@ def _class_methods(
     name: str, cls: type, slugger: _Slugger, issues: list[str]
 ) -> tuple[MethodDoc, ...]:
     methods: list[MethodDoc] = []
-    for attr_name in _sorted_names(
-        [n for n in vars(cls) if not n.startswith("_")]
-    ):
+    for attr_name in _sorted_names([n for n in vars(cls) if not n.startswith("_")]):
         raw = inspect.getattr_static(cls, attr_name)
         qualified = f"{name}.{attr_name}"
         kind: str
@@ -1158,12 +1145,16 @@ def render_index(
     out = [
         "---",
         'title: "API Reference"',
-        ('description: "Every public function, class and constant in '
-        'phonometry, generated from the source docstrings."'),
+        (
+            'description: "Every public function, class and constant in '
+            'phonometry, generated from the source docstrings."'
+        ),
         "---",
         "",
-        ("The complete public API, one page per module. Import the domain "
-        "subpackage and call through it:"),
+        (
+            "The complete public API, one page per module. Import the domain "
+            "subpackage and call through it:"
+        ),
         "",
         BANNER,
         "",
@@ -1174,16 +1165,22 @@ def render_index(
         "snr = underwater.passive_sonar_equation(185.0, 60.0, 50.0)",
         "```",
         "",
-        ("Every documented name can also be imported directly from the "
-        "top-level package (`from phonometry import leq`)."),
+        (
+            "Every documented name can also be imported directly from the "
+            "top-level package (`from phonometry import leq`)."
+        ),
         "",
         ":::note",
-        ("The API reference is generated from the English source docstrings "
-        "and is published in English only."),
+        (
+            "The API reference is generated from the English source docstrings "
+            "and is published in English only."
+        ),
         "",
-        ("La referencia de la API se genera a partir de los docstrings del "
-        "código (en inglés) y se publica únicamente en inglés; las rutas en "
-        "español muestran esta versión inglesa como alternativa."),
+        (
+            "La referencia de la API se genera a partir de los docstrings del "
+            "código (en inglés) y se publica únicamente en inglés; las rutas en "
+            "español muestran esta versión inglesa como alternativa."
+        ),
         ":::",
         "",
     ]
@@ -1202,14 +1199,8 @@ def render_index(
         for page in by_section[section.key]:
             # First sentence of the first paragraph (an opening sentence may
             # wrap across several physical source lines).
-            paragraph = (
-                page.intro.strip().split("\n\n", 1)[0].replace("\n", " ")
-            )
-            summary = (
-                paragraph.split(". ", 1)[0].rstrip(".") + "."
-                if paragraph
-                else ""
-            )
+            paragraph = page.intro.strip().split("\n\n", 1)[0].replace("\n", " ")
+            summary = paragraph.split(". ", 1)[0].rstrip(".") + "." if paragraph else ""
             cell = render_cell(summary, xref, stats)
             out.append(f"| [`{page.title}`]({page.url}) | {cell} |")
         out.append("")
@@ -1301,9 +1292,7 @@ def generate(content_dir: Path, sidebar_path: Path) -> Report:
             newline="\n",
         )
     sidebar_path.parent.mkdir(parents=True, exist_ok=True)
-    sidebar_path.write_text(
-        render_sidebar(pages), encoding="utf-8", newline="\n"
-    )
+    sidebar_path.write_text(render_sidebar(pages), encoding="utf-8", newline="\n")
     members = sum(len(page.members) for page in pages)
     return Report(
         pages=len(pages) + 1,
@@ -1316,9 +1305,7 @@ def generate(content_dir: Path, sidebar_path: Path) -> Report:
 
 def main() -> int:
     report = generate(CONTENT_DIR, SIDEBAR_PATH)
-    print(
-        f"API reference: {report.pages} pages, {report.members} public names."
-    )
+    print(f"API reference: {report.pages} pages, {report.members} public names.")
     print(
         f"Cross-references: {report.stats.resolved} linked, "
         f"{report.stats.degraded} degraded to inline code."

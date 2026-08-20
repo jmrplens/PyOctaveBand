@@ -141,7 +141,9 @@ def _condition(condition: str) -> str:
     return condition
 
 
-def _finite_bands(values: float | Sequence[float] | np.ndarray, name: str) -> np.ndarray:
+def _finite_bands(
+    values: float | Sequence[float] | np.ndarray, name: str
+) -> np.ndarray:
     a = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if not np.all(np.isfinite(a)):
         raise ValueError(f"'{name}' must contain only finite values.")
@@ -214,7 +216,9 @@ class AbsorptionUncertaintyResult:
         """Upper interval bound ``value + U`` (exact ``U``)."""
         return np.asarray(self.values + self.expanded_uncertainty, dtype=np.float64)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the quantity with its ``±U`` uncertainty ribbon (band quantities).
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

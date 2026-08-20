@@ -75,8 +75,7 @@ def _basis(
             language,
         ).format(standard=html.escape(", ".join(standards)))
     return t(
-        "Declaration and verification of noise emission values per "
-        "ISO 4871:1996.",
+        "Declaration and verification of noise emission values per ISO 4871:1996.",
         language,
     )
 
@@ -175,8 +174,10 @@ def _single_rows(
                 "L<sub>WAd</sub> (ref. 1 pW), in decibels",
                 language,
             ),
-            [format_number(m.declared_sound_power_level, language, decimals=0)
-             for m in modes],
+            [
+                format_number(m.declared_sound_power_level, language, decimals=0)
+                for m in modes
+            ],
         )
     ]
     if any(m.emission_pressure_level is not None for m in modes):
@@ -189,7 +190,9 @@ def _single_rows(
                     language,
                 ),
                 [
-                    _emission_declared_cell(m.declared_emission_pressure_level, language)
+                    _emission_declared_cell(
+                        m.declared_emission_pressure_level, language
+                    )
                     for m in modes
                 ],
             )
@@ -227,25 +230,44 @@ def _declaration_table(
     light = colors.HexColor(_LIGHT_HEX)
 
     ident_label_style = ParagraphStyle(
-        "iso4871_ident_label", parent=styles["Normal"], fontSize=8,
-        leading=11, textColor=colors.HexColor(_MUTED_HEX),
+        "iso4871_ident_label",
+        parent=styles["Normal"],
+        fontSize=8,
+        leading=11,
+        textColor=colors.HexColor(_MUTED_HEX),
     )
     ident_value_style = ParagraphStyle(
-        "iso4871_ident_value", parent=styles["Normal"], fontSize=9, leading=12,
+        "iso4871_ident_value",
+        parent=styles["Normal"],
+        fontSize=9,
+        leading=12,
     )
     banner_style = ParagraphStyle(
-        "iso4871_banner", parent=styles["Normal"], fontSize=9.5, leading=13,
-        alignment=1, textColor=colors.white,
+        "iso4871_banner",
+        parent=styles["Normal"],
+        fontSize=9.5,
+        leading=13,
+        alignment=1,
+        textColor=colors.white,
     )
     col_header_style = ParagraphStyle(
-        "iso4871_col_header", parent=styles["Normal"], fontSize=8.5, leading=11,
+        "iso4871_col_header",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
         alignment=1,
     )
     label_style = ParagraphStyle(
-        "iso4871_row_label", parent=styles["Normal"], fontSize=8.5, leading=11,
+        "iso4871_row_label",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
     )
     value_style = ParagraphStyle(
-        "iso4871_row_value", parent=styles["Normal"], fontSize=8.5, leading=11,
+        "iso4871_row_value",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        leading=11,
         alignment=1,
     )
 

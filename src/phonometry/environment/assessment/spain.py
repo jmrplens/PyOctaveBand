@@ -143,14 +143,16 @@ RD1367_PERIOD_CLOCK_LIMITS: Mapping[str, tuple[int, int]] = MappingProxyType(
 RD1367_MAX_CORRECTION = 9.0
 
 #: The acoustic area types of Article 7 of Ley 37/2003, keyed by their letter.
-ACOUSTIC_AREA_TYPES: Mapping[str, str] = MappingProxyType({
-    "e": "sanitary, educational and cultural land use requiring special protection",
-    "a": "residential land use",
-    "d": "tertiary land use other than type c",
-    "c": "recreational and public-entertainment land use",
-    "b": "industrial land use",
-    "f": "general transport-infrastructure systems and public facilities",
-})
+ACOUSTIC_AREA_TYPES: Mapping[str, str] = MappingProxyType(
+    {
+        "e": "sanitary, educational and cultural land use requiring special protection",
+        "a": "residential land use",
+        "d": "tertiary land use other than type c",
+        "c": "recreational and public-entertainment land use",
+        "b": "industrial land use",
+        "f": "general transport-infrastructure systems and public facilities",
+    }
+)
 
 #: Accepted spellings of an acoustic area type, mapped to its letter code.
 _AREA_ALIASES: dict[str, str] = {
@@ -314,8 +316,7 @@ def _check_period(period: str) -> str:
     key = str(period).strip().lower()
     if key not in RD1367_EVALUATION_PERIODS:
         raise ValueError(
-            "'period' must be one of 'day', 'evening', 'night'; got "
-            f"{period!r}."
+            f"'period' must be one of 'day', 'evening', 'night'; got {period!r}."
         )
     return key
 
@@ -364,7 +365,9 @@ class TonalCorrectionResult:
     correction: float
     governing_frequency: float | None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the band spectrum with the emergent-tone differences ``Lt``."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_tonal_correction_rd1367
@@ -377,9 +380,8 @@ class TonalCorrectionResult:
 def _kt_thresholds(frequency: float) -> tuple[float, float] | None:
     """The (lower, upper) ``Lt`` thresholds for a band centre, or ``None``."""
     for low, high, lower, upper in _KT_BANDS:
-        if (
-            frequency >= low * (1.0 - _BAND_TOLERANCE)
-            and frequency <= high * (1.0 + _BAND_TOLERANCE)
+        if frequency >= low * (1.0 - _BAND_TOLERANCE) and frequency <= high * (
+            1.0 + _BAND_TOLERANCE
         ):
             return lower, upper
     return None
@@ -532,9 +534,7 @@ def low_frequency_correction(lceq: float, laeq: float) -> float:
     :return: ``Kf`` in dB (0, 3 or 6).
     :raises ValueError: If either level is not finite.
     """
-    return _graded_correction(
-        _finite(lceq, "lceq") - _finite(laeq, "laeq")
-    )
+    return _graded_correction(_finite(lceq, "lceq") - _finite(laeq, "laeq"))
 
 
 def impulsive_correction(laieq: float, laeq: float) -> float:
@@ -559,9 +559,7 @@ def impulsive_correction(laieq: float, laeq: float) -> float:
     :return: ``Ki`` in dB (0, 3 or 6).
     :raises ValueError: If either level is not finite.
     """
-    return _graded_correction(
-        _finite(laieq, "laieq") - _finite(laeq, "laeq")
-    )
+    return _graded_correction(_finite(laieq, "laieq") - _finite(laeq, "laeq"))
 
 
 #: The only values a single correction can take (Annex IV A.3.3): each of the
@@ -831,8 +829,7 @@ def outdoor_quality_objectives(
     state = str(urbanisation).strip().lower()
     if state not in ("existing", "new"):
         raise ValueError(
-            "'urbanisation' must be 'existing' or 'new'; got "
-            f"{urbanisation!r}."
+            f"'urbanisation' must be 'existing' or 'new'; got {urbanisation!r}."
         )
     offset = 0.0 if state == "existing" else -5.0
     suffix = (
@@ -864,9 +861,7 @@ def _indoor_key(
     return use, room
 
 
-def indoor_quality_objectives(
-    building_use: str, room_type: str
-) -> RegulationLimits:
+def indoor_quality_objectives(building_use: str, room_type: str) -> RegulationLimits:
     """Indoor acoustic quality objectives ``Ld``/``Le``/``Ln`` (Annex II Table B).
 
     The objectives that the *whole set* of emitters reaching a habitable room
@@ -964,9 +959,7 @@ def activity_limits(area_type: str) -> RegulationLimits:
     )
 
 
-def adjacent_premises_limits(
-    building_use: str, room_type: str
-) -> RegulationLimits:
+def adjacent_premises_limits(building_use: str, room_type: str) -> RegulationLimits:
     """Limits on noise transmitted to adjacent premises (Annex III Table B2).
 
     Two premises are acoustically adjacent when noise never travels between
@@ -1041,9 +1034,7 @@ class PeriodAssessment:
     def complies(self) -> bool:
         """Whether every evaluated criterion of this period is met."""
         return (
-            self.phase_pass
-            and self.daily_pass
-            and (self.long_term_pass is not False)
+            self.phase_pass and self.daily_pass and (self.long_term_pass is not False)
         )
 
 
@@ -1068,7 +1059,9 @@ class ActivityAssessment:
         """Whether every period meets every evaluated criterion."""
         return all(p.complies for p in self.periods)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-period indices against their RD 1367/2007 limits."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_activity_assessment
@@ -1149,8 +1142,7 @@ def _validate_annual_inputs(
         return
     if int(operating_days) != operating_days:
         raise ValueError(
-            "'operating_days' must be a whole number of days; got "
-            f"{operating_days!r}."
+            f"'operating_days' must be a whole number of days; got {operating_days!r}."
         )
     if not 0 < int(operating_days) <= int(year_days):
         raise ValueError(

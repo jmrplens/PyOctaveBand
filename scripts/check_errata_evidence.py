@@ -59,54 +59,30 @@ REGISTRY = ROOT / "docs" / "ERRATA.md"
 #: its Evidence bullet, not adding a new line here. A ratio hit is never
 #: excused by membership of this list.
 PAGE_CITATION_ALLOWLIST: dict[str, str] = {
-    "ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (perimeter sums)":
-        "the claim is about five recomputed sums, not about printed characters",
-    "ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (external wall ηint)":
-        "the claim is a recomputation of Formula (C.1), not a character reading",
-    "ISO 12354-1:2017, Table L.4 (second path block labelled 2d)":
-        "the claim is that three recomputed columns identify a different path",
-    "ISO 12354-2:2017, Table G.1 (50 Hz to 80 Hz flanking columns)":
-        "the claim is a band-by-band recomputation of two printed tables",
-    "ISO 10848-1:2006, Clause 8.1.1, Formula (20) (spurious π in the critical frequency)":
-        "filed before the page rule; corrected upstream in the 2017 edition",
-    "ISO 12999-1:2020, Table 4 (missing 500 Hz row)":
-        "the claim is that a row is absent, which no reading of a page can show",
-    "ISO 10052:2021, Table 4 volume-range header":
-        "filed before the page rule",
-    "ECMA-418-2:2025 (4th edition), clause 5.1.5.2 (last block index)":
-        "filed before the page rule",
-    "ECMA-418-2:2025 (4th edition), clause 9.1.4, Formula (127) (HSA kernel phase)":
-        "filed before the page rule",
-    "ECMA-418-2:2025 (4th edition), clause 9.1.5, Formula (144) (bin offset)":
-        "filed before the page rule",
-    "ECMA-418-2:2025 (4th edition), clause 9.1.7 (units of the fine-tuning constants)":
-        "filed before the page rule",
-    "ECMA-418-2:2025 (4th edition), clause 9 introduction (broken cross-reference)":
-        "filed before the page rule",
-    "UNE-EN 61043:1999, clause 6.1 (class 2 frequency range dropped in translation)":
-        "filed before the page rule; the claim is a comparison of two prose sentences",
-    "ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)":
-        "filed before the page rule; the held copy is a scan without a text layer",
-    "ISO 9613-2:1996, Table 2 (15 °C / 80 % / 1 kHz cell)":
-        "filed before the page rule",
-    "ANSI S3.5-1997, Annex C worked examples (official WG S3-79 errata)":
-        "the standard is not held locally; the entry says so in a leading notice",
-    "ANSI S3.5-1997, captions of Tables 1 to 4 (official WG S3-79 erratum)":
-        "the standard is not held locally; the entry says so in a leading notice",
-    "NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (21)":
-        "filed before the page rule",
-    "NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), §A.3.1 triangulation":
-        "the claim is about shipped lookup tables, not about printed characters",
-    "NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (46)":
-        "filed before the page rule",
-    "RANDI 3.1 Physics Description (NRL, Breeding et al.), Table 2":
-        "filed before the page rule",
-    "Jiménez, Groby, Pagneux & Romero-García (2017), Appl. Sci. 7(6), 618, Eqs. (7)-(8)":
-        "filed before the page rule",
-    "Jiménez et al. (2017), Appl. Sci. 7(6), 618 / Sci. Rep. 7, 5389, slit-radiation term":
-        "filed before the page rule",
-    "Bies, Hansen & Howard, Engineering Noise Control 5e (2017), Eq. (8.141)":
-        "filed before the page rule",
+    "ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (perimeter sums)": "the claim is about five recomputed sums, not about printed characters",
+    "ISO 12354-1:2017 Table L.3 / ISO 12354-2:2017 Table G.3 (external wall ηint)": "the claim is a recomputation of Formula (C.1), not a character reading",
+    "ISO 12354-1:2017, Table L.4 (second path block labelled 2d)": "the claim is that three recomputed columns identify a different path",
+    "ISO 12354-2:2017, Table G.1 (50 Hz to 80 Hz flanking columns)": "the claim is a band-by-band recomputation of two printed tables",
+    "ISO 10848-1:2006, Clause 8.1.1, Formula (20) (spurious π in the critical frequency)": "filed before the page rule; corrected upstream in the 2017 edition",
+    "ISO 12999-1:2020, Table 4 (missing 500 Hz row)": "the claim is that a row is absent, which no reading of a page can show",
+    "ISO 10052:2021, Table 4 volume-range header": "filed before the page rule",
+    "ECMA-418-2:2025 (4th edition), clause 5.1.5.2 (last block index)": "filed before the page rule",
+    "ECMA-418-2:2025 (4th edition), clause 9.1.4, Formula (127) (HSA kernel phase)": "filed before the page rule",
+    "ECMA-418-2:2025 (4th edition), clause 9.1.5, Formula (144) (bin offset)": "filed before the page rule",
+    "ECMA-418-2:2025 (4th edition), clause 9.1.7 (units of the fine-tuning constants)": "filed before the page rule",
+    "ECMA-418-2:2025 (4th edition), clause 9 introduction (broken cross-reference)": "filed before the page rule",
+    "UNE-EN 61043:1999, clause 6.1 (class 2 frequency range dropped in translation)": "filed before the page rule; the claim is a comparison of two prose sentences",
+    "ISO/PAS 1996-3:2022, Clause 5 (cross-references of r and d)": "filed before the page rule; the held copy is a scan without a text layer",
+    "ISO 9613-2:1996, Table 2 (15 °C / 80 % / 1 kHz cell)": "filed before the page rule",
+    "ANSI S3.5-1997, Annex C worked examples (official WG S3-79 errata)": "the standard is not held locally; the entry says so in a leading notice",
+    "ANSI S3.5-1997, captions of Tables 1 to 4 (official WG S3-79 erratum)": "the standard is not held locally; the entry says so in a leading notice",
+    "NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (21)": "filed before the page rule",
+    "NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), §A.3.1 triangulation": "the claim is about shipped lookup tables, not about printed characters",
+    "NORAH2 rotorcraft guidance SC01.D1.5d (EASA.2020.FC.06), Eq. (46)": "filed before the page rule",
+    "RANDI 3.1 Physics Description (NRL, Breeding et al.), Table 2": "filed before the page rule",
+    "Jiménez, Groby, Pagneux & Romero-García (2017), Appl. Sci. 7(6), 618, Eqs. (7)-(8)": "filed before the page rule",
+    "Jiménez et al. (2017), Appl. Sci. 7(6), 618 / Sci. Rep. 7, 5389, slit-radiation term": "filed before the page rule",
+    "Bies, Hansen & Howard, Engineering Noise Control 5e (2017), Eq. (8.141)": "filed before the page rule",
 }
 
 #: A page citation: the PDF page index and the printed folio, anchored to the
@@ -345,7 +321,11 @@ def check_pages(entries: list[Entry]) -> list[str]:
             continue
         if entry.title in PAGE_CITATION_ALLOWLIST:
             continue
-        where = "in its Evidence bullet" if entry.evidence else "(it has no Evidence bullet)"
+        where = (
+            "in its Evidence bullet"
+            if entry.evidence
+            else "(it has no Evidence bullet)"
+        )
         problems.append(
             f"{REGISTRY.name}:{entry.line}: entry '{entry.title}' cites no page "
             f"{where}. Add 'Verified on PDF page N (printed p. M) of "

@@ -248,7 +248,10 @@ def test_sensitivity_step_stays_local_on_nonlinear_model() -> None:
     uncertainty scale, a sqrt(eps)*|x| step (~15 units at 1e9) would probe
     far outside the uncertainty region and bias the sensitivity."""
     x0, ux = 1.0e9, 1.0e-3
-    model = lambda x: math.sin((x - 1.0e9) / 1.0e-2)
+
+    def model(x):
+        return math.sin((x - 1.0e9) / 1.0e-2)
+
     result = u.combine_uncertainty(model, [u.Quantity(x0, ux)])
     # d/dx sin((x-x0)/1e-2) at x0 = 100; sensitivity must be ~100, not the
     # aliased near-zero value a 15-unit step returns.
@@ -271,9 +274,7 @@ def test_sensitivity_step_survives_tiny_relative_uncertainty() -> None:
     qs = [u.Quantity(1e9, 1e-6), u.Quantity(1e9, 1e-6)]
     result = u.combine_uncertainty(lambda a, b: a + b, qs)
     np.testing.assert_allclose(result.sensitivities, 1.0, rtol=1e-6)
-    assert result.combined_uncertainty == pytest.approx(
-        math.sqrt(2.0) * 1e-6, rel=1e-6
-    )
+    assert result.combined_uncertainty == pytest.approx(math.sqrt(2.0) * 1e-6, rel=1e-6)
 
 
 def test_flat_direction_warns_but_computes() -> None:
@@ -296,8 +297,12 @@ def _h1_budget() -> u.UncertaintyResult:
     qs = [u.Quantity(v, unc, dof=dof) for v, unc, dof in GUM_H1_INPUTS]
 
     def model(
-        ls: float, d: float, alpha_s: float, theta: float,
-        dalpha: float, dtheta: float,
+        ls: float,
+        d: float,
+        alpha_s: float,
+        theta: float,
+        dalpha: float,
+        dtheta: float,
     ) -> float:
         return ls + d - ls * (dalpha * theta + alpha_s * dtheta)
 
@@ -322,9 +327,7 @@ def test_gum_h1_end_to_end_combined_uncertainty() -> None:
     result = _h1_budget()
     assert result.value == pytest.approx(GUM_H1_VALUE, abs=0.5)
     assert result.combined_uncertainty == pytest.approx(GUM_H1_UC, abs=0.01)
-    np.testing.assert_allclose(
-        result.contributions, GUM_H1_CONTRIBUTIONS, atol=0.05
-    )
+    np.testing.assert_allclose(result.contributions, GUM_H1_CONTRIBUTIONS, atol=0.05)
     assert result.effective_dof == pytest.approx(GUM_H1_VEFF, abs=0.01)
 
 
@@ -374,9 +377,7 @@ def test_gum_h2_correlated_measurement() -> None:
         else:
             result = u.combine_uncertainty(model, qs, correlation=r)
         assert result.value == pytest.approx(expected_value, abs=5e-3), name
-        assert result.combined_uncertainty == pytest.approx(
-            expected_uc, abs=1e-3
-        ), name
+        assert result.combined_uncertainty == pytest.approx(expected_uc, abs=1e-3), name
 
 
 def test_monte_carlo_matches_supplement1_table2_gaussian() -> None:

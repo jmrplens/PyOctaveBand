@@ -60,8 +60,14 @@ def _result():
         np.exp(1j * kk * _X1) + r * np.exp(-1j * kk * _X1)
     )
     return two_microphone_impedance(
-        h12, frequency=_FREQS, spacing=_SPACING, x1=_X1, speed_of_sound=c0,
-        characteristic_impedance=rc, diameter=_DIAMETER, shape="circular",
+        h12,
+        frequency=_FREQS,
+        spacing=_SPACING,
+        x1=_X1,
+        speed_of_sound=c0,
+        characteristic_impedance=rc,
+        diameter=_DIAMETER,
+        shape="circular",
     )
 
 
@@ -97,9 +103,9 @@ def _assert_one_page(path: str) -> None:
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
-    return "\n".join(
-        page.extract_text() for page in PdfReader(path).pages
-    ).replace("\n", " ")
+    return "\n".join(page.extract_text() for page in PdfReader(path).pages).replace(
+        "\n", " "
+    )
 
 
 def test_report_writes_one_page_pdf(tmp_path) -> None:
@@ -156,9 +162,7 @@ def test_verbose_shows_reflection_column_one_page(tmp_path) -> None:
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "iso10534_xml.pdf"
-    _result().report(
-        str(out), metadata=_metadata(specimen="Panel <A> & <B> \"edge\"")
-    )
+    _result().report(str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"'))
     _assert_one_page(str(out))
 
 

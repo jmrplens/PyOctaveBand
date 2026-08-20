@@ -104,8 +104,7 @@ def test_bext_rides_the_application_block_field_for_field(
     got = read(path).provenance
     assert got is not None
     expected_history = (
-        meta.coding_history
-        + f"A=FLAC,F={FS},W=24,M=mono,T=phonometry {__version__}"
+        meta.coding_history + f"A=FLAC,F={FS},W=24,M=mono,T=phonometry {__version__}"
     )
     assert got == replace(meta, coding_history=expected_history)
     # info() surfaces the same chunk without decoding a single frame.
@@ -138,7 +137,7 @@ def test_application_block_bytes_match_the_reference_convention(
     application = None
     pos = 4
     while True:
-        header = blob[pos:pos + 4]
+        header = blob[pos : pos + 4]
         # One byte: last-block flag in bit 7, type in bits 6-0; then a
         # 24-bit big-endian length (RFC 9639 section 8.1).
         block_type = header[0] & 0x7F
@@ -147,7 +146,7 @@ def test_application_block_bytes_match_the_reference_convention(
         if block_type == 2:  # APPLICATION
             assert application is None, "one APPLICATION block, not several"
             assert last, "the inserted block must close the metadata chain"
-            application = blob[pos + 4:pos + 4 + length]
+            application = blob[pos + 4 : pos + 4 + length]
         pos += 4 + length
         if last:
             break

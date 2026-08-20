@@ -14,6 +14,7 @@ test suite loading that file by its path, an editor importing a single domain
 module -- reaches its numerical imports through a submodule of this package,
 so the package ``__init__`` is the one place that is always first.
 """
+
 import os
 
 # Deterministic fiche output: pin every numerical thread pool to a single
@@ -22,7 +23,11 @@ import os
 # machines. The figure generator does the same, and for the same reason: the
 # CI runner has a different core count than a dev box.
 for _threads_var in (
-    "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
-    "NUMEXPR_NUM_THREADS", "NUMBA_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "NUMBA_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
 ):
     os.environ.setdefault(_threads_var, "1")

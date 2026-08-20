@@ -28,14 +28,20 @@ from .levels import _FS
 
 
 def _iso532_stationary_expected() -> tuple[float, float, float]:
-    data = json.loads((_DATA / "iso532_1" / "iso532_1_annexB_expected.json").read_text())
+    data = json.loads(
+        (_DATA / "iso532_1" / "iso532_1_annexB_expected.json").read_text()
+    )
     entry = data["Test signal 1.txt"]
     return entry["N"], entry["Nmin"], entry["Nmax"]
 
 
 def _iso532_levels() -> np.ndarray:
     levels = []
-    for line in (_DATA / "iso532_1" / "iso532_1_test_signal_1_levels.txt").read_text().splitlines():
+    for line in (
+        (_DATA / "iso532_1" / "iso532_1_test_signal_1_levels.txt")
+        .read_text()
+        .splitlines()
+    ):
         if ":" in line and not line.strip().startswith("#"):
             levels.append(float(line.split(":")[1]))
     return np.array(levels)
@@ -91,9 +97,13 @@ def _iso532_b5_signal(
     import glob
     import wave
 
-    data = json.loads((_DATA / "iso532_1" / "iso532_1_annexB_expected.json").read_text())
+    data = json.loads(
+        (_DATA / "iso532_1" / "iso532_1_annexB_expected.json").read_text()
+    )
     entry = data[f"Test signal {num}"]
-    matches = glob.glob(str(_DATA / "iso532_1" / "Annex B.5" / f"Test signal {num} *.wav"))
+    matches = glob.glob(
+        str(_DATA / "iso532_1" / "Annex B.5" / f"Test signal {num} *.wav")
+    )
     if not matches:
         raise FileNotFoundError(
             f"No ISO 532-1 Annex B.5 WAV found for Test signal {num} "
@@ -111,7 +121,12 @@ def _iso532_b5_signal(
     field = str(entry["field"])
     if field not in ("free", "diffuse"):
         raise ValueError(f"unexpected sound field {field!r} in the workbook")
-    return signal, int(fs), float(entry["Nmax"]), cast(Literal["free", "diffuse"], field)
+    return (
+        signal,
+        int(fs),
+        float(entry["Nmax"]),
+        cast(Literal["free", "diffuse"], field),
+    )
 
 
 @register(
@@ -162,13 +177,9 @@ def _chk_sharpness_table_a2() -> Outcome:
     def narrowband(level_db: float) -> np.ndarray:
         rng = np.random.default_rng(7)
         white = rng.standard_normal(_FS * 2)
-        sos = sp_signal.butter(
-            8, [2320.0, 2700.0], btype="band", fs=_FS, output="sos"
-        )
+        sos = sp_signal.butter(8, [2320.0, 2700.0], btype="band", fs=_FS, output="sos")
         nb = sp_signal.sosfilt(sos, white)
-        return np.asarray(
-            nb / np.sqrt(np.mean(nb**2)) * 2e-5 * 10 ** (level_db / 20)
-        )
+        return np.asarray(nb / np.sqrt(np.mean(nb**2)) * 2e-5 * 10 ** (level_db / 20))
 
     lo, hi = 30.0, 90.0
     for _ in range(13):  # set the clause 6 loudness of 4 sone
@@ -177,9 +188,7 @@ def _chk_sharpness_table_a2() -> Outcome:
             narrowband(mid), _FS, stationary=True
         ).loudness
         lo, hi = (mid, hi) if n < 4.0 else (lo, mid)
-    computed = float(
-        ph.psychoacoustics.sharpness_din(narrowband((lo + hi) / 2), _FS)
-    )
+    computed = float(ph.psychoacoustics.sharpness_din(narrowband((lo + hi) / 2), _FS))
     return numeric(1.78, computed, 0.05 * 1.78, unit="acum", places=3)
 
 
@@ -214,12 +223,8 @@ def _am_tone(
     level of the signal, i.e. the overall RMS level of the modulated waveform.
     """
     t = np.arange(int(_FS * seconds)) / _FS
-    x = (1.0 + depth * np.cos(2.0 * np.pi * fmod * t)) * np.sin(
-        2.0 * np.pi * fc * t
-    )
-    return np.asarray(
-        x * (2e-5 * 10.0 ** (level_db / 20.0)) / np.sqrt(np.mean(x**2))
-    )
+    x = (1.0 + depth * np.cos(2.0 * np.pi * fmod * t)) * np.sin(2.0 * np.pi * fc * t)
+    return np.asarray(x * (2e-5 * 10.0 ** (level_db / 20.0)) / np.sqrt(np.mean(x**2)))
 
 
 @register(
@@ -232,9 +237,7 @@ def _chk_ecma_loudness() -> Outcome:
     # sone_HMS for the calibration tone; the residual's origin is documented
     # in the loudness_ecma module docstring (c_N stays the verbatim value).
     computed = float(
-        ph.psychoacoustics.loudness_ecma(
-            _spl_tone(1000.0, 40.0, 0.6), _FS
-        ).loudness
+        ph.psychoacoustics.loudness_ecma(_spl_tone(1000.0, 40.0, 0.6), _FS).loudness
     )
     return numeric(
         ref.ECMA418_2_LOUDNESS_1KHZ_40DB_SONE,
@@ -252,9 +255,7 @@ def _chk_ecma_loudness() -> Outcome:
 )
 def _chk_ecma_tonality() -> Outcome:
     computed = float(
-        ph.psychoacoustics.tonality_ecma(
-            _spl_tone(1000.0, 40.0, 0.7), _FS
-        ).tonality
+        ph.psychoacoustics.tonality_ecma(_spl_tone(1000.0, 40.0, 0.7), _FS).tonality
     )
     return numeric(
         ref.ECMA418_2_TONALITY_1KHZ_40DB_TU,
@@ -309,9 +310,7 @@ def _chk_mg_time_loudness() -> Outcome:
     fs = 32000.0
     t = np.arange(round(0.8 * fs)) / fs
     x = math.sqrt(2.0) * 2e-5 * 10.0 ** (40.0 / 20.0) * np.sin(2.0 * np.pi * 1000.0 * t)
-    computed = float(
-        ph.psychoacoustics.loudness_moore_glasberg_time(x, fs).n_max
-    )
+    computed = float(ph.psychoacoustics.loudness_moore_glasberg_time(x, fs).n_max)
     return numeric(
         ref.ISO532_3_ANCHOR_1KHZ_40DB_SONE, computed, 0.02, unit="sone", places=4
     )
@@ -328,9 +327,7 @@ def _chk_ecma_fluctuation_strength() -> Outcome:
     # with the tabulated c_F; 0.9958 converged for longer signals).
     sig = _am_tone(1000.0, 4.0, 1.0, 60.0, 5.0)
     computed = float(
-        ph.psychoacoustics.fluctuation_strength_ecma(
-            sig, _FS
-        ).fluctuation_strength
+        ph.psychoacoustics.fluctuation_strength_ecma(sig, _FS).fluctuation_strength
     )
     return numeric(
         ref.ECMA418_2_FLUCTUATION_1KHZ_4HZ_60DB_VACIL,

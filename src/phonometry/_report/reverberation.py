@@ -159,8 +159,12 @@ def _band_header_style() -> Any:
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
     return ParagraphStyle(
-        "reverb_thead", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.2, textColor=colors.white, alignment=1, leading=8.5,
+        "reverb_thead",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.2,
+        textColor=colors.white,
+        alignment=1,
+        leading=8.5,
     )
 
 
@@ -178,8 +182,12 @@ def _target_line(requirement: float, styles: Any, language: str) -> list[Any]:
     from ._layout import fiche_paragraph as Paragraph
 
     style = ParagraphStyle(
-        "reverb_target", parent=styles["Normal"], fontSize=9.5, leading=13,
-        spaceBefore=4, textColor=colors.HexColor("#555555"),
+        "reverb_target",
+        parent=styles["Normal"],
+        fontSize=9.5,
+        leading=13,
+        spaceBefore=4,
+        textColor=colors.HexColor("#555555"),
     )
     text = t("Target reverberation time T = {req} s", language).format(
         req=format_number(requirement, language, decimals=2)
@@ -213,15 +221,20 @@ def _header_grid(
         (t("Client", language), client),
         (t("Room", language), test_room),
         (t("Description", language), specimen),
-        (t("Room volume V [m<super>3</super>]", language),
-         fmt_meta(volume, language)),
+        (t("Room volume V [m<super>3</super>]", language), fmt_meta(volume, language)),
         *extra_pairs,
-        (t("Temperature [&#176;C]", language),
-         fmt_meta(temperature, language) if temperature is not None else None),
-        (t("Relative humidity [%]", language),
-         fmt_meta(humidity, language) if humidity is not None else None),
-        (t("Ambient pressure [kPa]", language),
-         fmt_meta(pressure, language) if pressure is not None else None),
+        (
+            t("Temperature [&#176;C]", language),
+            fmt_meta(temperature, language) if temperature is not None else None,
+        ),
+        (
+            t("Relative humidity [%]", language),
+            fmt_meta(humidity, language) if humidity is not None else None,
+        ),
+        (
+            t("Ambient pressure [kPa]", language),
+            fmt_meta(pressure, language) if pressure is not None else None,
+        ),
         (t("Date of prediction", language), test_date),
     ]
     pairs = escaped_pairs(specs)
@@ -246,12 +259,12 @@ def _models_table(result: ReverberationModelResult, language: str) -> Any:
     header += [Paragraph(name, head) for name in _MODEL_NAMES]
 
     freqs = np.asarray(result.frequencies, dtype=np.float64)
-    curves = [np.asarray(result.models[name], dtype=np.float64) for name in _MODEL_NAMES]
+    curves = [
+        np.asarray(result.models[name], dtype=np.float64) for name in _MODEL_NAMES
+    ]
     rows: list[list[Any]] = []
     for i, fk in enumerate(freqs):
-        rows.append(
-            [f"{round(float(fk))}", *[_fmt_t(c[i], language) for c in curves]]
-        )
+        rows.append([f"{round(float(fk))}", *[_fmt_t(c[i], language) for c in curves]])
     col_widths = [14 * mm, 17.6 * mm, 17.6 * mm, 17.6 * mm, 17.6 * mm, 17.6 * mm]
     return _octave_table(header, rows, col_widths)
 
@@ -265,8 +278,7 @@ def _prediction_statement(
     value, is_mid = _mid_or_first(freqs, primary)
     if is_mid:
         statement = t(
-            "Predicted T<sub>mid</sub> (Arau-Puchades, 500-1000 Hz) = "
-            "<b>{value} s</b>",
+            "Predicted T<sub>mid</sub> (Arau-Puchades, 500-1000 Hz) = <b>{value} s</b>",
             language,
         ).format(value=_fmt_t(value, language))
     else:
@@ -330,8 +342,12 @@ def render_reverberation_models_report(
         ),
     ]
 
-    extra = [(t("Total surface area S [m<super>2</super>]", language),
-              fmt_meta(result.surface_area, language))]
+    extra = [
+        (
+            t("Total surface area S [m<super>2</super>]", language),
+            fmt_meta(result.surface_area, language),
+        )
+    ]
     flow.extend(_header_grid(result.volume, extra, metadata, language))
     flow.append(Spacer(1, 8))
 
@@ -499,8 +515,12 @@ def render_enclosed_space_report(
         Paragraph(basis, basis_style),
     ]
 
-    extra = [(t("Object fraction &#968;", language),
-              fmt_meta(result.object_fraction, language))]
+    extra = [
+        (
+            t("Object fraction &#968;", language),
+            fmt_meta(result.object_fraction, language),
+        )
+    ]
     flow.extend(_header_grid(result.volume, extra, metadata, language))
     flow.append(Spacer(1, 8))
 

@@ -189,9 +189,7 @@ def test_absent_tone_reports_zero_adjustment(tmp_path) -> None:
     text = _extract_text(str(out)).replace("\n", " ")
     # The tone sits below the masking threshold, so no adjustment applies.
     assert result.decisive_audibility < 0.0
-    k = environment.tonal_adjustment_from_mean_audibility(
-        result.decisive_audibility
-    )
+    k = environment.tonal_adjustment_from_mean_audibility(result.decisive_audibility)
     assert k == 0
     assert "K = 0 dB" in text
     assert "No prominent tone is present" in text

@@ -205,8 +205,9 @@ class PistonDirectivity:
     directivity: np.ndarray
     directivity_db: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the far-field directivity (beam) pattern on a polar axes.
 
         Draws the directivity in dB against the polar angle: one curve per
@@ -289,9 +290,7 @@ def _directivity_index(ka: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     theta = np.linspace(0.0, 0.5 * np.pi, 2001)
     sin_t = np.sin(theta)
-    d = np.asarray(
-        piston_directivity(ka[:, None], theta[None, :]), dtype=np.float64
-    )
+    d = np.asarray(piston_directivity(ka[:, None], theta[None, :]), dtype=np.float64)
     integrand = d**2 * sin_t[None, :]
     integral = np.trapezoid(integrand, theta, axis=-1)
     return np.asarray(10.0 * np.log10(2.0 / integral), dtype=np.float64)
@@ -339,8 +338,9 @@ class RadiatingPistonResult:
     speed_of_sound: float
     density: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the normalized piston resistance and reactance against ``ka``.
 
         Reproduces the classic Beranek & Mellow figure: ``R1`` rising to 1 and
@@ -354,7 +354,6 @@ class RadiatingPistonResult:
 
         check_language(language)
         return plot_piston_impedance(self, ax=ax, language=language, **kwargs)
-
 
     def plot_geometry(
         self,
@@ -381,9 +380,13 @@ class RadiatingPistonResult:
 
         check_language(language)
         return plot_piston_result_geometry(
-            self, ax=ax, frequency_index=frequency_index,
-            language=language, **kwargs,
+            self,
+            ax=ax,
+            frequency_index=frequency_index,
+            language=language,
+            **kwargs,
         )
+
 
 def radiating_piston(
     radius: float,

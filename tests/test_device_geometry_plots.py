@@ -37,7 +37,11 @@ def test_silencer_results_retain_geometry_and_draw() -> None:
     cases = (
         pm.noise_control.expansion_chamber(FREQ, 0.3, 0.03, 0.005),
         pm.noise_control.extended_tube_chamber(
-            FREQ, 0.3, 0.03, 0.005, inlet_extension=0.075,
+            FREQ,
+            0.3,
+            0.03,
+            0.005,
+            inlet_extension=0.075,
             outlet_extension=0.05,
         ),
         pm.noise_control.helmholtz_resonator(FREQ, 0.01, 0.001, 0.05, 0.002),
@@ -48,7 +52,9 @@ def test_silencer_results_retain_geometry_and_draw() -> None:
         ax = result.plot_geometry()
         assert ax.get_aspect() == 1.0
     assert cases[0].geometry == {
-        "length": 0.3, "chamber_area": 0.03, "pipe_area": 0.005,
+        "length": 0.3,
+        "chamber_area": 0.03,
+        "pipe_area": 0.005,
     }
 
 
@@ -85,9 +91,7 @@ def _chain(branch_length: float = 0.686) -> pm.noise_control.SilencerChain:
 
 def _lengths_lettered(ax) -> set[str]:
     """Every measurement the drawing letters, as it letters it."""
-    return {
-        text.get_text() for text in ax.texts if text.get_text().endswith(" mm")
-    }
+    return {text.get_text() for text in ax.texts if text.get_text().endswith(" mm")}
 
 
 def test_silencer_chain_draws_its_ducts_and_marks_its_branch() -> None:
@@ -99,7 +103,12 @@ def test_silencer_chain_draws_its_ducts_and_marks_its_branch() -> None:
     # Every dimension on the page is a declared duct length, a declared bore
     # or their sum: nothing the branch would have to supply.
     assert _lengths_lettered(ax) == {
-        "150 mm", "600 mm", "300 mm", "L = 1200 mm", "199.9 mm", "400.1 mm",
+        "150 mm",
+        "600 mm",
+        "300 mm",
+        "L = 1200 mm",
+        "199.9 mm",
+        "400.1 mm",
     }
 
 
@@ -161,18 +170,22 @@ def test_silencer_free_function_validation() -> None:
         pm.noise_control.plot_silencer_geometry("muffler")
     with pytest.raises(ValueError, match="chamber_area"):
         pm.noise_control.plot_silencer_geometry(
-            "expansion chamber", length=0.3, chamber_area=0.004,
+            "expansion chamber",
+            length=0.3,
+            chamber_area=0.004,
             pipe_area=0.005,
         )
     with pytest.raises(ValueError, match="must not exceed"):
         pm.noise_control.plot_silencer_geometry(
-            "extended-tube chamber", length=0.1, chamber_area=0.03,
-            pipe_area=0.005, inlet_extension=0.08, outlet_extension=0.08,
+            "extended-tube chamber",
+            length=0.1,
+            chamber_area=0.03,
+            pipe_area=0.005,
+            inlet_extension=0.08,
+            outlet_extension=0.08,
         )
     with pytest.raises(ValueError, match="needs"):
-        pm.noise_control.plot_silencer_geometry(
-            "Helmholtz resonator", duct_area=0.01
-        )
+        pm.noise_control.plot_silencer_geometry("Helmholtz resonator", duct_area=0.01)
 
 
 # ---------------------------------------------------------------------------
@@ -180,8 +193,12 @@ def test_silencer_free_function_validation() -> None:
 # ---------------------------------------------------------------------------
 def test_image_source_plan_draws_and_caps_order() -> None:
     res = pm.room.image_source_rir(
-        (5.0, 4.0, 3.0), (1.5, 1.2, 1.5), (3.5, 2.8, 1.2), 0.3,
-        fs=8000, max_order=4,
+        (5.0, 4.0, 3.0),
+        (1.5, 1.2, 1.5),
+        (3.5, 2.8, 1.2),
+        0.3,
+        fs=8000,
+        max_order=4,
     )
     ax = res.plot_geometry(max_order=2)
     labels = [t.get_text() for t in ax.get_legend().get_texts()]
@@ -209,8 +226,11 @@ def test_barrier_result_retains_geometry_and_draws() -> None:
 def test_barrier_free_function_validation() -> None:
     with pytest.raises(ValueError, match="receiver_distance"):
         pm.environment.plot_barrier_geometry(
-            source_height=1.5, barrier_distance=5.0, barrier_height=3.0,
-            receiver_distance=4.0, receiver_height=1.5,
+            source_height=1.5,
+            barrier_distance=5.0,
+            barrier_height=3.0,
+            receiver_distance=4.0,
+            receiver_height=1.5,
         )
 
 
@@ -239,9 +259,7 @@ def test_aperture_results_retain_geometry_and_draw() -> None:
     assert slit.width == pytest.approx(0.003)
     assert slit.depth == pytest.approx(0.1)
     assert slit.plot_geometry() is not None
-    hole = pm.building.circular_aperture_transmission_coefficient(
-        FREQ, 0.005, 0.1
-    )
+    hole = pm.building.circular_aperture_transmission_coefficient(FREQ, 0.005, 0.1)
     assert hole.radius == pytest.approx(0.005)
     assert hole.plot_geometry() is not None
 
@@ -295,8 +313,12 @@ def test_fdtd_domain_preview() -> None:
     mask = np.zeros((40, 60), dtype=bool)
     mask[15:25, 28:31] = True
     sim = FDTD2D(
-        343.0, 0.05, shape=(40, 60), sponge_width=6,
-        sponge_sides=("left", "right"), edge_impedance={"top": 413.0},
+        343.0,
+        0.05,
+        shape=(40, 60),
+        sponge_width=6,
+        sponge_sides=("left", "right"),
+        edge_impedance={"top": 413.0},
         obstacle_mask=mask,
     )
     sim.add_source(GaussianPulse(8, 20, width=1e-3))
@@ -321,16 +343,22 @@ def test_device_geometry_language_validation() -> None:
         pm.noise_control.plot_plenum_geometry(0.09, 1.2, 6.0, language="fr")
     with pytest.raises(ValueError, match="Unknown language"):
         pm.environment.plot_barrier_geometry(
-            source_height=1.5, barrier_distance=5.0, barrier_height=3.0,
-            receiver_distance=20.0, receiver_height=1.5, language="pt",
+            source_height=1.5,
+            barrier_distance=5.0,
+            barrier_height=3.0,
+            receiver_distance=20.0,
+            receiver_height=1.5,
+            language="pt",
         )
 
 
 def test_device_geometry_spanish_labels() -> None:
     res = pm.environment.barrier_insertion_loss(FREQ, 1.5, 5.0, 3.0, 20.0, 1.5)
     ax = res.plot_geometry(language="es")
-    texts = " ".join(t.get_text() for t in ax.texts) + " " + " ".join(
-        t.get_text() for t in ax.get_legend().get_texts()
+    texts = (
+        " ".join(t.get_text() for t in ax.texts)
+        + " "
+        + " ".join(t.get_text() for t in ax.get_legend().get_texts())
     )
     assert "Fuente" in texts
     assert "Camino difractado" in texts

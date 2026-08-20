@@ -71,7 +71,7 @@ def maths_runs(text: str) -> list[str]:
         if start is None:
             start = i
         else:
-            runs.append(text[start:i + 1])
+            runs.append(text[start : i + 1])
             start = None
     return runs
 
@@ -121,8 +121,12 @@ def check(paths: list[pathlib.Path]) -> tuple[int, list[tuple[str, int, str, str
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("roots", nargs="*", default=list(DEFAULT_ROOTS),
-                        help="files or directories to scan (default: the drawing modules)")
+    parser.add_argument(
+        "roots",
+        nargs="*",
+        default=list(DEFAULT_ROOTS),
+        help="files or directories to scan (default: the drawing modules)",
+    )
     args = parser.parse_args(argv)
 
     paths: list[pathlib.Path] = []
@@ -138,7 +142,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"All {checked} mathtext labels in {len(paths)} files parse.")
         return 0
 
-    print(f"{len(failures)} of {checked} mathtext labels do not parse:\n", file=sys.stderr)
+    print(
+        f"{len(failures)} of {checked} mathtext labels do not parse:\n", file=sys.stderr
+    )
     for path, line, run, reason in failures:
         print(f"  {path}:{line}", file=sys.stderr)
         print(f"      {run}", file=sys.stderr)

@@ -52,11 +52,11 @@ _SBR_BORE_C = 45
 #: Stub width in cells: the guide's 2e-3 / 0.01 m2 area ratio read as a 2D
 #: height ratio, 0.2 x the bore = 22.5 mm.
 _SBR_STUB_W = 9
-_SBR_STUB_D = 120                       # 0.30 m closed stub, the guide's own
-_SBR_NX = 800                           # 2.0 m duct
-_SBR_JUNC = 480                         # stub mouth at x = 1.2 m
-_SBR_WALL = 4                           # wall cells around the air path
-_SBR_F_OFF = 150.0                      # the off-tune drive
+_SBR_STUB_D = 120  # 0.30 m closed stub, the guide's own
+_SBR_NX = 800  # 2.0 m duct
+_SBR_JUNC = 480  # stub mouth at x = 1.2 m
+_SBR_WALL = 4  # wall cells around the air path
+_SBR_F_OFF = 150.0  # the off-tune drive
 # Timeline. Mesh: dx = min(smallest scene dimension / 4, lambda / 8 at the
 # highest carrier) = min(22.5 mm / 4 = 5.6 mm, 1.2 m / 8 = 150 mm); the
 # 2.5 mm grid sits finer still so the 9-cell stub mouth rasterises cleanly
@@ -91,13 +91,19 @@ def _sbr_rig() -> tuple[Any, Any, int]:
     ny = _SBR_WALL + _SBR_BORE_C + _SBR_STUB_D + _SBR_WALL
     air = np.zeros((ny, _SBR_NX), dtype=bool)
     duct0 = _SBR_WALL
-    air[duct0:duct0 + _SBR_BORE_C, :] = True
-    air[duct0 + _SBR_BORE_C:duct0 + _SBR_BORE_C + _SBR_STUB_D,
-        _SBR_JUNC:_SBR_JUNC + _SBR_STUB_W] = True
+    air[duct0 : duct0 + _SBR_BORE_C, :] = True
+    air[
+        duct0 + _SBR_BORE_C : duct0 + _SBR_BORE_C + _SBR_STUB_D,
+        _SBR_JUNC : _SBR_JUNC + _SBR_STUB_W,
+    ] = True
     rho_map = np.where(air, 1.2, 1.2e6)
-    sim = fdtd2d.FDTD2D(_SBR_C0, _SBR_DX, shape=(ny, _SBR_NX), rho=rho_map,
-                        edge_impedance={"left": 1.2 * _SBR_C0,
-                                        "right": 1.2 * _SBR_C0})
+    sim = fdtd2d.FDTD2D(
+        _SBR_C0,
+        _SBR_DX,
+        shape=(ny, _SBR_NX),
+        rho=rho_map,
+        edge_impedance={"left": 1.2 * _SBR_C0, "right": 1.2 * _SBR_C0},
+    )
     return sim, air, duct0
 
 
@@ -127,14 +133,13 @@ def _sbr_ring_down() -> float:
         trace[i] = sim.p[iy, ix]
     t = (np.arange(n_steps) + 1) * sim.dt
     tail = trace[t > 0.03]
-    spec = np.abs(np.fft.rfft(tail * np.hanning(tail.size), n=2 ** 18))
-    freqs = np.fft.rfftfreq(2 ** 18, sim.dt)
+    spec = np.abs(np.fft.rfft(tail * np.hanning(tail.size), n=2**18))
+    freqs = np.fft.rfftfreq(2**18, sim.dt)
     band = (freqs > 150.0) & (freqs < 450.0)
     k = int(np.argmax(spec[band]))
     f_pk = float(freqs[band][k])
-    y0, y1, y2 = (float(v) for v in np.log(spec[band][k - 1:k + 2]))
-    return f_pk + float(freqs[1] - freqs[0]) * 0.5 * (y0 - y2) / (
-        y0 - 2.0 * y1 + y2)
+    y0, y1, y2 = (float(v) for v in np.log(spec[band][k - 1 : k + 2]))
+    return f_pk + float(freqs[1] - freqs[0]) * 0.5 * (y0 - y2) / (y0 - 2.0 * y1 + y2)
 
 
 @lru_cache(maxsize=1)
@@ -180,8 +185,7 @@ def _side_branch_fields() -> tuple[Any, ...]:
                 tr.append(float(sim.p[iy, ix]))
                 tt.append(sim.time)
             if (i + 1) % _SBR_EVERY == 0:
-                ps.append(np.where(air, sim.p, np.nan)[::2, ::2]
-                          .astype(np.float32))
+                ps.append(np.where(air, sim.p, np.nan)[::2, ::2].astype(np.float32))
                 ts.append(sim.time)
         trace = np.asarray(tr)
         # Per-period closed-end amplitude: the plateau ratio (the incident
@@ -193,15 +197,14 @@ def _side_branch_fields() -> tuple[Any, ...]:
         plateau = float(amps[-3:].mean())
         t_arr = (_SBR_JUNC * _SBR_DX) / _SBR_C0
         k90 = int(np.argmax(amps >= 0.9 * plateau))
-        t90 = (k90 + 1) / f                # per-period bins of the drive
+        t90 = (k90 + 1) / f  # per-period bins of the drive
         periods90 = (t90 - t_arr) * f
         metrics.append((plateau, float(periods90)))
         runs.append((np.stack(ps), trace))
         times = np.asarray(ts)
         t_tr = np.asarray(tt)
     (p_on, tr_on), (p_off, tr_off) = runs
-    return (p_on, p_off, times, t_tr, tr_on, tr_off, f0, f_sim,
-            metrics[0], metrics[1])
+    return (p_on, p_off, times, t_tr, tr_on, tr_off, f0, f_sim, metrics[0], metrics[1])
 
 
 def animate_fdtd_side_branch(output_dir: str) -> None:
@@ -217,9 +220,19 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
 
     T = _translate_str
-    (p_on, p_off, times, t_tr, tr_on, tr_off, f0, f_sim,
-     (ratio_on, per90_on), (ratio_off, _)) = _side_branch_fields()
-    l_eff = _SBR_C0 / (4.0 * f_sim) * 1000.0          # [mm]
+    (
+        p_on,
+        p_off,
+        times,
+        t_tr,
+        tr_on,
+        tr_off,
+        f0,
+        f_sim,
+        (ratio_on, per90_on),
+        (ratio_off, _),
+    ) = _side_branch_fields()
+    l_eff = _SBR_C0 / (4.0 * f_sim) * 1000.0  # [mm]
     length = _SBR_NX * _SBR_DX
     ny = _SBR_WALL + _SBR_BORE_C + _SBR_STUB_D + _SBR_WALL
     height = ny * _SBR_DX
@@ -234,18 +247,22 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
     # clip is that the inside of the branch runs several times hotter than
     # the duct that feeds it.
     duct_rows = slice(_SBR_WALL // 2, (_SBR_WALL + _SBR_BORE_C) // 2)
-    vmax = 0.7 * float(np.nanquantile(
-        np.abs(p_on[p_on.shape[0] // 2:, duct_rows]), 0.999))
+    vmax = 0.7 * float(
+        np.nanquantile(np.abs(p_on[p_on.shape[0] // 2 :, duct_rows]), 0.999)
+    )
 
     fig = _anim_figure()
-    fig.suptitle(T("The quarter-wave side branch, on and off tune (2D FDTD)"),
-                 )
+    fig.suptitle(
+        T("The quarter-wave side branch, on and off tune (2D FDTD)"),
+    )
     gs = fig.add_gridspec(3, 1, height_ratios=(1.0, 1.0, 0.74), hspace=0.1)
     axes = [fig.add_subplot(gs[i, 0]) for i in range(2)]
     ax_t = fig.add_subplot(gs[2, 0])
 
-    titles = [T(f"On the tuning frequency: {f0:.1f} Hz"),
-              T(f"Off tune: {_SBR_F_OFF:.0f} Hz")]
+    titles = [
+        T(f"On the tuning frequency: {f0:.1f} Hz"),
+        T(f"Off tune: {_SBR_F_OFF:.0f} Hz"),
+    ]
     ims: list[Any] = []
     pills: list[Any] = []
     trims: list[Any] = []
@@ -253,58 +270,125 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
         ax.grid(False)
         # The walls are NaN in the frames; a grey slab behind the imshow
         # renders them as solid hardware, and the air path draws over it.
-        ax.add_patch(Rectangle((0.0, 0.0), length, height,
-                               facecolor="#9a9a9a", edgecolor="none",
-                               zorder=1))
-        ims.append(ax.imshow(np.zeros((2, 2)), origin="lower",
-                             extent=(0.0, length, 0.0, height),
-                             cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
-                             aspect="auto", interpolation="bilinear",
-                             zorder=2))
+        ax.add_patch(
+            Rectangle(
+                (0.0, 0.0),
+                length,
+                height,
+                facecolor="#9a9a9a",
+                edgecolor="none",
+                zorder=1,
+            )
+        )
+        ims.append(
+            ax.imshow(
+                np.zeros((2, 2)),
+                origin="lower",
+                extent=(0.0, length, 0.0, height),
+                cmap=CMAP_FIELD,
+                vmin=-vmax,
+                vmax=vmax,
+                aspect="auto",
+                interpolation="bilinear",
+                zorder=2,
+            )
+        )
         # Air-path outline: duct bore, stub throat and cap.
-        for xa, xb, y in ((0.0, stub_x0, duct_y1), (stub_x1, length, duct_y1),
-                          (0.0, length, duct_y0)):
+        for xa, xb, y in (
+            (0.0, stub_x0, duct_y1),
+            (stub_x1, length, duct_y1),
+            (0.0, length, duct_y0),
+        ):
             ax.plot([xa, xb], [y, y], color=COLOR_FG, lw=0.9, zorder=3)
         for x in (stub_x0, stub_x1):
-            ax.plot([x, x], [duct_y1, stub_y1], color=COLOR_FG, lw=0.9,
-                    zorder=3)
-        ax.plot([stub_x0, stub_x1], [stub_y1, stub_y1], color=COLOR_FG,
-                lw=0.9, zorder=3)
-        _anim_speaker(ax, 0.0, 0.5 * (duct_y0 + duct_y1),
-                      duct_y1 - duct_y0, tip_inset=0.003,
-                      label_y=None)
-        ax.add_patch(Rectangle((length, duct_y0 - 0.01), 0.045,
-                               duct_y1 - duct_y0 + 0.02,
-                               facecolor="#9a9a9a", hatch="////",
-                               edgecolor=COLOR_FG, linewidth=0.8, zorder=3))
-        ax.text(stub_x1 + 0.03, duct_y1 + 0.24,
-                T("closed stub, built $\\ell$ = 300 mm"), fontsize=7.5,
-                ha="left", va="center", color=COLOR_FG, zorder=4)
+            ax.plot([x, x], [duct_y1, stub_y1], color=COLOR_FG, lw=0.9, zorder=3)
+        ax.plot(
+            [stub_x0, stub_x1], [stub_y1, stub_y1], color=COLOR_FG, lw=0.9, zorder=3
+        )
+        _anim_speaker(
+            ax,
+            0.0,
+            0.5 * (duct_y0 + duct_y1),
+            duct_y1 - duct_y0,
+            tip_inset=0.003,
+            label_y=None,
+        )
+        ax.add_patch(
+            Rectangle(
+                (length, duct_y0 - 0.01),
+                0.045,
+                duct_y1 - duct_y0 + 0.02,
+                facecolor="#9a9a9a",
+                hatch="////",
+                edgecolor=COLOR_FG,
+                linewidth=0.8,
+                zorder=3,
+            )
+        )
+        ax.text(
+            stub_x1 + 0.03,
+            duct_y1 + 0.24,
+            T("closed stub, built $\\ell$ = 300 mm"),
+            fontsize=7.5,
+            ha="left",
+            va="center",
+            color=COLOR_FG,
+            zorder=4,
+        )
         if panel == 1:
             # Labelled once, on the panel without the trim verdict: the
             # rig is identical in both.
-            ax.text(length - 0.06, duct_y1 + 0.035,
-                    T("anechoic termination"), ha="right", va="bottom",
-                    fontsize=7.0, color=COLOR_FG, zorder=4)
-        pills.append(ax.text(
-            0.03, height - 0.012, "", ha="left", va="top", fontsize=9,
-            color="white", zorder=5,
-            bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                  "alpha": 0.55, "edgecolor": "none"}))
+            ax.text(
+                length - 0.06,
+                duct_y1 + 0.035,
+                T("anechoic termination"),
+                ha="right",
+                va="bottom",
+                fontsize=7.0,
+                color=COLOR_FG,
+                zorder=4,
+            )
+        pills.append(
+            ax.text(
+                0.03,
+                height - 0.012,
+                "",
+                ha="left",
+                va="top",
+                fontsize=9,
+                color="white",
+                zorder=5,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.55,
+                    "edgecolor": "none",
+                },
+            )
+        )
         # The trim verdict lives in the wall grey under the stub label,
         # where no field or curve can ever strike it; only the on-tune
         # panel's copy is filled in (see update()).
-        trims.append(ax.text(
-            stub_x1 + 0.03, duct_y1 + 0.185, "", ha="left", va="top",
-            fontsize=7.8, color=COLOR_FG, linespacing=1.5, zorder=4))
+        trims.append(
+            ax.text(
+                stub_x1 + 0.03,
+                duct_y1 + 0.185,
+                "",
+                ha="left",
+                va="top",
+                fontsize=7.8,
+                color=COLOR_FG,
+                linespacing=1.5,
+                zorder=4,
+            )
+        )
         ax.set_title(title, fontsize=10)
         ax.set_xlim(-0.115, length + 0.065)
         ax.set_ylim(-0.012, height + 0.012)
         ax.set_yticks([])
         ax.tick_params(labelsize=7, labelbottom=False)
     axes[1].tick_params(labelbottom=True)
-    axes[1].set_xlabel(T("Position along the duct [m]"), fontsize=8.5,
-                       labelpad=1.5)
+    axes[1].set_xlabel(T("Position along the duct [m]"), fontsize=8.5, labelpad=1.5)
 
     # The closed-end pressure of both runs: the charge is one curve
     # ratcheting up over several periods while the other stays flat.
@@ -320,28 +404,49 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
     # keeps the axis clear of a label the red curve would run through.
     for y in (1.0, -1.0):
         ax_t.axhline(y, color=COLOR_MUTED, lw=0.9, ls="--", zorder=2)
-    line_on = ax_t.plot([], [], color=COLOR_SECONDARY, lw=1.1,
-                        label=T("on tune"), zorder=4)[0]
-    line_off = ax_t.plot([], [], color=COLOR_PRIMARY, lw=1.1,
-                         label=T("off tune"), zorder=3)[0]
+    line_on = ax_t.plot(
+        [], [], color=COLOR_SECONDARY, lw=1.1, label=T("on tune"), zorder=4
+    )[0]
+    line_off = ax_t.plot(
+        [], [], color=COLOR_PRIMARY, lw=1.1, label=T("off tune"), zorder=3
+    )[0]
     ax_t.legend(fontsize=7, loc="upper left", framealpha=0.85)
-    t_txt = fig.text(0.988, 0.955, "", ha="right", va="top",
-                     family="monospace", fontsize=9.5, color=COLOR_FG)
+    t_txt = fig.text(
+        0.988,
+        0.955,
+        "",
+        ha="right",
+        va="top",
+        family="monospace",
+        fontsize=9.5,
+        color=COLOR_FG,
+    )
     fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))
-    fig.text(0.5, 0.005,
-             T("Rigid walls, anechoic ends, incident amplitude 1; the "
-               "charge bandwidth $f/Q$ is percent-wide, the lossless notch "
-               "hertz-wide."),
-             ha="center", va="bottom", fontsize=7.2, color=COLOR_FG,
-             alpha=0.85)
+    fig.text(
+        0.5,
+        0.005,
+        T(
+            "Rigid walls, anechoic ends, incident amplitude 1; the "
+            "charge bandwidth $f/Q$ is percent-wide, the lossless notch "
+            "hertz-wide."
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=7.2,
+        color=COLOR_FG,
+        alpha=0.85,
+    )
 
     reveal = int(0.68 * times.size)
-    verdicts = (T(f"×{ratio_on:.1f} the incident wave, in ≈"
-                  f"{per90_on:.0f} periods"),
-                T(f"×{ratio_off:.1f} at once: it never charges"))
-    trim = T(f"the stub rings at {f_sim:.1f} Hz, not {f0:.1f}:\n"
-             f"$\\ell_{{\\mathrm{{eff}}}} = c/4f$ = {l_eff:.0f} mm, "
-             f"so trim it to tune")
+    verdicts = (
+        T(f"×{ratio_on:.1f} the incident wave, in ≈{per90_on:.0f} periods"),
+        T(f"×{ratio_off:.1f} at once: it never charges"),
+    )
+    trim = T(
+        f"the stub rings at {f_sim:.1f} Hz, not {f0:.1f}:\n"
+        f"$\\ell_{{\\mathrm{{eff}}}} = c/4f$ = {l_eff:.0f} mm, "
+        f"so trim it to tune"
+    )
 
     def update(k: int) -> tuple[Any, ...]:
         j = min(k, times.size - 1)
@@ -356,5 +461,12 @@ def animate_fdtd_side_branch(output_dir: str) -> None:
         t_txt.set_text(T(f"$t$ = {times[j] * 1e3:4.1f} ms"))
         return (*ims, line_on, line_off, *pills, trims[0], t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_side_branch",
-                 frames=times.size + _SBR_HOLD, fps=_SBR_FPS, gif_fps=10)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_side_branch",
+        frames=times.size + _SBR_HOLD,
+        fps=_SBR_FPS,
+        gif_fps=10,
+    )

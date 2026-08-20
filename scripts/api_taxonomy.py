@@ -424,8 +424,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     # Defined in phonometry._plot.geometry; documented with the materials
     # module whose devices each drawing depicts.
     "plot_absorber_stack": "phonometry.materials.absorbers.porous",
-    "plot_helmholtz_resonator_geometry":
-        "phonometry.materials.absorbers.slow_sound",
+    "plot_helmholtz_resonator_geometry": "phonometry.materials.absorbers.slow_sound",
     "plot_slit_absorber_geometry": "phonometry.materials.absorbers.slow_sound",
     "plot_qrd_geometry": "phonometry.materials.diffusers.design",
     "plot_metadiffuser_panel_geometry": "phonometry.materials.diffusers.metadiffuser",
@@ -438,8 +437,7 @@ OBJECT_MODULE_OVERRIDES: dict[str, str] = {
     "plot_microphone_positions": "phonometry.emission.sound_power",
     "plot_aperture_geometry": "phonometry.building.prediction.aperture_transmission",
     "plot_piston_geometry": "phonometry.electroacoustics.piston",
-    "plot_sound_reinforcement_geometry":
-        "phonometry.electroacoustics.sound_reinforcement",
+    "plot_sound_reinforcement_geometry": "phonometry.electroacoustics.sound_reinforcement",
     "plot_facade_elements": "phonometry.building.prediction.facade",
     "plot_double_wall_geometry": "phonometry.building.prediction.panel_transmission",
     "plot_junction_geometry": "phonometry.vibration.structural.junction_transmission",
@@ -526,7 +524,8 @@ def public_names() -> dict[str, ModuleType]:
     import phonometry
 
     packages = [
-        getattr(phonometry, name) for name in phonometry.__all__
+        getattr(phonometry, name)
+        for name in phonometry.__all__
         if inspect.ismodule(getattr(phonometry, name))
     ]
     owners: dict[str, ModuleType] = {}

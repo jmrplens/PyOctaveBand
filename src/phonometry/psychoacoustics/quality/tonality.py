@@ -53,6 +53,7 @@ def _warn_coarse_resolution(dfc: float, df: float, ft: float) -> None:
             stacklevel=3,
         )
 
+
 # Frequency range of interest for discrete tones (clauses 11.5 / 12.6).
 # NOTE: clause 4.1.2 prints the range as "89,1 Hz and 11 220 Hz inclusive",
 # but every formula and table span of the standard uses 11 200 Hz (Tables
@@ -115,7 +116,9 @@ class ToneAssessment:
     criterion_db: float
     prominent: bool
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the assessed tone against the ECMA-418-1 prominence criterion.
 
         Draws the frequency-dependent criterion curve over the 89.1 Hz -
@@ -225,7 +228,9 @@ def _tone_band(power: np.ndarray, peak: int, half_width_bins: int) -> tuple[int,
     return _edge(-1), _edge(+1)
 
 
-def _band_power(freqs: np.ndarray, power: np.ndarray, f1: float, f2: float) -> tuple[float, int]:
+def _band_power(
+    freqs: np.ndarray, power: np.ndarray, f1: float, f2: float
+) -> tuple[float, int]:
     mask = (freqs > f1) & (freqs <= f2)
     n = int(np.count_nonzero(mask))
     if n == 0:
@@ -323,9 +328,10 @@ def tone_to_noise_ratio(
             proximate = ft >= 1000.0 or abs(fsec - ft) < _proximity_spacing(ft)
             s_lo, s_hi = _tone_band(power, int(sec_local), half_width_bins)
             n_sec = s_hi - s_lo + 1
-            p_sec = float(np.sum(power[s_lo : s_hi + 1])) - (
-                power[s_lo] + power[s_hi]
-            ) * n_sec / 2.0
+            p_sec = (
+                float(np.sum(power[s_lo : s_hi + 1]))
+                - (power[s_lo] + power[s_hi]) * n_sec / 2.0
+            )
             p_sec = max(p_sec, 0.0)
             if proximate:
                 p_tone += p_sec  # Formula (15); (16) subtracts it via p_tone
@@ -423,7 +429,11 @@ def prominence_ratio(
     f1_m, f2_m, dfc_m = _critical_band(ft)
     _warn_coarse_resolution(dfc_m, df, ft)
     # Lower band (12.3): truncated at 20 Hz below 171.4 Hz.
-    f1_l = max(_fitted_edge(ft, _LOWER_EDGE_COEFFS), 20.0) if ft <= 171.4 else _fitted_edge(ft, _LOWER_EDGE_COEFFS)
+    f1_l = (
+        max(_fitted_edge(ft, _LOWER_EDGE_COEFFS), 20.0)
+        if ft <= 171.4
+        else _fitted_edge(ft, _LOWER_EDGE_COEFFS)
+    )
     # Upper band (12.4).
     f2_u = _fitted_edge(ft, _UPPER_EDGE_COEFFS)
 

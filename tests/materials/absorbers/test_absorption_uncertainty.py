@@ -84,8 +84,9 @@ def test_equivalent_area_ylabel_is_area() -> None:
     res = materials.equivalent_area_uncertainty([5.0, 6.0], [500, 1000])
     assert res.quantity == "equivalent_area"
     # Reported to one decimal (not a coefficient).
-    np.testing.assert_allclose(res.reported_expanded_uncertainty, np.round(
-        res.expanded_uncertainty, 1))
+    np.testing.assert_allclose(
+        res.reported_expanded_uncertainty, np.round(res.expanded_uncertainty, 1)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -111,32 +112,24 @@ def test_practical_coefficient_500hz_is_constant() -> None:
 # Clause 7 - single numbers
 # ---------------------------------------------------------------------------
 def test_weighted_coefficient_example_1() -> None:
-    res = materials.weighted_coefficient_uncertainty(
-        ref.ISO12999_2_ALPHA_W_EXAMPLE
-    )
+    res = materials.weighted_coefficient_uncertainty(ref.ISO12999_2_ALPHA_W_EXAMPLE)
     np.testing.assert_allclose(res.standard_uncertainty, [0.035])
     assert float(res.reported_expanded_uncertainty[0]) == ref.ISO12999_2_ALPHA_W_U_K2
 
 
 def test_weighted_coefficient_repeatability() -> None:
-    res = materials.weighted_coefficient_uncertainty(
-        0.7, condition="repeatability"
-    )
+    res = materials.weighted_coefficient_uncertainty(0.7, condition="repeatability")
     np.testing.assert_allclose(res.standard_uncertainty, [0.020])
 
 
 def test_single_number_rating_example_2() -> None:
-    res = materials.single_number_rating_uncertainty(
-        ref.ISO12999_2_DLALPHA_EXAMPLE
-    )
+    res = materials.single_number_rating_uncertainty(ref.ISO12999_2_DLALPHA_EXAMPLE)
     np.testing.assert_allclose(res.standard_uncertainty, [0.10 * 8.1])
     assert float(res.reported_expanded_uncertainty[0]) == ref.ISO12999_2_DLALPHA_U_K2
 
 
 def test_single_number_rating_repeatability() -> None:
-    res = materials.single_number_rating_uncertainty(
-        8.1, condition="repeatability"
-    )
+    res = materials.single_number_rating_uncertainty(8.1, condition="repeatability")
     np.testing.assert_allclose(res.standard_uncertainty, [0.02 * 8.1])
 
 
@@ -152,9 +145,7 @@ def test_interval_bounds() -> None:
 
 def test_reported_rounding_rule() -> None:
     # Coefficients -> 2 decimals; area and DLalpha -> 1 decimal.
-    coeff = materials.sound_absorption_coefficient_uncertainty(
-        [0.33], [63]
-    )  # U~0.327
+    coeff = materials.sound_absorption_coefficient_uncertainty([0.33], [63])  # U~0.327
     assert float(coeff.reported_expanded_uncertainty[0]) == 0.33
     rating = materials.single_number_rating_uncertainty(8.1)  # U=1.62 -> 1.6
     assert float(rating.reported_expanded_uncertainty[0]) == 1.6

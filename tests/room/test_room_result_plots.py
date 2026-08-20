@@ -65,7 +65,8 @@ def test_room_acoustics_invalid_bands_are_hatched() -> None:
     assert len(patches) == 3 * n  # EDT/T20/T30 grouped bars
     hatched = [p for p in patches if p.get_hatch()]
     greyed = [
-        p for p in patches
+        p
+        for p in patches
         if p.get_facecolor()[:3] == plt.matplotlib.colors.to_rgb(_plotting._C_MUTED)
     ]
     # Exactly one bar per series (EDT/T20/T30) is invalid -> 3 hatched/greyed.
@@ -137,7 +138,8 @@ def test_open_plan_plot_line_and_markers() -> None:
     assert at4 - at8 == pytest.approx(res.d2s, abs=0.05)
     # rD / rP are marked as vertical lines at their distances.
     vlines = [
-        np.asarray(ln.get_xdata())[0] for ln in ax.lines
+        np.asarray(ln.get_xdata())[0]
+        for ln in ax.lines
         if np.asarray(ln.get_xdata()).size == 2
         and np.asarray(ln.get_xdata())[0] == np.asarray(ln.get_xdata())[1]
     ]

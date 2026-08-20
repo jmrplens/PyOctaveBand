@@ -34,8 +34,22 @@ from phonometry import building
 #: ASTM E413-22 Table 1, the reference sound insulation contour (rating zero),
 #: over the 16 one-third-octave bands 125 Hz to 4000 Hz.
 E413_BANDS = (
-    125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
-    800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
 )
 E413_CONTOUR = (-16, -13, -10, -7, -4, -1, 0, 1, 2, 3, 4, 4, 4, 4, 4, 4)
 
@@ -46,13 +60,41 @@ E413_CONTOUR = (-16, -13, -10, -7, -4, -1, 0, 1, 2, 3, 4, 4, 4, 4, 4, 4)
 #: report prints Dn,c per one-third octave from 100 Hz to 4 kHz; the data sheet
 #: prints the CAC contour, the per-band deficiencies and their total.
 ALA_2016_DNC = (
-    14.4, 18.6, 21.7, 24.1, 23.4, 30.3, 33.7, 35.2,
-    41.6, 44.2, 42.1, 36.8, 35.7, 36.0, 36.9, 37.9,
+    14.4,
+    18.6,
+    21.7,
+    24.1,
+    23.4,
+    30.3,
+    33.7,
+    35.2,
+    41.6,
+    44.2,
+    42.1,
+    36.8,
+    35.7,
+    36.0,
+    36.9,
+    37.9,
 )
 ALA_2016_CAC = 34
 ALA_2016_PRINTED_DEFICIENCIES = (
-    3.6, 2.4, 2.3, 2.9, 6.6, 2.7, 0.3, 0.0,
-    0.0, 0.0, 0.0, 1.2, 2.3, 2.0, 1.1, 0.1,
+    3.6,
+    2.4,
+    2.3,
+    2.9,
+    6.6,
+    2.7,
+    0.3,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.2,
+    2.3,
+    2.0,
+    1.1,
+    0.1,
 )
 ALA_2016_PRINTED_DEFICIENCY_SUM = 27.5
 
@@ -61,8 +103,22 @@ ALA_2016_PRINTED_DEFICIENCY_SUM = 27.5
 #: insulation, ceiling continuous over the partition cap. Table 2 of the report
 #: prints Dn,c per one-third octave; the reported class is CAC 39.
 ALA_2020_DNC = (
-    20.7, 22.1, 25.1, 25.8, 27.1, 35.2, 37.9, 41.2,
-    43.4, 46.1, 48.2, 46.4, 45.7, 43.0, 40.7, 41.2,
+    20.7,
+    22.1,
+    25.1,
+    25.8,
+    27.1,
+    35.2,
+    37.9,
+    41.2,
+    43.4,
+    46.1,
+    48.2,
+    46.4,
+    45.7,
+    43.0,
+    40.7,
+    41.2,
 )
 ALA_2020_CAC = 39
 
@@ -296,9 +352,7 @@ def test_rating_rejects_mismatched_frequencies() -> None:
 
 def test_normalization_at_the_reference_area_is_the_level_difference() -> None:
     """ISO 140-9 clause 3.3: Dn,c = D - 10 lg(A/A0) is D when A = A0 = 10 m2."""
-    dnc = building.normalized_ceiling_attenuation(
-        [90.0, 85.0], [50.0, 48.0], 10.0
-    )
+    dnc = building.normalized_ceiling_attenuation([90.0, 85.0], [50.0, 48.0], 10.0)
     np.testing.assert_allclose(dnc, [40.0, 37.0])
 
 
@@ -327,11 +381,68 @@ def test_intertek_2019_normalization_reproduces_the_report_column() -> None:
     absorption is printed to 0,1 m2 and Dn,c to the nearest integer. The
     reproduction is therefore checked to 1 dB, which is the printing budget.
     """
-    source = (68, 79, 84, 87, 94, 92, 94, 92, 91, 86, 91, 89, 89, 90, 89, 90, 89, 89, 89)
-    receive = (59, 76, 75, 74, 80, 77, 74, 69, 67, 66, 69, 64, 64, 64, 60, 57, 56, 54, 55)
+    source = (
+        68,
+        79,
+        84,
+        87,
+        94,
+        92,
+        94,
+        92,
+        91,
+        86,
+        91,
+        89,
+        89,
+        90,
+        89,
+        90,
+        89,
+        89,
+        89,
+    )
+    receive = (
+        59,
+        76,
+        75,
+        74,
+        80,
+        77,
+        74,
+        69,
+        67,
+        66,
+        69,
+        64,
+        64,
+        64,
+        60,
+        57,
+        56,
+        54,
+        55,
+    )
     absorption = (
-        19.7, 16.2, 13.0, 12.3, 8.6, 12.4, 13.6, 13.0, 11.7, 11.1, 11.4,
-        11.0, 10.4, 10.3, 11.7, 12.4, 10.2, 9.0, 9.1,
+        19.7,
+        16.2,
+        13.0,
+        12.3,
+        8.6,
+        12.4,
+        13.6,
+        13.0,
+        11.7,
+        11.1,
+        11.4,
+        11.0,
+        10.4,
+        10.3,
+        11.7,
+        12.4,
+        10.2,
+        9.0,
+        9.1,
     )
     printed = (7, 2, 8, 13, 15, 15, 19, 23, 24, 21, 23, 26, 26, 27, 29, 32, 34, 36, 35)
     dnc = building.normalized_ceiling_attenuation(
@@ -360,15 +471,15 @@ def test_undamped_geometry_term_of_the_vigran_example() -> None:
         [30.0, 35.0], [30.0, 35.0], ceiling_length=4.75, plenum_height=0.43
     )
     assert res.geometry_term == pytest.approx(10.4, abs=0.05)
-    np.testing.assert_allclose(res.reduction_index, [60.0 - 10.4, 70.0 - 10.4], atol=0.05)
+    np.testing.assert_allclose(
+        res.reduction_index, [60.0 - 10.4, 70.0 - 10.4], atol=0.05
+    )
 
 
 def test_absorbing_sidewalls_gain_six_decibels() -> None:
     """Eq. (9.19): eps goes from 2 to 1, so the penalty drops by 20 lg 2 = 6,02 dB."""
     kwargs = {"ceiling_length": 4.75, "plenum_height": 0.43}
-    reflecting = building.plenum_flanking_reduction_index(
-        [30.0], [30.0], **kwargs
-    )
+    reflecting = building.plenum_flanking_reduction_index([30.0], [30.0], **kwargs)
     absorbing = building.plenum_flanking_reduction_index(
         [30.0], [30.0], sidewalls="absorbing", **kwargs
     )
@@ -393,8 +504,10 @@ def test_deeper_plenum_helps_by_ten_lg_of_the_depth_ratio() -> None:
 def test_transmission_factor_matches_the_reduction_index() -> None:
     """Rcl = -10 lg(tau_cl): the two outputs are the same quantity."""
     res = building.plenum_flanking_reduction_index(
-        [30.0, 35.0, 40.0], [28.0, 33.0, 38.0],
-        ceiling_length=4.75, plenum_height=0.43,
+        [30.0, 35.0, 40.0],
+        [28.0, 33.0, 38.0],
+        ceiling_length=4.75,
+        plenum_height=0.43,
     )
     np.testing.assert_allclose(
         res.reduction_index, -10.0 * np.log10(res.transmission_factor)
@@ -412,8 +525,12 @@ def test_attenuated_model_converges_to_the_undamped_limit() -> None:
         [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43
     )
     attenuated = building.plenum_flanking_reduction_index(
-        [50.0], [100.0], ceiling_length=4.75, plenum_height=0.43,
-        attenuation_source=[1e-5], attenuation_receiving=[1e-5],
+        [50.0],
+        [100.0],
+        ceiling_length=4.75,
+        plenum_height=0.43,
+        attenuation_source=[1e-5],
+        attenuation_receiving=[1e-5],
     )
     assert float(attenuated.reduction_index[0]) == pytest.approx(
         float(undamped.reduction_index[0]), abs=1e-3
@@ -436,8 +553,12 @@ def test_leakage_term_bites_at_a_realistic_ceiling() -> None:
         [20.0], [20.0], ceiling_length=4.75, plenum_height=0.43
     )
     attenuated = building.plenum_flanking_reduction_index(
-        [20.0], [20.0], ceiling_length=4.75, plenum_height=0.43,
-        attenuation_source=[1e-6], attenuation_receiving=[1e-6],
+        [20.0],
+        [20.0],
+        ceiling_length=4.75,
+        plenum_height=0.43,
+        attenuation_source=[1e-6],
+        attenuation_receiving=[1e-6],
     )
     excess = float(attenuated.reduction_index[0] - undamped.reduction_index[0])
     assert excess == pytest.approx(0.2377, abs=2e-3)
@@ -455,8 +576,12 @@ def test_attenuated_model_is_monotonic_in_the_plenum_damping() -> None:
     values = [
         float(
             building.plenum_flanking_reduction_index(
-                [25.0], [25.0], ceiling_length=5.0, plenum_height=0.6,
-                attenuation_source=[m], attenuation_receiving=[m],
+                [25.0],
+                [25.0],
+                ceiling_length=5.0,
+                plenum_height=0.6,
+                attenuation_source=[m],
+                attenuation_receiving=[m],
             ).reduction_index[0]
         )
         for m in (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0)
@@ -475,12 +600,17 @@ def test_attenuated_model_never_exceeds_the_undamped_path() -> None:
     )
     for m in (1e-6, 1e-4, 1e-2, 1.0):
         attenuated = building.plenum_flanking_reduction_index(
-            [25.0], [25.0], ceiling_length=5.0, plenum_height=0.6,
-            attenuation_source=[m], attenuation_receiving=[m],
+            [25.0],
+            [25.0],
+            ceiling_length=5.0,
+            plenum_height=0.6,
+            attenuation_source=[m],
+            attenuation_receiving=[m],
         )
-        assert float(attenuated.reduction_index[0]) >= float(
-            undamped.reduction_index[0]
-        ) - 1e-9
+        assert (
+            float(attenuated.reduction_index[0])
+            >= float(undamped.reduction_index[0]) - 1e-9
+        )
 
 
 def test_undamped_transmission_factor_above_unity_is_rejected() -> None:
@@ -507,8 +637,12 @@ def test_attenuated_transmission_factor_stays_below_unity() -> None:
     for m in (1e-4, 1e-2, 1e-1, 1.0):
         for h in (0.2, 0.43, 0.6):
             res = building.plenum_flanking_reduction_index(
-                [0.0], [0.0], ceiling_length=5.0, plenum_height=h,
-                attenuation_source=[m], attenuation_receiving=[m],
+                [0.0],
+                [0.0],
+                ceiling_length=5.0,
+                plenum_height=h,
+                attenuation_source=[m],
+                attenuation_receiving=[m],
             )
             assert float(res.transmission_factor[0]) <= 1.0
             assert float(res.reduction_index[0]) >= 0.0
@@ -519,8 +653,12 @@ def test_plenum_attenuation_increases_the_reduction_index() -> None:
     values = [
         float(
             building.plenum_flanking_reduction_index(
-                [30.0], [30.0], ceiling_length=4.75, plenum_height=0.43,
-                attenuation_source=[m], attenuation_receiving=[m],
+                [30.0],
+                [30.0],
+                ceiling_length=4.75,
+                plenum_height=0.43,
+                attenuation_source=[m],
+                attenuation_receiving=[m],
             ).reduction_index[0]
         )
         for m in (0.01, 0.1, 0.5, 1.0)
@@ -539,12 +677,20 @@ def test_attenuated_model_carries_the_sidewall_factor_in_its_exponents() -> None
     """
     kwargs = {"ceiling_length": 4.75, "plenum_height": 0.43}
     reflecting = building.plenum_flanking_reduction_index(
-        [50.0], [100.0], sidewalls="reflecting",
-        attenuation_source=[0.2], attenuation_receiving=[0.2], **kwargs,
+        [50.0],
+        [100.0],
+        sidewalls="reflecting",
+        attenuation_source=[0.2],
+        attenuation_receiving=[0.2],
+        **kwargs,
     )
     absorbing = building.plenum_flanking_reduction_index(
-        [50.0], [100.0], sidewalls="absorbing",
-        attenuation_source=[0.4], attenuation_receiving=[0.4], **kwargs,
+        [50.0],
+        [100.0],
+        sidewalls="absorbing",
+        attenuation_source=[0.4],
+        attenuation_receiving=[0.4],
+        **kwargs,
     )
     # The two exponents then agree exactly; only the 1/(mS LS mR LR) prefactor
     # differs, and halving both coefficients quadruples it, so the reflecting
@@ -557,12 +703,13 @@ def test_attenuated_model_carries_the_sidewall_factor_in_its_exponents() -> None
 def test_absorbing_sidewalls_converge_to_their_own_undamped_limit() -> None:
     """The eps = 1 attenuated form collapses to the eps = 1 compact form."""
     kwargs = {"ceiling_length": 4.75, "plenum_height": 0.43, "sidewalls": "absorbing"}
-    undamped = building.plenum_flanking_reduction_index(
-        [50.0], [100.0], **kwargs
-    )
+    undamped = building.plenum_flanking_reduction_index([50.0], [100.0], **kwargs)
     attenuated = building.plenum_flanking_reduction_index(
-        [50.0], [100.0], attenuation_source=[1e-5],
-        attenuation_receiving=[1e-5], **kwargs,
+        [50.0],
+        [100.0],
+        attenuation_source=[1e-5],
+        attenuation_receiving=[1e-5],
+        **kwargs,
     )
     assert float(attenuated.reduction_index[0]) == pytest.approx(
         float(undamped.reduction_index[0]), abs=1e-3
@@ -574,7 +721,10 @@ def test_power_split_must_be_a_fraction(name: str) -> None:
     """sS and sR are fractions of the injected power, so 1,2 is not a split."""
     with pytest.raises(ValueError, match=name):
         building.plenum_flanking_reduction_index(
-            [30.0], [30.0], ceiling_length=4.75, plenum_height=0.43,
+            [30.0],
+            [30.0],
+            ceiling_length=4.75,
+            plenum_height=0.43,
             **{name: 1.2},
         )
 
@@ -582,7 +732,10 @@ def test_power_split_must_be_a_fraction(name: str) -> None:
 def test_attenuation_coefficients_must_come_in_pairs() -> None:
     with pytest.raises(ValueError, match="together"):
         building.plenum_flanking_reduction_index(
-            [30.0], [30.0], ceiling_length=4.75, plenum_height=0.43,
+            [30.0],
+            [30.0],
+            ceiling_length=4.75,
+            plenum_height=0.43,
             attenuation_source=[0.1],
         )
 

@@ -230,26 +230,21 @@ def _runs_pmf(n1: int, n2: int) -> NDArray[np.float64]:
     any ``n1 + n2`` is exact to double precision.
     """
     n = n1 + n2
-    log_total = float(special.gammaln(n + 1.0) - special.gammaln(n1 + 1.0)
-                      - special.gammaln(n2 + 1.0))
+    log_total = float(
+        special.gammaln(n + 1.0) - special.gammaln(n1 + 1.0) - special.gammaln(n2 + 1.0)
+    )
     pmf = np.zeros(n + 1)
     r = np.arange(2, n + 1)
     k = r // 2
     even = r % 2 == 0
-    log_even = (
-        np.log(2.0)
-        + _log_comb(n1 - 1, k - 1)
-        + _log_comb(n2 - 1, k - 1)
-    )
+    log_even = np.log(2.0) + _log_comb(n1 - 1, k - 1) + _log_comb(n2 - 1, k - 1)
     with np.errstate(divide="ignore"):
         odd_a = _log_comb(n1 - 1, k) + _log_comb(n2 - 1, k - 1)
         odd_b = _log_comb(n1 - 1, k - 1) + _log_comb(n2 - 1, k)
         log_odd = np.logaddexp(odd_a, odd_b)
     log_count = np.where(even, log_even, log_odd)
     with np.errstate(invalid="ignore"):
-        pmf[2:] = np.where(
-            np.isfinite(log_count), np.exp(log_count - log_total), 0.0
-        )
+        pmf[2:] = np.where(np.isfinite(log_count), np.exp(log_count - log_total), 0.0)
     return pmf
 
 
@@ -374,9 +369,7 @@ class TrendTestResult:
         return plot_trend_test(self, ax=ax, language=language, **kwargs)
 
 
-def _trend_test_reverse(
-    values: NDArray[np.float64], alpha: float
-) -> TrendTestResult:
+def _trend_test_reverse(values: NDArray[np.float64], alpha: float) -> TrendTestResult:
     n = values.size
     statistic = _reverse_arrangements(values)
     mean, std = _reverse_arrangement_moments(n)
@@ -395,9 +388,7 @@ def _trend_test_reverse(
     )
 
 
-def _trend_test_runs(
-    values: NDArray[np.float64], alpha: float
-) -> TrendTestResult:
+def _trend_test_runs(values: NDArray[np.float64], alpha: float) -> TrendTestResult:
     median = float(np.median(values))
     keep = np.abs(values - median) > 0.0
     kept = values[keep]
@@ -559,9 +550,7 @@ def _segment_statistic(
     if statistic == "mean_square":
         return np.asarray(np.mean(segments**2, axis=1), dtype=np.float64)
     if statistic == "rms":
-        return np.asarray(
-            np.sqrt(np.mean(segments**2, axis=1)), dtype=np.float64
-        )
+        return np.asarray(np.sqrt(np.mean(segments**2, axis=1)), dtype=np.float64)
     if statistic == "mean":
         return np.asarray(np.mean(segments, axis=1), dtype=np.float64)
     return np.asarray(np.var(segments, axis=1), dtype=np.float64)
@@ -734,9 +723,7 @@ class LevelCrossingResult:
         from .._plot.metrology import plot_level_crossing_rate
 
         check_language(language)
-        return plot_level_crossing_rate(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_level_crossing_rate(self, ax=ax, language=language, **kwargs)
 
 
 def level_crossing_rate(
@@ -835,9 +822,7 @@ def _rice_peak_exceedance(
     eps_sq = max(0.0, 1.0 - r * r)
     tail = np.exp(-(z**2) / 2.0)
     if eps_sq < 1e-30:  # narrow bandwidth limit: exactly Rayleigh
-        return np.asarray(
-            np.where(z > 0.0, tail, 1.0), dtype=np.float64
-        )
+        return np.asarray(np.where(z > 0.0, tail, 1.0), dtype=np.float64)
     eps = float(np.sqrt(eps_sq))
     q_first = special.ndtr(-z / eps)
     phi_second = special.ndtr(r * z / eps)
@@ -859,9 +844,7 @@ def _rice_peak_density(
     eps_sq = max(0.0, 1.0 - r * r)
     tail = np.exp(-(z**2) / 2.0)
     if eps_sq < 1e-30:  # narrow bandwidth limit: exactly Rayleigh
-        return np.asarray(
-            np.where(z > 0.0, z * tail, 0.0), dtype=np.float64
-        )
+        return np.asarray(np.where(z > 0.0, z * tail, 0.0), dtype=np.float64)
     eps = float(np.sqrt(eps_sq))
     gaussian = eps / np.sqrt(2.0 * np.pi) * np.exp(-(z**2) / (2.0 * eps_sq))
     phi_second = special.ndtr(r * z / eps)

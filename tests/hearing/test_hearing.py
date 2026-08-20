@@ -42,8 +42,10 @@ def test_reference_age_is_zero_median(sex: str) -> None:
 def test_median_matches_reference_values() -> None:
     # Reference median deviations computed from the Table 1 formula.
     male = h.age_threshold(60, "male", 0.5)
-    assert male.median[4] == pytest.approx(7.8473, abs=1e-3)   # 1000 Hz
-    assert male.median[8] == pytest.approx(ISO7029_MEDIAN_MALE_60_4KHZ, abs=1e-3)  # 4000 Hz
+    assert male.median[4] == pytest.approx(7.8473, abs=1e-3)  # 1000 Hz
+    assert male.median[8] == pytest.approx(
+        ISO7029_MEDIAN_MALE_60_4KHZ, abs=1e-3
+    )  # 4000 Hz
     female = h.age_threshold(60, "female", 0.5)
     assert female.median[8] == pytest.approx(15.3218, abs=1e-3)
 
@@ -64,7 +66,7 @@ def test_fractiles_bracket_the_median() -> None:
 
 
 def test_male_median_exceeds_female_at_high_frequency() -> None:
-    male = h.age_threshold(70, "male", 0.5).median[8]     # 4000 Hz
+    male = h.age_threshold(70, "male", 0.5).median[8]  # 4000 Hz
     female = h.age_threshold(70, "female", 0.5).median[8]
     assert male > female
 

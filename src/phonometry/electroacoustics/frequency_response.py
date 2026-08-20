@@ -173,9 +173,7 @@ def transfer_function(
 
     freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, float(overlap))
     if estimator == "H1":
-        response = np.divide(
-            gxy, gxx, out=np.zeros_like(gxy), where=gxx > 0.0
-        )
+        response = np.divide(gxy, gxx, out=np.zeros_like(gxy), where=gxx > 0.0)
     else:
         # H2 = Gyy / Gyx = Gyy / conj(Gxy).
         gyx = np.conj(gxy)
@@ -188,9 +186,7 @@ def transfer_function(
             where=gyx.real**2 + gyx.imag**2 > 0.0,
         )
     denom = gxx * gyy
-    coh = np.divide(
-        np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0
-    )
+    coh = np.divide(np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0)
     coh = np.clip(coh, 0.0, 1.0)
     with np.errstate(divide="ignore"):
         magnitude_db = 20.0 * np.log10(np.abs(response))
@@ -248,7 +244,5 @@ def coherence(
         raise ValueError("'nperseg' must be between 32 and the signal length.")
     freqs, gxy, gxx, gyy = _spectra(xa, ya, fs_v, seg, float(overlap))
     denom = gxx * gyy
-    coh = np.divide(
-        np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0
-    )
+    coh = np.divide(np.abs(gxy) ** 2, denom, out=np.zeros_like(gxx), where=denom > 0.0)
     return freqs, np.clip(coh, 0.0, 1.0)

@@ -75,8 +75,7 @@ def corpus(tmp_path: pathlib.Path) -> pathlib.Path:
     _write(
         root / "README.md",
         f"The report runs {OLD_TOTAL} conformance checks across {OLD_DOMAINS} "
-        f"domains and {OLD_STANDARDS} standards, each pinning a value.\n"
-        + DECOY_LINES,
+        f"domains and {OLD_STANDARDS} standards, each pinning a value.\n" + DECOY_LINES,
     )
     _write(
         root / "README_PYPI.md",
@@ -173,7 +172,9 @@ def test_write_moves_every_quoted_count(corpus, capsys):
             f"{STANDARDS} standards" in text
         ), f"{readme} was not brought into line"
 
-    started = (corpus / "docs" / "start" / "getting-started.md").read_text(encoding="utf8")
+    started = (corpus / "docs" / "start" / "getting-started.md").read_text(
+        encoding="utf8"
+    )
     assert f"all {TOTAL} checks" in started
     assert (
         f"{TOTAL} numerical conformance checks across {DOMAINS} domains and "
@@ -184,7 +185,9 @@ def test_write_moves_every_quoted_count(corpus, capsys):
     assert f"{TOTAL} conformance checks against {STANDARDS} standards" in english
 
     spanish = (corpus / "site/src/content/docs/es/index.mdx").read_text(encoding="utf8")
-    assert f"{TOTAL} comprobaciones de conformidad frente a {STANDARDS} normas" in spanish
+    assert (
+        f"{TOTAL} comprobaciones de conformidad frente a {STANDARDS} normas" in spanish
+    )
     assert f"en {DOMAINS} dominios y {STANDARDS} normas" in spanish
     assert f"las {TOTAL} comprobaciones" in spanish
 
@@ -208,7 +211,9 @@ def test_write_leaves_the_decoys_alone(corpus):
     """
     assert _run(corpus, "--write") == 0
 
-    started = (corpus / "docs" / "start" / "getting-started.md").read_text(encoding="utf8")
+    started = (corpus / "docs" / "start" / "getting-started.md").read_text(
+        encoding="utf8"
+    )
     assert started.endswith(DECOY_LINES)
     assert f"one for each of the {OLD_TOTAL} rows of Annex {OLD_DOMAINS}." in started
 
@@ -262,9 +267,12 @@ def test_a_crlf_file_stays_crlf(tmp_path):
         f"Intro paragraph.\r\nThe suite runs {OLD_TOTAL} conformance checks.\r\n",
     )
     assert _run(tmp_path, "--write") == 0
-    assert page.read_bytes() == (
-        f"Intro paragraph.\r\nThe suite runs {TOTAL} conformance checks.\r\n"
-    ).encode()
+    assert (
+        page.read_bytes()
+        == (
+            f"Intro paragraph.\r\nThe suite runs {TOTAL} conformance checks.\r\n"
+        ).encode()
+    )
 
 
 def test_line_endings_and_surrounding_prose_are_preserved():

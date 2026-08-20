@@ -22,8 +22,9 @@ from phonometry.underwater.sonar_equation import (
 
 def test_passive_signal_excess_and_fom() -> None:
     # SE = SL - PL - (NL - DI) - DT ; hand values.
-    res = passive_sonar_equation(140.0, 80.0, 60.0, directivity_index=10.0,
-                                 detection_threshold=5.0)
+    res = passive_sonar_equation(
+        140.0, 80.0, 60.0, directivity_index=10.0, detection_threshold=5.0
+    )
     assert isinstance(res, SonarEquationResult)
     assert res.mode == "passive"
     # SE = 140 - 80 - (60 - 10) - 5 = 5
@@ -36,15 +37,17 @@ def test_passive_signal_excess_and_fom() -> None:
 
 def test_passive_detection_at_fom() -> None:
     # At PL = FOM the signal excess is exactly zero (detection limit).
-    res = passive_sonar_equation(140.0, [85.0], 60.0, directivity_index=10.0,
-                                 detection_threshold=5.0)
+    res = passive_sonar_equation(
+        140.0, [85.0], 60.0, directivity_index=10.0, detection_threshold=5.0
+    )
     assert res.signal_excess[0] == pytest.approx(0.0, abs=1e-9)
 
 
 def test_active_noise_limited() -> None:
     # SE = SL - 2 PL + TS - (NL - DI) - DT
-    res = active_sonar_equation(220.0, 70.0, 15.0, 60.0, directivity_index=20.0,
-                                detection_threshold=10.0)
+    res = active_sonar_equation(
+        220.0, 70.0, 15.0, 60.0, directivity_index=20.0, detection_threshold=10.0
+    )
     assert res.mode == "active"
     # SE = 220 - 140 + 15 - (60 - 20) - 10 = 45
     assert res.signal_excess[0] == pytest.approx(45.0)
@@ -54,8 +57,15 @@ def test_active_noise_limited() -> None:
 
 def test_active_reverberation_limited_ignores_di() -> None:
     # With RL given, masking is RL (DI does not apply to reverberation).
-    res = active_sonar_equation(220.0, 70.0, 15.0, 60.0, directivity_index=20.0,
-                                detection_threshold=10.0, reverberation_level=55.0)
+    res = active_sonar_equation(
+        220.0,
+        70.0,
+        15.0,
+        60.0,
+        directivity_index=20.0,
+        detection_threshold=10.0,
+        reverberation_level=55.0,
+    )
     assert res.reverberation_limited is True
     # SE = 220 - 140 + 15 - 55 - 10 = 30
     assert res.signal_excess[0] == pytest.approx(30.0)
@@ -82,8 +92,9 @@ def test_rejects_non_finite() -> None:
 
 
 def test_plot_smoke() -> None:
-    res = passive_sonar_equation(150.0, np.linspace(40.0, 110.0, 40), 55.0,
-                                 detection_threshold=8.0)
+    res = passive_sonar_equation(
+        150.0, np.linspace(40.0, 110.0, 40), 55.0, detection_threshold=8.0
+    )
     assert res.plot() is not None
 
 
@@ -106,8 +117,11 @@ def test_ainslie_passive_narrowband_fom() -> None:
     # noise as NL = NLf + 10 lg(0.25 Hz) = 59.7 - 6.0 dB. Five printed
     # terms, each rounded to 0.1 dB, give a 0.15 dB accumulation allowance.
     res = passive_sonar_equation(
-        133.9, 0.0, 59.7 - 6.0,
-        directivity_index=11.5, detection_threshold=13.8,
+        133.9,
+        0.0,
+        59.7 - 6.0,
+        directivity_index=11.5,
+        detection_threshold=13.8,
     )
     assert res.figure_of_merit == pytest.approx(78.0, abs=0.15)
 
@@ -118,8 +132,11 @@ def test_ainslie_passive_broadband_fom() -> None:
     # NLf = 53.2 dB re uPa2/Hz, AGm = 12.8 dB, DT = -18.6 dB ->
     # FOM = 79.0 dB re m2 (four printed 0.1 dB terms -> 0.15 dB allowance).
     res = passive_sonar_equation(
-        100.9, 0.0, 53.2,
-        directivity_index=12.8, detection_threshold=-18.6,
+        100.9,
+        0.0,
+        53.2,
+        directivity_index=12.8,
+        detection_threshold=-18.6,
     )
     assert res.figure_of_merit == pytest.approx(79.0, abs=0.15)
 
@@ -130,8 +147,12 @@ def test_ainslie_active_orca_noise_limited_fom() -> None:
     # NL = 75.0 dB re uPa2, AG = 16.5 dB, DT = 8.7 dB -> noise-limited
     # FOM_NL = (SL + TS - (NL - AG) - DT)/2 = 51.0 dB re m2.
     res = active_sonar_equation(
-        198.2, 0.0, -29.0, 75.0,
-        directivity_index=16.5, detection_threshold=8.7,
+        198.2,
+        0.0,
+        -29.0,
+        75.0,
+        directivity_index=16.5,
+        detection_threshold=8.7,
     )
     assert res.figure_of_merit == pytest.approx(51.0, abs=0.05)
 

@@ -53,8 +53,14 @@ _CUPY = _cupy_or_none()
 
 BACKENDS = [
     pytest.param(np, 1e-12, id="numpy"),
-    pytest.param(_CUPY, 1e-10, id="cupy", marks=pytest.mark.skipif(
-        _CUPY is None, reason="CuPy with a CUDA device is not available")),
+    pytest.param(
+        _CUPY,
+        1e-10,
+        id="cupy",
+        marks=pytest.mark.skipif(
+            _CUPY is None, reason="CuPy with a CUDA device is not available"
+        ),
+    ),
 ]
 
 _NY, _NX = 60, 80
@@ -68,39 +74,47 @@ def _scenarios() -> dict[str, dict[str, Any]]:
     An optional ``"c"`` entry replaces the default scalar sound speed.
     """
     rho_obstacle = np.full((_NY, _NX), 1.2)
-    rho_obstacle[24:36, 30:44] = 6000.0          # dense block scatterer
+    rho_obstacle[24:36, 30:44] = 6000.0  # dense block scatterer
     damping_map = np.zeros((_NY, _NX))
-    damping_map[:, _NX - 16:] = 35.0             # lossy slab at the right
+    damping_map[:, _NX - 16 :] = 35.0  # lossy slab at the right
     mask = np.zeros((_NY, _NX), dtype=np.bool_)
-    mask[40:46, 10:70] = True                    # rigid slat obstacle
-    c_hetero = np.full((_NY, _NX), 343.0)        # air over a water layer
-    c_hetero[_NY // 2:, :] = 1500.0
+    mask[40:46, 10:70] = True  # rigid slat obstacle
+    c_hetero = np.full((_NY, _NX), 343.0)  # air over a water layer
+    c_hetero[_NY // 2 :, :] = 1500.0
     rho_hetero = np.full((_NY, _NX), 1.2)
-    rho_hetero[_NY // 2:, :] = 1000.0
+    rho_hetero[_NY // 2 :, :] = 1000.0
     return {
         "rigid_box": {},
         "dense_rho_obstacle": {"rho": rho_obstacle},
         "heterogeneous_c": {"c": c_hetero, "rho": rho_hetero},
-        "sponge": {"sponge_width": 12,
-                   "sponge_sides": ("left", "right", "bottom"),
-                   "sponge_reflection": 1e-3},
+        "sponge": {
+            "sponge_width": 12,
+            "sponge_sides": ("left", "right", "bottom"),
+            "sponge_reflection": 1e-3,
+        },
         "sponge_side_string": {"sponge_width": 12, "sponge_sides": "top"},
-        "impedance_edges": {"edge_impedance": {
-            "top": 413.0,
-            "left": np.linspace(200.0, 800.0, _NY),
-        }},
-        "impedance_right_bottom": {"edge_impedance": {
-            "right": 620.0,
-            "bottom": np.linspace(300.0, 900.0, _NX),
-        }},
+        "impedance_edges": {
+            "edge_impedance": {
+                "top": 413.0,
+                "left": np.linspace(200.0, 800.0, _NY),
+            }
+        },
+        "impedance_right_bottom": {
+            "edge_impedance": {
+                "right": 620.0,
+                "bottom": np.linspace(300.0, 900.0, _NX),
+            }
+        },
         "damping_scalar": {"damping": 25.0},
         "damping_map": {"damping": damping_map},
         "obstacle_mask": {"obstacle_mask": mask},
-        "combined": {"rho": rho_obstacle,
-                     "sponge_width": 10,
-                     "sponge_sides": ("left", "right"),
-                     "damping": damping_map,
-                     "edge_impedance": {"top": 413.0}},
+        "combined": {
+            "rho": rho_obstacle,
+            "sponge_width": 10,
+            "sponge_sides": ("left", "right"),
+            "damping": damping_map,
+            "edge_impedance": {"top": 413.0},
+        },
     }
 
 
@@ -118,8 +132,9 @@ def _split_c(kwargs: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
     return rest.pop("c", 343.0), rest
 
 
-def _reference(kwargs: dict[str, Any], wave: dict[str, Any],
-               direction: str) -> list[np.ndarray]:
+def _reference(
+    kwargs: dict[str, Any], wave: dict[str, Any], direction: str
+) -> list[np.ndarray]:
     """Library-engine pressure fields every 50 steps."""
     c, rest = _split_c(kwargs)
     ref = FDTD2D(c, _DX, shape=(_NY, _NX), **rest)
@@ -132,20 +147,21 @@ def _reference(kwargs: dict[str, Any], wave: dict[str, Any],
     return fields
 
 
-def _assert_parity(fields: list[np.ndarray], got: list[np.ndarray],
-                   rtol_peak: float) -> None:
+def _assert_parity(
+    fields: list[np.ndarray], got: list[np.ndarray], rtol_peak: float
+) -> None:
     """Every recorded field matches within *rtol_peak* of the run peak."""
     peak = max(float(np.max(np.abs(f))) for f in fields)
     assert peak > 0.0
     for ref_f, got_f in zip(fields, got, strict=True):
-        np.testing.assert_allclose(got_f, ref_f, rtol=0.0,
-                                   atol=rtol_peak * peak)
+        np.testing.assert_allclose(got_f, ref_f, rtol=0.0, atol=rtol_peak * peak)
 
 
 @pytest.mark.parametrize("xp,tol", BACKENDS)
 @pytest.mark.parametrize("direction", list(_WAVES))
-def test_plane_wave_directions_match_library(xp: Any, tol: float,
-                                             direction: str) -> None:
+def test_plane_wave_directions_match_library(
+    xp: Any, tol: float, direction: str
+) -> None:
     """A plane packet in each travel direction reproduces the library."""
     wave = _WAVES[direction]
     fields = _reference({}, wave, direction)
@@ -200,9 +216,14 @@ def test_job_round_trip_matches_library() -> None:
     wave = {"center": 0.15, "width": 0.06, "wavelength": 0.09}
     fields = _reference(kwargs, wave, "down")
     job = fdtd_gpu_remote.build_job(
-        343.0, _DX, shape=(_NY, _NX), steps=_STEPS,
+        343.0,
+        _DX,
+        shape=(_NY, _NX),
+        steps=_STEPS,
         sample_steps=[50, 100, 150, 200],
-        plane_waves=[{"direction": "down", **wave}], **kwargs)
+        plane_waves=[{"direction": "down", **wave}],
+        **kwargs,
+    )
     result = job_runner.run_job(job)
     assert result["backend"] in ("numpy", "cupy")
     assert int(result["cells"]) == _NY * _NX
@@ -213,8 +234,8 @@ def test_job_round_trip_matches_library() -> None:
 def test_job_round_trip_edge_array_and_obstacle() -> None:
     """Per-cell 1D edge impedance and a non-trivial obstacle survive the npz."""
     mask = np.zeros((_NY, _NX), dtype=np.bool_)
-    mask[18:22, 8:36] = True                     # horizontal slat
-    mask[30:52, 44:48] = True                    # vertical baffle
+    mask[18:22, 8:36] = True  # horizontal slat
+    mask[30:52, 44:48] = True  # vertical baffle
     kwargs = {
         "edge_impedance": {"left": np.linspace(220.0, 760.0, _NY)},
         "obstacle_mask": mask,
@@ -222,9 +243,14 @@ def test_job_round_trip_edge_array_and_obstacle() -> None:
     wave = {"center": 0.15, "width": 0.06, "wavelength": 0.09}
     fields = _reference(kwargs, wave, "down")
     job = fdtd_gpu_remote.build_job(
-        343.0, _DX, shape=(_NY, _NX), steps=_STEPS,
+        343.0,
+        _DX,
+        shape=(_NY, _NX),
+        steps=_STEPS,
         sample_steps=[50, 100, 150, 200],
-        plane_waves=[{"direction": "down", **wave}], **kwargs)
+        plane_waves=[{"direction": "down", **wave}],
+        **kwargs,
+    )
     result = job_runner.run_job(job)
     tol = 1e-12 if result["backend"] == "numpy" else 1e-10
     _assert_parity(fields, list(np.asarray(result["frames"])), tol)
@@ -241,9 +267,14 @@ def test_job_round_trip_empty_sponge_sides() -> None:
     wave = {"center": 0.15, "width": 0.06, "wavelength": 0.09}
     fields = _reference(kwargs, wave, "down")
     job = fdtd_gpu_remote.build_job(
-        343.0, _DX, shape=(_NY, _NX), steps=_STEPS,
+        343.0,
+        _DX,
+        shape=(_NY, _NX),
+        steps=_STEPS,
         sample_steps=[50, 100, 150, 200],
-        plane_waves=[{"direction": "down", **wave}], **kwargs)
+        plane_waves=[{"direction": "down", **wave}],
+        **kwargs,
+    )
     assert job["sponge_sides"].size == 0
     result = job_runner.run_job(job)
     tol = 1e-12 if result["backend"] == "numpy" else 1e-10
@@ -264,10 +295,14 @@ def test_job_round_trip_init_scale_x() -> None:
         if (i + 1) % 50 == 0:
             fields.append(sim.pressure())
     job = fdtd_gpu_remote.build_job(
-        343.0, _DX, shape=(_NY, _NX), steps=_STEPS,
+        343.0,
+        _DX,
+        shape=(_NY, _NX),
+        steps=_STEPS,
         sample_steps=[50, 100, 150, 200],
         plane_waves=[{"direction": "down", **wave}],
-        init_scale_x=window)
+        init_scale_x=window,
+    )
     result = job_runner.run_job(job)
     tol = 1e-12 if result["backend"] == "numpy" else 1e-10
     _assert_parity(fields, list(np.asarray(result["frames"])), tol)
@@ -278,13 +313,18 @@ def test_job_round_trip_subsampled_frames() -> None:
     kwargs = _scenarios()["combined"]
     wave = {"center": 0.15, "width": 0.06, "wavelength": 0.09}
     common: dict[str, Any] = dict(
-        shape=(_NY, _NX), steps=_STEPS, sample_steps=[0, 100, 200],
-        plane_waves=[{"direction": "down", **wave}], **kwargs)
-    full = job_runner.run_job(
-        fdtd_gpu_remote.build_job(343.0, _DX, **common))
+        shape=(_NY, _NX),
+        steps=_STEPS,
+        sample_steps=[0, 100, 200],
+        plane_waves=[{"direction": "down", **wave}],
+        **kwargs,
+    )
+    full = job_runner.run_job(fdtd_gpu_remote.build_job(343.0, _DX, **common))
     sub = job_runner.run_job(
-        fdtd_gpu_remote.build_job(343.0, _DX, sample_stride=4,
-                                  sample_dtype="float32", **common))
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, sample_stride=4, sample_dtype="float32", **common
+        )
+    )
     full_frames = np.asarray(full["frames"])
     sub_frames = np.asarray(sub["frames"])
     assert full_frames.dtype == np.float64
@@ -292,13 +332,13 @@ def test_job_round_trip_subsampled_frames() -> None:
     assert sub_frames.shape == (3, (_NY + 3) // 4, (_NX + 3) // 4)
     assert sub_frames.nbytes * 32 == full_frames.nbytes
     np.testing.assert_array_equal(
-        sub_frames, full_frames[:, ::4, ::4].astype(np.float32))
+        sub_frames, full_frames[:, ::4, ::4].astype(np.float32)
+    )
 
 
 def test_build_job_validation() -> None:
     """build_job rejects inconsistent sampling and non-integer widths."""
-    ok: dict[str, Any] = {"shape": (_NY, _NX), "steps": 100,
-                          "sample_steps": [50]}
+    ok: dict[str, Any] = {"shape": (_NY, _NX), "steps": 100, "sample_steps": [50]}
     with pytest.raises(ValueError, match="cfl"):
         fdtd_gpu_remote.build_job(343.0, _DX, cfl=1.5, **ok)
     with pytest.raises(ValueError, match="damping"):
@@ -307,29 +347,28 @@ def test_build_job_validation() -> None:
     with pytest.raises(ValueError, match="damping"):
         fdtd_gpu_remote.build_job(343.0, _DX, damping=bad_damping, **ok)
     with pytest.raises(ValueError, match="impedance sides"):
-        fdtd_gpu_remote.build_job(343.0, _DX,
-                                  edge_impedance={"front": 413.0}, **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, edge_impedance={"front": 413.0}, **ok)
     with pytest.raises(ValueError, match="absorbing"):
-        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=10,
-                                  edge_impedance={"top": 413.0}, **ok)
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, sponge_width=10, edge_impedance={"top": 413.0}, **ok
+        )
     bad_profile = {"top": np.ones(_NX + 2)}
     with pytest.raises(ValueError, match="impedance"):
-        fdtd_gpu_remote.build_job(343.0, _DX, edge_impedance=bad_profile,
-                                  **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, edge_impedance=bad_profile, **ok)
     bad_mask_shape = np.zeros((_NY + 1, _NX), np.bool_)
     with pytest.raises(ValueError, match="obstacle_mask"):
-        fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_shape,
-                                  **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_shape, **ok)
     bad_mask_dtype = np.zeros((_NY, _NX), np.int64)
     with pytest.raises(ValueError, match="obstacle_mask"):
-        fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_dtype,
-                                  **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, obstacle_mask=bad_mask_dtype, **ok)
     with pytest.raises(ValueError, match="sample_steps"):
-        fdtd_gpu_remote.build_job(343.0, _DX, shape=(_NY, _NX), steps=100,
-                                  sample_steps=[50, 150])
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, shape=(_NY, _NX), steps=100, sample_steps=[50, 150]
+        )
     with pytest.raises(ValueError, match="sample_steps"):
-        fdtd_gpu_remote.build_job(343.0, _DX, shape=(_NY, _NX), steps=100,
-                                  sample_steps=[-1, 50])
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, shape=(_NY, _NX), steps=100, sample_steps=[-1, 50]
+        )
     with pytest.raises(ValueError, match="sample_stride"):
         fdtd_gpu_remote.build_job(343.0, _DX, sample_stride=0, **ok)
     with pytest.raises(ValueError, match="sample_stride"):
@@ -346,16 +385,15 @@ def test_build_job_validation() -> None:
     with pytest.raises(ValueError, match="smallest grid side"):
         fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=too_wide, **ok)
     with pytest.raises(ValueError, match="sponge_reflection"):
-        fdtd_gpu_remote.build_job(343.0, _DX, sponge_width=4,
-                                  sponge_reflection=1.5, **ok)
+        fdtd_gpu_remote.build_job(
+            343.0, _DX, sponge_width=4, sponge_reflection=1.5, **ok
+        )
     bad_scale_length = np.ones(_NX + 1)
     with pytest.raises(ValueError, match="init_scale_x"):
-        fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_length,
-                                  **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_length, **ok)
     bad_scale_nan = np.full(_NX, np.nan)
     with pytest.raises(ValueError, match="init_scale_x"):
-        fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_nan,
-                                  **ok)
+        fdtd_gpu_remote.build_job(343.0, _DX, init_scale_x=bad_scale_nan, **ok)
 
 
 def test_sample_steps_deduplicated_local_and_remote_contract() -> None:
@@ -366,35 +404,36 @@ def test_sample_steps_deduplicated_local_and_remote_contract() -> None:
     frames/sample_steps contract as the packed job.
     """
     job = fdtd_gpu_remote.build_job(
-        343.0, _DX, shape=(_NY, _NX), steps=100,
-        sample_steps=[100, 0, 50, 50, 0, 100])
+        343.0, _DX, shape=(_NY, _NX), steps=100, sample_steps=[100, 0, 50, 50, 0, 100]
+    )
     np.testing.assert_array_equal(job["sample_steps"], [0, 50, 100])
-    job["sample_steps"] = np.asarray([100, 0, 50, 50, 0, 100],
-                                     dtype=np.int64)
+    job["sample_steps"] = np.asarray([100, 0, 50, 50, 0, 100], dtype=np.int64)
     result = job_runner.run_job(job)
     np.testing.assert_array_equal(result["sample_steps"], [0, 50, 100])
     assert np.asarray(result["frames"]).shape[0] == 3
 
 
 def test_submit_falls_back_to_local_numpy_run(
-        monkeypatch: pytest.MonkeyPatch,
-        capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     """A reachable remote whose run fails degrades to a local NumPy run."""
     config = fdtd_gpu_remote.RemoteConfig(
-        host="203.0.113.9", user="gpuuser", name="test GPU",
-        image="cupy/cupy:v13.6.0", workdir="/tmp/phonometry-gpu")
-    monkeypatch.setattr(fdtd_gpu_remote, "remote_available",
-                        lambda config: True)
+        host="203.0.113.9",
+        user="gpuuser",
+        name="test GPU",
+        image="cupy/cupy:v13.6.0",
+        workdir="/tmp/phonometry-gpu",
+    )
+    monkeypatch.setattr(fdtd_gpu_remote, "remote_available", lambda config: True)
 
-    def _boom(job: dict[str, Any], config: Any,
-              timeout: float = 0.0) -> dict[str, Any]:
+    def _boom(job: dict[str, Any], config: Any, timeout: float = 0.0) -> dict[str, Any]:
         raise fdtd_gpu_remote.RemoteRunError("docker run failed")
 
     monkeypatch.setattr(fdtd_gpu_remote, "run_remote", _boom)
-    monkeypatch.setattr(job_runner, "_pick_backend",
-                        lambda: (np, "numpy"))
+    monkeypatch.setattr(job_runner, "_pick_backend", lambda: (np, "numpy"))
     job = fdtd_gpu_remote.build_job(
-        343.0, _DX, shape=(20, 24), steps=10, sample_steps=[0, 10])
+        343.0, _DX, shape=(20, 24), steps=10, sample_steps=[0, 10]
+    )
     result = fdtd_gpu_remote.submit(job, config)
     assert result["backend"] == "numpy"
     assert int(result["steps"]) == 10
@@ -405,20 +444,19 @@ def test_submit_falls_back_to_local_numpy_run(
 
 
 def test_load_env_real_environment_wins(
-        monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path) -> None:
+    monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+) -> None:
     """An exported variable beats the .env file; missing ones are loaded."""
     env_file = tmp_path / ".env"
     env_file.write_text(
-        "# comment line\n"
-        "PHONO_GPU_HOST=file-host\n"
-        'PHONO_GPU_NAME="lab GPU"\n',
-        encoding="utf-8")
+        '# comment line\nPHONO_GPU_HOST=file-host\nPHONO_GPU_NAME="lab GPU"\n',
+        encoding="utf-8",
+    )
     monkeypatch.setenv("PHONO_GPU_HOST", "env-host")
     # Guarantee the variable is absent and restored either way.
     monkeypatch.setenv("PHONO_GPU_NAME", "sentinel")
     monkeypatch.delenv("PHONO_GPU_NAME")
     values = fdtd_gpu_remote.load_env(env_file)
-    assert values == {"PHONO_GPU_HOST": "file-host",
-                      "PHONO_GPU_NAME": "lab GPU"}
-    assert os.environ["PHONO_GPU_HOST"] == "env-host"    # real env wins
-    assert os.environ["PHONO_GPU_NAME"] == "lab GPU"     # quotes stripped
+    assert values == {"PHONO_GPU_HOST": "file-host", "PHONO_GPU_NAME": "lab GPU"}
+    assert os.environ["PHONO_GPU_HOST"] == "env-host"  # real env wins
+    assert os.environ["PHONO_GPU_NAME"] == "lab GPU"  # quotes stripped

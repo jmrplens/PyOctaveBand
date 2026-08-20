@@ -66,7 +66,12 @@ _GUIDE = {"depth": 100.0, "zs": 36.0, "zr": 46.0, "r": 500.0, "aperture": 48.0}
 
 
 def _image_arrivals(
-    *, depth: float, zs: float, zr: float, r: float, aperture: float,
+    *,
+    depth: float,
+    zs: float,
+    zr: float,
+    r: float,
+    aperture: float,
 ) -> list[tuple[float, float, float, int, int]]:
     """Every arrival of the ideal waveguide inside the fan's aperture.
 
@@ -101,9 +106,13 @@ def _image_arrivals(
 
 def _guide_trace(aperture: float = 48.0, step_deg: float = 0.5):
     return ray_trace(
-        [0.0, _GUIDE["depth"]], [_C, _C], source_depth=_GUIDE["zs"],
+        [0.0, _GUIDE["depth"]],
+        [_C, _C],
+        source_depth=_GUIDE["zs"],
         launch_angles_deg=np.arange(-aperture, aperture + 1e-9, step_deg),
-        max_range=600.0, n_steps=201)
+        max_range=600.0,
+        n_steps=201,
+    )
 
 
 #: Refinement steps for the isovelocity searches. Straight rays are exact at
@@ -118,8 +127,12 @@ _GUIDE_STEPS = 64
 def _guide_arrivals() -> tuple[object, EigenrayResult]:
     """The shared trace and pressure-release arrival list, computed once."""
     trace = _guide_trace()
-    return trace, eigenrays(trace, receiver_range=_GUIDE["r"],
-                            receiver_depth=_GUIDE["zr"], n_steps=_GUIDE_STEPS)
+    return trace, eigenrays(
+        trace,
+        receiver_range=_GUIDE["r"],
+        receiver_depth=_GUIDE["zr"],
+        n_steps=_GUIDE_STEPS,
+    )
 
 
 # --- The image-method oracle ------------------------------------------------
@@ -139,8 +152,12 @@ def test_the_ideal_waveguide_arrivals_are_the_image_lattice_exactly() -> None:
     failure at these bounds is a wrong formula, not a loose one.
     """
     exact = _image_arrivals(
-        depth=_GUIDE["depth"], zs=_GUIDE["zs"], zr=_GUIDE["zr"],
-        r=_GUIDE["r"], aperture=_GUIDE["aperture"])
+        depth=_GUIDE["depth"],
+        zs=_GUIDE["zs"],
+        zr=_GUIDE["zr"],
+        r=_GUIDE["r"],
+        aperture=_GUIDE["aperture"],
+    )
     _trace, res = _guide_arrivals()
     assert isinstance(res, EigenrayResult)
     # The census: every image inside the aperture and nothing else. Eleven
@@ -174,15 +191,22 @@ def test_a_rigid_bottom_flips_exactly_the_bottom_signs() -> None:
     (the rigid coefficient is +1 where the pressure-release one was -1).
     """
     trace, soft = _guide_arrivals()
-    rigid = eigenrays(trace, receiver_range=_GUIDE["r"],
-                      receiver_depth=_GUIDE["zr"], bottom="rigid",
-                      n_steps=_GUIDE_STEPS)
+    rigid = eigenrays(
+        trace,
+        receiver_range=_GUIDE["r"],
+        receiver_depth=_GUIDE["zr"],
+        bottom="rigid",
+        n_steps=_GUIDE_STEPS,
+    )
     assert np.array_equal(rigid.travel_times, soft.travel_times)
     assert np.array_equal(rigid.launch_angles, soft.launch_angles)
     assert np.array_equal(rigid.arrival_angles, soft.arrival_angles)
     np.testing.assert_allclose(
         rigid.amplitudes,
-        soft.amplitudes * (-1.0) ** soft.bottom_reflections, rtol=0.0, atol=0.0)
+        soft.amplitudes * (-1.0) ** soft.bottom_reflections,
+        rtol=0.0,
+        atol=0.0,
+    )
 
 
 def test_a_lossy_seabed_charges_R_at_each_arrivals_own_angle_as_printed() -> None:
@@ -206,27 +230,37 @@ def test_a_lossy_seabed_charges_R_at_each_arrivals_own_angle_as_printed() -> Non
 
     rho1, rho2, c2 = 1000.0, 1800.0, 1700.0
     trace, soft = _guide_arrivals()
-    lossy = eigenrays(trace, receiver_range=_GUIDE["r"],
-                      receiver_depth=_GUIDE["zr"],
-                      bottom=FluidSeabed(density=rho2, sound_speed=c2,
-                                         water_density=rho1),
-                      n_steps=_GUIDE_STEPS)
+    lossy = eigenrays(
+        trace,
+        receiver_range=_GUIDE["r"],
+        receiver_depth=_GUIDE["zr"],
+        bottom=FluidSeabed(density=rho2, sound_speed=c2, water_density=rho1),
+        n_steps=_GUIDE_STEPS,
+    )
     assert np.array_equal(lossy.travel_times, soft.travel_times)
     exact = _image_arrivals(
-        depth=_GUIDE["depth"], zs=_GUIDE["zs"], zr=_GUIDE["zr"],
-        r=_GUIDE["r"], aperture=_GUIDE["aperture"])
+        depth=_GUIDE["depth"],
+        zs=_GUIDE["zs"],
+        zr=_GUIDE["zr"],
+        r=_GUIDE["r"],
+        aperture=_GUIDE["aperture"],
+    )
     below = above = 0
     for i, (t, launch, _arrival, n_s, n_b) in enumerate(exact):
         slant = t * _C
-        r_b = complex(np.ravel(reflection_coefficient(
-            abs(launch), rho1=rho1, c1=_C, rho2=rho2, c2=c2))[0])
-        amp = (-1.0) ** n_s * r_b ** n_b / slant
+        r_b = complex(
+            np.ravel(
+                reflection_coefficient(abs(launch), rho1=rho1, c1=_C, rho2=rho2, c2=c2)
+            )[0]
+        )
+        amp = (-1.0) ** n_s * r_b**n_b / slant
         assert lossy.amplitudes[i] == pytest.approx(amp, rel=1e-9), launch
         if n_b and abs(launch) < 28.0:
             below += 1
             # Total reflection: the seabed lives in the phase alone here.
             assert abs(lossy.amplitudes[i]) == pytest.approx(
-                abs(soft.amplitudes[i]), rel=1e-9)
+                abs(soft.amplitudes[i]), rel=1e-9
+            )
             assert abs(np.angle(lossy.amplitudes[i] / soft.amplitudes[i])) > 0.1
         elif n_b:
             above += 1
@@ -240,17 +274,25 @@ def test_the_cap_keeps_the_earliest_arrivals_and_says_so() -> None:
     about the arrivals it keeps."""
     trace, full = _guide_arrivals()
     with pytest.warns(PhonometryWarning, match="11 eigenrays.*6 earliest"):
-        capped = eigenrays(trace, receiver_range=_GUIDE["r"],
-                           receiver_depth=_GUIDE["zr"], max_arrivals=6,
-                           n_steps=_GUIDE_STEPS)
+        capped = eigenrays(
+            trace,
+            receiver_range=_GUIDE["r"],
+            receiver_depth=_GUIDE["zr"],
+            max_arrivals=6,
+            n_steps=_GUIDE_STEPS,
+        )
     assert capped.travel_times.size == 6
     assert np.array_equal(capped.travel_times, full.travel_times[:6])
     assert np.array_equal(capped.amplitudes, full.amplitudes[:6])
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        uncapped = eigenrays(trace, receiver_range=_GUIDE["r"],
-                             receiver_depth=_GUIDE["zr"], max_arrivals=11,
-                             n_steps=_GUIDE_STEPS)
+        uncapped = eigenrays(
+            trace,
+            receiver_range=_GUIDE["r"],
+            receiver_depth=_GUIDE["zr"],
+            max_arrivals=11,
+            n_steps=_GUIDE_STEPS,
+        )
     assert uncapped.travel_times.size == 11
 
 
@@ -262,10 +304,14 @@ def test_an_unreached_receiver_has_no_eigenrays_and_that_is_an_answer() -> None:
     no bracket, no arrivals, and the empty result still knows its geometry
     and still plots.
     """
-    trace = ray_trace([0.0, _GUIDE["depth"]], [_C, _C],
-                      source_depth=_GUIDE["zs"],
-                      launch_angles_deg=np.linspace(-5.0, 5.0, 21),
-                      max_range=250.0, n_steps=101)
+    trace = ray_trace(
+        [0.0, _GUIDE["depth"]],
+        [_C, _C],
+        source_depth=_GUIDE["zs"],
+        launch_angles_deg=np.linspace(-5.0, 5.0, 21),
+        max_range=250.0,
+        n_steps=101,
+    )
     res = eigenrays(trace, receiver_range=200.0, receiver_depth=80.0)
     assert res.travel_times.size == 0
     assert res.amplitudes.size == 0
@@ -332,14 +378,23 @@ def test_the_upward_refracted_eigenray_matches_the_closed_form_parabola() -> Non
     z_rec = float(z_path(r_rec))
     t_exact = quad(
         lambda r: float(np.sqrt(1.0 + zp(r) ** 2) / _n2_speed(np.asarray(z_path(r)))),
-        0.0, r_rec, epsabs=1e-14, epsrel=1e-13, limit=400)[0]
+        0.0,
+        r_rec,
+        epsabs=1e-14,
+        epsrel=1e-13,
+        limit=400,
+    )[0]
 
     depths = np.arange(0.0, _N2_DEPTH + 1.0, 2.0)
-    trace = ray_trace(depths, _n2_speed(depths), source_depth=_N2_SOURCE,
-                      launch_angles_deg=np.arange(-14.0, -7.999, 0.5),
-                      max_range=1100.0, n_steps=201)
-    res = eigenrays(trace, receiver_range=r_rec, receiver_depth=z_rec,
-                    n_steps=501)
+    trace = ray_trace(
+        depths,
+        _n2_speed(depths),
+        source_depth=_N2_SOURCE,
+        launch_angles_deg=np.arange(-14.0, -7.999, 0.5),
+        max_range=1100.0,
+        n_steps=201,
+    )
+    res = eigenrays(trace, receiver_range=r_rec, receiver_depth=z_rec, n_steps=501)
     assert res.travel_times.size == 1
     assert res.travel_times[0] == pytest.approx(t_exact, abs=2e-6)
     assert res.launch_angles[0] == pytest.approx(theta0, abs=1e-3)
@@ -371,11 +426,15 @@ def test_a_root_on_a_fan_rung_is_recovered_by_the_widened_bracket() -> None:
     z_path, _zp = _n2_parabola(-11.0)
     z_rec = float(z_path(1000.0))
     depths = np.arange(0.0, _N2_DEPTH + 2.0, 4.0)
-    trace = ray_trace(depths, _n2_speed(depths), source_depth=_N2_SOURCE,
-                      launch_angles_deg=np.arange(-14.0, -7.999, 0.5),
-                      max_range=1100.0, n_steps=201)
-    res = eigenrays(trace, receiver_range=1000.0, receiver_depth=z_rec,
-                    n_steps=301)
+    trace = ray_trace(
+        depths,
+        _n2_speed(depths),
+        source_depth=_N2_SOURCE,
+        launch_angles_deg=np.arange(-14.0, -7.999, 0.5),
+        max_range=1100.0,
+        n_steps=201,
+    )
+    res = eigenrays(trace, receiver_range=1000.0, receiver_depth=z_rec, n_steps=301)
     assert res.travel_times.size == 1
     assert res.launch_angles[0] == pytest.approx(-11.0, abs=5e-3)
 
@@ -392,12 +451,14 @@ def test_the_caustic_counter_reads_sign_changes_and_nothing_else() -> None:
     this cheaply (a caustic needs a refracting run long enough to fold the
     fan, tens of seconds of marching), so the counter is pinned directly.
     """
-    rows = np.array([
-        [0.0, 1.0, 2.0, 3.0, 4.0],    # monotone: no caustic
-        [0.0, 1.0, 0.5, -0.5, -1.0],  # one crossing between samples
-        [0.0, 1.0, 0.0, -1.0, 1.0],   # a crossing sampled exactly, then back
-        [0.0, 2.0, -1.0, 1.0, -2.0],  # three crossings
-    ])
+    rows = np.array(
+        [
+            [0.0, 1.0, 2.0, 3.0, 4.0],  # monotone: no caustic
+            [0.0, 1.0, 0.5, -0.5, -1.0],  # one crossing between samples
+            [0.0, 1.0, 0.0, -1.0, 1.0],  # a crossing sampled exactly, then back
+            [0.0, 2.0, -1.0, 1.0, -2.0],  # three crossings
+        ]
+    )
     assert _caustic_crossings(rows).tolist() == [0, 1, 2, 3]
 
 
@@ -416,19 +477,22 @@ def test_invalid_inputs_rejected() -> None:
     with pytest.raises(ValueError, match="receiver_range"):
         eigenrays(trace, receiver_range=0.0, receiver_depth=46.0)
     with pytest.raises(ValueError, match="max_arrivals"):
-        eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
-                  max_arrivals=0)
+        eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, max_arrivals=0)
     with pytest.raises(ValueError, match="n_steps"):
         eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, n_steps=1)
     slow = FluidSeabed(density=1800.0, sound_speed=-1700.0)
     with pytest.raises(ValueError, match="sound_speed"):
-        eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
-                  bottom=slow)
+        eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, bottom=slow)
     with pytest.raises(ValueError, match="bottom"):
-        eigenrays(trace, receiver_range=500.0, receiver_depth=46.0,
-                  bottom="sandy")
-    lone = ray_trace([0.0, 100.0], [_C, _C], source_depth=36.0,
-                     launch_angles_deg=[10.0], max_range=600.0, n_steps=101)
+        eigenrays(trace, receiver_range=500.0, receiver_depth=46.0, bottom="sandy")
+    lone = ray_trace(
+        [0.0, 100.0],
+        [_C, _C],
+        source_depth=36.0,
+        launch_angles_deg=[10.0],
+        max_range=600.0,
+        n_steps=101,
+    )
     with pytest.raises(ValueError, match="at least two rays"):
         eigenrays(lone, receiver_range=500.0, receiver_depth=46.0)
 

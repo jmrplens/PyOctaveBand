@@ -84,8 +84,9 @@ def test_fully_absorbing_wall_annihilates_its_reflections() -> None:
     dims = (6.0, 5.0, 4.0)
     alpha = np.zeros(6)
     alpha[WALL_ORDER.index("z0")] = 1.0  # floor perfectly absorbing
-    res = room.image_source_rir(dims, (2.0, 2.0, 2.0), (4.0, 3.0, 2.0), alpha,
-                                fs=48000, max_order=6)
+    res = room.image_source_rir(
+        dims, (2.0, 2.0, 2.0), (4.0, 3.0, 2.0), alpha, fs=48000, max_order=6
+    )
     amp = np.atleast_1d(res.amplitudes)
     # No non-finite or negative amplitudes; the floor-touching images are 0.
     assert np.all(np.isfinite(amp))
@@ -101,8 +102,9 @@ def test_fully_absorbing_wall_annihilates_its_reflections() -> None:
 @pytest.mark.parametrize("i0", [0, 1, 2, 3, 5, 10])
 def test_audible_image_count_matches_kuttruff_9_23(i0: int) -> None:
     dims = (8.0, 5.0, 3.0)
-    res = room.image_source_rir(dims, (2.0, 2.5, 1.6), (5.5, 3.2, 1.4), 0.1,
-                                fs=8000, max_order=i0)
+    res = room.image_source_rir(
+        dims, (2.0, 2.5, 1.6), (5.5, 3.2, 1.4), 0.1, fs=8000, max_order=i0
+    )
     # The reflection table holds the audible images plus the direct source.
     assert res.times.size == room.audible_image_count(i0) + 1
 
@@ -128,8 +130,9 @@ def test_reflection_density_matches_arrival_histogram() -> None:
     # (before the finite max_order truncates the far/late images).
     dims = (5.0, 4.0, 3.0)
     V = float(np.prod(dims))
-    res = room.image_source_rir(dims, (2.0, 2.0, 1.5), (3.0, 2.5, 1.5), 0.1,
-                                fs=48000, max_order=50)
+    res = room.image_source_rir(
+        dims, (2.0, 2.0, 1.5), (3.0, 2.5, 1.5), 0.1, fs=48000, max_order=50
+    )
     t_probe = 0.05  # s, well inside the complete region (50 * 3 / c = 0.44 s)
     n_before = int(np.count_nonzero(res.times <= t_probe))
     predicted = 4.0 * math.pi * C**3 / (3.0 * V) * t_probe**3
@@ -141,9 +144,7 @@ def test_reflection_density_matches_arrival_histogram() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _energy_density_t60(
-    res: room.ImageSourceResult, win: float = 0.008
-) -> float:
+def _energy_density_t60(res: room.ImageSourceResult, win: float = 0.008) -> float:
     """Recover T60 from the initial slope of the reverberant energy density."""
     times = res.times
     amp = np.atleast_1d(res.amplitudes)
@@ -165,12 +166,15 @@ def test_cubic_room_recovers_eyring(length: float, alpha: float) -> None:
     dims = (length, length, length)
     volume = length**3
     surface = 6.0 * length**2
-    eyring = float(
-        room.eyring_reverberation_time(volume, [(surface / 6.0, alpha)] * 6)
+    eyring = float(room.eyring_reverberation_time(volume, [(surface / 6.0, alpha)] * 6))
+    res = room.image_source_rir(
+        dims,
+        (1.3, 2.1, 1.7),
+        (length - 1.4, length - 1.9, length - 1.1),
+        alpha,
+        fs=48000,
+        max_order=70,
     )
-    res = room.image_source_rir(dims, (1.3, 2.1, 1.7),
-                                (length - 1.4, length - 1.9, length - 1.1),
-                                alpha, fs=48000, max_order=70)
     recovered = _energy_density_t60(res)
     # The specular decay of a cube reproduces the Eyring rate to ~10 %.
     assert recovered == pytest.approx(eyring, rel=0.12)
@@ -182,11 +186,10 @@ def test_elongated_room_decays_slower_than_eyring() -> None:
     dims = (12.0, 5.0, 3.0)
     volume = float(np.prod(dims))
     surface = 2.0 * (12 * 5 + 12 * 3 + 5 * 3)
-    eyring = float(
-        room.eyring_reverberation_time(volume, [(surface / 6.0, 0.12)] * 6)
+    eyring = float(room.eyring_reverberation_time(volume, [(surface / 6.0, 0.12)] * 6))
+    res = room.image_source_rir(
+        dims, (2.0, 2.0, 1.5), (9.0, 3.0, 1.6), 0.12, fs=48000, max_order=60
     )
-    res = room.image_source_rir(dims, (2.0, 2.0, 1.5), (9.0, 3.0, 1.6), 0.12,
-                                fs=48000, max_order=60)
     assert _energy_density_t60(res) > eyring
 
 
@@ -264,10 +267,12 @@ def test_length_six_is_per_band_with_six_frequencies() -> None:
 def test_air_attenuation_reduces_late_energy() -> None:
     dims = (8.0, 6.0, 4.0)
     common = {"fs": 48000, "max_order": 30}
-    dry = room.image_source_rir(dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1,
-                                air_attenuation=0.0, **common)
-    humid = room.image_source_rir(dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1,
-                                  air_attenuation=0.01, **common)
+    dry = room.image_source_rir(
+        dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1, air_attenuation=0.0, **common
+    )
+    humid = room.image_source_rir(
+        dims, (2.0, 2.0, 2.0), (6.0, 4.0, 2.0), 0.1, air_attenuation=0.01, **common
+    )
     # Air absorption scales exp(-m r / 2); distant (late) images lose more.
     late = dry.times > 0.05
     assert np.all(
@@ -294,10 +299,18 @@ def test_fdtd_rigid_wall_echo_matches_first_image() -> None:
     width = 0.4e-3
     src = GaussianPulse(ix=int(src_x / dx), iy=ny // 2, width=width)
     res = fdtd_simulation(
-        C, dx, duration=0.012, sources=[src], shape=(ny, nx),
+        C,
+        dx,
+        duration=0.012,
+        sources=[src],
+        shape=(ny, nx),
         probes=[(int(probe_x / dx), ny // 2)],
-        boundaries={"left": "rigid", "right": "absorbing",
-                    "top": "absorbing", "bottom": "absorbing"},
+        boundaries={
+            "left": "rigid",
+            "right": "absorbing",
+            "top": "absorbing",
+            "bottom": "absorbing",
+        },
         absorbing_layer_cells=25,
     )
     p = res.pressures[0]
@@ -325,9 +338,14 @@ def test_fdtd_damping_decay_recovers_t60() -> None:
     damping = 3.0 * math.log(10.0) / t60_target
     src = GaussianPulse(ix=nx // 3, iy=ny // 3, width=1.2e-3)
     res = fdtd_simulation(
-        C, dx, duration=1.2, sources=[src], shape=(ny, nx),
+        C,
+        dx,
+        duration=1.2,
+        sources=[src],
+        shape=(ny, nx),
         probes=[(2 * nx // 3, 2 * ny // 3)],
-        boundaries="rigid", damping=damping,
+        boundaries="rigid",
+        damping=damping,
     )
     p = res.pressures[0]
     fs = round(1.0 / res.dt)

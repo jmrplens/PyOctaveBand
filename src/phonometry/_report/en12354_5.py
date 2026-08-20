@@ -223,7 +223,8 @@ def render_installed_structure_borne_report(
             language,
         )
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Predicted installed structure-borne sound", language),
             basis=_basis(language),
@@ -237,5 +238,5 @@ def render_installed_structure_borne_report(
         language=language,
         verdict=verdict,
         disclaimer="Predicted result: the values relate only to the modelled "
-            "configuration, not to a tested specimen.",
+        "configuration, not to a tested specimen.",
     )

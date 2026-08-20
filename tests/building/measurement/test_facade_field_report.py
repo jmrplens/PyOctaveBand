@@ -25,8 +25,24 @@ _PDF_MAGIC = b"%PDF"
 
 #: ISO 717-1 Annex C Table C.1 measured curve; rated 30 (-2; -3) dB.
 _ANNEX_C_R = np.array(
-    [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-     28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+    [
+        20.4,
+        16.3,
+        17.7,
+        22.6,
+        22.4,
+        22.7,
+        24.8,
+        26.6,
+        28.0,
+        30.5,
+        31.8,
+        32.5,
+        33.4,
+        33.0,
+        31.0,
+        25.5,
+    ]
 )
 
 #: A receiving-room reverberation time equal to T0 = 0,5 s in every band, so
@@ -67,8 +83,12 @@ def _facade_r_prime() -> building.FacadeInsulationResult:
     # A = 0,16 x 62,5 / 1 = 10 = S, so 10 lg(S/A) = 0 and R'45 = L1,s - L2 - 1,5.
     surf = _ANNEX_C_R + 1.5
     return building.facade_insulation(
-        np.full(16, 50.0), np.full(16, 0.0), np.full(16, 1.0),
-        area=10.0, volume=62.5, surface_level=surf,
+        np.full(16, 50.0),
+        np.full(16, 0.0),
+        np.full(16, 1.0),
+        area=10.0,
+        volume=62.5,
+        surface_level=surf,
     )
 
 
@@ -112,8 +132,13 @@ def test_r_prime_road_traffic_fiche_labelled_rtrs(tmp_path) -> None:
     # A = 0,16 x 62,5 / 1 = 10 = S, so 10 lg(S/A) = 0 and R'tr,s = L1,s - L2 - 3.
     surf = _ANNEX_C_R + 3.0
     result = building.facade_insulation(
-        np.full(16, 50.0), np.full(16, 0.0), np.full(16, 1.0),
-        area=10.0, volume=62.5, surface_level=surf, method="road_traffic",
+        np.full(16, 50.0),
+        np.full(16, 0.0),
+        np.full(16, 1.0),
+        area=10.0,
+        volume=62.5,
+        surface_level=surf,
+        method="road_traffic",
     )
     assert result.method == "road_traffic"
     assert result.r_prime is not None
@@ -174,7 +199,8 @@ def test_spanish_fiche(tmp_path) -> None:
 
     out = tmp_path / "es.pdf"
     _facade_dnt().report(
-        str(out), metadata=ReportMetadata(requirement=30.0, laboratory="Ejemplo"),
+        str(out),
+        metadata=ReportMetadata(requirement=30.0, laboratory="Ejemplo"),
         language="es",
     )
     _assert_one_page(str(out))
@@ -202,9 +228,7 @@ def test_unknown_quantity_rejected(tmp_path) -> None:
 
 def test_missing_quantity_rejected(tmp_path) -> None:
     """Requesting d_2m_n / r_prime without their inputs raises ``ValueError``."""
-    bare = building.facade_insulation(
-        _ANNEX_C_R + 40.0, np.full(16, 40.0), _T_AT_T0
-    )
+    bare = building.facade_insulation(_ANNEX_C_R + 40.0, np.full(16, 40.0), _T_AT_T0)
     out = str(tmp_path / "x.pdf")
     with pytest.raises(ValueError, match="d_2m_n"):
         bare.report(out, quantity="d_2m_n")

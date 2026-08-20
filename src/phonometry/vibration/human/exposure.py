@@ -176,34 +176,140 @@ _INF = math.inf
 #: ISO 5349-1 Table A.1 figures are the five-significant-figure rounding.
 _WEIGHTINGS: dict[str, _WParams] = {
     # Whole-body, vertical z (ISO 2631-4); K = 1,024.
-    "Wb": _WParams(0.4, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   16.0, 16.0, 0.55, 2.5, 0.9, 4.0, 0.95, 1.024),
+    "Wb": _WParams(
+        0.4,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        16.0,
+        16.0,
+        0.55,
+        2.5,
+        0.9,
+        4.0,
+        0.95,
+        1.024,
+    ),
     # Whole-body, horizontal x seat-back (ISO 2631-1).
-    "Wc": _WParams(0.4, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   8.0, 8.0, 0.63, _INF, 1.0, _INF, 1.0, 1.0),
+    "Wc": _WParams(
+        0.4,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        8.0,
+        8.0,
+        0.63,
+        _INF,
+        1.0,
+        _INF,
+        1.0,
+        1.0,
+    ),
     # Whole-body, horizontal x/y (ISO 2631-1).
-    "Wd": _WParams(0.4, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   2.0, 2.0, 0.63, _INF, 1.0, _INF, 1.0, 1.0),
+    "Wd": _WParams(
+        0.4,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        2.0,
+        2.0,
+        0.63,
+        _INF,
+        1.0,
+        _INF,
+        1.0,
+        1.0,
+    ),
     # Whole-body, rotational (ISO 2631-1).
-    "We": _WParams(0.4, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   1.0, 1.0, 0.63, _INF, 1.0, _INF, 1.0, 1.0),
+    "We": _WParams(
+        0.4,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        1.0,
+        1.0,
+        0.63,
+        _INF,
+        1.0,
+        _INF,
+        1.0,
+        1.0,
+    ),
     # Whole-body, motion sickness, vertical z (ISO 2631-1).
-    "Wf": _WParams(0.08, _Q_BUTTERWORTH, 0.63, _Q_BUTTERWORTH,
-                   _INF, 0.25, 0.86, 0.0625, 0.80, 0.10, 0.80, 1.0),
+    "Wf": _WParams(
+        0.08,
+        _Q_BUTTERWORTH,
+        0.63,
+        _Q_BUTTERWORTH,
+        _INF,
+        0.25,
+        0.86,
+        0.0625,
+        0.80,
+        0.10,
+        0.80,
+        1.0,
+    ),
     # Hand-arm, all directions (ISO 5349-1); exact ISO 8041-1 corners.
-    "Wh": _WParams(10.0**0.8, _Q_BUTTERWORTH, 10.0**3.1, _Q_BUTTERWORTH,
-                   100.0 / (2.0 * math.pi), 100.0 / (2.0 * math.pi), 0.64,
-                   _INF, 1.0, _INF, 1.0, 1.0),
+    "Wh": _WParams(
+        10.0**0.8,
+        _Q_BUTTERWORTH,
+        10.0**3.1,
+        _Q_BUTTERWORTH,
+        100.0 / (2.0 * math.pi),
+        100.0 / (2.0 * math.pi),
+        0.64,
+        _INF,
+        1.0,
+        _INF,
+        1.0,
+        1.0,
+    ),
     # Whole-body, vertical head, recumbent x (ISO 2631-1).
-    "Wj": _WParams(0.4, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   _INF, _INF, 1.0, 3.75, 0.91, 5.32, 0.91, 1.0),
+    "Wj": _WParams(
+        0.4,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        _INF,
+        _INF,
+        1.0,
+        3.75,
+        0.91,
+        5.32,
+        0.91,
+        1.0,
+    ),
     # Whole-body, vertical z, the principal ISO 2631-1 weighting.
-    "Wk": _WParams(0.4, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   12.5, 12.5, 0.63, 2.37, 0.91, 3.35, 0.91, 1.0),
+    "Wk": _WParams(
+        0.4,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        12.5,
+        12.5,
+        0.63,
+        2.37,
+        0.91,
+        3.35,
+        0.91,
+        1.0,
+    ),
     # Whole-body in buildings, all directions (ISO 2631-2).
-    "Wm": _WParams(10.0**-0.1, _Q_BUTTERWORTH, 100.0, _Q_BUTTERWORTH,
-                   1.0 / (0.028 * 2.0 * math.pi), 1.0 / (0.028 * 2.0 * math.pi),
-                   0.5, _INF, 1.0, _INF, 1.0, 1.0),
+    "Wm": _WParams(
+        10.0**-0.1,
+        _Q_BUTTERWORTH,
+        100.0,
+        _Q_BUTTERWORTH,
+        1.0 / (0.028 * 2.0 * math.pi),
+        1.0 / (0.028 * 2.0 * math.pi),
+        0.5,
+        _INF,
+        1.0,
+        _INF,
+        1.0,
+        1.0,
+    ),
 }
 
 #: The nine ISO 8041-1 frequency-weighting names, in Table 3 order.
@@ -258,9 +364,11 @@ def _weighting_response(name: str, freq: Real) -> Complex:
     else:
         w5 = 2.0 * math.pi * p.f5
         w6 = 2.0 * math.pi * p.f6
-        hs = (1.0 + s / (p.q5 * w5) + (s / w5) ** 2) / (
-            1.0 + s / (p.q6 * w6) + (s / w6) ** 2
-        ) * (w5 / w6) ** 2
+        hs = (
+            (1.0 + s / (p.q5 * w5) + (s / w5) ** 2)
+            / (1.0 + s / (p.q6 * w6) + (s / w6) ** 2)
+            * (w5 / w6) ** 2
+        )
 
     out[positive] = np.asarray(hh * hl * ht * hs, dtype=np.complex128)
     return out
@@ -284,7 +392,9 @@ class WeightingResponse:
     magnitude: Real
     magnitude_db: Real
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the weighting factor (dB) versus frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -293,7 +403,9 @@ class WeightingResponse:
         from ..._i18n import check_language
         from ..._plot.vibration import plot_vibration_weighting
 
-        return plot_vibration_weighting(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_vibration_weighting(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def frequency_weighting(name: str, frequencies: ArrayLike) -> WeightingResponse:
@@ -336,9 +448,7 @@ def weighting_factors(name: str, frequencies: ArrayLike) -> Real:
     return frequency_weighting(name, frequencies).magnitude
 
 
-def apply_weighting(
-    signal: SignalInput, fs: float | None = None, *, name: str
-) -> Real:
+def apply_weighting(signal: SignalInput, fs: float | None = None, *, name: str) -> Real:
     """Apply frequency weighting ``name`` to a time signal (ISO 8041-1).
 
     The exact analog response :func:`frequency_weighting` is applied in the
@@ -392,7 +502,9 @@ class WeightedSpectrum:
     weighted: Real
     overall: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the unweighted and weighted band spectra with ``a_w``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -401,7 +513,9 @@ class WeightedSpectrum:
         from ..._i18n import check_language
         from ..._plot.vibration import plot_weighted_spectrum
 
-        return plot_weighted_spectrum(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_weighted_spectrum(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def weighted_acceleration(
@@ -550,14 +664,10 @@ def mtvv(
     :param integration_time: Running-r.m.s. averaging time, in seconds (1 s).
     :return: The MTVV, in m/s2.
     """
-    return float(
-        np.max(running_rms(signal, fs, integration_time=integration_time))
-    )
+    return float(np.max(running_rms(signal, fs, integration_time=integration_time)))
 
 
-def vibration_dose_value(
-    signal: SignalInput, fs: float | None = None
-) -> float:
+def vibration_dose_value(signal: SignalInput, fs: float | None = None) -> float:
     r"""Vibration dose value ``VDV`` (ISO 2631-1 Eq. (5)).
 
     :math:`\mathrm{VDV} = \left( \int a_\mathrm{w}(t)^4 \, dt \right)^{1/4}`, in
@@ -579,9 +689,7 @@ def vibration_dose_value(
     return float(np.sum(x**4 / fs) ** 0.25)
 
 
-def motion_sickness_dose_value(
-    signal: SignalInput, fs: float | None = None
-) -> float:
+def motion_sickness_dose_value(signal: SignalInput, fs: float | None = None) -> float:
     r"""Motion sickness dose value ``MSDV`` (ISO 2631-1 clause 9; 8041-1
     3.1.2.5).
 
@@ -757,8 +865,7 @@ def hav_daily_exposure(
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
     if ahv.ndim != 1 or ahv.size == 0 or ahv.shape != t.shape:
         raise ValueError(
-            "'total_values' and 'durations_s' must be non-empty, 1-D and "
-            "equal-length."
+            "'total_values' and 'durations_s' must be non-empty, 1-D and equal-length."
         )
     if np.any(ahv < 0.0) or np.any(t < 0.0):
         raise ValueError("'total_values' and 'durations_s' must be non-negative.")
@@ -783,8 +890,7 @@ def energy_equivalent_acceleration(
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
     if a.ndim != 1 or a.size == 0 or a.shape != t.shape:
         raise ValueError(
-            "'magnitudes' and 'durations_s' must be non-empty, 1-D and "
-            "equal-length."
+            "'magnitudes' and 'durations_s' must be non-empty, 1-D and equal-length."
         )
     if np.any(t < 0.0):
         raise ValueError("'durations_s' must be non-negative.")
@@ -908,7 +1014,9 @@ class DailyVibrationExposure:
     partials: Real
     assessment: ExposureAssessment
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the partial exposures against the EAV / ELV thresholds.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -917,7 +1025,9 @@ class DailyVibrationExposure:
         from ..._i18n import check_language
         from ..._plot.vibration import plot_daily_exposure
 
-        return plot_daily_exposure(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_daily_exposure(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,
@@ -1013,8 +1123,7 @@ def daily_vibration_exposure(
     t = np.atleast_1d(np.asarray(durations_s, dtype=np.float64))
     if ahv.ndim != 1 or ahv.size == 0 or ahv.shape != t.shape:
         raise ValueError(
-            "'total_values' and 'durations_s' must be non-empty, 1-D and "
-            "equal-length."
+            "'total_values' and 'durations_s' must be non-empty, 1-D and equal-length."
         )
     if labels is None:
         labels = tuple(f"op {i + 1}" for i in range(ahv.size))

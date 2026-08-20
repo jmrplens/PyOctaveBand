@@ -90,9 +90,7 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -191,11 +189,7 @@ def _statement(result: ProgramLoudnessResult, language: str = "en") -> str:
     integrated = format_number(float(result.integrated), language, decimals=1)
     lra = format_number(float(result.loudness_range), language, decimals=1)
     tp = format_number(float(result.true_peak), language, decimals=1)
-    return (
-        f"I = <b>{integrated} LUFS</b> &nbsp; "
-        f"(LRA = {lra} LU, "
-        f"max TP = {tp} dBTP)"
-    )
+    return f"I = <b>{integrated} LUFS</b> &nbsp; (LRA = {lra} LU, max TP = {tp} dBTP)"
 
 
 def _verdict(
@@ -213,7 +207,10 @@ def _verdict(
     """
     tolerance_lu = _TOLERANCES_LU[tolerance]
     _i_status, _tp_status, passed = _status(result, target, tolerance_lu)
-    text = t("Compliant when I is within {target} LUFS &#177;{tol} LU (EBU R 128 {clause}) and true peak &#8804; {tp} dBTP", language).format(
+    text = t(
+        "Compliant when I is within {target} LUFS &#177;{tol} LU (EBU R 128 {clause}) and true peak &#8804; {tp} dBTP",
+        language,
+    ).format(
         target=format_number(target, language, decimals=1),
         tol=format_number(tolerance_lu, language, decimals=1),
         clause=_TOLERANCE_CLAUSES[tolerance],
@@ -281,11 +278,15 @@ def render_program_loudness_report(
         metadata.measurement_standard if metadata is not None else None
     )
     if measurement_standard:
-        basis = t("{standard} programme loudness. Rating per EBU R 128 / ITU-R BS.1770-5 (K-weighting, gated).", language).format(
-            standard=html.escape(measurement_standard)
-        )
+        basis = t(
+            "{standard} programme loudness. Rating per EBU R 128 / ITU-R BS.1770-5 (K-weighting, gated).",
+            language,
+        ).format(standard=html.escape(measurement_standard))
     else:
-        basis = t("Programme loudness per EBU R 128 / ITU-R BS.1770-5 (K-weighting, gated).", language)
+        basis = t(
+            "Programme loudness per EBU R 128 / ITU-R BS.1770-5 (K-weighting, gated).",
+            language,
+        )
 
     target = (
         float(metadata.requirement)
@@ -326,17 +327,34 @@ def render_program_loudness_report(
     flow.extend(verdict_flow(text, passed, styles, language))
 
     basis_strip_style = ParagraphStyle(
-        "fiche_measurement_basis", parent=getSampleStyleSheet()["Normal"],
-        fontSize=7.5, leading=10, textColor=colors.HexColor(_MUTED_HEX),
+        "fiche_measurement_basis",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.5,
+        leading=10,
+        textColor=colors.HexColor(_MUTED_HEX),
         spaceBefore=6,
     )
     tolerance_note = (
-        t("Loudness tolerance &#177;0.2 LU for measurement errors in loudness workflows, e.g. Quality Control (EBU R 128 item i).", language)
+        t(
+            "Loudness tolerance &#177;0.2 LU for measurement errors in loudness workflows, e.g. Quality Control (EBU R 128 item i).",
+            language,
+        )
         if tolerance == "qc"
-        else t("Loudness tolerance &#177;1.0 LU, permitted where the Target Level is not achievable practically, e.g. live programmes (EBU R 128 item h).", language)
+        else t(
+            "Loudness tolerance &#177;1.0 LU, permitted where the Target Level is not achievable practically, e.g. live programmes (EBU R 128 item h).",
+            language,
+        )
     )
     flow.append(Paragraph(tolerance_note, basis_strip_style))
-    flow.append(Paragraph(t("Gating -70 LUFS absolute / -10 LU relative (ITU-R BS.1770); 1 LU = 1 dB; true peak per EBU Tech 3341; LRA per EBU Tech 3342 (not recommended for programmes under 60 s).", language), basis_strip_style))
+    flow.append(
+        Paragraph(
+            t(
+                "Gating -70 LUFS absolute / -10 LU relative (ITU-R BS.1770); 1 LU = 1 dB; true peak per EBU Tech 3341; LRA per EBU Tech 3342 (not recommended for programmes under 60 s).",
+                language,
+            ),
+            basis_strip_style,
+        )
+    )
     flow.extend(footer_flow(metadata, language))
 
     return build_document(path, flow, title)

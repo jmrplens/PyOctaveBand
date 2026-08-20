@@ -306,10 +306,17 @@ class RayDerivative(Protocol):
     """
 
     def __call__(
-        self, z: NDArray[np.float64], zeta: NDArray[np.float64],
-        xi: NDArray[np.float64], /
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
-               NDArray[np.float64]]: ...
+        self,
+        z: NDArray[np.float64],
+        zeta: NDArray[np.float64],
+        xi: NDArray[np.float64],
+        /,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]: ...
 
 
 class SlopingBoundary(NamedTuple):
@@ -348,7 +355,9 @@ def _prepare_sloping(boundary: SlopingBoundary) -> _Sloping:
     return _Sloping(r, z, np.concatenate(([0.0], np.diff(z) / np.diff(r), [0.0])))
 
 
-def _sloping_position(boundary: _Sloping, r: NDArray[np.float64]) -> NDArray[np.float64]:
+def _sloping_position(
+    boundary: _Sloping, r: NDArray[np.float64]
+) -> NDArray[np.float64]:
     return np.asarray(np.interp(r, boundary.ranges, boundary.positions))
 
 
@@ -479,10 +488,14 @@ class _Step(NamedTuple):
 
 
 def _rk4(
-    deriv: RayDerivative, z: NDArray[np.float64], zeta: NDArray[np.float64],
-    h: NDArray[np.float64], xi: NDArray[np.float64],
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
-           NDArray[np.float64]]:
+    deriv: RayDerivative,
+    z: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    h: NDArray[np.float64],
+    xi: NDArray[np.float64],
+) -> tuple[
+    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
+]:
     """One Runge-Kutta step of per-ray range size ``h``.
 
     The time and the arc length come back as *increments*: they are quadratures
@@ -493,14 +506,17 @@ def _rk4(
     k2z, k2zeta, k2t, k2s = deriv(z + 0.5 * h * k1z, zeta + 0.5 * h * k1zeta, xi)
     k3z, k3zeta, k3t, k3s = deriv(z + 0.5 * h * k2z, zeta + 0.5 * h * k2zeta, xi)
     k4z, k4zeta, k4t, k4s = deriv(z + h * k3z, zeta + h * k3zeta, xi)
-    return (z + h / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z),
-            zeta + h / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta),
-            h / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t),
-            h / 6.0 * (k1s + 2 * k2s + 2 * k3s + k4s))
+    return (
+        z + h / 6.0 * (k1z + 2 * k2z + 2 * k3z + k4z),
+        zeta + h / 6.0 * (k1zeta + 2 * k2zeta + 2 * k3zeta + k4zeta),
+        h / 6.0 * (k1t + 2 * k2t + 2 * k3t + k4t),
+        h / 6.0 * (k1s + 2 * k2s + 2 * k3s + k4s),
+    )
 
 
 def _gradients_with_half_spaces(
-    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Per-segment ``dc/dz``, with the half spaces beyond the profile's ends.
 
@@ -520,7 +536,10 @@ def _gradients_with_half_spaces(
 
 
 def _segment_gradient(
-    z_prof: NDArray[np.float64], grad: NDArray[np.float64], level: float, *,
+    z_prof: NDArray[np.float64],
+    grad: NDArray[np.float64],
+    level: float,
+    *,
     inward: float,
 ) -> float:
     """``dc/dz`` of the profile segment on the medium side of ``level``.
@@ -530,13 +549,14 @@ def _segment_gradient(
     that leads into the medium, whether that lands inside the profile or in a
     half space beyond it.
     """
-    seg = int(np.searchsorted(
-        z_prof, level, side="right" if inward > 0.0 else "left"))
+    seg = int(np.searchsorted(z_prof, level, side="right" if inward > 0.0 else "left"))
     return float(grad[seg])
 
 
 def _prepare_impulses(
-    dynamic: DynamicRays, lower: float, upper: float | None,
+    dynamic: DynamicRays,
+    lower: float,
+    upper: float | None,
 ) -> _Impulses:
     """Locate every discontinuity of ``dc/dz`` a ray can meet, and size it.
 
@@ -573,21 +593,34 @@ def _prepare_impulses(
     speeds = c_prof[keep]
 
     levels = [np.array([lower])]
-    strengths = [np.array([2.0 * _segment_gradient(z_prof, grad, lower, inward=1.0)
-                           / float(np.interp(lower, z_prof, c_prof))])]
+    strengths = [
+        np.array(
+            [
+                2.0
+                * _segment_gradient(z_prof, grad, lower, inward=1.0)
+                / float(np.interp(lower, z_prof, c_prof))
+            ]
+        )
+    ]
     levels.append(interfaces)
     strengths.append(jumps[keep] / speeds)
     if upper is not None:
         levels.append(np.array([float(upper)]))
         strengths.append(
-            np.array([-2.0 * _segment_gradient(z_prof, grad, upper, inward=-1.0)
-                      / float(np.interp(upper, z_prof, c_prof))])
+            np.array(
+                [
+                    -2.0
+                    * _segment_gradient(z_prof, grad, upper, inward=-1.0)
+                    / float(np.interp(upper, z_prof, c_prof))
+                ]
+            )
         )
     return _Impulses(interfaces, np.concatenate(levels), np.concatenate(strengths))
 
 
 def _next_interface(
-    z: NDArray[np.float64], z_end: NDArray[np.float64],
+    z: NDArray[np.float64],
+    z_end: NDArray[np.float64],
     interfaces: NDArray[np.float64],
 ) -> tuple[NDArray[np.bool_], NDArray[np.int_]]:
     """First interface the step reaches, in the direction it travels.
@@ -598,8 +631,11 @@ def _next_interface(
     ``z``, the same assumption the boundary interpolant already makes.
     """
     down = z_end > z
-    ahead = np.where(down, np.searchsorted(interfaces, z, side="right"),
-                     np.searchsorted(interfaces, z, side="left") - 1)
+    ahead = np.where(
+        down,
+        np.searchsorted(interfaces, z, side="right"),
+        np.searchsorted(interfaces, z, side="left") - 1,
+    )
     within = (ahead >= 0) & (ahead < interfaces.size)
     idx = np.clip(ahead, 0, interfaces.size - 1)
     depth = interfaces[idx]
@@ -608,7 +644,9 @@ def _next_interface(
 
 
 def _advance_spreading(
-    dyn: _Dynamic, h: NDArray[np.float64], xi: NDArray[np.float64],
+    dyn: _Dynamic,
+    h: NDArray[np.float64],
+    xi: NDArray[np.float64],
 ) -> _Dynamic:
     """Carry ``(q, p)`` across a range increment inside one profile segment.
 
@@ -622,8 +660,11 @@ def _advance_spreading(
 
 
 def _apply_impulse(
-    dyn: _Dynamic, xi: NDArray[np.float64], zeta: NDArray[np.float64],
-    level: NDArray[np.float64], crossed: NDArray[np.bool_],
+    dyn: _Dynamic,
+    xi: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    level: NDArray[np.float64],
+    crossed: NDArray[np.bool_],
 ) -> _Dynamic:
     """Jump ``p`` where the sub-step landed on a gradient discontinuity.
 
@@ -632,20 +673,31 @@ def _apply_impulse(
     magnitude enters, which is what makes the rule reciprocal.
     """
     strength = dyn.impulses.strengths[np.searchsorted(dyn.impulses.levels, level)]
-    jump = (-(xi**2) * strength * dyn.spreading
-            / np.maximum(np.abs(zeta), _GRAZING_VERTICAL))
+    jump = (
+        -(xi**2)
+        * strength
+        * dyn.spreading
+        / np.maximum(np.abs(zeta), _GRAZING_VERTICAL)
+    )
     return dyn._replace(slope=np.where(crossed, dyn.slope + jump, dyn.slope))
 
 
 def _hermite_position(
-    s: NDArray[np.float64], za: NDArray[np.float64], m0: NDArray[np.float64],
-    zb: NDArray[np.float64], m1: NDArray[np.float64],
+    s: NDArray[np.float64],
+    za: NDArray[np.float64],
+    m0: NDArray[np.float64],
+    zb: NDArray[np.float64],
+    m1: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """The step's own cubic Hermite interpolant of ``z``, at fraction ``s``."""
     s2 = s * s
     s3 = s2 * s
-    return ((2.0 * s3 - 3.0 * s2 + 1.0) * za + (s3 - 2.0 * s2 + s) * m0
-            + (3.0 * s2 - 2.0 * s3) * zb + (s3 - s2) * m1)
+    return (
+        (2.0 * s3 - 3.0 * s2 + 1.0) * za
+        + (s3 - 2.0 * s2 + s) * m0
+        + (3.0 * s2 - 2.0 * s3) * zb
+        + (s3 - s2) * m1
+    )
 
 
 def _bisect_offset(
@@ -672,9 +724,12 @@ def _bisect_offset(
 
 def _crossing_fraction(
     xi: NDArray[np.float64],
-    za: NDArray[np.float64], zeta_a: NDArray[np.float64],
-    zb: NDArray[np.float64], zeta_b: NDArray[np.float64],
-    h: NDArray[np.float64], target: NDArray[np.float64],
+    za: NDArray[np.float64],
+    zeta_a: NDArray[np.float64],
+    zb: NDArray[np.float64],
+    zeta_b: NDArray[np.float64],
+    h: NDArray[np.float64],
+    target: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """How far into the step the ray first reaches ``target``, in [0, 1].
 
@@ -693,9 +748,13 @@ def _crossing_fraction(
 
 def _crossing_fraction_sloping(
     xi: NDArray[np.float64],
-    za: NDArray[np.float64], zeta_a: NDArray[np.float64],
-    zb: NDArray[np.float64], zeta_b: NDArray[np.float64],
-    h: NDArray[np.float64], r_start: NDArray[np.float64], boundary: _Sloping,
+    za: NDArray[np.float64],
+    zeta_a: NDArray[np.float64],
+    zb: NDArray[np.float64],
+    zeta_b: NDArray[np.float64],
+    h: NDArray[np.float64],
+    r_start: NDArray[np.float64],
+    boundary: _Sloping,
 ) -> NDArray[np.float64]:
     """The same search against a piecewise-linear boundary.
 
@@ -708,16 +767,20 @@ def _crossing_fraction_sloping(
     m1 = h * zeta_b / xi
 
     def offset_at(s: NDArray[np.float64]) -> NDArray[np.float64]:
-        return (_hermite_position(s, za, m0, zb, m1)
-                - _sloping_position(boundary, r_start + s * h))
+        return _hermite_position(s, za, m0, zb, m1) - _sloping_position(
+            boundary, r_start + s * h
+        )
 
     return _bisect_offset(offset_at, za)
 
 
 def _polish_fraction(
-    deriv: RayDerivative, xi: NDArray[np.float64],
-    z: NDArray[np.float64], zeta: NDArray[np.float64],
-    h: NDArray[np.float64], target: NDArray[np.float64],
+    deriv: RayDerivative,
+    xi: NDArray[np.float64],
+    z: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    h: NDArray[np.float64],
+    target: NDArray[np.float64],
     frac: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """Newton-refine the interpolated crossing against real Runge-Kutta steps.
@@ -759,8 +822,12 @@ class _Levels(NamedTuple):
 
 
 def _levels_reached(
-    z: NDArray[np.float64], z_end: NDArray[np.float64],
-    moving: NDArray[np.bool_], *, lower: float, upper: float | None,
+    z: NDArray[np.float64],
+    z_end: NDArray[np.float64],
+    moving: NDArray[np.bool_],
+    *,
+    lower: float,
+    upper: float | None,
     dyn: _Dynamic | None,
 ) -> _Levels:
     """The nearest level ahead of each ray, boundaries and profile nodes alike.
@@ -773,8 +840,11 @@ def _levels_reached(
     out = z_end < lower if upper is None else (z_end < lower) | (z_end > upper)
     reflects = out & moving
     crossed = reflects
-    target = (np.full(z.size, lower) if upper is None
-              else np.where(z_end < lower, lower, float(upper)))
+    target = (
+        np.full(z.size, lower)
+        if upper is None
+        else np.where(z_end < lower, lower, float(upper))
+    )
     if dyn is not None and dyn.impulses.interfaces.size:
         kink, idx = _next_interface(z, z_end, dyn.impulses.interfaces)
         kink &= moving
@@ -788,11 +858,16 @@ def _levels_reached(
 
 
 def _polish_fraction_mixed(
-    deriv: RayDerivative, xi: NDArray[np.float64],
-    z: NDArray[np.float64], zeta: NDArray[np.float64],
-    h: NDArray[np.float64], level: NDArray[np.float64],
-    on_boundary: NDArray[np.bool_], boundary: _Sloping,
-    r_start: NDArray[np.float64], frac: NDArray[np.float64],
+    deriv: RayDerivative,
+    xi: NDArray[np.float64],
+    z: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    h: NDArray[np.float64],
+    level: NDArray[np.float64],
+    on_boundary: NDArray[np.bool_],
+    boundary: _Sloping,
+    r_start: NDArray[np.float64],
+    frac: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """:func:`_polish_fraction` with a per-ray choice of target.
 
@@ -817,9 +892,14 @@ def _polish_fraction_mixed(
 
 
 def _advance_one_step(
-    deriv: RayDerivative, *, xi: NDArray[np.float64],
-    z: NDArray[np.float64], zeta: NDArray[np.float64],
-    range_step: float, lower: float, upper: float | None,
+    deriv: RayDerivative,
+    *,
+    xi: NDArray[np.float64],
+    z: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    range_step: float,
+    lower: float,
+    upper: float | None,
     dyn: _Dynamic | None = None,
 ) -> _Step:
     """Advance every ray by one whole range step, splitting it at each level.
@@ -846,8 +926,9 @@ def _advance_one_step(
     # Crossing a profile node is not pathological the way sixteen bounces in
     # one step would be: a steep ray through a finely sampled profile meets
     # them legitimately, so the budget grows by one per node it could meet.
-    budget = _MAX_CROSSINGS_PER_STEP + (0 if dyn is None
-                                        else dyn.impulses.interfaces.size)
+    budget = _MAX_CROSSINGS_PER_STEP + (
+        0 if dyn is None else dyn.impulses.interfaces.size
+    )
     for _ in range(budget):
         # A ray whose step is spent has h = 0: its stage evaluations reproduce
         # its own state and add no time, and `moving` masks it out of every
@@ -856,7 +937,8 @@ def _advance_one_step(
         moving = h > 0.0
         z_end, zeta_end, dt, ds = _rk4(deriv, z, zeta, h, xi)
         target, crossed, reflects, at_upper = _levels_reached(
-            z, z_end, moving, lower=lower, upper=upper, dyn=dyn)
+            z, z_end, moving, lower=lower, upper=upper, dyn=dyn
+        )
         if not crossed.any():
             z = np.where(moving, z_end, z)
             zeta = np.where(moving, zeta_end, zeta)
@@ -872,8 +954,9 @@ def _advance_one_step(
         h_sub = np.where(crossed, frac, 1.0) * h
         z_sub, zeta_sub, dt_sub, ds_sub = _rk4(deriv, z, zeta, h_sub, xi)
         if dyn is not None:
-            dyn = _apply_impulse(_advance_spreading(dyn, h_sub, xi), xi, zeta_sub,
-                                 target, crossed)
+            dyn = _apply_impulse(
+                _advance_spreading(dyn, h_sub, xi), xi, zeta_sub, target, crossed
+            )
         # A reflection is specular and instantaneous: zeta changes sign and
         # neither time nor path is added, so only the sub-step before it is
         # charged. Crossing a profile node changes neither: the ray goes
@@ -903,7 +986,9 @@ class _SlopingStep(NamedTuple):
 
 
 def _reflect_off_facet(
-    xi: NDArray[np.float64], zeta: NDArray[np.float64], m: NDArray[np.float64],
+    xi: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    m: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Specular reflection of the slowness pair about a facet of slope ``m``.
 
@@ -917,9 +1002,13 @@ def _reflect_off_facet(
 
 
 def _facet_spreading_jump(
-    xi: NDArray[np.float64], zeta: NDArray[np.float64], m: NDArray[np.float64],
-    z_b: NDArray[np.float64], z_prof: NDArray[np.float64],
-    c_prof: NDArray[np.float64], grad: NDArray[np.float64],
+    xi: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    m: NDArray[np.float64],
+    z_b: NDArray[np.float64],
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
+    grad: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     """The ``p`` impulse of a reflection off a sloping facet, Eq. (3.123).
 
@@ -936,19 +1025,27 @@ def _facet_spreading_jump(
     c_z = grad[seg]
     c_b = np.interp(z_b, z_prof, c_prof)
     denom = zeta - xi * m
-    denom = np.where(np.abs(denom) < _GRAZING_VERTICAL,
-                     np.copysign(_GRAZING_VERTICAL, denom), denom)
+    denom = np.where(
+        np.abs(denom) < _GRAZING_VERTICAL, np.copysign(_GRAZING_VERTICAL, denom), denom
+    )
     ratio = (xi + zeta * m) / denom
     return np.asarray((2.0 * c_z / c_b) * ratio * (2.0 * xi - ratio * zeta))
 
 
 def _advance_one_step_sloping(
-    deriv: RayDerivative, *, xi: NDArray[np.float64],
-    z: NDArray[np.float64], zeta: NDArray[np.float64],
-    r0: float, range_step: float, lower: float, boundary: _Sloping,
-    stopped: NDArray[np.bool_], dyn: _Dynamic | None = None,
-    profile: tuple[NDArray[np.float64], NDArray[np.float64],
-                   NDArray[np.float64]] | None = None,
+    deriv: RayDerivative,
+    *,
+    xi: NDArray[np.float64],
+    z: NDArray[np.float64],
+    zeta: NDArray[np.float64],
+    r0: float,
+    range_step: float,
+    lower: float,
+    boundary: _Sloping,
+    stopped: NDArray[np.bool_],
+    dyn: _Dynamic | None = None,
+    profile: tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]
+    | None = None,
 ) -> _SlopingStep:
     """One whole range step against a piecewise-linear upper boundary.
 
@@ -970,8 +1067,9 @@ def _advance_one_step_sloping(
     bounces_upper = np.zeros(z.size, dtype=np.int_)
     stopped = stopped.copy()
     xi = xi.copy()
-    budget = _MAX_CROSSINGS_PER_STEP + (0 if dyn is None
-                                        else dyn.impulses.interfaces.size)
+    budget = _MAX_CROSSINGS_PER_STEP + (
+        0 if dyn is None else dyn.impulses.interfaces.size
+    )
     for _ in range(budget):
         moving = h > 0.0
         z_end, zeta_end, dt, ds = _rk4(deriv, z, zeta, h, xi)
@@ -995,8 +1093,9 @@ def _advance_one_step_sloping(
             h = np.where(moving, 0.0, h)
             break
         frac_level = _crossing_fraction(xi, z, zeta, z_end, zeta_end, h, level)
-        frac_upper = _crossing_fraction_sloping(xi, z, zeta, z_end, zeta_end,
-                                                h, r_now, boundary)
+        frac_upper = _crossing_fraction_sloping(
+            xi, z, zeta, z_end, zeta_end, h, r_now, boundary
+        )
         # A step flagged for both the sloping boundary and a level event takes
         # whichever its own interpolant meets first; the flat case's standing
         # order (interface before boundary) is the special case of this in
@@ -1007,8 +1106,9 @@ def _advance_one_step_sloping(
         reflects = upper_ev | lower_ev
         crossed = reflects | kink_ev
         frac = np.clip(np.where(upper_ev, frac_upper, frac_level), 0.0, 1.0)
-        frac = _polish_fraction_mixed(deriv, xi, z, zeta, h, level, upper_ev,
-                                      boundary, r_now, frac)
+        frac = _polish_fraction_mixed(
+            deriv, xi, z, zeta, h, level, upper_ev, boundary, r_now, frac
+        )
         h_sub = np.where(crossed, frac, 1.0) * h
         z_sub, zeta_sub, dt_sub, ds_sub = _rk4(deriv, z, zeta, h_sub, xi)
         r_cross = r_now + h_sub
@@ -1020,14 +1120,16 @@ def _advance_one_step_sloping(
             dyn = _apply_impulse(dyn, xi, zeta_sub, level, kink_ev | lower_ev)
             if profile is not None:
                 jump = _facet_spreading_jump(xi, zeta_sub, m, z_upper, *profile)
-                dyn = dyn._replace(slope=np.where(
-                    upper_ev, dyn.slope + jump * dyn.spreading, dyn.slope))
+                dyn = dyn._replace(
+                    slope=np.where(
+                        upper_ev, dyn.slope + jump * dyn.spreading, dyn.slope
+                    )
+                )
         xi_new, zeta_new = _reflect_off_facet(xi, zeta_sub, m)
         # A reflection within a milliradian of the vertical, or past it, is a
         # ray this march cannot carry: it is terminated at the bounce, state
         # frozen there. See the module docstring.
-        dying = upper_ev & (xi_new <= _MIN_FORWARD_COSINE
-                            * np.hypot(xi_new, zeta_new))
+        dying = upper_ev & (xi_new <= _MIN_FORWARD_COSINE * np.hypot(xi_new, zeta_new))
         z = np.where(moving, np.where(crossed, target, z_sub), z)
         zeta = np.where(moving, np.where(reflects, zeta_new, zeta_sub), zeta)
         xi = np.where(moving & reflects & ~dying, xi_new, xi)
@@ -1042,8 +1144,9 @@ def _advance_one_step_sloping(
     # the vertical in a thinning column can do: terminate it rather than hand
     # it the rest of the step untraced.
     stopped = stopped | (h > 0.0)
-    return _SlopingStep(z, zeta, xi, elapsed, travelled, bounces,
-                        bounces_upper, stopped, dyn)
+    return _SlopingStep(
+        z, zeta, xi, elapsed, travelled, bounces, bounces_upper, stopped, dyn
+    )
 
 
 def march_rays(
@@ -1085,10 +1188,8 @@ def march_rays(
     ns = int(n_steps)
     zeta = np.array(zeta0, dtype=np.float64)
     z = np.array(np.broadcast_to(np.asarray(z0, dtype=np.float64), zeta.shape))
-    xi_state = np.array(np.broadcast_to(np.asarray(xi, dtype=np.float64),
-                                        zeta.shape))
-    sloping = (_prepare_sloping(upper)
-               if isinstance(upper, SlopingBoundary) else None)
+    xi_state = np.array(np.broadcast_to(np.asarray(xi, dtype=np.float64), zeta.shape))
+    sloping = _prepare_sloping(upper) if isinstance(upper, SlopingBoundary) else None
     level_upper = None if isinstance(upper, SlopingBoundary) else upper
     stopped = np.zeros(z.size, dtype=bool)
     stopped_at = np.full(z.size, ns, dtype=np.int_)
@@ -1105,10 +1206,16 @@ def march_rays(
     horizontals[:, 0] = xi_state
 
     dyn: _Dynamic | None = None
-    profile: tuple[NDArray[np.float64], NDArray[np.float64],
-                   NDArray[np.float64]] | None = None
-    dyn_dtype = np.float64 if dynamic is None else np.result_type(
-        np.asarray(dynamic.spreading), np.asarray(dynamic.slope), np.float64)
+    profile: (
+        tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] | None
+    ) = None
+    dyn_dtype = (
+        np.float64
+        if dynamic is None
+        else np.result_type(
+            np.asarray(dynamic.spreading), np.asarray(dynamic.slope), np.float64
+        )
+    )
     spreadings = np.zeros((z.size, ns if dynamic is not None else 0), dtype=dyn_dtype)
     slopes = np.zeros_like(spreadings)
     if dynamic is not None:
@@ -1125,27 +1232,48 @@ def march_rays(
         if sloping is not None:
             z_prof = np.asarray(dynamic.profile_depths, dtype=np.float64).ravel()
             c_prof = np.asarray(dynamic.profile_speeds, dtype=np.float64).ravel()
-            profile = (z_prof, c_prof,
-                       _gradients_with_half_spaces(z_prof, c_prof))
+            profile = (z_prof, c_prof, _gradients_with_half_spaces(z_prof, c_prof))
 
     for s in range(1, ns):
         if sloping is None:
-            step = _advance_one_step(deriv, xi=xi_state, z=z, zeta=zeta,
-                                     dyn=dyn, range_step=range_step,
-                                     lower=lower, upper=level_upper)
+            step = _advance_one_step(
+                deriv,
+                xi=xi_state,
+                z=z,
+                zeta=zeta,
+                dyn=dyn,
+                range_step=range_step,
+                lower=lower,
+                upper=level_upper,
+            )
             z, zeta = step.position, step.vertical
         else:
             sstep = _advance_one_step_sloping(
-                deriv, xi=xi_state, z=z, zeta=zeta, dyn=dyn,
-                r0=(s - 1) * range_step, range_step=range_step, lower=lower,
-                boundary=sloping, stopped=stopped, profile=profile)
+                deriv,
+                xi=xi_state,
+                z=z,
+                zeta=zeta,
+                dyn=dyn,
+                r0=(s - 1) * range_step,
+                range_step=range_step,
+                lower=lower,
+                boundary=sloping,
+                stopped=stopped,
+                profile=profile,
+            )
             z, zeta, xi_state = sstep.position, sstep.vertical, sstep.horizontal
             newly = sstep.stopped & ~stopped
             stopped_at[newly] = s
             stopped = sstep.stopped
-            step = _Step(sstep.position, sstep.vertical, sstep.time,
-                         sstep.path, sstep.reflections,
-                         sstep.upper_reflections, sstep.dynamic)
+            step = _Step(
+                sstep.position,
+                sstep.vertical,
+                sstep.time,
+                sstep.path,
+                sstep.reflections,
+                sstep.upper_reflections,
+                sstep.dynamic,
+            )
         positions[:, s] = z
         verticals[:, s] = zeta
         horizontals[:, s] = xi_state
@@ -1159,9 +1287,25 @@ def march_rays(
             slopes[:, s] = dyn.slope
 
     if dynamic is None:
-        return RayMarch(positions, times, arcs, verticals, reflections,
-                        upper_reflections, horizontals=horizontals,
-                        stopped_columns=stopped_at)
-    return RayMarch(positions, times, arcs, verticals, reflections,
-                    upper_reflections, spreadings, slopes,
-                    horizontals=horizontals, stopped_columns=stopped_at)
+        return RayMarch(
+            positions,
+            times,
+            arcs,
+            verticals,
+            reflections,
+            upper_reflections,
+            horizontals=horizontals,
+            stopped_columns=stopped_at,
+        )
+    return RayMarch(
+        positions,
+        times,
+        arcs,
+        verticals,
+        reflections,
+        upper_reflections,
+        spreadings,
+        slopes,
+        horizontals=horizontals,
+        stopped_columns=stopped_at,
+    )

@@ -215,30 +215,36 @@ def _render_prediction_fiche(
     )
 
     statement_style = ParagraphStyle(
-        "prediction_statement", parent=styles["Normal"], fontSize=8.5,
-        textColor=colors.HexColor(_MUTED_HEX), spaceBefore=4,
+        "prediction_statement",
+        parent=styles["Normal"],
+        fontSize=8.5,
+        textColor=colors.HexColor(_MUTED_HEX),
+        spaceBefore=4,
     )
     statement_key, statement_values = statement
     values = statement_values or {"sd": _MODEL_SD_DB}
-    flow.append(
-        Paragraph(t(statement_key, language).format(**values), statement_style)
-    )
+    flow.append(Paragraph(t(statement_key, language).format(**values), statement_style))
 
     if metadata is not None and metadata.requirement is not None:
         text, passed = _prediction_verdict(
-            rating_value, float(metadata.requirement), rating_symbol,
-            is_impact=is_impact, language=language,
+            rating_value,
+            float(metadata.requirement),
+            rating_symbol,
+            is_impact=is_impact,
+            language=language,
         )
         flow.extend(verdict_flow(text, passed, styles, language))
 
-    flow.extend(footer_flow(
-        metadata,
-        language,
-        disclaimer=(
-            "Predicted result: the values relate only to the modelled "
-            "configuration, not to a tested specimen."
-        ),
-    ))
+    flow.extend(
+        footer_flow(
+            metadata,
+            language,
+            disclaimer=(
+                "Predicted result: the values relate only to the modelled "
+                "configuration, not to a tested specimen."
+            ),
+        )
+    )
 
     return build_document(path, flow, title_text)
 
@@ -273,9 +279,7 @@ def render_iso12354_airborne_report(
     for contribution in result.paths:
         value = fmt_num(contribution.r_w, language)
         if verbose:
-            share = format_number(
-                100.0 * contribution.fraction, language, decimals=1
-            )
+            share = format_number(100.0 * contribution.fraction, language, decimals=1)
             value = f"{value} &#183; {share}%"
         metric_rows.append((contribution.label, value))
 
@@ -521,8 +525,7 @@ def _facade_energy_shares(result: FacadePredictionResult) -> dict[str, float]:
     import numpy as np
 
     taus = {
-        name: 10.0 ** (-partial / 10.0)
-        for name, partial in result.element_r.items()
+        name: 10.0 ** (-partial / 10.0) for name, partial in result.element_r.items()
     }
     total = float(np.sum([t.sum() for t in taus.values()]))
     return {name: 100.0 * float(t.sum()) / total for name, t in taus.items()}

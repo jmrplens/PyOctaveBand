@@ -202,6 +202,7 @@ def _response_drawing(
     _draw_microphone_response(result, ax, language=language)
     decades = np.log10(float(np.max(f)) / float(np.min(f)))
     from .._plot.electroacoustics import _RESPONSE_SPAN_MIC
+
     ax.set_box_aspect(_RESPONSE_SPAN_MIC / (_DB_PER_DECADE * decades))
     fig.tight_layout()
     return _drawing_from_figure(fig, target_width, language)
@@ -227,8 +228,7 @@ def _secondary_drawing(
 
     has_polar = result.polar_angles_deg is not None
     has_noise = (
-        result.noise_frequencies is not None
-        and result.noise_band_levels_db is not None
+        result.noise_frequencies is not None and result.noise_band_levels_db is not None
     )
     has_thd = (
         result.distortion_spl_db is not None
@@ -243,7 +243,8 @@ def _secondary_drawing(
     idx = 1
     if has_polar:
         _draw_datasheet_polar(
-            result, fig.add_subplot(1, panels, idx, projection="polar"),
+            result,
+            fig.add_subplot(1, panels, idx, projection="polar"),
             language=language,
         )
         idx += 1

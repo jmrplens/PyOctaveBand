@@ -279,7 +279,11 @@ def wave_decomposition(
     canonical = _canonical_shape(shape)
     if diameter is not None:
         _warn_astm_plane_wave(
-            wavenumber, s1=s1, s2=s2, diameter=diameter, shape=canonical,
+            wavenumber,
+            s1=s1,
+            s2=s2,
+            diameter=diameter,
+            shape=canonical,
             stacklevel=2,
         )
     ha = np.asarray(h1, dtype=np.complex128)
@@ -520,8 +524,12 @@ class TransferMatrix:
 
         check_language(language)
         return plot_transfer_matrix(
-            self, frequency, characteristic_impedance, ax=ax,
-            language=language, **kwargs,
+            self,
+            frequency,
+            characteristic_impedance,
+            ax=ax,
+            language=language,
+            **kwargs,
         )
 
     def plot_geometry(
@@ -539,9 +547,7 @@ class TransferMatrix:
         from ..._plot.geometry import plot_transfer_matrix_geometry
 
         check_language(language)
-        return plot_transfer_matrix_geometry(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_transfer_matrix_geometry(self, ax=ax, language=language, **kwargs)
 
 
 def air_layer_transfer_matrix(
@@ -593,11 +599,21 @@ def _face_from_loads(
 ) -> tuple[Complex, Complex, Complex, Complex]:
     """Face pressures/velocities for one termination (Eqs. (17)-(21))."""
     a, b, c, d = wave_decomposition(
-        load[0], load[1], load[2], load[3],
-        l1=l1, s1=s1, l2=l2, s2=s2, wavenumber=wavenumber,
+        load[0],
+        load[1],
+        load[2],
+        load[3],
+        l1=l1,
+        s1=s1,
+        l2=l2,
+        s2=s2,
+        wavenumber=wavenumber,
     )
     return face_quantities(
-        a, b, c, d,
+        a,
+        b,
+        c,
+        d,
         wavenumber=wavenumber,
         thickness=thickness,
         characteristic_impedance=characteristic_impedance,
@@ -652,8 +668,7 @@ def _measurement_context(
         "diameter": diameter,
         "shape": shape if diameter is not None else None,
         "frequency": (
-            np.asarray(frequency, dtype=np.float64)
-            if frequency is not None else None
+            np.asarray(frequency, dtype=np.float64) if frequency is not None else None
         ),
         "air_characteristic_impedance": characteristic_impedance,
     }
@@ -712,22 +727,39 @@ def transfer_matrix_two_load(
     canonical = _canonical_shape(shape)
     if diameter is not None:
         _warn_astm_plane_wave(
-            wavenumber, s1=s1, s2=s2, diameter=diameter, shape=canonical,
+            wavenumber,
+            s1=s1,
+            s2=s2,
+            diameter=diameter,
+            shape=canonical,
             stacklevel=2,
         )
     p0a, pda, u0a, uda = _face_from_loads(
-        load_a, l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
-        wavenumber=wavenumber, characteristic_impedance=characteristic_impedance,
+        load_a,
+        l1=l1,
+        s1=s1,
+        l2=l2,
+        s2=s2,
+        thickness=thickness,
+        wavenumber=wavenumber,
+        characteristic_impedance=characteristic_impedance,
     )
     p0b, pdb, u0b, udb = _face_from_loads(
-        load_b, l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
-        wavenumber=wavenumber, characteristic_impedance=characteristic_impedance,
+        load_b,
+        l1=l1,
+        s1=s1,
+        l2=l2,
+        s2=s2,
+        thickness=thickness,
+        wavenumber=wavenumber,
+        characteristic_impedance=characteristic_impedance,
     )
     den = pda * udb - pdb * uda
     _warn_ill_conditioned(
         np.asarray(den, dtype=np.complex128),
         np.abs(pda * udb) + np.abs(pdb * uda),
-        "transfer_matrix_two_load", stacklevel=2,
+        "transfer_matrix_two_load",
+        stacklevel=2,
     )
     return TransferMatrix(
         t11=np.asarray((p0a * udb - p0b * uda) / den, dtype=np.complex128),
@@ -735,8 +767,14 @@ def transfer_matrix_two_load(
         t21=np.asarray((u0a * udb - u0b * uda) / den, dtype=np.complex128),
         t22=np.asarray((pda * u0b - pdb * u0a) / den, dtype=np.complex128),
         **_measurement_context(
-            l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
-            diameter=diameter, shape=canonical, frequency=frequency,
+            l1=l1,
+            s1=s1,
+            l2=l2,
+            s2=s2,
+            thickness=thickness,
+            diameter=diameter,
+            shape=canonical,
+            frequency=frequency,
             characteristic_impedance=characteristic_impedance,
         ),
     )
@@ -792,18 +830,29 @@ def transfer_matrix_one_load(
     canonical = _canonical_shape(shape)
     if diameter is not None:
         _warn_astm_plane_wave(
-            wavenumber, s1=s1, s2=s2, diameter=diameter, shape=canonical,
+            wavenumber,
+            s1=s1,
+            s2=s2,
+            diameter=diameter,
+            shape=canonical,
             stacklevel=2,
         )
     p0, pd, u0, ud = _face_from_loads(
-        load, l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
-        wavenumber=wavenumber, characteristic_impedance=characteristic_impedance,
+        load,
+        l1=l1,
+        s1=s1,
+        l2=l2,
+        s2=s2,
+        thickness=thickness,
+        wavenumber=wavenumber,
+        characteristic_impedance=characteristic_impedance,
     )
     den = p0 * ud + pd * u0
     _warn_ill_conditioned(
         np.asarray(den, dtype=np.complex128),
         np.abs(p0 * ud) + np.abs(pd * u0),
-        "transfer_matrix_one_load", stacklevel=2,
+        "transfer_matrix_one_load",
+        stacklevel=2,
     )
     t_diag = np.asarray((pd * ud + p0 * u0) / den, dtype=np.complex128)
     return TransferMatrix(
@@ -812,8 +861,14 @@ def transfer_matrix_one_load(
         t21=np.asarray((u0**2 - ud**2) / den, dtype=np.complex128),
         t22=t_diag,
         **_measurement_context(
-            l1=l1, s1=s1, l2=l2, s2=s2, thickness=thickness,
-            diameter=diameter, shape=canonical, frequency=frequency,
+            l1=l1,
+            s1=s1,
+            l2=l2,
+            s2=s2,
+            thickness=thickness,
+            diameter=diameter,
+            shape=canonical,
+            frequency=frequency,
             characteristic_impedance=characteristic_impedance,
         ),
     )

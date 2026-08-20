@@ -37,7 +37,9 @@ from ..io._signal import Signal
 _REF_PRESSURE = 2e-5
 
 
-def _level_db(mean_square: np.ndarray, calibration_factor: float, dbfs: bool) -> np.ndarray:
+def _level_db(
+    mean_square: np.ndarray, calibration_factor: float, dbfs: bool
+) -> np.ndarray:
     """Convert mean-square values to dB SPL (re 20 uPa) or dBFS."""
     eps = np.finfo(float).eps
     rms = np.sqrt(np.maximum(mean_square, eps))
@@ -303,8 +305,10 @@ def sound_exposure(
     if duration_hours is not None and duration_hours <= 0:
         raise ValueError("'duration_hours' must be positive.")
     p_a = weighting_filter(x_proc, fs, "A") * calibration
-    mean_square = np.mean(p_a ** 2, axis=-1)
-    hours = duration_hours if duration_hours is not None else x_proc.shape[-1] / fs / 3600.0
+    mean_square = np.mean(p_a**2, axis=-1)
+    hours = (
+        duration_hours if duration_hours is not None else x_proc.shape[-1] / fs / 3600.0
+    )
     out = np.asarray(mean_square * hours)
     return as_float_or_array(out)
 
@@ -336,8 +340,10 @@ def lex_8h(
     :return: LEX,8h in dB (scalar or per-channel array).
     """
     exposure = np.asarray(
-        sound_exposure(x, fs, duration_hours=duration_hours, calibration_factor=calibration_factor)
+        sound_exposure(
+            x, fs, duration_hours=duration_hours, calibration_factor=calibration_factor
+        )
     )
     eps = np.finfo(float).eps
-    out = 10 * np.log10(np.maximum(exposure, eps) / (8.0 * _REF_PRESSURE ** 2))
+    out = 10 * np.log10(np.maximum(exposure, eps) / (8.0 * _REF_PRESSURE**2))
     return as_float_or_array(out)

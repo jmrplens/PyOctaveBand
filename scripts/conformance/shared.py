@@ -81,7 +81,10 @@ def _filter_class(arch: str, fraction: float) -> FilterClass:
     smoke-test guard asserts the re-derived margin equals the library's).
     """
     bank = filters.OctaveFilterBank(
-        48000, fraction=fraction, order=6, limits=[100, 10000],
+        48000,
+        fraction=fraction,
+        order=6,
+        limits=[100, 10000],
         design=filters.FilterDesign(filter_type=arch),
     )
     result = verify_filter_class(bank)
@@ -90,7 +93,7 @@ def _filter_class(arch: str, fraction: float) -> FilterClass:
     idx = [b["freq"] for b in bands].index(worst["freq"])
     fm = float(bank.freq[idx])
     fsd = bank.fs / float(bank.factor[idx])
-    w, h = sg.sosfreqz(bank.sos[idx], worN=2 ** 15, fs=fsd)
+    w, h = sg.sosfreqz(bank.sos[idx], worN=2**15, fs=fsd)
     attenuation = -20.0 * np.log10(np.abs(h) + np.finfo(float).eps)
     a_ref = float(np.interp(fm, w, attenuation))
     delta = attenuation - a_ref

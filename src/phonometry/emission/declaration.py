@@ -163,7 +163,10 @@ class OperatingModeDeclaration:
         decibel (clause 3.15); ``None`` when no emission sound pressure level
         is declared for the mode.
         """
-        if self.emission_pressure_level is None or self.emission_pressure_uncertainty is None:
+        if (
+            self.emission_pressure_level is None
+            or self.emission_pressure_uncertainty is None
+        ):
             return None
         return _round_db(
             self.emission_pressure_level + self.emission_pressure_uncertainty

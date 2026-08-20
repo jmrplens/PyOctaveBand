@@ -38,7 +38,18 @@ BANG_MACHINE_LFE = ((47.0, 1.0), (40.0, 1.5), (22.0, 1.5), (11.5, 2.0), (5.5, 2.
 #: ISO 717-2:2020 Table D.3, A-weighting correction A in dB for the
 #: one-third-octave bands 50 Hz to 630 Hz.
 ISO717_2_TABLE_D3_THIRD = (
-    -30.3, -26.2, -22.4, -19.1, -16.2, -13.2, -10.8, -8.7, -6.6, -4.8, -3.2, -1.9
+    -30.3,
+    -26.2,
+    -22.4,
+    -19.1,
+    -16.2,
+    -13.2,
+    -10.8,
+    -8.7,
+    -6.6,
+    -4.8,
+    -3.2,
+    -1.9,
 )
 
 #: ISO 717-2:2020 Table D.3, octave bands 63 Hz to 500 Hz.
@@ -58,17 +69,85 @@ ISO717_2_TABLE_D4_RATING = 55
 #: reference measurement data; the standard prints no worked example of its own.
 GURTNER_VOLUME = 41.4
 GURTNER_REVERBERATION_TIME = (
-    1.3, 1.3, 1.3, 1.3, 0.42, 1.43, 2.06, 1.663, 3.7, 3.22, 3.09, 3.1, 2.87,
-    2.53, 2.38, 2.37, 2.03, 1.92, 1.65, 1.38, 1.27, 1.11, 0.97, 0.86, 0.74,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    0.42,
+    1.43,
+    2.06,
+    1.663,
+    3.7,
+    3.22,
+    3.09,
+    3.1,
+    2.87,
+    2.53,
+    2.38,
+    2.37,
+    2.03,
+    1.92,
+    1.65,
+    1.38,
+    1.27,
+    1.11,
+    0.97,
+    0.86,
+    0.74,
 )
 GURTNER_MEASURED = (
-    60.13, 71.09, 73.7, 76.71, 76.51, 60.79, 51.62, 48.74, 43.61, 42.27, 40.54,
-    35.9, 29.6, 27.0, 21.5, 19.8, 17.6, 15.96, 13.52, 12.15, 11.22, 12.02,
-    15.43, 15.15, 11.74,
+    60.13,
+    71.09,
+    73.7,
+    76.71,
+    76.51,
+    60.79,
+    51.62,
+    48.74,
+    43.61,
+    42.27,
+    40.54,
+    35.9,
+    29.6,
+    27.0,
+    21.5,
+    19.8,
+    17.6,
+    15.96,
+    13.52,
+    12.15,
+    11.22,
+    12.02,
+    15.43,
+    15.15,
+    11.74,
 )
 GURTNER_STANDARDIZED = (
-    56.7, 67.7, 70.3, 73.3, 76.3, 57.2, 47.2, 44.8, 38.1, 37.0, 35.3, 30.7,
-    24.5, 22.2, 16.8, 15.1, 13.2, 11.7, 9.6, 8.6, 7.9, 9.0, 12.8, 12.8, 9.8,
+    56.7,
+    67.7,
+    70.3,
+    73.3,
+    76.3,
+    57.2,
+    47.2,
+    44.8,
+    38.1,
+    37.0,
+    35.3,
+    30.7,
+    24.5,
+    22.2,
+    16.8,
+    15.1,
+    13.2,
+    11.7,
+    9.6,
+    8.6,
+    7.9,
+    9.0,
+    12.8,
+    12.8,
+    9.8,
 )
 
 
@@ -256,9 +335,7 @@ def test_standardization_at_the_reference_volume_is_the_time_term_only() -> None
     """V = V0 = 50 m3 leaves only the Fast reverberation correction."""
     res = building.standardized_maximum_impact_level([70.0], 50.0, 2.0)
     assert res.volume_term == pytest.approx(0.0)
-    np.testing.assert_allclose(
-        res.standardized, 70.0 - res.reverberation_correction
-    )
+    np.testing.assert_allclose(res.standardized, 70.0 - res.reverberation_correction)
 
 
 def test_reverberation_correction_grows_with_reverberation_time() -> None:
@@ -310,16 +387,12 @@ def test_standardization_reproduces_a_published_25_band_example() -> None:
     res = building.standardized_maximum_impact_level(
         GURTNER_MEASURED, GURTNER_VOLUME, GURTNER_REVERBERATION_TIME
     )
-    np.testing.assert_allclose(
-        res.standardized, GURTNER_STANDARDIZED, atol=0.1
-    )
+    np.testing.assert_allclose(res.standardized, GURTNER_STANDARDIZED, atol=0.1)
 
 
 def test_standardization_rejects_a_mismatched_reverberation_time() -> None:
     with pytest.raises(ValueError, match="reverberation_time"):
-        building.standardized_maximum_impact_level(
-            [70.0, 65.0], 50.0, [1.0, 2.0, 3.0]
-        )
+        building.standardized_maximum_impact_level([70.0, 65.0], 50.0, [1.0, 2.0, 3.0])
 
 
 # ---------------------------------------------------------------------------
@@ -347,15 +420,13 @@ def test_octave_conversion_groups_consecutive_thirds() -> None:
     octaves = building.heavy_impact_octave_levels(thirds)
     assert octaves.size == 4
     expected = [
-        10.0 * np.log10(np.sum(10.0 ** (thirds[3 * i:3 * i + 3] / 10.0)))
+        10.0 * np.log10(np.sum(10.0 ** (thirds[3 * i : 3 * i + 3] / 10.0)))
         for i in range(4)
     ]
     np.testing.assert_allclose(octaves, expected, atol=1e-12)
     # And explicitly: the top octave is 400 + 500 + 630 Hz. Striding instead
     # would put 160 + 400 + 630 Hz there and read 48,9 dB, 20,2 dB too high.
-    np.testing.assert_allclose(
-        octaves, [76.629, 50.570, 42.047, 28.680], atol=0.01
-    )
+    np.testing.assert_allclose(octaves, [76.629, 50.570, 42.047, 28.680], atol=0.01)
 
 
 def test_octave_conversion_rejects_a_non_multiple_of_three() -> None:
@@ -374,8 +445,18 @@ def test_a_weighting_table_third_octave() -> None:
     values = tuple(table[f] for f in sorted(table))
     assert values == ISO717_2_TABLE_D3_THIRD
     assert sorted(table) == [
-        50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0,
-        315.0, 400.0, 500.0, 630.0,
+        50.0,
+        63.0,
+        80.0,
+        100.0,
+        125.0,
+        160.0,
+        200.0,
+        250.0,
+        315.0,
+        400.0,
+        500.0,
+        630.0,
     ]
 
 
@@ -426,11 +507,11 @@ def test_rating_rounds_halves_up() -> None:
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        (54.5, 55),   # half-to-even would give 54
+        (54.5, 55),  # half-to-even would give 54
         (55.5, 56),
         (53.5, 54),
         (54.4999, 54),
-        (-0.5, 0),    # half-away-from-zero would give -1
+        (-0.5, 0),  # half-away-from-zero would give -1
         (-1.5, -1),
     ],
 )
@@ -453,17 +534,13 @@ def test_rating_is_dominated_by_the_low_bands() -> None:
     Adding 1 dB at 500 Hz therefore moves the rating far more than 1 dB at
     63 Hz for the Table D.4 spectrum.
     """
-    base = building.a_weighted_maximum_impact_level(
-        ISO717_2_TABLE_D4_LEVELS
-    ).unrounded
+    base = building.a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS).unrounded
     low = list(ISO717_2_TABLE_D4_LEVELS)
     low[0] += 1.0
     high = list(ISO717_2_TABLE_D4_LEVELS)
     high[-1] += 1.0
     delta_low = building.a_weighted_maximum_impact_level(low).unrounded - base
-    delta_high = (
-        building.a_weighted_maximum_impact_level(high).unrounded - base
-    )
+    delta_high = building.a_weighted_maximum_impact_level(high).unrounded - base
     assert delta_high > delta_low
 
 
@@ -502,6 +579,4 @@ def test_rating_and_standardization_compose() -> None:
     )
     rated = building.a_weighted_maximum_impact_level(standardized.standardized)
     plain = building.a_weighted_maximum_impact_level(ISO717_2_TABLE_D4_LEVELS)
-    assert rated.unrounded - plain.unrounded == pytest.approx(
-        10.0 * np.log10(2.0)
-    )
+    assert rated.unrounded - plain.unrounded == pytest.approx(10.0 * np.log10(2.0))

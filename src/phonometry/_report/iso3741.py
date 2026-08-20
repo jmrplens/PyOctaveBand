@@ -245,7 +245,8 @@ def render_reverberation_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Sound power determination", language),
             basis=_basis(result, language),
@@ -253,9 +254,9 @@ def render_reverberation_power_report(
             statement=statement,
             extended=extended,
             basis_strips=[
-            _corrections_strip(result, language),
-            _a_weighting_strip(language),
-        ],
+                _corrections_strip(result, language),
+                _a_weighting_strip(language),
+            ],
         ),
         value_table=_value_table(result, verbose, language),
         metadata=metadata,

@@ -90,9 +90,7 @@ def _intensity_power_negative() -> ph.emission.SoundPowerIntensityResult:
     intensity = np.column_stack([np.full(4, 5.0e-4), np.full(4, -5.0e-5)])
     freqs = np.array([500.0, 1000.0])
     with pytest.warns(ph.emission.SoundPowerWarning):
-        return ph.emission.sound_power_intensity(
-            intensity, areas, frequencies=freqs
-        )
+        return ph.emission.sound_power_intensity(intensity, areas, frequencies=freqs)
 
 
 def _intensity() -> ph.emission.IntensityResult:
@@ -112,12 +110,17 @@ def _open_plan() -> ph.room.OpenPlanResult:
 
 def _outdoor() -> ph.environment.OutdoorAttenuation:
     bands = np.array([63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0])
-    barrier = ph.environment.Barrier(
-        source_to_edge=101.0, edge_to_receiver=101.0
-    )
+    barrier = ph.environment.Barrier(source_to_edge=101.0, edge_to_receiver=101.0)
     return ph.environment.outdoor_propagation_attenuation(
-        200.0, 1.5, 1.5, bands, ground_source=1.0, ground_middle=1.0,
-        ground_receiver=1.0, barrier=barrier, temperature=15.0,
+        200.0,
+        1.5,
+        1.5,
+        bands,
+        ground_source=1.0,
+        ground_middle=1.0,
+        ground_receiver=1.0,
+        barrier=barrier,
+        temperature=15.0,
         relative_humidity=70.0,
     )
 
@@ -146,9 +149,7 @@ def _porous_medium() -> ph.materials.PorousMediumResult:
 def _layered_absorber() -> ph.materials.LayeredAbsorberResult:
     f = np.linspace(400.0, 4000.0, 40)
     med = ph.materials.miki(f, 20000.0)
-    return ph.materials.layered_absorber(
-        f, [ph.materials.PorousLayer(0.05, med)]
-    )
+    return ph.materials.layered_absorber(f, [ph.materials.PorousLayer(0.05, med)])
 
 
 def _diffuse_absorption() -> ph.materials.DiffuseFieldAbsorptionResult:
@@ -169,7 +170,11 @@ def _impedance_tube() -> ph.materials.ImpedanceTubeResult:
         1.0 + r_true * phase
     )
     return ph.materials.two_microphone_impedance(
-        h12, frequency=f, spacing=s, x1=x1, speed_of_sound=343.2,
+        h12,
+        frequency=f,
+        spacing=s,
+        x1=x1,
+        speed_of_sound=343.2,
         characteristic_impedance=407.0,
     )
 
@@ -183,7 +188,10 @@ _MC_QUANTITIES = (
 
 def _monte_carlo() -> ph.metrology.MonteCarloResult:
     return ph.metrology.monte_carlo(
-        lambda a, b, c: a + b + c, _MC_QUANTITIES, trials=2000, seed=7,
+        lambda a, b, c: a + b + c,
+        _MC_QUANTITIES,
+        trials=2000,
+        seed=7,
         keep_samples=True,
     )
 
@@ -200,9 +208,7 @@ def _exposure() -> ph.hearing.ExposureResult:
 def _static_airflow() -> ph.materials.StaticAirflowResult:
     u = np.array([0.2e-3, 0.4e-3, 0.6e-3, 0.8e-3, 1.0e-3])
     dp = 30000.0 * u + 4.0e6 * u**2
-    return ph.materials.static_airflow_resistance(
-        u, dp, area=0.01, thickness=0.05
-    )
+    return ph.materials.static_airflow_resistance(u, dp, area=0.01, thickness=0.05)
 
 
 def _airborne_prediction() -> ph.building.AirbornePredictionResult:
@@ -212,8 +218,14 @@ def _airborne_prediction() -> ph.building.AirbornePredictionResult:
         ("facade", 42.0, 12.6, 6.7, 2.55),
     ):
         ff, df, fd = ph.building.flanking_element(
-            label=name, r_flanking=rw, r_separating=57.0, k_ff=k_ff,
-            k_fd=k_side, k_df=k_side, separating_area=11.5, coupling_length=lf,
+            label=name,
+            r_flanking=rw,
+            r_separating=57.0,
+            k_ff=k_ff,
+            k_fd=k_side,
+            k_df=k_side,
+            separating_area=11.5,
+            coupling_length=lf,
         )
         paths.extend((ff, df, fd))
     return ph.building.predicted_airborne_insulation(
@@ -229,8 +241,11 @@ def _impact_prediction() -> ph.building.ImpactPredictionResult:
 
 def _airborne_insulation() -> ph.building.AirborneInsulationResult:
     return ph.building.airborne_insulation(
-        [70.0, 72.0, 74.0], [40.0, 41.0, 42.0], [0.5, 0.5, 0.5],
-        area=10.0, volume=50.0,
+        [70.0, 72.0, 74.0],
+        [40.0, 41.0, 42.0],
+        [0.5, 0.5, 0.5],
+        area=10.0,
+        volume=50.0,
     )
 
 
@@ -266,10 +281,47 @@ def _intensity_wide() -> ph.emission.IntensityResult:
     )
 
 
-_ANNEX_C2_R = [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-               28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
-_ANNEX_C2_FREQS = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-                   630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+_ANNEX_C2_R = [
+    20.4,
+    16.3,
+    17.7,
+    22.6,
+    22.4,
+    22.7,
+    24.8,
+    26.6,
+    28.0,
+    30.5,
+    31.8,
+    32.5,
+    33.4,
+    33.0,
+    31.0,
+    25.5,
+]
+_ANNEX_C2_FREQS = [
+    50,
+    63,
+    80,
+    100,
+    125,
+    160,
+    200,
+    250,
+    315,
+    400,
+    500,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+    4000,
+    5000,
+]
 
 
 def _extended_rating() -> ph.building.ExtendedWeightedRatingResult:
@@ -279,16 +331,71 @@ def _extended_rating() -> ph.building.ExtendedWeightedRatingResult:
 
 
 def _extended_impact_rating() -> ph.building.ExtendedImpactRatingResult:
-    li = [55.0, 57.0, 59.0, 62.1, 63.2, 63.5, 66.2, 68.5, 70.0, 71.7, 73.1,
-          73.8, 73.5, 73.8, 73.3, 73.1, 73.0, 72.4, 71.2]
-    freqs = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-             630, 800, 1000, 1250, 1600, 2000, 2500, 3150]
+    li = [
+        55.0,
+        57.0,
+        59.0,
+        62.1,
+        63.2,
+        63.5,
+        66.2,
+        68.5,
+        70.0,
+        71.7,
+        73.1,
+        73.8,
+        73.5,
+        73.8,
+        73.3,
+        73.1,
+        73.0,
+        72.4,
+        71.2,
+    ]
+    freqs = [
+        50,
+        63,
+        80,
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+    ]
     return ph.building.weighted_impact_rating_extended(li, freqs)
 
 
 _PANEL_BANDS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-     1000, 1250, 1600, 2000, 2500, 3150], dtype=float
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+    ],
+    dtype=float,
 )
 
 
@@ -307,9 +414,7 @@ def _single_panel() -> ph.building.SoundReductionResult:
 
 
 def _double_wall() -> ph.building.SoundReductionResult:
-    return ph.building.double_wall_transmission_loss(
-        _PANEL_BANDS, 12.0, 12.0, 0.1
-    )
+    return ph.building.double_wall_transmission_loss(_PANEL_BANDS, 12.0, 12.0, 0.1)
 
 
 def _slit_aperture() -> ph.building.ApertureTransmissionResult:
@@ -318,12 +423,13 @@ def _slit_aperture() -> ph.building.ApertureTransmissionResult:
 
 def _modulation() -> ph.electroacoustics.ModulationDistortionResult:
     t = np.arange(FS) / FS
-    x = (np.sin(2 * np.pi * 250.0 * t) + 0.25 * np.sin(2 * np.pi * 8000.0 * t)
-         + 0.02 * np.sin(2 * np.pi * 8250.0 * t)
-         + 0.02 * np.sin(2 * np.pi * 7750.0 * t))
-    return ph.electroacoustics.modulation_distortion(
-        x, FS, f_low=250.0, f_high=8000.0
+    x = (
+        np.sin(2 * np.pi * 250.0 * t)
+        + 0.25 * np.sin(2 * np.pi * 8000.0 * t)
+        + 0.02 * np.sin(2 * np.pi * 8250.0 * t)
+        + 0.02 * np.sin(2 * np.pi * 7750.0 * t)
     )
+    return ph.electroacoustics.modulation_distortion(x, FS, f_low=250.0, f_high=8000.0)
 
 
 def _field_indicators() -> ph.emission.FieldIndicators:
@@ -356,9 +462,7 @@ def _room_with_one_invalid_band() -> ph.room.RoomAcousticsResult:
     )
 
 
-def _transfer_matrix() -> tuple[
-    ph.materials.TransferMatrix, np.ndarray, float
-]:
+def _transfer_matrix() -> tuple[ph.materials.TransferMatrix, np.ndarray, float]:
     f = np.linspace(200.0, 1600.0, 40)
     rho_c = 407.0
     k = 2.0 * np.pi * f / 343.2

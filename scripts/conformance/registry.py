@@ -41,6 +41,7 @@ for _p in (str(_TESTS),):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+
 @dataclass(frozen=True)
 class Outcome:
     """The rendered result of a single conformance check."""
@@ -64,9 +65,9 @@ class Check:
 CHECKS: list[Check] = []
 
 
-def register(domain: str, standard: str, quantity: str) -> Callable[
-    [Callable[[], Outcome]], Callable[[], Outcome]
-]:
+def register(
+    domain: str, standard: str, quantity: str
+) -> Callable[[Callable[[], Outcome]], Callable[[], Outcome]]:
     """Register a check callable under a domain / standard / quantity."""
 
     def deco(fn: Callable[[], Outcome]) -> Callable[[], Outcome]:

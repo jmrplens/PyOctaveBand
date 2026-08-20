@@ -103,8 +103,10 @@ def _clean_profile(
 
 
 def _clean_bathymetry(
-    bathymetry: tuple[NDArray[np.float64] | list[float],
-                      NDArray[np.float64] | list[float]] | None,
+    bathymetry: tuple[
+        NDArray[np.float64] | list[float], NDArray[np.float64] | list[float]
+    ]
+    | None,
     z_prof: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
     """One validated depth(r) polyline out of the node pair, or ``None``.
@@ -120,14 +122,14 @@ def _clean_bathymetry(
         return None
     pair = tuple(bathymetry)
     if len(pair) != 2 or pair[0] is None or pair[1] is None:
-        raise ValueError(
-            "'bathymetry' must be a (ranges_m, depths_m) pair of arrays.")
+        raise ValueError("'bathymetry' must be a (ranges_m, depths_m) pair of arrays.")
     br = np.asarray(pair[0], dtype=np.float64).ravel()
     bd = np.asarray(pair[1], dtype=np.float64).ravel()
     if br.size < 2 or bd.shape != br.shape:
         raise ValueError(
             "the two halves of 'bathymetry' must be 1-D"
-            " arrays of equal length, at least two points.")
+            " arrays of equal length, at least two points."
+        )
     if not (np.all(np.isfinite(br)) and np.all(np.isfinite(bd))):
         raise ValueError("the bathymetry must be finite.")
     if np.any(np.diff(br) <= 0.0):
@@ -137,12 +139,14 @@ def _clean_bathymetry(
     if np.any(bd <= 0.0):
         raise ValueError(
             "the bathymetry depths must be strictly positive: the wedge apex"
-            " itself, where the water ends, cannot carry a water column.")
+            " itself, where the water ends, cannot carry a water column."
+        )
     if float(bd.max()) > float(z_prof[-1]) + 1e-9:
         raise ValueError(
             "the bathymetry depths must not run below the sound-speed"
             " profile: the profile is the medium, so it must reach the"
-            " deepest point of the bottom.")
+            " deepest point of the bottom."
+        )
     return br, bd
 
 
@@ -192,7 +196,8 @@ def _resolve_boundary(
         return "pressure-release", (
             require_positive(bottom.water_density, "water_density"),
             require_positive(bottom.density, "density"),
-            require_positive(bottom.sound_speed, "sound_speed"))
+            require_positive(bottom.sound_speed, "sound_speed"),
+        )
     key = bottom.strip().lower()
     if key not in _BOTTOM_TYPES:
         raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
@@ -200,7 +205,8 @@ def _resolve_boundary(
 
 
 def _seabed_grazing_deg(
-    xi: NDArray[np.float64], c_bottom: float,
+    xi: NDArray[np.float64],
+    c_bottom: float,
 ) -> NDArray[np.float64]:
     """The grazing angle Snell's invariant fixes at the seabed, in degrees.
 
@@ -215,7 +221,8 @@ def _seabed_grazing_deg(
 
 
 def _ocean_ray_derivative(
-    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
 ) -> RayDerivative:
     r"""The ocean's ray equations in range, vectorised over rays.
 
@@ -257,17 +264,29 @@ def _ocean_ray_derivative(
     seg_grad = np.diff(c_prof) / np.diff(z_prof)
 
     def deriv(
-        z_arr: NDArray[np.float64], zeta_arr: NDArray[np.float64],
-        xi_arr: NDArray[np.float64], /
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64],
-               NDArray[np.float64]]:
+        z_arr: NDArray[np.float64],
+        zeta_arr: NDArray[np.float64],
+        xi_arr: NDArray[np.float64],
+        /,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]:
         cc = np.interp(z_arr, z_prof, c_prof)
-        seg = np.where(zeta_arr >= 0.0,
-                       np.searchsorted(z_prof, z_arr, side="right") - 1,
-                       np.searchsorted(z_prof, z_arr, side="left") - 1)
+        seg = np.where(
+            zeta_arr >= 0.0,
+            np.searchsorted(z_prof, z_arr, side="right") - 1,
+            np.searchsorted(z_prof, z_arr, side="left") - 1,
+        )
         grad = seg_grad[np.clip(seg, 0, seg_grad.size - 1)]
-        return (zeta_arr / xi_arr, -grad / (cc**3 * xi_arr),
-                1.0 / (xi_arr * cc**2), 1.0 / (xi_arr * cc))
+        return (
+            zeta_arr / xi_arr,
+            -grad / (cc**3 * xi_arr),
+            1.0 / (xi_arr * cc**2),
+            1.0 / (xi_arr * cc),
+        )
 
     return deriv
 
@@ -303,17 +322,23 @@ class NormalModeResult:
     receiver_depth: float
     source_depth: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the propagation loss versus range (loss increasing downward)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_normal_modes
 
-        return plot_normal_modes(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_normal_modes(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def _propagating_band(
-    eigvals: NDArray[np.float64], eigvecs: NDArray[np.float64],
-    k2_max: float, dz: float,
+    eigvals: NDArray[np.float64],
+    eigvecs: NDArray[np.float64],
+    k2_max: float,
+    dz: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Propagating wavenumbers (descending) and mode columns, cutoff-guarded.
 
@@ -332,7 +357,10 @@ def _propagating_band(
         warnings.warn(
             "normal_modes: retained near-cutoff mode(s) lie within 10x the"
             " finite-difference error band; increase 'n_depth_points' to"
-            " resolve them accurately.", PhonometryWarning, stacklevel=3)
+            " resolve them accurately.",
+            PhonometryWarning,
+            stacklevel=3,
+        )
     kr = np.sqrt(eigvals[prop])
     order = np.argsort(kr)[::-1]  # descending kr (mode 1 first)
     return kr[order], eigvecs[:, prop][:, order]
@@ -393,13 +421,17 @@ def normal_modes(
     zs = float(source_depth)
     zr = float(receiver_depth)
     if not (0.0 < zs < water_depth) or not (0.0 < zr < water_depth):
-        raise ValueError("'source_depth'/'receiver_depth' must lie within the water column.")
+        raise ValueError(
+            "'source_depth'/'receiver_depth' must lie within the water column."
+        )
     key = bottom.strip().lower()
     if key not in _BOTTOM_TYPES:
         raise ValueError(f"'bottom' must be one of {_BOTTOM_TYPES}, got {bottom!r}.")
     if n_depth_points is None:
-        n_depth_points = min(20_000, max(400, int(np.ceil(
-            60.0 * water_depth * f / float(np.min(c_prof))))))
+        n_depth_points = min(
+            20_000,
+            max(400, int(np.ceil(60.0 * water_depth * f / float(np.min(c_prof))))),
+        )
     if int(n_depth_points) < 8:
         raise ValueError("'n_depth_points' must be at least 8.")
 
@@ -443,7 +475,8 @@ def normal_modes(
 
     k2_max = float(k2.max())
     eigvals, eigvecs = eigh_tridiagonal(
-        main, off, select="v", select_range=(0.0, k2_max * (1.0 + 1e-12)))
+        main, off, select="v", select_range=(0.0, k2_max * (1.0 + 1e-12))
+    )
     kr, shapes_int = _propagating_band(eigvals, eigvecs, k2_max, dz)
 
     # Rebuild full-depth mode functions with the boundary nodes.
@@ -472,8 +505,14 @@ def normal_modes(
 
     # Coherent PL (Eq. 5.14/5.17): p = i/(ρ√(8πr)) e^{-iπ/4} Σ Ψm(zs)Ψm(zr) e^{i kr r}/√kr
     r = ranges
-    modal = (psi_s * psi_r / np.sqrt(kr))[:, None] * np.exp(1j * kr[:, None] * r[None, :])
-    field = (1j / (rho * np.sqrt(8.0 * np.pi * r))) * np.exp(-1j * np.pi / 4.0) * modal.sum(axis=0)
+    modal = (psi_s * psi_r / np.sqrt(kr))[:, None] * np.exp(
+        1j * kr[:, None] * r[None, :]
+    )
+    field = (
+        (1j / (rho * np.sqrt(8.0 * np.pi * r)))
+        * np.exp(-1j * np.pi / 4.0)
+        * modal.sum(axis=0)
+    )
     p0 = 1.0 / (4.0 * np.pi)  # free-field pressure magnitude at r = 1 m
     with np.errstate(divide="ignore"):
         pl = -20.0 * np.log10(np.abs(field) / p0)
@@ -577,7 +616,9 @@ class RayTraceResult:
     bathymetry_ranges: NDArray[np.float64] | None = None
     bathymetry_depths: NDArray[np.float64] | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the ray paths (depth increasing downward)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_ray_trace
@@ -593,8 +634,10 @@ def ray_trace(
     launch_angles_deg: NDArray[np.float64] | list[float],
     max_range: float = 10_000.0,
     n_steps: int = 2000,
-    bathymetry: tuple[NDArray[np.float64] | list[float],
-                      NDArray[np.float64] | list[float]] | None = None,
+    bathymetry: tuple[
+        NDArray[np.float64] | list[float], NDArray[np.float64] | list[float]
+    ]
+    | None = None,
 ) -> RayTraceResult:
     r"""Trace acoustic rays through a range-independent sound-speed profile.
 
@@ -670,8 +713,7 @@ def ray_trace(
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
     bathy = _clean_bathymetry(bathymetry, z_prof)
     water_depth = float(z_prof[-1])
-    depth_at_source = (water_depth if bathy is None
-                       else float(bathy[1][0]))
+    depth_at_source = water_depth if bathy is None else float(bathy[1][0])
     zs = float(source_depth)
     if not (0.0 <= zs <= depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
@@ -682,7 +724,9 @@ def ray_trace(
     if angles.size == 0 or not np.all(np.isfinite(angles)):
         raise ValueError("'launch_angles_deg' must be finite and non-empty.")
     if np.any(np.abs(angles) >= 90.0):
-        raise ValueError("'launch_angles_deg' must be within (-90, 90) degrees (forward rays).")
+        raise ValueError(
+            "'launch_angles_deg' must be within (-90, 90) degrees (forward rays)."
+        )
 
     ns = int(n_steps)
     ranges = np.linspace(0.0, rmax, ns)
@@ -695,15 +739,26 @@ def ray_trace(
     # so a reflected ray keeps the order the rest of the path is integrated
     # with; see :mod:`phonometry._internal.rays`.
     upper: float | SlopingBoundary = (
-        water_depth if bathy is None else SlopingBoundary(*bathy))
-    march = march_rays(deriv, xi=xi, z0=np.full(angles.size, zs),
-                       zeta0=np.sin(th) / c0, range_step=rmax / (ns - 1),
-                       n_steps=ns, lower=0.0, upper=upper)
+        water_depth if bathy is None else SlopingBoundary(*bathy)
+    )
+    march = march_rays(
+        deriv,
+        xi=xi,
+        z0=np.full(angles.size, zs),
+        zeta0=np.sin(th) / c0,
+        range_step=rmax / (ns - 1),
+        n_steps=ns,
+        lower=0.0,
+        upper=upper,
+    )
     ray_r = np.broadcast_to(ranges, march.positions.shape).copy()
 
     ray_z, ray_t, ray_s = march.positions, march.times, march.arc_lengths
-    if bathy is not None and march.stopped_columns is not None and np.any(
-            march.stopped_columns < ns):
+    if (
+        bathy is not None
+        and march.stopped_columns is not None
+        and np.any(march.stopped_columns < ns)
+    ):
         # A terminated ray's samples from the stopping bounce on are frozen at
         # a point that is not on those columns' own ranges; NaN says "the ray
         # ended here" in every consumer at once, plots included.
@@ -722,7 +777,8 @@ def ray_trace(
         # each was at; accumulated along the ray they become the exponent any
         # per-boundary reflection coefficient enters the amplitude with.
         surface_reflections=np.cumsum(
-            march.reflections - march.upper_reflections, axis=1),
+            march.reflections - march.upper_reflections, axis=1
+        ),
         bottom_reflections=np.cumsum(march.upper_reflections, axis=1),
         source_depth=zs,
         water_depth=water_depth,
@@ -836,7 +892,9 @@ class EigenrayResult:
     source_depth: float
     water_depth: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the arrival structure (per-path loss stems against delay)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_eigenrays
@@ -845,8 +903,12 @@ class EigenrayResult:
 
 
 def _march_arrival_rays(
-    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], *,
-    source_depth: float, thetas: NDArray[np.float64], receiver_range: float,
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
+    *,
+    source_depth: float,
+    thetas: NDArray[np.float64],
+    receiver_range: float,
     n_steps: int,
 ) -> RayMarch:
     """March candidate eigenrays so the last sample lands on the receiver.
@@ -867,12 +929,18 @@ def _march_arrival_rays(
     xi = np.cos(thetas) / c0
     deriv = _ocean_ray_derivative(z_prof, c_prof)
     return march_rays(
-        deriv, xi=xi, z0=np.full(thetas.size, source_depth),
+        deriv,
+        xi=xi,
+        z0=np.full(thetas.size, source_depth),
         zeta0=np.sin(thetas) / c0,
-        range_step=receiver_range / (n_steps - 1), n_steps=n_steps,
-        lower=0.0, upper=float(z_prof[-1]),
-        dynamic=DynamicRays(np.zeros(thetas.size),
-                            np.full(thetas.size, 1.0 / c0), z_prof, c_prof))
+        range_step=receiver_range / (n_steps - 1),
+        n_steps=n_steps,
+        lower=0.0,
+        upper=float(z_prof[-1]),
+        dynamic=DynamicRays(
+            np.zeros(thetas.size), np.full(thetas.size, 1.0 / c0), z_prof, c_prof
+        ),
+    )
 
 
 def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
@@ -896,7 +964,9 @@ def _caustic_crossings(spreadings: NDArray[np.float64]) -> NDArray[np.int_]:
 
 
 def _bracket_launches(
-    trace: RayTraceResult, r_grid: NDArray[np.float64], r_rec: float,
+    trace: RayTraceResult,
+    r_grid: NDArray[np.float64],
+    r_rec: float,
     z_rec: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.intp]]:
     """Read the fan at the receiver range and raise the sign-change brackets.
@@ -905,14 +975,15 @@ def _bracket_launches(
     and every sign found here is re-established on a fresh march before the
     bisection of :func:`_refine_brackets` trusts it.
     """
-    launch = np.radians(np.sort(np.asarray(trace.launch_angles,
-                                           dtype=np.float64).ravel()))
+    launch = np.radians(
+        np.sort(np.asarray(trace.launch_angles, dtype=np.float64).ravel())
+    )
     col = int(np.clip(np.searchsorted(r_grid, r_rec), 1, r_grid.size - 1))
     w = (r_rec - r_grid[col - 1]) / (r_grid[col] - r_grid[col - 1])
-    fan_order = np.argsort(np.asarray(trace.launch_angles,
-                                      dtype=np.float64).ravel())
-    fan_depth = (trace.depths[fan_order, col - 1] * (1.0 - w)
-                 + trace.depths[fan_order, col] * w)
+    fan_order = np.argsort(np.asarray(trace.launch_angles, dtype=np.float64).ravel())
+    fan_depth = (
+        trace.depths[fan_order, col - 1] * (1.0 - w) + trace.depths[fan_order, col] * w
+    )
     # A fan ray landing exactly on the receiver depth counts to one side, so
     # the root right under it still raises exactly one bracket.
     sign = np.where(fan_depth == z_rec, 1.0, np.sign(fan_depth - z_rec))
@@ -921,9 +992,15 @@ def _bracket_launches(
 
 
 def _refine_brackets(
-    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], zs: float,
-    launch: NDArray[np.float64], crossing: NDArray[np.intp], *,
-    r_rec: float, z_rec: float, ns: int,
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
+    zs: float,
+    launch: NDArray[np.float64],
+    crossing: NDArray[np.intp],
+    *,
+    r_rec: float,
+    z_rec: float,
+    ns: int,
 ) -> NDArray[np.float64]:
     """Close each bracket by bisection on fresh marches through the profile.
 
@@ -936,10 +1013,15 @@ def _refine_brackets(
     # The brackets are only as good as the fan's reading of them; make
     # both endpoints real marches before bisecting between them.
     ends = _march_arrival_rays(
-        z_prof, c_prof, source_depth=zs,
-        thetas=np.concatenate([lo, hi]), receiver_range=r_rec, n_steps=ns)
-    f_lo = ends.positions[:lo.size, -1] - z_rec
-    f_hi = ends.positions[lo.size:, -1] - z_rec
+        z_prof,
+        c_prof,
+        source_depth=zs,
+        thetas=np.concatenate([lo, hi]),
+        receiver_range=r_rec,
+        n_steps=ns,
+    )
+    f_lo = ends.positions[: lo.size, -1] - z_rec
+    f_hi = ends.positions[lo.size :, -1] - z_rec
     # A root standing within the two integrations' disagreement of a fan
     # rung (the fan was traced at its own step, the search marches at ns)
     # can slip just past the endpoint and un-bracket itself; one rung of
@@ -949,12 +1031,16 @@ def _refine_brackets(
         wide_lo = launch[np.maximum(crossing[bad] - 1, 0)]
         wide_hi = launch[np.minimum(crossing[bad] + 2, launch.size - 1)]
         wide = _march_arrival_rays(
-            z_prof, c_prof, source_depth=zs,
+            z_prof,
+            c_prof,
+            source_depth=zs,
             thetas=np.concatenate([wide_lo, wide_hi]),
-            receiver_range=r_rec, n_steps=ns)
+            receiver_range=r_rec,
+            n_steps=ns,
+        )
         lo[bad], hi[bad] = wide_lo, wide_hi
-        f_lo[bad] = wide.positions[:bad.size, -1] - z_rec
-        f_hi[bad] = wide.positions[bad.size:, -1] - z_rec
+        f_lo[bad] = wide.positions[: bad.size, -1] - z_rec
+        f_hi[bad] = wide.positions[bad.size :, -1] - z_rec
     # An endpoint whose marched depth lands on the receiver to the last
     # bit *is* the eigenray; the zero test is exact (a nonzero mask,
     # inverted) because any tolerance would promote near-misses to roots
@@ -971,9 +1057,17 @@ def _refine_brackets(
         if not open_.any():
             break
         mid = 0.5 * (lo + hi)
-        f_mid = _march_arrival_rays(
-            z_prof, c_prof, source_depth=zs, thetas=mid,
-            receiver_range=r_rec, n_steps=ns).positions[:, -1] - z_rec
+        f_mid = (
+            _march_arrival_rays(
+                z_prof,
+                c_prof,
+                source_depth=zs,
+                thetas=mid,
+                receiver_range=r_rec,
+                n_steps=ns,
+            ).positions[:, -1]
+            - z_rec
+        )
         s_mid = np.sign(f_mid)
         # A midpoint landing exactly on the receiver depth is a root the
         # march itself certified; the exact test (sign code zero, taken as
@@ -985,27 +1079,34 @@ def _refine_brackets(
         hi = np.where(hit | (open_ & ~same), mid, hi)
     refined = 0.5 * (lo + hi)
     if refined.size:
-        refined = refined[np.concatenate(
-            ([True], np.diff(refined) > _EIGENRAY_DISTINCT))]
+        refined = refined[
+            np.concatenate(([True], np.diff(refined) > _EIGENRAY_DISTINCT))
+        ]
     return np.asarray(refined, dtype=np.float64)
 
 
 def _arrival_bottom_coefficient(
-    seabed: tuple[float, float, float] | None, key: str,
-    xi: NDArray[np.float64], c_bottom: float,
+    seabed: tuple[float, float, float] | None,
+    key: str,
+    xi: NDArray[np.float64],
+    c_bottom: float,
 ) -> NDArray[np.complex128]:
     """One bottom coefficient per arrival, at the angle its invariant fixes."""
     if seabed is None:
         return np.full(xi.size, _BOTTOM_REFLECTION[key], dtype=np.complex128)
     rho1, rho2, c2 = seabed
     # As printed, unconjugated: see the docstring's convention note.
-    return np.asarray(reflection_coefficient(
-        _seabed_grazing_deg(xi, c_bottom), rho1=rho1, c1=c_bottom,
-        rho2=rho2, c2=c2), dtype=np.complex128)
+    return np.asarray(
+        reflection_coefficient(
+            _seabed_grazing_deg(xi, c_bottom), rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2
+        ),
+        dtype=np.complex128,
+    )
 
 
 def _earliest_arrivals(
-    times: NDArray[np.float64], max_arrivals: int,
+    times: NDArray[np.float64],
+    max_arrivals: int,
 ) -> NDArray[np.intp]:
     """The stable order of the arrival times, truncated to the cap and said."""
     order = np.argsort(times, kind="stable")
@@ -1018,8 +1119,10 @@ def _earliest_arrivals(
             f"eigenrays: {order.size} eigenrays connect the receiver within"
             f" the traced fan; keeping the {int(max_arrivals)} earliest."
             " Raise 'max_arrivals' to keep them all.",
-            PhonometryWarning, stacklevel=3)
-        order = order[:int(max_arrivals)]
+            PhonometryWarning,
+            stacklevel=3,
+        )
+        order = order[: int(max_arrivals)]
     return order
 
 
@@ -1149,7 +1252,8 @@ def eigenrays(
             " arrival's bottom touches no longer share one grazing angle and"
             " the amplitude convention below (one coefficient per ray, raised"
             " to the touch count) stops holding. Trace over a level bottom to"
-            " list eigenrays.")
+            " list eigenrays."
+        )
     z_prof = np.asarray(trace.profile_depths, dtype=np.float64)
     c_prof = np.asarray(trace.profile_speeds, dtype=np.float64)
     water_depth = float(trace.water_depth)
@@ -1163,7 +1267,8 @@ def eigenrays(
         raise ValueError(
             "'receiver_depth' must lie strictly inside the water column: a"
             " folded ray only ever grazes the boundaries, so a receiver on"
-            " one is touched tangentially and never crossed.")
+            " one is touched tangentially and never crossed."
+        )
     if int(max_arrivals) < 1:
         raise ValueError("'max_arrivals' must be at least 1.")
     if trace.launch_angles.size < 2:
@@ -1176,24 +1281,34 @@ def eigenrays(
             raise ValueError("'n_steps' must be at least 2.")
 
     launch, crossing = _bracket_launches(trace, r_grid, r_rec, z_rec)
-    refined = _refine_brackets(z_prof, c_prof, zs, launch, crossing,
-                               r_rec=r_rec, z_rec=z_rec, ns=ns)
+    refined = _refine_brackets(
+        z_prof, c_prof, zs, launch, crossing, r_rec=r_rec, z_rec=z_rec, ns=ns
+    )
 
     if refined.size == 0:
         empty = np.zeros(0)
         return EigenrayResult(
-            launch_angles=empty, arrival_angles=np.zeros(0),
+            launch_angles=empty,
+            arrival_angles=np.zeros(0),
             travel_times=np.zeros(0),
             amplitudes=np.zeros(0, dtype=np.complex128),
             surface_reflections=np.zeros(0, dtype=np.int_),
             bottom_reflections=np.zeros(0, dtype=np.int_),
             caustic_crossings=np.zeros(0, dtype=np.int_),
-            receiver_range=r_rec, receiver_depth=z_rec, source_depth=zs,
-            water_depth=water_depth)
+            receiver_range=r_rec,
+            receiver_depth=z_rec,
+            source_depth=zs,
+            water_depth=water_depth,
+        )
 
-    final = _march_arrival_rays(z_prof, c_prof, source_depth=zs,
-                                thetas=refined, receiver_range=r_rec,
-                                n_steps=ns)
+    final = _march_arrival_rays(
+        z_prof,
+        c_prof,
+        source_depth=zs,
+        thetas=refined,
+        receiver_range=r_rec,
+        n_steps=ns,
+    )
     if final.spreadings is None:  # pragma: no cover
         raise ValueError("the march must carry the dynamic ray states.")
     c0 = float(np.interp(zs, z_prof, c_prof))
@@ -1204,19 +1319,20 @@ def eigenrays(
     # caustic has q = 0 and honestly infinite classical amplitude; the
     # errstate only keeps numpy from narrating what the docstring already has.
     with np.errstate(divide="ignore"):
-        magnitude = np.sqrt(np.abs(
-            c_end * np.cos(refined) / (c0 * r_rec * q_end)))
+        magnitude = np.sqrt(np.abs(c_end * np.cos(refined) / (c0 * r_rec * q_end)))
     n_bottom = np.asarray(final.upper_reflections.sum(axis=1))
     n_surface = np.asarray((final.reflections - final.upper_reflections).sum(axis=1))
     kmah = _caustic_crossings(np.asarray(final.spreadings, dtype=np.float64))
     xi = np.cos(refined) / c0
-    bottom_coeff = _arrival_bottom_coefficient(seabed, key, xi,
-                                               float(c_prof[-1]))
-    amplitudes = (magnitude * (-1j) ** kmah
-                  * _SURFACE_REFLECTION ** n_surface * bottom_coeff ** n_bottom)
+    bottom_coeff = _arrival_bottom_coefficient(seabed, key, xi, float(c_prof[-1]))
+    amplitudes = (
+        magnitude
+        * (-1j) ** kmah
+        * _SURFACE_REFLECTION**n_surface
+        * bottom_coeff**n_bottom
+    )
     times = final.times[:, -1]
-    arrival = np.degrees(np.arcsin(np.clip(
-        final.verticals[:, -1] * c_end, -1.0, 1.0)))
+    arrival = np.degrees(np.arcsin(np.clip(final.verticals[:, -1] * c_end, -1.0, 1.0)))
 
     order = _earliest_arrivals(times, max_arrivals)
 
@@ -1425,12 +1541,16 @@ class GaussianBeamResult:
     bathymetry_ranges: NDArray[np.float64] | None = None
     bathymetry_depths: NDArray[np.float64] | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the propagation-loss field (depth increasing downward)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_gaussian_beams
 
-        return plot_gaussian_beams(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_gaussian_beams(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 #: How many beam half-widths out the transverse Gaussian is still summed.
@@ -1472,7 +1592,9 @@ _TAIL_TRUST = 2.0
 
 
 def _default_beam_widths(
-    wavelength: float, max_range: float, water_depth: float,
+    wavelength: float,
+    max_range: float,
+    water_depth: float,
     launch: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     r"""The :math:`W_0` of Eq. (3.91) per launch angle: the free-space optimum,
@@ -1648,8 +1770,7 @@ def _image_ladder(
     ladder = []
     for wrap in range(-n_wrap, n_wrap + 1):
         ladder.append((wrap, 1.0, abs(wrap), abs(wrap)))
-        mirrored = ((wrap - 1, wrap) if wrap >= 1
-                    else (abs(wrap) + 1, abs(wrap)))
+        mirrored = (wrap - 1, wrap) if wrap >= 1 else (abs(wrap) + 1, abs(wrap))
         ladder.append((wrap, -1.0, *mirrored))
     return ladder
 
@@ -1708,7 +1829,10 @@ class _FoldColumns(NamedTuple):
 
 
 def _fold_images(
-    fold: _FoldColumns, cols: NDArray[np.intp], wrap: int, side: float,
+    fold: _FoldColumns,
+    cols: NDArray[np.intp],
+    wrap: int,
+    side: float,
     zr: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Receiver images of one ladder rung, per (column, receiver depth).
@@ -1749,14 +1873,16 @@ def _fold_images(
     gamma = np.arctan2(zr[None, :], x_col)
     angle = 2.0 * wrap * beta + side * gamma
     z_i = np.where(sloped, rho * np.sin(angle), z_flat)
-    r_i = np.where(sloped,
-                   r_col + np.sign(m_col) * (rho * np.cos(angle) - x_col),
-                   r_col)
+    r_i = np.where(
+        sloped, r_col + np.sign(m_col) * (rho * np.cos(angle) - x_col), r_col
+    )
     return z_i, r_i
 
 
 def _fold_margins(
-    fold: _FoldColumns, wrap: int, side: float,
+    fold: _FoldColumns,
+    wrap: int,
+    side: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
     """Per-column admission floor and validity of one ladder rung.
 
@@ -1797,8 +1923,11 @@ def _fold_margins(
     beta = np.arctan(np.abs(m_col))
     margin = np.where(sloped, 0.0, flat_margin)
     turned = 2.0 * abs(wrap) * beta
-    valid = ~sloped | (turned < np.pi - 1e-9) | (
-        (np.abs(turned - np.pi) <= 1e-9) & (wrap > 0))
+    valid = (
+        ~sloped
+        | (turned < np.pi - 1e-9)
+        | ((np.abs(turned - np.pi) <= 1e-9) & (wrap > 0))
+    )
     return margin, valid
 
 
@@ -1824,12 +1953,15 @@ class _Influence(NamedTuple):
 
 
 def _wrap_count(
-    s: _BeamSamples, water_depth: float, fold: _FoldColumns | None,
+    s: _BeamSamples,
+    water_depth: float,
+    fold: _FoldColumns | None,
 ) -> int:
     """How many rungs each way of the ladder the widest reach demands."""
     if fold is None:
-        return min(_MAX_BEAM_WRAPS,
-                   int(np.ceil(float(s.reach.max()) / (2.0 * water_depth))))
+        return min(
+            _MAX_BEAM_WRAPS, int(np.ceil(float(s.reach.max()) / (2.0 * water_depth)))
+        )
     # Level columns ask for the depth-stack count the reach implies; the
     # sloped ones ask for the whole half fan, seam included, because the
     # wrapped tails carry the up-and-back arrivals whatever the reach.
@@ -1842,7 +1974,10 @@ def _wrap_count(
 
 
 def _fold_rung_extent(
-    s: _BeamSamples, fold: _FoldColumns, wrap: int, side: float,
+    s: _BeamSamples,
+    fold: _FoldColumns,
+    wrap: int,
+    side: float,
     reach_max: float,
 ) -> tuple[NDArray[np.intp], NDArray[np.intp] | None] | None:
     """The rows and columns of one rung over a fold, or ``None`` for no rung.
@@ -1862,10 +1997,12 @@ def _fold_rung_extent(
 
 
 def _rung_plan(
-    s: _BeamSamples, fold: _FoldColumns | None, water_depth: float,
-    r_bottom: NDArray[Any], n_wrap: int,
-) -> list[tuple[int, float, NDArray[Any], NDArray[np.intp],
-                NDArray[np.intp] | None]]:
+    s: _BeamSamples,
+    fold: _FoldColumns | None,
+    water_depth: float,
+    r_bottom: NDArray[Any],
+    n_wrap: int,
+) -> list[tuple[int, float, NDArray[Any], NDArray[np.intp], NDArray[np.intp] | None]]:
     """The rungs some beam can populate: strength, rows and columns of each.
 
     Each image sits at ``shift + side*z_r - z_j`` in depth, so with both
@@ -1877,8 +2014,9 @@ def _rung_plan(
     and the rung's validity come from the local fan instead.
     """
     reach_max = float(s.reach.max())
-    plan: list[tuple[int, float, NDArray[Any], NDArray[np.intp],
-                     NDArray[np.intp] | None]] = []
+    plan: list[
+        tuple[int, float, NDArray[Any], NDArray[np.intp], NDArray[np.intp] | None]
+    ] = []
     for wrap, side, n_surface, n_bottom in _image_ladder(n_wrap):
         cols = None
         if fold is None:
@@ -1892,13 +2030,15 @@ def _rung_plan(
             rows, cols = extent
         if rows.size == 0:
             continue
-        strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows]**n_bottom
+        strength = _SURFACE_REFLECTION**n_surface * r_bottom[rows] ** n_bottom
         plan.append((wrap, side, strength, rows, cols))
     return plan
 
 
 def _rung_samples(
-    s: _BeamSamples, rows: NDArray[np.intp], cols: NDArray[np.intp] | None,
+    s: _BeamSamples,
+    rows: NDArray[np.intp],
+    cols: NDArray[np.intp] | None,
 ) -> _BeamSamples:
     """The march history of ``rows``, at every column or at ``cols`` alone.
 
@@ -1909,25 +2049,45 @@ def _rung_samples(
     """
     if cols is None:
         return _BeamSamples(
-            xi=s.xi[rows], column_range=s.column_range,
-            range_offset=s.range_offset, depth=s.depth[rows],
-            vertical=s.vertical[rows], speed=s.speed[rows],
-            spreading=s.spreading[rows], slope=s.slope[rows],
-            time=s.time[rows], path=s.path[rows], phase=s.phase[rows],
-            weight=s.weight[rows], reach=s.reach[rows])
+            xi=s.xi[rows],
+            column_range=s.column_range,
+            range_offset=s.range_offset,
+            depth=s.depth[rows],
+            vertical=s.vertical[rows],
+            speed=s.speed[rows],
+            spreading=s.spreading[rows],
+            slope=s.slope[rows],
+            time=s.time[rows],
+            path=s.path[rows],
+            phase=s.phase[rows],
+            weight=s.weight[rows],
+            reach=s.reach[rows],
+        )
     sub = np.ix_(rows, cols)
     return _BeamSamples(
-        xi=s.xi[sub], column_range=s.column_range[:, cols],
-        range_offset=s.range_offset[:, cols], depth=s.depth[sub],
-        vertical=s.vertical[sub], speed=s.speed[sub],
-        spreading=s.spreading[sub], slope=s.slope[sub],
-        time=s.time[sub], path=s.path[sub], phase=s.phase[sub],
-        weight=s.weight[sub], reach=s.reach[rows])
+        xi=s.xi[sub],
+        column_range=s.column_range[:, cols],
+        range_offset=s.range_offset[:, cols],
+        depth=s.depth[sub],
+        vertical=s.vertical[sub],
+        speed=s.speed[sub],
+        spreading=s.spreading[sub],
+        slope=s.slope[sub],
+        time=s.time[sub],
+        path=s.path[sub],
+        phase=s.phase[sub],
+        weight=s.weight[sub],
+        reach=s.reach[rows],
+    )
 
 
 def _image_offsets(
-    grid: _Influence, col_index: NDArray[np.intp], wrap: int, side: float,
-    zr: NDArray[np.float64], depth: NDArray[np.float64],
+    grid: _Influence,
+    col_index: NDArray[np.intp],
+    wrap: int,
+    side: float,
+    zr: NDArray[np.float64],
+    depth: NDArray[np.float64],
     offset: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Depth and range offsets from each beam sample to one rung's images."""
@@ -1943,10 +2103,16 @@ def _image_offsets(
 
 
 def _survivor_block(
-    r: _BeamSamples, grid: _Influence, strength: NDArray[Any], *,
-    admitted: NDArray[np.bool_], q_infl: NDArray[np.complex128],
-    r_infl: NDArray[np.float64], along: NDArray[np.float64],
-    normal: NDArray[np.float64], n_z: int,
+    r: _BeamSamples,
+    grid: _Influence,
+    strength: NDArray[Any],
+    *,
+    admitted: NDArray[np.bool_],
+    q_infl: NDArray[np.complex128],
+    r_infl: NDArray[np.float64],
+    along: NDArray[np.float64],
+    normal: NDArray[np.float64],
+    n_z: int,
 ) -> NDArray[np.complex128] | None:
     """Eq. (3.88) summed over one block's admitted cells, or ``None``."""
     nc = r.depth.shape[1]
@@ -1962,12 +2128,12 @@ def _survivor_block(
     # transverse Gaussian all ride in one exponent rather than three,
     # because a complex exponential over tens of millions of survivors
     # is where the run time goes.
-    exponent = (
-        -0.5j * (r.phase[beam_at, range_at]
-                 + np.angle(q_hit * np.conj(spread_hit)))
-        - 1j * grid.omega * (r.time[beam_at, range_at] + along_hit
-                             + r.slope[beam_at, range_at] / (2.0 * q_hit)
-                             * normal.ravel()[hits] ** 2)
+    exponent = -0.5j * (
+        r.phase[beam_at, range_at] + np.angle(q_hit * np.conj(spread_hit))
+    ) - 1j * grid.omega * (
+        r.time[beam_at, range_at]
+        + along_hit
+        + r.slope[beam_at, range_at] / (2.0 * q_hit) * normal.ravel()[hits] ** 2
     )
     if grid.attenuation > 0.0:
         # e^{-alpha s} of Eq. (3.116): the marched arc length continued
@@ -1975,24 +2141,33 @@ def _survivor_block(
         # zero; see the docstring. Real, so it joins the exponent as
         # pure decay whichever time convention the caller settles on.
         exponent -= grid.attenuation * np.maximum(
-            r.path[beam_at, range_at]
-            + r.speed[beam_at, range_at] * along_hit, 0.0)
+            r.path[beam_at, range_at] + r.speed[beam_at, range_at] * along_hit, 0.0
+        )
     value = (
-        r.weight[beam_at, range_at] * strength[beam_at]
+        r.weight[beam_at, range_at]
+        * strength[beam_at]
         * np.sqrt(r.speed[beam_at, range_at] / r_infl.ravel()[hits])
-        / np.sqrt(np.abs(q_hit)) * np.exp(exponent)
+        / np.sqrt(np.abs(q_hit))
+        * np.exp(exponent)
     )
     cells = n_z * nc
     target = depth_at * nc + range_at
-    return (np.bincount(target, value.real, minlength=cells)
-            + 1j * np.bincount(target, value.imag, minlength=cells)
-            ).reshape(n_z, nc)
+    return (
+        np.bincount(target, value.real, minlength=cells)
+        + 1j * np.bincount(target, value.imag, minlength=cells)
+    ).reshape(n_z, nc)
 
 
 def _sum_rung(
-    field: NDArray[np.complex128], s: _BeamSamples, grid: _Influence, *,
-    wrap: int, side: float, strength: NDArray[Any],
-    rows: NDArray[np.intp], cols: NDArray[np.intp] | None,
+    field: NDArray[np.complex128],
+    s: _BeamSamples,
+    grid: _Influence,
+    *,
+    wrap: int,
+    side: float,
+    strength: NDArray[Any],
+    rows: NDArray[np.intp],
+    cols: NDArray[np.intp] | None,
 ) -> None:
     """Add one rung's beams into ``field``, a block of depths at a time.
 
@@ -2021,9 +2196,8 @@ def _sum_rung(
         sub_capped = sub_capped[cols]
     step = max(1, _INFLUENCE_BLOCK // (rows.size * nc))
     for lo in range(0, grid.receiver_depths.size, step):
-        zr = grid.receiver_depths[lo:lo + step]
-        dz, d_r = _image_offsets(grid, col_index, wrap, side, zr, depth,
-                                 offset)
+        zr = grid.receiver_depths[lo : lo + step]
+        dz, d_r = _image_offsets(grid, col_index, wrap, side, zr, depth, offset)
         along = xi * d_r + vertical * dz  # s / c
         normal = speed * (xi * dz - vertical * d_r)
         q_infl = spreading + speed_sq * slope * along
@@ -2036,28 +2210,42 @@ def _sum_rung(
         # square root: this test runs over the whole block while everything
         # after it runs over the survivors, which in a waveguide are around
         # a third of the cells, so it must stay arithmetic.
-        admitted = ((normal * half_width) ** 2
-                    < grid.cutoff_sq * (q_infl.real**2 + q_infl.imag**2))
+        admitted = (normal * half_width) ** 2 < grid.cutoff_sq * (
+            q_infl.real**2 + q_infl.imag**2
+        )
         if sub_capped is not None and sub_capped.any():
-            admitted &= (~sub_capped[None, :, None]
-                         | (np.abs(speed * along) <= grid.tail_limit))
-        block = _survivor_block(r, grid, strength, admitted=admitted,
-                                q_infl=q_infl, r_infl=r_infl, along=along,
-                                normal=normal, n_z=zr.size)
+            admitted &= ~sub_capped[None, :, None] | (
+                np.abs(speed * along) <= grid.tail_limit
+            )
+        block = _survivor_block(
+            r,
+            grid,
+            strength,
+            admitted=admitted,
+            q_infl=q_infl,
+            r_infl=r_infl,
+            along=along,
+            normal=normal,
+            n_z=zr.size,
+        )
         if block is None:
             continue
         if cols is None:
-            field[lo:lo + zr.size] += block
+            field[lo : lo + zr.size] += block
         else:
-            field[lo:lo + zr.size, cols] += block
+            field[lo : lo + zr.size, cols] += block
 
 
 def _beam_influence(
-    s: _BeamSamples, receiver_depths: NDArray[np.float64], *,
+    s: _BeamSamples,
+    receiver_depths: NDArray[np.float64],
+    *,
     water_depth: float,
     bottom_reflection: float | NDArray[np.complex128],
-    omega: float, beam_width: float | NDArray[np.float64],
-    attenuation: float, fold: _FoldColumns | None = None,
+    omega: float,
+    beam_width: float | NDArray[np.float64],
+    attenuation: float,
+    fold: _FoldColumns | None = None,
     march_extent: float = np.inf,
 ) -> NDArray[np.complex128]:
     r"""Sum Eq. (3.88) over every beam at every point of the receiver grid.
@@ -2210,30 +2398,45 @@ def _beam_influence(
     :return: The complex field, shape ``(n_receiver_depths, n_ranges)``, in the
         convention Eq. (3.88) is printed in; the caller conjugates it.
     """
-    r_bottom = np.broadcast_to(np.asarray(bottom_reflection),
-                               (s.depth.shape[0],))
-    plan = _rung_plan(s, fold, water_depth, r_bottom,
-                      _wrap_count(s, water_depth, fold))
+    r_bottom = np.broadcast_to(np.asarray(bottom_reflection), (s.depth.shape[0],))
+    plan = _rung_plan(s, fold, water_depth, r_bottom, _wrap_count(s, water_depth, fold))
     # One W_0 per beam (a scalar is every beam's): the admission test of
     # :func:`_sum_rung` reads W = 2|q|/(omega W_0) with each row's own width.
-    half_omega_width = 0.5 * omega * np.broadcast_to(
-        np.asarray(beam_width, dtype=np.float64), (s.depth.shape[0],))
+    half_omega_width = (
+        0.5
+        * omega
+        * np.broadcast_to(np.asarray(beam_width, dtype=np.float64), (s.depth.shape[0],))
+    )
     grid = _Influence(
-        receiver_depths=receiver_depths, water_depth=water_depth, omega=omega,
-        attenuation=attenuation, fold=fold,
-        half_omega_width=half_omega_width, cutoff_sq=_BEAM_CUTOFF**2,
+        receiver_depths=receiver_depths,
+        water_depth=water_depth,
+        omega=omega,
+        attenuation=attenuation,
+        fold=fold,
+        half_omega_width=half_omega_width,
+        cutoff_sq=_BEAM_CUTOFF**2,
         capped=None if fold is None else np.abs(fold.slopes) > 0.0,
-        tail_limit=_TAIL_TRUST * march_extent)
-    field = np.zeros((receiver_depths.size, s.depth.shape[1]),
-                     dtype=np.complex128)
+        tail_limit=_TAIL_TRUST * march_extent,
+    )
+    field = np.zeros((receiver_depths.size, s.depth.shape[1]), dtype=np.complex128)
     for wrap, side, strength, rows, cols in plan:
-        _sum_rung(field, s, grid, wrap=wrap, side=side, strength=strength,
-                  rows=rows, cols=cols)
+        _sum_rung(
+            field,
+            s,
+            grid,
+            wrap=wrap,
+            side=side,
+            strength=strength,
+            rows=rows,
+            cols=cols,
+        )
     return field
 
 
 def _warn_beams(
-    message: str, *, nested: int = 0,
+    message: str,
+    *,
+    nested: int = 0,
 ) -> None:
     """Raise a :class:`~phonometry.PhonometryWarning` at the caller's call site.
 
@@ -2246,12 +2449,15 @@ def _warn_beams(
 
     from ..._internal.warnings import PhonometryWarning
 
-    warnings.warn(f"gaussian_beams: {message}", PhonometryWarning,
-                  stacklevel=3 + nested)
+    warnings.warn(
+        f"gaussian_beams: {message}", PhonometryWarning, stacklevel=3 + nested
+    )
 
 
 def _check_source_on_kink(
-    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64], source_depth: float,
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
+    source_depth: float,
 ) -> None:
     """Warn when the source sits on a gradient discontinuity of the profile.
 
@@ -2274,12 +2480,17 @@ def _check_source_on_kink(
         _warn_beams(
             "'source_depth' sits on a gradient discontinuity of the profile,"
             " which concentrates the near-horizontal beams into a spurious jet;"
-            " offset the source or smooth the profile there.", nested=1)
+            " offset the source or smooth the profile there.",
+            nested=1,
+        )
 
 
 def _beam_range_grid(
-    ranges_m: NDArray[np.float64] | list[float] | None, *,
-    n_steps: int, dr: float, rmax: float,
+    ranges_m: NDArray[np.float64] | list[float] | None,
+    *,
+    n_steps: int,
+    dr: float,
+    rmax: float,
 ) -> NDArray[np.float64]:
     """The ranges the field is evaluated at, defaulting to the marching grid.
 
@@ -2291,8 +2502,8 @@ def _beam_range_grid(
     exactly that is asking for a column that exists.
     """
     ranges = np.asarray(
-        np.arange(n_steps) * dr if ranges_m is None else ranges_m,
-        dtype=np.float64).ravel()
+        np.arange(n_steps) * dr if ranges_m is None else ranges_m, dtype=np.float64
+    ).ravel()
     if ranges.size == 0 or not np.all(np.isfinite(ranges)) or np.any(ranges < 0.0):
         raise ValueError("'ranges_m' must be finite, non-negative and non-empty.")
     if np.any(ranges > rmax + 0.5 * dr):
@@ -2301,8 +2512,10 @@ def _beam_range_grid(
 
 
 def _beam_receiver_grid(
-    receiver_depths_m: NDArray[np.float64] | list[float] | None, *,
-    n_depth_points: int, water_depth: float,
+    receiver_depths_m: NDArray[np.float64] | list[float] | None,
+    *,
+    n_depth_points: int,
+    water_depth: float,
 ) -> NDArray[np.float64]:
     """The depths the field is evaluated at.
 
@@ -2403,25 +2616,37 @@ class VolumeAbsorption:
 
 
 def _resolve_absorption(
-    absorption: str | VolumeAbsorption | None, frequency_hz: float, zs: float,
+    absorption: str | VolumeAbsorption | None,
+    frequency_hz: float,
+    zs: float,
 ) -> tuple[str | None, float]:
     """The validated model key and its dB/km coefficient at the source."""
     if absorption is None:
         return None, 0.0
-    spec = (VolumeAbsorption(absorption) if isinstance(absorption, str)
-            else absorption)
+    spec = VolumeAbsorption(absorption) if isinstance(absorption, str) else absorption
     key = spec.model.strip().lower()
     if key not in _ABSORPTION_MODELS:
         raise ValueError(
             f"'absorption' must name one of {_ABSORPTION_MODELS} or be None,"
-            f" got {spec.model!r}.")
-    return key, float(seawater_absorption(
-        frequency_hz, temperature=spec.temperature, salinity=spec.salinity,
-        depth=zs, ph=spec.ph, model=key)[0])
+            f" got {spec.model!r}."
+        )
+    return key, float(
+        seawater_absorption(
+            frequency_hz,
+            temperature=spec.temperature,
+            salinity=spec.salinity,
+            depth=zs,
+            ph=spec.ph,
+            model=key,
+        )[0]
+    )
 
 
 def _resolve_fan(
-    fan: BeamFan, wavelength: float, rmax: float, water_depth: float,
+    fan: BeamFan,
+    wavelength: float,
+    rmax: float,
+    water_depth: float,
     c0: float,
 ) -> _Fan:
     """The concrete fan a :class:`BeamFan` asks for, widths resolved."""
@@ -2436,23 +2661,37 @@ def _resolve_fan(
     if fan.beam_width is not None:
         w_fan = require_positive(fan.beam_width, "beam_width")
     else:
-        w_fan = float(_default_beam_widths(
-            wavelength, rmax, water_depth, np.zeros(1))[0])
+        w_fan = float(
+            _default_beam_widths(wavelength, rmax, water_depth, np.zeros(1))[0]
+        )
     span = 2.0 * np.radians(theta_max)
-    n_fan = (int(np.ceil(span * 4.0 * np.pi * w_fan / wavelength)) + 1
-             if fan.n_beams is None else int(fan.n_beams))
+    n_fan = (
+        int(np.ceil(span * 4.0 * np.pi * w_fan / wavelength)) + 1
+        if fan.n_beams is None
+        else int(fan.n_beams)
+    )
     if n_fan < 2:
         raise ValueError("'n_beams' must be at least 2.")
     launch = np.linspace(-np.radians(theta_max), np.radians(theta_max), n_fan)
-    w0 = (np.full(n_fan, float(w_fan)) if fan.beam_width is not None
-          else _default_beam_widths(wavelength, rmax, water_depth, launch))
-    return _Fan(launch, np.cos(launch) / c0, float(launch[1] - launch[0]),
-                np.asarray(w0, dtype=np.float64))
+    w0 = (
+        np.full(n_fan, float(w_fan))
+        if fan.beam_width is not None
+        else _default_beam_widths(wavelength, rmax, water_depth, launch)
+    )
+    return _Fan(
+        launch,
+        np.cos(launch) / c0,
+        float(launch[1] - launch[0]),
+        np.asarray(w0, dtype=np.float64),
+    )
 
 
 def _retire_stopped_beams(
-    march: RayMarch, sloping: bool, n_steps: int,
-    widths: NDArray[np.float64], curvatures: NDArray[np.float64],
+    march: RayMarch,
+    sloping: bool,
+    n_steps: int,
+    widths: NDArray[np.float64],
+    curvatures: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """The per-ray records, ``NaN`` from each terminated beam's stop column on.
 
@@ -2462,13 +2701,18 @@ def _retire_stopped_beams(
     records pass through untouched.
     """
     ray_depths = march.positions
-    if (not sloping or march.stopped_columns is None
-            or not np.any(march.stopped_columns < n_steps)):
+    if (
+        not sloping
+        or march.stopped_columns is None
+        or not np.any(march.stopped_columns < n_steps)
+    ):
         return ray_depths, widths, curvatures
     gone = np.arange(n_steps)[None, :] >= march.stopped_columns[:, None]
-    return (np.where(gone, np.nan, ray_depths),
-            np.where(gone, np.nan, widths),
-            np.where(gone, np.nan, curvatures))
+    return (
+        np.where(gone, np.nan, ray_depths),
+        np.where(gone, np.nan, widths),
+        np.where(gone, np.nan, curvatures),
+    )
 
 
 def gaussian_beams(
@@ -2485,8 +2729,10 @@ def gaussian_beams(
     range_step: float = 25.0,
     bottom: str | FluidSeabed = "pressure-release",
     absorption: str | VolumeAbsorption | None = None,
-    bathymetry: tuple[NDArray[np.float64] | list[float],
-                      NDArray[np.float64] | list[float]] | None = None,
+    bathymetry: tuple[
+        NDArray[np.float64] | list[float], NDArray[np.float64] | list[float]
+    ]
+    | None = None,
 ) -> GaussianBeamResult:
     r"""Propagation-loss field from Gaussian beam tracing.
 
@@ -2750,8 +2996,7 @@ def gaussian_beams(
     z_prof, c_prof = _clean_profile(depths, sound_speeds)
     bathy = _clean_bathymetry(bathymetry, z_prof)
     water_depth = float(z_prof[-1])
-    depth_at_source = (water_depth if bathy is None
-                       else float(bathy[1][0]))
+    depth_at_source = water_depth if bathy is None else float(bathy[1][0])
     zs = float(source_depth)
     if not (0.0 < zs < depth_at_source):
         raise ValueError(_SOURCE_OUTSIDE)
@@ -2767,7 +3012,8 @@ def gaussian_beams(
             " powers of R) rests on Snell's invariant fixing a single grazing"
             " angle per ray at a level bottom, and a slope rotates that"
             " invariant at every touch. Sloping runs take the perfect"
-            " reflectors of 'bottom'.")
+            " reflectors of 'bottom'."
+        )
     absorption_key, alpha = _resolve_absorption(absorption, f, zs)
     # dB/km to nepers/m: N dB is e^(N ln 10 / 20) in amplitude.
     attenuation = alpha * np.log(10.0) / (20.0 * _M_PER_KM)
@@ -2802,28 +3048,42 @@ def gaussian_beams(
         # carrying the seabed, and applying it un-conjugated measured 15 dB
         # wrong against the lossy image sum at 4 km where the conjugate
         # measures 0.02 dB.
-        bottom_factor = np.conj(reflection_coefficient(
-            grazing, rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2))
+        bottom_factor = np.conj(
+            reflection_coefficient(grazing, rho1=rho1, c1=c_bottom, rho2=rho2, c2=c2)
+        )
 
     upper: float | SlopingBoundary = (
-        water_depth if bathy is None else SlopingBoundary(*bathy))
+        water_depth if bathy is None else SlopingBoundary(*bathy)
+    )
     march = march_rays(
-        _ocean_ray_derivative(z_prof, c_prof), xi=launch_fan.xi,
-        z0=np.full(n_fan, zs), zeta0=np.sin(launch) / c0, range_step=dr,
-        n_steps=n_steps, lower=0.0, upper=upper,
-        dynamic=DynamicRays(np.asarray(0.5j * omega * w0**2, dtype=np.complex128),
-                            np.full(n_fan, 1.0 + 0.0j), z_prof, c_prof))
+        _ocean_ray_derivative(z_prof, c_prof),
+        xi=launch_fan.xi,
+        z0=np.full(n_fan, zs),
+        zeta0=np.sin(launch) / c0,
+        range_step=dr,
+        n_steps=n_steps,
+        lower=0.0,
+        upper=upper,
+        dynamic=DynamicRays(
+            np.asarray(0.5j * omega * w0**2, dtype=np.complex128),
+            np.full(n_fan, 1.0 + 0.0j),
+            z_prof,
+            c_prof,
+        ),
+    )
 
     ranges = _beam_range_grid(ranges_m, n_steps=n_steps, dr=dr, rmax=rmax)
-    receivers = _beam_receiver_grid(receiver_depths_m, n_depth_points=n_depth_points,
-                                    water_depth=water_depth)
+    receivers = _beam_receiver_grid(
+        receiver_depths_m, n_depth_points=n_depth_points, water_depth=water_depth
+    )
 
     climb = dr * np.tan(np.radians(float(fan.max_angle_deg)))
     if climb > _MAX_STEEP_CLIMB * water_depth:
         _warn_beams(
             f"one marching step carries the steepest beam of the fan {climb:.0f} m"
             f" across a {water_depth:.0f} m column, so its trajectory is not"
-            " resolved; cut 'range_step' or narrow 'max_angle_deg'.")
+            " resolved; cut 'range_step' or narrow 'max_angle_deg'."
+        )
 
     # The image ladder folds each receiver column at its own local facet when
     # the bottom slopes: depth and slope both, since a fold plane wrong by the
@@ -2833,13 +3093,25 @@ def gaussian_beams(
         br, bd = bathy
         facet = np.concatenate(([0.0], np.diff(bd) / np.diff(br), [0.0]))
         fold = _FoldColumns(
-            ranges, np.asarray(np.interp(ranges, br, bd)),
-            facet[np.searchsorted(br, ranges, side="right")])
+            ranges,
+            np.asarray(np.interp(ranges, br, bd)),
+            facet[np.searchsorted(br, ranges, side="right")],
+        )
     field, widths, curvatures = _assemble_beam_field(
-        march, ranges=ranges, receivers=receivers, fan=launch_fan, dr=dr,
-        z_prof=z_prof, c_prof=c_prof, omega=omega, c0=c0,
-        water_depth=water_depth, bottom_reflection=bottom_factor,
-        attenuation=attenuation, fold=fold)
+        march,
+        ranges=ranges,
+        receivers=receivers,
+        fan=launch_fan,
+        dr=dr,
+        z_prof=z_prof,
+        c_prof=c_prof,
+        omega=omega,
+        c0=c0,
+        water_depth=water_depth,
+        bottom_reflection=bottom_factor,
+        attenuation=attenuation,
+        fold=fold,
+    )
 
     # Eq. (3.88) is written in the exp(+i omega t) convention; conjugating once
     # here hands back a field in the exp(-i omega t) one the rest of the module
@@ -2851,7 +3123,8 @@ def gaussian_beams(
         pl = -20.0 * np.log10(np.abs(pressure))
 
     ray_depths, ray_widths, ray_curvatures = _retire_stopped_beams(
-        march, bathy is not None, n_steps, widths, curvatures)
+        march, bathy is not None, n_steps, widths, curvatures
+    )
 
     return GaussianBeamResult(
         frequency=f,
@@ -2860,8 +3133,9 @@ def gaussian_beams(
         propagation_loss=np.asarray(pl, dtype=np.float64),
         pressure=np.asarray(pressure, dtype=np.complex128),
         launch_angles=np.degrees(launch),
-        ray_ranges=np.broadcast_to(np.arange(n_steps) * dr,
-                                   march.positions.shape).copy(),
+        ray_ranges=np.broadcast_to(
+            np.arange(n_steps) * dr, march.positions.shape
+        ).copy(),
         ray_depths=ray_depths,
         beam_widths=ray_widths,
         wavefront_curvatures=ray_curvatures,
@@ -2878,12 +3152,19 @@ def gaussian_beams(
 
 
 def _assemble_beam_field(
-    march: RayMarch, *, ranges: NDArray[np.float64],
-    receivers: NDArray[np.float64], fan: _Fan, dr: float,
-    z_prof: NDArray[np.float64], c_prof: NDArray[np.float64],
-    omega: float, c0: float,
+    march: RayMarch,
+    *,
+    ranges: NDArray[np.float64],
+    receivers: NDArray[np.float64],
+    fan: _Fan,
+    dr: float,
+    z_prof: NDArray[np.float64],
+    c_prof: NDArray[np.float64],
+    omega: float,
+    c0: float,
     water_depth: float,
-    bottom_reflection: float | NDArray[np.complex128], attenuation: float,
+    bottom_reflection: float | NDArray[np.complex128],
+    attenuation: float,
     fold: _FoldColumns | None = None,
 ) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64]]:
     r"""Read the march into :class:`_BeamSamples` and sum the beams over it.
@@ -2910,9 +3191,12 @@ def _assemble_beam_field(
     wedge sends back down the slope, exactly as a one-way parabolic equation
     drops backscatter.
     """
-    if (march.spreadings is None or march.spreading_slopes is None
-            or march.horizontals is None
-            or march.stopped_columns is None):  # pragma: no cover
+    if (
+        march.spreadings is None
+        or march.spreading_slopes is None
+        or march.horizontals is None
+        or march.stopped_columns is None
+    ):  # pragma: no cover
         raise ValueError("the march must carry the dynamic ray states.")
     q = np.asarray(march.spreadings, dtype=np.complex128)
     p = np.asarray(march.spreading_slopes, dtype=np.complex128)
@@ -2925,17 +3209,24 @@ def _assemble_beam_field(
 
     at_bottom = np.cumsum(march.upper_reflections, axis=1)
     at_surface = np.cumsum(march.reflections - march.upper_reflections, axis=1)
-    r_bottom = (bottom_reflection if isinstance(bottom_reflection, float)
-                else np.asarray(bottom_reflection)[:, None])
+    r_bottom = (
+        bottom_reflection
+        if isinstance(bottom_reflection, float)
+        else np.asarray(bottom_reflection)[:, None]
+    )
     reflected = (_SURFACE_REFLECTION**at_surface) * (r_bottom**at_bottom)
     # A(theta_0) of Eq. (3.92) with Eq. (3.91) substituted in, real and
     # positive. The weight carries each beam's own q(0) through W_0, which is
     # what lets the fan mix initial widths without renormalising anything.
-    weight = (fan.dtheta * (omega * fan.width / (2.0 * c0))
-              * np.sqrt(np.cos(fan.launch) / np.pi))
+    weight = (
+        fan.dtheta
+        * (omega * fan.width / (2.0 * c0))
+        * np.sqrt(np.cos(fan.launch) / np.pi)
+    )
 
-    column = np.clip(np.rint(ranges / dr).astype(np.intp), 0,
-                     march.positions.shape[1] - 1)
+    column = np.clip(
+        np.rint(ranges / dr).astype(np.intp), 0, march.positions.shape[1] - 1
+    )
     cosine = speed[:, column] * march.horizontals[:, column]
     alive = column[None, :] < march.stopped_columns[:, None]
     samples = _BeamSamples(
@@ -2950,16 +3241,22 @@ def _assemble_beam_field(
         time=march.times[:, column],
         path=march.arc_lengths[:, column],
         phase=np.unwrap(np.angle(q), axis=1)[:, column],
-        weight=np.where(alive, weight[:, None] * reflected[:, column],
-                        0.0).astype(np.complex128),
+        weight=np.where(alive, weight[:, None] * reflected[:, column], 0.0).astype(
+            np.complex128
+        ),
         reach=_BEAM_CUTOFF * widths[:, column].max(axis=1) / cosine.min(axis=1),
     )
     field = _beam_influence(
-        samples, receivers, water_depth=water_depth,
-        bottom_reflection=bottom_reflection, omega=omega,
+        samples,
+        receivers,
+        water_depth=water_depth,
+        bottom_reflection=bottom_reflection,
+        omega=omega,
         beam_width=fan.width,
-        attenuation=attenuation, fold=fold,
-        march_extent=(march.positions.shape[1] - 1) * dr)
+        attenuation=attenuation,
+        fold=fold,
+        march_extent=(march.positions.shape[1] - 1) * dr,
+    )
     return field, widths, curvatures
 
 
@@ -2986,12 +3283,16 @@ class ParabolicEquationResult:
     propagation_loss: NDArray[np.float64]
     source_depth: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the propagation-loss field (depth increasing downward)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_parabolic_equation
 
-        return plot_parabolic_equation(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_parabolic_equation(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def parabolic_equation(
@@ -3068,8 +3369,12 @@ def parabolic_equation(
     n_r = int(np.ceil(rmax / dr)) + 1
     ranges = np.asarray(np.arange(n_r) * dr, dtype=np.float64)
     pl = np.zeros((n, n_r), dtype=np.float64)
-    half_phase = np.exp(0.5j * k0 * (nsq - 1.0) * dr)  # phase screen exp(i k0/2 (n²−1) Δr)
-    free_phase = np.exp(-0.5j * kz**2 / k0 * dr)  # free propagation exp(−i kz²/(2k0) Δr)
+    half_phase = np.exp(
+        0.5j * k0 * (nsq - 1.0) * dr
+    )  # phase screen exp(i k0/2 (n²−1) Δr)
+    free_phase = np.exp(
+        -0.5j * kz**2 / k0 * dr
+    )  # free propagation exp(−i kz²/(2k0) Δr)
 
     # PL = −20·log10(|ψ|/√r) (Eq. 6.71); the √k0 Gaussian starter reproduces
     # free-field spherical spreading (PL = 20·log10 r) exactly.

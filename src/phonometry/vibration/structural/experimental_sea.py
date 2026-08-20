@@ -254,9 +254,10 @@ def cylindrical_shell_modal_density(
     arg_1 = np.clip(1.745 / (factor**2 * np.maximum(x, 1e-12) ** 2), -1.0, 1.0)
     arg_2 = np.clip(1.745 * factor**2 / np.maximum(x, 1e-12) ** 2, -1.0, 1.0)
     shape = 0.596 / (factor - 1.0 / factor)
-    high = 2.0 * base * (
+    high = (
         2.0
-        + shape * (factor * np.arccos(arg_1) - np.arccos(arg_2) / factor)
+        * base
+        * (2.0 + shape * (factor * np.arccos(arg_1) - np.arccos(arg_2) / factor))
     )
     n = np.where(x <= 0.48, low, np.where(x <= 0.83, mid, high))
     return np.asarray(n, dtype=np.float64)

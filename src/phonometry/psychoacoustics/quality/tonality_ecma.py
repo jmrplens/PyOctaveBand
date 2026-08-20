@@ -95,7 +95,9 @@ class EcmaTonality:
     tonal_frequency_vs_time: np.ndarray
     field: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | np.ndarray:
         """Plot the average specific tonality T'(z) (see :mod:`phonometry._plot.psychoacoustics`).
 
         Adds a tonality-vs-time panel. Requires matplotlib
@@ -104,7 +106,9 @@ class EcmaTonality:
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_ecma_tonality
 
-        return plot_ecma_tonality(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ecma_tonality(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 # --------------------------------------------------------------------------
@@ -231,7 +235,9 @@ def tonality_ecma(
     if field not in ("free", "diffuse"):
         raise ValueError("field must be 'free' or 'diffuse'")
     fs = resolve_fs(signal_in, fs, name="signal_in")
-    x = apply_calibration(signal_in, require_1d_signal(_typesignal(np.asarray(signal_in))))
+    x = apply_calibration(
+        signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
+    )
     if x.size == 0:
         raise ValueError("signal must not be empty")
     fs = float(fs)

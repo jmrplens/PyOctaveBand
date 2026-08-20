@@ -199,7 +199,9 @@ def test_problem_4_18_operator_room_levels() -> None:
     """
     result = _problem_4_18()
     assert np.allclose(result.received_level, _R418_LP2, atol=0.1)
-    assert np.allclose(result.received_level, result.source_level - result.noise_reduction)
+    assert np.allclose(
+        result.received_level, result.source_level - result.noise_reduction
+    )
 
 
 def test_problem_4_18_source_power_model_is_worth_six_decibels() -> None:

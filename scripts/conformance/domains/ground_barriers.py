@@ -29,9 +29,7 @@ _GROUND_BARRIERS = "Spherical ground & barriers (Attenborough / Salomons / Bies)
     "abs(Q) as Z grows large (Rp -> 1 so (1 - Rp) -> 0 and Q -> 1)",
 )
 def _chk_hard_ground_q_unity() -> Outcome:
-    q = ph.environment.spherical_reflection_coefficient(
-        [500.0], 1e12, 1.0, 1.5, 50.0
-    )
+    q = ph.environment.spherical_reflection_coefficient([500.0], 1e12, 1.0, 1.5, 50.0)
     return numeric(1.0, float(abs(q[0])), 1e-6, places=6)
 
 
@@ -68,11 +66,8 @@ def _chk_salomons_fig_d3_dip() -> Outcome:
         # The bands sit below the Delany-Bazley published fit range for this
         # sigma; the model extrapolates there by design (Salomons Sec. 3.1).
         warnings.simplefilter("ignore")
-        res = ph.environment.ground_effect(
-            freqs, 2.0, 2.0, 100.0, flow_resistivity=2e5
-        )
-    return numeric(-12.7, float(res.excess_attenuation.min()), 0.3, unit="dB",
-                   places=2)
+        res = ph.environment.ground_effect(freqs, 2.0, 2.0, 100.0, flow_resistivity=2e5)
+    return numeric(-12.7, float(res.excess_attenuation.min()), 0.3, unit="dB", places=2)
 
 
 @register(

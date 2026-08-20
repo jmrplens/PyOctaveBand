@@ -41,20 +41,14 @@ def test_digitized_reference_points() -> None:
         10.0: (0.991305, 0.178366),
     }
     for x, (r1, x1) in ref.items():
-        assert electroacoustics.piston_resistance(x) == pytest.approx(
-            r1, abs=1e-5
-        )
-        assert electroacoustics.piston_reactance(x) == pytest.approx(
-            x1, abs=1e-5
-        )
+        assert electroacoustics.piston_resistance(x) == pytest.approx(r1, abs=1e-5)
+        assert electroacoustics.piston_reactance(x) == pytest.approx(x1, abs=1e-5)
 
 
 def test_low_frequency_limits() -> None:
     # R1 -> (ka)^2/2 = x^2/8 and X1 -> (8/3pi) ka = (4/3pi) x as x -> 0.
     x = 1e-3
-    assert electroacoustics.piston_resistance(x) == pytest.approx(
-        x**2 / 8.0, rel=1e-4
-    )
+    assert electroacoustics.piston_resistance(x) == pytest.approx(x**2 / 8.0, rel=1e-4)
     assert electroacoustics.piston_reactance(x) == pytest.approx(
         4.0 / (3.0 * math.pi) * x, rel=1e-4
     )
@@ -62,9 +56,7 @@ def test_low_frequency_limits() -> None:
 
 def test_high_frequency_limit_resistive() -> None:
     # R1 -> 1 and X1 -> 0 at large x: Z_r -> rho c S (purely resistive).
-    assert electroacoustics.piston_resistance(80.0) == pytest.approx(
-        1.0, abs=0.02
-    )
+    assert electroacoustics.piston_resistance(80.0) == pytest.approx(1.0, abs=0.02)
     assert abs(electroacoustics.piston_reactance(80.0)) < 0.05
 
 
@@ -83,9 +75,7 @@ def test_directivity_onaxis_and_first_null() -> None:
     assert abs(electroacoustics.piston_directivity(ka, theta_null)) < 1e-9
     # No null exists when ka < first zero of J1.
     theta = np.linspace(0.0, math.pi / 2, 200)
-    assert (
-        np.min(np.abs(electroacoustics.piston_directivity(3.0, theta))) > 0.1
-    )
+    assert np.min(np.abs(electroacoustics.piston_directivity(3.0, theta))) > 0.1
 
 
 def test_radiation_mass_coefficient() -> None:
@@ -158,9 +148,7 @@ def test_directivity_pattern_first_null() -> None:
     # only once ka > 3.8317. Sample the exact null angle for ka = 6.
     ka = 6.0
     theta_null = math.asin(J1_FIRST_ZERO / ka)
-    res = electroacoustics.piston_directivity_pattern(
-        [ka], angles=[0.0, theta_null]
-    )
+    res = electroacoustics.piston_directivity_pattern([ka], angles=[0.0, theta_null])
     assert abs(res.directivity[0, 1]) < 1e-9
     assert res.directivity_db[0, 1] < -120.0
     # No null for a scalar ka below the first zero of J1.
@@ -208,9 +196,7 @@ def test_directivity_pattern_validation() -> None:
     with pytest.raises(ValueError):
         electroacoustics.piston_directivity_pattern(-1.0)
     with pytest.raises(ValueError):
-        electroacoustics.piston_directivity_pattern(
-            ka_one, angles=infinite_angles
-        )
+        electroacoustics.piston_directivity_pattern(ka_one, angles=infinite_angles)
     with pytest.raises(ValueError):
         electroacoustics.piston_directivity_pattern(empty_ka)
 

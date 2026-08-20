@@ -94,9 +94,13 @@ _LOSSY_TARGET_SUFFIXES = frozenset(
 
 #: soundfile subtype -> (numeric kind, bits) for default-subtype selection.
 _SF_SUBTYPE_TRAITS: dict[str, tuple[str, int]] = {
-    "PCM_S8": ("int", 8), "PCM_U8": ("int", 8), "PCM_16": ("int", 16),
-    "PCM_24": ("int", 24), "PCM_32": ("int", 32),
-    "FLOAT": ("float", 32), "DOUBLE": ("float", 64),
+    "PCM_S8": ("int", 8),
+    "PCM_U8": ("int", 8),
+    "PCM_16": ("int", 16),
+    "PCM_24": ("int", 24),
+    "PCM_32": ("int", 32),
+    "FLOAT": ("float", 32),
+    "DOUBLE": ("float", 64),
 }
 
 
@@ -127,8 +131,12 @@ def _source_traits(
     kind, bits = _SF_SUBTYPE_TRAITS.get(str(file_info.subtype), ("decoded", 0))
     bext = read_flac_bext(path) if format_name == "FLAC" else None
     return (
-        kind, bits, bext, int(file_info.samplerate),
-        int(file_info.channels), int(file_info.frames),
+        kind,
+        bits,
+        bext,
+        int(file_info.samplerate),
+        int(file_info.channels),
+        int(file_info.frames),
     )
 
 
@@ -235,12 +243,17 @@ def _stream_to_flac(
     """Stream quantised blocks into a FLAC file, then embed the bext."""
     sf = _import_soundfile("FLAC")
     with sf.SoundFile(
-        str(target), "w", samplerate=fs, channels=channels,
-        subtype=resolved, format="FLAC",
+        str(target),
+        "w",
+        samplerate=fs,
+        channels=channels,
+        subtype=resolved,
+        format="FLAC",
     ) as out:
         for codes in blocks:
             narrowed = (
-                codes.astype(np.int16) if resolved == "PCM_16"
+                codes.astype(np.int16)
+                if resolved == "PCM_16"
                 else np.left_shift(codes.astype(np.int32), 8)
             )
             out.write(np.ascontiguousarray(narrowed.T))
@@ -285,9 +298,7 @@ def convert(
 
     flac = target.suffix.lower() == ".flac"
     kind, bits, bext, fs, channels, frames = _source_traits(source)
-    resolved = (
-        _default_subtype(kind, bits, flac=flac) if subtype is None else subtype
-    )
+    resolved = _default_subtype(kind, bits, flac=flac) if subtype is None else subtype
     _check_resolved_subtype(resolved, flac=flac)
 
     # The conversion's own CodingHistory line, appended under the carried
@@ -298,20 +309,29 @@ def convert(
     probe = np.zeros((channels, 0))
     carrier = Signal(data=np.zeros((channels, 1)), fs=fs, provenance=bext)
     bext_payload = _resolve_bext(
-        carrier, None, probe, fs, resolved,
+        carrier,
+        None,
+        probe,
+        fs,
+        resolved,
         algorithm="FLAC" if flac else "PCM",
     )
 
-    blocks = _quantised_blocks(source, target, resolved, block_size,
-                               frames * channels)
+    blocks = _quantised_blocks(source, target, resolved, block_size, frames * channels)
     if flac:
         _stream_to_flac(target, blocks, fs, channels, resolved, bext_payload)
     else:
         write_wav_stream(
-            target, blocks, fs, channels, resolved, frames,
+            target,
+            blocks,
+            fs,
+            channels,
+            resolved,
+            frames,
             metadata_chunks=(
                 frame_riff_chunk(b"bext", bext_payload)
-                if bext_payload is not None else b""
+                if bext_payload is not None
+                else b""
             ),
             # A lossy container's declared frame count is a promise its
             # decoder need not keep (decoder delay and padding), so the

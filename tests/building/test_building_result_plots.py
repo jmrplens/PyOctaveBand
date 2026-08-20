@@ -116,9 +116,7 @@ def test_extended_rating_plot_full_range_and_terms_in_title() -> None:
     assert ax.lines[0].get_xdata().size == 21
     np.testing.assert_allclose(ax.lines[0].get_ydata(), res.measured)
     assert ax.lines[1].get_xdata().size == 16
-    np.testing.assert_allclose(
-        ax.lines[1].get_ydata(), res.core.shifted_reference
-    )
+    np.testing.assert_allclose(ax.lines[1].get_ydata(), res.core.shifted_reference)
     # Title carries the core rating and the covered Annex B terms.
     title = ax.get_title()
     assert str(res.rating) in title
@@ -179,9 +177,9 @@ def test_octave_impact_plot_keeps_curve_honest_and_annotates_offset() -> None:
     assert ax.lines[1].get_ydata()[idx500] == pytest.approx(read_value)
     # a marker records the 500 Hz read value.
     marked = [
-        ln for ln in ax.lines
-        if ln.get_ydata().size == 1
-        and ln.get_ydata()[0] == pytest.approx(read_value)
+        ln
+        for ln in ax.lines
+        if ln.get_ydata().size == 1 and ln.get_ydata()[0] == pytest.approx(read_value)
     ]
     assert marked, "expected a 500 Hz read-value marker"
     # annotation carries both the rating and the -5 dB octave note.

@@ -71,7 +71,8 @@ def _mm(value: float, language: str) -> str:
 
     return (
         format_number(value * 1e3, language, decimals=1, trim=True)
-        + " " + _t("mm", language)
+        + " "
+        + _t("mm", language)
     )
 
 
@@ -80,8 +81,7 @@ def _metres(value: float, language: str) -> str:
     from ..._i18n import format_number
 
     return (
-        format_number(value, language, decimals=2, trim=True)
-        + " " + _t("m", language)
+        format_number(value, language, decimals=2, trim=True) + " " + _t("m", language)
     )
 
 
@@ -130,7 +130,9 @@ def _dim(
         _dim_extension_lines(ax, ((a, ao), (b, bo)))
     style = "|-|, widthA=0.4, widthB=0.4" if tight else "<->"
     ax.annotate(
-        "", xy=tuple(bo), xytext=tuple(ao),
+        "",
+        xy=tuple(bo),
+        xytext=tuple(ao),
         arrowprops={"arrowstyle": style, "color": _C_EDGE, "linewidth": 0.9},
         zorder=5,
     )
@@ -141,9 +143,16 @@ def _dim(
     shift = normal * (9.0 * label_side)
     ha, va, rotation = _dim_label_anchor(shift, angle, label_upright)
     ax.annotate(
-        label, xy=(mid[0], mid[1]), xytext=tuple(shift),
-        textcoords="offset points", fontsize=fontsize, ha=ha,
-        va=va, rotation=rotation, rotation_mode="anchor", zorder=6,
+        label,
+        xy=(mid[0], mid[1]),
+        xytext=tuple(shift),
+        textcoords="offset points",
+        fontsize=fontsize,
+        ha=ha,
+        va=va,
+        rotation=rotation,
+        rotation_mode="anchor",
+        zorder=6,
     )
 
 
@@ -153,8 +162,12 @@ def _dim_extension_lines(
     """The dashed witness lines from each measured point to its offset twin."""
     for point, moved in spans:
         ax.plot(
-            [point[0], moved[0]], [point[1], moved[1]],
-            linestyle=":", linewidth=0.7, color=_C_EDGE, zorder=4,
+            [point[0], moved[0]],
+            [point[1], moved[1]],
+            linestyle=":",
+            linewidth=0.7,
+            color=_C_EDGE,
+            zorder=4,
         )
 
 
@@ -219,27 +232,43 @@ def _material_rect(
 
 
 def _incidence_arrow(
-    ax: Axes, x: float, y: float, length: float, language: str,
-    *, downward: bool = False,
+    ax: Axes,
+    x: float,
+    y: float,
+    length: float,
+    language: str,
+    *,
+    downward: bool = False,
 ) -> None:
     """Incident-sound arrow pointing in +x (or -y), with its label beside."""
     tip = (x, y - length) if downward else (x + length, y)
     ax.annotate(
-        "", xy=tip, xytext=(x, y),
-        arrowprops={"arrowstyle": "-|>", "color": _C_PRIMARY,
-                    "linewidth": 1.6},
+        "",
+        xy=tip,
+        xytext=(x, y),
+        arrowprops={"arrowstyle": "-|>", "color": _C_PRIMARY, "linewidth": 1.6},
         zorder=5,
     )
     label = _t("Incident sound", language)
     if downward:
         ax.text(
-            x, y + 0.08 * length, label,
-            fontsize=8, ha="center", va="bottom", color=_C_PRIMARY,
+            x,
+            y + 0.08 * length,
+            label,
+            fontsize=8,
+            ha="center",
+            va="bottom",
+            color=_C_PRIMARY,
         )
     else:
         ax.text(
-            x + 0.5 * length, y + 0.06 * length, label,
-            fontsize=8, ha="center", va="bottom", color=_C_PRIMARY,
+            x + 0.5 * length,
+            y + 0.06 * length,
+            label,
+            fontsize=8,
+            ha="center",
+            va="bottom",
+            color=_C_PRIMARY,
         )
 
 
@@ -249,8 +278,14 @@ def _microphone(ax: Axes, x: float, y: float, size: float, label: str) -> None:
 
     ax.plot([x, x], [y, y + 0.55 * size], color=_C_EDGE, linewidth=1.4)
     ax.add_patch(
-        Circle((x, y + 0.75 * size), 0.22 * size, facecolor=_C_PRIMARY,
-               edgecolor=_C_EDGE, linewidth=0.8, zorder=5)
+        Circle(
+            (x, y + 0.75 * size),
+            0.22 * size,
+            facecolor=_C_PRIMARY,
+            edgecolor=_C_EDGE,
+            linewidth=0.8,
+            zorder=5,
+        )
     )
     ax.text(x, y + 1.15 * size, label, fontsize=8, ha="center", va="bottom")
 
@@ -262,23 +297,36 @@ def _loudspeaker(
     from matplotlib.patches import Polygon, Rectangle
 
     ax.add_patch(
-        Rectangle((x - 0.6 * size, y_centre - 0.25 * size), 0.35 * size,
-                  0.5 * size, facecolor=_C_MUTED, edgecolor=_C_EDGE,
-                  linewidth=0.9)
+        Rectangle(
+            (x - 0.6 * size, y_centre - 0.25 * size),
+            0.35 * size,
+            0.5 * size,
+            facecolor=_C_MUTED,
+            edgecolor=_C_EDGE,
+            linewidth=0.9,
+        )
     )
     ax.add_patch(
         Polygon(
-            [(x - 0.25 * size, y_centre - 0.18 * size),
-             (x - 0.25 * size, y_centre + 0.18 * size),
-             (x, y_centre + 0.48 * size),
-             (x, y_centre - 0.48 * size)],
-            closed=True, facecolor=_C_SECONDARY_LIGHT, edgecolor=_C_EDGE,
+            [
+                (x - 0.25 * size, y_centre - 0.18 * size),
+                (x - 0.25 * size, y_centre + 0.18 * size),
+                (x, y_centre + 0.48 * size),
+                (x, y_centre - 0.48 * size),
+            ],
+            closed=True,
+            facecolor=_C_SECONDARY_LIGHT,
+            edgecolor=_C_EDGE,
             linewidth=0.9,
         )
     )
     ax.text(
-        x - 0.42 * size, y_centre - 0.62 * size, _t("Loudspeaker", language),
-        fontsize=8, ha="center", va="top",
+        x - 0.42 * size,
+        y_centre - 0.62 * size,
+        _t("Loudspeaker", language),
+        fontsize=8,
+        ha="center",
+        va="top",
     )
 
 

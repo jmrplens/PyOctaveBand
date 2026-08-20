@@ -156,9 +156,7 @@ def _metadata_pairs(
     return escaped_pairs(specs)
 
 
-def _parameter_table(
-    result: RoomAcousticsResult, language: str = "en"
-) -> Any:
+def _parameter_table(result: RoomAcousticsResult, language: str = "en") -> Any:
     """Build the full-width per-band parameter table.
 
     Rows are the analysis bands (or a single ``Broadband`` row); the columns are
@@ -179,8 +177,12 @@ def _parameter_table(
     thin = colors.HexColor("#c9d4e0")
     styles = getSampleStyleSheet()
     head_style = ParagraphStyle(
-        "iso3382_thead", parent=styles["Normal"], fontSize=7.4,
-        textColor=colors.white, alignment=1, leading=8.6,
+        "iso3382_thead",
+        parent=styles["Normal"],
+        fontSize=7.4,
+        textColor=colors.white,
+        alignment=1,
+        leading=8.6,
     )
 
     freq = result.frequency
@@ -199,9 +201,7 @@ def _parameter_table(
     if freq is None:
         labels = [t("Broadband", language)] * n
     else:
-        labels = [
-            _band_label(f, fraction) for f in np.asarray(freq, dtype=np.float64)
-        ]
+        labels = [_band_label(f, fraction) for f in np.asarray(freq, dtype=np.float64)]
 
     # A one-third-octave range carries up to 18 rows; tighten the padding and
     # cell font so the stacked table plus the landscape plot still fit one A4
@@ -236,7 +236,14 @@ def _parameter_table(
         )
 
     col_widths = [
-        24 * mm, 20 * mm, 20 * mm, 20 * mm, 22 * mm, 22 * mm, 20 * mm, 26 * mm,
+        24 * mm,
+        20 * mm,
+        20 * mm,
+        20 * mm,
+        22 * mm,
+        22 * mm,
+        20 * mm,
+        26 * mm,
     ]
     style_cmds: list[Any] = [
         ("BACKGROUND", (0, 0), (-1, 0), accent),
@@ -331,7 +338,9 @@ def _reverberation_descriptor(
     return float(arr[idx]), False, band
 
 
-def _statement(result: RoomAcousticsResult, language: str = "en") -> tuple[str, list[str]]:
+def _statement(
+    result: RoomAcousticsResult, language: str = "en"
+) -> tuple[str, list[str]]:
     """The boxed reverberation-time descriptor and its extended EDT term.
 
     A band result spanning the 500 Hz and 1000 Hz bands boxes the
@@ -364,9 +373,7 @@ def _statement(result: RoomAcousticsResult, language: str = "en") -> tuple[str, 
             value=_cell(t_value, 2, language)
         )
     elif math.isfinite(t_band):
-        statement = t(
-            "T<sub>30</sub> ({band} Hz) = <b>{value} s</b>", language
-        ).format(
+        statement = t("T<sub>30</sub> ({band} Hz) = <b>{value} s</b>", language).format(
             band=_band_label(t_band, fraction),
             value=_cell(t_value, 2, language),
         )
@@ -378,8 +385,7 @@ def _statement(result: RoomAcousticsResult, language: str = "en") -> tuple[str, 
     if (t_is_mid or edt_is_mid) and fraction == 3:
         extended.append(
             t(
-                "Mid-frequency mean over the 500 Hz and 1 kHz "
-                "one-third-octave bands.",
+                "Mid-frequency mean over the 500 Hz and 1 kHz one-third-octave bands.",
                 language,
             )
         )
@@ -515,13 +521,14 @@ def render_iso3382_report(
 
     # Full-width per-band parameter table, then the landscape decay-time plot
     # drawn by the result's own single-panel plot(ax=...).
-    flow.append(
-        Paragraph(_fraction_label(result.frequency, language), caption_style)
-    )
+    flow.append(Paragraph(_fraction_label(result.frequency, language), caption_style))
     flow.append(_parameter_table(result, language))
     flow.append(Spacer(1, gap))
     plot_drawing = render_figure_drawing(
-        result.plot, 174 * mm, y_top=None, figsize=(9.2, fig_height),
+        result.plot,
+        174 * mm,
+        y_top=None,
+        figsize=(9.2, fig_height),
         language=language,
     )
     flow.append(plot_drawing)

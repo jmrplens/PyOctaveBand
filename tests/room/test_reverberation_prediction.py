@@ -28,9 +28,12 @@ VOLUME = 120.0
 SURFACE = 158.0
 # Its six boundary surfaces, one entry per wall (two per axis).
 UNIFORM_SURFACES = [
-    (40.0, 0.2), (40.0, 0.2),   # z-pair (floor/ceiling)
-    (24.0, 0.2), (24.0, 0.2),   # y-pair
-    (15.0, 0.2), (15.0, 0.2),   # x-pair
+    (40.0, 0.2),
+    (40.0, 0.2),  # z-pair (floor/ceiling)
+    (24.0, 0.2),
+    (24.0, 0.2),  # y-pair
+    (15.0, 0.2),
+    (15.0, 0.2),  # x-pair
 ]
 
 _K = 24.0 * math.log(10.0) / 343.0
@@ -54,18 +57,14 @@ def test_eyring_hand_value() -> None:
 
 def test_millington_hand_value() -> None:
     """Millington (V=100): -(60 ln0.7 + 40 ln0.4) = 58.0521, T = 0.277533 s."""
-    t = room.millington_sette_reverberation_time(
-        100.0, [(60.0, 0.3), (40.0, 0.6)]
-    )
+    t = room.millington_sette_reverberation_time(100.0, [(60.0, 0.3), (40.0, 0.6)])
     assert t == pytest.approx(0.2775330330, abs=1e-6)
 
 
 def test_mean_absorption() -> None:
     assert room.mean_absorption(UNIFORM_SURFACES) == pytest.approx(0.2)
     # Area-weighted, not arithmetic: 90 % of the area at 0.1, 10 % at 0.9.
-    assert room.mean_absorption([(90.0, 0.1), (10.0, 0.9)]) == pytest.approx(
-        0.18
-    )
+    assert room.mean_absorption([(90.0, 0.1), (10.0, 0.9)]) == pytest.approx(0.18)
 
 
 # ---------------------------------------------------------------------------
@@ -198,7 +197,11 @@ def test_reverberation_time_models_bundle() -> None:
     # Sabine is the longest estimate band by band.
     assert np.all(res.sabine >= res.eyring - 1e-9)
     assert set(res.models) == {
-        "Sabine", "Eyring", "Millington-Sette", "Fitzroy", "Arau-Puchades"
+        "Sabine",
+        "Eyring",
+        "Millington-Sette",
+        "Fitzroy",
+        "Arau-Puchades",
     }
 
 
@@ -206,8 +209,12 @@ def test_models_scalar_absorption_broadcasts() -> None:
     res = room.reverberation_time_models(DIMS, (0.2, 0.2, 0.2))
     assert res.frequencies.shape == (1,)
     # Uniform: the four Eyring-family models coincide; Sabine is longer.
-    eyring_family = [res.eyring[0], res.millington_sette[0], res.fitzroy[0],
-                     res.arau_puchades[0]]
+    eyring_family = [
+        res.eyring[0],
+        res.millington_sette[0],
+        res.fitzroy[0],
+        res.arau_puchades[0],
+    ]
     assert np.allclose(eyring_family, res.eyring[0])
     assert res.sabine[0] > res.eyring[0]
 
@@ -290,8 +297,7 @@ def test_sabine_accepts_iso354_alphas_at_and_above_one() -> None:
     surfaces = [(area, alpha) for area, _ in UNIFORM_SURFACES]
     t = room.sabine_reverberation_time(VOLUME, surfaces)
     np.testing.assert_allclose(t, _K * VOLUME / (SURFACE * alpha), atol=1e-9)
-    np.testing.assert_allclose(t, [0.6118246547, 0.1223649309, 0.1064042878],
-                               atol=1e-6)
+    np.testing.assert_allclose(t, [0.6118246547, 0.1223649309, 0.1064042878], atol=1e-6)
 
 
 def test_millington_rejects_any_alpha_at_or_above_one() -> None:
@@ -308,8 +314,7 @@ def test_eyring_accepts_alpha_above_one_when_mean_stays_below_one() -> None:
     surfaces = [(10.0, 1.2), (148.0, 0.1)]
     mean = (10.0 * 1.2 + 148.0 * 0.1) / 158.0
     t = room.eyring_reverberation_time(VOLUME, surfaces)
-    assert t == pytest.approx(_K * VOLUME / (-158.0 * math.log(1.0 - mean)),
-                              abs=1e-9)
+    assert t == pytest.approx(_K * VOLUME / (-158.0 * math.log(1.0 - mean)), abs=1e-9)
 
 
 def test_eyring_rejects_mean_at_or_above_one() -> None:
@@ -338,9 +343,7 @@ def test_models_bundle_inherits_the_strictest_domain() -> None:
 
 def test_mean_absorption_accepts_iso354_alphas_above_one() -> None:
     """The mean of measured coefficients above 1 is meaningful: 0.21 here."""
-    assert room.mean_absorption([(10.0, 1.2), (90.0, 0.1)]) == pytest.approx(
-        0.21
-    )
+    assert room.mean_absorption([(10.0, 1.2), (90.0, 0.1)]) == pytest.approx(0.21)
 
 
 def test_perfectly_reflecting_room_raises() -> None:
@@ -355,18 +358,14 @@ def test_non_positive_volume_raises() -> None:
 
 def test_negative_air_attenuation_raises() -> None:
     with pytest.raises(ValueError, match="air_attenuation"):
-        room.sabine_reverberation_time(
-            VOLUME, UNIFORM_SURFACES, air_attenuation=-1.0
-        )
+        room.sabine_reverberation_time(VOLUME, UNIFORM_SURFACES, air_attenuation=-1.0)
 
 
 @pytest.mark.parametrize("bad", [math.nan, math.inf])
 def test_non_finite_air_attenuation_raises(bad: float) -> None:
     """NaN used to slip through the old m < 0 comparison and return NaN."""
     with pytest.raises(ValueError, match="air_attenuation"):
-        room.sabine_reverberation_time(
-            VOLUME, UNIFORM_SURFACES, air_attenuation=bad
-        )
+        room.sabine_reverberation_time(VOLUME, UNIFORM_SURFACES, air_attenuation=bad)
 
 
 def test_bad_dimensions_raise() -> None:
@@ -398,9 +397,7 @@ def test_mismatched_air_band_count_raises() -> None:
     """Air attenuation with a different band count than the surfaces is caught."""
     surfaces = [(158.0, [0.2, 0.3, 0.4])]
     with pytest.raises(ValueError, match="incompatible shapes"):
-        room.sabine_reverberation_time(
-            VOLUME, surfaces, air_attenuation=[0.001, 0.002]
-        )
+        room.sabine_reverberation_time(VOLUME, surfaces, air_attenuation=[0.001, 0.002])
 
 
 # ---------------------------------------------------------------------------

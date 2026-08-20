@@ -112,20 +112,31 @@ def plot_barrier_geometry(
     far = (barrier_distance + e, top)
     # Ground.
     _material_rect(
-        ax, -0.08 * receiver_distance, -0.04 * receiver_distance,
-        1.2 * receiver_distance, 0.04 * receiver_distance, "rigid",
+        ax,
+        -0.08 * receiver_distance,
+        -0.04 * receiver_distance,
+        1.2 * receiver_distance,
+        0.04 * receiver_distance,
+        "rigid",
     )
     ax.text(
-        1.06 * receiver_distance, -0.02 * receiver_distance,
-        _t("Ground", language), fontsize=8, ha="left", va="center",
+        1.06 * receiver_distance,
+        -0.02 * receiver_distance,
+        _t("Ground", language),
+        fontsize=8,
+        ha="left",
+        va="center",
     )
-    _material_rect(
-        ax, barrier_distance, 0.0, drawn_e, top, "plate", **kwargs
-    )
+    _material_rect(ax, barrier_distance, 0.0, drawn_e, top, "plate", **kwargs)
     # Paths.
     ax.plot(
-        [src[0], rcv[0]], [src[1], rcv[1]], linestyle="--", linewidth=1.1,
-        color=_C_MUTED, label=_t("Direct path", language), zorder=4,
+        [src[0], rcv[0]],
+        [src[1], rcv[1]],
+        linestyle="--",
+        linewidth=1.1,
+        color=_C_MUTED,
+        label=_t("Direct path", language),
+        zorder=4,
     )
     diff_x = [src[0], near[0]]
     diff_y = [src[1], near[1]]
@@ -135,14 +146,33 @@ def plot_barrier_geometry(
     diff_x.append(rcv[0])
     diff_y.append(rcv[1])
     ax.plot(
-        diff_x, diff_y, linewidth=1.6, color=_C_PRIMARY,
-        label=_t("Diffracted path", language), zorder=5,
+        diff_x,
+        diff_y,
+        linewidth=1.6,
+        color=_C_PRIMARY,
+        label=_t("Diffracted path", language),
+        zorder=5,
     )
-    ax.plot([src[0]], [src[1]], marker="*", markersize=13,
-            color=_C_REFERENCE, linestyle="none", zorder=6,
-            label=_t("Source", language))
-    ax.plot([rcv[0]], [rcv[1]], marker="^", markersize=8, color=_C_PRIMARY,
-            linestyle="none", zorder=6, label=_t("Receiver", language))
+    ax.plot(
+        [src[0]],
+        [src[1]],
+        marker="*",
+        markersize=13,
+        color=_C_REFERENCE,
+        linestyle="none",
+        zorder=6,
+        label=_t("Source", language),
+    )
+    ax.plot(
+        [rcv[0]],
+        [rcv[1]],
+        marker="^",
+        markersize=8,
+        color=_C_PRIMARY,
+        linestyle="none",
+        zorder=6,
+        label=_t("Receiver", language),
+    )
     # Path difference over the top (delta = A + B (+ e) - d).
     a_len = float(np.hypot(near[0] - src[0], near[1] - src[1]))
     b_len = float(np.hypot(rcv[0] - far[0], rcv[1] - far[1]))
@@ -151,21 +181,31 @@ def plot_barrier_geometry(
     from ..._i18n import format_number
 
     ax.text(
-        barrier_distance, top + 0.06 * receiver_distance,
+        barrier_distance,
+        top + 0.06 * receiver_distance,
         _t("Path difference {delta} m", language).format(
             delta=format_number(delta, language, decimals=2, trim=True)
         ),
-        fontsize=8, ha="center", va="bottom",
+        fontsize=8,
+        ha="center",
+        va="bottom",
     )
     y_dim = -0.10 * receiver_distance
-    _dim(ax, (0.0, y_dim), (barrier_distance, y_dim),
-         _metres(barrier_distance, language))
-    _dim(ax, (0.0, y_dim - 0.06 * receiver_distance),
-         (receiver_distance, y_dim - 0.06 * receiver_distance),
-         _metres(receiver_distance, language))
-    _dim(ax, (barrier_distance - 0.04 * receiver_distance, 0.0),
-         (barrier_distance - 0.04 * receiver_distance, top),
-         _metres(top, language))
+    _dim(
+        ax, (0.0, y_dim), (barrier_distance, y_dim), _metres(barrier_distance, language)
+    )
+    _dim(
+        ax,
+        (0.0, y_dim - 0.06 * receiver_distance),
+        (receiver_distance, y_dim - 0.06 * receiver_distance),
+        _metres(receiver_distance, language),
+    )
+    _dim(
+        ax,
+        (barrier_distance - 0.04 * receiver_distance, 0.0),
+        (barrier_distance - 0.04 * receiver_distance, top),
+        _metres(top, language),
+    )
     _finish_geometry_axes(ax, _t("Barrier section", language))
     ax.legend(loc=_LEGEND_LOC, fontsize=8)
     return ax
@@ -191,10 +231,13 @@ def plot_barrier_result_geometry(
             "plot_barrier_geometry(...) with the original arguments."
         )
     return plot_barrier_geometry(
-        ax=ax, source_height=result.source_height,
+        ax=ax,
+        source_height=result.source_height,
         barrier_distance=result.barrier_distance,
         barrier_height=result.barrier_height,
         receiver_distance=result.receiver_distance,
         receiver_height=result.receiver_height,
-        thickness=result.thickness, language=language, **kwargs,
+        thickness=result.thickness,
+        language=language,
+        **kwargs,
     )

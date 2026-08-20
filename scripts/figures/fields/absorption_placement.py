@@ -50,11 +50,11 @@ from ..theme import (
 )
 
 _AP_C0, _AP_RHO = 343.0, 1.2
-_AP_LX, _AP_LY = 8.0, 2.5               # a flat, corridor-like section [m]
+_AP_LX, _AP_LY = 8.0, 2.5  # a flat, corridor-like section [m]
 _AP_DX = 0.02
-_AP_F0 = 250.0                          # burst centre frequency [Hz]
-_AP_CYCLES = 4                          # Hann-windowed burst length
-_AP_SRC = (1.73, 0.97)                  # off-centre, off-symmetry [m]
+_AP_F0 = 250.0  # burst centre frequency [Hz]
+_AP_CYCLES = 4  # Hann-windowed burst length
+_AP_SRC = (1.73, 0.97)  # off-centre, off-symmetry [m]
 #: Normal-incidence absorption of the concentrated pair: the guide's own
 #: carpeted-floor/acoustic-ceiling case (its z-pair carries 0.78 at 1 kHz,
 #: which is this lining's statistical value on this boundary).
@@ -93,8 +93,7 @@ def _ap_alpha_stat(zeta: float) -> float:
     th = np.linspace(0.0, np.pi / 2, 4001)
     zc = zeta * np.cos(th)
     alpha = 4.0 * zc / (zc + 1.0) ** 2
-    return float(np.trapezoid(alpha * np.cos(th), th)
-                 / np.trapezoid(np.cos(th), th))
+    return float(np.trapezoid(alpha * np.cos(th), th) / np.trapezoid(np.cos(th), th))
 
 
 def _ap_linings() -> tuple[float, float, float, float]:
@@ -147,16 +146,17 @@ def _absorption_placement_fields() -> tuple[Any, ...]:
     # can see, the total statistical absorption (2D mean free path pi A/P).
     mean_alpha = a_b * 2.0 * _AP_LX / per
     t_sab = 13.8155 * np.pi * area / (_AP_C0 * mean_alpha * per)
-    t_eyr = 13.8155 * np.pi * area / (
-        _AP_C0 * -np.log(1.0 - mean_alpha) * per)
+    t_eyr = 13.8155 * np.pi * area / (_AP_C0 * -np.log(1.0 - mean_alpha) * per)
 
     fs = 40.0 * _AP_F0
     tb = np.arange(round(_AP_CYCLES / _AP_F0 * fs)) / fs
     burst = np.sin(2.0 * np.pi * _AP_F0 * tb) * np.hanning(tb.size)
     z_a = zeta_a * _AP_RHO * _AP_C0
     z_b = zeta_b * _AP_RHO * _AP_C0
-    edges = ({"left": z_a, "right": z_a, "top": z_a, "bottom": z_a},
-             {"top": z_b, "bottom": z_b})
+    edges = (
+        {"left": z_a, "right": z_a, "top": z_a, "bottom": z_a},
+        {"top": z_b, "bottom": z_b},
+    )
     nx, ny = round(_AP_LX / _AP_DX), round(_AP_LY / _AP_DX)
 
     p_all: list[Any] = []
@@ -164,11 +164,15 @@ def _absorption_placement_fields() -> tuple[Any, ...]:
     e_all: list[Any] = []
     times = np.zeros(0)
     for edge_imp in edges:
-        sim = fdtd2d.FDTD2D(_AP_C0, _AP_DX, shape=(ny, nx),
-                            edge_impedance=edge_imp)
-        sim.add_source(fdtd2d.SignalSource(ix=round(_AP_SRC[0] / _AP_DX),
-                                           iy=round(_AP_SRC[1] / _AP_DX),
-                                           samples=burst, sample_rate=fs))
+        sim = fdtd2d.FDTD2D(_AP_C0, _AP_DX, shape=(ny, nx), edge_impedance=edge_imp)
+        sim.add_source(
+            fdtd2d.SignalSource(
+                ix=round(_AP_SRC[0] / _AP_DX),
+                iy=round(_AP_SRC[1] / _AP_DX),
+                samples=burst,
+                sample_rate=fs,
+            )
+        )
         beta = float(np.exp(-sim.dt * _AP_F0 / 2.0))
         ms = np.zeros_like(sim.p)
         ps: list[Any] = []
@@ -177,19 +181,21 @@ def _absorption_placement_fields() -> tuple[Any, ...]:
         ts: list[float] = []
         for i in range(_AP_EVERY * _AP_FRAMES):
             sim.step()
-            ms = beta * ms + (1.0 - beta) * sim.p ** 2
+            ms = beta * ms + (1.0 - beta) * sim.p**2
             if (i + 1) % _AP_EVERY == 0:
                 ps.append(sim.p.astype(np.float16))
                 # Re-referenced per frame: the panel shows where the
                 # energy lives, the decay axis says how much is left.
                 with np.errstate(divide="ignore", invalid="ignore"):
                     db = 10.0 * np.log10(ms / max(float(ms.max()), 1e-300))
-                rs.append(np.clip(db, -_AP_RMS_SPAN, 0.0)
-                          .astype(np.float16))
-                pe = float(np.sum(sim.p ** 2)) / (2.0 * _AP_RHO * _AP_C0 ** 2)
-                ke = 0.5 * _AP_RHO * (float(np.sum(sim.vx ** 2))
-                                      + float(np.sum(sim.vy ** 2)))
-                es.append((pe + ke) * _AP_DX ** 2)
+                rs.append(np.clip(db, -_AP_RMS_SPAN, 0.0).astype(np.float16))
+                pe = float(np.sum(sim.p**2)) / (2.0 * _AP_RHO * _AP_C0**2)
+                ke = (
+                    0.5
+                    * _AP_RHO
+                    * (float(np.sum(sim.vx**2)) + float(np.sum(sim.vy**2)))
+                )
+                es.append((pe + ke) * _AP_DX**2)
                 ts.append(sim.time)
         p_all.append(np.stack(ps))
         db_all.append(np.stack(rs))
@@ -207,9 +213,22 @@ def _absorption_placement_fields() -> tuple[Any, ...]:
     t_meas = _ap_fit_t60(times, levels[0], -5.0, -35.0)
     t_early = _ap_fit_t60(times, levels[1], -5.0, -20.0)
     t_late = _ap_fit_t60(times, levels[1], -25.0, -40.0)
-    return (p_all[0], p_all[1], db_all[0], db_all[1], times,
-            levels[0], levels[1], float(t_sab), float(t_eyr),
-            float(t_meas), float(t_early), float(t_late), a_a, a_b)
+    return (
+        p_all[0],
+        p_all[1],
+        db_all[0],
+        db_all[1],
+        times,
+        levels[0],
+        levels[1],
+        float(t_sab),
+        float(t_eyr),
+        float(t_meas),
+        float(t_early),
+        float(t_late),
+        a_a,
+        a_b,
+    )
 
 
 def animate_fdtd_absorption_placement(output_dir: str) -> None:
@@ -226,23 +245,37 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
     from matplotlib.patches import Rectangle
 
     T = _translate_str
-    (p_a, p_b, db_a, db_b, times, lev_a, lev_b, t_sab, t_eyr, t_meas,
-     t_early, t_late, a_a, a_b) = _absorption_placement_fields()
+    (
+        p_a,
+        p_b,
+        db_a,
+        db_b,
+        times,
+        lev_a,
+        lev_b,
+        t_sab,
+        t_eyr,
+        t_meas,
+        t_early,
+        t_late,
+        a_a,
+        a_b,
+    ) = _absorption_placement_fields()
     outline = [patheffects.withStroke(linewidth=1.8, foreground="black")]
     # Colour scale of the instantaneous row: referenced to the field a
     # third of the way into the decay (60 ms), so the blast saturates
     # boldly, the row stays alive well past the reveal, and what finally
     # fades out is the decay itself.
     k0 = int(np.searchsorted(times, 0.060))
-    vmax = float(np.quantile(
-        np.abs(p_a[k0:k0 + 40].astype(np.float32)), 0.999))
+    vmax = float(np.quantile(np.abs(p_a[k0 : k0 + 40].astype(np.float32)), 0.999))
 
     fig = _anim_figure()
-    fig.suptitle(T("Where the absorption sits: same total, two decays "
-                   "(2D FDTD)"))
+    fig.suptitle(T("Where the absorption sits: same total, two decays (2D FDTD)"))
     gs = fig.add_gridspec(3, 2, height_ratios=(1.0, 1.0, 1.15), hspace=0.12)
-    titles = [T("Absorption spread over all four edges"),
-              T("The same total, floor and ceiling only")]
+    titles = [
+        T("Absorption spread over all four edges"),
+        T("The same total, floor and ceiling only"),
+    ]
     ims: list[Any] = []
     rms_axes: list[Any] = []
     strip = 0.1
@@ -253,38 +286,77 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
         rms_axes.append(ax_r)
         for row, ax in enumerate((ax_p, ax_r)):
             ax.grid(False)
-            kwargs = ({"cmap": CMAP_FIELD, "vmin": -vmax, "vmax": vmax}
-                      if row == 0 else
-                      {"cmap": "magma", "vmin": -_AP_RMS_SPAN, "vmax": 0.0})
-            ims.append(ax.imshow(np.zeros((2, 2)), origin="lower",
-                                 extent=(0.0, _AP_LX, 0.0, _AP_LY),
-                                 aspect="equal", interpolation="bilinear",
-                                 zorder=2, **kwargs))
+            kwargs = (
+                {"cmap": CMAP_FIELD, "vmin": -vmax, "vmax": vmax}
+                if row == 0
+                else {"cmap": "magma", "vmin": -_AP_RMS_SPAN, "vmax": 0.0}
+            )
+            ims.append(
+                ax.imshow(
+                    np.zeros((2, 2)),
+                    origin="lower",
+                    extent=(0.0, _AP_LX, 0.0, _AP_LY),
+                    aspect="equal",
+                    interpolation="bilinear",
+                    zorder=2,
+                    **kwargs,
+                )
+            )
             # The treated edges as hatched absorber strips, the rigid ends
             # as solid grey: the geometry is the whole experiment.
-            for side in ("top", "bottom") + (("left", "right")
-                                             if treated_all else ()):
+            for side in ("top", "bottom") + (("left", "right") if treated_all else ()):
                 x0, y0, w, h = {
                     "top": (0.0, _AP_LY, _AP_LX, strip),
                     "bottom": (0.0, -strip, _AP_LX, strip),
                     "left": (-strip, 0.0, strip, _AP_LY),
                     "right": (_AP_LX, 0.0, strip, _AP_LY),
                 }[side]
-                ax.add_patch(Rectangle((x0, y0), w, h, facecolor="none",
-                                       hatch="////", edgecolor=COLOR_MUTED,
-                                       lw=0.0, zorder=3))
+                ax.add_patch(
+                    Rectangle(
+                        (x0, y0),
+                        w,
+                        h,
+                        facecolor="none",
+                        hatch="////",
+                        edgecolor=COLOR_MUTED,
+                        lw=0.0,
+                        zorder=3,
+                    )
+                )
             if not treated_all:
                 for x0 in (-strip, _AP_LX):
-                    ax.add_patch(Rectangle((x0, 0.0), strip, _AP_LY,
-                                           facecolor="#9a9a9a",
-                                           edgecolor=COLOR_FG, lw=0.5,
-                                           zorder=3))
-            ax.add_patch(Rectangle((0.0, 0.0), _AP_LX, _AP_LY,
-                                   facecolor="none", edgecolor=COLOR_FG,
-                                   lw=0.8, zorder=4))
-            ax.plot([_AP_SRC[0]], [_AP_SRC[1]], marker="o", ms=4,
-                    color=FIELD_STROKE, markeredgecolor=COLOR_FG,
-                    markeredgewidth=0.7, zorder=5)
+                    ax.add_patch(
+                        Rectangle(
+                            (x0, 0.0),
+                            strip,
+                            _AP_LY,
+                            facecolor="#9a9a9a",
+                            edgecolor=COLOR_FG,
+                            lw=0.5,
+                            zorder=3,
+                        )
+                    )
+            ax.add_patch(
+                Rectangle(
+                    (0.0, 0.0),
+                    _AP_LX,
+                    _AP_LY,
+                    facecolor="none",
+                    edgecolor=COLOR_FG,
+                    lw=0.8,
+                    zorder=4,
+                )
+            )
+            ax.plot(
+                [_AP_SRC[0]],
+                [_AP_SRC[1]],
+                marker="o",
+                ms=4,
+                color=FIELD_STROKE,
+                markeredgecolor=COLOR_FG,
+                markeredgewidth=0.7,
+                zorder=5,
+            )
             ax.set_xlim(-strip - 0.05, _AP_LX + strip + 0.05)
             ax.set_ylim(-strip - 0.06, _AP_LY + strip + 0.06)
             ax.set_xticks([])
@@ -293,15 +365,39 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
         if col == 0:
             ax_p.set_ylabel(T("$p(x, y)$"), fontsize=8.5)
             ax_r.set_ylabel(T("RMS level [dB]"), fontsize=8.5)
-            ax_p.text(0.12, _AP_LY - 0.16, "8 × 2.5 m", fontsize=6.8,
-                      ha="left", va="top", color="white", zorder=6,
-                      path_effects=outline)
-            ax_r.text(0.12, 0.16, T("each frame on its own scale, 25 dB"),
-                      fontsize=6.8, ha="left", va="bottom", color="white",
-                      zorder=6, path_effects=outline)
+            ax_p.text(
+                0.12,
+                _AP_LY - 0.16,
+                "8 × 2.5 m",
+                fontsize=6.8,
+                ha="left",
+                va="top",
+                color="white",
+                zorder=6,
+                path_effects=outline,
+            )
+            ax_r.text(
+                0.12,
+                0.16,
+                T("each frame on its own scale, 25 dB"),
+                fontsize=6.8,
+                ha="left",
+                va="bottom",
+                color="white",
+                zorder=6,
+                path_effects=outline,
+            )
     graze_txt = rms_axes[1].text(
-        _AP_LX - 0.16, _AP_LY - 0.22, "", ha="right", va="top",
-        fontsize=8, color="white", zorder=6, path_effects=outline)
+        _AP_LX - 0.16,
+        _AP_LY - 0.22,
+        "",
+        ha="right",
+        va="top",
+        fontsize=8,
+        color="white",
+        zorder=6,
+        path_effects=outline,
+    )
 
     ax_d = fig.add_subplot(gs[2, :])
     t_end = float(times[-1]) * 1e3
@@ -318,24 +414,35 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
     span = _AP_FLOOR + 2.0
     x_sab = t_pk + t_sab * 1e3 * -span / 60.0
     x_eyr = t_pk + t_eyr * 1e3 * -span / 60.0
-    ax_d.fill([t_pk, x_sab, x_eyr], [0.0, span, span], color=COLOR_MUTED,
-              alpha=0.14, lw=0.0, zorder=1)
-    for x_line, t_line, name in ((x_sab, t_sab, "Sabine"),
-                                 (x_eyr, t_eyr, "Eyring")):
-        ax_d.plot([t_pk, x_line], [0.0, span], color=COLOR_MUTED, lw=1.3,
-                  ls="--", zorder=3)
+    ax_d.fill(
+        [t_pk, x_sab, x_eyr],
+        [0.0, span, span],
+        color=COLOR_MUTED,
+        alpha=0.14,
+        lw=0.0,
+        zorder=1,
+    )
+    for x_line, t_line, name in ((x_sab, t_sab, "Sabine"), (x_eyr, t_eyr, "Eyring")):
+        ax_d.plot(
+            [t_pk, x_line], [0.0, span], color=COLOR_MUTED, lw=1.3, ls="--", zorder=3
+        )
         frac = 0.52 if name == "Sabine" else 0.30
         ax_d.annotate(
             T(f"{name}, $T$ = {t_line * 1e3:.0f} ms"),
             (t_pk + t_line * 1e3 * frac, -60.0 * frac),
             xytext=(6.0 if name == "Sabine" else -6.0, 0.0),
-            textcoords="offset points", fontsize=7.6, color=COLOR_MUTED,
+            textcoords="offset points",
+            fontsize=7.6,
+            color=COLOR_MUTED,
             ha="left" if name == "Sabine" else "right",
-            va="bottom" if name == "Sabine" else "top")
-    line_a = ax_d.plot([], [], color=COLOR_PRIMARY, lw=1.8,
-                       label=T("all four edges"), zorder=5)[0]
-    line_b = ax_d.plot([], [], color=COLOR_SECONDARY, lw=1.8,
-                       label=T("floor + ceiling"), zorder=4)[0]
+            va="bottom" if name == "Sabine" else "top",
+        )
+    line_a = ax_d.plot(
+        [], [], color=COLOR_PRIMARY, lw=1.8, label=T("all four edges"), zorder=5
+    )[0]
+    line_b = ax_d.plot(
+        [], [], color=COLOR_SECONDARY, lw=1.8, label=T("floor + ceiling"), zorder=4
+    )[0]
     # One row, hugging the top-right: the two-row box used to reach down to
     # ~-20 dB, where the concentrated room's verdict pill (whose Spanish
     # text runs wider) slid underneath it and covered the second entry's
@@ -343,29 +450,65 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
     # (~-16 dB) in both languages, and the curves stay below -30 dB in the
     # strip it occupies.
     ax_d.legend(fontsize=7.2, loc="upper right", framealpha=0.85, ncols=2)
-    pill_a = ax_d.text(0.055 * t_end, _AP_FLOOR + 4.0, "",
-                       ha="left", va="bottom", fontsize=8.5,
-                       color="white", zorder=6,
-                       bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor":
-                             COLOR_PRIMARY, "alpha": 0.8,
-                             "edgecolor": "none"})
-    pill_b = ax_d.text(0.56 * t_end, -24.0, "",
-                       ha="left", va="bottom", fontsize=8.5,
-                       color="white", zorder=6,
-                       bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor":
-                             COLOR_SECONDARY, "alpha": 0.8,
-                             "edgecolor": "none"})
-    t_txt = fig.text(0.988, 0.955, "", ha="right", va="top",
-                     family="monospace", fontsize=9.5, color=COLOR_FG)
+    pill_a = ax_d.text(
+        0.055 * t_end,
+        _AP_FLOOR + 4.0,
+        "",
+        ha="left",
+        va="bottom",
+        fontsize=8.5,
+        color="white",
+        zorder=6,
+        bbox={
+            "boxstyle": _ANIM_PILL_BOX,
+            "facecolor": COLOR_PRIMARY,
+            "alpha": 0.8,
+            "edgecolor": "none",
+        },
+    )
+    pill_b = ax_d.text(
+        0.56 * t_end,
+        -24.0,
+        "",
+        ha="left",
+        va="bottom",
+        fontsize=8.5,
+        color="white",
+        zorder=6,
+        bbox={
+            "boxstyle": _ANIM_PILL_BOX,
+            "facecolor": COLOR_SECONDARY,
+            "alpha": 0.8,
+            "edgecolor": "none",
+        },
+    )
+    t_txt = fig.text(
+        0.988,
+        0.955,
+        "",
+        ha="right",
+        va="top",
+        family="monospace",
+        fontsize=9.5,
+        color=COLOR_FG,
+    )
     fig.get_layout_engine().set(rect=(0.0, 0.03, 1.0, 0.965))
-    fig.text(0.5, 0.005,
-             T(f"Locally reacting resistive edges; both rooms hold "
-               f"{a_b * 2.0 * _AP_LX:.1f} m of statistical absorption "
-               r"($\alpha_{\mathrm{st}}$ = "
-               f"{a_a:.2f} on 21 m vs {a_b:.2f} on 16 m); "
-               f"250 Hz burst."),
-             ha="center", va="bottom", fontsize=7.2, color=COLOR_FG,
-             alpha=0.85)
+    fig.text(
+        0.5,
+        0.005,
+        T(
+            f"Locally reacting resistive edges; both rooms hold "
+            f"{a_b * 2.0 * _AP_LX:.1f} m of statistical absorption "
+            r"($\alpha_{\mathrm{st}}$ = "
+            f"{a_a:.2f} on 21 m vs {a_b:.2f} on 16 m); "
+            f"250 Hz burst."
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=7.2,
+        color=COLOR_FG,
+        alpha=0.85,
+    )
 
     # The placement penalty, drawn as the closing gap between the twins.
     # The suptitle and footer carry "same total"; the number is enough
@@ -374,18 +517,27 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
     gap = float(lev_b[k_gap] - lev_a[k_gap])
     x_gap = float(times[k_gap]) * 1e3
     arrow = ax_d.annotate(
-        "", (x_gap, float(lev_b[k_gap])), (x_gap, float(lev_a[k_gap])),
+        "",
+        (x_gap, float(lev_b[k_gap])),
+        (x_gap, float(lev_a[k_gap])),
         arrowprops={"arrowstyle": "<->", "color": COLOR_FG, "lw": 1.2},
-        visible=False)
-    gap_txt = ax_d.text(x_gap - 2.5,
-                        0.5 * float(lev_a[k_gap] + lev_b[k_gap]), "",
-                        ha="right", va="center", fontsize=8.5,
-                        color=COLOR_FG)
+        visible=False,
+    )
+    gap_txt = ax_d.text(
+        x_gap - 2.5,
+        0.5 * float(lev_a[k_gap] + lev_b[k_gap]),
+        "",
+        ha="right",
+        va="center",
+        fontsize=8.5,
+        color=COLOR_FG,
+    )
 
     reveal = int(0.7 * times.size)
     verdict_a = T(f"measured $T$ = {t_meas * 1e3:.0f} ms: inside the band")
-    verdict_b = T(f"early {t_early * 1e3:.0f} ms, tail {t_late * 1e3:.0f}"
-                  f" ms: no single $T$")
+    verdict_b = T(
+        f"early {t_early * 1e3:.0f} ms, tail {t_late * 1e3:.0f} ms: no single $T$"
+    )
     gap_note = f"{gap:.0f} dB"
     graze = T("what survives runs parallel to the absorber")
 
@@ -406,8 +558,14 @@ def animate_fdtd_absorption_placement(output_dir: str) -> None:
         arrow.set_visible(j >= k_gap)
         gap_txt.set_text(gap_note if j >= k_gap else "")
         t_txt.set_text(T(f"$t$ = {times[j] * 1e3:5.1f} ms"))
-        return (*ims, line_a, line_b, pill_a, pill_b, graze_txt, arrow,
-                gap_txt, t_txt)
+        return (*ims, line_a, line_b, pill_a, pill_b, graze_txt, arrow, gap_txt, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_absorption_placement",
-                 frames=times.size + _AP_HOLD, fps=_AP_FPS, gif_fps=6)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_absorption_placement",
+        frames=times.size + _AP_HOLD,
+        fps=_AP_FPS,
+        gif_fps=6,
+    )

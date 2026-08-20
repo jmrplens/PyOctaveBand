@@ -56,7 +56,7 @@ $\lvert H_2 \rvert = a_2/2$ (phase $-\pi/2$) and
 $\lvert H_3 \rvert = a_3/4$ (phase $\pi$), and a THD(f) equal to
 the closed form $\sqrt{(a_2/2)^2 + (a_3/4)^2} / (1 + 3 a_3/4)$ -- which
 also matches [`phonometry.electroacoustics.thd`](/phonometry/reference/api/electroacoustics/distortion/#thd) measured tone by tone on
-the same system. 
+the same system.
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

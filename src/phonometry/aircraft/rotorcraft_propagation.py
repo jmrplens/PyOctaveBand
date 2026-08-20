@@ -74,13 +74,13 @@ _RH = 60.0
 _C = 346.1
 #: CNOSSOS-EU flow resistivity by ground class, in Pa·s/m² (Doc 32 Table 5 / D1.5d Table 5).
 _FLOW_RESISTIVITY = {
-    "A": 12.5e3,   # very soft (snow, moss)
-    "B": 31.5e3,   # soft forest floor
-    "C": 80.0e3,   # uncompacted loose ground (turf, grass)
+    "A": 12.5e3,  # very soft (snow, moss)
+    "B": 31.5e3,  # soft forest floor
+    "C": 80.0e3,  # uncompacted loose ground (turf, grass)
     "D": 200.0e3,  # normal uncompacted ground (pasture)
     "E": 500.0e3,  # compacted field and gravel
-    "F": 2.0e6,    # compacted dense ground (gravel road, car park)
-    "G": 20.0e6,   # hard surfaces (asphalt, concrete)
+    "F": 2.0e6,  # compacted dense ground (gravel road, car park)
+    "G": 20.0e6,  # hard surfaces (asphalt, concrete)
     "H": 200.0e6,  # very hard and dense (dense asphalt, water)
 }
 
@@ -91,7 +91,9 @@ _FLOW_RESISTIVITY = {
 
 
 def spherical_spreading_adjustment(
-    distance: float, *, reference_distance: float = _RH,
+    distance: float,
+    *,
+    reference_distance: float = _RH,
 ) -> float:
     r"""Spherical-spreading adjustment ``ΔLs`` of the hemisphere level (Eq. 24).
 
@@ -172,7 +174,9 @@ def atmospheric_adjustment(
 
 
 def _absorption_coefficient(
-    frequencies: NDArray[np.float64], temperature: float, relative_humidity: float,
+    frequencies: NDArray[np.float64],
+    temperature: float,
+    relative_humidity: float,
     pressure: float,
 ) -> NDArray[np.float64]:
     """ISO 9613-1 pure-tone ``α`` in dB/m at the exact band centres (Eq. 27).
@@ -192,15 +196,19 @@ def _absorption_coefficient(
     with warnings.catch_warnings():
         if frequencies.max() <= 10000.0:
             warnings.filterwarnings(
-                "ignore", message="One or more frequencies are outside",
-                category=AtmosphericAbsorptionWarning)
+                "ignore",
+                message="One or more frequencies are outside",
+                category=AtmosphericAbsorptionWarning,
+            )
         alpha = air_attenuation(
-            frequencies, temperature, relative_humidity, pressure, exact_midband=True)
+            frequencies, temperature, relative_humidity, pressure, exact_midband=True
+        )
     return np.asarray(alpha, dtype=np.float64)
 
 
 def _delany_bazley_impedance(
-    frequencies: NDArray[np.float64], flow_resistivity: float) -> NDArray[np.complex128]:
+    frequencies: NDArray[np.float64], flow_resistivity: float
+) -> NDArray[np.complex128]:
     """Delany-Bazley one-parameter normalised surface impedance ``Zs`` (Eq. 35)."""
     ratio = frequencies / flow_resistivity
     real = 1.0 + 0.0511 * ratio ** (-0.754)
@@ -258,7 +266,8 @@ def _resolve_flow_resistivity(flow_resistivity: float | str) -> float:
         if key not in _FLOW_RESISTIVITY:
             valid = ", ".join(sorted(_FLOW_RESISTIVITY))
             raise ValueError(
-                f"'flow_resistivity' class must be one of {valid}, got {flow_resistivity!r}.")
+                f"'flow_resistivity' class must be one of {valid}, got {flow_resistivity!r}."
+            )
         return _FLOW_RESISTIVITY[key]
     return require_positive(flow_resistivity, "flow_resistivity")
 
@@ -282,14 +291,16 @@ def _ground_effect(
     from scipy.special import wofz
 
     f = frequencies[None, :]
-    hs = np.maximum(np.atleast_1d(np.asarray(source_height, dtype=np.float64)), 0.1)[:, None]
+    hs = np.maximum(np.atleast_1d(np.asarray(source_height, dtype=np.float64)), 0.1)[
+        :, None
+    ]
     hr = max(receiver_height, 0.1)
     dp = horizontal_distances[:, None]
 
-    r1 = np.hypot(dp, hs - hr)                    # direct path
-    r2 = np.hypot(dp, hs + hr)                    # reflected path (image source)
-    dr = r2 - r1                                  # path-length difference ΔR
-    cos_xi = (hs + hr) / r2                       # incidence angle from the normal
+    r1 = np.hypot(dp, hs - hr)  # direct path
+    r2 = np.hypot(dp, hs + hr)  # reflected path (image source)
+    dr = r2 - r1  # path-length difference ΔR
+    cos_xi = (hs + hr) / r2  # incidence angle from the normal
     k = 2.0 * np.pi * f / _C
 
     sig = np.atleast_1d(np.asarray(sigma, dtype=np.float64))[:, None]
@@ -304,15 +315,16 @@ def _ground_effect(
     psi = np.angle(q)
 
     a = 0.727 * f * dr / _C
-    sinc = np.sinc(a / np.pi)                                 # sin(a)/a, = 1 at a = 0
-    inter = sinc * np.cos(6.325 * f * dr / _C + psi)          # I (Eq. 30)
+    sinc = np.sinc(a / np.pi)  # sin(a)/a, = 1 at a = 0
+    inter = sinc * np.cos(6.325 * f * dr / _C + psi)  # I (Eq. 30)
     ratio = r1 / r2
     arg = 1.0 + ratio**2 * q_mag**2 + 2.0 * ratio * q_mag * inter
     return np.asarray(10.0 * np.log10(np.maximum(arg, 1e-15)), dtype=np.float64)
 
 
 def _delany_bazley_impedance_grid(
-    frequencies: NDArray[np.float64], sigma_column: NDArray[np.float64],
+    frequencies: NDArray[np.float64],
+    sigma_column: NDArray[np.float64],
 ) -> NDArray[np.complex128]:
     """``Zs`` (Eq. 35) broadcast over a ``(G, 1)`` flow-resistivity column."""
     ratio = frequencies[None, :] / sigma_column
@@ -351,8 +363,10 @@ class MeanGroundPlaneResult:
 
     def height(self, distance: float | NDArray[np.float64]) -> NDArray[np.float64]:
         r"""The plane height :math:`a\,d + b` at ``distance``, in metres."""
-        return np.asarray(self.slope * np.asarray(distance, dtype=np.float64)
-                          + self.intercept, dtype=np.float64)
+        return np.asarray(
+            self.slope * np.asarray(distance, dtype=np.float64) + self.intercept,
+            dtype=np.float64,
+        )
 
     def equivalent_height(self, distance: float, height: float) -> float:
         """The orthogonal (equivalent) height of a point above the plane.
@@ -361,15 +375,21 @@ class MeanGroundPlaneResult:
         heights, floored at 0.1 m for source and receiver, into the
         flat-ground equations (§A.4.4).
         """
-        return float((height - self.slope * distance - self.intercept)
-                     / math.hypot(1.0, self.slope))
+        return float(
+            (height - self.slope * distance - self.intercept)
+            / math.hypot(1.0, self.slope)
+        )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the terrain section and the fitted mean ground plane."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_mean_ground_plane
 
-        return plot_mean_ground_plane(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_mean_ground_plane(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def mean_ground_plane(
@@ -412,7 +432,8 @@ def _validated_section(
 
 
 def _mean_plane_coefficients(
-    d: NDArray[np.float64], z: NDArray[np.float64],
+    d: NDArray[np.float64],
+    z: NDArray[np.float64],
 ) -> tuple[float, float]:
     """The Eq. 37/38 closed-form least-squares line through a polyline."""
     ak = np.diff(z) / np.diff(d)
@@ -421,8 +442,10 @@ def _mean_plane_coefficients(
     big_b = np.sum(ak * np.diff(d**2)) + 2.0 * np.sum(bk * np.diff(d))
     span = float(d[-1] - d[0])
     a = 3.0 * (2.0 * big_a - big_b * (d[-1] + d[0])) / span**3
-    b = (2.0 * float(d[-1]**3 - d[0]**3) / span**4 * big_b
-         - 3.0 * (d[-1] + d[0]) / span**3 * big_a)
+    b = (
+        2.0 * float(d[-1] ** 3 - d[0] ** 3) / span**4 * big_b
+        - 3.0 * (d[-1] + d[0]) / span**3 * big_a
+    )
     return float(a), float(b)
 
 
@@ -547,12 +570,16 @@ class TerrainScreeningResult:
     distances: NDArray[np.float64]
     heights: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the section geometry: terrain, line of sight and sound path."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_terrain_screening
 
-        return plot_terrain_screening(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_terrain_screening(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def terrain_screening_adjustment(
@@ -611,20 +638,33 @@ def terrain_screening_adjustment(
     d, z = _validated_section(distances, heights)
     src = (float(source[0]), float(source[1]))
     rcv = (float(receiver[0]), float(receiver[1]))
-    if not (np.isfinite(src[0]) and np.isfinite(src[1])
-            and np.isfinite(rcv[0]) and np.isfinite(rcv[1])):
+    if not (
+        np.isfinite(src[0])
+        and np.isfinite(src[1])
+        and np.isfinite(rcv[0])
+        and np.isfinite(rcv[1])
+    ):
         raise ValueError("'source' and 'receiver' must be finite (d, z) points.")
     if src[0] >= rcv[0]:
-        raise ValueError("'source' must lie at a smaller section distance than 'receiver'.")
+        raise ValueError(
+            "'source' must lie at a smaller section distance than 'receiver'."
+        )
     if d[0] > src[0] + 1e-9 or d[-1] < rcv[0] - 1e-9:
         raise ValueError("The terrain section must cover [source d, receiver d].")
     sigma_seg = _segment_resistivities(flow_resistivity, d.size - 1)
     d, z, sigma_seg = _cropped_section(d, z, sigma_seg, src[0], rcv[0])
     adjustment, screened, delta, points = _screening_core(f, src, rcv, d, z, sigma_seg)
     return TerrainScreeningResult(
-        frequencies=f, adjustment=adjustment, screened=screened,
-        path_difference=delta, diffraction_points=points, source=src,
-        receiver=rcv, distances=d, heights=z)
+        frequencies=f,
+        adjustment=adjustment,
+        screened=screened,
+        path_difference=delta,
+        diffraction_points=points,
+        source=src,
+        receiver=rcv,
+        distances=d,
+        heights=z,
+    )
 
 
 def _segment_resistivities(
@@ -638,14 +678,18 @@ def _segment_resistivities(
         return np.full(n_segments, _resolve_flow_resistivity(float(flow_resistivity)))  # type: ignore[arg-type]
     arr = require_positive_array(flow_resistivity, "flow_resistivity")
     if arr.shape != (n_segments,):
-        raise ValueError("Per-segment 'flow_resistivity' must have one value per "
-                         "profile segment.")
+        raise ValueError(
+            "Per-segment 'flow_resistivity' must have one value per profile segment."
+        )
     return arr
 
 
 def _cropped_section(
-    d: NDArray[np.float64], z: NDArray[np.float64],
-    sigma_seg: NDArray[np.float64], d_lo: float, d_hi: float,
+    d: NDArray[np.float64],
+    z: NDArray[np.float64],
+    sigma_seg: NDArray[np.float64],
+    d_lo: float,
+    d_hi: float,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """The section restricted to ``[d_lo, d_hi]`` with interpolated ends."""
     keep = (d > d_lo) & (d < d_hi)
@@ -672,10 +716,13 @@ def _upper_hull(points: NDArray[np.float64]) -> NDArray[np.float64]:
 
 def _side_ground(
     f: NDArray[np.float64],
-    d: NDArray[np.float64], z: NDArray[np.float64],
+    d: NDArray[np.float64],
+    z: NDArray[np.float64],
     sigma_seg: NDArray[np.float64],
-    p_lo: tuple[float, float], p_hi: tuple[float, float],
-    clamp_lo: bool, clamp_hi: bool,
+    p_lo: tuple[float, float],
+    p_hi: tuple[float, float],
+    clamp_lo: bool,
+    clamp_hi: bool,
 ) -> tuple[NDArray[np.float64], float, float, float]:
     """Mean-plane ground effect between two points of the section.
 
@@ -708,8 +755,10 @@ def _side_ground(
 
 def _screening_core(
     f: NDArray[np.float64],
-    src: tuple[float, float], rcv: tuple[float, float],
-    d: NDArray[np.float64], z: NDArray[np.float64],
+    src: tuple[float, float],
+    rcv: tuple[float, float],
+    d: NDArray[np.float64],
+    z: NDArray[np.float64],
     sigma_seg: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], bool, float, NDArray[np.float64]]:
     """The combined ground-and-screening adjustment of a section (Eq. 45-47)."""
@@ -724,11 +773,12 @@ def _screening_core(
         return clear, False, float("nan"), np.empty((0, 2))
 
     # Blocked: rubber band over the terrain (the shortest convex path).
-    pts = np.vstack([[src[0], src[1]], np.column_stack([d[above], z[above]]),
-                     [rcv[0], rcv[1]]])
+    pts = np.vstack(
+        [[src[0], src[1]], np.column_stack([d[above], z[above]]), [rcv[0], rcv[1]]]
+    )
     hull = _upper_hull(pts)
     edges = hull[1:-1]
-    if edges.shape[0] == 0:   # numerically grazing: treat as clear
+    if edges.shape[0] == 0:  # numerically grazing: treat as clear
         return clear, False, float("nan"), np.empty((0, 2))
     seg_len = np.hypot(np.diff(hull[:, 0]), np.diff(hull[:, 1]))
     direct = math.hypot(rcv[0] - src[0], rcv[1] - src[1])
@@ -743,24 +793,31 @@ def _screening_core(
     ag_r, zo_r, zr, a_r = _side_ground(f, d, z, sigma_seg, o_last, rcv, False, True)
     h0 = max(max(zo_s, 0.0), max(zo_r, 0.0))
 
-    delta_img_s = _image_path_difference(hull, _mirrored_point(src, zs, a_s),
-                                         side="source")
-    delta_img_r = _image_path_difference(hull, _mirrored_point(rcv, zr, a_r),
-                                         side="receiver")
+    delta_img_s = _image_path_difference(
+        hull, _mirrored_point(src, zs, a_s), side="source"
+    )
+    delta_img_r = _image_path_difference(
+        hull, _mirrored_point(rcv, zr, a_r), side="receiver"
+    )
     ld = diffraction_attenuation(f, delta, edge_height=h0, edge_span=span)
-    ld_free = diffraction_attenuation(f, delta, edge_height=h0, edge_span=span,
-                                      capped=False)
-    ld_s = diffraction_attenuation(f, delta_img_s, edge_height=h0,
-                                   edge_span=span, capped=False)
-    ld_r = diffraction_attenuation(f, delta_img_r, edge_height=h0,
-                                   edge_span=span, capped=False)
+    ld_free = diffraction_attenuation(
+        f, delta, edge_height=h0, edge_span=span, capped=False
+    )
+    ld_s = diffraction_attenuation(
+        f, delta_img_s, edge_height=h0, edge_span=span, capped=False
+    )
+    ld_r = diffraction_attenuation(
+        f, delta_img_r, edge_height=h0, edge_span=span, capped=False
+    )
     # Eq. 46/47: the side ground attenuations, weighted by their image-path
     # diffractions (A = −ΔLg maps the Eq. 23 adjustments onto attenuations).
     lg_s = -20.0 * np.log10(
-        1.0 + (10.0 ** (ag_s / 20.0) - 1.0) * 10.0 ** (-(ld_s - ld_free) / 20.0))
+        1.0 + (10.0 ** (ag_s / 20.0) - 1.0) * 10.0 ** (-(ld_s - ld_free) / 20.0)
+    )
     lg_r = -20.0 * np.log10(
-        1.0 + (10.0 ** (ag_r / 20.0) - 1.0) * 10.0 ** (-(ld_r - ld_free) / 20.0))
-    total = ld + lg_s + lg_r                       # Eq. 45, an attenuation
+        1.0 + (10.0 ** (ag_r / 20.0) - 1.0) * 10.0 ** (-(ld_r - ld_free) / 20.0)
+    )
+    total = ld + lg_s + lg_r  # Eq. 45, an attenuation
     # Per-band trigger (§A.4.5): bands with δ < −λ/20 keep the clear path.
     screened_band = delta >= -(_C / f) / 20.0
     adjustment = np.where(screened_band, -total, clear)
@@ -768,7 +825,9 @@ def _screening_core(
 
 
 def _mirrored_point(
-    point: tuple[float, float], equivalent_height: float, slope: float,
+    point: tuple[float, float],
+    equivalent_height: float,
+    slope: float,
 ) -> tuple[float, float]:
     r"""The orthogonal mirror image of a point across a side mean plane.
 
@@ -784,7 +843,9 @@ def _mirrored_point(
 
 
 def _image_path_difference(
-    hull: NDArray[np.float64], image: tuple[float, float], side: str,
+    hull: NDArray[np.float64],
+    image: tuple[float, float],
+    side: str,
 ) -> float:
     """The rubber-band path difference from an image point (Eq. 46/47).
 

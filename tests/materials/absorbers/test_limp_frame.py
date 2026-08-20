@@ -78,9 +78,7 @@ def test_decoupling_frequency_allard_table_6_1() -> None:
 
 def test_decoupling_frequency_scaling() -> None:
     """The closed form is quadratic in porosity and inverse in frame density."""
-    base = materials.decoupling_frequency(
-        25.0e3, porosity=0.5, frame_density=30.0
-    )
+    base = materials.decoupling_frequency(25.0e3, porosity=0.5, frame_density=30.0)
     assert materials.decoupling_frequency(
         25.0e3, porosity=1.0, frame_density=30.0
     ) == pytest.approx(4.0 * base)
@@ -93,9 +91,7 @@ def test_decoupling_frequency_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="must be positive"):
         materials.decoupling_frequency(-1.0, porosity=0.98, frame_density=30.0)
     with pytest.raises(ValueError, match="must not exceed 1"):
-        materials.decoupling_frequency(
-            25.0e3, porosity=1.5, frame_density=30.0
-        )
+        materials.decoupling_frequency(25.0e3, porosity=1.5, frame_density=30.0)
 
 
 def test_limp_effective_density_matches_the_printed_closed_form() -> None:
@@ -130,9 +126,7 @@ def test_limp_frame_low_frequency_limit_is_the_apparent_total_density() -> None:
     )
     rho0 = rigid.air_density
     rho_t = TABLE_11_2_FRAME_DENSITY + TABLE_11_2["porosity"] * rho0
-    assert float(np.real(limp.effective_density[0])) == pytest.approx(
-        rho_t, rel=1e-6
-    )
+    assert float(np.real(limp.effective_density[0])) == pytest.approx(rho_t, rel=1e-6)
     assert float(np.imag(limp.effective_density[0])) == pytest.approx(0.0, abs=1e-3)
     # The rigid-frame model has no finite limit to compare with.
     assert abs(rigid.effective_density[0]) > 1.0e6 * rho_t
@@ -149,17 +143,15 @@ def test_limp_frame_recovers_the_rigid_frame_for_a_heavy_frame() -> None:
     rigid = _rigid(f)
     errors = []
     for rho1 in (1.0e9, 1.0e12):
-        limp = materials.limp_frame(
-            rigid, rho1, porosity=TABLE_11_2["porosity"]
-        )
+        limp = materials.limp_frame(rigid, rho1, porosity=TABLE_11_2["porosity"])
         errors.append(
-            float(np.max(np.abs(limp.effective_density / rigid.effective_density - 1.0)))
+            float(
+                np.max(np.abs(limp.effective_density / rigid.effective_density - 1.0))
+            )
         )
     assert errors[1] < 1.0e-5
     assert errors[0] / errors[1] == pytest.approx(1000.0, rel=0.05)
-    heavy = materials.limp_frame(
-        rigid, 1.0e12, porosity=TABLE_11_2["porosity"]
-    )
+    heavy = materials.limp_frame(rigid, 1.0e12, porosity=TABLE_11_2["porosity"])
     assert np.allclose(
         heavy.characteristic_impedance, rigid.characteristic_impedance, rtol=1e-5
     )
@@ -223,7 +215,9 @@ def test_limp_and_rigid_converge_well_above_the_decoupling_frequency() -> None:
     assert ratio[2] < 0.02
 
 
-def test_limp_layer_drops_the_low_frequency_absorption_of_the_table_11_2_layer() -> None:
+def test_limp_layer_drops_the_low_frequency_absorption_of_the_table_11_2_layer() -> (
+    None
+):
     """The 50 mm Table 11.2 layer, rigidly backed, in the transfer-matrix stack.
 
     The limp medium is a drop-in ``PorousLayer`` medium. Below the decoupling
@@ -255,7 +249,8 @@ def test_limp_frame_plot_smoke() -> None:
 
     matplotlib.use("Agg")
     limp = materials.limp_frame(
-        _rigid(np.array([100.0, 400.0, 1600.0])), TABLE_11_2_FRAME_DENSITY,
+        _rigid(np.array([100.0, 400.0, 1600.0])),
+        TABLE_11_2_FRAME_DENSITY,
         porosity=TABLE_11_2["porosity"],
     )
     ax = limp.plot()
@@ -286,9 +281,7 @@ def test_limp_frame_criteria_match_the_printed_thresholds() -> None:
     assert not materials.limp_frame_applicable(5.1e3, criterion="beranek")
     # Exactly at the boundary of each printed threshold.
     for name, ratio in materials.LIMP_FRAME_CRITERIA.items():
-        assert materials.limp_frame_applicable(
-            ratio * 101325.0, criterion=name
-        )
+        assert materials.limp_frame_applicable(ratio * 101325.0, criterion=name)
         assert not materials.limp_frame_applicable(
             ratio * 101325.0 * (1.0 + 1e-9), criterion=name
         )

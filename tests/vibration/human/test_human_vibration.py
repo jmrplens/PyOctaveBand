@@ -34,15 +34,36 @@ def _fc(n: int) -> float:
 # ---------------------------------------------------------------------------
 # (name, band index n, design-goal factor) sampled across every weighting.
 _ANNEX_B = [
-    ("Wk", 0, 0.4825), ("Wk", 8, 1.054), ("Wk", 20, 0.08873), ("Wk", -10, 0.03121),
-    ("Wd", 0, 1.011), ("Wd", 13, 0.1004), ("Wd", 26, 0.0003164),
-    ("Wc", 1, 1.000), ("Wc", 8, 0.9739), ("Wc", 20, 0.05665),
-    ("We", 0, 0.8798), ("We", 7, 0.2012), ("We", 20, 0.007071),
-    ("Wj", 15, 1.000), ("Wj", 0, 0.4844), ("Wj", 20, 0.7075),
-    ("Wb", 8, 1.054), ("Wb", 0, 0.3853), ("Wb", 20, 0.1154),
-    ("Wf", -8, 1.004), ("Wf", -10, 0.6951), ("Wf", 0, 0.02352),
-    ("Wh", 8, 0.7272), ("Wh", 10, 0.9514), ("Wh", 20, 0.1602), ("Wh", 30, 0.01346),
-    ("Wm", 2, 0.9342), ("Wm", 10, 0.4941), ("Wm", -1, 0.7003), ("Wm", 20, 0.04013),
+    ("Wk", 0, 0.4825),
+    ("Wk", 8, 1.054),
+    ("Wk", 20, 0.08873),
+    ("Wk", -10, 0.03121),
+    ("Wd", 0, 1.011),
+    ("Wd", 13, 0.1004),
+    ("Wd", 26, 0.0003164),
+    ("Wc", 1, 1.000),
+    ("Wc", 8, 0.9739),
+    ("Wc", 20, 0.05665),
+    ("We", 0, 0.8798),
+    ("We", 7, 0.2012),
+    ("We", 20, 0.007071),
+    ("Wj", 15, 1.000),
+    ("Wj", 0, 0.4844),
+    ("Wj", 20, 0.7075),
+    ("Wb", 8, 1.054),
+    ("Wb", 0, 0.3853),
+    ("Wb", 20, 0.1154),
+    ("Wf", -8, 1.004),
+    ("Wf", -10, 0.6951),
+    ("Wf", 0, 0.02352),
+    ("Wh", 8, 0.7272),
+    ("Wh", 10, 0.9514),
+    ("Wh", 20, 0.1602),
+    ("Wh", 30, 0.01346),
+    ("Wm", 2, 0.9342),
+    ("Wm", 10, 0.4941),
+    ("Wm", -1, 0.7003),
+    ("Wm", 20, 0.04013),
 ]
 
 
@@ -115,13 +136,34 @@ def test_iso5349_1_wh_third_octave_table_a2() -> None:
     """The Wh factors match ISO 5349-1 Table A.2 to its three figures."""
     # (nominal band centre, Whi) from ISO 5349-1:2001 Table A.2.
     a2 = {
-        6.3: 0.727, 8.0: 0.873, 10.0: 0.951, 12.5: 0.958, 16.0: 0.896,
-        20.0: 0.782, 25.0: 0.647, 31.5: 0.519, 40.0: 0.411, 100.0: 0.160,
-        250.0: 0.0634, 1000.0: 0.0135,
+        6.3: 0.727,
+        8.0: 0.873,
+        10.0: 0.951,
+        12.5: 0.958,
+        16.0: 0.896,
+        20.0: 0.782,
+        25.0: 0.647,
+        31.5: 0.519,
+        40.0: 0.411,
+        100.0: 0.160,
+        250.0: 0.0634,
+        1000.0: 0.0135,
     }
     # Evaluate at the *true* centres the table is computed at.
-    n_of = {6.3: 8, 8.0: 9, 10.0: 10, 12.5: 11, 16.0: 12, 20.0: 13, 25.0: 14,
-            31.5: 15, 40.0: 16, 100.0: 20, 250.0: 24, 1000.0: 30}
+    n_of = {
+        6.3: 8,
+        8.0: 9,
+        10.0: 10,
+        12.5: 11,
+        16.0: 12,
+        20.0: 13,
+        25.0: 14,
+        31.5: 15,
+        40.0: 16,
+        100.0: 20,
+        250.0: 24,
+        1000.0: 30,
+    }
     for nominal, expected in a2.items():
         got = hv.weighting_factors("Wh", _fc(n_of[nominal]))[0]
         assert got == pytest.approx(expected, rel=2e-3, abs=5e-4)
@@ -172,7 +214,7 @@ def test_apply_weighting_scales_sine_by_magnitude() -> None:
     y = hv.apply_weighting(x, fs, name="Wk")
     factor = hv.weighting_factors("Wk", f0)[0]
     # Interior r.m.s. (drop edges) equals |H(f0)| * input r.m.s. (~1).
-    interior = y[int(0.5 * fs):-int(0.5 * fs)]
+    interior = y[int(0.5 * fs) : -int(0.5 * fs)]
     assert float(np.sqrt(np.mean(interior**2))) == pytest.approx(factor, rel=2e-2)
 
 
@@ -329,9 +371,7 @@ def test_iso5349_2_example_e3_forestry_multi_tool() -> None:
 
 def test_iso5349_1_example_multi_operation() -> None:
     """ISO 5349-1 5.3 worked example: 1 h/3 h/0,5 h -> A(8)=3,4 m/s2."""
-    a8 = hv.hav_daily_exposure(
-        [2.0, 3.5, 10.0], [3600.0, 3 * 3600.0, 0.5 * 3600.0]
-    )
+    a8 = hv.hav_daily_exposure([2.0, 3.5, 10.0], [3600.0, 3 * 3600.0, 0.5 * 3600.0])
     assert a8 == pytest.approx(3.4, abs=0.05)
 
 
@@ -339,7 +379,9 @@ def test_hav_daily_exposure_matches_partial_combination() -> None:
     values = [3.0, 5.0]
     durations = [2 * 3600.0, 1 * 3600.0]
     direct = hv.hav_daily_exposure(values, durations)
-    partials = [hv.partial_exposure(v, d) for v, d in zip(values, durations, strict=True)]
+    partials = [
+        hv.partial_exposure(v, d) for v, d in zip(values, durations, strict=True)
+    ]
     assert direct == pytest.approx(hv.combine_partial_exposures(partials))
 
 
@@ -415,13 +457,22 @@ def test_daily_vibration_exposure_default_labels_and_mismatch() -> None:
     result = hv.daily_vibration_exposure([2.0], [3600.0], kind="wbv")
     assert result.labels == ("op 1",)
     with pytest.raises(ValueError, match="labels"):
-        hv.daily_vibration_exposure([2.0, 3.0], [1.0, 1.0], kind="hav",
-                                    labels=["only-one"])
+        hv.daily_vibration_exposure(
+            [2.0, 3.0], [1.0, 1.0], kind="hav", labels=["only-one"]
+        )
 
 
 def test_weighting_names_complete() -> None:
     assert set(hv.WEIGHTING_NAMES) == {
-        "Wb", "Wc", "Wd", "We", "Wf", "Wh", "Wj", "Wk", "Wm"
+        "Wb",
+        "Wc",
+        "Wd",
+        "We",
+        "Wf",
+        "Wh",
+        "Wj",
+        "Wk",
+        "Wm",
     }
 
 
@@ -504,9 +555,7 @@ def test_weighted_spectrum_plot_returns_axes() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    result = hv.weighted_acceleration(
-        [0.5, 0.8, 0.3], [16.0, 31.5, 63.0], "Wk"
-    )
+    result = hv.weighted_acceleration([0.5, 0.8, 0.3], [16.0, 31.5, 63.0], "Wk")
     ax = result.plot()
     assert isinstance(ax, plt.Axes)
     plt.close("all")
@@ -518,9 +567,7 @@ def test_daily_vibration_exposure_plot_returns_axes() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    result = hv.daily_vibration_exposure(
-        [2.5, 3.0], [3600.0, 1800.0], kind="hav"
-    )
+    result = hv.daily_vibration_exposure([2.5, 3.0], [3600.0, 1800.0], kind="hav")
     ax = result.plot()
     assert isinstance(ax, plt.Axes)
     plt.close("all")

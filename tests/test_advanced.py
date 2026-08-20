@@ -72,7 +72,9 @@ def test_invalid_inputs() -> None:
     x = np.zeros(1000)
 
     # Invalid limits: reversed
-    with pytest.raises(ValueError, match="lower limit must be less than the upper limit"):
+    with pytest.raises(
+        ValueError, match="lower limit must be less than the upper limit"
+    ):
         filters.octave_filter(x, fs, limits=[20000.0, 100.0])
 
     # Invalid limits: non-positive
@@ -122,11 +124,11 @@ def test_short_signal() -> None:
     # approx factor = fs / (2*freq) -> 48000 / 24 = 2000
     # Let's try a very short signal
     rng = np.random.default_rng(42)
-    x = rng.standard_normal(100) 
-    
+    x = rng.standard_normal(100)
+
     # This might fail if resample produces empty array or 0 length
     spl, freq = filters.octave_filter(x, fs, limits=[12.0, 100.0])
-    
+
     assert not np.isnan(spl).any()
     assert len(spl) == len(freq)
 
@@ -150,7 +152,7 @@ def test_nan_handling() -> None:
     rng = np.random.default_rng(42)
     x = rng.standard_normal(4800)
     x[100] = np.nan
-    
+
     spl, _ = filters.octave_filter(x, fs)
     # Expect NaNs in SPL
     assert np.isnan(spl).any()
@@ -172,9 +174,9 @@ def test_silence() -> None:
     """
     fs = 48000
     x = np.zeros(fs)
-    
+
     spl, _ = filters.octave_filter(x, fs)
-    
+
     # Should be very low dB (approx -inf, but code clips to eps)
     assert np.all(spl < -100)
 
@@ -196,16 +198,16 @@ def test_nyquist_limit() -> None:
     - It should automatically prune the bands above 500 Hz.
     - The returned frequencies should all be less than 500 Hz.
     """
-    fs = 1000 # Nyquist 500
+    fs = 1000  # Nyquist 500
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs)
-    
+
     # Request up to 1000Hz
     # _deleteouters should warn and remove high bands
     with pytest.warns(UserWarning, match="frequencies above fs/2 removed"):
         _, freq = filters.octave_filter(x, fs, limits=[10.0, 1000.0])
-        
-    assert np.all(np.array(freq) < fs/2)
+
+    assert np.all(np.array(freq) < fs / 2)
 
 
 def test_high_order_stability() -> None:
@@ -227,11 +229,11 @@ def test_high_order_stability() -> None:
     fs = 48000
     rng = np.random.default_rng(42)
     x = rng.standard_normal(fs)
-    
+
     # Order 12 or 24 is quite high for standard IIR, but SOS is better.
     # We just want to ensure it doesn't explode into NaNs.
     spl, _ = filters.octave_filter(x, fs, order=12)
     assert not np.isnan(spl).any()
-    
+
     spl2, _ = filters.octave_filter(x, fs, order=24)
     assert not np.isnan(spl2).any()

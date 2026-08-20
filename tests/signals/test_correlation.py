@@ -30,9 +30,7 @@ N = 32768
 
 
 def _white(seed: int, rms: float = 1.0, n: int = N) -> np.ndarray:
-    return ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=rms, seed=seed
-    )
+    return ph.signals.noise_signal(FS, n / FS, color="white", rms=rms, seed=seed)
 
 
 def _bandlimited(seed: int, cutoff: float, n: int = N) -> np.ndarray:
@@ -52,9 +50,7 @@ def _fractional_delay(x: np.ndarray, shift: float) -> np.ndarray:
 def _bandlimited_pulse(n: int, position: float, cutoff_norm: float) -> np.ndarray:
     """Band-limited impulse centred at a (fractional) sample position."""
     f = np.fft.rfftfreq(n)
-    spectrum = np.exp(-((f / cutoff_norm) ** 2)) * np.exp(
-        -2j * np.pi * f * position
-    )
+    spectrum = np.exp(-((f / cutoff_norm) ** 2)) * np.exp(-2j * np.pi * f * position)
     return np.asarray(np.fft.irfft(spectrum, n), dtype=np.float64)
 
 
@@ -68,9 +64,7 @@ def test_sine_autocorrelation_closed_form_unbiased() -> None:
     amp, f0 = 2.0, 128.0
     t = np.arange(N) / FS
     x = amp * np.sin(2.0 * np.pi * f0 * t)
-    res = ph.signals.correlation(
-        x, fs=FS, normalization="unbiased", max_lag=0.05
-    )
+    res = ph.signals.correlation(x, fs=FS, normalization="unbiased", max_lag=0.05)
     expected = (amp**2 / 2.0) * np.cos(2.0 * np.pi * f0 * res.lags)
     np.testing.assert_allclose(res.values, expected, atol=5e-3 * amp**2)
 
@@ -81,17 +75,16 @@ def test_sine_autocorrelation_biased_tapers_by_one_minus_lag_over_t() -> None:
     biased = ph.signals.correlation(x, fs=FS, normalization="biased")
     unbiased = ph.signals.correlation(x, fs=FS, normalization="unbiased")
     taper = 1.0 - np.abs(biased.lags) * FS / x.size
-    np.testing.assert_allclose(biased.values, unbiased.values * taper,
-                               rtol=1e-9, atol=1e-12)
+    np.testing.assert_allclose(
+        biased.values, unbiased.values * taper, rtol=1e-9, atol=1e-12
+    )
 
 
 def test_bandlimited_white_noise_autocorrelation_is_sinc() -> None:
     """ρxx(τ) of bandwidth-B white noise = sin(2πBτ)/(2πBτ) (Eq. 8.120)."""
     bandwidth = FS / 5.0
     x = _bandlimited(21, bandwidth)
-    res = ph.signals.correlation(
-        x, fs=FS, normalization="coefficient", max_lag=0.01
-    )
+    res = ph.signals.correlation(x, fs=FS, normalization="coefficient", max_lag=0.01)
     arg = 2.0 * np.pi * bandwidth * res.lags
     expected = np.ones_like(arg)
     nz = arg != 0.0
@@ -113,17 +106,13 @@ def test_cross_correlation_peaks_at_the_imposed_delay() -> None:
     """B&P Eq. 5.21: R̂xy peaks at τ0 with ρ ≈ α·σx/σy (Eq. 5.22)."""
     delay = 40
     x = _white(2)
-    noise = ph.signals.noise_signal(
-        FS, N / FS, color="white", rms=0.75, seed=3
-    )
+    noise = ph.signals.noise_signal(FS, N / FS, color="white", rms=0.75, seed=3)
     y = 0.5 * np.roll(x, delay) + noise
     res = ph.signals.correlation(x, y, FS, normalization="coefficient")
     peak = int(np.argmax(res.values))
     assert res.lags[peak] == pytest.approx(delay / FS)
     # α·σx/σy = 0.5/sqrt(0.25 + 0.5625)
-    assert res.values[peak] == pytest.approx(
-        0.5 / np.sqrt(0.25 + 0.5625), abs=0.01
-    )
+    assert res.values[peak] == pytest.approx(0.5 / np.sqrt(0.25 + 0.5625), abs=0.01)
     assert res.kind == "cross-correlation"
 
 
@@ -148,9 +137,7 @@ def test_autocorrelation_zero_lag_error_is_one_over_sqrt_bt() -> None:
         # Raw Gaussian noise: noise_signal rescales to an exact RMS, which
         # would remove precisely the zero-lag fluctuation measured here.
         x = np.random.default_rng(100 + seed).standard_normal(n)
-        res = ph.signals.correlation(
-            x, fs=FS, normalization="biased", max_lag=0.002
-        )
+        res = ph.signals.correlation(x, fs=FS, normalization="biased", max_lag=0.002)
         zero = int(np.argmin(np.abs(res.lags)))
         values.append(res.values[zero])
     arr = np.asarray(values)
@@ -161,9 +148,7 @@ def test_autocorrelation_zero_lag_error_is_one_over_sqrt_bt() -> None:
 
 def test_random_error_method_matches_the_closed_form() -> None:
     x = _bandlimited(5, 2000.0)
-    res = ph.signals.correlation(
-        x, fs=FS, normalization="coefficient", max_lag=0.01
-    )
+    res = ph.signals.correlation(x, fs=FS, normalization="coefficient", max_lag=0.01)
     eps = res.random_error(2000.0)
     expected = np.sqrt(1.0 + res.coefficient**-2.0) / np.sqrt(
         2.0 * 2000.0 * res.duration
@@ -171,9 +156,7 @@ def test_random_error_method_matches_the_closed_form() -> None:
     ok = res.coefficient != 0.0
     np.testing.assert_allclose(eps[ok], expected[ok], rtol=1e-12)
     zero = int(np.argmin(np.abs(res.lags)))
-    assert eps[zero] == pytest.approx(
-        1.0 / np.sqrt(2000.0 * res.duration), rel=1e-6
-    )
+    assert eps[zero] == pytest.approx(1.0 / np.sqrt(2000.0 * res.duration), rel=1e-6)
 
 
 def test_correlation_random_error_reproduces_example_8_5() -> None:
@@ -215,7 +198,12 @@ def test_integer_delay_recovered_by_every_gcc_weighting(weighting: str) -> None:
     x = _white(7)
     y = np.roll(x, delay)
     res = ph.signals.time_delay(
-        x, y, FS, method="gcc", weighting=weighting, nperseg=2048  # type: ignore[arg-type]
+        x,
+        y,
+        FS,
+        method="gcc",
+        weighting=weighting,
+        nperseg=2048,  # type: ignore[arg-type]
     )
     assert res.delay_samples == pytest.approx(delay, abs=1e-3)
     assert res.weighting == weighting
@@ -234,9 +222,7 @@ def test_gcc_phat_of_noiseless_delay_is_a_near_delta() -> None:
     """Knapp & Carter Eq. 23: ideal PHAT correlation is δ(τ-D)."""
     x = _white(9)
     y = np.roll(x, 12)
-    res = ph.signals.time_delay(
-        x, y, FS, method="gcc", weighting="phat", nperseg=2048
-    )
+    res = ph.signals.time_delay(x, y, FS, method="gcc", weighting="phat", nperseg=2048)
     curve = np.abs(res.correlation)
     peak = int(np.argmax(curve))
     assert curve[peak] == pytest.approx(1.0)  # normalized to unit peak
@@ -261,8 +247,7 @@ def test_gcc_phat_sharpens_the_peak_of_a_colored_signal() -> None:
         return int(np.sum(curve > 0.5 * np.max(curve)))
 
     direct = ph.signals.time_delay(x, y, FS, method="direct")
-    phat = ph.signals.time_delay(x, y, FS, method="gcc", weighting="phat",
-                         nperseg=2048)
+    phat = ph.signals.time_delay(x, y, FS, method="gcc", weighting="phat", nperseg=2048)
     assert half_width(phat) < half_width(direct)
     assert phat.delay_samples == pytest.approx(delay, abs=1e-3)
 
@@ -273,18 +258,16 @@ def test_ml_weighting_suppresses_empty_bands_where_phat_jitters() -> None:
     scales them by γ²/(1-γ²) and stays accurate on a band-limited signal
     observed through noisy sensors."""
     s = _bandlimited(11, 0.4 * FS)
-    noise_a = ph.signals.noise_signal(
-        FS, N / FS, color="white", rms=0.1, seed=311
-    )
-    noise_b = ph.signals.noise_signal(
-        FS, N / FS, color="white", rms=0.1, seed=312
-    )
+    noise_a = ph.signals.noise_signal(FS, N / FS, color="white", rms=0.1, seed=311)
+    noise_b = ph.signals.noise_signal(FS, N / FS, color="white", rms=0.1, seed=312)
     x = s + noise_a
     y = _fractional_delay(s, 12.25) + noise_b
-    ml = ph.signals.time_delay(x, y, FS, method="gcc", weighting="ml",
-                       nperseg=2048, upsample=16)
-    phat = ph.signals.time_delay(x, y, FS, method="gcc", weighting="phat",
-                         nperseg=2048, upsample=16)
+    ml = ph.signals.time_delay(
+        x, y, FS, method="gcc", weighting="ml", nperseg=2048, upsample=16
+    )
+    phat = ph.signals.time_delay(
+        x, y, FS, method="gcc", weighting="phat", nperseg=2048, upsample=16
+    )
     assert ml.delay_samples == pytest.approx(12.25, abs=5e-3)
     assert abs(ml.delay_samples - 12.25) < abs(phat.delay_samples - 12.25)
 
@@ -327,9 +310,7 @@ def test_ml_weighting_requires_averaged_coherence() -> None:
     x = _white(23, n=2048)
     y = np.roll(x, 5)
     with pytest.raises(ValueError, match="averaged coherence"):
-        ph.signals.time_delay(
-            x, y, FS, method="gcc", weighting="ml", nperseg=2048
-        )
+        ph.signals.time_delay(x, y, FS, method="gcc", weighting="ml", nperseg=2048)
 
 
 def test_time_delay_rejects_constant_records() -> None:
@@ -354,9 +335,7 @@ def test_fractional_delay_phase_slope_accuracy() -> None:
 def test_interpolation_none_stays_on_the_sample_grid() -> None:
     x = _bandlimited(14, 0.4 * FS)
     y = _fractional_delay(x, 12.25)
-    res = ph.signals.time_delay(
-        x, y, FS, method="direct", interpolation="none"
-    )
+    res = ph.signals.time_delay(x, y, FS, method="direct", interpolation="none")
     assert res.delay_samples == pytest.approx(round(res.delay_samples))
     assert abs(res.delay_samples - 12.25) <= 0.5
 
@@ -376,20 +355,15 @@ def _two_detector_pair(
     """
     s = _bandlimited(2000 + seed, bandwidth, n=n)
     rms = float(np.sqrt(nsr) * np.std(s))
-    m = ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=rms, seed=4000 + seed
-    )
-    nn = ph.signals.noise_signal(
-        FS, n / FS, color="white", rms=rms, seed=6000 + seed
-    )
+    m = ph.signals.noise_signal(FS, n / FS, color="white", rms=rms, seed=4000 + seed)
+    nn = ph.signals.noise_signal(FS, n / FS, color="white", rms=rms, seed=6000 + seed)
     return s + m, np.roll(s, delay) + nn
 
 
 def test_delay_std_fields_follow_the_closed_form() -> None:
     bandwidth = 1000.0
     x, y = _two_detector_pair(1, 50, 3.0, bandwidth)
-    res = ph.signals.time_delay(x, y, FS, method="direct",
-                        signal_bandwidth=bandwidth)
+    res = ph.signals.time_delay(x, y, FS, method="direct", signal_bandwidth=bandwidth)
     assert res.delay_std is not None
     assert res.delay_interval is not None
     eps = ph.signals.correlation_random_error(
@@ -397,12 +371,8 @@ def test_delay_std_fields_follow_the_closed_form() -> None:
     )
     expected = (0.75**0.25) * np.sqrt(eps) / (np.pi * bandwidth)
     assert res.delay_std == pytest.approx(expected, rel=1e-9)
-    assert res.delay_interval[0] == pytest.approx(
-        res.delay - 2.0 * res.delay_std
-    )
-    assert res.delay_interval[1] == pytest.approx(
-        res.delay + 2.0 * res.delay_std
-    )
+    assert res.delay_interval[0] == pytest.approx(res.delay - 2.0 * res.delay_std)
+    assert res.delay_interval[1] == pytest.approx(res.delay + 2.0 * res.delay_std)
     # ρpeak -> S/sqrt((S+M)(S+N)) = 1/4 (Eq. 8.115).
     assert res.peak_correlation == pytest.approx(0.25, abs=0.02)
 
@@ -536,9 +506,7 @@ def test_time_delay_rejects_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="upsample"):
         ph.signals.time_delay(x, y, FS, upsample=0)
     with pytest.raises(ValueError, match="max_delay"):
-        ph.signals.time_delay(
-            x, y, FS, method="gcc", nperseg=256, max_delay=1.0
-        )
+        ph.signals.time_delay(x, y, FS, method="gcc", nperseg=256, max_delay=1.0)
     with pytest.raises(ValueError, match="max_delay"):
         ph.signals.time_delay(x, y, FS, method="direct", max_delay=x.size / FS)
     with pytest.raises(ValueError, match="signal_bandwidth"):
@@ -593,9 +561,7 @@ def test_correlation_plot_line_and_external_ax() -> None:
 def test_time_delay_plot_marks_the_delay() -> None:
     x = _white(21)
     y = np.roll(x, 12)
-    res = ph.signals.time_delay(
-        x, y, FS, nperseg=2048, signal_bandwidth=FS / 2.0
-    )
+    res = ph.signals.time_delay(x, y, FS, nperseg=2048, signal_bandwidth=FS / 2.0)
     ax = res.plot()
     labels = [str(line.get_label()) for line in ax.lines]
     assert any("tau" in lab for lab in labels)

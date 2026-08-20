@@ -664,9 +664,7 @@ def induction_motor_frequencies(
             )
         )
     lines.append(
-        _line(
-            "fsh", f_slot, fs, "motor", "fundamental rotor-slot harmonic frequency"
-        )
+        _line("fsh", f_slot, fs, "motor", "fundamental rotor-slot harmonic frequency")
     )
     lines.extend(_slot_harmonics(f_slot, fs, fe, n_slot))
     for rate, tag in ((fs, "x"), (f_slip, "s")):
@@ -756,9 +754,7 @@ def blade_pass_frequencies(
     k_max = _require_count(lobe_orders, "lobe_orders")
     vanes = None if n_vanes is None else _require_count(n_vanes, "n_vanes")
 
-    lines: list[FaultLine] = [
-        _line("shaft", fs, fs, "shaft", _SHAFT_DESCRIPTION)
-    ]
+    lines: list[FaultLine] = [_line("shaft", fs, fs, "shaft", _SHAFT_DESCRIPTION)]
     for n in range(1, n_harm + 1):
         name = "BPF" if n == 1 else f"{n}xBPF"
         lines.append(

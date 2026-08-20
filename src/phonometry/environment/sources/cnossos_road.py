@@ -84,7 +84,14 @@ __all__ = [
 #: Octave-band midband frequencies of the road source, in Hz (2.2.1 as
 #: corrected by the corrigendum of OJ L 5, 10.1.2018: 63 Hz to 8 kHz).
 ROAD_OCTAVE_BANDS: tuple[float, ...] = (
-    63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0,
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
 )
 #: Reference speed ``v_ref`` of (2.2.4), (2.2.6), (2.2.11) and (2.2.19), km/h.
 ROAD_REFERENCE_SPEED = 70.0
@@ -104,7 +111,14 @@ _MAX_GRADIENT = 12.0
 #: Printed explicitly by the Directive, so it is used verbatim rather than
 #: recomputed from IEC 61672-1.
 CNOSSOS_A_WEIGHTING: tuple[float, ...] = (
-    -26.2, -16.1, -8.6, -3.2, 0.0, 1.2, 1.0, -1.1,
+    -26.2,
+    -16.1,
+    -8.6,
+    -3.2,
+    0.0,
+    1.2,
+    1.0,
+    -1.1,
 )
 
 
@@ -221,7 +235,11 @@ _TABLE_F3: dict[str, tuple[tuple[float, float], tuple[float, float]]] = {
 #: temperature dependence for the powered two-wheelers, which have no rolling
 #: noise at all.
 _TEMPERATURE_K: dict[str, float] = {
-    "1": 0.08, "2": 0.04, "3": 0.04, "4a": 0.0, "4b": 0.0,
+    "1": 0.08,
+    "2": 0.04,
+    "3": 0.04,
+    "4a": 0.0,
+    "4b": 0.0,
 }
 
 # ---------------------------------------------------------------------------
@@ -243,95 +261,123 @@ def _surface_row(
     two_wheelers: tuple[tuple[float, ...], float] = (_ZERO_8, 0.0),
 ) -> tuple[float | None, float | None, dict[str, tuple[tuple[float, ...], float]]]:
     """Assemble one Table F-4 row (the 4a/4b row is shared by both categories)."""
-    return v_min, v_max, {
-        "1": light, "2": medium, "3": heavy, "4a": two_wheelers, "4b": two_wheelers,
-    }
+    return (
+        v_min,
+        v_max,
+        {
+            "1": light,
+            "2": medium,
+            "3": heavy,
+            "4a": two_wheelers,
+            "4b": two_wheelers,
+        },
+    )
 
 
 _TABLE_F4: dict[
     str, tuple[float | None, float | None, dict[str, tuple[tuple[float, ...], float]]]
 ] = {
     RoadSurface.REFERENCE.value: _surface_row(
-        None, None, (_ZERO_8, 0.0), (_ZERO_8, 0.0), (_ZERO_8, 0.0),
+        None,
+        None,
+        (_ZERO_8, 0.0),
+        (_ZERO_8, 0.0),
+        (_ZERO_8, 0.0),
     ),
     RoadSurface.ONE_LAYER_ZOAB.value: _surface_row(
-        50.0, 130.0,
+        50.0,
+        130.0,
         ((0.0, 5.4, 4.3, 4.2, -1.0, -3.2, -2.6, 0.8), -6.5),
         ((7.9, 4.3, 5.3, -0.4, -5.2, -4.6, -3.0, -1.4), 0.2),
         ((9.3, 5.0, 5.5, -0.4, -5.2, -4.6, -3.0, -1.4), 0.2),
     ),
     RoadSurface.TWO_LAYER_ZOAB.value: _surface_row(
-        50.0, 130.0,
+        50.0,
+        130.0,
         ((1.6, 4.0, 0.3, -3.0, -4.0, -6.2, -4.8, -2.0), -3.0),
         ((7.3, 2.0, -0.3, -5.2, -6.1, -6.0, -4.4, -3.5), 4.7),
         ((8.3, 2.2, -0.4, -5.2, -6.2, -6.1, -4.5, -3.5), 4.7),
     ),
     RoadSurface.TWO_LAYER_ZOAB_FINE.value: _surface_row(
-        80.0, 130.0,
+        80.0,
+        130.0,
         ((-1.0, 3.0, -1.5, -5.3, -6.3, -8.5, -5.3, -2.4), -0.1),
         ((7.9, 0.1, -1.9, -5.9, -6.1, -6.8, -4.9, -3.8), -0.8),
         ((9.4, 0.2, -1.9, -5.9, -6.1, -6.7, -4.8, -3.8), -0.9),
     ),
     RoadSurface.SMA_NL5.value: _surface_row(
-        40.0, 80.0,
+        40.0,
+        80.0,
         ((10.3, -0.9, 0.9, 1.8, -1.8, -2.7, -2.0, -1.3), -1.6),
-        (_ZERO_8, 0.0), (_ZERO_8, 0.0),
+        (_ZERO_8, 0.0),
+        (_ZERO_8, 0.0),
     ),
     RoadSurface.SMA_NL8.value: _surface_row(
-        40.0, 80.0,
+        40.0,
+        80.0,
         ((6.0, 0.3, 0.3, 0.0, -0.6, -1.2, -0.7, -0.7), -1.4),
-        (_ZERO_8, 0.0), (_ZERO_8, 0.0),
+        (_ZERO_8, 0.0),
+        (_ZERO_8, 0.0),
     ),
     RoadSurface.BRUSHED_DOWN_CONCRETE.value: _surface_row(
-        70.0, 120.0,
+        70.0,
+        120.0,
         ((8.2, -0.4, 2.8, 2.7, 2.5, 0.8, -0.3, -0.1), 1.4),
         ((0.3, 4.5, 2.5, -0.2, -0.1, -0.5, -0.9, -0.8), 5.0),
         ((0.2, 5.3, 2.5, -0.2, -0.1, -0.6, -1.0, -0.9), 5.5),
     ),
     RoadSurface.OPTIMISED_BRUSHED_DOWN_CONCRETE.value: _surface_row(
-        70.0, 80.0,
+        70.0,
+        80.0,
         ((-0.2, -0.7, 1.4, 1.2, 1.1, -1.6, -2.0, -1.8), 1.0),
         ((-0.7, 3.0, -2.0, -1.4, -1.8, -2.7, -2.0, -1.9), -6.6),
         ((-0.5, 4.2, -1.9, -1.3, -1.7, -2.5, -1.8, -1.8), -6.6),
     ),
     RoadSurface.FINE_BROOMED_CONCRETE.value: _surface_row(
-        70.0, 120.0,
+        70.0,
+        120.0,
         ((8.0, -0.7, 4.8, 2.2, 1.2, 2.6, 1.5, -0.6), 7.6),
         ((0.2, 8.6, 7.1, 3.2, 3.6, 3.1, 0.7, 0.1), 3.2),
         ((0.1, 9.8, 7.4, 3.2, 3.1, 2.4, 0.4, 0.0), 2.0),
     ),
     RoadSurface.WORKED_SURFACE.value: _surface_row(
-        50.0, 130.0,
+        50.0,
+        130.0,
         ((8.3, 2.3, 5.1, 4.8, 4.1, 0.1, -1.0, -0.8), -0.3),
         ((0.1, 6.3, 5.8, 1.8, -0.6, -2.0, -1.8, -1.6), 1.7),
         ((0.0, 7.4, 6.2, 1.8, -0.7, -2.1, -1.9, -1.7), 1.4),
     ),
     RoadSurface.HARD_ELEMENTS_HERRINGBONE.value: _surface_row(
-        30.0, 60.0,
+        30.0,
+        60.0,
         ((27.0, 16.2, 14.7, 6.1, 3.0, -1.0, 1.2, 4.5), 2.5),
         ((29.5, 20.0, 17.6, 8.0, 6.2, -1.0, 3.1, 5.2), 2.5),
         ((29.4, 21.2, 18.2, 8.4, 5.6, -1.0, 3.0, 5.8), 2.5),
     ),
     RoadSurface.HARD_ELEMENTS_NOT_HERRINGBONE.value: _surface_row(
-        30.0, 60.0,
+        30.0,
+        60.0,
         ((31.4, 19.7, 16.8, 8.4, 7.2, 3.3, 7.8, 9.1), 2.9),
         ((34.0, 23.6, 19.8, 10.5, 11.7, 8.2, 12.2, 10.0), 2.9),
         ((33.8, 24.7, 20.4, 10.9, 10.9, 6.8, 12.0, 10.8), 2.9),
     ),
     RoadSurface.QUIET_HARD_ELEMENTS.value: _surface_row(
-        30.0, 60.0,
+        30.0,
+        60.0,
         ((26.8, 13.7, 11.9, 3.9, -1.8, -5.8, -2.7, 0.2), -1.7),
         ((9.2, 5.7, 4.8, 2.3, 4.4, 5.1, 5.4, 0.9), 0.0),
         ((9.1, 6.6, 5.2, 2.6, 3.9, 3.9, 5.2, 1.1), 0.0),
     ),
     RoadSurface.THIN_LAYER_A.value: _surface_row(
-        40.0, 130.0,
+        40.0,
+        130.0,
         ((10.4, 0.7, -0.6, -1.2, -3.0, -4.8, -3.4, -1.4), -2.9),
         ((13.8, 5.4, 3.9, -0.4, -1.8, -2.1, -0.7, -0.2), 0.5),
         ((14.1, 6.1, 4.1, -0.4, -1.8, -2.1, -0.7, -0.2), 0.3),
     ),
     RoadSurface.THIN_LAYER_B.value: _surface_row(
-        40.0, 130.0,
+        40.0,
+        130.0,
         ((6.8, -1.2, -1.2, -0.3, -4.9, -7.0, -4.8, -3.2), -1.8),
         ((13.8, 5.4, 3.9, -0.4, -1.8, -2.1, -0.7, -0.2), 0.5),
         ((14.1, 6.1, 4.1, -0.4, -1.8, -2.1, -0.7, -0.2), 0.3),
@@ -523,8 +569,10 @@ def _surface_of(
     A substituted Table F-4 row may carry fewer categories than the published
     one, and reaching for a missing one has to fail as an invalid input.
     """
-    row = surface if isinstance(surface, RoadSurfaceCoefficients) else (
-        road_surface_coefficients(surface)
+    row = (
+        surface
+        if isinstance(surface, RoadSurfaceCoefficients)
+        else (road_surface_coefficients(surface))
     )
     if key not in row.alpha or key not in row.beta:
         raise ValueError(
@@ -637,12 +685,18 @@ def road_rolling_noise(
     row = _surface_of(surface, key)
     log_speed = np.log10(v / ROAD_REFERENCE_SPEED)
 
-    base = _bands(coefficients.rolling_a[key]) + _bands(coefficients.rolling_b[key]) * log_speed
+    base = (
+        _bands(coefficients.rolling_a[key])
+        + _bands(coefficients.rolling_b[key]) * log_speed
+    )
     # (2.2.19) road-surface effect on rolling noise.
     d_road = _bands(row.alpha[key]) + row.beta[key] * log_speed
     d_stud = _studded_correction(
-        key, v, _finite(studded_fraction, "studded_fraction"),
-        _finite(studded_months, "studded_months"), coefficients,
+        key,
+        v,
+        _finite(studded_fraction, "studded_fraction"),
+        _finite(studded_months, "studded_months"),
+        coefficients,
     )
     factor = _junction_factor(junction_distance, junction_type)
     d_acc = (
@@ -752,16 +806,25 @@ def road_vehicle_sound_power(
     """
     key = _category_key(category)
     propulsion = road_propulsion_noise(
-        key, speed, surface=surface, gradient=gradient,
-        junction_distance=junction_distance, junction_type=junction_type,
+        key,
+        speed,
+        surface=surface,
+        gradient=gradient,
+        junction_distance=junction_distance,
+        junction_type=junction_type,
         coefficients=coefficients,
     )
     if key in ("4a", "4b"):
         return propulsion
     rolling = road_rolling_noise(
-        key, speed, surface=surface, temperature=temperature,
-        studded_fraction=studded_fraction, studded_months=studded_months,
-        junction_distance=junction_distance, junction_type=junction_type,
+        key,
+        speed,
+        surface=surface,
+        temperature=temperature,
+        studded_fraction=studded_fraction,
+        studded_months=studded_months,
+        junction_distance=junction_distance,
+        junction_type=junction_type,
         coefficients=coefficients,
     )
     return _combine_rolling_and_propulsion(key, rolling, propulsion)
@@ -808,7 +871,9 @@ class RoadEmissionResult:
         weighted = self.total_line_power + np.asarray(CNOSSOS_A_WEIGHTING)
         return float(10.0 * np.log10(np.sum(10.0 ** (weighted / 10.0))))
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-metre line power spectrum and its category breakdown."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_cnossos_road_emission
@@ -871,14 +936,23 @@ def road_source_power(
             raise ValueError("'flow_rate' must be a non-negative number of vehicles/h.")
         v = _positive_speed(flow.speed)
         lwr = road_rolling_noise(
-            key, v, surface=surface, temperature=temperature,
-            studded_fraction=flow.studded_fraction, studded_months=studded_months,
-            junction_distance=junction_distance, junction_type=junction_type,
+            key,
+            v,
+            surface=surface,
+            temperature=temperature,
+            studded_fraction=flow.studded_fraction,
+            studded_months=studded_months,
+            junction_distance=junction_distance,
+            junction_type=junction_type,
             coefficients=coefficients,
         )
         lwp = road_propulsion_noise(
-            key, v, surface=surface, gradient=gradient,
-            junction_distance=junction_distance, junction_type=junction_type,
+            key,
+            v,
+            surface=surface,
+            gradient=gradient,
+            junction_distance=junction_distance,
+            junction_type=junction_type,
             coefficients=coefficients,
         )
         lw = _combine_rolling_and_propulsion(key, lwr, lwp)

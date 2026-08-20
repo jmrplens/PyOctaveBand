@@ -105,9 +105,7 @@ def _governing_index(per_impulse: np.ndarray, qualifies: np.ndarray) -> int:
     return int(np.argmax(per_impulse))
 
 
-def _select_rows(
-    per_impulse: np.ndarray, governing: int
-) -> tuple[list[int], int]:
+def _select_rows(per_impulse: np.ndarray, governing: int) -> tuple[list[int], int]:
     """Choose the impulse rows to show and how many are dropped.
 
     Every impulse is shown (in input order) when the set fits :data:`_MAX_TABLE_ROWS`;
@@ -134,10 +132,7 @@ def _qualifies_markup(qualifies: bool, language: str = "en") -> str:
     ``Yes``, a non-qualifying one a muted en dash.
     """
     if qualifies:
-        return (
-            f"<font color='{_VERDICT_OK_HEX}'>&#9679; "
-            f"{t('Yes', language)}</font>"
-        )
+        return f"<font color='{_VERDICT_OK_HEX}'>&#9679; {t('Yes', language)}</font>"
     return f"<font color='{_MUTED_HEX}'>&#8211;</font>"
 
 
@@ -176,9 +171,7 @@ def _metadata_pairs(
     return [(label, value) for label, value in specs if value]
 
 
-def _per_impulse_table(
-    result: ImpulseProminenceResult, language: str = "en"
-) -> Any:
+def _per_impulse_table(result: ImpulseProminenceResult, language: str = "en") -> Any:
     """The full-width per-impulse table (onset rate, level difference, P).
 
     One row per candidate impulse: the onset rate (dB/s), the level difference
@@ -226,9 +219,9 @@ def _per_impulse_table(
             ]
         )
     if dropped:
-        note = t(
-            "&#8230; plus {n} more impulses of lower prominence", language
-        ).format(n=dropped)
+        note = t("&#8230; plus {n} more impulses of lower prominence", language).format(
+            n=dropped
+        )
         data.append([Paragraph(note, label_style), "", "", "", ""])
 
     table = stacked_table(data, [w * mm for w in widths])
@@ -315,9 +308,7 @@ def _basis_line(measurement_standard: str | None, language: str = "en") -> str:
     )
 
 
-def _prominence_note(
-    result: ImpulseProminenceResult, language: str = "en"
-) -> str:
+def _prominence_note(result: ImpulseProminenceResult, language: str = "en") -> str:
     """The prominence-category note: whether a prominent impulse is present.
 
     Two independent gates can withhold the adjustment, so the note states the
@@ -413,7 +404,10 @@ def render_impulse_prominence_report(
     # (the result's own self-scaling plot).
     flow.append(
         render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=(9.2, 3.1),
+            result.plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, 3.1),
             language=language,
         )
     )

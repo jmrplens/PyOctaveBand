@@ -288,13 +288,21 @@ class TestJohnsonChampouxAllard:
         f = np.array([100.0])
         with pytest.raises(ValueError, match="porosity"):
             johnson_champoux_allard(
-                f, 1e4, porosity=1.2, tortuosity=1.0,
-                viscous_length=1e-4, thermal_length=2e-4,
+                f,
+                1e4,
+                porosity=1.2,
+                tortuosity=1.0,
+                viscous_length=1e-4,
+                thermal_length=2e-4,
             )
         with pytest.raises(ValueError, match="tortuosity"):
             johnson_champoux_allard(
-                f, 1e4, porosity=0.9, tortuosity=0.5,
-                viscous_length=1e-4, thermal_length=2e-4,
+                f,
+                1e4,
+                porosity=0.9,
+                tortuosity=0.5,
+                viscous_length=1e-4,
+                thermal_length=2e-4,
             )
 
 
@@ -318,9 +326,7 @@ class TestLayeredAbsorber:
         med1 = delany_bazley(f, 30000.0, air_density=RHO0)
         med2 = miki(f, 8000.0, air_density=RHO0)
         layers = [PorousLayer(0.02, med1), AirLayer(0.03), PorousLayer(0.04, med2)]
-        res = layered_absorber(
-            f, layers, speed_of_sound=C0, air_density=RHO0
-        )
+        res = layered_absorber(f, layers, speed_of_sound=C0, air_density=RHO0)
         # Bies (D.95): Z_i = Zm (Z_{i-1} + j Zm tan(km l)) / (Zm + j Z_{i-1} tan)
         k0 = 2.0 * np.pi * f / C0
         z_l = np.full(f.shape, np.inf + 0j)
@@ -371,9 +377,7 @@ class TestLayeredAbsorber:
         f = _grid(100.0, 1000.0, 50)
         res = layered_absorber(f, [AirLayer(0.1)], termination="free")
         np.testing.assert_allclose(np.abs(res.reflection), 0.0, atol=1e-12)
-        res_ob = layered_absorber(
-            f, [AirLayer(0.1)], termination="free", angle=0.7
-        )
+        res_ob = layered_absorber(f, [AirLayer(0.1)], termination="free", angle=0.7)
         np.testing.assert_allclose(np.abs(res_ob.reflection), 0.0, atol=1e-12)
 
     def test_free_termination_admittance_is_the_literal_cosine_over_rho_c(
@@ -419,9 +423,7 @@ class TestLayeredAbsorber:
             med.characteristic_impedance,
             rtol=1e-10,
         )
-        np.testing.assert_allclose(
-            t.material_wavenumber(d), med.wavenumber, rtol=1e-10
-        )
+        np.testing.assert_allclose(t.material_wavenumber(d), med.wavenumber, rtol=1e-10)
         np.testing.assert_allclose(
             t.absorption_hard_backed(RC), res.absorption, atol=1e-12
         )
@@ -474,9 +476,7 @@ class TestLayeredAbsorber:
         ]
         for termination in ("rigid", "free", 800.0 + 200.0j):
             for angle in (0.0, 0.7, 1.3):
-                res = layered_absorber(
-                    f, layers, angle=angle, termination=termination
-                )
+                res = layered_absorber(f, layers, angle=angle, termination=termination)
                 t = res.transfer_matrix
                 cos_t = np.cos(angle)
                 if termination == "rigid":
@@ -590,10 +590,18 @@ class TestResonantSheets:
         omega = 2.0 * np.pi * f
         # Exact hole impedance = eps * (sheet impedance without the end
         # corrections), recovered by passing eps = 1 and delta = 0.
-        z_exact = microperforated_plate_impedance(
-            f, thickness=t, hole_radius=a, open_area=1.0,
-            end_correction=0.0, air_density=rho0, viscosity=eta,
-        ) - np.sqrt(2.0 * omega * rho0 * eta) / 2.0
+        z_exact = (
+            microperforated_plate_impedance(
+                f,
+                thickness=t,
+                hole_radius=a,
+                open_area=1.0,
+                end_correction=0.0,
+                air_density=rho0,
+                viscosity=eta,
+            )
+            - np.sqrt(2.0 * omega * rho0 * eta) / 2.0
+        )
         r_approx = (32.0 * eta * t / d**2) * np.sqrt(1.0 + k_perf**2 / 32.0)
         x_approx = omega * rho0 * t * (1.0 + (9.0 + k_perf**2 / 2.0) ** -0.5)
         assert np.max(np.abs(z_exact.real - r_approx) / r_approx) < 0.08
@@ -613,15 +621,19 @@ class TestResonantSheets:
         mpp = MicroperforatedPlateLayer(
             ref.MAA_FIG5_THICKNESS, ref.MAA_FIG5_DIAMETER / 2.0, eps
         )
-        z_sheet = microperforated_plate_impedance(
-            f, thickness=mpp.thickness, hole_radius=mpp.hole_radius,
-            open_area=mpp.open_area, air_density=RHO0,
-        ) / RC
+        z_sheet = (
+            microperforated_plate_impedance(
+                f,
+                thickness=mpp.thickness,
+                hole_radius=mpp.hole_radius,
+                open_area=mpp.open_area,
+                air_density=RHO0,
+            )
+            / RC
+        )
         k0 = 2.0 * np.pi * f / C0
         for theta in (0.0, 0.9):
-            res = layered_absorber(
-                f, [mpp, AirLayer(ref.MAA_FIG5_CAVITY)], angle=theta
-            )
+            res = layered_absorber(f, [mpp, AirLayer(ref.MAA_FIG5_CAVITY)], angle=theta)
             cos_t = np.cos(theta)
             reactance = z_sheet.imag - (
                 1.0 / np.tan(k0 * ref.MAA_FIG5_CAVITY * cos_t) / cos_t
@@ -639,10 +651,16 @@ class TestResonantSheets:
             ref.MAA_FIG5_THICKNESS, ref.MAA_FIG5_DIAMETER / 2.0, eps
         )
         res = layered_absorber(f, [mpp, AirLayer(ref.MAA_FIG5_CAVITY)])
-        xm = microperforated_plate_impedance(
-            f, thickness=mpp.thickness, hole_radius=mpp.hole_radius,
-            open_area=mpp.open_area, air_density=RHO0,
-        ).imag / RC
+        xm = (
+            microperforated_plate_impedance(
+                f,
+                thickness=mpp.thickness,
+                hole_radius=mpp.hole_radius,
+                open_area=mpp.open_area,
+                air_density=RHO0,
+            ).imag
+            / RC
+        )
         cot = 1.0 / np.tan(2.0 * np.pi * f * ref.MAA_FIG5_CAVITY / C0)
         i_root = int(np.argmin(np.abs(xm - cot)))
         i_peak = int(np.argmax(res.absorption))
@@ -735,14 +753,9 @@ class TestRandomIncidence:
             theta = np.linspace(0.0, lim, 20001)
             g = 1.0 / z[:, None]
             cos = np.cos(theta)[None, :]
-            alpha_t = (
-                4.0 * g.real * cos
-                / ((cos + g.real) ** 2 + g.imag**2)
-            )
+            alpha_t = 4.0 * g.real * cos / ((cos + g.real) ** 2 + g.imag**2)
             integrand = alpha_t * np.cos(theta) * np.sin(theta)
-            numeric = (
-                2.0 * np.trapezoid(integrand, theta, axis=1) / np.sin(lim) ** 2
-            )
+            numeric = 2.0 * np.trapezoid(integrand, theta, axis=1) / np.sin(lim) ** 2
             np.testing.assert_allclose(closed, numeric, atol=1e-6)
 
     def test_statistical_absorption_real_impedance_branch(self) -> None:
@@ -769,9 +782,9 @@ class TestRandomIncidence:
         branch independently of the complex formula.
         """
         xi = np.array([0.7, 1.0, 2.0, 5.0])
-        expected = (8.0 / xi) * (1.0 + 1.0 / (1.0 + xi)) - (
-            16.0 / xi**2
-        ) * np.log(1.0 + xi)
+        expected = (8.0 / xi) * (1.0 + 1.0 / (1.0 + xi)) - (16.0 / xi**2) * np.log(
+            1.0 + xi
+        )
         alpha = statistical_absorption(xi.astype(complex))
         np.testing.assert_allclose(alpha, expected, rtol=1e-13)
 

@@ -23,7 +23,9 @@ def test_directional_limits_table1() -> None:
 
 def test_directional_intermediate_angle_uses_greater() -> None:
     # 75 deg is between 60 and 90 -> use the 90 deg limit (subclause 4.4.2).
-    assert _iec61265_directional_limit(4000.0, 75.0) == _iec61265_directional_limit(4000.0, 90.0)
+    assert _iec61265_directional_limit(4000.0, 75.0) == _iec61265_directional_limit(
+        4000.0, 90.0
+    )
 
 
 def test_directional_pass() -> None:
@@ -60,9 +62,7 @@ def test_out_of_range_angle_raises() -> None:
     with pytest.raises(ValueError):
         aircraft.verify_aircraft_noise_system(directional={4000.0: {0.0: 0.5}})
     with pytest.raises(ValueError):
-        aircraft.verify_aircraft_noise_system(
-            directional={4000.0: {160.0: 0.5}}
-        )
+        aircraft.verify_aircraft_noise_system(directional={4000.0: {160.0: 0.5}})
 
 
 def test_linearity_rejects_unknown_key() -> None:
@@ -71,10 +71,7 @@ def test_linearity_rejects_unknown_key() -> None:
 
 
 def test_resolution_rejects_negative() -> None:
-    assert (
-        aircraft.verify_aircraft_noise_system(resolution=-1.0)["passed"]
-        is False
-    )
+    assert aircraft.verify_aircraft_noise_system(resolution=-1.0)["passed"] is False
 
 
 def test_empty_call_not_passed() -> None:

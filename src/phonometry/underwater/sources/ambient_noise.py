@@ -84,7 +84,8 @@ def wind_noise_spectrum(
     if u <= 0.0:  # calm sea: no wind-driven noise (u is non-negative here)
         return np.full(f_khz.shape, -np.inf, dtype=np.float64)
     nl = _WIND_ANCHOR_DB - (5.0 / 3.0) * 10.0 * (
-        np.log10(f_khz) - np.log10(u / _WIND_REF_KNOTS))
+        np.log10(f_khz) - np.log10(u / _WIND_REF_KNOTS)
+    )
     return np.asarray(nl, dtype=np.float64)
 
 
@@ -138,12 +139,16 @@ class AmbientNoiseResult:
     shipping: NDArray[np.float64] | None
     wind_speed_knots: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the composite spectrum and its components versus frequency."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_ambient_noise
 
-        return plot_ambient_noise(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ambient_noise(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def ocean_ambient_noise(
@@ -172,14 +177,17 @@ def ocean_ambient_noise(
     """
     f = require_positive_array(frequency_hz, "frequency_hz")
     wind = wind_noise_spectrum(f, wind_speed_knots)
-    thermal = thermal_noise_spectrum(f, temperature=temperature, density=density,
-                                     sound_speed=sound_speed)
+    thermal = thermal_noise_spectrum(
+        f, temperature=temperature, density=density, sound_speed=sound_speed
+    )
     energies = 10.0 ** (wind / 10.0) + 10.0 ** (thermal / 10.0)
     ship_arr: NDArray[np.float64] | None = None
     if shipping is not None:
         ship_arr = np.asarray(shipping, dtype=np.float64)
         if ship_arr.shape != f.shape or not np.all(np.isfinite(ship_arr)):
-            raise ValueError("'shipping' must be finite and match 'frequency_hz' in length.")
+            raise ValueError(
+                "'shipping' must be finite and match 'frequency_hz' in length."
+            )
         energies = energies + 10.0 ** (ship_arr / 10.0)
     spectrum = 10.0 * np.log10(energies)
     return AmbientNoiseResult(

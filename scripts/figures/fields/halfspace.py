@@ -29,7 +29,7 @@ _HS_CP, _HS_CS, _HS_RHO = 6320.0, 3130.0, 2700.0
 # the page itself asks for 15-20 cells per Rayleigh wavelength there (48 at
 # this dx).
 _HS_DX = 0.001
-_HS_SRC_W = 8e-6                   # Gaussian source width [s]
+_HS_SRC_W = 8e-6  # Gaussian source width [s]
 # Domain and view. The view is the 0.6 x 0.3 m block of the still figure,
 # centred on the impact; the simulated domain is 1.1 x 0.45 m so that the
 # sponges, and the corner where a sponge meets the free surface, stay off
@@ -40,7 +40,7 @@ _HS_SRC_W = 8e-6                   # Gaussian source width [s]
 # would need another 45 us to re-enter the view.
 _HS_NY, _HS_NX = 450, 1100
 _HS_SPONGE = 120
-_HS_HALF = 300                     # view half-width and depth [cells]
+_HS_HALF = 300  # view half-width and depth [cells]
 _HS_FPS = 40
 
 
@@ -59,9 +59,12 @@ def _rayleigh_speed(c_p: float, c_s: float) -> float:
 
     def char(c_r: float) -> float:
         kr2 = 1.0 / c_r**2
-        return (16.0 * kr2**3 * (kt2 - kl2)
-                + 8.0 * kr2**2 * (2.0 * kl2 * kt2 - 3.0 * kt2**2)
-                + 8.0 * kr2 * kt2**3 - kt2**4)
+        return (
+            16.0 * kr2**3 * (kt2 - kl2)
+            + 8.0 * kr2**2 * (2.0 * kl2 * kt2 - 3.0 * kt2**2)
+            + 8.0 * kr2 * kt2**3
+            - kt2**4
+        )
 
     return float(brentq(char, 0.5 * c_s, 0.999 * c_s, xtol=1e-12))
 
@@ -121,8 +124,11 @@ def _halfspace_fields() -> tuple[Any, Any, Any, Any, Any, float]:
             sponge_sides=("left", "right", "bottom"),
             free_sides=("top",) if free else None,
         )
-        sim.add_source(simulation.ForceSource(ix=src_ix, iy=0, direction="y",
-                                              amplitude=1e6, waveform=pulse))
+        sim.add_source(
+            simulation.ForceSource(
+                ix=src_ix, iy=0, direction="y", amplitude=1e6, waveform=pulse
+            )
+        )
         frames: list[Any] = []
         probe: list[Any] = []
         ts: list[float] = []
@@ -131,8 +137,7 @@ def _halfspace_fields() -> tuple[Any, Any, Any, Any, Any, float]:
             if sim.n % every == 0:
                 vy = sim.collocated("vy")
                 frames.append(vy[rows, cols].astype(np.float32))
-                probe.append([float(vy[0, probe_cols[0]]),
-                              float(vy[0, probe_cols[1]])])
+                probe.append([float(vy[0, probe_cols[0]]), float(vy[0, probe_cols[1]])])
                 ts.append(sim.time)
         stacks.append(np.stack(frames))
         traces.append(np.asarray(probe, dtype=np.float32))
@@ -145,8 +150,14 @@ def _halfspace_fields() -> tuple[Any, Any, Any, Any, Any, float]:
     t2 = times[int(np.abs(free_trace[:, 1]).argmax())]
     c_meas = float(150 * dx / (t2 - t1))
     scale = float(np.quantile(np.abs(stacks[0]), 0.999))
-    return (stacks[0] / scale, stacks[1] / scale,
-            traces[0] / scale, traces[1] / scale, times, c_meas)
+    return (
+        stacks[0] / scale,
+        stacks[1] / scale,
+        traces[0] / scale,
+        traces[1] / scale,
+        times,
+        c_meas,
+    )
 
 
 def animate_elastic_halfspace_waves(output_dir: str) -> None:
@@ -176,8 +187,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     c_r = _rayleigh_speed(_HS_CP, _HS_CS)
     n_active = int(times.size)
     half = _HS_HALF * _HS_DX
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     # Each field panel on its own colour scale, taken off the second half of
     # its own run. Two reasons, and the panels say so. The source blob is
     # orders of magnitude above the fronts it launches, so a scale set on the
@@ -188,8 +198,7 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # comparison stays quantitative: the missing surface arrival is a missing
     # peak, not a rescaled one.
     late = slice(n_active // 2, n_active)
-    vmaxes = [float(np.quantile(np.abs(d[late]), 0.995))
-              for d in (vy_free, vy_rigid)]
+    vmaxes = [float(np.quantile(np.abs(d[late]), 0.995)) for d in (vy_free, vy_rigid)]
     t_us = times * 1e6
 
     fig = _anim_figure()
@@ -199,15 +208,16 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
     # Short on purpose: the Spanish of a longer title overran the canvas at
     # both ends. What the boundary has to do with it is in the panel titles.
-    fig.suptitle(T("Lamb's problem: P, S and the surface wave "
-                   "(elastic 2D FDTD)"))
+    fig.suptitle(T("Lamb's problem: P, S and the surface wave (elastic 2D FDTD)"))
     # The field panels are 2:1 and, in a two-row canvas, height-limited: a
     # wider cell than their natural width only pads them with white. The
     # probe traces are time series and use every pixel of width they get,
     # so the split gives the leftover to them.
     grid = fig.add_gridspec(2, 2, width_ratios=(1.75, 1.0))
-    titles = [T("Free top surface: a Rayleigh train rides it"),
-              T("Rigid top surface: same block, no surface wave")]
+    titles = [
+        T("Free top surface: a Rayleigh train rides it"),
+        T("Rigid top surface: same block, no surface wave"),
+    ]
     ims: list[Any] = []
     arcs: list[tuple[Any, Any]] = []
     marks: list[Any] = []
@@ -215,42 +225,99 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     lines: list[tuple[Any, Any]] = []
     v_txts: list[Any] = []
     r_labs: list[Any] = []
-    for row, (data, trace, title, free) in enumerate(
-            ((vy_free, tr_free, titles[0], True),
-             (vy_rigid, tr_rigid, titles[1], False))):
+    # `trace` is unpacked and not read here (B007): the later block re-derives
+    # it as `(tr_free, tr_rigid)[row]`. Renaming it is cosmetic and moves this
+    # closure's fingerprint, which the clip freshness gate reads to decide
+    # whether the committed animation is stale. An unused binding is not worth
+    # re-rendering an FDTD animation over.
+    for row, (data, trace, title, free) in enumerate(  # noqa: B007
+        ((vy_free, tr_free, titles[0], True), (vy_rigid, tr_rigid, titles[1], False))
+    ):
         ax = fig.add_subplot(grid[row, 0])
         ax.grid(False)
-        im = ax.imshow(data[0], origin="upper",
-                       extent=(-half, half, half, 0.0), cmap=CMAP_FIELD,
-                       vmin=-vmaxes[row], vmax=vmaxes[row], aspect="equal",
-                       interpolation="bilinear")
+        im = ax.imshow(
+            data[0],
+            origin="upper",
+            extent=(-half, half, half, 0.0),
+            cmap=CMAP_FIELD,
+            vmin=-vmaxes[row],
+            vmax=vmaxes[row],
+            aspect="equal",
+            interpolation="bilinear",
+        )
         ax.set_title(title, fontsize=9.5)
-        ax.plot([0.0], [0.0], marker="v", ms=6, color=COLOR_SECONDARY,
-                markeredgecolor=FIELD_STROKE, markeredgewidth=0.6,
-                clip_on=False, zorder=6)
-        p_arc = Circle((0.0, 0.0), 0.0, fill=False, ls=":", lw=1.0,
-                       edgecolor=FIELD_INK, zorder=4)
-        s_arc = Circle((0.0, 0.0), 0.0, fill=False, ls=":", lw=1.0,
-                       edgecolor=FIELD_INK, zorder=4)
+        ax.plot(
+            [0.0],
+            [0.0],
+            marker="v",
+            ms=6,
+            color=COLOR_SECONDARY,
+            markeredgecolor=FIELD_STROKE,
+            markeredgewidth=0.6,
+            clip_on=False,
+            zorder=6,
+        )
+        p_arc = Circle(
+            (0.0, 0.0), 0.0, fill=False, ls=":", lw=1.0, edgecolor=FIELD_INK, zorder=4
+        )
+        s_arc = Circle(
+            (0.0, 0.0), 0.0, fill=False, ls=":", lw=1.0, edgecolor=FIELD_INK, zorder=4
+        )
         ax.add_patch(p_arc)
         ax.add_patch(s_arc)
-        p_lab = ax.text(0.0, 0.0, "P", fontsize=8, ha="center", va="center",
-                        color=FIELD_INK, path_effects=outline, zorder=5)
-        s_lab = ax.text(0.0, 0.0, "S", fontsize=8, ha="center", va="center",
-                        color=FIELD_INK, path_effects=outline, zorder=5)
-        (mark,) = ax.plot([], [], marker="o", ms=4, ls="none",
-                          color=COLOR_PRIMARY,
-                          markeredgecolor=FIELD_STROKE, markeredgewidth=0.6,
-                          zorder=6)
+        p_lab = ax.text(
+            0.0,
+            0.0,
+            "P",
+            fontsize=8,
+            ha="center",
+            va="center",
+            color=FIELD_INK,
+            path_effects=outline,
+            zorder=5,
+        )
+        s_lab = ax.text(
+            0.0,
+            0.0,
+            "S",
+            fontsize=8,
+            ha="center",
+            va="center",
+            color=FIELD_INK,
+            path_effects=outline,
+            zorder=5,
+        )
+        (mark,) = ax.plot(
+            [],
+            [],
+            marker="o",
+            ms=4,
+            ls="none",
+            color=COLOR_PRIMARY,
+            markeredgecolor=FIELD_STROKE,
+            markeredgewidth=0.6,
+            zorder=6,
+        )
         # The Rayleigh label rides the right-hand marker instead of sitting
         # over the source, where it collided with the panel title.
-        r_lab = ax.text(0.0, 0.018, "R", fontsize=8.5, ha="center",
-                        va="top", color=COLOR_PRIMARY, fontweight="bold",
-                        path_effects=outline, zorder=7, visible=free)
+        r_lab = ax.text(
+            0.0,
+            0.018,
+            "R",
+            fontsize=8.5,
+            ha="center",
+            va="top",
+            color=COLOR_PRIMARY,
+            fontweight="bold",
+            path_effects=outline,
+            zorder=7,
+            visible=free,
+        )
         r_labs.append(r_lab)
         for col in (0.15, 0.30):
-            ax.plot([col], [0.0], marker="|", ms=8, color=COLOR_FG,
-                    clip_on=False, zorder=6)
+            ax.plot(
+                [col], [0.0], marker="|", ms=8, color=COLOR_FG, clip_on=False, zorder=6
+            )
         ax.set_ylabel(T("depth [m]"), fontsize=8)
         ax.tick_params(labelsize=7)
         ax.set_xticks([-0.3, -0.15, 0.0, 0.15, 0.3])
@@ -258,11 +325,22 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
             ax.set_xlabel(T("distance from the impact [m]"), fontsize=8)
         else:
             ax.set_xticklabels([])
-        v_txt = ax.text(-half + 0.008, half - 0.008, "", ha="left",
-                        va="bottom", color="white", fontsize=7.5, zorder=7,
-                        bbox={"boxstyle": _ANIM_PILL_BOX,
-                              "facecolor": "black", "alpha": 0.55,
-                              "edgecolor": "none"})
+        v_txt = ax.text(
+            -half + 0.008,
+            half - 0.008,
+            "",
+            ha="left",
+            va="bottom",
+            color="white",
+            fontsize=7.5,
+            zorder=7,
+            bbox={
+                "boxstyle": _ANIM_PILL_BOX,
+                "facecolor": "black",
+                "alpha": 0.55,
+                "edgecolor": "none",
+            },
+        )
         ims.append(im)
         arcs.append((p_arc, s_arc))
         labels.append((p_lab, s_lab))
@@ -296,17 +374,39 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # fix for a real defect: `_translate_str` rewrites decimal points as
     # commas for Spanish unless the string carries maths, and it had been
     # turning the equation number "3.149" into "3,149".
-    speeds = fig.text(0.5, 0.030,
-                      T(f"aluminium: $c_\\mathrm{{P}}$ = {_HS_CP:.0f}, $c_\\mathrm{{S}}$ = "
-                        f"{_HS_CS:.0f}, $c_\\mathrm{{R}}$ = {c_r:.0f} m/s "
-                        f"(C&H Eq. 3.149)"),
-                      ha="center", va="bottom", fontsize=8, color=COLOR_FG)
-    scale_txt = fig.text(0.5, 0.006,
-                         T("each field panel on its own colour scale; the "
-                           "probe traces share one"), ha="center",
-                         va="bottom", fontsize=7, color=COLOR_FG, alpha=0.85)
-    t_txt = fig.text(0.988, 0.030, "", ha="right", va="bottom",
-                     family="monospace", fontsize=9, color=COLOR_FG)
+    speeds = fig.text(
+        0.5,
+        0.030,
+        T(
+            f"aluminium: $c_\\mathrm{{P}}$ = {_HS_CP:.0f}, $c_\\mathrm{{S}}$ = "
+            f"{_HS_CS:.0f}, $c_\\mathrm{{R}}$ = {c_r:.0f} m/s "
+            f"(C&H Eq. 3.149)"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=8,
+        color=COLOR_FG,
+    )
+    scale_txt = fig.text(
+        0.5,
+        0.006,
+        T("each field panel on its own colour scale; the probe traces share one"),
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color=COLOR_FG,
+        alpha=0.85,
+    )
+    t_txt = fig.text(
+        0.988,
+        0.030,
+        "",
+        ha="right",
+        va="bottom",
+        family="monospace",
+        fontsize=9,
+        color=COLOR_FG,
+    )
     reveal = int(0.88 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
@@ -318,20 +418,23 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
             p_arc, s_arc = arcs[row]
             p_arc.set_radius(r_p)
             s_arc.set_radius(r_s)
-            for arc, lab, rad in ((p_arc, labels[row][0], r_p),
-                                  (s_arc, labels[row][1], r_s)):
+            for arc, lab, rad in (
+                (p_arc, labels[row][0], r_p),
+                (s_arc, labels[row][1], r_s),
+            ):
                 arc.set_visible(rad > 0.01)
                 lab.set_visible(0.02 < rad < half * 1.35)
                 lab.set_position((rad * 0.72, rad * 0.72))
             if row == 0:
                 inside = 0.02 < r_r < half
-                marks[row].set_data(([-r_r, r_r] if inside else []),
-                                    ([0.0, 0.0] if inside else []))
+                marks[row].set_data(
+                    ([-r_r, r_r] if inside else []), ([0.0, 0.0] if inside else [])
+                )
                 r_labs[row].set_visible(inside)
                 r_labs[row].set_position((r_r, 0.018))
             trace = (tr_free, tr_rigid)[row]
             for i, line in enumerate(lines[row]):
-                line.set_data(t_us[:kf + 1], trace[:kf + 1, i])
+                line.set_data(t_us[: kf + 1], trace[: kf + 1, i])
             v_txts[row].set_text(verdicts[row] if k >= reveal else "")
         t_txt.set_text(T(f"$t$ = {t * 1e6:5.1f} µs"))
         return (*ims, *marks, *r_labs, *v_txts, speeds, scale_txt, t_txt)
@@ -342,8 +445,14 @@ def animate_elastic_halfspace_waves(output_dir: str) -> None:
     # the right edge (it leaves at 103 us) and both body fronts sit on their
     # arcs. `fields/pillar_hall._poster_ss_for` carries the same number so
     # that `make posters` agrees with a full render.
-    poster_frame = 95.0e-6 / (5.0 * 0.6 * _HS_DX
-                              / (_HS_CP * float(np.sqrt(2.0))))
-    _render_clip(fig, update, output_dir, "anim_elastic_halfspace_waves",
-                 frames=n_active + 2 * _HS_FPS, fps=_HS_FPS, gif_fps=6,
-                 poster_ss=poster_frame / _HS_FPS)
+    poster_frame = 95.0e-6 / (5.0 * 0.6 * _HS_DX / (_HS_CP * float(np.sqrt(2.0))))
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_elastic_halfspace_waves",
+        frames=n_active + 2 * _HS_FPS,
+        fps=_HS_FPS,
+        gif_fps=6,
+        poster_ss=poster_frame / _HS_FPS,
+    )

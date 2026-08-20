@@ -24,7 +24,9 @@ _FS = 44100
 _P_REF = 2e-5
 
 
-def _am_tone(fc: float, level_db: float, m: float, fmod: float, dur: float = 4.0) -> np.ndarray:
+def _am_tone(
+    fc: float, level_db: float, m: float, fmod: float, dur: float = 4.0
+) -> np.ndarray:
     t = np.arange(int(_FS * dur)) / _FS
     x = (1.0 + m * np.sin(2 * np.pi * fmod * t)) * np.sin(2 * np.pi * fc * t)
     return np.asarray(x / np.sqrt(np.mean(x**2)) * _P_REF * 10 ** (level_db / 20))
@@ -81,18 +83,12 @@ def test_am_noise_rejects_bad_frequency(bad_f: float) -> None:
 def test_signal_reference_is_one_vacil() -> None:
     # The 1 kHz / 60 dB / m=1 / 4 Hz AM tone defines 1 vacil; the model is
     # calibrated to it.
-    res = psychoacoustics.fluctuation_strength(
-        _am_tone(1000.0, 60.0, 1.0, 4.0), _FS
-    )
-    assert res.fluctuation_strength == pytest.approx(
-        ref.FS_CALIBRATION_VACIL, abs=0.1
-    )
+    res = psychoacoustics.fluctuation_strength(_am_tone(1000.0, 60.0, 1.0, 4.0), _FS)
+    assert res.fluctuation_strength == pytest.approx(ref.FS_CALIBRATION_VACIL, abs=0.1)
 
 
 def test_signal_result_fields_and_plot() -> None:
-    res = psychoacoustics.fluctuation_strength(
-        _am_tone(1000.0, 60.0, 1.0, 4.0), _FS
-    )
+    res = psychoacoustics.fluctuation_strength(_am_tone(1000.0, 60.0, 1.0, 4.0), _FS)
     assert isinstance(res, psychoacoustics.FluctuationStrengthResult)
     assert res.specific.shape == (47,)
     assert res.bark_axis.shape == (47,)
@@ -163,8 +159,14 @@ def test_signal_carrier_sweep_tracks_fig_10_5() -> None:
     assert model[8000.0] < 0.75 * min(plateau)  # 8 kHz roll-off
 
 
-def _am_bbn(level_db: float, m: float, fmod: float, dur: float = 4.0,
-            seed: int = 1234, bandwidth_hz: float = 16000.0) -> np.ndarray:
+def _am_bbn(
+    level_db: float,
+    m: float,
+    fmod: float,
+    dur: float = 4.0,
+    seed: int = 1234,
+    bandwidth_hz: float = 16000.0,
+) -> np.ndarray:
     """AM broadband noise (band-limited white), overall level in dB SPL."""
     rng = np.random.default_rng(seed)
     n = int(_FS * dur)

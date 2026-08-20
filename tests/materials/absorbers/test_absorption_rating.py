@@ -68,8 +68,21 @@ def test_reference_curve_verbatim() -> None:
 def test_band_layout() -> None:
     assert OCTAVE_BANDS == (250, 500, 1000, 2000, 4000)
     assert THIRD_OCTAVE_BANDS == (
-        200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
-        3150, 4000, 5000,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
     )
     # Each octave centre is the middle of its one-third-octave triple.
     for i, octave in enumerate(OCTAVE_BANDS):
@@ -113,7 +126,9 @@ def test_shift_is_the_smallest_qualifying_one() -> None:
     res = weighted_absorption(_ANNEX_A1_ALPHA_P)
     ref_units = [16, 20, 20, 20, 18]
     meas_units = [7, 14, 13, 12, 11]
-    smaller = sum(max(0, (r - 7) - m) for r, m in zip(ref_units, meas_units, strict=True))
+    smaller = sum(
+        max(0, (r - 7) - m) for r, m in zip(ref_units, meas_units, strict=True)
+    )
     assert smaller / 20.0 > 0.10
     assert _almost(res.shift, 0.40)
 
@@ -272,8 +287,21 @@ def test_end_to_end_from_third_octaves() -> None:
 def test_from_third_octave_matches_octave_path_and_carries_alpha_s() -> None:
     # A 15-band alpha_s whose octave means are the A.2 practical coefficients.
     alpha_s = [
-        0.30, 0.35, 0.40, 1.00, 1.00, 1.00, 0.62, 0.66, 0.67,
-        0.58, 0.60, 0.62, 0.53, 0.55, 0.57,
+        0.30,
+        0.35,
+        0.40,
+        1.00,
+        1.00,
+        1.00,
+        0.62,
+        0.66,
+        0.67,
+        0.58,
+        0.60,
+        0.62,
+        0.53,
+        0.55,
+        0.57,
     ]
     res = weighted_absorption_from_third_octave(alpha_s)
     ref = weighted_absorption(_ANNEX_A2_ALPHA_P)
@@ -319,8 +347,9 @@ def test_weighted_absorption_rejects_non_finite() -> None:
     with pytest.raises(ValueError, match="finite"):
         weighted_absorption([0.35, float("nan"), 0.65, 0.60, 0.55])
     with pytest.raises(ValueError, match="finite"):
-        weighted_absorption({250: 0.35, 500: float("inf"), 1000: 0.65,
-                             2000: 0.60, 4000: 0.55})
+        weighted_absorption(
+            {250: 0.35, 500: float("inf"), 1000: 0.65, 2000: 0.60, 4000: 0.55}
+        )
 
 
 def test_plot_smoke() -> None:
@@ -337,9 +366,13 @@ def test_public_exports() -> None:
     from phonometry import materials
 
     for name in (
-        "AbsorptionRatingResult", "OCTAVE_BANDS", "REFERENCE_CURVE",
-        "THIRD_OCTAVE_BANDS", "absorption_class",
-        "practical_absorption_coefficient", "weighted_absorption",
+        "AbsorptionRatingResult",
+        "OCTAVE_BANDS",
+        "REFERENCE_CURVE",
+        "THIRD_OCTAVE_BANDS",
+        "absorption_class",
+        "practical_absorption_coefficient",
+        "weighted_absorption",
         "weighted_absorption_from_third_octave",
     ):
         assert hasattr(materials, name), name

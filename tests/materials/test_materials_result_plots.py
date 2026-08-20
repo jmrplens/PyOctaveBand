@@ -57,7 +57,8 @@ def test_transfer_matrix_plot_tl_and_absorption() -> None:
     )
     # Twin axis: the Eq. (28) hard-backed absorption companion on a 0..1 scale.
     twins = [
-        other for other in ax.figure.axes
+        other
+        for other in ax.figure.axes
         if other is not ax and other.bbox.bounds == ax.bbox.bounds
     ]
     assert len(twins) == 1
@@ -105,12 +106,8 @@ def test_layered_absorber_plot_alpha_and_reflection() -> None:
 def test_porous_medium_plot_normalized_components() -> None:
     res = _porous_medium()
     ax = res.plot()
-    np.testing.assert_allclose(
-        ax.lines[0].get_ydata(), res.normalized_impedance.real
-    )
-    np.testing.assert_allclose(
-        ax.lines[1].get_ydata(), -res.normalized_impedance.imag
-    )
+    np.testing.assert_allclose(ax.lines[0].get_ydata(), res.normalized_impedance.real)
+    np.testing.assert_allclose(ax.lines[1].get_ydata(), -res.normalized_impedance.imag)
     assert len(ax.lines) == 4
     plt.close("all")
 

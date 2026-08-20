@@ -18,7 +18,9 @@ def test_zero_phase_no_group_delay() -> None:
     center = FS // 2
     x[center] = 1.0
 
-    _, _, bands_zp = bank.filter(x, sigbands=True, zero_phase=True, calculate_level=False)
+    _, _, bands_zp = bank.filter(
+        x, sigbands=True, zero_phase=True, calculate_level=False
+    )
     yb = bands_zp[0]
     centroid = int(np.sum(np.arange(len(yb)) * yb**2) / np.sum(yb**2))
     assert abs(centroid - center) < FS // 1000  # within 1 ms
@@ -35,7 +37,9 @@ def test_zero_phase_doubles_attenuation() -> None:
     x = np.sin(2 * np.pi * 4000 * t)  # far out of band
 
     _, _, bands_fwd = bank.filter(x, sigbands=True, calculate_level=False)
-    _, _, bands_zp = bank.filter(x, sigbands=True, calculate_level=False, zero_phase=True)
+    _, _, bands_zp = bank.filter(
+        x, sigbands=True, calculate_level=False, zero_phase=True
+    )
     mid = slice(FS // 4, 3 * FS // 4)
     rms_fwd = np.sqrt(np.mean(bands_fwd[0][mid] ** 2))
     rms_zp = np.sqrt(np.mean(bands_zp[0][mid] ** 2))

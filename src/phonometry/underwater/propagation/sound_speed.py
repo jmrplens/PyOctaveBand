@@ -83,7 +83,8 @@ def depth_to_pressure(depth: float, latitude: float = 45.0) -> float:
 
 
 def _pressure_mpa(
-    z: float | NDArray[np.float64], latitude_deg: float,
+    z: float | NDArray[np.float64],
+    latitude_deg: float,
 ) -> float | NDArray[np.float64]:
     """Leroy & Parthiot standard-ocean pressure, array-capable kernel."""
     phi = np.radians(latitude_deg)
@@ -100,7 +101,8 @@ def _pressure_mpa(
 
 
 def _mackenzie(
-    t: float | NDArray[np.float64], s: float | NDArray[np.float64],
+    t: float | NDArray[np.float64],
+    s: float | NDArray[np.float64],
     depth: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
     return (
@@ -122,7 +124,8 @@ def _mackenzie(
 
 
 def _medwin(
-    t: float | NDArray[np.float64], s: float | NDArray[np.float64],
+    t: float | NDArray[np.float64],
+    s: float | NDArray[np.float64],
     depth: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
     r"""Medwin's short formula, Ainslie (2010) Equation (1.2), printed p. 20.
@@ -170,7 +173,8 @@ _A = (
 
 
 def _unesco(
-    t: float | NDArray[np.float64], s: float | NDArray[np.float64],
+    t: float | NDArray[np.float64],
+    s: float | NDArray[np.float64],
     pressure_bar: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
     p = pressure_bar
@@ -197,7 +201,8 @@ def _unesco(
 
 
 def _del_grosso(
-    t: float | NDArray[np.float64], s: float | NDArray[np.float64],
+    t: float | NDArray[np.float64],
+    s: float | NDArray[np.float64],
     pressure_kgcm2: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
     p = pressure_kgcm2
@@ -286,12 +291,16 @@ class SoundSpeedProfile:
     gradient: NDArray[np.float64]
     model: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the sound-speed profile (speed vs depth, depth increasing down)."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_sound_speed_profile
 
-        return plot_sound_speed_profile(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_sound_speed_profile(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def sound_speed_profile(
@@ -329,13 +338,20 @@ def sound_speed_profile(
     key = model.strip().lower()
     lat = _finite(latitude, "latitude")
     if key in _DEPTH_MODELS:
-        c_any = _mackenzie(temp, sal, z) if key == "mackenzie" else _medwin(temp, sal, z)
+        c_any = (
+            _mackenzie(temp, sal, z) if key == "mackenzie" else _medwin(temp, sal, z)
+        )
     elif key in ("unesco", "del_grosso"):
         pressure_bar = np.asarray(_pressure_mpa(z, lat)) * _BAR_PER_MPA
-        c_any = (_unesco(temp, sal, pressure_bar) if key == "unesco"
-                 else _del_grosso(temp, sal, pressure_bar * _KGCM2_PER_BAR))
+        c_any = (
+            _unesco(temp, sal, pressure_bar)
+            if key == "unesco"
+            else _del_grosso(temp, sal, pressure_bar * _KGCM2_PER_BAR)
+        )
     else:
         raise ValueError(f"'model' must be one of {_MODELS}, got {model!r}.")
     c = np.asarray(c_any, dtype=np.float64)
     gradient = np.gradient(c, z)
-    return SoundSpeedProfile(depth=z, sound_speed=c, gradient=gradient, model=model.strip().lower())
+    return SoundSpeedProfile(
+        depth=z, sound_speed=c, gradient=gradient, model=model.strip().lower()
+    )

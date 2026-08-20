@@ -93,12 +93,18 @@ def material_metadata_pairs(
         *middle,
         (t("Test facility", language), metadata.test_room),
         (t("Date of test", language), metadata.test_date),
-        (t("Temperature [&#176;C]", language),
-         fmt_meta(metadata.temperature, language)
-         if metadata.temperature is not None else None),
-        (t("Relative humidity [%]", language),
-         fmt_meta(metadata.relative_humidity, language)
-         if metadata.relative_humidity is not None else None),
+        (
+            t("Temperature [&#176;C]", language),
+            fmt_meta(metadata.temperature, language)
+            if metadata.temperature is not None
+            else None,
+        ),
+        (
+            t("Relative humidity [%]", language),
+            fmt_meta(metadata.relative_humidity, language)
+            if metadata.relative_humidity is not None
+            else None,
+        ),
     ]
     return escaped_pairs(specs)
 

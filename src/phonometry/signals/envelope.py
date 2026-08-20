@@ -180,16 +180,12 @@ def envelope(
     if factor < 1:
         raise ValueError("'decimation_factor' must be a positive integer.")
     if factor >= xa.size:
-        raise ValueError(
-            "'decimation_factor' must be smaller than the record length."
-        )
+        raise ValueError("'decimation_factor' must be smaller than the record length.")
 
     analytic = sp_signal.hilbert(xa)
     env = np.asarray(np.abs(analytic), dtype=np.float64)
     phase = np.asarray(np.unwrap(np.angle(analytic)), dtype=np.float64)
-    inst_freq = np.asarray(
-        np.gradient(phase) * fs_v / (2.0 * np.pi), dtype=np.float64
-    )
+    inst_freq = np.asarray(np.gradient(phase) * fs_v / (2.0 * np.pi), dtype=np.float64)
 
     if factor > 1:
         env = _decimate_envelope(env, factor, antialias)
@@ -280,16 +276,14 @@ def _bandpass_pre_filter(
         low, high = (float(edge) for edge in band)
     except (TypeError, ValueError) as exc:
         raise ValueError(
-            "'band' must be a pair of numeric (low, high) edges in Hz, "
-            f"got {band!r}."
+            f"'band' must be a pair of numeric (low, high) edges in Hz, got {band!r}."
         ) from exc
     if not 0.0 < low < high < fs / 2.0:
         raise ValueError(
             "'band' must satisfy 0 < low < high < fs/2; got "
             f"({low:g}, {high:g}) at fs = {fs:g} Hz."
         )
-    sos = sp_signal.butter(4, (low, high), btype="bandpass", fs=fs,
-                           output="sos")
+    sos = sp_signal.butter(4, (low, high), btype="bandpass", fs=fs, output="sos")
     # sosfiltfilt's default edge padding needs 3*(2*n_sections + 1)
     # samples; fail with a clear message instead of scipy's padlen error.
     min_length = 3 * (2 * sos.shape[0] + 1) + 1
@@ -380,15 +374,11 @@ def envelope_spectrum(
     xa = _validate_signal(x, "x", context="an envelope spectrum")
     fs_v = _positive(resolve_fs(x, fs), "fs")
     if kind not in ("magnitude", "squared"):
-        raise ValueError(
-            f"'kind' must be 'magnitude' or 'squared', got {kind!r}."
-        )
+        raise ValueError(f"'kind' must be 'magnitude' or 'squared', got {kind!r}.")
     n = xa.size
     nfft_v = n if nfft is None else int(nfft)
     if nfft_v < n:
-        raise ValueError(
-            f"'nfft' must be at least the record length ({n} samples)."
-        )
+        raise ValueError(f"'nfft' must be at least the record length ({n} samples).")
 
     band_v: tuple[float, float] | None = None
     if band is not None:

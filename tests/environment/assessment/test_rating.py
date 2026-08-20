@@ -27,7 +27,11 @@ def test_lden_constant_level_analytic() -> None:
 def test_lden_hand_computed() -> None:
     ld, le, ln_ = 60.0, 55.0, 50.0
     expected = 10 * np.log10(
-        (12 * 10 ** (0.1 * ld) + 4 * 10 ** (0.1 * (le + 5)) + 8 * 10 ** (0.1 * (ln_ + 10)))
+        (
+            12 * 10 ** (0.1 * ld)
+            + 4 * 10 ** (0.1 * (le + 5))
+            + 8 * 10 ** (0.1 * (ln_ + 10))
+        )
         / 24
     )
     assert environment.lden(ld, le, ln_) == pytest.approx(expected, abs=1e-12)
@@ -37,7 +41,11 @@ def test_lden_custom_periods() -> None:
     """EU member states may shorten the evening (3.6.4 Note 1)."""
     ld, le, ln_ = 60.0, 55.0, 50.0
     expected = 10 * np.log10(
-        (12 * 10 ** (0.1 * ld) + 2 * 10 ** (0.1 * (le + 5)) + 10 * 10 ** (0.1 * (ln_ + 10)))
+        (
+            12 * 10 ** (0.1 * ld)
+            + 2 * 10 ** (0.1 * (le + 5))
+            + 10 * 10 ** (0.1 * (ln_ + 10))
+        )
         / 24
     )
     assert environment.lden(ld, le, ln_, hours=(12, 2, 10)) == pytest.approx(
@@ -81,17 +89,13 @@ def test_composite_validation() -> None:
     with pytest.raises(ValueError, match="24"):
         environment.composite_rating_level([(60.0, 10.0, 0.0)])
     with pytest.raises(ValueError, match="positive"):
-        environment.composite_rating_level(
-            [(60.0, -1.0, 0.0), (50.0, 25.0, 0.0)]
-        )
+        environment.composite_rating_level([(60.0, -1.0, 0.0), (50.0, 25.0, 0.0)])
 
 
 def test_composite_accepts_generator_and_rejects_empty() -> None:
     periods = [(60.0, 12, 0.0), (55.0, 4, 5.0), (50.0, 8, 10.0)]
     from_gen = environment.composite_rating_level(p for p in periods)
-    assert from_gen == pytest.approx(
-        environment.composite_rating_level(periods)
-    )
+    assert from_gen == pytest.approx(environment.composite_rating_level(periods))
     with pytest.raises(ValueError, match="one period"):
         environment.composite_rating_level([])
 

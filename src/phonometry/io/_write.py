@@ -150,9 +150,7 @@ def _resolve_input(
         data = np.asarray(data, dtype=np.float64)
     data = np.atleast_2d(data)
     if data.ndim != 2:
-        raise ValueError(
-            f"x must be 1-D or (channels, samples); got {data.ndim}-D"
-        )
+        raise ValueError(f"x must be 1-D or (channels, samples); got {data.ndim}-D")
     return data, int(fs)
 
 
@@ -176,7 +174,7 @@ def _resolve_subtype(data: np.ndarray, subtype: str | None) -> str:
                 "the codes. Convert to float64 first to choose a depth."
             )
         return implied
-    if data.dtype.kind not in "f":
+    if data.dtype.kind != "f":
         raise ValueError(
             f"unsupported input dtype {data.dtype}: pass float data, or "
             "int16/int32 codes for bit-exact pass-through"
@@ -210,9 +208,7 @@ def _quantise(
     ideal = data * scale
     if dither == "tpdf":
         generator = np.random.default_rng(rng)
-        ideal = ideal + (
-            generator.random(data.shape) - generator.random(data.shape)
-        )
+        ideal = ideal + (generator.random(data.shape) - generator.random(data.shape))
     codes = np.rint(ideal)
     lo, hi = -scale, scale - 1.0
     clipped = int(np.count_nonzero((codes < lo) | (codes > hi)))
@@ -244,9 +240,7 @@ def _pack_pcm24(codes_interleaved: NDArray[np.int64]) -> bytes:
     the vectorised form of "keep the low three".
     """
     as_int32 = codes_interleaved.astype("<i4")
-    return np.ascontiguousarray(
-        as_int32.view(np.uint8).reshape(-1, 4)[:, :3]
-    ).tobytes()
+    return np.ascontiguousarray(as_int32.view(np.uint8).reshape(-1, 4)[:, :3]).tobytes()
 
 
 def build_wav_header(
@@ -279,7 +273,12 @@ def build_wav_header(
     block_align = channels * sample_bytes
     data_size = frames * block_align
     fmt_payload = struct.pack(
-        "<HHIIHH", tag, channels, fs, fs * block_align, block_align,
+        "<HHIIHH",
+        tag,
+        channels,
+        fs,
+        fs * block_align,
+        block_align,
         8 * sample_bytes,
     )
     if tag != 0x0001:
@@ -293,15 +292,22 @@ def build_wav_header(
     riff_payload = 4 + len(body) + 8 + data_size + data_size % 2
     if riff_payload <= 0xFFFFFFFF:
         return (
-            b"RIFF" + struct.pack("<I", riff_payload) + b"WAVE" + body
-            + b"data" + struct.pack("<I", data_size)
+            b"RIFF"
+            + struct.pack("<I", riff_payload)
+            + b"WAVE"
+            + body
+            + b"data"
+            + struct.pack("<I", data_size)
         )
-    ds64 = b"ds64" + struct.pack(
-        "<IQQQI", 28, riff_payload + 36, data_size, frames, 0
-    )
+    ds64 = b"ds64" + struct.pack("<IQQQI", 28, riff_payload + 36, data_size, frames, 0)
     return (
-        b"RF64" + struct.pack("<I", 0xFFFFFFFF) + b"WAVE" + ds64 + body
-        + b"data" + struct.pack("<I", 0xFFFFFFFF)
+        b"RF64"
+        + struct.pack("<I", 0xFFFFFFFF)
+        + b"WAVE"
+        + ds64
+        + body
+        + b"data"
+        + struct.pack("<I", 0xFFFFFFFF)
     )
 
 
@@ -370,7 +376,11 @@ def append_riff_chunk(path: str | Path, chunk_id: bytes, payload: bytes) -> None
 
 #: subtype -> word length written to disk, for the CodingHistory ``W=``.
 _SUBTYPE_BITS = {
-    "PCM_16": 16, "PCM_24": 24, "PCM_32": 32, "FLOAT": 32, "DOUBLE": 64,
+    "PCM_16": 16,
+    "PCM_24": 24,
+    "PCM_32": 32,
+    "FLOAT": 32,
+    "DOUBLE": 64,
 }
 
 
@@ -423,13 +433,14 @@ def _resolve_bext(
         meta = with_measured_loudness(base, full_scale, fs)
     else:
         raise ValueError(
-            f"unknown bext {bext!r}: pass None, 'loudness' or a "
-            "BroadcastMetadata"
+            f"unknown bext {bext!r}: pass None, 'loudness' or a BroadcastMetadata"
         )
     if meta is None:
         return None
     line = coding_history_line(
-        fs=fs, bits=_SUBTYPE_BITS[subtype], channels=int(data.shape[0]),
+        fs=fs,
+        bits=_SUBTYPE_BITS[subtype],
+        channels=int(data.shape[0]),
         algorithm=algorithm,
     )
     meta = replace(
@@ -460,7 +471,10 @@ def _reconcile_streamed_header(
     discrepancy this large is no codec quirk and refusing is honest.
     """
     patched = build_wav_header(
-        fs=fs, channels=channels, subtype=subtype, frames=written,
+        fs=fs,
+        channels=channels,
+        subtype=subtype,
+        frames=written,
         metadata_chunks=metadata_chunks,
     )
     if len(patched) != header_len:
@@ -506,7 +520,10 @@ def write_wav_stream(
         rounding detail.
     """
     header = build_wav_header(
-        fs=fs, channels=channels, subtype=subtype, frames=frames,
+        fs=fs,
+        channels=channels,
+        subtype=subtype,
+        frames=frames,
         metadata_chunks=metadata_chunks,
     )
     written = 0
@@ -522,8 +539,13 @@ def write_wav_stream(
             fh.write(b"\x00")  # RIFF word alignment; not counted in the size
         if written != frames and frames_are_estimate:
             _reconcile_streamed_header(
-                fh, path, fs=fs, channels=channels, subtype=subtype,
-                written=written, header_len=len(header),
+                fh,
+                path,
+                fs=fs,
+                channels=channels,
+                subtype=subtype,
+                written=written,
+                header_len=len(header),
                 metadata_chunks=metadata_chunks,
             )
             frames = written
@@ -544,7 +566,12 @@ def write_wav(
 ) -> None:
     """Write ``(channels, samples)`` data as one WAV file, in one block."""
     write_wav_stream(
-        path, [data], fs, int(data.shape[0]), subtype, int(data.shape[-1]),
+        path,
+        [data],
+        fs,
+        int(data.shape[0]),
+        subtype,
+        int(data.shape[-1]),
         metadata_chunks=metadata_chunks,
     )
 
@@ -597,10 +624,12 @@ def _write_pcm24(
     if clipped:
         _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
     write_wav(
-        path, codes, rate, resolved,
+        path,
+        codes,
+        rate,
+        resolved,
         metadata_chunks=(
-            frame_riff_chunk(b"bext", bext_payload)
-            if bext_payload is not None else b""
+            frame_riff_chunk(b"bext", bext_payload) if bext_payload is not None else b""
         ),
     )
 
@@ -616,16 +645,14 @@ def _write_through_scipy(
     """Quantise (PCM) or narrow (float) and hand scipy finished samples."""
     tag, sample_bytes = _SUBTYPE_SPEC[resolved]
     if tag == 0x0001:
-        codes, clipped, peak_dbfs = _quantise(
-            data, 8 * sample_bytes, dither, rng
-        )
+        codes, clipped, peak_dbfs = _quantise(data, 8 * sample_bytes, dither, rng)
         if clipped:
             _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
-        _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2
-                                              else "<i4"))
+        _scipy_write(path, rate, codes.astype("<i2" if sample_bytes == 2 else "<i4"))
     else:
-        _scipy_write(path, rate, data if resolved == "DOUBLE"
-                     else data.astype(np.float32))
+        _scipy_write(
+            path, rate, data if resolved == "DOUBLE" else data.astype(np.float32)
+        )
 
 
 @overload
@@ -794,8 +821,9 @@ def _scipy_write(path: str | Path, fs: int, data: np.ndarray) -> None:
     interleaving and the 1-D mono convention are handled here.
     """
     frames_first = np.ascontiguousarray(data.T)
-    wavfile.write(str(path), fs, frames_first[:, 0] if data.shape[0] == 1
-                  else frames_first)
+    wavfile.write(
+        str(path), fs, frames_first[:, 0] if data.shape[0] == 1 else frames_first
+    )
 
 
 def _flac_passthrough_codes(
@@ -836,7 +864,8 @@ def _flac_quantised_codes(
     if clipped:
         _warn_clipped(path, resolved, clipped, data.size, peak_dbfs)
     out = (
-        codes.astype(np.int16) if resolved == "PCM_16"
+        codes.astype(np.int16)
+        if resolved == "PCM_16"
         else np.left_shift(codes.astype(np.int32), 8)
     )
     return resolved, out
@@ -886,8 +915,7 @@ def _write_flac(
         out = _flac_passthrough_codes(data, subtype, dither)
     else:
         resolved, out = _flac_quantised_codes(path, data, subtype, dither, rng)
-    bext_payload = _resolve_bext(x, bext, data, fs, resolved,
-                                 algorithm="FLAC")
+    bext_payload = _resolve_bext(x, bext, data, fs, resolved, algorithm="FLAC")
     frames_first = np.ascontiguousarray(out.T)
     sf.write(
         str(path),

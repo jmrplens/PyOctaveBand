@@ -85,10 +85,10 @@ def _bext_payload(blob: bytes) -> bytes:
     """
     pos = 12
     while pos + 8 <= len(blob):
-        chunk_id = blob[pos:pos + 4]
+        chunk_id = blob[pos : pos + 4]
         (size,) = struct.unpack_from("<I", blob, pos + 4)
         if chunk_id == b"bext":
-            return blob[pos + 8:pos + 8 + size]
+            return blob[pos + 8 : pos + 8 + size]
         pos += 8 + size + size % 2
     raise ValueError("no bext chunk in the written file")
 
@@ -121,7 +121,7 @@ def _field_bytes(payload: bytes, field: str) -> bytes:
     """Slice one fixed field out of a payload at its transcribed offset."""
     for name, offset, size in ref.TECH3285_BEXT_FIELDS:
         if name == field:
-            return payload[offset:offset + size]
+            return payload[offset : offset + size]
     raise KeyError(field)
 
 
@@ -168,9 +168,9 @@ def _expected_fixed_part() -> dict[str, bytes]:
                 "OriginationDate": "origination_date",
                 "OriginationTime": "origination_time",
             }[name]
-            expected[name] = str(getattr(meta, attribute)).encode(
-                "latin-1"
-            ).ljust(size, b"\x00")
+            expected[name] = (
+                str(getattr(meta, attribute)).encode("latin-1").ljust(size, b"\x00")
+            )
     return expected
 
 
@@ -185,7 +185,7 @@ def _chk_bext_layout() -> Outcome:
     matching = sum(
         1
         for name, offset, size in ref.TECH3285_BEXT_FIELDS
-        if payload[offset:offset + size] == expected[name]
+        if payload[offset : offset + size] == expected[name]
     )
     total = len(ref.TECH3285_BEXT_FIELDS)
     size_ok = len(payload) >= ref.TECH3285_BEXT_FIXED_SIZE
@@ -212,14 +212,21 @@ def _chk_bext_round_trip() -> Outcome:
     _, reread = _canonical()
     meta = _metadata()
     scalar_fields = (
-        "description", "originator", "originator_reference",
-        "origination_date", "origination_time", "time_reference", "version",
-        "umid", "loudness_value", "loudness_range", "max_true_peak_level",
-        "max_momentary_loudness", "max_short_term_loudness",
+        "description",
+        "originator",
+        "originator_reference",
+        "origination_date",
+        "origination_time",
+        "time_reference",
+        "version",
+        "umid",
+        "loudness_value",
+        "loudness_range",
+        "max_true_peak_level",
+        "max_momentary_loudness",
+        "max_short_term_loudness",
     )
-    identical = sum(
-        1 for f in scalar_fields if getattr(reread, f) == getattr(meta, f)
-    )
+    identical = sum(1 for f in scalar_fields if getattr(reread, f) == getattr(meta, f))
     # The CodingHistory is required to differ: the writer appends its own
     # R 98 row beneath the prior trail (checked in its own rows below).
     extended = reread.coding_history.startswith(ref.EBU_R98_EXAMPLE2_PRIOR_LINE)
@@ -234,12 +241,16 @@ def _chk_bext_round_trip() -> Outcome:
     )
 
 
-def _loudness_examples_outcome(rows: tuple[int, ...], fields: tuple[str, ...]) -> Outcome:
+def _loudness_examples_outcome(
+    rows: tuple[int, ...], fields: tuple[str, ...]
+) -> Outcome:
     """Write one file carrying three worked-example values; compare on disk."""
     examples = [ref.TECH3285_LOUDNESS_EXAMPLES[i] for i in rows]
     overrides = {
-        "loudness_value": None, "loudness_range": None,
-        "max_true_peak_level": None, "max_momentary_loudness": None,
+        "loudness_value": None,
+        "loudness_range": None,
+        "max_true_peak_level": None,
+        "max_momentary_loudness": None,
         "max_short_term_loudness": None,
     }
     attribute = {
@@ -256,11 +267,11 @@ def _loudness_examples_outcome(rows: tuple[int, ...], fields: tuple[str, ...]) -
     expected_txt = ", ".join(
         f"{value} -> {hexa:04X}h ({dec})" for value, dec, hexa in examples
     )
-    computed_txt = ", ".join(
-        f"{got & 0xFFFF:04X}h ({got})" for got in stored
-    )
+    computed_txt = ", ".join(f"{got & 0xFFFF:04X}h ({got})" for got in stored)
     passed = all(got == dec for got, (_v, dec, _h) in zip(stored, examples))
-    return Outcome(expected=expected_txt, computed=computed_txt, delta="-", passed=passed)
+    return Outcome(
+        expected=expected_txt, computed=computed_txt, delta="-", passed=passed
+    )
 
 
 @register(
@@ -293,17 +304,26 @@ def _chk_loudness_examples_positive() -> Outcome:
     "Unused loudness parameters: 7FFFh on disk, None through the reader",
 )
 def _chk_loudness_unset_sentinel() -> Outcome:
-    payload, reread = _write_and_capture(_metadata(
-        loudness_value=None, loudness_range=None, max_true_peak_level=None,
-        max_momentary_loudness=None, max_short_term_loudness=None,
-    ))
+    payload, reread = _write_and_capture(
+        _metadata(
+            loudness_value=None,
+            loudness_range=None,
+            max_true_peak_level=None,
+            max_momentary_loudness=None,
+            max_short_term_loudness=None,
+        )
+    )
     fields = (
-        "LoudnessValue", "LoudnessRange", "MaxTruePeakLevel",
-        "MaxMomentaryLoudness", "MaxShortTermLoudness",
+        "LoudnessValue",
+        "LoudnessRange",
+        "MaxTruePeakLevel",
+        "MaxMomentaryLoudness",
+        "MaxShortTermLoudness",
     )
     on_disk = [_uint16_at(payload, field) for field in fields]
     reread_none = (
-        reread.loudness_value is None and reread.loudness_range is None
+        reread.loudness_value is None
+        and reread.loudness_range is None
         and reread.max_true_peak_level is None
         and reread.max_momentary_loudness is None
         and reread.max_short_term_loudness is None
@@ -330,10 +350,12 @@ def _chk_loudness_clamp() -> Outcome:
     # -inf LUFS. Tech 3285 reserves 7FFFh for "not being used", so a real
     # value must never land there: the serialiser's documented rule pins
     # the overflow one code below the sentinel and the underflow to 8000h.
-    payload, reread = _write_and_capture(_metadata(
-        max_true_peak_level=327.9,
-        max_momentary_loudness=float("-inf"),
-    ))
+    payload, reread = _write_and_capture(
+        _metadata(
+            max_true_peak_level=327.9,
+            max_momentary_loudness=float("-inf"),
+        )
+    )
     over = _uint16_at(payload, "MaxTruePeakLevel")
     under = _uint16_at(payload, "MaxMomentaryLoudness")
     sentinel = ref.TECH3285_LOUDNESS_UNSET
@@ -393,12 +415,13 @@ def _chk_coding_history_grammar() -> Outcome:
     payload, reread = _r98_history()
     rows = reread.coding_history.split("\r\n")
     appended = rows[-1]
-    raw_history = payload[ref.TECH3285_BEXT_FIXED_SIZE:].split(b"\x00", 1)[0]
+    raw_history = payload[ref.TECH3285_BEXT_FIXED_SIZE :].split(b"\x00", 1)[0]
     prefix = ref.EBU_R98_EXAMPLE1_PCM_PREFIX
-    free_text = appended[len(prefix):] if appended.startswith(prefix) else ""
+    free_text = appended[len(prefix) :] if appended.startswith(prefix) else ""
     passed = (
         appended.startswith(prefix)
-        and free_text != "" and "," not in free_text  # T= free string, no commas
+        and free_text != ""
+        and "," not in free_text  # T= free string, no commas
         and raw_history.endswith(b"\r\n")  # every row CR/LF-terminated
     )
     shown = appended.split(",T=")[0] + ",T=(free text)" if appended else "(empty)"
@@ -427,8 +450,11 @@ def _chk_coding_history_appends() -> Outcome:
         expected="2 rows: Example 2's A/D row intact above, the writer's beneath",
         computed=(
             f"{len(rows)} rows, prior row "
-            + ("byte-identical" if rows and rows[0] == ref.EBU_R98_EXAMPLE2_PRIOR_LINE
-               else "altered")
+            + (
+                "byte-identical"
+                if rows and rows[0] == ref.EBU_R98_EXAMPLE2_PRIOR_LINE
+                else "altered"
+            )
         ),
         delta="-",
         passed=passed,
@@ -438,11 +464,16 @@ def _chk_coding_history_appends() -> Outcome:
 @functools.cache
 def _v1_capture() -> tuple[bytes, BroadcastMetadata]:
     """A version 1 chunk: UMID present, no loudness (those bytes reserved)."""
-    return _write_and_capture(_metadata(
-        version=1, loudness_value=None, loudness_range=None,
-        max_true_peak_level=None, max_momentary_loudness=None,
-        max_short_term_loudness=None,
-    ))
+    return _write_and_capture(
+        _metadata(
+            version=1,
+            loudness_value=None,
+            loudness_range=None,
+            max_true_peak_level=None,
+            max_momentary_loudness=None,
+            max_short_term_loudness=None,
+        )
+    )
 
 
 def _refused(**overrides: object) -> bool:
@@ -461,8 +492,11 @@ def _refused(**overrides: object) -> bool:
 )
 def _chk_umid_version_gate() -> Outcome:
     refused_v0 = _refused(
-        version=0, loudness_value=None, loudness_range=None,
-        max_true_peak_level=None, max_momentary_loudness=None,
+        version=0,
+        loudness_value=None,
+        loudness_range=None,
+        max_true_peak_level=None,
+        max_momentary_loudness=None,
         max_short_term_loudness=None,
     )
     payload, reread = _v1_capture()
@@ -491,13 +525,13 @@ def _chk_loudness_version_gate() -> Outcome:
     payload, reread = _v1_capture()
     offsets = {name: offset for name, offset, _size in ref.TECH3285_BEXT_FIELDS}
     start = offsets["LoudnessValue"]
-    loudness_area = payload[start:start + ref.TECH3285_LOUDNESS_BYTES]
+    loudness_area = payload[start : start + ref.TECH3285_LOUDNESS_BYTES]
     zeroed = loudness_area == bytes(ref.TECH3285_LOUDNESS_BYTES)
     reread_none = reread.loudness_value is None and reread.loudness_range is None
     v2_payload, _ = _canonical()
-    v2_carries = _int16_at(v2_payload, "LoudnessValue") == _LOUDNESS_ON_GRID[
-        "LoudnessValue"
-    ][1]
+    v2_carries = (
+        _int16_at(v2_payload, "LoudnessValue") == _LOUDNESS_ON_GRID["LoudnessValue"][1]
+    )
     passed = refused_v1 and zeroed and reread_none and v2_carries
     return Outcome(
         expected="v1+loudness refused; v1 writes 10 zero bytes, reads None; v2 carries",
@@ -524,18 +558,16 @@ _LONG_DATA_BYTES = _LONG_FRAMES * 6
 
 @functools.cache
 def _promoted_header() -> bytes:
-    return build_wav_header(
-        fs=48000, channels=2, subtype="PCM_24", frames=_LONG_FRAMES
-    )
+    return build_wav_header(fs=48000, channels=2, subtype="PCM_24", frames=_LONG_FRAMES)
 
 
 def _ds64_u64(payload: bytes, low_field: str) -> int:
     """Join a low/high DWORD pair of the ds64 payload into its uint64."""
     offsets = {name: offset for name, offset, _size in ref.BS2088_DS64_FIELDS}
-    low = int.from_bytes(payload[offsets[low_field]:offsets[low_field] + 4], "little")
+    low = int.from_bytes(payload[offsets[low_field] : offsets[low_field] + 4], "little")
     high_field = low_field.replace("Low", "High")
     high = int.from_bytes(
-        payload[offsets[high_field]:offsets[high_field] + 4], "little"
+        payload[offsets[high_field] : offsets[high_field] + 4], "little"
     )
     return high << 32 | low
 
@@ -549,7 +581,7 @@ def _chk_ds64_geometry() -> Outcome:
     header = _promoted_header()
     first_id = header[12:16]
     (ck_size,) = struct.unpack_from("<I", header, 16)
-    payload = header[20:20 + ck_size]
+    payload = header[20 : 20 + ck_size]
     riff_size = _ds64_u64(payload, "bw64SizeLow")
     data_size = _ds64_u64(payload, "dataSizeLow")
     offsets = {name: offset for name, offset, _size in ref.BS2088_DS64_FIELDS}
@@ -590,8 +622,10 @@ def _chk_size_sentinels() -> Outcome:
     form_type = header[8:12]
     sentinel = ref.BS2088_SIZE_SENTINEL
     passed = (
-        outer == sentinel and data_field == sentinel and form_type == b"WAVE"
-        and header[len(header) - 8:len(header) - 4] == b"data"
+        outer == sentinel
+        and data_field == sentinel
+        and form_type == b"WAVE"
+        and header[len(header) - 8 : len(header) - 4] == b"data"
     )
     return Outcome(
         expected=f"outer size = data size = {sentinel:08X}h, form type WAVE",
@@ -618,9 +652,15 @@ def _sixty_four_bit_file(fourcc: bytes) -> bytes:
     riff_size = 4 + 8 + ref.BS2088_DS64_MIN_SIZE + 8 + len(fmt) + 8 + len(samples)
     ds64 = struct.pack("<QQQI", riff_size, len(samples), 0, 0)
     body = (
-        b"ds64" + struct.pack("<I", len(ds64)) + ds64
-        + b"fmt " + struct.pack("<I", len(fmt)) + fmt
-        + b"data" + struct.pack("<I", sentinel) + samples
+        b"ds64"
+        + struct.pack("<I", len(ds64))
+        + ds64
+        + b"fmt "
+        + struct.pack("<I", len(fmt))
+        + fmt
+        + b"data"
+        + struct.pack("<I", sentinel)
+        + samples
     )
     return fourcc + struct.pack("<I", sentinel) + b"WAVE" + body
 
@@ -637,9 +677,7 @@ def _chk_reader_ds64_resolution() -> Outcome:
             path = Path(tmp) / f"{fourcc.decode('latin-1').lower()}.wav"
             path.write_bytes(_sixty_four_bit_file(fourcc))
             described = info(path)
-            results[fourcc.decode("latin-1")] = (
-                described.container, described.frames
-            )
+            results[fourcc.decode("latin-1")] = (described.container, described.frames)
     passed = results == {"RF64": ("RF64", 48), "BW64": ("BW64", 48)}
     return Outcome(
         expected="RF64: 48 frames, BW64: 48 frames (via ds64 dataSize = 96 B)",

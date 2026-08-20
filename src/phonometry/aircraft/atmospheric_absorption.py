@@ -83,12 +83,16 @@ class AircraftBandAttenuation:
     relative_humidity: float
     pressure: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the band and pure-tone mid-band attenuation versus frequency."""
         from .._i18n import check_language
         from .._plot.aircraft import plot_aircraft_band_attenuation
 
-        return plot_aircraft_band_attenuation(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_aircraft_band_attenuation(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def sae_band_attenuation(
@@ -122,7 +126,9 @@ def sae_band_attenuation(
     s = require_non_negative(path_length, "path_length")
 
     # Pure-tone coefficient at the exact mid-band frequency (ISO 9613-1).
-    alpha = air_attenuation(f, temperature, relative_humidity, pressure, exact_midband=True)
+    alpha = air_attenuation(
+        f, temperature, relative_humidity, pressure, exact_midband=True
+    )
     delta_t = alpha * s
     delta_b = _sae_band(delta_t)
     return AircraftBandAttenuation(

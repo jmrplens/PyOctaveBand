@@ -115,7 +115,9 @@ class STIResult:
     band_levels: np.ndarray | None
     rating: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band MTI bars with the STI and rating letter.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -221,7 +223,9 @@ def _octave_bank(fs: int) -> OctaveFilterBank:
     return bank
 
 
-def _validate_band_vector(values: Sequence[float] | np.ndarray, name: str) -> np.ndarray:
+def _validate_band_vector(
+    values: Sequence[float] | np.ndarray, name: str
+) -> np.ndarray:
     arr = np.asarray(values, dtype=np.float64)
     if arr.shape != (_NUM_BANDS,):
         raise ValueError(
@@ -307,7 +311,9 @@ def _corrected_mtf(
     else:
         ambient_arr = None
     i_noise = (
-        10.0 ** (ambient_arr / 10.0) if ambient_arr is not None else np.zeros(_NUM_BANDS)
+        10.0 ** (ambient_arr / 10.0)
+        if ambient_arr is not None
+        else np.zeros(_NUM_BANDS)
     )
     i_total = i_signal + i_noise
     level_total = 10.0 * np.log10(i_total)
@@ -763,7 +769,10 @@ def stipa_signal(
         envelope = 0.5 * (
             1.0
             + _STIPA_MOD_INDEX
-            * (np.sin(2.0 * np.pi * _STIPA_F1[k] * t) - np.sin(2.0 * np.pi * _STIPA_F2[k] * t))
+            * (
+                np.sin(2.0 * np.pi * _STIPA_F1[k] * t)
+                - np.sin(2.0 * np.pi * _STIPA_F2[k] * t)
+            )
         )
         # Intensity modulation: amplitude carries the square root. The
         # exact 1:5 frequency ratios keep the envelope non-negative; the

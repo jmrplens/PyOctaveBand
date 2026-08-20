@@ -27,9 +27,7 @@ _PDF_MAGIC = b"%PDF"
 
 def _class1_bank() -> filters.OctaveFilterBank:
     """A default Butterworth octave bank that meets IEC 61260-1:2014 class 1."""
-    return filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[125, 4000]
-    )
+    return filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[125, 4000])
 
 
 def _assert_one_page(path: str) -> None:
@@ -43,9 +41,7 @@ def _assert_one_page(path: str) -> None:
 
 def test_filter_class_compliance_carries_bank_data() -> None:
     """The result packages the bank data and agrees with verify_filter_class."""
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[500, 2000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[500, 2000])
     result = filters.filter_class_compliance(bank)
     verdict = filters.verify_filter_class(bank)
 
@@ -59,9 +55,7 @@ def test_filter_class_compliance_carries_bank_data() -> None:
     assert result.edition == "2014"
     # The per-band margins survive the packaging unchanged.
     for stored, computed in zip(result.bands, verdict["bands"], strict=True):
-        assert stored["margin_class1_db"] == pytest.approx(
-            computed["margin_class1_db"]
-        )
+        assert stored["margin_class1_db"] == pytest.approx(computed["margin_class1_db"])
     # Frozen and picklable (like the other result dataclasses).
     pickle.loads(pickle.dumps(result))
 
@@ -78,16 +72,18 @@ def test_class1_bank_reports_complies(tmp_path) -> None:
 
 def test_1995_edition_reports_class0(tmp_path) -> None:
     """The 1995 edition keeps class 0; a high-order bank renders a Class 0 fiche."""
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=6, limits=[250, 4000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=6, limits=[250, 4000])
     result = filters.filter_class_compliance(bank, edition="1995")
     assert result.edition == "1995"
     assert result.overall_class == 0
     assert 0 in result.available_classes()  # class 0 only exists in the 1995 mask
     out = tmp_path / "iec1995.pdf"
-    result.report(str(out), metadata=ReportMetadata(
-        measurement_standard="IEC 61260:1995", required_class=0))
+    result.report(
+        str(out),
+        metadata=ReportMetadata(
+            measurement_standard="IEC 61260:1995", required_class=0
+        ),
+    )
     _assert_one_page(str(out))
 
 
@@ -130,9 +126,7 @@ def test_required_class_pass_and_fail_both_render(tmp_path) -> None:
     _assert_one_page(str(passing))
     # FAIL case: a low-order bank meets no class of the edition.
     failing_result = filters.filter_class_compliance(
-        filters.OctaveFilterBank(
-            fs=48000, fraction=1, order=1, limits=[500, 2000]
-        )
+        filters.OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
     )
     assert failing_result.overall_class is None
     failing = tmp_path / "fail.pdf"
@@ -192,9 +186,7 @@ def test_range_limited_verdict_prints_qualifying_note(tmp_path) -> None:
 
 def test_non_compliant_bank_renders(tmp_path) -> None:
     """A low-order bank that meets no class renders its non-compliance fiche."""
-    bank = filters.OctaveFilterBank(
-        fs=48000, fraction=1, order=1, limits=[500, 2000]
-    )
+    bank = filters.OctaveFilterBank(fs=48000, fraction=1, order=1, limits=[500, 2000])
     result = filters.filter_class_compliance(bank)
     assert result.overall_class is None
     out = tmp_path / "noncompliant.pdf"
@@ -209,9 +201,15 @@ def test_empty_bands_result_is_graceful() -> None:
     from phonometry.filters.compliance import FilterComplianceResult
 
     empty = FilterComplianceResult(
-        overall_class=None, bands=(), fraction=1, edition="2014",
-        sos=(), band_frequencies=np.asarray([], dtype=float), factors=(),
-        fs=48000.0, num_points=2048,
+        overall_class=None,
+        bands=(),
+        fraction=1,
+        edition="2014",
+        sos=(),
+        band_frequencies=np.asarray([], dtype=float),
+        factors=(),
+        fs=48000.0,
+        num_points=2048,
     )
     assert empty.available_classes() == []
     with pytest.raises(ValueError, match="no bands"):

@@ -31,7 +31,9 @@ def test_wind_rule_of_fives_anchor() -> None:
     # Wenz/Knudsen: 25 dB re 0.0002 dyn/cm2 (20 uPa) at 1 kHz for 5 knots,
     # i.e. 25 + 20*lg(20) = 51.0206 dB re 1 uPa (ISO 18405 reference).
     expected = 25.0 + 20.0 * np.log10(20.0)
-    assert float(wind_noise_spectrum(1000.0, 5.0)[0]) == pytest.approx(expected, abs=1e-9)
+    assert float(wind_noise_spectrum(1000.0, 5.0)[0]) == pytest.approx(
+        expected, abs=1e-9
+    )
 
 
 def test_wind_matches_published_wenz_chart() -> None:
@@ -54,7 +56,9 @@ def test_wind_thermal_crossover_near_wenz_chart() -> None:
 
 def test_wind_minus_five_db_per_octave() -> None:
     nl = wind_noise_spectrum([1000.0, 2000.0], 5.0)
-    assert float(nl[0] - nl[1]) == pytest.approx(5.0 * np.log10(2.0) * (10.0 / 3.0), abs=1e-9)
+    assert float(nl[0] - nl[1]) == pytest.approx(
+        5.0 * np.log10(2.0) * (10.0 / 3.0), abs=1e-9
+    )
     assert float(nl[0] - nl[1]) == pytest.approx(5.017, abs=1e-3)
 
 
@@ -118,7 +122,9 @@ def test_calm_sea_zero_wind_returns_minus_inf() -> None:
     res = ocean_ambient_noise([5e4], wind_speed_knots=0.0)
     assert np.isneginf(res.wind[0])
     assert np.isfinite(res.spectrum_level[0])
-    assert float(res.spectrum_level[0]) == pytest.approx(float(res.thermal[0]), abs=1e-9)
+    assert float(res.spectrum_level[0]) == pytest.approx(
+        float(res.thermal[0]), abs=1e-9
+    )
 
 
 def test_ambient_plot_smoke() -> None:

@@ -16,8 +16,8 @@ from ..theme import (
 )
 from ._core import _fit_text_below
 
-_QRD_DESIGN_F = 343.0 / 0.56             # ~612 Hz: lambda0 = 0.56 m
-_QRD_SLAB = (2.085, 3.915, 0.55, 0.85)   # x0, x1, y0, y1 of the panel slab
+_QRD_DESIGN_F = 343.0 / 0.56  # ~612 Hz: lambda0 = 0.56 m
+_QRD_SLAB = (2.085, 3.915, 0.55, 0.85)  # x0, x1, y0, y1 of the panel slab
 
 
 def _qrd_wells() -> list[tuple[float, float, float]]:
@@ -28,7 +28,7 @@ def _qrd_wells() -> list[tuple[float, float, float]]:
     wells split by 1 cm rigid fins, two periods across the 1.83 m panel.
     """
     seq = (0, 1, 4, 2, 2, 4, 1)
-    unit = 0.56 / (2 * len(seq))          # = 4 cm per residue step
+    unit = 0.56 / (2 * len(seq))  # = 4 cm per residue step
     well_w, fin_w = 0.12, 0.01
     wells = []
     x = _QRD_SLAB[0]
@@ -90,16 +90,16 @@ def _diffusion_fields(
     import fdtd2d
 
     c0, dx = 343.0, 0.01
-    ny, nx = 440, 600                      # 4.4 m x 6.0 m
+    ny, nx = 440, 600  # 4.4 m x 6.0 m
     x0, x1, y0, y1 = _QRD_SLAB
     rho_flat = np.full((ny, nx), 1.2)
-    rho_flat[round(y0 / dx):round(y1 / dx),
-             round(x0 / dx):round(x1 / dx)] = 1.2e6
+    rho_flat[round(y0 / dx) : round(y1 / dx), round(x0 / dx) : round(x1 / dx)] = 1.2e6
     rho_qrd = rho_flat.copy()
     for wx0, wx1, d in _qrd_wells():
         if d > 0.0:
-            rho_qrd[round((y1 - d) / dx):round(y1 / dx),
-                    round(wx0 / dx):round(wx1 / dx)] = 1.2
+            rho_qrd[
+                round((y1 - d) / dx) : round(y1 / dx), round(wx0 / dx) : round(wx1 / dx)
+            ] = 1.2
     rho_ref = np.full((ny, nx), 1.2)
 
     # Downgoing packet: carrier at the design wavelength under a Gaussian
@@ -115,8 +115,7 @@ def _diffusion_fields(
     every = _DIFF_EVERY
     sims = []
     for rho in (rho_flat, rho_qrd, rho_ref):
-        sim = fdtd2d.FDTD2D(c0, dx, rho=rho, shape=(ny, nx),
-                            sponge_width=40)
+        sim = fdtd2d.FDTD2D(c0, dx, rho=rho, shape=(ny, nx), sponge_width=40)
         # One-way carrier-under-Gaussian packet toward the panel, the
         # leapfrog-consistent initial condition the solver now provides.
         sim.add_plane_wave("up", center=y_pkt, width=sig, wavelength=lam0)
@@ -143,15 +142,13 @@ def _diffusion_fields(
             np.maximum(trails[j] * decay, np.abs(scat), out=trails[j])
         if sims[0].n % every == 0 and len(ts) < n_frames:
             for j in range(2):
-                tot_frames[j].append(
-                    sims[j].p[::2, ::2].astype(np.float32))
-                trail_frames[j].append(
-                    trails[j][::2, ::2].astype(np.float32))
+                tot_frames[j].append(sims[j].p[::2, ::2].astype(np.float32))
+                trail_frames[j].append(trails[j][::2, ::2].astype(np.float32))
             ts.append(sims[0].time)
     times = np.asarray(ts)
     tot = np.stack([np.stack(f) for f in tot_frames])
     trail = np.stack([np.stack(f) for f in trail_frames])
-    ref = float(trail[:, trail.shape[1] // 3:].max())
+    ref = float(trail[:, trail.shape[1] // 3 :].max())
     with np.errstate(divide="ignore"):
         trail_db = 20.0 * np.log10(trail / ref)
     trail_db = np.clip(trail_db, -30.0, 0.0).astype(np.float32)
@@ -177,16 +174,16 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     from phonometry import materials
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     tot_all, trail_db, times, theta, levels = _diffusion_fields()
     d_coef = [materials.directional_diffusion_coefficient(lv) for lv in levels]
     x0, x1, y0, y1 = _QRD_SLAB
     vmax = float(np.quantile(np.abs(tot_all[:, 0]), 0.999))
 
     fig = _anim_figure()
-    fig.suptitle(T("Flat panel vs Schroeder diffuser (2D FDTD)"),
-                 )
+    fig.suptitle(
+        T("Flat panel vs Schroeder diffuser (2D FDTD)"),
+    )
     gs = fig.add_gridspec(2, 2)
     titles = [T("Flat rigid panel"), T("Schroeder diffuser (QRD, $N$ = 7)")]
     beams = [T("specular beam"), T("scattered fan")]
@@ -207,18 +204,36 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
     for col in range(2):
         ax_t = fig.add_subplot(gs[0, col])
         ax_s = fig.add_subplot(gs[1, col])
-        im_t = ax_t.imshow(tot_all[col][0], origin="lower",
-                           extent=(0.0, 6.0, 0.0, 4.4), cmap=CMAP_FIELD,
-                           vmin=-vmax, vmax=vmax, interpolation="bilinear")
-        im_s = ax_s.imshow(trail_db[col][0], origin="lower",
-                           extent=(0.0, 6.0, 0.0, 4.4), cmap="magma",
-                           vmin=-30.0, vmax=0.0, interpolation="bilinear")
+        im_t = ax_t.imshow(
+            tot_all[col][0],
+            origin="lower",
+            extent=(0.0, 6.0, 0.0, 4.4),
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            interpolation="bilinear",
+        )
+        im_s = ax_s.imshow(
+            trail_db[col][0],
+            origin="lower",
+            extent=(0.0, 6.0, 0.0, 4.4),
+            cmap="magma",
+            vmin=-30.0,
+            vmax=0.0,
+            interpolation="bilinear",
+        )
         ax_t.set_title(titles[col], fontsize=10)
         for ax in (ax_t, ax_s):
             ax.grid(False)
-            ax.add_patch(Polygon(polys[col], closed=True,
-                                 facecolor=COLOR_GRID, edgecolor=COLOR_FG,
-                                 lw=1.0))
+            ax.add_patch(
+                Polygon(
+                    polys[col],
+                    closed=True,
+                    facecolor=COLOR_GRID,
+                    edgecolor=COLOR_FG,
+                    lw=1.0,
+                )
+            )
             # Crop the absorbing sponge zones out of view, so the frame
             # edge is physical field, not the boundary-layer artefacts.
             ax.set_xlim(0.4, 5.6)
@@ -226,40 +241,78 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
             ax.tick_params(labelsize=7)
         ax_t.tick_params(labelbottom=False)
         ax_s.set_xlabel("$x$ [m]", fontsize=8)
-        ax_t.text(3.0, 3.6, T("incident plane wavefront"), ha="center",
-                  va="bottom", color=FIELD_INK, fontsize=7.5,
-                  path_effects=outline)
-        ax_t.annotate("", xy=(3.0, 3.1), xytext=(3.0, 3.55),
-                      arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                                  "lw": 1.2})
+        ax_t.text(
+            3.0,
+            3.6,
+            T("incident plane wavefront"),
+            ha="center",
+            va="bottom",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+        )
+        ax_t.annotate(
+            "",
+            xy=(3.0, 3.1),
+            xytext=(3.0, 3.55),
+            arrowprops={"arrowstyle": "-|>", "color": FIELD_INK, "lw": 1.2},
+        )
         ax_s.plot(arc_x, arc_y, ls=":", color="white", lw=0.9, alpha=0.65)
-        ax_s.text(3.0, 0.15, beams[col], ha="center", va="bottom",
-                  color="white", fontsize=7.5)
+        ax_s.text(
+            3.0, 0.15, beams[col], ha="center", va="bottom", color="white", fontsize=7.5
+        )
         # Written out here so the arc label below can be measured against
         # the annotation that will actually be drawn; update() blanks it
         # until the arc energy has settled.
-        d_txt = ax_s.text(5.45, 3.82,
-                          T(f"diffusion coefficient $d$ = {d_coef[col]:.2f}"),
-                          ha="right", va="top", color="white",
-                          fontsize=8.5, fontweight="bold")
+        d_txt = ax_s.text(
+            5.45,
+            3.82,
+            T(f"diffusion coefficient $d$ = {d_coef[col]:.2f}"),
+            ha="right",
+            va="top",
+            color="white",
+            fontsize=8.5,
+            fontweight="bold",
+        )
         if col == 0:
             ax_t.set_ylabel(T("sound field $p$"), fontsize=9)
-            ax_s.set_ylabel(T("scattered field (total − incident)"),
-                            fontsize=8)
-            arc_txt = ax_s.text(0.78, 2.05, T("receiver arc"), ha="left",
-                                va="bottom", color="white", fontsize=6.5,
-                                rotation=64.0)
+            ax_s.set_ylabel(T("scattered field (total − incident)"), fontsize=8)
+            arc_txt = ax_s.text(
+                0.78,
+                2.05,
+                T("receiver arc"),
+                ha="left",
+                va="bottom",
+                color="white",
+                fontsize=6.5,
+                rotation=64.0,
+            )
         else:
             ax_t.tick_params(labelleft=False)
             ax_s.tick_params(labelleft=False)
-            ax_t.text(3.0, 0.15, T(f"design frequency "
-                                   f"{_QRD_DESIGN_F:.0f} Hz"), ha="center",
-                      va="bottom", color=FIELD_INK, fontsize=6.5,
-                      path_effects=outline)
+            ax_t.text(
+                3.0,
+                0.15,
+                T(f"design frequency {_QRD_DESIGN_F:.0f} Hz"),
+                ha="center",
+                va="bottom",
+                color=FIELD_INK,
+                fontsize=6.5,
+                path_effects=outline,
+            )
         ims += [im_t, im_s]
         d_txts.append(d_txt)
-    t_txt = fig.text(0.985, 0.02, "", ha="right", va="bottom",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.985,
+        0.02,
+        "",
+        ha="right",
+        va="bottom",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
+
     # The arc label climbs the receiver arc toward the corner the diffusion
     # coefficient is printed in, and the Spanish string is half again as
     # long as the English one: at a fixed anchor its tail ran through the
@@ -270,7 +323,7 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
         for d_txt in d_txts:
             d_txt.set_text("")
 
-    reveal = int(0.8 * tot_all.shape[1])   # arc energy has settled by here
+    reveal = int(0.8 * tot_all.shape[1])  # arc energy has settled by here
 
     def update(k: int) -> tuple[Any, ...]:
         for col in range(2):
@@ -278,10 +331,19 @@ def animate_fdtd_diffusion(output_dir: str) -> None:
             ims[2 * col + 1].set_data(trail_db[col][k])
             d_txts[col].set_text(
                 T(f"diffusion coefficient $d$ = {d_coef[col]:.2f}")
-                if k >= reveal else "")
+                if k >= reveal
+                else ""
+            )
         t_txt.set_text(T(f"$t$ = {times[k] * 1000.0:4.1f} ms"))
         return (*ims, *d_txts, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_diffusion",
-                 frames=int(tot_all.shape[1]), fps=_DIFF_FPS, gif_fps=5,
-                 measure=fit_arc_label)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_diffusion",
+        frames=int(tot_all.shape[1]),
+        fps=_DIFF_FPS,
+        gif_fps=5,
+        measure=fit_arc_label,
+    )

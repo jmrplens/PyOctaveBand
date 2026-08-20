@@ -32,12 +32,18 @@ def _annex_b_modes() -> tuple[
 ]:
     """The ISO 4871:1996 Annex B.2 dual-number example (Type 990, Model 11-TC)."""
     mode1 = emission.OperatingModeDeclaration(
-        "Operating mode 1", 88.0, 2.0,
-        emission_pressure_level=78.0, emission_pressure_uncertainty=2.0,
+        "Operating mode 1",
+        88.0,
+        2.0,
+        emission_pressure_level=78.0,
+        emission_pressure_uncertainty=2.0,
     )
     mode2 = emission.OperatingModeDeclaration(
-        "Operating mode 2", 95.0, 2.0,
-        emission_pressure_level=86.0, emission_pressure_uncertainty=2.0,
+        "Operating mode 2",
+        95.0,
+        2.0,
+        emission_pressure_level=86.0,
+        emission_pressure_uncertainty=2.0,
     )
     return mode1, mode2
 
@@ -98,8 +104,11 @@ def test_declared_value_rounds_the_sum_not_the_addends() -> None:
     applies to the declared emission sound pressure level.
     """
     mode = emission.OperatingModeDeclaration(
-        "m", 91.4, 2.4,
-        emission_pressure_level=81.4, emission_pressure_uncertainty=2.4,
+        "m",
+        91.4,
+        2.4,
+        emission_pressure_level=81.4,
+        emission_pressure_uncertainty=2.4,
     )
     assert mode.declared_sound_power_level == 94
     assert mode.declared_emission_pressure_level == 84
@@ -120,9 +129,7 @@ def test_verification_passes_and_fails_at_the_clause_6_2_boundary() -> None:
     just_over = emission.OperatingModeDeclaration(
         "m", 88.0, 2.0, verification_level=91.0
     )
-    under = emission.OperatingModeDeclaration(
-        "m", 88.0, 2.0, verification_level=87.0
-    )
+    under = emission.OperatingModeDeclaration("m", 88.0, 2.0, verification_level=87.0)
     assert at_boundary.verified is True
     assert just_over.verified is False
     assert under.verified is True
@@ -168,9 +175,7 @@ def test_dual_number_verification_uses_separately_rounded_values() -> None:
 def test_emission_pressure_pair_must_be_given_together() -> None:
     """A lone emission-pressure level (no uncertainty) is rejected."""
     with pytest.raises(ValueError, match="given together"):
-        emission.OperatingModeDeclaration(
-            "m", 88.0, 2.0, emission_pressure_level=78.0
-        )
+        emission.OperatingModeDeclaration("m", 88.0, 2.0, emission_pressure_level=78.0)
 
 
 def test_negative_uncertainty_is_rejected() -> None:
@@ -221,9 +226,7 @@ def test_declare_from_sound_power_result() -> None:
     r = 1.0
     lw = 90.0
     lp = lw - 10.0 * math.log10(2.0 * math.pi * r**2)
-    result = emission.sound_power_pressure(
-        np.full((10, 1), lp), "hemisphere", radius=r
-    )
+    result = emission.sound_power_pressure(np.full((10, 1), lp), "hemisphere", radius=r)
     decl = result.declare(uncertainty=2.0, machine="Pump X", basic_standards="ISO 3744")
     mode = decl.modes[0]
     assert mode.sound_power_level == pytest.approx(lw, abs=1e-6)
@@ -294,9 +297,7 @@ def test_dual_number_verification_row_uses_rounded_sum(tmp_path) -> None:
     mode = emission.OperatingModeDeclaration(
         "Operating mode 1", 93.4, 2.4, verification_level=95.0
     )
-    decl = emission.NoiseEmissionDeclaration(
-        (mode,), basic_standards="ISO 3744"
-    )
+    decl = emission.NoiseEmissionDeclaration((mode,), basic_standards="ISO 3744")
     out = tmp_path / "iso4871_dual_verify.pdf"
     decl.report(str(out))
     text = _extract_text(str(out))
@@ -324,9 +325,7 @@ def test_verification_verdict_renders_both_ways(tmp_path) -> None:
     mode2 = emission.OperatingModeDeclaration(
         "Operating mode 2", 95.0, 2.0, verification_level=98.0
     )
-    decl = emission.NoiseEmissionDeclaration(
-        (mode1, mode2), basic_standards="ISO 3744"
-    )
+    decl = emission.NoiseEmissionDeclaration((mode1, mode2), basic_standards="ISO 3744")
     out = tmp_path / "iso4871_verify.pdf"
     decl.report(str(out), metadata=ReportMetadata(report_id="PHN-4871"))
     _assert_one_page(str(out))

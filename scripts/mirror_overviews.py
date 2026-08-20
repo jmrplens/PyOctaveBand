@@ -152,7 +152,9 @@ def _rewrite_links(body: str, route: str) -> str:
 #: which welds two claims into one paragraph and glues the panel's last line
 #: to the heading below it. Both were visible in the first generated mirror.
 _IMPORT = re.compile(r"^import\s+\w+\s+from\s+'[^']*';[ \t]*$\n?", re.MULTILINE)
-_COMPONENT = re.compile(r"^</?(?:Scope|ScopeClaim)(?:\s[^>]*)?>[ \t]*$\n?", re.MULTILINE)
+_COMPONENT = re.compile(
+    r"^</?(?:Scope|ScopeClaim)(?:\s[^>]*)?>[ \t]*$\n?", re.MULTILINE
+)
 _BLANK_RUN = re.compile(r"\n{3,}")
 
 
@@ -427,7 +429,9 @@ def _broken_intra_mirror_anchors() -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--check", action="store_true", help="fail on drift instead of writing")
+    parser.add_argument(
+        "--check", action="store_true", help="fail on drift instead of writing"
+    )
     args = parser.parse_args()
 
     PLANNED.update(

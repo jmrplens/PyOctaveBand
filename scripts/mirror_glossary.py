@@ -99,7 +99,7 @@ def _relative_link(to_route: str) -> str | None:
 
 def _link(to_route: str) -> str:
     rel = _relative_link(to_route)
-    return rel if rel else f"{SITE_BASE}/{to_route}/"
+    return rel or f"{SITE_BASE}/{to_route}/"
 
 
 def _rewrite_links(body: str) -> str:

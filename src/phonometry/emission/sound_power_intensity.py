@@ -131,14 +131,37 @@ def _table2_s(nominal: int, band_type: BandType) -> float:
     """
     if band_type == "octave":
         table: dict[int, float] = {
-            63: 3.0, 125: 3.0, 250: 2.0, 500: 1.5, 1000: 1.5, 2000: 1.5, 4000: 1.5,
+            63: 3.0,
+            125: 3.0,
+            250: 2.0,
+            500: 1.5,
+            1000: 1.5,
+            2000: 1.5,
+            4000: 1.5,
         }
     else:
         table = {
-            50: 3.0, 63: 3.0, 80: 3.0, 100: 3.0, 125: 3.0, 160: 3.0,
-            200: 2.0, 250: 2.0, 315: 2.0,
-            400: 1.5, 500: 1.5, 630: 1.5, 800: 1.5, 1000: 1.5, 1250: 1.5,
-            1600: 1.5, 2000: 1.5, 2500: 1.5, 3150: 1.5, 4000: 1.5, 5000: 1.5,
+            50: 3.0,
+            63: 3.0,
+            80: 3.0,
+            100: 3.0,
+            125: 3.0,
+            160: 3.0,
+            200: 2.0,
+            250: 2.0,
+            315: 2.0,
+            400: 1.5,
+            500: 1.5,
+            630: 1.5,
+            800: 1.5,
+            1000: 1.5,
+            1250: 1.5,
+            1600: 1.5,
+            2000: 1.5,
+            2500: 1.5,
+            3150: 1.5,
+            4000: 1.5,
+            5000: 1.5,
             6300: 2.5,
         }
     if nominal not in table:
@@ -198,7 +221,9 @@ class SoundPowerIntensityResult:
     a_weighting_omitted_bands: np.ndarray | None
     grade: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the LW spectrum; non-positive bands are hatched as unusable.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -312,7 +337,9 @@ def _validate_scan(
             f"'normal_intensity' first axis ({intensity.shape[0]}) must match "
             f"the number of segment 'areas' ({n_seg})."
         )
-    if frequencies is not None and np.asarray(frequencies).shape != (intensity.shape[1],):
+    if frequencies is not None and np.asarray(frequencies).shape != (
+        intensity.shape[1],
+    ):
         # Validate up front so a mismatched length raises the public ValueError
         # rather than an IndexError from the Table 2 lookup during classification.
         raise ValueError(_FREQUENCIES_BAND_COUNT_MSG)
@@ -389,7 +416,9 @@ def sound_power_intensity(
     # --- partial powers, using the mean of the two sweeps when available -----
     repeatability: np.ndarray | None = None
     if normal_intensity_2 is not None:
-        scan2 = _as_2d("normal_intensity_2", np.asarray(normal_intensity_2), n_seg, n_bands)
+        scan2 = _as_2d(
+            "normal_intensity_2", np.asarray(normal_intensity_2), n_seg, n_bands
+        )
         pi1 = intensity * seg[:, None]
         pi2 = scan2 * seg[:, None]
         repeatability = np.abs(_level_magnitude(pi1) - _level_magnitude(pi2))
@@ -767,7 +796,9 @@ class PrecisionIntensityResult:
     surface_area: float
     sound_power_level_a: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the ``LW`` spectrum; non-applicable bands are hatched/greyed.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -937,9 +968,12 @@ def precision_field_indicators(
     f_pi_signed = np.asarray(lp_bar - li_signed, dtype=np.float64)
 
     with np.errstate(divide="ignore", invalid="ignore"):
-        fs = np.sqrt(
-            np.sum((i_n - mean_signed[np.newaxis, :]) ** 2, axis=0) / (n_seg - 1)
-        ) / mean_signed  # Eq. B.8
+        fs = (
+            np.sqrt(
+                np.sum((i_n - mean_signed[np.newaxis, :]) ** 2, axis=0) / (n_seg - 1)
+            )
+            / mean_signed
+        )  # Eq. B.8
     fs = np.asarray(fs, dtype=np.float64)
 
     ft: np.ndarray | None = None
@@ -1164,7 +1198,8 @@ def sound_power_intensity_precision(
     with np.errstate(divide="ignore", invalid="ignore"):
         lw = np.where(
             total_power > 0.0,
-            10.0 * np.log10(np.maximum(total_power, np.finfo(float).tiny) / _P0_INTENSITY),
+            10.0
+            * np.log10(np.maximum(total_power, np.finfo(float).tiny) / _P0_INTENSITY),
             np.nan,
         )
 

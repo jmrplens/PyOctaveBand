@@ -130,8 +130,7 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
         raw = str(getattr(meta, attribute)).encode("latin-1")
         if len(raw) > size:
             raise ValueError(
-                f"bext {name} is {len(raw)} bytes; the Tech 3285 field "
-                f"holds {size}"
+                f"bext {name} is {len(raw)} bytes; the Tech 3285 field holds {size}"
             )
         encoded.append(raw)
     if not 0 <= meta.time_reference < 2**64:
@@ -145,8 +144,11 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
             "raise the version instead of losing the UMID"
         )
     loudness = (
-        meta.loudness_value, meta.loudness_range, meta.max_true_peak_level,
-        meta.max_momentary_loudness, meta.max_short_term_loudness,
+        meta.loudness_value,
+        meta.loudness_range,
+        meta.max_true_peak_level,
+        meta.max_momentary_loudness,
+        meta.max_short_term_loudness,
     )
     if meta.version < 2 and any(value is not None for value in loudness):
         raise ValueError(
@@ -157,19 +159,22 @@ def serialize_bext(meta: BroadcastMetadata) -> bytes:
     if len(umid) > 64:
         raise ValueError(f"bext UMID is {len(umid)} bytes; the field holds 64")
     history = meta.coding_history.encode("latin-1")
-    return _BEXT_FIXED.pack(
-        *encoded,
-        meta.time_reference & 0xFFFFFFFF,
-        meta.time_reference >> 32,
-        meta.version,
-        umid,
-        *(
-            (_encode_loudness(value) for value in loudness)
-            if meta.version >= 2
-            else (0, 0, 0, 0, 0)
-        ),
-        b"",  # the 180 reserved bytes: zeros in every version
-    ) + history
+    return (
+        _BEXT_FIXED.pack(
+            *encoded,
+            meta.time_reference & 0xFFFFFFFF,
+            meta.time_reference >> 32,
+            meta.version,
+            umid,
+            *(
+                (_encode_loudness(value) for value in loudness)
+                if meta.version >= 2
+                else (0, 0, 0, 0, 0)
+            ),
+            b"",  # the 180 reserved bytes: zeros in every version
+        )
+        + history
+    )
 
 
 def coding_history_line(

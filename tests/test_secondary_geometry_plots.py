@@ -63,9 +63,7 @@ def test_junction_result_retains_thicknesses_and_draws() -> None:
     assert res.thickness1 == pytest.approx(0.14)
     assert res.plot_geometry() is not None
     for junction in ("L", "T1", "T2", "X"):
-        assert (
-            pm.building.plot_junction_geometry(junction, 0.14, 0.2) is not None
-        )
+        assert pm.building.plot_junction_geometry(junction, 0.14, 0.2) is not None
     with pytest.raises(ValueError, match="junction"):
         pm.building.plot_junction_geometry("Y", 0.14, 0.2)
 

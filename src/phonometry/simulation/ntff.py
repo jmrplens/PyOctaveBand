@@ -112,13 +112,17 @@ class ContourPhasors:
         p = np.asarray(self.pressure, dtype=np.complex128)
         v = np.asarray(self.normal_velocity, dtype=np.complex128)
         n = p.shape[0] if p.ndim == 1 else -1
-        if n < 1 or pos.shape != (n, 2) or nrm.shape != (n, 2) \
-                or v.shape != (n,):
+        if n < 1 or pos.shape != (n, 2) or nrm.shape != (n, 2) or v.shape != (n,):
             raise ValueError(
                 "positions and normals must have shape (n, 2) and pressure "
-                "and normal_velocity shape (n,) for the same n >= 1")
-        if not (np.all(np.isfinite(pos)) and np.all(np.isfinite(nrm))
-                and np.all(np.isfinite(p)) and np.all(np.isfinite(v))):
+                "and normal_velocity shape (n,) for the same n >= 1"
+            )
+        if not (
+            np.all(np.isfinite(pos))
+            and np.all(np.isfinite(nrm))
+            and np.all(np.isfinite(p))
+            and np.all(np.isfinite(v))
+        ):
             raise ValueError("contour phasor arrays must be finite")
         # Store the converted arrays so hand-built instances (lists, mixed
         # dtypes) behave exactly like probe-built ones downstream.
@@ -136,20 +140,20 @@ class ContourPhasors:
         (incident-only) phasors. Geometry and frequency must match.
         """
         if not np.isclose(self.frequency, reference.frequency):
-            raise ValueError("cannot subtract phasors at different "
-                             "frequencies")
+            raise ValueError("cannot subtract phasors at different frequencies")
         if self.positions.shape != reference.positions.shape or not (
-                np.allclose(self.positions, reference.positions)
-                and np.allclose(self.normals, reference.normals)):
-            raise ValueError("cannot subtract phasors sampled on different "
-                             "contours")
+            np.allclose(self.positions, reference.positions)
+            and np.allclose(self.normals, reference.normals)
+        ):
+            raise ValueError("cannot subtract phasors sampled on different contours")
         return ContourPhasors(
             frequency=self.frequency,
             positions=self.positions,
             normals=self.normals,
             pressure=np.asarray(self.pressure - reference.pressure),
             normal_velocity=np.asarray(
-                self.normal_velocity - reference.normal_velocity),
+                self.normal_velocity - reference.normal_velocity
+            ),
             segment=self.segment,
         )
 
@@ -227,8 +231,9 @@ def far_field_from_contour(
         raise TypeError("contour must be a ContourPhasors")
     ang = np.atleast_1d(np.asarray(angles, dtype=np.float64))
     if ang.ndim != 1 or ang.size == 0 or not np.all(np.isfinite(ang)):
-        raise ValueError("angles must be a non-empty 1D sequence of finite "
-                         "values in degrees")
+        raise ValueError(
+            "angles must be a non-empty 1D sequence of finite values in degrees"
+        )
     c = float(speed_of_sound)
     rho = float(air_density)
     if not np.isfinite(c) or c <= 0.0:
@@ -242,19 +247,18 @@ def far_field_from_contour(
         raise ValueError("origin must be finite")
     pos = contour.positions - np.asarray([ox, oy])
     rad = np.radians(ang)
-    u = np.stack((np.cos(rad), np.sin(rad)), axis=1)          # (A, 2)
-    monopole = 1j * omega * rho * contour.normal_velocity     # j w rho v_n
+    u = np.stack((np.cos(rad), np.sin(rad)), axis=1)  # (A, 2)
+    monopole = 1j * omega * rho * contour.normal_velocity  # j w rho v_n
     if distance is None:
         # Far-field limit: dG/dn' -> (j k u.n') G and the common cylindrical
         # spreading exp(-j k r)/sqrt(r) is factored out of both kernels.
-        prefactor = (-0.25j * np.sqrt(2.0 / (np.pi * k))
-                     * np.exp(0.25j * np.pi))
-        kernel = np.exp(1j * k * (u @ pos.T))                 # (A, n)
-        integrand = (1j * k * (u @ contour.normals.T) * contour.pressure
-                     + monopole)
+        prefactor = -0.25j * np.sqrt(2.0 / (np.pi * k)) * np.exp(0.25j * np.pi)
+        kernel = np.exp(1j * k * (u @ pos.T))  # (A, n)
+        integrand = 1j * k * (u @ contour.normals.T) * contour.pressure + monopole
         return np.asarray(
             prefactor * contour.segment * np.sum(kernel * integrand, axis=1),
-            dtype=np.complex128)
+            dtype=np.complex128,
+        )
     d = float(distance)
     if not np.isfinite(d) or d <= 0.0:
         raise ValueError("distance must be positive and finite")
@@ -262,16 +266,21 @@ def far_field_from_contour(
     if d <= reach:
         raise ValueError(
             f"distance {d:g} m does not clear the contour (farthest sample "
-            f"{reach:g} m from origin); the representation is exterior only")
-    obs = d * u                                               # (A, 2)
-    sep = obs[:, np.newaxis, :] - pos[np.newaxis, :, :]       # (A, n, 2)
-    dist = np.hypot(sep[..., 0], sep[..., 1])                 # (A, n)
+            f"{reach:g} m from origin); the representation is exterior only"
+        )
+    obs = d * u  # (A, 2)
+    sep = obs[:, np.newaxis, :] - pos[np.newaxis, :, :]  # (A, n, 2)
+    dist = np.hypot(sep[..., 0], sep[..., 1])  # (A, n)
     green = -0.25j * hankel2(0, k * dist)
     # dG/dn' = dG/dR * (r' - r).n' / R with dG/dR = (j k / 4) H1(2)(k R).
-    dgdn = (0.25j * k * hankel2(1, k * dist)
-            * np.sum(-sep * contour.normals[np.newaxis, :, :], axis=2)
-            / dist)
+    dgdn = (
+        0.25j
+        * k
+        * hankel2(1, k * dist)
+        * np.sum(-sep * contour.normals[np.newaxis, :, :], axis=2)
+        / dist
+    )
     return np.asarray(
-        contour.segment * np.sum(
-            contour.pressure * dgdn + monopole * green, axis=1),
-        dtype=np.complex128)
+        contour.segment * np.sum(contour.pressure * dgdn + monopole * green, axis=1),
+        dtype=np.complex128,
+    )

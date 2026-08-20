@@ -275,9 +275,7 @@ def level_limit_verdict(
     ``L<sub>WA</sub>``/``L<sub>W</sub>`` handled by :func:`power_verdict`.
     """
     passed = math.isfinite(value) and display_round(value) <= requirement
-    text = t(
-        "{sym} = {value} dB, declared limit &#8804; {req} dB", language
-    ).format(
+    text = t("{sym} = {value} dB, declared limit &#8804; {req} dB", language).format(
         sym=symbol,
         value=d1(value, language),
         req=format_number(requirement, language, decimals=1),
@@ -324,8 +322,12 @@ def power_value_table(
     thin = colors.HexColor("#c9d4e0")
     styles = getSampleStyleSheet()
     head_style = ParagraphStyle(
-        "sound_power_thead", parent=styles["Normal"], fontSize=7.6,
-        textColor=colors.white, alignment=1, leading=9.0,
+        "sound_power_thead",
+        parent=styles["Normal"],
+        fontSize=7.6,
+        textColor=colors.white,
+        alignment=1,
+        leading=9.0,
     )
 
     n = len(rows_data)
@@ -454,7 +456,10 @@ def render_sound_power_fiche(
     # plot(ax=...); the band axis carries nominal labels (not base-ten log).
     flow.append(
         render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=figsize,
+            result.plot,
+            174 * mm,
+            y_top=None,
+            figsize=figsize,
             language=language,
         )
     )

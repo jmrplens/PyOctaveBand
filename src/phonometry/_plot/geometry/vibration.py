@@ -90,25 +90,25 @@ def plot_junction_geometry(
     # panel); it stops against the perpendicular plate for L and T2.
     x_left = -arm
     x_right = arm if junction in ("T1", "X") else 0.5 * h2
-    _material_rect(ax, x_left, -0.5 * h1, x_right - x_left, h1, "plate",
-                   **kwargs)
+    _material_rect(ax, x_left, -0.5 * h1, x_right - x_left, h1, "plate", **kwargs)
     # The perpendicular plate is continuous (both branches) for T2 and X.
     down = junction in ("T2", "X")
     _material_rect(ax, -0.5 * h2, 0.5 * h1, h2, arm, "plate")
     if down:
         _material_rect(ax, -0.5 * h2, -0.5 * h1 - arm, h2, arm, "plate")
-    _incidence_arrow(
-        ax, -arm - 0.5 * arm, 0.0, 0.35 * arm, language
+    _incidence_arrow(ax, -arm - 0.5 * arm, 0.0, 0.35 * arm, language)
+    _dim(
+        ax,
+        (-0.85 * arm, -0.5 * h1),
+        (-0.85 * arm, 0.5 * h1),
+        _mm(h1, language),
+        offset=-0.15 * arm,
+        tight=True,
     )
-    _dim(ax, (-0.85 * arm, -0.5 * h1), (-0.85 * arm, 0.5 * h1),
-         _mm(h1, language), offset=-0.15 * arm, tight=True)
     y_h2 = 0.5 * h1 + 1.12 * arm
-    _dim(ax, (-0.5 * h2, y_h2), (0.5 * h2, y_h2), _mm(h2, language),
-         tight=True)
+    _dim(ax, (-0.5 * h2, y_h2), (0.5 * h2, y_h2), _mm(h2, language), tight=True)
     _finish_geometry_axes(
-        ax, _t("Plate junction ({junction})", language).format(
-            junction=junction
-        )
+        ax, _t("Plate junction ({junction})", language).format(junction=junction)
     )
     return ax
 
@@ -127,8 +127,12 @@ def plot_junction_result_geometry(
             "plot_junction_geometry(junction, thickness1, thickness2)."
         )
     return plot_junction_geometry(
-        result.junction, result.thickness1, result.thickness2, ax=ax,
-        language=language, **kwargs,
+        result.junction,
+        result.thickness1,
+        result.thickness2,
+        ax=ax,
+        language=language,
+        **kwargs,
     )
 
 
@@ -163,17 +167,12 @@ def plot_plate_geometry(
         ax = _new_axes()
     a, b = float(length_x), float(length_y)
     frame = 0.18 * max(a, b)
-    _material_rect(ax, -frame, -frame, a + 2.0 * frame, b + 2.0 * frame,
-                   "rigid")
+    _material_rect(ax, -frame, -frame, a + 2.0 * frame, b + 2.0 * frame, "rigid")
     _material_rect(ax, 0.0, 0.0, a, b, "plate", **kwargs)
-    _dim(ax, (0.0, b + 0.5 * frame), (a, b + 0.5 * frame),
-         _metres(a, language))
-    _dim(ax, (a + 0.5 * frame, 0.0), (a + 0.5 * frame, b),
-         _metres(b, language))
+    _dim(ax, (0.0, b + 0.5 * frame), (a, b + 0.5 * frame), _metres(a, language))
+    _dim(ax, (a + 0.5 * frame, 0.0), (a + 0.5 * frame, b), _metres(b, language))
     _finish_geometry_axes(
-        ax, _t("Baffled plate ({boundary})", language).format(
-            boundary=boundary
-        )
+        ax, _t("Baffled plate ({boundary})", language).format(boundary=boundary)
     )
     return ax
 
@@ -187,6 +186,10 @@ def plot_radiation_result_geometry(
 ) -> Axes:
     """Plate drawing for a radiation-efficiency result (always retained)."""
     return plot_plate_geometry(
-        result.length_x, result.length_y, ax=ax, boundary=result.boundary,
-        language=language, **kwargs,
+        result.length_x,
+        result.length_y,
+        ax=ax,
+        boundary=result.boundary,
+        language=language,
+        **kwargs,
     )

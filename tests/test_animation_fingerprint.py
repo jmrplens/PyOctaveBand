@@ -31,14 +31,14 @@ if _SCRIPTS not in sys.path:
 
 import animation_fingerprint as fp
 
-REGISTRY = '''
+REGISTRY = """
 from .schematics import animate_one, animate_two
 
 _ANIMATIONS = {
     "anim_one": animate_one,
     "anim_two": animate_two,
 }
-'''
+"""
 
 SCHEMATICS = '''
 from .media import _render_clip, _translate_str
@@ -64,7 +64,7 @@ def animate_two(output_dir):
     _render_clip(None, None, output_dir, "anim_two")
 '''
 
-MEDIA = '''
+MEDIA = """
 from .i18n import _translate_figure
 
 _ANIM_FPS = 20
@@ -77,7 +77,7 @@ def _translate_str(s):
 def _render_clip(fig, update, output_dir, stem):
     _translate_figure(fig)
     return _ANIM_FPS
-'''
+"""
 
 THEME = '''
 COLOR_PRIMARY = "#1f77b4"
@@ -88,7 +88,7 @@ def set_theme(dark):
     return COLOR_PRIMARY if dark else COLOR_PRIMARY
 '''
 
-I18N = '''
+I18N = """
 _ES_EXACT = {
     "shared caption": "rótulo compartido",
     "only in clip one": "solo en el clip uno",
@@ -104,7 +104,7 @@ _ES_PATTERNS = [
 
 def _translate_figure(fig):
     return fig
-'''
+"""
 
 
 def _write_tree(root: pathlib.Path) -> pathlib.Path:
@@ -112,8 +112,13 @@ def _write_tree(root: pathlib.Path) -> pathlib.Path:
     package = root / "scripts" / "figures"
     package.mkdir(parents=True)
     (package / "__init__.py").write_text("", encoding="utf-8")
-    for name, body in (("registry", REGISTRY), ("schematics", SCHEMATICS),
-                       ("media", MEDIA), ("theme", THEME), ("i18n", I18N)):
+    for name, body in (
+        ("registry", REGISTRY),
+        ("schematics", SCHEMATICS),
+        ("media", MEDIA),
+        ("theme", THEME),
+        ("i18n", I18N),
+    ):
         (package / f"{name}.py").write_text(body, encoding="utf-8")
     return root
 
@@ -136,8 +141,7 @@ def test_every_registered_clip_is_fingerprinted(tree: pathlib.Path) -> None:
     assert sorted(fp.fingerprints(tree)) == ["anim_one", "anim_two"]
 
 
-def test_the_same_sources_give_the_same_fingerprint(
-        tmp_path: pathlib.Path) -> None:
+def test_the_same_sources_give_the_same_fingerprint(tmp_path: pathlib.Path) -> None:
     """The same sources hash the same, read again and read from elsewhere.
 
     The stamp is written from a working copy and recomputed in CI out of a
@@ -168,30 +172,30 @@ def test_the_same_sources_give_the_same_fingerprint(
     ("module", "old", "new", "moves"),
     [
         # The clip's own body: the whole point.
-        ("schematics", '"only in clip one"', '"clip one, reworded"',
-         {"anim_one"}),
+        ("schematics", '"only in clip one"', '"clip one, reworded"', {"anim_one"}),
         # A helper it calls, in its own module.
-        ("schematics", 'ax.text(0.0, 0.0', 'ax.text(0.5, 0.0', {"anim_one"}),
+        ("schematics", "ax.text(0.0, 0.0", "ax.text(0.5, 0.0", {"anim_one"}),
         # The shared clip tail: both clips are drawn through it.
         ("media", "_ANIM_FPS = 20", "_ANIM_FPS = 25", {"anim_one", "anim_two"}),
         # The theme, which nothing in a clip calls and every frame carries.
         ("theme", '"#1f77b4"', '"#d62728"', {"anim_one", "anim_two"}),
         # The translation machinery (this is the shape of the Spanish
         # minus-sign repair that started all this).
-        ("i18n", "def _translate_figure(fig):\n    return fig",
-         "def _translate_figure(fig):\n    return str(fig)",
-         {"anim_one", "anim_two"}),
+        (
+            "i18n",
+            "def _translate_figure(fig):\n    return fig",
+            "def _translate_figure(fig):\n    return str(fig)",
+            {"anim_one", "anim_two"},
+        ),
         # A translation the clip's own text selects, exact and by pattern.
-        ("i18n", '"solo en el clip uno"', '"solo en el primer clip"',
-         {"anim_one"}),
-        ("i18n", '"rótulo compartido"', '"el rótulo compartido"',
-         {"anim_one"}),
+        ("i18n", '"solo en el clip uno"', '"solo en el primer clip"', {"anim_one"}),
+        ("i18n", '"rótulo compartido"', '"el rótulo compartido"', {"anim_one"}),
         ("i18n", r'r"nivel \1,\2 dB"', r'r"nivel de \1,\2 dB"', {"anim_one"}),
     ],
 )
 def test_a_change_that_reaches_a_clip_moves_its_fingerprint(
-        tree: pathlib.Path, module: str, old: str, new: str,
-        moves: set[str]) -> None:
+    tree: pathlib.Path, module: str, old: str, new: str, moves: set[str]
+) -> None:
     before = fp.fingerprints(tree)
     edit(tree, module, old, new)
     after = fp.fingerprints(tree)
@@ -204,10 +208,17 @@ def test_a_change_that_reaches_a_clip_moves_its_fingerprint(
     [
         # Comments and docstrings: the fingerprint is taken over the syntax
         # tree, so prose cannot cost a re-render.
-        ("schematics", '"""The first clip."""', '"""The first clip, rewritten\n\n    with a longer explanation.\n    """'),
+        (
+            "schematics",
+            '"""The first clip."""',
+            '"""The first clip, rewritten\n\n    with a longer explanation.\n    """',
+        ),
         ("schematics", '"""A helper both clips call."""', "'''A helper.'''"),
-        ("theme", '"""The palette every frame is drawn with."""',
-         '"""The palette."""  # and a trailing comment'),
+        (
+            "theme",
+            '"""The palette every frame is drawn with."""',
+            '"""The palette."""  # and a trailing comment',
+        ),
         # A translation entry no clip of this tree writes, which is what the
         # per-clip selection of the tables buys: an unrelated figure gaining
         # or changing a Spanish string must not mark every clip stale.
@@ -216,7 +227,8 @@ def test_a_change_that_reaches_a_clip_moves_its_fingerprint(
     ],
 )
 def test_a_change_that_cannot_reach_a_clip_leaves_it_alone(
-        tree: pathlib.Path, module: str, old: str, new: str) -> None:
+    tree: pathlib.Path, module: str, old: str, new: str
+) -> None:
     before = fp.fingerprints(tree)
     edit(tree, module, old, new)
     assert fp.fingerprints(tree) == before
@@ -225,14 +237,26 @@ def test_a_change_that_cannot_reach_a_clip_leaves_it_alone(
 def test_a_new_clip_is_reported_rather_than_ignored(tree: pathlib.Path) -> None:
     """A clip added to the registry has no stamp until it is rendered."""
     before = fp.fingerprints(tree)
-    edit(tree, "registry", 'from .schematics import animate_one, animate_two',
-         'from .schematics import animate_one, animate_three, animate_two')
-    edit(tree, "registry", '    "anim_two": animate_two,',
-         '    "anim_two": animate_two,\n    "anim_three": animate_three,')
-    edit(tree, "schematics", 'def animate_two(output_dir):',
-         'def animate_three(output_dir):\n    """A third clip."""\n'
-         '    _render_clip(None, None, output_dir, "anim_three")\n\n\n'
-         'def animate_two(output_dir):')
+    edit(
+        tree,
+        "registry",
+        "from .schematics import animate_one, animate_two",
+        "from .schematics import animate_one, animate_three, animate_two",
+    )
+    edit(
+        tree,
+        "registry",
+        '    "anim_two": animate_two,',
+        '    "anim_two": animate_two,\n    "anim_three": animate_three,',
+    )
+    edit(
+        tree,
+        "schematics",
+        "def animate_two(output_dir):",
+        'def animate_three(output_dir):\n    """A third clip."""\n'
+        '    _render_clip(None, None, output_dir, "anim_three")\n\n\n'
+        "def animate_two(output_dir):",
+    )
     after = fp.fingerprints(tree)
     assert set(after) - set(before) == {"anim_three"}
     assert {c: after[c] for c in before} == before
@@ -246,8 +270,7 @@ def test_a_new_clip_is_reported_rather_than_ignored(tree: pathlib.Path) -> None:
 # not finish that decide whether the manifest can be trusted.
 
 
-def _fake_batch(monkeypatch: pytest.MonkeyPatch,
-                fails: str | None) -> list[list[str]]:
+def _fake_batch(monkeypatch: pytest.MonkeyPatch, fails: str | None) -> list[list[str]]:
     """Run a three-clip batch with the rendering replaced, return the stamps."""
     import shutil
 
@@ -260,11 +283,13 @@ def _fake_batch(monkeypatch: pytest.MonkeyPatch,
             raise RuntimeError("the encoder died")
 
     monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/ffmpeg")
-    monkeypatch.setattr(registry, "_ANIMATIONS",
-                        dict.fromkeys(("anim_one", "anim_two", "anim_three")))
+    monkeypatch.setattr(
+        registry, "_ANIMATIONS", dict.fromkeys(("anim_one", "anim_two", "anim_three"))
+    )
     monkeypatch.setattr(registry, "_render_anim_variants", render)
-    monkeypatch.setattr(registry, "_stamp_clips",
-                        lambda clips, output_dir: stamped.append(list(clips)))
+    monkeypatch.setattr(
+        registry, "_stamp_clips", lambda clips, output_dir: stamped.append(list(clips))
+    )
     if fails is None:
         registry.generate_animations("images", variants=True)
     else:
@@ -274,13 +299,16 @@ def _fake_batch(monkeypatch: pytest.MonkeyPatch,
 
 
 def test_a_finished_batch_stamps_every_clip_it_rendered(
-        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     assert _fake_batch(monkeypatch, fails=None) == [
-        ["anim_one", "anim_two", "anim_three"]]
+        ["anim_one", "anim_two", "anim_three"]
+    ]
 
 
 def test_a_clip_that_dies_does_not_cost_the_stamps_of_the_ones_before_it(
-        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """The clips already on disk keep their fingerprints when a later one dies.
 
     Their four variants are written and complete; leaving with the error and
@@ -291,8 +319,9 @@ def test_a_clip_that_dies_does_not_cost_the_stamps_of_the_ones_before_it(
     assert _fake_batch(monkeypatch, fails="anim_two") == [["anim_one"]]
 
 
-def _fake_parallel_batch(monkeypatch: pytest.MonkeyPatch,
-                         fails: str | None) -> list[list[str]]:
+def _fake_parallel_batch(
+    monkeypatch: pytest.MonkeyPatch, fails: str | None
+) -> list[list[str]]:
     """Run a three-clip *parallel* batch with the pool replaced, return the stamps.
 
     The pool is faked rather than run for real: ``_generate_animations_parallel``
@@ -323,8 +352,7 @@ def _fake_parallel_batch(monkeypatch: pytest.MonkeyPatch,
         def __exit__(self, *exc_info: object) -> None:
             del exc_info
 
-        def submit(self, fn: object, clip: str,
-                  img_dir: str) -> cf.Future[str]:
+        def submit(self, fn: object, clip: str, img_dir: str) -> cf.Future[str]:
             del fn, img_dir
             future: cf.Future[str] = cf.Future()
             if self._stopped:
@@ -337,8 +365,9 @@ def _fake_parallel_batch(monkeypatch: pytest.MonkeyPatch,
             return future
 
     monkeypatch.setattr(cf, "ProcessPoolExecutor", _FakePool)
-    monkeypatch.setattr(registry, "_stamp_clips",
-                        lambda clips, output_dir: stamped.append(list(clips)))
+    monkeypatch.setattr(
+        registry, "_stamp_clips", lambda clips, output_dir: stamped.append(list(clips))
+    )
     clips = ["anim_one", "anim_two", "anim_three"]
     if fails is None:
         registry._generate_animations_parallel("images", clips, jobs=1)
@@ -349,13 +378,16 @@ def _fake_parallel_batch(monkeypatch: pytest.MonkeyPatch,
 
 
 def test_a_finished_parallel_batch_stamps_every_clip_it_rendered(
-        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     assert _fake_parallel_batch(monkeypatch, fails=None) == [
-        ["anim_one", "anim_two", "anim_three"]]
+        ["anim_one", "anim_two", "anim_three"]
+    ]
 
 
 def test_a_parallel_task_that_dies_does_not_cost_the_stamps_of_the_ones_before_it(
-        monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """A task still queued when another dies is cancelled, and stays unstamped.
 
     ``anim_one`` has already finished, ``anim_two`` is the one that dies, and
@@ -366,15 +398,18 @@ def test_a_parallel_task_that_dies_does_not_cost_the_stamps_of_the_ones_before_i
     error with ``pytest.raises`` and then inspecting ``stamped`` is what pins
     the stamp as happening before the failure propagates, not after.
     """
-    assert _fake_parallel_batch(
-        monkeypatch, fails="anim_two") == [["anim_one"]]
+    assert _fake_parallel_batch(monkeypatch, fails="anim_two") == [["anim_one"]]
 
 
 # -- what the check says ----------------------------------------------------
 
 
-def _check(monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path,
-           committed: list[str], stamps: dict[str, str]) -> int:
+def _check(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path,
+    committed: list[str],
+    stamps: dict[str, str],
+) -> int:
     """Run the freshness check over a made-up image directory."""
     import check_animation_freshness as check
 
@@ -389,22 +424,26 @@ def _check(monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path,
 
 
 def test_a_complete_and_stamped_clip_passes(
-        monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path,
-        capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     import check_animation_freshness as check
 
-    code = _check(monkeypatch, tmp_path, check.outputs("anim_one"),
-                  {"anim_one": "1"})
+    code = _check(monkeypatch, tmp_path, check.outputs("anim_one"), {"anim_one": "1"})
     assert code == 0
     assert "1 committed clips" in capsys.readouterr().out
 
 
-@pytest.mark.parametrize("dropped", ["anim_one_es.webm",
-                                     "anim_one_es_dark_poster.jpg",
-                                     "anim_one_dark.gif"])
+@pytest.mark.parametrize(
+    "dropped", ["anim_one_es.webm", "anim_one_es_dark_poster.jpg", "anim_one_dark.gif"]
+)
 def test_every_file_a_render_writes_is_asked_for(
-        monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path,
-        capsys: pytest.CaptureFixture[str], dropped: str) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path,
+    capsys: pytest.CaptureFixture[str],
+    dropped: str,
+) -> None:
     """A poster or a GIF left behind is as broken as a missing WebM.
 
     They are written by the same render and embedded by the same pages: the
@@ -422,8 +461,10 @@ def test_every_file_a_render_writes_is_asked_for(
 
 
 def test_a_half_rendered_clip_is_not_called_uncommitted(
-        monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path,
-        capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """The clip is there; only some of its files are, and only that is said."""
     import check_animation_freshness as check
 
@@ -436,8 +477,10 @@ def test_a_half_rendered_clip_is_not_called_uncommitted(
 
 
 def test_a_clip_with_no_files_at_all_says_so(
-        monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path,
-        capsys: pytest.CaptureFixture[str]) -> None:
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     assert _check(monkeypatch, tmp_path, [], {}) == 1
     out = capsys.readouterr().out
     assert "registered but not committed at all" in out

@@ -82,7 +82,7 @@ _SKIP: dict[str, str] = {
     "spectral-analysis": "excerpt: starts from the record of the prose",
     "swept-sine-distortion": "excerpt: starts from the captured response",
     "synchronous-averaging": "excerpt: a later block shortens the record an "
-                             "earlier one averages",
+    "earlier one averages",
     "time-frequency": "excerpt: starts from the record of the prose",
     "time-weighting": "excerpt: starts from the block stream of the prose",
     "underwater-acoustics": "excerpt: starts from the hydrophone record",
@@ -130,9 +130,9 @@ def _rebindings(tree: ast.AST, names: dict[str, int]) -> list[str]:
     """Reports for every name from ``names`` rebound after its import."""
     reports: list[str] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and not (
-            node.module or ""
-        ).startswith("phonometry"):
+        if isinstance(node, ast.ImportFrom) and not (node.module or "").startswith(
+            "phonometry"
+        ):
             for alias in node.names:
                 name = alias.asname or alias.name
                 if name in names:
@@ -159,9 +159,7 @@ def _rebindings(tree: ast.AST, names: dict[str, int]) -> list[str]:
     return reports
 
 
-def check_shadowing(
-    pages: list[pathlib.Path], *, carry: bool = True
-) -> list[str]:
+def check_shadowing(pages: list[pathlib.Path], *, carry: bool = True) -> list[str]:
     """Failures for every page that rebinds a name it imported.
 
     A page is read top to bottom, so the imports of an earlier block are still
@@ -214,9 +212,7 @@ def check_translations(pairs: list[tuple[pathlib.Path, pathlib.Path]]) -> list[s
             detail.append("has " + ", ".join(extra) + " which its twin does not")
         if not detail:  # same names, different multiplicity
             detail.append("imports the same names a different number of times")
-        failures.append(
-            f"{_rel(right)}: {'; '.join(detail)} against {_rel(left)}"
-        )
+        failures.append(f"{_rel(right)}: {'; '.join(detail)} against {_rel(left)}")
     return failures
 
 
@@ -233,10 +229,10 @@ def _is_sketch(code: str) -> bool:
         tree = ast.parse(code)
     except SyntaxError:
         return False
+
     def placeholder(node: ast.Call) -> bool:
         args = [*node.args, *(kw.value for kw in node.keywords)]
-        return any(isinstance(a, ast.Constant) and a.value is Ellipsis
-                   for a in args)
+        return any(isinstance(a, ast.Constant) and a.value is Ellipsis for a in args)
 
     return any(isinstance(n, ast.Call) and placeholder(n) for n in ast.walk(tree))
 
@@ -259,8 +255,12 @@ def _run_page(page: pathlib.Path) -> tuple[pathlib.Path, str]:
         path.write_text(script, encoding="utf-8")
         try:
             done = subprocess.run(
-                [sys.executable, str(path)], check=False,
-                capture_output=True, text=True, timeout=_TIMEOUT_S, cwd=tmp,
+                [sys.executable, str(path)],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=_TIMEOUT_S,
+                cwd=tmp,
             )
         except subprocess.TimeoutExpired:
             return page, f"timed out after {_TIMEOUT_S} s"
@@ -312,20 +312,25 @@ def _published() -> list[pathlib.Path]:
 
 def _restated() -> list[pathlib.Path]:
     """Generated dumps that concatenate guide text; static checks only."""
-    out = [_ROOT / "llms-full.txt", *sorted((_ROOT / "site" / "public" / "llms").glob("*.txt"))]
+    out = [
+        _ROOT / "llms-full.txt",
+        *sorted((_ROOT / "site" / "public" / "llms").glob("*.txt")),
+    ]
     return [p for p in out if p.exists()]
 
 
 def _pages() -> tuple[list[pathlib.Path], list[tuple[pathlib.Path, pathlib.Path]]]:
     """Every page with snippets, and the pairs that must carry the same code."""
     site_en = [
-        p for p in sorted(_SITE.rglob("*.md*"))
+        p
+        for p in sorted(_SITE.rglob("*.md*"))
         if "/es/" not in p.as_posix() and "reference/api" not in p.as_posix()
     ]
     # `superpowers/` is gitignored scratch space, as in
     # scripts/check_conformance_claims.py; it is not documentation.
     mirror = sorted(
-        p for p in _DOCS.rglob("*.md")
+        p
+        for p in _DOCS.rglob("*.md")
         if "superpowers" not in p.relative_to(_DOCS).parts
     )
     pairs: list[tuple[pathlib.Path, pathlib.Path]] = []
@@ -333,15 +338,19 @@ def _pages() -> tuple[list[pathlib.Path], list[tuple[pathlib.Path, pathlib.Path]
         twin = _SITE_ES / page.relative_to(_SITE)
         if twin.exists():
             pairs.append((page, twin))
-    everything = (site_en + mirror + _published() + _restated()
-                  + [p for _, p in pairs if p.is_relative_to(_SITE_ES)])
+    everything = (
+        site_en
+        + mirror
+        + _published()
+        + _restated()
+        + [p for _, p in pairs if p.is_relative_to(_SITE_ES)]
+    )
     return everything, pairs
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--static", action="store_true",
-                        help="skip the execution pass")
+    parser.add_argument("--static", action="store_true", help="skip the execution pass")
     args = parser.parse_args()
 
     pages, pairs = _pages()
@@ -351,8 +360,11 @@ def main() -> int:
     failures += check_translations(pairs)
     stage = "static checks"
     if not args.static:
-        runnable = [p for p in pages if p.is_relative_to(_SITE)
-                    and not p.is_relative_to(_SITE_ES)] + _published()
+        runnable = [
+            p
+            for p in pages
+            if p.is_relative_to(_SITE) and not p.is_relative_to(_SITE_ES)
+        ] + _published()
         failures += check_execution(runnable)
         stage = "checks"
 
@@ -361,8 +373,10 @@ def main() -> int:
         for failure in failures:
             print(f"  {failure}", file=sys.stderr)
         return 1
-    print(f"Documentation snippets pass all {stage}: "
-          f"{sum(len(_blocks(p)) for p in pages)} blocks over {len(pages)} pages.")
+    print(
+        f"Documentation snippets pass all {stage}: "
+        f"{sum(len(_blocks(p)) for p in pages)} blocks over {len(pages)} pages."
+    )
     return 0
 
 

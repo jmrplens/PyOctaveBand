@@ -55,9 +55,9 @@ def _pick_backend() -> tuple[Any, str]:
     try:
         import cupy
 
-        cupy.cuda.runtime.getDeviceCount()       # raises without a GPU
-        cupy.arange(1).sum()                     # force a real kernel launch
-    except Exception:                            # noqa: BLE001 - any CUDA/import failure means CPU
+        cupy.cuda.runtime.getDeviceCount()  # raises without a GPU
+        cupy.arange(1).sum()  # force a real kernel launch
+    except Exception:  # noqa: BLE001 - any CUDA/import failure means CPU
         return np, "numpy"
     return cupy, "cupy"
 
@@ -82,8 +82,11 @@ def _build_engine(job: Any, xp: Any) -> fdtd_gpu.GpuFDTD2D:
         # the never-stored "not given" sentinel.
         sponge_sides=tuple(str(s) for s in job["sponge_sides"]),
         sponge_reflection=float(job["sponge_reflection"]),
-        damping=(float(damping) if damping.ndim == 0
-                 else np.asarray(damping, dtype=np.float64)),
+        damping=(
+            float(damping)
+            if damping.ndim == 0
+            else np.asarray(damping, dtype=np.float64)
+        ),
         edge_impedance=edge_impedance or None,
         obstacle_mask=obstacle if bool(obstacle.any()) else None,
     )
@@ -93,24 +96,25 @@ def _build_engine(job: Any, xp: Any) -> fdtd_gpu.GpuFDTD2D:
             center=float(spec["center"]),
             width=float(spec["width"]),
             amplitude=float(spec.get("amplitude", 1.0)),
-            wavelength=(None if spec.get("wavelength") is None
-                        else float(spec["wavelength"])),
+            wavelength=(
+                None if spec.get("wavelength") is None else float(spec["wavelength"])
+            ),
         )
     if "init_scale_x" in job:
         # Lateral taper of the initial front: column-wise window on the
         # pressure and the y-velocity (vx keeps its (ny, nx - 1) columns).
-        w = xp.asarray(np.asarray(job["init_scale_x"],
-                                  dtype=np.float64)[np.newaxis, :])
+        w = xp.asarray(np.asarray(job["init_scale_x"], dtype=np.float64)[np.newaxis, :])
         sim.p *= w
         sim.vy *= w
     return sim
 
 
-def _sample_frame(sim: fdtd_gpu.GpuFDTD2D, stride: int,
-                  dtype: np.dtype[Any]) -> np.ndarray:
+def _sample_frame(
+    sim: fdtd_gpu.GpuFDTD2D, stride: int, dtype: np.dtype[Any]
+) -> np.ndarray:
     """Subsample and cast the pressure on the device, then transfer it."""
     frame = sim.p[::stride, ::stride].astype(dtype, copy=True)
-    if hasattr(frame, "get"):                    # CuPy device array
+    if hasattr(frame, "get"):  # CuPy device array
         return np.asarray(frame.get())
     return np.asarray(frame)
 
@@ -123,8 +127,7 @@ def run_job(job: Any) -> dict[str, Any]:
     stride = int(job["sample_stride"]) if "sample_stride" in job else 1
     if stride < 1:
         raise ValueError("sample_stride must be >= 1")
-    dtype = np.dtype(str(job["sample_dtype"]) if "sample_dtype" in job
-                     else "float64")
+    dtype = np.dtype(str(job["sample_dtype"]) if "sample_dtype" in job else "float64")
     # Deduplicate defensively (build_job already stores unique steps, but
     # the archive may come from elsewhere): ascending order, one recorded
     # frame per reported step, so frames[i] always belongs to
@@ -146,8 +149,7 @@ def run_job(job: Any) -> dict[str, Any]:
     elapsed = time.perf_counter() - t0
     ny, nx = sim.p.shape
     return {
-        "frames": (np.stack(frames) if frames
-                   else np.zeros((0, 0, 0), dtype=dtype)),
+        "frames": (np.stack(frames) if frames else np.zeros((0, 0, 0), dtype=dtype)),
         "sample_steps": np.asarray(sample_steps, dtype=np.int64),
         "sample_stride": stride,
         "sample_dtype": str(dtype),
@@ -166,8 +168,10 @@ def main(argv: list[str]) -> int:
     with np.load(argv[1], allow_pickle=False) as job:
         result = run_job(job)
     np.savez_compressed(argv[2], **result)
-    print(f"backend={result['backend']} steps={result['steps']} "
-          f"cells={result['cells']} elapsed={result['elapsed']:.3f}s")
+    print(
+        f"backend={result['backend']} steps={result['steps']} "
+        f"cells={result['cells']} elapsed={result['elapsed']:.3f}s"
+    )
     return 0
 
 

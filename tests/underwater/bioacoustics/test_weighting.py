@@ -37,7 +37,11 @@ from phonometry.underwater.bioacoustics.weighting import (
 
 #: NMFS (2018) Appendix D worked example, printed p. 130.
 _APPENDIX_D_WFA_1KHZ = {
-    "LF": -0.06, "MF": -29.11, "HF": -37.55, "PW": -5.90, "OW": -4.87,
+    "LF": -0.06,
+    "MF": -29.11,
+    "HF": -37.55,
+    "PW": -5.90,
+    "OW": -4.87,
 }
 
 #: Generalised hearing ranges as printed in Table ES1 of each NMFS document
@@ -45,12 +49,19 @@ _APPENDIX_D_WFA_1KHZ = {
 #: none, so those rows carry ``None`` and are checked as such.
 _PRINTED_HEARING_RANGES = {
     "nmfs-2018": {
-        "LF": (7.0, 35e3), "MF": (150.0, 160e3), "HF": (275.0, 160e3),
-        "PW": (50.0, 86e3), "OW": (60.0, 39e3),
+        "LF": (7.0, 35e3),
+        "MF": (150.0, 160e3),
+        "HF": (275.0, 160e3),
+        "PW": (50.0, 86e3),
+        "OW": (60.0, 39e3),
     },
     "nmfs-2024": {
-        "LF": (7.0, 36e3), "HF": (150.0, 160e3), "VHF": (200.0, 165e3),
-        "PW": (40.0, 90e3), "OW": (60.0, 68e3), "PA": (42.0, 52e3),
+        "LF": (7.0, 36e3),
+        "HF": (150.0, 160e3),
+        "VHF": (200.0, 165e3),
+        "PW": (40.0, 90e3),
+        "OW": (60.0, 68e3),
+        "PA": (42.0, 52e3),
         "OA": (90.0, 40e3),
     },
 }
@@ -59,10 +70,25 @@ _PRINTED_HEARING_RANGES = {
 #: Table 5 and Southall Table 6.
 _PRINTED_TTS = {
     "nmfs-2018": {"LF": 179, "MF": 178, "HF": 153, "PW": 181, "OW": 199},
-    "nmfs-2024": {"LF": 177, "HF": 181, "VHF": 161, "PW": 175, "OW": 179,
-                  "PA": 134, "OA": 157},
-    "southall-2019": {"LF": 179, "HF": 178, "VHF": 153, "SI": 186, "PCW": 181,
-                      "OCW": 199, "PCA": 134, "OCA": 157},
+    "nmfs-2024": {
+        "LF": 177,
+        "HF": 181,
+        "VHF": 161,
+        "PW": 175,
+        "OW": 179,
+        "PA": 134,
+        "OA": 157,
+    },
+    "southall-2019": {
+        "LF": 179,
+        "HF": 178,
+        "VHF": 153,
+        "SI": 186,
+        "PCW": 181,
+        "OCW": 199,
+        "PCA": 134,
+        "OCA": 157,
+    },
 }
 
 
@@ -87,9 +113,9 @@ def test_appendix_d_hand_evaluation_of_the_lf_row() -> None:
     ratio = 25.0 / (26.0 * (1.0 + (1.0 / 19.0) ** 2) ** 2)
     expected = 0.13 + 10.0 * np.log10(ratio)
     assert expected == pytest.approx(-0.0644, abs=1e-4)
-    assert auditory_weighting(1000.0, "LF", guidance="nmfs-2018").weighting[0] == pytest.approx(
-        expected, rel=1e-12
-    )
+    assert auditory_weighting(1000.0, "LF", guidance="nmfs-2018").weighting[
+        0
+    ] == pytest.approx(expected, rel=1e-12)
 
 
 # ---------------------------------------------------------------------------
@@ -99,7 +125,7 @@ def test_appendix_d_hand_evaluation_of_the_lf_row() -> None:
 
 @pytest.mark.parametrize("guidance", WEIGHTING_GUIDANCE)
 def test_c_is_the_negated_peak_of_the_weighting_function(guidance: str) -> None:
-    """"C ... determined by ... setting the peak amplitude of the function to zero"."""
+    """ "C ... determined by ... setting the peak amplitude of the function to zero"."""
     freqs = np.logspace(-3.0, 3.0, 200_001) * 1000.0  # 1 Hz to 1 MHz
     for group in hearing_groups(guidance):
         res = auditory_weighting(freqs, group, guidance=guidance)
@@ -108,7 +134,7 @@ def test_c_is_the_negated_peak_of_the_weighting_function(guidance: str) -> None:
 
 @pytest.mark.parametrize("guidance", WEIGHTING_GUIDANCE)
 def test_weighted_tts_onset_is_k_plus_c(guidance: str) -> None:
-    """"mathematically equivalent to K + C" -- the printed footnote of every table.
+    """ "mathematically equivalent to K + C" -- the printed footnote of every table.
 
     Checked twice over: against the printed thresholds transcribed here, and
     against the ones the criteria table itself serves, so the two copies of the
@@ -142,7 +168,7 @@ def test_non_impulsive_injury_is_tts_plus_20_db(guidance: str) -> None:
 
 
 def test_southall_impulsive_sel_offset_from_the_non_impulsive_table() -> None:
-    """"181 dB re 1 µPa²s for non-impulsive TTS onset −11 dB" (printed p. 155)."""
+    """ "181 dB re 1 µPa²s for non-impulsive TTS onset −11 dB" (printed p. 155)."""
     cont = exposure_criteria("PCW", guidance="southall-2019")
     imp = exposure_criteria("PCW", guidance="southall-2019", impulsive=True)
     assert cont.tts_sel is not None
@@ -236,8 +262,14 @@ def test_southall_table_7_errata_values_are_implemented() -> None:
     """The errata (45(5), printed p. 570) corrects four peak SPL values."""
     pca = exposure_criteria("PCA", guidance="southall-2019", impulsive=True)
     oca = exposure_criteria("OCA", guidance="southall-2019", impulsive=True)
-    assert (pca.tts_peak_spl, pca.injury_peak_spl) == (155.0, 161.0)  # printed 138 / 144
-    assert (oca.tts_peak_spl, oca.injury_peak_spl) == (170.0, 176.0)  # printed 161 / 167
+    assert (pca.tts_peak_spl, pca.injury_peak_spl) == (
+        155.0,
+        161.0,
+    )  # printed 138 / 144
+    assert (oca.tts_peak_spl, oca.injury_peak_spl) == (
+        170.0,
+        176.0,
+    )  # printed 161 / 167
 
 
 def test_nmfs_2024_otariid_c_uses_the_corrected_1_36() -> None:
@@ -246,7 +278,9 @@ def test_nmfs_2024_otariid_c_uses_the_corrected_1_36() -> None:
     assert params.c_db == 1.36
     assert params.c_db_as_printed == 1.37
     freqs = np.logspace(0.0, 6.0, 400_001)
-    shape = auditory_weighting(freqs, "OW", guidance="nmfs-2024").weighting - params.c_db
+    shape = (
+        auditory_weighting(freqs, "OW", guidance="nmfs-2024").weighting - params.c_db
+    )
     assert -float(np.max(shape)) == pytest.approx(1.3643, abs=5e-4)
 
 
@@ -256,33 +290,54 @@ def test_generalised_hearing_ranges_match_table_es1(guidance: str) -> None:
     printed = _PRINTED_HEARING_RANGES[guidance]
     assert set(printed) == set(hearing_groups(guidance))
     for group, expected in printed.items():
-        assert weighting_parameters(group, guidance=guidance).hearing_range_hz == expected
+        assert (
+            weighting_parameters(group, guidance=guidance).hearing_range_hz == expected
+        )
 
 
 def test_southall_rows_carry_no_hearing_range() -> None:
     """The article tabulates none, so the field is ``None`` rather than borrowed."""
     for group in hearing_groups("southall-2019"):
-        assert weighting_parameters(group, guidance="southall-2019").hearing_range_hz is None
+        assert (
+            weighting_parameters(group, guidance="southall-2019").hearing_range_hz
+            is None
+        )
 
 
 def test_nmfs_2018_and_southall_agree_on_the_five_shared_groups() -> None:
     """Southall Table 5 and NMFS 2018 Table 3 are numerically identical there."""
-    for nmfs, southall in (("LF", "LF"), ("MF", "HF"), ("HF", "VHF"),
-                           ("PW", "PCW"), ("OW", "OCW")):
+    for nmfs, southall in (
+        ("LF", "LF"),
+        ("MF", "HF"),
+        ("HF", "VHF"),
+        ("PW", "PCW"),
+        ("OW", "OCW"),
+    ):
         a = weighting_parameters(nmfs, guidance="nmfs-2018")
         b = weighting_parameters(southall, guidance="southall-2019")
         assert (a.a, a.b, a.f1_khz, a.f2_khz, a.c_db, a.k_db) == (
-            b.a, b.b, b.f1_khz, b.f2_khz, b.c_db, b.k_db
+            b.a,
+            b.b,
+            b.f1_khz,
+            b.f2_khz,
+            b.c_db,
+            b.k_db,
         )
 
 
 def test_asymptotic_slopes_are_20a_and_minus_20b_per_decade() -> None:
     """W falls at 20a dB/decade below f1 and 20b dB/decade above f2 (NMFS 2018 §2.2.3)."""
     params = weighting_parameters("VHF", guidance="nmfs-2024")
-    low = auditory_weighting([params.f1_khz * 1e3 / 1000.0, params.f1_khz * 1e3 / 100.0],
-                             "VHF", guidance="nmfs-2024").weighting
-    high = auditory_weighting([params.f2_khz * 1e3 * 100.0, params.f2_khz * 1e3 * 1000.0],
-                              "VHF", guidance="nmfs-2024").weighting
+    low = auditory_weighting(
+        [params.f1_khz * 1e3 / 1000.0, params.f1_khz * 1e3 / 100.0],
+        "VHF",
+        guidance="nmfs-2024",
+    ).weighting
+    high = auditory_weighting(
+        [params.f2_khz * 1e3 * 100.0, params.f2_khz * 1e3 * 1000.0],
+        "VHF",
+        guidance="nmfs-2024",
+    ).weighting
     assert float(low[1] - low[0]) == pytest.approx(20.0 * params.a, abs=0.05)
     assert float(high[1] - high[0]) == pytest.approx(-20.0 * params.b, abs=0.05)
 
@@ -317,7 +372,9 @@ def test_weighted_exposure_flags_exceedance_of_the_published_criterion() -> None
     assert crit.injury_sel is not None
     # Place one band at the peak of W (where the weighting is 0 dB) so the
     # weighted SEL equals the band level exactly.
-    peak_hz = 1000.0 * _peak_frequency_khz(params.a, params.b, params.f1_khz, params.f2_khz)
+    peak_hz = 1000.0 * _peak_frequency_khz(
+        params.a, params.b, params.f1_khz, params.f2_khz
+    )
     below = weighted_exposure([peak_hz], [crit.injury_sel - 1.0], "LF", impulsive=True)
     above = weighted_exposure([peak_hz], [crit.injury_sel + 1.0], "LF", impulsive=True)
     assert below.exceeds_injury is False
@@ -347,8 +404,9 @@ def test_an_exposure_exactly_at_the_criterion_counts_as_exceeding_it() -> None:
     """``exceeds_*`` tests ``margin >= 0``: the onset threshold itself is included."""
     crit = exposure_criteria("VHF", guidance="nmfs-2024", impulsive=True)
     assert crit.injury_peak_spl is not None
-    res = weighted_exposure([1000.0], [100.0], "VHF", impulsive=True,
-                            peak_spl=crit.injury_peak_spl)
+    res = weighted_exposure(
+        [1000.0], [100.0], "VHF", impulsive=True, peak_spl=crit.injury_peak_spl
+    )
     assert res.peak_margin == 0.0
     assert res.exceeds_injury is True
 

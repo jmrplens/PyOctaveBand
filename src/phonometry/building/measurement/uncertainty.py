@@ -65,49 +65,198 @@ Measurand = Literal["airborne", "impact", "impact_reduction"]
 # --------------------------------------------------------------------------- #
 #: 21 bands 50-5000 Hz including 500 Hz (Tables 2, 6, D.1).
 _FREQ_FULL: tuple[float, ...] = (
-    50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
-    630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0,
+    50.0,
+    63.0,
+    80.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
 )
 #: 20 bands 50-5000 Hz **without** 500 Hz (Table 4, ISO 12999-1:2020).
 _FREQ_IMPACT: tuple[float, ...] = (
-    50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0,
-    630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0,
+    50.0,
+    63.0,
+    80.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
 )
 
 # --------------------------------------------------------------------------- #
 # Table 1: Maximum standard deviation of repeatability (Clause 5.8).
 # --------------------------------------------------------------------------- #
 _TABLE1: tuple[float, ...] = (
-    4.0, 3.5, 3.0, 2.6, 2.2, 1.9, 1.7, 1.5, 1.4, 1.3, 1.3,
-    1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3,
+    4.0,
+    3.5,
+    3.0,
+    2.6,
+    2.2,
+    1.9,
+    1.7,
+    1.5,
+    1.4,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
+    1.3,
 )
 
 # --------------------------------------------------------------------------- #
 # Table 2: Airborne one-third-octave (Clause 7.2). Columns A/B/C = σR/σsitu/σr.
 # --------------------------------------------------------------------------- #
 _TABLE2_A: tuple[float, ...] = (
-    6.8, 4.6, 3.8, 3.0, 2.7, 2.4, 2.1, 1.8, 1.8, 1.8, 1.8,
-    1.8, 1.8, 1.8, 1.8, 1.8, 1.8, 1.9, 2.0, 2.4, 2.8,
+    6.8,
+    4.6,
+    3.8,
+    3.0,
+    2.7,
+    2.4,
+    2.1,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.9,
+    2.0,
+    2.4,
+    2.8,
 )
 _TABLE2_B: tuple[float, ...] = (
-    4.0, 3.6, 3.2, 2.8, 2.4, 2.0, 1.8, 1.6, 1.4, 1.2, 1.1,
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.3, 1.6, 1.9, 2.2,
+    4.0,
+    3.6,
+    3.2,
+    2.8,
+    2.4,
+    2.0,
+    1.8,
+    1.6,
+    1.4,
+    1.2,
+    1.1,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.3,
+    1.6,
+    1.9,
+    2.2,
 )
 _TABLE2_C: tuple[float, ...] = (
-    2.0, 1.8, 1.6, 1.4, 1.2, 1.0, 0.9, 0.8, 0.7, 0.6, 0.6,
-    0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6,
+    2.0,
+    1.8,
+    1.6,
+    1.4,
+    1.2,
+    1.0,
+    0.9,
+    0.8,
+    0.7,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
+    0.6,
 )
 
 # --------------------------------------------------------------------------- #
 # Table 4: Impact one-third-octave (Clause 7.3). Situations B/C only, no 500 Hz.
 # --------------------------------------------------------------------------- #
 _TABLE4_B: tuple[float, ...] = (
-    3.2, 2.8, 2.4, 2.0, 1.6, 1.4, 1.3, 1.2, 1.2, 1.2,
-    1.2, 1.2, 1.2, 1.3, 1.4, 1.5, 1.7, 1.9, 2.1, 2.3,
+    3.2,
+    2.8,
+    2.4,
+    2.0,
+    1.6,
+    1.4,
+    1.3,
+    1.2,
+    1.2,
+    1.2,
+    1.2,
+    1.2,
+    1.2,
+    1.3,
+    1.4,
+    1.5,
+    1.7,
+    1.9,
+    2.1,
+    2.3,
 )
 _TABLE4_C: tuple[float, ...] = (
-    1.5, 1.4, 1.3, 1.2, 1.1, 1.0, 0.9, 0.8, 0.8, 0.8,
-    0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1.0, 1.2, 1.4, 1.6,
+    1.5,
+    1.4,
+    1.3,
+    1.2,
+    1.1,
+    1.0,
+    0.9,
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    1.0,
+    1.2,
+    1.4,
+    1.6,
 )
 
 # --------------------------------------------------------------------------- #
@@ -115,16 +264,54 @@ _TABLE4_C: tuple[float, ...] = (
 # Situation A only.
 # --------------------------------------------------------------------------- #
 _TABLE6_A: tuple[float, ...] = (
-    1.4, 1.3, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.2,
-    1.3, 1.6, 1.9, 2.2, 2.5, 2.8, 3.2, 3.6, 4.0, 4.4,
+    1.4,
+    1.3,
+    1.2,
+    1.1,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.1,
+    1.2,
+    1.3,
+    1.6,
+    1.9,
+    2.2,
+    2.5,
+    2.8,
+    3.2,
+    3.6,
+    4.0,
+    4.4,
 )
 
 # --------------------------------------------------------------------------- #
 # Annex D Table D.1: σR95 airborne one-third-octave (situation A upper limit).
 # --------------------------------------------------------------------------- #
 _TABLED1: tuple[float, ...] = (
-    11.7, 6.7, 5.9, 5.0, 5.0, 3.8, 3.3, 3.3, 3.3, 3.3, 3.3,
-    3.3, 3.3, 3.3, 3.4, 3.4, 3.4, 3.5, 3.6, 4.0, 4.7,
+    11.7,
+    6.7,
+    5.9,
+    5.0,
+    5.0,
+    3.8,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.4,
+    3.4,
+    3.4,
+    3.5,
+    3.6,
+    4.0,
+    4.7,
 )
 
 # Registry: (measurand, upper_limit) -> (frequencies, {situation: values}).
@@ -142,7 +329,9 @@ _BAND_TABLES: dict[
 # (A, B, C) standard uncertainty and the situation-A σR95 upper limit (or None).
 # Tables 3 (airborne), 5 (impact), 7 (reduction); Annex D Table D.2 (σR95).
 # --------------------------------------------------------------------------- #
-_SINGLE: dict[str, tuple[tuple[float | None, float | None, float | None], float | None]] = {
+_SINGLE: dict[
+    str, tuple[tuple[float | None, float | None, float | None], float | None]
+] = {
     # Airborne: Table 3 (A/B/C) and Table D.2 (σR95, situation A).
     "r_w": ((1.2, 0.9, 0.4), 2.0),
     "r_w+c_100_3150": ((1.3, 0.9, 0.5), 2.1),
@@ -185,10 +374,20 @@ _SITUATION_INDEX: dict[str, int] = {"A": 0, "B": 1, "C": 2}
 # Table 8: Coverage factors (Clause 8). Keyed by confidence level (fraction).
 # --------------------------------------------------------------------------- #
 _COVERAGE_TWO_SIDED: dict[float, float] = {
-    0.68: 1.00, 0.80: 1.28, 0.90: 1.65, 0.95: 1.96, 0.99: 2.58, 0.999: 3.29,
+    0.68: 1.00,
+    0.80: 1.28,
+    0.90: 1.65,
+    0.95: 1.96,
+    0.99: 2.58,
+    0.999: 3.29,
 }
 _COVERAGE_ONE_SIDED: dict[float, float] = {
-    0.84: 1.00, 0.90: 1.28, 0.95: 1.65, 0.975: 1.96, 0.995: 2.58, 0.9995: 3.29,
+    0.84: 1.00,
+    0.90: 1.28,
+    0.95: 1.65,
+    0.975: 1.96,
+    0.995: 2.58,
+    0.9995: 3.29,
 }
 
 
@@ -219,7 +418,9 @@ class BandUncertainty:
             np.asarray(self.uncertainties, dtype=float),
         )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band standard uncertainty spectrum.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -270,7 +471,9 @@ def _canonical(quantity: str) -> str:
     key = _ALIASES.get(key, key)
     if key not in _SINGLE:
         valid = ", ".join(sorted(set(_SINGLE) | set(_ALIASES)))
-        raise ValueError(f"Unknown single-number quantity {quantity!r}. Valid: {valid}.")
+        raise ValueError(
+            f"Unknown single-number quantity {quantity!r}. Valid: {valid}."
+        )
     return key
 
 
@@ -555,7 +758,9 @@ def single_number_uncertainty_uncorrelated(
     if u_arr.size == 0:
         raise ValueError("At least one band is required.")
     if u_arr.shape != d_arr.shape:
-        raise ValueError("band_uncertainties and reference_differences differ in length.")
+        raise ValueError(
+            "band_uncertainties and reference_differences differ in length."
+        )
     if np.any(u_arr < 0):
         raise ValueError("Band uncertainties must be non-negative.")
     if not np.all(np.isfinite(u_arr)) or not np.all(np.isfinite(d_arr)):

@@ -82,17 +82,13 @@ def _intensity_class_example() -> tuple[object, ReportMetadata, str]:
     required-class-1 verdict, showing both halves of the layout at once.
     """
     spacing = 0.012
-    freqs, _, _ = ph.emission.residual_index_limits(
-        "instrument", spacing=spacing
-    )
+    freqs, _, _ = ph.emission.residual_index_limits("instrument", spacing=spacing)
     phase_mismatch = 0.05 * np.maximum(1.0, freqs / 1000.0)  # degrees
     measured = ph.emission.residual_index_from_phase_mismatch(
         phase_mismatch, freqs, spacing
     )
     measured = measured - 4.0 * np.exp(-((np.log(freqs / 100.0) / 0.25) ** 2))
-    result = ph.emission.intensity_class_compliance(
-        measured, freqs, spacing=spacing
-    )
+    result = ph.emission.intensity_class_compliance(measured, freqs, spacing=spacing)
     metadata = ReportMetadata(
         specimen="p-p sound intensity probe and analyser, 12 mm spacer",
         client="Example client",

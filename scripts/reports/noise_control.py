@@ -72,9 +72,7 @@ def _silencer_example() -> tuple[object, ReportMetadata, str]:
     apply.
     """
     freqs = np.array([63, 125, 250, 500, 1000, 2000, 4000], dtype=float)
-    result = ph.noise_control.silencers.expansion_chamber(
-        freqs, 0.5, 0.08, 0.01
-    )
+    result = ph.noise_control.silencers.expansion_chamber(freqs, 0.5, 0.08, 0.01)
     metadata = ReportMetadata(
         specimen="Simple expansion-chamber muffler (m = 8, design case)",
         client="Example client",
@@ -149,30 +147,37 @@ def _duct_path_example() -> tuple[object, ReportMetadata, str]:
         [
             DuctElement(
                 "Elbow, 36 x 24 in, unlined",
-                [0, 1, 2, 3, 3, 3, 3, 3], [41, 39, 36, 29, 20, 6, 0, 0],
+                [0, 1, 2, 3, 3, 3, 3, 3],
+                [41, 39, 36, 29, 20, 6, 0, 0],
                 code="2",
             ),
             DuctElement(
                 "Silencer, standard pressure drop, 3 ft",
-                [7, 12, 16, 28, 35, 35, 28, 17], [49, 43, 44, 42, 42, 45, 35, 24],
+                [7, 12, 16, 28, 35, 35, 28, 17],
+                [49, 43, 44, 42, 42, 45, 35, 24],
                 code="3",
             ),
             DuctElement(
                 "Duct, 36 x 24 in, 5 ft, 1 in lining",
-                [2, 2, 3, 7, 15, 12, 11, 9], code="4",
+                [2, 2, 3, 7, 15, 12, 11, 9],
+                code="4",
             ),
             DuctElement("Branch split, 25 per cent", 6.0, code="5"),
             DuctElement(
                 "Duct, 18 x 12 in, 6 ft, 1 in lining",
-                [3, 3, 5, 11, 25, 22, 16, 13], code="6",
+                [3, 3, 5, 11, 25, 22, 16, 13],
+                code="6",
             ),
             DuctElement(
                 "Flexible duct, 12 in diameter, 6 ft",
-                [14, 14, 16, 15, 17, 22, 16, 13], code="7",
+                [14, 14, 16, 15, 17, 22, 16, 13],
+                code="7",
             ),
             DuctElement(
                 "Rectangular diffuser, 312 cfm",
-                0.0, [33, 32, 29, 23, 15, 4, 0, 0], code="8",
+                0.0,
+                [33, 32, 29, 23, 15, 4, 0, 0],
+                code="8",
             ),
         ],
         room_effect=[6, 6, 5, 5, 6, 7, 6, 6],

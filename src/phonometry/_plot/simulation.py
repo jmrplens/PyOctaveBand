@@ -30,19 +30,15 @@ _VELOCITY_LABEL = "Particle velocity [m/s]"
 _STRINGS: dict[str, str] = {
     "Time [ms]": "Tiempo [ms]",
     "Pressure [Pa]": "Presión [Pa]",
-    "FDTD pressure field at $t$ = {t_txt} ms":
-        "Campo de presión FDTD en $t$ = {t_txt} ms",
+    "FDTD pressure field at $t$ = {t_txt} ms": "Campo de presión FDTD en $t$ = {t_txt} ms",
     "FDTD probe pressure": "Presión en las sondas FDTD",
     "probe": "sonda",
     "Particle velocity [m/s]": "Velocidad de partícula [m/s]",
     "Signal [Pa, m/s]": "Señal [Pa, m/s]",
     "Elastic FDTD probe signals": "Señales en las sondas del FDTD elástico",
-    "Elastic FDTD pressure field at $t$ = {t_txt} ms":
-        "Campo de presión del FDTD elástico en $t$ = {t_txt} ms",
-    "Elastic FDTD $v_x$ field at $t$ = {t_txt} ms":
-        "Campo de $v_x$ del FDTD elástico en $t$ = {t_txt} ms",
-    "Elastic FDTD $v_y$ field at $t$ = {t_txt} ms":
-        "Campo de $v_y$ del FDTD elástico en $t$ = {t_txt} ms",
+    "Elastic FDTD pressure field at $t$ = {t_txt} ms": "Campo de presión del FDTD elástico en $t$ = {t_txt} ms",
+    "Elastic FDTD $v_x$ field at $t$ = {t_txt} ms": "Campo de $v_x$ del FDTD elástico en $t$ = {t_txt} ms",
+    "Elastic FDTD $v_y$ field at $t$ = {t_txt} ms": "Campo de $v_y$ del FDTD elástico en $t$ = {t_txt} ms",
 }
 
 #: Colorbar label of each elastic snapshot field.
@@ -79,9 +75,15 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
 
 
 def _render_probe_lines(
-    ax: Axes, t_ms: NDArray[np.float64],
-    traces: Sequence[NDArray[np.float64]], labels: Sequence[str],
-    *, xlabel: str, ylabel: str, title: str, language: str,
+    ax: Axes,
+    t_ms: NDArray[np.float64],
+    traces: Sequence[NDArray[np.float64]],
+    labels: Sequence[str],
+    *,
+    xlabel: str,
+    ylabel: str,
+    title: str,
+    language: str,
     **kwargs: Any,
 ) -> Axes:
     """Draw labelled probe time histories with the shared styling."""
@@ -102,7 +104,8 @@ def _render_probe_lines(
 
 
 def _probe_labels(
-    positions: NDArray[np.float64], language: str,
+    positions: NDArray[np.float64],
+    language: str,
 ) -> list[str]:
     """One ``probe (x, y) m`` label per probe position."""
     from .._i18n import format_number
@@ -118,12 +121,17 @@ def _probe_labels(
 
 
 def _render_snapshot(
-    ax: Axes, field: NDArray[np.float64],
-    *, size: tuple[float, float], shape: tuple[int, int],
+    ax: Axes,
+    field: NDArray[np.float64],
+    *,
+    size: tuple[float, float],
+    shape: tuple[int, int],
     obstacle_mask: NDArray[np.bool_] | None,
     source_positions: Sequence[tuple[float, float]],
     probe_positions: NDArray[np.float64],
-    colorbar_label: str, title: str, language: str,
+    colorbar_label: str,
+    title: str,
+    language: str,
     **kwargs: Any,
 ) -> Axes:
     """Render one field raster with the geometry overlaid (shared core)."""
@@ -146,15 +154,28 @@ def _render_snapshot(
     )
     if obstacle_mask is not None:
         overlay = np.ma.masked_where(~obstacle_mask, np.ones(shape))
-        ax.imshow(overlay, cmap="gray", vmin=0.0, vmax=2.0, origin="upper",
-                  extent=extent, interpolation="nearest")
+        ax.imshow(
+            overlay,
+            cmap="gray",
+            vmin=0.0,
+            vmax=2.0,
+            origin="upper",
+            extent=extent,
+            interpolation="nearest",
+        )
     for x, y in source_positions:
-        ax.plot(x, y, marker="*", markersize=10, color=_C_REFERENCE,
-                linestyle="none")
+        ax.plot(x, y, marker="*", markersize=10, color=_C_REFERENCE, linestyle="none")
     for k in range(probe_positions.shape[0]):
         x, y = probe_positions[k]
-        ax.plot(x, y, marker="o", markersize=5, color=_C_MUTED,
-                markeredgecolor="black", linestyle="none")
+        ax.plot(
+            x,
+            y,
+            marker="o",
+            markersize=5,
+            color=_C_MUTED,
+            markeredgecolor="black",
+            linestyle="none",
+        )
     ax.figure.colorbar(img, ax=ax, label=colorbar_label)
     ax.set_xlabel("$x$ [m]")
     ax.set_ylabel("$y$ [m]")
@@ -164,18 +185,18 @@ def _render_snapshot(
 
 
 def _snapshot_time_text(
-    snapshot_times: NDArray[np.float64], frame: int, language: str,
+    snapshot_times: NDArray[np.float64],
+    frame: int,
+    language: str,
 ) -> str:
     """The localised snapshot time in milliseconds."""
     from .._i18n import format_number
 
-    return format_number(float(snapshot_times[frame]) * 1000.0, language,
-                         decimals=2)
+    return format_number(float(snapshot_times[frame]) * 1000.0, language, decimals=2)
 
 
 def plot_fdtd_probes(
-    result: FDTDResult, ax: Axes | None = None, *, language: str = "en",
-    **kwargs: Any
+    result: FDTDResult, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Pressure time history at each probe of an FDTD run.
 
@@ -188,19 +209,25 @@ def plot_fdtd_probes(
     ax = ax if ax is not None else _new_axes()
     t_ms = np.asarray(result.times, dtype=np.float64) * 1000.0
     return _render_probe_lines(
-        ax, t_ms,
+        ax,
+        t_ms,
         [result.pressures[k] for k in range(result.pressures.shape[0])],
         _probe_labels(result.probe_positions, language),
         xlabel=_t(_TIME_LABEL, language),
         ylabel=_t(_PRESSURE_LABEL, language),
         title=_t("FDTD probe pressure", language),
-        language=language, **kwargs,
+        language=language,
+        **kwargs,
     )
 
 
 def plot_fdtd_snapshot(
-    result: FDTDResult, ax: Axes | None = None, *, frame: int = -1,
-    language: str = "en", **kwargs: Any
+    result: FDTDResult,
+    ax: Axes | None = None,
+    *,
+    frame: int = -1,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """One recorded pressure-field snapshot with the geometry overlaid.
 
@@ -221,26 +248,32 @@ def plot_fdtd_snapshot(
     :raises ValueError: If the result holds no snapshots.
     """
     if result.snapshots is None or result.snapshot_times is None:
-        raise ValueError("the result holds no snapshots; rerun the "
-                         "simulation with snapshot_every set")
+        raise ValueError(
+            "the result holds no snapshots; rerun the "
+            "simulation with snapshot_every set"
+        )
     ax = ax if ax is not None else _new_axes()
     t_txt = _snapshot_time_text(result.snapshot_times, frame, language)
     return _render_snapshot(
-        ax, np.asarray(result.snapshots[frame], dtype=np.float64),
-        size=result.size, shape=result.shape,
+        ax,
+        np.asarray(result.snapshots[frame], dtype=np.float64),
+        size=result.size,
+        shape=result.shape,
         obstacle_mask=result.obstacle_mask,
-        source_positions=[((s.ix + 0.5) * result.dx, (s.iy + 0.5) * result.dx)
-                          for s in result.sources],
+        source_positions=[
+            ((s.ix + 0.5) * result.dx, (s.iy + 0.5) * result.dx) for s in result.sources
+        ],
         probe_positions=result.probe_positions,
         colorbar_label=_t(_PRESSURE_LABEL, language),
-        title=_t("FDTD pressure field at $t$ = {t_txt} ms", language,
-                 t_txt=t_txt),
-        language=language, **kwargs,
+        title=_t("FDTD pressure field at $t$ = {t_txt} ms", language, t_txt=t_txt),
+        language=language,
+        **kwargs,
     )
 
 
 def _elastic_source_position(
-    source: Any, dx: float,
+    source: Any,
+    dx: float,
 ) -> tuple[float, float]:
     """Physical position of an elastic source marker."""
     from ..simulation.elastic_fdtd import ForceSource
@@ -253,8 +286,11 @@ def _elastic_source_position(
 
 
 def plot_elastic_probes(
-    result: ElasticFDTDResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: ElasticFDTDResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Recorded time history of every probe/field pair of an elastic run.
 
@@ -286,17 +322,25 @@ def plot_elastic_probes(
     else:
         ylabel = "Signal [Pa, m/s]"
     return _render_probe_lines(
-        ax, t_ms, traces, labels,
+        ax,
+        t_ms,
+        traces,
+        labels,
         xlabel=_t(_TIME_LABEL, language),
         ylabel=_t(ylabel, language),
         title=_t("Elastic FDTD probe signals", language),
-        language=language, **kwargs,
+        language=language,
+        **kwargs,
     )
 
 
 def plot_elastic_snapshot(
-    result: ElasticFDTDResult, ax: Axes | None = None, *, frame: int = -1,
-    language: str = "en", **kwargs: Any
+    result: ElasticFDTDResult,
+    ax: Axes | None = None,
+    *,
+    frame: int = -1,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """One recorded elastic field snapshot with the geometry overlaid.
 
@@ -317,20 +361,24 @@ def plot_elastic_snapshot(
     :raises ValueError: If the result holds no snapshots.
     """
     if result.snapshots is None or result.snapshot_times is None:
-        raise ValueError("the result holds no snapshots; rerun the "
-                         "simulation with snapshot_every set")
+        raise ValueError(
+            "the result holds no snapshots; rerun the "
+            "simulation with snapshot_every set"
+        )
     ax = ax if ax is not None else _new_axes()
     t_txt = _snapshot_time_text(result.snapshot_times, frame, language)
     return _render_snapshot(
-        ax, np.asarray(result.snapshots[frame], dtype=np.float64),
-        size=result.size, shape=result.shape,
+        ax,
+        np.asarray(result.snapshots[frame], dtype=np.float64),
+        size=result.size,
+        shape=result.shape,
         obstacle_mask=result.obstacle_mask,
-        source_positions=[_elastic_source_position(s, result.dx)
-                          for s in result.sources],
+        source_positions=[
+            _elastic_source_position(s, result.dx) for s in result.sources
+        ],
         probe_positions=result.probe_positions,
-        colorbar_label=_t(_ELASTIC_FIELD_LABELS[result.snapshot_field],
-                          language),
-        title=_t(_ELASTIC_FIELD_TITLES[result.snapshot_field], language,
-                 t_txt=t_txt),
-        language=language, **kwargs,
+        colorbar_label=_t(_ELASTIC_FIELD_LABELS[result.snapshot_field], language),
+        title=_t(_ELASTIC_FIELD_TITLES[result.snapshot_field], language, t_txt=t_txt),
+        language=language,
+        **kwargs,
     )

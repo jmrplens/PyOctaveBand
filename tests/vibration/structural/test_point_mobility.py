@@ -24,10 +24,10 @@ from phonometry.vibration.structural.point_mobility import (
     plate_bending_wave_speed,
 )
 
-BP = 1.0e4          # plate bending stiffness per width B' [N.m]
-M2 = 10.0           # plate mass per unit area m'' [kg/m2]
-B_BEAM = 200.0      # beam bending stiffness B = E I [N.m2]
-M1 = 5.0            # beam mass per unit length m' [kg/m]
+BP = 1.0e4  # plate bending stiffness per width B' [N.m]
+M2 = 10.0  # plate mass per unit area m'' [kg/m2]
+B_BEAM = 200.0  # beam bending stiffness B = E I [N.m2]
+M1 = 5.0  # beam mass per unit length m' [kg/m]
 
 
 # ---------------------------------------------------------------------------
@@ -40,9 +40,9 @@ def test_plate_impedance_centre() -> None:
 
 
 def test_plate_impedance_edge() -> None:
-    assert vibration.infinite_plate_impedance(
-        BP, M2, location="edge"
-    ) == pytest.approx(3.5 * math.sqrt(BP * M2))
+    assert vibration.infinite_plate_impedance(BP, M2, location="edge") == pytest.approx(
+        3.5 * math.sqrt(BP * M2)
+    )
 
 
 def test_plate_mobility_is_reciprocal_and_real() -> None:
@@ -53,9 +53,7 @@ def test_plate_mobility_is_reciprocal_and_real() -> None:
 
 
 def test_plate_mobility_frequency_independent() -> None:
-    res = vibration.infinite_plate_point_mobility(
-        [50.0, 200.0, 1000.0], BP, M2
-    )
+    res = vibration.infinite_plate_point_mobility([50.0, 200.0, 1000.0], BP, M2)
     assert np.allclose(res.magnitude, res.magnitude[0])
     assert np.allclose(res.mobility.imag, 0.0)
 
@@ -88,9 +86,7 @@ def test_beam_end_four_times_centre() -> None:
     # Table 5.1: end mobility magnitude is 4x the centre value.
     yc = abs(complex(vibration.infinite_beam_mobility(200.0, B_BEAM, M1)))
     ye = abs(
-        complex(
-            vibration.infinite_beam_mobility(200.0, B_BEAM, M1, location="end")
-        )
+        complex(vibration.infinite_beam_mobility(200.0, B_BEAM, M1, location="end"))
     )
     assert ye / yc == pytest.approx(4.0)
 

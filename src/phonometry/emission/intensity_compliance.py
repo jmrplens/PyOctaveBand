@@ -333,9 +333,7 @@ def verify_intensity_class(
     measured = np.atleast_1d(np.asarray(residual_index, dtype=np.float64))
     supplied = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if measured.ndim != 1 or supplied.ndim != 1:
-        raise ValueError(
-            "verify_intensity_class expects 1D per-band arrays."
-        )
+        raise ValueError("verify_intensity_class expects 1D per-band arrays.")
     if measured.size != supplied.size:
         raise ValueError(
             f"'residual_index' and 'frequencies' must have the same length, "
@@ -368,9 +366,7 @@ def verify_intensity_class(
     # own and clause 12.4 tests it in one-third octaves, so the alternative is
     # not open to it at all.
     full_range = covered.issuperset(_THIRD_OCTAVE_BANDS) or (
-        device != "probe"
-        and overall == 2
-        and covered.issuperset(_OCTAVE_BANDS)
+        device != "probe" and overall == 2 and covered.issuperset(_OCTAVE_BANDS)
     )
     range_limited = not full_range
 

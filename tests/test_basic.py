@@ -93,9 +93,7 @@ def test_detrend_acts_on_the_input_once_not_per_band() -> None:
     t = np.arange(2 * fs) / fs
     y = np.sin(2 * np.pi * 1000 * t) + 5.0  # 1 kHz tone riding a DC offset
 
-    bank = phonometry.filters.OctaveFilterBank(
-        fs=fs, fraction=1, limits=[12, 20000]
-    )
+    bank = phonometry.filters.OctaveFilterBank(fs=fs, fraction=1, limits=[12, 20000])
     spl_on, _, bands_on = bank.filter(y, sigbands=True, detrend=True)
     spl_off, _, bands_off = bank.filter(y, sigbands=True, detrend=False)
 

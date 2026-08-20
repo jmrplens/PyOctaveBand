@@ -88,9 +88,26 @@ def test_band_importance_sums_to_one() -> None:
     assert sii.BAND_IMPORTANCE.size == 18
     np.testing.assert_allclose(
         sii.BAND_CENTERS,
-        [160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0,
-         1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0,
-         8000.0],
+        [
+            160.0,
+            200.0,
+            250.0,
+            315.0,
+            400.0,
+            500.0,
+            630.0,
+            800.0,
+            1000.0,
+            1250.0,
+            1600.0,
+            2000.0,
+            2500.0,
+            3150.0,
+            4000.0,
+            5000.0,
+            6300.0,
+            8000.0,
+        ],
     )
 
 
@@ -139,9 +156,7 @@ def test_sii_annex_c2_worked_example() -> None:
     # 250 Hz cell is printed 25.04 while the exact chain gives 25.0468 (the
     # print truncates rather than rounds), hence the half-unit tolerance of
     # the two-decimal print.
-    np.testing.assert_allclose(
-        result.masking[:3], ANSIS3_5_ANNEX_C2_MASKING, atol=1e-2
-    )
+    np.testing.assert_allclose(result.masking[:3], ANSIS3_5_ANNEX_C2_MASKING, atol=1e-2)
 
 
 def test_sii_wg_s3_79_official_test_case_to() -> None:
@@ -205,9 +220,7 @@ def test_masking_slope_keeps_the_printed_summation_order() -> None:
     expected = np.empty(18)
     expected[0] = b[0]
     for i in range(1, 18):
-        contrib = 10.0 ** (
-            0.1 * (b[:i] + 3.32 * c[:i] * np.log10(0.89 * f[i] / f[:i]))
-        )
+        contrib = 10.0 ** (0.1 * (b[:i] + 3.32 * c[:i] * np.log10(0.89 * f[i] / f[:i])))
         expected[i] = 10.0 * np.log10(10.0 ** (0.1 * noise[i]) + np.sum(contrib))
 
     # Bit equality, not a tolerance: a reassociation shows up here as a few
@@ -265,7 +278,8 @@ def test_vocal_effort_overall_level_increases() -> None:
     f = sii.BAND_CENTERS
     bw = (2.0 ** (1 / 6) - 2.0 ** (-1 / 6)) * f
     overall = [
-        10.0 * np.log10(
+        10.0
+        * np.log10(
             np.sum(10.0 ** ((sii.standard_speech_spectrum(e) + 10 * np.log10(bw)) / 10))
         )
         for e in sii.VOCAL_EFFORTS
@@ -334,22 +348,20 @@ def test_standard_speech_spectra_family_matches_table3() -> None:
     assert res.levels.shape == (4, 18)
     np.testing.assert_allclose(res.frequencies, sii.BAND_CENTERS)
     for i, effort in enumerate(res.vocal_efforts):
-        np.testing.assert_allclose(
-            res.levels[i], sii.standard_speech_spectrum(effort)
-        )
+        np.testing.assert_allclose(res.levels[i], sii.standard_speech_spectrum(effort))
     # ANSI S3.5-1997 Table 3 anchor values, in dB SPL.
     i1k = int(np.flatnonzero(np.isclose(res.frequencies, 1000.0))[0])
     i8k = int(np.flatnonzero(np.isclose(res.frequencies, 8000.0))[0])
-    assert res.levels[0, i1k] == pytest.approx(25.01)          # normal, 1 kHz
-    assert res.levels[2, i1k] == pytest.approx(42.16)          # loud, 1 kHz
-    assert res.levels[3, i8k] == pytest.approx(20.72)          # shout, 8 kHz
+    assert res.levels[0, i1k] == pytest.approx(25.01)  # normal, 1 kHz
+    assert res.levels[2, i1k] == pytest.approx(42.16)  # loud, 1 kHz
+    assert res.levels[3, i8k] == pytest.approx(20.72)  # shout, 8 kHz
 
 
 def test_standard_speech_spectra_single_effort() -> None:
     res = sii.standard_speech_spectra("raised")
     assert res.vocal_efforts == ("raised",)
     assert res.levels.shape == (1, 18)
-    assert res.levels[0, 0] == pytest.approx(33.81)            # raised, 160 Hz
+    assert res.levels[0, 0] == pytest.approx(33.81)  # raised, 160 Hz
 
 
 def test_standard_speech_spectra_rejects_unknown_and_empty() -> None:
@@ -411,15 +423,20 @@ def test_sii_methods_are_the_four_procedures_of_the_standard() -> None:
     # ANSI S3.5-1997 defines four band procedures; the library exposes them
     # in the order of the standard's Tables 1 to 4.
     assert sii.SII_METHODS == (
-        "critical-band", "equally-contributing", "one-third-octave", "octave",
+        "critical-band",
+        "equally-contributing",
+        "one-third-octave",
+        "octave",
     )
     sizes = {
         method: sii.sii_procedure(method).band_importance.size
         for method in sii.SII_METHODS
     }
     assert sizes == {
-        "critical-band": 21, "equally-contributing": 17,
-        "one-third-octave": 18, "octave": 6,
+        "critical-band": 21,
+        "equally-contributing": 17,
+        "one-third-octave": 18,
+        "octave": 6,
     }
 
 
@@ -439,8 +456,7 @@ def test_band_importance_sums_of_every_procedure() -> None:
 
 @pytest.mark.parametrize(
     ("method", "table"),
-    [("critical-band", ANSIS3_5_CRITICAL_TABLE1),
-     ("octave", ANSIS3_5_OCTAVE_TABLE4)],
+    [("critical-band", ANSIS3_5_CRITICAL_TABLE1), ("octave", ANSIS3_5_OCTAVE_TABLE4)],
     ids=["Table 1", "Table 4"],
 )
 def test_band_table_transcription(
@@ -558,32 +574,80 @@ def test_equally_contributing_is_the_300_to_6400_hz_span_of_table_1() -> None:
 #: the file. The one-third-octave pair ``TO.TST``/``TO_1.TST`` keeps its own
 #: two tests above.
 _WG_OFFICIAL_CASES = (
-    ("CB.TST", "critical-band", ANSIS3_5_WG_CB_SPEECH, ANSIS3_5_WG_CB_NOISE,
-     ANSIS3_5_WG_CB_THRESHOLD, None,
-     ANSIS3_5_WG_CB_SII, ANSIS3_5_WG_CB_SII_EXACT),
-    ("CB_1.TST", "critical-band", ANSIS3_5_WG_CB_SPEECH, ANSIS3_5_WG_CB_NOISE,
-     ANSIS3_5_WG_CB_THRESHOLD, ANSIS3_5_WG_CB1_IMPORTANCE,
-     ANSIS3_5_WG_CB1_SII, ANSIS3_5_WG_CB1_SII_EXACT),
-    ("ECB.TST", "equally-contributing", ANSIS3_5_WG_ECB_SPEECH,
-     ANSIS3_5_WG_ECB_NOISE, ANSIS3_5_WG_ECB_THRESHOLD, None,
-     ANSIS3_5_WG_ECB_SII, ANSIS3_5_WG_ECB_SII_EXACT),
-    ("ECB_1.TST", "equally-contributing", ANSIS3_5_WG_ECB_SPEECH,
-     ANSIS3_5_WG_ECB_NOISE, ANSIS3_5_WG_ECB_THRESHOLD,
-     ANSIS3_5_WG_ECB1_IMPORTANCE,
-     ANSIS3_5_WG_ECB1_SII, ANSIS3_5_WG_ECB1_SII_EXACT),
-    ("OCTAVE.TST", "octave", ANSIS3_5_WG_OCTAVE_SPEECH,
-     ANSIS3_5_WG_OCTAVE_NOISE, ANSIS3_5_WG_OCTAVE_THRESHOLD, None,
-     ANSIS3_5_WG_OCTAVE_SII, ANSIS3_5_WG_OCTAVE_SII_EXACT),
-    ("OCTAVE_1.TST", "octave", ANSIS3_5_WG_OCTAVE_SPEECH,
-     ANSIS3_5_WG_OCTAVE_NOISE, ANSIS3_5_WG_OCTAVE_THRESHOLD,
-     ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
-     ANSIS3_5_WG_OCTAVE1_SII, ANSIS3_5_WG_OCTAVE1_SII_EXACT),
+    (
+        "CB.TST",
+        "critical-band",
+        ANSIS3_5_WG_CB_SPEECH,
+        ANSIS3_5_WG_CB_NOISE,
+        ANSIS3_5_WG_CB_THRESHOLD,
+        None,
+        ANSIS3_5_WG_CB_SII,
+        ANSIS3_5_WG_CB_SII_EXACT,
+    ),
+    (
+        "CB_1.TST",
+        "critical-band",
+        ANSIS3_5_WG_CB_SPEECH,
+        ANSIS3_5_WG_CB_NOISE,
+        ANSIS3_5_WG_CB_THRESHOLD,
+        ANSIS3_5_WG_CB1_IMPORTANCE,
+        ANSIS3_5_WG_CB1_SII,
+        ANSIS3_5_WG_CB1_SII_EXACT,
+    ),
+    (
+        "ECB.TST",
+        "equally-contributing",
+        ANSIS3_5_WG_ECB_SPEECH,
+        ANSIS3_5_WG_ECB_NOISE,
+        ANSIS3_5_WG_ECB_THRESHOLD,
+        None,
+        ANSIS3_5_WG_ECB_SII,
+        ANSIS3_5_WG_ECB_SII_EXACT,
+    ),
+    (
+        "ECB_1.TST",
+        "equally-contributing",
+        ANSIS3_5_WG_ECB_SPEECH,
+        ANSIS3_5_WG_ECB_NOISE,
+        ANSIS3_5_WG_ECB_THRESHOLD,
+        ANSIS3_5_WG_ECB1_IMPORTANCE,
+        ANSIS3_5_WG_ECB1_SII,
+        ANSIS3_5_WG_ECB1_SII_EXACT,
+    ),
+    (
+        "OCTAVE.TST",
+        "octave",
+        ANSIS3_5_WG_OCTAVE_SPEECH,
+        ANSIS3_5_WG_OCTAVE_NOISE,
+        ANSIS3_5_WG_OCTAVE_THRESHOLD,
+        None,
+        ANSIS3_5_WG_OCTAVE_SII,
+        ANSIS3_5_WG_OCTAVE_SII_EXACT,
+    ),
+    (
+        "OCTAVE_1.TST",
+        "octave",
+        ANSIS3_5_WG_OCTAVE_SPEECH,
+        ANSIS3_5_WG_OCTAVE_NOISE,
+        ANSIS3_5_WG_OCTAVE_THRESHOLD,
+        ANSIS3_5_WG_OCTAVE1_IMPORTANCE,
+        ANSIS3_5_WG_OCTAVE1_SII,
+        ANSIS3_5_WG_OCTAVE1_SII_EXACT,
+    ),
 )
 
 
 @pytest.mark.parametrize(
-    ("case", "method", "speech", "noise", "threshold", "importance",
-     "published", "committee"),
+    (
+        "case",
+        "method",
+        "speech",
+        "noise",
+        "threshold",
+        "importance",
+        "published",
+        "committee",
+    ),
     _WG_OFFICIAL_CASES,
     ids=[case[0] for case in _WG_OFFICIAL_CASES],
 )
@@ -643,7 +707,6 @@ def test_octave_procedure_has_no_spread_of_masking() -> None:
         method="octave",
     )
     np.testing.assert_allclose(result.masking, ANSIS3_5_WG_OCTAVE_NOISE)
-
 
 
 def test_sii_annex_c1_worked_example() -> None:

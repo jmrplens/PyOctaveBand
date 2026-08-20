@@ -106,8 +106,12 @@ def test_insertion_loss_column_when_impedances_given(tmp_path) -> None:
     pytest.importorskip("matplotlib")
     z = 1.206 * _C / _S_DUCT  # anechoic reference -> IL equals TL
     res = sl.expansion_chamber(
-        _FREQS, _LENGTH, _S_EXP, _S_DUCT,
-        source_impedance=z, radiation_impedance=z,
+        _FREQS,
+        _LENGTH,
+        _S_EXP,
+        _S_DUCT,
+        source_impedance=z,
+        radiation_impedance=z,
     )
     out = tmp_path / "with_il.pdf"
     res.report(str(out))

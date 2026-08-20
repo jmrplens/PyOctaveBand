@@ -15,8 +15,9 @@ from phonometry.underwater.sources.ambient_noise import ocean_ambient_noise
 
 
 def _result() -> object:
-    return passive_sonar_equation(140.0, 80.0, 60.0, directivity_index=10.0,
-                                  detection_threshold=5.0)
+    return passive_sonar_equation(
+        140.0, 80.0, 60.0, directivity_index=10.0, detection_threshold=5.0
+    )
 
 
 def test_plot_default_is_english() -> None:
@@ -44,8 +45,9 @@ def test_plot_unknown_language_raises() -> None:
 def test_seabed_reflection_plot_labels() -> None:
     import numpy as np
 
-    res = seabed_reflection(np.linspace(0.0, 90.0, 91), rho1=1000.0, c1=1500.0,
-                            rho2=1900.0, c2=1650.0)
+    res = seabed_reflection(
+        np.linspace(0.0, 90.0, 91), rho1=1000.0, c1=1500.0, rho2=1900.0, c2=1650.0
+    )
     ax = res.plot()
     assert ax.get_title() == "Seabed reflection coefficient"
     assert ax.get_xlabel() == "Grazing angle [°]"
@@ -55,8 +57,7 @@ def test_seabed_reflection_plot_labels() -> None:
     assert ax_es.get_title() == "Coeficiente de reflexión del fondo marino"
     assert ax_es.get_xlabel() == "Ángulo rasante [°]"
     assert any(
-        "Ángulo crítico" in txt.get_text()
-        for txt in ax_es.get_legend().get_texts()
+        "Ángulo crítico" in txt.get_text() for txt in ax_es.get_legend().get_texts()
     )
     with pytest.raises(ValueError, match="Unknown language"):
         res.plot(language="xx")

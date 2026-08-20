@@ -75,7 +75,9 @@ def test_b_masks_match_reference_data() -> None:
     assert len(_ANSI_S14_TABLE5_12) == len(ANSIS14_TABLE5) == 34
     for row, ref_row in zip(_ANSI_S14_TABLE5_12, ANSIS14_TABLE5):
         assert row[0] == ref_row[0]
-        assert row[1:] == pytest.approx(ref_row[3:]), f"Table V mismatch at {ref_row[0]} Hz"
+        assert row[1:] == pytest.approx(ref_row[3:]), (
+            f"Table V mismatch at {ref_row[0]} Hz"
+        )
 
 
 def test_au_masks_match_reference_data() -> None:
@@ -83,7 +85,7 @@ def test_au_masks_match_reference_data() -> None:
     assert len(_IEC61012_TABLE1) == len(IEC61012_TABLE1) == 37
     for row, ref_row in zip(_IEC61012_TABLE1, IEC61012_TABLE1):
         assert row == pytest.approx(ref_row), f"Table 1 mismatch at {ref_row[0]} Hz"
-    assert _IEC61012_AU_HF == pytest.approx(IEC61012_AU_HF)
+    assert pytest.approx(IEC61012_AU_HF) == _IEC61012_AU_HF
     poles = [(p.real, p.imag) for p in _U_POLES_HZ]
     assert poles == pytest.approx(IEC61012_TABLE2_POLES_HZ)
 
@@ -139,9 +141,7 @@ def test_b_sits_between_a_and_c_at_low_frequency() -> None:
 
 def test_b_verifier_reaches_type1() -> None:
     """verify_weighting_class attests the ANSI Type 1 mask for B."""
-    result = filters.verify_weighting_class(
-        filters.WeightingFilter(48000, "B")
-    )
+    result = filters.verify_weighting_class(filters.WeightingFilter(48000, "B"))
     assert result["overall_class"] == 1
     assert result["range_limited"] is False
     assert all(b["margin_class1_db"] >= 0 for b in result["bands"])
@@ -211,21 +211,15 @@ def test_au_matches_a_weighting_through_the_audio_band() -> None:
     au = filters.WeightingFilter(48000, "AU")
     a = filters.WeightingFilter(48000, "A")
     freqs = np.geomspace(20.0, 8000.0, 200)
-    assert _response_db(au, freqs) == pytest.approx(
-        _response_db(a, freqs), abs=0.12
-    )
+    assert _response_db(au, freqs) == pytest.approx(_response_db(a, freqs), abs=0.12)
 
 
 def test_au_verifier_flags_range_limited_at_48k() -> None:
     """At fs = 48 kHz the 25-40 kHz Table 1 rows cannot be demonstrated."""
-    result = filters.verify_weighting_class(
-        filters.WeightingFilter(48000, "AU")
-    )
+    result = filters.verify_weighting_class(filters.WeightingFilter(48000, "AU"))
     assert result["overall_class"] == 1
     assert result["range_limited"] is True
-    result_full = filters.verify_weighting_class(
-        filters.WeightingFilter(96000, "AU")
-    )
+    result_full = filters.verify_weighting_class(filters.WeightingFilter(96000, "AU"))
     assert result_full["overall_class"] == 1
     assert result_full["range_limited"] is False
     # Single tolerance set: both verdict slots carry the same margin.
@@ -344,9 +338,7 @@ def test_new_curves_support_stateful_block_processing(curve: str) -> None:
     fs = 48000
     rng = np.random.default_rng(7)
     x = rng.standard_normal(fs // 2)
-    continuous = filters.WeightingFilter(
-        fs, curve, high_accuracy=False
-    ).filter(x)
+    continuous = filters.WeightingFilter(fs, curve, high_accuracy=False).filter(x)
     wf = filters.WeightingFilter(fs, curve, stateful=True)
     blocks = np.concatenate([wf.filter(part) for part in np.split(x, 4)])
     assert blocks == pytest.approx(continuous, abs=1e-12)

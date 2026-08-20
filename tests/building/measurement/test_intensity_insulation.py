@@ -67,11 +67,28 @@ def test_ri_energy_averages_positions() -> None:
 
 def test_ri_modified_adds_kc() -> None:
     """RI,M = RI + Kc, and its rating is formed independently."""
-    lin = _levels_for_target_ri(
-        ref.ISO15186_1_REF_RI, 85.0, 12.0, 10.0
+    lin = _levels_for_target_ri(ref.ISO15186_1_REF_RI, 85.0, 12.0, 10.0)
+    freq = np.array(
+        [
+            100,
+            125,
+            160,
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+        ],
+        dtype=float,
     )
-    freq = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-                     1000, 1250, 1600, 2000, 2500, 3150], dtype=float)
     kc = building.adaptation_term_kc(freq)
     result = building.intensity_sound_reduction(
         [85.0] * 16, lin, measurement_area=12.0, area=10.0, kc=kc
@@ -165,9 +182,7 @@ def test_element_normalized_rejects_bad_n() -> None:
 
 
 def test_fpi_is_lp_minus_lin() -> None:
-    fpi = building.surface_pressure_intensity_indicator(
-        [60.0, 58.0], [55.0, 54.0]
-    )
+    fpi = building.surface_pressure_intensity_indicator([60.0, 58.0], [55.0, 54.0])
     np.testing.assert_allclose(fpi, [5.0, 4.0])
 
 
@@ -183,9 +198,7 @@ def test_fpi_shape_mismatch_raises() -> None:
 
 def test_combine_subareas_energy_average() -> None:
     """Equal-level subareas average to the same level; Sm is the total."""
-    lin, sm = building.combine_subareas(
-        [[40.0, 42.0], [40.0, 42.0]], [5.0, 5.0]
-    )
+    lin, sm = building.combine_subareas([[40.0, 42.0], [40.0, 42.0]], [5.0, 5.0])
     np.testing.assert_allclose(lin, [40.0, 42.0])
     assert sm == pytest.approx(10.0)
 
@@ -193,7 +206,7 @@ def test_combine_subareas_energy_average() -> None:
 def test_combine_subareas_area_weighting() -> None:
     """The larger subarea dominates the energy average."""
     lin, sm = building.combine_subareas([[50.0], [40.0]], [9.0, 1.0])
-    expected = 10.0 * np.log10((9.0 * 10 ** 5.0 + 1.0 * 10 ** 4.0) / 10.0)
+    expected = 10.0 * np.log10((9.0 * 10**5.0 + 1.0 * 10**4.0) / 10.0)
     assert lin[0] == pytest.approx(expected)
     assert sm == pytest.approx(10.0)
 

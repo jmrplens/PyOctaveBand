@@ -215,10 +215,12 @@ def _case_result(case: dict[str, str]) -> RailwayEmissionResult:
     stock = RollingStock(
         axles=int(vehicle["axles"]),
         wheel_roughness=(
-            lam, list(wavelength[("wheel_roughness", vehicle["wheel_roughness"])])
+            lam,
+            list(wavelength[("wheel_roughness", vehicle["wheel_roughness"])]),
         ),
         contact_filter=(
-            lam, list(wavelength[("contact_filter", vehicle["contact_filter"])])
+            lam,
+            list(wavelength[("contact_filter", vehicle["contact_filter"])]),
         ),
         wheel_transfer=np.asarray(
             frequency[("wheel_transfer", vehicle["wheel_transfer"], "")]
@@ -238,7 +240,8 @@ def _case_result(case: dict[str, str]) -> RailwayEmissionResult:
     )
     track = RailwayTrack(
         rail_roughness=(
-            lam, list(wavelength[("rail_roughness", case["rail_roughness"])])
+            lam,
+            list(wavelength[("rail_roughness", case["rail_roughness"])]),
         ),
         track_transfer=np.asarray(
             frequency[("track_transfer", case["track_transfer"], "")]
@@ -247,7 +250,8 @@ def _case_result(case: dict[str, str]) -> RailwayEmissionResult:
         # impact spectrum for that case is never read and is not committed.
         impact_roughness=(
             (lam, list(wavelength[("impact_roughness", case["impact_roughness"])]))
-            if case["impact_roughness"] else None
+            if case["impact_roughness"]
+            else None
         ),
         joint_density=float(case["joint_density_per_m"]),
         # The 2015 text made the bridge a constant added to the rolling noise;
@@ -277,8 +281,11 @@ def _case_result(case: dict[str, str]) -> RailwayEmissionResult:
     )
 
 
-@pytest.mark.parametrize("case", ref.cnossos_rail_workbook_cases(),
-                         ids=lambda c: f"v{c['vehicle']}-{c['case']}{c['source_height']}")
+@pytest.mark.parametrize(
+    "case",
+    ref.cnossos_rail_workbook_cases(),
+    ids=lambda c: f"v{c['vehicle']}-{c['case']}{c['source_height']}",
+)
 def test_workbook_cases(case: dict[str, str]) -> None:
     """Reproduce the CIRCABC railway emission workbook band by band.
 
@@ -287,8 +294,10 @@ def test_workbook_cases(case: dict[str, str]) -> None:
     """
     result = _case_result(case)
     height = 0 if case["source_height"] == "A" else 1
-    expected = [float(case[f"lw_{b}"]) for b in
-                ("63", "125", "250", "500", "1000", "2000", "4000", "8000")]
+    expected = [
+        float(case[f"lw_{b}"])
+        for b in ("63", "125", "250", "500", "1000", "2000", "4000", "8000")
+    ]
     np.testing.assert_allclose(result.line_power[height], expected, atol=0.006)
 
 
@@ -299,8 +308,12 @@ def test_workbook_total_is_the_energy_sum_of_its_own_bands() -> None:
     mistyped band would no longer sum to the printed total.
     """
     for case in ref.cnossos_rail_workbook_cases():
-        bands = np.array([float(case[f"lw_{b}"]) for b in
-                          ("63", "125", "250", "500", "1000", "2000", "4000", "8000")])
+        bands = np.array(
+            [
+                float(case[f"lw_{b}"])
+                for b in ("63", "125", "250", "500", "1000", "2000", "4000", "8000")
+            ]
+        )
         total = 10.0 * np.log10(np.sum(10.0 ** (bands / 10.0)))
         assert total == pytest.approx(float(case["lw_total"]), abs=0.01)
 
@@ -315,7 +328,7 @@ def test_committed_cases_span_the_workbook_grid() -> None:
     assert len({c["vehicle"] for c in cases}) == 20
     assert len({c["track_transfer"] for c in cases}) == 9
     assert len({c["rail_roughness"] for c in cases}) == 4
-    assert len({c["impact_roughness"] for c in cases}) == 3   # two densities + none
+    assert len({c["impact_roughness"] for c in cases}) == 3  # two densities + none
     assert len({(c["phi_deg"], c["psi_deg"]) for c in cases}) == 4
     assert {c["curve_radius_m"] for c in cases} >= {"250", "500", "5000"}
 
@@ -354,10 +367,12 @@ def test_every_committed_catalogue_row_is_exercised_unmasked() -> None:
         else:
             exposed.add(("traction_constant", vehicle["traction"]))
 
-    committed = {(table, key) for table, key in
-                 ref.cnossos_rail_2015_wavelength_tables()}
-    committed |= {(table, key) for table, key, _ in
-                  ref.cnossos_rail_2015_frequency_tables()}
+    committed = {
+        (table, key) for table, key in ref.cnossos_rail_2015_wavelength_tables()
+    }
+    committed |= {
+        (table, key) for table, key, _ in ref.cnossos_rail_2015_frequency_tables()
+    }
     assert committed <= exposed, sorted(committed - exposed)
 
 
@@ -366,15 +381,17 @@ def test_workbook_exercises_every_physical_source() -> None:
     have to be switched on somewhere in the committed extract, or the end-to-end
     agreement would be measuring less than it appears to."""
     cases = ref.cnossos_rail_workbook_cases()
-    assert any(c["condition"] == "constant" for c in cases)          # rolling
+    assert any(c["condition"] == "constant" for c in cases)  # rolling
     assert any(float(c["joint_density_per_m"]) > 0.0 for c in cases)  # impact
-    assert any(float(c["squeal_excess_db"]) > 0.0 for c in cases)     # squeal
-    assert any(c["condition"] == "idling" for c in cases)             # traction
-    assert any(float(c["speed_kmh"]) > 200.0 for c in cases)          # aerodynamic
-    assert any(float(c["bridge_constant_db"]) > 0.0 for c in cases)   # bridge
+    assert any(float(c["squeal_excess_db"]) > 0.0 for c in cases)  # squeal
+    assert any(c["condition"] == "idling" for c in cases)  # traction
+    assert any(float(c["speed_kmh"]) > 200.0 for c in cases)  # aerodynamic
+    assert any(float(c["bridge_constant_db"]) > 0.0 for c in cases)  # bridge
     # and every one of those with both source heights present
-    for predicate in (lambda c: c["condition"] == "constant",
-                      lambda c: float(c["speed_kmh"]) > 200.0):
+    for predicate in (
+        lambda c: c["condition"] == "constant",
+        lambda c: float(c["speed_kmh"]) > 200.0,
+    ):
         assert {c["source_height"] for c in cases if predicate(c)} == {"A", "B"}
 
 
@@ -407,9 +424,14 @@ def test_vertical_directivity_current_text_is_zero_below_the_horizon() -> None:
     for psi in (-1.0, -30.0, -45.0, -89.0):
         assert np.all(vertical_directivity(psi) == 0.0)
     for psi in (5.0, 30.0, 60.0, 85.0):
-        expected = (40.0 / 3.0) * (
-            (2.0 / 3.0) * math.sin(2 * math.radians(psi)) - math.sin(math.radians(psi))
-        ) * np.log10((freqs + 600.0) / 200.0)
+        expected = (
+            (40.0 / 3.0)
+            * (
+                (2.0 / 3.0) * math.sin(2 * math.radians(psi))
+                - math.sin(math.radians(psi))
+            )
+            * np.log10((freqs + 600.0) / 200.0)
+        )
         np.testing.assert_allclose(vertical_directivity(psi), expected, atol=1e-12)
 
 
@@ -429,7 +451,8 @@ def test_vertical_directivity_2015_edition_differs_over_the_lower_half_space() -
     for psi in (0.0, 10.0, 20.0, 40.0):
         np.testing.assert_allclose(
             vertical_directivity(psi, edition=DirectivityEdition.ORIGINAL_2015),
-            vertical_directivity(psi), atol=1e-12,
+            vertical_directivity(psi),
+            atol=1e-12,
         )
     crossover = math.degrees(math.acos(0.75))
     assert 41.0 < crossover < 42.0
@@ -440,8 +463,12 @@ def test_vertical_directivity_source_b() -> None:
     assert np.all(vertical_directivity(-40.0, height=2) == 0.0)
     assert np.all(vertical_directivity(40.0, height=2, aerodynamic=True) == 0.0)
     value = vertical_directivity(-60.0, height=2, aerodynamic=True)
-    assert np.all(value == pytest.approx(10.0 * math.log10(math.cos(math.radians(60.0)) ** 2)))
-    assert vertical_directivity(0.0, height=2, aerodynamic=True)[0] == pytest.approx(0.0)
+    assert np.all(
+        value == pytest.approx(10.0 * math.log10(math.cos(math.radians(60.0)) ** 2))
+    )
+    assert vertical_directivity(0.0, height=2, aerodynamic=True)[0] == pytest.approx(
+        0.0
+    )
 
 
 def test_aerodynamic_law_is_exact_at_the_reference_speed() -> None:
@@ -462,12 +489,14 @@ def test_impact_roughness_joint_density_law() -> None:
     _, single = impact_roughness_single()
     frequency_grid = np.asarray(single[:24])
     np.testing.assert_allclose(
-        impact_roughness(frequency_grid, REFERENCE_JOINT_DENSITY), frequency_grid,
+        impact_roughness(frequency_grid, REFERENCE_JOINT_DENSITY),
+        frequency_grid,
         atol=1e-12,
     )
     doubled = impact_roughness(frequency_grid, 2.0 * REFERENCE_JOINT_DENSITY)
-    np.testing.assert_allclose(doubled - frequency_grid, 10.0 * math.log10(2.0),
-                               atol=1e-12)
+    np.testing.assert_allclose(
+        doubled - frequency_grid, 10.0 * math.log10(2.0), atol=1e-12
+    )
     assert np.all(np.isneginf(impact_roughness(frequency_grid, 0.0)))
 
 
@@ -477,13 +506,15 @@ def test_total_effective_roughness_and_rolling_addition() -> None:
     wheel = np.full(24, 10.0)
     filt = np.zeros(24)
     np.testing.assert_allclose(
-        total_effective_roughness(rail, wheel, filt), 10.0 + 10.0 * math.log10(2.0),
+        total_effective_roughness(rail, wheel, filt),
+        10.0 + 10.0 * math.log10(2.0),
         atol=1e-12,
     )
     # a contact filter of -3 dB removes exactly 3 dB
     np.testing.assert_allclose(
         total_effective_roughness(rail, wheel, filt - 3.0),
-        10.0 + 10.0 * math.log10(2.0) - 3.0, atol=1e-12,
+        10.0 + 10.0 * math.log10(2.0) - 3.0,
+        atol=1e-12,
     )
     # (2.3.8): four axles are exactly +6,0206 dB over one
     roughness = np.linspace(-5.0, 5.0, 24)
@@ -491,10 +522,13 @@ def test_total_effective_roughness_and_rolling_addition() -> None:
     np.testing.assert_allclose(
         rolling_sound_power(roughness, transfer, 4)
         - rolling_sound_power(roughness, transfer, 1),
-        10.0 * math.log10(4.0), atol=1e-12,
+        10.0 * math.log10(4.0),
+        atol=1e-12,
     )
     np.testing.assert_allclose(
-        rolling_sound_power(roughness, transfer, 1), roughness + transfer, atol=1e-12,
+        rolling_sound_power(roughness, transfer, 1),
+        roughness + transfer,
+        atol=1e-12,
     )
 
 
@@ -505,7 +539,7 @@ def test_octave_summation_of_third_octaves() -> None:
     assert len(octaves) == len(RAILWAY_OCTAVE_BANDS)
     # a single loud 1/3-octave band lands in exactly one octave band
     spectrum = np.full(24, -np.inf)
-    spectrum[13] = 100.0                     # 1 000 Hz
+    spectrum[13] = 100.0  # 1 000 Hz
     octaves = octave_bands_from_third_octaves(spectrum)
     assert octaves[4] == pytest.approx(100.0)
     assert np.all(np.isneginf(np.delete(octaves, 4)))
@@ -520,7 +554,8 @@ def test_roughness_conversion_invariants() -> None:
         for speed in (30.0, 80.0, 250.0):
             np.testing.assert_allclose(
                 roughness_to_frequency(flat, lam, speed, interpolation=rule),
-                7.0, atol=1e-12,
+                7.0,
+                atol=1e-12,
             )
     # reading the table at f = v/lambda: at 36 km/h (10 m/s) the 100 Hz band
     # wants lambda = 0,1 m = 100 mm, which is tabulated, so no interpolation
@@ -533,7 +568,10 @@ def test_roughness_conversion_invariants() -> None:
     # the two rules bracket each other: the energy rule never reads lower
     mid = roughness_to_frequency(levels, lam, 36.0, frequencies=[40.0])
     mid_energy = roughness_to_frequency(
-        levels, lam, 36.0, frequencies=[40.0],
+        levels,
+        lam,
+        36.0,
+        frequencies=[40.0],
         interpolation=RoughnessInterpolation.ENERGY,
     )
     assert mid_energy[0] > mid[0]
@@ -621,7 +659,8 @@ def test_flow_term_is_exact() -> None:
         RailwayVehicle(_reference_stock(), flow_rate=20.0, speed=100.0), track
     )
     np.testing.assert_allclose(
-        doubled.total_line_power - single.total_line_power, 10.0 * math.log10(2.0),
+        doubled.total_line_power - single.total_line_power,
+        10.0 * math.log10(2.0),
         atol=1e-12,
     )
 
@@ -631,18 +670,23 @@ def test_idling_excludes_rolling_and_uses_the_idling_flow_term() -> None:
     track = _reference_track()
     idling = railway_source_power(
         RailwayVehicle(
-            _reference_stock(), condition=RunningCondition.IDLING, idling_time=1.0,
+            _reference_stock(),
+            condition=RunningCondition.IDLING,
+            idling_time=1.0,
         ),
-        track, reference_time=12.0,
+        track,
+        reference_time=12.0,
     )
     assert np.all(np.isneginf(idling.components["rolling"][0]))
     low, _ = traction_sound_power(TractionVehicle.ELECTRIC_LOCO)
     expected = octave_bands_from_third_octaves(
         np.asarray(low) + 10.0 * math.log10(1.0 / (12.0 * 100.0))
     )
-    np.testing.assert_allclose(idling.third_octave_line_power[0],
-                               np.asarray(low) + 10.0 * math.log10(1.0 / 1200.0),
-                               atol=1e-12)
+    np.testing.assert_allclose(
+        idling.third_octave_line_power[0],
+        np.asarray(low) + 10.0 * math.log10(1.0 / 1200.0),
+        atol=1e-12,
+    )
     np.testing.assert_allclose(idling.line_power[0], expected, atol=1e-12)
 
 
@@ -660,15 +704,23 @@ def test_minimum_speed_floor_and_impact_exclusion() -> None:
     # the roughness is frozen at the floor, so only the flow term moves
     shift = 10.0 * math.log10(RAILWAY_MINIMUM_SPEED / 20.0)
     np.testing.assert_allclose(
-        slow.components["rolling"][0], floored.components["rolling"][0], atol=1e-12,
+        slow.components["rolling"][0],
+        floored.components["rolling"][0],
+        atol=1e-12,
     )
     np.testing.assert_allclose(
-        slow.total_line_power - floored.total_line_power, shift, atol=1e-12,
+        slow.total_line_power - floored.total_line_power,
+        shift,
+        atol=1e-12,
     )
     # below the floor the impact term is dropped altogether, at it is not above
     jointed = _reference_track()
-    for speed, expect_impact in ((20.0, False), (49.9, False),
-                                 (RAILWAY_MINIMUM_SPEED, True), (120.0, True)):
+    for speed, expect_impact in (
+        (20.0, False),
+        (49.9, False),
+        (RAILWAY_MINIMUM_SPEED, True),
+        (120.0, True),
+    ):
         with_joints = railway_source_power(
             RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=speed), jointed
         )
@@ -676,19 +728,23 @@ def test_minimum_speed_floor_and_impact_exclusion() -> None:
             RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=speed), plain
         )
         differs = bool(
-            np.any(with_joints.components["rolling"][0]
-                   > without.components["rolling"][0] + 1e-9)
+            np.any(
+                with_joints.components["rolling"][0]
+                > without.components["rolling"][0] + 1e-9
+            )
         )
         assert differs is expect_impact
     # a tram keeps its impact noise down to 30 km/h
     tram = railway_source_power(
-        RailwayVehicle(_reference_stock(tram=True), flow_rate=10.0,
-                       speed=TRAM_MINIMUM_SPEED),
+        RailwayVehicle(
+            _reference_stock(tram=True), flow_rate=10.0, speed=TRAM_MINIMUM_SPEED
+        ),
         jointed,
     )
     tram_without = railway_source_power(
-        RailwayVehicle(_reference_stock(tram=True), flow_rate=10.0,
-                       speed=TRAM_MINIMUM_SPEED),
+        RailwayVehicle(
+            _reference_stock(tram=True), flow_rate=10.0, speed=TRAM_MINIMUM_SPEED
+        ),
         plain,
     )
     assert np.any(tram.components["rolling"][0] > tram_without.components["rolling"][0])
@@ -714,21 +770,29 @@ def test_bridge_is_a_separate_omnidirectional_source_at_height_a() -> None:
     bridge = bridge_transfer(BridgeType.PLUS_10_DBA)
     track = _reference_track(bridge_transfer=bridge, impact_roughness=None)
     on_axis = railway_source_power(
-        RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0), track,
-        phi=0.0, psi=30.0,
+        RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0),
+        track,
+        phi=0.0,
+        psi=30.0,
     )
     broadside = railway_source_power(
-        RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0), track,
-        phi=90.0, psi=0.0,
+        RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0),
+        track,
+        phi=90.0,
+        psi=0.0,
     )
     # the bridge component itself does not depend on the angles
     np.testing.assert_allclose(
-        on_axis.components["bridge"][0], broadside.components["bridge"][0], atol=1e-12,
+        on_axis.components["bridge"][0],
+        broadside.components["bridge"][0],
+        atol=1e-12,
     )
     # and it survives the -20 dB dipole null that removes everything else
     without = railway_source_power(
         RailwayVehicle(_reference_stock(), flow_rate=10.0, speed=100.0),
-        _reference_track(impact_roughness=None), phi=0.0, psi=30.0,
+        _reference_track(impact_roughness=None),
+        phi=0.0,
+        psi=30.0,
     )
     assert np.all(on_axis.total_line_power > without.total_line_power)
 
@@ -742,7 +806,8 @@ def test_superstructure_is_optional_and_freight_only() -> None:
     freight = railway_source_power(
         RailwayVehicle(
             _reference_stock(superstructure_transfer=superstructure_transfer()),
-            flow_rate=10.0, speed=100.0,
+            flow_rate=10.0,
+            speed=100.0,
         ),
         track,
     )
@@ -756,7 +821,8 @@ def test_traffic_mix_is_summed_energetically() -> None:
     single = railway_source_power(one, track)
     pair = railway_source_power([one, one], track)
     np.testing.assert_allclose(
-        pair.total_line_power - single.total_line_power, 10.0 * math.log10(2.0),
+        pair.total_line_power - single.total_line_power,
+        10.0 * math.log10(2.0),
         atol=1e-12,
     )
 
@@ -816,6 +882,7 @@ def test_invalid_inputs() -> None:
 
 def test_result_plot_draws_both_heights() -> None:
     import matplotlib
+
     matplotlib.use("Agg")
 
     result = railway_source_power(

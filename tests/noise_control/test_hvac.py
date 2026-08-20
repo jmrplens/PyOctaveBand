@@ -77,7 +77,9 @@ def test_elbow_lined_beats_unlined_high_freq() -> None:
     c = 343.0
     f = 1.5 * c / 0.3  # W/lambda = 1.5 (1.11-2.22 band)
     unlined = hvac.elbow_insertion_loss([f], 0.3, bend_type="square").values[0]
-    lined = hvac.elbow_insertion_loss([f], 0.3, bend_type="square", lined=True).values[0]
+    lined = hvac.elbow_insertion_loss([f], 0.3, bend_type="square", lined=True).values[
+        0
+    ]
     assert lined > unlined  # 10 vs 4 dB
 
 
@@ -114,7 +116,10 @@ def test_flow_noise_straight_duct_formula() -> None:
     u, s = 10.0, 0.04
     res = hvac.flow_noise_straight_duct(f, u, s)
     expected = (
-        7.0 + 50.0 * math.log10(u) + 10.0 * math.log10(s) - 2.0
+        7.0
+        + 50.0 * math.log10(u)
+        + 10.0 * math.log10(s)
+        - 2.0
         - 26.0 * math.log10(1.14 + 0.02 * 250.0 / u)
     )
     assert res.values[0] == pytest.approx(expected)
@@ -126,8 +131,9 @@ def test_flow_noise_scales_with_velocity() -> None:
     # Regenerated noise rises steeply with flow speed (dominant 50 log10 U term,
     # tempered by the frequency term which also depends on U).
     f = np.array([250.0])
-    levels = [hvac.flow_noise_straight_duct(f, u, 0.04).values[0]
-              for u in (5.0, 10.0, 15.0)]
+    levels = [
+        hvac.flow_noise_straight_duct(f, u, 0.04).values[0] for u in (5.0, 10.0, 15.0)
+    ]
     assert levels[0] < levels[1] < levels[2]
     assert levels[2] - levels[0] > 20.0
 
@@ -138,7 +144,9 @@ def test_flow_noise_bend_formula() -> None:
     res = hvac.flow_noise_bend(f, u, s, h, density=rho)
     lws = 30.0 * math.log10(u) + 10.0 * math.log10(s) + 10.0 * math.log10(rho) + 117.0
     ns = 500.0 * h / u
-    expected = lws - 10.0 * math.log10(1.0 + 0.165 * ns**2) + 30.0 * math.log10(u) - 103.0
+    expected = (
+        lws - 10.0 * math.log10(1.0 + 0.165 * ns**2) + 30.0 * math.log10(u) - 103.0
+    )
     assert res.values[0] == pytest.approx(expected)
 
 

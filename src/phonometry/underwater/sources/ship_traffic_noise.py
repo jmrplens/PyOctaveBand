@@ -76,7 +76,9 @@ def _default_bands() -> NDArray[np.float64]:
     return np.asarray(10.0 ** (i / 10.0) * 1000.0, dtype=np.float64)
 
 
-def _clean_frequency(frequency_hz: NDArray[np.float64] | list[float] | None) -> NDArray[np.float64]:
+def _clean_frequency(
+    frequency_hz: NDArray[np.float64] | list[float] | None,
+) -> NDArray[np.float64]:
     if frequency_hz is None:
         return _default_bands()
     return require_positive_array(frequency_hz, "frequency_hz")
@@ -87,7 +89,9 @@ def _jomopans_echo(
 ) -> NDArray[np.float64]:
     key = vessel_class.strip().lower()
     if key not in _VESSEL_CLASSES:
-        raise ValueError(f"'vessel_class' must be one of {VESSEL_CLASSES}, got {vessel_class!r}.")
+        raise ValueError(
+            f"'vessel_class' must be one of {VESSEL_CLASSES}, got {vessel_class!r}."
+        )
     v_c, cargo, d_lo, d_hi = _VESSEL_CLASSES[key]
     v = require_positive(speed_knots, "speed_knots")
     length = require_positive(length_m, "length_m")
@@ -107,7 +111,9 @@ def _jomopans_echo(
     return np.asarray(psd, dtype=np.float64)
 
 
-def _randi(f: NDArray[np.float64], speed_knots: float, length_m: float) -> NDArray[np.float64]:
+def _randi(
+    f: NDArray[np.float64], speed_knots: float, length_m: float
+) -> NDArray[np.float64]:
     v = require_positive(speed_knots, "speed_knots")
     length_ft = require_positive(length_m, "length_m") * 3.28084
     lf = -10.0 * np.log10(
@@ -120,12 +126,22 @@ def _randi(f: NDArray[np.float64], speed_knots: float, length_m: float) -> NDArr
         8.1,
         np.where(f <= 191.6, 22.3 - 9.77 * np.log10(f), 0.0),
     )
-    psd = base + 60.0 * np.log10(v / 12.0) + 20.0 * np.log10(length_ft / 300.0) + d_f * d_l + 3.0
+    psd = (
+        base
+        + 60.0 * np.log10(v / 12.0)
+        + 20.0 * np.log10(length_ft / 300.0)
+        + d_f * d_l
+        + 3.0
+    )
     return np.asarray(psd, dtype=np.float64)
 
 
 def _wales_heitmeyer(f: NDArray[np.float64]) -> NDArray[np.float64]:
-    psd = 230.0 - 10.0 * np.log10(f**3.594) + 10.0 * np.log10((1.0 + (f / 340.0) ** 2) ** 0.917)
+    psd = (
+        230.0
+        - 10.0 * np.log10(f**3.594)
+        + 10.0 * np.log10((1.0 + (f / 340.0) ** 2) ** 0.917)
+    )
     return np.asarray(psd, dtype=np.float64)
 
 
@@ -152,12 +168,16 @@ class ShipTrafficSpectrum:
     speed_knots: float | None
     length_m: float | None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the predicted source spectral-density level versus frequency."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_ship_traffic_spectrum
 
-        return plot_ship_traffic_spectrum(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ship_traffic_spectrum(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def ship_source_spectrum(

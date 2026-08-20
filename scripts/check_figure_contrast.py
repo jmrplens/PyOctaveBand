@@ -95,7 +95,11 @@ _PATH_NUMBER = re.compile(r"-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
 #: ``legend`` (frame plus swatches) and ``pane3d`` (the walls of a 3-D axes,
 #: which are page rather than content) never are.
 _SKIP_GROUPS = (
-    "text_", "legend_", "matplotlib.axis_", "line2d_", "pane3d_",
+    "text_",
+    "legend_",
+    "matplotlib.axis_",
+    "line2d_",
+    "pane3d_",
 )
 
 
@@ -186,8 +190,7 @@ def composite(
 ) -> tuple[float, float, float]:
     """Source-over composite of ``fill`` at ``opacity`` on ``background``."""
     return tuple(  # type: ignore[return-value]
-        opacity * f + (1.0 - opacity) * b
-        for f, b in zip(fill, background, strict=True)
+        opacity * f + (1.0 - opacity) * b for f, b in zip(fill, background, strict=True)
     )
 
 
@@ -235,9 +238,7 @@ def _tag(element: ElementTree.Element) -> str:
     return element.tag.removeprefix(_SVG_NS)
 
 
-def _element_area(
-    element: ElementTree.Element, defs: dict[str, str]
-) -> float:
+def _element_area(element: ElementTree.Element, defs: dict[str, str]) -> float:
     """Area of a drawable element in SVG user units (0 when not an area shape)."""
     tag = _tag(element)
     if tag == "path":
@@ -425,8 +426,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--report",
         action="store_true",
-        help="print every measured region, not just the offenders, and always "
-        "exit 0",
+        help="print every measured region, not just the offenders, and always exit 0",
     )
     parser.add_argument(
         "--min-delta-e",

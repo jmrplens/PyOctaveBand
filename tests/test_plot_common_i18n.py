@@ -90,8 +90,14 @@ def test_plot_rating_spanish_labels_and_legend() -> None:
     measured = np.array([30.0, 35.0, 40.0, 45.0])
     reference = np.array([32.0, 34.0, 42.0, 44.0])
     ax = _plot_rating(
-        band_centers, measured, reference,
-        impact=False, title="t", ylabel="y", ax=None, language="es",
+        band_centers,
+        measured,
+        reference,
+        impact=False,
+        title="t",
+        ylabel="y",
+        ax=None,
+        language="es",
     )
     assert ax.get_xlabel() == "Frecuencia [Hz]"
     legend_texts = _legend_texts(ax)
@@ -105,8 +111,14 @@ def test_plot_rating_unfavourable_deviations_localised() -> None:
     measured = np.array([50.0, 55.0, 60.0])
     reference = np.array([40.0, 45.0, 50.0])
     ax = _plot_rating(
-        band_centers, measured, reference,
-        impact=True, title="t", ylabel="y", ax=None, language="es",
+        band_centers,
+        measured,
+        reference,
+        impact=True,
+        title="t",
+        ylabel="y",
+        ax=None,
+        language="es",
     )
     assert "Desviaciones desfavorables" in _legend_texts(ax)
     plt.close("all")
@@ -117,8 +129,13 @@ def test_plot_rating_english_default_unchanged() -> None:
     measured = np.array([30.0, 35.0, 40.0])
     reference = np.array([32.0, 34.0, 42.0])
     ax = _plot_rating(
-        band_centers, measured, reference,
-        impact=False, title="t", ylabel="y", ax=None,
+        band_centers,
+        measured,
+        reference,
+        impact=False,
+        title="t",
+        ylabel="y",
+        ax=None,
     )
     assert ax.get_xlabel() == "Frequency [Hz]"
     legend_texts = _legend_texts(ax)
@@ -129,8 +146,13 @@ def test_plot_rating_english_default_unchanged() -> None:
 
 def test_plot_band_level_bars_spanish_xlabel_and_comma_total() -> None:
     ax = _plot_band_level_bars(
-        None, np.array([50.0, 55.0, 60.0]), np.array([125.0, 250.0, 500.0]),
-        62.3, ylabel="y", title="t", language="es",
+        None,
+        np.array([50.0, 55.0, 60.0]),
+        np.array([125.0, 250.0, 500.0]),
+        62.3,
+        ylabel="y",
+        title="t",
+        language="es",
     )
     assert ax.get_xlabel() == "Frecuencia [Hz]"
     assert "total 62,3 dB" in _legend_texts(ax)
@@ -139,7 +161,12 @@ def test_plot_band_level_bars_spanish_xlabel_and_comma_total() -> None:
 
 def test_plot_band_level_bars_band_xlabel_when_no_frequencies() -> None:
     ax = _plot_band_level_bars(
-        None, np.array([50.0, 55.0]), None, 53.0, ylabel="y", title="t",
+        None,
+        np.array([50.0, 55.0]),
+        None,
+        53.0,
+        ylabel="y",
+        title="t",
         language="es",
     )
     assert ax.get_xlabel() == "Banda"
@@ -148,8 +175,12 @@ def test_plot_band_level_bars_band_xlabel_when_no_frequencies() -> None:
 
 def test_plot_band_level_bars_english_default_unchanged() -> None:
     ax = _plot_band_level_bars(
-        None, np.array([50.0, 55.0, 60.0]), np.array([125.0, 250.0, 500.0]),
-        62.3, ylabel="y", title="t",
+        None,
+        np.array([50.0, 55.0, 60.0]),
+        np.array([125.0, 250.0, 500.0]),
+        62.3,
+        ylabel="y",
+        title="t",
     )
     assert ax.get_xlabel() == "Frequency [Hz]"
     assert "total 62.3 dB" in _legend_texts(ax)

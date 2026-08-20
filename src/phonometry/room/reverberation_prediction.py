@@ -220,7 +220,9 @@ def _millington_absorption(
     return np.asarray(total, dtype=np.float64)
 
 
-def _eyring_absorption(total_area: float, mean_absorption: NDArray[np.float64]) -> NDArray[np.float64]:
+def _eyring_absorption(
+    total_area: float, mean_absorption: NDArray[np.float64]
+) -> NDArray[np.float64]:
     r"""Eyring equivalent absorption :math:`-S \ln(1 - \bar{\alpha})` (per band)."""
     # A mean of exactly 1 (fully absorbing on average) has no finite Eyring
     # time: ln(1 - mean) diverges, so fail with a clear message instead.
@@ -380,7 +382,9 @@ def millington_sette_reverberation_time(
 # ---------------------------------------------------------------------------
 
 
-def _axial_geometry(dimensions: Sequence[float]) -> tuple[float, float, NDArray[np.float64]]:
+def _axial_geometry(
+    dimensions: Sequence[float],
+) -> tuple[float, float, NDArray[np.float64]]:
     r"""Volume ``V``, total surface ``S`` and the three wall-pair areas ``S_i``.
 
     ``S_i`` is the combined area of the two walls perpendicular to axis ``i``:
@@ -391,7 +395,9 @@ def _axial_geometry(dimensions: Sequence[float]) -> tuple[float, float, NDArray[
         raise ValueError("'dimensions' must be the three room lengths (Lx, Ly, Lz).")
     lx, ly, lz = (require_positive(float(d), "dimension") for d in dimensions)
     volume = lx * ly * lz
-    pair_areas = np.array([2.0 * ly * lz, 2.0 * lx * lz, 2.0 * lx * ly], dtype=np.float64)
+    pair_areas = np.array(
+        [2.0 * ly * lz, 2.0 * lx * lz, 2.0 * lx * ly], dtype=np.float64
+    )
     total_area = float(pair_areas.sum())
     return volume, total_area, pair_areas
 
@@ -504,7 +510,9 @@ def arau_puchades_reverberation_time(
     weights, times = _axial_eyring_times(
         dimensions, absorptions, air_attenuation, speed_of_sound
     )
-    log_t = sum(w * np.log(np.asarray(t, dtype=np.float64)) for w, t in zip(weights, times))
+    log_t = sum(
+        w * np.log(np.asarray(t, dtype=np.float64)) for w, t in zip(weights, times)
+    )
     return as_float_or_array(np.exp(log_t))
 
 
@@ -547,7 +555,9 @@ class ReverberationModelResult:
             "Arau-Puchades": self.arau_puchades,
         }
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the reverberation-time curves of the five models.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -656,18 +666,46 @@ def reverberation_time_models(
         surfaces.append((float(area) / 2.0, alpha))
         surfaces.append((float(area) / 2.0, alpha))
 
-    sabine = np.atleast_1d(sabine_reverberation_time(
-        volume, surfaces, air_attenuation=air_attenuation, speed_of_sound=speed_of_sound))
-    eyring = np.atleast_1d(eyring_reverberation_time(
-        volume, surfaces, air_attenuation=air_attenuation, speed_of_sound=speed_of_sound))
-    millington = np.atleast_1d(millington_sette_reverberation_time(
-        volume, surfaces, air_attenuation=air_attenuation, speed_of_sound=speed_of_sound))
-    fitzroy = np.atleast_1d(fitzroy_reverberation_time(
-        dimensions, absorptions, air_attenuation=air_attenuation,
-        speed_of_sound=speed_of_sound))
-    arau = np.atleast_1d(arau_puchades_reverberation_time(
-        dimensions, absorptions, air_attenuation=air_attenuation,
-        speed_of_sound=speed_of_sound))
+    sabine = np.atleast_1d(
+        sabine_reverberation_time(
+            volume,
+            surfaces,
+            air_attenuation=air_attenuation,
+            speed_of_sound=speed_of_sound,
+        )
+    )
+    eyring = np.atleast_1d(
+        eyring_reverberation_time(
+            volume,
+            surfaces,
+            air_attenuation=air_attenuation,
+            speed_of_sound=speed_of_sound,
+        )
+    )
+    millington = np.atleast_1d(
+        millington_sette_reverberation_time(
+            volume,
+            surfaces,
+            air_attenuation=air_attenuation,
+            speed_of_sound=speed_of_sound,
+        )
+    )
+    fitzroy = np.atleast_1d(
+        fitzroy_reverberation_time(
+            dimensions,
+            absorptions,
+            air_attenuation=air_attenuation,
+            speed_of_sound=speed_of_sound,
+        )
+    )
+    arau = np.atleast_1d(
+        arau_puchades_reverberation_time(
+            dimensions,
+            absorptions,
+            air_attenuation=air_attenuation,
+            speed_of_sound=speed_of_sound,
+        )
+    )
 
     curve_bands = max(arr.size for arr in (sabine, eyring, millington, fitzroy, arau))
     if frequencies is None:

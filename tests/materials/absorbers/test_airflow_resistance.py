@@ -49,6 +49,7 @@ from phonometry.materials.absorbers.airflow_resistance import (
 
 # --- 3.1-3.4: quantity chain and units --------------------------------------
 
+
 def test_airflow_resistance_ratio() -> None:
     # R = dp / q_v = 20 / 0.001 = 20000 Pa*s/m3.
     assert airflow_resistance(20.0, 0.001) == pytest.approx(20000.0)
@@ -100,6 +101,7 @@ def test_invalid_inputs_raise(call) -> None:  # type: ignore[no-untyped-def]
 
 
 # --- 7.5: static-method through-origin regression ---------------------------
+
 
 def test_static_regression_recovers_zero_velocity_intercept() -> None:
     # Synthetic data exactly on dp = a*u + b*u**2 with a known slope in R_s space:
@@ -158,6 +160,7 @@ def test_static_invalid_inputs_raise(call) -> None:  # type: ignore[no-untyped-d
 
 # --- 6.2 / Formula (2): alternating method ----------------------------------
 
+
 def test_piston_volume_flow_rate() -> None:
     # q_v = 2*pi*f*h*A_P.
     f, h, a_p = 2.0, 1.4e-3, math.pi * (5.0e-3) ** 2  # piston diameter 10 mm
@@ -169,9 +172,11 @@ def test_alternating_formula_matches_hand_computation() -> None:
     # Independent replication of ISO 9053-2:2020 Formula (2).
     kappa, p_s, f, v = 1.4, 101325.0, 2.0, 1.0e-3
     h_t, h_s = 1.4e-3, 14.0e-3  # stroke ratio 0.1
-    l_ps, l_pt = 60.0, 80.0     # level difference -20 dB -> factor 0.1
+    l_ps, l_pt = 60.0, 80.0  # level difference -20 dB -> factor 0.1
     expected = (
-        kappa * p_s / (2.0 * math.pi * f * v)
+        kappa
+        * p_s
+        / (2.0 * math.pi * f * v)
         * (h_t / h_s)
         * 10.0 ** ((l_ps - l_pt) / 20.0)
     )
@@ -257,6 +262,7 @@ def test_alternating_invalid_inputs_raise(kwargs: dict[str, float]) -> None:
 # and expected values are imported from tests/reference_data/ (shared with the
 # CI conformance report).
 
+
 def test_thermal_boundary_layer_thickness_annex_a_example() -> None:
     b = thermal_boundary_layer_thickness(frequency=ISO9053_2_ANNEX_A_FREQUENCY)
     assert b == pytest.approx(ISO9053_2_ANNEX_A_BOUNDARY_LAYER, abs=5e-6)
@@ -303,10 +309,16 @@ def test_public_exports() -> None:
     from phonometry import materials
 
     for name in (
-        "AirflowResistanceWarning", "StaticAirflowResult", "airflow_resistance",
-        "specific_airflow_resistance", "airflow_resistivity", "linear_airflow_velocity",
-        "static_airflow_resistance", "piston_volume_flow_rate",
-        "alternating_airflow_resistance", "effective_kappa",
+        "AirflowResistanceWarning",
+        "StaticAirflowResult",
+        "airflow_resistance",
+        "specific_airflow_resistance",
+        "airflow_resistivity",
+        "linear_airflow_velocity",
+        "static_airflow_resistance",
+        "piston_volume_flow_rate",
+        "alternating_airflow_resistance",
+        "effective_kappa",
         "thermal_boundary_layer_thickness",
     ):
         assert hasattr(materials, name), name

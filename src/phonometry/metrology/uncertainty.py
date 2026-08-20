@@ -164,8 +164,9 @@ class UncertaintyResult:
         k = coverage_factor(coverage, self.effective_dof)
         return k, k * self.combined_uncertainty
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the uncertainty budget (per-input contributions).
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -203,8 +204,9 @@ class MonteCarloResult:
     trials: int
     samples: np.ndarray | None = field(default=None, repr=False)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the output histogram with the coverage interval marked.
 
         Needs the raw output sample, so call ``monte_carlo(...,
@@ -220,7 +222,9 @@ class MonteCarloResult:
         return plot_monte_carlo(self, ax=ax, language=language, **kwargs)
 
 
-def _sensitivity(model: Model, values: np.ndarray, uncertainties: np.ndarray) -> np.ndarray:
+def _sensitivity(
+    model: Model, values: np.ndarray, uncertainties: np.ndarray
+) -> np.ndarray:
     r"""Central-difference sensitivities :math:`\partial f/\partial x_i`.
 
     Follows GUM 5.1.3. The step is
@@ -373,9 +377,7 @@ def combine_uncertainty(
     combined = math.sqrt(max(variance, 0.0))
 
     dofs = np.array([q.dof for q in quantities], dtype=np.float64)
-    effective_dof = _effective_dof(
-        dofs, contributions, combined, correlated=correlated
-    )
+    effective_dof = _effective_dof(dofs, contributions, combined, correlated=correlated)
 
     return UncertaintyResult(
         value=float(model(*values)),

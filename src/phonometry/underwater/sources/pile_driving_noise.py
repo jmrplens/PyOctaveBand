@@ -47,9 +47,7 @@ _ENERGY_LOW = 0.05
 _ENERGY_HIGH = 0.95
 
 
-def single_strike_sel(
-    pressure: SignalInput, fs: float | None = None
-) -> float:
+def single_strike_sel(pressure: SignalInput, fs: float | None = None) -> float:
     """Single-strike sound exposure level ``SEL_ss`` (ISO 18406 Formulae 3-4).
 
     The sound exposure level of one hammer-strike pulse, integrated over the
@@ -142,12 +140,16 @@ class PileStrikeResult:
     pressure: NDArray[np.float64]
     fs: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | NDArray[Any]:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | NDArray[Any]:
         """Plot the strike waveform and its cumulative energy."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_pile_strike
 
-        return plot_pile_strike(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_pile_strike(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 @dataclass(frozen=True)
@@ -179,12 +181,16 @@ class StrikeSelSpectrum:
     fraction: int
     fs: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band single-strike SEL."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_strike_sel_spectrum
 
-        return plot_strike_sel_spectrum(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_strike_sel_spectrum(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def strike_sel_spectrum(
@@ -246,10 +252,12 @@ def strike_sel_spectrum(
     energy = weight * np.abs(spectrum) ** 2 / (fs_v * n)
 
     fc = np.asarray(centres, dtype=np.float64)
-    band_energy = np.array([
-        float(energy[(freqs >= f_lo) & (freqs < f_hi)].sum())
-        for f_lo, f_hi in zip(lower, upper, strict=True)
-    ])
+    band_energy = np.array(
+        [
+            float(energy[(freqs >= f_lo) & (freqs < f_hi)].sum())
+            for f_lo, f_hi in zip(lower, upper, strict=True)
+        ]
+    )
     e0 = 1e-12  # 1 µPa²·s in Pa²·s
     # An empty band (narrower than the bin spacing fs/n) carries no energy, so
     # its level is -inf: the neutral element of the energy sum downstream.

@@ -118,9 +118,7 @@ class TestBearingIdentities:
         self, z: int, d: float, dm: float, phi: float
     ) -> None:
         """``BPFO + BPFI = Z fs`` exactly (Eqs. 8.8 + 8.9)."""
-        res = bearing_fault_frequencies(
-            1770.0, z, d, dm, contact_angle_deg=phi
-        )
+        res = bearing_fault_frequencies(1770.0, z, d, dm, contact_angle_deg=phi)
         assert res["BPFO"] + res["BPFI"] == pytest.approx(z * res.shaft_rate, rel=1e-12)
 
     def test_pass_outer_is_z_times_cage(self) -> None:
@@ -155,9 +153,7 @@ class TestBearingIdentities:
     def test_only_the_diameter_ratio_enters(self) -> None:
         """Millimetres or metres give the same frequencies."""
         mm = bearing_fault_frequencies(**_P85)  # type: ignore[arg-type]
-        m = bearing_fault_frequencies(
-            2000.0, 15, 0.006, 0.034, contact_angle_deg=12.96
-        )
+        m = bearing_fault_frequencies(2000.0, 15, 0.006, 0.034, contact_angle_deg=12.96)
         np.testing.assert_allclose(m.frequencies, mm.frequencies, rtol=1e-12)
 
 
@@ -199,7 +195,10 @@ class TestNortonProblem86:
         # (mL = 2, 6, 6 and 10), and none of them is silently dropped.
         lobes = [line.name for line in res.lines if line.name.startswith("lobe")]
         assert lobes == [
-            "lobe n=1 m=2", "lobe n=1 m=6", "lobe n=2 m=6", "lobe n=2 m=10",
+            "lobe n=1 m=2",
+            "lobe n=1 m=6",
+            "lobe n=2 m=6",
+            "lobe n=2 m=10",
         ]
 
     def test_rotary_blower_repeats_four_times_per_revolution(self) -> None:
@@ -233,9 +232,7 @@ class TestNortonProblem87:
 
     def test_supply_frequency_and_slip_are_interchangeable(self) -> None:
         """Giving ``fe`` recovers the same lines as giving the matching slip."""
-        by_supply = induction_motor_frequencies(
-            1750.0, 4, 52, supply_frequency=60.0
-        )
+        by_supply = induction_motor_frequencies(1750.0, 4, 52, supply_frequency=60.0)
         implied_slip = 1.0 - (1750.0 / 60.0) / (2.0 * 60.0 / 4.0)
         by_slip = induction_motor_frequencies(1750.0, 4, 52, slip=implied_slip)
         np.testing.assert_allclose(
@@ -367,7 +364,9 @@ class TestValidation:
     )
     def test_motor_rejects(self, kwargs: dict[str, object]) -> None:
         with pytest.raises(ValueError):
-            induction_motor_frequencies(1750.0, **{"poles": 4, "rotor_bars": 52, **kwargs})  # type: ignore[arg-type]
+            induction_motor_frequencies(
+                1750.0, **{"poles": 4, "rotor_bars": 52, **kwargs}
+            )  # type: ignore[arg-type]
 
     def test_motor_rejects_supply_below_shaft_rate(self) -> None:
         """A shaft turning at or above synchronous speed is not an induction motor."""

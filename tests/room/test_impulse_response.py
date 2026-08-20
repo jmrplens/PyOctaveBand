@@ -27,8 +27,9 @@ from phonometry.room.impulse_response import _MLS_TAPS
 FS = 48000
 
 
-def _band_response_db(b: np.ndarray, a: np.ndarray, ir: np.ndarray, fs: int,
-                      f_lo: float, f_hi: float) -> tuple[np.ndarray, np.ndarray]:
+def _band_response_db(
+    b: np.ndarray, a: np.ndarray, ir: np.ndarray, fs: int, f_lo: float, f_hi: float
+) -> tuple[np.ndarray, np.ndarray]:
     """Return (estimated, true) magnitudes in dB on the rfft grid, in band."""
     n = ir.size
     freqs = np.fft.rfftfreq(n, d=1.0 / fs)
@@ -85,7 +86,7 @@ def test_farina_inverse_filter_compresses_sweep() -> None:
     # Everything more than 1 ms away from the compression peak is a sidelobe.
     guard = FS // 1000
     mask = np.ones(y.size, dtype=bool)
-    mask[max(0, ipk - guard):ipk + guard] = False
+    mask[max(0, ipk - guard) : ipk + guard] = False
     assert 20.0 * np.log10(np.abs(y[mask]).max() / peak) < -30.0
 
 
@@ -126,9 +127,7 @@ def test_farina_rejects_zero_padded_reference() -> None:
     n = y.size + x.size - 1
     x_padded = np.concatenate([x, np.zeros(n - x.size)])
     with pytest.raises(ValueError, match="zero-pad|unpadded|spectral"):
-        room.impulse_response(
-            y, x_padded, FS, method="farina", f_range=(f1, f2)
-        )
+        room.impulse_response(y, x_padded, FS, method="farina", f_range=(f1, f2))
     # The unpadded sweep still works unchanged.
     ir = room.impulse_response(
         y, x, FS, method="farina", f_range=(f1, f2), length=16384
@@ -152,12 +151,12 @@ def test_harmonic_products_appear_at_negative_time() -> None:
     # negative time sits near index n - dt*fs.
     advance = round(secs * np.log(2.0) / np.log(f2 / f1) * FS)
     predicted = n - advance
-    window = np.abs(full[predicted - 500:predicted + 500])
+    window = np.abs(full[predicted - 500 : predicted + 500])
     harmonic_peak = window.max()
     peak_idx = predicted - 500 + int(np.argmax(window))
     assert abs(peak_idx - predicted) < 50
 
-    floor = np.sqrt(np.mean(full[n // 2:predicted - 5000] ** 2))
+    floor = np.sqrt(np.mean(full[n // 2 : predicted - 5000] ** 2))
     assert harmonic_peak > 15.0 * floor
 
     # The default (trimmed) IR is causal, so it excludes the harmonic product.
@@ -303,7 +302,7 @@ def test_mls_snr_improves_with_averaging() -> None:
         recorded = acc / n_avg
         ir = room.mls_impulse_response(recorded, a)
         peak = np.abs(ir).max()
-        floor = np.sqrt(np.mean(ir[length // 4:length // 2] ** 2))
+        floor = np.sqrt(np.mean(ir[length // 4 : length // 2] ** 2))
         return 20.0 * np.log10(peak / floor)
 
     snr_1 = snr_for(1)
@@ -328,12 +327,8 @@ def test_mls_multi_period_recording_averages_internally() -> None:
     noisy = y + rng.standard_normal(y.size) * 0.3
     assert noisy.size == reps * length  # multi-period recording
 
-    ir_multi = room.mls_impulse_response(
-        noisy, a
-    )  # internal averaging over reps
-    ir_single = room.mls_impulse_response(
-        noisy[:length], a
-    )  # one noisy period
+    ir_multi = room.mls_impulse_response(noisy, a)  # internal averaging over reps
+    ir_single = room.mls_impulse_response(noisy[:length], a)  # one noisy period
 
     err_multi = float(np.max(np.abs(ir_multi[: b.size] - b)))
     err_single = float(np.max(np.abs(ir_single[: b.size] - b)))
@@ -346,9 +341,7 @@ def test_invalid_arguments() -> None:
         room.sweep_signal(FS, 100.0, 100.0, 1.0)  # f1 == f2
     with pytest.raises(ValueError, match="f2 must be greater than f1"):
         room.sweep_signal(FS, 100.0, 50.0, 1.0)  # f1 > f2
-    with pytest.raises(
-        ValueError, match="must not exceed the Nyquist frequency"
-    ):
+    with pytest.raises(ValueError, match="must not exceed the Nyquist frequency"):
         room.sweep_signal(FS, 20.0, 30000.0, 1.0)  # f2 > Nyquist
     with pytest.raises(ValueError, match="order must be one of"):
         room.mls_signal(1)  # order too small
@@ -381,7 +374,11 @@ def test_inverse_filter_empty_band_raises() -> None:
         ValueError, match="no frequency bin falls within the sweep band"
     ):
         room.impulse_response(
-            silence, tone, FS, method="farina", f_range=(1000.0, 1000.5),
+            silence,
+            tone,
+            FS,
+            method="farina",
+            f_range=(1000.0, 1000.5),
         )
 
 
@@ -420,13 +417,9 @@ def test_mls_impulse_response_rejects_bad_shapes() -> None:
         ValueError, match="'recorded' and 'mls' must be one-dimensional"
     ):
         room.mls_impulse_response(good, two_dimensional)  # 2-D mls
-    with pytest.raises(
-        ValueError, match="'recorded' and 'mls' must be non-empty"
-    ):
+    with pytest.raises(ValueError, match="'recorded' and 'mls' must be non-empty"):
         room.mls_impulse_response(empty, seq)  # empty recorded
-    with pytest.raises(
-        ValueError, match="'recorded' and 'mls' must be non-empty"
-    ):
+    with pytest.raises(ValueError, match="'recorded' and 'mls' must be non-empty"):
         room.mls_impulse_response(good, empty)  # empty mls
 
 
@@ -497,6 +490,7 @@ def test_mls_result_metadata() -> None:
 # --------------------------------------------------------------------------
 def test_impulse_response_plot_returns_axes() -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     from matplotlib.axes import Axes
 
@@ -515,6 +509,7 @@ def test_impulse_response_plot_returns_axes() -> None:
 
 def test_plot_excitation_returns_axes() -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     from matplotlib.axes import Axes
 
@@ -533,6 +528,7 @@ def test_plot_excitation_returns_axes() -> None:
 
 def test_plot_excitation_short_and_empty_guards() -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -546,8 +542,6 @@ def test_plot_excitation_short_and_empty_guards() -> None:
     empty = np.array([])
     with pytest.raises(ValueError, match="empty"):
         room.plot_excitation(empty, FS, kind="mls")
-    empty_result = room.ImpulseResponseResult(
-        ir=empty, fs=FS, method="spectral"
-    )
+    empty_result = room.ImpulseResponseResult(ir=empty, fs=FS, method="spectral")
     with pytest.raises(ValueError, match="empty"):
         empty_result.plot()

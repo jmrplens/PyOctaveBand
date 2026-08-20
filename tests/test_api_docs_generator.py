@@ -161,18 +161,14 @@ def test_math_directive_becomes_display_math() -> None:
     # each equation's physical lines are joined into a single line so
     # remark-math keeps the whole block in one paragraph.
     assert (
-        "$$\nL_p = 10 \\lg\\!\\left( \\frac{S}{S_0} \\right)"
-        " \\tag{Eq. 12}\n$$" in out
+        "$$\nL_p = 10 \\lg\\!\\left( \\frac{S}{S_0} \\right) \\tag{Eq. 12}\n$$" in out
     )
     assert "$$\nK_2 = 10 \\lg(1 + 4S/A) \\tag{Eq. A.2}\n$$" in out
     assert ".. math::" not in out
 
 
 def test_math_role_becomes_inline_math_untouched_by_escaping() -> None:
-    text = (
-        "Area :math:`S = 2\\pi r^2` and :math:`a = 0.5\\,l_1+d` with "
-        "``S`` in m^2."
-    )
+    text = "Area :math:`S = 2\\pi r^2` and :math:`a = 0.5\\,l_1+d` with ``S`` in m^2."
     out = gad.render_prose(text, {}, gad.RoleStats())
     # The TeX passes through verbatim: no intraword-asterisk or ``<``
     # escaping may reach inside the ``$`` span.
@@ -194,9 +190,7 @@ def test_math_in_table_cell_keeps_its_bars_single() -> None:
     # GFM decodes the ``\|`` cell escape for prose but not inside math, so
     # escaping a formula's bar would silently typeset ``\|`` (a double bar)
     # where the standard means a modulus. The bars become TeX commands.
-    out = gad.render_cell(
-        "Magnitude :math:`20 \\lg |H|`, in dB.", {}, gad.RoleStats()
-    )
+    out = gad.render_cell("Magnitude :math:`20 \\lg |H|`, in dB.", {}, gad.RoleStats())
     assert "$20 \\lg \\vert H\\vert $" in out
     assert "\\|" not in out
     # A norm that was already written ``\|`` keeps both bars.
@@ -207,9 +201,7 @@ def test_math_in_table_cell_keeps_its_bars_single() -> None:
 
 def test_render_prose_leaves_math_bars_alone() -> None:
     # Outside a table there is nothing to escape, so the formula is verbatim.
-    out = gad.render_prose(
-        "Magnitude :math:`20 \\lg |H|`.", {}, gad.RoleStats()
-    )
+    out = gad.render_prose("Magnitude :math:`20 \\lg |H|`.", {}, gad.RoleStats())
     assert "$20 \\lg |H|$" in out
 
 
@@ -400,7 +392,10 @@ def test_quick_table_covers_public_api() -> None:
     """The committed docs/reference/api/index.md never misses an __all__ name."""
     path = (
         pathlib.Path(__file__).resolve().parent.parent
-        / "docs" / "reference" / "api" / "index.md"
+        / "docs"
+        / "reference"
+        / "api"
+        / "index.md"
     )
     markdown = path.read_text(encoding="utf-8")
     assert car.missing_names(markdown, sorted(api_taxonomy.public_names())) == []
@@ -444,7 +439,10 @@ def test_quick_table_version_literal_is_current() -> None:
     """The committed table shows the version the package actually reports."""
     path = (
         pathlib.Path(__file__).resolve().parent.parent
-        / "docs" / "reference" / "api" / "index.md"
+        / "docs"
+        / "reference"
+        / "api"
+        / "index.md"
     )
     markdown = path.read_text(encoding="utf-8")
     assert car.version_problems(markdown, phonometry.__version__) == []

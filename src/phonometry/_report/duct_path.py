@@ -62,7 +62,12 @@ if TYPE_CHECKING:
 #: Rows whose values are a level rather than a correction, shaded to separate
 #: them from the attenuation rows exactly as the published sheets do.
 _LEVEL_KINDS = (
-    "source", "sum", "self_noise", "level", "contribution", "received",
+    "source",
+    "sum",
+    "self_noise",
+    "level",
+    "contribution",
+    "received",
     "criterion",
 )
 
@@ -89,9 +94,7 @@ def _regenerates(row: dict[str, Any]) -> bool:
     return bool(np.any(np.asarray(row["values"]) > 0.0))
 
 
-def _visible_rows(
-    rows: list[dict[str, Any]], verbose: bool
-) -> list[dict[str, Any]]:
+def _visible_rows(rows: list[dict[str, Any]], verbose: bool) -> list[dict[str, Any]]:
     """Select the rows a sheet prints at the requested level of detail.
 
     Every row the cascade produces is meaningful, but a fiche is one page, so
@@ -113,9 +116,7 @@ def _visible_rows(
     ]
 
 
-def _prints(
-    row: dict[str, Any], rest: list[dict[str, Any]], verbose: bool
-) -> bool:
+def _prints(row: dict[str, Any], rest: list[dict[str, Any]], verbose: bool) -> bool:
     """Whether one sheet row survives the selection of :func:`_visible_rows`."""
     kind = row["kind"]
     if kind == "self_noise":
@@ -307,18 +308,23 @@ def _verdict(result: DuctPathResult, language: str) -> tuple[str, bool] | None:
     if passed:
         text = t(
             "no band exceeds {criterion} {target}; smallest margin "
-            "{margin} dB at {band} Hz", language,
+            "{margin} dB at {band} Hz",
+            language,
         ).format(
-            criterion=result.criterion, target=f"{result.target:g}",
-            margin=fmt_num(-margin, language), band=band,
+            criterion=result.criterion,
+            target=f"{result.target:g}",
+            margin=fmt_num(-margin, language),
+            band=band,
         )
     else:
         text = t(
             "{criterion} {target} exceeded by {margin} dB at {band} Hz",
             language,
         ).format(
-            criterion=result.criterion, target=f"{result.target:g}",
-            margin=fmt_num(margin, language), band=band,
+            criterion=result.criterion,
+            target=f"{result.target:g}",
+            margin=fmt_num(margin, language),
+            band=band,
         )
     return text, passed
 
@@ -415,9 +421,7 @@ def render_duct_path_report(
     rows = _visible_rows(result.table(), verbose)
     table, _count = _sheet_table(result, verbose, language, rows)
     flow.append(
-        Paragraph(
-            t("Octave-band path calculation, dB", language), caption_style
-        )
+        Paragraph(t("Octave-band path calculation, dB", language), caption_style)
     )
     table_index = len(flow)
     flow.append(table)
@@ -432,12 +436,17 @@ def render_duct_path_report(
     # gives up the height the extra rows need and the fiche stays on one page.
     plot_width = 88.0 if verbose else 96.0
     plot_drawing = render_figure_drawing(
-        result.plot, plot_width * mm, y_top=None,
-        figsize=(6.2, 3.1 if verbose else 4.0), language=language,
+        result.plot,
+        plot_width * mm,
+        y_top=None,
+        figsize=(6.2, 3.1 if verbose else 4.0),
+        language=language,
     )
     flow.append(
         two_panel_body(
-            left_cell, plot_drawing, left_width_mm=84.0 if verbose else 76.0,
+            left_cell,
+            plot_drawing,
+            left_width_mm=84.0 if verbose else 76.0,
             plot_width_mm=90.0 if verbose else 98.0,
         )
     )
@@ -452,8 +461,11 @@ def render_duct_path_report(
                 language,
             ),
             ParagraphStyle(
-                "duct_path_prediction", parent=styles["Normal"], fontSize=8.0,
-                textColor=colors.HexColor(_MUTED_HEX), spaceBefore=3,
+                "duct_path_prediction",
+                parent=styles["Normal"],
+                fontSize=8.0,
+                textColor=colors.HexColor(_MUTED_HEX),
+                spaceBefore=3,
             ),
         )
     )
@@ -461,14 +473,10 @@ def render_duct_path_report(
     basis_style_strip = measurement_basis_style()
     for strip in _basis_strips(result, language):
         flow.append(Paragraph(strip, basis_style_strip))
-    flow.extend(
-        footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER)
-    )
+    flow.extend(footer_flow(metadata, language, disclaimer=PREDICTION_DISCLAIMER))
 
     _fit_to_one_page(flow, table_index, result, rows, verbose, language)
-    return build_document(
-        path, flow, t("Duct-borne noise path calculation", language)
-    )
+    return build_document(path, flow, t("Duct-borne noise path calculation", language))
 
 
 def _fit_to_one_page(

@@ -49,8 +49,7 @@ if TYPE_CHECKING:
 #: verbatim English text. ``_t`` returns the English key unchanged for any
 #: language other than ``"es"``.
 _STRINGS: dict[str, str] = {
-    "Image-source room plan (z of the source plane)":
-        "Planta de fuentes imagen (plano z de la fuente)",
+    "Image-source room plan (z of the source plane)": "Planta de fuentes imagen (plano z de la fuente)",
     "Source": "Fuente",
     "Receiver": "Receptor",
     "order {n}": "orden {n}",
@@ -102,9 +101,7 @@ def plot_image_source_geometry(
     _check_language(language)
     from ..._i18n import localize_axes
 
-    order_cap = (
-        min(int(result.max_order), 3) if max_order is None else int(max_order)
-    )
+    order_cap = min(int(result.max_order), 3) if max_order is None else int(max_order)
     if order_cap < 1:
         raise ValueError("'max_order' must be >= 1.")
     if ax is None:
@@ -120,11 +117,23 @@ def plot_image_source_geometry(
     y_max = float(max(pos[:, 1].max(), ly)) + 0.2 * ly
     # Mirror-room grid.
     for x in np.arange(np.floor(x_min / lx) * lx, x_max + lx, lx):
-        ax.plot([x, x], [y_min, y_max], linestyle=":", linewidth=0.6,
-                color=_C_MUTED, zorder=1)
+        ax.plot(
+            [x, x],
+            [y_min, y_max],
+            linestyle=":",
+            linewidth=0.6,
+            color=_C_MUTED,
+            zorder=1,
+        )
     for y in np.arange(np.floor(y_min / ly) * ly, y_max + ly, ly):
-        ax.plot([x_min, x_max], [y, y], linestyle=":", linewidth=0.6,
-                color=_C_MUTED, zorder=1)
+        ax.plot(
+            [x_min, x_max],
+            [y, y],
+            linestyle=":",
+            linewidth=0.6,
+            color=_C_MUTED,
+            zorder=1,
+        )
     kwargs.setdefault("facecolor", "none")
     kwargs.setdefault("edgecolor", _C_EDGE)
     kwargs.setdefault("linewidth", 2.0)
@@ -135,18 +144,33 @@ def plot_image_source_geometry(
             continue
         colour = _ORDER_COLOURS[(order - 1) % len(_ORDER_COLOURS)]
         ax.plot(
-            pos[sel, 0], pos[sel, 1], "o", markersize=4, color=colour,
-            linestyle="none", zorder=4,
+            pos[sel, 0],
+            pos[sel, 1],
+            "o",
+            markersize=4,
+            color=colour,
+            linestyle="none",
+            zorder=4,
             label=_t("order {n}", language).format(n=order),
         )
     ax.plot(
-        [result.source[0]], [result.source[1]], marker="*", markersize=13,
-        color=_C_REFERENCE, linestyle="none", zorder=5,
+        [result.source[0]],
+        [result.source[1]],
+        marker="*",
+        markersize=13,
+        color=_C_REFERENCE,
+        linestyle="none",
+        zorder=5,
         label=_t("Source", language),
     )
     ax.plot(
-        [result.receiver[0]], [result.receiver[1]], marker="^",
-        markersize=8, color=_C_PRIMARY, linestyle="none", zorder=5,
+        [result.receiver[0]],
+        [result.receiver[1]],
+        marker="^",
+        markersize=8,
+        color=_C_PRIMARY,
+        linestyle="none",
+        zorder=5,
         label=_t("Receiver", language),
     )
     ax.set_aspect("equal", adjustable="datalim")
@@ -188,9 +212,7 @@ def plot_open_plan_geometry(
     _check_language(language)
     pos = np.sort(np.asarray(positions, dtype=np.float64).ravel())
     if pos.size < 2 or np.any(pos <= 0.0):
-        raise ValueError(
-            "'positions' needs at least two positive distances."
-        )
+        raise ValueError("'positions' needs at least two positive distances.")
     if ax is None:
         ax = _new_axes()
     span = float(pos.max())
@@ -201,35 +223,63 @@ def plot_open_plan_geometry(
     for left, right in pairwise(pos):
         centre = 0.5 * (left + right)
         _material_rect(
-            ax, centre - desk, -0.5 * desk, 2.0 * desk, desk, "plate",
-            linewidth=0.6, alpha=0.5,
+            ax,
+            centre - desk,
+            -0.5 * desk,
+            2.0 * desk,
+            desk,
+            "plate",
+            linewidth=0.6,
+            alpha=0.5,
         )
-    ax.text(0.12 * span, 3.0 * desk, _t("Workstations", language),
-            fontsize=8, ha="center", va="bottom")
-    ax.plot([0.0], [0.0], marker="*", markersize=13, color=_C_REFERENCE,
-            linestyle="none", zorder=6)
-    ax.text(0.0, -1.4 * desk, _t("Source", language), fontsize=8,
-            ha="center", va="top")
+    ax.text(
+        0.12 * span,
+        3.0 * desk,
+        _t("Workstations", language),
+        fontsize=8,
+        ha="center",
+        va="bottom",
+    )
+    ax.plot(
+        [0.0],
+        [0.0],
+        marker="*",
+        markersize=13,
+        color=_C_REFERENCE,
+        linestyle="none",
+        zorder=6,
+    )
+    ax.text(0.0, -1.4 * desk, _t("Source", language), fontsize=8, ha="center", va="top")
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("s", 18)
     ax.scatter(pos, np.zeros_like(pos), zorder=5, **kwargs)
-    ax.plot([0.0, span], [0.0, 0.0], color=_C_MUTED, linewidth=0.8,
-            linestyle=":", zorder=2)
+    ax.plot(
+        [0.0, span], [0.0, 0.0], color=_C_MUTED, linewidth=0.8, linestyle=":", zorder=2
+    )
     from ..._i18n import format_number
 
     for value, key in ((rd, "r$_D$"), (rp, "r$_P$")):
         if value is not None and np.isfinite(value):
-            ax.plot([value, value], [-2.2 * desk, 2.2 * desk],
-                    color=_C_SECONDARY, linewidth=1.2, linestyle="--")
-            ax.text(
-                value, 2.4 * desk,
-                key + " = "
-                + format_number(value, language, decimals=1, trim=True)
-                + " " + _t("m", language),
-                fontsize=8, ha="center", va="bottom",
+            ax.plot(
+                [value, value],
+                [-2.2 * desk, 2.2 * desk],
+                color=_C_SECONDARY,
+                linewidth=1.2,
+                linestyle="--",
             )
-    _dim(ax, (0.0, -2.6 * desk), (span, -2.6 * desk),
-         _metres(span, language))
+            ax.text(
+                value,
+                2.4 * desk,
+                key
+                + " = "
+                + format_number(value, language, decimals=1, trim=True)
+                + " "
+                + _t("m", language),
+                fontsize=8,
+                ha="center",
+                va="bottom",
+            )
+    _dim(ax, (0.0, -2.6 * desk), (span, -2.6 * desk), _metres(span, language))
     _finish_geometry_axes(ax, _t("Open-plan measurement line", language))
     return ax
 
@@ -248,6 +298,10 @@ def plot_open_plan_result_geometry(
             "plot_open_plan_geometry(positions)."
         )
     return plot_open_plan_geometry(
-        result.positions_m, ax=ax, rd=result.rd, rp=result.rp,
-        language=language, **kwargs,
+        result.positions_m,
+        ax=ax,
+        rd=result.rd,
+        rp=result.rp,
+        language=language,
+        **kwargs,
     )

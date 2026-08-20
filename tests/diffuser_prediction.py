@@ -82,12 +82,14 @@ def predicted_band_normalized_diffusion(
     freqs = np.geomspace(
         band_center * 2.0 ** (-1.0 / 6.0), band_center * 2.0 ** (1.0 / 6.0), 7
     )
+
     def band_levels(flat: bool) -> np.ndarray:
         energy = np.zeros(37, dtype=np.float64)
         for f in freqs:
             arc = predicted_arc(float(f), flat=flat, source_angle=source_angle)
             energy += 10.0 ** (np.asarray(arc.levels, dtype=np.float64) / 10.0)
         return np.asarray(10.0 * np.log10(energy / freqs.size))
+
     d = directional_diffusion_coefficient(band_levels(flat=False))
     d_ref = directional_diffusion_coefficient(band_levels(flat=True))
     return float(normalized_diffusion_coefficient(d, d_ref))

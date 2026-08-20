@@ -38,14 +38,8 @@ def test_pa_reduces_to_loudness_without_terms() -> None:
 
 def test_pa_sharpness_term_threshold_at_1_75() -> None:
     # wS is exactly zero at the 1.75 acum threshold and positive just above.
-    assert (
-        psychoacoustics.psychoacoustic_annoyance(10.0, 1.75, 0.0, 0.0).w_s
-        == 0.0
-    )
-    assert (
-        psychoacoustics.psychoacoustic_annoyance(10.0, 1.7501, 0.0, 0.0).w_s
-        > 0.0
-    )
+    assert psychoacoustics.psychoacoustic_annoyance(10.0, 1.75, 0.0, 0.0).w_s == 0.0
+    assert psychoacoustics.psychoacoustic_annoyance(10.0, 1.7501, 0.0, 0.0).w_s > 0.0
 
 
 def test_pa_sharpness_term_formula() -> None:
@@ -61,32 +55,23 @@ def test_pa_fluctuation_roughness_term_formula() -> None:
 
 
 def test_pa_increases_with_each_sensation() -> None:
-    base = psychoacoustics.psychoacoustic_annoyance(
-        10.0, 2.0, 0.5, 0.5
-    ).annoyance
+    base = psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, 0.5, 0.5).annoyance
     assert (
-        psychoacoustics.psychoacoustic_annoyance(11.0, 2.0, 0.5, 0.5).annoyance
-        > base
+        psychoacoustics.psychoacoustic_annoyance(11.0, 2.0, 0.5, 0.5).annoyance > base
     )
     assert (
-        psychoacoustics.psychoacoustic_annoyance(10.0, 2.5, 0.5, 0.5).annoyance
-        > base
+        psychoacoustics.psychoacoustic_annoyance(10.0, 2.5, 0.5, 0.5).annoyance > base
     )
     assert (
-        psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, 0.9, 0.5).annoyance
-        > base
+        psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, 0.9, 0.5).annoyance > base
     )
     assert (
-        psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, 0.5, 0.9).annoyance
-        > base
+        psychoacoustics.psychoacoustic_annoyance(10.0, 2.0, 0.5, 0.9).annoyance > base
     )
 
 
 def test_pa_silence_is_zero() -> None:
-    assert (
-        psychoacoustics.psychoacoustic_annoyance(0.0, 3.0, 1.0, 1.0).annoyance
-        == 0.0
-    )
+    assert psychoacoustics.psychoacoustic_annoyance(0.0, 3.0, 1.0, 1.0).annoyance == 0.0
 
 
 @pytest.mark.parametrize("bad", [-1.0, math.nan, math.inf])

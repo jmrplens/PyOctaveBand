@@ -409,8 +409,11 @@ def force_pulse(
         # period. ``expm1`` keeps the near-critical case (γ t ≪ 1, where the
         # two exponentials nearly cancel) accurate to full precision.
         pulse = (
-            v0 * k * np.exp(-(decay - gamma) * t)
-            * -np.expm1(-2.0 * gamma * t) / (2.0 * gamma)
+            v0
+            * k
+            * np.exp(-(decay - gamma) * t)
+            * -np.expm1(-2.0 * gamma * t)
+            / (2.0 * gamma)
         )
         return np.asarray(pulse, dtype=np.float64)
     beta = np.sqrt(omega0_sq - decay**2)
@@ -486,7 +489,9 @@ class TappingForceResult:
         (Hopkins Fig. 3.33)."""
         return np.asarray(10.0 * np.log10(self.power_input / _POWER_REFERENCE))
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the force spectrum ``|Fn|`` with its asymptotes and ``fco``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -624,7 +629,9 @@ class CoveringImprovementResult:
     bare: TappingForceResult
     covered: TappingForceResult
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``ΔL(f)`` from the force ratio beside the two-line estimate.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -715,11 +722,19 @@ def covering_improvement(
     empty = ~inside.any(axis=1)
     if empty.any():
         edge = tapping_force_spectrum(
-            f[empty], plate_stiffness, impedance, mass=mass, impact_rate=fi,
+            f[empty],
+            plate_stiffness,
+            impedance,
+            mass=mass,
+            impact_rate=fi,
             band=band,
         )
         edge_covered = tapping_force_spectrum(
-            f[empty], covering_stiffness, impedance, mass=mass, impact_rate=fi,
+            f[empty],
+            covering_stiffness,
+            impedance,
+            mass=mass,
+            impact_rate=fi,
             band=band,
         )
         bare_ms[empty] = edge.peak_force**2
@@ -897,7 +912,9 @@ class FloatingFloorImprovementResult:
     limiting_frequency: float | None = None
     delta_lw: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``ΔL(f)`` with the resonance and the asymptotic slope marked.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

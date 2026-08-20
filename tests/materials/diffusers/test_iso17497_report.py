@@ -29,12 +29,50 @@ _PDF_MAGIC = b"%PDF"
 # The committed clean-room example: V = 200 m3, S = 10 m2, 20 degC (c = 343.2),
 # m = 0, symmetrical base plate (T1 = T3). See scripts/generate_reports.py.
 _FREQS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-     1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000],
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
+    ],
     dtype=float,
 )
-_T1 = np.array([8.0, 7.9, 7.8, 7.6, 7.4, 7.2, 7.0, 6.7, 6.4, 6.0,
-                5.6, 5.2, 4.8, 4.4, 4.0, 3.6, 3.2, 2.9])
+_T1 = np.array(
+    [
+        8.0,
+        7.9,
+        7.8,
+        7.6,
+        7.4,
+        7.2,
+        7.0,
+        6.7,
+        6.4,
+        6.0,
+        5.6,
+        5.2,
+        4.8,
+        4.4,
+        4.0,
+        3.6,
+        3.2,
+        2.9,
+    ]
+)
 _ANGLES = np.arange(-90.0, 90.5, 10.0)
 
 
@@ -129,9 +167,9 @@ def _assert_one_page(path: str) -> None:
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
-    return "\n".join(
-        page.extract_text() for page in PdfReader(path).pages
-    ).replace("\n", " ")
+    return "\n".join(page.extract_text() for page in PdfReader(path).pages).replace(
+        "\n", " "
+    )
 
 
 # --- ISO 17497-1 scattering ------------------------------------------------

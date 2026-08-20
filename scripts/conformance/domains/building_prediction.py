@@ -29,8 +29,14 @@ def _annex_h3_paths() -> list[ph.building.FlankingPath]:
     paths: list[ph.building.FlankingPath] = []
     for label, rw, kff, kfd, lf in ref.EN12354_1_ANNEX_H3_ELEMENTS:
         ff, df, fd = ph.building.flanking_element(
-            label=label, r_flanking=rw, r_separating=ref.EN12354_1_ANNEX_H3_R_DIRECT,
-            k_ff=kff, k_fd=kfd, k_df=kfd, separating_area=ss, coupling_length=lf,
+            label=label,
+            r_flanking=rw,
+            r_separating=ref.EN12354_1_ANNEX_H3_R_DIRECT,
+            k_ff=kff,
+            k_fd=kfd,
+            k_df=kfd,
+            separating_area=ss,
+            coupling_length=lf,
         )
         paths += [ff, df, fd]
     return paths
@@ -70,8 +76,14 @@ def _chk_en12354_1_h3_paths() -> Outcome:
     for element, (r_ff, r_cross) in ref.EN12354_1_ANNEX_H3_PATH_RW.items():
         for suffix, expected in (("Ff", r_ff), ("Fd", r_cross), ("Df", r_cross)):
             worst = max(worst, abs(by_label[f"{element}-{suffix}"] - expected))
-    return numeric(0.0, worst, 0.05, unit="dB", places=3,
-                   expected_label="max abs(Rij,w - printed) <= 0,05 dB")
+    return numeric(
+        0.0,
+        worst,
+        0.05,
+        unit="dB",
+        places=3,
+        expected_label="max abs(Rij,w - printed) <= 0,05 dB",
+    )
 
 
 @register(
@@ -110,7 +122,8 @@ def _chk_en12354_2_impact() -> Outcome:
         ref.EN12354_2_ANNEX_E3_MASS, ref.EN12354_2_ANNEX_E3_FLANKING_MEAN_MASS
     )
     res = ph.building.predicted_impact_insulation(
-        ln_w_eq=round(ln_eq), delta_l_w=ref.EN12354_2_ANNEX_E3_DELTA_LW,
+        ln_w_eq=round(ln_eq),
+        delta_l_w=ref.EN12354_2_ANNEX_E3_DELTA_LW,
         k_correction=k,
     )
     k_ok = int(k) == ref.EN12354_2_ANNEX_E3_K
@@ -146,9 +159,7 @@ def _en12354_3_annex_f() -> ph.building.FacadePredictionResult:
         for name, area, r in ref.EN12354_3_ANNEX_F_ELEMENTS
     ]
     elements.append(
-        ph.building.FacadeElement(
-            name="inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE
-        )
+        ph.building.FacadeElement(name="inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE)
     )
     return ph.building.facade_sound_reduction(
         elements,
@@ -196,11 +207,13 @@ def _chk_en12354_4_radiated() -> Outcome:
         [
             ph.building.FacadeElement(
                 name="wall",
-                area=ref.EN12354_4_ANNEX_G_SEGMENT_AREA - ref.EN12354_4_ANNEX_G_DOOR_AREA,
+                area=ref.EN12354_4_ANNEX_G_SEGMENT_AREA
+                - ref.EN12354_4_ANNEX_G_DOOR_AREA,
                 r=ref.EN12354_4_ANNEX_G_CONCRETE_R,
             ),
             ph.building.FacadeElement(
-                name="door", area=ref.EN12354_4_ANNEX_G_DOOR_AREA,
+                name="door",
+                area=ref.EN12354_4_ANNEX_G_DOOR_AREA,
                 r=ref.EN12354_4_ANNEX_G_DOOR_R,
             ),
         ],
@@ -232,14 +245,26 @@ def _chk_en12354_4_radiated() -> Outcome:
 def _chk_en12354_4_propagation() -> Outcome:
     # (width, height, distance, printed A'tot, side LWA, printed Lp).
     cells = [
-        (*ref.EN12354_4_ANNEX_G_ATTENUATION[0],
-         ref.EN12354_4_ANNEX_G_SIDE1_LWA, ref.EN12354_4_ANNEX_G_LP_SIDE1_D5),
-        (*ref.EN12354_4_ANNEX_G_ATTENUATION[1],
-         ref.EN12354_4_ANNEX_G_SIDE1_LWA, ref.EN12354_4_ANNEX_G_LP_SIDE1_D25),
-        (*ref.EN12354_4_ANNEX_G_ATTENUATION[2],
-         ref.EN12354_4_ANNEX_G_SIDE4_LWA, ref.EN12354_4_ANNEX_G_LP_SIDE4_D5),
-        (*ref.EN12354_4_ANNEX_G_ATTENUATION[3],
-         ref.EN12354_4_ANNEX_G_SIDE4_LWA, ref.EN12354_4_ANNEX_G_LP_SIDE4_D25),
+        (
+            *ref.EN12354_4_ANNEX_G_ATTENUATION[0],
+            ref.EN12354_4_ANNEX_G_SIDE1_LWA,
+            ref.EN12354_4_ANNEX_G_LP_SIDE1_D5,
+        ),
+        (
+            *ref.EN12354_4_ANNEX_G_ATTENUATION[1],
+            ref.EN12354_4_ANNEX_G_SIDE1_LWA,
+            ref.EN12354_4_ANNEX_G_LP_SIDE1_D25,
+        ),
+        (
+            *ref.EN12354_4_ANNEX_G_ATTENUATION[2],
+            ref.EN12354_4_ANNEX_G_SIDE4_LWA,
+            ref.EN12354_4_ANNEX_G_LP_SIDE4_D5,
+        ),
+        (
+            *ref.EN12354_4_ANNEX_G_ATTENUATION[3],
+            ref.EN12354_4_ANNEX_G_SIDE4_LWA,
+            ref.EN12354_4_ANNEX_G_LP_SIDE4_D25,
+        ),
     ]
     worst = 0.0
     computed_lp = []
@@ -277,7 +302,8 @@ def _chk_iso12999_table2_band() -> Outcome:
 )
 def _chk_iso12999_annex_b_values() -> Outcome:
     res = ph.building.weighted_rating_extended(
-        ref.ISO12999_1_ANNEX_B_RI, ref.ISO12999_1_ANNEX_B_FREQ,
+        ref.ISO12999_1_ANNEX_B_RI,
+        ref.ISO12999_1_ANNEX_B_FREQ,
         one_decimal=True,
     )
     assert res.c_50_5000 is not None and res.ctr_50_5000 is not None
@@ -313,12 +339,16 @@ def _chk_iso12999_annex_b_uncertainties() -> Outcome:
 
     ri = np.asarray(ref.ISO12999_1_ANNEX_B_RI, dtype=float)
     ui = np.asarray(ref.ISO12999_1_ANNEX_B_UI, dtype=float)
-    u_c = float(ph.building.single_number_uncertainty_uncorrelated(
-        ui, np.asarray(_SPECTRUM1_50_5000, dtype=float) - ri
-    ))
-    u_ctr = float(ph.building.single_number_uncertainty_uncorrelated(
-        ui, np.asarray(_SPECTRUM2_50_5000, dtype=float) - ri
-    ))
+    u_c = float(
+        ph.building.single_number_uncertainty_uncorrelated(
+            ui, np.asarray(_SPECTRUM1_50_5000, dtype=float) - ri
+        )
+    )
+    u_ctr = float(
+        ph.building.single_number_uncertainty_uncorrelated(
+            ui, np.asarray(_SPECTRUM2_50_5000, dtype=float) - ri
+        )
+    )
     up = ph.building.weighted_rating_extended(
         ri + ui, ref.ISO12999_1_ANNEX_B_FREQ, one_decimal=True
     ).rating
@@ -351,9 +381,7 @@ def _chk_iso12999_annex_b_uncertainties() -> Outcome:
 def _chk_iso12999_expanded() -> Outcome:
     u = ref.ISO12999_1_RW_A_STANDARD_UNCERTAINTY
     expected = ref.ISO12999_1_COVERAGE_K_95 * u
-    computed = float(
-        ph.building.insulation_expanded_uncertainty(u, coverage=0.95)
-    )
+    computed = float(ph.building.insulation_expanded_uncertainty(u, coverage=0.95))
     return numeric(expected, computed, 1e-9, unit="dB", places=6)
 
 
@@ -413,9 +441,7 @@ def _chk_iso12999_2_single_numbers() -> Outcome:
             ref.ISO12999_2_DLALPHA_EXAMPLE
         ).reported_expanded_uncertainty[0]
     )
-    ok = (
-        u_aw == ref.ISO12999_2_ALPHA_W_U_K2 and u_dl == ref.ISO12999_2_DLALPHA_U_K2
-    )
+    ok = u_aw == ref.ISO12999_2_ALPHA_W_U_K2 and u_dl == ref.ISO12999_2_DLALPHA_U_K2
     return Outcome(
         expected=f"alpha_w +/-{ref.ISO12999_2_ALPHA_W_U_K2}, "
         f"DLalpha +/-{ref.ISO12999_2_DLALPHA_U_K2} dB",

@@ -46,9 +46,7 @@ def generate_psd_confidence_smoothing(output_dir: str) -> None:
     res = signals.power_spectral_density(x, fs, nperseg=4096)
     band = (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
     freqs = res.frequencies[band]
-    smooth = signals.fractional_octave_smoothing(
-        res.frequencies, res.psd, 3.0
-    )[band]
+    smooth = signals.fractional_octave_smoothing(res.frequencies, res.psd, 3.0)[band]
     # The exact -3.01 dB/oct power law through the level at 1 kHz.
     i0 = int(np.argmin(np.abs(freqs - 1000.0)))
     ref_db = 10.0 * np.log10(smooth[i0]) - 10.0 * np.log10(freqs / freqs[i0])
@@ -58,28 +56,54 @@ def generate_psd_confidence_smoothing(output_dir: str) -> None:
         freqs,
         10.0 * np.log10(res.ci_lower[band]),
         10.0 * np.log10(res.ci_upper[band]),
-        color=COLOR_PRIMARY, alpha=0.28, lw=0.0,
-        label="95 % chi-square confidence interval")
-    ax.semilogx(freqs, 10.0 * np.log10(res.psd[band]), color=COLOR_PRIMARY,
-                linewidth=1.0, alpha=0.85, label="Welch PSD estimate")
-    ax.semilogx(freqs, 10.0 * np.log10(smooth), color=COLOR_SECONDARY,
-                linewidth=2.2, label="1/3-octave smoothed")
-    ax.semilogx(freqs, ref_db, color=COLOR_FG, linestyle="--", linewidth=1.4,
-                alpha=0.7, label="Exact −3.01 dB/octave power law")
+        color=COLOR_PRIMARY,
+        alpha=0.28,
+        lw=0.0,
+        label="95 % chi-square confidence interval",
+    )
+    ax.semilogx(
+        freqs,
+        10.0 * np.log10(res.psd[band]),
+        color=COLOR_PRIMARY,
+        linewidth=1.0,
+        alpha=0.85,
+        label="Welch PSD estimate",
+    )
+    ax.semilogx(
+        freqs,
+        10.0 * np.log10(smooth),
+        color=COLOR_SECONDARY,
+        linewidth=2.2,
+        label="1/3-octave smoothed",
+    )
+    ax.semilogx(
+        freqs,
+        ref_db,
+        color=COLOR_FG,
+        linestyle="--",
+        linewidth=1.4,
+        alpha=0.7,
+        label="Exact −3.01 dB/octave power law",
+    )
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("PSD [dB re 1/Hz]")
-    ax.set_title("Calibrated Spectral Density of Pink Noise (Bendat & Piersol)",
-                 pad=12)
+    ax.set_title("Calibrated Spectral Density of Pink Noise (Bendat & Piersol)", pad=12)
     ax.set_xlim(20.0, 20000.0)
     format_frequency_axis(ax, 20.0, 20000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
-    ax.text(0.985, 0.965,
-            f"$n_\\mathrm{{d}}$ = {res.n_averages:.0f} averages, "
-            f"$\\varepsilon_\\mathrm{{r}}$ = {100.0 * res.random_error:.1f} %",
-            transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
-            color=COLOR_FG)
+    ax.text(
+        0.985,
+        0.965,
+        f"$n_\\mathrm{{d}}$ = {res.n_averages:.0f} averages, "
+        f"$\\varepsilon_\\mathrm{{r}}$ = {100.0 * res.random_error:.1f} %",
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=8.5,
+        color=COLOR_FG,
+    )
     plt.tight_layout()
     save_figure(output_dir, "psd_confidence_smoothing.svg")
 
@@ -111,73 +135,117 @@ def generate_multitaper_psd_confidence(output_dir: str) -> None:
         welch.frequencies[wband],
         10.0 * np.log10(welch.ci_lower[wband]),
         10.0 * np.log10(welch.ci_upper[wband]),
-        color=COLOR_SECONDARY, alpha=0.20, lw=0.0,
-        label=f"Welch 95 % interval ($n_\\mathrm{{d}}$ = {welch.n_averages:.1f})")
-    ax.semilogx(welch.frequencies[wband],
-                10.0 * np.log10(welch.psd[wband]), color=COLOR_SECONDARY,
-                linewidth=0.9, alpha=0.9, label="Welch, nperseg = 2048")
+        color=COLOR_SECONDARY,
+        alpha=0.20,
+        lw=0.0,
+        label=f"Welch 95 % interval ($n_\\mathrm{{d}}$ = {welch.n_averages:.1f})",
+    )
+    ax.semilogx(
+        welch.frequencies[wband],
+        10.0 * np.log10(welch.psd[wband]),
+        color=COLOR_SECONDARY,
+        linewidth=0.9,
+        alpha=0.9,
+        label="Welch, nperseg = 2048",
+    )
     # The single-taper estimate is the noisy thing the multitaper estimate is
     # being compared against, so it is drawn back: as a grey chosen against
     # the page, not as a grey diluted into it.
-    ax.semilogx(freqs, 10.0 * np.log10(single.psd[band]),
-                color=theme_line("gray", ax, quiet=0.45), linewidth=0.7,
-                label="Single Slepian taper ($K$ = 1, $\\nu$ = 2)")
+    ax.semilogx(
+        freqs,
+        10.0 * np.log10(single.psd[band]),
+        color=theme_line("gray", ax, quiet=0.45),
+        linewidth=0.7,
+        label="Single Slepian taper ($K$ = 1, $\\nu$ = 2)",
+    )
     ax.fill_between(
         freqs,
         10.0 * np.log10(res.ci_lower[band]),
         10.0 * np.log10(res.ci_upper[band]),
-        color=COLOR_PRIMARY, alpha=0.28, lw=0.0,
-        label="95 % chi-square confidence interval")
-    ax.semilogx(freqs, 10.0 * np.log10(res.psd[band]), color=COLOR_PRIMARY,
-                linewidth=1.2, label="Multitaper estimate ($K$ = 7, adaptive)")
-    ax.semilogx(freqs, ref_db, color=COLOR_FG, linestyle="--", linewidth=1.4,
-                alpha=0.7, label="Exact −3.01 dB/octave power law")
+        color=COLOR_PRIMARY,
+        alpha=0.28,
+        lw=0.0,
+        label="95 % chi-square confidence interval",
+    )
+    ax.semilogx(
+        freqs,
+        10.0 * np.log10(res.psd[band]),
+        color=COLOR_PRIMARY,
+        linewidth=1.2,
+        label="Multitaper estimate ($K$ = 7, adaptive)",
+    )
+    ax.semilogx(
+        freqs,
+        ref_db,
+        color=COLOR_FG,
+        linestyle="--",
+        linewidth=1.4,
+        alpha=0.7,
+        label="Exact −3.01 dB/octave power law",
+    )
     ax.set_xlabel("Frequency [Hz]")
     ax.set_ylabel("PSD [dB re 1/Hz]")
     ax.set_title(
-        "Thomson Multitaper Density of a Short Record (Percival & Walden)",
-        pad=12)
+        "Thomson Multitaper Density of a Short Record (Percival & Walden)", pad=12
+    )
     ax.set_xlim(20.0, 20000.0)
     format_frequency_axis(ax, 20.0, 20000.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
     nu = float(np.mean(res.degrees_of_freedom[1:-1]))
-    ax.text(0.985, 0.965,
-            f"171 ms record, $NW$ = 4, "
-            f"$\\bar\\nu$ = {nu:.1f} equivalent dof",
-            transform=ax.transAxes, va="top", ha="right", fontsize=8.5,
-            color=COLOR_FG)
+    ax.text(
+        0.985,
+        0.965,
+        f"171 ms record, $NW$ = 4, $\\bar\\nu$ = {nu:.1f} equivalent dof",
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=8.5,
+        color=COLOR_FG,
+    )
 
     # --- Right: a high-dynamic-range case, where the adaptive weights earn
     # their keep and the equivalent degrees of freedom pay for it. ---
     n_hd = 1 << 15
     tt = np.arange(n_hd) / fs
     floor = signals.noise_signal(fs, n_hd / fs, color="pink", seed=3)
-    tone_amp = float(np.sqrt(np.mean(floor ** 2))) * 10 ** (60.0 / 20.0)
+    tone_amp = float(np.sqrt(np.mean(floor**2))) * 10 ** (60.0 / 20.0)
     hd = floor + tone_amp * np.sin(2 * np.pi * 1000.0 * tt)
     w_hd = signals.power_spectral_density(hd, fs, nperseg=4096)
     m_hd = signals.multitaper_psd(hd, fs)
     hb = (m_hd.frequencies >= 200.0) & (m_hd.frequencies <= 5000.0)
     wb = (w_hd.frequencies >= 200.0) & (w_hd.frequencies <= 5000.0)
-    ax_hd.semilogx(w_hd.frequencies[wb], 10.0 * np.log10(w_hd.psd[wb]),
-                   color=COLOR_SECONDARY, linewidth=1.0,
-                   label="Welch, Hann taper")
-    ax_hd.semilogx(m_hd.frequencies[hb], 10.0 * np.log10(m_hd.psd[hb]),
-                   color=COLOR_PRIMARY, linewidth=1.2,
-                   label="Multitaper, adaptive")
+    ax_hd.semilogx(
+        w_hd.frequencies[wb],
+        10.0 * np.log10(w_hd.psd[wb]),
+        color=COLOR_SECONDARY,
+        linewidth=1.0,
+        label="Welch, Hann taper",
+    )
+    ax_hd.semilogx(
+        m_hd.frequencies[hb],
+        10.0 * np.log10(m_hd.psd[hb]),
+        color=COLOR_PRIMARY,
+        linewidth=1.2,
+        label="Multitaper, adaptive",
+    )
     ax_hd.set_xlabel("Frequency [Hz]")
     ax_hd.set_ylabel("PSD [dB re 1/Hz]")
-    ax_hd.set_title("A 60 dB tone over a pink floor, and what it costs",
-                    pad=12)
+    ax_hd.set_title("A 60 dB tone over a pink floor, and what it costs", pad=12)
     ax_hd.set_xlim(200.0, 5000.0)
     format_frequency_axis(ax_hd, 200.0, 5000.0)
     ax_hd.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_hd.set_axisbelow(True)
     ax_dof = ax_hd.twinx()
-    ax_dof.semilogx(m_hd.frequencies[hb], m_hd.degrees_of_freedom[hb],
-                    color=COLOR_TERTIARY, linewidth=1.1, alpha=0.85,
-                    label="equivalent dof (right axis)")
+    ax_dof.semilogx(
+        m_hd.frequencies[hb],
+        m_hd.degrees_of_freedom[hb],
+        color=COLOR_TERTIARY,
+        linewidth=1.1,
+        alpha=0.85,
+        label="equivalent dof (right axis)",
+    )
     ax_dof.set_ylabel("Equivalent degrees of freedom")
     ax_dof.set_ylim(0.0, 2.4 * float(np.max(m_hd.degrees_of_freedom[hb])))
     # The twin axis carries its own x formatter, which would print 10^n.
@@ -198,7 +266,7 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
     from phonometry import signals
 
     fs = 48000.0
-    f_r, b_r = 1000.0, 25.0                 # a resonance of half-power width 25 Hz
+    f_r, b_r = 1000.0, 25.0  # a resonance of half-power width 25 Hz
     x = signals.noise_signal(fs, 20.0, color="white", seed=5)
     q = f_r / b_r
     b_coef, a_coef = scipy_signal.iirpeak(f_r, q, fs=fs)
@@ -216,14 +284,18 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
         level = 10.0 * np.log10(res.psd[band])
         if peak_ref is None or nperseg == lengths[-1]:
             peak_ref = float(np.max(level))
-        ax_l.plot(res.frequencies[band], level, color=color, linewidth=1.5,
-                  label=f"nperseg = {nperseg}, "
-                        f"$B_\\mathrm{{e}}$ = {res.resolution_bandwidth:.1f} Hz")
+        ax_l.plot(
+            res.frequencies[band],
+            level,
+            color=color,
+            linewidth=1.5,
+            label=f"nperseg = {nperseg}, "
+            f"$B_\\mathrm{{e}}$ = {res.resolution_bandwidth:.1f} Hz",
+        )
     ax_l.set_xlim(880.0, 1120.0)
     ax_l.set_xlabel(LABEL_FREQ_HZ)
     ax_l.set_ylabel("PSD [dB re 1/Hz]")
-    ax_l.set_title(f"A {b_r:.0f} Hz-wide resonance at {f_r:.0f} Hz",
-                   pad=10)
+    ax_l.set_title(f"A {b_r:.0f} Hz-wide resonance at {f_r:.0f} Hz", pad=10)
     ax_l.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_l.set_axisbelow(True)
     ax_l.legend(loc="upper right", fontsize=8.5)
@@ -232,31 +304,49 @@ def generate_psd_segment_tradeoff(output_dir: str) -> None:
     grid = 2 ** np.arange(9, 17)
     bias_db, random_db, measured = [], [], []
     for segment in grid:
-        res = signals.power_spectral_density(
-            resonant, fs, nperseg=int(segment)
-        )
+        res = signals.power_spectral_density(resonant, fs, nperseg=int(segment))
         eps_b = signals.resolution_bias_error(res.resolution_bandwidth, b_r)
         bias_db.append(-10.0 * np.log10(max(1.0 + eps_b, 1e-6)))
         random_db.append(10.0 * np.log10(1.0 + res.random_error))
         band = (res.frequencies >= 850.0) & (res.frequencies <= 1150.0)
         measured.append(float(np.max(10.0 * np.log10(res.psd[band]))))
     measured_db = np.asarray(measured)
-    ax_r.semilogx(grid, bias_db, "o-", color=COLOR_SECONDARY, base=2,
-                  label="resolution bias, "
-                        "$-10\\lg(1+\\varepsilon_\\mathrm{b})$ [dB]")
-    ax_r.semilogx(grid, random_db, "s-", color=COLOR_PRIMARY, base=2,
-                  label="random error, "
-                        "$10\\lg(1+1/\\sqrt{n_\\mathrm{d}})$ [dB]")
-    ax_r.semilogx(grid, measured_db.max() - measured_db, "^--", color=COLOR_TERTIARY,
-                  base=2, label="measured peak deficit [dB]")
+    ax_r.semilogx(
+        grid,
+        bias_db,
+        "o-",
+        color=COLOR_SECONDARY,
+        base=2,
+        label="resolution bias, $-10\\lg(1+\\varepsilon_\\mathrm{b})$ [dB]",
+    )
+    ax_r.semilogx(
+        grid,
+        random_db,
+        "s-",
+        color=COLOR_PRIMARY,
+        base=2,
+        label="random error, $10\\lg(1+1/\\sqrt{n_\\mathrm{d}})$ [dB]",
+    )
+    ax_r.semilogx(
+        grid,
+        measured_db.max() - measured_db,
+        "^--",
+        color=COLOR_TERTIARY,
+        base=2,
+        label="measured peak deficit [dB]",
+    )
     # bias - random falls monotonically with nperseg, so interpolate on the
     # reversed (increasing) difference to find where the two are equal.
     diff = np.asarray(bias_db) - np.asarray(random_db)
     cross = float(np.interp(0.0, diff[::-1], np.log2(grid)[::-1]))
-    ax_r.axvline(2 ** cross, color=COLOR_FG, linestyle=":", linewidth=1.3)
-    ax_r.text(2 ** cross * 1.25, 5.6,
-              f"the two errors are equal\nnear nperseg = {2 ** cross:.0f}",
-              fontsize=9, color=COLOR_FG)
+    ax_r.axvline(2**cross, color=COLOR_FG, linestyle=":", linewidth=1.3)
+    ax_r.text(
+        2**cross * 1.25,
+        5.6,
+        f"the two errors are equal\nnear nperseg = {2**cross:.0f}",
+        fontsize=9,
+        color=COLOR_FG,
+    )
     ax_r.set_ylim(0.0, 8.0)
     ax_r.set_xlabel("Segment length [samples]")
     ax_r.set_ylabel("Error [dB]")
@@ -279,9 +369,12 @@ def generate_noise_colors(output_dir: str) -> None:
     # The names are the generator's own literals, not free-form strings, so
     # spell the type out and a colour it does not know fails here.
     colors: tuple[tuple[NoiseColor, float, str], ...] = (
-        ("violet", 2.0, COLOR_QUATERNARY), ("blue", 1.0, COLOR_TERTIARY),
-        ("white", 0.0, COLOR_FG), ("pink", -1.0, COLOR_PRIMARY),
-        ("red", -2.0, COLOR_SECONDARY))
+        ("violet", 2.0, COLOR_QUATERNARY),
+        ("blue", 1.0, COLOR_TERTIARY),
+        ("white", 0.0, COLOR_FG),
+        ("pink", -1.0, COLOR_PRIMARY),
+        ("red", -2.0, COLOR_SECONDARY),
+    )
 
     _fig, ax = plt.subplots(figsize=(10, 6.4))
     for name, alpha, color in colors:
@@ -298,21 +391,28 @@ def generate_noise_colors(output_dir: str) -> None:
         # The measured trace sits behind its own exact law, so it has to
         # recede; by colour rather than by opacity, which on the dark page
         # takes the red and the blue down to the ground they sit on.
-        ax.semilogx(freqs, level, color=theme_line(color, ax, quiet=0.55),
-                    linewidth=1.0)
-        ax.semilogx(freqs, 3.0103 * alpha * np.log2(freqs / 1000.0),
-                    color=color, linestyle="--", linewidth=1.8,
-                    label=(f"{name}: measured "
-                           f"{_fmt_minus(slope, '+.4f')}, exact "
-                           f"{_fmt_minus(3.0103 * alpha, '+.4f')} "
-                           f"dB/octave"))
+        ax.semilogx(
+            freqs, level, color=theme_line(color, ax, quiet=0.55), linewidth=1.0
+        )
+        ax.semilogx(
+            freqs,
+            3.0103 * alpha * np.log2(freqs / 1000.0),
+            color=color,
+            linestyle="--",
+            linewidth=1.8,
+            label=(
+                f"{name}: measured "
+                f"{_fmt_minus(slope, '+.4f')}, exact "
+                f"{_fmt_minus(3.0103 * alpha, '+.4f')} "
+                f"dB/octave"
+            ),
+        )
     ax.set_xlim(20.0, 20000.0)
     ax.set_ylim(-42.0, 48.0)
     format_frequency_axis(ax, 20.0, 20000.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("PSD re its own 1 kHz level [dB]")
-    ax.set_title("The five colours of noise_signal, over three decades",
-                 pad=12)
+    ax.set_title("The five colours of noise_signal, over three decades", pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=8.5)
@@ -338,16 +438,13 @@ def generate_calibrated_spectrogram(output_dir: str) -> None:
     x = siren_rms * np.sqrt(2.0) * np.cos(phase)
     rng = np.random.default_rng(9)
     n_imp = int(0.06 * fs)
-    impact = rng.standard_normal(n_imp) * np.exp(
-        -np.arange(n_imp) / (0.012 * fs)
+    impact = rng.standard_normal(n_imp) * np.exp(-np.arange(n_imp) / (0.012 * fs))
+    x[int(2.5 * fs) : int(2.5 * fs) + n_imp] += 0.4 * impact
+    x += signals.noise_signal(
+        fs, duration, color="pink", rms=p_ref * 10.0 ** (45.0 / 20.0), seed=10
     )
-    x[int(2.5 * fs):int(2.5 * fs) + n_imp] += 0.4 * impact
-    x += signals.noise_signal(fs, duration, color="pink",
-                              rms=p_ref * 10.0 ** (45.0 / 20.0), seed=10)
 
-    res = signals.spectrogram(
-        x, fs, nperseg=1024, overlap=0.75, scaling="spectrum"
-    )
+    res = signals.spectrogram(x, fs, nperseg=1024, overlap=0.75, scaling="spectrum")
     level = 10.0 * np.log10(res.power / p_ref**2)
     vmax = float(np.ceil(level.max()))
 
@@ -355,23 +452,36 @@ def generate_calibrated_spectrogram(output_dir: str) -> None:
     half_hop = 0.5 * res.hop / fs
     df = float(res.frequencies[1] - res.frequencies[0])
     img = ax.imshow(
-        level, cmap="magma", vmin=vmax - 55.0, vmax=vmax, aspect="auto",
-        origin="lower", interpolation="nearest",
-        extent=(float(res.times[0]) - half_hop,
-                float(res.times[-1]) + half_hop,
-                0.0, float(res.frequencies[-1]) + 0.5 * df),
+        level,
+        cmap="magma",
+        vmin=vmax - 55.0,
+        vmax=vmax,
+        aspect="auto",
+        origin="lower",
+        interpolation="nearest",
+        extent=(
+            float(res.times[0]) - half_hop,
+            float(res.times[-1]) + half_hop,
+            0.0,
+            float(res.frequencies[-1]) + 0.5 * df,
+        ),
     )
     fig.colorbar(img, ax=ax, label="Sound pressure level [dB SPL]")
     ax.set_ylim(0.0, 3000.0)
     ax.set_xlabel("Time [s]")
     ax.set_ylabel(LABEL_FREQ_HZ)
-    ax.set_title("Calibrated Spectrogram in dB SPL (Bendat & Piersol)",
-                 pad=12)
-    ax.text(0.02, 0.965,
-            "a siren, an impact and a pink-noise floor:\n"
-            "every cell reads an absolute level",
-            transform=ax.transAxes, va="top", ha="left", fontsize=8.5,
-            color="white")
+    ax.set_title("Calibrated Spectrogram in dB SPL (Bendat & Piersol)", pad=12)
+    ax.text(
+        0.02,
+        0.965,
+        "a siren, an impact and a pink-noise floor:\n"
+        "every cell reads an absolute level",
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=8.5,
+        color="white",
+    )
     plt.tight_layout()
     save_figure(output_dir, "calibrated_spectrogram.png")
     plt.close()
@@ -386,9 +496,7 @@ def generate_zoom_fft_resolution(output_dir: str) -> None:
 
     fs = 8192.0
     t = np.arange(8192) / fs  # 1 s record: 1 Hz true resolution
-    x = 0.8 * np.cos(2.0 * np.pi * 997.0 * t) + 0.5 * np.cos(
-        2.0 * np.pi * 1000.0 * t
-    )
+    x = 0.8 * np.cos(2.0 * np.pi * 997.0 * t) + 0.5 * np.cos(2.0 * np.pi * 1000.0 * t)
 
     # Coarse view: a 1024-point FFT of the same record (8 Hz bins).
     w = sp_signal.get_window("hann", 1024)
@@ -401,30 +509,47 @@ def generate_zoom_fft_resolution(output_dir: str) -> None:
     res = signals.zoom_fft(x, fs, f_min=980.0, f_max=1016.0, n_points=145)
 
     _fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(coarse_f[band], 20.0 * np.log10(np.maximum(coarse[band], 1e-12)),
-            color=COLOR_SECONDARY, marker="o",
-            ms=4.0, lw=1.2, ls="--", label="1024-point FFT (8 Hz bins)")
-    ax.plot(res.frequencies,
-            20.0 * np.log10(np.maximum(res.amplitude, 1e-12)),
-            color=COLOR_PRIMARY, lw=1.6,
-            label="Zoom FFT of the same record")
+    ax.plot(
+        coarse_f[band],
+        20.0 * np.log10(np.maximum(coarse[band], 1e-12)),
+        color=COLOR_SECONDARY,
+        marker="o",
+        ms=4.0,
+        lw=1.2,
+        ls="--",
+        label="1024-point FFT (8 Hz bins)",
+    )
+    ax.plot(
+        res.frequencies,
+        20.0 * np.log10(np.maximum(res.amplitude, 1e-12)),
+        color=COLOR_PRIMARY,
+        lw=1.6,
+        label="Zoom FFT of the same record",
+    )
     for f0 in (997.0, 1000.0):
         ax.axvline(f0, color=COLOR_FG, ls=":", lw=1.0, alpha=0.6)
     ax.set_xlim(950.0, 1050.0)
     ax.set_ylim(-70.0, 5.0)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Amplitude [dB]")
-    ax.set_title("Zoom FFT Resolves Tones One Coarse Bin Apart "
-                 "(Bendat & Piersol)", pad=12)
+    ax.set_title(
+        "Zoom FFT Resolves Tones One Coarse Bin Apart (Bendat & Piersol)", pad=12
+    )
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
-    ax.text(0.015, 0.965,
-            "997 and 1000 Hz, 3 Hz apart:\n"
-            "one lump on the 8 Hz grid,\n"
-            "two exact lines on the zoom grid",
-            transform=ax.transAxes, va="top", ha="left", fontsize=8.5,
-            color=COLOR_FG)
+    ax.text(
+        0.015,
+        0.965,
+        "997 and 1000 Hz, 3 Hz apart:\n"
+        "one lump on the 8 Hz grid,\n"
+        "two exact lines on the zoom grid",
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=8.5,
+        color=COLOR_FG,
+    )
     plt.tight_layout()
     save_figure(output_dir, "zoom_fft_resolution.svg")
 
@@ -448,16 +573,23 @@ def generate_window_functions_tradeoff(output_dir: str) -> None:
         level = 20.0 * np.log10(spectrum / spectrum[0])
         bins = np.arange(level.size) / oversample
         shown = bins <= 16.0
-        ax.plot(bins[shown], level[shown], color=color, linestyle=style,
-                linewidth=1.4, alpha=0.9,
-                label=(f"{name}: ENBW {res.enbw_bins:.2f} bins, sidelobe "
-                       f"{_fmt_minus(res.highest_sidelobe_db, '.1f')} dB"))
+        ax.plot(
+            bins[shown],
+            level[shown],
+            color=color,
+            linestyle=style,
+            linewidth=1.4,
+            alpha=0.9,
+            label=(
+                f"{name}: ENBW {res.enbw_bins:.2f} bins, sidelobe "
+                f"{_fmt_minus(res.highest_sidelobe_db, '.1f')} dB"
+            ),
+        )
     ax.set_xlim(0.0, 16.0)
     ax.set_ylim(-100.0, 5.0)
     ax.set_xlabel("Frequency offset [DFT bins]")
     ax.set_ylabel("Level re main lobe [dB]")
-    ax.set_title("Window Functions: The Spectral Trade-off (Harris 1978)",
-                 pad=12)
+    ax.set_title("Window Functions: The Spectral Trade-off (Harris 1978)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
@@ -497,37 +629,66 @@ def generate_miso_coherence(output_dir: str) -> None:
         with np.errstate(divide="ignore"):
             return 10.0 * np.log10(v)
 
-    ax_top.semilogx(fb, db(res.output_psd[band]), color="gray", linewidth=1.4,
-                    label="Measured output")
+    ax_top.semilogx(
+        fb,
+        db(res.output_psd[band]),
+        color="gray",
+        linewidth=1.4,
+        label="Measured output",
+    )
     floor = db(res.output_psd[band]).min() - 5.0
     for i, color in ((0, COLOR_PRIMARY), (1, COLOR_TERTIARY)):
         level = db(res.coherent_output_spectra[i][band])
         # Both contributions rise from the same floor, so they stay
         # translucent and only their opacity follows the page.
-        ax_top.fill_between(fb, floor, level, color=color, lw=0.0,
-                            alpha=theme_fill_alpha(color, ax_top))
-        ax_top.semilogx(fb, level, color=color, linewidth=1.4,
-                        label=f"Input {i + 1} contribution")
-    ax_top.semilogx(fb, db(res.noise_psd[band]), color=COLOR_SECONDARY,
-                    linestyle="--", linewidth=1.1, label="Residual noise")
+        ax_top.fill_between(
+            fb, floor, level, color=color, lw=0.0, alpha=theme_fill_alpha(color, ax_top)
+        )
+        ax_top.semilogx(
+            fb, level, color=color, linewidth=1.4, label=f"Input {i + 1} contribution"
+        )
+    ax_top.semilogx(
+        fb,
+        db(res.noise_psd[band]),
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.1,
+        label="Residual noise",
+    )
     ax_top.set_ylim(floor, db(res.output_psd[band]).max() + 3.0)
     ax_top.set_ylabel("Coherent output [dB re 1/Hz]")
     ax_top.set_title(
         "Multiple-Input Coherence: Which Source Dominates Each Band "
-        "(Bendat & Piersol Ch. 7)", pad=12)
+        "(Bendat & Piersol Ch. 7)",
+        pad=12,
+    )
     ax_top.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_top.set_axisbelow(True)
     ax_top.legend(loc="lower center", fontsize=8.5, ncol=2)
 
-    ax_bot.semilogx(fb, res.ordinary_coherence[1][band], color=COLOR_TERTIARY,
-                    linestyle=":", linewidth=1.6,
-                    label=r"Input 2 ordinary $\gamma^2_{2y}$ (inflated by $x_1$)")
-    ax_bot.semilogx(fb, res.partial_coherence[1][band], color=COLOR_TERTIARY,
-                    linewidth=1.8,
-                    label=r"Input 2 partial $\gamma^2_{2y\cdot 1}$ ($x_1$ removed)")
-    ax_bot.semilogx(fb, res.multiple_coherence[band], color=COLOR_FG,
-                    linewidth=1.4, alpha=0.8,
-                    label=r"Multiple $\gamma^2_{y:x}$")
+    ax_bot.semilogx(
+        fb,
+        res.ordinary_coherence[1][band],
+        color=COLOR_TERTIARY,
+        linestyle=":",
+        linewidth=1.6,
+        label=r"Input 2 ordinary $\gamma^2_{2y}$ (inflated by $x_1$)",
+    )
+    ax_bot.semilogx(
+        fb,
+        res.partial_coherence[1][band],
+        color=COLOR_TERTIARY,
+        linewidth=1.8,
+        label=r"Input 2 partial $\gamma^2_{2y\cdot 1}$ ($x_1$ removed)",
+    )
+    ax_bot.semilogx(
+        fb,
+        res.multiple_coherence[band],
+        color=COLOR_FG,
+        linewidth=1.4,
+        alpha=0.8,
+        label=r"Multiple $\gamma^2_{y:x}$",
+    )
     ax_bot.set_ylim(0.0, 1.05)
     ax_bot.set_xlim(20.0, 4000.0)
     ax_bot.set_xlabel("Frequency [Hz]")
@@ -535,11 +696,17 @@ def generate_miso_coherence(output_dir: str) -> None:
     ax_bot.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_bot.set_axisbelow(True)
     ax_bot.legend(loc="center right", fontsize=8.5)
-    ax_bot.text(0.015, 0.05,
-                "conditioning removes the shared $x_1$ component:\n"
-                "the low-band ordinary coherence of $x_2$ collapses",
-                transform=ax_bot.transAxes, va="bottom", ha="left",
-                fontsize=8.5, color=COLOR_FG)
+    ax_bot.text(
+        0.015,
+        0.05,
+        "conditioning removes the shared $x_1$ component:\n"
+        "the low-band ordinary coherence of $x_2$ collapses",
+        transform=ax_bot.transAxes,
+        va="bottom",
+        ha="left",
+        fontsize=8.5,
+        color=COLOR_FG,
+    )
     for ax in (ax_top, ax_bot):
         format_frequency_axis(ax, 20.0, 4000.0)
     plt.tight_layout()
@@ -553,7 +720,7 @@ def generate_cross_spectral_density_delay(output_dir: str) -> None:
     from phonometry import signals
 
     fs = 8000.0
-    tau = 0.002                                   # 2 ms = 16 samples
+    tau = 0.002  # 2 ms = 16 samples
     delay = int(tau * fs)
     x = signals.noise_signal(fs, 8.0, seed=8)
     noise = signals.noise_signal(fs, 8.0, rms=0.3, seed=9)
@@ -565,21 +732,39 @@ def generate_cross_spectral_density_delay(output_dir: str) -> None:
     freqs = res.frequencies[band]
 
     _fig, (ax_m, ax_p) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
-    ax_m.semilogx(freqs, 10.0 * np.log10(np.maximum(res.magnitude[band], tiny)),
-                  color=COLOR_PRIMARY, linewidth=1.1,
-                  label=r"$|\hat{G}_{xy}|$ (Welch estimate)")
+    ax_m.semilogx(
+        freqs,
+        10.0 * np.log10(np.maximum(res.magnitude[band], tiny)),
+        color=COLOR_PRIMARY,
+        linewidth=1.1,
+        label=r"$|\hat{G}_{xy}|$ (Welch estimate)",
+    )
     ax_m.set_ylabel("Magnitude [dB]")
     ax_m.legend(loc="lower left", fontsize=9)
 
-    ax_p.semilogx(freqs, res.phase[band], color=COLOR_PRIMARY, linewidth=1.1,
-                  label="Unwrapped phase")
-    ax_p.fill_between(freqs, res.phase[band] - res.phase_std[band],
-                      res.phase[band] + res.phase_std[band],
-                      color=COLOR_PRIMARY, alpha=0.25,
-                      label=r"$\pm 1$ s.d. band (Eq. 9.52)")
-    ax_p.semilogx(freqs, -2.0 * np.pi * freqs * tau, color=COLOR_SECONDARY,
-                  linestyle="--", linewidth=1.4,
-                  label=r"slope $-2\pi f\tau$ ($\tau$ = 2 ms)")
+    ax_p.semilogx(
+        freqs,
+        res.phase[band],
+        color=COLOR_PRIMARY,
+        linewidth=1.1,
+        label="Unwrapped phase",
+    )
+    ax_p.fill_between(
+        freqs,
+        res.phase[band] - res.phase_std[band],
+        res.phase[band] + res.phase_std[band],
+        color=COLOR_PRIMARY,
+        alpha=0.25,
+        label=r"$\pm 1$ s.d. band (Eq. 9.52)",
+    )
+    ax_p.semilogx(
+        freqs,
+        -2.0 * np.pi * freqs * tau,
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.4,
+        label=r"slope $-2\pi f\tau$ ($\tau$ = 2 ms)",
+    )
     ax_p.set_ylabel("Phase [rad]")
     ax_p.set_xlabel(LABEL_FREQ_HZ)
     ax_p.legend(loc="lower left", fontsize=9)
@@ -588,8 +773,7 @@ def generate_cross_spectral_density_delay(output_dir: str) -> None:
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
         ax.set_axisbelow(True)
         format_frequency_axis(ax, 20.0, 3500.0)
-    ax_m.set_title("Cross-Spectral Density of a 2 ms Delay Path",
-                   pad=12)
+    ax_m.set_title("Cross-Spectral Density of a 2 ms Delay Path", pad=12)
     plt.tight_layout()
     save_figure(output_dir, "cross_spectral_density.svg")
     plt.close()
@@ -603,13 +787,11 @@ def generate_coherent_output_snr(output_dir: str) -> None:
     fs = 48000.0
     x = signals.noise_signal(fs, 8.0, color="white", seed=1)
     noise = signals.noise_signal(fs, 8.0, color="white", rms=0.5, seed=2)
-    y = 0.8 * x + noise                      # SNR = 0.64/0.25 per band
+    y = 0.8 * x + noise  # SNR = 0.64/0.25 per band
 
     res = signals.coherent_output_spectrum(x, y, fs, nperseg=2048)
     tiny = np.finfo(np.float64).tiny
-    band = np.flatnonzero(
-        (res.frequencies >= 20.0) & (res.frequencies <= 20000.0)
-    )
+    band = np.flatnonzero((res.frequencies >= 20.0) & (res.frequencies <= 20000.0))
     # Thin the flat spectra to ~1000 log-spaced bins: on a log axis the
     # linear Welch grid bunches thousands of vertices at the right edge
     # without adding visual information (and bloats the SVG).
@@ -618,25 +800,40 @@ def generate_coherent_output_snr(output_dir: str) -> None:
 
     _fig, (ax_g, ax_s) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
     for values, colour, style, label in (
-        (res.output_psd, COLOR_PRIMARY, "-",
-         r"$\hat{G}_{yy}$ (measured output)"),
-        (res.coherent_psd, COLOR_TERTIARY, "--",
-         r"$\hat{G}_{vv} = \gamma^2\hat{G}_{yy}$ (coherent part)"),
-        (res.noise_psd, COLOR_SECONDARY, ":",
-         r"$\hat{G}_{nn}$ (uncorrelated noise)"),
+        (res.output_psd, COLOR_PRIMARY, "-", r"$\hat{G}_{yy}$ (measured output)"),
+        (
+            res.coherent_psd,
+            COLOR_TERTIARY,
+            "--",
+            r"$\hat{G}_{vv} = \gamma^2\hat{G}_{yy}$ (coherent part)",
+        ),
+        (res.noise_psd, COLOR_SECONDARY, ":", r"$\hat{G}_{nn}$ (uncorrelated noise)"),
     ):
-        ax_g.semilogx(freqs,
-                      10.0 * np.log10(np.maximum(values[band], tiny)),
-                      color=colour, linestyle=style, linewidth=1.1,
-                      label=label)
+        ax_g.semilogx(
+            freqs,
+            10.0 * np.log10(np.maximum(values[band], tiny)),
+            color=colour,
+            linestyle=style,
+            linewidth=1.1,
+            label=label,
+        )
     ax_g.set_ylabel("Spectral density [dB re 1/Hz]")
     ax_g.legend(loc="lower left", fontsize=9)
 
-    ax_s.semilogx(freqs, res.snr_db[band], color=COLOR_PRIMARY,
-                  linewidth=1.1, label="Spectral SNR [dB]")
-    ax_s.axhline(10.0 * np.log10(0.64 / 0.25), color=COLOR_SECONDARY,
-                 linestyle="--", linewidth=1.4,
-                 label=r"closed form $10\log_{10}(2.56)$ = 4.1 dB")
+    ax_s.semilogx(
+        freqs,
+        res.snr_db[band],
+        color=COLOR_PRIMARY,
+        linewidth=1.1,
+        label="Spectral SNR [dB]",
+    )
+    ax_s.axhline(
+        10.0 * np.log10(0.64 / 0.25),
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.4,
+        label=r"closed form $10\log_{10}(2.56)$ = 4.1 dB",
+    )
     ax_s.set_ylabel("Spectral SNR [dB]")
     ax_s.set_xlabel(LABEL_FREQ_HZ)
     ax_s.legend(loc="lower left", fontsize=9)
@@ -646,8 +843,8 @@ def generate_coherent_output_snr(output_dir: str) -> None:
         ax.set_axisbelow(True)
         format_frequency_axis(ax, 20.0, 20000.0)
     ax_g.set_title(
-        "Coherent Output Spectrum and Spectral SNR (Bendat & Piersol 9.2.2)",
-        pad=12)
+        "Coherent Output Spectrum and Spectral SNR (Bendat & Piersol 9.2.2)", pad=12
+    )
     plt.tight_layout()
     save_figure(output_dir, "coherent_output_snr.svg")
     plt.close()

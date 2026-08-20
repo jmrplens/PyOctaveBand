@@ -60,6 +60,7 @@ def _write(tmp_path: Path, image: bytes, name: str = "forged.wav") -> Path:
 # Scaling: hand-computed values, exact equality
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize(
     ("bits", "codes", "expected"),
     [
@@ -68,10 +69,8 @@ def _write(tmp_path: Path, image: bytes, name: str = "forged.wav") -> Path:
         (16, [16384, -32768, 0, 32767], [0.5, -1.0, 0.0, 32767 / 32768]),
         # 24-bit: scipy returns the sample left-justified in int32, so
         # dividing by 2**31 is dividing the 24-bit code by 2**23.
-        (24, [2**22, -(2**23), 0, 2**23 - 1],
-         [0.5, -1.0, 0.0, (2**23 - 1) / 2**23]),
-        (32, [2**30, -(2**31), 0, 2**31 - 1],
-         [0.5, -1.0, 0.0, (2**31 - 1) / 2**31]),
+        (24, [2**22, -(2**23), 0, 2**23 - 1], [0.5, -1.0, 0.0, (2**23 - 1) / 2**23]),
+        (32, [2**30, -(2**31), 0, 2**31 - 1], [0.5, -1.0, 0.0, (2**31 - 1) / 2**31]),
     ],
     ids=["pcm8", "pcm16", "pcm24", "pcm32"],
 )
@@ -134,6 +133,7 @@ def test_read_memory_is_owned_and_writable(tmp_path: Path) -> None:
 # Calibration: the scaling constant cancels, as the docstring derives
 # ---------------------------------------------------------------------------
 
+
 def test_calibration_cancels_the_scaling_convention(tmp_path: Path) -> None:
     """Calibrator + measurement through the same reader fix absolute level.
 
@@ -151,8 +151,8 @@ def test_calibration_cancels_the_scaling_convention(tmp_path: Path) -> None:
         """What a 16-bit recorder writes: dithered rounding at 32767."""
         return np.round(x * 32767 + rng.uniform(-0.5, 0.5, x.size)).astype(np.int64)
 
-    cal_fs = 0.3        # calibrator tone at 0.3 of full scale...
-    meas_fs = 0.05      # ...and the measured signal 15.56 dB below it
+    cal_fs = 0.3  # calibrator tone at 0.3 of full scale...
+    meas_fs = 0.05  # ...and the measured signal 15.56 dB below it
     cal = np.sin(2 * np.pi * 1000 * t)
     meas = np.sin(2 * np.pi * 250 * t)
     cal_sig = read(_write(tmp_path, pcm_wav(record(cal_fs * cal), bits=16), "cal.wav"))
@@ -178,6 +178,7 @@ def test_calibration_factor_is_attached_not_applied(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # Metadata: EXTENSIBLE, RF64, bext, info()
 # ---------------------------------------------------------------------------
+
 
 def test_extensible_channel_mask_labels_the_channels(tmp_path: Path) -> None:
     image = riff_wave(
@@ -269,7 +270,7 @@ def test_truncated_data_is_refused_at_every_depth(tmp_path: Path) -> None:
 def _minimal_bext(originator: bytes) -> bytes:
     """A minimal v2 bext payload: originator at offset 256, version at 346."""
     buf = bytearray(602)
-    buf[256:256 + len(originator)] = originator
+    buf[256 : 256 + len(originator)] = originator
     struct.pack_into("<H", buf, 346, 2)
     return bytes(buf)
 
@@ -395,6 +396,7 @@ def test_info_answers_a_giant_rf64_from_its_headers_alone(
 # Dispatch: magic bytes, missing extra, unknown files
 # ---------------------------------------------------------------------------
 
+
 def test_unrecognised_bytes_are_rejected(tmp_path: Path) -> None:
     path = tmp_path / "noise.bin"
     path.write_bytes(b"\x00\x01\x02\x03 not audio at all")
@@ -448,6 +450,7 @@ def test_missing_audio_extra_is_named_in_the_error(
 # ---------------------------------------------------------------------------
 # The [audio] lane: lossy warning, FLAC, magic-over-extension
 # ---------------------------------------------------------------------------
+
 
 @needs_soundfile
 def test_mp3_read_warns_and_stamps_lossy(tmp_path: Path) -> None:

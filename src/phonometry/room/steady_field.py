@@ -236,9 +236,7 @@ def steady_state_spl(
     # Named r_const (not rc) to avoid confusion with the critical distance rc.
     r_const = np.asarray(room_constant, dtype=np.float64)
     directivity = require_positive(directivity, "directivity")
-    model = require_choice(
-        source_model, "source_model", tuple(SOURCE_POWER_MODELS)
-    )
+    model = require_choice(source_model, "source_model", tuple(SOURCE_POWER_MODELS))
     if np.any(r_const <= 0.0) or not np.all(np.isfinite(r_const)):
         raise ValueError("'room_constant' must be positive and finite.")
     bracket = 4.0 / r_const
@@ -285,7 +283,9 @@ class SteadyFieldResult:
     sound_power_level: float
     directivity: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot direct, reverberant and total SPL against distance.
 
         Marks the critical distance ``rc`` where the direct and reverberant
@@ -340,7 +340,11 @@ def steady_state_field(
             raise ValueError("'distances' must be positive and finite.")
 
     offset = (
-        10.0 * np.log10(require_positive(characteristic_impedance, "characteristic_impedance") / 400.0)
+        10.0
+        * np.log10(
+            require_positive(characteristic_impedance, "characteristic_impedance")
+            / 400.0
+        )
         if characteristic_impedance is not None
         else 0.0
     )
@@ -348,7 +352,10 @@ def steady_state_field(
     reverberant = np.full_like(r, lw + 10.0 * np.log10(4.0 / r_const) + offset)
     total = np.asarray(
         steady_state_spl(
-            lw, r, r_const, directivity=q,
+            lw,
+            r,
+            r_const,
+            directivity=q,
             characteristic_impedance=characteristic_impedance,
         ),
         dtype=np.float64,

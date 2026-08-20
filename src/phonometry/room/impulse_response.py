@@ -143,7 +143,7 @@ class ImpulseResponseResult:
     :func:`phonometry.room.decay_curve` and
     :func:`phonometry.speech.sti_from_impulse_response`. Indexing,
     ``len(result)`` and the ``size``/``ndim``/``shape``/``dtype`` attributes
-    forward to ``ir``. """
+    forward to ``ir``."""
 
     ir: np.ndarray
     fs: int | None
@@ -176,7 +176,9 @@ class ImpulseResponseResult:
     def dtype(self) -> np.dtype[Any]:
         return self.ir.dtype
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | np.ndarray:
         """Plot the impulse response: waveform and log-magnitude decay.
 
         Draws the (normalised) time-domain waveform and, below it, the
@@ -516,9 +518,7 @@ def mls_signal(order: int) -> np.ndarray:
     :return: The bipolar MLS samples (values in ``{-1.0, +1.0}``).
     """
     if order not in _MLS_TAPS:
-        raise ValueError(
-            f"order must be one of {sorted(_MLS_TAPS)} (got {order})"
-        )
+        raise ValueError(f"order must be one of {sorted(_MLS_TAPS)} (got {order})")
     taps = _MLS_TAPS[order]
     length = (1 << order) - 1
     # LFSR state as a boolean register, seeded with all ones (any non-zero
@@ -613,9 +613,7 @@ def mls_impulse_response(
     return ImpulseResponseResult(ir=out, fs=fs, method="mls")
 
 
-def _warn_alias_tail(
-    ir: np.ndarray, period: int, excitation: str, remedy: str
-) -> None:
+def _warn_alias_tail(ir: np.ndarray, period: int, excitation: str, remedy: str) -> None:
     """Warn when a circularly recovered IR keeps energy at the period end.
 
     A system IR longer than one excitation period aliases back into the
@@ -626,8 +624,8 @@ def _warn_alias_tail(
     peak = float(np.max(np.abs(ir)))
     if peak <= 0.0:
         return
-    tail = ir[int(0.9 * period):]
-    tail_rms = float(np.sqrt(np.mean(tail ** 2)))
+    tail = ir[int(0.9 * period) :]
+    tail_rms = float(np.sqrt(np.mean(tail**2)))
     if tail_rms > peak * 10.0 ** (_MLS_ALIAS_TAIL_DB / 20.0):
         warnings.warn(
             f"Recovered {excitation} impulse response still has energy near "
@@ -640,9 +638,7 @@ def _warn_alias_tail(
         )
 
 
-def _periodic_output(
-    ir: np.ndarray, period: int, length: int | None
-) -> np.ndarray:
+def _periodic_output(ir: np.ndarray, period: int, length: int | None) -> np.ndarray:
     """Trim or periodically extend a one-period IR to ``length`` samples."""
     out_len = length if length is not None else period
     if out_len <= period:
@@ -914,7 +910,7 @@ def _band_edge_taper(
     signal cannot carry an arbitrary DC magnitude).
     """
     f1, f2 = f_range
-    ratio = 2.0 ** _SHAPED_EDGE_OCTAVES
+    ratio = 2.0**_SHAPED_EDGE_OCTAVES
     lo_start = f1 / ratio
     hi_stop = min(f2 * ratio, fs / 2.0)
     weight = np.zeros_like(freqs)
@@ -924,8 +920,11 @@ def _band_edge_taper(
     if np.any(below):
         x = np.log2(freqs[below] / lo_start) / np.log2(f1 / lo_start)
         weight[below] = 0.5 - 0.5 * np.cos(np.pi * x)
-    above = (freqs > f2) & (freqs <= hi_stop) if hi_stop > f2 else \
-        np.zeros_like(freqs, dtype=bool)
+    above = (
+        (freqs > f2) & (freqs <= hi_stop)
+        if hi_stop > f2
+        else np.zeros_like(freqs, dtype=bool)
+    )
     if np.any(above):
         x = np.log2(freqs[above] / f2) / np.log2(hi_stop / f2)
         weight[above] = 0.5 + 0.5 * np.cos(np.pi * x)
@@ -1047,7 +1046,7 @@ def shaped_sweep_signal(
 
     # Group delay grows with the spectral power (Eqs. (11)-(12)); the
     # cumulative sum is the discrete form of the bin-by-bin recursion.
-    power = magnitude ** 2
+    power = magnitude**2
     tau = lead + seconds * np.cumsum(power) / float(np.sum(power))
 
     # Phase = -2*pi * integral of the group delay; then force the Nyquist
@@ -1069,10 +1068,10 @@ def shaped_sweep_signal(
     # edges onto the same sample, leaving an empty (or single-sample) core
     # that would make the statistic blow up; fall back to the whole
     # retained sweep in that degenerate case.
-    core = sweep[round(lead * fs_v):round((lead + seconds) * fs_v)]
+    core = sweep[round(lead * fs_v) : round((lead + seconds) * fs_v)]
     if core.size < 2:
         core = sweep
-    rms = float(np.sqrt(np.mean(core ** 2)))
+    rms = float(np.sqrt(np.mean(core**2)))
     crest_db = 20.0 * np.log10(float(np.max(np.abs(core))) / rms)
 
     return ShapedSweepResult(

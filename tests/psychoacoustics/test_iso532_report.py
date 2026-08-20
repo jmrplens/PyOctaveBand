@@ -22,8 +22,36 @@ from phonometry import ReportMetadata, psychoacoustics
 
 # A shaped 28-band one-third-octave spectrum (25 Hz..12.5 kHz), descending.
 _LEVELS = np.array(
-    [55, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43,
-     42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29],
+    [
+        55,
+        55,
+        54,
+        53,
+        52,
+        51,
+        50,
+        49,
+        48,
+        47,
+        46,
+        45,
+        44,
+        43,
+        42,
+        41,
+        40,
+        39,
+        38,
+        37,
+        36,
+        35,
+        34,
+        33,
+        32,
+        31,
+        30,
+        29,
+    ],
     dtype=float,
 )
 
@@ -31,9 +59,7 @@ _PDF_MAGIC = b"%PDF"
 
 
 def _result():
-    return psychoacoustics.loudness_zwicker_from_spectrum(
-        _LEVELS, field="free"
-    )
+    return psychoacoustics.loudness_zwicker_from_spectrum(_LEVELS, field="free")
 
 
 def _assert_pdf(path: str) -> None:
@@ -152,7 +178,11 @@ def test_time_varying_fiche_reports_nmax_percentiles_and_nt(tmp_path) -> None:
 
     fs = 48000
     t = np.arange(fs) / fs
-    x = 0.2 * np.sin(2.0 * np.pi * 1000.0 * t) * (1.0 + 0.5 * np.sin(2.0 * np.pi * 3.0 * t))
+    x = (
+        0.2
+        * np.sin(2.0 * np.pi * 1000.0 * t)
+        * (1.0 + 0.5 * np.sin(2.0 * np.pi * 3.0 * t))
+    )
     result = psychoacoustics.loudness_zwicker(x, fs, field="diffuse")
     assert result.n5 is not None
     assert result.time is not None

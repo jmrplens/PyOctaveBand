@@ -146,8 +146,14 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
         ]
         widths = [30.0, 29.0, 29.0, 29.0, 29.0, 28.0]
         rows_data = [
-            [labels[i], d1(lp_mean[i], language), d1(k1[i], language),
-             d1(k2[i], language), d1(lp[i], language), d1(lw[i], language)]
+            [
+                labels[i],
+                d1(lp_mean[i], language),
+                d1(k1[i], language),
+                d1(k2[i], language),
+                d1(lp[i], language),
+                d1(lw[i], language),
+            ]
             for i in range(n)
         ]
     elif verbose and precision:
@@ -159,8 +165,12 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
         ]
         widths = [45.0, 43.0, 43.0, 43.0]
         rows_data = [
-            [labels[i], d1(lp_mean[i], language), d1(lp[i], language),
-             d1(lw[i], language)]
+            [
+                labels[i],
+                d1(lp_mean[i], language),
+                d1(lp[i], language),
+                d1(lw[i], language),
+            ]
             for i in range(n)
         ]
     else:
@@ -171,8 +181,7 @@ def _value_table(result: Any, verbose: bool, language: str = "en") -> Any:
         ]
         widths = [58.0, 58.0, 58.0]
         rows_data = [
-            [labels[i], d1(lp[i], language), d1(lw[i], language)]
-            for i in range(n)
+            [labels[i], d1(lp[i], language), d1(lw[i], language)] for i in range(n)
         ]
 
     return power_value_table(header, rows_data, widths, fraction)
@@ -214,7 +223,9 @@ def _corrections_strip(result: Any, language: str = "en") -> str:
         ).format(
             c1=format_number(float(result.c1), language, decimals=2),
             c2=format_number(float(result.c2), language, decimals=2),
-            c3=range_str(np.atleast_1d(np.asarray(result.c3, dtype=np.float64)), language),
+            c3=range_str(
+                np.atleast_1d(np.asarray(result.c3, dtype=np.float64)), language
+            ),
         )
     return t(
         "Surface level L<sub>p</sub> is the energy average over the microphone "
@@ -224,8 +235,12 @@ def _corrections_strip(result: Any, language: str = "en") -> str:
         "(Eq. 18). Applied corrections K1 = {k1} dB, K2 = {k2} dB.",
         language,
     ).format(
-        k1=range_str(np.asarray(result.background_correction, dtype=np.float64), language),
-        k2=range_str(np.asarray(result.environmental_correction, dtype=np.float64), language),
+        k1=range_str(
+            np.asarray(result.background_correction, dtype=np.float64), language
+        ),
+        k2=range_str(
+            np.asarray(result.environmental_correction, dtype=np.float64), language
+        ),
     )
 
 
@@ -284,7 +299,8 @@ def render_sound_power_report(
     """
     statement, extended = _statement(result, language)
     return render_sound_power_fiche(
-        result, path,
+        result,
+        path,
         copy=FicheCopy(
             title=t("Sound power determination", language),
             basis=_basis(result, language),
@@ -292,9 +308,9 @@ def render_sound_power_report(
             statement=statement,
             extended=extended,
             basis_strips=[
-            _corrections_strip(result, language),
-            _a_weighting_strip(result, language),
-        ],
+                _corrections_strip(result, language),
+                _a_weighting_strip(result, language),
+            ],
         ),
         value_table=_value_table(result, verbose, language),
         metadata=metadata,

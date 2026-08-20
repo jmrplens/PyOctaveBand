@@ -64,9 +64,9 @@ _EJ_F0 = 4000.0
 _EJ_SRC_X, _EJ_JUNC_X = 0.45, 1.05
 _EJ_PLATE_Y = 0.36
 _EJ_VERT_LEN = 0.35
-_EJ_SPONGE = 120                      # 0.30 m absorbing skirt on every side
-_EJ_NY, _EJ_NX = 440, 680             # 1.10 m x 1.70 m
-_EJ_VIEW = (0.31, 1.39, 0.31, 0.78)   # x0, x1, y0, y1 kept in frame
+_EJ_SPONGE = 120  # 0.30 m absorbing skirt on every side
+_EJ_NY, _EJ_NX = 440, 680  # 1.10 m x 1.70 m
+_EJ_VIEW = (0.31, 1.39, 0.31, 0.78)  # x0, x1, y0, y1 kept in frame
 
 
 @lru_cache(maxsize=1)
@@ -102,13 +102,15 @@ def _plate_junction_fields() -> tuple[Any, Any, Any, Any, int]:
     every = 28
     n_active = int(np.ceil((t0 + 1.2 * tour / c_g) / (every * _EL_DT)))
 
-    r0 = round(_EJ_PLATE_Y / dx)                    # plate rows r0..r0+3
-    j0 = round(_EJ_JUNC_X / dx)                     # junction columns
+    r0 = round(_EJ_PLATE_Y / dx)  # plate rows r0..r0+3
+    j0 = round(_EJ_JUNC_X / dx)  # junction columns
     r_end = r0 + round((_EL_H + _EJ_VERT_LEN) / dx)
 
     def burst(t: float) -> float:
-        return float(np.exp(-(((t - t0) / sigma_t) ** 2))
-                     * np.sin(2.0 * np.pi * _EJ_F0 * (t - t0)))
+        return float(
+            np.exp(-(((t - t0) / sigma_t) ** 2))
+            * np.sin(2.0 * np.pi * _EJ_F0 * (t - t0))
+        )
 
     x0, x1, y0, y1 = _EJ_VIEW
     rows = slice(round(y0 / dx), round(y1 / dx), 2)
@@ -119,15 +121,14 @@ def _plate_junction_fields() -> tuple[Any, Any, Any, Any, int]:
         c_s = np.zeros((_EJ_NY, _EJ_NX))
         rho = np.full((_EJ_NY, _EJ_NX), _EL_RHO0)
         h_cols = slice(0, j0 + 4) if with_junction else slice(0, _EJ_NX)
-        c_p[r0:r0 + 4, h_cols] = _EL_CP
-        c_s[r0:r0 + 4, h_cols] = _EL_CS
-        rho[r0:r0 + 4, h_cols] = _EL_RHO
+        c_p[r0 : r0 + 4, h_cols] = _EL_CP
+        c_s[r0 : r0 + 4, h_cols] = _EL_CS
+        rho[r0 : r0 + 4, h_cols] = _EL_RHO
         if with_junction:
-            c_p[r0:r_end, j0:j0 + 4] = _EL_CP
-            c_s[r0:r_end, j0:j0 + 4] = _EL_CS
-            rho[r0:r_end, j0:j0 + 4] = _EL_RHO
-        sim = simulation.ElasticFDTD2D(c_p, c_s, dx, rho=rho,
-                                       sponge_width=_EJ_SPONGE)
+            c_p[r0:r_end, j0 : j0 + 4] = _EL_CP
+            c_s[r0:r_end, j0 : j0 + 4] = _EL_CS
+            rho[r0:r_end, j0 : j0 + 4] = _EL_RHO
+        sim = simulation.ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_EJ_SPONGE)
         # Vertical force on the top surface (the vy face between the air
         # row r0 - 1 and the first plate row): Lamb-style A0 launcher.
         sim.add_source(
@@ -174,9 +175,7 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     hl_ctrl, hl_junc, vl_junc = lines
     bp, m2 = _elastic_plate_bp_m2()
     c_pl = float(np.sqrt(12.0 * bp / (m2 * _EL_H**2)))
-    res = vibration.junction_transmission(
-        "L", _EL_H, c_pl, m2, _EL_H, c_pl, m2
-    )
+    res = vibration.junction_transmission("L", _EL_H, c_pl, m2, _EL_H, c_pl, m2)
     tau0 = float(res.corner[0])
     kij = float(res.corner_reduction_index)
     x0, x1, y0, y1 = _EJ_VIEW
@@ -190,9 +189,9 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     r0 = round(_EJ_PLATE_Y / dx)
     r_end = r0 + round((_EL_H + _EJ_VERT_LEN) / dx)
     c0, c1 = round(x0 / dx), round(x1 / dx)
-    x_h = (np.arange(c0, c1) + 0.5) * dx           # vy faces, cropped
-    x_hj = (np.arange(c0, j0 + 4) + 0.5) * dx      # up to the junction
-    y_v = (np.arange(r0, r_end) + 0.5) * dx        # vx faces, vertical
+    x_h = (np.arange(c0, c1) + 0.5) * dx  # vy faces, cropped
+    x_hj = (np.arange(c0, j0 + 4) + 0.5) * dx  # up to the junction
+    y_v = (np.arange(r0, r_end) + 0.5) * dx  # vx faces, vertical
     y_mid = _EJ_PLATE_Y + 0.5 * _EL_H
     x_mid = _EJ_JUNC_X + 2.0 * dx
 
@@ -201,87 +200,182 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
     # fixed 16:9 canvas, so every point of vertical padding costs 2.3 of
     # panel width: the layout pads and the title pads run tight to give
     # back part of the side bands the aspect ratio forces.
-    fig.get_layout_engine().set(h_pad=0.022, w_pad=0.015,
-                                hspace=0.0, wspace=0.0)
-    fig.suptitle(T("Bending waves at an L-junction (elastic 2D FDTD)"),
-                 )
+    fig.get_layout_engine().set(h_pad=0.022, w_pad=0.015, hspace=0.0, wspace=0.0)
+    fig.suptitle(
+        T("Bending waves at an L-junction (elastic 2D FDTD)"),
+    )
     axes = fig.subplots(2, 1, sharex=True)
-    titles = [T("Straight plate: the packet just runs on"),
-              T("L-junction: reflected, transmitted and mode-converted")]
-    verdicts = [T("nothing comes back"),
-                T(f"junction_transmission('L'): $\\tau(0°)$ = {tau0:.2f}, "
-                  f"$K_{{12}}$ = {kij:.1f} dB")]
+    titles = [
+        T("Straight plate: the packet just runs on"),
+        T("L-junction: reflected, transmitted and mode-converted"),
+    ]
+    verdicts = [
+        T("nothing comes back"),
+        T(
+            f"junction_transmission('L'): $\\tau(0°)$ = {tau0:.2f}, "
+            f"$K_{{12}}$ = {kij:.1f} dB"
+        ),
+    ]
     ims: list[Any] = []
     v_txts: list[Any] = []
     ln_arts: list[Any] = []
     for ax, title, data, with_junction in (
-            (axes[0], titles[0], v_ctrl, False),
-            (axes[1], titles[1], v_junc, True)):
+        (axes[0], titles[0], v_ctrl, False),
+        (axes[1], titles[1], v_junc, True),
+    ):
         ax.grid(False)
-        im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
-                       cmap="magma", vmin=0.0, vmax=vmax,
-                       aspect="equal", interpolation="bilinear")
+        im = ax.imshow(
+            data[0],
+            origin="upper",
+            extent=(x0, x1, y1, y0),
+            cmap="magma",
+            vmin=0.0,
+            vmax=vmax,
+            aspect="equal",
+            interpolation="bilinear",
+        )
         ax.set_title(title, fontsize=10, pad=3.0)
         # The 10 mm plates, drawn as thin open rectangles so the field
         # inside stays visible.
         px1 = _EJ_JUNC_X + 4 * _EL_DX if with_junction else x1
-        ax.add_patch(Rectangle((x0, _EJ_PLATE_Y), px1 - x0, _EL_H,
-                               facecolor="none", edgecolor=COLOR_FG,
-                               lw=0.7, alpha=0.8))
+        ax.add_patch(
+            Rectangle(
+                (x0, _EJ_PLATE_Y),
+                px1 - x0,
+                _EL_H,
+                facecolor="none",
+                edgecolor=COLOR_FG,
+                lw=0.7,
+                alpha=0.8,
+            )
+        )
         if with_junction:
             y_end = _EJ_PLATE_Y + _EL_H + _EJ_VERT_LEN
-            ax.add_patch(Rectangle((_EJ_JUNC_X, _EJ_PLATE_Y),
-                                   4 * _EL_DX, y_end - _EJ_PLATE_Y,
-                                   facecolor="none", edgecolor=COLOR_FG,
-                                   lw=0.7, alpha=0.8))
+            ax.add_patch(
+                Rectangle(
+                    (_EJ_JUNC_X, _EJ_PLATE_Y),
+                    4 * _EL_DX,
+                    y_end - _EJ_PLATE_Y,
+                    facecolor="none",
+                    edgecolor=COLOR_FG,
+                    lw=0.7,
+                    alpha=0.8,
+                )
+            )
             # The same dark pill the clip's other labels carry: white on
             # its own over magma, this one washed out to ~1.2:1 every time
             # the bright spot reached the free end, which is exactly when
             # the label matters.
-            ax.text(_EJ_JUNC_X - 0.055, y_end - 0.005, T("free end"),
-                    ha="right", va="bottom", color="white", fontsize=7,
-                    zorder=5,
-                    bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                          "alpha": 0.5, "edgecolor": "none"})
-        ax.plot([_EJ_SRC_X], [_EJ_PLATE_Y - 0.008], marker="v", ms=5,
-                color=COLOR_TERTIARY, markeredgecolor="white",
-                markeredgewidth=0.6, zorder=4)
+            ax.text(
+                _EJ_JUNC_X - 0.055,
+                y_end - 0.005,
+                T("free end"),
+                ha="right",
+                va="bottom",
+                color="white",
+                fontsize=7,
+                zorder=5,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.5,
+                    "edgecolor": "none",
+                },
+            )
+        ax.plot(
+            [_EJ_SRC_X],
+            [_EJ_PLATE_Y - 0.008],
+            marker="v",
+            ms=5,
+            color=COLOR_TERTIARY,
+            markeredgecolor="white",
+            markeredgewidth=0.6,
+            zorder=4,
+        )
         if not with_junction:
-            ax.text(x0 + 0.015, y1 - 0.02, T("4 kHz tone burst at ▼"),
-                    ha="left", va="bottom", color="white", fontsize=7.5,
-                    zorder=5,
-                    bbox={"boxstyle": _ANIM_PILL_BOX, "facecolor": "black",
-                          "alpha": 0.5, "edgecolor": "none"})
+            ax.text(
+                x0 + 0.015,
+                y1 - 0.02,
+                T("4 kHz tone burst at ▼"),
+                ha="left",
+                va="bottom",
+                color="white",
+                fontsize=7.5,
+                zorder=5,
+                bbox={
+                    "boxstyle": _ANIM_PILL_BOX,
+                    "facecolor": "black",
+                    "alpha": 0.5,
+                    "edgecolor": "none",
+                },
+            )
         # The exaggerated deflection lines riding on the plates.
         if with_junction:
-            (ln_h,) = ax.plot(x_hj, np.full(x_hj.size, y_mid), color="white",
-                              lw=1.1, alpha=0.85, zorder=3.5)
-            (ln_v,) = ax.plot(np.full(y_v.size, x_mid), y_v, color="white",
-                              lw=1.1, alpha=0.85, zorder=3.5)
+            (ln_h,) = ax.plot(
+                x_hj,
+                np.full(x_hj.size, y_mid),
+                color="white",
+                lw=1.1,
+                alpha=0.85,
+                zorder=3.5,
+            )
+            (ln_v,) = ax.plot(
+                np.full(y_v.size, x_mid),
+                y_v,
+                color="white",
+                lw=1.1,
+                alpha=0.85,
+                zorder=3.5,
+            )
             ln_arts += [ln_h, ln_v]
         else:
-            (ln_h,) = ax.plot(x_h, np.full(x_h.size, y_mid), color="white",
-                              lw=1.1, alpha=0.85, zorder=3.5)
+            (ln_h,) = ax.plot(
+                x_h,
+                np.full(x_h.size, y_mid),
+                color="white",
+                lw=1.1,
+                alpha=0.85,
+                zorder=3.5,
+            )
             ln_arts.append(ln_h)
         ax.set_ylim(y1, y0)
         ax.set_ylabel("y [m]", fontsize=8)
         ax.tick_params(labelsize=7)
         # Written out here so the clamp below measures the pill that will
         # actually be drawn; update() blanks it until the reveal.
-        v_txt = ax.text(x1 - 0.015, y1 - 0.02,
-                        verdicts[1 if with_junction else 0], ha="right",
-                        va="bottom", color="white", fontsize=8, zorder=5,
-                        bbox={"boxstyle": _ANIM_PILL_BOX,
-                              "facecolor": "black", "alpha": 0.5,
-                              "edgecolor": "none"})
+        v_txt = ax.text(
+            x1 - 0.015,
+            y1 - 0.02,
+            verdicts[1 if with_junction else 0],
+            ha="right",
+            va="bottom",
+            color="white",
+            fontsize=8,
+            zorder=5,
+            bbox={
+                "boxstyle": _ANIM_PILL_BOX,
+                "facecolor": "black",
+                "alpha": 0.5,
+                "edgecolor": "none",
+            },
+        )
         ims.append(im)
         v_txts.append(v_txt)
     axes[1].set_xlabel("x [m]", fontsize=8, labelpad=2.0)
     # Clock in the top-left corner, where anim_fdtd_aperture_slit and the
     # plurality of the field clips carry it; this clip was the one of its
     # batch with it top-right.
-    t_txt = fig.text(0.012, 0.985, "", ha="left", va="top",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    t_txt = fig.text(
+        0.012,
+        0.985,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
+
     # aspect="equal" makes the axes box narrower than its gridspec cell, so
     # a pill anchored a fixed distance inside the data limits still hung its
     # fill out over the page. Slide it back against the measured box.
@@ -297,16 +391,22 @@ def animate_elastic_plate_junction(output_dir: str) -> None:
         ims[0].set_data(v_ctrl[kf])
         ims[1].set_data(v_junc[kf])
         ln_arts[0].set_ydata(y_mid + gain * hl_ctrl[kf][c0:c1])
-        ln_arts[1].set_ydata(y_mid + gain * hl_junc[kf][c0:j0 + 4])
+        ln_arts[1].set_ydata(y_mid + gain * hl_junc[kf][c0 : j0 + 4])
         ln_arts[2].set_xdata(x_mid + gain * vl_junc[kf][r0:r_end])
         for row, v_txt in enumerate(v_txts):
             v_txt.set_text(verdicts[row] if k >= reveal else "")
         t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.2f} ms"))
         return (*ims, *ln_arts, *v_txts, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_elastic_plate_junction",
-                 frames=n_active + _ANIM_HOLD, gif_fps=6,
-                 measure=fit_verdicts)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_elastic_plate_junction",
+        frames=n_active + _ANIM_HOLD,
+        gif_fps=6,
+        measure=fit_verdicts,
+    )
 
 
 # Coincidence clip geometry [m]: the same 10 mm steel plate lying flat at
@@ -320,7 +420,7 @@ _EC_PLATE_Y = 0.65
 _EC_SRC_Y = 0.32
 _EC_THETA = 45.0
 _EC_SPONGE = 120
-_EC_NY, _EC_NX = 564, 1036            # 1.41 m x 2.59 m
+_EC_NY, _EC_NX = 564, 1036  # 1.41 m x 2.59 m
 # The view starts at x = 1.06 so that even its bottom-left corner sits
 # inside the steady 45-degree beam of the source aperture (the stationary
 # source point of a view point (x, y) is at x - (y - y_src) tan(theta),
@@ -421,12 +521,10 @@ def _coincidence_fields() -> tuple[Any, Any, Any, list[float], int]:
         c_p = np.full((_EC_NY, _EC_NX), _EL_C0)
         c_s = np.zeros((_EC_NY, _EC_NX))
         rho = np.full((_EC_NY, _EC_NX), _EL_RHO0)
-        c_p[r0:r0 + 4] = _EL_CP * _EC_CB_TUNE
-        c_s[r0:r0 + 4] = _EL_CS * _EC_CB_TUNE
-        rho[r0:r0 + 4] = _EL_RHO
-        sim = simulation.ElasticFDTD2D(
-            c_p, c_s, dx, rho=rho, sponge_width=_EC_SPONGE
-        )
+        c_p[r0 : r0 + 4] = _EL_CP * _EC_CB_TUNE
+        c_s[r0 : r0 + 4] = _EL_CS * _EC_CB_TUNE
+        rho[r0 : r0 + 4] = _EL_RHO
+        sim = simulation.ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_EC_SPONGE)
         omega = 2.0 * np.pi * f0
         phase_x = omega * np.sin(theta) * x_src / _EL_C0
         frames: list[Any] = []
@@ -445,7 +543,7 @@ def _coincidence_fields() -> tuple[Any, Any, Any, list[float], int]:
                 frames.append(sim.p[rows, cols].astype(np.float32))
                 ts.append(t)
         stack = np.stack(frames) / inc
-        tail = stack[3 * n_active // 4:]
+        tail = stack[3 * n_active // 4 :]
         # The stored rows start at y0; index the under-plate box within.
         rb0 = (b_rows.start - rows.start) // 2
         rb1 = (b_rows.stop - rows.start) // 2
@@ -474,8 +572,7 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     from phonometry import vibration
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     p_lo, p_hi, times, trans_db, n_active = _coincidence_fields()
     bp, m2 = _elastic_plate_bp_m2()
     fc = vibration.coincidence_frequency(m2, bp)
@@ -488,8 +585,11 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     i_below = (round((_EC_PLATE_Y + _EL_H) / dx) - round(y0 / dx)) // 2
     settled = slice(3 * n_active // 4, n_active)
     gain = _weak_field_gain(
-        np.concatenate([p_lo[settled, i_below:, :].ravel(),
-                        p_hi[settled, i_below:, :].ravel()]), _EC_VLIM)
+        np.concatenate(
+            [p_lo[settled, i_below:, :].ravel(), p_hi[settled, i_below:, :].ravel()]
+        ),
+        _EC_VLIM,
+    )
     p_lo = p_lo.copy()
     p_hi = p_hi.copy()
     for stack in (p_lo, p_hi):
@@ -503,19 +603,25 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     # no room of its own from the layout), the pads run tight, and the
     # display window is cropped on the right below so the panels use the
     # height instead.
-    fig.get_layout_engine().set(rect=(0.0, 0.065, 1.0, 0.935),
-                                h_pad=0.015, w_pad=0.015,
-                                hspace=0.0, wspace=0.0)
+    fig.get_layout_engine().set(
+        rect=(0.0, 0.065, 1.0, 0.935), h_pad=0.015, w_pad=0.015, hspace=0.0, wspace=0.0
+    )
     # Display-only crop: the run, the capture and the under-plate
     # transmitted-level average all keep the full stored span; the panels
     # just stop showing the last stripes of the periodic pattern, which
     # buys the equal-aspect boxes their height.
     x_hi = 1.905
-    fig.suptitle(T("Coincidence: the same steel plate, below and above "
-                   "$f_\\mathrm{c}$ (elastic 2D FDTD)"))
+    fig.suptitle(
+        T(
+            "Coincidence: the same steel plate, below and above "
+            "$f_\\mathrm{c}$ (elastic 2D FDTD)"
+        )
+    )
     axes = fig.subplots(1, 2, sharey=True)
-    titles = [T(f"$f = f_\\mathrm{{c}}/2$ = {fc / 2:.0f} Hz, 45° incidence"),
-              T(f"$f = 2f_\\mathrm{{c}}$ = {2 * fc:.0f} Hz, 45° incidence")]
+    titles = [
+        T(f"$f = f_\\mathrm{{c}}/2$ = {fc / 2:.0f} Hz, 45° incidence"),
+        T(f"$f = 2f_\\mathrm{{c}}$ = {2 * fc:.0f} Hz, 45° incidence"),
+    ]
     # Each panel is judged against the oblique mass law (Bies Eq. 7.41):
     # TL(theta) = 10 log10[1 + (pi f m'' cos(theta) / rho0 c0)^2]. Below f_c
     # the measured level lands on it; above f_c the trace-matched plate
@@ -523,62 +629,129 @@ def animate_elastic_coincidence(output_dir: str) -> None:
     # same level even though the mass law demands 12 dB more at 4x the
     # frequency.
     theta = np.radians(_EC_THETA)
-    ml = [10.0 * float(np.log10(1.0 + (np.pi * f * m2 * np.cos(theta)
-                                       / (_EL_RHO0 * _EL_C0)) ** 2))
-          for f in (0.5 * fc, 2.0 * fc)]
-    verdicts = [T(f"below $f_\\mathrm{{c}}$: the mass law holds: "
-                  f"{_fmt_minus(trans_db[0], '.0f')} dB "
-                  f"(it predicts {_fmt_minus(-ml[0], '.0f')})"),
-                T(f"above $f_\\mathrm{{c}}$: trace matches $\\lambda_\\mathrm{{B}}$: "
-                  f"{_fmt_minus(trans_db[1], '.0f')} dB, "
-                  f"the mass law said {_fmt_minus(-ml[1], '.0f')}")]
+    ml = [
+        10.0
+        * float(
+            np.log10(1.0 + (np.pi * f * m2 * np.cos(theta) / (_EL_RHO0 * _EL_C0)) ** 2)
+        )
+        for f in (0.5 * fc, 2.0 * fc)
+    ]
+    verdicts = [
+        T(
+            f"below $f_\\mathrm{{c}}$: the mass law holds: "
+            f"{_fmt_minus(trans_db[0], '.0f')} dB "
+            f"(it predicts {_fmt_minus(-ml[0], '.0f')})"
+        ),
+        T(
+            f"above $f_\\mathrm{{c}}$: trace matches $\\lambda_\\mathrm{{B}}$: "
+            f"{_fmt_minus(trans_db[1], '.0f')} dB, "
+            f"the mass law said {_fmt_minus(-ml[1], '.0f')}"
+        ),
+    ]
     ims: list[Any] = []
     v_txts: list[Any] = []
     for col, (ax, title, data) in enumerate(
-            ((axes[0], titles[0], p_lo), (axes[1], titles[1], p_hi))):
+        ((axes[0], titles[0], p_lo), (axes[1], titles[1], p_hi))
+    ):
         ax.grid(False)
-        im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
-                       cmap=CMAP_FIELD, vmin=-_EC_VLIM, vmax=_EC_VLIM,
-                       aspect="equal", interpolation="bilinear")
+        im = ax.imshow(
+            data[0],
+            origin="upper",
+            extent=(x0, x1, y1, y0),
+            cmap=CMAP_FIELD,
+            vmin=-_EC_VLIM,
+            vmax=_EC_VLIM,
+            aspect="equal",
+            interpolation="bilinear",
+        )
         ax.set_xlim(x0, x_hi)
         ax.set_title(title, fontsize=10, pad=3.0)
-        ax.add_patch(Rectangle((x0, _EC_PLATE_Y), x1 - x0, _EL_H,
-                               facecolor=COLOR_GRID, edgecolor=COLOR_FG,
-                               lw=0.8, zorder=3))
+        ax.add_patch(
+            Rectangle(
+                (x0, _EC_PLATE_Y),
+                x1 - x0,
+                _EL_H,
+                facecolor=COLOR_GRID,
+                edgecolor=COLOR_FG,
+                lw=0.8,
+                zorder=3,
+            )
+        )
         if col == 0:
             # Right-aligned at the far end of the plate it names: anchored
             # at the near end it grew, in Spanish, into the incidence
             # arrow, whose head then landed on the "0" of "10 mm" and left
             # the plate reading 1 mm thick.
-            ax.text(x_hi - 0.02, _EC_PLATE_Y - 0.012,
-                    T("10 mm steel plate"), ha="right", va="bottom",
-                    color=FIELD_INK, fontsize=7.5, path_effects=outline,
-                    zorder=4)
+            ax.text(
+                x_hi - 0.02,
+                _EC_PLATE_Y - 0.012,
+                T("10 mm steel plate"),
+                ha="right",
+                va="bottom",
+                color=FIELD_INK,
+                fontsize=7.5,
+                path_effects=outline,
+                zorder=4,
+            )
             ax.set_ylabel("y [m]", fontsize=8)
-        ax.text(x0 + 0.02, _EC_PLATE_Y + _EL_H + 0.012,
-                T(_gain_note("air below the plate", gain)), ha="left",
-                va="top", color=FIELD_INK, fontsize=6.5,
-                path_effects=outline, zorder=4)
+        ax.text(
+            x0 + 0.02,
+            _EC_PLATE_Y + _EL_H + 0.012,
+            T(_gain_note("air below the plate", gain)),
+            ha="left",
+            va="top",
+            color=FIELD_INK,
+            fontsize=6.5,
+            path_effects=outline,
+            zorder=4,
+        )
         # Incidence arrow at 45 degrees.
-        ax.annotate("", xy=(x0 + 0.34, y0 + 0.30),
-                    xytext=(x0 + 0.13, y0 + 0.09),
-                    arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                                "lw": 1.4}, zorder=4)
+        ax.annotate(
+            "",
+            xy=(x0 + 0.34, y0 + 0.30),
+            xytext=(x0 + 0.13, y0 + 0.09),
+            arrowprops={"arrowstyle": "-|>", "color": FIELD_INK, "lw": 1.4},
+            zorder=4,
+        )
         ax.set_xlabel("x [m]", fontsize=8, labelpad=2.0)
         ax.tick_params(labelsize=7)
-        v_txt = ax.text(x_hi - 0.02, y1 - 0.02, "", ha="right", va="bottom",
-                        color="white", fontsize=8, zorder=5,
-                        bbox={"boxstyle": _ANIM_PILL_BOX,
-                              "facecolor": "black", "alpha": 0.55,
-                              "edgecolor": "none"})
+        v_txt = ax.text(
+            x_hi - 0.02,
+            y1 - 0.02,
+            "",
+            ha="right",
+            va="bottom",
+            color="white",
+            fontsize=8,
+            zorder=5,
+            bbox={
+                "boxstyle": _ANIM_PILL_BOX,
+                "facecolor": "black",
+                "alpha": 0.55,
+                "edgecolor": "none",
+            },
+        )
         ims.append(im)
         v_txts.append(v_txt)
-    fc_txt = fig.text(0.5, 0.035,
-                      T(f"coincidence_frequency: $f_\\mathrm{{c}}$ = {fc:.0f} Hz "
-                        f"(10 mm steel)"), ha="center", va="bottom",
-                      fontsize=9, color=COLOR_FG)
-    t_txt = fig.text(0.985, 0.035, "", ha="right", va="bottom",
-                     family="monospace", fontsize=10, color=COLOR_FG)
+    fc_txt = fig.text(
+        0.5,
+        0.035,
+        T(f"coincidence_frequency: $f_\\mathrm{{c}}$ = {fc:.0f} Hz (10 mm steel)"),
+        ha="center",
+        va="bottom",
+        fontsize=9,
+        color=COLOR_FG,
+    )
+    t_txt = fig.text(
+        0.985,
+        0.035,
+        "",
+        ha="right",
+        va="bottom",
+        family="monospace",
+        fontsize=10,
+        color=COLOR_FG,
+    )
     reveal = int(0.75 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
@@ -590,5 +763,11 @@ def animate_elastic_coincidence(output_dir: str) -> None:
         t_txt.set_text(T(f"$t$ = {times[kf] * 1e3:5.2f} ms"))
         return (*ims, *v_txts, fc_txt, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_elastic_coincidence",
-                 frames=n_active + _ANIM_HOLD, gif_fps=5)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_elastic_coincidence",
+        frames=n_active + _ANIM_HOLD,
+        gif_fps=5,
+    )

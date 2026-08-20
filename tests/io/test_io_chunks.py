@@ -67,7 +67,7 @@ def _place(buf: bytearray, field: str, raw: bytes) -> None:
     """Write ``raw`` into ``buf`` at the field's Tech 3285 offset."""
     offset, size = BEXT_OFFSETS[field]
     assert len(raw) <= size, f"{field}: {len(raw)} bytes exceed the field's {size}"
-    buf[offset:offset + len(raw)] = raw
+    buf[offset : offset + len(raw)] = raw
 
 
 def _bext_payload(
@@ -105,19 +105,22 @@ def _read_bext(tmp_path: Path, payload: bytes):
 def test_bext_fields_read_at_tech3285_offsets(tmp_path: Path) -> None:
     """Every fixed field decodes from exactly its documented offset."""
     history = b"A=PCM,F=48000,W=24,M=stereo,T=field recorder\r\n"
-    bext = _read_bext(tmp_path, _bext_payload(
-        time_low=0x0002D2F0,  # 48000 Hz * 3.86 s, low half
-        time_high=0x00000001,
-        umid=bytes(range(64)),
-        loudness={
-            "LoudnessValue": -2300,        # -23.00 LUFS
-            "LoudnessRange": 550,          # 5.50 LU
-            "MaxTruePeakLevel": -102,      # -1.02 dBTP
-            "MaxMomentaryLoudness": -1875, # -18.75 LUFS
-            "MaxShortTermLoudness": -2010, # -20.10 LUFS
-        },
-        coding_history=history,
-    ))
+    bext = _read_bext(
+        tmp_path,
+        _bext_payload(
+            time_low=0x0002D2F0,  # 48000 Hz * 3.86 s, low half
+            time_high=0x00000001,
+            umid=bytes(range(64)),
+            loudness={
+                "LoudnessValue": -2300,  # -23.00 LUFS
+                "LoudnessRange": 550,  # 5.50 LU
+                "MaxTruePeakLevel": -102,  # -1.02 dBTP
+                "MaxMomentaryLoudness": -1875,  # -18.75 LUFS
+                "MaxShortTermLoudness": -2010,  # -20.10 LUFS
+            },
+            coding_history=history,
+        ),
+    )
     assert bext.description == "Facade measurement, position 1"
     assert bext.originator == "phonometry test rig"
     assert bext.originator_reference == "ESJMR0123456789012345678901234"
@@ -144,8 +147,10 @@ def test_bext_version_gates_umid_and_loudness(tmp_path: Path) -> None:
     v0 = _read_bext(tmp_path, _bext_payload(version=0, umid=b"\x42" * 64))
     assert v0.umid is None
     assert v0.loudness_value is None
-    v1 = _read_bext(tmp_path, _bext_payload(version=1, umid=b"\x42" * 64,
-                                            loudness={"LoudnessValue": -2300}))
+    v1 = _read_bext(
+        tmp_path,
+        _bext_payload(version=1, umid=b"\x42" * 64, loudness={"LoudnessValue": -2300}),
+    )
     assert v1.umid == b"\x42" * 64
     assert v1.loudness_value is None
     assert v1.loudness_range is None
@@ -153,12 +158,21 @@ def test_bext_version_gates_umid_and_loudness(tmp_path: Path) -> None:
 
 def test_bext_unset_loudness_sentinel_reads_as_none(tmp_path: Path) -> None:
     """Tech 3285 fills unset v2 loudness fields with 0x7FFF, not a value."""
-    bext = _read_bext(tmp_path, _bext_payload(
-        loudness={field: 0x7FFF for field in (
-            "LoudnessValue", "LoudnessRange", "MaxTruePeakLevel",
-            "MaxMomentaryLoudness", "MaxShortTermLoudness",
-        )},
-    ))
+    bext = _read_bext(
+        tmp_path,
+        _bext_payload(
+            loudness=dict.fromkeys(
+                (
+                    "LoudnessValue",
+                    "LoudnessRange",
+                    "MaxTruePeakLevel",
+                    "MaxMomentaryLoudness",
+                    "MaxShortTermLoudness",
+                ),
+                32767,
+            ),
+        ),
+    )
     assert bext.loudness_value is None
     assert bext.loudness_range is None
     assert bext.max_true_peak_level is None
@@ -177,9 +191,13 @@ def test_bext_shorter_than_fixed_part_is_rejected(tmp_path: Path) -> None:
 # fmt: EXTENSIBLE fields scipy drops
 # ---------------------------------------------------------------------------
 
+
 def test_extensible_fmt_keeps_mask_valid_bits_and_guid(tmp_path: Path) -> None:
     payload = extensible_fmt_payload(
-        channels=2, bits=32, valid_bits=24, channel_mask=0x3,
+        channels=2,
+        bits=32,
+        valid_bits=24,
+        channel_mask=0x3,
     )
     image = riff_wave(
         chunk(b"fmt ", payload),
@@ -213,7 +231,10 @@ def test_ambisonic_guid_resolves_to_pcm_and_is_flagged(tmp_path: Path) -> None:
     """A FuMa ``.amb`` GUID decodes as PCM but keeps its ambisonic identity."""
     ambisonic_tail = b"\x21\x07\xd3\x11\x86\x44\xc8\xc1\xca\x00\x00\x00"
     payload = extensible_fmt_payload(
-        channels=4, bits=16, channel_mask=0, sub_tag=0x0001,
+        channels=4,
+        bits=16,
+        channel_mask=0,
+        sub_tag=0x0001,
         guid_tail=b"\x00\x00" + ambisonic_tail,
     )
     image = riff_wave(
@@ -229,7 +250,9 @@ def test_ambisonic_guid_resolves_to_pcm_and_is_flagged(tmp_path: Path) -> None:
 def test_unknown_extensible_guid_keeps_the_raw_tag(tmp_path: Path) -> None:
     """An unrecognised SubFormat must not be silently read as its first bytes."""
     payload = extensible_fmt_payload(
-        channels=1, sub_tag=0x0001, guid_tail=b"\xde\xad" * 7,
+        channels=1,
+        sub_tag=0x0001,
+        guid_tail=b"\xde\xad" * 7,
     )
     image = riff_wave(
         chunk(b"fmt ", payload),
@@ -264,6 +287,7 @@ def test_unknown_codec_tags_fail_closed_as_lossy(tmp_path: Path) -> None:
 # RF64 / ds64
 # ---------------------------------------------------------------------------
 
+
 def test_rf64_data_size_comes_from_ds64(tmp_path: Path) -> None:
     """The 0xFFFFFFFF sentinel defers to the 64-bit ds64 sizes."""
     parsed = parse_wav_chunks(_write(tmp_path, rf64_wav(TONE)))
@@ -295,10 +319,13 @@ def test_bw64_fourcc_is_accepted(tmp_path: Path) -> None:
 # cue, fact, iXML, alignment, errors
 # ---------------------------------------------------------------------------
 
+
 def test_cue_points_decode_all_record_fields(tmp_path: Path) -> None:
-    records = struct.pack("<I", 2) + struct.pack(
-        "<II4sIII", 1, 0, b"data", 0, 0, 4800
-    ) + struct.pack("<II4sIII", 2, 1, b"data", 0, 0, 96000)
+    records = (
+        struct.pack("<I", 2)
+        + struct.pack("<II4sIII", 1, 0, b"data", 0, 0, 4800)
+        + struct.pack("<II4sIII", 2, 1, b"data", 0, 0, 96000)
+    )
     image = pcm_wav(TONE, extra_chunks=chunk(b"cue ", records))
     points = parse_wav_chunks(_write(tmp_path, image)).cue_points
     assert len(points) == 2
@@ -309,9 +336,7 @@ def test_cue_points_decode_all_record_fields(tmp_path: Path) -> None:
 
 
 def test_ixml_presence_is_reported(tmp_path: Path) -> None:
-    with_ixml = pcm_wav(
-        TONE, extra_chunks=chunk(b"iXML", b"<BWFXML></BWFXML>")
-    )
+    with_ixml = pcm_wav(TONE, extra_chunks=chunk(b"iXML", b"<BWFXML></BWFXML>"))
     assert parse_wav_chunks(_write(tmp_path, with_ixml)).has_ixml
     assert not parse_wav_chunks(_write(tmp_path, pcm_wav(TONE))).has_ixml
 
@@ -319,8 +344,7 @@ def test_ixml_presence_is_reported(tmp_path: Path) -> None:
 def test_fact_frames_govern_compressed_frame_count(tmp_path: Path) -> None:
     """For ADPCM the fact chunk counts frames; block division cannot."""
     image = riff_wave(
-        chunk(b"fmt ", fmt_payload(tag=WAVE_FORMAT_IMA_ADPCM, bits=4,
-                                   block_align=256)),
+        chunk(b"fmt ", fmt_payload(tag=WAVE_FORMAT_IMA_ADPCM, bits=4, block_align=256)),
         chunk(b"fact", struct.pack("<I", 5000)),
         chunk(b"data", bytes(512)),
     )
@@ -430,13 +454,21 @@ def test_data_before_metadata_chunks_is_still_walked(tmp_path: Path) -> None:
             "fact chunk is 2 bytes",
         ),
     ],
-    ids=["junk-form", "junk-fourcc", "no-data", "no-fmt", "short-fmt",
-         "truncated-chunk", "overdeclared-skipped-chunk", "truncated-fmt",
-         "short-cue", "short-ds64", "short-fact"],
+    ids=[
+        "junk-form",
+        "junk-fourcc",
+        "no-data",
+        "no-fmt",
+        "short-fmt",
+        "truncated-chunk",
+        "overdeclared-skipped-chunk",
+        "truncated-fmt",
+        "short-cue",
+        "short-ds64",
+        "short-fact",
+    ],
 )
-def test_malformed_files_fail_loudly(
-    tmp_path: Path, image: bytes, match: str
-) -> None:
+def test_malformed_files_fail_loudly(tmp_path: Path, image: bytes, match: str) -> None:
     path = _write(tmp_path, image)
     with pytest.raises(ValueError, match=match):
         parse_wav_chunks(path)

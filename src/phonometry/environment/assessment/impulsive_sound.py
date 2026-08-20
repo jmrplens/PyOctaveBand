@@ -79,6 +79,7 @@ if TYPE_CHECKING:
 class ImpulseProminenceWarning(PhonometryWarning):
     """A supplied level rise does not qualify as an impulse (clause 4.5)."""
 
+
 # ---------------------------------------------------------------------------
 # Normative constants (NT ACOU 112:2002).
 # ---------------------------------------------------------------------------
@@ -129,7 +130,9 @@ class ImpulseProminenceResult:
     adjustment: float
     assessment_period_min: float = DEFAULT_ASSESSMENT_PERIOD_MIN
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the adjustment curve ``KI(P)`` with the impulses marked.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -138,7 +141,9 @@ class ImpulseProminenceResult:
         from ..._i18n import check_language
         from ..._plot.environment import plot_impulse_prominence
 
-        return plot_impulse_prominence(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_impulse_prominence(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,
@@ -344,7 +349,9 @@ def rating_level(
         raise ValueError("laeq, adjustment and durations must have equal length.")
     if le.size == 0:
         raise ValueError("at least one sub-interval is required.")
-    if not (np.all(np.isfinite(le)) and np.all(np.isfinite(ki)) and np.all(np.isfinite(dt))):
+    if not (
+        np.all(np.isfinite(le)) and np.all(np.isfinite(ki)) and np.all(np.isfinite(dt))
+    ):
         raise ValueError("laeq, adjustment and durations must be finite.")
     if not math.isfinite(reference_time) or reference_time <= 0.0 or np.any(dt <= 0.0):
         raise ValueError("reference_time and durations must be positive.")
@@ -460,7 +467,9 @@ class ImpulsiveSoundResult:
             return None
         return max(qualifying, key=lambda o: o.prominence)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``LpAF`` versus time with the detected onsets marked.
 
         Draws the level history, the starting/end points of each onset, the
@@ -579,7 +588,10 @@ def sound_pressure_level_history(
     idx = np.arange(0, mean_square.size, step)
     sampled = mean_square[idx]
     floor = np.finfo(np.float64).tiny
-    levels = 10.0 * np.log10(np.maximum(sampled, floor) / reference_pressure**2) + calibration_offset
+    levels = (
+        10.0 * np.log10(np.maximum(sampled, floor) / reference_pressure**2)
+        + calibration_offset
+    )
     times = idx / fs
     # The realised interval, not the target: the step is quantised to whole
     # samples, so storing the request would put a dt in the result that its
@@ -594,10 +606,15 @@ def _equivalent_level(
     """A-weighted equivalent continuous level ``LAeq`` of the interval, in dB."""
     from ...filters.weighting import weighting_filter
 
-    weighted = np.asarray(weighting_filter(signal, round(fs), curve="A"), dtype=np.float64)
+    weighted = np.asarray(
+        weighting_filter(signal, round(fs), curve="A"), dtype=np.float64
+    )
     mean_square = float(np.mean(weighted**2))
     floor = np.finfo(np.float64).tiny
-    return float(10.0 * np.log10(max(mean_square, floor) / reference_pressure**2)) + calibration_offset
+    return (
+        float(10.0 * np.log10(max(mean_square, floor) / reference_pressure**2))
+        + calibration_offset
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -792,7 +809,11 @@ def impulsive_sound_adjustment(
     fs = resolve_fs(signal, fs, name="signal")
     x = np.asarray(resolve_samples(signal), dtype=np.float64).ravel()
     times, levels = sound_pressure_level_history(
-        x, fs, dt=dt, reference_pressure=reference_pressure, calibration_offset=calibration_offset
+        x,
+        fs,
+        dt=dt,
+        reference_pressure=reference_pressure,
+        calibration_offset=calibration_offset,
     )
     realised_dt = float(times[1] - times[0]) if times.size > 1 else dt
     onsets = detect_onsets(levels, realised_dt, onset_rate_method=onset_rate_method)
@@ -921,7 +942,9 @@ def _plot_impulsive_sound(
     from ..._plot.common import theme_line
 
     ink = theme_line(ax.xaxis.label.get_color(), ax, quiet=0.7)
-    ax.plot(result.times, result.levels, color=ink, lw=1.2, label=labels["level"], **kwargs)
+    ax.plot(
+        result.times, result.levels, color=ink, lw=1.2, label=labels["level"], **kwargs
+    )
 
     for onset in result.onsets:
         color = "tab:red" if onset.qualifies else "tab:orange"
@@ -953,7 +976,9 @@ def _plot_impulsive_sound(
             va="center",
         )
         summary = labels["summary"].format(
-            p=f"{result.prominence:.2f}", k=f"{result.adjustment:.2f}", cat=labels[result.category]
+            p=f"{result.prominence:.2f}",
+            k=f"{result.adjustment:.2f}",
+            cat=labels[result.category],
         )
     else:
         summary = labels["nosummary"]

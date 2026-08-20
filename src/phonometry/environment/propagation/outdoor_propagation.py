@@ -66,8 +66,16 @@ _DISTANCE_NOT_POSITIVE = "'distance' must be positive."
 #: (ISO 9613-2:1996, clause 7.5 writes ``lambda = 340/f``), in m/s.
 _C_SOUND = 340.0
 #: Nominal octave-band midband frequencies of the method (clause 1), in hertz.
-DEFAULT_FREQUENCIES: tuple[float, ...] = (63.0, 125.0, 250.0, 500.0, 1000.0,
-                                          2000.0, 4000.0, 8000.0)
+DEFAULT_FREQUENCIES: tuple[float, ...] = (
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
+)
 #: Barrier attenuation limit for single diffraction (clause 7.4), in dB.
 _DZ_LIMIT_SINGLE = 20.0
 #: Barrier attenuation limit for double diffraction (clause 7.4), in dB.
@@ -272,7 +280,9 @@ class OutdoorAttenuation:
     a_total: NDArray[np.float64]
     d_omega: NDArray[np.float64]
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the stacked per-band attenuation terms with the total.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -281,7 +291,9 @@ class OutdoorAttenuation:
         from ..._i18n import check_language
         from ..._plot.environment import plot_outdoor_attenuation
 
-        return plot_outdoor_attenuation(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_outdoor_attenuation(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def report(
         self,
@@ -346,7 +358,11 @@ class OutdoorAttenuation:
         from ..._report.iso9613 import render_outdoor_attenuation_report
 
         return render_outdoor_attenuation_report(
-            self, path, metadata=metadata, verbose=verbose, language=language,
+            self,
+            path,
+            metadata=metadata,
+            verbose=verbose,
+            language=language,
             source_emission=source_emission,
         )
 
@@ -442,8 +458,7 @@ def _d_prime(h: float, dp: float) -> float:
 
 # Float keys are safe: lookups always come from _nearest_nominal, which returns
 # these exact literals.
-_PRIME_BY_BAND = {125.0: _a_prime, 250.0: _b_prime, 500.0: _c_prime,
-                  1000.0: _d_prime}
+_PRIME_BY_BAND = {125.0: _a_prime, 250.0: _b_prime, 500.0: _c_prime, 1000.0: _d_prime}
 
 
 def _nearest_nominal(freq: float) -> float:
@@ -506,9 +521,11 @@ def ground_attenuation(
     :raises ValueError: If a ground factor is outside ``[0, 1]``, ``distance``
         is not positive, a height is negative, or a frequency is not positive.
     """
-    for name, g in (("ground_source", ground_source),
-                    ("ground_middle", ground_middle),
-                    ("ground_receiver", ground_receiver)):
+    for name, g in (
+        ("ground_source", ground_source),
+        ("ground_middle", ground_middle),
+        ("ground_receiver", ground_receiver),
+    ):
         if not 0.0 <= g <= 1.0:
             raise ValueError(f"'{name}' must be within [0, 1].")
     if distance <= 0.0:
@@ -518,8 +535,9 @@ def ground_attenuation(
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
     if np.any(freqs <= 0.0):
         raise ValueError("'frequencies' must be positive.")
-    dp = _projected_distance(distance, source_height, receiver_height,
-                             projected_distance)
+    dp = _projected_distance(
+        distance, source_height, receiver_height, projected_distance
+    )
 
     threshold = 30.0 * (source_height + receiver_height)
     q = 0.0 if dp <= threshold else 1.0 - threshold / dp
@@ -656,8 +674,9 @@ def barrier_attenuation(
     if barrier.lateral or z <= 0.0:
         kmet = 1.0  # Eq. (18): Kmet = 1 for z <= 0 and for lateral diffraction
     else:
-        kmet = float(np.exp(-(1.0 / 2000.0)
-                            * np.sqrt(dss * dsr * distance / (2.0 * z))))
+        kmet = float(
+            np.exp(-(1.0 / 2000.0) * np.sqrt(dss * dsr * distance / (2.0 * z)))
+        )
 
     out = np.empty_like(freqs)
     for i, f in enumerate(freqs):
@@ -717,8 +736,9 @@ def _projected_distance(
     """Ground-plane projected distance ``dp`` (default from ``d``, ``hs``, ``hr``)."""
     if projected_distance is not None:
         return projected_distance
-    return float(np.sqrt(max(distance**2 - (source_height - receiver_height) ** 2,
-                             0.0)))
+    return float(
+        np.sqrt(max(distance**2 - (source_height - receiver_height) ** 2, 0.0))
+    )
 
 
 def _compose_receiver_level(
@@ -793,20 +813,25 @@ def outdoor_propagation_attenuation(
     freqs = np.atleast_1d(np.asarray(frequencies, dtype=np.float64))
 
     a_div = np.full_like(freqs, geometric_divergence(distance))
-    a_atm = atmospheric_absorption(distance, freqs, temperature,
-                                   relative_humidity, pressure)
-    a_gr = ground_attenuation(distance, source_height, receiver_height, freqs,
-                              ground_source, ground_middle, ground_receiver,
-                              projected_distance)
+    a_atm = atmospheric_absorption(
+        distance, freqs, temperature, relative_humidity, pressure
+    )
+    a_gr = ground_attenuation(
+        distance,
+        source_height,
+        receiver_height,
+        freqs,
+        ground_source,
+        ground_middle,
+        ground_receiver,
+        projected_distance,
+    )
 
     if barrier is None:
         a_bar = np.zeros_like(freqs)
     else:
         dz = barrier_attenuation(barrier, distance, freqs)
-        if barrier.lateral:
-            a_bar = np.maximum(dz, 0.0)
-        else:
-            a_bar = np.maximum(dz - a_gr, 0.0)
+        a_bar = np.maximum(dz, 0.0) if barrier.lateral else np.maximum(dz - a_gr, 0.0)
 
     a_total = a_div + a_atm + a_gr + a_bar
     return OutdoorAttenuation(
@@ -867,21 +892,35 @@ def predicted_receiver_level(
     ground = GroundFactors() if ground is None else ground
     atmosphere = AtmosphericConditions() if atmosphere is None else atmosphere
     directivity = DirectivityCorrection() if directivity is None else directivity
-    humidity = (70.0 if atmosphere.relative_humidity is None
-                else atmosphere.relative_humidity)
+    humidity = (
+        70.0 if atmosphere.relative_humidity is None else atmosphere.relative_humidity
+    )
     lw = np.atleast_1d(np.asarray(sound_power_level, dtype=np.float64))
     attenuation = outdoor_propagation_attenuation(
-        geometry.distance, geometry.source_height, geometry.receiver_height,
-        frequencies, ground.source, ground.middle, ground.receiver, barrier,
-        atmosphere.temperature, humidity, atmosphere.pressure,
+        geometry.distance,
+        geometry.source_height,
+        geometry.receiver_height,
+        frequencies,
+        ground.source,
+        ground.middle,
+        ground.receiver,
+        barrier,
+        atmosphere.temperature,
+        humidity,
+        atmosphere.pressure,
         geometry.projected_distance,
     )
     cmet: float | None = None
     if c0 is not None:
-        dp = _projected_distance(geometry.distance, geometry.source_height,
-                                 geometry.receiver_height,
-                                 geometry.projected_distance)
-        cmet = meteorological_correction(dp, geometry.source_height,
-                                         geometry.receiver_height, c0)
-    return _compose_receiver_level(lw, directivity.index, directivity.d_omega,
-                                   attenuation.a_total, cmet)
+        dp = _projected_distance(
+            geometry.distance,
+            geometry.source_height,
+            geometry.receiver_height,
+            geometry.projected_distance,
+        )
+        cmet = meteorological_correction(
+            dp, geometry.source_height, geometry.receiver_height, c0
+        )
+    return _compose_receiver_level(
+        lw, directivity.index, directivity.d_omega, attenuation.a_total, cmet
+    )

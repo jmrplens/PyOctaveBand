@@ -154,9 +154,7 @@ def _check_panel(
                 f"got {type(well).__name__}."
             )
         if well.slit_height >= period:
-            raise ValueError(
-                f"wells[{i}].slit_height must be smaller than the period."
-            )
+            raise ValueError(f"wells[{i}].slit_height must be smaller than the period.")
     return cells
 
 
@@ -207,10 +205,12 @@ def metadiffuser_reflection(
             rows[i] = 1.0
             continue
         prediction = slit_helmholtz_absorber(
-            f, well.resonators,
+            f,
+            well.resonators,
             slit_height=well.slit_height,
             lattice_step=depth / len(well.resonators),
-            period=period, angle=angle,
+            period=period,
+            angle=angle,
             resonator_geometry=resonator_geometry,
             air=air,
         )
@@ -271,17 +271,26 @@ def metadiffuser_polar_response(
     """
     f = require_positive(frequency, "frequency")
     result = metadiffuser_reflection(
-        np.asarray([f]), wells, depth=depth, period=period,
+        np.asarray([f]),
+        wells,
+        depth=depth,
+        period=period,
         angle=float(np.radians(source_angle)),
-        resonator_geometry=resonator_geometry, air=air,
+        resonator_geometry=resonator_geometry,
+        air=air,
     )
     # Sci. Rep. Eq. (1) is the bare Fraunhofer integral of R(x): the
     # piecewise-constant wells carry the aperture factor, but there is no
     # Kirchhoff obliquity term, so it is disabled here for fidelity.
     return predict_diffuser_polar_response(
-        period, f, reflection=result.reflection[:, 0],
-        angles=angles, source_angle=source_angle, periods=periods,
-        speed_of_sound=air.speed_of_sound, include_obliquity=False,
+        period,
+        f,
+        reflection=result.reflection[:, 0],
+        angles=angles,
+        source_angle=source_angle,
+        periods=periods,
+        speed_of_sound=air.speed_of_sound,
+        include_obliquity=False,
     )
 
 
@@ -331,27 +340,39 @@ def metadiffuser_diffusion_spectrum(
     cells = _check_panel(wells, depth, period)
     flat = np.ones(len(cells), dtype=np.complex128)
     result = metadiffuser_reflection(
-        freqs, cells, depth=depth, period=period,
+        freqs,
+        cells,
+        depth=depth,
+        period=period,
         angle=float(np.radians(source_angle)),
-        resonator_geometry=resonator_geometry, air=air,
+        resonator_geometry=resonator_geometry,
+        air=air,
     )
     raw = np.empty(freqs.size, dtype=np.float64)
     norm = np.empty(freqs.size, dtype=np.float64)
     for i, f in enumerate(freqs):
         surface = predict_diffuser_polar_response(
-            period, float(f), reflection=result.reflection[:, i],
-            angles=angles, source_angle=source_angle, periods=periods,
-            speed_of_sound=air.speed_of_sound, include_obliquity=False,
+            period,
+            float(f),
+            reflection=result.reflection[:, i],
+            angles=angles,
+            source_angle=source_angle,
+            periods=periods,
+            speed_of_sound=air.speed_of_sound,
+            include_obliquity=False,
         )
         reference = predict_diffuser_polar_response(
-            period, float(f), reflection=flat,
-            angles=angles, source_angle=source_angle, periods=periods,
-            speed_of_sound=air.speed_of_sound, include_obliquity=False,
+            period,
+            float(f),
+            reflection=flat,
+            angles=angles,
+            source_angle=source_angle,
+            periods=periods,
+            speed_of_sound=air.speed_of_sound,
+            include_obliquity=False,
         )
         raw[i] = surface.coefficient
         norm[i] = float(
-            normalized_diffusion_coefficient(
-                surface.coefficient, reference.coefficient
-            )
+            normalized_diffusion_coefficient(surface.coefficient, reference.coefficient)
         )
     return diffusion_spectrum(freqs, raw, normalized=norm)

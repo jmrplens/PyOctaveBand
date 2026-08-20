@@ -17,8 +17,12 @@ import os
 # Deterministic output: pin numerical thread pools to a single thread before any
 # numeric backend initializes (see generate_graphs.py for the rationale).
 for _threads_var in (
-    "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
-    "NUMEXPR_NUM_THREADS", "NUMBA_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "NUMBA_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
 ):
     os.environ.setdefault(_threads_var, "1")
 

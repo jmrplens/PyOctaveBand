@@ -120,8 +120,16 @@ _C_SOUND = 343.0
 #: Default air density ``rho``, in kg/m3 (matches the materials domain).
 _AIR_DENSITY = 1.205
 #: Nominal octave-band midband frequencies, in hertz (as ISO 9613-2 clause 1).
-DEFAULT_FREQUENCIES: tuple[float, ...] = (63.0, 125.0, 250.0, 500.0, 1000.0,
-                                          2000.0, 4000.0, 8000.0)
+DEFAULT_FREQUENCIES: tuple[float, ...] = (
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
+)
 
 Complex = NDArray[np.complex128]
 Real = NDArray[np.float64]
@@ -158,24 +166,23 @@ def _normalized_ground_impedance(
     from ...materials.absorbers.porous import PorousMediumResult
 
     if (impedance is None) == (flow_resistivity is None):
-        raise ValueError(
-            "provide exactly one of 'impedance' or 'flow_resistivity'."
-        )
+        raise ValueError("provide exactly one of 'impedance' or 'flow_resistivity'.")
     if flow_resistivity is not None:
         sigma = require_positive(flow_resistivity, "flow_resistivity")
         if model == "delany_bazley":
-            medium = delany_bazley(frequency, sigma, speed_of_sound=speed_of_sound,
-                                   air_density=air_density)
+            medium = delany_bazley(
+                frequency, sigma, speed_of_sound=speed_of_sound, air_density=air_density
+            )
         elif model == "miki":
-            medium = miki(frequency, sigma, speed_of_sound=speed_of_sound,
-                          air_density=air_density)
+            medium = miki(
+                frequency, sigma, speed_of_sound=speed_of_sound, air_density=air_density
+            )
         else:
             raise ValueError(
                 f"unknown ground model {model!r}; options: 'delany_bazley', 'miki'."
             )
         # Materials e^{+j omega t} -> Salomons e^{-i omega t}: conjugate.
-        return np.asarray(np.conj(medium.normalized_impedance),
-                          dtype=np.complex128)
+        return np.asarray(np.conj(medium.normalized_impedance), dtype=np.complex128)
     if isinstance(impedance, PorousMediumResult):
         # Materials e^{+j omega t} -> Salomons e^{-i omega t}: conjugate.
         impedance = np.conj(impedance.normalized_impedance)
@@ -238,7 +245,9 @@ class SphericalGroundResult:
     r_direct: float
     r_reflected: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         r"""Plot the excess attenuation :math:`\Delta L` versus frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -247,7 +256,9 @@ class SphericalGroundResult:
         from ..._i18n import check_language
         from ..._plot.environment import plot_spherical_ground
 
-        return plot_spherical_ground(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_spherical_ground(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def spherical_reflection_coefficient(
@@ -382,8 +393,9 @@ def ground_effect(
         raise ValueError("'distance' must be positive.")
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
     f = require_positive_array(frequencies, "frequencies")
-    z = _normalized_ground_impedance(f, impedance, flow_resistivity, model,
-                                     speed_of_sound, air_density)
+    z = _normalized_ground_impedance(
+        f, impedance, flow_resistivity, model, speed_of_sound, air_density
+    )
     k = 2.0 * np.pi * f / speed_of_sound
     r1 = float(np.hypot(distance, source_height - receiver_height))
     r2 = float(np.hypot(distance, source_height + receiver_height))
@@ -431,9 +443,11 @@ def fresnel_number(
     :return: Fresnel number ``N`` per frequency.
     :raises ValueError: If a distance is not positive.
     """
-    for name, value in (("source_to_edge", source_to_edge),
-                        ("edge_to_receiver", edge_to_receiver),
-                        ("direct_distance", direct_distance)):
+    for name, value in (
+        ("source_to_edge", source_to_edge),
+        ("edge_to_receiver", edge_to_receiver),
+        ("direct_distance", direct_distance),
+    ):
         if value <= 0.0:
             raise ValueError(f"'{name}' must be positive.")
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
@@ -565,8 +579,9 @@ def _screen_field(
     x_plus = arg(r_reflected)
     p0 = np.exp(1j * k * r_path) / (4.0 * np.pi * r_path)
     return np.asarray(
-        p0 * (0.5 + 0.5j) * (_diffraction_integral(x_minus)
-                             + _diffraction_integral(x_plus)),
+        p0
+        * (0.5 + 0.5j)
+        * (_diffraction_integral(x_minus) + _diffraction_integral(x_plus)),
         dtype=np.complex128,
     )
 
@@ -607,7 +622,9 @@ class BarrierInsertionLoss:
     receiver_height: float | None = None
     thickness: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the insertion loss versus frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -616,8 +633,9 @@ class BarrierInsertionLoss:
         from ..._i18n import check_language
         from ..._plot.environment import plot_barrier_insertion_loss
 
-        return plot_barrier_insertion_loss(self, ax=ax, language=check_language(language), **kwargs)
-
+        return plot_barrier_insertion_loss(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
     def plot_geometry(
         self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
@@ -633,9 +651,8 @@ class BarrierInsertionLoss:
         from ..._plot.geometry import plot_barrier_result_geometry
 
         check_language(language)
-        return plot_barrier_result_geometry(
-            self, ax=ax, language=language, **kwargs
-        )
+        return plot_barrier_result_geometry(self, ax=ax, language=language, **kwargs)
+
     def report(
         self,
         path: str,
@@ -793,8 +810,12 @@ def barrier_insertion_loss(
         requested with ``method="kurze_anderson"``.
     """
     thickness = _validate_barrier_geometry(
-        source_height, barrier_distance, barrier_height, receiver_distance,
-        receiver_height, thickness,
+        source_height,
+        barrier_distance,
+        barrier_height,
+        receiver_distance,
+        receiver_height,
+        thickness,
     )
     has_ground = ground_impedance is not None or ground_flow_resistivity is not None
     speed_of_sound = require_positive(speed_of_sound, "speed_of_sound")
@@ -815,26 +836,26 @@ def barrier_insertion_loss(
 
     if method == "kurze_anderson":
         if has_ground:
-            raise ValueError(
-                "the coherent ground model requires method='exact'."
-            )
+            raise ValueError("the coherent ground model requires method='exact'.")
         il = kurze_anderson_attenuation(n)
     elif method == "exact":
-        il = _exact_barrier_il(_ExactBarrierSetup(
-            frequencies=f,
-            wavenumber=k,
-            source=source,
-            near_edge=edge,
-            far_edge=far_edge,
-            receiver=receiver,
-            thickness=thickness,
-            receiver_distance=receiver_distance,
-            speed_of_sound=speed_of_sound,
-            air_density=air_density,
-            ground_impedance=ground_impedance,
-            ground_flow_resistivity=ground_flow_resistivity,
-            ground_model=ground_model,
-        ))
+        il = _exact_barrier_il(
+            _ExactBarrierSetup(
+                frequencies=f,
+                wavenumber=k,
+                source=source,
+                near_edge=edge,
+                far_edge=far_edge,
+                receiver=receiver,
+                thickness=thickness,
+                receiver_distance=receiver_distance,
+                speed_of_sound=speed_of_sound,
+                air_density=air_density,
+                ground_impedance=ground_impedance,
+                ground_flow_resistivity=ground_flow_resistivity,
+                ground_model=ground_model,
+            )
+        )
     else:
         raise ValueError(
             f"unknown method {method!r}; options: 'kurze_anderson', 'exact'."
@@ -894,8 +915,10 @@ class _ExactBarrierSetup:
     @property
     def has_ground(self) -> bool:
         """Whether the coherent four-path ground model applies."""
-        return (self.ground_impedance is not None
-                or self.ground_flow_resistivity is not None)
+        return (
+            self.ground_impedance is not None
+            or self.ground_flow_resistivity is not None
+        )
 
 
 def _exact_barrier_il(setup: _ExactBarrierSetup) -> Real:
@@ -905,35 +928,42 @@ def _exact_barrier_il(setup: _ExactBarrierSetup) -> Real:
     near_edge, far_edge = setup.near_edge, setup.far_edge
     thickness = setup.thickness
     if not setup.has_ground:
-        p_diff = _diffracted_over_barrier(source, near_edge, far_edge, receiver,
-                                          thickness, k)
+        p_diff = _diffracted_over_barrier(
+            source, near_edge, far_edge, receiver, thickness, k
+        )
         r_direct = float(np.hypot(source[0] - receiver[0], source[1] - receiver[1]))
         p_free = np.exp(1j * k * r_direct) / (4.0 * np.pi * r_direct)
-        return np.asarray(-20.0 * np.log10(np.abs(p_diff) / np.abs(p_free)),
-                          dtype=np.float64)
+        return np.asarray(
+            -20.0 * np.log10(np.abs(p_diff) / np.abs(p_free)), dtype=np.float64
+        )
 
     z = _normalized_ground_impedance(
-        setup.frequencies, setup.ground_impedance, setup.ground_flow_resistivity,
-        setup.ground_model, setup.speed_of_sound, setup.air_density,
+        setup.frequencies,
+        setup.ground_impedance,
+        setup.ground_flow_resistivity,
+        setup.ground_model,
+        setup.speed_of_sound,
+        setup.air_density,
     )
     hs, hr = source[1], receiver[1]
     src_img = (source[0], -hs)
     rec_img = (receiver[0], -hr)
     # Spherical-wave reflection coefficient for the source-side and receiver-side
     # ground bounces (evaluated over the full source-receiver geometry).
-    q_src = spherical_reflection_coefficient(setup.frequencies, z, hs, hr,
-                                             setup.receiver_distance,
-                                             setup.speed_of_sound)
+    q_src = spherical_reflection_coefficient(
+        setup.frequencies, z, hs, hr, setup.receiver_distance, setup.speed_of_sound
+    )
     q_rec = q_src
     # Four diffracted paths: {source, source image} x {receiver, receiver image}.
     p_barrier = (
         _diffracted_over_barrier(source, near_edge, far_edge, receiver, thickness, k)
-        + q_src * _diffracted_over_barrier(src_img, near_edge, far_edge, receiver,
-                                           thickness, k)
-        + q_rec * _diffracted_over_barrier(source, near_edge, far_edge, rec_img,
-                                           thickness, k)
-        + q_src * q_rec * _diffracted_over_barrier(src_img, near_edge, far_edge,
-                                                   rec_img, thickness, k)
+        + q_src
+        * _diffracted_over_barrier(src_img, near_edge, far_edge, receiver, thickness, k)
+        + q_rec
+        * _diffracted_over_barrier(source, near_edge, far_edge, rec_img, thickness, k)
+        + q_src
+        * q_rec
+        * _diffracted_over_barrier(src_img, near_edge, far_edge, rec_img, thickness, k)
     )
     # Field without the barrier: the two-ray ground field.
     r1 = float(np.hypot(setup.receiver_distance, hs - hr))
@@ -943,5 +973,6 @@ def _exact_barrier_il(setup: _ExactBarrierSetup) -> Real:
         + q_src * np.exp(1j * k * r2) / (4.0 * np.pi * r2),
         dtype=np.complex128,
     )
-    return np.asarray(-20.0 * np.log10(np.abs(p_barrier) / np.abs(p_free_2ray)),
-                      dtype=np.float64)
+    return np.asarray(
+        -20.0 * np.log10(np.abs(p_barrier) / np.abs(p_free_2ray)), dtype=np.float64
+    )

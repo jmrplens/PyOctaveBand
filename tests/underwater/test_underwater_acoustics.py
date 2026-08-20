@@ -27,9 +27,7 @@ def test_spl_of_known_tone() -> None:
     amp = 2.0  # Pa
     x = _tone(500.0, 1.0, amp)
     expected = 20.0 * np.log10((amp / np.sqrt(2.0)) / 1e-6)
-    assert underwater.sound_pressure_level(x) == pytest.approx(
-        expected, rel=1e-9
-    )
+    assert underwater.sound_pressure_level(x) == pytest.approx(expected, rel=1e-9)
 
 
 def test_sel_of_known_tone() -> None:
@@ -38,18 +36,14 @@ def test_sel_of_known_tone() -> None:
     x = _tone(500.0, seconds, amp)
     spl = 20.0 * np.log10((amp / np.sqrt(2.0)) / 1e-6)
     expected = spl + 10.0 * np.log10(seconds)
-    assert underwater.sound_exposure_level(x, FS) == pytest.approx(
-        expected, rel=1e-6
-    )
+    assert underwater.sound_exposure_level(x, FS) == pytest.approx(expected, rel=1e-6)
 
 
 def test_peak_level_of_known_tone() -> None:
     amp = 3.0
     x = _tone(500.0, 0.5, amp)
     expected = 20.0 * np.log10(amp / 1e-6)
-    assert underwater.peak_sound_pressure_level(x) == pytest.approx(
-        expected, rel=1e-6
-    )
+    assert underwater.peak_sound_pressure_level(x) == pytest.approx(expected, rel=1e-6)
 
 
 def test_reference_conversion_round_trip() -> None:

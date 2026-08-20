@@ -110,7 +110,9 @@ class EnclosureResult:
     internal_area: float
     room_constant: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the panel ``R``, correction ``C`` and net insertion loss.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -283,9 +285,7 @@ def _resolve_interior(
 
 def enclosure_insertion_loss(
     panel_transmission_loss: (
-        ArrayLike
-        | Callable[[NDArray[np.float64]], ArrayLike]
-        | PanelTransmissionResult
+        ArrayLike | Callable[[NDArray[np.float64]], ArrayLike] | PanelTransmissionResult
     ),
     external_area: float,
     internal_area: float,
@@ -334,9 +334,7 @@ def enclosure_insertion_loss(
         result = cast("PanelTransmissionResult", panel_transmission_loss)
         if frequencies is None:
             frequencies = result.frequencies
-        panel_transmission_loss = np.asarray(
-            result.transmission_loss, dtype=np.float64
-        )
+        panel_transmission_loss = np.asarray(result.transmission_loss, dtype=np.float64)
 
     freqs, r_b, correction, r_i_b, s_e, s_i = _resolve_interior(
         panel_transmission_loss,

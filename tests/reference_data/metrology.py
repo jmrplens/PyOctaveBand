@@ -36,18 +36,18 @@ GUM_WELCH_VEFF = 40.0  # Welch-Satterthwaite effective degrees of freedom
 # untruncated veff, permitted by G.4.2 NOTE 1, gives 92.1 nm).
 GUM_H1_INPUTS = [
     # (value, standard uncertainty, dof)
-    (50_000_623.0, 25.0, 18.0),        # lS, nm
-    (215.0, 9.7, 25.6),                # d, nm
-    (11.5e-6, 1.2e-6, math.inf),       # alphaS, 1/degC
-    (-0.1, 0.41, math.inf),            # theta, degC
-    (0.0, 0.58e-6, 50.0),              # dalpha, 1/degC
-    (0.0, 0.029, 2.0),                 # dtheta, degC
+    (50_000_623.0, 25.0, 18.0),  # lS, nm
+    (215.0, 9.7, 25.6),  # d, nm
+    (11.5e-6, 1.2e-6, math.inf),  # alphaS, 1/degC
+    (-0.1, 0.41, math.inf),  # theta, degC
+    (0.0, 0.58e-6, 50.0),  # dalpha, 1/degC
+    (0.0, 0.029, 2.0),  # dtheta, degC
 ]
-GUM_H1_VALUE = 50_000_838.0            # nm
-GUM_H1_UC = 31.71                      # nm (printed 32)
+GUM_H1_VALUE = 50_000_838.0  # nm
+GUM_H1_UC = 31.71  # nm (printed 32)
 GUM_H1_CONTRIBUTIONS = [25.0, 9.7, 0.0, 0.0, 2.9, 16.7]
-GUM_H1_VEFF = 16.66                    # (printed truncated to 16)
-GUM_H1_U99 = 92.1                      # nm at the untruncated veff (printed 93)
+GUM_H1_VEFF = 16.66  # (printed truncated to 16)
+GUM_H1_U99 = 92.1  # nm at the untruncated veff (printed 93)
 
 # GUM Annex H.2 simultaneous resistance/reactance measurement: the only
 # published numeric oracle of the correlated Equation (16) path. Five
@@ -66,7 +66,7 @@ GUM_H2_OBSERVATIONS = [
     (4.990, 19.685, 1.0428),
     (4.999, 19.678, 1.0433),
 ]
-GUM_H2_RESULTS = {                     # measurand: (value / ohm, uc / ohm)
+GUM_H2_RESULTS = {  # measurand: (value / ohm, uc / ohm)
     "R": (127.732, 0.071),
     "X": (219.847, 0.295),
     "Z": (254.260, 0.236),

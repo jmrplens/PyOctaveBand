@@ -128,12 +128,16 @@ class BottomLossResult:
     reflection_coefficient: NDArray[np.complex128]
     critical_angle: float | None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the bottom loss versus grazing angle with the critical angle."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_bottom_loss
 
-        return plot_bottom_loss(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_bottom_loss(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def bottom_reflection_loss(
@@ -214,7 +218,9 @@ class SeabedReflection:
     rho2: float
     c2: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the reflection-coefficient magnitude ``|R|`` versus grazing angle.
 
         Draws ``|R|`` on a linear grazing-angle axis (0..90°), marking the
@@ -230,7 +236,9 @@ class SeabedReflection:
         from ..._i18n import check_language
         from ..._plot.underwater import plot_seabed_reflection
 
-        return plot_seabed_reflection(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_seabed_reflection(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def seabed_reflection(

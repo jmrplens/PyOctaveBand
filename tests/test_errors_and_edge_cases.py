@@ -28,22 +28,22 @@ def test_octave_filter_bank_invalid_init() -> None:
     """
     with pytest.raises(ValueError, match="fs' must be positive"):
         filters.OctaveFilterBank(fs=0)
-    
+
     with pytest.raises(ValueError, match="fraction' must be positive"):
         filters.OctaveFilterBank(fs=48000, fraction=-1)
-        
+
     with pytest.raises(ValueError, match="order' must be positive"):
         filters.OctaveFilterBank(fs=48000, order=0)
-        
+
     with pytest.raises(ValueError, match="list of two frequencies"):
         filters.OctaveFilterBank(fs=48000, limits=[1000])
-        
+
     with pytest.raises(ValueError, match="must be positive"):
         filters.OctaveFilterBank(fs=48000, limits=[-10, 1000])
-        
+
     with pytest.raises(ValueError, match="less than the upper limit"):
         filters.OctaveFilterBank(fs=48000, limits=[2000, 1000])
-        
+
     invalid_design = filters.FilterDesign(filter_type="invalid")
     with pytest.raises(ValueError, match="Invalid filter_type"):
         filters.OctaveFilterBank(fs=48000, design=invalid_design)
@@ -64,7 +64,9 @@ def test_weighting_filter_invalid() -> None:
     """
     rng = np.random.default_rng(42)
     x = rng.standard_normal(1000)
-    with pytest.raises(ValueError, match="must be 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'"):
+    with pytest.raises(
+        ValueError, match="must be 'A', 'B', 'C', 'D', 'G', 'AU' or 'Z'"
+    ):
         filters.weighting_filter(x, 48000, curve="E")
 
 
@@ -145,7 +147,7 @@ def test_octave_filter_vs_class_consistency() -> None:
     fraction = 3
     order = 6
     filter_type = "butter"
-    
+
     # 1. Using function
     spl_func, freq_func = filters.octave_filter(
         x,
@@ -154,7 +156,7 @@ def test_octave_filter_vs_class_consistency() -> None:
         order=order,
         design=filters.FilterDesign(filter_type=filter_type),
     )
-    
+
     # 2. Using class
     bank = filters.OctaveFilterBank(
         fs=fs,
@@ -163,7 +165,7 @@ def test_octave_filter_vs_class_consistency() -> None:
         design=filters.FilterDesign(filter_type=filter_type),
     )
     spl_class, freq_class = bank.filter(x)
-    
+
     assert np.allclose(spl_func, spl_class)
     assert np.allclose(freq_func, freq_class)
 
@@ -211,16 +213,16 @@ def test_multichannel_consistency() -> None:
     x1 = rng.standard_normal(fs)
     x2 = rng.standard_normal(fs)
     x_stereo = np.vstack((x1, x2))
-    
+
     bank = filters.OctaveFilterBank(fs, fraction=1)
-    
+
     # Separate
     spl1, _ = bank.filter(x1)
     spl2, _ = bank.filter(x2)
-    
+
     # Together
     spl_stereo, _ = bank.filter(x_stereo)
-    
+
     assert np.allclose(spl_stereo[0], spl1)
     assert np.allclose(spl_stereo[1], spl2)
 
@@ -237,9 +239,7 @@ def test_octave_filter_bank_repr() -> None:
 def test_octavefilter_limits_none() -> None:
     """Verify None limits use package defaults and return nominal labels."""
     rng = np.random.default_rng(42)
-    spl, _ = filters.octave_filter(
-        rng.standard_normal(1000), 1000, limits=None
-    )
+    spl, _ = filters.octave_filter(rng.standard_normal(1000), 1000, limits=None)
     assert len(spl) > 0
 
     freq, freq_d, freq_u, labels = nominal_frequencies(1, limits=None)

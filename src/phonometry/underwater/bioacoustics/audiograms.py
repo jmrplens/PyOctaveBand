@@ -118,7 +118,9 @@ ORCA_AUDIOGRAM_RANGE_KHZ = (0.5, 80.0)
 _ORCA_BREAKS = (11.3, 46.2)
 
 
-def audiogram_parameters(group: str, *, normalized: bool = False) -> AudiogramParameters:
+def audiogram_parameters(
+    group: str, *, normalized: bool = False
+) -> AudiogramParameters:
     """Fit parameters of a published group audiogram.
 
     :param group: Hearing-group code, one of :data:`AUDIOGRAM_GROUPS`
@@ -133,7 +135,9 @@ def audiogram_parameters(group: str, *, normalized: bool = False) -> AudiogramPa
     if key not in table:
         extra = (
             " Southall et al. publish no fitted audiogram for LF cetaceans"
-            " (the F1 parameter is never printed)." if key == "LF" else ""
+            " (the F1 parameter is never printed)."
+            if key == "LF"
+            else ""
         )
         raise ValueError(
             f"'group' must be one of {AUDIOGRAM_GROUPS}, got {group!r}.{extra}"
@@ -164,15 +168,21 @@ class AudiogramResult:
     best_frequency: float
     best_threshold: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the hearing threshold versus frequency."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_marine_mammal_audiogram
 
-        return plot_marine_mammal_audiogram(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_marine_mammal_audiogram(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
-def _frequency_khz(frequency_hz: NDArray[np.float64] | list[float] | float) -> NDArray[np.float64]:
+def _frequency_khz(
+    frequency_hz: NDArray[np.float64] | list[float] | float,
+) -> NDArray[np.float64]:
     f = np.atleast_1d(np.asarray(frequency_hz, dtype=np.float64))
     if f.size == 0 or not np.all(np.isfinite(f)):
         raise ValueError("'frequency_hz' must be finite and non-empty.")
@@ -182,8 +192,11 @@ def _frequency_khz(frequency_hz: NDArray[np.float64] | list[float] | float) -> N
 
 
 def _bundle(
-    freq_hz: NDArray[np.float64], threshold: NDArray[np.float64], group: str,
-    source: str, in_air: bool,
+    freq_hz: NDArray[np.float64],
+    threshold: NDArray[np.float64],
+    group: str,
+    source: str,
+    in_air: bool,
 ) -> AudiogramResult:
     best = int(np.argmin(threshold))
     return AudiogramResult(
@@ -224,8 +237,11 @@ def group_audiogram(
     )
     table = "Table 3 (normalized)" if normalized else "Table 2 (original)"
     return _bundle(
-        f_khz * 1000.0, np.asarray(threshold, dtype=np.float64), params.group,
-        f"Southall et al. (2019) Eq. (1), {table}", params.in_air,
+        f_khz * 1000.0,
+        np.asarray(threshold, dtype=np.float64),
+        params.group,
+        f"Southall et al. (2019) Eq. (1), {table}",
+        params.in_air,
     )
 
 
@@ -271,6 +287,9 @@ def orca_audiogram(
         ),
     )
     return _bundle(
-        f_khz * 1000.0, np.asarray(threshold, dtype=np.float64), "orca",
-        "Wensveen & Van Roij (2007) via Ainslie (2010) Eq. (11.159)", False,
+        f_khz * 1000.0,
+        np.asarray(threshold, dtype=np.float64),
+        "orca",
+        "Wensveen & Van Roij (2007) via Ainslie (2010) Eq. (11.159)",
+        False,
     )

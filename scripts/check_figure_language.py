@@ -100,57 +100,39 @@ IMAGES = _SCRIPTS.parent / ".github" / "images"
 #: because that says "looked at, and it is the same", which is a different
 #: statement from "do not translate this".
 ENGLISH_BY_DESIGN: dict[str, str] = {
-    'PlaneWaveSource("down", offset = 60)':
-        "the API call the figure documents, quoted as the reader would type it",
-    "narrowband=True (Goertzel)":
-        "a keyword argument of the API the figure documents, and the name of "
-        "the algorithm behind it",
-    "shape (4, N)":
-        "a numpy attribute and its value, as the reader sees it printed",
-    "OctaveFilterBank":
-        "a class name; translating it would name a class that does not exist",
-    "francois-garrison":
-        "the model= literal of seawater_absorption, quoted as the reader "
-        "would type it",
-    "ainslie-mccolm":
-        "the model= literal of seawater_absorption, quoted as the reader "
-        "would type it",
-    "thorp":
-        "the model= literal of seawater_absorption, quoted as the reader "
-        "would type it",
-    "unesco":
-        "the model= literal of sound_speed_profile, quoted as the reader "
-        "would type it",
-    "mackenzie":
-        "the model= literal of sound_speed_profile, quoted as the reader "
-        "would type it",
-    "medwin":
-        "the model= literal of sound_speed_profile, quoted as the reader "
-        "would type it",
-    "surfaces = [":
-        "the opening line of the surfaces input list the EN 12354-6 take-off "
-        "plate prints, code the reader types",
-    "objects = hard_object_absorption(volumes)":
-        "the API call the EN 12354-6 take-off plate documents, quoted as the "
-        "reader would type it",
-    "psi = object_fraction(volumes, 29.75)":
-        "the API call the EN 12354-6 take-off plate documents, quoted as the "
-        "reader would type it",
-    "'rigid_cross', 'through' / 'corner'":
-        "the junction_type= and path= literals of junction_vibration_reduction, "
-        "quoted as the reader would type them",
-    "'rigid_t', 'through' / 'corner'":
-        "the junction_type= and path= literals of junction_vibration_reduction, "
-        "quoted as the reader would type them",
-    "'flexible_t', 'through' / 'corner'":
-        "the junction_type= and path= literals of junction_vibration_reduction, "
-        "quoted as the reader would type them",
-    "'corner', 'corner'":
-        "the junction_type= and path= literals of junction_vibration_reduction, "
-        "quoted as the reader would type them",
-    "'thickness_change', 'through'":
-        "the junction_type= and path= literals of junction_vibration_reduction, "
-        "quoted as the reader would type them",
+    'PlaneWaveSource("down", offset = 60)': "the API call the figure documents, quoted as the reader would type it",
+    "narrowband=True (Goertzel)": "a keyword argument of the API the figure documents, and the name of "
+    "the algorithm behind it",
+    "shape (4, N)": "a numpy attribute and its value, as the reader sees it printed",
+    "OctaveFilterBank": "a class name; translating it would name a class that does not exist",
+    "francois-garrison": "the model= literal of seawater_absorption, quoted as the reader "
+    "would type it",
+    "ainslie-mccolm": "the model= literal of seawater_absorption, quoted as the reader "
+    "would type it",
+    "thorp": "the model= literal of seawater_absorption, quoted as the reader "
+    "would type it",
+    "unesco": "the model= literal of sound_speed_profile, quoted as the reader "
+    "would type it",
+    "mackenzie": "the model= literal of sound_speed_profile, quoted as the reader "
+    "would type it",
+    "medwin": "the model= literal of sound_speed_profile, quoted as the reader "
+    "would type it",
+    "surfaces = [": "the opening line of the surfaces input list the EN 12354-6 take-off "
+    "plate prints, code the reader types",
+    "objects = hard_object_absorption(volumes)": "the API call the EN 12354-6 take-off plate documents, quoted as the "
+    "reader would type it",
+    "psi = object_fraction(volumes, 29.75)": "the API call the EN 12354-6 take-off plate documents, quoted as the "
+    "reader would type it",
+    "'rigid_cross', 'through' / 'corner'": "the junction_type= and path= literals of junction_vibration_reduction, "
+    "quoted as the reader would type them",
+    "'rigid_t', 'through' / 'corner'": "the junction_type= and path= literals of junction_vibration_reduction, "
+    "quoted as the reader would type them",
+    "'flexible_t', 'through' / 'corner'": "the junction_type= and path= literals of junction_vibration_reduction, "
+    "quoted as the reader would type them",
+    "'corner', 'corner'": "the junction_type= and path= literals of junction_vibration_reduction, "
+    "quoted as the reader would type them",
+    "'thickness_change', 'through'": "the junction_type= and path= literals of junction_vibration_reduction, "
+    "quoted as the reader would type them",
     # The machine-fault line names drawn by FaultFrequencyResult.plot() are
     # the keys of the result the figure documents (res["2xGMF+1x"],
     # res["lobe n=1 m=2"]...), and the library draws line.name verbatim even
@@ -166,37 +148,27 @@ ENGLISH_BY_DESIGN: dict[str, str] = {
     "3xGMF+2x": "a FaultFrequencyResult key, drawn as the reader indexes it",
     "3xGMF-1x": "a FaultFrequencyResult key, drawn as the reader indexes it",
     "3xGMF-2x": "a FaultFrequencyResult key, drawn as the reader indexes it",
-    "fsh":
-        "the rotor-slot key of induction_motor_frequencies, drawn as the "
-        "reader indexes it",
-    "lobe n=1 m=2":
-        "a lobe-pattern key of blade_pass_frequencies, drawn as the reader "
-        "indexes it",
-    "lobe n=1 m=10":
-        "a lobe-pattern key of blade_pass_frequencies, drawn as the reader "
-        "indexes it",
-    "butter":
-        "the filter_type= literal of FilterDesign, quoted as the reader "
-        "would type it (architecture_tradeoff tick labels)",
-    "cheby1":
-        "the filter_type= literal of FilterDesign, quoted as the reader "
-        "would type it (architecture_tradeoff tick labels)",
-    "cheby2":
-        "the filter_type= literal of FilterDesign, quoted as the reader "
-        "would type it (architecture_tradeoff tick labels)",
-    "ellip":
-        "the filter_type= literal of FilterDesign, quoted as the reader "
-        "would type it (architecture_tradeoff tick labels)",
-    "bessel":
-        "the filter_type= literal of FilterDesign, quoted as the reader "
-        "would type it (architecture_tradeoff tick labels)",
+    "fsh": "the rotor-slot key of induction_motor_frequencies, drawn as the "
+    "reader indexes it",
+    "lobe n=1 m=2": "a lobe-pattern key of blade_pass_frequencies, drawn as the reader "
+    "indexes it",
+    "lobe n=1 m=10": "a lobe-pattern key of blade_pass_frequencies, drawn as the reader "
+    "indexes it",
+    "butter": "the filter_type= literal of FilterDesign, quoted as the reader "
+    "would type it (architecture_tradeoff tick labels)",
+    "cheby1": "the filter_type= literal of FilterDesign, quoted as the reader "
+    "would type it (architecture_tradeoff tick labels)",
+    "cheby2": "the filter_type= literal of FilterDesign, quoted as the reader "
+    "would type it (architecture_tradeoff tick labels)",
+    "ellip": "the filter_type= literal of FilterDesign, quoted as the reader "
+    "would type it (architecture_tradeoff tick labels)",
+    "bessel": "the filter_type= literal of FilterDesign, quoted as the reader "
+    "would type it (architecture_tradeoff tick labels)",
     "octave_filter · leq · laeq · sel · ln_levels · lc_peak · "
-    "OctaveFilterBank":
-        "the level functions and the bank class of the API, listed as the "
-        "reader would type them (calibration data-flow plate)",
-    "laeq · sel · lc_peak":
-        "the level functions of the API, listed as the reader would type "
-        "them (sound-level-meter pipeline plate)",
+    "OctaveFilterBank": "the level functions and the bank class of the API, listed as the "
+    "reader would type them (calibration data-flow plate)",
+    "laeq · sel · lc_peak": "the level functions of the API, listed as the reader would type "
+    "them (sound-level-meter pipeline plate)",
 }
 
 # A run of at least three letters, in any alphabet: shorter runs are unit and
@@ -313,8 +285,13 @@ def committed_assets() -> tuple[set[str], set[str]]:
     return required, optional
 
 
-def report(found: dict[str, set[str]], baseline: dict[str, set[str]],
-           optional: set[str], *, partial: bool) -> int:
+def report(
+    found: dict[str, set[str]],
+    baseline: dict[str, set[str]],
+    optional: set[str],
+    *,
+    partial: bool,
+) -> int:
     """Compare the run against the baseline in both directions."""
     problems: list[str] = []
 
@@ -352,8 +329,7 @@ def report(found: dict[str, set[str]], baseline: dict[str, set[str]],
                 f"(translated, allowlisted or gone):"
             )
             for stem, text in stale:
-                problems.append(
-                    f"  {stem}: {json.dumps(text, ensure_ascii=False)}")
+                problems.append(f"  {stem}: {json.dumps(text, ensure_ascii=False)}")
             problems.append(
                 f"  -> delete them from {BASELINE.name}. The baseline only "
                 "ratchets down if a paid-off line is removed."
@@ -376,15 +352,19 @@ def report(found: dict[str, set[str]], baseline: dict[str, set[str]],
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
-        "--audit", default=audit.DEFAULT_DIR, metavar="DIR",
+        "--audit",
+        default=audit.DEFAULT_DIR,
+        metavar="DIR",
         help=f"where the generation run recorded (default: {audit.DEFAULT_DIR})",
     )
     parser.add_argument(
-        "--write-baseline", action="store_true",
+        "--write-baseline",
+        action="store_true",
         help="rewrite the baseline from this run instead of checking it",
     )
     parser.add_argument(
-        "--partial", action="store_true",
+        "--partial",
+        action="store_true",
         help="the run generated only some of the figures: check the new "
         "strings only, and neither require full coverage nor report a "
         "baseline line as stale",
@@ -424,8 +404,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.write_baseline:
         write_baseline(BASELINE, {k: v for k, v in found.items() if v})
         strings = sum(len(v) for v in found.values())
-        print(f"Wrote {BASELINE}: {strings} string(s) across "
-              f"{sum(1 for v in found.values() if v)} figure(s).")
+        print(
+            f"Wrote {BASELINE}: {strings} string(s) across "
+            f"{sum(1 for v in found.values() if v)} figure(s)."
+        )
         return 0
 
     baseline = read_baseline(BASELINE)
@@ -436,8 +418,10 @@ def main(argv: list[str] | None = None) -> int:
         if text in ENGLISH_BY_DESIGN
     }
     if both:
-        print("::error::these strings are in the baseline AND in "
-              "ENGLISH_BY_DESIGN, so nobody decided which they are:")
+        print(
+            "::error::these strings are in the baseline AND in "
+            "ENGLISH_BY_DESIGN, so nobody decided which they are:"
+        )
         for text in sorted(both):
             print(f"  {json.dumps(text, ensure_ascii=False)}")
         return 1

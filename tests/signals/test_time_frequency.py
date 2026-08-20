@@ -18,9 +18,7 @@ from phonometry import signals
 REF_PRESSURE = 2e-5
 
 
-def _tone(
-    fs: float, duration: float, freq: float, amplitude: float
-) -> np.ndarray:
+def _tone(fs: float, duration: float, freq: float, amplitude: float) -> np.ndarray:
     t = np.arange(round(fs * duration)) / fs
     return amplitude * np.cos(2.0 * np.pi * freq * t)
 
@@ -64,13 +62,9 @@ class TestSpectrogramCalibration:
             res = signals.spectrogram(x, fs, nperseg=512, scaling=scaling)  # type: ignore[arg-type]
             psd = signals.power_spectral_density(x, fs, nperseg=512, scaling=scaling)  # type: ignore[arg-type]
             np.testing.assert_allclose(res.frequencies, psd.frequencies)
-            np.testing.assert_allclose(
-                np.mean(res.power, axis=1), psd.psd, rtol=1e-10
-            )
+            np.testing.assert_allclose(np.mean(res.power, axis=1), psd.psd, rtol=1e-10)
             assert res.n_segments == psd.n_segments
-            assert res.resolution_bandwidth == pytest.approx(
-                psd.resolution_bandwidth
-            )
+            assert res.resolution_bandwidth == pytest.approx(psd.resolution_bandwidth)
 
     def test_parseval_energy_identity_with_cola_taper(self) -> None:
         """STFT power integrates to the record energy (Hann, 75 % overlap).
@@ -243,9 +237,7 @@ class TestZoomFFTExactness:
     def test_power_is_the_tone_mean_square(self) -> None:
         fs = 8192.0
         x = _tone(fs, 0.5, 1024.0, 2.0)
-        res = signals.zoom_fft(
-            x, fs, f_min=1000.0, f_max=1048.0, window="boxcar"
-        )
+        res = signals.zoom_fft(x, fs, f_min=1000.0, f_max=1048.0, window="boxcar")
         peak = int(np.argmax(res.power))
         assert res.frequencies[peak] == 1024.0
         assert res.power[peak] == pytest.approx(2.0, rel=1e-12)  # A^2/2

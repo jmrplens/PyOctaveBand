@@ -23,6 +23,7 @@ def _sci_math(value: float, digits: int = 2) -> str:
     mantissa = value / 10.0**exponent
     return rf"${mantissa:.{digits}f}\times10^{{{exponent}}}$"
 
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.artist import Artist
@@ -52,35 +53,60 @@ def generate_junction_transmission(output_dir: str) -> None:
 
     # X-junction between a 100 mm and a 200 mm concrete plate (cL = 3200 m/s,
     # rho = 2400 kg/m^3 -> rho_s = 240 and 480 kg/m^2).
-    res = vibration.junction_transmission(
-        "X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0
-    )
+    res = vibration.junction_transmission("X", 0.1, 3200.0, 240.0, 0.2, 3200.0, 480.0)
     assert res.straight is not None and res.straight_average is not None
     angles = res.angles_deg
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    ax.plot(angles, res.corner, color=COLOR_PRIMARY, linewidth=2.0,
-            label=r"corner $\tau_{12}(\theta)$")
-    ax.plot(angles, res.straight, color=COLOR_SECONDARY, linewidth=2.0,
-            label=r"straight $\tau_{13}(\theta)$")
-    ax.axhline(res.corner_average, color=COLOR_PRIMARY, linestyle="--",
-               linewidth=1.3, label="corner average")
-    ax.axhline(res.straight_average, color=COLOR_SECONDARY, linestyle=":",
-               linewidth=1.3, label="straight average")
+    ax.plot(
+        angles,
+        res.corner,
+        color=COLOR_PRIMARY,
+        linewidth=2.0,
+        label=r"corner $\tau_{12}(\theta)$",
+    )
+    ax.plot(
+        angles,
+        res.straight,
+        color=COLOR_SECONDARY,
+        linewidth=2.0,
+        label=r"straight $\tau_{13}(\theta)$",
+    )
+    ax.axhline(
+        res.corner_average,
+        color=COLOR_PRIMARY,
+        linestyle="--",
+        linewidth=1.3,
+        label="corner average",
+    )
+    ax.axhline(
+        res.straight_average,
+        color=COLOR_SECONDARY,
+        linestyle=":",
+        linewidth=1.3,
+        label="straight average",
+    )
 
     # The cut-off: beyond arcsin(chi) the receiving plate has no propagating
     # bending wave to accept, so the corner path shuts completely.
     theta_co = math.degrees(math.asin(min(1.0, res.chi)))
-    ax.axvspan(theta_co, 90.0, color=theme_fill(COLOR_SECONDARY, ax),
-               zorder=0)
-    ax.axvline(theta_co, color=COLOR_FG, linestyle="-.", linewidth=1.4,
-               label=r"cut-off $\theta_\mathrm{co} = \arcsin\chi$")
-    ax.annotate(rf"$\theta_\mathrm{{co}} = {theta_co:.0f}°$: "
-                r"$\tau_{12} = 0$ beyond it",
-                xy=(theta_co, 0.5 * float(np.max(res.corner))),
-                xytext=(theta_co + 6.0, 0.78 * float(np.max(res.corner))),
-                fontsize=9.5, color=COLOR_FG,
-                arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
+    ax.axvspan(theta_co, 90.0, color=theme_fill(COLOR_SECONDARY, ax), zorder=0)
+    ax.axvline(
+        theta_co,
+        color=COLOR_FG,
+        linestyle="-.",
+        linewidth=1.4,
+        label=r"cut-off $\theta_\mathrm{co} = \arcsin\chi$",
+    )
+    ax.annotate(
+        rf"$\theta_\mathrm{{co}} = {theta_co:.0f}°$: "
+        r"$\tau_{12} = 0$ beyond it",
+        xy=(theta_co, 0.5 * float(np.max(res.corner))),
+        xytext=(theta_co + 6.0, 0.78 * float(np.max(res.corner))),
+        fontsize=9.5,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED},
+    )
 
     ax.set_xlabel("Incidence angle [degrees]")
     ax.set_ylabel(r"Transmission coefficient $\tau$")
@@ -100,10 +126,21 @@ def generate_junction_transmission(output_dir: str) -> None:
         f"corner avg = {res.corner_average:.4f}",
         f"straight avg = {res.straight_average:.4f}",
     ]
-    ax.text(0.015, 0.60, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="left", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.015,
+        0.60,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
     plt.tight_layout()
     save_figure(output_dir, "junction_transmission.svg")
     plt.close()
@@ -124,16 +161,19 @@ def generate_mechanical_mobility(output_dir: str) -> None:
     # Normalise each FRF to O(1) near resonance so all three share one axis.
     curves = [
         (np.abs(h) * k, COLOR_PRIMARY, r"Receptance $|H|$ ($\times k$)"),
-        (np.abs(y) * k / w0, COLOR_SECONDARY,
-         r"Mobility $|Y|$ ($\times k/\omega_0$)"),
-        (np.abs(a) * k / w0**2, COLOR_TERTIARY,
-         r"Accelerance $|A|$ ($\times k/\omega_0^2$)"),
+        (np.abs(y) * k / w0, COLOR_SECONDARY, r"Mobility $|Y|$ ($\times k/\omega_0$)"),
+        (
+            np.abs(a) * k / w0**2,
+            COLOR_TERTIARY,
+            r"Accelerance $|A|$ ($\times k/\omega_0^2$)",
+        ),
     ]
     _fig, ax = plt.subplots(figsize=(10, 6.2))
     for mag, color, label in curves:
         ax.loglog(freq, mag, color=color, linewidth=2.0, label=label)
-    ax.axvline(f0, color=COLOR_GRID, linestyle="--", linewidth=1.2,
-               label="resonance $f_0$")
+    ax.axvline(
+        f0, color=COLOR_GRID, linestyle="--", linewidth=1.2, label="resonance $f_0$"
+    )
 
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Normalized FRF magnitude")
@@ -149,10 +189,21 @@ def generate_mechanical_mobility(output_dir: str) -> None:
         r"$Y = \mathrm{j}\,\omega H$,   $A = -\omega^2 H$  (Table 1)",
         rf"$f_0$ = {f0:.1f} Hz,  $|Y(f_0)| = 1/c$",
     ]
-    ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.985,
+        0.97,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
     plt.tight_layout()
     save_figure(output_dir, "mechanical_mobility.svg")
     plt.close()
@@ -170,9 +221,7 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     w = 2.0 * np.pi * freq
 
     k_true = k + 1j * w * c  # exact transfer stiffness
-    t = vibration.base_transmissibility(
-        freq, m2, k, c
-    )  # mass-loaded transmissibility
+    t = vibration.base_transmissibility(freq, m2, k, c)  # mass-loaded transmissibility
     k_indirect = vibration.transfer_stiffness_indirect(
         freq, t, m2
     )  # ISO 10846-3 Eq. (1)
@@ -182,13 +231,18 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     magnitude_t = np.abs(np.asarray(t, dtype=np.complex128))
     valid = np.flatnonzero(magnitude_t <= 0.1)
     f_valid = float(freq[valid[0]]) if valid.size else float(freq[-1])
-    level_error = (vibration.transfer_stiffness_level(k_indirect)
-                   - vibration.transfer_stiffness_level(k_true))
-    eta = np.imag(k_true) / np.real(k_true)          # Kelvin-Voigt: w c / k
+    level_error = vibration.transfer_stiffness_level(
+        k_indirect
+    ) - vibration.transfer_stiffness_level(k_true)
+    eta = np.imag(k_true) / np.real(k_true)  # Kelvin-Voigt: w c / k
 
     fig, (ax, mid, low) = plt.subplots(
-        3, 1, figsize=(10, 10.2), sharex=True,
-        gridspec_kw={"height_ratios": [1.5, 1.0, 0.85]})
+        3,
+        1,
+        figsize=(10, 10.2),
+        sharex=True,
+        gridspec_kw={"height_ratios": [1.5, 1.0, 0.85]},
+    )
     ax.semilogx(
         freq,
         vibration.transfer_stiffness_level(k_true),
@@ -204,18 +258,19 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         linestyle="--",
         label=r"indirect method $-(2\pi f)^2 m_2 T$",
     )
-    ax.axvline(f0, color=COLOR_GRID, linestyle=":", linewidth=1.2,
-               label="resonance $f_0$")
+    ax.axvline(
+        f0, color=COLOR_GRID, linestyle=":", linewidth=1.2, label="resonance $f_0$"
+    )
     for panel in (ax, mid, low):
-        panel.axvspan(freq[0], f_valid, color=theme_fill(COLOR_SECONDARY, panel),
-                      zorder=0)
+        panel.axvspan(
+            freq[0], f_valid, color=theme_fill(COLOR_SECONDARY, panel), zorder=0
+        )
         panel.axvline(f_valid, color=COLOR_FG, linestyle="-.", linewidth=1.3)
         panel.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
         panel.set_axisbelow(True)
 
     ax.set_ylabel(r"$L_k$ [dB re 1 N/m]")
-    ax.set_title("ISO 10846 Dynamic Transfer Stiffness",
-                 pad=12)
+    ax.set_title("ISO 10846 Dynamic Transfer Stiffness", pad=12)
     ax.set_xlim(freq[0], freq[-1])
     ax.legend(loc="upper left", fontsize=9)
     info = [
@@ -224,15 +279,36 @@ def generate_transfer_stiffness(output_dir: str) -> None:
         rf"$|T|$ falls to 0.1 at {f_valid:.0f} Hz",
         "shaded: Inequality (2) not met → no result",
     ]
-    ax.text(0.985, 0.05, "\n".join(info), transform=ax.transAxes,
-            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.985,
+        0.05,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="bottom",
+        ha="right",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
 
-    mid.loglog(freq, magnitude_t, color=COLOR_PRIMARY, linewidth=2.0,
-               label=r"transmissibility $|T|$")
-    mid.axhline(0.1, color=COLOR_FG, linestyle="--", linewidth=1.4,
-                label=r"TRANSMISSIBILITY_LIMIT = 0.1  ($\Delta L_{1,2}$ = 20 dB)")
+    mid.loglog(
+        freq,
+        magnitude_t,
+        color=COLOR_PRIMARY,
+        linewidth=2.0,
+        label=r"transmissibility $|T|$",
+    )
+    mid.axhline(
+        0.1,
+        color=COLOR_FG,
+        linestyle="--",
+        linewidth=1.4,
+        label=r"TRANSMISSIBILITY_LIMIT = 0.1  ($\Delta L_{1,2}$ = 20 dB)",
+    )
     mid.set_ylabel("$|T|$")
     mid.legend(loc="lower left", fontsize=9)
     twin = mid.twinx()
@@ -243,23 +319,44 @@ def generate_transfer_stiffness(output_dir: str) -> None:
     twin.semilogx(freq, level_error, color=COLOR_TERTIARY, linewidth=1.8)
     twin.axhspan(-1.0, 1.0, color=theme_fill(COLOR_TERTIARY, twin), zorder=0)
     twin.set_ylim(-6.0, 6.0)
-    twin.set_ylabel(r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]",
-                    color=COLOR_TERTIARY)
+    twin.set_ylabel(
+        r"$L_{k,\mathrm{ind}} - L_{k,\mathrm{true}}$ [dB]", color=COLOR_TERTIARY
+    )
     twin.tick_params(axis="y", colors=COLOR_TERTIARY)
-    twin.text(0.985, 0.06, "the ±1 dB the criterion buys", transform=twin.transAxes,
-              va="bottom", ha="right", fontsize=9.5, color=COLOR_TERTIARY)
+    twin.text(
+        0.985,
+        0.06,
+        "the ±1 dB the criterion buys",
+        transform=twin.transAxes,
+        va="bottom",
+        ha="right",
+        fontsize=9.5,
+        color=COLOR_TERTIARY,
+    )
 
-    low.semilogx(freq, eta, color=COLOR_SECONDARY, linewidth=2.0,
-                 label=r"loss factor $\eta = \mathrm{Im}(k_{2,1})/"
-                       r"\mathrm{Re}(k_{2,1})$")
+    low.semilogx(
+        freq,
+        eta,
+        color=COLOR_SECONDARY,
+        linewidth=2.0,
+        label=r"loss factor $\eta = \mathrm{Im}(k_{2,1})/"
+        r"\mathrm{Re}(k_{2,1})$",
+    )
     low.set_ylabel(r"$\eta$")
     low.set_xlabel(LABEL_FREQ_HZ)
     format_frequency_axis(low, float(freq[0]), float(freq[-1]))
     low.legend(loc="upper left", fontsize=9)
-    low.text(0.985, 0.90, "Kelvin-Voigt makes $\\eta$ rise with frequency; real\n"
-             "elastomers are far flatter, so this is a model, not a material",
-             transform=low.transAxes, va="top", ha="right", fontsize=9.5,
-             color=COLOR_FG)
+    low.text(
+        0.985,
+        0.90,
+        "Kelvin-Voigt makes $\\eta$ rise with frequency; real\n"
+        "elastomers are far flatter, so this is a model, not a material",
+        transform=low.transAxes,
+        va="top",
+        ha="right",
+        fontsize=9.5,
+        color=COLOR_FG,
+    )
     fig.align_ylabels()
     plt.tight_layout()
     save_figure(output_dir, "transfer_stiffness.svg")
@@ -286,23 +383,43 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
     tol = res.tolerance
 
     _fig, (ax_top, ax_bot) = plt.subplots(
-        2, 1, sharex=True, figsize=(10, 7.0),
+        2,
+        1,
+        sharex=True,
+        figsize=(10, 7.0),
         gridspec_kw={"height_ratios": [1.5, 1.0]},
     )
     # Upper panel: measured accelerance against the rigid-mass line + band.
-    ax_top.fill_between(freq, res.expected * (1.0 - tol), res.expected * (1.0 + tol),
-                        color=COLOR_SECONDARY, alpha=0.15,
-                        label="±5 % tolerance band")
-    ax_top.semilogx(freq, res.expected, color=COLOR_SECONDARY, linestyle="--",
-                    linewidth=1.6, label=r"expected $|A| = 1/m$")
-    ax_top.semilogx(freq, res.measured, color=COLOR_PRIMARY, linewidth=2.0,
-                    label="within tolerance")
-    ax_top.semilogx(freq[~within], res.measured[~within], linestyle="none",
-                    marker="o", markersize=4, color=COLOR_SECONDARY,
-                    label="out of tolerance")
+    ax_top.fill_between(
+        freq,
+        res.expected * (1.0 - tol),
+        res.expected * (1.0 + tol),
+        color=COLOR_SECONDARY,
+        alpha=0.15,
+        label="±5 % tolerance band",
+    )
+    ax_top.semilogx(
+        freq,
+        res.expected,
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.6,
+        label=r"expected $|A| = 1/m$",
+    )
+    ax_top.semilogx(
+        freq, res.measured, color=COLOR_PRIMARY, linewidth=2.0, label="within tolerance"
+    )
+    ax_top.semilogx(
+        freq[~within],
+        res.measured[~within],
+        linestyle="none",
+        marker="o",
+        markersize=4,
+        color=COLOR_SECONDARY,
+        label="out of tolerance",
+    )
     ax_top.set_ylabel("Accelerance $|A|$ [1/kg]")
-    ax_top.set_title("ISO 7626-2 Rigid-Mass Calibration Check",
-                     pad=12)
+    ax_top.set_title("ISO 7626-2 Rigid-Mass Calibration Check", pad=12)
     ax_top.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax_top.legend(loc="upper left", fontsize=9)
 
@@ -310,11 +427,15 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
     # the few-percent tolerance is actually readable.
     ax_bot.axhspan(-100.0 * tol, 100.0 * tol, color=COLOR_SECONDARY, alpha=0.15)
     ax_bot.axhline(0.0, color=COLOR_GRID, linestyle=":", linewidth=1.0)
-    ax_bot.semilogx(freq, 100.0 * res.deviation, color=COLOR_PRIMARY,
-                    linewidth=2.0)
-    ax_bot.semilogx(freq[~within], 100.0 * res.deviation[~within],
-                    linestyle="none", marker="o", markersize=4,
-                    color=COLOR_SECONDARY)
+    ax_bot.semilogx(freq, 100.0 * res.deviation, color=COLOR_PRIMARY, linewidth=2.0)
+    ax_bot.semilogx(
+        freq[~within],
+        100.0 * res.deviation[~within],
+        linestyle="none",
+        marker="o",
+        markersize=4,
+        color=COLOR_SECONDARY,
+    )
     ax_bot.set_xlabel(LABEL_FREQ_HZ)
     ax_bot.set_ylabel("Deviation [%]")
     ax_bot.set_xlim(freq[0], freq[-1])
@@ -329,10 +450,21 @@ def generate_rigid_mass_calibration(output_dir: str) -> None:
         "criterion: agree within ±5 %",
         "high-f drift → attachment error",
     ]
-    ax_top.text(0.985, 0.05, "\n".join(info), transform=ax_top.transAxes,
-                va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-                bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                      "edgecolor": COLOR_GRID})
+    ax_top.text(
+        0.985,
+        0.05,
+        "\n".join(info),
+        transform=ax_top.transAxes,
+        va="bottom",
+        ha="right",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
     plt.tight_layout()
     save_figure(output_dir, "rigid_mass_calibration.svg")
     plt.close()
@@ -369,16 +501,21 @@ def generate_vibration_weighting(output_dir: str) -> None:
     result = vibration.frequency_weighting("Wk", freqs)
 
     _fig, ax = plt.subplots(figsize=(10, 6.3))
-    ax.semilogx(result.frequencies, result.magnitude_db, color=COLOR_PRIMARY,
-                linewidth=1.9, zorder=3)
+    ax.semilogx(
+        result.frequencies,
+        result.magnitude_db,
+        color=COLOR_PRIMARY,
+        linewidth=1.9,
+        zorder=3,
+    )
     ax.axhline(0.0, color=COLOR_FG, linewidth=0.8, alpha=0.4, zorder=1)
-    ax.set_title("Whole-body vertical weighting Wk (ISO 8041-1)",
-                 pad=12)
+    ax.set_title("Whole-body vertical weighting Wk (ISO 8041-1)", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Weighting factor [dB]")
     ax.set_xlim(0.4, 100.0)
     ax.set_ylim(-40.0, 5.0)
     from matplotlib.ticker import NullFormatter
+
     ax.set_xticks([0.5, 1, 2, 5, 10, 20, 50, 100])
     # Explicit string labels install a FixedFormatter so the Spanish pass can
     # apply the decimal comma (a log-axis ScalarFormatter would not be caught).
@@ -399,27 +536,84 @@ def generate_weighted_acceleration(output_dir: str) -> None:
     # A measured vertical seat-pan acceleration spectrum (r.m.s. per one-third
     # octave, m/s^2) from a vehicle seat: energy concentrated in the 2-8 Hz
     # whole-body range. Weighting it with Wk gives the health-relevant a_w.
-    freqs = np.array([1.0, 1.25, 1.6, 2.0, 2.5, 3.15, 4.0, 5.0, 6.3, 8.0,
-                      10.0, 12.5, 16.0, 20.0, 25.0, 31.5, 40.0, 63.0, 80.0])
-    accel = np.array([0.18, 0.24, 0.33, 0.46, 0.52, 0.55, 0.48, 0.39, 0.31,
-                      0.26, 0.21, 0.17, 0.13, 0.10, 0.078, 0.060, 0.045,
-                      0.028, 0.020])
+    freqs = np.array(
+        [
+            1.0,
+            1.25,
+            1.6,
+            2.0,
+            2.5,
+            3.15,
+            4.0,
+            5.0,
+            6.3,
+            8.0,
+            10.0,
+            12.5,
+            16.0,
+            20.0,
+            25.0,
+            31.5,
+            40.0,
+            63.0,
+            80.0,
+        ]
+    )
+    accel = np.array(
+        [
+            0.18,
+            0.24,
+            0.33,
+            0.46,
+            0.52,
+            0.55,
+            0.48,
+            0.39,
+            0.31,
+            0.26,
+            0.21,
+            0.17,
+            0.13,
+            0.10,
+            0.078,
+            0.060,
+            0.045,
+            0.028,
+            0.020,
+        ]
+    )
     result = vibration.weighted_acceleration(accel, freqs, "Wk")
 
     positions = np.arange(freqs.size, dtype=float)
     width = 0.4
     _fig, ax = plt.subplots(figsize=(10.5, 6.3))
-    ax.bar(positions - width / 2, result.band_accelerations, width,
-           color="#9e9e9e", edgecolor=COLOR_FG, linewidth=0.5,
-           label="Unweighted $a_i$", zorder=2)
-    ax.bar(positions + width / 2, result.weighted, width, color=COLOR_PRIMARY,
-           edgecolor=COLOR_FG, linewidth=0.5, label="Weighted $W_i\\,a_i$ (Wk)",
-           zorder=3)
+    ax.bar(
+        positions - width / 2,
+        result.band_accelerations,
+        width,
+        color="#9e9e9e",
+        edgecolor=COLOR_FG,
+        linewidth=0.5,
+        label="Unweighted $a_i$",
+        zorder=2,
+    )
+    ax.bar(
+        positions + width / 2,
+        result.weighted,
+        width,
+        color=COLOR_PRIMARY,
+        edgecolor=COLOR_FG,
+        linewidth=0.5,
+        label="Weighted $W_i\\,a_i$ (Wk)",
+        zorder=3,
+    )
     ax.set_xticks(positions)
     ax.set_xticklabels([f"{f:g}" for f in freqs], rotation=45, ha="right")
     ax.set_title(
         rf"Weighted seat acceleration (ISO 2631-1)  $a_\mathrm{{w}}$ = "
-        f"{result.overall:.3f} m/s²", pad=12)
+        f"{result.overall:.3f} m/s²",
+        pad=12,
+    )
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("r.m.s. acceleration [m/s²]")
     ax.legend(loc="upper right", fontsize=9)
@@ -451,21 +645,42 @@ def generate_daily_vibration_exposure(output_dir: str) -> None:
     positions = np.arange(len(values), dtype=float)
     colors = ["#9e9e9e"] * result.partials.size + [COLOR_PRIMARY]
     _fig, ax = plt.subplots(figsize=(9.5, 6.3))
-    ax.bar(positions, values, width=0.62, color=colors, edgecolor=COLOR_FG,
-           linewidth=0.6, zorder=3)
+    ax.bar(
+        positions,
+        values,
+        width=0.62,
+        color=colors,
+        edgecolor=COLOR_FG,
+        linewidth=0.6,
+        zorder=3,
+    )
     eav = result.assessment.action_value
     elv = result.assessment.limit_value
-    ax.axhline(eav, color=COLOR_TERTIARY, linestyle="--", linewidth=1.6,
-               label=f"EAV = {eav:g} m/s²", zorder=2)
-    ax.axhline(elv, color=COLOR_SECONDARY, linestyle="--", linewidth=1.6,
-               label=f"ELV = {elv:g} m/s²", zorder=2)
+    ax.axhline(
+        eav,
+        color=COLOR_TERTIARY,
+        linestyle="--",
+        linewidth=1.6,
+        label=f"EAV = {eav:g} m/s²",
+        zorder=2,
+    )
+    ax.axhline(
+        elv,
+        color=COLOR_SECONDARY,
+        linestyle="--",
+        linewidth=1.6,
+        label=f"ELV = {elv:g} m/s²",
+        zorder=2,
+    )
     ax.set_xticks(positions)
     ax.set_xticklabels(labels, rotation=30, ha="right")
     ax.set_ylabel("Daily exposure $A(8)$ [m/s²]")
     ax.set_ylim(0.0, elv * 1.2)
     ax.set_title(
         f"Hand-arm daily exposure (ISO 5349 / 2002-44-EC)  $A(8)$ = "
-        f"{result.a8:.2f} m/s²", pad=12)
+        f"{result.a8:.2f} m/s²",
+        pad=12,
+    )
     ax.legend(loc="upper left", fontsize=9)
     ax.grid(axis="y", color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
@@ -513,9 +728,7 @@ def generate_multiple_shock(output_dir: str) -> None:
         prob = 100.0 * vibration.injury_probability(grid, sex=sex)
         ax_r.plot(grid, prob, color=colour, label=f"{sex}")
     # The worked example: five 40 m/s2 peaks, 82 kg male -> R = 1.22.
-    sd = vibration.compression_dose(
-        vibration.dose_from_peaks([40.0] * 5), mz=MZ_MALE
-    )
+    sd = vibration.compression_dose(vibration.dose_from_peaks([40.0] * 5), mz=MZ_MALE)
     r_male = vibration.injury_risk(
         sd, start_age=20, years=20, days_per_year=120, sex="male"
     )
@@ -556,27 +769,36 @@ def generate_vibration_weighting_family(output_dir: str) -> None:
     # comparable at all. Grouped by the part of the family each belongs to.
     freqs = np.geomspace(0.05, 1500.0, 900)
     curves = (
-        ("Wk", "Wk — seat surface, vertical (ISO 2631-1)",
-         COLOR_PRIMARY, "-", 2.4),
+        ("Wk", "Wk — seat surface, vertical (ISO 2631-1)", COLOR_PRIMARY, "-", 2.4),
         ("Wd", "Wd — seat surface, horizontal", COLOR_PRIMARY, "--", 1.6),
         ("Wc", "Wc — backrest, x", COLOR_PRIMARY, (0, (1, 1, 3, 1)), 1.6),
         ("We", "We — rotational (per rad)", "#9467bd", "-.", 1.6),
         ("Wj", "Wj — recumbent, under the head", "#9467bd", ":", 1.8),
-        ("Wm", "Wm — building occupants, all axes (ISO 2631-2)",
-         "#ff7f0e", "-", 1.8),
-        ("Wb", "Wb — rail ride comfort, vertical (ISO 2631-4)",
-         "#ff7f0e", "--", 1.6),
+        ("Wm", "Wm — building occupants, all axes (ISO 2631-2)", "#ff7f0e", "-", 1.8),
+        ("Wb", "Wb — rail ride comfort, vertical (ISO 2631-4)", "#ff7f0e", "--", 1.6),
         ("Wf", "Wf — motion sickness, vertical", COLOR_TERTIARY, "-", 2.0),
-        ("Wh", "Wh — hand-transmitted, all three axes (ISO 5349-1)",
-         COLOR_SECONDARY, "-", 2.4),
+        (
+            "Wh",
+            "Wh — hand-transmitted, all three axes (ISO 5349-1)",
+            COLOR_SECONDARY,
+            "-",
+            2.4,
+        ),
     )
 
     _fig, ax = plt.subplots(figsize=(11, 6.8))
     for name, label, colour, style, width in curves:
         factors = np.asarray(vibration.weighting_factors(name, freqs))
         db = 20.0 * np.log10(np.maximum(factors, 1e-9))
-        ax.semilogx(freqs, db, color=colour, linestyle=style, linewidth=width,
-                    label=label, zorder=3)
+        ax.semilogx(
+            freqs,
+            db,
+            color=colour,
+            linestyle=style,
+            linewidth=width,
+            label=label,
+            zorder=3,
+        )
     ax.axhline(0.0, color=COLOR_FG, linewidth=0.8, alpha=0.4, zorder=1)
 
     # The band each part of the family is tabulated over, drawn above the
@@ -589,36 +811,63 @@ def generate_vibration_weighting_family(output_dir: str) -> None:
         (6.3, 1250.0, 4.0, COLOR_SECONDARY, "hand-arm Wh: 6.3–1250 Hz"),
     )
     for low, high, level, colour, label in bands:
-        ax.plot([low, high], [level, level], color=colour, linewidth=3.0,
-                solid_capstyle="butt", zorder=4)
+        ax.plot(
+            [low, high],
+            [level, level],
+            color=colour,
+            linewidth=3.0,
+            solid_capstyle="butt",
+            zorder=4,
+        )
         for edge in (low, high):
-            ax.plot([edge, edge], [level - 1.1, level + 1.1], color=colour,
-                    linewidth=1.4, zorder=4)
-        ax.text(np.sqrt(low * high), level + 1.6, label, fontsize=8.5,
-                color=colour, ha="center", va="bottom")
+            ax.plot(
+                [edge, edge],
+                [level - 1.1, level + 1.1],
+                color=colour,
+                linewidth=1.4,
+                zorder=4,
+            )
+        ax.text(
+            np.sqrt(low * high),
+            level + 1.6,
+            label,
+            fontsize=8.5,
+            color=colour,
+            ha="center",
+            va="bottom",
+        )
 
-    ax.annotate("Wf peaks at 0.17 Hz:\nmotion sickness is sub-hertz",
-                xy=(0.150, -1.6), xytext=(0.052, 2.6), fontsize=9,
-                color=COLOR_TERTIARY, ha="left",
-                arrowprops={"arrowstyle": "->", "lw": 0.9,
-                            "color": COLOR_TERTIARY})
-    ax.annotate("Wd peaks 2.5 octaves below Wk:\nthe body is more compliant\n"
-                "horizontally at low frequency",
-                xy=(1.09, 0.1), xytext=(2.1, -46.0), fontsize=9,
-                color=COLOR_PRIMARY, ha="left",
-                arrowprops={"arrowstyle": "->", "lw": 0.9,
-                            "color": COLOR_PRIMARY})
+    ax.annotate(
+        "Wf peaks at 0.17 Hz:\nmotion sickness is sub-hertz",
+        xy=(0.150, -1.6),
+        xytext=(0.052, 2.6),
+        fontsize=9,
+        color=COLOR_TERTIARY,
+        ha="left",
+        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_TERTIARY},
+    )
+    ax.annotate(
+        "Wd peaks 2.5 octaves below Wk:\nthe body is more compliant\n"
+        "horizontally at low frequency",
+        xy=(1.09, 0.1),
+        xytext=(2.1, -46.0),
+        fontsize=9,
+        color=COLOR_PRIMARY,
+        ha="left",
+        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_PRIMARY},
+    )
 
-    ax.set_title("The nine human-vibration weightings (ISO 8041-1 Table 3)",
-                 pad=12)
+    ax.set_title("The nine human-vibration weightings (ISO 8041-1 Table 3)", pad=12)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Weighting factor [dB]")
     ax.set_xlim(0.05, 1500.0)
     ax.set_ylim(-70.0, 16.0)
     from matplotlib.ticker import NullFormatter
+
     ax.set_xticks([0.05, 0.1, 0.5, 1, 5, 10, 50, 100, 500, 1250])
-    ax.set_xticklabels(["0.05", "0.1", "0.5", "1", "5", "10", "50", "100",
-                        "500", "1250"])
+    ax.set_xticklabels(
+        ["0.05", "0.1", "0.5", "1", "5", "10", "50", "100", "500", "1250"]
+    )
     ax.xaxis.set_minor_formatter(NullFormatter())
     ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
     ax.set_axisbelow(True)
@@ -637,13 +886,22 @@ def _shock_ride_record(fs: float, duration: float) -> np.ndarray:
     """
     time = np.arange(int(duration * fs)) / fs
     rng = np.random.default_rng(3)
-    signal = (0.35 * np.sin(2.0 * np.pi * 4.5 * time)
-              + 0.10 * rng.standard_normal(time.size))
-    for start, amplitude in ((2.6, 9.0), (6.1, 14.0), (9.4, 6.0),
-                             (13.8, 18.0), (17.2, 11.0)):
+    signal = 0.35 * np.sin(2.0 * np.pi * 4.5 * time) + 0.10 * rng.standard_normal(
+        time.size
+    )
+    for start, amplitude in (
+        (2.6, 9.0),
+        (6.1, 14.0),
+        (9.4, 6.0),
+        (13.8, 18.0),
+        (17.2, 11.0),
+    ):
         mask = time >= start
-        signal[mask] += amplitude * np.exp(-28.0 * (time[mask] - start)) \
+        signal[mask] += (
+            amplitude
+            * np.exp(-28.0 * (time[mask] - start))
             * np.sin(2.0 * np.pi * 8.0 * (time[mask] - start))
+        )
     return signal
 
 
@@ -656,72 +914,136 @@ def generate_shock_dose_measures(output_dir: str) -> None:
     time = np.arange(int(duration * fs)) / fs
     raw = _shock_ride_record(fs, duration)
     weighted = np.asarray(vibration.apply_weighting(raw, fs, name="Wk"))
-    a_w = float(np.sqrt(np.mean(weighted ** 2)))
-    running = np.asarray(vibration.running_rms(weighted, fs,
-                                               integration_time=1.0))
+    a_w = float(np.sqrt(np.mean(weighted**2)))
+    running = np.asarray(vibration.running_rms(weighted, fs, integration_time=1.0))
     mtvv = float(vibration.mtvv(weighted, fs))
     vdv = float(vibration.vibration_dose_value(weighted, fs))
     # The running fourth-power accumulation whose end point is the VDV, drawn
     # against a_w t^(1/4), the value the basic method would predict for it.
-    fourth = np.cumsum(weighted ** 4) / fs
-    running_vdv = fourth ** 0.25
-    basic_vdv = a_w * time ** 0.25
+    fourth = np.cumsum(weighted**4) / fs
+    running_vdv = fourth**0.25
+    basic_vdv = a_w * time**0.25
 
     _fig, (ax_t, ax_r, ax_v) = plt.subplots(
-        3, 1, sharex=True, figsize=(11, 9.2),
-        gridspec_kw={"height_ratios": (1.15, 1.0, 1.0)})
+        3,
+        1,
+        sharex=True,
+        figsize=(11, 9.2),
+        gridspec_kw={"height_ratios": (1.15, 1.0, 1.0)},
+    )
 
-    ax_t.plot(time, raw, color=COLOR_MUTED, linewidth=0.7,
-              label="$a_z(t)$, unweighted", zorder=2)
-    ax_t.plot(time, weighted, color=COLOR_PRIMARY, linewidth=1.0,
-              label=r"$a_\mathrm{w}(t)$, Wk-weighted", zorder=3)
+    ax_t.plot(
+        time,
+        raw,
+        color=COLOR_MUTED,
+        linewidth=0.7,
+        label="$a_z(t)$, unweighted",
+        zorder=2,
+    )
+    ax_t.plot(
+        time,
+        weighted,
+        color=COLOR_PRIMARY,
+        linewidth=1.0,
+        label=r"$a_\mathrm{w}(t)$, Wk-weighted",
+        zorder=3,
+    )
     ax_t.set_ylabel("acceleration [m/s²]")
     ax_t.set_title(
         "(a)  A seated off-road record: 4.5 Hz ride plus five impacts",
-        fontsize=10, loc="left", pad=6)
+        fontsize=10,
+        loc="left",
+        pad=6,
+    )
     ax_t.legend(loc="upper right", fontsize=9)
 
-    ax_r.plot(time, running, color=COLOR_PRIMARY, linewidth=1.4,
-              label="running r.m.s., 1 s (Eq. (3))", zorder=3)
-    ax_r.axhline(a_w, color=COLOR_MUTED, linestyle="--", linewidth=1.6,
-                 label=rf"$a_\mathrm{{w}}$ = {a_w:.2f} m/s² (Eq. (1))", zorder=2)
+    ax_r.plot(
+        time,
+        running,
+        color=COLOR_PRIMARY,
+        linewidth=1.4,
+        label="running r.m.s., 1 s (Eq. (3))",
+        zorder=3,
+    )
+    ax_r.axhline(
+        a_w,
+        color=COLOR_MUTED,
+        linestyle="--",
+        linewidth=1.6,
+        label=rf"$a_\mathrm{{w}}$ = {a_w:.2f} m/s² (Eq. (1))",
+        zorder=2,
+    )
     peak_index = int(np.argmax(running))
-    ax_r.plot([time[peak_index]], [mtvv], marker="o", markersize=7,
-              color=COLOR_SECONDARY, zorder=4,
-              label=f"MTVV = {mtvv:.2f} m/s² (Eq. (4))")
-    ax_r.annotate(rf"$\mathrm{{MTVV}}/a_\mathrm{{w}}$ = {mtvv / a_w:.2f}"
-                  "   (> 1.5)",
-                  xy=(time[peak_index], mtvv),
-                  xytext=(time[peak_index] - 6.5, mtvv * 0.78), fontsize=9,
-                  color=COLOR_SECONDARY,
-                  arrowprops={"arrowstyle": "->", "lw": 0.9,
-                              "color": COLOR_SECONDARY})
+    ax_r.plot(
+        [time[peak_index]],
+        [mtvv],
+        marker="o",
+        markersize=7,
+        color=COLOR_SECONDARY,
+        zorder=4,
+        label=f"MTVV = {mtvv:.2f} m/s² (Eq. (4))",
+    )
+    ax_r.annotate(
+        rf"$\mathrm{{MTVV}}/a_\mathrm{{w}}$ = {mtvv / a_w:.2f}"
+        "   (> 1.5)",
+        xy=(time[peak_index], mtvv),
+        xytext=(time[peak_index] - 6.5, mtvv * 0.78),
+        fontsize=9,
+        color=COLOR_SECONDARY,
+        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_SECONDARY},
+    )
     ax_r.set_ylabel("r.m.s. [m/s²]")
-    ax_r.set_title("(b)  The 1 s running r.m.s., whose maximum is the MTVV",
-                   fontsize=10, loc="left", pad=6)
+    ax_r.set_title(
+        "(b)  The 1 s running r.m.s., whose maximum is the MTVV",
+        fontsize=10,
+        loc="left",
+        pad=6,
+    )
     ax_r.legend(loc="upper left", fontsize=9)
 
-    ax_v.plot(time, running_vdv, color=COLOR_PRIMARY, linewidth=1.6,
-              label=r"$\left(\int_0^t a_\mathrm{w}^4\,dt\right)^{1/4}$",
-              zorder=3)
-    ax_v.plot(time, basic_vdv, color=COLOR_MUTED, linestyle="--",
-              linewidth=1.6,
-              label=r"$a_\mathrm{w}\,t^{1/4}$ (the basic method)",
-              zorder=2)
-    ax_v.plot([duration], [vdv], marker="o", markersize=7,
-              color=COLOR_SECONDARY, zorder=4,
-              label=f"VDV = {vdv:.2f} m/s$^{{1.75}}$ (Eq. (5))")
+    ax_v.plot(
+        time,
+        running_vdv,
+        color=COLOR_PRIMARY,
+        linewidth=1.6,
+        label=r"$\left(\int_0^t a_\mathrm{w}^4\,dt\right)^{1/4}$",
+        zorder=3,
+    )
+    ax_v.plot(
+        time,
+        basic_vdv,
+        color=COLOR_MUTED,
+        linestyle="--",
+        linewidth=1.6,
+        label=r"$a_\mathrm{w}\,t^{1/4}$ (the basic method)",
+        zorder=2,
+    )
+    ax_v.plot(
+        [duration],
+        [vdv],
+        marker="o",
+        markersize=7,
+        color=COLOR_SECONDARY,
+        zorder=4,
+        label=f"VDV = {vdv:.2f} m/s$^{{1.75}}$ (Eq. (5))",
+    )
     ax_v.annotate(
         rf"$\mathrm{{VDV}}/(a_\mathrm{{w}} T^{{1/4}})$ = "
-        f"{vdv / (a_w * duration ** 0.25):.2f}   (> 1.75)",
-        xy=(duration, vdv), xytext=(7.0, vdv * 0.55), fontsize=9,
+        f"{vdv / (a_w * duration**0.25):.2f}   (> 1.75)",
+        xy=(duration, vdv),
+        xytext=(7.0, vdv * 0.55),
+        fontsize=9,
         color=COLOR_SECONDARY,
-        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_SECONDARY})
+        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_SECONDARY},
+    )
     ax_v.set_ylabel("dose [m/s$^{1.75}$]")
     ax_v.set_xlabel("Time [s]")
-    ax_v.set_title("(c)  The fourth-power accumulation, whose end point is "
-                   "the VDV", fontsize=10, loc="left",
-                   pad=6)
+    ax_v.set_title(
+        "(c)  The fourth-power accumulation, whose end point is the VDV",
+        fontsize=10,
+        loc="left",
+        pad=6,
+    )
     ax_v.legend(loc="upper left", fontsize=9)
 
     for axis in (ax_t, ax_r, ax_v):
@@ -752,25 +1074,61 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
     wash = theme_fill(COLOR_MUTED, ax)
     ax.axhspan(0.3, 1.0, color=wash, zorder=0)
     ax.axhspan(8.0, 60.0, color=wash, zorder=0)
-    ax.text(1.15, 22.0, "extrapolation beyond Table C.1", fontsize=9,
-            color=COLOR_FG, alpha=0.75, va="center")
-    ax.text(1.15, 0.42, "extrapolation beyond Table C.1", fontsize=9,
-            color=COLOR_FG, alpha=0.75, va="center")
-    ax.loglog(a8, years, color=COLOR_PRIMARY, linewidth=2.0, zorder=3,
-              label=r"$D_\mathrm{y} = 31.8\,A(8)^{-1.06}$ (Eq. (C.1))")
-    ax.loglog(table_a8, table_years, linestyle="none", marker="o",
-              markersize=8, color=COLOR_SECONDARY, zorder=4,
-              label="Table C.1: 26 / 14 / 7 / 3.7 m/s²")
-    for value, label, colour in ((2.5, "EAV 2.5", COLOR_TERTIARY),
-                                 (5.0, "ELV 5.0", COLOR_SECONDARY)):
-        ax.axvline(value, color=colour, linestyle="--", linewidth=1.5,
-                   zorder=2)
-        ax.text(value * 1.04, 0.36,
-                f"{label} m/s²\n{vibration.hav_vwf_lifetime_years(value):.1f}"
-                " years", fontsize=9, color=colour, va="bottom")
+    ax.text(
+        1.15,
+        22.0,
+        "extrapolation beyond Table C.1",
+        fontsize=9,
+        color=COLOR_FG,
+        alpha=0.75,
+        va="center",
+    )
+    ax.text(
+        1.15,
+        0.42,
+        "extrapolation beyond Table C.1",
+        fontsize=9,
+        color=COLOR_FG,
+        alpha=0.75,
+        va="center",
+    )
+    ax.loglog(
+        a8,
+        years,
+        color=COLOR_PRIMARY,
+        linewidth=2.0,
+        zorder=3,
+        label=r"$D_\mathrm{y} = 31.8\,A(8)^{-1.06}$ (Eq. (C.1))",
+    )
+    ax.loglog(
+        table_a8,
+        table_years,
+        linestyle="none",
+        marker="o",
+        markersize=8,
+        color=COLOR_SECONDARY,
+        zorder=4,
+        label="Table C.1: 26 / 14 / 7 / 3.7 m/s²",
+    )
+    for value, label, colour in (
+        (2.5, "EAV 2.5", COLOR_TERTIARY),
+        (5.0, "ELV 5.0", COLOR_SECONDARY),
+    ):
+        ax.axvline(value, color=colour, linestyle="--", linewidth=1.5, zorder=2)
+        ax.text(
+            value * 1.04,
+            0.36,
+            f"{label} m/s²\n{vibration.hav_vwf_lifetime_years(value):.1f} years",
+            fontsize=9,
+            color=colour,
+            va="bottom",
+        )
 
-    ax.set_title("Group-mean years to a 10 % prevalence of vibration white "
-                 "finger (ISO 5349-1 Annex C)", pad=12)
+    ax.set_title(
+        "Group-mean years to a 10 % prevalence of vibration white "
+        "finger (ISO 5349-1 Annex C)",
+        pad=12,
+    )
     ax.set_xlabel("Daily exposure $A(8)$ [m/s²]")
     ax.set_ylabel(r"Exposure duration $D_\mathrm{y}$ [years]")
     ax.set_xlim(1.0, 40.0)
@@ -780,6 +1138,7 @@ def generate_hav_vwf_lifetime(output_dir: str) -> None:
     ax.set_yticks([0.5, 1, 2, 4, 8, 20, 50])
     ax.set_yticklabels(["0.5", "1", "2", "4", "8", "20", "50"])
     from matplotlib.ticker import NullFormatter
+
     ax.xaxis.set_minor_formatter(NullFormatter())
     ax.yaxis.set_minor_formatter(NullFormatter())
     ax.grid(which="major", color=COLOR_GRID, linestyle="-", alpha=0.5)
@@ -796,8 +1155,13 @@ def _positive_peak_indices(response: np.ndarray) -> np.ndarray:
     edges = np.flatnonzero(np.diff(positive.astype(np.int8)))
     starts = np.r_[0, edges + 1]
     stops = np.r_[edges + 1, response.size]
-    return np.array([int(a + np.argmax(response[a:b]))
-                     for a, b in zip(starts, stops) if positive[a]])
+    return np.array(
+        [
+            int(a + np.argmax(response[a:b]))
+            for a, b in zip(starts, stops)
+            if positive[a]
+        ]
+    )
 
 
 def generate_spinal_response_peaks(output_dir: str) -> None:
@@ -812,65 +1176,100 @@ def generate_spinal_response_peaks(output_dir: str) -> None:
     fs, duration = 256.0, 8.0
     time = np.arange(int(duration * fs)) / fs
     rng = np.random.default_rng(11)
-    seat = (1.5 * np.sin(2.0 * np.pi * 3.6 * time)
-            + 0.45 * rng.standard_normal(time.size))
-    for start, amplitude in ((1.15, 26.0), (3.05, 8.0), (5.60, 55.0),
-                             (6.95, 15.0)):
+    seat = 1.5 * np.sin(2.0 * np.pi * 3.6 * time) + 0.45 * rng.standard_normal(
+        time.size
+    )
+    for start, amplitude in ((1.15, 26.0), (3.05, 8.0), (5.60, 55.0), (6.95, 15.0)):
         mask = time >= start
-        seat[mask] += amplitude * np.exp(-20.0 * (time[mask] - start)) \
+        seat[mask] += (
+            amplitude
+            * np.exp(-20.0 * (time[mask] - start))
             * np.sin(2.0 * np.pi * 5.5 * (time[mask] - start))
+        )
     free_fall = (time >= 5.18) & (time < 5.58)
     seat[free_fall] = -9.81
 
     response = np.asarray(vibration.spinal_response(seat, fs))
     peaks = np.asarray(vibration.response_peaks(response))
     indices = _positive_peak_indices(response)
-    shares = 100.0 * peaks ** 6 / float(np.sum(peaks ** 6))
+    shares = 100.0 * peaks**6 / float(np.sum(peaks**6))
     dose = float(vibration.dose_from_peaks(peaks))
 
     _fig, (ax_t, ax_p) = plt.subplots(2, 1, sharex=True, figsize=(11, 7.6))
 
-    ax_t.plot(time, seat, color=COLOR_MUTED, linewidth=0.9,
-              label=r"$a_\mathrm{z}(t)$, conditioned seat acceleration",
-              zorder=2)
-    ax_t.plot(time, response, color=COLOR_PRIMARY, linewidth=1.5,
-              label=r"$A_\mathrm{z}(t)$, spinal response (Formula 2)", zorder=3)
-    ax_t.axhline(-9.81, color=COLOR_SECONDARY, linestyle=":", linewidth=1.2,
-                 zorder=1)
-    ax_t.annotate("0.4 s of free fall at $-1\\,g$:\nthe 0.01 Hz high pass of "
-                  "5.1.3 keeps it",
-                  xy=(5.30, -9.81), xytext=(2.25, 13.0), fontsize=9,
-                  color=COLOR_SECONDARY,
-                  arrowprops={"arrowstyle": "->", "lw": 0.9,
-                              "color": COLOR_SECONDARY})
+    ax_t.plot(
+        time,
+        seat,
+        color=COLOR_MUTED,
+        linewidth=0.9,
+        label=r"$a_\mathrm{z}(t)$, conditioned seat acceleration",
+        zorder=2,
+    )
+    ax_t.plot(
+        time,
+        response,
+        color=COLOR_PRIMARY,
+        linewidth=1.5,
+        label=r"$A_\mathrm{z}(t)$, spinal response (Formula 2)",
+        zorder=3,
+    )
+    ax_t.axhline(-9.81, color=COLOR_SECONDARY, linestyle=":", linewidth=1.2, zorder=1)
+    ax_t.annotate(
+        "0.4 s of free fall at $-1\\,g$:\nthe 0.01 Hz high pass of 5.1.3 keeps it",
+        xy=(5.30, -9.81),
+        xytext=(2.25, 13.0),
+        fontsize=9,
+        color=COLOR_SECONDARY,
+        arrowprops={"arrowstyle": "->", "lw": 0.9, "color": COLOR_SECONDARY},
+    )
     ax_t.set_ylabel("acceleration [m/s²]")
-    ax_t.set_title("(a)  The seat-to-spine filter turns an impact into a "
-                   "ringing response", fontsize=10,
-                   loc="left", pad=6)
+    ax_t.set_title(
+        "(a)  The seat-to-spine filter turns an impact into a ringing response",
+        fontsize=10,
+        loc="left",
+        pad=6,
+    )
     ax_t.legend(loc="upper left", fontsize=9)
 
     ax_p.plot(time, response, color=COLOR_PRIMARY, linewidth=1.2, zorder=2)
     ax_p.axhline(0.0, color=COLOR_FG, linewidth=0.9, alpha=0.6, zorder=1)
-    ax_p.plot(time[indices], peaks, linestyle="none", marker="o",
-              markersize=5, color=COLOR_SECONDARY, zorder=4,
-              label=rf"{peaks.size} counted positive peaks $A_{{\mathrm{{z}},i}}$")
+    ax_p.plot(
+        time[indices],
+        peaks,
+        linestyle="none",
+        marker="o",
+        markersize=5,
+        color=COLOR_SECONDARY,
+        zorder=4,
+        label=rf"{peaks.size} counted positive peaks $A_{{\mathrm{{z}},i}}$",
+    )
     largest = int(np.argmax(peaks))
-    ax_p.axhline(peaks[largest] / 3.0, color=COLOR_TERTIARY, linestyle="--",
-                 linewidth=1.4, zorder=3,
-                 label="a third of the largest peak: below this, "
-                       "no contribution")
+    ax_p.axhline(
+        peaks[largest] / 3.0,
+        color=COLOR_TERTIARY,
+        linestyle="--",
+        linewidth=1.4,
+        zorder=3,
+        label="a third of the largest peak: below this, no contribution",
+    )
     for rank in np.argsort(peaks)[::-1][:3]:
-        ax_p.annotate(f"{peaks[rank]:.1f}  ({shares[rank]:.1f} %)",
-                      xy=(time[indices[rank]], peaks[rank]),
-                      xytext=(time[indices[rank]] + 0.18, peaks[rank] + 1.6),
-                      fontsize=9, color=COLOR_FG)
+        ax_p.annotate(
+            f"{peaks[rank]:.1f}  ({shares[rank]:.1f} %)",
+            xy=(time[indices[rank]], peaks[rank]),
+            xytext=(time[indices[rank]] + 0.18, peaks[rank] + 1.6),
+            fontsize=9,
+            color=COLOR_FG,
+        )
     ax_p.set_ylabel(r"$A_\mathrm{z}$ [m/s²]")
     ax_p.set_xlabel("Time [s]")
     ax_p.set_title(
         f"(b)  Each peak's share of $\\sum A_{{\\mathrm{{z}},i}}^6$ — "
         f"dose $D_\\mathrm{{z}}$ = "
-        f"{dose:.1f} m/s²", fontsize=10, loc="left",
-        pad=6)
+        f"{dose:.1f} m/s²",
+        fontsize=10,
+        loc="left",
+        pad=6,
+    )
     ax_p.legend(loc="upper left", fontsize=9)
 
     for axis in (ax_t, ax_p):
@@ -892,14 +1291,14 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
     h1, cl, rho = 0.1, 3200.0, 2400.0
     ratios = np.linspace(0.5, 4.0, 36)
     curves: dict[str, list[float]] = {
-        "X corner": [], "X straight": [], "T-junction (1) corner": [],
+        "X corner": [],
+        "X straight": [],
+        "T-junction (1) corner": [],
         "L corner": [],
     }
     for ratio in ratios:
         h2 = h1 * float(ratio)
-        res_x = vibration.junction_transmission(
-            "X", h1, cl, rho * h1, h2, cl, rho * h2
-        )
+        res_x = vibration.junction_transmission("X", h1, cl, rho * h1, h2, cl, rho * h2)
         assert res_x.straight_average is not None
         curves["X corner"].append(res_x.corner_reduction_index)
         curves["X straight"].append(
@@ -913,29 +1312,34 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
             "T1", h1, cl, rho * h1, h2, cl, rho * h2
         )
         curves["T-junction (1) corner"].append(res_t.corner_reduction_index)
-        res_l = vibration.junction_transmission(
-            "L", h1, cl, rho * h1, h2, cl, rho * h2
-        )
+        res_l = vibration.junction_transmission("L", h1, cl, rho * h1, h2, cl, rho * h2)
         curves["L corner"].append(res_l.corner_reduction_index)
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    styles = [("-", COLOR_PRIMARY), ("--", COLOR_PRIMARY),
-              ("-", COLOR_SECONDARY), ("-", COLOR_TERTIARY)]
+    styles = [
+        ("-", COLOR_PRIMARY),
+        ("--", COLOR_PRIMARY),
+        ("-", COLOR_SECONDARY),
+        ("-", COLOR_TERTIARY),
+    ]
     for (label, values), (ls, color) in zip(curves.items(), styles):
         ax.plot(ratios, values, ls, color=color, linewidth=2.0, label=label)
     # The identical-plate X-junction: Kij = 10 log10 12 + 5 log10(fc2/1000).
-    res_eq = vibration.junction_transmission(
-        "X", h1, cl, rho * h1, h1, cl, rho * h1
+    res_eq = vibration.junction_transmission("X", h1, cl, rho * h1, h1, cl, rho * h1)
+    ax.scatter(
+        [1.0],
+        [res_eq.corner_reduction_index],
+        color=COLOR_FG,
+        s=70,
+        zorder=6,
+        label=r"identical plates ($\tau = 1/12$)",
     )
-    ax.scatter([1.0], [res_eq.corner_reduction_index], color=COLOR_FG, s=70,
-               zorder=6, label=r"identical plates ($\tau = 1/12$)")
 
     ax.set_xticks(np.arange(0.5, 4.01, 0.5))
     ax.set_xticklabels([f"{v:.1f}" for v in np.arange(0.5, 4.01, 0.5)])
     ax.set_xlabel("Thickness ratio $h_2/h_1$")
     ax.set_ylabel("Vibration reduction index $K_{ij}$ [dB]")
-    ax.set_title("Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)",
-                 pad=12)
+    ax.set_title("Wave-Approach Junction $K_{ij}$ (Hopkins Eq. 5.116)", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=9)
@@ -944,10 +1348,21 @@ def generate_junction_kij_thickness(output_dir: str) -> None:
         r"$K_{ij} = 10\,\log_{10}(1/\bar{\tau}) + 5\,\log_{10}(f_{\mathrm{c}2}/1000)$",
         "concrete, plate 1 fixed at 100 mm",
     ]
-    ax.text(0.985, 0.03, "\n".join(info), transform=ax.transAxes,
-            va="bottom", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.985,
+        0.03,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="bottom",
+        ha="right",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
     plt.tight_layout()
     save_figure(output_dir, "junction_kij_thickness.svg")
     plt.close()
@@ -960,8 +1375,9 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
 
     # Norton problem 8.5 geometry: fifteen rollers, 34 mm pitch diameter,
     # 6 mm rollers, 12.96 deg contact angle, 2000 r/min.
-    faults = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                                 contact_angle_deg=12.96)
+    faults = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
     bpfo, fs_shaft = faults["BPFO"], faults.shaft_rate
 
     # A spalled outer race: one impact per BPFO period ringing a 3 kHz housing
@@ -976,7 +1392,7 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
     tau = np.arange(int(0.004 * fs)) / fs
     ring = np.exp(-tau / 6.0e-4) * np.sin(2.0 * np.pi * 3000.0 * tau)
     x = np.convolve(impacts, ring)[: t.size] * 0.6
-    x += 0.35 * np.sin(2.0 * np.pi * fs_shaft * t)          # residual unbalance
+    x += 0.35 * np.sin(2.0 * np.pi * fs_shaft * t)  # residual unbalance
     x += signals.noise_signal(fs, seconds, color="white", rms=0.25, seed=17)
 
     res = signals.envelope_spectrum(x, fs, band=(2000.0, 4000.0))
@@ -984,30 +1400,61 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
     freq, amp = res.frequencies[keep], res.amplitude[keep]
 
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    ax.plot(freq, amp, color=COLOR_PRIMARY, linewidth=1.1,
-            label="envelope spectrum of the 2-4 kHz band")
+    ax.plot(
+        freq,
+        amp,
+        color=COLOR_PRIMARY,
+        linewidth=1.1,
+        label="envelope spectrum of the 2-4 kHz band",
+    )
     top = float(amp.max())
     for order in range(1, 5):
         line = order * bpfo
-        ax.axvline(line, color=COLOR_SECONDARY, linestyle="--", linewidth=1.2,
-                   alpha=0.85, zorder=2,
-                   label="predicted BPFO and harmonics" if order == 1 else None)
-        ax.annotate(f"{order}×BPFO" if order > 1 else "BPFO",
-                    xy=(line, 1.02 * top), xytext=(3, 0),
-                    textcoords="offset points", rotation=90, fontsize=8.5,
-                    color=COLOR_SECONDARY, ha="left", va="bottom")
+        ax.axvline(
+            line,
+            color=COLOR_SECONDARY,
+            linestyle="--",
+            linewidth=1.2,
+            alpha=0.85,
+            zorder=2,
+            label="predicted BPFO and harmonics" if order == 1 else None,
+        )
+        ax.annotate(
+            f"{order}×BPFO" if order > 1 else "BPFO",
+            xy=(line, 1.02 * top),
+            xytext=(3, 0),
+            textcoords="offset points",
+            rotation=90,
+            fontsize=8.5,
+            color=COLOR_SECONDARY,
+            ha="left",
+            va="bottom",
+        )
     for name, colour in (("BPFI", COLOR_TERTIARY), ("BSF", "#9467bd")):
-        ax.axvline(faults[name], color=colour, linestyle=":", linewidth=1.3,
-                   alpha=0.9, zorder=2, label=f"predicted {name}")
-    ax.axvline(fs_shaft, color=COLOR_FG, linestyle="-.", linewidth=1.0,
-               alpha=0.6, zorder=2, label="shaft rate")
+        ax.axvline(
+            faults[name],
+            color=colour,
+            linestyle=":",
+            linewidth=1.3,
+            alpha=0.9,
+            zorder=2,
+            label=f"predicted {name}",
+        )
+    ax.axvline(
+        fs_shaft,
+        color=COLOR_FG,
+        linestyle="-.",
+        linewidth=1.0,
+        alpha=0.6,
+        zorder=2,
+        label="shaft rate",
+    )
 
     ax.set_xlim(0.0, 4.6 * bpfo)
     ax.set_ylim(0.0, 1.55 * top)
     ax.set_xlabel(LABEL_FREQ_HZ)
     ax.set_ylabel("Envelope amplitude")
-    ax.set_title("Bearing Fault Lines on a Measured Envelope Spectrum",
-                 pad=12)
+    ax.set_title("Bearing Fault Lines on a Measured Envelope Spectrum", pad=12)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=8, ncol=2)
@@ -1018,10 +1465,17 @@ def generate_bearing_fault_envelope(output_dir: str) -> None:
         f"BPFO = {bpfo:.0f} Hz, BPFI = {faults['BPFI']:.0f} Hz",
         "the envelope lines fall on BPFO, not on BPFI: outer-race spall",
     ]
-    ax.text(0.985, 0.47, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="right", fontsize=9, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.985,
+        0.47,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={"boxstyle": "round,pad=0.5", "facecolor": panel, "edgecolor": COLOR_GRID},
+    )
     plt.tight_layout()
     save_figure(output_dir, "bearing_fault_envelope.svg")
     plt.close()
@@ -1041,22 +1495,28 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     # 5.5 mm x 2.0 m x 1.2 m along the 1.2 m edge (Norton problem 6.13).
     h1, h2, area1, length = 0.003, 0.0055, 2.5 * 1.2, 1.2
     tau = vibration.right_angle_transmission_coefficient(
-        h1, h2, density1=rho, density2=rho, wave_speed1=c_l, wave_speed2=c_l)
+        h1, h2, density1=rho, density2=rho, wave_speed1=c_l, wave_speed2=c_l
+    )
     c_b = plate_bending_wave_speed(
         bands, vibration.plate_bending_stiffness(young, h1, nu), rho * h1
     )
     welded = np.array(
         [
-            float(
-                vibration.coupling_loss_factor(tau, 2.0 * c, length, f, area1)
-            )
+            float(vibration.coupling_loss_factor(tau, 2.0 * c, length, f, area1))
             for c, f in zip(c_b, bands, strict=True)
         ]
     )
     bolted = vibration.point_connection_coupling_loss_factor(
-        bands, 12, thickness1=h1, thickness2=h2, surface_density1=rho * h1,
-        surface_density2=rho * h2, wave_speed1=c_l, wave_speed2=c_l,
-        plate_area1=area1)
+        bands,
+        12,
+        thickness1=h1,
+        thickness2=h2,
+        surface_density1=rho * h1,
+        surface_density2=rho * h2,
+        wave_speed1=c_l,
+        wave_speed2=c_l,
+        plate_area1=area1,
+    )
 
     # The satellite platform and cylinder of Norton problem 6.10, inverted from
     # its measured energies in the 500 Hz octave.
@@ -1071,21 +1531,41 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
         2.4e-3,
         vibration.flat_plate_modal_density(area_p, t_p, c_l),
         float(
-            vibration.cylindrical_shell_modal_density(
-                500.0, area_c, t_c, radius, c_l
-            )[0]
+            vibration.cylindrical_shell_modal_density(500.0, area_c, t_c, radius, c_l)[
+                0
+            ]
         ),
     )
 
     fig, axes = plt.subplots(1, 2, figsize=(12.5, 5.6))
     ax = axes[0]
     x = _band_index_axis(ax, bands, fontsize=9)
-    ax.semilogy(x, welded, "-o", color=COLOR_PRIMARY, linewidth=2.0,
-                markersize=5, label=r"welded line junction $\eta_{12}$")
-    ax.semilogy(x, bolted, "-s", color=COLOR_SECONDARY, linewidth=2.0,
-                markersize=5, label=r"12 bolts, point connections $\eta_{12}$")
-    ax.axhline(1.0e-2, color=COLOR_FG, linestyle="--", linewidth=1.2,
-               alpha=0.7, label=r"internal loss factor $\eta_1$")
+    ax.semilogy(
+        x,
+        welded,
+        "-o",
+        color=COLOR_PRIMARY,
+        linewidth=2.0,
+        markersize=5,
+        label=r"welded line junction $\eta_{12}$",
+    )
+    ax.semilogy(
+        x,
+        bolted,
+        "-s",
+        color=COLOR_SECONDARY,
+        linewidth=2.0,
+        markersize=5,
+        label=r"12 bolts, point connections $\eta_{12}$",
+    )
+    ax.axhline(
+        1.0e-2,
+        color=COLOR_FG,
+        linestyle="--",
+        linewidth=1.2,
+        alpha=0.7,
+        label=r"internal loss factor $\eta_1$",
+    )
     ax.set_ylabel("Coupling loss factor")
     ax.set_title("Predicted: Weld Against Bolts", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, which="both")
@@ -1094,8 +1574,12 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
 
     ax = axes[1]
     labels = [r"$\eta_1$", r"$\eta_2$", r"$\eta_{12}$", r"$\eta_{21}$"]
-    values = [4.4e-3, 2.4e-3, float(sea.coupling_loss_factor12[0]),
-              float(sea.coupling_loss_factor21[0])]
+    values = [
+        4.4e-3,
+        2.4e-3,
+        float(sea.coupling_loss_factor12[0]),
+        float(sea.coupling_loss_factor21[0]),
+    ]
     # COLOR_MUTED, not COLOR_GRID: this is a de-emphasised *bar*, and the
     # grid colour is tuned to disappear into the page it is drawn on.
     colours = [COLOR_FG, COLOR_MUTED, COLOR_PRIMARY, COLOR_SECONDARY]
@@ -1103,14 +1587,19 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
     ax.set_yscale("log")
     ax.set_ylim(1.0e-4, 1.0e-2)
     ax.set_ylabel("Loss factor")
-    ax.set_title("Measured: Power Injection, 500 Hz Octave",
-                 pad=10)
+    ax.set_title("Measured: Power Injection, 500 Hz Octave", pad=10)
     ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5, axis="y", which="both")
     ax.set_axisbelow(True)
     for label, value in zip(labels, values, strict=True):
-        ax.annotate(_sci_math(value), xy=(label, value), xytext=(0, 4),
-                    textcoords="offset points", ha="center", fontsize=8.5,
-                    color=COLOR_FG)
+        ax.annotate(
+            _sci_math(value),
+            xy=(label, value),
+            xytext=(0, 4),
+            textcoords="offset points",
+            ha="center",
+            fontsize=8.5,
+            color=COLOR_FG,
+        )
 
     panel = "#f0f2f5" if COLOR_FG == "black" else "#1c2128"
     info = [
@@ -1118,12 +1607,18 @@ def generate_experimental_sea_clf(output_dir: str) -> None:
         f"input power = {float(sea.input_power[0]):.2f} W",
         r"coupling stays well below the damping: valid SEA",
     ]
-    ax.text(0.98, 0.97, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="right", fontsize=9, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": panel,
-                  "edgecolor": COLOR_GRID})
-    fig.suptitle("Coupling Loss Factors: Prediction and Power Injection",
-                 fontsize=13)
+    ax.text(
+        0.98,
+        0.97,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=9,
+        color=COLOR_FG,
+        bbox={"boxstyle": "round,pad=0.5", "facecolor": panel, "edgecolor": COLOR_GRID},
+    )
+    fig.suptitle("Coupling Loss Factors: Prediction and Power Injection", fontsize=13)
     plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.95))
     save_figure(output_dir, "experimental_sea_clf.svg")
     plt.close()
@@ -1141,23 +1636,45 @@ def generate_mobility_result_lines(output_dir: str) -> None:
     f0 = float(res.frequencies[int(np.argmax(res.magnitude))])
 
     fig, (ax, low) = plt.subplots(
-        2, 1, figsize=(10, 7.6), sharex=True,
-        gridspec_kw={"height_ratios": [1.6, 1.0]})
-    ax.loglog(f, res.magnitude, color=COLOR_PRIMARY, linewidth=2.2,
-              label="driving-point $|Y(f)|$")
-    ax.loglog(f, w / k, ":", color=COLOR_SECONDARY, linewidth=1.6,
-              label=r"stiffness line $\omega/k$")
-    ax.loglog(f, 1.0 / (w * m), ":", color=COLOR_TERTIARY, linewidth=1.6,
-              label=r"mass line $1/(\omega m)$")
+        2, 1, figsize=(10, 7.6), sharex=True, gridspec_kw={"height_ratios": [1.6, 1.0]}
+    )
+    ax.loglog(
+        f,
+        res.magnitude,
+        color=COLOR_PRIMARY,
+        linewidth=2.2,
+        label="driving-point $|Y(f)|$",
+    )
+    ax.loglog(
+        f,
+        w / k,
+        ":",
+        color=COLOR_SECONDARY,
+        linewidth=1.6,
+        label=r"stiffness line $\omega/k$",
+    )
+    ax.loglog(
+        f,
+        1.0 / (w * m),
+        ":",
+        color=COLOR_TERTIARY,
+        linewidth=1.6,
+        label=r"mass line $1/(\omega m)$",
+    )
     ax.axhline(1.0 / c, color=COLOR_GRID, linestyle="--", linewidth=1.2)
-    ax.scatter([f0], [1.0 / c], color=COLOR_FG, s=60, zorder=6,
-               label="peak $|Y| = 1/c$ (damping)")
+    ax.scatter(
+        [f0],
+        [1.0 / c],
+        color=COLOR_FG,
+        s=60,
+        zorder=6,
+        label="peak $|Y| = 1/c$ (damping)",
+    )
 
     ax.set_xlim(float(f[0]), float(f[-1]))
     ax.set_ylim(2e-4, 0.6)
     ax.set_ylabel("Mobility $|Y|$ [m/(N·s)]")
-    ax.set_title("Reading a Driving-Point Mobility (ISO 7626-1)",
-                 pad=12)
+    ax.set_title("Reading a Driving-Point Mobility (ISO 7626-1)", pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower center", fontsize=9, ncol=2)
@@ -1167,20 +1684,36 @@ def generate_mobility_result_lines(output_dir: str) -> None:
         r"above $f_0$: mass-controlled, $|Y| \sim 1/(\omega m)$",
         rf"$f_0$ = {f0:.1f} Hz,  $1/c$ = {1.0 / c:.2f} m/(N·s)",
     ]
-    ax.text(0.015, 0.97, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="left", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.015,
+        0.97,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="left",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
 
     # The phase is the other half of the reading, and the one the +-90 deg
     # bound of ISO 7626-2 A.4 turns into a validity check on the setup.
     phase = np.degrees(np.asarray(res.phase, dtype=np.float64))
     low.axhspan(-90.0, 90.0, color=theme_fill(COLOR_PRIMARY, low), zorder=0)
-    low.semilogx(f, phase, color=COLOR_PRIMARY, linewidth=2.2,
-                 label="phase of $Y(f)$")
+    low.semilogx(f, phase, color=COLOR_PRIMARY, linewidth=2.2, label="phase of $Y(f)$")
     low.axhline(0.0, color=COLOR_GRID, linestyle="--", linewidth=1.2)
-    low.scatter([f0], [0.0], color=COLOR_FG, s=55, zorder=6,
-                label="0° at the resonance: $Y$ is real, $|Y| = 1/c$")
+    low.scatter(
+        [f0],
+        [0.0],
+        color=COLOR_FG,
+        s=55,
+        zorder=6,
+        label="0° at the resonance: $Y$ is real, $|Y| = 1/c$",
+    )
     low.set_ylim(-115.0, 115.0)
     low.set_yticks([-90, -45, 0, 45, 90])
     low.set_ylabel("Phase [degrees]")
@@ -1189,9 +1722,16 @@ def generate_mobility_result_lines(output_dir: str) -> None:
     low.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     low.set_axisbelow(True)
     low.legend(loc="lower left", fontsize=9)
-    low.text(0.985, 0.93, "a driving-point FRF never leaves ±90°\n"
-             "(ISO 7626-2, A.4)", transform=low.transAxes, va="top",
-             ha="right", fontsize=9.5, color=COLOR_FG)
+    low.text(
+        0.985,
+        0.93,
+        "a driving-point FRF never leaves ±90°\n(ISO 7626-2, A.4)",
+        transform=low.transAxes,
+        va="top",
+        ha="right",
+        fontsize=9.5,
+        color=COLOR_FG,
+    )
     fig.align_ylabels()
     plt.tight_layout()
     save_figure(output_dir, "mobility_result_lines.svg")
@@ -1214,7 +1754,8 @@ class _LineSpectrum:
 
     def add(self, centre: float, height: float, width: float = 2.2) -> None:
         self.amplitude = self.amplitude + height * np.exp(
-            -0.5 * ((self.frequencies - centre) / width) ** 2)
+            -0.5 * ((self.frequencies - centre) / width) ** 2
+        )
 
 
 #: One size for the four reading blocks of ``machine_fault_families``. Half a
@@ -1254,21 +1795,22 @@ def generate_machine_fault_families(output_dir: str) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(13.6, 8.8))
 
     # --- (a) and (b): the same gear pair with two different faults ----------
-    gear = vibration.gear_mesh_frequencies(
-        1500.0, 28, harmonics=3, sidebands=2
-    )
-    shaft = gear.shaft_rate                                    # 25 Hz
-    gmf = gear["GMF"]                                          # 700 Hz
+    gear = vibration.gear_mesh_frequencies(1500.0, 28, harmonics=3, sidebands=2)
+    shaft = gear.shaft_rate  # 25 Hz
+    gmf = gear["GMF"]  # 700 Hz
     cases = (
-        ("Localised fault: one chipped tooth", (1.0, 0.40, 0.16),
-         (0.13, 0.09), axes[0][0]),
-        ("Distributed wear: every tooth", (1.0, 0.78, 0.62), (0.46, 0.33),
-         axes[0][1]),
+        (
+            "Localised fault: one chipped tooth",
+            (1.0, 0.40, 0.16),
+            (0.13, 0.09),
+            axes[0][0],
+        ),
+        ("Distributed wear: every tooth", (1.0, 0.78, 0.62), (0.46, 0.33), axes[0][1]),
     )
     for title, harm, side, ax in cases:
         freq = np.linspace(0.0, 2400.0, 4800)
         spec = _LineSpectrum(freq)
-        for order in range(1, 4):                              # shaft orders
+        for order in range(1, 4):  # shaft orders
             spec.add(order * shaft, 0.05 / order)
         for k, height in enumerate(harm, start=1):
             spec.add(k * gmf, height)
@@ -1283,12 +1825,20 @@ def generate_machine_fault_families(output_dir: str) -> None:
         # through the 2xGMF group's five of them.
         ax.annotate(
             "sidebands at\n$\\pm f_\\mathrm{s}$ = 25 Hz:\n"
-            + ("low and flat" if "Localised" in title
-               else "tall groups, and the\nhigher harmonics lift"),
+            + (
+                "low and flat"
+                if "Localised" in title
+                else "tall groups, and the\nhigher harmonics lift"
+            ),
             xy=(gmf - 2.0 * shaft, 0.16 if "Localised" in title else 0.42),
-            xytext=(0.025, 0.76), textcoords="axes fraction",
-            va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
-            arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
+            xytext=(0.025, 0.76),
+            textcoords="axes fraction",
+            va="top",
+            ha="left",
+            fontsize=_NOTE_PT,
+            color=COLOR_FG,
+            arrowprops={"arrowstyle": "->", "color": COLOR_MUTED},
+        )
 
     # --- (c): the motor family, three decades of amplitude ------------------
     ax = axes[1][0]
@@ -1297,21 +1847,24 @@ def generate_machine_fault_families(output_dir: str) -> None:
     spec = _LineSpectrum(freq, floor=2.0e-5)
     for name, height in (("1x", 1.0), ("2x", 0.30), ("2fe", 0.06)):
         spec.add(motor[name], height, width=3.0)
-    spec.add(motor["fsh"], 1.6e-3, width=3.0)                  # rotor slot
-    for sign in (-1.0, 1.0):                                   # ± shaft rate
+    spec.add(motor["fsh"], 1.6e-3, width=3.0)  # rotor slot
+    for sign in (-1.0, 1.0):  # ± shaft rate
         spec.add(motor["fsh"] + sign * motor["1x"], 5.5e-4, width=3.0)
     motor.plot(spectrum=spec, ax=ax)
-    _relabel_spectrum(ax, "Induction motor: 1x, 2x, 2fe and the rotor-slot "
-                      "family")
+    _relabel_spectrum(ax, "Induction motor: 1x, 2x, 2fe and the rotor-slot family")
     ax.set_yscale("log")
     # Five decades and a little: the 1x line is the tallest thing in the panel
     # and the top of the axis is where its name is written.
     ax.set_ylim(1.0e-5, 5.0)
-    ax.annotate("rotor-slot harmonic\nwith $\\pm f_\\mathrm{s}$ sidebands:\n"
-                "the spacing is the diagnosis",
-                xy=(motor["fsh"], 1.6e-3), xytext=(1700.0, 0.02),
-                fontsize=_NOTE_PT, color=COLOR_FG,
-                arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
+    ax.annotate(
+        "rotor-slot harmonic\nwith $\\pm f_\\mathrm{s}$ sidebands:\n"
+        "the spacing is the diagnosis",
+        xy=(motor["fsh"], 1.6e-3),
+        xytext=(1700.0, 0.02),
+        fontsize=_NOTE_PT,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED},
+    )
 
     # --- (d): the ducted fan, blade rate against its lobe patterns ----------
     ax = axes[1][1]
@@ -1323,20 +1876,30 @@ def generate_machine_fault_families(output_dir: str) -> None:
     spec.add(fan["lobe n=1 m=2"], 0.62, width=0.8)
     spec.add(fan["lobe n=1 m=10"], 0.07, width=0.8)
     fan.plot(spectrum=spec, ax=ax)
-    _relabel_spectrum(ax, "Ducted fan: the blade rate and its rotating lobe "
-                      "patterns")
+    _relabel_spectrum(ax, "Ducted fan: the blade rate and its rotating lobe patterns")
     # Each block is centred in the column between two of the fan's lines: the
     # first between the shaft and the two-lobe pattern, the second between that
     # and the blade rate, which the longer Spanish reading used to run over.
-    ax.annotate("$m_\\mathrm{L}$ = 10 turns at 35 Hz,\nbelow the shaft: weak",
-                xy=(fan["lobe n=1 m=10"], 0.12), xytext=(66.0, 0.62),
-                va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
-                arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
-    ax.annotate("$m_\\mathrm{L}$ = 2 turns at 175 Hz,\n"
-                "3x the shaft speed: strong",
-                xy=(fan["lobe n=1 m=2"], 0.70), xytext=(189.0, 0.96),
-                va="top", ha="left", fontsize=_NOTE_PT, color=COLOR_FG,
-                arrowprops={"arrowstyle": "->", "color": COLOR_MUTED})
+    ax.annotate(
+        "$m_\\mathrm{L}$ = 10 turns at 35 Hz,\nbelow the shaft: weak",
+        xy=(fan["lobe n=1 m=10"], 0.12),
+        xytext=(66.0, 0.62),
+        va="top",
+        ha="left",
+        fontsize=_NOTE_PT,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED},
+    )
+    ax.annotate(
+        "$m_\\mathrm{L}$ = 2 turns at 175 Hz,\n3x the shaft speed: strong",
+        xy=(fan["lobe n=1 m=2"], 0.70),
+        xytext=(189.0, 0.96),
+        va="top",
+        ha="left",
+        fontsize=_NOTE_PT,
+        color=COLOR_FG,
+        arrowprops={"arrowstyle": "->", "color": COLOR_MUTED},
+    )
 
     # One key for the four panels, at the foot of the figure: they draw the
     # same curve and give each family the same colour, so a box per panel
@@ -1346,11 +1909,16 @@ def generate_machine_fault_families(output_dir: str) -> None:
         handles, names = panel.get_legend_handles_labels()
         for name, handle in zip(names, handles, strict=True):
             keyed.setdefault(name, handle)
-    fig.legend(list(keyed.values()), list(keyed), loc="lower center",
-               ncol=len(keyed), fontsize=9.5, frameon=False)
+    fig.legend(
+        list(keyed.values()),
+        list(keyed),
+        loc="lower center",
+        ncol=len(keyed),
+        fontsize=9.5,
+        frameon=False,
+    )
 
-    fig.suptitle("Fault Families Are Recognised by Their Pattern",
-                 fontsize=13)
+    fig.suptitle("Fault Families Are Recognised by Their Pattern", fontsize=13)
     plt.tight_layout(rect=(0.0, 0.035, 1.0, 0.96))
     save_figure(output_dir, "machine_fault_families.svg")
     plt.close()
@@ -1363,8 +1931,9 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
 
     from phonometry import signals, vibration
 
-    faults = vibration.bearing_fault_frequencies(2000.0, 15, 6.0, 34.0,
-                                                 contact_angle_deg=12.96)
+    faults = vibration.bearing_fault_frequencies(
+        2000.0, 15, 6.0, 34.0, contact_angle_deg=12.96
+    )
     bpfo, fs_shaft = faults["BPFO"], faults.shaft_rate
 
     # The record of the opening figure: impacts at BPFO ringing a 3 kHz
@@ -1387,65 +1956,90 @@ def generate_envelope_chain_steps(output_dir: str) -> None:
     sos = sp_signal.butter(4, band, btype="bandpass", fs=fs, output="sos")
     narrow = np.asarray(sp_signal.sosfiltfilt(sos, x), dtype=np.float64)
 
-    window = slice(0, int(0.05 * fs))                 # the first 50 ms
+    window = slice(0, int(0.05 * fs))  # the first 50 ms
     fig, axes = plt.subplots(4, 1, figsize=(10.5, 10.4))
 
     axes[0].plot(t[window] * 1e3, x[window], color=COLOR_MUTED, linewidth=0.9)
     axes[0].set_ylabel("raw record")
-    axes[0].set_title("1. As recorded: noise and unbalance, no visible impacts",
-                      fontsize=11, pad=8)
+    axes[0].set_title(
+        "1. As recorded: noise and unbalance, no visible impacts", fontsize=11, pad=8
+    )
 
-    axes[1].plot(t[window] * 1e3, narrow[window], color=COLOR_PRIMARY,
-                 linewidth=0.9)
+    axes[1].plot(t[window] * 1e3, narrow[window], color=COLOR_PRIMARY, linewidth=0.9)
     axes[1].set_ylabel("2-4 kHz band")
-    axes[1].set_title("2. Band-passed on the 3 kHz housing resonance: "
-                      "the impact train", fontsize=11,
-                      pad=8)
+    axes[1].set_title(
+        "2. Band-passed on the 3 kHz housing resonance: the impact train",
+        fontsize=11,
+        pad=8,
+    )
     top = float(np.max(np.abs(narrow[window])))
     axes[1].set_ylim(-1.35 * top, 1.35 * top)
-    for k in range(11):                       # one impact per BPFO period
-        axes[1].axvline(1e3 * k / bpfo, color=COLOR_MUTED, linewidth=0.8,
-                        alpha=0.55, zorder=0)
+    for k in range(11):  # one impact per BPFO period
+        axes[1].axvline(
+            1e3 * k / bpfo, color=COLOR_MUTED, linewidth=0.8, alpha=0.55, zorder=0
+        )
     t0 = 1e3 / bpfo * 3.0
-    axes[1].annotate("", xy=(t0, 1.06 * top), xytext=(t0 + 1e3 / bpfo,
-                     1.06 * top),
-                     arrowprops={"arrowstyle": "<->", "color": COLOR_SECONDARY})
-    axes[1].text(t0 + 0.5e3 / bpfo, 1.14 * top,
-                 rf"$1/\mathrm{{BPFO}}$ = {1e3 / bpfo:.2f} ms", ha="center",
-                 fontsize=9, color=COLOR_SECONDARY)
+    axes[1].annotate(
+        "",
+        xy=(t0, 1.06 * top),
+        xytext=(t0 + 1e3 / bpfo, 1.06 * top),
+        arrowprops={"arrowstyle": "<->", "color": COLOR_SECONDARY},
+    )
+    axes[1].text(
+        t0 + 0.5e3 / bpfo,
+        1.14 * top,
+        rf"$1/\mathrm{{BPFO}}$ = {1e3 / bpfo:.2f} ms",
+        ha="center",
+        fontsize=9,
+        color=COLOR_SECONDARY,
+    )
 
-    axes[2].plot(res.times[window] * 1e3, res.envelope[window],
-                 color=COLOR_SECONDARY, linewidth=1.0)
+    axes[2].plot(
+        res.times[window] * 1e3,
+        res.envelope[window],
+        color=COLOR_SECONDARY,
+        linewidth=1.0,
+    )
     axes[2].set_ylabel("envelope")
     axes[2].set_xlabel("Time [ms]")
-    axes[2].set_title("3. Hilbert envelope: one pulse per impact",
-                      fontsize=11, pad=8)
+    axes[2].set_title("3. Hilbert envelope: one pulse per impact", fontsize=11, pad=8)
 
     keep = res.frequencies <= 4.6 * bpfo
-    axes[3].plot(res.frequencies[keep], res.amplitude[keep],
-                 color=COLOR_PRIMARY, linewidth=1.1)
+    axes[3].plot(
+        res.frequencies[keep], res.amplitude[keep], color=COLOR_PRIMARY, linewidth=1.1
+    )
     peak = float(np.max(res.amplitude[keep]))
     for order in range(1, 5):
-        axes[3].axvline(order * bpfo, color=COLOR_SECONDARY, linestyle="--",
-                        linewidth=1.2, alpha=0.85,
-                        label="predicted BPFO and harmonics"
-                        if order == 1 else None)
+        axes[3].axvline(
+            order * bpfo,
+            color=COLOR_SECONDARY,
+            linestyle="--",
+            linewidth=1.2,
+            alpha=0.85,
+            label="predicted BPFO and harmonics" if order == 1 else None,
+        )
     for name, colour in (("BPFI", COLOR_TERTIARY), ("BSF", "#9467bd")):
-        axes[3].axvline(faults[name], color=colour, linestyle=":",
-                        linewidth=1.3, alpha=0.9, label=f"predicted {name}")
+        axes[3].axvline(
+            faults[name],
+            color=colour,
+            linestyle=":",
+            linewidth=1.3,
+            alpha=0.9,
+            label=f"predicted {name}",
+        )
     axes[3].set_xlim(0.0, 4.6 * bpfo)
     axes[3].set_ylim(0.0, 1.35 * peak)
     axes[3].set_xlabel(LABEL_FREQ_HZ)
     axes[3].set_ylabel("envelope spectrum")
-    axes[3].set_title("4. Its spectrum: the period has become a line at BPFO",
-                      fontsize=11, pad=8)
+    axes[3].set_title(
+        "4. Its spectrum: the period has become a line at BPFO", fontsize=11, pad=8
+    )
     axes[3].legend(loc="upper right", fontsize=8.5)
 
     for ax in axes:
         ax.grid(color=COLOR_GRID, linestyle="--", alpha=0.5)
         ax.set_axisbelow(True)
-    fig.suptitle("What Each Step of the Envelope Route Does to the Signal",
-                 fontsize=13)
+    fig.suptitle("What Each Step of the Envelope Route Does to the Signal", fontsize=13)
     plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.965))
     save_figure(output_dir, "envelope_chain_steps.svg")
     plt.close()
@@ -1465,22 +2059,40 @@ def generate_infinite_mobilities(output_dir: str) -> None:
     b_beam = 2.1e11 * 0.1 * 0.2**3 / 12.0
     beam = vibration.infinite_beam_point_mobility(freq, b_beam, 7800.0 * 0.02)
     rod = vibration.longitudinal_rod_mobility(7800.0, 5100.0, 2.0e-4)
-    sdof = vibration.sdof_mobility_result(
-        freq, mass=2.0, stiffness=8000.0, damping=5.0
-    )
+    sdof = vibration.sdof_mobility_result(freq, mass=2.0, stiffness=8000.0, damping=5.0)
 
     fig, (ax, low) = plt.subplots(
-        2, 1, figsize=(10, 7.6), sharex=True,
-        gridspec_kw={"height_ratios": [1.6, 1.0]})
+        2, 1, figsize=(10, 7.6), sharex=True, gridspec_kw={"height_ratios": [1.6, 1.0]}
+    )
     curves = (
-        (sdof.magnitude, np.degrees(np.asarray(sdof.phase)), COLOR_MUTED,
-         "SDOF resonator (section 2)", "--"),
-        (plate.magnitude, np.degrees(np.asarray(plate.phase)), COLOR_PRIMARY,
-         "infinite plate, 140 mm concrete", "-"),
-        (beam.magnitude, np.degrees(np.asarray(beam.phase)), COLOR_SECONDARY,
-         "infinite beam, 100 × 200 mm steel", "-"),
-        (np.full_like(freq, rod), np.zeros_like(freq), COLOR_TERTIARY,
-         "steel strut, longitudinal", ":"),
+        (
+            sdof.magnitude,
+            np.degrees(np.asarray(sdof.phase)),
+            COLOR_MUTED,
+            "SDOF resonator (section 2)",
+            "--",
+        ),
+        (
+            plate.magnitude,
+            np.degrees(np.asarray(plate.phase)),
+            COLOR_PRIMARY,
+            "infinite plate, 140 mm concrete",
+            "-",
+        ),
+        (
+            beam.magnitude,
+            np.degrees(np.asarray(beam.phase)),
+            COLOR_SECONDARY,
+            "infinite beam, 100 × 200 mm steel",
+            "-",
+        ),
+        (
+            np.full_like(freq, rod),
+            np.zeros_like(freq),
+            COLOR_TERTIARY,
+            "steel strut, longitudinal",
+            ":",
+        ),
     )
     for mag, phase, colour, label, style in curves:
         ax.loglog(freq, mag, style, color=colour, linewidth=2.0, label=label)
@@ -1488,8 +2100,7 @@ def generate_infinite_mobilities(output_dir: str) -> None:
 
     ax.set_ylim(5.0e-7, 0.6)
     ax.set_ylabel("Mobility $|Y|$ [m/(N·s)]")
-    ax.set_title("Point Mobilities of Infinite Structures (Cremer Table 5.1)",
-                 pad=12)
+    ax.set_title("Point Mobilities of Infinite Structures (Cremer Table 5.1)", pad=12)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="lower left", fontsize=9)
@@ -1499,10 +2110,21 @@ def generate_infinite_mobilities(output_dir: str) -> None:
         r"rod:    $Y = 1/(\rho c_\mathrm{L} S)$, real and flat",
         f"plate $|Y|$ = {_sci_math(float(plate.magnitude[0]))} m/(N·s)",
     ]
-    ax.text(0.985, 0.97, "\n".join(info), transform=ax.transAxes,
-            va="top", ha="right", fontsize=10, color=COLOR_FG,
-            bbox={"boxstyle": "round,pad=0.5", "facecolor": COLOR_PANEL,
-                  "edgecolor": COLOR_GRID})
+    ax.text(
+        0.985,
+        0.97,
+        "\n".join(info),
+        transform=ax.transAxes,
+        va="top",
+        ha="right",
+        fontsize=10,
+        color=COLOR_FG,
+        bbox={
+            "boxstyle": "round,pad=0.5",
+            "facecolor": COLOR_PANEL,
+            "edgecolor": COLOR_GRID,
+        },
+    )
 
     low.axhline(0.0, color=COLOR_GRID, linestyle="--", linewidth=1.1)
     low.axhline(-45.0, color=COLOR_GRID, linestyle=":", linewidth=1.1)
@@ -1525,13 +2147,10 @@ def generate_mobility_random_error(output_dir: str) -> None:
     print("Generating mobility_random_error...")
     from phonometry import vibration
 
-    averages = np.unique(np.round(
-        np.logspace(np.log10(2.0), np.log10(1000.0), 260)))
+    averages = np.unique(np.round(np.logspace(np.log10(2.0), np.log10(1000.0), 260)))
     _fig, ax = plt.subplots(figsize=(10, 6.2))
-    palette = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, COLOR_MUTED,
-               COLOR_FG)
-    for coherence, colour in zip((0.5, 0.7, 0.8, 0.9, 0.95), palette,
-                                 strict=True):
+    palette = (COLOR_PRIMARY, COLOR_SECONDARY, COLOR_TERTIARY, COLOR_MUTED, COLOR_FG)
+    for coherence, colour in zip((0.5, 0.7, 0.8, 0.9, 0.95), palette, strict=True):
         error = np.array(
             [
                 float(vibration.random_error_percent(coherence, int(n)))
@@ -1539,15 +2158,31 @@ def generate_mobility_random_error(output_dir: str) -> None:
             ],
             dtype=np.float64,
         )
-        ax.loglog(averages, error, color=colour, linewidth=2.0,
-                  label=rf"$\gamma^2 = {coherence}$")
+        ax.loglog(
+            averages,
+            error,
+            color=colour,
+            linewidth=2.0,
+            label=rf"$\gamma^2 = {coherence}$",
+        )
         needed = (1.0 - coherence) / (2.0 * coherence * 0.05**2)
         ax.scatter([needed], [5.0], color=colour, s=36, zorder=6)
-        ax.annotate(f"{needed:.0f}", xy=(needed, 5.0), xytext=(0, -14),
-                    textcoords="offset points", ha="center", fontsize=9,
-                    color=colour)
-    ax.axhline(5.0, color=COLOR_FG, linestyle="--", linewidth=1.4,
-               label="the Annex A criterion, 5 %")
+        ax.annotate(
+            f"{needed:.0f}",
+            xy=(needed, 5.0),
+            xytext=(0, -14),
+            textcoords="offset points",
+            ha="center",
+            fontsize=9,
+            color=colour,
+        )
+    ax.axhline(
+        5.0,
+        color=COLOR_FG,
+        linestyle="--",
+        linewidth=1.4,
+        label="the Annex A criterion, 5 %",
+    )
     ax.scatter(
         [75.0],
         [float(vibration.random_error_percent(0.8, 75))],
@@ -1561,17 +2196,26 @@ def generate_mobility_random_error(output_dir: str) -> None:
 
     ax.set_xlabel("Number of averaged spectra $n$")
     ax.set_ylabel(r"Normalized random error $\varepsilon$ [%]")
-    ax.set_title("How Many Averages the 5 % Criterion Costs (ISO 7626-2, "
-                 "Annex A)", pad=12)
+    ax.set_title(
+        "How Many Averages the 5 % Criterion Costs (ISO 7626-2, Annex A)", pad=12
+    )
     ax.set_xlim(2.0, 1000.0)
     ax.set_ylim(1.0, 60.0)
     ax.grid(which="both", color=COLOR_GRID, linestyle="--", alpha=0.5)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", fontsize=9)
-    ax.text(0.015, 0.05, "the marked $n$ is what each coherence needs to reach "
-            "5 %: 11 averages at 0.95, 200 at 0.5.\nFixing the measurement is "
-            "cheaper than averaging through it.", transform=ax.transAxes,
-            va="bottom", ha="left", fontsize=9.5, color=COLOR_FG)
+    ax.text(
+        0.015,
+        0.05,
+        "the marked $n$ is what each coherence needs to reach "
+        "5 %: 11 averages at 0.95, 200 at 0.5.\nFixing the measurement is "
+        "cheaper than averaging through it.",
+        transform=ax.transAxes,
+        va="bottom",
+        ha="left",
+        fontsize=9.5,
+        color=COLOR_FG,
+    )
     plt.tight_layout()
     save_figure(output_dir, "mobility_random_error.svg")
     plt.close()

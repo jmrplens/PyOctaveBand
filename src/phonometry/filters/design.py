@@ -102,33 +102,49 @@ def _design_sos_filter(
     for idx, (lower, upper) in enumerate(zip(freq_d, freq_u)):
         fsd = fs / factor[idx]
         wn = np.array([lower, upper]) / (fsd / 2)
-        
+
         if filter_type == "butter":
             sos[idx] = signal.butter(N=order, Wn=wn, btype="bandpass", output="sos")
         elif filter_type == "cheby1":
-            sos[idx] = signal.cheby1(N=order, rp=ripple, Wn=wn, btype="bandpass", output="sos")
+            sos[idx] = signal.cheby1(
+                N=order, rp=ripple, Wn=wn, btype="bandpass", output="sos"
+            )
         elif filter_type == "cheby2":
             # Wn in cheby2 is the STOPBAND edge; map the desired -3 dB band
             # edges to stopband edges so the passband matches the ANSI band.
-            f1_stop, f2_stop = _cheby2_stopband_edges(lower, upper, order, attenuation, fsd)
+            f1_stop, f2_stop = _cheby2_stopband_edges(
+                lower, upper, order, attenuation, fsd
+            )
             # No Nyquist clamp is needed here. Called with a sample rate, the
             # mapping returns through (fsd/pi)*arctan(...), and arctan is
             # bounded by pi/2, so f2_stop < fsd/2 strictly however wide the
             # prototype's transition or however close the band sits to Nyquist.
             nyq = fsd / 2
             wn_stop = np.array([f1_stop, f2_stop]) / nyq
-            sos[idx] = signal.cheby2(N=order, rs=attenuation, Wn=wn_stop, btype="bandpass", output="sos")
+            sos[idx] = signal.cheby2(
+                N=order, rs=attenuation, Wn=wn_stop, btype="bandpass", output="sos"
+            )
         elif filter_type == "ellip":
-            sos[idx] = signal.ellip(N=order, rp=ripple, rs=attenuation, Wn=wn, btype="bandpass", output="sos")
+            sos[idx] = signal.ellip(
+                N=order,
+                rp=ripple,
+                rs=attenuation,
+                Wn=wn,
+                btype="bandpass",
+                output="sos",
+            )
         elif filter_type == "bessel":
             # norm="mag" places the -3 dB point at Wn (band edges);
             # norm="phase" would shift it to ~-10 dB at the edges.
-            sos[idx] = signal.bessel(N=order, Wn=wn, btype="bandpass", norm="mag", output="sos")
+            sos[idx] = signal.bessel(
+                N=order, Wn=wn, btype="bandpass", norm="mag", output="sos"
+            )
 
     if show or plot_file:
         _showfilter(sos, freq, freq_u, freq_d, fs, factor, show, plot_file)
 
     return sos
+
 
 def _showfilter(
     sos: list[np.ndarray],
@@ -171,7 +187,9 @@ def _showfilter(
         w[:, idx], h[:, idx] = signal.sosfreqz(sos[idx], worN=wn, whole=False, fs=fsd)
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.semilogx(w, 20 * np.log10(abs(h) + np.finfo(float).eps), color="#1f77b4", linewidth=1.2)
+    ax.semilogx(
+        w, 20 * np.log10(abs(h) + np.finfo(float).eps), color="#1f77b4", linewidth=1.2
+    )
     # The -3 dB line is a reference, so it is drawn quieter than the responses
     # it is read against -- but quieter by *colour*, not by opacity. Half
     # opacity of this red is a soft pink over the white page and lands within
@@ -180,8 +198,13 @@ def _showfilter(
     # for it and raises the colour where there is not.
     from .._plot.common import theme_line
 
-    ax.axhline(-3, color=theme_line("#d62728", ax, quiet=0.5), linestyle="--",
-               linewidth=1, label="-3 dB")
+    ax.axhline(
+        -3,
+        color=theme_line("#d62728", ax, quiet=0.5),
+        linestyle="--",
+        linewidth=1,
+        label="-3 dB",
+    )
 
     ax.set_title("Filter Bank Frequency Response", pad=15)
     ax.set_xlabel("Frequency [Hz]")
@@ -195,14 +218,33 @@ def _showfilter(
     # Dynamic ticks based on range
     f_min = freq_d[0] * 0.8
     f_max = freq_u[-1] * 1.2
-    
+
     # Standard frequencies for ticks
     all_ticks = [
-        0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 
-        1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000
+        0.1,
+        0.2,
+        0.5,
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100,
+        200,
+        500,
+        1000,
+        2000,
+        5000,
+        10000,
+        20000,
+        50000,
+        100000,
+        200000,
+        500000,
     ]
     xticks = [f for f in all_ticks if f_min <= f <= f_max]
-    
+
     # If too few ticks, use simpler logic
     if len(xticks) < 3:
         # Fallback to powers of 10
@@ -213,10 +255,10 @@ def _showfilter(
     xticklabels = []
     for f in xticks:
         if f >= 1000:
-            xticklabels.append(f"{f/1000:g}k")
+            xticklabels.append(f"{f / 1000:g}k")
         else:
             xticklabels.append(f"{f:g}")
-            
+
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticklabels)
 

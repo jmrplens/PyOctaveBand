@@ -147,9 +147,13 @@ def test_annex_d_task_levels_and_contributions():
     assert by_label["cutting/grinding"].lp_aeqt == pytest.approx(90.1, abs=0.05)
     # Contributions match the standard to rounding (it rounds Lp to 80.8/90.1
     # before Eq 8; unrounded welding gives 78.74 -> reported 78.8).
-    assert by_label["planning/breaks"].lex_8h_contribution == pytest.approx(62.7, abs=0.1)
+    assert by_label["planning/breaks"].lex_8h_contribution == pytest.approx(
+        62.7, abs=0.1
+    )
     assert by_label["welding"].lex_8h_contribution == pytest.approx(78.8, abs=0.1)
-    assert by_label["cutting/grinding"].lex_8h_contribution == pytest.approx(82.8, abs=0.1)
+    assert by_label["cutting/grinding"].lex_8h_contribution == pytest.approx(
+        82.8, abs=0.1
+    )
 
 
 def test_annex_d_daily_level():
@@ -243,9 +247,7 @@ def test_annex_e_job_based():
 def test_annex_e_table1_satisfied_no_advisory():
     """Annex E: 12 h cumulative >= 10.75 h Table 1 minimum -> no advisory."""
     samples = [88.1, 86.1, 89.7, 86.5, 91.1, 86.7]
-    result = job_based_exposure(
-        samples, 7.5, n_workers=18, sample_duration_hours=2.0
-    )
+    result = job_based_exposure(samples, 7.5, n_workers=18, sample_duration_hours=2.0)
     assert result.sampling_advisory is False
 
 
@@ -322,7 +324,9 @@ def test_task_rejects_empty_samples():
 
 def test_job_based_rejects_nonpositive_sample_duration():
     with pytest.raises(ValueError, match="sample_duration_hours"):
-        job_based_exposure([80.0, 82.0, 81.0], 8.0, n_workers=6, sample_duration_hours=0.0)
+        job_based_exposure(
+            [80.0, 82.0, 81.0], 8.0, n_workers=6, sample_duration_hours=0.0
+        )
 
 
 def test_job_based_requires_two_samples():
@@ -343,9 +347,19 @@ def test_result_dataclasses_are_frozen():
     with pytest.raises(AttributeError):
         result.lex_8h = 0.0  # type: ignore[misc]
     tc = TaskContribution(
-        label="x", lp_aeqt=85.0, duration_hours=8.0, lex_8h_contribution=85.0,
-        n_samples=3, sample_range_db=0.0, spread_advisory=False, u1a=0.0,
-        c1a=1.0, u1b=0.0, c1b=0.0, u2=0.7, u3=1.0,
+        label="x",
+        lp_aeqt=85.0,
+        duration_hours=8.0,
+        lex_8h_contribution=85.0,
+        n_samples=3,
+        sample_range_db=0.0,
+        spread_advisory=False,
+        u1a=0.0,
+        c1a=1.0,
+        u1b=0.0,
+        c1b=0.0,
+        u2=0.7,
+        u3=1.0,
     )
     with pytest.raises(AttributeError):
         tc.u1a = 1.0  # type: ignore[misc]

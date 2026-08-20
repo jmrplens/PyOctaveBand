@@ -58,9 +58,7 @@ def test_pcm_blocks_reassemble_the_whole_read(tmp_path: Path, bits: int) -> None
 
 
 @pytest.mark.parametrize("bits", [32, 64])
-def test_float_blocks_reassemble_the_whole_read(
-    tmp_path: Path, bits: int
-) -> None:
+def test_float_blocks_reassemble_the_whole_read(tmp_path: Path, bits: int) -> None:
     rng = np.random.default_rng(bits)
     x = rng.standard_normal(45) * 0.25
     path = _write(tmp_path, float_wav(x, bits=bits))
@@ -97,8 +95,10 @@ def test_overlap_repeats_the_tail_of_each_block(tmp_path: Path) -> None:
     whole = np.asarray(read(path))
     blocks = list(read_blocks(path, 4, overlap=2))
     assert [b.tolist() for b in blocks] == [
-        whole[0:4].tolist(), whole[2:6].tolist(),
-        whole[4:8].tolist(), whole[6:10].tolist(),
+        whole[0:4].tolist(),
+        whole[2:6].tolist(),
+        whole[4:8].tolist(),
+        whole[6:10].tolist(),
     ]
 
 
@@ -149,8 +149,7 @@ def test_a_truncated_data_chunk_fails_mid_stream(tmp_path: Path) -> None:
     image = riff_wave(
         chunk(b"fmt ", fmt_payload(bits=16)),
         # Claims 40 bytes (20 frames) but carries only 10 frames.
-        chunk(b"data", np.arange(10, dtype="<i2").tobytes(),
-              declared_size=40),
+        chunk(b"data", np.arange(10, dtype="<i2").tobytes(), declared_size=40),
     )
     path = _write(tmp_path, image)
     blocks = read_blocks(path, 8)
@@ -168,9 +167,9 @@ def test_blocks_agree_with_read_on_a_written_measurement(
     path = tmp_path / "meas.wav"
     write(path, x, FS, subtype="PCM_24")
     whole = np.asarray(read(path))
-    assert np.concatenate(
-        list(read_blocks(path, 256)), axis=-1
-    ).tolist() == whole.tolist()
+    assert (
+        np.concatenate(list(read_blocks(path, 256)), axis=-1).tolist() == whole.tolist()
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -180,6 +179,7 @@ def test_blocks_agree_with_read_on_a_written_measurement(
 # implementation strategy, never a different answer -- so it is asserted
 # at float64 precision, not to some engineering tolerance.
 # ---------------------------------------------------------------------------
+
 
 def _streamed_leq(path: Path, block_size: int, overlap: int) -> float:
     """Accumulate a running Leq from the block stream, dB re 20 uPa.
@@ -200,15 +200,11 @@ def _long_synthetic(seconds: float = 3.0) -> np.ndarray:
     """A tone in noise, long enough that many blocks tile it unevenly."""
     rng = np.random.default_rng(2026)
     t = np.arange(int(seconds * FS)) / FS
-    return 0.05 * np.sin(2 * np.pi * 1000 * t) + 0.02 * rng.standard_normal(
-        t.size
-    )
+    return 0.05 * np.sin(2 * np.pi * 1000 * t) + 0.02 * rng.standard_normal(t.size)
 
 
 @pytest.mark.parametrize("overlap", [0, 480])
-def test_streamed_leq_equals_the_whole_file_leq(
-    tmp_path: Path, overlap: int
-) -> None:
+def test_streamed_leq_equals_the_whole_file_leq(tmp_path: Path, overlap: int) -> None:
     """Block-accumulated Leq == whole-file Leq, with and without overlap."""
     x = _long_synthetic()
     path = tmp_path / "night.wav"
@@ -217,9 +213,7 @@ def test_streamed_leq_equals_the_whole_file_leq(
     # between the two paths is summation order (~1e-13 dB).
     whole = signals.leq(np.asarray(read(path)))
     # 4800-frame blocks do not divide 144000 - overlap tilings evenly.
-    assert _streamed_leq(path, 4800, overlap) == pytest.approx(
-        whole, abs=1e-9
-    )
+    assert _streamed_leq(path, 4800, overlap) == pytest.approx(whole, abs=1e-9)
 
 
 @pytest.mark.parametrize("overlap", [0, 1200])
@@ -275,9 +269,9 @@ def test_streamed_band_leq_through_a_stateful_bank(tmp_path: Path) -> None:
     )
     total, frames = 0.0, 0
     for block in read_blocks(path, 4800):
-        band = bank.filter(
-            block, sigbands=True, detrend=False, calculate_level=False
-        )[2][0]
+        band = bank.filter(block, sigbands=True, detrend=False, calculate_level=False)[
+            2
+        ][0]
         total += float(np.sum(band**2))
         frames += band.shape[-1]
     streamed = 10 * np.log10((total / frames) / (2e-5) ** 2)
@@ -293,16 +287,12 @@ def test_streamed_band_leq_through_a_stateful_bank(tmp_path: Path) -> None:
         detrend=False,
         calculate_level=False,
     )[2][0]
-    assert streamed == pytest.approx(
-        signals.leq(offline_band), abs=1e-9
-    )
+    assert streamed == pytest.approx(signals.leq(offline_band), abs=1e-9)
 
 
 @needs_soundfile
 @pytest.mark.parametrize("overlap", [0, 800])
-def test_streamed_leq_matches_across_backends(
-    tmp_path: Path, overlap: int
-) -> None:
+def test_streamed_leq_matches_across_backends(tmp_path: Path, overlap: int) -> None:
     """WAV (base decoder) and FLAC (libsndfile) stream the same Leq.
 
     The same 24-bit codes go into both containers, so the decoded

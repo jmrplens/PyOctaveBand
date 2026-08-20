@@ -35,9 +35,7 @@ def test_composite_cap_independent_of_wall() -> None:
 
 
 def test_composite_all_equal_returns_same() -> None:
-    r = building.composite_transmission_loss(
-        [1.0, 2.0, 3.0], [40.0, 40.0, 40.0]
-    )
+    r = building.composite_transmission_loss([1.0, 2.0, 3.0], [40.0, 40.0, 40.0])
     assert float(r) == pytest.approx(40.0)
 
 
@@ -47,9 +45,7 @@ def test_composite_2d_per_band() -> None:
     )
     assert r.shape == (2,)
     # A fixed open area gives the same cap in both bands.
-    np.testing.assert_allclose(
-        r, 10.0 * math.log10((10.1) / 0.1), atol=0.05
-    )
+    np.testing.assert_allclose(r, 10.0 * math.log10((10.1) / 0.1), atol=0.05)
 
 
 def test_composite_matches_facade_energy_sum() -> None:
@@ -58,9 +54,9 @@ def test_composite_matches_facade_energy_sum() -> None:
     r = np.array([55.0, 30.0])
     tau = 10.0 ** (-r / 10.0)
     expected = -10.0 * math.log10(np.sum(areas * tau) / np.sum(areas))
-    assert float(
-        building.composite_transmission_loss(areas, r)
-    ) == pytest.approx(expected)
+    assert float(building.composite_transmission_loss(areas, r)) == pytest.approx(
+        expected
+    )
 
 
 def test_composite_rejects_bad_shape() -> None:
@@ -110,19 +106,13 @@ def test_slit_transmission_finite_through_cos_ke_zero() -> None:
 
 def test_slit_reduction_index_from_coefficient() -> None:
     res = building.slit_transmission_coefficient([500.0], 0.002, 0.1)
-    r = building.transmission_loss_from_coefficient(
-        res.transmission_coefficient
-    )
+    r = building.transmission_loss_from_coefficient(res.transmission_coefficient)
     np.testing.assert_allclose(r, res.transmission_loss)
 
 
 def test_slit_edge_position_differs_from_mid() -> None:
-    mid = building.slit_transmission_coefficient(
-        [400.0], 0.003, 0.05, position="mid"
-    )
-    edge = building.slit_transmission_coefficient(
-        [400.0], 0.003, 0.05, position="edge"
-    )
+    mid = building.slit_transmission_coefficient([400.0], 0.003, 0.05, position="mid")
+    edge = building.slit_transmission_coefficient([400.0], 0.003, 0.05, position="edge")
     assert not np.isclose(
         mid.transmission_coefficient[0], edge.transmission_coefficient[0]
     )
@@ -133,16 +123,12 @@ def test_slit_edge_position_differs_from_mid() -> None:
 # ---------------------------------------------------------------------------
 def test_circular_aperture_large_hole_transmits_fully() -> None:
     # ka >> 1: tau -> 1 (R -> 0 dB).
-    res = building.circular_aperture_transmission_coefficient(
-        [50000.0], 0.02, 0.001
-    )
+    res = building.circular_aperture_transmission_coefficient([50000.0], 0.02, 0.001)
     assert res.transmission_coefficient[0] == pytest.approx(1.0, abs=0.02)
 
 
 def test_circular_aperture_thin_hole_reduction_positive_at_low_f() -> None:
-    res = building.circular_aperture_transmission_coefficient(
-        [100.0], 0.005, 0.002
-    )
+    res = building.circular_aperture_transmission_coefficient([100.0], 0.005, 0.002)
     assert float(res.transmission_loss[0]) > 0.0
 
 
@@ -151,9 +137,7 @@ def test_circular_aperture_thin_hole_reduction_positive_at_low_f() -> None:
 # ---------------------------------------------------------------------------
 def test_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="field"):
-        building.slit_transmission_coefficient(
-            [500.0], 0.002, 0.1, field="oblique"
-        )
+        building.slit_transmission_coefficient([500.0], 0.002, 0.1, field="oblique")
     with pytest.raises(ValueError, match="width"):
         building.slit_transmission_coefficient([500.0], -0.002, 0.1)
     with pytest.raises(ValueError, match="tau"):

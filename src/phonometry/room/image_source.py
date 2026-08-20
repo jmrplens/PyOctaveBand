@@ -225,7 +225,9 @@ class ImageSourceResult:
         """Arrival time of the direct sound (order 0), s."""
         return float(self.times[int(np.argmin(self.distances))])
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         r"""Plot the reflectogram: reflection level in dB against arrival time.
 
         Stems the per-image amplitudes (in dB re the direct sound), coloured by
@@ -238,7 +240,6 @@ class ImageSourceResult:
 
         check_language(language)
         return plot_image_source_reflectogram(self, ax=ax, language=language, **kwargs)
-
 
     def plot_geometry(
         self,
@@ -266,6 +267,7 @@ class ImageSourceResult:
         return plot_image_source_geometry(
             self, ax=ax, max_order=max_order, language=language, **kwargs
         )
+
 
 def _validate_point(
     point: ArrayLike, dimensions: tuple[float, float, float], name: str
@@ -348,15 +350,14 @@ def _image_lattice(
     order_y = y_lo + y_hi
     order_z = z_lo + z_hi
     # Outer combination with the total-order cut-off, kept vectorised.
-    total_order = (order_x[:, None, None] + order_y[None, :, None]
-                   + order_z[None, None, :])
+    total_order = (
+        order_x[:, None, None] + order_y[None, :, None] + order_z[None, None, :]
+    )
     ix, iy, iz = np.nonzero(np.asarray(total_order <= max_order))
 
     px, py, pz = xs[ix], ys[iy], zs[iz]
     positions = np.stack([px, py, pz], axis=1)
-    distances = np.sqrt(
-        (px - rcv[0]) ** 2 + (py - rcv[1]) ** 2 + (pz - rcv[2]) ** 2
-    )
+    distances = np.sqrt((px - rcv[0]) ** 2 + (py - rcv[1]) ** 2 + (pz - rcv[2]) ** 2)
     orders = (order_x[ix] + order_y[iy] + order_z[iz]).astype(np.int_)
     counts = np.stack(
         [x_lo[ix], x_hi[ix], y_lo[iy], y_hi[iy], z_lo[iz], z_hi[iz]], axis=0
@@ -364,8 +365,13 @@ def _image_lattice(
 
     times = distances / speed_of_sound
     order_idx = np.argsort(times, kind="stable")
-    return (times[order_idx], distances[order_idx], orders[order_idx],
-            positions[order_idx], counts[:, order_idx])
+    return (
+        times[order_idx],
+        distances[order_idx],
+        orders[order_idx],
+        positions[order_idx],
+        counts[:, order_idx],
+    )
 
 
 def _image_amplitudes(
@@ -559,7 +565,9 @@ def audible_image_count(max_order: int) -> int:
     return (2 * (2 * i0**3 + 3 * i0**2 + 4 * i0)) // 3
 
 
-def reflection_density(time: ArrayLike, volume: float, speed_of_sound: float = DEFAULT_SPEED_OF_SOUND) -> np.ndarray | float:
+def reflection_density(
+    time: ArrayLike, volume: float, speed_of_sound: float = DEFAULT_SPEED_OF_SOUND
+) -> np.ndarray | float:
     r"""Temporal density of reflections :math:`dN/dt = 4 \pi c^3 t^2 / V`.
 
     Kuttruff *Room Acoustics* 6th ed., Equation (4.6): the number of image

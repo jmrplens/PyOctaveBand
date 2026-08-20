@@ -218,7 +218,9 @@ class EcmaFluctuationStrength:
     specific_fluctuation_strength_vs_time: np.ndarray
     field: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes | np.ndarray:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes | np.ndarray:
         """Plot the fluctuation-strength result (see :mod:`phonometry._plot.psychoacoustics`).
 
         Draws the time-dependent fluctuation strength F(l50) and a
@@ -228,7 +230,9 @@ class EcmaFluctuationStrength:
         from ..._i18n import check_language
         from ..._plot.psychoacoustics import plot_ecma_fluctuation_strength
 
-        return plot_ecma_fluctuation_strength(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ecma_fluctuation_strength(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 # --------------------------------------------------------------------------
@@ -881,7 +885,9 @@ def fluctuation_strength_ecma(
     if field not in ("free", "diffuse"):
         raise ValueError("field must be 'free' or 'diffuse'")
     fs = resolve_fs(signal_in, fs, name="signal_in")
-    x = apply_calibration(signal_in, require_1d_signal(_typesignal(np.asarray(signal_in))))
+    x = apply_calibration(
+        signal_in, require_1d_signal(_typesignal(np.asarray(signal_in)))
+    )
     if x.size == 0:
         raise ValueError("signal must not be empty")
     if not np.all(np.isfinite(x)):

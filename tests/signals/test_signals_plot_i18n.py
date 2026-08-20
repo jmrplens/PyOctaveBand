@@ -119,9 +119,7 @@ def test_correlation_es() -> None:
 
 def test_correlation_normalization_label_es() -> None:
     """The normalization word is a table key reached through the result."""
-    res = ph.signals.correlation(
-        _white(), fs=FS, max_lag=0.01, normalization="biased"
-    )
+    res = ph.signals.correlation(_white(), fs=FS, max_lag=0.01, normalization="biased")
     ax = res.plot(language="es")
     assert ax.get_ylabel() == "Correlación (sesgada)"
     plt.close("all")
@@ -137,9 +135,7 @@ def test_correlation_normalization_label_es() -> None:
 def test_time_delay_es() -> None:
     x = _white(8192)
     y = np.roll(x, 12)
-    res = ph.signals.time_delay(
-        x, y, FS, nperseg=2048, signal_bandwidth=FS / 2.0
-    )
+    res = ph.signals.time_delay(x, y, FS, nperseg=2048, signal_bandwidth=FS / 2.0)
     ax = res.plot(language="es")
     assert ax.get_title().startswith("Estimación del retardo temporal")
     plt.close("all")
@@ -210,9 +206,7 @@ def test_phase_decomposition_es() -> None:
 
 
 def test_tone_burst_es_and_bad_language() -> None:
-    res = ph.signals.tone_burst(
-        FS, 5000.0, 25, repetitions=2, repetition_rate=10.0
-    )
+    res = ph.signals.tone_burst(FS, 5000.0, 25, repetitions=2, repetition_rate=10.0)
     ax = res.plot(language="es")
     assert "Salva de tono (IEC 60268-1)" in ax.get_title()
     assert ax.get_xlabel() == "Tiempo [s]"
@@ -224,7 +218,8 @@ def test_tone_burst_es_and_bad_language() -> None:
 
 def test_resampled_signal_es_and_bad_language() -> None:
     res = ph.signals.resample_signal(
-        ph.signals.noise_signal(FS, 0.2, seed=5), FS, fs_new=32000.0)
+        ph.signals.noise_signal(FS, 0.2, seed=5), FS, fs_new=32000.0
+    )
     ax = res.plot(language="es")
     assert "Remuestreo polifásico" in ax.get_title()
     assert ax.get_xlabel() == "Frecuencia [Hz]"

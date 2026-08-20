@@ -157,13 +157,17 @@ def _attenuation_metadata_pairs(
     if metadata is not None:
         if metadata.temperature is not None:
             specs.append(
-                (t("Air temperature [&#176;C]", language),
-                 _fmt(metadata.temperature, language))
+                (
+                    t("Air temperature [&#176;C]", language),
+                    _fmt(metadata.temperature, language),
+                )
             )
         if metadata.relative_humidity is not None:
             specs.append(
-                (t("Relative humidity [%]", language),
-                 _fmt(metadata.relative_humidity, language, 0))
+                (
+                    t("Relative humidity [%]", language),
+                    _fmt(metadata.relative_humidity, language, 0),
+                )
             )
         if metadata.pressure is not None:
             specs.append(
@@ -195,15 +199,22 @@ def _attenuation_table(
     freqs = np.asarray(result.frequencies, dtype=np.float64)
 
     term_headers = [
-        "A<sub>div</sub>", "A<sub>atm</sub>", "A<sub>gr</sub>",
-        "A<sub>bar</sub>", "A [dB]",
+        "A<sub>div</sub>",
+        "A<sub>atm</sub>",
+        "A<sub>gr</sub>",
+        "A<sub>bar</sub>",
+        "A [dB]",
     ]
     if levels is None:
         headers = [t(_FREQ_HEADER, language), *term_headers]
         widths = [26.0, 29.0, 29.0, 29.0, 29.0, 30.0]
     else:
-        headers = [t(_FREQ_HEADER, language), "L<sub>w</sub> [dB]", *term_headers,
-                   "L<sub>fT</sub> [dB]"]
+        headers = [
+            t(_FREQ_HEADER, language),
+            "L<sub>w</sub> [dB]",
+            *term_headers,
+            "L<sub>fT</sub> [dB]",
+        ]
         widths = [22.0, 20.0, 20.0, 20.0, 20.0, 20.0, 22.0, 24.0]
         if verbose:
             headers.append("L<sub>A</sub> [dB(A)]")
@@ -213,8 +224,9 @@ def _attenuation_table(
     for i in range(freqs.size):
         row = [Paragraph(_fmt(freqs[i], language, 0), value_style)]
         if levels is not None:
-            row.append(Paragraph(_fmt(levels.sound_power_level[i], language),
-                                 value_style))
+            row.append(
+                Paragraph(_fmt(levels.sound_power_level[i], language), value_style)
+            )
         row += [
             Paragraph(_fmt(result.a_div[i], language), value_style),
             Paragraph(_fmt(result.a_atm[i], language), value_style),
@@ -223,13 +235,14 @@ def _attenuation_table(
             Paragraph(_fmt(result.a_total[i], language), value_style),
         ]
         if levels is not None:
-            row.append(Paragraph(_fmt(levels.receiver_level[i], language),
-                                 value_style))
+            row.append(Paragraph(_fmt(levels.receiver_level[i], language), value_style))
             if verbose:
-                row.append(Paragraph(
-                    _fmt(levels.receiver_level[i] + levels.ck[i], language),
-                    value_style,
-                ))
+                row.append(
+                    Paragraph(
+                        _fmt(levels.receiver_level[i] + levels.ck[i], language),
+                        value_style,
+                    )
+                )
         data.append(row)
     return stacked_table(data, [w * mm for w in widths])
 
@@ -237,8 +250,8 @@ def _attenuation_table(
 def _attenuation_statement(la_dw: float, language: str) -> str:
     """The boxed A-weighted downwind level ``LAT(DW)`` at the receiver."""
     return t(
-        "A-weighted downwind level at the receiver "
-        "L<sub>AT</sub>(DW) = <b>{la} dB</b>", language
+        "A-weighted downwind level at the receiver L<sub>AT</sub>(DW) = <b>{la} dB</b>",
+        language,
     ).format(la=_fmt(la_dw, language))
 
 
@@ -296,8 +309,11 @@ def _resolve_levels(
             f"band (got {lw.size}, expected {freqs.size})."
         )
     receiver = _compose_receiver_level(
-        lw, emission.directivity_index, emission.d_omega,
-        np.asarray(result.a_total, dtype=np.float64), emission.cmet,
+        lw,
+        emission.directivity_index,
+        emission.d_omega,
+        np.asarray(result.a_total, dtype=np.float64),
+        emission.cmet,
     )
     return _AttenuationLevels(
         sound_power_level=lw,
@@ -379,7 +395,10 @@ def render_outdoor_attenuation_report(
     flow.append(Spacer(1, 8))
     flow.append(
         render_figure_drawing(
-            result.plot, 174 * mm, y_top=None, figsize=(9.2, 3.1),
+            result.plot,
+            174 * mm,
+            y_top=None,
+            figsize=(9.2, 3.1),
             language=language,
         )
     )
@@ -387,18 +406,14 @@ def render_outdoor_attenuation_report(
 
     if levels is not None:
         la_dw = _a_weighted_level(levels.receiver_level, levels.ck)
-        flow.append(
-            result_box(_attenuation_statement(la_dw, language), styles, accent)
-        )
+        flow.append(result_box(_attenuation_statement(la_dw, language), styles, accent))
         if metadata is not None and metadata.requirement is not None:
             text, passed = _attenuation_verdict(
                 la_dw, float(metadata.requirement), language
             )
             flow.extend(verdict_flow(text, passed, styles, language))
     else:
-        flow.append(
-            result_box(_breakdown_statement(result, language), styles, accent)
-        )
+        flow.append(result_box(_breakdown_statement(result, language), styles, accent))
 
     basis_strip_style = measurement_basis_style()
     flow.append(
@@ -451,8 +466,7 @@ _BARRIER_MODEL: dict[str, str] = {
         "MacDonald / Hadden-Pierce solution)"
     ),
     "kurze_anderson": (
-        "the Kurze-Anderson closed form of the Fresnel number (Kurze & "
-        "Anderson, 1971)"
+        "the Kurze-Anderson closed form of the Fresnel number (Kurze & Anderson, 1971)"
     ),
 }
 
@@ -481,9 +495,7 @@ def _barrier_metadata_pairs(
     return [(label, value) for label, value in specs if value]
 
 
-def _barrier_table(
-    result: BarrierInsertionLoss, verbose: bool, language: str
-) -> Any:
+def _barrier_table(result: BarrierInsertionLoss, verbose: bool, language: str) -> Any:
     """The per-band barrier insertion-loss table (``IL`` and, verbose, ``N``)."""
     from reportlab.lib.units import mm
 
@@ -530,9 +542,9 @@ def _barrier_verdict(
     """
     displayed = display_round(mean_il)
     passed = displayed >= requirement - 1e-9
-    text = t(
-        "IL = {il} dB, required &#8805; {req} dB", language
-    ).format(il=_fmt(mean_il, language), req=_fmt(requirement, language))
+    text = t("IL = {il} dB, required &#8805; {req} dB", language).format(
+        il=_fmt(mean_il, language), req=_fmt(requirement, language)
+    )
     return text, passed
 
 

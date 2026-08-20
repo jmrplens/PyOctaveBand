@@ -262,9 +262,9 @@ def _statement(
     finite = values[np.isfinite(values)]
     lo = float(np.min(finite)) if finite.size else float("nan")
     hi = float(np.max(finite)) if finite.size else float("nan")
-    statement = t(
-        "Mean attenuation D = <b>{value} dB</b>", language
-    ).format(value=d1(mean_att, language))
+    statement = t("Mean attenuation D = <b>{value} dB</b>", language).format(
+        value=d1(mean_att, language)
+    )
     extended = [
         t("Band attenuation range {lo} to {hi} dB", language).format(
             lo=d1(lo, language), hi=d1(hi, language)
@@ -350,8 +350,12 @@ def render_hvac_report(
             symbol = "D"
         unit = "dB(A)" if a_weighted else "dB"
         verdict = performance_verdict(
-            value, metadata.requirement, symbol,
-            higher_is_better=higher_is_better, unit=unit, language=language,
+            value,
+            metadata.requirement,
+            symbol,
+            higher_is_better=higher_is_better,
+            unit=unit,
+            language=language,
         )
     return render_noise_control_fiche(
         result,

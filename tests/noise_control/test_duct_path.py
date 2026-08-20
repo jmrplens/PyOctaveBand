@@ -45,19 +45,33 @@ FAN_LW = [90.0, 86.0, 82.0, 79.0, 77.0, 75.0, 71.0, 61.0]
 #: Long Table 14.9, supply path: (label, attenuation, self-noise) per element,
 #: attenuations entered as the positive losses the models return.
 SUPPLY_ELEMENTS = (
-    ("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
-     [41, 39, 36, 29, 20, 6, 0, 0]),
-    ("Silencer, standard pressure drop, 3 ft, 36 x 24 in",
-     [7, 12, 16, 28, 35, 35, 28, 17], [49, 43, 44, 42, 42, 45, 35, 24]),
-    ("Duct, rectangular, 36 x 24 in, 5 ft, 1 in lining",
-     [2, 2, 3, 7, 15, 12, 11, 9], None),
+    (
+        "Elbow, 36 x 24 in, unlined",
+        [0, 1, 2, 3, 3, 3, 3, 3],
+        [41, 39, 36, 29, 20, 6, 0, 0],
+    ),
+    (
+        "Silencer, standard pressure drop, 3 ft, 36 x 24 in",
+        [7, 12, 16, 28, 35, 35, 28, 17],
+        [49, 43, 44, 42, 42, 45, 35, 24],
+    ),
+    (
+        "Duct, rectangular, 36 x 24 in, 5 ft, 1 in lining",
+        [2, 2, 3, 7, 15, 12, 11, 9],
+        None,
+    ),
     ("Split, 25 per cent", 6.0, None),
-    ("Duct, rectangular, 18 x 12 in, 6 ft, 1 in lining",
-     [3, 3, 5, 11, 25, 22, 16, 13], None),
-    ("Duct, round flexible, 12 in diameter, 6 ft",
-     [14, 14, 16, 15, 17, 22, 16, 13], None),
-    ("Rectangular diffuser, 312 cfm, 0.05 in pd", 0.0,
-     [33, 32, 29, 23, 15, 4, 0, 0]),
+    (
+        "Duct, rectangular, 18 x 12 in, 6 ft, 1 in lining",
+        [3, 3, 5, 11, 25, 22, 16, 13],
+        None,
+    ),
+    (
+        "Duct, round flexible, 12 in diameter, 6 ft",
+        [14, 14, 16, 15, 17, 22, 16, 13],
+        None,
+    ),
+    ("Rectangular diffuser, 312 cfm, 0.05 in pd", 0.0, [33, 32, 29, 23, 15, 4, 0, 0]),
 )
 SUPPLY_ROOM_EFFECT = [6.0, 6.0, 5.0, 5.0, 6.0, 7.0, 6.0, 6.0]
 
@@ -88,16 +102,27 @@ SUPPLY_RECEIVED = [52, 42, 30, 18, 9, -2, -2, -1]
 
 #: Long Table 14.9, return path.
 RETURN_ELEMENTS = (
-    ("Elbow, 36 x 24 in, unlined", [0, 1, 2, 3, 3, 3, 3, 3],
-     [43, 42, 39, 33, 24, 12, 0, 0]),
-    ("Silencer, low-frequency standard pressure drop, 5 ft, 36 x 24 in",
-     [16, 21, 35, 41, 41, 28, 21, 15], [51, 49, 53, 56, 56, 59, 60, 53]),
-    ("Elbow, 36 x 24 in, lined, 1 in", [1, 2, 3, 4, 5, 6, 8, 10],
-     [39, 38, 34, 28, 18, 4, 0, 0]),
-    ("Plenum, 800 ft2, 50 per cent lined", [12, 13, 19, 20, 20, 20, 21, 21],
-     None),
-    ("Rectangular grille, 24 x 24 in, 563 cfm, 0.05 in pd", 0.0,
-     [30, 29, 26, 20, 12, 1, 0, 0]),
+    (
+        "Elbow, 36 x 24 in, unlined",
+        [0, 1, 2, 3, 3, 3, 3, 3],
+        [43, 42, 39, 33, 24, 12, 0, 0],
+    ),
+    (
+        "Silencer, low-frequency standard pressure drop, 5 ft, 36 x 24 in",
+        [16, 21, 35, 41, 41, 28, 21, 15],
+        [51, 49, 53, 56, 56, 59, 60, 53],
+    ),
+    (
+        "Elbow, 36 x 24 in, lined, 1 in",
+        [1, 2, 3, 4, 5, 6, 8, 10],
+        [39, 38, 34, 28, 18, 4, 0, 0],
+    ),
+    ("Plenum, 800 ft2, 50 per cent lined", [12, 13, 19, 20, 20, 20, 21, 21], None),
+    (
+        "Rectangular grille, 24 x 24 in, 563 cfm, 0.05 in pd",
+        0.0,
+        [30, 29, 26, 20, 12, 1, 0, 0],
+    ),
 )
 RETURN_ROOM_EFFECT = [9.0, 8.0, 6.0, 8.0, 8.0, 8.0, 9.0, 10.0]
 
@@ -157,9 +182,7 @@ def _assert_sheet(got: np.ndarray, printed: list[int], what: str) -> None:
 
 def _row(value: object) -> list[int]:
     """The eight printed columns of a sheet row given as a scalar or a list."""
-    return [
-        int(v) for v in np.broadcast_to(np.asarray(value, dtype=np.float64), (8,))
-    ]
+    return [int(v) for v in np.broadcast_to(np.asarray(value, dtype=np.float64), (8,))]
 
 
 def _assert_path(
@@ -297,8 +320,12 @@ def test_element_accepts_an_hvac_spectrum_result() -> None:
 
 def test_rc_criterion_family() -> None:
     res = duct_path(
-        OCTAVE_BANDS, FAN_LW, [DuctElement("Silencer", 50.0)],
-        room_effect=6.0, criterion="RC", target=35.0,
+        OCTAVE_BANDS,
+        FAN_LW,
+        [DuctElement("Silencer", 50.0)],
+        room_effect=6.0,
+        criterion="RC",
+        target=35.0,
     )
     assert res.criterion == "RC"
     assert res.rating.__class__.__name__ == "RCResult"
@@ -308,8 +335,11 @@ def test_rc_criterion_family() -> None:
 def test_section_declares_the_plane_wave_limit() -> None:
     with pytest.warns(PlaneWaveWarning, match="Supply"):
         duct_path(
-            OCTAVE_BANDS, FAN_LW, [DuctElement("Duct", 3.0)],
-            section={"width": 0.9144, "height": 0.6096}, flow_velocity=8.0,
+            OCTAVE_BANDS,
+            FAN_LW,
+            [DuctElement("Duct", 3.0)],
+            section={"width": 0.9144, "height": 0.6096},
+            flow_velocity=8.0,
             label="Supply",
         )
 

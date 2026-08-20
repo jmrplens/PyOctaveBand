@@ -63,9 +63,7 @@ def _plate(name: str, thickness: float) -> tuple[float, float]:
 # ===========================================================================
 def test_impact_velocity_is_the_printed_0_886() -> None:
     """H printed p. 276: "the hammer velocity at impact ... will be 0,886 m/s"."""
-    assert building.hammer_impact_velocity() == pytest.approx(
-        0.886, abs=0.0005
-    )
+    assert building.hammer_impact_velocity() == pytest.approx(0.886, abs=0.0005)
 
 
 def test_short_pulse_coefficient_reproduces_eq_3_92() -> None:
@@ -139,10 +137,29 @@ def test_concrete_slab_force_is_within_1_db_of_the_upper_limit() -> None:
     3 150 Hz and passing 1 dB in the 4 kHz band itself.
     """
     stiffness, impedance = _plate("concrete", 0.14)
-    freqs = np.array([
-        50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0,
-        500.0, 630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0,
-    ])
+    freqs = np.array(
+        [
+            50.0,
+            63.0,
+            80.0,
+            100.0,
+            125.0,
+            160.0,
+            200.0,
+            250.0,
+            315.0,
+            400.0,
+            500.0,
+            630.0,
+            800.0,
+            1000.0,
+            1250.0,
+            1600.0,
+            2000.0,
+            2500.0,
+            3150.0,
+        ]
+    )
     result = building.tapping_force_spectrum(freqs, stiffness, impedance)
     deviation = 20.0 * np.log10(result.peak_force / result.upper_limit)
     assert np.max(np.abs(deviation)) <= 1.0
@@ -152,7 +169,9 @@ def test_concrete_slab_force_is_within_1_db_of_the_upper_limit() -> None:
 
 
 @pytest.mark.parametrize(("name", "thickness"), [("chipboard", 0.022), ("osb", 0.015)])
-def test_lightweight_plates_tend_to_the_lower_limit(name: str, thickness: float) -> None:
+def test_lightweight_plates_tend_to_the_lower_limit(
+    name: str, thickness: float
+) -> None:
     """H printed p. 282: "with |Fn| tending towards the lower limit ... below 100 Hz"."""
     stiffness, impedance = _plate(name, thickness)
     result = building.tapping_force_spectrum(
@@ -161,9 +180,9 @@ def test_lightweight_plates_tend_to_the_lower_limit(name: str, thickness: float)
     deviation = 20.0 * np.log10(result.peak_force / result.lower_limit)
     assert np.max(np.abs(deviation)) <= 0.7
     # ... and, unlike the concrete slab, well away from the upper limit.
-    assert np.min(np.abs(
-        20.0 * np.log10(result.peak_force / result.upper_limit)
-    )) >= 5.0
+    assert (
+        np.min(np.abs(20.0 * np.log10(result.peak_force / result.upper_limit))) >= 5.0
+    )
 
 
 def test_over_critical_cut_off_is_the_lower_root() -> None:
@@ -189,15 +208,13 @@ def test_over_critical_cut_off_is_the_lower_root() -> None:
     # Continuity across the critical boundary, from both sides.
     stiffness = 1.0e8
     critical = np.sqrt(stiffness * building.TAPPING_HAMMER_MASS) / 2.0
-    undamped = np.sqrt(stiffness / building.TAPPING_HAMMER_MASS) / (
-        2.0 * np.pi
+    undamped = np.sqrt(stiffness / building.TAPPING_HAMMER_MASS) / (2.0 * np.pi)
+    assert building.tapping_cut_off_frequency(stiffness, critical * (1.0 - 1e-9)) == (
+        pytest.approx(undamped, rel=1e-4)
     )
-    assert building.tapping_cut_off_frequency(
-        stiffness, critical * (1.0 - 1e-9)
-    ) == (pytest.approx(undamped, rel=1e-4))
-    assert building.tapping_cut_off_frequency(
-        stiffness, critical * (1.0 + 1e-9)
-    ) == (pytest.approx(undamped, rel=1e-4))
+    assert building.tapping_cut_off_frequency(stiffness, critical * (1.0 + 1e-9)) == (
+        pytest.approx(undamped, rel=1e-4)
+    )
 
 
 def test_bare_concrete_cut_off_is_about_7000_hz() -> None:
@@ -315,9 +332,9 @@ def test_force_pulse_transform_matches_the_closed_form_spectrum() -> None:
     pulse = building.force_pulse(time, stiffness, impedance)
     assert np.all(pulse >= -1e-6)
     freqs = np.array([100.0, 1000.0, 5000.0])
-    quadrature = np.array([
-        np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs
-    ])
+    quadrature = np.array(
+        [np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs]
+    )
     result = building.tapping_force_spectrum(freqs, stiffness, impedance)
     assert np.allclose(result.peak_force, np.abs(quadrature) * 10.0, rtol=2e-3)
 
@@ -387,7 +404,8 @@ def test_over_critical_pulse_is_still_equation_3_95() -> None:
     assert np.allclose(slope, -(decay - gamma), rtol=1e-9)
     # And the amplitude of that exponential is vo K/(2 gamma).
     assert np.allclose(
-        values, v0 * stiffness * np.exp(-(decay - gamma) * tail) / (2.0 * gamma),
+        values,
+        v0 * stiffness * np.exp(-(decay - gamma) * tail) / (2.0 * gamma),
         rtol=1e-12,
     )
 
@@ -408,13 +426,8 @@ def test_under_critical_pulse_is_truncated_at_the_first_zero_crossing() -> None:
     beta = np.sqrt(omega0**2 - decay**2)
     duration = np.pi / beta
     # Positive right up to the cut, exactly zero just after it.
-    assert (
-        building.force_pulse([duration * 0.999], stiffness, impedance)[0] > 0.0
-    )
-    assert (
-        building.force_pulse([duration * 1.001], stiffness, impedance)[0]
-        == 0.0
-    )
+    assert building.force_pulse([duration * 0.999], stiffness, impedance)[0] > 0.0
+    assert building.force_pulse([duration * 1.001], stiffness, impedance)[0] == 0.0
     # An untruncated Eq. (3.96) would be negative in the next half period.
     negative = duration * 1.5
     assert np.sin(beta * negative) < 0.0
@@ -422,13 +435,9 @@ def test_under_critical_pulse_is_truncated_at_the_first_zero_crossing() -> None:
     # pi/omega_o is a different, shorter time, and the pulse is still positive
     # and rising nowhere near zero there.
     assert np.pi / omega0 < duration
-    assert (
-        building.force_pulse([np.pi / omega0], stiffness, impedance)[0] > 0.0
-    )
+    assert building.force_pulse([np.pi / omega0], stiffness, impedance)[0] > 0.0
     assert np.all(
-        building.force_pulse(
-            np.linspace(0.0, duration, 401), stiffness, impedance
-        )
+        building.force_pulse(np.linspace(0.0, duration, 401), stiffness, impedance)
         >= 0.0
     )
 
@@ -453,9 +462,9 @@ def test_spectrum_truncation_uses_the_same_duration_as_the_pulse() -> None:
     pulse = building.force_pulse(time, stiffness, impedance)
     assert np.all(pulse[time > duration] == 0.0)
     freqs = np.array([200.0, 1500.0, 4000.0, 9000.0])
-    quadrature = np.array([
-        np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs
-    ])
+    quadrature = np.array(
+        [np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs]
+    )
     result = building.tapping_force_spectrum(freqs, stiffness, impedance)
     assert np.allclose(result.peak_force, np.abs(quadrature) * 10.0, rtol=3e-3)
 
@@ -470,7 +479,7 @@ def test_spectrum_truncation_holds_for_a_heavily_damped_impact() -> None:
     five, which is where the distinction is actually observable.
     """
     stiffness, mass = 1.0e8, building.TAPPING_HAMMER_MASS
-    impedance = 3600.0                     # 4 Zdp^2 = 5,18e7 > K m = 5,0e7
+    impedance = 3600.0  # 4 Zdp^2 = 5,18e7 > K m = 5,0e7
     assert stiffness * mass < 4.0 * impedance**2
     decay = stiffness / (2.0 * impedance)
     omega0 = np.sqrt(stiffness / mass)
@@ -483,9 +492,9 @@ def test_spectrum_truncation_holds_for_a_heavily_damped_impact() -> None:
     assert np.all(pulse[time > duration] == 0.0)
     assert pulse[time < duration].min() >= 0.0
     freqs = np.array([300.0, 1200.0, 3000.0])
-    quadrature = np.array([
-        np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs
-    ])
+    quadrature = np.array(
+        [np.trapezoid(pulse * np.exp(-2.0j * np.pi * f * time), time) for f in freqs]
+    )
     result = building.tapping_force_spectrum(freqs, stiffness, impedance)
     assert result.over_critical is False
     assert np.allclose(result.peak_force, np.abs(quadrature) * 10.0, rtol=3e-3)
@@ -502,11 +511,9 @@ def test_critical_case_is_inclusive_and_finite() -> None:
     """
     mass = building.TAPPING_HAMMER_MASS
     stiffness = 1.0e8
-    critical = np.sqrt(stiffness * mass) / 2.0        # K m == 4 Zdp^2 exactly
+    critical = np.sqrt(stiffness * mass) / 2.0  # K m == 4 Zdp^2 exactly
     assert stiffness * mass == pytest.approx(4.0 * critical**2, rel=1e-12)
-    result = building.tapping_force_spectrum(
-        [100.0, 1000.0], stiffness, critical
-    )
+    result = building.tapping_force_spectrum([100.0, 1000.0], stiffness, critical)
     assert result.over_critical is True
     assert np.all(np.isfinite(result.peak_force))
     assert np.all(result.peak_force > 0.0)
@@ -514,9 +521,7 @@ def test_critical_case_is_inclusive_and_finite() -> None:
     assert np.all(np.isfinite(pulse))
     assert pulse[0] == 0.0
     # The critically damped limit is the t -> 0 limit of both neighbours.
-    nearby = building.force_pulse([1e-4], stiffness, critical * (1.0 + 1e-9))[
-        0
-    ]
+    nearby = building.force_pulse([1e-4], stiffness, critical * (1.0 + 1e-9))[0]
     assert pulse[1] == pytest.approx(nearby, rel=1e-6)
 
 
@@ -528,9 +533,7 @@ def test_troughs_occur_at_odd_multiples_of_the_cut_off() -> None:
     result = building.tapping_force_spectrum([1.0], stiffness, impedance)
     fco = result.cut_off_frequency
     freqs = np.logspace(np.log10(fco), np.log10(9.0 * fco), 40001)
-    force = building.tapping_force_spectrum(
-        freqs, stiffness, impedance
-    ).peak_force
+    force = building.tapping_force_spectrum(freqs, stiffness, impedance).peak_force
     minima = freqs[1:-1][(force[1:-1] < force[:-2]) & (force[1:-1] < force[2:])]
     for n in (3, 5, 7):
         assert np.min(np.abs(minima / fco - n)) < 0.05
@@ -568,13 +571,9 @@ def test_covering_improvement_is_zero_below_the_cut_off() -> None:
     approximately 0 dB"."""
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
-    covering = building.covering_contact_stiffness(
-        2.8e8 * thickness, thickness
-    )
+    covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
     freqs = np.array([50.0, 63.0, 80.0])
-    result = building.covering_improvement(
-        freqs, covering, plate_stiffness, impedance
-    )
+    result = building.covering_improvement(freqs, covering, plate_stiffness, impedance)
     assert np.all(np.abs(result.improvement) < 1.0)
     assert np.all(result.two_line == 0.0)
 
@@ -584,29 +583,31 @@ def test_two_line_estimate_rises_12_db_per_octave() -> None:
     12 dB/octave (equivalent to 40 dB/decade) for f >= fco"."""
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
-    covering = building.covering_contact_stiffness(
-        2.8e8 * thickness, thickness
-    )
+    covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
     freqs = np.array([200.0, 400.0, 800.0, 1600.0])
-    result = building.covering_improvement(
-        freqs, covering, plate_stiffness, impedance
-    )
+    result = building.covering_improvement(freqs, covering, plate_stiffness, impedance)
     assert np.allclose(np.diff(result.two_line), 12.0411, atol=1e-3)
     # The band model approaches the same asymptote from above. Octave bands
     # average the truncation ripple (whose period is 4 fco = 400 Hz) far more
     # evenly than one-third-octave bands do, so the convergence is read there.
     octaves = building.covering_improvement(
         np.array([250.0, 500.0, 1000.0, 2000.0, 4000.0]),
-        covering, plate_stiffness, impedance, band="octave",
+        covering,
+        plate_stiffness,
+        impedance,
+        band="octave",
     )
     steps = np.diff(octaves.improvement)
     assert np.all(steps > 11.0)
-    assert np.all(np.diff(steps) < 0.0)          # monotonically approaching
+    assert np.all(np.diff(steps) < 0.0)  # monotonically approaching
     assert steps[-1] == pytest.approx(12.0411, abs=0.6)
     # Above the *bare* slab's own cut-off (about 7 kHz) the uncovered force
     # falls too and DeltaL stops rising, so the asymptote is not read there.
     far = building.covering_improvement(
-        np.array([8000.0, 16000.0]), covering, plate_stiffness, impedance,
+        np.array([8000.0, 16000.0]),
+        covering,
+        plate_stiffness,
+        impedance,
         band="octave",
     )
     assert np.diff(far.improvement)[0] < 6.0
@@ -653,13 +654,9 @@ def test_covering_improvement_is_a_band_value_not_a_single_fourier_line() -> Non
     """
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
-    covering = building.covering_contact_stiffness(
-        2.8e8 * thickness, thickness
-    )
+    covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
     odd = np.array([300.0, 500.0, 700.0])  # 3 fco, 5 fco, 7 fco
-    result = building.covering_improvement(
-        odd, covering, plate_stiffness, impedance
-    )
+    result = building.covering_improvement(odd, covering, plate_stiffness, impedance)
     assert result.cut_off_frequency == pytest.approx(100.0, rel=0.01)
 
     # The per-line ratio still carries the nulls, and is where they belong.
@@ -688,14 +685,27 @@ def test_covering_band_average_is_independent_of_where_the_grid_falls() -> None:
     """
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
-    covering = building.covering_contact_stiffness(
-        2.8e8 * thickness, thickness
+    covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
+    grid = np.array(
+        [
+            125.0,
+            160.0,
+            200.0,
+            250.0,
+            315.0,
+            400.0,
+            500.0,
+            630.0,
+            800.0,
+            1000.0,
+            1250.0,
+            1600.0,
+            2000.0,
+            2500.0,
+            3150.0,
+        ]
     )
-    grid = np.array([125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0,
-                     800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0])
-    result = building.covering_improvement(
-        grid, covering, plate_stiffness, impedance
-    )
+    result = building.covering_improvement(grid, covering, plate_stiffness, impedance)
     assert np.all(result.improvement > 0.0)
     steps = np.diff(result.improvement)
     assert np.all(steps > -11.0)
@@ -705,9 +715,7 @@ def test_covering_band_average_is_independent_of_where_the_grid_falls() -> None:
     assert np.max(np.abs(np.diff(lines))) > 35.0
 
 
-@pytest.mark.parametrize(
-    ("band", "exponent"), [("third", 1.0 / 6.0), ("octave", 0.5)]
-)
+@pytest.mark.parametrize(("band", "exponent"), [("third", 1.0 / 6.0), ("octave", 0.5)])
 def test_covering_bands_are_the_iec_61260_base_ten_bands(
     band: str, exponent: float
 ) -> None:
@@ -725,13 +733,15 @@ def test_covering_bands_are_the_iec_61260_base_ten_bands(
     """
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
-    covering = building.covering_contact_stiffness(
-        2.8e8 * thickness, thickness
-    )
+    covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
     ratio = (10.0 ** (3.0 / 10.0)) ** exponent
     centres = np.array([200.0, 1000.0, 4000.0])
     result = building.covering_improvement(
-        centres, covering, plate_stiffness, impedance, band=band,  # type: ignore[arg-type]
+        centres,
+        covering,
+        plate_stiffness,
+        impedance,
+        band=band,  # type: ignore[arg-type]
     )
     for i, fc in enumerate(centres):
         chosen = (result.lines >= fc / ratio) & (result.lines <= fc * ratio)
@@ -758,9 +768,7 @@ def test_covering_improvement_result_carries_both_cut_offs() -> None:
     covering's, since above it the bare force falls too (H printed p. 514)."""
     plate_stiffness, impedance = _plate("concrete", 0.14)
     thickness = 0.005
-    covering = building.covering_contact_stiffness(
-        2.8e8 * thickness, thickness
-    )
+    covering = building.covering_contact_stiffness(2.8e8 * thickness, thickness)
     result = building.covering_improvement(
         [500.0], covering, plate_stiffness, impedance
     )
@@ -797,12 +805,11 @@ def test_annex_g4_printed_delta_l_per_band() -> None:
         ref.ISO12354_ANNEX_L_FLOATING_STIFFNESS * 1e6,
         ref.ISO12354_ANNEX_L_FLOATING_MASS,
     )
-    result = building.floating_floor_improvement_spectrum(
-        bands, resonance_frequency=f0
+    result = building.floating_floor_improvement_spectrum(bands, resonance_frequency=f0)
+    assert (
+        np.max(np.abs(result.improvement - np.asarray(ref.ISO12354_ANNEX_G4_DELTA_L)))
+        <= 0.05
     )
-    assert np.max(
-        np.abs(result.improvement - np.asarray(ref.ISO12354_ANNEX_G4_DELTA_L))
-    ) <= 0.05
 
 
 def test_weighted_improvement_matches_the_printed_32_2_db() -> None:
@@ -976,17 +983,19 @@ def test_cremer_hammer_branch_tends_to_18_db_per_octave() -> None:
     """
     freqs = np.array([4000.0, 8000.0, 16000.0])
     result = building.floating_floor_improvement_spectrum(
-        freqs, resonance_frequency=83.0, model="cremer_hammer",
+        freqs,
+        resonance_frequency=83.0,
+        model="cremer_hammer",
         limiting_frequency=521.0,
     )
     assert np.allclose(np.diff(result.improvement), 18.0, atol=0.1)
     # Well below flimit the hammer term vanishes and the 40 lg law is recovered.
     low = np.array([100.0, 130.0])
-    plain = building.floating_floor_improvement_spectrum(
-        low, resonance_frequency=83.0
-    )
+    plain = building.floating_floor_improvement_spectrum(low, resonance_frequency=83.0)
     hammer = building.floating_floor_improvement_spectrum(
-        low, resonance_frequency=83.0, model="cremer_hammer",
+        low,
+        resonance_frequency=83.0,
+        model="cremer_hammer",
         limiting_frequency=521.0,
     )
     assert np.all(hammer.improvement - plain.improvement * 4.0 / 3.0 < 0.3)
@@ -1001,8 +1010,12 @@ def test_resilient_mount_model_rises_30_db_per_decade() -> None:
     """
     freqs = np.array([100.0, 1000.0])
     values = building.resilient_mount_improvement(
-        freqs, impedance=3.8e5, mass_per_area=115.0, loss_factor=0.02,
-        mount_stiffness=2.0e6, mount_density=4.0,
+        freqs,
+        impedance=3.8e5,
+        mass_per_area=115.0,
+        loss_factor=0.02,
+        mount_stiffness=2.0e6,
+        mount_density=4.0,
     )
     assert values[1] - values[0] == pytest.approx(30.0, abs=1e-9)
 
@@ -1027,12 +1040,21 @@ def test_ver_model_agrees_between_hopkins_and_vigran() -> None:
     omega = 2.0 * np.pi * freqs
 
     hopkins = 10.0 * np.log10(
-        2.3 * mass_per_area**2 * c_l * thickness * eta * area * omega**3
+        2.3
+        * mass_per_area**2
+        * c_l
+        * thickness
+        * eta
+        * area
+        * omega**3
         / (per_area * area * stiffness**2)
     )
     f0 = np.sqrt(per_area * stiffness / mass_per_area) / (2.0 * np.pi)
     vigran = 10.0 * np.log10(
-        impedance_hopkins * eta * per_area * freqs**3
+        impedance_hopkins
+        * eta
+        * per_area
+        * freqs**3
         / (2.0 * np.pi * mass_per_area * f0**4)
     )
     assert np.allclose(hopkins, vigran, atol=1e-9)
@@ -1063,9 +1085,7 @@ def test_asphalt_weighted_improvement_exceeds_the_screed_branch() -> None:
     sand-cement screed of the same mass on the same resilient layer.
     """
     screed = building.weighted_floating_floor_improvement(73.5, 8e6)
-    asphalt = building.weighted_floating_floor_improvement(
-        73.5, 8e6, floor="asphalt"
-    )
+    asphalt = building.weighted_floating_floor_improvement(73.5, 8e6, floor="asphalt")
     assert asphalt > screed
     # Both fall as the resilient layer stiffens.
     assert building.weighted_floating_floor_improvement(73.5, 2e7) < screed
@@ -1073,9 +1093,7 @@ def test_asphalt_weighted_improvement_exceeds_the_screed_branch() -> None:
     # DeltaLw = ((-0,21 m') - 5,45) lg(s') + (0,46 m') + 23,8, with s' in
     # MN/m3, independently of the implementation.
     for mass, stiffness in ((73.5, 8.0), (120.0, 20.0), (25.0, 3.0)):
-        printed = (
-            (-0.21 * mass - 5.45) * np.log10(stiffness) + 0.46 * mass + 23.8
-        )
+        printed = (-0.21 * mass - 5.45) * np.log10(stiffness) + 0.46 * mass + 23.8
         assert building.weighted_floating_floor_improvement(
             mass, stiffness * 1e6, floor="asphalt"
         ) == pytest.approx(printed, abs=1e-9)
@@ -1102,14 +1120,21 @@ def test_spectrum_picks_the_weighted_fit_of_its_own_construction(
     """
     mass, stiffness = 73.5, 8.0e6
     result = building.floating_floor_improvement_spectrum(
-        np.array([100.0, 500.0]), resonance_frequency=52.8, model=model,
-        mass_per_area=mass, dynamic_stiffness=stiffness, **kwargs,
+        np.array([100.0, 500.0]),
+        resonance_frequency=52.8,
+        model=model,
+        mass_per_area=mass,
+        dynamic_stiffness=stiffness,
+        **kwargs,
     )
     expected = building.weighted_floating_floor_improvement(
-        mass, stiffness, floor=expected_floor  # type: ignore[arg-type]
+        mass,
+        stiffness,
+        floor=expected_floor,  # type: ignore[arg-type]
     )
     other = building.weighted_floating_floor_improvement(
-        mass, stiffness,
+        mass,
+        stiffness,
         floor="asphalt" if expected_floor == "screed" else "screed",  # type: ignore[arg-type]
     )
     assert abs(expected - other) > 5.0
@@ -1130,9 +1155,12 @@ def test_mount_model_is_zero_at_and_below_its_own_resonance() -> None:
     f0 = np.sqrt(density * stiffness / mass_per_area) / (2.0 * np.pi)
     assert f0 == pytest.approx(41.98, abs=0.05)
     values = building.resilient_mount_improvement(
-        np.array([1.0, 10.0, f0, f0 * 1.01, 100.0]), impedance=impedance,
-        mass_per_area=mass_per_area, loss_factor=0.02,
-        mount_stiffness=stiffness, mount_density=density,
+        np.array([1.0, 10.0, f0, f0 * 1.01, 100.0]),
+        impedance=impedance,
+        mass_per_area=mass_per_area,
+        loss_factor=0.02,
+        mount_stiffness=stiffness,
+        mount_density=density,
     )
     assert np.all(values[:3] == 0.0)
     assert values[3] > 0.0
@@ -1152,9 +1180,7 @@ def test_plots_return_axes(monkeypatch: pytest.MonkeyPatch) -> None:
     freqs = np.array([100.0, 200.0, 400.0, 800.0, 1600.0])
     results = [
         building.tapping_force_spectrum(freqs, plate_stiffness, impedance),
-        building.covering_improvement(
-            freqs, covering, plate_stiffness, impedance
-        ),
+        building.covering_improvement(freqs, covering, plate_stiffness, impedance),
         building.floating_floor_improvement_spectrum(
             freqs,
             resonance_frequency=52.8,
@@ -1198,9 +1224,7 @@ def test_octave_bandwidth_factor() -> None:
         ),
         (lambda: building.covering_contact_stiffness(1e9, 0.0), "thickness"),
         (
-            lambda: building.tapping_force_spectrum(
-                [100.0], 1e6, 1e3, band="half"
-            ),
+            lambda: building.tapping_force_spectrum([100.0], 1e6, 1e3, band="half"),
             "band",
         ),
         (lambda: building.force_pulse([-1.0], 1e6, 1e3), "time"),
@@ -1239,9 +1263,7 @@ def test_octave_bandwidth_factor() -> None:
             "base_rating",
         ),
         (
-            lambda: building.lining_improvement_in_situ(
-                float("inf"), 100.0, 50.0
-            ),
+            lambda: building.lining_improvement_in_situ(float("inf"), 100.0, 50.0),
             "finite",
         ),
     ],

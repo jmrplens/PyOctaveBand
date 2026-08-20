@@ -39,8 +39,13 @@ _PDF_MAGIC = b"%PDF"
 # Standard octave-band A-weighting corrections Ck (dB), IEC 61672 / ISO 3744
 # Annex E Table E.2 (reused by ISO 3741 Annex F), at the example band centres.
 _CK_OCTAVE = {
-    125: -16.1, 250: -8.6, 500: -3.2, 1000: 0.0,
-    2000: 1.2, 4000: 1.0, 8000: -1.1,
+    125: -16.1,
+    250: -8.6,
+    500: -3.2,
+    1000: 0.0,
+    2000: 1.2,
+    4000: 1.0,
+    8000: -1.1,
 }
 
 _FREQS = np.array([125, 250, 500, 1000, 2000, 4000, 8000], dtype=float)
@@ -73,8 +78,13 @@ def _extract_text(path: str) -> str:
 def _result():
     """The direct-method determination whose LW and LWA are hand-derivable."""
     return sound_power_reverberation(
-        _LP, _T60, volume=_VOLUME, surface_area=_SURFACE, frequencies=_FREQS,
-        temperature=_THETA, static_pressure=_PS,
+        _LP,
+        _T60,
+        volume=_VOLUME,
+        surface_area=_SURFACE,
+        frequencies=_FREQS,
+        temperature=_THETA,
+        static_pressure=_PS,
     )
 
 
@@ -86,8 +96,13 @@ def _oracle_lw() -> np.ndarray:
     c1 = -10.0 * np.log10(_PS / 101.325) + 5.0 * np.log10((273.15 + _THETA) / 314.0)
     c2 = -10.0 * np.log10(_PS / 101.325) + 15.0 * np.log10((273.15 + _THETA) / 296.0)
     return (
-        _LP + 10.0 * np.log10(area / 1.0) + 4.34 * (area / _SURFACE)
-        + waterhouse + c1 + c2 - 6.0
+        _LP
+        + 10.0 * np.log10(area / 1.0)
+        + 4.34 * (area / _SURFACE)
+        + waterhouse
+        + c1
+        + c2
+        - 6.0
     )
 
 
@@ -148,7 +163,11 @@ def test_third_octave_labels_and_grouping(tmp_path) -> None:
     freqs = np.array([100, 125, 160, 200, 250, 315, 400, 500, 630, 800], dtype=float)
     lp = np.linspace(82.0, 74.0, freqs.size)
     res = sound_power_reverberation(
-        lp, 2.0, volume=200.0, surface_area=240.0, frequencies=freqs,
+        lp,
+        2.0,
+        volume=200.0,
+        surface_area=240.0,
+        frequencies=freqs,
     )
     out = tmp_path / "third.pdf"
     res.report(str(out))
@@ -188,7 +207,11 @@ def test_comparison_method_reports_eq21(tmp_path) -> None:
     lp_rss = _LP - 3.0
     lw_rss = np.full(_FREQS.size, 85.0)
     res = sound_power_comparison(
-        _LP, lp_rss, lw_rss, frequencies=_FREQS, temperature=_THETA,
+        _LP,
+        lp_rss,
+        lw_rss,
+        frequencies=_FREQS,
+        temperature=_THETA,
         static_pressure=_PS,
     )
     out = tmp_path / "comparison.pdf"

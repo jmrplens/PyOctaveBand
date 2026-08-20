@@ -17,8 +17,8 @@ from ..theme import (
     FIELD_STROKE,
 )
 
-_DUCT_AXIS = 400.0                       # channel-axis depth [m]
-_DUCT_SRC_DEPTHS = (400.0, 150.0)        # on the axis / near the surface
+_DUCT_AXIS = 400.0  # channel-axis depth [m]
+_DUCT_SRC_DEPTHS = (400.0, 150.0)  # on the axis / near the surface
 
 
 def _duct_profile(z: Any) -> Any:
@@ -81,7 +81,7 @@ def _ducting_fields(
     import fdtd2d
 
     dx = 2.0
-    ny, nx = 400, 1200                     # 800 m depth x 2400 m range
+    ny, nx = 400, 1200  # 800 m depth x 2400 m range
     z = (np.arange(ny) + 0.5) * dx
     c_prof = _duct_profile(z)
     c_map = np.repeat(c_prof[:, np.newaxis], nx, axis=1)
@@ -93,9 +93,11 @@ def _ducting_fields(
         sim = fdtd2d.FDTD2D(c_map, dx, rho=1025.0, sponge_width=30)
         iy = round(depth / dx)
         sim.add_source(fdtd2d.GaussianPulse(ix=100, iy=iy, width=width))
-        sim.add_source(fdtd2d.GaussianPulse(ix=100, iy=iy, width=width,
-                                            t0=4.0 * width + offset,
-                                            amplitude=-1.0))
+        sim.add_source(
+            fdtd2d.GaussianPulse(
+                ix=100, iy=iy, width=width, t0=4.0 * width + offset, amplitude=-1.0
+            )
+        )
         energy = np.zeros_like(sim.p)
         ps: list[Any] = []
         ts: list[float] = []
@@ -113,7 +115,7 @@ def _ducting_fields(
     # i.e. everywhere the pulse has carried energy over the whole run. The
     # reference comes from the far half of the domain so the near-source
     # blast saturates instead of washing out the duct-band contrast.
-    ref = float(np.quantile(energy_maps[:, :, nx // 4:], 0.999))
+    ref = float(np.quantile(energy_maps[:, :, nx // 4 :], 0.999))
     with np.errstate(divide="ignore"):
         e_db = 10.0 * np.log10(energy_maps[:, ::2, ::2] / ref)
     e_db = np.clip(e_db, -20.0, 0.0).astype(np.float32)
@@ -130,20 +132,22 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     from matplotlib import patheffects
 
     T = _translate_str
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     p_all, e_db, times, z, c_prof, _ = _ducting_fields()
     half = p_all.shape[1] // 2
     vmax = float(np.quantile(np.abs(p_all[:, :half]), 0.999))
 
     fig = _anim_figure()
-    fig.suptitle(T("SOFAR channel: sound trapped by the $c(z)$ minimum "
-                   "(2D FDTD)"))
+    fig.suptitle(T("SOFAR channel: sound trapped by the $c(z)$ minimum (2D FDTD)"))
     gs = fig.add_gridspec(2, 2, width_ratios=[0.22, 1.0])
-    titles = [T("Source on the channel axis (depth 400 m)"),
-              T("Source near the surface (depth 150 m)")]
-    verdicts = [T("trapped: wavefronts bend back to the axis"),
-                T("leaks: energy escapes the channel")]
+    titles = [
+        T("Source on the channel axis (depth 400 m)"),
+        T("Source near the surface (depth 150 m)"),
+    ]
+    verdicts = [
+        T("trapped: wavefronts bend back to the axis"),
+        T("leaks: energy escapes the channel"),
+    ]
     extent = (0.0, 2400.0, 800.0, 0.0)
     ims: list[Any] = []
     ims_e: list[Any] = []
@@ -153,9 +157,15 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         ax_c = fig.add_subplot(gs[row, 0])
         _grid_axes(ax_c)
         ax_c.plot(c_prof, z, color=COLOR_PRIMARY, lw=1.6)
-        ax_c.plot([float(np.interp(depth, z, c_prof))], [depth],
-                  marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor="white", markeredgewidth=0.8)
+        ax_c.plot(
+            [float(np.interp(depth, z, c_prof))],
+            [depth],
+            marker="o",
+            ms=5,
+            color=COLOR_TERTIARY,
+            markeredgecolor="white",
+            markeredgewidth=0.8,
+        )
         ax_c.axhline(_DUCT_AXIS, color=COLOR_FG, ls="--", lw=0.9, alpha=0.6)
         ax_c.set_ylim(800.0, 0.0)
         ax_c.set_xlim(1460.0, 1750.0)
@@ -167,35 +177,84 @@ def animate_fdtd_ducting(output_dir: str) -> None:
 
         ax_f = fig.add_subplot(gs[row, 1])
         ax_f.grid(False)
-        im = ax_f.imshow(p_all[row][0], origin="upper", extent=extent,
-                         cmap=CMAP_FIELD, vmin=-vmax, vmax=vmax,
-                         aspect="auto", interpolation="bilinear")
+        im = ax_f.imshow(
+            p_all[row][0],
+            origin="upper",
+            extent=extent,
+            cmap=CMAP_FIELD,
+            vmin=-vmax,
+            vmax=vmax,
+            aspect="auto",
+            interpolation="bilinear",
+        )
         # The verdict overlay: fades in over the last seconds (and the
         # poster frame), replacing the instantaneous wavefronts with the
         # time-integrated energy paths.
-        im_e = ax_f.imshow(e_db[row], origin="upper", extent=extent,
-                           cmap="magma", vmin=-20.0, vmax=0.0,
-                           aspect="auto", interpolation="bilinear",
-                           alpha=0.0, zorder=2.5)
+        im_e = ax_f.imshow(
+            e_db[row],
+            origin="upper",
+            extent=extent,
+            cmap="magma",
+            vmin=-20.0,
+            vmax=0.0,
+            aspect="auto",
+            interpolation="bilinear",
+            alpha=0.0,
+            zorder=2.5,
+        )
         ax_f.set_title(titles[row], fontsize=10)
-        ax_f.axhline(_DUCT_AXIS, color="#888888", ls="--", lw=0.9,
-                     alpha=0.8, zorder=3)
-        ax_f.plot([200.0], [depth], marker="o", ms=5, color=COLOR_TERTIARY,
-                  markeredgecolor=FIELD_STROKE, markeredgewidth=0.8,
-                  zorder=4)
-        ax_f.text(240.0, depth - 25.0, T("source"), ha="left", va="bottom",
-                  color=FIELD_INK, fontsize=7.5, path_effects=outline,
-                  zorder=4)
+        ax_f.axhline(_DUCT_AXIS, color="#888888", ls="--", lw=0.9, alpha=0.8, zorder=3)
+        ax_f.plot(
+            [200.0],
+            [depth],
+            marker="o",
+            ms=5,
+            color=COLOR_TERTIARY,
+            markeredgecolor=FIELD_STROKE,
+            markeredgewidth=0.8,
+            zorder=4,
+        )
+        ax_f.text(
+            240.0,
+            depth - 25.0,
+            T("source"),
+            ha="left",
+            va="bottom",
+            color=FIELD_INK,
+            fontsize=7.5,
+            path_effects=outline,
+            zorder=4,
+        )
         # A translucent dark pill keeps this label legible once the bright
         # magma energy overlay fades in over the channel axis (a plain white
         # stroke washes out against the near-white high-energy region).
-        ax_f.text(2360.0, 425.0, T("channel axis ($c$ minimum)"), ha="right",
-                  va="top", color="white", fontsize=7, zorder=4,
-                  bbox={"boxstyle": "round,pad=0.2", "facecolor": "black",
-                        "alpha": 0.45, "edgecolor": "none"})
-        v_txt = ax_f.text(60.0, 770.0, "", ha="left", va="bottom",
-                          color=FIELD_INK, fontsize=8, path_effects=outline,
-                          zorder=4)
+        ax_f.text(
+            2360.0,
+            425.0,
+            T("channel axis ($c$ minimum)"),
+            ha="right",
+            va="top",
+            color="white",
+            fontsize=7,
+            zorder=4,
+            bbox={
+                "boxstyle": "round,pad=0.2",
+                "facecolor": "black",
+                "alpha": 0.45,
+                "edgecolor": "none",
+            },
+        )
+        v_txt = ax_f.text(
+            60.0,
+            770.0,
+            "",
+            ha="left",
+            va="bottom",
+            color=FIELD_INK,
+            fontsize=8,
+            path_effects=outline,
+            zorder=4,
+        )
         ax_f.tick_params(labelsize=7, labelleft=False)
         if row == 0:
             ax_f.tick_params(labelbottom=False)
@@ -213,14 +272,25 @@ def animate_fdtd_ducting(output_dir: str) -> None:
     # top spine -- where, once that panel crossfades to the magma energy
     # map, black text on black background disappeared. The pill carries its
     # own contrast, so the readout no longer depends on what is under it.
-    t_txt = ax_top.text(55.0, 25.0, "", ha="left", va="top",
-                        family="monospace", fontsize=10, color="white",
-                        zorder=4,
-                        bbox={"boxstyle": "round,pad=0.2",
-                              "facecolor": "black", "alpha": 0.45,
-                              "edgecolor": "none"})
-    reveal = int(0.83 * p_all.shape[1])    # ~17.5 s: pulse has crossed
-    captions_on = int(0.38 * p_all.shape[1])   # first refocus is visible
+    t_txt = ax_top.text(
+        55.0,
+        25.0,
+        "",
+        ha="left",
+        va="top",
+        family="monospace",
+        fontsize=10,
+        color="white",
+        zorder=4,
+        bbox={
+            "boxstyle": "round,pad=0.2",
+            "facecolor": "black",
+            "alpha": 0.45,
+            "edgecolor": "none",
+        },
+    )
+    reveal = int(0.83 * p_all.shape[1])  # ~17.5 s: pulse has crossed
+    captions_on = int(0.38 * p_all.shape[1])  # first refocus is visible
 
     def update(k: int) -> tuple[Any, ...]:
         alpha = min(1.0, max(0.0, (k - reveal) / 12.0))
@@ -231,5 +301,12 @@ def animate_fdtd_ducting(output_dir: str) -> None:
         t_txt.set_text(T(f"$t$ = {times[k]:5.2f} s"))
         return (*ims, *ims_e, *v_txts, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_fdtd_ducting",
-                 frames=int(p_all.shape[1]), fps=_DUCT_FPS, gif_fps=5)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_fdtd_ducting",
+        frames=int(p_all.shape[1]),
+        fps=_DUCT_FPS,
+        gif_fps=5,
+    )

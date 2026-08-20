@@ -61,48 +61,36 @@ _SIGMA_UNFAV_LABEL = r"$\Sigma$ unfav. = "
 _STRINGS: dict[str, str] = {
     _FREQ_LABEL: "Frecuencia [Hz]",
     "Sound absorption coefficient": "Coeficiente de absorción acústica",
-    r"Sound absorption coefficient $\alpha_\mathrm{s}$":
-        r"Coeficiente de absorción acústica $\alpha_\mathrm{s}$",
-    "ISO 354 reverberation-room sound absorption":
-        "Absorción acústica en cámara reverberante ISO 354",
+    r"Sound absorption coefficient $\alpha_\mathrm{s}$": r"Coeficiente de absorción acústica $\alpha_\mathrm{s}$",
+    "ISO 354 reverberation-room sound absorption": "Absorción acústica en cámara reverberante ISO 354",
     r"Practical $\alpha_\mathrm{p}$": r"$\alpha_\mathrm{p}$ práctico",
     "class ": "clase ",
     _SIGMA_UNFAV_LABEL: r"$\Sigma$ desfav. = ",
     "Scattering coefficient $s$": "Coeficiente de dispersión $s$",
-    _SCATTERING_TITLE:
-        "Coeficiente de dispersión de incidencia aleatoria (ISO 17497-1)",
+    _SCATTERING_TITLE: "Coeficiente de dispersión de incidencia aleatoria (ISO 17497-1)",
     "Diffusion coefficient $d$ = ": "Coeficiente de difusión $d$ = ",
-    "Predicted diffuser polar response":
-        "Respuesta polar predicha del difusor",
-    _DIFFUSION_TITLE:
-        "Coeficiente de difusión direccional (ISO 17497-2)",
-    "Reflected sound-pressure level L [dB]":
-        "Nivel de presión acústica reflejado L [dB]",
+    "Predicted diffuser polar response": "Respuesta polar predicha del difusor",
+    _DIFFUSION_TITLE: "Coeficiente de difusión direccional (ISO 17497-2)",
+    "Reflected sound-pressure level L [dB]": "Nivel de presión acústica reflejado L [dB]",
     "Absorption coefficient": "Coeficiente de absorción",
-    "In-situ road-surface absorption (ISO 13472-1)":
-        "Absorción in situ de pavimentos (ISO 13472-1)",
-    r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]":
-        r"Rigidez dinámica por unidad de área $s^{\prime}$ [MN/m³]",
+    "In-situ road-surface absorption (ISO 13472-1)": "Absorción in situ de pavimentos (ISO 13472-1)",
+    r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]": r"Rigidez dinámica por unidad de área $s^{\prime}$ [MN/m³]",
     "Natural frequency $f_0$ [Hz]": "Frecuencia natural $f_0$ [Hz]",
     "EN 29052-1 floating-floor resonance": "Resonancia de suelo flotante EN 29052-1",
     r"Absorption $\alpha$": r"Absorción $\alpha$",
     "Reflection factor $|r|$": "Factor de reflexión $|r|$",
     "Coefficient": "Coeficiente",
-    "ISO 10534-2 normal-incidence absorption":
-        "Absorción a incidencia normal ISO 10534-2",
+    "ISO 10534-2 normal-incidence absorption": "Absorción a incidencia normal ISO 10534-2",
     r"Fit $\Delta p = a\,u + b\,u^2$": r"Ajuste $\Delta p = a\,u + b\,u^2$",
     "Evaluation point ($u$ = ": "Punto de evaluación ($u$ = ",
     "Linear airflow velocity $u$ [mm/s]": "Velocidad lineal del aire $u$ [mm/s]",
     r"Pressure difference $\Delta p$ [Pa]": r"Diferencia de presión $\Delta p$ [Pa]",
-    "ISO 9053-1 static airflow resistance — ":
-        "Resistencia al flujo de aire ISO 9053-1 — ",
+    "ISO 9053-1 static airflow resistance — ": "Resistencia al flujo de aire ISO 9053-1 — ",
     "ISO 12999-2 absorption uncertainty": "Incertidumbre de absorción ISO 12999-2",
     "reproducibility": "reproducibilidad",
     "repeatability": "repetibilidad",
-    r"Equivalent absorption area $A_\mathrm{T}$ [m²]":
-        r"Área de absorción equivalente $A_\mathrm{T}$ [m²]",
-    r"Practical absorption coefficient $\alpha_\mathrm{p}$":
-        r"Coeficiente de absorción práctico $\alpha_\mathrm{p}$",
+    r"Equivalent absorption area $A_\mathrm{T}$ [m²]": r"Área de absorción equivalente $A_\mathrm{T}$ [m²]",
+    r"Practical absorption coefficient $\alpha_\mathrm{p}$": r"Coeficiente de absorción práctico $\alpha_\mathrm{p}$",
     "Value": "Valor",
     "Porous medium": "Medio poroso",
     "Normalised characteristic value": "Valor característico normalizado",
@@ -119,12 +107,9 @@ _STRINGS: dict[str, str] = {
     r"Absorption $\alpha(\theta)$": r"Absorción $\alpha(\theta)$",
     r"Absorption $\alpha_{\mathrm{dif}}$": r"Absorción $\alpha_{\mathrm{dif}}$",
     r"Transmission loss $TL_\mathrm{n}$": r"Pérdida de transmisión $TL_\mathrm{n}$",
-    r"Transmission loss $TL_\mathrm{n}$ [dB]":
-        r"Pérdida de transmisión $TL_\mathrm{n}$ [dB]",
-    _HARD_BACKED_ALPHA_LABEL:
-        r"Absorción con respaldo rígido $\alpha$",
-    "ASTM E2611 transfer-matrix quantities":
-        "Magnitudes de la matriz de transferencia ASTM E2611",
+    r"Transmission loss $TL_\mathrm{n}$ [dB]": r"Pérdida de transmisión $TL_\mathrm{n}$ [dB]",
+    _HARD_BACKED_ALPHA_LABEL: r"Absorción con respaldo rígido $\alpha$",
+    "ASTM E2611 transfer-matrix quantities": "Magnitudes de la matriz de transferencia ASTM E2611",
 }
 
 
@@ -147,8 +132,10 @@ def _localize_band_axes(ax: Any, language: str) -> None:
 
 
 def plot_weighted_absorption(
-    result: AbsorptionRatingResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: AbsorptionRatingResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Practical absorption curve vs the shifted reference (ISO 11654:1997).
 
@@ -186,9 +173,12 @@ def plot_weighted_absorption(
     localize_axes(ax, language)
     return ax
 
+
 def plot_sound_absorption(
-    result: SoundAbsorptionMeasurement, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: SoundAbsorptionMeasurement,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Sound absorption coefficient ``alpha_s`` versus frequency (ISO 354:2003).
 
@@ -220,9 +210,12 @@ def plot_sound_absorption(
     _localize_band_axes(ax, language)
     return ax
 
+
 def plot_scattering_coefficient(
-    result: ScatteringResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: ScatteringResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Random-incidence scattering coefficient ``s`` versus frequency.
 
@@ -251,9 +244,9 @@ def plot_scattering_coefficient(
     localize_axes(ax, language)
     return ax
 
+
 def plot_diffusion_polar(
-    result: DiffusionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DiffusionResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Polar reflected-level response with the diffusion coefficient annotated.
 
@@ -274,8 +267,12 @@ def plot_diffusion_polar(
 
     ax.plot(angles, levels, **kwargs)
     # Translucent so the polar grid keeps reading through the lobe.
-    ax.fill(angles, levels, color=kwargs["color"],
-            alpha=theme_fill_alpha(kwargs["color"], ax))
+    ax.fill(
+        angles,
+        levels,
+        color=kwargs["color"],
+        alpha=theme_fill_alpha(kwargs["color"], ax),
+    )
     ax.set_title(
         f"{_t('Diffusion coefficient $d$ = ', language)}"
         f"{format_number(float(result.coefficient), language, decimals=2)} "
@@ -283,9 +280,12 @@ def plot_diffusion_polar(
     )
     return cast("Axes", ax)
 
+
 def plot_scattering_report(
-    result: ScatteringResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: ScatteringResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Scattering coefficient ``s`` and ``alpha_s`` on a categorical band axis.
 
@@ -309,11 +309,20 @@ def plot_scattering_report(
         ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     ax.fill_between(
-        positions, 0.0, np.clip(s, 0.0, None),
-        color=_C_PRIMARY_LIGHT, edgecolor="none", zorder=1,
+        positions,
+        0.0,
+        np.clip(s, 0.0, None),
+        color=_C_PRIMARY_LIGHT,
+        edgecolor="none",
+        zorder=1,
     )
     ax.plot(
-        positions, a_s, marker="s", ms=4, color=_C_MUTED, zorder=3,
+        positions,
+        a_s,
+        marker="s",
+        ms=4,
+        color=_C_MUTED,
+        zorder=3,
         label=r"$\alpha_\mathrm{s}$",
     )
     kwargs.setdefault("marker", "o")
@@ -323,16 +332,17 @@ def plot_scattering_report(
     ax.set_ylabel(_t("Coefficient", language))
     top = max(1.05, float(np.nanmax(s)) * 1.05) if s.size else 1.05
     ax.set_ylim(0.0, top)
-    ax.set_title(
-        _t(_SCATTERING_TITLE, language)
-    )
+    ax.set_title(_t(_SCATTERING_TITLE, language))
     ax.grid(True, axis="y", alpha=0.3)
     _localize_band_axes(ax, language)
     return ax
 
+
 def plot_diffusion_report(
-    result: DiffusionSpectrum, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DiffusionSpectrum,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Directional diffusion coefficient ``d(f)`` on a categorical band axis.
 
@@ -356,13 +366,22 @@ def plot_diffusion_report(
         ax, freqs, xlabel=_t(_FREQ_LABEL, language), language=language
     )
     ax.fill_between(
-        positions, 0.0, np.clip(d, 0.0, None),
-        color=_C_PRIMARY_LIGHT, edgecolor="none", zorder=1,
+        positions,
+        0.0,
+        np.clip(d, 0.0, None),
+        color=_C_PRIMARY_LIGHT,
+        edgecolor="none",
+        zorder=1,
     )
     if result.normalized is not None:
         d_n = np.asarray(result.normalized, dtype=np.float64)
         ax.plot(
-            positions, d_n, marker="s", ms=4, color=_C_MUTED, zorder=3,
+            positions,
+            d_n,
+            marker="s",
+            ms=4,
+            color=_C_MUTED,
+            zorder=3,
             label=r"$d_\mathrm{n}$",
         )
     kwargs.setdefault("marker", "o")
@@ -371,16 +390,14 @@ def plot_diffusion_report(
     ax.plot(positions, d, ms=4, zorder=3, **kwargs)
     ax.set_ylabel(_t("Coefficient", language))
     ax.set_ylim(0.0, 1.05)
-    ax.set_title(
-        _t(_DIFFUSION_TITLE, language)
-    )
+    ax.set_title(_t(_DIFFUSION_TITLE, language))
     ax.grid(True, axis="y", alpha=0.3)
     _localize_band_axes(ax, language)
     return ax
 
+
 def plot_diffusion_polar_report(
-    result: DiffusionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DiffusionResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """Polar reflected-level response for the diffusion fiche (opaque fill).
 
@@ -408,8 +425,11 @@ def plot_diffusion_polar_report(
     polar_ax: Any = ax
     polar_ax.set_theta_zero_location("N")
     polar_ax.set_theta_direction(-1)
-    if angles_deg.size and float(np.nanmin(angles_deg)) >= -90.0 and \
-            float(np.nanmax(angles_deg)) <= 90.0:
+    if (
+        angles_deg.size
+        and float(np.nanmin(angles_deg)) >= -90.0
+        and float(np.nanmax(angles_deg)) <= 90.0
+    ):
         polar_ax.set_thetamin(-90)
         polar_ax.set_thetamax(90)
     ax.set_title(_t(_DIFFUSION_TITLE, language))
@@ -418,9 +438,12 @@ def plot_diffusion_polar_report(
     localize_axes(ax, language)
     return cast("Axes", ax)
 
+
 def plot_insitu_absorption(
-    result: InsituAbsorptionResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: InsituAbsorptionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """In-situ one-third-octave absorption spectrum ``alpha(f)``.
 
@@ -446,9 +469,12 @@ def plot_insitu_absorption(
     _localize_band_axes(ax, language)
     return ax
 
+
 def plot_dynamic_stiffness(
-    result: DynamicStiffnessResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: DynamicStiffnessResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Floating-floor natural frequency ``f0(s')`` with the design point marked.
 
@@ -465,20 +491,28 @@ def plot_dynamic_stiffness(
     s_mn = result.dynamic_stiffness / 1e6
     grid = np.logspace(np.log10(max(s_mn * 0.2, 1e-2)), np.log10(s_mn * 5.0), 240)
     f0 = np.sqrt(grid * 1e6 / m) / (2.0 * np.pi)
-    ax.plot(grid, f0, color=_C_PRIMARY,
-            label=rf"$f_0 = \frac{{1}}{{2\pi}}\sqrt{{s^{{\prime}}/m^{{\prime}}}}$,  "
-                 rf"$m^{{\prime}}$ = {decimal_comma(f'{m:g}', language)} kg/m²")
+    ax.plot(
+        grid,
+        f0,
+        color=_C_PRIMARY,
+        label=rf"$f_0 = \frac{{1}}{{2\pi}}\sqrt{{s^{{\prime}}/m^{{\prime}}}}$,  "
+        rf"$m^{{\prime}}$ = {decimal_comma(f'{m:g}', language)} kg/m²",
+    )
     ax.axhline(result.natural_frequency, color=_C_MUTED, ls=":", lw=0.8)
-    ax.plot([s_mn, s_mn], [0.0, result.natural_frequency], color=_C_MUTED, ls=":", lw=0.8)
+    ax.plot(
+        [s_mn, s_mn], [0.0, result.natural_frequency], color=_C_MUTED, ls=":", lw=0.8
+    )
 
     kwargs.setdefault("color", _C_REFERENCE)
     kwargs.setdefault("zorder", 5)
     kwargs.setdefault("s", 80)
-    kwargs.setdefault("label", rf"$s^{{\prime}}$ = {format_number(s_mn, language, decimals=2)} MN/m³,  "
-                      f"$f_0$ = "
-                      f"{format_number(result.natural_frequency, language, decimals=1)} Hz")
-    ax.scatter([s_mn], [result.natural_frequency],
-               **kwargs)
+    kwargs.setdefault(
+        "label",
+        rf"$s^{{\prime}}$ = {format_number(s_mn, language, decimals=2)} MN/m³,  "
+        f"$f_0$ = "
+        f"{format_number(result.natural_frequency, language, decimals=1)} Hz",
+    )
+    ax.scatter([s_mn], [result.natural_frequency], **kwargs)
     ax.set_xscale("log")
     ax.set_xlabel(_t(r"Dynamic stiffness per unit area $s^{\prime}$ [MN/m³]", language))
     ax.set_ylabel(_t("Natural frequency $f_0$ [Hz]", language))
@@ -489,9 +523,12 @@ def plot_dynamic_stiffness(
     localize_axes(ax, language)
     return ax
 
+
 def plot_impedance_tube(
-    result: ImpedanceTubeResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: ImpedanceTubeResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Normal-incidence absorption spectrum with |r| overlaid (ISO 10534-2).
 
@@ -512,8 +549,13 @@ def plot_impedance_tube(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t(r"Absorption $\alpha$", language))
     ax.plot(freqs, alpha, **kwargs)
-    ax.plot(freqs, np.abs(np.asarray(result.reflection, dtype=np.complex128)),
-            ls="--", color=_C_MUTED, label=_t("Reflection factor $|r|$", language))
+    ax.plot(
+        freqs,
+        np.abs(np.asarray(result.reflection, dtype=np.complex128)),
+        ls="--",
+        color=_C_MUTED,
+        label=_t("Reflection factor $|r|$", language),
+    )
     # A continuous logarithmic frequency axis with band-centre labels (1k, 2k)
     # matches the working plane-wave range of the tube and the rest of the
     # library's spectrum plots (never a power-of-ten log formatter).
@@ -527,9 +569,12 @@ def plot_impedance_tube(
     localize_axes(ax, language)
     return ax
 
+
 def plot_static_airflow(
-    result: StaticAirflowResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: StaticAirflowResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Fitted pressure-drop curve with the evaluation point (ISO 9053-1).
 
@@ -553,9 +598,17 @@ def plot_static_airflow(
     kwargs.setdefault("label", _t(r"Fit $\Delta p = a\,u + b\,u^2$", language))
     # Millimetres per second keep the clause 7.5 reference (0.5 mm/s) legible.
     ax.plot(u * 1e3, dp, **kwargs)
-    ax.plot([u_eval * 1e3], [result.pressure_drop], "D", color=_C_REFERENCE,
-            ms=7, label=(f"{_t('Evaluation point ($u$ = ', language)}"
-                         f"{decimal_comma(f'{u_eval * 1e3:g}', language)} mm/s)"))
+    ax.plot(
+        [u_eval * 1e3],
+        [result.pressure_drop],
+        "D",
+        color=_C_REFERENCE,
+        ms=7,
+        label=(
+            f"{_t('Evaluation point ($u$ = ', language)}"
+            f"{decimal_comma(f'{u_eval * 1e3:g}', language)} mm/s)"
+        ),
+    )
     ax.set_xlabel(_t("Linear airflow velocity $u$ [mm/s]", language))
     ax.set_ylabel(_t(r"Pressure difference $\Delta p$ [Pa]", language))
     ax.set_title(
@@ -568,9 +621,12 @@ def plot_static_airflow(
     localize_axes(ax, language)
     return ax
 
+
 def plot_absorption_uncertainty(
-    result: AbsorptionUncertaintyResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: AbsorptionUncertaintyResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Absorption quantity with its expanded-uncertainty ribbon (ISO 12999-2).
 
@@ -605,7 +661,7 @@ def plot_absorption_uncertainty(
         color=_C_PRIMARY_LIGHT,
         alpha=0.5,
         label=rf"$\pm U$ ($k$ = "
-              f"{decimal_comma(f'{result.coverage_factor:g}', language)})",
+        f"{decimal_comma(f'{result.coverage_factor:g}', language)})",
     )
     ax.plot(freqs, value, **kwargs)
     _freq_axis(ax, freqs, language=language)
@@ -614,7 +670,8 @@ def plot_absorption_uncertainty(
     if result.quantity != "equivalent_area":
         ax.set_ylim(0.0, 1.05)
     sigma = (
-        r"$\sigma_\mathrm{R}$" if result.condition == "reproducibility"
+        r"$\sigma_\mathrm{R}$"
+        if result.condition == "reproducibility"
         else r"$\sigma_\mathrm{r}$"
     )
     ax.set_title(
@@ -682,15 +739,19 @@ def _absorption_reflection_axes(
     ax.semilogx(
         freqs,
         np.abs(np.asarray(reflection, dtype=np.complex128)),
-        ls="--", color=_C_MUTED, label=_t("Reflection factor $|R|$", language),
+        ls="--",
+        color=_C_MUTED,
+        label=_t("Reflection factor $|R|$", language),
     )
     ax.legend(loc="best", fontsize="small")
     return ax
 
 
 def plot_porous_medium(
-    result: PorousMediumResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: PorousMediumResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Normalised characteristic values of a porous medium vs frequency.
 
@@ -713,11 +774,15 @@ def plot_porous_medium(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", r"$\mathrm{Re}(Z_\mathrm{c})/\rho c$")
     ax.loglog(freqs, zn.real, **kwargs)
-    ax.loglog(freqs, -zn.imag, ls="--", color=_C_PRIMARY_LIGHT,
-              label=r"$-\mathrm{Im}(Z_\mathrm{c})/\rho c$")
+    ax.loglog(
+        freqs,
+        -zn.imag,
+        ls="--",
+        color=_C_PRIMARY_LIGHT,
+        label=r"$-\mathrm{Im}(Z_\mathrm{c})/\rho c$",
+    )
     ax.loglog(freqs, kn.real, color=_C_REFERENCE, label=r"$\mathrm{Re}(k)/k_0$")
-    ax.loglog(freqs, -kn.imag, ls="--", color=_C_MUTED,
-              label=r"$-\mathrm{Im}(k)/k_0$")
+    ax.loglog(freqs, -kn.imag, ls="--", color=_C_MUTED, label=r"$-\mathrm{Im}(k)/k_0$")
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Normalised characteristic value", language))
@@ -738,8 +803,7 @@ _BIOT_IMAG_PART = r", $-\mathrm{Im}(\delta)$"
 
 
 def plot_biot_waves(
-    result: BiotWavesResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: BiotWavesResult, ax: Axes | None = None, language: str = "en", **kwargs: Any
 ) -> Axes:
     """The three Biot wavenumbers of a poroelastic layer vs frequency.
 
@@ -764,24 +828,33 @@ def plot_biot_waves(
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(result.frequency, dtype=np.float64)
     kwargs.setdefault("color", _C_PRIMARY)
-    kwargs.setdefault(
-        "label", _t("Airborne", language) + _BIOT_REAL_PART
-    )
+    kwargs.setdefault("label", _t("Airborne", language) + _BIOT_REAL_PART)
     ax.semilogx(freqs, result.airborne_wavenumber.real, **kwargs)
     ax.semilogx(
-        freqs, -result.airborne_wavenumber.imag, ls="--", color=_C_PRIMARY_LIGHT,
+        freqs,
+        -result.airborne_wavenumber.imag,
+        ls="--",
+        color=_C_PRIMARY_LIGHT,
         label=_t("Airborne", language) + _BIOT_IMAG_PART,
     )
     ax.semilogx(
-        freqs, result.frame_borne_wavenumber.real, color=_C_REFERENCE,
+        freqs,
+        result.frame_borne_wavenumber.real,
+        color=_C_REFERENCE,
         label=_t("Frame-borne", language) + _BIOT_REAL_PART,
     )
     ax.semilogx(
-        freqs, -result.frame_borne_wavenumber.imag, ls="--", color=_C_MUTED,
+        freqs,
+        -result.frame_borne_wavenumber.imag,
+        ls="--",
+        color=_C_MUTED,
         label=_t("Frame-borne", language) + _BIOT_IMAG_PART,
     )
     ax.semilogx(
-        freqs, result.shear_wavenumber.real, ls=":", color=_C_REFERENCE,
+        freqs,
+        result.shear_wavenumber.real,
+        ls=":",
+        color=_C_REFERENCE,
         label=_t("Shear", language) + _BIOT_REAL_PART,
     )
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -795,8 +868,10 @@ def plot_biot_waves(
 
 
 def plot_layered_absorber(
-    result: LayeredAbsorberResult, ax: Axes | None = None, language: str = "en",
-    **kwargs: Any
+    result: LayeredAbsorberResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Oblique-incidence absorption spectrum with |R| overlaid.
 
@@ -812,8 +887,10 @@ def plot_layered_absorber(
 
     angle_deg = np.degrees(result.angle)
     if language == "es":
-        title = (f"Predicción de absorbente multicapa "
-                 f"($\\theta$ = {format_number(float(angle_deg), language, decimals=0)}°)")
+        title = (
+            f"Predicción de absorbente multicapa "
+            f"($\\theta$ = {format_number(float(angle_deg), language, decimals=0)}°)"
+        )
     else:
         title = f"Layered absorber prediction ($\\theta$ = {angle_deg:.0f}°)"
     return _absorption_reflection_axes(
@@ -828,8 +905,10 @@ def plot_layered_absorber(
 
 
 def plot_slit_resonator_absorber(
-    result: SlitResonatorAbsorberResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: SlitResonatorAbsorberResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Absorption spectrum of a slit panel loaded with Helmholtz resonators.
 
@@ -846,11 +925,12 @@ def plot_slit_resonator_absorber(
 
     angle_deg = np.degrees(result.angle)
     if language == "es":
-        title = (f"Panel ranurado con resonadores de Helmholtz "
-                 f"($\\theta$ = {format_number(float(angle_deg), language, decimals=0)}°)")
+        title = (
+            f"Panel ranurado con resonadores de Helmholtz "
+            f"($\\theta$ = {format_number(float(angle_deg), language, decimals=0)}°)"
+        )
     else:
-        title = (f"Slit panel with Helmholtz resonators "
-                 f"($\\theta$ = {angle_deg:.0f}°)")
+        title = f"Slit panel with Helmholtz resonators ($\\theta$ = {angle_deg:.0f}°)"
     return _absorption_reflection_axes(
         ax,
         np.asarray(result.frequency, dtype=np.float64),
@@ -863,8 +943,10 @@ def plot_slit_resonator_absorber(
 
 
 def plot_diffuse_field_absorption(
-    result: DiffuseFieldAbsorptionResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: DiffuseFieldAbsorptionResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Random-incidence (Paris-integral) absorption spectrum.
 
@@ -877,9 +959,11 @@ def plot_diffuse_field_absorption(
 
     limit_deg = np.degrees(result.angle_limit)
     if language == "es":
-        title = (f"Absorción a incidencia aleatoria "
-                 f"(integral de Paris hasta "
-                 f"{format_number(float(limit_deg), language, decimals=0)}°)")
+        title = (
+            f"Absorción a incidencia aleatoria "
+            f"(integral de Paris hasta "
+            f"{format_number(float(limit_deg), language, decimals=0)}°)"
+        )
     else:
         title = f"Random-incidence absorption (Paris integral to {limit_deg:.0f}°)"
     kwargs.setdefault("label", _t(r"Absorption $\alpha_{\mathrm{dif}}$", language))
@@ -896,8 +980,10 @@ def plot_diffuse_field_absorption(
 
 
 def plot_diffuser_polar_response(
-    result: DiffuserPolarResponse, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: DiffuserPolarResponse,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Predicted far-field polar response of a diffuser design.
 
@@ -922,14 +1008,21 @@ def plot_diffuser_polar_response(
     kwargs.setdefault("marker", "o")
     kwargs.setdefault("color", _C_PRIMARY)
     # Translucent so the polar grid keeps reading through the lobe.
-    ax.fill(angles, levels, color=kwargs["color"],
-            alpha=theme_fill_alpha(kwargs["color"], ax))
+    ax.fill(
+        angles,
+        levels,
+        color=kwargs["color"],
+        alpha=theme_fill_alpha(kwargs["color"], ax),
+    )
     ax.plot(angles, levels, ms=4, **kwargs)
     polar_ax: Any = ax
     polar_ax.set_theta_zero_location("N")
     polar_ax.set_theta_direction(-1)
-    if angles_deg.size and float(np.nanmin(angles_deg)) >= -90.0 and \
-            float(np.nanmax(angles_deg)) <= 90.0:
+    if (
+        angles_deg.size
+        and float(np.nanmin(angles_deg)) >= -90.0
+        and float(np.nanmax(angles_deg)) <= 90.0
+    ):
         polar_ax.set_thetamin(-90)
         polar_ax.set_thetamax(90)
     freq = format_number(float(result.frequency), language, decimals=0)
@@ -972,16 +1065,23 @@ def plot_transfer_matrix(
 
     ax = ax if ax is not None else _new_axes()
     freqs = np.asarray(frequency, dtype=np.float64)
-    tl = np.asarray(matrix.transmission_loss(characteristic_impedance),
-                    dtype=np.float64)
-    alpha = np.asarray(matrix.absorption_hard_backed(characteristic_impedance),
-                       dtype=np.float64)
+    tl = np.asarray(
+        matrix.transmission_loss(characteristic_impedance), dtype=np.float64
+    )
+    alpha = np.asarray(
+        matrix.absorption_hard_backed(characteristic_impedance), dtype=np.float64
+    )
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t(r"Transmission loss $TL_\mathrm{n}$", language))
     ax.plot(freqs, tl, **kwargs)
     twin = ax.twinx()
-    twin.plot(freqs, alpha, ls="--", color=_C_MUTED,
-              label=_t(_HARD_BACKED_ALPHA_LABEL, language))
+    twin.plot(
+        freqs,
+        alpha,
+        ls="--",
+        color=_C_MUTED,
+        label=_t(_HARD_BACKED_ALPHA_LABEL, language),
+    )
     twin.set_ylim(0.0, 1.05)
     twin.set_ylabel(_t(_HARD_BACKED_ALPHA_LABEL, language))
     format_frequency_axis(ax, float(freqs.min()), float(freqs.max()))
@@ -999,8 +1099,10 @@ def plot_transfer_matrix(
 
 
 def plot_metadiffuser_absorption(
-    result: MetadiffuserResult, ax: Axes | None = None,
-    language: str = "en", **kwargs: Any
+    result: MetadiffuserResult,
+    ax: Axes | None = None,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Per-well and face-averaged absorption spectra of a metadiffuser.
 
@@ -1027,10 +1129,8 @@ def plot_metadiffuser_absorption(
     wells = np.asarray(result.well_absorption, dtype=np.float64)
     for n, alpha_n in enumerate(wells, start=1):
         label = (
-            _t("Well {n}", language).format(n=f"1-{wells.shape[0]}")
-            if n == 1 else None
+            _t("Well {n}", language).format(n=f"1-{wells.shape[0]}") if n == 1 else None
         )
-        ax.semilogx(freqs, alpha_n, lw=0.9, alpha=0.6, color=_C_MUTED,
-                    label=label)
+        ax.semilogx(freqs, alpha_n, lw=0.9, alpha=0.6, color=_C_MUTED, label=label)
     ax.legend(loc="best", fontsize="small")
     return ax

@@ -39,9 +39,7 @@ def _annex_f_result() -> building.FacadePredictionResult:
         for name, area, r in ref.EN12354_3_ANNEX_F_ELEMENTS
     ]
     elements.append(
-        building.FacadeElement(
-            name="inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE
-        )
+        building.FacadeElement(name="inlet", dn_e=ref.EN12354_3_ANNEX_F_INLET_DNE)
     )
     return building.facade_sound_reduction(
         elements,
@@ -63,8 +61,12 @@ def test_annex_f_element_partial_indices() -> None:
     res = _annex_f_result()
     # From Table F.1.3 (rounded to 0.1 dB as printed).
     assert np.allclose(res.element_r["wall"], [43.7, 48.7, 54.7, 60.7, 66.7], atol=0.05)
-    assert np.allclose(res.element_r["window2"], [27.0, 26.0, 34.0, 40.0, 41.0], atol=0.05)
-    assert np.allclose(res.element_r["inlet"], [28.5, 23.5, 25.5, 38.5, 44.5], atol=0.05)
+    assert np.allclose(
+        res.element_r["window2"], [27.0, 26.0, 34.0, 40.0, 41.0], atol=0.05
+    )
+    assert np.allclose(
+        res.element_r["inlet"], [28.5, 23.5, 25.5, 38.5, 44.5], atol=0.05
+    )
 
 
 def test_annex_f_single_numbers_exact() -> None:
@@ -101,8 +103,7 @@ def test_d2m_nt_formula() -> None:
     """D2m,nT = R' + ΔLfs + 10 lg(V/(6 T0 S)) with T0 = 0,5 s (Formula 13)."""
     res = _annex_f_result()
     term = 10.0 * np.log10(
-        ref.EN12354_3_ANNEX_F_VOLUME
-        / (6.0 * 0.5 * ref.EN12354_3_ANNEX_F_AREA)
+        ref.EN12354_3_ANNEX_F_VOLUME / (6.0 * 0.5 * ref.EN12354_3_ANNEX_F_AREA)
     )
     assert np.allclose(res.d_2m_nt, res.r_prime + term)
 
@@ -127,11 +128,13 @@ def _annex_g_side1_with_door() -> building.RadiatedPowerResult:
         [
             building.FacadeElement(
                 name="wall",
-                area=ref.EN12354_4_ANNEX_G_SEGMENT_AREA - ref.EN12354_4_ANNEX_G_DOOR_AREA,
+                area=ref.EN12354_4_ANNEX_G_SEGMENT_AREA
+                - ref.EN12354_4_ANNEX_G_DOOR_AREA,
                 r=ref.EN12354_4_ANNEX_G_CONCRETE_R,
             ),
             building.FacadeElement(
-                name="door", area=ref.EN12354_4_ANNEX_G_DOOR_AREA,
+                name="door",
+                area=ref.EN12354_4_ANNEX_G_DOOR_AREA,
                 r=ref.EN12354_4_ANNEX_G_DOOR_R,
             ),
         ],
@@ -195,7 +198,8 @@ def test_rprime_cap_off_by_default() -> None:
     by default R' is the bare energy sum, uncapped."""
     res = building.radiated_sound_power(
         [building.FacadeElement(name="wall", area=100.0, r=[60.0])],
-        lp_in=90.0, area=100.0,
+        lp_in=90.0,
+        area=100.0,
     )
     assert res.r_prime[0] == pytest.approx(60.0)
     # LW then follows the bare Formula (2): 90 - 6 - 60 + 20 = 44 dB.
@@ -254,7 +258,9 @@ def test_opening_insertion_loss() -> None:
             building.FacadeElement(name="wall", area=99.0, r=[60.0]),
             building.FacadeElement(name="hole", area=1.0, insertion_loss=0.0),
         ],
-        lp_in=90.0, area=100.0, r_prime_cap=None,
+        lp_in=90.0,
+        area=100.0,
+        r_prime_cap=None,
     )
     # 1 % open area with R=0 dominates: τ ~ 0.01 -> R' ~ 20 dB.
     assert seg.r_prime[0] == pytest.approx(20.0, abs=0.2)
@@ -288,9 +294,9 @@ def test_annex_e_attenuation(
     width: float, height: float, distance: float, expected: float
 ) -> None:
     """A'tot of a finite radiating side reproduces Table G.9 exactly."""
-    assert building.outdoor_attenuation(
-        width, height, distance
-    ) == pytest.approx(expected, abs=0.05)
+    assert building.outdoor_attenuation(width, height, distance) == pytest.approx(
+        expected, abs=0.05
+    )
 
 
 def test_annex_e_exterior_level() -> None:
@@ -380,7 +386,8 @@ def test_scalar_broadcasts_to_band_count() -> None:
             building.FacadeElement(name="a", area=5.0, r=40.0),
             building.FacadeElement(name="b", area=5.0, r=[30.0, 31.0, 32.0]),
         ],
-        area=10.0, volume=50.0,
+        area=10.0,
+        volume=50.0,
     )
     assert res.r_prime.size == 3
 
@@ -394,9 +401,9 @@ def test_non_finite_input_rejected() -> None:
 def test_duplicate_element_names_raise() -> None:
     """Elements are keyed by name in the result, so names must be unique."""
     elements = [
-                building.FacadeElement(name="glass", area=5.0, r=[40.0]),
-                building.FacadeElement(name="glass", area=5.0, r=[30.0]),
-            ]
+        building.FacadeElement(name="glass", area=5.0, r=[40.0]),
+        building.FacadeElement(name="glass", area=5.0, r=[30.0]),
+    ]
     with pytest.raises(ValueError, match="unique"):
         building.facade_sound_reduction(elements, area=10.0, volume=50.0)
 
@@ -408,7 +415,8 @@ def test_no_element_silently_dropped_when_names_unique() -> None:
             building.FacadeElement(name="a", area=5.0, r=[30.0]),
             building.FacadeElement(name="b", area=5.0, r=[30.0]),
         ],
-        area=10.0, volume=50.0,
+        area=10.0,
+        volume=50.0,
     )
     one = building.facade_sound_reduction(
         [building.FacadeElement(name="a", area=5.0, r=[30.0])],
@@ -421,9 +429,7 @@ def test_no_element_silently_dropped_when_names_unique() -> None:
 
 
 def test_frequencies_length_must_match_bands() -> None:
-    elements = [
-        building.FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0])
-    ]
+    elements = [building.FacadeElement(name="a", area=5.0, r=[40.0, 41.0, 42.0])]
     with pytest.raises(ValueError, match="frequencies"):
         building.facade_sound_reduction(
             elements,

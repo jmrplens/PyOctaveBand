@@ -271,8 +271,12 @@ def test_sweep_reversal_fails_criterion_3() -> None:
     # Without the sign guard, the magnitude-only |ΔL| would have been 0 and the
     # band would have qualified; confirm an all-aligned pair does qualify.
     ok = emission.sound_power_intensity(
-        scan1, areas, normal_intensity_2=scan1, pressure_levels=lp,
-        pressure_residual_index=40.0, frequencies=np.array([1000.0]),
+        scan1,
+        areas,
+        normal_intensity_2=scan1,
+        pressure_levels=lp,
+        pressure_residual_index=40.0,
+        frequencies=np.array([1000.0]),
         band_type="octave",
     )
     assert ok.achieved_grade[0] == "engineering"
@@ -285,9 +289,7 @@ def test_partial_sweep_reversal_only_affects_flipped_segment() -> None:
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
     scan2[2, 0] = -5.0e-4  # reverse only segment 2
-    res = emission.sound_power_intensity(
-        scan1, areas, normal_intensity_2=scan2
-    )
+    res = emission.sound_power_intensity(scan1, areas, normal_intensity_2=scan2)
     rep = res.repeatability[:, 0]
     assert np.isinf(rep[2])
     assert np.allclose(rep[[0, 1, 3]], 0.0, atol=1e-9)
@@ -300,9 +302,7 @@ def test_exact_zero_partial_power_does_not_trigger_reversal() -> None:
     scan1 = np.full((4, 1), 5.0e-4)
     scan2 = scan1.copy()
     scan2[1, 0] = 0.0  # zero, not a sign flip
-    res = emission.sound_power_intensity(
-        scan1, areas, normal_intensity_2=scan2
-    )
+    res = emission.sound_power_intensity(scan1, areas, normal_intensity_2=scan2)
     assert np.all(np.isfinite(res.repeatability[:, 0]))
 
 
@@ -329,9 +329,7 @@ def test_repeatability_uses_mean_of_two_scans_for_power() -> None:
     areas = np.array([0.5, 0.5, 0.5, 0.5])
     scan1 = np.full((4, 1), 6.0e-4)
     scan2 = np.full((4, 1), 4.0e-4)
-    res = emission.sound_power_intensity(
-        scan1, areas, normal_intensity_2=scan2
-    )
+    res = emission.sound_power_intensity(scan1, areas, normal_intensity_2=scan2)
     # mean In = 5e-4 -> P = 1e-3.
     assert res.sound_power[0] == pytest.approx(1.0e-3)
 
@@ -355,7 +353,9 @@ def test_a_weighted_total_excludes_non_determinable_band() -> None:
     )
     with pytest.warns(emission.SoundPowerWarning):
         res = emission.sound_power_intensity(
-            intensity, areas, frequencies=np.array([1000.0, 2000.0]),
+            intensity,
+            areas,
+            frequencies=np.array([1000.0, 2000.0]),
             band_type="octave",
         )
     # Only the 1000 Hz band contributes; Ck(1000)=0 -> LWA = 90.

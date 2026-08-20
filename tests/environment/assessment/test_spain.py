@@ -281,7 +281,9 @@ def test_outdoor_quality_objectives_annex_ii_table_a(
     assert limits.index == "Lx"
 
 
-def test_outdoor_objectives_of_newly_urbanised_areas_are_five_decibels_stricter() -> None:
+def test_outdoor_objectives_of_newly_urbanised_areas_are_five_decibels_stricter() -> (
+    None
+):
     """Article 14.2: for the rest of the urbanised areas, Table A minus 5 dB."""
     existing = rd.outdoor_quality_objectives("a")
     new = rd.outdoor_quality_objectives("a", urbanisation="new")
@@ -408,7 +410,9 @@ def test_adjacent_premises_limits_annex_iii_table_b2(
 def test_area_type_aliases_and_catalogue() -> None:
     """The letter codes of Article 7 of Ley 37/2003 and their spelled-out aliases."""
     assert set(rd.ACOUSTIC_AREA_TYPES) == {"e", "a", "d", "c", "b", "f"}
-    assert rd.activity_limits("residential").as_dict() == rd.activity_limits("a").as_dict()
+    assert (
+        rd.activity_limits("residential").as_dict() == rd.activity_limits("a").as_dict()
+    )
     assert rd.activity_limits("INDUSTRIAL").day == rd.activity_limits("b").day
     assert rd.outdoor_quality_objectives("sanitary").night == 50.0
 
@@ -509,7 +513,9 @@ def test_operating_activity_without_annual_information_is_allowed() -> None:
     assert verdict.complies is True
 
 
-def test_assess_activity_flags_a_phase_that_exceeds_the_five_decibel_allowance() -> None:
+def test_assess_activity_flags_a_phase_that_exceeds_the_five_decibel_allowance() -> (
+    None
+):
     """Article 25.1 b iii: no measured LKeq,Ti more than 5 dB above the limit."""
     phases = {"night": [rd.NoisePhase(8.0, 51.0)]}  # limit 45 dB, allowance 50 dB
     verdict = rd.assess_activity(phases, rd.activity_limits("a"), new_activity=False)

@@ -144,13 +144,41 @@ __all__ = [
 #: Annex point (1) states that the railway sound power is derived in 1/3 octave
 #: bands; Appendix G tabulates 50 Hz to 10 kHz.
 RAILWAY_THIRD_OCTAVE_BANDS: tuple[float, ...] = (
-    50.0, 63.0, 80.0, 100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
-    630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0, 4000.0,
-    5000.0, 6300.0, 8000.0, 10000.0,
+    50.0,
+    63.0,
+    80.0,
+    100.0,
+    125.0,
+    160.0,
+    200.0,
+    250.0,
+    315.0,
+    400.0,
+    500.0,
+    630.0,
+    800.0,
+    1000.0,
+    1250.0,
+    1600.0,
+    2000.0,
+    2500.0,
+    3150.0,
+    4000.0,
+    5000.0,
+    6300.0,
+    8000.0,
+    10000.0,
 )
 #: Octave-band midband frequencies handed to the propagation stage, in Hz.
 RAILWAY_OCTAVE_BANDS: tuple[float, ...] = (
-    63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0,
+    63.0,
+    125.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    4000.0,
+    8000.0,
 )
 #: Heights of the two equivalent source lines above the rail head, in m
 #: (2.3.1): source A at 0,5 m and source B at 4,0 m.
@@ -169,9 +197,41 @@ REFERENCE_JOINT_DENSITY = 0.01
 #: Wavelength grid of Tables G-1b, G-2 and G-4 as replaced by (EU) 2021/1226,
 #: in mm: the standard 1/3-octave series from 2 000 mm to 0,8 mm.
 _WAVELENGTHS_STANDARD: tuple[float, ...] = (
-    2000.0, 1600.0, 1250.0, 1000.0, 800.0, 630.0, 500.0, 400.0, 315.0, 250.0,
-    200.0, 160.0, 125.0, 100.0, 80.0, 63.0, 50.0, 40.0, 31.5, 25.0, 20.0, 16.0,
-    12.5, 10.0, 8.0, 6.3, 5.0, 4.0, 3.15, 2.5, 2.0, 1.6, 1.25, 1.0, 0.8,
+    2000.0,
+    1600.0,
+    1250.0,
+    1000.0,
+    800.0,
+    630.0,
+    500.0,
+    400.0,
+    315.0,
+    250.0,
+    200.0,
+    160.0,
+    125.0,
+    100.0,
+    80.0,
+    63.0,
+    50.0,
+    40.0,
+    31.5,
+    25.0,
+    20.0,
+    16.0,
+    12.5,
+    10.0,
+    8.0,
+    6.3,
+    5.0,
+    4.0,
+    3.15,
+    2.5,
+    2.0,
+    1.6,
+    1.25,
+    1.0,
+    0.8,
 )
 #: Wavelength grid, in mm, of Table G-1a, the first table of G-1, which
 #: (EU) 2021/1226 did not replace: point (20)(a) replaces "the second table"
@@ -181,13 +241,49 @@ _WAVELENGTHS_STANDARD: tuple[float, ...] = (
 #: resampled on its own grid rather than forced onto a common one, which is how
 #: this implementation resolves an ambiguity the Directive leaves open.
 _WAVELENGTHS_WHEEL: tuple[float, ...] = (
-    1000.0, 800.0, 630.0, 500.0, 400.0, 315.0, 250.0, 200.0, 160.0, 120.0,
-    100.0, 80.0, 63.0, 50.0, 40.0, 31.5, 25.0, 20.0, 16.0, 12.0, 10.0, 8.0,
-    6.3, 5.0, 4.0, 3.2, 2.5, 2.0, 1.6, 1.2, 1.0, 0.8,
+    1000.0,
+    800.0,
+    630.0,
+    500.0,
+    400.0,
+    315.0,
+    250.0,
+    200.0,
+    160.0,
+    120.0,
+    100.0,
+    80.0,
+    63.0,
+    50.0,
+    40.0,
+    31.5,
+    25.0,
+    20.0,
+    16.0,
+    12.0,
+    10.0,
+    8.0,
+    6.3,
+    5.0,
+    4.0,
+    3.2,
+    2.5,
+    2.0,
+    1.6,
+    1.2,
+    1.0,
+    0.8,
 )
 
 _OCTAVE_SLICES: tuple[tuple[int, int], ...] = (
-    (0, 3), (3, 6), (6, 9), (9, 12), (12, 15), (15, 18), (18, 21), (21, 24),
+    (0, 3),
+    (3, 6),
+    (6, 9),
+    (9, 12),
+    (12, 15),
+    (15, 18),
+    (18, 21),
+    (21, 24),
 )
 
 
@@ -199,51 +295,51 @@ _OCTAVE_SLICES: tuple[tuple[int, int], ...] = (
 class VehicleType(Enum):
     """Digit 1 of the vehicle descriptor, Table [2.3.a]."""
 
-    HIGH_SPEED = "h"          #: High-speed vehicle, above 200 km/h.
-    SELF_PROPELLED = "m"      #: Self-propelled passenger coaches.
-    HAULED = "p"              #: Hauled passenger coaches.
-    CITY_TRAM = "c"           #: City tram or light-metro self-propelled coach.
-    DIESEL_LOCO = "d"         #: Diesel locomotive.
-    ELECTRIC_LOCO = "e"       #: Electric locomotive.
-    FREIGHT = "a"             #: Any generic freight vehicle.
-    OTHER = "o"               #: Other, such as maintenance vehicles.
+    HIGH_SPEED = "h"  #: High-speed vehicle, above 200 km/h.
+    SELF_PROPELLED = "m"  #: Self-propelled passenger coaches.
+    HAULED = "p"  #: Hauled passenger coaches.
+    CITY_TRAM = "c"  #: City tram or light-metro self-propelled coach.
+    DIESEL_LOCO = "d"  #: Diesel locomotive.
+    ELECTRIC_LOCO = "e"  #: Electric locomotive.
+    FREIGHT = "a"  #: Any generic freight vehicle.
+    OTHER = "o"  #: Other, such as maintenance vehicles.
 
 
 class BrakeType(Enum):
     """Digit 3 of the vehicle descriptor, Table [2.3.a]."""
 
-    CAST_IRON = "c"           #: Cast-iron tread brake.
-    COMPOSITE = "k"           #: Composite or sinter-metal tread brake.
-    NON_TREAD = "n"           #: Non-tread braked: disc, drum or magnetic.
+    CAST_IRON = "c"  #: Cast-iron tread brake.
+    COMPOSITE = "k"  #: Composite or sinter-metal tread brake.
+    NON_TREAD = "n"  #: Non-tread braked: disc, drum or magnetic.
 
 
 class WheelMeasure(Enum):
     """Digit 4 of the vehicle descriptor, Table [2.3.a]."""
 
-    NONE = "n"                #: No wheel measure.
-    DAMPERS = "d"             #: Wheel dampers.
-    SCREENS = "s"             #: Screens.
-    OTHER = "o"               #: Other measure.
+    NONE = "n"  #: No wheel measure.
+    DAMPERS = "d"  #: Wheel dampers.
+    SCREENS = "s"  #: Screens.
+    OTHER = "o"  #: Other measure.
 
 
 class TrackBase(Enum):
     """Digit 1 of the track descriptor, Table [2.3.b]."""
 
-    BALLAST = "B"             #: Ballast.
-    SLAB = "S"                #: Slab track.
-    BALLASTED_BRIDGE = "L"    #: Ballasted bridge.
+    BALLAST = "B"  #: Ballast.
+    SLAB = "S"  #: Slab track.
+    BALLASTED_BRIDGE = "L"  #: Ballasted bridge.
     NON_BALLASTED_BRIDGE = "N"  #: Non-ballasted bridge.
-    EMBEDDED = "T"            #: Embedded track.
-    OTHER = "O"               #: Other.
+    EMBEDDED = "T"  #: Embedded track.
+    OTHER = "O"  #: Other.
 
 
 class RailRoughnessClass(Enum):
     """Digit 2 of the track descriptor, Table [2.3.b]."""
 
-    WELL_MAINTAINED = "E"     #: Well maintained and very smooth.
-    NORMAL = "M"              #: Normally maintained, smooth.
+    WELL_MAINTAINED = "E"  #: Well maintained and very smooth.
+    NORMAL = "M"  #: Normally maintained, smooth.
     NOT_WELL_MAINTAINED = "N"  #: Not well maintained.
-    BAD = "B"                 #: Not maintained and in bad condition.
+    BAD = "B"  #: Not maintained and in bad condition.
 
 
 class RailPad(Enum):
@@ -254,38 +350,38 @@ class RailPad(Enum):
     "Hard (800-1 000 MN/m)".
     """
 
-    SOFT = "S"                #: Soft, 150-250 MN/m.
-    MEDIUM = "M"              #: Medium, 250 to 800 MN/m.
-    HARD = "H"                #: Hard, 800-1 000 MN/m.
+    SOFT = "S"  #: Soft, 150-250 MN/m.
+    MEDIUM = "M"  #: Medium, 250 to 800 MN/m.
+    HARD = "H"  #: Hard, 800-1 000 MN/m.
 
 
 class TrackMeasure(Enum):
     """Digit 4 of the track descriptor, Table [2.3.b]."""
 
-    NONE = "N"                #: No additional measure.
-    RAIL_DAMPER = "D"         #: Rail damper.
-    LOW_BARRIER = "B"         #: Low barrier.
-    ABSORBER_PLATE = "A"      #: Absorber plate on slab track.
-    EMBEDDED_RAIL = "E"       #: Embedded rail.
-    OTHER = "O"               #: Other measure.
+    NONE = "N"  #: No additional measure.
+    RAIL_DAMPER = "D"  #: Rail damper.
+    LOW_BARRIER = "B"  #: Low barrier.
+    ABSORBER_PLATE = "A"  #: Absorber plate on slab track.
+    EMBEDDED_RAIL = "E"  #: Embedded rail.
+    OTHER = "O"  #: Other measure.
 
 
 class RailJoints(Enum):
     """Digit 5 of the track descriptor, Table [2.3.b]."""
 
-    NONE = "N"                #: No joint or switch.
-    SINGLE = "S"              #: Single joint or switch.
-    TWO = "D"                 #: Two joints or switches per 100 m.
-    MORE = "M"                #: More than two joints or switches per 100 m.
+    NONE = "N"  #: No joint or switch.
+    SINGLE = "S"  #: Single joint or switch.
+    TWO = "D"  #: Two joints or switches per 100 m.
+    MORE = "M"  #: More than two joints or switches per 100 m.
 
 
 class TrackCurvature(Enum):
     """Digit 6 of the track descriptor, Table [2.3.b]."""
 
-    STRAIGHT = "N"            #: Straight track.
-    LOW = "L"                 #: Low curvature, 1 000-500 m.
-    MEDIUM = "M"              #: Medium curvature, below 500 m and above 300 m.
-    HIGH = "H"                #: High curvature, below 300 m.
+    STRAIGHT = "N"  #: Straight track.
+    LOW = "L"  #: Low curvature, 1 000-500 m.
+    MEDIUM = "M"  #: Medium curvature, below 500 m and above 300 m.
+    HIGH = "H"  #: High curvature, below 300 m.
 
 
 @dataclass(frozen=True)
@@ -392,8 +488,13 @@ class TrackDescriptor:
     def code(self) -> str:
         """The descriptor written back out as a string."""
         return "".join(
-            part.value for part in (
-                self.base, self.roughness, self.pad, self.measure, self.joints,
+            part.value
+            for part in (
+                self.base,
+                self.roughness,
+                self.pad,
+                self.measure,
+                self.joints,
                 self.curvature,
             )
         )
@@ -406,8 +507,8 @@ class RunningCondition(Enum):
     is valid as well when the train accelerates or decelerates, and idling.
     """
 
-    CONSTANT = 1              #: ``c = 1``, constant speed.
-    IDLING = 2                #: ``c = 2``, idling.
+    CONSTANT = 1  #: ``c = 1``, constant speed.
+    IDLING = 2  #: ``c = 2``, idling.
 
 
 class DirectivityEdition(Enum):
@@ -454,19 +555,106 @@ class RoughnessInterpolation(Enum):
 # ---------------------------------------------------------------------------
 _TABLE_G1A: dict[str, tuple[float, ...]] = {
     "c": (
-        2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2, 2.4, 0.6, 2.6, 5.8, 8.8, 11.1,
-        11.0, 9.8, 7.5, 5.1, 3.0, 1.3, 0.2, -0.7, -1.2, -1.0, 0.3, 0.2, 1.3,
-        3.1, 3.1, 3.1, 3.1, 3.1,
+        2.2,
+        2.2,
+        2.2,
+        2.2,
+        2.2,
+        2.2,
+        2.2,
+        2.2,
+        2.4,
+        0.6,
+        2.6,
+        5.8,
+        8.8,
+        11.1,
+        11.0,
+        9.8,
+        7.5,
+        5.1,
+        3.0,
+        1.3,
+        0.2,
+        -0.7,
+        -1.2,
+        -1.0,
+        0.3,
+        0.2,
+        1.3,
+        3.1,
+        3.1,
+        3.1,
+        3.1,
+        3.1,
     ),
     "k": (
-        -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.3,
-        -4.6, -4.9, -5.2, -6.3, -6.8, -7.2, -7.3, -7.3, -7.1, -6.9, -6.7, -6.0,
-        -3.7, -2.4, -2.6, -2.5, -2.5, -2.5, -2.5, -2.5,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.0,
+        -4.3,
+        -4.6,
+        -4.9,
+        -5.2,
+        -6.3,
+        -6.8,
+        -7.2,
+        -7.3,
+        -7.3,
+        -7.1,
+        -6.9,
+        -6.7,
+        -6.0,
+        -3.7,
+        -2.4,
+        -2.6,
+        -2.5,
+        -2.5,
+        -2.5,
+        -2.5,
+        -2.5,
     ),
     "n": (
-        -5.9, -5.9, -5.9, -5.9, -5.9, -5.9, 2.3, 2.8, 2.6, 1.2, 2.1, 0.9, -0.3,
-        -1.6, -2.9, -4.9, -7.0, -8.6, -9.3, -9.5, -10.1, -10.3, -10.3, -10.8,
-        -10.9, -9.5, -9.5, -9.5, -9.5, -9.5, -9.5, -9.5,
+        -5.9,
+        -5.9,
+        -5.9,
+        -5.9,
+        -5.9,
+        -5.9,
+        2.3,
+        2.8,
+        2.6,
+        1.2,
+        2.1,
+        0.9,
+        -0.3,
+        -1.6,
+        -2.9,
+        -4.9,
+        -7.0,
+        -8.6,
+        -9.3,
+        -9.5,
+        -10.1,
+        -10.3,
+        -10.3,
+        -10.8,
+        -10.9,
+        -9.5,
+        -9.5,
+        -9.5,
+        -9.5,
+        -9.5,
+        -9.5,
+        -9.5,
     ),
 }
 
@@ -476,15 +664,77 @@ _TABLE_G1A: dict[str, tuple[float, ...]] = {
 # ---------------------------------------------------------------------------
 _TABLE_G1B: dict[str, tuple[float, ...]] = {
     "E": (
-        17.1, 17.1, 17.1, 17.1, 17.1, 17.1, 17.1, 17.1, 15.0, 13.0, 11.0, 9.0,
-        7.0, 4.9, 2.9, 0.9, -1.1, -3.2, -5.0, -5.6, -6.2, -6.8, -7.4, -8.0,
-        -8.6, -9.2, -9.8, -10.4, -11.0, -11.6, -12.2, -12.8, -13.4, -14.0,
+        17.1,
+        17.1,
+        17.1,
+        17.1,
+        17.1,
+        17.1,
+        17.1,
+        17.1,
+        15.0,
+        13.0,
+        11.0,
+        9.0,
+        7.0,
+        4.9,
+        2.9,
+        0.9,
+        -1.1,
+        -3.2,
+        -5.0,
+        -5.6,
+        -6.2,
+        -6.8,
+        -7.4,
+        -8.0,
+        -8.6,
+        -9.2,
+        -9.8,
+        -10.4,
+        -11.0,
+        -11.6,
+        -12.2,
+        -12.8,
+        -13.4,
+        -14.0,
         -14.0,
     ),
     "M": (
-        35.0, 31.0, 28.0, 25.0, 23.0, 20.0, 17.0, 13.5, 10.5, 9.0, 6.5, 5.5,
-        5.0, 3.5, 2.0, 0.1, -0.2, -0.3, -0.8, -3.0, -5.0, -7.0, -8.0, -9.0,
-        -10.0, -12.0, -13.0, -14.0, -15.0, -16.0, -17.0, -18.0, -19.0, -19.0,
+        35.0,
+        31.0,
+        28.0,
+        25.0,
+        23.0,
+        20.0,
+        17.0,
+        13.5,
+        10.5,
+        9.0,
+        6.5,
+        5.5,
+        5.0,
+        3.5,
+        2.0,
+        0.1,
+        -0.2,
+        -0.3,
+        -0.8,
+        -3.0,
+        -5.0,
+        -7.0,
+        -8.0,
+        -9.0,
+        -10.0,
+        -12.0,
+        -13.0,
+        -14.0,
+        -15.0,
+        -16.0,
+        -17.0,
+        -18.0,
+        -19.0,
+        -19.0,
         -19.0,
     ),
 }
@@ -497,30 +747,140 @@ _TABLE_G1B: dict[str, tuple[float, ...]] = {
 # ---------------------------------------------------------------------------
 _ELEVEN_ZEROS: tuple[float, ...] = (0.0,) * 11
 _TABLE_G2: dict[tuple[float, float], tuple[float, ...]] = {
-    (50.0, 360.0): _ELEVEN_ZEROS + (
-        0.0, 0.0, 0.0, -0.1, -0.2, -0.3, -0.6, -1.0, -1.8, -3.2, -5.4, -8.7,
-        -12.2, -16.7, -17.7, -17.8, -20.7, -22.1, -22.8, -24.0, -24.5, -24.7,
-        -27.0, -27.8,
+    (50.0, 360.0): _ELEVEN_ZEROS
+    + (
+        0.0,
+        0.0,
+        0.0,
+        -0.1,
+        -0.2,
+        -0.3,
+        -0.6,
+        -1.0,
+        -1.8,
+        -3.2,
+        -5.4,
+        -8.7,
+        -12.2,
+        -16.7,
+        -17.7,
+        -17.8,
+        -20.7,
+        -22.1,
+        -22.8,
+        -24.0,
+        -24.5,
+        -24.7,
+        -27.0,
+        -27.8,
     ),
-    (50.0, 680.0): _ELEVEN_ZEROS + (
-        0.0, 0.0, -0.1, -0.2, -0.3, -0.7, -1.2, -2.0, -4.1, -6.0, -9.2, -13.8,
-        -17.2, -17.7, -18.6, -21.5, -22.3, -23.1, -24.4, -24.5, -25.0, -28.0,
-        -28.8, -29.6,
+    (50.0, 680.0): _ELEVEN_ZEROS
+    + (
+        0.0,
+        0.0,
+        -0.1,
+        -0.2,
+        -0.3,
+        -0.7,
+        -1.2,
+        -2.0,
+        -4.1,
+        -6.0,
+        -9.2,
+        -13.8,
+        -17.2,
+        -17.7,
+        -18.6,
+        -21.5,
+        -22.3,
+        -23.1,
+        -24.4,
+        -24.5,
+        -25.0,
+        -28.0,
+        -28.8,
+        -29.6,
     ),
-    (50.0, 920.0): _ELEVEN_ZEROS + (
-        0.0, -0.1, -0.1, -0.3, -0.6, -1.1, -1.3, -3.5, -5.3, -8.0, -12.0,
-        -16.8, -17.7, -18.0, -21.5, -21.8, -22.8, -24.0, -24.5, -25.0, -27.3,
-        -28.1, -28.9, -29.7,
+    (50.0, 920.0): _ELEVEN_ZEROS
+    + (
+        0.0,
+        -0.1,
+        -0.1,
+        -0.3,
+        -0.6,
+        -1.1,
+        -1.3,
+        -3.5,
+        -5.3,
+        -8.0,
+        -12.0,
+        -16.8,
+        -17.7,
+        -18.0,
+        -21.5,
+        -21.8,
+        -22.8,
+        -24.0,
+        -24.5,
+        -25.0,
+        -27.3,
+        -28.1,
+        -28.9,
+        -29.7,
     ),
-    (25.0, 920.0): _ELEVEN_ZEROS + (
-        0.0, 0.0, 0.0, -0.1, -0.3, -0.5, -1.1, -1.8, -3.3, -5.3, -7.9, -12.8,
-        -16.8, -17.7, -18.2, -20.5, -22.0, -22.8, -24.2, -24.5, -25.0, -27.4,
-        -28.2, -29.0,
+    (25.0, 920.0): _ELEVEN_ZEROS
+    + (
+        0.0,
+        0.0,
+        0.0,
+        -0.1,
+        -0.3,
+        -0.5,
+        -1.1,
+        -1.8,
+        -3.3,
+        -5.3,
+        -7.9,
+        -12.8,
+        -16.8,
+        -17.7,
+        -18.2,
+        -20.5,
+        -22.0,
+        -22.8,
+        -24.2,
+        -24.5,
+        -25.0,
+        -27.4,
+        -28.2,
+        -29.0,
     ),
-    (100.0, 920.0): _ELEVEN_ZEROS + (
-        -0.1, -0.2, -0.3, -0.6, -1.0, -1.8, -3.2, -5.4, -8.7, -12.2, -16.7,
-        -17.7, -17.8, -20.7, -22.1, -22.8, -24.0, -24.5, -24.7, -27.0, -27.8,
-        -28.6, -29.4, -30.2,
+    (100.0, 920.0): _ELEVEN_ZEROS
+    + (
+        -0.1,
+        -0.2,
+        -0.3,
+        -0.6,
+        -1.0,
+        -1.8,
+        -3.2,
+        -5.4,
+        -8.7,
+        -12.2,
+        -16.7,
+        -17.7,
+        -17.8,
+        -20.7,
+        -22.1,
+        -22.8,
+        -24.0,
+        -24.5,
+        -24.7,
+        -27.0,
+        -27.8,
+        -28.6,
+        -29.4,
+        -30.2,
     ),
 }
 
@@ -531,44 +891,212 @@ _TABLE_G2: dict[tuple[float, float], tuple[float, ...]] = {
 # ---------------------------------------------------------------------------
 _TABLE_G3A: dict[str, tuple[float, ...]] = {
     "M/S": (
-        53.3, 59.3, 67.2, 75.9, 79.2, 81.8, 84.2, 88.6, 91.0, 94.5, 97.0, 99.2,
-        104.0, 107.1, 108.3, 108.5, 109.7, 110.0, 110.0, 110.0, 110.3, 110.0,
-        110.1, 110.6,
+        53.3,
+        59.3,
+        67.2,
+        75.9,
+        79.2,
+        81.8,
+        84.2,
+        88.6,
+        91.0,
+        94.5,
+        97.0,
+        99.2,
+        104.0,
+        107.1,
+        108.3,
+        108.5,
+        109.7,
+        110.0,
+        110.0,
+        110.0,
+        110.3,
+        110.0,
+        110.1,
+        110.6,
     ),
     "M/M": (
-        50.9, 57.8, 66.5, 76.8, 80.9, 83.3, 85.8, 90.0, 91.6, 93.9, 95.6, 97.4,
-        101.7, 104.4, 106.0, 106.8, 108.3, 108.9, 109.1, 109.4, 109.9, 109.9,
-        110.3, 111.0,
+        50.9,
+        57.8,
+        66.5,
+        76.8,
+        80.9,
+        83.3,
+        85.8,
+        90.0,
+        91.6,
+        93.9,
+        95.6,
+        97.4,
+        101.7,
+        104.4,
+        106.0,
+        106.8,
+        108.3,
+        108.9,
+        109.1,
+        109.4,
+        109.9,
+        109.9,
+        110.3,
+        111.0,
     ),
     "M/H": (
-        50.1, 57.2, 66.3, 77.2, 81.6, 84.0, 86.5, 90.7, 92.1, 94.3, 95.8, 97.0,
-        100.3, 102.5, 104.2, 105.4, 107.1, 107.9, 108.2, 108.7, 109.4, 109.7,
-        110.4, 111.4,
+        50.1,
+        57.2,
+        66.3,
+        77.2,
+        81.6,
+        84.0,
+        86.5,
+        90.7,
+        92.1,
+        94.3,
+        95.8,
+        97.0,
+        100.3,
+        102.5,
+        104.2,
+        105.4,
+        107.1,
+        107.9,
+        108.2,
+        108.7,
+        109.4,
+        109.7,
+        110.4,
+        111.4,
     ),
     "B/S": (
-        50.9, 56.6, 64.3, 72.3, 75.4, 78.5, 81.8, 86.6, 89.1, 91.9, 94.5, 97.5,
-        104.0, 107.9, 108.9, 108.8, 109.8, 110.2, 110.1, 110.1, 110.3, 109.9,
-        110.0, 110.4,
+        50.9,
+        56.6,
+        64.3,
+        72.3,
+        75.4,
+        78.5,
+        81.8,
+        86.6,
+        89.1,
+        91.9,
+        94.5,
+        97.5,
+        104.0,
+        107.9,
+        108.9,
+        108.8,
+        109.8,
+        110.2,
+        110.1,
+        110.1,
+        110.3,
+        109.9,
+        110.0,
+        110.4,
     ),
     "B/M": (
-        50.0, 56.1, 64.1, 72.5, 75.8, 79.1, 83.6, 88.7, 89.6, 89.7, 90.6, 93.8,
-        100.6, 104.7, 106.3, 107.1, 108.8, 109.3, 109.4, 109.7, 110.0, 109.8,
-        110.0, 110.5,
+        50.0,
+        56.1,
+        64.1,
+        72.5,
+        75.8,
+        79.1,
+        83.6,
+        88.7,
+        89.6,
+        89.7,
+        90.6,
+        93.8,
+        100.6,
+        104.7,
+        106.3,
+        107.1,
+        108.8,
+        109.3,
+        109.4,
+        109.7,
+        110.0,
+        109.8,
+        110.0,
+        110.5,
     ),
     "B/H": (
-        49.8, 55.9, 64.0, 72.5, 75.9, 79.4, 84.4, 89.7, 90.2, 90.2, 90.8, 93.1,
-        97.9, 101.1, 103.4, 105.4, 107.7, 108.5, 108.7, 109.1, 109.6, 109.6,
-        109.9, 110.6,
+        49.8,
+        55.9,
+        64.0,
+        72.5,
+        75.9,
+        79.4,
+        84.4,
+        89.7,
+        90.2,
+        90.2,
+        90.8,
+        93.1,
+        97.9,
+        101.1,
+        103.4,
+        105.4,
+        107.7,
+        108.5,
+        108.7,
+        109.1,
+        109.6,
+        109.6,
+        109.9,
+        110.6,
     ),
     "W": (
-        44.0, 51.0, 59.9, 70.8, 75.1, 76.9, 77.2, 80.9, 85.3, 92.5, 97.0, 98.7,
-        102.8, 105.4, 106.5, 106.4, 107.5, 108.1, 108.4, 108.7, 109.1, 109.1,
-        109.5, 110.2,
+        44.0,
+        51.0,
+        59.9,
+        70.8,
+        75.1,
+        76.9,
+        77.2,
+        80.9,
+        85.3,
+        92.5,
+        97.0,
+        98.7,
+        102.8,
+        105.4,
+        106.5,
+        106.4,
+        107.5,
+        108.1,
+        108.4,
+        108.7,
+        109.1,
+        109.1,
+        109.5,
+        110.2,
     ),
     "D": (
-        75.4, 77.4, 81.4, 87.1, 88.0, 89.7, 83.4, 87.7, 89.8, 97.5, 99.0,
-        100.8, 104.9, 111.8, 113.9, 115.5, 114.9, 118.2, 118.3, 118.4, 118.9,
-        117.5, 117.9, 118.6,
+        75.4,
+        77.4,
+        81.4,
+        87.1,
+        88.0,
+        89.7,
+        83.4,
+        87.7,
+        89.8,
+        97.5,
+        99.0,
+        100.8,
+        104.9,
+        111.8,
+        113.9,
+        115.5,
+        114.9,
+        118.2,
+        118.3,
+        118.4,
+        118.9,
+        117.5,
+        117.9,
+        118.6,
     ),
 }
 
@@ -580,24 +1108,108 @@ _TABLE_G3A: dict[str, tuple[float, ...]] = {
 # ---------------------------------------------------------------------------
 _TABLE_G3B: dict[float, tuple[float, ...]] = {
     920.0: (
-        75.4, 77.3, 81.1, 84.1, 83.3, 84.3, 86.0, 90.1, 89.8, 89.0, 88.8, 90.4,
-        92.4, 94.9, 100.4, 104.6, 109.6, 114.9, 115.0, 115.0, 115.5, 115.6,
-        116.0, 116.7,
+        75.4,
+        77.3,
+        81.1,
+        84.1,
+        83.3,
+        84.3,
+        86.0,
+        90.1,
+        89.8,
+        89.0,
+        88.8,
+        90.4,
+        92.4,
+        94.9,
+        100.4,
+        104.6,
+        109.6,
+        114.9,
+        115.0,
+        115.0,
+        115.5,
+        115.6,
+        116.0,
+        116.7,
     ),
     840.0: (
-        75.4, 77.3, 81.1, 84.1, 82.8, 83.3, 84.1, 86.9, 87.9, 89.9, 90.9, 91.5,
-        91.5, 93.0, 98.7, 101.6, 107.6, 111.9, 114.5, 114.5, 115.0, 115.1,
-        115.5, 116.2,
+        75.4,
+        77.3,
+        81.1,
+        84.1,
+        82.8,
+        83.3,
+        84.1,
+        86.9,
+        87.9,
+        89.9,
+        90.9,
+        91.5,
+        91.5,
+        93.0,
+        98.7,
+        101.6,
+        107.6,
+        111.9,
+        114.5,
+        114.5,
+        115.0,
+        115.1,
+        115.5,
+        116.2,
     ),
     680.0: (
-        75.4, 77.3, 81.1, 84.1, 82.8, 83.3, 83.9, 86.3, 88.0, 92.2, 93.9, 92.5,
-        90.9, 90.4, 93.2, 93.5, 99.6, 104.9, 108.0, 111.0, 111.5, 111.6, 112.0,
+        75.4,
+        77.3,
+        81.1,
+        84.1,
+        82.8,
+        83.3,
+        83.9,
+        86.3,
+        88.0,
+        92.2,
+        93.9,
+        92.5,
+        90.9,
+        90.4,
+        93.2,
+        93.5,
+        99.6,
+        104.9,
+        108.0,
+        111.0,
+        111.5,
+        111.6,
+        112.0,
         112.7,
     ),
     1200.0: (
-        75.4, 77.3, 81.1, 84.1, 82.8, 83.3, 84.5, 90.4, 90.4, 89.9, 90.1, 91.3,
-        91.5, 93.6, 100.5, 104.6, 115.6, 115.9, 116.0, 116.0, 116.5, 116.6,
-        117.0, 117.7,
+        75.4,
+        77.3,
+        81.1,
+        84.1,
+        82.8,
+        83.3,
+        84.5,
+        90.4,
+        90.4,
+        89.9,
+        90.1,
+        91.3,
+        91.5,
+        93.6,
+        100.5,
+        104.6,
+        115.6,
+        115.9,
+        116.0,
+        116.0,
+        116.5,
+        116.6,
+        117.0,
+        117.7,
     ),
 }
 
@@ -611,9 +1223,40 @@ _TABLE_G3C: tuple[float, ...] = (0.0,) * 24
 # crossing per 100 m, as replaced by (EU) 2021/1226 Annex point (20)(e).
 # ---------------------------------------------------------------------------
 _TABLE_G4: tuple[float, ...] = (
-    22.0, 22.0, 22.0, 22.0, 22.0, 20.0, 16.0, 15.0, 14.0, 15.0, 14.0, 12.0,
-    11.0, 10.0, 9.0, 8.0, 6.0, 3.0, 2.0, -3.0, -8.0, -13.0, -17.0, -19.0,
-    -22.0, -25.0, -26.0, -32.0, -35.0, -40.0, -43.0, -45.0, -47.0, -49.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    22.0,
+    20.0,
+    16.0,
+    15.0,
+    14.0,
+    15.0,
+    14.0,
+    12.0,
+    11.0,
+    10.0,
+    9.0,
+    8.0,
+    6.0,
+    3.0,
+    2.0,
+    -3.0,
+    -8.0,
+    -13.0,
+    -17.0,
+    -19.0,
+    -22.0,
+    -25.0,
+    -26.0,
+    -32.0,
+    -35.0,
+    -40.0,
+    -43.0,
+    -45.0,
+    -47.0,
+    -49.0,
     -50.0,
 )
 
@@ -638,62 +1281,272 @@ class TractionVehicle(Enum):
 _TABLE_G5: dict[str, tuple[tuple[float, ...], tuple[float, ...]]] = {
     TractionVehicle.DIESEL_LOCO_800.value: (
         (
-            98.9, 94.8, 92.6, 94.6, 92.8, 92.8, 93.0, 94.8, 94.6, 95.7, 95.6,
-            98.6, 95.2, 95.1, 95.1, 94.1, 94.1, 99.4, 92.5, 89.5, 87.0, 84.1,
-            81.5, 79.2,
+            98.9,
+            94.8,
+            92.6,
+            94.6,
+            92.8,
+            92.8,
+            93.0,
+            94.8,
+            94.6,
+            95.7,
+            95.6,
+            98.6,
+            95.2,
+            95.1,
+            95.1,
+            94.1,
+            94.1,
+            99.4,
+            92.5,
+            89.5,
+            87.0,
+            84.1,
+            81.5,
+            79.2,
         ),
         (
-            103.2, 100.0, 95.5, 94.0, 93.3, 93.6, 92.9, 92.7, 92.4, 92.8, 92.8,
-            96.8, 92.7, 93.0, 92.9, 93.1, 93.2, 98.3, 91.5, 88.7, 86.0, 83.4,
-            80.9, 78.7,
+            103.2,
+            100.0,
+            95.5,
+            94.0,
+            93.3,
+            93.6,
+            92.9,
+            92.7,
+            92.4,
+            92.8,
+            92.8,
+            96.8,
+            92.7,
+            93.0,
+            92.9,
+            93.1,
+            93.2,
+            98.3,
+            91.5,
+            88.7,
+            86.0,
+            83.4,
+            80.9,
+            78.7,
         ),
     ),
     TractionVehicle.DIESEL_LOCO_2200.value: (
         (
-            99.4, 107.3, 103.1, 102.1, 99.3, 99.3, 99.5, 101.3, 101.1, 102.2,
-            102.1, 101.1, 101.7, 101.6, 99.3, 96.0, 93.7, 101.9, 89.5, 87.1,
-            90.5, 81.4, 81.2, 79.6,
+            99.4,
+            107.3,
+            103.1,
+            102.1,
+            99.3,
+            99.3,
+            99.5,
+            101.3,
+            101.1,
+            102.2,
+            102.1,
+            101.1,
+            101.7,
+            101.6,
+            99.3,
+            96.0,
+            93.7,
+            101.9,
+            89.5,
+            87.1,
+            90.5,
+            81.4,
+            81.2,
+            79.6,
         ),
         (
-            103.7, 112.5, 106.0, 101.5, 99.8, 100.1, 99.4, 99.2, 98.9, 99.3,
-            99.3, 99.3, 99.2, 99.5, 97.1, 95.0, 92.8, 100.8, 88.5, 86.3, 89.5,
-            80.7, 80.6, 79.1,
+            103.7,
+            112.5,
+            106.0,
+            101.5,
+            99.8,
+            100.1,
+            99.4,
+            99.2,
+            98.9,
+            99.3,
+            99.3,
+            99.3,
+            99.2,
+            99.5,
+            97.1,
+            95.0,
+            92.8,
+            100.8,
+            88.5,
+            86.3,
+            89.5,
+            80.7,
+            80.6,
+            79.1,
         ),
     ),
     TractionVehicle.DIESEL_MULTIPLE_UNIT.value: (
         (
-            82.6, 82.5, 89.3, 90.3, 93.5, 99.5, 98.7, 95.5, 90.3, 91.4, 91.3,
-            90.3, 90.9, 91.8, 92.8, 92.8, 90.8, 88.1, 85.2, 83.2, 81.7, 78.8,
-            76.2, 73.9,
+            82.6,
+            82.5,
+            89.3,
+            90.3,
+            93.5,
+            99.5,
+            98.7,
+            95.5,
+            90.3,
+            91.4,
+            91.3,
+            90.3,
+            90.9,
+            91.8,
+            92.8,
+            92.8,
+            90.8,
+            88.1,
+            85.2,
+            83.2,
+            81.7,
+            78.8,
+            76.2,
+            73.9,
         ),
         (
-            86.9, 87.7, 92.2, 89.7, 94.0, 100.3, 98.6, 93.4, 88.1, 88.5, 88.5,
-            88.5, 88.4, 89.7, 90.6, 91.8, 89.9, 87.0, 84.2, 82.4, 80.7, 78.1,
-            75.6, 73.4,
+            86.9,
+            87.7,
+            92.2,
+            89.7,
+            94.0,
+            100.3,
+            98.6,
+            93.4,
+            88.1,
+            88.5,
+            88.5,
+            88.5,
+            88.4,
+            89.7,
+            90.6,
+            91.8,
+            89.9,
+            87.0,
+            84.2,
+            82.4,
+            80.7,
+            78.1,
+            75.6,
+            73.4,
         ),
     ),
     TractionVehicle.ELECTRIC_LOCO.value: (
         (
-            87.9, 90.8, 91.6, 94.6, 94.8, 96.8, 104.0, 100.8, 99.6, 101.7,
-            98.6, 95.6, 95.2, 96.1, 92.1, 89.1, 87.1, 85.4, 83.5, 81.5, 80.0,
-            78.1, 76.5, 75.2,
+            87.9,
+            90.8,
+            91.6,
+            94.6,
+            94.8,
+            96.8,
+            104.0,
+            100.8,
+            99.6,
+            101.7,
+            98.6,
+            95.6,
+            95.2,
+            96.1,
+            92.1,
+            89.1,
+            87.1,
+            85.4,
+            83.5,
+            81.5,
+            80.0,
+            78.1,
+            76.5,
+            75.2,
         ),
         (
-            92.2, 96.0, 94.5, 94.0, 95.3, 97.6, 103.9, 98.7, 97.4, 98.8, 95.8,
-            93.8, 92.7, 94.0, 89.9, 88.1, 86.2, 84.3, 82.5, 80.7, 79.0, 77.4,
-            75.9, 74.7,
+            92.2,
+            96.0,
+            94.5,
+            94.0,
+            95.3,
+            97.6,
+            103.9,
+            98.7,
+            97.4,
+            98.8,
+            95.8,
+            93.8,
+            92.7,
+            94.0,
+            89.9,
+            88.1,
+            86.2,
+            84.3,
+            82.5,
+            80.7,
+            79.0,
+            77.4,
+            75.9,
+            74.7,
         ),
     ),
     TractionVehicle.ELECTRIC_MULTIPLE_UNIT.value: (
         (
-            80.5, 81.4, 80.5, 82.2, 80.0, 79.7, 79.6, 96.4, 80.5, 81.3, 97.2,
-            79.5, 79.8, 86.7, 81.7, 82.7, 80.7, 78.0, 75.1, 72.1, 69.6, 66.7,
-            64.1, 61.8,
+            80.5,
+            81.4,
+            80.5,
+            82.2,
+            80.0,
+            79.7,
+            79.6,
+            96.4,
+            80.5,
+            81.3,
+            97.2,
+            79.5,
+            79.8,
+            86.7,
+            81.7,
+            82.7,
+            80.7,
+            78.0,
+            75.1,
+            72.1,
+            69.6,
+            66.7,
+            64.1,
+            61.8,
         ),
         (
-            84.8, 86.6, 83.4, 81.6, 80.5, 80.5, 79.5, 94.3, 78.3, 78.4, 94.4,
-            77.7, 77.3, 84.6, 79.5, 81.7, 79.8, 76.9, 74.1, 71.3, 68.6, 66.0,
-            63.5, 61.3,
+            84.8,
+            86.6,
+            83.4,
+            81.6,
+            80.5,
+            80.5,
+            79.5,
+            94.3,
+            78.3,
+            78.4,
+            94.4,
+            77.7,
+            77.3,
+            84.6,
+            79.5,
+            81.7,
+            79.8,
+            76.9,
+            74.1,
+            71.3,
+            68.6,
+            66.0,
+            63.5,
+            61.3,
         ),
     ),
 }
@@ -705,13 +1558,56 @@ _TABLE_G5: dict[str, tuple[tuple[float, ...], tuple[float, ...]]] = {
 # alpha_1 = alpha_2 = 50 in every band.
 # ---------------------------------------------------------------------------
 _TABLE_G6_A: tuple[float, ...] = (
-    112.6, 113.2, 115.7, 117.4, 115.3, 115.0, 114.9, 116.4, 115.9, 116.3,
-    116.2, 115.2, 115.8, 115.7, 115.7, 114.7, 114.7, 115.0, 114.5, 113.1,
-    112.1, 110.6, 109.6, 108.8,
+    112.6,
+    113.2,
+    115.7,
+    117.4,
+    115.3,
+    115.0,
+    114.9,
+    116.4,
+    115.9,
+    116.3,
+    116.2,
+    115.2,
+    115.8,
+    115.7,
+    115.7,
+    114.7,
+    114.7,
+    115.0,
+    114.5,
+    113.1,
+    112.1,
+    110.6,
+    109.6,
+    108.8,
 )
 _TABLE_G6_B: tuple[float, ...] = (
-    36.7, 38.5, 39.0, 37.5, 36.8, 37.1, 36.4, 36.2, 35.9, 36.3, 36.3, 36.3,
-    36.2, 36.5, 36.4, 105.2, 110.3, 110.4, 105.6, 37.2, 37.5, 37.9, 38.4, 39.2,
+    36.7,
+    38.5,
+    39.0,
+    37.5,
+    36.8,
+    37.1,
+    36.4,
+    36.2,
+    35.9,
+    36.3,
+    36.3,
+    36.3,
+    36.2,
+    36.5,
+    36.4,
+    105.2,
+    110.3,
+    110.4,
+    105.6,
+    37.2,
+    37.5,
+    37.9,
+    38.4,
+    39.2,
 )
 _AERODYNAMIC_ALPHA = 50.0
 
@@ -731,14 +1627,56 @@ class BridgeType(Enum):
 # ---------------------------------------------------------------------------
 _TABLE_G7: dict[str, tuple[float, ...]] = {
     BridgeType.PLUS_10_DBA.value: (
-        85.2, 87.1, 91.0, 94.0, 94.4, 96.0, 92.5, 96.7, 97.4, 99.4, 100.7,
-        102.5, 107.1, 109.8, 112.0, 107.2, 106.8, 107.3, 99.3, 91.4, 86.9,
-        79.7, 75.1, 70.8,
+        85.2,
+        87.1,
+        91.0,
+        94.0,
+        94.4,
+        96.0,
+        92.5,
+        96.7,
+        97.4,
+        99.4,
+        100.7,
+        102.5,
+        107.1,
+        109.8,
+        112.0,
+        107.2,
+        106.8,
+        107.3,
+        99.3,
+        91.4,
+        86.9,
+        79.7,
+        75.1,
+        70.8,
     ),
     BridgeType.PLUS_15_DBA.value: (
-        90.1, 92.1, 96.0, 99.5, 99.9, 101.5, 99.6, 103.8, 104.5, 106.5, 107.8,
-        109.6, 116.1, 118.8, 120.9, 109.5, 109.1, 109.6, 102.0, 94.1, 89.6,
-        83.6, 79.0, 74.7,
+        90.1,
+        92.1,
+        96.0,
+        99.5,
+        99.9,
+        101.5,
+        99.6,
+        103.8,
+        104.5,
+        106.5,
+        107.8,
+        109.6,
+        116.1,
+        118.8,
+        120.9,
+        109.5,
+        109.1,
+        109.6,
+        102.0,
+        94.1,
+        89.6,
+        83.6,
+        79.0,
+        74.7,
     ),
 }
 
@@ -793,7 +1731,9 @@ def _energy_sum(*spectra: NDArray[np.float64]) -> NDArray[np.float64]:
 # ---------------------------------------------------------------------------
 
 
-def wheel_roughness(brake: BrakeType | str) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+def wheel_roughness(
+    brake: BrakeType | str,
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Wheel roughness ``L_r,VEH`` of Table G-1a.
 
     :param brake: The :class:`BrakeType` of digit 3 of the vehicle descriptor.
@@ -827,13 +1767,13 @@ def rail_roughness(
     :raises ValueError: If the class carries no spectrum in Table G-1b.
     """
     key = (
-        roughness.value if isinstance(roughness, RailRoughnessClass)
-        else str(roughness)
+        roughness.value if isinstance(roughness, RailRoughnessClass) else str(roughness)
     )
     if key not in _TABLE_G1B:
         raise ValueError(
             f"Rail roughness class {key!r} has no spectrum in Table G-1b, "
-            "which only tabulates " + " and ".join(_TABLE_G1B)
+            "which only tabulates "
+            + " and ".join(_TABLE_G1B)
             + "; supply a national spectrum instead."
         )
     return (
@@ -862,14 +1802,15 @@ def contact_filter(
     :return: ``(wavelengths in mm, levels in dB)``.
     :raises ValueError: If the combination is not tabulated.
     """
-    key = filter_.value if isinstance(filter_, ContactFilter) else (
-        float(filter_[0]), float(filter_[1])
+    key = (
+        filter_.value
+        if isinstance(filter_, ContactFilter)
+        else (float(filter_[0]), float(filter_[1]))
     )
     if key not in _TABLE_G2:
         raise ValueError(
             f"Unknown contact filter {key!r}; Table G-2 tabulates the wheel "
-            "load and wheel diameter pairs "
-            + ", ".join(str(k) for k in _TABLE_G2)
+            "load and wheel diameter pairs " + ", ".join(str(k) for k in _TABLE_G2)
         )
     return (
         np.asarray(_WAVELENGTHS_STANDARD, dtype=np.float64),
@@ -880,14 +1821,14 @@ def contact_filter(
 class TrackTransferClass(Enum):
     """Columns of Table G-3a, ``track base / rail pad`` of the track descriptor."""
 
-    MONOBLOCK_SOFT = "M/S"          #: Concrete mono-block sleeper, soft pad.
-    MONOBLOCK_MEDIUM = "M/M"        #: Concrete mono-block sleeper, medium pad.
-    MONOBLOCK_HARD = "M/H"          #: Concrete mono-block sleeper, hard pad.
-    BIBLOCK_SOFT = "B/S"            #: Concrete bi-block sleeper, soft pad.
-    BIBLOCK_MEDIUM = "B/M"          #: Concrete bi-block sleeper, medium pad.
-    BIBLOCK_HARD = "B/H"            #: Concrete bi-block sleeper, hard pad.
-    WOODEN = "W"                    #: Wooden sleepers.
-    DIRECT_FASTENING = "D"          #: Direct fastening on bridges.
+    MONOBLOCK_SOFT = "M/S"  #: Concrete mono-block sleeper, soft pad.
+    MONOBLOCK_MEDIUM = "M/M"  #: Concrete mono-block sleeper, medium pad.
+    MONOBLOCK_HARD = "M/H"  #: Concrete mono-block sleeper, hard pad.
+    BIBLOCK_SOFT = "B/S"  #: Concrete bi-block sleeper, soft pad.
+    BIBLOCK_MEDIUM = "B/M"  #: Concrete bi-block sleeper, medium pad.
+    BIBLOCK_HARD = "B/H"  #: Concrete bi-block sleeper, hard pad.
+    WOODEN = "W"  #: Wooden sleepers.
+    DIRECT_FASTENING = "D"  #: Direct fastening on bridges.
 
 
 def track_transfer(track: TrackTransferClass | str) -> NDArray[np.float64]:
@@ -1004,11 +1945,15 @@ def aerodynamic_sound_power(
     """
     v = _speed(speed)
     low, high = (
-        (np.asarray(_TABLE_G6_A, dtype=np.float64),
-         np.asarray(_TABLE_G6_B, dtype=np.float64))
+        (
+            np.asarray(_TABLE_G6_A, dtype=np.float64),
+            np.asarray(_TABLE_G6_B, dtype=np.float64),
+        )
         if reference is None
-        else (_spectrum(reference[0], "reference[0]"),
-              _spectrum(reference[1], "reference[1]"))
+        else (
+            _spectrum(reference[0], "reference[0]"),
+            _spectrum(reference[1], "reference[1]"),
+        )
     )
     shift = _finite(alpha, "alpha") * np.log10(v / AERODYNAMIC_REFERENCE_SPEED)
     return low + shift, high + shift
@@ -1024,8 +1969,7 @@ def bridge_transfer(bridge: BridgeType | str) -> NDArray[np.float64]:
     key = bridge.value if isinstance(bridge, BridgeType) else str(bridge)
     if key not in _TABLE_G7:
         raise ValueError(
-            f"Unknown bridge type {key!r}; Table G-7 tabulates: "
-            + ", ".join(_TABLE_G7)
+            f"Unknown bridge type {key!r}; Table G-7 tabulates: " + ", ".join(_TABLE_G7)
         )
     return np.asarray(_TABLE_G7[key], dtype=np.float64)
 
@@ -1100,9 +2044,9 @@ def total_effective_roughness(
     :return: ``L_R,TOT,i``, in dB.
     :raises ValueError: If the spectra are not 24 bands each.
     """
-    return _energy_sum(
-        _spectrum(rail, "rail"), _spectrum(wheel, "wheel")
-    ) + _spectrum(filter_, "filter_")
+    return _energy_sum(_spectrum(rail, "rail"), _spectrum(wheel, "wheel")) + _spectrum(
+        filter_, "filter_"
+    )
 
 
 def impact_roughness(single: Any, joint_density: float) -> NDArray[np.float64]:
@@ -1263,9 +2207,11 @@ def vertical_directivity(
         if aerodynamic and angle < 0.0:
             return np.full(len(freqs), 10.0 * np.log10(np.cos(angle) ** 2))
         return np.zeros(len(freqs))
-    shape = (40.0 / 3.0) * (
-        (2.0 / 3.0) * np.sin(2.0 * angle) - np.sin(angle)
-    ) * np.log10((freqs + 600.0) / 200.0)
+    shape = (
+        (40.0 / 3.0)
+        * ((2.0 / 3.0) * np.sin(2.0 * angle) - np.sin(angle))
+        * np.log10((freqs + 600.0) / 200.0)
+    )
     if edition is DirectivityEdition.ORIGINAL_2015:
         return np.asarray(np.abs(shape), dtype=np.float64)
     return np.asarray(np.where(angle > 0.0, shape, 0.0), dtype=np.float64)
@@ -1403,7 +2349,9 @@ class RailwayEmissionResult:
         default_factory=dict
     )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-metre line power of the two equivalent source heights."""
         from ..._i18n import check_language
         from ..._plot.environment import plot_cnossos_rail_emission
@@ -1463,18 +2411,14 @@ def _rolling_and_bridge(
     return rolling, bridge
 
 
-def _roughness_speed_floor(
-    stock: RollingStock, minimum_speed: float | None
-) -> float:
+def _roughness_speed_floor(stock: RollingStock, minimum_speed: float | None) -> float:
     """Speed floor of 2.3.2: 50 km/h, or 30 km/h for a tram or light metro."""
     if minimum_speed is not None:
         return _finite(minimum_speed, "minimum_speed")
     return TRAM_MINIMUM_SPEED if stock.tram else RAILWAY_MINIMUM_SPEED
 
 
-def _flow_term(
-    vehicle: RailwayVehicle, reference_time: float, length: float
-) -> float:
+def _flow_term(vehicle: RailwayVehicle, reference_time: float, length: float) -> float:
     """Flow term of (2.3.2) for a running train, (2.3.4) for an idling one."""
     if vehicle.condition is RunningCondition.IDLING:
         idle = _finite(vehicle.idling_time, "idling_time")
@@ -1522,7 +2466,10 @@ def _vehicle_spectra(
     if vehicle.condition is not RunningCondition.IDLING:
         speed = _speed(vehicle.speed)
         rolling, bridge = _rolling_and_bridge(
-            vehicle, track, max(speed, floor), interpolation,
+            vehicle,
+            track,
+            max(speed, floor),
+            interpolation,
             include_impact=speed >= floor,
         )
         directional[0].append(rolling)
@@ -1642,9 +2589,11 @@ def railway_source_power(
 
     for vehicle in vehicles:
         sources, omni, breakdown = _vehicle_spectra(
-            vehicle, track,
+            vehicle,
+            track,
             _roughness_speed_floor(vehicle.stock, minimum_speed),
-            interpolation, ver_aero_b,
+            interpolation,
+            ver_aero_b,
         )
         for name, height, spectrum in breakdown:
             components[name][height].append(spectrum)

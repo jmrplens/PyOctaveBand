@@ -27,9 +27,7 @@ from phonometry import filters
 # CI conformance report). Z weighting is 0.0 dB at every frequency.
 
 
-def _measured_gain_db(
-    wf: filters.WeightingFilter, fs: int, f0: float
-) -> float:
+def _measured_gain_db(wf: filters.WeightingFilter, fs: int, f0: float) -> float:
     """Steady-state RMS gain of the weighting filter at a single frequency."""
     # Longer windows at low frequencies keep the partial-cycle RMS error tiny.
     duration = max(0.5, 12 / f0)
@@ -62,7 +60,9 @@ _CLASS1_MISSES: dict[tuple[str, int], set[float]] = {
 
 @pytest.mark.parametrize("fs", [16000, 32000, 48000, 96000])
 @pytest.mark.parametrize("curve,column", [("A", 1), ("C", 2)])
-def test_weighting_within_class1_limits_table3(fs: int, curve: str, column: int) -> None:
+def test_weighting_within_class1_limits_table3(
+    fs: int, curve: str, column: int
+) -> None:
     wf = filters.WeightingFilter(fs, curve)
     missed: set[float] = set()
     detail = []
@@ -77,9 +77,11 @@ def test_weighting_within_class1_limits_table3(fs: int, curve: str, column: int)
         deviation = _measured_gain_db(wf, fs, f0) - nominal
         if not (lower <= deviation <= upper):
             missed.add(row[0])
-            detail.append(f"{f0} Hz: deviation {deviation:+.2f} dB (limits {upper:+}/{lower:+})")
-    assert missed == _CLASS1_MISSES[(curve, fs)], (
-        f"{curve} @ fs={fs}: measured " + ("; ".join(detail) or "no miss")
+            detail.append(
+                f"{f0} Hz: deviation {deviation:+.2f} dB (limits {upper:+}/{lower:+})"
+            )
+    assert missed == _CLASS1_MISSES[(curve, fs)], f"{curve} @ fs={fs}: measured " + (
+        "; ".join(detail) or "no miss"
     )
 
 

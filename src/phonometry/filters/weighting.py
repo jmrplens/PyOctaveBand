@@ -82,9 +82,14 @@ class WeightingFilter:
     Allows pre-calculating and reusing filter coefficients.
     """
 
-    def __init__(self, fs: int, curve: str = "A",
-                 stateful: bool = False, steady_ic: bool = False,
-                 high_accuracy: bool | None = None) -> None:
+    def __init__(
+        self,
+        fs: int,
+        curve: str = "A",
+        stateful: bool = False,
+        steady_ic: bool = False,
+        high_accuracy: bool | None = None,
+    ) -> None:
         """
         Initialize the weighting filter.
 
@@ -127,7 +132,9 @@ class WeightingFilter:
         if high_accuracy is None:
             high_accuracy = not stateful
         if high_accuracy and stateful:
-            raise ValueError("high_accuracy is not compatible with stateful processing.")
+            raise ValueError(
+                "high_accuracy is not compatible with stateful processing."
+            )
 
         self.fs = fs
         self.curve = curve.upper()
@@ -137,7 +144,9 @@ class WeightingFilter:
         # fs=128k -> x2, fs>=144k -> x1.
         # A 96 kHz target left the common 48 kHz rate at only x2 (-1.1 dB @16k /
         # -2.1 dB @20k vs analytic); 144 kHz halves that residual (audit N1 A6).
-        self._oversample = min(8, max(1, math.ceil(144000 / fs))) if high_accuracy else 1
+        self._oversample = (
+            min(8, max(1, math.ceil(144000 / fs))) if high_accuracy else 1
+        )
 
         if self.curve == "Z":
             self.sos = np.array([])
@@ -243,15 +252,19 @@ class WeightingFilter:
                 # renormalized to 0 dB at the 1 kHz reference frequency
                 # below (Table 1 note: zero tolerance at the reference
                 # frequency of IEC 651 subclause 3.7).
-                p_u = 2 * np.pi * np.array(
-                    [
-                        -12200.0,
-                        -12200.0,
-                        -7850.0 + 8800.0j,
-                        -7850.0 - 8800.0j,
-                        -2900.0 + 12150.0j,
-                        -2900.0 - 12150.0j,
-                    ]
+                p_u = (
+                    2
+                    * np.pi
+                    * np.array(
+                        [
+                            -12200.0,
+                            -12200.0,
+                            -7850.0 + 8800.0j,
+                            -7850.0 - 8800.0j,
+                            -2900.0 + 12150.0j,
+                            -2900.0 - 12150.0j,
+                        ]
+                    )
                 )
                 p = np.concatenate([p.astype(complex), p_u])
                 if self.high_accuracy:
@@ -297,14 +310,14 @@ class WeightingFilter:
             pr = -21514.0 / 2.0
             pi = math.sqrt(3.8836e8 - pr**2)
             z = np.array([0.0, complex(zr, zi), complex(zr, -zi)])
-            p = np.array(
-                [-1776.3, -7288.5, complex(pr, pi), complex(pr, -pi)]
-            )
+            p = np.array([-1776.3, -7288.5, complex(pr, pi), complex(pr, -pi)])
             k = 1.0
 
         else:  # C weighting
             z = np.array([0, 0])
-            p = np.array([-2 * np.pi * f1, -2 * np.pi * f1, -2 * np.pi * f4, -2 * np.pi * f4])
+            p = np.array(
+                [-2 * np.pi * f1, -2 * np.pi * f1, -2 * np.pi * f4, -2 * np.pi * f4]
+            )
             k = 5.91797e8
 
         if self.curve != "G":
@@ -325,9 +338,7 @@ class WeightingFilter:
         """Check whether ``zi`` must be (re)allocated for *x_proc*."""
         return _sos_state_mismatch(self.zi, x_proc)
 
-    def filter(
-        self, x: Signal | list[float] | np.ndarray
-    ) -> Signal | np.ndarray:
+    def filter(self, x: Signal | list[float] | np.ndarray) -> Signal | np.ndarray:
         """
         Apply the weighting filter to a signal.
 
@@ -557,7 +568,6 @@ class TimeWeightedEnvelope:
         return plot_time_weighted_envelope(self, ax=ax, language=language, **kwargs)
 
 
-
 @overload
 def weighting_filter(
     x: Signal,
@@ -613,7 +623,9 @@ def _prepare_time_weighting_initial_state(
     initial_state: str | float | np.ndarray | None,
 ) -> np.ndarray:
     """Return the previous output state ``y[-1]`` for time weighting."""
-    invalid_initial_state_message = "initial_state must be None, 'zero', 'first', a scalar, or an array"
+    invalid_initial_state_message = (
+        "initial_state must be None, 'zero', 'first', a scalar, or an array"
+    )
     state_shape = x_sq.shape[:-1]
 
     if initial_state is None:
@@ -668,6 +680,7 @@ if _numba_jit is not None:
 else:  # pragma: no cover - exercised only without numba installed
     _apply_impulse_kernel = _impulse_kernel_py
 
+
 @overload
 def time_weighting(
     x: Signal,
@@ -718,9 +731,9 @@ def time_weighting(
         raise ValueError(_FS_POSITIVE)
     x_sq = x_proc**2
     initial = _prepare_time_weighting_initial_state(x_sq, initial_state)
-    
+
     mode_lower = mode.lower()
-    
+
     if mode_lower in ["fast", "slow"]:
         tau = 0.125 if mode_lower == "fast" else 1.0
         alpha = 1 - np.exp(-1 / (fs * tau))
@@ -730,28 +743,27 @@ def time_weighting(
         zi = np.expand_dims((1 - alpha) * initial, axis=-1)
         y, _ = signal.lfilter(b, a, x_sq, axis=-1, zi=zi)
         return _as_envelope(x, cast(np.ndarray, y), fs, mode_lower)
-        
-    elif mode_lower == "impulse":
+
+    if mode_lower == "impulse":
         # IEC 61672-1: 35ms for rising, 1500ms for falling
         tau_rise = 0.035
         tau_fall = 1.5
-        
+
         alpha_rise = 1 - np.exp(-1 / (fs * tau_rise))
         alpha_fall = 1 - np.exp(-1 / (fs * tau_fall))
-        
+
         # Move time axis to front for iteration
         x_t = np.moveaxis(x_sq, -1, 0)
-        
+
         # Ensure contiguous array for Numba
         x_t = np.ascontiguousarray(x_t)
         initial_kernel = initial if initial.ndim == 0 else np.ascontiguousarray(initial)
         y_t = _apply_impulse_kernel(x_t, alpha_rise, alpha_fall, initial_kernel)
-            
+
         # Move time axis back
         return _as_envelope(x, np.moveaxis(y_t, 0, -1), fs, mode_lower)
 
-    else:
-        raise ValueError("Invalid time weighting mode. Use ['fast', 'slow', 'impulse']")
+    raise ValueError("Invalid time weighting mode. Use ['fast', 'slow', 'impulse']")
 
 
 class TimeWeighting:
@@ -770,7 +782,9 @@ class TimeWeighting:
         if fs <= 0:
             raise ValueError(_FS_POSITIVE)
         if mode.lower() not in ("fast", "slow", "impulse"):
-            raise ValueError("Invalid time weighting mode. Use ['fast', 'slow', 'impulse']")
+            raise ValueError(
+                "Invalid time weighting mode. Use ['fast', 'slow', 'impulse']"
+            )
         self.fs = fs
         self.mode = mode.lower()
         self._state: np.ndarray | None = None
@@ -849,21 +863,21 @@ def linkwitz_riley(
     x_proc = resolve_samples(x)
     if order % 2 != 0:
         raise ValueError("Linkwitz-Riley order must be even (typically 2 or 4).")
-    
+
     # A Linkwitz-Riley filter of order N is two Butterworth filters of order N/2 in series
     half_order = order // 2
     wn = freq / (fs / 2)
-    
-    sos_lp = signal.butter(half_order, wn, btype='low', output='sos')
-    sos_hp = signal.butter(half_order, wn, btype='high', output='sos')
-    
+
+    sos_lp = signal.butter(half_order, wn, btype="low", output="sos")
+    sos_hp = signal.butter(half_order, wn, btype="high", output="sos")
+
     # Pass twice
     lp = signal.sosfilt(sos_lp, x_proc)
     lp = signal.sosfilt(sos_lp, lp)
-    
+
     hp = signal.sosfilt(sos_hp, x_proc)
     hp = signal.sosfilt(sos_hp, hp)
-    
+
     # The two branches are one measurement split in two, so they are wrapped
     # together: a caller that got a Signal for the low band and an array for
     # the high one would have to test which it holds before using either.

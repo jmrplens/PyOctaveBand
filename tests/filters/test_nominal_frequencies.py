@@ -17,6 +17,7 @@ from phonometry.filters.frequencies import (
 
 # --- _iec_e3_round ---
 
+
 def test_iec_e3_round_msd_1_to_4():
     assert _iec_e3_round(1234.5) == pytest.approx(1230.0)
     assert _iec_e3_round(456.7) == pytest.approx(457.0)
@@ -34,6 +35,7 @@ def test_iec_e3_round_nonpositive():
 
 # --- _nominal_freq_for_band ---
 
+
 def test_nominal_freq_fraction1():
     assert _nominal_freq_for_band(15.849, 1) == pytest.approx(16.0)
     assert _nominal_freq_for_band(997.2, 1) == pytest.approx(1000.0)
@@ -50,6 +52,7 @@ def test_nominal_freq_other_fraction():
 
 # --- _format_nominal_freq ---
 
+
 def test_format_below_1k():
     assert _format_nominal_freq(31.5) == "31.5"
     assert _format_nominal_freq(500.0) == "500"
@@ -62,6 +65,7 @@ def test_format_1k_and_above():
 
 
 # --- nominal_frequencies — 4-tuple ---
+
 
 def test_getansifrequencies_returns_labels():
     freq, _, _, labels = nominal_frequencies(fraction=3)
@@ -80,6 +84,7 @@ def test_getansifrequencies_fraction1_labels():
 
 # --- OctaveFilterBank.nominal_freq attribute ---
 
+
 def test_filterbank_nominal_freq_attribute():
     fb = filters.OctaveFilterBank(fs=48000, fraction=1)
     assert hasattr(fb, "nominal_freq")
@@ -91,6 +96,7 @@ def test_filterbank_nominal_freq_attribute():
 
 # --- filter(nominal=False) — default exact floats ---
 
+
 def test_filter_nominal_false_returns_floats():
     fb = filters.OctaveFilterBank(fs=48000, fraction=3)
     x = np.zeros(4800)
@@ -99,6 +105,7 @@ def test_filter_nominal_false_returns_floats():
 
 
 # --- filter(nominal=True) — nominal string labels ---
+
 
 def test_filter_nominal_true_returns_strings():
     fb = filters.OctaveFilterBank(fs=48000, fraction=3)
@@ -117,6 +124,7 @@ def test_filter_nominal_true_with_sigbands():
 
 
 # --- octave_filter(nominal=True) ---
+
 
 def test_octavefilter_nominal_true():
     x = np.zeros(4800)
@@ -161,6 +169,10 @@ def test_infer_band_fraction_octave_third_and_single() -> None:
     assert _infer_band_fraction(octave) == 1
     assert _infer_band_fraction(third) == 3
     # A wide octave set (>6 bands) is still octave, not one-third-octave.
-    assert _infer_band_fraction(np.array([16.0, 31.5, 63.0, 125.0, 250.0,
-                                          500.0, 1000.0, 2000.0])) == 1
+    assert (
+        _infer_band_fraction(
+            np.array([16.0, 31.5, 63.0, 125.0, 250.0, 500.0, 1000.0, 2000.0])
+        )
+        == 1
+    )
     assert _infer_band_fraction(np.array([500.0])) == 1

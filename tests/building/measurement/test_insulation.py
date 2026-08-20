@@ -39,10 +39,40 @@ _INDEX_500_OCTAVE = 2
 
 # ISO 717-1 Table 4 spectra (A-weighted, normalized to 0 dB).
 _SPECTRUM1_THIRD = [
-    -29, -26, -23, -21, -19, -17, -15, -13, -12, -11, -10, -9, -9, -9, -9, -9,
+    -29,
+    -26,
+    -23,
+    -21,
+    -19,
+    -17,
+    -15,
+    -13,
+    -12,
+    -11,
+    -10,
+    -9,
+    -9,
+    -9,
+    -9,
+    -9,
 ]
 _SPECTRUM2_THIRD = [
-    -20, -20, -18, -16, -15, -14, -13, -12, -11, -9, -8, -9, -10, -11, -13, -15,
+    -20,
+    -20,
+    -18,
+    -16,
+    -15,
+    -14,
+    -13,
+    -12,
+    -11,
+    -9,
+    -8,
+    -9,
+    -10,
+    -11,
+    -13,
+    -15,
 ]
 _SPECTRUM1_OCTAVE = [-21, -14, -8, -5, -4]
 _SPECTRUM2_OCTAVE = [-14, -10, -7, -4, -6]
@@ -87,6 +117,7 @@ def _brute_force_adaptation(
     x_aj = -10.0 * np.log10(np.sum(10.0 ** ((spec - meas) / 10.0)))
     return math.floor(x_aj + 0.5) - rating
 
+
 # ISO 717-1 Annex C, Table C.1 measured sound reduction index R (100-3150)
 # is imported from reference_data (shared with the CI conformance report).
 
@@ -94,6 +125,7 @@ def _brute_force_adaptation(
 # --------------------------------------------------------------------------
 # ISO 717-1 weighted rating and spectrum adaptation terms
 # --------------------------------------------------------------------------
+
 
 def test_annex_c_worked_example_third_octave() -> None:
     """ISO 717-1 Annex C Table C.1: Rw(C;Ctr) = 30(-2;-3) dB."""
@@ -213,15 +245,12 @@ def test_engine_matches_brute_force_octave() -> None:
 # ISO 16283-1 field quantities
 # --------------------------------------------------------------------------
 
+
 def test_energy_average_level_formula9() -> None:
     """Formula (9): equal levels average to themselves; 60 & 70 -> 67,4."""
-    assert building.energy_average_level([60.0, 60.0, 60.0]) == pytest.approx(
-        60.0
-    )
-    expected = 10.0 * np.log10((10 ** 6 + 10 ** 7) / 2.0)
-    assert building.energy_average_level([60.0, 70.0]) == pytest.approx(
-        expected
-    )
+    assert building.energy_average_level([60.0, 60.0, 60.0]) == pytest.approx(60.0)
+    expected = 10.0 * np.log10((10**6 + 10**7) / 2.0)
+    assert building.energy_average_level([60.0, 70.0]) == pytest.approx(expected)
 
 
 def test_dnt_equals_d_when_t_is_half_second() -> None:
@@ -258,9 +287,7 @@ def test_apparent_reduction_index_ten_db_offset() -> None:
     """S = 1,6, V = 1, T = 1 => A = 0,16, S/A = 10 => R' = D + 10."""
     l1 = np.array([80.0])
     l2 = np.array([40.0])
-    res = building.airborne_insulation(
-        l1, l2, np.array([1.0]), area=1.6, volume=1.0
-    )
+    res = building.airborne_insulation(l1, l2, np.array([1.0]), area=1.6, volume=1.0)
     assert res.r_prime is not None
     np.testing.assert_allclose(res.r_prime, [50.0])
 
@@ -277,7 +304,7 @@ def test_airborne_energy_averages_positions() -> None:
     l1 = np.array([[80.0, 80.0], [80.0, 80.0]])  # two positions, two bands
     l2 = np.array([[40.0, 50.0], [50.0, 40.0]])
     res = building.airborne_insulation(l1, l2, np.array([0.5, 0.5]))
-    l2_avg = 10.0 * np.log10((10 ** 4 + 10 ** 5) / 2.0)
+    l2_avg = 10.0 * np.log10((10**4 + 10**5) / 2.0)
     np.testing.assert_allclose(res.d, 80.0 - l2_avg)
 
 
@@ -296,9 +323,7 @@ def test_airborne_requires_both_area_and_volume() -> None:
     l1 = np.array([80.0])
     l2 = np.array([40.0])
     t2 = np.array([0.5])
-    with pytest.raises(
-        ValueError, match="'area' and 'volume' must be given together"
-    ):
+    with pytest.raises(ValueError, match="'area' and 'volume' must be given together"):
         building.airborne_insulation(l1, l2, t2, area=10.0)
 
 
@@ -317,17 +342,36 @@ def test_field_rating_pipeline_dnt_w() -> None:
 # Enlarged frequency ranges (ISO 717-1 Annex B) and one-decimal ratings
 # --------------------------------------------------------------------------
 
+
 def test_extended_annex_c2_enlarged_range() -> None:
     """ISO 717-1:2020 Annex C Table C.2: Rw(C;Ctr;C50-5000;Ctr,50-5000)
     = 30 (-2; -3; -2; -4) dB."""
     import reference_data as ref
 
-
-    freqs = [50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-             630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
-    res = building.weighted_rating_extended(
-        ref.ISO717_1_ANNEX_C2_R_50_5000, freqs
-    )
+    freqs = [
+        50,
+        63,
+        80,
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
+    ]
+    res = building.weighted_rating_extended(ref.ISO717_1_ANNEX_C2_R_50_5000, freqs)
     exp = ref.ISO717_1_ANNEX_C2_EXPECTED
     assert res.rating == exp["rw"]
     assert res.c == exp["c"]
@@ -347,7 +391,6 @@ def test_extended_core_only_input() -> None:
     """A bare 16-band input yields the core terms; extended ones are None."""
     import reference_data as ref
 
-
     res = building.weighted_rating_extended(ref.ISO717_1_ANNEX_C_R)
     assert res.rating == ref.ISO717_1_ANNEX_C_EXPECTED["rw"]
     assert res.c == ref.ISO717_1_ANNEX_C_EXPECTED["c"]
@@ -362,9 +405,26 @@ def test_extended_18_band_100_5000_range() -> None:
     """An 18-band 100-5000 Hz input yields C100-5000 but not the 50 Hz terms."""
     import reference_data as ref
 
-
-    freqs = [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-             1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000]
+    freqs = [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
+    ]
     values = [*ref.ISO717_1_ANNEX_C_R, 26.8, 29.2]
     res = building.weighted_rating_extended(values, freqs)
     assert res.rating == 30
@@ -389,9 +449,9 @@ def test_one_decimal_rating_annex_b() -> None:
     one-decimal sums Rw + C50-5000 = 56,4 / Rw + Ctr,50-5000 = 51,1 dB."""
     import reference_data as ref
 
-
     res = building.weighted_rating_extended(
-        ref.ISO12999_1_ANNEX_B_RI, ref.ISO12999_1_ANNEX_B_FREQ,
+        ref.ISO12999_1_ANNEX_B_RI,
+        ref.ISO12999_1_ANNEX_B_FREQ,
         one_decimal=True,
     )
     assert res.rating == pytest.approx(ref.ISO12999_1_ANNEX_B_RW)
@@ -415,9 +475,12 @@ def test_impact_extended_ci_50_2500() -> None:
     energy leave it equal to the core CI."""
     import reference_data as ref
 
-
-    freqs = [50, 63, 80, *[int(f) for f in np.asarray(
-        ref.ISO717_2_REFERENCE_FLOOR_FREQ, dtype=float)]]
+    freqs = [
+        50,
+        63,
+        80,
+        *[int(f) for f in np.asarray(ref.ISO717_2_REFERENCE_FLOOR_FREQ, dtype=float)],
+    ]
     ln = [30.0, 30.0, 30.0, *ref.ISO717_2_REFERENCE_FLOOR_LN_R0]
     res = building.weighted_impact_rating_extended(ln, freqs)
     assert res.rating == 78
@@ -435,7 +498,6 @@ def test_impact_one_decimal_reference_floor() -> None:
     """The 0,1 dB variant reproduces the printed uncertainty constants of
     ISO 717-2:2020 A.2.2: Ln,r,0,w = 77,6 dB and CI,r,0 = -10,3 dB."""
     import reference_data as ref
-
 
     res = building.weighted_impact_rating_extended(
         ref.ISO717_2_REFERENCE_FLOOR_LN_R0, one_decimal=True
@@ -456,15 +518,43 @@ def test_impact_one_decimal_reference_floor() -> None:
 # real field test report, one-third-octave bands 100 Hz - 3150 Hz (the report
 # extends to 5 kHz; the 16 ISO 717-1 rating bands are used here).
 _MANUAL_ES_R_PRIME = (
-    36.2, 41.5, 36.9, 40.4, 44.7, 42.4, 45.7, 46.1,
-    47.1, 52.3, 54.3, 57.5, 57.8, 57.3, 59.0, 62.8,
+    36.2,
+    41.5,
+    36.9,
+    40.4,
+    44.7,
+    42.4,
+    45.7,
+    46.1,
+    47.1,
+    52.3,
+    54.3,
+    57.5,
+    57.8,
+    57.3,
+    59.0,
+    62.8,
 )
 
 # Ejercicio 7.1 (p. 395): standardized facade level difference D2m,nT of the
 # same building's facade, same band layout.
 _MANUAL_ES_D_2M_NT = (
-    28.5, 28.5, 18.9, 23.7, 30.7, 31.3, 37.8, 35.2,
-    34.7, 38.5, 37.7, 43.1, 42.3, 44.2, 41.9, 37.5,
+    28.5,
+    28.5,
+    18.9,
+    23.7,
+    30.7,
+    31.3,
+    37.8,
+    35.2,
+    34.7,
+    38.5,
+    37.7,
+    43.1,
+    42.3,
+    44.2,
+    41.9,
+    37.5,
 )
 
 

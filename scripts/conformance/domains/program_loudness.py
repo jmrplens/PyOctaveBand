@@ -53,9 +53,7 @@ def _chk_bs1770_anchor() -> Outcome:
 )
 def _chk_tech3341_case1() -> Outcome:
     _, segments, expected = ref.EBU_TECH3341_INTEGRATED_CASES[0]
-    computed = ph.broadcast.integrated_loudness(
-        _ebu_stereo_steps(segments), _EBU_FS
-    )
+    computed = ph.broadcast.integrated_loudness(_ebu_stereo_steps(segments), _EBU_FS)
     return numeric(expected, computed, ref.EBU_TECH3341_TOL_LU, unit="LUFS", places=2)
 
 
@@ -66,9 +64,7 @@ def _chk_tech3341_case1() -> Outcome:
 )
 def _chk_tech3341_case5() -> Outcome:
     _, segments, expected = ref.EBU_TECH3341_INTEGRATED_CASES[4]
-    computed = ph.broadcast.integrated_loudness(
-        _ebu_stereo_steps(segments), _EBU_FS
-    )
+    computed = ph.broadcast.integrated_loudness(_ebu_stereo_steps(segments), _EBU_FS)
     return numeric(expected, computed, ref.EBU_TECH3341_TOL_LU, unit="LUFS", places=2)
 
 

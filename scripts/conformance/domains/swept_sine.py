@@ -51,9 +51,7 @@ def _ss_response_at(res: Any, order: int, freq: float) -> complex:
 )
 def _chk_swept_sine_h3_magnitude() -> Outcome:
     res = _swept_sine_polynomial()
-    return numeric(
-        _SS_A3 / 4.0, abs(_ss_response_at(res, 3, 3000.0)), 5e-4, places=5
-    )
+    return numeric(_SS_A3 / 4.0, abs(_ss_response_at(res, 3, 3000.0)), 5e-4, places=5)
 
 
 @register(
@@ -64,8 +62,11 @@ def _chk_swept_sine_h3_magnitude() -> Outcome:
 def _chk_swept_sine_h3_phase() -> Outcome:
     res = _swept_sine_polynomial()
     return numeric(
-        math.pi, abs(np.angle(_ss_response_at(res, 3, 3000.0))), 5e-3,
-        unit="rad", places=4,
+        math.pi,
+        abs(np.angle(_ss_response_at(res, 3, 3000.0))),
+        5e-3,
+        unit="rad",
+        places=4,
     )
 
 

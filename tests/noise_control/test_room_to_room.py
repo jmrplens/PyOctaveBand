@@ -38,7 +38,11 @@ def _chain(**kwargs: object) -> RoomToRoomResult:
     }
     defaults.update(kwargs)
     return noise_control.room_to_room_transmission(
-        _BANDS, 40.0, 20.0, _ABSORPTION, **defaults  # type: ignore[arg-type]
+        _BANDS,
+        40.0,
+        20.0,
+        _ABSORPTION,
+        **defaults,  # type: ignore[arg-type]
     )
 
 
@@ -79,9 +83,7 @@ def test_partition_transmission_term_adds_absorption() -> None:
 def test_flanking_penalty_is_a_straight_debit() -> None:
     """The penalty comes off the noise reduction and lands on the received level."""
     plain = _chain()
-    penalised = _chain(
-        criterion=noise_control.DesignCriterion(flanking_penalty=3.0)
-    )
+    penalised = _chain(criterion=noise_control.DesignCriterion(flanking_penalty=3.0))
     assert np.allclose(penalised.noise_reduction, plain.noise_reduction - 3.0)
     assert np.allclose(penalised.received_level, plain.received_level + 3.0)
     assert penalised.flanking_penalty == pytest.approx(3.0)
@@ -92,7 +94,11 @@ def test_flanking_penalty_is_a_straight_debit() -> None:
 
 @pytest.mark.parametrize(
     ("model", "expected"),
-    [("constant_power", 0.0), ("constant_volume", 6.0206), ("constant_pressure", -6.0206)],
+    [
+        ("constant_power", 0.0),
+        ("constant_volume", 6.0206),
+        ("constant_pressure", -6.0206),
+    ],
 )
 def test_source_power_models_scale_by_ten_lg_q(model: str, expected: float) -> None:
     """Norton Table 4.5: the radiated power goes as ``Q^0``, ``Q^1``, ``Q^-1``."""
@@ -121,7 +127,10 @@ def test_required_transmission_loss_closes_the_gap() -> None:
     assert np.allclose(required - result.transmission_loss, excess)
     # Re-running with that TL lands exactly on the criterion curve.
     tightened = noise_control.room_to_room_transmission(
-        _BANDS, required, 20.0, _ABSORPTION,
+        _BANDS,
+        required,
+        20.0,
+        _ABSORPTION,
         source=noise_control.SourceRoom(level=result.source_level),
         criterion=noise_control.DesignCriterion(target=45.0),
     )
@@ -141,9 +150,7 @@ def test_no_target_leaves_the_verdicts_undefined() -> None:
 
 def test_rc_criterion_family() -> None:
     """``family="RC"`` rates against the RC Mark II curves of Annex D."""
-    result = _chain(
-        criterion=noise_control.DesignCriterion(family="RC", target=35.0)
-    )
+    result = _chain(criterion=noise_control.DesignCriterion(family="RC", target=35.0))
     assert result.criterion == "RC"
     assert result.criterion_curve is not None
     # The six bands of this chain are short of the 31.5 Hz to 4 kHz span
@@ -175,9 +182,7 @@ def test_source_description_is_exclusive() -> None:
     itself for the same reason.
     """
     with pytest.raises(ValueError, match="exactly one"):
-        noise_control.room_to_room_transmission(
-            _BANDS, 40.0, 20.0, _ABSORPTION
-        )
+        noise_control.room_to_room_transmission(_BANDS, 40.0, 20.0, _ABSORPTION)
     with pytest.raises(ValueError, match="exactly one"):
         noise_control.SourceRoom(level=90.0, power_level=100.0)
     with pytest.raises(ValueError, match="room_constant"):
@@ -188,9 +193,7 @@ def test_validation() -> None:
     """Malformed bands, spectra, areas, absorption and options are rejected."""
     source = noise_control.SourceRoom(level=90.0)
     with pytest.raises(ValueError, match="non-empty 1-D"):
-        noise_control.room_to_room_transmission(
-            [], 40.0, 20.0, 20.0, source=source
-        )
+        noise_control.room_to_room_transmission([], 40.0, 20.0, 20.0, source=source)
     with pytest.raises(ValueError, match="one value per band"):
         noise_control.room_to_room_transmission(
             _BANDS, [40.0, 41.0], 20.0, _ABSORPTION, source=source
@@ -213,9 +216,7 @@ def test_validation() -> None:
     unknown_family = noise_control.DesignCriterion(family="NR")
     with pytest.raises(ValueError, match="criterion"):
         _chain(criterion=unknown_family)
-    unknown_model = noise_control.SourceRoom(
-        level=_SOURCE, model="constant_energy"
-    )
+    unknown_model = noise_control.SourceRoom(level=_SOURCE, model="constant_energy")
     with pytest.raises(ValueError, match="model"):
         _chain(source=unknown_model)
     nan_target = noise_control.DesignCriterion(target=_NAN)
@@ -229,9 +230,7 @@ def test_plot_smoke() -> None:
 
     matplotlib.use("Agg")
     result = _chain(
-        criterion=noise_control.DesignCriterion(
-            target=45.0, flanking_penalty=2.0
-        )
+        criterion=noise_control.DesignCriterion(target=45.0, flanking_penalty=2.0)
     )
     ax = result.plot()
     assert ax.get_ylabel() == "Level [dB]"

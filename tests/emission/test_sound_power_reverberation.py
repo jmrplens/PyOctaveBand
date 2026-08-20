@@ -61,8 +61,13 @@ def test_direct_method_exact_inversion() -> None:
     lp = lw_target - _bracket(t60, volume, surface, freqs, theta, ps)
 
     res = emission.sound_power_reverberation(
-        lp, t60, volume, surface, freqs,
-        temperature=theta, static_pressure=ps,
+        lp,
+        t60,
+        volume,
+        surface,
+        freqs,
+        temperature=theta,
+        static_pressure=ps,
     )
     assert isinstance(res, emission.ReverberationSoundPowerResult)
     assert np.allclose(res.sound_power_level, lw_target, atol=1e-9, rtol=0.0)
@@ -77,10 +82,8 @@ def test_direct_method_multi_position_energy_average() -> None:
     levels = np.array([[80.0], [86.0]])
     with warnings.catch_warnings():  # 2 positions trip the qualification advisories
         warnings.simplefilter("ignore", emission.SoundPowerWarning)
-        res = emission.sound_power_reverberation(
-            levels, t60, volume, surface, freqs
-        )
-    mean = 10.0 * np.log10((10 ** 8.0 + 10 ** 8.6) / 2.0)
+        res = emission.sound_power_reverberation(levels, t60, volume, surface, freqs)
+    mean = 10.0 * np.log10((10**8.0 + 10**8.6) / 2.0)
     assert np.isclose(res.mean_pressure_level[0], mean)
 
 
@@ -114,7 +117,11 @@ def test_comparison_method_exact_by_construction() -> None:
     lp_st = lw_target - lw_ref + lp_rss - _c2(theta, ps)
 
     res = emission.sound_power_comparison(
-        lp_st, lp_rss, lw_ref, temperature=theta, static_pressure=ps,
+        lp_st,
+        lp_rss,
+        lw_ref,
+        temperature=theta,
+        static_pressure=ps,
     )
     assert isinstance(res, emission.ReverberationSoundPowerResult)
     assert res.method == "comparison"
@@ -175,17 +182,13 @@ def test_synergy_room_parameters_feeds_direct_method() -> None:
     ir = rng.standard_normal(n) * decay
     ir[0] += 5.0  # a clear direct-sound peak
 
-    parameters = room.room_parameters(
-        ir, fs, limits=(500.0, 1000.0), fraction=1
-    )
+    parameters = room.room_parameters(ir, fs, limits=(500.0, 1000.0), fraction=1)
     t60_bands = parameters.t30  # decay time (s) extrapolated to 60 dB
     freqs = np.asarray(parameters.frequency, dtype=float)
     assert np.all(np.isfinite(t60_bands))
 
     lp = np.full(freqs.shape, 80.0)
-    res = emission.sound_power_reverberation(
-        lp, t60_bands, 200.0, 210.0, freqs
-    )
+    res = emission.sound_power_reverberation(lp, t60_bands, 200.0, 210.0, freqs)
     assert res.sound_power_level.shape == freqs.shape
     assert np.all(np.isfinite(res.sound_power_level))
 
@@ -201,7 +204,12 @@ def test_background_correction_reduces_level_and_warns_below_criterion() -> None
     background = np.array([[70.0]])  # dLp = 4 dB
     with pytest.warns(emission.SoundPowerWarning):
         res = emission.sound_power_reverberation(
-            levels, t60, 200.0, 210.0, freqs, background_levels=background,
+            levels,
+            t60,
+            200.0,
+            210.0,
+            freqs,
+            background_levels=background,
         )
     assert res.background_correction[0] > 0.0
 
@@ -225,7 +233,12 @@ def test_background_correction_is_per_position_eq14_to_16() -> None:
     background = np.array([[58.0], [60.0], [59.0], [60.0], [62.0], [58.0]])
     with pytest.warns(emission.SoundPowerWarning, match="9.1.2"):
         res = emission.sound_power_reverberation(
-            levels, t60, 200.0, 210.0, freqs, background_levels=background,
+            levels,
+            t60,
+            200.0,
+            210.0,
+            freqs,
+            background_levels=background,
         )
     assert res.mean_pressure_level[0] == pytest.approx(69.3887156232, abs=1e-9)
     assert res.background_correction[0] == pytest.approx(0.3634659689, abs=1e-9)
@@ -240,12 +253,20 @@ def test_background_single_spectrum_broadcasts_to_positions() -> None:
     levels = np.array([[70.0], [68.0], [66.0], [72.0], [71.0], [69.0]])
     with pytest.warns(emission.SoundPowerWarning):
         res_1d = emission.sound_power_reverberation(
-            levels, t60, 200.0, 210.0, freqs,
+            levels,
+            t60,
+            200.0,
+            210.0,
+            freqs,
             background_levels=np.array([60.0]),
         )
     with pytest.warns(emission.SoundPowerWarning):
         res_2d = emission.sound_power_reverberation(
-            levels, t60, 200.0, 210.0, freqs,
+            levels,
+            t60,
+            200.0,
+            210.0,
+            freqs,
             background_levels=np.full((6, 1), 60.0),
         )
     assert res_1d.mean_pressure_level[0] == pytest.approx(
@@ -261,7 +282,11 @@ def test_background_shape_mismatch_raises() -> None:
     mismatched_background = np.full((3, 1), 60.0)  # 3 rows against 6 positions
     with pytest.raises(ValueError, match="background_levels"):
         emission.sound_power_reverberation(
-            levels, t60, 200.0, 210.0, freqs,
+            levels,
+            t60,
+            200.0,
+            210.0,
+            freqs,
             background_levels=mismatched_background,
         )
 
@@ -272,7 +297,11 @@ def test_preaveraged_1d_levels_keep_single_k1_path() -> None:
     freqs = np.array([1000.0])
     t60 = np.array([1.5])
     res = emission.sound_power_reverberation(
-        np.array([80.0]), t60, 200.0, 210.0, freqs,
+        np.array([80.0]),
+        t60,
+        200.0,
+        210.0,
+        freqs,
         background_levels=np.array([70.0]),  # margin 10 dB, no clamp
     )
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * 10.0))
@@ -290,7 +319,10 @@ def test_comparison_method_corrects_test_source_per_position() -> None:
     lw_ref = np.array([90.0])
     with pytest.warns(emission.SoundPowerWarning):
         res = emission.sound_power_comparison(
-            levels, lp_rss, lw_ref, frequencies=freqs,
+            levels,
+            lp_rss,
+            lw_ref,
+            frequencies=freqs,
             background_levels=background,
         )
     assert res.mean_pressure_level[0] == pytest.approx(69.3887156232, abs=1e-9)
@@ -333,7 +365,12 @@ def test_direct_method_invalid_temperature_raises(theta: float) -> None:
     lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
     with pytest.raises(ValueError, match="temperature"):
         emission.sound_power_reverberation(
-            lp, t60, 200.0, 210.0, freqs, temperature=theta,
+            lp,
+            t60,
+            200.0,
+            210.0,
+            freqs,
+            temperature=theta,
         )
 
 
@@ -342,28 +379,25 @@ def test_direct_method_invalid_pressure_raises(ps: float) -> None:
     lp, t60, freqs = np.array([80.0]), np.array([1.5]), np.array([1000.0])
     with pytest.raises(ValueError, match="static_pressure"):
         emission.sound_power_reverberation(
-            lp, t60, 200.0, 210.0, freqs, static_pressure=ps,
+            lp,
+            t60,
+            200.0,
+            210.0,
+            freqs,
+            static_pressure=ps,
         )
 
 
 def test_comparison_method_invalid_temperature_raises() -> None:
-    levels, levels_ref, lw_ref = (
-        np.array([80.0]), np.array([70.0]), np.array([90.0])
-    )
+    levels, levels_ref, lw_ref = (np.array([80.0]), np.array([70.0]), np.array([90.0]))
     with pytest.raises(ValueError, match="temperature"):
-        emission.sound_power_comparison(
-            levels, levels_ref, lw_ref, temperature=-300.0
-        )
+        emission.sound_power_comparison(levels, levels_ref, lw_ref, temperature=-300.0)
 
 
 def test_comparison_method_invalid_pressure_raises() -> None:
-    levels, levels_ref, lw_ref = (
-        np.array([80.0]), np.array([70.0]), np.array([90.0])
-    )
+    levels, levels_ref, lw_ref = (np.array([80.0]), np.array([70.0]), np.array([90.0]))
     with pytest.raises(ValueError, match="static_pressure"):
-        emission.sound_power_comparison(
-            levels, levels_ref, lw_ref, static_pressure=0.0
-        )
+        emission.sound_power_comparison(levels, levels_ref, lw_ref, static_pressure=0.0)
 
 
 # --------------------------------------------------------------------------
@@ -433,7 +467,9 @@ def test_comparison_wrong_frequency_length_raises_clean_error() -> None:
     short_freqs = np.array([1000.0, 2000.0])  # wrong length (2 != 3)
     with pytest.raises(ValueError, match="length must match"):
         emission.sound_power_comparison(
-            levels, levels_ref, lw_ref,
+            levels,
+            levels_ref,
+            lw_ref,
             frequencies=short_freqs,
             background_levels=background,
         )
@@ -467,7 +503,11 @@ def test_comparison_reports_applied_background_correction() -> None:
     k1 = -10.0 * np.log10(1.0 - 10.0 ** (-0.1 * 10.0))
 
     res = emission.sound_power_comparison(
-        lp_st, lp_rss, lw_ref, frequencies=freqs, background_levels=background,
+        lp_st,
+        lp_rss,
+        lw_ref,
+        frequencies=freqs,
+        background_levels=background,
     )
     assert res.background_correction[0] == pytest.approx(k1, abs=1e-9)
     # LW keeps the K1-corrected level: LW(RSS) + (Lp(ST) - K1 - Lp(RSS) + C2).
@@ -479,6 +519,8 @@ def test_comparison_reports_applied_background_correction() -> None:
 def test_comparison_background_correction_zero_without_background() -> None:
     """No background supplied -> the reported per-band K1 is zero."""
     res = emission.sound_power_comparison(
-        np.array([80.0, 80.0]), np.array([70.0, 70.0]), np.array([90.0, 90.0]),
+        np.array([80.0, 80.0]),
+        np.array([70.0, 70.0]),
+        np.array([90.0, 90.0]),
     )
     assert np.all(res.background_correction == 0.0)

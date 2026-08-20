@@ -24,8 +24,8 @@ _MC_ANGLES = (10.0, 20.0, 35.0)
 # lambda_w = 7.4 mm and the bound is 0.93 mm; the grid runs at 0.6 mm,
 # 12.3 cells per water wavelength, 26.7 per shear wavelength in the steel.
 _MC_DX = 0.0006
-_MC_SPONGE = 50                    # 30 mm skirt on all four sides
-_MC_SRC_ROW = 56                   # source line, 6 cells clear of the top
+_MC_SPONGE = 50  # 30 mm skirt on all four sides
+_MC_SRC_ROW = 56  # source line, 6 cells clear of the top
 #                                    sponge, which eats its upgoing half
 # Panel shape. Three panels across an 8 x 4.5 in canvas want a portrait
 # field of about 4:5, so the domain is deliberately narrow and deep: a
@@ -36,17 +36,17 @@ _MC_SRC_ROW = 56                   # source line, 6 cells clear of the top
 # lambda_w / (2 cos 35) = 4.5 mm, five of them in the 23 mm of water shown),
 # and the 10 and 20 deg panels need enough steel for the departing beams to
 # separate (90 mm = 5.6 shear wavelengths).
-_MC_WATER = 40                     # cells of water between source and
+_MC_WATER = 40  # cells of water between source and
 #                                    contact (3.2 water wavelengths); short
 #                                    on purpose, because the beam axis walks
 #                                    sideways by _MC_WATER tan(theta) and a
 #                                    deeper source would push the 35 deg
 #                                    aperture into the left sponge
-_MC_STEEL = 150                    # cells of steel below the contact
+_MC_STEEL = 150  # cells of steel below the contact
 _MC_NX = 250
-_MC_APERTURE = 70                  # source aperture [cells], tapered
-_MC_RAMP = 1.5                     # source onset [periods]
-_MC_EVERY = 4                      # capture stride [solver steps]
+_MC_APERTURE = 70  # source aperture [cells], tapered
+_MC_RAMP = 1.5  # source onset [periods]
+_MC_EVERY = 4  # capture stride [solver steps]
 _MC_FPS = 45
 #: Colour half-range on the normalisation that puts the incident particle
 #: velocity at unit amplitude; 2.0 leaves the standing pattern of the
@@ -127,9 +127,7 @@ def _mc_run(theta_deg: float) -> tuple[Any, Any]:
     c_p[iface:] = STEEL.c_p
     c_s[iface:] = STEEL.c_s
     rho[iface:] = STEEL.rho
-    sim = simulation.ElasticFDTD2D(
-        c_p, c_s, dx, rho=rho, sponge_width=_MC_SPONGE
-    )
+    sim = simulation.ElasticFDTD2D(c_p, c_s, dx, rho=rho, sponge_width=_MC_SPONGE)
     # Tapered aperture, centred so the beam axis meets the contact at the
     # middle of the frame whatever the incidence: a soft-edged beam instead
     # of a hard-clipped one keeps the edge diffraction out of the picture.
@@ -148,18 +146,17 @@ def _mc_run(theta_deg: float) -> tuple[Any, Any]:
     # it. The 35 degree panel is the binding one.
     t_in = _MC_WATER * dx / (WATER.c_p * float(np.cos(np.radians(35.0))))
     t_solid = _MC_STEEL * dx / (STEEL.c_s * float(np.cos(np.radians(47.7))))
-    t_out = (_MC_WATER - 2) * dx / (WATER.c_p
-                                    * float(np.cos(np.radians(35.0))))
-    n_active = int(np.ceil((ramp_t + 1.2 * (t_in + t_solid + t_out))
-                           / (every * sim.dt)))
+    t_out = (_MC_WATER - 2) * dx / (WATER.c_p * float(np.cos(np.radians(35.0))))
+    n_active = int(
+        np.ceil((ramp_t + 1.2 * (t_in + t_solid + t_out)) / (every * sim.dt))
+    )
     frames: list[Any] = []
     ts: list[float] = []
     for i in range(n_active * every):
         sim.step()
         t = sim.time
         r = min(t / ramp_t, 1.0)
-        drive = ((r * r * (3.0 - 2.0 * r)) * taper
-                 * np.sin(omega * t - phase_x))
+        drive = (r * r * (3.0 - 2.0 * r)) * taper * np.sin(omega * t - phase_x)
         sim.txx[_MC_SRC_ROW, src_cols] -= drive
         sim.tyy[_MC_SRC_ROW, src_cols] -= drive
         if (i + 1) % every == 0:
@@ -250,8 +247,7 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
     frames3 = (f_a, f_b, f_c)
     dx = _MC_DX
     _ny, iface, rows, cols = _mc_geometry()
-    outline = [patheffects.withStroke(linewidth=2.0,
-                                      foreground=FIELD_STROKE)]
+    outline = [patheffects.withStroke(linewidth=2.0, foreground=FIELD_STROKE)]
     # Frame coordinates in millimetres, with the contact at y = 0 and
     # depth increasing downwards.
     x0 = 0.0
@@ -269,8 +265,7 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
     # Brightness in the steel is therefore not power, and the panel says so.
     i_steel = iface - rows.start
     settled = slice(3 * n_active // 4, n_active)
-    gains = [_weak_field_gain(f[settled, i_steel:, :], _MC_VLIM)
-             for f in frames3]
+    gains = [_weak_field_gain(f[settled, i_steel:, :], _MC_VLIM) for f in frames3]
     shown = []
     for stack, gain in zip(frames3, gains, strict=True):
         copy = stack.copy()
@@ -281,30 +276,41 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
     # Reserve the bottom strip for the figure-level caption and clock:
     # fig.text does not claim space from the constrained layout on its own.
     fig.get_layout_engine().set(rect=(0.0, 0.055, 1.0, 0.945))
-    fig.suptitle(T("Mode conversion: water on steel, three incidences "
-                   "(elastic 2D FDTD)"))
+    fig.suptitle(
+        T("Mode conversion: water on steel, three incidences (elastic 2D FDTD)")
+    )
     axes = fig.subplots(1, 3, sharey=True)
     ims: list[Any] = []
     v_txts: list[Any] = []
-    for ax, theta, data, gain in zip(axes, _MC_ANGLES, shown, gains,
-                                     strict=True):
+    for ax, theta, data, gain in zip(axes, _MC_ANGLES, shown, gains, strict=True):
         ax.grid(False)
-        im = ax.imshow(data[0], origin="upper", extent=(x0, x1, y1, y0),
-                       cmap=CMAP_FIELD, vmin=-_MC_VLIM, vmax=_MC_VLIM,
-                       aspect="equal", interpolation="bilinear")
+        im = ax.imshow(
+            data[0],
+            origin="upper",
+            extent=(x0, x1, y1, y0),
+            cmap=CMAP_FIELD,
+            vmin=-_MC_VLIM,
+            vmax=_MC_VLIM,
+            aspect="equal",
+            interpolation="bilinear",
+        )
         ax.axhline(0.0, color=FIELD_INK, lw=1.0, zorder=4)
-        ax.set_title(T(f"$\\theta$ = {theta:.0f}°"), fontsize=10,
-                     )
+        ax.set_title(
+            T(f"$\\theta$ = {theta:.0f}°"),
+            fontsize=10,
+        )
         ax.tick_params(labelsize=7)
         ax.set_xlabel("x [mm]", fontsize=8)
         # Incident beam arrow, drawn from the top of the frame down onto
         # the contact at the beam axis.
         depth = -y0
-        ax.annotate("", xy=(0.5 * x1, 0.0),
-                    xytext=(0.5 * x1 - depth * float(np.tan(
-                        np.radians(theta))), y0),
-                    arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                                "lw": 1.2}, zorder=5)
+        ax.annotate(
+            "",
+            xy=(0.5 * x1, 0.0),
+            xytext=(0.5 * x1 - depth * float(np.tan(np.radians(theta))), y0),
+            arrowprops={"arrowstyle": "-|>", "color": FIELD_INK, "lw": 1.2},
+            zorder=5,
+        )
         theta_p, theta_s = _mc_snell(theta)
         for name, angle in ((T("P"), theta_p), (T("SV"), theta_s)):
             if angle is None:
@@ -312,51 +318,121 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
             slope = max(float(np.tan(np.radians(angle))), 1e-6)
             reach = min(0.8 * y1, 0.45 * x1 / slope)
             ax.annotate(
-                "", xy=(0.5 * x1 + reach * slope, reach),
+                "",
+                xy=(0.5 * x1 + reach * slope, reach),
                 xytext=(0.5 * x1, 0.0),
-                arrowprops={"arrowstyle": "-|>", "color": FIELD_INK,
-                            "lw": 1.2, "ls": "--"}, zorder=5)
+                arrowprops={
+                    "arrowstyle": "-|>",
+                    "color": FIELD_INK,
+                    "lw": 1.2,
+                    "ls": "--",
+                },
+                zorder=5,
+            )
             # Beside the arrow at 60 % of its length, never at its tip: at
             # 47.7 deg the tip is against the right edge and a label anchored
             # there is cut off.
-            ax.text(0.5 * x1 + 0.6 * reach * slope + 2.0, 0.6 * reach,
-                    T(f"{name} {angle:.1f}°"), fontsize=7,
-                    ha="left", va="center", color=FIELD_INK,
-                    path_effects=outline, zorder=6)
+            ax.text(
+                0.5 * x1 + 0.6 * reach * slope + 2.0,
+                0.6 * reach,
+                T(f"{name} {angle:.1f}°"),
+                fontsize=7,
+                ha="left",
+                va="center",
+                color=FIELD_INK,
+                path_effects=outline,
+                zorder=6,
+            )
         # Inside the steel, which is the region the gain applies to, and in
         # its top-right corner, clear of the incident arrowhead above and of
         # every Snell arrow below.
-        ax.text(x1 - 1.5, 6.0, T(_gain_note("steel", gain)), fontsize=6.5,
-                ha="right", va="top", color=FIELD_INK,
-                path_effects=outline, zorder=6)
-        v_txt = ax.text(0.5 * x1, y1 - 1.5, "", ha="center", va="bottom",
-                        color="white", fontsize=7.5, zorder=7,
-                        bbox={"boxstyle": _ANIM_PILL_BOX,
-                              "facecolor": "black", "alpha": 0.55,
-                              "edgecolor": "none"})
+        ax.text(
+            x1 - 1.5,
+            6.0,
+            T(_gain_note("steel", gain)),
+            fontsize=6.5,
+            ha="right",
+            va="top",
+            color=FIELD_INK,
+            path_effects=outline,
+            zorder=6,
+        )
+        v_txt = ax.text(
+            0.5 * x1,
+            y1 - 1.5,
+            "",
+            ha="center",
+            va="bottom",
+            color="white",
+            fontsize=7.5,
+            zorder=7,
+            bbox={
+                "boxstyle": _ANIM_PILL_BOX,
+                "facecolor": "black",
+                "alpha": 0.55,
+                "edgecolor": "none",
+            },
+        )
         ims.append(im)
         v_txts.append(v_txt)
     axes[0].set_ylabel(T("depth from the contact [mm]"), fontsize=8)
-    axes[0].text(x0 + 1.5, y0 + 1.5, T("water"), fontsize=7.5, ha="left",
-                 va="top", color=FIELD_INK, path_effects=outline, zorder=6)
-    axes[0].text(x0 + 1.5, 1.5, T("steel"), fontsize=7.5, ha="left",
-                 va="top", color=FIELD_INK, path_effects=outline, zorder=6)
+    axes[0].text(
+        x0 + 1.5,
+        y0 + 1.5,
+        T("water"),
+        fontsize=7.5,
+        ha="left",
+        va="top",
+        color=FIELD_INK,
+        path_effects=outline,
+        zorder=6,
+    )
+    axes[0].text(
+        x0 + 1.5,
+        1.5,
+        T("steel"),
+        fontsize=7.5,
+        ha="left",
+        va="top",
+        color=FIELD_INK,
+        path_effects=outline,
+        zorder=6,
+    )
     # Two lines, not one: the Spanish of these runs 10 % longer than the
     # English and a single line fills a third of the canvas edge to edge.
     verdicts = [
-        T(f"P and SV both propagate\n$|V|$ = "
-          f"{abs(_mc_reflection(_MC_ANGLES[0])):.3f}"),
-        T(f"P evanescent, SV alone crosses\n$|V|$ = "
-          f"{abs(_mc_reflection(_MC_ANGLES[1])):.3f}"),
-        T(f"both evanescent\n$|V|$ = "
-          f"{abs(_mc_reflection(_MC_ANGLES[2])):.3f}, with a phase"),
+        T(f"P and SV both propagate\n$|V|$ = {abs(_mc_reflection(_MC_ANGLES[0])):.3f}"),
+        T(
+            f"P evanescent, SV alone crosses\n$|V|$ = "
+            f"{abs(_mc_reflection(_MC_ANGLES[1])):.3f}"
+        ),
+        T(
+            f"both evanescent\n$|V|$ = "
+            f"{abs(_mc_reflection(_MC_ANGLES[2])):.3f}, with a phase"
+        ),
     ]
-    crit = fig.text(0.5, 0.030,
-                    T("critical angles: 14.5° (P), 27.5° (SV). Dashed: the "
-                      "Snell direction of each transmitted wave"),
-                    ha="center", va="bottom", fontsize=8, color=COLOR_FG)
-    t_txt = fig.text(0.988, 0.030, "", ha="right", va="bottom",
-                     family="monospace", fontsize=9, color=COLOR_FG)
+    crit = fig.text(
+        0.5,
+        0.030,
+        T(
+            "critical angles: 14.5° (P), 27.5° (SV). Dashed: the "
+            "Snell direction of each transmitted wave"
+        ),
+        ha="center",
+        va="bottom",
+        fontsize=8,
+        color=COLOR_FG,
+    )
+    t_txt = fig.text(
+        0.988,
+        0.030,
+        "",
+        ha="right",
+        va="bottom",
+        family="monospace",
+        fontsize=9,
+        color=COLOR_FG,
+    )
     reveal = int(0.80 * n_active)
 
     def update(k: int) -> tuple[Any, ...]:
@@ -367,5 +443,12 @@ def animate_elastic_mode_conversion(output_dir: str) -> None:
         t_txt.set_text(T(f"$t$ = {times[kf] * 1e6:5.1f} µs"))
         return (*ims, *v_txts, crit, t_txt)
 
-    _render_clip(fig, update, output_dir, "anim_elastic_mode_conversion",
-                 frames=n_active + 2 * _MC_FPS, fps=_MC_FPS, gif_fps=5)
+    _render_clip(
+        fig,
+        update,
+        output_dir,
+        "anim_elastic_mode_conversion",
+        frames=n_active + 2 * _MC_FPS,
+        fps=_MC_FPS,
+        gif_fps=5,
+    )

@@ -32,8 +32,10 @@ def _close_figures():
 
 def _resonator() -> m.HelmholtzResonator:
     return m.HelmholtzResonator(
-        neck_length=0.002, neck_side=0.002,
-        cavity_length=0.015, cavity_side=0.01,
+        neck_length=0.002,
+        neck_side=0.002,
+        cavity_length=0.015,
+        cavity_side=0.01,
     )
 
 
@@ -53,7 +55,9 @@ def _geometry_axes():
     yield m.plot_absorber_stack(_layers())
     yield _resonator().plot()
     yield m.plot_slit_absorber_geometry(
-        [_resonator()] * 3, slit_height=0.002, lattice_step=0.015,
+        [_resonator()] * 3,
+        slit_height=0.002,
+        lattice_step=0.015,
         period=0.02,
     )
     yield m.plot_qrd_geometry(m.qrd_well_depths(7, 500.0), 0.12, periods=2)
@@ -61,7 +65,12 @@ def _geometry_axes():
         spacing=0.05, x1=0.15, diameter=0.1, shape="circular"
     )
     yield m.plot_transmission_tube_geometry(
-        l1=0.1, s1=0.03, l2=0.15, s2=0.03, thickness=0.05, diameter=0.1,
+        l1=0.1,
+        s1=0.03,
+        l2=0.15,
+        s2=0.03,
+        thickness=0.05,
+        diameter=0.1,
         shape="square",
     )
 
@@ -96,10 +105,12 @@ def test_layered_result_retains_layers_and_draws() -> None:
     assert res.layers == tuple(layers)
     assert res.plot_geometry() is not None
     bare = m.LayeredAbsorberResult(
-        frequency=res.frequency, angle=res.angle,
+        frequency=res.frequency,
+        angle=res.angle,
         surface_impedance=res.surface_impedance,
         normalized_impedance=res.normalized_impedance,
-        reflection=res.reflection, absorption=res.absorption,
+        reflection=res.reflection,
+        absorption=res.absorption,
         transfer_matrix=res.transfer_matrix,
     )
     with pytest.raises(ValueError, match="does not retain"):
@@ -115,7 +126,10 @@ def test_single_layer_dataclasses_plot() -> None:
 
 def test_slit_result_retains_geometry_and_draws() -> None:
     res = m.slit_helmholtz_absorber(
-        FREQ, [_resonator()] * 3, slit_height=0.002, lattice_step=0.015,
+        FREQ,
+        [_resonator()] * 3,
+        slit_height=0.002,
+        lattice_step=0.015,
         period=0.02,
     )
     assert res.resonators == (_resonator(),) * 3
@@ -127,16 +141,16 @@ def test_slit_result_retains_geometry_and_draws() -> None:
 
 def test_diffuser_response_retains_wells_and_draws() -> None:
     depths = m.qrd_well_depths(7, 500.0)
-    res = m.predict_diffuser_polar_response(
-        0.12, 1000.0, depths=depths, periods=2
-    )
+    res = m.predict_diffuser_polar_response(0.12, 1000.0, depths=depths, periods=2)
     assert res.well_width == pytest.approx(0.12)
     assert res.periods == 2
     assert res.depths is not None
     assert np.allclose(res.depths, depths)
     assert res.plot_geometry() is not None
     explicit = m.predict_diffuser_polar_response(
-        0.12, 1000.0, reflection=np.exp(-2j * np.pi * np.arange(7) / 7),
+        0.12,
+        1000.0,
+        reflection=np.exp(-2j * np.pi * np.arange(7) / 7),
     )
     assert explicit.depths is None
     with pytest.raises(ValueError, match="does not retain"):
@@ -146,14 +160,22 @@ def test_diffuser_response_retains_wells_and_draws() -> None:
 def test_impedance_tube_result_draws_from_retained_geometry() -> None:
     f = np.array([500.0, 1000.0])
     res = m.two_microphone_impedance(
-        np.array([0.5 + 0.1j, 0.4 - 0.2j]), frequency=f, spacing=0.05,
-        x1=0.15, speed_of_sound=343.2, characteristic_impedance=413.0,
+        np.array([0.5 + 0.1j, 0.4 - 0.2j]),
+        frequency=f,
+        spacing=0.05,
+        x1=0.15,
+        speed_of_sound=343.2,
+        characteristic_impedance=413.0,
         diameter=0.1,
     )
     assert res.plot_geometry() is not None
     bare = m.two_microphone_impedance(
-        np.array([0.5 + 0.1j, 0.4 - 0.2j]), frequency=f, spacing=0.05,
-        x1=0.15, speed_of_sound=343.2, characteristic_impedance=413.0,
+        np.array([0.5 + 0.1j, 0.4 - 0.2j]),
+        frequency=f,
+        spacing=0.05,
+        x1=0.15,
+        speed_of_sound=343.2,
+        characteristic_impedance=413.0,
     )
     # Without a diameter the drawing still works (nominal bore, no cut-on).
     assert bare.plot_geometry() is not None
@@ -217,9 +239,7 @@ def test_impedance_tube_validation() -> None:
     with pytest.raises(ValueError, match="diameter"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, diameter=-0.1)
     with pytest.raises(ValueError, match="sample_thickness"):
-        m.plot_impedance_tube_geometry(
-            spacing=0.05, x1=0.15, sample_thickness=0.0
-        )
+        m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, sample_thickness=0.0)
     with pytest.raises(ValueError, match="Unknown language"):
         m.plot_impedance_tube_geometry(spacing=0.05, x1=0.15, language="de")
 

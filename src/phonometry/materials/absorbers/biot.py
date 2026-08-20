@@ -152,9 +152,7 @@ def frame_bulk_modulus(shear_modulus: complex, poisson_ratio: float) -> complex:
     return 2.0 * n * (nu + 1.0) / (3.0 * (1.0 - 2.0 * nu))
 
 
-def frame_elastic_coefficient(
-    shear_modulus: complex, poisson_ratio: float
-) -> complex:
+def frame_elastic_coefficient(shear_modulus: complex, poisson_ratio: float) -> complex:
     r"""Longitudinal elastic coefficient ``Kc`` of the frame in vacuum.
 
     .. math::
@@ -343,7 +341,9 @@ class BiotWavesResult:
             dtype=np.complex128,
         )
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the three Biot wavenumbers against frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -457,9 +457,7 @@ def biot_waves(
     # roots depends on this choice; every predicted quantity is invariant.
     trace = p_coef * rho22 + r_coef * rho11 - 2.0 * q_coef * rho12
     det_m = p_coef * r_coef - q_coef**2
-    discriminant = -np.sqrt(
-        trace**2 - 4.0 * det_m * (rho11 * rho22 - rho12**2)
-    )
+    discriminant = -np.sqrt(trace**2 - 4.0 * det_m * (rho11 * rho22 - rho12**2))
     delta1_sq = omega**2 * (trace - discriminant) / (2.0 * det_m)
     delta2_sq = omega**2 * (trace + discriminant) / (2.0 * det_m)
     # The shear wave, A&A Eq. (6.83).
@@ -544,11 +542,9 @@ def biot_surface_impedance(waves: BiotWavesResult, thickness: float) -> Complex:
     z2f = (r_coef + q_coef / mu2) * d2 / (phi * omega)
     z1s = (p_coef + q_coef * mu1) * d1 / omega
     z2s = (p_coef + q_coef * mu2) * d2 / omega
-    denominator = (1.0 - phi + phi * mu2) * (
-        z1s - (1.0 - phi) * z1f * mu1
-    ) * np.tan(d2 * length) + (1.0 - phi + phi * mu1) * (
-        (1.0 - phi) * z2f * mu2 - z2s
-    ) * np.tan(d1 * length)
+    denominator = (1.0 - phi + phi * mu2) * (z1s - (1.0 - phi) * z1f * mu1) * np.tan(
+        d2 * length
+    ) + (1.0 - phi + phi * mu1) * ((1.0 - phi) * z2f * mu2 - z2s) * np.tan(d1 * length)
     return np.asarray(
         -1j * (z1s * z2f * mu2 - z2s * z1f * mu1) / denominator,
         dtype=np.complex128,
@@ -599,29 +595,44 @@ def _gamma(
     shear = n_mod * (k33**2 - kt2)
     rows = (
         (
-            omega * k_t * c1, -1j * omega * k_t * s1,
-            omega * k_t * c2, -1j * omega * k_t * s2,
-            1j * omega * k33 * s3, -omega * k33 * c3,
+            omega * k_t * c1,
+            -1j * omega * k_t * s1,
+            omega * k_t * c2,
+            -1j * omega * k_t * s2,
+            1j * omega * k33 * s3,
+            -omega * k33 * c3,
         ),
         (
-            -1j * omega * k13 * s1, omega * k13 * c1,
-            -1j * omega * k23 * s2, omega * k23 * c2,
-            omega * k_t * c3, -1j * omega * k_t * s3,
+            -1j * omega * k13 * s1,
+            omega * k13 * c1,
+            -1j * omega * k23 * s2,
+            omega * k23 * c2,
+            omega * k_t * c3,
+            -1j * omega * k_t * s3,
         ),
         (
-            -1j * omega * k13 * mu1 * s1, omega * k13 * mu1 * c1,
-            -1j * omega * k23 * mu2 * s2, omega * k23 * mu2 * c2,
-            omega * k_t * mu3 * c3, -1j * omega * k_t * mu3 * s3,
+            -1j * omega * k13 * mu1 * s1,
+            omega * k13 * mu1 * c1,
+            -1j * omega * k23 * mu2 * s2,
+            omega * k23 * mu2 * c2,
+            omega * k_t * mu3 * c3,
+            -1j * omega * k_t * mu3 * s3,
         ),
         (
-            -d1 * c1, 1j * d1 * s1,
-            -d2 * c2, 1j * d2 * s2,
-            2j * n_mod * k33 * k_t * s3, -2.0 * n_mod * k33 * k_t * c3,
+            -d1 * c1,
+            1j * d1 * s1,
+            -d2 * c2,
+            1j * d2 * s2,
+            2j * n_mod * k33 * k_t * s3,
+            -2.0 * n_mod * k33 * k_t * c3,
         ),
         (
-            2j * n_mod * k_t * k13 * s1, -2.0 * n_mod * k_t * k13 * c1,
-            2j * n_mod * k_t * k23 * s2, -2.0 * n_mod * k_t * k23 * c2,
-            shear * c3, -1j * shear * s3,
+            2j * n_mod * k_t * k13 * s1,
+            -2.0 * n_mod * k_t * k13 * c1,
+            2j * n_mod * k_t * k23 * s2,
+            -2.0 * n_mod * k_t * k23 * c2,
+            shear * c3,
+            -1j * shear * s3,
         ),
         (-e1 * c1, 1j * e1 * s1, -e2 * c2, 1j * e2 * s2, zero, zero),
     )
@@ -731,9 +742,7 @@ class _Block:
 
 def _fluid_block(transfer_matrix: Complex) -> _Block:
     """A two-variable block from its ``(nf, 2, 2)`` chain matrix."""
-    identity = np.broadcast_to(
-        np.eye(2, dtype=np.complex128), transfer_matrix.shape
-    )
+    identity = np.broadcast_to(np.eye(2, dtype=np.complex128), transfer_matrix.shape)
     return _Block("fluid", transfer_matrix, np.asarray(identity), 1.0)
 
 
@@ -785,9 +794,7 @@ def _block_count(attenuation: float, owner: str) -> int:
     return pieces
 
 
-def _layer_attenuation(
-    waves: BiotWavesResult, thickness: float, k_t: Complex
-) -> float:
+def _layer_attenuation(waves: BiotWavesResult, thickness: float, k_t: Complex) -> float:
     """Nepers accumulated by the most damped Biot wave across the layer."""
     kt2 = k_t**2
     depths = [
@@ -798,9 +805,7 @@ def _layer_attenuation(
             waves.shear_wavenumber,
         )
     ]
-    return float(
-        max(float(np.max(np.abs(depth.imag))) for depth in depths) * thickness
-    )
+    return float(max(float(np.max(np.abs(depth.imag))) for depth in depths) * thickness)
 
 
 def _poroelastic_blocks(
@@ -816,9 +821,7 @@ def _poroelastic_blocks(
     """
     h = require_positive(thickness, "thickness")
     k_t = np.asarray(transverse_wavenumber, dtype=np.complex128)
-    pieces = _block_count(
-        _layer_attenuation(waves, h, k_t), "PoroelasticLayer"
-    )
+    pieces = _block_count(_layer_attenuation(waves, h, k_t), "PoroelasticLayer")
     return [_poroelastic_block(waves, h / pieces, k_t) for _ in range(pieces)]
 
 
@@ -915,9 +918,7 @@ def _stack_surface_impedance(
     for left_slot, right_slot, i_mat, j_mat in couplings:
         height = int(i_mat.shape[0])
         left_map = (
-            _identity_map(n_freq)
-            if left_slot == 0
-            else blocks[left_slot - 1].back
+            _identity_map(n_freq) if left_slot == 0 else blocks[left_slot - 1].back
         )
         matrix[:, row : row + height, offsets[left_slot] : offsets[left_slot + 1]] = (
             i_mat @ left_map
@@ -927,9 +928,9 @@ def _stack_surface_impedance(
             block_rows = j_mat @ right_map
         else:
             block_rows = np.broadcast_to(j_mat, (n_freq, *j_mat.shape))
-        matrix[
-            :, row : row + height, offsets[right_slot] : offsets[right_slot + 1]
-        ] = block_rows
+        matrix[:, row : row + height, offsets[right_slot] : offsets[right_slot + 1]] = (
+            block_rows
+        )
         row += height
 
     if termination is None:
@@ -951,9 +952,7 @@ def _stack_surface_impedance(
     # whose magnitudes differ by many orders of magnitude.
     scale = np.max(np.abs(lhs), axis=2)
     scale = np.where(scale > 0.0, scale, 1.0)
-    solution = np.linalg.solve(
-        lhs / scale[:, :, None], (rhs / scale)[:, :, None]
-    )
+    solution = np.linalg.solve(lhs / scale[:, :, None], (rhs / scale)[:, :, None])
     velocity = solution[:, 0, 0]
     # A lossless stack over a rigid wall drives the surface velocity to zero,
     # which maps to an infinite surface impedance.
@@ -965,6 +964,4 @@ def _stack_surface_impedance(
     moving = finite & (np.abs(velocity) > 0.0)
     with np.errstate(divide="ignore", invalid="ignore"):
         impedance = np.where(moving, 1.0 / np.where(moving, velocity, 1.0), np.inf + 0j)
-        return np.asarray(
-            np.where(finite, impedance, np.nan + 0j), dtype=np.complex128
-        )
+        return np.asarray(np.where(finite, impedance, np.nan + 0j), dtype=np.complex128)

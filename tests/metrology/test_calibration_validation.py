@@ -70,13 +70,9 @@ def test_validation_needs_fs_and_is_skipped_without_it() -> None:
 
 def test_custom_fluctuation_limit() -> None:
     with pytest.warns(metrology.CalibrationWarning):
-        metrology.sensitivity(
-            _cal_tone(am_depth=0.05), fs=FS, max_fluctuation_db=0.1
-        )
+        metrology.sensitivity(_cal_tone(am_depth=0.05), fs=FS, max_fluctuation_db=0.1)
     with _assert_no_calibration_warning():
-        metrology.sensitivity(
-            _cal_tone(am_depth=0.05), fs=FS, max_fluctuation_db=1.0
-        )
+        metrology.sensitivity(_cal_tone(am_depth=0.05), fs=FS, max_fluctuation_db=1.0)
 
 
 def test_empty_reference_raises() -> None:
@@ -122,18 +118,16 @@ def test_narrowband_rejects_broadband_noise() -> None:
     """A noisy calibrator take biases the broadband-RMS factor low by
     ``-10*lg(1 + 1/SNR)``; the narrowband tone estimator recovers it."""
     tone = _cal_tone(seconds=3.0)
-    tone_power = float(np.mean(tone ** 2))
+    tone_power = float(np.mean(tone**2))
     rng = np.random.default_rng(0)
     noise = rng.standard_normal(tone.size)
     # 10 dB SNR broadband noise: broadband RMS inflates ~0.42 dB.
-    noise *= np.sqrt(tone_power / 10 ** (10 / 10)) / np.sqrt(np.mean(noise ** 2))
+    noise *= np.sqrt(tone_power / 10 ** (10 / 10)) / np.sqrt(np.mean(noise**2))
     noisy = tone + noise
 
     clean = metrology.sensitivity(tone, fs=FS, validate=False)
     broadband = metrology.sensitivity(noisy, fs=FS, validate=False)
-    narrow = metrology.sensitivity(
-        noisy, fs=FS, validate=False, narrowband=True
-    )
+    narrow = metrology.sensitivity(noisy, fs=FS, validate=False, narrowband=True)
 
     broadband_bias_db = 20 * np.log10(broadband / clean)
     narrow_bias_db = 20 * np.log10(narrow / clean)
@@ -146,9 +140,7 @@ def test_narrowband_locks_to_off_nominal_tone() -> None:
     t = np.arange(int(FS * 3.0)) / FS
     tone = 0.5 * np.sin(2 * np.pi * 1003.0 * t)
     clean = metrology.sensitivity(tone, fs=FS, validate=False)
-    narrow = metrology.sensitivity(
-        tone, fs=FS, validate=False, narrowband=True
-    )
+    narrow = metrology.sensitivity(tone, fs=FS, validate=False, narrowband=True)
     assert 20 * np.log10(narrow / clean) == pytest.approx(0.0, abs=0.01)
 
 
@@ -173,7 +165,6 @@ def test_sensitivity_rejects_non_finite_samples() -> None:
     """NaN samples propagated silently to a NaN factor before; now rejected."""
     import numpy as np
     import pytest
-
 
     sig = np.sin(2 * np.pi * 1000.0 * np.arange(4800) / 48000.0)
     sig[100] = np.nan

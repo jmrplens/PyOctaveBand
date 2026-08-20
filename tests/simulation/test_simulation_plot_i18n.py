@@ -19,7 +19,10 @@ def _result() -> object:
     mask = np.zeros((30, 40), dtype=bool)
     mask[12:18, 20:22] = True
     return fdtd_simulation(
-        343.0, 9.0e-3, 3.0e-3, shape=(30, 40),
+        343.0,
+        9.0e-3,
+        3.0e-3,
+        shape=(30, 40),
         sources=[GaussianPulse(ix=7, iy=5, width=3.0e-4)],
         probes=[(10, 5), (24, 10)],
         obstacle_mask=mask,

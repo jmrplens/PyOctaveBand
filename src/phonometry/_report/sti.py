@@ -94,9 +94,7 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -115,8 +113,12 @@ def _band_table(result: STIResult, language: str = "en") -> Any:
     accent = colors.HexColor(_ACCENT_HEX)
     light = colors.HexColor(_LIGHT_HEX)
     head_style = ParagraphStyle(
-        "sti_thead", parent=getSampleStyleSheet()["Normal"], fontSize=7.2,
-        textColor=colors.white, alignment=1, leading=8.5,
+        "sti_thead",
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=7.2,
+        textColor=colors.white,
+        alignment=1,
+        leading=8.5,
     )
 
     mti = np.asarray(result.mti, dtype=np.float64)
@@ -156,12 +158,10 @@ def _statement(result: STIResult, language: str = "en") -> str:
 def _extended_terms(result: STIResult, language: str = "en") -> list[str]:
     """The Annex F qualification band and the method shown beside the box."""
     return [
-        t(
-            "Qualification band (IEC 60268-16 Annex F): {value}", language
-        ).format(value=html.escape(result.rating)),
-        t("Method: {method}", language).format(
-            method=_method_phrase(result, language)
+        t("Qualification band (IEC 60268-16 Annex F): {value}", language).format(
+            value=html.escape(result.rating)
         ),
+        t("Method: {method}", language).format(method=_method_phrase(result, language)),
     ]
 
 
@@ -258,7 +258,9 @@ def render_sti_report(
     flow.append(Spacer(1, 8))
 
     left_cell = [
-        Paragraph(t("Octave-band modulation transfer index MTI", language), caption_style),
+        Paragraph(
+            t("Octave-band modulation transfer index MTI", language), caption_style
+        ),
         _band_table(result, language),
     ]
     plot_drawing = render_figure_drawing(
@@ -269,7 +271,9 @@ def render_sti_report(
 
     flow.append(
         result_box(
-            _statement(result, language), styles, accent,
+            _statement(result, language),
+            styles,
+            accent,
             _extended_terms(result, language),
         )
     )

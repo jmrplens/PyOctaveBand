@@ -253,7 +253,9 @@ class PorousMediumResult:
         k0 = 2.0 * np.pi * self.frequency / self.speed_of_sound
         return np.asarray(self.wavenumber / k0, dtype=np.complex128)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the normalised ``Zc`` and ``k`` components against frequency.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -344,8 +346,7 @@ def delany_bazley(
         except KeyError:
             options = ", ".join(sorted(DELANY_BAZLEY_COEFFICIENTS))
             raise ValueError(
-                f"unknown coefficient preset {coefficients!r}; "
-                f"options: {options}."
+                f"unknown coefficient preset {coefficients!r}; options: {options}."
             ) from None
         model = f"delany_bazley[{coefficients}]"
     else:
@@ -494,8 +495,7 @@ def johnson_champoux_allard(
     omega = 2.0 * np.pi * f
     # Effective density, Cox & D'Antonio Eq. (6.19).
     g_v = np.sqrt(
-        1.0
-        + 4.0j * t_inf**2 * eta * rho0 * omega / (sigma**2 * lam_v**2 * phi**2)
+        1.0 + 4.0j * t_inf**2 * eta * rho0 * omega / (sigma**2 * lam_v**2 * phi**2)
     )
     rho_e = (t_inf * rho0 / phi) * (
         1.0 + sigma * phi / (1j * omega * rho0 * t_inf) * g_v

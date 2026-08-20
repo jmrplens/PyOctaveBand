@@ -56,7 +56,9 @@ def _positive(value: float, name: str) -> float:
     return scalar
 
 
-def _positive_array(values: NDArray[np.float64] | list[float] | float, name: str) -> NDArray[np.float64]:
+def _positive_array(
+    values: NDArray[np.float64] | list[float] | float, name: str
+) -> NDArray[np.float64]:
     arr = np.atleast_1d(np.asarray(values, dtype=np.float64))
     if arr.size == 0 or not np.all(np.isfinite(arr)):
         raise ValueError(f"'{name}' must be finite and non-empty.")
@@ -96,12 +98,16 @@ def spreading_loss(
         if transition_range is None:
             raise ValueError("'transition_range' is required for the 'practical' law.")
         r0 = _positive(transition_range, "transition_range")
-        return np.where(r <= r0, 20.0 * np.log10(r), 20.0 * np.log10(r0) + 10.0 * np.log10(r / r0))
+        return np.where(
+            r <= r0, 20.0 * np.log10(r), 20.0 * np.log10(r0) + 10.0 * np.log10(r / r0)
+        )
     raise ValueError(f"'law' must be one of {_SPREADING_LAWS}, got {law!r}.")
 
 
 def _thorp(f_khz: NDArray[np.float64]) -> NDArray[np.float64]:
-    return 1.0936 * (0.1 * f_khz**2 / (1.0 + f_khz**2) + 40.0 * f_khz**2 / (4100.0 + f_khz**2))
+    return 1.0936 * (
+        0.1 * f_khz**2 / (1.0 + f_khz**2) + 40.0 * f_khz**2 / (4100.0 + f_khz**2)
+    )
 
 
 def _francois_garrison(
@@ -141,7 +147,15 @@ def _ainslie_mccolm(
     f1 = 0.78 * (s / 35.0) ** 0.5 * np.exp(t / 26.0)
     f2 = 42.0 * np.exp(t / 17.0)
     boric = 0.106 * f1 * f_khz**2 / (f_khz**2 + f1**2) * np.exp((ph - 8.0) / 0.56)
-    mgso4 = 0.52 * (1.0 + t / 43.0) * (s / 35.0) * f2 * f_khz**2 / (f_khz**2 + f2**2) * np.exp(-z_km / 6.0)
+    mgso4 = (
+        0.52
+        * (1.0 + t / 43.0)
+        * (s / 35.0)
+        * f2
+        * f_khz**2
+        / (f_khz**2 + f2**2)
+        * np.exp(-z_km / 6.0)
+    )
     water = 0.00049 * f_khz**2 * np.exp(-(t / 27.0 + z_km / 17.0))
     return np.asarray(boric + mgso4 + water, dtype=np.float64)
 
@@ -210,12 +224,16 @@ class PropagationLossResult:
     law: str
     model: str
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the propagation loss versus range with its two contributions."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_propagation_loss
 
-        return plot_propagation_loss(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_propagation_loss(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def propagation_loss(
@@ -250,7 +268,12 @@ def propagation_loss(
     spreading = spreading_loss(r, law=law, transition_range=transition_range)
     alpha = float(
         seawater_absorption(
-            f, temperature=temperature, salinity=salinity, depth=depth, ph=ph, model=model
+            f,
+            temperature=temperature,
+            salinity=salinity,
+            depth=depth,
+            ph=ph,
+            model=model,
         )[0]
     )
     absorption = alpha * (r / _M_PER_KM)

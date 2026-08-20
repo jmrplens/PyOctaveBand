@@ -198,7 +198,9 @@ def _language(relative: str) -> str:
     return "es" if relative.startswith("es/") else "en"
 
 
-def _claims(path: Path, base: Path, markup: dict[str, str]) -> tuple[list[Claim], list[str]]:
+def _claims(
+    path: Path, base: Path, markup: dict[str, str]
+) -> tuple[list[Claim], list[str]]:
     relative = path.relative_to(base).as_posix()
     parser = _ScopeParser(markup, relative)
     parser.feed(path.read_text(encoding="utf-8"))
@@ -224,7 +226,9 @@ def _claims(path: Path, base: Path, markup: dict[str, str]) -> tuple[list[Claim]
     return claims, parser.problems
 
 
-def collect(base: Path, pattern: str, markup: dict[str, str]) -> tuple[list[Claim], list[str]]:
+def collect(
+    base: Path, pattern: str, markup: dict[str, str]
+) -> tuple[list[Claim], list[str]]:
     """Every claim under a tree, in path order."""
     claims: list[Claim] = []
     problems: list[str] = []
@@ -262,7 +266,9 @@ def main() -> int:
         "also proves the components emitted what the pages asked for",
     )
     parser.add_argument("--status", choices=STATUSES, help="only claims of this side")
-    parser.add_argument("--lang", choices=("en", "es"), help="only claims in this language")
+    parser.add_argument(
+        "--lang", choices=("en", "es"), help="only claims in this language"
+    )
     parser.add_argument(
         "--format", choices=("table", "json"), default="table", help="output shape"
     )
@@ -283,7 +289,11 @@ def main() -> int:
         claims = [claim for claim in claims if claim.lang == args.lang]
 
     if args.format == "json":
-        print(json.dumps([asdict(claim) for claim in claims], ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                [asdict(claim) for claim in claims], ensure_ascii=False, indent=2
+            )
+        )
     else:
         _print_table(claims)
         _print_census(claims)

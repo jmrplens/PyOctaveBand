@@ -51,7 +51,7 @@ Chebyshev identities, :math:`\lvert H_1 \rvert = 1 + 3 a_3/4`,
 :math:`\lvert H_3 \rvert = a_3/4` (phase :math:`\pi`), and a THD(f) equal to
 the closed form :math:`\sqrt{(a_2/2)^2 + (a_3/4)^2} / (1 + 3 a_3/4)` -- which
 also matches :func:`phonometry.electroacoustics.thd` measured tone by tone on
-the same system. """
+the same system."""
 
 from __future__ import annotations
 
@@ -252,8 +252,7 @@ class SweptSineDistortionResult:
         from .._plot.electroacoustics import plot_swept_sine_distortion
 
         check_language(language)
-        return plot_swept_sine_distortion(self, ax=ax, language=language,
-                                          **kwargs)
+        return plot_swept_sine_distortion(self, ax=ax, language=language, **kwargs)
 
 
 def _analytic_inverse_spectrum(
@@ -271,9 +270,13 @@ def _analytic_inverse_spectrum(
     """
     with np.errstate(divide="ignore", invalid="ignore"):
         f_safe = np.maximum(freqs, np.finfo(np.float64).tiny)
-        spectrum = 2.0 * np.sqrt(f_safe / rate) * np.exp(
-            -2j * np.pi * freqs * rate * (1.0 - np.log(f_safe / f1))
-            + 1j * np.pi / 4.0
+        spectrum = (
+            2.0
+            * np.sqrt(f_safe / rate)
+            * np.exp(
+                -2j * np.pi * freqs * rate * (1.0 - np.log(f_safe / f1))
+                + 1j * np.pi / 4.0
+            )
         )
     spectrum[0] = 0.0
     return np.asarray(spectrum, dtype=np.complex128)
@@ -366,9 +369,7 @@ def _thd_curves(
     f1: float,
     f2: float,
     method: str,
-) -> tuple[
-    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
-]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     r"""THD(f) and per-order ratios referenced to the fundamental.
 
     At each excitation frequency :math:`f` the order-``n`` product is
@@ -465,9 +466,7 @@ def _harmonic_window(
     if ir_length is not None:
         window = int(ir_length)
         if window < _MIN_IR_LENGTH:
-            raise ValueError(
-                f"'ir_length' must be at least {_MIN_IR_LENGTH} samples."
-            )
+            raise ValueError(f"'ir_length' must be at least {_MIN_IR_LENGTH} samples.")
     else:
         window = _default_ir_length(min_spacing)
         if window < _MIN_IR_LENGTH:
@@ -619,9 +618,7 @@ def swept_sine_distortion(
     if n_orders < 2:
         raise ValueError("'n_harmonics' must be at least 2.")
 
-    rate, duration, sweep_samples = _sweep_timing(
-        method, fs_v, f1_v, f2_v, seconds_v
-    )
+    rate, duration, sweep_samples = _sweep_timing(method, fs_v, f1_v, f2_v, seconds_v)
     if rec.size < sweep_samples:
         raise ValueError(
             f"'recorded' has {rec.size} samples but the sweep lasts "
@@ -633,9 +630,7 @@ def swept_sine_distortion(
     delays_samples = rate * np.log(orders) * fs_v
     window = _harmonic_window(ir_length, delays_samples, n_orders)
     if method == "farina":
-        _check_farina_span(
-            delays_samples, window, sweep_samples, f1_v, f2_v, n_orders
-        )
+        _check_farina_span(delays_samples, window, sweep_samples, f1_v, f2_v, n_orders)
 
     signal = rec / amplitude_v
     if remove_dc:
@@ -646,9 +641,7 @@ def swept_sine_distortion(
         buffer = _deconvolve_synchronized(signal, fs_v, f1_v, rate, pad)
     else:
         fade_v = 0.01 if fade is None else float(fade)
-        buffer = _deconvolve_farina(
-            signal, fs_v, f1_v, f2_v, seconds_v, fade_v
-        )
+        buffer = _deconvolve_farina(signal, fs_v, f1_v, f2_v, seconds_v, fade_v)
 
     irs, responses = _window_harmonics(buffer, delays_samples, window)
     frequencies = np.asarray(np.fft.rfftfreq(window, 1.0 / fs_v), dtype=np.float64)

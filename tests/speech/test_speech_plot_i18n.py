@@ -102,6 +102,7 @@ def test_stoi_es() -> None:
     assert "Correlación" in text
     plt.close("all")
 
+
 def test_sti_with_a_non_octave_band_set_es() -> None:
     """A result whose MTI is not the seven octave bands gets a plain axis."""
     res = ph.speech.STIResult(
@@ -115,4 +116,3 @@ def test_sti_with_a_non_octave_band_set_es() -> None:
     assert ax.get_xlabel() == "Banda"
     assert "calificación" in ax.get_title()
     plt.close("all")
-

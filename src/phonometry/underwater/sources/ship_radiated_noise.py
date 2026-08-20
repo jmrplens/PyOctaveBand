@@ -154,12 +154,16 @@ class ShipSourceLevelResult:
     source_depth: float
     sound_speed: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot RNL, source level and the ΔL surface correction vs frequency."""
         from ..._i18n import check_language
         from ..._plot.underwater import plot_ship_source_level
 
-        return plot_ship_source_level(self, ax=ax, language=check_language(language), **kwargs)
+        return plot_ship_source_level(
+            self, ax=ax, language=check_language(language), **kwargs
+        )
 
 
 def monopole_source_level(

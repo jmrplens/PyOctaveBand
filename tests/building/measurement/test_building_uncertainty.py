@@ -31,12 +31,49 @@ from phonometry.building.measurement.uncertainty import (
 
 # Frequency axes from the standard.
 FREQ_FULL = [
-    50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-    630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000,
+    50,
+    63,
+    80,
+    100,
+    125,
+    160,
+    200,
+    250,
+    315,
+    400,
+    500,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+    4000,
+    5000,
 ]
 FREQ_IMPACT = [
-    50, 63, 80, 100, 125, 160, 200, 250, 315, 400,
-    630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000,
+    50,
+    63,
+    80,
+    100,
+    125,
+    160,
+    200,
+    250,
+    315,
+    400,
+    630,
+    800,
+    1000,
+    1250,
+    1600,
+    2000,
+    2500,
+    3150,
+    4000,
+    5000,
 ]
 
 
@@ -44,13 +81,27 @@ FREQ_IMPACT = [
 # Table 2 — airborne one-third-octave (Clause 7.2), every band digit-exact.
 # --------------------------------------------------------------------------- #
 TABLE2 = {
-    50: (6.8, 4.0, 2.0), 63: (4.6, 3.6, 1.8), 80: (3.8, 3.2, 1.6),
-    100: (3.0, 2.8, 1.4), 125: (2.7, 2.4, 1.2), 160: (2.4, 2.0, 1.0),
-    200: (2.1, 1.8, 0.9), 250: (1.8, 1.6, 0.8), 315: (1.8, 1.4, 0.7),
-    400: (1.8, 1.2, 0.6), 500: (1.8, 1.1, 0.6), 630: (1.8, 1.0, 0.6),
-    800: (1.8, 1.0, 0.6), 1000: (1.8, 1.0, 0.6), 1250: (1.8, 1.0, 0.6),
-    1600: (1.8, 1.0, 0.6), 2000: (1.8, 1.0, 0.6), 2500: (1.9, 1.3, 0.6),
-    3150: (2.0, 1.6, 0.6), 4000: (2.4, 1.9, 0.6), 5000: (2.8, 2.2, 0.6),
+    50: (6.8, 4.0, 2.0),
+    63: (4.6, 3.6, 1.8),
+    80: (3.8, 3.2, 1.6),
+    100: (3.0, 2.8, 1.4),
+    125: (2.7, 2.4, 1.2),
+    160: (2.4, 2.0, 1.0),
+    200: (2.1, 1.8, 0.9),
+    250: (1.8, 1.6, 0.8),
+    315: (1.8, 1.4, 0.7),
+    400: (1.8, 1.2, 0.6),
+    500: (1.8, 1.1, 0.6),
+    630: (1.8, 1.0, 0.6),
+    800: (1.8, 1.0, 0.6),
+    1000: (1.8, 1.0, 0.6),
+    1250: (1.8, 1.0, 0.6),
+    1600: (1.8, 1.0, 0.6),
+    2000: (1.8, 1.0, 0.6),
+    2500: (1.9, 1.3, 0.6),
+    3150: (2.0, 1.6, 0.6),
+    4000: (2.4, 1.9, 0.6),
+    5000: (2.8, 2.2, 0.6),
 }
 
 
@@ -66,11 +117,26 @@ def test_table2_airborne_every_band(situation, col):
 # Table 4 — impact one-third-octave (Clause 7.3). No 500 Hz in the 2020 edition.
 # --------------------------------------------------------------------------- #
 TABLE4 = {
-    50: (3.2, 1.5), 63: (2.8, 1.4), 80: (2.4, 1.3), 100: (2.0, 1.2),
-    125: (1.6, 1.1), 160: (1.4, 1.0), 200: (1.3, 0.9), 250: (1.2, 0.8),
-    315: (1.2, 0.8), 400: (1.2, 0.8), 630: (1.2, 0.8), 800: (1.2, 0.8),
-    1000: (1.2, 0.8), 1250: (1.3, 0.8), 1600: (1.4, 0.8), 2000: (1.5, 0.8),
-    2500: (1.7, 1.0), 3150: (1.9, 1.2), 4000: (2.1, 1.4), 5000: (2.3, 1.6),
+    50: (3.2, 1.5),
+    63: (2.8, 1.4),
+    80: (2.4, 1.3),
+    100: (2.0, 1.2),
+    125: (1.6, 1.1),
+    160: (1.4, 1.0),
+    200: (1.3, 0.9),
+    250: (1.2, 0.8),
+    315: (1.2, 0.8),
+    400: (1.2, 0.8),
+    630: (1.2, 0.8),
+    800: (1.2, 0.8),
+    1000: (1.2, 0.8),
+    1250: (1.3, 0.8),
+    1600: (1.4, 0.8),
+    2000: (1.5, 0.8),
+    2500: (1.7, 1.0),
+    3150: (1.9, 1.2),
+    4000: (2.1, 1.4),
+    5000: (2.3, 1.6),
 }
 
 
@@ -92,8 +158,27 @@ def test_impact_has_no_situation_a():
 # Table 6 — reduction ΔL one-third-octave (Clause 7.4), situation A only.
 # --------------------------------------------------------------------------- #
 TABLE6_A = [
-    1.4, 1.3, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.2,
-    1.3, 1.6, 1.9, 2.2, 2.5, 2.8, 3.2, 3.6, 4.0, 4.4,
+    1.4,
+    1.3,
+    1.2,
+    1.1,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.1,
+    1.2,
+    1.3,
+    1.6,
+    1.9,
+    2.2,
+    2.5,
+    2.8,
+    3.2,
+    3.6,
+    4.0,
+    4.4,
 ]
 
 
@@ -114,8 +199,27 @@ def test_reduction_only_situation_a(situation):
 # Annex D Table D.1 — σR95 airborne (situation A upper limit), digit-exact.
 # --------------------------------------------------------------------------- #
 TABLED1 = [
-    11.7, 6.7, 5.9, 5.0, 5.0, 3.8, 3.3, 3.3, 3.3, 3.3, 3.3,
-    3.3, 3.3, 3.3, 3.4, 3.4, 3.4, 3.5, 3.6, 4.0, 4.7,
+    11.7,
+    6.7,
+    5.9,
+    5.0,
+    5.0,
+    3.8,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.3,
+    3.4,
+    3.4,
+    3.4,
+    3.5,
+    3.6,
+    4.0,
+    4.7,
 ]
 
 
@@ -138,8 +242,27 @@ def test_sigma_r95_only_airborne():
 def test_table1_maximum_repeatability():
     result = maximum_repeatability_standard_deviation()
     expected = [
-        4.0, 3.5, 3.0, 2.6, 2.2, 1.9, 1.7, 1.5, 1.4, 1.3, 1.3,
-        1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3,
+        4.0,
+        3.5,
+        3.0,
+        2.6,
+        2.2,
+        1.9,
+        1.7,
+        1.5,
+        1.4,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
+        1.3,
     ]
     assert list(result.frequencies) == FREQ_FULL
     for u, e in zip(result.uncertainties, expected, strict=True):
@@ -209,10 +332,14 @@ def test_delta_lw_only_situation_a(situation):
 # --------------------------------------------------------------------------- #
 TABLED2 = {
     "r_w": 2.0,
-    "r_w+c_100_3150": 2.1, "r_w+c_100_5000": 2.1,
-    "r_w+c_50_3150": 2.1, "r_w+c_50_5000": 2.1,
-    "r_w+ctr_100_3150": 2.4, "r_w+ctr_100_5000": 2.4,
-    "r_w+ctr_50_3150": 2.4, "r_w+ctr_50_5000": 2.4,
+    "r_w+c_100_3150": 2.1,
+    "r_w+c_100_5000": 2.1,
+    "r_w+c_50_3150": 2.1,
+    "r_w+c_50_5000": 2.1,
+    "r_w+ctr_100_3150": 2.4,
+    "r_w+ctr_100_5000": 2.4,
+    "r_w+ctr_50_3150": 2.4,
+    "r_w+ctr_50_5000": 2.4,
 }
 
 
@@ -238,7 +365,14 @@ def test_sigma_r95_single_number_impact_absent():
 # --------------------------------------------------------------------------- #
 @pytest.mark.parametrize(
     "confidence,k",
-    [(0.68, 1.00), (0.80, 1.28), (0.90, 1.65), (0.95, 1.96), (0.99, 2.58), (0.999, 3.29)],
+    [
+        (0.68, 1.00),
+        (0.80, 1.28),
+        (0.90, 1.65),
+        (0.95, 1.96),
+        (0.99, 2.58),
+        (0.999, 3.29),
+    ],
 )
 def test_table8_two_sided(confidence, k):
     assert insulation_coverage_factor(confidence, one_sided=False) == pytest.approx(k)
@@ -246,7 +380,14 @@ def test_table8_two_sided(confidence, k):
 
 @pytest.mark.parametrize(
     "confidence,k",
-    [(0.84, 1.00), (0.90, 1.28), (0.95, 1.65), (0.975, 1.96), (0.995, 2.58), (0.9995, 3.29)],
+    [
+        (0.84, 1.00),
+        (0.90, 1.28),
+        (0.95, 1.65),
+        (0.975, 1.96),
+        (0.995, 2.58),
+        (0.9995, 3.29),
+    ],
 )
 def test_table8_one_sided(confidence, k):
     assert insulation_coverage_factor(confidence, one_sided=True) == pytest.approx(k)
@@ -279,14 +420,16 @@ def test_coverage_factors_table_is_read_only():
 # --------------------------------------------------------------------------- #
 def test_expanded_uncertainty_two_sided():
     # Rw situation A, u = 1.2 dB, 95 % two-sided -> k = 1.96.
-    assert insulation_expanded_uncertainty(1.2, coverage=0.95) == pytest.approx(1.96 * 1.2)
+    assert insulation_expanded_uncertainty(1.2, coverage=0.95) == pytest.approx(
+        1.96 * 1.2
+    )
 
 
 def test_expanded_uncertainty_one_sided():
     # Conformity check at 95 % one-sided -> k = 1.65.
-    assert insulation_expanded_uncertainty(1.2, coverage=0.95, one_sided=True) == pytest.approx(
-        1.65 * 1.2
-    )
+    assert insulation_expanded_uncertainty(
+        1.2, coverage=0.95, one_sided=True
+    ) == pytest.approx(1.65 * 1.2)
 
 
 def test_coverage_minimum_k_is_one():
@@ -424,12 +567,15 @@ def test_the_bare_names_are_gone():
         with pytest.raises(AttributeError):
             getattr(bu, name)
     assert bu.insulation_coverage_factor(0.95) == insulation_coverage_factor(0.95)
-    assert bu.insulation_expanded_uncertainty(1.2) == insulation_expanded_uncertainty(1.2)
+    assert bu.insulation_expanded_uncertainty(1.2) == insulation_expanded_uncertainty(
+        1.2
+    )
 
 
 # ---------------------------------------------------------------------------
 # Annex B worked example (Tables B.1/B.2)
 # ---------------------------------------------------------------------------
+
 
 def test_annex_b_uncorrelated_single_number_uncertainties() -> None:
     """Formula (B.2) on the Table B.1 spectrum gives u(Rw+C50-5000) = 0,6 dB
@@ -486,15 +632,19 @@ def test_annex_b_correlated_adaptation_sum_uncertainties() -> None:
     ui = np.asarray(ref.ISO12999_1_ANNEX_B_UI)
 
     def rw_plus_c(spectrum: np.ndarray, shift: np.ndarray) -> float:
-        return float(
-            -10.0 * np.log10(np.sum(10.0 ** ((spectrum - ri + shift) / 10.0)))
-        )
+        return float(-10.0 * np.log10(np.sum(10.0 ** ((spectrum - ri + shift) / 10.0))))
 
     for spectrum, printed, unrounded in (
-        (np.asarray(_SPECTRUM1_50_5000, dtype=float),
-         ref.ISO12999_1_ANNEX_B_U_CORR_C, 2.05),
-        (np.asarray(_SPECTRUM2_50_5000, dtype=float),
-         ref.ISO12999_1_ANNEX_B_U_CORR_CTR, 2.63),
+        (
+            np.asarray(_SPECTRUM1_50_5000, dtype=float),
+            ref.ISO12999_1_ANNEX_B_U_CORR_C,
+            2.05,
+        ),
+        (
+            np.asarray(_SPECTRUM2_50_5000, dtype=float),
+            ref.ISO12999_1_ANNEX_B_U_CORR_CTR,
+            2.63,
+        ),
     ):
         u = (rw_plus_c(spectrum, -ui) - rw_plus_c(spectrum, +ui)) / 2.0
         assert u == pytest.approx(unrounded, abs=0.01)

@@ -42,6 +42,7 @@ install:
 
 lint:
 	$(RUFF) check .
+	$(RUFF) format --check .
 	$(MYPY) src scripts
 
 format:

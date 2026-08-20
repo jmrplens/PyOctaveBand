@@ -89,8 +89,7 @@ _STRINGS: dict[str, str] = {
     _MAGNITUDE_LABEL: "Magnitud [dB]",
     "Phase [deg]": "Fase [grados]",
     r"Coherence $\gamma^2$": r"Coherencia $\gamma^2$",
-    r"Harmonic order $n$  ($f = n \cdot f_1$)":
-        r"Orden del armónico $n$  ($f = n \cdot f_1$)",
+    r"Harmonic order $n$  ($f = n \cdot f_1$)": r"Orden del armónico $n$  ($f = n \cdot f_1$)",
     "Level re fundamental [dB]": "Nivel respecto al fundamental [dB]",
     "Harmonics": "Armónicos",
     "Frequency response": "Respuesta en frecuencia",
@@ -130,22 +129,18 @@ _STRINGS: dict[str, str] = {
     # --- Sound-reinforcement gain before feedback (Long Ch. 18) ---
     "Open-loop gain $Z_\\mathrm{S}$": "Ganancia en lazo abierto $Z_\\mathrm{S}$",
     "Feedback-loop gain $G_\\mathrm{S}$": "Ganancia del lazo de realimentación $G_\\mathrm{S}$",
-    r"Open microphones $\Delta L_{\mathrm{nom}}$":
-        r"Micrófonos abiertos $\Delta L_{\mathrm{nom}}$",
+    r"Open microphones $\Delta L_{\mathrm{nom}}$": r"Micrófonos abiertos $\Delta L_{\mathrm{nom}}$",
     "Total loop gain": "Ganancia total del lazo",
     "Gain [dB]": "Ganancia [dB]",
     "Oscillation (0 dB)": "Oscilación (0 dB)",
     "Stability limit ({margin} dB margin)": "Límite de estabilidad (margen de {margin} dB)",
-    "Gain before feedback — stable, {head} dB spare":
-        "Ganancia antes de la realimentación — estable, {head} dB de reserva",
-    "Gain before feedback — unstable by {head} dB":
-        "Ganancia antes de la realimentación — inestable en {head} dB",
+    "Gain before feedback — stable, {head} dB spare": "Ganancia antes de la realimentación — estable, {head} dB de reserva",
+    "Gain before feedback — unstable by {head} dB": "Ganancia antes de la realimentación — inestable en {head} dB",
     "Talker (T)": "Hablante (T)",
     "Microphone (M)": "Micrófono (M)",
     "Loudspeaker (H)": "Altavoz (H)",
     "Listener (L)": "Oyente (L)",
-    "Sound-reinforcement feedback geometry":
-        "Geometría de realimentación del sistema de refuerzo sonoro",
+    "Sound-reinforcement feedback geometry": "Geometría de realimentación del sistema de refuerzo sonoro",
 }
 
 
@@ -156,8 +151,11 @@ def _t(text: str, language: str = "en", **fmt: Any) -> str:
 
 
 def plot_harmonic_distortion(
-    result: HarmonicDistortionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: HarmonicDistortionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Harmonic amplitude spectrum with the harmonics marked and THD annotated.
 
@@ -212,9 +210,13 @@ def plot_harmonic_distortion(
     localize_axes(ax, language)
     return ax
 
+
 def plot_modulation_distortion(
-    result: ModulationDistortionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: ModulationDistortionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Carrier and modulation sidebands with the per-order distortion annotated.
 
@@ -253,8 +255,13 @@ def plot_modulation_distortion(
     floor = -120.0
 
     ax.vlines([result.f_high], floor, [0.0], color=_C_SECONDARY, lw=1.8)
-    ax.plot([result.f_high], [0.0], "s", color=_C_SECONDARY,
-            label=_t("Carrier $f_2$", language))
+    ax.plot(
+        [result.f_high],
+        [0.0],
+        "s",
+        color=_C_SECONDARY,
+        label=_t("Carrier $f_2$", language),
+    )
     ax.vlines(sb_freqs, floor, np.maximum(sb_db, floor), color=_C_PRIMARY, lw=1.5)
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t(r"Sidebands $f_2 \pm n \cdot f_1$", language))
@@ -289,8 +296,11 @@ def plot_modulation_distortion(
 
 
 def plot_frequency_response(
-    result: FrequencyResponseResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: FrequencyResponseResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Bode magnitude / phase and coherence of an estimated frequency response.
 
@@ -352,8 +362,11 @@ def plot_frequency_response(
 
 
 def plot_swept_sine_distortion(
-    result: SweptSineDistortionResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: SweptSineDistortionResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes | np.ndarray:
     """Harmonic frequency responses and THD(f) of a swept-sine measurement.
 
@@ -418,7 +431,11 @@ def plot_swept_sine_distortion(
     axes[0].set_ylabel(_t(_MAGNITUDE_LABEL, language))
     axes[0].set_xlabel(_t(_FREQ_LABEL, language))
     axes[0].set_title(
-        _t("Harmonic frequency responses ({method} sweep)", language, method=result.method)
+        _t(
+            "Harmonic frequency responses ({method} sweep)",
+            language,
+            method=result.method,
+        )
     )
     axes[0].grid(True, which="both", alpha=0.3)
     axes[0].legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
@@ -432,8 +449,11 @@ def plot_swept_sine_distortion(
 
 
 def plot_piston_impedance(
-    result: RadiatingPistonResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: RadiatingPistonResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Normalized radiation resistance and reactance of a baffled piston.
 
@@ -454,12 +474,21 @@ def plot_piston_impedance(
     kwargs.setdefault("color", _C_PRIMARY)
     kwargs.setdefault("label", _t("$R_1$ (resistance)", language))
     ax.semilogx(ka, np.asarray(result.resistance), lw=1.8, **kwargs)
-    ax.semilogx(ka, np.asarray(result.reactance), color=_C_SECONDARY, lw=1.8,
-                ls="--", label=_t("$X_1$ (reactance)", language))
-    ax.axhline(1.0, color=_C_TERTIARY, ls=":", lw=1.0,
-               label=r"$R_1 \to 1$ ($ka \gg 1$)")
+    ax.semilogx(
+        ka,
+        np.asarray(result.reactance),
+        color=_C_SECONDARY,
+        lw=1.8,
+        ls="--",
+        label=_t("$X_1$ (reactance)", language),
+    )
+    ax.axhline(
+        1.0, color=_C_TERTIARY, ls=":", lw=1.0, label=r"$R_1 \to 1$ ($ka \gg 1$)"
+    )
     ax.set_xlabel(r"$ka$")
-    ax.set_ylabel(_t(r"Normalized radiation impedance $Z_\mathrm{r} / \rho c S$", language))
+    ax.set_ylabel(
+        _t(r"Normalized radiation impedance $Z_\mathrm{r} / \rho c S$", language)
+    )
     ax.set_title(_t("Baffled circular piston radiation impedance", language))
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="best", fontsize="small")
@@ -487,8 +516,11 @@ def _sign_theta_labels(ax: Any) -> None:
 
 
 def plot_piston_directivity(
-    result: PistonDirectivity, ax: Any | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: PistonDirectivity,
+    ax: Any | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Far-field directivity (beam) pattern of a baffled circular piston.
 
@@ -513,7 +545,8 @@ def plot_piston_directivity(
     ka = np.asarray(result.ka, dtype=np.float64)
     levels = np.clip(
         np.asarray(result.directivity_db, dtype=np.float64),
-        -_POLAR_SPAN_PISTON_DB, 0.0,
+        -_POLAR_SPAN_PISTON_DB,
+        0.0,
     )
     colors = (_C_PRIMARY, _C_SECONDARY, _C_TERTIARY, _C_REFERENCE, _C_EDGE)
     # Axis (theta = 0) points up; positive angles swing clockwise so the front
@@ -526,7 +559,9 @@ def plot_piston_directivity(
     for i, ka_value in enumerate(ka):
         label = f"$ka$ = {decimal_comma(f'{ka_value:.3g}', language)}"
         line_kwargs: dict[str, Any] = {
-            "color": colors[i % len(colors)], "lw": 1.6, "label": label,
+            "color": colors[i % len(colors)],
+            "lw": 1.6,
+            "label": label,
         }
         if ka.size == 1:
             # User overrides (color, label, ...) apply only to a single-curve
@@ -540,8 +575,12 @@ def plot_piston_directivity(
     ax.grid(True, ls=":", lw=0.4, alpha=0.7)
     ax.set_title(_t("Baffled circular piston directivity", language))
     if ka.size > 1:
-        ax.legend(loc=_LEGEND_LOWER_CENTER, bbox_to_anchor=(0.5, -0.12),
-                  ncol=min(ka.size, 3), fontsize="small")
+        ax.legend(
+            loc=_LEGEND_LOWER_CENTER,
+            bbox_to_anchor=(0.5, -0.12),
+            ncol=min(ka.size, 3),
+            fontsize="small",
+        )
     localize_axes(ax, language)
     axes: Axes = ax
     return axes
@@ -588,19 +627,29 @@ def _draw_loudspeaker_response(
     ref = float(result.reference_level_db)
     tol = float(result.tolerance_db)
     top = float(np.ceil((max(float(np.max(spl)), ref + tol) + 2.0) / 5.0) * 5.0)
-    ax.axhspan(ref - tol, ref + tol, facecolor=_C_TOL_BAND, edgecolor="none",
-               zorder=0,
-               label=_t(_TOLERANCE_LABEL, language, tol=_fmt_num(tol, language)))
+    ax.axhspan(
+        ref - tol,
+        ref + tol,
+        facecolor=_C_TOL_BAND,
+        edgecolor="none",
+        zorder=0,
+        label=_t(_TOLERANCE_LABEL, language, tol=_fmt_num(tol, language)),
+    )
     ax.axhline(ref, color=_C_EDGE, lw=0.8, ls="--")
-    ax.axhline(ref - 10.0, color=_C_REFERENCE, lw=0.8, ls=":",
-               label=_t("−10 dB reference", language))
-    ax.semilogx(f, spl, color=_C_PRIMARY, lw=1.4,
-                label=_t(_ON_AXIS_RESPONSE, language))
+    ax.axhline(
+        ref - 10.0,
+        color=_C_REFERENCE,
+        lw=0.8,
+        ls=":",
+        label=_t("−10 dB reference", language),
+    )
+    ax.semilogx(f, spl, color=_C_PRIMARY, lw=1.4, label=_t(_ON_AXIS_RESPONSE, language))
     lo, hi = result.effective_range
     for edge in (lo, hi):
         ax.axvline(edge, color=_C_TERTIARY, lw=0.9, ls="-.")
-    ax.plot([], [], color=_C_TERTIARY, lw=0.9, ls="-.",
-            label=_t(_EFFECTIVE_RANGE, language))
+    ax.plot(
+        [], [], color=_C_TERTIARY, lw=0.9, ls="-.", label=_t(_EFFECTIVE_RANGE, language)
+    )
     ax.set_xlim(float(np.min(f)), float(np.max(f)))
     ax.set_ylim(top - _RESPONSE_SPAN_LSP, top)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
@@ -615,12 +664,23 @@ def _draw_impedance(
     result: LoudspeakerCharacteristics, ax: Axes, *, language: str = "en"
 ) -> None:
     """Impedance modulus with the rated and 80 %-of-rated reference lines (16)."""
-    ax.semilogx(result.impedance_frequencies, result.impedance_modulus,
-                color=_C_PRIMARY, lw=1.3)
-    ax.axhline(result.rated_impedance, color=_C_EDGE, lw=0.8, ls="--",
-               label=_t("Rated impedance", language))
-    ax.axhline(0.8 * result.rated_impedance, color=_C_REFERENCE, lw=0.8, ls=":",
-               label=_t("80 % of rated", language))
+    ax.semilogx(
+        result.impedance_frequencies, result.impedance_modulus, color=_C_PRIMARY, lw=1.3
+    )
+    ax.axhline(
+        result.rated_impedance,
+        color=_C_EDGE,
+        lw=0.8,
+        ls="--",
+        label=_t("Rated impedance", language),
+    )
+    ax.axhline(
+        0.8 * result.rated_impedance,
+        color=_C_REFERENCE,
+        lw=0.8,
+        ls=":",
+        label=_t("80 % of rated", language),
+    )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Impedance $|Z|$ [{ohm}]", language, ohm=_OHM_TEXT))
     ax.set_ylim(bottom=0.0)
@@ -645,11 +705,15 @@ def _draw_loudspeaker_thd(
 
 def _draw_datasheet_polar(
     result: LoudspeakerCharacteristics | MicrophoneCharacteristics,
-    ax: Any, *, language: str = "en",
+    ax: Any,
+    *,
+    language: str = "en",
 ) -> None:
     """Polar directivity to the IEC 60263 clause 3 25 dB reference-circle scale."""
     angles = np.asarray(result.polar_angles_deg, dtype=np.float64)
-    levels = np.clip(np.asarray(result.polar_db, dtype=np.float64), -_POLAR_SPAN_DB, 0.0)
+    levels = np.clip(
+        np.asarray(result.polar_db, dtype=np.float64), -_POLAR_SPAN_DB, 0.0
+    )
     # Mirror a one-sided pattern about the reference axis for a full rose.
     if float(np.min(angles)) >= 0.0:
         angles = np.concatenate([-angles[::-1], angles])
@@ -667,8 +731,11 @@ def _draw_datasheet_polar(
     ax.grid(True, ls=":", lw=0.4, alpha=0.7)
     title = _t("Directional response", language)
     if result.polar_frequency is not None:
-        title = _t("Directional response at {freq} Hz", language,
-                   freq=_freq_label(result.polar_frequency, language))
+        title = _t(
+            "Directional response at {freq} Hz",
+            language,
+            freq=_freq_label(result.polar_frequency, language),
+        )
     ax.set_title(title)
 
 
@@ -680,18 +747,31 @@ def _draw_microphone_response(
     rel = np.asarray(result.response_db, dtype=np.float64)
     tol = float(result.tolerance_db)
     top = float(np.ceil((max(float(np.max(rel)), tol) + 2.0) / 5.0) * 5.0)
-    ax.axhspan(-tol, tol, facecolor=_C_TOL_BAND, edgecolor="none", zorder=0,
-               label=_t(_TOLERANCE_LABEL, language, tol=_fmt_num(tol, language)))
+    ax.axhspan(
+        -tol,
+        tol,
+        facecolor=_C_TOL_BAND,
+        edgecolor="none",
+        zorder=0,
+        label=_t(_TOLERANCE_LABEL, language, tol=_fmt_num(tol, language)),
+    )
     ax.axhline(0.0, color=_C_EDGE, lw=0.8, ls="--")
-    ax.axvline(result.reference_frequency, color=_C_SECONDARY, lw=0.8, ls=":",
-               label=_t("Reference frequency", language))
-    ax.semilogx(f, rel, color=_C_PRIMARY, lw=1.4,
-                label=_t(_FREE_FIELD_RESPONSE, language))
+    ax.axvline(
+        result.reference_frequency,
+        color=_C_SECONDARY,
+        lw=0.8,
+        ls=":",
+        label=_t("Reference frequency", language),
+    )
+    ax.semilogx(
+        f, rel, color=_C_PRIMARY, lw=1.4, label=_t(_FREE_FIELD_RESPONSE, language)
+    )
     lo, hi = result.effective_range
     for edge in (lo, hi):
         ax.axvline(edge, color=_C_TERTIARY, lw=0.9, ls="-.")
-    ax.plot([], [], color=_C_TERTIARY, lw=0.9, ls="-.",
-            label=_t(_EFFECTIVE_RANGE, language))
+    ax.plot(
+        [], [], color=_C_TERTIARY, lw=0.9, ls="-.", label=_t(_EFFECTIVE_RANGE, language)
+    )
     ax.set_xlim(float(np.min(f)), float(np.max(f)))
     ax.set_ylim(top - _RESPONSE_SPAN_MIC, top)
     ax.set_xlabel(_t(_FREQ_LABEL, language))
@@ -706,8 +786,9 @@ def _draw_noise_spectrum(
     result: MicrophoneCharacteristics, ax: Axes, *, language: str = "en"
 ) -> None:
     """Inherent-noise equivalent band-level spectrum (17.2 b)."""
-    ax.semilogx(result.noise_frequencies, result.noise_band_levels_db,
-                color=_C_PRIMARY, lw=1.3)
+    ax.semilogx(
+        result.noise_frequencies, result.noise_band_levels_db, color=_C_PRIMARY, lw=1.3
+    )
     ax.set_xlabel(_t(_FREQ_LABEL, language))
     ax.set_ylabel(_t("Band level [dB]", language))
     _grid(ax)
@@ -719,15 +800,31 @@ def _draw_microphone_distortion(
     result: MicrophoneCharacteristics, ax: Axes, *, language: str = "en"
 ) -> None:
     """Total harmonic distortion against sound pressure level (14.2/15.2)."""
-    ax.plot(np.asarray(result.distortion_spl_db, dtype=np.float64),
-            np.asarray(result.distortion_thd_percent, dtype=np.float64),
-            color=_C_PRIMARY, lw=1.3)
-    ax.axhline(result.max_spl_thd_percent, color=_C_REFERENCE, lw=0.8, ls=":",
-               label=_t("{thd} % limit", language,
-                        thd=_fmt_num(result.max_spl_thd_percent, language)))
+    ax.plot(
+        np.asarray(result.distortion_spl_db, dtype=np.float64),
+        np.asarray(result.distortion_thd_percent, dtype=np.float64),
+        color=_C_PRIMARY,
+        lw=1.3,
+    )
+    ax.axhline(
+        result.max_spl_thd_percent,
+        color=_C_REFERENCE,
+        lw=0.8,
+        ls=":",
+        label=_t(
+            "{thd} % limit",
+            language,
+            thd=_fmt_num(result.max_spl_thd_percent, language),
+        ),
+    )
     if result.max_spl_db is not None:
-        ax.axvline(result.max_spl_db, color=_C_EDGE, lw=0.8, ls="--",
-                   label=_t("Max. SPL", language))
+        ax.axvline(
+            result.max_spl_db,
+            color=_C_EDGE,
+            lw=0.8,
+            ls="--",
+            label=_t("Max. SPL", language),
+        )
     ax.set_xlabel(_t(_SPL_LABEL, language))
     ax.set_ylabel(_t(_THD_LABEL, language))
     ax.set_ylim(bottom=0.0)
@@ -782,9 +879,7 @@ def _plot_one_quantity(
 
     if quantity not in table:
         allowed = ", ".join(repr(q) for q in table)
-        raise ValueError(
-            f"unknown quantity {quantity!r}; choose one of {allowed}."
-        )
+        raise ValueError(f"unknown quantity {quantity!r}; choose one of {allowed}.")
     drawer, polar, attr = table[quantity]
     if attr is not None and getattr(result, attr) is None:
         raise ValueError(missing[quantity])
@@ -796,8 +891,12 @@ def _plot_one_quantity(
 
 
 def plot_loudspeaker_characteristics(
-    result: LoudspeakerCharacteristics, quantity: str = "response",
-    ax: Axes | None = None, *, language: str = "en", **kwargs: Any,
+    result: LoudspeakerCharacteristics,
+    quantity: str = "response",
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Plot one IEC 60268-5 loudspeaker rated characteristic on a single axes.
 
@@ -831,8 +930,12 @@ def plot_loudspeaker_characteristics(
 
 
 def plot_microphone_characteristics(
-    result: MicrophoneCharacteristics, quantity: str = "response",
-    ax: Axes | None = None, *, language: str = "en", **kwargs: Any,
+    result: MicrophoneCharacteristics,
+    quantity: str = "response",
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Plot one IEC 60268-4 microphone rated characteristic on a single axes.
 
@@ -866,8 +969,11 @@ def plot_microphone_characteristics(
 
 
 def plot_feedback_stability(
-    result: FeedbackStabilityResult, ax: Axes | None = None, *,
-    language: str = "en", **kwargs: Any
+    result: FeedbackStabilityResult,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    **kwargs: Any,
 ) -> Axes:
     """Gain structure of a reinforcement loop against its stability limits.
 
@@ -901,24 +1007,50 @@ def plot_feedback_stability(
         ],
         dtype=np.float64,
     )
-    colors = [_C_PRIMARY, _C_SECONDARY, _C_TERTIARY,
-              _C_REFERENCE if not result.is_stable else _C_EDGE]
+    colors = [
+        _C_PRIMARY,
+        _C_SECONDARY,
+        _C_TERTIARY,
+        _C_REFERENCE if not result.is_stable else _C_EDGE,
+    ]
     kwargs.setdefault("width", 0.62)
-    ax.bar(np.arange(values.size), values, color=colors, edgecolor=_C_EDGE,
-           linewidth=0.6, zorder=3, **kwargs)
+    ax.bar(
+        np.arange(values.size),
+        values,
+        color=colors,
+        edgecolor=_C_EDGE,
+        linewidth=0.6,
+        zorder=3,
+        **kwargs,
+    )
     for i, value in enumerate(values):
         ax.annotate(
             format_number(value, language, decimals=1) + " dB",
-            xy=(i, value), xytext=(0, 4 if value >= 0.0 else -12),
-            textcoords=_OFFSET_POINTS, ha="center", fontsize=8,
+            xy=(i, value),
+            xytext=(0, 4 if value >= 0.0 else -12),
+            textcoords=_OFFSET_POINTS,
+            ha="center",
+            fontsize=8,
         )
-    ax.axhline(0.0, color=_C_REFERENCE, ls="-", lw=1.2, zorder=2,
-               label=_t("Oscillation (0 dB)", language))
     ax.axhline(
-        -result.stability_margin, color=_C_TERTIARY, ls="--", lw=1.3, zorder=2,
-        label=_t("Stability limit ({margin} dB margin)", language,
-                 margin=format_number(result.stability_margin, language,
-                                      decimals=0)),
+        0.0,
+        color=_C_REFERENCE,
+        ls="-",
+        lw=1.2,
+        zorder=2,
+        label=_t("Oscillation (0 dB)", language),
+    )
+    ax.axhline(
+        -result.stability_margin,
+        color=_C_TERTIARY,
+        ls="--",
+        lw=1.3,
+        zorder=2,
+        label=_t(
+            "Stability limit ({margin} dB margin)",
+            language,
+            margin=format_number(result.stability_margin, language, decimals=0),
+        ),
     )
     ax.set_xticks(np.arange(values.size))
     ax.set_xticklabels(labels, fontsize=8)
@@ -927,8 +1059,7 @@ def plot_feedback_stability(
     ax.set_title(
         _t("Gain before feedback — stable, {head} dB spare", language, head=head)
         if result.is_stable
-        else _t("Gain before feedback — unstable by {head} dB", language,
-                head=head)
+        else _t("Gain before feedback — unstable by {head} dB", language, head=head)
     )
     ax.grid(True, axis="y", alpha=0.3)
     ax.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")

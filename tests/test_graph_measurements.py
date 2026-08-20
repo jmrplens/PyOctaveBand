@@ -41,9 +41,7 @@ def _analytic_a_db(f: np.ndarray) -> np.ndarray:
     """IEC 61672-1 analytic A-weighting curve."""
     f2 = np.asarray(f, dtype=float) ** 2
     ra = (12194**2 * f2**2) / (
-        (f2 + 20.6**2)
-        * np.sqrt((f2 + 107.7**2) * (f2 + 737.9**2))
-        * (f2 + 12194**2)
+        (f2 + 20.6**2) * np.sqrt((f2 + 107.7**2) * (f2 + 737.9**2)) * (f2 + 12194**2)
     )
     return 20 * np.log10(ra) + 2.0
 
@@ -87,8 +85,12 @@ def test_graph_a_curve_shows_positive_bump() -> None:
 def test_graph_curves_anchor_at_1khz() -> None:
     """Both weightings are normalized to 0 dB at 1 kHz; the figure must agree."""
     for curve in ("A", "C"):
-        _, mag = generate_graphs.measure_weighting_response(FS, curve, np.array([1000.0]))
-        assert mag[0] == pytest.approx(0.0, abs=0.1), f"{curve} at 1 kHz: {mag[0]:+.2f} dB"
+        _, mag = generate_graphs.measure_weighting_response(
+            FS, curve, np.array([1000.0])
+        )
+        assert mag[0] == pytest.approx(0.0, abs=0.1), (
+            f"{curve} at 1 kHz: {mag[0]:+.2f} dB"
+        )
 
 
 def test_graph_b_curve_matches_published_table() -> None:
@@ -139,8 +141,11 @@ def test_graph_au_trace_is_a_plus_the_u_lowpass() -> None:
     own AU and A traces is the U response. The extra 0,2 dB of slack covers
     the 1 kHz row, whose published tolerance is exactly zero.
     """
-    rows = [row for row in IEC61012_TABLE1
-            if row[0] in (1000.0, 8000.0, 16000.0, 20000.0, 40000.0)]
+    rows = [
+        row
+        for row in IEC61012_TABLE1
+        if row[0] in (1000.0, 8000.0, 16000.0, 20000.0, 40000.0)
+    ]
     freqs = np.array([row[0] for row in rows])
     _, mag_au = generate_graphs.measure_weighting_response(SPECIAL_FS, "AU", freqs)
     _, mag_a = generate_graphs.measure_weighting_response(SPECIAL_FS, "A", freqs)

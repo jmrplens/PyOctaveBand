@@ -49,9 +49,7 @@ def test_long_table_8_1_orders_and_frequencies() -> None:
     itself is consistent with c0 = 344.7 m/s, so each printed value sits
     slightly above the c0 = 344 m/s closed form (see the next test).
     """
-    result = room.room_modes(
-        LONG_ROOM, max_frequency=61.0, speed_of_sound=LONG_C0
-    )
+    result = room.room_modes(LONG_ROOM, max_frequency=61.0, speed_of_sound=LONG_C0)
     assert len(result.frequencies) == len(LONG_TABLE_8_1)
     for row, (orders, _) in zip(result.orders, LONG_TABLE_8_1):
         assert tuple(int(v) for v in row) == orders
@@ -82,18 +80,14 @@ def test_mode_frequency_closed_form() -> None:
 
 def test_mode_frequency_accepts_an_array_of_triples() -> None:
     orders = np.array([[1, 0, 0], [0, 1, 0]])
-    f = np.asarray(
-        room.room_mode_frequency(orders, LONG_ROOM, speed_of_sound=LONG_C0)
-    )
+    f = np.asarray(room.room_mode_frequency(orders, LONG_ROOM, speed_of_sound=LONG_C0))
     assert f.shape == (2,)
     assert f[0] == pytest.approx(LONG_C0 / 14.0)
     assert f[1] == pytest.approx(LONG_C0 / 10.0)
 
 
 def test_classification_counts_non_zero_orders() -> None:
-    result = room.room_modes(
-        LONG_ROOM, max_frequency=200.0, speed_of_sound=LONG_C0
-    )
+    result = room.room_modes(LONG_ROOM, max_frequency=200.0, speed_of_sound=LONG_C0)
     for orders, kind in zip(result.orders, result.kinds):
         assert kind == room.MODE_KINDS[int(np.count_nonzero(orders)) - 1]
     counts = result.count_by_kind()
@@ -110,16 +104,12 @@ def test_cubic_room_modes_are_degenerate() -> None:
     c0 sqrt(3)/8: the coalescing that Long warns about for integer-ratio rooms.
     """
     c0 = 344.0
-    result = room.room_modes(
-        (4.0, 4.0, 4.0), max_frequency=80.0, speed_of_sound=c0
-    )
+    result = room.room_modes((4.0, 4.0, 4.0), max_frequency=80.0, speed_of_sound=c0)
     freqs = np.asarray(result.frequencies)
     axial = freqs[np.asarray(result.kinds) == "axial"]
     assert np.count_nonzero(np.isclose(axial, c0 / 8.0)) == 3
     tangential = freqs[np.asarray(result.kinds) == "tangential"]
-    assert np.count_nonzero(
-        np.isclose(tangential, c0 * math.sqrt(2.0) / 8.0)
-    ) == 3
+    assert np.count_nonzero(np.isclose(tangential, c0 * math.sqrt(2.0) / 8.0)) == 3
     oblique = freqs[np.asarray(result.kinds) == "oblique"]
     assert oblique[0] == pytest.approx(c0 * math.sqrt(3.0) / 8.0)
     # The listing stays sorted despite the exact ties.
@@ -128,9 +118,7 @@ def test_cubic_room_modes_are_degenerate() -> None:
 
 def test_long_modal_density_34_modes_per_hertz_at_1_khz() -> None:
     """Long, printed p. 326: 34 modes per hertz at 1 kHz for the 7 x 5 x 3 m room."""
-    density = room.room_modal_density(
-        1000.0, LONG_ROOM, speed_of_sound=LONG_C0
-    )
+    density = room.room_modal_density(1000.0, LONG_ROOM, speed_of_sound=LONG_C0)
     assert round(float(density)) == 34
 
 
@@ -147,22 +135,18 @@ def test_mode_count_matches_its_closed_form() -> None:
         + math.pi / 4.0 * surface * x**2
         + edges / 8.0 * x
     )
-    assert float(
-        room.room_mode_count(f, LONG_ROOM, speed_of_sound=LONG_C0)
-    ) == (pytest.approx(expected))
+    assert float(room.room_mode_count(f, LONG_ROOM, speed_of_sound=LONG_C0)) == (
+        pytest.approx(expected)
+    )
 
 
 def test_modal_density_is_the_derivative_of_the_count() -> None:
     """Equation (8.46) is d/df of Equation (8.45) (central difference)."""
     f, h = 500.0, 1e-3
     up = float(room.room_mode_count(f + h, LONG_ROOM, speed_of_sound=LONG_C0))
-    down = float(
-        room.room_mode_count(f - h, LONG_ROOM, speed_of_sound=LONG_C0)
-    )
+    down = float(room.room_mode_count(f - h, LONG_ROOM, speed_of_sound=LONG_C0))
     numeric = (up - down) / (2.0 * h)
-    analytic = float(
-        room.room_modal_density(f, LONG_ROOM, speed_of_sound=LONG_C0)
-    )
+    analytic = float(room.room_modal_density(f, LONG_ROOM, speed_of_sound=LONG_C0))
     assert numeric == pytest.approx(analytic, rel=1e-7)
 
 
@@ -174,12 +158,11 @@ def test_smooth_count_tracks_the_exact_enumeration_at_high_frequency() -> None:
     """
     f_max = 400.0
     exact = len(
-        room.room_modes(LONG_ROOM, max_frequency=f_max, speed_of_sound=LONG_C0)
-        .frequencies
+        room.room_modes(
+            LONG_ROOM, max_frequency=f_max, speed_of_sound=LONG_C0
+        ).frequencies
     )
-    smooth = float(
-        room.room_mode_count(f_max, LONG_ROOM, speed_of_sound=LONG_C0)
-    )
+    smooth = float(room.room_mode_count(f_max, LONG_ROOM, speed_of_sound=LONG_C0))
     assert exact > 800
     assert smooth == pytest.approx(exact, rel=0.01)
 
@@ -190,24 +173,17 @@ def test_result_geometry_properties() -> None:
     assert result.surface_area == pytest.approx(142.0)
     assert result.edge_length == pytest.approx(60.0)
     assert result.density(1000.0) == pytest.approx(
-        room.room_modal_density(
-            1000.0, LONG_ROOM, speed_of_sound=result.speed_of_sound
-        )
+        room.room_modal_density(1000.0, LONG_ROOM, speed_of_sound=result.speed_of_sound)
     )
 
 
 def test_schroeder_frequency_is_the_shared_implementation() -> None:
     """The result reuses phonometry.room.schroeder_frequency, not a copy."""
-    result = room.room_modes(
-        LONG_ROOM, max_frequency=80.0, reverberation_time=0.8
-    )
+    result = room.room_modes(LONG_ROOM, max_frequency=80.0, reverberation_time=0.8)
     assert result.schroeder_frequency == pytest.approx(
         float(np.asarray(room.schroeder_frequency(0.8, 105.0))[()])
     )
-    assert (
-        room.room_modes(LONG_ROOM, max_frequency=80.0).schroeder_frequency
-        is None
-    )
+    assert room.room_modes(LONG_ROOM, max_frequency=80.0).schroeder_frequency is None
 
 
 def test_zero_order_mode_is_excluded() -> None:
@@ -254,9 +230,7 @@ def test_plot_returns_two_panels_and_marks_the_schroeder_frequency() -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    result = room.room_modes(
-        LONG_ROOM, max_frequency=150.0, reverberation_time=0.8
-    )
+    result = room.room_modes(LONG_ROOM, max_frequency=150.0, reverberation_time=0.8)
     axes = result.plot()
     assert isinstance(axes, np.ndarray)
     assert axes.size == 2

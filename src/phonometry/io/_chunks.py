@@ -86,14 +86,16 @@ WAVE_FORMAT_EXTENSIBLE = 0xFFFE
 #: writes by default), GSM and MP3-in-WAV. Reading them is possible (via the
 #: ``[audio]`` extra) but levels computed from them are not metrologically
 #: defensible, which is why the reader warns.
-LOSSY_FORMAT_TAGS: frozenset[int] = frozenset({
-    WAVE_FORMAT_ADPCM,
-    WAVE_FORMAT_ALAW,
-    WAVE_FORMAT_MULAW,
-    WAVE_FORMAT_IMA_ADPCM,
-    WAVE_FORMAT_GSM610,
-    WAVE_FORMAT_MPEGLAYER3,
-})
+LOSSY_FORMAT_TAGS: frozenset[int] = frozenset(
+    {
+        WAVE_FORMAT_ADPCM,
+        WAVE_FORMAT_ALAW,
+        WAVE_FORMAT_MULAW,
+        WAVE_FORMAT_IMA_ADPCM,
+        WAVE_FORMAT_GSM610,
+        WAVE_FORMAT_MPEGLAYER3,
+    }
+)
 
 _FORMAT_TAG_NAMES: dict[int, str] = {
     WAVE_FORMAT_PCM: "PCM",
@@ -124,8 +126,24 @@ _AMBISONIC_TAIL = b"\x21\x07\xd3\x11\x86\x44\xc8\xc1\xca\x00\x00\x00"
 #: channel to that position, lowest bit first, so a mask of 0x3 labels a
 #: stereo pair front left, front right.
 CHANNEL_MASK_LABELS: tuple[str, ...] = (
-    "FL", "FR", "FC", "LFE", "BL", "BR", "FLC", "FRC", "BC",
-    "SL", "SR", "TC", "TFL", "TFC", "TFR", "TBL", "TBC", "TBR",
+    "FL",
+    "FR",
+    "FC",
+    "LFE",
+    "BL",
+    "BR",
+    "FLC",
+    "FRC",
+    "BC",
+    "SL",
+    "SR",
+    "TC",
+    "TFL",
+    "TFC",
+    "TFR",
+    "TBL",
+    "TBC",
+    "TBR",
 )
 
 #: ``struct`` layout of the fixed part of ``bext`` v2 (EBU Tech 3285, 2011).
@@ -187,7 +205,9 @@ class FormatChunk:
     @property
     def format_name(self) -> str:
         """Human-readable codec name for the resolved tag."""
-        name = _FORMAT_TAG_NAMES.get(self.resolved_tag, f"tag 0x{self.resolved_tag:04X}")
+        name = _FORMAT_TAG_NAMES.get(
+            self.resolved_tag, f"tag 0x{self.resolved_tag:04X}"
+        )
         return f"ambisonic B-format {name}" if self.ambisonic else name
 
     @property
@@ -350,7 +370,9 @@ class WavChunks:
         (mandatory there) is believed first, then a nonzero ``ds64``
         sample count, with the block-align quotient as the last resort.
         """
-        by_blocks = self.data_size // self.fmt.block_align if self.fmt.block_align else 0
+        by_blocks = (
+            self.data_size // self.fmt.block_align if self.fmt.block_align else 0
+        )
         if self.fmt.resolved_tag in (WAVE_FORMAT_PCM, WAVE_FORMAT_IEEE_FLOAT):
             return by_blocks
         if self.fact_frames:
@@ -378,13 +400,24 @@ def _parse_bext(payload: bytes) -> BroadcastMetadata:
             f"part is {_BEXT_FIXED.size}"
         )
     (
-        description, originator, originator_reference, origination_date,
-        origination_time, time_low, time_high, version, umid,
-        loudness_value, loudness_range, max_true_peak,
-        max_momentary, max_short_term, _reserved,
+        description,
+        originator,
+        originator_reference,
+        origination_date,
+        origination_time,
+        time_low,
+        time_high,
+        version,
+        umid,
+        loudness_value,
+        loudness_range,
+        max_true_peak,
+        max_momentary,
+        max_short_term,
+        _reserved,
     ) = _BEXT_FIXED.unpack_from(payload)
     coding_history = (
-        payload[_BEXT_FIXED.size:].split(b"\x00", 1)[0].decode("latin-1").rstrip()
+        payload[_BEXT_FIXED.size :].split(b"\x00", 1)[0].decode("latin-1").rstrip()
     )
     v2 = version >= 2
     return BroadcastMetadata(
@@ -449,8 +482,7 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
     """
     if len(payload) < 4:
         raise ValueError(
-            f"cue chunk is {len(payload)} bytes; its uint32 record count "
-            "requires 4"
+            f"cue chunk is {len(payload)} bytes; its uint32 record count requires 4"
         )
     (count,) = struct.unpack_from("<I", payload)
     needed = 4 + 24 * count
@@ -464,14 +496,16 @@ def _parse_cue(payload: bytes) -> tuple[CuePoint, ...]:
         cue_id, position, chunk_id, chunk_start, block_start, sample_offset = (
             struct.unpack_from("<II4sIII", payload, 4 + 24 * i)
         )
-        points.append(CuePoint(
-            cue_id=cue_id,
-            position=position,
-            chunk_id=chunk_id,
-            chunk_start=chunk_start,
-            block_start=block_start,
-            sample_offset=sample_offset,
-        ))
+        points.append(
+            CuePoint(
+                cue_id=cue_id,
+                position=position,
+                chunk_id=chunk_id,
+                chunk_start=chunk_start,
+                block_start=block_start,
+                sample_offset=sample_offset,
+            )
+        )
     return tuple(points)
 
 
@@ -482,9 +516,7 @@ def _parse_ds64(payload: bytes, path: str | Path) -> Ds64Chunk:
             f"{path}: ds64 chunk is {len(payload)} bytes; the "
             "riffSize, dataSize and sampleCount fields require 24"
         )
-    riff_size, chunk_data_size, sample_count = struct.unpack_from(
-        "<QQQ", payload
-    )
+    riff_size, chunk_data_size, sample_count = struct.unpack_from("<QQQ", payload)
     return Ds64Chunk(
         riff_size=riff_size,
         data_size=chunk_data_size,
@@ -512,8 +544,7 @@ def _read_wave_header(fh: BinaryIO, path: str | Path) -> str:
     containers = {b"RIFF": "WAV", b"RF64": "RF64", b"BW64": "BW64"}
     if fourcc not in containers:
         raise ValueError(
-            f"{path}: unknown container fourcc {fourcc!r} "
-            "(expected RIFF, RF64 or BW64)"
+            f"{path}: unknown container fourcc {fourcc!r} (expected RIFF, RF64 or BW64)"
         )
     return containers[fourcc]
 
@@ -654,7 +685,8 @@ def parse_wav_chunks(path: str | Path) -> WavChunks:
             _check_chunk_extent(chunk_id, size, fh.tell(), file_size, path)
             if chunk_id in _DECODED_CHUNKS:
                 seen.absorb(
-                    chunk_id, _read_chunk_payload(fh, chunk_id, size, path),
+                    chunk_id,
+                    _read_chunk_payload(fh, chunk_id, size, path),
                     path,
                 )
                 continue

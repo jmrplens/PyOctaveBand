@@ -50,7 +50,7 @@ rating bands 100 Hz to 3150 Hz; a wider clause 6.3 spectrum (18 bands 100-5000
 Hz, optionally extended to 50 Hz) is rated on that sub-range. The statement of
 results (Clause 8 e)) also carries the spectrum adaptation term `CI,Δ` (ISO
 717-2:2020 Formula (A.4)) via
-[`phonometry.building.impact_improvement_adaptation_term`](/phonometry/reference/api/building/ratings/#impact_improvement_adaptation_term). 
+[`phonometry.building.impact_improvement_adaptation_term`](/phonometry/reference/api/building/ratings/#impact_improvement_adaptation_term).
 
 > Auto-generated from the source docstrings by `scripts/generate_api_docs.py` (`make api-docs`). Do not edit by hand.
 

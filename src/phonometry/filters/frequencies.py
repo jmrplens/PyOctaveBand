@@ -41,7 +41,9 @@ def nominal_frequencies(
     freq_d = freq / _bandedge(g, fraction)
     freq_u = freq * _bandedge(g, fraction)
 
-    labels = [_format_nominal_freq(_nominal_freq_for_band(f, fraction)) for f in freq.tolist()]
+    labels = [
+        _format_nominal_freq(_nominal_freq_for_band(f, fraction)) for f in freq.tolist()
+    ]
     return freq.tolist(), freq_d.tolist(), freq_u.tolist(), labels
 
 
@@ -138,7 +140,7 @@ def _iec_e3_round(f: float) -> float:
     if f <= 0:
         return f
     exponent = int(np.floor(np.log10(f)))
-    msd = f / (10.0 ** exponent)
+    msd = f / (10.0**exponent)
     step = 10.0 ** (exponent - 2) if msd < 5.0 else 10.0 ** (exponent - 1)
     return round(f / step) * step
 
@@ -147,7 +149,7 @@ def _iec_e3_round(f: float) -> float:
 def _extended_preferred(frac: int) -> list[float]:
     """Cached expansion of the IEC preferred frequency table across decades."""
     base = normalized_frequencies(frac)
-    return [f * (10 ** d) for d in range(-3, 4) for f in base]
+    return [f * (10**d) for d in range(-3, 4) for f in base]
 
 
 def _nominal_freq_for_band(exact_freq: float, fraction: float) -> float:
@@ -196,9 +198,39 @@ def normalized_frequencies(fraction: int) -> list[float]:
     predefined = {
         1: [16, 31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
         3: [
-            12.5, 16, 20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500,
-            630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000,
-            12500, 16000, 20000,
+            12.5,
+            16,
+            20,
+            25,
+            31.5,
+            40,
+            50,
+            63,
+            80,
+            100,
+            125,
+            160,
+            200,
+            250,
+            315,
+            400,
+            500,
+            630,
+            800,
+            1000,
+            1250,
+            1600,
+            2000,
+            2500,
+            3150,
+            4000,
+            5000,
+            6300,
+            8000,
+            10000,
+            12500,
+            16000,
+            20000,
         ],
     }
     if fraction not in predefined:

@@ -26,19 +26,82 @@ _PDF_MAGIC = b"%PDF"
 # The committed clean-room example (V = 200 m3, S = 10.8 m2, 20 degC -> c = 343,
 # m = 0); alpha_s(500 Hz) = 0.33 and alpha_s(1000 Hz) = 0.61 by Eq. (8)/(9).
 _FREQS = np.array(
-    [100, 125, 160, 200, 250, 315, 400, 500, 630, 800,
-     1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000],
+    [
+        100,
+        125,
+        160,
+        200,
+        250,
+        315,
+        400,
+        500,
+        630,
+        800,
+        1000,
+        1250,
+        1600,
+        2000,
+        2500,
+        3150,
+        4000,
+        5000,
+    ],
     dtype=float,
 )
-_T1 = np.array([9.0, 9.0, 8.8, 8.6, 8.4, 8.2, 8.0, 7.8, 7.5, 7.2,
-                6.9, 6.6, 6.2, 5.8, 5.4, 5.0, 4.6, 4.2])
-_T2 = np.array([8.4, 8.2, 7.7, 7.2, 6.5, 5.7, 4.9, 4.2, 3.6, 3.15,
-                2.85, 2.65, 2.55, 2.5, 2.55, 2.6, 2.7, 2.85])
+_T1 = np.array(
+    [
+        9.0,
+        9.0,
+        8.8,
+        8.6,
+        8.4,
+        8.2,
+        8.0,
+        7.8,
+        7.5,
+        7.2,
+        6.9,
+        6.6,
+        6.2,
+        5.8,
+        5.4,
+        5.0,
+        4.6,
+        4.2,
+    ]
+)
+_T2 = np.array(
+    [
+        8.4,
+        8.2,
+        7.7,
+        7.2,
+        6.5,
+        5.7,
+        4.9,
+        4.2,
+        3.6,
+        3.15,
+        2.85,
+        2.65,
+        2.55,
+        2.5,
+        2.55,
+        2.6,
+        2.7,
+        2.85,
+    ]
+)
 
 
 def _result():
     return measure_sound_absorption(
-        _FREQS, _T1, _T2, volume=200.0, area=10.8, temperature=20.0,
+        _FREQS,
+        _T1,
+        _T2,
+        volume=200.0,
+        area=10.8,
+        temperature=20.0,
         humidity=54.0,
     )
 
@@ -72,9 +135,9 @@ def _assert_one_page(path: str) -> None:
 def _text(path: str) -> str:
     from pypdf import PdfReader
 
-    return "\n".join(
-        page.extract_text() for page in PdfReader(path).pages
-    ).replace("\n", " ")
+    return "\n".join(page.extract_text() for page in PdfReader(path).pages).replace(
+        "\n", " "
+    )
 
 
 def test_report_writes_one_page_pdf(tmp_path) -> None:
@@ -123,14 +186,12 @@ def test_verbose_shows_areas_and_times_one_page(tmp_path) -> None:
     _assert_one_page(str(out))
     text = _text(str(out))
     assert "7.80" in text  # T1(500 Hz)
-    assert "7.7" in text   # A2(500 Hz) = 7.677 m2 rounded to 0.1
+    assert "7.7" in text  # A2(500 Hz) = 7.677 m2 rounded to 0.1
 
 
 def test_metadata_xml_specials_do_not_break(tmp_path) -> None:
     out = tmp_path / "iso354_xml.pdf"
-    _result().report(
-        str(out), metadata=_metadata(specimen="Panel <A> & <B> \"edge\"")
-    )
+    _result().report(str(out), metadata=_metadata(specimen='Panel <A> & <B> "edge"'))
     _assert_one_page(str(out))
 
 

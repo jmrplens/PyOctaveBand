@@ -72,37 +72,145 @@ SII_METHODS: tuple[str, ...] = (
 
 #: One-third-octave band centre frequencies, in hertz (18 bands, Table 3).
 BAND_CENTERS: np.ndarray = np.array(
-    [160.0, 200.0, 250.0, 315.0, 400.0, 500.0, 630.0, 800.0, 1000.0, 1250.0,
-     1600.0, 2000.0, 2500.0, 3150.0, 4000.0, 5000.0, 6300.0, 8000.0],
+    [
+        160.0,
+        200.0,
+        250.0,
+        315.0,
+        400.0,
+        500.0,
+        630.0,
+        800.0,
+        1000.0,
+        1250.0,
+        1600.0,
+        2000.0,
+        2500.0,
+        3150.0,
+        4000.0,
+        5000.0,
+        6300.0,
+        8000.0,
+    ],
     dtype=np.float64,
 )
 
 #: Band-importance function ``Ii`` (Table 3, average speech material); sums to 1.
 BAND_IMPORTANCE: np.ndarray = np.array(
-    [0.0083, 0.0095, 0.0150, 0.0289, 0.0440, 0.0578, 0.0653, 0.0711, 0.0818,
-     0.0844, 0.0882, 0.0898, 0.0868, 0.0844, 0.0771, 0.0527, 0.0364, 0.0185],
+    [
+        0.0083,
+        0.0095,
+        0.0150,
+        0.0289,
+        0.0440,
+        0.0578,
+        0.0653,
+        0.0711,
+        0.0818,
+        0.0844,
+        0.0882,
+        0.0898,
+        0.0868,
+        0.0844,
+        0.0771,
+        0.0527,
+        0.0364,
+        0.0185,
+    ],
     dtype=np.float64,
 )
 
 #: Standard speech spectrum level ``Ui`` by vocal effort (Table 3), dB SPL.
 _SPEECH_NORMAL: np.ndarray = np.array(
-    [32.41, 34.48, 34.75, 33.98, 34.59, 34.27, 32.06, 28.30, 25.01, 23.00,
-     20.15, 17.32, 13.18, 11.55, 9.33, 5.31, 2.59, 1.13],
+    [
+        32.41,
+        34.48,
+        34.75,
+        33.98,
+        34.59,
+        34.27,
+        32.06,
+        28.30,
+        25.01,
+        23.00,
+        20.15,
+        17.32,
+        13.18,
+        11.55,
+        9.33,
+        5.31,
+        2.59,
+        1.13,
+    ],
     dtype=np.float64,
 )
 _SPEECH_RAISED: np.ndarray = np.array(
-    [33.81, 33.92, 38.98, 38.57, 39.11, 40.15, 38.78, 36.37, 33.86, 31.89,
-     28.58, 25.32, 22.35, 20.15, 16.78, 11.47, 7.67, 5.07],
+    [
+        33.81,
+        33.92,
+        38.98,
+        38.57,
+        39.11,
+        40.15,
+        38.78,
+        36.37,
+        33.86,
+        31.89,
+        28.58,
+        25.32,
+        22.35,
+        20.15,
+        16.78,
+        11.47,
+        7.67,
+        5.07,
+    ],
     dtype=np.float64,
 )
 _SPEECH_LOUD: np.ndarray = np.array(
-    [35.29, 37.76, 41.55, 43.78, 43.30, 44.85, 45.55, 44.05, 42.16, 40.53,
-     37.70, 34.39, 30.98, 28.21, 25.41, 18.35, 13.87, 11.39],
+    [
+        35.29,
+        37.76,
+        41.55,
+        43.78,
+        43.30,
+        44.85,
+        45.55,
+        44.05,
+        42.16,
+        40.53,
+        37.70,
+        34.39,
+        30.98,
+        28.21,
+        25.41,
+        18.35,
+        13.87,
+        11.39,
+    ],
     dtype=np.float64,
 )
 _SPEECH_SHOUT: np.ndarray = np.array(
-    [30.77, 36.65, 42.50, 46.51, 47.40, 49.24, 51.21, 51.44, 51.31, 49.63,
-     47.65, 44.32, 40.80, 38.13, 34.41, 28.24, 23.45, 20.72],
+    [
+        30.77,
+        36.65,
+        42.50,
+        46.51,
+        47.40,
+        49.24,
+        51.21,
+        51.44,
+        51.31,
+        49.63,
+        47.65,
+        44.32,
+        40.80,
+        38.13,
+        34.41,
+        28.24,
+        23.45,
+        20.72,
+    ],
     dtype=np.float64,
 )
 
@@ -117,8 +225,26 @@ _SPEECH_SPECTRA: dict[str, np.ndarray] = {
 
 #: Reference internal noise spectrum level ``Xi`` (Table 3), dB SPL.
 REFERENCE_INTERNAL_NOISE: np.ndarray = np.array(
-    [0.6, -1.7, -3.9, -6.1, -8.2, -9.7, -10.8, -11.9, -12.5, -13.5, -15.4,
-     -17.7, -21.2, -24.2, -25.9, -23.6, -15.8, -7.1],
+    [
+        0.6,
+        -1.7,
+        -3.9,
+        -6.1,
+        -8.2,
+        -9.7,
+        -10.8,
+        -11.9,
+        -12.5,
+        -13.5,
+        -15.4,
+        -17.7,
+        -21.2,
+        -24.2,
+        -25.9,
+        -23.6,
+        -15.8,
+        -7.1,
+    ],
     dtype=np.float64,
 )
 
@@ -137,41 +263,144 @@ VOCAL_EFFORTS: tuple[str, ...] = ("normal", "raised", "loud", "shout")
 
 #: Critical-band limits, in hertz (22 edges bounding the 21 bands, Table 1).
 _CRITICAL_EDGES: np.ndarray = np.array(
-    [100.0, 200.0, 300.0, 400.0, 510.0, 630.0, 770.0, 920.0, 1080.0, 1270.0,
-     1480.0, 1720.0, 2000.0, 2320.0, 2700.0, 3150.0, 3700.0, 4400.0, 5300.0,
-     6400.0, 7700.0, 9500.0],
+    [
+        100.0,
+        200.0,
+        300.0,
+        400.0,
+        510.0,
+        630.0,
+        770.0,
+        920.0,
+        1080.0,
+        1270.0,
+        1480.0,
+        1720.0,
+        2000.0,
+        2320.0,
+        2700.0,
+        3150.0,
+        3700.0,
+        4400.0,
+        5300.0,
+        6400.0,
+        7700.0,
+        9500.0,
+    ],
     dtype=np.float64,
 )
 
 #: Nominal critical-band centre frequencies, in hertz (Table 1).
 _CRITICAL_CENTERS: np.ndarray = np.array(
-    [150.0, 250.0, 350.0, 450.0, 570.0, 700.0, 840.0, 1000.0, 1170.0, 1370.0,
-     1600.0, 1850.0, 2150.0, 2500.0, 2900.0, 3400.0, 4000.0, 4800.0, 5800.0,
-     7000.0, 8500.0],
+    [
+        150.0,
+        250.0,
+        350.0,
+        450.0,
+        570.0,
+        700.0,
+        840.0,
+        1000.0,
+        1170.0,
+        1370.0,
+        1600.0,
+        1850.0,
+        2150.0,
+        2500.0,
+        2900.0,
+        3400.0,
+        4000.0,
+        4800.0,
+        5800.0,
+        7000.0,
+        8500.0,
+    ],
     dtype=np.float64,
 )
 
 #: Critical-band importance function ``Ii`` (Table 1); sums to 1.
 _CRITICAL_IMPORTANCE: np.ndarray = np.array(
-    [0.0103, 0.0261, 0.0419, 0.0577, 0.0577, 0.0577, 0.0577, 0.0577, 0.0577,
-     0.0577, 0.0577, 0.0577, 0.0577, 0.0577, 0.0577, 0.0577, 0.0577, 0.0460,
-     0.0343, 0.0226, 0.0110],
+    [
+        0.0103,
+        0.0261,
+        0.0419,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0577,
+        0.0460,
+        0.0343,
+        0.0226,
+        0.0110,
+    ],
     dtype=np.float64,
 )
 
 #: Critical-band standard speech spectrum level ``Ui``, normal vocal effort
 #: (Table 1), dB SPL.
 _CRITICAL_SPEECH_NORMAL: np.ndarray = np.array(
-    [31.44, 34.75, 34.14, 34.58, 33.17, 30.64, 27.59, 25.01, 23.52, 22.28,
-     20.15, 18.29, 16.37, 13.80, 12.21, 11.09, 9.33, 5.84, 3.47, 1.78, -0.14],
+    [
+        31.44,
+        34.75,
+        34.14,
+        34.58,
+        33.17,
+        30.64,
+        27.59,
+        25.01,
+        23.52,
+        22.28,
+        20.15,
+        18.29,
+        16.37,
+        13.80,
+        12.21,
+        11.09,
+        9.33,
+        5.84,
+        3.47,
+        1.78,
+        -0.14,
+    ],
     dtype=np.float64,
 )
 
 #: Critical-band reference internal noise spectrum level ``Xi`` (Table 1),
 #: dB SPL.
 _CRITICAL_INTERNAL_NOISE: np.ndarray = np.array(
-    [1.5, -3.9, -7.2, -8.9, -10.3, -11.4, -12.0, -12.5, -13.2, -14.0, -15.4,
-     -16.9, -18.8, -21.2, -23.2, -24.9, -25.9, -24.2, -19.0, -11.7, -6.0],
+    [
+        1.5,
+        -3.9,
+        -7.2,
+        -8.9,
+        -10.3,
+        -11.4,
+        -12.0,
+        -12.5,
+        -13.2,
+        -14.0,
+        -15.4,
+        -16.9,
+        -18.8,
+        -21.2,
+        -23.2,
+        -24.9,
+        -25.9,
+        -24.2,
+        -19.0,
+        -11.7,
+        -6.0,
+    ],
     dtype=np.float64,
 )
 
@@ -328,9 +557,7 @@ def _third_octave_geometry() -> tuple[np.ndarray, np.ndarray]:
     the addition.
     """
     f = BAND_CENTERS
-    return 10.0 * np.log10(f), np.log10(
-        0.89 * f[:, np.newaxis] / f[np.newaxis, :]
-    )
+    return 10.0 * np.log10(f), np.log10(0.89 * f[:, np.newaxis] / f[np.newaxis, :])
 
 
 def _build_procedures() -> dict[str, _BandProcedure]:
@@ -369,8 +596,10 @@ def _build_procedures() -> dict[str, _BandProcedure]:
             # Table 3 prints the centre frequencies; the exact one-third-octave
             # limits 2**(-+1/6) fi bound the same bands.
             band_edges=np.concatenate(
-                (BAND_CENTERS * 2.0 ** (-1.0 / 6.0),
-                 BAND_CENTERS[-1:] * 2.0 ** (1.0 / 6.0))
+                (
+                    BAND_CENTERS * 2.0 ** (-1.0 / 6.0),
+                    BAND_CENTERS[-1:] * 2.0 ** (1.0 / 6.0),
+                )
             ),
             band_importance=BAND_IMPORTANCE,
             internal_noise=REFERENCE_INTERNAL_NOISE,
@@ -409,8 +638,7 @@ def _procedure(method: str) -> _BandProcedure:
         return _PROCEDURES[method]
     except KeyError:
         raise ValueError(
-            f"Unknown SII method {method!r}; choose from "
-            f"{', '.join(SII_METHODS)}."
+            f"Unknown SII method {method!r}; choose from {', '.join(SII_METHODS)}."
         ) from None
 
 
@@ -442,7 +670,9 @@ class SIIResult:
     level_distortion: np.ndarray
     method: str = "one-third-octave"
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the per-band audibility weighted by importance, with the SII.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -545,8 +775,9 @@ class StandardSpeechSpectrum:
     vocal_efforts: tuple[str, ...]
     levels: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the standard speech spectrum level versus frequency band.
 
         Draws the standard speech spectrum level (dB SPL) over the 18
@@ -588,9 +819,7 @@ def standard_speech_spectra(
     :raises ValueError: for an unknown vocal effort, or an empty selection.
     """
     efforts = (
-        (vocal_efforts,)
-        if isinstance(vocal_efforts, str)
-        else tuple(vocal_efforts)
+        (vocal_efforts,) if isinstance(vocal_efforts, str) else tuple(vocal_efforts)
     )
     if not efforts:
         raise ValueError(
@@ -654,9 +883,7 @@ def _equivalent_masking(
     bandwidth_db, spread_decades = procedure.bandwidth_db, procedure.spread_decades
     if bandwidth_db is None or spread_decades is None:
         return noise.copy()
-    slope = -80.0 + 0.6 * (
-        self_masked + bandwidth_db - procedure.bandwidth_offset_db
-    )
+    slope = -80.0 + 0.6 * (self_masked + bandwidth_db - procedure.bandwidth_offset_db)
     masking = np.empty(noise.size, dtype=np.float64)
     masking[0] = self_masked[0]
     for i in range(1, noise.size):
@@ -823,8 +1050,9 @@ class SIIProcedure:
     internal_noise: np.ndarray
     speech_spectrum: np.ndarray
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en",
-             **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the band-importance function of the procedure versus frequency.
 
         Draws the band-importance function ``Ii`` as a step over the band

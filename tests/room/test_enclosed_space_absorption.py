@@ -60,9 +60,13 @@ def test_annex_e_case2_with_objects() -> None:
 def test_annex_e_case3_absorbing_wall() -> None:
     # One long wall lined for 90 % of its area with alpha_s = 0.85.
     surfaces = [
-        (12.39, 0.05), (12.39, 0.02),
-        (1.09, 0.04), (9.81, 0.85),
-        (10.90, 0.04), (6.55, 0.04), (6.55, 0.04),
+        (12.39, 0.05),
+        (12.39, 0.02),
+        (1.09, 0.04),
+        (9.81, 0.85),
+        (10.90, 0.04),
+        (6.55, 0.04),
+        (6.55, 0.04),
     ]
     a = m.equivalent_absorption_area(surfaces)
     assert a == pytest.approx(10.21, abs=0.01)
@@ -88,7 +92,7 @@ def test_air_absorption_area_formula_2() -> None:
 
 def test_reverberation_factor_is_016() -> None:
     # 55.3 / c0 = 0.16 for the standard's c0 = 345.6 m/s.
-    assert m._RT_CONSTANT / m.SPEED_OF_SOUND == pytest.approx(0.16, abs=1e-4)
+    assert pytest.approx(0.16, abs=1e-4) == m._RT_CONSTANT / m.SPEED_OF_SOUND
 
 
 def test_object_fraction_formula_3() -> None:
@@ -177,6 +181,8 @@ def test_air_condition_requires_standard_bands() -> None:
     # The built-in Table 1 profiles cover the standard octave bands only.
     with pytest.raises(ValueError, match="OCTAVE_BANDS"):
         m.enclosed_space_reverberation(
-            [(20.0, 0.5)], 50.0,
-            air_condition="20C_50-70", frequencies=[500.0, 1000.0],
+            [(20.0, 0.5)],
+            50.0,
+            air_condition="20C_50-70",
+            frequencies=[500.0, 1000.0],
         )

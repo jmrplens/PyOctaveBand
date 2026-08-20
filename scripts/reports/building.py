@@ -163,9 +163,7 @@ def _field_airborne_example() -> tuple[object, ReportMetadata, str]:
             0.42,
         ]
     )
-    result = ph.building.airborne_insulation(
-        l1, l1 - d, t2, area=12.5, volume=30.4
-    )
+    result = ph.building.airborne_insulation(l1, l1 - d, t2, area=12.5, volume=30.4)
     metadata = ReportMetadata(
         specimen="Separating wall, 240 mm brick with independent lining",
         client="Example client",
@@ -328,9 +326,7 @@ def _lab_impact_example() -> tuple[object, ReportMetadata, str]:
             71.2,
         ]
     )
-    result = ph.building.lab_impact_insulation(
-        li, np.full(16, 0.8), volume=50.0
-    )
+    result = ph.building.lab_impact_insulation(li, np.full(16, 0.8), volume=50.0)
     # The impact fiche's plot legend carries an extra "500 Hz read" entry that
     # wraps to a second row, making the embedded figure taller than the
     # airborne one; the header is kept to the essential accredited fields so
@@ -746,9 +742,7 @@ def _survey_facade_example() -> tuple[object, ReportMetadata, str]:
     l1_2m = np.full(5, 75.0)
     d2m = np.array([31.0, 34.0, 37.0, 40.0, 43.0])
     k = ph.building.estimate_reverberation_index(40.0, "furnished")
-    result = ph.building.survey_facade_insulation(
-        l1_2m, l1_2m - d2m, k, volume=40.0
-    )
+    result = ph.building.survey_facade_insulation(l1_2m, l1_2m - d2m, k, volume=40.0)
     metadata = ReportMetadata(
         specimen="Dwelling facade with a double-glazed window (survey method)",
         client="Example client",
@@ -775,16 +769,51 @@ def _field_facade_example() -> tuple[object, ReportMetadata, str]:
     the fiche boxes D2m,nT,w = 30 (-2; -3) dB.
     """
     annex_c = np.array(
-        [20.4, 16.3, 17.7, 22.6, 22.4, 22.7, 24.8, 26.6,
-         28.0, 30.5, 31.8, 32.5, 33.4, 33.0, 31.0, 25.5]
+        [
+            20.4,
+            16.3,
+            17.7,
+            22.6,
+            22.4,
+            22.7,
+            24.8,
+            26.6,
+            28.0,
+            30.5,
+            31.8,
+            32.5,
+            33.4,
+            33.0,
+            31.0,
+            25.5,
+        ]
     )
     core_freqs = np.array(
-        [100.0, 125.0, 160.0, 200.0, 250.0, 315.0, 400.0, 500.0,
-         630.0, 800.0, 1000.0, 1250.0, 1600.0, 2000.0, 2500.0, 3150.0]
+        [
+            100.0,
+            125.0,
+            160.0,
+            200.0,
+            250.0,
+            315.0,
+            400.0,
+            500.0,
+            630.0,
+            800.0,
+            1000.0,
+            1250.0,
+            1600.0,
+            2000.0,
+            2500.0,
+            3150.0,
+        ]
     )
     result = ph.building.facade_insulation(
-        annex_c + 40.0, np.full(16, 40.0), np.full(16, 0.5),
-        volume=62.5, frequencies=core_freqs,
+        annex_c + 40.0,
+        np.full(16, 40.0),
+        np.full(16, 0.5),
+        volume=62.5,
+        frequencies=core_freqs,
     )
     metadata = ReportMetadata(
         specimen="Dwelling facade, loudspeaker method",

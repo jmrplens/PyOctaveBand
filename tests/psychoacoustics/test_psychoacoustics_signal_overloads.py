@@ -241,7 +241,8 @@ def test_a_bare_array_with_no_factor_is_still_read_as_pascals() -> None:
 
 
 @pytest.mark.parametrize(
-    "func", [fluctuation_strength, fluctuation_strength_ecma],
+    "func",
+    [fluctuation_strength, fluctuation_strength_ecma],
     ids=["fluctuation_strength", "fluctuation_strength_ecma"],
 )
 def test_the_fluctuation_models_take_the_signal_too(func) -> None:

@@ -19,8 +19,8 @@ import pytest
 
 from phonometry import vibration
 
-M, K, C = 2.0, 8000.0, 5.0          # mass [kg], stiffness [N/m], damping [N.s/m]
-F0 = math.sqrt(K / M) / (2.0 * math.pi)   # ~10.066 Hz
+M, K, C = 2.0, 8000.0, 5.0  # mass [kg], stiffness [N/m], damping [N.s/m]
+F0 = math.sqrt(K / M) / (2.0 * math.pi)  # ~10.066 Hz
 
 
 # ---------------------------------------------------------------------------
@@ -37,7 +37,7 @@ def test_mobility_peak_equals_inverse_damping() -> None:
     """At omega0 the driving-point mobility is real and |Y| = 1/c."""
     y0 = complex(vibration.sdof_mobility(F0, M, K, C))
     assert y0.real == pytest.approx(1.0 / C, rel=1e-9)
-    assert y0.imag == pytest.approx(0.0, abs=1e-9)   # purely real at resonance
+    assert y0.imag == pytest.approx(0.0, abs=1e-9)  # purely real at resonance
 
 
 def test_static_receptance_is_inverse_stiffness() -> None:
@@ -64,12 +64,12 @@ def test_mobility_and_accelerance_are_jomega_powers_of_receptance() -> None:
     f = 37.0
     w = 2.0 * math.pi * f
     h = vibration.sdof_receptance(f, M, K, C)
-    assert vibration.convert_frf(
-        h, f, "receptance", "mobility"
-    ) == pytest.approx(1j * w * h)
-    assert vibration.convert_frf(
-        h, f, "receptance", "accelerance"
-    ) == pytest.approx(-(w**2) * h)
+    assert vibration.convert_frf(h, f, "receptance", "mobility") == pytest.approx(
+        1j * w * h
+    )
+    assert vibration.convert_frf(h, f, "receptance", "accelerance") == pytest.approx(
+        -(w**2) * h
+    )
 
 
 def test_reciprocals_multiply_to_one() -> None:
@@ -77,9 +77,9 @@ def test_reciprocals_multiply_to_one() -> None:
     h = vibration.sdof_receptance(f, M, K, C)
     y = vibration.convert_frf(h, f, "receptance", "mobility")
     a = vibration.convert_frf(h, f, "receptance", "accelerance")
-    assert vibration.convert_frf(
-        y, f, "mobility", "impedance"
-    ) * y == pytest.approx(1.0)
+    assert vibration.convert_frf(y, f, "mobility", "impedance") * y == pytest.approx(
+        1.0
+    )
     assert vibration.convert_frf(
         a, f, "accelerance", "apparent_mass"
     ) * a == pytest.approx(1.0)
@@ -106,9 +106,13 @@ def test_conversion_round_trip() -> None:
     back = vibration.convert_frf(
         vibration.convert_frf(
             vibration.convert_frf(y, f, "mobility", "receptance"),
-            f, "receptance", "accelerance",
+            f,
+            "receptance",
+            "accelerance",
         ),
-        f, "accelerance", "mobility",
+        f,
+        "accelerance",
+        "mobility",
     )
     assert np.allclose(back, y)
 
@@ -116,9 +120,7 @@ def test_conversion_round_trip() -> None:
 def test_accelerance_matches_impedance_route() -> None:
     """Apparent mass at high frequency approaches the rigid mass m."""
     a = vibration.sdof_accelerance(5000.0, M, K, C)  # well above resonance
-    apparent_mass = vibration.convert_frf(
-        a, 5000.0, "accelerance", "apparent_mass"
-    )
+    apparent_mass = vibration.convert_frf(a, 5000.0, "accelerance", "apparent_mass")
     assert complex(apparent_mass).real == pytest.approx(M, rel=1e-2)
 
 
@@ -188,9 +190,7 @@ def test_rigid_mass_calibration_flags_out_of_tolerance_bands() -> None:
 def test_rigid_mass_calibration_accepts_complex_frf() -> None:
     # The criterion applies to the magnitude; phase is irrelevant.
     frf = 0.1 * np.exp(1j * np.linspace(0.0, 1.0, 4))
-    res = vibration.rigid_mass_calibration_check(
-        frf, [10.0, 20.0, 40.0, 80.0], 10.0
-    )
+    res = vibration.rigid_mass_calibration_check(frf, [10.0, 20.0, 40.0, 80.0], 10.0)
     assert res.passed
 
 
@@ -274,9 +274,9 @@ def test_rigid_mass_plot_two_panels_and_external_ax() -> None:
     meas = (1.0 / 10.0) * (1.0 + 0.02 * np.sin(f / 200.0) + 0.06 * (f > 1200.0))
     res = vibration.rigid_mass_calibration_check(meas, f, mass=10.0)
     axes = res.plot()
-    assert len(axes) == 2                       # magnitude + deviation panels
+    assert len(axes) == 2  # magnitude + deviation panels
     _fig, ext = plt.subplots()
-    assert res.plot(ax=ext) is ext              # single deviation panel on ax
+    assert res.plot(ax=ext) is ext  # single deviation panel on ax
     plt.close("all")
 
 
@@ -309,12 +309,8 @@ def test_resonance_vigran_floor_covering_spot_values() -> None:
     # (The Fig. 8.37 caption prints the carpet stiffness as 3.2e6 N/m; the
     # body text value 3.2e5 N/m is the one that reproduces 130 Hz — a book
     # erratum, not one of the standard.)
-    assert vibration.resonance_frequency(0.5, 3.2e5) == pytest.approx(
-        130.0, abs=4.0
-    )
-    assert vibration.resonance_frequency(0.5, 5.2e6) == pytest.approx(
-        510.0, abs=4.0
-    )
+    assert vibration.resonance_frequency(0.5, 3.2e5) == pytest.approx(130.0, abs=4.0)
+    assert vibration.resonance_frequency(0.5, 5.2e6) == pytest.approx(510.0, abs=4.0)
 
 
 def test_resonance_hopkins_contact_stiffness_cutoffs() -> None:
@@ -327,15 +323,15 @@ def test_resonance_hopkins_contact_stiffness_cutoffs() -> None:
     # fco = (1/2pi) sqrt(K/m); Hopkins publishes fco = 100 Hz (exact
     # 100.1 Hz).
     k_covering_2 = 2.8e8 * math.pi * r_contact**2
-    assert vibration.resonance_frequency(
-        m_hammer, k_covering_2
-    ) == pytest.approx(100.0, abs=0.5)
+    assert vibration.resonance_frequency(m_hammer, k_covering_2) == pytest.approx(
+        100.0, abs=0.5
+    )
     # Covering No. 1, E/d = 1.5e11 N/m3: Hopkins publishes fco ~= 2300 Hz
     # (exact 2318 Hz; the book rounds to two significant figures).
     k_covering_1 = 1.5e11 * math.pi * r_contact**2
-    assert vibration.resonance_frequency(
-        m_hammer, k_covering_1
-    ) == pytest.approx(2300.0, abs=25.0)
+    assert vibration.resonance_frequency(m_hammer, k_covering_1) == pytest.approx(
+        2300.0, abs=25.0
+    )
     # Bare 140 mm concrete slab: K = 2 r E / (1 - nu^2) (Eq. 3.97) with
     # E = cL^2 rho (1 - nu^2) from cL = 3800 m/s, rho = 2200 kg/m3,
     # nu = 0.2; Hopkins publishes fco ~= 7000 Hz (exact 6947 Hz, rounded to

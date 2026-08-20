@@ -25,9 +25,12 @@ FS = 48000
 # Single ISO 532-1 data root, honouring the ISO532_1_TESTDATA override so the
 # presence gate, the expected-values JSON and the Annex B.5 recordings all
 # resolve from the same directory. Defaults to the in-repo fixtures.
-DATA = pathlib.Path(os.environ.get(
-    "ISO532_1_TESTDATA", str(pathlib.Path(__file__).parents[2] / "data" / "iso532_1")
-))
+DATA = pathlib.Path(
+    os.environ.get(
+        "ISO532_1_TESTDATA",
+        str(pathlib.Path(__file__).parents[2] / "data" / "iso532_1"),
+    )
+)
 # The ISO 532-1 Annex B validation data may be absent (its README documents a
 # removal policy); the tests that need it then skip rather than crash on import.
 _ISO_DATA_PRESENT = (DATA / "iso532_1_annexB_expected.json").is_file()
@@ -60,7 +63,9 @@ def test_iso_data_present_in_repo() -> None:
     )
 
 
-def _tone(freq: float, level_db: float, seconds: float = 1.0, pad_ms: float = 100.0) -> np.ndarray:
+def _tone(
+    freq: float, level_db: float, seconds: float = 1.0, pad_ms: float = 100.0
+) -> np.ndarray:
     """Pure tone at an SPL (dB re 20 uPa) with leading/trailing silence."""
     t = np.arange(int(FS * seconds)) / FS
     amp = np.sqrt(2.0) * 2e-5 * 10 ** (level_db / 20)
@@ -80,6 +85,7 @@ def _levels_from_file() -> np.ndarray:
 # ---------------------------------------------------------------------------
 # Annex B.2 - stationary loudness from one-third-octave levels
 # ---------------------------------------------------------------------------
+
 
 @requires_iso_data
 def test_annex_b2_stationary_from_levels() -> None:
@@ -105,10 +111,14 @@ def test_specific_loudness_shape_and_integral() -> None:
 # the normative descriptions: pure tones at the stated levels)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize(
     ("case", "freq", "level"),
-    [("Test signal 2", 250.0, 80.0), ("Test signal 3", 1000.0, 60.0),
-     ("Test signal 4", 4000.0, 40.0)],
+    [
+        ("Test signal 2", 250.0, 80.0),
+        ("Test signal 3", 1000.0, 60.0),
+        ("Test signal 4", 4000.0, 40.0),
+    ],
 )
 @requires_iso_data
 def test_annex_b3_stationary_tones(case: str, freq: float, level: float) -> None:
@@ -142,9 +152,7 @@ def test_annex_b3_pink_noise_bounds() -> None:
     the stated overall level is checked against the workbook bounds only.
     """
     exp = EXPECTED["Test signal 5"]
-    res = psychoacoustics.loudness_zwicker(
-        _pink_noise(5.0, 60.0), FS, stationary=True
-    )
+    res = psychoacoustics.loudness_zwicker(_pink_noise(5.0, 60.0), FS, stationary=True)
     assert exp["Nmin"] <= res.loudness <= exp["Nmax"], (
         f"pink noise: N={res.loudness:.4f} outside [{exp['Nmin']}, {exp['Nmax']}]"
     )
@@ -171,9 +179,7 @@ def test_stationary_time_skip() -> None:
     # broadband onset click the skip removes.
     assert n_skip == pytest.approx(n_steady, rel=0.02)
     with pytest.raises(ValueError, match="time_skip"):
-        psychoacoustics.loudness_zwicker(
-            x, FS, stationary=True, time_skip=-0.1
-        )
+        psychoacoustics.loudness_zwicker(x, FS, stationary=True, time_skip=-0.1)
     with pytest.raises(ValueError, match="time_skip"):
         psychoacoustics.loudness_zwicker(x, FS, stationary=True, time_skip=2.0)
 
@@ -193,6 +199,7 @@ def test_1khz_60db_anchor() -> None:
 # ---------------------------------------------------------------------------
 # Annex B.4 - time-varying loudness (synthetic, regenerated)
 # ---------------------------------------------------------------------------
+
 
 def _read_wav_fullscale(path: str) -> tuple[np.ndarray, int]:
     """Read a 16-bit WAV as first-channel samples in [-1, 1) with its rate.
@@ -239,15 +246,12 @@ def _level_ramp_tone(freq: float) -> np.ndarray:
     act = amp * np.sin(2 * np.pi * freq * tau)
     n_fade = int(0.005 * FS)
     act[-n_fade:] *= 0.5 * (1.0 + np.cos(np.pi * np.arange(n_fade) / n_fade))
-    return np.concatenate(
-        [np.zeros(int(0.1 * FS)), act, np.zeros(int(0.5 * FS))]
-    )
+    return np.concatenate([np.zeros(int(0.1 * FS)), act, np.zeros(int(0.5 * FS))])
 
 
 @pytest.mark.parametrize(
     ("case", "freq"),
-    [("Test signal 6", 250.0), ("Test signal 7", 1000.0),
-     ("Test signal 8", 4000.0)],
+    [("Test signal 6", 250.0), ("Test signal 7", 1000.0), ("Test signal 8", 4000.0)],
 )
 @requires_iso_data
 def test_annex_b4_level_ramp_tones(case: str, freq: float) -> None:
@@ -260,9 +264,7 @@ def test_annex_b4_level_ramp_tones(case: str, freq: float) -> None:
     pins are 0.6 % and 2 % with about 2x headroom.
     """
     exp = EXPECTED[case]
-    res = psychoacoustics.loudness_zwicker(
-        _level_ramp_tone(freq), FS, stationary=False
-    )
+    res = psychoacoustics.loudness_zwicker(_level_ramp_tone(freq), FS, stationary=False)
     assert res.loudness == pytest.approx(exp["Nmax"], rel=6e-3), (
         f"{case}: Nmax={res.loudness:.4f} vs workbook {exp['Nmax']}"
     )
@@ -305,8 +307,12 @@ def test_annex_b4_pink_noise_ramp() -> None:
 
 @pytest.mark.parametrize(
     ("case", "num", "level"),
-    [("Test signal 10", 10, 70.0), ("Test signal 11", 11, 70.0),
-     ("Test signal 12", 12, 70.0), ("Test signal 13", 13, 80.0)],
+    [
+        ("Test signal 10", 10, 70.0),
+        ("Test signal 11", 11, 70.0),
+        ("Test signal 12", 12, 70.0),
+        ("Test signal 13", 13, 80.0),
+    ],
 )
 @requires_iso_data
 def test_annex_b4_tone_pulses(case: str, num: int, level: float) -> None:
@@ -333,7 +339,9 @@ def test_annex_b4_tone_pulses(case: str, num: int, level: float) -> None:
     n = min(ref.shape[0], res.loudness_vs_time.shape[0])
     ours, lo, hi = res.loudness_vs_time[:n], ref[:n, 2], ref[:n, 3]
     inside = np.mean((ours >= lo) & (ours <= hi))
-    assert inside >= 0.99, f"{case}: only {inside:.1%} of N(t) inside the tolerance band"
+    assert inside >= 0.99, (
+        f"{case}: only {inside:.1%} of N(t) inside the tolerance band"
+    )
 
 
 @requires_iso_data
@@ -424,15 +432,14 @@ def test_annex_b5_technical_signals(num: int) -> None:
 # Validation and API behavior
 # ---------------------------------------------------------------------------
 
+
 def test_invalid_inputs() -> None:
     ten_bands = np.zeros(10)
     with pytest.raises(ValueError, match="28"):
         psychoacoustics.loudness_zwicker_from_spectrum(ten_bands)
     levels = np.full(28, 60.0)
     with pytest.raises(ValueError, match="field"):
-        psychoacoustics.loudness_zwicker_from_spectrum(
-            levels, field="reverberant"
-        )
+        psychoacoustics.loudness_zwicker_from_spectrum(levels, field="reverberant")
     x = np.ones(1000)
     with pytest.raises(ValueError, match="fs"):
         psychoacoustics.loudness_zwicker(x, 0)
@@ -460,9 +467,7 @@ def test_pathological_resampling_ratio_rejected() -> None:
 def test_diffuse_field_differs() -> None:
     levels = np.full(28, 70.0)
     free = psychoacoustics.loudness_zwicker_from_spectrum(levels, field="free")
-    diffuse = psychoacoustics.loudness_zwicker_from_spectrum(
-        levels, field="diffuse"
-    )
+    diffuse = psychoacoustics.loudness_zwicker_from_spectrum(levels, field="diffuse")
     assert isinstance(free, psychoacoustics.ZwickerLoudness)
     assert free.loudness != diffuse.loudness
 

@@ -134,10 +134,22 @@ __all__ = [
 #: value. The same array rates STC (E90), NIC/NNIC/ASTC (E336), NIC (E596) and
 #: the ceiling attenuation class CAC (E1414).
 CEILING_ATTENUATION_CONTOUR: dict[float, float] = {
-    125.0: -16.0, 160.0: -13.0, 200.0: -10.0, 250.0: -7.0,
-    315.0: -4.0, 400.0: -1.0, 500.0: 0.0, 630.0: 1.0,
-    800.0: 2.0, 1000.0: 3.0, 1250.0: 4.0, 1600.0: 4.0,
-    2000.0: 4.0, 2500.0: 4.0, 3150.0: 4.0, 4000.0: 4.0,
+    125.0: -16.0,
+    160.0: -13.0,
+    200.0: -10.0,
+    250.0: -7.0,
+    315.0: -4.0,
+    400.0: -1.0,
+    500.0: 0.0,
+    630.0: 1.0,
+    800.0: 2.0,
+    1000.0: 3.0,
+    1250.0: 4.0,
+    1600.0: 4.0,
+    2000.0: 4.0,
+    2500.0: 4.0,
+    3150.0: 4.0,
+    4000.0: 4.0,
 }
 
 #: Reference equivalent absorption area ``A0`` of ISO 140-9:1985 clause 3.3 and
@@ -254,7 +266,9 @@ class CeilingAttenuationResult:
     max_deficiency: float
     rating: int
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``Dn,c`` against the fitted ASTM E413 contour.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -299,8 +313,7 @@ def ceiling_attenuation_class(
         given = require_finite_array(frequency, "frequency")
         if given.shape != bands.shape or not np.allclose(given, bands):
             raise ValueError(
-                "'frequency' must be the 16 ASTM E413 contour bands "
-                "125 Hz to 4000 Hz."
+                "'frequency' must be the 16 ASTM E413 contour bands 125 Hz to 4000 Hz."
             )
     # Clause 5.2: the contour is fitted to integer-rounded data.
     rounded = np.asarray(np.floor(values + 0.5), dtype=np.float64)
@@ -312,9 +325,10 @@ def ceiling_attenuation_class(
     shift = int(np.floor(np.min(rounded - contour)))
     while True:
         trial = _deficiencies(shift + 1)
-        if float(np.sum(trial)) > _MAX_DEFICIENCY_SUM or float(
-            np.max(trial)
-        ) > _MAX_SINGLE_DEFICIENCY:
+        if (
+            float(np.sum(trial)) > _MAX_DEFICIENCY_SUM
+            or float(np.max(trial)) > _MAX_SINGLE_DEFICIENCY
+        ):
             break
         shift += 1
     deficiencies = _deficiencies(shift)
@@ -365,7 +379,9 @@ class PlenumFlankingResult:
     plenum_height: float
     ceiling_length: float
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot ``Rcl`` against the two ceiling reduction indices.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -475,7 +491,11 @@ def plenum_flanking_reduction_index(
         )
     lr = require_positive(ceiling_length, "ceiling_length")
     h = require_positive(plenum_height, "plenum_height")
-    ls = lr if source_length is None else require_positive(source_length, "source_length")
+    ls = (
+        lr
+        if source_length is None
+        else require_positive(source_length, "source_length")
+    )
     case = require_choice(sidewalls, "sidewalls", tuple(_SIDEWALLS))
     eps = _SIDEWALLS[case]
     ss = _require_split(split_source, "split_source")
@@ -490,8 +510,7 @@ def plenum_flanking_reduction_index(
     tau_r = 10.0 ** (-rr / 10.0)
     if (attenuation_source is None) != (attenuation_receiving is None):
         raise ValueError(
-            "'attenuation_source' and 'attenuation_receiving' must be given "
-            "together."
+            "'attenuation_source' and 'attenuation_receiving' must be given together."
         )
     if attenuation_source is None or attenuation_receiving is None:
         geometry = float(10.0 * np.log10(eps**2 * lr / (4.0 * h)))
@@ -515,7 +534,9 @@ def plenum_flanking_reduction_index(
     ms = require_finite_array(attenuation_source, "attenuation_source")
     mr = require_finite_array(attenuation_receiving, "attenuation_receiving")
     if ms.shape != rs.shape or mr.shape != rs.shape:
-        raise ValueError("the attenuation coefficients must match the reduction indices.")
+        raise ValueError(
+            "the attenuation coefficients must match the reduction indices."
+        )
     if np.any(ms <= 0.0) or np.any(mr <= 0.0):
         raise ValueError("the attenuation coefficients must be positive.")
     # Eq. (9.17): the receiving side also loses power back into the room.
@@ -529,7 +550,12 @@ def plenum_flanking_reduction_index(
     # the leakage term, and it exceeds unity for ordinary inputs. See
     # docs/ERRATA.md, "Vigran (2008), Eq. (9.18)".
     tau = (
-        ss * sr * tau_s * tau_r * lr / (ms * ls * mr_eff * lr * h)
+        ss
+        * sr
+        * tau_s
+        * tau_r
+        * lr
+        / (ms * ls * mr_eff * lr * h)
         * (1.0 - np.exp(-eps * ms * ls))
         * (1.0 - np.exp(-eps * mr_eff * lr))
     )

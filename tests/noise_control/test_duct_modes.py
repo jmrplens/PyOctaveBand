@@ -51,9 +51,7 @@ _PROBLEM_7_1 = (
 
 
 def test_norton_problem_7_1_no_flow() -> None:
-    res = duct_modes.circular_duct_cut_on(
-        0.254, speed_of_sound=_C_STEAM, count=6
-    )
+    res = duct_modes.circular_duct_cut_on(0.254, speed_of_sound=_C_STEAM, count=6)
     assert res.mach == 0.0
     assert res.modes == tuple(mode for mode, _, _, _ in _PROBLEM_7_1)
     expected = [f for _, f, _, _ in _PROBLEM_7_1]
@@ -70,9 +68,7 @@ def test_norton_problem_7_1_with_flow() -> None:
     # The printed answers are rounded to the hertz; the (1, 1) entry (2354 Hz)
     # is one hertz above the exact 2353.0 Hz, the book's own rounding of an
     # intermediate.
-    assert np.allclose(
-        res.cut_on, [f for _, _, f, _ in _PROBLEM_7_1], atol=1.1
-    )
+    assert np.allclose(res.cut_on, [f for _, _, f, _ in _PROBLEM_7_1], atol=1.1)
     assert np.allclose(
         res.axial_wavenumber, [k for _, _, _, k in _PROBLEM_7_1], atol=0.006
     )
@@ -82,9 +78,7 @@ def test_norton_problem_7_1_with_flow() -> None:
 
 
 def test_norton_problem_7_2() -> None:
-    res = duct_modes.rectangular_duct_cut_on(
-        0.65, 0.4, flow_velocity=15.0, count=3
-    )
+    res = duct_modes.rectangular_duct_cut_on(0.65, 0.4, flow_velocity=15.0, count=3)
     # The (1, 1) mode at 503 Hz cuts on before the (2, 0) mode at 527 Hz.
     assert res.modes == ((1, 0), (0, 1), (1, 1))
     assert np.allclose(res.cut_on, [264.0, 428.0, 503.0], atol=0.6)
@@ -127,9 +121,7 @@ def test_warn_above_plane_wave_limit() -> None:
 def test_no_warning_below_the_limit() -> None:
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        mask = duct_modes.warn_above_plane_wave_limit(
-            [63.0, 125.0], 263.6, "test duct"
-        )
+        mask = duct_modes.warn_above_plane_wave_limit([63.0, 125.0], 263.6, "test duct")
     assert not mask.any()
 
 
@@ -195,9 +187,7 @@ def test_silencer_result_reports_its_plane_wave_limit() -> None:
 
     # A 0.1 m2 chamber is 357 mm across: plane waves only below about 1.26 kHz.
     with pytest.warns(duct_modes.PlaneWaveWarning):
-        res = silencers.expansion_chamber(
-            [50.0, 100.0, 2000.0], 0.3, 0.02, 0.002
-        )
+        res = silencers.expansion_chamber([50.0, 100.0, 2000.0], 0.3, 0.02, 0.002)
     assert res.plane_wave_limit is not None
     assert res.plane_wave_limit == pytest.approx(
         duct_modes.plane_wave_limit(area=0.02), rel=1e-12

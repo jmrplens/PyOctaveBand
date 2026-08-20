@@ -102,9 +102,7 @@ def test_stoi_takes_the_rate_from_either_side() -> None:
     reference = stoi(_CLEAN, _DEGRADED, STOI_FS)
     assert_same(stoi(Signal(_CLEAN, STOI_FS), _DEGRADED), reference)
     assert_same(stoi(_CLEAN, Signal(_DEGRADED, STOI_FS)), reference)
-    assert_same(
-        stoi(Signal(_CLEAN, STOI_FS), Signal(_DEGRADED, STOI_FS)), reference
-    )
+    assert_same(stoi(Signal(_CLEAN, STOI_FS), Signal(_DEGRADED, STOI_FS)), reference)
 
 
 def test_stoi_refuses_two_signals_at_different_rates() -> None:

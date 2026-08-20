@@ -81,7 +81,11 @@ def test_wav24_to_flac_and_back_loses_nothing(tmp_path: Path) -> None:
         meta,
         coding_history=(
             meta.coding_history
-            + line_written + "\r\n" + line_flac + "\r\n" + line_written
+            + line_written
+            + "\r\n"
+            + line_flac
+            + "\r\n"
+            + line_written
         ),
     )
     # The calibration sidecar rode along byte for byte at each hop.
@@ -90,9 +94,7 @@ def test_wav24_to_flac_and_back_loses_nothing(tmp_path: Path) -> None:
         assert carried is not None
         assert carried.calibration_factor == 12.5
         assert carried.reference_spl == 94.0
-        assert sidecar_path(path).read_bytes() == (
-            sidecar_path(original).read_bytes()
-        )
+        assert sidecar_path(path).read_bytes() == (sidecar_path(original).read_bytes())
     # And read() therefore returns the restored file already calibrated.
     assert read(restored).calibration_factor == 12.5
 

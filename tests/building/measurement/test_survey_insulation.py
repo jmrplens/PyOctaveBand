@@ -81,21 +81,15 @@ def test_airborne_area_without_volume_raises() -> None:
     source, receiving = np.full(_OCTAVE, 80.0), np.full(_OCTAVE, 45.0)
     index = np.zeros(_OCTAVE)
     with pytest.raises(ValueError, match="requires 'volume'"):
-        building.survey_airborne_insulation(
-            source, receiving, index, area=12.0
-        )
+        building.survey_airborne_insulation(source, receiving, index, area=12.0)
 
 
 def test_airborne_energy_averages_positions() -> None:
     """A 2-D (positions, bands) source input is energy-averaged first."""
     l1 = np.array([[80.0, 80.0], [86.0, 84.0]])
     avg = 10.0 * np.log10(np.mean(10.0 ** (0.1 * l1), axis=0))
-    multi = building.survey_airborne_insulation(
-        l1, np.full(2, 40.0), np.zeros(2)
-    )
-    single = building.survey_airborne_insulation(
-        avg, np.full(2, 40.0), np.zeros(2)
-    )
+    multi = building.survey_airborne_insulation(l1, np.full(2, 40.0), np.zeros(2))
+    single = building.survey_airborne_insulation(avg, np.full(2, 40.0), np.zeros(2))
     np.testing.assert_allclose(multi.d, single.d)
 
 
@@ -107,7 +101,7 @@ def test_airborne_energy_averages_positions() -> None:
 def test_impact_li_lnt_ln() -> None:
     """Li energy-average, L'nT = Li - k, L'n."""
     li = np.array([[60.0] * _OCTAVE, [62.0] * _OCTAVE])
-    expected_li = 10.0 * np.log10((10.0 ** 6.0 + 10.0 ** 6.2) / 2.0)
+    expected_li = 10.0 * np.log10((10.0**6.0 + 10.0**6.2) / 2.0)
     k = np.full(_OCTAVE, 3.0)
     res = building.survey_impact_insulation(li, k, volume=50.0)
     assert res.l_i[0] == pytest.approx(expected_li)
@@ -140,9 +134,7 @@ def test_facade_d2m_family() -> None:
 def test_service_equipment_lxy() -> None:
     """LXY is the energy average of the three positions; LXY,nT / LXY,n follow."""
     meas = [35.0, 30.0, 32.0]
-    expected = 10.0 * np.log10(
-        (10.0 ** 3.5 + 10.0 ** 3.0 + 10.0 ** 3.2) / 3.0
-    )
+    expected = 10.0 * np.log10((10.0**3.5 + 10.0**3.0 + 10.0**3.2) / 3.0)
     res = building.survey_service_equipment_level(meas, 3.0, volume=50.0)
     assert float(res.l_xy) == pytest.approx(expected)
     assert float(res.l_xy_nt) == pytest.approx(expected - 3.0)
@@ -156,6 +148,7 @@ def test_service_equipment_banded() -> None:
     res = building.survey_service_equipment_level(meas, k)
     assert res.l_xy.shape == (2,)
     assert res.l_xy_n is None  # no volume
+
 
 def test_service_equipment_requires_three_positions() -> None:
     with pytest.raises(ValueError, match="exactly three"):
@@ -238,9 +231,7 @@ def test_estimate_matches_table4_spot_cells() -> None:
 
 def test_estimate_weighted_column() -> None:
     for (volume, room), expected in _TABLE4_AC.items():
-        got = building.estimate_reverberation_index(
-            volume, room, weighted=True
-        )
+        got = building.estimate_reverberation_index(volume, room, weighted=True)
         assert got == pytest.approx(expected)
 
 
@@ -288,9 +279,7 @@ def test_estimate_volume_range_boundaries() -> None:
 def test_estimate_feeds_survey_functions() -> None:
     """An estimated k is a drop-in for the measurement functions."""
     k = building.estimate_reverberation_index(50.0, "g")
-    res = building.survey_airborne_insulation(
-        np.full(5, 80.0), np.full(5, 45.0), k
-    )
+    res = building.survey_airborne_insulation(np.full(5, 80.0), np.full(5, 45.0), k)
     np.testing.assert_allclose(res.d_nt, 35.0 + np.asarray(k))
 
 

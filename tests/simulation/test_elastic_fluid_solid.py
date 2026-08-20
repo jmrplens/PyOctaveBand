@@ -57,8 +57,9 @@ VV_FLUID = Material(c_p=1500.0, c_s=0.0, rho=1000.0)
 VV_SOLID = Material(c_p=3500.0, c_s=2000.0, rho=2500.0)
 
 
-def _reflection_coefficient(theta_deg: float, fluid: Material,
-                            solid: Material) -> complex:
+def _reflection_coefficient(
+    theta_deg: float, fluid: Material, solid: Material
+) -> complex:
     """Plane-wave reflection of a fluid over an elastic half-space.
 
     Brekhovskikh & Godin (1990) Eqs. 4.2.22-4.2.24: Snell angles for the
@@ -88,8 +89,9 @@ def _reflection_coefficient(theta_deg: float, fluid: Material,
     return complex((z_total - z) / (z_total + z))
 
 
-def _plate_transmission(f: float, h: float, fluid: Material,
-                        solid: Material) -> complex:
+def _plate_transmission(
+    f: float, h: float, fluid: Material, solid: Material
+) -> complex:
     """Three-media transmission of an immersed plate at normal incidence.
 
     B&G Eq. 2.4.14 with ``Z1 = Z3`` (same fluid on both sides) and
@@ -104,8 +106,12 @@ def _plate_transmission(f: float, h: float, fluid: Material,
     z1 = fluid.rho * fluid.c_p
     z2 = solid.rho * solid.c_p
     phi = 2.0 * np.pi * f * h / solid.c_p
-    return complex(4.0 * z1 * z2 / ((z1 + z2) ** 2 * np.exp(-1j * phi)
-                                    - (z1 - z2) ** 2 * np.exp(1j * phi)))
+    return complex(
+        4.0
+        * z1
+        * z2
+        / ((z1 + z2) ** 2 * np.exp(-1j * phi) - (z1 - z2) ** 2 * np.exp(1j * phi))
+    )
 
 
 # --- The reference oracle itself: B&G limiting cases ------------------------
@@ -124,8 +130,7 @@ def test_reflection_coefficient_limiting_cases() -> None:
     assert v0.imag == 0.0
 
     # theta with theta_t = pi/4: sin(theta) = c / (c_t sqrt(2)).
-    theta_45 = float(np.degrees(np.arcsin(
-        WATER.c_p / (STEEL.c_s * np.sqrt(2.0)))))
+    theta_45 = float(np.degrees(np.arcsin(WATER.c_p / (STEEL.c_s * np.sqrt(2.0)))))
     z_t = STEEL.rho * STEEL.c_s * np.sqrt(2.0)
     z = z1 / np.cos(np.radians(theta_45))
     v45 = _reflection_coefficient(theta_45, WATER, STEEL)
@@ -190,8 +195,10 @@ def test_scholte_speed_rejects_wrong_material_roles() -> None:
 # --- Oblique reflection with mode conversion (FDTD) -------------------------
 
 
-def _oblique_water_trace(theta_deg: float, with_steel: bool,
-                         ) -> tuple[np.ndarray, float]:
+def _oblique_water_trace(
+    theta_deg: float,
+    with_steel: bool,
+) -> tuple[np.ndarray, float]:
     """Probe pressure of a tilted carrier beam over water or water/steel.
 
     A Gaussian-envelope 25 kHz beam (transverse 1/e half-width 0.35 m,
@@ -203,7 +210,7 @@ def _oblique_water_trace(theta_deg: float, with_steel: bool,
     """
     theta = np.radians(theta_deg)
     dx, f0 = 0.004, 25e3
-    ny_w = 113                          # 0.452 m of water
+    ny_w = 113  # 0.452 m of water
     ny, nx = ny_w + 70, 600
     regions = []
     cfl = 0.6
@@ -212,11 +219,17 @@ def _oblique_water_trace(theta_deg: float, with_steel: bool,
     else:
         cfl = 0.6 * WATER.c_p / STEEL.c_p
     sim = ElasticFDTD2D.from_regions(
-        (ny, nx), dx, background=WATER, regions=regions,
-        sponge_width=30, sponge_sides=("bottom",), cfl=cfl)
+        (ny, nx),
+        dx,
+        background=WATER,
+        regions=regions,
+        sponge_width=30,
+        sponge_sides=("bottom",),
+        cfl=cfl,
+    )
     y_interface = ny_w * dx
-    height = 0.28                       # beam-centre launch height
-    x_hit = 0.5 * nx * dx               # beam axis meets the interface here
+    height = 0.28  # beam-centre launch height
+    x_hit = 0.5 * nx * dx  # beam axis meets the interface here
     x0 = x_hit - height * np.tan(theta)
     y0 = y_interface - height
     k = 2.0 * np.pi * f0 / WATER.c_p
@@ -225,8 +238,11 @@ def _oblique_water_trace(theta_deg: float, with_steel: bool,
     def packet(x: np.ndarray, y: np.ndarray, shift: float) -> np.ndarray:
         xi = (x - x0) * np.sin(theta) + (y - y0) * np.cos(theta) + shift
         eta = (x - x0) * np.cos(theta) - (y - y0) * np.sin(theta)
-        return np.asarray(np.exp(-(xi / w_env) ** 2)
-                          * np.exp(-(eta / sigma_t) ** 2) * np.sin(k * xi))
+        return np.asarray(
+            np.exp(-((xi / w_env) ** 2))
+            * np.exp(-((eta / sigma_t) ** 2))
+            * np.sin(k * xi)
+        )
 
     x_c = (np.arange(nx) + 0.5) * dx
     y_c = (np.arange(ny) + 0.5) * dx
@@ -237,11 +253,9 @@ def _oblique_water_trace(theta_deg: float, with_steel: bool,
     # Leapfrog-consistent particle velocity, half a time step back.
     shift = 0.5 * WATER.c_p * sim.dt
     x_gf, y_gf = np.meshgrid(np.arange(1, nx) * dx, y_c)
-    sim.vx += (packet(x_gf, y_gf, shift) / (WATER.rho * WATER.c_p)
-               * np.sin(theta))
+    sim.vx += packet(x_gf, y_gf, shift) / (WATER.rho * WATER.c_p) * np.sin(theta)
     x_gv, y_gv = np.meshgrid(x_c, np.arange(1, ny) * dx)
-    sim.vy += (packet(x_gv, y_gv, shift) / (WATER.rho * WATER.c_p)
-               * np.cos(theta))
+    sim.vy += packet(x_gv, y_gv, shift) / (WATER.rho * WATER.c_p) * np.cos(theta)
 
     # The probe sits on the beam axis' interface hit point, 0.12 m up:
     # the incident and reflected beam centres cross it at symmetric
@@ -296,19 +310,22 @@ def test_scholte_wave_speed_van_vossen_configuration() -> None:
     # 1435.97 m/s from the exact characteristic; measured: -1.5 %.
     dx = 1.0
     ny, nx = 190, 550
-    iy_interface = 90                   # solid from y = 90 m down
+    iy_interface = 90  # solid from y = 90 m down
     sim = ElasticFDTD2D.from_regions(
-        (ny, nx), dx, background=VV_FLUID,
+        (ny, nx),
+        dx,
+        background=VV_FLUID,
         regions=[((slice(iy_interface, None), slice(None)), VV_SOLID)],
-        sponge_width=20, sponge_sides=("top", "bottom"))
+        sponge_width=20,
+        sponge_sides=("top", "bottom"),
+    )
     f0, t0 = 50.0, 0.030
 
     def ricker(t: float) -> float:
         a = (np.pi * f0 * (t - t0)) ** 2
         return float((1.0 - 2.0 * a) * np.exp(-a))
 
-    sim.add_source(ExplosionSource(ix=50, iy=80, waveform=ricker,
-                                   amplitude=1e3))
+    sim.add_source(ExplosionSource(ix=50, iy=80, waveform=ricker, amplitude=1e3))
     # Two fluid cells on the contact, plus one 30 m up into the water.
     probes = ((150, 89), (450, 89), (450, 59))
     n_steps = round(0.360 / sim.dt)
@@ -354,8 +371,11 @@ def test_immersed_plate_transmission_and_thickness_resonance() -> None:
     ny, nx = round(0.75 / dx), 3
     iy0 = round(0.35 / dx)
     sim = ElasticFDTD2D.from_regions(
-        (ny, nx), dx, background=WATER,
-        regions=[((slice(iy0, iy0 + round(h / dx)), slice(None)), STEEL)])
+        (ny, nx),
+        dx,
+        background=WATER,
+        regions=[((slice(iy0, iy0 + round(h / dx)), slice(None)), STEEL)],
+    )
     y = (np.arange(ny) + 0.5) * dx
     width, y0 = 1.5e-3, 0.25
     p0 = np.exp(-(((y - y0) / width) ** 2))
@@ -365,8 +385,8 @@ def test_immersed_plate_transmission_and_thickness_resonance() -> None:
     v0 = np.exp(-(((y_face - y0) / width) ** 2)) / (WATER.rho * WATER.c_p)
     sim.vy += v0[:, np.newaxis]
     n_steps = round(0.45e-3 / sim.dt)
-    iy_above = round(0.32 / dx)         # sees incident then reflected
-    iy_below = round(0.41 / dx)         # sees the transmitted ring-down
+    iy_above = round(0.32 / dx)  # sees incident then reflected
+    iy_below = round(0.41 / dx)  # sees the transmitted ring-down
     trace_above = np.zeros(n_steps)
     trace_below = np.zeros(n_steps)
     for i in range(n_steps):
@@ -389,9 +409,15 @@ def test_immersed_plate_transmission_and_thickness_resonance() -> None:
     assert tl_50k == pytest.approx(-20.0 * np.log10(w_50k), abs=1.0)
 
     tl_10k = float(tl[np.argmin(np.abs(freqs - 10e3))])
-    tl_mass_law = float(mass_law_transmission_loss(
-        10e3, STEEL.rho * h, incidence="normal",
-        speed_of_sound=WATER.c_p, air_density=WATER.rho))
+    tl_mass_law = float(
+        mass_law_transmission_loss(
+            10e3,
+            STEEL.rho * h,
+            incidence="normal",
+            speed_of_sound=WATER.c_p,
+            air_density=WATER.rho,
+        )
+    )
     assert tl_10k == pytest.approx(tl_mass_law, abs=1.0)
 
     band = (freqs >= 250e3) & (freqs <= 340e3)
@@ -418,10 +444,13 @@ def test_air_solid_interface_is_stable_and_reflects_totally() -> None:
     # asymptotics test) and is deliberately not asserted.
     dx = 5e-3
     ny, nx = 1440, 3
-    iy_interface = 240                  # steel from y = 1.2 m down
+    iy_interface = 240  # steel from y = 1.2 m down
     sim = ElasticFDTD2D.from_regions(
-        (ny, nx), dx, background=AIR,
-        regions=[((slice(iy_interface, None), slice(None)), STEEL)])
+        (ny, nx),
+        dx,
+        background=AIR,
+        regions=[((slice(iy_interface, None), slice(None)), STEEL)],
+    )
     y = (np.arange(ny) + 0.5) * dx
     p0 = np.exp(-(((y - 0.7) / 0.15) ** 2))
     sim.txx[:] = -p0[:, np.newaxis]
@@ -445,8 +474,7 @@ def test_air_solid_interface_is_stable_and_reflects_totally() -> None:
     incident = float(trace_air[times < 1.4e-3].max())
     window = trace_air[(times > 1.9e-3) & (times < 2.6e-3)]
     reflected = float(window[np.abs(window).argmax()])
-    assert reflected / incident == pytest.approx((z2 - z1) / (z2 + z1),
-                                                 rel=0.005)
+    assert reflected / incident == pytest.approx((z2 - z1) / (z2 + z1), rel=0.005)
     solid_window = trace_solid[times < 3.3e-3]
     transmitted = float(solid_window[np.abs(solid_window).argmax()])
     expected = 2.0 * z2 / (z1 + z2) * incident
@@ -466,16 +494,23 @@ def test_from_regions_matches_manual_maps() -> None:
     c_p[20:], c_s[20:], rho[20:] = STEEL.c_p, STEEL.c_s, STEEL.rho
     manual = ElasticFDTD2D(c_p, c_s, 0.01, rho=rho)
     sugar = ElasticFDTD2D.from_regions(
-        (ny, nx), 0.01, background=WATER,
-        regions=[((slice(20, None), slice(None)), STEEL)])
+        (ny, nx),
+        0.01,
+        background=WATER,
+        regions=[((slice(20, None), slice(None)), STEEL)],
+    )
     np.testing.assert_array_equal(sugar.c_p, manual.c_p)
     np.testing.assert_array_equal(sugar.c_s, manual.c_s)
     np.testing.assert_array_equal(sugar.rho, manual.rho)
     assert sugar.dt == manual.dt
     for sim in (manual, sugar):
-        sim.add_source(ExplosionSource(
-            ix=30, iy=10,
-            waveform=lambda t: float(np.exp(-((t - 5e-5) / 1e-5) ** 2))))
+        sim.add_source(
+            ExplosionSource(
+                ix=30,
+                iy=10,
+                waveform=lambda t: float(np.exp(-(((t - 5e-5) / 1e-5) ** 2))),
+            )
+        )
         sim.run(200)
     np.testing.assert_array_equal(sugar.txx, manual.txx)
     np.testing.assert_array_equal(sugar.vy, manual.vy)
@@ -486,31 +521,37 @@ def test_from_regions_paints_in_order_and_accepts_masks() -> None:
     mask = np.zeros((10, 12), dtype=bool)
     mask[2:5, 3:6] = True
     sim = ElasticFDTD2D.from_regions(
-        (10, 12), 0.01, background=(343.0, 0.0, 1.2),
-        regions=[((slice(0, 6), slice(None)), ALUMINIUM), (mask, STEEL)])
-    assert sim.c_p[0, 0] == ALUMINIUM.c_p          # first region
-    assert sim.c_p[3, 4] == STEEL.c_p              # later region wins
+        (10, 12),
+        0.01,
+        background=(343.0, 0.0, 1.2),
+        regions=[((slice(0, 6), slice(None)), ALUMINIUM), (mask, STEEL)],
+    )
+    assert sim.c_p[0, 0] == ALUMINIUM.c_p  # first region
+    assert sim.c_p[3, 4] == STEEL.c_p  # later region wins
     assert sim.rho[3, 4] == STEEL.rho
-    assert sim.c_p[8, 0] == 343.0                  # background triple
+    assert sim.c_p[8, 0] == 343.0  # background triple
 
 
 def test_from_regions_and_material_validation() -> None:
     wrong_shape_mask = np.zeros((3, 3), dtype=bool)
     with pytest.raises(ValueError, match="mask must be a boolean"):
         ElasticFDTD2D.from_regions(
-            (10, 10), 0.01, background=WATER,
-            regions=[(wrong_shape_mask, STEEL)])
+            (10, 10), 0.01, background=WATER, regions=[(wrong_shape_mask, STEEL)]
+        )
     with pytest.raises(ValueError, match="background must be a Material"):
         ElasticFDTD2D.from_regions((10, 10), 0.01, background="water")
     with pytest.raises(ValueError, match=r"regions\[0\] must be a Material"):
         ElasticFDTD2D.from_regions(
-            (10, 10), 0.01, background=WATER,
-            regions=[(np.s_[0:2, :], (1480.0, 0.0))])
+            (10, 10), 0.01, background=WATER, regions=[(np.s_[0:2, :], (1480.0, 0.0))]
+        )
     with pytest.raises(ValueError, match="at least 2 x 2"):
         ElasticFDTD2D.from_regions((1, 10), 0.01, background=WATER)
     with pytest.raises(ValueError, match="must be an integer"):
-        ElasticFDTD2D.from_regions((10.5, 10), 0.01,  # type: ignore[arg-type]
-                                   background=WATER)
+        ElasticFDTD2D.from_regions(
+            (10.5, 10),
+            0.01,  # type: ignore[arg-type]
+            background=WATER,
+        )
     with pytest.raises(ValueError, match="c_s must be non-negative"):
         Material(c_p=1480.0, c_s=-1.0, rho=1000.0)
     with pytest.raises(ValueError, match=r"c_p\*\*2 must be at least"):
@@ -522,5 +563,4 @@ def test_from_regions_and_material_validation() -> None:
     assert not STEEL.is_fluid
     assert not ALUMINIUM.is_fluid
     coerced = Material(c_p=1480, c_s=0, rho=1000)
-    assert all(isinstance(v, float)
-               for v in (coerced.c_p, coerced.c_s, coerced.rho))
+    assert all(isinstance(v, float) for v in (coerced.c_p, coerced.c_s, coerced.rho))

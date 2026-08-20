@@ -125,14 +125,16 @@ def test_attenuation_requirement_lower_is_better(tmp_path) -> None:
     emission = _emission()
     passing = tmp_path / "pass.pdf"
     result.report(
-        str(passing), metadata=ReportMetadata(requirement=50.0),
+        str(passing),
+        metadata=ReportMetadata(requirement=50.0),
         source_emission=emission,
     )
     assert "PASS" in _extract_text(str(passing))
 
     failing = tmp_path / "fail.pdf"
     result.report(
-        str(failing), metadata=ReportMetadata(requirement=40.0),
+        str(failing),
+        metadata=ReportMetadata(requirement=40.0),
         source_emission=emission,
     )
     assert "FAIL" in _extract_text(str(failing))

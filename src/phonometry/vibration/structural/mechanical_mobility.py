@@ -93,12 +93,12 @@ from ..._internal.validation import require_non_negative, require_positive
 #: of ``j*omega`` relating the FRF to the receptance (0 displacement, 1 velocity,
 #: 2 acceleration); ``inverse`` marks the force-per-motion reciprocals.
 _FRF_TYPES: dict[str, tuple[int, bool]] = {
-    "receptance": (0, False),        # dynamic compliance, x/F  [m/N]
-    "mobility": (1, False),          # v/F                      [m/(N.s)]
-    "accelerance": (2, False),       # a/F                      [1/kg]
+    "receptance": (0, False),  # dynamic compliance, x/F  [m/N]
+    "mobility": (1, False),  # v/F                      [m/(N.s)]
+    "accelerance": (2, False),  # a/F                      [1/kg]
     "dynamic_stiffness": (0, True),  # F/x                      [N/m]
-    "impedance": (1, True),          # F/v                      [N.s/m]
-    "apparent_mass": (2, True),      # F/a                      [kg]
+    "impedance": (1, True),  # F/v                      [N.s/m]
+    "apparent_mass": (2, True),  # F/a                      [kg]
 }
 
 #: SI unit strings for each FRF, for labelling.
@@ -116,8 +116,9 @@ def _omega(frequency: ArrayLike) -> NDArray[np.float64]:
     r"""Angular frequency :math:`\omega = 2 \pi f` (rad/s); rejects f <= 0."""
     f = np.asarray(frequency, dtype=np.float64)
     if np.any(f <= 0.0):
-        raise ValueError("'frequency' must be positive (mobility conversions "
-                         "divide by omega).")
+        raise ValueError(
+            "'frequency' must be positive (mobility conversions divide by omega)."
+        )
     return 2.0 * np.pi * f
 
 
@@ -182,8 +183,9 @@ def convert_frf(
             )
     omega = _omega(frequency)
     val = np.asarray(value, dtype=np.complex128)
-    if ((_FRF_TYPES[source][1] or _FRF_TYPES[target][1])
-            and not np.all(np.abs(val) > 0.0)):
+    if (_FRF_TYPES[source][1] or _FRF_TYPES[target][1]) and not np.all(
+        np.abs(val) > 0.0
+    ):
         raise ValueError(
             "'value' contains zeros (dead channel); converting "
             f"{source!r} to {target!r} takes a reciprocal, which is "
@@ -445,7 +447,9 @@ class MobilityResult:
         """
         return convert_frf(self.mobility, self.frequencies, "mobility", target)
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the mobility magnitude ``|Y(f)|``.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the

@@ -186,9 +186,17 @@ def _shown_in(language: str) -> set[str]:
     """Fiche names embedded on the pages of one language."""
     root = Path(DOCS_DIR)
     pages = (
-        [page for page in root.rglob("*.mdx") if page.relative_to(root).parts[0] == "es"]
+        [
+            page
+            for page in root.rglob("*.mdx")
+            if page.relative_to(root).parts[0] == "es"
+        ]
         if language == "es"
-        else [page for page in root.rglob("*.mdx") if page.relative_to(root).parts[0] != "es"]
+        else [
+            page
+            for page in root.rglob("*.mdx")
+            if page.relative_to(root).parts[0] != "es"
+        ]
     )
     return {
         name

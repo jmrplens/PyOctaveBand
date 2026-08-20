@@ -60,7 +60,9 @@ def test_reflection_loss_gradient_sand_matches_table_9_1() -> None:
 
 def test_reflection_loss_gradient_mud_matches_table_9_1_coefficient() -> None:
     """η_mud = 2·ω·ε/c' (Eq. 9.53); Table 9.1 prints ``0.021·f̂`` Np/rad."""
-    assert reflection_loss_gradient("mud", frequency_hz=1.0) == pytest.approx(0.021, abs=5e-4)
+    assert reflection_loss_gradient("mud", frequency_hz=1.0) == pytest.approx(
+        0.021, abs=5e-4
+    )
     # Linear in frequency, as the table's f̂ factor states.
     assert reflection_loss_gradient("mud", frequency_hz=250.0) == pytest.approx(
         250.0 * reflection_loss_gradient("mud", frequency_hz=1.0), rel=1e-12
@@ -84,7 +86,9 @@ def test_effective_depth_matches_equation_9_55() -> None:
     k = 2.0 * np.pi * f / c
     psi_c = np.arccos(1.0 / 1.20)
     expected = h + 2.1 / (k * np.sin(psi_c))
-    assert effective_depth(h, f, seabed="sand", sound_speed=c) == pytest.approx(expected, rel=1e-12)
+    assert effective_depth(h, f, seabed="sand", sound_speed=c) == pytest.approx(
+        expected, rel=1e-12
+    )
 
 
 def test_cutoff_frequency_matches_equation_9_60() -> None:
@@ -138,7 +142,9 @@ def test_mode_stripping_boundary_equates_theta_eff_with_mode_3_over_2() -> None:
     theta_eff = np.sqrt(np.pi * h / (4.0 * eta * r))
     assert theta_eff == pytest.approx(theta_32, rel=1e-12)
     # ...and the same rule solved symbolically for r.
-    assert r == pytest.approx(k**2 * b.effective_depth**2 * h / (9.0 * np.pi * eta), rel=1e-12)
+    assert r == pytest.approx(
+        k**2 * b.effective_depth**2 * h / (9.0 * np.pi * eta), rel=1e-12
+    )
     # The printed Eq. (9.57) puts the transition where the effective angle has
     # already fallen below the *first* mode's own angle, which cannot be where
     # the second mode is stripped.
@@ -163,7 +169,9 @@ def test_composite_loss_and_the_boundary_use_the_same_effective_angle() -> None:
     # Recover θ_eff from the printed Eq. (9.46) F_MP = (2·θ_eff/(r·H))·erf(...)
     # by inverting the closed form the module evaluates.
     theta_eff = np.sqrt(np.pi * h / (4.0 * b.reflection_loss_gradient * r))
-    expected = (2.0 * theta_eff / (r * h)) * erf(np.sqrt(np.pi) * b.critical_angle / (2.0 * theta_eff))
+    expected = (2.0 * theta_eff / (r * h)) * erf(
+        np.sqrt(np.pi) * b.critical_angle / (2.0 * theta_eff)
+    )
     assert res.multipath[0] == pytest.approx(-10.0 * np.log10(expected), rel=1e-12)
 
 
@@ -171,7 +179,9 @@ def test_spherical_to_cylindrical_boundary() -> None:
     """1/r² and 2·ψc/(r·H) are equal at r = H/(2·ψc)."""
     h, f = 50.0, 250.0
     b = weston_regime_boundaries(f, h, seabed="sand")
-    assert b.spherical_to_cylindrical == pytest.approx(h / (2.0 * b.critical_angle), rel=1e-12)
+    assert b.spherical_to_cylindrical == pytest.approx(
+        h / (2.0 * b.critical_angle), rel=1e-12
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -205,12 +215,14 @@ def test_multipath_integral_limits_to_the_two_regimes() -> None:
 def test_composite_regime_labels_follow_the_boundaries() -> None:
     h, f = 50.0, 250.0
     b = weston_regime_boundaries(f, h, seabed="sand")
-    ranges = np.array([
-        b.spherical_to_cylindrical / 2.0,
-        np.sqrt(b.spherical_to_cylindrical * b.cylindrical_to_mode_stripping),
-        np.sqrt(b.cylindrical_to_mode_stripping * b.mode_stripping_to_single_mode),
-        b.mode_stripping_to_single_mode * 2.0,
-    ])
+    ranges = np.array(
+        [
+            b.spherical_to_cylindrical / 2.0,
+            np.sqrt(b.spherical_to_cylindrical * b.cylindrical_to_mode_stripping),
+            np.sqrt(b.cylindrical_to_mode_stripping * b.mode_stripping_to_single_mode),
+            b.mode_stripping_to_single_mode * 2.0,
+        ]
+    )
     res = weston_propagation_loss(ranges, f, h, seabed="sand")
     assert isinstance(res, WestonPropagationResult)
     assert list(res.regime) == list(WESTON_REGIMES)
@@ -255,7 +267,9 @@ def test_ideal_waveguide_cylindrical_factor_is_pi_over_rh() -> None:
 
 
 @pytest.mark.parametrize("frequency", [50.0, 100.0, 200.0])
-def test_normal_modes_range_average_matches_weston_cylindrical(frequency: float) -> None:
+def test_normal_modes_range_average_matches_weston_cylindrical(
+    frequency: float,
+) -> None:
     """Depth- and range-averaged normal-mode loss converges on Weston's Eq. (9.42).
 
     The mean over range of the coherent modal field is the incoherent modal
@@ -268,10 +282,21 @@ def test_normal_modes_range_average_matches_weston_cylindrical(frequency: float)
     speeds = np.array([c, c])
     ranges = np.linspace(20_000.0, 30_000.0, 2001)
     energies = [
-        np.mean(10.0 ** (-normal_modes(
-            frequency, depths, speeds, source_depth=41.0, receiver_depth=float(zr),
-            ranges_m=ranges, bottom="pressure-release",
-        ).propagation_loss / 10.0))
+        np.mean(
+            10.0
+            ** (
+                -normal_modes(
+                    frequency,
+                    depths,
+                    speeds,
+                    source_depth=41.0,
+                    receiver_depth=float(zr),
+                    ranges_m=ranges,
+                    bottom="pressure-release",
+                ).propagation_loss
+                / 10.0
+            )
+        )
         for zr in np.linspace(10.0, 90.0, 9)
     ]
     numeric = -10.0 * np.log10(float(np.mean(energies)))
@@ -293,8 +318,15 @@ def test_parabolic_equation_range_average_matches_weston_cylindrical() -> None:
     h, c, f = 100.0, 1500.0, 50.0
     depths = np.array([0.0, h])
     speeds = np.array([c, c])
-    pe = parabolic_equation(f, depths, speeds, source_depth=41.0, max_range=30_000.0,
-                            range_step=5.0, n_depth_points=256)
+    pe = parabolic_equation(
+        f,
+        depths,
+        speeds,
+        source_depth=41.0,
+        max_range=30_000.0,
+        range_step=5.0,
+        n_depth_points=256,
+    )
     keep_r = pe.ranges >= 20_000.0
     keep_z = (pe.depths >= 10.0) & (pe.depths <= 90.0)
     numeric = -10.0 * np.log10(
@@ -363,8 +395,12 @@ def test_refracting_branch_requires_a_frequency() -> None:
 def test_refracting_branch_requires_a_sediment_gradient() -> None:
     """Without a critical angle *and* without c', neither Eq. (9.51) nor (9.53) applies."""
     flat = WestonSeabed(
-        name="flat", grain_size=8.0, sound_speed_ratio=1.0, density_ratio=1.4,
-        attenuation_db_per_wavelength=0.09, loss_parameter=0.00165,
+        name="flat",
+        grain_size=8.0,
+        sound_speed_ratio=1.0,
+        density_ratio=1.4,
+        attenuation_db_per_wavelength=0.09,
+        loss_parameter=0.00165,
         sound_speed_gradient=0.0,
     )
     with pytest.raises(ValueError, match="sound_speed_gradient"):

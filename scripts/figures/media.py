@@ -59,7 +59,7 @@ _ANIM_HOLD = 2 * _ANIM_FPS
 # value is the starting budget the older clips were sized against and the
 # default for clips whose own note does not override it.
 _FDTD_ANIM_FRAMES = 18 * _ANIM_FPS
-_ANIM_FIGSIZE = (8.0, 4.5)   # inches at _ANIM_DPI -> 2400 x 1350 px
+_ANIM_FIGSIZE = (8.0, 4.5)  # inches at _ANIM_DPI -> 2400 x 1350 px
 _ANIM_DPI = 300
 # The GitHub-docs GIF is a compact fallback for the smooth site WebM: a lower
 # frame rate, smaller frame and capped palette keep even the detail-dense
@@ -87,10 +87,25 @@ _ANIM_ENCODE_THREADS = 3
 def _vp9_extra_args() -> list[str]:
     """ffmpeg args for the tuned constant-quality VP9 WebM encode."""
     return [
-        "-b:v", "0", "-crf", "40",
-        "-tune-content", "screen", "-row-mt", "1", "-deadline", "good",
-        "-cpu-used", str(_ANIM_CPU_USED), "-threads", str(_ANIM_ENCODE_THREADS),
-        "-pix_fmt", "yuv420p", "-an", "-loglevel", "error",
+        "-b:v",
+        "0",
+        "-crf",
+        "40",
+        "-tune-content",
+        "screen",
+        "-row-mt",
+        "1",
+        "-deadline",
+        "good",
+        "-cpu-used",
+        str(_ANIM_CPU_USED),
+        "-threads",
+        str(_ANIM_ENCODE_THREADS),
+        "-pix_fmt",
+        "yuv420p",
+        "-an",
+        "-loglevel",
+        "error",
     ]
 
 
@@ -121,11 +136,18 @@ def _anim_figure() -> Any:
     return plt.figure(figsize=_ANIM_FIGSIZE, dpi=_ANIM_DPI, layout="constrained")
 
 
-def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
-                 output_dir: str, stem: str, *, frames: int | None = None,
-                 fps: float | None = None, gif_fps: int | None = None,
-                 poster_ss: float | None = None,
-                 measure: Callable[[], None] | None = None) -> None:
+def _render_clip(
+    fig: Any,
+    update: Callable[[int], tuple[Any, ...]],
+    output_dir: str,
+    stem: str,
+    *,
+    frames: int | None = None,
+    fps: float | None = None,
+    gif_fps: int | None = None,
+    poster_ss: float | None = None,
+    measure: Callable[[], None] | None = None,
+) -> None:
     """Shared clip tail: drive *update* through FuncAnimation and encode.
 
     Static artists (tick labels included) get the same Spanish pass as the
@@ -156,9 +178,10 @@ def _render_clip(fig: Any, update: Callable[[int], tuple[Any, ...]],
         measure()
     n_frames = _ANIM_FRAMES if frames is None else frames
     rate = _ANIM_FPS if fps is None else fps
-    anim = FuncAnimation(fig, update, frames=n_frames,
-                         interval=1000 / rate, blit=False)
-    _save_animation(anim, fig, output_dir, stem, fps=rate, gif_fps=gif_fps, poster_ss=poster_ss)
+    anim = FuncAnimation(fig, update, frames=n_frames, interval=1000 / rate, blit=False)
+    _save_animation(
+        anim, fig, output_dir, stem, fps=rate, gif_fps=gif_fps, poster_ss=poster_ss
+    )
 
 
 def _extract_poster(webm: str, poster_ss: float | None = None) -> str:
@@ -175,11 +198,10 @@ def _extract_poster(webm: str, poster_ss: float | None = None) -> str:
     poster = webm.removesuffix(".webm") + "_poster.jpg"
     subprocess.run(
         ["ffmpeg", "-y", "-loglevel", "error"]
-        + (["-ss", f"{poster_ss:.2f}"] if poster_ss is not None
-           else ["-sseof", "-0.5"])
-        + ["-i", webm, "-frames:v", "1", "-q:v", "3", "-update", "1",
-           poster],
-        check=True)
+        + (["-ss", f"{poster_ss:.2f}"] if poster_ss is not None else ["-sseof", "-0.5"])
+        + ["-i", webm, "-frames:v", "1", "-q:v", "3", "-update", "1", poster],
+        check=True,
+    )
     return poster
 
 
@@ -220,8 +242,19 @@ def _gpu_encode_target() -> dict[str, str] | None:
         decline("PHONO_GPU_HOST is not set")
         return None
     probe = subprocess.run(
-        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=4", "--",
-         f"{user}@{host}", "true"], capture_output=True, check=False)
+        [
+            "ssh",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            "ConnectTimeout=4",
+            "--",
+            f"{user}@{host}",
+            "true",
+        ],
+        capture_output=True,
+        check=False,
+    )
     if probe.returncode != 0:
         decline(f"{user}@{host} did not answer")
         return None
@@ -232,11 +265,21 @@ def _gpu_encode_target() -> dict[str, str] | None:
 def _av1_nvenc_extra_args() -> list[str]:
     """ffmpeg args for the remote AV1 NVENC encode (WebM container)."""
     return [
-        "-c:v", "av1_nvenc",
+        "-c:v",
+        "av1_nvenc",
         # cq 44 calibrated against the VP9 crf-40 size on the metadiffuser
         # clip (cq 42 = parity, 46 = -22 %): smaller files, same resolution.
-        "-b:v", "0", "-cq", "44", "-preset", "p6",
-        "-pix_fmt", "yuv420p", "-an", "-loglevel", "error",
+        "-b:v",
+        "0",
+        "-cq",
+        "44",
+        "-preset",
+        "p6",
+        "-pix_fmt",
+        "yuv420p",
+        "-an",
+        "-loglevel",
+        "error",
     ]
 
 
@@ -268,16 +311,24 @@ scp -q -- {q_target}:{q_dir}/"$rid" "$out"
 ssh -o BatchMode=yes -- {q_target} "rm -f {q_dir}/$rid"
 """
     with tempfile.NamedTemporaryFile(
-            "w", suffix=".sh", prefix="ffmpeg-gpu-", delete=False) as handle:
+        "w", suffix=".sh", prefix="ffmpeg-gpu-", delete=False
+    ) as handle:
         handle.write(script)
     os.chmod(handle.name, 0o755)
     return handle.name
 
 
-def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
-                    make_gif: bool = True, *, fps: float | None = None,
-                    gif_fps: int | None = None,
-                    poster_ss: float | None = None) -> None:
+def _save_animation(
+    anim: Any,
+    fig: Any,
+    output_dir: str,
+    stem: str,
+    make_gif: bool = True,
+    *,
+    fps: float | None = None,
+    gif_fps: int | None = None,
+    poster_ss: float | None = None,
+) -> None:
     """Write *anim* to WebM (always), its poster JPEG and, for English, a GIF.
 
     The GIF is derived from the just-written WebM with an ffmpeg palette pass
@@ -304,45 +355,83 @@ def _save_animation(anim: Any, fig: Any, output_dir: str, stem: str,
     gpu = _gpu_encode_target()
     saved = False
     if gpu is not None:
-        wrapper = _write_gpu_ffmpeg_wrapper(gpu["target"], gpu["image"],
-                                            gpu["workdir"])
+        wrapper = _write_gpu_ffmpeg_wrapper(gpu["target"], gpu["image"], gpu["workdir"])
         try:
-            writer = FFMpegWriter(fps=rate_arg, codec="av1_nvenc",
-                                  extra_args=_av1_nvenc_extra_args())
-            with plt.rc_context({"savefig.bbox": "standard",
-                                 "animation.ffmpeg_path": wrapper}):
-                anim.save(webm, writer=writer, dpi=_ANIM_DPI,
-                          savefig_kwargs={"facecolor": fig.get_facecolor()})
+            writer = FFMpegWriter(
+                fps=rate_arg, codec="av1_nvenc", extra_args=_av1_nvenc_extra_args()
+            )
+            with plt.rc_context(
+                {"savefig.bbox": "standard", "animation.ffmpeg_path": wrapper}
+            ):
+                anim.save(
+                    webm,
+                    writer=writer,
+                    dpi=_ANIM_DPI,
+                    savefig_kwargs={"facecolor": fig.get_facecolor()},
+                )
             saved = True
         except (RuntimeError, subprocess.CalledProcessError, OSError) as exc:
             print(f"  [gpu-encode] {stem}: {exc}; falling back to VP9")
         finally:
             os.remove(wrapper)
     if not saved:
-        writer = FFMpegWriter(fps=rate_arg, codec="libvpx-vp9",
-                              extra_args=_vp9_extra_args())
+        writer = FFMpegWriter(
+            fps=rate_arg, codec="libvpx-vp9", extra_args=_vp9_extra_args()
+        )
         with plt.rc_context({"savefig.bbox": "standard"}):
-            anim.save(webm, writer=writer, dpi=_ANIM_DPI,
-                      savefig_kwargs={"facecolor": fig.get_facecolor()})
+            anim.save(
+                webm,
+                writer=writer,
+                dpi=_ANIM_DPI,
+                savefig_kwargs={"facecolor": fig.get_facecolor()},
+            )
     _extract_poster(webm, poster_ss)
     made_gif = False
     if make_gif and _LANG == "en":
         gif = _anim_path(output_dir, stem, "gif")
         palette = os.path.join(output_dir, f".{stem}{_FILENAME_SUFFIX}_pal.png")
-        vf = (f"fps={_GIF_FPS if gif_fps is None else gif_fps},"
-              f"scale={_GIF_SCALE}:-1:flags=lanczos")
+        vf = (
+            f"fps={_GIF_FPS if gif_fps is None else gif_fps},"
+            f"scale={_GIF_SCALE}:-1:flags=lanczos"
+        )
         subprocess.run(
-            ["ffmpeg", "-y", "-loglevel", "error", "-i", webm, "-vf",
-             f"{vf},palettegen=max_colors={_GIF_COLORS}:stats_mode=diff",
-             "-update", "1", palette],
-            check=True)
+            [
+                "ffmpeg",
+                "-y",
+                "-loglevel",
+                "error",
+                "-i",
+                webm,
+                "-vf",
+                f"{vf},palettegen=max_colors={_GIF_COLORS}:stats_mode=diff",
+                "-update",
+                "1",
+                palette,
+            ],
+            check=True,
+        )
         subprocess.run(
-            ["ffmpeg", "-y", "-loglevel", "error", "-i", webm, "-i", palette,
-             "-lavfi", f"{vf}[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=3",
-             "-loop", "0", gif], check=True)
+            [
+                "ffmpeg",
+                "-y",
+                "-loglevel",
+                "error",
+                "-i",
+                webm,
+                "-i",
+                palette,
+                "-lavfi",
+                f"{vf}[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=3",
+                "-loop",
+                "0",
+                gif,
+            ],
+            check=True,
+        )
         os.remove(palette)
         made_gif = True
     plt.close(fig)
     theme = "dark" if _FILENAME_SUFFIX else "light"
-    print(f"  {stem} [{_LANG} {theme}] -> webm + poster"
-          + (" + gif" if made_gif else ""))
+    print(
+        f"  {stem} [{_LANG} {theme}] -> webm + poster" + (" + gif" if made_gif else "")
+    )

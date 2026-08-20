@@ -108,9 +108,7 @@ class WindowMetricsResult:
         return plot_window_metrics(self, ax=ax, language=language, **kwargs)
 
 
-def _window_spectrum_db(
-    w: NDArray[np.float64], oversample: int
-) -> NDArray[np.float64]:
+def _window_spectrum_db(w: NDArray[np.float64], oversample: int) -> NDArray[np.float64]:
     """Magnitude of the window spectrum re its peak, in dB, oversampled.
 
     Zero-padding the DFT by ``oversample`` samples the underlying
@@ -132,9 +130,7 @@ def _mainlobe_edge(level_db: NDArray[np.float64]) -> int:
     return int(edges[0])
 
 
-def _width_3db_bins(
-    level_db: NDArray[np.float64], oversample: int
-) -> float:
+def _width_3db_bins(level_db: NDArray[np.float64], oversample: int) -> float:
     """Two-sided -3 dB main-lobe width in bins (linear dB interpolation)."""
     below = np.flatnonzero(level_db <= -3.0103)
     i = int(below[0])

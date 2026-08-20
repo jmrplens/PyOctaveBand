@@ -254,7 +254,9 @@ def rectangular_duct_properties(
     return np.asarray(rho, dtype=np.complex128), np.asarray(kap, dtype=np.complex128)
 
 
-def _neck_slit_correction(neck_side: float, slit_height: float, lattice_step: float) -> float:
+def _neck_slit_correction(
+    neck_side: float, slit_height: float, lattice_step: float
+) -> float:
     """Neck-to-slit radiation end correction ``Delta l_2`` (APL Eqs. (A25)-(A26)).
 
     Circular-duct fit evaluated with area-equivalent radii; the slit radius is
@@ -264,9 +266,7 @@ def _neck_slit_correction(neck_side: float, slit_height: float, lattice_step: fl
     rt = np.sqrt(slit_height * lattice_step / np.pi)
     x = rn / rt
     return float(
-        0.82
-        * (1.0 - 0.235 * x - 1.32 * x**2 + 1.54 * x**3 - 0.86 * x**4)
-        * rn
+        0.82 * (1.0 - 0.235 * x - 1.32 * x**2 + 1.54 * x**3 - 0.86 * x**4) * rn
     )
 
 
@@ -291,9 +291,7 @@ def _neck_slit_correction_2d(neck_width: float, slit_height: float) -> float:
     """
     x = neck_width / slit_height
     return float(
-        0.41
-        * (1.0 - 0.235 * x - 1.32 * x**2 + 1.54 * x**3 - 0.86 * x**4)
-        * neck_width
+        0.41 * (1.0 - 0.235 * x - 1.32 * x**2 + 1.54 * x**3 - 0.86 * x**4) * neck_width
     )
 
 
@@ -304,23 +302,25 @@ def _neck_cavity_correction_2d(neck_width: float, cavity_width: float) -> float:
 
 
 def _slit_resonator_ducts(
-    f: Real, wn: float, wc: float, slit_height: float | None,
-    lattice_step: float | None, end_correction: bool, air: AirProperties,
+    f: Real,
+    wn: float,
+    wc: float,
+    slit_height: float | None,
+    lattice_step: float | None,
+    end_correction: bool,
+    air: AirProperties,
 ) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
     """Duct parameters of the 2-D resonator (Sci. Rep. Eqs. (8)-(12))."""
     if slit_height is None or lattice_step is None:
         raise ValueError(
-            "The 'slit' resonator geometry requires 'slit_height' and "
-            "'lattice_step'."
+            "The 'slit' resonator geometry requires 'slit_height' and 'lattice_step'."
         )
     h = require_positive(slit_height, "slit_height")
     a = require_positive(lattice_step, "lattice_step")
     rho_n, kap_n = slit_effective_properties(f, slit_height=wn, air=air)
     rho_c, kap_c = slit_effective_properties(f, slit_height=wc, air=air)
-    z_n = np.asarray(np.sqrt(kap_n * rho_n) / (wn * a),
-                     dtype=np.complex128)
-    z_c = np.asarray(np.sqrt(kap_c * rho_c) / (wc * a),
-                     dtype=np.complex128)
+    z_n = np.asarray(np.sqrt(kap_n * rho_n) / (wn * a), dtype=np.complex128)
+    z_c = np.asarray(np.sqrt(kap_c * rho_c) / (wc * a), dtype=np.complex128)
     dl = 0.0
     if end_correction:
         if wn > h:
@@ -338,17 +338,18 @@ def _slit_resonator_ducts(
 
 
 def _square_resonator_ducts(
-    f: Real, wn: float, wc: float, slit_height: float | None,
-    lattice_step: float | None, end_correction: bool,
-    air: AirProperties, sum_terms: int,
+    f: Real,
+    wn: float,
+    wc: float,
+    slit_height: float | None,
+    lattice_step: float | None,
+    end_correction: bool,
+    air: AirProperties,
+    sum_terms: int,
 ) -> tuple[Complex, Complex, Complex, Complex, Complex, Complex, float]:
     """Duct parameters of the square resonator (APL Eqs. (A23)-(A26))."""
-    rho_n, kap_n = rectangular_duct_properties(
-        f, side=wn, air=air, sum_terms=sum_terms
-    )
-    rho_c, kap_c = rectangular_duct_properties(
-        f, side=wc, air=air, sum_terms=sum_terms
-    )
+    rho_n, kap_n = rectangular_duct_properties(f, side=wn, air=air, sum_terms=sum_terms)
+    rho_c, kap_c = rectangular_duct_properties(f, side=wc, air=air, sum_terms=sum_terms)
     z_n = np.asarray(np.sqrt(kap_n * rho_n) / wn**2, dtype=np.complex128)
     z_c = np.asarray(np.sqrt(kap_c * rho_c) / wc**2, dtype=np.complex128)
     dl = 0.0
@@ -356,7 +357,8 @@ def _square_resonator_ducts(
         dl = _neck_cavity_correction(wn, wc)
         if slit_height is not None and lattice_step is not None:
             dl += _neck_slit_correction(
-                wn, require_positive(slit_height, "slit_height"),
+                wn,
+                require_positive(slit_height, "slit_height"),
                 require_positive(lattice_step, "lattice_step"),
             )
     return rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl
@@ -428,27 +430,33 @@ def helmholtz_resonator_impedance(
     omega = 2.0 * np.pi * f
     if geometry == "slit":
         rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl = _slit_resonator_ducts(
-            f, wn, wc, slit_height, lattice_step, end_correction, air,
+            f,
+            wn,
+            wc,
+            slit_height,
+            lattice_step,
+            end_correction,
+            air,
         )
     else:
         rho_n, kap_n, rho_c, kap_c, z_n, z_c, dl = _square_resonator_ducts(
-            f, wn, wc, slit_height, lattice_step, end_correction,
-            air, sum_terms,
+            f,
+            wn,
+            wc,
+            slit_height,
+            lattice_step,
+            end_correction,
+            air,
+            sum_terms,
         )
     k_n = omega * np.sqrt(rho_n / kap_n)
     k_c = omega * np.sqrt(rho_c / kap_c)
     cos_n, sin_n = np.cos(k_n * ln), np.sin(k_n * ln)
     cos_c, sin_c = np.cos(k_c * lc), np.sin(k_c * lc)
     num = (
-        cos_n * cos_c
-        - z_n * k_n * dl * cos_n * sin_c / z_c
-        - z_n * sin_n * sin_c / z_c
+        cos_n * cos_c - z_n * k_n * dl * cos_n * sin_c / z_c - z_n * sin_n * sin_c / z_c
     )
-    den = (
-        sin_n * cos_c / z_n
-        - k_n * dl * sin_n * sin_c / z_c
-        + cos_n * sin_c / z_c
-    )
+    den = sin_n * cos_c / z_n - k_n * dl * sin_n * sin_c / z_c + cos_n * sin_c / z_c
     return np.asarray(-1j * num / den, dtype=np.complex128)
 
 
@@ -489,7 +497,9 @@ class SlitResonatorAbsorberResult:
     lattice_step: float | None = None
     period: float | None = None
 
-    def plot(self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any) -> Axes:
+    def plot(
+        self, ax: Axes | None = None, *, language: str = "en", **kwargs: Any
+    ) -> Axes:
         """Plot the absorption spectrum ``alpha(f)`` with ``|R|`` overlaid.
 
         Requires matplotlib (``pip install phonometry[plot]``); returns the
@@ -520,11 +530,17 @@ class SlitResonatorAbsorberResult:
         )
 
 
-def _slit_radiation_length(slit_height: float, period: float, terms: int = 400) -> float:
+def _slit_radiation_length(
+    slit_height: float, period: float, terms: int = 400
+) -> float:
     """Slit-to-free-air radiation end correction ``Delta l_slit`` (APL Eq. (A27))."""
     phit = slit_height / period
     n = np.arange(1, terms + 1)
-    return float(slit_height * phit * np.sum(np.sin(n * np.pi * phit) ** 2 / (n * np.pi * phit) ** 3))
+    return float(
+        slit_height
+        * phit
+        * np.sum(np.sin(n * np.pi * phit) ** 2 / (n * np.pi * phit) ** 3)
+    )
 
 
 def _panel_transfer_matrix(
@@ -563,8 +579,12 @@ def _panel_transfer_matrix(
     total = np.array([[ones, z_dl], [zeros, ones]])
     for res in resonators:
         z_hr = helmholtz_resonator_impedance(
-            f, res, slit_height=slit_height, lattice_step=lattice_step,
-            end_correction=end_correction, geometry=resonator_geometry,
+            f,
+            res,
+            slit_height=slit_height,
+            lattice_step=lattice_step,
+            end_correction=end_correction,
+            geometry=resonator_geometry,
             air=air,
         )
         m_hr = np.array([[ones, zeros], [ones / z_hr, ones]])
@@ -577,8 +597,14 @@ def _matmul(a: Complex, b: Complex) -> Complex:
     """Frequency-wise product of two ``(2, 2, nf)`` chain matrices."""
     return np.asarray(
         [
-            [a[0, 0] * b[0, 0] + a[0, 1] * b[1, 0], a[0, 0] * b[0, 1] + a[0, 1] * b[1, 1]],
-            [a[1, 0] * b[0, 0] + a[1, 1] * b[1, 0], a[1, 0] * b[0, 1] + a[1, 1] * b[1, 1]],
+            [
+                a[0, 0] * b[0, 0] + a[0, 1] * b[1, 0],
+                a[0, 0] * b[0, 1] + a[0, 1] * b[1, 1],
+            ],
+            [
+                a[1, 0] * b[0, 0] + a[1, 1] * b[1, 0],
+                a[1, 0] * b[0, 1] + a[1, 1] * b[1, 1],
+            ],
         ],
         dtype=np.complex128,
     )
@@ -586,7 +612,9 @@ def _matmul(a: Complex, b: Complex) -> Complex:
 
 def slit_helmholtz_absorber(
     frequency: ArrayLike,
-    resonators: HelmholtzResonator | list[HelmholtzResonator] | tuple[HelmholtzResonator, ...],
+    resonators: HelmholtzResonator
+    | list[HelmholtzResonator]
+    | tuple[HelmholtzResonator, ...],
     *,
     slit_height: float,
     lattice_step: float,
@@ -652,9 +680,15 @@ def slit_helmholtz_absorber(
 
     omega = 2.0 * np.pi * f
     tm = _panel_transfer_matrix(
-        omega, res, slit_height=h, lattice_step=a, period=d,
-        slit_radiation=slit_radiation, end_correction=end_correction,
-        resonator_geometry=resonator_geometry, air=air,
+        omega,
+        res,
+        slit_height=h,
+        lattice_step=a,
+        period=d,
+        slit_radiation=slit_radiation,
+        end_correction=end_correction,
+        resonator_geometry=resonator_geometry,
+        air=air,
     )
     t11, t12, t21, t22 = tm[0, 0], tm[0, 1], tm[1, 0], tm[1, 1]
     area_cell = d * a
@@ -720,9 +754,15 @@ def _acoustic_surface_impedance(
     r"""Acoustic surface impedance :math:`Z = T_{11} / T_{21}` at ``f0``."""
     omega = np.array([2.0 * np.pi * f0], dtype=np.float64)
     tm = _panel_transfer_matrix(
-        omega, (resonator,), slit_height=slit_height, lattice_step=lattice_step,
-        period=period, slit_radiation=slit_radiation, end_correction=end_correction,
-        resonator_geometry="square", air=air,
+        omega,
+        (resonator,),
+        slit_height=slit_height,
+        lattice_step=lattice_step,
+        period=period,
+        slit_radiation=slit_radiation,
+        end_correction=end_correction,
+        resonator_geometry="square",
+        air=air,
     )
     return complex(tm[0, 0][0] / tm[1, 0][0])
 
@@ -789,24 +829,38 @@ def critical_coupling_design(
         lc, h = float(x[0]), float(x[1])
         if not (lc_lo <= lc <= lc_hi and h_lo <= h <= h_hi and h <= d):
             return [1e6, 1e6]
-        cand = HelmholtzResonator(resonator.neck_length, resonator.neck_side, lc, resonator.cavity_side)
+        cand = HelmholtzResonator(
+            resonator.neck_length, resonator.neck_side, lc, resonator.cavity_side
+        )
         z = _acoustic_surface_impedance(
-            f0, cand, slit_height=h, lattice_step=a, period=d,
-            end_correction=end_correction, slit_radiation=slit_radiation,
+            f0,
+            cand,
+            slit_height=h,
+            lattice_step=a,
+            period=d,
+            end_correction=end_correction,
+            slit_radiation=slit_radiation,
             air=air,
         )
         diff = z * cos_t - z0
         return [diff.real / z0, diff.imag / z0]
 
-    guess = np.array([require_positive(resonator.cavity_length, "cavity_length"), 1.0e-3])
+    guess = np.array(
+        [require_positive(resonator.cavity_length, "cavity_length"), 1.0e-3]
+    )
     sol = root(residual, guess, method="hybr", tol=1e-10)
     lc_opt, h_opt = float(sol.x[0]), float(sol.x[1])
     designed = HelmholtzResonator(
         resonator.neck_length, resonator.neck_side, lc_opt, resonator.cavity_side
     )
     z_final = _acoustic_surface_impedance(
-        f0, designed, slit_height=h_opt, lattice_step=a, period=d,
-        end_correction=end_correction, slit_radiation=slit_radiation,
+        f0,
+        designed,
+        slit_height=h_opt,
+        lattice_step=a,
+        period=d,
+        end_correction=end_correction,
+        slit_radiation=slit_radiation,
         air=air,
     )
     r = (z_final * cos_t - z0) / (z_final * cos_t + z0)

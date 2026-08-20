@@ -52,8 +52,8 @@ _DECIMAL = re.compile(r"\d\.\d")
 #: last group is why this list is bilingual: a Spanish label writes "apartado
 #: 8.2" and "Ec. 9.52", and neither number is a quantity.
 _NOT_A_MEASUREMENT = re.compile(
-    r"\d+\.\d+\.\d"                     # 5.3.3
-    r"|[A-Z]\d*\.\d"                    # S3.5
+    r"\d+\.\d+\.\d"  # 5.3.3
+    r"|[A-Z]\d*\.\d"  # S3.5
     r"|(?:ISO|IEC|EN|UNE|ANSI|ASTM|AES|ITU|EBU|ECMA|DIN|BS)[\s\d.\-]*\d\.\d"
     r"|(?i:"
     r"Eq\.|Ec\.|Ecuaci[oó]n|Equation"
@@ -97,10 +97,10 @@ def at_risk(text: str) -> str | None:
     rest = "".join(outside)
     rest = _PLACEHOLDER.sub(" ", rest)
     for match in _DECIMAL.finditer(rest):
-        window = rest[max(0, match.start() - 12):match.end() + 6]
+        window = rest[max(0, match.start() - 12) : match.end() + 6]
         if _NOT_A_MEASUREMENT.search(window):
             continue
-        return rest[max(0, match.start() - 20):match.end() + 12].strip()
+        return rest[max(0, match.start() - 20) : match.end() + 12].strip()
     return None
 
 
@@ -126,7 +126,9 @@ def check(paths: list[pathlib.Path]) -> list[tuple[str, int, str, str]]:
             if not isinstance(node, ast.Dict):
                 continue
             for key, value in zip(node.keys, node.values, strict=False):
-                if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+                if not isinstance(value, ast.Constant) or not isinstance(
+                    value.value, str
+                ):
                     continue
                 if not isinstance(key, ast.Constant) or not isinstance(key.value, str):
                     continue
@@ -148,20 +150,28 @@ def main(argv: list[str] | None = None) -> int:
 
     found = check(paths)
     if not found:
-        print(f"No label in {len(paths)} files mixes mathematics with a "
-              f"hard-coded decimal.")
+        print(
+            f"No label in {len(paths)} files mixes mathematics with a "
+            f"hard-coded decimal."
+        )
         return 0
 
-    print(f"{len(found)} label(s) would keep an English decimal point in "
-          f"Spanish:\n", file=sys.stderr)
+    print(
+        f"{len(found)} label(s) would keep an English decimal point in Spanish:\n",
+        file=sys.stderr,
+    )
     for path, line, text, risky in found:
         print(f"  {path}:{line}", file=sys.stderr)
         print(f"      {text!r}", file=sys.stderr)
-        print(f"      the maths blocks the comma pass, so {risky!r} keeps its "
-              f"point", file=sys.stderr)
-    print("\nEither bake the comma into the Spanish value, or format the number "
-          "through format_number(value, language), which localises itself.",
-          file=sys.stderr)
+        print(
+            f"      the maths blocks the comma pass, so {risky!r} keeps its point",
+            file=sys.stderr,
+        )
+    print(
+        "\nEither bake the comma into the Spanish value, or format the number "
+        "through format_number(value, language), which localises itself.",
+        file=sys.stderr,
+    )
     return 1
 
 

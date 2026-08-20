@@ -78,8 +78,8 @@ def test_hann_scalloping_matches_continuous_limit() -> None:
 @pytest.mark.parametrize(
     ("window", "sidelobe_db", "tol"),
     [
-        ("boxcar", -13.3, 0.05),   # Harris Table 1: -13 dB (exact -13.26)
-        ("hann", -31.5, 0.05),     # Harris Table 1: -32 dB (exact -31.47)
+        ("boxcar", -13.3, 0.05),  # Harris Table 1: -13 dB (exact -13.26)
+        ("hann", -31.5, 0.05),  # Harris Table 1: -32 dB (exact -31.47)
         ("hamming", -42.7, 0.15),  # Harris Table 1: -43 dB (exact -42.68)
     ],
 )
@@ -94,9 +94,7 @@ def test_highest_sidelobe_matches_classic_values(
     ("window", "width"),
     [("boxcar", 0.89), ("hann", 1.44), ("hamming", 1.30)],
 )
-def test_mainlobe_3db_width_matches_harris_table(
-    window: str, width: float
-) -> None:
+def test_mainlobe_3db_width_matches_harris_table(window: str, width: float) -> None:
     res = ph.signals.window_metrics(window, N)
     assert res.mainlobe_width_3db_bins == pytest.approx(width, abs=0.01)
 
@@ -105,9 +103,7 @@ def test_worst_case_processing_loss() -> None:
     # WCPL = scalloping loss + 10·lg(ENBW): 3.92 dB rectangular (no ENBW
     # term), 3.18 dB Hann (Harris Table 1).
     rect = ph.signals.window_metrics("boxcar", N)
-    assert rect.worst_case_processing_loss_db == pytest.approx(
-        rect.scalloping_loss_db
-    )
+    assert rect.worst_case_processing_loss_db == pytest.approx(rect.scalloping_loss_db)
     hann = ph.signals.window_metrics("hann", N)
     assert hann.worst_case_processing_loss_db == pytest.approx(3.18, abs=0.01)
 
@@ -119,9 +115,7 @@ def test_enbw_hz_matches_welch_resolution_bandwidth() -> None:
     x = ph.signals.noise_signal(fs, 1.0, seed=6)
     psd = ph.signals.power_spectral_density(x, fs, nperseg=nperseg)
     metrics = ph.signals.window_metrics("hann", nperseg)
-    assert psd.resolution_bandwidth == pytest.approx(
-        metrics.enbw_hz(fs), rel=1e-12
-    )
+    assert psd.resolution_bandwidth == pytest.approx(metrics.enbw_hz(fs), rel=1e-12)
 
 
 def test_parametric_windows_are_accepted() -> None:
@@ -159,7 +153,6 @@ def test_window_metrics_plot_two_panels_and_single_axes() -> None:
     assert out is ax
     red = plt.matplotlib.colors.to_rgba("red")
     assert any(
-        plt.matplotlib.colors.to_rgba(line.get_color()) == red
-        for line in ax.lines
+        plt.matplotlib.colors.to_rgba(line.get_color()) == red for line in ax.lines
     )
     plt.close("all")

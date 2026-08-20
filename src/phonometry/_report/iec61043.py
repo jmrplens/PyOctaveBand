@@ -121,9 +121,7 @@ def _metadata_pairs(
         (t("Date of test", language), metadata.test_date),
     ]
     return [
-        (label, html.escape(str(value)))
-        for label, value in specs
-        if value is not None
+        (label, html.escape(str(value))) for label, value in specs if value is not None
     ]
 
 
@@ -260,9 +258,7 @@ def _verdict(
     strict, i.e. an overall class index of ``N`` or lower (class 1 is the
     stricter of the two).
     """
-    passed = (
-        result.overall_class is not None and result.overall_class <= required_class
-    )
+    passed = result.overall_class is not None and result.overall_class <= required_class
     achieved = (
         t("none", language)
         if result.overall_class is None
@@ -337,9 +333,7 @@ def render_iec61043_report(
         result.plot, 92 * mm, y_top=None, figsize=(5.2, 7.2), language=language
     )
     flow.append(
-        two_panel_body(
-            left_cell, plot_drawing, left_width_mm=80.0, plot_width_mm=94.0
-        )
+        two_panel_body(left_cell, plot_drawing, left_width_mm=80.0, plot_width_mm=94.0)
     )
     flow.append(Spacer(1, 8))
 

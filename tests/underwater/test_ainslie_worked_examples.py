@@ -57,8 +57,9 @@ def test_example_3_2_3_8_narrowband_passive_fom() -> None:
     """
     sl, nl_f, ag, dt, bw = _db(2.44e13), _db(9.26e5), _db(14.2), _db(23.8), _db(0.250)
     # In-band noise level = spectrum level + bandwidth term.
-    res = passive_sonar_equation(sl, [0.0], nl_f + bw, directivity_index=ag,
-                                 detection_threshold=dt)
+    res = passive_sonar_equation(
+        sl, [0.0], nl_f + bw, directivity_index=ag, detection_threshold=dt
+    )
     assert res.figure_of_merit == pytest.approx(sl + (ag - bw) - nl_f - dt, rel=1e-12)
     assert res.figure_of_merit == pytest.approx(78.0, abs=0.05)
 
@@ -76,8 +77,9 @@ def test_example_3_2_4_8_broadband_passive_fom() -> None:
     """Table 3.2 -> FOM_BB = SLf − (NLf − AGm) − DT = 79.0 dB re m² (Eq. 3.145)."""
     sl_f, nl_f, ag_m, dt = _db(1.22e10), _db(2.09e5), _db(19.0), _db(1.38e-2)
     assert dt == pytest.approx(-18.6, abs=0.05)
-    res = passive_sonar_equation(sl_f, [0.0], nl_f, directivity_index=ag_m,
-                                 detection_threshold=dt)
+    res = passive_sonar_equation(
+        sl_f, [0.0], nl_f, directivity_index=ag_m, detection_threshold=dt
+    )
     assert res.figure_of_merit == pytest.approx(79.0, abs=0.06)
 
 
@@ -90,8 +92,9 @@ def test_example_3_3_3_8_active_cw_fom_and_minimum_sphere() -> None:
     ts_e = 10.0 * np.log10(6.10**2 / 4.0)
     assert ts_e == pytest.approx(9.7, abs=0.05)
     sl_e, nl_f, ag, dt = _db(2.00e19), _db(1.97e4), _db(99.1), _db(26.8)
-    res = active_sonar_equation(sl_e, [0.0], ts_e, nl_f, directivity_index=ag,
-                                detection_threshold=dt)
+    res = active_sonar_equation(
+        sl_e, [0.0], ts_e, nl_f, directivity_index=ag, detection_threshold=dt
+    )
     assert res.figure_of_merit == pytest.approx(82.7, abs=0.05)
     # The FOM is by definition the propagation loss at r50 = 1.3 km, and the
     # printed propagation factor there is F = 5.34e-9 m⁻².
@@ -133,15 +136,17 @@ def test_example_3_3_4_8_energy_detector() -> None:
 
 def test_example_11_2_8_nwp_winter_fom() -> None:
     """Table 11.3 -> FOM_NB = 133.9 + (11.1 − (−6.0)) − 64.2 − 13.0 = 73.8 dB re m²."""
-    res = passive_sonar_equation(133.9, [0.0], 64.2 + (-6.0), directivity_index=11.1,
-                                 detection_threshold=13.0)
+    res = passive_sonar_equation(
+        133.9, [0.0], 64.2 + (-6.0), directivity_index=11.1, detection_threshold=13.0
+    )
     assert res.figure_of_merit == pytest.approx(73.8, abs=1e-9)
 
 
 def test_example_11_3_7_shallow_water_sand_fom() -> None:
     """Table 11.5 -> FOM_BB = 100.9 − (51.7 − 14.0) − (−6.6) = 69.8 dB re m²."""
-    res = passive_sonar_equation(100.9, [0.0], 51.7, directivity_index=14.0,
-                                 detection_threshold=-6.6)
+    res = passive_sonar_equation(
+        100.9, [0.0], 51.7, directivity_index=14.0, detection_threshold=-6.6
+    )
     assert res.figure_of_merit == pytest.approx(69.8, abs=1e-9)
     # The source spectrum level is unchanged from the Chapter 3 broadband example.
     assert _db(1.22e10) == pytest.approx(100.9, abs=0.05)
@@ -162,8 +167,9 @@ def test_example_11_4_6_target_strength_of_the_salmon() -> None:
 
 def test_example_11_4_6_noise_limited_fom() -> None:
     """Table 11.7 -> FOM = (SL + TS − NL + AG − DT)/2 = 51.0 dB re m² (Eq. 11.175)."""
-    res = active_sonar_equation(198.2, [0.0], -29.0, 75.0, directivity_index=16.5,
-                                detection_threshold=8.7)
+    res = active_sonar_equation(
+        198.2, [0.0], -29.0, 75.0, directivity_index=16.5, detection_threshold=8.7
+    )
     assert res.figure_of_merit == pytest.approx(51.0, abs=1e-9)
 
 
@@ -184,8 +190,9 @@ def test_example_11_4_6_detection_ranges_versus_wind_speed(
     Ainslie's broadband propagation model.
     """
     noise = 75.0 + 22.4 * np.log10(wind_speed / 2.0)
-    fom = active_sonar_equation(198.2, [0.0], -29.0, noise, directivity_index=16.5,
-                                detection_threshold=8.7).figure_of_merit
+    fom = active_sonar_equation(
+        198.2, [0.0], -29.0, noise, directivity_index=16.5, detection_threshold=8.7
+    ).figure_of_merit
     res = detection_range(fom, 50e3)
     assert res.detection_range == pytest.approx(printed_range, rel=0.05)
 
@@ -211,12 +218,16 @@ def test_detection_range_matches_the_loss_it_inverts() -> None:
 
 
 def test_detection_range_is_infinite_when_the_loss_never_reaches_the_fom() -> None:
-    assert detection_range(300.0, 100e3, max_range=1000.0).detection_range == float("inf")
+    assert detection_range(300.0, 100e3, max_range=1000.0).detection_range == float(
+        "inf"
+    )
 
 
 def test_detection_range_saturates_at_zero_below_the_search_floor() -> None:
     """Spherical spreading is −60 dB at 1 mm, so any lower FOM has no root."""
-    assert detection_range(-10.0, 1000.0).detection_range == pytest.approx(0.3162, abs=1e-3)
+    assert detection_range(-10.0, 1000.0).detection_range == pytest.approx(
+        0.3162, abs=1e-3
+    )
     assert detection_range(-100.0, 1000.0).detection_range == 0.0
 
 
@@ -230,19 +241,19 @@ def test_detection_range_from_curve_handles_multiple_crossings() -> None:
     """Ainslie §11.2.8 warns that an oscillatory loss crosses the FOM repeatedly."""
     ranges = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     losses = np.array([40.0, 60.0, 40.0, 60.0, 70.0])
-    assert detection_range_from_curve(50.0, ranges, losses, crossing="first") == pytest.approx(1.5)
-    assert detection_range_from_curve(50.0, ranges, losses, crossing="last") == pytest.approx(3.5)
+    assert detection_range_from_curve(
+        50.0, ranges, losses, crossing="first"
+    ) == pytest.approx(1.5)
+    assert detection_range_from_curve(
+        50.0, ranges, losses, crossing="last"
+    ) == pytest.approx(3.5)
 
 
 def test_detection_range_from_curve_without_a_crossing() -> None:
     """A loss that stays below the figure of merit is detectable past the grid."""
-    assert detection_range_from_curve(
-        60.0, [1.0, 2.0], [40.0, 50.0]
-    ) == float("inf")
+    assert detection_range_from_curve(60.0, [1.0, 2.0], [40.0, 50.0]) == float("inf")
     # Descending through the figure of merit: still below it at the far end.
-    assert detection_range_from_curve(
-        60.0, [1.0, 2.0], [70.0, 50.0]
-    ) == float("inf")
+    assert detection_range_from_curve(60.0, [1.0, 2.0], [70.0, 50.0]) == float("inf")
 
 
 def test_both_solvers_return_zero_when_the_target_is_undetectable_everywhere() -> None:
@@ -257,9 +268,12 @@ def test_both_solvers_return_zero_when_the_target_is_undetectable_everywhere() -
     res = detection_range(-100.0, 1000.0)
     assert res.detection_range == 0.0
     assert float(res.propagation_loss.min()) > res.figure_of_merit
-    assert detection_range_from_curve(
-        res.figure_of_merit, res.range_m, res.propagation_loss
-    ) == 0.0
+    assert (
+        detection_range_from_curve(
+            res.figure_of_merit, res.range_m, res.propagation_loss
+        )
+        == 0.0
+    )
     # And directly, on a plain rising curve entirely above the figure of merit.
     assert detection_range_from_curve(20.0, [1.0, 2.0, 3.0], [50.0, 58.0, 70.0]) == 0.0
 
@@ -271,8 +285,9 @@ def test_detection_range_from_curve_bridges_a_numerical_model() -> None:
     depths = np.array([0.0, 100.0])
     speeds = np.array([1500.0, 1500.0])
     ranges = np.linspace(100.0, 20_000.0, 800)
-    nm = normal_modes(200.0, depths, speeds, source_depth=40.0, receiver_depth=60.0,
-                      ranges_m=ranges)
+    nm = normal_modes(
+        200.0, depths, speeds, source_depth=40.0, receiver_depth=60.0, ranges_m=ranges
+    )
     got = detection_range_from_curve(60.0, nm.ranges, nm.propagation_loss)
     assert 100.0 < got < 20_000.0
 

@@ -60,8 +60,12 @@ def _db_waveform(y: np.ndarray, calibrated: bool) -> np.ndarray:
 
 
 def _draw_channels(
-    axw: Axes, t: np.ndarray, y: np.ndarray, result: Signal,
-    language: str, kwargs: dict[str, Any],
+    axw: Axes,
+    t: np.ndarray,
+    y: np.ndarray,
+    result: Signal,
+    language: str,
+    kwargs: dict[str, Any],
 ) -> None:
     """Draw one line per channel, labelled and with a legend when there are several."""
     if result.n_channels == 1:
@@ -73,18 +77,25 @@ def _draw_channels(
         # so a caller who passes one through **kwargs would otherwise hit
         # "got multiple values for keyword argument 'label'". Theirs wins.
         per_channel = dict(kwargs)
-        per_channel.setdefault("label", (
-            result.channel_labels[index]
-            if result.channel_labels is not None
-            else _t("Channel {n}", language, n=index + 1)
-        ))
+        per_channel.setdefault(
+            "label",
+            (
+                result.channel_labels[index]
+                if result.channel_labels is not None
+                else _t("Channel {n}", language, n=index + 1)
+            ),
+        )
         axw.plot(t, channel, **per_channel)
     axw.legend(loc=_LEGEND_UPPER_RIGHT, fontsize="small")
 
 
 def plot_signal(
-    result: Signal, ax: Axes | None = None, *,
-    language: str = "en", scale: str = "linear", **kwargs: Any
+    result: Signal,
+    ax: Axes | None = None,
+    *,
+    language: str = "en",
+    scale: str = "linear",
+    **kwargs: Any,
 ) -> Axes:
     """Waveform of a :class:`~phonometry.io.Signal`, calibrated when it can be.
 
@@ -133,8 +144,6 @@ def plot_signal(
     axw.set_ylabel(_t(ylabel, language))
     axw.grid(True, alpha=0.3)
     if new_figure:
-        axw.set_title(_t(
-            "Calibrated waveform" if calibrated else "Waveform", language
-        ))
+        axw.set_title(_t("Calibrated waveform" if calibrated else "Waveform", language))
     localize_axes(axw, language)
     return axw
